@@ -18,84 +18,83 @@ import {
   getMediaClipTimelineRangeRect,
 } from './mediaClipTimelineModel.js';
 import { normalizeText, readLayoutWidthPx, stopPointer, toNumber } from './mediaClipUtils.js';
-function mediaClipText(_0x576662, _0x2b08d7 = {}) {
-  return t('mediaClip.' + _0x576662, _0x2b08d7);
+function mediaClipText(value, item = {}) {
+  return t('mediaClip.' + value, item);
 }
-function timelineEditClipIndex(_0x2b7251 = null) {
-  return Math['max'](0x0, Math['trunc'](toNumber(_0x2b7251?.['clipIndex'], 0x0)));
+function timelineEditClipIndex(value2 = null) {
+  return Math['max'](0x0, Math['trunc'](toNumber(value2?.['clipIndex'], 0x0)));
 }
-function timelineEditClips(_0x2b6e71 = null) {
-  return Array['isArray'](_0x2b6e71?.['startClips']) ? _0x2b6e71['startClips'] : [];
+function timelineEditClips(value3 = null) {
+  return Array['isArray'](value3?.['startClips']) ? value3['startClips'] : [];
 }
-function timelineEditBaseState(_0x3bc7ea = {}, _0x180863 = 'video', _0x34ab9b = null) {
-  const _0x3779c0 = timelineEditClips(_0x34ab9b);
+function timelineEditBaseState(args = {}, key = 'video', index = null) {
+  const audioClips = timelineEditClips(index);
   return {
-    ..._0x3bc7ea,
-    ...(_0x180863 === 'audio' ? { audioClips: _0x3779c0 } : { clips: _0x3779c0 }),
-    tracks: { ...(_0x3bc7ea['tracks'] || {}), [_0x180863]: _0x34ab9b?.['startTrack'] },
+    ...args,
+    ...(key === 'audio' ? { audioClips: audioClips } : { clips: audioClips }),
+    tracks: { ...(args['tracks'] || {}), [key]: index?.['startTrack'] },
   };
 }
-function findCommittedClipIndex(_0x406ec7 = {}, _0x29a80f = 'video', _0x3ecf3e = null, _0x324457 = -0x1) {
-  const _0x57ea47 = timelineEditClipIndex(_0x3ecf3e),
-    _0x5c8f44 = timelineEditClips(_0x3ecf3e),
-    _0x3ac975 = normalizeText(_0x5c8f44[_0x57ea47]?.['id']);
-  if (!_0x3ac975) return _0x324457;
-  const _0x3d1e26 = _0x29a80f === 'audio' ? _0x406ec7['audioClips'] : _0x406ec7['clips'];
-  return _0x3d1e26?.['findIndex']((_0x13ab31) => normalizeText(_0x13ab31?.['id']) === _0x3ac975) ?? _0x324457;
+function findCommittedClipIndex(options = {}, result = 'video', data = null, target = -0x1) {
+  const timelineEditClipIndex2 = timelineEditClipIndex(data),
+    timelineEditClips2 = timelineEditClips(data),
+    text = normalizeText(timelineEditClips2[timelineEditClipIndex2]?.['id']);
+  if (!text) return target;
+  const list = result === 'audio' ? options['audioClips'] : options['clips'];
+  return list?.['findIndex']((source) => normalizeText(source?.['id']) === text) ?? target;
 }
-function buildFirstVideoLeftTrimPreviewState(_0x219454 = {}, _0xe9f59 = {}, _0x42d2bb = {}) {
-  const _0x2731c3 = timelineEditClips(_0xe9f59),
-    _0x4e67fe = timelineEditClipIndex(_0xe9f59),
-    _0x581273 = _0x2731c3[_0x4e67fe] || {},
-    _0x3a19db = Math['max'](
+function buildFirstVideoLeftTrimPreviewState(args2 = {}, next = {}, startSec = {}) {
+  const list2 = timelineEditClips(next),
+    timelineEditClipIndex3 = timelineEditClipIndex(next),
+    current = list2[timelineEditClipIndex3] || {},
+    entry = Math['max'](
       0x0,
-      toNumber(_0x42d2bb['endSec'], _0x581273['endSec']) -
-        toNumber(_0x42d2bb['startSec'], _0x581273['startSec']),
+      toNumber(startSec['endSec'], current['endSec']) - toNumber(startSec['startSec'], current['startSec']),
     ),
-    _0xc4e677 = Math['max'](
+    record = Math['max'](
       0x0,
       toNumber(
-        _0x581273['timelineEndSec'],
-        toNumber(_0x581273['timelineStartSec'], 0x0) +
-          Math['max'](0x0, toNumber(_0x581273['endSec'], 0x0) - toNumber(_0x581273['startSec'], 0x0)),
+        current['timelineEndSec'],
+        toNumber(current['timelineStartSec'], 0x0) +
+          Math['max'](0x0, toNumber(current['endSec'], 0x0) - toNumber(current['startSec'], 0x0)),
       ),
     ),
-    _0x41a2a8 = _0xc4e677 - _0x3a19db,
-    _0x146517 = _0x41a2a8 + _0x3a19db,
-    _0x455796 = _0x2731c3['map']((_0x5f5a94, _0x9569ae) =>
-      _0x9569ae === _0x4e67fe
+    payload = record - entry,
+    handle = payload + entry,
+    clips = list2['map']((args3, state) =>
+      state === timelineEditClipIndex3
         ? {
-            ..._0x5f5a94,
-            startSec: _0x42d2bb['startSec'],
-            endSec: _0x42d2bb['endSec'],
-            timelineStartSec: Math['round'](_0x41a2a8 * 0x3e8) / 0x3e8,
-            timelineEndSec: Math['round'](_0x146517 * 0x3e8) / 0x3e8,
+            ...args3,
+            startSec: startSec['startSec'],
+            endSec: startSec['endSec'],
+            timelineStartSec: Math['round'](payload * 0x3e8) / 0x3e8,
+            timelineEndSec: Math['round'](handle * 0x3e8) / 0x3e8,
           }
-        : { ..._0x5f5a94 },
+        : { ...args3 },
     );
   return {
-    ..._0x219454,
-    clips: _0x455796,
+    ...args2,
+    clips: clips,
     tracks: {
-      ...(_0x219454['tracks'] || {}),
+      ...(args2['tracks'] || {}),
       video: {
-        ...(_0xe9f59['startTrack'] || {}),
-        startSec: _0x42d2bb['startSec'],
-        endSec: _0x42d2bb['endSec'],
+        ...(next['startTrack'] || {}),
+        startSec: startSec['startSec'],
+        endSec: startSec['endSec'],
       },
     },
   };
 }
-export function isMediaClipVideoLeftTrimDrag(_0x290303 = null) {
-  const _0x2e900b = timelineEditClipIndex(_0x290303);
+export function isMediaClipVideoLeftTrimDrag(value4 = null) {
+  const timelineEditClipIndex4 = timelineEditClipIndex(value4);
   return (
-    _0x290303?.['kind'] === 'video' &&
-    _0x290303?.['side'] === 'left' &&
-    !!timelineEditClips(_0x290303)[_0x2e900b]
+    value4?.['kind'] === 'video' &&
+    value4?.['side'] === 'left' &&
+    !!timelineEditClips(value4)[timelineEditClipIndex4]
   );
 }
-export function isMediaClipRollingVideoLeftTrimDrag(_0x97de0e = null) {
-  return isMediaClipVideoLeftTrimDrag(_0x97de0e) && timelineEditClipIndex(_0x97de0e) > 0x0;
+export function isMediaClipRollingVideoLeftTrimDrag(value5 = null) {
+  return isMediaClipVideoLeftTrimDrag(value5) && timelineEditClipIndex(value5) > 0x0;
 }
 export function resolveMediaClipTimelineTrimPreview({
   mediaClip: mediaClip = {},
@@ -104,51 +103,52 @@ export function resolveMediaClipTimelineTrimPreview({
   deltaSec: deltaSec = 0x0,
   durationSec: durationSec = 0x0,
 } = {}) {
-  const _0x225c26 = timelineEditClipIndex(drag),
-    _0xebe410 = timelineEditClips(drag),
-    _0x34334c = _0xebe410[_0x225c26];
-  if (!_0x34334c) return null;
-  const _0x4158a1 =
+  const clipIndex = timelineEditClipIndex(drag),
+    timelineEditClips3 = timelineEditClips(drag),
+    startSec2 = timelineEditClips3[clipIndex];
+  if (!startSec2) return null;
+  const args4 =
       drag?.['side'] === 'left'
-        ? { startSec: _0x34334c['startSec'] + deltaSec }
-        : { endSec: _0x34334c['endSec'] + deltaSec },
-    _0x3982ce = clampMediaClipRange({ ..._0x34334c, ..._0x4158a1 }, _0x34334c['durationSec']),
-    _0x12f972 = { startSec: _0x3982ce['startSec'], endSec: _0x3982ce['endSec'] },
-    _0x473eb4 = timelineEditBaseState(mediaClip, kind, drag);
-  let _0x483579,
-    _0x406f0f = null;
-  if (kind === 'audio') _0x483579 = patchMediaClipAudioClipRange(_0x473eb4, _0x225c26, _0x12f972);
+        ? { startSec: startSec2['startSec'] + deltaSec }
+        : { endSec: startSec2['endSec'] + deltaSec },
+    startSec3 = clampMediaClipRange({ ...startSec2, ...args4 }, startSec2['durationSec']),
+    args5 = { startSec: startSec3['startSec'], endSec: startSec3['endSec'] },
+    timelineEditBaseState2 = timelineEditBaseState(mediaClip, kind, drag);
+  let previewState,
+    pendingRollRange = null;
+  if (kind === 'audio') previewState = patchMediaClipAudioClipRange(timelineEditBaseState2, clipIndex, args5);
   else {
     if (isMediaClipRollingVideoLeftTrimDrag(drag))
-      ((_0x406f0f = { ..._0x12f972 }),
-        (_0x483579 = rollMediaClipVisualLeftTrim(_0x473eb4, _0x225c26, _0x12f972)));
+      ((pendingRollRange = { ...args5 }),
+        (previewState = rollMediaClipVisualLeftTrim(timelineEditBaseState2, clipIndex, args5)));
     else
       isMediaClipVideoLeftTrimDrag(drag)
-        ? (_0x483579 = buildFirstVideoLeftTrimPreviewState(_0x473eb4, drag, _0x3982ce))
-        : (_0x483579 = patchMediaClipClipRange(_0x473eb4, _0x225c26, _0x12f972));
+        ? (previewState = buildFirstVideoLeftTrimPreviewState(timelineEditBaseState2, drag, startSec3))
+        : (previewState = patchMediaClipClipRange(timelineEditBaseState2, clipIndex, args5));
   }
-  const _0x19c8c9 = (kind === 'audio' ? _0x483579['audioClips'] : _0x483579['clips']) || _0xebe410,
-    _0x371092 = _0x19c8c9[_0x225c26] || _0x34334c,
-    _0xd25ce5 = toNumber(_0x371092['timelineStartSec'], 0x0),
-    _0x133d6a = Math['max'](_0xd25ce5, toNumber(_0x371092['timelineEndSec'], _0xd25ce5)),
-    _0x1046d9 = {
-      startSec: toNumber(_0x371092['startSec'], _0x3982ce['startSec']),
-      endSec: toNumber(_0x371092['endSec'], _0x3982ce['endSec']),
+  const previewClips =
+      (kind === 'audio' ? previewState['audioClips'] : previewState['clips']) || timelineEditClips3,
+    previewClip = previewClips[clipIndex] || startSec2,
+    timelineStartSec = toNumber(previewClip['timelineStartSec'], 0x0),
+    timelineEndSec = Math['max'](timelineStartSec, toNumber(previewClip['timelineEndSec'], timelineStartSec)),
+    pendingRange = {
+      startSec: toNumber(previewClip['startSec'], startSec3['startSec']),
+      endSec: toNumber(previewClip['endSec'], startSec3['endSec']),
     };
   return {
     kind: kind,
-    clipIndex: _0x225c26,
-    previewState: _0x483579,
-    previewClips: _0x19c8c9,
-    previewClip: _0x371092,
-    pendingRange: _0x1046d9,
-    pendingRollRange: _0x406f0f,
-    pendingPlayheadSec: drag?.['side'] === 'left' ? _0xd25ce5 : _0x133d6a,
+    clipIndex: clipIndex,
+    previewState: previewState,
+    previewClips: previewClips,
+    previewClip: previewClip,
+    pendingRange: pendingRange,
+    pendingRollRange: pendingRollRange,
+    pendingPlayheadSec: drag?.['side'] === 'left' ? timelineStartSec : timelineEndSec,
     displayDurationSec: getMediaClipTimelineDisplayDuration(durationSec),
-    timelineStartSec: _0xd25ce5,
-    timelineEndSec: _0x133d6a,
-    clipDurationSec: Math['max'](0x0, _0x133d6a - _0xd25ce5),
-    sourcePreviewSec: drag?.['side'] === 'left' ? _0x1046d9['startSec'] : _0x1046d9['endSec'],
+    timelineStartSec: timelineStartSec,
+    timelineEndSec: timelineEndSec,
+    clipDurationSec: Math['max'](0x0, timelineEndSec - timelineStartSec),
+    sourcePreviewSec: drag?.['side'] === 'left' ? pendingRange['startSec'] : pendingRange['endSec'],
   };
 }
 export function resolveMediaClipTimelineMovePreview({
@@ -158,33 +158,39 @@ export function resolveMediaClipTimelineMovePreview({
   durationSec: durationSec = 0x0,
   laneIndex: laneIndex = null,
 } = {}) {
-  const _0x1837ed = timelineEditClipIndex(drag),
-    _0x24ad29 = timelineEditClips(drag)[_0x1837ed];
-  if (!_0x24ad29) return null;
-  const _0x56ba32 = getMediaClipTimelineDisplayDuration(durationSec),
-    _0x2c7451 = toNumber(_0x24ad29['timelineStartSec'], 0x0),
-    _0x1416de = Math['max'](_0x2c7451, toNumber(_0x24ad29['timelineEndSec'], _0x2c7451)),
-    _0x3ae5f3 = Math['max'](0.1, _0x1416de - _0x2c7451),
-    _0x4ed5b4 =
+  const clipIndex2 = timelineEditClipIndex(drag),
+    clip = timelineEditClips(drag)[clipIndex2];
+  if (!clip) return null;
+  const displayDurationSec = getMediaClipTimelineDisplayDuration(durationSec),
+    toNumber2 = toNumber(clip['timelineStartSec'], 0x0),
+    config = Math['max'](toNumber2, toNumber(clip['timelineEndSec'], toNumber2)),
+    clipDurationSec = Math['max'](0.1, config - toNumber2),
+    timelineStartSec2 =
       kind === 'video'
-        ? Math['max'](0x0, Math['min'](Math['max'](0x0, _0x56ba32 - _0x3ae5f3), _0x2c7451 + deltaSec))
-        : Math['max'](0x0, _0x2c7451 + deltaSec),
-    _0x458c88 = _0x4ed5b4 - _0x2c7451,
-    _0x3e6923 =
+        ? Math['max'](
+            0x0,
+            Math['min'](Math['max'](0x0, displayDurationSec - clipDurationSec), toNumber2 + deltaSec),
+          )
+        : Math['max'](0x0, toNumber2 + deltaSec),
+    pendingDeltaSec = timelineStartSec2 - toNumber2,
+    pendingLaneIndex =
       kind === 'audio' ? normalizeMediaClipAudioLaneIndex(laneIndex ?? drag?.['startLaneIndex']) : 0x0;
   return {
     kind: kind,
-    clipIndex: _0x1837ed,
-    clip: _0x24ad29,
-    displayDurationSec: _0x56ba32,
-    timelineStartSec: _0x4ed5b4,
-    timelineEndSec: _0x4ed5b4 + _0x3ae5f3,
-    clipDurationSec: _0x3ae5f3,
-    pendingDeltaSec: _0x458c88,
-    pendingLaneIndex: _0x3e6923,
+    clipIndex: clipIndex2,
+    clip: clip,
+    displayDurationSec: displayDurationSec,
+    timelineStartSec: timelineStartSec2,
+    timelineEndSec: timelineStartSec2 + clipDurationSec,
+    clipDurationSec: clipDurationSec,
+    pendingDeltaSec: pendingDeltaSec,
+    pendingLaneIndex: pendingLaneIndex,
     pendingPlayheadSec: Math['max'](
-      _0x4ed5b4,
-      Math['min'](_0x4ed5b4 + _0x3ae5f3, toNumber(drag?.['startPlayheadSec'], 0x0) + _0x458c88),
+      timelineStartSec2,
+      Math['min'](
+        timelineStartSec2 + clipDurationSec,
+        toNumber(drag?.['startPlayheadSec'], 0x0) + pendingDeltaSec,
+      ),
     ),
   };
 }
@@ -194,713 +200,747 @@ export function commitMediaClipTimelineEditTransaction({
   mode: mode = 'trim',
   drag: drag = null,
 } = {}) {
-  const _0x1a6197 = timelineEditClipIndex(drag),
-    _0x5939a9 = timelineEditClips(drag);
-  if (!_0x5939a9[_0x1a6197]) return null;
-  const _0x40a663 = timelineEditBaseState(mediaClip, kind, drag);
-  let _0x4f6ba7 = _0x40a663;
+  const timelineEditClipIndex5 = timelineEditClipIndex(drag),
+    timelineEditClips4 = timelineEditClips(drag);
+  if (!timelineEditClips4[timelineEditClipIndex5]) return null;
+  const timelineEditBaseState3 = timelineEditBaseState(mediaClip, kind, drag);
+  let mediaClip2 = timelineEditBaseState3;
   if (mode === 'trim' && kind === 'video')
-    _0x4f6ba7 = isMediaClipRollingVideoLeftTrimDrag(drag)
+    mediaClip2 = isMediaClipRollingVideoLeftTrimDrag(drag)
       ? rollMediaClipVisualLeftTrim(
-          _0x40a663,
-          _0x1a6197,
+          timelineEditBaseState3,
+          timelineEditClipIndex5,
           drag?.['pendingRollRange'] || drag?.['pendingRange'],
           { rebaseNegativeTimeline: !![], rebaseTimelineStart: !![] },
         )
-      : patchMediaClipClipRange(_0x40a663, _0x1a6197, drag?.['pendingRange']);
+      : patchMediaClipClipRange(timelineEditBaseState3, timelineEditClipIndex5, drag?.['pendingRange']);
   else {
     if (mode === 'trim' && kind === 'audio')
-      _0x4f6ba7 = patchMediaClipAudioClipRange(_0x40a663, _0x1a6197, drag?.['pendingRange']);
+      mediaClip2 = patchMediaClipAudioClipRange(
+        timelineEditBaseState3,
+        timelineEditClipIndex5,
+        drag?.['pendingRange'],
+      );
     else {
       if (mode === 'move' && kind === 'video')
-        _0x4f6ba7 = moveMediaClipClipOnTimeline(_0x40a663, _0x1a6197, drag?.['pendingDeltaSec']);
+        mediaClip2 = moveMediaClipClipOnTimeline(
+          timelineEditBaseState3,
+          timelineEditClipIndex5,
+          drag?.['pendingDeltaSec'],
+        );
       else {
         if (mode === 'move' && kind === 'audio')
-          _0x4f6ba7 = moveMediaClipAudioClipOnTimeline(_0x40a663, _0x1a6197, drag?.['pendingDeltaSec'], {
-            laneIndex: drag?.['pendingLaneIndex'],
-          });
+          mediaClip2 = moveMediaClipAudioClipOnTimeline(
+            timelineEditBaseState3,
+            timelineEditClipIndex5,
+            drag?.['pendingDeltaSec'],
+            {
+              laneIndex: drag?.['pendingLaneIndex'],
+            },
+          );
         else return null;
       }
     }
   }
-  const _0x3ff85c = mode === 'move' && kind === 'video' ? -0x1 : _0x1a6197;
+  const scope = mode === 'move' && kind === 'video' ? -0x1 : timelineEditClipIndex5;
   return {
     kind: kind,
     mode: mode,
-    mediaClip: _0x4f6ba7,
-    activeClipIndex: findCommittedClipIndex(_0x4f6ba7, kind, drag, _0x3ff85c),
+    mediaClip: mediaClip2,
+    activeClipIndex: findCommittedClipIndex(mediaClip2, kind, drag, scope),
   };
 }
 export function previewMediaClipTimelineTrimDrag(
-  _0x9a808a,
-  _0x3b2bfe,
-  _0x5120de,
-  _0x42259e = 0x0,
-  _0x2e032e = 0x0,
-  _0x18af7e = null,
+  mediaClip3,
+  kind2,
+  drag2,
+  deltaSec2 = 0x0,
+  durationSec2 = 0x0,
+  input = null,
 ) {
-  const _0x3c29c9 = _0x5120de?.['segmentEl'];
-  if (!_0x3c29c9) return;
-  const _0x31eafd = resolveMediaClipTimelineTrimPreview({
-    mediaClip: _0x9a808a['_mediaClip'],
-    kind: _0x3b2bfe,
-    drag: _0x5120de,
-    deltaSec: _0x42259e,
-    durationSec: _0x2e032e,
+  const enabled = drag2?.['segmentEl'];
+  if (!enabled) return;
+  const startSec4 = resolveMediaClipTimelineTrimPreview({
+    mediaClip: mediaClip3['_mediaClip'],
+    kind: kind2,
+    drag: drag2,
+    deltaSec: deltaSec2,
+    durationSec: durationSec2,
   });
-  if (!_0x31eafd) return;
-  _0x5120de['pendingRange'] = _0x31eafd['pendingRange'];
-  _0x3b2bfe === 'video' && (_0x5120de['pendingRollRange'] = _0x31eafd['pendingRollRange']);
-  ((_0x5120de['previewDurationSec'] = _0x31eafd['displayDurationSec']),
-    (_0x5120de['pendingPlayheadSec'] = _0x31eafd['pendingPlayheadSec']),
-    (_0x5120de['hasMoved'] = !![]));
-  const _0x11d7de = _0x18af7e || _0x5120de['rowEl'];
-  if (_0x3b2bfe === 'video') {
-    !_0x9a808a['_applyVideoTimelinePreview'](
-      _0x11d7de,
-      _0x31eafd['previewClips'],
-      _0x31eafd['displayDurationSec'],
+  if (!startSec4) return;
+  drag2['pendingRange'] = startSec4['pendingRange'];
+  kind2 === 'video' && (drag2['pendingRollRange'] = startSec4['pendingRollRange']);
+  ((drag2['previewDurationSec'] = startSec4['displayDurationSec']),
+    (drag2['pendingPlayheadSec'] = startSec4['pendingPlayheadSec']),
+    (drag2['hasMoved'] = !![]));
+  const output = input || drag2['rowEl'];
+  if (kind2 === 'video') {
+    !mediaClip3['_applyVideoTimelinePreview'](
+      output,
+      startSec4['previewClips'],
+      startSec4['displayDurationSec'],
     ) &&
-      (_0x9a808a['_applyTimelineSegmentRect'](
-        _0x3c29c9,
-        _0x9a808a['_timelinePreviewRangeRect']({
-          startSec: _0x31eafd['timelineStartSec'],
-          endSec: _0x31eafd['timelineEndSec'],
-          durationSec: _0x31eafd['displayDurationSec'],
+      (mediaClip3['_applyTimelineSegmentRect'](
+        enabled,
+        mediaClip3['_timelinePreviewRangeRect']({
+          startSec: startSec4['timelineStartSec'],
+          endSec: startSec4['timelineEndSec'],
+          durationSec: startSec4['displayDurationSec'],
         }),
       ),
-      _0x9a808a['_updateTimelineSegmentLabel'](_0x3c29c9, _0x31eafd['clipDurationSec']));
-    const _0x12a7ba = _0x9a808a['_videoTimelineMaterialEnd'](
-      _0x31eafd['previewState']['tracks']?.['video'],
-      _0x31eafd['previewClips'],
+      mediaClip3['_updateTimelineSegmentLabel'](enabled, startSec4['clipDurationSec']));
+    const materialEndSec = mediaClip3['_videoTimelineMaterialEnd'](
+      startSec4['previewState']['tracks']?.['video'],
+      startSec4['previewClips'],
     );
-    (_0x9a808a['_syncTimelineAddSlotForRow'](_0x11d7de, {
-      displayDurationSec: _0x31eafd['displayDurationSec'],
-      materialEndSec: _0x12a7ba,
+    (mediaClip3['_syncTimelineAddSlotForRow'](output, {
+      displayDurationSec: startSec4['displayDurationSec'],
+      materialEndSec: materialEndSec,
     }),
-      _0x9a808a['_updateTrackPlayheadVisual'](_0x11d7de, _0x31eafd['displayDurationSec'], {
-        playheadSec: _0x5120de['startPlayheadSec'],
+      mediaClip3['_updateTrackPlayheadVisual'](output, startSec4['displayDurationSec'], {
+        playheadSec: drag2['startPlayheadSec'],
       }));
-    const _0x3a9a36 = toNumber(_0x5120de['startPlayheadSec'], _0x9a808a['_playheadSec']);
-    (_0x9a808a['_syncVideoPreviewSourceForTimelineSec'](_0x3a9a36, { clips: _0x31eafd['previewClips'] }),
-      _0x9a808a['_syncPreviewTime'](
+    const toNumber3 = toNumber(drag2['startPlayheadSec'], mediaClip3['_playheadSec']);
+    (mediaClip3['_syncVideoPreviewSourceForTimelineSec'](toNumber3, { clips: startSec4['previewClips'] }),
+      mediaClip3['_syncPreviewTime'](
         'video',
-        _0x9a808a['_videoSourceSecForTimelineSec'](_0x3a9a36, _0x31eafd['previewClips']),
+        mediaClip3['_videoSourceSecForTimelineSec'](toNumber3, startSec4['previewClips']),
       ));
     return;
   }
-  (!_0x9a808a['_applyAudioTimelinePreview'](
-    _0x11d7de,
-    _0x31eafd['previewClips'],
-    _0x31eafd['displayDurationSec'],
+  (!mediaClip3['_applyAudioTimelinePreview'](
+    output,
+    startSec4['previewClips'],
+    startSec4['displayDurationSec'],
   ) &&
-    (_0x9a808a['_applyAudioTimelineSegmentRect'](
-      _0x3c29c9,
+    (mediaClip3['_applyAudioTimelineSegmentRect'](
+      enabled,
       getMediaClipTimelineRangeRect({
-        startSec: _0x31eafd['timelineStartSec'],
-        endSec: _0x31eafd['timelineEndSec'],
-        durationSec: _0x31eafd['displayDurationSec'],
+        startSec: startSec4['timelineStartSec'],
+        endSec: startSec4['timelineEndSec'],
+        durationSec: startSec4['displayDurationSec'],
       }),
     ),
-    _0x9a808a['_updateTimelineSegmentLabel'](_0x3c29c9, _0x31eafd['clipDurationSec']),
-    _0x9a808a['_syncAudioSegmentWaveformViewport'](_0x3c29c9, _0x31eafd['previewClip'])),
-    _0x9a808a['_updateTrackPlayheadVisual'](_0x11d7de, _0x31eafd['displayDurationSec'], {
-      playheadSec: _0x5120de['startPlayheadSec'],
+    mediaClip3['_updateTimelineSegmentLabel'](enabled, startSec4['clipDurationSec']),
+    mediaClip3['_syncAudioSegmentWaveformViewport'](enabled, startSec4['previewClip'])),
+    mediaClip3['_updateTrackPlayheadVisual'](output, startSec4['displayDurationSec'], {
+      playheadSec: drag2['startPlayheadSec'],
     }),
-    _0x9a808a['_syncPreviewTime']('audio', _0x31eafd['sourcePreviewSec']));
+    mediaClip3['_syncPreviewTime']('audio', startSec4['sourcePreviewSec']));
 }
-export function previewMediaClipTimelineMoveDrag(
-  _0x15c939,
-  _0x3b0727,
-  _0x2b55da,
-  _0x2360f6 = 0x0,
-  _0x134d5a = 0x0,
-) {
-  const _0xb6c2e8 = _0x2b55da?.['segmentEl'];
-  if (!_0xb6c2e8) return;
-  const _0x42b538 = _0x3b0727 === 'audio' ? _0x15c939['_audioLaneIndexFromDrag'](_0x2b55da) : 0x0,
-    _0x5a0718 = resolveMediaClipTimelineMovePreview({
-      kind: _0x3b0727,
-      drag: _0x2b55da,
-      deltaSec: _0x2360f6,
-      durationSec: _0x134d5a,
-      laneIndex: _0x42b538,
+export function previewMediaClipTimelineMoveDrag(value6, kind3, drag3, deltaSec3 = 0x0, durationSec3 = 0x0) {
+  const el = drag3?.['segmentEl'];
+  if (!el) return;
+  const laneIndex2 = kind3 === 'audio' ? value6['_audioLaneIndexFromDrag'](drag3) : 0x0,
+    startSec5 = resolveMediaClipTimelineMovePreview({
+      kind: kind3,
+      drag: drag3,
+      deltaSec: deltaSec3,
+      durationSec: durationSec3,
+      laneIndex: laneIndex2,
     });
-  if (!_0x5a0718) return;
-  if (_0x3b0727 === 'video')
-    _0x15c939['_applyTimelineSegmentRect'](
-      _0xb6c2e8,
+  if (!startSec5) return;
+  if (kind3 === 'video')
+    value6['_applyTimelineSegmentRect'](
+      el,
       getMediaClipTimelineRangeRect({
-        startSec: _0x5a0718['timelineStartSec'],
-        endSec: _0x5a0718['timelineEndSec'],
-        durationSec: _0x5a0718['displayDurationSec'],
+        startSec: startSec5['timelineStartSec'],
+        endSec: startSec5['timelineEndSec'],
+        durationSec: startSec5['displayDurationSec'],
       }),
     );
   else {
-    const _0xfe241f = _0x15c939['_audioLaneCount'](_0x2b55da['startClips'], {
-      previewLaneIndex: _0x5a0718['pendingLaneIndex'],
+    const value7 = value6['_audioLaneCount'](drag3['startClips'], {
+      previewLaneIndex: startSec5['pendingLaneIndex'],
     });
-    (_0x15c939['_setAudioSegmentLaneVisual'](_0xb6c2e8, _0x5a0718['pendingLaneIndex']),
-      _0xb6c2e8['classList']?.['toggle']?.(
+    (value6['_setAudioSegmentLaneVisual'](el, startSec5['pendingLaneIndex']),
+      el['classList']?.['toggle']?.(
         'is-lane-preview',
-        _0x5a0718['pendingLaneIndex'] !== normalizeMediaClipAudioLaneIndex(_0x2b55da['startLaneIndex']),
+        startSec5['pendingLaneIndex'] !== normalizeMediaClipAudioLaneIndex(drag3['startLaneIndex']),
       ),
-      _0x15c939['_setAudioLaneCountStyle'](_0x2b55da['rowEl'], _0xfe241f),
-      _0x15c939['_setAudioLaneCountStyle'](_0x2b55da['rowEl']?.['parentElement'], _0xfe241f),
-      _0x15c939['_setAudioLaneCountStyle'](_0x2b55da['laneEl'], _0xfe241f),
-      _0x15c939['_setAudioLaneCountStyle'](_0x2b55da['timelineEl'], _0xfe241f),
-      _0x15c939['_setAudioLaneCountStyle'](
-        _0x2b55da['laneEl']?.['querySelector']?.('.media-clip-audio-lane-controls'),
-        _0xfe241f,
+      value6['_setAudioLaneCountStyle'](drag3['rowEl'], value7),
+      value6['_setAudioLaneCountStyle'](drag3['rowEl']?.['parentElement'], value7),
+      value6['_setAudioLaneCountStyle'](drag3['laneEl'], value7),
+      value6['_setAudioLaneCountStyle'](drag3['timelineEl'], value7),
+      value6['_setAudioLaneCountStyle'](
+        drag3['laneEl']?.['querySelector']?.('.media-clip-audio-lane-controls'),
+        value7,
       ),
-      _0x15c939['_applyAudioTimelineSegmentRect'](
-        _0xb6c2e8,
+      value6['_applyAudioTimelineSegmentRect'](
+        el,
         getMediaClipTimelineRangeRect({
-          startSec: _0x5a0718['timelineStartSec'],
-          endSec: _0x5a0718['timelineEndSec'],
-          durationSec: _0x5a0718['displayDurationSec'],
+          startSec: startSec5['timelineStartSec'],
+          endSec: startSec5['timelineEndSec'],
+          durationSec: startSec5['displayDurationSec'],
         }),
       ));
   }
-  (_0x15c939['_updateTimelineSegmentLabel'](_0xb6c2e8, _0x5a0718['clipDurationSec']),
-    (_0x2b55da['previewDurationSec'] = _0x5a0718['displayDurationSec']),
-    (_0x2b55da['pendingDeltaSec'] = _0x5a0718['pendingDeltaSec']),
-    _0x3b0727 === 'audio' &&
-      ((_0x2b55da['pendingLaneIndex'] = _0x5a0718['pendingLaneIndex']),
-      (_0x2b55da['pendingPlayheadSec'] = _0x5a0718['pendingPlayheadSec'])));
+  (value6['_updateTimelineSegmentLabel'](el, startSec5['clipDurationSec']),
+    (drag3['previewDurationSec'] = startSec5['displayDurationSec']),
+    (drag3['pendingDeltaSec'] = startSec5['pendingDeltaSec']),
+    kind3 === 'audio' &&
+      ((drag3['pendingLaneIndex'] = startSec5['pendingLaneIndex']),
+      (drag3['pendingPlayheadSec'] = startSec5['pendingPlayheadSec'])));
 }
-export function commitMediaClipTimelineEdit(_0x35e258, _0x210d8f, _0x3223e1, _0x1acdf8, _0x1ed6f9 = {}) {
-  const _0x1decf3 = commitMediaClipTimelineEditTransaction({
-    mediaClip: _0x35e258['_mediaClip'],
-    kind: _0x210d8f,
-    mode: _0x3223e1,
-    drag: _0x1acdf8,
+export function commitMediaClipTimelineEdit(mediaClip4, kind4, mode2, drag4, value8 = {}) {
+  const commitMediaClipTimelineEditTransaction2 = commitMediaClipTimelineEditTransaction({
+    mediaClip: mediaClip4['_mediaClip'],
+    kind: kind4,
+    mode: mode2,
+    drag: drag4,
   });
-  if (!_0x1decf3) return;
-  _0x35e258['_mediaClip'] = _0x1decf3['mediaClip'];
-  const _0x5e323b = _0x1decf3['activeClipIndex'];
-  if (_0x5e323b >= 0x0 && _0x210d8f === 'video')
-    (_0x35e258['_setActiveClipIndex'](_0x5e323b), _0x35e258['_selectClipIndex'](_0x5e323b));
+  if (!commitMediaClipTimelineEditTransaction2) return;
+  mediaClip4['_mediaClip'] = commitMediaClipTimelineEditTransaction2['mediaClip'];
+  const count = commitMediaClipTimelineEditTransaction2['activeClipIndex'];
+  if (count >= 0x0 && kind4 === 'video')
+    (mediaClip4['_setActiveClipIndex'](count), mediaClip4['_selectClipIndex'](count));
   else
-    _0x5e323b >= 0x0 &&
-      _0x210d8f === 'audio' &&
-      (_0x35e258['_setActiveAudioClipIndex'](_0x5e323b), _0x35e258['_selectAudioClipIndex'](_0x5e323b));
-  if (_0x3223e1 === 'trim' && _0x210d8f === 'video') {
-    const _0xe482eb =
-      _0x35e258['_mediaClip']['clips']?.[_0x5e323b >= 0x0 ? _0x5e323b : timelineEditClipIndex(_0x1acdf8)];
-    if (_0xe482eb) {
-      const _0x584b05 = _0x35e258['_videoTimelineDuration'](_0x35e258['_mediaClip']['tracks']?.['video']),
-        _0xc08856 = getMediaClipTimelineDisplayDuration(
-          toNumber(_0x1acdf8?.['durationSec'], toNumber(_0x1acdf8?.['previewDurationSec'], _0x584b05)),
+    count >= 0x0 &&
+      kind4 === 'audio' &&
+      (mediaClip4['_setActiveAudioClipIndex'](count), mediaClip4['_selectAudioClipIndex'](count));
+  if (mode2 === 'trim' && kind4 === 'video') {
+    const value9 = mediaClip4['_mediaClip']['clips']?.[count >= 0x0 ? count : timelineEditClipIndex(drag4)];
+    if (value9) {
+      const value10 = mediaClip4['_videoTimelineDuration'](mediaClip4['_mediaClip']['tracks']?.['video']),
+        displayDurationSec2 = getMediaClipTimelineDisplayDuration(
+          toNumber(drag4?.['durationSec'], toNumber(drag4?.['previewDurationSec'], value10)),
         );
-      ((_0x35e258['_playheadSec'] = Math['max'](
+      ((mediaClip4['_playheadSec'] = Math['max'](
         0x0,
-        Math['min'](_0xc08856, toNumber(_0x1acdf8?.['startPlayheadSec'], _0x35e258['_playheadSec'])),
+        Math['min'](displayDurationSec2, toNumber(drag4?.['startPlayheadSec'], mediaClip4['_playheadSec'])),
       )),
-        _0x35e258['_syncTimelineAddSlotForRow'](_0x1acdf8?.['rowEl'], {
-          displayDurationSec: _0xc08856,
-          materialEndSec: _0x35e258['_videoTimelineMaterialEnd'](
-            _0x35e258['_mediaClip']['tracks']?.['video'],
+        mediaClip4['_syncTimelineAddSlotForRow'](drag4?.['rowEl'], {
+          displayDurationSec: displayDurationSec2,
+          materialEndSec: mediaClip4['_videoTimelineMaterialEnd'](
+            mediaClip4['_mediaClip']['tracks']?.['video'],
           ),
         }),
-        _0x35e258['_syncVideoPreviewSourceForTimelineSec'](_0x35e258['_playheadSec']),
-        _0x35e258['_syncPreviewTime'](
+        mediaClip4['_syncVideoPreviewSourceForTimelineSec'](mediaClip4['_playheadSec']),
+        mediaClip4['_syncPreviewTime'](
           'video',
-          _0x35e258['_videoSourceSecForPlayhead'](_0x35e258['_playheadSec']),
+          mediaClip4['_videoSourceSecForPlayhead'](mediaClip4['_playheadSec']),
         ));
     }
   } else {
-    if (_0x3223e1 === 'trim' && _0x210d8f === 'audio') {
-      const _0x41a55c = _0x35e258['_timelineDurationForKind']('audio'),
-        _0x25c337 = getMediaClipTimelineDisplayDuration(
-          toNumber(_0x1acdf8?.['durationSec'], toNumber(_0x1acdf8?.['previewDurationSec'], _0x41a55c)),
+    if (mode2 === 'trim' && kind4 === 'audio') {
+      const value11 = mediaClip4['_timelineDurationForKind']('audio'),
+        displayDurationSec3 = getMediaClipTimelineDisplayDuration(
+          toNumber(drag4?.['durationSec'], toNumber(drag4?.['previewDurationSec'], value11)),
         );
-      ((_0x35e258['_playheadSec'] = Math['max'](
+      ((mediaClip4['_playheadSec'] = Math['max'](
         0x0,
-        Math['min'](_0x25c337, toNumber(_0x1acdf8?.['startPlayheadSec'], _0x35e258['_playheadSec'])),
+        Math['min'](displayDurationSec3, toNumber(drag4?.['startPlayheadSec'], mediaClip4['_playheadSec'])),
       )),
-        _0x35e258['_syncTimelineAddSlotForRow'](_0x1acdf8?.['rowEl'], {
-          displayDurationSec: _0x25c337,
-          materialEndSec: _0x35e258['_timelineMaterialEndSec'](),
+        mediaClip4['_syncTimelineAddSlotForRow'](drag4?.['rowEl'], {
+          displayDurationSec: displayDurationSec3,
+          materialEndSec: mediaClip4['_timelineMaterialEndSec'](),
         }),
-        _0x35e258['_syncAudioPreviewSourceForTimelineSec'](_0x35e258['_playheadSec']),
-        _0x35e258['_syncPreviewTime'](
+        mediaClip4['_syncAudioPreviewSourceForTimelineSec'](mediaClip4['_playheadSec']),
+        mediaClip4['_syncPreviewTime'](
           'audio',
-          _0x35e258['_audioSourceSecForPlayhead'](_0x35e258['_playheadSec']),
+          mediaClip4['_audioSourceSecForPlayhead'](mediaClip4['_playheadSec']),
         ));
     } else {
-      if (_0x3223e1 === 'move' && _0x210d8f === 'video') {
-        const _0x440840 = _0x35e258['_videoTimelineDuration'](_0x35e258['_mediaClip']['tracks']?.['video']);
-        _0x35e258['_playheadSec'] = Math['max'](
+      if (mode2 === 'move' && kind4 === 'video') {
+        const value12 = mediaClip4['_videoTimelineDuration'](mediaClip4['_mediaClip']['tracks']?.['video']);
+        mediaClip4['_playheadSec'] = Math['max'](
           0x0,
-          Math['min'](_0x440840, toNumber(_0x1acdf8?.['startPlayheadSec'], _0x35e258['_playheadSec'])),
+          Math['min'](value12, toNumber(drag4?.['startPlayheadSec'], mediaClip4['_playheadSec'])),
         );
       } else {
-        if (_0x3223e1 === 'move' && _0x210d8f === 'audio') {
-          const _0x1c246f = _0x35e258['_timelineDurationForKind']('audio');
-          ((_0x35e258['_playheadSec'] = Math['max'](0x0, Math['min'](_0x1c246f, _0x35e258['_playheadSec']))),
-            _0x35e258['_syncTimelineAddSlotForRow'](_0x1acdf8?.['rowEl'], {
-              displayDurationSec: _0x1acdf8?.['previewDurationSec'],
-              materialEndSec: _0x35e258['_timelineMaterialEndSec'](),
+        if (mode2 === 'move' && kind4 === 'audio') {
+          const value13 = mediaClip4['_timelineDurationForKind']('audio');
+          ((mediaClip4['_playheadSec'] = Math['max'](0x0, Math['min'](value13, mediaClip4['_playheadSec']))),
+            mediaClip4['_syncTimelineAddSlotForRow'](drag4?.['rowEl'], {
+              displayDurationSec: drag4?.['previewDurationSec'],
+              materialEndSec: mediaClip4['_timelineMaterialEndSec'](),
             }),
-            _0x35e258['_syncAudioPreviewSourceForTimelineSec'](_0x35e258['_playheadSec']),
-            _0x35e258['_syncPreviewTime'](
+            mediaClip4['_syncAudioPreviewSourceForTimelineSec'](mediaClip4['_playheadSec']),
+            mediaClip4['_syncPreviewTime'](
               'audio',
-              _0x35e258['_audioSourceSecForPlayhead'](_0x35e258['_playheadSec']),
+              mediaClip4['_audioSourceSecForPlayhead'](mediaClip4['_playheadSec']),
             ));
         }
       }
     }
   }
-  ((_0x35e258['nodeData'] = { ...(_0x35e258['nodeData'] || {}), mediaClip: _0x35e258['_mediaClip'] }),
-    _0x1ed6f9['persist'] !== ![] &&
-      appStore['updateNodeData'](_0x35e258['id'], { mediaClip: _0x35e258['_mediaClip'] }));
+  ((mediaClip4['nodeData'] = { ...(mediaClip4['nodeData'] || {}), mediaClip: mediaClip4['_mediaClip'] }),
+    value8['persist'] !== ![] &&
+      appStore['updateNodeData'](mediaClip4['id'], { mediaClip: mediaClip4['_mediaClip'] }));
 }
-export function renderMediaClipTimelineTrimHandle(_0x1728f0, _0x3af8e2, _0x54d0e3, _0x4d3c5c = {}) {
-  const _0x2e5b67 = document['createElement']('button');
-  ((_0x2e5b67['type'] = 'button'),
-    (_0x2e5b67['className'] = 'media-clip-trim media-clip-trim-' + _0x54d0e3),
-    (_0x2e5b67['dataset']['clipIndex'] = String(
-      Math['max'](0x0, Math['trunc'](toNumber(_0x4d3c5c['clipIndex'], 0x0))),
+export function renderMediaClipTimelineTrimHandle(startMediaClip, kind5, side, value14 = {}) {
+  const el2 = document['createElement']('button');
+  ((el2['type'] = 'button'),
+    (el2['className'] = 'media-clip-trim media-clip-trim-' + side),
+    (el2['dataset']['clipIndex'] = String(
+      Math['max'](0x0, Math['trunc'](toNumber(value14['clipIndex'], 0x0))),
     )),
-    _0x2e5b67['setAttribute'](
-      'aria-label',
-      mediaClipText(_0x54d0e3 === 'left' ? 'trim.left' : 'trim.right'),
-    ));
-  const _0x358519 = document['createElement']('span');
+    el2['setAttribute']('aria-label', mediaClipText(side === 'left' ? 'trim.left' : 'trim.right')));
+  const el3 = document['createElement']('span');
   return (
-    (_0x358519['className'] = 'media-clip-trim-visual'),
-    _0x358519['setAttribute']('aria-hidden', 'true'),
-    _0x2e5b67['appendChild'](_0x358519),
-    _0x2e5b67['addEventListener']('pointerenter', () => {
-      const _0x344a16 = _0x2e5b67['closest']('.media-clip-segment'),
-        _0x1c9560 = _0x344a16?.['closest']('.media-clip-track') || null;
-      (_0x344a16?.['querySelectorAll']?.('.media-clip-trim.is-hovered')?.['forEach']((_0x8379ce) => {
-        if (_0x8379ce !== _0x2e5b67) _0x8379ce['classList']['remove']('is-hovered');
+    (el3['className'] = 'media-clip-trim-visual'),
+    el3['setAttribute']('aria-hidden', 'true'),
+    el2['appendChild'](el3),
+    el2['addEventListener']('pointerenter', () => {
+      const el4 = el2['closest']('.media-clip-segment'),
+        value15 = el4?.['closest']('.media-clip-track') || null;
+      (el4?.['querySelectorAll']?.('.media-clip-trim.is-hovered')?.['forEach']((el5) => {
+        if (el5 !== el2) el5['classList']['remove']('is-hovered');
       }),
-        _0x2e5b67['classList']['add']('is-hovered'),
-        _0x344a16 &&
-          _0x1728f0['_setTimelineHoverSegment'](_0x1c9560, _0x344a16, _0x3af8e2, _0x4d3c5c['clipIndex']));
+        el2['classList']['add']('is-hovered'),
+        el4 && startMediaClip['_setTimelineHoverSegment'](value15, el4, kind5, value14['clipIndex']));
     }),
-    _0x2e5b67['addEventListener']('pointerleave', () => {
-      if (!_0x1728f0['_timelineDrag']()) _0x2e5b67['classList']['remove']('is-hovered');
+    el2['addEventListener']('pointerleave', () => {
+      if (!startMediaClip['_timelineDrag']()) el2['classList']['remove']('is-hovered');
     }),
-    _0x2e5b67['addEventListener']('pointerdown', (_0x24a6fd) => {
-      (stopPointer(_0x24a6fd),
-        _0x1728f0['_cancelTimelineSettle'](),
-        _0x1728f0['_stopTimelineDragAutoScroll'](),
-        (_0x1728f0['_deferredTimelineDragNodeData'] = null),
-        _0x2e5b67['classList']['add']('is-hovered'));
+    el2['addEventListener']('pointerdown', (startX) => {
+      (stopPointer(startX),
+        startMediaClip['_cancelTimelineSettle'](),
+        startMediaClip['_stopTimelineDragAutoScroll'](),
+        (startMediaClip['_deferredTimelineDragNodeData'] = null),
+        el2['classList']['add']('is-hovered'));
       try {
-        _0x2e5b67['setPointerCapture']?.(_0x24a6fd['pointerId']);
+        el2['setPointerCapture']?.(startX['pointerId']);
       } catch {}
-      const _0x4003b2 = _0x1728f0['_mediaClip']['tracks']?.[_0x3af8e2],
-        _0x1dc458 = Math['max'](0x0, Math['trunc'](toNumber(_0x4d3c5c['clipIndex'], 0x0)));
-      if (_0x3af8e2 === 'video')
-        (_0x1728f0['_setActiveClipIndex'](_0x1dc458), _0x1728f0['_selectClipIndex'](_0x1dc458));
+      const value16 = startMediaClip['_mediaClip']['tracks']?.[kind5],
+        clipIndex3 = Math['max'](0x0, Math['trunc'](toNumber(value14['clipIndex'], 0x0)));
+      if (kind5 === 'video')
+        (startMediaClip['_setActiveClipIndex'](clipIndex3), startMediaClip['_selectClipIndex'](clipIndex3));
       else
-        _0x3af8e2 === 'audio' &&
-          (_0x1728f0['_setActiveAudioClipIndex'](_0x1dc458), _0x1728f0['_selectAudioClipIndex'](_0x1dc458));
-      const _0xa8ab01 = _0x2e5b67['closest']('.media-clip-segment'),
-        _0xd30a5c = _0xa8ab01?.['closest']('.media-clip-track') || null,
-        _0x4eac52 = _0xa8ab01?.['closest']('.media-clip-timeline-lane') || null,
-        _0x5e2173 = _0xa8ab01?.['closest']('.media-clip-timeline-scroll') || null,
-        _0x1884a8 =
-          _0x3af8e2 === 'audio'
-            ? _0x1728f0['_audioTimelineClips'](_0x4003b2)['map']((_0x123a83) => ({ ..._0x123a83 }))
-            : _0x1728f0['_videoTimelineClips'](_0x4003b2)['map']((_0x308110) => ({ ..._0x308110 })),
-        _0x43ce2c = _0x1728f0['_resolveTimelineDragDuration'](
-          _0x3af8e2,
-          _0x4003b2,
-          _0x1884a8,
-          _0xa8ab01,
-          _0x1dc458,
+        kind5 === 'audio' &&
+          (startMediaClip['_setActiveAudioClipIndex'](clipIndex3),
+          startMediaClip['_selectAudioClipIndex'](clipIndex3));
+      const segmentEl = el2['closest']('.media-clip-segment'),
+        rowEl = segmentEl?.['closest']('.media-clip-track') || null,
+        laneEl = segmentEl?.['closest']('.media-clip-timeline-lane') || null,
+        scrollEl = segmentEl?.['closest']('.media-clip-timeline-scroll') || null,
+        startClips =
+          kind5 === 'audio'
+            ? startMediaClip['_audioTimelineClips'](value16)['map']((args6) => ({ ...args6 }))
+            : startMediaClip['_videoTimelineClips'](value16)['map']((args7) => ({ ...args7 })),
+        durationSec4 = startMediaClip['_resolveTimelineDragDuration'](
+          kind5,
+          value16,
+          startClips,
+          segmentEl,
+          clipIndex3,
         );
-      _0xa8ab01 && _0x1728f0['_setTimelineHoverSegment'](_0xd30a5c, _0xa8ab01, _0x3af8e2, _0x1dc458);
-      (_0xa8ab01?.['classList']['add']('is-trimming'),
-        _0xd30a5c?.['classList']['add']('is-trimming'),
-        _0x4eac52?.['classList']['add']('is-trimming'),
-        _0x5e2173?.['classList']['add']('is-trimming'));
-      const _0x4a332a = _0x1728f0['_nextTimelineDragSessionId']();
-      _0x1728f0['_setTimelineDrag']({
-        sessionId: _0x4a332a,
-        kind: _0x3af8e2,
+      segmentEl && startMediaClip['_setTimelineHoverSegment'](rowEl, segmentEl, kind5, clipIndex3);
+      (segmentEl?.['classList']['add']('is-trimming'),
+        rowEl?.['classList']['add']('is-trimming'),
+        laneEl?.['classList']['add']('is-trimming'),
+        scrollEl?.['classList']['add']('is-trimming'));
+      const sessionId = startMediaClip['_nextTimelineDragSessionId']();
+      startMediaClip['_setTimelineDrag']({
+        sessionId: sessionId,
+        kind: kind5,
         mode: 'trim',
-        side: _0x54d0e3,
-        clipIndex: _0x1dc458,
-        startX: _0x24a6fd['clientX'],
-        startTrack: { ...(_0x4003b2 || {}) },
-        startClips: _0x1884a8,
-        startMediaClip: _0x1728f0['_mediaClip'],
-        durationSec: _0x43ce2c,
-        startScrollLeft: toNumber(_0x5e2173?.['scrollLeft'], 0x0),
-        latestClientX: _0x24a6fd['clientX'],
-        segmentEl: _0xa8ab01,
-        rowEl: _0xd30a5c,
-        laneEl: _0x4eac52,
-        scrollEl: _0x5e2173,
+        side: side,
+        clipIndex: clipIndex3,
+        startX: startX['clientX'],
+        startTrack: { ...(value16 || {}) },
+        startClips: startClips,
+        startMediaClip: startMediaClip['_mediaClip'],
+        durationSec: durationSec4,
+        startScrollLeft: toNumber(scrollEl?.['scrollLeft'], 0x0),
+        latestClientX: startX['clientX'],
+        segmentEl: segmentEl,
+        rowEl: rowEl,
+        laneEl: laneEl,
+        scrollEl: scrollEl,
         pendingRange: null,
-        pendingPlayheadSec: _0x1728f0['_playheadSec'],
-        startPlayheadSec: _0x1728f0['_playheadSec'],
+        pendingPlayheadSec: startMediaClip['_playheadSec'],
+        startPlayheadSec: startMediaClip['_playheadSec'],
         hasMoved: ![],
       });
-      const _0x28b5b9 = (_0x7bca81) => handleMediaClipTimelineDrag(_0x1728f0, _0x7bca81, _0x4a332a),
-        _0x3b3c02 = (_0x5e0551) => {
-          stopPointer(_0x5e0551);
-          if (!_0x1728f0['_isTimelineDragSession'](_0x4a332a)) return;
-          const _0x57be33 = _0x1728f0['_timelineDrag']();
-          _0x1728f0['_persistTimelineDragScroll'](_0x57be33);
-          if (_0x57be33?.['kind'] === 'video' && _0x57be33['pendingRange']) {
-            const _0xb4a519 = isMediaClipVideoLeftTrimDrag(_0x57be33);
-            commitMediaClipTimelineEdit(_0x1728f0, 'video', 'trim', _0x57be33, { persist: ![] });
-            const _0x121047 = _0x1728f0['_videoTimelineDuration'](
-                _0x1728f0['_mediaClip']['tracks']?.['video'],
+      const value17 = (value18) => handleMediaClipTimelineDrag(startMediaClip, value18, sessionId),
+        value19 = (value20) => {
+          stopPointer(value20);
+          if (!startMediaClip['_isTimelineDragSession'](sessionId)) return;
+          const durationSec5 = startMediaClip['_timelineDrag']();
+          startMediaClip['_persistTimelineDragScroll'](durationSec5);
+          if (durationSec5?.['kind'] === 'video' && durationSec5['pendingRange']) {
+            const isMediaClipVideoLeftTrimDrag2 = isMediaClipVideoLeftTrimDrag(durationSec5);
+            commitMediaClipTimelineEdit(startMediaClip, 'video', 'trim', durationSec5, { persist: ![] });
+            const value21 = startMediaClip['_videoTimelineDuration'](
+                startMediaClip['_mediaClip']['tracks']?.['video'],
               ),
-              _0x4a9aa4 = getMediaClipTimelineDisplayDuration(
-                toNumber(_0x57be33['durationSec'], toNumber(_0x57be33['previewDurationSec'], _0x121047)),
+              durationSec6 = getMediaClipTimelineDisplayDuration(
+                toNumber(durationSec5['durationSec'], toNumber(durationSec5['previewDurationSec'], value21)),
               ),
-              _0x9fbe87 = _0x57be33;
-            detachMediaClipTimelineEditDrag(_0x1728f0);
-            _0xb4a519
-              ? _0x1728f0['_animateTrackVisualsToCurrentState'](_0x57be33['rowEl'], 'video', {
-                  durationSec: _0x4a9aa4,
+              value22 = durationSec5;
+            detachMediaClipTimelineEditDrag(startMediaClip);
+            isMediaClipVideoLeftTrimDrag2
+              ? startMediaClip['_animateTrackVisualsToCurrentState'](durationSec5['rowEl'], 'video', {
+                  durationSec: durationSec6,
                   persist: !![],
                   commitHistory: !![],
                   syncTimelineWidthAfterSettle: ![],
                 })
-              : (_0x1728f0['_updateTrackVisuals']('video', {
-                  durationSec: _0x57be33['previewDurationSec'],
+              : (startMediaClip['_updateTrackVisuals']('video', {
+                  durationSec: durationSec5['previewDurationSec'],
                   syncTimelineWidth: ![],
                 }),
-                _0x1728f0['_persistTimelineMediaClip']({ commitHistory: !![] }));
-            _0x1728f0['_applyDeferredTimelineDragUpdate'](_0x9fbe87);
+                startMediaClip['_persistTimelineMediaClip']({ commitHistory: !![] }));
+            startMediaClip['_applyDeferredTimelineDragUpdate'](value22);
             return;
           }
-          if (_0x57be33?.['kind'] === 'audio' && _0x57be33['pendingRange']) {
-            commitMediaClipTimelineEdit(_0x1728f0, 'audio', 'trim', _0x57be33, { persist: ![] });
-            const _0x335828 = _0x57be33;
-            (detachMediaClipTimelineEditDrag(_0x1728f0),
-              _0x1728f0['_updateTrackVisuals']('audio', {
-                durationSec: _0x57be33['previewDurationSec'],
+          if (durationSec5?.['kind'] === 'audio' && durationSec5['pendingRange']) {
+            commitMediaClipTimelineEdit(startMediaClip, 'audio', 'trim', durationSec5, { persist: ![] });
+            const value23 = durationSec5;
+            (detachMediaClipTimelineEditDrag(startMediaClip),
+              startMediaClip['_updateTrackVisuals']('audio', {
+                durationSec: durationSec5['previewDurationSec'],
                 syncTimelineWidth: ![],
               }),
-              _0x1728f0['_persistTimelineMediaClip']({ commitHistory: !![] }),
-              _0x1728f0['_applyDeferredTimelineDragUpdate'](_0x335828));
+              startMediaClip['_persistTimelineMediaClip']({ commitHistory: !![] }),
+              startMediaClip['_applyDeferredTimelineDragUpdate'](value23));
             return;
           }
-          (appStore['updateNodeData'](_0x1728f0['id'], { mediaClip: _0x1728f0['_mediaClip'] }),
-            (_0x1728f0['nodeData'] = {
-              ...(_0x1728f0['nodeData'] || {}),
-              mediaClip: _0x1728f0['_mediaClip'],
+          (appStore['updateNodeData'](startMediaClip['id'], { mediaClip: startMediaClip['_mediaClip'] }),
+            (startMediaClip['nodeData'] = {
+              ...(startMediaClip['nodeData'] || {}),
+              mediaClip: startMediaClip['_mediaClip'],
             }));
-          const _0x3d606b = _0x57be33;
-          (detachMediaClipTimelineEditDrag(_0x1728f0),
-            _0x1728f0['_render'](),
+          const value24 = durationSec5;
+          (detachMediaClipTimelineEditDrag(startMediaClip),
+            startMediaClip['_render'](),
             commit(),
-            _0x1728f0['_applyDeferredTimelineDragUpdate'](_0x3d606b));
+            startMediaClip['_applyDeferredTimelineDragUpdate'](value24));
         };
-      ((_0x1728f0['_dragMove'] = _0x28b5b9),
-        (_0x1728f0['_dragUp'] = _0x3b3c02),
-        window['addEventListener']('pointermove', _0x28b5b9, !![]),
-        window['addEventListener']('pointerup', _0x3b3c02, { once: !![], capture: !![] }));
+      ((startMediaClip['_dragMove'] = value17),
+        (startMediaClip['_dragUp'] = value19),
+        window['addEventListener']('pointermove', value17, !![]),
+        window['addEventListener']('pointerup', value19, { once: !![], capture: !![] }));
     }),
-    _0x2e5b67
+    el2
   );
 }
-export function detachMediaClipTimelineEditDrag(_0x58e3e2) {
-  _0x58e3e2['_dragMove'] && window['removeEventListener']('pointermove', _0x58e3e2['_dragMove'], !![]);
-  _0x58e3e2['_dragUp'] && window['removeEventListener']('pointerup', _0x58e3e2['_dragUp'], !![]);
-  _0x58e3e2['_stopTimelineDragAutoScroll']();
-  const _0x1f1fc1 = _0x58e3e2['_timelineDrag']();
-  (_0x1f1fc1?.['segmentEl']?.['classList']['remove']('is-dragging'),
-    _0x1f1fc1?.['segmentEl']?.['classList']['remove']('is-trimming'),
-    _0x1f1fc1?.['segmentEl']?.['classList']['remove']('is-lane-preview'),
-    _0x1f1fc1?.['segmentEl']
-      ?.['querySelectorAll']?.('.media-clip-trim.is-hovered')
-      ?.['forEach']((_0x148058) => {
-        _0x148058['classList']['remove']('is-hovered');
-      }),
-    _0x1f1fc1?.['rowEl']?.['classList']['remove']('is-trimming'),
-    _0x1f1fc1?.['rowEl']?.['classList']['remove']('is-preview-dragging'),
-    _0x1f1fc1?.['laneEl']?.['classList']['remove']('is-trimming'),
-    _0x1f1fc1?.['laneEl']?.['classList']['remove']('is-moving'),
-    _0x1f1fc1?.['timelineEl']?.['classList']['remove']('is-moving-material'),
-    _0x1f1fc1?.['scrollEl']?.['classList']['remove']('is-trimming'),
-    (_0x58e3e2['_dragMove'] = null),
-    (_0x58e3e2['_dragUp'] = null),
-    _0x58e3e2['_setTimelineDrag'](null));
+export function detachMediaClipTimelineEditDrag(value25) {
+  value25['_dragMove'] && window['removeEventListener']('pointermove', value25['_dragMove'], !![]);
+  value25['_dragUp'] && window['removeEventListener']('pointerup', value25['_dragUp'], !![]);
+  value25['_stopTimelineDragAutoScroll']();
+  const value26 = value25['_timelineDrag']();
+  (value26?.['segmentEl']?.['classList']['remove']('is-dragging'),
+    value26?.['segmentEl']?.['classList']['remove']('is-trimming'),
+    value26?.['segmentEl']?.['classList']['remove']('is-lane-preview'),
+    value26?.['segmentEl']?.['querySelectorAll']?.('.media-clip-trim.is-hovered')?.['forEach']((el6) => {
+      el6['classList']['remove']('is-hovered');
+    }),
+    value26?.['rowEl']?.['classList']['remove']('is-trimming'),
+    value26?.['rowEl']?.['classList']['remove']('is-preview-dragging'),
+    value26?.['laneEl']?.['classList']['remove']('is-trimming'),
+    value26?.['laneEl']?.['classList']['remove']('is-moving'),
+    value26?.['timelineEl']?.['classList']['remove']('is-moving-material'),
+    value26?.['scrollEl']?.['classList']['remove']('is-trimming'),
+    (value25['_dragMove'] = null),
+    (value25['_dragUp'] = null),
+    value25['_setTimelineDrag'](null));
 }
-export function startMediaClipTimelineSegmentDrag(_0x3b8f29, _0x4e8e7c, _0x46bb6d, _0x52b7b2 = {}) {
-  if (_0x52b7b2['compact'] === !![] || _0x46bb6d['button'] !== 0x0) return;
-  (stopPointer(_0x46bb6d),
-    _0x3b8f29['_cancelTimelineSettle'](),
-    _0x3b8f29['_stopTimelineDragAutoScroll'](),
-    (_0x3b8f29['_deferredTimelineDragNodeData'] = null));
-  const _0xb32d26 = _0x3b8f29['_mediaClip']['tracks']?.[_0x4e8e7c];
-  if (!_0xb32d26) return;
-  const _0x45f7da = _0x46bb6d['currentTarget']?.['closest']('.media-clip-track') || null,
-    _0x4e8604 = _0x45f7da?.['closest']?.('.media-clip-timeline-scroll') || null,
-    _0x44c99b = _0x45f7da?.['closest']?.('.media-clip-timeline-lane') || null,
-    _0x4ffe3f = _0x45f7da?.['closest']?.('.media-clip-compact-timeline') || null,
-    _0x1cfc8b =
-      _0x4e8e7c === 'audio'
-        ? _0x3b8f29['_audioTimelineClips'](_0xb32d26)['map']((_0x471cd5) => ({ ..._0x471cd5 }))
-        : _0x3b8f29['_videoTimelineClips'](_0xb32d26)['map']((_0x1cbaa4) => ({ ..._0x1cbaa4 })),
-    _0x3173b3 = Math['max'](0x0, Math['trunc'](toNumber(_0x52b7b2['clipIndex'], 0x0))),
-    _0x565566 = _0x3b8f29['_resolveTimelineDragDuration'](
-      _0x4e8e7c,
-      _0xb32d26,
-      _0x1cfc8b,
-      _0x46bb6d['currentTarget'],
-      _0x3173b3,
+export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, startX2, value27 = {}) {
+  if (value27['compact'] === !![] || startX2['button'] !== 0x0) return;
+  (stopPointer(startX2),
+    startPlayheadSec['_cancelTimelineSettle'](),
+    startPlayheadSec['_stopTimelineDragAutoScroll'](),
+    (startPlayheadSec['_deferredTimelineDragNodeData'] = null));
+  const args8 = startPlayheadSec['_mediaClip']['tracks']?.[kind6];
+  if (!args8) return;
+  const rowEl2 = startX2['currentTarget']?.['closest']('.media-clip-track') || null,
+    scrollEl2 = rowEl2?.['closest']?.('.media-clip-timeline-scroll') || null,
+    laneEl2 = rowEl2?.['closest']?.('.media-clip-timeline-lane') || null,
+    timelineEl = rowEl2?.['closest']?.('.media-clip-compact-timeline') || null,
+    startClips2 =
+      kind6 === 'audio'
+        ? startPlayheadSec['_audioTimelineClips'](args8)['map']((args9) => ({ ...args9 }))
+        : startPlayheadSec['_videoTimelineClips'](args8)['map']((args10) => ({ ...args10 })),
+    clipIndex4 = Math['max'](0x0, Math['trunc'](toNumber(value27['clipIndex'], 0x0))),
+    durationSec7 = startPlayheadSec['_resolveTimelineDragDuration'](
+      kind6,
+      args8,
+      startClips2,
+      startX2['currentTarget'],
+      clipIndex4,
     );
-  if (_0x4e8e7c === 'video')
-    (_0x3b8f29['_setActiveClipIndex'](_0x3173b3),
-      _0x3b8f29['_selectClipIndex'](_0x3173b3),
-      _0x3b8f29['_syncTrackActiveClipChrome'](
-        _0x46bb6d['currentTarget']?.['closest']('.media-clip-track'),
-        _0x4e8e7c,
+  if (kind6 === 'video')
+    (startPlayheadSec['_setActiveClipIndex'](clipIndex4),
+      startPlayheadSec['_selectClipIndex'](clipIndex4),
+      startPlayheadSec['_syncTrackActiveClipChrome'](
+        startX2['currentTarget']?.['closest']('.media-clip-track'),
+        kind6,
       ));
   else
-    _0x4e8e7c === 'audio' &&
-      (_0x3b8f29['_setActiveAudioClipIndex'](_0x3173b3),
-      _0x3b8f29['_selectAudioClipIndex'](_0x3173b3),
-      _0x3b8f29['_syncTrackActiveClipChrome'](
-        _0x46bb6d['currentTarget']?.['closest']('.media-clip-track'),
-        _0x4e8e7c,
+    kind6 === 'audio' &&
+      (startPlayheadSec['_setActiveAudioClipIndex'](clipIndex4),
+      startPlayheadSec['_selectAudioClipIndex'](clipIndex4),
+      startPlayheadSec['_syncTrackActiveClipChrome'](
+        startX2['currentTarget']?.['closest']('.media-clip-track'),
+        kind6,
       ));
   try {
-    _0x46bb6d['currentTarget']?.['setPointerCapture']?.(_0x46bb6d['pointerId']);
+    startX2['currentTarget']?.['setPointerCapture']?.(startX2['pointerId']);
   } catch {}
-  (_0x46bb6d['currentTarget']?.['classList']['add']('is-dragging'),
-    _0x45f7da?.['classList']['add']('is-preview-dragging'));
-  const _0x1a2172 = _0x3b8f29['_nextTimelineDragSessionId']();
-  _0x3b8f29['_setTimelineDrag']({
-    sessionId: _0x1a2172,
-    kind: _0x4e8e7c,
+  (startX2['currentTarget']?.['classList']['add']('is-dragging'),
+    rowEl2?.['classList']['add']('is-preview-dragging'));
+  const sessionId2 = startPlayheadSec['_nextTimelineDragSessionId']();
+  startPlayheadSec['_setTimelineDrag']({
+    sessionId: sessionId2,
+    kind: kind6,
     mode: 'move',
-    clipIndex: _0x3173b3,
-    startX: _0x46bb6d['clientX'],
-    startY: _0x46bb6d['clientY'],
-    startLaneIndex: _0x4e8e7c === 'audio' ? _0x3b8f29['_audioClipLaneIndex'](_0x1cfc8b[_0x3173b3]) : 0x0,
-    startPlayheadSec: _0x3b8f29['_playheadSec'],
-    startTrack: { ..._0xb32d26 },
-    startClips: _0x1cfc8b,
-    startMediaClip: _0x3b8f29['_mediaClip'],
-    durationSec: _0x565566,
-    startScrollLeft: toNumber(_0x4e8604?.['scrollLeft'], 0x0),
-    latestClientX: _0x46bb6d['clientX'],
-    latestClientY: _0x46bb6d['clientY'],
-    segmentEl: _0x46bb6d['currentTarget'],
-    rowEl: _0x45f7da,
-    laneEl: _0x44c99b,
-    timelineEl: _0x4ffe3f,
-    scrollEl: _0x4e8604,
+    clipIndex: clipIndex4,
+    startX: startX2['clientX'],
+    startY: startX2['clientY'],
+    startLaneIndex:
+      kind6 === 'audio' ? startPlayheadSec['_audioClipLaneIndex'](startClips2[clipIndex4]) : 0x0,
+    startPlayheadSec: startPlayheadSec['_playheadSec'],
+    startTrack: { ...args8 },
+    startClips: startClips2,
+    startMediaClip: startPlayheadSec['_mediaClip'],
+    durationSec: durationSec7,
+    startScrollLeft: toNumber(scrollEl2?.['scrollLeft'], 0x0),
+    latestClientX: startX2['clientX'],
+    latestClientY: startX2['clientY'],
+    segmentEl: startX2['currentTarget'],
+    rowEl: rowEl2,
+    laneEl: laneEl2,
+    timelineEl: timelineEl,
+    scrollEl: scrollEl2,
     pendingDeltaSec: 0x0,
-    pendingLaneIndex: _0x4e8e7c === 'audio' ? _0x3b8f29['_audioClipLaneIndex'](_0x1cfc8b[_0x3173b3]) : 0x0,
+    pendingLaneIndex:
+      kind6 === 'audio' ? startPlayheadSec['_audioClipLaneIndex'](startClips2[clipIndex4]) : 0x0,
     hasMoved: ![],
   });
-  const _0x26d669 = (_0x19487e) => handleMediaClipTimelineDrag(_0x3b8f29, _0x19487e, _0x1a2172),
-    _0x653e1b = (_0x5a1098) => {
-      stopPointer(_0x5a1098);
-      if (!_0x3b8f29['_isTimelineDragSession'](_0x1a2172)) return;
-      const _0x4d7c44 = _0x3b8f29['_timelineDrag']();
-      _0x3b8f29['_persistTimelineDragScroll'](_0x4d7c44);
+  const value28 = (value29) => handleMediaClipTimelineDrag(startPlayheadSec, value29, sessionId2),
+    value30 = (value31) => {
+      stopPointer(value31);
+      if (!startPlayheadSec['_isTimelineDragSession'](sessionId2)) return;
+      const durationSec8 = startPlayheadSec['_timelineDrag']();
+      startPlayheadSec['_persistTimelineDragScroll'](durationSec8);
       if (
-        _0x4d7c44?.['hasMoved'] &&
-        _0x4d7c44['kind'] === 'video' &&
-        _0x4d7c44['startClips']?.[_0x4d7c44['clipIndex']]
+        durationSec8?.['hasMoved'] &&
+        durationSec8['kind'] === 'video' &&
+        durationSec8['startClips']?.[durationSec8['clipIndex']]
       ) {
-        commitMediaClipTimelineEdit(_0x3b8f29, 'video', 'move', _0x4d7c44, { persist: ![] });
-        const _0x1afb3a = _0x4d7c44;
-        (detachMediaClipTimelineEditDrag(_0x3b8f29),
-          _0x3b8f29['_animateTrackVisualsToCurrentState'](_0x4d7c44['rowEl'], 'video', {
-            durationSec: _0x4d7c44['previewDurationSec'],
+        commitMediaClipTimelineEdit(startPlayheadSec, 'video', 'move', durationSec8, { persist: ![] });
+        const value32 = durationSec8;
+        (detachMediaClipTimelineEditDrag(startPlayheadSec),
+          startPlayheadSec['_animateTrackVisualsToCurrentState'](durationSec8['rowEl'], 'video', {
+            durationSec: durationSec8['previewDurationSec'],
             persist: !![],
             commitHistory: !![],
             syncTimelineWidthAfterSettle: ![],
           }),
-          _0x3b8f29['_applyDeferredTimelineDragUpdate'](_0x1afb3a));
+          startPlayheadSec['_applyDeferredTimelineDragUpdate'](value32));
         return;
       }
       if (
-        _0x4d7c44?.['hasMoved'] &&
-        _0x4d7c44['kind'] === 'audio' &&
-        _0x4d7c44['startClips']?.[_0x4d7c44['clipIndex']]
+        durationSec8?.['hasMoved'] &&
+        durationSec8['kind'] === 'audio' &&
+        durationSec8['startClips']?.[durationSec8['clipIndex']]
       ) {
-        commitMediaClipTimelineEdit(_0x3b8f29, 'audio', 'move', _0x4d7c44, { persist: ![] });
-        const _0x14be67 = _0x4d7c44;
-        (detachMediaClipTimelineEditDrag(_0x3b8f29),
-          _0x3b8f29['_animateTrackVisualsToCurrentState'](_0x4d7c44['rowEl'], 'audio', {
-            durationSec: _0x4d7c44['previewDurationSec'],
+        commitMediaClipTimelineEdit(startPlayheadSec, 'audio', 'move', durationSec8, { persist: ![] });
+        const value33 = durationSec8;
+        (detachMediaClipTimelineEditDrag(startPlayheadSec),
+          startPlayheadSec['_animateTrackVisualsToCurrentState'](durationSec8['rowEl'], 'audio', {
+            durationSec: durationSec8['previewDurationSec'],
             persist: !![],
             commitHistory: !![],
             syncTimelineWidthAfterSettle: ![],
           }),
-          _0x3b8f29['_applyDeferredTimelineDragUpdate'](_0x14be67));
+          startPlayheadSec['_applyDeferredTimelineDragUpdate'](value33));
         return;
       } else
-        _0x4d7c44?.['hasMoved'] &&
-          (appStore['updateNodeData'](_0x3b8f29['id'], { mediaClip: _0x3b8f29['_mediaClip'] }),
-          (_0x3b8f29['nodeData'] = { ...(_0x3b8f29['nodeData'] || {}), mediaClip: _0x3b8f29['_mediaClip'] }),
+        durationSec8?.['hasMoved'] &&
+          (appStore['updateNodeData'](startPlayheadSec['id'], { mediaClip: startPlayheadSec['_mediaClip'] }),
+          (startPlayheadSec['nodeData'] = {
+            ...(startPlayheadSec['nodeData'] || {}),
+            mediaClip: startPlayheadSec['_mediaClip'],
+          }),
           commit());
-      !_0x4d7c44?.['hasMoved'] &&
-        ((_0x3b8f29['_suppressTrackClick'] = !![]),
-        _0x3b8f29['_setTimelinePlayheadFromPointer'](
-          _0x4d7c44?.['rowEl'],
-          _0x4d7c44?.['kind'],
-          _0x5a1098,
-          _0x4d7c44?.['durationSec'],
-          { clipIndex: _0x4d7c44?.['clipIndex'] },
+      !durationSec8?.['hasMoved'] &&
+        ((startPlayheadSec['_suppressTrackClick'] = !![]),
+        startPlayheadSec['_setTimelinePlayheadFromPointer'](
+          durationSec8?.['rowEl'],
+          durationSec8?.['kind'],
+          value31,
+          durationSec8?.['durationSec'],
+          { clipIndex: durationSec8?.['clipIndex'] },
         ));
-      const _0x24d4f8 = _0x4d7c44;
-      detachMediaClipTimelineEditDrag(_0x3b8f29);
-      if (_0x4d7c44?.['hasMoved']) _0x3b8f29['_render']();
-      _0x3b8f29['_applyDeferredTimelineDragUpdate'](_0x24d4f8);
+      const value34 = durationSec8;
+      detachMediaClipTimelineEditDrag(startPlayheadSec);
+      if (durationSec8?.['hasMoved']) startPlayheadSec['_render']();
+      startPlayheadSec['_applyDeferredTimelineDragUpdate'](value34);
     };
-  ((_0x3b8f29['_dragMove'] = _0x26d669),
-    (_0x3b8f29['_dragUp'] = _0x653e1b),
-    window['addEventListener']('pointermove', _0x26d669, !![]),
-    window['addEventListener']('pointerup', _0x653e1b, { once: !![], capture: !![] }));
+  ((startPlayheadSec['_dragMove'] = value28),
+    (startPlayheadSec['_dragUp'] = value30),
+    window['addEventListener']('pointermove', value28, !![]),
+    window['addEventListener']('pointerup', value30, { once: !![], capture: !![] }));
 }
-export function handleMediaClipTimelineDrag(_0x2d62df, _0x4bc1bb, _0x49222d = null) {
-  const _0x57ad17 = _0x2d62df['_timelineDrag']();
-  if (!_0x57ad17) return;
-  if (_0x49222d != null && _0x57ad17['sessionId'] !== _0x49222d) return;
-  (stopPointer(_0x4bc1bb),
-    (_0x57ad17['latestClientX'] = toNumber(
-      _0x4bc1bb?.['clientX'],
-      _0x57ad17['latestClientX'] ?? _0x57ad17['startX'],
+export function handleMediaClipTimelineDrag(value35, event, value36 = null) {
+  const enabled2 = value35['_timelineDrag']();
+  if (!enabled2) return;
+  if (value36 != null && enabled2['sessionId'] !== value36) return;
+  (stopPointer(event),
+    (enabled2['latestClientX'] = toNumber(
+      event?.['clientX'],
+      enabled2['latestClientX'] ?? enabled2['startX'],
     )),
-    (_0x57ad17['latestClientY'] = toNumber(
-      _0x4bc1bb?.['clientY'],
-      _0x57ad17['latestClientY'] ?? _0x57ad17['startY'],
+    (enabled2['latestClientY'] = toNumber(
+      event?.['clientY'],
+      enabled2['latestClientY'] ?? enabled2['startY'],
     )),
-    applyMediaClipTimelineDragPreviewFromPointer(_0x2d62df, _0x57ad17, _0x4bc1bb),
-    _0x2d62df['_scheduleTimelineDragAutoScroll'](_0x57ad17));
+    applyMediaClipTimelineDragPreviewFromPointer(value35, enabled2, event),
+    value35['_scheduleTimelineDragAutoScroll'](enabled2));
 }
 export function applyMediaClipTimelineDragPreviewFromPointer(
-  _0x3ac491,
-  _0xbde93c = _0x3ac491['_timelineDrag'](),
-  _0x324428 = {},
+  value37,
+  startSec6 = value37['_timelineDrag'](),
+  value38 = {},
 ) {
-  if (!_0xbde93c) return;
-  const _0x40c6fb = _0x3ac491['_timelineRowForDrag'](_0xbde93c),
-    _0x44e684 =
-      _0xbde93c['durationSec'] ??
-      _0x3ac491['_resolveTimelineDragDuration'](
-        _0xbde93c['kind'],
-        _0xbde93c['startTrack'],
-        _0xbde93c['startClips'],
-        _0xbde93c['segmentEl'],
-        _0xbde93c['clipIndex'],
+  if (!startSec6) return;
+  const el7 = value37['_timelineRowForDrag'](startSec6),
+    durationSec9 =
+      startSec6['durationSec'] ??
+      value37['_resolveTimelineDragDuration'](
+        startSec6['kind'],
+        startSec6['startTrack'],
+        startSec6['startClips'],
+        startSec6['segmentEl'],
+        startSec6['clipIndex'],
       );
-  if (_0xbde93c['mode'] === 'move') {
-    (_0x3ac491['_syncTimelineHoverPlayheadFromPointer'](_0x40c6fb, _0x324428, _0x44e684),
-      handleMediaClipTimelineSegmentDrag(_0x3ac491, _0x324428));
+  if (startSec6['mode'] === 'move') {
+    (value37['_syncTimelineHoverPlayheadFromPointer'](el7, value38, durationSec9),
+      handleMediaClipTimelineSegmentDrag(value37, value38));
     return;
   }
-  _0xbde93c['mode'] === 'trim' && _0x3ac491['_hideTimelineHoverPlayhead'](_0x40c6fb);
-  const _0x30ef75 = _0x40c6fb?.['getBoundingClientRect'](),
-    _0x207f15 = Math['max'](0x1, toNumber(_0x30ef75?.['width'], readLayoutWidthPx(_0x40c6fb, 0x1))),
-    _0x1421a0 = getMediaClipTimelineDeltaSecFromPx(_0x3ac491['_timelineDragDeltaPx'](_0xbde93c, _0x324428), {
-      durationSec: _0x44e684,
-      trackWidthPx: _0x207f15,
-    });
-  if (_0xbde93c['kind'] === 'video' && _0xbde93c['startClips']?.[_0xbde93c['clipIndex']]) {
-    previewMediaClipTimelineTrimDrag(_0x3ac491, 'video', _0xbde93c, _0x1421a0, _0x44e684, _0x40c6fb);
+  startSec6['mode'] === 'trim' && value37['_hideTimelineHoverPlayhead'](el7);
+  const box = el7?.['getBoundingClientRect'](),
+    trackWidthPx = Math['max'](0x1, toNumber(box?.['width'], readLayoutWidthPx(el7, 0x1))),
+    mediaClipTimelineDeltaSecFromPx = getMediaClipTimelineDeltaSecFromPx(
+      value37['_timelineDragDeltaPx'](startSec6, value38),
+      {
+        durationSec: durationSec9,
+        trackWidthPx: trackWidthPx,
+      },
+    );
+  if (startSec6['kind'] === 'video' && startSec6['startClips']?.[startSec6['clipIndex']]) {
+    previewMediaClipTimelineTrimDrag(
+      value37,
+      'video',
+      startSec6,
+      mediaClipTimelineDeltaSecFromPx,
+      durationSec9,
+      el7,
+    );
     return;
   } else {
-    if (_0xbde93c['kind'] === 'audio' && _0xbde93c['startClips']?.[_0xbde93c['clipIndex']]) {
-      previewMediaClipTimelineTrimDrag(_0x3ac491, 'audio', _0xbde93c, _0x1421a0, _0x44e684, _0x40c6fb);
+    if (startSec6['kind'] === 'audio' && startSec6['startClips']?.[startSec6['clipIndex']]) {
+      previewMediaClipTimelineTrimDrag(
+        value37,
+        'audio',
+        startSec6,
+        mediaClipTimelineDeltaSecFromPx,
+        durationSec9,
+        el7,
+      );
       return;
     } else {
-      const _0x32a272 =
-        _0xbde93c['side'] === 'left'
-          ? { startSec: _0xbde93c['startTrack']['startSec'] + _0x1421a0 }
-          : { endSec: _0xbde93c['startTrack']['endSec'] + _0x1421a0 };
-      _0x3ac491['_mediaClip'] = patchMediaClipTrackRange(
-        _0x3ac491['_mediaClip'],
-        _0xbde93c['kind'],
-        _0x32a272,
-      );
-      const _0x151c52 = _0x3ac491['_mediaClip']['tracks']?.[_0xbde93c['kind']];
-      _0x151c52 &&
-        (_0x3ac491['_playheadSec'] =
-          _0xbde93c['side'] === 'left' ? _0x151c52['startSec'] : _0x151c52['endSec']);
+      const value39 =
+        startSec6['side'] === 'left'
+          ? { startSec: startSec6['startTrack']['startSec'] + mediaClipTimelineDeltaSecFromPx }
+          : { endSec: startSec6['startTrack']['endSec'] + mediaClipTimelineDeltaSecFromPx };
+      value37['_mediaClip'] = patchMediaClipTrackRange(value37['_mediaClip'], startSec6['kind'], value39);
+      const value40 = value37['_mediaClip']['tracks']?.[startSec6['kind']];
+      value40 &&
+        (value37['_playheadSec'] = startSec6['side'] === 'left' ? value40['startSec'] : value40['endSec']);
     }
   }
-  (!(_0xbde93c['kind'] === 'audio' && _0xbde93c['startClips']?.[_0xbde93c['clipIndex']]) &&
-    _0xbde93c['kind'] !== 'video' &&
-    _0x3ac491['_updateTrackVisuals'](_0xbde93c['kind']),
-    _0x3ac491['_syncPreviewTime'](
-      _0xbde93c['kind'],
-      _0x3ac491['_previewSourceSecForTimelineSec'](_0xbde93c['kind'], _0x3ac491['_playheadSec']),
+  (!(startSec6['kind'] === 'audio' && startSec6['startClips']?.[startSec6['clipIndex']]) &&
+    startSec6['kind'] !== 'video' &&
+    value37['_updateTrackVisuals'](startSec6['kind']),
+    value37['_syncPreviewTime'](
+      startSec6['kind'],
+      value37['_previewSourceSecForTimelineSec'](startSec6['kind'], value37['_playheadSec']),
     ));
 }
-export function handleMediaClipTimelineSegmentDrag(_0x561f2e, _0x418ec0) {
-  const _0xe2f3bb = _0x561f2e['_timelineDrag']();
-  if (!_0xe2f3bb) return;
-  const _0x2f65a5 = _0x561f2e['_timelineRowForDrag'](_0xe2f3bb),
-    _0x2f0ab6 = _0x2f65a5?.['getBoundingClientRect'](),
-    _0x4e3544 = Math['max'](0x1, toNumber(_0x2f0ab6?.['width'], readLayoutWidthPx(_0x2f65a5, 0x1))),
-    _0x4741c5 =
-      _0xe2f3bb['durationSec'] ??
-      _0x561f2e['_resolveTimelineDragDuration'](
-        _0xe2f3bb['kind'],
-        _0xe2f3bb['startTrack'],
-        _0xe2f3bb['startClips'],
-        _0xe2f3bb['segmentEl'],
-        _0xe2f3bb['clipIndex'],
+export function handleMediaClipTimelineSegmentDrag(args11, event2) {
+  const enabled3 = args11['_timelineDrag']();
+  if (!enabled3) return;
+  const el8 = args11['_timelineRowForDrag'](enabled3),
+    box2 = el8?.['getBoundingClientRect'](),
+    trackWidthPx2 = Math['max'](0x1, toNumber(box2?.['width'], readLayoutWidthPx(el8, 0x1))),
+    durationSec10 =
+      enabled3['durationSec'] ??
+      args11['_resolveTimelineDragDuration'](
+        enabled3['kind'],
+        enabled3['startTrack'],
+        enabled3['startClips'],
+        enabled3['segmentEl'],
+        enabled3['clipIndex'],
       ),
-    _0x201d82 = _0x561f2e['_timelineDragDeltaPx'](_0xe2f3bb, _0x418ec0),
-    _0x27a000 =
-      _0xe2f3bb['kind'] === 'audio' && _0xe2f3bb['mode'] === 'move'
-        ? toNumber(_0xe2f3bb['latestClientY'], toNumber(_0x418ec0?.['clientY'], _0xe2f3bb['startY'])) -
-          toNumber(_0xe2f3bb['startY'], 0x0)
+    value41 = args11['_timelineDragDeltaPx'](enabled3, event2),
+    value42 =
+      enabled3['kind'] === 'audio' && enabled3['mode'] === 'move'
+        ? toNumber(enabled3['latestClientY'], toNumber(event2?.['clientY'], enabled3['startY'])) -
+          toNumber(enabled3['startY'], 0x0)
         : 0x0,
-    _0x2c2c9f =
-      _0xe2f3bb['kind'] === 'audio' && _0xe2f3bb['mode'] === 'move'
-        ? Math['max'](Math['abs'](_0x201d82), Math['abs'](_0x27a000))
-        : Math['abs'](_0x201d82);
-  if (!_0xe2f3bb['hasMoved'] && _0x2c2c9f <= 0x3) return;
-  ((_0xe2f3bb['hasMoved'] = !![]),
-    _0xe2f3bb['laneEl']?.['classList']['add']('is-moving'),
-    _0xe2f3bb['timelineEl']?.['classList']['add']('is-moving-material'),
-    (_0x561f2e['_suppressTrackClick'] = !![]));
-  const _0x2a9a6c = getMediaClipTimelineDeltaSecFromPx(_0x201d82, {
-    durationSec: _0x4741c5,
-    trackWidthPx: _0x4e3544,
+    count2 =
+      enabled3['kind'] === 'audio' && enabled3['mode'] === 'move'
+        ? Math['max'](Math['abs'](value41), Math['abs'](value42))
+        : Math['abs'](value41);
+  if (!enabled3['hasMoved'] && count2 <= 0x3) return;
+  ((enabled3['hasMoved'] = !![]),
+    enabled3['laneEl']?.['classList']['add']('is-moving'),
+    enabled3['timelineEl']?.['classList']['add']('is-moving-material'),
+    (args11['_suppressTrackClick'] = !![]));
+  const mediaClipTimelineDeltaSecFromPx2 = getMediaClipTimelineDeltaSecFromPx(value41, {
+    durationSec: durationSec10,
+    trackWidthPx: trackWidthPx2,
   });
-  if (_0xe2f3bb['kind'] === 'video' && _0xe2f3bb['startClips']?.[_0xe2f3bb['clipIndex']])
-    previewMediaClipTimelineMoveDrag(_0x561f2e, 'video', _0xe2f3bb, _0x2a9a6c, _0x4741c5);
+  if (enabled3['kind'] === 'video' && enabled3['startClips']?.[enabled3['clipIndex']])
+    previewMediaClipTimelineMoveDrag(
+      args11,
+      'video',
+      enabled3,
+      mediaClipTimelineDeltaSecFromPx2,
+      durationSec10,
+    );
   else {
-    if (_0xe2f3bb['kind'] === 'audio' && _0xe2f3bb['startClips']?.[_0xe2f3bb['clipIndex']])
-      previewMediaClipTimelineMoveDrag(_0x561f2e, 'audio', _0xe2f3bb, _0x2a9a6c, _0x4741c5);
+    if (enabled3['kind'] === 'audio' && enabled3['startClips']?.[enabled3['clipIndex']])
+      previewMediaClipTimelineMoveDrag(
+        args11,
+        'audio',
+        enabled3,
+        mediaClipTimelineDeltaSecFromPx2,
+        durationSec10,
+      );
     else {
-      const _0x906d1b = {
-        ..._0x561f2e['_mediaClip'],
+      const value43 = {
+        ...args11['_mediaClip'],
         tracks: {
-          ...(_0x561f2e['_mediaClip']['tracks'] || {}),
-          [_0xe2f3bb['kind']]: _0xe2f3bb['startTrack'],
+          ...(args11['_mediaClip']['tracks'] || {}),
+          [enabled3['kind']]: enabled3['startTrack'],
         },
       };
-      _0x561f2e['_mediaClip'] = shiftMediaClipTrackRange(_0x906d1b, _0xe2f3bb['kind'], _0x2a9a6c);
-      const _0x2bc76d = _0x561f2e['_mediaClip']['tracks']?.[_0xe2f3bb['kind']];
-      if (_0x2bc76d) {
-        const _0x130d4f = _0x2bc76d['startSec'] - _0xe2f3bb['startTrack']['startSec'];
-        _0x561f2e['_playheadSec'] = Math['max'](
-          _0x2bc76d['startSec'],
-          Math['min'](_0x2bc76d['endSec'], _0xe2f3bb['startPlayheadSec'] + _0x130d4f),
+      args11['_mediaClip'] = shiftMediaClipTrackRange(
+        value43,
+        enabled3['kind'],
+        mediaClipTimelineDeltaSecFromPx2,
+      );
+      const value44 = args11['_mediaClip']['tracks']?.[enabled3['kind']];
+      if (value44) {
+        const value45 = value44['startSec'] - enabled3['startTrack']['startSec'];
+        args11['_playheadSec'] = Math['max'](
+          value44['startSec'],
+          Math['min'](value44['endSec'], enabled3['startPlayheadSec'] + value45),
         );
       }
     }
   }
-  (!(_0xe2f3bb['kind'] === 'audio' && _0xe2f3bb['startClips']?.[_0xe2f3bb['clipIndex']]) &&
-    _0xe2f3bb['kind'] !== 'video' &&
-    _0x561f2e['_updateTrackVisuals'](_0xe2f3bb['kind']),
-    _0x561f2e['_syncPreviewTime'](
-      _0xe2f3bb['kind'],
-      _0x561f2e['_previewSourceSecForTimelineSec'](_0xe2f3bb['kind'], _0x561f2e['_playheadSec']),
+  (!(enabled3['kind'] === 'audio' && enabled3['startClips']?.[enabled3['clipIndex']]) &&
+    enabled3['kind'] !== 'video' &&
+    args11['_updateTrackVisuals'](enabled3['kind']),
+    args11['_syncPreviewTime'](
+      enabled3['kind'],
+      args11['_previewSourceSecForTimelineSec'](enabled3['kind'], args11['_playheadSec']),
     ));
 }

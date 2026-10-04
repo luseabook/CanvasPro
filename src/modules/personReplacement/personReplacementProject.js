@@ -108,45 +108,43 @@ const PERSON_REPLACEMENT_SCOPE_LABELS = Object['freeze']({
   'face-hair': '脸发',
   feet: '脚部',
 });
-export function isGeneratedPersonReplacementLabel(_0x1911a4) {
-  return /^人物(?:[A-Z]+|\d+)$/u['test'](normalizeText(_0x1911a4));
+export function isGeneratedPersonReplacementLabel(value) {
+  return /^人物(?:[A-Z]+|\d+)$/u['test'](normalizeText(value));
 }
-const STATUS_INDEX = new Map(
-    PERSON_REPLACEMENT_PROJECT_STATUSES['map']((_0x60b4db, _0x4e6333) => [_0x60b4db, _0x4e6333]),
-  ),
+const STATUS_INDEX = new Map(PERSON_REPLACEMENT_PROJECT_STATUSES['map']((item, key) => [item, key])),
   ORIENTATION_SET = new Set(PERSON_REPLACEMENT_ORIENTATIONS),
   REPLACEMENT_SCOPE_SET = new Set(PERSON_REPLACEMENT_SCOPES),
   AUDIO_TRACKS = new Set(['original', 'replacement']),
   IDENTITY_REVIEW_STATUSES = new Set(['auto', 'needs_review', 'confirmed']),
   IDENTITY_METHODS = new Set(['osnet', 'manual', 'fallback', 'unassigned']);
-function normalizeText(_0x5c3bfe) {
-  return String(_0x5c3bfe ?? '')['trim']();
+function normalizeText(result) {
+  return String(result ?? '')['trim']();
 }
-export function normalizePersonReplacementScope(_0x29f254) {
-  const _0x3f4437 = normalizeText(_0x29f254);
-  return REPLACEMENT_SCOPE_SET['has'](_0x3f4437) ? _0x3f4437 : PERSON_REPLACEMENT_DEFAULT_SCOPE;
+export function normalizePersonReplacementScope(data) {
+  const text = normalizeText(data);
+  return REPLACEMENT_SCOPE_SET['has'](text) ? text : PERSON_REPLACEMENT_DEFAULT_SCOPE;
 }
-export function formatPersonReplacementScopeLabel(_0x6c6d68) {
-  return PERSON_REPLACEMENT_SCOPE_LABELS[normalizePersonReplacementScope(_0x6c6d68)];
+export function formatPersonReplacementScopeLabel(options) {
+  return PERSON_REPLACEMENT_SCOPE_LABELS[normalizePersonReplacementScope(options)];
 }
-export function resolvePersonReplacementVideoModelId(_0x35b49f) {
-  const _0x360b9c = normalizeText(_0x35b49f);
-  return PERSON_REPLACEMENT_VIDEO_MODEL_IDS['includes'](_0x360b9c)
-    ? _0x360b9c
+export function resolvePersonReplacementVideoModelId(target) {
+  const text2 = normalizeText(target);
+  return PERSON_REPLACEMENT_VIDEO_MODEL_IDS['includes'](text2)
+    ? text2
     : PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID;
 }
-export function resolvePersonReplacementVideoGenerationFps(_0x1385c0 = {}) {
-  if (_0x1385c0?.['processingMode'] === 'skip') return 0x18;
-  return normalizeSmartClipFps(_0x1385c0?.['smartClipFps']);
+export function resolvePersonReplacementVideoGenerationFps(options2 = {}) {
+  if (options2?.['processingMode'] === 'skip') return 0x18;
+  return normalizeSmartClipFps(options2?.['smartClipFps']);
 }
-export function normalizePersonReplacementVideoInputMode(_0x2554a8) {
-  const _0x13f988 = normalizeText(_0x2554a8);
-  return PERSON_REPLACEMENT_VIDEO_INPUT_MODES['includes'](_0x13f988)
-    ? _0x13f988
+export function normalizePersonReplacementVideoInputMode(source) {
+  const text3 = normalizeText(source);
+  return PERSON_REPLACEMENT_VIDEO_INPUT_MODES['includes'](text3)
+    ? text3
     : PERSON_REPLACEMENT_VIDEO_INPUT_MODE_FIRST_FRAME;
 }
-function normalizePlainObject(_0x3e3776) {
-  return _0x3e3776 && typeof _0x3e3776 === 'object' && !Array['isArray'](_0x3e3776) ? { ..._0x3e3776 } : {};
+function normalizePlainObject(args) {
+  return args && typeof args === 'object' && !Array['isArray'](args) ? { ...args } : {};
 }
 export function resolvePersonReplacementVideoParameterPolicy({
   modelId: modelId = PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID,
@@ -154,128 +152,129 @@ export function resolvePersonReplacementVideoParameterPolicy({
   generationParams: generationParams = {},
   resetModeDefaults: resetModeDefaults = ![],
 } = {}) {
-  const _0x482cf6 = resolvePersonReplacementVideoModelId(modelId),
-    _0x1a23de = normalizePersonReplacementVideoInputMode(inputMode),
-    _0x15c95f = PERSON_REPLACEMENT_VIDEO_PARAMETER_POLICIES[_0x482cf6]?.[_0x1a23de] || {},
-    _0x382a2a = {
-      ...normalizePlainObject(_0x15c95f['defaultParams']),
+  const modelId2 = resolvePersonReplacementVideoModelId(modelId),
+    inputMode2 = normalizePersonReplacementVideoInputMode(inputMode),
+    next = PERSON_REPLACEMENT_VIDEO_PARAMETER_POLICIES[modelId2]?.[inputMode2] || {},
+    generationParams2 = {
+      ...normalizePlainObject(next['defaultParams']),
       ...normalizePlainObject(generationParams),
-      ...(resetModeDefaults ? normalizePlainObject(_0x15c95f['transitionParams']) : {}),
-      ...normalizePlainObject(_0x15c95f['forcedParams']),
+      ...(resetModeDefaults ? normalizePlainObject(next['transitionParams']) : {}),
+      ...normalizePlainObject(next['forcedParams']),
     },
-    _0x433673 = {};
+    uiSchemaFieldState = {};
   return (
-    (Array['isArray'](_0x15c95f['lockedFields']) ? _0x15c95f['lockedFields'] : [])['forEach']((_0x44cd4c) => {
-      const _0x25bf88 = normalizeText(_0x44cd4c);
-      if (_0x25bf88) _0x433673[_0x25bf88] = { disabled: !![] };
+    (Array['isArray'](next['lockedFields']) ? next['lockedFields'] : [])['forEach']((current) => {
+      const text4 = normalizeText(current);
+      if (text4) uiSchemaFieldState[text4] = { disabled: !![] };
     }),
-    { modelId: _0x482cf6, inputMode: _0x1a23de, generationParams: _0x382a2a, uiSchemaFieldState: _0x433673 }
+    {
+      modelId: modelId2,
+      inputMode: inputMode2,
+      generationParams: generationParams2,
+      uiSchemaFieldState: uiSchemaFieldState,
+    }
   );
 }
-function normalizeParamsByModel(_0x1f4aeb) {
-  const _0x2ba095 = normalizePlainObject(_0x1f4aeb);
+function normalizeParamsByModel(entry) {
+  const plainObject = normalizePlainObject(entry);
   return Object['fromEntries'](
-    Object['entries'](_0x2ba095)
-      ['map'](([_0x1dec5a, _0x383f63]) => [normalizeText(_0x1dec5a), normalizePlainObject(_0x383f63)])
-      ['filter'](([_0x56b185]) => _0x56b185),
+    Object['entries'](plainObject)
+      ['map'](([record, payload]) => [normalizeText(record), normalizePlainObject(payload)])
+      ['filter'](([handle]) => handle),
   );
 }
-function firstDefined(..._0xe5a454) {
-  return _0xe5a454['find']((_0x4e5a7d) => _0x4e5a7d !== undefined && _0x4e5a7d !== null);
+function firstDefined(...list) {
+  return list['find']((state) => state !== undefined && state !== null);
 }
-function toArray(_0x58f6df) {
-  if (Array['isArray'](_0x58f6df)) return _0x58f6df;
-  return _0x58f6df && typeof _0x58f6df === 'object' ? [_0x58f6df] : [];
+function toArray(config) {
+  if (Array['isArray'](config)) return config;
+  return config && typeof config === 'object' ? [config] : [];
 }
-function normalizeNonNegativeNumber(_0x4aa656, _0x817e35 = 0x0) {
-  const _0x3f7db9 = Number(_0x4aa656);
-  return Number['isFinite'](_0x3f7db9) && _0x3f7db9 >= 0x0 ? _0x3f7db9 : _0x817e35;
+function normalizeNonNegativeNumber(scope, input = 0x0) {
+  const count = Number(scope);
+  return Number['isFinite'](count) && count >= 0x0 ? count : input;
 }
-function normalizeConfidence(_0x558e6c) {
-  const _0x57fe8c = Number(_0x558e6c);
-  if (!Number['isFinite'](_0x57fe8c)) return 0x0;
-  const _0x2e9594 = _0x57fe8c > 0x1 && _0x57fe8c <= 0x64 ? _0x57fe8c / 0x64 : _0x57fe8c;
-  return Math['max'](0x0, Math['min'](0x1, _0x2e9594));
+function normalizeConfidence(output) {
+  const count2 = Number(output);
+  if (!Number['isFinite'](count2)) return 0x0;
+  const value2 = count2 > 0x1 && count2 <= 0x64 ? count2 / 0x64 : count2;
+  return Math['max'](0x0, Math['min'](0x1, value2));
 }
-function normalizeStringArray(_0x5ca311) {
-  const _0x4d0ec0 = [],
-    _0x4dd0a3 = new Set();
+function normalizeStringArray(value3) {
+  const list2 = [],
+    map = new Set();
   return (
-    toArray(_0x5ca311)['forEach']((_0x3d2dd5) => {
-      const _0x229797 = normalizeText(_0x3d2dd5);
-      if (!_0x229797 || _0x4dd0a3['has'](_0x229797)) return;
-      (_0x4dd0a3['add'](_0x229797), _0x4d0ec0['push'](_0x229797));
+    toArray(value3)['forEach']((value4) => {
+      const text5 = normalizeText(value4);
+      if (!text5 || map['has'](text5)) return;
+      (map['add'](text5), list2['push'](text5));
     }),
-    _0x4d0ec0
+    list2
   );
 }
-function normalizeImageRefs(_0x599082) {
-  const _0x5f3ed5 = [],
-    _0x10d96d = new Set(),
-    _0x1f2c73 = Array['isArray'](_0x599082)
-      ? _0x599082
-      : _0x599082 === undefined || _0x599082 === null
-        ? []
-        : [_0x599082];
+function normalizeImageRefs(value5) {
+  const list3 = [],
+    map2 = new Set(),
+    list4 = Array['isArray'](value5) ? value5 : value5 === undefined || value5 === null ? [] : [value5];
   return (
-    _0x1f2c73['forEach']((_0x67d301) => {
-      const _0x44b6a7 = normalizeText(
-        _0x67d301 && typeof _0x67d301 === 'object'
+    list4['forEach']((response) => {
+      const text6 = normalizeText(
+        response && typeof response === 'object'
           ? firstDefined(
-              _0x67d301['ref'],
-              _0x67d301['id'],
-              _0x67d301['assetRef'],
-              _0x67d301['url'],
-              _0x67d301['path'],
+              response['ref'],
+              response['id'],
+              response['assetRef'],
+              response['url'],
+              response['path'],
             )
-          : _0x67d301,
+          : response,
       );
-      if (!_0x44b6a7 || _0x10d96d['has'](_0x44b6a7)) return;
-      (_0x10d96d['add'](_0x44b6a7), _0x5f3ed5['push'](_0x44b6a7));
+      if (!text6 || map2['has'](text6)) return;
+      (map2['add'](text6), list3['push'](text6));
     }),
-    _0x5f3ed5
+    list3
   );
 }
-function parseJsonLike(_0x53e2d9) {
-  if (typeof _0x53e2d9 !== 'string') return _0x53e2d9;
-  const _0x585b1d = _0x53e2d9['trim']();
-  if (!_0x585b1d) return {};
-  const _0x2444d8 = _0x585b1d['replace'](/^```(?:json)?\s*/iu, '')
+function parseJsonLike(value6) {
+  if (typeof value6 !== 'string') return value6;
+  const enabled = value6['trim']();
+  if (!enabled) return {};
+  const list5 = enabled['replace'](/^```(?:json)?\s*/iu, '')
     ['replace'](/\s*```$/u, '')
     ['trim']();
   try {
-    return JSON['parse'](_0x2444d8);
+    return JSON['parse'](list5);
   } catch {
-    const _0x355b09 = Math['min'](
-        ...[_0x2444d8['indexOf']('{'), _0x2444d8['indexOf']('[')]['filter']((_0x316ff4) => _0x316ff4 >= 0x0),
+    const count3 = Math['min'](
+        ...[list5['indexOf']('{'), list5['indexOf']('[')]['filter']((count4) => count4 >= 0x0),
       ),
-      _0x3d6f61 = _0x2444d8['lastIndexOf']('}'),
-      _0x45b951 = _0x2444d8['lastIndexOf'](']'),
-      _0x162157 = Math['max'](_0x3d6f61, _0x45b951);
-    if (Number['isFinite'](_0x355b09) && _0x355b09 >= 0x0 && _0x162157 > _0x355b09)
+      value7 = list5['lastIndexOf']('}'),
+      value8 = list5['lastIndexOf'](']'),
+      value9 = Math['max'](value7, value8);
+    if (Number['isFinite'](count3) && count3 >= 0x0 && value9 > count3)
       try {
-        return JSON['parse'](_0x2444d8['slice'](_0x355b09, _0x162157 + 0x1));
+        return JSON['parse'](list5['slice'](count3, value9 + 0x1));
       } catch {
         return {};
       }
     return {};
   }
 }
-function unwrapAiAnalysis(_0x95c23d) {
-  let _0xb545eb = parseJsonLike(_0x95c23d);
-  for (let _0x360dd4 = 0x0; _0x360dd4 < 0x5; _0x360dd4 += 0x1) {
-    if (!_0xb545eb || typeof _0xb545eb !== 'object' || Array['isArray'](_0xb545eb)) break;
-    const _0x183088 = firstDefined(
-      _0xb545eb['analysis'],
-      _0xb545eb['result'],
-      _0xb545eb['output'],
-      _0xb545eb['data'],
-      _0xb545eb['response'],
+function unwrapAiAnalysis(value10) {
+  let jsonLike = parseJsonLike(value10);
+  for (let count5 = 0x0; count5 < 0x5; count5 += 0x1) {
+    if (!jsonLike || typeof jsonLike !== 'object' || Array['isArray'](jsonLike)) break;
+    const defined = firstDefined(
+      jsonLike['analysis'],
+      jsonLike['result'],
+      jsonLike['output'],
+      jsonLike['data'],
+      jsonLike['response'],
     );
-    if (_0x183088 === undefined || _0x183088 === _0xb545eb) break;
-    _0xb545eb = parseJsonLike(_0x183088);
+    if (defined === undefined || defined === jsonLike) break;
+    jsonLike = parseJsonLike(defined);
   }
-  return _0xb545eb;
+  return jsonLike;
 }
 const ORIENTATION_ALIASES = new Map([
   ['front', 'front'],
@@ -320,1678 +319,1786 @@ const ORIENTATION_ALIASES = new Map([
   ['unknown', 'unknown'],
   ['未知', 'unknown'],
 ]);
-export function normalizePersonReplacementOrientation(_0x49fcf7) {
-  const _0x24ff54 = normalizeText(_0x49fcf7)['toLowerCase']();
-  if (!_0x24ff54) return 'unknown';
-  const _0x92e1d2 = _0x24ff54['replace'](/[\s/-]+/gu, '_');
-  if (ORIENTATION_SET['has'](_0x92e1d2)) return _0x92e1d2;
-  if (ORIENTATION_ALIASES['has'](_0x92e1d2)) return ORIENTATION_ALIASES['get'](_0x92e1d2);
-  if (/过肩|over.*shoulder/iu['test'](_0x24ff54)) {
-    if (/左|left/iu['test'](_0x24ff54)) return 'over_shoulder_left';
-    if (/右|right/iu['test'](_0x24ff54)) return 'over_shoulder_right';
+export function normalizePersonReplacementOrientation(value11) {
+  const text7 = normalizeText(value11)['toLowerCase']();
+  if (!text7) return 'unknown';
+  const value12 = text7['replace'](/[\s/-]+/gu, '_');
+  if (ORIENTATION_SET['has'](value12)) return value12;
+  if (ORIENTATION_ALIASES['has'](value12)) return ORIENTATION_ALIASES['get'](value12);
+  if (/过肩|over.*shoulder/iu['test'](text7)) {
+    if (/左|left/iu['test'](text7)) return 'over_shoulder_left';
+    if (/右|right/iu['test'](text7)) return 'over_shoulder_right';
   }
-  if (/背|back|rear/iu['test'](_0x24ff54)) return 'back';
-  if (/正|front/iu['test'](_0x24ff54)) return 'front';
-  if (/左.*(?:侧|profile)|(?:left).*profile/iu['test'](_0x24ff54)) return 'left_profile';
-  if (/右.*(?:侧|profile)|(?:right).*profile/iu['test'](_0x24ff54)) return 'right_profile';
-  if (/侧|side|profile/iu['test'](_0x24ff54)) return 'side';
+  if (/背|back|rear/iu['test'](text7)) return 'back';
+  if (/正|front/iu['test'](text7)) return 'front';
+  if (/左.*(?:侧|profile)|(?:left).*profile/iu['test'](text7)) return 'left_profile';
+  if (/右.*(?:侧|profile)|(?:right).*profile/iu['test'](text7)) return 'right_profile';
+  if (/侧|side|profile/iu['test'](text7)) return 'side';
   return 'unknown';
 }
-function normalizeHorizontal(_0x4fc934) {
-  const _0x4c24e5 = normalizeText(_0x4fc934)['toLowerCase']();
-  if (/左|left/iu['test'](_0x4c24e5)) return 'left';
-  if (/右|right/iu['test'](_0x4c24e5)) return 'right';
-  if (/中|center|centre|middle/iu['test'](_0x4c24e5)) return 'center';
+function normalizeHorizontal(value13) {
+  const text8 = normalizeText(value13)['toLowerCase']();
+  if (/左|left/iu['test'](text8)) return 'left';
+  if (/右|right/iu['test'](text8)) return 'right';
+  if (/中|center|centre|middle/iu['test'](text8)) return 'center';
   return 'unknown';
 }
-function normalizeDepth(_0x1b49ec) {
-  const _0xa0a99e = normalizeText(_0x1b49ec)['toLowerCase']();
-  if (/前景|foreground|near|close/iu['test'](_0xa0a99e)) return 'foreground';
-  if (/后景|背景|background|far/iu['test'](_0xa0a99e)) return 'background';
-  if (/中景|midground|middle/iu['test'](_0xa0a99e)) return 'midground';
+function normalizeDepth(value14) {
+  const text9 = normalizeText(value14)['toLowerCase']();
+  if (/前景|foreground|near|close/iu['test'](text9)) return 'foreground';
+  if (/后景|背景|background|far/iu['test'](text9)) return 'background';
+  if (/中景|midground|middle/iu['test'](text9)) return 'midground';
   return 'unknown';
 }
-function normalizeOcclusion(_0x5952ed) {
-  if (_0x5952ed === !![]) return 'partial';
-  if (_0x5952ed === ![]) return 'none';
-  const _0x3e3d35 = normalizeText(
-    _0x5952ed && typeof _0x5952ed === 'object'
-      ? firstDefined(_0x5952ed['level'], _0x5952ed['type'], _0x5952ed['status'])
-      : _0x5952ed,
+function normalizeOcclusion(response2) {
+  if (response2 === !![]) return 'partial';
+  if (response2 === ![]) return 'none';
+  const text10 = normalizeText(
+    response2 && typeof response2 === 'object'
+      ? firstDefined(response2['level'], response2['type'], response2['status'])
+      : response2,
   )['toLowerCase']();
-  if (/heavy|severe|large|大面积|严重|高度/iu['test'](_0x3e3d35)) return 'heavy';
-  if (/partial|partly|medium|局部|部分|遮挡/iu['test'](_0x3e3d35)) return 'partial';
+  if (/heavy|severe|large|大面积|严重|高度/iu['test'](text10)) return 'heavy';
+  if (/partial|partly|medium|局部|部分|遮挡/iu['test'](text10)) return 'partial';
   return 'none';
 }
-function normalizeBoundingBox(_0x379241, _0x13abc4 = {}) {
-  if (!_0x379241) return null;
-  let _0x5f3d84, _0x194f1b, _0x4d25e7, _0x128173;
-  if (Array['isArray'](_0x379241)) [_0x5f3d84, _0x194f1b, _0x4d25e7, _0x128173] = _0x379241;
+function normalizeBoundingBox(box, box2 = {}) {
+  if (!box) return null;
+  let defined2, defined3, defined4, defined5;
+  if (Array['isArray'](box)) [defined2, defined3, defined4, defined5] = box;
   else {
-    if (typeof _0x379241 === 'object') {
-      ((_0x5f3d84 = firstDefined(_0x379241['x'], _0x379241['left'], _0x379241['xmin'], _0x379241['xMin'])),
-        (_0x194f1b = firstDefined(_0x379241['y'], _0x379241['top'], _0x379241['ymin'], _0x379241['yMin'])),
-        (_0x4d25e7 = firstDefined(_0x379241['width'], _0x379241['w'])),
-        (_0x128173 = firstDefined(_0x379241['height'], _0x379241['h'])));
-      const _0x1b5e6a = firstDefined(_0x379241['right'], _0x379241['xmax'], _0x379241['xMax']),
-        _0x580df7 = firstDefined(_0x379241['bottom'], _0x379241['ymax'], _0x379241['yMax']);
-      if (_0x4d25e7 === undefined && _0x1b5e6a !== undefined)
-        _0x4d25e7 = Number(_0x1b5e6a) - Number(_0x5f3d84);
-      if (_0x128173 === undefined && _0x580df7 !== undefined)
-        _0x128173 = Number(_0x580df7) - Number(_0x194f1b);
+    if (typeof box === 'object') {
+      ((defined2 = firstDefined(box['x'], box['left'], box['xmin'], box['xMin'])),
+        (defined3 = firstDefined(box['y'], box['top'], box['ymin'], box['yMin'])),
+        (defined4 = firstDefined(box['width'], box['w'])),
+        (defined5 = firstDefined(box['height'], box['h'])));
+      const defined6 = firstDefined(box['right'], box['xmax'], box['xMax']),
+        defined7 = firstDefined(box['bottom'], box['ymax'], box['yMax']);
+      if (defined4 === undefined && defined6 !== undefined) defined4 = Number(defined6) - Number(defined2);
+      if (defined5 === undefined && defined7 !== undefined) defined5 = Number(defined7) - Number(defined3);
     }
   }
-  const _0x266bc9 = [_0x5f3d84, _0x194f1b, _0x4d25e7, _0x128173]['map'](Number);
-  if (_0x266bc9['some']((_0x26805e) => !Number['isFinite'](_0x26805e))) return null;
-  let [_0x2efabb, _0x2007b0, _0x250c85, _0x457235] = _0x266bc9;
-  const _0x453a6a = Number(
-      firstDefined(_0x13abc4['width'], _0x13abc4['frameWidth'], _0x13abc4['imageWidth']),
-    ),
-    _0x53276b = Number(firstDefined(_0x13abc4['height'], _0x13abc4['frameHeight'], _0x13abc4['imageHeight']));
-  if (_0x453a6a > 0x0 && _0x53276b > 0x0 && _0x266bc9['some']((_0x662cba) => _0x662cba > 0x1))
-    ((_0x2efabb /= _0x453a6a), (_0x250c85 /= _0x453a6a), (_0x2007b0 /= _0x53276b), (_0x457235 /= _0x53276b));
+  const list6 = [defined2, defined3, defined4, defined5]['map'](Number);
+  if (list6['some']((value15) => !Number['isFinite'](value15))) return null;
+  let [value16, value17, value18, value19] = list6;
+  const count6 = Number(firstDefined(box2['width'], box2['frameWidth'], box2['imageWidth'])),
+    count7 = Number(firstDefined(box2['height'], box2['frameHeight'], box2['imageHeight']));
+  if (count6 > 0x0 && count7 > 0x0 && list6['some']((count8) => count8 > 0x1))
+    ((value16 /= count6), (value18 /= count6), (value17 /= count7), (value19 /= count7));
   else
-    _0x266bc9['every']((_0x9c90a0) => _0x9c90a0 >= 0x0 && _0x9c90a0 <= 0x64) &&
-      _0x266bc9['some']((_0x114254) => _0x114254 > 0x1) &&
-      ((_0x2efabb /= 0x64), (_0x2007b0 /= 0x64), (_0x250c85 /= 0x64), (_0x457235 /= 0x64));
+    list6['every']((count9) => count9 >= 0x0 && count9 <= 0x64) &&
+      list6['some']((count10) => count10 > 0x1) &&
+      ((value16 /= 0x64), (value17 /= 0x64), (value18 /= 0x64), (value19 /= 0x64));
   return {
-    x: Math['max'](0x0, Math['min'](0x1, _0x2efabb)),
-    y: Math['max'](0x0, Math['min'](0x1, _0x2007b0)),
-    width: Math['max'](0x0, Math['min'](0x1 - Math['max'](0x0, _0x2efabb), _0x250c85)),
-    height: Math['max'](0x0, Math['min'](0x1 - Math['max'](0x0, _0x2007b0), _0x457235)),
+    x: Math['max'](0x0, Math['min'](0x1, value16)),
+    y: Math['max'](0x0, Math['min'](0x1, value17)),
+    width: Math['max'](0x0, Math['min'](0x1 - Math['max'](0x0, value16), value18)),
+    height: Math['max'](0x0, Math['min'](0x1 - Math['max'](0x0, value17), value19)),
   };
 }
-function inferHorizontal(_0x22b9a1) {
-  if (!_0x22b9a1) return 'unknown';
-  const _0x3fdb02 = _0x22b9a1['x'] + _0x22b9a1['width'] / 0x2;
-  if (_0x3fdb02 < 0.4) return 'left';
-  if (_0x3fdb02 > 0.6) return 'right';
+function inferHorizontal(box3) {
+  if (!box3) return 'unknown';
+  const count11 = box3['x'] + box3['width'] / 0x2;
+  if (count11 < 0.4) return 'left';
+  if (count11 > 0.6) return 'right';
   return 'center';
 }
-function normalizeAnalysisStatus(_0x5066b0, _0x27f86f = 'pending') {
-  const _0x372736 = normalizeText(_0x5066b0)['toLowerCase']();
-  return ['pending', 'running', 'succeeded', 'failed', 'needs_review']['includes'](_0x372736)
-    ? _0x372736
-    : _0x27f86f;
+function normalizeAnalysisStatus(value20, value21 = 'pending') {
+  const text11 = normalizeText(value20)['toLowerCase']();
+  return ['pending', 'running', 'succeeded', 'failed', 'needs_review']['includes'](text11) ? text11 : value21;
 }
-function normalizeGenerationStatus(_0x472174) {
-  const _0x11bc46 = normalizeText(_0x472174)['toLowerCase']();
+function normalizeGenerationStatus(value22) {
+  const text12 = normalizeText(value22)['toLowerCase']();
   return ['pending', 'queued', 'submitting', 'running', 'succeeded', 'failed', 'cancelled', 'needs_review'][
     'includes'
-  ](_0x11bc46)
-    ? _0x11bc46
+  ](text12)
+    ? text12
     : 'pending';
 }
-function normalizeMaterializationStatus(_0x3a41e1, _0x4f518d = ![]) {
-  const _0x46057a = normalizeText(_0x3a41e1)['toLowerCase']();
-  if (['pending', 'running', 'succeeded', 'failed']['includes'](_0x46057a)) return _0x46057a;
-  return _0x4f518d ? 'succeeded' : 'pending';
+function normalizeMaterializationStatus(value23, value24 = ![]) {
+  const text13 = normalizeText(value23)['toLowerCase']();
+  if (['pending', 'running', 'succeeded', 'failed']['includes'](text13)) return text13;
+  return value24 ? 'succeeded' : 'pending';
 }
 export function normalizePersonReplacementPerson(
-  _0x58ca25 = {},
+  promptMarkerIndex = {},
   { shotId: shotId = 'shot-1', index: index = 0x0, frame: frame = {} } = {},
 ) {
-  const _0x21ae0a = normalizeBoundingBox(
+  const bbox = normalizeBoundingBox(
       firstDefined(
-        _0x58ca25['bbox'],
-        _0x58ca25['box'],
-        _0x58ca25['boundingBox'],
-        _0x58ca25['bounding_box'],
-        _0x58ca25['region'],
-        _0x58ca25['locator']?.['bbox'],
+        promptMarkerIndex['bbox'],
+        promptMarkerIndex['box'],
+        promptMarkerIndex['boundingBox'],
+        promptMarkerIndex['bounding_box'],
+        promptMarkerIndex['region'],
+        promptMarkerIndex['locator']?.['bbox'],
       ),
       frame,
     ),
-    _0x228af0 = normalizeHorizontal(
+    horizontal = normalizeHorizontal(
       firstDefined(
-        _0x58ca25['horizontal'],
-        _0x58ca25['side'],
-        _0x58ca25['position'],
-        _0x58ca25['location'],
-        _0x58ca25['locator']?.['horizontal'],
+        promptMarkerIndex['horizontal'],
+        promptMarkerIndex['side'],
+        promptMarkerIndex['position'],
+        promptMarkerIndex['location'],
+        promptMarkerIndex['locator']?.['horizontal'],
       ),
     ),
-    _0x2e013 = normalizeText(
+    sourceCharacterId = normalizeText(
       firstDefined(
-        _0x58ca25['sourceCharacterId'],
-        _0x58ca25['source_character_id'],
-        _0x58ca25['identityId'],
-        _0x58ca25['identity_id'],
-        _0x58ca25['clusterId'],
-        _0x58ca25['cluster_id'],
-        _0x58ca25['trackId'],
-        _0x58ca25['track_id'],
+        promptMarkerIndex['sourceCharacterId'],
+        promptMarkerIndex['source_character_id'],
+        promptMarkerIndex['identityId'],
+        promptMarkerIndex['identity_id'],
+        promptMarkerIndex['clusterId'],
+        promptMarkerIndex['cluster_id'],
+        promptMarkerIndex['trackId'],
+        promptMarkerIndex['track_id'],
       ),
     );
   return {
     id:
-      normalizeText(firstDefined(_0x58ca25['id'], _0x58ca25['personId'], _0x58ca25['person_id'])) ||
-      shotId + '-person-' + (index + 0x1),
-    ...(Number['isSafeInteger'](_0x58ca25['promptMarkerIndex']) && _0x58ca25['promptMarkerIndex'] >= 0x0
-      ? { promptMarkerIndex: _0x58ca25['promptMarkerIndex'] }
+      normalizeText(
+        firstDefined(promptMarkerIndex['id'], promptMarkerIndex['personId'], promptMarkerIndex['person_id']),
+      ) || shotId + '-person-' + (index + 0x1),
+    ...(Number['isSafeInteger'](promptMarkerIndex['promptMarkerIndex']) &&
+    promptMarkerIndex['promptMarkerIndex'] >= 0x0
+      ? { promptMarkerIndex: promptMarkerIndex['promptMarkerIndex'] }
       : {}),
-    sourceCharacterId: _0x2e013,
+    sourceCharacterId: sourceCharacterId,
     targetCharacterId: normalizeText(
-      firstDefined(_0x58ca25['targetCharacterId'], _0x58ca25['target_character_id']),
+      firstDefined(promptMarkerIndex['targetCharacterId'], promptMarkerIndex['target_character_id']),
     ),
     targetAppearanceId: normalizeText(
-      firstDefined(_0x58ca25['targetAppearanceId'], _0x58ca25['target_appearance_id']),
+      firstDefined(promptMarkerIndex['targetAppearanceId'], promptMarkerIndex['target_appearance_id']),
     ),
-    ...(_0x58ca25['projectMappingDisabled'] === !![] || _0x58ca25['project_mapping_disabled'] === !![]
+    ...(promptMarkerIndex['projectMappingDisabled'] === !![] ||
+    promptMarkerIndex['project_mapping_disabled'] === !![]
       ? { projectMappingDisabled: !![] }
       : {}),
     replacementScope: normalizePersonReplacementScope(
-      firstDefined(_0x58ca25['replacementScope'], _0x58ca25['replacement_scope']),
+      firstDefined(promptMarkerIndex['replacementScope'], promptMarkerIndex['replacement_scope']),
     ),
     detectionClass:
       normalizeText(
-        firstDefined(_0x58ca25['detectionClass'], _0x58ca25['detection_class'], _0x58ca25['className']),
+        firstDefined(
+          promptMarkerIndex['detectionClass'],
+          promptMarkerIndex['detection_class'],
+          promptMarkerIndex['className'],
+        ),
       ) || 'person',
     detectionMethod: ['automatic', 'manual']['includes'](
-      normalizeText(firstDefined(_0x58ca25['detectionMethod'], _0x58ca25['detection_method'])),
+      normalizeText(
+        firstDefined(promptMarkerIndex['detectionMethod'], promptMarkerIndex['detection_method']),
+      ),
     )
-      ? normalizeText(firstDefined(_0x58ca25['detectionMethod'], _0x58ca25['detection_method']))
+      ? normalizeText(
+          firstDefined(promptMarkerIndex['detectionMethod'], promptMarkerIndex['detection_method']),
+        )
       : 'automatic',
-    label: normalizeText(firstDefined(_0x58ca25['label'], _0x58ca25['personLabel'], _0x58ca25['name'])),
+    label: normalizeText(
+      firstDefined(promptMarkerIndex['label'], promptMarkerIndex['personLabel'], promptMarkerIndex['name']),
+    ),
     genderHint: normalizeText(
       firstDefined(
-        _0x58ca25['genderHint'],
-        _0x58ca25['gender'],
-        _0x58ca25['perceivedGender'],
-        _0x58ca25['sex'],
+        promptMarkerIndex['genderHint'],
+        promptMarkerIndex['gender'],
+        promptMarkerIndex['perceivedGender'],
+        promptMarkerIndex['sex'],
       ),
     ),
     locator: {
-      horizontal: _0x228af0 === 'unknown' ? inferHorizontal(_0x21ae0a) : _0x228af0,
+      horizontal: horizontal === 'unknown' ? inferHorizontal(bbox) : horizontal,
       depth: normalizeDepth(
         firstDefined(
-          _0x58ca25['depth'],
-          _0x58ca25['layer'],
-          _0x58ca25['position'],
-          _0x58ca25['location'],
-          _0x58ca25['locator']?.['depth'],
+          promptMarkerIndex['depth'],
+          promptMarkerIndex['layer'],
+          promptMarkerIndex['position'],
+          promptMarkerIndex['location'],
+          promptMarkerIndex['locator']?.['depth'],
         ),
       ),
-      bbox: _0x21ae0a,
+      bbox: bbox,
     },
     orientation: normalizePersonReplacementOrientation(
       firstDefined(
-        _0x58ca25['orientation'],
-        _0x58ca25['facing'],
-        _0x58ca25['direction'],
-        _0x58ca25['pose']?.['orientation'],
+        promptMarkerIndex['orientation'],
+        promptMarkerIndex['facing'],
+        promptMarkerIndex['direction'],
+        promptMarkerIndex['pose']?.['orientation'],
       ),
     ),
     orientationModelId: normalizeText(
-      firstDefined(_0x58ca25['orientationModelId'], _0x58ca25['orientation_model_id']),
+      firstDefined(promptMarkerIndex['orientationModelId'], promptMarkerIndex['orientation_model_id']),
     ),
     identityConfidence: normalizeConfidence(
       firstDefined(
-        _0x58ca25['identityConfidence'],
-        _0x58ca25['identity_confidence'],
-        _0x58ca25['characterConfidence'],
-        _0x58ca25['character_confidence'],
+        promptMarkerIndex['identityConfidence'],
+        promptMarkerIndex['identity_confidence'],
+        promptMarkerIndex['characterConfidence'],
+        promptMarkerIndex['character_confidence'],
       ),
     ),
     detectionConfidence: normalizeConfidence(
       firstDefined(
-        _0x58ca25['detectionConfidence'],
-        _0x58ca25['detection_confidence'],
-        _0x58ca25['detectorConfidence'],
-        _0x58ca25['detector_confidence'],
+        promptMarkerIndex['detectionConfidence'],
+        promptMarkerIndex['detection_confidence'],
+        promptMarkerIndex['detectorConfidence'],
+        promptMarkerIndex['detector_confidence'],
       ),
     ),
     identityMatchSimilarity: normalizeConfidence(
       firstDefined(
-        _0x58ca25['identityMatchSimilarity'],
-        _0x58ca25['matchSimilarity'],
-        _0x58ca25['match_similarity'],
+        promptMarkerIndex['identityMatchSimilarity'],
+        promptMarkerIndex['matchSimilarity'],
+        promptMarkerIndex['match_similarity'],
       ),
     ),
-    identityReviewStatus: IDENTITY_REVIEW_STATUSES['has'](normalizeText(_0x58ca25['identityReviewStatus']))
-      ? normalizeText(_0x58ca25['identityReviewStatus'])
-      : firstDefined(_0x58ca25['reviewRequired'], _0x58ca25['needsReview'], ![])
+    identityReviewStatus: IDENTITY_REVIEW_STATUSES['has'](
+      normalizeText(promptMarkerIndex['identityReviewStatus']),
+    )
+      ? normalizeText(promptMarkerIndex['identityReviewStatus'])
+      : firstDefined(promptMarkerIndex['reviewRequired'], promptMarkerIndex['needsReview'], ![])
         ? 'needs_review'
         : 'auto',
-    identityMethod: IDENTITY_METHODS['has'](normalizeText(_0x58ca25['identityMethod']))
-      ? normalizeText(_0x58ca25['identityMethod'])
-      : _0x2e013
+    identityMethod: IDENTITY_METHODS['has'](normalizeText(promptMarkerIndex['identityMethod']))
+      ? normalizeText(promptMarkerIndex['identityMethod'])
+      : sourceCharacterId
         ? 'fallback'
         : 'unassigned',
     identityReviewRequired: Boolean(
       firstDefined(
-        _0x58ca25['identityReviewRequired'],
-        _0x58ca25['reviewRequired'],
-        _0x58ca25['needsReview'],
+        promptMarkerIndex['identityReviewRequired'],
+        promptMarkerIndex['reviewRequired'],
+        promptMarkerIndex['needsReview'],
         ![],
       ),
     ),
     ambiguousIdentityIds: toArray(
-      firstDefined(_0x58ca25['ambiguousIdentityIds'], _0x58ca25['ambiguous_identity_ids'], []),
+      firstDefined(
+        promptMarkerIndex['ambiguousIdentityIds'],
+        promptMarkerIndex['ambiguous_identity_ids'],
+        [],
+      ),
     )
       ['map'](normalizeText)
       ['filter'](Boolean),
     orientationConfidence: normalizeConfidence(
       firstDefined(
-        _0x58ca25['orientationConfidence'],
-        _0x58ca25['orientation_confidence'],
-        _0x58ca25['facingConfidence'],
-        _0x58ca25['facing_confidence'],
+        promptMarkerIndex['orientationConfidence'],
+        promptMarkerIndex['orientation_confidence'],
+        promptMarkerIndex['facingConfidence'],
+        promptMarkerIndex['facing_confidence'],
       ),
     ),
     occlusion: normalizeOcclusion(
-      firstDefined(_0x58ca25['occlusion'], _0x58ca25['occluded'], _0x58ca25['visibility']),
+      firstDefined(
+        promptMarkerIndex['occlusion'],
+        promptMarkerIndex['occluded'],
+        promptMarkerIndex['visibility'],
+      ),
     ),
-    notes: normalizeText(firstDefined(_0x58ca25['notes'], _0x58ca25['note'], _0x58ca25['description'])),
+    notes: normalizeText(
+      firstDefined(promptMarkerIndex['notes'], promptMarkerIndex['note'], promptMarkerIndex['description']),
+    ),
   };
 }
-function extractPeople(_0x181ea3) {
+function extractPeople(value25) {
   return firstDefined(
-    _0x181ea3['people'],
-    _0x181ea3['persons'],
-    _0x181ea3['characters'],
-    _0x181ea3['subjects'],
-    _0x181ea3['detections']?.['people'],
-    _0x181ea3['detection']?.['people'],
-    _0x181ea3['人物'],
+    value25['people'],
+    value25['persons'],
+    value25['characters'],
+    value25['subjects'],
+    value25['detections']?.['people'],
+    value25['detection']?.['people'],
+    value25['人物'],
     [],
   );
 }
-export function resolvePersonReplacementImageResultRef(_0x599116 = {}) {
-  if (typeof _0x599116 === 'string') {
-    const _0xff57f3 = normalizeText(_0x599116);
-    return normalizeLocalPath(_0xff57f3) ? _0xff57f3 : '';
+export function resolvePersonReplacementImageResultRef(response3 = {}) {
+  if (typeof response3 === 'string') {
+    const text14 = normalizeText(response3);
+    return normalizeLocalPath(text14) ? text14 : '';
   }
-  if (!_0x599116 || typeof _0x599116 !== 'object' || Array['isArray'](_0x599116)) return '';
+  if (!response3 || typeof response3 !== 'object' || Array['isArray'](response3)) return '';
   return (
     [
-      _0x599116['originalLocalPath'],
-      _0x599116['localPath'],
-      _0x599116['sourceUrl'],
-      _0x599116['imageUrl'],
-      _0x599116['url'],
-      _0x599116['resultUrl'],
-      _0x599116['localUrl'],
-      _0x599116['src'],
-      _0x599116['displayLocalPath'],
-      _0x599116['displayUrl'],
-      _0x599116['ref'],
+      response3['originalLocalPath'],
+      response3['localPath'],
+      response3['sourceUrl'],
+      response3['imageUrl'],
+      response3['url'],
+      response3['resultUrl'],
+      response3['localUrl'],
+      response3['src'],
+      response3['displayLocalPath'],
+      response3['displayUrl'],
+      response3['ref'],
     ]
       ['map'](normalizeText)
-      ['find']((_0xa936d1) => normalizeLocalPath(_0xa936d1)) || ''
+      ['find']((value26) => normalizeLocalPath(value26)) || ''
   );
 }
-function normalizePersonReplacementImageResult(_0x29f95f = {}) {
-  if (typeof _0x29f95f === 'string') {
-    const _0x32fe09 = resolvePersonReplacementImageResultRef(_0x29f95f);
-    return _0x32fe09 ? { imageUrl: _0x32fe09 } : null;
+function normalizePersonReplacementImageResult(response4 = {}) {
+  if (typeof response4 === 'string') {
+    const imageUrl = resolvePersonReplacementImageResultRef(response4);
+    return imageUrl ? { imageUrl: imageUrl } : null;
   }
-  if (!_0x29f95f || typeof _0x29f95f !== 'object' || Array['isArray'](_0x29f95f)) return null;
-  const _0x4113aa = resolvePersonReplacementImageResultRef(_0x29f95f);
-  if (!_0x4113aa) return null;
+  if (!response4 || typeof response4 !== 'object' || Array['isArray'](response4)) return null;
+  const personReplacementImageResultRef = resolvePersonReplacementImageResultRef(response4);
+  if (!personReplacementImageResultRef) return null;
   return {
-    ..._0x29f95f,
-    ...(_0x29f95f['originalLocalPath'] !== undefined
-      ? { originalLocalPath: resolvePersonReplacementImageResultRef(_0x29f95f['originalLocalPath']) }
+    ...response4,
+    ...(response4['originalLocalPath'] !== undefined
+      ? { originalLocalPath: resolvePersonReplacementImageResultRef(response4['originalLocalPath']) }
       : {}),
-    ...(_0x29f95f['displayLocalPath'] !== undefined
-      ? { displayLocalPath: resolvePersonReplacementImageResultRef(_0x29f95f['displayLocalPath']) }
+    ...(response4['displayLocalPath'] !== undefined
+      ? { displayLocalPath: resolvePersonReplacementImageResultRef(response4['displayLocalPath']) }
       : {}),
-    ...(_0x29f95f['localPath'] !== undefined
-      ? { localPath: resolvePersonReplacementImageResultRef(_0x29f95f['localPath']) }
+    ...(response4['localPath'] !== undefined
+      ? { localPath: resolvePersonReplacementImageResultRef(response4['localPath']) }
       : {}),
-    ...(_0x29f95f['imageUrl'] !== undefined
-      ? { imageUrl: resolvePersonReplacementImageResultRef(_0x29f95f['imageUrl']) }
+    ...(response4['imageUrl'] !== undefined
+      ? { imageUrl: resolvePersonReplacementImageResultRef(response4['imageUrl']) }
       : {}),
-    ...(_0x29f95f['src'] !== undefined
-      ? { src: resolvePersonReplacementImageResultRef(_0x29f95f['src']) }
+    ...(response4['src'] !== undefined
+      ? { src: resolvePersonReplacementImageResultRef(response4['src']) }
       : {}),
-    ...(_0x29f95f['resultUrl'] !== undefined
-      ? { resultUrl: resolvePersonReplacementImageResultRef(_0x29f95f['resultUrl']) }
+    ...(response4['resultUrl'] !== undefined
+      ? { resultUrl: resolvePersonReplacementImageResultRef(response4['resultUrl']) }
       : {}),
-    ...(_0x29f95f['localUrl'] !== undefined
-      ? { localUrl: resolvePersonReplacementImageResultRef(_0x29f95f['localUrl']) }
+    ...(response4['localUrl'] !== undefined
+      ? { localUrl: resolvePersonReplacementImageResultRef(response4['localUrl']) }
       : {}),
-    ...(_0x29f95f['sourceUrl'] !== undefined
-      ? { sourceUrl: resolvePersonReplacementImageResultRef(_0x29f95f['sourceUrl']) }
+    ...(response4['sourceUrl'] !== undefined
+      ? { sourceUrl: resolvePersonReplacementImageResultRef(response4['sourceUrl']) }
       : {}),
-    ...(_0x29f95f['url'] !== undefined
-      ? { url: resolvePersonReplacementImageResultRef(_0x29f95f['url']) }
+    ...(response4['url'] !== undefined
+      ? { url: resolvePersonReplacementImageResultRef(response4['url']) }
       : {}),
-    ...(_0x29f95f['displayUrl'] !== undefined
-      ? { displayUrl: resolvePersonReplacementImageResultRef(_0x29f95f['displayUrl']) }
+    ...(response4['displayUrl'] !== undefined
+      ? { displayUrl: resolvePersonReplacementImageResultRef(response4['displayUrl']) }
       : {}),
-    ...(_0x29f95f['ref'] !== undefined
-      ? { ref: resolvePersonReplacementImageResultRef(_0x29f95f['ref']) }
+    ...(response4['ref'] !== undefined
+      ? { ref: resolvePersonReplacementImageResultRef(response4['ref']) }
       : {}),
-    ...(_0x29f95f['remoteFallbackUrl'] !== undefined ? { remoteFallbackUrl: '' } : {}),
-    ...(_0x29f95f['localSaveError'] !== undefined ? { localSaveError: '' } : {}),
-    ...(_0x29f95f['prompt'] !== undefined ? { prompt: normalizeText(_0x29f95f['prompt']) } : {}),
-    ...(_0x29f95f['userPrompt'] !== undefined ? { userPrompt: normalizeText(_0x29f95f['userPrompt']) } : {}),
-    ...(_0x29f95f['modelId'] !== undefined ? { modelId: normalizeText(_0x29f95f['modelId']) } : {}),
-    ...(_0x29f95f['provider'] !== undefined ? { provider: normalizeText(_0x29f95f['provider']) } : {}),
-    ...(_0x29f95f['createdAt'] !== undefined ? { createdAt: normalizeText(_0x29f95f['createdAt']) } : {}),
+    ...(response4['remoteFallbackUrl'] !== undefined ? { remoteFallbackUrl: '' } : {}),
+    ...(response4['localSaveError'] !== undefined ? { localSaveError: '' } : {}),
+    ...(response4['prompt'] !== undefined ? { prompt: normalizeText(response4['prompt']) } : {}),
+    ...(response4['userPrompt'] !== undefined ? { userPrompt: normalizeText(response4['userPrompt']) } : {}),
+    ...(response4['modelId'] !== undefined ? { modelId: normalizeText(response4['modelId']) } : {}),
+    ...(response4['provider'] !== undefined ? { provider: normalizeText(response4['provider']) } : {}),
+    ...(response4['createdAt'] !== undefined ? { createdAt: normalizeText(response4['createdAt']) } : {}),
   };
 }
-export function getPersonReplacementImageResults(_0x142496 = {}) {
-  const _0x329c0e = _0x142496?.['replacementImage'],
-    _0x4be969 =
-      _0x329c0e && typeof _0x329c0e === 'object' && !Array['isArray'](_0x329c0e) ? _0x329c0e['results'] : [];
-  return Array['isArray'](_0x4be969)
-    ? _0x4be969['map'](normalizePersonReplacementImageResult)['filter'](Boolean)
+export function getPersonReplacementImageResults(options3 = {}) {
+  const value27 = options3?.['replacementImage'],
+    list7 = value27 && typeof value27 === 'object' && !Array['isArray'](value27) ? value27['results'] : [];
+  return Array['isArray'](list7)
+    ? list7['map'](normalizePersonReplacementImageResult)['filter'](Boolean)
     : [];
 }
 export function getPersonReplacementActiveImageResultIndex(
-  _0x4490a2 = {},
-  _0x10560c = getPersonReplacementImageResults(_0x4490a2),
+  options4 = {},
+  list8 = getPersonReplacementImageResults(options4),
 ) {
-  if (!_0x10560c['length']) return 0x0;
-  const _0x1dbd20 = Math['trunc'](Number(_0x4490a2?.['replacementImage']?.['activeIndex']) || 0x0);
-  return Math['max'](0x0, Math['min'](_0x10560c['length'] - 0x1, _0x1dbd20));
+  if (!list8['length']) return 0x0;
+  const value28 = Math['trunc'](Number(options4?.['replacementImage']?.['activeIndex']) || 0x0);
+  return Math['max'](0x0, Math['min'](list8['length'] - 0x1, value28));
 }
 export function getPersonReplacementActiveImageResult(
-  _0x2a2e86 = {},
-  _0x2633e6 = getPersonReplacementImageResults(_0x2a2e86),
+  options5 = {},
+  personReplacementImageResults = getPersonReplacementImageResults(options5),
 ) {
-  return _0x2633e6[getPersonReplacementActiveImageResultIndex(_0x2a2e86, _0x2633e6)] || null;
-}
-export function resolvePersonReplacementImageSourceRef(_0x24ea1a = {}) {
   return (
-    normalizeText(_0x24ea1a?.['imageIterationReferenceRef']) || normalizeText(_0x24ea1a?.['keyframeRef'])
+    personReplacementImageResults[
+      getPersonReplacementActiveImageResultIndex(options5, personReplacementImageResults)
+    ] || null
   );
 }
-function normalizePersonReplacementImage(_0x345f17 = {}) {
-  const _0x32ce3e =
-      _0x345f17['replacementImage'] &&
-      typeof _0x345f17['replacementImage'] === 'object' &&
-      !Array['isArray'](_0x345f17['replacementImage'])
-        ? _0x345f17['replacementImage']
+export function resolvePersonReplacementImageSourceRef(options6 = {}) {
+  return normalizeText(options6?.['imageIterationReferenceRef']) || normalizeText(options6?.['keyframeRef']);
+}
+function normalizePersonReplacementImage(options7 = {}) {
+  const replacementImage =
+      options7['replacementImage'] &&
+      typeof options7['replacementImage'] === 'object' &&
+      !Array['isArray'](options7['replacementImage'])
+        ? options7['replacementImage']
         : {},
-    _0xcb7d70 = getPersonReplacementImageResults({ replacementImage: _0x32ce3e }),
-    _0x3c3639 = resolvePersonReplacementImageResultRef(
+    results = getPersonReplacementImageResults({ replacementImage: replacementImage }),
+    imageUrl2 = resolvePersonReplacementImageResultRef(
       normalizeText(
         firstDefined(
-          _0x345f17['replacementImageRef'],
-          _0x345f17['generatedKeyframeRef'],
-          _0x345f17['replacedFrameRef'],
+          options7['replacementImageRef'],
+          options7['generatedKeyframeRef'],
+          options7['replacedFrameRef'],
         ),
       ),
     );
-  _0x3c3639 && !_0xcb7d70['length'] && _0xcb7d70['push']({ imageUrl: _0x3c3639 });
-  const _0x7f0697 = Number(_0x32ce3e['activeIndex']),
-    _0x43a2e7 = _0x3c3639
-      ? _0xcb7d70['findIndex']((_0x1194e2) => resolvePersonReplacementImageResultRef(_0x1194e2) === _0x3c3639)
+  imageUrl2 && !results['length'] && results['push']({ imageUrl: imageUrl2 });
+  const value29 = Number(replacementImage['activeIndex']),
+    value30 = imageUrl2
+      ? results['findIndex']((value31) => resolvePersonReplacementImageResultRef(value31) === imageUrl2)
       : -0x1,
-    _0x98128a = _0xcb7d70['length']
-      ? Number['isFinite'](_0x7f0697)
-        ? Math['max'](0x0, Math['min'](_0xcb7d70['length'] - 0x1, Math['trunc'](_0x7f0697)))
-        : Math['max'](0x0, _0x43a2e7)
+    activeIndex = results['length']
+      ? Number['isFinite'](value29)
+        ? Math['max'](0x0, Math['min'](results['length'] - 0x1, Math['trunc'](value29)))
+        : Math['max'](0x0, value30)
       : 0x0;
-  return { results: _0xcb7d70, activeIndex: _0x98128a };
+  return { results: results, activeIndex: activeIndex };
 }
-export function resolvePersonReplacementVideoResultRef(_0x205793 = {}) {
-  if (typeof _0x205793 === 'string') {
-    const _0x291fa2 = normalizeText(_0x205793);
-    return normalizeLocalPath(_0x291fa2) ? _0x291fa2 : '';
+export function resolvePersonReplacementVideoResultRef(response5 = {}) {
+  if (typeof response5 === 'string') {
+    const text15 = normalizeText(response5);
+    return normalizeLocalPath(text15) ? text15 : '';
   }
-  if (!_0x205793 || typeof _0x205793 !== 'object' || Array['isArray'](_0x205793)) return '';
+  if (!response5 || typeof response5 !== 'object' || Array['isArray'](response5)) return '';
   return (
     [
-      _0x205793['displayLocalPath'],
-      _0x205793['localPath'],
-      _0x205793['videoUrl'],
-      _0x205793['url'],
-      _0x205793['displayUrl'],
-      _0x205793['ref'],
+      response5['displayLocalPath'],
+      response5['localPath'],
+      response5['videoUrl'],
+      response5['url'],
+      response5['displayUrl'],
+      response5['ref'],
     ]
       ['map'](normalizeText)
-      ['find']((_0x428c13) => normalizeLocalPath(_0x428c13)) || ''
+      ['find']((value32) => normalizeLocalPath(value32)) || ''
   );
 }
-function normalizePersonReplacementVideoResult(_0xd9b6de = {}) {
-  if (typeof _0xd9b6de === 'string') {
-    const _0x389562 = resolvePersonReplacementVideoResultRef(_0xd9b6de);
-    return _0x389562 ? { videoUrl: _0x389562 } : null;
+function normalizePersonReplacementVideoResult(response6 = {}) {
+  if (typeof response6 === 'string') {
+    const videoUrl = resolvePersonReplacementVideoResultRef(response6);
+    return videoUrl ? { videoUrl: videoUrl } : null;
   }
-  if (!_0xd9b6de || typeof _0xd9b6de !== 'object' || Array['isArray'](_0xd9b6de)) return null;
-  const _0x1df67a = resolvePersonReplacementVideoResultRef(_0xd9b6de);
-  if (!_0x1df67a) return null;
+  if (!response6 || typeof response6 !== 'object' || Array['isArray'](response6)) return null;
+  const personReplacementVideoResultRef = resolvePersonReplacementVideoResultRef(response6);
+  if (!personReplacementVideoResultRef) return null;
   return {
-    ..._0xd9b6de,
-    ...(_0xd9b6de['displayLocalPath'] !== undefined
-      ? { displayLocalPath: resolvePersonReplacementVideoResultRef(_0xd9b6de['displayLocalPath']) }
+    ...response6,
+    ...(response6['displayLocalPath'] !== undefined
+      ? { displayLocalPath: resolvePersonReplacementVideoResultRef(response6['displayLocalPath']) }
       : {}),
-    ...(_0xd9b6de['localPath'] !== undefined
-      ? { localPath: resolvePersonReplacementVideoResultRef(_0xd9b6de['localPath']) }
+    ...(response6['localPath'] !== undefined
+      ? { localPath: resolvePersonReplacementVideoResultRef(response6['localPath']) }
       : {}),
-    ...(_0xd9b6de['videoUrl'] !== undefined
-      ? { videoUrl: resolvePersonReplacementVideoResultRef(_0xd9b6de['videoUrl']) }
+    ...(response6['videoUrl'] !== undefined
+      ? { videoUrl: resolvePersonReplacementVideoResultRef(response6['videoUrl']) }
       : {}),
-    ...(_0xd9b6de['src'] !== undefined
-      ? { src: resolvePersonReplacementVideoResultRef(_0xd9b6de['src']) }
+    ...(response6['src'] !== undefined
+      ? { src: resolvePersonReplacementVideoResultRef(response6['src']) }
       : {}),
-    ...(_0xd9b6de['resultUrl'] !== undefined
-      ? { resultUrl: resolvePersonReplacementVideoResultRef(_0xd9b6de['resultUrl']) }
+    ...(response6['resultUrl'] !== undefined
+      ? { resultUrl: resolvePersonReplacementVideoResultRef(response6['resultUrl']) }
       : {}),
-    ...(_0xd9b6de['localUrl'] !== undefined
-      ? { localUrl: resolvePersonReplacementVideoResultRef(_0xd9b6de['localUrl']) }
+    ...(response6['localUrl'] !== undefined
+      ? { localUrl: resolvePersonReplacementVideoResultRef(response6['localUrl']) }
       : {}),
-    ...(_0xd9b6de['sourceUrl'] !== undefined
-      ? { sourceUrl: resolvePersonReplacementVideoResultRef(_0xd9b6de['sourceUrl']) }
+    ...(response6['sourceUrl'] !== undefined
+      ? { sourceUrl: resolvePersonReplacementVideoResultRef(response6['sourceUrl']) }
       : {}),
-    ...(_0xd9b6de['url'] !== undefined
-      ? { url: resolvePersonReplacementVideoResultRef(_0xd9b6de['url']) }
+    ...(response6['url'] !== undefined
+      ? { url: resolvePersonReplacementVideoResultRef(response6['url']) }
       : {}),
-    ...(_0xd9b6de['displayUrl'] !== undefined
-      ? { displayUrl: resolvePersonReplacementVideoResultRef(_0xd9b6de['displayUrl']) }
+    ...(response6['displayUrl'] !== undefined
+      ? { displayUrl: resolvePersonReplacementVideoResultRef(response6['displayUrl']) }
       : {}),
-    ...(_0xd9b6de['ref'] !== undefined
-      ? { ref: resolvePersonReplacementVideoResultRef(_0xd9b6de['ref']) }
+    ...(response6['ref'] !== undefined
+      ? { ref: resolvePersonReplacementVideoResultRef(response6['ref']) }
       : {}),
-    ...(_0xd9b6de['remoteFallbackUrl'] !== undefined ? { remoteFallbackUrl: '' } : {}),
-    ...(_0xd9b6de['localSaveError'] !== undefined ? { localSaveError: '' } : {}),
-    ...(_0xd9b6de['thumbUrl'] !== undefined
-      ? { thumbUrl: resolvePersonReplacementVideoResultRef(_0xd9b6de['thumbUrl']) }
+    ...(response6['remoteFallbackUrl'] !== undefined ? { remoteFallbackUrl: '' } : {}),
+    ...(response6['localSaveError'] !== undefined ? { localSaveError: '' } : {}),
+    ...(response6['thumbUrl'] !== undefined
+      ? { thumbUrl: resolvePersonReplacementVideoResultRef(response6['thumbUrl']) }
       : {}),
-    ...(_0xd9b6de['posterUrl'] !== undefined
-      ? { posterUrl: resolvePersonReplacementVideoResultRef(_0xd9b6de['posterUrl']) }
+    ...(response6['posterUrl'] !== undefined
+      ? { posterUrl: resolvePersonReplacementVideoResultRef(response6['posterUrl']) }
       : {}),
-    ...(_0xd9b6de['previewUrl'] !== undefined
-      ? { previewUrl: resolvePersonReplacementVideoResultRef(_0xd9b6de['previewUrl']) }
+    ...(response6['previewUrl'] !== undefined
+      ? { previewUrl: resolvePersonReplacementVideoResultRef(response6['previewUrl']) }
       : {}),
-    ...(_0xd9b6de['thumbnailUrl'] !== undefined
-      ? { thumbnailUrl: resolvePersonReplacementVideoResultRef(_0xd9b6de['thumbnailUrl']) }
+    ...(response6['thumbnailUrl'] !== undefined
+      ? { thumbnailUrl: resolvePersonReplacementVideoResultRef(response6['thumbnailUrl']) }
       : {}),
-    ...(_0xd9b6de['prompt'] !== undefined ? { prompt: normalizeText(_0xd9b6de['prompt']) } : {}),
-    ...(_0xd9b6de['modelId'] !== undefined ? { modelId: normalizeText(_0xd9b6de['modelId']) } : {}),
-    ...(_0xd9b6de['provider'] !== undefined ? { provider: normalizeText(_0xd9b6de['provider']) } : {}),
-    ...(_0xd9b6de['createdAt'] !== undefined ? { createdAt: normalizeText(_0xd9b6de['createdAt']) } : {}),
+    ...(response6['prompt'] !== undefined ? { prompt: normalizeText(response6['prompt']) } : {}),
+    ...(response6['modelId'] !== undefined ? { modelId: normalizeText(response6['modelId']) } : {}),
+    ...(response6['provider'] !== undefined ? { provider: normalizeText(response6['provider']) } : {}),
+    ...(response6['createdAt'] !== undefined ? { createdAt: normalizeText(response6['createdAt']) } : {}),
   };
 }
-export function getPersonReplacementVideoResults(_0x144897 = {}) {
-  const _0x537203 = _0x144897?.['replacementVideo'],
-    _0x14a2a8 =
-      _0x537203 && typeof _0x537203 === 'object' && !Array['isArray'](_0x537203) ? _0x537203['results'] : [];
-  return Array['isArray'](_0x14a2a8)
-    ? _0x14a2a8['map'](normalizePersonReplacementVideoResult)['filter'](Boolean)
+export function getPersonReplacementVideoResults(options8 = {}) {
+  const value33 = options8?.['replacementVideo'],
+    list9 = value33 && typeof value33 === 'object' && !Array['isArray'](value33) ? value33['results'] : [];
+  return Array['isArray'](list9)
+    ? list9['map'](normalizePersonReplacementVideoResult)['filter'](Boolean)
     : [];
 }
 export function getPersonReplacementActiveVideoResultIndex(
-  _0x58d667 = {},
-  _0x7b40b4 = getPersonReplacementVideoResults(_0x58d667),
+  options9 = {},
+  list10 = getPersonReplacementVideoResults(options9),
 ) {
-  if (!_0x7b40b4['length']) return 0x0;
-  const _0x1c58d7 = Math['trunc'](Number(_0x58d667?.['replacementVideo']?.['activeIndex']) || 0x0);
-  return Math['max'](0x0, Math['min'](_0x7b40b4['length'] - 0x1, _0x1c58d7));
+  if (!list10['length']) return 0x0;
+  const value34 = Math['trunc'](Number(options9?.['replacementVideo']?.['activeIndex']) || 0x0);
+  return Math['max'](0x0, Math['min'](list10['length'] - 0x1, value34));
 }
 export function getPersonReplacementActiveVideoResult(
-  _0x338d19 = {},
-  _0x36811f = getPersonReplacementVideoResults(_0x338d19),
+  options10 = {},
+  personReplacementVideoResults = getPersonReplacementVideoResults(options10),
 ) {
-  return _0x36811f[getPersonReplacementActiveVideoResultIndex(_0x338d19, _0x36811f)] || null;
+  return (
+    personReplacementVideoResults[
+      getPersonReplacementActiveVideoResultIndex(options10, personReplacementVideoResults)
+    ] || null
+  );
 }
-export function resolvePersonReplacementVideoSourceRef(_0x367c96 = {}) {
-  const _0x536290 = normalizeText(_0x367c96?.['videoIterationReferenceRef']);
-  return _0x536290
-    ? normalizeText(_0x367c96?.['videoIterationInputRef']) || _0x536290
-    : normalizeText(_0x367c96?.['videoRef']);
+export function resolvePersonReplacementVideoSourceRef(options11 = {}) {
+  const text16 = normalizeText(options11?.['videoIterationReferenceRef']);
+  return text16
+    ? normalizeText(options11?.['videoIterationInputRef']) || text16
+    : normalizeText(options11?.['videoRef']);
 }
-function normalizePersonReplacementVideo(_0x377b4c = {}) {
-  const _0x257d13 =
-      _0x377b4c['replacementVideo'] &&
-      typeof _0x377b4c['replacementVideo'] === 'object' &&
-      !Array['isArray'](_0x377b4c['replacementVideo'])
-        ? _0x377b4c['replacementVideo']
+function normalizePersonReplacementVideo(options12 = {}) {
+  const replacementVideo =
+      options12['replacementVideo'] &&
+      typeof options12['replacementVideo'] === 'object' &&
+      !Array['isArray'](options12['replacementVideo'])
+        ? options12['replacementVideo']
         : {},
-    _0x5273ed = getPersonReplacementVideoResults({ replacementVideo: _0x257d13 }),
-    _0x55e370 = resolvePersonReplacementVideoResultRef(
+    results2 = getPersonReplacementVideoResults({ replacementVideo: replacementVideo }),
+    videoUrl2 = resolvePersonReplacementVideoResultRef(
       normalizeText(
-        firstDefined(_0x377b4c['resultVideoRef'], _0x377b4c['outputVideoRef'], _0x377b4c['resultRef']),
+        firstDefined(options12['resultVideoRef'], options12['outputVideoRef'], options12['resultRef']),
       ),
     );
-  _0x55e370 && !_0x5273ed['length'] && _0x5273ed['push']({ videoUrl: _0x55e370 });
-  const _0x514847 = Number(_0x257d13['activeIndex']),
-    _0x4b379a = _0x55e370
-      ? _0x5273ed['findIndex']((_0x3f4309) => resolvePersonReplacementVideoResultRef(_0x3f4309) === _0x55e370)
+  videoUrl2 && !results2['length'] && results2['push']({ videoUrl: videoUrl2 });
+  const value35 = Number(replacementVideo['activeIndex']),
+    value36 = videoUrl2
+      ? results2['findIndex']((value37) => resolvePersonReplacementVideoResultRef(value37) === videoUrl2)
       : -0x1,
-    _0x5cfb53 = _0x5273ed['length']
-      ? Number['isFinite'](_0x514847)
-        ? Math['max'](0x0, Math['min'](_0x5273ed['length'] - 0x1, Math['trunc'](_0x514847)))
-        : Math['max'](0x0, _0x4b379a)
+    activeIndex2 = results2['length']
+      ? Number['isFinite'](value35)
+        ? Math['max'](0x0, Math['min'](results2['length'] - 0x1, Math['trunc'](value35)))
+        : Math['max'](0x0, value36)
       : 0x0;
-  return { results: _0x5273ed, activeIndex: _0x5cfb53 };
+  return { results: results2, activeIndex: activeIndex2 };
 }
-export function normalizePersonReplacementShot(_0x2ab2cd = {}, _0x2772ad = 0x0) {
-  const _0x16f6fb =
+export function normalizePersonReplacementShot(imagePromptReferences = {}, value38 = 0x0) {
+  const shotId2 =
       normalizeText(
         firstDefined(
-          _0x2ab2cd['id'],
-          _0x2ab2cd['shotId'],
-          _0x2ab2cd['shot_id'],
-          _0x2ab2cd['segmentId'],
-          _0x2ab2cd['clipId'],
+          imagePromptReferences['id'],
+          imagePromptReferences['shotId'],
+          imagePromptReferences['shot_id'],
+          imagePromptReferences['segmentId'],
+          imagePromptReferences['clipId'],
         ),
-      ) || 'shot-' + (_0x2772ad + 0x1),
-    _0x31de8a = normalizeNonNegativeNumber(
-      firstDefined(_0x2ab2cd['startTimeSec'], _0x2ab2cd['start_time'], _0x2ab2cd['start'], _0x2ab2cd['in']),
+      ) || 'shot-' + (value38 + 0x1),
+    startTimeSec = normalizeNonNegativeNumber(
+      firstDefined(
+        imagePromptReferences['startTimeSec'],
+        imagePromptReferences['start_time'],
+        imagePromptReferences['start'],
+        imagePromptReferences['in'],
+      ),
     ),
-    _0x232fa8 = Number(
-      firstDefined(_0x2ab2cd['endTimeSec'], _0x2ab2cd['end_time'], _0x2ab2cd['end'], _0x2ab2cd['out']),
+    value39 = Number(
+      firstDefined(
+        imagePromptReferences['endTimeSec'],
+        imagePromptReferences['end_time'],
+        imagePromptReferences['end'],
+        imagePromptReferences['out'],
+      ),
     ),
-    _0x5e7495 = normalizeNonNegativeNumber(
-      firstDefined(_0x2ab2cd['durationSec'], _0x2ab2cd['duration'], _0x2ab2cd['length']),
+    nonNegativeNumber = normalizeNonNegativeNumber(
+      firstDefined(
+        imagePromptReferences['durationSec'],
+        imagePromptReferences['duration'],
+        imagePromptReferences['length'],
+      ),
     ),
-    _0x57ef71 = Number['isFinite'](_0x232fa8) && _0x232fa8 >= _0x31de8a ? _0x232fa8 : _0x31de8a + _0x5e7495,
-    _0x111afa = firstDefined(_0x2ab2cd['frame'], _0x2ab2cd['frameSize'], _0x2ab2cd['imageSize'], {}),
-    _0xa624e7 = assignPersonReplacementPromptIndexes(
-      toArray(extractPeople(_0x2ab2cd))['map']((_0x1226dc, _0x30b5c6) =>
-        normalizePersonReplacementPerson(_0x1226dc, {
-          shotId: _0x16f6fb,
-          index: _0x30b5c6,
-          frame: _0x111afa,
+    endTimeSec =
+      Number['isFinite'](value39) && value39 >= startTimeSec ? value39 : startTimeSec + nonNegativeNumber,
+    frame2 = firstDefined(
+      imagePromptReferences['frame'],
+      imagePromptReferences['frameSize'],
+      imagePromptReferences['imageSize'],
+      {},
+    ),
+    people = assignPersonReplacementPromptIndexes(
+      toArray(extractPeople(imagePromptReferences))['map']((value40, index2) =>
+        normalizePersonReplacementPerson(value40, {
+          shotId: shotId2,
+          index: index2,
+          frame: frame2,
         }),
       ),
-    )['map']((_0x2f8082) => ({
-      ..._0x2f8082,
-      label: _0x2f8082['label'] || formatPersonReplacementPersonLabel(_0x2f8082['promptMarkerIndex']),
+    )['map']((label2) => ({
+      ...label2,
+      label: label2['label'] || formatPersonReplacementPersonLabel(label2['promptMarkerIndex']),
     })),
-    _0x379682 = normalizeText(
-      firstDefined(_0x2ab2cd['videoRef'], _0x2ab2cd['clipRef'], _0x2ab2cd['segmentRef'], _0x2ab2cd['video']),
-    ),
-    _0x4badde = normalizeText(
+    videoRef = normalizeText(
       firstDefined(
-        _0x2ab2cd['keyframeRef'],
-        _0x2ab2cd['keyFrameRef'],
-        _0x2ab2cd['firstFrameRef'],
-        _0x2ab2cd['frameRef'],
-        _0x2ab2cd['imageRef'],
+        imagePromptReferences['videoRef'],
+        imagePromptReferences['clipRef'],
+        imagePromptReferences['segmentRef'],
+        imagePromptReferences['video'],
       ),
     ),
-    _0x497d5 = normalizeText(_0x2ab2cd['imageIterationOriginalKeyframeRef']),
-    _0x52742f = normalizePersonReplacementImage(_0x2ab2cd),
-    _0x4a92b1 = normalizeText(_0x2ab2cd['imageIterationReferenceRef']) || (_0x497d5 ? _0x4badde : ''),
-    _0x1329fc = _0x52742f['results']['some'](
-      (_0x207438) => resolvePersonReplacementImageResultRef(_0x207438) === _0x4a92b1,
+    text17 = normalizeText(
+      firstDefined(
+        imagePromptReferences['keyframeRef'],
+        imagePromptReferences['keyFrameRef'],
+        imagePromptReferences['firstFrameRef'],
+        imagePromptReferences['frameRef'],
+        imagePromptReferences['imageRef'],
+      ),
+    ),
+    keyframeRef = normalizeText(imagePromptReferences['imageIterationOriginalKeyframeRef']),
+    replacementImage2 = normalizePersonReplacementImage(imagePromptReferences),
+    text18 =
+      normalizeText(imagePromptReferences['imageIterationReferenceRef']) || (keyframeRef ? text17 : ''),
+    imageIterationReferenceRef = replacementImage2['results']['some'](
+      (value41) => resolvePersonReplacementImageResultRef(value41) === text18,
     )
-      ? _0x4a92b1
+      ? text18
       : '',
-    _0x482e6b = getPersonReplacementActiveImageResult({ replacementImage: _0x52742f }, _0x52742f['results']),
-    _0x29aa9f = normalizeText(_0x2ab2cd['replacementVideoReferenceSourceShotId']),
-    _0x28eaef = normalizeText(_0x2ab2cd['replacementVideoReferencePersonId']),
-    _0x50e103 = resolvePersonReplacementImageResultRef(_0x2ab2cd['replacementVideoReferenceImageRef']),
-    _0x174fb6 = normalizePersonReplacementVideo(_0x2ab2cd),
-    _0x308ab7 = normalizeText(_0x2ab2cd['videoIterationReferenceRef']),
-    _0x891271 = _0x174fb6['results']['some'](
-      (_0x4e2466) => resolvePersonReplacementVideoResultRef(_0x4e2466) === _0x308ab7,
+    personReplacementActiveImageResult = getPersonReplacementActiveImageResult(
+      { replacementImage: replacementImage2 },
+      replacementImage2['results'],
+    ),
+    replacementVideoReferenceSourceShotId = normalizeText(
+      imagePromptReferences['replacementVideoReferenceSourceShotId'],
+    ),
+    replacementVideoReferencePersonId = normalizeText(
+      imagePromptReferences['replacementVideoReferencePersonId'],
+    ),
+    replacementVideoReferenceImageRef = resolvePersonReplacementImageResultRef(
+      imagePromptReferences['replacementVideoReferenceImageRef'],
+    ),
+    replacementVideo2 = normalizePersonReplacementVideo(imagePromptReferences),
+    text19 = normalizeText(imagePromptReferences['videoIterationReferenceRef']),
+    videoIterationReferenceRef = replacementVideo2['results']['some'](
+      (value42) => resolvePersonReplacementVideoResultRef(value42) === text19,
     )
-      ? _0x308ab7
+      ? text19
       : '',
-    _0x45317e = getPersonReplacementActiveVideoResult({ replacementVideo: _0x174fb6 }, _0x174fb6['results']);
+    personReplacementActiveVideoResult = getPersonReplacementActiveVideoResult(
+      { replacementVideo: replacementVideo2 },
+      replacementVideo2['results'],
+    );
   return {
-    id: _0x16f6fb,
-    sourceId: normalizeText(firstDefined(_0x2ab2cd['sourceId'], _0x2ab2cd['source_id'])),
-    index: Number['isInteger'](Number(_0x2ab2cd['index'])) ? Number(_0x2ab2cd['index']) : _0x2772ad,
+    id: shotId2,
+    sourceId: normalizeText(
+      firstDefined(imagePromptReferences['sourceId'], imagePromptReferences['source_id']),
+    ),
+    index: Number['isInteger'](Number(imagePromptReferences['index']))
+      ? Number(imagePromptReferences['index'])
+      : value38,
     frame: {
       width: normalizeNonNegativeNumber(
-        firstDefined(_0x111afa['width'], _0x111afa['frameWidth'], _0x111afa['imageWidth']),
+        firstDefined(frame2['width'], frame2['frameWidth'], frame2['imageWidth']),
       ),
       height: normalizeNonNegativeNumber(
-        firstDefined(_0x111afa['height'], _0x111afa['frameHeight'], _0x111afa['imageHeight']),
+        firstDefined(frame2['height'], frame2['frameHeight'], frame2['imageHeight']),
       ),
     },
-    startTimeSec: _0x31de8a,
-    endTimeSec: _0x57ef71,
-    durationSec: Math['max'](0x0, _0x57ef71 - _0x31de8a),
+    startTimeSec: startTimeSec,
+    endTimeSec: endTimeSec,
+    durationSec: Math['max'](0x0, endTimeSec - startTimeSec),
     sourceVideoRef: normalizeText(
-      firstDefined(_0x2ab2cd['sourceVideoRef'], _0x2ab2cd['sourceRef'], _0x2ab2cd['originalVideoRef']),
+      firstDefined(
+        imagePromptReferences['sourceVideoRef'],
+        imagePromptReferences['sourceRef'],
+        imagePromptReferences['originalVideoRef'],
+      ),
     ),
-    videoRef: _0x379682,
-    ...(_0x891271
+    videoRef: videoRef,
+    ...(videoIterationReferenceRef
       ? {
-          videoIterationReferenceRef: _0x891271,
-          ...(resolvePersonReplacementVideoResultRef(_0x2ab2cd['videoIterationInputRef'])
+          videoIterationReferenceRef: videoIterationReferenceRef,
+          ...(resolvePersonReplacementVideoResultRef(imagePromptReferences['videoIterationInputRef'])
             ? {
                 videoIterationInputRef: resolvePersonReplacementVideoResultRef(
-                  _0x2ab2cd['videoIterationInputRef'],
+                  imagePromptReferences['videoIterationInputRef'],
                 ),
-                ...(_0x2ab2cd['videoIterationInputIsReversed'] === !![]
+                ...(imagePromptReferences['videoIterationInputIsReversed'] === !![]
                   ? { videoIterationInputIsReversed: !![] }
                   : {}),
               }
             : {}),
         }
       : {}),
-    ...(_0x2ab2cd['videoRefIsCropped'] === !![] ? { videoRefIsCropped: !![] } : {}),
-    ...(_0x2ab2cd['isReversed'] === !![] ? { isReversed: !![] } : {}),
+    ...(imagePromptReferences['videoRefIsCropped'] === !![] ? { videoRefIsCropped: !![] } : {}),
+    ...(imagePromptReferences['isReversed'] === !![] ? { isReversed: !![] } : {}),
     materializedIsReversed:
-      typeof _0x2ab2cd['materializedIsReversed'] === 'boolean'
-        ? _0x2ab2cd['materializedIsReversed']
-        : Boolean(_0x379682) && _0x2ab2cd['isReversed'] === !![],
-    keyframeRef: _0x497d5 || _0x4badde,
-    ...(_0x1329fc ? { imageIterationReferenceRef: _0x1329fc } : {}),
+      typeof imagePromptReferences['materializedIsReversed'] === 'boolean'
+        ? imagePromptReferences['materializedIsReversed']
+        : Boolean(videoRef) && imagePromptReferences['isReversed'] === !![],
+    keyframeRef: keyframeRef || text17,
+    ...(imageIterationReferenceRef ? { imageIterationReferenceRef: imageIterationReferenceRef } : {}),
     keyframeIndex: Math['max'](
       0x0,
       Math['trunc'](
-        normalizeNonNegativeNumber(firstDefined(_0x2ab2cd['keyframeIndex'], _0x2ab2cd['frameIndex'])),
+        normalizeNonNegativeNumber(
+          firstDefined(imagePromptReferences['keyframeIndex'], imagePromptReferences['frameIndex']),
+        ),
       ),
     ),
     keyframeTimeSec: normalizeNonNegativeNumber(
-      firstDefined(_0x2ab2cd['keyframeTimeSec'], _0x2ab2cd['frameTimeSec'], _0x31de8a),
+      firstDefined(
+        imagePromptReferences['keyframeTimeSec'],
+        imagePromptReferences['frameTimeSec'],
+        startTimeSec,
+      ),
     ),
-    ...(_0x2ab2cd['keyframeManuallySelected'] === !![] ? { keyframeManuallySelected: !![] } : {}),
+    ...(imagePromptReferences['keyframeManuallySelected'] === !![] ? { keyframeManuallySelected: !![] } : {}),
     outputFps: normalizeNonNegativeNumber(
-      firstDefined(_0x2ab2cd['outputFps'], _0x2ab2cd['fps'], _0x2ab2cd['frameRate']),
+      firstDefined(
+        imagePromptReferences['outputFps'],
+        imagePromptReferences['fps'],
+        imagePromptReferences['frameRate'],
+      ),
     ),
     materializationStatus: normalizeMaterializationStatus(
-      firstDefined(_0x2ab2cd['materializationStatus'], _0x2ab2cd['clipStatus']),
-      Boolean(_0x379682),
+      firstDefined(imagePromptReferences['materializationStatus'], imagePromptReferences['clipStatus']),
+      Boolean(videoRef),
     ),
     materializationProgress: Math['max'](
       0x0,
-      Math['min'](0x64, normalizeNonNegativeNumber(_0x2ab2cd['materializationProgress'])),
+      Math['min'](0x64, normalizeNonNegativeNumber(imagePromptReferences['materializationProgress'])),
     ),
-    replacementImage: _0x52742f,
-    replacementImageRef: resolvePersonReplacementImageResultRef(_0x482e6b),
+    replacementImage: replacementImage2,
+    replacementImageRef: resolvePersonReplacementImageResultRef(personReplacementActiveImageResult),
     replacementVideoReferenceKind:
-      normalizeText(_0x2ab2cd['replacementVideoReferenceKind']) ===
+      normalizeText(imagePromptReferences['replacementVideoReferenceKind']) ===
       PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE
         ? PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE
         : PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE,
-    ...(_0x29aa9f ? { replacementVideoReferenceSourceShotId: _0x29aa9f } : {}),
-    ...(_0x50e103 ? { replacementVideoReferenceImageRef: _0x50e103 } : {}),
-    ...(_0x28eaef ? { replacementVideoReferencePersonId: _0x28eaef } : {}),
-    people: _0xa624e7,
+    ...(replacementVideoReferenceSourceShotId
+      ? { replacementVideoReferenceSourceShotId: replacementVideoReferenceSourceShotId }
+      : {}),
+    ...(replacementVideoReferenceImageRef
+      ? { replacementVideoReferenceImageRef: replacementVideoReferenceImageRef }
+      : {}),
+    ...(replacementVideoReferencePersonId
+      ? { replacementVideoReferencePersonId: replacementVideoReferencePersonId }
+      : {}),
+    people: people,
     analysisStatus: normalizeAnalysisStatus(
-      firstDefined(_0x2ab2cd['analysisStatus'], _0x2ab2cd['analysis_status']),
-      _0xa624e7['length'] ? 'succeeded' : 'pending',
+      firstDefined(imagePromptReferences['analysisStatus'], imagePromptReferences['analysis_status']),
+      people['length'] ? 'succeeded' : 'pending',
     ),
     reviewRequired: Boolean(
-      firstDefined(_0x2ab2cd['reviewRequired'], _0x2ab2cd['needsReview'], _0x2ab2cd['needs_review'], ![]),
+      firstDefined(
+        imagePromptReferences['reviewRequired'],
+        imagePromptReferences['needsReview'],
+        imagePromptReferences['needs_review'],
+        ![],
+      ),
     ),
-    replacementPromptMode: normalizePersonReplacementPromptMode(_0x2ab2cd['replacementPromptMode']),
-    ...(Array['isArray'](_0x2ab2cd['imagePromptReferences'])
+    replacementPromptMode: normalizePersonReplacementPromptMode(
+      imagePromptReferences['replacementPromptMode'],
+    ),
+    ...(Array['isArray'](imagePromptReferences['imagePromptReferences'])
       ? {
-          imagePromptReferences: _0x2ab2cd['imagePromptReferences']
-            ['filter']((_0x2efbae) => Number['isSafeInteger'](_0x2efbae?.['slot']) && _0x2efbae['slot'] > 0x0)
-            ['map']((_0x59d721) => ({ slot: _0x59d721['slot'], key: normalizeText(_0x59d721['key']) })),
+          imagePromptReferences: imagePromptReferences['imagePromptReferences']
+            ['filter']((value43) => Number['isSafeInteger'](value43?.['slot']) && value43['slot'] > 0x0)
+            ['map']((slot) => ({ slot: slot['slot'], key: normalizeText(slot['key']) })),
         }
       : {}),
     imagePrompt: normalizeText(
       firstDefined(
-        _0x2ab2cd['imagePrompt'],
-        _0x2ab2cd['replacementImagePrompt'],
-        _0x2ab2cd['prompt'],
-        _0x2ab2cd['replacementPrompt'],
+        imagePromptReferences['imagePrompt'],
+        imagePromptReferences['replacementImagePrompt'],
+        imagePromptReferences['prompt'],
+        imagePromptReferences['replacementPrompt'],
       ),
     ),
     sceneReference: {
       sceneId: normalizeText(
-        firstDefined(_0x2ab2cd['sceneReference']?.['sceneId'], _0x2ab2cd['sceneReferenceId']),
+        firstDefined(
+          imagePromptReferences['sceneReference']?.['sceneId'],
+          imagePromptReferences['sceneReferenceId'],
+        ),
       ),
       appearanceId: normalizeText(
-        firstDefined(_0x2ab2cd['sceneReference']?.['appearanceId'], _0x2ab2cd['sceneReferenceAppearanceId']),
+        firstDefined(
+          imagePromptReferences['sceneReference']?.['appearanceId'],
+          imagePromptReferences['sceneReferenceAppearanceId'],
+        ),
       ),
     },
-    videoPrompt: normalizeText(firstDefined(_0x2ab2cd['videoPrompt'], _0x2ab2cd['replacementVideoPrompt'])),
+    videoPrompt: normalizeText(
+      firstDefined(imagePromptReferences['videoPrompt'], imagePromptReferences['replacementVideoPrompt']),
+    ),
     replacementVideoInputsBySlot: Object['fromEntries'](
-      Object['entries'](normalizePlainObject(_0x2ab2cd['replacementVideoInputsBySlot']))
-        ['map'](([_0xd6dc89, _0x360b04]) => {
-          const _0x4b0d34 =
-              typeof _0x360b04 === 'string' ? { url: _0x360b04 } : normalizePlainObject(_0x360b04),
-            _0x5f3d80 = normalizeText(_0xd6dc89),
-            _0x1edc18 = normalizeText(
+      Object['entries'](normalizePlainObject(imagePromptReferences['replacementVideoInputsBySlot']))
+        ['map'](([value44, url]) => {
+          const error = typeof url === 'string' ? { url: url } : normalizePlainObject(url),
+            text20 = normalizeText(value44),
+            url2 = normalizeText(
               firstDefined(
-                _0x4b0d34['url'],
-                _0x4b0d34['localUrl'],
-                _0x4b0d34['imageUrl'],
-                _0x4b0d34['videoUrl'],
-                _0x4b0d34['localPath'],
+                error['url'],
+                error['localUrl'],
+                error['imageUrl'],
+                error['videoUrl'],
+                error['localPath'],
               ),
             ),
-            _0x4b3368 = normalizeText(_0x4b0d34['kind']);
-          if (!_0x5f3d80 || !_0x1edc18 || !['image', 'video', 'audio']['includes'](_0x4b3368)) return null;
+            kind = normalizeText(error['kind']);
+          if (!text20 || !url2 || !['image', 'video', 'audio']['includes'](kind)) return null;
           return [
-            _0x5f3d80,
+            text20,
             {
-              kind: _0x4b3368,
-              url: _0x1edc18,
-              modelId: normalizeText(_0x4b0d34['modelId']),
-              fileName: normalizeText(firstDefined(_0x4b0d34['fileName'], _0x4b0d34['name'])),
-              mimeType: normalizeText(_0x4b0d34['mimeType']),
-              thumbUrl: normalizeText(_0x4b0d34['thumbUrl']),
+              kind: kind,
+              url: url2,
+              modelId: normalizeText(error['modelId']),
+              fileName: normalizeText(firstDefined(error['fileName'], error['name'])),
+              mimeType: normalizeText(error['mimeType']),
+              thumbUrl: normalizeText(error['thumbUrl']),
             },
           ];
         })
         ['filter'](Boolean),
     ),
     generationStatus: normalizeGenerationStatus(
-      firstDefined(_0x2ab2cd['generationStatus'], _0x2ab2cd['generation_status'], _0x2ab2cd['status']),
+      firstDefined(
+        imagePromptReferences['generationStatus'],
+        imagePromptReferences['generation_status'],
+        imagePromptReferences['status'],
+      ),
     ),
-    replacementVideo: _0x174fb6,
-    resultVideoRef: resolvePersonReplacementVideoResultRef(_0x45317e),
-    error: normalizeText(firstDefined(_0x2ab2cd['error'], _0x2ab2cd['errorMessage'])),
+    replacementVideo: replacementVideo2,
+    resultVideoRef: resolvePersonReplacementVideoResultRef(personReplacementActiveVideoResult),
+    error: normalizeText(firstDefined(imagePromptReferences['error'], imagePromptReferences['errorMessage'])),
   };
 }
-function clearPersonReplacementVideoReferenceSelection(_0x1cc4a5 = {}) {
+function clearPersonReplacementVideoReferenceSelection(options13 = {}) {
   const {
-    replacementVideoReferenceSourceShotId: _0x346410,
-    replacementVideoReferenceImageRef: _0x25661f,
-    ..._0x11eff2
-  } = _0x1cc4a5;
-  return _0x11eff2;
+    replacementVideoReferenceSourceShotId: replacementVideoReferenceSourceShotId2,
+    replacementVideoReferenceImageRef: replacementVideoReferenceImageRef2,
+    ...args2
+  } = options13;
+  return args2;
 }
-function reconcilePersonReplacementVideoReferenceSelections(_0x313dea = []) {
-  const _0x10ae40 = new Map(_0x313dea['map']((_0x8b3b9e) => [normalizeText(_0x8b3b9e?.['id']), _0x8b3b9e]));
-  return _0x313dea['map']((_0x52c7a8) => {
-    const _0x14266d = normalizeText(_0x52c7a8?.['replacementVideoReferenceSourceShotId']),
-      _0x3d9306 = resolvePersonReplacementImageResultRef(_0x52c7a8?.['replacementVideoReferenceImageRef']);
-    if (!_0x14266d && !_0x3d9306) return _0x52c7a8;
-    const _0x5bc89e = _0x10ae40['get'](_0x14266d),
-      _0xc30f37 = getPersonReplacementImageResults(_0x5bc89e);
-    if (!_0x5bc89e || !_0xc30f37['length']) return clearPersonReplacementVideoReferenceSelection(_0x52c7a8);
-    const _0x10c675 = _0x3d9306
-        ? _0xc30f37['find']((_0x2d0ae8) => resolvePersonReplacementImageResultRef(_0x2d0ae8) === _0x3d9306)
-        : null,
-      _0x5e8b23 = resolvePersonReplacementImageResultRef(
-        _0x10c675 || _0xc30f37[getPersonReplacementActiveImageResultIndex(_0x5bc89e, _0xc30f37)],
+function reconcilePersonReplacementVideoReferenceSelections(list11 = []) {
+  const map3 = new Map(list11['map']((value45) => [normalizeText(value45?.['id']), value45]));
+  return list11['map']((args3) => {
+    const replacementVideoReferenceSourceShotId3 = normalizeText(
+        args3?.['replacementVideoReferenceSourceShotId'],
+      ),
+      personReplacementImageResultRef2 = resolvePersonReplacementImageResultRef(
+        args3?.['replacementVideoReferenceImageRef'],
       );
-    if (!_0x5e8b23) return clearPersonReplacementVideoReferenceSelection(_0x52c7a8);
+    if (!replacementVideoReferenceSourceShotId3 && !personReplacementImageResultRef2) return args3;
+    const enabled2 = map3['get'](replacementVideoReferenceSourceShotId3),
+      list12 = getPersonReplacementImageResults(enabled2);
+    if (!enabled2 || !list12['length']) return clearPersonReplacementVideoReferenceSelection(args3);
+    const value46 = personReplacementImageResultRef2
+        ? list12['find'](
+            (value47) => resolvePersonReplacementImageResultRef(value47) === personReplacementImageResultRef2,
+          )
+        : null,
+      replacementVideoReferenceImageRef3 = resolvePersonReplacementImageResultRef(
+        value46 || list12[getPersonReplacementActiveImageResultIndex(enabled2, list12)],
+      );
+    if (!replacementVideoReferenceImageRef3) return clearPersonReplacementVideoReferenceSelection(args3);
     return {
-      ..._0x52c7a8,
-      replacementVideoReferenceSourceShotId: _0x14266d,
-      replacementVideoReferenceImageRef: _0x5e8b23,
+      ...args3,
+      replacementVideoReferenceSourceShotId: replacementVideoReferenceSourceShotId3,
+      replacementVideoReferenceImageRef: replacementVideoReferenceImageRef3,
     };
   });
 }
-function normalizeVoiceReference(_0x35b010, _0x5979d0 = '') {
-  const _0x4a72c5 = _0x35b010 && typeof _0x35b010 === 'object' ? _0x35b010 : {},
-    _0x309e10 = normalizeText(_0x4a72c5['source']) || 'upload',
-    _0x18402a = normalizeText(
+function normalizeVoiceReference(value48, value49 = '') {
+  const error2 = value48 && typeof value48 === 'object' ? value48 : {},
+    source2 = normalizeText(error2['source']) || 'upload',
+    text21 = normalizeText(
       firstDefined(
-        _0x4a72c5['audioUrl'],
-        _0x4a72c5['localPath'],
-        _0x4a72c5['url'],
-        _0x5979d0,
-        typeof _0x35b010 === 'string' ? _0x35b010 : '',
+        error2['audioUrl'],
+        error2['localPath'],
+        error2['url'],
+        value49,
+        typeof value48 === 'string' ? value48 : '',
       ),
     );
-  if (!_0x18402a) return null;
+  if (!text21) return null;
   return {
-    audioUrl: normalizeText(firstDefined(_0x4a72c5['audioUrl'], _0x4a72c5['url'], _0x18402a)),
-    localPath: normalizeText(firstDefined(_0x4a72c5['localPath'], _0x18402a)),
-    fileName: normalizeText(firstDefined(_0x4a72c5['fileName'], _0x4a72c5['name'], '上传声音')),
-    source: _0x309e10,
-    ...(_0x309e10 === 'library'
+    audioUrl: normalizeText(firstDefined(error2['audioUrl'], error2['url'], text21)),
+    localPath: normalizeText(firstDefined(error2['localPath'], text21)),
+    fileName: normalizeText(firstDefined(error2['fileName'], error2['name'], '上传声音')),
+    source: source2,
+    ...(source2 === 'library'
       ? {
-          libraryAssetId: normalizeText(_0x4a72c5['libraryAssetId']),
-          sourceAssetId: normalizeText(_0x4a72c5['sourceAssetId']),
-          sourceItemIndex: Math['max'](0x0, Math['trunc'](Number(_0x4a72c5['sourceItemIndex']) || 0x0)),
+          libraryAssetId: normalizeText(error2['libraryAssetId']),
+          sourceAssetId: normalizeText(error2['sourceAssetId']),
+          sourceItemIndex: Math['max'](0x0, Math['trunc'](Number(error2['sourceItemIndex']) || 0x0)),
         }
       : {}),
-    updatedAt: normalizeNonNegativeNumber(_0x4a72c5['updatedAt'], Date['now']()),
+    updatedAt: normalizeNonNegativeNumber(error2['updatedAt'], Date['now']()),
   };
 }
-function normalizeCharacterAppearances(_0x2f0a86 = {}) {
-  const _0x2d0455 = Array['isArray'](_0x2f0a86['appearances'])
-    ? _0x2f0a86['appearances']
+function normalizeCharacterAppearances(options14 = {}) {
+  const list13 = Array['isArray'](options14['appearances'])
+    ? options14['appearances']
     : normalizeImageRefs(
         firstDefined(
-          _0x2f0a86['imageRefs'],
-          _0x2f0a86['referenceImages'],
-          _0x2f0a86['images'],
-          _0x2f0a86['imageRef'],
+          options14['imageRefs'],
+          options14['referenceImages'],
+          options14['images'],
+          options14['imageRef'],
         ),
-      )['map']((_0x502874, _0x500b9e) => ({
-        id: (normalizeText(_0x2f0a86['id']) || 'target-character') + '-appearance-' + (_0x500b9e + 0x1),
-        name: _0x500b9e === 0x0 ? '基础形象' : '形象 ' + (_0x500b9e + 0x1),
-        imageUrl: _0x502874,
+      )['map']((imageUrl3, name2) => ({
+        id: (normalizeText(options14['id']) || 'target-character') + '-appearance-' + (name2 + 0x1),
+        name: name2 === 0x0 ? '基础形象' : '形象 ' + (name2 + 0x1),
+        imageUrl: imageUrl3,
       }));
-  return _0x2d0455['map']((_0x55b541, _0x3b6121) => ({
-    ...(_0x55b541 && typeof _0x55b541 === 'object' ? _0x55b541 : {}),
+  return list13['map']((error3, count12) => ({
+    ...(error3 && typeof error3 === 'object' ? error3 : {}),
     id:
-      normalizeText(_0x55b541?.['id']) ||
-      (normalizeText(_0x2f0a86['id']) || 'target-character') + '-appearance-' + (_0x3b6121 + 0x1),
-    name:
-      normalizeText(_0x55b541?.['name']) || (_0x3b6121 === 0x0 ? '基础形象' : '形象 ' + (_0x3b6121 + 0x1)),
+      normalizeText(error3?.['id']) ||
+      (normalizeText(options14['id']) || 'target-character') + '-appearance-' + (count12 + 0x1),
+    name: normalizeText(error3?.['name']) || (count12 === 0x0 ? '基础形象' : '形象 ' + (count12 + 0x1)),
     imageUrl: normalizeText(
       firstDefined(
-        _0x55b541?.['imageUrl'],
-        _0x55b541?.['imageRef'],
-        _0x55b541?.['url'],
-        typeof _0x55b541 === 'string' ? _0x55b541 : '',
+        error3?.['imageUrl'],
+        error3?.['imageRef'],
+        error3?.['url'],
+        typeof error3 === 'string' ? error3 : '',
       ),
     ),
-    prompt: normalizeText(firstDefined(_0x55b541?.['prompt'], _0x2f0a86['description'])),
-    occurrences: normalizeText(_0x55b541?.['occurrences']) || '当前项目',
-    generationStatus: normalizeGenerationStatus(_0x55b541?.['generationStatus']),
-    error: normalizeText(_0x55b541?.['error']),
+    prompt: normalizeText(firstDefined(error3?.['prompt'], options14['description'])),
+    occurrences: normalizeText(error3?.['occurrences']) || '当前项目',
+    generationStatus: normalizeGenerationStatus(error3?.['generationStatus']),
+    error: normalizeText(error3?.['error']),
   }));
 }
-function normalizeTargetCharacter(_0x450891 = {}, _0x5c51f6 = 0x0) {
-  const _0xda6098 =
-      normalizeText(firstDefined(_0x450891['id'], _0x450891['ref'], _0x450891['characterId'])) ||
-      'target-character-' + (_0x5c51f6 + 0x1),
-    _0x20bf33 = normalizeCharacterAppearances({ ..._0x450891, id: _0xda6098 }),
-    _0x4076fb = _0x20bf33['some'](
-      (_0xc85970) => _0xc85970['id'] === normalizeText(_0x450891['baseAppearanceId']),
+function normalizeTargetCharacter(error4 = {}, value50 = 0x0) {
+  const id2 =
+      normalizeText(firstDefined(error4['id'], error4['ref'], error4['characterId'])) ||
+      'target-character-' + (value50 + 0x1),
+    appearances = normalizeCharacterAppearances({ ...error4, id: id2 }),
+    baseAppearanceId = appearances['some'](
+      (value51) => value51['id'] === normalizeText(error4['baseAppearanceId']),
     )
-      ? normalizeText(_0x450891['baseAppearanceId'])
-      : _0x20bf33[0x0]?.['id'] || '',
-    _0x1eb6a9 = normalizeVoiceReference(
-      _0x450891['voiceReference'],
-      firstDefined(_0x450891['voiceRef'], _0x450891['audioRef']),
+      ? normalizeText(error4['baseAppearanceId'])
+      : appearances[0x0]?.['id'] || '',
+    voiceReference = normalizeVoiceReference(
+      error4['voiceReference'],
+      firstDefined(error4['voiceRef'], error4['audioRef']),
     );
   return {
-    ...normalizePlainObject(_0x450891),
-    id: _0xda6098,
+    ...normalizePlainObject(error4),
+    id: id2,
     kind: 'character',
     name:
-      normalizeText(firstDefined(_0x450891['name'], _0x450891['label'], _0x450891['title'])) ||
-      '目标角色' + (_0x5c51f6 + 0x1),
-    role: normalizeText(_0x450891['role']) || '人物',
-    appearances: _0x20bf33,
-    baseAppearanceId: _0x4076fb,
-    imageRefs: _0x20bf33['map']((_0x278fd5) => _0x278fd5['imageUrl'])['filter'](Boolean),
-    voiceReference: _0x1eb6a9,
-    voiceRef: normalizeText(firstDefined(_0x1eb6a9?.['localPath'], _0x1eb6a9?.['audioUrl'])),
-    description: normalizeText(firstDefined(_0x450891['description'], _0x450891['prompt'])),
+      normalizeText(firstDefined(error4['name'], error4['label'], error4['title'])) ||
+      '目标角色' + (value50 + 0x1),
+    role: normalizeText(error4['role']) || '人物',
+    appearances: appearances,
+    baseAppearanceId: baseAppearanceId,
+    imageRefs: appearances['map']((value52) => value52['imageUrl'])['filter'](Boolean),
+    voiceReference: voiceReference,
+    voiceRef: normalizeText(firstDefined(voiceReference?.['localPath'], voiceReference?.['audioUrl'])),
+    description: normalizeText(firstDefined(error4['description'], error4['prompt'])),
   };
 }
-function normalizeTargetScene(_0x40991c = {}, _0xfbc007 = 0x0) {
-  const _0x4f0827 =
-      normalizeText(firstDefined(_0x40991c['id'], _0x40991c['ref'], _0x40991c['sceneId'])) ||
-      'target-scene-' + (_0xfbc007 + 0x1),
-    _0x2521e7 = normalizeCharacterAppearances({ ..._0x40991c, id: _0x4f0827 }),
-    _0x21149e = _0x2521e7['some'](
-      (_0x141893) => _0x141893['id'] === normalizeText(_0x40991c['baseAppearanceId']),
+function normalizeTargetScene(error5 = {}, value53 = 0x0) {
+  const id3 =
+      normalizeText(firstDefined(error5['id'], error5['ref'], error5['sceneId'])) ||
+      'target-scene-' + (value53 + 0x1),
+    appearances2 = normalizeCharacterAppearances({ ...error5, id: id3 }),
+    baseAppearanceId2 = appearances2['some'](
+      (value54) => value54['id'] === normalizeText(error5['baseAppearanceId']),
     )
-      ? normalizeText(_0x40991c['baseAppearanceId'])
-      : _0x2521e7[0x0]?.['id'] || '';
+      ? normalizeText(error5['baseAppearanceId'])
+      : appearances2[0x0]?.['id'] || '';
   return {
-    ...normalizePlainObject(_0x40991c),
-    id: _0x4f0827,
+    ...normalizePlainObject(error5),
+    id: id3,
     kind: 'scene',
     name:
-      normalizeText(firstDefined(_0x40991c['name'], _0x40991c['label'], _0x40991c['title'])) ||
-      '场景' + (_0xfbc007 + 0x1),
-    role: normalizeText(_0x40991c['role']) || '场景',
-    appearances: _0x2521e7,
-    baseAppearanceId: _0x21149e,
-    imageRefs: _0x2521e7['map']((_0x1c952b) => _0x1c952b['imageUrl'])['filter'](Boolean),
-    description: normalizeText(firstDefined(_0x40991c['description'], _0x40991c['prompt'])),
+      normalizeText(firstDefined(error5['name'], error5['label'], error5['title'])) ||
+      '场景' + (value53 + 0x1),
+    role: normalizeText(error5['role']) || '场景',
+    appearances: appearances2,
+    baseAppearanceId: baseAppearanceId2,
+    imageRefs: appearances2['map']((value55) => value55['imageUrl'])['filter'](Boolean),
+    description: normalizeText(firstDefined(error5['description'], error5['prompt'])),
   };
 }
-function normalizeProjectAudioAsset(_0x18cd0d = {}, _0x3df057 = 0x0) {
-  const _0x1b7993 = normalizePlainObject(_0x18cd0d),
-    _0x37467a = normalizeText(firstDefined(_0x18cd0d['sourceAssetId'], _0x18cd0d['assetId'])),
-    _0x2284b5 = Math['max'](
+function normalizeProjectAudioAsset(error6 = {}, value56 = 0x0) {
+  const args4 = normalizePlainObject(error6),
+    sourceAssetId = normalizeText(firstDefined(error6['sourceAssetId'], error6['assetId'])),
+    sourceItemIndex = Math['max'](
       0x0,
-      Math['trunc'](Number(firstDefined(_0x18cd0d['sourceItemIndex'], _0x18cd0d['itemIndex'], 0x0)) || 0x0),
+      Math['trunc'](Number(firstDefined(error6['sourceItemIndex'], error6['itemIndex'], 0x0)) || 0x0),
     ),
-    _0x51c304 = normalizeText(
-      firstDefined(_0x18cd0d['audioUrl'], _0x18cd0d['sourceUrl'], _0x18cd0d['url'], _0x18cd0d['localPath']),
+    sourceUrl = normalizeText(
+      firstDefined(error6['audioUrl'], error6['sourceUrl'], error6['url'], error6['localPath']),
     ),
-    _0x28b7d2 = normalizeText(_0x18cd0d['description']),
-    _0xae3f3f = normalizeText(_0x28b7d2['match'](/^来自画布素材「(.+)」$/u)?.[0x1]),
-    _0x57df97 = normalizeText(_0x18cd0d['savedName']) || _0xae3f3f,
-    _0x3e8520 =
-      _0x57df97 ||
-      normalizeText(firstDefined(_0x18cd0d['name'], _0x18cd0d['assetName'], _0x18cd0d['fileName'])) ||
-      '音频 ' + (_0x3df057 + 0x1);
+    description = normalizeText(error6['description']),
+    text22 = normalizeText(description['match'](/^来自画布素材「(.+)」$/u)?.[0x1]),
+    savedName = normalizeText(error6['savedName']) || text22,
+    name3 =
+      savedName ||
+      normalizeText(firstDefined(error6['name'], error6['assetName'], error6['fileName'])) ||
+      '音频 ' + (value56 + 0x1);
   return {
-    ..._0x1b7993,
+    ...args4,
     id:
-      normalizeText(firstDefined(_0x18cd0d['id'], _0x18cd0d['audioAssetId'])) ||
-      'project-audio-' + (_0x3df057 + 0x1),
+      normalizeText(firstDefined(error6['id'], error6['audioAssetId'])) || 'project-audio-' + (value56 + 0x1),
     kind: 'audio',
     mediaKind: 'audio',
-    name: _0x3e8520,
-    ...(_0x57df97 ? { savedName: _0x57df97 } : {}),
+    name: name3,
+    ...(savedName ? { savedName: savedName } : {}),
     role: '音频素材',
-    sourceOrigin: normalizeText(_0x18cd0d['sourceOrigin']) || (_0x37467a ? 'library' : 'project'),
-    sourceAssetId: _0x37467a,
-    sourceItemIndex: _0x2284b5,
-    sourceUrl: _0x51c304,
-    audioUrl: _0x51c304,
-    assetName: normalizeText(_0x18cd0d['assetName']) || _0x3e8520,
-    occurrences: normalizeText(_0x18cd0d['occurrences']) || '当前项目',
-    description: _0x28b7d2,
+    sourceOrigin: normalizeText(error6['sourceOrigin']) || (sourceAssetId ? 'library' : 'project'),
+    sourceAssetId: sourceAssetId,
+    sourceItemIndex: sourceItemIndex,
+    sourceUrl: sourceUrl,
+    audioUrl: sourceUrl,
+    assetName: normalizeText(error6['assetName']) || name3,
+    occurrences: normalizeText(error6['occurrences']) || '当前项目',
+    description: description,
     isLibraryAsset: ![],
   };
 }
-export function getPersonReplacementCharacterBaseImageRef(_0x3f4cd6 = {}) {
-  const _0x10941e = normalizeCharacterAppearances(_0x3f4cd6),
-    _0x34a559 = normalizeText(_0x3f4cd6['baseAppearanceId']),
-    _0x303f13 = _0x10941e['find']((_0x443add) => _0x443add['id'] === _0x34a559) || _0x10941e[0x0];
-  if (_0x303f13?.['imageUrl']) return _0x303f13['imageUrl'];
+export function getPersonReplacementCharacterBaseImageRef(options15 = {}) {
+  const list14 = normalizeCharacterAppearances(options15),
+    text23 = normalizeText(options15['baseAppearanceId']),
+    value57 = list14['find']((value58) => value58['id'] === text23) || list14[0x0];
+  if (value57?.['imageUrl']) return value57['imageUrl'];
   return (
     normalizeImageRefs(
       firstDefined(
-        _0x3f4cd6['imageRefs'],
-        _0x3f4cd6['referenceImages'],
-        _0x3f4cd6['images'],
-        _0x3f4cd6['imageRef'],
+        options15['imageRefs'],
+        options15['referenceImages'],
+        options15['images'],
+        options15['imageRef'],
       ),
     )[0x0] || ''
   );
 }
-export function getPersonReplacementShotCharacterReferences(_0x713749 = {}, _0x13c365 = {}) {
-  const _0x511023 = Array['isArray'](_0x713749?.['characters']) ? _0x713749['characters'] : [],
-    _0x458f9f = new Map(_0x511023['map']((_0x3a2543) => [normalizeText(_0x3a2543?.['id']), _0x3a2543])),
-    _0x1a8ed2 = new Map(
-      (Array['isArray'](_0x713749?.['mappings']) ? _0x713749['mappings'] : [])
-        ['map']((_0x48be55) => [
-          normalizeText(_0x48be55?.['sourceCharacterId']),
-          normalizeText(_0x48be55?.['targetCharacterId']),
+export function getPersonReplacementShotCharacterReferences(options16 = {}, value59 = {}) {
+  const list15 = Array['isArray'](options16?.['characters']) ? options16['characters'] : [],
+    map4 = new Map(list15['map']((value60) => [normalizeText(value60?.['id']), value60])),
+    map5 = new Map(
+      (Array['isArray'](options16?.['mappings']) ? options16['mappings'] : [])
+        ['map']((value61) => [
+          normalizeText(value61?.['sourceCharacterId']),
+          normalizeText(value61?.['targetCharacterId']),
         ])
-        ['filter'](([_0x33887c, _0x201dd6]) => _0x33887c && _0x201dd6),
+        ['filter'](([value62, value63]) => value62 && value63),
     );
-  return (Array['isArray'](_0x13c365?.['people']) ? _0x13c365['people'] : [])
-    ['map']((_0x5026bd) => {
-      const _0x42501f = normalizeText(_0x5026bd?.['targetCharacterId']),
-        _0x2eb6fb =
-          _0x42501f ||
-          (_0x5026bd?.['projectMappingDisabled'] === !![]
+  return (Array['isArray'](value59?.['people']) ? value59['people'] : [])
+    ['map']((value64) => {
+      const text24 = normalizeText(value64?.['targetCharacterId']),
+        characterId =
+          text24 ||
+          (value64?.['projectMappingDisabled'] === !![]
             ? ''
-            : _0x1a8ed2['get'](normalizeText(_0x5026bd?.['sourceCharacterId']))) ||
+            : map5['get'](normalizeText(value64?.['sourceCharacterId']))) ||
           '';
-      if (!_0x2eb6fb) return null;
-      const _0x40d0eb = _0x458f9f['get'](_0x2eb6fb);
-      if (!_0x40d0eb) return null;
-      const _0xb08f3e = normalizeCharacterAppearances(_0x40d0eb),
-        _0x14f6bd = normalizeText(_0x5026bd?.['targetAppearanceId']),
-        _0x3f1d2d =
-          _0xb08f3e['find']((_0x570e0) => normalizeText(_0x570e0?.['id']) === _0x14f6bd) ||
-          _0xb08f3e['find'](
-            (_0x4e7931) => normalizeText(_0x4e7931?.['id']) === normalizeText(_0x40d0eb['baseAppearanceId']),
+      if (!characterId) return null;
+      const error7 = map4['get'](characterId);
+      if (!error7) return null;
+      const list16 = normalizeCharacterAppearances(error7),
+        text25 = normalizeText(value64?.['targetAppearanceId']),
+        error8 =
+          list16['find']((value65) => normalizeText(value65?.['id']) === text25) ||
+          list16['find'](
+            (value66) => normalizeText(value66?.['id']) === normalizeText(error7['baseAppearanceId']),
           ) ||
-          _0xb08f3e[0x0] ||
+          list16[0x0] ||
           null;
       return {
-        personId: normalizeText(_0x5026bd?.['id']),
-        characterId: _0x2eb6fb,
-        characterName: normalizeText(_0x40d0eb['name']) || '人物参考',
-        appearanceId: normalizeText(_0x3f1d2d?.['id']),
-        appearanceName: normalizeText(_0x3f1d2d?.['name']) || '基础形象',
-        imageRef: normalizeText(
-          _0x3f1d2d?.['imageUrl'] || getPersonReplacementCharacterBaseImageRef(_0x40d0eb),
-        ),
+        personId: normalizeText(value64?.['id']),
+        characterId: characterId,
+        characterName: normalizeText(error7['name']) || '人物参考',
+        appearanceId: normalizeText(error8?.['id']),
+        appearanceName: normalizeText(error8?.['name']) || '基础形象',
+        imageRef: normalizeText(error8?.['imageUrl'] || getPersonReplacementCharacterBaseImageRef(error7)),
       };
     })
     ['filter'](Boolean);
 }
 export function resolvePersonReplacementVideoImageInput(
-  _0x3c73d0 = {},
-  _0x4e0869 = {},
-  _0x57cd8d = _0x3c73d0?.['settings']?.['replacementVideoInputMode'],
+  options17 = {},
+  value67 = {},
+  value68 = options17?.['settings']?.['replacementVideoInputMode'],
 ) {
-  const _0x2b14ca = normalizePersonReplacementVideoInputMode(_0x57cd8d),
-    _0x55b14a = normalizeText(_0x4e0869?.['id']),
-    _0x3b283c = getPersonReplacementImageResults(_0x4e0869),
-    _0x5c63bf = getPersonReplacementActiveImageResultIndex(_0x4e0869, _0x3b283c),
-    _0x212d52 = resolvePersonReplacementImageResultRef(_0x3b283c[_0x5c63bf]),
-    _0x2e3d6a = normalizeText(_0x4e0869?.['replacementImageRef'] || _0x212d52),
-    _0x4d0956 = normalizeText(_0x4e0869?.['replacementVideoReferenceSourceShotId']),
-    _0x3e1b53 = resolvePersonReplacementImageResultRef(_0x4e0869?.['replacementVideoReferenceImageRef']),
-    _0x2832dd = toArray(_0x3c73d0?.['shots']),
-    _0x260d98 = _0x2832dd['some']((_0x4ca872) => normalizeText(_0x4ca872?.['id']) === _0x55b14a)
-      ? _0x2832dd
-      : [..._0x2832dd, _0x4e0869],
-    _0x34214a = _0x260d98['map']((_0x31c963, _0x9f50f4) => {
-      const _0x58d82a = normalizeText(_0x31c963?.['id']),
-        _0x14b6ac = getPersonReplacementImageResults(_0x31c963),
-        _0x27e3c2 = normalizeText(_0x31c963?.['replacementImageRef']),
-        _0x70b494 = _0x14b6ac['length'] ? _0x14b6ac : _0x27e3c2 ? [{ imageUrl: _0x27e3c2 }] : [];
-      if (!_0x70b494['length']) return null;
-      const _0x521bff =
-          _0x58d82a && _0x58d82a === _0x4d0956 && _0x3e1b53
-            ? _0x70b494['findIndex'](
-                (_0x18bb31) => resolvePersonReplacementImageResultRef(_0x18bb31) === _0x3e1b53,
+  const mode = normalizePersonReplacementVideoInputMode(value68),
+    text26 = normalizeText(value67?.['id']),
+    personReplacementImageResults2 = getPersonReplacementImageResults(value67),
+    personReplacementActiveImageResultIndex = getPersonReplacementActiveImageResultIndex(
+      value67,
+      personReplacementImageResults2,
+    ),
+    personReplacementImageResultRef3 = resolvePersonReplacementImageResultRef(
+      personReplacementImageResults2[personReplacementActiveImageResultIndex],
+    ),
+    text27 = normalizeText(value67?.['replacementImageRef'] || personReplacementImageResultRef3),
+    text28 = normalizeText(value67?.['replacementVideoReferenceSourceShotId']),
+    personReplacementImageResultRef4 = resolvePersonReplacementImageResultRef(
+      value67?.['replacementVideoReferenceImageRef'],
+    ),
+    list17 = toArray(options17?.['shots']),
+    list18 = list17['some']((value69) => normalizeText(value69?.['id']) === text26)
+      ? list17
+      : [...list17, value67],
+    list19 = list18['map']((value70, sourceShotIndex) => {
+      const sourceShotId = normalizeText(value70?.['id']),
+        list20 = getPersonReplacementImageResults(value70),
+        imageUrl4 = normalizeText(value70?.['replacementImageRef']),
+        resultCount = list20['length'] ? list20 : imageUrl4 ? [{ imageUrl: imageUrl4 }] : [];
+      if (!resultCount['length']) return null;
+      const count13 =
+          sourceShotId && sourceShotId === text28 && personReplacementImageResultRef4
+            ? resultCount['findIndex'](
+                (value71) =>
+                  resolvePersonReplacementImageResultRef(value71) === personReplacementImageResultRef4,
               )
             : -0x1,
-        _0x30e97f =
-          _0x521bff >= 0x0 ? _0x521bff : getPersonReplacementActiveImageResultIndex(_0x31c963, _0x70b494),
-        _0x5993f2 = _0x14b6ac['length']
-          ? resolvePersonReplacementImageResultRef(_0x70b494[_0x30e97f])
-          : _0x27e3c2;
-      return _0x5993f2
+        resultIndex =
+          count13 >= 0x0 ? count13 : getPersonReplacementActiveImageResultIndex(value70, resultCount),
+        imageRef = list20['length']
+          ? resolvePersonReplacementImageResultRef(resultCount[resultIndex])
+          : imageUrl4;
+      return imageRef
         ? {
             kind: PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE,
-            imageRef: _0x5993f2,
-            sourceShotId: _0x58d82a,
-            sourceShotIndex: _0x9f50f4,
-            resultIndex: _0x30e97f,
-            resultCount: _0x70b494['length'],
+            imageRef: imageRef,
+            sourceShotId: sourceShotId,
+            sourceShotIndex: sourceShotIndex,
+            resultIndex: resultIndex,
+            resultCount: resultCount['length'],
           }
         : null;
     })['filter'](Boolean),
-    _0x5dfc07 =
-      _0x4d0956 && _0x3e1b53
-        ? _0x34214a['find'](
-            (_0x12b58c) => _0x12b58c['sourceShotId'] === _0x4d0956 && _0x12b58c['imageRef'] === _0x3e1b53,
+    value72 =
+      text28 && personReplacementImageResultRef4
+        ? list19['find'](
+            (value73) =>
+              value73['sourceShotId'] === text28 && value73['imageRef'] === personReplacementImageResultRef4,
           ) || null
         : null,
-    _0x5daeb9 =
-      _0x34214a['find'](
-        (_0x5add0a) => _0x5add0a['sourceShotId'] === _0x55b14a && _0x5add0a['imageRef'] === _0x2e3d6a,
-      ) || null,
-    _0x73d1e5 = _0x5dfc07 || _0x5daeb9;
-  if (_0x2b14ca === PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE) {
-    const _0x1e0cdd = getPersonReplacementShotCharacterReferences(_0x3c73d0, _0x4e0869),
-      _0xfa3d60 = _0x1e0cdd['filter']((_0x500cca) => normalizeText(_0x500cca?.['imageRef']))['map'](
-        (_0x4788e3) => ({
+    value74 =
+      list19['find']((value75) => value75['sourceShotId'] === text26 && value75['imageRef'] === text27) ||
+      null,
+    value76 = value72 || value74;
+  if (mode === PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE) {
+    const references = getPersonReplacementShotCharacterReferences(options17, value67),
+      list21 = references['filter']((value77) => normalizeText(value77?.['imageRef']))['map'](
+        (imageRef2) => ({
           kind: PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
-          imageRef: _0x4788e3['imageRef'],
-          reference: _0x4788e3,
+          imageRef: imageRef2['imageRef'],
+          reference: imageRef2,
         }),
       ),
-      _0x3bf0ce = [..._0x34214a, ..._0xfa3d60],
-      _0x186682 = normalizeText(_0x4e0869?.['replacementVideoReferenceKind']),
-      _0x47fbcd = normalizeText(_0x4e0869?.['replacementVideoReferencePersonId']),
-      _0x229a89 = _0x47fbcd
-        ? _0xfa3d60['find'](
-            (_0x41b530) => normalizeText(_0x41b530['reference']?.['personId']) === _0x47fbcd,
-          ) || null
+      referenceOptions = [...list19, ...list21],
+      text29 = normalizeText(value67?.['replacementVideoReferenceKind']),
+      text30 = normalizeText(value67?.['replacementVideoReferencePersonId']),
+      enabled3 = text30
+        ? list21['find']((value78) => normalizeText(value78['reference']?.['personId']) === text30) || null
         : null,
-      _0x469d4d = Boolean(
-        _0x186682 === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE && _0x47fbcd && !_0x229a89,
+      message = Boolean(
+        text29 === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE && text30 && !enabled3,
       ),
-      _0xa6a13d = _0x229a89 || (!_0x47fbcd ? _0xfa3d60[0x0] : null) || null,
-      _0x1ef0c5 = _0x469d4d
+      value79 = enabled3 || (!text30 ? list21[0x0] : null) || null,
+      referenceKind = message
         ? null
-        : (_0x186682 === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE ? _0xa6a13d : _0x73d1e5) ||
-          _0x73d1e5 ||
-          _0xa6a13d ||
+        : (text29 === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE ? value79 : value76) ||
+          value76 ||
+          value79 ||
           null,
-      _0x404d43 = _0x3bf0ce['indexOf'](_0x1ef0c5),
-      _0x3bb853 = _0x1ef0c5?.['imageRef'] || '',
-      _0x3a15a8 = _0x1ef0c5?.['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
-      _0x4466b7 = _0x469d4d ? null : _0xa6a13d?.['reference'] || _0x1e0cdd[0x0] || null;
+      activeReferenceIndex = referenceOptions['indexOf'](referenceKind),
+      status = referenceKind?.['imageRef'] || '',
+      value80 = referenceKind?.['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
+      reference = message ? null : value79?.['reference'] || references[0x0] || null;
     return {
-      mode: _0x2b14ca,
-      status: _0x3bb853 ? 'ready' : 'missing',
-      imageRef: _0x3bb853,
-      selectedImageRef: _0x3bb853,
+      mode: mode,
+      status: status ? 'ready' : 'missing',
+      imageRef: status,
+      selectedImageRef: status,
       referenceKind:
-        _0x1ef0c5?.['kind'] || (_0x469d4d ? PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE : ''),
-      referenceOptions: _0x3bf0ce,
-      activeReferenceIndex: _0x404d43,
-      reference: _0x4466b7,
-      references: _0x1e0cdd,
-      message: _0x469d4d
+        referenceKind?.['kind'] || (message ? PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE : ''),
+      referenceOptions: referenceOptions,
+      activeReferenceIndex: activeReferenceIndex,
+      reference: reference,
+      references: references,
+      message: message
         ? '原选中的人物参考图已失效，请重新选择'
-        : _0x3a15a8
-          ? (_0x4466b7?.['characterName'] || '人物参考') +
+        : value80
+          ? (reference?.['characterName'] || '人物参考') +
             '\x20·\x20' +
-            (_0x4466b7?.['appearanceName'] || '基础形象')
-          : _0x3bb853
+            (reference?.['appearanceName'] || '基础形象')
+          : status
             ? '替换首帧'
-            : _0x1e0cdd['length']
+            : references['length']
               ? '当前人物缺少可用参考图'
               : '未绑定人物参考图',
     };
   }
-  const _0x17ea8c = _0x34214a,
-    _0xb0afbc = _0x73d1e5,
-    _0x1fbbca = _0xb0afbc?.['imageRef'] || '',
-    _0x1eb325 = _0x17ea8c['indexOf'](_0xb0afbc);
+  const referenceOptions2 = list19,
+    referenceKind2 = value76,
+    status2 = referenceKind2?.['imageRef'] || '',
+    activeReferenceIndex2 = referenceOptions2['indexOf'](referenceKind2);
   return {
-    mode: _0x2b14ca,
-    status: _0x1fbbca ? 'ready' : 'missing',
-    imageRef: _0x1fbbca,
-    selectedImageRef: _0x1fbbca,
-    referenceKind: _0xb0afbc?.['kind'] || PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE,
-    referenceOptions: _0x17ea8c,
-    activeReferenceIndex: _0x1eb325,
+    mode: mode,
+    status: status2 ? 'ready' : 'missing',
+    imageRef: status2,
+    selectedImageRef: status2,
+    referenceKind: referenceKind2?.['kind'] || PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE,
+    referenceOptions: referenceOptions2,
+    activeReferenceIndex: activeReferenceIndex2,
     references: [],
-    message: _0x1fbbca ? '替换首帧' : '缺少替换首帧',
+    message: status2 ? '替换首帧' : '缺少替换首帧',
   };
 }
-function normalizeSource(_0x57b883 = {}, _0x2e19f2 = 0x0) {
-  const _0x34d2f4 = normalizeText(firstDefined(_0x57b883['videoRef'], _0x57b883['ref'], _0x57b883['url']));
+function normalizeSource(error9 = {}, value81 = 0x0) {
+  const videoRef2 = normalizeText(firstDefined(error9['videoRef'], error9['ref'], error9['url']));
   return {
-    id: normalizeText(_0x57b883['id']) || 'source-' + (_0x2e19f2 + 0x1),
-    assetId: normalizeText(_0x57b883['assetId']),
-    videoRef: _0x34d2f4,
+    id: normalizeText(error9['id']) || 'source-' + (value81 + 0x1),
+    assetId: normalizeText(error9['assetId']),
+    videoRef: videoRef2,
     playbackVideoRef: normalizeText(
-      firstDefined(_0x57b883['playbackVideoRef'], _0x57b883['displayLocalPath'], _0x57b883['displayUrl']),
+      firstDefined(error9['playbackVideoRef'], error9['displayLocalPath'], error9['displayUrl']),
     ),
     thumbnailRef: normalizeText(
       firstDefined(
-        _0x57b883['thumbnailRef'],
-        _0x57b883['posterLocalPath'],
-        _0x57b883['thumbLocalPath'],
-        _0x57b883['posterUrl'],
-        _0x57b883['thumbUrl'],
+        error9['thumbnailRef'],
+        error9['posterLocalPath'],
+        error9['thumbLocalPath'],
+        error9['posterUrl'],
+        error9['thumbUrl'],
       ),
     ),
-    fileName: normalizeText(firstDefined(_0x57b883['fileName'], _0x57b883['name'])),
-    durationSec: normalizeNonNegativeNumber(_0x57b883['durationSec']),
+    fileName: normalizeText(firstDefined(error9['fileName'], error9['name'])),
+    durationSec: normalizeNonNegativeNumber(error9['durationSec']),
     processingStatus:
-      normalizeText(firstDefined(_0x57b883['processingStatus'], _0x57b883['analysisStatus'])) || 'idle',
+      normalizeText(firstDefined(error9['processingStatus'], error9['analysisStatus'])) || 'idle',
     processingProgress: Math['max'](
       0x0,
       Math['min'](
         0x64,
-        normalizeNonNegativeNumber(
-          firstDefined(_0x57b883['processingProgress'], _0x57b883['analysisProgress']),
-        ),
+        normalizeNonNegativeNumber(firstDefined(error9['processingProgress'], error9['analysisProgress'])),
       ),
     ),
-    order: Number['isInteger'](Number(_0x57b883['order'])) ? Number(_0x57b883['order']) : _0x2e19f2,
-    error: normalizeText(_0x57b883['error']),
+    order: Number['isInteger'](Number(error9['order'])) ? Number(error9['order']) : value81,
+    error: normalizeText(error9['error']),
   };
 }
-function normalizeSourceCharacter(_0x3d6ce0 = {}, _0x512f2d = 0x0) {
+function normalizeSourceCharacter(error10 = {}, value82 = 0x0) {
   return {
     id:
-      normalizeText(firstDefined(_0x3d6ce0['id'], _0x3d6ce0['ref'], _0x3d6ce0['sourceCharacterId'])) ||
-      'source-character-' + (_0x512f2d + 0x1),
+      normalizeText(firstDefined(error10['id'], error10['ref'], error10['sourceCharacterId'])) ||
+      'source-character-' + (value82 + 0x1),
     name:
-      normalizeText(firstDefined(_0x3d6ce0['name'], _0x3d6ce0['label'], _0x3d6ce0['title'])) ||
-      '原人物' + (_0x512f2d + 0x1),
+      normalizeText(firstDefined(error10['name'], error10['label'], error10['title'])) ||
+      '原人物' + (value82 + 0x1),
     imageRefs: normalizeImageRefs(
-      firstDefined(_0x3d6ce0['imageRefs'], _0x3d6ce0['keyframeRefs'], _0x3d6ce0['images']),
+      firstDefined(error10['imageRefs'], error10['keyframeRefs'], error10['images']),
     ),
-    confidence: normalizeConfidence(firstDefined(_0x3d6ce0['confidence'], _0x3d6ce0['identityConfidence'])),
-    reviewRequired: Boolean(firstDefined(_0x3d6ce0['reviewRequired'], _0x3d6ce0['needsReview'], ![])),
-    identityReviewStatus: IDENTITY_REVIEW_STATUSES['has'](normalizeText(_0x3d6ce0['identityReviewStatus']))
-      ? normalizeText(_0x3d6ce0['identityReviewStatus'])
-      : firstDefined(_0x3d6ce0['reviewRequired'], _0x3d6ce0['needsReview'], ![])
+    confidence: normalizeConfidence(firstDefined(error10['confidence'], error10['identityConfidence'])),
+    reviewRequired: Boolean(firstDefined(error10['reviewRequired'], error10['needsReview'], ![])),
+    identityReviewStatus: IDENTITY_REVIEW_STATUSES['has'](normalizeText(error10['identityReviewStatus']))
+      ? normalizeText(error10['identityReviewStatus'])
+      : firstDefined(error10['reviewRequired'], error10['needsReview'], ![])
         ? 'needs_review'
         : 'auto',
-    memberCount: Math['max'](0x0, Math['trunc'](normalizeNonNegativeNumber(_0x3d6ce0['memberCount']))),
-    exemplarShotId: normalizeText(_0x3d6ce0['exemplarShotId']),
-    exemplarPersonId: normalizeText(_0x3d6ce0['exemplarPersonId']),
-    ambiguousIdentityIds: toArray(_0x3d6ce0['ambiguousIdentityIds'])['map'](normalizeText)['filter'](Boolean),
-    notes: normalizeText(firstDefined(_0x3d6ce0['notes'], _0x3d6ce0['description'])),
+    memberCount: Math['max'](0x0, Math['trunc'](normalizeNonNegativeNumber(error10['memberCount']))),
+    exemplarShotId: normalizeText(error10['exemplarShotId']),
+    exemplarPersonId: normalizeText(error10['exemplarPersonId']),
+    ambiguousIdentityIds: toArray(error10['ambiguousIdentityIds'])['map'](normalizeText)['filter'](Boolean),
+    notes: normalizeText(firstDefined(error10['notes'], error10['description'])),
   };
 }
-function normalizeMappings(_0xf0a54b) {
-  const _0x1e3265 = Array['isArray'](_0xf0a54b)
-      ? _0xf0a54b
-      : _0xf0a54b && typeof _0xf0a54b === 'object'
-        ? Object['entries'](_0xf0a54b)['map'](([_0x78448c, _0x19326e]) => ({
-            sourceCharacterId: _0x78448c,
-            targetCharacterId: _0x19326e,
+function normalizeMappings(value83) {
+  const list22 = Array['isArray'](value83)
+      ? value83
+      : value83 && typeof value83 === 'object'
+        ? Object['entries'](value83)['map'](([sourceCharacterId2, targetCharacterId]) => ({
+            sourceCharacterId: sourceCharacterId2,
+            targetCharacterId: targetCharacterId,
           }))
         : [],
-    _0x1ee488 = new Map();
+    map6 = new Map();
   return (
-    _0x1e3265['forEach']((_0x2097b1) => {
-      const _0x3dc48c = normalizeText(
-          firstDefined(
-            _0x2097b1?.['sourceCharacterId'],
-            _0x2097b1?.['source_character_id'],
-            _0x2097b1?.['source'],
-          ),
+    list22['forEach']((event) => {
+      const sourceCharacterId3 = normalizeText(
+          firstDefined(event?.['sourceCharacterId'], event?.['source_character_id'], event?.['source']),
         ),
-        _0x52476d = normalizeText(
-          firstDefined(
-            _0x2097b1?.['targetCharacterId'],
-            _0x2097b1?.['target_character_id'],
-            _0x2097b1?.['target'],
-          ),
+        targetCharacterId2 = normalizeText(
+          firstDefined(event?.['targetCharacterId'], event?.['target_character_id'], event?.['target']),
         );
-      if (!_0x3dc48c || !_0x52476d) return;
-      _0x1ee488['set'](_0x3dc48c, { sourceCharacterId: _0x3dc48c, targetCharacterId: _0x52476d });
+      if (!sourceCharacterId3 || !targetCharacterId2) return;
+      map6['set'](sourceCharacterId3, {
+        sourceCharacterId: sourceCharacterId3,
+        targetCharacterId: targetCharacterId2,
+      });
     }),
-    [..._0x1ee488['values']()]
+    [...map6['values']()]
   );
 }
-function normalizeAudio(_0x3ad7fe = {}) {
+function normalizeAudio(options18 = {}) {
   return {
     strategy: 'full_replace',
-    originalAudioRef: normalizeText(_0x3ad7fe['originalAudioRef']),
-    replacementAudioRef: normalizeText(_0x3ad7fe['replacementAudioRef']),
-    previewTrack: AUDIO_TRACKS['has'](_0x3ad7fe['previewTrack']) ? _0x3ad7fe['previewTrack'] : 'replacement',
-    exportTrack: AUDIO_TRACKS['has'](_0x3ad7fe['exportTrack']) ? _0x3ad7fe['exportTrack'] : 'replacement',
-    composeStatus: normalizeGenerationStatus(_0x3ad7fe['composeStatus']),
-    selectedSourceId: normalizeText(_0x3ad7fe['selectedSourceId']),
-    voiceStudioState: normalizePlainObject(_0x3ad7fe['voiceStudioState']),
+    originalAudioRef: normalizeText(options18['originalAudioRef']),
+    replacementAudioRef: normalizeText(options18['replacementAudioRef']),
+    previewTrack: AUDIO_TRACKS['has'](options18['previewTrack']) ? options18['previewTrack'] : 'replacement',
+    exportTrack: AUDIO_TRACKS['has'](options18['exportTrack']) ? options18['exportTrack'] : 'replacement',
+    composeStatus: normalizeGenerationStatus(options18['composeStatus']),
+    selectedSourceId: normalizeText(options18['selectedSourceId']),
+    voiceStudioState: normalizePlainObject(options18['voiceStudioState']),
     voiceSeparationsBySourceId: normalizePersonReplacementVoiceSeparationsBySourceId(
-      _0x3ad7fe['voiceSeparationsBySourceId'],
+      options18['voiceSeparationsBySourceId'],
     ),
   };
 }
-export function normalizePersonReplacementProject(_0x5a6362 = {}) {
-  const _0x481f15 = normalizeText(_0x5a6362['status']),
-    _0x2a0222 = toArray(firstDefined(_0x5a6362['characters'], _0x5a6362['targetCharacters'], []))['map'](
-      normalizeTargetCharacter,
-    ),
-    _0xc52957 = normalizeSource({
-      ...(_0x5a6362['source'] || {}),
+export function normalizePersonReplacementProject(providerProfileId = {}) {
+  const text31 = normalizeText(providerProfileId['status']),
+    characters = toArray(
+      firstDefined(providerProfileId['characters'], providerProfileId['targetCharacters'], []),
+    )['map'](normalizeTargetCharacter),
+    source3 = normalizeSource({
+      ...(providerProfileId['source'] || {}),
       videoRef: firstDefined(
-        _0x5a6362['source']?.['videoRef'],
-        _0x5a6362['videoRef'],
-        _0x5a6362['sourceVideoRef'],
+        providerProfileId['source']?.['videoRef'],
+        providerProfileId['videoRef'],
+        providerProfileId['sourceVideoRef'],
       ),
       fileName: firstDefined(
-        _0x5a6362['source']?.['fileName'],
-        _0x5a6362['source']?.['name'],
-        _0x5a6362['fileName'],
+        providerProfileId['source']?.['fileName'],
+        providerProfileId['source']?.['name'],
+        providerProfileId['fileName'],
       ),
-      durationSec: firstDefined(_0x5a6362['source']?.['durationSec'], _0x5a6362['durationSec']),
+      durationSec: firstDefined(
+        providerProfileId['source']?.['durationSec'],
+        providerProfileId['durationSec'],
+      ),
     }),
-    _0x458dbb = (
-      Array['isArray'](_0x5a6362['sources']) && _0x5a6362['sources']['length']
-        ? _0x5a6362['sources']
-        : _0xc52957['videoRef'] || _0xc52957['fileName']
-          ? [_0xc52957]
+    sources = (
+      Array['isArray'](providerProfileId['sources']) && providerProfileId['sources']['length']
+        ? providerProfileId['sources']
+        : source3['videoRef'] || source3['fileName']
+          ? [source3]
           : []
     )
       ['map'](normalizeSource)
-      ['sort']((_0x5dcfe7, _0x1346b2) => _0x5dcfe7['order'] - _0x1346b2['order']),
-    _0x246378 = _0x458dbb[0x0] || _0xc52957,
-    _0x3bfbd3 =
-      normalizeText(_0x5a6362['settings']?.['replacementImageModelId']) ||
+      ['sort']((value84, value85) => value84['order'] - value85['order']),
+    source4 = sources[0x0] || source3,
+    model =
+      normalizeText(providerProfileId['settings']?.['replacementImageModelId']) ||
       PERSON_REPLACEMENT_DEFAULT_IMAGE_MODEL_ID,
-    _0x59aa57 = resolveModelProvider(
-      _0x3bfbd3,
-      normalizeText(_0x5a6362['settings']?.['replacementImageProvider']),
+    replacementImageProvider = resolveModelProvider(
+      model,
+      normalizeText(providerProfileId['settings']?.['replacementImageProvider']),
     ),
-    _0x309d8b = buildModelProviderProfileSelectionPatch(
+    replacementImageProviderProfileId = buildModelProviderProfileSelectionPatch(
       {
-        model: _0x3bfbd3,
-        providerProfileId: _0x5a6362['settings']?.['replacementImageProviderProfileId'],
-        providerProfileIdByModel: _0x5a6362['settings']?.['replacementImageProviderProfileIdByModel'],
+        model: model,
+        providerProfileId: providerProfileId['settings']?.['replacementImageProviderProfileId'],
+        providerProfileIdByModel: providerProfileId['settings']?.['replacementImageProviderProfileIdByModel'],
       },
-      _0x3bfbd3,
-      _0x5a6362['settings']?.['replacementImageProviderProfileId'],
+      model,
+      providerProfileId['settings']?.['replacementImageProviderProfileId'],
     ),
-    _0x246bf6 =
-      normalizeText(_0x5a6362['settings']?.['characterImageModelId']) ||
+    model2 =
+      normalizeText(providerProfileId['settings']?.['characterImageModelId']) ||
       PERSON_REPLACEMENT_DEFAULT_IMAGE_MODEL_ID,
-    _0x4d520f = buildModelProviderProfileSelectionPatch(
+    characterImageProviderProfileId = buildModelProviderProfileSelectionPatch(
       {
-        model: _0x246bf6,
-        providerProfileId: _0x5a6362['settings']?.['characterImageProviderProfileId'],
-        providerProfileIdByModel: _0x5a6362['settings']?.['characterImageProviderProfileIdByModel'],
+        model: model2,
+        providerProfileId: providerProfileId['settings']?.['characterImageProviderProfileId'],
+        providerProfileIdByModel: providerProfileId['settings']?.['characterImageProviderProfileIdByModel'],
       },
-      _0x246bf6,
-      _0x5a6362['settings']?.['characterImageProviderProfileId'],
+      model2,
+      providerProfileId['settings']?.['characterImageProviderProfileId'],
     ),
-    _0x218fb9 = normalizeText(_0x5a6362['settings']?.['replacementModelId']),
-    _0x3303e1 = resolvePersonReplacementVideoModelId(_0x218fb9),
-    _0x5197fa = Boolean(_0x218fb9 && _0x218fb9 !== _0x3303e1),
-    _0x213aa1 = normalizePersonReplacementVideoInputMode(
-      _0x5a6362['settings']?.['replacementVideoInputMode'],
+    text32 = normalizeText(providerProfileId['settings']?.['replacementModelId']),
+    modelId3 = resolvePersonReplacementVideoModelId(text32),
+    generationParams3 = Boolean(text32 && text32 !== modelId3),
+    inputMode3 = normalizePersonReplacementVideoInputMode(
+      providerProfileId['settings']?.['replacementVideoInputMode'],
     ),
-    _0x190cb6 = resolvePersonReplacementVideoParameterPolicy({
-      modelId: _0x3303e1,
-      inputMode: _0x213aa1,
-      generationParams: _0x5197fa
+    replacementVideoGenerationParams = resolvePersonReplacementVideoParameterPolicy({
+      modelId: modelId3,
+      inputMode: inputMode3,
+      generationParams: generationParams3
         ? {}
-        : normalizePlainObject(_0x5a6362['settings']?.['replacementVideoGenerationParams']),
+        : normalizePlainObject(providerProfileId['settings']?.['replacementVideoGenerationParams']),
     }),
-    _0x5d262c = buildModelProviderProfileSelectionPatch(
+    replacementVideoProviderProfileId = buildModelProviderProfileSelectionPatch(
       {
-        model: _0x3303e1,
-        providerProfileId: _0x5a6362['settings']?.['replacementVideoProviderProfileId'],
-        providerProfileIdByModel: _0x5a6362['settings']?.['replacementVideoProviderProfileIdByModel'],
+        model: modelId3,
+        providerProfileId: providerProfileId['settings']?.['replacementVideoProviderProfileId'],
+        providerProfileIdByModel: providerProfileId['settings']?.['replacementVideoProviderProfileIdByModel'],
       },
-      _0x3303e1,
-      _0x5a6362['settings']?.['replacementVideoProviderProfileId'],
+      modelId3,
+      providerProfileId['settings']?.['replacementVideoProviderProfileId'],
     ),
-    _0x449c7b = reconcilePersonReplacementVideoReferenceSelections(
-      toArray(_0x5a6362['shots'])['map'](normalizePersonReplacementShot),
+    shots = reconcilePersonReplacementVideoReferenceSelections(
+      toArray(providerProfileId['shots'])['map'](normalizePersonReplacementShot),
     );
   return {
     schemaVersion: PERSON_REPLACEMENT_SCHEMA_VERSION,
-    id: normalizeText(_0x5a6362['id']),
-    title: normalizeText(_0x5a6362['title']) || '未命名人物替换项目',
-    status: STATUS_INDEX['has'](_0x481f15) ? _0x481f15 : 'draft',
-    source: _0x246378,
-    sources: _0x458dbb,
+    id: normalizeText(providerProfileId['id']),
+    title: normalizeText(providerProfileId['title']) || '未命名人物替换项目',
+    status: STATUS_INDEX['has'](text31) ? text31 : 'draft',
+    source: source4,
+    sources: sources,
     settings: {
-      replacementModelId: _0x3303e1,
-      replacementVideoInputMode: _0x213aa1,
-      replacementImageModelId: _0x3bfbd3,
-      replacementImageProvider: _0x59aa57,
-      replacementImageProviderProfileId: _0x309d8b['providerProfileId'],
-      replacementImageProviderProfileIdByModel: _0x309d8b['providerProfileIdByModel'],
-      replacementVideoProviderProfileId: _0x5d262c['providerProfileId'],
-      replacementVideoProviderProfileIdByModel: _0x5d262c['providerProfileIdByModel'],
-      characterImageModelId: _0x246bf6,
-      characterImageProvider: normalizeText(_0x5a6362['settings']?.['characterImageProvider']) || 'apimart',
-      characterImageProviderProfileId: _0x4d520f['providerProfileId'],
-      characterImageProviderProfileIdByModel: _0x4d520f['providerProfileIdByModel'],
+      replacementModelId: modelId3,
+      replacementVideoInputMode: inputMode3,
+      replacementImageModelId: model,
+      replacementImageProvider: replacementImageProvider,
+      replacementImageProviderProfileId: replacementImageProviderProfileId['providerProfileId'],
+      replacementImageProviderProfileIdByModel: replacementImageProviderProfileId['providerProfileIdByModel'],
+      replacementVideoProviderProfileId: replacementVideoProviderProfileId['providerProfileId'],
+      replacementVideoProviderProfileIdByModel: replacementVideoProviderProfileId['providerProfileIdByModel'],
+      characterImageModelId: model2,
+      characterImageProvider:
+        normalizeText(providerProfileId['settings']?.['characterImageProvider']) || 'apimart',
+      characterImageProviderProfileId: characterImageProviderProfileId['providerProfileId'],
+      characterImageProviderProfileIdByModel: characterImageProviderProfileId['providerProfileIdByModel'],
       characterImageGenerationParams: normalizePlainObject(
-        _0x5a6362['settings']?.['characterImageGenerationParams'],
+        providerProfileId['settings']?.['characterImageGenerationParams'],
       ),
       characterImageGenerationParamsByModel: normalizeParamsByModel(
-        _0x5a6362['settings']?.['characterImageGenerationParamsByModel'],
+        providerProfileId['settings']?.['characterImageGenerationParamsByModel'],
       ),
       replacementImageGenerationParams: normalizePlainObject(
-        _0x5a6362['settings']?.['replacementImageGenerationParams'],
+        providerProfileId['settings']?.['replacementImageGenerationParams'],
       ),
       replacementImageGenerationParamsByModel: normalizeParamsByModel(
-        _0x5a6362['settings']?.['replacementImageGenerationParamsByModel'],
+        providerProfileId['settings']?.['replacementImageGenerationParamsByModel'],
       ),
       replacementPromptEnhancementEnabled:
-        _0x5a6362['settings']?.['replacementPromptEnhancementEnabled'] === !![],
-      replacementVideoGenerationParams: _0x190cb6['generationParams'],
+        providerProfileId['settings']?.['replacementPromptEnhancementEnabled'] === !![],
+      replacementVideoGenerationParams: replacementVideoGenerationParams['generationParams'],
       smartClipMode: normalizeSmartClipMode(
-        firstDefined(_0x5a6362['settings']?.['smartClipMode'], 'balanced'),
+        firstDefined(providerProfileId['settings']?.['smartClipMode'], 'balanced'),
       ),
-      smartClipFps: normalizeSmartClipFps(_0x5a6362['settings']?.['smartClipFps']),
-      processingMode: _0x5a6362['settings']?.['processingMode'] === 'skip' ? 'skip' : 'cut',
-      automationMode: _0x5a6362['settings']?.['automationMode'] === 'auto' ? 'auto' : 'review',
+      smartClipFps: normalizeSmartClipFps(providerProfileId['settings']?.['smartClipFps']),
+      processingMode: providerProfileId['settings']?.['processingMode'] === 'skip' ? 'skip' : 'cut',
+      automationMode: providerProfileId['settings']?.['automationMode'] === 'auto' ? 'auto' : 'review',
       confidenceThreshold: normalizeConfidence(
-        firstDefined(_0x5a6362['settings']?.['confidenceThreshold'], 0.75),
+        firstDefined(providerProfileId['settings']?.['confidenceThreshold'], 0.75),
       ),
       identityAutoThreshold: normalizeConfidence(
-        firstDefined(_0x5a6362['settings']?.['identityAutoThreshold'], 0.78),
+        firstDefined(providerProfileId['settings']?.['identityAutoThreshold'], 0.78),
       ),
       identityReviewThreshold: normalizeConfidence(
-        firstDefined(_0x5a6362['settings']?.['identityReviewThreshold'], 0.68),
+        firstDefined(providerProfileId['settings']?.['identityReviewThreshold'], 0.68),
       ),
       identityAmbiguityMargin: normalizeConfidence(
-        firstDefined(_0x5a6362['settings']?.['identityAmbiguityMargin'], 0.06),
+        firstDefined(providerProfileId['settings']?.['identityAmbiguityMargin'], 0.06),
       ),
     },
-    characters: _0x2a0222,
-    scenes: toArray(_0x5a6362['scenes'])['map'](normalizeTargetScene),
-    audioAssets: toArray(_0x5a6362['audioAssets'])
+    characters: characters,
+    scenes: toArray(providerProfileId['scenes'])['map'](normalizeTargetScene),
+    audioAssets: toArray(providerProfileId['audioAssets'])
       ['map'](normalizeProjectAudioAsset)
-      ['filter']((_0x414ea0) => _0x414ea0['audioUrl']),
-    sourceCharacters: toArray(_0x5a6362['sourceCharacters'])['map'](normalizeSourceCharacter),
-    mappings: normalizeMappings(_0x5a6362['mappings']),
-    shots: _0x449c7b,
-    audio: normalizeAudio(_0x5a6362['audio']),
+      ['filter']((value86) => value86['audioUrl']),
+    sourceCharacters: toArray(providerProfileId['sourceCharacters'])['map'](normalizeSourceCharacter),
+    mappings: normalizeMappings(providerProfileId['mappings']),
+    shots: shots,
+    audio: normalizeAudio(providerProfileId['audio']),
     output: {
-      originalMasterRef: normalizeText(_0x5a6362['output']?.['originalMasterRef']),
-      visualMasterRef: normalizeText(_0x5a6362['output']?.['visualMasterRef']),
-      finalVideoRef: normalizeText(_0x5a6362['output']?.['finalVideoRef']),
-      finalAudioTrack: AUDIO_TRACKS['has'](_0x5a6362['output']?.['finalAudioTrack'])
-        ? _0x5a6362['output']['finalAudioTrack']
+      originalMasterRef: normalizeText(providerProfileId['output']?.['originalMasterRef']),
+      visualMasterRef: normalizeText(providerProfileId['output']?.['visualMasterRef']),
+      finalVideoRef: normalizeText(providerProfileId['output']?.['finalVideoRef']),
+      finalAudioTrack: AUDIO_TRACKS['has'](providerProfileId['output']?.['finalAudioTrack'])
+        ? providerProfileId['output']['finalAudioTrack']
         : '',
-      composeStatus: normalizeGenerationStatus(_0x5a6362['output']?.['composeStatus']),
-      composedShotIds: toArray(_0x5a6362['output']?.['composedShotIds'])
+      composeStatus: normalizeGenerationStatus(providerProfileId['output']?.['composeStatus']),
+      composedShotIds: toArray(providerProfileId['output']?.['composedShotIds'])
         ['map'](normalizeText)
         ['filter'](Boolean),
-      canvasBinding: normalizePlainObject(_0x5a6362['output']?.['canvasBinding']),
+      canvasBinding: normalizePlainObject(providerProfileId['output']?.['canvasBinding']),
     },
-    archivedAt: normalizeNonNegativeNumber(_0x5a6362['archivedAt']),
-    createdAt: normalizeText(_0x5a6362['createdAt']),
-    updatedAt: normalizeText(_0x5a6362['updatedAt']),
+    archivedAt: normalizeNonNegativeNumber(providerProfileId['archivedAt']),
+    createdAt: normalizeText(providerProfileId['createdAt']),
+    updatedAt: normalizeText(providerProfileId['updatedAt']),
   };
 }
-export function createPersonReplacementProject(_0x3e49b1 = {}) {
-  return normalizePersonReplacementProject(_0x3e49b1);
+export function createPersonReplacementProject(options19 = {}) {
+  return normalizePersonReplacementProject(options19);
 }
-export function canTransitionPersonReplacementProject(_0x475724, _0x42340f) {
-  const _0x3c4b4b = STATUS_INDEX['get'](normalizeText(_0x475724)),
-    _0x147911 = STATUS_INDEX['get'](normalizeText(_0x42340f));
-  if (_0x3c4b4b === undefined || _0x147911 === undefined) return ![];
-  return _0x147911 === _0x3c4b4b || _0x147911 === _0x3c4b4b + 0x1;
+export function canTransitionPersonReplacementProject(value87, value88) {
+  const value89 = STATUS_INDEX['get'](normalizeText(value87)),
+    value90 = STATUS_INDEX['get'](normalizeText(value88));
+  if (value89 === undefined || value90 === undefined) return ![];
+  return value90 === value89 || value90 === value89 + 0x1;
 }
-export function transitionPersonReplacementProject(_0x310a4c, _0x3d7dd1) {
-  const _0x186646 = normalizePersonReplacementProject(_0x310a4c);
-  if (!canTransitionPersonReplacementProject(_0x186646['status'], _0x3d7dd1))
+export function transitionPersonReplacementProject(value91, value92) {
+  const response7 = normalizePersonReplacementProject(value91);
+  if (!canTransitionPersonReplacementProject(response7['status'], value92))
     throw new Error(
       '[personReplacementProject] invalid status transition: ' +
-        _0x186646['status'] +
+        response7['status'] +
         ' -> ' +
-        normalizeText(_0x3d7dd1),
+        normalizeText(value92),
     );
-  return { ..._0x186646, status: normalizeText(_0x3d7dd1) };
+  return { ...response7, status: normalizeText(value92) };
 }
 export function setPersonReplacementCharacterMapping(
-  _0x2d1856,
-  { sourceCharacterId: _0x5729c9, targetCharacterId: _0x157898 } = {},
+  value93,
+  { sourceCharacterId: sourceCharacterId4, targetCharacterId: targetCharacterId3 } = {},
 ) {
-  const _0x474ae8 = normalizePersonReplacementProject(_0x2d1856),
-    _0x2b8a26 = normalizeText(_0x5729c9),
-    _0x2fb0e3 = normalizeText(_0x157898);
-  if (!_0x2b8a26) throw new Error('[personReplacementProject] sourceCharacterId is required');
-  const _0x383e0f = _0x474ae8['mappings']['filter'](
-    (_0x1c2133) => _0x1c2133['sourceCharacterId'] !== _0x2b8a26,
+  const args5 = normalizePersonReplacementProject(value93),
+    sourceCharacterId5 = normalizeText(sourceCharacterId4),
+    targetCharacterId4 = normalizeText(targetCharacterId3);
+  if (!sourceCharacterId5) throw new Error('[personReplacementProject] sourceCharacterId is required');
+  const mappings = args5['mappings']['filter'](
+    (value94) => value94['sourceCharacterId'] !== sourceCharacterId5,
   );
-  if (_0x2fb0e3) _0x383e0f['push']({ sourceCharacterId: _0x2b8a26, targetCharacterId: _0x2fb0e3 });
-  return { ..._0x474ae8, mappings: _0x383e0f };
+  if (targetCharacterId4)
+    mappings['push']({ sourceCharacterId: sourceCharacterId5, targetCharacterId: targetCharacterId4 });
+  return { ...args5, mappings: mappings };
 }
-export function resolvePersonReplacementTargetCharacterId(_0x541a59, _0x1bd01e) {
-  const _0x36361e = normalizePersonReplacementProject(_0x541a59),
-    _0x1ad678 = _0x1bd01e && typeof _0x1bd01e === 'object' ? _0x1bd01e : null,
-    _0x5abee5 = normalizeText(_0x1ad678?.['targetCharacterId']);
-  if (_0x5abee5) return _0x5abee5;
-  if (_0x1ad678?.['projectMappingDisabled'] === !![]) return '';
-  const _0x15c9bd = normalizeText(_0x1ad678 ? _0x1ad678['sourceCharacterId'] : _0x1bd01e);
+export function resolvePersonReplacementTargetCharacterId(value95, value96) {
+  const personReplacementProject = normalizePersonReplacementProject(value95),
+    value97 = value96 && typeof value96 === 'object' ? value96 : null,
+    text33 = normalizeText(value97?.['targetCharacterId']);
+  if (text33) return text33;
+  if (value97?.['projectMappingDisabled'] === !![]) return '';
+  const text34 = normalizeText(value97 ? value97['sourceCharacterId'] : value96);
   return (
-    _0x36361e['mappings']['find']((_0x55a5ff) => _0x55a5ff['sourceCharacterId'] === _0x15c9bd)?.[
+    personReplacementProject['mappings']['find']((value98) => value98['sourceCharacterId'] === text34)?.[
       'targetCharacterId'
     ] || ''
   );
 }
-export function getPersonReplacementCrossRoleSourceCharacterIds(_0x5c66ba = {}) {
-  const _0x40f156 = new Map();
+export function getPersonReplacementCrossRoleSourceCharacterIds(options20 = {}) {
+  const map7 = new Map();
   return (
-    toArray(_0x5c66ba?.['shots'])['forEach']((_0x48f4cb) => {
-      toArray(_0x48f4cb?.['people'])['forEach']((_0xec854c) => {
-        const _0x52377c = normalizeText(_0xec854c?.['sourceCharacterId']),
-          _0x32d394 = normalizeText(_0xec854c?.['label']);
-        if (!_0x52377c || !_0x32d394) return;
-        const _0x1b6ccd = _0x40f156['get'](_0x52377c) || new Set();
-        (_0x1b6ccd['add'](_0x32d394), _0x40f156['set'](_0x52377c, _0x1b6ccd));
+    toArray(options20?.['shots'])['forEach']((value99) => {
+      toArray(value99?.['people'])['forEach']((value100) => {
+        const text35 = normalizeText(value100?.['sourceCharacterId']),
+          text36 = normalizeText(value100?.['label']);
+        if (!text35 || !text36) return;
+        const value101 = map7['get'](text35) || new Set();
+        (value101['add'](text36), map7['set'](text35, value101));
       });
     }),
     new Set(
-      [..._0x40f156['entries']()]
-        ['filter'](([, _0x179aff]) => _0x179aff['size'] > 0x1)
-        ['map'](([_0xceb2e]) => _0xceb2e),
+      [...map7['entries']()]
+        ['filter'](([, value102]) => value102['size'] > 0x1)
+        ['map'](([value103]) => value103),
     )
   );
 }
 export function getPersonReplacementBindingOccurrences(
-  _0x44a098,
+  value104,
   { shotId: shotId = '', personId: personId = '' } = {},
 ) {
-  const _0x44f2ef = normalizeText(shotId),
-    _0x400ae1 = normalizeText(personId),
-    _0x6618f0 = toArray(_0x44a098?.['shots']),
-    _0x2cfd15 = _0x6618f0['find']((_0x4c0011) => normalizeText(_0x4c0011?.['id']) === _0x44f2ef),
-    _0x5677da = toArray(_0x2cfd15?.['people'])['find'](
-      (_0x94e772) => normalizeText(_0x94e772?.['id']) === _0x400ae1,
+  const text37 = normalizeText(shotId),
+    text38 = normalizeText(personId),
+    list23 = toArray(value104?.['shots']),
+    value105 = list23['find']((value106) => normalizeText(value106?.['id']) === text37),
+    toArray2 = toArray(value105?.['people'])['find'](
+      (value107) => normalizeText(value107?.['id']) === text38,
     );
-  if (!_0x5677da) return [];
-  const _0x15b98c = normalizeText(_0x5677da['sourceCharacterId']),
-    _0x17782c = normalizeText(_0x5677da['label']);
-  return _0x6618f0['flatMap']((_0x5c2a39) =>
-    toArray(_0x5c2a39?.['people'])['flatMap']((_0x3b97ca) => {
-      const _0x3ff7b5 = normalizeText(_0x5c2a39?.['id']),
-        _0x2c5ee4 = normalizeText(_0x3b97ca?.['id']),
-        _0x1c23e6 = _0x3ff7b5 === _0x44f2ef && _0x2c5ee4 === _0x400ae1,
-        _0x1f1a70 = _0x17782c
-          ? normalizeText(_0x3b97ca?.['label']) === _0x17782c
-          : Boolean(_0x15b98c && normalizeText(_0x3b97ca?.['sourceCharacterId']) === _0x15b98c);
-      if (!_0x1c23e6 && !_0x1f1a70) return [];
+  if (!toArray2) return [];
+  const text39 = normalizeText(toArray2['sourceCharacterId']),
+    text40 = normalizeText(toArray2['label']);
+  return list23['flatMap']((value108) =>
+    toArray(value108?.['people'])['flatMap']((value109) => {
+      const shotId3 = normalizeText(value108?.['id']),
+        personId2 = normalizeText(value109?.['id']),
+        enabled4 = shotId3 === text37 && personId2 === text38,
+        enabled5 = text40
+          ? normalizeText(value109?.['label']) === text40
+          : Boolean(text39 && normalizeText(value109?.['sourceCharacterId']) === text39);
+      if (!enabled4 && !enabled5) return [];
       return [
         {
-          shotId: _0x3ff7b5,
-          personId: _0x2c5ee4,
-          sourceCharacterId: normalizeText(_0x3b97ca?.['sourceCharacterId']),
+          shotId: shotId3,
+          personId: personId2,
+          sourceCharacterId: normalizeText(value109?.['sourceCharacterId']),
         },
       ];
     }),
   );
 }
-function collectSourceIdentityOccurrences(_0x5d1315, _0x15cf37) {
-  const _0x34535c = normalizeText(_0x15cf37);
-  return toArray(_0x5d1315?.['shots'])['flatMap']((_0x23d421) =>
-    toArray(_0x23d421?.['people'])
-      ['filter']((_0x5bc12f) => normalizeText(_0x5bc12f?.['sourceCharacterId']) === _0x34535c)
-      ['map']((_0x594d7a) => ({ shot: _0x23d421, person: _0x594d7a })),
+function collectSourceIdentityOccurrences(value110, value111) {
+  const text41 = normalizeText(value111);
+  return toArray(value110?.['shots'])['flatMap']((shot) =>
+    toArray(shot?.['people'])
+      ['filter']((value112) => normalizeText(value112?.['sourceCharacterId']) === text41)
+      ['map']((person) => ({ shot: shot, person: person })),
   );
 }
 export function mergePersonReplacementSourceCharacters(
-  _0x3ed110,
+  args6,
   { sourceCharacterIds: sourceCharacterIds = [], keepSourceCharacterId: keepSourceCharacterId = '' } = {},
 ) {
-  const _0x1ef65c = [...new Set(toArray(sourceCharacterIds)['map'](normalizeText)['filter'](Boolean))];
-  if (_0x1ef65c['length'] < 0x2) throw new Error('合并人物至少需要选择两个身份');
-  const _0x3c22b7 = new Set(_0x1ef65c),
-    _0x41c4b7 = _0x3c22b7['has'](normalizeText(keepSourceCharacterId))
+  const list24 = [...new Set(toArray(sourceCharacterIds)['map'](normalizeText)['filter'](Boolean))];
+  if (list24['length'] < 0x2) throw new Error('合并人物至少需要选择两个身份');
+  const map8 = new Set(list24),
+    id4 = map8['has'](normalizeText(keepSourceCharacterId))
       ? normalizeText(keepSourceCharacterId)
-      : _0x1ef65c[0x0];
-  for (const _0x576176 of toArray(_0x3ed110?.['shots'])) {
-    const _0x364896 = toArray(_0x576176?.['people'])['filter']((_0x4f7714) =>
-      _0x3c22b7['has'](normalizeText(_0x4f7714?.['sourceCharacterId'])),
+      : list24[0x0];
+  for (const value113 of toArray(args6?.['shots'])) {
+    const list25 = toArray(value113?.['people'])['filter']((value114) =>
+      map8['has'](normalizeText(value114?.['sourceCharacterId'])),
     );
-    if (_0x364896['length'] > 0x1) throw new Error('同一镜头中同时出现的人物不能合并为同一身份');
+    if (list25['length'] > 0x1) throw new Error('同一镜头中同时出现的人物不能合并为同一身份');
   }
-  const _0x3312b8 = new Set();
-  (toArray(_0x3ed110?.['mappings'])['forEach']((_0x30dec1) => {
-    _0x3c22b7['has'](normalizeText(_0x30dec1?.['sourceCharacterId'])) &&
-      _0x30dec1?.['targetCharacterId'] &&
-      _0x3312b8['add'](normalizeText(_0x30dec1['targetCharacterId']));
+  const args7 = new Set();
+  (toArray(args6?.['mappings'])['forEach']((value115) => {
+    map8['has'](normalizeText(value115?.['sourceCharacterId'])) &&
+      value115?.['targetCharacterId'] &&
+      args7['add'](normalizeText(value115['targetCharacterId']));
   }),
-    toArray(_0x3ed110?.['shots'])['forEach']((_0x41be5e) =>
-      toArray(_0x41be5e?.['people'])['forEach']((_0x59c56b) => {
-        _0x3c22b7['has'](normalizeText(_0x59c56b?.['sourceCharacterId'])) &&
-          _0x59c56b?.['targetCharacterId'] &&
-          _0x3312b8['add'](normalizeText(_0x59c56b['targetCharacterId']));
+    toArray(args6?.['shots'])['forEach']((value116) =>
+      toArray(value116?.['people'])['forEach']((value117) => {
+        map8['has'](normalizeText(value117?.['sourceCharacterId'])) &&
+          value117?.['targetCharacterId'] &&
+          args7['add'](normalizeText(value117['targetCharacterId']));
       }),
     ));
-  if (_0x3312b8['size'] > 0x1) throw new Error('所选人物已经映射到不同目标人物，请先统一映射后再合并');
-  const _0x52a36a = [..._0x3312b8][0x0] || '',
-    _0x1c355c = toArray(_0x3ed110?.['sourceCharacters']),
-    _0x73fc53 = _0x1c355c['filter']((_0x51e06f) => _0x3c22b7['has'](_0x51e06f['id'])),
-    _0x217a22 = _0x73fc53['find']((_0xdfceda) => _0xdfceda['id'] === _0x41c4b7) ||
-      _0x73fc53[0x0] || { id: _0x41c4b7, name: '原人物' },
-    _0x4706e0 = {
-      ..._0x217a22,
-      id: _0x41c4b7,
-      imageRefs: [...new Set(_0x73fc53['flatMap']((_0x145f14) => toArray(_0x145f14['imageRefs'])))],
-      confidence: _0x73fc53['length']
-        ? Math['min'](..._0x73fc53['map']((_0x4e3e3b) => normalizeConfidence(_0x4e3e3b['confidence'])))
+  if (args7['size'] > 0x1) throw new Error('所选人物已经映射到不同目标人物，请先统一映射后再合并');
+  const targetCharacterId5 = [...args7][0x0] || '',
+    list26 = toArray(args6?.['sourceCharacters']),
+    confidence = list26['filter']((value118) => map8['has'](value118['id'])),
+    label3 = confidence['find']((value119) => value119['id'] === id4) ||
+      confidence[0x0] || { id: id4, name: '原人物' },
+    value120 = {
+      ...label3,
+      id: id4,
+      imageRefs: [...new Set(confidence['flatMap']((value121) => toArray(value121['imageRefs'])))],
+      confidence: confidence['length']
+        ? Math['min'](...confidence['map']((value122) => normalizeConfidence(value122['confidence'])))
         : 0x0,
       reviewRequired: ![],
       identityReviewStatus: 'confirmed',
-      memberCount: _0x73fc53['reduce'](
-        (_0x5e27cc, _0x125cdf) => _0x5e27cc + Math['max'](0x0, Number(_0x125cdf['memberCount']) || 0x0),
+      memberCount: confidence['reduce'](
+        (value123, value124) => value123 + Math['max'](0x0, Number(value124['memberCount']) || 0x0),
         0x0,
       ),
       ambiguousIdentityIds: [
-        ...new Set(_0x73fc53['flatMap']((_0x5e1695) => toArray(_0x5e1695['ambiguousIdentityIds']))),
-      ]['filter']((_0x32c1d5) => !_0x3c22b7['has'](_0x32c1d5)),
+        ...new Set(confidence['flatMap']((value125) => toArray(value125['ambiguousIdentityIds']))),
+      ]['filter']((value126) => !map8['has'](value126)),
       notes: '人工合并人物身份',
     },
-    _0x17aec6 = toArray(_0x3ed110?.['mappings'])['filter'](
-      (_0xf16b47) => !_0x3c22b7['has'](normalizeText(_0xf16b47?.['sourceCharacterId'])),
+    mappings2 = toArray(args6?.['mappings'])['filter'](
+      (value127) => !map8['has'](normalizeText(value127?.['sourceCharacterId'])),
     );
-  if (_0x52a36a) _0x17aec6['push']({ sourceCharacterId: _0x41c4b7, targetCharacterId: _0x52a36a });
+  if (targetCharacterId5)
+    mappings2['push']({ sourceCharacterId: id4, targetCharacterId: targetCharacterId5 });
   return {
-    ..._0x3ed110,
-    shots: toArray(_0x3ed110?.['shots'])['map']((_0x425881) => ({
-      ..._0x425881,
-      people: toArray(_0x425881?.['people'])['map']((_0x4656a2) =>
-        _0x3c22b7['has'](normalizeText(_0x4656a2?.['sourceCharacterId']))
+    ...args6,
+    shots: toArray(args6?.['shots'])['map']((args8) => ({
+      ...args8,
+      people: toArray(args8?.['people'])['map']((args9) =>
+        map8['has'](normalizeText(args9?.['sourceCharacterId']))
           ? {
-              ..._0x4656a2,
-              sourceCharacterId: _0x41c4b7,
-              label: _0x217a22['name'] || _0x4656a2['label'],
-              targetCharacterId: _0x52a36a || _0x4656a2['targetCharacterId'] || '',
+              ...args9,
+              sourceCharacterId: id4,
+              label: label3['name'] || args9['label'],
+              targetCharacterId: targetCharacterId5 || args9['targetCharacterId'] || '',
               identityReviewStatus: 'confirmed',
               identityReviewRequired: ![],
               identityMethod: 'manual',
-              ambiguousIdentityIds: toArray(_0x4656a2['ambiguousIdentityIds'])['filter'](
-                (_0x3a3374) => !_0x3c22b7['has'](_0x3a3374),
+              ambiguousIdentityIds: toArray(args9['ambiguousIdentityIds'])['filter'](
+                (value128) => !map8['has'](value128),
               ),
             }
-          : _0x4656a2,
+          : args9,
       ),
     })),
-    sourceCharacters: [..._0x1c355c['filter']((_0x1b0060) => !_0x3c22b7['has'](_0x1b0060['id'])), _0x4706e0],
-    mappings: _0x17aec6,
+    sourceCharacters: [...list26['filter']((value129) => !map8['has'](value129['id'])), value120],
+    mappings: mappings2,
   };
 }
 export function splitPersonReplacementSourceCharacter(
-  _0x48e039,
+  args10,
   {
-    sourceCharacterId: _0x1e0b00,
+    sourceCharacterId: sourceCharacterId6,
     occurrences: occurrences = [],
     newSourceCharacterId: newSourceCharacterId = '',
   } = {},
 ) {
-  const _0x12cdf7 = normalizeText(_0x1e0b00);
-  if (!_0x12cdf7) throw new Error('拆分人物缺少原身份');
-  const _0x2f35be = new Set(
+  const id5 = normalizeText(sourceCharacterId6);
+  if (!id5) throw new Error('拆分人物缺少原身份');
+  const map9 = new Set(
     toArray(occurrences)
-      ['map'](
-        (_0x4bf57e) => normalizeText(_0x4bf57e?.['shotId']) + ':' + normalizeText(_0x4bf57e?.['personId']),
-      )
-      ['filter']((_0x1f3610) => _0x1f3610 !== ':'),
+      ['map']((value130) => normalizeText(value130?.['shotId']) + ':' + normalizeText(value130?.['personId']))
+      ['filter']((value131) => value131 !== ':'),
   );
-  if (!_0x2f35be['size']) throw new Error('请先选择要拆分的人物框');
-  const _0x44c084 = collectSourceIdentityOccurrences(_0x48e039, _0x12cdf7),
-    _0x2caa53 = _0x44c084['filter'](({ shot: _0x324691, person: _0x4e7332 }) =>
-      _0x2f35be['has'](_0x324691['id'] + ':' + _0x4e7332['id']),
+  if (!map9['size']) throw new Error('请先选择要拆分的人物框');
+  const list27 = collectSourceIdentityOccurrences(args10, id5),
+    memberCount = list27['filter'](({ shot: shot2, person: person2 }) =>
+      map9['has'](shot2['id'] + ':' + person2['id']),
     );
-  if (!_0x2caa53['length']) throw new Error('没有找到要拆分的人物框');
-  if (_0x2caa53['length'] >= _0x44c084['length'] && _0x44c084['length'] > 0x1)
+  if (!memberCount['length']) throw new Error('没有找到要拆分的人物框');
+  if (memberCount['length'] >= list27['length'] && list27['length'] > 0x1)
     throw new Error('不能把该身份的全部人物框拆分出去');
-  if (_0x44c084['length'] === 0x1) {
-    const _0xda662c = _0x2caa53[0x0]['person'],
-      _0x17d72d = normalizeText(_0xda662c['label']) || formatPersonReplacementPersonLabel(0x0);
+  if (list27['length'] === 0x1) {
+    const value132 = memberCount[0x0]['person'],
+      label4 = normalizeText(value132['label']) || formatPersonReplacementPersonLabel(0x0);
     return {
-      ..._0x48e039,
-      shots: toArray(_0x48e039?.['shots'])['map']((_0x53ab3b) => ({
-        ..._0x53ab3b,
-        people: toArray(_0x53ab3b?.['people'])['map']((_0x2cedad) =>
-          normalizeText(_0x2cedad?.['sourceCharacterId']) === _0x12cdf7
+      ...args10,
+      shots: toArray(args10?.['shots'])['map']((args11) => ({
+        ...args11,
+        people: toArray(args11?.['people'])['map']((args12) =>
+          normalizeText(args12?.['sourceCharacterId']) === id5
             ? {
-                ..._0x2cedad,
-                label: _0x17d72d,
+                ...args12,
+                label: label4,
                 identityReviewStatus: 'needs_review',
                 identityReviewRequired: !![],
                 identityMethod: 'manual',
                 ambiguousIdentityIds: [],
               }
-            : _0x2cedad,
+            : args12,
         ),
       })),
-      sourceCharacters: toArray(_0x48e039?.['sourceCharacters'])['map']((_0x2a7a39) =>
-        _0x2a7a39['id'] === _0x12cdf7
+      sourceCharacters: toArray(args10?.['sourceCharacters'])['map']((args13) =>
+        args13['id'] === id5
           ? {
-              ..._0x2a7a39,
-              name: _0x17d72d,
+              ...args13,
+              name: label4,
               reviewRequired: !![],
               identityReviewStatus: 'needs_review',
               ambiguousIdentityIds: [],
               notes: '人工纠正人物身份',
             }
-          : _0x2a7a39,
+          : args13,
       ),
     };
   }
-  const _0x1b47a4 = new Set(toArray(_0x48e039?.['sourceCharacters'])['map']((_0x3e91e2) => _0x3e91e2['id']));
-  let _0x461921 = normalizeText(newSourceCharacterId) || _0x12cdf7 + '-split-' + (_0x1b47a4['size'] + 0x1),
-    _0x1553a9 = 0x2;
-  while (_0x1b47a4['has'](_0x461921)) {
-    ((_0x461921 = _0x12cdf7 + '-split-' + (_0x1b47a4['size'] + _0x1553a9)), (_0x1553a9 += 0x1));
+  const map10 = new Set(toArray(args10?.['sourceCharacters'])['map']((value133) => value133['id']));
+  let sourceCharacterId7 = normalizeText(newSourceCharacterId) || id5 + '-split-' + (map10['size'] + 0x1),
+    value134 = 0x2;
+  while (map10['has'](sourceCharacterId7)) {
+    ((sourceCharacterId7 = id5 + '-split-' + (map10['size'] + value134)), (value134 += 0x1));
   }
-  const _0x1141d4 = toArray(_0x48e039?.['sourceCharacters'])['find'](
-      (_0x3023ba) => _0x3023ba['id'] === _0x12cdf7,
-    ) || { id: _0x12cdf7, name: '原人物' },
-    _0x1fe6ea = [
-      ...new Set(_0x2caa53['map'](({ shot: _0x18ef6d }) => _0x18ef6d['keyframeRef'])['filter'](Boolean)),
+  const error11 = toArray(args10?.['sourceCharacters'])['find']((value135) => value135['id'] === id5) || {
+      id: id5,
+      name: '原人物',
+    },
+    imageRefs = [
+      ...new Set(memberCount['map'](({ shot: shot3 }) => shot3['keyframeRef'])['filter'](Boolean)),
     ],
-    _0x131c6a =
-      normalizeText(_0x2caa53[0x0]['person']['label']) ||
-      normalizeText(_0x1141d4['name']) ||
+    label5 =
+      normalizeText(memberCount[0x0]['person']['label']) ||
+      normalizeText(error11['name']) ||
       formatPersonReplacementPersonLabel(0x0);
   return {
-    ..._0x48e039,
-    shots: toArray(_0x48e039?.['shots'])['map']((_0x35ad59) => ({
-      ..._0x35ad59,
-      people: toArray(_0x35ad59?.['people'])['map']((_0x51c7d9) =>
-        normalizeText(_0x51c7d9?.['sourceCharacterId']) === _0x12cdf7 &&
-        _0x2f35be['has'](_0x35ad59['id'] + ':' + _0x51c7d9['id'])
+    ...args10,
+    shots: toArray(args10?.['shots'])['map']((args14) => ({
+      ...args14,
+      people: toArray(args14?.['people'])['map']((args15) =>
+        normalizeText(args15?.['sourceCharacterId']) === id5 && map9['has'](args14['id'] + ':' + args15['id'])
           ? {
-              ..._0x51c7d9,
-              sourceCharacterId: _0x461921,
-              label: _0x131c6a,
+              ...args15,
+              sourceCharacterId: sourceCharacterId7,
+              label: label5,
               targetCharacterId: '',
               targetAppearanceId: '',
               identityReviewStatus: 'needs_review',
@@ -1999,48 +2106,46 @@ export function splitPersonReplacementSourceCharacter(
               identityMethod: 'manual',
               ambiguousIdentityIds: [],
             }
-          : _0x51c7d9,
+          : args15,
       ),
     })),
     sourceCharacters: [
-      ...toArray(_0x48e039?.['sourceCharacters'])['map']((_0x2bc7c0) =>
-        _0x2bc7c0['id'] === _0x12cdf7
+      ...toArray(args10?.['sourceCharacters'])['map']((args16) =>
+        args16['id'] === id5
           ? {
-              ..._0x2bc7c0,
+              ...args16,
               memberCount: Math['max'](
                 0x0,
-                (Number(_0x2bc7c0['memberCount']) || _0x44c084['length']) - _0x2caa53['length'],
+                (Number(args16['memberCount']) || list27['length']) - memberCount['length'],
               ),
             }
-          : _0x2bc7c0,
+          : args16,
       ),
       {
-        id: _0x461921,
-        name: _0x131c6a,
-        imageRefs: _0x1fe6ea,
+        id: sourceCharacterId7,
+        name: label5,
+        imageRefs: imageRefs,
         confidence: Math['min'](
-          ..._0x2caa53['map'](({ person: _0x1ecdbe }) =>
-            normalizeConfidence(_0x1ecdbe['identityConfidence']),
-          ),
+          ...memberCount['map'](({ person: person3 }) => normalizeConfidence(person3['identityConfidence'])),
         ),
         reviewRequired: !![],
         identityReviewStatus: 'needs_review',
-        memberCount: _0x2caa53['length'],
-        exemplarShotId: _0x2caa53[0x0]['shot']['id'],
-        exemplarPersonId: _0x2caa53[0x0]['person']['id'],
+        memberCount: memberCount['length'],
+        exemplarShotId: memberCount[0x0]['shot']['id'],
+        exemplarPersonId: memberCount[0x0]['person']['id'],
         ambiguousIdentityIds: [],
         notes: '人工拆分人物身份',
       },
     ],
-    mappings: toArray(_0x48e039?.['mappings'])['filter'](
-      (_0x5ae8b4) => normalizeText(_0x5ae8b4?.['sourceCharacterId']) !== _0x461921,
+    mappings: toArray(args10?.['mappings'])['filter'](
+      (value136) => normalizeText(value136?.['sourceCharacterId']) !== sourceCharacterId7,
     ),
   };
 }
 export function confirmPersonReplacementSourceCharacter(
-  _0x44b463,
+  args17,
   {
-    sourceCharacterId: _0x2d04ce,
+    sourceCharacterId: sourceCharacterId8,
     targetSourceCharacterId: targetSourceCharacterId = '',
     shotId: shotId = '',
     personId: personId = '',
@@ -2048,157 +2153,156 @@ export function confirmPersonReplacementSourceCharacter(
     orientation: orientation = '',
   } = {},
 ) {
-  const _0x51392a = normalizeText(_0x2d04ce);
-  if (!_0x51392a) throw new Error('确认人物缺少身份');
-  const _0x35fdb4 = normalizeText(targetSourceCharacterId) || _0x51392a,
-    _0x16e8c1 = normalizeText(shotId),
-    _0x32f495 = normalizeText(personId),
-    _0x20cfa3 = normalizeText(label),
-    _0x20dce4 = normalizePersonReplacementOrientation(orientation),
-    _0x5cd1b2 = _0x35fdb4 !== _0x51392a;
-  if (_0x5cd1b2 && (!_0x16e8c1 || !_0x32f495)) throw new Error('切换人物身份时必须指定当前人物框');
-  const _0x7f4e70 = toArray(_0x44b463?.['sourceCharacters']),
-    _0x35ab15 =
-      _0x7f4e70['some']((_0x129a71) => normalizeText(_0x129a71?.['id']) === _0x35fdb4) ||
-      toArray(_0x44b463?.['shots'])['some']((_0x450888) =>
-        toArray(_0x450888?.['people'])['some'](
-          (_0x19efb2) => normalizeText(_0x19efb2?.['sourceCharacterId']) === _0x35fdb4,
+  const text42 = normalizeText(sourceCharacterId8);
+  if (!text42) throw new Error('确认人物缺少身份');
+  const text43 = normalizeText(targetSourceCharacterId) || text42,
+    text44 = normalizeText(shotId),
+    text45 = normalizeText(personId),
+    label6 = normalizeText(label),
+    personReplacementOrientation = normalizePersonReplacementOrientation(orientation),
+    enabled6 = text43 !== text42;
+  if (enabled6 && (!text44 || !text45)) throw new Error('切换人物身份时必须指定当前人物框');
+  const sourceCharacters = toArray(args17?.['sourceCharacters']),
+    enabled7 =
+      sourceCharacters['some']((value137) => normalizeText(value137?.['id']) === text43) ||
+      toArray(args17?.['shots'])['some']((value138) =>
+        toArray(value138?.['people'])['some'](
+          (value139) => normalizeText(value139?.['sourceCharacterId']) === text43,
         ),
       );
-  if (_0x5cd1b2 && !_0x35ab15) throw new Error('选择的人物身份不存在');
-  const _0x9fd966 = toArray(_0x44b463?.['shots'])['find'](
-      (_0x5d0ef4) => normalizeText(_0x5d0ef4?.['id']) === _0x16e8c1,
+  if (enabled6 && !enabled7) throw new Error('选择的人物身份不存在');
+  const toArray3 = toArray(args17?.['shots'])['find'](
+      (value140) => normalizeText(value140?.['id']) === text44,
     ),
-    _0xcd9b1e = toArray(_0x9fd966?.['people'])['find'](
-      (_0x4ae610) => normalizeText(_0x4ae610?.['id']) === _0x32f495,
+    toArray4 = toArray(toArray3?.['people'])['find'](
+      (value141) => normalizeText(value141?.['id']) === text45,
     );
-  if (_0x5cd1b2 && (!_0xcd9b1e || normalizeText(_0xcd9b1e['sourceCharacterId']) !== _0x51392a))
+  if (enabled6 && (!toArray4 || normalizeText(toArray4['sourceCharacterId']) !== text42))
     throw new Error('没有找到要切换身份的人物框');
-  const _0x126044 =
-      _0x5cd1b2 &&
-      toArray(_0x9fd966?.['people'])['some'](
-        (_0xf339fb) =>
-          normalizeText(_0xf339fb?.['id']) !== _0x32f495 &&
-          normalizeText(_0xf339fb?.['sourceCharacterId']) === _0x35fdb4,
+  const enabled8 =
+      enabled6 &&
+      toArray(toArray3?.['people'])['some'](
+        (value142) =>
+          normalizeText(value142?.['id']) !== text45 &&
+          normalizeText(value142?.['sourceCharacterId']) === text43,
       ),
-    _0x2437a4 = toArray(_0x44b463?.['mappings'])['find'](
-      (_0x5d376c) => normalizeText(_0x5d376c?.['sourceCharacterId']) === _0x35fdb4,
+    toArray5 = toArray(args17?.['mappings'])['find'](
+      (value143) => normalizeText(value143?.['sourceCharacterId']) === text43,
     ),
-    _0x5940da = toArray(_0x44b463?.['shots'])
-      ['flatMap']((_0x57b6ea) => toArray(_0x57b6ea?.['people']))
+    toArray6 = toArray(args17?.['shots'])
+      ['flatMap']((value144) => toArray(value144?.['people']))
       ['find'](
-        (_0x20abe9) =>
-          normalizeText(_0x20abe9?.['sourceCharacterId']) === _0x35fdb4 &&
-          normalizeText(_0x20abe9?.['targetCharacterId']),
+        (value145) =>
+          normalizeText(value145?.['sourceCharacterId']) === text43 &&
+          normalizeText(value145?.['targetCharacterId']),
       ),
-    _0x5dcba2 =
-      normalizeText(_0x2437a4?.['targetCharacterId']) || normalizeText(_0x5940da?.['targetCharacterId']),
-    _0x16c6d6 = _0x5dcba2
+    targetCharacterId6 =
+      normalizeText(toArray5?.['targetCharacterId']) || normalizeText(toArray6?.['targetCharacterId']),
+    targetAppearanceId = targetCharacterId6
       ? normalizeText(
-          toArray(_0x44b463?.['shots'])
-            ['flatMap']((_0x2250fa) => toArray(_0x2250fa?.['people']))
+          toArray(args17?.['shots'])
+            ['flatMap']((value146) => toArray(value146?.['people']))
             ['find'](
-              (_0x6ff4be) =>
-                normalizeText(_0x6ff4be?.['sourceCharacterId']) === _0x35fdb4 &&
-                normalizeText(_0x6ff4be?.['targetCharacterId']) === _0x5dcba2 &&
-                normalizeText(_0x6ff4be?.['targetAppearanceId']),
+              (value147) =>
+                normalizeText(value147?.['sourceCharacterId']) === text43 &&
+                normalizeText(value147?.['targetCharacterId']) === targetCharacterId6 &&
+                normalizeText(value147?.['targetAppearanceId']),
             )?.['targetAppearanceId'],
         )
       : '',
-    _0x345a21 = toArray(_0x44b463?.['shots'])['map']((_0x93fc11) => ({
-      ..._0x93fc11,
-      people: toArray(_0x93fc11?.['people'])['map']((_0x694286) => {
-        const _0x524cca = normalizeText(_0x694286?.['sourceCharacterId']) === _0x51392a;
-        if (!_0x524cca) return _0x694286;
-        const _0x3fe7af =
-          (!_0x16e8c1 || _0x93fc11['id'] === _0x16e8c1) && (!_0x32f495 || _0x694286['id'] === _0x32f495);
-        if (_0x5cd1b2 && !_0x3fe7af) return _0x694286;
-        const _0x4371ef = _0x5cd1b2 && !_0x126044;
+    shots2 = toArray(args17?.['shots'])['map']((args18) => ({
+      ...args18,
+      people: toArray(args18?.['people'])['map']((args19) => {
+        const text46 = normalizeText(args19?.['sourceCharacterId']) === text42;
+        if (!text46) return args19;
+        const enabled9 = (!text44 || args18['id'] === text44) && (!text45 || args19['id'] === text45);
+        if (enabled6 && !enabled9) return args19;
+        const sourceCharacterId9 = enabled6 && !enabled8;
         return {
-          ..._0x694286,
-          ...(_0x3fe7af
+          ...args19,
+          ...(enabled9
             ? {
-                sourceCharacterId: _0x4371ef ? _0x35fdb4 : _0x694286['sourceCharacterId'],
-                label: _0x20cfa3 || _0x694286['label'],
-                ...(_0x4371ef
-                  ? { targetCharacterId: _0x5dcba2, targetAppearanceId: _0x16c6d6, identityMethod: 'manual' }
+                sourceCharacterId: sourceCharacterId9 ? text43 : args19['sourceCharacterId'],
+                label: label6 || args19['label'],
+                ...(sourceCharacterId9
+                  ? {
+                      targetCharacterId: targetCharacterId6,
+                      targetAppearanceId: targetAppearanceId,
+                      identityMethod: 'manual',
+                    }
                   : {}),
               }
             : {}),
-          orientation: orientation && _0x3fe7af ? _0x20dce4 : _0x694286['orientation'],
-          orientationConfidence: orientation && _0x3fe7af ? 0x1 : _0x694286['orientationConfidence'],
-          orientationModelId: orientation && _0x3fe7af ? '' : _0x694286['orientationModelId'],
+          orientation: orientation && enabled9 ? personReplacementOrientation : args19['orientation'],
+          orientationConfidence: orientation && enabled9 ? 0x1 : args19['orientationConfidence'],
+          orientationModelId: orientation && enabled9 ? '' : args19['orientationModelId'],
           identityReviewStatus: 'confirmed',
           identityReviewRequired: ![],
           ambiguousIdentityIds: [],
         };
       }),
     })),
-    _0x1ce54d = new Set(
-      _0x345a21['flatMap']((_0x43be38) =>
-        toArray(_0x43be38['people'])['map']((_0x3f7ef0) => normalizeText(_0x3f7ef0?.['sourceCharacterId'])),
+    map11 = new Set(
+      shots2['flatMap']((value148) =>
+        toArray(value148['people'])['map']((value149) => normalizeText(value149?.['sourceCharacterId'])),
       )['filter'](Boolean),
     );
   return {
-    ..._0x44b463,
-    shots: _0x345a21,
-    sourceCharacters: _0x7f4e70['map']((_0x3fca22) =>
-      normalizeText(_0x3fca22?.['id']) === _0x35fdb4
+    ...args17,
+    shots: shots2,
+    sourceCharacters: sourceCharacters['map']((error12) =>
+      normalizeText(error12?.['id']) === text43
         ? {
-            ..._0x3fca22,
-            name: _0x20cfa3 || _0x3fca22['name'],
+            ...error12,
+            name: label6 || error12['name'],
             reviewRequired: ![],
             identityReviewStatus: 'confirmed',
             ambiguousIdentityIds: [],
           }
-        : _0x3fca22,
+        : error12,
     )['filter'](
-      (_0x1ec027) =>
-        !_0x5cd1b2 || normalizeText(_0x1ec027?.['id']) !== _0x51392a || _0x1ce54d['has'](_0x51392a),
+      (value150) => !enabled6 || normalizeText(value150?.['id']) !== text42 || map11['has'](text42),
     ),
-    mappings: toArray(_0x44b463?.['mappings'])['filter'](
-      (_0x183701) =>
-        !_0x5cd1b2 ||
-        normalizeText(_0x183701?.['sourceCharacterId']) !== _0x51392a ||
-        _0x1ce54d['has'](_0x51392a),
+    mappings: toArray(args17?.['mappings'])['filter'](
+      (value151) =>
+        !enabled6 || normalizeText(value151?.['sourceCharacterId']) !== text42 || map11['has'](text42),
     ),
   };
 }
-export function normalizePersonReplacementAiAnalysis(_0x4a4bb3, { existingShots: existingShots = [] } = {}) {
-  const _0x42c55f = unwrapAiAnalysis(_0x4a4bb3);
-  let _0x22bb68;
-  Array['isArray'](_0x42c55f)
-    ? (_0x22bb68 = _0x42c55f)
-    : ((_0x22bb68 = firstDefined(
-        _0x42c55f?.['shots'],
-        _0x42c55f?.['segments'],
-        _0x42c55f?.['clips'],
-        _0x42c55f?.['keyframes'],
+export function normalizePersonReplacementAiAnalysis(value152, { existingShots: existingShots = [] } = {}) {
+  const unwrapAiAnalysis2 = unwrapAiAnalysis(value152);
+  let list28;
+  Array['isArray'](unwrapAiAnalysis2)
+    ? (list28 = unwrapAiAnalysis2)
+    : ((list28 = firstDefined(
+        unwrapAiAnalysis2?.['shots'],
+        unwrapAiAnalysis2?.['segments'],
+        unwrapAiAnalysis2?.['clips'],
+        unwrapAiAnalysis2?.['keyframes'],
       )),
-      !Array['isArray'](_0x22bb68) &&
-        (_0x22bb68 = _0x42c55f && typeof _0x42c55f === 'object' ? [_0x42c55f] : []));
-  const _0x19232a = toArray(existingShots)['map'](normalizePersonReplacementShot);
-  return _0x22bb68['map']((_0x1a8762, _0x1ee029) => {
-    const _0x5a4c25 = normalizeText(
+      !Array['isArray'](list28) &&
+        (list28 = unwrapAiAnalysis2 && typeof unwrapAiAnalysis2 === 'object' ? [unwrapAiAnalysis2] : []));
+  const list29 = toArray(existingShots)['map'](normalizePersonReplacementShot);
+  return list28['map']((args20, value153) => {
+    const id6 = normalizeText(
         firstDefined(
-          _0x1a8762?.['id'],
-          _0x1a8762?.['shotId'],
-          _0x1a8762?.['shot_id'],
-          _0x1a8762?.['segmentId'],
-          _0x1a8762?.['clipId'],
+          args20?.['id'],
+          args20?.['shotId'],
+          args20?.['shot_id'],
+          args20?.['segmentId'],
+          args20?.['clipId'],
         ),
       ),
-      _0x2c3d97 =
-        _0x19232a['find']((_0x2c9405) => _0x2c9405['id'] === _0x5a4c25) || _0x19232a[_0x1ee029] || {};
+      args21 = list29['find']((value154) => value154['id'] === id6) || list29[value153] || {};
     return normalizePersonReplacementShot(
       {
-        ..._0x2c3d97,
-        ..._0x1a8762,
-        id: _0x5a4c25 || _0x2c3d97['id'],
-        people: extractPeople(_0x1a8762),
+        ...args21,
+        ...args20,
+        id: id6 || args21['id'],
+        people: extractPeople(args20),
         analysisStatus: 'succeeded',
       },
-      _0x1ee029,
+      value153,
     );
   });
 }

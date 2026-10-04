@@ -30,8 +30,8 @@ import { WebPreviewTabBarView } from './webPreview/WebPreviewTabBarView.js';
 import { createWebPreviewToolbar } from './webPreview/WebPreviewToolbarView.js';
 import { getWebPreviewDefaultStatusText } from './webPreview/webPreviewConstants.js';
 import { onLocaleChange, t } from '../i18n/index.js';
-function webPreviewText(_0x563545, _0x86c133 = {}) {
-  return t('webPreview.' + _0x563545, _0x86c133);
+function webPreviewText(value, item = {}) {
+  return t('webPreview.' + value, item);
 }
 const WEB_PREVIEW_REVERSE_PROMPT_GENERATE_EVENT = 'reverse-image-prompt-generate',
   WEB_PREVIEW_TEXT_SOURCE_EVENT = 'send-selected-text-source',
@@ -41,55 +41,55 @@ const WEB_PREVIEW_REVERSE_PROMPT_GENERATE_EVENT = 'reverse-image-prompt-generate
   WEB_PREVIEW_TEXT_VIDEO_PROMPT_GENERATE_EVENT = 'send-selected-text-to-video-generate',
   WEB_PREVIEW_REVERSE_PROMPT_MOUNT_ATTEMPTS = 30,
   WEB_PREVIEW_REVERSE_PROMPT_MOUNT_DELAY_MS = 16;
-function dispatchWebPreviewForceSync(_0x420417) {
+function dispatchWebPreviewForceSync(nodeId) {
   globalThis.window?.dispatchEvent?.(
-    new CustomEvent('web-preview:force-sync', { detail: { nodeId: _0x420417 } }),
+    new CustomEvent('web-preview:force-sync', { detail: { nodeId: nodeId } }),
   );
 }
 function waitForNextFrame() {
-  return new Promise((_0x3acd2b) => {
-    const _0x5be155 = globalThis.window;
-    if (typeof _0x5be155?.requestAnimationFrame === 'function') {
-      _0x5be155.requestAnimationFrame(() => _0x3acd2b());
+  return new Promise((handler) => {
+    const key = globalThis.window;
+    if (typeof key?.requestAnimationFrame === 'function') {
+      key.requestAnimationFrame(() => handler());
       return;
     }
     if (typeof globalThis.requestAnimationFrame === 'function') {
-      globalThis.requestAnimationFrame(() => _0x3acd2b());
+      globalThis.requestAnimationFrame(() => handler());
       return;
     }
     if (typeof globalThis.setTimeout === 'function') {
-      globalThis.setTimeout(_0x3acd2b, WEB_PREVIEW_REVERSE_PROMPT_MOUNT_DELAY_MS);
+      globalThis.setTimeout(handler, WEB_PREVIEW_REVERSE_PROMPT_MOUNT_DELAY_MS);
       return;
     }
-    _0x3acd2b();
+    handler();
   });
 }
-function getMountedCanvasNodeInstance(_0x1589d5) {
-  const _0x2a8e00 = String(_0x1589d5 || '').trim();
-  return _0x2a8e00 ? globalThis.window?.v2Renderer?.nodeInstances?.get?.(_0x2a8e00) || null : null;
+function getMountedCanvasNodeInstance(index) {
+  const result = String(index || '').trim();
+  return result ? globalThis.window?.v2Renderer?.nodeInstances?.get?.(result) || null : null;
 }
-async function waitForMountedCanvasNodeInstance(_0x49675e) {
-  for (let _0x2935e3 = 0; _0x2935e3 < WEB_PREVIEW_REVERSE_PROMPT_MOUNT_ATTEMPTS; _0x2935e3 += 1) {
-    const _0x403f72 = getMountedCanvasNodeInstance(_0x49675e);
-    if (_0x403f72) return _0x403f72;
+async function waitForMountedCanvasNodeInstance(data) {
+  for (let options = 0; options < WEB_PREVIEW_REVERSE_PROMPT_MOUNT_ATTEMPTS; options += 1) {
+    const mountedCanvasNodeInstance = getMountedCanvasNodeInstance(data);
+    if (mountedCanvasNodeInstance) return mountedCanvasNodeInstance;
     await waitForNextFrame();
   }
   return null;
 }
-function getCanvasCommandFailureText(_0x13f583) {
+function getCanvasCommandFailureText(error) {
   return String(
-    _0x13f583?.message ||
-      _0x13f583?.errorCode ||
-      _0x13f583?.error ||
+    error?.message ||
+      error?.errorCode ||
+      error?.error ||
       webPreviewText('toasts.reversePromptGenerateUnavailable'),
   );
 }
-function getPendingVisitKey(_0x11abaa, _0x491939) {
-  return (_0x11abaa || '') + '\n' + (_0x491939 || '');
+function getPendingVisitKey(target, source) {
+  return (target || '') + '\n' + (source || '');
 }
 export function commitWebPreviewNodeUrl({
-  nodeId: _0x392bbc,
-  rawUrl: _0x5d794d,
+  nodeId: nodeId2,
+  rawUrl: rawUrl,
   title: title = '',
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
@@ -98,32 +98,32 @@ export function commitWebPreviewNodeUrl({
   tabId: tabId = '',
   nodeData: nodeData = null,
 } = {}) {
-  const _0x3f0f39 = normalizeWebPreviewAddressInput(_0x5d794d);
-  if (!_0x3f0f39)
+  const url2 = normalizeWebPreviewAddressInput(rawUrl);
+  if (!url2)
     return (
       showToast?.(webPreviewText('toasts.addressRequired'), 'warning'),
       { ok: false, error: 'invalid-url' }
     );
-  if (!_0x392bbc || typeof storeInstance?.updateNodeData !== 'function')
+  if (!nodeId2 || typeof storeInstance?.updateNodeData !== 'function')
     return { ok: false, error: 'missing-node' };
-  const _0x4f6454 = nodeData ||
-      storeInstance.getStateRaw?.()?.nodes?.[_0x392bbc] ||
-      storeInstance.getState?.()?.nodes?.[_0x392bbc] || { id: _0x392bbc, type: 'web-preview', webUrl: '' },
-    _0x23c200 = updateWebPreviewTabUrlData(_0x4f6454, { tabId: tabId, url: _0x3f0f39, title: title });
-  if (_0x23c200.ok === false) return { ok: false, error: _0x23c200.error || 'missing-tab' };
-  const _0xef05c6 = { ..._0x23c200.patch, name: webPreviewText('nodeName') };
+  const next = nodeData ||
+      storeInstance.getStateRaw?.()?.nodes?.[nodeId2] ||
+      storeInstance.getState?.()?.nodes?.[nodeId2] || { id: nodeId2, type: 'web-preview', webUrl: '' },
+    error2 = updateWebPreviewTabUrlData(next, { tabId: tabId, url: url2, title: title });
+  if (error2.ok === false) return { ok: false, error: error2.error || 'missing-tab' };
+  const patch = { ...error2.patch, name: webPreviewText('nodeName') };
   return (
-    storeInstance.updateNodeData(_0x392bbc, { ..._0xef05c6 }),
-    recordVisitFn?.({ url: _0x3f0f39, title: title }),
+    storeInstance.updateNodeData(nodeId2, { ...patch }),
+    recordVisitFn?.({ url: url2, title: title }),
     commitFn?.(),
-    dispatchWebPreviewForceSync(_0x392bbc),
-    { ok: true, url: _0x3f0f39, tabId: _0x23c200.tabId, patch: _0xef05c6 }
+    dispatchWebPreviewForceSync(nodeId2),
+    { ok: true, url: url2, tabId: error2.tabId, patch: patch }
   );
 }
 export class WebPreviewNode {
-  constructor(_0x2981c8) {
-    ((this._data = _0x2981c8),
-      (this.id = _0x2981c8.id),
+  constructor(current) {
+    ((this._data = current),
+      (this.id = current.id),
       (this.el = document.createElement('div')),
       (this.el.className = 'v2-node-component web-preview-component'),
       (this._statusText = getWebPreviewDefaultStatusText()),
@@ -150,13 +150,13 @@ export class WebPreviewNode {
       (this._pendingVisitTitles = new Map()));
   }
   ['mount']() {
-    const _0x1c4f1d = document.createElement('div');
-    ((_0x1c4f1d.className = 'node-card web-preview-card'),
-      _0x1c4f1d.addEventListener('dblclick', (_0x1e113a) => _0x1e113a.stopPropagation()));
-    const _0x41a567 = createWebPreviewToolbar({
+    const el = document.createElement('div');
+    ((el.className = 'node-card web-preview-card'),
+      el.addEventListener('dblclick', (event) => event.stopPropagation()));
+    const webPreviewToolbar = createWebPreviewToolbar({
         className: 'web-preview-header',
         url: this._getActiveUrl(),
-        onSubmit: (_0x1b5ee6) => this._commitUrl(_0x1b5ee6),
+        onSubmit: (entry) => this._commitUrl(entry),
         onBack: () => this._navigate('back'),
         onForward: () => this._navigate('forward'),
         onRefresh: () => this._refresh(),
@@ -165,72 +165,71 @@ export class WebPreviewNode {
         onExternal: () => this._openExternal(),
         onFullscreen: () => this._openFullscreen(),
       }),
-      _0x1410b9 = this._createTabBarView(),
-      _0x390aa6 = document.createElement('div');
-    ((_0x390aa6.className = 'web-preview-body'),
-      (_0x390aa6.dataset.webPreviewSlot = 'true'),
-      (_0x390aa6.dataset.nodeId = this.id),
-      (_0x390aa6.dataset.tabId = this._getActiveTabId()),
-      (_0x390aa6.dataset.webUrl = this._getActiveUrl()),
-      _0x390aa6.addEventListener('pointerdown', (_0x19fc01) => {
-        const _0x42ab5b = this._getTabState().activeTab;
-        if (this._getActiveUrl() || _0x42ab5b?.pendingPopup === true) _0x19fc01.stopPropagation();
+      record = this._createTabBarView(),
+      el2 = document.createElement('div');
+    ((el2.className = 'web-preview-body'),
+      (el2.dataset.webPreviewSlot = 'true'),
+      (el2.dataset.nodeId = this.id),
+      (el2.dataset.tabId = this._getActiveTabId()),
+      (el2.dataset.webUrl = this._getActiveUrl()),
+      el2.addEventListener('pointerdown', (event2) => {
+        const payload = this._getTabState().activeTab;
+        if (this._getActiveUrl() || payload?.pendingPopup === true) event2.stopPropagation();
       }));
-    const _0x46fb1b = new WebPreviewStartPageView({
+    const webPreviewStartPageView = new WebPreviewStartPageView({
         statusText: getWebPreviewDefaultStatusText(),
-        onOpenUrl: (_0x3d4ca6, _0x3a7fb4) => this._commitUrl(_0x3d4ca6, _0x3a7fb4),
+        onOpenUrl: (handle, state) => this._commitUrl(handle, state),
       }),
-      _0x30e061 = _0x46fb1b.mount();
-    _0x390aa6.appendChild(_0x30e061);
-    const _0x443a09 = document.createElement('div');
-    _0x443a09.className = 'web-preview-freeze-layer';
-    const _0x10ab04 = document.createElement('img');
-    ((_0x10ab04.className = 'web-preview-freeze-image'),
-      (_0x10ab04.alt = ''),
-      _0x443a09.appendChild(_0x10ab04),
-      _0x390aa6.appendChild(_0x443a09));
-    const _0x184a14 = document.createElement('div');
-    ((_0x184a14.className = 'web-preview-status'),
-      (_0x184a14.textContent = getWebPreviewDefaultStatusText()));
-    const _0x21050b = document.createElement('div');
-    _0x21050b.className = 'node-port out-port';
-    const _0x8eda99 = document.createElement('div');
+      config = webPreviewStartPageView.mount();
+    el2.appendChild(config);
+    const el3 = document.createElement('div');
+    el3.className = 'web-preview-freeze-layer';
+    const scope = document.createElement('img');
+    ((scope.className = 'web-preview-freeze-image'),
+      (scope.alt = ''),
+      el3.appendChild(scope),
+      el2.appendChild(el3));
+    const el4 = document.createElement('div');
+    ((el4.className = 'web-preview-status'), (el4.textContent = getWebPreviewDefaultStatusText()));
+    const input = document.createElement('div');
+    input.className = 'node-port out-port';
+    const el5 = document.createElement('div');
     return (
-      (_0x8eda99.className = 'group-resizer'),
-      _0x8eda99.addEventListener('pointerdown', (_0x19b1e2) => {
-        (_0x19b1e2.stopPropagation(),
+      (el5.className = 'group-resizer'),
+      el5.addEventListener('pointerdown', (event3) => {
+        (event3.stopPropagation(),
           startNodeResizePreview({
-            event: _0x19b1e2,
+            event: event3,
             nodeId: this.id,
             getNode: () => appStore.getStateRaw().nodes?.[this.id] || this._data,
             getViewport: () => appStore.getStateRaw().viewport,
-            resolveSize: ({ startWidth: _0x231e20, startHeight: _0x5a5799, dx: _0x2b7f4b, dy: _0x2b3df2 }) =>
-              clampWebPreviewNodeSize({ width: _0x231e20 + _0x2b7f4b, height: _0x5a5799 + _0x2b3df2 }),
-            applyPatch: (_0x3f2b55) => appStore.updateNodeData(this.id, _0x3f2b55),
+            resolveSize: ({ startWidth: startWidth, startHeight: startHeight, dx: dx, dy: dy }) =>
+              clampWebPreviewNodeSize({ width: startWidth + dx, height: startHeight + dy }),
+            applyPatch: (output) => appStore.updateNodeData(this.id, output),
             commit: commit,
           }));
       }),
-      _0x1c4f1d.appendChild(_0x41a567.element),
-      _0x1c4f1d.appendChild(_0x1410b9.element),
-      _0x1c4f1d.appendChild(_0x390aa6),
-      _0x1c4f1d.appendChild(_0x184a14),
-      _0x1c4f1d.appendChild(_0x21050b),
-      _0x1c4f1d.appendChild(_0x8eda99),
-      this.el.replaceChildren(_0x1c4f1d),
-      (this._toolbar = _0x41a567),
-      (this._tabBar = _0x1410b9),
-      (this._startPageView = _0x46fb1b),
-      (this._input = _0x41a567.input),
-      (this._emptyInput = _0x46fb1b.input),
-      (this._slot = _0x390aa6),
+      el.appendChild(webPreviewToolbar.element),
+      el.appendChild(record.element),
+      el.appendChild(el2),
+      el.appendChild(el4),
+      el.appendChild(input),
+      el.appendChild(el5),
+      this.el.replaceChildren(el),
+      (this._toolbar = webPreviewToolbar),
+      (this._tabBar = record),
+      (this._startPageView = webPreviewStartPageView),
+      (this._input = webPreviewToolbar.input),
+      (this._emptyInput = webPreviewStartPageView.input),
+      (this._slot = el2),
       this._unregisterSlot?.(),
-      (this._unregisterSlot = registerWebPreviewSlot(this.id, _0x390aa6)),
-      (this._placeholder = _0x30e061),
-      (this._status = _0x184a14),
-      (this._freezeLayer = _0x443a09),
-      (this._freezeImage = _0x10ab04),
-      (this._backButtons = [_0x41a567.backButton]),
-      (this._forwardButtons = [_0x41a567.forwardButton]),
+      (this._unregisterSlot = registerWebPreviewSlot(this.id, el2)),
+      (this._placeholder = config),
+      (this._status = el4),
+      (this._freezeLayer = el3),
+      (this._freezeImage = scope),
+      (this._backButtons = [webPreviewToolbar.backButton]),
+      (this._forwardButtons = [webPreviewToolbar.forwardButton]),
       this._syncDom(),
       this._renderStartPageTiles(),
       this._syncNavigationButtons(),
@@ -241,8 +240,8 @@ export class WebPreviewNode {
   }
   ['_createTabBarView']() {
     return new WebPreviewTabBarView({
-      onActivate: (_0x1a3ac9) => this._activateTab(_0x1a3ac9),
-      onClose: (_0x338b7a) => this._closeTab(_0x338b7a),
+      onActivate: (value2) => this._activateTab(value2),
+      onClose: (value3) => this._closeTab(value3),
       onAdd: () => this._addTab(),
     });
   }
@@ -267,192 +266,201 @@ export class WebPreviewNode {
   ['_getActiveUrl']() {
     return getWebPreviewActiveTabUrl(this._data);
   }
-  ['_applyTabPatch'](_0x45802d, { commitHistory: commitHistory = false } = {}) {
-    if (!_0x45802d) return;
-    ((this._data = { ...this._data, ..._0x45802d }), appStore.updateNodeData(this.id, _0x45802d));
+  ['_applyTabPatch'](args, { commitHistory: commitHistory = false } = {}) {
+    if (!args) return;
+    ((this._data = { ...this._data, ...args }), appStore.updateNodeData(this.id, args));
     if (commitHistory) commit();
     (this._clearSnapshot(), this._syncDom(), dispatchWebPreviewForceSync(this.id));
   }
   ['_addTab']({ id: id = '', url: url = '', title: title = '', pendingPopup: pendingPopup = false } = {}) {
-    const _0x3e9943 = addWebPreviewTabData(this._data, {
+    const response = addWebPreviewTabData(this._data, {
       id: id,
       url: url,
       title: title,
       pendingPopup: pendingPopup,
     });
-    if (_0x3e9943.ok === false)
-      return (globalThis.window?.showToast?.(webPreviewText('toasts.maxTabs'), 'warning'), _0x3e9943);
+    if (response.ok === false)
+      return (globalThis.window?.showToast?.(webPreviewText('toasts.maxTabs'), 'warning'), response);
     return (
-      this._applyTabPatch(_0x3e9943.patch, { commitHistory: true }),
+      this._applyTabPatch(response.patch, { commitHistory: true }),
       this._setStatus(getWebPreviewDefaultStatusText()),
-      _0x3e9943
+      response
     );
   }
-  ['_activateTab'](_0x1e5bb5) {
-    const _0xb2d8d5 = activateWebPreviewTabData(this._data, _0x1e5bb5);
-    if (_0xb2d8d5.ok === false) return;
-    (this._applyTabPatch(_0xb2d8d5.patch), this._syncNavigationButtons());
+  ['_activateTab'](value4) {
+    const response2 = activateWebPreviewTabData(this._data, value4);
+    if (response2.ok === false) return;
+    (this._applyTabPatch(response2.patch), this._syncNavigationButtons());
   }
-  ['_disposeNativeTab'](_0x56c44e) {
-    if (!_0x56c44e) return;
-    const _0x46ef70 = globalThis.window?.electronAPI?.webPreview?.disposeViews?.({
+  ['_disposeNativeTab'](enabled) {
+    if (!enabled) return;
+    const promise = globalThis.window?.electronAPI?.webPreview?.disposeViews?.({
       nodeIds: [this.id],
-      tabIds: [_0x56c44e],
+      tabIds: [enabled],
     });
-    _0x46ef70 && typeof _0x46ef70.catch === 'function' && void _0x46ef70.catch(() => {});
+    promise && typeof promise.catch === 'function' && void promise.catch(() => {});
   }
-  ['_closeTab'](_0x37ea3d) {
-    const _0xa188ec = closeWebPreviewTabData(this._data, _0x37ea3d);
-    if (_0xa188ec.ok === false) return;
-    (this._disposeNativeTab(_0xa188ec.closedTabId),
-      this._navigationStateByTabId.delete(_0xa188ec.closedTabId),
-      this._applyTabPatch(_0xa188ec.patch, { commitHistory: true }),
+  ['_closeTab'](value5) {
+    const response3 = closeWebPreviewTabData(this._data, value5);
+    if (response3.ok === false) return;
+    (this._disposeNativeTab(response3.closedTabId),
+      this._navigationStateByTabId.delete(response3.closedTabId),
+      this._applyTabPatch(response3.patch, { commitHistory: true }),
       this._syncNavigationButtons());
-    if (!_0xa188ec.state.webUrl) this._setStatus(getWebPreviewDefaultStatusText());
+    if (!response3.state.webUrl) this._setStatus(getWebPreviewDefaultStatusText());
   }
-  ['_openPopupTab'](_0x2cfeea, { tabId: tabId = '', pendingPopup: pendingPopup = false } = {}) {
-    const _0x16a087 = normalizeWebPreviewUrl(_0x2cfeea);
-    if (!_0x16a087 && pendingPopup !== true) return;
-    const _0x315dec = this._addTab({
+  ['_openPopupTab'](value6, { tabId: tabId = '', pendingPopup: pendingPopup = false } = {}) {
+    const url3 = normalizeWebPreviewUrl(value6);
+    if (!url3 && pendingPopup !== true) return;
+    const response4 = this._addTab({
       id: tabId,
-      url: _0x16a087,
+      url: url3,
       title: pendingPopup === true ? webPreviewText('tabs.loginWindow') : '',
-      pendingPopup: pendingPopup === true && !_0x16a087,
+      pendingPopup: pendingPopup === true && !url3,
     });
-    if (_0x315dec?.ok === false) {
+    if (response4?.ok === false) {
       if (tabId) this._disposeNativeTab(tabId);
       return;
     }
-    if (_0x315dec?.ok) this._setStatus(webPreviewText('status.loading'));
+    if (response4?.ok) this._setStatus(webPreviewText('status.loading'));
   }
   ['_renderStartPageTiles']() {
     this._startPageView?.renderTiles();
   }
   ['_bindNativeEvents']() {
-    const _0x1f4f90 = globalThis.window;
-    if (!_0x1f4f90 || typeof _0x1f4f90.addEventListener !== 'function') return;
-    const _0x217d5e = (_0x240a00) => {
-      const _0x2fbd9b = _0x240a00?.detail || {};
-      if (_0x2fbd9b.nodeId !== this.id) return;
-      const _0x4accdb = _0x2fbd9b.tabId || this._getActiveTabId(),
-        _0x371f0b = _0x4accdb === this._getActiveTabId();
-      if (_0x2fbd9b.type === 'loading')
-        _0x371f0b &&
-          (_0x2fbd9b.holdSnapshot === true
+    const el6 = globalThis.window;
+    if (!el6 || typeof el6.addEventListener !== 'function') return;
+    const value7 = (value8) => {
+      const tabId2 = value8?.detail || {};
+      if (tabId2.nodeId !== this.id) return;
+      const value9 = tabId2.tabId || this._getActiveTabId(),
+        value10 = value9 === this._getActiveTabId();
+      if (tabId2.type === 'loading')
+        value10 &&
+          (tabId2.holdSnapshot === true
             ? this.el.classList.add('is-web-preview-loading')
             : this._clearSnapshot(),
           this._setStatus(webPreviewText('status.loading')));
       else {
-        if (_0x2fbd9b.type === 'loaded')
-          _0x371f0b &&
+        if (tabId2.type === 'loaded')
+          value10 &&
             (this.el.classList.remove('is-web-preview-loading'),
             this._setStatus(webPreviewText('status.loaded')));
         else {
-          if (_0x2fbd9b.type === 'failed')
-            _0x371f0b &&
+          if (tabId2.type === 'failed')
+            value10 &&
               (this.el.classList.remove('is-web-preview-loading'),
-              this._setStatus(_0x2fbd9b.message || webPreviewText('status.loadFailed')));
+              this._setStatus(tabId2.message || webPreviewText('status.loadFailed')));
           else {
-            if (_0x2fbd9b.type === 'blocked')
-              _0x371f0b &&
+            if (tabId2.type === 'blocked')
+              value10 &&
                 (this.el.classList.remove('is-web-preview-loading'),
-                this._setStatus(_0x2fbd9b.message || webPreviewText('status.blocked')));
+                this._setStatus(tabId2.message || webPreviewText('status.blocked')));
             else {
-              if (_0x2fbd9b.type === 'open-popup')
-                this._openPopupTab(_0x2fbd9b.url, {
-                  tabId: _0x2fbd9b.popupTabId,
-                  pendingPopup: _0x2fbd9b.pendingPopup === true,
+              if (tabId2.type === 'open-popup')
+                this._openPopupTab(tabId2.url, {
+                  tabId: tabId2.popupTabId,
+                  pendingPopup: tabId2.pendingPopup === true,
                 });
               else {
-                if (_0x2fbd9b.type === 'closed') {
-                  if (_0x4accdb) this._closeTab(_0x4accdb);
+                if (tabId2.type === 'closed') {
+                  if (value9) this._closeTab(value9);
                 } else {
-                  if (_0x2fbd9b.type === 'send-selected-text') {
-                    const _0x56217b = createWebPreviewTextNodeFromSelection({
+                  if (tabId2.type === 'send-selected-text') {
+                    const webPreviewTextNodeFromSelection = createWebPreviewTextNodeFromSelection({
                       nodeId: this.id,
-                      payload: _0x2fbd9b,
+                      payload: tabId2,
                     });
-                    if (_0x56217b)
+                    if (webPreviewTextNodeFromSelection)
                       globalThis.window?.showToast?.(webPreviewText('toasts.textSent'), 'success');
                   } else {
-                    if (_0x2fbd9b.type === WEB_PREVIEW_TEXT_SOURCE_EVENT) {
-                      const _0x51ebd2 = createWebPreviewSourceTextNodeFromSelection({
-                        nodeId: this.id,
-                        payload: _0x2fbd9b,
-                      });
-                      if (_0x51ebd2)
+                    if (tabId2.type === WEB_PREVIEW_TEXT_SOURCE_EVENT) {
+                      const webPreviewSourceTextNodeFromSelection =
+                        createWebPreviewSourceTextNodeFromSelection({
+                          nodeId: this.id,
+                          payload: tabId2,
+                        });
+                      if (webPreviewSourceTextNodeFromSelection)
                         globalThis.window?.showToast?.(webPreviewText('toasts.sourceTextSent'), 'success');
                     } else {
                       if (
-                        _0x2fbd9b.type === WEB_PREVIEW_TEXT_IMAGE_PROMPT_EVENT ||
-                        _0x2fbd9b.type === WEB_PREVIEW_TEXT_IMAGE_PROMPT_GENERATE_EVENT
+                        tabId2.type === WEB_PREVIEW_TEXT_IMAGE_PROMPT_EVENT ||
+                        tabId2.type === WEB_PREVIEW_TEXT_IMAGE_PROMPT_GENERATE_EVENT
                       ) {
-                        const _0x12696a = createWebPreviewImagePromptNodeFromSelection({
-                          nodeId: this.id,
-                          payload: _0x2fbd9b,
-                        });
-                        if (_0x12696a && _0x2fbd9b.type === WEB_PREVIEW_TEXT_IMAGE_PROMPT_GENERATE_EVENT)
-                          void this._runImagePromptGeneration(_0x12696a);
+                        const webPreviewImagePromptNodeFromSelection =
+                          createWebPreviewImagePromptNodeFromSelection({
+                            nodeId: this.id,
+                            payload: tabId2,
+                          });
+                        if (
+                          webPreviewImagePromptNodeFromSelection &&
+                          tabId2.type === WEB_PREVIEW_TEXT_IMAGE_PROMPT_GENERATE_EVENT
+                        )
+                          void this._runImagePromptGeneration(webPreviewImagePromptNodeFromSelection);
                         else
-                          _0x12696a &&
+                          webPreviewImagePromptNodeFromSelection &&
                             globalThis.window?.showToast?.(
                               webPreviewText('toasts.imagePromptCreated'),
                               'success',
                             );
                       } else {
                         if (
-                          _0x2fbd9b.type === WEB_PREVIEW_TEXT_VIDEO_PROMPT_EVENT ||
-                          _0x2fbd9b.type === WEB_PREVIEW_TEXT_VIDEO_PROMPT_GENERATE_EVENT
+                          tabId2.type === WEB_PREVIEW_TEXT_VIDEO_PROMPT_EVENT ||
+                          tabId2.type === WEB_PREVIEW_TEXT_VIDEO_PROMPT_GENERATE_EVENT
                         ) {
-                          const _0x3b8e66 = createWebPreviewVideoPromptNodeFromSelection({
-                            nodeId: this.id,
-                            payload: _0x2fbd9b,
-                          });
-                          if (_0x3b8e66 && _0x2fbd9b.type === WEB_PREVIEW_TEXT_VIDEO_PROMPT_GENERATE_EVENT)
-                            void this._runVideoPromptGeneration(_0x3b8e66);
+                          const webPreviewVideoPromptNodeFromSelection =
+                            createWebPreviewVideoPromptNodeFromSelection({
+                              nodeId: this.id,
+                              payload: tabId2,
+                            });
+                          if (
+                            webPreviewVideoPromptNodeFromSelection &&
+                            tabId2.type === WEB_PREVIEW_TEXT_VIDEO_PROMPT_GENERATE_EVENT
+                          )
+                            void this._runVideoPromptGeneration(webPreviewVideoPromptNodeFromSelection);
                           else
-                            _0x3b8e66 &&
+                            webPreviewVideoPromptNodeFromSelection &&
                               globalThis.window?.showToast?.(
                                 webPreviewText('toasts.videoPromptCreated'),
                                 'success',
                               );
                         } else {
-                          if (_0x2fbd9b.type === 'send-image-to-canvas') {
-                            const _0x375375 = createWebPreviewImageNodeFromContext({
+                          if (tabId2.type === 'send-image-to-canvas') {
+                            const webPreviewImageNodeFromContext = createWebPreviewImageNodeFromContext({
                               nodeId: this.id,
-                              payload: _0x2fbd9b,
+                              payload: tabId2,
                             });
-                            if (_0x375375)
+                            if (webPreviewImageNodeFromContext)
                               globalThis.window?.showToast?.(webPreviewText('toasts.imageAdded'), 'success');
                           } else {
                             if (
-                              _0x2fbd9b.type === 'reverse-image-prompt' ||
-                              _0x2fbd9b.type === WEB_PREVIEW_REVERSE_PROMPT_GENERATE_EVENT
+                              tabId2.type === 'reverse-image-prompt' ||
+                              tabId2.type === WEB_PREVIEW_REVERSE_PROMPT_GENERATE_EVENT
                             ) {
-                              const _0x484b9a = createWebPreviewReverseImagePromptNodes({
-                                nodeId: this.id,
-                                payload: _0x2fbd9b,
-                              });
-                              if (_0x484b9a && _0x2fbd9b.type === WEB_PREVIEW_REVERSE_PROMPT_GENERATE_EVENT)
-                                void this._runReverseImagePromptGeneration(_0x484b9a);
+                              const webPreviewReverseImagePromptNodes =
+                                createWebPreviewReverseImagePromptNodes({
+                                  nodeId: this.id,
+                                  payload: tabId2,
+                                });
+                              if (
+                                webPreviewReverseImagePromptNodes &&
+                                tabId2.type === WEB_PREVIEW_REVERSE_PROMPT_GENERATE_EVENT
+                              )
+                                void this._runReverseImagePromptGeneration(webPreviewReverseImagePromptNodes);
                               else
-                                _0x484b9a &&
+                                webPreviewReverseImagePromptNodes &&
                                   globalThis.window?.showToast?.(
                                     webPreviewText('toasts.reversePromptCreated'),
                                     'success',
                                   );
                             } else {
-                              if (_0x2fbd9b.type === 'favicon')
-                                this._applyFavicon(_0x2fbd9b.faviconUrl, _0x4accdb);
+                              if (tabId2.type === 'favicon') this._applyFavicon(tabId2.faviconUrl, value9);
                               else {
-                                if (_0x2fbd9b.type === 'navigated')
-                                  this._applyNavigatedUrl(_0x2fbd9b.url, _0x4accdb);
+                                if (tabId2.type === 'navigated') this._applyNavigatedUrl(tabId2.url, value9);
                                 else {
-                                  if (_0x2fbd9b.type === 'navigation-state')
-                                    this._setNavigationState(_0x2fbd9b);
+                                  if (tabId2.type === 'navigation-state') this._setNavigationState(tabId2);
                                   else {
-                                    if (_0x2fbd9b.type === 'snapshot' && _0x371f0b)
-                                      this._applySnapshot(_0x2fbd9b);
+                                    if (tabId2.type === 'snapshot' && value10) this._applySnapshot(tabId2);
                                   }
                                 }
                               }
@@ -469,73 +477,73 @@ export class WebPreviewNode {
         }
       }
     };
-    (_0x1f4f90.addEventListener('web-preview:native-event', _0x217d5e),
+    (el6.addEventListener('web-preview:native-event', value7),
       (this._unsubscribeNativeEvent = () => {
-        _0x1f4f90.removeEventListener?.('web-preview:native-event', _0x217d5e);
+        el6.removeEventListener?.('web-preview:native-event', value7);
       }));
   }
   async ['_runCreatedNodeGeneration'](
-    _0x19a119,
-    { startedKey: _0x119bde, failedKey: _0x4172d4, nodeNotReadyKey: _0x35b4da } = {},
+    value11,
+    { startedKey: startedKey, failedKey: failedKey, nodeNotReadyKey: nodeNotReadyKey } = {},
   ) {
-    const _0x343a51 = String(_0x19a119 || '').trim(),
-      _0x90a729 = globalThis.window?.showToast,
-      _0x416bee = (_0x3d3f94) => {
-        _0x90a729?.(
-          webPreviewText(_0x4172d4 || 'toasts.reversePromptGenerateFailed', {
-            error: String(_0x3d3f94 || webPreviewText('toasts.reversePromptGenerateUnavailable')),
+    const nodeId3 = String(value11 || '').trim(),
+      value12 = globalThis.window?.showToast,
+      handler2 = (value13) => {
+        value12?.(
+          webPreviewText(failedKey || 'toasts.reversePromptGenerateFailed', {
+            error: String(value13 || webPreviewText('toasts.reversePromptGenerateUnavailable')),
           }),
           'warning',
         );
       };
-    if (!_0x343a51) {
-      _0x416bee(webPreviewText('toasts.reversePromptGenerateUnavailable'));
+    if (!nodeId3) {
+      handler2(webPreviewText('toasts.reversePromptGenerateUnavailable'));
       return;
     }
-    const _0x36bda2 = await waitForMountedCanvasNodeInstance(_0x343a51);
-    if (!_0x36bda2) {
-      _0x416bee(webPreviewText(_0x35b4da || 'toasts.reversePromptGenerateNodeNotReady'));
+    const waitForMountedCanvasNodeInstance2 = await waitForMountedCanvasNodeInstance(nodeId3);
+    if (!waitForMountedCanvasNodeInstance2) {
+      handler2(webPreviewText(nodeNotReadyKey || 'toasts.reversePromptGenerateNodeNotReady'));
       return;
     }
-    const _0x514b13 = globalThis.window?.canvasCommands;
-    if (typeof _0x514b13?.executeCanvasCommand !== 'function') {
-      _0x416bee(webPreviewText('toasts.reversePromptGenerateUnavailable'));
+    const value14 = globalThis.window?.canvasCommands;
+    if (typeof value14?.executeCanvasCommand !== 'function') {
+      handler2(webPreviewText('toasts.reversePromptGenerateUnavailable'));
       return;
     }
-    _0x90a729?.(webPreviewText(_0x119bde || 'toasts.reversePromptGenerateStarted'), 'success');
+    value12?.(webPreviewText(startedKey || 'toasts.reversePromptGenerateStarted'), 'success');
     try {
-      const _0x539fe4 = await _0x514b13.executeCanvasCommand('generation.run', { nodeId: _0x343a51 });
-      _0x539fe4?.ok === false && _0x416bee(getCanvasCommandFailureText(_0x539fe4));
-    } catch (_0xf0e4a0) {
-      _0x416bee(_0xf0e4a0?.message || _0xf0e4a0);
+      const response5 = await value14.executeCanvasCommand('generation.run', { nodeId: nodeId3 });
+      response5?.ok === false && handler2(getCanvasCommandFailureText(response5));
+    } catch (error3) {
+      handler2(error3?.message || error3);
     }
   }
-  async ['_runReverseImagePromptGeneration'](_0x4c3aa3) {
-    await this._runCreatedNodeGeneration(_0x4c3aa3?.textNode?.id, {
+  async ['_runReverseImagePromptGeneration'](value15) {
+    await this._runCreatedNodeGeneration(value15?.textNode?.id, {
       startedKey: 'toasts.reversePromptGenerateStarted',
       failedKey: 'toasts.reversePromptGenerateFailed',
       nodeNotReadyKey: 'toasts.reversePromptGenerateNodeNotReady',
     });
   }
-  async ['_runImagePromptGeneration'](_0x31802f) {
-    await this._runCreatedNodeGeneration(_0x31802f?.id, {
+  async ['_runImagePromptGeneration'](value16) {
+    await this._runCreatedNodeGeneration(value16?.id, {
       startedKey: 'toasts.imagePromptGenerateStarted',
       failedKey: 'toasts.imagePromptGenerateFailed',
       nodeNotReadyKey: 'toasts.imagePromptGenerateNodeNotReady',
     });
   }
-  async ['_runVideoPromptGeneration'](_0xa90217) {
-    await this._runCreatedNodeGeneration(_0xa90217?.id, {
+  async ['_runVideoPromptGeneration'](value17) {
+    await this._runCreatedNodeGeneration(value17?.id, {
       startedKey: 'toasts.videoPromptGenerateStarted',
       failedKey: 'toasts.videoPromptGenerateFailed',
       nodeNotReadyKey: 'toasts.videoPromptGenerateNodeNotReady',
     });
   }
   ['_readUrlInputValue']() {
-    const _0x270356 = globalThis.document?.activeElement || null;
-    if (_0x270356 === this._fullscreenInput) return this._fullscreenInput?.value || '';
-    if (_0x270356 === this._input) return this._input?.value || '';
-    if (_0x270356 === this._emptyInput) return this._emptyInput?.value || '';
+    const value18 = globalThis.document?.activeElement || null;
+    if (value18 === this._fullscreenInput) return this._fullscreenInput?.value || '';
+    if (value18 === this._input) return this._input?.value || '';
+    if (value18 === this._emptyInput) return this._emptyInput?.value || '';
     return (
       this._fullscreenInput?.value ||
       this._input?.value ||
@@ -544,71 +552,73 @@ export class WebPreviewNode {
       ''
     );
   }
-  ['_commitUrl'](_0x3fc2d8 = this._readUrlInputValue(), { title: title = '' } = {}) {
-    const _0x19d0fd = normalizeWebPreviewAddressInput(_0x3fc2d8),
-      _0x18336c = this._getActiveTabId(),
-      _0x4bcb94 = !!globalThis.window?.electronAPI?.webPreview;
-    _0x19d0fd && title && this._pendingVisitTitles.set(getPendingVisitKey(_0x18336c, _0x19d0fd), title);
-    const _0x3d29d8 = commitWebPreviewNodeUrl({
+  ['_commitUrl'](rawUrl2 = this._readUrlInputValue(), { title: title = '' } = {}) {
+    const webPreviewAddressInput = normalizeWebPreviewAddressInput(rawUrl2),
+      tabId3 = this._getActiveTabId(),
+      recordVisitFn2 = !!globalThis.window?.electronAPI?.webPreview;
+    webPreviewAddressInput &&
+      title &&
+      this._pendingVisitTitles.set(getPendingVisitKey(tabId3, webPreviewAddressInput), title);
+    const response6 = commitWebPreviewNodeUrl({
       nodeId: this.id,
-      rawUrl: _0x3fc2d8,
+      rawUrl: rawUrl2,
       title: title,
-      tabId: _0x18336c,
+      tabId: tabId3,
       nodeData: this._data,
-      recordVisitFn: _0x4bcb94 ? null : recordWebPreviewVisit,
+      recordVisitFn: recordVisitFn2 ? null : recordWebPreviewVisit,
     });
-    _0x3d29d8.ok &&
-      ((this._data = { ...this._data, ..._0x3d29d8.patch }),
+    response6.ok &&
+      ((this._data = { ...this._data, ...response6.patch }),
       this._syncDom(),
       this._renderStartPageTiles(),
       this._setStatus(webPreviewText('status.loading')));
   }
   ['_refresh']() {
-    const _0x122f7a = globalThis.window?.electronAPI?.webPreview,
-      _0x59caac = this._getActiveTabId();
+    const value19 = globalThis.window?.electronAPI?.webPreview,
+      tabId4 = this._getActiveTabId();
     if (!this._getActiveUrl()) return;
-    if (_0x122f7a?.controlView)
-      void _0x122f7a.controlView({ nodeId: this.id, tabId: _0x59caac, action: 'reload' }).catch(() => {});
+    if (value19?.controlView)
+      void value19.controlView({ nodeId: this.id, tabId: tabId4, action: 'reload' }).catch(() => {});
     else
-      _0x122f7a?.disposeViews &&
-        void _0x122f7a.disposeViews({ nodeIds: [this.id] }).finally(() => {
+      value19?.disposeViews &&
+        void value19.disposeViews({ nodeIds: [this.id] }).finally(() => {
           dispatchWebPreviewForceSync(this.id);
         });
     this._setStatus(webPreviewText('status.refreshing'));
   }
-  ['_navigate'](_0x34966d) {
-    const _0x612475 = globalThis.window?.electronAPI?.webPreview,
-      _0x4da184 = this._getActiveTabId();
-    if (!this._getActiveUrl() || !_0x612475?.controlView) return;
-    void _0x612475
-      .controlView({ nodeId: this.id, tabId: _0x4da184, action: _0x34966d })
-      .then((_0x40f58a) => {
-        _0x40f58a?.ok === false &&
-          _0x40f58a.error === 'no-history' &&
-          this._setNavigationState({ ..._0x40f58a, tabId: _0x4da184 });
+  ['_navigate'](action) {
+    const enabled2 = globalThis.window?.electronAPI?.webPreview,
+      tabId5 = this._getActiveTabId();
+    if (!this._getActiveUrl() || !enabled2?.controlView) return;
+    void enabled2
+      .controlView({ nodeId: this.id, tabId: tabId5, action: action })
+      .then((response7) => {
+        response7?.ok === false &&
+          response7.error === 'no-history' &&
+          this._setNavigationState({ ...response7, tabId: tabId5 });
       })
       .catch(() => {});
   }
   ['_extractMedia']() {
-    const _0x311631 = globalThis.window?.electronAPI?.webPreview,
-      _0xb84797 = this._getActiveTabId();
-    if (!this._getActiveUrl() || !_0x311631?.controlView) {
+    const enabled3 = globalThis.window?.electronAPI?.webPreview,
+      tabId6 = this._getActiveTabId();
+    if (!this._getActiveUrl() || !enabled3?.controlView) {
       globalThis.window?.showToast?.(webPreviewText('toasts.openPageFirst'), 'warning');
       return;
     }
-    void _0x311631
-      .controlView({ nodeId: this.id, tabId: _0xb84797, action: 'extract-media' })
-      .then((_0x12ead2) => {
-        if (_0x12ead2?.ok === false) {
+    void enabled3
+      .controlView({ nodeId: this.id, tabId: tabId6, action: 'extract-media' })
+      .then((response8) => {
+        if (response8?.ok === false) {
           globalThis.window?.showToast?.(webPreviewText('toasts.extractMediaFailed'), 'error');
           return;
         }
-        const _0x287482 = Array.isArray(_0x12ead2?.images) ? _0x12ead2.images : [],
-          _0x8548c1 = Array.isArray(_0x12ead2?.videos) ? _0x12ead2.videos : [];
+        const imageCandidates = Array.isArray(response8?.images) ? response8.images : [],
+          videoCandidates = Array.isArray(response8?.videos) ? response8.videos : [];
         openWebPreviewMediaPicker({
           nodeId: this.id,
-          imageCandidates: _0x287482,
-          videoCandidates: _0x8548c1,
+          imageCandidates: imageCandidates,
+          videoCandidates: videoCandidates,
         });
       })
       .catch(() => {
@@ -616,57 +626,55 @@ export class WebPreviewNode {
       });
   }
   ['_saveReferenceCard']() {
-    const _0x1080e1 = globalThis.window?.electronAPI?.webPreview,
-      _0x59b1ea = this._getActiveTabId();
-    if (!this._getActiveUrl() || !_0x1080e1?.controlView) {
+    const enabled4 = globalThis.window?.electronAPI?.webPreview,
+      tabId7 = this._getActiveTabId();
+    if (!this._getActiveUrl() || !enabled4?.controlView) {
       globalThis.window?.showToast?.(webPreviewText('toasts.openPageFirst'), 'warning');
       return;
     }
-    void _0x1080e1
-      .controlView({ nodeId: this.id, tabId: _0x59b1ea, action: 'capture-reference' })
-      .then((_0x2edbc4) => {
-        if (_0x2edbc4?.ok === false) {
+    void enabled4
+      .controlView({ nodeId: this.id, tabId: tabId7, action: 'capture-reference' })
+      .then((payload2) => {
+        if (payload2?.ok === false) {
           globalThis.window?.showToast?.(webPreviewText('toasts.saveReferenceFailed'), 'error');
           return;
         }
-        const _0x3e7bce = createWebReferenceCardNode({ nodeId: this.id, payload: _0x2edbc4 });
-        _0x3e7bce && globalThis.window?.showToast?.(webPreviewText('toasts.referenceAdded'), 'success');
+        const webReferenceCardNode = createWebReferenceCardNode({ nodeId: this.id, payload: payload2 });
+        webReferenceCardNode &&
+          globalThis.window?.showToast?.(webPreviewText('toasts.referenceAdded'), 'success');
       })
       .catch(() => {
         globalThis.window?.showToast?.(webPreviewText('toasts.saveReferenceFailed'), 'error');
       });
   }
   ['_openExternal']() {
-    const _0x213ead = normalizeWebPreviewAddressInput(this._readUrlInputValue());
-    if (!_0x213ead) {
+    const webPreviewAddressInput2 = normalizeWebPreviewAddressInput(this._readUrlInputValue());
+    if (!webPreviewAddressInput2) {
       globalThis.window?.showToast?.(webPreviewText('toasts.addressRequired'), 'warning');
       return;
     }
-    void openExternalLink(_0x213ead, { label: webPreviewText('nodeName') }).catch((_0x2c79bf) => {
-      globalThis.window?.showToast?.(
-        _0x2c79bf?.message || webPreviewText('toasts.openExternalFailed'),
-        'error',
-      );
+    void openExternalLink(webPreviewAddressInput2, { label: webPreviewText('nodeName') }).catch((error4) => {
+      globalThis.window?.showToast?.(error4?.message || webPreviewText('toasts.openExternalFailed'), 'error');
     });
   }
   ['_openFullscreen']() {
-    const _0x2c8692 = normalizeWebPreviewAddressInput(this._readUrlInputValue());
-    if (!_0x2c8692) {
+    const url4 = normalizeWebPreviewAddressInput(this._readUrlInputValue());
+    if (!url4) {
       globalThis.window?.showToast?.(webPreviewText('toasts.addressRequired'), 'warning');
       return;
     }
-    _0x2c8692 !== normalizeWebPreviewUrl(this._getActiveUrl()) && this._commitUrl(_0x2c8692);
+    url4 !== normalizeWebPreviewUrl(this._getActiveUrl()) && this._commitUrl(url4);
     if (this._fullscreenOverlay?.isConnected) {
       dispatchWebPreviewForceSync(this.id);
       return;
     }
-    const _0x40b1d5 = document.createElement('div');
-    ((_0x40b1d5.className = 'web-preview-fullscreen-overlay'),
-      _0x40b1d5.addEventListener('pointerdown', (_0x333889) => _0x333889.stopPropagation()));
-    const _0x4e9f63 = createWebPreviewToolbar({
+    const el7 = document.createElement('div');
+    ((el7.className = 'web-preview-fullscreen-overlay'),
+      el7.addEventListener('pointerdown', (event4) => event4.stopPropagation()));
+    const webPreviewToolbar2 = createWebPreviewToolbar({
         className: 'web-preview-fullscreen-header',
-        url: _0x2c8692,
-        onSubmit: (_0x599b45) => this._commitUrl(_0x599b45),
+        url: url4,
+        onSubmit: (value20) => this._commitUrl(value20),
         onBack: () => this._navigate('back'),
         onForward: () => this._navigate('forward'),
         onRefresh: () => this._refresh(),
@@ -675,29 +683,29 @@ export class WebPreviewNode {
         onExternal: () => this._openExternal(),
         onExit: () => this._closeFullscreen(),
       }),
-      _0x203fa2 = this._createTabBarView(),
-      _0x584281 = document.createElement('div');
-    ((_0x584281.className = 'web-preview-fullscreen-body'),
-      (_0x584281.dataset.webPreviewSlot = 'true'),
-      (_0x584281.dataset.webPreviewFullscreen = 'true'),
-      (_0x584281.dataset.nodeId = this.id),
-      (_0x584281.dataset.tabId = this._getActiveTabId()),
-      (_0x584281.dataset.webUrl = this._getActiveUrl() || _0x2c8692),
-      _0x40b1d5.appendChild(_0x4e9f63.element),
-      _0x40b1d5.appendChild(_0x203fa2.element),
-      _0x40b1d5.appendChild(_0x584281),
-      document.body.appendChild(_0x40b1d5),
-      (this._fullscreenOverlay = _0x40b1d5),
-      (this._fullscreenToolbar = _0x4e9f63),
-      (this._fullscreenInput = _0x4e9f63.input),
-      (this._fullscreenTabBar = _0x203fa2),
-      (this._fullscreenSlot = _0x584281),
+      value21 = this._createTabBarView(),
+      el8 = document.createElement('div');
+    ((el8.className = 'web-preview-fullscreen-body'),
+      (el8.dataset.webPreviewSlot = 'true'),
+      (el8.dataset.webPreviewFullscreen = 'true'),
+      (el8.dataset.nodeId = this.id),
+      (el8.dataset.tabId = this._getActiveTabId()),
+      (el8.dataset.webUrl = this._getActiveUrl() || url4),
+      el7.appendChild(webPreviewToolbar2.element),
+      el7.appendChild(value21.element),
+      el7.appendChild(el8),
+      document.body.appendChild(el7),
+      (this._fullscreenOverlay = el7),
+      (this._fullscreenToolbar = webPreviewToolbar2),
+      (this._fullscreenInput = webPreviewToolbar2.input),
+      (this._fullscreenTabBar = value21),
+      (this._fullscreenSlot = el8),
       this._unregisterFullscreenSlot?.(),
-      (this._unregisterFullscreenSlot = registerWebPreviewSlot(this.id, _0x584281)),
-      (this._backButtons = [this._backButtons[0], _0x4e9f63.backButton].filter(Boolean)),
-      (this._forwardButtons = [this._forwardButtons[0], _0x4e9f63.forwardButton].filter(Boolean)),
-      (this._fullscreenKeyHandler = (_0x1331f6) => {
-        if (_0x1331f6.key === 'Escape') this._closeFullscreen();
+      (this._unregisterFullscreenSlot = registerWebPreviewSlot(this.id, el8)),
+      (this._backButtons = [this._backButtons[0], webPreviewToolbar2.backButton].filter(Boolean)),
+      (this._forwardButtons = [this._forwardButtons[0], webPreviewToolbar2.forwardButton].filter(Boolean)),
+      (this._fullscreenKeyHandler = (event5) => {
+        if (event5.key === 'Escape') this._closeFullscreen();
       }),
       globalThis.window?.addEventListener?.('keydown', this._fullscreenKeyHandler),
       this._syncDom(),
@@ -720,37 +728,37 @@ export class WebPreviewNode {
       (this._forwardButtons = [this._forwardButtons[0]].filter(Boolean)),
       dispatchWebPreviewForceSync(this.id));
   }
-  ['_applyNavigatedUrl'](_0x76d469, _0x3d1cb0 = this._getActiveTabId()) {
-    const _0x3bc5f6 = normalizeWebPreviewUrl(_0x76d469);
-    if (!_0x3bc5f6) return;
-    const _0x31c53b = getPendingVisitKey(_0x3d1cb0, _0x3bc5f6),
-      _0x565e02 = this._pendingVisitTitles.get(_0x31c53b) || '';
-    (this._pendingVisitTitles.delete(_0x31c53b),
-      recordWebPreviewVisit({ url: _0x3bc5f6, title: _0x565e02 }),
+  ['_applyNavigatedUrl'](value22, tabId8 = this._getActiveTabId()) {
+    const url5 = normalizeWebPreviewUrl(value22);
+    if (!url5) return;
+    const pendingVisitKey = getPendingVisitKey(tabId8, url5),
+      title2 = this._pendingVisitTitles.get(pendingVisitKey) || '';
+    (this._pendingVisitTitles.delete(pendingVisitKey),
+      recordWebPreviewVisit({ url: url5, title: title2 }),
       this._renderStartPageTiles());
-    const _0x1adda6 = updateWebPreviewTabUrlData(this._data, {
-      tabId: _0x3d1cb0,
-      url: _0x3bc5f6,
-      title: _0x565e02,
-      activate: _0x3d1cb0 === this._getActiveTabId(),
+    const response9 = updateWebPreviewTabUrlData(this._data, {
+      tabId: tabId8,
+      url: url5,
+      title: title2,
+      activate: tabId8 === this._getActiveTabId(),
     });
-    if (_0x1adda6.ok === false) return;
-    ((this._data = { ...this._data, ..._0x1adda6.patch }),
-      appStore.updateNodeData(this.id, _0x1adda6.patch),
+    if (response9.ok === false) return;
+    ((this._data = { ...this._data, ...response9.patch }),
+      appStore.updateNodeData(this.id, response9.patch),
       this._syncDom());
   }
-  ['_applyFavicon'](_0x3e71ff, _0x53bf65 = this._getActiveTabId()) {
-    const _0x29007b = updateWebPreviewTabFaviconData(this._data, { tabId: _0x53bf65, faviconUrl: _0x3e71ff });
-    if (_0x29007b.ok === false) return;
-    ((this._data = { ...this._data, ..._0x29007b.patch }),
-      appStore.updateNodeData(this.id, _0x29007b.patch),
+  ['_applyFavicon'](faviconUrl, tabId9 = this._getActiveTabId()) {
+    const response10 = updateWebPreviewTabFaviconData(this._data, { tabId: tabId9, faviconUrl: faviconUrl });
+    if (response10.ok === false) return;
+    ((this._data = { ...this._data, ...response10.patch }),
+      appStore.updateNodeData(this.id, response10.patch),
       this._syncDom());
   }
-  ['_setNavigationState'](_0xf807ca = {}) {
-    const _0x16a1ff = _0xf807ca.tabId || this._getActiveTabId(),
-      _0x9c6f34 = { canGoBack: Boolean(_0xf807ca.canGoBack), canGoForward: Boolean(_0xf807ca.canGoForward) };
-    this._navigationStateByTabId.set(_0x16a1ff, _0x9c6f34);
-    if (_0x16a1ff === this._getActiveTabId()) this._navigationState = _0x9c6f34;
+  ['_setNavigationState'](options2 = {}) {
+    const value23 = options2.tabId || this._getActiveTabId(),
+      value24 = { canGoBack: Boolean(options2.canGoBack), canGoForward: Boolean(options2.canGoForward) };
+    this._navigationStateByTabId.set(value23, value24);
+    if (value23 === this._getActiveTabId()) this._navigationState = value24;
     this._syncNavigationButtons();
   }
   ['_syncNavigationButtons']() {
@@ -758,56 +766,56 @@ export class WebPreviewNode {
       canGoBack: false,
       canGoForward: false,
     };
-    for (const _0x4d6326 of this._backButtons) {
-      if (_0x4d6326) _0x4d6326.disabled = !this._navigationState.canGoBack;
+    for (const el9 of this._backButtons) {
+      if (el9) el9.disabled = !this._navigationState.canGoBack;
     }
-    for (const _0xaa15f8 of this._forwardButtons) {
-      if (_0xaa15f8) _0xaa15f8.disabled = !this._navigationState.canGoForward;
+    for (const el10 of this._forwardButtons) {
+      if (el10) el10.disabled = !this._navigationState.canGoForward;
     }
   }
-  ['_setStatus'](_0x1abd5b) {
-    this._statusText = String(_0x1abd5b || getWebPreviewDefaultStatusText());
+  ['_setStatus'](value25) {
+    this._statusText = String(value25 || getWebPreviewDefaultStatusText());
     if (this._status) this._status.textContent = this._statusText;
     this._startPageView?.setStatus(this._statusText);
   }
-  ['_applySnapshot'](_0x2a1ff3 = {}) {
-    const _0x14b95a = String(_0x2a1ff3.dataUrl || '');
-    if (!_0x14b95a.startsWith('data:image/') || !this._freezeImage) return;
-    const _0x4f25e1 = String(_0x2a1ff3.freezeToken || 'ready'),
-      _0x57e955 = this._freezeSnapshotSerial + 1;
-    this._freezeSnapshotSerial = _0x57e955;
-    let _0x446913 = false;
-    const _0x3c36e5 = () => {
-        if (_0x446913) return;
-        if (this._freezeSnapshotSerial !== _0x57e955 || !this._freezeImage) return;
-        ((_0x446913 = true),
-          (this._freezeImage.src = _0x14b95a),
-          (this.el.dataset.webPreviewSnapshotToken = _0x4f25e1),
+  ['_applySnapshot'](options3 = {}) {
+    const enabled5 = String(options3.dataUrl || '');
+    if (!enabled5.startsWith('data:image/') || !this._freezeImage) return;
+    const value26 = String(options3.freezeToken || 'ready'),
+      value27 = this._freezeSnapshotSerial + 1;
+    this._freezeSnapshotSerial = value27;
+    let value28 = false;
+    const run = () => {
+        if (value28) return;
+        if (this._freezeSnapshotSerial !== value27 || !this._freezeImage) return;
+        ((value28 = true),
+          (this._freezeImage.src = enabled5),
+          (this.el.dataset.webPreviewSnapshotToken = value26),
           this.el.classList.add('has-freeze-snapshot'),
           dispatchWebPreviewForceSync(this.id));
       },
-      _0x3c90ea =
+      enabled6 =
         typeof globalThis.Image === 'function'
           ? new globalThis['Image']()
           : globalThis.document?.createElement?.('img');
-    if (!_0x3c90ea) {
-      _0x3c36e5();
+    if (!enabled6) {
+      run();
       return;
     }
-    ((_0x3c90ea.onload = _0x3c36e5),
-      (_0x3c90ea.onerror = () => {
-        this._freezeSnapshotSerial === _0x57e955 &&
+    ((enabled6.onload = run),
+      (enabled6.onerror = () => {
+        this._freezeSnapshotSerial === value27 &&
           (this.el.classList.remove('has-freeze-snapshot'), delete this.el.dataset.webPreviewSnapshotToken);
       }),
-      (_0x3c90ea.src = _0x14b95a));
-    if (typeof _0x3c90ea.decode === 'function')
-      void _0x3c90ea
+      (enabled6.src = enabled5));
+    if (typeof enabled6.decode === 'function')
+      void enabled6
         .decode()
-        .then(_0x3c36e5)
+        .then(run)
         .catch(() => {
-          if (_0x3c90ea.complete) _0x3c36e5();
+          if (enabled6.complete) run();
         });
-    else _0x3c90ea.complete && _0x3c36e5();
+    else enabled6.complete && run();
   }
   ['_clearSnapshot']() {
     this._freezeSnapshotSerial += 1;
@@ -816,34 +824,34 @@ export class WebPreviewNode {
       this.el.classList.remove('has-freeze-snapshot', 'is-web-preview-loading'));
   }
   ['_syncDom']() {
-    const _0x4adac9 = this._getTabState(),
-      _0x421b2c = _0x4adac9.webUrl || '';
-    ((this._data = { ...this._data, activeTabId: _0x4adac9.activeTabId, webUrl: _0x421b2c }),
+    const activeTabId = this._getTabState(),
+      webUrl2 = activeTabId.webUrl || '';
+    ((this._data = { ...this._data, activeTabId: activeTabId.activeTabId, webUrl: webUrl2 }),
       this._tabBar?.setTabs(this._data),
       this._fullscreenTabBar?.setTabs(this._data));
-    this._input && document.activeElement !== this._input && (this._input.value = _0x421b2c);
-    this._startPageView?.setUrl(_0x421b2c);
+    this._input && document.activeElement !== this._input && (this._input.value = webUrl2);
+    this._startPageView?.setUrl(webUrl2);
     this._fullscreenInput &&
       document.activeElement !== this._fullscreenInput &&
-      (this._fullscreenInput.value = _0x421b2c);
+      (this._fullscreenInput.value = webUrl2);
     this._slot?.dataset &&
-      ((this._slot.dataset.webUrl = _0x421b2c),
+      ((this._slot.dataset.webUrl = webUrl2),
       (this._slot.dataset.nodeId = this.id),
-      (this._slot.dataset.tabId = _0x4adac9.activeTabId));
+      (this._slot.dataset.tabId = activeTabId.activeTabId));
     this._fullscreenSlot?.dataset &&
-      ((this._fullscreenSlot.dataset.webUrl = _0x421b2c),
+      ((this._fullscreenSlot.dataset.webUrl = webUrl2),
       (this._fullscreenSlot.dataset.nodeId = this.id),
-      (this._fullscreenSlot.dataset.tabId = _0x4adac9.activeTabId));
-    const _0x19311d = Boolean(_0x421b2c || _0x4adac9.activeTab?.pendingPopup === true);
-    this.el.classList.toggle('has-web-url', _0x19311d);
-    if (!_0x19311d) (this._renderStartPageTiles(), this._setStatus(getWebPreviewDefaultStatusText()));
+      (this._fullscreenSlot.dataset.tabId = activeTabId.activeTabId));
+    const enabled7 = Boolean(webUrl2 || activeTabId.activeTab?.pendingPopup === true);
+    this.el.classList.toggle('has-web-url', enabled7);
+    if (!enabled7) (this._renderStartPageTiles(), this._setStatus(getWebPreviewDefaultStatusText()));
     else
-      _0x421b2c &&
+      webUrl2 &&
         !globalThis.window?.electronAPI?.webPreview &&
         this._setStatus(webPreviewText('status.nativeUnsupported'));
   }
-  ['update'](_0x3e28e3) {
-    ((this._data = _0x3e28e3), this._syncDom());
+  ['update'](value29) {
+    ((this._data = value29), this._syncDom());
   }
   ['unmount']() {
     (this._closeFullscreen(),
@@ -855,7 +863,7 @@ export class WebPreviewNode {
       (this._unsubscribeNativeEvent = null),
       this._unsubscribeLocale?.(),
       (this._unsubscribeLocale = null));
-    const _0x4b23ef = globalThis.window?.electronAPI?.webPreview;
-    _0x4b23ef?.disposeViews && void _0x4b23ef.disposeViews({ nodeIds: [this.id] });
+    const value30 = globalThis.window?.electronAPI?.webPreview;
+    value30?.disposeViews && void value30.disposeViews({ nodeIds: [this.id] });
   }
 }

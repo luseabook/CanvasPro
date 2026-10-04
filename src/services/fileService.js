@@ -27,94 +27,94 @@ export {
   MEDIA_CLIP_COMPACT_SIZE,
   SOURCE_MEDIA_AUTO_RESIZE_SHORT_SIDE,
 } from './mediaSizingPolicy.js';
-function _toOneLineMessage(_0x13fc61) {
-  const _0x47404a =
-    typeof _0x13fc61 === 'string'
-      ? _0x13fc61
-      : _0x13fc61?.message
-        ? String(_0x13fc61.message)
+function _toOneLineMessage(error) {
+  const value =
+    typeof error === 'string'
+      ? error
+      : error?.message
+        ? String(error.message)
         : t('fileService.unknownError');
-  return _0x47404a.replace(/\s+/g, ' ').trim();
+  return value.replace(/\s+/g, ' ').trim();
 }
-function _profileDragImport(_0x48a2b1, _0x28ce2e = {}) {
-  logDragImportProfile(_0x48a2b1, _0x28ce2e);
+function _profileDragImport(item, key = {}) {
+  logDragImportProfile(item, key);
 }
 let _assetUpdatedListenerInstalled = false;
 function installElectronAssetUpdatedListener() {
   if (_assetUpdatedListenerInstalled) return;
   _assetUpdatedListenerInstalled = true;
-  const _0x1496fc = globalThis.window?.electronAPI?.onAssetUpdated;
-  if (typeof _0x1496fc !== 'function') return;
-  _0x1496fc((_0x397351) => {
-    const _0x5c32c0 = String(_0x397351?.assetId || '').trim();
-    if (!_0x5c32c0) return;
-    const _0x2be65e = appStore.getState()?.nodes || {},
-      _0x2f929d = {
-        assetId: _0x5c32c0,
-        localPath: _0x397351?.localPath || _0x397351?.originalLocalPath || '',
-        originalLocalPath: _0x397351?.originalLocalPath || _0x397351?.localPath || '',
-        displayLocalPath: _0x397351?.displayLocalPath || '',
-        thumbLocalPath: _0x397351?.thumbLocalPath || _0x397351?.posterLocalPath || '',
-        posterLocalPath: _0x397351?.posterLocalPath || '',
-        waveformLocalPath: _0x397351?.waveformLocalPath || '',
-        derivativeStatus: _0x397351?.derivativeStatus || _0x397351?.status || '',
-        mediaTaskId: _0x397351?.mediaTaskId || '',
-        mediaTaskKind: _0x397351?.mediaTaskKind || '',
-        mediaTaskStatus: _0x397351?.mediaTaskStatus || '',
-        mediaTaskProgress: Number(_0x397351?.mediaTaskProgress || 0) || 0,
-        mediaTaskError: _0x397351?.mediaTaskError || '',
-        videoProxyStatus: _0x397351?.videoProxyStatus || '',
-        videoCodec: _0x397351?.videoCodec || '',
-        videoWidth: Number(_0x397351?.videoWidth || _0x397351?.width || 0) || 0,
-        videoHeight: Number(_0x397351?.videoHeight || _0x397351?.height || 0) || 0,
-        videoDuration: Number(_0x397351?.videoDuration || 0) || 0,
-        videoFps: Number(_0x397351?.videoFps || 0) || 0,
+  const run = globalThis.window?.electronAPI?.onAssetUpdated;
+  if (typeof run !== 'function') return;
+  run((localPath) => {
+    const assetId = String(localPath?.assetId || '').trim();
+    if (!assetId) return;
+    const index = appStore.getState()?.nodes || {},
+      result = {
+        assetId: assetId,
+        localPath: localPath?.localPath || localPath?.originalLocalPath || '',
+        originalLocalPath: localPath?.originalLocalPath || localPath?.localPath || '',
+        displayLocalPath: localPath?.displayLocalPath || '',
+        thumbLocalPath: localPath?.thumbLocalPath || localPath?.posterLocalPath || '',
+        posterLocalPath: localPath?.posterLocalPath || '',
+        waveformLocalPath: localPath?.waveformLocalPath || '',
+        derivativeStatus: localPath?.derivativeStatus || localPath?.status || '',
+        mediaTaskId: localPath?.mediaTaskId || '',
+        mediaTaskKind: localPath?.mediaTaskKind || '',
+        mediaTaskStatus: localPath?.mediaTaskStatus || '',
+        mediaTaskProgress: Number(localPath?.mediaTaskProgress || 0) || 0,
+        mediaTaskError: localPath?.mediaTaskError || '',
+        videoProxyStatus: localPath?.videoProxyStatus || '',
+        videoCodec: localPath?.videoCodec || '',
+        videoWidth: Number(localPath?.videoWidth || localPath?.width || 0) || 0,
+        videoHeight: Number(localPath?.videoHeight || localPath?.height || 0) || 0,
+        videoDuration: Number(localPath?.videoDuration || 0) || 0,
+        videoFps: Number(localPath?.videoFps || 0) || 0,
       };
-    if (_0x397351?.kind === 'image')
-      ((_0x2f929d.src = _0x397351?.displayUrl || _0x397351?.url || ''),
-        (_0x2f929d.imageUrl = _0x397351?.displayUrl || _0x397351?.url || ''),
-        (_0x2f929d.sourceUrl = _0x397351?.originalUrl || ''),
-        (_0x2f929d.thumbUrl = _0x397351?.thumbUrl || ''));
+    if (localPath?.kind === 'image')
+      ((result.src = localPath?.displayUrl || localPath?.url || ''),
+        (result.imageUrl = localPath?.displayUrl || localPath?.url || ''),
+        (result.sourceUrl = localPath?.originalUrl || ''),
+        (result.thumbUrl = localPath?.thumbUrl || ''));
     else {
-      if (_0x397351?.kind === 'video')
-        ((_0x2f929d.src = _0x397351?.originalUrl || _0x397351?.url || ''),
-          (_0x2f929d.videoUrl = _0x397351?.originalUrl || _0x397351?.url || ''),
-          (_0x2f929d.thumbUrl = _0x397351?.posterUrl || _0x397351?.thumbUrl || ''));
+      if (localPath?.kind === 'video')
+        ((result.src = localPath?.originalUrl || localPath?.url || ''),
+          (result.videoUrl = localPath?.originalUrl || localPath?.url || ''),
+          (result.thumbUrl = localPath?.posterUrl || localPath?.thumbUrl || ''));
       else
-        _0x397351?.kind === 'audio' &&
-          ((_0x2f929d.src = _0x397351?.originalUrl || _0x397351?.url || ''),
-          (_0x2f929d.audioUrl = _0x397351?.originalUrl || _0x397351?.url || ''));
+        localPath?.kind === 'audio' &&
+          ((result.src = localPath?.originalUrl || localPath?.url || ''),
+          (result.audioUrl = localPath?.originalUrl || localPath?.url || ''));
     }
-    Object.values(_0x2be65e).forEach((_0x472860) => {
-      if (String(_0x472860?.assetId || '').trim() !== _0x5c32c0) return;
-      appStore.updateNodeData(_0x472860.id, _0x2f929d);
+    Object.values(index).forEach((item2) => {
+      if (String(item2?.assetId || '').trim() !== assetId) return;
+      appStore.updateNodeData(item2.id, result);
     });
   });
 }
 (installElectronAssetUpdatedListener(), installMediaTaskUpdateListener());
-export function getBaseName(_0x53603c) {
-  const _0x153a0d = String(_0x53603c || '').trim();
-  return _0x153a0d.replace(/\.[^/.]+$/, '');
+export function getBaseName(data) {
+  const options = String(data || '').trim();
+  return options.replace(/\.[^/.]+$/, '');
 }
-function getDefaultNodeName(_0x2cc4ae) {
-  const _0x3cf92a = {
+function getDefaultNodeName(target) {
+  const source = {
     'source-image': t('fileService.defaultNames.image'),
     'source-video': t('fileService.defaultNames.video'),
     'source-audio': t('fileService.defaultNames.audio'),
     'media-clip': t('fileService.defaultNames.mediaClip'),
     'source-text': t('fileService.defaultNames.text'),
   };
-  return _0x3cf92a[_0x2cc4ae] || t('fileService.defaultNames.file');
+  return source[target] || t('fileService.defaultNames.file');
 }
-export function getNodeTypeByFile(_0x2082da) {
-  if (_0x2082da.type.startsWith('image/')) return 'source-image';
-  if (_0x2082da.type.startsWith('video/')) return 'source-video';
-  if (_0x2082da.type.startsWith('audio/')) return 'source-audio';
-  if (_0x2082da.type === 'text/plain' || _0x2082da.name.endsWith('.txt')) return 'source-text';
+export function getNodeTypeByFile(error2) {
+  if (error2.type.startsWith('image/')) return 'source-image';
+  if (error2.type.startsWith('video/')) return 'source-video';
+  if (error2.type.startsWith('audio/')) return 'source-audio';
+  if (error2.type === 'text/plain' || error2.name.endsWith('.txt')) return 'source-text';
   return null;
 }
-export function getNodeDefaultSize(_0x347af4) {
-  const _0x47f42a = {
+export function getNodeDefaultSize(next) {
+  const current = {
     'source-image': { width: 0x200, height: 0x120 },
     'source-video': { width: 0x200, height: 0x120 },
     'web-preview': { ...WEB_PREVIEW_MIN_SIZE },
@@ -131,106 +131,98 @@ export function getNodeDefaultSize(_0x347af4) {
     'panorama-scene': { width: 0x400, height: 0x240 },
     'panorama-360': { width: 0x400, height: 0x240 },
   };
-  return _0x47f42a[_0x347af4] || { width: 0x140, height: 180 };
+  return current[next] || { width: 0x140, height: 180 };
 }
-export function getAutoMediaSizeByShortSide(
-  _0x4e9e36,
-  _0x4973c0,
-  _0x1485c3 = SOURCE_MEDIA_AUTO_RESIZE_SHORT_SIDE,
-) {
-  const _0x54972e = Math.max(1, Number(_0x4e9e36) || 1),
-    _0x499a06 = Math.max(1, Number(_0x4973c0) || 1),
-    _0x5737da = Math.max(1, Number(_0x1485c3) || SOURCE_MEDIA_AUTO_RESIZE_SHORT_SIDE),
-    _0x35c04f = Math.min(_0x54972e, _0x499a06),
-    _0x5177a4 = _0x5737da / _0x35c04f;
+export function getAutoMediaSizeByShortSide(entry, record, payload = SOURCE_MEDIA_AUTO_RESIZE_SHORT_SIDE) {
+  const handle = Math.max(1, Number(entry) || 1),
+    state = Math.max(1, Number(record) || 1),
+    config = Math.max(1, Number(payload) || SOURCE_MEDIA_AUTO_RESIZE_SHORT_SIDE),
+    scope = Math.min(handle, state),
+    input = config / scope;
   return {
-    width: Math.max(1, Math.round(_0x54972e * _0x5177a4)),
-    height: Math.max(1, Math.round(_0x499a06 * _0x5177a4)),
+    width: Math.max(1, Math.round(handle * input)),
+    height: Math.max(1, Math.round(state * input)),
   };
 }
-export function getAIGenerationNodeSize(_0x39d17f, _0x20a543, _0x16009e = AI_GENERATION_NODE_SHORT_SIDE) {
-  const _0x175292 = Math.max(1, Number(_0x16009e) || AI_GENERATION_NODE_SHORT_SIDE),
-    _0x683ea7 = Number(_0x39d17f) || 0,
-    _0x5d309b = Number(_0x20a543) || 0;
-  if (_0x683ea7 > 0 && _0x5d309b > 0) return getAutoMediaSizeByShortSide(_0x683ea7, _0x5d309b, _0x175292);
-  return { width: _0x175292, height: _0x175292 };
+export function getAIGenerationNodeSize(output, value2, value3 = AI_GENERATION_NODE_SHORT_SIDE) {
+  const width2 = Math.max(1, Number(value3) || AI_GENERATION_NODE_SHORT_SIDE),
+    count = Number(output) || 0,
+    count2 = Number(value2) || 0;
+  if (count > 0 && count2 > 0) return getAutoMediaSizeByShortSide(count, count2, width2);
+  return { width: width2, height: width2 };
 }
-export function getAIGenerationDefaultSizeByType(_0x307f3f, _0x47ce45 = AI_GENERATION_NODE_SHORT_SIDE) {
-  const _0x4529a0 = String(_0x307f3f || '').trim();
-  if (_0x4529a0 === 'ai-text')
-    return getAutoMediaSizeByShortSide(AI_TEXT_DEFAULT_RATIO.width, AI_TEXT_DEFAULT_RATIO.height, _0x47ce45);
-  if (_0x4529a0 === 'ai-image' || _0x4529a0 === 'ai-video')
-    return getAIGenerationNodeSize(undefined, undefined, _0x47ce45);
+export function getAIGenerationDefaultSizeByType(value4, value5 = AI_GENERATION_NODE_SHORT_SIDE) {
+  const value6 = String(value4 || '').trim();
+  if (value6 === 'ai-text')
+    return getAutoMediaSizeByShortSide(AI_TEXT_DEFAULT_RATIO.width, AI_TEXT_DEFAULT_RATIO.height, value5);
+  if (value6 === 'ai-image' || value6 === 'ai-video')
+    return getAIGenerationNodeSize(undefined, undefined, value5);
   return {
-    width: Math.max(1, Number(_0x47ce45) || AI_GENERATION_NODE_SHORT_SIDE),
-    height: Math.max(1, Number(_0x47ce45) || AI_GENERATION_NODE_SHORT_SIDE),
+    width: Math.max(1, Number(value5) || AI_GENERATION_NODE_SHORT_SIDE),
+    height: Math.max(1, Number(value5) || AI_GENERATION_NODE_SHORT_SIDE),
   };
 }
-export function buildSourceMediaNodePayload(_0x5e72ca = {}) {
-  const _0x46f8da = String(_0x5e72ca.type || '').trim();
-  if (_0x46f8da !== 'source-image' && _0x46f8da !== 'source-video')
-    throw new Error('Unsupported source media type: ' + (_0x46f8da || 'unknown'));
-  const _0x2ed14d = {
-    ..._0x5e72ca,
-    id: _0x5e72ca.id,
-    type: _0x46f8da,
-    x: Number(_0x5e72ca.x) || 0,
-    y: Number(_0x5e72ca.y) || 0,
-    src: _0x5e72ca.src || '',
-    localPath: _0x5e72ca.localPath || '',
-    fileName: _0x5e72ca.fileName || '',
-    name: _0x5e72ca.name || getDefaultNodeName(_0x46f8da),
+export function buildSourceMediaNodePayload(id = {}) {
+  const type = String(id.type || '').trim();
+  if (type !== 'source-image' && type !== 'source-video')
+    throw new Error('Unsupported source media type: ' + (type || 'unknown'));
+  const args = {
+    ...id,
+    id: id.id,
+    type: type,
+    x: Number(id.x) || 0,
+    y: Number(id.y) || 0,
+    src: id.src || '',
+    localPath: id.localPath || '',
+    fileName: id.fileName || '',
+    name: id.name || getDefaultNodeName(type),
   };
-  (delete _0x2ed14d.naturalWidth, delete _0x2ed14d.naturalHeight);
-  const _0x4dc668 = Number(_0x5e72ca.naturalWidth || 0),
-    _0x3b1541 = Number(_0x5e72ca.naturalHeight || 0),
-    _0xe36877 = Number(_0x5e72ca.width || 0),
-    _0x56ea50 = Number(_0x5e72ca.height || 0),
-    _0x45cba6 = _0x4dc668 > 0 && _0x3b1541 > 0,
-    _0x5c2ea9 = _0xe36877 > 0 && _0x56ea50 > 0,
-    _0x1b8486 =
-      _0x5c2ea9 &&
-      (_0x5e72ca.needsAutoResize === false ||
-        _0x5e72ca.fixedSize === true ||
-        _0x5e72ca.useExplicitSizeAsSource === true),
-    _0x21e8c6 = _0x45cba6
-      ? getAutoMediaSizeByShortSide(_0x4dc668, _0x3b1541)
-      : _0x1b8486
-        ? { width: _0xe36877, height: _0x56ea50 }
-        : getNodeDefaultSize(_0x46f8da),
-    _0x5cdd1a = !!String(_0x5e72ca.src || _0x5e72ca.localPath || '').trim(),
-    _0x1affd3 =
-      typeof _0x5e72ca.needsAutoResize === 'boolean' ? _0x5e72ca.needsAutoResize : !_0x45cba6 && !_0x1b8486;
+  (delete args.naturalWidth, delete args.naturalHeight);
+  const count3 = Number(id.naturalWidth || 0),
+    count4 = Number(id.naturalHeight || 0),
+    width3 = Number(id.width || 0),
+    height2 = Number(id.height || 0),
+    enabled = count3 > 0 && count4 > 0,
+    value7 = width3 > 0 && height2 > 0,
+    enabled2 =
+      value7 &&
+      (id.needsAutoResize === false || id.fixedSize === true || id.useExplicitSizeAsSource === true),
+    width4 = enabled
+      ? getAutoMediaSizeByShortSide(count3, count4)
+      : enabled2
+        ? { width: width3, height: height2 }
+        : getNodeDefaultSize(type),
+    value8 = !!String(id.src || id.localPath || '').trim(),
+    needsAutoResize = typeof id.needsAutoResize === 'boolean' ? id.needsAutoResize : !enabled && !enabled2;
   return (
-    _0x1affd3 && _0x2ed14d.fixedSize && (_0x2ed14d.fixedSize = false),
-    { ..._0x2ed14d, width: _0x21e8c6.width, height: _0x21e8c6.height, needsAutoResize: _0x1affd3 }
+    needsAutoResize && args.fixedSize && (args.fixedSize = false),
+    { ...args, width: width4.width, height: width4.height, needsAutoResize: needsAutoResize }
   );
 }
-export function buildSourceAudioNodePayload(_0x332da6 = {}) {
-  const _0x4e21c7 = String(_0x332da6.type || 'source-audio').trim();
-  if (_0x4e21c7 !== 'source-audio')
-    throw new Error('Unsupported source audio type: ' + (_0x4e21c7 || 'unknown'));
-  const _0x2622e8 = getNodeDefaultSize('source-audio'),
-    _0xdde8f8 = Number(_0x332da6.width) > 0 ? Number(_0x332da6.width) : _0x2622e8.width,
-    _0x4d55c7 = Number(_0x332da6.height) > 0 ? Number(_0x332da6.height) : _0x2622e8.height;
+export function buildSourceAudioNodePayload(id2 = {}) {
+  const value9 = String(id2.type || 'source-audio').trim();
+  if (value9 !== 'source-audio') throw new Error('Unsupported source audio type: ' + (value9 || 'unknown'));
+  const box = getNodeDefaultSize('source-audio'),
+    width5 = Number(id2.width) > 0 ? Number(id2.width) : box.width,
+    height3 = Number(id2.height) > 0 ? Number(id2.height) : box.height;
   return {
-    ..._0x332da6,
-    id: _0x332da6.id,
+    ...id2,
+    id: id2.id,
     type: 'source-audio',
-    x: Number(_0x332da6.x) || 0,
-    y: Number(_0x332da6.y) || 0,
-    width: _0xdde8f8,
-    height: _0x4d55c7,
-    src: _0x332da6.src || '',
-    localPath: _0x332da6.localPath || '',
-    fileName: _0x332da6.fileName || '',
-    name: _0x332da6.name || getDefaultNodeName('source-audio'),
+    x: Number(id2.x) || 0,
+    y: Number(id2.y) || 0,
+    width: width5,
+    height: height3,
+    src: id2.src || '',
+    localPath: id2.localPath || '',
+    fileName: id2.fileName || '',
+    name: id2.name || getDefaultNodeName('source-audio'),
     needsAutoResize: false,
-    fixedSize: typeof _0x332da6.fixedSize === 'boolean' ? _0x332da6.fixedSize : true,
+    fixedSize: typeof id2.fixedSize === 'boolean' ? id2.fixedSize : true,
   };
 }
-function generateNodeId(_0x3724da, _0x16dde8 = 0) {
-  return _0x3724da + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7) + '-' + _0x16dde8;
+function generateNodeId(value10, value11 = 0) {
+  return value10 + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7) + '-' + value11;
 }
 const WEB_PREVIEW_IMAGE_DROP_MIME = 'application/x-ai-canvas-web-preview-image',
   IMAGE_URL_EXTENSION_RE = /\.(?:png|jpe?g|webp|gif|bmp|svg|avif)(?:[?#].*)?$/i,
@@ -246,206 +238,203 @@ const WEB_PREVIEW_IMAGE_DROP_MIME = 'application/x-ai-canvas-web-preview-image',
   ]),
   _webImageRemoteImportQueue = [];
 let _webImageRemoteImportActive = 0;
-function normalizeHttpDropUrl(_0x3806f6) {
-  const _0x523086 = String(_0x3806f6 || '').trim();
-  if (!_0x523086) return '';
+function normalizeHttpDropUrl(value12) {
+  const enabled3 = String(value12 || '').trim();
+  if (!enabled3) return '';
   try {
-    const _0x3a523f = new URL(_0x523086, globalThis.location?.href || 'https://example.invalid/');
-    if (_0x3a523f.protocol !== 'http:' && _0x3a523f.protocol !== 'https:') return '';
-    return ((_0x3a523f.username = ''), (_0x3a523f.password = ''), _0x3a523f.href);
+    const uRL = new URL(enabled3, globalThis.location?.href || 'https://example.invalid/');
+    if (uRL.protocol !== 'http:' && uRL.protocol !== 'https:') return '';
+    return ((uRL.username = ''), (uRL.password = ''), uRL.href);
   } catch {
     return '';
   }
 }
-function toPositiveMediaDimension(_0x11fbb1) {
-  const _0x2795b1 = Number(_0x11fbb1);
-  if (!Number.isFinite(_0x2795b1) || _0x2795b1 <= 0) return 0;
-  return Math.max(1, Math.round(_0x2795b1));
+function toPositiveMediaDimension(value13) {
+  const count5 = Number(value13);
+  if (!Number.isFinite(count5) || count5 <= 0) return 0;
+  return Math.max(1, Math.round(count5));
 }
-function normalizeWebImagePayloadSize(_0x3a6075 = {}) {
-  const _0x135d6e = toPositiveMediaDimension(
-      _0x3a6075?.width ?? _0x3a6075?.naturalWidth ?? _0x3a6075?.imageWidth,
-    ),
-    _0x2e364b = toPositiveMediaDimension(
-      _0x3a6075?.height ?? _0x3a6075?.naturalHeight ?? _0x3a6075?.imageHeight,
-    );
-  return _0x135d6e > 0 && _0x2e364b > 0 ? { width: _0x135d6e, height: _0x2e364b } : {};
+function normalizeWebImagePayloadSize(box2 = {}) {
+  const width6 = toPositiveMediaDimension(box2?.width ?? box2?.naturalWidth ?? box2?.imageWidth),
+    height4 = toPositiveMediaDimension(box2?.height ?? box2?.naturalHeight ?? box2?.imageHeight);
+  return width6 > 0 && height4 > 0 ? { width: width6, height: height4 } : {};
 }
-function readDataTransferText(_0x101312, _0x239eab) {
+function readDataTransferText(value14, value15) {
   try {
-    return String(_0x101312?.getData?.(_0x239eab) || '').trim();
+    return String(value14?.getData?.(value15) || '').trim();
   } catch {
     return '';
   }
 }
-function normalizeWebImagePayload(_0x5e0c03 = {}) {
-  const _0x1e94d6 = normalizeHttpDropUrl(_0x5e0c03?.url);
-  if (!_0x1e94d6) return null;
-  const _0x1e5c66 = normalizeHttpDropUrl(
-    _0x5e0c03?.pageUrl || _0x5e0c03?.sourceUrl || _0x5e0c03?.webPageUrl || '',
+function normalizeWebImagePayload(response = {}) {
+  const url = normalizeHttpDropUrl(response?.url);
+  if (!url) return null;
+  const pageUrl2 = normalizeHttpDropUrl(
+    response?.pageUrl || response?.sourceUrl || response?.webPageUrl || '',
   );
   return {
     kind: 'image',
-    url: _0x1e94d6,
-    title: String(_0x5e0c03?.title || _0x5e0c03?.alt || '')
+    url: url,
+    title: String(response?.title || response?.alt || '')
       .trim()
       .slice(0, 160),
-    pageUrl: _0x1e5c66,
-    sourceUrl: _0x1e5c66,
-    nodeId: String(_0x5e0c03?.nodeId || '').trim(),
-    tabId: String(_0x5e0c03?.tabId || '').trim(),
-    ...normalizeWebImagePayloadSize(_0x5e0c03),
+    pageUrl: pageUrl2,
+    sourceUrl: pageUrl2,
+    nodeId: String(response?.nodeId || '').trim(),
+    tabId: String(response?.tabId || '').trim(),
+    ...normalizeWebImagePayloadSize(response),
   };
 }
-function normalizeWebVideoPayload(_0x63698d = {}) {
-  const _0x3a399f = normalizeHttpDropUrl(_0x63698d?.url);
-  if (!_0x3a399f) return null;
-  const _0x284833 = String(_0x63698d?.mimeType || '').trim(),
-    _0x3e366d = String(_0x63698d?.sourceType || '')
+function normalizeWebVideoPayload(rightsConfirmed = {}) {
+  const url2 = normalizeHttpDropUrl(rightsConfirmed?.url);
+  if (!url2) return null;
+  const mimeType = String(rightsConfirmed?.mimeType || '').trim(),
+    sourceType = String(rightsConfirmed?.sourceType || '')
       .trim()
       .toLowerCase();
   try {
-    const _0x3359cf = new URL(_0x3a399f).pathname;
-    if (STREAM_MEDIA_URL_EXTENSION_RE.test(_0x3359cf)) return null;
-    const _0x28b8c9 =
-      _0x284833.toLowerCase().startsWith('video/') ||
-      VIDEO_URL_EXTENSION_RE.test(_0x3359cf) ||
-      WEB_VIDEO_TRUSTED_SOURCE_TYPES.has(_0x3e366d);
-    if (!_0x28b8c9) return null;
+    const uRL2 = new URL(url2).pathname;
+    if (STREAM_MEDIA_URL_EXTENSION_RE.test(uRL2)) return null;
+    const enabled4 =
+      mimeType.toLowerCase().startsWith('video/') ||
+      VIDEO_URL_EXTENSION_RE.test(uRL2) ||
+      WEB_VIDEO_TRUSTED_SOURCE_TYPES.has(sourceType);
+    if (!enabled4) return null;
   } catch {
     return null;
   }
-  const _0x3ef61a = normalizeHttpDropUrl(
-    _0x63698d?.pageUrl || _0x63698d?.sourceUrl || _0x63698d?.webPageUrl || '',
+  const pageUrl3 = normalizeHttpDropUrl(
+    rightsConfirmed?.pageUrl || rightsConfirmed?.sourceUrl || rightsConfirmed?.webPageUrl || '',
   );
   return {
     kind: 'video',
-    url: _0x3a399f,
-    title: String(_0x63698d?.title || '')
+    url: url2,
+    title: String(rightsConfirmed?.title || '')
       .trim()
       .slice(0, 160),
-    pageUrl: _0x3ef61a,
-    sourceUrl: _0x3ef61a,
-    nodeId: String(_0x63698d?.nodeId || '').trim(),
-    tabId: String(_0x63698d?.tabId || '').trim(),
-    width: Math.max(0, Math.round(Number(_0x63698d?.width || 0) || 0)),
-    height: Math.max(0, Math.round(Number(_0x63698d?.height || 0) || 0)),
-    duration: Math.max(0, Number(_0x63698d?.duration || 0) || 0),
-    mimeType: _0x284833,
-    sourceType: _0x3e366d,
-    rightsConfirmed: _0x63698d?.rightsConfirmed === true,
+    pageUrl: pageUrl3,
+    sourceUrl: pageUrl3,
+    nodeId: String(rightsConfirmed?.nodeId || '').trim(),
+    tabId: String(rightsConfirmed?.tabId || '').trim(),
+    width: Math.max(0, Math.round(Number(rightsConfirmed?.width || 0) || 0)),
+    height: Math.max(0, Math.round(Number(rightsConfirmed?.height || 0) || 0)),
+    duration: Math.max(0, Number(rightsConfirmed?.duration || 0) || 0),
+    mimeType: mimeType,
+    sourceType: sourceType,
+    rightsConfirmed: rightsConfirmed?.rightsConfirmed === true,
   };
 }
-function parseWebPreviewImagePayload(_0x37da6c) {
+function parseWebPreviewImagePayload(value16) {
   try {
-    const _0x1b3585 = JSON.parse(String(_0x37da6c || ''));
-    if (_0x1b3585?.kind !== 'image') return null;
-    return normalizeWebImagePayload(_0x1b3585);
+    const value17 = JSON.parse(String(value16 || ''));
+    if (value17?.kind !== 'image') return null;
+    return normalizeWebImagePayload(value17);
   } catch {
     return null;
   }
 }
-function extractFirstUriListUrl(_0x167878) {
+function extractFirstUriListUrl(value18) {
   return (
-    String(_0x167878 || '')
+    String(value18 || '')
       .split(/\r?\n/)
-      .map((_0x490b4a) => _0x490b4a.trim())
-      .find((_0x4c61f6) => _0x4c61f6 && !_0x4c61f6.startsWith('#')) || ''
+      .map((item3) => item3.trim())
+      .find((enabled5) => enabled5 && !enabled5.startsWith('#')) || ''
   );
 }
-function decodeHtmlAttribute(_0x55e51b) {
-  return String(_0x55e51b || '')
+function decodeHtmlAttribute(value19) {
+  return String(value19 || '')
     .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
 }
-function extractImageUrlFromHtml(_0x316568) {
-  const _0x41d45b = String(_0x316568 || ''),
-    _0x1cc8d7 = _0x41d45b.match(/<img\b[^>]*\bsrc\s*=\s*(["'])(?<src>.*?)\1/i);
-  return normalizeHttpDropUrl(decodeHtmlAttribute(_0x1cc8d7?.groups?.src || ''));
+function extractImageUrlFromHtml(value20) {
+  const value21 = String(value20 || ''),
+    value22 = value21.match(/<img\b[^>]*\bsrc\s*=\s*(["'])(?<src>.*?)\1/i);
+  return normalizeHttpDropUrl(decodeHtmlAttribute(value22?.groups?.src || ''));
 }
-function looksLikeImageUrl(_0x362ef5) {
-  const _0x2d80f3 = normalizeHttpDropUrl(_0x362ef5);
-  if (!_0x2d80f3) return '';
+function looksLikeImageUrl(value23) {
+  const httpDropUrl = normalizeHttpDropUrl(value23);
+  if (!httpDropUrl) return '';
   try {
-    const _0x3525de = new URL(_0x2d80f3);
-    if (IMAGE_URL_EXTENSION_RE.test(_0x3525de.pathname)) return _0x2d80f3;
-    const _0x40319a = _0x3525de.searchParams.get('format') || _0x3525de.searchParams.get('type') || '';
-    return /^(?:png|jpe?g|webp|gif|bmp|svg|avif)$/i.test(_0x40319a) ? _0x2d80f3 : '';
+    const uRL3 = new URL(httpDropUrl);
+    if (IMAGE_URL_EXTENSION_RE.test(uRL3.pathname)) return httpDropUrl;
+    const value24 = uRL3.searchParams.get('format') || uRL3.searchParams.get('type') || '';
+    return /^(?:png|jpe?g|webp|gif|bmp|svg|avif)$/i.test(value24) ? httpDropUrl : '';
   } catch {
     return '';
   }
 }
-export function extractWebImageDropUrl(_0x290922) {
-  return extractWebImageDropPayload(_0x290922)?.url || '';
+export function extractWebImageDropUrl(value25) {
+  return extractWebImageDropPayload(value25)?.url || '';
 }
-export function extractWebImageDropPayload(_0x552c85) {
-  const _0x3f583c = parseWebPreviewImagePayload(readDataTransferText(_0x552c85, WEB_PREVIEW_IMAGE_DROP_MIME));
-  if (_0x3f583c) return _0x3f583c;
-  const _0x78141 = extractImageUrlFromHtml(readDataTransferText(_0x552c85, 'text/html'));
-  if (_0x78141) return normalizeWebImagePayload({ url: _0x78141 });
-  const _0x25ad96 = looksLikeImageUrl(
-    extractFirstUriListUrl(readDataTransferText(_0x552c85, 'text/uri-list')),
+export function extractWebImageDropPayload(value26) {
+  const webPreviewImagePayload = parseWebPreviewImagePayload(
+    readDataTransferText(value26, WEB_PREVIEW_IMAGE_DROP_MIME),
   );
-  if (_0x25ad96) return normalizeWebImagePayload({ url: _0x25ad96 });
-  const _0x112c05 = looksLikeImageUrl(readDataTransferText(_0x552c85, 'text/plain'));
-  return _0x112c05 ? normalizeWebImagePayload({ url: _0x112c05 }) : null;
+  if (webPreviewImagePayload) return webPreviewImagePayload;
+  const url3 = extractImageUrlFromHtml(readDataTransferText(value26, 'text/html'));
+  if (url3) return normalizeWebImagePayload({ url: url3 });
+  const url4 = looksLikeImageUrl(extractFirstUriListUrl(readDataTransferText(value26, 'text/uri-list')));
+  if (url4) return normalizeWebImagePayload({ url: url4 });
+  const url5 = looksLikeImageUrl(readDataTransferText(value26, 'text/plain'));
+  return url5 ? normalizeWebImagePayload({ url: url5 }) : null;
 }
-function getRemoteImageFileName(_0x61f3c2) {
+function getRemoteImageFileName(value27) {
   try {
-    const _0x619b4f = new URL(_0x61f3c2),
-      _0x255efb = decodeURIComponent(_0x619b4f.pathname.split('/').filter(Boolean).pop() || '');
-    return _0x255efb || t('fileService.defaultNames.webImage');
+    const uRL4 = new URL(value27),
+      decodeURIComponent2 = decodeURIComponent(uRL4.pathname.split('/').filter(Boolean).pop() || '');
+    return decodeURIComponent2 || t('fileService.defaultNames.webImage');
   } catch {
     return t('fileService.defaultNames.webImage');
   }
 }
-function getRemoteVideoFileName(_0x1600ae) {
+function getRemoteVideoFileName(value28) {
   try {
-    const _0x445fdd = new URL(_0x1600ae),
-      _0x32087c = decodeURIComponent(_0x445fdd.pathname.split('/').filter(Boolean).pop() || '');
-    if (_0x32087c && !STREAM_MEDIA_URL_EXTENSION_RE.test(_0x32087c)) return _0x32087c;
+    const uRL5 = new URL(value28),
+      decodeURIComponent3 = decodeURIComponent(uRL5.pathname.split('/').filter(Boolean).pop() || '');
+    if (decodeURIComponent3 && !STREAM_MEDIA_URL_EXTENSION_RE.test(decodeURIComponent3))
+      return decodeURIComponent3;
     return t('fileService.defaultNames.webVideo');
   } catch {
     return t('fileService.defaultNames.webVideo');
   }
 }
 export function buildWebImageDropNodePayload({
-  url: _0x56294e,
+  url: url6,
   title: title = '',
   pageUrl: pageUrl = '',
-  nodeId: _0x8d2015,
-  worldX: _0x51abee,
-  worldY: _0x483bc,
+  nodeId: nodeId,
+  worldX: worldX,
+  worldY: worldY,
   width: width = 0,
   height: height = 0,
 } = {}) {
-  const _0x5b3c0b = normalizeHttpDropUrl(_0x56294e);
-  if (!_0x5b3c0b) return null;
-  const _0x1e25a4 = getRemoteImageFileName(_0x5b3c0b),
-    _0x27f402 = normalizeHttpDropUrl(pageUrl),
-    _0x3fa7e2 = String(title || '')
+  const capturePreviewUrl = normalizeHttpDropUrl(url6);
+  if (!capturePreviewUrl) return null;
+  const fileName = getRemoteImageFileName(capturePreviewUrl),
+    webPageUrl = normalizeHttpDropUrl(pageUrl),
+    webSourceTitle = String(title || '')
       .trim()
       .slice(0, 160),
-    _0x429fc5 = toPositiveMediaDimension(width),
-    _0x2a2e47 = toPositiveMediaDimension(height),
-    _0x4f0269 = _0x429fc5 > 0 && _0x2a2e47 > 0;
+    naturalWidth = toPositiveMediaDimension(width),
+    naturalHeight = toPositiveMediaDimension(height),
+    value29 = naturalWidth > 0 && naturalHeight > 0;
   return buildSourceMediaNodePayload({
-    id: _0x8d2015 || generateNodeId('source-image'),
+    id: nodeId || generateNodeId('source-image'),
     type: 'source-image',
-    x: _0x51abee,
-    y: _0x483bc,
-    naturalWidth: _0x429fc5,
-    naturalHeight: _0x2a2e47,
-    ...(_0x4f0269 ? { imageWidth: _0x429fc5, imageHeight: _0x2a2e47 } : {}),
-    capturePreviewUrl: _0x5b3c0b,
-    webSourceUrl: _0x5b3c0b,
-    webPageUrl: _0x27f402,
-    webSourceTitle: _0x3fa7e2,
-    fileName: _0x1e25a4,
-    name: _0x3fa7e2 || getBaseName(_0x1e25a4) || t('fileService.defaultNames.webImage'),
+    x: worldX,
+    y: worldY,
+    naturalWidth: naturalWidth,
+    naturalHeight: naturalHeight,
+    ...(value29 ? { imageWidth: naturalWidth, imageHeight: naturalHeight } : {}),
+    capturePreviewUrl: capturePreviewUrl,
+    webSourceUrl: capturePreviewUrl,
+    webPageUrl: webPageUrl,
+    webSourceTitle: webSourceTitle,
+    fileName: fileName,
+    name: webSourceTitle || getBaseName(fileName) || t('fileService.defaultNames.webImage'),
     needsAutoResize: true,
     isGenerating: true,
     jobStatus: 'running',
@@ -454,65 +443,61 @@ export function buildWebImageDropNodePayload({
     generationDuration: null,
   });
 }
-function buildRemoteImageImportPatch(_0x257fa1 = {}, _0x30ec60 = {}) {
-  const _0x6a1d4f = buildImageNodeStorageFields(_0x257fa1),
-    _0x35f59e = localPathToUrl(
-      _0x6a1d4f.displayLocalPath || _0x6a1d4f.originalLocalPath || _0x6a1d4f.localPath,
-    ),
-    _0x5980eb = localPathToUrl(
-      _0x6a1d4f.originalLocalPath || _0x6a1d4f.localPath || _0x6a1d4f.displayLocalPath,
-    ),
-    _0x3f7352 = localPathToUrl(_0x6a1d4f.thumbLocalPath);
+function buildRemoteImageImportPatch(assetId2 = {}, value30 = {}) {
+  const args2 = buildImageNodeStorageFields(assetId2),
+    src = localPathToUrl(args2.displayLocalPath || args2.originalLocalPath || args2.localPath),
+    sourceUrl = localPathToUrl(args2.originalLocalPath || args2.localPath || args2.displayLocalPath),
+    thumbUrl = localPathToUrl(args2.thumbLocalPath);
   return {
-    assetId: _0x257fa1?.assetId || '',
-    derivativeStatus: _0x257fa1?.derivativeStatus || _0x257fa1?.status || '',
-    ..._0x6a1d4f,
-    src: _0x35f59e || _0x5980eb || '',
-    imageUrl: _0x35f59e || _0x5980eb || '',
-    sourceUrl: _0x5980eb || _0x35f59e || '',
-    thumbUrl: _0x3f7352,
+    assetId: assetId2?.assetId || '',
+    derivativeStatus: assetId2?.derivativeStatus || assetId2?.status || '',
+    ...args2,
+    src: src || sourceUrl || '',
+    imageUrl: src || sourceUrl || '',
+    sourceUrl: sourceUrl || src || '',
+    thumbUrl: thumbUrl,
     isGenerating: false,
     jobStatus: null,
     jobError: null,
-    generationDuration: Date.now() - Number(_0x30ec60?.generationStartTime || Date.now()),
+    generationDuration: Date.now() - Number(value30?.generationStartTime || Date.now()),
     capturePreviewUrl: '',
   };
 }
 export function buildWebVideoSourceNodePayload({
-  url: _0x544607,
+  url: url7,
   title: title = '',
   pageUrl: pageUrl = '',
-  nodeId: _0x8f960e,
-  worldX: _0x117741,
-  worldY: _0x58930b,
+  nodeId: nodeId2,
+  worldX: worldX2,
+  worldY: worldY2,
   width: width = 0,
   height: height = 0,
   duration: duration = 0,
 } = {}) {
-  const _0x6599e = normalizeHttpDropUrl(_0x544607);
-  if (!_0x6599e) return null;
+  const webSourceUrl = normalizeHttpDropUrl(url7);
+  if (!webSourceUrl) return null;
   try {
-    if (STREAM_MEDIA_URL_EXTENSION_RE.test(new URL(_0x6599e).pathname)) return null;
+    if (STREAM_MEDIA_URL_EXTENSION_RE.test(new URL(webSourceUrl).pathname)) return null;
   } catch {
     return null;
   }
-  const _0x4cb3ce = getRemoteVideoFileName(_0x6599e),
-    _0x5c6646 = normalizeHttpDropUrl(pageUrl),
-    _0x3aeef7 = String(title || '')
+  const fileName2 = getRemoteVideoFileName(webSourceUrl),
+    webPageUrl2 = normalizeHttpDropUrl(pageUrl),
+    webSourceTitle2 = String(title || '')
       .trim()
       .slice(0, 160);
   return buildSourceMediaNodePayload({
-    id: _0x8f960e || generateNodeId('source-video'),
+    id: nodeId2 || generateNodeId('source-video'),
     type: 'source-video',
-    x: _0x117741,
-    y: _0x58930b,
-    webSourceUrl: _0x6599e,
-    webPageUrl: _0x5c6646,
-    webSourceTitle: _0x3aeef7,
+    x: worldX2,
+    y: worldY2,
+    webSourceUrl: webSourceUrl,
+    webPageUrl: webPageUrl2,
+    webSourceTitle: webSourceTitle2,
     webMediaKind: 'video',
     webRightsConfirmed: true,
-    fileName: _0x4cb3ce,
-    name: _0x3aeef7 || getBaseName(_0x4cb3ce) || t('fileService.defaultNames.webVideo'),
+    fileName: fileName2,
+    name: webSourceTitle2 || getBaseName(fileName2) || t('fileService.defaultNames.webVideo'),
     naturalWidth: width,
     naturalHeight: height,
     videoWidth: Number(width || 0) || 0,
@@ -526,62 +511,62 @@ export function buildWebVideoSourceNodePayload({
     generationDuration: null,
   });
 }
-function buildRemoteVideoImportPatch(_0x26aa32 = {}, _0x4b6f37 = {}) {
-  const _0x456a48 = _0x26aa32?.localPath || _0x26aa32?.originalLocalPath || '',
-    _0x3e3099 = _0x26aa32?.displayLocalPath || '',
-    _0x24ed05 = _0x3e3099 || _0x456a48,
-    _0x4830c1 = localPathToUrl(_0x24ed05),
-    _0x344a4b = localPathToUrl(_0x456a48 || _0x3e3099),
-    _0x266c29 = _0x26aa32?.posterLocalPath || _0x26aa32?.thumbLocalPath || '',
-    _0x115d9b = _0x26aa32?.posterUrl || _0x26aa32?.thumbUrl || localPathToUrl(_0x266c29),
-    _0x4495c4 = String(_0x26aa32?.mediaTaskStatus || '').trim(),
-    _0x30f1ae = String(_0x26aa32?.videoProxyStatus || '').trim(),
-    _0x56609c = _0x4495c4 === 'waiting' || _0x4495c4 === 'processing' || _0x30f1ae === 'processing';
+function buildRemoteVideoImportPatch(assetId3 = {}, value31 = {}) {
+  const localPath2 = assetId3?.localPath || assetId3?.originalLocalPath || '',
+    displayLocalPath = assetId3?.displayLocalPath || '',
+    value32 = displayLocalPath || localPath2,
+    url8 = localPathToUrl(value32),
+    sourceUrl2 = localPathToUrl(localPath2 || displayLocalPath),
+    thumbLocalPath = assetId3?.posterLocalPath || assetId3?.thumbLocalPath || '',
+    thumbUrl2 = assetId3?.posterUrl || assetId3?.thumbUrl || localPathToUrl(thumbLocalPath),
+    mediaTaskStatus = String(assetId3?.mediaTaskStatus || '').trim(),
+    videoProxyStatus = String(assetId3?.videoProxyStatus || '').trim(),
+    isGenerating =
+      mediaTaskStatus === 'waiting' || mediaTaskStatus === 'processing' || videoProxyStatus === 'processing';
   return {
-    assetId: _0x26aa32?.assetId || '',
-    localPath: _0x456a48,
-    originalLocalPath: _0x26aa32?.originalLocalPath || _0x456a48,
-    displayLocalPath: _0x3e3099,
-    posterLocalPath: _0x26aa32?.posterLocalPath || '',
-    thumbLocalPath: _0x266c29,
-    derivativeStatus: _0x26aa32?.derivativeStatus || _0x26aa32?.status || '',
-    mediaTaskId: _0x26aa32?.mediaTaskId || '',
-    mediaTaskKind: _0x26aa32?.mediaTaskKind || '',
-    mediaTaskStatus: _0x4495c4,
-    mediaTaskProgress: Number(_0x26aa32?.mediaTaskProgress || 0) || 0,
-    mediaTaskError: _0x26aa32?.mediaTaskError || '',
-    videoProxyStatus: _0x30f1ae,
-    videoCodec: _0x26aa32?.videoCodec || '',
-    videoDuration: Number(_0x26aa32?.videoDuration || 0) || Number(_0x4b6f37?.videoDuration || 0) || 0,
-    videoFps: Number(_0x26aa32?.videoFps || 0) || 0,
-    videoWidth:
-      Number(_0x26aa32?.videoWidth || _0x26aa32?.width || 0) || Number(_0x4b6f37?.videoWidth || 0) || 0,
+    assetId: assetId3?.assetId || '',
+    localPath: localPath2,
+    originalLocalPath: assetId3?.originalLocalPath || localPath2,
+    displayLocalPath: displayLocalPath,
+    posterLocalPath: assetId3?.posterLocalPath || '',
+    thumbLocalPath: thumbLocalPath,
+    derivativeStatus: assetId3?.derivativeStatus || assetId3?.status || '',
+    mediaTaskId: assetId3?.mediaTaskId || '',
+    mediaTaskKind: assetId3?.mediaTaskKind || '',
+    mediaTaskStatus: mediaTaskStatus,
+    mediaTaskProgress: Number(assetId3?.mediaTaskProgress || 0) || 0,
+    mediaTaskError: assetId3?.mediaTaskError || '',
+    videoProxyStatus: videoProxyStatus,
+    videoCodec: assetId3?.videoCodec || '',
+    videoDuration: Number(assetId3?.videoDuration || 0) || Number(value31?.videoDuration || 0) || 0,
+    videoFps: Number(assetId3?.videoFps || 0) || 0,
+    videoWidth: Number(assetId3?.videoWidth || assetId3?.width || 0) || Number(value31?.videoWidth || 0) || 0,
     videoHeight:
-      Number(_0x26aa32?.videoHeight || _0x26aa32?.height || 0) || Number(_0x4b6f37?.videoHeight || 0) || 0,
-    src: _0x30f1ae === 'processing' ? '' : _0x4830c1 || _0x344a4b || '',
-    videoUrl: _0x30f1ae === 'processing' ? '' : _0x4830c1 || _0x344a4b || '',
-    sourceUrl: _0x344a4b || _0x4830c1 || '',
-    thumbUrl: _0x115d9b,
-    isGenerating: _0x56609c,
-    jobStatus: _0x56609c ? 'running' : null,
+      Number(assetId3?.videoHeight || assetId3?.height || 0) || Number(value31?.videoHeight || 0) || 0,
+    src: videoProxyStatus === 'processing' ? '' : url8 || sourceUrl2 || '',
+    videoUrl: videoProxyStatus === 'processing' ? '' : url8 || sourceUrl2 || '',
+    sourceUrl: sourceUrl2 || url8 || '',
+    thumbUrl: thumbUrl2,
+    isGenerating: isGenerating,
+    jobStatus: isGenerating ? 'running' : null,
     jobError: null,
-    generationDuration: Date.now() - Number(_0x4b6f37?.generationStartTime || Date.now()),
+    generationDuration: Date.now() - Number(value31?.generationStartTime || Date.now()),
     capturePreviewUrl: '',
   };
 }
 function getRemoteImportApi() {
-  const _0x13aef9 = globalThis.window?.electronAPI?.importRemoteAsset;
-  return typeof _0x13aef9 === 'function' ? _0x13aef9 : null;
+  const value33 = globalThis.window?.electronAPI?.importRemoteAsset;
+  return typeof value33 === 'function' ? value33 : null;
 }
 function pumpWebImageRemoteImportQueue() {
   while (
     _webImageRemoteImportActive < WEB_IMAGE_REMOTE_IMPORT_CONCURRENCY &&
     _webImageRemoteImportQueue.length > 0
   ) {
-    const _0x3e2496 = _webImageRemoteImportQueue.shift();
+    const value34 = _webImageRemoteImportQueue.shift();
     ((_webImageRemoteImportActive += 1),
       Promise.resolve()
-        .then(_0x3e2496)
+        .then(value34)
         .catch(() => {})
         .finally(() => {
           ((_webImageRemoteImportActive = Math.max(0, _webImageRemoteImportActive - 1)),
@@ -589,140 +574,134 @@ function pumpWebImageRemoteImportQueue() {
         }));
   }
 }
-function enqueueWebImageRemoteImport(_0x192f6a) {
-  if (typeof _0x192f6a !== 'function') return;
-  (_webImageRemoteImportQueue.push(_0x192f6a), pumpWebImageRemoteImportQueue());
+function enqueueWebImageRemoteImport(value35) {
+  if (typeof value35 !== 'function') return;
+  (_webImageRemoteImportQueue.push(value35), pumpWebImageRemoteImportQueue());
 }
-function buildWebImageRemoteImportFallbackPatch(_0x3a4b14, _0x4ba181 = {}) {
+function buildWebImageRemoteImportFallbackPatch(value36, value37 = {}) {
   return {
     isGenerating: false,
     jobStatus: null,
     jobError: null,
     webImportStatus: 'failed',
-    webImportError: String(_0x3a4b14 || t('fileService.errors.remoteImageImportFailed')),
-    generationDuration: Date.now() - Number(_0x4ba181?.generationStartTime || Date.now()),
+    webImportError: String(value36 || t('fileService.errors.remoteImageImportFailed')),
+    generationDuration: Date.now() - Number(value37?.generationStartTime || Date.now()),
   };
 }
-export function scheduleWebImageRemoteImport(_0x389d97, _0x585a3f = {}, _0x4924b7 = {}) {
-  const _0xa56166 = normalizeWebImagePayload(_0x585a3f);
-  if (!_0x389d97 || !_0xa56166) return false;
-  const _0x5abbf4 = _0x4924b7.storeInstance || appStore,
-    _0x37e46b = _0x4924b7.projectId || globalThis.window?.currentProjectId || 'default_v2_project',
-    _0x51479a = _0x4924b7.importRemoteAsset || getRemoteImportApi(),
-    _0x47c065 = (_0x280ee4) => {
-      const _0x53ee53 =
-        _0x5abbf4.getState?.()?.nodes?.[_0x389d97] || _0x5abbf4.getStateRaw?.()?.nodes?.[_0x389d97];
-      if (!_0x53ee53) return;
-      const _0x15ef2b = normalizeHttpDropUrl(_0x53ee53.capturePreviewUrl),
-        _0x22ccea = normalizeHttpDropUrl(_0x53ee53.webSourceUrl);
-      if (_0x15ef2b === _0xa56166.url || _0x22ccea === _0xa56166.url) {
-        _0x5abbf4.updateNodeData?.(_0x389d97, buildWebImageRemoteImportFallbackPatch(_0x280ee4, _0x53ee53));
+export function scheduleWebImageRemoteImport(enabled6, value38 = {}, value39 = {}) {
+  const url9 = normalizeWebImagePayload(value38);
+  if (!enabled6 || !url9) return false;
+  const store = value39.storeInstance || appStore,
+    projectId = value39.projectId || globalThis.window?.currentProjectId || 'default_v2_project',
+    handler = value39.importRemoteAsset || getRemoteImportApi(),
+    handler2 = (value40) => {
+      const enabled7 = store.getState?.()?.nodes?.[enabled6] || store.getStateRaw?.()?.nodes?.[enabled6];
+      if (!enabled7) return;
+      const httpDropUrl2 = normalizeHttpDropUrl(enabled7.capturePreviewUrl),
+        httpDropUrl3 = normalizeHttpDropUrl(enabled7.webSourceUrl);
+      if (httpDropUrl2 === url9.url || httpDropUrl3 === url9.url) {
+        store.updateNodeData?.(enabled6, buildWebImageRemoteImportFallbackPatch(value40, enabled7));
         return;
       }
-      _0x5abbf4.updateNodeData?.(_0x389d97, {
+      store.updateNodeData?.(enabled6, {
         isGenerating: false,
         jobStatus: 'error',
-        jobError: String(_0x280ee4 || t('fileService.errors.remoteImageImportFailed')),
-        generationDuration: Date.now() - Number(_0x53ee53.generationStartTime || Date.now()),
+        jobError: String(value40 || t('fileService.errors.remoteImageImportFailed')),
+        generationDuration: Date.now() - Number(enabled7.generationStartTime || Date.now()),
       });
     };
   return (
     enqueueWebImageRemoteImport(async () => {
-      const _0x3e3966 =
-        _0x5abbf4.getState?.()?.nodes?.[_0x389d97] || _0x5abbf4.getStateRaw?.()?.nodes?.[_0x389d97];
-      if (!_0x3e3966) return;
-      if (typeof _0x51479a !== 'function') {
-        _0x47c065(t('fileService.errors.remoteImportUnsupported'));
+      const enabled8 = store.getState?.()?.nodes?.[enabled6] || store.getStateRaw?.()?.nodes?.[enabled6];
+      if (!enabled8) return;
+      if (typeof handler !== 'function') {
+        handler2(t('fileService.errors.remoteImportUnsupported'));
         return;
       }
       try {
-        const _0x254a58 = await _0x51479a({
-            url: _0xa56166.url,
-            pageUrl: _0xa56166.pageUrl,
-            referrer: _0xa56166.pageUrl,
-            title: _0xa56166.title,
-            name: getRemoteImageFileName(_0xa56166.url),
-            projectId: _0x37e46b,
-            nodeId: _0xa56166.nodeId,
-            tabId: _0xa56166.tabId,
+        const value41 = await handler({
+            url: url9.url,
+            pageUrl: url9.pageUrl,
+            referrer: url9.pageUrl,
+            title: url9.title,
+            name: getRemoteImageFileName(url9.url),
+            projectId: projectId,
+            nodeId: url9.nodeId,
+            tabId: url9.tabId,
           }),
-          _0x21996c =
-            _0x5abbf4.getState?.()?.nodes?.[_0x389d97] || _0x5abbf4.getStateRaw?.()?.nodes?.[_0x389d97];
-        if (!_0x21996c) return;
-        _0x5abbf4.updateNodeData?.(_0x389d97, buildRemoteImageImportPatch(_0x254a58, _0x21996c));
-      } catch (_0x27c507) {
-        const _0x5365a0 = _toOneLineMessage(_0x27c507);
-        (_0x47c065(_0x5365a0 || t('fileService.errors.remoteImageImportFailed')),
+          enabled9 = store.getState?.()?.nodes?.[enabled6] || store.getStateRaw?.()?.nodes?.[enabled6];
+        if (!enabled9) return;
+        store.updateNodeData?.(enabled6, buildRemoteImageImportPatch(value41, enabled9));
+      } catch (error3) {
+        const message = _toOneLineMessage(error3);
+        (handler2(message || t('fileService.errors.remoteImageImportFailed')),
           void logDiagnosticEvent({
             type: 'import.web_image_failed',
             level: 'warn',
             source: 'renderer',
-            message: _0x5365a0 || t('fileService.errors.remoteImageImportFailed'),
-            error: _0x27c507,
-            context: { url: _0xa56166.url, pageUrl: _0xa56166.pageUrl, projectId: _0x37e46b },
+            message: message || t('fileService.errors.remoteImageImportFailed'),
+            error: error3,
+            context: { url: url9.url, pageUrl: url9.pageUrl, projectId: projectId },
           }));
       }
     }),
     true
   );
 }
-export function scheduleWebVideoRemoteImport(_0x2aba1b, _0x12d031 = {}, _0x11c4fd = {}) {
-  const _0x43f493 = normalizeWebVideoPayload(_0x12d031);
-  if (!_0x2aba1b || !_0x43f493) return false;
-  const _0x1aa296 = _0x11c4fd.storeInstance || appStore,
-    _0x3bbe26 = _0x11c4fd.projectId || globalThis.window?.currentProjectId || 'default_v2_project',
-    _0x69831e = _0x11c4fd.importRemoteAsset || getRemoteImportApi(),
-    _0x3d0b76 = (_0x54a53d) => {
-      const _0x445d41 =
-        _0x1aa296.getState?.()?.nodes?.[_0x2aba1b] || _0x1aa296.getStateRaw?.()?.nodes?.[_0x2aba1b];
-      if (!_0x445d41) return;
-      _0x1aa296.updateNodeData?.(_0x2aba1b, {
+export function scheduleWebVideoRemoteImport(enabled10, value42 = {}, value43 = {}) {
+  const url10 = normalizeWebVideoPayload(value42);
+  if (!enabled10 || !url10) return false;
+  const store2 = value43.storeInstance || appStore,
+    projectId2 = value43.projectId || globalThis.window?.currentProjectId || 'default_v2_project',
+    handler3 = value43.importRemoteAsset || getRemoteImportApi(),
+    handler4 = (value44) => {
+      const enabled11 = store2.getState?.()?.nodes?.[enabled10] || store2.getStateRaw?.()?.nodes?.[enabled10];
+      if (!enabled11) return;
+      store2.updateNodeData?.(enabled10, {
         isGenerating: false,
         jobStatus: 'error',
-        jobError: String(_0x54a53d || t('fileService.errors.remoteVideoImportFailed')),
-        generationDuration: Date.now() - Number(_0x445d41.generationStartTime || Date.now()),
+        jobError: String(value44 || t('fileService.errors.remoteVideoImportFailed')),
+        generationDuration: Date.now() - Number(enabled11.generationStartTime || Date.now()),
       });
     };
   return (
     enqueueWebImageRemoteImport(async () => {
-      const _0x17de41 =
-        _0x1aa296.getState?.()?.nodes?.[_0x2aba1b] || _0x1aa296.getStateRaw?.()?.nodes?.[_0x2aba1b];
-      if (!_0x17de41) return;
-      if (typeof _0x69831e !== 'function') {
-        _0x3d0b76(t('fileService.errors.remoteImportUnsupported'));
+      const enabled12 = store2.getState?.()?.nodes?.[enabled10] || store2.getStateRaw?.()?.nodes?.[enabled10];
+      if (!enabled12) return;
+      if (typeof handler3 !== 'function') {
+        handler4(t('fileService.errors.remoteImportUnsupported'));
         return;
       }
-      if (_0x43f493.rightsConfirmed !== true) {
-        _0x3d0b76(t('fileService.errors.webVideoRightsRequired'));
+      if (url10.rightsConfirmed !== true) {
+        handler4(t('fileService.errors.webVideoRightsRequired'));
         return;
       }
       try {
-        const _0x5ae24a = await _0x69831e({
+        const value45 = await handler3({
             kind: 'video',
-            url: _0x43f493.url,
-            pageUrl: _0x43f493.pageUrl,
-            referrer: _0x43f493.pageUrl,
-            title: _0x43f493.title,
-            name: getRemoteVideoFileName(_0x43f493.url),
-            type: _0x43f493.mimeType,
-            projectId: _0x3bbe26,
-            nodeId: _0x43f493.nodeId,
-            tabId: _0x43f493.tabId,
+            url: url10.url,
+            pageUrl: url10.pageUrl,
+            referrer: url10.pageUrl,
+            title: url10.title,
+            name: getRemoteVideoFileName(url10.url),
+            type: url10.mimeType,
+            projectId: projectId2,
+            nodeId: url10.nodeId,
+            tabId: url10.tabId,
           }),
-          _0x5924de =
-            _0x1aa296.getState?.()?.nodes?.[_0x2aba1b] || _0x1aa296.getStateRaw?.()?.nodes?.[_0x2aba1b];
-        if (!_0x5924de) return;
-        _0x1aa296.updateNodeData?.(_0x2aba1b, buildRemoteVideoImportPatch(_0x5ae24a, _0x5924de));
-      } catch (_0x364d7c) {
-        const _0x2578ce = _toOneLineMessage(_0x364d7c);
-        (_0x3d0b76(_0x2578ce || t('fileService.errors.remoteVideoImportFailed')),
+          enabled13 = store2.getState?.()?.nodes?.[enabled10] || store2.getStateRaw?.()?.nodes?.[enabled10];
+        if (!enabled13) return;
+        store2.updateNodeData?.(enabled10, buildRemoteVideoImportPatch(value45, enabled13));
+      } catch (error4) {
+        const message2 = _toOneLineMessage(error4);
+        (handler4(message2 || t('fileService.errors.remoteVideoImportFailed')),
           void logDiagnosticEvent({
             type: 'import.web_video_failed',
             level: 'warn',
             source: 'renderer',
-            message: _0x2578ce || t('fileService.errors.remoteVideoImportFailed'),
-            error: _0x364d7c,
-            context: { url: _0x43f493.url, pageUrl: _0x43f493.pageUrl, projectId: _0x3bbe26 },
+            message: message2 || t('fileService.errors.remoteVideoImportFailed'),
+            error: error4,
+            context: { url: url10.url, pageUrl: url10.pageUrl, projectId: projectId2 },
           }));
       }
     }),
@@ -730,730 +709,844 @@ export function scheduleWebVideoRemoteImport(_0x2aba1b, _0x12d031 = {}, _0x11c4f
   );
 }
 export function createWebImageSourceNode({
-  payload: _0x30efa7,
-  worldX: _0x32e90c,
-  worldY: _0x339c09,
+  payload: payload2,
+  worldX: worldX3,
+  worldY: worldY3,
   storeInstance: storeInstance = appStore,
-  projectId: _0x15572f,
+  projectId: projectId3,
   select: select = true,
   importRemote: importRemote = true,
-  importRemoteAsset: _0x18c042,
+  importRemoteAsset: importRemoteAsset,
 } = {}) {
-  const _0xc4318c = normalizeWebImagePayload(_0x30efa7);
-  if (!_0xc4318c) return null;
-  const _0x97012a = buildWebImageDropNodePayload({
-    url: _0xc4318c.url,
-    title: _0xc4318c.title,
-    pageUrl: _0xc4318c.pageUrl,
-    width: _0xc4318c.width,
-    height: _0xc4318c.height,
-    worldX: _0x32e90c,
-    worldY: _0x339c09,
+  const url11 = normalizeWebImagePayload(payload2);
+  if (!url11) return null;
+  const webImageDropNodePayload = buildWebImageDropNodePayload({
+    url: url11.url,
+    title: url11.title,
+    pageUrl: url11.pageUrl,
+    width: url11.width,
+    height: url11.height,
+    worldX: worldX3,
+    worldY: worldY3,
   });
-  if (!_0x97012a) return null;
-  storeInstance.addNode?.(_0x97012a);
-  if (select) storeInstance.setSelectedNodes?.([_0x97012a.id]);
+  if (!webImageDropNodePayload) return null;
+  storeInstance.addNode?.(webImageDropNodePayload);
+  if (select) storeInstance.setSelectedNodes?.([webImageDropNodePayload.id]);
   return (
     importRemote &&
-      scheduleWebImageRemoteImport(_0x97012a.id, _0xc4318c, {
+      scheduleWebImageRemoteImport(webImageDropNodePayload.id, url11, {
         storeInstance: storeInstance,
-        projectId: _0x15572f,
-        importRemoteAsset: _0x18c042,
+        projectId: projectId3,
+        importRemoteAsset: importRemoteAsset,
       }),
-    _0x97012a
+    webImageDropNodePayload
   );
 }
 export function createWebVideoSourceNode({
-  payload: _0x55f960,
-  worldX: _0x122d4d,
-  worldY: _0xa511ff,
+  payload: payload3,
+  worldX: worldX4,
+  worldY: worldY4,
   storeInstance: storeInstance = appStore,
-  projectId: _0xe88c6a,
+  projectId: projectId4,
   select: select = true,
   importRemote: importRemote = true,
-  importRemoteAsset: _0xf9757b,
+  importRemoteAsset: importRemoteAsset2,
 } = {}) {
-  const _0x38aa49 = normalizeWebVideoPayload(_0x55f960);
-  if (!_0x38aa49 || _0x38aa49.rightsConfirmed !== true) return null;
-  const _0x632a3d = buildWebVideoSourceNodePayload({
-    url: _0x38aa49.url,
-    title: _0x38aa49.title,
-    pageUrl: _0x38aa49.pageUrl,
-    width: _0x38aa49.width,
-    height: _0x38aa49.height,
-    duration: _0x38aa49.duration,
-    worldX: _0x122d4d,
-    worldY: _0xa511ff,
+  const url12 = normalizeWebVideoPayload(payload3);
+  if (!url12 || url12.rightsConfirmed !== true) return null;
+  const webVideoSourceNodePayload = buildWebVideoSourceNodePayload({
+    url: url12.url,
+    title: url12.title,
+    pageUrl: url12.pageUrl,
+    width: url12.width,
+    height: url12.height,
+    duration: url12.duration,
+    worldX: worldX4,
+    worldY: worldY4,
   });
-  if (!_0x632a3d) return null;
-  storeInstance.addNode?.(_0x632a3d);
-  if (select) storeInstance.setSelectedNodes?.([_0x632a3d.id]);
+  if (!webVideoSourceNodePayload) return null;
+  storeInstance.addNode?.(webVideoSourceNodePayload);
+  if (select) storeInstance.setSelectedNodes?.([webVideoSourceNodePayload.id]);
   return (
     importRemote &&
-      scheduleWebVideoRemoteImport(_0x632a3d.id, _0x38aa49, {
+      scheduleWebVideoRemoteImport(webVideoSourceNodePayload.id, url12, {
         storeInstance: storeInstance,
-        projectId: _0xe88c6a,
-        importRemoteAsset: _0xf9757b,
+        projectId: projectId4,
+        importRemoteAsset: importRemoteAsset2,
       }),
-    _0x632a3d
+    webVideoSourceNodePayload
   );
 }
-function createObjectUrlForFilePreview(_0x2f4c8a) {
-  const _0x40be2d = String(_0x2f4c8a?.type || '').trim();
-  if (!_0x40be2d.startsWith('image/') && !_0x40be2d.startsWith('video/')) return '';
-  const _0x3dbe74 = globalThis.window?.URL || globalThis.URL;
-  if (typeof _0x3dbe74?.createObjectURL !== 'function') return '';
+function createObjectUrlForFilePreview(value46) {
+  const enabled14 = String(value46?.type || '').trim();
+  if (!enabled14.startsWith('image/') && !enabled14.startsWith('video/')) return '';
+  const value47 = globalThis.window?.URL || globalThis.URL;
+  if (typeof value47?.createObjectURL !== 'function') return '';
   try {
-    return _0x3dbe74.createObjectURL(_0x2f4c8a);
+    return value47.createObjectURL(value46);
   } catch {
     return '';
   }
 }
-function revokeObjectUrl(_0x26e840) {
-  const _0x2e9b8a = String(_0x26e840 || '').trim();
-  if (!_0x2e9b8a.startsWith('blob:')) return;
-  const _0x1b33d5 = globalThis.window?.URL || globalThis.URL;
-  if (typeof _0x1b33d5?.revokeObjectURL !== 'function') return;
+function revokeObjectUrl(value48) {
+  const enabled15 = String(value48 || '').trim();
+  if (!enabled15.startsWith('blob:')) return;
+  const value49 = globalThis.window?.URL || globalThis.URL;
+  if (typeof value49?.revokeObjectURL !== 'function') return;
   try {
-    _0x1b33d5.revokeObjectURL(_0x2e9b8a);
+    value49.revokeObjectURL(enabled15);
   } catch {}
 }
-function scheduleRevokeObjectUrl(_0x4c6c61) {
-  const _0x39c748 = String(_0x4c6c61 || '').trim();
-  if (!_0x39c748.startsWith('blob:')) return;
-  const _0x1fa52e = globalThis.window?.setTimeout || globalThis.setTimeout;
-  if (typeof _0x1fa52e === 'function') {
-    _0x1fa52e(() => revokeObjectUrl(_0x39c748), 0);
+function scheduleRevokeObjectUrl(value50) {
+  const enabled16 = String(value50 || '').trim();
+  if (!enabled16.startsWith('blob:')) return;
+  const run2 = globalThis.window?.setTimeout || globalThis.setTimeout;
+  if (typeof run2 === 'function') {
+    run2(() => revokeObjectUrl(enabled16), 0);
     return;
   }
-  revokeObjectUrl(_0x39c748);
+  revokeObjectUrl(enabled16);
 }
-function normalizeNaturalSize(_0x532623, _0x43ea67) {
-  const _0x4be413 = Math.round(Number(_0x532623) || 0),
-    _0x51f023 = Math.round(Number(_0x43ea67) || 0);
-  if (_0x4be413 <= 0 || _0x51f023 <= 0) return null;
-  return { width: _0x4be413, height: _0x51f023 };
+function normalizeNaturalSize(value51, value52) {
+  const width7 = Math.round(Number(value51) || 0),
+    height5 = Math.round(Number(value52) || 0);
+  if (width7 <= 0 || height5 <= 0) return null;
+  return { width: width7, height: height5 };
 }
-function pickNaturalSize(_0x4b04c4 = {}) {
-  return normalizeNaturalSize(
-    _0x4b04c4?.width ?? _0x4b04c4?.naturalWidth,
-    _0x4b04c4?.height ?? _0x4b04c4?.naturalHeight,
-  );
+function pickNaturalSize(box3 = {}) {
+  return normalizeNaturalSize(box3?.width ?? box3?.naturalWidth, box3?.height ?? box3?.naturalHeight);
 }
-async function readImageFileNaturalSize(_0x2f0a6b) {
-  if (!_0x2f0a6b) return null;
-  const _0x3e54f8 = globalThis?.createImageBitmap;
-  if (typeof _0x3e54f8 === 'function')
+async function readImageFileNaturalSize(enabled17) {
+  if (!enabled17) return null;
+  const run3 = globalThis?.createImageBitmap;
+  if (typeof run3 === 'function')
     try {
-      const _0xee7dbb = await _0x3e54f8(_0x2f0a6b),
-        _0x4a02ea = normalizeNaturalSize(_0xee7dbb?.width, _0xee7dbb?.height);
-      if (typeof _0xee7dbb?.close === 'function') _0xee7dbb.close();
-      if (_0x4a02ea) return _0x4a02ea;
+      const box4 = await run3(enabled17),
+        naturalSize = normalizeNaturalSize(box4?.width, box4?.height);
+      if (typeof box4?.close === 'function') box4.close();
+      if (naturalSize) return naturalSize;
     } catch {}
-  const _0x273218 = globalThis.Image || globalThis.window?.Image,
-    _0xdd171c = globalThis.window?.URL || globalThis.URL;
-  if (!_0x273218 || typeof _0xdd171c?.createObjectURL !== 'function') return null;
-  let _0x5bc08f = '';
+  const run4 = globalThis.Image || globalThis.window?.Image,
+    value53 = globalThis.window?.URL || globalThis.URL;
+  if (!run4 || typeof value53?.createObjectURL !== 'function') return null;
+  let value54 = '';
   try {
-    _0x5bc08f = _0xdd171c.createObjectURL(_0x2f0a6b);
+    value54 = value53.createObjectURL(enabled17);
   } catch {
     return null;
   }
-  return new Promise((_0x455150) => {
-    const _0x122bd8 = new _0x273218();
-    let _0x265d32 = false,
-      _0x443b71 = null;
-    const _0x15bc37 = (_0x30501e) => {
-      if (_0x265d32) return;
-      _0x265d32 = true;
-      if (_0x443b71) clearTimeout(_0x443b71);
-      (revokeObjectUrl(_0x5bc08f), _0x455150(_0x30501e));
+  return new Promise((handler5) => {
+    const box5 = new run4();
+    let value55 = false,
+      setTimeout2 = null;
+    const run5 = (value56) => {
+      if (value55) return;
+      value55 = true;
+      if (setTimeout2) clearTimeout(setTimeout2);
+      (revokeObjectUrl(value54), handler5(value56));
     };
-    ((_0x443b71 = setTimeout(() => _0x15bc37(null), 0x7d0)),
-      (_0x122bd8.onload = () =>
-        _0x15bc37(
-          normalizeNaturalSize(
-            _0x122bd8.naturalWidth || _0x122bd8.width,
-            _0x122bd8.naturalHeight || _0x122bd8.height,
-          ),
-        )),
-      (_0x122bd8.onerror = () => _0x15bc37(null)),
-      (_0x122bd8.src = _0x5bc08f));
+    ((setTimeout2 = setTimeout(() => run5(null), 0x7d0)),
+      (box5.onload = () =>
+        run5(normalizeNaturalSize(box5.naturalWidth || box5.width, box5.naturalHeight || box5.height))),
+      (box5.onerror = () => run5(null)),
+      (box5.src = value54));
   });
 }
-async function readVideoFileNaturalSize(_0x54ad11) {
-  const _0x547afa = globalThis.document,
-    _0x15f673 = globalThis.window?.URL || globalThis.URL;
-  if (!_0x54ad11 || typeof _0x547afa?.createElement !== 'function') return null;
-  if (typeof _0x15f673?.createObjectURL !== 'function') return null;
-  let _0x3b3f1b = '';
+async function readVideoFileNaturalSize(enabled18) {
+  const el = globalThis.document,
+    value57 = globalThis.window?.URL || globalThis.URL;
+  if (!enabled18 || typeof el?.createElement !== 'function') return null;
+  if (typeof value57?.createObjectURL !== 'function') return null;
+  let value58 = '';
   try {
-    _0x3b3f1b = _0x15f673.createObjectURL(_0x54ad11);
+    value58 = value57.createObjectURL(enabled18);
   } catch {
     return null;
   }
-  return new Promise((_0x40a5b8) => {
-    const _0x4245f4 = _0x547afa.createElement('video');
-    let _0x5d7bf8 = false,
-      _0x2bf689 = null;
-    const _0x28a244 = (_0x577606) => {
-      if (_0x5d7bf8) return;
-      _0x5d7bf8 = true;
-      if (_0x2bf689) clearTimeout(_0x2bf689);
-      _0x4245f4.removeAttribute('src');
+  return new Promise((handler6) => {
+    const value59 = el.createElement('video');
+    let value60 = false,
+      setTimeout3 = null;
+    const run6 = (value61) => {
+      if (value60) return;
+      value60 = true;
+      if (setTimeout3) clearTimeout(setTimeout3);
+      value59.removeAttribute('src');
       try {
-        _0x4245f4.load?.();
+        value59.load?.();
       } catch {}
-      (revokeObjectUrl(_0x3b3f1b), _0x40a5b8(_0x577606));
+      (revokeObjectUrl(value58), handler6(value61));
     };
-    ((_0x2bf689 = setTimeout(() => _0x28a244(null), 0x9c4)),
-      (_0x4245f4.preload = 'metadata'),
-      (_0x4245f4.muted = true),
-      (_0x4245f4.onloadedmetadata = () =>
-        _0x28a244(normalizeNaturalSize(_0x4245f4.videoWidth, _0x4245f4.videoHeight))),
-      (_0x4245f4.onerror = () => _0x28a244(null)),
-      (_0x4245f4.src = _0x3b3f1b));
+    ((setTimeout3 = setTimeout(() => run6(null), 0x9c4)),
+      (value59.preload = 'metadata'),
+      (value59.muted = true),
+      (value59.onloadedmetadata = () => run6(normalizeNaturalSize(value59.videoWidth, value59.videoHeight))),
+      (value59.onerror = () => run6(null)),
+      (value59.src = value58));
   });
 }
-export async function readFileNaturalSize(_0x21f297, _0x5d0ef2 = '') {
-  const _0x4efee1 = String(_0x5d0ef2 || getNodeTypeByFile(_0x21f297) || '').trim();
-  if (_0x4efee1 === 'source-image') return readImageFileNaturalSize(_0x21f297);
-  if (_0x4efee1 === 'source-video') return readVideoFileNaturalSize(_0x21f297);
+export async function readFileNaturalSize(value62, value63 = '') {
+  const value64 = String(value63 || getNodeTypeByFile(value62) || '').trim();
+  if (value64 === 'source-image') return readImageFileNaturalSize(value62);
+  if (value64 === 'source-video') return readVideoFileNaturalSize(value62);
   return null;
 }
 function getElectronImportLocalFile() {
-  const _0xc2eae1 = globalThis.window?.electronAPI?.importLocalFile;
-  return typeof _0xc2eae1 === 'function' ? _0xc2eae1 : null;
+  const value65 = globalThis.window?.electronAPI?.importLocalFile;
+  return typeof value65 === 'function' ? value65 : null;
 }
 function getElectronLocalPreviewUrl() {
-  const _0x270db6 = globalThis.window?.electronAPI?.getLocalPreviewUrl;
-  return typeof _0x270db6 === 'function' ? _0x270db6 : null;
+  const value66 = globalThis.window?.electronAPI?.getLocalPreviewUrl;
+  return typeof value66 === 'function' ? value66 : null;
 }
-function getElectronFilePath(_0x5c84ef) {
+function getElectronFilePath(name) {
   if (!globalThis.window?.electronAPI) return '';
-  const _0x48d711 = String(_0x5c84ef?.path || '').trim();
-  if (_0x48d711)
-    return (
-      _profileDragImport('electron-file-path:direct', { name: _0x5c84ef?.name || '', path: _0x48d711 }),
-      _0x48d711
-    );
-  const _0x2e5ca2 = globalThis.window?.electronAPI?.getPathForFile;
-  if (typeof _0x2e5ca2 !== 'function')
+  const path = String(name?.path || '').trim();
+  if (path)
+    return (_profileDragImport('electron-file-path:direct', { name: name?.name || '', path: path }), path);
+  const run7 = globalThis.window?.electronAPI?.getPathForFile;
+  if (typeof run7 !== 'function')
     return (
       _profileDragImport('electron-file-path:missing-api', {
-        name: _0x5c84ef?.name || '',
+        name: name?.name || '',
         hasElectronAPI: !!globalThis.window?.electronAPI,
       }),
       ''
     );
   try {
-    const _0x2987e4 = String(_0x2e5ca2(_0x5c84ef) || '').trim();
+    const path2 = String(run7(name) || '').trim();
     return (
-      _profileDragImport('electron-file-path:webutils', { name: _0x5c84ef?.name || '', path: _0x2987e4 }),
-      _0x2987e4
+      _profileDragImport('electron-file-path:webutils', { name: name?.name || '', path: path2 }),
+      path2
     );
-  } catch (_0x3b3742) {
+  } catch (value67) {
     return (
       _profileDragImport('electron-file-path:error', {
-        name: _0x5c84ef?.name || '',
-        error: _toOneLineMessage(_0x3b3742),
+        name: name?.name || '',
+        error: _toOneLineMessage(value67),
       }),
       ''
     );
   }
 }
-function canUseElectronLocalImport(_0x214ff3) {
-  return !!(getElectronImportLocalFile() && getElectronFilePath(_0x214ff3));
+function canUseElectronLocalImport(value68) {
+  return !!(getElectronImportLocalFile() && getElectronFilePath(value68));
 }
-function isPreviewablePendingFile(_0x2e6475, _0x406c2b = '') {
-  const _0x1ed759 = String(_0x2e6475?.type || '').trim();
+function isPreviewablePendingFile(value69, value70 = '') {
+  const value71 = String(value69?.type || '').trim();
   return (
-    _0x406c2b === 'source-image' ||
-    _0x406c2b === 'source-video' ||
-    _0x1ed759.startsWith('image/') ||
-    _0x1ed759.startsWith('video/')
+    value70 === 'source-image' ||
+    value70 === 'source-video' ||
+    value71.startsWith('image/') ||
+    value71.startsWith('video/')
   );
 }
-function isAllowedCapturePreviewUrl(_0x3a27f0) {
-  const _0x5c4a90 = String(_0x3a27f0 || '').trim();
+function isAllowedCapturePreviewUrl(value72) {
+  const value73 = String(value72 || '').trim();
   return (
-    _0x5c4a90.startsWith('blob:') ||
-    _0x5c4a90.startsWith('data:image/') ||
-    _0x5c4a90.startsWith('aic-local-preview:')
+    value73.startsWith('blob:') ||
+    value73.startsWith('data:image/') ||
+    value73.startsWith('aic-local-preview:')
   );
 }
 function waitForNextPaint() {
-  const _0x44ecb4 = globalThis.window?.requestAnimationFrame || globalThis.requestAnimationFrame;
-  if (typeof _0x44ecb4 === 'function')
-    return new Promise((_0x5a45cc) => {
-      let _0x3e9770 = false,
-        _0x25b46f = null;
-      const _0x45aeeb = () => {
-        if (_0x3e9770) return;
-        _0x3e9770 = true;
-        if (_0x25b46f) clearTimeout(_0x25b46f);
-        _0x5a45cc();
+  const run8 = globalThis.window?.requestAnimationFrame || globalThis.requestAnimationFrame;
+  if (typeof run8 === 'function')
+    return new Promise((handler7) => {
+      let value74 = false,
+        setTimeout4 = null;
+      const value75 = () => {
+        if (value74) return;
+        value74 = true;
+        if (setTimeout4) clearTimeout(setTimeout4);
+        handler7();
       };
-      ((_0x25b46f = setTimeout(_0x45aeeb, 50)), _0x44ecb4(_0x45aeeb));
+      ((setTimeout4 = setTimeout(value75, 50)), run8(value75));
     });
-  return new Promise((_0x2f059a) => setTimeout(_0x2f059a, 0));
+  return new Promise((value76) => setTimeout(value76, 0));
 }
-async function createCapturePreviewUrlForFile(_0x2683e0, _0x422325 = '') {
-  if (!isPreviewablePendingFile(_0x2683e0, _0x422325)) return '';
-  const _0x2b463a = getElectronLocalPreviewUrl(),
-    _0x298bde = getElectronImportLocalFile();
-  if (_0x2b463a && _0x298bde) {
-    const _0xa8c310 = getElectronFilePath(_0x2683e0);
-    if (_0xa8c310)
+async function createCapturePreviewUrlForFile(name2, value77 = '') {
+  if (!isPreviewablePendingFile(name2, value77)) return '';
+  const run9 = getElectronLocalPreviewUrl(),
+    electronImportLocalFile = getElectronImportLocalFile();
+  if (run9 && electronImportLocalFile) {
+    const path3 = getElectronFilePath(name2);
+    if (path3)
       try {
-        const _0x1ff2d7 = await _0x2b463a({
-            path: _0xa8c310,
-            name: _0x2683e0?.name || '',
-            type: _0x2683e0?.type || '',
+        const response2 = await run9({
+            path: path3,
+            name: name2?.name || '',
+            type: name2?.type || '',
           }),
-          _0x3d41d7 = typeof _0x1ff2d7 === 'string' ? _0x1ff2d7 : String(_0x1ff2d7?.url || '').trim();
-        if (isAllowedCapturePreviewUrl(_0x3d41d7))
+          url13 = typeof response2 === 'string' ? response2 : String(response2?.url || '').trim();
+        if (isAllowedCapturePreviewUrl(url13))
           return (
-            _profileDragImport('electron-preview-url:done', { name: _0x2683e0?.name || '', url: _0x3d41d7 }),
-            _0x3d41d7
+            _profileDragImport('electron-preview-url:done', { name: name2?.name || '', url: url13 }),
+            url13
           );
-      } catch (_0x464526) {
+      } catch (value78) {
         _profileDragImport('electron-preview-url:error', {
-          name: _0x2683e0?.name || '',
-          error: _toOneLineMessage(_0x464526),
+          name: name2?.name || '',
+          error: _toOneLineMessage(value78),
         });
       }
   }
-  return createObjectUrlForFilePreview(_0x2683e0);
+  return createObjectUrlForFilePreview(name2);
 }
-async function importFileWithBestAvailableFlow(_0x47f28f, _0x32df59, _0x12158c = '') {
-  const _0x59cf7d = getElectronImportLocalFile();
-  if (_0x59cf7d) {
-    const _0x4c4dd9 = getElectronFilePath(_0x47f28f);
-    if (_0x4c4dd9)
+async function importFileWithBestAvailableFlow(name3, projectId5, value79 = '') {
+  const run10 = getElectronImportLocalFile();
+  if (run10) {
+    const path4 = getElectronFilePath(name3);
+    if (path4)
       try {
-        const _0xdc9048 = await _0x59cf7d({
-          path: _0x4c4dd9,
-          name: _0x47f28f?.name || '',
-          type: _0x47f28f?.type || '',
-          projectId: _0x32df59,
+        const localPath3 = await run10({
+          path: path4,
+          name: name3?.name || '',
+          type: name3?.type || '',
+          projectId: projectId5,
         });
         _profileDragImport('electron-import:done', {
-          name: _0x47f28f?.name || '',
-          localPath: _0xdc9048?.localPath || '',
-          displayLocalPath: _0xdc9048?.displayLocalPath || '',
-          thumbLocalPath: _0xdc9048?.thumbLocalPath || '',
+          name: name3?.name || '',
+          localPath: localPath3?.localPath || '',
+          displayLocalPath: localPath3?.displayLocalPath || '',
+          thumbLocalPath: localPath3?.thumbLocalPath || '',
         });
-        const _0x583987 = String(_0xdc9048?.localPath || '').trim(),
-          _0x55b4f7 = !!String(
-            _0xdc9048?.displayLocalPath || _0xdc9048?.thumbLocalPath || _0xdc9048?.originalLocalPath || '',
+        const localPath4 = String(localPath3?.localPath || '').trim(),
+          enabled19 = !!String(
+            localPath3?.displayLocalPath || localPath3?.thumbLocalPath || localPath3?.originalLocalPath || '',
           ).trim();
-        if (_0xdc9048 && _0x12158c === 'source-image' && _0x583987 && !_0x55b4f7)
+        if (localPath3 && value79 === 'source-image' && localPath4 && !enabled19)
           try {
-            _profileDragImport('ensure-derivatives:start', { localPath: _0x583987 });
-            const _0x392ba1 = await ensureLocalImageDerivatives(_0x583987);
+            _profileDragImport('ensure-derivatives:start', { localPath: localPath4 });
+            const localPath5 = await ensureLocalImageDerivatives(localPath4);
             return (
               _profileDragImport('ensure-derivatives:done', {
-                localPath: _0x392ba1?.localPath || '',
-                displayLocalPath: _0x392ba1?.displayLocalPath || '',
-                thumbLocalPath: _0x392ba1?.thumbLocalPath || '',
+                localPath: localPath5?.localPath || '',
+                displayLocalPath: localPath5?.displayLocalPath || '',
+                thumbLocalPath: localPath5?.thumbLocalPath || '',
               }),
-              _0x392ba1
+              localPath5
             );
-          } catch (_0x62ba43) {
+          } catch (value80) {
             return (
-              console.warn('[fileService] Electron 本地导入图片派生生成失败，使用原始文件:', _0x62ba43),
-              _0xdc9048
+              console.warn('[fileService] Electron 本地导入图片派生生成失败，使用原始文件:', value80),
+              localPath3
             );
           }
-        if (_0xdc9048) return _0xdc9048;
-      } catch (_0x5c454e) {
-        console.warn('[fileService] Electron 本地导入失败，回退上传流程:', _0x5c454e);
+        if (localPath3) return localPath3;
+      } catch (value81) {
+        console.warn('[fileService] Electron 本地导入失败，回退上传流程:', value81);
       }
   }
-  return uploadFile(_0x47f28f, _0x32df59);
+  return uploadFile(name3, projectId5);
 }
-export function buildPendingFileNodePayload(_0x23a475, _0x24ca6f, _0xdba0d0, _0x376192, _0x1b5de3 = {}) {
-  const _0x3d5e59 = getNodeTypeByFile(_0x23a475);
-  if (!_0x3d5e59 || _0x3d5e59 === 'source-text') return null;
-  const _0x2fb401 = _0x376192 || generateNodeId(_0x3d5e59),
-    _0x4c0b4a = getBaseName(_0x23a475?.name),
-    _0xe2576b = pickNaturalSize(
-      _0x1b5de3.mediaNaturalSize || { width: _0x1b5de3.naturalWidth, height: _0x1b5de3.naturalHeight },
+export function buildPendingFileNodePayload(fileName3, x, y, value82, width8 = {}) {
+  const type2 = getNodeTypeByFile(fileName3);
+  if (!type2 || type2 === 'source-text') return null;
+  const id3 = value82 || generateNodeId(type2),
+    name4 = getBaseName(fileName3?.name),
+    naturalWidth2 = pickNaturalSize(
+      width8.mediaNaturalSize || { width: width8.naturalWidth, height: width8.naturalHeight },
     ),
-    _0x3a728c = {
-      id: _0x2fb401,
-      type: _0x3d5e59,
-      x: _0x24ca6f,
-      y: _0xdba0d0,
-      fileName: _0x23a475?.name || '',
-      name: _0x4c0b4a || getDefaultNodeName(_0x3d5e59),
+    args3 = {
+      id: id3,
+      type: type2,
+      x: x,
+      y: y,
+      fileName: fileName3?.name || '',
+      name: name4 || getDefaultNodeName(type2),
       isGenerating: true,
       jobStatus: 'running',
       jobError: null,
       generationStartTime: Date.now(),
       generationDuration: null,
     };
-  if (_0x3d5e59 === 'source-image' || _0x3d5e59 === 'source-video')
+  if (type2 === 'source-image' || type2 === 'source-video')
     return buildSourceMediaNodePayload({
-      ..._0x3a728c,
-      naturalWidth: _0xe2576b?.width,
-      naturalHeight: _0xe2576b?.height,
+      ...args3,
+      naturalWidth: naturalWidth2?.width,
+      naturalHeight: naturalWidth2?.height,
       capturePreviewUrl:
-        typeof _0x1b5de3.capturePreviewUrl === 'string'
-          ? _0x1b5de3.capturePreviewUrl
-          : createObjectUrlForFilePreview(_0x23a475),
+        typeof width8.capturePreviewUrl === 'string'
+          ? width8.capturePreviewUrl
+          : createObjectUrlForFilePreview(fileName3),
     });
-  if (_0x3d5e59 === 'source-audio') return buildSourceAudioNodePayload(_0x3a728c);
+  if (type2 === 'source-audio') return buildSourceAudioNodePayload(args3);
   return null;
 }
-function readTextFile(_0xf322aa) {
-  return new Promise((_0x3a6181, _0x4b8d43) => {
-    const _0x2502ce = new FileReader();
-    ((_0x2502ce.onload = (_0x172496) => _0x3a6181(_0x172496.target.result)),
-      (_0x2502ce.onerror = _0x4b8d43),
-      _0x2502ce.readAsText(_0xf322aa, 'UTF-8'));
+function readTextFile(value83) {
+  return new Promise((handler8, value84) => {
+    const fileReader = new FileReader();
+    ((fileReader.onload = (event) => handler8(event.target.result)),
+      (fileReader.onerror = value84),
+      fileReader.readAsText(value83, 'UTF-8'));
   });
 }
-export async function processFile(_0x41c5c8, _0x5b596f, _0x456189, _0x57e203, _0x5ceef3 = {}) {
-  const _0x212cb8 = getNodeTypeByFile(_0x41c5c8);
-  if (!_0x212cb8)
+export async function processFile(file, x2, y2, value85, width9 = {}) {
+  const type3 = getNodeTypeByFile(file);
+  if (!type3)
     return (
-      console.warn('[fileService] 暂不支持此类型文件: ' + _0x41c5c8.type),
+      console.warn('[fileService] 暂不支持此类型文件: ' + file.type),
       showWarning(
         t('fileService.errors.unsupportedFileType', {
-          file: _0x41c5c8.name || _0x41c5c8.type || t('fileService.defaultNames.unknownFile'),
+          file: file.name || file.type || t('fileService.defaultNames.unknownFile'),
         }),
       ),
       null
     );
-  const { width: _0x2b1e62, height: _0x5e1cb5 } = getNodeDefaultSize(_0x212cb8),
-    _0x30ffed = _0x5ceef3?.nodeId || generateNodeId(_0x212cb8),
-    _0x1146be = getBaseName(_0x41c5c8.name),
-    _0x687d69 = pickNaturalSize(
-      _0x5ceef3?.mediaNaturalSize || { width: _0x5ceef3?.naturalWidth, height: _0x5ceef3?.naturalHeight },
+  const { width: width10, height: height6 } = getNodeDefaultSize(type3),
+    id4 = width9?.nodeId || generateNodeId(type3),
+    name5 = getBaseName(file.name),
+    box6 = pickNaturalSize(
+      width9?.mediaNaturalSize || { width: width9?.naturalWidth, height: width9?.naturalHeight },
     );
   try {
-    if (_0x212cb8 === 'source-text') {
-      const _0x2f3446 = await readTextFile(_0x41c5c8);
+    if (type3 === 'source-text') {
+      const text = await readTextFile(file);
       return {
-        id: _0x30ffed,
-        type: _0x212cb8,
-        x: _0x5b596f,
-        y: _0x456189,
-        width: _0x2b1e62,
-        height: _0x5e1cb5,
-        text: _0x2f3446,
-        content: _0x2f3446,
-        fileName: _0x41c5c8.name,
-        name: _0x1146be || t('fileService.defaultNames.text'),
+        id: id4,
+        type: type3,
+        x: x2,
+        y: y2,
+        width: width10,
+        height: height6,
+        text: text,
+        content: text,
+        fileName: file.name,
+        name: name5 || t('fileService.defaultNames.text'),
         isGenerating: false,
         jobStatus: null,
         jobError: null,
       };
     } else {
-      const _0x24c0a =
-          _0x212cb8 === 'source-image' && !canUseElectronLocalImport(_0x41c5c8)
+      const value86 =
+          type3 === 'source-image' && !canUseElectronLocalImport(file)
             ? (() => {
-                const _0x12afd0 = URL.createObjectURL(_0x41c5c8);
-                return generateThumbnail(_0x12afd0).finally(() => {
-                  URL.revokeObjectURL(_0x12afd0);
+                const value87 = URL.createObjectURL(file);
+                return generateThumbnail(value87).finally(() => {
+                  URL.revokeObjectURL(value87);
                 });
               })()
             : Promise.resolve(null),
-        _0x47dc72 = await importFileWithBestAvailableFlow(_0x41c5c8, _0x57e203, _0x212cb8),
-        _0x1d2c57 = await _0x24c0a,
-        _0x52a255 = pickResultLocalPath(_0x47dc72),
-        _0x5c0311 = localPathToUrl(_0x52a255);
-      if (_0x212cb8 === 'source-image' && _0x1d2c57)
+        assetId4 = await importFileWithBestAvailableFlow(file, value85, type3),
+        value88 = await value86,
+        localPath6 = pickResultLocalPath(assetId4),
+        src2 = localPathToUrl(localPath6);
+      if (type3 === 'source-image' && value88)
         try {
-          await setThumbnail({ localPath: _0x52a255, src: _0x5c0311, imageUrl: _0x5c0311 }, _0x1d2c57);
-        } catch (_0x229813) {
-          console.warn('[fileService] 写入缩略图缓存失败:', _0x229813);
+          await setThumbnail({ localPath: localPath6, src: src2, imageUrl: src2 }, value88);
+        } catch (value89) {
+          console.warn('[fileService] 写入缩略图缓存失败:', value89);
         }
-      const _0x48c440 = _0x212cb8 === 'source-image' ? buildImageNodeStorageFields(_0x47dc72) : {},
-        _0x5ee540 = {
-          assetId: _0x47dc72.assetId || '',
-          originalLocalPath: _0x47dc72.originalLocalPath || _0x47dc72.localPath || '',
-          displayLocalPath: _0x47dc72.displayLocalPath || '',
-          posterLocalPath: _0x47dc72.posterLocalPath || '',
-          waveformLocalPath: _0x47dc72.waveformLocalPath || '',
-          derivativeStatus: _0x47dc72.derivativeStatus || _0x47dc72.status || '',
-          mediaTaskId: _0x47dc72.mediaTaskId || '',
-          mediaTaskKind: _0x47dc72.mediaTaskKind || '',
-          mediaTaskStatus: _0x47dc72.mediaTaskStatus || '',
-          mediaTaskProgress: Number(_0x47dc72.mediaTaskProgress || 0) || 0,
-          mediaTaskError: _0x47dc72.mediaTaskError || '',
-          videoProxyStatus: _0x47dc72.videoProxyStatus || '',
-          videoCodec: _0x47dc72.videoCodec || '',
-          videoDuration: Number(_0x47dc72.videoDuration || 0) || 0,
-          videoFps: Number(_0x47dc72.videoFps || 0) || 0,
+      const args4 = type3 === 'source-image' ? buildImageNodeStorageFields(assetId4) : {},
+        args5 = {
+          assetId: assetId4.assetId || '',
+          originalLocalPath: assetId4.originalLocalPath || assetId4.localPath || '',
+          displayLocalPath: assetId4.displayLocalPath || '',
+          posterLocalPath: assetId4.posterLocalPath || '',
+          waveformLocalPath: assetId4.waveformLocalPath || '',
+          derivativeStatus: assetId4.derivativeStatus || assetId4.status || '',
+          mediaTaskId: assetId4.mediaTaskId || '',
+          mediaTaskKind: assetId4.mediaTaskKind || '',
+          mediaTaskStatus: assetId4.mediaTaskStatus || '',
+          mediaTaskProgress: Number(assetId4.mediaTaskProgress || 0) || 0,
+          mediaTaskError: assetId4.mediaTaskError || '',
+          videoProxyStatus: assetId4.videoProxyStatus || '',
+          videoCodec: assetId4.videoCodec || '',
+          videoDuration: Number(assetId4.videoDuration || 0) || 0,
+          videoFps: Number(assetId4.videoFps || 0) || 0,
         };
-      _0x212cb8 === 'source-video' &&
-        (_0x47dc72.posterLocalPath || _0x47dc72.posterUrl || _0x47dc72.thumbUrl) &&
-        ((_0x5ee540.thumbUrl = _0x47dc72.posterUrl || _0x47dc72.thumbUrl || ''),
-        (_0x5ee540.thumbLocalPath = _0x47dc72.posterLocalPath || _0x47dc72.thumbLocalPath || ''));
-      const _0x12e3f1 = String(_0x47dc72.mediaTaskStatus || '').trim(),
-        _0xdaba52 = String(_0x47dc72.videoProxyStatus || '').trim(),
-        _0x3c03fb = _0x12e3f1 === 'waiting' || _0x12e3f1 === 'processing',
-        _0xd5d4d9 =
-          _0x212cb8 === 'source-video' &&
-          _0x3c03fb &&
-          isAllowedCapturePreviewUrl(_0x5ceef3?.capturePreviewUrl)
-            ? String(_0x5ceef3.capturePreviewUrl || '').trim()
+      type3 === 'source-video' &&
+        (assetId4.posterLocalPath || assetId4.posterUrl || assetId4.thumbUrl) &&
+        ((args5.thumbUrl = assetId4.posterUrl || assetId4.thumbUrl || ''),
+        (args5.thumbLocalPath = assetId4.posterLocalPath || assetId4.thumbLocalPath || ''));
+      const value90 = String(assetId4.mediaTaskStatus || '').trim(),
+        value91 = String(assetId4.videoProxyStatus || '').trim(),
+        isGenerating2 = value90 === 'waiting' || value90 === 'processing',
+        capturePreviewUrl2 =
+          type3 === 'source-video' && isGenerating2 && isAllowedCapturePreviewUrl(width9?.capturePreviewUrl)
+            ? String(width9.capturePreviewUrl || '').trim()
             : '',
-        _0x4e318b = Number(_0x47dc72.videoWidth || _0x47dc72.width || 0) || _0x687d69?.width || 0,
-        _0x2242e3 = Number(_0x47dc72.videoHeight || _0x47dc72.height || 0) || _0x687d69?.height || 0,
-        _0x56b6a4 = Number(_0x48c440.originalWidth || _0x47dc72.originalWidth || 0) || _0x687d69?.width || 0,
-        _0x1753ad =
-          Number(_0x48c440.originalHeight || _0x47dc72.originalHeight || 0) || _0x687d69?.height || 0,
-        _0x27d66c =
-          _0x212cb8 === 'source-video' && _0xdaba52 === 'processing'
+        videoWidth = Number(assetId4.videoWidth || assetId4.width || 0) || box6?.width || 0,
+        videoHeight = Number(assetId4.videoHeight || assetId4.height || 0) || box6?.height || 0,
+        originalWidth = Number(args4.originalWidth || assetId4.originalWidth || 0) || box6?.width || 0,
+        originalHeight = Number(args4.originalHeight || assetId4.originalHeight || 0) || box6?.height || 0,
+        value92 =
+          type3 === 'source-video' && value91 === 'processing'
             ? ''
-            : localPathToUrl(_0x47dc72.displayLocalPath) || _0x5c0311,
-        _0x52b6a2 =
-          _0x212cb8 === 'source-image'
+            : localPathToUrl(assetId4.displayLocalPath) || src2,
+        args6 =
+          type3 === 'source-image'
             ? {
-                originalWidth: _0x56b6a4 || undefined,
-                originalHeight: _0x1753ad || undefined,
-                imageWidth: _0x56b6a4 || undefined,
-                imageHeight: _0x1753ad || undefined,
+                originalWidth: originalWidth || undefined,
+                originalHeight: originalHeight || undefined,
+                imageWidth: originalWidth || undefined,
+                imageHeight: originalHeight || undefined,
               }
             : {},
-        _0x3948e2 = _0x212cb8 === 'source-video' ? { videoWidth: _0x4e318b, videoHeight: _0x2242e3 } : {},
-        _0x19ce47 = {
-          id: _0x30ffed,
-          type: _0x212cb8,
-          x: _0x5b596f,
-          y: _0x456189,
-          width: _0x2b1e62,
-          height: _0x5e1cb5,
-          src: _0x212cb8 === 'source-video' ? _0x27d66c : _0x5c0311,
-          localPath: _0x52a255,
-          ..._0x5ee540,
-          ..._0x48c440,
-          fileName: _0x41c5c8.name,
-          name: _0x1146be || getDefaultNodeName(_0x212cb8),
-          ..._0x52b6a2,
-          naturalWidth: _0x212cb8 === 'source-video' ? _0x4e318b : _0x56b6a4,
-          naturalHeight: _0x212cb8 === 'source-video' ? _0x2242e3 : _0x1753ad,
-          ..._0x3948e2,
-          isGenerating: _0x3c03fb,
-          jobStatus: _0x3c03fb ? 'running' : null,
+        args7 = type3 === 'source-video' ? { videoWidth: videoWidth, videoHeight: videoHeight } : {},
+        value93 = {
+          id: id4,
+          type: type3,
+          x: x2,
+          y: y2,
+          width: width10,
+          height: height6,
+          src: type3 === 'source-video' ? value92 : src2,
+          localPath: localPath6,
+          ...args5,
+          ...args4,
+          fileName: file.name,
+          name: name5 || getDefaultNodeName(type3),
+          ...args6,
+          naturalWidth: type3 === 'source-video' ? videoWidth : originalWidth,
+          naturalHeight: type3 === 'source-video' ? videoHeight : originalHeight,
+          ...args7,
+          isGenerating: isGenerating2,
+          jobStatus: isGenerating2 ? 'running' : null,
           jobError: null,
           generationDuration: null,
-          capturePreviewUrl: _0xd5d4d9,
+          capturePreviewUrl: capturePreviewUrl2,
         };
-      if (_0x212cb8 === 'source-image' || _0x212cb8 === 'source-video')
-        return buildSourceMediaNodePayload(_0x19ce47);
-      return _0x19ce47;
+      if (type3 === 'source-image' || type3 === 'source-video') return buildSourceMediaNodePayload(value93);
+      return value93;
     }
-  } catch (_0x4762b8) {
-    console.error('[fileService] 文件 ' + _0x41c5c8.name + ' 处理失败:', _0x4762b8);
-    throw _0x4762b8;
+  } catch (value94) {
+    console.error('[fileService] 文件 ' + file.name + ' 处理失败:', value94);
+    throw value94;
   }
 }
-export async function handleFileDrop(_0x1bfbc6, _0x423ebc) {
-  const _0x1ad425 = _0x1bfbc6.dataTransfer.files;
-  if (!_0x1ad425 || _0x1ad425.length === 0) return false;
-  _profileDragImport('drop:start', { count: _0x1ad425.length, projectId: _0x423ebc });
-  if (_0x1ad425.length === 1 && /\.(json|aicpkg)$/i.test(_0x1ad425[0].name || '')) return false;
-  (_0x1bfbc6.preventDefault(), _0x1bfbc6.stopPropagation());
-  const { viewport: _0x414dc0 } = appStore.getState(),
-    _0x43ec54 = screenToWorld(_0x1bfbc6.clientX, _0x1bfbc6.clientY, _0x414dc0);
-  let _0x332691 = _0x43ec54.x,
-    _0x562891 = _0x43ec54.y,
-    _0x4f6023 = false;
-  for (let _0x39142e = 0; _0x39142e < _0x1ad425.length; _0x39142e++) {
-    const _0xd1d71 = _0x1ad425[_0x39142e],
-      _0x57b99d = getNodeTypeByFile(_0xd1d71);
+export async function handleFileDrop(event2, projectId6) {
+  const count6 = event2.dataTransfer.files;
+  if (!count6 || count6.length === 0) return false;
+  _profileDragImport('drop:start', { count: count6.length, projectId: projectId6 });
+  if (count6.length === 1 && /\.(json|aicpkg)$/i.test(count6[0].name || '')) return false;
+  (event2.preventDefault(), event2.stopPropagation());
+  const { viewport: viewport } = appStore.getState(),
+    box7 = screenToWorld(event2.clientX, event2.clientY, viewport);
+  let value95 = box7.x,
+    value96 = box7.y,
+    value97 = false;
+  for (let value98 = 0; value98 < count6.length; value98++) {
+    const name6 = count6[value98],
+      nodeType = getNodeTypeByFile(name6);
     _profileDragImport('file:start', {
-      name: _0xd1d71?.name || '',
-      type: _0xd1d71?.type || '',
-      size: _0xd1d71?.size || 0,
-      nodeType: _0x57b99d,
-      canUseElectronLocalImport: canUseElectronLocalImport(_0xd1d71),
+      name: name6?.name || '',
+      type: name6?.type || '',
+      size: name6?.size || 0,
+      nodeType: nodeType,
+      canUseElectronLocalImport: canUseElectronLocalImport(name6),
     });
-    let _0x55ae94 = '',
-      _0xc65740 = null;
-    _0x57b99d &&
-      _0x57b99d !== 'source-text' &&
-      ((_0x55ae94 = await createCapturePreviewUrlForFile(_0xd1d71, _0x57b99d)),
-      _0x57b99d !== 'source-video' && (_0xc65740 = await readFileNaturalSize(_0xd1d71, _0x57b99d)));
-    _0xc65740 &&
+    let capturePreviewUrl3 = '',
+      width11 = null;
+    nodeType &&
+      nodeType !== 'source-text' &&
+      ((capturePreviewUrl3 = await createCapturePreviewUrlForFile(name6, nodeType)),
+      nodeType !== 'source-video' && (width11 = await readFileNaturalSize(name6, nodeType)));
+    width11 &&
       _profileDragImport('file:natural-size', {
-        name: _0xd1d71?.name || '',
-        width: _0xc65740.width,
-        height: _0xc65740.height,
+        name: name6?.name || '',
+        width: width11.width,
+        height: width11.height,
       });
-    const _0x20e4e6 =
-        _0x57b99d && _0x57b99d !== 'source-text'
-          ? buildPendingFileNodePayload(
-              _0xd1d71,
-              _0x332691,
-              _0x562891,
-              generateNodeId(_0x57b99d, _0x39142e),
-              { capturePreviewUrl: _0x55ae94, mediaNaturalSize: _0xc65740 },
-            )
+    const id5 =
+        nodeType && nodeType !== 'source-text'
+          ? buildPendingFileNodePayload(name6, value95, value96, generateNodeId(nodeType, value98), {
+              capturePreviewUrl: capturePreviewUrl3,
+              mediaNaturalSize: width11,
+            })
           : null,
-      _0x11a72c = _0x20e4e6?.capturePreviewUrl || '';
-    _0x20e4e6 &&
-      (appStore.addNode(_0x20e4e6),
-      appStore.setSelectedNodes([_0x20e4e6.id]),
+      value99 = id5?.capturePreviewUrl || '';
+    id5 &&
+      (appStore.addNode(id5),
+      appStore.setSelectedNodes([id5.id]),
       _profileDragImport('pending:add', {
-        id: _0x20e4e6.id,
-        name: _0xd1d71?.name || '',
-        hasCapturePreviewUrl: !!_0x20e4e6.capturePreviewUrl,
-        jobStatus: _0x20e4e6.jobStatus || '',
+        id: id5.id,
+        name: name6?.name || '',
+        hasCapturePreviewUrl: !!id5.capturePreviewUrl,
+        jobStatus: id5.jobStatus || '',
       }),
-      (_0x4f6023 = true),
-      (_0x332691 += 30),
-      (_0x562891 += 30),
-      _0x20e4e6.type === 'source-video' && (await waitForNextPaint()));
+      (value97 = true),
+      (value95 += 30),
+      (value96 += 30),
+      id5.type === 'source-video' && (await waitForNextPaint()));
     try {
-      _profileDragImport('process:start', { name: _0xd1d71?.name || '', pendingId: _0x20e4e6?.id || '' });
-      const _0x5f1e6b = await processFile(
-        _0xd1d71,
-        _0x20e4e6 ? _0x20e4e6.x : _0x332691,
-        _0x20e4e6 ? _0x20e4e6.y : _0x562891,
-        _0x423ebc,
-        _0x20e4e6
-          ? { nodeId: _0x20e4e6.id, mediaNaturalSize: _0xc65740, capturePreviewUrl: _0x55ae94 }
-          : { mediaNaturalSize: _0xc65740, capturePreviewUrl: _0x55ae94 },
+      _profileDragImport('process:start', { name: name6?.name || '', pendingId: id5?.id || '' });
+      const localPath7 = await processFile(
+        name6,
+        id5 ? id5.x : value95,
+        id5 ? id5.y : value96,
+        projectId6,
+        id5
+          ? { nodeId: id5.id, mediaNaturalSize: width11, capturePreviewUrl: capturePreviewUrl3 }
+          : { mediaNaturalSize: width11, capturePreviewUrl: capturePreviewUrl3 },
       );
       _profileDragImport('process:done', {
-        name: _0xd1d71?.name || '',
-        pendingId: _0x20e4e6?.id || '',
-        localPath: _0x5f1e6b?.localPath || '',
-        displayLocalPath: _0x5f1e6b?.displayLocalPath || '',
-        thumbLocalPath: _0x5f1e6b?.thumbLocalPath || '',
-        jobStatus: _0x5f1e6b?.jobStatus || '',
+        name: name6?.name || '',
+        pendingId: id5?.id || '',
+        localPath: localPath7?.localPath || '',
+        displayLocalPath: localPath7?.displayLocalPath || '',
+        thumbLocalPath: localPath7?.thumbLocalPath || '',
+        jobStatus: localPath7?.jobStatus || '',
       });
-      if (_0x5f1e6b) {
-        if (_0x20e4e6) {
-          const _0xe51ad2 = appStore.getState().nodes?.[_0x20e4e6.id];
-          _0xe51ad2
-            ? (appStore.updateNodeData(_0x20e4e6.id, _0x5f1e6b),
+      if (localPath7) {
+        if (id5) {
+          const value100 = appStore.getState().nodes?.[id5.id];
+          value100
+            ? (appStore.updateNodeData(id5.id, localPath7),
               _profileDragImport('pending:update-final', {
-                id: _0x20e4e6.id,
-                localPath: _0x5f1e6b?.localPath || '',
-                displayLocalPath: _0x5f1e6b?.displayLocalPath || '',
-                thumbLocalPath: _0x5f1e6b?.thumbLocalPath || '',
+                id: id5.id,
+                localPath: localPath7?.localPath || '',
+                displayLocalPath: localPath7?.displayLocalPath || '',
+                thumbLocalPath: localPath7?.thumbLocalPath || '',
               }),
-              _0x5f1e6b.capturePreviewUrl !== _0x11a72c && scheduleRevokeObjectUrl(_0x11a72c))
-            : revokeObjectUrl(_0x11a72c);
+              localPath7.capturePreviewUrl !== value99 && scheduleRevokeObjectUrl(value99))
+            : revokeObjectUrl(value99);
         } else
-          (appStore.addNode(_0x5f1e6b),
-            appStore.setSelectedNodes([_0x5f1e6b.id]),
-            (_0x4f6023 = true),
-            (_0x332691 += 30),
-            (_0x562891 += 30));
+          (appStore.addNode(localPath7),
+            appStore.setSelectedNodes([localPath7.id]),
+            (value97 = true),
+            (value95 += 30),
+            (value96 += 30));
       }
-    } catch (_0x4d93b8) {
-      const _0x4c71e3 = _toOneLineMessage(_0x4d93b8),
-        _0x460b4b = _0x4c71e3 || t('fileService.errors.importFailed');
+    } catch (error5) {
+      const reason = _toOneLineMessage(error5),
+        message3 = reason || t('fileService.errors.importFailed');
       (void logDiagnosticEvent({
         type: 'import.file_failed',
         level: 'error',
         source: 'renderer',
-        message: _0x460b4b,
-        error: _0x4d93b8,
+        message: message3,
+        error: error5,
         context: {
-          fileName: _0xd1d71?.name || '',
-          fileType: _0xd1d71?.type || '',
-          fileSize: Number(_0xd1d71?.size || 0) || 0,
-          projectId: _0x423ebc || '',
+          fileName: name6?.name || '',
+          fileType: name6?.type || '',
+          fileSize: Number(name6?.size || 0) || 0,
+          projectId: projectId6 || '',
         },
       }),
-        _0x20e4e6 &&
-          appStore.getState().nodes?.[_0x20e4e6.id] &&
-          appStore.updateNodeData(_0x20e4e6.id, {
+        id5 &&
+          appStore.getState().nodes?.[id5.id] &&
+          appStore.updateNodeData(id5.id, {
             isGenerating: false,
             jobStatus: 'error',
-            jobError: _0x460b4b,
-            generationDuration: Date.now() - Number(_0x20e4e6.generationStartTime || Date.now()),
+            jobError: message3,
+            generationDuration: Date.now() - Number(id5.generationStartTime || Date.now()),
             capturePreviewUrl: '',
           }),
-        revokeObjectUrl(_0x11a72c),
+        revokeObjectUrl(value99),
         showError(
           t('fileService.errors.importFailedWithFile', {
-            file: _0xd1d71?.name || t('fileService.defaultNames.file'),
-            reason: _0x4c71e3 ? t('fileService.errors.importFailedReason', { reason: _0x4c71e3 }) : '',
+            file: name6?.name || t('fileService.defaultNames.file'),
+            reason: reason ? t('fileService.errors.importFailedReason', { reason: reason }) : '',
           }).trim(),
         ),
-        console.error('[fileService] 处理文件失败:', _0x4d93b8));
+        console.error('[fileService] 处理文件失败:', error5));
     }
   }
-  return _0x4f6023;
+  return value97;
 }
-export async function handleWebImageUrlDrop(_0x4b27e6, _0x10f874 = {}) {
-  const _0x10d256 = extractWebImageDropPayload(_0x4b27e6?.dataTransfer);
-  if (!_0x10d256?.url) return false;
-  (_0x4b27e6?.preventDefault?.(), _0x4b27e6?.stopPropagation?.());
-  const _0x18fd71 = _0x10f874.storeInstance || appStore,
-    _0x538b74 = typeof _0x18fd71.getState === 'function' ? _0x18fd71.getState() : {},
-    _0x141785 = screenToWorld(_0x4b27e6?.clientX || 0, _0x4b27e6?.clientY || 0, _0x538b74.viewport || {}),
-    _0x4b84d4 = createWebImageSourceNode({
-      payload: _0x10d256,
-      worldX: _0x141785.x,
-      worldY: _0x141785.y,
-      storeInstance: _0x18fd71,
-      projectId: _0x10f874.projectId,
-      importRemote: _0x10f874.importRemote !== false,
+export async function handleWebImageUrlDrop(event3, projectId7 = {}) {
+  const payload4 = extractWebImageDropPayload(event3?.dataTransfer);
+  if (!payload4?.url) return false;
+  (event3?.preventDefault?.(), event3?.stopPropagation?.());
+  const storeInstance2 = projectId7.storeInstance || appStore,
+    value101 = typeof storeInstance2.getState === 'function' ? storeInstance2.getState() : {},
+    worldX5 = screenToWorld(event3?.clientX || 0, event3?.clientY || 0, value101.viewport || {}),
+    id6 = createWebImageSourceNode({
+      payload: payload4,
+      worldX: worldX5.x,
+      worldY: worldX5.y,
+      storeInstance: storeInstance2,
+      projectId: projectId7.projectId,
+      importRemote: projectId7.importRemote !== false,
     });
-  if (!_0x4b84d4) return false;
+  if (!id6) return false;
   return (
     _profileDragImport('web-image:add', {
-      id: _0x4b84d4.id,
-      url: _0x10d256.url,
-      pageUrl: _0x10d256.pageUrl || '',
+      id: id6.id,
+      url: payload4.url,
+      pageUrl: payload4.pageUrl || '',
     }),
     true
   );
 }
-export function downloadJson(_0x39730e, _0x22c01d) {
-  const _0x3c452c = new Blob([JSON.stringify(_0x39730e, null, 2)], { type: 'application/json' }),
-    _0x5b8840 = URL.createObjectURL(_0x3c452c),
-    _0xeec5a6 = document.createElement('a');
-  ((_0xeec5a6.href = _0x5b8840),
-    (_0xeec5a6.download = _0x22c01d),
-    document.body.appendChild(_0xeec5a6),
-    _0xeec5a6.click(),
-    document.body.removeChild(_0xeec5a6),
-    URL.revokeObjectURL(_0x5b8840));
+export function downloadJson(value102, value103) {
+  const blob = new Blob([JSON.stringify(value102, null, 2)], { type: 'application/json' }),
+    value104 = URL.createObjectURL(blob),
+    el2 = document.createElement('a');
+  ((el2.href = value104),
+    (el2.download = value103),
+    document.body.appendChild(el2),
+    el2.click(),
+    document.body.removeChild(el2),
+    URL.revokeObjectURL(value104));
 }
-export function readJsonFile(_0x3e8c6f) {
-  return new Promise((_0x5070c7, _0x4948f3) => {
-    const _0x2a97de = new FileReader();
-    ((_0x2a97de.onload = (_0x33cd5e) => {
+export function readJsonFile(value105) {
+  return new Promise((handler9, handler10) => {
+    const fileReader2 = new FileReader();
+    ((fileReader2.onload = (event4) => {
       try {
-        const _0x1c0970 = JSON.parse(_0x33cd5e.target.result);
-        _0x5070c7(_0x1c0970);
-      } catch (_0x57a9eb) {
-        _0x4948f3(new Error(t('fileService.errors.jsonParseFailed')));
+        const value106 = JSON.parse(event4.target.result);
+        handler9(value106);
+      } catch (value107) {
+        handler10(new Error(t('fileService.errors.jsonParseFailed')));
       }
     }),
-      (_0x2a97de.onerror = () => _0x4948f3(new Error(t('fileService.errors.fileReadFailed')))),
-      _0x2a97de.readAsText(_0x3e8c6f));
+      (fileReader2.onerror = () => handler10(new Error(t('fileService.errors.fileReadFailed')))),
+      fileReader2.readAsText(value105));
   });
 }
 
-export const CANVAS_VIDEO_IMPORT_MAX_BYTES=0x12c*0x400*0x400;
+export const CANVAS_VIDEO_IMPORT_MAX_BYTES = 0x12c * 0x400 * 0x400;
 
-export const CANVAS_VIDEO_IMPORT_MAX_MB=Math["round"](CANVAS_VIDEO_IMPORT_MAX_BYTES/0x400/0x400);
+export const CANVAS_VIDEO_IMPORT_MAX_MB = Math['round'](CANVAS_VIDEO_IMPORT_MAX_BYTES / 0x400 / 0x400);
 
-const ASSET_MEDIA_TASK_STATUS_RANK=new Map([['waiting',0x1],["processing",0x2],["cancelled",0x3],["failed",0x3],["complete",0x3]]);
+const ASSET_MEDIA_TASK_STATUS_RANK = new Map([
+  ['waiting', 0x1],
+  ['processing', 0x2],
+  ['cancelled', 0x3],
+  ['failed', 0x3],
+  ['complete', 0x3],
+]);
 
-function normalizeAssetUpdatedAt(_0x1f91c5){const _0x19e058=String(_0x1f91c5||'')["trim"]();if(!_0x19e058)return'';const _0x2024dd=Date["parse"](_0x19e058);return Number["isFinite"](_0x2024dd)?_0x2024dd:'';}
+function normalizeAssetUpdatedAt(value108) {
+  const enabled20 = String(value108 || '')['trim']();
+  if (!enabled20) return '';
+  const value109 = Date['parse'](enabled20);
+  return Number['isFinite'](value109) ? value109 : '';
+}
 
-function normalizeAssetRevision(_0x55961d){const _0x320eb5=Math["trunc"](Number(_0x55961d));return Number["isFinite"](_0x320eb5)&&_0x320eb5>0x0?_0x320eb5:0x0;}
+function normalizeAssetRevision(value110) {
+  const count7 = Math['trunc'](Number(value110));
+  return Number['isFinite'](count7) && count7 > 0x0 ? count7 : 0x0;
+}
 
-export function shouldApplyElectronAssetUpdateToNode(_0x48b138={},_0x95a490={}){const _0xb5f832=normalizeAssetRevision(_0x95a490?.["assetRevision"]),_0x40fe6b=normalizeAssetRevision(_0x48b138?.['assetRevision']);if(_0xb5f832>0x0&&_0x40fe6b>0x0)return _0xb5f832>_0x40fe6b;const _0x1173aa=normalizeAssetUpdatedAt(_0x95a490?.["assetUpdatedAt"]||_0x95a490?.["updatedAt"]),_0x12dcf0=normalizeAssetUpdatedAt(_0x48b138?.["assetUpdatedAt"]),_0x5ecaf8=_0x1173aa!==''&&_0x12dcf0!=='';if(_0x5ecaf8&&_0x1173aa<_0x12dcf0)return![];const _0x94d61={'taskId':_0x95a490?.["mediaTaskId"]||'','kind':_0x95a490?.["mediaTaskKind"]||'','status':_0x95a490?.["mediaTaskStatus"]||''};if(shouldApplyMediaTaskEventToNode(_0x48b138,_0x94d61)){const _0x1bb3b4=String(_0x94d61["taskId"]||'')["trim"](),_0x19ca0f=String(_0x48b138?.["mediaTaskId"]||'')["trim"]();if(!_0x1bb3b4||!_0x19ca0f||_0x1bb3b4===_0x19ca0f){const _0x6b560e=ASSET_MEDIA_TASK_STATUS_RANK['get'](String(_0x94d61["status"]||'')['trim']()["toLowerCase"]())||0x0,_0x371d7c=ASSET_MEDIA_TASK_STATUS_RANK["get"](String(_0x48b138?.["mediaTaskStatus"]||'')['trim']()["toLowerCase"]())||0x0;if(_0x6b560e<_0x371d7c)return![];}return!![];}return _0x5ecaf8&&_0x1173aa>_0x12dcf0;}
+export function shouldApplyElectronAssetUpdateToNode(options2 = {}, value111 = {}) {
+  const assetRevision = normalizeAssetRevision(value111?.['assetRevision']),
+    assetRevision2 = normalizeAssetRevision(options2?.['assetRevision']);
+  if (assetRevision > 0x0 && assetRevision2 > 0x0) return assetRevision > assetRevision2;
+  const assetUpdatedAt = normalizeAssetUpdatedAt(value111?.['assetUpdatedAt'] || value111?.['updatedAt']),
+    assetUpdatedAt2 = normalizeAssetUpdatedAt(options2?.['assetUpdatedAt']),
+    value112 = assetUpdatedAt !== '' && assetUpdatedAt2 !== '';
+  if (value112 && assetUpdatedAt < assetUpdatedAt2) return ![];
+  const value113 = {
+    taskId: value111?.['mediaTaskId'] || '',
+    kind: value111?.['mediaTaskKind'] || '',
+    status: value111?.['mediaTaskStatus'] || '',
+  };
+  if (shouldApplyMediaTaskEventToNode(options2, value113)) {
+    const enabled21 = String(value113['taskId'] || '')['trim'](),
+      enabled22 = String(options2?.['mediaTaskId'] || '')['trim']();
+    if (!enabled21 || !enabled22 || enabled21 === enabled22) {
+      const value114 =
+          ASSET_MEDIA_TASK_STATUS_RANK['get'](
+            String(value113['status'] || '')
+              ['trim']()
+              ['toLowerCase'](),
+          ) || 0x0,
+        value115 =
+          ASSET_MEDIA_TASK_STATUS_RANK['get'](
+            String(options2?.['mediaTaskStatus'] || '')
+              ['trim']()
+              ['toLowerCase'](),
+          ) || 0x0;
+      if (value114 < value115) return ![];
+    }
+    return !![];
+  }
+  return value112 && assetUpdatedAt > assetUpdatedAt2;
+}
 
-function assignPositiveNumber(_0x37964e,_0x3c87a5,..._0x1e05b6){const _0x5db649=_0x1e05b6["map"](_0x509d26=>Number(_0x509d26))["find"](_0x49ec5d=>Number['isFinite'](_0x49ec5d)&&_0x49ec5d>0x0);if(_0x5db649!==undefined)_0x37964e[_0x3c87a5]=_0x5db649;}
+function assignPositiveNumber(value116, value117, ...args8) {
+  const value118 = args8['map']((value119) => Number(value119))['find'](
+    (count8) => Number['isFinite'](count8) && count8 > 0x0,
+  );
+  if (value118 !== undefined) value116[value117] = value118;
+}
 
-export function buildElectronAssetNodePatch(_0x4e696c={}){const _0xc69a48=String(_0x4e696c?.["assetId"]||'')['trim']();if(!_0xc69a48)return{};const _0x1cc5da={'assetId':_0xc69a48,'localPath':_0x4e696c?.["localPath"]||_0x4e696c?.["originalLocalPath"]||'','originalLocalPath':_0x4e696c?.["originalLocalPath"]||_0x4e696c?.['localPath']||'','displayLocalPath':_0x4e696c?.['displayLocalPath']||'','thumbLocalPath':_0x4e696c?.["thumbLocalPath"]||_0x4e696c?.['posterLocalPath']||'','posterLocalPath':_0x4e696c?.["posterLocalPath"]||'','waveformLocalPath':_0x4e696c?.["waveformLocalPath"]||'','derivativeStatus':_0x4e696c?.["derivativeStatus"]||_0x4e696c?.['status']||'','mediaTaskId':_0x4e696c?.["mediaTaskId"]||'','mediaTaskKind':_0x4e696c?.['mediaTaskKind']||'','mediaTaskStatus':_0x4e696c?.["mediaTaskStatus"]||'','mediaTaskProgress':Number(_0x4e696c?.["mediaTaskProgress"]||0x0)||0x0,'mediaTaskError':_0x4e696c?.["mediaTaskError"]||'','videoProxyStatus':_0x4e696c?.["videoProxyStatus"]||'','videoProxyVersion':_0x4e696c?.["videoProxyVersion"]||'','videoCodec':_0x4e696c?.["videoCodec"]||''},_0x43e701=String(_0x4e696c?.["assetUpdatedAt"]||_0x4e696c?.["updatedAt"]||'')['trim'](),_0x58342c=normalizeAssetRevision(_0x4e696c?.["assetRevision"]);if(_0x58342c>0x0)_0x1cc5da["assetRevision"]=_0x58342c;if(_0x43e701)_0x1cc5da["assetUpdatedAt"]=_0x43e701;assignPositiveNumber(_0x1cc5da,'videoWidth',_0x4e696c?.['videoWidth'],_0x4e696c?.["width"]),assignPositiveNumber(_0x1cc5da,"videoHeight",_0x4e696c?.['videoHeight'],_0x4e696c?.["height"]),assignPositiveNumber(_0x1cc5da,"videoDuration",_0x4e696c?.["videoDuration"]),assignPositiveNumber(_0x1cc5da,"videoFps",_0x4e696c?.["videoFps"]);if(_0x4e696c?.["kind"]==="image")_0x1cc5da["src"]=_0x4e696c?.["displayUrl"]||_0x4e696c?.["url"]||'',_0x1cc5da['imageUrl']=_0x4e696c?.['displayUrl']||_0x4e696c?.["url"]||'',_0x1cc5da['sourceUrl']=_0x4e696c?.['originalUrl']||'',_0x1cc5da["thumbUrl"]=_0x4e696c?.["thumbUrl"]||'';else{if(_0x4e696c?.["kind"]==="video")_0x1cc5da['src']=_0x4e696c?.['displayUrl']||_0x4e696c?.["url"]||_0x4e696c?.["originalUrl"]||'',_0x1cc5da['videoUrl']=_0x4e696c?.['displayUrl']||_0x4e696c?.["url"]||_0x4e696c?.["originalUrl"]||'',_0x1cc5da["sourceUrl"]=_0x4e696c?.["originalUrl"]||_0x4e696c?.["url"]||'',_0x1cc5da["thumbUrl"]=_0x4e696c?.['posterUrl']||_0x4e696c?.["thumbUrl"]||'';else _0x4e696c?.['kind']==='audio'&&(_0x1cc5da['src']=_0x4e696c?.['originalUrl']||_0x4e696c?.["url"]||'',_0x1cc5da["audioUrl"]=_0x4e696c?.["originalUrl"]||_0x4e696c?.["url"]||'');}return _0x1cc5da;}
+export function buildElectronAssetNodePatch(response3 = {}) {
+  const enabled23 = String(response3?.['assetId'] || '')['trim']();
+  if (!enabled23) return {};
+  const value120 = {
+      assetId: enabled23,
+      localPath: response3?.['localPath'] || response3?.['originalLocalPath'] || '',
+      originalLocalPath: response3?.['originalLocalPath'] || response3?.['localPath'] || '',
+      displayLocalPath: response3?.['displayLocalPath'] || '',
+      thumbLocalPath: response3?.['thumbLocalPath'] || response3?.['posterLocalPath'] || '',
+      posterLocalPath: response3?.['posterLocalPath'] || '',
+      waveformLocalPath: response3?.['waveformLocalPath'] || '',
+      derivativeStatus: response3?.['derivativeStatus'] || response3?.['status'] || '',
+      mediaTaskId: response3?.['mediaTaskId'] || '',
+      mediaTaskKind: response3?.['mediaTaskKind'] || '',
+      mediaTaskStatus: response3?.['mediaTaskStatus'] || '',
+      mediaTaskProgress: Number(response3?.['mediaTaskProgress'] || 0x0) || 0x0,
+      mediaTaskError: response3?.['mediaTaskError'] || '',
+      videoProxyStatus: response3?.['videoProxyStatus'] || '',
+      videoProxyVersion: response3?.['videoProxyVersion'] || '',
+      videoCodec: response3?.['videoCodec'] || '',
+    },
+    value121 = String(response3?.['assetUpdatedAt'] || response3?.['updatedAt'] || '')['trim'](),
+    assetRevision3 = normalizeAssetRevision(response3?.['assetRevision']);
+  if (assetRevision3 > 0x0) value120['assetRevision'] = assetRevision3;
+  if (value121) value120['assetUpdatedAt'] = value121;
+  (assignPositiveNumber(value120, 'videoWidth', response3?.['videoWidth'], response3?.['width']),
+    assignPositiveNumber(value120, 'videoHeight', response3?.['videoHeight'], response3?.['height']),
+    assignPositiveNumber(value120, 'videoDuration', response3?.['videoDuration']),
+    assignPositiveNumber(value120, 'videoFps', response3?.['videoFps']));
+  if (response3?.['kind'] === 'image')
+    ((value120['src'] = response3?.['displayUrl'] || response3?.['url'] || ''),
+      (value120['imageUrl'] = response3?.['displayUrl'] || response3?.['url'] || ''),
+      (value120['sourceUrl'] = response3?.['originalUrl'] || ''),
+      (value120['thumbUrl'] = response3?.['thumbUrl'] || ''));
+  else {
+    if (response3?.['kind'] === 'video')
+      ((value120['src'] =
+        response3?.['displayUrl'] || response3?.['url'] || response3?.['originalUrl'] || ''),
+        (value120['videoUrl'] =
+          response3?.['displayUrl'] || response3?.['url'] || response3?.['originalUrl'] || ''),
+        (value120['sourceUrl'] = response3?.['originalUrl'] || response3?.['url'] || ''),
+        (value120['thumbUrl'] = response3?.['posterUrl'] || response3?.['thumbUrl'] || ''));
+    else
+      response3?.['kind'] === 'audio' &&
+        ((value120['src'] = response3?.['originalUrl'] || response3?.['url'] || ''),
+        (value120['audioUrl'] = response3?.['originalUrl'] || response3?.['url'] || ''));
+  }
+  return value120;
+}
 
-export function applyElectronAssetUpdate(_0xe3d706={},_0x5cb373=appStore){const _0x14badc=String(_0xe3d706?.['assetId']||'')["trim"]();if(!_0x14badc)return[];const _0x301ea6=typeof _0x5cb373?.['getStateRaw']==="function"?_0x5cb373["getStateRaw"]():_0x5cb373?.["getState"]?.(),_0x365646=_0x301ea6?.["nodes"]||{},_0x33faf4=[];return Object["values"](_0x365646)["forEach"](_0x2e3b72=>{if(String(_0x2e3b72?.['assetId']||'')["trim"]()!==_0x14badc)return;if(!shouldApplyElectronAssetUpdateToNode(_0x2e3b72,_0xe3d706))return;const _0x31a3d6=buildElectronAssetNodePatch(_0xe3d706),_0x8f3977=Object['entries'](_0x31a3d6)["some"](([_0x58d612,_0x4c4fc5])=>_0x2e3b72?.[_0x58d612]!==_0x4c4fc5);if(!_0x8f3977)return;_0x5cb373['updateNodeData'](_0x2e3b72['id'],_0x31a3d6),_0x33faf4["push"](_0x2e3b72['id']);}),_0x33faf4;}
+export function applyElectronAssetUpdate(options3 = {}, store3 = appStore) {
+  const enabled24 = String(options3?.['assetId'] || '')['trim']();
+  if (!enabled24) return [];
+  const value122 =
+      typeof store3?.['getStateRaw'] === 'function' ? store3['getStateRaw']() : store3?.['getState']?.(),
+    value123 = value122?.['nodes'] || {},
+    value124 = [];
+  return (
+    Object['values'](value123)['forEach']((value125) => {
+      if (String(value125?.['assetId'] || '')['trim']() !== enabled24) return;
+      if (!shouldApplyElectronAssetUpdateToNode(value125, options3)) return;
+      const electronAssetNodePatch = buildElectronAssetNodePatch(options3),
+        enabled25 = Object['entries'](electronAssetNodePatch)['some'](
+          ([value126, value127]) => value125?.[value126] !== value127,
+        );
+      if (!enabled25) return;
+      (store3['updateNodeData'](value125['id'], electronAssetNodePatch), value124['push'](value125['id']));
+    }),
+    value124
+  );
+}
 
-export async function resolveImageImportThumbnailData({suppliedThumbnail:_0xc1f98,canUseLocalImport:canUseLocalImport=![],generateThumbnailData:_0x54f004}={}){if(_0xc1f98!=null)try{const _0x502c80=String(await _0xc1f98||'')["trim"]();if(_0x502c80)return _0x502c80;}catch{}if(canUseLocalImport||typeof _0x54f004!=="function")return null;return _0x54f004();}
+export async function resolveImageImportThumbnailData({
+  suppliedThumbnail: suppliedThumbnail,
+  canUseLocalImport: canUseLocalImport = ![],
+  generateThumbnailData: generateThumbnailData,
+} = {}) {
+  if (suppliedThumbnail != null)
+    try {
+      const value128 = String((await suppliedThumbnail) || '')['trim']();
+      if (value128) return value128;
+    } catch {}
+  if (canUseLocalImport || typeof generateThumbnailData !== 'function') return null;
+  return generateThumbnailData();
+}

@@ -41,50 +41,50 @@ const PROVIDER_TEST_STATUS_CLASSES = [
     embedding: 'kindEmbedding',
     unknown: 'kindUnknown',
   };
-function trTemplate(_0x792cd, _0x3ebc52 = {}) {
-  let _0x2669ab = t(_0x792cd);
+function trTemplate(value, item = {}) {
+  let t2 = t(value);
   return (
-    Object['entries'](_0x3ebc52 || {})['forEach'](([_0x5b9233, _0x4d5801]) => {
-      _0x2669ab = _0x2669ab['split']('{' + _0x5b9233 + '}')['join'](String(_0x4d5801 ?? ''));
+    Object['entries'](item || {})['forEach'](([key, index]) => {
+      t2 = t2['split']('{' + key + '}')['join'](String(index ?? ''));
     }),
-    _0x2669ab
+    t2
   );
 }
-function trApiInput(_0x45e5df, _0x1a9122 = {}) {
-  return trTemplate('settings.apiInput.' + _0x45e5df, _0x1a9122);
+function trApiInput(result, data = {}) {
+  return trTemplate('settings.apiInput.' + result, data);
 }
-function trCustomProvider(_0x5c972f, _0xfc5df = {}) {
-  return trApiInput('customProvider.' + _0x5c972f, _0xfc5df);
+function trCustomProvider(options, target = {}) {
+  return trApiInput('customProvider.' + options, target);
 }
-function markNonLoginTextInput(_0x4b1442) {
-  if (!_0x4b1442) return;
-  ((_0x4b1442['autocomplete'] = 'off'),
-    _0x4b1442['setAttribute']('autocomplete', 'off'),
-    _0x4b1442['setAttribute']('autocapitalize', 'off'),
-    _0x4b1442['setAttribute']('spellcheck', 'false'),
-    _0x4b1442['setAttribute']('data-form-type', 'other'));
+function markNonLoginTextInput(el) {
+  if (!el) return;
+  ((el['autocomplete'] = 'off'),
+    el['setAttribute']('autocomplete', 'off'),
+    el['setAttribute']('autocapitalize', 'off'),
+    el['setAttribute']('spellcheck', 'false'),
+    el['setAttribute']('data-form-type', 'other'));
 }
-function markApiSecretInput(_0x248302) {
-  if (!_0x248302) return;
-  ((_0x248302['autocomplete'] = 'new-password'),
-    _0x248302['setAttribute']('autocomplete', 'new-password'),
-    _0x248302['setAttribute']('autocapitalize', 'off'),
-    _0x248302['setAttribute']('spellcheck', 'false'),
-    _0x248302['setAttribute']('data-lpignore', 'true'),
-    _0x248302['setAttribute']('data-1p-ignore', 'true'),
-    _0x248302['setAttribute']('data-form-type', 'other'));
+function markApiSecretInput(el2) {
+  if (!el2) return;
+  ((el2['autocomplete'] = 'new-password'),
+    el2['setAttribute']('autocomplete', 'new-password'),
+    el2['setAttribute']('autocapitalize', 'off'),
+    el2['setAttribute']('spellcheck', 'false'),
+    el2['setAttribute']('data-lpignore', 'true'),
+    el2['setAttribute']('data-1p-ignore', 'true'),
+    el2['setAttribute']('data-form-type', 'other'));
 }
 export function createCustomProviderOnboardingController({
-  store: _0x2f1035,
-  saveApiConfigToServer: _0x6ce60a,
-  discoverCustomProvider: _0x37fad5,
-  analyzeCustomProviderDocumentation: _0x4015c2,
-  buildCustomProviderManifestDraft: _0x42e0f6,
-  validateCustomProviderManifestDraft: _0x2071fc,
-  saveCustomProviderManifestBundle: _0x48a2e5,
-  listCustomProviderManifestBundles: _0x1f9b4a,
-  deleteCustomProviderManifestBundle: _0x47c6df,
-  refreshManifestModelNodeUis: _0x155da5,
+  store: store,
+  saveApiConfigToServer: saveApiConfigToServer,
+  discoverCustomProvider: discoverCustomProvider,
+  analyzeCustomProviderDocumentation: analyzeCustomProviderDocumentation,
+  buildCustomProviderManifestDraft: buildCustomProviderManifestDraft,
+  validateCustomProviderManifestDraft: validateCustomProviderManifestDraft,
+  saveCustomProviderManifestBundle: saveCustomProviderManifestBundle,
+  listCustomProviderManifestBundles: listCustomProviderManifestBundles,
+  deleteCustomProviderManifestBundle: deleteCustomProviderManifestBundle,
+  refreshManifestModelNodeUis: refreshManifestModelNodeUis,
   showError: showError = null,
   syncModelServiceReadinessSummary: syncModelServiceReadinessSummary = () => {},
   getConfigSnapshot: getConfigSnapshot = () => ({}),
@@ -92,56 +92,54 @@ export function createCustomProviderOnboardingController({
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis['window'],
 } = {}) {
-  const _0x57a604 = documentObject,
-    _0x4aef0b = windowObject;
-  let _0x6cada3 = getConfigSnapshot() || {};
-  const _0x3c8fad = createProviderStatusTooltipController(),
-    _0x52560e = new Map();
-  function _0x53ff29(_0x1d9aee) {
-    ((_0x6cada3 = _0x1d9aee || {}), onConfigSnapshotChange(_0x6cada3));
+  const cardEl = documentObject,
+    source = windowObject;
+  let configSnapshot = getConfigSnapshot() || {};
+  const providerStatusTooltipController = createProviderStatusTooltipController(),
+    map = new Map();
+  function run(next) {
+    ((configSnapshot = next || {}), onConfigSnapshotChange(configSnapshot));
   }
-  function _0x1c4a39() {
+  function run2() {
     return {
-      cardEl: _0x57a604['getElementById']('customProviderDiscoveryCard'),
-      statusEl: _0x57a604['getElementById']('customProviderDiscoveryStatus'),
-      editorListEl: _0x57a604['getElementById']('customProviderEditors'),
-      addBtnEl: _0x57a604['getElementById']('btnCustomProviderAdd'),
-      editorEl: _0x57a604['getElementById']('customProviderEditor'),
+      cardEl: cardEl['getElementById']('customProviderDiscoveryCard'),
+      statusEl: cardEl['getElementById']('customProviderDiscoveryStatus'),
+      editorListEl: cardEl['getElementById']('customProviderEditors'),
+      addBtnEl: cardEl['getElementById']('btnCustomProviderAdd'),
+      editorEl: cardEl['getElementById']('customProviderEditor'),
     };
   }
-  const _0x1a7ae7 = {
+  const enabled = {
     activeEditorId: 'custom-provider-editor-1',
     editorSequence: 0x1,
     editorStates: new Map(),
   };
-  function _0x46a7d6() {
-    const { editorListEl: _0x2c6162 } = _0x1c4a39();
-    return Array['from'](_0x2c6162?.['querySelectorAll']?.('[data-custom-provider-editor-id]') || []);
+  function run3() {
+    const { editorListEl: editorListEl } = run2();
+    return Array['from'](editorListEl?.['querySelectorAll']?.('[data-custom-provider-editor-id]') || []);
   }
-  function _0x20560a(_0x3cdbf9) {
+  function run4(baseUrlEl) {
     return {
       baseUrlEl:
-        _0x3cdbf9?.['querySelector']?.('[data-custom-provider-base-url]') ||
-        _0x57a604['getElementById']('customProviderBaseUrl'),
+        baseUrlEl?.['querySelector']?.('[data-custom-provider-base-url]') ||
+        cardEl['getElementById']('customProviderBaseUrl'),
       apiKeyEl:
-        _0x3cdbf9?.['querySelector']?.('[data-custom-provider-api-key]') ||
-        _0x57a604['getElementById']('customProviderApiKey'),
+        baseUrlEl?.['querySelector']?.('[data-custom-provider-api-key]') ||
+        cardEl['getElementById']('customProviderApiKey'),
       documentationUrlEl:
-        _0x3cdbf9?.['querySelector']?.('[data-custom-provider-documentation-url]') ||
-        _0x57a604['getElementById']('customProviderDocumentationUrl'),
+        baseUrlEl?.['querySelector']?.('[data-custom-provider-documentation-url]') ||
+        cardEl['getElementById']('customProviderDocumentationUrl'),
       documentationFileEl:
-        _0x3cdbf9?.['querySelector']?.('[data-custom-provider-documentation-file]') ||
-        _0x57a604['querySelector'](
-          '#customProviderDiscoveryCard\x20[data-custom-provider-documentation-file]',
-        ),
+        baseUrlEl?.['querySelector']?.('[data-custom-provider-documentation-file]') ||
+        cardEl['querySelector']('#customProviderDiscoveryCard\x20[data-custom-provider-documentation-file]'),
     };
   }
-  function _0x28893f(_0x52c47d) {
-    return String(_0x52c47d?.['dataset']?.['customProviderEditorId'] || '')['trim']();
+  function run5(el3) {
+    return String(el3?.['dataset']?.['customProviderEditorId'] || '')['trim']();
   }
-  function _0x497e40(_0xd906c3) {
-    const _0x38ba47 = _0x28893f(_0xd906c3);
-    if (!_0x38ba47)
+  function run6(current) {
+    const enabled2 = run5(current);
+    if (!enabled2)
       return {
         discovery: null,
         provider: null,
@@ -155,8 +153,8 @@ export function createCustomProviderOnboardingController({
         titleManuallyEdited: ![],
       };
     return (
-      !_0x1a7ae7['editorStates']['has'](_0x38ba47) &&
-        _0x1a7ae7['editorStates']['set'](_0x38ba47, {
+      !enabled['editorStates']['has'](enabled2) &&
+        enabled['editorStates']['set'](enabled2, {
           discovery: null,
           provider: null,
           activeKindFilter: 'all',
@@ -168,1770 +166,1747 @@ export function createCustomProviderOnboardingController({
           titleText: '',
           titleManuallyEdited: ![],
         }),
-      _0x1a7ae7['editorStates']['get'](_0x38ba47)
+      enabled['editorStates']['get'](enabled2)
     );
   }
-  function _0xf3935f(_0x1c59fd) {
+  function run7(bodyEl) {
     return {
-      bodyEl: _0x1c59fd?.['querySelector']?.('[data-custom-provider-editor-body]'),
-      tabBtnEl: _0x1c59fd?.['querySelector']?.('[data-custom-provider-editor-tab]'),
-      deleteBtnEl: _0x1c59fd?.['querySelector']?.('[data-custom-provider-delete]'),
-      discoverBtnEl: _0x1c59fd?.['querySelector']?.('[data-custom-provider-discover]'),
-      resultEl: _0x1c59fd?.['querySelector']?.('[data-custom-provider-result]'),
-      resultInnerEl: _0x1c59fd?.['querySelector']?.('[data-custom-provider-result-inner]'),
-      actionsEl: _0x1c59fd?.['querySelector']?.('[data-custom-provider-actions]'),
-      saveSelectedBtnEl: _0x1c59fd?.['querySelector']?.('[data-custom-provider-save-selected]'),
-      verifyParamsBtnEl: _0x1c59fd?.['querySelector']?.('[data-custom-provider-verify-params]'),
+      bodyEl: bodyEl?.['querySelector']?.('[data-custom-provider-editor-body]'),
+      tabBtnEl: bodyEl?.['querySelector']?.('[data-custom-provider-editor-tab]'),
+      deleteBtnEl: bodyEl?.['querySelector']?.('[data-custom-provider-delete]'),
+      discoverBtnEl: bodyEl?.['querySelector']?.('[data-custom-provider-discover]'),
+      resultEl: bodyEl?.['querySelector']?.('[data-custom-provider-result]'),
+      resultInnerEl: bodyEl?.['querySelector']?.('[data-custom-provider-result-inner]'),
+      actionsEl: bodyEl?.['querySelector']?.('[data-custom-provider-actions]'),
+      saveSelectedBtnEl: bodyEl?.['querySelector']?.('[data-custom-provider-save-selected]'),
+      verifyParamsBtnEl: bodyEl?.['querySelector']?.('[data-custom-provider-verify-params]'),
     };
   }
-  function _0x9855a8(_0xac29c7 = null) {
-    const _0x4087a5 = _0x28893f(_0xac29c7) || _0x1a7ae7['activeEditorId'];
-    _0x46a7d6()['forEach']((_0x4595f6) => {
-      const _0x31a1ce = _0x28893f(_0x4595f6) === _0x4087a5,
-        { bodyEl: _0x36749d, tabBtnEl: _0x2dc714 } = _0xf3935f(_0x4595f6);
-      (_0x4595f6['classList']['toggle']('is-active', _0x31a1ce),
-        _0x36749d &&
-          ((_0x36749d['hidden'] = !_0x31a1ce),
-          _0x36749d['setAttribute']('aria-hidden', _0x31a1ce ? 'false' : 'true')),
-        _0x2dc714 && _0x2dc714['setAttribute']('aria-selected', _0x31a1ce ? 'true' : 'false'));
+  function run8(value2 = null) {
+    const entry = run5(value2) || enabled['activeEditorId'];
+    run3()['forEach']((el4) => {
+      const enabled3 = run5(el4) === entry,
+        { bodyEl: bodyEl2, tabBtnEl: tabBtnEl } = run7(el4);
+      (el4['classList']['toggle']('is-active', enabled3),
+        bodyEl2 &&
+          ((bodyEl2['hidden'] = !enabled3),
+          bodyEl2['setAttribute']('aria-hidden', enabled3 ? 'false' : 'true')),
+        tabBtnEl && tabBtnEl['setAttribute']('aria-selected', enabled3 ? 'true' : 'false'));
     });
   }
-  function _0x3719ed(_0x4aa359, _0x508b86 = {}) {
-    if (!_0x4aa359) return;
-    const _0x4af59c = String(_0x4aa359['dataset']['customProviderEditorId'] || '')['trim']();
-    if (!_0x4af59c) return;
-    const _0x37e1e9 = _0x1a7ae7['activeEditorId'] !== _0x4af59c,
-      { editorListEl: _0x326932 } = _0x1c4a39();
-    (stabilizeCustomProviderEditorListHeight(_0x326932),
-      (_0x1a7ae7['activeEditorId'] = _0x4af59c),
-      _0x9855a8(_0x4aa359),
-      stabilizeCustomProviderEditorListHeight(_0x326932));
-    if (_0x37e1e9 || _0x508b86['clearStatus']) _0x3c5eb6('', '');
+  function run9(el5, record = {}) {
+    if (!el5) return;
+    const enabled4 = String(el5['dataset']['customProviderEditorId'] || '')['trim']();
+    if (!enabled4) return;
+    const payload = enabled['activeEditorId'] !== enabled4,
+      { editorListEl: editorListEl2 } = run2();
+    (stabilizeCustomProviderEditorListHeight(editorListEl2),
+      (enabled['activeEditorId'] = enabled4),
+      run8(el5),
+      stabilizeCustomProviderEditorListHeight(editorListEl2));
+    if (payload || record['clearStatus']) run10('', '');
   }
-  function _0x36ce14() {
-    const _0x4145a0 = _0x46a7d6(),
-      _0x4ee989 = _0x4145a0['find'](
-        (_0x1b0b89) =>
-          String(_0x1b0b89['dataset']['customProviderEditorId'] || '') === _0x1a7ae7['activeEditorId'],
+  function run11() {
+    const list = run3(),
+      handle = list['find'](
+        (el6) => String(el6['dataset']['customProviderEditorId'] || '') === enabled['activeEditorId'],
       );
-    return (
-      _0x4ee989 ||
-      _0x4145a0['find']((_0x539c14) => _0x539c14['classList']['contains']('is-active')) ||
-      _0x4145a0[0x0] ||
-      null
-    );
+    return handle || list['find']((el7) => el7['classList']['contains']('is-active')) || list[0x0] || null;
   }
-  function _0x2ade32() {
-    return _0x20560a(_0x36ce14());
+  function run12() {
+    return run4(run11());
   }
-  function _0x398959(_0x31bf22) {
-    const _0x417e5c = String(_0x31bf22 || '')['trim']();
-    return _0x417e5c ? 'custom-provider:' + _0x417e5c : '';
+  function run13(state) {
+    const config = String(state || '')['trim']();
+    return config ? 'custom-provider:' + config : '';
   }
-  function _0x59e3a6(_0x2e09de) {
-    return _0x52560e['get'](_0x398959(_0x2e09de)) || null;
+  function run14(scope) {
+    return map['get'](run13(scope)) || null;
   }
-  function _0x59b32b(_0x548173) {
-    const _0x2247d3 = _0x497e40(_0x548173),
-      _0x4e2378 = String(_0x2247d3['provider']?.['providerId'] || '')['trim']();
-    if (_0x4e2378) return _0x4e2378;
-    return String(_0x48eb16(_0x548173)['providerId'] || '')['trim']();
+  function run15(input) {
+    const output = run6(input),
+      value3 = String(output['provider']?.['providerId'] || '')['trim']();
+    if (value3) return value3;
+    return String(run16(input)['providerId'] || '')['trim']();
   }
-  function _0x356937(_0x469061) {
-    const _0x2f57f1 = _0x59b32b(_0x469061);
-    if (!_0x2f57f1) return ![];
-    const _0x5468e5 = _0x497e40(_0x469061),
-      _0x52d571 = _0x398959(_0x2f57f1);
-    return !!_0x5468e5['provider'] || _0x52560e['has'](_0x52d571);
+  function run17(value4) {
+    const enabled5 = run15(value4);
+    if (!enabled5) return ![];
+    const enabled6 = run6(value4),
+      value5 = run13(enabled5);
+    return !!enabled6['provider'] || map['has'](value5);
   }
-  function _0x19eead(_0x1e5403) {
-    return String(_0x1e5403 || '')
+  function run18(value6) {
+    return String(value6 || '')
       ['trim']()
       ['replace'](/\s+/g, '\x20');
   }
-  function _0x5ec5d0(_0x4dad29) {
-    const _0x476d73 = _0x46a7d6(),
-      _0x2a58c3 = Math['max'](0x0, _0x476d73['indexOf'](_0x4dad29));
-    return trCustomProvider('providerDraftTitle', { index: _0x2a58c3 + 0x1 });
+  function run19(value7) {
+    const list2 = run3(),
+      index2 = Math['max'](0x0, list2['indexOf'](value7));
+    return trCustomProvider('providerDraftTitle', { index: index2 + 0x1 });
   }
-  function _0x9ea563(_0x36e232) {
-    const _0x4dde7e = _0x497e40(_0x36e232);
-    return _0x19eead(_0x4dde7e['titleText']) || _0x5ec5d0(_0x36e232);
+  function run20(value8) {
+    const value9 = run6(value8);
+    return run18(value9['titleText']) || run19(value8);
   }
-  function _0x5be417(_0x5ab038) {
-    const _0x453fe8 = _0x5ab038?.['querySelector']?.('[data-custom-provider-editor-title]'),
-      _0x123b4c = _0x5ab038?.['querySelector']?.('[data-custom-provider-editor-tab]'),
-      _0x25f5ea = _0x9ea563(_0x5ab038);
-    (_0x453fe8 && (_0x453fe8['removeAttribute']('data-i18n'), (_0x453fe8['textContent'] = _0x25f5ea)),
-      _0x123b4c?.['setAttribute']('aria-label', _0x25f5ea));
+  function run21(el8) {
+    const el9 = el8?.['querySelector']?.('[data-custom-provider-editor-title]'),
+      el10 = el8?.['querySelector']?.('[data-custom-provider-editor-tab]'),
+      value10 = run20(el8);
+    (el9 && (el9['removeAttribute']('data-i18n'), (el9['textContent'] = value10)),
+      el10?.['setAttribute']('aria-label', value10));
   }
-  function _0x5d62c5() {
-    _0x46a7d6()['forEach']((_0x2e5c9d) => {
-      _0x5be417(_0x2e5c9d);
+  function run22() {
+    run3()['forEach']((value11) => {
+      run21(value11);
     });
   }
-  function _0x421be2(_0x43e207, _0x3adbbb, _0xfad0d5 = {}) {
-    if (!_0x43e207) return;
-    const _0x5193d9 = _0x497e40(_0x43e207),
-      _0xdccfab = _0x19eead(_0x3adbbb);
-    _0x5193d9['titleText'] = _0xdccfab;
-    if (_0xfad0d5['manual'] === !![]) _0x5193d9['titleManuallyEdited'] = !![];
-    else _0xfad0d5['manual'] === ![] && (_0x5193d9['titleManuallyEdited'] = ![]);
-    _0x5be417(_0x43e207);
+  function run23(enabled7, value12, value13 = {}) {
+    if (!enabled7) return;
+    const value14 = run6(enabled7),
+      value15 = run18(value12);
+    value14['titleText'] = value15;
+    if (value13['manual'] === !![]) value14['titleManuallyEdited'] = !![];
+    else value13['manual'] === ![] && (value14['titleManuallyEdited'] = ![]);
+    run21(enabled7);
   }
-  function _0xb8cb4c(_0xd8d4d5) {
-    if (!_0xd8d4d5) return;
-    const _0x428221 = _0x497e40(_0xd8d4d5);
-    ((_0x428221['titleText'] = ''), (_0x428221['titleManuallyEdited'] = ![]), _0x5be417(_0xd8d4d5));
+  function run24(enabled8) {
+    if (!enabled8) return;
+    const value16 = run6(enabled8);
+    ((value16['titleText'] = ''), (value16['titleManuallyEdited'] = ![]), run21(enabled8));
   }
-  function _0x36d676(_0xda21c4, _0x59af20) {
-    if (!_0xda21c4) return;
-    const _0x2e02ee = _0x497e40(_0xda21c4);
-    if (_0x2e02ee['titleManuallyEdited']) return;
-    const _0x8eea5c = _0x19eead(_0x59af20);
-    if (!_0x8eea5c) return;
-    ((_0x2e02ee['titleText'] = _0x8eea5c), _0x5be417(_0xda21c4));
+  function run25(enabled9, value17) {
+    if (!enabled9) return;
+    const value18 = run6(enabled9);
+    if (value18['titleManuallyEdited']) return;
+    const enabled10 = run18(value17);
+    if (!enabled10) return;
+    ((value18['titleText'] = enabled10), run21(enabled9));
   }
-  function _0x12d823(_0x7576d8) {
-    if (!_0x7576d8) return;
-    const { tabBtnEl: _0x4ca232, deleteBtnEl: _0x5ae764 } = _0xf3935f(_0x7576d8);
-    if (!_0x4ca232 || _0x7576d8['querySelector']('[data-custom-provider-editor-title-input]')) return;
-    const _0x4d0d1c = _0x497e40(_0x7576d8),
-      _0x3ddd40 = _0x4d0d1c['titleText'],
-      _0x54230d = !!_0x4d0d1c['titleManuallyEdited'],
-      _0x183c6c = _0x9ea563(_0x7576d8),
-      _0x1cc6ec = _0x57a604['createElement']('input');
-    ((_0x1cc6ec['type'] = 'text'),
-      (_0x1cc6ec['className'] = 'custom-provider-editor-title-input'),
-      (_0x1cc6ec['dataset']['customProviderEditorTitleInput'] = ''),
-      (_0x1cc6ec['value'] = _0x183c6c),
-      _0x1cc6ec['setAttribute']('aria-label', _0x183c6c));
-    let _0x62f751 = ![];
-    const _0x1154ba = (_0x58db37) => {
-      if (_0x62f751) return;
-      ((_0x62f751 = !![]),
-        _0x1cc6ec['removeEventListener']('blur', _0x51e368),
-        _0x1cc6ec['removeEventListener']('keydown', _0x361561));
-      if (_0x58db37) {
-        const _0x108a1b = _0x19eead(_0x1cc6ec['value']);
-        _0x108a1b
-          ? _0x54230d || _0x108a1b !== _0x183c6c
-            ? _0x421be2(_0x7576d8, _0x108a1b, { manual: !![] })
-            : ((_0x4d0d1c['titleText'] = _0x3ddd40),
-              (_0x4d0d1c['titleManuallyEdited'] = _0x54230d),
-              _0x5be417(_0x7576d8))
-          : ((_0x4d0d1c['titleText'] = _0x3ddd40),
-            (_0x4d0d1c['titleManuallyEdited'] = _0x54230d),
-            _0x5be417(_0x7576d8));
-      } else
-        ((_0x4d0d1c['titleText'] = _0x3ddd40),
-          (_0x4d0d1c['titleManuallyEdited'] = _0x54230d),
-          _0x5be417(_0x7576d8));
-      ((_0x4ca232['hidden'] = ![]), _0x1cc6ec['remove'](), _0x4ca232['focus']?.());
+  function run26(el11) {
+    if (!el11) return;
+    const { tabBtnEl: tabBtnEl2, deleteBtnEl: deleteBtnEl } = run7(el11);
+    if (!tabBtnEl2 || el11['querySelector']('[data-custom-provider-editor-title-input]')) return;
+    const enabled11 = run6(el11),
+      value19 = enabled11['titleText'],
+      value20 = !!enabled11['titleManuallyEdited'],
+      value21 = run20(el11),
+      el12 = cardEl['createElement']('input');
+    ((el12['type'] = 'text'),
+      (el12['className'] = 'custom-provider-editor-title-input'),
+      (el12['dataset']['customProviderEditorTitleInput'] = ''),
+      (el12['value'] = value21),
+      el12['setAttribute']('aria-label', value21));
+    let value22 = ![];
+    const run27 = (value23) => {
+      if (value22) return;
+      ((value22 = !![]),
+        el12['removeEventListener']('blur', run28),
+        el12['removeEventListener']('keydown', run29));
+      if (value23) {
+        const value24 = run18(el12['value']);
+        value24
+          ? value20 || value24 !== value21
+            ? run23(el11, value24, { manual: !![] })
+            : ((enabled11['titleText'] = value19), (enabled11['titleManuallyEdited'] = value20), run21(el11))
+          : ((enabled11['titleText'] = value19), (enabled11['titleManuallyEdited'] = value20), run21(el11));
+      } else ((enabled11['titleText'] = value19), (enabled11['titleManuallyEdited'] = value20), run21(el11));
+      ((tabBtnEl2['hidden'] = ![]), el12['remove'](), tabBtnEl2['focus']?.());
     };
-    function _0x51e368() {
-      _0x1154ba(!![]);
+    function run28() {
+      run27(!![]);
     }
-    function _0x361561(_0xb45205) {
-      if (_0xb45205['key'] === 'Enter') (_0xb45205['preventDefault'](), _0x1154ba(!![]));
-      else _0xb45205['key'] === 'Escape' && (_0xb45205['preventDefault'](), _0x1154ba(![]));
+    function run29(event) {
+      if (event['key'] === 'Enter') (event['preventDefault'](), run27(!![]));
+      else event['key'] === 'Escape' && (event['preventDefault'](), run27(![]));
     }
-    (_0x1cc6ec['addEventListener']('blur', _0x51e368),
-      _0x1cc6ec['addEventListener']('keydown', _0x361561),
-      (_0x4ca232['hidden'] = !![]),
-      _0x4ca232['parentElement']?.['insertBefore'](_0x1cc6ec, _0x5ae764 || _0x4ca232['nextSibling']),
-      _0x1cc6ec['focus']?.(),
-      _0x1cc6ec['select']?.());
+    (el12['addEventListener']('blur', run28),
+      el12['addEventListener']('keydown', run29),
+      (tabBtnEl2['hidden'] = !![]),
+      tabBtnEl2['parentElement']?.['insertBefore'](el12, deleteBtnEl || tabBtnEl2['nextSibling']),
+      el12['focus']?.(),
+      el12['select']?.());
   }
-  function _0x185155() {
-    const _0x4d44be = _0x46a7d6();
-    _0x4d44be['forEach']((_0x2d2940) => {
-      const { deleteBtnEl: _0x5d6039 } = _0xf3935f(_0x2d2940);
-      if (_0x5d6039) _0x5d6039['hidden'] = _0x4d44be['length'] <= 0x1 && !_0x356937(_0x2d2940);
+  function run30() {
+    const list3 = run3();
+    list3['forEach']((value25) => {
+      const { deleteBtnEl: deleteBtnEl2 } = run7(value25);
+      if (deleteBtnEl2) deleteBtnEl2['hidden'] = list3['length'] <= 0x1 && !run17(value25);
     });
   }
-  function _0x52f7f5(_0x124883) {
-    const _0x42cd99 = _0x46a7d6();
-    if (!_0x124883 || _0x42cd99['length'] <= 0x1) return;
-    const _0x131360 = _0x28893f(_0x124883),
-      _0x40c0b4 = _0x42cd99['indexOf'](_0x124883),
-      _0x2ef036 = _0x42cd99[_0x40c0b4 + 0x1] || _0x42cd99[_0x40c0b4 - 0x1] || null;
-    (_0x1a7ae7['editorStates']['delete'](_0x131360),
-      _0x124883['remove'](),
-      _0x5d62c5(),
-      _0x185155(),
-      _0x2ef036 && _0x3719ed(_0x2ef036, { clearStatus: !![] }));
+  function run31(el13) {
+    const list4 = run3();
+    if (!el13 || list4['length'] <= 0x1) return;
+    const value26 = run5(el13),
+      value27 = list4['indexOf'](el13),
+      value28 = list4[value27 + 0x1] || list4[value27 - 0x1] || null;
+    (enabled['editorStates']['delete'](value26),
+      el13['remove'](),
+      run22(),
+      run30(),
+      value28 && run9(value28, { clearStatus: !![] }));
   }
-  async function _0x522024(_0x5b8cd5) {
-    if (typeof _0x6ce60a !== 'function') return;
-    const _0x26df45 = String(_0x5b8cd5 || '')['trim']();
-    if (!_0x26df45 || !_0x6cada3?.['providers']?.[_0x26df45]) return;
-    const _0xc19a47 = { ...(_0x6cada3['providers'] || {}) };
-    delete _0xc19a47[_0x26df45];
-    const _0x32654d = { ...(_0x6cada3 || {}), providers: _0xc19a47 };
-    (await _0x6ce60a(_0x32654d),
-      _0x53ff29(_0x32654d),
-      syncModelServiceReadinessSummary(_0x32654d),
-      _0x155da5?.());
+  async function run32(value29) {
+    if (typeof saveApiConfigToServer !== 'function') return;
+    const enabled12 = String(value29 || '')['trim']();
+    if (!enabled12 || !configSnapshot?.['providers']?.[enabled12]) return;
+    const providers = { ...(configSnapshot['providers'] || {}) };
+    delete providers[enabled12];
+    const value30 = { ...(configSnapshot || {}), providers: providers };
+    (await saveApiConfigToServer(value30),
+      run(value30),
+      syncModelServiceReadinessSummary(value30),
+      refreshManifestModelNodeUis?.());
   }
-  async function _0x2be850(_0x4289ad) {
-    const _0x1e581d = String(_0x4289ad || '')['trim']();
-    if (!_0x1e581d) return;
-    const _0x41822f = _0x398959(_0x1e581d),
-      _0x3ca115 = _0x52560e['get'](_0x41822f);
-    if (typeof _0x47c6df === 'function' && _0x41822f)
+  async function run33(value31) {
+    const enabled13 = String(value31 || '')['trim']();
+    if (!enabled13) return;
+    const value32 = run13(enabled13),
+      value33 = map['get'](value32);
+    if (typeof deleteCustomProviderManifestBundle === 'function' && value32)
       try {
-        await _0x47c6df(_0x41822f);
-      } catch (_0x5ada3f) {
-        const _0x492181 = String(_0x5ada3f?.['message'] || _0x5ada3f || '')['toLowerCase']();
-        if (!_0x492181['includes']('not found') && !_0x492181['includes']('404')) throw _0x5ada3f;
+        await deleteCustomProviderManifestBundle(value32);
+      } catch (error) {
+        const list5 = String(error?.['message'] || error || '')['toLowerCase']();
+        if (!list5['includes']('not found') && !list5['includes']('404')) throw error;
       }
-    if (_0x3ca115) {
+    if (value33) {
       try {
-        unregisterManifestBundle(_0x3ca115);
-      } catch (_0x5cdf12) {
-        console['warn']('[Custom Provider] unregister deleted bundle failed:', _0x5cdf12);
+        unregisterManifestBundle(value33);
+      } catch (value34) {
+        console['warn']('[Custom Provider] unregister deleted bundle failed:', value34);
       }
-      _0x52560e['delete'](_0x41822f);
+      map['delete'](value32);
     }
-    await _0x522024(_0x1e581d);
+    await run32(enabled13);
   }
-  function _0x1b364f(_0x2430da) {
+  function run34(el14) {
     const {
-      baseUrlEl: _0x586704,
-      apiKeyEl: _0x1d68b4,
-      documentationUrlEl: _0x10516c,
-      documentationFileEl: _0x59caac,
-    } = _0x20560a(_0x2430da);
-    if (_0x586704) _0x586704['value'] = '';
-    if (_0x1d68b4) _0x1d68b4['value'] = '';
-    if (_0x10516c) _0x10516c['value'] = '';
-    if (_0x59caac) _0x59caac['value'] = '';
-    ((_0x497e40(_0x2430da)['documentationDocument'] = null),
-      _0x2430da?.['dataset'] &&
-        (delete _0x2430da['dataset']['customProviderProviderId'],
-        delete _0x2430da['dataset']['customProviderSyncedBundle']),
-      _0x4a601d(_0x2430da),
-      _0xb8cb4c(_0x2430da),
-      _0x3c5eb6('', ''));
+      baseUrlEl: baseUrlEl2,
+      apiKeyEl: apiKeyEl,
+      documentationUrlEl: documentationUrlEl,
+      documentationFileEl: documentationFileEl,
+    } = run4(el14);
+    if (baseUrlEl2) baseUrlEl2['value'] = '';
+    if (apiKeyEl) apiKeyEl['value'] = '';
+    if (documentationUrlEl) documentationUrlEl['value'] = '';
+    if (documentationFileEl) documentationFileEl['value'] = '';
+    ((run6(el14)['documentationDocument'] = null),
+      el14?.['dataset'] &&
+        (delete el14['dataset']['customProviderProviderId'],
+        delete el14['dataset']['customProviderSyncedBundle']),
+      run35(el14),
+      run24(el14),
+      run10('', ''));
   }
-  async function _0x50732f(_0x5d48d8, _0x48247c) {
-    if (!_0x5d48d8) return;
-    const _0x5a5b4c = _0x356937(_0x5d48d8),
-      _0x437ffe = _0x5a5b4c ? _0x59b32b(_0x5d48d8) : '';
-    if (_0x48247c) _0x48247c['disabled'] = !![];
+  async function run36(enabled14, el15) {
+    if (!enabled14) return;
+    const value35 = run17(enabled14),
+      value36 = value35 ? run15(enabled14) : '';
+    if (el15) el15['disabled'] = !![];
     try {
-      _0x5a5b4c && (await _0x2be850(_0x437ffe));
-      const _0x2f1552 = _0x46a7d6();
-      _0x2f1552['length'] <= 0x1
-        ? (_0x1b364f(_0x5d48d8), _0x5d62c5(), _0x185155(), _0x3719ed(_0x5d48d8, { clearStatus: !![] }))
-        : _0x52f7f5(_0x5d48d8);
-      if (_0x437ffe) {
-        const _0x512fbf = trCustomProvider('deleteSuccess'),
-          _0x1fa542 = getRememberedCustomProviderConfigs(_0x6cada3?.['providers'])['length']
+      value35 && (await run33(value36));
+      const list6 = run3();
+      list6['length'] <= 0x1
+        ? (run34(enabled14), run22(), run30(), run9(enabled14, { clearStatus: !![] }))
+        : run31(enabled14);
+      if (value36) {
+        const trCustomProvider2 = trCustomProvider('deleteSuccess'),
+          rememberedCustomProviderConfigs = getRememberedCustomProviderConfigs(configSnapshot?.['providers'])[
+            'length'
+          ]
             ? 'configured'
             : 'unconfigured';
-        (_0x3c5eb6(_0x1fa542, trApiInput('statuses.' + _0x1fa542)),
-          _0x4aef0b['showToast']?.(_0x512fbf, 'success'));
+        (run10(rememberedCustomProviderConfigs, trApiInput('statuses.' + rememberedCustomProviderConfigs)),
+          source['showToast']?.(trCustomProvider2, 'success'));
       }
-    } catch (_0x168abb) {
-      const _0x3ddfa3 = trCustomProvider('deleteFailed', {
-        error: _0x168abb?.['message'] || trApiInput('diagnostics.unknownError'),
+    } catch (error2) {
+      const trCustomProvider3 = trCustomProvider('deleteFailed', {
+        error: error2?.['message'] || trApiInput('diagnostics.unknownError'),
       });
-      (_0x3c5eb6('danger', trApiInput('diagnostics.failed'), _0x3ddfa3),
-        _0x4aef0b['showToast']?.(_0x3ddfa3, 'error', 0x2328));
+      (run10('danger', trApiInput('diagnostics.failed'), trCustomProvider3),
+        source['showToast']?.(trCustomProvider3, 'error', 0x2328));
     } finally {
-      if (_0x48247c) _0x48247c['disabled'] = ![];
+      if (el15) el15['disabled'] = ![];
     }
   }
-  function _0x452c68() {
-    const _0x3a984f = 'custom-provider-editor-' + (_0x1a7ae7['editorSequence'] + 0x1);
-    _0x1a7ae7['editorSequence'] += 0x1;
-    const _0x3ff8ef = createCustomProviderEditorShell({
-        documentObject: _0x57a604,
-        editorId: _0x3a984f,
+  function run37() {
+    const editorId = 'custom-provider-editor-' + (enabled['editorSequence'] + 0x1);
+    enabled['editorSequence'] += 0x1;
+    const customProviderEditorShell = createCustomProviderEditorShell({
+        documentObject: cardEl,
+        editorId: editorId,
         tutorialLabel: trCustomProvider('tutorial'),
         discoverLabel: trCustomProvider('discover'),
         deleteAriaLabel: trCustomProvider('deleteProviderDraft'),
       }),
-      _0x222813 = _0x57a604['createElement']('div');
-    ((_0x222813['className'] = 'custom-provider-editor-item-body'),
-      (_0x222813['dataset']['customProviderEditorBody'] = ''),
-      (_0x222813['hidden'] = !![]),
-      _0x222813['setAttribute']('aria-hidden', 'true'));
-    const _0x4f0110 = _0x57a604['createElement']('div');
-    _0x4f0110['className'] = 'custom-provider-discovery-grid';
-    const _0x5d6778 = _0x57a604['createElement']('div');
-    _0x5d6778['className'] = 'custom-provider-discovery-field custom-provider-discovery-field--wide';
-    const _0x30df3e = _0x2cb1d0('settings-label', trCustomProvider('baseUrl')),
-      _0x381104 = _0x57a604['createElement']('input');
-    ((_0x381104['type'] = 'text'),
-      (_0x381104['className'] = 'settings-input'),
-      (_0x381104['placeholder'] = trCustomProvider('baseUrlPlaceholder')),
-      (_0x381104['dataset']['customProviderBaseUrl'] = ''),
-      markNonLoginTextInput(_0x381104),
-      _0x5d6778['append'](_0x30df3e, _0x381104));
-    const _0x518bc5 = _0x57a604['createElement']('div');
-    _0x518bc5['className'] = 'custom-provider-discovery-field custom-provider-discovery-field--wide';
-    const _0x808fa = _0x2cb1d0('settings-label', trCustomProvider('apiKey')),
-      _0x21a33c = _0x57a604['createElement']('input');
-    ((_0x21a33c['type'] = 'password'),
-      (_0x21a33c['className'] = 'settings-input'),
-      (_0x21a33c['placeholder'] = trCustomProvider('apiKeyPlaceholder')),
-      (_0x21a33c['dataset']['customProviderApiKey'] = ''),
-      markApiSecretInput(_0x21a33c),
-      _0x518bc5['append'](_0x808fa, _0x21a33c));
-    const _0x8dfac8 = _0x57a604['createElement']('div');
-    _0x8dfac8['className'] = 'custom-provider-discovery-field custom-provider-discovery-field--wide';
-    const _0x5034d8 = _0x2cb1d0('settings-label', trCustomProvider('documentationUrl'));
-    _0x5034d8['append'](_0x19d150(trCustomProvider('documentationAgentHint')));
-    const _0x3e3e4f = _0x57a604['createElement']('input');
-    ((_0x3e3e4f['type'] = 'text'),
-      (_0x3e3e4f['className'] = 'settings-input'),
-      (_0x3e3e4f['placeholder'] = trCustomProvider('documentationUrlPlaceholder')),
-      (_0x3e3e4f['dataset']['customProviderDocumentationUrl'] = ''),
-      markNonLoginTextInput(_0x3e3e4f));
-    const _0x346215 = _0x57a604['createElement']('div');
-    _0x346215['className'] = 'custom-provider-documentation-input-row';
-    const _0x74277f = _0x57a604['createElement']('button');
-    ((_0x74277f['type'] = 'button'),
-      (_0x74277f['className'] =
-        'settings-save-btn settings-btn-ghost custom-provider-documentation-file-btn'),
-      (_0x74277f['dataset']['customProviderSelectDocument'] = ''),
-      (_0x74277f['textContent'] = trCustomProvider('selectDocumentationFile')));
-    const _0x21ce16 = _0x57a604['createElement']('input');
-    ((_0x21ce16['type'] = 'file'),
-      (_0x21ce16['hidden'] = !![]),
-      (_0x21ce16['accept'] = '.md,.txt,.json,.yaml,.yml,.html,.htm'),
-      (_0x21ce16['dataset']['customProviderDocumentationFile'] = ''),
-      _0x346215['append'](_0x3e3e4f, _0x74277f, _0x21ce16),
-      _0x8dfac8['append'](_0x5034d8, _0x346215),
-      _0x4f0110['append'](_0x5d6778, _0x518bc5, _0x8dfac8));
-    const _0x1cbbe5 = _0x57a604['createElement']('div');
-    ((_0x1cbbe5['className'] = 'custom-provider-discovery-result'),
-      (_0x1cbbe5['dataset']['customProviderResult'] = ''),
-      (_0x1cbbe5['hidden'] = !![]),
-      _0x1cbbe5['setAttribute']('aria-hidden', 'true'));
-    const _0x5c159d = _0x57a604['createElement']('div');
-    ((_0x5c159d['className'] = 'custom-provider-discovery-result-inner'),
-      (_0x5c159d['dataset']['customProviderResultInner'] = ''),
-      _0x1cbbe5['append'](_0x5c159d));
-    const _0x295a85 = _0x57a604['createElement']('div');
-    ((_0x295a85['className'] = 'custom-provider-discovery-actions'),
-      (_0x295a85['dataset']['customProviderActions'] = ''),
-      (_0x295a85['hidden'] = !![]));
-    const _0x2e1bfe = _0x57a604['createElement']('button');
-    ((_0x2e1bfe['type'] = 'button'),
-      (_0x2e1bfe['className'] = 'settings-save-btn settings-btn-ghost settings-api-test-btn'),
-      (_0x2e1bfe['dataset']['customProviderVerifyParams'] = ''));
-    const _0x2dc382 = _0x57a604['querySelector']('[data-provider-test]\x20.settings-btn-icon')?.['cloneNode'](
+      el16 = cardEl['createElement']('div');
+    ((el16['className'] = 'custom-provider-editor-item-body'),
+      (el16['dataset']['customProviderEditorBody'] = ''),
+      (el16['hidden'] = !![]),
+      el16['setAttribute']('aria-hidden', 'true'));
+    const value37 = cardEl['createElement']('div');
+    value37['className'] = 'custom-provider-discovery-grid';
+    const value38 = cardEl['createElement']('div');
+    value38['className'] = 'custom-provider-discovery-field custom-provider-discovery-field--wide';
+    const value39 = run38('settings-label', trCustomProvider('baseUrl')),
+      el17 = cardEl['createElement']('input');
+    ((el17['type'] = 'text'),
+      (el17['className'] = 'settings-input'),
+      (el17['placeholder'] = trCustomProvider('baseUrlPlaceholder')),
+      (el17['dataset']['customProviderBaseUrl'] = ''),
+      markNonLoginTextInput(el17),
+      value38['append'](value39, el17));
+    const value40 = cardEl['createElement']('div');
+    value40['className'] = 'custom-provider-discovery-field custom-provider-discovery-field--wide';
+    const value41 = run38('settings-label', trCustomProvider('apiKey')),
+      el18 = cardEl['createElement']('input');
+    ((el18['type'] = 'password'),
+      (el18['className'] = 'settings-input'),
+      (el18['placeholder'] = trCustomProvider('apiKeyPlaceholder')),
+      (el18['dataset']['customProviderApiKey'] = ''),
+      markApiSecretInput(el18),
+      value40['append'](value41, el18));
+    const value42 = cardEl['createElement']('div');
+    value42['className'] = 'custom-provider-discovery-field custom-provider-discovery-field--wide';
+    const value43 = run38('settings-label', trCustomProvider('documentationUrl'));
+    value43['append'](run39(trCustomProvider('documentationAgentHint')));
+    const el19 = cardEl['createElement']('input');
+    ((el19['type'] = 'text'),
+      (el19['className'] = 'settings-input'),
+      (el19['placeholder'] = trCustomProvider('documentationUrlPlaceholder')),
+      (el19['dataset']['customProviderDocumentationUrl'] = ''),
+      markNonLoginTextInput(el19));
+    const value44 = cardEl['createElement']('div');
+    value44['className'] = 'custom-provider-documentation-input-row';
+    const el20 = cardEl['createElement']('button');
+    ((el20['type'] = 'button'),
+      (el20['className'] = 'settings-save-btn settings-btn-ghost custom-provider-documentation-file-btn'),
+      (el20['dataset']['customProviderSelectDocument'] = ''),
+      (el20['textContent'] = trCustomProvider('selectDocumentationFile')));
+    const el21 = cardEl['createElement']('input');
+    ((el21['type'] = 'file'),
+      (el21['hidden'] = !![]),
+      (el21['accept'] = '.md,.txt,.json,.yaml,.yml,.html,.htm'),
+      (el21['dataset']['customProviderDocumentationFile'] = ''),
+      value44['append'](el19, el20, el21),
+      value42['append'](value43, value44),
+      value37['append'](value38, value40, value42));
+    const el22 = cardEl['createElement']('div');
+    ((el22['className'] = 'custom-provider-discovery-result'),
+      (el22['dataset']['customProviderResult'] = ''),
+      (el22['hidden'] = !![]),
+      el22['setAttribute']('aria-hidden', 'true'));
+    const el23 = cardEl['createElement']('div');
+    ((el23['className'] = 'custom-provider-discovery-result-inner'),
+      (el23['dataset']['customProviderResultInner'] = ''),
+      el22['append'](el23));
+    const el24 = cardEl['createElement']('div');
+    ((el24['className'] = 'custom-provider-discovery-actions'),
+      (el24['dataset']['customProviderActions'] = ''),
+      (el24['hidden'] = !![]));
+    const el25 = cardEl['createElement']('button');
+    ((el25['type'] = 'button'),
+      (el25['className'] = 'settings-save-btn settings-btn-ghost settings-api-test-btn'),
+      (el25['dataset']['customProviderVerifyParams'] = ''));
+    const value45 = cardEl['querySelector']('[data-provider-test]\x20.settings-btn-icon')?.['cloneNode'](
       !![],
     );
-    if (_0x2dc382) _0x2e1bfe['append'](_0x2dc382);
-    const _0x34751c = _0x57a604['createElement']('span');
-    ((_0x34751c['className'] = 'settings-btn-label'),
-      (_0x34751c['dataset']['i18n'] = 'settings.apiInput.customProvider.verifyParameters'),
-      (_0x34751c['textContent'] = trCustomProvider('verifyParameters')),
-      _0x2e1bfe['append'](_0x34751c),
-      (_0x2e1bfe['hidden'] = !![]),
-      (_0x2e1bfe['disabled'] = !![]));
-    const _0x3af573 = _0x57a604['createElement']('button');
+    if (value45) el25['append'](value45);
+    const el26 = cardEl['createElement']('span');
+    ((el26['className'] = 'settings-btn-label'),
+      (el26['dataset']['i18n'] = 'settings.apiInput.customProvider.verifyParameters'),
+      (el26['textContent'] = trCustomProvider('verifyParameters')),
+      el25['append'](el26),
+      (el25['hidden'] = !![]),
+      (el25['disabled'] = !![]));
+    const el27 = cardEl['createElement']('button');
     return (
-      (_0x3af573['type'] = 'button'),
-      (_0x3af573['className'] = 'settings-save-btn'),
-      (_0x3af573['dataset']['customProviderSaveSelected'] = ''),
-      (_0x3af573['dataset']['i18n'] = 'settings.apiInput.customProvider.saveModels'),
-      (_0x3af573['textContent'] = trCustomProvider('saveModels')),
-      (_0x3af573['hidden'] = !![]),
-      (_0x3af573['disabled'] = !![]),
-      _0x295a85['append'](_0x2e1bfe, _0x3af573),
-      _0x222813['append'](_0x4f0110, _0x1cbbe5, _0x295a85),
-      _0x3ff8ef['append'](_0x222813),
-      _0x3ff8ef
+      (el27['type'] = 'button'),
+      (el27['className'] = 'settings-save-btn'),
+      (el27['dataset']['customProviderSaveSelected'] = ''),
+      (el27['dataset']['i18n'] = 'settings.apiInput.customProvider.saveModels'),
+      (el27['textContent'] = trCustomProvider('saveModels')),
+      (el27['hidden'] = !![]),
+      (el27['disabled'] = !![]),
+      el24['append'](el25, el27),
+      el16['append'](value37, el22, el24),
+      customProviderEditorShell['append'](el16),
+      customProviderEditorShell
     );
   }
-  function _0x41d77f() {
-    const _0x403065 = _0x46a7d6();
-    (_0x403065['forEach']((_0x160cad, _0x2f050f) => {
-      !_0x160cad['dataset']['customProviderEditorId'] &&
-        (_0x160cad['dataset']['customProviderEditorId'] = 'custom-provider-editor-' + (_0x2f050f + 0x1));
-      const _0x4141ee = String(_0x160cad['dataset']['customProviderEditorId'] || '')['match'](/(\d+)$/);
-      _0x4141ee &&
-        (_0x1a7ae7['editorSequence'] = Math['max'](
-          _0x1a7ae7['editorSequence'],
-          Number(_0x4141ee[0x1]) || 0x1,
-        ));
+  function run40() {
+    const list7 = run3();
+    (list7['forEach']((el28, value46) => {
+      !el28['dataset']['customProviderEditorId'] &&
+        (el28['dataset']['customProviderEditorId'] = 'custom-provider-editor-' + (value46 + 0x1));
+      const value47 = String(el28['dataset']['customProviderEditorId'] || '')['match'](/(\d+)$/);
+      value47 &&
+        (enabled['editorSequence'] = Math['max'](enabled['editorSequence'], Number(value47[0x1]) || 0x1));
     }),
-      _0x3719ed(_0x36ce14() || _0x403065[0x0]),
-      _0x5d62c5(),
-      _0x185155(),
-      _0x9855a8(_0x36ce14()));
+      run9(run11() || list7[0x0]),
+      run22(),
+      run30(),
+      run8(run11()));
   }
-  function _0x24833d(_0x2845e3) {
-    const _0x46768c = String(_0x2845e3 || '')['trim']();
-    if (!_0x46768c) return '';
-    if (/^[a-z][a-z0-9+.-]*:\/\//i['test'](_0x46768c)) return _0x46768c;
-    return 'https://' + _0x46768c;
+  function run41(value48) {
+    const enabled15 = String(value48 || '')['trim']();
+    if (!enabled15) return '';
+    if (/^[a-z][a-z0-9+.-]*:\/\//i['test'](enabled15)) return enabled15;
+    return 'https://' + enabled15;
   }
-  function _0xca085d(_0x524689) {
-    const _0x2ad7db = _0x24833d(_0x524689);
-    if (!_0x2ad7db) return '';
+  function run42(value49) {
+    const enabled16 = run41(value49);
+    if (!enabled16) return '';
     try {
-      return new URL(_0x2ad7db)['hostname']['replace'](/^www\./i, '');
+      return new URL(enabled16)['hostname']['replace'](/^www\./i, '');
     } catch {
-      return String(_0x524689 || '')
+      return String(value49 || '')
         ['trim']()
         ['replace'](/^[a-z][a-z0-9+.-]*:\/\//i, '')
         ['split'](/[/?#]/)[0x0]
         ['replace'](/^www\./i, '');
     }
   }
-  function _0xe860e0(_0x41ff96) {
-    return _0xca085d(_0x41ff96) || '';
+  function run43(value50) {
+    return run42(value50) || '';
   }
-  function _0x2620dc(_0x268af9) {
-    const _0x224cad = (_0xca085d(_0x268af9) || String(_0x268af9 || '')['trim']())['toLowerCase'](),
-      _0x2a99b6 = _0x224cad['replace'](/[^a-z0-9_-]+/g, '_')
+  function run44(value51) {
+    const value52 = (run42(value51) || String(value51 || '')['trim']())['toLowerCase'](),
+      value53 = value52['replace'](/[^a-z0-9_-]+/g, '_')
         ['replace'](/^_+|_+$/g, '')
         ['replace'](/_{2,}/g, '_'),
-      _0x175b82 = _0x2a99b6 || 'provider';
-    return _0x175b82['startsWith']('custom_') ? _0x175b82 : 'custom_' + _0x175b82;
+      value54 = value53 || 'provider';
+    return value54['startsWith']('custom_') ? value54 : 'custom_' + value54;
   }
-  function _0x13c697(_0x28d167) {
-    const _0x42f1ab = _0x497e40(_0x28d167),
-      _0x5f0ebe = String(_0x42f1ab['provider']?.['providerId'] || '')['trim']();
-    if (_0x5f0ebe) return _0x5f0ebe;
-    const _0x3ee5fb = _0x48eb16(_0x28d167);
-    return _0x3ee5fb['baseUrl'] ? String(_0x3ee5fb['providerId'] || '')['trim']() : '';
+  function run45(value55) {
+    const value56 = run6(value55),
+      value57 = String(value56['provider']?.['providerId'] || '')['trim']();
+    if (value57) return value57;
+    const value58 = run16(value55);
+    return value58['baseUrl'] ? String(value58['providerId'] || '')['trim']() : '';
   }
-  function _0x2b52a8(_0x468ff5, _0x3921fb) {
-    const _0x51e439 = String(_0x3921fb || '')['trim']();
-    if (!_0x51e439) return ![];
-    return _0x46a7d6()['some']((_0x3849d8) => _0x3849d8 !== _0x468ff5 && _0x13c697(_0x3849d8) === _0x51e439);
+  function run46(value59, value60) {
+    const enabled17 = String(value60 || '')['trim']();
+    if (!enabled17) return ![];
+    return run3()['some']((value61) => value61 !== value59 && run45(value61) === enabled17);
   }
-  function _0x2146a9(_0x4c344f, _0x39ddbe) {
-    if (!_0x2b52a8(_0x4c344f, _0x39ddbe)) return ![];
-    const _0x2697fb = trCustomProvider('duplicateProviderDomain'),
-      { baseUrlEl: _0x31d7c1 } = _0x20560a(_0x4c344f);
+  function run47(value62, value63) {
+    if (!run46(value62, value63)) return ![];
+    const trCustomProvider4 = trCustomProvider('duplicateProviderDomain'),
+      { baseUrlEl: baseUrlEl3 } = run4(value62);
     return (
-      _0x3c5eb6('danger', trApiInput('diagnostics.failed'), _0x2697fb),
-      _0x4aef0b['showToast']?.(_0x2697fb, 'warn', 0x1b58),
-      _0x31d7c1?.['focus']?.(),
+      run10('danger', trApiInput('diagnostics.failed'), trCustomProvider4),
+      source['showToast']?.(trCustomProvider4, 'warn', 0x1b58),
+      baseUrlEl3?.['focus']?.(),
       !![]
     );
   }
-  function _0x2a7b4a(_0x23c3c8) {
-    const _0x596fa0 = String(_0x23c3c8 || 'unknown')
+  function run48(value64) {
+    const value65 = String(value64 || 'unknown')
         ['trim']()
         ['toLowerCase'](),
-      _0x318bc1 = CUSTOM_PROVIDER_KIND_LABEL_KEYS[_0x596fa0] || CUSTOM_PROVIDER_KIND_LABEL_KEYS['unknown'];
-    return trCustomProvider(_0x318bc1);
+      value66 = CUSTOM_PROVIDER_KIND_LABEL_KEYS[value65] || CUSTOM_PROVIDER_KIND_LABEL_KEYS['unknown'];
+    return trCustomProvider(value66);
   }
-  function _0x5975b0(_0x884823) {
-    return String(_0x884823 || '')
+  function run49(value67) {
+    return String(value67 || '')
       ['trim']()
       ['toLowerCase']() === 'documented'
       ? trCustomProvider('capabilityDocumented')
       : trCustomProvider('capabilityUnverified');
   }
-  function _0x1ef0cf(_0x1ab269) {
-    return String(_0x1ab269 || '')
+  function run50(value68) {
+    return String(value68 || '')
       ['trim']()
       ['toLowerCase']() === 'documented'
       ? trCustomProvider('capabilityDocumentedHint')
       : trCustomProvider('capabilityUnverifiedHint');
   }
-  function _0x3c5eb6(_0x1c2653, _0x19cad0, _0x3a00b9 = '') {
-    const { statusEl: _0x21cce5 } = _0x1c4a39();
-    if (!_0x21cce5) return;
-    (_0x3c8fad['bind'](_0x21cce5), _0x21cce5['classList']['remove'](...PROVIDER_TEST_STATUS_CLASSES));
-    const _0x4ee257 = String(_0x19cad0 || '')['trim']();
-    if (!_0x4ee257) {
-      (_0x3c8fad['hide'](_0x21cce5),
-        (_0x21cce5['hidden'] = !![]),
-        (_0x21cce5['textContent'] = ''),
-        delete _0x21cce5['dataset']['detail'],
-        _0x21cce5['removeAttribute']('title'),
-        _0x21cce5['removeAttribute']('aria-label'),
-        _0x21cce5['removeAttribute']('tabindex'),
-        _0x21cce5['removeAttribute']('data-provider-test-tooltip'));
+  function run10(value69, value70, value71 = '') {
+    const { statusEl: statusEl } = run2();
+    if (!statusEl) return;
+    (providerStatusTooltipController['bind'](statusEl),
+      statusEl['classList']['remove'](...PROVIDER_TEST_STATUS_CLASSES));
+    const enabled18 = String(value70 || '')['trim']();
+    if (!enabled18) {
+      (providerStatusTooltipController['hide'](statusEl),
+        (statusEl['hidden'] = !![]),
+        (statusEl['textContent'] = ''),
+        delete statusEl['dataset']['detail'],
+        statusEl['removeAttribute']('title'),
+        statusEl['removeAttribute']('aria-label'),
+        statusEl['removeAttribute']('tabindex'),
+        statusEl['removeAttribute']('data-provider-test-tooltip'));
       return;
     }
-    const _0x5c074f = String(_0x1c2653 || '')['trim']();
-    _0x5c074f && _0x21cce5['classList']['add']('settings-provider-status--' + _0x5c074f);
-    _0x21cce5['textContent'] = _0x4ee257;
-    const _0x1f4a29 = String(_0x3a00b9 || '')['trim']();
-    (_0x1f4a29
-      ? ((_0x21cce5['dataset']['detail'] = _0x1f4a29),
-        _0x21cce5['setAttribute']('data-provider-test-tooltip', _0x1f4a29),
-        _0x21cce5['setAttribute']('aria-label', _0x1f4a29),
-        _0x21cce5['setAttribute']('tabindex', '0'))
-      : (_0x3c8fad['hide'](_0x21cce5),
-        delete _0x21cce5['dataset']['detail'],
-        _0x21cce5['removeAttribute']('data-provider-test-tooltip'),
-        _0x21cce5['removeAttribute']('aria-label'),
-        _0x21cce5['removeAttribute']('tabindex')),
-      _0x21cce5['removeAttribute']('title'),
-      (_0x21cce5['hidden'] = ![]));
+    const value72 = String(value69 || '')['trim']();
+    value72 && statusEl['classList']['add']('settings-provider-status--' + value72);
+    statusEl['textContent'] = enabled18;
+    const value73 = String(value71 || '')['trim']();
+    (value73
+      ? ((statusEl['dataset']['detail'] = value73),
+        statusEl['setAttribute']('data-provider-test-tooltip', value73),
+        statusEl['setAttribute']('aria-label', value73),
+        statusEl['setAttribute']('tabindex', '0'))
+      : (providerStatusTooltipController['hide'](statusEl),
+        delete statusEl['dataset']['detail'],
+        statusEl['removeAttribute']('data-provider-test-tooltip'),
+        statusEl['removeAttribute']('aria-label'),
+        statusEl['removeAttribute']('tabindex')),
+      statusEl['removeAttribute']('title'),
+      (statusEl['hidden'] = ![]));
   }
-  function _0x344b2d(_0x49b4d9, _0x512ae6) {
-    if (!_0x49b4d9) return () => {};
-    const _0x17ba6b = _0x49b4d9['querySelector']?.('.settings-btn-label'),
-      _0x3475d1 = _0x17ba6b?.['textContent'] || _0x49b4d9['textContent'];
-    _0x49b4d9['disabled'] = !![];
-    if (_0x17ba6b) _0x17ba6b['textContent'] = _0x512ae6;
-    else _0x49b4d9['textContent'] = _0x512ae6;
+  function run51(el29, value74) {
+    if (!el29) return () => {};
+    const el30 = el29['querySelector']?.('.settings-btn-label'),
+      value75 = el30?.['textContent'] || el29['textContent'];
+    el29['disabled'] = !![];
+    if (el30) el30['textContent'] = value74;
+    else el29['textContent'] = value74;
     return () => {
-      _0x49b4d9['disabled'] = ![];
-      if (_0x17ba6b) _0x17ba6b['textContent'] = _0x3475d1;
-      else _0x49b4d9['textContent'] = _0x3475d1;
+      el29['disabled'] = ![];
+      if (el30) el30['textContent'] = value75;
+      else el29['textContent'] = value75;
     };
   }
-  function _0x2478df(_0x36a751) {
-    const _0x1112ae = String(_0x36a751 || '')
+  function run52(value76) {
+    const value77 = String(value76 || '')
       ['trim']()
       ['toLowerCase']()
       ['match'](/(\.[^.]+)$/);
-    return _0x1112ae?.[0x1] || '';
+    return value77?.[0x1] || '';
   }
-  function _0x48a605(_0xde70fd) {
-    const _0x1f5ac4 = _0x497e40(_0xde70fd);
-    _0x1f5ac4['documentationDocument'] = null;
-    const { documentationFileEl: _0x2a7b25 } = _0x20560a(_0xde70fd);
-    if (_0x2a7b25) _0x2a7b25['value'] = '';
+  function run53(value78) {
+    const value79 = run6(value78);
+    value79['documentationDocument'] = null;
+    const { documentationFileEl: documentationFileEl2 } = run4(value78);
+    if (documentationFileEl2) documentationFileEl2['value'] = '';
   }
-  async function _0x39dda3(_0x29d892, _0x46a5a8) {
-    const _0x274689 = _0x46a5a8?.['files']?.[0x0];
-    if (!_0x29d892 || !_0x274689) return;
-    const _0x2de531 = _0x497e40(_0x29d892);
-    ((_0x2de531['parameterDraft'] = null),
-      (_0x2de531['recognitionInvalidated'] = !![]),
-      _0x4f74b3(_0x29d892));
-    const _0x53c51a = _0x2478df(_0x274689['name']);
-    if (!CUSTOM_PROVIDER_DOCUMENTATION_EXTENSIONS['has'](_0x53c51a)) {
-      (_0x48a605(_0x29d892),
-        _0x4aef0b['showToast']?.(trCustomProvider('localDocumentationUnsupported'), 'warn'));
+  async function run54(enabled19, value80) {
+    const name = value80?.['files']?.[0x0];
+    if (!enabled19 || !name) return;
+    const value81 = run6(enabled19);
+    ((value81['parameterDraft'] = null), (value81['recognitionInvalidated'] = !![]), run55(enabled19));
+    const value82 = run52(name['name']);
+    if (!CUSTOM_PROVIDER_DOCUMENTATION_EXTENSIONS['has'](value82)) {
+      (run53(enabled19), source['showToast']?.(trCustomProvider('localDocumentationUnsupported'), 'warn'));
       return;
     }
-    if (Number(_0x274689['size'] || 0x0) > CUSTOM_PROVIDER_DOCUMENTATION_MAX_BYTES) {
-      (_0x48a605(_0x29d892),
-        _0x4aef0b['showToast']?.(trCustomProvider('localDocumentationTooLarge'), 'warn'));
+    if (Number(name['size'] || 0x0) > CUSTOM_PROVIDER_DOCUMENTATION_MAX_BYTES) {
+      (run53(enabled19), source['showToast']?.(trCustomProvider('localDocumentationTooLarge'), 'warn'));
       return;
     }
     try {
-      const _0x197959 = await _0x274689['text'](),
-        _0x327161 = _0x497e40(_0x29d892);
-      _0x327161['documentationDocument'] = {
-        name: String(_0x274689['name'] || '')['trim'](),
-        contentType: String(_0x274689['type'] || '')['trim'](),
-        text: _0x197959,
+      const text = await name['text'](),
+        value83 = run6(enabled19);
+      value83['documentationDocument'] = {
+        name: String(name['name'] || '')['trim'](),
+        contentType: String(name['type'] || '')['trim'](),
+        text: text,
       };
-      const { documentationUrlEl: _0x1906fe } = _0x20560a(_0x29d892);
-      _0x1906fe &&
-        (_0x1906fe['value'] = trCustomProvider('localDocumentationSelected', { name: _0x274689['name'] }));
-    } catch (_0x573d6d) {
-      (_0x48a605(_0x29d892),
-        _0x4aef0b['showToast']?.(
+      const { documentationUrlEl: documentationUrlEl2 } = run4(enabled19);
+      documentationUrlEl2 &&
+        (documentationUrlEl2['value'] = trCustomProvider('localDocumentationSelected', {
+          name: name['name'],
+        }));
+    } catch (error3) {
+      (run53(enabled19),
+        source['showToast']?.(
           trCustomProvider('localDocumentationReadFailed', {
-            error: _0x573d6d?.['message'] || trApiInput('diagnostics.unknownError'),
+            error: error3?.['message'] || trApiInput('diagnostics.unknownError'),
           }),
           'error',
         ));
     }
   }
-  function _0x48eb16(_0xbe1f75 = _0x36ce14()) {
-    const { baseUrlEl: _0x5d0dab, apiKeyEl: _0x12ec62, documentationUrlEl: _0x463cf6 } = _0x20560a(_0xbe1f75),
-      _0x14f577 = _0x24833d(_0x5d0dab?.['value']),
-      _0x557fa3 = String(_0x12ec62?.['value'] || '')['trim'](),
-      _0x1f3376 = _0x497e40(_0xbe1f75),
-      _0x3552ee = _0x1f3376['documentationDocument'],
-      _0x4e7de7 = _0x3552ee ? '' : String(_0x463cf6?.['value'] || '')['trim'](),
-      _0x3809a4 = _0xe860e0(_0x14f577),
-      _0x33d046 = _0x2620dc(_0x14f577);
+  function run16(value84 = run11()) {
+    const {
+        baseUrlEl: baseUrlEl4,
+        apiKeyEl: apiKeyEl2,
+        documentationUrlEl: documentationUrlEl3,
+      } = run4(value84),
+      baseUrl = run41(baseUrlEl4?.['value']),
+      apiKey = String(apiKeyEl2?.['value'] || '')['trim'](),
+      value85 = run6(value84),
+      documentationDocument = value85['documentationDocument'],
+      documentationUrl = documentationDocument ? '' : String(documentationUrlEl3?.['value'] || '')['trim'](),
+      name2 = run43(baseUrl),
+      providerId = run44(baseUrl);
     return {
-      name: _0x3809a4,
-      providerId: _0x33d046,
-      baseUrl: _0x14f577,
-      apiKey: _0x557fa3,
-      documentationUrl: _0x4e7de7,
-      documentationDocument: _0x3552ee,
+      name: name2,
+      providerId: providerId,
+      baseUrl: baseUrl,
+      apiKey: apiKey,
+      documentationUrl: documentationUrl,
+      documentationDocument: documentationDocument,
     };
   }
-  function _0x16ad8f(_0x3bdddd = {}) {
-    const { baseUrlEl: _0x186e35, apiKeyEl: _0x37c203 } = _0x20560a(_0x46a7d6()[0x0]),
-      _0xbacbd9 = _0x3bdddd?.['openai'] || {};
-    (_0x186e35 &&
-      !String(_0x186e35['value'] || '')['trim']() &&
-      _0xbacbd9['apiUrl'] &&
-      (_0x186e35['value'] = _0xbacbd9['apiUrl']),
-      _0x37c203 &&
-        !String(_0x37c203['value'] || '')['trim']() &&
-        _0xbacbd9['apiKey'] &&
-        (_0x37c203['value'] = _0xbacbd9['apiKey']));
+  function syncDefaults(options2 = {}) {
+    const { baseUrlEl: baseUrlEl5, apiKeyEl: apiKeyEl3 } = run4(run3()[0x0]),
+      value86 = options2?.['openai'] || {};
+    (baseUrlEl5 &&
+      !String(baseUrlEl5['value'] || '')['trim']() &&
+      value86['apiUrl'] &&
+      (baseUrlEl5['value'] = value86['apiUrl']),
+      apiKeyEl3 &&
+        !String(apiKeyEl3['value'] || '')['trim']() &&
+        value86['apiKey'] &&
+        (apiKeyEl3['value'] = value86['apiKey']));
   }
-  function _0x2cb1d0(_0x38fed9, _0x2ed30e) {
-    const _0x41ffdf = _0x57a604['createElement']('div');
+  function run38(value87, value88) {
+    const el31 = cardEl['createElement']('div');
+    return ((el31['className'] = value87), (el31['textContent'] = String(value88 || '')), el31);
+  }
+  function run39(value89) {
+    const value90 = String(value89 || '')['trim'](),
+      el32 = cardEl['createElement']('button');
     return (
-      (_0x41ffdf['className'] = _0x38fed9),
-      (_0x41ffdf['textContent'] = String(_0x2ed30e || '')),
-      _0x41ffdf
+      (el32['type'] = 'button'),
+      (el32['className'] = 'custom-provider-info-tip'),
+      el32['setAttribute']('aria-label', value90),
+      (el32['textContent'] = '!'),
+      (el32['dataset']['tooltip'] = value90),
+      el32
     );
   }
-  function _0x19d150(_0x3e14b3) {
-    const _0x5cd574 = String(_0x3e14b3 || '')['trim'](),
-      _0x5d76e5 = _0x57a604['createElement']('button');
-    return (
-      (_0x5d76e5['type'] = 'button'),
-      (_0x5d76e5['className'] = 'custom-provider-info-tip'),
-      _0x5d76e5['setAttribute']('aria-label', _0x5cd574),
-      (_0x5d76e5['textContent'] = '!'),
-      (_0x5d76e5['dataset']['tooltip'] = _0x5cd574),
-      _0x5d76e5
-    );
+  function run56(options3 = {}) {
+    return String(options3?.['upstreamModelId'] || '')['trim']();
   }
-  function _0x521f6b(_0x26468f = {}) {
-    return String(_0x26468f?.['upstreamModelId'] || '')['trim']();
-  }
-  function _0x22be64(_0x1428cd = {}) {
-    const _0x45dce6 = [
-        ...(Array['isArray'](_0x1428cd?.['models']) ? _0x1428cd['models'] : []),
-        ...(Array['isArray'](_0x1428cd?.['unknown']) ? _0x1428cd['unknown'] : []),
+  function run57(options4 = {}) {
+    const list8 = [
+        ...(Array['isArray'](options4?.['models']) ? options4['models'] : []),
+        ...(Array['isArray'](options4?.['unknown']) ? options4['unknown'] : []),
       ],
-      _0x3c6ff5 = new Set();
-    return _0x45dce6['filter']((_0x399dcc) => {
-      const _0x5c9c00 = _0x521f6b(_0x399dcc);
-      if (!_0x5c9c00 || _0x3c6ff5['has'](_0x5c9c00)) return ![];
-      return (_0x3c6ff5['add'](_0x5c9c00), !![]);
+      map2 = new Set();
+    return list8['filter']((value91) => {
+      const enabled20 = run56(value91);
+      if (!enabled20 || map2['has'](enabled20)) return ![];
+      return (map2['add'](enabled20), !![]);
     });
   }
-  function _0x49ff66(_0x294a48, _0x47760a = {}) {
-    const _0x2c30b1 = String(_0x47760a?.['kind'] || 'unknown')
+  function kind(value92, value93 = {}) {
+    const value94 = String(value93?.['kind'] || 'unknown')
       ['trim']()
       ['toLowerCase']();
-    if (CUSTOM_PROVIDER_SELECTABLE_KINDS['includes'](_0x2c30b1)) return _0x2c30b1;
-    const _0x268fc0 = _0x497e40(_0x294a48)['assignedModelKinds']['get'](_0x521f6b(_0x47760a));
-    return CUSTOM_PROVIDER_SELECTABLE_KINDS['includes'](_0x268fc0) ? _0x268fc0 : 'unknown';
+    if (CUSTOM_PROVIDER_SELECTABLE_KINDS['includes'](value94)) return value94;
+    const value95 = run6(value92)['assignedModelKinds']['get'](run56(value93));
+    return CUSTOM_PROVIDER_SELECTABLE_KINDS['includes'](value95) ? value95 : 'unknown';
   }
-  function _0x5f0f95(_0x5ea319, _0x28e922 = []) {
-    return (Array['isArray'](_0x28e922) ? _0x28e922 : [])['filter']((_0x19fdf7) =>
-      CUSTOM_PROVIDER_SELECTABLE_KINDS['includes'](_0x49ff66(_0x5ea319, _0x19fdf7)),
+  function run58(value96, value97 = []) {
+    return (Array['isArray'](value97) ? value97 : [])['filter']((value98) =>
+      CUSTOM_PROVIDER_SELECTABLE_KINDS['includes'](kind(value96, value98)),
     );
   }
-  function _0xf1ed58(_0x3f71b6) {
-    const _0x11bdba = _0x497e40(_0x3f71b6);
-    ((_0x11bdba['activeKindFilter'] = 'all'),
-      (_0x11bdba['selectedModelKeys'] = new Set()),
-      (_0x11bdba['assignedModelKinds'] = new Map()),
-      (_0x11bdba['verifyingModelKeys'] = new Set()));
+  function run59(value99) {
+    const value100 = run6(value99);
+    ((value100['activeKindFilter'] = 'all'),
+      (value100['selectedModelKeys'] = new Set()),
+      (value100['assignedModelKinds'] = new Map()),
+      (value100['verifyingModelKeys'] = new Set()));
   }
-  function _0x30e46f(_0x2534da, _0x5507b2 = []) {
-    const _0x1a3400 = _0x497e40(_0x2534da),
-      _0x27314d = CUSTOM_PROVIDER_FILTER_KINDS['includes'](_0x1a3400['activeKindFilter'])
-        ? _0x1a3400['activeKindFilter']
+  function run60(value101, value102 = []) {
+    const value103 = run6(value101),
+      value104 = CUSTOM_PROVIDER_FILTER_KINDS['includes'](value103['activeKindFilter'])
+        ? value103['activeKindFilter']
         : 'all',
-      _0x5b56c5 = Array['isArray'](_0x5507b2) ? _0x5507b2 : [];
-    if (_0x27314d === 'all') return _0x5b56c5;
-    return _0x5b56c5['filter'](
-      (_0x357b19) =>
-        String(_0x357b19?.['kind'] || '')
+      list9 = Array['isArray'](value102) ? value102 : [];
+    if (value104 === 'all') return list9;
+    return list9['filter'](
+      (value105) =>
+        String(value105?.['kind'] || '')
           ['trim']()
-          ['toLowerCase']() === _0x27314d,
+          ['toLowerCase']() === value104,
     );
   }
-  function _0x5a39b1(_0x27a60b = []) {
-    const _0x4ab226 = new Map(
-      CUSTOM_PROVIDER_FILTER_KINDS['filter']((_0x541a0f) => _0x541a0f !== 'all')['map']((_0xb95617) => [
-        _0xb95617,
+  function run61(list10 = []) {
+    const map3 = new Map(
+      CUSTOM_PROVIDER_FILTER_KINDS['filter']((value106) => value106 !== 'all')['map']((value107) => [
+        value107,
         0x0,
       ]),
     );
     return (
-      (Array['isArray'](_0x27a60b) ? _0x27a60b : [])['forEach']((_0xc2e040) => {
-        const _0x5763b9 = String(_0xc2e040?.['kind'] || 'unknown')
+      (Array['isArray'](list10) ? list10 : [])['forEach']((value108) => {
+        const value109 = String(value108?.['kind'] || 'unknown')
           ['trim']()
           ['toLowerCase']();
-        _0x4ab226['set'](_0x5763b9, (_0x4ab226['get'](_0x5763b9) || 0x0) + 0x1);
+        map3['set'](value109, (map3['get'](value109) || 0x0) + 0x1);
       }),
-      _0x4ab226
+      map3
     );
   }
-  function _0x2c91d2(_0x3804e7 = _0x36ce14()) {
-    const _0xa3c936 = _0x497e40(_0x3804e7),
-      _0xd79f81 = _0xa3c936['discovery'] || {},
-      _0x537a5a = _0xa3c936['selectedModelKeys'],
-      _0x368f6b = _0x22be64(_0xd79f81);
-    return _0x5f0f95(_0x3804e7, _0x368f6b)
-      ['filter']((_0x4b912c) => _0x537a5a['has'](_0x521f6b(_0x4b912c)))
-      ['map']((_0x1cb385) => ({ ..._0x1cb385, kind: _0x49ff66(_0x3804e7, _0x1cb385) }));
+  function run62(value110 = run11()) {
+    const value111 = run6(value110),
+      value112 = value111['discovery'] || {},
+      map4 = value111['selectedModelKeys'],
+      value113 = run57(value112);
+    return run58(value110, value113)
+      ['filter']((value114) => map4['has'](run56(value114)))
+      ['map']((args) => ({ ...args, kind: kind(value110, args) }));
   }
-  function _0x5678fd(_0x218a2f) {
-    const _0x2ccf6b = _0x48eb16(_0x218a2f);
+  function run63(value115) {
+    const value116 = run16(value115);
     return JSON['stringify']([
-      _0x2ccf6b['baseUrl'],
-      _0x2ccf6b['apiKey'],
-      _0x2ccf6b['documentationUrl'],
-      _0x2ccf6b['documentationDocument'],
+      value116['baseUrl'],
+      value116['apiKey'],
+      value116['documentationUrl'],
+      value116['documentationDocument'],
     ]);
   }
-  function _0x4c8c0c(_0x460036) {
-    const _0x114964 = _0x497e40(_0x460036),
-      _0x1ed2d2 = _0x2c91d2(_0x460036),
-      _0x184c29 = _0x114964['recognitionInvalidated']
-        ? _0x1ed2d2['map']((_0x44d70a) => ({ ..._0x44d70a, capabilityStatus: 'unverified' }))
-        : _0x1ed2d2,
-      _0x3e64d1 = _0x114964['parameterDraft'];
-    if (!_0x3e64d1 || _0x3e64d1['context'] !== _0x5678fd(_0x460036)) return _0x184c29;
-    return mergeCustomProviderDiscoveryCapabilities({ models: _0x184c29 }, _0x3e64d1['bundle'])['models'];
+  function run64(value117) {
+    const value118 = run6(value117),
+      list11 = run62(value117),
+      models = value118['recognitionInvalidated']
+        ? list11['map']((args2) => ({ ...args2, capabilityStatus: 'unverified' }))
+        : list11,
+      enabled21 = value118['parameterDraft'];
+    if (!enabled21 || enabled21['context'] !== run63(value117)) return models;
+    return mergeCustomProviderDiscoveryCapabilities({ models: models }, enabled21['bundle'])['models'];
   }
-  function _0x4f74b3(_0xa94937 = _0x36ce14()) {
+  function run55(el33 = run11()) {
     const {
-      saveSelectedBtnEl: _0x5424df,
-      verifyParamsBtnEl: _0x10dc25,
-      actionsEl: _0x522e73,
-    } = _0xf3935f(_0xa94937);
-    if (!_0x5424df) return;
-    const _0x12675b = _0x2c91d2(_0xa94937)['length'],
-      _0x2603fc = _0x497e40(_0xa94937),
-      _0x1810b9 = !!_0x2603fc['discovery'],
-      _0x220fce = _0xa94937?.['dataset']?.['customProviderSyncedBundle'] === 'true',
-      _0x1a8e43 = getCustomProviderModelActionState({
-        hasDiscovery: _0x1810b9,
-        hasSavedBundle: _0x220fce,
-        isAddingModels: _0x2603fc['isAddingModels'] === !![],
-        selectedCount: _0x12675b,
-        unverifiedCount: getCustomProviderModelsBlockingSave(_0x4c8c0c(_0xa94937))['length'],
-        busy: _0x2603fc['verifyingModelKeys']['size'] > 0x0 || _0x2603fc['saving'] === !![],
+      saveSelectedBtnEl: saveSelectedBtnEl,
+      verifyParamsBtnEl: verifyParamsBtnEl,
+      actionsEl: actionsEl,
+    } = run7(el33);
+    if (!saveSelectedBtnEl) return;
+    const selectedCount = run62(el33)['length'],
+      isAddingModels = run6(el33),
+      hasDiscovery = !!isAddingModels['discovery'],
+      hasSavedBundle = el33?.['dataset']?.['customProviderSyncedBundle'] === 'true',
+      customProviderModelActionState = getCustomProviderModelActionState({
+        hasDiscovery: hasDiscovery,
+        hasSavedBundle: hasSavedBundle,
+        isAddingModels: isAddingModels['isAddingModels'] === !![],
+        selectedCount: selectedCount,
+        unverifiedCount: getCustomProviderModelsBlockingSave(run64(el33))['length'],
+        busy: isAddingModels['verifyingModelKeys']['size'] > 0x0 || isAddingModels['saving'] === !![],
       });
-    ((_0x5424df['disabled'] = _0x1a8e43['saveDisabled']),
-      (_0x5424df['hidden'] = _0x1a8e43['saveHidden']),
-      (_0x5424df['dataset']['i18n'] = 'settings.apiInput.customProvider.' + _0x1a8e43['saveLabelKey']),
-      (_0x5424df['textContent'] = trCustomProvider(_0x1a8e43['saveLabelKey'])));
-    _0x10dc25 &&
-      ((_0x10dc25['hidden'] = _0x1a8e43['verifyHidden']),
-      (_0x10dc25['disabled'] = _0x1a8e43['verifyDisabled']));
-    if (_0x522e73) _0x522e73['hidden'] = _0x1a8e43['actionsHidden'];
+    ((saveSelectedBtnEl['disabled'] = customProviderModelActionState['saveDisabled']),
+      (saveSelectedBtnEl['hidden'] = customProviderModelActionState['saveHidden']),
+      (saveSelectedBtnEl['dataset']['i18n'] =
+        'settings.apiInput.customProvider.' + customProviderModelActionState['saveLabelKey']),
+      (saveSelectedBtnEl['textContent'] = trCustomProvider(customProviderModelActionState['saveLabelKey'])));
+    verifyParamsBtnEl &&
+      ((verifyParamsBtnEl['hidden'] = customProviderModelActionState['verifyHidden']),
+      (verifyParamsBtnEl['disabled'] = customProviderModelActionState['verifyDisabled']));
+    if (actionsEl) actionsEl['hidden'] = customProviderModelActionState['actionsHidden'];
   }
-  function _0x4f852b(_0x61c695) {
-    if (!_0x61c695 || _0x61c695['hidden']) return;
-    (_0x61c695['classList']['remove']('is-open'),
-      _0x61c695['setAttribute']('aria-hidden', 'true'),
-      _0x4aef0b['setTimeout']?.(() => {
-        if (!_0x61c695['classList']['contains']('is-open')) _0x61c695['hidden'] = !![];
+  function run65(el34) {
+    if (!el34 || el34['hidden']) return;
+    (el34['classList']['remove']('is-open'),
+      el34['setAttribute']('aria-hidden', 'true'),
+      source['setTimeout']?.(() => {
+        if (!el34['classList']['contains']('is-open')) el34['hidden'] = !![];
       }, 0x104));
   }
-  function _0x1aba57(_0xd7d8e) {
-    if (!_0xd7d8e) return;
-    ((_0xd7d8e['hidden'] = ![]),
-      _0xd7d8e['setAttribute']('aria-hidden', 'false'),
-      _0x4aef0b['requestAnimationFrame']?.(() => {
-        _0xd7d8e['classList']['add']('is-open');
-      }) || _0xd7d8e['classList']['add']('is-open'));
+  function run66(el35) {
+    if (!el35) return;
+    ((el35['hidden'] = ![]),
+      el35['setAttribute']('aria-hidden', 'false'),
+      source['requestAnimationFrame']?.(() => {
+        el35['classList']['add']('is-open');
+      }) || el35['classList']['add']('is-open'));
   }
-  function _0x4a601d(_0x1d20de = _0x36ce14()) {
+  function run35(value119 = run11()) {
     const {
-      resultEl: _0x5b999a,
-      resultInnerEl: _0xd62366,
-      saveSelectedBtnEl: _0x542ebd,
-      verifyParamsBtnEl: _0x5a9f18,
-      actionsEl: _0x4d12ec,
-    } = _0xf3935f(_0x1d20de);
-    (_0xd62366?.['replaceChildren'](), _0x4f852b(_0x5b999a));
-    _0x542ebd && ((_0x542ebd['hidden'] = !![]), (_0x542ebd['disabled'] = !![]));
-    if (_0x5a9f18) _0x5a9f18['hidden'] = !![];
-    if (_0x4d12ec) _0x4d12ec['hidden'] = !![];
-    const _0x926532 = _0x497e40(_0x1d20de);
-    ((_0x926532['discovery'] = null),
-      (_0x926532['provider'] = null),
-      (_0x926532['activeKindFilter'] = 'all'),
-      (_0x926532['selectedModelKeys'] = new Set()),
-      (_0x926532['assignedModelKinds'] = new Map()),
-      (_0x926532['verifyingModelKeys'] = new Set()),
-      (_0x926532['isAddingModels'] = ![]));
+      resultEl: resultEl,
+      resultInnerEl: resultInnerEl,
+      saveSelectedBtnEl: saveSelectedBtnEl2,
+      verifyParamsBtnEl: verifyParamsBtnEl2,
+      actionsEl: actionsEl2,
+    } = run7(value119);
+    (resultInnerEl?.['replaceChildren'](), run65(resultEl));
+    saveSelectedBtnEl2 && ((saveSelectedBtnEl2['hidden'] = !![]), (saveSelectedBtnEl2['disabled'] = !![]));
+    if (verifyParamsBtnEl2) verifyParamsBtnEl2['hidden'] = !![];
+    if (actionsEl2) actionsEl2['hidden'] = !![];
+    const value120 = run6(value119);
+    ((value120['discovery'] = null),
+      (value120['provider'] = null),
+      (value120['activeKindFilter'] = 'all'),
+      (value120['selectedModelKeys'] = new Set()),
+      (value120['assignedModelKinds'] = new Map()),
+      (value120['verifyingModelKeys'] = new Set()),
+      (value120['isAddingModels'] = ![]));
   }
-  function _0x544e92(_0x5704e5, _0x1d21e6 = {}) {
-    const _0x6a1af9 = _0x521f6b(_0x1d21e6),
-      _0x490989 = _0x497e40(_0x5704e5),
-      _0x1dde24 = String(_0x1d21e6?.['kind'] || 'unknown')
+  function run67(value121, value122 = {}) {
+    const value123 = run56(value122),
+      value124 = run6(value121),
+      value125 = String(value122?.['kind'] || 'unknown')
         ['trim']()
         ['toLowerCase'](),
-      _0x10ce92 = _0x49ff66(_0x5704e5, _0x1d21e6),
-      _0xe37b1e = _0x1dde24 === 'unknown' && _0x10ce92 === 'unknown',
-      _0x15ad6d = _0x490989['selectedModelKeys']['has'](_0x6a1af9) && !_0xe37b1e,
-      _0x1c8981 = _0x490989['verifyingModelKeys']?.['has'](_0x6a1af9) === !![],
-      _0x29745f = _0x57a604['createElement']('label');
-    ((_0x29745f['className'] = 'custom-provider-model-option'),
-      (_0x29745f['dataset']['customProviderModelKey'] = _0x6a1af9),
-      (_0x29745f['dataset']['customProviderDetectedKind'] = _0x1dde24));
-    const _0x20087a = String(_0x1d21e6?.['capabilityStatus'] || 'unverified')
+      value126 = kind(value121, value122),
+      enabled22 = value125 === 'unknown' && value126 === 'unknown',
+      value127 = value124['selectedModelKeys']['has'](value123) && !enabled22,
+      value128 = value124['verifyingModelKeys']?.['has'](value123) === !![],
+      el36 = cardEl['createElement']('label');
+    ((el36['className'] = 'custom-provider-model-option'),
+      (el36['dataset']['customProviderModelKey'] = value123),
+      (el36['dataset']['customProviderDetectedKind'] = value125));
+    const value129 = String(value122?.['capabilityStatus'] || 'unverified')
       ['trim']()
       ['toLowerCase']();
-    _0x29745f['dataset']['customProviderCapabilityStatus'] = _0x20087a;
-    if (_0x1dde24 === 'unknown') _0x29745f['tabIndex'] = 0x0;
-    (_0x29745f['classList']['toggle']('is-selected', _0x15ad6d),
-      _0x29745f['classList']['toggle']('is-verifying', _0x1c8981));
-    if (_0x1c8981) _0x29745f['setAttribute']('aria-busy', 'true');
-    const _0x27290f = _0x57a604['createElement']('input');
-    ((_0x27290f['type'] = 'checkbox'),
-      (_0x27290f['className'] = 'custom-provider-model-option-checkbox'),
-      (_0x27290f['dataset']['customProviderModelCheckbox'] = ''),
-      (_0x27290f['checked'] = _0x15ad6d),
-      (_0x27290f['disabled'] = _0xe37b1e || _0x1c8981),
-      _0x27290f['setAttribute'](
+    el36['dataset']['customProviderCapabilityStatus'] = value129;
+    if (value125 === 'unknown') el36['tabIndex'] = 0x0;
+    (el36['classList']['toggle']('is-selected', value127),
+      el36['classList']['toggle']('is-verifying', value128));
+    if (value128) el36['setAttribute']('aria-busy', 'true');
+    const el37 = cardEl['createElement']('input');
+    ((el37['type'] = 'checkbox'),
+      (el37['className'] = 'custom-provider-model-option-checkbox'),
+      (el37['dataset']['customProviderModelCheckbox'] = ''),
+      (el37['checked'] = value127),
+      (el37['disabled'] = enabled22 || value128),
+      el37['setAttribute'](
         'aria-label',
-        _0xe37b1e ? trCustomProvider('classifyBeforeSelecting') : String(_0x1d21e6['upstreamModelId'] || ''),
+        enabled22 ? trCustomProvider('classifyBeforeSelecting') : String(value122['upstreamModelId'] || ''),
       ));
-    const _0x248f2b = _0x57a604['createElement']('span');
-    ((_0x248f2b['className'] = 'custom-provider-model-option-title'),
-      (_0x248f2b['textContent'] = String(_0x1d21e6['upstreamModelId'] || '')),
-      _0x29745f['append'](_0x27290f, _0x248f2b));
-    const _0x2bfa39 = _0x1d21e6?.['isSaved'] === !![] || isCustomProviderModelCapabilityRecognized(_0x1d21e6);
-    if (_0x1c8981) {
-      const _0x170e8b = _0x57a604['createElement']('span');
-      ((_0x170e8b['className'] = 'custom-provider-model-verifying'),
-        _0x170e8b['setAttribute']('aria-label', trCustomProvider('verifyingParameters')),
-        (_0x170e8b['title'] = trCustomProvider('verifyingParameters')));
-      const _0x561e41 = _0x57a604['createElement']('span');
-      ((_0x561e41['className'] = 'custom-provider-model-loading-spinner'),
-        _0x561e41['setAttribute']('aria-hidden', 'true'),
-        _0x170e8b['append'](_0x561e41),
-        _0x29745f['append'](_0x170e8b));
+    const el38 = cardEl['createElement']('span');
+    ((el38['className'] = 'custom-provider-model-option-title'),
+      (el38['textContent'] = String(value122['upstreamModelId'] || '')),
+      el36['append'](el37, el38));
+    const value130 = value122?.['isSaved'] === !![] || isCustomProviderModelCapabilityRecognized(value122);
+    if (value128) {
+      const el39 = cardEl['createElement']('span');
+      ((el39['className'] = 'custom-provider-model-verifying'),
+        el39['setAttribute']('aria-label', trCustomProvider('verifyingParameters')),
+        (el39['title'] = trCustomProvider('verifyingParameters')));
+      const el40 = cardEl['createElement']('span');
+      ((el40['className'] = 'custom-provider-model-loading-spinner'),
+        el40['setAttribute']('aria-hidden', 'true'),
+        el39['append'](el40),
+        el36['append'](el39));
     } else {
-      if (_0x2bfa39 && _0x20087a !== 'verified') {
-        const _0x164636 = _0x57a604['createElement']('span');
-        ((_0x164636['className'] = 'custom-provider-model-kind-tag'),
-          _0x164636['classList']['toggle'](
-            'is-success',
-            isCustomProviderModelCapabilityRecognized(_0x1d21e6),
-          ),
-          (_0x164636['textContent'] = _0x5975b0(_0x20087a)),
-          (_0x164636['title'] = _0x1ef0cf(_0x20087a)),
-          _0x29745f['append'](_0x164636));
+      if (value130 && value129 !== 'verified') {
+        const el41 = cardEl['createElement']('span');
+        ((el41['className'] = 'custom-provider-model-kind-tag'),
+          el41['classList']['toggle']('is-success', isCustomProviderModelCapabilityRecognized(value122)),
+          (el41['textContent'] = run49(value129)),
+          (el41['title'] = run50(value129)),
+          el36['append'](el41));
       }
     }
-    if (_0x1dde24 === 'unknown' && _0x10ce92 !== 'unknown') {
-      const _0x5d4132 = _0x57a604['createElement']('span');
-      ((_0x5d4132['className'] = 'custom-provider-model-kind-tag'),
-        (_0x5d4132['textContent'] = _0x2a7b4a(_0x10ce92)),
-        _0x29745f['append'](_0x5d4132));
+    if (value125 === 'unknown' && value126 !== 'unknown') {
+      const el42 = cardEl['createElement']('span');
+      ((el42['className'] = 'custom-provider-model-kind-tag'),
+        (el42['textContent'] = run48(value126)),
+        el36['append'](el42));
     }
-    if (_0x1dde24 === 'unknown') {
-      const _0x49a93a = _0x2e9b9e(_0x5704e5, _0x1d21e6);
-      _0x29745f['append'](_0x49a93a);
+    if (value125 === 'unknown') {
+      const value131 = run68(value121, value122);
+      el36['append'](value131);
     }
-    return _0x29745f;
+    return el36;
   }
-  function _0x5d0c3b(_0x19b12a, _0x2f5556 = []) {
-    const _0x55e131 = _0x5a39b1(_0x2f5556),
-      _0x1fd14d = _0x497e40(_0x19b12a),
-      _0x2498dc = _0x57a604['createElement']('div');
+  function run69(value132, list12 = []) {
+    const map5 = run61(list12),
+      value133 = run6(value132),
+      value134 = cardEl['createElement']('div');
     return (
-      (_0x2498dc['className'] = 'custom-provider-kind-filter-row'),
-      CUSTOM_PROVIDER_FILTER_KINDS['forEach']((_0x37a68d) => {
-        if (_0x37a68d === 'unknown' && !(_0x55e131['get']('unknown') > 0x0)) return;
-        const _0x1a9190 = _0x57a604['createElement']('button');
-        ((_0x1a9190['type'] = 'button'),
-          (_0x1a9190['className'] = 'custom-provider-kind-filter'),
-          (_0x1a9190['dataset']['customProviderKindFilter'] = _0x37a68d),
-          _0x1a9190['classList']['toggle']('is-active', _0x37a68d === _0x1fd14d['activeKindFilter']),
-          _0x1a9190['setAttribute'](
-            'aria-pressed',
-            _0x37a68d === _0x1fd14d['activeKindFilter'] ? 'true' : 'false',
-          ));
-        const _0x186a72 = _0x37a68d === 'all' ? _0x2f5556['length'] : _0x55e131['get'](_0x37a68d) || 0x0;
-        ((_0x1a9190['textContent'] = _0x2a7b4a(_0x37a68d) + '\x20' + _0x186a72),
-          _0x2498dc['append'](_0x1a9190));
+      (value134['className'] = 'custom-provider-kind-filter-row'),
+      CUSTOM_PROVIDER_FILTER_KINDS['forEach']((value135) => {
+        if (value135 === 'unknown' && !(map5['get']('unknown') > 0x0)) return;
+        const el43 = cardEl['createElement']('button');
+        ((el43['type'] = 'button'),
+          (el43['className'] = 'custom-provider-kind-filter'),
+          (el43['dataset']['customProviderKindFilter'] = value135),
+          el43['classList']['toggle']('is-active', value135 === value133['activeKindFilter']),
+          el43['setAttribute']('aria-pressed', value135 === value133['activeKindFilter'] ? 'true' : 'false'));
+        const value136 = value135 === 'all' ? list12['length'] : map5['get'](value135) || 0x0;
+        ((el43['textContent'] = run48(value135) + '\x20' + value136), value134['append'](el43));
       }),
-      _0x2498dc
+      value134
     );
   }
-  function _0x2e9b9e(_0x3a4ea4, _0x34c3d4 = {}) {
-    const _0x25c9f5 = _0x521f6b(_0x34c3d4),
-      _0x5dc0bf = _0x49ff66(_0x3a4ea4, _0x34c3d4),
-      _0x301426 = _0x57a604['createElement']('div');
-    ((_0x301426['className'] = 'custom-provider-model-kind-toolbar'),
-      (_0x301426['dataset']['customProviderModelKindToolbar'] = _0x25c9f5),
-      _0x301426['setAttribute']('aria-label', trCustomProvider('modelKindLabel')));
-    const _0x2723bb = _0x57a604['createElement']('span');
+  function run68(value137, value138 = {}) {
+    const value139 = run56(value138),
+      value140 = kind(value137, value138),
+      el44 = cardEl['createElement']('div');
+    ((el44['className'] = 'custom-provider-model-kind-toolbar'),
+      (el44['dataset']['customProviderModelKindToolbar'] = value139),
+      el44['setAttribute']('aria-label', trCustomProvider('modelKindLabel')));
+    const el45 = cardEl['createElement']('span');
     return (
-      (_0x2723bb['className'] = 'custom-provider-model-kind-toolbar-label'),
-      (_0x2723bb['textContent'] = trCustomProvider('modelKindLabel')),
-      _0x301426['append'](_0x2723bb),
-      CUSTOM_PROVIDER_SELECTABLE_KINDS['forEach']((_0xdaf1) => {
-        const _0x16a815 = _0x57a604['createElement']('button');
-        ((_0x16a815['type'] = 'button'),
-          (_0x16a815['className'] = 'custom-provider-model-kind-button'),
-          (_0x16a815['dataset']['customProviderAssignKind'] = _0xdaf1));
-        const _0x2b4873 = _0x5dc0bf === _0xdaf1;
-        (_0x16a815['classList']['toggle']('is-active', _0x2b4873),
-          _0x16a815['setAttribute']('aria-pressed', String(_0x2b4873)),
-          (_0x16a815['textContent'] = _0x2a7b4a(_0xdaf1)),
-          _0x301426['append'](_0x16a815));
+      (el45['className'] = 'custom-provider-model-kind-toolbar-label'),
+      (el45['textContent'] = trCustomProvider('modelKindLabel')),
+      el44['append'](el45),
+      CUSTOM_PROVIDER_SELECTABLE_KINDS['forEach']((value141) => {
+        const el46 = cardEl['createElement']('button');
+        ((el46['type'] = 'button'),
+          (el46['className'] = 'custom-provider-model-kind-button'),
+          (el46['dataset']['customProviderAssignKind'] = value141));
+        const value142 = value140 === value141;
+        (el46['classList']['toggle']('is-active', value142),
+          el46['setAttribute']('aria-pressed', String(value142)),
+          (el46['textContent'] = run48(value141)),
+          el44['append'](el46));
       }),
-      _0x301426
+      el44
     );
   }
-  function _0x222257() {
-    const _0x51e734 = _0x57a604['createElement']('div');
+  function run70() {
+    const value143 = cardEl['createElement']('div');
     return (
-      (_0x51e734['className'] = 'custom-provider-selection-head'),
-      _0x51e734['append'](_0x2cb1d0('custom-provider-result-title', trCustomProvider('selectModels'))),
-      _0x51e734['append'](_0x19d150(trCustomProvider('selectionHint'))),
-      _0x51e734
+      (value143['className'] = 'custom-provider-selection-head'),
+      value143['append'](run38('custom-provider-result-title', trCustomProvider('selectModels'))),
+      value143['append'](run39(trCustomProvider('selectionHint'))),
+      value143
     );
   }
-  function _0x2a36bd(_0x4af632) {
-    const _0x48ecf3 = _0x57a604['createElement']('div');
+  function run71(value144) {
+    const value145 = cardEl['createElement']('div');
     return (
-      (_0x48ecf3['className'] = 'custom-provider-result-heading'),
-      _0x48ecf3['append'](
-        _0x222257(),
-        _0x2cb1d0('custom-provider-result-title custom-provider-result-summary', _0x4af632),
+      (value145['className'] = 'custom-provider-result-heading'),
+      value145['append'](
+        run70(),
+        run38('custom-provider-result-title custom-provider-result-summary', value144),
       ),
-      _0x48ecf3
+      value145
     );
   }
-  function _0x415581(_0x19a844, _0x1b2e72 = []) {
-    const _0x37195d = _0x30e46f(_0x19a844, _0x1b2e72),
-      _0x151776 = _0x57a604['createElement']('div');
-    ((_0x151776['className'] = 'custom-provider-selection'),
-      _0x151776['append'](_0x5d0c3b(_0x19a844, _0x1b2e72)));
-    const _0x56ba2a = _0x57a604['createElement']('div');
-    ((_0x56ba2a['className'] = 'custom-provider-model-options'),
-      _0x56ba2a['classList']['toggle'](
+  function run72(value146, list13 = []) {
+    const list14 = run60(value146, list13),
+      value147 = cardEl['createElement']('div');
+    ((value147['className'] = 'custom-provider-selection'), value147['append'](run69(value146, list13)));
+    const el47 = cardEl['createElement']('div');
+    ((el47['className'] = 'custom-provider-model-options'),
+      el47['classList']['toggle'](
         'has-kind-toolbar',
-        _0x37195d['some'](
-          (_0x2ca3a5) =>
-            String(_0x2ca3a5?.['kind'] || 'unknown')
+        list14['some'](
+          (value148) =>
+            String(value148?.['kind'] || 'unknown')
               ['trim']()
               ['toLowerCase']() === 'unknown',
         ),
       ),
-      _0x37195d['forEach']((_0x32e56c) => _0x56ba2a['append'](_0x544e92(_0x19a844, _0x32e56c))));
-    if (_0x37195d['length'] > 0x0) _0x151776['append'](_0x56ba2a);
-    if (_0x1b2e72['length'] === 0x0)
-      _0x151776['append'](_0x2cb1d0('custom-provider-bundle-empty', trCustomProvider('noModelsDiscovered')));
+      list14['forEach']((value149) => el47['append'](run67(value146, value149))));
+    if (list14['length'] > 0x0) value147['append'](el47);
+    if (list13['length'] === 0x0)
+      value147['append'](run38('custom-provider-bundle-empty', trCustomProvider('noModelsDiscovered')));
     else
-      _0x37195d['length'] === 0x0 &&
-        _0x151776['append'](_0x2cb1d0('custom-provider-bundle-empty', trCustomProvider('noModelsInFilter')));
-    return _0x151776;
+      list14['length'] === 0x0 &&
+        value147['append'](run38('custom-provider-bundle-empty', trCustomProvider('noModelsInFilter')));
+    return value147;
   }
-  function _0x2e05e3(_0x581188, _0x1e7c56 = {}, _0x4c4a8f = {}) {
-    const { resultEl: _0xb90f37, resultInnerEl: _0x5cf502 } = _0xf3935f(_0x581188);
-    if (!_0xb90f37 || !_0x5cf502) return;
-    const _0x16b130 = _0x497e40(_0x581188),
-      _0xf565f5 = _0x16b130['parameterDraft'],
-      _0x159981 = _0x22be64(
-        _0xf565f5?.['context'] === _0x5678fd(_0x581188)
-          ? mergeCustomProviderDiscoveryCapabilities(_0x1e7c56, _0xf565f5['bundle'], ![])
-          : _0x1e7c56,
+  function run73(value150, value151 = {}, value152 = {}) {
+    const { resultEl: resultEl2, resultInnerEl: resultInnerEl2 } = run7(value150);
+    if (!resultEl2 || !resultInnerEl2) return;
+    const value153 = run6(value150),
+      value154 = value153['parameterDraft'],
+      count = run57(
+        value154?.['context'] === run63(value150)
+          ? mergeCustomProviderDiscoveryCapabilities(value151, value154['bundle'], ![])
+          : value151,
       ),
-      _0x52c300 = Array['isArray'](_0x1e7c56['unknown']) ? _0x1e7c56['unknown'] : [],
-      _0x5d270e = _0x5f0f95(_0x581188, _0x159981);
-    (_0x5cf502['replaceChildren'](),
-      _0x5cf502['append'](
-        _0x2a36bd(
+      unknown = Array['isArray'](value151['unknown']) ? value151['unknown'] : [],
+      supported = run58(value150, count);
+    (resultInnerEl2['replaceChildren'](),
+      resultInnerEl2['append'](
+        run71(
           trCustomProvider('resultSummary', {
-            count: _0x159981['length'],
-            supported: _0x5d270e['length'],
-            unknown: _0x52c300['length'],
+            count: count['length'],
+            supported: supported['length'],
+            unknown: unknown['length'],
           }),
         ),
       ),
-      _0x5cf502['append'](_0x415581(_0x581188, _0x159981)),
-      _0x1aba57(_0xb90f37),
-      _0x4f74b3(_0x581188));
+      resultInnerEl2['append'](run72(value150, count)),
+      run66(resultEl2),
+      run55(value150));
   }
-  function _0x483393(_0x27f93c, _0x47c2f7 = {}, _0x16187f = {}) {
-    const { resultEl: _0x58d19e } = _0xf3935f(_0x27f93c),
-      _0x5c6611 = captureCustomProviderModelSelectionScroll(_0x58d19e);
-    (_0x2e05e3(_0x27f93c, _0x47c2f7, _0x16187f),
-      restoreCustomProviderModelSelectionScroll(_0x58d19e, _0x5c6611));
+  function run74(value155, value156 = {}, value157 = {}) {
+    const { resultEl: resultEl3 } = run7(value155),
+      captureCustomProviderModelSelectionScroll2 = captureCustomProviderModelSelectionScroll(resultEl3);
+    (run73(value155, value156, value157),
+      restoreCustomProviderModelSelectionScroll(resultEl3, captureCustomProviderModelSelectionScroll2));
   }
-  function _0x5ee6ea() {
-    const { editorListEl: _0x5b1833, addBtnEl: _0x4a99f7 } = _0x1c4a39();
-    if (!_0x5b1833) return;
-    const _0x49a316 = _0x452c68();
-    (_0x5b1833['insertBefore'](_0x49a316, _0x4a99f7 || null),
-      _0x5d62c5(),
-      _0x185155(),
-      _0x3719ed(_0x49a316, { clearResult: !![] }),
-      _0x3c5eb6('', ''));
-    const { baseUrlEl: _0x249d8 } = _0x20560a(_0x49a316);
-    _0x249d8?.['focus']?.();
+  function run75() {
+    const { editorListEl: editorListEl3, addBtnEl: addBtnEl } = run2();
+    if (!editorListEl3) return;
+    const value158 = run37();
+    (editorListEl3['insertBefore'](value158, addBtnEl || null),
+      run22(),
+      run30(),
+      run9(value158, { clearResult: !![] }),
+      run10('', ''));
+    const { baseUrlEl: baseUrlEl6 } = run4(value158);
+    baseUrlEl6?.['focus']?.();
   }
-  function _0x129be6(_0x2fb222 = {}) {
-    return String(_0x2fb222?.['sourceId'] || _0x2fb222?.['bundle']?.['sourceId'] || '')['trim']();
+  function run76(options5 = {}) {
+    return String(options5?.['sourceId'] || options5?.['bundle']?.['sourceId'] || '')['trim']();
   }
-  function _0x1d6c96(_0x5686eb) {
-    return String(_0x5686eb || '')
+  function run77(value159) {
+    return String(value159 || '')
       ['replace'](/^custom-provider:/, '')
       ['trim']();
   }
-  function _0x1db180(_0x2cb669 = {}) {
-    const _0x2db9f3 =
-        _0x2cb669?.['bundle'] && typeof _0x2cb669['bundle'] === 'object' ? _0x2cb669['bundle'] : {},
-      _0x487804 =
-        _0x2db9f3['provider'] && typeof _0x2db9f3['provider'] === 'object' ? _0x2db9f3['provider'] : {},
-      _0x270cf4 = _0x1d6c96(_0x129be6(_0x2cb669)),
-      _0x1efe6a = String(_0x487804['providerId'] || _0x2cb669['providerId'] || _0x270cf4)['trim'](),
-      _0x455d0d = String(_0x487804['baseUrl'] || _0x487804['apiUrl'] || '')['trim'](),
-      _0x502800 = String(_0x487804['name'] || _0x2cb669['displayName'] || _0xe860e0(_0x455d0d) || _0x1efe6a)[
-        'trim'
-      ]();
-    return { ..._0x487804, providerId: _0x1efe6a, name: _0x502800, baseUrl: _0x455d0d };
+  function run78(options6 = {}) {
+    const value160 = options6?.['bundle'] && typeof options6['bundle'] === 'object' ? options6['bundle'] : {},
+      error4 = value160['provider'] && typeof value160['provider'] === 'object' ? value160['provider'] : {},
+      value161 = run77(run76(options6)),
+      providerId2 = String(error4['providerId'] || options6['providerId'] || value161)['trim'](),
+      baseUrl2 = String(error4['baseUrl'] || error4['apiUrl'] || '')['trim'](),
+      name3 = String(error4['name'] || options6['displayName'] || run43(baseUrl2) || providerId2)['trim']();
+    return { ...error4, providerId: providerId2, name: name3, baseUrl: baseUrl2 };
   }
-  function _0x1bf18d(_0x33c767) {
-    if (!_0x33c767) return '';
-    const _0x55efc0 = _0x497e40(_0x33c767);
+  function run79(el48) {
+    if (!el48) return '';
+    const value162 = run6(el48);
     return String(
-      _0x55efc0['provider']?.['providerId'] || _0x33c767['dataset']?.['customProviderProviderId'] || '',
+      value162['provider']?.['providerId'] || el48['dataset']?.['customProviderProviderId'] || '',
     )['trim']();
   }
-  function _0x59d7fc(_0xcf8a7d) {
-    const _0x52c663 = String(_0xcf8a7d || '')['trim']();
-    if (!_0x52c663) return null;
-    return _0x46a7d6()['find']((_0x236b90) => _0x1bf18d(_0x236b90) === _0x52c663) || null;
+  function run80(value163) {
+    const enabled23 = String(value163 || '')['trim']();
+    if (!enabled23) return null;
+    return run3()['find']((value164) => run79(value164) === enabled23) || null;
   }
-  function _0x20c0d7(_0xdf621f) {
-    if (!_0xdf621f) return ![];
-    const _0x498383 = _0x497e40(_0xdf621f),
-      { baseUrlEl: _0x4885bd, apiKeyEl: _0x82a0d7, documentationUrlEl: _0x444560 } = _0x20560a(_0xdf621f);
+  function run81(enabled24) {
+    if (!enabled24) return ![];
+    const enabled25 = run6(enabled24),
+      {
+        baseUrlEl: baseUrlEl7,
+        apiKeyEl: apiKeyEl4,
+        documentationUrlEl: documentationUrlEl4,
+      } = run4(enabled24);
     return (
-      !_0x498383['provider'] &&
-      !_0x498383['discovery'] &&
-      !_0x498383['titleText'] &&
-      !String(_0x4885bd?.['value'] || '')['trim']() &&
-      !String(_0x82a0d7?.['value'] || '')['trim']() &&
-      !String(_0x444560?.['value'] || '')['trim']() &&
-      !_0x498383['documentationDocument']
+      !enabled25['provider'] &&
+      !enabled25['discovery'] &&
+      !enabled25['titleText'] &&
+      !String(baseUrlEl7?.['value'] || '')['trim']() &&
+      !String(apiKeyEl4?.['value'] || '')['trim']() &&
+      !String(documentationUrlEl4?.['value'] || '')['trim']() &&
+      !enabled25['documentationDocument']
     );
   }
-  function _0xfaf615() {
-    return _0x46a7d6()['find'](_0x20c0d7) || null;
+  function run82() {
+    return run3()['find'](run81) || null;
   }
-  function _0x4d647d() {
-    const { editorListEl: _0x1a4c50, addBtnEl: _0xc5f4bb } = _0x1c4a39();
-    if (!_0x1a4c50) return null;
-    const _0x2a32c9 = _0x452c68();
-    return (_0x1a4c50['insertBefore'](_0x2a32c9, _0xc5f4bb || null), _0x2a32c9);
+  function run83() {
+    const { editorListEl: editorListEl4, addBtnEl: addBtnEl2 } = run2();
+    if (!editorListEl4) return null;
+    const value165 = run37();
+    return (editorListEl4['insertBefore'](value165, addBtnEl2 || null), value165);
   }
-  function _0x2a96cb(_0x24bf32 = {}) {
-    return getCustomProviderManifestUpstreamModelId(_0x24bf32);
+  function upstreamModelId(options7 = {}) {
+    return getCustomProviderManifestUpstreamModelId(options7);
   }
-  function _0x5f21ce(_0x26abbf = {}) {
-    const _0x594ddd = Array['isArray'](_0x26abbf?.['models'])
-      ? _0x26abbf['models']
-          ['map']((_0x2271d7) => {
-            const _0x5d3476 = _0x2271d7?.['extensions']?.['customProvider']?.['capability'] || {};
+  function run84(provider = {}) {
+    const models2 = Array['isArray'](provider?.['models'])
+      ? provider['models']
+          ['map']((value166) => {
+            const response = value166?.['extensions']?.['customProvider']?.['capability'] || {};
             return {
-              upstreamModelId: _0x2a96cb(_0x2271d7),
-              kind: String(_0x2271d7?.['kind'] || '')
+              upstreamModelId: upstreamModelId(value166),
+              kind: String(value166?.['kind'] || '')
                 ['trim']()
                 ['toLowerCase'](),
               isSaved: !![],
-              capabilityStatus: String(_0x5d3476?.['status'] || 'unverified')
+              capabilityStatus: String(response?.['status'] || 'unverified')
                 ['trim']()
                 ['toLowerCase'](),
-              capabilitySource: String(_0x5d3476?.['source'] || 'stored-bundle')['trim'](),
+              capabilitySource: String(response?.['source'] || 'stored-bundle')['trim'](),
             };
           })
-          ['filter']((_0x2b9cb3) => _0x2b9cb3['upstreamModelId'] && _0x2b9cb3['kind'])
+          ['filter']((value167) => value167['upstreamModelId'] && value167['kind'])
       : [];
-    return { provider: _0x26abbf?.['provider'] || {}, models: _0x594ddd, unknown: [] };
+    return { provider: provider?.['provider'] || {}, models: models2, unknown: [] };
   }
-  function _0x9bfd0b(_0x231fa8, _0xf84820 = {}) {
-    if (!_0x231fa8) return;
-    const _0x30ff5 =
-        _0xf84820?.['bundle'] && typeof _0xf84820['bundle'] === 'object' ? _0xf84820['bundle'] : {},
-      _0x143c3c = _0x1db180(_0xf84820);
-    if (!_0x143c3c['providerId']) return;
-    const _0x1bd2a4 = _0x5f21ce(_0x30ff5);
-    _0x1bd2a4['provider'] = _0x143c3c;
-    const _0x34fe49 = _0x497e40(_0x231fa8),
-      _0x4f1da2 = _0x1bf18d(_0x231fa8),
-      _0x5813d3 =
-        _0x4f1da2 === _0x143c3c['providerId'] &&
-        _0x34fe49['titleManuallyEdited'] &&
-        _0x19eead(_0x34fe49['titleText']),
-      _0x197941 = _0x4f1da2 === _0x143c3c['providerId'] && !!_0x34fe49['documentationDocument'],
+  function run85(el49, value168 = {}) {
+    if (!el49) return;
+    const value169 = value168?.['bundle'] && typeof value168['bundle'] === 'object' ? value168['bundle'] : {},
+      error5 = run78(value168);
+    if (!error5['providerId']) return;
+    const value170 = run84(value169);
+    value170['provider'] = error5;
+    const enabled26 = run6(el49),
+      value171 = run79(el49),
+      enabled27 =
+        value171 === error5['providerId'] &&
+        enabled26['titleManuallyEdited'] &&
+        run18(enabled26['titleText']),
+      enabled28 = value171 === error5['providerId'] && !!enabled26['documentationDocument'],
       {
-        baseUrlEl: _0x2437ce,
-        apiKeyEl: _0x476d2d,
-        documentationUrlEl: _0x349b86,
-        documentationFileEl: _0x28d242,
-      } = _0x20560a(_0x231fa8),
-      _0x5cf972 = _0x6cada3?.['providers']?.[_0x143c3c['providerId']] || {};
-    if (_0x2437ce) _0x2437ce['value'] = _0x143c3c['baseUrl'] || _0x5cf972['apiUrl'] || '';
-    if (_0x476d2d) _0x476d2d['value'] = _0x5cf972['apiKey'] || '';
-    _0x349b86 &&
-      !_0x197941 &&
-      (_0x349b86['value'] = String(_0x143c3c['documentationUrl'] || _0x5cf972['documentationUrl'] || '')[
-        'trim'
-      ]());
-    if (!_0x197941) {
-      if (_0x28d242) _0x28d242['value'] = '';
-      _0x34fe49['documentationDocument'] = null;
+        baseUrlEl: baseUrlEl8,
+        apiKeyEl: apiKeyEl5,
+        documentationUrlEl: documentationUrlEl5,
+        documentationFileEl: documentationFileEl3,
+      } = run4(el49),
+      value172 = configSnapshot?.['providers']?.[error5['providerId']] || {};
+    if (baseUrlEl8) baseUrlEl8['value'] = error5['baseUrl'] || value172['apiUrl'] || '';
+    if (apiKeyEl5) apiKeyEl5['value'] = value172['apiKey'] || '';
+    documentationUrlEl5 &&
+      !enabled28 &&
+      (documentationUrlEl5['value'] = String(
+        error5['documentationUrl'] || value172['documentationUrl'] || '',
+      )['trim']());
+    if (!enabled28) {
+      if (documentationFileEl3) documentationFileEl3['value'] = '';
+      enabled26['documentationDocument'] = null;
     }
-    ((_0x231fa8['dataset']['customProviderProviderId'] = _0x143c3c['providerId']),
-      (_0x231fa8['dataset']['customProviderSyncedBundle'] = 'true'),
-      (_0x34fe49['provider'] = _0x143c3c),
-      (_0x34fe49['discovery'] = _0x1bd2a4),
-      (_0x34fe49['isAddingModels'] = ![]));
-    const _0x4077cc = _0x1bd2a4['unknown']['length'] > 0x0;
-    ((_0x34fe49['activeKindFilter'] =
-      CUSTOM_PROVIDER_FILTER_KINDS['includes'](_0x34fe49['activeKindFilter']) &&
-      (_0x34fe49['activeKindFilter'] !== 'unknown' || _0x4077cc)
-        ? _0x34fe49['activeKindFilter']
+    ((el49['dataset']['customProviderProviderId'] = error5['providerId']),
+      (el49['dataset']['customProviderSyncedBundle'] = 'true'),
+      (enabled26['provider'] = error5),
+      (enabled26['discovery'] = value170),
+      (enabled26['isAddingModels'] = ![]));
+    const value173 = value170['unknown']['length'] > 0x0;
+    ((enabled26['activeKindFilter'] =
+      CUSTOM_PROVIDER_FILTER_KINDS['includes'](enabled26['activeKindFilter']) &&
+      (enabled26['activeKindFilter'] !== 'unknown' || value173)
+        ? enabled26['activeKindFilter']
         : 'all'),
-      (_0x34fe49['selectedModelKeys'] = new Set(_0x5f0f95(_0x231fa8, _0x1bd2a4['models'])['map'](_0x521f6b))),
-      (_0x34fe49['assignedModelKinds'] = new Map()),
-      !_0x5813d3 ? _0x421be2(_0x231fa8, _0x143c3c['name'], { manual: !![] }) : _0x5be417(_0x231fa8),
-      _0x2e05e3(_0x231fa8, _0x1bd2a4, _0x143c3c));
+      (enabled26['selectedModelKeys'] = new Set(run58(el49, value170['models'])['map'](run56))),
+      (enabled26['assignedModelKinds'] = new Map()),
+      !enabled27 ? run23(el49, error5['name'], { manual: !![] }) : run21(el49),
+      run73(el49, value170, error5));
   }
-  function _0x22d171(_0x17901b) {
-    if (!_0x17901b) return;
-    if (_0x46a7d6()['length'] <= 0x1) {
-      (_0x1b364f(_0x17901b), _0x3719ed(_0x17901b, { clearStatus: !![] }));
+  function run86(enabled29) {
+    if (!enabled29) return;
+    if (run3()['length'] <= 0x1) {
+      (run34(enabled29), run9(enabled29, { clearStatus: !![] }));
       return;
     }
-    _0x52f7f5(_0x17901b);
+    run31(enabled29);
   }
-  function _0xe8e188(_0x13f1a3 = []) {
-    const { editorListEl: _0xc20841 } = _0x1c4a39();
-    if (!_0xc20841) return;
-    const _0x1f3f8e = (Array['isArray'](_0x13f1a3) ? _0x13f1a3 : [])['filter'](
-        (_0x5a245a) => _0x5a245a?.['bundle'] && _0x1db180(_0x5a245a)['providerId'],
+  function run87(list15 = []) {
+    const { editorListEl: editorListEl5 } = run2();
+    if (!editorListEl5) return;
+    const list16 = (Array['isArray'](list15) ? list15 : [])['filter'](
+        (value174) => value174?.['bundle'] && run78(value174)['providerId'],
       ),
-      _0x3a5bcf = new Set(_0x1f3f8e['map']((_0x5c6847) => _0x1db180(_0x5c6847)['providerId']));
-    (_0x1f3f8e['forEach']((_0x4a07f7) => {
-      const _0x172963 = _0x1db180(_0x4a07f7),
-        _0x3e8fe6 = _0x59d7fc(_0x172963['providerId']) || _0xfaf615() || _0x4d647d();
-      _0x9bfd0b(_0x3e8fe6, _0x4a07f7);
+      map6 = new Set(list16['map']((value175) => run78(value175)['providerId']));
+    (list16['forEach']((value176) => {
+      const value177 = run78(value176),
+        value178 = run80(value177['providerId']) || run82() || run83();
+      run85(value178, value176);
     }),
-      _0x46a7d6()['forEach']((_0x3147b1) => {
-        const _0x242ce9 = _0x1bf18d(_0x3147b1);
-        _0x3147b1['dataset']?.['customProviderSyncedBundle'] === 'true' &&
-          _0x242ce9 &&
-          !_0x3a5bcf['has'](_0x242ce9) &&
-          _0x22d171(_0x3147b1);
+      run3()['forEach']((el50) => {
+        const value179 = run79(el50);
+        el50['dataset']?.['customProviderSyncedBundle'] === 'true' &&
+          value179 &&
+          !map6['has'](value179) &&
+          run86(el50);
       }),
-      _0x46a7d6()['length'] === 0x0 && _0x4d647d(),
-      _0x5d62c5(),
-      _0x185155(),
-      _0x9855a8(_0x36ce14()));
+      run3()['length'] === 0x0 && run83(),
+      run22(),
+      run30(),
+      run8(run11()));
   }
-  function _0xba173(_0x38fbab = {}) {
-    (getRememberedCustomProviderConfigs(_0x38fbab)['forEach']((_0x1e6937) => {
-      const _0x1b8655 = _0x59d7fc(_0x1e6937['providerId']) || _0xfaf615() || _0x4d647d();
-      if (!_0x1b8655) return;
-      const _0x1c5113 = _0x497e40(_0x1b8655),
-        { baseUrlEl: _0x122dc3, apiKeyEl: _0x3854bf, documentationUrlEl: _0x490eff } = _0x20560a(_0x1b8655);
-      if (_0x122dc3) _0x122dc3['value'] = _0x1e6937['baseUrl'];
-      if (_0x3854bf) _0x3854bf['value'] = _0x1e6937['apiKey'];
-      (_0x490eff &&
-        !_0x1c5113['documentationDocument'] &&
-        (_0x490eff['value'] = _0x1e6937['documentationUrl']),
-        (_0x1b8655['dataset']['customProviderProviderId'] = _0x1e6937['providerId']),
-        !_0x1c5113['provider'] &&
-          (_0x1c5113['provider'] = {
-            providerId: _0x1e6937['providerId'],
-            name: _0x1e6937['name'],
-            baseUrl: _0x1e6937['baseUrl'],
-            documentationUrl: _0x1e6937['documentationUrl'],
+  function syncEditorCredentials(options8 = {}) {
+    (getRememberedCustomProviderConfigs(options8)['forEach']((providerId3) => {
+      const el51 = run80(providerId3['providerId']) || run82() || run83();
+      if (!el51) return;
+      const enabled30 = run6(el51),
+        { baseUrlEl: baseUrlEl9, apiKeyEl: apiKeyEl6, documentationUrlEl: documentationUrlEl6 } = run4(el51);
+      if (baseUrlEl9) baseUrlEl9['value'] = providerId3['baseUrl'];
+      if (apiKeyEl6) apiKeyEl6['value'] = providerId3['apiKey'];
+      (documentationUrlEl6 &&
+        !enabled30['documentationDocument'] &&
+        (documentationUrlEl6['value'] = providerId3['documentationUrl']),
+        (el51['dataset']['customProviderProviderId'] = providerId3['providerId']),
+        !enabled30['provider'] &&
+          (enabled30['provider'] = {
+            providerId: providerId3['providerId'],
+            name: providerId3['name'],
+            baseUrl: providerId3['baseUrl'],
+            documentationUrl: providerId3['documentationUrl'],
           }),
-        !_0x1c5113['discovery'] && _0x421be2(_0x1b8655, _0x1e6937['name'], { manual: !![] }));
+        !enabled30['discovery'] && run23(el51, providerId3['name'], { manual: !![] }));
     }),
-      _0x46a7d6()['forEach']((_0x5069e8) => {
-        const _0x5d5419 = _0x1bf18d(_0x5069e8);
-        if (!_0x5d5419) return;
-        const _0x2d63c1 = _0x38fbab?.[_0x5d5419] || {},
-          { baseUrlEl: _0x3c1fd7, apiKeyEl: _0x55d7ab, documentationUrlEl: _0x351b9d } = _0x20560a(_0x5069e8);
-        if (_0x3c1fd7 && _0x2d63c1['apiUrl']) _0x3c1fd7['value'] = _0x2d63c1['apiUrl'];
-        if (_0x55d7ab && _0x2d63c1['apiKey']) _0x55d7ab['value'] = _0x2d63c1['apiKey'];
-        _0x351b9d &&
-          !_0x497e40(_0x5069e8)['documentationDocument'] &&
-          _0x2d63c1['documentationUrl'] &&
-          (_0x351b9d['value'] = _0x2d63c1['documentationUrl']);
+      run3()['forEach']((value180) => {
+        const enabled31 = run79(value180);
+        if (!enabled31) return;
+        const value181 = options8?.[enabled31] || {},
+          {
+            baseUrlEl: baseUrlEl10,
+            apiKeyEl: apiKeyEl7,
+            documentationUrlEl: documentationUrlEl7,
+          } = run4(value180);
+        if (baseUrlEl10 && value181['apiUrl']) baseUrlEl10['value'] = value181['apiUrl'];
+        if (apiKeyEl7 && value181['apiKey']) apiKeyEl7['value'] = value181['apiKey'];
+        documentationUrlEl7 &&
+          !run6(value180)['documentationDocument'] &&
+          value181['documentationUrl'] &&
+          (documentationUrlEl7['value'] = value181['documentationUrl']);
       }),
-      _0x5d62c5(),
-      _0x185155(),
-      _0x9855a8(_0x36ce14()));
+      run22(),
+      run30(),
+      run8(run11()));
   }
-  function _0x2cf6f3(_0x28d419 = {}) {
-    const _0x1aa892 = _0x28d419?.['bundle'],
-      _0x1f58b9 = String(_0x28d419?.['sourceId'] || _0x1aa892?.['sourceId'] || '')['trim']();
-    if (!_0x1f58b9 || !_0x1aa892) return ![];
-    let _0x3e58e5 = ![];
-    const _0x2bf385 = _0x52560e['get'](_0x1f58b9);
-    if (_0x2bf385)
+  function run88(options9 = {}) {
+    const enabled32 = options9?.['bundle'],
+      enabled33 = String(options9?.['sourceId'] || enabled32?.['sourceId'] || '')['trim']();
+    if (!enabled33 || !enabled32) return ![];
+    let value182 = ![];
+    const value183 = map['get'](enabled33);
+    if (value183)
       try {
-        (unregisterManifestBundle(_0x2bf385), (_0x3e58e5 = !![]));
-      } catch (_0x30294d) {
-        console['warn']('[Custom Provider] unregister previous bundle failed:', _0x30294d);
+        (unregisterManifestBundle(value183), (value182 = !![]));
+      } catch (value184) {
+        console['warn']('[Custom Provider] unregister previous bundle failed:', value184);
       }
     try {
-      (registerManifestBundle(_0x1aa892), _0x52560e['set'](_0x1f58b9, _0x1aa892), (_0x3e58e5 = !![]));
-    } catch (_0x247faf) {
-      (console['warn']('[Custom Provider] register bundle failed:', _0x247faf),
-        _0x52560e['delete'](_0x1f58b9));
+      (registerManifestBundle(enabled32), map['set'](enabled33, enabled32), (value182 = !![]));
+    } catch (value185) {
+      (console['warn']('[Custom Provider] register bundle failed:', value185), map['delete'](enabled33));
     }
-    return _0x3e58e5;
+    return value182;
   }
-  function _0x333f72(_0x5374b9 = []) {
-    let _0x40d160 = ![];
-    const _0x595d2c = new Set();
+  function run89(list17 = []) {
+    let value186 = ![];
+    const map7 = new Set();
     return (
-      _0x5374b9['forEach']((_0x4c6416) => {
-        const _0x281166 = _0x4c6416?.['bundle'],
-          _0x19ddbd = String(_0x4c6416?.['sourceId'] || _0x281166?.['sourceId'] || '')['trim']();
-        if (!_0x19ddbd || !_0x281166) return;
-        _0x595d2c['add'](_0x19ddbd);
-        if (_0x2cf6f3(_0x4c6416)) _0x40d160 = !![];
+      list17['forEach']((value187) => {
+        const enabled34 = value187?.['bundle'],
+          enabled35 = String(value187?.['sourceId'] || enabled34?.['sourceId'] || '')['trim']();
+        if (!enabled35 || !enabled34) return;
+        map7['add'](enabled35);
+        if (run88(value187)) value186 = !![];
       }),
-      [..._0x52560e['entries']()]['forEach'](([_0x3aed38, _0x40af97]) => {
-        if (_0x595d2c['has'](_0x3aed38)) return;
+      [...map['entries']()]['forEach'](([value188, value189]) => {
+        if (map7['has'](value188)) return;
         try {
-          (unregisterManifestBundle(_0x40af97), (_0x40d160 = !![]));
-        } catch (_0x5348c0) {
-          console['warn']('[Custom Provider] unregister stale bundle failed:', _0x5348c0);
+          (unregisterManifestBundle(value189), (value186 = !![]));
+        } catch (value190) {
+          console['warn']('[Custom Provider] unregister stale bundle failed:', value190);
         }
-        _0x52560e['delete'](_0x3aed38);
+        map['delete'](value188);
       }),
-      _0x40d160
+      value186
     );
   }
-  function _0xfa6461(_0x2dc0f2, _0x3159c2, _0x24d17e, _0x4cf1ae = {}) {
-    const _0x43368e = _0x3159c2?.['item'] && typeof _0x3159c2['item'] === 'object' ? _0x3159c2['item'] : {},
-      _0x8650c =
-        _0x43368e?.['bundle'] && typeof _0x43368e['bundle'] === 'object' ? _0x43368e['bundle'] : _0x24d17e,
-      _0x55335d = String(_0x43368e?.['sourceId'] || _0x8650c?.['sourceId'] || '')['trim'](),
-      _0x26874d = { ..._0x43368e, sourceId: _0x55335d, bundle: _0x8650c },
-      _0x44e3cd = _0x497e40(_0x2dc0f2);
+  function run90(el52, value191, value192, value193 = {}) {
+    const args3 = value191?.['item'] && typeof value191['item'] === 'object' ? value191['item'] : {},
+      bundle = args3?.['bundle'] && typeof args3['bundle'] === 'object' ? args3['bundle'] : value192,
+      sourceId = String(args3?.['sourceId'] || bundle?.['sourceId'] || '')['trim'](),
+      value194 = { ...args3, sourceId: sourceId, bundle: bundle },
+      value195 = run6(el52);
     return (
-      (_0x44e3cd['discovery'] = mergeCustomProviderDiscoveryCapabilities(_0x44e3cd['discovery'], _0x8650c)),
-      (_0x44e3cd['provider'] = {
-        ...(_0x44e3cd['provider'] || {}),
-        ...(_0x8650c?.['provider'] || {}),
-        ...(_0x4cf1ae || {}),
+      (value195['discovery'] = mergeCustomProviderDiscoveryCapabilities(value195['discovery'], bundle)),
+      (value195['provider'] = {
+        ...(value195['provider'] || {}),
+        ...(bundle?.['provider'] || {}),
+        ...(value193 || {}),
       }),
-      (_0x44e3cd['isAddingModels'] = ![]),
-      (_0x2dc0f2['dataset']['customProviderProviderId'] = String(_0x44e3cd['provider']?.['providerId'] || '')[
+      (value195['isAddingModels'] = ![]),
+      (el52['dataset']['customProviderProviderId'] = String(value195['provider']?.['providerId'] || '')[
         'trim'
       ]()),
-      (_0x2dc0f2['dataset']['customProviderSyncedBundle'] = 'true'),
-      _0x2cf6f3(_0x26874d) && _0x155da5?.(),
-      _0x8650c
+      (el52['dataset']['customProviderSyncedBundle'] = 'true'),
+      run88(value194) && refreshManifestModelNodeUis?.(),
+      bundle
     );
   }
-  async function _0x1068f6(_0x2d9d38 = {}) {
-    const _0x3b967b = !!_0x2d9d38['silent'];
-    if (typeof _0x1f9b4a !== 'function')
-      return (!_0x3b967b && _0x3c5eb6('danger', trCustomProvider('apiUnsupported')), []);
+  async function refreshBundles(enabled36 = {}) {
+    const enabled37 = !!enabled36['silent'];
+    if (typeof listCustomProviderManifestBundles !== 'function')
+      return (!enabled37 && run10('danger', trCustomProvider('apiUnsupported')), []);
     try {
-      const _0x38fe15 = await _0x1f9b4a(),
-        _0x215632 = Array['isArray'](_0x38fe15?.['items']) ? _0x38fe15['items'] : [],
-        _0x2e8c06 = _0x333f72(_0x215632);
-      _0xe8e188(_0x215632);
-      if (_0x2e8c06) _0x155da5?.();
-      if (!_0x3b967b) _0x3c5eb6('', '');
-      return _0x215632;
-    } catch (_0x1fbb82) {
-      const _0x297d44 = trCustomProvider('loadBundlesFailed', {
-        error: _0x1fbb82?.['message'] || trApiInput('diagnostics.unknownError'),
+      const value196 = await listCustomProviderManifestBundles(),
+        value197 = Array['isArray'](value196?.['items']) ? value196['items'] : [],
+        value198 = run89(value197);
+      run87(value197);
+      if (value198) refreshManifestModelNodeUis?.();
+      if (!enabled37) run10('', '');
+      return value197;
+    } catch (error6) {
+      const trCustomProvider5 = trCustomProvider('loadBundlesFailed', {
+        error: error6?.['message'] || trApiInput('diagnostics.unknownError'),
       });
       return (
-        !_0x3b967b &&
-          (_0x3c5eb6('danger', trApiInput('diagnostics.failed'), _0x297d44),
-          _0x4aef0b['showToast']?.(_0x297d44, 'error')),
+        !enabled37 &&
+          (run10('danger', trApiInput('diagnostics.failed'), trCustomProvider5),
+          source['showToast']?.(trCustomProvider5, 'error')),
         []
       );
     }
   }
-  async function _0x3d844f(_0x37901c = {}, _0xeaefc3 = '') {
-    if (typeof _0x6ce60a !== 'function') return;
-    const _0x21af96 = String(_0x37901c['providerId'] || '')['trim']();
-    if (!_0x21af96) return;
-    const _0x42d833 = { ...(_0x6cada3?.['providers'] || {}) };
-    _0x42d833[_0x21af96] = {
-      ...(_0x42d833[_0x21af96] || {}),
-      apiUrl: String(_0x37901c['baseUrl'] || _0x37901c['apiUrl'] || '')['trim'](),
-      apiKey: String(_0xeaefc3 || '')['trim'](),
-      label: String(_0x37901c['name'] || _0x21af96)['trim'](),
-      documentationUrl: String(_0x37901c['documentationUrl'] || '')['trim'](),
+  async function run91(error7 = {}, value199 = '') {
+    if (typeof saveApiConfigToServer !== 'function') return;
+    const enabled38 = String(error7['providerId'] || '')['trim']();
+    if (!enabled38) return;
+    const providers2 = { ...(configSnapshot?.['providers'] || {}) };
+    providers2[enabled38] = {
+      ...(providers2[enabled38] || {}),
+      apiUrl: String(error7['baseUrl'] || error7['apiUrl'] || '')['trim'](),
+      apiKey: String(value199 || '')['trim'](),
+      label: String(error7['name'] || enabled38)['trim'](),
+      documentationUrl: String(error7['documentationUrl'] || '')['trim'](),
     };
-    const _0x36ff15 = { ...(_0x6cada3 || {}), providers: _0x42d833 };
-    (await _0x6ce60a(_0x36ff15),
-      _0x53ff29(_0x36ff15),
-      syncModelServiceReadinessSummary(_0x36ff15),
-      _0x155da5?.());
+    const value200 = { ...(configSnapshot || {}), providers: providers2 };
+    (await saveApiConfigToServer(value200),
+      run(value200),
+      syncModelServiceReadinessSummary(value200),
+      refreshManifestModelNodeUis?.());
   }
-  function _0x3ef2b5(_0x17eb08, _0x4f4f1c = {}) {
-    return (
-      _0x19eead(_0x9ea563(_0x17eb08)) ||
-      String(_0x4f4f1c['name'] || '')['trim']() ||
-      _0xe860e0(_0x4f4f1c['baseUrl'])
-    );
+  function name4(value201, error8 = {}) {
+    return run18(run20(value201)) || String(error8['name'] || '')['trim']() || run43(error8['baseUrl']);
   }
-  function _0x1fe8fc(_0x529340 = null) {
-    if (typeof _0x4aef0b['openSubscriptionDialog'] === 'function') {
-      _0x4aef0b['openSubscriptionDialog']({
+  function run92(onSuccess = null) {
+    if (typeof source['openSubscriptionDialog'] === 'function') {
+      source['openSubscriptionDialog']({
         modelId: CUSTOM_PROVIDER_VIP_MODEL_ID,
         provider: 'aicanvas',
-        onSuccess: _0x529340,
+        onSuccess: onSuccess,
       });
       return;
     }
-    _0x4aef0b['showToast']?.(trCustomProvider('vipRequired'), 'warn');
+    source['showToast']?.(trCustomProvider('vipRequired'), 'warn');
   }
-  function _0x4d20d(_0x9830ba = null) {
-    const _0x19233f = _0x2f1035?.['getStateRaw']?.()['subscription'] || {};
-    if (isCustomProviderAccessAllowed(_0x19233f)) return !![];
-    return (_0x1fe8fc(_0x9830ba), ![]);
+  function run93(value202 = null) {
+    const value203 = store?.['getStateRaw']?.()['subscription'] || {};
+    if (isCustomProviderAccessAllowed(value203)) return !![];
+    return (run92(value202), ![]);
   }
-  async function _0x321cc3(_0x2d00c4, _0x23a343) {
+  async function run94(el53, value204) {
     if (
-      !_0x4d20d(() => {
-        _0x321cc3(_0x2d00c4, _0x23a343)['catch'](() => {});
+      !run93(() => {
+        run94(el53, value204)['catch'](() => {});
       })
     )
       return;
-    if (typeof _0x37fad5 !== 'function') {
-      (_0x3c5eb6('danger', trCustomProvider('apiUnsupported')),
-        _0x4aef0b['showToast']?.(trCustomProvider('apiUnsupported'), 'error'));
+    if (typeof discoverCustomProvider !== 'function') {
+      (run10('danger', trCustomProvider('apiUnsupported')),
+        source['showToast']?.(trCustomProvider('apiUnsupported'), 'error'));
       return;
     }
-    _0x3719ed(_0x2d00c4);
-    const _0xe8d7f = _0x48eb16(_0x2d00c4);
-    if (!_0xe8d7f['baseUrl'] || !_0xe8d7f['apiKey']) {
-      const { baseUrlEl: _0x3a013d, apiKeyEl: _0x157dff } = _0x20560a(_0x2d00c4);
-      (_0x3c5eb6('danger', trApiInput('diagnostics.failed')),
-        _0x4aef0b['showToast']?.(trCustomProvider('fillRequired'), 'warn'));
-      if (!_0xe8d7f['baseUrl']) _0x3a013d?.['focus']?.();
-      else _0x157dff?.['focus']?.();
+    run9(el53);
+    const name5 = run16(el53);
+    if (!name5['baseUrl'] || !name5['apiKey']) {
+      const { baseUrlEl: baseUrlEl11, apiKeyEl: apiKeyEl8 } = run4(el53);
+      (run10('danger', trApiInput('diagnostics.failed')),
+        source['showToast']?.(trCustomProvider('fillRequired'), 'warn'));
+      if (!name5['baseUrl']) baseUrlEl11?.['focus']?.();
+      else apiKeyEl8?.['focus']?.();
       return;
     }
-    if (_0x2146a9(_0x2d00c4, _0xe8d7f['providerId'])) return;
-    const _0x5527d0 = _0x344b2d(_0x23a343, trCustomProvider('discovering'));
+    if (run47(el53, name5['providerId'])) return;
+    const run95 = run51(value204, trCustomProvider('discovering'));
     try {
-      _0x3c5eb6('testing', trCustomProvider('discovering'));
-      const { documentationDocument: _0x5476b0, ..._0x14d27c } = _0xe8d7f,
-        _0x3a199b = _0x59e3a6(_0xe8d7f['providerId']),
-        _0x4361fe = await _0x37fad5(_0x14d27c),
-        _0x5b20e2 = mergeCustomProviderDiscoveryCapabilities(_0x4361fe, _0x3a199b),
-        _0x566155 = {
-          ...(_0x5b20e2['provider'] || {}),
-          name: _0xe8d7f['name'],
-          providerId: _0xe8d7f['providerId'],
-          baseUrl: _0x5b20e2['provider']?.['baseUrl'] || _0xe8d7f['baseUrl'],
-          documentationUrl: _0xe8d7f['documentationUrl'] || _0x5b20e2['provider']?.['documentationUrl'] || '',
+      run10('testing', trCustomProvider('discovering'));
+      const { documentationDocument: documentationDocument2, ...args4 } = name5,
+        value205 = run14(name5['providerId']),
+        value206 = await discoverCustomProvider(args4),
+        baseUrl3 = mergeCustomProviderDiscoveryCapabilities(value206, value205),
+        error9 = {
+          ...(baseUrl3['provider'] || {}),
+          name: name5['name'],
+          providerId: name5['providerId'],
+          baseUrl: baseUrl3['provider']?.['baseUrl'] || name5['baseUrl'],
+          documentationUrl: name5['documentationUrl'] || baseUrl3['provider']?.['documentationUrl'] || '',
         };
-      _0x36d676(_0x2d00c4, _0x566155['name']);
-      const _0x163403 = { ..._0x566155, name: _0x3ef2b5(_0x2d00c4, _0x566155) };
-      (await _0x3d844f(_0x163403, _0xe8d7f['apiKey']),
-        (_0x2d00c4['dataset']['customProviderProviderId'] = _0x163403['providerId']),
-        delete _0x2d00c4['dataset']['customProviderSyncedBundle'],
-        _0xf1ed58(_0x2d00c4));
-      const _0x4ed1db = _0x497e40(_0x2d00c4);
-      ((_0x4ed1db['discovery'] = _0x5b20e2),
-        (_0x4ed1db['provider'] = _0x163403),
-        (_0x4ed1db['isAddingModels'] = !![]),
-        (_0x4ed1db['parameterDraft'] = null),
-        (_0x4ed1db['recognitionInvalidated'] = ![]));
-      const _0x5a53c9 = _0x20560a(_0x2d00c4);
-      if (_0x5a53c9['baseUrlEl']) _0x5a53c9['baseUrlEl']['value'] = _0x163403['baseUrl'];
-      _0x5a53c9['documentationUrlEl'] &&
-        !_0x4ed1db['documentationDocument'] &&
-        (_0x5a53c9['documentationUrlEl']['value'] = _0x163403['documentationUrl']);
-      (_0x2e05e3(_0x2d00c4, _0x5b20e2, _0x163403), _0x185155());
-      const _0x14b0b0 = _0x22be64(_0x5b20e2),
-        _0x1118ea = _0x5f0f95(_0x2d00c4, _0x14b0b0)['length'];
-      if (_0x1118ea === 0x0) {
-        const _0x52205e = trCustomProvider('configSavedNoSupportedModels');
-        (_0x3c5eb6('partial', _0x52205e), _0x4aef0b['showToast']?.(_0x52205e, 'warn', 0x2328));
+      run25(el53, error9['name']);
+      const value207 = { ...error9, name: name4(el53, error9) };
+      (await run91(value207, name5['apiKey']),
+        (el53['dataset']['customProviderProviderId'] = value207['providerId']),
+        delete el53['dataset']['customProviderSyncedBundle'],
+        run59(el53));
+      const enabled39 = run6(el53);
+      ((enabled39['discovery'] = baseUrl3),
+        (enabled39['provider'] = value207),
+        (enabled39['isAddingModels'] = !![]),
+        (enabled39['parameterDraft'] = null),
+        (enabled39['recognitionInvalidated'] = ![]));
+      const value208 = run4(el53);
+      if (value208['baseUrlEl']) value208['baseUrlEl']['value'] = value207['baseUrl'];
+      value208['documentationUrlEl'] &&
+        !enabled39['documentationDocument'] &&
+        (value208['documentationUrlEl']['value'] = value207['documentationUrl']);
+      (run73(el53, baseUrl3, value207), run30());
+      const count2 = run57(baseUrl3),
+        supported2 = run58(el53, count2)['length'];
+      if (supported2 === 0x0) {
+        const trCustomProvider6 = trCustomProvider('configSavedNoSupportedModels');
+        (run10('partial', trCustomProvider6), source['showToast']?.(trCustomProvider6, 'warn', 0x2328));
         return;
       }
-      _0x3c5eb6(
-        _0x5b20e2['warnings']?.['length'] ? 'partial' : 'success',
+      run10(
+        baseUrl3['warnings']?.['length'] ? 'partial' : 'success',
         trCustomProvider('resultSummary', {
-          count: _0x14b0b0['length'],
-          supported: _0x1118ea,
-          unknown: Array['isArray'](_0x5b20e2['unknown']) ? _0x5b20e2['unknown']['length'] : 0x0,
+          count: count2['length'],
+          supported: supported2,
+          unknown: Array['isArray'](baseUrl3['unknown']) ? baseUrl3['unknown']['length'] : 0x0,
         }),
-        _0x5b20e2['warnings']?.['length'] ? trCustomProvider('sourceIncomplete') : '',
+        baseUrl3['warnings']?.['length'] ? trCustomProvider('sourceIncomplete') : '',
       );
-    } catch (_0x1bf7f5) {
-      const _0x3c5e09 = trCustomProvider('saveFailed', {
-        error: _0x1bf7f5?.['message'] || trApiInput('diagnostics.unknownError'),
+    } catch (error10) {
+      const trCustomProvider7 = trCustomProvider('saveFailed', {
+        error: error10?.['message'] || trApiInput('diagnostics.unknownError'),
       });
-      (_0x3c5eb6('danger', trApiInput('diagnostics.failed'), _0x3c5e09),
-        _0x4aef0b['showToast']?.(_0x3c5e09, 'error', 0x2328));
+      (run10('danger', trApiInput('diagnostics.failed'), trCustomProvider7),
+        source['showToast']?.(trCustomProvider7, 'error', 0x2328));
     } finally {
-      _0x5527d0();
+      run95();
     }
   }
-  async function _0x50d0ec(_0x2113a7, _0x3efb9c) {
-    const _0x56610f = _0x497e40(_0x2113a7);
-    if (_0x56610f['saving'] || _0x56610f['verifyingModelKeys']['size']) return;
-    if (getCustomProviderModelsBlockingSave(_0x4c8c0c(_0x2113a7))['length']) {
-      _0x4aef0b['showToast']?.(trCustomProvider('recognizeBeforeSave'), 'warn');
+  async function run96(value209, value210) {
+    const value211 = run6(value209);
+    if (value211['saving'] || value211['verifyingModelKeys']['size']) return;
+    if (getCustomProviderModelsBlockingSave(run64(value209))['length']) {
+      source['showToast']?.(trCustomProvider('recognizeBeforeSave'), 'warn');
       return;
     }
     if (
-      !_0x4d20d(() => {
-        _0x50d0ec(_0x2113a7, _0x3efb9c)['catch'](() => {});
+      !run93(() => {
+        run96(value209, value210)['catch'](() => {});
       })
     )
       return;
     if (
-      typeof _0x42e0f6 !== 'function' ||
-      typeof _0x2071fc !== 'function' ||
-      typeof _0x48a2e5 !== 'function'
+      typeof buildCustomProviderManifestDraft !== 'function' ||
+      typeof validateCustomProviderManifestDraft !== 'function' ||
+      typeof saveCustomProviderManifestBundle !== 'function'
     ) {
-      (_0x3c5eb6('danger', trCustomProvider('apiUnsupported')),
-        _0x4aef0b['showToast']?.(trCustomProvider('apiUnsupported'), 'error'));
+      (run10('danger', trCustomProvider('apiUnsupported')),
+        source['showToast']?.(trCustomProvider('apiUnsupported'), 'error'));
       return;
     }
-    const _0x3218f8 = _0x2c91d2(_0x2113a7);
-    if (_0x3218f8['length'] === 0x0) {
-      _0x4aef0b['showToast']?.(trCustomProvider('noModelsSelected'), 'warn');
+    const models3 = run62(value209);
+    if (models3['length'] === 0x0) {
+      source['showToast']?.(trCustomProvider('noModelsSelected'), 'warn');
       return;
     }
-    const _0x5c9907 = _0x48eb16(_0x2113a7);
-    if (_0x2146a9(_0x2113a7, _0x5c9907['providerId'])) return;
-    const _0x2f1da9 = {
-        ...(_0x56610f['provider'] || {}),
-        name: _0x3ef2b5(_0x2113a7, _0x56610f['provider']),
+    const providerId4 = run16(value209);
+    if (run47(value209, providerId4['providerId'])) return;
+    const provider2 = {
+        ...(value211['provider'] || {}),
+        name: name4(value209, value211['provider']),
         providerId:
-          _0x5c9907['baseUrl'] === _0x56610f['provider']?.['baseUrl']
-            ? _0x56610f['provider']['providerId']
-            : _0x5c9907['providerId'],
-        baseUrl: _0x5c9907['baseUrl'],
-        documentationUrl: _0x5c9907['documentationUrl'],
+          providerId4['baseUrl'] === value211['provider']?.['baseUrl']
+            ? value211['provider']['providerId']
+            : providerId4['providerId'],
+        baseUrl: providerId4['baseUrl'],
+        documentationUrl: providerId4['documentationUrl'],
       },
-      _0x16fca6 = _0x59e3a6(_0x2f1da9['providerId']),
-      _0x1b7c90 = _0x5678fd(_0x2113a7);
-    ((_0x56610f['saving'] = !![]), _0x4f74b3(_0x2113a7));
-    const _0x101300 = _0x344b2d(_0x3efb9c, trCustomProvider('validating'));
+      value212 = run14(provider2['providerId']),
+      value213 = run63(value209);
+    ((value211['saving'] = !![]), run55(value209));
+    const run97 = run51(value210, trCustomProvider('validating'));
     try {
-      _0x3c5eb6('testing', trCustomProvider('validating'));
-      const _0x419f45 = await _0x42e0f6({ provider: _0x2f1da9, models: _0x3218f8 }),
-        _0xf3955a = mergeCustomProviderRecognizedProfiles(
-          mergeCustomProviderRecognizedProfiles(_0x419f45?.['bundle'], _0x16fca6),
-          _0x56610f['parameterDraft']?.['context'] === _0x1b7c90 ? _0x56610f['parameterDraft']['bundle'] : {},
+      run10('testing', trCustomProvider('validating'));
+      const value214 = await buildCustomProviderManifestDraft({ provider: provider2, models: models3 }),
+        customProviderRecognizedProfiles = mergeCustomProviderRecognizedProfiles(
+          mergeCustomProviderRecognizedProfiles(value214?.['bundle'], value212),
+          value211['parameterDraft']?.['context'] === value213 ? value211['parameterDraft']['bundle'] : {},
         ),
-        _0x5befa1 = Array['isArray'](_0xf3955a?.['models']) ? _0xf3955a['models']['length'] : 0x0;
-      if (_0x5befa1 === 0x0) throw new Error(trCustomProvider('noSupportedModels'));
-      if (getCustomProviderModelsBlockingSave(_0xf3955a['models'])['length'])
+        count3 = Array['isArray'](customProviderRecognizedProfiles?.['models'])
+          ? customProviderRecognizedProfiles['models']['length']
+          : 0x0;
+      if (count3 === 0x0) throw new Error(trCustomProvider('noSupportedModels'));
+      if (getCustomProviderModelsBlockingSave(customProviderRecognizedProfiles['models'])['length'])
         throw new Error(trCustomProvider('recognizeBeforeSave'));
-      const _0x106fd3 = await _0x2071fc(_0xf3955a);
-      if (!_0x106fd3?.['ok'])
+      const response2 = await validateCustomProviderManifestDraft(customProviderRecognizedProfiles);
+      if (!response2?.['ok'])
         throw new Error(
-          Array['isArray'](_0x106fd3?.['errors']) && _0x106fd3['errors']['length']
-            ? _0x106fd3['errors']['join'](';\x20')
+          Array['isArray'](response2?.['errors']) && response2['errors']['length']
+            ? response2['errors']['join'](';\x20')
             : trApiInput('diagnostics.failed'),
         );
-      const _0x432da6 = _0x106fd3['bundle'] || _0xf3955a;
-      if (_0x1b7c90 !== _0x5678fd(_0x2113a7)) throw new Error(trCustomProvider('recognizeBeforeSave'));
-      await _0x3d844f(_0x2f1da9, _0x5c9907['apiKey']);
-      const _0x4710e7 = await _0x48a2e5(_0x432da6),
-        _0x50d189 = _0xfa6461(_0x2113a7, _0x4710e7, _0x432da6, _0x2f1da9);
-      _0x483393(_0x2113a7, _0x56610f['discovery'], _0x56610f['provider']);
-      const _0x45c543 = getCustomProviderSaveStatus(_0x50d189?.['models']),
-        _0x478148 = trCustomProvider(_0x45c543['key'], _0x45c543);
-      (_0x3c5eb6('success', _0x478148), _0x4aef0b['showToast']?.(_0x478148, 'success'));
-    } catch (_0x4cbd1e) {
-      const _0x2c620 = trCustomProvider('saveFailed', {
-        error: _0x4cbd1e?.['message'] || trApiInput('diagnostics.unknownError'),
+      const value215 = response2['bundle'] || customProviderRecognizedProfiles;
+      if (value213 !== run63(value209)) throw new Error(trCustomProvider('recognizeBeforeSave'));
+      await run91(provider2, providerId4['apiKey']);
+      const value216 = await saveCustomProviderManifestBundle(value215),
+        value217 = run90(value209, value216, value215, provider2);
+      run74(value209, value211['discovery'], value211['provider']);
+      const event2 = getCustomProviderSaveStatus(value217?.['models']),
+        trCustomProvider8 = trCustomProvider(event2['key'], event2);
+      (run10('success', trCustomProvider8), source['showToast']?.(trCustomProvider8, 'success'));
+    } catch (error11) {
+      const trCustomProvider9 = trCustomProvider('saveFailed', {
+        error: error11?.['message'] || trApiInput('diagnostics.unknownError'),
       });
-      (_0x3c5eb6('danger', trApiInput('diagnostics.failed'), _0x2c620),
-        _0x4aef0b['showToast']?.(_0x2c620, 'error', 0x2328));
+      (run10('danger', trApiInput('diagnostics.failed'), trCustomProvider9),
+        source['showToast']?.(trCustomProvider9, 'error', 0x2328));
     } finally {
-      (_0x101300(), (_0x56610f['saving'] = ![]), _0x4f74b3(_0x2113a7));
+      (run97(), (value211['saving'] = ![]), run55(value209));
     }
   }
-  function _0x50f75d(_0x4db8e3) {
-    const _0x3d9563 = _0x4db8e3?.['message'] || trApiInput('diagnostics.unknownError'),
-      _0x311031 = _0x3d9563['includes']('Automatic API documentation discovery failed')
+  function run98(error12) {
+    const list18 = error12?.['message'] || trApiInput('diagnostics.unknownError'),
+      error13 = list18['includes']('Automatic API documentation discovery failed')
         ? trCustomProvider('documentationAutoDiscoveryFailed')
-        : _0x3d9563,
-      _0x5248e0 = trCustomProvider('parameterVerificationFailed', { error: _0x311031 });
-    console['error']('[Custom Provider] 模型参数验证失败:', _0x4db8e3);
+        : list18,
+      trCustomProvider10 = trCustomProvider('parameterVerificationFailed', { error: error13 });
+    console['error']('[Custom Provider] 模型参数验证失败:', error12);
     try {
-      _0x3c5eb6('danger', _0x5248e0, _0x311031);
-    } catch (_0x524cc3) {
-      console['error']('[Custom Provider] 无法更新参数验证状态:', _0x524cc3);
+      run10('danger', trCustomProvider10, error13);
+    } catch (value218) {
+      console['error']('[Custom Provider] 无法更新参数验证状态:', value218);
     }
-    let _0x4d43df = ![];
+    let enabled40 = ![];
     try {
-      typeof _0x4aef0b['showToast'] === 'function' &&
-        (_0x4aef0b['showToast'](_0x5248e0, 'error', 0x2328), (_0x4d43df = !![]));
-    } catch (_0xefb764) {
-      console['error']('[Custom Provider] 无法显示参数验证提示:', _0xefb764);
+      typeof source['showToast'] === 'function' &&
+        (source['showToast'](trCustomProvider10, 'error', 0x2328), (enabled40 = !![]));
+    } catch (value219) {
+      console['error']('[Custom Provider] 无法显示参数验证提示:', value219);
     }
-    if (!_0x4d43df)
+    if (!enabled40)
       try {
-        showError?.(_0x5248e0);
-      } catch (_0x118205) {
-        console['error']('[Custom Provider] 无法显示参数验证错误:', _0x118205);
+        showError?.(trCustomProvider10);
+      } catch (value220) {
+        console['error']('[Custom Provider] 无法显示参数验证错误:', value220);
       }
   }
-  async function _0x15a880(_0x391cc9, _0x445c2a) {
+  async function run99(value221, value222) {
     try {
-      await _0x48b731(_0x391cc9, _0x445c2a);
-    } catch (_0x4f9e58) {
-      _0x50f75d(_0x4f9e58);
+      await run100(value221, value222);
+    } catch (value223) {
+      run98(value223);
     }
   }
-  async function _0x48b731(_0x1f1868, _0x15b7ae) {
-    const _0xffd6ce = _0x497e40(_0x1f1868);
-    if (_0xffd6ce['saving'] || _0xffd6ce['verifyingModelKeys']['size']) return;
+  async function run100(value224, value225) {
+    const value226 = run6(value224);
+    if (value226['saving'] || value226['verifyingModelKeys']['size']) return;
     if (
-      !_0x4d20d(() => {
-        _0x15a880(_0x1f1868, _0x15b7ae)['catch'](_0x50f75d);
+      !run93(() => {
+        run99(value224, value225)['catch'](run98);
       })
     )
       return;
     if (
-      typeof _0x4015c2 !== 'function' ||
-      typeof _0x42e0f6 !== 'function' ||
-      typeof _0x2071fc !== 'function' ||
-      typeof _0x48a2e5 !== 'function'
+      typeof analyzeCustomProviderDocumentation !== 'function' ||
+      typeof buildCustomProviderManifestDraft !== 'function' ||
+      typeof validateCustomProviderManifestDraft !== 'function' ||
+      typeof saveCustomProviderManifestBundle !== 'function'
     ) {
-      (_0x3c5eb6('danger', trCustomProvider('apiUnsupported')),
-        _0x4aef0b['showToast']?.(trCustomProvider('apiUnsupported'), 'error'));
+      (run10('danger', trCustomProvider('apiUnsupported')),
+        source['showToast']?.(trCustomProvider('apiUnsupported'), 'error'));
       return;
     }
-    const _0x4c3807 = _0x48eb16(_0x1f1868),
-      _0x2be15d = _0x2c91d2(_0x1f1868);
-    if (_0x2be15d['length'] === 0x0) {
-      const _0x28397e = trCustomProvider('noModelsSelected');
-      (_0x3c5eb6('partial', _0x28397e), _0x4aef0b['showToast']?.(_0x28397e, 'warn'));
+    const providerId5 = run16(value224),
+      models4 = run62(value224);
+    if (models4['length'] === 0x0) {
+      const trCustomProvider11 = trCustomProvider('noModelsSelected');
+      (run10('partial', trCustomProvider11), source['showToast']?.(trCustomProvider11, 'warn'));
       return;
     }
-    const _0x2fa5e3 = _0x2be15d;
-    if (_0x2146a9(_0x1f1868, _0x4c3807['providerId'])) return;
-    const _0x318484 = _0x5678fd(_0x1f1868),
-      _0x207006 = {
-        ...(_0xffd6ce['provider'] || {}),
-        name: _0x3ef2b5(_0x1f1868, _0xffd6ce['provider']),
+    const models5 = models4;
+    if (run47(value224, providerId5['providerId'])) return;
+    const context = run63(value224),
+      provider3 = {
+        ...(value226['provider'] || {}),
+        name: name4(value224, value226['provider']),
         providerId:
-          _0x4c3807['baseUrl'] === _0xffd6ce['provider']?.['baseUrl']
-            ? _0xffd6ce['provider']['providerId']
-            : _0x4c3807['providerId'],
-        baseUrl: _0x4c3807['baseUrl'],
-        documentationUrl: _0x4c3807['documentationUrl'],
+          providerId5['baseUrl'] === value226['provider']?.['baseUrl']
+            ? value226['provider']['providerId']
+            : providerId5['providerId'],
+        baseUrl: providerId5['baseUrl'],
+        documentationUrl: providerId5['documentationUrl'],
       },
-      { resultEl: _0x5ba190 } = _0xf3935f(_0x1f1868),
-      _0x408385 = captureCustomProviderModelSelectionScroll(_0x5ba190);
-    ((_0xffd6ce['parameterDraft'] = null),
-      (_0xffd6ce['recognitionInvalidated'] = !![]),
-      (_0xffd6ce['verifyingModelKeys'] = new Set(_0x2be15d['map'](_0x521f6b)['filter'](Boolean))),
-      _0x2e05e3(_0x1f1868, _0xffd6ce['discovery'], _0xffd6ce['provider']),
-      restoreCustomProviderModelSelectionScroll(_0x5ba190, _0x408385));
-    const _0x3961b4 = _0x344b2d(_0x15b7ae, trCustomProvider('verifyingParameters'));
+      { resultEl: resultEl4 } = run7(value224),
+      captureCustomProviderModelSelectionScroll3 = captureCustomProviderModelSelectionScroll(resultEl4);
+    ((value226['parameterDraft'] = null),
+      (value226['recognitionInvalidated'] = !![]),
+      (value226['verifyingModelKeys'] = new Set(models4['map'](run56)['filter'](Boolean))),
+      run73(value224, value226['discovery'], value226['provider']),
+      restoreCustomProviderModelSelectionScroll(resultEl4, captureCustomProviderModelSelectionScroll3));
+    const run101 = run51(value225, trCustomProvider('verifyingParameters'));
     try {
-      _0x3c5eb6('testing', trCustomProvider('analyzingDocumentation'));
-      const _0x16338b = await _0x4015c2({
-        apiKey: _0x4c3807['apiKey'],
-        provider: _0x207006,
-        models: _0x2fa5e3,
-        documentationUrl: _0x4c3807['documentationUrl'],
-        documentationDocument: _0x4c3807['documentationDocument'],
+      run10('testing', trCustomProvider('analyzingDocumentation'));
+      const enabled41 = await analyzeCustomProviderDocumentation({
+        apiKey: providerId5['apiKey'],
+        provider: provider3,
+        models: models5,
+        documentationUrl: providerId5['documentationUrl'],
+        documentationDocument: providerId5['documentationDocument'],
       });
-      if (_0x16338b?.['agentUnavailable']) throw new Error(trCustomProvider('documentationAgentUnavailable'));
-      if (!_0x16338b?.['bundle']) throw new Error(trCustomProvider('documentationNoMatchingProfile'));
-      const _0x316a1e = Number(_0x16338b?.['analysis']?.['documentedModels'] || 0x0);
-      if (_0x316a1e <= 0x0)
+      if (enabled41?.['agentUnavailable']) throw new Error(trCustomProvider('documentationAgentUnavailable'));
+      if (!enabled41?.['bundle']) throw new Error(trCustomProvider('documentationNoMatchingProfile'));
+      const count4 = Number(enabled41?.['analysis']?.['documentedModels'] || 0x0);
+      if (count4 <= 0x0)
         throw new Error(
-          trCustomProvider(resolveCustomProviderDocumentationFailureKey(_0x16338b?.['analysis'])),
+          trCustomProvider(resolveCustomProviderDocumentationFailureKey(enabled41?.['analysis'])),
         );
-      const _0x35cdc2 = await _0x42e0f6({ provider: _0x207006, models: _0x2be15d }),
-        _0x1e251f = mergeCustomProviderRecognizedProfiles(_0x35cdc2?.['bundle'], _0x16338b['bundle']),
-        _0x5cce65 = await _0x2071fc(_0x1e251f);
-      if (!_0x5cce65?.['ok'])
+      const value227 = await buildCustomProviderManifestDraft({ provider: provider3, models: models4 }),
+        customProviderRecognizedProfiles2 = mergeCustomProviderRecognizedProfiles(
+          value227?.['bundle'],
+          enabled41['bundle'],
+        ),
+        response3 = await validateCustomProviderManifestDraft(customProviderRecognizedProfiles2);
+      if (!response3?.['ok'])
         throw new Error(
-          Array['isArray'](_0x5cce65?.['errors']) && _0x5cce65['errors']['length']
-            ? _0x5cce65['errors']['join'](';\x20')
+          Array['isArray'](response3?.['errors']) && response3['errors']['length']
+            ? response3['errors']['join'](';\x20')
             : trApiInput('diagnostics.failed'),
         );
-      if (_0x318484 !== _0x5678fd(_0x1f1868)) throw new Error(trCustomProvider('recognizeBeforeSave'));
-      const _0x2e0b0f = _0x5cce65['bundle'] || _0x1e251f;
-      _0xffd6ce['parameterDraft'] = { context: _0x318484, bundle: _0x2e0b0f };
-      const _0x145657 = Array['isArray'](_0x2e0b0f?.['models']) ? _0x2e0b0f['models']['length'] : 0x0,
-        _0x385bcc = (Array['isArray'](_0x2e0b0f?.['models']) ? _0x2e0b0f['models'] : [])['filter'](
+      if (context !== run63(value224)) throw new Error(trCustomProvider('recognizeBeforeSave'));
+      const bundle2 = response3['bundle'] || customProviderRecognizedProfiles2;
+      value226['parameterDraft'] = { context: context, bundle: bundle2 };
+      const count5 = Array['isArray'](bundle2?.['models']) ? bundle2['models']['length'] : 0x0,
+        documented = (Array['isArray'](bundle2?.['models']) ? bundle2['models'] : [])['filter'](
           isCustomProviderModelCapabilityRecognized,
         )['length'],
-        _0x51e359 = Number(_0x16338b?.['analysis']?.['agentRepairAttempts'] || 0x0) > 0x0,
-        _0xa4df51 =
-          _0x385bcc < _0x145657
-            ? _0x51e359
+        value228 = Number(enabled41?.['analysis']?.['agentRepairAttempts'] || 0x0) > 0x0,
+        value229 =
+          documented < count5
+            ? value228
               ? 'parametersVerifiedPartialAfterRepair'
               : 'parametersVerifiedPartial'
-            : _0x51e359
+            : value228
               ? 'parametersVerifiedAfterRepair'
               : 'parametersVerified',
-        _0x30951d = trCustomProvider(_0xa4df51, { count: _0x145657, documented: _0x385bcc });
-      (_0x3c5eb6(_0x385bcc < _0x145657 ? 'partial' : 'success', _0x30951d),
-        _0x4aef0b['showToast']?.(
-          _0x30951d,
-          _0x385bcc < _0x145657 ? 'warn' : 'success',
-          _0x385bcc < _0x145657 ? 0x2328 : undefined,
+        trCustomProvider12 = trCustomProvider(value229, { count: count5, documented: documented });
+      (run10(documented < count5 ? 'partial' : 'success', trCustomProvider12),
+        source['showToast']?.(
+          trCustomProvider12,
+          documented < count5 ? 'warn' : 'success',
+          documented < count5 ? 0x2328 : undefined,
         ));
     } finally {
-      ((_0xffd6ce['verifyingModelKeys'] = new Set()),
-        _0x2e05e3(_0x1f1868, _0xffd6ce['discovery'], _0xffd6ce['provider']),
-        restoreCustomProviderModelSelectionScroll(_0x5ba190, _0x408385),
-        _0x3961b4(),
-        _0x4f74b3(_0x1f1868));
+      ((value226['verifyingModelKeys'] = new Set()),
+        run73(value224, value226['discovery'], value226['provider']),
+        restoreCustomProviderModelSelectionScroll(resultEl4, captureCustomProviderModelSelectionScroll3),
+        run101(),
+        run55(value224));
     }
   }
-  function _0x2402bb() {
-    const { cardEl: _0x3310d5, editorEl: _0x1c48c7 } = _0x1c4a39();
-    if (!_0x3310d5) return;
-    (_0x41d77f(),
-      _0x1c48c7?.['addEventListener']('input', (_0x502ceb) => {
+  function init() {
+    const { cardEl: cardEl2, editorEl: editorEl } = run2();
+    if (!cardEl2) return;
+    (run40(),
+      editorEl?.['addEventListener']('input', (event3) => {
         if (
-          !_0x502ceb['target']?.['matches']?.(
+          !event3['target']?.['matches']?.(
             '[data-custom-provider-base-url], [data-custom-provider-api-key], [data-custom-provider-documentation-url]',
           )
         )
           return;
-        const _0x116d6c = _0x502ceb['target']['closest']('[data-custom-provider-editor-id]'),
-          _0x5a3518 = _0x497e40(_0x116d6c);
-        ((_0x5a3518['parameterDraft'] = null),
-          (_0x5a3518['recognitionInvalidated'] = !![]),
-          _0x4f74b3(_0x116d6c));
+        const value230 = event3['target']['closest']('[data-custom-provider-editor-id]'),
+          value231 = run6(value230);
+        ((value231['parameterDraft'] = null), (value231['recognitionInvalidated'] = !![]), run55(value230));
       }),
-      _0x1c48c7?.['addEventListener']('focusin', (_0x59c8cb) => {
-        const _0x85f799 = _0x59c8cb['target']?.['closest']?.('[data-custom-provider-editor-id]');
-        _0x85f799 && _0x1c48c7['contains'](_0x85f799) && _0x3719ed(_0x85f799);
+      editorEl?.['addEventListener']('focusin', (event4) => {
+        const value232 = event4['target']?.['closest']?.('[data-custom-provider-editor-id]');
+        value232 && editorEl['contains'](value232) && run9(value232);
       }),
-      _0x1c48c7?.['addEventListener'](
+      editorEl?.['addEventListener'](
         'wheel',
-        (_0x3132df) => handleCustomProviderResultWheel(_0x3132df, _0x1c48c7),
+        (value233) => handleCustomProviderResultWheel(value233, editorEl),
         { passive: ![] },
       ),
-      _0x1c48c7?.['addEventListener']('click', (_0x4bf086) => {
-        const _0x695d82 = _0x4bf086['target']?.['closest']?.('[data-custom-provider-editor-id]');
-        _0x695d82 && _0x1c48c7['contains'](_0x695d82) && _0x3719ed(_0x695d82);
-        const _0x4fd473 = _0x4bf086['target']?.['closest']?.('[data-custom-provider-add]');
-        if (_0x4fd473 && _0x1c48c7['contains'](_0x4fd473)) {
-          _0x5ee6ea();
+      editorEl?.['addEventListener']('click', (event5) => {
+        const value234 = event5['target']?.['closest']?.('[data-custom-provider-editor-id]');
+        value234 && editorEl['contains'](value234) && run9(value234);
+        const value235 = event5['target']?.['closest']?.('[data-custom-provider-add]');
+        if (value235 && editorEl['contains'](value235)) {
+          run75();
           return;
         }
-        const _0x5aa70b = _0x4bf086['target']?.['closest']?.('[data-custom-provider-delete]');
-        if (_0x5aa70b && _0x1c48c7['contains'](_0x5aa70b)) {
-          const _0x276358 = _0x5aa70b['closest']('[data-custom-provider-editor-id]');
-          _0x50732f(_0x276358, _0x5aa70b)['catch'](() => {});
+        const el54 = event5['target']?.['closest']?.('[data-custom-provider-delete]');
+        if (el54 && editorEl['contains'](el54)) {
+          const value236 = el54['closest']('[data-custom-provider-editor-id]');
+          run36(value236, el54)['catch'](() => {});
           return;
         }
-        const _0x2787b2 = _0x4bf086['target']?.['closest']?.('[data-custom-provider-select-document]');
-        if (_0x2787b2 && _0x1c48c7['contains'](_0x2787b2)) {
-          const _0x8ab17c = _0x2787b2['closest']('[data-custom-provider-editor-id]'),
-            { documentationFileEl: _0x4a81f3 } = _0x20560a(_0x8ab17c);
-          if (_0x4a81f3) _0x4a81f3['value'] = '';
-          _0x4a81f3?.['click']?.();
+        const el55 = event5['target']?.['closest']?.('[data-custom-provider-select-document]');
+        if (el55 && editorEl['contains'](el55)) {
+          const value237 = el55['closest']('[data-custom-provider-editor-id]'),
+            { documentationFileEl: documentationFileEl4 } = run4(value237);
+          if (documentationFileEl4) documentationFileEl4['value'] = '';
+          documentationFileEl4?.['click']?.();
           return;
         }
-        const _0x3d89f5 = _0x4bf086['target']?.['closest']?.('[data-custom-provider-discover]');
-        if (_0x3d89f5 && _0x1c48c7['contains'](_0x3d89f5)) {
-          const _0x4f85f8 = _0x3d89f5['closest']('[data-custom-provider-editor-id]');
-          _0x321cc3(_0x4f85f8, _0x3d89f5)['catch'](() => {});
+        const el56 = event5['target']?.['closest']?.('[data-custom-provider-discover]');
+        if (el56 && editorEl['contains'](el56)) {
+          const value238 = el56['closest']('[data-custom-provider-editor-id]');
+          run94(value238, el56)['catch'](() => {});
           return;
         }
-        const _0x3d7cd5 = _0x4bf086['target']?.['closest']?.('[data-custom-provider-save-selected]');
-        if (_0x3d7cd5 && _0x1c48c7['contains'](_0x3d7cd5)) {
-          const _0x306c66 = _0x3d7cd5['closest']('[data-custom-provider-editor-id]');
-          _0x50d0ec(_0x306c66, _0x3d7cd5)['catch'](() => {});
+        const el57 = event5['target']?.['closest']?.('[data-custom-provider-save-selected]');
+        if (el57 && editorEl['contains'](el57)) {
+          const value239 = el57['closest']('[data-custom-provider-editor-id]');
+          run96(value239, el57)['catch'](() => {});
           return;
         }
-        const _0x145e70 = _0x4bf086['target']?.['closest']?.('[data-custom-provider-verify-params]');
-        if (_0x145e70 && _0x1c48c7['contains'](_0x145e70)) {
-          const _0x3a0817 = _0x145e70['closest']('[data-custom-provider-editor-id]');
-          _0x15a880(_0x3a0817, _0x145e70)['catch'](_0x50f75d);
+        const el58 = event5['target']?.['closest']?.('[data-custom-provider-verify-params]');
+        if (el58 && editorEl['contains'](el58)) {
+          const value240 = el58['closest']('[data-custom-provider-editor-id]');
+          run99(value240, el58)['catch'](run98);
           return;
         }
-        const _0x3cd463 = _0x4bf086['target']?.['closest']?.('[data-custom-provider-kind-filter]');
-        if (_0x3cd463 && _0x1c48c7['contains'](_0x3cd463)) {
-          const _0x467d14 = _0x3cd463['closest']('[data-custom-provider-editor-id]'),
-            _0x6bbdb1 = String(_0x3cd463['dataset']['customProviderKindFilter'] || 'all');
-          if (!CUSTOM_PROVIDER_FILTER_KINDS['includes'](_0x6bbdb1)) return;
-          const _0x5c7c71 = _0x497e40(_0x467d14);
-          ((_0x5c7c71['activeKindFilter'] = _0x6bbdb1),
-            (_0x5c7c71['provider'] = {
-              ...(_0x5c7c71['provider'] || {}),
-              name: _0x3ef2b5(_0x467d14, _0x5c7c71['provider']),
+        const el59 = event5['target']?.['closest']?.('[data-custom-provider-kind-filter]');
+        if (el59 && editorEl['contains'](el59)) {
+          const value241 = el59['closest']('[data-custom-provider-editor-id]'),
+            value242 = String(el59['dataset']['customProviderKindFilter'] || 'all');
+          if (!CUSTOM_PROVIDER_FILTER_KINDS['includes'](value242)) return;
+          const value243 = run6(value241);
+          ((value243['activeKindFilter'] = value242),
+            (value243['provider'] = {
+              ...(value243['provider'] || {}),
+              name: name4(value241, value243['provider']),
             }),
-            _0x2e05e3(_0x467d14, _0x5c7c71['discovery'], _0x5c7c71['provider']));
+            run73(value241, value243['discovery'], value243['provider']));
           return;
         }
-        const _0x17be7e = _0x4bf086['target']?.['closest']?.('[data-custom-provider-assign-kind]');
-        if (_0x17be7e && _0x1c48c7['contains'](_0x17be7e)) {
-          (_0x4bf086['preventDefault'](), _0x4bf086['stopPropagation']());
-          const _0x42bd0c = _0x17be7e['closest']('[data-custom-provider-editor-id]'),
-            _0x5e25ab = _0x17be7e['closest']('[data-custom-provider-model-kind-toolbar]'),
-            _0x5d459a = String(_0x5e25ab?.['dataset']['customProviderModelKindToolbar'] || ''),
-            _0x9baac9 = String(_0x17be7e['dataset']['customProviderAssignKind'] || '');
-          if (!_0x42bd0c || !_0x5d459a || !CUSTOM_PROVIDER_SELECTABLE_KINDS['includes'](_0x9baac9)) return;
-          const _0x732455 = _0x497e40(_0x42bd0c);
-          (_0x732455['assignedModelKinds']['set'](_0x5d459a, _0x9baac9),
-            _0x732455['selectedModelKeys']['add'](_0x5d459a),
-            delete _0x42bd0c['dataset']['customProviderSyncedBundle'],
-            _0x483393(_0x42bd0c, _0x732455['discovery'], _0x732455['provider']));
+        const el60 = event5['target']?.['closest']?.('[data-custom-provider-assign-kind]');
+        if (el60 && editorEl['contains'](el60)) {
+          (event5['preventDefault'](), event5['stopPropagation']());
+          const el61 = el60['closest']('[data-custom-provider-editor-id]'),
+            el62 = el60['closest']('[data-custom-provider-model-kind-toolbar]'),
+            enabled42 = String(el62?.['dataset']['customProviderModelKindToolbar'] || ''),
+            value244 = String(el60['dataset']['customProviderAssignKind'] || '');
+          if (!el61 || !enabled42 || !CUSTOM_PROVIDER_SELECTABLE_KINDS['includes'](value244)) return;
+          const value245 = run6(el61);
+          (value245['assignedModelKinds']['set'](enabled42, value244),
+            value245['selectedModelKeys']['add'](enabled42),
+            delete el61['dataset']['customProviderSyncedBundle'],
+            run74(el61, value245['discovery'], value245['provider']));
           return;
         }
       }),
-      _0x1c48c7?.['addEventListener']('dblclick', (_0x157c8e) => {
-        const _0x7db82b = _0x157c8e['target']?.['closest']?.('[data-custom-provider-editor-tab]');
-        if (!_0x7db82b || !_0x1c48c7['contains'](_0x7db82b)) return;
-        const _0x3e531c = _0x7db82b['closest']('[data-custom-provider-editor-id]');
-        (_0x3719ed(_0x3e531c), _0x12d823(_0x3e531c));
+      editorEl?.['addEventListener']('dblclick', (event6) => {
+        const el63 = event6['target']?.['closest']?.('[data-custom-provider-editor-tab]');
+        if (!el63 || !editorEl['contains'](el63)) return;
+        const value246 = el63['closest']('[data-custom-provider-editor-id]');
+        (run9(value246), run26(value246));
       }),
-      _0x1c48c7['addEventListener']('change', (_0x34de44) => {
-        const _0x27af3c = _0x34de44['target']?.['closest']?.('[data-custom-provider-documentation-file]');
-        if (_0x27af3c && _0x1c48c7['contains'](_0x27af3c)) {
-          const _0x4323f3 = _0x27af3c['closest']('[data-custom-provider-editor-id]');
-          _0x39dda3(_0x4323f3, _0x27af3c)['catch'](() => {});
+      editorEl['addEventListener']('change', (event7) => {
+        const el64 = event7['target']?.['closest']?.('[data-custom-provider-documentation-file]');
+        if (el64 && editorEl['contains'](el64)) {
+          const value247 = el64['closest']('[data-custom-provider-editor-id]');
+          run54(value247, el64)['catch'](() => {});
           return;
         }
-        const _0x2eeabb = _0x34de44['target']?.['closest']?.('[data-custom-provider-model-checkbox]');
-        if (!_0x2eeabb || !_0x1c48c7['contains'](_0x2eeabb)) return;
-        const _0x2a4fb1 = _0x2eeabb['closest']('[data-custom-provider-model-key]'),
-          _0x420d20 = _0x2eeabb['closest']('[data-custom-provider-editor-id]');
-        if (_0x2a4fb1 && _0x420d20) {
-          const _0x13d241 = String(_0x2a4fb1['dataset']['customProviderModelKey'] || '');
-          if (!_0x13d241) return;
-          const _0x391d18 = _0x497e40(_0x420d20),
-            _0x43a203 = String(_0x2a4fb1['dataset']['customProviderDetectedKind'] || 'unknown'),
-            _0x5cb408 = !!_0x2eeabb['checked'],
-            _0xe1a7b9 = applyCustomProviderModelSelectionState(_0x391d18, {
-              modelKey: _0x13d241,
-              detectedKind: _0x43a203,
-              selected: _0x5cb408,
+        const el65 = event7['target']?.['closest']?.('[data-custom-provider-model-checkbox]');
+        if (!el65 || !editorEl['contains'](el65)) return;
+        const el66 = el65['closest']('[data-custom-provider-model-key]'),
+          el67 = el65['closest']('[data-custom-provider-editor-id]');
+        if (el66 && el67) {
+          const modelKey = String(el66['dataset']['customProviderModelKey'] || '');
+          if (!modelKey) return;
+          const value248 = run6(el67),
+            detectedKind = String(el66['dataset']['customProviderDetectedKind'] || 'unknown'),
+            selected = !!el65['checked'],
+            customProviderModelSelectionState = applyCustomProviderModelSelectionState(value248, {
+              modelKey: modelKey,
+              detectedKind: detectedKind,
+              selected: selected,
             });
-          delete _0x420d20['dataset']['customProviderSyncedBundle'];
-          if (_0xe1a7b9) {
-            _0x483393(_0x420d20, _0x391d18['discovery'], _0x391d18['provider']);
+          delete el67['dataset']['customProviderSyncedBundle'];
+          if (customProviderModelSelectionState) {
+            run74(el67, value248['discovery'], value248['provider']);
             return;
           }
-          (_0x2a4fb1['classList']['toggle']('is-selected', _0x5cb408), _0x4f74b3(_0x420d20));
+          (el66['classList']['toggle']('is-selected', selected), run55(el67));
         }
       }),
-      _0x1c48c7['addEventListener']('input', (_0x240cc5) => {
-        const _0x496eb7 = _0x240cc5['target']?.['closest']?.('[data-custom-provider-documentation-url]');
-        if (!_0x496eb7 || !_0x1c48c7['contains'](_0x496eb7)) return;
-        const _0x127054 = _0x496eb7['closest']('[data-custom-provider-editor-id]');
-        _0x497e40(_0x127054)['documentationDocument'] && _0x48a605(_0x127054);
+      editorEl['addEventListener']('input', (event8) => {
+        const el68 = event8['target']?.['closest']?.('[data-custom-provider-documentation-url]');
+        if (!el68 || !editorEl['contains'](el68)) return;
+        const value249 = el68['closest']('[data-custom-provider-editor-id]');
+        run6(value249)['documentationDocument'] && run53(value249);
       }),
-      trackRuntimeManifestLoad(_0x1068f6({ silent: !![] }))['catch'](() => {}));
+      trackRuntimeManifestLoad(refreshBundles({ silent: !![] }))['catch'](() => {}));
   }
   return {
-    init: _0x2402bb,
-    refreshBundles: _0x1068f6,
-    syncConfigSnapshot(_0x5678ae) {
-      _0x6cada3 = _0x5678ae || {};
+    init: init,
+    refreshBundles: refreshBundles,
+    syncConfigSnapshot(value250) {
+      configSnapshot = value250 || {};
     },
-    syncDefaults: _0x16ad8f,
-    syncEditorCredentials: _0xba173,
+    syncDefaults: syncDefaults,
+    syncEditorCredentials: syncEditorCredentials,
   };
 }

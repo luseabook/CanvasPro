@@ -141,490 +141,464 @@ const ALLOWED_ADAPTER_TYPES = new Set(['workflow', 'modelApi', 'localRuntime']),
   REQUIRED_LOCAL_RUNTIME_EXECUTION_FIELDS = Object.freeze(['runtime']),
   _models = new Map(),
   _executions = new Map();
-function assertPlainObject(_0x3e3389, _0x35e355) {
-  if (!_0x3e3389 || typeof _0x3e3389 !== 'object' || Array.isArray(_0x3e3389))
-    throw new TypeError('[manifest] ' + _0x35e355 + ' must be an object');
+function assertPlainObject(enabled, value) {
+  if (!enabled || typeof enabled !== 'object' || Array.isArray(enabled))
+    throw new TypeError('[manifest] ' + value + ' must be an object');
 }
-function isPlainObject(_0x51c609) {
-  if (!_0x51c609 || typeof _0x51c609 !== 'object' || Array.isArray(_0x51c609)) return false;
-  const _0x3223a7 = Object.getPrototypeOf(_0x51c609);
-  return _0x3223a7 === Object.prototype || _0x3223a7 === null;
+function isPlainObject(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object' || Array.isArray(enabled2)) return false;
+  const item = Object.getPrototypeOf(enabled2);
+  return item === Object.prototype || item === null;
 }
-function assertPlainData(_0x3bb1d7, _0x3c9e5d, _0x5cb274 = new WeakSet()) {
-  if (_0x3bb1d7 === null) return;
-  const _0x32e9aa = typeof _0x3bb1d7;
-  if (_0x32e9aa === 'string' || _0x32e9aa === 'number' || _0x32e9aa === 'boolean') return;
-  if (
-    _0x32e9aa === 'function' ||
-    _0x32e9aa === 'symbol' ||
-    _0x32e9aa === 'undefined' ||
-    _0x32e9aa === 'bigint'
-  )
-    throw new TypeError('[manifest] ' + _0x3c9e5d + ' must be plain data');
-  if (_0x5cb274.has(_0x3bb1d7))
-    throw new TypeError('[manifest] ' + _0x3c9e5d + ' cannot contain circular references');
-  _0x5cb274.add(_0x3bb1d7);
-  if (Array.isArray(_0x3bb1d7)) {
-    _0x3bb1d7.forEach((_0x24dd67, _0x5aface) => {
-      assertPlainData(_0x24dd67, _0x3c9e5d + '[' + _0x5aface + ']', _0x5cb274);
+function assertPlainData(list, key, map = new WeakSet()) {
+  if (list === null) return;
+  const index = typeof list;
+  if (index === 'string' || index === 'number' || index === 'boolean') return;
+  if (index === 'function' || index === 'symbol' || index === 'undefined' || index === 'bigint')
+    throw new TypeError('[manifest] ' + key + ' must be plain data');
+  if (map.has(list)) throw new TypeError('[manifest] ' + key + ' cannot contain circular references');
+  map.add(list);
+  if (Array.isArray(list)) {
+    list.forEach((item2, result) => {
+      assertPlainData(item2, key + '[' + result + ']', map);
     });
     return;
   }
-  if (!isPlainObject(_0x3bb1d7)) throw new TypeError('[manifest] ' + _0x3c9e5d + ' must be plain data');
-  Object.entries(_0x3bb1d7).forEach(([_0x3f4fbc, _0x5dcca3]) => {
-    assertPlainData(_0x5dcca3, _0x3c9e5d + '.' + _0x3f4fbc, _0x5cb274);
+  if (!isPlainObject(list)) throw new TypeError('[manifest] ' + key + ' must be plain data');
+  Object.entries(list).forEach(([data, options]) => {
+    assertPlainData(options, key + '.' + data, map);
   });
 }
-function assertRequiredFields(_0xa32247, _0x464188, _0x57efa8) {
-  const _0x30ae44 = _0x464188.filter(
-    (_0x1afeeb) =>
-      _0xa32247[_0x1afeeb] === undefined || _0xa32247[_0x1afeeb] === null || _0xa32247[_0x1afeeb] === '',
+function assertRequiredFields(target, list2, source) {
+  const list3 = list2.filter(
+    (item3) => target[item3] === undefined || target[item3] === null || target[item3] === '',
   );
-  if (_0x30ae44.length > 0)
-    throw new Error('[manifest] ' + _0x57efa8 + ' missing required fields: ' + _0x30ae44.join(', '));
+  if (list3.length > 0)
+    throw new Error('[manifest] ' + source + ' missing required fields: ' + list3.join(', '));
 }
-function normalizeRegistryKey(_0x4f7ecc) {
-  return String(_0x4f7ecc || '').trim();
+function normalizeRegistryKey(next) {
+  return String(next || '').trim();
 }
-function getUiSchemaOptionValue(_0x139098) {
-  return String(_0x139098?.value ?? _0x139098);
+function getUiSchemaOptionValue(el) {
+  return String(el?.value ?? el);
 }
-function normalizeUiSchemaCompareValue(_0x1b545b) {
-  return String(_0x1b545b ?? '')
+function normalizeUiSchemaCompareValue(current) {
+  return String(current ?? '')
     .trim()
     .toLowerCase();
 }
-function isAdaptiveUiSchemaValue(_0x504df7) {
-  const _0x4a4155 = String(_0x504df7 || '').trim(),
-    _0x3f2d4f = _0x4a4155.toLowerCase();
+function isAdaptiveUiSchemaValue(entry) {
+  const record = String(entry || '').trim(),
+    payload = record.toLowerCase();
   return (
-    _0x3f2d4f === 'auto' ||
-    _0x3f2d4f === 'adaptive' ||
-    _0x3f2d4f === 'default' ||
-    _0x4a4155 === '自适应' ||
-    _0x4a4155 === '默认'
+    payload === 'auto' ||
+    payload === 'adaptive' ||
+    payload === 'default' ||
+    record === '自适应' ||
+    record === '默认'
   );
 }
-function getUiSchemaDisableWhen(_0x4fa92a) {
-  if (!_0x4fa92a || typeof _0x4fa92a !== 'object' || Array.isArray(_0x4fa92a)) return null;
-  const _0x22635a = _0x4fa92a.disableWhen || _0x4fa92a.disabledWhen;
-  return _0x22635a &&
-    (Array.isArray(_0x22635a) || (typeof _0x22635a === 'object' && !Array.isArray(_0x22635a)))
-    ? _0x22635a
+function getUiSchemaDisableWhen(enabled3) {
+  if (!enabled3 || typeof enabled3 !== 'object' || Array.isArray(enabled3)) return null;
+  const handle = enabled3.disableWhen || enabled3.disabledWhen;
+  return handle && (Array.isArray(handle) || (typeof handle === 'object' && !Array.isArray(handle)))
+    ? handle
     : null;
 }
-function uiSchemaDisableWhenMatches(_0x1745fa, _0x23d495 = {}) {
-  if (Array.isArray(_0x1745fa))
-    return _0x1745fa.some((_0x371b1c) => uiSchemaDisableWhenMatches(_0x371b1c, _0x23d495));
-  if (!_0x1745fa || typeof _0x1745fa !== 'object') return false;
-  if (Array.isArray(_0x1745fa.any))
-    return _0x1745fa.any.some((_0x146cf2) => uiSchemaDisableWhenMatches(_0x146cf2, _0x23d495));
-  if (Array.isArray(_0x1745fa.all))
-    return _0x1745fa.all.every((_0x1821bb) => uiSchemaDisableWhenMatches(_0x1821bb, _0x23d495));
-  const _0x135764 = normalizeRegistryKey(_0x1745fa?.field || _0x1745fa?.param);
-  if (!_0x135764) return false;
-  const _0x8aa6b4 = _0x1745fa.values !== undefined ? _0x1745fa.values : _0x1745fa.value,
-    _0x132088 = Array.isArray(_0x8aa6b4) ? _0x8aa6b4 : [_0x8aa6b4],
-    _0x10e709 = _0x132088.map(normalizeUiSchemaCompareValue),
-    _0xaa66f = normalizeUiSchemaCompareValue(_0x23d495?.[_0x135764]);
-  return _0x10e709.includes(_0xaa66f);
+function uiSchemaDisableWhenMatches(el2, state = {}) {
+  if (Array.isArray(el2)) return el2.some((item4) => uiSchemaDisableWhenMatches(item4, state));
+  if (!el2 || typeof el2 !== 'object') return false;
+  if (Array.isArray(el2.any)) return el2.any.some((item5) => uiSchemaDisableWhenMatches(item5, state));
+  if (Array.isArray(el2.all)) return el2.all.every((item6) => uiSchemaDisableWhenMatches(item6, state));
+  const registryKey = normalizeRegistryKey(el2?.field || el2?.param);
+  if (!registryKey) return false;
+  const config = el2.values !== undefined ? el2.values : el2.value,
+    list4 = Array.isArray(config) ? config : [config],
+    list5 = list4.map(normalizeUiSchemaCompareValue),
+    uiSchemaCompareValue = normalizeUiSchemaCompareValue(state?.[registryKey]);
+  return list5.includes(uiSchemaCompareValue);
 }
-function isUiSchemaOptionDisabled(_0x5bd8ba, _0x2e59e0, _0xe23783 = {}) {
-  if (_0x5bd8ba?.disabled === true || _0x5bd8ba?.readOnly === true) return true;
-  if (!_0x2e59e0 || typeof _0x2e59e0 !== 'object' || Array.isArray(_0x2e59e0)) return false;
-  if (_0x2e59e0.disabled === true) return true;
-  const _0x24cea2 = getUiSchemaDisableWhen(_0x2e59e0);
-  return _0x24cea2 ? uiSchemaDisableWhenMatches(_0x24cea2, _0xe23783) : false;
+function isUiSchemaOptionDisabled(el3, el4, scope = {}) {
+  if (el3?.disabled === true || el3?.readOnly === true) return true;
+  if (!el4 || typeof el4 !== 'object' || Array.isArray(el4)) return false;
+  if (el4.disabled === true) return true;
+  const uiSchemaDisableWhen = getUiSchemaDisableWhen(el4);
+  return uiSchemaDisableWhen ? uiSchemaDisableWhenMatches(uiSchemaDisableWhen, scope) : false;
 }
-function findUiSchemaOptionByValue(_0x1f4a2b, _0xb83333) {
-  const _0x153647 = Array.isArray(_0x1f4a2b?.options) ? _0x1f4a2b.options : [],
-    _0x51f84b = String(_0xb83333 ?? '').trim(),
-    _0x4c291e = _0x51f84b.toLowerCase();
+function findUiSchemaOptionByValue(input, output) {
+  const list6 = Array.isArray(input?.options) ? input.options : [],
+    value2 = String(output ?? '').trim(),
+    value3 = value2.toLowerCase();
   return (
-    _0x153647.find((_0x109877) => getUiSchemaOptionValue(_0x109877) === _0x51f84b) ||
-    _0x153647.find((_0x4095bc) => getUiSchemaOptionValue(_0x4095bc).trim().toLowerCase() === _0x4c291e) ||
+    list6.find((item7) => getUiSchemaOptionValue(item7) === value2) ||
+    list6.find((item8) => getUiSchemaOptionValue(item8).trim().toLowerCase() === value3) ||
     null
   );
 }
-function findAdaptiveUiSchemaOption(_0x484a50) {
-  const _0x29f676 = Array.isArray(_0x484a50?.options) ? _0x484a50.options : [];
+function findAdaptiveUiSchemaOption(value4) {
+  const list7 = Array.isArray(value4?.options) ? value4.options : [];
   return (
-    _0x29f676.find((_0x2fc5b7) => {
-      const _0x1da818 = getUiSchemaOptionValue(_0x2fc5b7),
-        _0x2c17c1 = String(_0x2fc5b7?.label ?? _0x1da818).trim();
-      return isAdaptiveUiSchemaValue(_0x1da818) || isAdaptiveUiSchemaValue(_0x2c17c1);
+    list7.find((item9) => {
+      const uiSchemaOptionValue = getUiSchemaOptionValue(item9),
+        value5 = String(item9?.label ?? uiSchemaOptionValue).trim();
+      return isAdaptiveUiSchemaValue(uiSchemaOptionValue) || isAdaptiveUiSchemaValue(value5);
     }) || null
   );
 }
-function findEnabledUiSchemaOption(_0x3cf288, _0x1b06a9, _0x7cc5a = {}) {
-  const _0x245cca = findUiSchemaOptionByValue(_0x3cf288, _0x1b06a9);
-  return _0x245cca && !isUiSchemaOptionDisabled(_0x3cf288, _0x245cca, _0x7cc5a) ? _0x245cca : null;
+function findEnabledUiSchemaOption(value6, value7, value8 = {}) {
+  const uiSchemaOptionByValue = findUiSchemaOptionByValue(value6, value7);
+  return uiSchemaOptionByValue && !isUiSchemaOptionDisabled(value6, uiSchemaOptionByValue, value8)
+    ? uiSchemaOptionByValue
+    : null;
 }
-function findFirstEnabledUiSchemaOption(_0x394027, _0x19bf55 = {}) {
-  const _0x154892 = Array.isArray(_0x394027?.options) ? _0x394027.options : [];
-  return (
-    _0x154892.find(
-      (_0x12d032) => _0x12d032?.hidden !== true && !isUiSchemaOptionDisabled(_0x394027, _0x12d032, _0x19bf55),
-    ) || null
-  );
+function findFirstEnabledUiSchemaOption(value9, value10 = {}) {
+  const list8 = Array.isArray(value9?.options) ? value9.options : [];
+  return list8.find((el5) => el5?.hidden !== true && !isUiSchemaOptionDisabled(value9, el5, value10)) || null;
 }
-function getUiSchemaDefaultValueAliases(_0x39a25e) {
-  return (Array.isArray(_0x39a25e?.defaultValueAliases) ? _0x39a25e.defaultValueAliases : [])
-    .map((_0x29865f) =>
-      String(_0x29865f ?? '')
+function getUiSchemaDefaultValueAliases(value11) {
+  return (Array.isArray(value11?.defaultValueAliases) ? value11.defaultValueAliases : [])
+    .map((item10) =>
+      String(item10 ?? '')
         .trim()
         .toLowerCase(),
     )
     .filter(Boolean);
 }
-export function normalizeUiSchemaFieldValue(_0x17d820, _0x30dbad, { params: params = {} } = {}) {
-  const _0x1e01ce = String(_0x17d820?.type || '')
+export function normalizeUiSchemaFieldValue(value12, value13, { params: params = {} } = {}) {
+  const value14 = String(value12?.type || '')
     .trim()
     .toLowerCase();
-  if (_0x30dbad === undefined || _0x30dbad === null) return _0x17d820?.defaultValue ?? '';
-  if (String(_0x30dbad).trim() === '')
-    return _0x17d820?.allowEmpty === true && (_0x1e01ce === 'text' || _0x1e01ce === 'textarea')
+  if (value13 === undefined || value13 === null) return value12?.defaultValue ?? '';
+  if (String(value13).trim() === '')
+    return value12?.allowEmpty === true && (value14 === 'text' || value14 === 'textarea')
       ? ''
-      : (_0x17d820?.defaultValue ?? '');
-  const _0x357ac7 = String(_0x30dbad).trim().toLowerCase();
-  if (getUiSchemaDefaultValueAliases(_0x17d820).includes(_0x357ac7)) return _0x17d820?.defaultValue ?? '';
-  if (_0x1e01ce === 'toggle') {
-    if (_0x30dbad === true || _0x30dbad === false) return _0x30dbad;
-    if (['true', '1', 'yes', 'on'].includes(_0x357ac7)) return true;
-    if (['false', '0', 'no', 'off'].includes(_0x357ac7)) return false;
-    return _0x17d820?.defaultValue === true;
+      : (value12?.defaultValue ?? '');
+  const value15 = String(value13).trim().toLowerCase();
+  if (getUiSchemaDefaultValueAliases(value12).includes(value15)) return value12?.defaultValue ?? '';
+  if (value14 === 'toggle') {
+    if (value13 === true || value13 === false) return value13;
+    if (['true', '1', 'yes', 'on'].includes(value15)) return true;
+    if (['false', '0', 'no', 'off'].includes(value15)) return false;
+    return value12?.defaultValue === true;
   }
-  if (_0x1e01ce === 'slider' && Array.isArray(_0x17d820?.options) && _0x17d820.options.length) {
-    const _0x10370e = findEnabledUiSchemaOption(_0x17d820, _0x30dbad, params);
-    if (_0x10370e) return _0x10370e.value ?? _0x10370e;
-    const _0x535b2f = findEnabledUiSchemaOption(_0x17d820, _0x17d820?.defaultValue, params);
-    if (_0x535b2f) return _0x535b2f.value ?? _0x535b2f;
-    const _0x1792e5 = findFirstEnabledUiSchemaOption(_0x17d820, params);
-    if (_0x1792e5) return _0x1792e5.value ?? _0x1792e5;
-    return _0x17d820?.defaultValue ?? '';
+  if (value14 === 'slider' && Array.isArray(value12?.options) && value12.options.length) {
+    const el6 = findEnabledUiSchemaOption(value12, value13, params);
+    if (el6) return el6.value ?? el6;
+    const el7 = findEnabledUiSchemaOption(value12, value12?.defaultValue, params);
+    if (el7) return el7.value ?? el7;
+    const el8 = findFirstEnabledUiSchemaOption(value12, params);
+    if (el8) return el8.value ?? el8;
+    return value12?.defaultValue ?? '';
   }
-  if (_0x1e01ce !== 'segmented' && _0x1e01ce !== 'select') return _0x30dbad;
-  const _0x24ae96 = findEnabledUiSchemaOption(_0x17d820, _0x30dbad, params);
-  if (_0x24ae96) return _0x24ae96.value ?? _0x24ae96;
-  if (isAdaptiveUiSchemaValue(_0x30dbad)) {
-    const _0x18ec81 = findAdaptiveUiSchemaOption(_0x17d820);
-    if (_0x18ec81 && !isUiSchemaOptionDisabled(_0x17d820, _0x18ec81, params))
-      return _0x18ec81.value ?? _0x18ec81;
+  if (value14 !== 'segmented' && value14 !== 'select') return value13;
+  const el9 = findEnabledUiSchemaOption(value12, value13, params);
+  if (el9) return el9.value ?? el9;
+  if (isAdaptiveUiSchemaValue(value13)) {
+    const el10 = findAdaptiveUiSchemaOption(value12);
+    if (el10 && !isUiSchemaOptionDisabled(value12, el10, params)) return el10.value ?? el10;
   }
-  const _0x29eac0 = findEnabledUiSchemaOption(_0x17d820, _0x17d820?.defaultValue, params);
-  if (_0x29eac0) return _0x29eac0.value ?? _0x29eac0;
-  const _0x10b0ed = findFirstEnabledUiSchemaOption(_0x17d820, params);
-  if (_0x10b0ed) return _0x10b0ed.value ?? _0x10b0ed;
-  return _0x17d820?.defaultValue ?? '';
+  const el11 = findEnabledUiSchemaOption(value12, value12?.defaultValue, params);
+  if (el11) return el11.value ?? el11;
+  const el12 = findFirstEnabledUiSchemaOption(value12, params);
+  if (el12) return el12.value ?? el12;
+  return value12?.defaultValue ?? '';
 }
 export function sanitizeModelUiSchemaParams(
-  _0x4270b4,
-  _0x31fd2c = {},
+  value16,
+  value17 = {},
   { includeDefaults: includeDefaults = true } = {},
 ) {
-  const _0x4dafa7 = getModelManifest(_0x4270b4),
-    _0x479881 = Array.isArray(_0x4dafa7?.uiSchema?.fields) ? _0x4dafa7.uiSchema.fields : [],
-    _0x45aab3 = _0x31fd2c && typeof _0x31fd2c === 'object' && !Array.isArray(_0x31fd2c) ? _0x31fd2c : {},
-    _0x2cbbed = {};
-  return _0x479881.reduce((_0x44b45a, _0x1092e9) => {
-    const _0x5f3a79 = normalizeRegistryKey(_0x1092e9?.id);
-    if (!_0x5f3a79) return _0x44b45a;
-    const _0xaa8fc = { ..._0x45aab3, ..._0x2cbbed, ..._0x44b45a };
-    if (Object.prototype.hasOwnProperty.call(_0x45aab3, _0x5f3a79))
-      ((_0x44b45a[_0x5f3a79] = normalizeUiSchemaFieldValue(_0x1092e9, _0x45aab3[_0x5f3a79], {
-        params: _0xaa8fc,
+  const modelManifest = getModelManifest(value16),
+    list9 = Array.isArray(modelManifest?.uiSchema?.fields) ? modelManifest.uiSchema.fields : [],
+    args = value17 && typeof value17 === 'object' && !Array.isArray(value17) ? value17 : {},
+    args2 = {};
+  return list9.reduce((args3, value18) => {
+    const registryKey2 = normalizeRegistryKey(value18?.id);
+    if (!registryKey2) return args3;
+    const params2 = { ...args, ...args2, ...args3 };
+    if (Object.prototype.hasOwnProperty.call(args, registryKey2))
+      ((args3[registryKey2] = normalizeUiSchemaFieldValue(value18, args[registryKey2], {
+        params: params2,
       })),
-        (_0x2cbbed[_0x5f3a79] = _0x44b45a[_0x5f3a79]));
+        (args2[registryKey2] = args3[registryKey2]));
     else
       includeDefaults
-        ? ((_0x44b45a[_0x5f3a79] = normalizeUiSchemaFieldValue(_0x1092e9, _0x1092e9?.defaultValue, {
-            params: _0xaa8fc,
+        ? ((args3[registryKey2] = normalizeUiSchemaFieldValue(value18, value18?.defaultValue, {
+            params: params2,
           })),
-          (_0x2cbbed[_0x5f3a79] = _0x44b45a[_0x5f3a79]))
-        : (_0x2cbbed[_0x5f3a79] = normalizeUiSchemaFieldValue(_0x1092e9, _0x1092e9?.defaultValue, {
-            params: _0xaa8fc,
+          (args2[registryKey2] = args3[registryKey2]))
+        : (args2[registryKey2] = normalizeUiSchemaFieldValue(value18, value18?.defaultValue, {
+            params: params2,
           }));
-    return _0x44b45a;
+    return args3;
   }, {});
 }
-function getManifestRegistryKeys(_0x472f36, _0x3ce509, _0x22ca82) {
-  const _0x5dea6a = normalizeRegistryKey(_0x472f36[_0x3ce509]);
-  if (!_0x5dea6a) throw new Error('[manifest] ' + _0x22ca82 + ' has empty ' + _0x3ce509);
-  const _0x371ae1 = [_0x5dea6a];
-  if (_0x472f36.aliases !== undefined) {
-    if (!Array.isArray(_0x472f36.aliases))
-      throw new Error('[manifest] ' + _0x22ca82 + ' aliases must be an array');
-    _0x472f36.aliases.forEach((_0x291344) => {
-      const _0x5f57f5 = normalizeRegistryKey(_0x291344);
-      if (_0x5f57f5) _0x371ae1.push(_0x5f57f5);
+function getManifestRegistryKeys(value19, value20, value21) {
+  const registryKey3 = normalizeRegistryKey(value19[value20]);
+  if (!registryKey3) throw new Error('[manifest] ' + value21 + ' has empty ' + value20);
+  const list10 = [registryKey3];
+  if (value19.aliases !== undefined) {
+    if (!Array.isArray(value19.aliases))
+      throw new Error('[manifest] ' + value21 + ' aliases must be an array');
+    value19.aliases.forEach((item11) => {
+      const registryKey4 = normalizeRegistryKey(item11);
+      if (registryKey4) list10.push(registryKey4);
     });
   }
-  return _0x371ae1;
+  return list10;
 }
-function assertRegistryKeysAvailable(_0x5dde5e, _0x47c954, _0x1c418e, _0x411ee5) {
-  const _0x3b7848 = new Set();
+function assertRegistryKeysAvailable(list11, map2, value22, value23) {
+  const map3 = new Set();
   return (
-    _0x5dde5e.forEach((_0x2011df, _0x2f9fb9) => {
-      const _0xce1665 = getManifestRegistryKeys(_0x2011df, _0x1c418e, _0x411ee5 + '[' + _0x2f9fb9 + ']');
-      _0xce1665.forEach((_0x2f3152) => {
-        if (_0x47c954.has(_0x2f3152))
-          throw new Error('[manifest] ' + _0x411ee5 + ' duplicate key: ' + _0x2f3152);
-        if (_0x3b7848.has(_0x2f3152))
-          throw new Error('[manifest] ' + _0x411ee5 + ' duplicate key in bundle: ' + _0x2f3152);
-        _0x3b7848.add(_0x2f3152);
+    list11.forEach((item12, value24) => {
+      const list12 = getManifestRegistryKeys(item12, value22, value23 + '[' + value24 + ']');
+      list12.forEach((item13) => {
+        if (map2.has(item13)) throw new Error('[manifest] ' + value23 + ' duplicate key: ' + item13);
+        if (map3.has(item13))
+          throw new Error('[manifest] ' + value23 + ' duplicate key in bundle: ' + item13);
+        map3.add(item13);
       });
     }),
-    _0x3b7848
+    map3
   );
 }
-function buildManifestKeyMap(_0x123db6, _0x4c6ade, _0x1da748) {
-  const _0x4011f4 = new Map();
+function buildManifestKeyMap(list13, value25, value26) {
+  const map4 = new Map();
   return (
-    _0x123db6.forEach((_0x27288c, _0x563bd3) => {
-      getManifestRegistryKeys(_0x27288c, _0x4c6ade, _0x1da748 + '[' + _0x563bd3 + ']').forEach(
-        (_0x1afee6) => {
-          _0x4011f4.set(_0x1afee6, _0x27288c);
-        },
-      );
+    list13.forEach((item14, value27) => {
+      getManifestRegistryKeys(item14, value25, value26 + '[' + value27 + ']').forEach((item15) => {
+        map4.set(item15, item14);
+      });
     }),
-    _0x4011f4
+    map4
   );
 }
-function assertModelExecutionContract(_0x13a921, _0x1747aa) {
-  ['adapterType', 'kind', 'provider'].forEach((_0x5ea845) => {
-    const _0x1fb052 = normalizeRegistryKey(_0x13a921[_0x5ea845]),
-      _0x177666 = normalizeRegistryKey(_0x1747aa[_0x5ea845]);
-    if (_0x1fb052 !== _0x177666)
+function assertModelExecutionContract(value28, value29) {
+  ['adapterType', 'kind', 'provider'].forEach((item16) => {
+    const registryKey5 = normalizeRegistryKey(value28[item16]),
+      registryKey6 = normalizeRegistryKey(value29[item16]);
+    if (registryKey5 !== registryKey6)
       throw new Error(
         '[manifest] model manifest ' +
-          _0x13a921.modelId +
+          value28.modelId +
           ' ' +
-          _0x5ea845 +
+          item16 +
           ' (' +
-          _0x13a921[_0x5ea845] +
+          value28[item16] +
           ') does not match execution manifest ' +
-          _0x1747aa.id +
+          value29.id +
           ' ' +
-          _0x5ea845 +
+          item16 +
           ' (' +
-          _0x1747aa[_0x5ea845] +
+          value29[item16] +
           ')',
       );
   });
 }
-function assertBundleModelExecutionLinks(_0x5a121f, _0x315daa) {
-  _0x5a121f.forEach((_0x5a27b6) => {
-    const _0x3caa0a = normalizeRegistryKey(_0x5a27b6.executionId),
-      _0x3901dd = _executions.get(_0x3caa0a) || _0x315daa.get(_0x3caa0a);
-    if (!_0x3901dd)
+function assertBundleModelExecutionLinks(list14, map5) {
+  list14.forEach((item17) => {
+    const registryKey7 = normalizeRegistryKey(item17.executionId),
+      enabled4 = _executions.get(registryKey7) || map5.get(registryKey7);
+    if (!enabled4)
       throw new Error(
         '[manifest] model manifest ' +
-          _0x5a27b6.modelId +
+          item17.modelId +
           ' references unknown executionId: ' +
-          _0x5a27b6.executionId,
+          item17.executionId,
       );
-    assertModelExecutionContract(_0x5a27b6, _0x3901dd);
+    assertModelExecutionContract(item17, enabled4);
   });
 }
-function assertAdapterType(_0x1860a5, _0x1db33d) {
-  if (!ALLOWED_ADAPTER_TYPES.has(String(_0x1860a5 || '')))
-    throw new Error('[manifest] ' + _0x1db33d + ' has unsupported adapterType: ' + _0x1860a5);
+function assertAdapterType(value30, value31) {
+  if (!ALLOWED_ADAPTER_TYPES.has(String(value30 || '')))
+    throw new Error('[manifest] ' + value31 + ' has unsupported adapterType: ' + value30);
 }
-function assertExecutionTarget(_0x4d7eb5) {
-  if (_0x4d7eb5.adapterType !== 'workflow') return;
-  if (!_0x4d7eb5.workflowId && !_0x4d7eb5.appId)
+function assertExecutionTarget(enabled5) {
+  if (enabled5.adapterType !== 'workflow') return;
+  if (!enabled5.workflowId && !enabled5.appId)
     throw new Error('[manifest] workflow execution missing workflowId/appId');
 }
-function assertUiSchema(_0x167a8b) {
-  const _0x4f8c29 = _0x167a8b.uiSchema;
-  assertPlainObject(_0x4f8c29, 'model manifest uiSchema');
-  if (!Array.isArray(_0x4f8c29.fields))
+function assertUiSchema(value32) {
+  const value33 = value32.uiSchema;
+  assertPlainObject(value33, 'model manifest uiSchema');
+  if (!Array.isArray(value33.fields))
     throw new Error('[manifest] model manifest uiSchema.fields must be an array');
-  _0x4f8c29.fields.forEach((_0x404613, _0x454252) => {
-    (assertPlainObject(_0x404613, 'model manifest uiSchema.fields[' + _0x454252 + ']'),
+  value33.fields.forEach((item18, value34) => {
+    (assertPlainObject(item18, 'model manifest uiSchema.fields[' + value34 + ']'),
       assertRequiredFields(
-        _0x404613,
+        item18,
         ['id', 'type', 'defaultValue'],
-        'model manifest uiSchema.fields[' + _0x454252 + ']',
+        'model manifest uiSchema.fields[' + value34 + ']',
       ));
-    const _0x1f02d0 = String(_0x404613.type || '')
+    const value35 = String(item18.type || '')
       .trim()
       .toLowerCase();
-    if (!SUPPORTED_UI_CONTROL_TYPES.has(_0x1f02d0))
-      throw new Error('[manifest] unsupported uiSchema control type: ' + _0x404613.type);
+    if (!SUPPORTED_UI_CONTROL_TYPES.has(value35))
+      throw new Error('[manifest] unsupported uiSchema control type: ' + item18.type);
     if (
-      (_0x1f02d0 === 'segmented' || _0x1f02d0 === 'select') &&
-      (!Array.isArray(_0x404613.options) || _0x404613.options.length === 0)
+      (value35 === 'segmented' || value35 === 'select') &&
+      (!Array.isArray(item18.options) || item18.options.length === 0)
     )
-      throw new Error('[manifest] uiSchema field ' + _0x404613.id + ' requires non-empty options');
+      throw new Error('[manifest] uiSchema field ' + item18.id + ' requires non-empty options');
   });
 }
-function assertInputSlots(_0x49ec0c) {
-  const _0x5cc922 = _0x49ec0c.inputSlots;
-  assertPlainObject(_0x5cc922, 'model manifest inputSlots');
-  const _0x3c62d9 =
-    _0x5cc922.fixedSlots === undefined || _0x5cc922.fixedSlots === null ? [] : _0x5cc922.fixedSlots;
-  if (!Array.isArray(_0x3c62d9))
+function assertInputSlots(value36) {
+  const value37 = value36.inputSlots;
+  assertPlainObject(value37, 'model manifest inputSlots');
+  const list15 = value37.fixedSlots === undefined || value37.fixedSlots === null ? [] : value37.fixedSlots;
+  if (!Array.isArray(list15))
     throw new Error('[manifest] model manifest inputSlots.fixedSlots must be an array');
-  const _0x1f9803 = new Map(),
-    _0x2c5fc3 = new Map(),
-    _0x4953e0 = new Set();
-  _0x3c62d9.forEach((_0x51f1dc, _0x4da777) => {
-    (assertPlainObject(_0x51f1dc, 'model manifest inputSlots.fixedSlots[' + _0x4da777 + ']'),
-      assertRequiredFields(
-        _0x51f1dc,
-        ['id', 'kind'],
-        'model manifest inputSlots.fixedSlots[' + _0x4da777 + ']',
-      ));
-    const _0xc8fb21 = normalizeRegistryKey(_0x51f1dc.kind),
-      _0x27b70a = String(_0x51f1dc.id || '').trim();
-    if (_0x27b70a) _0x4953e0.add(_0x27b70a);
-    _0x1f9803.set(_0xc8fb21, (_0x1f9803.get(_0xc8fb21) || 0) + 1);
-    if (
-      _0x51f1dc.required !== undefined &&
-      _0x51f1dc.required !== null &&
-      typeof _0x51f1dc.required !== 'boolean'
-    )
-      throw new Error('[manifest] fixed slot ' + _0x51f1dc.id + ' required must be a boolean');
-    _0x51f1dc.required === true && _0x2c5fc3.set(_0xc8fb21, (_0x2c5fc3.get(_0xc8fb21) || 0) + 1);
+  const map6 = new Map(),
+    map7 = new Map(),
+    map8 = new Set();
+  list15.forEach((item19, value38) => {
+    (assertPlainObject(item19, 'model manifest inputSlots.fixedSlots[' + value38 + ']'),
+      assertRequiredFields(item19, ['id', 'kind'], 'model manifest inputSlots.fixedSlots[' + value38 + ']'));
+    const registryKey8 = normalizeRegistryKey(item19.kind),
+      value39 = String(item19.id || '').trim();
+    if (value39) map8.add(value39);
+    map6.set(registryKey8, (map6.get(registryKey8) || 0) + 1);
+    if (item19.required !== undefined && item19.required !== null && typeof item19.required !== 'boolean')
+      throw new Error('[manifest] fixed slot ' + item19.id + ' required must be a boolean');
+    item19.required === true && map7.set(registryKey8, (map7.get(registryKey8) || 0) + 1);
   });
-  const _0x3700ef = _0x5cc922.minByKind || {};
-  if (_0x3700ef && !isPlainObject(_0x3700ef))
+  const value40 = value37.minByKind || {};
+  if (value40 && !isPlainObject(value40))
     throw new Error('[manifest] model manifest inputSlots.minByKind must be an object');
-  Object.entries(_0x3700ef || {}).forEach(([_0x42d823, _0x4a7ecf]) => {
-    const _0x4acbbe = Number(_0x4a7ecf);
-    if (!Number.isFinite(_0x4acbbe) || _0x4acbbe < 0)
+  Object.entries(value40 || {}).forEach(([value41, value42]) => {
+    const count = Number(value42);
+    if (!Number.isFinite(count) || count < 0)
       throw new Error(
-        '[manifest] model manifest inputSlots.minByKind.' + _0x42d823 + ' must be a non-negative number',
+        '[manifest] model manifest inputSlots.minByKind.' + value41 + ' must be a non-negative number',
       );
-    const _0x5b3ff3 = normalizeRegistryKey(_0x42d823),
-      _0x1bac41 = _0x1f9803.get(_0x5b3ff3) || 0;
-    if (_0x1bac41 === 0 || _0x4acbbe <= 0) return;
-    const _0x265ad9 = _0x2c5fc3.get(_0x5b3ff3) || 0;
-    if (_0x265ad9 < _0x4acbbe)
+    const registryKey9 = normalizeRegistryKey(value41),
+      count2 = map6.get(registryKey9) || 0;
+    if (count2 === 0 || count <= 0) return;
+    const value43 = map7.get(registryKey9) || 0;
+    if (value43 < count)
       throw new Error(
         '[manifest] model manifest ' +
-          _0x49ec0c.modelId +
+          value36.modelId +
           ' inputSlots.' +
-          _0x5b3ff3 +
+          registryKey9 +
           ' requires ' +
-          _0x4acbbe +
+          count +
           ' input(s), but only ' +
-          _0x265ad9 +
+          value43 +
           ' fixed slot(s) are marked required',
       );
   });
-  const _0x36389f = _0x5cc922.exclusiveGroups || [];
-  if (_0x36389f && !Array.isArray(_0x36389f))
+  const value44 = value37.exclusiveGroups || [];
+  if (value44 && !Array.isArray(value44))
     throw new Error('[manifest] model manifest inputSlots.exclusiveGroups must be an array');
-  (_0x36389f || []).forEach((_0x418e51, _0x24cd63) => {
-    assertPlainObject(_0x418e51, 'model manifest inputSlots.exclusiveGroups[' + _0x24cd63 + ']');
-    if (!Array.isArray(_0x418e51.slots) || _0x418e51.slots.length < 2)
+  (value44 || []).forEach((item20, value45) => {
+    assertPlainObject(item20, 'model manifest inputSlots.exclusiveGroups[' + value45 + ']');
+    if (!Array.isArray(item20.slots) || item20.slots.length < 2)
       throw new Error(
         '[manifest] model manifest inputSlots.exclusiveGroups[' +
-          _0x24cd63 +
+          value45 +
           '].slots must contain at least two slots',
       );
-    (_0x418e51.slots.forEach((_0x1c11c1) => {
-      const _0x40147f = String(_0x1c11c1 || '').trim();
-      if (!_0x4953e0.has(_0x40147f))
+    (item20.slots.forEach((item21) => {
+      const value46 = String(item21 || '').trim();
+      if (!map8.has(value46))
         throw new Error(
           '[manifest] model manifest inputSlots.exclusiveGroups[' +
-            _0x24cd63 +
+            value45 +
             '] references unknown fixed slot: ' +
-            _0x40147f,
+            value46,
         );
     }),
-      ['min', 'max'].forEach((_0x3d4e6b) => {
-        if (_0x418e51[_0x3d4e6b] === undefined || _0x418e51[_0x3d4e6b] === null) return;
-        const _0xe32f5d = Number(_0x418e51[_0x3d4e6b]);
-        if (!Number.isFinite(_0xe32f5d) || _0xe32f5d < 0)
+      ['min', 'max'].forEach((item22) => {
+        if (item20[item22] === undefined || item20[item22] === null) return;
+        const count3 = Number(item20[item22]);
+        if (!Number.isFinite(count3) || count3 < 0)
           throw new Error(
             '[manifest] model manifest inputSlots.exclusiveGroups[' +
-              _0x24cd63 +
+              value45 +
               '].' +
-              _0x3d4e6b +
+              item22 +
               ' must be a non-negative number',
           );
       }));
   });
 }
-export function validateModelManifest(_0x110abe) {
+export function validateModelManifest(value47) {
   return (
-    assertPlainObject(_0x110abe, 'model manifest'),
-    assertRequiredFields(_0x110abe, REQUIRED_MODEL_FIELDS, 'model manifest'),
-    assertAdapterType(_0x110abe.adapterType, 'model manifest'),
-    assertUiSchema(_0x110abe),
-    assertInputSlots(_0x110abe),
+    assertPlainObject(value47, 'model manifest'),
+    assertRequiredFields(value47, REQUIRED_MODEL_FIELDS, 'model manifest'),
+    assertAdapterType(value47.adapterType, 'model manifest'),
+    assertUiSchema(value47),
+    assertInputSlots(value47),
     true
   );
 }
-export function validateExecutionManifest(_0x4ddaa5) {
+export function validateExecutionManifest(value48) {
   return (
-    assertPlainObject(_0x4ddaa5, 'execution manifest'),
-    assertRequiredFields(_0x4ddaa5, REQUIRED_EXECUTION_FIELDS, 'execution manifest'),
-    assertAdapterType(_0x4ddaa5.adapterType, 'execution manifest'),
-    _0x4ddaa5.adapterType === 'workflow' &&
-      assertRequiredFields(_0x4ddaa5, REQUIRED_WORKFLOW_EXECUTION_FIELDS, 'workflow execution manifest'),
-    _0x4ddaa5.adapterType === 'modelApi' &&
-      assertRequiredFields(_0x4ddaa5, REQUIRED_MODEL_API_EXECUTION_FIELDS, 'modelApi execution manifest'),
-    _0x4ddaa5.adapterType === 'localRuntime' &&
+    assertPlainObject(value48, 'execution manifest'),
+    assertRequiredFields(value48, REQUIRED_EXECUTION_FIELDS, 'execution manifest'),
+    assertAdapterType(value48.adapterType, 'execution manifest'),
+    value48.adapterType === 'workflow' &&
+      assertRequiredFields(value48, REQUIRED_WORKFLOW_EXECUTION_FIELDS, 'workflow execution manifest'),
+    value48.adapterType === 'modelApi' &&
+      assertRequiredFields(value48, REQUIRED_MODEL_API_EXECUTION_FIELDS, 'modelApi execution manifest'),
+    value48.adapterType === 'localRuntime' &&
       assertRequiredFields(
-        _0x4ddaa5,
+        value48,
         REQUIRED_LOCAL_RUNTIME_EXECUTION_FIELDS,
         'localRuntime execution manifest',
       ),
-    assertExecutionTarget(_0x4ddaa5),
+    assertExecutionTarget(value48),
     true
   );
 }
-function addModelManifestToRegistry(_0x5829f1) {
-  const _0x19e176 = String(_0x5829f1.modelId || '').trim();
-  (_models.set(_0x19e176, _0x5829f1),
-    Array.isArray(_0x5829f1.aliases) &&
-      _0x5829f1.aliases.forEach((_0x45f510) => {
-        const _0x52944e = String(_0x45f510 || '').trim();
-        if (_0x52944e) _models.set(_0x52944e, _0x5829f1);
+function addModelManifestToRegistry(value49) {
+  const value50 = String(value49.modelId || '').trim();
+  (_models.set(value50, value49),
+    Array.isArray(value49.aliases) &&
+      value49.aliases.forEach((item23) => {
+        const value51 = String(item23 || '').trim();
+        if (value51) _models.set(value51, value49);
       }));
 }
-function addExecutionManifestToRegistry(_0x198407) {
-  (_executions.set(String(_0x198407.id), _0x198407),
-    Array.isArray(_0x198407.aliases) &&
-      _0x198407.aliases.forEach((_0x183555) => {
-        const _0x260b18 = String(_0x183555 || '').trim();
-        if (_0x260b18) _executions.set(_0x260b18, _0x198407);
+function addExecutionManifestToRegistry(value52) {
+  (_executions.set(String(value52.id), value52),
+    Array.isArray(value52.aliases) &&
+      value52.aliases.forEach((item24) => {
+        const value53 = String(item24 || '').trim();
+        if (value53) _executions.set(value53, value52);
       }));
 }
-function registerModelManifest(_0x365307) {
-  validateModelManifest(_0x365307);
-  const _0x417399 = getExecutionManifest(_0x365307.executionId);
-  if (_0x417399) assertModelExecutionContract(_0x365307, _0x417399);
-  addModelManifestToRegistry(_0x365307);
+function registerModelManifest(value54) {
+  validateModelManifest(value54);
+  const executionManifest = getExecutionManifest(value54.executionId);
+  if (executionManifest) assertModelExecutionContract(value54, executionManifest);
+  addModelManifestToRegistry(value54);
 }
-function registerExecutionManifest(_0x509e63) {
-  (validateExecutionManifest(_0x509e63), addExecutionManifestToRegistry(_0x509e63));
+function registerExecutionManifest(value55) {
+  (validateExecutionManifest(value55), addExecutionManifestToRegistry(value55));
 }
-export function registerManifestBundle(_0xfe73cc) {
-  (assertPlainObject(_0xfe73cc, 'manifest bundle'),
-    assertPlainData(_0xfe73cc, 'manifest bundle'),
-    assertRequiredFields(_0xfe73cc, ['sourceId'], 'manifest bundle'));
-  if (!normalizeRegistryKey(_0xfe73cc.sourceId))
+export function registerManifestBundle(value56) {
+  (assertPlainObject(value56, 'manifest bundle'),
+    assertPlainData(value56, 'manifest bundle'),
+    assertRequiredFields(value56, ['sourceId'], 'manifest bundle'));
+  if (!normalizeRegistryKey(value56.sourceId))
     throw new Error('[manifest] manifest bundle sourceId must be non-empty');
-  if (!Array.isArray(_0xfe73cc.models))
+  if (!Array.isArray(value56.models))
     throw new TypeError('[manifest] manifest bundle.models must be an array');
-  if (!Array.isArray(_0xfe73cc.executions))
+  if (!Array.isArray(value56.executions))
     throw new TypeError('[manifest] manifest bundle.executions must be an array');
-  const _0x5787a7 = _0xfe73cc.executions,
-    _0x41369a = _0xfe73cc.models;
-  (_0x5787a7.forEach(validateExecutionManifest),
-    _0x41369a.forEach(validateModelManifest),
-    assertRegistryKeysAvailable(_0x5787a7, _executions, 'id', 'execution manifest'));
-  const _0x188d84 = buildManifestKeyMap(_0x5787a7, 'id', 'execution manifest');
+  const list16 = value56.executions,
+    list17 = value56.models;
+  (list16.forEach(validateExecutionManifest),
+    list17.forEach(validateModelManifest),
+    assertRegistryKeysAvailable(list16, _executions, 'id', 'execution manifest'));
+  const manifestKeyMap = buildManifestKeyMap(list16, 'id', 'execution manifest');
   return (
-    assertRegistryKeysAvailable(_0x41369a, _models, 'modelId', 'model manifest'),
-    assertBundleModelExecutionLinks(_0x41369a, _0x188d84),
-    _0x5787a7.forEach(addExecutionManifestToRegistry),
-    _0x41369a.forEach(addModelManifestToRegistry),
+    assertRegistryKeysAvailable(list17, _models, 'modelId', 'model manifest'),
+    assertBundleModelExecutionLinks(list17, manifestKeyMap),
+    list16.forEach(addExecutionManifestToRegistry),
+    list17.forEach(addModelManifestToRegistry),
     true
   );
 }
@@ -680,22 +654,22 @@ export function registerManifestBundle(_0xfe73cc) {
   dreaminaVideoModelManifests.forEach(registerModelManifest),
   vendorTextModelApiExecutionManifests.forEach(registerExecutionManifest),
   vendorTextModelApiModelManifests.forEach(registerModelManifest));
-export function getModelManifest(_0x8005e4) {
-  const _0x23d403 = String(_0x8005e4 || '').trim();
-  return _models.get(_0x23d403) || null;
+export function getModelManifest(value57) {
+  const value58 = String(value57 || '').trim();
+  return _models.get(value58) || null;
 }
-export function resolveModelManifest(_0x51dcaa, _0x1e9081 = '') {
-  const _0x46e312 = getModelManifest(_0x51dcaa);
-  if (!_0x46e312) return null;
-  const _0x7db348 = String(_0x1e9081 || '').trim();
-  if (_0x7db348 && _0x46e312.provider !== _0x7db348) return null;
-  return _0x46e312;
+export function resolveModelManifest(value59, value60 = '') {
+  const modelManifest2 = getModelManifest(value59);
+  if (!modelManifest2) return null;
+  const value61 = String(value60 || '').trim();
+  if (value61 && modelManifest2.provider !== value61) return null;
+  return modelManifest2;
 }
-export function getExecutionManifest(_0x4ad588) {
-  return _executions.get(String(_0x4ad588 || '').trim()) || null;
+export function getExecutionManifest(value62) {
+  return _executions.get(String(value62 || '').trim()) || null;
 }
-export function resolveExecutionManifest(_0x4fe20f) {
-  return getExecutionManifest(_0x4fe20f);
+export function resolveExecutionManifest(value63) {
+  return getExecutionManifest(value63);
 }
 const PROVIDER_PREFIXES = Object.freeze({
   'runninghub-model': 'runninghub',
@@ -707,113 +681,111 @@ const PROVIDER_PREFIXES = Object.freeze({
   grsai: 'grsai',
   volcengine: 'volcengine',
 });
-export function normalizeProviderId(_0x38bd91) {
-  const _0x3eb09e = String(_0x38bd91 || '')
+export function normalizeProviderId(value64) {
+  const value65 = String(value64 || '')
     .trim()
     .toLowerCase();
-  if (_0x3eb09e === 'runninghub-workflow' || _0x3eb09e === 'runninghubwf') return 'runninghubwf';
-  if (_0x3eb09e === 'runninghub-model') return 'runninghub';
-  return _0x3eb09e;
+  if (value65 === 'runninghub-workflow' || value65 === 'runninghubwf') return 'runninghubwf';
+  if (value65 === 'runninghub-model') return 'runninghub';
+  return value65;
 }
-function inferProviderFromModelPrefix(_0x51c51e) {
-  const _0x24c5ef = String(_0x51c51e || '')
+function inferProviderFromModelPrefix(value66) {
+  const list18 = String(value66 || '')
       .trim()
       .toLowerCase(),
-    _0x2438f0 = _0x24c5ef.includes('/') ? _0x24c5ef.split('/')[0] : '';
-  return PROVIDER_PREFIXES[_0x2438f0] || '';
+    value67 = list18.includes('/') ? list18.split('/')[0] : '';
+  return PROVIDER_PREFIXES[value67] || '';
 }
-function resolveModelManifestCandidate(_0x4673d9, _0x5641d1 = '') {
-  const _0x1e35a8 = normalizeRegistryKey(_0x4673d9),
-    _0x925778 = normalizeProviderId(_0x5641d1);
-  if (!_0x1e35a8) return null;
-  const _0x23e852 = getModelManifest(_0x1e35a8);
-  if (_0x23e852 && (!_0x925778 || normalizeProviderId(_0x23e852.provider) === _0x925778))
+function resolveModelManifestCandidate(value68, value69 = '') {
+  const inputModelId = normalizeRegistryKey(value68),
+    providerId = normalizeProviderId(value69);
+  if (!inputModelId) return null;
+  const modelManifest3 = getModelManifest(inputModelId);
+  if (modelManifest3 && (!providerId || normalizeProviderId(modelManifest3.provider) === providerId))
     return {
-      modelManifest: _0x23e852,
-      inputModelId: _0x1e35a8,
-      canonicalModelId: _0x23e852.modelId,
+      modelManifest: modelManifest3,
+      inputModelId: inputModelId,
+      canonicalModelId: modelManifest3.modelId,
       source: 'exact',
     };
-  if (_0x925778 && _0x1e35a8.includes('/')) {
-    const [_0x5f423f, ..._0x1208e2] = _0x1e35a8.split('/'),
-      _0x48df76 = inferProviderFromModelPrefix(_0x1e35a8),
-      _0x390bf9 = _0x1208e2.join('/');
-    if (_0x390bf9 && (!_0x48df76 || _0x48df76 === _0x925778)) {
-      const _0x4e3e2c = getModelManifest(_0x390bf9);
-      if (_0x4e3e2c && normalizeProviderId(_0x4e3e2c.provider) === _0x925778)
+  if (providerId && inputModelId.includes('/')) {
+    const [value70, ...list19] = inputModelId.split('/'),
+      inferProviderFromModelPrefix2 = inferProviderFromModelPrefix(inputModelId),
+      value71 = list19.join('/');
+    if (value71 && (!inferProviderFromModelPrefix2 || inferProviderFromModelPrefix2 === providerId)) {
+      const modelManifest4 = getModelManifest(value71);
+      if (modelManifest4 && normalizeProviderId(modelManifest4.provider) === providerId)
         return {
-          modelManifest: _0x4e3e2c,
-          inputModelId: _0x1e35a8,
-          canonicalModelId: _0x4e3e2c.modelId,
-          source: 'stripped:' + _0x5f423f,
+          modelManifest: modelManifest4,
+          inputModelId: inputModelId,
+          canonicalModelId: modelManifest4.modelId,
+          source: 'stripped:' + value70,
         };
     }
   }
-  if (_0x925778 && !_0x1e35a8.includes('/')) {
-    const _0xa25465 = getModelManifest(_0x925778 + '/' + _0x1e35a8);
-    if (_0xa25465 && normalizeProviderId(_0xa25465.provider) === _0x925778)
+  if (providerId && !inputModelId.includes('/')) {
+    const modelManifest5 = getModelManifest(providerId + '/' + inputModelId);
+    if (modelManifest5 && normalizeProviderId(modelManifest5.provider) === providerId)
       return {
-        modelManifest: _0xa25465,
-        inputModelId: _0x1e35a8,
-        canonicalModelId: _0xa25465.modelId,
+        modelManifest: modelManifest5,
+        inputModelId: inputModelId,
+        canonicalModelId: modelManifest5.modelId,
         source: 'prefixed',
       };
   }
   return null;
 }
 export function resolveModelProvider(
-  _0x1881a5,
-  _0x2eb30e = '',
+  value72,
+  value73 = '',
   { allowProviderHint: allowProviderHint = true, allowPrefixInference: allowPrefixInference = true } = {},
 ) {
-  const _0x4ff174 = normalizeProviderId(_0x2eb30e);
-  if (_0x4ff174 && allowProviderHint) return _0x4ff174;
-  const _0x422c31 = resolveModelManifestCandidate(_0x1881a5, _0x4ff174);
-  if (_0x422c31?.modelManifest?.provider) return normalizeProviderId(_0x422c31.modelManifest.provider);
-  return allowPrefixInference ? inferProviderFromModelPrefix(_0x1881a5) : '';
+  const providerId2 = normalizeProviderId(value73);
+  if (providerId2 && allowProviderHint) return providerId2;
+  const modelManifestCandidate = resolveModelManifestCandidate(value72, providerId2);
+  if (modelManifestCandidate?.modelManifest?.provider)
+    return normalizeProviderId(modelManifestCandidate.modelManifest.provider);
+  return allowPrefixInference ? inferProviderFromModelPrefix(value72) : '';
 }
-export function resolveModelExecution(_0x4fe385, _0x1d27af = {}) {
-  const _0x3b90c1 =
-      typeof _0x1d27af === 'string' ? _0x1d27af : _0x1d27af?.providerHint || _0x1d27af?.provider || '',
-    _0x306132 = resolveModelManifestCandidate(_0x4fe385, _0x3b90c1),
-    _0xba9c00 = _0x306132?.modelManifest || null;
-  if (!_0xba9c00) return null;
-  const _0x36e8dc = getExecutionManifest(_0xba9c00.executionId);
-  if (!_0x36e8dc) return null;
+export function resolveModelExecution(value74, value75 = {}) {
+  const value76 = typeof value75 === 'string' ? value75 : value75?.providerHint || value75?.provider || '',
+    inputModelId2 = resolveModelManifestCandidate(value74, value76),
+    modelManifest6 = inputModelId2?.modelManifest || null;
+  if (!modelManifest6) return null;
+  const executionManifest2 = getExecutionManifest(modelManifest6.executionId);
+  if (!executionManifest2) return null;
   return {
-    modelManifest: _0xba9c00,
-    executionManifest: _0x36e8dc,
-    inputModelId: _0x306132.inputModelId,
-    canonicalModelId: _0x306132.canonicalModelId,
-    source: _0x306132.source,
+    modelManifest: modelManifest6,
+    executionManifest: executionManifest2,
+    inputModelId: inputModelId2.inputModelId,
+    canonicalModelId: inputModelId2.canonicalModelId,
+    source: inputModelId2.source,
   };
 }
-export function isModelApiModel(_0x4a73b2, _0x598fa5 = '') {
-  const _0x53cd03 = resolveModelExecution(_0x4a73b2, { providerHint: _0x598fa5 });
+export function isModelApiModel(value77, providerHint = '') {
+  const modelExecution = resolveModelExecution(value77, { providerHint: providerHint });
   return (
-    _0x53cd03?.modelManifest?.adapterType === 'modelApi' &&
-    _0x53cd03?.executionManifest?.adapterType === 'modelApi'
+    modelExecution?.modelManifest?.adapterType === 'modelApi' &&
+    modelExecution?.executionManifest?.adapterType === 'modelApi'
   );
 }
-export function isWorkflowModel(_0xcfb220, _0x2dc892 = '') {
-  const _0xaf3611 = resolveModelExecution(_0xcfb220, { providerHint: _0x2dc892 });
+export function isWorkflowModel(value78, providerHint2 = '') {
+  const modelExecution2 = resolveModelExecution(value78, { providerHint: providerHint2 });
   return (
-    _0xaf3611?.modelManifest?.adapterType === 'workflow' &&
-    _0xaf3611?.executionManifest?.adapterType === 'workflow'
+    modelExecution2?.modelManifest?.adapterType === 'workflow' &&
+    modelExecution2?.executionManifest?.adapterType === 'workflow'
   );
 }
-export function isLocalRuntimeModel(_0x22a3dd, _0x5d10be = '') {
-  const _0x5552b6 = resolveModelExecution(_0x22a3dd, { providerHint: _0x5d10be });
+export function isLocalRuntimeModel(value79, providerHint3 = '') {
+  const modelExecution3 = resolveModelExecution(value79, { providerHint: providerHint3 });
   return (
-    _0x5552b6?.modelManifest?.adapterType === 'localRuntime' &&
-    _0x5552b6?.executionManifest?.adapterType === 'localRuntime'
+    modelExecution3?.modelManifest?.adapterType === 'localRuntime' &&
+    modelExecution3?.executionManifest?.adapterType === 'localRuntime'
   );
 }
-export function getModelsByKind(_0x34ada7) {
-  const _0x2797ca = String(_0x34ada7 || '').trim();
-  return Array.from(new Set(_models.values())).filter(
-    (_0x2f887c) => !_0x2797ca || _0x2f887c.kind === _0x2797ca,
-  );
+export function getModelsByKind(value80) {
+  const enabled6 = String(value80 || '').trim();
+  return Array.from(new Set(_models.values())).filter((item25) => !enabled6 || item25.kind === enabled6);
 }
 export function listModelManifests() {
   return Array.from(new Set(_models.values()));
@@ -821,191 +793,189 @@ export function listModelManifests() {
 
 const ALLOWED_PROMPT_EMPTY_POLICIES = new Set(['block', 'allowWithInput', 'allow']);
 
-function isAspectRatioUiSchemaField(_0x253d88) {
-  const _0x355260 = normalizeRegistryKey(_0x253d88?.['id'])['toLowerCase'](),
-    _0x29b1bc = normalizeRegistryKey(_0x253d88?.['displayRole'])['toLowerCase'](),
-    _0x28cc1e = normalizeRegistryKey(_0x253d88?.['variant'])['toLowerCase']();
-  return _0x355260 === 'aspectratio' || _0x29b1bc === 'aspectratio' || _0x28cc1e === 'ratiopill';
+function isAspectRatioUiSchemaField(value81) {
+  const registryKey10 = normalizeRegistryKey(value81?.['id'])['toLowerCase'](),
+    registryKey11 = normalizeRegistryKey(value81?.['displayRole'])['toLowerCase'](),
+    registryKey12 = normalizeRegistryKey(value81?.['variant'])['toLowerCase']();
+  return registryKey10 === 'aspectratio' || registryKey11 === 'aspectratio' || registryKey12 === 'ratiopill';
 }
 
-function getUiSchemaFieldOptions(_0x5ea862) {
-  const _0x10830b = Array['isArray'](_0x5ea862?.['options']) ? _0x5ea862['options'] : [],
-    _0x1bc95b = Array['isArray'](_0x5ea862?.['developerOptions']) ? _0x5ea862['developerOptions'] : [];
-  return [..._0x10830b, ..._0x1bc95b];
+function getUiSchemaFieldOptions(value82) {
+  const args4 = Array['isArray'](value82?.['options']) ? value82['options'] : [],
+    args5 = Array['isArray'](value82?.['developerOptions']) ? value82['developerOptions'] : [];
+  return [...args4, ...args5];
 }
 
-function assertPromptConfig(_0x757c93) {
-  if (_0x757c93['prompt'] === undefined || _0x757c93['prompt'] === null) return;
-  assertPlainObject(_0x757c93['prompt'], 'model manifest prompt');
+function assertPromptConfig(value83) {
+  if (value83['prompt'] === undefined || value83['prompt'] === null) return;
+  assertPlainObject(value83['prompt'], 'model manifest prompt');
   if (
-    _0x757c93['prompt']['emptyPolicy'] !== undefined &&
-    _0x757c93['prompt']['emptyPolicy'] !== null &&
-    !ALLOWED_PROMPT_EMPTY_POLICIES['has'](String(_0x757c93['prompt']['emptyPolicy'] || ''))
+    value83['prompt']['emptyPolicy'] !== undefined &&
+    value83['prompt']['emptyPolicy'] !== null &&
+    !ALLOWED_PROMPT_EMPTY_POLICIES['has'](String(value83['prompt']['emptyPolicy'] || ''))
   )
     throw new Error(
       '[manifest]\x20model\x20manifest\x20' +
-        _0x757c93['modelId'] +
+        value83['modelId'] +
         ' prompt.emptyPolicy must be one of: ' +
         Array['from'](ALLOWED_PROMPT_EMPTY_POLICIES)['join'](',\x20'),
     );
-  if (_0x757c93['prompt']['minLength'] !== undefined && _0x757c93['prompt']['minLength'] !== null) {
-    const _0x3ee75e = Number(_0x757c93['prompt']['minLength']);
-    if (!Number['isInteger'](_0x3ee75e) || _0x3ee75e < 0x0)
+  if (value83['prompt']['minLength'] !== undefined && value83['prompt']['minLength'] !== null) {
+    const count4 = Number(value83['prompt']['minLength']);
+    if (!Number['isInteger'](count4) || count4 < 0x0)
       throw new Error(
         '[manifest]\x20model\x20manifest\x20' +
-          _0x757c93['modelId'] +
+          value83['modelId'] +
           ' prompt.minLength must be a non-negative integer',
       );
   }
 }
 
-function assertInputPolicyCondition(_0x5c1a5e, _0x590bc9) {
-  if (Array['isArray'](_0x5c1a5e)) {
-    if (_0x5c1a5e['length'] === 0x0)
-      throw new Error('[manifest] ' + _0x590bc9 + '\x20must\x20not\x20be\x20empty');
-    _0x5c1a5e['forEach']((_0x56ccbc, _0x473f40) =>
-      assertInputPolicyCondition(_0x56ccbc, _0x590bc9 + '[' + _0x473f40 + ']'),
+function assertInputPolicyCondition(list20, value84) {
+  if (Array['isArray'](list20)) {
+    if (list20['length'] === 0x0) throw new Error('[manifest] ' + value84 + '\x20must\x20not\x20be\x20empty');
+    list20['forEach']((value85, value86) =>
+      assertInputPolicyCondition(value85, value84 + '[' + value86 + ']'),
     );
     return;
   }
-  assertPlainObject(_0x5c1a5e, _0x590bc9);
-  if (Array['isArray'](_0x5c1a5e['any']) || Array['isArray'](_0x5c1a5e['all'])) {
-    const _0x447dbb = Array['isArray'](_0x5c1a5e['any']) ? 'any' : 'all';
-    assertInputPolicyCondition(_0x5c1a5e[_0x447dbb], _0x590bc9 + '.' + _0x447dbb);
+  assertPlainObject(list20, value84);
+  if (Array['isArray'](list20['any']) || Array['isArray'](list20['all'])) {
+    const value87 = Array['isArray'](list20['any']) ? 'any' : 'all';
+    assertInputPolicyCondition(list20[value87], value84 + '.' + value87);
     return;
   }
-  if (!normalizeRegistryKey(_0x5c1a5e['field'] ?? _0x5c1a5e['param']))
-    throw new Error('[manifest] ' + _0x590bc9 + '\x20must\x20declare\x20field\x20or\x20param');
-  if (_0x5c1a5e['value'] === undefined && _0x5c1a5e['values'] === undefined)
-    throw new Error('[manifest]\x20' + _0x590bc9 + ' must declare value or values');
+  if (!normalizeRegistryKey(list20['field'] ?? list20['param']))
+    throw new Error('[manifest] ' + value84 + '\x20must\x20declare\x20field\x20or\x20param');
+  if (list20['value'] === undefined && list20['values'] === undefined)
+    throw new Error('[manifest]\x20' + value84 + ' must declare value or values');
 }
 
-function assertInputPolicyExtensions(_0x184ec4) {
-  const _0x3a47f7 = _0x184ec4['inputSlots'];
+function assertInputPolicyExtensions(value88) {
+  const value89 = value88['inputSlots'];
   if (
-    _0x3a47f7['preserveHiddenInputsByKind'] !== undefined &&
-    typeof _0x3a47f7['preserveHiddenInputsByKind'] !== 'boolean'
+    value89['preserveHiddenInputsByKind'] !== undefined &&
+    typeof value89['preserveHiddenInputsByKind'] !== 'boolean'
   )
     throw new Error('[manifest] model manifest inputSlots.preserveHiddenInputsByKind must be a boolean');
-  const _0x3e1317 = _0x3a47f7['preserveHiddenInputsByKindFields'];
+  const list21 = value89['preserveHiddenInputsByKindFields'];
   if (
-    _0x3e1317 !== undefined &&
-    (!Array['isArray'](_0x3e1317) ||
-      _0x3e1317['length'] === 0x0 ||
-      _0x3e1317['some']((_0x26e8d9) => !String(_0x26e8d9 || '')['trim']()))
+    list21 !== undefined &&
+    (!Array['isArray'](list21) ||
+      list21['length'] === 0x0 ||
+      list21['some']((value90) => !String(value90 || '')['trim']()))
   )
     throw new Error(
       '[manifest]\x20model\x20manifest\x20inputSlots.preserveHiddenInputsByKindFields\x20must\x20be\x20a\x20non-empty\x20string\x20array',
     );
-  if (Array['isArray'](_0x3e1317) && _0x3a47f7['preserveHiddenInputsByKind'] !== !![])
+  if (Array['isArray'](list21) && value89['preserveHiddenInputsByKind'] !== !![])
     throw new Error(
       '[manifest] model manifest inputSlots.preserveHiddenInputsByKindFields requires preserveHiddenInputsByKind',
     );
-  const _0x59a309 = _0x3a47f7['policyVariants'] || [];
-  if (_0x59a309 && !Array['isArray'](_0x59a309))
+  const value91 = value89['policyVariants'] || [];
+  if (value91 && !Array['isArray'](value91))
     throw new Error('[manifest] model manifest inputSlots.policyVariants must be an array');
-  (_0x59a309 || [])['forEach']((_0x5966f6, _0xc28623) => {
-    const _0x91cb01 = 'model manifest inputSlots.policyVariants[' + _0xc28623 + ']';
-    (assertPlainObject(_0x5966f6, _0x91cb01),
-      assertInputPolicyCondition(_0x5966f6['when'], _0x91cb01 + '.when'));
-    if (_0x5966f6['allowedKinds'] !== undefined && !Array['isArray'](_0x5966f6['allowedKinds']))
-      throw new Error('[manifest] ' + _0x91cb01 + '.allowedKinds must be an array');
-    if (_0x5966f6['maxByKind'] !== undefined && !isPlainObject(_0x5966f6['maxByKind']))
-      throw new Error('[manifest] ' + _0x91cb01 + '.maxByKind must be an object');
-    Object['entries'](_0x5966f6['maxByKind'] || {})['forEach'](([_0x1a287d, _0x17c907]) => {
-      const _0x1b6e19 = Number(_0x17c907);
-      if (!Number['isFinite'](_0x1b6e19) || _0x1b6e19 < 0x0)
+  (value91 || [])['forEach']((value92, value93) => {
+    const value94 = 'model manifest inputSlots.policyVariants[' + value93 + ']';
+    (assertPlainObject(value92, value94), assertInputPolicyCondition(value92['when'], value94 + '.when'));
+    if (value92['allowedKinds'] !== undefined && !Array['isArray'](value92['allowedKinds']))
+      throw new Error('[manifest] ' + value94 + '.allowedKinds must be an array');
+    if (value92['maxByKind'] !== undefined && !isPlainObject(value92['maxByKind']))
+      throw new Error('[manifest] ' + value94 + '.maxByKind must be an object');
+    Object['entries'](value92['maxByKind'] || {})['forEach'](([value95, value96]) => {
+      const count5 = Number(value96);
+      if (!Number['isFinite'](count5) || count5 < 0x0)
         throw new Error(
-          '[manifest]\x20' + _0x91cb01 + '.maxByKind.' + _0x1a287d + ' must be a non-negative number',
+          '[manifest]\x20' + value94 + '.maxByKind.' + value95 + ' must be a non-negative number',
         );
     });
   });
-  const _0x229592 = _0x3a47f7['mediaConstraintsByKind'] || {};
-  if (_0x229592 && !isPlainObject(_0x229592))
+  const value97 = value89['mediaConstraintsByKind'] || {};
+  if (value97 && !isPlainObject(value97))
     throw new Error('[manifest] model manifest inputSlots.mediaConstraintsByKind must be an object');
-  Object['entries'](_0x229592 || {})['forEach'](([_0x584ebc, _0x17f505]) => {
-    const _0x543c18 = 'model manifest inputSlots.mediaConstraintsByKind.' + _0x584ebc;
-    (assertPlainObject(_0x17f505, _0x543c18),
-      ['minDurationSeconds', 'maxDurationSeconds', 'maxBytes']['forEach']((_0x3fccc1) => {
-        if (_0x17f505[_0x3fccc1] === undefined) return;
-        const _0x175c6f = Number(_0x17f505[_0x3fccc1]);
-        if (!Number['isFinite'](_0x175c6f) || _0x175c6f <= 0x0)
-          throw new Error('[manifest] ' + _0x543c18 + '.' + _0x3fccc1 + ' must be positive');
+  Object['entries'](value97 || {})['forEach'](([value98, value99]) => {
+    const value100 = 'model manifest inputSlots.mediaConstraintsByKind.' + value98;
+    (assertPlainObject(value99, value100),
+      ['minDurationSeconds', 'maxDurationSeconds', 'maxBytes']['forEach']((value101) => {
+        if (value99[value101] === undefined) return;
+        const count6 = Number(value99[value101]);
+        if (!Number['isFinite'](count6) || count6 <= 0x0)
+          throw new Error('[manifest] ' + value100 + '.' + value101 + ' must be positive');
       }));
     if (
-      _0x17f505['minDurationSeconds'] !== undefined &&
-      _0x17f505['maxDurationSeconds'] !== undefined &&
-      Number(_0x17f505['minDurationSeconds']) > Number(_0x17f505['maxDurationSeconds'])
+      value99['minDurationSeconds'] !== undefined &&
+      value99['maxDurationSeconds'] !== undefined &&
+      Number(value99['minDurationSeconds']) > Number(value99['maxDurationSeconds'])
     )
       throw new Error(
-        '[manifest] ' + _0x543c18 + '.minDurationSeconds\x20cannot\x20exceed\x20maxDurationSeconds',
+        '[manifest] ' + value100 + '.minDurationSeconds\x20cannot\x20exceed\x20maxDurationSeconds',
       );
     if (
-      _0x17f505['allowedExtensions'] !== undefined &&
-      (!Array['isArray'](_0x17f505['allowedExtensions']) ||
-        _0x17f505['allowedExtensions']['some']((_0x4f6303) => !String(_0x4f6303 || '')['trim']()))
+      value99['allowedExtensions'] !== undefined &&
+      (!Array['isArray'](value99['allowedExtensions']) ||
+        value99['allowedExtensions']['some']((value102) => !String(value102 || '')['trim']()))
     )
-      throw new Error('[manifest] ' + _0x543c18 + '.allowedExtensions must be an array of non-empty strings');
+      throw new Error('[manifest] ' + value100 + '.allowedExtensions must be an array of non-empty strings');
   });
 }
 
-function assertManifestBundle(_0x3bd194) {
-  (assertPlainObject(_0x3bd194, 'manifest bundle'),
-    assertPlainData(_0x3bd194, 'manifest bundle'),
-    assertRequiredFields(_0x3bd194, ['sourceId'], 'manifest bundle'));
-  if (!normalizeRegistryKey(_0x3bd194['sourceId']))
+function assertManifestBundle(value103) {
+  (assertPlainObject(value103, 'manifest bundle'),
+    assertPlainData(value103, 'manifest bundle'),
+    assertRequiredFields(value103, ['sourceId'], 'manifest bundle'));
+  if (!normalizeRegistryKey(value103['sourceId']))
     throw new Error('[manifest] manifest bundle sourceId must be non-empty');
-  if (!Array['isArray'](_0x3bd194['models']))
+  if (!Array['isArray'](value103['models']))
     throw new TypeError('[manifest] manifest bundle.models must be an array');
-  if (!Array['isArray'](_0x3bd194['executions']))
+  if (!Array['isArray'](value103['executions']))
     throw new TypeError('[manifest] manifest bundle.executions must be an array');
-  const _0x1d7c59 = _0x3bd194['executions'],
-    _0x47741a = _0x3bd194['models'];
-  (_0x1d7c59['forEach'](validateExecutionManifest),
-    _0x47741a['forEach'](validateModelManifest),
-    assertRegistryKeysAvailable(_0x1d7c59, _executions, 'id', 'execution\x20manifest'));
-  const _0x557610 = buildManifestKeyMap(_0x1d7c59, 'id', 'execution manifest');
+  const executions = value103['executions'],
+    models = value103['models'];
+  (executions['forEach'](validateExecutionManifest),
+    models['forEach'](validateModelManifest),
+    assertRegistryKeysAvailable(executions, _executions, 'id', 'execution\x20manifest'));
+  const manifestKeyMap2 = buildManifestKeyMap(executions, 'id', 'execution manifest');
   return (
-    assertRegistryKeysAvailable(_0x47741a, _models, 'modelId', 'model manifest'),
-    assertBundleModelExecutionLinks(_0x47741a, _0x557610),
-    { executions: _0x1d7c59, models: _0x47741a }
+    assertRegistryKeysAvailable(models, _models, 'modelId', 'model manifest'),
+    assertBundleModelExecutionLinks(models, manifestKeyMap2),
+    { executions: executions, models: models }
   );
 }
 
-export function validateManifestBundle(_0x4842b2) {
-  return (assertManifestBundle(_0x4842b2), !![]);
+export function validateManifestBundle(value104) {
+  return (assertManifestBundle(value104), !![]);
 }
 
-function removeManifestFromRegistry(_0x489574, _0x4b614c, _0x331eaf, _0x341783) {
-  const _0x392bfa = String(_0x489574?.[_0x331eaf] || '')['trim']();
-  if (!_0x392bfa) return;
-  getManifestRegistryKeys(_0x489574, _0x331eaf, _0x341783)['forEach']((_0x134a7f) => {
-    const _0xbea582 = _0x4b614c['get'](_0x134a7f);
-    String(_0xbea582?.[_0x331eaf] || '')['trim']() === _0x392bfa && _0x4b614c['delete'](_0x134a7f);
+function removeManifestFromRegistry(value105, map9, value106, value107) {
+  const enabled7 = String(value105?.[value106] || '')['trim']();
+  if (!enabled7) return;
+  getManifestRegistryKeys(value105, value106, value107)['forEach']((value108) => {
+    const value109 = map9['get'](value108);
+    String(value109?.[value106] || '')['trim']() === enabled7 && map9['delete'](value108);
   });
 }
 
-export function unregisterManifestBundle(_0x218062) {
-  const _0x5be94d = Array['isArray'](_0x218062?.['executions']) ? _0x218062['executions'] : [],
-    _0x171d6c = Array['isArray'](_0x218062?.['models']) ? _0x218062['models'] : [];
+export function unregisterManifestBundle(value110) {
+  const list22 = Array['isArray'](value110?.['executions']) ? value110['executions'] : [],
+    list23 = Array['isArray'](value110?.['models']) ? value110['models'] : [];
   return (
-    _0x5be94d['forEach']((_0x24d39b) =>
-      removeManifestFromRegistry(_0x24d39b, _executions, 'id', 'execution\x20manifest'),
+    list22['forEach']((value111) =>
+      removeManifestFromRegistry(value111, _executions, 'id', 'execution\x20manifest'),
     ),
-    _0x171d6c['forEach']((_0x558e34) =>
-      removeManifestFromRegistry(_0x558e34, _models, 'modelId', 'model manifest'),
+    list23['forEach']((value112) =>
+      removeManifestFromRegistry(value112, _models, 'modelId', 'model manifest'),
     ),
     !![]
   );
 }
 
-function resolveUniqueModelDisplayName(_0x1f7c87, _0x3d2c10 = '') {
-  const _0x2fadaf = normalizeRegistryKey(_0x1f7c87)['toLowerCase'](),
-    _0x88270e = normalizeProviderId(_0x3d2c10);
-  if (!_0x2fadaf) return null;
-  const _0x1805b4 = Array['from'](new Set(_models['values']()))['filter']((_0x351cf6) => {
-    if (normalizeRegistryKey(_0x351cf6?.['displayName'])['toLowerCase']() !== _0x2fadaf) return ![];
-    return !_0x88270e || normalizeProviderId(_0x351cf6?.['provider']) === _0x88270e;
+function resolveUniqueModelDisplayName(value113, value114 = '') {
+  const registryKey13 = normalizeRegistryKey(value113)['toLowerCase'](),
+    providerId3 = normalizeProviderId(value114);
+  if (!registryKey13) return null;
+  const list24 = Array['from'](new Set(_models['values']()))['filter']((value115) => {
+    if (normalizeRegistryKey(value115?.['displayName'])['toLowerCase']() !== registryKey13) return ![];
+    return !providerId3 || normalizeProviderId(value115?.['provider']) === providerId3;
   });
-  return _0x1805b4['length'] === 0x1 ? _0x1805b4[0x0] : null;
+  return list24['length'] === 0x1 ? list24[0x0] : null;
 }

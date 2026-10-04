@@ -8,218 +8,209 @@ import {
 } from '../../core/panoramaSceneMath.js';
 import * as threeRuntime from '../panoramaSceneNode/threeRuntime.js';
 const MOVE_THRESHOLD = 3;
-function hasFiniteQuaternion(_0x17c086) {
+function hasFiniteQuaternion(box) {
   return (
-    Number.isFinite(Number(_0x17c086?.x)) &&
-    Number.isFinite(Number(_0x17c086?.y)) &&
-    Number.isFinite(Number(_0x17c086?.z)) &&
-    Number.isFinite(Number(_0x17c086?.w))
+    Number.isFinite(Number(box?.x)) &&
+    Number.isFinite(Number(box?.y)) &&
+    Number.isFinite(Number(box?.z)) &&
+    Number.isFinite(Number(box?.w))
   );
 }
-function cloneObjectPose(_0x4ad729) {
-  const _0x15f3c6 = Number.isFinite(_0x4ad729?.scale)
-      ? Number(_0x4ad729.scale) || 1
-      : _0x4ad729?.scale &&
-          Number.isFinite(_0x4ad729.scale.x) &&
-          Number.isFinite(_0x4ad729.scale.y) &&
-          Number.isFinite(_0x4ad729.scale.z)
+function cloneObjectPose(box2) {
+  const scale = Number.isFinite(box2?.scale)
+      ? Number(box2.scale) || 1
+      : box2?.scale &&
+          Number.isFinite(box2.scale.x) &&
+          Number.isFinite(box2.scale.y) &&
+          Number.isFinite(box2.scale.z)
         ? {
-            x: Number(_0x4ad729.scale.x) || 1,
-            y: Number(_0x4ad729.scale.y) || 1,
-            z: Number(_0x4ad729.scale.z) || 1,
+            x: Number(box2.scale.x) || 1,
+            y: Number(box2.scale.y) || 1,
+            z: Number(box2.scale.z) || 1,
           }
         : 1,
-    _0x37c095 = {
-      x: Number(_0x4ad729?.rotation?.x) || 0,
-      y: Number(_0x4ad729?.rotation?.y) || 0,
-      z: Number(_0x4ad729?.rotation?.z) || 0,
+    rotation = {
+      x: Number(box2?.rotation?.x) || 0,
+      y: Number(box2?.rotation?.y) || 0,
+      z: Number(box2?.rotation?.z) || 0,
     },
-    _0x7603fa = hasFiniteQuaternion(_0x4ad729?.quaternion)
+    x2 = hasFiniteQuaternion(box2?.quaternion)
       ? new threeRuntime['Quaternion'](
-          Number(_0x4ad729.quaternion.x),
-          Number(_0x4ad729.quaternion.y),
-          Number(_0x4ad729.quaternion.z),
-          Number(_0x4ad729.quaternion.w),
+          Number(box2.quaternion.x),
+          Number(box2.quaternion.y),
+          Number(box2.quaternion.z),
+          Number(box2.quaternion.w),
         ).normalize()
       : new threeRuntime['Quaternion']().setFromEuler(
-          new threeRuntime.Euler(_0x37c095.x, _0x37c095.y, _0x37c095.z, 'XYZ'),
+          new threeRuntime.Euler(rotation.x, rotation.y, rotation.z, 'XYZ'),
         );
   return {
     position: {
-      x: Number(_0x4ad729?.position?.x) || 0,
-      y: Number(_0x4ad729?.position?.y) || 0,
-      z: Number(_0x4ad729?.position?.z) || 0,
+      x: Number(box2?.position?.x) || 0,
+      y: Number(box2?.position?.y) || 0,
+      z: Number(box2?.position?.z) || 0,
     },
-    rotation: _0x37c095,
-    quaternion: { x: _0x7603fa.x, y: _0x7603fa.y, z: _0x7603fa.z, w: _0x7603fa.w },
-    fov: Number(_0x4ad729?.fov) || 58,
-    scale: _0x15f3c6,
+    rotation: rotation,
+    quaternion: { x: x2.x, y: x2.y, z: x2.z, w: x2.w },
+    fov: Number(box2?.fov) || 58,
+    scale: scale,
   };
 }
-function toScaleVector(_0x3b9149) {
-  if (Number.isFinite(_0x3b9149)) {
-    const _0x5424f8 = Math.max(0.01, Number(_0x3b9149) || 1);
-    return { x: _0x5424f8, y: _0x5424f8, z: _0x5424f8 };
+function toScaleVector(box3) {
+  if (Number.isFinite(box3)) {
+    const x3 = Math.max(0.01, Number(box3) || 1);
+    return { x: x3, y: x3, z: x3 };
   }
-  if (
-    _0x3b9149 &&
-    Number.isFinite(_0x3b9149.x) &&
-    Number.isFinite(_0x3b9149.y) &&
-    Number.isFinite(_0x3b9149.z)
-  )
+  if (box3 && Number.isFinite(box3.x) && Number.isFinite(box3.y) && Number.isFinite(box3.z))
     return {
-      x: Math.max(0.01, Number(_0x3b9149.x) || 1),
-      y: Math.max(0.01, Number(_0x3b9149.y) || 1),
-      z: Math.max(0.01, Number(_0x3b9149.z) || 1),
+      x: Math.max(0.01, Number(box3.x) || 1),
+      y: Math.max(0.01, Number(box3.y) || 1),
+      z: Math.max(0.01, Number(box3.z) || 1),
     };
   return { x: 1, y: 1, z: 1 };
 }
-function toCompatibleScale(_0x3570e4) {
-  const _0x22f36d = toScaleVector(_0x3570e4),
-    _0x2de381 = 0.0001;
-  if (Math.abs(_0x22f36d.x - _0x22f36d.y) < _0x2de381 && Math.abs(_0x22f36d.y - _0x22f36d.z) < _0x2de381)
-    return (_0x22f36d.x + _0x22f36d.y + _0x22f36d.z) / 3;
-  return _0x22f36d;
+function toCompatibleScale(value) {
+  const box4 = toScaleVector(value),
+    item = 0.0001;
+  if (Math.abs(box4.x - box4.y) < item && Math.abs(box4.y - box4.z) < item)
+    return (box4.x + box4.y + box4.z) / 3;
+  return box4;
 }
-function toVector3(_0x5be6fb) {
-  return new threeRuntime['Vector3'](
-    Number(_0x5be6fb?.x) || 0,
-    Number(_0x5be6fb?.y) || 0,
-    Number(_0x5be6fb?.z) || 0,
-  );
+function toVector3(box5) {
+  return new threeRuntime['Vector3'](Number(box5?.x) || 0, Number(box5?.y) || 0, Number(box5?.z) || 0);
 }
-function fromVector3(_0x1ef4af) {
-  return { x: _0x1ef4af.x, y: _0x1ef4af.y, z: _0x1ef4af.z };
+function fromVector3(x4) {
+  return { x: x4.x, y: x4.y, z: x4.z };
 }
-function rotatePoseAroundWorldAxis(_0x45ba24, _0x474304, _0xb62898, _0x3c48f6) {
-  const _0xab1535 = toVector3(_0x474304);
-  if (_0xab1535.lengthSq() < 1e-8 || !Number.isFinite(_0xb62898) || Math.abs(_0xb62898) < 1e-8) {
-    const _0x5bd595 = hasFiniteQuaternion(_0x45ba24?.quaternion)
+function rotatePoseAroundWorldAxis(key, index, result, data) {
+  const toVector32 = toVector3(index);
+  if (toVector32.lengthSq() < 1e-8 || !Number.isFinite(result) || Math.abs(result) < 1e-8) {
+    const quaternion = hasFiniteQuaternion(key?.quaternion)
       ? {
-          x: Number(_0x45ba24.quaternion.x) || 0,
-          y: Number(_0x45ba24.quaternion.y) || 0,
-          z: Number(_0x45ba24.quaternion.z) || 0,
-          w: Number(_0x45ba24.quaternion.w) || 1,
+          x: Number(key.quaternion.x) || 0,
+          y: Number(key.quaternion.y) || 0,
+          z: Number(key.quaternion.z) || 0,
+          w: Number(key.quaternion.w) || 1,
         }
       : undefined;
     return {
       position: {
-        x: Number(_0x45ba24?.position?.x) || 0,
-        y: Number(_0x45ba24?.position?.y) || 0,
-        z: Number(_0x45ba24?.position?.z) || 0,
+        x: Number(key?.position?.x) || 0,
+        y: Number(key?.position?.y) || 0,
+        z: Number(key?.position?.z) || 0,
       },
       rotation: {
-        x: Number(_0x45ba24?.rotation?.x) || 0,
-        y: Number(_0x45ba24?.rotation?.y) || 0,
-        z: Number(_0x45ba24?.rotation?.z) || 0,
+        x: Number(key?.rotation?.x) || 0,
+        y: Number(key?.rotation?.y) || 0,
+        z: Number(key?.rotation?.z) || 0,
       },
-      quaternion: _0x5bd595,
+      quaternion: quaternion,
     };
   }
-  _0xab1535.normalize();
-  const _0x209605 = toVector3(_0x3c48f6),
-    _0x7e659d = toVector3(_0x45ba24?.position),
-    _0x3d6d39 = hasFiniteQuaternion(_0x45ba24?.quaternion)
+  toVector32.normalize();
+  const toVector33 = toVector3(data),
+    toVector34 = toVector3(key?.position),
+    hasFiniteQuaternion2 = hasFiniteQuaternion(key?.quaternion)
       ? new threeRuntime.Quaternion(
-          Number(_0x45ba24.quaternion.x) || 0,
-          Number(_0x45ba24.quaternion.y) || 0,
-          Number(_0x45ba24.quaternion.z) || 0,
-          Number(_0x45ba24.quaternion.w) || 1,
+          Number(key.quaternion.x) || 0,
+          Number(key.quaternion.y) || 0,
+          Number(key.quaternion.z) || 0,
+          Number(key.quaternion.w) || 1,
         ).normalize()
       : new threeRuntime['Quaternion']().setFromEuler(
           new threeRuntime['Euler'](
-            Number(_0x45ba24?.rotation?.x) || 0,
-            Number(_0x45ba24?.rotation?.y) || 0,
-            Number(_0x45ba24?.rotation?.z) || 0,
+            Number(key?.rotation?.x) || 0,
+            Number(key?.rotation?.y) || 0,
+            Number(key?.rotation?.z) || 0,
             'XYZ',
           ),
         ),
-    _0x47658c = new threeRuntime['Quaternion']().setFromAxisAngle(_0xab1535, _0xb62898),
-    _0x38ea56 = _0x7e659d.sub(_0x209605).applyQuaternion(_0x47658c).add(_0x209605),
-    _0x2178d1 = _0x47658c.clone().multiply(_0x3d6d39),
-    _0x1861fc = new threeRuntime['Euler']().setFromQuaternion(_0x2178d1, 'XYZ');
+    options = new threeRuntime['Quaternion']().setFromAxisAngle(toVector32, result),
+    target = toVector34.sub(toVector33).applyQuaternion(options).add(toVector33),
+    x5 = options.clone().multiply(hasFiniteQuaternion2),
+    x6 = new threeRuntime['Euler']().setFromQuaternion(x5, 'XYZ');
   return {
-    position: fromVector3(_0x38ea56),
-    rotation: { x: _0x1861fc.x, y: _0x1861fc.y, z: _0x1861fc.z },
-    quaternion: { x: _0x2178d1.x, y: _0x2178d1.y, z: _0x2178d1.z, w: _0x2178d1.w },
+    position: fromVector3(target),
+    rotation: { x: x6.x, y: x6.y, z: x6.z },
+    quaternion: { x: x5.x, y: x5.y, z: x5.z, w: x5.w },
   };
 }
-function scalePositionAroundPivot(_0x37445e, _0x2ff6a3, _0x28f21d, _0x58851d = null) {
-  const _0x3a038c = Number.isFinite(_0x28f21d) ? _0x28f21d : 1,
-    _0xaf8ec3 = toVector3(_0x2ff6a3),
-    _0x87aa2d = toVector3(_0x37445e),
-    _0x73f496 = _0x87aa2d.sub(_0xaf8ec3);
-  if (!_0x58851d) return fromVector3(_0x73f496.multiplyScalar(_0x3a038c).add(_0xaf8ec3));
-  const _0x1f0cb6 = toVector3(_0x58851d);
-  if (_0x1f0cb6.lengthSq() < 1e-8) return fromVector3(_0x73f496.add(_0xaf8ec3));
-  _0x1f0cb6.normalize();
-  const _0x3c454a = _0x1f0cb6.clone().multiplyScalar(_0x73f496.dot(_0x1f0cb6)),
-    _0x3d88dc = _0x73f496.clone().sub(_0x3c454a);
-  return fromVector3(_0x3d88dc.add(_0x3c454a.multiplyScalar(_0x3a038c)).add(_0xaf8ec3));
+function scalePositionAroundPivot(source, next, current, enabled = null) {
+  const entry = Number.isFinite(current) ? current : 1,
+    toVector35 = toVector3(next),
+    toVector36 = toVector3(source),
+    record = toVector36.sub(toVector35);
+  if (!enabled) return fromVector3(record.multiplyScalar(entry).add(toVector35));
+  const toVector37 = toVector3(enabled);
+  if (toVector37.lengthSq() < 1e-8) return fromVector3(record.add(toVector35));
+  toVector37.normalize();
+  const payload = toVector37.clone().multiplyScalar(record.dot(toVector37)),
+    handle = record.clone().sub(payload);
+  return fromVector3(handle.add(payload.multiplyScalar(entry)).add(toVector35));
 }
-function getClientRectFromPoints(_0x2e1a88, _0x17143d, _0x3091ac, _0x105772) {
+function getClientRectFromPoints(state, config, scope, input) {
   return {
-    left: Math.min(_0x2e1a88, _0x3091ac),
-    top: Math.min(_0x17143d, _0x105772),
-    right: Math.max(_0x2e1a88, _0x3091ac),
-    bottom: Math.max(_0x17143d, _0x105772),
+    left: Math.min(state, scope),
+    top: Math.min(config, input),
+    right: Math.max(state, scope),
+    bottom: Math.max(config, input),
   };
 }
-function getLocalRectFromPoints(_0xdca47d, _0x262fab, _0x205f0a, _0x421016) {
+function getLocalRectFromPoints(output, value2, value3, value4) {
   return {
-    left: Math.min(_0xdca47d, _0x205f0a),
-    top: Math.min(_0x262fab, _0x421016),
-    width: Math.abs(_0x205f0a - _0xdca47d),
-    height: Math.abs(_0x421016 - _0x262fab),
+    left: Math.min(output, value3),
+    top: Math.min(value2, value4),
+    width: Math.abs(value3 - output),
+    height: Math.abs(value4 - value2),
   };
 }
-function addVector3Like(_0x2c6133, _0xd8f0de) {
+function addVector3Like(box6, box7) {
   return {
-    x: (Number(_0x2c6133?.x) || 0) + (Number(_0xd8f0de?.x) || 0),
-    y: (Number(_0x2c6133?.y) || 0) + (Number(_0xd8f0de?.y) || 0),
-    z: (Number(_0x2c6133?.z) || 0) + (Number(_0xd8f0de?.z) || 0),
+    x: (Number(box6?.x) || 0) + (Number(box7?.x) || 0),
+    y: (Number(box6?.y) || 0) + (Number(box7?.y) || 0),
+    z: (Number(box6?.z) || 0) + (Number(box7?.z) || 0),
   };
 }
-export function measureSelectionBoxLocalRect(_0x550218, _0x5e7d4f, _0x2ce117, _0x35c1d3, _0x4f9fee) {
-  const _0x46cb32 = _0x550218?.getBoundingClientRect?.() || { left: 0, top: 0, width: 1, height: 1 },
-    _0x47090d = Math.max(1, Number(_0x550218?.offsetWidth) || _0x46cb32.width || 1),
-    _0x1da2fa = Math.max(1, Number(_0x550218?.offsetHeight) || _0x46cb32.height || 1),
-    _0x4deaeb = _0x46cb32.width > 0 ? _0x46cb32.width / _0x47090d : 1,
-    _0x519d19 = _0x46cb32.height > 0 ? _0x46cb32.height / _0x1da2fa : 1,
-    _0x284d5f = _0x4deaeb > 0 ? _0x4deaeb : 1,
-    _0x51021e = _0x519d19 > 0 ? _0x519d19 : 1;
+export function measureSelectionBoxLocalRect(el, value5, value6, value7, value8) {
+  const box8 = el?.getBoundingClientRect?.() || { left: 0, top: 0, width: 1, height: 1 },
+    value9 = Math.max(1, Number(el?.offsetWidth) || box8.width || 1),
+    value10 = Math.max(1, Number(el?.offsetHeight) || box8.height || 1),
+    count = box8.width > 0 ? box8.width / value9 : 1,
+    count2 = box8.height > 0 ? box8.height / value10 : 1,
+    value11 = count > 0 ? count : 1,
+    value12 = count2 > 0 ? count2 : 1;
   return {
-    left: (Math.min(_0x5e7d4f, _0x35c1d3) - _0x46cb32.left) / _0x284d5f,
-    top: (Math.min(_0x2ce117, _0x4f9fee) - _0x46cb32.top) / _0x51021e,
-    width: Math.abs(_0x35c1d3 - _0x5e7d4f) / _0x284d5f,
-    height: Math.abs(_0x4f9fee - _0x2ce117) / _0x51021e,
+    left: (Math.min(value5, value7) - box8.left) / value11,
+    top: (Math.min(value6, value8) - box8.top) / value12,
+    width: Math.abs(value7 - value5) / value11,
+    height: Math.abs(value8 - value6) / value12,
   };
 }
 export class PanoramaSceneInteraction {
   constructor({
-    viewportEl: _0x20f219,
-    overlayEl: _0x4400fb,
-    bridge: _0x41b572,
-    getSceneState: _0x53eda1,
-    onViewCommit: _0x2555d0,
-    onObjectCommit: _0x4f0699,
-    onObjectBatchCommit: _0x221ea9,
-    onSelectionChange: _0x98b12e,
-    onSelectionBatchChange: _0x85e312,
-    onSelectionObjectsChange: _0x1c04c4,
-    onSelectionClear: _0x3564f8,
+    viewportEl: viewportEl,
+    overlayEl: overlayEl,
+    bridge: bridge,
+    getSceneState: getSceneState,
+    onViewCommit: onViewCommit,
+    onObjectCommit: onObjectCommit,
+    onObjectBatchCommit: onObjectBatchCommit,
+    onSelectionChange: onSelectionChange,
+    onSelectionBatchChange: onSelectionBatchChange,
+    onSelectionObjectsChange: onSelectionObjectsChange,
+    onSelectionClear: onSelectionClear,
   } = {}) {
-    ((this.viewportEl = _0x20f219),
-      (this.overlayEl = _0x4400fb || _0x20f219),
-      (this.bridge = _0x41b572),
-      (this.getSceneState = _0x53eda1),
-      (this.onViewCommit = _0x2555d0),
-      (this.onObjectCommit = _0x4f0699),
-      (this.onObjectBatchCommit = _0x221ea9),
-      (this.onSelectionChange = _0x98b12e),
-      (this.onSelectionBatchChange = _0x85e312),
-      (this.onSelectionObjectsChange = _0x1c04c4),
-      (this.onSelectionClear = _0x3564f8),
+    ((this.viewportEl = viewportEl),
+      (this.overlayEl = overlayEl || viewportEl),
+      (this.bridge = bridge),
+      (this.getSceneState = getSceneState),
+      (this.onViewCommit = onViewCommit),
+      (this.onObjectCommit = onObjectCommit),
+      (this.onObjectBatchCommit = onObjectBatchCommit),
+      (this.onSelectionChange = onSelectionChange),
+      (this.onSelectionBatchChange = onSelectionBatchChange),
+      (this.onSelectionObjectsChange = onSelectionObjectsChange),
+      (this.onSelectionClear = onSelectionClear),
       (this._gesture = null),
       (this._selectionBoxEl = null),
       (this._clearDraftRafId = null),
@@ -256,140 +247,130 @@ export class PanoramaSceneInteraction {
       this._clearGizmoMoveGuideLine(),
       this.bridge?.clearAllDrafts?.());
   }
-  ['_isEditing'](_0x4eb42c) {
-    return _0x4eb42c?.ui?.isEditing === true;
+  ['_isEditing'](value13) {
+    return value13?.ui?.isEditing === true;
   }
-  ['_isPanoramaMode'](_0xa61874) {
-    return _0xa61874?.type === 'panorama-360';
+  ['_isPanoramaMode'](value14) {
+    return value14?.type === 'panorama-360';
   }
-  ['_syncControlsByMode'](_0x57b63f) {
-    const _0x4a5284 = this.bridge?.controls || this.bridge?._controls;
-    if (!_0x4a5284) return;
-    ('enablePan' in _0x4a5284 && (_0x4a5284.enablePan = _0x57b63f ? false : true),
-      'enableRotate' in _0x4a5284 && (_0x4a5284.enableRotate = true));
+  ['_syncControlsByMode'](value15) {
+    const enabled2 = this.bridge?.controls || this.bridge?._controls;
+    if (!enabled2) return;
+    ('enablePan' in enabled2 && (enabled2.enablePan = value15 ? false : true),
+      'enableRotate' in enabled2 && (enabled2.enableRotate = true));
   }
-  ['_stopEvent'](_0x5b0f7d, _0x12350c = {}) {
-    _0x5b0f7d.stopPropagation();
-    if (_0x12350c.preventDefault) _0x5b0f7d.preventDefault();
+  ['_stopEvent'](event, event2 = {}) {
+    event.stopPropagation();
+    if (event2.preventDefault) event.preventDefault();
   }
-  ['_createBaseView'](_0x2f9293) {
-    if (_0x2f9293.mode === 'panorama') {
-      const _0x10b53e = { ..._0x2f9293.viewport.panoramaView };
-      return { kind: 'panorama-default', sceneState: _0x2f9293, panoramaView: _0x10b53e };
+  ['_createBaseView'](sceneState) {
+    if (sceneState.mode === 'panorama') {
+      const panoramaView = { ...sceneState.viewport.panoramaView };
+      return { kind: 'panorama-default', sceneState: sceneState, panoramaView: panoramaView };
     }
-    const _0x197ec7 = this.bridge?.readCurrentViewPose?.() || null,
-      _0x3a2252 = { ..._0x2f9293.viewport.sceneView };
-    return { kind: 'scene-default', sceneState: _0x2f9293, sceneView: _0x3a2252, currentPose: _0x197ec7 };
+    const currentPose = this.bridge?.readCurrentViewPose?.() || null,
+      sceneView = { ...sceneState.viewport.sceneView };
+    return { kind: 'scene-default', sceneState: sceneState, sceneView: sceneView, currentPose: currentPose };
   }
-  ['_getObjectByPick'](_0x111549, _0x25d13d) {
-    if (!_0x25d13d) return null;
-    if (_0x25d13d.objectType !== 'cube' && _0x25d13d.objectType !== 'mannequin') return null;
-    const _0x5c63f9 = _0x25d13d.objectType === 'cube' ? _0x111549.cubes : _0x111549.mannequins;
-    return _0x5c63f9.find((_0x304ea6) => _0x304ea6.id === _0x25d13d.objectId) || null;
+  ['_getObjectByPick'](value16, enabled3) {
+    if (!enabled3) return null;
+    if (enabled3.objectType !== 'cube' && enabled3.objectType !== 'mannequin') return null;
+    const list = enabled3.objectType === 'cube' ? value16.cubes : value16.mannequins;
+    return list.find((item2) => item2.id === enabled3.objectId) || null;
   }
-  ['_getSelectedObject'](_0x4de466) {
-    const _0x212026 = _0x4de466?.selection?.selectedObjectType,
-      _0x2cf641 = _0x4de466?.selection?.selectedObjectId;
-    if (!_0x212026 || !_0x2cf641) return null;
-    if (_0x212026 !== 'cube' && _0x212026 !== 'mannequin') return null;
-    const _0x5508c8 = _0x212026 === 'cube' ? _0x4de466.cubes : _0x4de466.mannequins,
-      _0x15defb = _0x5508c8.find((_0x4f74bc) => _0x4f74bc.id === _0x2cf641) || null;
-    if (!_0x15defb) return null;
-    return { objectType: _0x212026, objectId: _0x2cf641, item: _0x15defb };
+  ['_getSelectedObject'](value17) {
+    const objectType = value17?.selection?.selectedObjectType,
+      objectId = value17?.selection?.selectedObjectId;
+    if (!objectType || !objectId) return null;
+    if (objectType !== 'cube' && objectType !== 'mannequin') return null;
+    const list2 = objectType === 'cube' ? value17.cubes : value17.mannequins,
+      item3 = list2.find((item4) => item4.id === objectId) || null;
+    if (!item3) return null;
+    return { objectType: objectType, objectId: objectId, item: item3 };
   }
-  ['_findGroupByMember'](_0x48c91e, _0x1a68d3, _0x33c7ae) {
-    if (_0x1a68d3 !== 'mannequin' || !_0x33c7ae) return null;
-    const _0x4006e9 = Array.isArray(_0x48c91e?.groups) ? _0x48c91e.groups : [];
+  ['_findGroupByMember'](value18, value19, enabled4) {
+    if (value19 !== 'mannequin' || !enabled4) return null;
+    const list3 = Array.isArray(value18?.groups) ? value18.groups : [];
     return (
-      _0x4006e9.find(
-        (_0x11dc4a) => Array.isArray(_0x11dc4a.memberIds) && _0x11dc4a.memberIds.includes(_0x33c7ae),
-      ) || null
+      list3.find((item5) => Array.isArray(item5.memberIds) && item5.memberIds.includes(enabled4)) || null
     );
   }
-  ['_resolveTargetsByIds'](_0x3a6bd5, _0xc87fd9, _0x4f6233) {
-    const _0x398be7 = Array.isArray(_0x4f6233) ? _0x4f6233 : [];
-    if (!_0xc87fd9 || _0x398be7.length === 0) return [];
-    if (_0xc87fd9 !== 'cube' && _0xc87fd9 !== 'mannequin') return [];
-    const _0x5e538d = _0xc87fd9 === 'cube' ? _0x3a6bd5.cubes : _0x3a6bd5.mannequins,
-      _0x14500a = new Set(_0x398be7);
-    return _0x5e538d
-      .filter((_0x1c0419) => _0x14500a.has(_0x1c0419.id))
-      .map((_0x5dd82b) => ({ objectType: _0xc87fd9, objectId: _0x5dd82b.id, item: _0x5dd82b }));
+  ['_resolveTargetsByIds'](value20, objectType2, value21) {
+    const list4 = Array.isArray(value21) ? value21 : [];
+    if (!objectType2 || list4.length === 0) return [];
+    if (objectType2 !== 'cube' && objectType2 !== 'mannequin') return [];
+    const list5 = objectType2 === 'cube' ? value20.cubes : value20.mannequins,
+      map = new Set(list4);
+    return list5
+      .filter((item6) => map.has(item6.id))
+      .map((objectId2) => ({ objectType: objectType2, objectId: objectId2.id, item: objectId2 }));
   }
-  ['_collectSelectionObjects'](_0x1179c0) {
-    const _0x1ffe17 = Array.isArray(_0x1179c0?.cubes) ? _0x1179c0.cubes : [],
-      _0x3ba40a = Array.isArray(_0x1179c0?.mannequins) ? _0x1179c0.mannequins : [],
-      _0x5c2740 = new Set(_0x1ffe17.map((_0x39c274) => _0x39c274.id)),
-      _0xb7c8f2 = new Set(_0x3ba40a.map((_0x37a745) => _0x37a745.id)),
-      _0x572ce1 = new Set(),
-      _0x534a5d = [],
-      _0x269ab5 = (_0x121a22, _0x2a4a38) => {
-        if (_0x121a22 !== 'cube' && _0x121a22 !== 'mannequin') return;
-        const _0x4d6907 = String(_0x2a4a38 || '').trim();
-        if (!_0x4d6907) return;
-        const _0x25d4d3 = _0x121a22 === 'cube' ? _0x5c2740.has(_0x4d6907) : _0xb7c8f2.has(_0x4d6907);
-        if (!_0x25d4d3) return;
-        const _0xe9af77 = _0x121a22 + ':' + _0x4d6907;
-        if (_0x572ce1.has(_0xe9af77)) return;
-        (_0x572ce1.add(_0xe9af77), _0x534a5d.push({ objectType: _0x121a22, objectId: _0x4d6907 }));
+  ['_collectSelectionObjects'](value22) {
+    const list6 = Array.isArray(value22?.cubes) ? value22.cubes : [],
+      list7 = Array.isArray(value22?.mannequins) ? value22.mannequins : [],
+      map2 = new Set(list6.map((item7) => item7.id)),
+      map3 = new Set(list7.map((item8) => item8.id)),
+      map4 = new Set(),
+      list8 = [],
+      handler = (objectType3, value23) => {
+        if (objectType3 !== 'cube' && objectType3 !== 'mannequin') return;
+        const objectId3 = String(value23 || '').trim();
+        if (!objectId3) return;
+        const enabled5 = objectType3 === 'cube' ? map2.has(objectId3) : map3.has(objectId3);
+        if (!enabled5) return;
+        const value24 = objectType3 + ':' + objectId3;
+        if (map4.has(value24)) return;
+        (map4.add(value24), list8.push({ objectType: objectType3, objectId: objectId3 }));
       },
-      _0x49f245 = Array.isArray(_0x1179c0?.selection?.selectedObjects)
-        ? _0x1179c0.selection.selectedObjects
-        : [];
-    _0x49f245.forEach((_0x59b2b5) => {
-      _0x269ab5(_0x59b2b5?.objectType, _0x59b2b5?.objectId);
+      list9 = Array.isArray(value22?.selection?.selectedObjects) ? value22.selection.selectedObjects : [];
+    list9.forEach((item9) => {
+      handler(item9?.objectType, item9?.objectId);
     });
-    if (_0x534a5d.length > 0) return _0x534a5d;
-    const _0x43e0b8 = _0x1179c0?.selection?.selectedGroupId || null;
-    if (_0x43e0b8) {
-      const _0x2e1b16 = (_0x1179c0?.groups || []).find((_0x112714) => _0x112714.id === _0x43e0b8);
-      if (Array.isArray(_0x2e1b16?.memberIds) && _0x2e1b16.memberIds.length > 0) {
-        _0x2e1b16.memberIds.forEach((_0xb4df61) => {
-          _0x269ab5('mannequin', _0xb4df61);
+    if (list8.length > 0) return list8;
+    const value25 = value22?.selection?.selectedGroupId || null;
+    if (value25) {
+      const value26 = (value22?.groups || []).find((item10) => item10.id === value25);
+      if (Array.isArray(value26?.memberIds) && value26.memberIds.length > 0) {
+        value26.memberIds.forEach((item11) => {
+          handler('mannequin', item11);
         });
-        if (_0x534a5d.length > 0) return _0x534a5d;
+        if (list8.length > 0) return list8;
       }
     }
-    const _0x480502 =
-      _0x1179c0?.selection?.selectedObjectType === 'cube' ||
-      _0x1179c0?.selection?.selectedObjectType === 'mannequin'
-        ? _0x1179c0.selection.selectedObjectType
+    const enabled6 =
+      value22?.selection?.selectedObjectType === 'cube' ||
+      value22?.selection?.selectedObjectType === 'mannequin'
+        ? value22.selection.selectedObjectType
         : null;
-    if (!_0x480502) return _0x534a5d;
-    const _0x214212 = Array.isArray(_0x1179c0?.selection?.selectedObjectIds)
-      ? _0x1179c0.selection.selectedObjectIds
+    if (!enabled6) return list8;
+    const list10 = Array.isArray(value22?.selection?.selectedObjectIds)
+      ? value22.selection.selectedObjectIds
       : [];
-    if (_0x214212.length > 0) {
-      _0x214212.forEach((_0x21479c) => {
-        _0x269ab5(_0x480502, _0x21479c);
+    if (list10.length > 0) {
+      list10.forEach((item12) => {
+        handler(enabled6, item12);
       });
-      if (_0x534a5d.length > 0) return _0x534a5d;
+      if (list8.length > 0) return list8;
     }
-    return (_0x269ab5(_0x480502, _0x1179c0?.selection?.selectedObjectId || null), _0x534a5d);
+    return (handler(enabled6, value22?.selection?.selectedObjectId || null), list8);
   }
-  ['_getSelectionTargets'](_0x2dd7c1) {
-    const _0x108e21 = this._collectSelectionObjects(_0x2dd7c1);
-    if (_0x108e21.length > 0) {
-      const _0x2b9038 = new Map(
-          (Array.isArray(_0x2dd7c1?.cubes) ? _0x2dd7c1.cubes : []).map((_0x295c8c) => [
-            _0x295c8c.id,
-            _0x295c8c,
-          ]),
+  ['_getSelectionTargets'](value27) {
+    const list11 = this._collectSelectionObjects(value27);
+    if (list11.length > 0) {
+      const map5 = new Map(
+          (Array.isArray(value27?.cubes) ? value27.cubes : []).map((item13) => [item13.id, item13]),
         ),
-        _0x4d69af = new Map(
-          (Array.isArray(_0x2dd7c1?.mannequins) ? _0x2dd7c1.mannequins : []).map((_0x51dc89) => [
-            _0x51dc89.id,
-            _0x51dc89,
-          ]),
+        map6 = new Map(
+          (Array.isArray(value27?.mannequins) ? value27.mannequins : []).map((item14) => [item14.id, item14]),
         );
-      return _0x108e21
-        .map((_0x103668) => {
-          const _0x21056a =
-            _0x103668.objectType === 'cube'
-              ? _0x2b9038.get(_0x103668.objectId)
-              : _0x4d69af.get(_0x103668.objectId);
-          if (!_0x21056a) return null;
-          return { objectType: _0x103668.objectType, objectId: _0x103668.objectId, item: _0x21056a };
+      return list11
+        .map((objectType4) => {
+          const item15 =
+            objectType4.objectType === 'cube'
+              ? map5.get(objectType4.objectId)
+              : map6.get(objectType4.objectId);
+          if (!item15) return null;
+          return { objectType: objectType4.objectType, objectId: objectType4.objectId, item: item15 };
         })
         .filter(Boolean);
     }
@@ -397,49 +378,49 @@ export class PanoramaSceneInteraction {
   }
   ['_ensureSelectionBox']() {
     if (this._selectionBoxEl) return this._selectionBoxEl;
-    const _0x3b3e20 = document.createElement('div');
+    const value28 = document.createElement('div');
     return (
-      (_0x3b3e20.className = 'panorama-scene-selection-box'),
-      this.overlayEl?.appendChild(_0x3b3e20),
-      (this._selectionBoxEl = _0x3b3e20),
-      _0x3b3e20
+      (value28.className = 'panorama-scene-selection-box'),
+      this.overlayEl?.appendChild(value28),
+      (this._selectionBoxEl = value28),
+      value28
     );
   }
-  ['_updateSelectionBox'](_0x166b4f, _0x17f739, _0x46417e, _0x2f011b) {
-    const _0xf56d46 = getLocalRectFromPoints(_0x166b4f, _0x17f739, _0x46417e, _0x2f011b),
-      _0xc2a204 = this._ensureSelectionBox();
-    ((_0xc2a204.style.left = _0xf56d46.left + 'px'),
-      (_0xc2a204.style.top = _0xf56d46.top + 'px'),
-      (_0xc2a204.style.width = _0xf56d46.width + 'px'),
-      (_0xc2a204.style.height = _0xf56d46.height + 'px'),
-      _0xc2a204.classList.add('is-visible'));
+  ['_updateSelectionBox'](value29, value30, value31, value32) {
+    const box9 = getLocalRectFromPoints(value29, value30, value31, value32),
+      el2 = this._ensureSelectionBox();
+    ((el2.style.left = box9.left + 'px'),
+      (el2.style.top = box9.top + 'px'),
+      (el2.style.width = box9.width + 'px'),
+      (el2.style.height = box9.height + 'px'),
+      el2.classList.add('is-visible'));
   }
-  ['_getLocalPoint'](_0xc38afd) {
-    const _0x5ab679 = this.viewportEl?.getBoundingClientRect?.() || { left: 0, top: 0, width: 1, height: 1 },
-      _0x112d5a = Math.max(1, Number(this.viewportEl?.offsetWidth) || _0x5ab679.width || 1),
-      _0x2d948b = Math.max(1, Number(this.viewportEl?.offsetHeight) || _0x5ab679.height || 1),
-      _0x580670 = _0x5ab679.width > 0 ? _0x5ab679.width / _0x112d5a : 1,
-      _0x2f97e0 = _0x5ab679.height > 0 ? _0x5ab679.height / _0x2d948b : 1,
-      _0x35672b = _0x580670 > 0 ? _0x580670 : 1,
-      _0x4d611d = _0x2f97e0 > 0 ? _0x2f97e0 : 1;
+  ['_getLocalPoint'](event3) {
+    const box10 = this.viewportEl?.getBoundingClientRect?.() || { left: 0, top: 0, width: 1, height: 1 },
+      value33 = Math.max(1, Number(this.viewportEl?.offsetWidth) || box10.width || 1),
+      value34 = Math.max(1, Number(this.viewportEl?.offsetHeight) || box10.height || 1),
+      count3 = box10.width > 0 ? box10.width / value33 : 1,
+      count4 = box10.height > 0 ? box10.height / value34 : 1,
+      value35 = count3 > 0 ? count3 : 1,
+      value36 = count4 > 0 ? count4 : 1;
     return {
-      x: (_0xc38afd?.clientX - _0x5ab679.left) / _0x35672b,
-      y: (_0xc38afd?.clientY - _0x5ab679.top) / _0x4d611d,
+      x: (event3?.clientX - box10.left) / value35,
+      y: (event3?.clientY - box10.top) / value36,
     };
   }
   ['_clearSelectionBox']() {
     (this._selectionBoxEl?.remove(), (this._selectionBoxEl = null));
   }
-  ['_queueDraftClear'](_0x4e3403) {
-    if (typeof _0x4e3403 !== 'function') return;
-    this._queuedDraftClearTasks.push(_0x4e3403);
+  ['_queueDraftClear'](value37) {
+    if (typeof value37 !== 'function') return;
+    this._queuedDraftClearTasks.push(value37);
     if (this._clearDraftRafId != null) return;
     this._clearDraftRafId = requestAnimationFrame(() => {
       this._clearDraftRafId = null;
-      const _0x1cbdd0 = this._queuedDraftClearTasks.splice(0, this._queuedDraftClearTasks.length);
-      _0x1cbdd0.forEach((_0x18bb8f) => {
+      const list12 = this._queuedDraftClearTasks.splice(0, this._queuedDraftClearTasks.length);
+      list12.forEach((handler2) => {
         try {
-          _0x18bb8f();
+          handler2();
         } catch {}
       });
     });
@@ -449,92 +430,88 @@ export class PanoramaSceneInteraction {
       (cancelAnimationFrame(this._clearDraftRafId), (this._clearDraftRafId = null)),
       (this._queuedDraftClearTasks.length = 0));
   }
-  ['_beginObjectMove'](_0x4f42a1, _0x45abad, _0x337779, _0x2ccb9a) {
-    const _0x2d8fc0 = cloneObjectPose(_0x2ccb9a),
-      _0x5ef364 = this.bridge?.intersectGround?.(_0x4f42a1.clientX, _0x4f42a1.clientY, 0) || {
-        x: _0x2d8fc0.position.x,
+  ['_beginObjectMove'](pointerId, value38, objectType5, value39) {
+    const x7 = cloneObjectPose(value39),
+      x8 = this.bridge?.intersectGround?.(pointerId.clientX, pointerId.clientY, 0) || {
+        x: x7.position.x,
         y: 0,
-        z: _0x2d8fc0.position.z,
+        z: x7.position.z,
       };
     return {
       type: 'object-move',
-      pointerId: _0x4f42a1.pointerId,
-      startX: _0x4f42a1.clientX,
-      startY: _0x4f42a1.clientY,
-      objectType: _0x337779.objectType,
-      objectId: _0x337779.objectId,
-      basePose: _0x2d8fc0,
+      pointerId: pointerId.pointerId,
+      startX: pointerId.clientX,
+      startY: pointerId.clientY,
+      objectType: objectType5.objectType,
+      objectId: objectType5.objectId,
+      basePose: x7,
       moved: false,
-      offset: { x: _0x5ef364.x - _0x2d8fc0.position.x, z: _0x5ef364.z - _0x2d8fc0.position.z },
+      offset: { x: x8.x - x7.position.x, z: x8.z - x7.position.z },
     };
   }
-  ['_beginBatchMove'](_0x41fb0f, _0x53a631) {
-    const _0x2a9b9e = Array.isArray(_0x53a631) ? _0x53a631 : [];
-    if (_0x2a9b9e.length === 0) return null;
-    const _0x23e12c = _0x2a9b9e.map((_0x54eff1) => ({
-        objectType: _0x54eff1.objectType,
-        objectId: _0x54eff1.objectId,
-        pose: cloneObjectPose(_0x54eff1.item),
+  ['_beginBatchMove'](pointerId2, value40) {
+    const list13 = Array.isArray(value40) ? value40 : [];
+    if (list13.length === 0) return null;
+    const entries = list13.map((objectType6) => ({
+        objectType: objectType6.objectType,
+        objectId: objectType6.objectId,
+        pose: cloneObjectPose(objectType6.item),
       })),
-      _0x25b2b4 = _0x23e12c.reduce(
-        (_0x536e9e, _0x12540f) => {
-          return (
-            (_0x536e9e.x += _0x12540f.pose.position.x),
-            (_0x536e9e.z += _0x12540f.pose.position.z),
-            _0x536e9e
-          );
+      x9 = entries.reduce(
+        (box11, value41) => {
+          return ((box11.x += value41.pose.position.x), (box11.z += value41.pose.position.z), box11);
         },
         { x: 0, z: 0 },
       );
-    ((_0x25b2b4.x /= _0x23e12c.length), (_0x25b2b4.z /= _0x23e12c.length));
-    const _0x4e6fd0 = this.bridge?.intersectGround?.(_0x41fb0f.clientX, _0x41fb0f.clientY, 0) || {
-      x: _0x25b2b4.x,
+    ((x9.x /= entries.length), (x9.z /= entries.length));
+    const x10 = this.bridge?.intersectGround?.(pointerId2.clientX, pointerId2.clientY, 0) || {
+      x: x9.x,
       y: 0,
-      z: _0x25b2b4.z,
+      z: x9.z,
     };
     return {
       type: 'object-move-batch',
-      pointerId: _0x41fb0f.pointerId,
-      startX: _0x41fb0f.clientX,
-      startY: _0x41fb0f.clientY,
+      pointerId: pointerId2.pointerId,
+      startX: pointerId2.clientX,
+      startY: pointerId2.clientY,
       moved: false,
-      baseCenter: _0x25b2b4,
-      pointerOffset: { x: _0x4e6fd0.x - _0x25b2b4.x, z: _0x4e6fd0.z - _0x25b2b4.z },
-      entries: _0x23e12c.map((_0x33d919) => ({
-        ..._0x33d919,
-        offset: { x: _0x33d919.pose.position.x - _0x25b2b4.x, z: _0x33d919.pose.position.z - _0x25b2b4.z },
+      baseCenter: x9,
+      pointerOffset: { x: x10.x - x9.x, z: x10.z - x9.z },
+      entries: entries.map((x11) => ({
+        ...x11,
+        offset: { x: x11.pose.position.x - x9.x, z: x11.pose.position.z - x9.z },
       })),
     };
   }
-  ['_beginGizmoMove'](_0x460b34, _0x7d12d5, _0x903fa8) {
-    const _0x51b19d = this._getSelectionTargets(_0x7d12d5);
-    if (!_0x51b19d.length) return null;
-    const _0x569150 = this.bridge?.beginMoveGizmoDrag?.({
-      handleKey: _0x903fa8?.handleKey,
-      clientX: _0x460b34.clientX,
-      clientY: _0x460b34.clientY,
+  ['_beginGizmoMove'](clientX, value42, handleKey) {
+    const list14 = this._getSelectionTargets(value42);
+    if (!list14.length) return null;
+    const from2 = this.bridge?.beginMoveGizmoDrag?.({
+      handleKey: handleKey?.handleKey,
+      clientX: clientX.clientX,
+      clientY: clientX.clientY,
     });
-    if (!_0x569150) return null;
-    const _0x972e60 = _0x51b19d.map((_0x5ed1a2) => ({
-      objectType: _0x5ed1a2.objectType,
-      objectId: _0x5ed1a2.objectId,
-      basePose: cloneObjectPose(_0x5ed1a2.item),
+    if (!from2) return null;
+    const entries2 = list14.map((objectType7) => ({
+      objectType: objectType7.objectType,
+      objectId: objectType7.objectId,
+      basePose: cloneObjectPose(objectType7.item),
     }));
     return (
-      this.bridge?.setGizmoActiveHandle?.(_0x903fa8.handleKey),
+      this.bridge?.setGizmoActiveHandle?.(handleKey.handleKey),
       this.bridge?.setGizmoMoveGuideLine?.({
-        from: _0x569150?.pivot || { x: 0, y: 0, z: 0 },
-        to: _0x569150?.pivot || { x: 0, y: 0, z: 0 },
+        from: from2?.pivot || { x: 0, y: 0, z: 0 },
+        to: from2?.pivot || { x: 0, y: 0, z: 0 },
       }),
       {
         type: 'gizmo-move',
-        pointerId: _0x460b34.pointerId,
-        startX: _0x460b34.clientX,
-        startY: _0x460b34.clientY,
+        pointerId: clientX.pointerId,
+        startX: clientX.clientX,
+        startY: clientX.clientY,
         moved: false,
-        handleKey: _0x903fa8.handleKey,
-        dragState: _0x569150,
-        entries: _0x972e60,
+        handleKey: handleKey.handleKey,
+        dragState: from2,
+        entries: entries2,
         draftTargets: [],
       }
     );
@@ -542,847 +519,845 @@ export class PanoramaSceneInteraction {
   ['_clearGizmoMoveGuideLine']() {
     this.bridge?.clearGizmoMoveGuideLine?.();
   }
-  ['_beginGizmoRotate'](_0x17fbeb, _0x570a43, _0x5aaa0f) {
-    const _0x37f63a = this._getSelectionTargets(_0x570a43);
-    if (!_0x37f63a.length) return null;
-    const _0x22dae7 = this.bridge?.beginRotateGizmoDrag?.({
-      handleKey: _0x5aaa0f?.handleKey,
-      clientX: _0x17fbeb.clientX,
-      clientY: _0x17fbeb.clientY,
+  ['_beginGizmoRotate'](clientX2, value43, handleKey2) {
+    const list15 = this._getSelectionTargets(value43);
+    if (!list15.length) return null;
+    const dragState = this.bridge?.beginRotateGizmoDrag?.({
+      handleKey: handleKey2?.handleKey,
+      clientX: clientX2.clientX,
+      clientY: clientX2.clientY,
     });
-    if (!_0x22dae7) return null;
-    const _0x2acc98 = _0x37f63a.map((_0x166b70) => ({
-      objectType: _0x166b70.objectType,
-      objectId: _0x166b70.objectId,
-      basePose: cloneObjectPose(_0x166b70.item),
+    if (!dragState) return null;
+    const entries3 = list15.map((objectType8) => ({
+      objectType: objectType8.objectType,
+      objectId: objectType8.objectId,
+      basePose: cloneObjectPose(objectType8.item),
     }));
     return (
-      this.bridge?.setGizmoActiveHandle?.(_0x5aaa0f.handleKey),
+      this.bridge?.setGizmoActiveHandle?.(handleKey2.handleKey),
       {
         type: 'gizmo-rotate',
-        pointerId: _0x17fbeb.pointerId,
-        handleKey: _0x5aaa0f.handleKey,
-        dragState: _0x22dae7,
-        entries: _0x2acc98,
+        pointerId: clientX2.pointerId,
+        handleKey: handleKey2.handleKey,
+        dragState: dragState,
+        entries: entries3,
         moved: false,
         draftTargets: [],
       }
     );
   }
-  ['_beginGizmoScale'](_0x10cfda, _0x53aa71, _0x2e45c9) {
-    const _0x11aa63 = this._getSelectionTargets(_0x53aa71).filter(
-      (_0x156a5f) => _0x156a5f.objectType !== 'camera',
-    );
-    if (!_0x11aa63.length) return null;
-    const _0x2ce367 = this.bridge?.beginScaleGizmoDrag?.({
-      handleKey: _0x2e45c9?.handleKey,
-      clientX: _0x10cfda.clientX,
-      clientY: _0x10cfda.clientY,
+  ['_beginGizmoScale'](clientX3, value44, handleKey3) {
+    const list16 = this._getSelectionTargets(value44).filter((item16) => item16.objectType !== 'camera');
+    if (!list16.length) return null;
+    const dragState2 = this.bridge?.beginScaleGizmoDrag?.({
+      handleKey: handleKey3?.handleKey,
+      clientX: clientX3.clientX,
+      clientY: clientX3.clientY,
     });
-    if (!_0x2ce367) return null;
-    const _0x598c4f = _0x11aa63.map((_0x49e731) => ({
-      objectType: _0x49e731.objectType,
-      objectId: _0x49e731.objectId,
-      basePose: cloneObjectPose(_0x49e731.item),
-      baseScale: toScaleVector(_0x49e731.item?.scale),
+    if (!dragState2) return null;
+    const entries4 = list16.map((objectType9) => ({
+      objectType: objectType9.objectType,
+      objectId: objectType9.objectId,
+      basePose: cloneObjectPose(objectType9.item),
+      baseScale: toScaleVector(objectType9.item?.scale),
     }));
     return (
-      this.bridge?.setGizmoActiveHandle?.(_0x2e45c9.handleKey),
+      this.bridge?.setGizmoActiveHandle?.(handleKey3.handleKey),
       {
         type: 'gizmo-scale',
-        pointerId: _0x10cfda.pointerId,
-        handleKey: _0x2e45c9.handleKey,
-        dragState: _0x2ce367,
-        entries: _0x598c4f,
+        pointerId: clientX3.pointerId,
+        handleKey: handleKey3.handleKey,
+        dragState: dragState2,
+        entries: entries4,
         moved: false,
         draftTargets: [],
       }
     );
   }
-  ['_updateGizmoHover'](_0x2328fb) {
-    const _0x3ee979 = this.getSceneState?.(),
-      _0x3fa166 = this._isPanoramaMode(_0x3ee979);
-    this._syncControlsByMode(_0x3fa166);
-    if (_0x3fa166 || !_0x3ee979 || !this._isEditing(_0x3ee979) || _0x3ee979.mode !== 'scene') {
+  ['_updateGizmoHover'](event4) {
+    const enabled7 = this.getSceneState?.(),
+      value45 = this._isPanoramaMode(enabled7);
+    this._syncControlsByMode(value45);
+    if (value45 || !enabled7 || !this._isEditing(enabled7) || enabled7.mode !== 'scene') {
       this.bridge?.setGizmoHoverHandle?.(null);
       return;
     }
-    const _0x171616 =
-        _0x3ee979?.ui?.transformTool ||
-        (_0x3ee979?.ui?.activeTool === 'move' ||
-        _0x3ee979?.ui?.activeTool === 'rotate' ||
-        _0x3ee979?.ui?.activeTool === 'scale'
-          ? _0x3ee979.ui.activeTool
+    const value46 =
+        enabled7?.ui?.transformTool ||
+        (enabled7?.ui?.activeTool === 'move' ||
+        enabled7?.ui?.activeTool === 'rotate' ||
+        enabled7?.ui?.activeTool === 'scale'
+          ? enabled7.ui.activeTool
           : 'move'),
-      _0x242a41 = this._getSelectionTargets(_0x3ee979);
-    if (!_0x242a41.length) {
+      list17 = this._getSelectionTargets(enabled7);
+    if (!list17.length) {
       this.bridge?.setGizmoHoverHandle?.(null);
       return;
     }
-    if (_0x171616 !== 'move' && _0x171616 !== 'rotate' && _0x171616 !== 'scale') {
+    if (value46 !== 'move' && value46 !== 'rotate' && value46 !== 'scale') {
       this.bridge?.setGizmoHoverHandle?.(null);
       return;
     }
-    const _0x1dc898 = this.bridge?.pickGizmoHandle?.(_0x2328fb.clientX, _0x2328fb.clientY) || null;
-    this.bridge?.setGizmoHoverHandle?.(_0x1dc898?.handleKey || null);
+    const value47 = this.bridge?.pickGizmoHandle?.(event4.clientX, event4.clientY) || null;
+    this.bridge?.setGizmoHoverHandle?.(value47?.handleKey || null);
   }
-  ['_exitActiveCameraOnManualNavigate'](_0x554abf) {
-    if (!_0x554abf || _0x554abf._activeCameraExited) return;
-    const _0x1d9192 = this.getSceneState?.();
-    if (_0x1d9192?.viewport?.activeView !== 'camera' || !_0x1d9192?.viewport?.activeCameraId) {
-      _0x554abf._activeCameraExited = true;
+  ['_exitActiveCameraOnManualNavigate'](enabled8) {
+    if (!enabled8 || enabled8._activeCameraExited) return;
+    const args = this.getSceneState?.();
+    if (args?.viewport?.activeView !== 'camera' || !args?.viewport?.activeCameraId) {
+      enabled8._activeCameraExited = true;
       return;
     }
     (this.onViewCommit?.({
-      sceneView: { ..._0x1d9192.viewport.sceneView },
+      sceneView: { ...args.viewport.sceneView },
       activeView: 'default',
       activeCameraId: null,
     }),
-      (_0x554abf._activeCameraExited = true));
+      (enabled8._activeCameraExited = true));
   }
-  ['_resolveSceneNavigateGesture'](_0x116b8c) {
-    const _0x4d4fd5 = _0x116b8c.altKey === true,
-      _0x41e854 = _0x116b8c.button === 0,
-      _0x5d35ee = _0x116b8c.button === 1,
-      _0x2ab1d2 = _0x116b8c.button === 2;
-    if (_0x4d4fd5 && _0x41e854) return 'orbit-scene';
-    if (_0x4d4fd5 && _0x5d35ee) return 'pan';
-    if (_0x4d4fd5 && _0x2ab1d2) return 'dolly';
-    if (_0x5d35ee) return 'pan';
+  ['_resolveSceneNavigateGesture'](event5) {
+    const value48 = event5.altKey === true,
+      value49 = event5.button === 0,
+      value50 = event5.button === 1,
+      value51 = event5.button === 2;
+    if (value48 && value49) return 'orbit-scene';
+    if (value48 && value50) return 'pan';
+    if (value48 && value51) return 'dolly';
+    if (value50) return 'pan';
     return null;
   }
-  ['_handlePointerDown'](_0x34d63d) {
-    const _0x1cfe59 = this.getSceneState?.();
-    if (!_0x1cfe59 || !this._isEditing(_0x1cfe59)) return;
-    const _0x1f27fd = this._isPanoramaMode(_0x1cfe59);
-    (this._syncControlsByMode(_0x1f27fd), this._cancelQueuedDraftClear());
-    const _0x192f45 = _0x34d63d.button === 0,
-      _0x17c392 = _0x34d63d.button === 1,
-      _0x117935 = _0x34d63d.button === 2,
-      _0xc2e23 = _0x17c392 && _0x34d63d.ctrlKey,
-      _0x79f2e4 = _0x17c392 && _0x34d63d.shiftKey,
-      _0x4229a2 = _0x1cfe59.mode === 'scene',
-      _0x114690 = this.viewportEl.getBoundingClientRect(),
-      _0x249b46 = this._createBaseView(_0x1cfe59);
-    (this._stopEvent(_0x34d63d, { preventDefault: true }), this.viewportEl.focus?.());
-    if (_0x1f27fd) {
-      if (!_0x192f45 && !_0x17c392 && !_0x117935) return;
+  ['_handlePointerDown'](pointerId3) {
+    const enabled9 = this.getSceneState?.();
+    if (!enabled9 || !this._isEditing(enabled9)) return;
+    const value52 = this._isPanoramaMode(enabled9);
+    (this._syncControlsByMode(value52), this._cancelQueuedDraftClear());
+    const enabled10 = pointerId3.button === 0,
+      enabled11 = pointerId3.button === 1,
+      enabled12 = pointerId3.button === 2,
+      value53 = enabled11 && pointerId3.ctrlKey,
+      value54 = enabled11 && pointerId3.shiftKey,
+      value55 = enabled9.mode === 'scene',
+      rect = this.viewportEl.getBoundingClientRect(),
+      baseView = this._createBaseView(enabled9);
+    (this._stopEvent(pointerId3, { preventDefault: true }), this.viewportEl.focus?.());
+    if (value52) {
+      if (!enabled10 && !enabled11 && !enabled12) return;
       (this.bridge?.setGizmoHoverHandle?.(null),
         this._clearGizmoMoveGuideLine(),
         this.bridge?.setGizmoActiveHandle?.(null),
         (this._gesture = {
           type: 'look-panorama',
-          pointerId: _0x34d63d.pointerId,
-          startX: _0x34d63d.clientX,
-          startY: _0x34d63d.clientY,
+          pointerId: pointerId3.pointerId,
+          startX: pointerId3.clientX,
+          startY: pointerId3.clientY,
           moved: false,
-          rect: _0x114690,
-          baseView: _0x249b46,
+          rect: rect,
+          baseView: baseView,
         }),
-        this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+        this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
       return;
     }
-    if (_0x4229a2 && (_0x192f45 || _0x17c392 || _0x117935)) {
-      const _0x4a8ebc = this._resolveSceneNavigateGesture(_0x34d63d);
-      if (_0x4a8ebc) {
+    if (value55 && (enabled10 || enabled11 || enabled12)) {
+      const type = this._resolveSceneNavigateGesture(pointerId3);
+      if (type) {
         (this._clearGizmoMoveGuideLine(),
           this.bridge?.setGizmoActiveHandle?.(null),
           (this._gesture = {
-            type: _0x4a8ebc,
-            pointerId: _0x34d63d.pointerId,
-            startX: _0x34d63d.clientX,
-            startY: _0x34d63d.clientY,
+            type: type,
+            pointerId: pointerId3.pointerId,
+            startX: pointerId3.clientX,
+            startY: pointerId3.clientY,
             moved: false,
-            rect: _0x114690,
-            baseView: _0x249b46,
+            rect: rect,
+            baseView: baseView,
           }),
-          this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+          this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
         return;
       }
-      if (_0x192f45) {
-        const _0x470165 =
-            _0x1cfe59?.ui?.mouseTool ||
-            (_0x1cfe59?.ui?.activeTool === 'box-select' ? 'box-select' : 'navigate'),
-          _0x49c363 =
-            _0x1cfe59?.ui?.transformTool ||
-            (_0x1cfe59?.ui?.activeTool === 'move' ||
-            _0x1cfe59?.ui?.activeTool === 'rotate' ||
-            _0x1cfe59?.ui?.activeTool === 'scale'
-              ? _0x1cfe59.ui.activeTool
+      if (enabled10) {
+        const value56 =
+            enabled9?.ui?.mouseTool ||
+            (enabled9?.ui?.activeTool === 'box-select' ? 'box-select' : 'navigate'),
+          value57 =
+            enabled9?.ui?.transformTool ||
+            (enabled9?.ui?.activeTool === 'move' ||
+            enabled9?.ui?.activeTool === 'rotate' ||
+            enabled9?.ui?.activeTool === 'scale'
+              ? enabled9.ui.activeTool
               : 'move');
-        if (_0x49c363 === 'move' || _0x49c363 === 'rotate' || _0x49c363 === 'scale') {
-          const _0x1cc5be = this.bridge?.pickGizmoHandle?.(_0x34d63d.clientX, _0x34d63d.clientY) || null;
-          if (_0x1cc5be) {
-            if (_0x49c363 === 'move') this._gesture = this._beginGizmoMove(_0x34d63d, _0x1cfe59, _0x1cc5be);
+        if (value57 === 'move' || value57 === 'rotate' || value57 === 'scale') {
+          const value58 = this.bridge?.pickGizmoHandle?.(pointerId3.clientX, pointerId3.clientY) || null;
+          if (value58) {
+            if (value57 === 'move') this._gesture = this._beginGizmoMove(pointerId3, enabled9, value58);
             else
-              _0x49c363 === 'rotate'
-                ? (this._gesture = this._beginGizmoRotate(_0x34d63d, _0x1cfe59, _0x1cc5be))
-                : (this._gesture = this._beginGizmoScale(_0x34d63d, _0x1cfe59, _0x1cc5be));
+              value57 === 'rotate'
+                ? (this._gesture = this._beginGizmoRotate(pointerId3, enabled9, value58))
+                : (this._gesture = this._beginGizmoScale(pointerId3, enabled9, value58));
             if (this._gesture) {
-              this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId);
+              this.viewportEl.setPointerCapture?.(pointerId3.pointerId);
               return;
             }
           }
         }
-        const _0x4c1dd4 = this.bridge?.pick?.(_0x34d63d.clientX, _0x34d63d.clientY) || null,
-          _0x208ff0 = this._getObjectByPick(_0x1cfe59, _0x4c1dd4),
-          _0x57c0ce = this._getSelectionTargets(_0x1cfe59),
-          _0x3fbc29 =
-            _0x4c1dd4 && _0x208ff0
-              ? { objectType: _0x4c1dd4.objectType, objectId: _0x4c1dd4.objectId, item: _0x208ff0 }
+        const objectType10 = this.bridge?.pick?.(pointerId3.clientX, pointerId3.clientY) || null,
+          item17 = this._getObjectByPick(enabled9, objectType10),
+          list18 = this._getSelectionTargets(enabled9),
+          pickedTarget =
+            objectType10 && item17
+              ? { objectType: objectType10.objectType, objectId: objectType10.objectId, item: item17 }
               : null,
-          _0x28bc82 = _0x3fbc29
-            ? this._findGroupByMember(_0x1cfe59, _0x3fbc29.objectType, _0x3fbc29.objectId)
+          pickedGroup = pickedTarget
+            ? this._findGroupByMember(enabled9, pickedTarget.objectType, pickedTarget.objectId)
             : null;
-        let _0x46c9fe = _0x57c0ce;
-        if (_0x3fbc29) {
-          if (_0x28bc82) {
-            const _0x987d56 = this._resolveTargetsByIds(_0x1cfe59, 'mannequin', _0x28bc82.memberIds);
-            ((_0x46c9fe = _0x987d56),
-              this.onSelectionBatchChange?.('mannequin', _0x28bc82.memberIds, _0x28bc82.id));
+        let objectType11 = list18;
+        if (pickedTarget) {
+          if (pickedGroup) {
+            const value59 = this._resolveTargetsByIds(enabled9, 'mannequin', pickedGroup.memberIds);
+            ((objectType11 = value59),
+              this.onSelectionBatchChange?.('mannequin', pickedGroup.memberIds, pickedGroup.id));
           } else {
-            const _0x39e203 = new Set(
-                this._collectSelectionObjects(_0x1cfe59).map(
-                  (_0x169568) => _0x169568.objectType + ':' + _0x169568.objectId,
+            const map7 = new Set(
+                this._collectSelectionObjects(enabled9).map(
+                  (item18) => item18.objectType + ':' + item18.objectId,
                 ),
               ),
-              _0x45e895 = _0x3fbc29.objectType + ':' + _0x3fbc29.objectId;
-            !(_0x39e203.has(_0x45e895) && _0x57c0ce.length > 0) &&
-              (this.onSelectionChange?.(_0x3fbc29.objectType, _0x3fbc29.objectId), (_0x46c9fe = [_0x3fbc29]));
+              value60 = pickedTarget.objectType + ':' + pickedTarget.objectId;
+            !(map7.has(value60) && list18.length > 0) &&
+              (this.onSelectionChange?.(pickedTarget.objectType, pickedTarget.objectId),
+              (objectType11 = [pickedTarget]));
           }
         }
-        if (_0x470165 === 'box-select') {
-          const _0x5f4370 = this._getLocalPoint(_0x34d63d);
+        if (value56 === 'box-select') {
+          const startLocalX = this._getLocalPoint(pointerId3);
           ((this._gesture = {
             type: 'selection-box',
-            pointerId: _0x34d63d.pointerId,
-            startX: _0x34d63d.clientX,
-            startY: _0x34d63d.clientY,
-            startLocalX: _0x5f4370.x,
-            startLocalY: _0x5f4370.y,
-            keepSelectionOnClick: !!_0x3fbc29,
+            pointerId: pointerId3.pointerId,
+            startX: pointerId3.clientX,
+            startY: pointerId3.clientY,
+            startLocalX: startLocalX.x,
+            startLocalY: startLocalX.y,
+            keepSelectionOnClick: !!pickedTarget,
             moved: false,
           }),
-            this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+            this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
           return;
         }
-        if (_0x49c363 === 'rotate' && _0x3fbc29) {
+        if (value57 === 'rotate' && pickedTarget) {
           ((this._gesture = {
             type: 'scene-select',
-            pointerId: _0x34d63d.pointerId,
-            startX: _0x34d63d.clientX,
-            startY: _0x34d63d.clientY,
-            pickedTarget: _0x3fbc29,
-            pickedGroup: _0x28bc82,
+            pointerId: pointerId3.pointerId,
+            startX: pointerId3.clientX,
+            startY: pointerId3.clientY,
+            pickedTarget: pickedTarget,
+            pickedGroup: pickedGroup,
             selectionCommittedOnPointerDown: true,
             moved: false,
           }),
-            this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+            this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
           return;
         }
-        if (_0x3fbc29) {
+        if (pickedTarget) {
           ((this._gesture =
-            _0x46c9fe.length > 1
-              ? this._beginBatchMove(_0x34d63d, _0x46c9fe)
+            objectType11.length > 1
+              ? this._beginBatchMove(pointerId3, objectType11)
               : this._beginObjectMove(
-                  _0x34d63d,
-                  _0x1cfe59,
-                  { objectType: _0x46c9fe[0].objectType, objectId: _0x46c9fe[0].objectId },
-                  _0x46c9fe[0].item,
+                  pointerId3,
+                  enabled9,
+                  { objectType: objectType11[0].objectType, objectId: objectType11[0].objectId },
+                  objectType11[0].item,
                 )),
-            this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+            this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
           return;
         }
         (this._clearGizmoMoveGuideLine(),
           this.bridge?.setGizmoActiveHandle?.(null),
           (this._gesture = {
             type: 'orbit-scene',
-            pointerId: _0x34d63d.pointerId,
-            startX: _0x34d63d.clientX,
-            startY: _0x34d63d.clientY,
+            pointerId: pointerId3.pointerId,
+            startX: pointerId3.clientX,
+            startY: pointerId3.clientY,
             moved: false,
             clearSelectionOnClick: true,
-            rect: _0x114690,
-            baseView: _0x249b46,
+            rect: rect,
+            baseView: baseView,
           }),
-          this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+          this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
         return;
       }
     }
-    if (_0xc2e23) {
+    if (value53) {
       ((this._gesture = {
         type: 'zoom-middle',
-        pointerId: _0x34d63d.pointerId,
-        startY: _0x34d63d.clientY,
-        baseView: _0x249b46,
+        pointerId: pointerId3.pointerId,
+        startY: pointerId3.clientY,
+        baseView: baseView,
       }),
-        this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+        this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
       return;
     }
-    if (_0x79f2e4) {
+    if (value54) {
       ((this._gesture = {
-        type: _0x249b46.kind === 'panorama-default' ? 'look-panorama' : 'orbit-scene',
-        pointerId: _0x34d63d.pointerId,
-        startX: _0x34d63d.clientX,
-        startY: _0x34d63d.clientY,
+        type: baseView.kind === 'panorama-default' ? 'look-panorama' : 'orbit-scene',
+        pointerId: pointerId3.pointerId,
+        startX: pointerId3.clientX,
+        startY: pointerId3.clientY,
         moved: false,
-        rect: _0x114690,
-        baseView: _0x249b46,
+        rect: rect,
+        baseView: baseView,
       }),
-        this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+        this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
       return;
     }
-    if (_0x17c392) {
-      if (_0x249b46.kind !== 'scene-default') return;
+    if (enabled11) {
+      if (baseView.kind !== 'scene-default') return;
       ((this._gesture = {
         type: 'pan',
-        pointerId: _0x34d63d.pointerId,
-        startX: _0x34d63d.clientX,
-        startY: _0x34d63d.clientY,
+        pointerId: pointerId3.pointerId,
+        startX: pointerId3.clientX,
+        startY: pointerId3.clientY,
         moved: false,
-        rect: _0x114690,
-        baseView: _0x249b46,
+        rect: rect,
+        baseView: baseView,
       }),
-        this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+        this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
       return;
     }
-    if (!_0x192f45) return;
-    const _0x19a2a7 =
-        _0x1cfe59?.ui?.mouseTool || (_0x1cfe59?.ui?.activeTool === 'box-select' ? 'box-select' : 'navigate'),
-      _0x1f4230 =
-        _0x1cfe59?.ui?.transformTool ||
-        (_0x1cfe59?.ui?.activeTool === 'move' ||
-        _0x1cfe59?.ui?.activeTool === 'rotate' ||
-        _0x1cfe59?.ui?.activeTool === 'scale'
-          ? _0x1cfe59.ui.activeTool
+    if (!enabled10) return;
+    const value61 =
+        enabled9?.ui?.mouseTool || (enabled9?.ui?.activeTool === 'box-select' ? 'box-select' : 'navigate'),
+      value62 =
+        enabled9?.ui?.transformTool ||
+        (enabled9?.ui?.activeTool === 'move' ||
+        enabled9?.ui?.activeTool === 'rotate' ||
+        enabled9?.ui?.activeTool === 'scale'
+          ? enabled9.ui.activeTool
           : 'move'),
-      _0x370ffd = this.bridge?.pick?.(_0x34d63d.clientX, _0x34d63d.clientY) || null,
-      _0x31ce6e = this._getObjectByPick(_0x1cfe59, _0x370ffd),
-      _0x3d38fb = this._getSelectionTargets(_0x1cfe59),
-      _0x4df79b =
-        _0x370ffd && _0x31ce6e
-          ? { objectType: _0x370ffd.objectType, objectId: _0x370ffd.objectId, item: _0x31ce6e }
+      objectType12 = this.bridge?.pick?.(pointerId3.clientX, pointerId3.clientY) || null,
+      item19 = this._getObjectByPick(enabled9, objectType12),
+      list19 = this._getSelectionTargets(enabled9),
+      pickedTarget2 =
+        objectType12 && item19
+          ? { objectType: objectType12.objectType, objectId: objectType12.objectId, item: item19 }
           : null,
-      _0x421fa8 = _0x4df79b
-        ? this._findGroupByMember(_0x1cfe59, _0x4df79b.objectType, _0x4df79b.objectId)
+      pickedGroup2 = pickedTarget2
+        ? this._findGroupByMember(enabled9, pickedTarget2.objectType, pickedTarget2.objectId)
         : null;
-    let _0x193efa = _0x3d38fb;
-    if (_0x4df79b) {
-      if (_0x421fa8) {
-        const _0xea1283 = this._resolveTargetsByIds(_0x1cfe59, 'mannequin', _0x421fa8.memberIds);
-        ((_0x193efa = _0xea1283),
-          this.onSelectionBatchChange?.('mannequin', _0x421fa8.memberIds, _0x421fa8.id));
+    let objectType13 = list19;
+    if (pickedTarget2) {
+      if (pickedGroup2) {
+        const value63 = this._resolveTargetsByIds(enabled9, 'mannequin', pickedGroup2.memberIds);
+        ((objectType13 = value63),
+          this.onSelectionBatchChange?.('mannequin', pickedGroup2.memberIds, pickedGroup2.id));
       } else {
-        const _0x3ec6dd = new Set(
-            this._collectSelectionObjects(_0x1cfe59).map(
-              (_0x4da906) => _0x4da906.objectType + ':' + _0x4da906.objectId,
+        const map8 = new Set(
+            this._collectSelectionObjects(enabled9).map(
+              (item20) => item20.objectType + ':' + item20.objectId,
             ),
           ),
-          _0x28a9de = _0x4df79b.objectType + ':' + _0x4df79b.objectId;
-        !(_0x3ec6dd.has(_0x28a9de) && _0x3d38fb.length > 0) &&
-          (this.onSelectionChange?.(_0x4df79b.objectType, _0x4df79b.objectId), (_0x193efa = [_0x4df79b]));
+          value64 = pickedTarget2.objectType + ':' + pickedTarget2.objectId;
+        !(map8.has(value64) && list19.length > 0) &&
+          (this.onSelectionChange?.(pickedTarget2.objectType, pickedTarget2.objectId),
+          (objectType13 = [pickedTarget2]));
       }
     }
-    const _0x483c44 = _0x4df79b ? _0x1f4230 : _0x19a2a7;
-    if (_0x483c44 === 'move' && _0x193efa.length > 0) {
+    const value65 = pickedTarget2 ? value62 : value61;
+    if (value65 === 'move' && objectType13.length > 0) {
       ((this._gesture =
-        _0x193efa.length > 1
-          ? this._beginBatchMove(_0x34d63d, _0x193efa)
+        objectType13.length > 1
+          ? this._beginBatchMove(pointerId3, objectType13)
           : this._beginObjectMove(
-              _0x34d63d,
-              _0x1cfe59,
-              { objectType: _0x193efa[0].objectType, objectId: _0x193efa[0].objectId },
-              _0x193efa[0].item,
+              pointerId3,
+              enabled9,
+              { objectType: objectType13[0].objectType, objectId: objectType13[0].objectId },
+              objectType13[0].item,
             )),
-        this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+        this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
       return;
     }
-    if (_0x483c44 === 'rotate' && _0x193efa.length > 0) {
+    if (value65 === 'rotate' && objectType13.length > 0) {
       ((this._gesture = {
         type: 'scene-select',
-        pointerId: _0x34d63d.pointerId,
-        startX: _0x34d63d.clientX,
-        startY: _0x34d63d.clientY,
-        pickedTarget: _0x4df79b,
-        pickedGroup: _0x421fa8,
+        pointerId: pointerId3.pointerId,
+        startX: pointerId3.clientX,
+        startY: pointerId3.clientY,
+        pickedTarget: pickedTarget2,
+        pickedGroup: pickedGroup2,
         selectionCommittedOnPointerDown: true,
         moved: false,
       }),
-        this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+        this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
       return;
     }
-    if (_0x483c44 === 'scale' && _0x193efa.length > 0) {
-      const _0x3b0974 = _0x193efa.filter((_0x3c4139) => _0x3c4139.objectType !== 'camera');
-      if (_0x3b0974.length === 0) return;
-      if (_0x3b0974.length > 1) {
-        const _0x447c6c = _0x3b0974.map((_0x2cd8ff) => ({
-            objectType: _0x2cd8ff.objectType,
-            objectId: _0x2cd8ff.objectId,
-            basePose: cloneObjectPose(_0x2cd8ff.item),
+    if (value65 === 'scale' && objectType13.length > 0) {
+      const objectType14 = objectType13.filter((item21) => item21.objectType !== 'camera');
+      if (objectType14.length === 0) return;
+      if (objectType14.length > 1) {
+        const entries5 = objectType14.map((objectType15) => ({
+            objectType: objectType15.objectType,
+            objectId: objectType15.objectId,
+            basePose: cloneObjectPose(objectType15.item),
           })),
-          _0x146f5b = _0x447c6c.reduce(
-            (_0x1bfd98, _0x54fc60) => {
+          center = entries5.reduce(
+            (box12, value66) => {
               return (
-                (_0x1bfd98.x += _0x54fc60.basePose.position.x),
-                (_0x1bfd98.z += _0x54fc60.basePose.position.z),
-                _0x1bfd98
+                (box12.x += value66.basePose.position.x),
+                (box12.z += value66.basePose.position.z),
+                box12
               );
             },
             { x: 0, z: 0 },
           );
-        ((_0x146f5b.x /= _0x447c6c.length),
-          (_0x146f5b.z /= _0x447c6c.length),
+        ((center.x /= entries5.length),
+          (center.z /= entries5.length),
           (this._gesture = {
             type: 'object-scale-batch',
-            pointerId: _0x34d63d.pointerId,
-            startX: _0x34d63d.clientX,
-            rect: _0x114690,
-            center: _0x146f5b,
-            entries: _0x447c6c,
+            pointerId: pointerId3.pointerId,
+            startX: pointerId3.clientX,
+            rect: rect,
+            center: center,
+            entries: entries5,
             moved: false,
           }));
       } else
         this._gesture = {
           type: 'object-scale',
-          pointerId: _0x34d63d.pointerId,
-          startX: _0x34d63d.clientX,
-          objectType: _0x3b0974[0].objectType,
-          objectId: _0x3b0974[0].objectId,
-          rect: _0x114690,
-          basePose: cloneObjectPose(_0x3b0974[0].item),
+          pointerId: pointerId3.pointerId,
+          startX: pointerId3.clientX,
+          objectType: objectType14[0].objectType,
+          objectId: objectType14[0].objectId,
+          rect: rect,
+          basePose: cloneObjectPose(objectType14[0].item),
           moved: false,
         };
-      this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId);
+      this.viewportEl.setPointerCapture?.(pointerId3.pointerId);
       return;
     }
-    if (_0x483c44 === 'box-select') {
-      _0x4df79b &&
-        (_0x421fa8
-          ? this.onSelectionBatchChange?.('mannequin', _0x421fa8.memberIds, _0x421fa8.id)
-          : this.onSelectionChange?.(_0x4df79b.objectType, _0x4df79b.objectId));
+    if (value65 === 'box-select') {
+      pickedTarget2 &&
+        (pickedGroup2
+          ? this.onSelectionBatchChange?.('mannequin', pickedGroup2.memberIds, pickedGroup2.id)
+          : this.onSelectionChange?.(pickedTarget2.objectType, pickedTarget2.objectId));
       ((this._gesture = {
         type: 'selection-box',
-        pointerId: _0x34d63d.pointerId,
-        startX: _0x34d63d.clientX,
-        startY: _0x34d63d.clientY,
-        startLocalX: this._getLocalPoint(_0x34d63d).x,
-        startLocalY: this._getLocalPoint(_0x34d63d).y,
-        keepSelectionOnClick: !!_0x4df79b,
+        pointerId: pointerId3.pointerId,
+        startX: pointerId3.clientX,
+        startY: pointerId3.clientY,
+        startLocalX: this._getLocalPoint(pointerId3).x,
+        startLocalY: this._getLocalPoint(pointerId3).y,
+        keepSelectionOnClick: !!pickedTarget2,
         moved: false,
       }),
-        this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+        this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
       return;
     }
-    if (_0x483c44 === 'navigate') {
-      if (_0x370ffd && _0x31ce6e) {
-        _0x193efa.length > 1
-          ? (this._gesture = this._beginBatchMove(_0x34d63d, _0x193efa))
-          : (this.onSelectionChange?.(_0x370ffd.objectType, _0x370ffd.objectId),
-            (this._gesture = this._beginObjectMove(_0x34d63d, _0x1cfe59, _0x370ffd, _0x31ce6e)));
-        this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId);
+    if (value65 === 'navigate') {
+      if (objectType12 && item19) {
+        objectType13.length > 1
+          ? (this._gesture = this._beginBatchMove(pointerId3, objectType13))
+          : (this.onSelectionChange?.(objectType12.objectType, objectType12.objectId),
+            (this._gesture = this._beginObjectMove(pointerId3, enabled9, objectType12, item19)));
+        this.viewportEl.setPointerCapture?.(pointerId3.pointerId);
         return;
       }
       ((this._gesture = {
-        type: _0x249b46.kind === 'panorama-default' ? 'look-panorama' : 'orbit-scene',
-        pointerId: _0x34d63d.pointerId,
-        startX: _0x34d63d.clientX,
-        startY: _0x34d63d.clientY,
-        rect: _0x114690,
-        baseView: _0x249b46,
+        type: baseView.kind === 'panorama-default' ? 'look-panorama' : 'orbit-scene',
+        pointerId: pointerId3.pointerId,
+        startX: pointerId3.clientX,
+        startY: pointerId3.clientY,
+        rect: rect,
+        baseView: baseView,
         moved: false,
       }),
-        this.viewportEl.setPointerCapture?.(_0x34d63d.pointerId));
+        this.viewportEl.setPointerCapture?.(pointerId3.pointerId));
     }
   }
-  ['_handlePointerMove'](_0x13618e) {
+  ['_handlePointerMove'](event6) {
     if (!this._gesture) {
-      this._updateGizmoHover(_0x13618e);
+      this._updateGizmoHover(event6);
       return;
     }
-    if (_0x13618e.pointerId !== this._gesture.pointerId) return;
-    this._stopEvent(_0x13618e, { preventDefault: true });
-    const _0x170f9b = this._gesture;
-    if (_0x170f9b.type === 'orbit-scene') {
-      const _0x230e4f = _0x13618e.clientX - _0x170f9b.startX,
-        _0x4898e0 = _0x13618e.clientY - _0x170f9b.startY,
-        _0x5e10af = Math.hypot(_0x230e4f, _0x4898e0) >= MOVE_THRESHOLD;
-      !_0x170f9b.moved && _0x5e10af && this._exitActiveCameraOnManualNavigate(_0x170f9b);
-      ((_0x170f9b.moved = _0x170f9b.moved || _0x5e10af), this.bridge?.markViewSmoothingWindow?.());
-      const _0x8055bb = applyOrbitDelta(_0x170f9b.baseView.sceneView, _0x230e4f, _0x4898e0, _0x170f9b.rect);
-      ((_0x170f9b.draftView = { ..._0x170f9b.baseView.sceneView, ..._0x8055bb }),
-        this.bridge?.setDraftView?.({ kind: 'scene-default', sceneView: _0x170f9b.draftView }));
+    if (event6.pointerId !== this._gesture.pointerId) return;
+    this._stopEvent(event6, { preventDefault: true });
+    const sceneView2 = this._gesture;
+    if (sceneView2.type === 'orbit-scene') {
+      const value67 = event6.clientX - sceneView2.startX,
+        value68 = event6.clientY - sceneView2.startY,
+        value69 = Math.hypot(value67, value68) >= MOVE_THRESHOLD;
+      !sceneView2.moved && value69 && this._exitActiveCameraOnManualNavigate(sceneView2);
+      ((sceneView2.moved = sceneView2.moved || value69), this.bridge?.markViewSmoothingWindow?.());
+      const args2 = applyOrbitDelta(sceneView2.baseView.sceneView, value67, value68, sceneView2.rect);
+      ((sceneView2.draftView = { ...sceneView2.baseView.sceneView, ...args2 }),
+        this.bridge?.setDraftView?.({ kind: 'scene-default', sceneView: sceneView2.draftView }));
       return;
     }
-    if (_0x170f9b.type === 'look-panorama') {
-      const _0x365ccf = _0x13618e.clientX - _0x170f9b.startX,
-        _0x2c3693 = _0x13618e.clientY - _0x170f9b.startY,
-        _0x4b88ad = Math.hypot(_0x365ccf, _0x2c3693) >= MOVE_THRESHOLD;
-      !_0x170f9b.moved && _0x4b88ad && this._exitActiveCameraOnManualNavigate(_0x170f9b);
-      ((_0x170f9b.moved = _0x170f9b.moved || _0x4b88ad), this.bridge?.markViewSmoothingWindow?.());
-      const _0xaf61d4 = applyPanoramaLookDelta(
-        _0x170f9b.baseView.panoramaView,
-        _0x365ccf,
-        -_0x2c3693,
-        _0x170f9b.rect,
+    if (sceneView2.type === 'look-panorama') {
+      const value70 = event6.clientX - sceneView2.startX,
+        value71 = event6.clientY - sceneView2.startY,
+        value72 = Math.hypot(value70, value71) >= MOVE_THRESHOLD;
+      !sceneView2.moved && value72 && this._exitActiveCameraOnManualNavigate(sceneView2);
+      ((sceneView2.moved = sceneView2.moved || value72), this.bridge?.markViewSmoothingWindow?.());
+      const args3 = applyPanoramaLookDelta(
+        sceneView2.baseView.panoramaView,
+        value70,
+        -value71,
+        sceneView2.rect,
       );
-      ((_0x170f9b.draftView = { ..._0x170f9b.baseView.panoramaView, ..._0xaf61d4 }),
-        this.bridge?.setDraftView?.({ kind: 'panorama-default', panoramaView: _0x170f9b.draftView }));
+      ((sceneView2.draftView = { ...sceneView2.baseView.panoramaView, ...args3 }),
+        this.bridge?.setDraftView?.({ kind: 'panorama-default', panoramaView: sceneView2.draftView }));
       return;
     }
-    if (_0x170f9b.type === 'pan') {
-      const _0x505945 = _0x13618e.clientX - _0x170f9b.startX,
-        _0x551351 = _0x13618e.clientY - _0x170f9b.startY,
-        _0x1aa5f9 = Math.hypot(_0x505945, _0x551351) >= MOVE_THRESHOLD;
-      !_0x170f9b.moved && _0x1aa5f9 && this._exitActiveCameraOnManualNavigate(_0x170f9b);
-      ((_0x170f9b.moved = _0x170f9b.moved || _0x1aa5f9), this.bridge?.markViewSmoothingWindow?.());
-      const _0x35bef6 = applyScenePanDelta(
-        _0x170f9b.baseView.sceneView,
-        _0x170f9b.baseView.currentPose,
-        _0x505945,
-        _0x551351,
-        _0x170f9b.rect,
+    if (sceneView2.type === 'pan') {
+      const value73 = event6.clientX - sceneView2.startX,
+        value74 = event6.clientY - sceneView2.startY,
+        value75 = Math.hypot(value73, value74) >= MOVE_THRESHOLD;
+      !sceneView2.moved && value75 && this._exitActiveCameraOnManualNavigate(sceneView2);
+      ((sceneView2.moved = sceneView2.moved || value75), this.bridge?.markViewSmoothingWindow?.());
+      const args4 = applyScenePanDelta(
+        sceneView2.baseView.sceneView,
+        sceneView2.baseView.currentPose,
+        value73,
+        value74,
+        sceneView2.rect,
       );
-      ((_0x170f9b.draftView = { ..._0x170f9b.baseView.sceneView, ..._0x35bef6 }),
-        this.bridge?.setDraftView?.({ kind: 'scene-default', sceneView: _0x170f9b.draftView }));
+      ((sceneView2.draftView = { ...sceneView2.baseView.sceneView, ...args4 }),
+        this.bridge?.setDraftView?.({ kind: 'scene-default', sceneView: sceneView2.draftView }));
       return;
     }
-    if (_0x170f9b.type === 'dolly') {
-      const _0x216999 = Math.abs(_0x13618e.clientY - _0x170f9b.startY) >= MOVE_THRESHOLD;
-      !_0x170f9b.moved && _0x216999 && this._exitActiveCameraOnManualNavigate(_0x170f9b);
-      _0x170f9b.moved = _0x170f9b.moved || _0x216999;
-      const _0x36d2f0 = (_0x13618e.clientY - _0x170f9b.startY) * 8;
+    if (sceneView2.type === 'dolly') {
+      const value76 = Math.abs(event6.clientY - sceneView2.startY) >= MOVE_THRESHOLD;
+      !sceneView2.moved && value76 && this._exitActiveCameraOnManualNavigate(sceneView2);
+      sceneView2.moved = sceneView2.moved || value76;
+      const value77 = (event6.clientY - sceneView2.startY) * 8;
       this.bridge?.markViewSmoothingWindow?.();
-      const _0x2e3742 = applySceneDollyDelta(_0x170f9b.baseView.sceneView, _0x36d2f0);
-      ((_0x170f9b.draftView = { ..._0x170f9b.baseView.sceneView, ..._0x2e3742 }),
-        this.bridge?.setDraftView?.({ kind: 'scene-default', sceneView: _0x170f9b.draftView }));
+      const args5 = applySceneDollyDelta(sceneView2.baseView.sceneView, value77);
+      ((sceneView2.draftView = { ...sceneView2.baseView.sceneView, ...args5 }),
+        this.bridge?.setDraftView?.({ kind: 'scene-default', sceneView: sceneView2.draftView }));
       return;
     }
-    if (_0x170f9b.type === 'zoom-middle') {
-      const _0x45cc1b = Math.abs(_0x13618e.clientY - _0x170f9b.startY) >= MOVE_THRESHOLD;
-      !_0x170f9b.moved && _0x45cc1b && this._exitActiveCameraOnManualNavigate(_0x170f9b);
-      _0x170f9b.moved = _0x170f9b.moved || _0x45cc1b;
-      const _0x345018 = (_0x13618e.clientY - _0x170f9b.startY) * 8;
+    if (sceneView2.type === 'zoom-middle') {
+      const value78 = Math.abs(event6.clientY - sceneView2.startY) >= MOVE_THRESHOLD;
+      !sceneView2.moved && value78 && this._exitActiveCameraOnManualNavigate(sceneView2);
+      sceneView2.moved = sceneView2.moved || value78;
+      const value79 = (event6.clientY - sceneView2.startY) * 8;
       this.bridge?.markViewSmoothingWindow?.();
-      if (_0x170f9b.baseView.kind === 'panorama-default') {
-        const _0x19b8d5 = applyPanoramaZoomDelta(_0x170f9b.baseView.panoramaView, _0x345018);
-        ((_0x170f9b.draftView = { ..._0x170f9b.baseView.panoramaView, ..._0x19b8d5 }),
-          this.bridge?.setDraftView?.({ kind: 'panorama-default', panoramaView: _0x170f9b.draftView }));
+      if (sceneView2.baseView.kind === 'panorama-default') {
+        const args6 = applyPanoramaZoomDelta(sceneView2.baseView.panoramaView, value79);
+        ((sceneView2.draftView = { ...sceneView2.baseView.panoramaView, ...args6 }),
+          this.bridge?.setDraftView?.({ kind: 'panorama-default', panoramaView: sceneView2.draftView }));
       } else {
-        const _0x3071c0 = applySceneZoomDelta(_0x170f9b.baseView.sceneView, _0x345018);
-        ((_0x170f9b.draftView = { ..._0x170f9b.baseView.sceneView, ..._0x3071c0 }),
-          this.bridge?.setDraftView?.({ kind: 'scene-default', sceneView: _0x170f9b.draftView }));
+        const args7 = applySceneZoomDelta(sceneView2.baseView.sceneView, value79);
+        ((sceneView2.draftView = { ...sceneView2.baseView.sceneView, ...args7 }),
+          this.bridge?.setDraftView?.({ kind: 'scene-default', sceneView: sceneView2.draftView }));
       }
       return;
     }
-    if (_0x170f9b.type === 'selection-box') {
-      const _0x1e4986 = _0x13618e.clientX - _0x170f9b.startX,
-        _0x370b04 = _0x13618e.clientY - _0x170f9b.startY;
-      _0x170f9b.moved = _0x170f9b.moved || Math.hypot(_0x1e4986, _0x370b04) >= MOVE_THRESHOLD;
-      const _0x217752 = this._getLocalPoint(_0x13618e);
-      this._updateSelectionBox(_0x170f9b.startLocalX, _0x170f9b.startLocalY, _0x217752.x, _0x217752.y);
+    if (sceneView2.type === 'selection-box') {
+      const value80 = event6.clientX - sceneView2.startX,
+        value81 = event6.clientY - sceneView2.startY;
+      sceneView2.moved = sceneView2.moved || Math.hypot(value80, value81) >= MOVE_THRESHOLD;
+      const box13 = this._getLocalPoint(event6);
+      this._updateSelectionBox(sceneView2.startLocalX, sceneView2.startLocalY, box13.x, box13.y);
       return;
     }
-    if (_0x170f9b.type === 'scene-select') {
-      const _0x2e939a = _0x13618e.clientX - _0x170f9b.startX,
-        _0x3222dd = _0x13618e.clientY - _0x170f9b.startY,
-        _0x53ab78 = Math.hypot(_0x2e939a, _0x3222dd) >= MOVE_THRESHOLD;
-      _0x170f9b.moved = _0x170f9b.moved || _0x53ab78;
-      if (!_0x170f9b.pickedTarget && _0x53ab78) {
-        const _0x25ab47 = this._getLocalPoint(_0x13618e);
-        (this._updateSelectionBox(_0x170f9b.startLocalX, _0x170f9b.startLocalY, _0x25ab47.x, _0x25ab47.y),
-          (_0x170f9b.type = 'selection-box'),
-          (_0x170f9b.keepSelectionOnClick = false));
+    if (sceneView2.type === 'scene-select') {
+      const value82 = event6.clientX - sceneView2.startX,
+        value83 = event6.clientY - sceneView2.startY,
+        value84 = Math.hypot(value82, value83) >= MOVE_THRESHOLD;
+      sceneView2.moved = sceneView2.moved || value84;
+      if (!sceneView2.pickedTarget && value84) {
+        const box14 = this._getLocalPoint(event6);
+        (this._updateSelectionBox(sceneView2.startLocalX, sceneView2.startLocalY, box14.x, box14.y),
+          (sceneView2.type = 'selection-box'),
+          (sceneView2.keepSelectionOnClick = false));
       }
       return;
     }
-    if (_0x170f9b.type === 'gizmo-move') {
-      const _0x2eb90c = this.bridge?.sampleMoveGizmoDragPoint?.(
-        _0x170f9b.dragState,
-        _0x13618e.clientX,
-        _0x13618e.clientY,
+    if (sceneView2.type === 'gizmo-move') {
+      const enabled13 = this.bridge?.sampleMoveGizmoDragPoint?.(
+        sceneView2.dragState,
+        event6.clientX,
+        event6.clientY,
       );
-      if (!_0x2eb90c) return;
-      const _0x342538 = this.bridge?.computeMoveGizmoDelta?.(_0x170f9b.dragState, _0x2eb90c);
-      if (!_0x342538) return;
+      if (!enabled13) return;
+      const box15 = this.bridge?.computeMoveGizmoDelta?.(sceneView2.dragState, enabled13);
+      if (!box15) return;
       this.bridge?.setGizmoMoveGuideLine?.({
-        from: _0x170f9b.dragState?.pivot || { x: 0, y: 0, z: 0 },
-        to: addVector3Like(_0x170f9b.dragState?.pivot, _0x342538),
+        from: sceneView2.dragState?.pivot || { x: 0, y: 0, z: 0 },
+        to: addVector3Like(sceneView2.dragState?.pivot, box15),
       });
-      const _0x268c3f = Math.hypot(_0x342538.x || 0, _0x342538.y || 0, _0x342538.z || 0);
-      ((_0x170f9b.moved = _0x170f9b.moved || _0x268c3f >= 0.0001),
-        (_0x170f9b.draftTargets = _0x170f9b.entries.map((_0x76367f) => {
-          const _0x30bb9d = {
-            ..._0x76367f.basePose,
+      const count5 = Math.hypot(box15.x || 0, box15.y || 0, box15.z || 0);
+      ((sceneView2.moved = sceneView2.moved || count5 >= 0.0001),
+        (sceneView2.draftTargets = sceneView2.entries.map((x12) => {
+          const pose = {
+            ...x12.basePose,
             position: {
-              x: _0x76367f.basePose.position.x + (_0x342538.x || 0),
-              y: _0x76367f.basePose.position.y + (_0x342538.y || 0),
-              z: _0x76367f.basePose.position.z + (_0x342538.z || 0),
+              x: x12.basePose.position.x + (box15.x || 0),
+              y: x12.basePose.position.y + (box15.y || 0),
+              z: x12.basePose.position.z + (box15.z || 0),
             },
           };
           return (
-            this.bridge?.setDraftObjectTransform?.(_0x76367f.objectType, _0x76367f.objectId, _0x30bb9d),
-            { objectType: _0x76367f.objectType, objectId: _0x76367f.objectId, pose: _0x30bb9d }
+            this.bridge?.setDraftObjectTransform?.(x12.objectType, x12.objectId, pose),
+            { objectType: x12.objectType, objectId: x12.objectId, pose: pose }
           );
         })));
       return;
     }
-    if (_0x170f9b.type === 'gizmo-rotate') {
-      const _0x4c1623 = this.bridge?.sampleMoveGizmoDragPoint?.(
-        _0x170f9b.dragState,
-        _0x13618e.clientX,
-        _0x13618e.clientY,
+    if (sceneView2.type === 'gizmo-rotate') {
+      const enabled14 = this.bridge?.sampleMoveGizmoDragPoint?.(
+        sceneView2.dragState,
+        event6.clientX,
+        event6.clientY,
       );
-      if (!_0x4c1623) return;
-      const _0x1553ce = this.bridge?.computeRotateGizmoAngle?.(_0x170f9b.dragState, _0x4c1623) || 0;
-      _0x170f9b.moved = _0x170f9b.moved || Math.abs(_0x1553ce) >= 0.0001;
-      if (!_0x170f9b.dragState?.axisWorld || !_0x170f9b.dragState?.pivot) return;
-      _0x170f9b.draftTargets = _0x170f9b.entries.map((_0x3e3a0e) => {
-        const _0x56af00 = rotatePoseAroundWorldAxis(
-            _0x3e3a0e.basePose,
-            _0x170f9b.dragState.axisWorld,
-            _0x1553ce,
-            _0x170f9b.dragState.pivot,
+      if (!enabled14) return;
+      const value85 = this.bridge?.computeRotateGizmoAngle?.(sceneView2.dragState, enabled14) || 0;
+      sceneView2.moved = sceneView2.moved || Math.abs(value85) >= 0.0001;
+      if (!sceneView2.dragState?.axisWorld || !sceneView2.dragState?.pivot) return;
+      sceneView2.draftTargets = sceneView2.entries.map((objectType16) => {
+        const position = rotatePoseAroundWorldAxis(
+            objectType16.basePose,
+            sceneView2.dragState.axisWorld,
+            value85,
+            sceneView2.dragState.pivot,
           ),
-          _0x10898c = {
-            ..._0x3e3a0e.basePose,
-            position: _0x56af00.position,
-            rotation: _0x56af00.rotation,
-            quaternion: _0x56af00.quaternion,
+          pose2 = {
+            ...objectType16.basePose,
+            position: position.position,
+            rotation: position.rotation,
+            quaternion: position.quaternion,
           };
         return (
-          this.bridge?.setDraftObjectTransform?.(_0x3e3a0e.objectType, _0x3e3a0e.objectId, _0x10898c),
-          { objectType: _0x3e3a0e.objectType, objectId: _0x3e3a0e.objectId, pose: _0x10898c }
+          this.bridge?.setDraftObjectTransform?.(objectType16.objectType, objectType16.objectId, pose2),
+          { objectType: objectType16.objectType, objectId: objectType16.objectId, pose: pose2 }
         );
       });
       return;
     }
-    if (_0x170f9b.type === 'gizmo-scale') {
-      const _0x10a882 = this.bridge?.sampleMoveGizmoDragPoint?.(
-        _0x170f9b.dragState,
-        _0x13618e.clientX,
-        _0x13618e.clientY,
+    if (sceneView2.type === 'gizmo-scale') {
+      const enabled15 = this.bridge?.sampleMoveGizmoDragPoint?.(
+        sceneView2.dragState,
+        event6.clientX,
+        event6.clientY,
       );
-      if (!_0x10a882) return;
-      const _0x1b5bb6 = this.bridge?.computeScaleGizmoFactor?.(_0x170f9b.dragState, _0x10a882) || 1;
-      _0x170f9b.moved = _0x170f9b.moved || Math.abs(_0x1b5bb6 - 1) >= 0.0001;
-      const _0xa18c01 = String(_0x170f9b.dragState?.handleKey || '').slice(-1);
-      _0x170f9b.draftTargets = _0x170f9b.entries.map((_0x4c34b3) => {
-        const _0x52d2a5 = toScaleVector(_0x4c34b3.baseScale);
-        let _0x592c8e = { ..._0x52d2a5 };
-        if (_0x170f9b.dragState?.mode === 'scale-uniform')
-          _0x592c8e = {
-            x: Math.max(0.01, _0x52d2a5.x * _0x1b5bb6),
-            y: Math.max(0.01, _0x52d2a5.y * _0x1b5bb6),
-            z: Math.max(0.01, _0x52d2a5.z * _0x1b5bb6),
+      if (!enabled15) return;
+      const value86 = this.bridge?.computeScaleGizmoFactor?.(sceneView2.dragState, enabled15) || 1;
+      sceneView2.moved = sceneView2.moved || Math.abs(value86 - 1) >= 0.0001;
+      const value87 = String(sceneView2.dragState?.handleKey || '').slice(-1);
+      sceneView2.draftTargets = sceneView2.entries.map((x13) => {
+        const box16 = toScaleVector(x13.baseScale);
+        let value88 = { ...box16 };
+        if (sceneView2.dragState?.mode === 'scale-uniform')
+          value88 = {
+            x: Math.max(0.01, box16.x * value86),
+            y: Math.max(0.01, box16.y * value86),
+            z: Math.max(0.01, box16.z * value86),
           };
         else
-          (_0xa18c01 === 'x' || _0xa18c01 === 'y' || _0xa18c01 === 'z') &&
-            (_0x592c8e[_0xa18c01] = Math.max(0.01, _0x52d2a5[_0xa18c01] * _0x1b5bb6));
-        const _0x4458ab =
-            _0x170f9b.dragState?.mode === 'scale-axis'
+          (value87 === 'x' || value87 === 'y' || value87 === 'z') &&
+            (value88[value87] = Math.max(0.01, box16[value87] * value86));
+        const position2 =
+            sceneView2.dragState?.mode === 'scale-axis'
               ? {
-                  x: _0x4c34b3.basePose.position.x,
-                  y: _0x4c34b3.basePose.position.y,
-                  z: _0x4c34b3.basePose.position.z,
+                  x: x13.basePose.position.x,
+                  y: x13.basePose.position.y,
+                  z: x13.basePose.position.z,
                 }
-              : _0x170f9b.dragState?.pivot
-                ? scalePositionAroundPivot(
-                    _0x4c34b3.basePose.position,
-                    _0x170f9b.dragState?.pivot,
-                    _0x1b5bb6,
-                    null,
-                  )
+              : sceneView2.dragState?.pivot
+                ? scalePositionAroundPivot(x13.basePose.position, sceneView2.dragState?.pivot, value86, null)
                 : {
-                    x: _0x4c34b3.basePose.position.x,
-                    y: _0x4c34b3.basePose.position.y,
-                    z: _0x4c34b3.basePose.position.z,
+                    x: x13.basePose.position.x,
+                    y: x13.basePose.position.y,
+                    z: x13.basePose.position.z,
                   },
-          _0x3cdcf8 = { ..._0x4c34b3.basePose, position: _0x4458ab, scale: toCompatibleScale(_0x592c8e) };
+          pose3 = { ...x13.basePose, position: position2, scale: toCompatibleScale(value88) };
         return (
-          this.bridge?.setDraftObjectTransform?.(_0x4c34b3.objectType, _0x4c34b3.objectId, _0x3cdcf8),
-          { objectType: _0x4c34b3.objectType, objectId: _0x4c34b3.objectId, pose: _0x3cdcf8 }
+          this.bridge?.setDraftObjectTransform?.(x13.objectType, x13.objectId, pose3),
+          { objectType: x13.objectType, objectId: x13.objectId, pose: pose3 }
         );
       });
       return;
     }
-    if (_0x170f9b.type === 'object-move') {
-      const _0x3ef063 = this.bridge?.intersectGround?.(_0x13618e.clientX, _0x13618e.clientY, 0);
-      if (_0x3ef063)
-        ((_0x170f9b.moved = true),
-          (_0x170f9b.draftPose = {
-            ..._0x170f9b.basePose,
+    if (sceneView2.type === 'object-move') {
+      const x14 = this.bridge?.intersectGround?.(event6.clientX, event6.clientY, 0);
+      if (x14)
+        ((sceneView2.moved = true),
+          (sceneView2.draftPose = {
+            ...sceneView2.basePose,
             position: {
-              x: _0x3ef063.x - _0x170f9b.offset.x,
-              y: _0x170f9b.basePose.position.y,
-              z: _0x3ef063.z - _0x170f9b.offset.z,
+              x: x14.x - sceneView2.offset.x,
+              y: sceneView2.basePose.position.y,
+              z: x14.z - sceneView2.offset.z,
             },
           }));
       else {
-        const _0x283cdb = _0x13618e.clientX - _0x170f9b.startX,
-          _0x237786 = _0x13618e.clientY - _0x170f9b.startY;
-        ((_0x170f9b.moved = Math.hypot(_0x283cdb, _0x237786) >= 1),
-          (_0x170f9b.draftPose = {
-            ..._0x170f9b.basePose,
+        const value89 = event6.clientX - sceneView2.startX,
+          value90 = event6.clientY - sceneView2.startY;
+        ((sceneView2.moved = Math.hypot(value89, value90) >= 1),
+          (sceneView2.draftPose = {
+            ...sceneView2.basePose,
             position: {
-              x: _0x170f9b.basePose.position.x + _0x283cdb * 0.01,
-              y: _0x170f9b.basePose.position.y,
-              z: _0x170f9b.basePose.position.z - _0x237786 * 0.01,
+              x: sceneView2.basePose.position.x + value89 * 0.01,
+              y: sceneView2.basePose.position.y,
+              z: sceneView2.basePose.position.z - value90 * 0.01,
             },
           }));
       }
-      this.bridge?.setDraftObjectTransform?.(_0x170f9b.objectType, _0x170f9b.objectId, _0x170f9b.draftPose);
+      this.bridge?.setDraftObjectTransform?.(
+        sceneView2.objectType,
+        sceneView2.objectId,
+        sceneView2.draftPose,
+      );
       return;
     }
-    if (_0x170f9b.type === 'object-move-batch') {
-      const _0x2b150a = this.bridge?.intersectGround?.(_0x13618e.clientX, _0x13618e.clientY, 0);
-      let _0x117abb = _0x170f9b.baseCenter;
-      if (_0x2b150a)
-        ((_0x170f9b.moved = true),
-          (_0x117abb = {
-            x: _0x2b150a.x - _0x170f9b.pointerOffset.x,
-            z: _0x2b150a.z - _0x170f9b.pointerOffset.z,
+    if (sceneView2.type === 'object-move-batch') {
+      const x15 = this.bridge?.intersectGround?.(event6.clientX, event6.clientY, 0);
+      let x16 = sceneView2.baseCenter;
+      if (x15)
+        ((sceneView2.moved = true),
+          (x16 = {
+            x: x15.x - sceneView2.pointerOffset.x,
+            z: x15.z - sceneView2.pointerOffset.z,
           }));
       else {
-        const _0x3449df = _0x13618e.clientX - _0x170f9b.startX,
-          _0x4395a2 = _0x13618e.clientY - _0x170f9b.startY;
-        ((_0x170f9b.moved = Math.hypot(_0x3449df, _0x4395a2) >= 1),
-          (_0x117abb = {
-            x: _0x170f9b.baseCenter.x + _0x3449df * 0.01,
-            z: _0x170f9b.baseCenter.z - _0x4395a2 * 0.01,
+        const value91 = event6.clientX - sceneView2.startX,
+          value92 = event6.clientY - sceneView2.startY;
+        ((sceneView2.moved = Math.hypot(value91, value92) >= 1),
+          (x16 = {
+            x: sceneView2.baseCenter.x + value91 * 0.01,
+            z: sceneView2.baseCenter.z - value92 * 0.01,
           }));
       }
-      _0x170f9b.draftTargets = _0x170f9b.entries.map((_0x3c52ab) => {
-        const _0x3dd61d = {
-          ..._0x3c52ab.pose,
+      sceneView2.draftTargets = sceneView2.entries.map((y2) => {
+        const pose4 = {
+          ...y2.pose,
           position: {
-            x: _0x117abb.x + _0x3c52ab.offset.x,
-            y: _0x3c52ab.pose.position.y,
-            z: _0x117abb.z + _0x3c52ab.offset.z,
+            x: x16.x + y2.offset.x,
+            y: y2.pose.position.y,
+            z: x16.z + y2.offset.z,
           },
         };
         return (
-          this.bridge?.setDraftObjectTransform?.(_0x3c52ab.objectType, _0x3c52ab.objectId, _0x3dd61d),
-          { objectType: _0x3c52ab.objectType, objectId: _0x3c52ab.objectId, pose: _0x3dd61d }
+          this.bridge?.setDraftObjectTransform?.(y2.objectType, y2.objectId, pose4),
+          { objectType: y2.objectType, objectId: y2.objectId, pose: pose4 }
         );
       });
       return;
     }
-    if (_0x170f9b.type === 'object-rotate') {
-      const _0x5cf0b8 = _0x13618e.clientX - _0x170f9b.startX;
-      _0x170f9b.moved = Math.abs(_0x5cf0b8) >= 1;
-      const _0x1a4a89 =
-        _0x170f9b.basePose.rotation.y -
-        (_0x5cf0b8 / Math.max(160, _0x170f9b.rect.width || 1)) * Math.PI * 1.2;
-      ((_0x170f9b.draftPose = {
-        ..._0x170f9b.basePose,
-        rotation: { ..._0x170f9b.basePose.rotation, y: _0x1a4a89 },
+    if (sceneView2.type === 'object-rotate') {
+      const value93 = event6.clientX - sceneView2.startX;
+      sceneView2.moved = Math.abs(value93) >= 1;
+      const y3 =
+        sceneView2.basePose.rotation.y -
+        (value93 / Math.max(160, sceneView2.rect.width || 1)) * Math.PI * 1.2;
+      ((sceneView2.draftPose = {
+        ...sceneView2.basePose,
+        rotation: { ...sceneView2.basePose.rotation, y: y3 },
       }),
         this.bridge?.setDraftObjectTransform?.(
-          _0x170f9b.objectType,
-          _0x170f9b.objectId,
-          _0x170f9b.draftPose,
+          sceneView2.objectType,
+          sceneView2.objectId,
+          sceneView2.draftPose,
         ));
       return;
     }
-    if (_0x170f9b.type === 'object-rotate-batch') {
-      const _0x2f9fcb = _0x13618e.clientX - _0x170f9b.startX;
-      _0x170f9b.moved = Math.abs(_0x2f9fcb) >= 1;
-      const _0x4722d3 = -(_0x2f9fcb / Math.max(160, _0x170f9b.rect.width || 1)) * Math.PI * 1.2;
-      _0x170f9b.draftTargets = _0x170f9b.entries.map((_0x569964) => {
-        const _0x304285 = _0x569964.basePose.position.x - _0x170f9b.center.x,
-          _0x896544 = _0x569964.basePose.position.z - _0x170f9b.center.z,
-          _0x2bea5a = Math.cos(_0x4722d3),
-          _0x52144d = Math.sin(_0x4722d3),
-          _0x5133ed = _0x304285 * _0x2bea5a - _0x896544 * _0x52144d,
-          _0xbfaea4 = _0x304285 * _0x52144d + _0x896544 * _0x2bea5a,
-          _0x9f9b4f = {
-            ..._0x569964.basePose,
+    if (sceneView2.type === 'object-rotate-batch') {
+      const value94 = event6.clientX - sceneView2.startX;
+      sceneView2.moved = Math.abs(value94) >= 1;
+      const value95 = -(value94 / Math.max(160, sceneView2.rect.width || 1)) * Math.PI * 1.2;
+      sceneView2.draftTargets = sceneView2.entries.map((y4) => {
+        const value96 = y4.basePose.position.x - sceneView2.center.x,
+          value97 = y4.basePose.position.z - sceneView2.center.z,
+          value98 = Math.cos(value95),
+          value99 = Math.sin(value95),
+          value100 = value96 * value98 - value97 * value99,
+          value101 = value96 * value99 + value97 * value98,
+          pose5 = {
+            ...y4.basePose,
             position: {
-              x: _0x170f9b.center.x + _0x5133ed,
-              y: _0x569964.basePose.position.y,
-              z: _0x170f9b.center.z + _0xbfaea4,
+              x: sceneView2.center.x + value100,
+              y: y4.basePose.position.y,
+              z: sceneView2.center.z + value101,
             },
-            rotation: { ..._0x569964.basePose.rotation, y: _0x569964.basePose.rotation.y + _0x4722d3 },
+            rotation: { ...y4.basePose.rotation, y: y4.basePose.rotation.y + value95 },
           };
         return (
-          this.bridge?.setDraftObjectTransform?.(_0x569964.objectType, _0x569964.objectId, _0x9f9b4f),
-          { objectType: _0x569964.objectType, objectId: _0x569964.objectId, pose: _0x9f9b4f }
+          this.bridge?.setDraftObjectTransform?.(y4.objectType, y4.objectId, pose5),
+          { objectType: y4.objectType, objectId: y4.objectId, pose: pose5 }
         );
       });
       return;
     }
-    if (_0x170f9b.type === 'object-scale') {
-      const _0x3c6a84 = _0x13618e.clientX - _0x170f9b.startX;
-      _0x170f9b.moved = Math.abs(_0x3c6a84) >= 1;
-      const _0x126fb6 = Math.max(
+    if (sceneView2.type === 'object-scale') {
+      const value102 = event6.clientX - sceneView2.startX;
+      sceneView2.moved = Math.abs(value102) >= 1;
+      const value103 = Math.max(
           0.01,
-          Math.min(4, 1 + (_0x3c6a84 / Math.max(120, _0x170f9b.rect.width || 1)) * 2),
+          Math.min(4, 1 + (value102 / Math.max(120, sceneView2.rect.width || 1)) * 2),
         ),
-        _0xf571e5 = toScaleVector(_0x170f9b.basePose.scale),
-        _0x5a5b8e = toCompatibleScale({
-          x: Math.max(0.01, Math.min(4, _0xf571e5.x * _0x126fb6)),
-          y: Math.max(0.01, Math.min(4, _0xf571e5.y * _0x126fb6)),
-          z: Math.max(0.01, Math.min(4, _0xf571e5.z * _0x126fb6)),
+        box17 = toScaleVector(sceneView2.basePose.scale),
+        scale2 = toCompatibleScale({
+          x: Math.max(0.01, Math.min(4, box17.x * value103)),
+          y: Math.max(0.01, Math.min(4, box17.y * value103)),
+          z: Math.max(0.01, Math.min(4, box17.z * value103)),
         });
-      ((_0x170f9b.draftPose = { ..._0x170f9b.basePose, scale: _0x5a5b8e }),
+      ((sceneView2.draftPose = { ...sceneView2.basePose, scale: scale2 }),
         this.bridge?.setDraftObjectTransform?.(
-          _0x170f9b.objectType,
-          _0x170f9b.objectId,
-          _0x170f9b.draftPose,
+          sceneView2.objectType,
+          sceneView2.objectId,
+          sceneView2.draftPose,
         ));
       return;
     }
-    if (_0x170f9b.type === 'object-scale-batch') {
-      const _0x1d3211 = _0x13618e.clientX - _0x170f9b.startX;
-      _0x170f9b.moved = Math.abs(_0x1d3211) >= 1;
-      const _0xc8c88a = Math.max(
+    if (sceneView2.type === 'object-scale-batch') {
+      const value104 = event6.clientX - sceneView2.startX;
+      sceneView2.moved = Math.abs(value104) >= 1;
+      const value105 = Math.max(
         0.01,
-        Math.min(4, 1 + (_0x1d3211 / Math.max(120, _0x170f9b.rect.width || 1)) * 2),
+        Math.min(4, 1 + (value104 / Math.max(120, sceneView2.rect.width || 1)) * 2),
       );
-      _0x170f9b.draftTargets = _0x170f9b.entries.map((_0x47f338) => {
-        const _0x1dca1c = _0x47f338.basePose.position.x - _0x170f9b.center.x,
-          _0x307efd = _0x47f338.basePose.position.z - _0x170f9b.center.z,
-          _0x3e5cf7 = toScaleVector(_0x47f338.basePose.scale),
-          _0x40b692 = {
-            ..._0x47f338.basePose,
+      sceneView2.draftTargets = sceneView2.entries.map((y5) => {
+        const value106 = y5.basePose.position.x - sceneView2.center.x,
+          value107 = y5.basePose.position.z - sceneView2.center.z,
+          box18 = toScaleVector(y5.basePose.scale),
+          pose6 = {
+            ...y5.basePose,
             position: {
-              x: _0x170f9b.center.x + _0x1dca1c * _0xc8c88a,
-              y: _0x47f338.basePose.position.y,
-              z: _0x170f9b.center.z + _0x307efd * _0xc8c88a,
+              x: sceneView2.center.x + value106 * value105,
+              y: y5.basePose.position.y,
+              z: sceneView2.center.z + value107 * value105,
             },
             scale: toCompatibleScale({
-              x: Math.max(0.01, Math.min(4, _0x3e5cf7.x * _0xc8c88a)),
-              y: Math.max(0.01, Math.min(4, _0x3e5cf7.y * _0xc8c88a)),
-              z: Math.max(0.01, Math.min(4, _0x3e5cf7.z * _0xc8c88a)),
+              x: Math.max(0.01, Math.min(4, box18.x * value105)),
+              y: Math.max(0.01, Math.min(4, box18.y * value105)),
+              z: Math.max(0.01, Math.min(4, box18.z * value105)),
             }),
           };
         return (
-          this.bridge?.setDraftObjectTransform?.(_0x47f338.objectType, _0x47f338.objectId, _0x40b692),
-          { objectType: _0x47f338.objectType, objectId: _0x47f338.objectId, pose: _0x40b692 }
+          this.bridge?.setDraftObjectTransform?.(y5.objectType, y5.objectId, pose6),
+          { objectType: y5.objectType, objectId: y5.objectId, pose: pose6 }
         );
       });
     }
   }
-  ['_handlePointerUp'](_0x5f1723) {
-    if (!this._gesture || (_0x5f1723.pointerId != null && _0x5f1723.pointerId !== this._gesture.pointerId))
-      return;
-    this._stopEvent(_0x5f1723, { preventDefault: true });
-    const _0x1ae6f5 = this._gesture;
-    ((this._gesture = null), this.viewportEl.releasePointerCapture?.(_0x1ae6f5.pointerId));
-    if (_0x1ae6f5.type === 'orbit-scene') {
-      if (_0x1ae6f5.clearSelectionOnClick && !_0x1ae6f5.moved) {
+  ['_handlePointerUp'](event7) {
+    if (!this._gesture || (event7.pointerId != null && event7.pointerId !== this._gesture.pointerId)) return;
+    this._stopEvent(event7, { preventDefault: true });
+    const sceneView3 = this._gesture;
+    ((this._gesture = null), this.viewportEl.releasePointerCapture?.(sceneView3.pointerId));
+    if (sceneView3.type === 'orbit-scene') {
+      if (sceneView3.clearSelectionOnClick && !sceneView3.moved) {
         (this.onSelectionClear?.(), this.bridge?.clearDraftView?.());
         return;
       }
-      if (!_0x1ae6f5.draftView && _0x1ae6f5.rect) {
-        const _0xa7393b = _0x5f1723.clientX - _0x1ae6f5.startX,
-          _0x30d689 = _0x5f1723.clientY - _0x1ae6f5.startY,
-          _0x2ad8fd = applyOrbitDelta(_0x1ae6f5.baseView.sceneView, _0xa7393b, _0x30d689, _0x1ae6f5.rect);
-        _0x1ae6f5.draftView = { ..._0x1ae6f5.baseView.sceneView, ..._0x2ad8fd };
+      if (!sceneView3.draftView && sceneView3.rect) {
+        const value108 = event7.clientX - sceneView3.startX,
+          value109 = event7.clientY - sceneView3.startY,
+          args8 = applyOrbitDelta(sceneView3.baseView.sceneView, value108, value109, sceneView3.rect);
+        sceneView3.draftView = { ...sceneView3.baseView.sceneView, ...args8 };
       }
-      _0x1ae6f5.draftView
+      sceneView3.draftView
         ? (this.onViewCommit?.({
-            sceneView: _0x1ae6f5.draftView,
+            sceneView: sceneView3.draftView,
             activeView: 'default',
             activeCameraId: null,
           }),
@@ -1390,21 +1365,21 @@ export class PanoramaSceneInteraction {
         : this.bridge?.clearDraftView?.();
       return;
     }
-    if (_0x1ae6f5.type === 'look-panorama') {
-      if (!_0x1ae6f5.draftView && _0x1ae6f5.rect) {
-        const _0x1c9f24 = _0x5f1723.clientX - _0x1ae6f5.startX,
-          _0x3b297f = _0x5f1723.clientY - _0x1ae6f5.startY,
-          _0x4454a8 = applyPanoramaLookDelta(
-            _0x1ae6f5.baseView.panoramaView,
-            _0x1c9f24,
-            -_0x3b297f,
-            _0x1ae6f5.rect,
+    if (sceneView3.type === 'look-panorama') {
+      if (!sceneView3.draftView && sceneView3.rect) {
+        const value110 = event7.clientX - sceneView3.startX,
+          value111 = event7.clientY - sceneView3.startY,
+          args9 = applyPanoramaLookDelta(
+            sceneView3.baseView.panoramaView,
+            value110,
+            -value111,
+            sceneView3.rect,
           );
-        _0x1ae6f5.draftView = { ..._0x1ae6f5.baseView.panoramaView, ..._0x4454a8 };
+        sceneView3.draftView = { ...sceneView3.baseView.panoramaView, ...args9 };
       }
-      _0x1ae6f5.draftView
+      sceneView3.draftView
         ? (this.onViewCommit?.({
-            panoramaView: _0x1ae6f5.draftView,
+            panoramaView: sceneView3.draftView,
             activeView: 'default',
             activeCameraId: null,
           }),
@@ -1412,10 +1387,10 @@ export class PanoramaSceneInteraction {
         : this.bridge?.clearDraftView?.();
       return;
     }
-    if (_0x1ae6f5.type === 'pan' || _0x1ae6f5.type === 'dolly') {
-      _0x1ae6f5.draftView
+    if (sceneView3.type === 'pan' || sceneView3.type === 'dolly') {
+      sceneView3.draftView
         ? (this.onViewCommit?.({
-            sceneView: _0x1ae6f5.draftView,
+            sceneView: sceneView3.draftView,
             activeView: 'default',
             activeCameraId: null,
           }),
@@ -1423,16 +1398,16 @@ export class PanoramaSceneInteraction {
         : this.bridge?.clearDraftView?.();
       return;
     }
-    if (_0x1ae6f5.type === 'zoom-middle') {
-      _0x1ae6f5.draftView
-        ? (_0x1ae6f5.baseView?.kind === 'panorama-default'
+    if (sceneView3.type === 'zoom-middle') {
+      sceneView3.draftView
+        ? (sceneView3.baseView?.kind === 'panorama-default'
             ? this.onViewCommit?.({
-                panoramaView: _0x1ae6f5.draftView,
+                panoramaView: sceneView3.draftView,
                 activeView: 'default',
                 activeCameraId: null,
               })
             : this.onViewCommit?.({
-                sceneView: _0x1ae6f5.draftView,
+                sceneView: sceneView3.draftView,
                 activeView: 'default',
                 activeCameraId: null,
               }),
@@ -1440,160 +1415,158 @@ export class PanoramaSceneInteraction {
         : this.bridge?.clearDraftView?.();
       return;
     }
-    if (_0x1ae6f5.type === 'selection-box') {
+    if (sceneView3.type === 'selection-box') {
       this._clearSelectionBox();
-      if (!_0x1ae6f5.moved) {
-        if (_0x1ae6f5.keepSelectionOnClick) return;
+      if (!sceneView3.moved) {
+        if (sceneView3.keepSelectionOnClick) return;
         this.onSelectionClear?.();
         return;
       }
-      const _0x57bdec = getClientRectFromPoints(
-          _0x1ae6f5.startX,
-          _0x1ae6f5.startY,
-          _0x5f1723.clientX,
-          _0x5f1723.clientY,
+      const clientRectFromPoints = getClientRectFromPoints(
+          sceneView3.startX,
+          sceneView3.startY,
+          event7.clientX,
+          event7.clientY,
         ),
-        _0xed7055 = this.bridge?.pickObjectsInRect?.(_0x57bdec) || [];
-      if (_0xed7055.length === 0) {
+        list20 = this.bridge?.pickObjectsInRect?.(clientRectFromPoints) || [];
+      if (list20.length === 0) {
         this.onSelectionClear?.();
         return;
       }
-      const _0x6e43b6 = this.getSceneState?.(),
-        _0x1e9282 = [],
-        _0x4c47ed = new Set(),
-        _0x43d661 = new Set(),
-        _0x52794c = new Set(),
-        _0x5b2dd8 = (_0x875194, _0x4c9a4e) => {
-          if ((_0x875194 !== 'mannequin' && _0x875194 !== 'cube') || !_0x4c9a4e) return;
-          const _0x55c377 = _0x875194 + ':' + _0x4c9a4e;
-          if (_0x4c47ed.has(_0x55c377)) return;
-          (_0x4c47ed.add(_0x55c377), _0x1e9282.push({ objectType: _0x875194, objectId: _0x4c9a4e }));
+      const value112 = this.getSceneState?.(),
+        list21 = [],
+        map9 = new Set(),
+        value113 = new Set(),
+        map10 = new Set(),
+        handler3 = (objectType17, objectId4) => {
+          if ((objectType17 !== 'mannequin' && objectType17 !== 'cube') || !objectId4) return;
+          const value114 = objectType17 + ':' + objectId4;
+          if (map9.has(value114)) return;
+          (map9.add(value114), list21.push({ objectType: objectType17, objectId: objectId4 }));
         };
-      _0xed7055.forEach((_0x1e096b) => {
-        if (_0x1e096b.objectType === 'mannequin')
-          (_0x43d661.add(_0x1e096b.objectId), _0x5b2dd8('mannequin', _0x1e096b.objectId));
-        else
-          _0x1e096b.objectType === 'cube' &&
-            (_0x52794c.add(_0x1e096b.objectId), _0x5b2dd8('cube', _0x1e096b.objectId));
+      list20.forEach((item22) => {
+        if (item22.objectType === 'mannequin')
+          (value113.add(item22.objectId), handler3('mannequin', item22.objectId));
+        else item22.objectType === 'cube' && (map10.add(item22.objectId), handler3('cube', item22.objectId));
       });
-      if (_0x1e9282.length === 0) {
+      if (list21.length === 0) {
         this.onSelectionClear?.();
         return;
       }
-      const _0x44d0b4 = Array.isArray(_0x6e43b6?.groups) ? _0x6e43b6.groups : [],
-        _0x45a007 = new Set(_0x43d661),
-        _0x1ff6a4 = [];
-      (_0x44d0b4.forEach((_0x1c9401) => {
-        const _0x1c12c8 = Array.isArray(_0x1c9401?.memberIds) ? _0x1c9401.memberIds : [];
-        if (!_0x1c12c8.some((_0x3c37ec) => _0x45a007.has(_0x3c37ec))) return;
-        (_0x1ff6a4.push(_0x1c9401), _0x1c12c8.forEach((_0x234f6f) => _0x45a007.add(_0x234f6f)));
+      const list22 = Array.isArray(value112?.groups) ? value112.groups : [],
+        list23 = new Set(value113),
+        list24 = [];
+      (list22.forEach((item23) => {
+        const list25 = Array.isArray(item23?.memberIds) ? item23.memberIds : [];
+        if (!list25.some((item24) => list23.has(item24))) return;
+        (list24.push(item23), list25.forEach((item25) => list23.add(item25)));
       }),
-        _0x45a007.forEach((_0x51970c) => {
-          _0x5b2dd8('mannequin', _0x51970c);
+        list23.forEach((item26) => {
+          handler3('mannequin', item26);
         }));
-      const _0x5023bb = _0x1e9282.filter((_0x4a7336) => {
-        if (_0x4a7336.objectType === 'cube') return _0x52794c.has(_0x4a7336.objectId);
-        return _0x45a007.has(_0x4a7336.objectId);
+      const activeObjectType = list21.filter((item27) => {
+        if (item27.objectType === 'cube') return map10.has(item27.objectId);
+        return list23.has(item27.objectId);
       });
-      if (_0x5023bb.length === 0) {
+      if (activeObjectType.length === 0) {
         this.onSelectionClear?.();
         return;
       }
-      const _0x3a7e5b =
-        _0x52794c.size === 0 &&
-        _0x1ff6a4.length === 1 &&
-        _0x5023bb.every((_0x123374) => _0x123374.objectType === 'mannequin') &&
-        _0x1ff6a4[0].memberIds.length === _0x5023bb.length &&
-        _0x1ff6a4[0].memberIds.every((_0x1f40d7) => _0x45a007.has(_0x1f40d7))
-          ? _0x1ff6a4[0].id
+      const groupId =
+        map10.size === 0 &&
+        list24.length === 1 &&
+        activeObjectType.every((item28) => item28.objectType === 'mannequin') &&
+        list24[0].memberIds.length === activeObjectType.length &&
+        list24[0].memberIds.every((item29) => list23.has(item29))
+          ? list24[0].id
           : null;
-      this.onSelectionObjectsChange?.(_0x5023bb, {
-        activeObjectType: _0x5023bb[0].objectType,
-        activeObjectId: _0x5023bb[0].objectId,
-        groupId: _0x3a7e5b,
+      this.onSelectionObjectsChange?.(activeObjectType, {
+        activeObjectType: activeObjectType[0].objectType,
+        activeObjectId: activeObjectType[0].objectId,
+        groupId: groupId,
       });
       return;
     }
-    if (_0x1ae6f5.type === 'scene-select') {
-      if (_0x1ae6f5.pickedTarget) {
-        if (_0x1ae6f5.selectionCommittedOnPointerDown) return;
-        _0x1ae6f5.pickedGroup
+    if (sceneView3.type === 'scene-select') {
+      if (sceneView3.pickedTarget) {
+        if (sceneView3.selectionCommittedOnPointerDown) return;
+        sceneView3.pickedGroup
           ? this.onSelectionBatchChange?.(
               'mannequin',
-              _0x1ae6f5.pickedGroup.memberIds,
-              _0x1ae6f5.pickedGroup.id,
+              sceneView3.pickedGroup.memberIds,
+              sceneView3.pickedGroup.id,
             )
-          : this.onSelectionChange?.(_0x1ae6f5.pickedTarget.objectType, _0x1ae6f5.pickedTarget.objectId);
+          : this.onSelectionChange?.(sceneView3.pickedTarget.objectType, sceneView3.pickedTarget.objectId);
       } else this.onSelectionClear?.();
       return;
     }
-    if (_0x1ae6f5.type === 'gizmo-move') {
+    if (sceneView3.type === 'gizmo-move') {
       (this._clearGizmoMoveGuideLine(), this.bridge?.setGizmoActiveHandle?.(null));
-      const _0x2189dc = Array.isArray(_0x1ae6f5.draftTargets) ? _0x1ae6f5.draftTargets : [];
-      _0x2189dc.length > 0
-        ? (_0x2189dc.length === 1
+      const objectType18 = Array.isArray(sceneView3.draftTargets) ? sceneView3.draftTargets : [];
+      objectType18.length > 0
+        ? (objectType18.length === 1
             ? this.onObjectCommit?.({
-                objectType: _0x2189dc[0].objectType,
-                objectId: _0x2189dc[0].objectId,
-                pose: _0x2189dc[0].pose,
+                objectType: objectType18[0].objectType,
+                objectId: objectType18[0].objectId,
+                pose: objectType18[0].pose,
               })
-            : this.onObjectBatchCommit?.({ targets: _0x2189dc }),
+            : this.onObjectBatchCommit?.({ targets: objectType18 }),
           this._queueDraftClear(() => {
-            _0x2189dc.forEach((_0x46d521) => {
-              this.bridge?.clearDraftObjectTransform?.(_0x46d521.objectType, _0x46d521.objectId);
+            objectType18.forEach((item30) => {
+              this.bridge?.clearDraftObjectTransform?.(item30.objectType, item30.objectId);
             });
           }))
         : this.bridge?.clearAllDrafts?.();
-      this._updateGizmoHover(_0x5f1723);
+      this._updateGizmoHover(event7);
       return;
     }
-    if (_0x1ae6f5.type === 'gizmo-rotate' || _0x1ae6f5.type === 'gizmo-scale') {
+    if (sceneView3.type === 'gizmo-rotate' || sceneView3.type === 'gizmo-scale') {
       (this._clearGizmoMoveGuideLine(), this.bridge?.setGizmoActiveHandle?.(null));
-      const _0x3f51c5 = Array.isArray(_0x1ae6f5.draftTargets) ? _0x1ae6f5.draftTargets : [];
-      _0x3f51c5.length > 0
-        ? (_0x3f51c5.length === 1
+      const objectType19 = Array.isArray(sceneView3.draftTargets) ? sceneView3.draftTargets : [];
+      objectType19.length > 0
+        ? (objectType19.length === 1
             ? this.onObjectCommit?.({
-                objectType: _0x3f51c5[0].objectType,
-                objectId: _0x3f51c5[0].objectId,
-                pose: _0x3f51c5[0].pose,
+                objectType: objectType19[0].objectType,
+                objectId: objectType19[0].objectId,
+                pose: objectType19[0].pose,
               })
-            : this.onObjectBatchCommit?.({ targets: _0x3f51c5 }),
+            : this.onObjectBatchCommit?.({ targets: objectType19 }),
           this._queueDraftClear(() => {
-            _0x3f51c5.forEach((_0x229fb8) => {
-              this.bridge?.clearDraftObjectTransform?.(_0x229fb8.objectType, _0x229fb8.objectId);
+            objectType19.forEach((item31) => {
+              this.bridge?.clearDraftObjectTransform?.(item31.objectType, item31.objectId);
             });
           }))
         : this.bridge?.clearAllDrafts?.();
-      this._updateGizmoHover(_0x5f1723);
+      this._updateGizmoHover(event7);
       return;
     }
     if (
-      _0x1ae6f5.type === 'object-move' ||
-      _0x1ae6f5.type === 'object-rotate' ||
-      _0x1ae6f5.type === 'object-scale'
+      sceneView3.type === 'object-move' ||
+      sceneView3.type === 'object-rotate' ||
+      sceneView3.type === 'object-scale'
     ) {
-      (this.onSelectionChange?.(_0x1ae6f5.objectType, _0x1ae6f5.objectId),
+      (this.onSelectionChange?.(sceneView3.objectType, sceneView3.objectId),
         this.onObjectCommit?.({
-          objectType: _0x1ae6f5.objectType,
-          objectId: _0x1ae6f5.objectId,
-          pose: _0x1ae6f5.draftPose || _0x1ae6f5.basePose,
+          objectType: sceneView3.objectType,
+          objectId: sceneView3.objectId,
+          pose: sceneView3.draftPose || sceneView3.basePose,
         }),
         this._queueDraftClear(() =>
-          this.bridge?.clearDraftObjectTransform?.(_0x1ae6f5.objectType, _0x1ae6f5.objectId),
+          this.bridge?.clearDraftObjectTransform?.(sceneView3.objectType, sceneView3.objectId),
         ));
       return;
     }
     if (
-      _0x1ae6f5.type === 'object-move-batch' ||
-      _0x1ae6f5.type === 'object-rotate-batch' ||
-      _0x1ae6f5.type === 'object-scale-batch'
+      sceneView3.type === 'object-move-batch' ||
+      sceneView3.type === 'object-rotate-batch' ||
+      sceneView3.type === 'object-scale-batch'
     ) {
-      const _0x442f2b = Array.isArray(_0x1ae6f5.draftTargets) ? _0x1ae6f5.draftTargets : [];
-      _0x442f2b.length > 0
-        ? (this.onObjectBatchCommit?.({ targets: _0x442f2b }),
+      const targets = Array.isArray(sceneView3.draftTargets) ? sceneView3.draftTargets : [];
+      targets.length > 0
+        ? (this.onObjectBatchCommit?.({ targets: targets }),
           this._queueDraftClear(() => {
-            _0x442f2b.forEach((_0x524cb9) => {
-              this.bridge?.clearDraftObjectTransform?.(_0x524cb9.objectType, _0x524cb9.objectId);
+            targets.forEach((item32) => {
+              this.bridge?.clearDraftObjectTransform?.(item32.objectType, item32.objectId);
             });
           }))
         : this.bridge?.clearAllDrafts?.();
@@ -1608,42 +1581,42 @@ export class PanoramaSceneInteraction {
       return;
     this.bridge?.setGizmoHoverHandle?.(null);
   }
-  ['_handleWheel'](_0x16bd10) {
-    const _0x450590 = this.getSceneState?.();
-    if (!_0x450590 || !this._isEditing(_0x450590)) return;
-    const _0x4c000c = this._isPanoramaMode(_0x450590);
-    (this._syncControlsByMode(_0x4c000c),
-      this._stopEvent(_0x16bd10, { preventDefault: true }),
+  ['_handleWheel'](event8) {
+    const enabled16 = this.getSceneState?.();
+    if (!enabled16 || !this._isEditing(enabled16)) return;
+    const value115 = this._isPanoramaMode(enabled16);
+    (this._syncControlsByMode(value115),
+      this._stopEvent(event8, { preventDefault: true }),
       this.bridge?.markViewSmoothingWindow?.());
-    if (_0x4c000c) {
-      const _0xd45f67 = _0x450590.viewport.panoramaView;
+    if (value115) {
+      const args10 = enabled16.viewport.panoramaView;
       this.onViewCommit?.({
-        panoramaView: { ..._0xd45f67, ...applyPanoramaZoomDelta(_0xd45f67, _0x16bd10.deltaY) },
+        panoramaView: { ...args10, ...applyPanoramaZoomDelta(args10, event8.deltaY) },
         activeView: 'default',
         activeCameraId: null,
       });
       return;
     }
-    if (_0x450590.mode === 'panorama') {
-      const _0x2671ad = _0x450590.viewport.panoramaView;
+    if (enabled16.mode === 'panorama') {
+      const args11 = enabled16.viewport.panoramaView;
       this.onViewCommit?.({
-        panoramaView: { ..._0x2671ad, ...applyPanoramaZoomDelta(_0x2671ad, _0x16bd10.deltaY) },
+        panoramaView: { ...args11, ...applyPanoramaZoomDelta(args11, event8.deltaY) },
         activeView: 'default',
         activeCameraId: null,
       });
       return;
     }
-    const _0x3e864b = this._createBaseView(_0x450590);
-    if (_0x3e864b.kind !== 'scene-default') return;
+    const args12 = this._createBaseView(enabled16);
+    if (args12.kind !== 'scene-default') return;
     this.onViewCommit?.({
-      sceneView: { ..._0x3e864b.sceneView, ...applySceneZoomDelta(_0x3e864b.sceneView, _0x16bd10.deltaY) },
+      sceneView: { ...args12.sceneView, ...applySceneZoomDelta(args12.sceneView, event8.deltaY) },
       activeView: 'default',
       activeCameraId: null,
     });
   }
-  ['_handleContextMenu'](_0x27dbb1) {
-    const _0x2eff5e = this.getSceneState?.();
-    if (!_0x2eff5e || !this._isEditing(_0x2eff5e)) return;
-    this._stopEvent(_0x27dbb1, { preventDefault: true });
+  ['_handleContextMenu'](value116) {
+    const enabled17 = this.getSceneState?.();
+    if (!enabled17 || !this._isEditing(enabled17)) return;
+    this._stopEvent(value116, { preventDefault: true });
   }
 }

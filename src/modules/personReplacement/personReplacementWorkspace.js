@@ -245,26 +245,24 @@ const PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE = 'application/x-person-replaceme
     "[role='slider']",
     '[tabindex]',
   ]['join'](',');
-function escapeHtml(_0x567846) {
-  return String(_0x567846 ?? '')
+function escapeHtml(value) {
+  return String(value ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
     ['replaceAll']('\x22', '&quot;')
     ['replaceAll']('\x27', '&#039;');
 }
-function normalizeText(_0x12ca66, _0x38dcaa = '') {
-  const _0x17127f = String(_0x12ca66 ?? '')['trim']();
-  return _0x17127f || _0x38dcaa;
+function normalizeText(item, key = '') {
+  const index = String(item ?? '')['trim']();
+  return index || key;
 }
-function cloneJson(_0x3764ce) {
-  return _0x3764ce && typeof _0x3764ce === 'object' ? JSON['parse'](JSON['stringify'](_0x3764ce)) : _0x3764ce;
+function cloneJson(result) {
+  return result && typeof result === 'object' ? JSON['parse'](JSON['stringify'](result)) : result;
 }
-function clamp(_0x1d45b9, _0x4b7723, _0x5acc7f, _0x36343e = _0x4b7723) {
-  const _0x2f90e9 = Number(_0x1d45b9);
-  return Number['isFinite'](_0x2f90e9)
-    ? Math['min'](_0x5acc7f, Math['max'](_0x4b7723, _0x2f90e9))
-    : _0x36343e;
+function clamp(data, options, target, source = options) {
+  const next = Number(data);
+  return Number['isFinite'](next) ? Math['min'](target, Math['max'](options, next)) : source;
 }
 const PERSON_REPLACEMENT_ORIENTATION_LABELS = Object['freeze']({
   front: '正面',
@@ -278,51 +276,51 @@ const PERSON_REPLACEMENT_ORIENTATION_LABELS = Object['freeze']({
   over_shoulder_right: '右过肩',
   unknown: '待确认',
 });
-function formatPersonOrientation(_0x518f7b) {
+function formatPersonOrientation(current) {
   return (
-    PERSON_REPLACEMENT_ORIENTATION_LABELS[normalizeText(_0x518f7b)] ||
+    PERSON_REPLACEMENT_ORIENTATION_LABELS[normalizeText(current)] ||
     PERSON_REPLACEMENT_ORIENTATION_LABELS['unknown']
   );
 }
 function getPersonOrientationOptions() {
-  const _0x29c150 = PERSON_REPLACEMENT_ORIENTATIONS['filter']((_0x13ca84) => _0x13ca84 !== 'unknown');
-  return _0x29c150['map']((_0x119f5f) => ({ value: _0x119f5f, label: formatPersonOrientation(_0x119f5f) }));
+  const list = PERSON_REPLACEMENT_ORIENTATIONS['filter']((entry) => entry !== 'unknown');
+  return list['map']((value2) => ({ value: value2, label: formatPersonOrientation(value2) }));
 }
 function getPersonReplacementScopeOptions() {
-  return PERSON_REPLACEMENT_SCOPES['map']((_0x5d5e92) => ({
-    value: _0x5d5e92,
-    label: formatPersonReplacementScopeLabel(_0x5d5e92),
+  return PERSON_REPLACEMENT_SCOPES['map']((value3) => ({
+    value: value3,
+    label: formatPersonReplacementScopeLabel(value3),
   }));
 }
-function normalizeMediaUrl(_0xba8946) {
-  const _0x1ff03c = normalizeText(_0xba8946);
-  if (!_0x1ff03c) return '';
-  return localPathToUrl(_0x1ff03c) || _0x1ff03c;
+function normalizeMediaUrl(record) {
+  const text = normalizeText(record);
+  if (!text) return '';
+  return localPathToUrl(text) || text;
 }
-function getCharacterAppearance(_0x511449, _0xc29b15 = '') {
-  const _0x42d240 = getWorkspaceAssetAppearances(_0x511449);
+function getCharacterAppearance(payload, handle = '') {
+  const list2 = getWorkspaceAssetAppearances(payload);
   return (
-    _0x42d240['find']((_0xfdb0e0) => _0xfdb0e0['id'] === _0xc29b15) ||
-    getWorkspaceAssetBaseAppearance(_0x511449) ||
-    _0x42d240[0x0] ||
+    list2['find']((state) => state['id'] === handle) ||
+    getWorkspaceAssetBaseAppearance(payload) ||
+    list2[0x0] ||
     null
   );
 }
-function getCharacterVoiceUrl(_0xaebda = {}) {
+function getCharacterVoiceUrl(options2 = {}) {
   return normalizeMediaUrl(
-    _0xaebda['voiceReference']?.['audioUrl'] ||
-      _0xaebda['voiceReference']?.['localPath'] ||
-      _0xaebda['voiceRef'],
+    options2['voiceReference']?.['audioUrl'] ||
+      options2['voiceReference']?.['localPath'] ||
+      options2['voiceRef'],
   );
 }
-function formatClock(_0x17fb17) {
-  const _0x21e7ad = Math['max'](0x0, Number(_0x17fb17) || 0x0),
-    _0xd68d71 = Math['floor'](_0x21e7ad / 0x3c),
-    _0x1748ce = Math['floor'](_0x21e7ad % 0x3c);
-  return String(_0xd68d71)['padStart'](0x2, '0') + ':' + String(_0x1748ce)['padStart'](0x2, '0');
+function formatClock(config) {
+  const scope = Math['max'](0x0, Number(config) || 0x0),
+    input = Math['floor'](scope / 0x3c),
+    output = Math['floor'](scope % 0x3c);
+  return String(input)['padStart'](0x2, '0') + ':' + String(output)['padStart'](0x2, '0');
 }
-function renderIcon(_0x4a8933) {
-  const _0x3e5711 = {
+function renderIcon(value4) {
+  const value5 = {
     upload:
       '<path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>',
     video:
@@ -343,7 +341,7 @@ function renderIcon(_0x4a8933) {
   };
   return (
     '<svg\x20class=\x22person-replacement-icon\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.7\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22\x20aria-hidden=\x22true\x22>' +
-    (_0x3e5711[_0x4a8933] || '') +
+    (value5[value4] || '') +
     '</svg>'
   );
 }
@@ -356,131 +354,136 @@ const personReplacementSmartDetectPresentation = createPersonReplacementSmartDet
   personReplacementIdentityPresentation = createPersonReplacementIdentityPresentation(),
   personReplacementCompositePreviewPresentation = createPersonReplacementCompositePreviewPresentation(),
   personReplacementShellPresentation = createPersonReplacementShellPresentation({
-    resolveVoiceReferenceCount: (_0x16f35c) =>
-      getPersonReplacementVoiceCloneCharacters(_0x16f35c)['filter']((_0x143fb6) =>
-        getCharacterVoiceUrl(_0x143fb6),
-      )['length'],
+    resolveVoiceReferenceCount: (value6) =>
+      getPersonReplacementVoiceCloneCharacters(value6)['filter']((value7) => getCharacterVoiceUrl(value7))[
+        'length'
+      ],
   }),
   personReplacementImagePresentation = createPersonReplacementImagePresentation({
-    buildIdentityView: (_0x4c49a3, _0x495bb4, _0x25c09b) =>
-      personReplacementIdentityPresentation['buildImage'](_0x4c49a3, _0x495bb4, _0x25c09b),
-    renderShotTimeline: (_0x5d9bd0, _0x24094f) =>
-      personReplacementShotTimelinePresentation['renderStage'](_0x5d9bd0, _0x24094f),
+    buildIdentityView: (value8, value9, value10) =>
+      personReplacementIdentityPresentation['buildImage'](value8, value9, value10),
+    renderShotTimeline: (value11, value12) =>
+      personReplacementShotTimelinePresentation['renderStage'](value11, value12),
     renderLayoutSplitter: renderPersonReplacementLayoutSplitter,
-    renderFooter: (_0x4c034c, _0x3a0eba) =>
-      personReplacementShellPresentation['renderStepFooter'](_0x4c034c, _0x3a0eba),
+    renderFooter: (value13, value14) =>
+      personReplacementShellPresentation['renderStepFooter'](value13, value14),
     renderSmartDetectTrigger: personReplacementSmartDetectPresentation['renderTrigger'],
   }),
   personReplacementVideoPresentation = createPersonReplacementVideoPresentation({
-    buildIdentityView: (_0x185ce4, _0x555054) =>
-      personReplacementIdentityPresentation['buildVideo'](_0x185ce4, _0x555054),
-    renderShotTimeline: (_0x270678, _0x73e295) =>
-      personReplacementShotTimelinePresentation['renderStage'](_0x270678, _0x73e295),
+    buildIdentityView: (value15, value16) =>
+      personReplacementIdentityPresentation['buildVideo'](value15, value16),
+    renderShotTimeline: (value17, value18) =>
+      personReplacementShotTimelinePresentation['renderStage'](value17, value18),
     renderLayoutSplitter: renderPersonReplacementLayoutSplitter,
-    renderFooter: (_0x2ac36f, _0x468d35) =>
-      personReplacementShellPresentation['renderStepFooter'](_0x2ac36f, _0x468d35),
+    renderFooter: (value19, value20) =>
+      personReplacementShellPresentation['renderStepFooter'](value19, value20),
   });
-function renderCompositeComposeAction(_0x5007be, _0x4371d9 = {}) {
-  const _0x28b9e1 = _0x5007be['shots']['some']((_0x4cdb56) => normalizeText(_0x4cdb56['resultVideoRef'])),
-    _0x2bbb48 = _0x4371d9['composeOutputPending'] === !![],
-    _0x42d207 = buildPersonReplacementCompositePreviewSnapshot(_0x5007be)['fullAvailable'],
-    _0x23ce24 = _0x2bbb48 ? '合成中…' : _0x42d207 ? '重新合成全部视频' : '合成全部视频';
+function renderCompositeComposeAction(value21, value22 = {}) {
+  const enabled = value21['shots']['some']((value23) => normalizeText(value23['resultVideoRef'])),
+    value24 = value22['composeOutputPending'] === !![],
+    personReplacementCompositePreviewSnapshot =
+      buildPersonReplacementCompositePreviewSnapshot(value21)['fullAvailable'],
+    value25 = value24
+      ? '合成中…'
+      : personReplacementCompositePreviewSnapshot
+        ? '重新合成全部视频'
+        : '合成全部视频';
   return (
     '<button\x20type=\x22button\x22\x20class=\x22story-workbench-action-button\x20story-main-action-button\x20person-replacement-compose-output' +
-    (_0x2bbb48 ? ' is-loading' : '') +
+    (value24 ? ' is-loading' : '') +
     '" data-person-replacement-action="compose-output" aria-busy="' +
-    _0x2bbb48 +
+    value24 +
     '\x22' +
-    (_0x2bbb48 || !_0x28b9e1 ? ' disabled' : '') +
+    (value24 || !enabled ? ' disabled' : '') +
     '>' +
-    (_0x2bbb48
+    (value24
       ? '<span class="storyboard-script-loading-spinner person-replacement-compose-spinner" aria-hidden="true"></span>'
       : '') +
     '<span>' +
-    _0x23ce24 +
+    value25 +
     '</span></button>'
   );
 }
-function renderAssetSettings(_0x821e46, _0x9ddb23 = {}) {
-  return renderPersonReplacementAssetSettingsPage(_0x821e46, {
-    ..._0x9ddb23,
-    renderDetailSplitter: (_0x44f2fe) =>
-      renderPersonReplacementLayoutSplitter('asset-detail', { assetDetailSplitRatio: _0x44f2fe }),
-    footerHtml: personReplacementShellPresentation['renderStepFooter'](_0x821e46, {
+function renderAssetSettings(value26, args = {}) {
+  return renderPersonReplacementAssetSettingsPage(value26, {
+    ...args,
+    renderDetailSplitter: (assetDetailSplitRatio) =>
+      renderPersonReplacementLayoutSplitter('asset-detail', { assetDetailSplitRatio: assetDetailSplitRatio }),
+    footerHtml: personReplacementShellPresentation['renderStepFooter'](value26, {
       nextLabel: '进入图像替换',
       hidePrevious: !![],
     }),
   });
 }
-function renderVoiceClone(_0x4c6c08) {
-  return renderPersonReplacementVoiceClonePage(_0x4c6c08, {
-    footerHtml: personReplacementShellPresentation['renderStepFooter'](_0x4c6c08, {
+function renderVoiceClone(value27) {
+  return renderPersonReplacementVoiceClonePage(value27, {
+    footerHtml: personReplacementShellPresentation['renderStepFooter'](value27, {
       nextLabel: '进入合成视频',
     }),
   });
 }
-function renderCompositePreview(_0x3a863c, _0xd3de14 = {}) {
-  const _0x22a2c6 = buildPersonReplacementCompositePreviewSnapshot(_0x3a863c);
-  return personReplacementCompositePreviewPresentation['render'](_0x22a2c6, {
-    composeActionHtml: renderCompositeComposeAction(_0x3a863c, _0xd3de14),
+function renderCompositePreview(value28, composeOutputPending = {}) {
+  const personReplacementCompositePreviewSnapshot2 = buildPersonReplacementCompositePreviewSnapshot(value28);
+  return personReplacementCompositePreviewPresentation['render'](personReplacementCompositePreviewSnapshot2, {
+    composeActionHtml: renderCompositeComposeAction(value28, composeOutputPending),
     playbackControlsHtml: personReplacementVideoPresentation['renderPlaybackControls'](
-      _0x22a2c6['selectedShot'],
-      { context: 'comparison', disabled: !_0x22a2c6['canCompare'] },
+      personReplacementCompositePreviewSnapshot2['selectedShot'],
+      { context: 'comparison', disabled: !personReplacementCompositePreviewSnapshot2['canCompare'] },
     ),
-    composeOutputPending: _0xd3de14['composeOutputPending'] === !![],
+    composeOutputPending: composeOutputPending['composeOutputPending'] === !![],
   });
 }
-function renderProject(_0x12b8e5, _0x1e5e38 = {}) {
-  const _0xc093af = {
+function renderProject(value29, smartDetecting = {}) {
+  const value30 = {
       0x1: renderAssetSettings,
-      0x2: (_0x61b215, _0x451893) => personReplacementImagePresentation['render'](_0x61b215, _0x451893),
-      0x3: (_0x4a42a0, _0x281f91) => personReplacementVideoPresentation['render'](_0x4a42a0, _0x281f91),
+      0x2: (value31, value32) => personReplacementImagePresentation['render'](value31, value32),
+      0x3: (value33, value34) => personReplacementVideoPresentation['render'](value33, value34),
       0x4: renderVoiceClone,
       0x5: renderCompositePreview,
     },
-    _0x2e22ec = _0x1e5e38['cutEditorSmartDetectOpen']
-      ? personReplacementSmartDetectPresentation['renderPanel'](_0x12b8e5, {
-          smartDetecting: _0x1e5e38['cutEditorSmartDetecting'],
+    value35 = smartDetecting['cutEditorSmartDetectOpen']
+      ? personReplacementSmartDetectPresentation['renderPanel'](value29, {
+          smartDetecting: smartDetecting['cutEditorSmartDetecting'],
         })
       : '',
-    _0x1f608c =
-      _0x1e5e38['canvasSyncOverlayInline'] === ![]
+    value36 =
+      smartDetecting['canvasSyncOverlayInline'] === ![]
         ? ''
-        : personReplacementShellPresentation['renderCanvasSyncLoadingOverlay'](_0x1e5e38);
+        : personReplacementShellPresentation['renderCanvasSyncLoadingOverlay'](smartDetecting);
   return (
-    personReplacementShellPresentation['renderHeader'](_0x12b8e5, _0x1e5e38) +
+    personReplacementShellPresentation['renderHeader'](value29, smartDetecting) +
     '<main class="person-replacement-project-body"' +
-    (_0x1e5e38['canvasSyncPending'] === !![] ? ' aria-hidden="true" inert' : '') +
+    (smartDetecting['canvasSyncPending'] === !![] ? ' aria-hidden="true" inert' : '') +
     '>' +
-    _0xc093af[_0x12b8e5['workspace']['step']](_0x12b8e5, _0x1e5e38) +
+    value30[value29['workspace']['step']](value29, smartDetecting) +
     '</main>' +
-    _0x2e22ec +
-    _0x1f608c
+    value35 +
+    value36
   );
 }
 function renderHiddenInputs() {
   return '<div\x20class=\x22story-asset-hover-preview\x22\x20data-story-asset-hover-preview\x20role=\x22tooltip\x22\x20aria-hidden=\x22true\x22></div><input\x20type=\x22file\x22\x20accept=\x22video/*\x22\x20multiple\x20hidden\x20data-person-replacement-input=\x22source-videos\x22><input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20multiple\x20hidden\x20data-person-replacement-input=\x22new-character-images\x22><input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20multiple\x20hidden\x20data-person-replacement-input=\x22new-scene-images\x22><input\x20type=\x22file\x22\x20accept=\x22audio/*\x22\x20multiple\x20hidden\x20data-person-replacement-input=\x22new-audio-files\x22><input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20hidden\x20data-person-replacement-input=\x22appearance-image\x22><input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20hidden\x20data-person-replacement-input=\x22replacement-image\x22><input\x20type=\x22file\x22\x20accept=\x22video/*\x22\x20hidden\x20data-person-replacement-input=\x22replacement-video-result\x22><input\x20type=\x22file\x22\x20accept=\x22image/*,video/*\x22\x20hidden\x20data-person-replacement-input=\x22replacement-video-slot\x22><input\x20type=\x22file\x22\x20accept=\x22audio/*\x22\x20hidden\x20data-person-replacement-input=\x22character-voice\x22>';
 }
-export function renderPersonReplacementWorkspace(_0x1ad505 = {}, _0x25c8d5 = {}) {
-  const _0x579d1d = normalizePersonReplacementWorkspaceProject(_0x1ad505),
-    _0x36e70e =
-      _0x579d1d['workspace']['view'] === 'home'
-        ? personReplacementShellPresentation['renderHome'](_0x579d1d)
-        : renderProject(_0x579d1d, _0x25c8d5);
+export function renderPersonReplacementWorkspace(options3 = {}, value37 = {}) {
+  const personReplacementWorkspaceProject = normalizePersonReplacementWorkspaceProject(options3),
+    value38 =
+      personReplacementWorkspaceProject['workspace']['view'] === 'home'
+        ? personReplacementShellPresentation['renderHome'](personReplacementWorkspaceProject)
+        : renderProject(personReplacementWorkspaceProject, value37);
   return (
     '<section class="person-replacement-workspace" data-person-replacement-workspace data-person-replacement-view="' +
-    _0x579d1d['workspace']['view'] +
+    personReplacementWorkspaceProject['workspace']['view'] +
     '" data-person-replacement-step="' +
-    _0x579d1d['workspace']['step'] +
+    personReplacementWorkspaceProject['workspace']['step'] +
     '\x22>' +
-    _0x36e70e +
+    value38 +
     renderHiddenInputs() +
     '</section>'
   );
 }
-function resolveMountTarget(_0x29c113, _0x301df6) {
-  if (_0x301df6?.['nodeType'] === 0x1) return _0x301df6;
-  return _0x29c113?.['querySelector']?.(_0x301df6) || _0x29c113?.['body'] || null;
+function resolveMountTarget(el, value39) {
+  if (value39?.['nodeType'] === 0x1) return value39;
+  return el?.['querySelector']?.(value39) || el?.['body'] || null;
 }
 export function createReplacementStudioWorkspace({
   documentObject: documentObject = globalThis['document'],
@@ -492,644 +495,672 @@ export function createReplacementStudioWorkspace({
   projectSession: projectSession = null,
   workspaceIntentPort: workspaceIntentPort = createPersonReplacementWorkspaceIntentPort(),
 } = {}) {
-  const _0x43f995 = PERSON_REPLACEMENT_WORKSPACE_INTENTS,
-    _0x750640 = (_0x25c329) => workspaceIntentPort['supports'](_0x25c329),
-    _0x4ad4fe = (_0x150dd2, ..._0x36cec5) => workspaceIntentPort['request'](_0x150dd2, ..._0x36cec5),
-    _0x52549f =
-      (_0x120cc9) =>
-      (..._0x3dabc4) =>
-        _0x4ad4fe(_0x120cc9, ..._0x3dabc4);
-  let _0x57b9e5 = normalizePersonReplacementWorkspaceProject(initialProject);
-  const _0x5b9bfb = createWorkspaceAssetLibraryDisclosure();
-  let _0x42b7b0 = null,
-    _0x348b2e = null,
-    _0x2f325d = ![];
-  const _0x3accc4 = createWorkspacePresentationLifecycle({ getRoot: () => _0x42b7b0 }),
-    _0x3a22a2 = createWorkspacePersistencePresentation({ getRoot: () => _0x42b7b0 });
-  let _0x2c9c4b = mountTarget,
-    _0x40a90d = null,
-    _0x116a03 = null;
-  const _0x29b772 = new Set();
-  let _0x834763 = '',
-    _0x42cf44 = [],
-    _0x2fa649 = null,
-    _0x5cb732 = null,
-    _0xdc14ac = null,
-    _0xc29065 = null,
-    _0x1b7b58 = ![],
-    _0x47513d = '',
-    _0x4fcdf7 = ![],
-    _0x463a8b = ![],
-    _0x3b1585 = null,
-    _0xbd6d44 = null;
-  const _0x1ffaf2 = new Map();
-  let _0x177009 = ![],
-    _0x59e1d9 = null,
-    _0x546083 = null,
-    _0x4aeba7 = null,
-    _0x3e5d6c = null;
-  const _0x2ba69b = createPersonReplacementVideoPlaybackController({
-      getRoot: () => _0x42b7b0,
-      getProject: () => _0x57b9e5,
-      getSelectedShot: (_0x319459) => personReplacementVideoPresentation['build'](_0x319459)['shot'],
+  const downloadImageIntent = PERSON_REPLACEMENT_WORKSPACE_INTENTS,
+    hasWorkspaceIntent = (value40) => workspaceIntentPort['supports'](value40),
+    promptEnhancementModel = (value41, ...args2) => workspaceIntentPort['request'](value41, ...args2),
+    onShotKeyframeSelected =
+      (value42) =>
+      (...args3) =>
+        promptEnhancementModel(value42, ...args3);
+  let initialProject2 = normalizePersonReplacementWorkspaceProject(initialProject);
+  const assetLibraryDisclosure = createWorkspaceAssetLibraryDisclosure();
+  let floatingMenuHost = null,
+    bindWorkspaceEntityContextMenu2 = null,
+    value43 = ![];
+  const workspacePresentationLifecycle = createWorkspacePresentationLifecycle({
+      getRoot: () => floatingMenuHost,
+    }),
+    workspacePersistencePresentation = createWorkspacePersistencePresentation({
+      getRoot: () => floatingMenuHost,
+    });
+  let value44 = mountTarget,
+    value45 = null,
+    value46 = null;
+  const map = new Set();
+  let voiceLibraryTargetCharacterId = '',
+    list3 = [],
+    bindAIGenVideoModelSelector2 = null,
+    value47 = null,
+    el2 = null,
+    el3 = null,
+    canvasSyncPending = ![],
+    canvasSyncScope = '',
+    composeOutputPending2 = ![],
+    exportOutputPending = ![],
+    el4 = null,
+    el5 = null;
+  const map2 = new Map();
+  let enabled2 = ![],
+    value48 = null,
+    value49 = null,
+    ctx = null,
+    value50 = null;
+  const personReplacementVideoPlaybackController = createPersonReplacementVideoPlaybackController({
+      getRoot: () => floatingMenuHost,
+      getProject: () => initialProject2,
+      getSelectedShot: (value51) => personReplacementVideoPresentation['build'](value51)['shot'],
       createVideoPlayback: createVideoPlayback,
       videoClipController: videoClipController,
     }),
-    _0x2fb45b = (_0x33e407) => _0x2ba69b['bind'](_0x33e407),
-    _0x31cf87 = () => _0x2ba69b['bindCenterIndicators'](),
-    _0x3c691d = (_0x4096c) => _0x2ba69b['stop'](_0x4096c),
-    _0x31cdf2 = createPersonReplacementCompositePreviewController({
-      getRoot: () => _0x42b7b0,
-      getProject: () => _0x57b9e5,
+    handler = (value52) => personReplacementVideoPlaybackController['bind'](value52),
+    handler2 = () => personReplacementVideoPlaybackController['bindCenterIndicators'](),
+    handler3 = (value53) => personReplacementVideoPlaybackController['stop'](value53),
+    personReplacementCompositePreviewController = createPersonReplacementCompositePreviewController({
+      getRoot: () => floatingMenuHost,
+      getProject: () => initialProject2,
       documentObject: documentObject,
       windowObject: windowObject,
       createVideoPlayback: createVideoPlayback,
     }),
-    _0xa770b0 = () => _0x31cdf2['stop'](),
-    _0x5083e0 = (_0xa792cd) => _0x31cdf2['releaseOriginalWarmup'](_0xa792cd),
-    _0x2f6a26 = (_0x438102) => _0x31cdf2['startOriginalWarmup'](_0x438102),
-    _0x481bb9 = () => _0x31cdf2['prepareOriginalHandoff'](),
-    _0x2d6050 = () => _0x31cdf2['retainFullVideosForPageRefresh'](),
-    _0x1d0ea5 = () => _0x31cdf2['bind']();
-  let _0x57b119 = null;
-  const _0x24b921 = createPersonReplacementShotCutSession({
-      initialProject: _0x57b9e5,
+    handler4 = () => personReplacementCompositePreviewController['stop'](),
+    handler5 = (value54) => personReplacementCompositePreviewController['releaseOriginalWarmup'](value54),
+    handler6 = (value55) => personReplacementCompositePreviewController['startOriginalWarmup'](value55),
+    handler7 = () => personReplacementCompositePreviewController['prepareOriginalHandoff'](),
+    handler8 = () => personReplacementCompositePreviewController['retainFullVideosForPageRefresh'](),
+    handler9 = () => personReplacementCompositePreviewController['bind']();
+  let previewController = null;
+  const session = createPersonReplacementShotCutSession({
+      initialProject: initialProject2,
       windowObject: windowObject,
       onBoundaryDragStopped: () => {
         documentObject?.['body']?.['classList']?.['remove']?.('person-replacement-cut-resizing');
       },
-      onDetectionRequested: async (_0x475438) => {
-        const _0x521ea6 = await _0x4ad4fe(_0x43f995['DETECT_SHOT_CUT_RANGES'], _0x475438, {
-            project: cloneJson(_0x57b9e5),
+      onDetectionRequested: async (value56) => {
+        const value57 = await promptEnhancementModel(downloadImageIntent['DETECT_SHOT_CUT_RANGES'], value56, {
+            project: cloneJson(initialProject2),
           }),
-          _0x50a1b3 = Array['isArray'](_0x521ea6?.['ranges']) ? _0x521ea6['ranges'] : [];
-        if (!_0x50a1b3['length']) throw new Error('智能检测未返回可用切口');
-        return _0x50a1b3;
+          list4 = Array['isArray'](value57?.['ranges']) ? value57['ranges'] : [];
+        if (!list4['length']) throw new Error('智能检测未返回可用切口');
+        return list4;
       },
       playbackControllerOptions: {
         windowObject: windowObject,
-        isEditorOpen: () => _0x4e4610['isOpen'],
-        getDraft: () => _0x4e4610['draft'],
-        getProject: () => _0x57b9e5,
-        syncNativePlayback: (_0x538c1d) => _0x57b119?.['syncPlaybackFromVideo'](_0x538c1d),
-        syncTimelinePosition: (_0x2132c8) => _0x57b119?.['syncTimelinePosition'](_0x2132c8),
-        previewShotCut: (..._0x26eb46) => _0x57b119?.['preview'](..._0x26eb46),
+        isEditorOpen: () => selectedIds['isOpen'],
+        getDraft: () => selectedIds['draft'],
+        getProject: () => initialProject2,
+        syncNativePlayback: (value58) => previewController?.['syncPlaybackFromVideo'](value58),
+        syncTimelinePosition: (value59) => previewController?.['syncTimelinePosition'](value59),
+        previewShotCut: (...args4) => previewController?.['preview'](...args4),
       },
     }),
-    _0x4e4610 = _0x24b921['workspaceState'],
-    _0x177092 = createPersonReplacementShotCutPreviewMediaController({
-      session: _0x24b921,
-      getRoot: () => _0x42b7b0,
-      getProject: () => _0x57b9e5,
-      getSelectedShot: (_0x15a1cc) => personReplacementImagePresentation['build'](_0x15a1cc)['selectedShot'],
+    selectedIds = session['workspaceState'],
+    mediaController = createPersonReplacementShotCutPreviewMediaController({
+      session: session,
+      getRoot: () => floatingMenuHost,
+      getProject: () => initialProject2,
+      getSelectedShot: (value60) => personReplacementImagePresentation['build'](value60)['selectedShot'],
       createVideoPlayback: createVideoPlayback,
       documentObject: documentObject,
-      isDestroyed: () => _0x2f325d,
+      isDestroyed: () => value43,
     }),
     {
-      preparePreviewVideo: _0x53b56d,
-      preserveBufferedVideo: _0x45ae96,
-      releaseBufferedVideo: _0x551a99,
-      restoreBufferedVideo: _0x1eb029,
-    } = _0x177092,
-    _0x2ca5f9 = createPersonReplacementShotCutViewportController({
-      session: _0x24b921,
-      getRoot: () => _0x42b7b0,
+      preparePreviewVideo: preparePreviewVideo,
+      preserveBufferedVideo: preserveBufferedVideo,
+      releaseBufferedVideo: releaseBufferedVideo,
+      restoreBufferedVideo: restoreBufferedVideo,
+    } = mediaController,
+    viewportController = createPersonReplacementShotCutViewportController({
+      session: session,
+      getRoot: () => floatingMenuHost,
       renderIcon: renderIcon,
     }),
-    { applyTimelineZoom: _0x1d4206, isBusy: _0x26d2a5, isDraftMutationBusy: _0x374e20 } = _0x2ca5f9;
-  _0x57b119 = createPersonReplacementShotCutPreviewController({
-    session: _0x24b921,
-    mediaController: _0x177092,
-    viewportController: _0x2ca5f9,
-    getRoot: () => _0x42b7b0,
-    getProject: () => _0x57b9e5,
+    {
+      applyTimelineZoom: applyTimelineZoom,
+      isBusy: isBusy,
+      isDraftMutationBusy: isDraftMutationBusy,
+    } = viewportController;
+  previewController = createPersonReplacementShotCutPreviewController({
+    session: session,
+    mediaController: mediaController,
+    viewportController: viewportController,
+    getRoot: () => floatingMenuHost,
+    getProject: () => initialProject2,
   });
   const {
-      armFrameWait: _0x324bbc,
-      cancelFrameWait: _0x139716,
-      cancelHoverPreview: _0x2a5781,
-      clearPreviewMetadata: _0x41541c,
-      markFrameReady: _0x52e2c5,
-      preview: _0x2fd756,
-      seekTimeline: _0x57503e,
-      stepTimeline: _0x3b2808,
-      stopPlayback: _0x33e2c8,
-      syncPlaybackFromVideo: _0x6f845a,
-      togglePlayback: _0x4b8ea2,
-    } = _0x57b119,
-    _0x16350b = createPersonReplacementShotCutEditorController({
-      session: _0x24b921,
-      previewController: _0x57b119,
-      mediaController: _0x177092,
-      viewportController: _0x2ca5f9,
-      getRoot: () => _0x42b7b0,
-      getProject: () => _0x57b9e5,
+      armFrameWait: armFrameWait,
+      cancelFrameWait: cancelFrameWait,
+      cancelHoverPreview: cancelHoverPreview,
+      clearPreviewMetadata: clearPreviewMetadata,
+      markFrameReady: markFrameReady,
+      preview: preview,
+      seekTimeline: seekTimeline,
+      stepTimeline: stepTimeline,
+      stopPlayback: stopPlayback,
+      syncPlaybackFromVideo: syncPlaybackFromVideo,
+      togglePlayback: togglePlayback,
+    } = previewController,
+    editorController = createPersonReplacementShotCutEditorController({
+      session: session,
+      previewController: previewController,
+      mediaController: mediaController,
+      viewportController: viewportController,
+      getRoot: () => floatingMenuHost,
+      getProject: () => initialProject2,
       documentObject: documentObject,
       windowObject: windowObject,
-      isDestroyed: () => _0x2f325d,
-      requestRender: () => _0x4cf492(),
-      onShotKeyframeSelected: _0x52549f(_0x43f995['SELECT_SHOT_KEYFRAME']),
-      onShotReverseRequested: _0x52549f(_0x43f995['UPDATE_SHOT_REVERSE']),
-      hideResultHistoryMenu: () => _0x446a6f(),
-      scrollShotCardIntoView: (_0x1a2b96) => _0x25aef6(_0x1a2b96),
+      isDestroyed: () => value43,
+      requestRender: () => run(),
+      onShotKeyframeSelected: onShotKeyframeSelected(downloadImageIntent['SELECT_SHOT_KEYFRAME']),
+      onShotReverseRequested: onShotKeyframeSelected(downloadImageIntent['UPDATE_SHOT_REVERSE']),
+      hideResultHistoryMenu: () => handler10(),
+      scrollShotCardIntoView: (value61) => scrollShotCardIntoView(value61),
     }),
     {
-      close: _0x26bf5a,
-      requestReverseChange: _0x482b47,
-      reset: _0x119305,
-      splitAtPlayhead: _0x4299a2,
-      watchOpeningVideo: _0x5e0fff,
-    } = _0x16350b,
-    _0x27ca5e = createPersonReplacementShotCutInteractionController({
-      session: _0x24b921,
-      previewController: _0x57b119,
-      viewportController: _0x2ca5f9,
-      editorController: _0x16350b,
-      getRoot: () => _0x42b7b0,
-      getProject: () => _0x57b9e5,
+      close: close2,
+      requestReverseChange: requestReverseChange,
+      reset: reset,
+      splitAtPlayhead: splitAtPlayhead,
+      watchOpeningVideo: watchOpeningVideo,
+    } = editorController,
+    personReplacementShotCutInteractionController = createPersonReplacementShotCutInteractionController({
+      session: session,
+      previewController: previewController,
+      viewportController: viewportController,
+      editorController: editorController,
+      getRoot: () => floatingMenuHost,
+      getProject: () => initialProject2,
       documentObject: documentObject,
       windowObject: windowObject,
-      isDestroyed: () => _0x2f325d,
-      requestRender: () => _0x4cf492(),
-      onShotCutDetectionRequested: _0x52549f(_0x43f995['DETECT_SHOT_CUT_RANGES']),
-      onShotCutRangesRequested: _0x52549f(_0x43f995['UPDATE_SHOT_CUT_RANGES']),
-      runRequest: (_0x7a1283, _0x23e9d7) => _0x267b3(_0x7a1283, _0x23e9d7),
-      updateSmartClipSettings: (..._0x22153e) => _0x2583b7(..._0x22153e),
+      isDestroyed: () => value43,
+      requestRender: () => run(),
+      onShotCutDetectionRequested: onShotKeyframeSelected(downloadImageIntent['DETECT_SHOT_CUT_RANGES']),
+      onShotCutRangesRequested: onShotKeyframeSelected(downloadImageIntent['UPDATE_SHOT_CUT_RANGES']),
+      runRequest: (value62, value63) => handler11(value62, value63),
+      updateSmartClipSettings: (...args5) => handler12(...args5),
     }),
     {
-      applyBoundaryTime: _0x42c738,
-      beginBoundaryDrag: _0x1217d1,
-      getTimelineSecFromPointer: _0x5272fe,
-      hideHoverPlayhead: _0x22c15c,
-      syncHoverPlayhead: _0x1e50c3,
-      undoDraft: _0x3ca241,
-    } = _0x27ca5e,
-    _0x400faa = createPersonReplacementAssetHoverPreviewController({
-      getRoot: () => _0x42b7b0,
-      getProject: () => _0x57b9e5,
-      getSelectedAppearance: (_0x2863cb) => _0x391a96(_0x2863cb),
-      isTargetAssetDragActive: () => _0x177009,
+      applyBoundaryTime: applyBoundaryTime,
+      beginBoundaryDrag: beginBoundaryDrag,
+      getTimelineSecFromPointer: getTimelineSecFromPointer,
+      hideHoverPlayhead: hideHoverPlayhead,
+      syncHoverPlayhead: syncHoverPlayhead,
+      undoDraft: undoDraft,
+    } = personReplacementShotCutInteractionController,
+    personReplacementAssetHoverPreviewController = createPersonReplacementAssetHoverPreviewController({
+      getRoot: () => floatingMenuHost,
+      getProject: () => initialProject2,
+      getSelectedAppearance: (value64) => handler13(value64),
+      isTargetAssetDragActive: () => enabled2,
       documentObject: documentObject,
       windowObject: windowObject,
     }),
     {
-      blockDropTarget: _0x297e45,
-      handlePointerMove: _0x5ae2bd,
-      handlePointerOut: _0x54b283,
-      handlePointerOver: _0x3f459d,
-      hide: _0x58b712,
-    } = _0x400faa;
-  let _0x553216 = ![],
-    _0x3d05d4 = null,
-    _0x236762 = null,
-    _0x59940c = 'none',
-    _0x5bc315 = 'page',
-    _0x3238d5 = '',
-    _0x1c8531 = () => ![];
-  const _0x1f77e4 = { accumulator: 0x0, lockedUntil: 0x0 },
-    _0x110a98 = { accumulator: 0x0, lockedUntil: 0x0 },
-    _0x4092b9 = { accumulator: 0x0, lockedUntil: 0x0 },
-    _0x260afc = { accumulator: 0x0, lockedUntil: 0x0 },
-    _0x32e60f = { accumulator: 0x0, lockedUntil: 0x0 },
-    _0x4625b2 = new Map(),
-    _0x735220 = new Map(),
-    _0x3d57d6 = createWorkspaceMenuController({
-      root: () => _0x42b7b0,
+      blockDropTarget: blockDropTarget,
+      handlePointerMove: handlePointerMove,
+      handlePointerOut: handlePointerOut,
+      handlePointerOver: handlePointerOver,
+      hide: hide,
+    } = personReplacementAssetHoverPreviewController;
+  let enabled3 = ![],
+    value65 = null,
+    value66 = null,
+    value67 = 'none',
+    value68 = 'page',
+    value69 = '',
+    handler14 = () => ![];
+  const value70 = { accumulator: 0x0, lockedUntil: 0x0 },
+    value71 = { accumulator: 0x0, lockedUntil: 0x0 },
+    value72 = { accumulator: 0x0, lockedUntil: 0x0 },
+    value73 = { accumulator: 0x0, lockedUntil: 0x0 },
+    value74 = { accumulator: 0x0, lockedUntil: 0x0 },
+    map3 = new Map(),
+    map4 = new Map(),
+    workspaceMenuController = createWorkspaceMenuController({
+      root: () => floatingMenuHost,
       wrapperSelector: '[data-person-replacement-output-menu]',
       triggerSelector: '[data-person-replacement-output-menu-trigger]',
       menuSelector: '.story-canvas-sync-menu',
       optionSelector: '[data-person-replacement-output-menu-item]',
     }),
-    _0x23c082 = createPersonReplacementExportSubmenuController({ root: () => _0x42b7b0 }),
-    _0x624e11 = (_0x1616a7 = null) => {
-      return (_0x23c082['close'](), _0x3d57d6['close'](_0x1616a7));
+    personReplacementExportSubmenuController = createPersonReplacementExportSubmenuController({
+      root: () => floatingMenuHost,
+    }),
+    handler15 = (value75 = null) => {
+      return (personReplacementExportSubmenuController['close'](), workspaceMenuController['close'](value75));
     },
-    _0x37ce51 = (_0x250afc) => _0x3d57d6['toggle'](_0x250afc),
-    _0x17c907 = (_0x5b946d) => {
-      if (_0x750640(_0x43f995['SELECT_SOURCE_VIDEOS']))
-        return _0x4e3281(_0x43f995['SELECT_SOURCE_VIDEOS'], _0x5b946d);
-      if (_0x750640(_0x43f995['SELECT_SOURCE_VIDEO']))
+    handler16 = (value76) => workspaceMenuController['toggle'](value76),
+    handler17 = (list5) => {
+      if (hasWorkspaceIntent(downloadImageIntent['SELECT_SOURCE_VIDEOS']))
+        return runIntent(downloadImageIntent['SELECT_SOURCE_VIDEOS'], list5);
+      if (hasWorkspaceIntent(downloadImageIntent['SELECT_SOURCE_VIDEO']))
         return Promise['all'](
-          _0x5b946d['map']((_0x5ee74a) => _0x4ad4fe(_0x43f995['SELECT_SOURCE_VIDEO'], _0x5ee74a)),
-        );
-      return null;
-    },
-    _0x59d19e = (_0x5df881) => {
-      if (_0x750640(_0x43f995['SELECT_NEW_CHARACTER_IMAGES']))
-        return _0x4e3281(_0x43f995['SELECT_NEW_CHARACTER_IMAGES'], _0x5df881);
-      if (_0x750640(_0x43f995['SELECT_NEW_CHARACTER_IMAGE']))
-        return Promise['all'](
-          _0x5df881['map']((_0x1c85be) =>
-            _0x4ad4fe(_0x43f995['SELECT_NEW_CHARACTER_IMAGE'], _0x1c85be, { project: cloneJson(_0x57b9e5) }),
+          list5['map']((value77) =>
+            promptEnhancementModel(downloadImageIntent['SELECT_SOURCE_VIDEO'], value77),
           ),
         );
       return null;
     },
-    _0x3ccd2d = (_0x3dd2d5 = _0x57b9e5) =>
-      refreshPersonReplacementWorkspaceAssets(_0x3dd2d5, () =>
-        _0x750640(_0x43f995['LIST_LIBRARY_ASSETS']) ? _0x4ad4fe(_0x43f995['LIST_LIBRARY_ASSETS']) : null,
+    handler18 = (list6) => {
+      if (hasWorkspaceIntent(downloadImageIntent['SELECT_NEW_CHARACTER_IMAGES']))
+        return runIntent(downloadImageIntent['SELECT_NEW_CHARACTER_IMAGES'], list6);
+      if (hasWorkspaceIntent(downloadImageIntent['SELECT_NEW_CHARACTER_IMAGE']))
+        return Promise['all'](
+          list6['map']((value78) =>
+            promptEnhancementModel(downloadImageIntent['SELECT_NEW_CHARACTER_IMAGE'], value78, {
+              project: cloneJson(initialProject2),
+            }),
+          ),
+        );
+      return null;
+    },
+    handler19 = (value79 = initialProject2) =>
+      refreshPersonReplacementWorkspaceAssets(value79, () =>
+        hasWorkspaceIntent(downloadImageIntent['LIST_LIBRARY_ASSETS'])
+          ? promptEnhancementModel(downloadImageIntent['LIST_LIBRARY_ASSETS'])
+          : null,
       ),
-    _0x906547 = (_0x506756, _0x567b63) => {
-      const _0x468f07 = normalizePersonReplacementWorkspaceProject(_0x506756);
-      if (typeof projectSession?.['commitWorkspaceProject'] !== 'function') return _0x468f07;
-      const _0x1e923f = projectSession['commitWorkspaceProject'](cloneJson(_0x468f07), { reason: _0x567b63 });
+    handler20 = (value80, reason2) => {
+      const libraryProjects = normalizePersonReplacementWorkspaceProject(value80);
+      if (typeof projectSession?.['commitWorkspaceProject'] !== 'function') return libraryProjects;
+      const args6 = projectSession['commitWorkspaceProject'](cloneJson(libraryProjects), { reason: reason2 });
       return normalizePersonReplacementWorkspaceProject({
-        ..._0x1e923f,
-        libraryProjects: _0x468f07['libraryProjects'],
-        libraryAssets: _0x468f07['libraryAssets'],
-        sourcePreviewRefs: _0x468f07['sourcePreviewRefs'],
-        persistenceState: _0x468f07['persistenceState'],
+        ...args6,
+        libraryProjects: libraryProjects['libraryProjects'],
+        libraryAssets: libraryProjects['libraryAssets'],
+        sourcePreviewRefs: libraryProjects['sourcePreviewRefs'],
+        persistenceState: libraryProjects['persistenceState'],
       });
     },
-    _0x273c17 = (_0xdb0c5a) => {
-      ((_0x57b9e5 = _0x906547(_0x57b9e5, _0xdb0c5a)),
-        _0x42cf44['forEach']((_0x27c55e) => _0x27c55e?.['syncPrices']?.()));
-      if (_0xdb0c5a === 'image-prompt')
-        syncPersonReplacementImagePromptGate(_0x42b7b0, _0x57b9e5, _0x1f9cef());
-      return cloneJson(_0x57b9e5);
+    handler21 = (value81) => {
+      ((initialProject2 = handler20(initialProject2, value81)),
+        list3['forEach']((value82) => value82?.['syncPrices']?.()));
+      if (value81 === 'image-prompt')
+        syncPersonReplacementImagePromptGate(floatingMenuHost, initialProject2, handler22());
+      return cloneJson(initialProject2);
     },
-    _0x4175c2 = () => isPersonReplacementSourceProcessing(_0x57b9e5),
-    _0x3fc4d6 = (_0x625e20, _0xd9d7af = 0x0) => {
-      _0x4ad4fe(_0x43f995['REPORT_STEP_NAVIGATION_BLOCKED'], {
-        reason: _0x625e20,
-        currentStep: _0x57b9e5['workspace']['step'],
-        requestedStep: _0xd9d7af,
-        project: cloneJson(_0x57b9e5),
+    handler23 = () => isPersonReplacementSourceProcessing(initialProject2),
+    handler24 = (reason3, requestedStep = 0x0) => {
+      promptEnhancementModel(downloadImageIntent['REPORT_STEP_NAVIGATION_BLOCKED'], {
+        reason: reason3,
+        currentStep: initialProject2['workspace']['step'],
+        requestedStep: requestedStep,
+        project: cloneJson(initialProject2),
       });
     },
-    _0x934d2e = (_0x95f7ee = _0x57b9e5) => {
-      const _0x22a002 = _0x95f7ee?.['workspace'] || {};
-      if (_0x22a002['view'] !== 'project') return normalizeText(_0x22a002['view']) || 'home';
-      const _0x3262ab = Math['trunc'](Number(_0x22a002['step']) || 0x1);
-      return _0x3262ab === 0x1
+    handler25 = (value83 = initialProject2) => {
+      const value84 = value83?.['workspace'] || {};
+      if (value84['view'] !== 'project') return normalizeText(value84['view']) || 'home';
+      const count = Math['trunc'](Number(value84['step']) || 0x1);
+      return count === 0x1
         ? 'project:' +
-            _0x3262ab +
+            count +
             ':asset:' +
-            (['character', 'scene', 'audio', 'library']['includes'](_0x22a002['characterAssetTab'])
-              ? _0x22a002['characterAssetTab']
+            (['character', 'scene', 'audio', 'library']['includes'](value84['characterAssetTab'])
+              ? value84['characterAssetTab']
               : 'character')
-        : 'project:' + _0x3262ab;
+        : 'project:' + count;
     },
-    _0x4c0940 = (_0x1910e0 = _0x57b9e5) =>
-      (normalizeText(_0x1910e0?.['id']) || 'draft') + '\x1f' + _0x934d2e(_0x1910e0),
-    _0x969ed5 = (_0x41c3cb, _0x5166d3, { assetScope: assetScope = 'asset-content' } = {}) => {
-      const _0x2f50c6 = _0x41c3cb?.['workspace'] || {},
-        _0x40ba6b = _0x5166d3?.['workspace'] || {};
-      if (_0x2f50c6['view'] !== 'project' || _0x40ba6b['view'] !== 'project') return;
-      const _0x56c3c = Math['trunc'](Number(_0x2f50c6['step']) || 0x1),
-        _0x2e4c62 = Math['trunc'](Number(_0x40ba6b['step']) || 0x1);
-      if (_0x56c3c !== _0x2e4c62) {
-        ((_0x59940c = _0x2e4c62 > _0x56c3c ? 'forward' : 'backward'), (_0x5bc315 = 'page'));
+    handler26 = (value85 = initialProject2) =>
+      (normalizeText(value85?.['id']) || 'draft') + '\x1f' + handler25(value85),
+    handler27 = (value86, value87, { assetScope: assetScope = 'asset-content' } = {}) => {
+      const value88 = value86?.['workspace'] || {},
+        value89 = value87?.['workspace'] || {};
+      if (value88['view'] !== 'project' || value89['view'] !== 'project') return;
+      const value90 = Math['trunc'](Number(value88['step']) || 0x1),
+        count2 = Math['trunc'](Number(value89['step']) || 0x1);
+      if (value90 !== count2) {
+        ((value67 = count2 > value90 ? 'forward' : 'backward'), (value68 = 'page'));
         return;
       }
-      if (_0x2e4c62 !== 0x1) return;
-      const _0x4fe482 = resolveWorkspaceTabTransitionDirection(
-        _0x2f50c6['characterAssetTab'],
-        _0x40ba6b['characterAssetTab'],
+      if (count2 !== 0x1) return;
+      const workspaceTabTransitionDirection = resolveWorkspaceTabTransitionDirection(
+        value88['characterAssetTab'],
+        value89['characterAssetTab'],
         ['character', 'scene', 'audio', 'library'],
       );
-      if (_0x4fe482 === 'none') return;
-      ((_0x59940c = _0x4fe482), (_0x5bc315 = assetScope === 'asset-list' ? 'asset-list' : 'asset-content'));
+      if (workspaceTabTransitionDirection === 'none') return;
+      ((value67 = workspaceTabTransitionDirection),
+        (value68 = assetScope === 'asset-list' ? 'asset-list' : 'asset-content'));
     },
-    _0x5bad7b = (_0x13deba, _0x232299 = null, { inPlace: inPlace = ![] } = {}) => {
-      const _0x34f7da = _0x13deba?.['project'] || _0x13deba;
-      if (_0x34f7da && typeof _0x34f7da === 'object') {
-        const _0x41e06f = _0x232299
-          ? { ..._0x34f7da, workspace: { ...(_0x34f7da['workspace'] || {}), ..._0x232299 } }
-          : _0x34f7da;
+    handler28 = (value91, args7 = null, { inPlace: inPlace = ![] } = {}) => {
+      const args8 = value91?.['project'] || value91;
+      if (args8 && typeof args8 === 'object') {
+        const value92 = args7 ? { ...args8, workspace: { ...(args8['workspace'] || {}), ...args7 } } : args8;
         inPlace
-          ? _0x2edc43['syncProjectState'](_0x41e06f, { returnSnapshot: ![] })
-          : _0x2edc43['setProject'](_0x41e06f);
+          ? value93['syncProjectState'](value92, { returnSnapshot: ![] })
+          : value93['setProject'](value92);
       }
     },
-    _0x267b3 = (
-      _0x3204bf,
-      _0x4efbb7,
-      _0x5f0a58 = {},
+    handler11 = (
+      handler29,
+      value94,
+      args9 = {},
       {
         applyCallbackResult: applyCallbackResult = !![],
         applyCallbackResultInPlace: applyCallbackResultInPlace = ![],
       } = {},
     ) => {
-      const _0x4ce8ca =
-        _0x57b9e5['workspace']['view'] === 'home'
+      const value95 =
+        initialProject2['workspace']['view'] === 'home'
           ? {
-              projectSearchQuery: _0x57b9e5['workspace']['projectSearchQuery'],
-              projectSortOrder: _0x57b9e5['workspace']['projectSortOrder'],
-              showArchivedProjects: _0x57b9e5['workspace']['showArchivedProjects'],
+              projectSearchQuery: initialProject2['workspace']['projectSearchQuery'],
+              projectSortOrder: initialProject2['workspace']['projectSortOrder'],
+              showArchivedProjects: initialProject2['workspace']['showArchivedProjects'],
               openProjectMenuId: '',
               pendingDeleteProjectId: '',
             }
           : null;
       try {
-        const _0x9d445e = _0x3204bf(_0x4efbb7, { project: cloneJson(_0x57b9e5), ..._0x5f0a58 });
-        if (_0x9d445e?.['then'])
-          void _0x9d445e['then'](
-            (_0xa67189) => {
-              applyCallbackResult && _0x5bad7b(_0xa67189, _0x4ce8ca, { inPlace: applyCallbackResultInPlace });
+        const promise = handler29(value94, { project: cloneJson(initialProject2), ...args9 });
+        if (promise?.['then'])
+          void promise['then'](
+            (value96) => {
+              applyCallbackResult && handler28(value96, value95, { inPlace: applyCallbackResultInPlace });
             },
             () => {},
           );
-        else applyCallbackResult && _0x5bad7b(_0x9d445e, _0x4ce8ca, { inPlace: applyCallbackResultInPlace });
-        return _0x9d445e;
-      } catch (_0x416d66) {
+        else applyCallbackResult && handler28(promise, value95, { inPlace: applyCallbackResultInPlace });
+        return promise;
+      } catch (value97) {
         return (
           globalThis['queueMicrotask']?.(() => {
-            throw _0x416d66;
+            throw value97;
           }),
           null
         );
       }
     },
-    _0x4e3281 = (_0x41c9f1, _0x28fe58, _0x393848 = {}, _0x419f8b = {}) =>
-      _0x267b3(_0x52549f(_0x41c9f1), _0x28fe58, _0x393848, _0x419f8b),
-    _0x1fc768 = (_0x5b7017, _0xa2c2c2 = '') => {
-      const _0x4ce83b = normalizeText(_0x5b7017?.['dataset']?.['shotId']);
-      if (!_0x4ce83b) return '';
-      const _0x2fe64a = readPersonReplacementVideoPromptEditor(_0x5b7017);
-      _0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-        ..._0x57b9e5,
-        shots: _0x57b9e5['shots']['map']((_0x796c9c) =>
-          _0x796c9c['id'] === _0x4ce83b ? { ..._0x796c9c, videoPrompt: _0x2fe64a } : _0x796c9c,
+    runIntent = (value98, value99, value100 = {}, value101 = {}) =>
+      handler11(onShotKeyframeSelected(value98), value99, value100, value101),
+    handler30 = (el6, value102 = '') => {
+      const text2 = normalizeText(el6?.['dataset']?.['shotId']);
+      if (!text2) return '';
+      const videoPrompt = readPersonReplacementVideoPromptEditor(el6);
+      initialProject2 = normalizePersonReplacementWorkspaceProject({
+        ...initialProject2,
+        shots: initialProject2['shots']['map']((args10) =>
+          args10['id'] === text2 ? { ...args10, videoPrompt: videoPrompt } : args10,
         ),
       });
-      if (_0xa2c2c2) _0x273c17(_0xa2c2c2);
-      return _0x2fe64a;
+      if (value102) handler21(value102);
+      return videoPrompt;
     },
-    _0x56892a = (_0x64d355, _0x5bd323, _0x2db51e = {}) => {
-      if (!_0x64d355) return;
+    handler31 = (promptEl, template, value103 = {}) => {
+      if (!promptEl) return;
       (insertPresetPromptIntoEditor({
         storeApi: null,
-        promptEl: _0x64d355,
-        template: _0x5bd323,
+        promptEl: promptEl,
+        template: template,
         allowedAssetTypes: ['text', 'image', 'video', 'audio'],
       }),
-        _0x1fc768(_0x64d355, 'video-prompt-preset'));
-      if (_0x2db51e?.['insertPrompt'] === !![]) return;
-      _0x4e3281(
-        _0x43f995['GENERATE_REPLACEMENT_VIDEO'],
-        { projectId: _0x57b9e5['id'], shotId: normalizeText(_0x64d355['dataset']?.['shotId']) },
+        handler30(promptEl, 'video-prompt-preset'));
+      if (value103?.['insertPrompt'] === !![]) return;
+      runIntent(
+        downloadImageIntent['GENERATE_REPLACEMENT_VIDEO'],
+        { projectId: initialProject2['id'], shotId: normalizeText(promptEl['dataset']?.['shotId']) },
         {},
         { applyCallbackResult: ![] },
       );
     },
-    _0x7a45ba = (_0x491624, _0x28bfdc = _0x57b9e5['id']) =>
-      normalizeText(_0x28bfdc) + '\x1f' + normalizeText(_0x491624),
-    _0x533135 = (_0x535383, _0x2c8a62) => {
-      const _0x3f67e8 = _0x7a45ba(_0x535383);
-      if (_0x29b772['has'](_0x3f67e8)) return null;
-      (_0x29b772['add'](_0x3f67e8), _0x4cf492());
-      let _0x28c176 = null;
+    handler32 = (value104, value105 = initialProject2['id']) =>
+      normalizeText(value105) + '\x1f' + normalizeText(value104),
+    handler33 = (value106, handler34) => {
+      const value107 = handler32(value106);
+      if (map['has'](value107)) return null;
+      (map['add'](value107), run());
+      let promise2 = null;
       try {
-        _0x28c176 = _0x2c8a62();
-      } catch (_0x5517f5) {
+        promise2 = handler34();
+      } catch (error) {
         return (
-          _0x29b772['delete'](_0x3f67e8),
-          _0x4cf492(),
-          windowObject?.['showToast']?.(_0x5517f5?.['message'] || '素材上传失败，请稍后重试。', 'error'),
+          map['delete'](value107),
+          run(),
+          windowObject?.['showToast']?.(error?.['message'] || '素材上传失败，请稍后重试。', 'error'),
           null
         );
       }
-      const _0x2fb8f0 = () => {
-        if (!_0x29b772['delete'](_0x3f67e8)) return;
-        _0x4cf492();
+      const run2 = () => {
+        if (!map['delete'](value107)) return;
+        run();
       };
-      if (!_0x28c176?.['then']) return (_0x2fb8f0(), _0x28c176);
+      if (!promise2?.['then']) return (run2(), promise2);
       return (
-        void Promise['resolve'](_0x28c176)
-          ['catch']((_0x1a2008) => {
-            windowObject?.['showToast']?.(_0x1a2008?.['message'] || '素材上传失败，请稍后重试。', 'error');
+        void Promise['resolve'](promise2)
+          ['catch']((error2) => {
+            windowObject?.['showToast']?.(error2?.['message'] || '素材上传失败，请稍后重试。', 'error');
           })
-          ['finally'](_0x2fb8f0),
-        _0x28c176
+          ['finally'](run2),
+        promise2
       );
     },
-    _0x29175f = (_0x1f86f0, _0x45330d) => {
-      const _0x41527e = _0x1f86f0?.['querySelector']?.(
-          '[data-person-replacement-action="toggle-library-add-targets"]',
-        ),
-        _0x3f3ce0 = _0x1f86f0?.['querySelector']?.('.story-asset-batch-menu');
-      if (!_0x1f86f0 || !_0x41527e || !_0x3f3ce0) return ![];
-      if (_0x45330d) syncWorkspaceInlineMenuExpandedWidth(_0x3f3ce0);
+    handler35 = (el7, enabled4) => {
+      const el8 = el7?.['querySelector']?.('[data-person-replacement-action="toggle-library-add-targets"]'),
+        el9 = el7?.['querySelector']?.('.story-asset-batch-menu');
+      if (!el7 || !el8 || !el9) return ![];
+      if (enabled4) syncWorkspaceInlineMenuExpandedWidth(el9);
       return (
-        _0x1f86f0['classList']?.['toggle']?.('is-open', _0x45330d),
-        _0x41527e['setAttribute']?.('aria-expanded', String(_0x45330d)),
-        _0x3f3ce0['setAttribute']?.('aria-hidden', String(!_0x45330d)),
+        el7['classList']?.['toggle']?.('is-open', enabled4),
+        el8['setAttribute']?.('aria-expanded', String(enabled4)),
+        el9['setAttribute']?.('aria-hidden', String(!enabled4)),
         !![]
       );
     },
-    _0x318ab0 = (_0x269582 = null) => {
-      _0x42b7b0?.['querySelectorAll']?.('.person-replacement-library-add-menu-wrap.is-open')?.['forEach']?.(
-        (_0x631db5) => {
-          if (_0x631db5 !== _0x269582) _0x29175f(_0x631db5, ![]);
-        },
-      );
+    handler36 = (value108 = null) => {
+      floatingMenuHost?.['querySelectorAll']?.('.person-replacement-library-add-menu-wrap.is-open')?.[
+        'forEach'
+      ]?.((value109) => {
+        if (value109 !== value108) handler35(value109, ![]);
+      });
     },
-    _0x28395d = (_0x4b65e5, _0x204d54) => {
-      const _0x2dcfad = _0x4b65e5?.['querySelector']?.(
-          '[data-story-action=\x22toggle-character-voice-menu\x22]',
-        ),
-        _0x1033c0 = _0x4b65e5?.['querySelector']?.('.person-replacement-add-voice-menu');
-      if (!_0x4b65e5 || !_0x2dcfad || !_0x1033c0) return ![];
+    handler37 = (el10, enabled5) => {
+      const el11 = el10?.['querySelector']?.('[data-story-action=\x22toggle-character-voice-menu\x22]'),
+        el12 = el10?.['querySelector']?.('.person-replacement-add-voice-menu');
+      if (!el10 || !el11 || !el12) return ![];
       return (
-        _0x4b65e5['classList']?.['toggle']?.('is-open', _0x204d54),
-        _0x2dcfad['setAttribute']?.('aria-expanded', String(_0x204d54)),
-        _0x1033c0['setAttribute']?.('aria-hidden', String(!_0x204d54)),
+        el10['classList']?.['toggle']?.('is-open', enabled5),
+        el11['setAttribute']?.('aria-expanded', String(enabled5)),
+        el12['setAttribute']?.('aria-hidden', String(!enabled5)),
         !![]
       );
     },
-    _0x4ba512 = (_0x492c83 = null) => {
-      _0x42b7b0?.['querySelectorAll']?.('.person-replacement-add-voice-menu-wrap.is-open')?.['forEach']?.(
-        (_0xebe492) => {
-          if (_0xebe492 !== _0x492c83) _0x28395d(_0xebe492, ![]);
-        },
-      );
+    handler38 = (value110 = null) => {
+      floatingMenuHost?.['querySelectorAll']?.('.person-replacement-add-voice-menu-wrap.is-open')?.[
+        'forEach'
+      ]?.((value111) => {
+        if (value111 !== value110) handler37(value111, ![]);
+      });
     },
-    _0x26d845 = (_0x5a5faf, _0x26a2bc, _0x267940 = {}) => {
-      const _0x15d4fc = _0x57b9e5;
-      _0x57b9e5 = _0x906547(_0x5a5faf, _0x26a2bc);
-      const _0xca52b2 = normalizeText(_0x26a2bc),
-        _0x57cb2c = [
+    updateProject = (value112, value113, value114 = {}) => {
+      const value115 = initialProject2;
+      initialProject2 = handler20(value112, value113);
+      const text3 = normalizeText(value113),
+        assetScope2 = [
           'character-voice-library-open',
           'character-voice-library-cancel',
           'character-voice-library-confirm',
-        ]['includes'](_0xca52b2)
+        ]['includes'](text3)
           ? 'asset-list'
           : 'asset-content';
-      _0x969ed5(_0x15d4fc, _0x57b9e5, { assetScope: _0x57cb2c });
-      if (!_0x1c8531(_0x26a2bc, _0x267940)) _0x4cf492();
-      return (_0x4aeba7?.['refresh'](), cloneJson(_0x57b9e5));
+      handler27(value115, initialProject2, { assetScope: assetScope2 });
+      if (!handler14(value113, value114)) run();
+      return (ctx?.['refresh'](), cloneJson(initialProject2));
     },
-    _0x5569e2 = ({
-      detectionBox: _0x5276ca,
-      label: _0x470b70,
-      sourceCharacterId: _0x34d0f0,
-      orientation: _0x42ad43,
+    handler39 = ({
+      detectionBox: detectionBox,
+      label: label,
+      sourceCharacterId: sourceCharacterId,
+      orientation: orientation,
     } = {}) => {
-      const _0xc708bc = normalizeText(_0x5276ca?.['dataset']?.['shotId']),
-        _0x4d4c2a = normalizeText(_0x5276ca?.['dataset']?.['personId']),
-        _0x36962d = _0x57b9e5['shots']['find']((_0x1e4684) => _0x1e4684['id'] === _0xc708bc),
-        _0x34b4a7 = _0x36962d?.['people']?.['find']((_0x55867a) => _0x55867a['id'] === _0x4d4c2a);
-      if (!_0x34b4a7) return ![];
-      const _0x1d5419 =
-        _0x470b70 === undefined ? normalizeText(_0x34b4a7['label']) : normalizeText(_0x470b70);
-      if (!_0x1d5419) return ![];
-      const _0x1a16e7 = normalizeText(_0x34d0f0, normalizeText(_0x34b4a7['sourceCharacterId'])),
-        _0x1ea77a =
-          _0x42ad43 === undefined ? normalizeText(_0x34b4a7['orientation']) : normalizeText(_0x42ad43),
-        _0x4dbd7f = getPersonReplacementIdentityCorrectionDraftKey(_0xc708bc, _0x4d4c2a),
-        _0x64ee2c = { ..._0x57b9e5['workspace']['identityCorrectionDrafts'] };
-      delete _0x64ee2c[_0x4dbd7f];
-      const _0x30a933 = _0x57b9e5['workspace']['removedCustomPersonLabels']['filter'](
-        (_0x4fc94c) => _0x4fc94c !== _0x1d5419,
+      const shotId = normalizeText(detectionBox?.['dataset']?.['shotId']),
+        personId = normalizeText(detectionBox?.['dataset']?.['personId']),
+        value116 = initialProject2['shots']['find']((value117) => value117['id'] === shotId),
+        sourceCharacterId2 = value116?.['people']?.['find']((value118) => value118['id'] === personId);
+      if (!sourceCharacterId2) return ![];
+      const label2 = label === undefined ? normalizeText(sourceCharacterId2['label']) : normalizeText(label);
+      if (!label2) return ![];
+      const targetSourceCharacterId = normalizeText(
+          sourceCharacterId,
+          normalizeText(sourceCharacterId2['sourceCharacterId']),
+        ),
+        orientation2 =
+          orientation === undefined
+            ? normalizeText(sourceCharacterId2['orientation'])
+            : normalizeText(orientation),
+        personReplacementIdentityCorrectionDraftKey = getPersonReplacementIdentityCorrectionDraftKey(
+          shotId,
+          personId,
+        ),
+        identityCorrectionDrafts = { ...initialProject2['workspace']['identityCorrectionDrafts'] };
+      delete identityCorrectionDrafts[personReplacementIdentityCorrectionDraftKey];
+      const removedCustomPersonLabels = initialProject2['workspace']['removedCustomPersonLabels']['filter'](
+        (value119) => value119 !== label2,
       );
       return (
-        (_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-          ..._0x57b9e5,
+        (initialProject2 = normalizePersonReplacementWorkspaceProject({
+          ...initialProject2,
           workspace: {
-            ..._0x57b9e5['workspace'],
-            identityCorrectionDrafts: _0x64ee2c,
-            removedCustomPersonLabels: _0x30a933,
+            ...initialProject2['workspace'],
+            identityCorrectionDrafts: identityCorrectionDrafts,
+            removedCustomPersonLabels: removedCustomPersonLabels,
           },
         })),
-        _0x4e3281(_0x43f995['CONFIRM_SOURCE_IDENTITY'], {
-          sourceCharacterId: _0x34b4a7['sourceCharacterId'],
-          targetSourceCharacterId: _0x1a16e7,
-          shotId: _0xc708bc,
-          personId: _0x4d4c2a,
-          label: _0x1d5419,
-          orientation: _0x1ea77a,
+        runIntent(downloadImageIntent['CONFIRM_SOURCE_IDENTITY'], {
+          sourceCharacterId: sourceCharacterId2['sourceCharacterId'],
+          targetSourceCharacterId: targetSourceCharacterId,
+          shotId: shotId,
+          personId: personId,
+          label: label2,
+          orientation: orientation2,
           silent: !![],
         }),
         !![]
       );
     },
-    _0x57cd0f = (_0x11e11d) => {
-      const _0x389c60 = _0x11e11d === 'original' ? 'original' : 'replacement';
-      if (_0x389c60 === 'replacement') {
-        const _0x4f9189 = buildPersonReplacementCompositePreviewSnapshot(_0x57b9e5)['media'];
-        if (!_0x4f9189['replacementAudioRef'])
+    handler40 = (value120) => {
+      const previewTrack = value120 === 'original' ? 'original' : 'replacement';
+      if (previewTrack === 'replacement') {
+        const personReplacementCompositePreviewSnapshot3 =
+          buildPersonReplacementCompositePreviewSnapshot(initialProject2)['media'];
+        if (!personReplacementCompositePreviewSnapshot3['replacementAudioRef'])
           return (
             windowObject?.['showToast']?.(
               '请返回「声音克隆」，先生成语音并点击「合成」，完成后再选择替换音轨。',
               'warn',
             ),
-            cloneJson(_0x57b9e5)
+            cloneJson(initialProject2)
           );
       }
-      if (_0x389c60 === _0x57b9e5['audio']['previewTrack'] && _0x389c60 === _0x57b9e5['audio']['exportTrack'])
-        return (_0x31cdf2['setTrack'](_0x389c60), cloneJson(_0x57b9e5));
+      if (
+        previewTrack === initialProject2['audio']['previewTrack'] &&
+        previewTrack === initialProject2['audio']['exportTrack']
+      )
+        return (
+          personReplacementCompositePreviewController['setTrack'](previewTrack),
+          cloneJson(initialProject2)
+        );
       return (
-        (_0x57b9e5 = normalizePersonReplacementWorkspaceProject(
+        (initialProject2 = normalizePersonReplacementWorkspaceProject(
           transitionPersonReplacementOutput(
             {
-              ..._0x57b9e5,
-              audio: { ..._0x57b9e5['audio'], previewTrack: _0x389c60, exportTrack: _0x389c60 },
+              ...initialProject2,
+              audio: { ...initialProject2['audio'], previewTrack: previewTrack, exportTrack: previewTrack },
             },
             { type: PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['FINAL_MUX_INVALIDATE'] },
           ),
         )),
-        _0x42b7b0?.['querySelectorAll']?.('[data-person-replacement-action="set-preview-track"]')?.[
+        floatingMenuHost?.['querySelectorAll']?.('[data-person-replacement-action="set-preview-track"]')?.[
           'forEach'
-        ]?.((_0x5e34ee) => {
-          const _0x2c4659 = _0x5e34ee['dataset']?.['previewTrack'] === _0x389c60;
-          (_0x5e34ee['classList']?.['toggle']?.('is-selected', _0x2c4659),
-            _0x5e34ee['setAttribute']?.('aria-pressed', String(_0x2c4659)));
+        ]?.((el13) => {
+          const value121 = el13['dataset']?.['previewTrack'] === previewTrack;
+          (el13['classList']?.['toggle']?.('is-selected', value121),
+            el13['setAttribute']?.('aria-pressed', String(value121)));
         }),
-        _0x31cdf2['setTrack'](_0x389c60),
-        _0x273c17('preview-track'),
-        cloneJson(_0x57b9e5)
+        personReplacementCompositePreviewController['setTrack'](previewTrack),
+        handler21('preview-track'),
+        cloneJson(initialProject2)
       );
     },
-    _0x3013ce = (_0x40c56d = '') => {
-      const _0x4afcee = _0x57b9e5['shots']['find'](
-          (_0x1674b2) =>
-            _0x1674b2['id'] === normalizeText(_0x40c56d || _0x57b9e5['workspace']['selectedShotId']),
+    handler41 = (value122 = '') => {
+      const selectedShot = initialProject2['shots']['find'](
+          (value123) =>
+            value123['id'] === normalizeText(value122 || initialProject2['workspace']['selectedShotId']),
         ),
-        _0x4c0f44 = _0x42b7b0?.['querySelector']?.('[data-person-replacement-video-stage]'),
-        _0x56c830 = _0x4c0f44?.['querySelector']?.('[data-person-replacement-video-player]'),
-        _0x53b114 = resolvePersonReplacementVideoSlotState(_0x57b9e5, _0x4afcee)['slotEntries'][
-          'sourceVideo'
-        ]?.['url'],
-        _0x38450d = normalizeMediaUrl(_0x53b114);
-      if (!_0x4afcee || !_0x4c0f44 || !_0x56c830 || !_0x38450d)
+        stage = floatingMenuHost?.['querySelector']?.('[data-person-replacement-video-stage]'),
+        videoEl = stage?.['querySelector']?.('[data-person-replacement-video-player]'),
+        personReplacementVideoSlotState = resolvePersonReplacementVideoSlotState(
+          initialProject2,
+          selectedShot,
+        )['slotEntries']['sourceVideo']?.['url'],
+        mediaUrl = normalizeMediaUrl(personReplacementVideoSlotState);
+      if (!selectedShot || !stage || !videoEl || !mediaUrl)
         return (windowObject?.['showToast']?.('当前视频片段尚未准备完成。', 'warn'), ![]);
-      if (isPersonReplacementVideoCropReverseRunning(_0x4afcee))
+      if (isPersonReplacementVideoCropReverseRunning(selectedShot))
         return (windowObject?.['showToast']?.('当前视频片段正在处理倒放，请稍后再裁剪。', 'info'), ![]);
-      _0x56c830['pause']?.();
-      const _0x671a59 =
-          Number(_0x56c830['duration']) > 0x0
-            ? Number(_0x56c830['duration'])
-            : Math['max'](0x0, Number(_0x4afcee['durationSec']) || 0x0),
-        _0x5219f4 = videoClipController?.['initForSource']?.(
+      videoEl['pause']?.();
+      const durationSec =
+          Number(videoEl['duration']) > 0x0
+            ? Number(videoEl['duration'])
+            : Math['max'](0x0, Number(selectedShot['durationSec']) || 0x0),
+        value124 = videoClipController?.['initForSource']?.(
           createPersonReplacementVideoCropOptions({
-            projectId: _0x57b9e5['id'],
-            selectedShot: _0x4afcee,
-            stage: _0x4c0f44,
-            videoEl: _0x56c830,
-            durationSec: _0x671a59,
-            getProject: () => _0x57b9e5,
-            acceptProject: (_0x2b523b) => {
-              const _0x233a37 = normalizePersonReplacementWorkspaceProject(_0x2b523b);
+            projectId: initialProject2['id'],
+            selectedShot: selectedShot,
+            stage: stage,
+            videoEl: videoEl,
+            durationSec: durationSec,
+            getProject: () => initialProject2,
+            acceptProject: (value125) => {
+              const personReplacementWorkspaceProject2 = normalizePersonReplacementWorkspaceProject(value125);
               return (
-                normalizeText(_0x233a37['id']) === normalizeText(_0x57b9e5['id']) && (_0x57b9e5 = _0x233a37),
-                _0x57b9e5
+                normalizeText(personReplacementWorkspaceProject2['id']) ===
+                  normalizeText(initialProject2['id']) &&
+                  (initialProject2 = personReplacementWorkspaceProject2),
+                initialProject2
               );
             },
-            requestReverseChange: _0x482b47,
-            onConfirm: (_0x5ce056) => {
-              (_0x2ba69b['setClipActive'](![]),
-                _0x26d845(
-                  applyPersonReplacementVideoCrop(_0x57b9e5, { ..._0x5ce056, shotId: _0x4afcee['id'] }),
+            requestReverseChange: requestReverseChange,
+            onConfirm: (args11) => {
+              (personReplacementVideoPlaybackController['setClipActive'](![]),
+                updateProject(
+                  applyPersonReplacementVideoCrop(initialProject2, { ...args11, shotId: selectedShot['id'] }),
                   'video-crop',
                 ));
             },
-            onExit: ({ reason: _0x15834e } = {}) => {
-              _0x2ba69b['setClipActive'](![]);
-              if (['confirm', 'silent']['includes'](_0x15834e) || _0x2f325d) return;
-              if (!_0x59d0d2()) _0x4cf492();
+            onExit: ({ reason: reason4 } = {}) => {
+              personReplacementVideoPlaybackController['setClipActive'](![]);
+              if (['confirm', 'silent']['includes'](reason4) || value43) return;
+              if (!handler42()) run();
             },
           }),
         );
-      return _0x2ba69b['setClipActive'](_0x5219f4 === !![]);
+      return personReplacementVideoPlaybackController['setClipActive'](value124 === !![]);
     },
-    _0x26dd8e = createPersonReplacementLayoutResizeController({
+    personReplacementLayoutResizeController = createPersonReplacementLayoutResizeController({
       documentObject: documentObject,
       windowObject: windowObject,
-      getProject: () => _0x57b9e5,
-      commitLayoutChange: (_0x386cb1) => {
-        ((_0x57b9e5 = normalizePersonReplacementWorkspaceProject(_0x57b9e5)),
-          _0x273c17(_0x386cb1 === 'asset-detail' ? 'asset-detail-split-ratio' : 'replacement-layout'));
+      getProject: () => initialProject2,
+      commitLayoutChange: (value126) => {
+        ((initialProject2 = normalizePersonReplacementWorkspaceProject(initialProject2)),
+          handler21(value126 === 'asset-detail' ? 'asset-detail-split-ratio' : 'replacement-layout'));
       },
     }),
-    { begin: _0x22c867, stop: _0xea53df } = _0x26dd8e,
-    _0x56d700 = () => {
-      if (_0x2f325d || !_0x3accc4['isActive']()) return;
-      if (_0x57b9e5['workspace']['step'] !== 0x2 || !_0x593f36()) _0x4cf492();
+    { begin: begin, stop: stop } = personReplacementLayoutResizeController,
+    requestRender = () => {
+      if (value43 || !workspacePresentationLifecycle['isActive']()) return;
+      if (initialProject2['workspace']['step'] !== 0x2 || !handler43()) run();
     },
-    _0x1feb36 = (_0x20c23b, _0x4e6581) => {
-      const _0x13d5ff = _0x4e3281(
-        _0x20c23b,
-        _0x4e6581,
+    handler44 = (value127, value128) => {
+      const promise3 = runIntent(
+        value127,
+        value128,
         { renderWorkspace: ![] },
         { applyCallbackResultInPlace: !![] },
       );
-      if (_0x13d5ff?.['then']) void _0x13d5ff['then'](_0x56d700, () => {});
-      else _0x56d700();
+      if (promise3?.['then']) void promise3['then'](requestRender, () => {});
+      else requestRender();
     },
-    _0x4b407f = createPersonReplacementPersonBoxInteractionController({
-      getRoot: () => _0x42b7b0,
-      getProject: () => _0x57b9e5,
-      requestRender: _0x56d700,
-      runRequest: (..._0x19cbf5) => _0x267b3(..._0x19cbf5),
-      updateStageA11y: (..._0x58c995) => _0x33236e(..._0x58c995),
-      onDeletePeopleRequested: (_0x1589db) => _0x1feb36(_0x43f995['DELETE_PEOPLE'], _0x1589db),
-      onManualPersonSelected: (_0x4aa92a) => _0x1feb36(_0x43f995['SELECT_MANUAL_PERSON'], _0x4aa92a),
-      onUpdatePeopleRequested: (_0x28c12f) =>
-        _0x4e3281(
-          _0x43f995['UPDATE_PEOPLE'],
-          _0x28c12f,
+    personReplacementPersonBoxInteractionController = createPersonReplacementPersonBoxInteractionController({
+      getRoot: () => floatingMenuHost,
+      getProject: () => initialProject2,
+      requestRender: requestRender,
+      runRequest: (...args12) => handler11(...args12),
+      updateStageA11y: (...args13) => handler45(...args13),
+      onDeletePeopleRequested: (value129) => handler44(downloadImageIntent['DELETE_PEOPLE'], value129),
+      onManualPersonSelected: (value130) => handler44(downloadImageIntent['SELECT_MANUAL_PERSON'], value130),
+      onUpdatePeopleRequested: (value131) =>
+        runIntent(
+          downloadImageIntent['UPDATE_PEOPLE'],
+          value131,
           { renderWorkspace: ![] },
           { applyCallbackResultInPlace: !![] },
         ),
@@ -1137,339 +1168,348 @@ export function createReplacementStudioWorkspace({
       windowObject: windowObject,
     }),
     {
-      beginBoxEdit: _0x4dc575,
-      beginManualSelection: _0x42019b,
-      bringBoxToFront: _0x29b3c0,
-      cancelManualSelection: _0x32d3c6,
-      clearBatchSelection: _0x113bbe,
-      clearKeyboardSelection: _0x218fa0,
-      destroy: _0x54fdfd,
-      focusBatchSelectionStage: _0x431ffd,
-      handleEscape: _0x46a111,
-      handleSelectionKeyDown: _0x213c96,
-      isManualSelectionActive: _0x31602a,
-      restoreLayerState: _0x25fae1,
-      selectBatch: _0x29b821,
-      selectBox: _0x348a7d,
-      setManualSelectionActive: _0x454e24,
-      syncAfterRender: _0x2e8658,
-    } = _0x4b407f,
-    _0xe8cb52 = (_0x11248a = _0x57b9e5['workspace']['selectedCharacterId']) =>
-      _0x57b9e5['characters']['find']((_0x37a50f) => _0x37a50f['id'] === _0x11248a) || null,
-    _0x391a96 = (_0x300082 = _0xe8cb52()) => {
-      const _0x5e8916 = Math['trunc'](
-        Number(_0x57b9e5['workspace']['assetAppearanceIndexes']?.[_0x300082?.['id']]) || 0x0,
+      beginBoxEdit: beginBoxEdit,
+      beginManualSelection: beginManualSelection,
+      bringBoxToFront: bringBoxToFront,
+      cancelManualSelection: cancelManualSelection,
+      clearBatchSelection: clearBatchSelection,
+      clearKeyboardSelection: clearKeyboardSelection,
+      destroy: destroy2,
+      focusBatchSelectionStage: focusBatchSelectionStage,
+      handleEscape: handleEscape,
+      handleSelectionKeyDown: handleSelectionKeyDown,
+      isManualSelectionActive: isManualSelectionActive,
+      restoreLayerState: restoreLayerState,
+      selectBatch: selectBatch,
+      selectBox: selectBox,
+      setManualSelectionActive: setManualSelectionActive,
+      syncAfterRender: syncAfterRender,
+    } = personReplacementPersonBoxInteractionController,
+    characterId = (value132 = initialProject2['workspace']['selectedCharacterId']) =>
+      initialProject2['characters']['find']((value133) => value133['id'] === value132) || null,
+    handler13 = (value134 = characterId()) => {
+      const value135 = Math['trunc'](
+        Number(initialProject2['workspace']['assetAppearanceIndexes']?.[value134?.['id']]) || 0x0,
       );
       return (
-        getWorkspaceAssetAppearances(_0x300082)[_0x5e8916] ||
-        getWorkspaceAssetAppearances(_0x300082)[0x0] ||
+        getWorkspaceAssetAppearances(value134)[value135] ||
+        getWorkspaceAssetAppearances(value134)[0x0] ||
         null
       );
     },
-    _0x295d0b = () => {
-      const _0x55b2cd = _0x57b9e5['workspace']['characterAssetTab'],
-        _0x13c97e =
-          _0x55b2cd === 'scene'
-            ? _0x57b9e5['scenes']['find'](
-                (_0x4d0a98) => _0x4d0a98['id'] === _0x57b9e5['workspace']['selectedSceneId'],
+    handler46 = () => {
+      const value136 = initialProject2['workspace']['characterAssetTab'],
+        error3 =
+          value136 === 'scene'
+            ? initialProject2['scenes']['find'](
+                (value137) => value137['id'] === initialProject2['workspace']['selectedSceneId'],
               )
-            : _0x55b2cd === 'library'
-              ? _0x57b9e5['libraryAssets']['find'](
-                  (_0x95a185) => _0x95a185['id'] === _0x57b9e5['workspace']['selectedLibraryAssetId'],
+            : value136 === 'library'
+              ? initialProject2['libraryAssets']['find'](
+                  (value138) => value138['id'] === initialProject2['workspace']['selectedLibraryAssetId'],
                 )
-              : _0xe8cb52(),
-        _0xb50e9e = _0x55b2cd === 'library' ? _0x13c97e : _0x391a96(_0x13c97e),
-        _0x141169 = normalizeText(
-          _0xb50e9e?.['sourceUrl'] || _0xb50e9e?.['imageUrl'] || _0xb50e9e?.['thumbnailUrl'],
-        );
-      if (!_0x13c97e || !_0x141169) return null;
-      const _0xf98fc6 = normalizeText(_0x13c97e['name']) || '生成图片',
-        _0x25f904 = normalizeText(_0xb50e9e?.['name']);
+              : characterId(),
+        error4 = value136 === 'library' ? error3 : handler13(error3),
+        imageRef = normalizeText(error4?.['sourceUrl'] || error4?.['imageUrl'] || error4?.['thumbnailUrl']);
+      if (!error3 || !imageRef) return null;
+      const text4 = normalizeText(error3['name']) || '生成图片',
+        filenameBase = normalizeText(error4?.['name']);
       return {
-        imageRef: _0x141169,
+        imageRef: imageRef,
         filenameBase:
-          _0x25f904 && _0x25f904 !== _0xf98fc6 && _0x25f904 !== '基础形象'
-            ? [_0xf98fc6, _0x25f904]['join']('-')
-            : _0xf98fc6,
+          filenameBase && filenameBase !== text4 && filenameBase !== '基础形象'
+            ? [text4, filenameBase]['join']('-')
+            : text4,
         title: '下载图片',
       };
     },
     {
-      getSelectedReplacementImageDownloadRequest: _0x570287,
-      getSelectedReplacementVideoDownloadRequest: _0x22da78,
-      requestImageDownload: _0x3f9454,
-      requestVideoDownload: _0x47874c,
+      getSelectedReplacementImageDownloadRequest: getSelectedReplacementImageDownloadRequest,
+      getSelectedReplacementVideoDownloadRequest: getSelectedReplacementVideoDownloadRequest,
+      requestImageDownload: requestImageDownload,
+      requestVideoDownload: requestVideoDownload,
     } = createPersonReplacementResultMediaActions({
-      getProject: () => _0x57b9e5,
-      runIntent: _0x4e3281,
-      downloadImageIntent: _0x43f995['DOWNLOAD_IMAGE'],
-      downloadVideoIntent: _0x43f995['DOWNLOAD_VIDEO'],
+      getProject: () => initialProject2,
+      runIntent: runIntent,
+      downloadImageIntent: downloadImageIntent['DOWNLOAD_IMAGE'],
+      downloadVideoIntent: downloadImageIntent['DOWNLOAD_VIDEO'],
     }),
-    _0x2bff49 = (_0x39c4d5, _0xf9e2d2 = '未命名人物') =>
-      String(_0x39c4d5 ?? '')
+    handler47 = (value139, value140 = '未命名人物') =>
+      String(value139 ?? '')
         ['replace'](/\s+/gu, '\x20')
-        ['trim']() || _0xf9e2d2,
-    _0x5a1098 = (_0x5a43e6) => {
-      const _0x437972 = normalizeText(_0x5a43e6?.['dataset']?.['storyAssetNameId']),
-        _0xe21f46 = _0x57b9e5['characters']['find']((_0x68af51) => _0x68af51['id'] === _0x437972);
-      if (!_0x5a43e6 || !_0xe21f46 || _0x5a43e6['getAttribute']?.('contenteditable') === 'true') return ![];
-      ((_0x5a43e6['dataset']['storyAssetOriginalName'] = _0xe21f46['name']),
-        _0x5a43e6['setAttribute']?.('contenteditable', 'true'),
-        _0x5a43e6['setAttribute']?.('role', 'textbox'),
-        _0x5a43e6['setAttribute']?.('aria-label', '修改' + _0xe21f46['name'] + '的名称'),
-        _0x5a43e6['classList']?.['add']?.('is-editing'),
-        _0x5a43e6['focus']?.());
-      const _0x43b7af = windowObject?.['getSelection']?.(),
-        _0x471a90 = documentObject?.['createRange']?.();
+        ['trim']() || value140,
+    handler48 = (el14) => {
+      const text5 = normalizeText(el14?.['dataset']?.['storyAssetNameId']),
+        error5 = initialProject2['characters']['find']((value141) => value141['id'] === text5);
+      if (!el14 || !error5 || el14['getAttribute']?.('contenteditable') === 'true') return ![];
+      ((el14['dataset']['storyAssetOriginalName'] = error5['name']),
+        el14['setAttribute']?.('contenteditable', 'true'),
+        el14['setAttribute']?.('role', 'textbox'),
+        el14['setAttribute']?.('aria-label', '修改' + error5['name'] + '的名称'),
+        el14['classList']?.['add']?.('is-editing'),
+        el14['focus']?.());
+      const value142 = windowObject?.['getSelection']?.(),
+        value143 = documentObject?.['createRange']?.();
       return (
-        _0x43b7af &&
-          _0x471a90 &&
-          (_0x471a90['selectNodeContents']?.(_0x5a43e6),
-          _0x43b7af['removeAllRanges']?.(),
-          _0x43b7af['addRange']?.(_0x471a90)),
+        value142 &&
+          value143 &&
+          (value143['selectNodeContents']?.(el14),
+          value142['removeAllRanges']?.(),
+          value142['addRange']?.(value143)),
         !![]
       );
     },
-    _0x31e38b = (_0x18b449, { cancel: cancel = ![] } = {}) => {
-      const _0x276549 = normalizeText(_0x18b449?.['dataset']?.['storyAssetNameId']),
-        _0x53d786 = _0x57b9e5['characters']['find']((_0x2528e1) => _0x2528e1['id'] === _0x276549);
-      if (!_0x18b449 || !_0x53d786 || _0x18b449['getAttribute']?.('contenteditable') !== 'true') return ![];
-      const _0x399e00 = _0x2bff49(_0x18b449['dataset']['storyAssetOriginalName'], _0x53d786['name']),
-        _0x17c344 = cancel ? _0x399e00 : _0x2bff49(_0x18b449['textContent'], _0x399e00);
-      ((_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-        ..._0x57b9e5,
-        characters: _0x57b9e5['characters']['map']((_0x44b62b) =>
-          _0x44b62b['id'] === _0x276549 ? { ..._0x44b62b, name: _0x17c344 } : _0x44b62b,
+    handler49 = (el15, { cancel: cancel = ![] } = {}) => {
+      const text6 = normalizeText(el15?.['dataset']?.['storyAssetNameId']),
+        error6 = initialProject2['characters']['find']((value144) => value144['id'] === text6);
+      if (!el15 || !error6 || el15['getAttribute']?.('contenteditable') !== 'true') return ![];
+      const value145 = handler47(el15['dataset']['storyAssetOriginalName'], error6['name']),
+        name = cancel ? value145 : handler47(el15['textContent'], value145);
+      ((initialProject2 = normalizePersonReplacementWorkspaceProject({
+        ...initialProject2,
+        characters: initialProject2['characters']['map']((args14) =>
+          args14['id'] === text6 ? { ...args14, name: name } : args14,
         ),
       })),
-        _0x42b7b0?.['querySelectorAll']?.('[data-story-asset-name-id]')?.['forEach']?.((_0x5e39df) => {
-          if (normalizeText(_0x5e39df['dataset']['storyAssetNameId']) !== _0x276549) return;
-          ((_0x5e39df['textContent'] = _0x17c344),
-            _0x5e39df['removeAttribute']?.('contenteditable'),
-            _0x5e39df['removeAttribute']?.('role'),
-            _0x5e39df['setAttribute']?.('aria-label', '重命名' + _0x17c344),
-            _0x5e39df['classList']?.['remove']?.('is-editing'),
-            delete _0x5e39df['dataset']['storyAssetOriginalName']);
+        floatingMenuHost?.['querySelectorAll']?.('[data-story-asset-name-id]')?.['forEach']?.((el16) => {
+          if (normalizeText(el16['dataset']['storyAssetNameId']) !== text6) return;
+          ((el16['textContent'] = name),
+            el16['removeAttribute']?.('contenteditable'),
+            el16['removeAttribute']?.('role'),
+            el16['setAttribute']?.('aria-label', '重命名' + name),
+            el16['classList']?.['remove']?.('is-editing'),
+            delete el16['dataset']['storyAssetOriginalName']);
         }));
-      if (!cancel && _0x17c344 !== _0x53d786['name']) _0x273c17('character-name');
+      if (!cancel && name !== error6['name']) handler21('character-name');
       return !![];
     },
-    _0x135d3b = () => {
-      ((_0x4aeba7 ??= createPersonReplacementResultHistoryController({
-        getRoot: () => _0x42b7b0,
-        getProject: () => _0x57b9e5,
-        renderHistoryMenu: (_0x15215f) =>
-          personReplacementShotTimelinePresentation['renderHistoryMenu'](_0x15215f),
-        selectShot: (..._0x19b693) => _0x2bd9ab(..._0x19b693),
-        isCutEditorOpen: () => _0x4e4610['isOpen'],
+    handler50 = () => {
+      ((ctx ??= createPersonReplacementResultHistoryController({
+        getRoot: () => floatingMenuHost,
+        getProject: () => initialProject2,
+        renderHistoryMenu: (value146) =>
+          personReplacementShotTimelinePresentation['renderHistoryMenu'](value146),
+        selectShot: (...args15) => handler51(...args15),
+        isCutEditorOpen: () => selectedIds['isOpen'],
       })),
-        _0x4aeba7['refresh']());
+        ctx['refresh']());
     },
-    _0x446a6f = () => _0x4aeba7?.['hide'](),
-    _0x502778 = () => _0x4aeba7?.['capture'](),
-    _0x229882 = (_0x2f6d9a) => _0x4aeba7?.['restore'](_0x2f6d9a),
-    _0x124a6a = createPersonReplacementVoiceCloneInteractionController({
-      getRoot: () => _0x42b7b0,
-      getProject: () => _0x57b9e5,
-      isDestroyed: () => _0x2f325d,
-      commitProject: (_0x251d74, { reason: reason = 'voice-clone', render: _0x462fef = ![] } = {}) => {
-        if (_0x462fef) return _0x26d845(_0x251d74, reason);
-        return (
-          (_0x57b9e5 = normalizePersonReplacementWorkspaceProject(_0x251d74)),
-          _0x273c17(reason),
-          cloneJson(_0x57b9e5)
-        );
+    handler10 = () => ctx?.['hide'](),
+    captureResultHistoryMenu = () => ctx?.['capture'](),
+    restoreResultHistoryMenu = (value147) => ctx?.['restore'](value147),
+    personReplacementVoiceCloneInteractionController = createPersonReplacementVoiceCloneInteractionController(
+      {
+        getRoot: () => floatingMenuHost,
+        getProject: () => initialProject2,
+        isDestroyed: () => value43,
+        commitProject: (value148, { reason: reason = 'voice-clone', render: render = ![] } = {}) => {
+          if (render) return updateProject(value148, reason);
+          return (
+            (initialProject2 = normalizePersonReplacementWorkspaceProject(value148)),
+            handler21(reason),
+            cloneJson(initialProject2)
+          );
+        },
+        mountStudio: (...args16) =>
+          promptEnhancementModel(downloadImageIntent['MOUNT_VOICE_STUDIO'], ...args16),
+        resumeVoiceSeparation: (value149) =>
+          runIntent(
+            downloadImageIntent['RESUME_VOICE_EXTRACTION'],
+            value149,
+            {},
+            { applyCallbackResult: ![] },
+          ),
+        resolveCharacterVoiceUrl: getCharacterVoiceUrl,
+        documentObject: documentObject,
+        windowObject: windowObject,
       },
-      mountStudio: (..._0x597500) => _0x4ad4fe(_0x43f995['MOUNT_VOICE_STUDIO'], ..._0x597500),
-      resumeVoiceSeparation: (_0x43de28) =>
-        _0x4e3281(_0x43f995['RESUME_VOICE_EXTRACTION'], _0x43de28, {}, { applyCallbackResult: ![] }),
-      resolveCharacterVoiceUrl: getCharacterVoiceUrl,
-      documentObject: documentObject,
-      windowObject: windowObject,
-    }),
+    ),
     {
-      bindSourcePlayback: _0x3324fa,
-      canDropOnAudioParam: _0x112ccc,
-      clearDropTarget: _0x308696,
-      destroy: _0x773f3f,
-      destroySourcePlaybackBindings: _0x379113,
-      mount: _0x46feac,
-      playPreview: _0x50e1f0,
-      refreshSourceCards: _0x152aca,
-      resetDropEligibility: _0x49234b,
-      selectSource: _0x43d4f5,
-      selectVoiceAsset: _0x3400a4,
-      setDropTarget: _0x1454c7,
-      stopPreview: _0x196980,
-      syncPreviewUi: _0x2929aa,
-      unmount: _0xb8cf88,
-    } = _0x124a6a,
-    _0x84de04 = () => {
-      (_0x42cf44['forEach']((_0x25ad5f) => _0x25ad5f?.['destroy']?.()), (_0x42cf44 = []));
-      const _0x432876 = _0x42b7b0?.['querySelector']?.('.story-audio-detail');
-      if (_0x432876?.['ownerDocument']) _0x42cf44['push'](bindWorkspaceSelects(_0x432876));
-      _0x42cf44['push'](bindPersonReplacementPricing(_0x42b7b0, () => _0x57b9e5));
-      const _0xa7da9 = createAudioPlaybackSurfaceController(
-        _0x42b7b0?.['querySelector']?.(
+      bindSourcePlayback: bindSourcePlayback,
+      canDropOnAudioParam: canDropOnAudioParam,
+      clearDropTarget: clearDropTarget,
+      destroy: destroy3,
+      destroySourcePlaybackBindings: destroySourcePlaybackBindings,
+      mount: mount,
+      playPreview: playPreview,
+      refreshSourceCards: refreshSourceCards,
+      resetDropEligibility: resetDropEligibility,
+      selectSource: selectSource,
+      selectVoiceAsset: selectVoiceAsset,
+      setDropTarget: setDropTarget,
+      stopPreview: stopPreview,
+      syncPreviewUi: syncPreviewUi,
+      unmount: unmount,
+    } = personReplacementVoiceCloneInteractionController,
+    handler52 = () => {
+      (list3['forEach']((value150) => value150?.['destroy']?.()), (list3 = []));
+      const value151 = floatingMenuHost?.['querySelector']?.('.story-audio-detail');
+      if (value151?.['ownerDocument']) list3['push'](bindWorkspaceSelects(value151));
+      list3['push'](bindPersonReplacementPricing(floatingMenuHost, () => initialProject2));
+      const audioPlaybackSurfaceController = createAudioPlaybackSurfaceController(
+        floatingMenuHost?.['querySelector']?.(
           '.person-replacement-audio-playback[data-audio-playback-surface], .person-replacement-voice-library-playback[data-audio-playback-surface]',
         ),
         {
-          onBeforePlay: _0x196980,
+          onBeforePlay: stopPreview,
           onError: () => windowObject?.['showToast']?.('声音素材播放失败。', 'warn'),
         },
       );
-      if (_0xa7da9) _0x42cf44['push'](_0xa7da9);
-      _0x3324fa();
-      let _0x56cd8d = null;
-      _0x2fa649 = null;
-      const _0x1b19ad = _0x42b7b0?.['querySelector']?.('[data-aigen-image-model-selector]');
-      if (_0x1b19ad) {
-        const _0x54b826 = _0x57b9e5['workspace']['step'] === 0x1,
-          _0x4a58ec = _0x54b826
-            ? _0x57b9e5['settings']['characterImageModelId']
-            : _0x57b9e5['settings']['replacementImageModelId'],
-          _0x308cc4 = _0x54b826
-            ? _0x57b9e5['settings']['characterImageGenerationParams']
-            : _0x57b9e5['settings']['replacementImageGenerationParams'],
-          _0x3df977 = _0x54b826
-            ? _0x57b9e5['settings']['characterImageProvider']
-            : _0x57b9e5['settings']['replacementImageProvider'],
-          _0xdd1473 = _0x54b826
-            ? _0x57b9e5['settings']['characterImageProviderProfileId']
-            : _0x57b9e5['settings']['replacementImageProviderProfileId'],
-          _0x30cc82 = _0x54b826
-            ? _0x57b9e5['settings']['characterImageProviderProfileIdByModel']
-            : _0x57b9e5['settings']['replacementImageProviderProfileIdByModel'];
-        _0x42cf44['push'](
-          bindAIGenImageModelSelector(_0x1b19ad, {
-            modelId: _0x4a58ec,
-            provider: resolveModelProvider(_0x4a58ec, _0x3df977),
-            generationParams: _0x308cc4,
-            generationParamsByModel: _0x54b826
-              ? _0x57b9e5['settings']['characterImageGenerationParamsByModel']
-              : _0x57b9e5['settings']['replacementImageGenerationParamsByModel'],
-            providerProfileId: _0xdd1473,
-            providerProfileIdByModel: _0x30cc82,
+      if (audioPlaybackSurfaceController) list3['push'](audioPlaybackSurfaceController);
+      bindSourcePlayback();
+      let el17 = null;
+      bindAIGenVideoModelSelector2 = null;
+      const value152 = floatingMenuHost?.['querySelector']?.('[data-aigen-image-model-selector]');
+      if (value152) {
+        const generationParamsByModel = initialProject2['workspace']['step'] === 0x1,
+          modelId = generationParamsByModel
+            ? initialProject2['settings']['characterImageModelId']
+            : initialProject2['settings']['replacementImageModelId'],
+          generationParams = generationParamsByModel
+            ? initialProject2['settings']['characterImageGenerationParams']
+            : initialProject2['settings']['replacementImageGenerationParams'],
+          value153 = generationParamsByModel
+            ? initialProject2['settings']['characterImageProvider']
+            : initialProject2['settings']['replacementImageProvider'],
+          providerProfileId = generationParamsByModel
+            ? initialProject2['settings']['characterImageProviderProfileId']
+            : initialProject2['settings']['replacementImageProviderProfileId'],
+          providerProfileIdByModel = generationParamsByModel
+            ? initialProject2['settings']['characterImageProviderProfileIdByModel']
+            : initialProject2['settings']['replacementImageProviderProfileIdByModel'];
+        list3['push'](
+          bindAIGenImageModelSelector(value152, {
+            modelId: modelId,
+            provider: resolveModelProvider(modelId, value153),
+            generationParams: generationParams,
+            generationParamsByModel: generationParamsByModel
+              ? initialProject2['settings']['characterImageGenerationParamsByModel']
+              : initialProject2['settings']['replacementImageGenerationParamsByModel'],
+            providerProfileId: providerProfileId,
+            providerProfileIdByModel: providerProfileIdByModel,
             showSchemaControls: !![],
             documentObject: documentObject,
             windowObject: windowObject,
-            floatingMenuHost: _0x42b7b0,
+            floatingMenuHost: floatingMenuHost,
             schemaPopupPlacement: 'portal-auto-up',
             onChange: ({
-              modelId: _0x432b41,
-              provider: _0x1bfe8a,
-              generationParams: _0x3d9c29,
-              generationParamsByModel: _0x5ce64a,
-              providerProfileId: _0x4826f7,
-              providerProfileIdByModel: _0xc86fad,
+              modelId: modelId2,
+              provider: provider,
+              generationParams: generationParams2,
+              generationParamsByModel: generationParamsByModel2,
+              providerProfileId: providerProfileId2,
+              providerProfileIdByModel: providerProfileIdByModel2,
             }) => {
-              const _0x55d122 = { ..._0x57b9e5['settings'] };
-              _0x54b826
-                ? ((_0x55d122['characterImageModelId'] = _0x432b41),
-                  (_0x55d122['characterImageProvider'] = resolveModelProvider(_0x432b41, _0x1bfe8a)),
-                  (_0x55d122['characterImageGenerationParams'] = normalizeCharacterAssetImageGenerationParams(
-                    _0x432b41,
-                    _0x3d9c29,
+              const settings2 = { ...initialProject2['settings'] };
+              generationParamsByModel
+                ? ((settings2['characterImageModelId'] = modelId2),
+                  (settings2['characterImageProvider'] = resolveModelProvider(modelId2, provider)),
+                  (settings2['characterImageGenerationParams'] = normalizeCharacterAssetImageGenerationParams(
+                    modelId2,
+                    generationParams2,
                   )),
-                  (_0x55d122['characterImageGenerationParamsByModel'] = _0x5ce64a),
-                  (_0x55d122['characterImageProviderProfileId'] = _0x4826f7),
-                  (_0x55d122['characterImageProviderProfileIdByModel'] = _0xc86fad))
-                : ((_0x55d122['replacementImageModelId'] = _0x432b41),
-                  (_0x55d122['replacementImageProvider'] = resolveModelProvider(_0x432b41, _0x1bfe8a)),
-                  (_0x55d122['replacementImageGenerationParams'] = _0x3d9c29),
-                  (_0x55d122['replacementImageGenerationParamsByModel'] = _0x5ce64a),
-                  (_0x55d122['replacementImageProviderProfileId'] = _0x4826f7),
-                  (_0x55d122['replacementImageProviderProfileIdByModel'] = _0xc86fad));
-              ((_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-                ..._0x57b9e5,
-                settings: _0x55d122,
+                  (settings2['characterImageGenerationParamsByModel'] = generationParamsByModel2),
+                  (settings2['characterImageProviderProfileId'] = providerProfileId2),
+                  (settings2['characterImageProviderProfileIdByModel'] = providerProfileIdByModel2))
+                : ((settings2['replacementImageModelId'] = modelId2),
+                  (settings2['replacementImageProvider'] = resolveModelProvider(modelId2, provider)),
+                  (settings2['replacementImageGenerationParams'] = generationParams2),
+                  (settings2['replacementImageGenerationParamsByModel'] = generationParamsByModel2),
+                  (settings2['replacementImageProviderProfileId'] = providerProfileId2),
+                  (settings2['replacementImageProviderProfileIdByModel'] = providerProfileIdByModel2));
+              ((initialProject2 = normalizePersonReplacementWorkspaceProject({
+                ...initialProject2,
+                settings: settings2,
               })),
-                _0x273c17('image-model'));
-              if (!_0x54b826) _0x4c1ba8();
-              _0x56cd8d?.['sync']();
+                handler21('image-model'));
+              if (!generationParamsByModel) handler53();
+              el17?.['sync']();
             },
           }),
         );
       }
-      const _0x2dfdf4 = _0x42b7b0?.['querySelector']?.('[data-aigen-video-model-selector]');
-      if (_0x2dfdf4) {
-        const _0x55ae2b = personReplacementVideoPresentation['build'](_0x57b9e5),
-          _0x304ff2 = resolvePersonReplacementVideoParameterPolicy({
-            modelId: _0x57b9e5['settings']['replacementModelId'],
-            inputMode: _0x57b9e5['settings']['replacementVideoInputMode'],
-            generationParams: _0x57b9e5['settings']['replacementVideoGenerationParams'],
+      const value154 = floatingMenuHost?.['querySelector']?.('[data-aigen-video-model-selector]');
+      if (value154) {
+        const referenceCounts = personReplacementVideoPresentation['build'](initialProject2),
+          generationParams3 = resolvePersonReplacementVideoParameterPolicy({
+            modelId: initialProject2['settings']['replacementModelId'],
+            inputMode: initialProject2['settings']['replacementVideoInputMode'],
+            generationParams: initialProject2['settings']['replacementVideoGenerationParams'],
           });
-        ((_0x2fa649 = bindAIGenVideoModelSelector(_0x2dfdf4, {
-          modelId: _0x57b9e5['settings']['replacementModelId'],
-          provider: resolveModelProvider(_0x57b9e5['settings']['replacementModelId']),
-          generationParams: _0x304ff2['generationParams'],
-          uiSchemaFieldState: _0x304ff2['uiSchemaFieldState'],
-          providerProfileId: _0x57b9e5['settings']['replacementVideoProviderProfileId'],
-          providerProfileIdByModel: _0x57b9e5['settings']['replacementVideoProviderProfileIdByModel'],
-          referenceCounts: _0x55ae2b['slotState']['referenceCounts'],
+        ((bindAIGenVideoModelSelector2 = bindAIGenVideoModelSelector(value154, {
+          modelId: initialProject2['settings']['replacementModelId'],
+          provider: resolveModelProvider(initialProject2['settings']['replacementModelId']),
+          generationParams: generationParams3['generationParams'],
+          uiSchemaFieldState: generationParams3['uiSchemaFieldState'],
+          providerProfileId: initialProject2['settings']['replacementVideoProviderProfileId'],
+          providerProfileIdByModel: initialProject2['settings']['replacementVideoProviderProfileIdByModel'],
+          referenceCounts: referenceCounts['slotState']['referenceCounts'],
           showSchemaControls: !![],
           allowedModelIds: PERSON_REPLACEMENT_VIDEO_MODEL_IDS,
           documentObject: documentObject,
           windowObject: windowObject,
-          floatingMenuHost: _0x42b7b0,
+          floatingMenuHost: floatingMenuHost,
           modelSubmenuPlacement: 'viewport-auto-up',
           schemaPopupPlacement: 'viewport-auto-up',
           onChange: ({
-            modelId: _0xf7f0e6,
-            generationParams: _0x1ae786,
-            providerProfileId: _0x372d66,
-            providerProfileIdByModel: _0x1e6ac8,
+            modelId: modelId3,
+            generationParams: generationParams4,
+            providerProfileId: providerProfileId3,
+            providerProfileIdByModel: providerProfileIdByModel3,
           }) => {
-            const _0x3b30e1 = resolvePersonReplacementVideoParameterPolicy({
-              modelId: _0xf7f0e6,
-              inputMode: _0x57b9e5['settings']['replacementVideoInputMode'],
-              generationParams: _0x1ae786,
-              resetModeDefaults: _0xf7f0e6 !== _0x57b9e5['settings']['replacementModelId'],
+            const replacementVideoGenerationParams = resolvePersonReplacementVideoParameterPolicy({
+              modelId: modelId3,
+              inputMode: initialProject2['settings']['replacementVideoInputMode'],
+              generationParams: generationParams4,
+              resetModeDefaults: modelId3 !== initialProject2['settings']['replacementModelId'],
             });
-            _0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-              ..._0x57b9e5,
+            initialProject2 = normalizePersonReplacementWorkspaceProject({
+              ...initialProject2,
               settings: {
-                ..._0x57b9e5['settings'],
-                replacementModelId: _0xf7f0e6,
-                replacementVideoGenerationParams: _0x3b30e1['generationParams'],
-                replacementVideoProviderProfileId: _0x372d66,
-                replacementVideoProviderProfileIdByModel: _0x1e6ac8,
+                ...initialProject2['settings'],
+                replacementModelId: modelId3,
+                replacementVideoGenerationParams: replacementVideoGenerationParams['generationParams'],
+                replacementVideoProviderProfileId: providerProfileId3,
+                replacementVideoProviderProfileIdByModel: providerProfileIdByModel3,
               },
             });
-            const _0x1d31b4 = _0x42b7b0?.['querySelector']?.(
+            const currentInputs = floatingMenuHost?.['querySelector']?.(
               '[data-person-replacement-video-reference-inputs]',
             );
-            if (_0x1d31b4) {
-              const _0x43be97 = personReplacementIdentityPresentation['buildVideo'](
-                  _0x57b9e5,
-                  personReplacementVideoPresentation['build'](_0x57b9e5),
+            if (currentInputs) {
+              const value155 = personReplacementIdentityPresentation['buildVideo'](
+                  initialProject2,
+                  personReplacementVideoPresentation['build'](initialProject2),
                 )['referenceInputsHtml'],
-                _0x165b04 = typeof _0x1d31b4['cloneNode'] === 'function' ? _0x1d31b4['cloneNode'](![]) : null;
-              (_0x165b04 && (_0x165b04['innerHTML'] = _0x43be97),
-                (!_0x165b04 ||
+                nextInputs =
+                  typeof currentInputs['cloneNode'] === 'function' ? currentInputs['cloneNode'](![]) : null;
+              (nextInputs && (nextInputs['innerHTML'] = value155),
+                (!nextInputs ||
                   !reconcilePersonReplacementReferenceInputs({
-                    currentInputs: _0x1d31b4,
-                    nextInputs: _0x165b04,
+                    currentInputs: currentInputs,
+                    nextInputs: nextInputs,
                   })) &&
-                  (_0x1d31b4['innerHTML'] = _0x43be97));
+                  (currentInputs['innerHTML'] = value155));
             }
-            (_0x273c17('video-model'), _0x56cd8d?.['sync']());
+            (handler21('video-model'), el17?.['sync']());
           },
         })),
-          _0x42cf44['push'](_0x2fa649));
+          list3['push'](bindAIGenVideoModelSelector2));
       }
-      const _0x4ea010 =
-        _0x57b9e5['workspace']['step'] === 0x1
+      const panel =
+        initialProject2['workspace']['step'] === 0x1
           ? {
-              panel: _0x42b7b0?.['querySelector']?.('.story-asset-detail-panel .story-asset-prompt-field'),
+              panel: floatingMenuHost?.['querySelector']?.(
+                '.story-asset-detail-panel .story-asset-prompt-field',
+              ),
               modelSetting: 'characterImageModelId',
               providerSetting: 'characterImageProvider',
               profileSetting: 'characterImageProviderProfileId',
               memorySetting: 'characterImageProviderProfileIdByModel',
             }
-          : _0x57b9e5['workspace']['step'] === 0x2
+          : initialProject2['workspace']['step'] === 0x2
             ? {
-                panel: _0x42b7b0?.['querySelector']?.(
+                panel: floatingMenuHost?.['querySelector']?.(
                   '.person-replacement-image-generation-panel .person-replacement-prompt-input-wrapper',
                 ),
                 modelSetting: 'replacementImageModelId',
@@ -1477,9 +1517,9 @@ export function createReplacementStudioWorkspace({
                 profileSetting: 'replacementImageProviderProfileId',
                 memorySetting: 'replacementImageProviderProfileIdByModel',
               }
-            : _0x57b9e5['workspace']['step'] === 0x3
+            : initialProject2['workspace']['step'] === 0x3
               ? {
-                  panel: _0x42b7b0?.['querySelector']?.(
+                  panel: floatingMenuHost?.['querySelector']?.(
                     '.person-replacement-video-generation-panel .person-replacement-prompt-input-wrapper',
                   ),
                   modelSetting: 'replacementModelId',
@@ -1488,2031 +1528,2089 @@ export function createReplacementStudioWorkspace({
                   memorySetting: 'replacementVideoProviderProfileIdByModel',
                 }
               : null;
-      _0x4ea010?.['panel'] &&
-        ((_0x56cd8d = createModelProviderProfileControl({
-          panel: _0x4ea010['panel'],
+      panel?.['panel'] &&
+        ((el17 = createModelProviderProfileControl({
+          panel: panel['panel'],
           getNodeData: () => ({
-            model: _0x57b9e5['settings'][_0x4ea010['modelSetting']],
-            provider: _0x4ea010['providerSetting']
-              ? _0x57b9e5['settings'][_0x4ea010['providerSetting']]
-              : resolveModelProvider(_0x57b9e5['settings'][_0x4ea010['modelSetting']]),
-            providerProfileId: _0x57b9e5['settings'][_0x4ea010['profileSetting']],
-            providerProfileIdByModel: _0x57b9e5['settings'][_0x4ea010['memorySetting']],
+            model: initialProject2['settings'][panel['modelSetting']],
+            provider: panel['providerSetting']
+              ? initialProject2['settings'][panel['providerSetting']]
+              : resolveModelProvider(initialProject2['settings'][panel['modelSetting']]),
+            providerProfileId: initialProject2['settings'][panel['profileSetting']],
+            providerProfileIdByModel: initialProject2['settings'][panel['memorySetting']],
           }),
-          onChange: (_0x5d9222) => {
+          onChange: (value156) => {
             if (
-              _0x4ea010['profileSetting'] === 'replacementVideoProviderProfileId' &&
-              _0x2fa649?.['applyProviderProfilePatch']?.(_0x5d9222)
+              panel['profileSetting'] === 'replacementVideoProviderProfileId' &&
+              bindAIGenVideoModelSelector2?.['applyProviderProfilePatch']?.(value156)
             )
               return;
-            ((_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-              ..._0x57b9e5,
+            ((initialProject2 = normalizePersonReplacementWorkspaceProject({
+              ...initialProject2,
               settings: {
-                ..._0x57b9e5['settings'],
-                [_0x4ea010['profileSetting']]: _0x5d9222['providerProfileId'],
-                [_0x4ea010['memorySetting']]: _0x5d9222['providerProfileIdByModel'],
+                ...initialProject2['settings'],
+                [panel['profileSetting']]: value156['providerProfileId'],
+                [panel['memorySetting']]: value156['providerProfileIdByModel'],
               },
             })),
-              _0x273c17('provider-profile'),
-              _0x56cd8d?.['sync']());
+              handler21('provider-profile'),
+              el17?.['sync']());
           },
         })),
-        _0x42cf44['push']({ destroy: () => _0x56cd8d?.['remove']() }));
+        list3['push']({ destroy: () => el17?.['remove']() }));
     },
-    _0x3d140b = (_0x4ee09f) => {
-      const _0x4b0181 = personReplacementImagePresentation['build'](_0x57b9e5)['selectedShot'];
-      if (!_0x4ee09f || !_0x4b0181) return null;
-      const _0xd39599 = normalizeText(_0x57b9e5['id']),
-        _0x1d60be = normalizeText(_0x4b0181['id']),
-        _0x184faa = () =>
-          normalizeText(_0x57b9e5['id']) === _0xd39599
-            ? _0x57b9e5['shots']['find']((_0x679da7) => normalizeText(_0x679da7['id']) === _0x1d60be)
+    handler54 = (promptEl2) => {
+      const enabled6 = personReplacementImagePresentation['build'](initialProject2)['selectedShot'];
+      if (!promptEl2 || !enabled6) return null;
+      const text7 = normalizeText(initialProject2['id']),
+        text8 = normalizeText(enabled6['id']),
+        shot = () =>
+          normalizeText(initialProject2['id']) === text7
+            ? initialProject2['shots']['find']((value157) => normalizeText(value157['id']) === text8)
             : null;
       return {
-        nodeId: 'person-replacement-image:' + _0x1d60be,
-        promptEl: _0x4ee09f,
+        nodeId: 'person-replacement-image:' + text8,
+        promptEl: promptEl2,
         keepAssetMentionPills: !![],
         _data: {
           type: 'ai-image',
-          model: _0x57b9e5['settings']['replacementImageModelId'],
+          model: initialProject2['settings']['replacementImageModelId'],
           provider: resolveModelProvider(
-            _0x57b9e5['settings']['replacementImageModelId'],
-            _0x57b9e5['settings']['replacementImageProvider'],
+            initialProject2['settings']['replacementImageModelId'],
+            initialProject2['settings']['replacementImageProvider'],
           ),
         },
         getMentionMenuPages: () => [{ id: 'assets', label: '素材', icon: 'assets' }],
         getMentionMenuDefaultPage: () => 'assets',
         getMentionCandidates: ({ query: query = '' } = {}) =>
-          buildPersonReplacementPromptMentionCandidates(_0x57b9e5, { query: query, shot: _0x184faa() }),
-        getMentionVisual: ({ mention: _0x32be14, pill: _0x487e6f } = {}) => {
-          const _0x22b710 = _0x32be14?.['thumbUrl']
-            ? _0x32be14
-            : resolvePersonReplacementPromptMentionRef(_0x487e6f, { project: _0x57b9e5, shot: _0x184faa() });
+          buildPersonReplacementPromptMentionCandidates(initialProject2, { query: query, shot: shot() }),
+        getMentionVisual: ({ mention: mention, pill: pill } = {}) => {
+          const response = mention?.['thumbUrl']
+            ? mention
+            : resolvePersonReplacementPromptMentionRef(pill, { project: initialProject2, shot: shot() });
           return {
-            thumbUrl: normalizeMediaUrl(_0x22b710?.['thumbUrl'] || _0x22b710?.['url']),
+            thumbUrl: normalizeMediaUrl(response?.['thumbUrl'] || response?.['url']),
             iconType: 'image',
           };
         },
-        commitPromptHtml: (_0xa0a0c0) => {
-          if (!_0x184faa()) return;
-          ((_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-            ..._0x57b9e5,
-            shots: _0x57b9e5['shots']['map']((_0x1efe87) =>
-              normalizeText(_0x1efe87['id']) === _0x1d60be
-                ? { ..._0x1efe87, imagePrompt: sanitizePromptHtmlForCommit(_0xa0a0c0) }
-                : _0x1efe87,
+        commitPromptHtml: (value158) => {
+          if (!shot()) return;
+          ((initialProject2 = normalizePersonReplacementWorkspaceProject({
+            ...initialProject2,
+            shots: initialProject2['shots']['map']((args17) =>
+              normalizeText(args17['id']) === text8
+                ? { ...args17, imagePrompt: sanitizePromptHtmlForCommit(value158) }
+                : args17,
             ),
           })),
-            _0x273c17('image-prompt'));
+            handler21('image-prompt'));
         },
-        getPromptHtml: () => normalizeText(_0x184faa()?.['imagePrompt']),
+        getPromptHtml: () => normalizeText(shot()?.['imagePrompt']),
       };
     },
-    _0x3d9d7b = () => {
-      (_0x5cb732?.(), (_0x5cb732 = null));
-      if (_0x57b9e5['workspace']['view'] !== 'project' || _0x57b9e5['workspace']['step'] !== 0x2) return;
-      const _0x5d1359 = _0x42b7b0?.['querySelector']?.(
+    handler55 = () => {
+      (value47?.(), (value47 = null));
+      if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 0x2)
+        return;
+      const value159 = floatingMenuHost?.['querySelector']?.(
           '[data-person-replacement-field=\x22image-prompt\x22][contenteditable=\x22true\x22]',
         ),
-        _0x5cae8b = _0x3d140b(_0x5d1359);
-      if (!_0x5cae8b) return;
-      const _0x9d27c0 = bindPromptMentionHost(_0x5cae8b);
-      _0x5cb732 = () => _0x9d27c0?.['destroy']?.();
+        enabled7 = handler54(value159);
+      if (!enabled7) return;
+      const bindPromptMentionHost2 = bindPromptMentionHost(enabled7);
+      value47 = () => bindPromptMentionHost2?.['destroy']?.();
     },
-    _0x2538e3 = () => {
-      (_0x3e5d6c?.(), (_0x3e5d6c = null));
-      if (_0x57b9e5['workspace']['view'] !== 'project' || _0x57b9e5['workspace']['step'] !== 0x2) return;
-      const _0x5293bb =
-        _0x42b7b0?.['querySelector']?.(
+    handler56 = () => {
+      (value50?.(), (value50 = null));
+      if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 0x2)
+        return;
+      const el18 =
+        floatingMenuHost?.['querySelector']?.(
           '.person-replacement-middle-preview-slide:not(' +
             '.person-replacement-middle-preview-slide--outgoing) ' +
             '[data-person-replacement-keyframe-stage]\x20>\x20img',
-        ) || _0x42b7b0?.['querySelector']?.('[data-person-replacement-keyframe-stage] > img');
-      if (!_0x5293bb) return;
-      const _0x230d76 = () => syncPersonReplacementImageStageFrame(_0x5293bb);
-      if (_0x5293bb['complete'] && Number(_0x5293bb['naturalWidth']) > 0x0) _0x230d76();
-      else _0x5293bb['addEventListener']?.('load', _0x230d76, { once: !![] });
-      const _0x518e92 = _0x5293bb['closest']?.('[data-person-replacement-keyframe-stage]')?.['parentElement'],
-        _0x48b05f = windowObject?.['ResizeObserver'],
-        _0x1610c2 = typeof _0x48b05f === 'function' ? new _0x48b05f(_0x230d76) : null;
-      (_0x1610c2?.['observe']?.(_0x518e92),
-        windowObject?.['addEventListener']?.('resize', _0x230d76),
-        (_0x3e5d6c = () => {
-          (_0x5293bb['removeEventListener']?.('load', _0x230d76),
-            _0x1610c2?.['disconnect']?.(),
-            windowObject?.['removeEventListener']?.('resize', _0x230d76));
+        ) || floatingMenuHost?.['querySelector']?.('[data-person-replacement-keyframe-stage] > img');
+      if (!el18) return;
+      const run3 = () => syncPersonReplacementImageStageFrame(el18);
+      if (el18['complete'] && Number(el18['naturalWidth']) > 0x0) run3();
+      else el18['addEventListener']?.('load', run3, { once: !![] });
+      const value160 = el18['closest']?.('[data-person-replacement-keyframe-stage]')?.['parentElement'],
+        handler57 = windowObject?.['ResizeObserver'],
+        value161 = typeof handler57 === 'function' ? new handler57(run3) : null;
+      (value161?.['observe']?.(value160),
+        windowObject?.['addEventListener']?.('resize', run3),
+        (value50 = () => {
+          (el18['removeEventListener']?.('load', run3),
+            value161?.['disconnect']?.(),
+            windowObject?.['removeEventListener']?.('resize', run3));
         }));
     },
-    _0x57f715 = createPersonReplacementBatchGenerationController({
-      getProject: () => _0x57b9e5,
-      buildImagePresentation: (_0x3601d8) => personReplacementImagePresentation['build'](_0x3601d8),
+    personReplacementBatchGenerationController = createPersonReplacementBatchGenerationController({
+      getProject: () => initialProject2,
+      buildImagePresentation: (value162) => personReplacementImagePresentation['build'](value162),
       getCharacterAppearance: getCharacterAppearance,
-      runRequest: (..._0x30f1c0) => _0x267b3(..._0x30f1c0),
-      requestRender: () => _0x4cf492(),
-      refreshShotSelectionControls: () => _0x4c1ba8(),
-      resolveCharacterImageBatchConcurrency: _0x52549f(
-        _0x43f995['RESOLVE_CHARACTER_IMAGE_BATCH_CONCURRENCY'],
+      runRequest: (...args18) => handler11(...args18),
+      requestRender: () => run(),
+      refreshShotSelectionControls: () => handler53(),
+      resolveCharacterImageBatchConcurrency: onShotKeyframeSelected(
+        downloadImageIntent['RESOLVE_CHARACTER_IMAGE_BATCH_CONCURRENCY'],
       ),
-      onGenerateReplacementImageRequested: _0x52549f(_0x43f995['GENERATE_REPLACEMENT_IMAGE']),
-      onCancelReplacementImageRequested: _0x52549f(_0x43f995['CANCEL_REPLACEMENT_IMAGE']),
-      onGenerateReplacementVideoRequested: _0x52549f(_0x43f995['GENERATE_REPLACEMENT_VIDEO']),
-      onCancelReplacementVideoRequested: _0x52549f(_0x43f995['CANCEL_REPLACEMENT_VIDEO']),
-      onGenerateCharacterImageRequested: _0x52549f(_0x43f995['GENERATE_CHARACTER_IMAGE']),
-      onGenerationBatchCompleted: _0x52549f(_0x43f995['COMPLETE_GENERATION_BATCH']),
+      onGenerateReplacementImageRequested: onShotKeyframeSelected(
+        downloadImageIntent['GENERATE_REPLACEMENT_IMAGE'],
+      ),
+      onCancelReplacementImageRequested: onShotKeyframeSelected(
+        downloadImageIntent['CANCEL_REPLACEMENT_IMAGE'],
+      ),
+      onGenerateReplacementVideoRequested: onShotKeyframeSelected(
+        downloadImageIntent['GENERATE_REPLACEMENT_VIDEO'],
+      ),
+      onCancelReplacementVideoRequested: onShotKeyframeSelected(
+        downloadImageIntent['CANCEL_REPLACEMENT_VIDEO'],
+      ),
+      onGenerateCharacterImageRequested: onShotKeyframeSelected(
+        downloadImageIntent['GENERATE_CHARACTER_IMAGE'],
+      ),
+      onGenerationBatchCompleted: onShotKeyframeSelected(downloadImageIntent['COMPLETE_GENERATION_BATCH']),
       windowObject: windowObject,
     }),
     {
-      cancelAssetBatch: _0x3f648b,
-      cancelShotBatch: _0x1d3a8e,
-      destroy: _0xc2e7d1,
-      getAssetRenderState: _0x546595,
-      getShotRenderState: _0x53365b,
-      isShotBatchForCurrentProject: _0x4fea56,
-      runAssetBatch: _0x5e8e9c,
-      runShotBatch: _0x2daac8,
-    } = _0x57f715,
-    _0x1f9cef = () => {
-      const _0xb256ac = _0x53365b(),
-        _0xa80fad = _0x546595();
-      return _0x24b921['getWorkspacePresentation']({
-        shotBatchGenerationActive: _0xb256ac['active'],
-        shotBatchGenerationLabel: _0xb256ac['label'],
-        shotBatchGeneratingShotIds: _0xb256ac['generatingShotIds'],
-        shotBatchCancelRequested: _0xb256ac['cancelRequested'],
-        assetBatchGenerationActive: _0xa80fad['active'],
-        assetBatchGenerationLabel: _0xa80fad['label'],
-        assetBatchGeneratingCharacterIds: _0xa80fad['generatingCharacterIds'],
-        assetBatchCancelRequested: _0xa80fad['cancelRequested'],
-        canvasSyncPending: _0x1b7b58,
-        canvasSyncScope: _0x47513d,
-        composeOutputPending: _0x4fcdf7,
-        exportOutputPending: _0x463a8b,
+      cancelAssetBatch: cancelAssetBatch,
+      cancelShotBatch: cancelShotBatch,
+      destroy: destroy4,
+      getAssetRenderState: getAssetRenderState,
+      getShotRenderState: getShotRenderState,
+      isShotBatchForCurrentProject: isShotBatchForCurrentProject,
+      runAssetBatch: runAssetBatch,
+      runShotBatch: runShotBatch,
+    } = personReplacementBatchGenerationController,
+    handler22 = () => {
+      const shotBatchGenerationActive = getShotRenderState(),
+        assetBatchGenerationActive = getAssetRenderState();
+      return session['getWorkspacePresentation']({
+        shotBatchGenerationActive: shotBatchGenerationActive['active'],
+        shotBatchGenerationLabel: shotBatchGenerationActive['label'],
+        shotBatchGeneratingShotIds: shotBatchGenerationActive['generatingShotIds'],
+        shotBatchCancelRequested: shotBatchGenerationActive['cancelRequested'],
+        assetBatchGenerationActive: assetBatchGenerationActive['active'],
+        assetBatchGenerationLabel: assetBatchGenerationActive['label'],
+        assetBatchGeneratingCharacterIds: assetBatchGenerationActive['generatingCharacterIds'],
+        assetBatchCancelRequested: assetBatchGenerationActive['cancelRequested'],
+        canvasSyncPending: canvasSyncPending,
+        canvasSyncScope: canvasSyncScope,
+        composeOutputPending: composeOutputPending2,
+        exportOutputPending: exportOutputPending,
         canvasSyncOverlayInline: ![],
-        assetLibraryDisclosure: _0x5b9bfb,
-        assetUploadPendingKinds: ['character', 'scene', 'audio']['filter']((_0x15f889) =>
-          _0x29b772['has'](_0x7a45ba(_0x15f889)),
+        assetLibraryDisclosure: assetLibraryDisclosure,
+        assetUploadPendingKinds: ['character', 'scene', 'audio']['filter']((value163) =>
+          map['has'](handler32(value163)),
         ),
-        voiceLibraryTargetCharacterId: _0x834763,
-        promptEnhancementModel: _0x4ad4fe(_0x43f995['GET_PROMPT_ENHANCEMENT_MODEL']) || {},
+        voiceLibraryTargetCharacterId: voiceLibraryTargetCharacterId,
+        promptEnhancementModel:
+          promptEnhancementModel(downloadImageIntent['GET_PROMPT_ENHANCEMENT_MODEL']) || {},
       });
     },
-    _0x218b57 = () => {
-      const _0x13da3e = _0x42b7b0?.['querySelector']?.('#person-replacement-shot-cut-smart-detect-panel');
-      if (!_0x13da3e?.['style']) return ![];
-      const _0x313e6a =
+    handler58 = () => {
+      const el19 = floatingMenuHost?.['querySelector']?.('#person-replacement-shot-cut-smart-detect-panel');
+      if (!el19?.['style']) return ![];
+      const count3 =
         Number(windowObject?.['innerWidth'] || documentObject?.['documentElement']?.['clientWidth']) || 0x0;
-      if (_0x313e6a <= 0x2d0)
+      if (count3 <= 0x2d0)
         return (
-          ['top', 'right', 'bottom', 'left']['forEach']((_0x5803f1) => {
-            _0x13da3e['style']['removeProperty']?.(_0x5803f1);
+          ['top', 'right', 'bottom', 'left']['forEach']((value164) => {
+            el19['style']['removeProperty']?.(value164);
           }),
           !![]
         );
-      const _0x51baa2 = _0x42b7b0?.['querySelector']?.(
+      const el20 = floatingMenuHost?.['querySelector']?.(
           '[data-person-replacement-action="toggle-shot-cut-smart-detect"]',
         ),
-        _0x39ccda = _0x51baa2?.['getBoundingClientRect']?.(),
-        _0x15fc12 = _0x13da3e['getBoundingClientRect']?.();
-      if (!_0x39ccda || !_0x15fc12) return ![];
-      const _0x160409 =
+        box = el20?.['getBoundingClientRect']?.(),
+        box2 = el19['getBoundingClientRect']?.();
+      if (!box || !box2) return ![];
+      const value165 =
           Number(windowObject?.['innerHeight'] || documentObject?.['documentElement']?.['clientHeight']) ||
           0x0,
-        _0x4a2b6f = 0x10,
-        _0x21ae43 = 0x8,
-        _0x127012 = Math['max'](
-          _0x4a2b6f,
-          Math['min'](_0x313e6a - _0x15fc12['width'] - _0x4a2b6f, _0x39ccda['right'] - _0x15fc12['width']),
+        value166 = 0x10,
+        value167 = 0x8,
+        value168 = Math['max'](
+          value166,
+          Math['min'](count3 - box2['width'] - value166, box['right'] - box2['width']),
         ),
-        _0x5a39d9 = _0x39ccda['bottom'] + _0x21ae43,
-        _0x658218 =
-          _0x5a39d9 + _0x15fc12['height'] <= _0x160409 - _0x4a2b6f
-            ? _0x5a39d9
-            : Math['max'](_0x4a2b6f, _0x39ccda['top'] - _0x15fc12['height'] - _0x21ae43);
+        value169 = box['bottom'] + value167,
+        value170 =
+          value169 + box2['height'] <= value165 - value166
+            ? value169
+            : Math['max'](value166, box['top'] - box2['height'] - value167);
       return (
-        _0x13da3e['style']['setProperty']?.('top', _0x658218 + 'px'),
-        _0x13da3e['style']['setProperty']?.('right', 'auto'),
-        _0x13da3e['style']['setProperty']?.('bottom', 'auto'),
-        _0x13da3e['style']['setProperty']?.('left', _0x127012 + 'px'),
+        el19['style']['setProperty']?.('top', value170 + 'px'),
+        el19['style']['setProperty']?.('right', 'auto'),
+        el19['style']['setProperty']?.('bottom', 'auto'),
+        el19['style']['setProperty']?.('left', value168 + 'px'),
         !![]
       );
     },
-    _0x11a836 = () => {
-      if (_0x4e4610['isSmartDetectOpen']) _0x218b57();
+    value171 = () => {
+      if (selectedIds['isSmartDetectOpen']) handler58();
     },
-    _0x1dc794 = (_0x4851b3) => {
-      const _0xa7aa90 = documentObject?.['createElement']?.('div');
-      if (!_0xa7aa90) return null;
-      return ((_0xa7aa90['innerHTML'] = String(_0x4851b3 || '')['trim']()), _0xa7aa90['firstElementChild']);
+    handler59 = (value172) => {
+      const el21 = documentObject?.['createElement']?.('div');
+      if (!el21) return null;
+      return ((el21['innerHTML'] = String(value172 || '')['trim']()), el21['firstElementChild']);
     },
-    _0x3ff432 = () => {
-      const _0x569e4b = _0x42b7b0?.['querySelector']?.(
+    handler60 = () => {
+      const el22 = floatingMenuHost?.['querySelector']?.(
         '[data-person-replacement-compare-card="replacement"] .person-replacement-compare-media-frame',
       );
-      if (!_0x569e4b) return ![];
-      (_0x569e4b['classList']?.['toggle']?.('img-preview-loading', _0x4fcdf7),
-        _0x569e4b['setAttribute']?.('aria-busy', String(_0x4fcdf7)));
-      if (_0x4fcdf7) _0x569e4b['setAttribute']?.('inert', '');
-      else _0x569e4b['removeAttribute']?.('inert');
-      const _0x55826f = _0x569e4b['querySelector']?.('.story-asset-loading-overlay');
-      if (_0x4fcdf7 && !_0x55826f) {
-        const _0x2eef20 = _0x1dc794(
+      if (!el22) return ![];
+      (el22['classList']?.['toggle']?.('img-preview-loading', composeOutputPending2),
+        el22['setAttribute']?.('aria-busy', String(composeOutputPending2)));
+      if (composeOutputPending2) el22['setAttribute']?.('inert', '');
+      else el22['removeAttribute']?.('inert');
+      const el23 = el22['querySelector']?.('.story-asset-loading-overlay');
+      if (composeOutputPending2 && !el23) {
+        const value173 = handler59(
           renderWorkspaceAssetLoadingOverlay({
             title: '视频合成中',
             description: '正在合成替换片段，完成后会自动显示完整视频。',
           }),
         );
-        if (_0x2eef20) _0x569e4b['appendChild']?.(_0x2eef20);
-      } else !_0x4fcdf7 && _0x55826f?.['remove']?.();
+        if (value173) el22['appendChild']?.(value173);
+      } else !composeOutputPending2 && el23?.['remove']?.();
       return !![];
     },
-    _0x245ac4 = (_0x264ed2, _0x311526) => {
-      if (!_0x264ed2) return;
+    handler61 = (el24, value174) => {
+      if (!el24) return;
       try {
-        _0x264ed2['inert'] = _0x311526;
+        el24['inert'] = value174;
       } catch {
-        if (_0x311526) _0x264ed2['setAttribute']?.('inert', '');
-        else _0x264ed2['removeAttribute']?.('inert');
+        if (value174) el24['setAttribute']?.('inert', '');
+        else el24['removeAttribute']?.('inert');
       }
-      if (_0x311526) _0x264ed2['setAttribute']?.('inert', '');
-      else _0x264ed2['removeAttribute']?.('inert');
+      if (value174) el24['setAttribute']?.('inert', '');
+      else el24['removeAttribute']?.('inert');
     },
-    _0x13053b = ({ restoreFocus: restoreFocus = !![] } = {}) => {
-      (_0x1ffaf2['forEach']((_0x3bc680, _0x2bb3c6) => {
-        _0x245ac4(_0x2bb3c6, _0x3bc680);
+    handler62 = ({ restoreFocus: restoreFocus = !![] } = {}) => {
+      (map2['forEach']((value175, value176) => {
+        handler61(value176, value175);
       }),
-        _0x1ffaf2['clear'](),
-        _0x3b1585?.['remove']?.(),
-        (_0x3b1585 = null),
+        map2['clear'](),
+        el4?.['remove']?.(),
+        (el4 = null),
         documentObject?.['body']?.['classList']?.['remove']?.('person-replacement-canvas-sync-active'),
-        _0x42b7b0?.['classList']?.['remove']?.('is-canvas-sync-pending'),
-        _0x42b7b0?.['setAttribute']?.('aria-busy', 'false'));
+        floatingMenuHost?.['classList']?.['remove']?.('is-canvas-sync-pending'),
+        floatingMenuHost?.['setAttribute']?.('aria-busy', 'false'));
       if (
         restoreFocus &&
-        _0x42b7b0?.['hidden'] === ![] &&
-        _0xbd6d44 &&
-        _0xbd6d44['isConnected'] !== ![] &&
-        typeof _0xbd6d44['focus'] === 'function'
+        floatingMenuHost?.['hidden'] === ![] &&
+        el5 &&
+        el5['isConnected'] !== ![] &&
+        typeof el5['focus'] === 'function'
       )
         try {
-          _0xbd6d44['focus']({ preventScroll: !![] });
+          el5['focus']({ preventScroll: !![] });
         } catch {
-          _0xbd6d44['focus']();
+          el5['focus']();
         }
-      _0xbd6d44 = null;
+      el5 = null;
     },
-    _0x59adb4 = ({ captureFocus: captureFocus = ![] } = {}) => {
-      if (!_0x1b7b58) {
-        _0x13053b();
+    handler63 = ({ captureFocus: captureFocus = ![] } = {}) => {
+      if (!canvasSyncPending) {
+        handler62();
         return;
       }
-      const _0x2fc525 = documentObject?.['body'];
-      if (!_0x2fc525) return;
+      const el25 = documentObject?.['body'];
+      if (!el25) return;
       if (captureFocus) {
-        const _0x840c8a = documentObject?.['activeElement'];
-        _0xbd6d44 = _0x42b7b0?.['contains']?.(_0x840c8a) ? _0x840c8a : null;
+        const value177 = documentObject?.['activeElement'];
+        el5 = floatingMenuHost?.['contains']?.(value177) ? value177 : null;
       }
-      if (!_0x3b1585) {
-        _0x3b1585 = _0x1dc794(
+      if (!el4) {
+        el4 = handler59(
           personReplacementShellPresentation['renderCanvasSyncLoadingOverlay']({ canvasSyncPending: !![] }),
         );
-        if (_0x3b1585) _0x2fc525['appendChild']?.(_0x3b1585);
+        if (el4) el25['appendChild']?.(el4);
       }
-      (Array['from'](_0x2fc525['children'] || [])['forEach']((_0x3458b9) => {
-        if (_0x3458b9 === _0x3b1585) return;
-        (!_0x1ffaf2['has'](_0x3458b9) &&
-          _0x1ffaf2['set'](
-            _0x3458b9,
-            Boolean(_0x3458b9?.['inert'] || _0x3458b9?.['hasAttribute']?.('inert')),
-          ),
-          _0x245ac4(_0x3458b9, !![]));
+      (Array['from'](el25['children'] || [])['forEach']((value178) => {
+        if (value178 === el4) return;
+        (!map2['has'](value178) &&
+          map2['set'](value178, Boolean(value178?.['inert'] || value178?.['hasAttribute']?.('inert'))),
+          handler61(value178, !![]));
       }),
         documentObject['body']?.['classList']?.['add']?.('person-replacement-canvas-sync-active'),
-        _0x42b7b0?.['classList']?.['add']?.('is-canvas-sync-pending'),
-        _0x42b7b0?.['setAttribute']?.('aria-busy', 'true'));
+        floatingMenuHost?.['classList']?.['add']?.('is-canvas-sync-pending'),
+        floatingMenuHost?.['setAttribute']?.('aria-busy', 'true'));
       try {
-        _0x3b1585?.['focus']?.({ preventScroll: !![] });
+        el4?.['focus']?.({ preventScroll: !![] });
       } catch {
-        _0x3b1585?.['focus']?.();
+        el4?.['focus']?.();
       }
     },
-    _0xfd0282 = () => '[data-person-replacement-shot-timeline-scroll]',
-    _0x4c34e9 = (_0x3624a2) => {
-      const _0xbfd19d = normalizeText(_0x57b9e5['workspace']['selectedShotId']);
-      Array['from'](_0x3624a2?.['querySelectorAll']?.('[data-person-replacement-shot-card="true"]') || [])[
+    handler64 = () => '[data-person-replacement-shot-timeline-scroll]',
+    handler65 = (el26) => {
+      const text9 = normalizeText(initialProject2['workspace']['selectedShotId']);
+      Array['from'](el26?.['querySelectorAll']?.('[data-person-replacement-shot-card="true"]') || [])[
         'forEach'
-      ]((_0x5ae14d) => {
-        const _0x397160 = normalizeText(_0x5ae14d['dataset']?.['shotId']) === _0xbfd19d;
-        (_0x5ae14d['classList']?.['toggle']?.('is-selected', _0x397160),
-          _0x5ae14d['setAttribute']?.('aria-current', String(_0x397160)));
+      ]((el27) => {
+        const text10 = normalizeText(el27['dataset']?.['shotId']) === text9;
+        (el27['classList']?.['toggle']?.('is-selected', text10),
+          el27['setAttribute']?.('aria-current', String(text10)));
       });
     },
-    _0x124d27 = () => {
-      (_0x58b712(),
-        _0x3c691d(),
-        _0x42cf44['forEach']((_0x490ae5) => _0x490ae5?.['destroy']?.()),
-        (_0x42cf44 = []),
-        _0x379113(),
-        _0x5cb732?.(),
-        (_0x5cb732 = null),
-        _0x3e5d6c?.(),
-        (_0x3e5d6c = null));
+    handler66 = () => {
+      (hide(),
+        handler3(),
+        list3['forEach']((value179) => value179?.['destroy']?.()),
+        (list3 = []),
+        destroySourcePlaybackBindings(),
+        value47?.(),
+        (value47 = null),
+        value50?.(),
+        (value50 = null));
     },
-    _0x16d8a2 = () => {
-      const _0x13f245 = _0x57b9e5['workspace']['step'] === 0x2 && !_0x4e4610['isOpen'];
-      _0x2e8658({ manualSelectionSurfaceActive: _0x13f245 });
+    handler67 = () => {
+      const manualSelectionSurfaceActive =
+        initialProject2['workspace']['step'] === 0x2 && !selectedIds['isOpen'];
+      syncAfterRender({ manualSelectionSurfaceActive: manualSelectionSurfaceActive });
     },
-    _0x54458e = (_0x294e97) => {
-      const _0x213131 = Number(_0x294e97?.['scrollLeft']) || 0x0,
-        _0x2d10b4 = Number(_0x294e97?.['scrollTop']) || 0x0,
-        _0x160a7e = _0x294e97?.['style']?.['overflowAnchor'] || '';
-      _0x294e97?.['style']?.['setProperty']?.('overflow-anchor', 'none');
-      const _0x30e332 = () => {
-        if (!_0x294e97) return;
-        ((_0x294e97['scrollLeft'] = _0x213131), (_0x294e97['scrollTop'] = _0x2d10b4));
+    handler68 = (el28) => {
+      const value180 = Number(el28?.['scrollLeft']) || 0x0,
+        value181 = Number(el28?.['scrollTop']) || 0x0,
+        value182 = el28?.['style']?.['overflowAnchor'] || '';
+      el28?.['style']?.['setProperty']?.('overflow-anchor', 'none');
+      const run4 = () => {
+        if (!el28) return;
+        ((el28['scrollLeft'] = value180), (el28['scrollTop'] = value181));
       };
       return () => {
-        _0x30e332();
-        const _0x1656ef = () => {
-          (_0x30e332(),
-            _0x160a7e
-              ? _0x294e97?.['style']?.['setProperty']?.('overflow-anchor', _0x160a7e)
-              : _0x294e97?.['style']?.['removeProperty']?.('overflow-anchor'));
+        run4();
+        const run5 = () => {
+          (run4(),
+            value182
+              ? el28?.['style']?.['setProperty']?.('overflow-anchor', value182)
+              : el28?.['style']?.['removeProperty']?.('overflow-anchor'));
         };
         typeof windowObject?.['requestAnimationFrame'] === 'function'
-          ? windowObject['requestAnimationFrame'](_0x1656ef)
-          : _0x1656ef();
+          ? windowObject['requestAnimationFrame'](run5)
+          : run5();
       };
     },
-    _0x5f4137 = (_0x989098, _0x3dcc7e = _0x57b9e5['workspace']['selectedShotId']) => {
-      const _0x2d30f9 = _0x53365b(),
-        _0x854599 = _0x1dc794(
-          personReplacementShotTimelinePresentation['renderTimeline'](_0x57b9e5, {
+    handler69 = (currentScroller, shotId2 = initialProject2['workspace']['selectedShotId']) => {
+      const isBatchGenerating = getShotRenderState(),
+        el29 = handler59(
+          personReplacementShotTimelinePresentation['renderTimeline'](initialProject2, {
             allowCutEditing: !![],
             mode: 'image',
-            isBatchGenerating: _0x2d30f9['active'],
-            batchGenerationLabel: _0x2d30f9['label'],
-            batchGeneratingShotIds: _0x2d30f9['generatingShotIds'],
-            batchCancelRequested: _0x2d30f9['cancelRequested'],
+            isBatchGenerating: isBatchGenerating['active'],
+            batchGenerationLabel: isBatchGenerating['label'],
+            batchGeneratingShotIds: isBatchGenerating['generatingShotIds'],
+            batchCancelRequested: isBatchGenerating['cancelRequested'],
           }),
         ),
-        _0x3d4d63 = _0x854599?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]');
-      if (!_0x989098 || !_0x3d4d63) return ![];
-      const _0x329e30 = _0x54458e(_0x989098),
-        _0x342ba9 = reconcilePersonReplacementShotTimelineCard({
-          currentScroller: _0x989098,
-          nextScroller: _0x3d4d63,
-          shotId: _0x3dcc7e,
+        nextScroller = el29?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]');
+      if (!currentScroller || !nextScroller) return ![];
+      const run6 = handler68(currentScroller),
+        reconcilePersonReplacementShotTimelineCard2 = reconcilePersonReplacementShotTimelineCard({
+          currentScroller: currentScroller,
+          nextScroller: nextScroller,
+          shotId: shotId2,
         });
-      if (!_0x342ba9) return (_0x329e30(), ![]);
-      return (_0x4c34e9(_0x989098), _0x329e30(), !![]);
+      if (!reconcilePersonReplacementShotTimelineCard2) return (run6(), ![]);
+      return (handler65(currentScroller), run6(), !![]);
     },
-    _0x4c1ba8 = () => {
+    handler53 = () => {
       if (
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        ![0x2, 0x3]['includes'](_0x57b9e5['workspace']['step']) ||
-        _0x4e4610['isOpen']
+        initialProject2['workspace']['view'] !== 'project' ||
+        ![0x2, 0x3]['includes'](initialProject2['workspace']['step']) ||
+        selectedIds['isOpen']
       )
         return ![];
-      const _0x4b5097 = _0x57b9e5['workspace']['step'] === 0x3,
-        _0x34bfe0 = _0x53365b();
-      syncPersonReplacementPromptModeControl(_0x42b7b0, _0x57b9e5, _0x34bfe0['generatingShotIds']);
-      const _0x519fa9 = _0x42b7b0?.['querySelector']?.('.person-replacement-shot-timeline'),
-        _0x597a89 = _0x1dc794(
-          personReplacementShotTimelinePresentation['renderTimeline'](_0x57b9e5, {
-            allowCutEditing: !_0x4b5097,
-            mode: _0x4b5097 ? 'video' : 'image',
-            isBatchGenerating: _0x34bfe0['active'],
-            batchGenerationLabel: _0x34bfe0['label'],
-            batchGeneratingShotIds: _0x34bfe0['generatingShotIds'],
-            batchCancelRequested: _0x34bfe0['cancelRequested'],
+      const mode = initialProject2['workspace']['step'] === 0x3,
+        isBatchGenerating2 = getShotRenderState();
+      syncPersonReplacementPromptModeControl(
+        floatingMenuHost,
+        initialProject2,
+        isBatchGenerating2['generatingShotIds'],
+      );
+      const el30 = floatingMenuHost?.['querySelector']?.('.person-replacement-shot-timeline'),
+        el31 = handler59(
+          personReplacementShotTimelinePresentation['renderTimeline'](initialProject2, {
+            allowCutEditing: !mode,
+            mode: mode ? 'video' : 'image',
+            isBatchGenerating: isBatchGenerating2['active'],
+            batchGenerationLabel: isBatchGenerating2['label'],
+            batchGeneratingShotIds: isBatchGenerating2['generatingShotIds'],
+            batchCancelRequested: isBatchGenerating2['cancelRequested'],
           }),
         ),
-        _0x4bd350 = _0x519fa9?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
-        _0x41db2e = _0x597a89?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
-        _0x435682 = _0x42b7b0?.['querySelector']?.(
-          _0x4b5097
+        currentList = el30?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
+        nextList = el31?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
+        enabled8 = floatingMenuHost?.['querySelector']?.(
+          mode
             ? '[data-person-replacement-action="generate-replacement-video"]'
             : '[data-person-replacement-action=\x22generate-replacement-image\x22]',
         ),
-        _0x1ec60a = _0x1f9cef(),
-        _0x4e700d = _0x4b5097
-          ? personReplacementVideoPresentation['build'](_0x57b9e5)
-          : personReplacementImagePresentation['build'](_0x57b9e5, _0x1ec60a['shotBatchGeneratingShotIds']),
-        _0x14862a = _0x1dc794(
-          _0x4b5097
-            ? personReplacementVideoPresentation['renderGenerateButton'](_0x57b9e5, {
-                presentation: _0x4e700d,
-                ..._0x1ec60a,
+        args19 = handler22(),
+        presentation = mode
+          ? personReplacementVideoPresentation['build'](initialProject2)
+          : personReplacementImagePresentation['build'](
+              initialProject2,
+              args19['shotBatchGeneratingShotIds'],
+            ),
+        enabled9 = handler59(
+          mode
+            ? personReplacementVideoPresentation['renderGenerateButton'](initialProject2, {
+                presentation: presentation,
+                ...args19,
               })
-            : personReplacementImagePresentation['renderGenerateButton'](_0x57b9e5, {
-                presentation: _0x4e700d,
-                ..._0x1ec60a,
+            : personReplacementImagePresentation['renderGenerateButton'](initialProject2, {
+                presentation: presentation,
+                ...args19,
               }),
         );
       if (
-        !_0x519fa9 ||
-        !_0x597a89 ||
-        !_0x4bd350 ||
-        !_0x41db2e ||
-        !_0x435682 ||
-        !_0x14862a ||
-        typeof _0x519fa9['replaceWith'] !== 'function' ||
-        typeof _0x435682['replaceWith'] !== 'function'
+        !el30 ||
+        !el31 ||
+        !currentList ||
+        !nextList ||
+        !enabled8 ||
+        !enabled9 ||
+        typeof el30['replaceWith'] !== 'function' ||
+        typeof enabled8['replaceWith'] !== 'function'
       )
         return ![];
-      const _0x42c31e = _0x54458e(_0x4bd350);
-      if (!reconcilePersonReplacementShotCardList({ currentList: _0x4bd350, nextList: _0x41db2e }))
-        return (_0x42c31e(), ![]);
-      (reconcileElementTree(_0x519fa9, _0x597a89, {
+      const run7 = handler68(currentList);
+      if (!reconcilePersonReplacementShotCardList({ currentList: currentList, nextList: nextList }))
+        return (run7(), ![]);
+      (reconcileElementTree(el30, el31, {
         preserveChildNodes: !![],
         preserveSelector: '[data-person-replacement-shot-timeline-scroll]',
       }),
-        reconcileElementTree(_0x435682, _0x14862a, { preserveChildNodes: !![] }));
-      if (!_0x4b5097) syncPersonReplacementImageGenerationLoading(_0x42b7b0, _0x4e700d);
-      return (_0x42c31e(), _0x4aeba7?.['refresh'](), !![]);
+        reconcileElementTree(enabled8, enabled9, { preserveChildNodes: !![] }));
+      if (!mode) syncPersonReplacementImageGenerationLoading(floatingMenuHost, presentation);
+      return (run7(), ctx?.['refresh'](), !![]);
     },
-    _0x1fff09 = () => {
+    handler70 = () => {
       if (
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        _0x57b9e5['workspace']['step'] !== 0x5 ||
-        _0x4e4610['isOpen']
+        initialProject2['workspace']['view'] !== 'project' ||
+        initialProject2['workspace']['step'] !== 0x5 ||
+        selectedIds['isOpen']
       )
         return ![];
-      const _0x31f29b = _0x42b7b0?.['querySelector']?.('.person-replacement-preview-shot-rail'),
-        _0x439b53 = _0x1dc794(
+      const el32 = floatingMenuHost?.['querySelector']?.('.person-replacement-preview-shot-rail'),
+        el33 = handler59(
           personReplacementCompositePreviewPresentation['renderRail'](
-            buildPersonReplacementCompositePreviewSnapshot(_0x57b9e5),
+            buildPersonReplacementCompositePreviewSnapshot(initialProject2),
           ),
         ),
-        _0x21c8de = _0x42b7b0?.['querySelector']?.('.person-replacement-preview-actions--toolbar'),
-        _0x3314e7 = _0x1dc794(
-          personReplacementShellPresentation['renderToolbarActions'](_0x57b9e5, _0x1f9cef()),
+        enabled10 = floatingMenuHost?.['querySelector']?.('.person-replacement-preview-actions--toolbar'),
+        enabled11 = handler59(
+          personReplacementShellPresentation['renderToolbarActions'](initialProject2, handler22()),
         ),
-        _0x47a4b7 = _0x31f29b?.['querySelector']?.('.person-replacement-preview-shot-list'),
-        _0x387c4f = _0x439b53?.['querySelector']?.('.person-replacement-preview-shot-list');
+        currentList2 = el32?.['querySelector']?.('.person-replacement-preview-shot-list'),
+        nextList2 = el33?.['querySelector']?.('.person-replacement-preview-shot-list');
       if (
-        !_0x31f29b ||
-        !_0x439b53 ||
-        !_0x21c8de ||
-        !_0x3314e7 ||
-        typeof _0x31f29b['replaceWith'] !== 'function' ||
-        typeof _0x21c8de['replaceWith'] !== 'function'
+        !el32 ||
+        !el33 ||
+        !enabled10 ||
+        !enabled11 ||
+        typeof el32['replaceWith'] !== 'function' ||
+        typeof enabled10['replaceWith'] !== 'function'
       )
         return ![];
-      const _0x1c0649 = _0x47a4b7 && _0x387c4f ? _0x54458e(_0x47a4b7) : null;
-      if (_0x47a4b7 && _0x387c4f) {
-        if (!reconcilePersonReplacementShotCardList({ currentList: _0x47a4b7, nextList: _0x387c4f }))
-          return (_0x1c0649?.(), ![]);
-        _0x387c4f['replaceWith'](_0x47a4b7);
+      const value183 = currentList2 && nextList2 ? handler68(currentList2) : null;
+      if (currentList2 && nextList2) {
+        if (!reconcilePersonReplacementShotCardList({ currentList: currentList2, nextList: nextList2 }))
+          return (value183?.(), ![]);
+        nextList2['replaceWith'](currentList2);
       }
-      return (_0x31f29b['replaceWith'](_0x439b53), _0x21c8de['replaceWith'](_0x3314e7), _0x1c0649?.(), !![]);
+      return (el32['replaceWith'](el33), enabled10['replaceWith'](enabled11), value183?.(), !![]);
     },
-    _0x539642 = () => {
+    handler71 = () => {
       if (
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        _0x57b9e5['workspace']['step'] !== 0x5 ||
-        _0x4e4610['isOpen']
+        initialProject2['workspace']['view'] !== 'project' ||
+        initialProject2['workspace']['step'] !== 0x5 ||
+        selectedIds['isOpen']
       )
         return ![];
-      const _0x2970d3 = _0x42b7b0?.['querySelector']?.('[data-person-replacement-composite-preview]'),
-        _0x381dcb = _0x1dc794(renderCompositePreview(_0x57b9e5, _0x1f9cef())),
-        _0x1fc275 = _0x2970d3?.['querySelector']?.('.person-replacement-preview-shot-list'),
-        _0x1ae558 = _0x381dcb?.['querySelector']?.('.person-replacement-preview-shot-list');
+      const el34 = floatingMenuHost?.['querySelector']?.('[data-person-replacement-composite-preview]'),
+        el35 = handler59(renderCompositePreview(initialProject2, handler22())),
+        currentList3 = el34?.['querySelector']?.('.person-replacement-preview-shot-list'),
+        nextList3 = el35?.['querySelector']?.('.person-replacement-preview-shot-list');
       if (
-        !_0x2970d3 ||
-        !_0x381dcb ||
-        !_0x1fc275 ||
-        !_0x1ae558 ||
-        typeof _0x2970d3['replaceWith'] !== 'function' ||
-        typeof _0x1ae558['replaceWith'] !== 'function'
+        !el34 ||
+        !el35 ||
+        !currentList3 ||
+        !nextList3 ||
+        typeof el34['replaceWith'] !== 'function' ||
+        typeof nextList3['replaceWith'] !== 'function'
       )
         return ![];
-      const _0x51400d = _0x54458e(_0x1fc275);
-      if (!reconcilePersonReplacementShotCardList({ currentList: _0x1fc275, nextList: _0x1ae558 }))
-        return (_0x51400d(), ![]);
+      const run8 = handler68(currentList3);
+      if (!reconcilePersonReplacementShotCardList({ currentList: currentList3, nextList: nextList3 }))
+        return (run8(), ![]);
       return (
-        _0x1ae558['replaceWith'](_0x1fc275),
-        _0x58b712(),
-        _0x2d6050(),
-        _0xa770b0(),
-        _0x2970d3['replaceWith'](_0x381dcb),
-        _0x51400d(),
-        _0x1d0ea5(),
+        nextList3['replaceWith'](currentList3),
+        hide(),
+        handler8(),
+        handler4(),
+        el34['replaceWith'](el35),
+        run8(),
+        handler9(),
         !![]
       );
     },
-    _0x593f36 = ({
+    handler43 = ({
       refreshTimelineCard: refreshTimelineCard = ![],
-      timelineShotId: timelineShotId = _0x57b9e5['workspace']['selectedShotId'],
+      timelineShotId: timelineShotId = initialProject2['workspace']['selectedShotId'],
     } = {}) => {
       if (
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        ![0x2, 0x3]['includes'](_0x57b9e5['workspace']['step']) ||
-        _0x4e4610['isOpen']
+        initialProject2['workspace']['view'] !== 'project' ||
+        ![0x2, 0x3]['includes'](initialProject2['workspace']['step']) ||
+        selectedIds['isOpen']
       )
         return ![];
-      const _0x23e1b7 = _0x42b7b0?.['querySelector']?.('.person-replacement-production-page'),
-        _0xf759ca = _0x57b9e5['workspace']['step'] === 0x3,
-        _0x264360 = _0x1f9cef(),
-        _0x3f4805 = _0x1dc794(
-          _0xf759ca
-            ? personReplacementVideoPresentation['render'](_0x57b9e5, _0x264360)
-            : personReplacementImagePresentation['render'](_0x57b9e5, {
-                ..._0x264360,
+      const currentPage = floatingMenuHost?.['querySelector']?.('.person-replacement-production-page'),
+        value184 = initialProject2['workspace']['step'] === 0x3,
+        args20 = handler22(),
+        nextPage = handler59(
+          value184
+            ? personReplacementVideoPresentation['render'](initialProject2, args20)
+            : personReplacementImagePresentation['render'](initialProject2, {
+                ...args20,
                 omitShotTimeline: !![],
               }),
         ),
-        _0x1a1875 = _0xfd0282(),
-        _0x3773a1 = _0x23e1b7?.['querySelector']?.(_0x1a1875),
-        _0x35fdc3 = _0x3f4805?.['querySelector']?.(_0x1a1875),
-        _0x5cca93 = _0x23e1b7?.['querySelector']?.('.person-replacement-middle-layout'),
-        _0x4beacd = _0x3f4805?.['querySelector']?.('.person-replacement-middle-layout'),
-        _0x11c522 = _0x5cca93?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]');
-      if (_0xf759ca) {
-        if (!_0x23e1b7 || !_0x3f4805 || !_0x3773a1 || !_0x35fdc3) return ![];
-        const _0x4f81d9 = _0x54458e(_0x3773a1);
-        if (!reconcilePersonReplacementVideoShotSelection({ currentPage: _0x23e1b7, nextPage: _0x3f4805 }))
+        value185 = handler64(),
+        enabled12 = currentPage?.['querySelector']?.(value185),
+        enabled13 = nextPage?.['querySelector']?.(value185),
+        el36 = currentPage?.['querySelector']?.('.person-replacement-middle-layout'),
+        enabled14 = nextPage?.['querySelector']?.('.person-replacement-middle-layout'),
+        enabled15 = el36?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]');
+      if (value184) {
+        if (!currentPage || !nextPage || !enabled12 || !enabled13) return ![];
+        const run9 = handler68(enabled12);
+        if (!reconcilePersonReplacementVideoShotSelection({ currentPage: currentPage, nextPage: nextPage }))
           return ![];
-        return (_0x124d27(), _0x4f81d9(), _0x16d8a2(), _0x3d9d7b(), _0x84de04(), _0x2fb45b(), !![]);
+        return (handler66(), run9(), handler67(), handler55(), handler52(), handler(), !![]);
       }
-      if (!_0x3773a1 || !_0x5cca93 || !_0x4beacd || !_0x11c522) return ![];
-      if (refreshTimelineCard && !_0x5f4137(_0x3773a1, timelineShotId)) return ![];
-      if (!refreshTimelineCard) _0x4c34e9(_0x3773a1);
-      (_0x58b712(), _0x5cb732?.(), (_0x5cb732 = null));
-      if (!reconcilePersonReplacementImageShotSelection({ currentPage: _0x23e1b7, nextPage: _0x3f4805 }))
+      if (!enabled12 || !el36 || !enabled14 || !enabled15) return ![];
+      if (refreshTimelineCard && !handler69(enabled12, timelineShotId)) return ![];
+      if (!refreshTimelineCard) handler65(enabled12);
+      (hide(), value47?.(), (value47 = null));
+      if (!reconcilePersonReplacementImageShotSelection({ currentPage: currentPage, nextPage: nextPage }))
         return ![];
-      return (_0x16d8a2(), _0x3d9d7b(), _0x2538e3(), !![]);
+      return (handler67(), handler55(), handler56(), !![]);
     },
-    _0x59d0d2 = () => {
+    handler42 = () => {
       if (
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        _0x57b9e5['workspace']['step'] !== 0x3 ||
-        _0x4e4610['isOpen'] ||
-        _0x2ba69b['isClipActive']()
+        initialProject2['workspace']['view'] !== 'project' ||
+        initialProject2['workspace']['step'] !== 0x3 ||
+        selectedIds['isOpen'] ||
+        personReplacementVideoPlaybackController['isClipActive']()
       )
         return ![];
-      const _0x55c679 = _0x42b7b0?.['querySelector']?.('.person-replacement-production-page'),
-        _0x54b76c = _0x1dc794(personReplacementVideoPresentation['render'](_0x57b9e5, _0x1f9cef())),
-        _0x150b65 = _0x55c679?.['querySelector']?.('[data-person-replacement-video-playback-stage="source"]'),
-        _0x522003 = _0x54b76c?.['querySelector']?.('[data-person-replacement-video-playback-stage="source"]'),
-        _0x1e13a2 = shouldReusePersonReplacementVideoPlaybackStage(_0x150b65, _0x522003),
-        _0x3693a6 = _0x55c679?.['querySelector']?.('.person-replacement-video-reference-assets'),
-        _0x192922 = _0x54b76c?.['querySelector']?.('.person-replacement-video-reference-assets'),
-        _0x46868b = _0x55c679?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]'),
-        _0xe5256a = _0x54b76c?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]'),
-        _0x121789 = _0x46868b?.['querySelector']?.('.person-replacement-shot-timeline-scroll'),
-        _0x3b4b04 = _0xe5256a?.['querySelector']?.('.person-replacement-shot-timeline-scroll'),
-        _0x1e1afe = _0x55c679?.['querySelector']?.('.person-replacement-video-generation-panel'),
-        _0x3ebaa5 = _0x54b76c?.['querySelector']?.('.person-replacement-video-generation-panel'),
-        _0x5d232c = _0x1e1afe?.['querySelector']?.('[data-person-replacement-video-reference-inputs]'),
-        _0x4ee1e0 = _0x3ebaa5?.['querySelector']?.('[data-person-replacement-video-reference-inputs]'),
-        _0x2fae36 = _0x1e1afe?.['querySelector']?.(
+      const el37 = floatingMenuHost?.['querySelector']?.('.person-replacement-production-page'),
+        el38 = handler59(personReplacementVideoPresentation['render'](initialProject2, handler22())),
+        value186 = el37?.['querySelector']?.('[data-person-replacement-video-playback-stage="source"]'),
+        value187 = el38?.['querySelector']?.('[data-person-replacement-video-playback-stage="source"]'),
+        shouldReusePersonReplacementVideoPlaybackStage2 = shouldReusePersonReplacementVideoPlaybackStage(
+          value186,
+          value187,
+        ),
+        enabled16 = el37?.['querySelector']?.('.person-replacement-video-reference-assets'),
+        enabled17 = el38?.['querySelector']?.('.person-replacement-video-reference-assets'),
+        el39 = el37?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]'),
+        el40 = el38?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]'),
+        currentList4 = el39?.['querySelector']?.('.person-replacement-shot-timeline-scroll'),
+        nextList4 = el40?.['querySelector']?.('.person-replacement-shot-timeline-scroll'),
+        el41 = el37?.['querySelector']?.('.person-replacement-video-generation-panel'),
+        el42 = el38?.['querySelector']?.('.person-replacement-video-generation-panel'),
+        enabled18 = el41?.['querySelector']?.('[data-person-replacement-video-reference-inputs]'),
+        enabled19 = el42?.['querySelector']?.('[data-person-replacement-video-reference-inputs]'),
+        enabled20 = el41?.['querySelector']?.(
           '[data-person-replacement-field="video-prompt"][contenteditable="true"]',
         ),
-        _0x37a041 = _0x3ebaa5?.['querySelector']?.(
+        enabled21 = el42?.['querySelector']?.(
           '[data-person-replacement-field="video-prompt"][contenteditable="true"]',
         ),
-        _0x4997e3 = _0x1e1afe?.['querySelector']?.('[data-person-replacement-video-playback-stage="result"]'),
-        _0x514813 = _0x3ebaa5?.['querySelector']?.(
-          '[data-person-replacement-video-playback-stage=\x22result\x22]',
-        ),
-        _0x130509 =
-          shouldReusePersonReplacementVideoPlaybackStage(_0x4997e3, _0x514813) &&
-          typeof _0x514813?.['replaceWith'] === 'function',
-        _0x59b684 = _0x55c679?.['querySelector']?.('.person-replacement-step-footer'),
-        _0x13da21 = _0x54b76c?.['querySelector']?.('.person-replacement-step-footer'),
-        _0xc10e9c = [
-          ...(!_0x1e13a2
+        value188 = el41?.['querySelector']?.('[data-person-replacement-video-playback-stage="result"]'),
+        value189 = el42?.['querySelector']?.('[data-person-replacement-video-playback-stage=\x22result\x22]'),
+        shouldReusePersonReplacementVideoPlaybackStage3 =
+          shouldReusePersonReplacementVideoPlaybackStage(value188, value189) &&
+          typeof value189?.['replaceWith'] === 'function',
+        value190 = el37?.['querySelector']?.('.person-replacement-step-footer'),
+        value191 = el38?.['querySelector']?.('.person-replacement-step-footer'),
+        list7 = [
+          ...(!shouldReusePersonReplacementVideoPlaybackStage2
             ? [
                 [
-                  _0x55c679?.['querySelector']?.('.person-replacement-middle-preview-slide'),
-                  _0x54b76c?.['querySelector']?.('.person-replacement-middle-preview-slide'),
+                  el37?.['querySelector']?.('.person-replacement-middle-preview-slide'),
+                  el38?.['querySelector']?.('.person-replacement-middle-preview-slide'),
                 ],
               ]
             : []),
-          [_0x46868b, _0xe5256a],
-          [_0x1e1afe, _0x3ebaa5],
-          [_0x59b684, _0x13da21],
+          [el39, el40],
+          [el41, el42],
+          [value190, value191],
         ];
       if (
-        !_0x55c679 ||
-        !_0x54b76c ||
-        !_0x121789 ||
-        !_0x3b4b04 ||
-        !_0x3693a6 ||
-        !_0x192922 ||
-        !_0x5d232c ||
-        !_0x4ee1e0 ||
-        !_0x2fae36 ||
-        !_0x37a041 ||
-        _0xc10e9c['some'](
-          ([_0x3b4c8b, _0x3d586e]) =>
-            !_0x3b4c8b || !_0x3d586e || typeof _0x3b4c8b['replaceWith'] !== 'function',
+        !el37 ||
+        !el38 ||
+        !currentList4 ||
+        !nextList4 ||
+        !enabled16 ||
+        !enabled17 ||
+        !enabled18 ||
+        !enabled19 ||
+        !enabled20 ||
+        !enabled21 ||
+        list7['some'](
+          ([enabled22, enabled23]) =>
+            !enabled22 || !enabled23 || typeof enabled22['replaceWith'] !== 'function',
         )
       )
         return ![];
-      const _0x1c0a38 = _0x54458e(_0x121789);
-      if (!reconcilePersonReplacementShotCardList({ currentList: _0x121789, nextList: _0x3b4b04 }))
-        return (_0x1c0a38(), ![]);
-      (_0x58b712(), reconcileElementTree(_0x3693a6, _0x192922, { preserveChildNodes: !![] }));
-      if (!_0x130509) _0x2ba69b['destroyRole']('result');
-      if (!_0x1e13a2) _0x2ba69b['destroyRole']('source');
-      (_0xc10e9c['forEach'](([_0x1698e1, _0x5b5273]) => {
-        reconcileElementTree(_0x1698e1, _0x5b5273, {
+      const run10 = handler68(currentList4);
+      if (!reconcilePersonReplacementShotCardList({ currentList: currentList4, nextList: nextList4 }))
+        return (run10(), ![]);
+      (hide(), reconcileElementTree(enabled16, enabled17, { preserveChildNodes: !![] }));
+      if (!shouldReusePersonReplacementVideoPlaybackStage3)
+        personReplacementVideoPlaybackController['destroyRole']('result');
+      if (!shouldReusePersonReplacementVideoPlaybackStage2)
+        personReplacementVideoPlaybackController['destroyRole']('source');
+      (list7['forEach'](([value192, value193]) => {
+        reconcileElementTree(value192, value193, {
           preserveChildNodes: !![],
           preserveSelector:
             '[data-person-replacement-result-history-menu], .person-replacement-shot-timeline-scroll, [data-aigen-video-model-selector], .person-replacement-prompt-input-wrapper' +
-            (_0x130509 ? ', [data-person-replacement-video-playback-stage="result"]' : ''),
+            (shouldReusePersonReplacementVideoPlaybackStage3
+              ? ', [data-person-replacement-video-playback-stage="result"]'
+              : ''),
         });
       }),
-        _0x1c0a38(),
-        _0x2fa649?.['syncContext']?.({
+        run10(),
+        bindAIGenVideoModelSelector2?.['syncContext']?.({
           ...resolvePersonReplacementVideoParameterPolicy({
-            modelId: _0x57b9e5['settings']['replacementModelId'],
-            inputMode: _0x57b9e5['settings']['replacementVideoInputMode'],
-            generationParams: _0x57b9e5['settings']['replacementVideoGenerationParams'],
+            modelId: initialProject2['settings']['replacementModelId'],
+            inputMode: initialProject2['settings']['replacementVideoInputMode'],
+            generationParams: initialProject2['settings']['replacementVideoGenerationParams'],
           }),
           referenceCounts:
-            personReplacementVideoPresentation['build'](_0x57b9e5)['slotState']['referenceCounts'],
+            personReplacementVideoPresentation['build'](initialProject2)['slotState']['referenceCounts'],
         }));
-      if (_0x130509) _0x31cf87();
-      else _0x2fb45b({ roles: ['result'], reset: ![] });
-      if (!_0x1e13a2) _0x2fb45b({ roles: ['source'], reset: ![] });
+      if (shouldReusePersonReplacementVideoPlaybackStage3) handler2();
+      else handler({ roles: ['result'], reset: ![] });
+      if (!shouldReusePersonReplacementVideoPlaybackStage2) handler({ roles: ['source'], reset: ![] });
       return !![];
     };
-  _0x1c8531 = (
-    _0x51df5d,
-    { timelineShotId: timelineShotId = _0x57b9e5['workspace']['selectedShotId'] } = {},
+  handler14 = (
+    value194,
+    { timelineShotId: timelineShotId = initialProject2['workspace']['selectedShotId'] } = {},
   ) => {
-    const _0xfae2fe = normalizeText(_0x51df5d);
+    const text11 = normalizeText(value194);
     if (
-      _0x57b9e5['workspace']['step'] === 0x1 &&
+      initialProject2['workspace']['step'] === 0x1 &&
       [
         'asset-selection-mode',
         'asset-selection-cancel',
         'asset-selection-all',
         'asset-selection',
         'scene-asset-selection',
-      ]['includes'](_0xfae2fe)
+      ]['includes'](text11)
     )
-      return syncPersonReplacementAssetSelection(_0x42b7b0, renderAssetSettings(_0x57b9e5, _0x1f9cef()));
+      return syncPersonReplacementAssetSelection(
+        floatingMenuHost,
+        renderAssetSettings(initialProject2, handler22()),
+      );
     if (
-      _0x57b9e5['workspace']['step'] === 0x2 &&
+      initialProject2['workspace']['step'] === 0x2 &&
       [
         'replacement-target-asset-select',
         'replacement-scene-asset-select',
         'target-appearance-preview-change',
-      ]['includes'](_0xfae2fe)
+      ]['includes'](text11)
     )
       return syncPersonReplacementAssetSelection(
-        _0x42b7b0,
-        personReplacementImagePresentation['render'](_0x57b9e5, { ..._0x1f9cef(), omitShotTimeline: !![] }),
+        floatingMenuHost,
+        personReplacementImagePresentation['render'](initialProject2, {
+          ...handler22(),
+          omitShotTimeline: !![],
+        }),
         { targetRail: !![] },
       );
     if (
-      _0x57b9e5['workspace']['step'] === 0x2 &&
+      initialProject2['workspace']['step'] === 0x2 &&
       [
         'person-mapping',
         'person-mapping-current-shot',
         'person-mapping-clear',
         'person-mapping-clear-reference',
-      ]['includes'](_0xfae2fe)
+      ]['includes'](text11)
     )
-      return _0x593f36();
-    if (_0xfae2fe === 'shot-marquee' || _0xfae2fe['startsWith']('shot-selection'))
-      return _0x57b9e5['workspace']['step'] === 0x5 ? _0x1fff09() : _0x4c1ba8();
+      return handler43();
+    if (text11 === 'shot-marquee' || text11['startsWith']('shot-selection'))
+      return initialProject2['workspace']['step'] === 0x5 ? handler70() : handler53();
     if (
-      _0xfae2fe === 'video-input-mode' ||
-      _0xfae2fe === 'video-reference-change' ||
-      _0xfae2fe === 'replacement-video-result' ||
-      _0xfae2fe === 'replacement-video-reference' ||
-      _0xfae2fe === 'delete-replacement-video-result' ||
-      ((_0xfae2fe === 'replacement-image-result' || _0xfae2fe === 'delete-replacement-image-result') &&
-        _0x57b9e5['workspace']['step'] === 0x3)
+      text11 === 'video-input-mode' ||
+      text11 === 'video-reference-change' ||
+      text11 === 'replacement-video-result' ||
+      text11 === 'replacement-video-reference' ||
+      text11 === 'delete-replacement-video-result' ||
+      ((text11 === 'replacement-image-result' || text11 === 'delete-replacement-image-result') &&
+        initialProject2['workspace']['step'] === 0x3)
     )
-      return _0x59d0d2();
+      return handler42();
     if (
-      (_0xfae2fe === 'replacement-image-result' || _0xfae2fe === 'delete-replacement-image-result') &&
-      _0x57b9e5['workspace']['step'] === 0x2
+      (text11 === 'replacement-image-result' || text11 === 'delete-replacement-image-result') &&
+      initialProject2['workspace']['step'] === 0x2
     )
-      return _0x593f36({ refreshTimelineCard: !![], timelineShotId: timelineShotId });
-    if (_0xfae2fe === 'shot-select')
-      return _0x57b9e5['workspace']['step'] === 0x5 ? _0x539642() : _0x593f36();
-    if (_0xfae2fe === 'replacement-image-reference' && _0x57b9e5['workspace']['step'] === 0x2)
-      return _0x593f36({ refreshTimelineCard: !![] });
-    if (_0xfae2fe === 'composite-full-video-select') return _0x539642();
+      return handler43({ refreshTimelineCard: !![], timelineShotId: timelineShotId });
+    if (text11 === 'shot-select')
+      return initialProject2['workspace']['step'] === 0x5 ? handler71() : handler43();
+    if (text11 === 'replacement-image-reference' && initialProject2['workspace']['step'] === 0x2)
+      return handler43({ refreshTimelineCard: !![] });
+    if (text11 === 'composite-full-video-select') return handler71();
     return ![];
   };
-  let _0x4cf492 = () => {
-    if (!_0x42b7b0 || _0x2f325d) return;
-    ((_0x236762 = null),
-      _0x481bb9(),
-      _0x2d6050(),
-      _0x3c691d(),
-      _0xa770b0(),
-      _0x33e2c8(),
-      _0x41541c(),
-      _0x139716(),
-      (_0x4e4610['pendingPreviewSeek'] = null),
-      (_0x4e4610['hoverPreviewActive'] = ![]),
-      (_0x4e4610['hoverPreviewTimeSec'] = null),
-      _0x2a5781(),
-      _0x42cf44['forEach']((_0x303b84) => _0x303b84?.['destroy']?.()),
-      (_0x42cf44 = []),
-      _0x379113(),
-      _0x5cb732?.(),
-      (_0x5cb732 = null),
-      _0xb8cf88(),
-      (_0x4e4610['playheadElement'] = null),
-      (_0x4e4610['clockElement'] = null),
-      (_0x42b7b0['dataset']['personReplacementView'] = _0x57b9e5['workspace']['view']),
-      (_0x42b7b0['dataset']['personReplacementStep'] = String(_0x57b9e5['workspace']['step'])),
-      (_0x42b7b0['innerHTML'] =
-        _0x57b9e5['workspace']['view'] === 'home'
-          ? personReplacementShellPresentation['renderHome'](_0x57b9e5)
-          : renderProject(_0x57b9e5, _0x1f9cef())),
-      _0x25fae1(),
-      _0x3d9d7b(),
-      _0x2538e3(),
-      _0x84de04(),
-      _0x2fb45b(),
-      _0x1d0ea5(),
-      _0x46feac(),
-      _0x2929aa());
+  let run = () => {
+    if (!floatingMenuHost || value43) return;
+    ((value66 = null),
+      handler7(),
+      handler8(),
+      handler3(),
+      handler4(),
+      stopPlayback(),
+      clearPreviewMetadata(),
+      cancelFrameWait(),
+      (selectedIds['pendingPreviewSeek'] = null),
+      (selectedIds['hoverPreviewActive'] = ![]),
+      (selectedIds['hoverPreviewTimeSec'] = null),
+      cancelHoverPreview(),
+      list3['forEach']((value195) => value195?.['destroy']?.()),
+      (list3 = []),
+      destroySourcePlaybackBindings(),
+      value47?.(),
+      (value47 = null),
+      unmount(),
+      (selectedIds['playheadElement'] = null),
+      (selectedIds['clockElement'] = null),
+      (floatingMenuHost['dataset']['personReplacementView'] = initialProject2['workspace']['view']),
+      (floatingMenuHost['dataset']['personReplacementStep'] = String(initialProject2['workspace']['step'])),
+      (floatingMenuHost['innerHTML'] =
+        initialProject2['workspace']['view'] === 'home'
+          ? personReplacementShellPresentation['renderHome'](initialProject2)
+          : renderProject(initialProject2, handler22())),
+      restoreLayerState(),
+      handler55(),
+      handler56(),
+      handler52(),
+      handler(),
+      handler9(),
+      mount(),
+      syncPreviewUi());
   };
-  const _0x1a3d01 = (_0x30f352) => {
-      const _0x520d3c = Math['trunc'](clamp(_0x30f352, 0x1, 0x5, _0x57b9e5['workspace']['step']));
-      if (_0x520d3c > _0x57b9e5['workspace']['step'] && _0x4175c2())
-        return (_0x3fc4d6('step-change', _0x520d3c), cloneJson(_0x57b9e5));
-      const _0xe160b7 = getPersonReplacementStepGate(_0x57b9e5, _0x520d3c);
-      if (_0x520d3c !== _0x57b9e5['workspace']['step'] && !_0xe160b7['allowed'])
-        return (_0x3fc4d6(_0xe160b7['reason'], _0x520d3c), cloneJson(_0x57b9e5));
+  const navigate = (value196) => {
+      const step = Math['trunc'](clamp(value196, 0x1, 0x5, initialProject2['workspace']['step']));
+      if (step > initialProject2['workspace']['step'] && handler23())
+        return (handler24('step-change', step), cloneJson(initialProject2));
+      const personReplacementStepGate = getPersonReplacementStepGate(initialProject2, step);
+      if (step !== initialProject2['workspace']['step'] && !personReplacementStepGate['allowed'])
+        return (handler24(personReplacementStepGate['reason'], step), cloneJson(initialProject2));
       return (
-        _0x26bf5a({ animate: ![], renderWorkspace: ![] }),
-        _0x26d845({ ..._0x57b9e5, workspace: { ..._0x57b9e5['workspace'], step: _0x520d3c } }, 'step-change')
+        close2({ animate: ![], renderWorkspace: ![] }),
+        updateProject(
+          { ...initialProject2, workspace: { ...initialProject2['workspace'], step: step } },
+          'step-change',
+        )
       );
     },
-    _0x4d5162 = (_0x5ed16b) =>
-      handleWorkspaceStepShortcut(_0x5ed16b, {
+    handler72 = (value197) =>
+      handleWorkspaceStepShortcut(value197, {
         enabled: Boolean(
-          _0x42b7b0 && !_0x42b7b0['hidden'] && !_0x1b7b58 && _0x57b9e5['workspace']['view'] === 'project',
+          floatingMenuHost &&
+          !floatingMenuHost['hidden'] &&
+          !canvasSyncPending &&
+          initialProject2['workspace']['view'] === 'project',
         ),
         stepCount: PERSON_REPLACEMENT_STEPS['length'],
-        navigate: _0x1a3d01,
+        navigate: navigate,
       }),
-    _0x4d01cc = (_0x5392bc, _0x4ac74c = '') => {
-      const _0x24b38f = _0x4ac74c
-          ? [..._0x57b9e5['characters'], ..._0x57b9e5['scenes']]['find'](
-              (_0x4241c9) => _0x4241c9['id'] === _0x4ac74c,
+    handler73 = (count4, value198 = '') => {
+      const value199 = value198
+          ? [...initialProject2['characters'], ...initialProject2['scenes']]['find'](
+              (value200) => value200['id'] === value198,
             )
-          : _0x57b9e5['workspace']['characterAssetTab'] === 'scene'
-            ? _0x57b9e5['scenes']['find'](
-                (_0x14bc18) => _0x14bc18['id'] === _0x57b9e5['workspace']['selectedSceneId'],
+          : initialProject2['workspace']['characterAssetTab'] === 'scene'
+            ? initialProject2['scenes']['find'](
+                (value201) => value201['id'] === initialProject2['workspace']['selectedSceneId'],
               )
-            : _0xe8cb52(),
-        _0x510502 = getWorkspaceAssetAppearances(_0x24b38f);
-      if (_0x510502['length'] < 0x2) return;
-      const _0x443df5 = Math['trunc'](
-          Number(_0x57b9e5['workspace']['assetAppearanceIndexes']?.[_0x24b38f['id']]) || 0x0,
+            : characterId(),
+        list8 = getWorkspaceAssetAppearances(value199);
+      if (list8['length'] < 0x2) return;
+      const value202 = Math['trunc'](
+          Number(initialProject2['workspace']['assetAppearanceIndexes']?.[value199['id']]) || 0x0,
         ),
-        _0x9e3a38 = (_0x443df5 + _0x5392bc + _0x510502['length']) % _0x510502['length'],
-        _0x332ed5 = _0x5392bc > 0x0 ? 'next' : 'previous',
-        _0x317075 =
-          _0x24b38f['id'] ===
-          (_0x57b9e5['workspace']['characterAssetTab'] === 'scene'
-            ? _0x57b9e5['workspace']['selectedSceneId']
-            : _0x57b9e5['workspace']['selectedCharacterId']),
-        _0x2a3c7f = _0x42b7b0?.['querySelector']?.('.story-asset-detail .story-asset-preview-slide')?.[
+        value203 = (value202 + count4 + list8['length']) % list8['length'],
+        value204 = count4 > 0x0 ? 'next' : 'previous',
+        enabled24 =
+          value199['id'] ===
+          (initialProject2['workspace']['characterAssetTab'] === 'scene'
+            ? initialProject2['workspace']['selectedSceneId']
+            : initialProject2['workspace']['selectedCharacterId']),
+        el43 = floatingMenuHost?.['querySelector']?.('.story-asset-detail .story-asset-preview-slide')?.[
           'cloneNode'
         ]?.(!![]);
-      _0x26d845(
+      updateProject(
         {
-          ..._0x57b9e5,
+          ...initialProject2,
           workspace: {
-            ..._0x57b9e5['workspace'],
+            ...initialProject2['workspace'],
             assetAppearanceIndexes: {
-              ..._0x57b9e5['workspace']['assetAppearanceIndexes'],
-              [_0x24b38f['id']]: _0x9e3a38,
+              ...initialProject2['workspace']['assetAppearanceIndexes'],
+              [value199['id']]: value203,
             },
           },
         },
         'appearance-change',
       );
-      if (!_0x317075) return;
-      const _0xeb6e23 = _0x42b7b0?.['querySelector']?.('.story-asset-detail'),
-        _0x21a4b4 = _0xeb6e23?.['querySelector']?.('.story-asset-preview-slide');
-      if (!_0xeb6e23 || !_0x21a4b4) return;
-      _0xeb6e23['classList']['remove']('is-sliding-next', 'is-sliding-previous');
-      if (_0x2a3c7f) {
-        (_0x2a3c7f['classList']['remove']('img-preview-loading'),
-          _0x2a3c7f['classList']['add']('story-asset-preview-slide--outgoing', 'is-sliding-' + _0x332ed5),
-          _0x2a3c7f['removeAttribute']?.('aria-busy'),
-          _0x2a3c7f['setAttribute']?.('aria-hidden', 'true'),
-          _0x2a3c7f['querySelector']?.('.img-loading-overlay')?.['remove']?.(),
-          _0x21a4b4['after']?.(_0x2a3c7f));
-        const _0x27a2d1 = () => _0x2a3c7f['remove']?.();
-        (_0x2a3c7f['addEventListener']?.('animationend', _0x27a2d1, { once: !![] }),
-          windowObject?.['setTimeout']?.(_0x27a2d1, 0x1cc));
+      if (!enabled24) return;
+      const el44 = floatingMenuHost?.['querySelector']?.('.story-asset-detail'),
+        enabled25 = el44?.['querySelector']?.('.story-asset-preview-slide');
+      if (!el44 || !enabled25) return;
+      el44['classList']['remove']('is-sliding-next', 'is-sliding-previous');
+      if (el43) {
+        (el43['classList']['remove']('img-preview-loading'),
+          el43['classList']['add']('story-asset-preview-slide--outgoing', 'is-sliding-' + value204),
+          el43['removeAttribute']?.('aria-busy'),
+          el43['setAttribute']?.('aria-hidden', 'true'),
+          el43['querySelector']?.('.img-loading-overlay')?.['remove']?.(),
+          enabled25['after']?.(el43));
+        const value205 = () => el43['remove']?.();
+        (el43['addEventListener']?.('animationend', value205, { once: !![] }),
+          windowObject?.['setTimeout']?.(value205, 0x1cc));
       }
-      (void _0xeb6e23['offsetWidth'], _0xeb6e23['classList']['add']('is-sliding-' + _0x332ed5));
+      (void el44['offsetWidth'], el44['classList']['add']('is-sliding-' + value204));
     },
-    _0x6f1208 = (_0xe1874) => {
-      const _0x2286f5 = getPersonReplacementProjectAudioAssets(_0x57b9e5)['find'](
-          (_0x3475c3) => _0x3475c3['id'] === _0x57b9e5['workspace']['selectedAudioAssetId'],
-        ),
-        _0x83d951 = getPersonReplacementVoiceLibraryBoundCharacters(_0x57b9e5, _0x2286f5);
-      if (_0x83d951['length'] < 0x2) return;
-      const _0x1f5413 = Math['max'](
+    handler74 = (value206) => {
+      const personReplacementProjectAudioAssets = getPersonReplacementProjectAudioAssets(initialProject2)[
+          'find'
+        ]((value207) => value207['id'] === initialProject2['workspace']['selectedAudioAssetId']),
+        selectedCharacterId = getPersonReplacementVoiceLibraryBoundCharacters(
+          initialProject2,
+          personReplacementProjectAudioAssets,
+        );
+      if (selectedCharacterId['length'] < 0x2) return;
+      const value208 = Math['max'](
           0x0,
-          _0x83d951['findIndex'](
-            (_0x241e1f) => _0x241e1f['id'] === _0x57b9e5['workspace']['selectedCharacterId'],
+          selectedCharacterId['findIndex'](
+            (value209) => value209['id'] === initialProject2['workspace']['selectedCharacterId'],
           ),
         ),
-        _0x453709 = (_0x1f5413 + _0xe1874 + _0x83d951['length']) % _0x83d951['length'];
-      _0x26d845(
+        value210 = (value208 + value206 + selectedCharacterId['length']) % selectedCharacterId['length'];
+      updateProject(
         {
-          ..._0x57b9e5,
-          workspace: { ..._0x57b9e5['workspace'], selectedCharacterId: _0x83d951[_0x453709]['id'] },
+          ...initialProject2,
+          workspace: {
+            ...initialProject2['workspace'],
+            selectedCharacterId: selectedCharacterId[value210]['id'],
+          },
         },
         'audio-bound-character-change',
       );
     },
-    _0x25aef6 = (_0x39dedc) => {
-      const _0xee04a5 = () => {
-        Array['from'](_0x42b7b0?.['querySelectorAll']?.('[data-person-replacement-shot-card="true"]') || [])
-          ['find']((_0x432767) => _0x432767['dataset']?.['shotId'] === normalizeText(_0x39dedc))
+    scrollShotCardIntoView = (value211) => {
+      const run11 = () => {
+        Array['from'](
+          floatingMenuHost?.['querySelectorAll']?.('[data-person-replacement-shot-card="true"]') || [],
+        )
+          ['find']((el45) => el45['dataset']?.['shotId'] === normalizeText(value211))
           ?.['scrollIntoView']?.({ block: 'nearest', inline: 'nearest' });
       };
       typeof windowObject?.['requestAnimationFrame'] === 'function'
-        ? windowObject['requestAnimationFrame'](_0xee04a5)
-        : _0xee04a5();
+        ? windowObject['requestAnimationFrame'](run11)
+        : run11();
     },
-    _0x42b6b8 = (_0x29ae48) => {
-      const _0x5ba68c = _0x57b9e5['shots']['findIndex'](
-          (_0xd77692) => _0xd77692['id'] === normalizeText(_0x57b9e5['workspace']['selectedShotId']),
+    getShotSwitchDirection = (value212) => {
+      const count5 = initialProject2['shots']['findIndex'](
+          (value213) => value213['id'] === normalizeText(initialProject2['workspace']['selectedShotId']),
         ),
-        _0x266b18 = _0x57b9e5['shots']['findIndex'](
-          (_0x4ddb91) => _0x4ddb91['id'] === normalizeText(_0x29ae48),
+        count6 = initialProject2['shots']['findIndex'](
+          (value214) => value214['id'] === normalizeText(value212),
         );
-      if (_0x5ba68c < 0x0 || _0x266b18 < 0x0 || _0x5ba68c === _0x266b18) return '';
-      return _0x266b18 > _0x5ba68c ? 'next' : 'previous';
+      if (count5 < 0x0 || count6 < 0x0 || count5 === count6) return '';
+      return count6 > count5 ? 'next' : 'previous';
     },
-    _0x8f9a8a = () =>
-      _0x42b7b0?.['querySelector']?.(
+    captureImagePreviewSlide = () =>
+      floatingMenuHost?.['querySelector']?.(
         '.person-replacement-image-generation-panel ' +
           '.person-replacement-image-preview-slide:not(' +
           '.person-replacement-image-preview-slide--outgoing)',
       )?.['cloneNode']?.(!![]) || null,
-    _0x5b886b = () =>
-      _0x42b7b0?.['querySelector']?.(
+    captureMiddlePreviewSlide = () =>
+      floatingMenuHost?.['querySelector']?.(
         '.person-replacement-middle-layout ' +
           '>\x20.person-replacement-middle-preview-slide:not(' +
           '.person-replacement-middle-preview-slide--outgoing)',
       )?.['cloneNode']?.(!![]) || null,
-    _0x1b8454 = (_0x43450f) => {
+    handler75 = (el46) => {
       return (
-        _0x43450f?.['querySelectorAll']?.(
+        el46?.['querySelectorAll']?.(
           '.person-replacement-detection-empty,\x20' +
             '.person-replacement-keyframe-tools, ' +
             '.person-replacement-shot-navigation-arrow',
-        )?.['forEach']?.((_0x523321) => _0x523321['remove']?.()),
-        _0x43450f?.['querySelectorAll']?.('.person-replacement-detection-box')?.['forEach']?.((_0x2e0eab) =>
-          _0x2e0eab['replaceChildren']?.(),
+        )?.['forEach']?.((el47) => el47['remove']?.()),
+        el46?.['querySelectorAll']?.('.person-replacement-detection-box')?.['forEach']?.((value215) =>
+          value215['replaceChildren']?.(),
         ),
-        _0x43450f
+        el46
       );
     },
-    _0x4e7f64 = () =>
-      _0x42b7b0?.['querySelector']?.(
+    captureVideoResultSlide = () =>
+      floatingMenuHost?.['querySelector']?.(
         '.person-replacement-video-generation-panel\x20' +
           '.person-replacement-video-result-slide:not(' +
           '.person-replacement-video-result-slide--outgoing)',
       ) || null,
-    _0x4fe063 = (_0x484e23, _0x1b814c) => {
-      const _0x272476 = _0x484e23 === 'previous' ? 'previous' : 'next',
-        _0x4ccb28 = _0x42b7b0?.['querySelector']?.('.person-replacement-middle-layout'),
-        _0x23337d = _0x4ccb28?.['querySelector']?.(
+    playMiddlePreviewTransition = (value216, outgoingSlide) => {
+      const direction2 = value216 === 'previous' ? 'previous' : 'next',
+        el48 = floatingMenuHost?.['querySelector']?.('.person-replacement-middle-layout'),
+        incomingSlide = el48?.['querySelector']?.(
           '.person-replacement-middle-preview-slide:not(' +
             '.person-replacement-middle-preview-slide--outgoing)',
         );
-      if (!_0x4ccb28 || !_0x23337d || _0x23337d === _0x1b814c) return ![];
-      (_0x4ccb28['querySelectorAll']?.('.person-replacement-middle-preview-slide--outgoing')?.['forEach']?.(
-        (_0x1ced79) => _0x1ced79['remove']?.(),
+      if (!el48 || !incomingSlide || incomingSlide === outgoingSlide) return ![];
+      (el48['querySelectorAll']?.('.person-replacement-middle-preview-slide--outgoing')?.['forEach']?.(
+        (el49) => el49['remove']?.(),
       ),
-        _0x4ccb28['classList']?.['remove']?.('is-sliding-next', 'is-sliding-previous'));
-      if (_0x1b814c) {
-        (_0x1b8454(_0x1b814c),
-          _0x1b814c['classList']?.['remove']?.(
+        el48['classList']?.['remove']?.('is-sliding-next', 'is-sliding-previous'));
+      if (outgoingSlide) {
+        (handler75(outgoingSlide),
+          outgoingSlide['classList']?.['remove']?.(
             'img-preview-loading',
             'is-sliding-next',
             'is-sliding-previous',
           ),
-          _0x1b814c['classList']?.['add']?.('person-replacement-middle-preview-slide--outgoing'),
-          _0x1b814c['removeAttribute']?.('aria-busy'),
-          _0x1b814c['setAttribute']?.('aria-hidden', 'true'));
+          outgoingSlide['classList']?.['add']?.('person-replacement-middle-preview-slide--outgoing'),
+          outgoingSlide['removeAttribute']?.('aria-busy'),
+          outgoingSlide['setAttribute']?.('aria-hidden', 'true'));
         try {
-          _0x1b814c['inert'] = !![];
+          outgoingSlide['inert'] = !![];
         } catch {}
-        (_0x1b814c['querySelector']?.('.story-asset-loading-overlay, .img-loading-overlay')?.['remove']?.(),
-          _0x4ccb28['append']?.(_0x1b814c));
+        (outgoingSlide['querySelector']?.('.story-asset-loading-overlay, .img-loading-overlay')?.[
+          'remove'
+        ]?.(),
+          el48['append']?.(outgoingSlide));
       }
-      const _0x566386 = startPersonReplacementSlideTransition({
+      const startPersonReplacementSlideTransition2 = startPersonReplacementSlideTransition({
         windowObject: windowObject,
-        incomingSlide: _0x23337d,
-        outgoingSlide: _0x1b814c,
-        direction: _0x272476,
+        incomingSlide: incomingSlide,
+        outgoingSlide: outgoingSlide,
+        direction: direction2,
       });
-      let _0x333667 = ![];
-      const _0x5ce8ab = () => {
-        if (_0x333667) return;
-        ((_0x333667 = !![]), cancelPersonReplacementSlideTransition(_0x566386), _0x1b814c?.['remove']?.());
+      let value217 = ![];
+      const value218 = () => {
+        if (value217) return;
+        ((value217 = !![]),
+          cancelPersonReplacementSlideTransition(startPersonReplacementSlideTransition2),
+          outgoingSlide?.['remove']?.());
       };
       return (
-        _0x566386['finished']['then'](_0x5ce8ab),
-        windowObject?.['setTimeout']?.(_0x5ce8ab, _0x566386['duration'] + 0x50),
+        startPersonReplacementSlideTransition2['finished']['then'](value218),
+        windowObject?.['setTimeout']?.(value218, startPersonReplacementSlideTransition2['duration'] + 0x50),
         !![]
       );
     },
-    _0x361573 = (_0x196b1f, _0x555c58) => {
-      const _0x6ae8ec = _0x196b1f === 'previous' ? 'previous' : 'next',
-        _0x11b364 = _0x42b7b0?.['querySelector']?.(
+    playImagePreviewTransition = (value219, outgoingSlide2) => {
+      const direction3 = value219 === 'previous' ? 'previous' : 'next',
+        el50 = floatingMenuHost?.['querySelector']?.(
           '.person-replacement-image-generation-panel ' + '.person-replacement-generation-preview',
         ),
-        _0x33a55f = _0x11b364?.['querySelector']?.(
+        incomingSlide2 = el50?.['querySelector']?.(
           '.person-replacement-image-preview-slide:not(' +
             '.person-replacement-image-preview-slide--outgoing)',
         );
-      if (!_0x11b364 || !_0x33a55f) return ![];
-      (_0x11b364['querySelectorAll']?.('.person-replacement-image-preview-slide--outgoing')?.['forEach']?.(
-        (_0x1b3b34) => _0x1b3b34['remove']?.(),
+      if (!el50 || !incomingSlide2) return ![];
+      (el50['querySelectorAll']?.('.person-replacement-image-preview-slide--outgoing')?.['forEach']?.(
+        (el51) => el51['remove']?.(),
       ),
-        _0x11b364['classList']?.['remove']?.('is-sliding-next', 'is-sliding-previous'));
-      _0x555c58 &&
-        (_0x555c58['classList']?.['remove']?.('img-preview-loading'),
-        _0x555c58['classList']?.['add']?.('person-replacement-image-preview-slide--outgoing'),
-        _0x555c58['removeAttribute']?.('aria-busy'),
-        _0x555c58['setAttribute']?.('aria-hidden', 'true'),
-        _0x555c58['querySelector']?.('.story-asset-loading-overlay, .img-loading-overlay')?.['remove']?.(),
-        _0x11b364['append']?.(_0x555c58));
-      const _0x526c7a = startPersonReplacementSlideTransition({
+        el50['classList']?.['remove']?.('is-sliding-next', 'is-sliding-previous'));
+      outgoingSlide2 &&
+        (outgoingSlide2['classList']?.['remove']?.('img-preview-loading'),
+        outgoingSlide2['classList']?.['add']?.('person-replacement-image-preview-slide--outgoing'),
+        outgoingSlide2['removeAttribute']?.('aria-busy'),
+        outgoingSlide2['setAttribute']?.('aria-hidden', 'true'),
+        outgoingSlide2['querySelector']?.('.story-asset-loading-overlay, .img-loading-overlay')?.[
+          'remove'
+        ]?.(),
+        el50['append']?.(outgoingSlide2));
+      const startPersonReplacementSlideTransition3 = startPersonReplacementSlideTransition({
         windowObject: windowObject,
-        incomingSlide: _0x33a55f,
-        outgoingSlide: _0x555c58,
-        direction: _0x6ae8ec,
+        incomingSlide: incomingSlide2,
+        outgoingSlide: outgoingSlide2,
+        direction: direction3,
       });
-      let _0x1e3cea = ![];
-      const _0x4fcbc0 = () => {
-        if (_0x1e3cea) return;
-        ((_0x1e3cea = !![]), cancelPersonReplacementSlideTransition(_0x526c7a), _0x555c58?.['remove']?.());
+      let value220 = ![];
+      const value221 = () => {
+        if (value220) return;
+        ((value220 = !![]),
+          cancelPersonReplacementSlideTransition(startPersonReplacementSlideTransition3),
+          outgoingSlide2?.['remove']?.());
       };
       return (
-        _0x526c7a['finished']['then'](_0x4fcbc0),
-        windowObject?.['setTimeout']?.(_0x4fcbc0, _0x526c7a['duration'] + 0x50),
+        startPersonReplacementSlideTransition3['finished']['then'](value221),
+        windowObject?.['setTimeout']?.(value221, startPersonReplacementSlideTransition3['duration'] + 0x50),
         !![]
       );
     },
-    _0x19fb24 = (_0x178695, _0x1fab6d) => {
-      const _0x28b2bb = _0x178695 === 'previous' ? 'previous' : 'next',
-        _0x25f2f2 = _0x42b7b0?.['querySelector']?.(
+    playVideoResultTransition = (value222, outgoingSlide3) => {
+      const direction4 = value222 === 'previous' ? 'previous' : 'next',
+        el52 = floatingMenuHost?.['querySelector']?.(
           '.person-replacement-video-generation-panel ' + '.person-replacement-video-result',
         ),
-        _0x3cc29c = _0x25f2f2?.['querySelector']?.(
+        incomingSlide3 = el52?.['querySelector']?.(
           '.person-replacement-video-result-slide:not(' + '.person-replacement-video-result-slide--outgoing)',
         );
-      if (!_0x25f2f2 || !_0x3cc29c || _0x3cc29c === _0x1fab6d) return ![];
-      (_0x25f2f2['querySelectorAll']?.('.person-replacement-video-result-slide--outgoing')?.['forEach']?.(
-        (_0x8bb93e) => _0x8bb93e['remove']?.(),
+      if (!el52 || !incomingSlide3 || incomingSlide3 === outgoingSlide3) return ![];
+      (el52['querySelectorAll']?.('.person-replacement-video-result-slide--outgoing')?.['forEach']?.((el53) =>
+        el53['remove']?.(),
       ),
-        _0x25f2f2['classList']?.['remove']?.('is-sliding-next', 'is-sliding-previous'));
-      if (_0x1fab6d) {
-        (_0x1fab6d['classList']?.['remove']?.(
+        el52['classList']?.['remove']?.('is-sliding-next', 'is-sliding-previous'));
+      if (outgoingSlide3) {
+        (outgoingSlide3['classList']?.['remove']?.(
           'img-preview-loading',
           'is-sliding-next',
           'is-sliding-previous',
         ),
-          _0x1fab6d['classList']?.['add']?.('person-replacement-video-result-slide--outgoing'),
-          _0x1fab6d['removeAttribute']?.('aria-busy'),
-          _0x1fab6d['setAttribute']?.('aria-hidden', 'true'));
+          outgoingSlide3['classList']?.['add']?.('person-replacement-video-result-slide--outgoing'),
+          outgoingSlide3['removeAttribute']?.('aria-busy'),
+          outgoingSlide3['setAttribute']?.('aria-hidden', 'true'));
         try {
-          _0x1fab6d['inert'] = !![];
+          outgoingSlide3['inert'] = !![];
         } catch {}
-        (_0x1fab6d['querySelector']?.('.story-asset-loading-overlay, .img-loading-overlay')?.['remove']?.(),
-          _0x25f2f2['append']?.(_0x1fab6d));
+        (outgoingSlide3['querySelector']?.('.story-asset-loading-overlay, .img-loading-overlay')?.[
+          'remove'
+        ]?.(),
+          el52['append']?.(outgoingSlide3));
       }
-      const _0x5c6da0 = startPersonReplacementSlideTransition({
+      const startPersonReplacementSlideTransition4 = startPersonReplacementSlideTransition({
         windowObject: windowObject,
-        incomingSlide: _0x3cc29c,
-        outgoingSlide: _0x1fab6d,
-        direction: _0x28b2bb,
+        incomingSlide: incomingSlide3,
+        outgoingSlide: outgoingSlide3,
+        direction: direction4,
       });
-      let _0x1c4ed2 = ![];
-      const _0x54652f = () => {
-        if (_0x1c4ed2) return;
-        ((_0x1c4ed2 = !![]), cancelPersonReplacementSlideTransition(_0x5c6da0), _0x1fab6d?.['remove']?.());
+      let value223 = ![];
+      const value224 = () => {
+        if (value223) return;
+        ((value223 = !![]),
+          cancelPersonReplacementSlideTransition(startPersonReplacementSlideTransition4),
+          outgoingSlide3?.['remove']?.());
       };
       return (
-        _0x5c6da0['finished']['then'](_0x54652f),
-        windowObject?.['setTimeout']?.(_0x54652f, _0x5c6da0['duration'] + 0x50),
+        startPersonReplacementSlideTransition4['finished']['then'](value224),
+        windowObject?.['setTimeout']?.(value224, startPersonReplacementSlideTransition4['duration'] + 0x50),
         !![]
       );
     },
-    _0x546c9f = (_0x5eabb1) => {
-      if (_0x57b9e5['workspace']['view'] !== 'project' || _0x57b9e5['workspace']['step'] !== 0x5) return ![];
-      const _0xae4081 = _0x42b7b0?.['querySelector']?.('.person-replacement-compare-grid');
-      if (!_0xae4081) return ![];
-      const _0x3461a6 = _0x5eabb1 === 'previous' ? 'previous' : 'next';
+    handler76 = (value225) => {
+      if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 0x5)
+        return ![];
+      const el54 = floatingMenuHost?.['querySelector']?.('.person-replacement-compare-grid');
+      if (!el54) return ![];
+      const value226 = value225 === 'previous' ? 'previous' : 'next';
       return (
-        _0xae4081['classList']?.['remove']?.('is-sliding-next'),
-        _0xae4081['classList']?.['remove']?.('is-sliding-previous'),
-        void _0xae4081['offsetWidth'],
-        _0xae4081['classList']?.['add']?.('is-sliding-' + _0x3461a6),
+        el54['classList']?.['remove']?.('is-sliding-next'),
+        el54['classList']?.['remove']?.('is-sliding-previous'),
+        void el54['offsetWidth'],
+        el54['classList']?.['add']?.('is-sliding-' + value226),
         !![]
       );
     },
-    _0x2bd9ab = (_0x45cb9c, { direction: direction = '', ensureVisible: ensureVisible = ![] } = {}) => {
-      const _0x3a0866 = normalizeText(_0x45cb9c),
-        _0x19d724 = _0x57b9e5['shots']['find']((_0x756e19) => _0x756e19['id'] === _0x3a0866),
-        _0x50e28d =
-          _0x57b9e5['workspace']['step'] === 0x5 &&
-          buildPersonReplacementCompositePreviewSnapshot(_0x57b9e5)['previewMode'] === 'full';
-      if (!_0x19d724 || (_0x3a0866 === _0x57b9e5['workspace']['selectedShotId'] && !_0x50e28d)) return ![];
-      const _0x1d54e6 = direction || _0x42b6b8(_0x3a0866),
-        _0x1da298 = _0x8f9a8a(),
-        _0x307fc9 = _0x5b886b(),
-        _0x352bbd = _0x4e7f64();
-      (_0x26d845(
+    handler51 = (value227, { direction: direction = '', ensureVisible: ensureVisible = ![] } = {}) => {
+      const selectedShotId = normalizeText(value227),
+        enabled26 = initialProject2['shots']['find']((value228) => value228['id'] === selectedShotId),
+        enabled27 =
+          initialProject2['workspace']['step'] === 0x5 &&
+          buildPersonReplacementCompositePreviewSnapshot(initialProject2)['previewMode'] === 'full';
+      if (!enabled26 || (selectedShotId === initialProject2['workspace']['selectedShotId'] && !enabled27))
+        return ![];
+      const value229 = direction || getShotSwitchDirection(selectedShotId),
+        value230 = captureImagePreviewSlide(),
+        value231 = captureMiddlePreviewSlide(),
+        value232 = captureVideoResultSlide();
+      (updateProject(
         {
-          ..._0x57b9e5,
+          ...initialProject2,
           workspace: {
-            ..._0x57b9e5['workspace'],
-            selectedShotId: _0x3a0866,
-            ...(_0x57b9e5['workspace']['step'] === 0x5 ? { compositePreviewMode: 'shot' } : {}),
+            ...initialProject2['workspace'],
+            selectedShotId: selectedShotId,
+            ...(initialProject2['workspace']['step'] === 0x5 ? { compositePreviewMode: 'shot' } : {}),
           },
         },
         'shot-select',
       ),
-        _0x361573(_0x1d54e6 || 'next', _0x1da298),
-        _0x4fe063(_0x1d54e6 || 'next', _0x307fc9),
-        _0x19fb24(_0x1d54e6 || 'next', _0x352bbd),
-        _0x546c9f(_0x1d54e6 || 'next'));
-      if (ensureVisible) _0x25aef6(_0x3a0866);
+        playImagePreviewTransition(value229 || 'next', value230),
+        playMiddlePreviewTransition(value229 || 'next', value231),
+        playVideoResultTransition(value229 || 'next', value232),
+        handler76(value229 || 'next'));
+      if (ensureVisible) scrollShotCardIntoView(selectedShotId);
       return !![];
     },
-    _0x33236e = (_0x41f363) => {
-      _0x41f363?.['setAttribute']?.(
+    handler45 = (el55) => {
+      el55?.['setAttribute']?.(
         'aria-label',
-        _0x41f363?.['dataset']?.['personReplacementShotWheel'] === 'true'
+        el55?.['dataset']?.['personReplacementShotWheel'] === 'true'
           ? '拖拽新增可替换主体；按住 Ctrl 拖拽可多选人物框；按 D 或 Delete 删除选中框；滚轮或左右方向键切换片段'
           : '拖拽新增可替换主体；按住 Ctrl 拖拽可多选人物框，按 D 或 Delete 批量删除',
       );
     },
-    _0x38b343 = (_0x550640) => {
-      const _0x131e43 = Array['isArray'](_0x57b9e5['shots']) ? _0x57b9e5['shots'] : [];
-      if (_0x131e43['length'] < 0x2) return ![];
-      const _0x4f353a = Math['max'](
+    handler77 = (value233) => {
+      const list9 = Array['isArray'](initialProject2['shots']) ? initialProject2['shots'] : [];
+      if (list9['length'] < 0x2) return ![];
+      const value234 = Math['max'](
           0x0,
-          _0x131e43['findIndex']((_0x30b6f8) => _0x30b6f8['id'] === _0x57b9e5['workspace']['selectedShotId']),
+          list9['findIndex']((value235) => value235['id'] === initialProject2['workspace']['selectedShotId']),
         ),
-        _0x5207f4 =
-          (_0x4f353a + Math['sign'](Number(_0x550640) || 0x0) + _0x131e43['length']) % _0x131e43['length'],
-        _0x1fc713 = _0x131e43[_0x5207f4];
-      if (!_0x1fc713 || _0x1fc713['id'] === _0x57b9e5['workspace']['selectedShotId']) return ![];
-      return _0x2bd9ab(_0x1fc713['id'], {
-        direction: Math['sign'](Number(_0x550640) || 0x0) < 0x0 ? 'previous' : 'next',
+        value236 = (value234 + Math['sign'](Number(value233) || 0x0) + list9['length']) % list9['length'],
+        enabled28 = list9[value236];
+      if (!enabled28 || enabled28['id'] === initialProject2['workspace']['selectedShotId']) return ![];
+      return handler51(enabled28['id'], {
+        direction: Math['sign'](Number(value233) || 0x0) < 0x0 ? 'previous' : 'next',
         ensureVisible: !![],
       });
     },
-    _0x1cb2a4 = createPersonReplacementResultSelectionController({
-      getProject: () => _0x57b9e5,
-      updateProject: _0x26d845,
-      getShotSwitchDirection: _0x42b6b8,
-      captureImagePreviewSlide: _0x8f9a8a,
-      captureMiddlePreviewSlide: _0x5b886b,
-      captureVideoResultSlide: _0x4e7f64,
-      playImagePreviewTransition: _0x361573,
-      playMiddlePreviewTransition: _0x4fe063,
-      playVideoResultTransition: _0x19fb24,
-      scrollShotCardIntoView: _0x25aef6,
-      captureResultHistoryMenu: _0x502778,
-      restoreResultHistoryMenu: _0x229882,
+    personReplacementResultSelectionController = createPersonReplacementResultSelectionController({
+      getProject: () => initialProject2,
+      updateProject: updateProject,
+      getShotSwitchDirection: getShotSwitchDirection,
+      captureImagePreviewSlide: captureImagePreviewSlide,
+      captureMiddlePreviewSlide: captureMiddlePreviewSlide,
+      captureVideoResultSlide: captureVideoResultSlide,
+      playImagePreviewTransition: playImagePreviewTransition,
+      playMiddlePreviewTransition: playMiddlePreviewTransition,
+      playVideoResultTransition: playVideoResultTransition,
+      scrollShotCardIntoView: scrollShotCardIntoView,
+      captureResultHistoryMenu: captureResultHistoryMenu,
+      restoreResultHistoryMenu: restoreResultHistoryMenu,
       windowObject: windowObject,
     }),
     {
-      deleteImageResult: _0x2f0478,
-      deleteVideoResult: _0x2727d8,
-      selectImageResult: _0x2e11e0,
-      selectVideoReference: _0x3b2204,
-      selectVideoResult: _0x5f1af7,
-      setImageReference: _0x3d31c5,
-      setVideoReference: _0x7e07c0,
-      switchImageResult: _0x110efe,
-      switchVideoReferenceResult: _0x4f2b4a,
-      switchVideoResult: _0x473d04,
-    } = _0x1cb2a4,
-    _0x1b6ef9 = (_0x5cbaf6) => {
-      const _0x1ef472 = _0x5cbaf6['target']?.['closest']?.(
+      deleteImageResult: deleteImageResult,
+      deleteVideoResult: deleteVideoResult,
+      selectImageResult: selectImageResult,
+      selectVideoReference: selectVideoReference,
+      selectVideoResult: selectVideoResult,
+      setImageReference: setImageReference,
+      setVideoReference: setVideoReference,
+      switchImageResult: switchImageResult,
+      switchVideoReferenceResult: switchVideoReferenceResult,
+      switchVideoResult: switchVideoResult,
+    } = personReplacementResultSelectionController,
+    handler78 = (event) => {
+      const currentResultIndex = event['target']?.['closest']?.(
         '[data-person-replacement-video-reference-wheel="true"]',
       );
       if (
-        !_0x1ef472 ||
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        _0x57b9e5['workspace']['step'] !== 0x3
+        !currentResultIndex ||
+        initialProject2['workspace']['view'] !== 'project' ||
+        initialProject2['workspace']['step'] !== 0x3
       )
         return ![];
-      _0x5cbaf6['preventDefault']();
-      const _0x24f62d = normalizeText(_0x1ef472['dataset']['personReplacementVideoReferenceSourceShotId']),
-        _0x441117 = _0x735220['get'](_0x24f62d) || { accumulator: 0x0, lockedUntil: 0x0 };
-      _0x735220['set'](_0x24f62d, _0x441117);
-      const _0x3be202 = consumeWorkspaceWheelDirection(_0x5cbaf6, _0x441117, {
+      event['preventDefault']();
+      const sourceShotId = normalizeText(
+          currentResultIndex['dataset']['personReplacementVideoReferenceSourceShotId'],
+        ),
+        value237 = map4['get'](sourceShotId) || { accumulator: 0x0, lockedUntil: 0x0 };
+      map4['set'](sourceShotId, value237);
+      const delta = consumeWorkspaceWheelDirection(event, value237, {
         threshold: 0x4,
         lockDuration: 0xa0,
       });
       return (
-        _0x3be202 &&
-          _0x4f2b4a({
-            sourceShotId: _0x24f62d,
-            currentResultIndex: _0x1ef472['dataset']['personReplacementVideoReferenceResultIndex'],
-            delta: _0x3be202,
+        delta &&
+          switchVideoReferenceResult({
+            sourceShotId: sourceShotId,
+            currentResultIndex: currentResultIndex['dataset']['personReplacementVideoReferenceResultIndex'],
+            delta: delta,
           }),
         !![]
       );
     },
-    _0x1c6c30 = (_0x2f48c4, _0x12db8e) => {
-      const _0x90385e = _0x57b9e5['characters']['find'](
-          (_0x1ae4b7) => _0x1ae4b7['id'] === normalizeText(_0x2f48c4),
+    handler79 = (value238, value239) => {
+      const enabled29 = initialProject2['characters']['find'](
+          (value240) => value240['id'] === normalizeText(value238),
         ),
-        _0x5f4538 = getWorkspaceAssetAppearances(_0x90385e),
-        _0x297eca = _0x5f4538['filter']((_0xaf364) => _0xaf364['imageUrl']);
-      if (!_0x90385e || _0x297eca['length'] < 0x2) return ![];
-      const _0x574682 = Math['max'](
+        list10 = getWorkspaceAssetAppearances(enabled29),
+        list11 = list10['filter']((value241) => value241['imageUrl']);
+      if (!enabled29 || list11['length'] < 0x2) return ![];
+      const value242 = Math['max'](
           0x0,
           Math['min'](
-            _0x5f4538['length'] - 0x1,
-            Math['trunc'](Number(_0x57b9e5['workspace']['assetAppearanceIndexes']?.[_0x90385e['id']]) || 0x0),
+            list10['length'] - 0x1,
+            Math['trunc'](
+              Number(initialProject2['workspace']['assetAppearanceIndexes']?.[enabled29['id']]) || 0x0,
+            ),
           ),
         ),
-        _0x163202 = _0x5f4538[_0x574682]?.['id'],
-        _0x577c0b = Math['max'](
+        value243 = list10[value242]?.['id'],
+        value244 = Math['max'](
           0x0,
-          _0x297eca['findIndex']((_0x398a08) => _0x398a08['id'] === _0x163202),
+          list11['findIndex']((value245) => value245['id'] === value243),
         ),
-        _0x330add =
-          (_0x577c0b + Math['sign'](Number(_0x12db8e) || 0x0) + _0x297eca['length']) % _0x297eca['length'];
-      if (_0x330add === _0x577c0b) return ![];
-      const _0x1dc77c = _0x297eca[_0x330add]?.['id'],
-        _0x35ee06 = _0x5f4538['findIndex']((_0x20b826) => _0x20b826['id'] === _0x1dc77c),
-        _0x108a74 = {
-          ..._0x57b9e5,
+        value246 = (value244 + Math['sign'](Number(value239) || 0x0) + list11['length']) % list11['length'];
+      if (value246 === value244) return ![];
+      const value247 = list11[value246]?.['id'],
+        value248 = list10['findIndex']((value249) => value249['id'] === value247),
+        value250 = {
+          ...initialProject2,
           workspace: {
-            ..._0x57b9e5['workspace'],
+            ...initialProject2['workspace'],
             assetAppearanceIndexes: {
-              ..._0x57b9e5['workspace']['assetAppearanceIndexes'],
-              [_0x90385e['id']]: Math['max'](0x0, _0x35ee06),
+              ...initialProject2['workspace']['assetAppearanceIndexes'],
+              [enabled29['id']]: Math['max'](0x0, value248),
             },
           },
         };
-      return (_0x26d845(_0x108a74, 'target-appearance-preview-change'), !![]);
+      return (updateProject(value250, 'target-appearance-preview-change'), !![]);
     },
-    _0x52ce70 = (_0x5af66d) => {
-      const _0x4249fc = _0x5af66d['target']?.['closest']?.(
+    handler80 = (event2) => {
+      const el56 = event2['target']?.['closest']?.(
         '[data-person-replacement-target-appearance-wheel="true"]',
       );
       if (
-        !_0x4249fc ||
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        _0x57b9e5['workspace']['step'] !== 0x2
+        !el56 ||
+        initialProject2['workspace']['view'] !== 'project' ||
+        initialProject2['workspace']['step'] !== 0x2
       )
         return ![];
-      _0x5af66d['preventDefault']();
-      const _0x1c9316 = normalizeText(_0x4249fc['dataset']['personReplacementTargetCharacterId']),
-        _0x4863f2 = _0x4625b2['get'](_0x1c9316) || { accumulator: 0x0, lockedUntil: 0x0 };
-      _0x4625b2['set'](_0x1c9316, _0x4863f2);
-      const _0x2cd941 = consumeWorkspaceWheelDirection(_0x5af66d, _0x4863f2, {
+      event2['preventDefault']();
+      const text12 = normalizeText(el56['dataset']['personReplacementTargetCharacterId']),
+        value251 = map3['get'](text12) || { accumulator: 0x0, lockedUntil: 0x0 };
+      map3['set'](text12, value251);
+      const consumeWorkspaceWheelDirection2 = consumeWorkspaceWheelDirection(event2, value251, {
         threshold: 0x4,
         lockDuration: 0xa0,
       });
-      if (_0x2cd941) _0x1c6c30(_0x1c9316, _0x2cd941);
+      if (consumeWorkspaceWheelDirection2) handler79(text12, consumeWorkspaceWheelDirection2);
       return !![];
     },
-    _0x3f9fb5 = (_0x1deb11) => {
-      const _0x52e474 = _0x1deb11['target']?.['closest']?.(
+    handler81 = (event3) => {
+      const boundaryRoot = event3['target']?.['closest']?.(
         '[data-story-appearance-wheel="true"], [data-story-card-appearance-wheel]',
       );
       if (
-        !_0x52e474 ||
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        _0x57b9e5['workspace']['step'] !== 0x1 ||
-        _0x57b9e5['workspace']['characterAssetTab'] === 'library'
+        !boundaryRoot ||
+        initialProject2['workspace']['view'] !== 'project' ||
+        initialProject2['workspace']['step'] !== 0x1 ||
+        initialProject2['workspace']['characterAssetTab'] === 'library'
       )
         return ![];
-      if (shouldPreserveWorkspaceNestedWheel(_0x1deb11['target'], { boundaryRoot: _0x52e474 })) return ![];
-      _0x1deb11['preventDefault']();
-      const _0x3ceec0 = consumeWorkspaceWheelDirection(_0x1deb11, _0x1f77e4);
-      if (_0x3ceec0) _0x4d01cc(_0x3ceec0, _0x52e474['dataset']['storyCardAppearanceWheel']);
+      if (shouldPreserveWorkspaceNestedWheel(event3['target'], { boundaryRoot: boundaryRoot })) return ![];
+      event3['preventDefault']();
+      const consumeWorkspaceWheelDirection3 = consumeWorkspaceWheelDirection(event3, value70);
+      if (consumeWorkspaceWheelDirection3)
+        handler73(consumeWorkspaceWheelDirection3, boundaryRoot['dataset']['storyCardAppearanceWheel']);
       return !![];
     },
-    _0x32a2f0 = (_0x5f4123) => {
-      const _0x4a08a7 = _0x5f4123['target']?.['closest']?.(
-        '[data-person-replacement-audio-bound-wheel="true"]',
-      );
+    handler82 = (event4) => {
+      const enabled30 = event4['target']?.['closest']?.('[data-person-replacement-audio-bound-wheel="true"]');
       if (
-        !_0x4a08a7 ||
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        _0x57b9e5['workspace']['step'] !== 0x1 ||
-        _0x57b9e5['workspace']['characterAssetTab'] !== 'audio'
+        !enabled30 ||
+        initialProject2['workspace']['view'] !== 'project' ||
+        initialProject2['workspace']['step'] !== 0x1 ||
+        initialProject2['workspace']['characterAssetTab'] !== 'audio'
       )
         return ![];
-      _0x5f4123['preventDefault']();
-      const _0x197195 = consumeWorkspaceWheelDirection(_0x5f4123, _0x110a98);
-      if (_0x197195) _0x6f1208(_0x197195);
+      event4['preventDefault']();
+      const consumeWorkspaceWheelDirection4 = consumeWorkspaceWheelDirection(event4, value71);
+      if (consumeWorkspaceWheelDirection4) handler74(consumeWorkspaceWheelDirection4);
       return !![];
     },
-    _0x204611 = (_0x209e42) => {
-      const _0x471629 = _0x209e42['target']?.['closest']?.('[data-person-replacement-shot-wheel="true"]');
+    handler83 = (event5) => {
+      const enabled31 = event5['target']?.['closest']?.('[data-person-replacement-shot-wheel="true"]');
       if (
-        !_0x471629 ||
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        ![0x2, 0x3, 0x5]['includes'](_0x57b9e5['workspace']['step']) ||
-        (_0x57b9e5['workspace']['step'] === 0x2 && _0x4e4610['isOpen'])
+        !enabled31 ||
+        initialProject2['workspace']['view'] !== 'project' ||
+        ![0x2, 0x3, 0x5]['includes'](initialProject2['workspace']['step']) ||
+        (initialProject2['workspace']['step'] === 0x2 && selectedIds['isOpen'])
       )
         return ![];
-      _0x209e42['preventDefault']();
-      const _0x3ac5dd = consumeWorkspaceWheelDirection(_0x209e42, _0x4092b9);
-      if (_0x3ac5dd) _0x38b343(_0x3ac5dd);
+      event5['preventDefault']();
+      const consumeWorkspaceWheelDirection5 = consumeWorkspaceWheelDirection(event5, value72);
+      if (consumeWorkspaceWheelDirection5) handler77(consumeWorkspaceWheelDirection5);
       return !![];
     },
-    _0x4a6238 = (_0x4d690b) => {
-      const _0x32fab9 = _0x4d690b['target']?.['closest']?.(
+    handler84 = (event6) => {
+      const value252 = event6['target']?.['closest']?.(
         '[data-person-replacement-video-result-wheel=\x22true\x22]',
       );
       if (
-        _0x32fab9 &&
-        _0x57b9e5['workspace']['view'] === 'project' &&
-        _0x57b9e5['workspace']['step'] === 0x3
+        value252 &&
+        initialProject2['workspace']['view'] === 'project' &&
+        initialProject2['workspace']['step'] === 0x3
       ) {
-        _0x4d690b['preventDefault']();
-        const _0x427bcd = consumeWorkspaceWheelDirection(_0x4d690b, _0x32e60f);
-        if (_0x427bcd) _0x473d04(_0x427bcd);
+        event6['preventDefault']();
+        const consumeWorkspaceWheelDirection6 = consumeWorkspaceWheelDirection(event6, value74);
+        if (consumeWorkspaceWheelDirection6) switchVideoResult(consumeWorkspaceWheelDirection6);
         return !![];
       }
-      const _0x32d147 = _0x4d690b['target']?.['closest']?.(
+      const enabled32 = event6['target']?.['closest']?.(
         '[data-person-replacement-image-result-wheel="true"]',
       );
       if (
-        !_0x32d147 ||
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        _0x57b9e5['workspace']['step'] !== 0x2
+        !enabled32 ||
+        initialProject2['workspace']['view'] !== 'project' ||
+        initialProject2['workspace']['step'] !== 0x2
       )
         return ![];
-      _0x4d690b['preventDefault']();
-      const _0x5f00da = consumeWorkspaceWheelDirection(_0x4d690b, _0x260afc);
-      if (_0x5f00da) _0x110efe(_0x5f00da);
+      event6['preventDefault']();
+      const consumeWorkspaceWheelDirection7 = consumeWorkspaceWheelDirection(event6, value73);
+      if (consumeWorkspaceWheelDirection7) switchImageResult(consumeWorkspaceWheelDirection7);
       return !![];
     },
-    _0x31ad17 = (_0x59ec47) => {
-      const _0x284015 = _0x59ec47['target']?.['closest']?.('[data-person-replacement-shot-timeline-scroll]'),
-        _0x1d8a96 = _0x59ec47['target']?.['closest']?.('[data-person-replacement-shot-cut-timeline]');
-      if (!_0x4e4610['isOpen'] || !_0x284015 || !_0x1d8a96 || !_0x42b7b0?.['contains']?.(_0x284015))
+    handler85 = (clientX2) => {
+      const el57 = clientX2['target']?.['closest']?.('[data-person-replacement-shot-timeline-scroll]'),
+        enabled33 = clientX2['target']?.['closest']?.('[data-person-replacement-shot-cut-timeline]');
+      if (!selectedIds['isOpen'] || !el57 || !enabled33 || !floatingMenuHost?.['contains']?.(el57))
         return ![];
-      const _0x235e37 = Number(_0x59ec47['deltaX']) || 0x0,
-        _0x249f2b = Number(_0x59ec47['deltaY']) || 0x0,
-        _0x5574e1 = Math['abs'](_0x235e37) > Math['abs'](_0x249f2b) ? _0x235e37 : _0x249f2b;
-      if (!_0x5574e1) return ![];
-      if (_0x59ec47['ctrlKey'] || _0x59ec47['metaKey'])
+      const value253 = Number(clientX2['deltaX']) || 0x0,
+        value254 = Number(clientX2['deltaY']) || 0x0,
+        enabled34 = Math['abs'](value253) > Math['abs'](value254) ? value253 : value254;
+      if (!enabled34) return ![];
+      if (clientX2['ctrlKey'] || clientX2['metaKey'])
         return (
-          _0x59ec47['preventDefault']?.(),
-          _0x59ec47['stopPropagation']?.(),
-          _0x1d4206(_0x5574e1 > 0x0 ? 'out' : 'in', { clientX: _0x59ec47['clientX'] }),
+          clientX2['preventDefault']?.(),
+          clientX2['stopPropagation']?.(),
+          applyTimelineZoom(enabled34 > 0x0 ? 'out' : 'in', { clientX: clientX2['clientX'] }),
           !![]
         );
-      const _0x12e4df = Math['max'](0x0, Number(_0x284015['scrollWidth']) - Number(_0x284015['clientWidth']));
-      if (!(_0x12e4df > 0x0)) return ![];
-      const _0x530f92 = clamp(
-        Number(_0x284015['scrollLeft']) + _0x5574e1,
+      const count7 = Math['max'](0x0, Number(el57['scrollWidth']) - Number(el57['clientWidth']));
+      if (!(count7 > 0x0)) return ![];
+      const clamp2 = clamp(
+        Number(el57['scrollLeft']) + enabled34,
         0x0,
-        _0x12e4df,
-        Number(_0x284015['scrollLeft']) || 0x0,
+        count7,
+        Number(el57['scrollLeft']) || 0x0,
       );
-      if (_0x530f92 === Number(_0x284015['scrollLeft'])) return ![];
+      if (clamp2 === Number(el57['scrollLeft'])) return ![];
       return (
-        _0x59ec47['preventDefault']?.(),
-        _0x59ec47['stopPropagation']?.(),
-        (_0x284015['scrollLeft'] = _0x530f92),
+        clientX2['preventDefault']?.(),
+        clientX2['stopPropagation']?.(),
+        (el57['scrollLeft'] = clamp2),
         !![]
       );
     },
-    _0x460f91 = (_0x3accab) => {
+    handler86 = (value255) => {
       return scrollClosestElementHorizontallyWithWheel(
-        _0x3accab,
+        value255,
         '[data-person-replacement-shot-timeline-scroll]',
-        { boundaryRoot: _0x42b7b0, preserveNestedScrollable: !![] },
+        { boundaryRoot: floatingMenuHost, preserveNestedScrollable: !![] },
       );
     },
-    _0xbbcbef = (_0x567f12) => {
-      return scrollClosestElementHorizontallyWithWheel(
-        _0x567f12,
-        '.person-replacement-video-model-selector',
-        { boundaryRoot: _0x42b7b0, preserveNestedScrollable: !![], stopPropagation: !![] },
-      );
+    handler87 = (value256) => {
+      return scrollClosestElementHorizontallyWithWheel(value256, '.person-replacement-video-model-selector', {
+        boundaryRoot: floatingMenuHost,
+        preserveNestedScrollable: !![],
+        stopPropagation: !![],
+      });
     },
-    _0x1af548 = (_0x4a43ab) => {
-      if (_0x4aeba7?.['handleKeyDown'](_0x4a43ab)) return;
-      const _0x36b98e = _0x4a43ab['target']?.['closest']?.(
-        '[data-person-replacement-composite-project-title]',
-      );
-      if (_0x36b98e && ['Enter', 'Escape']['includes'](_0x4a43ab['key'])) {
-        (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
-        _0x4a43ab['key'] === 'Escape' && (_0x36b98e['value'] = _0x57b9e5['title']);
-        _0x36b98e['blur']?.();
+    value257 = (cancelled2) => {
+      if (ctx?.['handleKeyDown'](cancelled2)) return;
+      const el58 = cancelled2['target']?.['closest']?.('[data-person-replacement-composite-project-title]');
+      if (el58 && ['Enter', 'Escape']['includes'](cancelled2['key'])) {
+        (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
+        cancelled2['key'] === 'Escape' && (el58['value'] = initialProject2['title']);
+        el58['blur']?.();
         return;
       }
       if (
-        _0x4a43ab['target']?.['dataset']?.['personReplacementField'] === 'video-prompt' &&
-        handleSlashKeyboardNavigation(_0x4a43ab)
+        cancelled2['target']?.['dataset']?.['personReplacementField'] === 'video-prompt' &&
+        handleSlashKeyboardNavigation(cancelled2)
       )
         return;
-      if (_0x23c082['handleKeyDown'](_0x4a43ab)) return;
-      if (_0x3d57d6['handleKeyDown'](_0x4a43ab)) return;
-      const _0x3365b3 = _0x4a43ab['target']?.['closest']?.(
+      if (personReplacementExportSubmenuController['handleKeyDown'](cancelled2)) return;
+      if (workspaceMenuController['handleKeyDown'](cancelled2)) return;
+      const el59 = cancelled2['target']?.['closest']?.(
         '[data-person-replacement-composite-sidebar-splitter]',
       );
-      if (_0x3365b3 && ['ArrowLeft', 'ArrowRight']['includes'](_0x4a43ab['key'])) {
-        (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
-        const _0x4e5f93 = _0x3365b3['closest']?.('.person-replacement-preview-workbench'),
-          _0x2fab2d = _0x4a43ab['key'] === 'ArrowLeft' ? -0x10 : 0x10;
-        ((_0x57b9e5['workspace']['compositeSidebarWidth'] =
+      if (el59 && ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])) {
+        (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
+        const value258 = el59['closest']?.('.person-replacement-preview-workbench'),
+          value259 = cancelled2['key'] === 'ArrowLeft' ? -0x10 : 0x10;
+        ((initialProject2['workspace']['compositeSidebarWidth'] =
           applyPersonReplacementCompositeSidebarWidthToLayout(
-            _0x4e5f93,
-            _0x3365b3,
-            _0x57b9e5['workspace']['compositeSidebarWidth'] + _0x2fab2d,
+            value258,
+            el59,
+            initialProject2['workspace']['compositeSidebarWidth'] + value259,
           )),
-          _0x273c17('composite-sidebar-width'));
+          handler21('composite-sidebar-width'));
         return;
       }
-      const _0x20e35c = _0x4a43ab['target']?.['closest']?.('[data-person-replacement-voice-layout-splitter]');
-      if (_0x20e35c && ['ArrowLeft', 'ArrowRight']['includes'](_0x4a43ab['key'])) {
-        (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
-        const _0x486ae3 = normalizeText(_0x20e35c['dataset']?.['personReplacementVoiceLayoutSplitter']);
-        if (['assets', 'sources']['includes'](_0x486ae3)) {
-          const _0x3def8b = _0x20e35c['closest']?.('[data-person-replacement-voice-layout]'),
-            _0x1f043f = normalizePersonReplacementVoiceLayout(_0x57b9e5['workspace']['voiceLayout']),
-            _0x40161e = _0x4a43ab['key'] === 'ArrowLeft' ? -0x2 : 0x2;
-          ((_0x57b9e5['workspace']['voiceLayout'] = applyPersonReplacementVoiceLayoutToElement(_0x3def8b, {
-            ..._0x1f043f,
-            ...(_0x486ae3 === 'assets'
-              ? { assetsEnd: _0x1f043f['assetsEnd'] + _0x40161e }
-              : { sourcesEnd: _0x1f043f['sourcesEnd'] + _0x40161e }),
-          })),
-            _0x273c17('voice-layout'));
+      const el60 = cancelled2['target']?.['closest']?.('[data-person-replacement-voice-layout-splitter]');
+      if (el60 && ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])) {
+        (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
+        const text13 = normalizeText(el60['dataset']?.['personReplacementVoiceLayoutSplitter']);
+        if (['assets', 'sources']['includes'](text13)) {
+          const value260 = el60['closest']?.('[data-person-replacement-voice-layout]'),
+            assetsEnd = normalizePersonReplacementVoiceLayout(initialProject2['workspace']['voiceLayout']),
+            value261 = cancelled2['key'] === 'ArrowLeft' ? -0x2 : 0x2;
+          ((initialProject2['workspace']['voiceLayout'] = applyPersonReplacementVoiceLayoutToElement(
+            value260,
+            {
+              ...assetsEnd,
+              ...(text13 === 'assets'
+                ? { assetsEnd: assetsEnd['assetsEnd'] + value261 }
+                : { sourcesEnd: assetsEnd['sourcesEnd'] + value261 }),
+            },
+          )),
+            handler21('voice-layout'));
         }
         return;
       }
-      if (_0x4a43ab['key'] === 'Escape') {
-        const _0x5747f0 = _0x42b7b0?.['querySelector']?.('.person-replacement-add-voice-menu-wrap.is-open');
-        if (_0x5747f0) {
-          (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
-          const _0x1bcca1 = _0x5747f0['querySelector']?.(
-            '[data-story-action=\x22toggle-character-voice-menu\x22]',
-          );
-          (_0x28395d(_0x5747f0, ![]), _0x1bcca1?.['focus']?.());
+      if (cancelled2['key'] === 'Escape') {
+        const el61 = floatingMenuHost?.['querySelector']?.('.person-replacement-add-voice-menu-wrap.is-open');
+        if (el61) {
+          (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
+          const el62 = el61['querySelector']?.('[data-story-action=\x22toggle-character-voice-menu\x22]');
+          (handler37(el61, ![]), el62?.['focus']?.());
           return;
         }
-        const _0xcfa8 = _0x42b7b0?.['querySelector']?.('.person-replacement-library-add-menu-wrap.is-open');
-        if (_0xcfa8) {
-          (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
-          const _0x2318f3 = _0xcfa8['querySelector']?.(
+        const el63 = floatingMenuHost?.['querySelector']?.(
+          '.person-replacement-library-add-menu-wrap.is-open',
+        );
+        if (el63) {
+          (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
+          const el64 = el63['querySelector']?.(
             '[data-person-replacement-action="toggle-library-add-targets"]',
           );
-          (_0x29175f(_0xcfa8, ![]), _0x2318f3?.['focus']?.());
+          (handler35(el63, ![]), el64?.['focus']?.());
           return;
         }
       }
-      if (_0x4a43ab['key'] === 'Escape' && _0x236762) {
-        (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation'](), _0x524d22({ restoreFocus: !![] }));
+      if (cancelled2['key'] === 'Escape' && value66) {
+        (cancelled2['preventDefault'](), cancelled2['stopPropagation'](), handler88({ restoreFocus: !![] }));
         return;
       }
-      const _0x343428 = _0x4a43ab['target']?.['closest']?.('[data-person-replacement-person-custom-label]');
-      if (_0x343428 && ['Enter', 'Escape']['includes'](_0x4a43ab['key'])) {
-        (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
-        const _0x7b104c = _0x343428['closest']?.('[data-person-replacement-detection-picker]');
-        (_0x51b3c8(_0x343428, { cancelled: _0x4a43ab['key'] === 'Escape' }),
-          _0x7b104c?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]')?.[
-            'focus'
-          ]?.());
+      const el65 = cancelled2['target']?.['closest']?.('[data-person-replacement-person-custom-label]');
+      if (el65 && ['Enter', 'Escape']['includes'](cancelled2['key'])) {
+        (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
+        const el66 = el65['closest']?.('[data-person-replacement-detection-picker]');
+        (handler89(el65, { cancelled: cancelled2['key'] === 'Escape' }),
+          el66?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]')?.['focus']?.());
         return;
       }
-      const _0xaec5e9 = _0x4a43ab['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]');
-      if (_0xaec5e9 && _0x4e4610['isOpen'] && ['ArrowLeft', 'ArrowRight']['includes'](_0x4a43ab['key'])) {
-        const _0x11cd56 = _0x4a43ab['shiftKey'] ? 0x5 : _0x4a43ab['ctrlKey'] ? 0x1 : 0x0;
-        if (!_0x11cd56) return;
-        (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
-        const _0x32559d = Math['trunc'](Number(_0xaec5e9['dataset']['personReplacementCutBoundaryIndex'])),
-          _0x3ae96c = _0x4e4610['draft'][_0x32559d - 0x1],
-          _0x129be7 = _0x4e4610['draft'][_0x32559d],
-          _0x1b8635 = _0x4a43ab['key'] === 'ArrowRight' ? 0x1 : -0x1,
-          _0x3e916b = getPersonReplacementShotCutFrameSec(_0x3ae96c, _0x129be7) * _0x11cd56;
-        _0x42c738(_0x32559d, Number(_0x129be7?.['startSec']) + _0x1b8635 * _0x3e916b, { active: _0x32559d });
+      const el67 = cancelled2['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]');
+      if (el67 && selectedIds['isOpen'] && ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])) {
+        const enabled35 = cancelled2['shiftKey'] ? 0x5 : cancelled2['ctrlKey'] ? 0x1 : 0x0;
+        if (!enabled35) return;
+        (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
+        const active = Math['trunc'](Number(el67['dataset']['personReplacementCutBoundaryIndex'])),
+          value262 = selectedIds['draft'][active - 0x1],
+          value263 = selectedIds['draft'][active],
+          value264 = cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1,
+          personReplacementShotCutFrameSec =
+            getPersonReplacementShotCutFrameSec(value262, value263) * enabled35;
+        applyBoundaryTime(
+          active,
+          Number(value263?.['startSec']) + value264 * personReplacementShotCutFrameSec,
+          { active: active },
+        );
         return;
       }
-      const _0x2869f3 = _0x4a43ab['target']?.['closest']?.('[data-person-replacement-cut-shot-index]'),
-        _0x497c53 = Boolean(
-          _0x4a43ab['target']?.['closest']?.(
+      const el68 = cancelled2['target']?.['closest']?.('[data-person-replacement-cut-shot-index]'),
+        isEditableTarget = Boolean(
+          cancelled2['target']?.['closest']?.(
             'input, textarea, select, [contenteditable="true"], [role="textbox"]',
           ),
         );
-      if (_0x4d5162(_0x4a43ab)) return;
+      if (handler72(cancelled2)) return;
       if (
-        _0x213c96(_0x4a43ab, {
+        handleSelectionKeyDown(cancelled2, {
           deletionEnabled:
-            _0x57b9e5['workspace']['view'] === 'project' &&
-            _0x57b9e5['workspace']['step'] === 0x2 &&
-            !_0x4e4610['isOpen'],
-          isEditableTarget: _0x497c53,
+            initialProject2['workspace']['view'] === 'project' &&
+            initialProject2['workspace']['step'] === 0x2 &&
+            !selectedIds['isOpen'],
+          isEditableTarget: isEditableTarget,
         })
       )
         return;
-      const _0x2f05b6 = Boolean(_0x4a43ab['target']?.['closest']?.('.person-replacement-shot-cut-action'));
+      const enabled36 = Boolean(cancelled2['target']?.['closest']?.('.person-replacement-shot-cut-action'));
       if (
-        _0x4e4610['isOpen'] &&
-        !_0x26d2a5() &&
-        !_0x497c53 &&
-        (_0x4a43ab['key'] === '\x20' || _0x4a43ab['code'] === 'Space')
+        selectedIds['isOpen'] &&
+        !isBusy() &&
+        !isEditableTarget &&
+        (cancelled2['key'] === '\x20' || cancelled2['code'] === 'Space')
       ) {
-        (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
-        const _0x578595 = _0x42b7b0?.['querySelector']?.('[data-person-replacement-shot-cut-editor]');
-        if (_0x578595 && _0x4a43ab['target'] !== _0x578595)
+        (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
+        const el69 = floatingMenuHost?.['querySelector']?.('[data-person-replacement-shot-cut-editor]');
+        if (el69 && cancelled2['target'] !== el69)
           try {
-            _0x578595['focus']?.({ preventScroll: !![] });
+            el69['focus']?.({ preventScroll: !![] });
           } catch {
-            _0x578595['focus']?.();
+            el69['focus']?.();
           }
-        if (!_0x4a43ab['repeat']) _0x4b8ea2();
+        if (!cancelled2['repeat']) togglePlayback();
         return;
       }
-      if (_0x4e4610['isOpen'] && !_0x26d2a5() && !_0x497c53 && !_0x2f05b6) {
+      if (selectedIds['isOpen'] && !isBusy() && !isEditableTarget && !enabled36) {
         if (
-          !_0x4a43ab['repeat'] &&
-          (_0x4a43ab['ctrlKey'] || _0x4a43ab['metaKey']) &&
-          !_0x4a43ab['shiftKey'] &&
-          String(_0x4a43ab['key'] || '')['toLowerCase']() === 'z'
+          !cancelled2['repeat'] &&
+          (cancelled2['ctrlKey'] || cancelled2['metaKey']) &&
+          !cancelled2['shiftKey'] &&
+          String(cancelled2['key'] || '')['toLowerCase']() === 'z'
         ) {
-          (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation'](), _0x3ca241());
-          return;
-        }
-        if (
-          !_0x4a43ab['repeat'] &&
-          (_0x4a43ab['ctrlKey'] || _0x4a43ab['metaKey']) &&
-          (String(_0x4a43ab['key'] || '') === '+' ||
-            String(_0x4a43ab['key'] || '') === '=' ||
-            _0x4a43ab['code'] === 'Equal')
-        ) {
-          (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation'](), _0x1d4206('in'));
+          (cancelled2['preventDefault'](), cancelled2['stopPropagation'](), undoDraft());
           return;
         }
         if (
-          !_0x4a43ab['repeat'] &&
-          (_0x4a43ab['ctrlKey'] || _0x4a43ab['metaKey']) &&
-          (String(_0x4a43ab['key'] || '') === '-' || _0x4a43ab['code'] === 'Minus')
+          !cancelled2['repeat'] &&
+          (cancelled2['ctrlKey'] || cancelled2['metaKey']) &&
+          (String(cancelled2['key'] || '') === '+' ||
+            String(cancelled2['key'] || '') === '=' ||
+            cancelled2['code'] === 'Equal')
         ) {
-          (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation'](), _0x1d4206('out'));
+          (cancelled2['preventDefault'](), cancelled2['stopPropagation'](), applyTimelineZoom('in'));
           return;
         }
         if (
-          !_0x4a43ab['repeat'] &&
-          (_0x4a43ab['ctrlKey'] || _0x4a43ab['metaKey']) &&
-          (String(_0x4a43ab['key'] || '') === '0' || _0x4a43ab['code'] === 'Digit0')
+          !cancelled2['repeat'] &&
+          (cancelled2['ctrlKey'] || cancelled2['metaKey']) &&
+          (String(cancelled2['key'] || '') === '-' || cancelled2['code'] === 'Minus')
         ) {
-          (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation'](), _0x1d4206('reset'));
+          (cancelled2['preventDefault'](), cancelled2['stopPropagation'](), applyTimelineZoom('out'));
           return;
         }
         if (
-          !_0x4a43ab['repeat'] &&
-          !_0x4a43ab['ctrlKey'] &&
-          !_0x4a43ab['metaKey'] &&
-          !_0x4a43ab['altKey'] &&
-          (String(_0x4a43ab['key'] || '')['toLowerCase']() === 'c' || _0x4a43ab['code'] === 'KeyC')
+          !cancelled2['repeat'] &&
+          (cancelled2['ctrlKey'] || cancelled2['metaKey']) &&
+          (String(cancelled2['key'] || '') === '0' || cancelled2['code'] === 'Digit0')
         ) {
-          (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation'](), _0x4299a2());
+          (cancelled2['preventDefault'](), cancelled2['stopPropagation'](), applyTimelineZoom('reset'));
           return;
         }
-        if (['ArrowLeft', 'ArrowRight']['includes'](_0x4a43ab['key'])) {
-          (_0x4a43ab['preventDefault'](),
-            _0x4a43ab['stopPropagation'](),
-            _0x3b2808(_0x4a43ab['key'] === 'ArrowLeft' ? -0x1 : 0x1, _0x4a43ab['shiftKey'] ? 0x5 : 0x1));
+        if (
+          !cancelled2['repeat'] &&
+          !cancelled2['ctrlKey'] &&
+          !cancelled2['metaKey'] &&
+          !cancelled2['altKey'] &&
+          (String(cancelled2['key'] || '')['toLowerCase']() === 'c' || cancelled2['code'] === 'KeyC')
+        ) {
+          (cancelled2['preventDefault'](), cancelled2['stopPropagation'](), splitAtPlayhead());
           return;
         }
-        if (['Home', 'End']['includes'](_0x4a43ab['key'])) {
-          (_0x4a43ab['preventDefault'](),
-            _0x4a43ab['stopPropagation'](),
-            _0x57503e(
-              _0x4a43ab['key'] === 'Home'
+        if (['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])) {
+          (cancelled2['preventDefault'](),
+            cancelled2['stopPropagation'](),
+            stepTimeline(cancelled2['key'] === 'ArrowLeft' ? -0x1 : 0x1, cancelled2['shiftKey'] ? 0x5 : 0x1));
+          return;
+        }
+        if (['Home', 'End']['includes'](cancelled2['key'])) {
+          (cancelled2['preventDefault'](),
+            cancelled2['stopPropagation'](),
+            seekTimeline(
+              cancelled2['key'] === 'Home'
                 ? 0x0
-                : getPersonReplacementShotCutTotalDuration(_0x4e4610['draft']),
+                : getPersonReplacementShotCutTotalDuration(selectedIds['draft']),
             ));
           return;
         }
       }
-      if (_0x2869f3 && _0x4e4610['isOpen'] && _0x4a43ab['key'] === 'Enter') {
-        (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
-        const _0x4a300c =
-          _0x4e4610['draft'][Math['trunc'](Number(_0x2869f3['dataset']['personReplacementCutShotIndex']))];
-        if (_0x4a300c) _0x2fd756(_0x4a300c['shotId'], _0x4a300c['startSec']);
+      if (el68 && selectedIds['isOpen'] && cancelled2['key'] === 'Enter') {
+        (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
+        const value265 =
+          selectedIds['draft'][Math['trunc'](Number(el68['dataset']['personReplacementCutShotIndex']))];
+        if (value265) preview(value265['shotId'], value265['startSec']);
         return;
       }
-      const _0x4865be = _0x4a43ab['target']?.['closest']?.(
+      const value266 = cancelled2['target']?.['closest']?.(
         '[data-story-asset-name-id][contenteditable="true"]',
       );
-      if (_0x4865be && ['Enter', 'Escape']['includes'](_0x4a43ab['key'])) {
-        (_0x4a43ab['preventDefault'](),
-          _0x4a43ab['stopPropagation'](),
-          _0x31e38b(_0x4865be, { cancel: _0x4a43ab['key'] === 'Escape' }),
-          _0x4865be['blur']?.());
+      if (value266 && ['Enter', 'Escape']['includes'](cancelled2['key'])) {
+        (cancelled2['preventDefault'](),
+          cancelled2['stopPropagation'](),
+          handler49(value266, { cancel: cancelled2['key'] === 'Escape' }),
+          value266['blur']?.());
         return;
       }
-      if (_0x4a43ab['key'] === 'Escape') {
-        if (_0x1c8c49()) {
-          (_0x4a43ab['preventDefault'](), _0x4a43ab['stopPropagation']());
+      if (cancelled2['key'] === 'Escape') {
+        if (handler90()) {
+          (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
           return;
         }
         if (
-          !_0x57b9e5['workspace']['shotSelectionMode'] &&
-          !_0x57b9e5['workspace']['selectedShotIds']['length'] &&
-          _0x46a111(_0x4a43ab)
+          !initialProject2['workspace']['shotSelectionMode'] &&
+          !initialProject2['workspace']['selectedShotIds']['length'] &&
+          handleEscape(cancelled2)
         )
           return;
-        if (_0x4e4610['isSmartDetectOpen'] && !_0x4e4610['isSmartDetecting']) {
-          (_0x4a43ab['preventDefault'](),
-            _0x4a43ab['stopPropagation'](),
-            (_0x4e4610['isSmartDetectOpen'] = ![]),
-            _0x4cf492());
+        if (selectedIds['isSmartDetectOpen'] && !selectedIds['isSmartDetecting']) {
+          (cancelled2['preventDefault'](),
+            cancelled2['stopPropagation'](),
+            (selectedIds['isSmartDetectOpen'] = ![]),
+            run());
           return;
         }
-        if (_0x4e4610['isOpen'] && !_0x374e20()) {
-          (_0x4a43ab['preventDefault'](), _0x26bf5a({ animate: !![], renderWorkspace: !![] }));
+        if (selectedIds['isOpen'] && !isDraftMutationBusy()) {
+          (cancelled2['preventDefault'](), close2({ animate: !![], renderWorkspace: !![] }));
           return;
         }
-        (_0x4d8968?.['cancel']?.(),
-          _0x1399ed(),
-          (_0x57b9e5['workspace']['shotSelectionMode'] ||
-            _0x57b9e5['workspace']['selectedShotIds']['length']) &&
-            _0x26d845(
+        (workspaceMarqueeSelectionController?.['cancel']?.(),
+          handler91(),
+          (initialProject2['workspace']['shotSelectionMode'] ||
+            initialProject2['workspace']['selectedShotIds']['length']) &&
+            updateProject(
               {
-                ..._0x57b9e5,
-                workspace: { ..._0x57b9e5['workspace'], shotSelectionMode: ![], selectedShotIds: [] },
+                ...initialProject2,
+                workspace: { ...initialProject2['workspace'], shotSelectionMode: ![], selectedShotIds: [] },
               },
               'shot-selection-cancel',
             ),
-          _0x57b9e5['workspace']['step'] === 0x1 &&
-            _0x57b9e5['workspace']['selectedAssetIds']['length'] &&
-            _0x26d845(
+          initialProject2['workspace']['step'] === 0x1 &&
+            initialProject2['workspace']['selectedAssetIds']['length'] &&
+            updateProject(
               {
-                ..._0x57b9e5,
-                workspace: { ..._0x57b9e5['workspace'], assetSelectionMode: ![], selectedAssetIds: [] },
+                ...initialProject2,
+                workspace: { ...initialProject2['workspace'], assetSelectionMode: ![], selectedAssetIds: [] },
               },
               'asset-selection-cancel',
             ));
       }
-      const _0xa1922c = _0x4a43ab['target']?.['closest']?.(
+      const el70 = cancelled2['target']?.['closest']?.(
         '[data-person-replacement-target-appearance-wheel="true"]',
       );
       if (
-        _0xa1922c &&
-        _0x57b9e5['workspace']['step'] === 0x2 &&
-        ['ArrowLeft', 'ArrowRight']['includes'](_0x4a43ab['key'])
+        el70 &&
+        initialProject2['workspace']['step'] === 0x2 &&
+        ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])
       ) {
-        (_0x4a43ab['preventDefault'](),
-          _0x4a43ab['stopPropagation'](),
-          _0x1c6c30(
-            _0xa1922c['dataset']['personReplacementTargetCharacterId'],
-            _0x4a43ab['key'] === 'ArrowRight' ? 0x1 : -0x1,
+        (cancelled2['preventDefault'](),
+          cancelled2['stopPropagation'](),
+          handler79(
+            el70['dataset']['personReplacementTargetCharacterId'],
+            cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1,
           ));
         return;
       }
-      const _0x523df8 = _0x4a43ab['target']?.['closest']?.('[data-person-replacement-shot-wheel="true"]');
+      const value267 = cancelled2['target']?.['closest']?.('[data-person-replacement-shot-wheel="true"]');
       if (
-        _0x523df8 &&
-        _0x57b9e5['workspace']['step'] === 0x2 &&
-        ['ArrowLeft', 'ArrowRight']['includes'](_0x4a43ab['key'])
+        value267 &&
+        initialProject2['workspace']['step'] === 0x2 &&
+        ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])
       ) {
-        (_0x4a43ab['preventDefault'](),
-          _0x4a43ab['stopPropagation'](),
-          _0x38b343(_0x4a43ab['key'] === 'ArrowRight' ? 0x1 : -0x1));
+        (cancelled2['preventDefault'](),
+          cancelled2['stopPropagation'](),
+          handler77(cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1));
         return;
       }
-      const _0x457b6b = _0x4a43ab['target']?.['closest']?.(
+      const value268 = cancelled2['target']?.['closest']?.(
         '[data-person-replacement-audio-bound-wheel="true"]',
       );
       if (
-        _0x457b6b &&
-        _0x57b9e5['workspace']['step'] === 0x1 &&
-        _0x57b9e5['workspace']['characterAssetTab'] === 'audio' &&
-        ['ArrowLeft', 'ArrowRight']['includes'](_0x4a43ab['key'])
+        value268 &&
+        initialProject2['workspace']['step'] === 0x1 &&
+        initialProject2['workspace']['characterAssetTab'] === 'audio' &&
+        ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])
       ) {
-        (_0x4a43ab['preventDefault'](),
-          _0x4a43ab['stopPropagation'](),
-          _0x6f1208(_0x4a43ab['key'] === 'ArrowRight' ? 0x1 : -0x1));
+        (cancelled2['preventDefault'](),
+          cancelled2['stopPropagation'](),
+          handler74(cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1));
         return;
       }
-      const _0x30e4be = _0x4a43ab['target']?.['closest']?.('[data-story-appearance-wheel="true"]');
-      if (!_0x30e4be || !['ArrowLeft', 'ArrowRight']['includes'](_0x4a43ab['key'])) return;
-      (_0x4a43ab['preventDefault'](),
-        _0x4a43ab['stopPropagation'](),
-        _0x4d01cc(_0x4a43ab['key'] === 'ArrowRight' ? 0x1 : -0x1));
+      const enabled37 = cancelled2['target']?.['closest']?.('[data-story-appearance-wheel="true"]');
+      if (!enabled37 || !['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])) return;
+      (cancelled2['preventDefault'](),
+        cancelled2['stopPropagation'](),
+        handler73(cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1));
     },
-    _0x2b3990 = (_0x166ec5) => {
-      _0x166ec5['stopPropagation']();
-      const _0x1802ba = _0x166ec5['target']?.['closest']?.(
+    value269 = (event7) => {
+      event7['stopPropagation']();
+      const alt = event7['target']?.['closest']?.(
         '.person-replacement-image-preview-slide:not(' +
           '.person-replacement-image-preview-slide--outgoing) > img',
       );
-      if (_0x1802ba && _0x42b7b0?.['contains']?.(_0x1802ba)) {
-        const _0x423d67 = normalizeMediaUrl(_0x1802ba['currentSrc'] || _0x1802ba['getAttribute']?.('src'));
-        if (!_0x423d67) return;
-        (_0x166ec5['preventDefault'](),
-          openImagePreview(_0x423d67, { alt: _0x1802ba['alt'] || '替换图片生成结果预览' }));
+      if (alt && floatingMenuHost?.['contains']?.(alt)) {
+        const mediaUrl2 = normalizeMediaUrl(alt['currentSrc'] || alt['getAttribute']?.('src'));
+        if (!mediaUrl2) return;
+        (event7['preventDefault'](),
+          openImagePreview(mediaUrl2, { alt: alt['alt'] || '替换图片生成结果预览' }));
         return;
       }
-      const _0x347885 = _0x166ec5['target']?.['closest']?.(
-        'video[data-person-replacement-video-player="result"]',
-      );
-      if (_0x347885 && _0x42b7b0?.['contains']?.(_0x347885)) {
-        const _0x27f1a9 = normalizeMediaUrl(
-          _0x347885['dataset']?.['personReplacementVideoUrl'] ||
-            _0x347885['getAttribute']?.('src') ||
-            _0x347885['currentSrc'],
+      const el71 = event7['target']?.['closest']?.('video[data-person-replacement-video-player="result"]');
+      if (el71 && floatingMenuHost?.['contains']?.(el71)) {
+        const mediaUrl3 = normalizeMediaUrl(
+          el71['dataset']?.['personReplacementVideoUrl'] ||
+            el71['getAttribute']?.('src') ||
+            el71['currentSrc'],
         );
-        if (!_0x27f1a9) return;
-        const _0x40a5cd = normalizeMediaUrl(_0x347885['currentSrc'] || _0x347885['getAttribute']?.('src'));
-        (_0x166ec5['preventDefault'](), openVideoPreview(_0x27f1a9, { playbackUrl: _0x40a5cd }));
+        if (!mediaUrl3) return;
+        const playbackUrl = normalizeMediaUrl(el71['currentSrc'] || el71['getAttribute']?.('src'));
+        (event7['preventDefault'](), openVideoPreview(mediaUrl3, { playbackUrl: playbackUrl }));
         return;
       }
-      const _0x152fea = _0x166ec5['target']?.['closest']?.('img.story-asset-preview');
-      if (!_0x152fea || !_0x42b7b0?.['contains']?.(_0x152fea)) return;
-      const _0x3c8866 = normalizeMediaUrl(_0x152fea['currentSrc'] || _0x152fea['getAttribute']?.('src'));
-      if (!_0x3c8866) return;
-      (_0x166ec5['preventDefault'](),
-        openImagePreview(_0x3c8866, { alt: _0x152fea['alt'] || '人物形象图片预览' }));
+      const alt2 = event7['target']?.['closest']?.('img.story-asset-preview');
+      if (!alt2 || !floatingMenuHost?.['contains']?.(alt2)) return;
+      const mediaUrl4 = normalizeMediaUrl(alt2['currentSrc'] || alt2['getAttribute']?.('src'));
+      if (!mediaUrl4) return;
+      (event7['preventDefault'](), openImagePreview(mediaUrl4, { alt: alt2['alt'] || '人物形象图片预览' }));
     },
-    _0x2118fd = (_0x4ef9df = {}) => {
+    handler92 = (args21 = {}) => {
       return (
-        (_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-          ..._0x57b9e5,
-          workspace: { ..._0x57b9e5['workspace'], ..._0x4ef9df },
+        (initialProject2 = normalizePersonReplacementWorkspaceProject({
+          ...initialProject2,
+          workspace: { ...initialProject2['workspace'], ...args21 },
         })),
-        _0x4cf492(),
-        cloneJson(_0x57b9e5)
+        run(),
+        cloneJson(initialProject2)
       );
     },
-    _0x2515df = () => {
-      if (_0x57b9e5['workspace']['view'] !== 'home') return ![];
-      const _0x1e1806 = _0x42b7b0?.['querySelector']?.('[data-person-replacement-smart-clip-settings]'),
-        _0x1c1b99 = _0x1e1806?.['querySelector']?.(
-          '[data-person-replacement-action="toggle-smart-clip-settings"]',
-        );
-      if (!_0x1e1806 || !_0x1c1b99) return ![];
-      const _0x1a4619 = _0x57b9e5['workspace']['smartClipSettingsOpen'] === !![],
-        _0x5c59be = _0x1e1806['querySelector']?.('.person-replacement-smart-clip-settings-panel');
-      if (_0x1a4619 && !_0x5c59be && typeof _0x1e1806['insertAdjacentHTML'] !== 'function') return ![];
-      (_0x1c1b99['classList']?.['toggle']?.('is-active', _0x1a4619),
-        _0x1c1b99['setAttribute']?.('aria-expanded', String(_0x1a4619)));
-      if (_0x1a4619 && !_0x5c59be)
-        _0x1e1806['insertAdjacentHTML'](
+    handler93 = () => {
+      if (initialProject2['workspace']['view'] !== 'home') return ![];
+      const el72 = floatingMenuHost?.['querySelector']?.('[data-person-replacement-smart-clip-settings]'),
+        el73 = el72?.['querySelector']?.('[data-person-replacement-action="toggle-smart-clip-settings"]');
+      if (!el72 || !el73) return ![];
+      const enabled38 = initialProject2['workspace']['smartClipSettingsOpen'] === !![],
+        el74 = el72['querySelector']?.('.person-replacement-smart-clip-settings-panel');
+      if (enabled38 && !el74 && typeof el72['insertAdjacentHTML'] !== 'function') return ![];
+      (el73['classList']?.['toggle']?.('is-active', enabled38),
+        el73['setAttribute']?.('aria-expanded', String(enabled38)));
+      if (enabled38 && !el74)
+        el72['insertAdjacentHTML'](
           'beforeend',
-          personReplacementShellPresentation['renderSmartClipSettingsPanel'](_0x57b9e5),
+          personReplacementShellPresentation['renderSmartClipSettingsPanel'](initialProject2),
         );
-      else !_0x1a4619 && _0x5c59be?.['remove']?.();
+      else !enabled38 && el74?.['remove']?.();
       return (
-        _0x1e1806['querySelectorAll']?.('[data-smart-clip-mode]')?.['forEach']?.((_0xc5f862) => {
-          const _0x10c733 =
-            _0xc5f862['dataset']?.['smartClipMode'] === _0x57b9e5['settings']['smartClipMode'];
-          (_0xc5f862['classList']?.['toggle']?.('is-active', _0x10c733),
-            _0xc5f862['setAttribute']?.('aria-pressed', String(_0x10c733)));
+        el72['querySelectorAll']?.('[data-smart-clip-mode]')?.['forEach']?.((el75) => {
+          const value270 =
+            el75['dataset']?.['smartClipMode'] === initialProject2['settings']['smartClipMode'];
+          (el75['classList']?.['toggle']?.('is-active', value270),
+            el75['setAttribute']?.('aria-pressed', String(value270)));
         }),
-        _0x1e1806['querySelectorAll']?.('[data-smart-clip-fps]')?.['forEach']?.((_0x2d4487) => {
-          const _0x3f4aba =
-            Number(_0x2d4487['dataset']?.['smartClipFps']) === _0x57b9e5['settings']['smartClipFps'];
-          (_0x2d4487['classList']?.['toggle']?.('is-active', _0x3f4aba),
-            _0x2d4487['setAttribute']?.('aria-pressed', String(_0x3f4aba)));
+        el72['querySelectorAll']?.('[data-smart-clip-fps]')?.['forEach']?.((el76) => {
+          const value271 =
+            Number(el76['dataset']?.['smartClipFps']) === initialProject2['settings']['smartClipFps'];
+          (el76['classList']?.['toggle']?.('is-active', value271),
+            el76['setAttribute']?.('aria-pressed', String(value271)));
         }),
         !![]
       );
     },
-    _0x2583b7 = (
+    handler12 = (
       { workspace: workspace = {}, settings: settings = {} } = {},
       { notify: notify = ![] } = {},
     ) => {
-      _0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-        ..._0x57b9e5,
-        settings: { ..._0x57b9e5['settings'], ...settings },
-        workspace: { ..._0x57b9e5['workspace'], ...workspace },
+      initialProject2 = normalizePersonReplacementWorkspaceProject({
+        ...initialProject2,
+        settings: { ...initialProject2['settings'], ...settings },
+        workspace: { ...initialProject2['workspace'], ...workspace },
       });
-      if (!_0x2515df()) _0x4cf492();
-      if (notify) _0x273c17('smart-clip-settings');
-      return cloneJson(_0x57b9e5);
+      if (!handler93()) run();
+      if (notify) handler21('smart-clip-settings');
+      return cloneJson(initialProject2);
     },
-    _0x497b01 = (_0x1c0fd8) => {
-      const _0x1a1c0f = _0x42b7b0?.['querySelector']?.('[data-story-project-sort-wrap]'),
-        _0x18a01a = _0x1a1c0f?.['querySelector']?.("[data-story-action='toggle-project-sort-menu']"),
-        _0x44f5b7 = _0x1a1c0f?.['querySelector']?.('[data-story-project-sort-menu]');
-      (_0x1a1c0f?.['classList']?.['toggle']?.('is-open', _0x1c0fd8),
-        _0x18a01a?.['setAttribute']?.('aria-expanded', String(_0x1c0fd8)),
-        _0x44f5b7?.['setAttribute']?.('aria-hidden', String(!_0x1c0fd8)));
+    handler94 = (enabled39) => {
+      const el77 = floatingMenuHost?.['querySelector']?.('[data-story-project-sort-wrap]'),
+        el78 = el77?.['querySelector']?.("[data-story-action='toggle-project-sort-menu']"),
+        el79 = el77?.['querySelector']?.('[data-story-project-sort-menu]');
+      (el77?.['classList']?.['toggle']?.('is-open', enabled39),
+        el78?.['setAttribute']?.('aria-expanded', String(enabled39)),
+        el79?.['setAttribute']?.('aria-hidden', String(!enabled39)));
     },
-    _0x1399ed = (_0x26328f = null) => {
-      _0x42b7b0?.['querySelectorAll']?.('.story-home-param-picker.is-open')?.['forEach']?.((_0x3ab519) => {
-        if (_0x3ab519 === _0x26328f) return;
-        (_0x3ab519['classList']?.['remove']?.('is-open'),
-          _0x3ab519['querySelector']?.('[data-story-home-param-trigger]')?.['setAttribute']?.(
+    handler91 = (value272 = null) => {
+      floatingMenuHost?.['querySelectorAll']?.('.story-home-param-picker.is-open')?.['forEach']?.((el80) => {
+        if (el80 === value272) return;
+        (el80['classList']?.['remove']?.('is-open'),
+          el80['querySelector']?.('[data-story-home-param-trigger]')?.['setAttribute']?.(
             'aria-expanded',
             'false',
           ));
       });
     },
-    _0x403e9c = (_0x2c1e4a) => {
-      const _0x587f58 = _0x2c1e4a?.['querySelector']?.('[data-person-replacement-detection-picker-menu]'),
-        _0x2891e5 = _0x2c1e4a?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]');
-      if (!_0x587f58 || !_0x2891e5) return ![];
-      if (_0x587f58['dataset']?.['personReplacementPickerOptionsReady'] === 'true') return !![];
-      const _0x1d8e89 = normalizeText(_0x2c1e4a['dataset']?.['personReplacementDetectionPicker']);
-      let _0x1e07a9 = [];
-      if (_0x1d8e89 === 'orientation') _0x1e07a9 = getPersonOrientationOptions();
+    handler95 = (el81) => {
+      const el82 = el81?.['querySelector']?.('[data-person-replacement-detection-picker-menu]'),
+        selectedValue = el81?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]');
+      if (!el82 || !selectedValue) return ![];
+      if (el82['dataset']?.['personReplacementPickerOptionsReady'] === 'true') return !![];
+      const text14 = normalizeText(el81['dataset']?.['personReplacementDetectionPicker']);
+      let options4 = [];
+      if (text14 === 'orientation') options4 = getPersonOrientationOptions();
       else {
-        if (_0x1d8e89 === 'scope') _0x1e07a9 = getPersonReplacementScopeOptions();
+        if (text14 === 'scope') options4 = getPersonReplacementScopeOptions();
         else {
-          if (_0x1d8e89 === 'label') {
-            const _0x1b5951 = _0x2c1e4a['closest']?.('.person-replacement-detection-box'),
-              _0x106d8c = normalizeText(
-                _0x1b5951?.['dataset']?.['shotId'] || _0x57b9e5['workspace']['selectedShotId'],
+          if (text14 === 'label') {
+            const el83 = el81['closest']?.('.person-replacement-detection-box'),
+              text15 = normalizeText(
+                el83?.['dataset']?.['shotId'] || initialProject2['workspace']['selectedShotId'],
               ),
-              _0x4b75a9 = _0x57b9e5['shots']['find']((_0x188225) => _0x188225['id'] === _0x106d8c),
-              _0x5f17b2 = getPersonReplacementBoxedPeople(_0x4b75a9),
-              _0x48bdce = normalizeText(
-                _0x2891e5['querySelector']?.('[data-person-replacement-detection-picker-value]')?.[
+              value273 = initialProject2['shots']['find']((value274) => value274['id'] === text15),
+              list12 = getPersonReplacementBoxedPeople(value273),
+              selectedLabel = normalizeText(
+                selectedValue['querySelector']?.('[data-person-replacement-detection-picker-value]')?.[
                   'textContent'
                 ],
-                _0x2891e5['value'],
+                selectedValue['value'],
               );
-            _0x1e07a9 = getPersonReplacementLabelOptions({
+            options4 = getPersonReplacementLabelOptions({
               labels: [
-                ..._0x5f17b2['map']((_0x310b75, _0x4c246b) => formatPersonReplacementPersonLabel(_0x4c246b)),
-                ...getPersonReplacementReusableLabels(_0x57b9e5),
+                ...list12['map']((value275, value276) => formatPersonReplacementPersonLabel(value276)),
+                ...getPersonReplacementReusableLabels(initialProject2),
               ],
-              selectedLabel: _0x48bdce,
-              removedLabels: _0x57b9e5['workspace']['removedCustomPersonLabels'],
-              project: _0x57b9e5,
+              selectedLabel: selectedLabel,
+              removedLabels: initialProject2['workspace']['removedCustomPersonLabels'],
+              project: initialProject2,
             });
           }
         }
       }
       return (
-        (_0x587f58['innerHTML'] = personReplacementIdentityPresentation['renderOverlay']('picker-options', {
-          options: _0x1e07a9,
-          selectedValue: _0x2891e5['value'],
+        (el82['innerHTML'] = personReplacementIdentityPresentation['renderOverlay']('picker-options', {
+          options: options4,
+          selectedValue: selectedValue['value'],
         })),
-        _0x587f58['dataset'] && (_0x587f58['dataset']['personReplacementPickerOptionsReady'] = 'true'),
+        el82['dataset'] && (el82['dataset']['personReplacementPickerOptionsReady'] = 'true'),
         !![]
       );
     },
-    _0x30a2f8 = (_0x3207cf, _0x2c403f) => {
-      const _0x433ab3 = _0x3207cf?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]'),
-        _0x1b02a7 = _0x3207cf?.['querySelector']?.('[data-person-replacement-detection-picker-menu]');
-      if (_0x2c403f && !_0x403e9c(_0x3207cf)) return ![];
+    handler96 = (el84, enabled40) => {
+      const el85 = el84?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]'),
+        el86 = el84?.['querySelector']?.('[data-person-replacement-detection-picker-menu]');
+      if (enabled40 && !handler95(el84)) return ![];
       return (
-        _0x3207cf?.['classList']?.['toggle']?.('is-open', _0x2c403f),
-        _0x3207cf?.['closest']?.('.person-replacement-detection-box')?.['classList']?.['toggle']?.(
+        el84?.['classList']?.['toggle']?.('is-open', enabled40),
+        el84?.['closest']?.('.person-replacement-detection-box')?.['classList']?.['toggle']?.(
           'is-picker-open',
-          _0x2c403f,
+          enabled40,
         ),
-        _0x433ab3?.['setAttribute']?.('aria-expanded', String(_0x2c403f)),
-        _0x1b02a7?.['setAttribute']?.('aria-hidden', String(!_0x2c403f)),
-        !_0x2c403f &&
-          _0x1b02a7?.['dataset']?.['personReplacementPickerOptionsLazy'] === 'true' &&
-          ((_0x1b02a7['innerHTML'] = ''),
-          _0x1b02a7['dataset'] && delete _0x1b02a7['dataset']['personReplacementPickerOptionsReady']),
+        el85?.['setAttribute']?.('aria-expanded', String(enabled40)),
+        el86?.['setAttribute']?.('aria-hidden', String(!enabled40)),
+        !enabled40 &&
+          el86?.['dataset']?.['personReplacementPickerOptionsLazy'] === 'true' &&
+          ((el86['innerHTML'] = ''),
+          el86['dataset'] && delete el86['dataset']['personReplacementPickerOptionsReady']),
         !![]
       );
     },
-    _0x1c8c49 = (_0x35442a = null) => {
-      let _0x313908 = ![];
+    handler90 = (value277 = null) => {
+      let value278 = ![];
       return (
-        _0x42b7b0?.['querySelectorAll']?.('[data-person-replacement-detection-picker].is-open')?.[
+        floatingMenuHost?.['querySelectorAll']?.('[data-person-replacement-detection-picker].is-open')?.[
           'forEach'
-        ]?.((_0x281a70) => {
-          if (_0x281a70 === _0x35442a) return;
-          (_0x30a2f8(_0x281a70, ![]), (_0x313908 = !![]));
+        ]?.((value279) => {
+          if (value279 === value277) return;
+          (handler96(value279, ![]), (value278 = !![]));
         }),
-        _0x313908
+        value278
       );
     },
-    _0x51b3c8 = (_0x8b3198, { cancelled: cancelled = ![] } = {}) => {
-      if (!_0x8b3198 || _0x8b3198['hidden']) return ![];
-      const _0x534663 = _0x8b3198['closest']?.('[data-person-replacement-detection-picker]'),
-        _0x4ea481 = _0x8b3198['closest']?.('.person-replacement-detection-box'),
-        _0x40c536 = _0x534663?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]'),
-        _0x20a97b = _0x40c536?.['querySelector']?.('[data-person-replacement-detection-picker-value]');
-      if (!_0x534663 || !_0x40c536 || !_0x20a97b) return ![];
-      const _0x5da065 = normalizeText(_0x534663['dataset']['personReplacementPreviousValue']),
-        _0xfe3720 = normalizeText(_0x534663['dataset']['personReplacementPreviousLabel'], _0x5da065),
-        _0x3431ac = normalizeText(_0x534663['dataset']['personReplacementPreviousSourceCharacterId']),
-        _0x1b2fb3 = normalizeText(_0x8b3198['value']),
-        _0x5488d0 = cancelled || !_0x1b2fb3,
-        _0x4431a0 = _0x5488d0 ? _0x5da065 : PERSON_REPLACEMENT_CUSTOM_LABEL_VALUE,
-        _0x3b7dd3 = _0x5488d0 ? _0xfe3720 : _0x1b2fb3;
+    handler89 = (el87, { cancelled: cancelled = ![] } = {}) => {
+      if (!el87 || el87['hidden']) return ![];
+      const el88 = el87['closest']?.('[data-person-replacement-detection-picker]'),
+        detectionBox2 = el87['closest']?.('.person-replacement-detection-box'),
+        sourceCharacterId3 = el88?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]'),
+        el89 = sourceCharacterId3?.['querySelector']?.('[data-person-replacement-detection-picker-value]');
+      if (!el88 || !sourceCharacterId3 || !el89) return ![];
+      const text16 = normalizeText(el88['dataset']['personReplacementPreviousValue']),
+        text17 = normalizeText(el88['dataset']['personReplacementPreviousLabel'], text16),
+        text18 = normalizeText(el88['dataset']['personReplacementPreviousSourceCharacterId']),
+        text19 = normalizeText(el87['value']),
+        enabled41 = cancelled || !text19,
+        value280 = enabled41 ? text16 : PERSON_REPLACEMENT_CUSTOM_LABEL_VALUE,
+        label3 = enabled41 ? text17 : text19;
       return (
-        (_0x40c536['value'] = _0x4431a0),
-        (_0x40c536['dataset']['personReplacementSelectedSourceCharacterId'] = _0x5488d0
-          ? _0x3431ac
+        (sourceCharacterId3['value'] = value280),
+        (sourceCharacterId3['dataset']['personReplacementSelectedSourceCharacterId'] = enabled41
+          ? text18
           : normalizeText(
-              _0x57b9e5['shots']
-                ['find']((_0x328911) => _0x328911['id'] === normalizeText(_0x4ea481?.['dataset']?.['shotId']))
+              initialProject2['shots']
+                ['find'](
+                  (value281) => value281['id'] === normalizeText(detectionBox2?.['dataset']?.['shotId']),
+                )
                 ?.['people']?.['find'](
-                  (_0x4f7fc6) => _0x4f7fc6['id'] === normalizeText(_0x4ea481?.['dataset']?.['personId']),
+                  (value282) => value282['id'] === normalizeText(detectionBox2?.['dataset']?.['personId']),
                 )?.['sourceCharacterId'],
             )),
-        (_0x40c536['hidden'] = ![]),
-        _0x40c536['setAttribute']('aria-label', '人物名称：' + _0x3b7dd3),
-        (_0x20a97b['textContent'] = _0x3b7dd3),
-        (_0x8b3198['value'] = _0x3b7dd3),
-        (_0x8b3198['hidden'] = !![]),
-        _0x534663['querySelectorAll']?.('[data-person-replacement-detection-picker-option]')?.['forEach']?.(
-          (_0x359494) => {
-            const _0x14086e =
-              normalizeText(_0x359494['dataset']['personReplacementDetectionPickerOption']) === _0x4431a0;
-            (_0x359494['classList']?.['toggle']?.('is-selected', _0x14086e),
-              _0x359494['setAttribute']?.('aria-selected', String(_0x14086e)));
+        (sourceCharacterId3['hidden'] = ![]),
+        sourceCharacterId3['setAttribute']('aria-label', '人物名称：' + label3),
+        (el89['textContent'] = label3),
+        (el87['value'] = label3),
+        (el87['hidden'] = !![]),
+        el88['querySelectorAll']?.('[data-person-replacement-detection-picker-option]')?.['forEach']?.(
+          (el90) => {
+            const text20 =
+              normalizeText(el90['dataset']['personReplacementDetectionPickerOption']) === value280;
+            (el90['classList']?.['toggle']?.('is-selected', text20),
+              el90['setAttribute']?.('aria-selected', String(text20)));
           },
         ),
-        delete _0x534663['dataset']['personReplacementPreviousValue'],
-        delete _0x534663['dataset']['personReplacementPreviousLabel'],
-        delete _0x534663['dataset']['personReplacementPreviousSourceCharacterId'],
-        !_0x5488d0 &&
-          _0x5569e2({
-            detectionBox: _0x4ea481,
-            label: _0x3b7dd3,
-            sourceCharacterId: _0x40c536['dataset']['personReplacementSelectedSourceCharacterId'],
+        delete el88['dataset']['personReplacementPreviousValue'],
+        delete el88['dataset']['personReplacementPreviousLabel'],
+        delete el88['dataset']['personReplacementPreviousSourceCharacterId'],
+        !enabled41 &&
+          handler39({
+            detectionBox: detectionBox2,
+            label: label3,
+            sourceCharacterId: sourceCharacterId3['dataset']['personReplacementSelectedSourceCharacterId'],
           }),
-        !_0x5488d0
+        !enabled41
       );
     },
-    _0x4935d9 = (_0x3376cf) => {
-      const _0x49b660 = _0x3376cf?.['target'],
-        _0x264847 = _0x49b660?.['closest']?.('[data-story-marquee-surface="shots"]'),
-        _0x3f655c =
-          _0x57b9e5['workspace']['step'] === 0x1 &&
-          _0x57b9e5['workspace']['assetSelectionMode'] &&
-          _0x49b660?.['closest']?.('.person-replacement-assets-page'),
-        _0x49cd22 =
-          [0x2, 0x3, 0x5]['includes'](_0x57b9e5['workspace']['step']) &&
-          (_0x57b9e5['workspace']['shotSelectionMode'] ||
-            _0x57b9e5['workspace']['selectedShotIds']['length']) &&
-          _0x264847,
-        _0x71a11e = _0x49b660?.['closest']?.(PERSON_REPLACEMENT_MULTI_SELECTION_INTERACTIVE_SELECTOR),
-        _0x4124b0 = _0x49cd22 && _0x71a11e === _0x264847;
+    handler97 = (event8) => {
+      const el91 = event8?.['target'],
+        value283 = el91?.['closest']?.('[data-story-marquee-surface="shots"]'),
+        enabled42 =
+          initialProject2['workspace']['step'] === 0x1 &&
+          initialProject2['workspace']['assetSelectionMode'] &&
+          el91?.['closest']?.('.person-replacement-assets-page'),
+        enabled43 =
+          [0x2, 0x3, 0x5]['includes'](initialProject2['workspace']['step']) &&
+          (initialProject2['workspace']['shotSelectionMode'] ||
+            initialProject2['workspace']['selectedShotIds']['length']) &&
+          value283,
+        value284 = el91?.['closest']?.(PERSON_REPLACEMENT_MULTI_SELECTION_INTERACTIVE_SELECTOR),
+        enabled44 = enabled43 && value284 === value283;
       if (
-        _0x57b9e5['workspace']['view'] !== 'project' ||
-        (!_0x3f655c && !_0x49cd22) ||
-        (_0x71a11e && !_0x4124b0)
+        initialProject2['workspace']['view'] !== 'project' ||
+        (!enabled42 && !enabled43) ||
+        (value284 && !enabled44)
       )
         return ![];
       return (
-        _0x4d8968?.['cancel']?.(),
-        _0x26d845(
+        workspaceMarqueeSelectionController?.['cancel']?.(),
+        updateProject(
           {
-            ..._0x57b9e5,
+            ...initialProject2,
             workspace: {
-              ..._0x57b9e5['workspace'],
-              ...(_0x49cd22
+              ...initialProject2['workspace'],
+              ...(enabled43
                 ? { shotSelectionMode: ![], selectedShotIds: [] }
                 : { assetSelectionMode: ![], selectedAssetIds: [] }),
             },
           },
-          _0x49cd22 ? 'shot-selection-cancel' : 'asset-selection-cancel',
+          enabled43 ? 'shot-selection-cancel' : 'asset-selection-cancel',
         ),
         !![]
       );
     },
-    _0x560d76 = (_0xed9468) => {
-      const _0x23ad15 = () => {
-        const _0x628b9a = Array['from'](
-          _0x42b7b0?.['querySelectorAll']?.('[data-story-project-title]') || [],
-        )['find'](
-          (_0x6d4474) =>
-            normalizeText(_0x6d4474['dataset']['storyProjectTitle']) === normalizeText(_0xed9468),
-        );
-        (_0x628b9a?.['focus']?.(), _0x628b9a?.['select']?.());
+    handler98 = (value285) => {
+      const value286 = () => {
+        const el92 = Array['from'](
+          floatingMenuHost?.['querySelectorAll']?.('[data-story-project-title]') || [],
+        )['find']((el93) => normalizeText(el93['dataset']['storyProjectTitle']) === normalizeText(value285));
+        (el92?.['focus']?.(), el92?.['select']?.());
       };
       typeof windowObject?.['requestAnimationFrame'] === 'function'
-        ? windowObject['requestAnimationFrame'](_0x23ad15)
-        : globalThis['queueMicrotask']?.(_0x23ad15);
+        ? windowObject['requestAnimationFrame'](value286)
+        : globalThis['queueMicrotask']?.(value286);
     },
-    _0x478e16 = (_0x2849af, _0x1797b4) => {
-      if (_0x57b9e5['workspace']['view'] === 'home' && _0x1797b4 === 'toggle-project-sort-menu') {
-        const _0xf352cc = _0x2849af['closest']?.('[data-story-project-sort-wrap]');
-        _0x497b01(!_0xf352cc?.['classList']?.['contains']?.('is-open'));
+    handler99 = (projectId, archived) => {
+      if (initialProject2['workspace']['view'] === 'home' && archived === 'toggle-project-sort-menu') {
+        const el94 = projectId['closest']?.('[data-story-project-sort-wrap]');
+        handler94(!el94?.['classList']?.['contains']?.('is-open'));
       } else {
-        if (_0x57b9e5['workspace']['view'] === 'home' && _0x1797b4 === 'select-project-sort')
-          _0x2118fd({
+        if (initialProject2['workspace']['view'] === 'home' && archived === 'select-project-sort')
+          handler92({
             projectSortOrder: normalizeWorkspaceProjectSortOrder(
-              _0x2849af['dataset']['storyProjectSortOption'],
+              projectId['dataset']['storyProjectSortOption'],
             ),
           });
         else {
-          if (_0x57b9e5['workspace']['view'] === 'home' && _0x1797b4 === 'toggle-archived-projects')
-            _0x2118fd({
-              showArchivedProjects: !_0x57b9e5['workspace']['showArchivedProjects'],
+          if (initialProject2['workspace']['view'] === 'home' && archived === 'toggle-archived-projects')
+            handler92({
+              showArchivedProjects: !initialProject2['workspace']['showArchivedProjects'],
               openProjectMenuId: '',
               pendingDeleteProjectId: '',
             });
           else {
-            if (_0x57b9e5['workspace']['view'] === 'home' && _0x1797b4 === 'toggle-project-menu') {
-              const _0x2527a2 = normalizeText(_0x2849af['dataset']['storyProjectId']);
-              _0x2118fd({
-                openProjectMenuId: _0x57b9e5['workspace']['openProjectMenuId'] === _0x2527a2 ? '' : _0x2527a2,
+            if (initialProject2['workspace']['view'] === 'home' && archived === 'toggle-project-menu') {
+              const text21 = normalizeText(projectId['dataset']['storyProjectId']);
+              handler92({
+                openProjectMenuId: initialProject2['workspace']['openProjectMenuId'] === text21 ? '' : text21,
                 pendingDeleteProjectId: '',
               });
             } else {
-              if (_0x57b9e5['workspace']['view'] === 'home' && _0x1797b4 === 'rename-project') {
-                const _0x3fb59b = normalizeText(_0x2849af['dataset']['storyProjectId']);
-                (_0x2118fd({ openProjectMenuId: '', pendingDeleteProjectId: '' }), _0x560d76(_0x3fb59b));
+              if (initialProject2['workspace']['view'] === 'home' && archived === 'rename-project') {
+                const text22 = normalizeText(projectId['dataset']['storyProjectId']);
+                (handler92({ openProjectMenuId: '', pendingDeleteProjectId: '' }), handler98(text22));
               } else {
-                if (_0x57b9e5['workspace']['view'] === 'home' && _0x1797b4 === 'duplicate-project')
-                  _0x4e3281(_0x43f995['DUPLICATE_PROJECT'], {
-                    projectId: _0x2849af['dataset']['storyProjectId'],
+                if (initialProject2['workspace']['view'] === 'home' && archived === 'duplicate-project')
+                  runIntent(downloadImageIntent['DUPLICATE_PROJECT'], {
+                    projectId: projectId['dataset']['storyProjectId'],
                   });
                 else {
-                  if (_0x57b9e5['workspace']['view'] === 'home' && _0x1797b4 === 'collect-project')
-                    _0x4e3281(_0x43f995['COLLECT_PROJECT'], {
-                      projectId: _0x2849af['dataset']['storyProjectId'],
+                  if (initialProject2['workspace']['view'] === 'home' && archived === 'collect-project')
+                    runIntent(downloadImageIntent['COLLECT_PROJECT'], {
+                      projectId: projectId['dataset']['storyProjectId'],
                     });
                   else {
-                    if (_0x57b9e5['workspace']['view'] === 'home' && _0x1797b4 === 'import-project')
-                      _0x4e3281(_0x43f995['IMPORT_PROJECT']);
+                    if (initialProject2['workspace']['view'] === 'home' && archived === 'import-project')
+                      runIntent(downloadImageIntent['IMPORT_PROJECT']);
                     else {
                       if (
-                        _0x57b9e5['workspace']['view'] === 'home' &&
-                        (_0x1797b4 === 'archive-project' || _0x1797b4 === 'unarchive-project')
+                        initialProject2['workspace']['view'] === 'home' &&
+                        (archived === 'archive-project' || archived === 'unarchive-project')
                       )
-                        _0x4e3281(_0x43f995['ARCHIVE_PROJECT'], {
-                          projectId: _0x2849af['dataset']['storyProjectId'],
-                          archived: _0x1797b4 === 'archive-project',
+                        runIntent(downloadImageIntent['ARCHIVE_PROJECT'], {
+                          projectId: projectId['dataset']['storyProjectId'],
+                          archived: archived === 'archive-project',
                         });
                       else {
                         if (
-                          _0x57b9e5['workspace']['view'] === 'home' &&
-                          _0x1797b4 === 'request-delete-project'
+                          initialProject2['workspace']['view'] === 'home' &&
+                          archived === 'request-delete-project'
                         )
-                          _0x2118fd({
+                          handler92({
                             openProjectMenuId: '',
-                            pendingDeleteProjectId: normalizeText(_0x2849af['dataset']['storyProjectId']),
+                            pendingDeleteProjectId: normalizeText(projectId['dataset']['storyProjectId']),
                           });
                         else {
                           if (
-                            _0x57b9e5['workspace']['view'] === 'home' &&
-                            _0x1797b4 === 'cancel-delete-project'
+                            initialProject2['workspace']['view'] === 'home' &&
+                            archived === 'cancel-delete-project'
                           )
-                            _0x2118fd({ pendingDeleteProjectId: '' });
+                            handler92({ pendingDeleteProjectId: '' });
                           else {
                             if (
-                              _0x57b9e5['workspace']['view'] === 'home' &&
-                              _0x1797b4 === 'confirm-delete-project'
+                              initialProject2['workspace']['view'] === 'home' &&
+                              archived === 'confirm-delete-project'
                             )
-                              _0x4e3281(_0x43f995['DELETE_PROJECT'], {
-                                projectId: _0x2849af['dataset']['storyProjectId'],
+                              runIntent(downloadImageIntent['DELETE_PROJECT'], {
+                                projectId: projectId['dataset']['storyProjectId'],
                               });
                             else {
                               if (
-                                _0x1797b4 === 'target-previous-appearance' ||
-                                _0x1797b4 === 'target-next-appearance'
+                                archived === 'target-previous-appearance' ||
+                                archived === 'target-next-appearance'
                               ) {
-                                const _0x23618b = _0x2849af['closest']?.(
+                                const el95 = projectId['closest']?.(
                                   '[data-person-replacement-target-controls]',
                                 );
-                                _0x1c6c30(
-                                  _0x23618b?.['dataset']?.['personReplacementTargetControls'],
-                                  _0x1797b4 === 'target-next-appearance' ? 0x1 : -0x1,
+                                handler79(
+                                  el95?.['dataset']?.['personReplacementTargetControls'],
+                                  archived === 'target-next-appearance' ? 0x1 : -0x1,
                                 );
                               } else {
                                 if (
-                                  _0x1797b4 === 'video-reference-previous-result' ||
-                                  _0x1797b4 === 'video-reference-next-result'
+                                  archived === 'video-reference-previous-result' ||
+                                  archived === 'video-reference-next-result'
                                 ) {
-                                  const _0xfcb3f9 = _0x2849af['closest']?.(
+                                  const sourceShotId2 = projectId['closest']?.(
                                     '[data-person-replacement-video-reference-controls]',
                                   );
-                                  _0x4f2b4a({
+                                  switchVideoReferenceResult({
                                     sourceShotId:
-                                      _0xfcb3f9?.['dataset']?.['personReplacementVideoReferenceControls'],
+                                      sourceShotId2?.['dataset']?.['personReplacementVideoReferenceControls'],
                                     currentResultIndex:
-                                      _0xfcb3f9?.['dataset']?.['personReplacementVideoReferenceResultIndex'],
-                                    delta: _0x1797b4 === 'video-reference-next-result' ? 0x1 : -0x1,
+                                      sourceShotId2?.['dataset']?.[
+                                        'personReplacementVideoReferenceResultIndex'
+                                      ],
+                                    delta: archived === 'video-reference-next-result' ? 0x1 : -0x1,
                                   });
                                 } else {
-                                  if (_0x1797b4 === 'cancel-asset-selection')
-                                    _0x26d845(
+                                  if (archived === 'cancel-asset-selection')
+                                    updateProject(
                                       {
-                                        ..._0x57b9e5,
+                                        ...initialProject2,
                                         workspace: {
-                                          ..._0x57b9e5['workspace'],
+                                          ...initialProject2['workspace'],
                                           assetSelectionMode: ![],
                                           selectedAssetIds: [],
                                         },
@@ -3520,308 +3618,309 @@ export function createReplacementStudioWorkspace({
                                       'asset-selection-cancel',
                                     );
                                   else {
-                                    if (_0x1797b4 === 'cancel-shot-batch-generation') _0x1d3a8e();
+                                    if (archived === 'cancel-shot-batch-generation') cancelShotBatch();
                                     else {
-                                      if (_0x1797b4 === 'cancel-asset-batch-generation') _0x3f648b();
+                                      if (archived === 'cancel-asset-batch-generation') cancelAssetBatch();
                                       else {
-                                        if (_0x1797b4 === 'toggle-all-assets') {
-                                          const _0x27012d = getPersonReplacementSelectableAssets(
-                                              _0x57b9e5,
-                                              _0x57b9e5['workspace']['characterAssetTab'],
+                                        if (archived === 'toggle-all-assets') {
+                                          const list13 = getPersonReplacementSelectableAssets(
+                                              initialProject2,
+                                              initialProject2['workspace']['characterAssetTab'],
                                             ),
-                                            _0x9d5843 =
-                                              _0x27012d['length'] > 0x0 &&
-                                              _0x27012d['every']((_0x3545e2) =>
-                                                _0x57b9e5['workspace']['selectedAssetIds']['includes'](
-                                                  _0x3545e2['id'],
+                                            selectedAssetIds =
+                                              list13['length'] > 0x0 &&
+                                              list13['every']((value287) =>
+                                                initialProject2['workspace']['selectedAssetIds']['includes'](
+                                                  value287['id'],
                                                 ),
                                               );
-                                          _0x26d845(
+                                          updateProject(
                                             {
-                                              ..._0x57b9e5,
+                                              ...initialProject2,
                                               workspace: {
-                                                ..._0x57b9e5['workspace'],
-                                                selectedAssetIds: _0x9d5843
+                                                ...initialProject2['workspace'],
+                                                selectedAssetIds: selectedAssetIds
                                                   ? []
-                                                  : _0x27012d['map']((_0x39bff8) => _0x39bff8['id']),
-                                                assetSelectionMode: !_0x9d5843 && _0x27012d['length'] > 0x0,
+                                                  : list13['map']((value288) => value288['id']),
+                                                assetSelectionMode:
+                                                  !selectedAssetIds && list13['length'] > 0x0,
                                               },
                                             },
                                             'asset-selection-all',
                                           );
                                         } else {
-                                          if (_0x1797b4 === 'toggle-all-shots') {
-                                            const _0x3df4c1 = _0x57b9e5['shots']['every']((_0x4bb489) =>
-                                              _0x57b9e5['workspace']['selectedShotIds']['includes'](
-                                                _0x4bb489['id'],
-                                              ),
+                                          if (archived === 'toggle-all-shots') {
+                                            const selectedShotIds = initialProject2['shots']['every'](
+                                              (value289) =>
+                                                initialProject2['workspace']['selectedShotIds']['includes'](
+                                                  value289['id'],
+                                                ),
                                             );
-                                            _0x26d845(
+                                            updateProject(
                                               {
-                                                ..._0x57b9e5,
+                                                ...initialProject2,
                                                 workspace: {
-                                                  ..._0x57b9e5['workspace'],
-                                                  shotSelectionMode: !_0x3df4c1,
-                                                  selectedShotIds: _0x3df4c1
+                                                  ...initialProject2['workspace'],
+                                                  shotSelectionMode: !selectedShotIds,
+                                                  selectedShotIds: selectedShotIds
                                                     ? []
-                                                    : _0x57b9e5['shots']['map'](
-                                                        (_0x88cd54) => _0x88cd54['id'],
+                                                    : initialProject2['shots']['map'](
+                                                        (value290) => value290['id'],
                                                       ),
                                                 },
                                               },
                                               'shot-selection-all',
                                             );
                                           } else {
-                                            if (_0x1797b4 === 'previous-appearance')
-                                              _0x4d01cc(-0x1, _0x2849af['dataset']['storyCardAppearanceId']);
+                                            if (archived === 'previous-appearance')
+                                              handler73(-0x1, projectId['dataset']['storyCardAppearanceId']);
                                             else {
-                                              if (_0x1797b4 === 'next-appearance')
-                                                _0x4d01cc(0x1, _0x2849af['dataset']['storyCardAppearanceId']);
+                                              if (archived === 'next-appearance')
+                                                handler73(0x1, projectId['dataset']['storyCardAppearanceId']);
                                               else {
-                                                if (_0x1797b4 === 'previous-audio-bound-character')
-                                                  _0x6f1208(-0x1);
+                                                if (archived === 'previous-audio-bound-character')
+                                                  handler74(-0x1);
                                                 else {
-                                                  if (_0x1797b4 === 'next-audio-bound-character')
-                                                    _0x6f1208(0x1);
+                                                  if (archived === 'next-audio-bound-character')
+                                                    handler74(0x1);
                                                   else {
-                                                    if (_0x1797b4 === 'previous-shot') _0x38b343(-0x1);
+                                                    if (archived === 'previous-shot') handler77(-0x1);
                                                     else {
-                                                      if (_0x1797b4 === 'next-shot') _0x38b343(0x1);
+                                                      if (archived === 'next-shot') handler77(0x1);
                                                       else {
-                                                        if (_0x1797b4 === 'previous-replacement-image-result')
-                                                          _0x110efe(-0x1);
+                                                        if (archived === 'previous-replacement-image-result')
+                                                          switchImageResult(-0x1);
                                                         else {
-                                                          if (_0x1797b4 === 'next-replacement-image-result')
-                                                            _0x110efe(0x1);
+                                                          if (archived === 'next-replacement-image-result')
+                                                            switchImageResult(0x1);
                                                           else {
                                                             if (
-                                                              _0x1797b4 ===
-                                                              'previous-replacement-video-result'
+                                                              archived === 'previous-replacement-video-result'
                                                             )
-                                                              _0x473d04(-0x1);
+                                                              switchVideoResult(-0x1);
                                                             else {
                                                               if (
-                                                                _0x1797b4 === 'next-replacement-video-result'
+                                                                archived === 'next-replacement-video-result'
                                                               )
-                                                                _0x473d04(0x1);
+                                                                switchVideoResult(0x1);
                                                               else {
                                                                 if (
-                                                                  _0x1797b4 === 'select-video-shot-reference'
+                                                                  archived === 'select-video-shot-reference'
                                                                 )
-                                                                  _0x3b2204(
-                                                                    _0x2849af['dataset']['shotId'] ||
-                                                                      _0x57b9e5['workspace'][
+                                                                  selectVideoReference(
+                                                                    projectId['dataset']['shotId'] ||
+                                                                      initialProject2['workspace'][
                                                                         'selectedShotId'
                                                                       ],
-                                                                    _0x2849af['dataset'][
+                                                                    projectId['dataset'][
                                                                       'personReplacementVideoReferenceIndex'
                                                                     ],
                                                                     {
                                                                       sourceShotId:
-                                                                        _0x2849af['dataset'][
+                                                                        projectId['dataset'][
                                                                           'personReplacementVideoReferenceSourceShotId'
                                                                         ],
                                                                       resultIndex:
-                                                                        _0x2849af['dataset'][
+                                                                        projectId['dataset'][
                                                                           'personReplacementVideoReferenceResultIndex'
                                                                         ],
                                                                       referencePersonId:
-                                                                        _0x2849af['dataset'][
+                                                                        projectId['dataset'][
                                                                           'personReplacementVideoCharacterReference'
                                                                         ],
                                                                       referenceKind:
-                                                                        _0x2849af['dataset'][
+                                                                        projectId['dataset'][
                                                                           'personReplacementVideoReferenceKind'
                                                                         ],
                                                                     },
                                                                   );
                                                                 else {
                                                                   if (
-                                                                    _0x1797b4 ===
+                                                                    archived ===
                                                                     'select-replacement-image-result'
                                                                   )
-                                                                    (_0x2e11e0(
-                                                                      _0x2849af['dataset']['shotId'],
-                                                                      _0x2849af['dataset'][
+                                                                    (selectImageResult(
+                                                                      projectId['dataset']['shotId'],
+                                                                      projectId['dataset'][
                                                                         'replacementImageResultIndex'
                                                                       ],
                                                                     ),
-                                                                      _0x4aeba7?.['refresh']());
+                                                                      ctx?.['refresh']());
                                                                   else {
                                                                     if (
-                                                                      _0x1797b4 ===
+                                                                      archived ===
                                                                       'set-replacement-image-reference'
                                                                     )
-                                                                      _0x3d31c5(
-                                                                        _0x2849af['dataset']['shotId'],
-                                                                        _0x2849af['dataset'][
+                                                                      setImageReference(
+                                                                        projectId['dataset']['shotId'],
+                                                                        projectId['dataset'][
                                                                           'replacementImageResultIndex'
                                                                         ],
                                                                       );
                                                                     else {
                                                                       if (
-                                                                        _0x1797b4 ===
+                                                                        archived ===
                                                                         'delete-replacement-image-result'
                                                                       )
-                                                                        _0x2f0478(
-                                                                          _0x2849af['dataset']['shotId'],
-                                                                          _0x2849af['dataset'][
+                                                                        deleteImageResult(
+                                                                          projectId['dataset']['shotId'],
+                                                                          projectId['dataset'][
                                                                             'replacementImageResultIndex'
                                                                           ],
                                                                         );
                                                                       else {
                                                                         if (
-                                                                          _0x1797b4 ===
+                                                                          archived ===
                                                                           'select-replacement-video-result'
                                                                         )
-                                                                          (_0x5f1af7(
-                                                                            _0x2849af['dataset']['shotId'],
-                                                                            _0x2849af['dataset'][
+                                                                          (selectVideoResult(
+                                                                            projectId['dataset']['shotId'],
+                                                                            projectId['dataset'][
                                                                               'replacementVideoResultIndex'
                                                                             ],
                                                                           ),
-                                                                            _0x4aeba7?.['refresh']());
+                                                                            ctx?.['refresh']());
                                                                         else {
                                                                           if (
-                                                                            _0x1797b4 ===
+                                                                            archived ===
                                                                             'set-replacement-video-reference'
                                                                           )
-                                                                            _0x7e07c0(
-                                                                              _0x2849af['dataset']['shotId'],
-                                                                              _0x2849af['dataset'][
+                                                                            setVideoReference(
+                                                                              projectId['dataset']['shotId'],
+                                                                              projectId['dataset'][
                                                                                 'replacementVideoResultIndex'
                                                                               ],
                                                                             );
                                                                           else {
                                                                             if (
-                                                                              _0x1797b4 ===
+                                                                              archived ===
                                                                               'delete-replacement-video-result'
                                                                             )
-                                                                              _0x2727d8(
-                                                                                _0x2849af['dataset'][
+                                                                              deleteVideoResult(
+                                                                                projectId['dataset'][
                                                                                   'shotId'
                                                                                 ],
-                                                                                _0x2849af['dataset'][
+                                                                                projectId['dataset'][
                                                                                   'replacementVideoResultIndex'
                                                                                 ],
                                                                               );
                                                                             else {
                                                                               if (
-                                                                                _0x1797b4 ===
+                                                                                archived ===
                                                                                 'download-asset-image'
                                                                               )
-                                                                                _0x3f9454(
-                                                                                  _0x2849af,
-                                                                                  _0x295d0b(),
+                                                                                requestImageDownload(
+                                                                                  projectId,
+                                                                                  handler46(),
                                                                                 );
                                                                               else {
                                                                                 if (
-                                                                                  _0x1797b4 ===
+                                                                                  archived ===
                                                                                   'add-asset-appearance-to-library'
                                                                                 )
                                                                                   void addPersonReplacementAppearanceToLibraryWithFly(
-                                                                                    _0x42b7b0,
-                                                                                    _0xe8cb52(),
-                                                                                    _0x391a96(),
-                                                                                    _0x52549f(
-                                                                                      _0x43f995[
+                                                                                    floatingMenuHost,
+                                                                                    characterId(),
+                                                                                    handler13(),
+                                                                                    onShotKeyframeSelected(
+                                                                                      downloadImageIntent[
                                                                                         'ADD_ASSET_APPEARANCE_TO_LIBRARY'
                                                                                       ],
                                                                                     ),
-                                                                                    _0x267b3,
+                                                                                    handler11,
                                                                                     documentObject,
                                                                                     windowObject,
                                                                                   );
                                                                                 else {
                                                                                   if (
-                                                                                    _0x1797b4 ===
+                                                                                    archived ===
                                                                                     'download-replacement-image'
                                                                                   )
-                                                                                    _0x3f9454(
-                                                                                      _0x2849af,
-                                                                                      _0x570287(),
+                                                                                    requestImageDownload(
+                                                                                      projectId,
+                                                                                      getSelectedReplacementImageDownloadRequest(),
                                                                                     );
                                                                                   else {
                                                                                     if (
-                                                                                      _0x1797b4 ===
+                                                                                      archived ===
                                                                                       'upload-replacement-image'
                                                                                     )
-                                                                                      ((_0x40a90d = {
+                                                                                      ((value45 = {
                                                                                         kind: 'replacement-image',
                                                                                         shotId:
-                                                                                          _0x57b9e5[
+                                                                                          initialProject2[
                                                                                             'workspace'
                                                                                           ]['selectedShotId'],
                                                                                       }),
-                                                                                        _0x42b7b0[
+                                                                                        floatingMenuHost[
                                                                                           'querySelector'
                                                                                         ](
                                                                                           "[data-person-replacement-input='replacement-image']",
                                                                                         )?.['click']?.());
                                                                                     else {
                                                                                       if (
-                                                                                        _0x1797b4 ===
+                                                                                        archived ===
                                                                                         'download-replacement-video'
                                                                                       )
-                                                                                        _0x47874c(
-                                                                                          _0x2849af,
-                                                                                          _0x22da78(),
+                                                                                        requestVideoDownload(
+                                                                                          projectId,
+                                                                                          getSelectedReplacementVideoDownloadRequest(),
                                                                                         );
                                                                                       else {
                                                                                         if (
-                                                                                          _0x1797b4 ===
+                                                                                          archived ===
                                                                                           'upload-replacement-video'
                                                                                         )
-                                                                                          ((_0x116a03 =
-                                                                                            _0x2849af),
-                                                                                            (_0x40a90d = {
+                                                                                          ((value46 =
+                                                                                            projectId),
+                                                                                            (value45 = {
                                                                                               kind: 'replacement-video',
                                                                                               shotId:
-                                                                                                _0x57b9e5[
+                                                                                                initialProject2[
                                                                                                   'workspace'
                                                                                                 ][
                                                                                                   'selectedShotId'
                                                                                                 ],
                                                                                             }),
-                                                                                            _0x42b7b0[
+                                                                                            floatingMenuHost[
                                                                                               'querySelector'
                                                                                             ](
                                                                                               "[data-person-replacement-input='replacement-video-result']",
                                                                                             )?.['click']?.());
                                                                                         else {
                                                                                           if (
-                                                                                            _0x1797b4 ===
+                                                                                            archived ===
                                                                                             'upload-asset'
                                                                                           ) {
-                                                                                            const _0x479c43 =
-                                                                                                _0xe8cb52(
-                                                                                                  _0x2849af[
+                                                                                            const characterId2 =
+                                                                                                characterId(
+                                                                                                  projectId[
                                                                                                     'dataset'
                                                                                                   ][
                                                                                                     'storyCardAppearanceId'
                                                                                                   ] ||
-                                                                                                    _0x57b9e5[
+                                                                                                    initialProject2[
                                                                                                       'workspace'
                                                                                                     ][
                                                                                                       'selectedCharacterId'
                                                                                                     ],
                                                                                                 ),
-                                                                                              _0x2d7e9c =
-                                                                                                _0x391a96(
-                                                                                                  _0x479c43,
+                                                                                              appearanceId =
+                                                                                                handler13(
+                                                                                                  characterId2,
                                                                                                 );
-                                                                                            ((_0x40a90d = {
+                                                                                            ((value45 = {
                                                                                               kind: 'appearance',
                                                                                               characterId:
-                                                                                                _0x479c43?.[
+                                                                                                characterId2?.[
                                                                                                   'id'
                                                                                                 ],
                                                                                               appearanceId:
-                                                                                                _0x2d7e9c?.[
+                                                                                                appearanceId?.[
                                                                                                   'id'
                                                                                                 ],
                                                                                             }),
-                                                                                              _0x42b7b0[
+                                                                                              floatingMenuHost[
                                                                                                 'querySelector'
                                                                                               ](
                                                                                                 "[data-person-replacement-input='appearance-image']",
@@ -3830,88 +3929,88 @@ export function createReplacementStudioWorkspace({
                                                                                               ]?.());
                                                                                           } else {
                                                                                             if (
-                                                                                              _0x1797b4 ===
+                                                                                              archived ===
                                                                                               'toggle-character-voice-menu'
                                                                                             ) {
-                                                                                              const _0x5d9c92 =
-                                                                                                  _0x2849af[
+                                                                                              const el96 =
+                                                                                                  projectId[
                                                                                                     'closest'
                                                                                                   ]?.(
                                                                                                     '.person-replacement-add-voice-menu-wrap',
                                                                                                   ),
-                                                                                                _0x3d58b6 =
-                                                                                                  !_0x5d9c92?.[
+                                                                                                value291 =
+                                                                                                  !el96?.[
                                                                                                     'classList'
                                                                                                   ]?.[
                                                                                                     'contains'
                                                                                                   ]?.(
                                                                                                     'is-open',
                                                                                                   );
-                                                                                              (_0x4ba512(
-                                                                                                _0x5d9c92,
+                                                                                              (handler38(
+                                                                                                el96,
                                                                                               ),
-                                                                                                _0x28395d(
-                                                                                                  _0x5d9c92,
-                                                                                                  _0x3d58b6,
+                                                                                                handler37(
+                                                                                                  el96,
+                                                                                                  value291,
                                                                                                 ));
                                                                                             } else {
                                                                                               if (
-                                                                                                _0x1797b4 ===
+                                                                                                archived ===
                                                                                                 'remove-character-voice'
                                                                                               ) {
-                                                                                                _0x4ba512();
-                                                                                                const _0x16a835 =
-                                                                                                  _0xe8cb52();
+                                                                                                handler38();
+                                                                                                const enabled45 =
+                                                                                                  characterId();
                                                                                                 if (
-                                                                                                  !_0x16a835
+                                                                                                  !enabled45
                                                                                                 )
                                                                                                   return;
-                                                                                                (_0x196980(),
-                                                                                                  _0x26d845(
+                                                                                                (stopPreview(),
+                                                                                                  updateProject(
                                                                                                     {
-                                                                                                      ..._0x57b9e5,
+                                                                                                      ...initialProject2,
                                                                                                       characters:
-                                                                                                        _0x57b9e5[
+                                                                                                        initialProject2[
                                                                                                           'characters'
                                                                                                         ][
                                                                                                           'map'
                                                                                                         ](
                                                                                                           (
-                                                                                                            _0x580fa6,
+                                                                                                            args22,
                                                                                                           ) =>
-                                                                                                            _0x580fa6[
+                                                                                                            args22[
                                                                                                               'id'
                                                                                                             ] ===
-                                                                                                            _0x16a835[
+                                                                                                            enabled45[
                                                                                                               'id'
                                                                                                             ]
                                                                                                               ? {
-                                                                                                                  ..._0x580fa6,
+                                                                                                                  ...args22,
                                                                                                                   voiceReference:
                                                                                                                     null,
                                                                                                                   voiceRef:
                                                                                                                     '',
                                                                                                                 }
-                                                                                                              : _0x580fa6,
+                                                                                                              : args22,
                                                                                                         ),
                                                                                                     },
                                                                                                     'remove-character-voice',
                                                                                                   ));
                                                                                               } else {
                                                                                                 if (
-                                                                                                  _0x1797b4 ===
+                                                                                                  archived ===
                                                                                                   'upload-character-voice'
                                                                                                 )
-                                                                                                  (_0x4ba512(),
-                                                                                                    (_0x40a90d =
+                                                                                                  (handler38(),
+                                                                                                    (value45 =
                                                                                                       {
                                                                                                         kind: 'voice',
                                                                                                         characterId:
-                                                                                                          _0xe8cb52()?.[
+                                                                                                          characterId()?.[
                                                                                                             'id'
                                                                                                           ],
                                                                                                       }),
-                                                                                                    _0x42b7b0[
+                                                                                                    floatingMenuHost[
                                                                                                       'querySelector'
                                                                                                     ](
                                                                                                       '[data-person-replacement-input=\x27character-voice\x27]',
@@ -3920,14 +4019,14 @@ export function createReplacementStudioWorkspace({
                                                                                                     ]?.());
                                                                                                 else {
                                                                                                   if (
-                                                                                                    _0x1797b4 ===
+                                                                                                    archived ===
                                                                                                     'choose-character-voice-from-library'
                                                                                                   ) {
-                                                                                                    _0x4ba512();
-                                                                                                    const _0x4adfc4 =
-                                                                                                      _0xe8cb52();
+                                                                                                    handler38();
+                                                                                                    const enabled46 =
+                                                                                                      characterId();
                                                                                                     if (
-                                                                                                      !_0x4adfc4
+                                                                                                      !enabled46
                                                                                                     ) {
                                                                                                       windowObject?.[
                                                                                                         'showToast'
@@ -3937,55 +4036,55 @@ export function createReplacementStudioWorkspace({
                                                                                                       );
                                                                                                       return;
                                                                                                     }
-                                                                                                    const _0xfed31a =
-                                                                                                        _0x57b9e5,
-                                                                                                      _0x33fc07 =
+                                                                                                    const args23 =
+                                                                                                        initialProject2,
+                                                                                                      list14 =
                                                                                                         getPersonReplacementProjectAudioAssets(
-                                                                                                          _0xfed31a,
+                                                                                                          args23,
                                                                                                         ),
-                                                                                                      _0x1a37ec =
-                                                                                                        _0x33fc07[
+                                                                                                      selectedAudioAssetId =
+                                                                                                        list14[
                                                                                                           'find'
                                                                                                         ](
                                                                                                           (
-                                                                                                            _0x431fb7,
+                                                                                                            value292,
                                                                                                           ) =>
                                                                                                             getPersonReplacementVoiceLibraryBoundCharacters(
-                                                                                                              _0xfed31a,
-                                                                                                              _0x431fb7,
+                                                                                                              args23,
+                                                                                                              value292,
                                                                                                             )[
                                                                                                               'some'
                                                                                                             ](
                                                                                                               (
-                                                                                                                _0x4177b8,
+                                                                                                                value293,
                                                                                                               ) =>
-                                                                                                                _0x4177b8[
+                                                                                                                value293[
                                                                                                                   'id'
                                                                                                                 ] ===
-                                                                                                                _0x4adfc4[
+                                                                                                                enabled46[
                                                                                                                   'id'
                                                                                                                 ],
                                                                                                             ),
                                                                                                         );
-                                                                                                    ((_0x834763 =
-                                                                                                      _0x4adfc4[
+                                                                                                    ((voiceLibraryTargetCharacterId =
+                                                                                                      enabled46[
                                                                                                         'id'
                                                                                                       ]),
-                                                                                                      _0x26d845(
+                                                                                                      updateProject(
                                                                                                         {
-                                                                                                          ..._0xfed31a,
+                                                                                                          ...args23,
                                                                                                           workspace:
                                                                                                             {
-                                                                                                              ..._0xfed31a[
+                                                                                                              ...args23[
                                                                                                                 'workspace'
                                                                                                               ],
                                                                                                               characterAssetTab:
                                                                                                                 'audio',
                                                                                                               selectedAudioAssetId:
-                                                                                                                _0x1a37ec?.[
+                                                                                                                selectedAudioAssetId?.[
                                                                                                                   'id'
                                                                                                                 ] ||
-                                                                                                                _0x33fc07[0x0]?.[
+                                                                                                                list14[0x0]?.[
                                                                                                                   'id'
                                                                                                                 ] ||
                                                                                                                 '',
@@ -3999,123 +4098,123 @@ export function createReplacementStudioWorkspace({
                                                                                                       ));
                                                                                                   } else {
                                                                                                     if (
-                                                                                                      _0x1797b4 ===
+                                                                                                      archived ===
                                                                                                       'set-base-appearance'
                                                                                                     ) {
-                                                                                                      const _0x313443 =
-                                                                                                          _0xe8cb52(),
-                                                                                                        _0x1298ac =
-                                                                                                          _0x391a96(
-                                                                                                            _0x313443,
+                                                                                                      const value294 =
+                                                                                                          characterId(),
+                                                                                                        baseAppearanceId =
+                                                                                                          handler13(
+                                                                                                            value294,
                                                                                                           ),
-                                                                                                        _0x3f686e =
-                                                                                                          _0x57b9e5[
+                                                                                                        characters =
+                                                                                                          initialProject2[
                                                                                                             'characters'
                                                                                                           ][
                                                                                                             'map'
                                                                                                           ](
                                                                                                             (
-                                                                                                              _0x6db60c,
+                                                                                                              args24,
                                                                                                             ) =>
-                                                                                                              _0x6db60c[
+                                                                                                              args24[
                                                                                                                 'id'
                                                                                                               ] ===
-                                                                                                              _0x313443?.[
+                                                                                                              value294?.[
                                                                                                                 'id'
                                                                                                               ]
                                                                                                                 ? {
-                                                                                                                    ..._0x6db60c,
+                                                                                                                    ...args24,
                                                                                                                     baseAppearanceId:
-                                                                                                                      _0x1298ac?.[
+                                                                                                                      baseAppearanceId?.[
                                                                                                                         'id'
                                                                                                                       ],
                                                                                                                   }
-                                                                                                                : _0x6db60c,
+                                                                                                                : args24,
                                                                                                           );
-                                                                                                      _0x26d845(
+                                                                                                      updateProject(
                                                                                                         {
-                                                                                                          ..._0x57b9e5,
+                                                                                                          ...initialProject2,
                                                                                                           characters:
-                                                                                                            _0x3f686e,
+                                                                                                            characters,
                                                                                                         },
                                                                                                         'set-base-appearance',
                                                                                                       );
                                                                                                     } else {
                                                                                                       if (
-                                                                                                        _0x1797b4 ===
+                                                                                                        archived ===
                                                                                                         'delete-appearance'
                                                                                                       ) {
-                                                                                                        const _0x3128cc =
-                                                                                                            _0xe8cb52(),
-                                                                                                          _0x1bda71 =
-                                                                                                            _0x391a96(
-                                                                                                              _0x3128cc,
+                                                                                                        const enabled47 =
+                                                                                                            characterId(),
+                                                                                                          enabled48 =
+                                                                                                            handler13(
+                                                                                                              enabled47,
                                                                                                             );
                                                                                                         if (
-                                                                                                          !_0x3128cc ||
-                                                                                                          !_0x1bda71 ||
-                                                                                                          _0x1bda71[
+                                                                                                          !enabled47 ||
+                                                                                                          !enabled48 ||
+                                                                                                          enabled48[
                                                                                                             'id'
                                                                                                           ] ===
-                                                                                                            _0x3128cc[
+                                                                                                            enabled47[
                                                                                                               'baseAppearanceId'
                                                                                                             ]
                                                                                                         )
                                                                                                           return;
-                                                                                                        const _0xe900a6 =
-                                                                                                          _0x57b9e5[
+                                                                                                        const characters2 =
+                                                                                                          initialProject2[
                                                                                                             'characters'
                                                                                                           ][
                                                                                                             'map'
                                                                                                           ](
                                                                                                             (
-                                                                                                              _0x3972d5,
+                                                                                                              appearances,
                                                                                                             ) =>
-                                                                                                              _0x3972d5[
+                                                                                                              appearances[
                                                                                                                 'id'
                                                                                                               ] ===
-                                                                                                              _0x3128cc[
+                                                                                                              enabled47[
                                                                                                                 'id'
                                                                                                               ]
                                                                                                                 ? {
-                                                                                                                    ..._0x3972d5,
+                                                                                                                    ...appearances,
                                                                                                                     appearances:
-                                                                                                                      _0x3972d5[
+                                                                                                                      appearances[
                                                                                                                         'appearances'
                                                                                                                       ][
                                                                                                                         'filter'
                                                                                                                       ](
                                                                                                                         (
-                                                                                                                          _0x570dba,
+                                                                                                                          value295,
                                                                                                                         ) =>
-                                                                                                                          _0x570dba[
+                                                                                                                          value295[
                                                                                                                             'id'
                                                                                                                           ] !==
-                                                                                                                          _0x1bda71[
+                                                                                                                          enabled48[
                                                                                                                             'id'
                                                                                                                           ],
                                                                                                                       ),
                                                                                                                   }
-                                                                                                                : _0x3972d5,
+                                                                                                                : appearances,
                                                                                                           );
-                                                                                                        _0x26d845(
+                                                                                                        updateProject(
                                                                                                           {
-                                                                                                            ..._0x57b9e5,
+                                                                                                            ...initialProject2,
                                                                                                             characters:
-                                                                                                              _0xe900a6,
+                                                                                                              characters2,
                                                                                                             workspace:
                                                                                                               {
-                                                                                                                ..._0x57b9e5[
+                                                                                                                ...initialProject2[
                                                                                                                   'workspace'
                                                                                                                 ],
                                                                                                                 assetAppearanceIndexes:
                                                                                                                   {
-                                                                                                                    ..._0x57b9e5[
+                                                                                                                    ...initialProject2[
                                                                                                                       'workspace'
                                                                                                                     ][
                                                                                                                       'assetAppearanceIndexes'
                                                                                                                     ],
-                                                                                                                    [_0x3128cc[
+                                                                                                                    [enabled47[
                                                                                                                       'id'
                                                                                                                     ]]:
                                                                                                                       0x0,
@@ -4126,89 +4225,89 @@ export function createReplacementStudioWorkspace({
                                                                                                         );
                                                                                                       } else {
                                                                                                         if (
-                                                                                                          _0x1797b4 ===
+                                                                                                          archived ===
                                                                                                           'delete-asset-card'
                                                                                                         ) {
-                                                                                                          _0x58b712();
-                                                                                                          const _0x2885a9 =
+                                                                                                          hide();
+                                                                                                          const sceneId =
                                                                                                             normalizeText(
-                                                                                                              _0x2849af[
+                                                                                                              projectId[
                                                                                                                 'dataset'
                                                                                                               ][
                                                                                                                 'storyAssetDeleteId'
                                                                                                               ],
                                                                                                             );
                                                                                                           if (
-                                                                                                            _0x57b9e5[
+                                                                                                            initialProject2[
                                                                                                               'workspace'
                                                                                                             ][
                                                                                                               'characterAssetTab'
                                                                                                             ] ===
                                                                                                               'scene' &&
-                                                                                                            _0x57b9e5[
+                                                                                                            initialProject2[
                                                                                                               'scenes'
                                                                                                             ][
                                                                                                               'some'
                                                                                                             ](
                                                                                                               (
-                                                                                                                _0x459253,
+                                                                                                                value296,
                                                                                                               ) =>
-                                                                                                                _0x459253[
+                                                                                                                value296[
                                                                                                                   'id'
                                                                                                                 ] ===
-                                                                                                                _0x2885a9,
+                                                                                                                sceneId,
                                                                                                             )
                                                                                                           )
-                                                                                                            _0x4e3281(
-                                                                                                              _0x43f995[
+                                                                                                            runIntent(
+                                                                                                              downloadImageIntent[
                                                                                                                 'DELETE_SCENE'
                                                                                                               ],
                                                                                                               {
                                                                                                                 sceneId:
-                                                                                                                  _0x2885a9,
+                                                                                                                  sceneId,
                                                                                                               },
                                                                                                             );
                                                                                                           else
-                                                                                                            _0x57b9e5[
+                                                                                                            initialProject2[
                                                                                                               'workspace'
                                                                                                             ][
                                                                                                               'characterAssetTab'
                                                                                                             ] ===
                                                                                                               'audio' &&
-                                                                                                            _0x57b9e5[
+                                                                                                            initialProject2[
                                                                                                               'audioAssets'
                                                                                                             ][
                                                                                                               'some'
                                                                                                             ](
                                                                                                               (
-                                                                                                                _0x5b7700,
+                                                                                                                value297,
                                                                                                               ) =>
-                                                                                                                _0x5b7700[
+                                                                                                                value297[
                                                                                                                   'id'
                                                                                                                 ] ===
-                                                                                                                _0x2885a9,
+                                                                                                                sceneId,
                                                                                                             )
-                                                                                                              ? _0x4e3281(
-                                                                                                                  _0x43f995[
+                                                                                                              ? runIntent(
+                                                                                                                  downloadImageIntent[
                                                                                                                     'DELETE_AUDIO_ASSET'
                                                                                                                   ],
                                                                                                                   {
                                                                                                                     audioAssetId:
-                                                                                                                      _0x2885a9,
+                                                                                                                      sceneId,
                                                                                                                   },
                                                                                                                 )
-                                                                                                              : _0x4e3281(
-                                                                                                                  _0x43f995[
+                                                                                                              : runIntent(
+                                                                                                                  downloadImageIntent[
                                                                                                                     'DELETE_CHARACTER'
                                                                                                                   ],
                                                                                                                   {
                                                                                                                     characterId:
-                                                                                                                      _0x2885a9,
+                                                                                                                      sceneId,
                                                                                                                   },
                                                                                                                 );
                                                                                                         } else {
                                                                                                           if (
-                                                                                                            _0x1797b4[
+                                                                                                            archived[
                                                                                                               'startsWith'
                                                                                                             ](
                                                                                                               'debug-generation-',
@@ -4221,19 +4320,19 @@ export function createReplacementStudioWorkspace({
                                                                                                               !![]
                                                                                                             )
                                                                                                               return;
-                                                                                                            const _0x35f3fa =
-                                                                                                                _0x1797b4[
+                                                                                                            const kind =
+                                                                                                                archived[
                                                                                                                   'slice'
                                                                                                                 ](
                                                                                                                   'debug-generation-'[
                                                                                                                     'length'
                                                                                                                   ],
                                                                                                                 ),
-                                                                                                              _0x1b39a0 =
-                                                                                                                _0xe8cb52(),
-                                                                                                              _0x4b72c2 =
-                                                                                                                _0x391a96(
-                                                                                                                  _0x1b39a0,
+                                                                                                              characterId3 =
+                                                                                                                characterId(),
+                                                                                                              appearanceId2 =
+                                                                                                                handler13(
+                                                                                                                  characterId3,
                                                                                                                 );
                                                                                                             openDebugRequestWindow(
                                                                                                               {
@@ -4247,41 +4346,41 @@ export function createReplacementStudioWorkspace({
                                                                                                                   async () =>
                                                                                                                     buildGenerationDebugPreview(
                                                                                                                       {
-                                                                                                                        ...(await _0x4e3281(
-                                                                                                                          _0x43f995[
+                                                                                                                        ...(await runIntent(
+                                                                                                                          downloadImageIntent[
                                                                                                                             'PREVIEW_GENERATION'
                                                                                                                           ],
                                                                                                                           {
-                                                                                                                            kind: _0x35f3fa,
+                                                                                                                            kind: kind,
                                                                                                                             projectId:
-                                                                                                                              _0x57b9e5[
+                                                                                                                              initialProject2[
                                                                                                                                 'id'
                                                                                                                               ],
                                                                                                                             shotId:
-                                                                                                                              _0x57b9e5[
+                                                                                                                              initialProject2[
                                                                                                                                 'workspace'
                                                                                                                               ][
                                                                                                                                 'selectedShotId'
                                                                                                                               ],
                                                                                                                             sourceImageSize:
                                                                                                                               resolvePersonReplacementSourceImageSize(
-                                                                                                                                _0x42b7b0?.[
+                                                                                                                                floatingMenuHost?.[
                                                                                                                                   'querySelector'
                                                                                                                                 ](
                                                                                                                                   '[data-person-replacement-keyframe-stage] > img',
                                                                                                                                 ),
-                                                                                                                                _0x57b9e5[
+                                                                                                                                initialProject2[
                                                                                                                                   'shots'
                                                                                                                                 ][
                                                                                                                                   'find'
                                                                                                                                 ](
                                                                                                                                   (
-                                                                                                                                    _0xee522e,
+                                                                                                                                    value298,
                                                                                                                                   ) =>
-                                                                                                                                    _0xee522e[
+                                                                                                                                    value298[
                                                                                                                                       'id'
                                                                                                                                     ] ===
-                                                                                                                                    _0x57b9e5[
+                                                                                                                                    initialProject2[
                                                                                                                                       'workspace'
                                                                                                                                     ][
                                                                                                                                       'selectedShotId'
@@ -4289,22 +4388,22 @@ export function createReplacementStudioWorkspace({
                                                                                                                                 ),
                                                                                                                               ),
                                                                                                                             characterId:
-                                                                                                                              _0x1b39a0?.[
+                                                                                                                              characterId3?.[
                                                                                                                                 'id'
                                                                                                                               ],
                                                                                                                             appearanceId:
-                                                                                                                              _0x4b72c2?.[
+                                                                                                                              appearanceId2?.[
                                                                                                                                 'id'
                                                                                                                               ],
                                                                                                                             prompt:
-                                                                                                                              _0x4b72c2?.[
+                                                                                                                              appearanceId2?.[
                                                                                                                                 'prompt'
                                                                                                                               ] ||
-                                                                                                                              _0x1b39a0?.[
+                                                                                                                              characterId3?.[
                                                                                                                                 'description'
                                                                                                                               ],
                                                                                                                             promptPresetId:
-                                                                                                                              _0x57b9e5[
+                                                                                                                              initialProject2[
                                                                                                                                 'workspace'
                                                                                                                               ][
                                                                                                                                 'assetPromptPresetId'
@@ -4317,7 +4416,7 @@ export function createReplacementStudioWorkspace({
                                                                                                                           },
                                                                                                                         )),
                                                                                                                         notes:
-                                                                                                                          _0x57b9e5[
+                                                                                                                          initialProject2[
                                                                                                                             'settings'
                                                                                                                           ]?.[
                                                                                                                             'replacementPromptEnhancementEnabled'
@@ -4331,72 +4430,72 @@ export function createReplacementStudioWorkspace({
                                                                                                             return;
                                                                                                           } else {
                                                                                                             if (
-                                                                                                              _0x1797b4 ===
+                                                                                                              archived ===
                                                                                                               'generate-asset'
                                                                                                             ) {
-                                                                                                              const _0x4725e5 =
-                                                                                                                  _0xe8cb52(
-                                                                                                                    _0x2849af[
+                                                                                                              const characterId4 =
+                                                                                                                  characterId(
+                                                                                                                    projectId[
                                                                                                                       'dataset'
                                                                                                                     ][
                                                                                                                       'storyCardAppearanceId'
                                                                                                                     ] ||
-                                                                                                                      _0x57b9e5[
+                                                                                                                      initialProject2[
                                                                                                                         'workspace'
                                                                                                                       ][
                                                                                                                         'selectedCharacterId'
                                                                                                                       ],
                                                                                                                   ),
-                                                                                                                _0x1ffca2 =
-                                                                                                                  _0x391a96(
-                                                                                                                    _0x4725e5,
+                                                                                                                appearanceId3 =
+                                                                                                                  handler13(
+                                                                                                                    characterId4,
                                                                                                                   );
-                                                                                                              _0x4e3281(
-                                                                                                                _0x43f995[
+                                                                                                              runIntent(
+                                                                                                                downloadImageIntent[
                                                                                                                   'GENERATE_CHARACTER_IMAGE'
                                                                                                                 ],
                                                                                                                 {
                                                                                                                   characterId:
-                                                                                                                    _0x4725e5?.[
+                                                                                                                    characterId4?.[
                                                                                                                       'id'
                                                                                                                     ],
                                                                                                                   appearanceId:
-                                                                                                                    _0x1ffca2?.[
+                                                                                                                    appearanceId3?.[
                                                                                                                       'id'
                                                                                                                     ],
                                                                                                                   prompt:
-                                                                                                                    _0x1ffca2?.[
+                                                                                                                    appearanceId3?.[
                                                                                                                       'prompt'
                                                                                                                     ] ||
-                                                                                                                    _0x4725e5?.[
+                                                                                                                    characterId4?.[
                                                                                                                       'description'
                                                                                                                     ],
                                                                                                                   promptPresetId:
-                                                                                                                    _0x57b9e5[
+                                                                                                                    initialProject2[
                                                                                                                       'workspace'
                                                                                                                     ][
                                                                                                                       'assetPromptPresetId'
                                                                                                                     ],
                                                                                                                   modelId:
-                                                                                                                    _0x57b9e5[
+                                                                                                                    initialProject2[
                                                                                                                       'settings'
                                                                                                                     ][
                                                                                                                       'characterImageModelId'
                                                                                                                     ],
                                                                                                                   provider:
-                                                                                                                    _0x57b9e5[
+                                                                                                                    initialProject2[
                                                                                                                       'settings'
                                                                                                                     ][
                                                                                                                       'characterImageProvider'
                                                                                                                     ],
                                                                                                                   providerProfileId:
-                                                                                                                    _0x57b9e5[
+                                                                                                                    initialProject2[
                                                                                                                       'settings'
                                                                                                                     ][
                                                                                                                       'characterImageProviderProfileId'
                                                                                                                     ],
                                                                                                                   generationParams:
-                                                                                                                    _0x57b9e5[
+                                                                                                                    initialProject2[
                                                                                                                       'settings'
                                                                                                                     ][
                                                                                                                       'characterImageGenerationParams'
@@ -4405,7 +4504,7 @@ export function createReplacementStudioWorkspace({
                                                                                                               );
                                                                                                             } else {
                                                                                                               if (
-                                                                                                                _0x1797b4 ===
+                                                                                                                archived ===
                                                                                                                   'batch-generate-assets' &&
                                                                                                                 [
                                                                                                                   0x2,
@@ -4413,15 +4512,15 @@ export function createReplacementStudioWorkspace({
                                                                                                                 ][
                                                                                                                   'includes'
                                                                                                                 ](
-                                                                                                                  _0x57b9e5[
+                                                                                                                  initialProject2[
                                                                                                                     'workspace'
                                                                                                                   ][
                                                                                                                     'step'
                                                                                                                   ],
                                                                                                                 )
                                                                                                               )
-                                                                                                                _0x2daac8(
-                                                                                                                  _0x57b9e5[
+                                                                                                                runShotBatch(
+                                                                                                                  initialProject2[
                                                                                                                     'workspace'
                                                                                                                   ][
                                                                                                                     'step'
@@ -4432,15 +4531,15 @@ export function createReplacementStudioWorkspace({
                                                                                                                 );
                                                                                                               else {
                                                                                                                 if (
-                                                                                                                  _0x1797b4 ===
+                                                                                                                  archived ===
                                                                                                                   'batch-generate-assets'
                                                                                                                 )
-                                                                                                                  _0x5e8e9c();
+                                                                                                                  runAssetBatch();
                                                                                                                 else
-                                                                                                                  _0x1797b4 ===
+                                                                                                                  archived ===
                                                                                                                     'play-character-voice' &&
-                                                                                                                    void _0x50e1f0(
-                                                                                                                      _0x2849af[
+                                                                                                                    void playPreview(
+                                                                                                                      projectId[
                                                                                                                         'dataset'
                                                                                                                       ][
                                                                                                                         'storyVoiceAssetId'
@@ -4500,34 +4599,37 @@ export function createReplacementStudioWorkspace({
         }
       }
     },
-    _0x2d9fc4 = (_0x110e6f) => {
-      if (!_0x110e6f?.['project']) return ![];
-      return (_0x58b712(), _0x26d845(_0x110e6f['project'], _0x110e6f['reason']), !![]);
+    handler100 = (enabled49) => {
+      if (!enabled49?.['project']) return ![];
+      return (hide(), updateProject(enabled49['project'], enabled49['reason']), !![]);
     },
-    _0x41e8c9 = (_0x54782f, _0xc23ca4 = 'scene-reference-change') =>
-      _0x2d9fc4(applyPersonReplacementShotSceneReference(_0x57b9e5, _0x54782f, { reason: _0xc23ca4 })),
-    _0x2012da = (_0xc8d386, _0x580a71 = 'person-mapping-clear') =>
-      _0x2d9fc4(clearPersonReplacementShotPersonMappings(_0x57b9e5, _0xc8d386, { reason: _0x580a71 })),
-    _0x2337bb = (_0x22ac30) => _0x2d9fc4(assignPersonReplacementShotPersonMapping(_0x57b9e5, _0x22ac30)),
-    _0x524d22 = ({ restoreFocus: restoreFocus = ![] } = {}) => {
-      const _0x1340fc = _0x236762?.['focusTarget'];
-      ((_0x236762 = null),
-        _0x42b7b0?.['querySelector']?.('[data-person-replacement-mapping-scope-menu]')?.['remove']?.());
-      if (restoreFocus) _0x1340fc?.['focus']?.();
+    handler101 = (value299, reason5 = 'scene-reference-change') =>
+      handler100(applyPersonReplacementShotSceneReference(initialProject2, value299, { reason: reason5 })),
+    handler102 = (value300, reason6 = 'person-mapping-clear') =>
+      handler100(clearPersonReplacementShotPersonMappings(initialProject2, value300, { reason: reason6 })),
+    handler103 = (value301) =>
+      handler100(assignPersonReplacementShotPersonMapping(initialProject2, value301)),
+    handler88 = ({ restoreFocus: restoreFocus = ![] } = {}) => {
+      const el97 = value66?.['focusTarget'];
+      ((value66 = null),
+        floatingMenuHost?.['querySelector']?.('[data-person-replacement-mapping-scope-menu]')?.[
+          'remove'
+        ]?.());
+      if (restoreFocus) el97?.['focus']?.();
     },
-    _0xe2ad53 = ({
-      personBox: _0x5a35fc,
-      mapping: _0x28c617,
+    handler104 = ({
+      personBox: personBox,
+      mapping: mapping,
       personLabel: personLabel = '',
       targetName: targetName = '',
       appearanceName: appearanceName = '',
-      clientX: _0x277d96,
-      clientY: _0x5c58e5,
+      clientX: clientX3,
+      clientY: clientY2,
     } = {}) => {
-      if (!_0x42b7b0 || !_0x5a35fc || !_0x28c617) return ![];
-      (_0x524d22(),
-        (_0x236762 = { mapping: _0x28c617, focusTarget: _0x5a35fc }),
-        _0x42b7b0['insertAdjacentHTML']?.(
+      if (!floatingMenuHost || !personBox || !mapping) return ![];
+      (handler88(),
+        (value66 = { mapping: mapping, focusTarget: personBox }),
+        floatingMenuHost['insertAdjacentHTML']?.(
           'beforeend',
           personReplacementIdentityPresentation['renderOverlay']('mapping-scope', {
             personLabel: personLabel,
@@ -4535,106 +4637,91 @@ export function createReplacementStudioWorkspace({
             appearanceName: appearanceName,
           }),
         ));
-      const _0x377c13 = _0x42b7b0['querySelector']?.('[data-person-replacement-mapping-scope-menu]');
-      if (!_0x377c13) return ((_0x236762 = null), ![]);
-      const _0x4f8ca5 = _0x42b7b0['getBoundingClientRect']?.(),
-        _0xd9123e = _0x5a35fc['getBoundingClientRect']?.(),
-        _0x37434e = _0x377c13['getBoundingClientRect']?.();
-      if (_0x4f8ca5 && _0xd9123e && _0x37434e) {
-        const _0x31d203 = _0x37434e['width'] || 0x104,
-          _0x2af71d = _0x37434e['height'] || 0xaa,
-          _0x44e96d = Number['isFinite'](Number(_0x277d96)) ? Number(_0x277d96) : _0xd9123e['right'],
-          _0x1faca1 = Number['isFinite'](Number(_0x5c58e5)) ? Number(_0x5c58e5) : _0xd9123e['top'],
-          _0x1b3b01 = clamp(
-            _0x44e96d - _0x4f8ca5['left'] - _0x31d203 / 0x2,
-            0xc,
-            _0x4f8ca5['width'] - _0x31d203 - 0xc,
-            0xc,
-          ),
-          _0x54ca02 = _0x1faca1 - _0x4f8ca5['top'] + 0xa,
-          _0x8ce688 =
-            _0x54ca02 + _0x2af71d <= _0x4f8ca5['height'] - 0xc
-              ? _0x54ca02
-              : clamp(
-                  _0x1faca1 - _0x4f8ca5['top'] - _0x2af71d - 0xa,
-                  0xc,
-                  _0x4f8ca5['height'] - _0x2af71d - 0xc,
-                  0xc,
-                );
-        (_0x377c13['style']?.['setProperty']?.('--person-replacement-mapping-scope-left', _0x1b3b01 + 'px'),
-          _0x377c13['style']?.['setProperty']?.('--person-replacement-mapping-scope-top', _0x8ce688 + 'px'));
+      const el98 = floatingMenuHost['querySelector']?.('[data-person-replacement-mapping-scope-menu]');
+      if (!el98) return ((value66 = null), ![]);
+      const box3 = floatingMenuHost['getBoundingClientRect']?.(),
+        box4 = personBox['getBoundingClientRect']?.(),
+        box5 = el98['getBoundingClientRect']?.();
+      if (box3 && box4 && box5) {
+        const value302 = box5['width'] || 0x104,
+          value303 = box5['height'] || 0xaa,
+          value304 = Number['isFinite'](Number(clientX3)) ? Number(clientX3) : box4['right'],
+          value305 = Number['isFinite'](Number(clientY2)) ? Number(clientY2) : box4['top'],
+          clamp3 = clamp(value304 - box3['left'] - value302 / 0x2, 0xc, box3['width'] - value302 - 0xc, 0xc),
+          value306 = value305 - box3['top'] + 0xa,
+          value307 =
+            value306 + value303 <= box3['height'] - 0xc
+              ? value306
+              : clamp(value305 - box3['top'] - value303 - 0xa, 0xc, box3['height'] - value303 - 0xc, 0xc);
+        (el98['style']?.['setProperty']?.('--person-replacement-mapping-scope-left', clamp3 + 'px'),
+          el98['style']?.['setProperty']?.('--person-replacement-mapping-scope-top', value307 + 'px'));
       }
       return (
-        _0x377c13['querySelector']?.('[data-person-replacement-mapping-scope=\x27current\x27]')?.[
-          'focus'
-        ]?.(),
+        el98['querySelector']?.('[data-person-replacement-mapping-scope=\x27current\x27]')?.['focus']?.(),
         !![]
       );
     },
-    _0x4f358e = (_0x5eb983, _0x5321c7) =>
+    handler105 = (selectedAssetIds2, targetKind) =>
       requestPersonReplacementLibraryAssignment({
-        project: _0x57b9e5,
-        selectedAssetIds: _0x5eb983,
-        targetKind: _0x5321c7,
-        root: _0x42b7b0,
+        project: initialProject2,
+        selectedAssetIds: selectedAssetIds2,
+        targetKind: targetKind,
+        root: floatingMenuHost,
         documentObject: documentObject,
         windowObject: windowObject,
-        hasWorkspaceIntent: _0x750640,
-        runIntent: _0x4e3281,
+        hasWorkspaceIntent: hasWorkspaceIntent,
+        runIntent: runIntent,
       }),
-    _0x1ee13c = (_0x4721fa) => {
-      if (_0x4aeba7?.['handleClick'](_0x4721fa)) return;
-      const _0x2c73b4 = _0x546083;
-      _0x546083 = null;
-      if (_0x2c73b4 && (_0x4721fa['target'] === _0x2c73b4 || _0x2c73b4['contains']?.(_0x4721fa['target']))) {
-        (_0x4721fa['preventDefault']?.(), _0x4721fa['stopPropagation']?.());
+    value308 = (shiftKey) => {
+      if (ctx?.['handleClick'](shiftKey)) return;
+      const value309 = value49;
+      value49 = null;
+      if (value309 && (shiftKey['target'] === value309 || value309['contains']?.(shiftKey['target']))) {
+        (shiftKey['preventDefault']?.(), shiftKey['stopPropagation']?.());
         return;
       }
-      if (_0x23c082['handleClick'](_0x4721fa)) return;
-      !_0x4721fa['target']?.['closest']?.('[data-person-replacement-output-menu]') && _0x624e11();
-      !_0x4721fa['target']?.['closest']?.('.person-replacement-library-add-menu-wrap') && _0x318ab0();
-      !_0x4721fa['target']?.['closest']?.('.person-replacement-add-voice-menu-wrap') && _0x4ba512();
-      if (_0x5b9bfb['toggleFromTarget'](_0x4721fa['target'])) return;
-      if (_0x4d8968?.['consumeClick']?.(_0x4721fa)) return;
-      if (!_0x4721fa['target']?.['closest']?.('.story-home-param-picker')) _0x1399ed();
-      !_0x4721fa['target']?.['closest']?.('[data-person-replacement-detection-picker]') && _0x1c8c49();
-      if (_0x4935d9(_0x4721fa)) return;
-      const _0x956563 = _0x4721fa['target']?.['closest']?.('[data-person-replacement-shot-cut-timeline]');
+      if (personReplacementExportSubmenuController['handleClick'](shiftKey)) return;
+      !shiftKey['target']?.['closest']?.('[data-person-replacement-output-menu]') && handler15();
+      !shiftKey['target']?.['closest']?.('.person-replacement-library-add-menu-wrap') && handler36();
+      !shiftKey['target']?.['closest']?.('.person-replacement-add-voice-menu-wrap') && handler38();
+      if (assetLibraryDisclosure['toggleFromTarget'](shiftKey['target'])) return;
+      if (workspaceMarqueeSelectionController?.['consumeClick']?.(shiftKey)) return;
+      if (!shiftKey['target']?.['closest']?.('.story-home-param-picker')) handler91();
+      !shiftKey['target']?.['closest']?.('[data-person-replacement-detection-picker]') && handler90();
+      if (handler97(shiftKey)) return;
+      const value310 = shiftKey['target']?.['closest']?.('[data-person-replacement-shot-cut-timeline]');
       if (
-        _0x4e4610['isOpen'] &&
-        _0x956563 &&
-        Number(_0x4721fa['detail']) > 0x0 &&
-        !_0x4721fa['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]')
+        selectedIds['isOpen'] &&
+        value310 &&
+        Number(shiftKey['detail']) > 0x0 &&
+        !shiftKey['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]')
       ) {
-        (_0x4721fa['preventDefault']?.(), _0x57503e(_0x5272fe(_0x4721fa, _0x956563)));
+        (shiftKey['preventDefault']?.(), seekTimeline(getTimelineSecFromPointer(shiftKey, value310)));
         return;
       }
-      const _0x5b364d = _0x4721fa['target']?.['closest']?.('[data-story-asset-name-id]');
-      if (_0x5b364d && _0x42b7b0['contains'](_0x5b364d)) {
-        (_0x4721fa['preventDefault']?.(),
-          _0x4721fa['stopPropagation']?.(),
-          _0x58b712(),
-          _0x5a1098(_0x5b364d));
+      const value311 = shiftKey['target']?.['closest']?.('[data-story-asset-name-id]');
+      if (value311 && floatingMenuHost['contains'](value311)) {
+        (shiftKey['preventDefault']?.(), shiftKey['stopPropagation']?.(), hide(), handler48(value311));
         return;
       }
-      const _0x4330ba = _0x4721fa['target']?.['closest']?.('[data-story-home-param-trigger="asset-preset"]');
-      if (_0x4330ba && _0x42b7b0['contains'](_0x4330ba)) {
-        const _0x2ab477 = _0x4330ba['closest']?.('.story-home-param-picker'),
-          _0x2a4cdf = !_0x2ab477?.['classList']?.['contains']?.('is-open');
-        (_0x1399ed(_0x2ab477),
-          _0x2ab477?.['classList']?.['toggle']?.('is-open', _0x2a4cdf),
-          _0x4330ba['setAttribute']?.('aria-expanded', String(_0x2a4cdf)));
+      const el99 = shiftKey['target']?.['closest']?.('[data-story-home-param-trigger="asset-preset"]');
+      if (el99 && floatingMenuHost['contains'](el99)) {
+        const el100 = el99['closest']?.('.story-home-param-picker'),
+          value312 = !el100?.['classList']?.['contains']?.('is-open');
+        (handler91(el100),
+          el100?.['classList']?.['toggle']?.('is-open', value312),
+          el99['setAttribute']?.('aria-expanded', String(value312)));
         return;
       }
-      const _0xb780e5 = _0x4721fa['target']?.['closest']?.('[data-story-asset-preset-option]');
-      if (_0xb780e5 && _0x42b7b0['contains'](_0xb780e5)) {
-        _0x26d845(
+      const el101 = shiftKey['target']?.['closest']?.('[data-story-asset-preset-option]');
+      if (el101 && floatingMenuHost['contains'](el101)) {
+        updateProject(
           {
-            ..._0x57b9e5,
+            ...initialProject2,
             workspace: {
-              ..._0x57b9e5['workspace'],
+              ...initialProject2['workspace'],
               assetPromptPresetId: normalizePersonReplacementAssetPromptPresetId(
-                _0xb780e5['dataset']['storyAssetPresetOption'],
+                el101['dataset']['storyAssetPresetOption'],
               ),
             },
           },
@@ -4642,202 +4729,202 @@ export function createReplacementStudioWorkspace({
         );
         return;
       }
-      const _0x3dbca1 = _0x4721fa['target']?.['closest']?.('[data-ref-remove-action]');
-      if (_0x3dbca1 && _0x42b7b0['contains'](_0x3dbca1)) {
-        const _0xad5d2e = normalizeText(_0x3dbca1['dataset']['refRemoveAction']);
+      const el102 = shiftKey['target']?.['closest']?.('[data-ref-remove-action]');
+      if (el102 && floatingMenuHost['contains'](el102)) {
+        const text23 = normalizeText(el102['dataset']['refRemoveAction']);
         if (
-          ['clear-person-replacement-target', 'clear-person-replacement-scene-reference']['includes'](
-            _0xad5d2e,
-          )
+          ['clear-person-replacement-target', 'clear-person-replacement-scene-reference']['includes'](text23)
         ) {
-          _0x4721fa['preventDefault']?.();
-          let _0x3347d1 = null;
+          shiftKey['preventDefault']?.();
+          let shotId3 = null;
           try {
-            _0x3347d1 = JSON['parse'](_0x3dbca1['dataset']['refRemoveValue'] || '{}');
+            shotId3 = JSON['parse'](el102['dataset']['refRemoveValue'] || '{}');
           } catch {
-            _0x3347d1 = null;
+            shotId3 = null;
           }
-          if (_0x3347d1 && _0xad5d2e === 'clear-person-replacement-target')
-            _0x2012da(_0x3347d1, 'person-mapping-clear-reference');
+          if (shotId3 && text23 === 'clear-person-replacement-target')
+            handler102(shotId3, 'person-mapping-clear-reference');
           else
-            _0x3347d1 &&
-              _0xad5d2e === 'clear-person-replacement-scene-reference' &&
-              _0x41e8c9({ shotId: _0x3347d1['shotId'] }, 'scene-reference-clear');
+            shotId3 &&
+              text23 === 'clear-person-replacement-scene-reference' &&
+              handler101({ shotId: shotId3['shotId'] }, 'scene-reference-clear');
           return;
         }
       }
-      const _0x30d011 = _0x4721fa['target']?.['closest']?.(
+      const el103 = shiftKey['target']?.['closest']?.(
         '[data-person-replacement-video-reference-inputs] .ref-thumb-delete',
       );
-      if (_0x30d011 && _0x42b7b0['contains'](_0x30d011)) {
-        const _0x15b948 = _0x30d011['closest']?.('[data-slot]');
-        _0x15b948 &&
-          (_0x4721fa['preventDefault']?.(),
-          _0x4e3281(
-            _0x43f995['REMOVE_REPLACEMENT_VIDEO_INPUT'],
+      if (el103 && floatingMenuHost['contains'](el103)) {
+        const slotId = el103['closest']?.('[data-slot]');
+        slotId &&
+          (shiftKey['preventDefault']?.(),
+          runIntent(
+            downloadImageIntent['REMOVE_REPLACEMENT_VIDEO_INPUT'],
             {
-              shotId: _0x57b9e5['workspace']['selectedShotId'],
-              slotId: _0x15b948['dataset']['slot'],
-              kind: _0x15b948['dataset']['kind'],
-              modelId: _0x57b9e5['settings']['replacementModelId'],
+              shotId: initialProject2['workspace']['selectedShotId'],
+              slotId: slotId['dataset']['slot'],
+              kind: slotId['dataset']['kind'],
+              modelId: initialProject2['settings']['replacementModelId'],
             },
             {},
             { applyCallbackResult: ![] },
           ));
         return;
       }
-      const _0x470b8f = _0x4721fa['target']?.['closest']?.(
+      const slotId2 = shiftKey['target']?.['closest']?.(
         '[data-person-replacement-video-reference-inputs]\x20.ref-upload-slot[data-slot]',
       );
-      if (_0x470b8f && _0x42b7b0['contains'](_0x470b8f)) {
-        const _0x1da40c = normalizeText(_0x470b8f['dataset']['kind']);
-        _0x40a90d = {
-          kind: _0x1da40c,
-          shotId: _0x57b9e5['workspace']['selectedShotId'],
-          slotId: _0x470b8f['dataset']['slot'],
-          modelId: _0x57b9e5['settings']['replacementModelId'],
+      if (slotId2 && floatingMenuHost['contains'](slotId2)) {
+        const kind2 = normalizeText(slotId2['dataset']['kind']);
+        value45 = {
+          kind: kind2,
+          shotId: initialProject2['workspace']['selectedShotId'],
+          slotId: slotId2['dataset']['slot'],
+          modelId: initialProject2['settings']['replacementModelId'],
         };
-        const _0x5343d3 = _0x42b7b0['querySelector']?.(
+        const el104 = floatingMenuHost['querySelector']?.(
           '[data-person-replacement-input=\x27replacement-video-slot\x27]',
         );
-        _0x5343d3 &&
-          ((_0x5343d3['accept'] = _0x1da40c === 'image' ? 'image/*' : 'video/*'), _0x5343d3['click']?.());
+        el104 && ((el104['accept'] = kind2 === 'image' ? 'image/*' : 'video/*'), el104['click']?.());
         return;
       }
-      const _0x1560f2 = _0x4721fa['target']?.['closest']?.('[data-story-asset-id]');
-      if (_0x1560f2 && _0x42b7b0['contains'](_0x1560f2)) {
-        const _0x2e05f4 = normalizeText(_0x1560f2['dataset']['storyAssetId']);
-        if (_0x1560f2['dataset']['personReplacementShotCard'] === 'true') {
-          const _0x4db69e = resolveWorkspaceCardMultiSelection({
-            selectedIds: _0x57b9e5['workspace']['selectedShotIds'],
-            itemId: _0x2e05f4,
-            activeItemId: _0x57b9e5['workspace']['selectedShotId'],
-            selectionMode: _0x57b9e5['workspace']['shotSelectionMode'],
-            shiftKey: _0x4721fa['shiftKey'] === !![],
-            toggleKey: _0x4721fa['ctrlKey'] || _0x4721fa['metaKey'],
-            orderedIds: _0x57b9e5['shots']['map']((_0x4280c4) => _0x4280c4['id']),
+      const el105 = shiftKey['target']?.['closest']?.('[data-story-asset-id]');
+      if (el105 && floatingMenuHost['contains'](el105)) {
+        const itemId = normalizeText(el105['dataset']['storyAssetId']);
+        if (el105['dataset']['personReplacementShotCard'] === 'true') {
+          const shotSelectionMode = resolveWorkspaceCardMultiSelection({
+            selectedIds: initialProject2['workspace']['selectedShotIds'],
+            itemId: itemId,
+            activeItemId: initialProject2['workspace']['selectedShotId'],
+            selectionMode: initialProject2['workspace']['shotSelectionMode'],
+            shiftKey: shiftKey['shiftKey'] === !![],
+            toggleKey: shiftKey['ctrlKey'] || shiftKey['metaKey'],
+            orderedIds: initialProject2['shots']['map']((value313) => value313['id']),
           });
-          (_0x4db69e['handled'] &&
-            _0x26d845(
+          (shotSelectionMode['handled'] &&
+            updateProject(
               {
-                ..._0x57b9e5,
+                ...initialProject2,
                 workspace: {
-                  ..._0x57b9e5['workspace'],
+                  ...initialProject2['workspace'],
                   shotSelectionMode:
-                    _0x4db69e['selectionMode'] &&
-                    Boolean(_0x4721fa['shiftKey'] || _0x4721fa['ctrlKey'] || _0x4721fa['metaKey']),
-                  selectedShotIds: _0x4db69e['selectedIds'],
+                    shotSelectionMode['selectionMode'] &&
+                    Boolean(shiftKey['shiftKey'] || shiftKey['ctrlKey'] || shiftKey['metaKey']),
+                  selectedShotIds: shotSelectionMode['selectedIds'],
                 },
               },
               'shot-selection',
             ),
-            !_0x4721fa['shiftKey'] && !_0x4721fa['ctrlKey'] && !_0x4721fa['metaKey'] && _0x2bd9ab(_0x2e05f4));
+            !shiftKey['shiftKey'] && !shiftKey['ctrlKey'] && !shiftKey['metaKey'] && handler51(itemId));
         } else {
           if (
-            _0x57b9e5['workspace']['step'] === 0x2 &&
-            _0x1560f2['dataset']['personReplacementReplacementAssetKind'] === 'scene'
+            initialProject2['workspace']['step'] === 0x2 &&
+            el105['dataset']['personReplacementReplacementAssetKind'] === 'scene'
           ) {
-            if (_0x57b9e5['workspace']['selectedSceneId'] === _0x2e05f4) return;
-            _0x26d845(
-              { ..._0x57b9e5, workspace: { ..._0x57b9e5['workspace'], selectedSceneId: _0x2e05f4 } },
+            if (initialProject2['workspace']['selectedSceneId'] === itemId) return;
+            updateProject(
+              { ...initialProject2, workspace: { ...initialProject2['workspace'], selectedSceneId: itemId } },
               'replacement-scene-asset-select',
             );
           } else {
             if (
-              _0x57b9e5['workspace']['step'] === 0x2 &&
-              _0x1560f2['dataset']['personReplacementTargetCharacterId']
+              initialProject2['workspace']['step'] === 0x2 &&
+              el105['dataset']['personReplacementTargetCharacterId']
             ) {
-              if (_0x57b9e5['workspace']['selectedCharacterId'] === _0x2e05f4) return;
-              _0x26d845(
-                { ..._0x57b9e5, workspace: { ..._0x57b9e5['workspace'], selectedCharacterId: _0x2e05f4 } },
+              if (initialProject2['workspace']['selectedCharacterId'] === itemId) return;
+              updateProject(
+                {
+                  ...initialProject2,
+                  workspace: { ...initialProject2['workspace'], selectedCharacterId: itemId },
+                },
                 'replacement-target-asset-select',
               );
             } else {
-              if (_0x57b9e5['workspace']['characterAssetTab'] === 'audio') {
-                const _0x19dc02 = resolveWorkspaceCardMultiSelection({
-                  selectedIds: _0x57b9e5['workspace']['selectedAssetIds'],
-                  itemId: _0x2e05f4,
-                  activeItemId: _0x57b9e5['workspace']['selectedAudioAssetId'],
-                  orderedIds: getPersonReplacementSelectableAssets(_0x57b9e5, 'audio')['map'](
-                    (_0xaa2cca) => _0xaa2cca['id'],
+              if (initialProject2['workspace']['characterAssetTab'] === 'audio') {
+                const assetSelectionMode = resolveWorkspaceCardMultiSelection({
+                  selectedIds: initialProject2['workspace']['selectedAssetIds'],
+                  itemId: itemId,
+                  activeItemId: initialProject2['workspace']['selectedAudioAssetId'],
+                  orderedIds: getPersonReplacementSelectableAssets(initialProject2, 'audio')['map'](
+                    (value314) => value314['id'],
                   ),
-                  shiftKey: _0x4721fa['shiftKey'],
-                  toggleKey: _0x4721fa['ctrlKey'] || _0x4721fa['metaKey'],
+                  shiftKey: shiftKey['shiftKey'],
+                  toggleKey: shiftKey['ctrlKey'] || shiftKey['metaKey'],
                 });
-                _0x26d845(
+                updateProject(
                   {
-                    ..._0x57b9e5,
+                    ...initialProject2,
                     workspace: {
-                      ..._0x57b9e5['workspace'],
-                      selectedAudioAssetId: _0x2e05f4,
-                      assetSelectionMode: _0x19dc02['selectionMode'],
-                      selectedAssetIds: _0x19dc02['selectedIds'],
+                      ...initialProject2['workspace'],
+                      selectedAudioAssetId: itemId,
+                      assetSelectionMode: assetSelectionMode['selectionMode'],
+                      selectedAssetIds: assetSelectionMode['selectedIds'],
                     },
                   },
                   'audio-library-asset-select',
                 );
               } else {
-                if (_0x57b9e5['workspace']['characterAssetTab'] === 'scene') {
-                  const _0xdaec17 = resolveWorkspaceCardMultiSelection({
-                    selectedIds: _0x57b9e5['workspace']['selectedAssetIds'],
-                    itemId: _0x2e05f4,
-                    activeItemId: _0x57b9e5['workspace']['selectedSceneId'],
-                    orderedIds: getPersonReplacementSelectableAssets(_0x57b9e5, 'scene')['map'](
-                      (_0x5ce21c) => _0x5ce21c['id'],
+                if (initialProject2['workspace']['characterAssetTab'] === 'scene') {
+                  const assetSelectionMode2 = resolveWorkspaceCardMultiSelection({
+                    selectedIds: initialProject2['workspace']['selectedAssetIds'],
+                    itemId: itemId,
+                    activeItemId: initialProject2['workspace']['selectedSceneId'],
+                    orderedIds: getPersonReplacementSelectableAssets(initialProject2, 'scene')['map'](
+                      (value315) => value315['id'],
                     ),
-                    toggleKey: _0x4721fa['ctrlKey'] || _0x4721fa['metaKey'],
-                    selectionMode: _0x57b9e5['workspace']['assetSelectionMode'],
-                    shiftKey: _0x4721fa['shiftKey'] === !![],
+                    toggleKey: shiftKey['ctrlKey'] || shiftKey['metaKey'],
+                    selectionMode: initialProject2['workspace']['assetSelectionMode'],
+                    shiftKey: shiftKey['shiftKey'] === !![],
                   });
-                  _0x26d845(
+                  updateProject(
                     {
-                      ..._0x57b9e5,
+                      ...initialProject2,
                       workspace: {
-                        ..._0x57b9e5['workspace'],
-                        selectedSceneId: _0x2e05f4,
-                        ...(_0xdaec17['handled']
+                        ...initialProject2['workspace'],
+                        selectedSceneId: itemId,
+                        ...(assetSelectionMode2['handled']
                           ? {
-                              assetSelectionMode: _0xdaec17['selectionMode'],
-                              selectedAssetIds: _0xdaec17['selectedIds'],
+                              assetSelectionMode: assetSelectionMode2['selectionMode'],
+                              selectedAssetIds: assetSelectionMode2['selectedIds'],
                             }
-                          : { selectedSceneId: _0x2e05f4 }),
+                          : { selectedSceneId: itemId }),
                       },
                     },
                     'scene-asset-select',
                   );
                 } else {
-                  if (_0x57b9e5['workspace']['characterAssetTab'] === 'library') {
-                    const _0x520c16 = _0x57b9e5['libraryAssets']['find'](
-                        (_0x372b84) => _0x372b84['id'] === _0x2e05f4,
+                  if (initialProject2['workspace']['characterAssetTab'] === 'library') {
+                    const value316 = initialProject2['libraryAssets']['find'](
+                        (value317) => value317['id'] === itemId,
                       ),
-                      _0x1cfb00 = resolveWorkspaceCardMultiSelection({
-                        selectedIds: _0x57b9e5['workspace']['selectedAssetIds'],
-                        itemId: _0x2e05f4,
-                        activeItemId: _0x57b9e5['workspace']['selectedLibraryAssetId'],
+                      assetSelectionMode3 = resolveWorkspaceCardMultiSelection({
+                        selectedIds: initialProject2['workspace']['selectedAssetIds'],
+                        itemId: itemId,
+                        activeItemId: initialProject2['workspace']['selectedLibraryAssetId'],
                         orderedIds: getWorkspaceAssetLibrarySelectionOrder(
-                          getPersonReplacementSelectableAssets(_0x57b9e5, 'library'),
-                          _0x5b9bfb,
+                          getPersonReplacementSelectableAssets(initialProject2, 'library'),
+                          assetLibraryDisclosure,
                         ),
-                        toggleKey: _0x4721fa['ctrlKey'] || _0x4721fa['metaKey'],
-                        selectionMode: _0x57b9e5['workspace']['assetSelectionMode'],
-                        shiftKey: _0x4721fa['shiftKey'] === !![],
+                        toggleKey: shiftKey['ctrlKey'] || shiftKey['metaKey'],
+                        selectionMode: initialProject2['workspace']['assetSelectionMode'],
+                        shiftKey: shiftKey['shiftKey'] === !![],
                         enabled: Boolean(
-                          (normalizeText(_0x520c16?.['mediaKind'])['toLowerCase']() === 'image' &&
-                            normalizeText(_0x520c16?.['sourceUrl'] || _0x520c16?.['imageUrl'])) ||
-                          (normalizeText(_0x520c16?.['mediaKind'])['toLowerCase']() === 'audio' &&
-                            getPersonReplacementLibraryAudioRef(_0x520c16)),
+                          (normalizeText(value316?.['mediaKind'])['toLowerCase']() === 'image' &&
+                            normalizeText(value316?.['sourceUrl'] || value316?.['imageUrl'])) ||
+                          (normalizeText(value316?.['mediaKind'])['toLowerCase']() === 'audio' &&
+                            getPersonReplacementLibraryAudioRef(value316)),
                         ),
                       });
-                    _0x26d845(
+                    updateProject(
                       {
-                        ..._0x57b9e5,
+                        ...initialProject2,
                         workspace: {
-                          ..._0x57b9e5['workspace'],
-                          selectedLibraryAssetId: _0x2e05f4,
-                          ...(_0x1cfb00['handled']
+                          ...initialProject2['workspace'],
+                          selectedLibraryAssetId: itemId,
+                          ...(assetSelectionMode3['handled']
                             ? {
-                                assetSelectionMode: _0x1cfb00['selectionMode'],
-                                selectedAssetIds: _0x1cfb00['selectedIds'],
+                                assetSelectionMode: assetSelectionMode3['selectionMode'],
+                                selectedAssetIds: assetSelectionMode3['selectedIds'],
                               }
                             : {}),
                         },
@@ -4845,29 +4932,29 @@ export function createReplacementStudioWorkspace({
                       'library-asset-select',
                     );
                   } else {
-                    const _0x5f0709 = resolveWorkspaceCardMultiSelection({
-                      selectedIds: _0x57b9e5['workspace']['selectedAssetIds'],
-                      itemId: _0x2e05f4,
-                      activeItemId: _0x57b9e5['workspace']['selectedCharacterId'],
-                      orderedIds: getPersonReplacementSelectableAssets(_0x57b9e5, 'character')['map'](
-                        (_0x26a61a) => _0x26a61a['id'],
+                    const assetSelectionMode4 = resolveWorkspaceCardMultiSelection({
+                      selectedIds: initialProject2['workspace']['selectedAssetIds'],
+                      itemId: itemId,
+                      activeItemId: initialProject2['workspace']['selectedCharacterId'],
+                      orderedIds: getPersonReplacementSelectableAssets(initialProject2, 'character')['map'](
+                        (value318) => value318['id'],
                       ),
-                      toggleKey: _0x4721fa['ctrlKey'] || _0x4721fa['metaKey'],
-                      selectionMode: _0x57b9e5['workspace']['assetSelectionMode'],
-                      shiftKey: _0x4721fa['shiftKey'] === !![],
+                      toggleKey: shiftKey['ctrlKey'] || shiftKey['metaKey'],
+                      selectionMode: initialProject2['workspace']['assetSelectionMode'],
+                      shiftKey: shiftKey['shiftKey'] === !![],
                     });
-                    _0x26d845(
+                    updateProject(
                       {
-                        ..._0x57b9e5,
+                        ...initialProject2,
                         workspace: {
-                          ..._0x57b9e5['workspace'],
-                          selectedCharacterId: _0x2e05f4,
-                          ...(_0x5f0709['handled']
+                          ...initialProject2['workspace'],
+                          selectedCharacterId: itemId,
+                          ...(assetSelectionMode4['handled']
                             ? {
-                                assetSelectionMode: _0x5f0709['selectionMode'],
-                                selectedAssetIds: _0x5f0709['selectedIds'],
+                                assetSelectionMode: assetSelectionMode4['selectionMode'],
+                                selectedAssetIds: assetSelectionMode4['selectedIds'],
                               }
-                            : { selectedCharacterId: _0x2e05f4 }),
+                            : { selectedCharacterId: itemId }),
                         },
                       },
                       'asset-select',
@@ -4878,155 +4965,157 @@ export function createReplacementStudioWorkspace({
             }
           }
         }
-        focusWorkspaceAssetCard(_0x42b7b0, _0x2e05f4);
+        focusWorkspaceAssetCard(floatingMenuHost, itemId);
         return;
       }
-      const _0x728570 = _0x4721fa['target']?.['closest']?.('[data-story-action]');
-      if (_0x728570 && _0x42b7b0['contains'](_0x728570)) {
-        _0x478e16(_0x728570, normalizeText(_0x728570['dataset']['storyAction']));
+      const el106 = shiftKey['target']?.['closest']?.('[data-story-action]');
+      if (el106 && floatingMenuHost['contains'](el106)) {
+        handler99(el106, normalizeText(el106['dataset']['storyAction']));
         return;
       }
-      const _0x8ec19 = _0x4721fa['target']?.['closest']?.('[data-story-open-project]');
+      const el107 = shiftKey['target']?.['closest']?.('[data-story-open-project]');
       if (
-        _0x8ec19 &&
-        _0x42b7b0['contains'](_0x8ec19) &&
-        !_0x4721fa['target']?.['closest']?.('[data-story-project-title]')
+        el107 &&
+        floatingMenuHost['contains'](el107) &&
+        !shiftKey['target']?.['closest']?.('[data-story-project-title]')
       ) {
-        _0x4e3281(_0x43f995['OPEN_PROJECT'], _0x8ec19['dataset']['storyOpenProject']);
+        runIntent(downloadImageIntent['OPEN_PROJECT'], el107['dataset']['storyOpenProject']);
         return;
       }
-      _0x57b9e5['workspace']['view'] === 'home' &&
-        !_0x4721fa['target']?.['closest']?.('[data-story-project-sort-wrap]') &&
-        _0x497b01(![]);
-      _0x57b9e5['workspace']['view'] === 'home' &&
-        _0x57b9e5['workspace']['openProjectMenuId'] &&
-        !_0x4721fa['target']?.['closest']?.('[data-story-project-menu-wrap]') &&
-        ((_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-          ..._0x57b9e5,
-          workspace: { ..._0x57b9e5['workspace'], openProjectMenuId: '' },
+      initialProject2['workspace']['view'] === 'home' &&
+        !shiftKey['target']?.['closest']?.('[data-story-project-sort-wrap]') &&
+        handler94(![]);
+      initialProject2['workspace']['view'] === 'home' &&
+        initialProject2['workspace']['openProjectMenuId'] &&
+        !shiftKey['target']?.['closest']?.('[data-story-project-menu-wrap]') &&
+        ((initialProject2 = normalizePersonReplacementWorkspaceProject({
+          ...initialProject2,
+          workspace: { ...initialProject2['workspace'], openProjectMenuId: '' },
         })),
-        _0x42b7b0?.['querySelectorAll']?.('.story-project-card.is-menu-open')?.['forEach']?.((_0x544497) => {
-          _0x544497['classList']?.['remove']?.('is-menu-open');
-          const _0x4b7463 = _0x544497['querySelector']?.("[data-story-action='toggle-project-menu']"),
-            _0x1ead8c = _0x544497['querySelector']?.('[data-story-project-menu]');
-          (_0x4b7463?.['setAttribute']?.('aria-expanded', 'false'),
-            _0x1ead8c?.['setAttribute']?.('aria-hidden', 'true'));
-          if (_0x1ead8c) _0x1ead8c['hidden'] = !![];
-        }));
-      if (_0x4721fa['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]')) return;
-      const _0x1d4b2f = _0x4721fa['target']?.['closest']?.('[data-person-replacement-action]');
-      if (!_0x1d4b2f || !_0x42b7b0['contains'](_0x1d4b2f)) return;
-      const _0x2a330c = _0x1d4b2f['dataset']['personReplacementAction'];
-      if (_0x2a330c === 'confirm-person-mapping-scope') {
-        const _0x58707f = _0x236762?.['mapping'],
-          _0x4d3660 =
-            normalizeText(_0x1d4b2f['dataset']['personReplacementMappingScope'])['toLowerCase']() ===
-            'current'
+        floatingMenuHost?.['querySelectorAll']?.('.story-project-card.is-menu-open')?.['forEach']?.(
+          (el108) => {
+            el108['classList']?.['remove']?.('is-menu-open');
+            const el109 = el108['querySelector']?.("[data-story-action='toggle-project-menu']"),
+              el110 = el108['querySelector']?.('[data-story-project-menu]');
+            (el109?.['setAttribute']?.('aria-expanded', 'false'),
+              el110?.['setAttribute']?.('aria-hidden', 'true'));
+            if (el110) el110['hidden'] = !![];
+          },
+        ));
+      if (shiftKey['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]')) return;
+      const sourceId = shiftKey['target']?.['closest']?.('[data-person-replacement-action]');
+      if (!sourceId || !floatingMenuHost['contains'](sourceId)) return;
+      const mode2 = sourceId['dataset']['personReplacementAction'];
+      if (mode2 === 'confirm-person-mapping-scope') {
+        const args25 = value66?.['mapping'],
+          scope2 =
+            normalizeText(sourceId['dataset']['personReplacementMappingScope'])['toLowerCase']() === 'current'
               ? 'current'
               : 'all';
-        (_0x524d22(), _0x58707f && _0x2337bb({ ..._0x58707f, scope: _0x4d3660 }));
+        (handler88(), args25 && handler103({ ...args25, scope: scope2 }));
       } else {
-        if (_0x2a330c === 'close') _0x2edc43['close']();
+        if (mode2 === 'close') value93['close']();
         else {
-          if (_0x2a330c === 'back-home') _0x4e3281(_0x43f995['BACK_HOME'], cloneJson(_0x57b9e5));
+          if (mode2 === 'back-home') runIntent(downloadImageIntent['BACK_HOME'], cloneJson(initialProject2));
           else {
-            if (_0x2a330c === 'open-project')
-              _0x4e3281(_0x43f995['OPEN_PROJECT'], _0x1d4b2f['dataset']['projectId']);
+            if (mode2 === 'open-project')
+              runIntent(downloadImageIntent['OPEN_PROJECT'], sourceId['dataset']['projectId']);
             else {
-              if (_0x2a330c === 'select-step') _0x1a3d01(_0x1d4b2f['dataset']['personReplacementStep']);
+              if (mode2 === 'select-step') navigate(sourceId['dataset']['personReplacementStep']);
               else {
-                if (_0x2a330c === 'previous-step') _0x1a3d01(_0x57b9e5['workspace']['step'] - 0x1);
+                if (mode2 === 'previous-step') navigate(initialProject2['workspace']['step'] - 0x1);
                 else {
-                  if (_0x2a330c === 'next-step') _0x1a3d01(_0x57b9e5['workspace']['step'] + 0x1);
+                  if (mode2 === 'next-step') navigate(initialProject2['workspace']['step'] + 0x1);
                   else {
-                    if (_0x2a330c === 'set-video-input-mode') {
-                      const _0x5a960d =
-                        _0x1d4b2f['dataset']['personReplacementVideoInputMode'] ===
+                    if (mode2 === 'set-video-input-mode') {
+                      const inputMode =
+                        sourceId['dataset']['personReplacementVideoInputMode'] ===
                         PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE
                           ? PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE
                           : PERSON_REPLACEMENT_VIDEO_INPUT_MODE_FIRST_FRAME;
-                      if (_0x5a960d === _0x57b9e5['settings']['replacementVideoInputMode']) return;
-                      const _0x3fa261 = documentObject?.['activeElement'] === _0x1d4b2f,
-                        _0x3379d5 = resolvePersonReplacementVideoParameterPolicy({
-                          modelId: _0x57b9e5['settings']['replacementModelId'],
-                          inputMode: _0x5a960d,
-                          generationParams: _0x57b9e5['settings']['replacementVideoGenerationParams'],
+                      if (inputMode === initialProject2['settings']['replacementVideoInputMode']) return;
+                      const value319 = documentObject?.['activeElement'] === sourceId,
+                        replacementVideoGenerationParams2 = resolvePersonReplacementVideoParameterPolicy({
+                          modelId: initialProject2['settings']['replacementModelId'],
+                          inputMode: inputMode,
+                          generationParams: initialProject2['settings']['replacementVideoGenerationParams'],
                           resetModeDefaults: !![],
                         });
-                      _0x26d845(
+                      updateProject(
                         {
-                          ..._0x57b9e5,
+                          ...initialProject2,
                           settings: {
-                            ..._0x57b9e5['settings'],
-                            replacementVideoInputMode: _0x5a960d,
-                            replacementVideoGenerationParams: _0x3379d5['generationParams'],
+                            ...initialProject2['settings'],
+                            replacementVideoInputMode: inputMode,
+                            replacementVideoGenerationParams:
+                              replacementVideoGenerationParams2['generationParams'],
                           },
                         },
                         'video-input-mode',
                       );
-                      if (_0x3fa261)
-                        _0x42b7b0['querySelector'](
+                      if (value319)
+                        floatingMenuHost['querySelector'](
                           '[data-person-replacement-action="set-video-input-mode"]',
                         )?.['focus']?.({ preventScroll: !![] });
                     } else {
-                      if (_0x2a330c === 'select-voice-source') _0x43d4f5(_0x1d4b2f['dataset']['sourceId']);
+                      if (mode2 === 'select-voice-source') selectSource(sourceId['dataset']['sourceId']);
                       else {
-                        if (_0x2a330c === 'extract-clean-voice')
-                          _0x4e3281(
-                            _0x43f995['EXTRACT_VOICE'],
-                            _0x1d4b2f['dataset']['sourceId'],
+                        if (mode2 === 'extract-clean-voice')
+                          runIntent(
+                            downloadImageIntent['EXTRACT_VOICE'],
+                            sourceId['dataset']['sourceId'],
                             {},
                             { applyCallbackResult: ![] },
                           );
                         else {
-                          if (_0x2a330c === 'cancel-voice-separation')
-                            _0x4e3281(
-                              _0x43f995['CANCEL_VOICE_EXTRACTION'],
-                              _0x1d4b2f['dataset']['sourceId'],
+                          if (mode2 === 'cancel-voice-separation')
+                            runIntent(
+                              downloadImageIntent['CANCEL_VOICE_EXTRACTION'],
+                              sourceId['dataset']['sourceId'],
                               {},
                               { applyCallbackResult: ![] },
                             );
                           else {
-                            if (_0x2a330c === 'select-voice-asset')
-                              _0x3400a4(_0x1d4b2f['dataset']['characterId']);
+                            if (mode2 === 'select-voice-asset')
+                              selectVoiceAsset(sourceId['dataset']['characterId']);
                             else {
-                              if (_0x2a330c === 'choose-source-videos')
-                                _0x42b7b0['querySelector'](
+                              if (mode2 === 'choose-source-videos')
+                                floatingMenuHost['querySelector'](
                                   "[data-person-replacement-input='source-videos']",
                                 )?.['click']?.();
                               else {
-                                if (_0x2a330c === 'remove-source')
-                                  _0x4e3281(_0x43f995['REMOVE_SOURCE'], {
-                                    sourceId: _0x1d4b2f['dataset']['sourceId'],
+                                if (mode2 === 'remove-source')
+                                  runIntent(downloadImageIntent['REMOVE_SOURCE'], {
+                                    sourceId: sourceId['dataset']['sourceId'],
                                   });
                                 else {
-                                  if (_0x2a330c === 'choose-new-character-images')
-                                    _0x42b7b0['querySelector'](
+                                  if (mode2 === 'choose-new-character-images')
+                                    floatingMenuHost['querySelector'](
                                       "[data-person-replacement-input='new-character-images']",
                                     )?.['click']?.();
                                   else {
-                                    if (_0x2a330c === 'choose-new-scene-images')
-                                      _0x42b7b0['querySelector'](
+                                    if (mode2 === 'choose-new-scene-images')
+                                      floatingMenuHost['querySelector'](
                                         "[data-person-replacement-input='new-scene-images']",
                                       )?.['click']?.();
                                     else {
-                                      if (_0x2a330c === 'choose-new-audio-files')
-                                        _0x42b7b0['querySelector'](
+                                      if (mode2 === 'choose-new-audio-files')
+                                        floatingMenuHost['querySelector'](
                                           "[data-person-replacement-input='new-audio-files']",
                                         )?.['click']?.();
                                       else {
-                                        if (_0x2a330c === 'cancel-character-voice-library') {
-                                          const _0x2c62c4 = _0x834763;
-                                          ((_0x834763 = ''),
-                                            _0x26d845(
+                                        if (mode2 === 'cancel-character-voice-library') {
+                                          const selectedCharacterId2 = voiceLibraryTargetCharacterId;
+                                          ((voiceLibraryTargetCharacterId = ''),
+                                            updateProject(
                                               {
-                                                ..._0x57b9e5,
+                                                ...initialProject2,
                                                 workspace: {
-                                                  ..._0x57b9e5['workspace'],
+                                                  ...initialProject2['workspace'],
                                                   characterAssetTab: 'character',
                                                   selectedCharacterId:
-                                                    _0x2c62c4 ||
-                                                    _0x57b9e5['workspace']['selectedCharacterId'],
+                                                    selectedCharacterId2 ||
+                                                    initialProject2['workspace']['selectedCharacterId'],
                                                   assetSelectionMode: ![],
                                                   selectedAssetIds: [],
                                                 },
@@ -5039,57 +5128,62 @@ export function createReplacementStudioWorkspace({
                                               'bind-project-audio',
                                               'add-project-audio',
                                               'remove-project-audio',
-                                            ]['includes'](_0x2a330c)
+                                            ]['includes'](mode2)
                                           ) {
-                                            const _0xc667a9 = _0x1d4b2f['closest'](
+                                            const el111 = sourceId['closest'](
                                                 '[data-workspace-audio-asset-id]',
                                               ),
-                                              _0x551cb3 = _0xc667a9?.['dataset']['workspaceAudioAssetId'],
-                                              _0x37864b = [
-                                                ..._0x57b9e5['audioAssets'],
-                                                ..._0x57b9e5['libraryAssets'],
-                                              ]['find']((_0x39d500) => _0x39d500['id'] === _0x551cb3);
-                                            if (!_0x37864b) return;
-                                            if (_0x2a330c === 'add-project-audio')
-                                              _0x4f358e([_0x551cb3], 'audio');
+                                              audioAssetId = el111?.['dataset']['workspaceAudioAssetId'],
+                                              enabled50 = [
+                                                ...initialProject2['audioAssets'],
+                                                ...initialProject2['libraryAssets'],
+                                              ]['find']((value320) => value320['id'] === audioAssetId);
+                                            if (!enabled50) return;
+                                            if (mode2 === 'add-project-audio')
+                                              handler105([audioAssetId], 'audio');
                                             else {
-                                              if (_0x2a330c === 'remove-project-audio')
-                                                _0x4e3281(_0x43f995['DELETE_AUDIO_ASSET'], {
-                                                  audioAssetId: _0x551cb3,
+                                              if (mode2 === 'remove-project-audio')
+                                                runIntent(downloadImageIntent['DELETE_AUDIO_ASSET'], {
+                                                  audioAssetId: audioAssetId,
                                                 });
                                               else {
-                                                const _0x560239 = _0xc667a9['querySelector'](
+                                                const characterId5 = el111['querySelector'](
                                                   '[data-person-replacement-audio-character]',
                                                 )?.['value'];
                                                 if (
-                                                  _0x57b9e5['characters']['some'](
-                                                    (_0x15050c) => _0x15050c['id'] === _0x560239,
+                                                  initialProject2['characters']['some'](
+                                                    (value321) => value321['id'] === characterId5,
                                                   )
                                                 )
-                                                  _0x4e3281(_0x43f995['SELECT_CHARACTER_VOICE_LIBRARY'], {
-                                                    characterId: _0x560239,
-                                                    asset: cloneJson(_0x37864b),
-                                                  });
+                                                  runIntent(
+                                                    downloadImageIntent['SELECT_CHARACTER_VOICE_LIBRARY'],
+                                                    {
+                                                      characterId: characterId5,
+                                                      asset: cloneJson(enabled50),
+                                                    },
+                                                  );
                                               }
                                             }
                                           } else {
-                                            if (_0x2a330c === 'confirm-character-voice-library') {
-                                              const _0x76c2fb = _0x834763,
-                                                _0x3b23ad = normalizeText(
-                                                  _0x1d4b2f['dataset']['personReplacementAudioAssetId'],
+                                            if (mode2 === 'confirm-character-voice-library') {
+                                              const selectedCharacterId3 = voiceLibraryTargetCharacterId,
+                                                text24 = normalizeText(
+                                                  sourceId['dataset']['personReplacementAudioAssetId'],
                                                 ),
-                                                _0x4ab82a = _0x57b9e5['audioAssets']['find'](
-                                                  (_0x38a2bd) =>
-                                                    _0x38a2bd['id'] ===
-                                                      (_0x3b23ad ||
-                                                        _0x57b9e5['workspace']['selectedAudioAssetId']) &&
-                                                    normalizeText(_0x38a2bd?.['mediaKind'])[
+                                                value322 = initialProject2['audioAssets']['find'](
+                                                  (value323) =>
+                                                    value323['id'] ===
+                                                      (text24 ||
+                                                        initialProject2['workspace'][
+                                                          'selectedAudioAssetId'
+                                                        ]) &&
+                                                    normalizeText(value323?.['mediaKind'])[
                                                       'toLowerCase'
                                                     ]() === 'audio',
                                                 );
                                               if (
-                                                !_0x76c2fb ||
-                                                !getPersonReplacementLibraryAudioRef(_0x4ab82a)
+                                                !selectedCharacterId3 ||
+                                                !getPersonReplacementLibraryAudioRef(value322)
                                               ) {
                                                 windowObject?.['showToast']?.(
                                                   '请选择要添加的人设声音。',
@@ -5097,16 +5191,16 @@ export function createReplacementStudioWorkspace({
                                                 );
                                                 return;
                                               }
-                                              const _0x35f2cd = (_0x1be0ad) => {
-                                                  if (!_0x1be0ad) return;
-                                                  ((_0x834763 = ''),
-                                                    _0x26d845(
+                                              const run12 = (enabled51) => {
+                                                  if (!enabled51) return;
+                                                  ((voiceLibraryTargetCharacterId = ''),
+                                                    updateProject(
                                                       {
-                                                        ..._0x57b9e5,
+                                                        ...initialProject2,
                                                         workspace: {
-                                                          ..._0x57b9e5['workspace'],
+                                                          ...initialProject2['workspace'],
                                                           characterAssetTab: 'character',
-                                                          selectedCharacterId: _0x76c2fb,
+                                                          selectedCharacterId: selectedCharacterId3,
                                                           assetSelectionMode: ![],
                                                           selectedAssetIds: [],
                                                         },
@@ -5114,88 +5208,94 @@ export function createReplacementStudioWorkspace({
                                                       'character-voice-library-confirm',
                                                     ));
                                                 },
-                                                _0x320c4e = _0x4e3281(
-                                                  _0x43f995['SELECT_CHARACTER_VOICE_LIBRARY'],
-                                                  { characterId: _0x76c2fb, asset: cloneJson(_0x4ab82a) },
+                                                promise4 = runIntent(
+                                                  downloadImageIntent['SELECT_CHARACTER_VOICE_LIBRARY'],
+                                                  {
+                                                    characterId: selectedCharacterId3,
+                                                    asset: cloneJson(value322),
+                                                  },
                                                 );
-                                              if (_0x320c4e?.['then']) void _0x320c4e['then'](_0x35f2cd);
-                                              else _0x35f2cd(_0x320c4e);
+                                              if (promise4?.['then']) void promise4['then'](run12);
+                                              else run12(promise4);
                                             } else {
-                                              if (_0x2a330c === 'toggle-library-add-targets') {
-                                                const _0x30704c = _0x1d4b2f['closest']?.(
+                                              if (mode2 === 'toggle-library-add-targets') {
+                                                const el112 = sourceId['closest']?.(
                                                     '.person-replacement-library-add-menu-wrap',
                                                   ),
-                                                  _0x4abeb4 =
-                                                    !_0x30704c?.['classList']?.['contains']?.('is-open');
-                                                (_0x318ab0(_0x30704c), _0x29175f(_0x30704c, _0x4abeb4));
+                                                  value324 = !el112?.['classList']?.['contains']?.('is-open');
+                                                (handler36(el112), handler35(el112, value324));
                                               } else {
                                                 if (
-                                                  _0x2a330c === 'add-library-assets-to-project' ||
-                                                  _0x2a330c === 'add-library-assets-to-characters'
+                                                  mode2 === 'add-library-assets-to-project' ||
+                                                  mode2 === 'add-library-assets-to-characters'
                                                 ) {
-                                                  const _0x1d040b = normalizeText(
-                                                      _0x1d4b2f['dataset'][
+                                                  const text25 = normalizeText(
+                                                      sourceId['dataset'][
                                                         'personReplacementLibraryTargetKind'
                                                       ],
                                                     ),
-                                                    _0x383517 =
-                                                      _0x2a330c === 'add-library-assets-to-characters'
+                                                    value325 =
+                                                      mode2 === 'add-library-assets-to-characters'
                                                         ? 'character'
-                                                        : ['character', 'scene', 'audio']['includes'](
-                                                              _0x1d040b,
-                                                            )
-                                                          ? _0x1d040b
+                                                        : ['character', 'scene', 'audio']['includes'](text25)
+                                                          ? text25
                                                           : 'character';
-                                                  _0x29175f(
-                                                    _0x1d4b2f['closest']?.(
+                                                  handler35(
+                                                    sourceId['closest']?.(
                                                       '.person-replacement-library-add-menu-wrap',
                                                     ),
                                                     ![],
                                                   );
-                                                  const _0x598d8b = _0x57b9e5['workspace'][
+                                                  const value326 = initialProject2['workspace'][
                                                     'assetSelectionMode'
                                                   ]
-                                                    ? _0x57b9e5['workspace']['selectedAssetIds']
-                                                    : [_0x57b9e5['workspace']['selectedLibraryAssetId']];
-                                                  _0x4f358e(_0x598d8b, _0x383517);
+                                                    ? initialProject2['workspace']['selectedAssetIds']
+                                                    : [
+                                                        initialProject2['workspace'][
+                                                          'selectedLibraryAssetId'
+                                                        ],
+                                                      ];
+                                                  handler105(value326, value325);
                                                 } else {
-                                                  if (_0x2a330c === 'select-character-asset-tab') {
-                                                    const _0x1f2605 = normalizeText(
-                                                        _0x1d4b2f['dataset']['assetTab'],
+                                                  if (mode2 === 'select-character-asset-tab') {
+                                                    const text26 = normalizeText(
+                                                        sourceId['dataset']['assetTab'],
                                                       ),
-                                                      _0x3f849e = ['character', 'scene', 'audio', 'library'][
-                                                        'includes'
-                                                      ](_0x1f2605)
-                                                        ? _0x1f2605
+                                                      characterAssetTab = [
+                                                        'character',
+                                                        'scene',
+                                                        'audio',
+                                                        'library',
+                                                      ]['includes'](text26)
+                                                        ? text26
                                                         : 'character',
-                                                      _0x55a692 =
-                                                        _0x3f849e === 'library'
-                                                          ? _0x3ccd2d(_0x57b9e5)
-                                                          : _0x57b9e5,
-                                                      _0x367353 =
-                                                        _0x3f849e === 'audio'
-                                                          ? getPersonReplacementProjectAudioAssets(_0x55a692)
+                                                      args26 =
+                                                        characterAssetTab === 'library'
+                                                          ? handler19(initialProject2)
+                                                          : initialProject2,
+                                                      list15 =
+                                                        characterAssetTab === 'audio'
+                                                          ? getPersonReplacementProjectAudioAssets(args26)
                                                           : [],
-                                                      _0x57b960 =
-                                                        _0x3f849e === 'audio'
-                                                          ? _0x367353['some'](
-                                                              (_0x4fc108) =>
-                                                                _0x4fc108['id'] ===
-                                                                _0x55a692['workspace'][
-                                                                  'selectedAudioAssetId'
-                                                                ],
+                                                      selectedAudioAssetId2 =
+                                                        characterAssetTab === 'audio'
+                                                          ? list15['some'](
+                                                              (value327) =>
+                                                                value327['id'] ===
+                                                                args26['workspace']['selectedAudioAssetId'],
                                                             )
-                                                            ? _0x55a692['workspace']['selectedAudioAssetId']
-                                                            : _0x367353[0x0]?.['id'] || ''
-                                                          : _0x55a692['workspace']['selectedAudioAssetId'];
-                                                    if (_0x3f849e !== 'audio') _0x834763 = '';
-                                                    _0x26d845(
+                                                            ? args26['workspace']['selectedAudioAssetId']
+                                                            : list15[0x0]?.['id'] || ''
+                                                          : args26['workspace']['selectedAudioAssetId'];
+                                                    if (characterAssetTab !== 'audio')
+                                                      voiceLibraryTargetCharacterId = '';
+                                                    updateProject(
                                                       {
-                                                        ..._0x55a692,
+                                                        ...args26,
                                                         workspace: {
-                                                          ..._0x55a692['workspace'],
-                                                          characterAssetTab: _0x3f849e,
-                                                          selectedAudioAssetId: _0x57b960,
+                                                          ...args26['workspace'],
+                                                          characterAssetTab: characterAssetTab,
+                                                          selectedAudioAssetId: selectedAudioAssetId2,
                                                           assetSelectionMode: ![],
                                                           selectedAssetIds: [],
                                                         },
@@ -5203,67 +5303,70 @@ export function createReplacementStudioWorkspace({
                                                       'character-asset-tab',
                                                     );
                                                   } else {
-                                                    if (_0x2a330c === 'toggle-smart-clip-settings')
-                                                      _0x2583b7({
+                                                    if (mode2 === 'toggle-smart-clip-settings')
+                                                      handler12({
                                                         workspace: {
                                                           smartClipSettingsOpen:
-                                                            !_0x57b9e5['workspace']['smartClipSettingsOpen'],
+                                                            !initialProject2['workspace'][
+                                                              'smartClipSettingsOpen'
+                                                            ],
                                                         },
                                                       });
                                                     else {
-                                                      if (_0x2a330c === 'set-smart-clip-mode')
-                                                        _0x2583b7(
+                                                      if (mode2 === 'set-smart-clip-mode')
+                                                        handler12(
                                                           {
                                                             settings: {
                                                               smartClipMode:
-                                                                _0x1d4b2f['dataset']['smartClipMode'],
+                                                                sourceId['dataset']['smartClipMode'],
                                                             },
                                                           },
                                                           { notify: !![] },
                                                         );
                                                       else {
-                                                        if (_0x2a330c === 'set-smart-clip-fps')
-                                                          _0x2583b7(
+                                                        if (mode2 === 'set-smart-clip-fps')
+                                                          handler12(
                                                             {
                                                               settings: {
                                                                 smartClipFps: Number(
-                                                                  _0x1d4b2f['dataset']['smartClipFps'],
+                                                                  sourceId['dataset']['smartClipFps'],
                                                                 ),
                                                               },
                                                             },
                                                             { notify: !![] },
                                                           );
                                                         else {
-                                                          if (_0x2a330c === 'process-sources')
-                                                            _0x4e3281(_0x43f995['PROCESS_SOURCES'], {
-                                                              mode: _0x1d4b2f['dataset']['processingMode'],
-                                                            });
+                                                          if (mode2 === 'process-sources')
+                                                            runIntent(
+                                                              downloadImageIntent['PROCESS_SOURCES'],
+                                                              {
+                                                                mode: sourceId['dataset']['processingMode'],
+                                                              },
+                                                            );
                                                           else {
                                                             if (
-                                                              _0x24b921['handleAction'](_0x2a330c, {
-                                                                target: _0x1d4b2f,
-                                                                event: _0x4721fa,
+                                                              session['handleAction'](mode2, {
+                                                                target: sourceId,
+                                                                event: shiftKey,
                                                               })
                                                             ) {
                                                             } else {
-                                                              if (_0x2a330c === 'select-shot')
-                                                                (_0x26bf5a({
+                                                              if (mode2 === 'select-shot')
+                                                                (close2({
                                                                   animate: ![],
                                                                   renderWorkspace: ![],
                                                                 }),
-                                                                  _0x2bd9ab(_0x1d4b2f['dataset']['shotId']));
+                                                                  handler51(sourceId['dataset']['shotId']));
                                                               else {
-                                                                if (
-                                                                  _0x2a330c === 'select-composite-full-video'
-                                                                )
+                                                                if (mode2 === 'select-composite-full-video')
                                                                   buildPersonReplacementCompositePreviewSnapshot(
-                                                                    _0x57b9e5,
+                                                                    initialProject2,
                                                                   )['fullAvailable'] &&
-                                                                    _0x26d845(
+                                                                    updateProject(
                                                                       {
-                                                                        ..._0x57b9e5,
+                                                                        ...initialProject2,
                                                                         workspace: {
-                                                                          ..._0x57b9e5['workspace'],
+                                                                          ...initialProject2['workspace'],
                                                                           compositePreviewMode: 'full',
                                                                         },
                                                                       },
@@ -5271,302 +5374,298 @@ export function createReplacementStudioWorkspace({
                                                                     );
                                                                 else {
                                                                   if (
-                                                                    _0x2a330c ===
+                                                                    mode2 ===
                                                                     'toggle-source-identity-selection'
                                                                   ) {
-                                                                    const _0x48e5bb = normalizeText(
-                                                                        _0x1d4b2f['dataset'][
+                                                                    const text27 = normalizeText(
+                                                                        sourceId['dataset'][
                                                                           'sourceCharacterId'
                                                                         ],
                                                                       ),
-                                                                      _0x1921f2 = new Set(
-                                                                        _0x57b9e5['workspace'][
+                                                                      map5 = new Set(
+                                                                        initialProject2['workspace'][
                                                                           'selectedIdentityIds'
                                                                         ],
                                                                       );
-                                                                    if (_0x1921f2['has'](_0x48e5bb))
-                                                                      _0x1921f2['delete'](_0x48e5bb);
-                                                                    else _0x1921f2['add'](_0x48e5bb);
-                                                                    _0x26d845(
+                                                                    if (map5['has'](text27))
+                                                                      map5['delete'](text27);
+                                                                    else map5['add'](text27);
+                                                                    updateProject(
                                                                       {
-                                                                        ..._0x57b9e5,
+                                                                        ...initialProject2,
                                                                         workspace: {
-                                                                          ..._0x57b9e5['workspace'],
-                                                                          selectedIdentityIds: [..._0x1921f2],
+                                                                          ...initialProject2['workspace'],
+                                                                          selectedIdentityIds: [...map5],
                                                                         },
                                                                       },
                                                                       'identity-selection',
                                                                     );
                                                                   } else {
-                                                                    if (
-                                                                      _0x2a330c === 'merge-source-identities'
-                                                                    )
-                                                                      _0x4e3281(
-                                                                        _0x43f995['MERGE_SOURCE_IDENTITIES'],
+                                                                    if (mode2 === 'merge-source-identities')
+                                                                      runIntent(
+                                                                        downloadImageIntent[
+                                                                          'MERGE_SOURCE_IDENTITIES'
+                                                                        ],
                                                                         {
                                                                           sourceCharacterIds:
-                                                                            _0x57b9e5['workspace'][
+                                                                            initialProject2['workspace'][
                                                                               'selectedIdentityIds'
                                                                             ],
                                                                         },
                                                                       );
                                                                     else {
                                                                       if (
-                                                                        _0x2a330c ===
-                                                                        'toggle-detection-picker'
+                                                                        mode2 === 'toggle-detection-picker'
                                                                       ) {
-                                                                        const _0x32cfdc = _0x1d4b2f[
-                                                                            'closest'
-                                                                          ]?.(
+                                                                        const el113 = sourceId['closest']?.(
                                                                             '[data-person-replacement-detection-picker]',
                                                                           ),
-                                                                          _0x788884 =
-                                                                            !_0x32cfdc?.['classList']?.[
+                                                                          value328 =
+                                                                            !el113?.['classList']?.[
                                                                               'contains'
                                                                             ]?.('is-open');
-                                                                        (_0x1c8c49(_0x32cfdc),
-                                                                          _0x30a2f8(_0x32cfdc, _0x788884));
+                                                                        (handler90(el113),
+                                                                          handler96(el113, value328));
                                                                       } else {
                                                                         if (
-                                                                          _0x2a330c ===
+                                                                          mode2 ===
                                                                           'select-detection-picker-option'
                                                                         ) {
-                                                                          const _0x2578b3 = _0x1d4b2f[
-                                                                              'closest'
-                                                                            ]?.(
+                                                                          const el114 = sourceId['closest']?.(
                                                                               '[data-person-replacement-detection-picker]',
                                                                             ),
-                                                                            _0x4eff23 = normalizeText(
-                                                                              _0x2578b3?.['dataset']?.[
+                                                                            text28 = normalizeText(
+                                                                              el114?.['dataset']?.[
                                                                                 'personReplacementDetectionPicker'
                                                                               ],
                                                                             ),
-                                                                            _0x138735 = normalizeText(
-                                                                              _0x1d4b2f['dataset'][
+                                                                            orientation3 = normalizeText(
+                                                                              sourceId['dataset'][
                                                                                 'personReplacementDetectionPickerOption'
                                                                               ],
                                                                             ),
-                                                                            _0x3365c4 = normalizeText(
-                                                                              _0x1d4b2f['querySelector']?.(
+                                                                            label4 = normalizeText(
+                                                                              sourceId['querySelector']?.(
                                                                                 'span',
                                                                               )?.['textContent'],
-                                                                              _0x138735,
+                                                                              orientation3,
                                                                             ),
-                                                                            _0x4287f5 = normalizeText(
-                                                                              _0x1d4b2f['dataset'][
-                                                                                'personReplacementSourceCharacterId'
-                                                                              ],
-                                                                            ),
-                                                                            _0x22a0a9 = _0x2578b3?.[
+                                                                            sourceCharacterId4 =
+                                                                              normalizeText(
+                                                                                sourceId['dataset'][
+                                                                                  'personReplacementSourceCharacterId'
+                                                                                ],
+                                                                              ),
+                                                                            el115 = el114?.[
                                                                               'querySelector'
                                                                             ]?.(
                                                                               '[data-person-replacement-detection-picker-trigger]',
                                                                             ),
-                                                                            _0x24e92e = _0x22a0a9?.[
+                                                                            el116 = el115?.[
                                                                               'querySelector'
                                                                             ]?.(
                                                                               '[data-person-replacement-detection-picker-value]',
                                                                             ),
-                                                                            _0x4caec4 =
-                                                                              _0x4eff23 === 'label' &&
-                                                                              _0x138735 ===
+                                                                            enabled52 =
+                                                                              text28 === 'label' &&
+                                                                              orientation3 ===
                                                                                 PERSON_REPLACEMENT_CUSTOM_LABEL_VALUE;
-                                                                          _0x4caec4 &&
-                                                                            _0x22a0a9 &&
-                                                                            ((_0x2578b3['dataset'][
+                                                                          enabled52 &&
+                                                                            el115 &&
+                                                                            ((el114['dataset'][
                                                                               'personReplacementPreviousValue'
                                                                             ] = normalizeText(
-                                                                              _0x22a0a9['value'],
+                                                                              el115['value'],
                                                                             )),
-                                                                            (_0x2578b3['dataset'][
+                                                                            (el114['dataset'][
                                                                               'personReplacementPreviousLabel'
                                                                             ] = normalizeText(
-                                                                              _0x24e92e?.['textContent'],
+                                                                              el116?.['textContent'],
                                                                             )),
-                                                                            (_0x2578b3['dataset'][
+                                                                            (el114['dataset'][
                                                                               'personReplacementPreviousSourceCharacterId'
                                                                             ] = normalizeText(
-                                                                              _0x22a0a9['dataset']?.[
+                                                                              el115['dataset']?.[
                                                                                 'personReplacementSelectedSourceCharacterId'
                                                                               ],
                                                                             )));
-                                                                          _0x22a0a9 &&
-                                                                            ((_0x22a0a9['value'] = _0x138735),
-                                                                            _0x4eff23 === 'label' &&
-                                                                              !_0x4caec4 &&
-                                                                              (_0x22a0a9['dataset'][
+                                                                          el115 &&
+                                                                            ((el115['value'] = orientation3),
+                                                                            text28 === 'label' &&
+                                                                              !enabled52 &&
+                                                                              (el115['dataset'][
                                                                                 'personReplacementSelectedSourceCharacterId'
-                                                                              ] = _0x4287f5),
-                                                                            _0x22a0a9['setAttribute'](
+                                                                              ] = sourceCharacterId4),
+                                                                            el115['setAttribute'](
                                                                               'aria-label',
-                                                                              (_0x4eff23 === 'label'
+                                                                              (text28 === 'label'
                                                                                 ? '人物名称'
-                                                                                : _0x4eff23 === 'scope'
+                                                                                : text28 === 'scope'
                                                                                   ? '替换范围'
                                                                                   : '人物朝向') +
                                                                                 '：' +
-                                                                                _0x3365c4,
+                                                                                label4,
                                                                             ));
-                                                                          if (_0x24e92e)
-                                                                            _0x24e92e['textContent'] =
-                                                                              _0x3365c4;
-                                                                          _0x2578b3?.['querySelectorAll']?.(
+                                                                          if (el116)
+                                                                            el116['textContent'] = label4;
+                                                                          el114?.['querySelectorAll']?.(
                                                                             '[data-person-replacement-detection-picker-option]',
-                                                                          )?.['forEach']?.((_0x5cd4a5) => {
-                                                                            const _0x1e6fa9 =
-                                                                              _0x5cd4a5 === _0x1d4b2f;
-                                                                            (_0x5cd4a5['classList']?.[
-                                                                              'toggle'
-                                                                            ]?.('is-selected', _0x1e6fa9),
-                                                                              _0x5cd4a5['setAttribute']?.(
+                                                                          )?.['forEach']?.((el117) => {
+                                                                            const value329 =
+                                                                              el117 === sourceId;
+                                                                            (el117['classList']?.['toggle']?.(
+                                                                              'is-selected',
+                                                                              value329,
+                                                                            ),
+                                                                              el117['setAttribute']?.(
                                                                                 'aria-selected',
-                                                                                String(_0x1e6fa9),
+                                                                                String(value329),
                                                                               ));
                                                                           });
-                                                                          if (_0x4eff23 === 'label') {
-                                                                            const _0x1458b7 = _0x2578b3?.[
+                                                                          if (text28 === 'label') {
+                                                                            const el118 = el114?.[
                                                                                 'querySelector'
                                                                               ]?.(
                                                                                 '[data-person-replacement-person-custom-label]',
                                                                               ),
-                                                                              _0x4000f5 =
-                                                                                _0x138735 ===
+                                                                              enabled53 =
+                                                                                orientation3 ===
                                                                                 PERSON_REPLACEMENT_CUSTOM_LABEL_VALUE;
-                                                                            if (_0x22a0a9)
-                                                                              _0x22a0a9['hidden'] = _0x4000f5;
-                                                                            _0x1458b7 &&
-                                                                              ((_0x1458b7['hidden'] =
-                                                                                !_0x4000f5),
-                                                                              _0x4000f5 &&
-                                                                                ((_0x1458b7['value'] = ''),
-                                                                                _0x1458b7['focus']?.()));
+                                                                            if (el115)
+                                                                              el115['hidden'] = enabled53;
+                                                                            el118 &&
+                                                                              ((el118['hidden'] = !enabled53),
+                                                                              enabled53 &&
+                                                                                ((el118['value'] = ''),
+                                                                                el118['focus']?.()));
                                                                           }
-                                                                          _0x30a2f8(_0x2578b3, ![]);
-                                                                          const _0x1fb399 = _0x2578b3?.[
+                                                                          handler96(el114, ![]);
+                                                                          const detectionBox3 = el114?.[
                                                                             'closest'
                                                                           ]?.(
                                                                             '.person-replacement-detection-box',
                                                                           );
-                                                                          if (_0x4eff23 === 'orientation') {
-                                                                            const _0x5d0111 = _0x1fb399?.[
+                                                                          if (text28 === 'orientation') {
+                                                                            const label5 = detectionBox3?.[
                                                                               'querySelector'
                                                                             ]?.(
                                                                               '[data-person-replacement-person-label]',
                                                                             );
-                                                                            _0x5569e2({
-                                                                              detectionBox: _0x1fb399,
-                                                                              label: _0x5d0111?.[
+                                                                            handler39({
+                                                                              detectionBox: detectionBox3,
+                                                                              label: label5?.[
                                                                                 'querySelector'
                                                                               ]?.(
                                                                                 '[data-person-replacement-detection-picker-value]',
                                                                               )?.['textContent'],
                                                                               sourceCharacterId:
-                                                                                _0x5d0111?.['dataset']?.[
+                                                                                label5?.['dataset']?.[
                                                                                   'personReplacementSelectedSourceCharacterId'
                                                                                 ],
-                                                                              orientation: _0x138735,
+                                                                              orientation: orientation3,
                                                                             });
                                                                           } else {
-                                                                            if (_0x4eff23 === 'scope')
-                                                                              _0x4e3281(
-                                                                                _0x43f995['UPDATE_PEOPLE'],
+                                                                            if (text28 === 'scope')
+                                                                              runIntent(
+                                                                                downloadImageIntent[
+                                                                                  'UPDATE_PEOPLE'
+                                                                                ],
                                                                                 {
                                                                                   shotId: normalizeText(
-                                                                                    _0x1fb399?.['dataset']?.[
-                                                                                      'shotId'
-                                                                                    ] ||
-                                                                                      _0x57b9e5['workspace'][
-                                                                                        'selectedShotId'
-                                                                                      ],
+                                                                                    detectionBox3?.[
+                                                                                      'dataset'
+                                                                                    ]?.['shotId'] ||
+                                                                                      initialProject2[
+                                                                                        'workspace'
+                                                                                      ]['selectedShotId'],
                                                                                   ),
                                                                                   updates: [
                                                                                     {
                                                                                       personId: normalizeText(
-                                                                                        _0x1fb399?.[
+                                                                                        detectionBox3?.[
                                                                                           'dataset'
                                                                                         ]?.['personId'],
                                                                                       ),
                                                                                       replacementScope:
-                                                                                        _0x138735,
+                                                                                        orientation3,
                                                                                     },
                                                                                   ],
                                                                                 },
                                                                               );
                                                                             else
-                                                                              _0x138735 !==
+                                                                              orientation3 !==
                                                                                 PERSON_REPLACEMENT_CUSTOM_LABEL_VALUE &&
-                                                                                _0x5569e2({
-                                                                                  detectionBox: _0x1fb399,
-                                                                                  label: _0x3365c4,
+                                                                                handler39({
+                                                                                  detectionBox: detectionBox3,
+                                                                                  label: label4,
                                                                                   sourceCharacterId:
-                                                                                    _0x4287f5,
+                                                                                    sourceCharacterId4,
                                                                                 });
                                                                           }
                                                                         } else {
                                                                           if (
-                                                                            _0x2a330c ===
+                                                                            mode2 ===
                                                                             'delete-detection-custom-label'
                                                                           ) {
-                                                                            const _0x108e8d = normalizeText(
-                                                                              _0x1d4b2f['dataset'][
+                                                                            const text29 = normalizeText(
+                                                                              sourceId['dataset'][
                                                                                 'personReplacementCustomLabel'
                                                                               ],
                                                                             );
                                                                             if (
-                                                                              !_0x108e8d ||
+                                                                              !text29 ||
                                                                               isGeneratedPersonReplacementLabel(
-                                                                                _0x108e8d,
+                                                                                text29,
                                                                               )
                                                                             )
                                                                               return;
-                                                                            const _0x3b2b5a = new Set(
-                                                                              _0x57b9e5['workspace'][
+                                                                            const args27 = new Set(
+                                                                              initialProject2['workspace'][
                                                                                 'removedCustomPersonLabels'
                                                                               ],
                                                                             );
-                                                                            (_0x3b2b5a['add'](_0x108e8d),
-                                                                              _0x26d845(
+                                                                            (args27['add'](text29),
+                                                                              updateProject(
                                                                                 {
-                                                                                  ..._0x57b9e5,
+                                                                                  ...initialProject2,
                                                                                   workspace: {
-                                                                                    ..._0x57b9e5['workspace'],
+                                                                                    ...initialProject2[
+                                                                                      'workspace'
+                                                                                    ],
                                                                                     removedCustomPersonLabels:
-                                                                                      [..._0x3b2b5a],
+                                                                                      [...args27],
                                                                                   },
                                                                                 },
                                                                                 'person-custom-label-delete',
                                                                               ));
                                                                           } else {
                                                                             if (
-                                                                              _0x2a330c ===
-                                                                              'clear-person-mapping'
+                                                                              mode2 === 'clear-person-mapping'
                                                                             )
-                                                                              _0x2012da({
+                                                                              handler102({
                                                                                 shotId:
-                                                                                  _0x1d4b2f['dataset'][
+                                                                                  sourceId['dataset'][
                                                                                     'shotId'
                                                                                   ],
                                                                                 personId:
-                                                                                  _0x1d4b2f['dataset'][
+                                                                                  sourceId['dataset'][
                                                                                     'personId'
                                                                                   ],
                                                                               });
                                                                             else {
-                                                                              if (
-                                                                                _0x2a330c === 'delete-person'
-                                                                              )
-                                                                                (_0x218fa0(),
-                                                                                  _0x1feb36(
-                                                                                    _0x43f995[
+                                                                              if (mode2 === 'delete-person')
+                                                                                (clearKeyboardSelection(),
+                                                                                  handler44(
+                                                                                    downloadImageIntent[
                                                                                       'DELETE_PEOPLE'
                                                                                     ],
                                                                                     {
                                                                                       shotId:
-                                                                                        _0x1d4b2f['dataset'][
+                                                                                        sourceId['dataset'][
                                                                                           'shotId'
                                                                                         ],
                                                                                       personIds: [
-                                                                                        _0x1d4b2f['dataset'][
+                                                                                        sourceId['dataset'][
                                                                                           'personId'
                                                                                         ],
                                                                                       ],
@@ -5574,133 +5673,134 @@ export function createReplacementStudioWorkspace({
                                                                                   ));
                                                                               else {
                                                                                 if (
-                                                                                  _0x2a330c ===
+                                                                                  mode2 ===
                                                                                   'clear-shot-people'
                                                                                 ) {
-                                                                                  const _0x53ca0b =
+                                                                                  const shotId4 =
                                                                                       normalizeText(
-                                                                                        _0x1d4b2f['dataset'][
+                                                                                        sourceId['dataset'][
                                                                                           'shotId'
                                                                                         ] ||
-                                                                                          _0x57b9e5[
+                                                                                          initialProject2[
                                                                                             'workspace'
                                                                                           ]['selectedShotId'],
                                                                                       ),
-                                                                                    _0x372efc = _0x57b9e5[
-                                                                                      'shots'
-                                                                                    ]['find'](
-                                                                                      (_0x77ba1a) =>
-                                                                                        _0x77ba1a['id'] ===
-                                                                                        _0x53ca0b,
-                                                                                    ),
-                                                                                    _0x357cc7 =
+                                                                                    value330 =
+                                                                                      initialProject2[
+                                                                                        'shots'
+                                                                                      ]['find'](
+                                                                                        (value331) =>
+                                                                                          value331['id'] ===
+                                                                                          shotId4,
+                                                                                      ),
+                                                                                    personIds =
                                                                                       getPersonReplacementBoxedPeople(
-                                                                                        _0x372efc,
+                                                                                        value330,
                                                                                       )
-                                                                                        ['map']((_0x2c6bbf) =>
+                                                                                        ['map']((value332) =>
                                                                                           normalizeText(
-                                                                                            _0x2c6bbf['id'],
+                                                                                            value332['id'],
                                                                                           ),
                                                                                         )
                                                                                         ['filter'](Boolean);
-                                                                                  if (!_0x357cc7['length'])
+                                                                                  if (!personIds['length'])
                                                                                     return;
-                                                                                  (_0x218fa0(),
-                                                                                    _0x113bbe(),
-                                                                                    _0x1feb36(
-                                                                                      _0x43f995[
+                                                                                  (clearKeyboardSelection(),
+                                                                                    clearBatchSelection(),
+                                                                                    handler44(
+                                                                                      downloadImageIntent[
                                                                                         'DELETE_PEOPLE'
                                                                                       ],
                                                                                       {
-                                                                                        shotId: _0x53ca0b,
-                                                                                        personIds: _0x357cc7,
+                                                                                        shotId: shotId4,
+                                                                                        personIds: personIds,
                                                                                       },
                                                                                     ));
                                                                                 } else {
                                                                                   if (
-                                                                                    _0x2a330c ===
+                                                                                    mode2 ===
                                                                                       'toggle-prompt-enhancement' ||
-                                                                                    _0x2a330c ===
+                                                                                    mode2 ===
                                                                                       'toggle-prompt-mode'
                                                                                   ) {
-                                                                                    const _0x3bfbf3 =
+                                                                                    const args28 =
                                                                                       applyPersonReplacementPromptControlAction(
-                                                                                        _0x57b9e5,
-                                                                                        _0x2a330c,
-                                                                                        _0x1d4b2f,
-                                                                                        _0x53365b()[
+                                                                                        initialProject2,
+                                                                                        mode2,
+                                                                                        sourceId,
+                                                                                        getShotRenderState()[
                                                                                           'generatingShotIds'
                                                                                         ],
                                                                                       );
-                                                                                    if (!_0x3bfbf3) return;
-                                                                                    ((_0x57b9e5 =
+                                                                                    if (!args28) return;
+                                                                                    ((initialProject2 =
                                                                                       normalizePersonReplacementWorkspaceProject(
                                                                                         {
-                                                                                          ..._0x57b9e5,
-                                                                                          ..._0x3bfbf3[
-                                                                                            'patch'
-                                                                                          ],
+                                                                                          ...initialProject2,
+                                                                                          ...args28['patch'],
                                                                                         },
                                                                                       )),
                                                                                       syncPersonReplacementPromptModeControl(
-                                                                                        _0x42b7b0,
-                                                                                        _0x57b9e5,
-                                                                                        _0x53365b()[
+                                                                                        floatingMenuHost,
+                                                                                        initialProject2,
+                                                                                        getShotRenderState()[
                                                                                           'generatingShotIds'
                                                                                         ],
                                                                                       ),
-                                                                                      _0x273c17(
-                                                                                        _0x3bfbf3['reason'],
+                                                                                      handler21(
+                                                                                        args28['reason'],
                                                                                       ));
                                                                                     if (
-                                                                                      _0x2a330c ===
+                                                                                      mode2 ===
                                                                                       'toggle-prompt-mode'
                                                                                     )
                                                                                       syncPersonReplacementImagePromptGate(
-                                                                                        _0x42b7b0,
-                                                                                        _0x57b9e5,
-                                                                                        _0x1f9cef(),
+                                                                                        floatingMenuHost,
+                                                                                        initialProject2,
+                                                                                        handler22(),
                                                                                       );
                                                                                   } else {
                                                                                     if (
-                                                                                      _0x2a330c ===
+                                                                                      mode2 ===
                                                                                       'generate-replacement-image'
                                                                                     ) {
                                                                                       if (
-                                                                                        _0x57b9e5[
+                                                                                        initialProject2[
                                                                                           'workspace'
                                                                                         ]['shotSelectionMode']
                                                                                       ) {
-                                                                                        if (_0x4fea56()) {
-                                                                                          _0x1d3a8e();
+                                                                                        if (
+                                                                                          isShotBatchForCurrentProject()
+                                                                                        ) {
+                                                                                          cancelShotBatch();
                                                                                           return;
                                                                                         }
-                                                                                        _0x2daac8('image');
+                                                                                        runShotBatch('image');
                                                                                         return;
                                                                                       }
-                                                                                      const _0x1109c3 =
+                                                                                      const enabled54 =
                                                                                           personReplacementImagePresentation[
                                                                                             'build'
-                                                                                          ](_0x57b9e5),
-                                                                                        _0x1bd06d =
-                                                                                          _0x1109c3[
+                                                                                          ](initialProject2),
+                                                                                        value333 =
+                                                                                          enabled54[
                                                                                             'selectedShot'
                                                                                           ],
-                                                                                        _0x22ce60 =
-                                                                                          _0x1109c3['gate'][
+                                                                                        list16 =
+                                                                                          enabled54['gate'][
                                                                                             'duplicateRoleLabels'
                                                                                           ];
                                                                                       if (
-                                                                                        !_0x1109c3['gate'][
+                                                                                        !enabled54['gate'][
                                                                                           'sceneOnly'
                                                                                         ] &&
-                                                                                        _0x22ce60['length']
+                                                                                        list16['length']
                                                                                       ) {
                                                                                         windowObject?.[
                                                                                           'showToast'
                                                                                         ]?.(
                                                                                           '同一镜头内角色不能重复：' +
-                                                                                            _0x22ce60['join'](
+                                                                                            list16['join'](
                                                                                               '、',
                                                                                             ) +
                                                                                             '。请修改红色框中的角色名。',
@@ -5709,10 +5809,10 @@ export function createReplacementStudioWorkspace({
                                                                                         return;
                                                                                       }
                                                                                       if (
-                                                                                        !_0x1109c3['gate'][
+                                                                                        !enabled54['gate'][
                                                                                           'sceneOnly'
                                                                                         ] &&
-                                                                                        _0x1109c3['gate'][
+                                                                                        enabled54['gate'][
                                                                                           'unresolvedOrientationPersonIds'
                                                                                         ]['length']
                                                                                       ) {
@@ -5720,7 +5820,7 @@ export function createReplacementStudioWorkspace({
                                                                                           'showToast'
                                                                                         ]?.(
                                                                                           '还有 ' +
-                                                                                            _0x1109c3['gate'][
+                                                                                            enabled54['gate'][
                                                                                               'unresolvedOrientationPersonIds'
                                                                                             ]['length'] +
                                                                                             '\x20个人物未确认朝向，请先选择朝向。',
@@ -5728,29 +5828,31 @@ export function createReplacementStudioWorkspace({
                                                                                         );
                                                                                         return;
                                                                                       }
-                                                                                      const _0x418f88 =
-                                                                                        _0x42b7b0?.[
+                                                                                      const value334 =
+                                                                                        floatingMenuHost?.[
                                                                                           'querySelector'
                                                                                         ]?.(
                                                                                           '[data-person-replacement-keyframe-stage] > img',
                                                                                         );
-                                                                                      _0x4e3281(
-                                                                                        _0x43f995[
+                                                                                      runIntent(
+                                                                                        downloadImageIntent[
                                                                                           'GENERATE_REPLACEMENT_IMAGE'
                                                                                         ],
                                                                                         {
                                                                                           projectId:
-                                                                                            _0x57b9e5['id'],
+                                                                                            initialProject2[
+                                                                                              'id'
+                                                                                            ],
                                                                                           shotId:
-                                                                                            _0x57b9e5[
+                                                                                            initialProject2[
                                                                                               'workspace'
                                                                                             ][
                                                                                               'selectedShotId'
                                                                                             ],
                                                                                           sourceImageSize:
                                                                                             resolvePersonReplacementSourceImageSize(
-                                                                                              _0x418f88,
-                                                                                              _0x1bd06d,
+                                                                                              value334,
+                                                                                              value333,
                                                                                             ),
                                                                                         },
                                                                                         {},
@@ -5761,52 +5863,55 @@ export function createReplacementStudioWorkspace({
                                                                                       );
                                                                                     } else {
                                                                                       if (
-                                                                                        _0x2a330c ===
+                                                                                        mode2 ===
                                                                                         'generate-replacement-video'
                                                                                       ) {
                                                                                         if (
-                                                                                          _0x57b9e5[
+                                                                                          initialProject2[
                                                                                             'workspace'
                                                                                           ][
                                                                                             'shotSelectionMode'
                                                                                           ]
                                                                                         ) {
-                                                                                          if (_0x4fea56()) {
-                                                                                            _0x1d3a8e();
+                                                                                          if (
+                                                                                            isShotBatchForCurrentProject()
+                                                                                          ) {
+                                                                                            cancelShotBatch();
                                                                                             return;
                                                                                           }
-                                                                                          _0x2daac8('video');
+                                                                                          runShotBatch(
+                                                                                            'video',
+                                                                                          );
                                                                                           return;
                                                                                         }
-                                                                                        const _0x4cfb22 =
-                                                                                            _0x57b9e5[
+                                                                                        const shotId5 =
+                                                                                            initialProject2[
                                                                                               'workspace'
                                                                                             ][
                                                                                               'selectedShotId'
                                                                                             ],
-                                                                                          _0x5111f1 =
+                                                                                          personReplacementVideoGenerationState =
                                                                                             resolvePersonReplacementVideoGenerationState(
-                                                                                              _0x57b9e5[
+                                                                                              initialProject2[
                                                                                                 'workspace'
                                                                                               ],
-                                                                                              _0x4cfb22,
+                                                                                              shotId5,
                                                                                             );
                                                                                         if (
                                                                                           isPersonReplacementVideoGenerationActive(
-                                                                                            _0x5111f1,
+                                                                                            personReplacementVideoGenerationState,
                                                                                           )
                                                                                         ) {
-                                                                                          _0x4e3281(
-                                                                                            _0x43f995[
+                                                                                          runIntent(
+                                                                                            downloadImageIntent[
                                                                                               'CANCEL_REPLACEMENT_VIDEO'
                                                                                             ],
                                                                                             {
                                                                                               projectId:
-                                                                                                _0x57b9e5[
+                                                                                                initialProject2[
                                                                                                   'id'
                                                                                                 ],
-                                                                                              shotId:
-                                                                                                _0x4cfb22,
+                                                                                              shotId: shotId5,
                                                                                             },
                                                                                             {},
                                                                                             {
@@ -5816,14 +5921,16 @@ export function createReplacementStudioWorkspace({
                                                                                           );
                                                                                           return;
                                                                                         }
-                                                                                        _0x4e3281(
-                                                                                          _0x43f995[
+                                                                                        runIntent(
+                                                                                          downloadImageIntent[
                                                                                             'GENERATE_REPLACEMENT_VIDEO'
                                                                                           ],
                                                                                           {
                                                                                             projectId:
-                                                                                              _0x57b9e5['id'],
-                                                                                            shotId: _0x4cfb22,
+                                                                                              initialProject2[
+                                                                                                'id'
+                                                                                              ],
+                                                                                            shotId: shotId5,
                                                                                           },
                                                                                           {},
                                                                                           {
@@ -5833,37 +5940,37 @@ export function createReplacementStudioWorkspace({
                                                                                         );
                                                                                       } else {
                                                                                         if (
-                                                                                          _0x2a330c ===
+                                                                                          mode2 ===
                                                                                           'trim-current-video'
                                                                                         )
-                                                                                          _0x3013ce(
-                                                                                            _0x1d4b2f[
+                                                                                          handler41(
+                                                                                            sourceId[
                                                                                               'dataset'
                                                                                             ]['shotId'],
                                                                                           );
                                                                                         else {
                                                                                           if (
-                                                                                            _0x2a330c ===
+                                                                                            mode2 ===
                                                                                             'toggle-video-replacement-sync-playback'
                                                                                           )
-                                                                                            void _0x2ba69b[
+                                                                                            void personReplacementVideoPlaybackController[
                                                                                               'toggleSyncEnabled'
                                                                                             ]();
                                                                                           else {
                                                                                             if (
-                                                                                              _0x2a330c ===
+                                                                                              mode2 ===
                                                                                               'toggle-comparison-playback'
                                                                                             )
-                                                                                              _0x31cdf2[
+                                                                                              personReplacementCompositePreviewController[
                                                                                                 'togglePlayback'
                                                                                               ]();
                                                                                             else {
                                                                                               if (
-                                                                                                _0x2a330c ===
+                                                                                                mode2 ===
                                                                                                 'set-preview-track'
                                                                                               )
-                                                                                                _0x57cd0f(
-                                                                                                  _0x1d4b2f[
+                                                                                                handler40(
+                                                                                                  sourceId[
                                                                                                     'dataset'
                                                                                                   ][
                                                                                                     'previewTrack'
@@ -5871,15 +5978,15 @@ export function createReplacementStudioWorkspace({
                                                                                                 );
                                                                                               else {
                                                                                                 if (
-                                                                                                  _0x2a330c ===
+                                                                                                  mode2 ===
                                                                                                   'compose-output'
                                                                                                 )
-                                                                                                  _0x4e3281(
-                                                                                                    _0x43f995[
+                                                                                                  runIntent(
+                                                                                                    downloadImageIntent[
                                                                                                       'COMPOSE_OUTPUT'
                                                                                                     ],
                                                                                                     cloneJson(
-                                                                                                      _0x57b9e5,
+                                                                                                      initialProject2,
                                                                                                     ),
                                                                                                     {},
                                                                                                     {
@@ -5889,20 +5996,20 @@ export function createReplacementStudioWorkspace({
                                                                                                   );
                                                                                                 else {
                                                                                                   if (
-                                                                                                    _0x2a330c ===
+                                                                                                    mode2 ===
                                                                                                     'toggle-output-menu'
                                                                                                   )
-                                                                                                    _0x37ce51(
-                                                                                                      _0x1d4b2f,
+                                                                                                    handler16(
+                                                                                                      sourceId,
                                                                                                     );
                                                                                                   else {
                                                                                                     if (
-                                                                                                      _0x2a330c ===
+                                                                                                      mode2 ===
                                                                                                       'sync-all-clips-to-canvas'
                                                                                                     )
-                                                                                                      (_0x624e11(),
-                                                                                                        _0x4e3281(
-                                                                                                          _0x43f995[
+                                                                                                      (handler15(),
+                                                                                                        runIntent(
+                                                                                                          downloadImageIntent[
                                                                                                             'ADD_OUTPUT_TO_CANVAS'
                                                                                                           ],
                                                                                                           {
@@ -5912,7 +6019,7 @@ export function createReplacementStudioWorkspace({
                                                                                                               ],
                                                                                                             project:
                                                                                                               cloneJson(
-                                                                                                                _0x57b9e5,
+                                                                                                                initialProject2,
                                                                                                               ),
                                                                                                           },
                                                                                                           {},
@@ -5923,12 +6030,12 @@ export function createReplacementStudioWorkspace({
                                                                                                         ));
                                                                                                     else {
                                                                                                       if (
-                                                                                                        _0x2a330c ===
+                                                                                                        mode2 ===
                                                                                                         'sync-project-to-canvas'
                                                                                                       )
-                                                                                                        (_0x624e11(),
-                                                                                                          _0x4e3281(
-                                                                                                            _0x43f995[
+                                                                                                        (handler15(),
+                                                                                                          runIntent(
+                                                                                                            downloadImageIntent[
                                                                                                               'ADD_OUTPUT_TO_CANVAS'
                                                                                                             ],
                                                                                                             {
@@ -5938,7 +6045,7 @@ export function createReplacementStudioWorkspace({
                                                                                                                 ],
                                                                                                               project:
                                                                                                                 cloneJson(
-                                                                                                                  _0x57b9e5,
+                                                                                                                  initialProject2,
                                                                                                                 ),
                                                                                                             },
                                                                                                             {},
@@ -5957,15 +6064,15 @@ export function createReplacementStudioWorkspace({
                                                                                                             'export-premiere-xml': 0x1,
                                                                                                             'export-jianying-draft': 0x1,
                                                                                                           },
-                                                                                                          _0x2a330c,
+                                                                                                          mode2,
                                                                                                         ) &&
-                                                                                                          (_0x624e11(),
-                                                                                                          _0x4e3281(
-                                                                                                            _0x43f995[
+                                                                                                          (handler15(),
+                                                                                                          runIntent(
+                                                                                                            downloadImageIntent[
                                                                                                               'EXPORT_OUTPUT'
                                                                                                             ],
                                                                                                             {
-                                                                                                              mode: _0x2a330c[
+                                                                                                              mode: mode2[
                                                                                                                 'slice'
                                                                                                               ](
                                                                                                                 'export-'[
@@ -5974,7 +6081,7 @@ export function createReplacementStudioWorkspace({
                                                                                                               ),
                                                                                                               project:
                                                                                                                 cloneJson(
-                                                                                                                  _0x57b9e5,
+                                                                                                                  initialProject2,
                                                                                                                 ),
                                                                                                             },
                                                                                                             {},
@@ -6032,151 +6139,164 @@ export function createReplacementStudioWorkspace({
         }
       }
     },
-    _0x2f6384 = (_0x4cb0cc) => {
-      if (_0x4cb0cc['target']?.['matches']?.('[data-story-project-search]')) {
-        const _0x23e6b5 = Number(_0x4cb0cc['target']['selectionStart']);
-        ((_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-          ..._0x57b9e5,
+    handler106 = (projectSearchQuery) => {
+      if (projectSearchQuery['target']?.['matches']?.('[data-story-project-search]')) {
+        const value335 = Number(projectSearchQuery['target']['selectionStart']);
+        ((initialProject2 = normalizePersonReplacementWorkspaceProject({
+          ...initialProject2,
           workspace: {
-            ..._0x57b9e5['workspace'],
-            projectSearchQuery: _0x4cb0cc['target']['value'],
+            ...initialProject2['workspace'],
+            projectSearchQuery: projectSearchQuery['target']['value'],
             openProjectMenuId: '',
             pendingDeleteProjectId: '',
           },
         })),
-          (_0x4cb0cc['target']['value'] = _0x57b9e5['workspace']['projectSearchQuery']));
-        const _0x4be4eb = refreshWorkspaceProjectResultsInPlace({
-          root: _0x4cb0cc['target']['closest']?.('.story-home-page') || _0x42b7b0,
+          (projectSearchQuery['target']['value'] = initialProject2['workspace']['projectSearchQuery']));
+        const refreshWorkspaceProjectResultsInPlace2 = refreshWorkspaceProjectResultsInPlace({
+          root: projectSearchQuery['target']['closest']?.('.story-home-page') || floatingMenuHost,
           documentObject: documentObject,
-          renderResults: () => personReplacementShellPresentation['renderHomeProjectResults'](_0x57b9e5),
+          renderResults: () =>
+            personReplacementShellPresentation['renderHomeProjectResults'](initialProject2),
         });
-        if (!_0x4be4eb) _0x4cf492();
-        const _0x41381d = _0x4be4eb
-          ? _0x4cb0cc['target']
-          : _0x42b7b0?.['querySelector']?.('[data-story-project-search]');
-        _0x41381d?.['focus']?.();
-        Number['isFinite'](_0x23e6b5) && _0x41381d?.['setSelectionRange']?.(_0x23e6b5, _0x23e6b5);
+        if (!refreshWorkspaceProjectResultsInPlace2) run();
+        const el119 = refreshWorkspaceProjectResultsInPlace2
+          ? projectSearchQuery['target']
+          : floatingMenuHost?.['querySelector']?.('[data-story-project-search]');
+        el119?.['focus']?.();
+        Number['isFinite'](value335) && el119?.['setSelectionRange']?.(value335, value335);
         return;
       }
-      if (_0x4cb0cc['target']?.['matches']?.('[data-story-project-title]')) {
-        const _0x487575 = normalizeText(_0x4cb0cc['target']['dataset']['storyProjectTitle']);
-        _0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-          ..._0x57b9e5,
-          libraryProjects: _0x57b9e5['libraryProjects']['map']((_0x43c55a) =>
-            normalizeText(_0x43c55a?.['id']) === _0x487575
-              ? { ..._0x43c55a, title: _0x4cb0cc['target']['value'] }
-              : _0x43c55a,
+      if (projectSearchQuery['target']?.['matches']?.('[data-story-project-title]')) {
+        const text30 = normalizeText(projectSearchQuery['target']['dataset']['storyProjectTitle']);
+        initialProject2 = normalizePersonReplacementWorkspaceProject({
+          ...initialProject2,
+          libraryProjects: initialProject2['libraryProjects']['map']((args29) =>
+            normalizeText(args29?.['id']) === text30
+              ? { ...args29, title: projectSearchQuery['target']['value'] }
+              : args29,
           ),
         });
         return;
       }
-      if (_0x4cb0cc['target']?.['matches']?.('[data-story-asset-prompt]')) {
-        const _0x33d6d2 = _0xe8cb52(),
-          _0x3bef6d = _0x391a96(_0x33d6d2);
-        if (!_0x33d6d2 || !_0x3bef6d) return;
-        ((_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-          ..._0x57b9e5,
-          characters: _0x57b9e5['characters']['map']((_0x572a90) =>
-            _0x572a90['id'] === _0x33d6d2['id']
+      if (projectSearchQuery['target']?.['matches']?.('[data-story-asset-prompt]')) {
+        const enabled55 = characterId(),
+          enabled56 = handler13(enabled55);
+        if (!enabled55 || !enabled56) return;
+        ((initialProject2 = normalizePersonReplacementWorkspaceProject({
+          ...initialProject2,
+          characters: initialProject2['characters']['map']((appearances2) =>
+            appearances2['id'] === enabled55['id']
               ? {
-                  ..._0x572a90,
-                  appearances: _0x572a90['appearances']['map']((_0x1ff62d) =>
-                    _0x1ff62d['id'] === _0x3bef6d['id']
-                      ? { ..._0x1ff62d, prompt: readPersonReplacementAssetPromptText(_0x4cb0cc['target']) }
-                      : _0x1ff62d,
+                  ...appearances2,
+                  appearances: appearances2['appearances']['map']((args30) =>
+                    args30['id'] === enabled56['id']
+                      ? {
+                          ...args30,
+                          prompt: readPersonReplacementAssetPromptText(projectSearchQuery['target']),
+                        }
+                      : args30,
                   ),
                 }
-              : _0x572a90,
+              : appearances2,
           ),
         })),
-          _0x273c17('appearance-prompt'));
+          handler21('appearance-prompt'));
         return;
       }
-      if (_0x4cb0cc['target']?.['dataset']?.['personReplacementField'] === 'image-prompt') {
-        if (shouldSkipPromptTriggerForBulkInput(_0x4cb0cc)) return;
-        const _0x5a846c = _0x4cb0cc['target']['dataset']['shotId'],
-          _0x36ea54 = _0x4cb0cc['target']['matches']?.('[contenteditable="true"]')
-            ? sanitizePromptHtmlForCommit(_0x4cb0cc['target']['innerHTML'])
-            : _0x4cb0cc['target']['value'];
-        ((_0x57b9e5 = normalizePersonReplacementWorkspaceProject({
-          ..._0x57b9e5,
-          shots: _0x57b9e5['shots']['map']((_0x211b4f) =>
-            _0x211b4f['id'] === _0x5a846c ? { ..._0x211b4f, imagePrompt: _0x36ea54 } : _0x211b4f,
+      if (projectSearchQuery['target']?.['dataset']?.['personReplacementField'] === 'image-prompt') {
+        if (shouldSkipPromptTriggerForBulkInput(projectSearchQuery)) return;
+        const value336 = projectSearchQuery['target']['dataset']['shotId'],
+          imagePrompt = projectSearchQuery['target']['matches']?.('[contenteditable="true"]')
+            ? sanitizePromptHtmlForCommit(projectSearchQuery['target']['innerHTML'])
+            : projectSearchQuery['target']['value'];
+        ((initialProject2 = normalizePersonReplacementWorkspaceProject({
+          ...initialProject2,
+          shots: initialProject2['shots']['map']((args31) =>
+            args31['id'] === value336 ? { ...args31, imagePrompt: imagePrompt } : args31,
           ),
         })),
-          _0x273c17('image-prompt'));
+          handler21('image-prompt'));
         return;
       }
-      _0x4cb0cc['target']?.['dataset']?.['personReplacementField'] === 'video-prompt' &&
-        (_0x4cb0cc['type'] === 'input' &&
-          checkSlashTrigger(_0x4cb0cc, {
-            promptEl: _0x4cb0cc['target'],
+      projectSearchQuery['target']?.['dataset']?.['personReplacementField'] === 'video-prompt' &&
+        (projectSearchQuery['type'] === 'input' &&
+          checkSlashTrigger(projectSearchQuery, {
+            promptEl: projectSearchQuery['target'],
             nodeType: 'ai-video',
             nodeId: '',
-            onPromptCommit: () => _0x1fc768(_0x4cb0cc['target'], 'video-prompt'),
-            onGenerate: (_0x269309, _0x33262b) => _0x56892a(_0x4cb0cc['target'], _0x269309, _0x33262b),
+            onPromptCommit: () => handler30(projectSearchQuery['target'], 'video-prompt'),
+            onGenerate: (value337, value338) => handler31(projectSearchQuery['target'], value337, value338),
           }),
-        _0x1fc768(_0x4cb0cc['target']));
+        handler30(projectSearchQuery['target']));
     },
-    _0x50349f = (_0x40afb6) => {
-      if (_0x40afb6['target']['matches']?.('[data-person-replacement-audio-character]')) {
-        const _0x32d6b2 = _0x40afb6['target']
+    value339 = (selectedVoiceSourceId) => {
+      if (selectedVoiceSourceId['target']['matches']?.('[data-person-replacement-audio-character]')) {
+        const el120 = selectedVoiceSourceId['target']
           ['closest']('[data-workspace-audio-asset-id]')
           ?.['querySelector']('[data-person-replacement-action=\x22bind-project-audio\x22]');
-        if (_0x32d6b2)
-          _0x32d6b2['disabled'] = !_0x57b9e5['characters']['some'](
-            (_0x5a59b0) => _0x5a59b0['id'] === _0x40afb6['target']['value'],
+        if (el120)
+          el120['disabled'] = !initialProject2['characters']['some'](
+            (value340) => value340['id'] === selectedVoiceSourceId['target']['value'],
           );
         return;
       }
-      const _0x511971 = _0x40afb6['target']?.['dataset']?.['personReplacementInput'];
-      if (_0x511971) {
-        const _0x11cb47 = Array['from'](_0x40afb6['target']['files'] || []);
-        if (_0x511971 === 'source-videos') _0x17c907(_0x11cb47['filter'](isPersonReplacementVideoFile));
+      const value341 = selectedVoiceSourceId['target']?.['dataset']?.['personReplacementInput'];
+      if (value341) {
+        const list17 = Array['from'](selectedVoiceSourceId['target']['files'] || []);
+        if (value341 === 'source-videos') handler17(list17['filter'](isPersonReplacementVideoFile));
         else {
-          if (_0x511971 === 'new-character-images') {
-            const _0x1d8200 = _0x11cb47['filter'](isPersonReplacementImageFile);
-            _0x1d8200['length'] && _0x533135('character', () => _0x59d19e(_0x1d8200));
+          if (value341 === 'new-character-images') {
+            const list18 = list17['filter'](isPersonReplacementImageFile);
+            list18['length'] && handler33('character', () => handler18(list18));
           } else {
-            if (_0x511971 === 'new-scene-images') {
-              const _0x2bf916 = _0x11cb47['filter'](isPersonReplacementImageFile);
-              _0x2bf916['length'] &&
-                _0x533135('scene', () => _0x4e3281(_0x43f995['SELECT_NEW_SCENE_IMAGES'], _0x2bf916));
+            if (value341 === 'new-scene-images') {
+              const list19 = list17['filter'](isPersonReplacementImageFile);
+              list19['length'] &&
+                handler33('scene', () => runIntent(downloadImageIntent['SELECT_NEW_SCENE_IMAGES'], list19));
             } else {
-              if (_0x511971 === 'new-audio-files') {
-                const _0x416358 = _0x11cb47['filter'](isPersonReplacementAudioFile);
-                _0x416358['length'] &&
-                  _0x533135('audio', () => _0x4e3281(_0x43f995['SELECT_NEW_AUDIO_FILES'], _0x416358));
+              if (value341 === 'new-audio-files') {
+                const list20 = list17['filter'](isPersonReplacementAudioFile);
+                list20['length'] &&
+                  handler33('audio', () => runIntent(downloadImageIntent['SELECT_NEW_AUDIO_FILES'], list20));
               } else {
-                if (_0x511971 === 'appearance-image' && _0x11cb47[0x0])
-                  _0x4e3281(_0x43f995['SELECT_CHARACTER_REFERENCE'], _0x11cb47[0x0], _0x40a90d || {});
+                if (value341 === 'appearance-image' && list17[0x0])
+                  runIntent(downloadImageIntent['SELECT_CHARACTER_REFERENCE'], list17[0x0], value45 || {});
                 else {
-                  if (_0x511971 === 'replacement-image' && _0x11cb47[0x0])
-                    _0x4e3281(_0x43f995['SELECT_REPLACEMENT_IMAGE'], _0x11cb47[0x0], _0x40a90d || {}, {
+                  if (value341 === 'replacement-image' && list17[0x0])
+                    runIntent(downloadImageIntent['SELECT_REPLACEMENT_IMAGE'], list17[0x0], value45 || {}, {
                       applyCallbackResult: ![],
                     });
                   else {
-                    if (_0x511971 === 'replacement-video-result' && _0x11cb47[0x0]) {
-                      const _0x32a66a = _0x116a03,
-                        _0x42ccd7 = _0x40a90d || {};
-                      void runWorkspaceVideoDownloadAction(_0x32a66a, () =>
+                    if (value341 === 'replacement-video-result' && list17[0x0]) {
+                      const value342 = value46,
+                        value343 = value45 || {};
+                      void runWorkspaceVideoDownloadAction(value342, () =>
                         Promise['resolve'](
-                          _0x4e3281(_0x43f995['SELECT_REPLACEMENT_VIDEO_RESULT'], _0x11cb47[0x0], _0x42ccd7, {
-                            applyCallbackResult: ![],
-                          }),
+                          runIntent(
+                            downloadImageIntent['SELECT_REPLACEMENT_VIDEO_RESULT'],
+                            list17[0x0],
+                            value343,
+                            {
+                              applyCallbackResult: ![],
+                            },
+                          ),
                         ),
                       )['catch'](() => {});
                     } else {
-                      if (_0x511971 === 'replacement-video-slot' && _0x11cb47[0x0])
-                        _0x4e3281(
-                          _0x43f995['SELECT_REPLACEMENT_VIDEO_INPUT'],
-                          _0x11cb47[0x0],
-                          _0x40a90d || {},
+                      if (value341 === 'replacement-video-slot' && list17[0x0])
+                        runIntent(
+                          downloadImageIntent['SELECT_REPLACEMENT_VIDEO_INPUT'],
+                          list17[0x0],
+                          value45 || {},
                           { applyCallbackResult: ![] },
                         );
                       else {
-                        if (_0x511971 === 'character-voice' && _0x11cb47[0x0])
-                          _0x4e3281(_0x43f995['SELECT_CHARACTER_VOICE'], _0x11cb47[0x0], _0x40a90d || {});
+                        if (value341 === 'character-voice' && list17[0x0])
+                          runIntent(
+                            downloadImageIntent['SELECT_CHARACTER_VOICE'],
+                            list17[0x0],
+                            value45 || {},
+                          );
                       }
                     }
                   }
@@ -6185,38 +6305,44 @@ export function createReplacementStudioWorkspace({
             }
           }
         }
-        ((_0x40afb6['target']['value'] = ''), (_0x40a90d = null), (_0x116a03 = null));
+        ((selectedVoiceSourceId['target']['value'] = ''), (value45 = null), (value46 = null));
         return;
       }
-      if (_0x40afb6['target']?.['matches']?.('[data-story-project-title]')) {
-        const _0x58d49b = normalizeText(_0x40afb6['target']['dataset']['storyProjectTitle']),
-          _0xf554d5 = normalizeText(_0x40afb6['target']['value'], '未命名人物替换项目');
-        ((_0x40afb6['target']['value'] = _0xf554d5),
-          _0x4e3281(_0x43f995['RENAME_PROJECT'], { projectId: _0x58d49b, title: _0xf554d5 }));
+      if (selectedVoiceSourceId['target']?.['matches']?.('[data-story-project-title]')) {
+        const projectId2 = normalizeText(selectedVoiceSourceId['target']['dataset']['storyProjectTitle']),
+          title = normalizeText(selectedVoiceSourceId['target']['value'], '未命名人物替换项目');
+        ((selectedVoiceSourceId['target']['value'] = title),
+          runIntent(downloadImageIntent['RENAME_PROJECT'], { projectId: projectId2, title: title }));
       } else {
-        if (_0x40afb6['target']?.['matches']?.('[data-person-replacement-composite-project-title]')) {
-          const _0x17b390 = normalizeText(_0x40afb6['target']['value']) || '未命名人物替换项目';
-          ((_0x40afb6['target']['value'] = _0x17b390),
-            _0x17b390 !== _0x57b9e5['title'] &&
-              _0x4e3281(_0x43f995['RENAME_PROJECT'], { projectId: _0x57b9e5['id'], title: _0x17b390 }));
+        if (
+          selectedVoiceSourceId['target']?.['matches']?.('[data-person-replacement-composite-project-title]')
+        ) {
+          const title2 = normalizeText(selectedVoiceSourceId['target']['value']) || '未命名人物替换项目';
+          ((selectedVoiceSourceId['target']['value'] = title2),
+            title2 !== initialProject2['title'] &&
+              runIntent(downloadImageIntent['RENAME_PROJECT'], {
+                projectId: initialProject2['id'],
+                title: title2,
+              }));
         } else {
-          if (_0x40afb6['target']?.['matches']?.('[data-story-asset-prompt]')) _0x2f6384(_0x40afb6);
+          if (selectedVoiceSourceId['target']?.['matches']?.('[data-story-asset-prompt]'))
+            handler106(selectedVoiceSourceId);
           else {
             if (
-              _0x40afb6['target']?.['dataset']?.['personReplacementField'] === 'image-prompt' ||
-              _0x40afb6['target']?.['dataset']?.['personReplacementField'] === 'video-prompt'
+              selectedVoiceSourceId['target']?.['dataset']?.['personReplacementField'] === 'image-prompt' ||
+              selectedVoiceSourceId['target']?.['dataset']?.['personReplacementField'] === 'video-prompt'
             )
-              (_0x2f6384(_0x40afb6),
-                _0x40afb6['target']['dataset']['personReplacementField'] === 'video-prompt' &&
-                  _0x273c17('video-prompt'));
+              (handler106(selectedVoiceSourceId),
+                selectedVoiceSourceId['target']['dataset']['personReplacementField'] === 'video-prompt' &&
+                  handler21('video-prompt'));
             else
-              _0x40afb6['target']?.['dataset']?.['personReplacementField'] === 'voice-source' &&
-                _0x26d845(
+              selectedVoiceSourceId['target']?.['dataset']?.['personReplacementField'] === 'voice-source' &&
+                updateProject(
                   {
-                    ..._0x57b9e5,
+                    ...initialProject2,
                     workspace: {
-                      ..._0x57b9e5['workspace'],
-                      selectedVoiceSourceId: _0x40afb6['target']['value'],
+                      ...initialProject2['workspace'],
+                      selectedVoiceSourceId: selectedVoiceSourceId['target']['value'],
                     },
                   },
                   'voice-source',
@@ -6225,840 +6351,839 @@ export function createReplacementStudioWorkspace({
         }
       }
     },
-    _0x1f0bcb = (_0x5d5053) => {
-      _0x23c082['handleFocusOut'](_0x5d5053);
-      const _0x36abcf = _0x5d5053['target']?.['closest']?.('[data-person-replacement-person-custom-label]');
-      if (_0x36abcf) _0x51b3c8(_0x36abcf);
-      const _0x31d848 = _0x5d5053['target']?.['closest']?.('[data-person-replacement-detection-picker]');
-      _0x31d848 && !_0x31d848['contains']?.(_0x5d5053['relatedTarget']) && _0x30a2f8(_0x31d848, ![]);
-      const _0x5233a1 = _0x5d5053['target']?.['closest']?.(
-        '[data-story-asset-name-id][contenteditable="true"]',
-      );
-      if (_0x5233a1) _0x31e38b(_0x5233a1);
+    value344 = (event9) => {
+      personReplacementExportSubmenuController['handleFocusOut'](event9);
+      const value345 = event9['target']?.['closest']?.('[data-person-replacement-person-custom-label]');
+      if (value345) handler89(value345);
+      const enabled57 = event9['target']?.['closest']?.('[data-person-replacement-detection-picker]');
+      enabled57 && !enabled57['contains']?.(event9['relatedTarget']) && handler96(enabled57, ![]);
+      const value346 = event9['target']?.['closest']?.('[data-story-asset-name-id][contenteditable="true"]');
+      if (value346) handler49(value346);
     },
-    _0x47c5ed = (_0x4520bf) => {
-      _0x58b712();
-      const _0x6cce74 = _0x4520bf['target']?.['closest']?.('[data-person-replacement-voice-asset-id]');
-      if (_0x6cce74) {
-        const _0x517ce4 = normalizeText(_0x6cce74['dataset']?.['personReplacementVoiceAssetId']);
-        if (!_0x4520bf['dataTransfer'] || !_0x517ce4 || _0x6cce74['disabled']) {
-          _0x4520bf['preventDefault']?.();
+    value347 = (event10) => {
+      hide();
+      const el121 = event10['target']?.['closest']?.('[data-person-replacement-voice-asset-id]');
+      if (el121) {
+        const characterId6 = normalizeText(el121['dataset']?.['personReplacementVoiceAssetId']);
+        if (!event10['dataTransfer'] || !characterId6 || el121['disabled']) {
+          event10['preventDefault']?.();
           return;
         }
-        ((_0x4520bf['dataTransfer']['effectAllowed'] = 'copy'),
-          _0x4520bf['dataTransfer']['setData'](
+        ((event10['dataTransfer']['effectAllowed'] = 'copy'),
+          event10['dataTransfer']['setData'](
             PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE,
-            JSON['stringify']({ characterId: _0x517ce4 }),
+            JSON['stringify']({ characterId: characterId6 }),
           ),
           applyWorkspaceAssetNativeDragPreview(
-            _0x4520bf['dataTransfer'],
-            _0x6cce74['querySelector']?.('.person-replacement-voice-asset-image img') || _0x6cce74,
+            event10['dataTransfer'],
+            el121['querySelector']?.('.person-replacement-voice-asset-image img') || el121,
           ),
-          _0x6cce74['classList']?.['add']?.('is-voice-asset-dragging'),
-          _0x42b7b0?.['classList']?.['add']?.('is-voice-asset-dragging'));
+          el121['classList']?.['add']?.('is-voice-asset-dragging'),
+          floatingMenuHost?.['classList']?.['add']?.('is-voice-asset-dragging'));
         return;
       }
-      const _0x2452a0 = _0x4520bf['target']?.['closest']?.(
+      const el122 = event10['target']?.['closest']?.(
         '[data-person-replacement-target-character-id], [data-person-replacement-target-scene-id]',
       );
-      if (!_0x2452a0 || !_0x4520bf['dataTransfer']) {
-        _0x4520bf['preventDefault']?.();
+      if (!el122 || !event10['dataTransfer']) {
+        event10['preventDefault']?.();
         return;
       }
-      if (_0x4520bf['target']?.['closest']?.('.at-mention-variant-arrow')) {
-        _0x4520bf['preventDefault']?.();
+      if (event10['target']?.['closest']?.('.at-mention-variant-arrow')) {
+        event10['preventDefault']?.();
         return;
       }
-      const _0x548698 = normalizeText(_0x2452a0['dataset']['personReplacementTargetSceneId']),
-        _0x1fa1bc = normalizeText(_0x2452a0['dataset']['personReplacementTargetCharacterId']),
-        _0x169621 = normalizeText(
-          _0x548698
-            ? _0x2452a0['dataset']['personReplacementTargetSceneAppearanceId']
-            : _0x2452a0['dataset']['personReplacementTargetAppearanceId'],
+      const sceneId2 = normalizeText(el122['dataset']['personReplacementTargetSceneId']),
+        characterId7 = normalizeText(el122['dataset']['personReplacementTargetCharacterId']),
+        appearanceId4 = normalizeText(
+          sceneId2
+            ? el122['dataset']['personReplacementTargetSceneAppearanceId']
+            : el122['dataset']['personReplacementTargetAppearanceId'],
         );
-      if ((!_0x548698 && !_0x1fa1bc) || !_0x169621) {
-        _0x4520bf['preventDefault']?.();
+      if ((!sceneId2 && !characterId7) || !appearanceId4) {
+        event10['preventDefault']?.();
         return;
       }
-      ((_0x177009 = !![]),
-        (_0x4520bf['dataTransfer']['effectAllowed'] = 'copy'),
-        _0x548698
-          ? _0x4520bf['dataTransfer']['setData'](
+      ((enabled2 = !![]),
+        (event10['dataTransfer']['effectAllowed'] = 'copy'),
+        sceneId2
+          ? event10['dataTransfer']['setData'](
               PERSON_REPLACEMENT_SCENE_ASSET_DRAG_TYPE,
-              JSON['stringify']({ sceneId: _0x548698, appearanceId: _0x169621 }),
+              JSON['stringify']({ sceneId: sceneId2, appearanceId: appearanceId4 }),
             )
-          : _0x4520bf['dataTransfer']['setData'](
+          : event10['dataTransfer']['setData'](
               'application/x-person-replacement-target',
-              JSON['stringify']({ characterId: _0x1fa1bc, appearanceId: _0x169621 }),
+              JSON['stringify']({ characterId: characterId7, appearanceId: appearanceId4 }),
             ),
         applyWorkspaceAssetNativeDragPreview(
-          _0x4520bf['dataTransfer'],
-          _0x2452a0['querySelector']?.('.story-asset-card-image') || _0x2452a0,
+          event10['dataTransfer'],
+          el122['querySelector']?.('.story-asset-card-image') || el122,
         ),
-        _0x2452a0['classList']?.['add']?.('is-story-asset-dragging'));
+        el122['classList']?.['add']?.('is-story-asset-dragging'));
     },
-    _0x58f3f3 = (_0x408c2f) => {
-      const _0x260b42 = _0x408c2f?.['querySelector']?.('.story-asset-card-image'),
-        _0x1d1219 = normalizeText(
-          _0x260b42?.['currentSrc'] || _0x260b42?.['src'] || _0x260b42?.['getAttribute']?.('src'),
-        );
-      if (!_0x260b42 || !_0x1d1219 || !documentObject?.['createElement']) return null;
-      const _0x2dc774 =
-          _0x260b42['getBoundingClientRect']?.() || _0x408c2f['getBoundingClientRect']?.() || {},
-        _0x494191 = Math['max'](0x1, Number(_0x2dc774['width']) || 0x80),
-        _0x2d39d7 = Math['max'](0x1, Number(_0x2dc774['height']) || _0x494191),
-        _0x11b19a = Math['min'](0xa0, Math['max'](0x60, _0x494191)),
-        _0x57c426 = Math['max'](0x36, Math['round']((_0x11b19a * _0x2d39d7) / _0x494191)),
-        _0x4a0870 = documentObject['createElement']('div'),
-        _0xd85839 = documentObject['createElement']('img');
+    handler107 = (el123) => {
+      const el124 = el123?.['querySelector']?.('.story-asset-card-image'),
+        text31 = normalizeText(el124?.['currentSrc'] || el124?.['src'] || el124?.['getAttribute']?.('src'));
+      if (!el124 || !text31 || !documentObject?.['createElement']) return null;
+      const box6 = el124['getBoundingClientRect']?.() || el123['getBoundingClientRect']?.() || {},
+        value348 = Math['max'](0x1, Number(box6['width']) || 0x80),
+        value349 = Math['max'](0x1, Number(box6['height']) || value348),
+        value350 = Math['min'](0xa0, Math['max'](0x60, value348)),
+        value351 = Math['max'](0x36, Math['round']((value350 * value349) / value348)),
+        el125 = documentObject['createElement']('div'),
+        value352 = documentObject['createElement']('img');
       return (
-        (_0x4a0870['className'] = 'story-asset-drag-preview\x20person-replacement-target-asset-drag-preview'),
-        _0x4a0870['setAttribute']('aria-hidden', 'true'),
-        (_0x4a0870['style']['width'] = Math['round'](_0x11b19a) + 'px'),
-        (_0x4a0870['style']['height'] = Math['round'](_0x57c426) + 'px'),
-        (_0xd85839['src'] = _0x1d1219),
-        (_0xd85839['alt'] = ''),
-        (_0xd85839['draggable'] = ![]),
-        _0x4a0870['appendChild'](_0xd85839),
-        documentObject['body']?.['appendChild']?.(_0x4a0870),
-        _0x4a0870
+        (el125['className'] = 'story-asset-drag-preview\x20person-replacement-target-asset-drag-preview'),
+        el125['setAttribute']('aria-hidden', 'true'),
+        (el125['style']['width'] = Math['round'](value350) + 'px'),
+        (el125['style']['height'] = Math['round'](value351) + 'px'),
+        (value352['src'] = text31),
+        (value352['alt'] = ''),
+        (value352['draggable'] = ![]),
+        el125['appendChild'](value352),
+        documentObject['body']?.['appendChild']?.(el125),
+        el125
       );
     },
-    _0x1a4d6c = (_0xce34da, _0x304a45) => {
-      if (!_0xce34da) return;
-      const _0xec73cd = Number(_0x304a45?.['clientX']) || 0x0,
-        _0x1ef7a9 = Number(_0x304a45?.['clientY']) || 0x0,
-        _0xaa0cc4 = _0xce34da['getBoundingClientRect']?.() || {},
-        _0x28bd64 = Math['max'](
+    handler108 = (el126, event11) => {
+      if (!el126) return;
+      const value353 = Number(event11?.['clientX']) || 0x0,
+        value354 = Number(event11?.['clientY']) || 0x0,
+        box7 = el126['getBoundingClientRect']?.() || {},
+        value355 = Math['max'](
           0x1,
-          Number(_0xaa0cc4['width']) || Number['parseFloat'](_0xce34da['style']['width']) || 0x1,
+          Number(box7['width']) || Number['parseFloat'](el126['style']['width']) || 0x1,
         ),
-        _0x4b3aa5 = Math['max'](
+        value356 = Math['max'](
           0x1,
-          Number(_0xaa0cc4['height']) || Number['parseFloat'](_0xce34da['style']['height']) || 0x1,
+          Number(box7['height']) || Number['parseFloat'](el126['style']['height']) || 0x1,
         ),
-        _0x43577e = Number(windowObject?.['innerWidth']) || Number['POSITIVE_INFINITY'],
-        _0x3dd7d7 = Number(windowObject?.['innerHeight']) || Number['POSITIVE_INFINITY'],
-        _0x3b4ca4 = 0x8;
-      let _0x58b3a4 = _0xec73cd + WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP,
-        _0x90a3f6 = _0x1ef7a9 + WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP;
-      (_0x58b3a4 + _0x28bd64 > _0x43577e - _0x3b4ca4 &&
-        (_0x58b3a4 = _0xec73cd - _0x28bd64 - WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP),
-        _0x90a3f6 + _0x4b3aa5 > _0x3dd7d7 - _0x3b4ca4 &&
-          (_0x90a3f6 = _0x1ef7a9 - _0x4b3aa5 - WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP),
-        (_0xce34da['style']['transform'] =
+        value357 = Number(windowObject?.['innerWidth']) || Number['POSITIVE_INFINITY'],
+        value358 = Number(windowObject?.['innerHeight']) || Number['POSITIVE_INFINITY'],
+        value359 = 0x8;
+      let value360 = value353 + WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP,
+        value361 = value354 + WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP;
+      (value360 + value355 > value357 - value359 &&
+        (value360 = value353 - value355 - WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP),
+        value361 + value356 > value358 - value359 &&
+          (value361 = value354 - value356 - WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP),
+        (el126['style']['transform'] =
           'translate3d(' +
-          Math['max'](_0x3b4ca4, _0x58b3a4) +
+          Math['max'](value359, value360) +
           'px, ' +
-          Math['max'](_0x3b4ca4, _0x90a3f6) +
+          Math['max'](value359, value361) +
           'px,\x200)'));
     },
-    _0xe08a21 = (_0x165caf) => {
-      const _0x18d277 = documentObject?.['elementFromPoint']?.(
-          Number(_0x165caf?.['clientX']) || 0x0,
-          Number(_0x165caf?.['clientY']) || 0x0,
+    handler109 = (event12) => {
+      const el127 = documentObject?.['elementFromPoint']?.(
+          Number(event12?.['clientX']) || 0x0,
+          Number(event12?.['clientY']) || 0x0,
         ),
-        _0x40f25d = _0x18d277?.['closest']?.('[data-person-replacement-person-drop]');
-      return _0x40f25d && _0x42b7b0?.['contains']?.(_0x40f25d) ? _0x40f25d : null;
+        value362 = el127?.['closest']?.('[data-person-replacement-person-drop]');
+      return value362 && floatingMenuHost?.['contains']?.(value362) ? value362 : null;
     },
-    _0x4a0065 = (_0x29cd85) => {
-      const _0x4bc343 = documentObject?.['elementFromPoint']?.(
-          Number(_0x29cd85?.['clientX']) || 0x0,
-          Number(_0x29cd85?.['clientY']) || 0x0,
+    handler110 = (event13) => {
+      const el128 = documentObject?.['elementFromPoint']?.(
+          Number(event13?.['clientX']) || 0x0,
+          Number(event13?.['clientY']) || 0x0,
         ),
-        _0x1f6b24 = _0x4bc343?.['closest']?.('[data-person-replacement-keyframe-stage]');
-      return _0x1f6b24 && _0x42b7b0?.['contains']?.(_0x1f6b24) ? _0x1f6b24 : null;
+        value363 = el128?.['closest']?.('[data-person-replacement-keyframe-stage]');
+      return value363 && floatingMenuHost?.['contains']?.(value363) ? value363 : null;
     },
-    _0x105813 = (_0x58d666) => {
-      if (_0xc29065 === _0x58d666) return;
-      (_0xc29065?.['classList']?.['remove']?.('is-scene-reference-drop-target'),
-        (_0xc29065 = _0x58d666 || null),
-        _0xc29065?.['classList']?.['add']?.('is-scene-reference-drop-target'));
+    handler111 = (value364) => {
+      if (el3 === value364) return;
+      (el3?.['classList']?.['remove']?.('is-scene-reference-drop-target'),
+        (el3 = value364 || null),
+        el3?.['classList']?.['add']?.('is-scene-reference-drop-target'));
     },
-    _0x2012e0 = ({
-      personBox: _0x55e2fd,
-      target: _0x53dadd,
+    handler112 = ({
+      personBox: personBox2,
+      target: target2,
       clientX: clientX = 0x0,
       clientY: clientY = 0x0,
     } = {}) => {
       if (
-        !_0x55e2fd ||
-        !normalizeText(_0x53dadd?.['characterId']) ||
-        !normalizeText(_0x53dadd?.['appearanceId'])
+        !personBox2 ||
+        !normalizeText(target2?.['characterId']) ||
+        !normalizeText(target2?.['appearanceId'])
       )
         return ![];
-      const _0x198bd0 = {
-          shotId: _0x55e2fd['dataset']['shotId'],
-          personId: _0x55e2fd['dataset']['personId'],
-          targetCharacterId: _0x53dadd['characterId'],
-          targetAppearanceId: _0x53dadd['appearanceId'],
+      const mapping2 = {
+          shotId: personBox2['dataset']['shotId'],
+          personId: personBox2['dataset']['personId'],
+          targetCharacterId: target2['characterId'],
+          targetAppearanceId: target2['appearanceId'],
         },
-        _0x3d740b = _0x57b9e5['shots']['find'](
-          (_0x5eafe7) => _0x5eafe7['id'] === normalizeText(_0x198bd0['shotId']),
+        value365 = initialProject2['shots']['find'](
+          (value366) => value366['id'] === normalizeText(mapping2['shotId']),
         ),
-        _0x4f7a0f = _0x3d740b?.['people']?.['find'](
-          (_0x13d6c5) => _0x13d6c5['id'] === normalizeText(_0x198bd0['personId']),
+        enabled58 = value365?.['people']?.['find'](
+          (value367) => value367['id'] === normalizeText(mapping2['personId']),
         );
-      if (!_0x4f7a0f) return ![];
-      const _0x120db9 = normalizeText(_0x4f7a0f['sourceCharacterId']),
-        _0x6a878f = _0x57b9e5['mappings']['find'](
-          (_0x8660aa) => normalizeText(_0x8660aa['sourceCharacterId']) === _0x120db9,
+      if (!enabled58) return ![];
+      const text32 = normalizeText(enabled58['sourceCharacterId']),
+        value368 = initialProject2['mappings']['find'](
+          (value369) => normalizeText(value369['sourceCharacterId']) === text32,
         )?.['targetCharacterId'],
-        _0x3d5f74 = Boolean(normalizeText(_0x4f7a0f['targetCharacterId']) || normalizeText(_0x6a878f));
-      if (_0x3d5f74) {
-        const _0x44b7ea = _0x57b9e5['characters']['find'](
-            (_0x78511d) => _0x78511d['id'] === normalizeText(_0x53dadd['characterId']),
+        value370 = Boolean(normalizeText(enabled58['targetCharacterId']) || normalizeText(value368));
+      if (value370) {
+        const error7 = initialProject2['characters']['find'](
+            (value371) => value371['id'] === normalizeText(target2['characterId']),
           ),
-          _0x4f7199 = getCharacterAppearance(_0x44b7ea, normalizeText(_0x53dadd['appearanceId']));
-        _0xe2ad53({
-          personBox: _0x55e2fd,
-          mapping: _0x198bd0,
-          personLabel: normalizeText(_0x4f7a0f['label'], _0x120db9 || '当前人物'),
-          targetName: normalizeText(_0x44b7ea?.['name'], '目标人物'),
-          appearanceName: normalizeText(_0x4f7199?.['name'], '当前形象'),
+          error8 = getCharacterAppearance(error7, normalizeText(target2['appearanceId']));
+        handler104({
+          personBox: personBox2,
+          mapping: mapping2,
+          personLabel: normalizeText(enabled58['label'], text32 || '当前人物'),
+          targetName: normalizeText(error7?.['name'], '目标人物'),
+          appearanceName: normalizeText(error8?.['name'], '当前形象'),
           clientX: clientX,
           clientY: clientY,
         });
-      } else _0x2337bb(_0x198bd0);
+      } else handler103(mapping2);
       return (
-        _0x297e45({
-          assetId: normalizeText(_0x53dadd['characterId']),
-          shotId: normalizeText(_0x198bd0['shotId']),
-          personId: normalizeText(_0x198bd0['personId']),
+        blockDropTarget({
+          assetId: normalizeText(target2['characterId']),
+          shotId: normalizeText(mapping2['shotId']),
+          personId: normalizeText(mapping2['personId']),
         }),
-        _0x58b712(),
+        hide(),
         !![]
       );
     },
-    _0x2228cf = () => {
-      const _0x3b30bd = _0x59e1d9;
-      ((_0x59e1d9 = null),
-        _0x3b30bd?.['preview']?.['remove']?.(),
+    handler113 = () => {
+      const event14 = value48;
+      ((value48 = null),
+        event14?.['preview']?.['remove']?.(),
         documentObject['body']?.['classList']?.['remove']?.('person-replacement-target-asset-dragging'));
-      if (!_0x3b30bd?.['element']) return;
-      (_0x3b30bd['originalDraggable'] == null
-        ? _0x3b30bd['element']['removeAttribute']?.('draggable')
-        : _0x3b30bd['element']['setAttribute']?.('draggable', _0x3b30bd['originalDraggable']),
-        _0x3b30bd['element']['hasPointerCapture']?.(_0x3b30bd['pointerId']) &&
-          _0x3b30bd['element']['releasePointerCapture']?.(_0x3b30bd['pointerId']));
+      if (!event14?.['element']) return;
+      (event14['originalDraggable'] == null
+        ? event14['element']['removeAttribute']?.('draggable')
+        : event14['element']['setAttribute']?.('draggable', event14['originalDraggable']),
+        event14['element']['hasPointerCapture']?.(event14['pointerId']) &&
+          event14['element']['releasePointerCapture']?.(event14['pointerId']));
     },
-    _0xcda9ef = (_0x20f3bf) => {
-      const _0x34de37 = _0x20f3bf['target']?.['closest']?.(
+    handler114 = (pointerId) => {
+      const element = pointerId['target']?.['closest']?.(
         '[data-person-replacement-target-character-id], [data-person-replacement-target-scene-id]',
       );
       if (
-        !_0x34de37 ||
-        !_0x42b7b0?.['contains']?.(_0x34de37) ||
-        _0x20f3bf['button'] !== 0x0 ||
-        _0x20f3bf['target']?.['closest']?.('.story-appearance-arrow, .at-mention-variant-arrow')
+        !element ||
+        !floatingMenuHost?.['contains']?.(element) ||
+        pointerId['button'] !== 0x0 ||
+        pointerId['target']?.['closest']?.('.story-appearance-arrow, .at-mention-variant-arrow')
       )
         return ![];
-      const _0x54d2c6 = normalizeText(_0x34de37['dataset']?.['personReplacementTargetSceneId']),
-        _0xcbab03 = normalizeText(_0x34de37['dataset']?.['personReplacementTargetCharacterId']),
-        _0x1ba080 = normalizeText(
-          _0x54d2c6
-            ? _0x34de37['dataset']?.['personReplacementTargetSceneAppearanceId']
-            : _0x34de37['dataset']?.['personReplacementTargetAppearanceId'],
+      const kind3 = normalizeText(element['dataset']?.['personReplacementTargetSceneId']),
+        characterId8 = normalizeText(element['dataset']?.['personReplacementTargetCharacterId']),
+        appearanceId5 = normalizeText(
+          kind3
+            ? element['dataset']?.['personReplacementTargetSceneAppearanceId']
+            : element['dataset']?.['personReplacementTargetAppearanceId'],
         );
-      if ((!_0x54d2c6 && !_0xcbab03) || !_0x1ba080) return ![];
+      if ((!kind3 && !characterId8) || !appearanceId5) return ![];
       return (
-        (_0x59e1d9 = {
-          kind: _0x54d2c6 ? 'scene' : 'character',
-          sceneId: _0x54d2c6,
-          characterId: _0xcbab03,
-          appearanceId: _0x1ba080,
-          element: _0x34de37,
-          pointerId: _0x20f3bf['pointerId'],
-          startX: Number(_0x20f3bf['clientX']) || 0x0,
-          startY: Number(_0x20f3bf['clientY']) || 0x0,
-          originalDraggable: _0x34de37['getAttribute']?.('draggable'),
+        (value48 = {
+          kind: kind3 ? 'scene' : 'character',
+          sceneId: kind3,
+          characterId: characterId8,
+          appearanceId: appearanceId5,
+          element: element,
+          pointerId: pointerId['pointerId'],
+          startX: Number(pointerId['clientX']) || 0x0,
+          startY: Number(pointerId['clientY']) || 0x0,
+          originalDraggable: element['getAttribute']?.('draggable'),
           active: ![],
           preview: null,
         }),
-        _0x34de37['setAttribute']?.('draggable', 'false'),
-        _0x34de37['setPointerCapture']?.(_0x20f3bf['pointerId']),
+        element['setAttribute']?.('draggable', 'false'),
+        element['setPointerCapture']?.(pointerId['pointerId']),
         !![]
       );
     },
-    _0x244e35 = (_0x4a8d73) => {
-      const _0x5a5939 = _0x59e1d9;
-      if (!_0x5a5939 || _0x5a5939['pointerId'] !== _0x4a8d73['pointerId']) return ![];
-      if (!_0x5a5939['active']) {
-        const _0x392ecd = (Number(_0x4a8d73['clientX']) || 0x0) - _0x5a5939['startX'],
-          _0x18c5f4 = (Number(_0x4a8d73['clientY']) || 0x0) - _0x5a5939['startY'];
-        if (Math['hypot'](_0x392ecd, _0x18c5f4) < 0x8) return ![];
-        ((_0x5a5939['active'] = !![]),
-          (_0x177009 = !![]),
-          _0x5a5939['element']['classList']?.['add']?.('is-story-asset-dragging'),
+    handler115 = (event15) => {
+      const event16 = value48;
+      if (!event16 || event16['pointerId'] !== event15['pointerId']) return ![];
+      if (!event16['active']) {
+        const value372 = (Number(event15['clientX']) || 0x0) - event16['startX'],
+          value373 = (Number(event15['clientY']) || 0x0) - event16['startY'];
+        if (Math['hypot'](value372, value373) < 0x8) return ![];
+        ((event16['active'] = !![]),
+          (enabled2 = !![]),
+          event16['element']['classList']?.['add']?.('is-story-asset-dragging'),
           documentObject['body']?.['classList']?.['add']?.('person-replacement-target-asset-dragging'),
-          _0x58b712(),
-          (_0x5a5939['preview'] = _0x58f3f3(_0x5a5939['element'])));
+          hide(),
+          (event16['preview'] = handler107(event16['element'])));
       }
       return (
-        _0x1a4d6c(_0x5a5939['preview'], _0x4a8d73),
-        _0x5a5939['kind'] === 'scene' && _0x105813(_0x4a0065(_0x4a8d73)),
-        _0x4a8d73['preventDefault']?.(),
+        handler108(event16['preview'], event15),
+        event16['kind'] === 'scene' && handler111(handler110(event15)),
+        event15['preventDefault']?.(),
         !![]
       );
     },
-    _0x40b574 = (_0x5a8c35, { cancelled: cancelled = ![] } = {}) => {
-      const _0x3e6705 = _0x59e1d9;
-      if (!_0x3e6705 || _0x3e6705['pointerId'] !== _0x5a8c35['pointerId']) return ![];
-      const _0x25383a =
-          _0x3e6705['kind'] === 'scene' && !cancelled && _0x3e6705['active'] ? _0x4a0065(_0x5a8c35) : null,
-        _0x2d0f13 =
-          _0x3e6705['kind'] === 'character' && !cancelled && _0x3e6705['active']
-            ? _0xe08a21(_0x5a8c35)
+    handler116 = (clientX4, { cancelled: cancelled = ![] } = {}) => {
+      const characterId9 = value48;
+      if (!characterId9 || characterId9['pointerId'] !== clientX4['pointerId']) return ![];
+      const shotId6 =
+          characterId9['kind'] === 'scene' && !cancelled && characterId9['active']
+            ? handler110(clientX4)
             : null,
-        _0x5e56fc = _0x3e6705['active'],
-        _0x50a3f0 = { characterId: _0x3e6705['characterId'], appearanceId: _0x3e6705['appearanceId'] };
-      (_0x2228cf(),
-        _0x105813(null),
-        (_0x177009 = ![]),
-        _0x3e6705['element']['classList']?.['remove']?.('is-story-asset-dragging'));
-      if (!_0x5e56fc) return ![];
-      ((_0x546083 = _0x3e6705['element']), _0x5a8c35['preventDefault']?.(), _0x5a8c35['stopPropagation']?.());
-      if (_0x25383a)
-        _0x41e8c9({
-          shotId: _0x25383a['dataset']['shotId'],
-          sceneId: _0x3e6705['sceneId'],
-          appearanceId: _0x3e6705['appearanceId'],
+        personBox3 =
+          characterId9['kind'] === 'character' && !cancelled && characterId9['active']
+            ? handler109(clientX4)
+            : null,
+        enabled59 = characterId9['active'],
+        target3 = { characterId: characterId9['characterId'], appearanceId: characterId9['appearanceId'] };
+      (handler113(),
+        handler111(null),
+        (enabled2 = ![]),
+        characterId9['element']['classList']?.['remove']?.('is-story-asset-dragging'));
+      if (!enabled59) return ![];
+      ((value49 = characterId9['element']), clientX4['preventDefault']?.(), clientX4['stopPropagation']?.());
+      if (shotId6)
+        handler101({
+          shotId: shotId6['dataset']['shotId'],
+          sceneId: characterId9['sceneId'],
+          appearanceId: characterId9['appearanceId'],
         });
       else
-        _0x2d0f13 &&
-          _0x2012e0({
-            personBox: _0x2d0f13,
-            target: _0x50a3f0,
-            clientX: _0x5a8c35['clientX'],
-            clientY: _0x5a8c35['clientY'],
+        personBox3 &&
+          handler112({
+            personBox: personBox3,
+            target: target3,
+            clientX: clientX4['clientX'],
+            clientY: clientX4['clientY'],
           });
       return !![];
     },
-    _0x27c84f = () => {
-      (_0xdc14ac?.['classList']?.['remove']?.('is-dragover'),
-        (_0xdc14ac = null),
-        _0x42b7b0?.['classList']?.['remove']?.('is-dragging-file'));
+    handler117 = () => {
+      (el2?.['classList']?.['remove']?.('is-dragover'),
+        (el2 = null),
+        floatingMenuHost?.['classList']?.['remove']?.('is-dragging-file'));
     },
-    _0x115624 = (_0x5412b8) => {
-      if (_0x4ad4fe(_0x43f995['HAS_PROJECT_PACKAGE_DRAG'], _0x5412b8['dataTransfer']) === !![]) {
-        (_0x5412b8['preventDefault']?.(), _0x5412b8['stopPropagation']?.());
-        if (_0x5412b8['dataTransfer']) _0x5412b8['dataTransfer']['dropEffect'] = 'copy';
+    value374 = (event17) => {
+      if (
+        promptEnhancementModel(downloadImageIntent['HAS_PROJECT_PACKAGE_DRAG'], event17['dataTransfer']) ===
+        !![]
+      ) {
+        (event17['preventDefault']?.(), event17['stopPropagation']?.());
+        if (event17['dataTransfer']) event17['dataTransfer']['dropEffect'] = 'copy';
         return;
       }
-      const _0x3f4b18 = _0x5412b8['target']?.['closest']?.('[data-audio-voice-action="audio-param"]'),
-        _0x44541b = Array['from'](_0x5412b8['dataTransfer']?.['types'] || []),
-        _0x5814b1 =
-          _0x42b7b0?.['classList']?.['contains']?.('is-voice-asset-dragging') ||
-          _0x44541b['includes'](PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE);
-      if (_0x3f4b18 && _0x5814b1) {
-        if (!_0x112ccc(_0x3f4b18)) {
-          _0x308696();
-          if (_0x5412b8['dataTransfer']) _0x5412b8['dataTransfer']['dropEffect'] = 'none';
+      const value375 = event17['target']?.['closest']?.('[data-audio-voice-action="audio-param"]'),
+        list21 = Array['from'](event17['dataTransfer']?.['types'] || []),
+        value376 =
+          floatingMenuHost?.['classList']?.['contains']?.('is-voice-asset-dragging') ||
+          list21['includes'](PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE);
+      if (value375 && value376) {
+        if (!canDropOnAudioParam(value375)) {
+          clearDropTarget();
+          if (event17['dataTransfer']) event17['dataTransfer']['dropEffect'] = 'none';
           return;
         }
-        _0x5412b8['preventDefault']?.();
-        if (_0x5412b8['dataTransfer']) _0x5412b8['dataTransfer']['dropEffect'] = 'copy';
-        _0x1454c7(_0x3f4b18);
+        event17['preventDefault']?.();
+        if (event17['dataTransfer']) event17['dataTransfer']['dropEffect'] = 'copy';
+        setDropTarget(value375);
         return;
       }
-      _0x5814b1 && (_0x308696(), _0x49234b());
-      const _0x4ab73c = _0x5412b8['target']?.['closest']?.('[data-person-replacement-keyframe-stage]'),
-        _0x533d22 = _0x44541b['includes'](PERSON_REPLACEMENT_SCENE_ASSET_DRAG_TYPE);
-      if (_0x4ab73c && _0x533d22) {
-        _0x5412b8['preventDefault']?.();
-        if (_0x5412b8['dataTransfer']) _0x5412b8['dataTransfer']['dropEffect'] = 'copy';
-        (_0x105813(_0x4ab73c), _0x27c84f());
+      value376 && (clearDropTarget(), resetDropEligibility());
+      const value377 = event17['target']?.['closest']?.('[data-person-replacement-keyframe-stage]'),
+        value378 = list21['includes'](PERSON_REPLACEMENT_SCENE_ASSET_DRAG_TYPE);
+      if (value377 && value378) {
+        event17['preventDefault']?.();
+        if (event17['dataTransfer']) event17['dataTransfer']['dropEffect'] = 'copy';
+        (handler111(value377), handler117());
         return;
       }
-      if (_0x533d22) _0x105813(null);
-      const _0x1d1a98 = _0x5412b8['target']?.['closest']?.('[data-person-replacement-video-drop]'),
-        _0x5f4797 = Boolean(_0x5412b8['target']?.['closest']?.('[data-person-replacement-person-drop]')),
-        _0x307b35 = _0x44541b['includes']('Files');
-      if (!_0x5f4797 && !_0x307b35) return;
-      (_0x5412b8['preventDefault'](), _0x42b7b0['classList']['add']('is-dragging-file'));
-      if (_0x1d1a98 && _0x307b35 && _0x57b9e5['workspace']['view'] === 'home') {
-        if (_0x5412b8['dataTransfer']) _0x5412b8['dataTransfer']['dropEffect'] = 'copy';
-        _0xdc14ac !== _0x1d1a98 &&
-          (_0x27c84f(),
-          (_0xdc14ac = _0x1d1a98),
-          _0xdc14ac['classList']?.['add']?.('is-dragover'),
-          _0x42b7b0['classList']['add']('is-dragging-file'));
+      if (value378) handler111(null);
+      const value379 = event17['target']?.['closest']?.('[data-person-replacement-video-drop]'),
+        enabled60 = Boolean(event17['target']?.['closest']?.('[data-person-replacement-person-drop]')),
+        enabled61 = list21['includes']('Files');
+      if (!enabled60 && !enabled61) return;
+      (event17['preventDefault'](), floatingMenuHost['classList']['add']('is-dragging-file'));
+      if (value379 && enabled61 && initialProject2['workspace']['view'] === 'home') {
+        if (event17['dataTransfer']) event17['dataTransfer']['dropEffect'] = 'copy';
+        el2 !== value379 &&
+          (handler117(),
+          (el2 = value379),
+          el2['classList']?.['add']?.('is-dragover'),
+          floatingMenuHost['classList']['add']('is-dragging-file'));
       } else {
-        _0x27c84f();
-        if (_0x307b35) _0x42b7b0['classList']['add']('is-dragging-file');
+        handler117();
+        if (enabled61) floatingMenuHost['classList']['add']('is-dragging-file');
       }
     },
-    _0x303d4e = () => {
-      ((_0x177009 = ![]),
-        _0x2228cf(),
-        _0x105813(null),
-        _0x42b7b0?.['querySelectorAll']?.('.person-replacement-target-asset.is-story-asset-dragging')?.[
-          'forEach'
-        ]?.((_0x3dbb0e) => _0x3dbb0e['classList']?.['remove']?.('is-story-asset-dragging')));
+    handler118 = () => {
+      ((enabled2 = ![]),
+        handler113(),
+        handler111(null),
+        floatingMenuHost?.['querySelectorAll']?.(
+          '.person-replacement-target-asset.is-story-asset-dragging',
+        )?.['forEach']?.((el129) => el129['classList']?.['remove']?.('is-story-asset-dragging')));
     },
-    _0x56cb63 = () => {
-      (_0x42b7b0?.['classList']?.['remove']?.('is-voice-asset-dragging'),
-        _0x42b7b0?.['querySelectorAll']?.('.person-replacement-voice-asset-card.is-voice-asset-dragging')?.[
-          'forEach'
-        ]?.((_0x19f0fc) => _0x19f0fc['classList']?.['remove']?.('is-voice-asset-dragging')),
-        _0x308696(),
-        _0x49234b());
+    handler119 = () => {
+      (floatingMenuHost?.['classList']?.['remove']?.('is-voice-asset-dragging'),
+        floatingMenuHost?.['querySelectorAll']?.(
+          '.person-replacement-voice-asset-card.is-voice-asset-dragging',
+        )?.['forEach']?.((el130) => el130['classList']?.['remove']?.('is-voice-asset-dragging')),
+        clearDropTarget(),
+        resetDropEligibility());
     },
-    _0x416474 = () => {
-      (_0x58b712(), _0x303d4e(), _0x56cb63(), _0x27c84f());
+    handler120 = () => {
+      (hide(), handler118(), handler119(), handler117());
     },
-    _0x11adf8 = (_0x1b5168) => {
-      const _0x4c4735 = _0x1b5168['target']?.['closest']?.('[data-person-replacement-video-drop]');
-      _0x4c4735 && !_0x4c4735['contains']?.(_0x1b5168['relatedTarget']) && _0x27c84f();
-      const _0x522ac3 = _0x1b5168['relatedTarget'];
-      if (_0x522ac3 && _0x42b7b0?.['contains']?.(_0x522ac3)) return;
-      (_0x308696(), _0x49234b(), _0x27c84f(), _0x105813(null));
+    value380 = (event18) => {
+      const enabled62 = event18['target']?.['closest']?.('[data-person-replacement-video-drop]');
+      enabled62 && !enabled62['contains']?.(event18['relatedTarget']) && handler117();
+      const value381 = event18['relatedTarget'];
+      if (value381 && floatingMenuHost?.['contains']?.(value381)) return;
+      (clearDropTarget(), resetDropEligibility(), handler117(), handler111(null));
     },
-    _0x4565af = (_0x1da01f) => {
-      if (_0x4ad4fe(_0x43f995['DROP_PROJECT_PACKAGE'], _0x1da01f) === !![]) return;
-      const _0x433e58 = _0x1da01f['target']?.['closest']?.('[data-audio-voice-action="audio-param"]'),
-        _0x5cc04d = _0x1da01f['dataTransfer']?.['getData']?.(PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE),
-        _0x3d8fd3 = _0x1da01f['dataTransfer']?.['getData']?.(PERSON_REPLACEMENT_SCENE_ASSET_DRAG_TYPE),
-        _0x4bc2e7 = _0x1da01f['target']?.['closest']?.('[data-person-replacement-keyframe-stage]');
-      _0x416474();
-      if (_0x433e58 && _0x5cc04d) {
-        _0x1da01f['stopPropagation']?.();
-        if (!_0x112ccc(_0x433e58)) return;
-        _0x1da01f['preventDefault']?.();
-        let _0x325880;
+    value382 = (clientX5) => {
+      if (promptEnhancementModel(downloadImageIntent['DROP_PROJECT_PACKAGE'], clientX5) === !![]) return;
+      const el131 = clientX5['target']?.['closest']?.('[data-audio-voice-action="audio-param"]'),
+        value383 = clientX5['dataTransfer']?.['getData']?.(PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE),
+        value384 = clientX5['dataTransfer']?.['getData']?.(PERSON_REPLACEMENT_SCENE_ASSET_DRAG_TYPE),
+        shotId7 = clientX5['target']?.['closest']?.('[data-person-replacement-keyframe-stage]');
+      handler120();
+      if (el131 && value383) {
+        clientX5['stopPropagation']?.();
+        if (!canDropOnAudioParam(el131)) return;
+        clientX5['preventDefault']?.();
+        let value385;
         try {
-          _0x325880 = JSON['parse'](_0x5cc04d);
+          value385 = JSON['parse'](value383);
         } catch {
           return;
         }
-        const _0x3bdcfc = normalizeText(_0x325880?.['characterId']),
-          _0x30beb2 = normalizeText(_0x433e58['dataset']?.['segmentId']);
-        if (!_0x3bdcfc || !_0x30beb2) return;
-        _0x3400a4(_0x3bdcfc, { segmentId: _0x30beb2 });
+        const text33 = normalizeText(value385?.['characterId']),
+          segmentId = normalizeText(el131['dataset']?.['segmentId']);
+        if (!text33 || !segmentId) return;
+        selectVoiceAsset(text33, { segmentId: segmentId });
         return;
       }
-      if (_0x4bc2e7 && _0x3d8fd3) {
-        (_0x1da01f['stopPropagation']?.(), _0x1da01f['preventDefault']?.());
-        let _0x3ec14d;
+      if (shotId7 && value384) {
+        (clientX5['stopPropagation']?.(), clientX5['preventDefault']?.());
+        let sceneId3;
         try {
-          _0x3ec14d = JSON['parse'](_0x3d8fd3);
+          sceneId3 = JSON['parse'](value384);
         } catch {
           return;
         }
-        _0x41e8c9({
-          shotId: _0x4bc2e7['dataset']['shotId'],
-          sceneId: _0x3ec14d?.['sceneId'],
-          appearanceId: _0x3ec14d?.['appearanceId'],
+        handler101({
+          shotId: shotId7['dataset']['shotId'],
+          sceneId: sceneId3?.['sceneId'],
+          appearanceId: sceneId3?.['appearanceId'],
         });
         return;
       }
-      const _0x313424 = _0x1da01f['target']?.['closest']?.('[data-person-replacement-person-drop]');
-      if (_0x313424) {
-        const _0x540dea = _0x1da01f['dataTransfer']?.['getData']?.('application/x-person-replacement-target');
-        if (!_0x540dea) return;
-        (_0x1da01f['stopPropagation']?.(), _0x1da01f['preventDefault']());
-        let _0x5cecfc;
+      const personBox4 = clientX5['target']?.['closest']?.('[data-person-replacement-person-drop]');
+      if (personBox4) {
+        const enabled63 = clientX5['dataTransfer']?.['getData']?.('application/x-person-replacement-target');
+        if (!enabled63) return;
+        (clientX5['stopPropagation']?.(), clientX5['preventDefault']());
+        let target4;
         try {
-          _0x5cecfc = JSON['parse'](_0x540dea);
+          target4 = JSON['parse'](enabled63);
         } catch {
           return;
         }
-        _0x2012e0({
-          personBox: _0x313424,
-          target: _0x5cecfc,
-          clientX: _0x1da01f['clientX'],
-          clientY: _0x1da01f['clientY'],
+        handler112({
+          personBox: personBox4,
+          target: target4,
+          clientX: clientX5['clientX'],
+          clientY: clientX5['clientY'],
         });
         return;
       }
-      const _0x55f0a5 = Array['from'](_0x1da01f['dataTransfer']?.['files'] || []);
-      if (!_0x55f0a5['length']) return;
-      (_0x1da01f['stopPropagation']?.(), _0x1da01f['preventDefault']());
-      if (_0x57b9e5['workspace']['view'] === 'home')
-        _0x17c907(_0x55f0a5['filter'](isPersonReplacementVideoFile));
+      const list22 = Array['from'](clientX5['dataTransfer']?.['files'] || []);
+      if (!list22['length']) return;
+      (clientX5['stopPropagation']?.(), clientX5['preventDefault']());
+      if (initialProject2['workspace']['view'] === 'home')
+        handler17(list22['filter'](isPersonReplacementVideoFile));
       else {
-        if (_0x57b9e5['workspace']['step'] === 0x1)
-          _0x59d19e(_0x55f0a5['filter'](isPersonReplacementImageFile));
+        if (initialProject2['workspace']['step'] === 0x1)
+          handler18(list22['filter'](isPersonReplacementImageFile));
       }
     };
-  let _0x4d8968 = null;
-  const _0x1c28ec = (_0x5ba955) =>
-      _0x5ba955?.['ctrlKey'] === !![] || _0x5ba955?.['getModifierState']?.('Control') === !![] || _0x553216,
-    _0x2f9b10 = (_0x45c381) => {
-      ((_0x546083 = null), _0x45c381['stopPropagation'](), _0x58b712());
-      !_0x45c381['target']?.['closest']?.('[data-person-replacement-mapping-scope-menu]') && _0x524d22();
-      const _0xa6b9a7 = _0x45c381['target']?.['closest']?.('[data-person-replacement-person-drop]');
-      _0xa6b9a7 && _0x42b7b0['contains'](_0xa6b9a7) && _0x29b3c0(_0xa6b9a7);
+  let workspaceMarqueeSelectionController = null;
+  const run13 = (value386) =>
+      value386?.['ctrlKey'] === !![] || value386?.['getModifierState']?.('Control') === !![] || enabled3,
+    value387 = (event19) => {
+      ((value49 = null), event19['stopPropagation'](), hide());
+      !event19['target']?.['closest']?.('[data-person-replacement-mapping-scope-menu]') && handler88();
+      const el132 = event19['target']?.['closest']?.('[data-person-replacement-person-drop]');
+      el132 && floatingMenuHost['contains'](el132) && bringBoxToFront(el132);
       if (
-        _0x45c381['target']?.['closest']?.(
+        event19['target']?.['closest']?.(
           '[data-person-replacement-result-history-toggle], [data-person-replacement-result-history-close]',
         )
       )
         return;
-      if (_0xcda9ef(_0x45c381)) return;
-      const _0x502fba = _0x45c381['target']?.['closest']?.('[data-story-marquee-surface="people"]'),
-        _0x55d67f = _0x45c381['target']?.['closest']?.(
+      if (handler114(event19)) return;
+      const value388 = event19['target']?.['closest']?.('[data-story-marquee-surface="people"]'),
+        enabled64 = event19['target']?.['closest']?.(
           '.person-replacement-detection-label, .person-replacement-mapping-badge, [data-person-replacement-action], [data-person-replacement-manual-resize]',
         );
       if (
-        _0x1c28ec(_0x45c381) &&
-        _0x502fba &&
-        _0x42b7b0['contains'](_0x502fba) &&
-        !_0x55d67f &&
-        _0x4d8968?.['begin']?.(_0x45c381)
+        run13(event19) &&
+        value388 &&
+        floatingMenuHost['contains'](value388) &&
+        !enabled64 &&
+        workspaceMarqueeSelectionController?.['begin']?.(event19)
       )
         return;
-      const _0x54f702 = Boolean(_0xa6b9a7?.['classList']?.['contains']?.('is-batch-selected'));
-      if (_0x54f702 && !_0x55d67f && _0x4dc575(_0x45c381, _0xa6b9a7, { batch: !![] })) return;
-      !_0x1c28ec(_0x45c381) && (!_0xa6b9a7 || !_0x54f702) && _0x113bbe();
-      const _0x447565 = _0xa6b9a7?.['matches']?.('.person-replacement-detection-box[data-person-id]')
-        ? _0xa6b9a7
+      const enabled65 = Boolean(el132?.['classList']?.['contains']?.('is-batch-selected'));
+      if (enabled65 && !enabled64 && beginBoxEdit(event19, el132, { batch: !![] })) return;
+      !run13(event19) && (!el132 || !enabled65) && clearBatchSelection();
+      const value389 = el132?.['matches']?.('.person-replacement-detection-box[data-person-id]')
+        ? el132
         : null;
-      _0x447565 && _0x42b7b0['contains'](_0x447565)
-        ? _0x348a7d(_0x447565, {
-            focus: !_0x45c381['target']?.['closest']?.(
+      value389 && floatingMenuHost['contains'](value389)
+        ? selectBox(value389, {
+            focus: !event19['target']?.['closest']?.(
               '.person-replacement-detection-label, .person-replacement-mapping-badge, [data-person-replacement-action]',
             ),
           })
-        : _0x218fa0();
+        : clearKeyboardSelection();
       if (
-        _0x447565 &&
-        _0x42b7b0['contains'](_0x447565) &&
-        !_0x45c381['target']?.['closest']?.(
+        value389 &&
+        floatingMenuHost['contains'](value389) &&
+        !event19['target']?.['closest']?.(
           '.person-replacement-detection-label,\x20.person-replacement-mapping-badge,\x20[data-person-replacement-action]',
         ) &&
-        _0x4dc575(_0x45c381, _0x447565)
+        beginBoxEdit(event19, value389)
       )
         return;
-      if (_0x31602a()) {
-        const _0x13870c = _0x45c381['target']?.['closest']?.('[data-person-replacement-keyframe-stage]');
+      if (isManualSelectionActive()) {
+        const value390 = event19['target']?.['closest']?.('[data-person-replacement-keyframe-stage]');
         if (
-          _0x13870c &&
-          _0x42b7b0['contains'](_0x13870c) &&
-          !_0x1c28ec(_0x45c381) &&
-          !_0x45c381['target']?.['closest']?.('[data-person-replacement-person-drop]') &&
-          !_0x45c381['target']?.['closest']?.('[data-person-replacement-action], [data-story-action]')
+          value390 &&
+          floatingMenuHost['contains'](value390) &&
+          !run13(event19) &&
+          !event19['target']?.['closest']?.('[data-person-replacement-person-drop]') &&
+          !event19['target']?.['closest']?.('[data-person-replacement-action], [data-story-action]')
         ) {
-          if (_0x42019b(_0x45c381, _0x13870c)) return;
+          if (beginManualSelection(event19, value390)) return;
         }
       }
-      const _0x840f02 = _0x45c381['target']?.['closest']?.('[data-person-replacement-layout-splitter]');
-      if (_0x840f02 && _0x22c867(_0x45c381, _0x840f02)) return;
-      const _0x3abf7f = _0x45c381['target']?.['closest']?.(
+      const value391 = event19['target']?.['closest']?.('[data-person-replacement-layout-splitter]');
+      if (value391 && begin(event19, value391)) return;
+      const splitter = event19['target']?.['closest']?.(
         '[data-person-replacement-composite-sidebar-splitter]',
       );
-      if (_0x3abf7f) {
-        const _0xfacecd = _0x3abf7f['closest']?.('.person-replacement-preview-workbench');
-        _0x3abf7f['classList']?.['add']?.('is-active');
-        const _0x3530c1 = beginWorkspaceHorizontalResizeSession({
-          event: _0x45c381,
-          splitter: _0x3abf7f,
-          layout: _0xfacecd,
+      if (splitter) {
+        const layout = splitter['closest']?.('.person-replacement-preview-workbench');
+        splitter['classList']?.['add']?.('is-active');
+        const beginWorkspaceHorizontalResizeSession2 = beginWorkspaceHorizontalResizeSession({
+          event: event19,
+          splitter: splitter,
+          layout: layout,
           windowObject: windowObject,
           body: documentObject['body'],
           resizingClass: 'person-replacement-composite-sidebar-resizing',
-          onRatio: (_0x298ff0) => {
-            const _0x1d306d = Number(_0xfacecd?.['getBoundingClientRect']?.()?.['width']),
-              _0x4f3a1e = Number['isFinite'](_0x1d306d)
-                ? (_0x1d306d * _0x298ff0) / 0x64
-                : _0x57b9e5['workspace']['compositeSidebarWidth'];
-            _0x57b9e5['workspace']['compositeSidebarWidth'] =
-              applyPersonReplacementCompositeSidebarWidthToLayout(_0xfacecd, _0x3abf7f, _0x4f3a1e);
+          onRatio: (value392) => {
+            const value393 = Number(layout?.['getBoundingClientRect']?.()?.['width']),
+              value394 = Number['isFinite'](value393)
+                ? (value393 * value392) / 0x64
+                : initialProject2['workspace']['compositeSidebarWidth'];
+            initialProject2['workspace']['compositeSidebarWidth'] =
+              applyPersonReplacementCompositeSidebarWidthToLayout(layout, splitter, value394);
           },
           onFinish: () => {
-            (_0x3abf7f['classList']?.['remove']?.('is-active'), _0x273c17('composite-sidebar-width'));
+            (splitter['classList']?.['remove']?.('is-active'), handler21('composite-sidebar-width'));
           },
         });
-        if (!_0x3530c1) _0x3abf7f['classList']?.['remove']?.('is-active');
-        if (_0x3530c1) return;
+        if (!beginWorkspaceHorizontalResizeSession2) splitter['classList']?.['remove']?.('is-active');
+        if (beginWorkspaceHorizontalResizeSession2) return;
       }
-      const _0x1dbdb8 = _0x45c381['target']?.['closest']?.('[data-person-replacement-voice-layout-splitter]');
-      if (_0x1dbdb8) {
-        const _0x178680 = _0x1dbdb8['closest']?.('[data-person-replacement-voice-layout]'),
-          _0xdd19c3 = normalizeText(_0x1dbdb8['dataset']?.['personReplacementVoiceLayoutSplitter']),
-          _0x5b842c = ['assets', 'sources']['includes'](_0xdd19c3);
-        if (_0x5b842c) _0x1dbdb8['classList']?.['add']?.('is-active');
-        const _0x4b18a9 =
-          _0x5b842c &&
+      const splitter2 = event19['target']?.['closest']?.('[data-person-replacement-voice-layout-splitter]');
+      if (splitter2) {
+        const layout2 = splitter2['closest']?.('[data-person-replacement-voice-layout]'),
+          text34 = normalizeText(splitter2['dataset']?.['personReplacementVoiceLayoutSplitter']),
+          value395 = ['assets', 'sources']['includes'](text34);
+        if (value395) splitter2['classList']?.['add']?.('is-active');
+        const enabled66 =
+          value395 &&
           beginWorkspaceHorizontalResizeSession({
-            event: _0x45c381,
-            splitter: _0x1dbdb8,
-            layout: _0x178680,
+            event: event19,
+            splitter: splitter2,
+            layout: layout2,
             windowObject: windowObject,
             body: documentObject['body'],
             resizingClass: 'person-replacement-voice-layout-resizing',
-            onRatio: (_0x5ad143) => {
-              const _0xb58a15 = normalizePersonReplacementVoiceLayout(_0x57b9e5['workspace']['voiceLayout']),
-                _0x3ada23 = normalizePersonReplacementVoiceLayout({
-                  ..._0xb58a15,
-                  ...(_0xdd19c3 === 'assets'
+            onRatio: (value396) => {
+              const args32 = normalizePersonReplacementVoiceLayout(
+                  initialProject2['workspace']['voiceLayout'],
+                ),
+                personReplacementVoiceLayout = normalizePersonReplacementVoiceLayout({
+                  ...args32,
+                  ...(text34 === 'assets'
                     ? {
-                        assetsEnd: clamp(
-                          _0x5ad143,
-                          0x10,
-                          _0xb58a15['sourcesEnd'] - 0x10,
-                          _0xb58a15['assetsEnd'],
-                        ),
+                        assetsEnd: clamp(value396, 0x10, args32['sourcesEnd'] - 0x10, args32['assetsEnd']),
                       }
                     : {
-                        sourcesEnd: clamp(
-                          _0x5ad143,
-                          _0xb58a15['assetsEnd'] + 0x10,
-                          0x3c,
-                          _0xb58a15['sourcesEnd'],
-                        ),
+                        sourcesEnd: clamp(value396, args32['assetsEnd'] + 0x10, 0x3c, args32['sourcesEnd']),
                       }),
                 });
-              _0x57b9e5['workspace']['voiceLayout'] = applyPersonReplacementVoiceLayoutToElement(
-                _0x178680,
-                _0x3ada23,
+              initialProject2['workspace']['voiceLayout'] = applyPersonReplacementVoiceLayoutToElement(
+                layout2,
+                personReplacementVoiceLayout,
               );
             },
             onFinish: () => {
-              (_0x1dbdb8['classList']?.['remove']?.('is-active'), _0x273c17('voice-layout'));
+              (splitter2['classList']?.['remove']?.('is-active'), handler21('voice-layout'));
             },
           });
-        if (!_0x4b18a9) _0x1dbdb8['classList']?.['remove']?.('is-active');
-        if (_0x4b18a9) return;
+        if (!enabled66) splitter2['classList']?.['remove']?.('is-active');
+        if (enabled66) return;
       }
-      const _0x47dd76 = _0x45c381['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]');
-      if (_0x47dd76 && _0x1217d1(_0x45c381, _0x47dd76)) return;
-      const _0x565c77 = _0x45c381['target']?.['closest']?.('[data-story-assets-splitter]');
-      if (_0x565c77) {
-        const _0x2a78a0 = _0x565c77['closest']?.('.story-assets-layout');
+      const value397 = event19['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]');
+      if (value397 && beginBoundaryDrag(event19, value397)) return;
+      const splitter3 = event19['target']?.['closest']?.('[data-story-assets-splitter]');
+      if (splitter3) {
+        const layout3 = splitter3['closest']?.('.story-assets-layout');
         beginWorkspaceHorizontalResizeSession({
-          event: _0x45c381,
-          splitter: _0x565c77,
-          layout: _0x2a78a0,
+          event: event19,
+          splitter: splitter3,
+          layout: layout3,
           windowObject: windowObject,
           body: documentObject['body'],
           resizingClass: 'story-assets-resizing',
-          onRatio: (_0x2b8fdb) => {
-            _0x57b9e5['workspace']['assetSplitRatio'] = applyWorkspaceAssetSplitRatioToLayout(
-              _0x2a78a0,
-              _0x565c77,
-              _0x2b8fdb,
+          onRatio: (value398) => {
+            initialProject2['workspace']['assetSplitRatio'] = applyWorkspaceAssetSplitRatioToLayout(
+              layout3,
+              splitter3,
+              value398,
             );
           },
-          onFinish: () => _0x273c17('asset-split-ratio'),
+          onFinish: () => handler21('asset-split-ratio'),
         });
         return;
       }
-      if (_0x45c381['target']) _0x4d8968?.['begin']?.(_0x45c381);
+      if (event19['target']) workspaceMarqueeSelectionController?.['begin']?.(event19);
     },
-    _0x41a116 = (_0xd42019) => {
-      if (_0x244e35(_0xd42019)) return;
-      (_0x1e50c3(_0xd42019), _0x5ae2bd(_0xd42019));
+    value399 = (value400) => {
+      if (handler115(value400)) return;
+      (syncHoverPlayhead(value400), handlePointerMove(value400));
     },
-    _0x1fcbf5 = (_0x564213) => {
-      (_0x23c082['handlePointerOver'](_0x564213), _0x3f459d(_0x564213));
+    value401 = (value402) => {
+      (personReplacementExportSubmenuController['handlePointerOver'](value402), handlePointerOver(value402));
     },
-    _0x2f55c5 = (_0x5ab8cd) => {
-      _0x40b574(_0x5ab8cd);
+    value403 = (value404) => {
+      handler116(value404);
     },
-    _0x314a54 = (_0x261c09) => {
-      _0x40b574(_0x261c09, { cancelled: !![] });
+    value405 = (value406) => {
+      handler116(value406, { cancelled: !![] });
     },
-    _0x1e5a56 = (_0x35bc52) => {
-      (_0x23c082['handlePointerOut'](_0x35bc52), _0x22c15c(_0x35bc52), _0x54b283(_0x35bc52));
+    value407 = (value408) => {
+      (personReplacementExportSubmenuController['handlePointerOut'](value408),
+        hideHoverPlayhead(value408),
+        handlePointerOut(value408));
     },
-    _0x1dce51 = () => {
-      _0x1eb029();
-      const _0x4e6328 = _0x42b7b0?.['querySelector']?.('[data-person-replacement-shot-cut-video]');
-      if (!_0x4e6328 || !_0x4e4610['isOpen']) return;
-      ((_0x4e6328['preload'] = 'auto'), (_0x4e6328['muted'] = !_0x4e4610['soundEnabled']));
-      if (_0x4e4610['boundPreviewVideos']['has'](_0x4e6328)) {
-        if (_0x4e6328['paused'] === ![]) cutEditorPlaybackController['startNative'](_0x4e6328);
+    handler121 = () => {
+      restoreBufferedVideo();
+      const el133 = floatingMenuHost?.['querySelector']?.('[data-person-replacement-shot-cut-video]');
+      if (!el133 || !selectedIds['isOpen']) return;
+      ((el133['preload'] = 'auto'), (el133['muted'] = !selectedIds['soundEnabled']));
+      if (selectedIds['boundPreviewVideos']['has'](el133)) {
+        if (el133['paused'] === ![]) cutEditorPlaybackController['startNative'](el133);
         return;
       }
-      (_0x4e4610['boundPreviewVideos']['add'](_0x4e6328),
-        _0x4e6328['addEventListener']?.('playing', () =>
-          cutEditorPlaybackController['startNative'](_0x4e6328),
-        ),
-        _0x4e6328['addEventListener']?.('pause', () => {
-          (_0x33e2c8(), _0x6f845a(_0x4e6328));
+      (selectedIds['boundPreviewVideos']['add'](el133),
+        el133['addEventListener']?.('playing', () => cutEditorPlaybackController['startNative'](el133)),
+        el133['addEventListener']?.('pause', () => {
+          (stopPlayback(), syncPlaybackFromVideo(el133));
         }),
-        _0x4e6328['addEventListener']?.('seeked', () => {
-          const _0x3c747c = _0x4e4610['pendingPreviewSeek'];
-          if (!_0x3c747c) {
-            _0x6f845a(_0x4e6328);
+        el133['addEventListener']?.('seeked', () => {
+          const enabled67 = selectedIds['pendingPreviewSeek'];
+          if (!enabled67) {
+            syncPlaybackFromVideo(el133);
             return;
           }
-          const _0x1c5d12 = Number(_0x3c747c['token']);
-          _0x3c747c['seeked'] = !![];
-          if (typeof _0x4e6328['requestVideoFrameCallback'] !== 'function')
-            _0x3c747c['presentedSourceSec'] = Number(_0x4e6328['currentTime']);
+          const value409 = Number(enabled67['token']);
+          enabled67['seeked'] = !![];
+          if (typeof el133['requestVideoFrameCallback'] !== 'function')
+            enabled67['presentedSourceSec'] = Number(el133['currentTime']);
           else
-            !Number['isFinite'](Number(_0x3c747c['presentedSourceSec'])) &&
-              _0x4e4610['previewFrameCallbackId'] == null &&
-              _0x324bbc(_0x4e6328, _0x3c747c, _0x1c5d12);
-          (_0x52e2c5(_0x4e6328, _0x3c747c, _0x1c5d12), _0x6f845a(_0x4e6328));
+            !Number['isFinite'](Number(enabled67['presentedSourceSec'])) &&
+              selectedIds['previewFrameCallbackId'] == null &&
+              armFrameWait(el133, enabled67, value409);
+          (markFrameReady(el133, enabled67, value409), syncPlaybackFromVideo(el133));
         }),
-        _0x4e6328['addEventListener']?.('timeupdate', () => {
-          if (!_0x4e6328['paused']) cutEditorPlaybackController['startNative'](_0x4e6328);
-          else _0x6f845a(_0x4e6328);
+        el133['addEventListener']?.('timeupdate', () => {
+          if (!el133['paused']) cutEditorPlaybackController['startNative'](el133);
+          else syncPlaybackFromVideo(el133);
         }),
-        _0x4e6328['addEventListener']?.('ended', () => {
-          (_0x33e2c8(), _0x6f845a(_0x4e6328));
+        el133['addEventListener']?.('ended', () => {
+          (stopPlayback(), syncPlaybackFromVideo(el133));
         }),
-        _0x4e6328['addEventListener']?.('error', () => {
-          (_0x139716(),
-            (_0x4e4610['pendingPreviewSeek'] = null),
+        el133['addEventListener']?.('error', () => {
+          (cancelFrameWait(),
+            (selectedIds['pendingPreviewSeek'] = null),
             windowObject?.['showToast']?.('裁剪预览视频加载失败，请稍后重试。', 'warn'));
         }));
-      if (_0x4e6328['paused'] === ![]) cutEditorPlaybackController['startNative'](_0x4e6328);
+      if (el133['paused'] === ![]) cutEditorPlaybackController['startNative'](el133);
     },
-    _0x35b1d5 = (_0xe4c09d) => {
-      const _0x25885b = _0x57b9e5['id'],
-        _0x10614f = (_0x1cbffb, _0x305286) =>
-          _0x478e16({ dataset: { storyProjectId: _0x1cbffb } }, _0x305286);
+    resolveItems = (event20) => {
+      const value410 = initialProject2['id'],
+        handler122 = (storyProjectId, value411) =>
+          handler99({ dataset: { storyProjectId: storyProjectId } }, value411);
       return resolvePersonReplacementContextMenuItems({
-        event: _0xe4c09d,
-        root: _0x42b7b0,
-        projects: _0x57b9e5['libraryProjects'],
-        project: _0x57b9e5,
+        event: event20,
+        root: floatingMenuHost,
+        projects: initialProject2['libraryProjects'],
+        project: initialProject2,
         commands: {
-          addLibraryAssets: (_0x2ed7df, _0x4833c1) => {
-            if (_0x57b9e5['id'] !== _0x25885b || _0x57b9e5['workspace']['characterAssetTab'] !== 'library')
+          addLibraryAssets: (value412, value413) => {
+            if (
+              initialProject2['id'] !== value410 ||
+              initialProject2['workspace']['characterAssetTab'] !== 'library'
+            )
               return;
-            _0x4f358e(_0x2ed7df, _0x4833c1);
+            handler105(value412, value413);
           },
-          bindAudioCharacter: (_0x22edce, _0x528ad9) => {
-            if (_0x57b9e5['id'] !== _0x25885b) return;
-            const _0x4ce5a4 = [...(_0x57b9e5['audioAssets'] || []), ...(_0x57b9e5['libraryAssets'] || [])][
-              'find'
-            ]((_0x454b28) => _0x454b28['id'] === _0x22edce);
-            if (_0x4ce5a4)
-              _0x4e3281(_0x43f995['SELECT_CHARACTER_VOICE_LIBRARY'], {
-                characterId: _0x528ad9,
-                asset: { ..._0x4ce5a4 },
+          bindAudioCharacter: (value414, characterId10) => {
+            if (initialProject2['id'] !== value410) return;
+            const args33 = [
+              ...(initialProject2['audioAssets'] || []),
+              ...(initialProject2['libraryAssets'] || []),
+            ]['find']((value415) => value415['id'] === value414);
+            if (args33)
+              runIntent(downloadImageIntent['SELECT_CHARACTER_VOICE_LIBRARY'], {
+                characterId: characterId10,
+                asset: { ...args33 },
               });
           },
-          openProject: (_0x4df4f7) => _0x4e3281(_0x43f995['OPEN_PROJECT'], _0x4df4f7),
-          renameProject: (_0x3da953) => _0x10614f(_0x3da953, 'rename-project'),
-          duplicateProject: (_0x5da5e0) => _0x10614f(_0x5da5e0, 'duplicate-project'),
-          collectProject: (_0x4043d) => _0x10614f(_0x4043d, 'collect-project'),
-          setProjectArchived: (_0x48ed93, _0x156bde) =>
-            _0x10614f(_0x48ed93, _0x156bde ? 'archive-project' : 'unarchive-project'),
-          requestDeleteProject: (_0x446a21) => _0x10614f(_0x446a21, 'request-delete-project'),
+          openProject: (value416) => runIntent(downloadImageIntent['OPEN_PROJECT'], value416),
+          renameProject: (value417) => handler122(value417, 'rename-project'),
+          duplicateProject: (value418) => handler122(value418, 'duplicate-project'),
+          collectProject: (value419) => handler122(value419, 'collect-project'),
+          setProjectArchived: (value420, value421) =>
+            handler122(value420, value421 ? 'archive-project' : 'unarchive-project'),
+          requestDeleteProject: (value422) => handler122(value422, 'request-delete-project'),
         },
       });
     },
-    _0x2b9821 = (_0x2efe8e) => {
-      ((_0x42b7b0 = documentObject['createElement']('section')),
-        (_0x42b7b0['className'] = 'person-replacement-workspace replacement-studio-workspace'),
-        (_0x42b7b0['dataset']['personReplacementWorkspace'] = ''),
-        (_0x42b7b0['dataset']['replacementStudioWorkspace'] = ''),
-        (_0x42b7b0['dataset']['uiStop'] = '1'),
-        _0x42b7b0['setAttribute']('aria-label', REPLACEMENT_STUDIO_NAME),
-        (_0x42b7b0['innerHTML'] = renderHiddenInputs()),
-        _0x2efe8e['appendChild'](_0x42b7b0),
-        _0x42b7b0['addEventListener']('click', _0x1ee13c),
-        _0x42b7b0['addEventListener']('input', _0x2f6384),
-        _0x42b7b0['addEventListener']('change', _0x50349f),
-        _0x42b7b0['addEventListener']('focusin', _0x23c082['handleFocusIn']),
-        _0x42b7b0['addEventListener']('focusout', _0x1f0bcb),
-        _0x42b7b0['addEventListener']('dragstart', _0x47c5ed),
-        _0x42b7b0['addEventListener']('dragend', _0x416474),
-        _0x42b7b0['addEventListener']('dragover', _0x115624),
-        _0x42b7b0['addEventListener']('dragleave', _0x11adf8),
-        _0x42b7b0['addEventListener']('drop', _0x4565af),
-        _0x348b2e?.(),
-        (_0x348b2e = bindWorkspaceEntityContextMenu(_0x42b7b0, {
-          resolveItems: _0x35b1d5,
+    handler123 = (el134) => {
+      ((floatingMenuHost = documentObject['createElement']('section')),
+        (floatingMenuHost['className'] = 'person-replacement-workspace replacement-studio-workspace'),
+        (floatingMenuHost['dataset']['personReplacementWorkspace'] = ''),
+        (floatingMenuHost['dataset']['replacementStudioWorkspace'] = ''),
+        (floatingMenuHost['dataset']['uiStop'] = '1'),
+        floatingMenuHost['setAttribute']('aria-label', REPLACEMENT_STUDIO_NAME),
+        (floatingMenuHost['innerHTML'] = renderHiddenInputs()),
+        el134['appendChild'](floatingMenuHost),
+        floatingMenuHost['addEventListener']('click', value308),
+        floatingMenuHost['addEventListener']('input', handler106),
+        floatingMenuHost['addEventListener']('change', value339),
+        floatingMenuHost['addEventListener'](
+          'focusin',
+          personReplacementExportSubmenuController['handleFocusIn'],
+        ),
+        floatingMenuHost['addEventListener']('focusout', value344),
+        floatingMenuHost['addEventListener']('dragstart', value347),
+        floatingMenuHost['addEventListener']('dragend', handler120),
+        floatingMenuHost['addEventListener']('dragover', value374),
+        floatingMenuHost['addEventListener']('dragleave', value380),
+        floatingMenuHost['addEventListener']('drop', value382),
+        bindWorkspaceEntityContextMenu2?.(),
+        (bindWorkspaceEntityContextMenu2 = bindWorkspaceEntityContextMenu(floatingMenuHost, {
+          resolveItems: resolveItems,
           beforeOpen() {
-            if (!_0x57b9e5['workspace']['openProjectMenuId']) return;
-            _0x2118fd({ openProjectMenuId: '' });
+            if (!initialProject2['workspace']['openProjectMenuId']) return;
+            handler92({ openProjectMenuId: '' });
           },
         })),
-        _0x42b7b0['addEventListener']('error', handleWorkspaceAssetLibraryImageError, !![]),
-        _0x42b7b0['addEventListener']('pointerdown', _0x2f9b10),
-        _0x42b7b0['addEventListener']('pointerup', _0x2f55c5),
-        _0x42b7b0['addEventListener']('pointercancel', _0x314a54),
-        _0x42b7b0['addEventListener']('pointerover', _0x1fcbf5),
-        _0x42b7b0['addEventListener']('pointermove', _0x41a116),
-        _0x42b7b0['addEventListener']('pointerout', _0x1e5a56),
-        _0x42b7b0['addEventListener']('dblclick', _0x2b3990));
-      const _0x7a9ac3 = (_0x242a55) => {
-        const _0x4217e3 = _0x242a55['target']?.['closest']?.('.person-replacement-production-page');
-        if (!_0x4217e3 || !_0x42b7b0['contains'](_0x4217e3)) return ![];
-        const _0x52c107 =
-          _0x4217e3['ownerDocument']?.['defaultView']?.['getComputedStyle']?.(_0x4217e3)?.['overflowY'];
-        if (!['auto', 'scroll', 'overlay']['includes'](_0x52c107)) return ![];
-        const _0x532a78 = Number(_0x242a55['deltaY']) || 0x0,
-          _0x47bc4e = Math['max'](0x0, _0x4217e3['scrollHeight'] - _0x4217e3['clientHeight']);
-        if (_0x532a78 < 0x0) return _0x4217e3['scrollTop'] > 0x0;
-        if (_0x532a78 > 0x0) return _0x4217e3['scrollTop'] < _0x47bc4e;
+        floatingMenuHost['addEventListener']('error', handleWorkspaceAssetLibraryImageError, !![]),
+        floatingMenuHost['addEventListener']('pointerdown', value387),
+        floatingMenuHost['addEventListener']('pointerup', value403),
+        floatingMenuHost['addEventListener']('pointercancel', value405),
+        floatingMenuHost['addEventListener']('pointerover', value401),
+        floatingMenuHost['addEventListener']('pointermove', value399),
+        floatingMenuHost['addEventListener']('pointerout', value407),
+        floatingMenuHost['addEventListener']('dblclick', value269));
+      const run14 = (event21) => {
+        const el135 = event21['target']?.['closest']?.('.person-replacement-production-page');
+        if (!el135 || !floatingMenuHost['contains'](el135)) return ![];
+        const value423 =
+          el135['ownerDocument']?.['defaultView']?.['getComputedStyle']?.(el135)?.['overflowY'];
+        if (!['auto', 'scroll', 'overlay']['includes'](value423)) return ![];
+        const count8 = Number(event21['deltaY']) || 0x0,
+          value424 = Math['max'](0x0, el135['scrollHeight'] - el135['clientHeight']);
+        if (count8 < 0x0) return el135['scrollTop'] > 0x0;
+        if (count8 > 0x0) return el135['scrollTop'] < value424;
         return ![];
       };
-      (_0x42b7b0['addEventListener'](
+      (floatingMenuHost['addEventListener'](
         'wheel',
-        (_0x569213) => {
-          if (_0x7a9ac3(_0x569213)) {
-            _0x569213['stopPropagation']();
+        (event22) => {
+          if (run14(event22)) {
+            event22['stopPropagation']();
             return;
           }
-          if (_0x31ad17(_0x569213)) {
-            _0x569213['stopPropagation']();
+          if (handler85(event22)) {
+            event22['stopPropagation']();
             return;
           }
-          if (_0x4a6238(_0x569213)) {
-            _0x569213['stopPropagation']();
+          if (handler84(event22)) {
+            event22['stopPropagation']();
             return;
           }
-          if (_0xbbcbef(_0x569213)) return;
-          if (_0x460f91(_0x569213)) {
-            _0x569213['stopPropagation']();
+          if (handler87(event22)) return;
+          if (handler86(event22)) {
+            event22['stopPropagation']();
             return;
           }
-          if (_0x1b6ef9(_0x569213)) {
-            _0x569213['stopPropagation']();
+          if (handler78(event22)) {
+            event22['stopPropagation']();
             return;
           }
-          if (_0x3f9fb5(_0x569213)) {
-            _0x569213['stopPropagation']();
+          if (handler81(event22)) {
+            event22['stopPropagation']();
             return;
           }
           if (
-            shouldPreserveWorkspaceNestedWheel(_0x569213['target'], {
+            shouldPreserveWorkspaceNestedWheel(event22['target'], {
               nestedSelector:
                 'textarea, [contenteditable="true"], .node-model-submenu, .story-style-grid, .story-assets-list, .story-episode-assets, .story-clip-strip',
-              boundaryRoot: _0x42b7b0,
+              boundaryRoot: floatingMenuHost,
             })
           ) {
-            _0x569213['stopPropagation']();
+            event22['stopPropagation']();
             return;
           }
-          _0x569213['stopPropagation']();
-          if (_0x204611(_0x569213) || _0x52ce70(_0x569213)) return;
-          _0x32a2f0(_0x569213);
+          event22['stopPropagation']();
+          if (handler83(event22) || handler80(event22)) return;
+          handler82(event22);
         },
         { passive: ![] },
       ),
-        _0x42b7b0['addEventListener']('keydown', _0x1af548, !![]),
-        windowObject?.['addEventListener']?.('keydown', _0x4d5162, !![]),
-        windowObject?.['addEventListener']?.('resize', _0x11a836));
-      const _0x44bcb7 = (_0x4f9251) => {
-          (_0x4f9251?.['key'] === 'Control' ||
-            _0x4f9251?.['code'] === 'ControlLeft' ||
-            _0x4f9251?.['code'] === 'ControlRight') &&
-            (_0x553216 = _0x4f9251['type'] === 'keydown');
+        floatingMenuHost['addEventListener']('keydown', value257, !![]),
+        windowObject?.['addEventListener']?.('keydown', handler72, !![]),
+        windowObject?.['addEventListener']?.('resize', value171));
+      const value425 = (event23) => {
+          (event23?.['key'] === 'Control' ||
+            event23?.['code'] === 'ControlLeft' ||
+            event23?.['code'] === 'ControlRight') &&
+            (enabled3 = event23['type'] === 'keydown');
         },
-        _0x1d2210 = () => {
-          ((_0x553216 = ![]), _0x303d4e());
+        handler124 = () => {
+          ((enabled3 = ![]), handler118());
         };
       return (
-        windowObject?.['addEventListener']?.('keydown', _0x44bcb7, !![]),
-        windowObject?.['addEventListener']?.('keyup', _0x44bcb7, !![]),
-        windowObject?.['addEventListener']?.('blur', _0x1d2210, !![]),
-        (_0x3d05d4 = () => {
-          (windowObject?.['removeEventListener']?.('keydown', _0x44bcb7, !![]),
-            windowObject?.['removeEventListener']?.('keyup', _0x44bcb7, !![]),
-            windowObject?.['removeEventListener']?.('blur', _0x1d2210, !![]),
-            _0x1d2210());
+        windowObject?.['addEventListener']?.('keydown', value425, !![]),
+        windowObject?.['addEventListener']?.('keyup', value425, !![]),
+        windowObject?.['addEventListener']?.('blur', handler124, !![]),
+        (value65 = () => {
+          (windowObject?.['removeEventListener']?.('keydown', value425, !![]),
+            windowObject?.['removeEventListener']?.('keyup', value425, !![]),
+            windowObject?.['removeEventListener']?.('blur', handler124, !![]),
+            handler124());
         }),
-        (_0x4d8968 = createWorkspaceMarqueeSelectionController({
-          root: _0x42b7b0,
+        (workspaceMarqueeSelectionController = createWorkspaceMarqueeSelectionController({
+          root: floatingMenuHost,
           documentObject: documentObject,
           windowObject: windowObject,
           surfaceSelector: '[data-story-marquee-surface]',
@@ -7066,62 +7191,62 @@ export function createReplacementStudioWorkspace({
             "[data-story-action], [data-person-replacement-action], input, textarea, select, a, [contenteditable='true']",
           overlayClassName: 'story-marquee-selection',
           itemSelector: '[data-story-marquee-item]',
-          getItemId: (_0x364a7b) => _0x364a7b['dataset']?.['storyMarqueeId'],
-          getConfig: (_0x3c317b) => {
+          getItemId: (el136) => el136['dataset']?.['storyMarqueeId'],
+          getConfig: (enabled68) => {
             if (
-              _0x3c317b?.['dataset']?.['storyMarqueeSurface'] === 'shot-cuts' &&
-              _0x57b9e5['workspace']['view'] === 'project' &&
-              _0x57b9e5['workspace']['step'] === 0x2 &&
-              _0x4e4610['isOpen']
+              enabled68?.['dataset']?.['storyMarqueeSurface'] === 'shot-cuts' &&
+              initialProject2['workspace']['view'] === 'project' &&
+              initialProject2['workspace']['step'] === 0x2 &&
+              selectedIds['isOpen']
             )
               return {
-                enabled: !_0x374e20(),
-                selectedIds: _0x4e4610['selectedShotIds'],
+                enabled: !isDraftMutationBusy(),
+                selectedIds: selectedIds['selectedShotIds'],
                 itemSelector: '[data-person-replacement-shot-cut-selectable]',
-                getItemId: (_0x42c7c7) => _0x42c7c7['dataset']?.['shotId'],
+                getItemId: (el137) => el137['dataset']?.['shotId'],
                 hitClassName: 'is-marquee-hit',
                 rootClassName: 'is-shot-cut-marquee-selecting',
-                commit: (_0x5cd880) => {
-                  (_0x24b921['setSelectedShotIds'](_0x5cd880), _0x4cf492());
+                commit: (value426) => {
+                  (session['setSelectedShotIds'](value426), run());
                 },
               };
             if (
-              _0x3c317b?.['dataset']?.['storyMarqueeSurface'] === 'people' &&
-              _0x57b9e5['workspace']['view'] === 'project' &&
-              _0x57b9e5['workspace']['step'] === 0x2 &&
-              !_0x4e4610['isOpen']
+              enabled68?.['dataset']?.['storyMarqueeSurface'] === 'people' &&
+              initialProject2['workspace']['view'] === 'project' &&
+              initialProject2['workspace']['step'] === 0x2 &&
+              !selectedIds['isOpen']
             )
               return {
                 enabled: !![],
-                canBegin: (_0x52cebf) => _0x1c28ec(_0x52cebf),
+                canBegin: (value427) => run13(value427),
                 additive: ![],
                 selectedIds: [],
                 itemSelector: '[data-person-replacement-person-drop]',
                 hitClassName: 'is-batch-selection-hit',
                 overlayClassName: 'is-person-box-selection',
                 rootClassName: 'is-person-box-marquee-selecting',
-                getItemId: (_0x4ae01e) => _0x4ae01e['dataset']?.['personId'],
-                commit: (_0x1ced81) => {
-                  (_0x29b821(_0x3c317b['dataset']?.['shotId'], _0x1ced81), _0x431ffd());
+                getItemId: (el138) => el138['dataset']?.['personId'],
+                commit: (value428) => {
+                  (selectBatch(enabled68['dataset']?.['shotId'], value428), focusBatchSelectionStage());
                 },
               };
             if (
-              _0x3c317b?.['dataset']?.['storyMarqueeSurface'] === 'shots' &&
-              _0x57b9e5['workspace']['view'] === 'project' &&
-              [0x2, 0x3, 0x5]['includes'](_0x57b9e5['workspace']['step']) &&
-              !_0x4e4610['isOpen']
+              enabled68?.['dataset']?.['storyMarqueeSurface'] === 'shots' &&
+              initialProject2['workspace']['view'] === 'project' &&
+              [0x2, 0x3, 0x5]['includes'](initialProject2['workspace']['step']) &&
+              !selectedIds['isOpen']
             )
               return {
                 enabled: !![],
-                selectedIds: _0x57b9e5['workspace']['selectedShotIds'],
-                commit: (_0x5e885c) => {
-                  _0x26d845(
+                selectedIds: initialProject2['workspace']['selectedShotIds'],
+                commit: (selectedShotIds2) => {
+                  updateProject(
                     {
-                      ..._0x57b9e5,
+                      ...initialProject2,
                       workspace: {
-                        ..._0x57b9e5['workspace'],
+                        ...initialProject2['workspace'],
                         shotSelectionMode: !![],
-                        selectedShotIds: _0x5e885c,
+                        selectedShotIds: selectedShotIds2,
                       },
                     },
                     'shot-marquee',
@@ -7130,357 +7255,381 @@ export function createReplacementStudioWorkspace({
               };
             return {
               enabled:
-                _0x3c317b?.['dataset']?.['storyMarqueeSurface'] === 'assets' &&
-                _0x57b9e5['workspace']['view'] === 'project' &&
-                _0x57b9e5['workspace']['step'] === 0x1 &&
+                enabled68?.['dataset']?.['storyMarqueeSurface'] === 'assets' &&
+                initialProject2['workspace']['view'] === 'project' &&
+                initialProject2['workspace']['step'] === 0x1 &&
                 ['character', 'scene', 'audio', 'library']['includes'](
-                  _0x57b9e5['workspace']['characterAssetTab'],
+                  initialProject2['workspace']['characterAssetTab'],
                 ),
-              selectedIds: _0x57b9e5['workspace']['selectedAssetIds'],
-              commit: (_0x343e7b) => {
-                const _0x399dc2 = new Set(
+              selectedIds: initialProject2['workspace']['selectedAssetIds'],
+              commit: (list23) => {
+                const map6 = new Set(
                     getPersonReplacementSelectableAssets(
-                      _0x57b9e5,
-                      _0x57b9e5['workspace']['characterAssetTab'],
-                    )['map']((_0x32e7fc) => _0x32e7fc['id']),
+                      initialProject2,
+                      initialProject2['workspace']['characterAssetTab'],
+                    )['map']((value429) => value429['id']),
                   ),
-                  _0x34ca05 = _0x343e7b['filter']((_0x44e3f4) => _0x399dc2['has'](_0x44e3f4));
-                (_0x26d845(
+                  assetSelectionMode5 = list23['filter']((value430) => map6['has'](value430));
+                (updateProject(
                   {
-                    ..._0x57b9e5,
+                    ...initialProject2,
                     workspace: {
-                      ..._0x57b9e5['workspace'],
-                      assetSelectionMode: _0x34ca05['length'] > 0x0,
-                      selectedAssetIds: _0x34ca05,
-                      ...(_0x34ca05['length']
+                      ...initialProject2['workspace'],
+                      assetSelectionMode: assetSelectionMode5['length'] > 0x0,
+                      selectedAssetIds: assetSelectionMode5,
+                      ...(assetSelectionMode5['length']
                         ? {
                             [{
                               character: 'selectedCharacterId',
                               scene: 'selectedSceneId',
                               audio: 'selectedAudioAssetId',
                               library: 'selectedLibraryAssetId',
-                            }[_0x57b9e5['workspace']['characterAssetTab']]]: _0x34ca05['at'](-0x1),
+                            }[initialProject2['workspace']['characterAssetTab']]]:
+                              assetSelectionMode5['at'](-0x1),
                           }
                         : {}),
                     },
                   },
                   'asset-marquee',
                 ),
-                  focusWorkspaceAssetCard(_0x42b7b0, _0x34ca05['at'](-0x1)));
+                  focusWorkspaceAssetCard(floatingMenuHost, assetSelectionMode5['at'](-0x1)));
               },
             };
           },
         })),
-        _0x42b7b0
+        floatingMenuHost
       );
     },
-    _0x2e5b13 = createPersonReplacementPageTransitionController({
-      getRoot: () => _0x42b7b0,
-      getTransitionKey: () => _0x934d2e(_0x57b9e5),
-      isCutEditorOpen: () => _0x4e4610['isOpen'],
-      isDestroyed: () => _0x2f325d,
-      requestRender: () => _0x4cf492(),
+    personReplacementPageTransitionController = createPersonReplacementPageTransitionController({
+      getRoot: () => floatingMenuHost,
+      getTransitionKey: () => handler25(initialProject2),
+      isCutEditorOpen: () => selectedIds['isOpen'],
+      isDestroyed: () => value43,
+      requestRender: () => run(),
       documentObject: documentObject,
       windowObject: windowObject,
     }),
     {
-      captureFocus: _0x7bff34,
-      deferRenderIfSettling: _0x41a669,
-      destroy: _0x4a9758,
-      restoreFocus: _0x38d4d3,
-      start: _0x2ac7c4,
-      stop: _0x550b2a,
-      syncProjectToolbarInPlace: _0x565909,
-    } = _0x2e5b13,
-    _0x1fe8bc = _0x4cf492;
-  _0x4cf492 = () => {
-    if (!_0x42b7b0 || _0x2f325d || !_0x3accc4['isActive']()) return;
-    if (personReplacementShellPresentation['syncHome'](_0x42b7b0, _0x57b9e5)) {
-      _0x3a22a2['update'](_0x57b9e5['persistenceState']);
+      captureFocus: captureFocus2,
+      deferRenderIfSettling: deferRenderIfSettling,
+      destroy: destroy5,
+      restoreFocus: restoreFocus2,
+      start: start,
+      stop: stop2,
+      syncProjectToolbarInPlace: syncProjectToolbarInPlace,
+    } = personReplacementPageTransitionController,
+    handler125 = run;
+  run = () => {
+    if (!floatingMenuHost || value43 || !workspacePresentationLifecycle['isActive']()) return;
+    if (personReplacementShellPresentation['syncHome'](floatingMenuHost, initialProject2)) {
+      workspacePersistencePresentation['update'](initialProject2['persistenceState']);
       return;
     }
-    const _0x5eee1a = _0x59940c,
-      _0x1d94b7 = _0x5bc315,
-      _0xaa3130 = _0x4c0940(_0x57b9e5),
-      _0x219004 =
-        _0x5eee1a === 'none' && _0x3238d5 === _0xaa3130
+    const value431 = value67,
+      value432 = value68,
+      value433 = handler26(initialProject2),
+      value434 =
+        value431 === 'none' && value69 === value433
           ? captureWorkspaceNestedScrollPositions(
-              _0x42b7b0,
+              floatingMenuHost,
               PERSON_REPLACEMENT_PERSISTENT_NESTED_SCROLL_SELECTORS,
             )
           : null;
-    ((_0x59940c = 'none'), (_0x5bc315 = 'page'));
-    if (_0x41a669(_0x5eee1a)) return;
-    const _0xdb623a = _0x7bff34();
-    (_0x45ae96(), _0x550b2a({ renderPending: ![] }));
-    const _0x4237c2 = _0x42b7b0['querySelector']?.('.person-replacement-project-body'),
-      _0xf577e1 = ['forward', 'backward']['includes'](_0x5eee1a)
-        ? _0x4237c2?.['firstElementChild'] || null
-        : null,
-      _0x3b95da = _0xf577e1 ? _0x42b7b0['querySelector']?.('.story-workspace-toolbar') : null;
-    (_0xf577e1?.['remove']?.(), _0x3b95da?.['remove']?.());
-    const _0x56e6cc =
-      _0x57b9e5['workspace']['view'] === 'project' &&
-      _0x57b9e5['workspace']['step'] === 0x2 &&
-      !_0x4e4610['isOpen'];
-    (_0x454e24(_0x56e6cc),
-      _0x1fe8bc(),
-      _0x3a22a2['update'](_0x57b9e5['persistenceState']),
-      restoreWorkspaceNestedScrollPositions(_0x42b7b0, _0x219004),
-      (_0x3238d5 = _0xaa3130),
-      _0x218b57());
-    const _0x5df4b6 = _0x42b7b0['querySelector']?.('.person-replacement-project-body'),
-      _0x2555bd = _0x5df4b6?.['firstElementChild'] || null,
-      _0x15ba9a = _0x3b95da ? _0x42b7b0['querySelector']?.('.story-workspace-toolbar') : null;
-    if (_0x3b95da && _0x15ba9a) _0x15ba9a['replaceWith']?.(_0x3b95da);
-    const _0x5cb455 = _0x2ac7c4(_0xf577e1, _0x2555bd, _0x5eee1a, _0x1d94b7, {
-      currentToolbar: _0x3b95da,
-      nextToolbar: _0x15ba9a,
-      focusKey: _0xdb623a,
+    ((value67 = 'none'), (value68 = 'page'));
+    if (deferRenderIfSettling(value431)) return;
+    const focusKey = captureFocus2();
+    (preserveBufferedVideo(), stop2({ renderPending: ![] }));
+    const value435 = floatingMenuHost['querySelector']?.('.person-replacement-project-body'),
+      el139 = ['forward', 'backward']['includes'](value431) ? value435?.['firstElementChild'] || null : null,
+      currentToolbar = el139 ? floatingMenuHost['querySelector']?.('.story-workspace-toolbar') : null;
+    (el139?.['remove']?.(), currentToolbar?.['remove']?.());
+    const value436 =
+      initialProject2['workspace']['view'] === 'project' &&
+      initialProject2['workspace']['step'] === 0x2 &&
+      !selectedIds['isOpen'];
+    (setManualSelectionActive(value436),
+      handler125(),
+      workspacePersistencePresentation['update'](initialProject2['persistenceState']),
+      restoreWorkspaceNestedScrollPositions(floatingMenuHost, value434),
+      (value69 = value433),
+      handler58());
+    const value437 = floatingMenuHost['querySelector']?.('.person-replacement-project-body'),
+      incomingPage = value437?.['firstElementChild'] || null,
+      nextToolbar = currentToolbar ? floatingMenuHost['querySelector']?.('.story-workspace-toolbar') : null;
+    if (currentToolbar && nextToolbar) nextToolbar['replaceWith']?.(currentToolbar);
+    const enabled69 = start(el139, incomingPage, value431, value432, {
+      currentToolbar: currentToolbar,
+      nextToolbar: nextToolbar,
+      focusKey: focusKey,
     });
-    (!_0x5cb455 && _0x565909(_0x3b95da, _0x15ba9a),
-      _0x38d4d3(_0xdb623a, { currentToolbar: _0x3b95da, incomingPage: _0x2555bd }),
-      _0x2e8658(),
-      typeof _0x42b7b0['insertAdjacentHTML'] === 'function'
-        ? _0x42b7b0['insertAdjacentHTML']('beforeend', renderHiddenInputs())
-        : (_0x42b7b0['innerHTML'] += renderHiddenInputs()),
-      _0x135d3b(),
-      _0x1dce51(),
-      _0x53b56d(),
-      _0x5e0fff());
+    (!enabled69 && syncProjectToolbarInPlace(currentToolbar, nextToolbar),
+      restoreFocus2(focusKey, { currentToolbar: currentToolbar, incomingPage: incomingPage }),
+      syncAfterRender(),
+      typeof floatingMenuHost['insertAdjacentHTML'] === 'function'
+        ? floatingMenuHost['insertAdjacentHTML']('beforeend', renderHiddenInputs())
+        : (floatingMenuHost['innerHTML'] += renderHiddenInputs()),
+      handler50(),
+      handler121(),
+      preparePreviewVideo(),
+      watchOpeningVideo());
   };
-  const _0x2edc43 = Object['freeze']({
-    open(_0x499d18 = {}) {
-      if (_0x2f325d) return null;
-      _0x499d18['project'] &&
-        (_0x119305(),
-        (_0x57b9e5 = normalizePersonReplacementWorkspaceProject(_0x499d18['project'])),
-        _0x24b921['syncProject'](_0x57b9e5),
-        _0x31cdf2['switchProject'](_0x57b9e5['id']));
-      ((_0x57b9e5 = _0x3ccd2d(_0x57b9e5)), (_0x2c9c4b = _0x499d18['mountTarget'] || _0x2c9c4b));
-      const _0x692fa = resolveMountTarget(documentObject, _0x2c9c4b);
-      if (!_0x692fa) return null;
-      if (!_0x42b7b0) _0x2b9821(_0x692fa);
+  const value93 = Object['freeze']({
+    open(options5 = {}) {
+      if (value43) return null;
+      options5['project'] &&
+        (reset(),
+        (initialProject2 = normalizePersonReplacementWorkspaceProject(options5['project'])),
+        session['syncProject'](initialProject2),
+        personReplacementCompositePreviewController['switchProject'](initialProject2['id']));
+      ((initialProject2 = handler19(initialProject2)), (value44 = options5['mountTarget'] || value44));
+      const el140 = resolveMountTarget(documentObject, value44);
+      if (!el140) return null;
+      if (!floatingMenuHost) handler123(el140);
       else {
-        if (_0x42b7b0['parentElement'] !== _0x692fa) _0x692fa['appendChild'](_0x42b7b0);
+        if (floatingMenuHost['parentElement'] !== el140) el140['appendChild'](floatingMenuHost);
       }
-      return (_0x3accc4['activate'](), _0x4cf492(), _0x42b7b0);
+      return (workspacePresentationLifecycle['activate'](), run(), floatingMenuHost);
     },
     close() {
-      if (!_0x42b7b0 || _0x2f325d) return ![];
-      (_0xea53df(), _0x32d3c6(), _0x4d8968?.['cancel']?.(), _0x113bbe());
-      let _0x592421 = !![];
+      if (!floatingMenuHost || value43) return ![];
+      (stop(),
+        cancelManualSelection(),
+        workspaceMarqueeSelectionController?.['cancel']?.(),
+        clearBatchSelection());
+      let enabled70 = !![];
       try {
-        _0x592421 = _0x4ad4fe(_0x43f995['CAN_CLOSE'], cloneJson(_0x57b9e5)) !== ![];
+        enabled70 =
+          promptEnhancementModel(downloadImageIntent['CAN_CLOSE'], cloneJson(initialProject2)) !== ![];
       } catch {
-        _0x592421 = !![];
+        enabled70 = !![];
       }
-      if (!_0x592421) return (_0x3fc4d6('close'), ![]);
+      if (!enabled70) return (handler24('close'), ![]);
       return (
         closeDebugRequestWindow(documentObject),
-        _0x119305(),
-        _0x551a99(),
-        _0x3c691d(),
-        _0x481bb9(),
-        _0x2d6050(),
-        _0xa770b0(),
-        _0x446a6f(),
-        _0x3accc4['deactivate'](),
-        _0x196980(),
-        (_0x834763 = ''),
-        _0xb8cf88(),
-        _0x4ad4fe(_0x43f995['CLOSE'], { project: cloneJson(_0x57b9e5) }),
+        reset(),
+        releaseBufferedVideo(),
+        handler3(),
+        handler7(),
+        handler8(),
+        handler4(),
+        handler10(),
+        workspacePresentationLifecycle['deactivate'](),
+        stopPreview(),
+        (voiceLibraryTargetCharacterId = ''),
+        unmount(),
+        promptEnhancementModel(downloadImageIntent['CLOSE'], { project: cloneJson(initialProject2) }),
         !![]
       );
     },
-    setProject(_0x34218f) {
-      if (_0x2f325d) return null;
-      const _0x419b95 = _0x57b9e5,
-        _0x3f99f3 = _0x3ccd2d(normalizePersonReplacementWorkspaceProject(_0x34218f)),
-        _0x3bee27 = normalizeText(_0x3f99f3['id']);
-      _0x3bee27 !== normalizeText(_0x419b95['id']) &&
-        (closeDebugRequestWindow(documentObject), _0xa770b0(), _0x31cdf2['switchProject'](_0x3bee27));
-      _0x57b9e5 = _0x3f99f3;
-      _0x834763 &&
-        !_0x57b9e5['characters']['some']((_0x2b685b) => _0x2b685b['id'] === _0x834763) &&
-        (_0x834763 = '');
-      const _0x26f59b = _0x24b921['syncProject'](_0x57b9e5);
-      _0x969ed5(_0x419b95, _0x57b9e5);
-      const _0x285434 = new Set(_0x57b9e5['shots']['map']((_0x40acc5) => _0x40acc5['id']));
+    setProject(value438) {
+      if (value43) return null;
+      const value439 = initialProject2,
+        value440 = handler19(normalizePersonReplacementWorkspaceProject(value438)),
+        text35 = normalizeText(value440['id']);
+      text35 !== normalizeText(value439['id']) &&
+        (closeDebugRequestWindow(documentObject),
+        handler4(),
+        personReplacementCompositePreviewController['switchProject'](text35));
+      initialProject2 = value440;
+      voiceLibraryTargetCharacterId &&
+        !initialProject2['characters']['some'](
+          (value441) => value441['id'] === voiceLibraryTargetCharacterId,
+        ) &&
+        (voiceLibraryTargetCharacterId = '');
+      const value442 = session['syncProject'](initialProject2);
+      handler27(value439, initialProject2);
+      const map7 = new Set(initialProject2['shots']['map']((value443) => value443['id']));
       return (
-        (_0x26f59b ||
-          ((_0x4e4610['isOpen'] || _0x4e4610['isOpening']) &&
-            (_0x57b9e5['workspace']['view'] !== 'project' ||
-              _0x57b9e5['workspace']['step'] !== 0x2 ||
-              _0x4e4610['draft']['some']((_0x97a7e8) => !_0x285434['has'](_0x97a7e8['shotId']))))) &&
-          _0x119305(),
-        _0x4cf492(),
-        cloneJson(_0x57b9e5)
+        (value442 ||
+          ((selectedIds['isOpen'] || selectedIds['isOpening']) &&
+            (initialProject2['workspace']['view'] !== 'project' ||
+              initialProject2['workspace']['step'] !== 0x2 ||
+              selectedIds['draft']['some']((value444) => !map7['has'](value444['shotId']))))) &&
+          reset(),
+        run(),
+        cloneJson(initialProject2)
       );
     },
-    syncProjectState(_0x155ab6, { returnSnapshot: returnSnapshot = !![] } = {}) {
-      if (_0x2f325d) return null;
-      const _0x292d94 = _0x57b9e5,
-        _0x38ae7e = normalizePersonReplacementWorkspaceProject(_0x155ab6);
-      if (!Object['hasOwn'](_0x155ab6, 'libraryProjects') && _0x38ae7e['id'] === _0x292d94['id'])
-        _0x38ae7e['libraryProjects'] = _0x292d94['libraryProjects'];
-      const _0x213363 = Boolean(
-          _0x42b7b0 &&
-          normalizeText(_0x38ae7e['id']) === normalizeText(_0x57b9e5['id']) &&
-          _0x38ae7e['workspace']?.['view'] === 'project' &&
-          _0x38ae7e['workspace']?.['step'] === 0x3 &&
-          _0x57b9e5['workspace']?.['view'] === 'project' &&
-          _0x57b9e5['workspace']?.['step'] === 0x3,
+    syncProjectState(value445, { returnSnapshot: returnSnapshot = !![] } = {}) {
+      if (value43) return null;
+      const value446 = initialProject2,
+        personReplacementWorkspaceProject3 = normalizePersonReplacementWorkspaceProject(value445);
+      if (
+        !Object['hasOwn'](value445, 'libraryProjects') &&
+        personReplacementWorkspaceProject3['id'] === value446['id']
+      )
+        personReplacementWorkspaceProject3['libraryProjects'] = value446['libraryProjects'];
+      const value447 = Boolean(
+          floatingMenuHost &&
+          normalizeText(personReplacementWorkspaceProject3['id']) === normalizeText(initialProject2['id']) &&
+          personReplacementWorkspaceProject3['workspace']?.['view'] === 'project' &&
+          personReplacementWorkspaceProject3['workspace']?.['step'] === 0x3 &&
+          initialProject2['workspace']?.['view'] === 'project' &&
+          initialProject2['workspace']?.['step'] === 0x3,
         ),
-        _0x3c0760 = _0x213363
-          ? resolvePersonReplacementVideoGenerationUiRefreshScope(_0x292d94, _0x38ae7e)
+        value448 = value447
+          ? resolvePersonReplacementVideoGenerationUiRefreshScope(
+              value446,
+              personReplacementWorkspaceProject3,
+            )
           : '',
-        _0x48bc7e = Boolean(
-          _0x42b7b0 &&
-          normalizeText(_0x38ae7e['id']) === normalizeText(_0x57b9e5['id']) &&
-          _0x38ae7e['workspace']?.['view'] === 'project' &&
-          _0x38ae7e['workspace']?.['step'] === 0x2 &&
-          _0x57b9e5['workspace']?.['view'] === 'project' &&
-          _0x57b9e5['workspace']?.['step'] === 0x2,
+        value449 = Boolean(
+          floatingMenuHost &&
+          normalizeText(personReplacementWorkspaceProject3['id']) === normalizeText(initialProject2['id']) &&
+          personReplacementWorkspaceProject3['workspace']?.['view'] === 'project' &&
+          personReplacementWorkspaceProject3['workspace']?.['step'] === 0x2 &&
+          initialProject2['workspace']?.['view'] === 'project' &&
+          initialProject2['workspace']?.['step'] === 0x2,
         ),
-        _0x2b52c3 = _0x48bc7e
-          ? resolvePersonReplacementImageGenerationUiRefreshScope(_0x292d94, _0x38ae7e)
+        value450 = value449
+          ? resolvePersonReplacementImageGenerationUiRefreshScope(
+              value446,
+              personReplacementWorkspaceProject3,
+            )
           : '';
-      normalizeText(_0x38ae7e['id']) !== normalizeText(_0x57b9e5['id']) &&
-        (_0xa770b0(), _0x31cdf2['switchProject'](_0x38ae7e['id']));
-      _0x57b9e5 = _0x38ae7e;
-      if (_0x24b921['syncProject'](_0x57b9e5)) _0x119305();
-      if (!_0x3accc4['isActive']()) return returnSnapshot ? cloneJson(_0x57b9e5) : null;
-      if (_0x2b52c3 === 'selected-shot') _0x593f36({ refreshTimelineCard: !![] });
+      normalizeText(personReplacementWorkspaceProject3['id']) !== normalizeText(initialProject2['id']) &&
+        (handler4(),
+        personReplacementCompositePreviewController['switchProject'](
+          personReplacementWorkspaceProject3['id'],
+        ));
+      initialProject2 = personReplacementWorkspaceProject3;
+      if (session['syncProject'](initialProject2)) reset();
+      if (!workspacePresentationLifecycle['isActive']())
+        return returnSnapshot ? cloneJson(initialProject2) : null;
+      if (value450 === 'selected-shot') handler43({ refreshTimelineCard: !![] });
       else {
-        if (_0x2b52c3 === 'timeline') _0x4c1ba8();
+        if (value450 === 'timeline') handler53();
         else {
-          if (_0x3c0760 === 'selected-shot') {
-            if (!_0x59d0d2() && !_0x2ba69b['isClipActive']()) _0x4cf492();
-          } else _0x3c0760 === 'timeline' && _0x4c1ba8();
+          if (value448 === 'selected-shot') {
+            if (!handler42() && !personReplacementVideoPlaybackController['isClipActive']()) run();
+          } else value448 === 'timeline' && handler53();
         }
       }
       return (
-        syncPersonReplacementPromptModeControl(_0x42b7b0, _0x57b9e5, _0x53365b()['generatingShotIds']),
-        personReplacementShellPresentation['syncStatus'](_0x42b7b0, _0x57b9e5),
-        _0x53b56d(),
-        _0x5e0fff(),
-        _0x4aeba7?.['refresh'](),
-        returnSnapshot ? cloneJson(_0x57b9e5) : null
+        syncPersonReplacementPromptModeControl(
+          floatingMenuHost,
+          initialProject2,
+          getShotRenderState()['generatingShotIds'],
+        ),
+        personReplacementShellPresentation['syncStatus'](floatingMenuHost, initialProject2),
+        preparePreviewVideo(),
+        watchOpeningVideo(),
+        ctx?.['refresh'](),
+        returnSnapshot ? cloneJson(initialProject2) : null
       );
     },
-    setPersistenceState(_0x502839) {
-      if (_0x2f325d) return null;
+    setPersistenceState(value451) {
+      if (value43) return null;
       return (
-        (_0x57b9e5 = {
-          ..._0x57b9e5,
-          persistenceState: normalizePersonReplacementPersistenceState(_0x502839),
+        (initialProject2 = {
+          ...initialProject2,
+          persistenceState: normalizePersonReplacementPersistenceState(value451),
         }),
-        _0x3a22a2['update'](_0x57b9e5['persistenceState']),
-        cloneJson(_0x57b9e5['persistenceState'])
+        workspacePersistencePresentation['update'](initialProject2['persistenceState']),
+        cloneJson(initialProject2['persistenceState'])
       );
     },
-    setOutputCanvasSyncState(_0x37a0b5 = {}) {
-      if (_0x2f325d) return null;
-      const _0x46962f = _0x1b7b58;
-      ((_0x1b7b58 = _0x37a0b5?.['pending'] === !![]),
-        (_0x47513d = _0x1b7b58 ? normalizeText(_0x37a0b5?.['scope']) : ''),
-        _0x624e11());
-      const _0x3caf3a = _0x42b7b0?.['querySelector']?.('.person-replacement-toolbar-actions'),
-        _0x3798c9 = _0x1dc794(
-          personReplacementShellPresentation['renderToolbarActions'](_0x57b9e5, _0x1f9cef()),
+    setOutputCanvasSyncState(options6 = {}) {
+      if (value43) return null;
+      const enabled71 = canvasSyncPending;
+      ((canvasSyncPending = options6?.['pending'] === !![]),
+        (canvasSyncScope = canvasSyncPending ? normalizeText(options6?.['scope']) : ''),
+        handler15());
+      const value452 = floatingMenuHost?.['querySelector']?.('.person-replacement-toolbar-actions'),
+        value453 = handler59(
+          personReplacementShellPresentation['renderToolbarActions'](initialProject2, handler22()),
         );
       return (
-        _0x3caf3a &&
-          _0x3798c9 &&
-          typeof _0x3caf3a['replaceWith'] === 'function' &&
-          _0x3caf3a['replaceWith'](_0x3798c9),
-        _0x59adb4({ captureFocus: _0x1b7b58 && !_0x46962f }),
-        { pending: _0x1b7b58, scope: _0x47513d }
+        value452 &&
+          value453 &&
+          typeof value452['replaceWith'] === 'function' &&
+          value452['replaceWith'](value453),
+        handler63({ captureFocus: canvasSyncPending && !enabled71 }),
+        { pending: canvasSyncPending, scope: canvasSyncScope }
       );
     },
-    setComposeOutputState(_0x3789f6 = {}) {
-      if (_0x2f325d) return null;
-      const _0x435892 = _0x4fcdf7;
-      _0x4fcdf7 = _0x3789f6?.['pending'] === !![];
-      const _0x150637 = _0x42b7b0?.['querySelector']?.(
+    setComposeOutputState(options7 = {}) {
+      if (value43) return null;
+      const value454 = composeOutputPending2;
+      composeOutputPending2 = options7?.['pending'] === !![];
+      const value455 = floatingMenuHost?.['querySelector']?.(
           '[data-person-replacement-action=\x22compose-output\x22]',
         ),
-        _0x502d7a = _0x1dc794(renderCompositeComposeAction(_0x57b9e5, _0x1f9cef()));
+        value456 = handler59(renderCompositeComposeAction(initialProject2, handler22()));
       return (
-        _0x150637 &&
-          _0x502d7a &&
-          typeof _0x150637['replaceWith'] === 'function' &&
-          _0x150637['replaceWith'](_0x502d7a),
-        _0x3ff432(),
-        _0x435892 && !_0x4fcdf7 && _0x5083e0({ composeOnly: !![] }),
-        { pending: _0x4fcdf7 }
+        value455 &&
+          value456 &&
+          typeof value455['replaceWith'] === 'function' &&
+          value455['replaceWith'](value456),
+        handler60(),
+        value454 && !composeOutputPending2 && handler5({ composeOnly: !![] }),
+        { pending: composeOutputPending2 }
       );
     },
-    setExportOutputState(_0x127722 = {}) {
-      if (_0x2f325d) return null;
-      ((_0x463a8b = _0x127722?.['pending'] === !![]), _0x624e11());
-      const _0x147638 = _0x42b7b0?.['querySelector']?.('.person-replacement-toolbar-actions'),
-        _0x252817 = _0x1dc794(
-          personReplacementShellPresentation['renderToolbarActions'](_0x57b9e5, _0x1f9cef()),
+    setExportOutputState(options8 = {}) {
+      if (value43) return null;
+      ((exportOutputPending = options8?.['pending'] === !![]), handler15());
+      const value457 = floatingMenuHost?.['querySelector']?.('.person-replacement-toolbar-actions'),
+        value458 = handler59(
+          personReplacementShellPresentation['renderToolbarActions'](initialProject2, handler22()),
         );
       return (
-        _0x147638 &&
-          _0x252817 &&
-          typeof _0x147638['replaceWith'] === 'function' &&
-          _0x147638['replaceWith'](_0x252817),
-        { pending: _0x463a8b }
+        value457 &&
+          value458 &&
+          typeof value457['replaceWith'] === 'function' &&
+          value457['replaceWith'](value458),
+        { pending: exportOutputPending }
       );
     },
-    prewarmCompositeOriginalVideo(_0x14b025 = '') {
-      if (_0x2f325d) return ![];
-      return _0x2f6a26(_0x14b025);
+    prewarmCompositeOriginalVideo(value459 = '') {
+      if (value43) return ![];
+      return handler6(value459);
     },
     getProject() {
-      return cloneJson(_0x57b9e5);
+      return cloneJson(initialProject2);
     },
-    refreshVoiceSources(_0x2a0ad2 = {}) {
-      return _0x152aca(_0x2a0ad2);
+    refreshVoiceSources(options9 = {}) {
+      return refreshSourceCards(options9);
     },
     destroy() {
-      if (_0x2f325d) return;
-      (_0xc2e7d1(),
-        _0xea53df(),
-        _0x54fdfd(),
-        _0x119305(),
-        _0x24b921['dispose'](),
-        _0x551a99(),
-        _0x3c691d(),
-        _0xa770b0(),
-        _0x31cdf2['dispose'](),
-        _0x4a9758(),
-        _0x524d22(),
-        _0x416474(),
-        _0x773f3f(),
-        _0x13053b({ restoreFocus: ![] }),
-        _0x3accc4['dispose'](),
-        _0x3a22a2['destroy'](),
-        (_0x2f325d = !![]),
-        _0x42cf44['forEach']((_0x2e7d9c) => _0x2e7d9c?.['destroy']?.()),
-        _0x4aeba7?.['destroy']?.(),
-        (_0x4aeba7 = null),
-        _0x5cb732?.(),
-        (_0x5cb732 = null),
-        _0x3e5d6c?.(),
-        (_0x3e5d6c = null),
-        typeof _0x42b7b0?.['removeEventListener'] === 'function' &&
-          _0x42b7b0['removeEventListener']('error', handleWorkspaceAssetLibraryImageError, !![]),
-        _0x348b2e?.(),
-        (_0x348b2e = null),
-        _0x3d05d4?.(),
-        (_0x3d05d4 = null),
-        windowObject?.['removeEventListener']?.('keydown', _0x4d5162, !![]),
-        windowObject?.['removeEventListener']?.('resize', _0x11a836),
-        _0x4d8968?.['destroy']?.(),
-        _0x400faa['destroy'](),
-        _0x42b7b0?.['remove']?.(),
-        (_0x42b7b0 = null));
+      if (value43) return;
+      (destroy4(),
+        stop(),
+        destroy2(),
+        reset(),
+        session['dispose'](),
+        releaseBufferedVideo(),
+        handler3(),
+        handler4(),
+        personReplacementCompositePreviewController['dispose'](),
+        destroy5(),
+        handler88(),
+        handler120(),
+        destroy3(),
+        handler62({ restoreFocus: ![] }),
+        workspacePresentationLifecycle['dispose'](),
+        workspacePersistencePresentation['destroy'](),
+        (value43 = !![]),
+        list3['forEach']((value460) => value460?.['destroy']?.()),
+        ctx?.['destroy']?.(),
+        (ctx = null),
+        value47?.(),
+        (value47 = null),
+        value50?.(),
+        (value50 = null),
+        typeof floatingMenuHost?.['removeEventListener'] === 'function' &&
+          floatingMenuHost['removeEventListener']('error', handleWorkspaceAssetLibraryImageError, !![]),
+        bindWorkspaceEntityContextMenu2?.(),
+        (bindWorkspaceEntityContextMenu2 = null),
+        value65?.(),
+        (value65 = null),
+        windowObject?.['removeEventListener']?.('keydown', handler72, !![]),
+        windowObject?.['removeEventListener']?.('resize', value171),
+        workspaceMarqueeSelectionController?.['destroy']?.(),
+        personReplacementAssetHoverPreviewController['destroy'](),
+        floatingMenuHost?.['remove']?.(),
+        (floatingMenuHost = null));
     },
   });
-  return _0x2edc43;
+  return value93;
 }

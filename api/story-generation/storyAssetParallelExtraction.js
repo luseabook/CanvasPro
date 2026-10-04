@@ -5,126 +5,121 @@ import {
   createStoryAssetPromptContracts,
 } from './storyAssetExtractionRequest.js';
 const STORY_ASSET_DETAILED_DRAFT_STRATEGY = 'kind-detailed-parallel-v1';
-function cloneStoryAssetDetailedExtractionValue(_0x449227) {
-  if (!_0x449227 || typeof _0x449227 !== 'object') return null;
+function cloneStoryAssetDetailedExtractionValue(enabled) {
+  if (!enabled || typeof enabled !== 'object') return null;
   try {
-    return JSON['parse'](JSON['stringify'](_0x449227));
+    return JSON['parse'](JSON['stringify'](enabled));
   } catch {
     return null;
   }
 }
-function classifyStoryAssetDetailedExtractionError(_0x2017a9, _0x3969fb) {
-  const _0x5508b0 = _0x3969fb(_0x2017a9?.['message'] || _0x2017a9),
-    _0xb59982 = _0x3969fb(_0x2017a9?.['type'] || _0x2017a9?.['code'])['toUpperCase']();
-  if (_0xb59982['includes']('TIMEOUT') || /超时|timeout/iu['test'](_0x5508b0)) return 'timeout';
+function classifyStoryAssetDetailedExtractionError(error, handler) {
+  const value = handler(error?.['message'] || error),
+    list = handler(error?.['type'] || error?.['code'])['toUpperCase']();
+  if (list['includes']('TIMEOUT') || /超时|timeout/iu['test'](value)) return 'timeout';
   if (
-    _0xb59982['includes']('DNS') ||
-    _0xb59982['includes']('ENOTFOUND') ||
-    _0xb59982['includes']('EAI_AGAIN') ||
-    /dns|name\s+resolution|getaddrinfo|域名解析/iu['test'](_0x5508b0)
+    list['includes']('DNS') ||
+    list['includes']('ENOTFOUND') ||
+    list['includes']('EAI_AGAIN') ||
+    /dns|name\s+resolution|getaddrinfo|域名解析/iu['test'](value)
   )
     return 'dns-error';
   if (
-    _0xb59982['includes']('NETWORK') ||
-    /fetch\s+failed|failed\s+to\s+fetch|network\s+(?:error|failure)|网络(?:错误|异常|失败)/iu['test'](
-      _0x5508b0,
-    )
+    list['includes']('NETWORK') ||
+    /fetch\s+failed|failed\s+to\s+fetch|network\s+(?:error|failure)|网络(?:错误|异常|失败)/iu['test'](value)
   )
     return 'network-error';
   if (
-    _0xb59982['includes']('ECONNRESET') ||
-    _0xb59982['includes']('ECONNABORTED') ||
-    _0xb59982['includes']('UND_ERR_SOCKET') ||
-    /connection\s*(?:reset|closed|aborted)|socket\s*hang\s*up|连接(?:被)?重置|连接中断/iu['test'](_0x5508b0)
+    list['includes']('ECONNRESET') ||
+    list['includes']('ECONNABORTED') ||
+    list['includes']('UND_ERR_SOCKET') ||
+    /connection\s*(?:reset|closed|aborted)|socket\s*hang\s*up|连接(?:被)?重置|连接中断/iu['test'](value)
   )
     return 'connection-reset';
-  if (_0xb59982['includes']('RATE') || /限流|rate.?limit|429/iu['test'](_0x5508b0)) return 'rate-limit';
-  if (/too\s+many\s+states|schema\s+(?:constraint|complexity)|constraint[^.]*schema/iu['test'](_0x5508b0))
+  if (list['includes']('RATE') || /限流|rate.?limit|429/iu['test'](value)) return 'rate-limit';
+  if (/too\s+many\s+states|schema\s+(?:constraint|complexity)|constraint[^.]*schema/iu['test'](value))
     return 'schema-complexity';
-  if (_0xb59982['includes']('LENGTH') || /截断|token|length/iu['test'](_0x5508b0)) return 'length';
-  if (_0xb59982['includes']('JSON') || /JSON|返回格式|没有可用/u['test'](_0x5508b0)) return 'invalid-json';
+  if (list['includes']('LENGTH') || /截断|token|length/iu['test'](value)) return 'length';
+  if (list['includes']('JSON') || /JSON|返回格式|没有可用/u['test'](value)) return 'invalid-json';
   return 'request-error';
 }
-function isStoryAssetConfirmedUnchargedRejection(_0x1ae8c3) {
-  const _0x1e0345 = Number(_0x1ae8c3?.['status'] ?? _0x1ae8c3?.['statusCode']);
-  return [0x190, 0x191, 0x193, 0x194, 0x199, 0x1a6, 0x1ad]['includes'](_0x1e0345);
+function isStoryAssetConfirmedUnchargedRejection(response) {
+  const item = Number(response?.['status'] ?? response?.['statusCode']);
+  return [0x190, 0x191, 0x193, 0x194, 0x199, 0x1a6, 0x1ad]['includes'](item);
 }
-function isStoryAssetPaidRerunAuthorized(_0x3f8ab3, _0x257199) {
-  if (!_0x3f8ab3 || typeof _0x3f8ab3 !== 'object') return ![];
-  const _0x3e4cff = Array['isArray'](_0x3f8ab3['authorizedKinds']) ? _0x3f8ab3['authorizedKinds'] : [];
-  return _0x3f8ab3['confirmed'] === !![] && _0x3e4cff['includes'](_0x257199);
+function isStoryAssetPaidRerunAuthorized(enabled2, key) {
+  if (!enabled2 || typeof enabled2 !== 'object') return ![];
+  const list2 = Array['isArray'](enabled2['authorizedKinds']) ? enabled2['authorizedKinds'] : [];
+  return enabled2['confirmed'] === !![] && list2['includes'](key);
 }
-function archiveStoryAssetPaidLane(_0x419604, _0x4eea29, _0x2dd5ae) {
-  const _0x1f2379 =
-    _0x419604['paidResponseHistoryByKind'] && typeof _0x419604['paidResponseHistoryByKind'] === 'object'
-      ? _0x419604['paidResponseHistoryByKind']
+function archiveStoryAssetPaidLane(responseMode2, index, reason) {
+  const result =
+    responseMode2['paidResponseHistoryByKind'] &&
+    typeof responseMode2['paidResponseHistoryByKind'] === 'object'
+      ? responseMode2['paidResponseHistoryByKind']
       : {};
-  _0x419604['paidResponseHistoryByKind'] = _0x1f2379;
-  const _0x54483c = Array['isArray'](_0x1f2379[_0x4eea29]) ? _0x1f2379[_0x4eea29] : [];
-  (_0x54483c['push']({
+  responseMode2['paidResponseHistoryByKind'] = result;
+  const list3 = Array['isArray'](result[index]) ? result[index] : [];
+  (list3['push']({
     archivedAt: Date['now'](),
-    reason: _0x2dd5ae,
-    rawResponse: Object['hasOwn'](_0x419604['rawResponsesByKind'] || {}, _0x4eea29)
-      ? _0x419604['rawResponsesByKind'][_0x4eea29]
+    reason: reason,
+    rawResponse: Object['hasOwn'](responseMode2['rawResponsesByKind'] || {}, index)
+      ? responseMode2['rawResponsesByKind'][index]
       : '',
-    responseMode: _0x419604['rawResponseModesByKind']?.[_0x4eea29] || '',
+    responseMode: responseMode2['rawResponseModesByKind']?.[index] || '',
     contractSnapshot: cloneStoryAssetDetailedExtractionValue(
-      _0x419604['rawResponseContractSnapshotsByKind']?.[_0x4eea29],
+      responseMode2['rawResponseContractSnapshotsByKind']?.[index],
     ),
-    decisions: cloneStoryAssetDetailedExtractionValue(_0x419604['decisionsByKind']?.[_0x4eea29]),
-    assets: cloneStoryAssetDetailedExtractionValue(_0x419604['assetsByKind']?.[_0x4eea29]) || [],
-    submissionState: cloneStoryAssetDetailedExtractionValue(_0x419604['submissionStatesByKind']?.[_0x4eea29]),
-    kindState: cloneStoryAssetDetailedExtractionValue(_0x419604['kindStates']?.[_0x4eea29]),
+    decisions: cloneStoryAssetDetailedExtractionValue(responseMode2['decisionsByKind']?.[index]),
+    assets: cloneStoryAssetDetailedExtractionValue(responseMode2['assetsByKind']?.[index]) || [],
+    submissionState: cloneStoryAssetDetailedExtractionValue(responseMode2['submissionStatesByKind']?.[index]),
+    kindState: cloneStoryAssetDetailedExtractionValue(responseMode2['kindStates']?.[index]),
   }),
-    (_0x1f2379[_0x4eea29] = _0x54483c));
+    (result[index] = list3));
 }
-function clearStoryAssetPaidLane(_0x40cfd9, _0x41936a, _0x34fb2e) {
-  (archiveStoryAssetPaidLane(_0x40cfd9, _0x41936a, _0x34fb2e),
-    (_0x40cfd9['assetsByKind'][_0x41936a] = []),
-    delete _0x40cfd9['rawResponsesByKind'][_0x41936a],
-    delete _0x40cfd9['rawResponseModesByKind'][_0x41936a],
-    delete _0x40cfd9['rawResponseContractSnapshotsByKind'][_0x41936a],
-    delete _0x40cfd9['paidResponseReceivedByKind'][_0x41936a],
-    delete _0x40cfd9['decisionsByKind'][_0x41936a],
-    delete _0x40cfd9['submissionStatesByKind'][_0x41936a]);
+function clearStoryAssetPaidLane(data, options, target) {
+  (archiveStoryAssetPaidLane(data, options, target),
+    (data['assetsByKind'][options] = []),
+    delete data['rawResponsesByKind'][options],
+    delete data['rawResponseModesByKind'][options],
+    delete data['rawResponseContractSnapshotsByKind'][options],
+    delete data['paidResponseReceivedByKind'][options],
+    delete data['decisionsByKind'][options],
+    delete data['submissionStatesByKind'][options]);
 }
-function makeUniqueStoryAssetExtractionRef(_0x24d238, _0x3b86de, _0x1956c6, _0x18edb4) {
-  const _0x3ac2d1 = _0x18edb4(_0x24d238, _0x3b86de);
-  if (!_0x1956c6['has'](_0x3ac2d1)) return (_0x1956c6['add'](_0x3ac2d1), _0x3ac2d1);
-  let _0x54aa6f = 0x2,
-    _0x5c32af = _0x3b86de + '-' + _0x54aa6f;
-  while (_0x1956c6['has'](_0x5c32af)) {
-    ((_0x54aa6f += 0x1), (_0x5c32af = _0x3b86de + '-' + _0x54aa6f));
+function makeUniqueStoryAssetExtractionRef(source, next, map, handler2) {
+  const current = handler2(source, next);
+  if (!map['has'](current)) return (map['add'](current), current);
+  let entry = 0x2,
+    record = next + '-' + entry;
+  while (map['has'](record)) {
+    ((entry += 0x1), (record = next + '-' + entry));
   }
-  return (_0x1956c6['add'](_0x5c32af), _0x5c32af);
+  return (map['add'](record), record);
 }
 export function createParallelStoryAssetExtractor({
-  schemaVersion: _0x2d9a62,
-  assetKinds: _0x4b50f3,
-  generateText: _0x23177e,
-  normalizeText: _0x18dff1,
-  getResultText: _0x260132,
-  normalizeStoryProjectInput: _0x1147ea,
-  normalizeAssetReference: _0x32640b,
-  parseStoryAssetExtractionResult: _0x23571f,
-  parseStoryAssetCompactExtractionResult: _0xed3827,
-  extractStoryAssets: _0x1199ff,
+  schemaVersion: schemaVersion,
+  assetKinds: assetKinds,
+  generateText: generateText,
+  normalizeText: normalizeText,
+  getResultText: getResultText,
+  normalizeStoryProjectInput: normalizeStoryProjectInput,
+  normalizeAssetReference: normalizeAssetReference,
+  parseStoryAssetExtractionResult: parseStoryAssetExtractionResult,
+  parseStoryAssetCompactExtractionResult: parseStoryAssetCompactExtractionResult,
+  extractStoryAssets: extractStoryAssets,
 } = {}) {
-  function _0x2c0bb7(_0x542b86) {
-    const _0x1ff4c4 = JSON['stringify'](_0x542b86);
-    let _0x31d2c0 = 0x811c9dc5;
-    for (let _0x19cff9 = 0x0; _0x19cff9 < _0x1ff4c4['length']; _0x19cff9 += 0x1) {
-      ((_0x31d2c0 ^= _0x1ff4c4['charCodeAt'](_0x19cff9)), (_0x31d2c0 = Math['imul'](_0x31d2c0, 0x1000193)));
+  function run(payload) {
+    const list4 = JSON['stringify'](payload);
+    let handle = 0x811c9dc5;
+    for (let state = 0x0; state < list4['length']; state += 0x1) {
+      ((handle ^= list4['charCodeAt'](state)), (handle = Math['imul'](handle, 0x1000193)));
     }
     return (
-      _0x2d9a62 +
-      '-' +
-      (_0x31d2c0 >>> 0x0)['toString'](0x10)['padStart'](0x8, '0') +
-      '-' +
-      _0x1ff4c4['length']
+      schemaVersion + '-' + (handle >>> 0x0)['toString'](0x10)['padStart'](0x8, '0') + '-' + list4['length']
     );
   }
-  function _0x44c6a6({
+  function run2({
     project: project = {},
     aspectRatio: aspectRatio = '',
     visualStyle: visualStyle = '',
@@ -132,23 +127,23 @@ export function createParallelStoryAssetExtractor({
     compactOutput: compactOutput = ![],
     compactOutputByKind: compactOutputByKind = null,
   } = {}) {
-    const _0x506a33 = _0x1147ea(project);
-    return _0x2c0bb7({
-      title: _0x506a33['title'],
-      chapters: _0x506a33['chapters'],
-      aspectRatio: _0x18dff1(aspectRatio) || _0x506a33['aspectRatio'],
-      visualStyle: _0x18dff1(visualStyle) || _0x506a33['visualStyle'],
+    const title = normalizeStoryProjectInput(project);
+    return run({
+      title: title['title'],
+      chapters: title['chapters'],
+      aspectRatio: normalizeText(aspectRatio) || title['aspectRatio'],
+      visualStyle: normalizeText(visualStyle) || title['visualStyle'],
       extractionStrategy: STORY_ASSET_DETAILED_DRAFT_STRATEGY,
-      extractionKinds: _0x4b50f3,
+      extractionKinds: assetKinds,
       compactOutputByKind:
         compactOutputByKind && typeof compactOutputByKind === 'object'
           ? compactOutputByKind
-          : Object['fromEntries'](_0x4b50f3['map']((_0x36db31) => [_0x36db31, Boolean(compactOutput)])),
+          : Object['fromEntries'](assetKinds['map']((config) => [config, Boolean(compactOutput)])),
       ...(requiredAssetNamesByKind ? { requiredAssetNamesByKind: requiredAssetNamesByKind } : {}),
     });
   }
-  function _0x566af8(
-    _0x27595b,
+  function run3(
+    kind,
     {
       requiredAssetNamesByKind: requiredAssetNamesByKind = null,
       requiredAssetsByKind: requiredAssetsByKind = null,
@@ -156,31 +151,31 @@ export function createParallelStoryAssetExtractor({
       responseMode: responseMode = 'verbose',
     } = {},
   ) {
-    const _0x422f23 = (_0x112308 = []) =>
-      (Array['isArray'](_0x112308) ? _0x112308 : [])['map']((_0xdbd950) => ({
-        name: _0x18dff1(_0xdbd950 && typeof _0xdbd950 === 'object' ? _0xdbd950['name'] : _0xdbd950),
-        sourceSceneRefs: Array['isArray'](_0xdbd950?.['sourceSceneRefs'])
-          ? _0xdbd950['sourceSceneRefs']['map'](_0x18dff1)['filter'](Boolean)
+    const requiredNames = (list5 = []) =>
+      (Array['isArray'](list5) ? list5 : [])['map']((error2) => ({
+        name: normalizeText(error2 && typeof error2 === 'object' ? error2['name'] : error2),
+        sourceSceneRefs: Array['isArray'](error2?.['sourceSceneRefs'])
+          ? error2['sourceSceneRefs']['map'](normalizeText)['filter'](Boolean)
           : [],
-        sourceChapterIds: Array['isArray'](_0xdbd950?.['sourceChapterIds'])
-          ? _0xdbd950['sourceChapterIds']['map'](_0x18dff1)['filter'](Boolean)
+        sourceChapterIds: Array['isArray'](error2?.['sourceChapterIds'])
+          ? error2['sourceChapterIds']['map'](normalizeText)['filter'](Boolean)
           : [],
-        role: _0x18dff1(_0xdbd950?.['role']),
-        fixedTraits: _0x18dff1(_0xdbd950?.['fixedTraits']),
+        role: normalizeText(error2?.['role']),
+        fixedTraits: normalizeText(error2?.['fixedTraits']),
       }));
-    return _0x2c0bb7({
-      kind: _0x27595b,
+    return run({
+      kind: kind,
       responseMode: responseMode,
       ...(responseMode === 'compact'
         ? { responseSchemaVersion: STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION }
         : {}),
-      requiredNames: _0x422f23(requiredAssetNamesByKind?.[_0x27595b]),
-      requiredContracts: _0x422f23(requiredAssetsByKind?.[_0x27595b]),
-      candidateContracts: _0x422f23(candidateAssetsByKind?.[_0x27595b]),
+      requiredNames: requiredNames(requiredAssetNamesByKind?.[kind]),
+      requiredContracts: requiredNames(requiredAssetsByKind?.[kind]),
+      candidateContracts: requiredNames(candidateAssetsByKind?.[kind]),
     });
   }
-  function _0x186fca(
-    _0x515ab8,
+  function run4(
+    kind2,
     {
       requiredAssetNamesByKind: requiredAssetNamesByKind = null,
       requiredAssetsByKind: requiredAssetsByKind = null,
@@ -188,31 +183,33 @@ export function createParallelStoryAssetExtractor({
       responseMode: responseMode = 'verbose',
     } = {},
   ) {
-    const _0x2b4f66 = createStoryAssetPromptContracts(
-      [_0x515ab8],
+    const storyAssetPromptContracts = createStoryAssetPromptContracts(
+      [kind2],
       requiredAssetNamesByKind,
       candidateAssetsByKind,
       requiredAssetsByKind,
       { includeClientKeys: responseMode === 'compact' },
     )['payload'];
     return {
-      kind: _0x515ab8,
+      kind: kind2,
       responseMode: responseMode,
       responseSchemaVersion: responseMode === 'compact' ? STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION : 0x1,
-      requiredAssets: cloneStoryAssetDetailedExtractionValue(_0x2b4f66['requiredAssets'] || []) || [],
-      candidateAssets: cloneStoryAssetDetailedExtractionValue(_0x2b4f66['candidateAssets'] || []) || [],
+      requiredAssets:
+        cloneStoryAssetDetailedExtractionValue(storyAssetPromptContracts['requiredAssets'] || []) || [],
+      candidateAssets:
+        cloneStoryAssetDetailedExtractionValue(storyAssetPromptContracts['candidateAssets'] || []) || [],
     };
   }
-  function _0x483ed6(_0x5106f9) {
-    const _0x3fc6e7 = _0x260132(_0x5106f9);
-    if (typeof _0x3fc6e7 === 'string') return _0x3fc6e7['trim']();
+  function run5(scope) {
+    const input = getResultText(scope);
+    if (typeof input === 'string') return input['trim']();
     try {
-      return JSON['stringify'](_0x3fc6e7);
+      return JSON['stringify'](input);
     } catch {
       return '';
     }
   }
-  return async function _0xb74880({
+  return async function run6({
     project: project = {},
     model: model = '',
     provider: provider = '',
@@ -232,99 +229,102 @@ export function createParallelStoryAssetExtractor({
     compactOutput: compactOutput = ![],
     compactOutputByKind: compactOutputByKind = null,
     maxOutputTokens: maxOutputTokens = STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
-    request: request = _0x23177e,
+    request: request = generateText,
     onProgress: onProgress = null,
     onCheckpoint: onCheckpoint = null,
     resumeDraft: resumeDraft = null,
     paidRerunAuthorization: paidRerunAuthorization = null,
   } = {}) {
     request = withReplicationRequestPolicy(request, project);
-    const _0x1e2541 = [..._0x4b50f3],
-      _0xec2a5a = { character: '角色', scene: '场景', prop: '道具' },
-      _0x528c06 = Object['fromEntries'](
-        _0x1e2541['map']((_0x1dee92) => [
-          _0x1dee92,
+    const total = [...assetKinds],
+      output = { character: '角色', scene: '场景', prop: '道具' },
+      responseMode3 = Object['fromEntries'](
+        total['map']((value2) => [
+          value2,
           compactOutputByKind && typeof compactOutputByKind === 'object'
-            ? compactOutputByKind[_0x1dee92] === 'compact'
+            ? compactOutputByKind[value2] === 'compact'
             : Boolean(compactOutput),
         ]),
       ),
-      _0x5f11c5 = Object['fromEntries'](
-        _0x1e2541['map']((_0x2a8c01) => [
-          _0x2a8c01,
-          _0x566af8(_0x2a8c01, {
+      contractFingerprintsByKind = Object['fromEntries'](
+        total['map']((value3) => [
+          value3,
+          run3(value3, {
             requiredAssetNamesByKind: requiredAssetNamesByKind,
             requiredAssetsByKind: requiredAssetsByKind,
             candidateAssetsByKind: candidateAssetsByKind,
-            responseMode: _0x528c06[_0x2a8c01] ? 'compact' : 'verbose',
+            responseMode: responseMode3[value3] ? 'compact' : 'verbose',
           }),
         ]),
       ),
-      _0x32b729 = Object['fromEntries'](
-        _0x1e2541['map']((_0x6a8c00) => [
-          _0x6a8c00,
-          _0x186fca(_0x6a8c00, {
+      contractSnapshotByKind = Object['fromEntries'](
+        total['map']((value4) => [
+          value4,
+          run4(value4, {
             requiredAssetNamesByKind: requiredAssetNamesByKind,
             requiredAssetsByKind: requiredAssetsByKind,
             candidateAssetsByKind: candidateAssetsByKind,
-            responseMode: _0x528c06[_0x6a8c00] ? 'compact' : 'verbose',
+            responseMode: responseMode3[value4] ? 'compact' : 'verbose',
           }),
         ]),
       ),
-      _0x1b5dfd = _0x1147ea(project),
-      _0x557b41 = _0x1b5dfd['chapters']['map']((_0x8e4b50) => _0x8e4b50['id']),
-      _0x1ec341 = _0x44c6a6({
+      value5 = normalizeStoryProjectInput(project),
+      chapterIds = value5['chapters']['map']((value6) => value6['id']),
+      sourceFingerprint = run2({
         project: project,
         aspectRatio: aspectRatio,
         visualStyle: visualStyle,
         requiredAssetNamesByKind: requiredAssetNamesByKind,
         compactOutput: compactOutput,
-        compactOutputByKind: _0x528c06,
+        compactOutputByKind: responseMode3,
       }),
-      _0x1c046e = new Set([
-        _0x1ec341,
+      map2 = new Set([
+        sourceFingerprint,
         ...(Array['isArray'](resumeRequiredAssetNamesByKindAliases)
-          ? resumeRequiredAssetNamesByKindAliases['map']((_0x3013da) =>
-              _0x44c6a6({
+          ? resumeRequiredAssetNamesByKindAliases['map']((requiredAssetNamesByKind2) =>
+              run2({
                 project: project,
                 aspectRatio: aspectRatio,
                 visualStyle: visualStyle,
-                requiredAssetNamesByKind: _0x3013da,
+                requiredAssetNamesByKind: requiredAssetNamesByKind2,
                 compactOutput: compactOutput,
-                compactOutputByKind: _0x528c06,
+                compactOutputByKind: responseMode3,
               }),
             )
           : []),
         ...(Array['isArray'](resumeSourceAliases)
-          ? resumeSourceAliases['map']((_0x74ed7a) =>
-              _0x44c6a6({
-                project: _0x74ed7a?.['project'] || project,
+          ? resumeSourceAliases['map']((project2) =>
+              run2({
+                project: project2?.['project'] || project,
                 aspectRatio: aspectRatio,
                 visualStyle: visualStyle,
-                requiredAssetNamesByKind: _0x74ed7a?.['requiredAssetNamesByKind'] ?? requiredAssetNamesByKind,
+                requiredAssetNamesByKind: project2?.['requiredAssetNamesByKind'] ?? requiredAssetNamesByKind,
                 compactOutput: compactOutput,
-                compactOutputByKind: _0x528c06,
+                compactOutputByKind: responseMode3,
               }),
             )
           : []),
         ...(Array['isArray'](resumeSourceFingerprintAliases)
-          ? resumeSourceFingerprintAliases['map'](_0x18dff1)['filter'](Boolean)
+          ? resumeSourceFingerprintAliases['map'](normalizeText)['filter'](Boolean)
           : []),
       ]),
-      _0x1366b2 = cloneStoryAssetDetailedExtractionValue(resumeDraft),
-      _0x11e91b = _0x1366b2?.['strategy'] === STORY_ASSET_DETAILED_DRAFT_STRATEGY,
-      _0x34eb58 = _0x1366b2?.['schemaVersion'] === _0x2d9a62,
-      _0x27a6ea = _0x1c046e['has'](_0x18dff1(_0x1366b2?.['sourceFingerprint'])),
-      _0x34b321 = _0x11e91b && _0x34eb58 && _0x27a6ea,
-      _0x59c3d5 = Boolean(
-        _0x11e91b &&
-        _0x1e2541['some'](
-          (_0x38ba9f) =>
-            _0x1366b2?.['paidResponseReceivedByKind']?.[_0x38ba9f] ||
-            Object['hasOwn'](_0x1366b2?.['rawResponsesByKind'] || {}, _0x38ba9f) ||
+      cloneStoryAssetDetailedExtractionValue2 = cloneStoryAssetDetailedExtractionValue(resumeDraft),
+      value7 = cloneStoryAssetDetailedExtractionValue2?.['strategy'] === STORY_ASSET_DETAILED_DRAFT_STRATEGY,
+      enabled3 = cloneStoryAssetDetailedExtractionValue2?.['schemaVersion'] === schemaVersion,
+      enabled4 = map2['has'](normalizeText(cloneStoryAssetDetailedExtractionValue2?.['sourceFingerprint'])),
+      enabled5 = value7 && enabled3 && enabled4,
+      value8 = Boolean(
+        value7 &&
+        total['some'](
+          (value9) =>
+            cloneStoryAssetDetailedExtractionValue2?.['paidResponseReceivedByKind']?.[value9] ||
+            Object['hasOwn'](cloneStoryAssetDetailedExtractionValue2?.['rawResponsesByKind'] || {}, value9) ||
             Math['max'](
               0x0,
-              Math['trunc'](Number(_0x1366b2?.['kindStates']?.[_0x38ba9f]?.['requestCount']) || 0x0),
+              Math['trunc'](
+                Number(cloneStoryAssetDetailedExtractionValue2?.['kindStates']?.[value9]?.['requestCount']) ||
+                  0x0,
+              ),
             ) > 0x0 ||
             [
               'submitted',
@@ -334,18 +334,22 @@ export function createParallelStoryAssetExtractor({
               'blocked-ambiguous-submission',
               'blocked-incompatible',
               'validated',
-            ]['includes'](_0x18dff1(_0x1366b2?.['submissionStatesByKind']?.[_0x38ba9f]?.['status'])) ||
-            (Array['isArray'](_0x1366b2?.['assetsByKind']?.[_0x38ba9f]) &&
-              _0x1366b2['assetsByKind'][_0x38ba9f]['length'] > 0x0),
+            ]['includes'](
+              normalizeText(
+                cloneStoryAssetDetailedExtractionValue2?.['submissionStatesByKind']?.[value9]?.['status'],
+              ),
+            ) ||
+            (Array['isArray'](cloneStoryAssetDetailedExtractionValue2?.['assetsByKind']?.[value9]) &&
+              cloneStoryAssetDetailedExtractionValue2['assetsByKind'][value9]['length'] > 0x0),
         ),
       ),
-      _0x169c5a = Boolean(!_0x34b321 && _0x59c3d5),
-      _0x304aca = Boolean(_0x169c5a && (!_0x34eb58 || !_0x27a6ea)),
-      _0x305513 = Object['fromEntries'](
-        _0x1e2541['map']((_0x2120e5) => [
-          _0x2120e5,
+      value10 = Boolean(!enabled5 && value8),
+      errorMessage = Boolean(value10 && (!enabled3 || !enabled4)),
+      kindStates = Object['fromEntries'](
+        total['map']((kind3) => [
+          kind3,
           {
-            kind: _0x2120e5,
+            kind: kind3,
             status: 'pending',
             attempt: 0x0,
             requestCount: 0x0,
@@ -358,15 +362,15 @@ export function createParallelStoryAssetExtractor({
           },
         ]),
       );
-    let _0x3b6427 =
-      _0x34b321 || _0x169c5a
-        ? _0x1366b2
+    let current2 =
+      enabled5 || value10
+        ? cloneStoryAssetDetailedExtractionValue2
         : {
             strategy: STORY_ASSET_DETAILED_DRAFT_STRATEGY,
-            schemaVersion: _0x2d9a62,
-            sourceFingerprint: _0x1ec341,
+            schemaVersion: schemaVersion,
+            sourceFingerprint: sourceFingerprint,
             status: 'pending',
-            assetsByKind: Object['fromEntries'](_0x1e2541['map']((_0xbe632f) => [_0xbe632f, []])),
+            assetsByKind: Object['fromEntries'](total['map']((value11) => [value11, []])),
             rawResponsesByKind: {},
             rawResponseModesByKind: {},
             rawResponseContractSnapshotsByKind: {},
@@ -374,84 +378,84 @@ export function createParallelStoryAssetExtractor({
             paidResponseHistoryByKind: {},
             submissionStatesByKind: {},
             decisionsByKind: {},
-            contractFingerprintsByKind: _0x5f11c5,
-            contractSnapshotByKind: _0x32b729,
-            kindStates: _0x305513,
+            contractFingerprintsByKind: contractFingerprintsByKind,
+            contractSnapshotByKind: contractSnapshotByKind,
+            kindStates: kindStates,
             completedKinds: [],
             completedAssets: [],
             failures: [],
             totalRequestCount: 0x0,
           };
-    _0x3b6427['strategy'] = STORY_ASSET_DETAILED_DRAFT_STRATEGY;
-    !_0x304aca && ((_0x3b6427['schemaVersion'] = _0x2d9a62), (_0x3b6427['sourceFingerprint'] = _0x1ec341));
-    ((_0x3b6427['assetsByKind'] =
-      _0x3b6427['assetsByKind'] && typeof _0x3b6427['assetsByKind'] === 'object'
-        ? _0x3b6427['assetsByKind']
+    current2['strategy'] = STORY_ASSET_DETAILED_DRAFT_STRATEGY;
+    !errorMessage &&
+      ((current2['schemaVersion'] = schemaVersion), (current2['sourceFingerprint'] = sourceFingerprint));
+    ((current2['assetsByKind'] =
+      current2['assetsByKind'] && typeof current2['assetsByKind'] === 'object'
+        ? current2['assetsByKind']
         : {}),
-      (_0x3b6427['rawResponsesByKind'] =
-        _0x3b6427['rawResponsesByKind'] && typeof _0x3b6427['rawResponsesByKind'] === 'object'
-          ? _0x3b6427['rawResponsesByKind']
+      (current2['rawResponsesByKind'] =
+        current2['rawResponsesByKind'] && typeof current2['rawResponsesByKind'] === 'object'
+          ? current2['rawResponsesByKind']
           : {}),
-      (_0x3b6427['rawResponseModesByKind'] =
-        _0x3b6427['rawResponseModesByKind'] && typeof _0x3b6427['rawResponseModesByKind'] === 'object'
-          ? _0x3b6427['rawResponseModesByKind']
+      (current2['rawResponseModesByKind'] =
+        current2['rawResponseModesByKind'] && typeof current2['rawResponseModesByKind'] === 'object'
+          ? current2['rawResponseModesByKind']
           : {}),
-      (_0x3b6427['rawResponseContractSnapshotsByKind'] =
-        _0x3b6427['rawResponseContractSnapshotsByKind'] &&
-        typeof _0x3b6427['rawResponseContractSnapshotsByKind'] === 'object'
-          ? _0x3b6427['rawResponseContractSnapshotsByKind']
+      (current2['rawResponseContractSnapshotsByKind'] =
+        current2['rawResponseContractSnapshotsByKind'] &&
+        typeof current2['rawResponseContractSnapshotsByKind'] === 'object'
+          ? current2['rawResponseContractSnapshotsByKind']
           : {}),
-      (_0x3b6427['paidResponseReceivedByKind'] =
-        _0x3b6427['paidResponseReceivedByKind'] && typeof _0x3b6427['paidResponseReceivedByKind'] === 'object'
-          ? _0x3b6427['paidResponseReceivedByKind']
+      (current2['paidResponseReceivedByKind'] =
+        current2['paidResponseReceivedByKind'] && typeof current2['paidResponseReceivedByKind'] === 'object'
+          ? current2['paidResponseReceivedByKind']
           : {}),
-      (_0x3b6427['paidResponseHistoryByKind'] =
-        _0x3b6427['paidResponseHistoryByKind'] && typeof _0x3b6427['paidResponseHistoryByKind'] === 'object'
-          ? _0x3b6427['paidResponseHistoryByKind']
+      (current2['paidResponseHistoryByKind'] =
+        current2['paidResponseHistoryByKind'] && typeof current2['paidResponseHistoryByKind'] === 'object'
+          ? current2['paidResponseHistoryByKind']
           : {}),
-      (_0x3b6427['submissionStatesByKind'] =
-        _0x3b6427['submissionStatesByKind'] && typeof _0x3b6427['submissionStatesByKind'] === 'object'
-          ? _0x3b6427['submissionStatesByKind']
+      (current2['submissionStatesByKind'] =
+        current2['submissionStatesByKind'] && typeof current2['submissionStatesByKind'] === 'object'
+          ? current2['submissionStatesByKind']
           : {}),
-      (_0x3b6427['decisionsByKind'] =
-        _0x3b6427['decisionsByKind'] && typeof _0x3b6427['decisionsByKind'] === 'object'
-          ? _0x3b6427['decisionsByKind']
+      (current2['decisionsByKind'] =
+        current2['decisionsByKind'] && typeof current2['decisionsByKind'] === 'object'
+          ? current2['decisionsByKind']
           : {}));
-    const _0x22bef2 =
-      _0x3b6427['contractFingerprintsByKind'] && typeof _0x3b6427['contractFingerprintsByKind'] === 'object'
-        ? _0x3b6427['contractFingerprintsByKind']
+    const args =
+      current2['contractFingerprintsByKind'] && typeof current2['contractFingerprintsByKind'] === 'object'
+        ? current2['contractFingerprintsByKind']
         : {};
-    ((_0x3b6427['contractFingerprintsByKind'] = { ..._0x22bef2 }),
-      (_0x3b6427['contractSnapshotByKind'] =
-        _0x3b6427['contractSnapshotByKind'] && typeof _0x3b6427['contractSnapshotByKind'] === 'object'
-          ? _0x3b6427['contractSnapshotByKind']
+    ((current2['contractFingerprintsByKind'] = { ...args }),
+      (current2['contractSnapshotByKind'] =
+        current2['contractSnapshotByKind'] && typeof current2['contractSnapshotByKind'] === 'object'
+          ? current2['contractSnapshotByKind']
           : {}),
-      (_0x3b6427['requestedContractSnapshotByKind'] = cloneStoryAssetDetailedExtractionValue(_0x32b729)),
-      (_0x3b6427['responseMode'] =
-        new Set(Object['values'](_0x528c06))['size'] === 0x1
-          ? Object['values'](_0x528c06)[0x0]
+      (current2['requestedContractSnapshotByKind'] =
+        cloneStoryAssetDetailedExtractionValue(contractSnapshotByKind)),
+      (current2['responseMode'] =
+        new Set(Object['values'](responseMode3))['size'] === 0x1
+          ? Object['values'](responseMode3)[0x0]
             ? 'compact'
             : 'verbose'
           : 'mixed'),
-      (_0x3b6427['kindStates'] =
-        _0x3b6427['kindStates'] && typeof _0x3b6427['kindStates'] === 'object'
-          ? _0x3b6427['kindStates']
-          : {}));
-    for (const _0x3184b8 of _0x1e2541) {
-      if (!Array['isArray'](_0x3b6427['assetsByKind'][_0x3184b8])) _0x3b6427['assetsByKind'][_0x3184b8] = [];
-      const _0x3c1207 = _0x3b6427['kindStates'][_0x3184b8] || {},
-        _0x326700 = _0x18dff1(_0x22bef2[_0x3184b8]),
-        _0x2eb294 = Boolean((_0x34b321 || _0x169c5a) && _0x326700 && _0x326700 !== _0x5f11c5[_0x3184b8]),
-        _0x3770ad = Boolean(
-          (_0x34b321 || _0x169c5a) &&
-          Object['hasOwn'](_0x3b6427['rawResponsesByKind'], _0x3184b8) &&
-          _0x18dff1(_0x3b6427['rawResponseModesByKind'][_0x3184b8] || _0x3c1207?.['responseMode']) ===
+      (current2['kindStates'] =
+        current2['kindStates'] && typeof current2['kindStates'] === 'object' ? current2['kindStates'] : {}));
+    for (const kind4 of total) {
+      if (!Array['isArray'](current2['assetsByKind'][kind4])) current2['assetsByKind'][kind4] = [];
+      const response2 = current2['kindStates'][kind4] || {},
+        value12 = normalizeText(args[kind4]),
+        value13 = Boolean((enabled5 || value10) && value12 && value12 !== contractFingerprintsByKind[kind4]),
+        value14 = Boolean(
+          (enabled5 || value10) &&
+          Object['hasOwn'](current2['rawResponsesByKind'], kind4) &&
+          normalizeText(current2['rawResponseModesByKind'][kind4] || response2?.['responseMode']) ===
             'compact' &&
-          !_0x3b6427['rawResponseContractSnapshotsByKind'][_0x3184b8],
+          !current2['rawResponseContractSnapshotsByKind'][kind4],
         ),
-        _0x2c27c5 = Boolean(
-          _0x3b6427['paidResponseReceivedByKind'][_0x3184b8] ||
-          Object['hasOwn'](_0x3b6427['rawResponsesByKind'], _0x3184b8) ||
+        enabled6 = Boolean(
+          current2['paidResponseReceivedByKind'][kind4] ||
+          Object['hasOwn'](current2['rawResponsesByKind'], kind4) ||
           [
             'submitted',
             'ambiguous',
@@ -460,240 +464,240 @@ export function createParallelStoryAssetExtractor({
             'blocked-ambiguous-submission',
             'blocked-incompatible',
             'validated',
-          ]['includes'](_0x18dff1(_0x3b6427['submissionStatesByKind'][_0x3184b8]?.['status'])) ||
-          Math['max'](0x0, Math['trunc'](Number(_0x3c1207?.['requestCount']) || 0x0)) > 0x0 ||
-          _0x3b6427['assetsByKind'][_0x3184b8]['length'],
+          ]['includes'](normalizeText(current2['submissionStatesByKind'][kind4]?.['status'])) ||
+          Math['max'](0x0, Math['trunc'](Number(response2?.['requestCount']) || 0x0)) > 0x0 ||
+          current2['assetsByKind'][kind4]['length'],
         ),
-        _0x19fe2a = isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, _0x3184b8);
-      let _0x1770d9 = ![];
-      const _0x4ee373 = Boolean(_0x2c27c5 && _0x3c1207?.['status'] === 'blocked-quality-rerun'),
-        _0x2629d7 = Boolean(
-          _0x2c27c5 &&
-          !_0x4ee373 &&
-          (_0x304aca ||
-            _0x3c1207?.['status'] === 'blocked-incompatible' ||
-            (_0x2eb294 && !allowSavedPaidResultContractRevalidation) ||
-            _0x3770ad),
+        isStoryAssetPaidRerunAuthorized2 = isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, kind4);
+      let enabled7 = ![];
+      const enabled8 = Boolean(enabled6 && response2?.['status'] === 'blocked-quality-rerun'),
+        value15 = Boolean(
+          enabled6 &&
+          !enabled8 &&
+          (errorMessage ||
+            response2?.['status'] === 'blocked-incompatible' ||
+            (value13 && !allowSavedPaidResultContractRevalidation) ||
+            value14),
         );
-      if ((_0x34b321 || _0x169c5a) && _0x4ee373 && !_0x19fe2a) {
-        _0x3b6427['kindStates'][_0x3184b8] = {
-          ..._0x3c1207,
-          kind: _0x3184b8,
+      if ((enabled5 || value10) && enabled8 && !isStoryAssetPaidRerunAuthorized2) {
+        current2['kindStates'][kind4] = {
+          ...response2,
+          kind: kind4,
           status: 'blocked-quality-rerun',
           errorType: 'quality-rerun-required',
           errorMessage: '已付费结果未通过当前视觉质量合同；需要用户明确授权后才能重新请求。',
-          responseMode: _0x528c06[_0x3184b8] ? 'compact' : 'verbose',
+          responseMode: responseMode3[kind4] ? 'compact' : 'verbose',
         };
         continue;
       }
-      (_0x34b321 || _0x169c5a) &&
-        _0x4ee373 &&
-        _0x19fe2a &&
-        (clearStoryAssetPaidLane(_0x3b6427, _0x3184b8, 'authorized-quality-rerun'),
-        (_0x3b6427['kindStates'][_0x3184b8] = {
-          ..._0x3c1207,
+      (enabled5 || value10) &&
+        enabled8 &&
+        isStoryAssetPaidRerunAuthorized2 &&
+        (clearStoryAssetPaidLane(current2, kind4, 'authorized-quality-rerun'),
+        (current2['kindStates'][kind4] = {
+          ...response2,
           status: 'pending',
           assetCount: 0x0,
           errorType: '',
           errorMessage: '',
           finishedAt: 0x0,
         }),
-        (_0x1770d9 = !![]));
-      if ((_0x34b321 || _0x169c5a) && _0x2629d7 && !_0x19fe2a) {
-        _0x3b6427['kindStates'][_0x3184b8] = {
-          ..._0x3c1207,
-          kind: _0x3184b8,
+        (enabled7 = !![]));
+      if ((enabled5 || value10) && value15 && !isStoryAssetPaidRerunAuthorized2) {
+        current2['kindStates'][kind4] = {
+          ...response2,
+          kind: kind4,
           status: 'blocked-incompatible',
           errorType: 'contract-incompatible',
-          errorMessage: _0x304aca
+          errorMessage: errorMessage
             ? '已付费结果的剧本来源或草稿版本与当前请求不兼容，需要用户明确授权后才能重新请求。'
-            : _0x2eb294
+            : value13
               ? '已付费结果的资产合同版本与当前合同不兼容，需要用户明确授权后才能重新请求。'
               : '已付费紧凑结果缺少其原始合同快照，无法安全绑定，需要用户明确授权后才能重新请求。',
-          responseMode: _0x528c06[_0x3184b8] ? 'compact' : 'verbose',
+          responseMode: responseMode3[kind4] ? 'compact' : 'verbose',
         };
         continue;
       }
-      (_0x34b321 || _0x169c5a) &&
-        (_0x2629d7 ||
-          (!_0x2c27c5 && _0x304aca) ||
-          (_0x2eb294 && !allowSavedPaidResultContractRevalidation) ||
-          _0x3770ad) &&
-        (_0x19fe2a || !_0x2c27c5) &&
-        (_0x2c27c5
+      (enabled5 || value10) &&
+        (value15 ||
+          (!enabled6 && errorMessage) ||
+          (value13 && !allowSavedPaidResultContractRevalidation) ||
+          value14) &&
+        (isStoryAssetPaidRerunAuthorized2 || !enabled6) &&
+        (enabled6
           ? clearStoryAssetPaidLane(
-              _0x3b6427,
-              _0x3184b8,
-              _0x304aca
+              current2,
+              kind4,
+              errorMessage
                 ? 'authorized-source-or-schema-change-rerun'
-                : _0x2eb294
+                : value13
                   ? 'authorized-contract-upgrade-rerun'
                   : 'authorized-missing-contract-snapshot-rerun',
             )
-          : ((_0x3b6427['assetsByKind'][_0x3184b8] = []),
-            delete _0x3b6427['rawResponsesByKind'][_0x3184b8],
-            delete _0x3b6427['rawResponseModesByKind'][_0x3184b8],
-            delete _0x3b6427['rawResponseContractSnapshotsByKind'][_0x3184b8],
-            delete _0x3b6427['paidResponseReceivedByKind'][_0x3184b8],
-            delete _0x3b6427['decisionsByKind'][_0x3184b8],
-            delete _0x3b6427['submissionStatesByKind'][_0x3184b8]),
-        (_0x3b6427['kindStates'][_0x3184b8] = {
-          ..._0x3c1207,
+          : ((current2['assetsByKind'][kind4] = []),
+            delete current2['rawResponsesByKind'][kind4],
+            delete current2['rawResponseModesByKind'][kind4],
+            delete current2['rawResponseContractSnapshotsByKind'][kind4],
+            delete current2['paidResponseReceivedByKind'][kind4],
+            delete current2['decisionsByKind'][kind4],
+            delete current2['submissionStatesByKind'][kind4]),
+        (current2['kindStates'][kind4] = {
+          ...response2,
           status: 'pending',
           assetCount: 0x0,
           errorType: '',
           errorMessage: '',
           finishedAt: 0x0,
         }),
-        (_0x1770d9 = !![]));
-      const _0x234428 = _0x18dff1(_0x3b6427['submissionStatesByKind'][_0x3184b8]?.['status']),
-        _0x579032 = _0x18dff1(_0x3c1207?.['errorType']),
-        _0x59c502 =
-          !_0x1770d9 &&
+        (enabled7 = !![]));
+      const value16 = normalizeText(current2['submissionStatesByKind'][kind4]?.['status']),
+        value17 = normalizeText(response2?.['errorType']),
+        value18 =
+          !enabled7 &&
           Boolean(
-            _0x234428 === 'submitted' ||
-            _0x234428 === 'ambiguous' ||
-            _0x3c1207?.['status'] === 'blocked-ambiguous-submission' ||
-            (!_0x3b6427['rawResponsesByKind'][_0x3184b8] &&
-              Math['max'](0x0, Math['trunc'](Number(_0x3c1207?.['requestCount']) || 0x0)) > 0x0 &&
-              (_0x3c1207?.['status'] === 'running' ||
-                (_0x3c1207?.['status'] === 'failed' &&
-                  ['timeout', 'connection-reset']['includes'](_0x579032)))),
+            value16 === 'submitted' ||
+            value16 === 'ambiguous' ||
+            response2?.['status'] === 'blocked-ambiguous-submission' ||
+            (!current2['rawResponsesByKind'][kind4] &&
+              Math['max'](0x0, Math['trunc'](Number(response2?.['requestCount']) || 0x0)) > 0x0 &&
+              (response2?.['status'] === 'running' ||
+                (response2?.['status'] === 'failed' &&
+                  ['timeout', 'connection-reset']['includes'](value17)))),
           );
-      if ((_0x34b321 || _0x169c5a) && _0x59c502 && !_0x19fe2a) {
-        _0x3b6427['kindStates'][_0x3184b8] = {
-          ..._0x3c1207,
-          kind: _0x3184b8,
+      if ((enabled5 || value10) && value18 && !isStoryAssetPaidRerunAuthorized2) {
+        current2['kindStates'][kind4] = {
+          ...response2,
+          kind: kind4,
           status: 'blocked-ambiguous-submission',
           errorType: 'ambiguous-submission',
           errorMessage: '请求已提交但未确认是否计费成功；需要用户明确授权后才能重新请求。',
-          responseMode: _0x528c06[_0x3184b8] ? 'compact' : 'verbose',
-          finishedAt: Number(_0x3c1207?.['finishedAt']) || Date['now'](),
+          responseMode: responseMode3[kind4] ? 'compact' : 'verbose',
+          finishedAt: Number(response2?.['finishedAt']) || Date['now'](),
         };
         continue;
       }
-      ((_0x34b321 || _0x169c5a) &&
-        _0x59c502 &&
-        _0x19fe2a &&
-        (clearStoryAssetPaidLane(_0x3b6427, _0x3184b8, 'authorized-ambiguous-submission-rerun'),
-        (_0x3b6427['kindStates'][_0x3184b8] = {
-          ..._0x3c1207,
+      ((enabled5 || value10) &&
+        value18 &&
+        isStoryAssetPaidRerunAuthorized2 &&
+        (clearStoryAssetPaidLane(current2, kind4, 'authorized-ambiguous-submission-rerun'),
+        (current2['kindStates'][kind4] = {
+          ...response2,
           status: 'pending',
           assetCount: 0x0,
           errorType: '',
           errorMessage: '',
           finishedAt: 0x0,
         })),
-        (_0x3b6427['contractFingerprintsByKind'][_0x3184b8] = _0x5f11c5[_0x3184b8]),
-        (_0x3b6427['contractSnapshotByKind'][_0x3184b8] = cloneStoryAssetDetailedExtractionValue(
-          _0x32b729[_0x3184b8],
+        (current2['contractFingerprintsByKind'][kind4] = contractFingerprintsByKind[kind4]),
+        (current2['contractSnapshotByKind'][kind4] = cloneStoryAssetDetailedExtractionValue(
+          contractSnapshotByKind[kind4],
         )),
-        (_0x3b6427['kindStates'][_0x3184b8] = {
-          ..._0x305513[_0x3184b8],
-          ...(_0x3b6427['kindStates'][_0x3184b8] || {}),
-          kind: _0x3184b8,
-          responseMode: _0x528c06[_0x3184b8] ? 'compact' : 'verbose',
+        (current2['kindStates'][kind4] = {
+          ...kindStates[kind4],
+          ...(current2['kindStates'][kind4] || {}),
+          kind: kind4,
+          responseMode: responseMode3[kind4] ? 'compact' : 'verbose',
         }));
     }
-    ((_0x3b6427['schemaVersion'] = _0x2d9a62), (_0x3b6427['sourceFingerprint'] = _0x1ec341));
-    let _0x4ea0f = Promise['resolve']();
-    const _0x20c4a4 = async (_0x1cf9eb = '') => {
-        ((_0x3b6427['completedKinds'] = _0x1e2541['filter'](
-          (_0x18e1eb) => _0x3b6427['kindStates'][_0x18e1eb]?.['status'] === 'succeeded',
+    ((current2['schemaVersion'] = schemaVersion), (current2['sourceFingerprint'] = sourceFingerprint));
+    let promise = Promise['resolve']();
+    const run7 = async (message = '') => {
+        ((current2['completedKinds'] = total['filter'](
+          (value19) => current2['kindStates'][value19]?.['status'] === 'succeeded',
         )),
-          (_0x3b6427['completedAssets'] = _0x1e2541['flatMap'](
-            (_0x4efd14) => _0x3b6427['assetsByKind'][_0x4efd14] || [],
+          (current2['completedAssets'] = total['flatMap'](
+            (value20) => current2['assetsByKind'][value20] || [],
           )),
-          (_0x3b6427['failures'] = _0x1e2541['flatMap']((_0x5778f5) => {
-            const _0x1e99c7 = _0x3b6427['kindStates'][_0x5778f5];
-            return _0x1e99c7?.['status'] === 'failed' ||
-              String(_0x1e99c7?.['status'] || '')['startsWith']('blocked-')
+          (current2['failures'] = total['flatMap']((kind5) => {
+            const response3 = current2['kindStates'][kind5];
+            return response3?.['status'] === 'failed' ||
+              String(response3?.['status'] || '')['startsWith']('blocked-')
               ? [
                   {
                     stage: 'kind',
-                    kind: _0x5778f5,
-                    errorType: _0x18dff1(_0x1e99c7['errorType']),
-                    errorMessage: _0x18dff1(_0x1e99c7['errorMessage']),
+                    kind: kind5,
+                    errorType: normalizeText(response3['errorType']),
+                    errorMessage: normalizeText(response3['errorMessage']),
                   },
                 ]
               : [];
           })),
-          (_0x3b6427['progress'] = {
+          (current2['progress'] = {
             stage: 'kind',
-            current: _0x3b6427['completedKinds']['length'],
-            total: _0x1e2541['length'],
-            message: _0x1cf9eb,
+            current: current2['completedKinds']['length'],
+            total: total['length'],
+            message: message,
           }),
-          (_0x3b6427['updatedAt'] = Date['now']()));
-        const _0x4f7eb8 = cloneStoryAssetDetailedExtractionValue(_0x3b6427);
+          (current2['updatedAt'] = Date['now']()));
+        const cloneStoryAssetDetailedExtractionValue3 = cloneStoryAssetDetailedExtractionValue(current2);
         (typeof onCheckpoint === 'function' &&
-          ((_0x4ea0f = _0x4ea0f['then'](() => onCheckpoint(_0x4f7eb8))), await _0x4ea0f),
+          ((promise = promise['then'](() => onCheckpoint(cloneStoryAssetDetailedExtractionValue3))),
+          await promise),
           onProgress?.({
             stage: 'extracting-assets-parallel',
-            current: _0x3b6427['completedKinds']['length'],
-            total: _0x1e2541['length'],
-            message: _0x1cf9eb,
+            current: current2['completedKinds']['length'],
+            total: total['length'],
+            message: message,
           }));
       },
-      _0x8b4f76 = async (_0x5e5807, _0x180f45, _0x4f778b) => {
-        ((_0x3b6427['status'] = 'blocked'), await _0x20c4a4(_0x4f778b));
-        const _0x2ca25e = new Error(_0x4f778b);
-        ((_0x2ca25e['type'] = _0x180f45),
-          (_0x2ca25e['blockedKinds'] = [..._0x5e5807]),
-          (_0x2ca25e['assetExtractionDraft'] = cloneStoryAssetDetailedExtractionValue(_0x3b6427)));
-        throw _0x2ca25e;
+      handler3 = async (args2, value21, value22) => {
+        ((current2['status'] = 'blocked'), await run7(value22));
+        const error3 = new Error(value22);
+        ((error3['type'] = value21),
+          (error3['blockedKinds'] = [...args2]),
+          (error3['assetExtractionDraft'] = cloneStoryAssetDetailedExtractionValue(current2)));
+        throw error3;
       };
     onProgress?.({
       stage: 'extracting-assets-parallel',
-      current: _0x1e2541['filter'](
-        (_0x5570bc) => _0x3b6427['kindStates'][_0x5570bc]?.['status'] === 'succeeded',
-      )['length'],
-      total: _0x1e2541['length'],
+      current: total['filter']((value23) => current2['kindStates'][value23]?.['status'] === 'succeeded')[
+        'length'
+      ],
+      total: total['length'],
       message: '正在并行提取角色、场景与道具',
     });
-    const _0x47d2c5 = _0x1e2541['filter'](
-      (_0x13b5b5) => _0x3b6427['kindStates'][_0x13b5b5]?.['status'] === 'blocked-quality-rerun',
+    const list6 = total['filter'](
+      (value24) => current2['kindStates'][value24]?.['status'] === 'blocked-quality-rerun',
     );
-    _0x47d2c5['length'] &&
-      (await _0x8b4f76(
-        _0x47d2c5,
+    list6['length'] &&
+      (await handler3(
+        list6,
         'ASSET_VISUAL_QUALITY_RERUN_REQUIRED',
         '已付费的' +
-          _0x47d2c5['map']((_0xc17e90) => _0xec2a5a[_0xc17e90])['join']('、') +
+          list6['map']((value25) => output[value25])['join']('、') +
           '结果未通过视觉质量合同；未自动重新请求。',
       ));
-    const _0x43d342 = _0x1e2541['filter'](
-      (_0x43747a) => _0x3b6427['kindStates'][_0x43747a]?.['status'] === 'blocked-incompatible',
+    const list7 = total['filter'](
+      (value26) => current2['kindStates'][value26]?.['status'] === 'blocked-incompatible',
     );
-    _0x43d342['length'] &&
-      (await _0x8b4f76(
-        _0x43d342,
+    list7['length'] &&
+      (await handler3(
+        list7,
         'ASSET_CONTRACT_INCOMPATIBLE',
         '已付费的' +
-          _0x43d342['map']((_0x97eac) => _0xec2a5a[_0x97eac])['join']('、') +
+          list7['map']((value27) => output[value27])['join']('、') +
           '结果与当前合同不兼容；未自动重新请求。',
       ));
-    const _0x2e283d = _0x1e2541['filter'](
-      (_0x3d2bdd) => _0x3b6427['kindStates'][_0x3d2bdd]?.['status'] === 'blocked-ambiguous-submission',
+    const list8 = total['filter'](
+      (value28) => current2['kindStates'][value28]?.['status'] === 'blocked-ambiguous-submission',
     );
-    _0x2e283d['length'] &&
-      (await _0x8b4f76(
-        _0x2e283d,
+    list8['length'] &&
+      (await handler3(
+        list8,
         'ASSET_SUBMISSION_AMBIGUOUS',
-        _0x2e283d['map']((_0x203d22) => _0xec2a5a[_0x203d22])['join']('、') +
-          '请求的计费状态不明确；未自动重新请求。',
+        list8['map']((value29) => output[value29])['join']('、') + '请求的计费状态不明确；未自动重新请求。',
       ));
-    ((_0x3b6427['status'] = 'in-progress'), await _0x20c4a4('正在并行提取角色、场景与道具'));
-    for (const _0x46dd1b of _0x1e2541) {
-      if (_0x3b6427['kindStates'][_0x46dd1b]?.['status'] === 'succeeded') continue;
-      const _0x45d7b5 = _0x18dff1(_0x3b6427['rawResponsesByKind'][_0x46dd1b]);
-      if (!_0x45d7b5) {
+    ((current2['status'] = 'in-progress'), await run7('正在并行提取角色、场景与道具'));
+    for (const value30 of total) {
+      if (current2['kindStates'][value30]?.['status'] === 'succeeded') continue;
+      const enabled9 = normalizeText(current2['rawResponsesByKind'][value30]);
+      if (!enabled9) {
         if (
-          _0x3b6427['paidResponseReceivedByKind'][_0x46dd1b] &&
-          !isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, _0x46dd1b)
+          current2['paidResponseReceivedByKind'][value30] &&
+          !isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, value30)
         )
-          _0x3b6427['kindStates'][_0x46dd1b] = {
-            ..._0x3b6427['kindStates'][_0x46dd1b],
+          current2['kindStates'][value30] = {
+            ...current2['kindStates'][value30],
             status: 'blocked-paid-response',
             assetCount: 0x0,
             errorType: 'paid-result-validation',
@@ -701,11 +705,11 @@ export function createParallelStoryAssetExtractor({
             finishedAt: Date['now'](),
           };
         else
-          _0x3b6427['paidResponseReceivedByKind'][_0x46dd1b] &&
-            isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, _0x46dd1b) &&
-            (clearStoryAssetPaidLane(_0x3b6427, _0x46dd1b, 'authorized-empty-paid-response-rerun'),
-            (_0x3b6427['kindStates'][_0x46dd1b] = {
-              ..._0x3b6427['kindStates'][_0x46dd1b],
+          current2['paidResponseReceivedByKind'][value30] &&
+            isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, value30) &&
+            (clearStoryAssetPaidLane(current2, value30, 'authorized-empty-paid-response-rerun'),
+            (current2['kindStates'][value30] = {
+              ...current2['kindStates'][value30],
               status: 'pending',
               assetCount: 0x0,
               errorType: '',
@@ -715,55 +719,53 @@ export function createParallelStoryAssetExtractor({
         continue;
       }
       try {
-        const _0x2f7ed2 = _0x18dff1(
-            _0x3b6427['rawResponseModesByKind'][_0x46dd1b] ||
-              _0x3b6427['kindStates'][_0x46dd1b]?.['responseMode'] ||
-              _0x3b6427['responseMode'],
+        const value31 = normalizeText(
+            current2['rawResponseModesByKind'][value30] ||
+              current2['kindStates'][value30]?.['responseMode'] ||
+              current2['responseMode'],
           ),
-          _0x1e941f =
-            _0x2f7ed2 === 'compact'
-              ? _0xed3827(_0x45d7b5, {
-                  assetKinds: [_0x46dd1b],
-                  chapterIds: _0x557b41,
-                  contractSnapshot: _0x3b6427['rawResponseContractSnapshotsByKind'][_0x46dd1b],
+          assetCount =
+            value31 === 'compact'
+              ? parseStoryAssetCompactExtractionResult(enabled9, {
+                  assetKinds: [value30],
+                  chapterIds: chapterIds,
+                  contractSnapshot: current2['rawResponseContractSnapshotsByKind'][value30],
                 })
-              : _0x23571f(_0x45d7b5, {
-                  chapterIds: _0x557b41,
-                  allowedKinds: [_0x46dd1b],
+              : parseStoryAssetExtractionResult(enabled9, {
+                  chapterIds: chapterIds,
+                  allowedKinds: [value30],
                   allowEmptyResult:
-                    Array['isArray'](requiredAssetNamesByKind?.[_0x46dd1b]) &&
-                    requiredAssetNamesByKind[_0x46dd1b]['length'] === 0x0,
+                    Array['isArray'](requiredAssetNamesByKind?.[value30]) &&
+                    requiredAssetNamesByKind[value30]['length'] === 0x0,
                 });
-        ((_0x3b6427['assetsByKind'][_0x46dd1b] = _0x1e941f['assets']),
-          Array['isArray'](_0x1e941f?.['decisions']) &&
-            (_0x3b6427['decisionsByKind'][_0x46dd1b] = cloneStoryAssetDetailedExtractionValue(
-              _0x1e941f['decisions'],
+        ((current2['assetsByKind'][value30] = assetCount['assets']),
+          Array['isArray'](assetCount?.['decisions']) &&
+            (current2['decisionsByKind'][value30] = cloneStoryAssetDetailedExtractionValue(
+              assetCount['decisions'],
             )),
-          (_0x3b6427['contractFingerprintsByKind'][_0x46dd1b] = _0x5f11c5[_0x46dd1b]),
-          (_0x3b6427['contractSnapshotByKind'][_0x46dd1b] = cloneStoryAssetDetailedExtractionValue(
-            _0x32b729[_0x46dd1b],
+          (current2['contractFingerprintsByKind'][value30] = contractFingerprintsByKind[value30]),
+          (current2['contractSnapshotByKind'][value30] = cloneStoryAssetDetailedExtractionValue(
+            contractSnapshotByKind[value30],
           )),
-          (_0x3b6427['kindStates'][_0x46dd1b] = {
-            ..._0x3b6427['kindStates'][_0x46dd1b],
+          (current2['kindStates'][value30] = {
+            ...current2['kindStates'][value30],
             status: 'succeeded',
-            assetCount: _0x1e941f['assets']['length'],
+            assetCount: assetCount['assets']['length'],
             errorType: '',
             errorMessage: '',
             finishedAt: Date['now'](),
           }),
-          (_0x3b6427['submissionStatesByKind'][_0x46dd1b] = {
-            ..._0x3b6427['submissionStatesByKind'][_0x46dd1b],
+          (current2['submissionStatesByKind'][value30] = {
+            ...current2['submissionStatesByKind'][value30],
             status: 'validated',
             validatedAt: Date['now'](),
           }),
-          await _0x20c4a4(
-            _0xec2a5a[_0x46dd1b] + '已从上次付费结果恢复：' + _0x1e941f['assets']['length'] + '\x20个',
-          ));
-      } catch (_0x17c406) {
-        if (isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, _0x46dd1b)) {
-          (clearStoryAssetPaidLane(_0x3b6427, _0x46dd1b, 'authorized-invalid-paid-response-rerun'),
-            (_0x3b6427['kindStates'][_0x46dd1b] = {
-              ..._0x3b6427['kindStates'][_0x46dd1b],
+          await run7(output[value30] + '已从上次付费结果恢复：' + assetCount['assets']['length'] + '\x20个'));
+      } catch (error4) {
+        if (isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, value30)) {
+          (clearStoryAssetPaidLane(current2, value30, 'authorized-invalid-paid-response-rerun'),
+            (current2['kindStates'][value30] = {
+              ...current2['kindStates'][value30],
               status: 'pending',
               assetCount: 0x0,
               errorType: '',
@@ -772,308 +774,300 @@ export function createParallelStoryAssetExtractor({
             }));
           continue;
         }
-        _0x3b6427['kindStates'][_0x46dd1b] = {
-          ..._0x3b6427['kindStates'][_0x46dd1b],
+        current2['kindStates'][value30] = {
+          ...current2['kindStates'][value30],
           status: 'blocked-paid-response',
           assetCount: 0x0,
           errorType: 'paid-result-validation',
-          errorMessage: _0x18dff1(_0x17c406?.['message'] || _0x17c406),
+          errorMessage: normalizeText(error4?.['message'] || error4),
           finishedAt: Date['now'](),
         };
       }
     }
-    const _0xcd965a = _0x1e2541['filter'](
-      (_0x6d2cec) => _0x3b6427['kindStates'][_0x6d2cec]?.['status'] === 'blocked-paid-response',
+    const list9 = total['filter'](
+      (value32) => current2['kindStates'][value32]?.['status'] === 'blocked-paid-response',
     );
-    _0xcd965a['length'] &&
-      (await _0x8b4f76(
-        _0xcd965a,
+    list9['length'] &&
+      (await handler3(
+        list9,
         'ASSET_PAID_RESULT_BLOCKED',
         '已付费的' +
-          _0xcd965a['map']((_0x159418) => _0xec2a5a[_0x159418])['join']('、') +
+          list9['map']((value33) => output[value33])['join']('、') +
           '结果未通过合同校验；已保留原始返回且未自动重新请求。',
       ));
-    const _0x2ab721 = _0x1e2541['filter'](
-        (_0x2404bb) => _0x3b6427['kindStates'][_0x2404bb]?.['status'] !== 'succeeded',
-      ),
-      _0x2a6798 = await Promise['allSettled'](
-        _0x2ab721['map'](async (_0x506993) => {
-          const _0x3bb688 =
-            _0x528c06[_0x506993] &&
-            Array['isArray'](requiredAssetNamesByKind?.[_0x506993]) &&
-            requiredAssetNamesByKind[_0x506993]['length'] === 0x0 &&
-            (!Array['isArray'](candidateAssetsByKind?.[_0x506993]) ||
-              candidateAssetsByKind[_0x506993]['length'] === 0x0);
-          if (_0x3bb688)
+    const list10 = total['filter']((value34) => current2['kindStates'][value34]?.['status'] !== 'succeeded'),
+      list11 = await Promise['allSettled'](
+        list10['map'](async (value35) => {
+          const value36 =
+            responseMode3[value35] &&
+            Array['isArray'](requiredAssetNamesByKind?.[value35]) &&
+            requiredAssetNamesByKind[value35]['length'] === 0x0 &&
+            (!Array['isArray'](candidateAssetsByKind?.[value35]) ||
+              candidateAssetsByKind[value35]['length'] === 0x0);
+          if (value36)
             return (
-              (_0x3b6427['assetsByKind'][_0x506993] = []),
-              (_0x3b6427['kindStates'][_0x506993] = {
-                ..._0x3b6427['kindStates'][_0x506993],
+              (current2['assetsByKind'][value35] = []),
+              (current2['kindStates'][value35] = {
+                ...current2['kindStates'][value35],
                 status: 'succeeded',
                 assetCount: 0x0,
                 errorType: '',
                 errorMessage: '',
                 finishedAt: Date['now'](),
               }),
-              await _0x20c4a4(_0xec2a5a[_0x506993] + '无待提取资产，已在本地完成'),
-              { schemaVersion: _0x2d9a62, assets: [] }
+              await run7(output[value35] + '无待提取资产，已在本地完成'),
+              { schemaVersion: schemaVersion, assets: [] }
             );
-          const _0x30fcf1 = _0x528c06[_0x506993],
-            _0x28ab40 = Date['now']();
-          ((_0x3b6427['kindStates'][_0x506993] = {
-            ..._0x3b6427['kindStates'][_0x506993],
+          const compactOutput2 = responseMode3[value35],
+            startedAt = Date['now']();
+          ((current2['kindStates'][value35] = {
+            ...current2['kindStates'][value35],
             status: 'running',
             attempt:
-              Math['max'](
-                0x0,
-                Math['trunc'](Number(_0x3b6427['kindStates'][_0x506993]?.['attempt']) || 0x0),
-              ) + 0x1,
+              Math['max'](0x0, Math['trunc'](Number(current2['kindStates'][value35]?.['attempt']) || 0x0)) +
+              0x1,
             assetCount: 0x0,
             errorType: '',
             errorMessage: '',
-            startedAt: _0x28ab40,
+            startedAt: startedAt,
             finishedAt: 0x0,
           }),
-            await _0x20c4a4(
+            await run7(
               '正在提取' +
-                _0xec2a5a[_0x506993] +
+                output[value35] +
                 '；已完成 ' +
-                _0x3b6427['completedKinds']['length'] +
+                current2['completedKinds']['length'] +
                 '/' +
-                _0x1e2541['length'],
+                total['length'],
             ));
-          let _0x574443 = 0x0;
+          let count = 0x0;
           try {
-            const _0x40389b = await _0x1199ff({
+            const assetCount2 = await extractStoryAssets({
               project: project,
               model: model,
               provider: provider,
               providerProfileId: providerProfileId,
               aspectRatio: aspectRatio,
               visualStyle: visualStyle,
-              assetKinds: [_0x506993],
+              assetKinds: [value35],
               requiredAssetNamesByKind: requiredAssetNamesByKind,
               requiredAssetsByKind: requiredAssetsByKind,
               candidateAssetsByKind: candidateAssetsByKind,
-              compactOutput: _0x30fcf1,
+              compactOutput: compactOutput2,
               allowOversizedPrompt: allowOversizedPrompt,
               automaticRecovery: automaticRecovery,
               structuredOutputFallback: structuredOutputFallback,
               maxOutputTokens: maxOutputTokens,
-              onProgress: ({ stage: _0x2e545e, message: _0x76c739 } = {}) => {
+              onProgress: ({ stage: stage, message: message2 } = {}) => {
                 onProgress?.({
-                  stage: _0x18dff1(_0x2e545e) || 'extracting-assets-parallel',
-                  current: _0x3b6427['completedKinds']['length'],
-                  total: _0x1e2541['length'],
-                  message: _0x18dff1(_0x76c739),
+                  stage: normalizeText(stage) || 'extracting-assets-parallel',
+                  current: current2['completedKinds']['length'],
+                  total: total['length'],
+                  message: normalizeText(message2),
                 });
               },
-              request: async (_0x105ce3) => {
-                ((_0x574443 += 0x1),
-                  (_0x3b6427['totalRequestCount'] =
-                    Math['max'](0x0, Math['trunc'](Number(_0x3b6427['totalRequestCount']) || 0x0)) + 0x1),
-                  (_0x3b6427['kindStates'][_0x506993]['requestCount'] =
+              request: async (value37) => {
+                ((count += 0x1),
+                  (current2['totalRequestCount'] =
+                    Math['max'](0x0, Math['trunc'](Number(current2['totalRequestCount']) || 0x0)) + 0x1),
+                  (current2['kindStates'][value35]['requestCount'] =
                     Math['max'](
                       0x0,
-                      Math['trunc'](Number(_0x3b6427['kindStates'][_0x506993]?.['requestCount']) || 0x0),
+                      Math['trunc'](Number(current2['kindStates'][value35]?.['requestCount']) || 0x0),
                     ) + 0x1));
-                _0x574443 > 0x1 &&
-                  (_0x3b6427['kindStates'][_0x506993]['repairCount'] =
+                count > 0x1 &&
+                  (current2['kindStates'][value35]['repairCount'] =
                     Math['max'](
                       0x0,
-                      Math['trunc'](Number(_0x3b6427['kindStates'][_0x506993]?.['repairCount']) || 0x0),
+                      Math['trunc'](Number(current2['kindStates'][value35]?.['repairCount']) || 0x0),
                     ) + 0x1);
-                ((_0x3b6427['submissionStatesByKind'][_0x506993] = {
+                ((current2['submissionStatesByKind'][value35] = {
                   status: 'submitted',
                   submittedAt: Date['now'](),
-                  requestCount: _0x3b6427['kindStates'][_0x506993]['requestCount'],
-                  responseMode: _0x30fcf1 ? 'compact' : 'verbose',
-                  contractSnapshot: cloneStoryAssetDetailedExtractionValue(_0x32b729[_0x506993]),
+                  requestCount: current2['kindStates'][value35]['requestCount'],
+                  responseMode: compactOutput2 ? 'compact' : 'verbose',
+                  contractSnapshot: cloneStoryAssetDetailedExtractionValue(contractSnapshotByKind[value35]),
                 }),
-                  await _0x20c4a4(
-                    _0x574443 > 0x1
-                      ? '正在提交' + _0xec2a5a[_0x506993] + '自动纠错请求（1/1）'
-                      : '正在提交' + _0xec2a5a[_0x506993] + '提取请求',
+                  await run7(
+                    count > 0x1
+                      ? '正在提交' + output[value35] + '自动纠错请求（1/1）'
+                      : '正在提交' + output[value35] + '提取请求',
                   ));
-                const _0x36a800 = await request(_0x105ce3),
-                  _0x33f197 = _0x483ed6(_0x36a800);
-                ((_0x3b6427['paidResponseReceivedByKind'][_0x506993] = !![]),
-                  (_0x3b6427['rawResponsesByKind'][_0x506993] = _0x33f197),
-                  (_0x3b6427['rawResponseModesByKind'][_0x506993] = _0x30fcf1 ? 'compact' : 'verbose'),
-                  (_0x3b6427['rawResponseContractSnapshotsByKind'][_0x506993] =
-                    cloneStoryAssetDetailedExtractionValue(_0x32b729[_0x506993])),
-                  (_0x3b6427['submissionStatesByKind'][_0x506993] = {
-                    ..._0x3b6427['submissionStatesByKind'][_0x506993],
+                const request2 = await request(value37),
+                  enabled10 = run5(request2);
+                ((current2['paidResponseReceivedByKind'][value35] = !![]),
+                  (current2['rawResponsesByKind'][value35] = enabled10),
+                  (current2['rawResponseModesByKind'][value35] = compactOutput2 ? 'compact' : 'verbose'),
+                  (current2['rawResponseContractSnapshotsByKind'][value35] =
+                    cloneStoryAssetDetailedExtractionValue(contractSnapshotByKind[value35])),
+                  (current2['submissionStatesByKind'][value35] = {
+                    ...current2['submissionStatesByKind'][value35],
                     status: 'response-received',
                     responseReceivedAt: Date['now'](),
                   }));
-                if (!_0x33f197) {
-                  ((_0x3b6427['kindStates'][_0x506993] = {
-                    ..._0x3b6427['kindStates'][_0x506993],
+                if (!enabled10) {
+                  ((current2['kindStates'][value35] = {
+                    ...current2['kindStates'][value35],
                     status: 'blocked-paid-response',
                     assetCount: 0x0,
                     errorType: 'empty-paid-response',
                     errorMessage: '已付费请求返回空内容；已停止自动重新请求。',
                     finishedAt: Date['now'](),
                   }),
-                    (_0x3b6427['submissionStatesByKind'][_0x506993] = {
-                      ..._0x3b6427['submissionStatesByKind'][_0x506993],
+                    (current2['submissionStatesByKind'][value35] = {
+                      ...current2['submissionStatesByKind'][value35],
                       status: 'blocked-paid-response',
                       blockedAt: Date['now'](),
                       errorType: 'empty-paid-response',
                     }),
-                    await _0x20c4a4(_0xec2a5a[_0x506993] + '付费请求返回空内容；已阻断且未自动重试'));
-                  const _0x25fdc6 = new Error(
-                    _0xec2a5a[_0x506993] + '付费请求返回空内容；需要明确授权后才能重新请求。',
+                    await run7(output[value35] + '付费请求返回空内容；已阻断且未自动重试'));
+                  const error5 = new Error(
+                    output[value35] + '付费请求返回空内容；需要明确授权后才能重新请求。',
                   );
-                  _0x25fdc6['type'] = 'ASSET_PAID_RESULT_BLOCKED';
-                  throw _0x25fdc6;
+                  error5['type'] = 'ASSET_PAID_RESULT_BLOCKED';
+                  throw error5;
                 }
-                return (await _0x20c4a4(_0xec2a5a[_0x506993] + '请求已完成，正在校验付费结果'), _0x36a800);
+                return (await run7(output[value35] + '请求已完成，正在校验付费结果'), request2);
               },
             });
             return (
-              (_0x3b6427['assetsByKind'][_0x506993] = _0x40389b['assets']),
-              Array['isArray'](_0x40389b?.['decisions'])
-                ? (_0x3b6427['decisionsByKind'][_0x506993] = cloneStoryAssetDetailedExtractionValue(
-                    _0x40389b['decisions'],
+              (current2['assetsByKind'][value35] = assetCount2['assets']),
+              Array['isArray'](assetCount2?.['decisions'])
+                ? (current2['decisionsByKind'][value35] = cloneStoryAssetDetailedExtractionValue(
+                    assetCount2['decisions'],
                   ))
-                : delete _0x3b6427['decisionsByKind'][_0x506993],
-              (_0x3b6427['contractFingerprintsByKind'][_0x506993] = _0x5f11c5[_0x506993]),
-              (_0x3b6427['contractSnapshotByKind'][_0x506993] = cloneStoryAssetDetailedExtractionValue(
-                _0x32b729[_0x506993],
+                : delete current2['decisionsByKind'][value35],
+              (current2['contractFingerprintsByKind'][value35] = contractFingerprintsByKind[value35]),
+              (current2['contractSnapshotByKind'][value35] = cloneStoryAssetDetailedExtractionValue(
+                contractSnapshotByKind[value35],
               )),
-              (_0x3b6427['kindStates'][_0x506993] = {
-                ..._0x3b6427['kindStates'][_0x506993],
+              (current2['kindStates'][value35] = {
+                ...current2['kindStates'][value35],
                 status: 'succeeded',
-                assetCount: _0x40389b['assets']['length'],
+                assetCount: assetCount2['assets']['length'],
                 errorType: '',
                 errorMessage: '',
                 finishedAt: Date['now'](),
               }),
-              (_0x3b6427['submissionStatesByKind'][_0x506993] = {
-                ..._0x3b6427['submissionStatesByKind'][_0x506993],
+              (current2['submissionStatesByKind'][value35] = {
+                ...current2['submissionStatesByKind'][value35],
                 status: 'validated',
                 validatedAt: Date['now'](),
               }),
-              await _0x20c4a4(_0xec2a5a[_0x506993] + '完成：' + _0x40389b['assets']['length'] + '\x20个'),
-              _0x40389b
+              await run7(output[value35] + '完成：' + assetCount2['assets']['length'] + '\x20个'),
+              assetCount2
             );
-          } catch (_0x36869a) {
-            const _0x343929 = _0x18dff1(_0x3b6427['submissionStatesByKind'][_0x506993]?.['status']),
-              _0xbb9184 = _0x343929 === 'response-received',
-              _0x3894ac = Boolean(
-                _0x36869a?.['type'] === 'ASSET_PAID_RESULT_BLOCKED' || _0x343929 === 'blocked-paid-response',
+          } catch (error6) {
+            const value38 = normalizeText(current2['submissionStatesByKind'][value35]?.['status']),
+              status = value38 === 'response-received',
+              errorType = Boolean(
+                error6?.['type'] === 'ASSET_PAID_RESULT_BLOCKED' || value38 === 'blocked-paid-response',
               ),
-              _0x1455bb = classifyStoryAssetDetailedExtractionError(_0x36869a, _0x18dff1),
-              _0x1708e6 = Boolean(
-                !_0xbb9184 &&
-                !_0x3894ac &&
-                _0x574443 > 0x0 &&
-                isStoryAssetConfirmedUnchargedRejection(_0x36869a),
+              errorType2 = classifyStoryAssetDetailedExtractionError(error6, normalizeText),
+              enabled11 = Boolean(
+                !status && !errorType && count > 0x0 && isStoryAssetConfirmedUnchargedRejection(error6),
               ),
-              _0x18ae7d = Boolean(!_0xbb9184 && !_0x3894ac && _0x574443 > 0x0 && !_0x1708e6);
-            _0x574443 > 0x0 &&
-              !_0xbb9184 &&
-              !_0x3894ac &&
-              (_0x3b6427['submissionStatesByKind'][_0x506993] = {
-                ..._0x3b6427['submissionStatesByKind'][_0x506993],
-                status: _0x18ae7d ? 'ambiguous' : 'rejected-confirmed',
+              status2 = Boolean(!status && !errorType && count > 0x0 && !enabled11);
+            count > 0x0 &&
+              !status &&
+              !errorType &&
+              (current2['submissionStatesByKind'][value35] = {
+                ...current2['submissionStatesByKind'][value35],
+                status: status2 ? 'ambiguous' : 'rejected-confirmed',
                 failedAt: Date['now'](),
-                errorType: _0x1455bb,
-                errorMessage: _0x18dff1(_0x36869a?.['message'] || _0x36869a),
+                errorType: errorType2,
+                errorMessage: normalizeText(error6?.['message'] || error6),
               });
-            ((_0x3b6427['kindStates'][_0x506993] = {
-              ..._0x3b6427['kindStates'][_0x506993],
+            ((current2['kindStates'][value35] = {
+              ...current2['kindStates'][value35],
               status:
-                _0xbb9184 || _0x3894ac
+                status || errorType
                   ? 'blocked-paid-response'
-                  : _0x18ae7d
+                  : status2
                     ? 'blocked-ambiguous-submission'
                     : 'failed',
               assetCount: 0x0,
-              errorType: _0x3894ac
-                ? _0x18dff1(_0x3b6427['kindStates'][_0x506993]?.['errorType']) || 'paid-result-validation'
-                : _0xbb9184
+              errorType: errorType
+                ? normalizeText(current2['kindStates'][value35]?.['errorType']) || 'paid-result-validation'
+                : status
                   ? 'paid-result-validation'
-                  : _0x18ae7d
+                  : status2
                     ? 'ambiguous-submission'
-                    : _0x1455bb,
-              errorMessage: _0x18dff1(_0x36869a?.['message'] || _0x36869a),
+                    : errorType2,
+              errorMessage: normalizeText(error6?.['message'] || error6),
               finishedAt: Date['now'](),
             }),
-              await _0x20c4a4(_0xec2a5a[_0x506993] + '提取失败；已保留其他付费结果'));
-            throw _0x36869a;
+              await run7(output[value35] + '提取失败；已保留其他付费结果'));
+            throw error6;
           }
         }),
       ),
-      _0x25b462 = _0x2a6798['findIndex']((_0x30dba5) => _0x30dba5['status'] === 'rejected');
-    if (_0x25b462 >= 0x0) {
-      const _0xb70f5 = _0x1e2541['filter'](
-          (_0x1143e9) => _0x3b6427['kindStates'][_0x1143e9]?.['status'] === 'blocked-paid-response',
+      count2 = list11['findIndex']((response4) => response4['status'] === 'rejected');
+    if (count2 >= 0x0) {
+      const list12 = total['filter'](
+          (value39) => current2['kindStates'][value39]?.['status'] === 'blocked-paid-response',
         ),
-        _0x2ab736 = _0x1e2541['filter'](
-          (_0x51c4c3) => _0x3b6427['kindStates'][_0x51c4c3]?.['status'] === 'blocked-ambiguous-submission',
+        list13 = total['filter'](
+          (value40) => current2['kindStates'][value40]?.['status'] === 'blocked-ambiguous-submission',
         ),
-        _0x2c71d1 = [..._0xb70f5, ..._0x2ab736];
-      ((_0x3b6427['status'] = _0x2c71d1['length']
+        list14 = [...list12, ...list13];
+      ((current2['status'] = list14['length']
         ? 'blocked'
-        : _0x3b6427['completedKinds']['length']
+        : current2['completedKinds']['length']
           ? 'partial'
           : 'failed'),
-        await _0x20c4a4(
-          _0x2c71d1['length']
-            ? _0x2c71d1['map']((_0x419ad9) => _0xec2a5a[_0x419ad9])['join']('、') +
-                '已进入付费保护状态；未自动重新请求'
+        await run7(
+          list14['length']
+            ? list14['map']((value41) => output[value41])['join']('、') + '已进入付费保护状态；未自动重新请求'
             : '已保留 ' +
-                _0x3b6427['completedKinds']['length'] +
+                current2['completedKinds']['length'] +
                 '/' +
-                _0x1e2541['length'] +
+                total['length'] +
                 ' 路付费结果；仅需重试失败项',
         ));
-      const _0x3518c2 = _0x2a6798[_0x25b462]['reason'],
-        _0x5acb76 = _0x2ab721[_0x25b462],
-        _0x156270 = new Error(
-          _0xec2a5a[_0x5acb76] + '提取失败：' + (_0x18dff1(_0x3518c2?.['message']) || '模型请求失败'),
+      const error7 = list11[count2]['reason'],
+        value42 = list10[count2],
+        error8 = new Error(
+          output[value42] + '提取失败：' + (normalizeText(error7?.['message']) || '模型请求失败'),
         );
-      if (_0xb70f5['length'])
-        ((_0x156270['type'] = 'ASSET_PAID_RESULT_BLOCKED'), (_0x156270['blockedKinds'] = _0xb70f5));
+      if (list12['length'])
+        ((error8['type'] = 'ASSET_PAID_RESULT_BLOCKED'), (error8['blockedKinds'] = list12));
       else
-        _0x2ab736['length'] &&
-          ((_0x156270['type'] = 'ASSET_SUBMISSION_AMBIGUOUS'), (_0x156270['blockedKinds'] = _0x2ab736));
-      ((_0x156270['cause'] = _0x3518c2),
-        (_0x156270['assetExtractionDraft'] = cloneStoryAssetDetailedExtractionValue(_0x3b6427)));
-      throw _0x156270;
+        list13['length'] &&
+          ((error8['type'] = 'ASSET_SUBMISSION_AMBIGUOUS'), (error8['blockedKinds'] = list13));
+      ((error8['cause'] = error7),
+        (error8['assetExtractionDraft'] = cloneStoryAssetDetailedExtractionValue(current2)));
+      throw error8;
     }
-    const _0x100928 = new Set(),
-      _0x52601d = new Set(),
-      _0x1ecad0 = _0x1e2541['flatMap']((_0x331c52) =>
-        (_0x3b6427['assetsByKind'][_0x331c52] || [])['map']((_0x15307b, _0x2cb671) => {
-          const _0x437cf8 = makeUniqueStoryAssetExtractionRef(
-            _0x15307b['ref'],
-            _0x331c52 + '-' + (_0x2cb671 + 0x1),
-            _0x100928,
-            _0x32640b,
+    const value43 = new Set(),
+      value44 = new Set(),
+      assets = total['flatMap']((value45) =>
+        (current2['assetsByKind'][value45] || [])['map']((appearances, value46) => {
+          const ref = makeUniqueStoryAssetExtractionRef(
+            appearances['ref'],
+            value45 + '-' + (value46 + 0x1),
+            value43,
+            normalizeAssetReference,
           );
           return {
-            ..._0x15307b,
-            ref: _0x437cf8,
-            appearances: _0x15307b['appearances']['map']((_0x261c63, _0x3b563e) => ({
-              ..._0x261c63,
+            ...appearances,
+            ref: ref,
+            appearances: appearances['appearances']['map']((args3, value47) => ({
+              ...args3,
               ref: makeUniqueStoryAssetExtractionRef(
-                _0x261c63['ref'],
-                _0x437cf8 + '-appearance-' + (_0x3b563e + 0x1),
-                _0x52601d,
-                _0x32640b,
+                args3['ref'],
+                ref + '-appearance-' + (value47 + 0x1),
+                value44,
+                normalizeAssetReference,
               ),
             })),
           };
         }),
       );
     return (
-      (_0x3b6427['status'] = 'completed'),
-      await _0x20c4a4('资产提取完成：' + _0x1ecad0['length'] + '\x20个'),
-      { schemaVersion: _0x2d9a62, extractionStrategy: 'kind-detailed-parallel', assets: _0x1ecad0 }
+      (current2['status'] = 'completed'),
+      await run7('资产提取完成：' + assets['length'] + '\x20个'),
+      { schemaVersion: schemaVersion, extractionStrategy: 'kind-detailed-parallel', assets: assets }
     );
   };
 }

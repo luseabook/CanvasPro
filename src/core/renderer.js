@@ -1,9 +1,5 @@
 import { isNodeType } from '../modules/registry.js';
-import {
-  getRefKindByNodeType,
-  hasNodeTypeBetaBadge,
-  normalizeNodeType,
-} from '../modules/nodeMeta.js';
+import { getRefKindByNodeType, hasNodeTypeBetaBadge, normalizeNodeType } from '../modules/nodeMeta.js';
 import { getDragContext } from './interaction.js';
 import { getViewportPanPreview } from './viewportPanPreview.js';
 import { getAlignableSelectionNodes, computeSelectionBounds } from './math.js';
@@ -94,7 +90,7 @@ import { setCanvasMediaSchedulerPaused } from '../modules/canvasMediaScheduler.j
 let _schedulePreparedMediaRuntimeCommit = null;
 const _componentMap = new Map(),
   _nodeRuntimeBridge = createRendererNodeRuntimeBridge({
-    getInstance: (_0xecbd03) => _componentMap.get(_0xecbd03),
+    getInstance: (value) => _componentMap.get(value),
   }),
   _nodeDataSnapshotMap = new Map(),
   _wrapperMap = new Map();
@@ -120,17 +116,17 @@ const _multiSelectRenderCache = {
   }),
   _fastPreviewLifecycle = createRendererFastPreviewLifecycleTracker(),
   _sourceVideoSlotLifecycle = createRendererSourceVideoSlotLifecycle({
-    getNode: (_0x2de466) => _currentSnapshot?.nodes?.[_0x2de466],
-    getWrapper: (_0x308bea) => _wrapperMap.get(_0x308bea),
-    releasePreview: (_0x3ba9d2) => _fastPreviewLayer.releaseNode(_0x3ba9d2),
-    forgetScheduledRelease: (_0x53cf86) => _fastPreviewRelease.forget(_0x53cf86),
+    getNode: (item) => _currentSnapshot?.nodes?.[item],
+    getWrapper: (key) => _wrapperMap.get(key),
+    releasePreview: (index) => _fastPreviewLayer.releaseNode(index),
+    forgetScheduledRelease: (result) => _fastPreviewRelease.forget(result),
   }),
   _fastPreviewLayer = createRendererFastPreviewLayer({
-    getWrapper: (_0x3c5282) => _wrapperMap.get(_0x3c5282),
-    isMounted: (_0x2bcb8b) => _mountedNodeIds.has(_0x2bcb8b),
+    getWrapper: (data) => _wrapperMap.get(data),
+    isMounted: (options) => _mountedNodeIds.has(options),
     resolveMediaPresentationReady: _sourceVideoSlotLifecycle.resolveMediaPresentationReady,
-    onPresentationOwnerChanged: ({ active: _0x5f21bd, wrapper: _0x427cee }) => {
-      syncRendererFastPreviewPresentationOwner(_0x427cee, _0x5f21bd);
+    onPresentationOwnerChanged: ({ active: active, wrapper: wrapper }) => {
+      syncRendererFastPreviewPresentationOwner(wrapper, active);
     },
     onMediaPresented: () => {
       if (_rendererInteractionGrace.isBusy()) return;
@@ -138,24 +134,22 @@ const _multiSelectRenderCache = {
     },
   }),
   _fastPreviewContinuation = createRendererFastPreviewContinuationController({
-    sync: (..._0x28ccde) => _fastPreviewLayer.sync(..._0x28ccde),
+    sync: (...args) => _fastPreviewLayer.sync(...args),
   }),
   _fastPreviewRelease = createFastPreviewReleaseScheduler({
-    getWrapper: (_0x5897de) => _wrapperMap.get(_0x5897de),
-    hasPreview: (_0x298c9b) => _fastPreviewLayer.hasNodePreview(_0x298c9b),
-    isMounted: (_0x3889c3) => _mountedNodeIds.has(_0x3889c3),
+    getWrapper: (target) => _wrapperMap.get(target),
+    hasPreview: (source) => _fastPreviewLayer.hasNodePreview(source),
+    isMounted: (next) => _mountedNodeIds.has(next),
     isInteractionBusy: _rendererInteractionGrace.isBusy,
     resolveMediaPresentationReady: _sourceVideoSlotLifecycle.resolveMediaPresentationReady,
-    releasePreview: (_0x2546bc) => _fastPreviewLayer.releaseNode(_0x2546bc),
+    releasePreview: (current) => _fastPreviewLayer.releaseNode(current),
   }),
   _rasterPreviewCoordinator = createRendererRasterPreviewCoordinator({
-    isDomMediaPresented: (_0x546764, _0x2859a7) =>
-      _fastPreviewLayer.isNodePresentationReady(_0x546764, _0x2859a7),
+    isDomMediaPresented: (entry, record) => _fastPreviewLayer.isNodePresentationReady(entry, record),
     onRasterHandoffFrame: _fastPreviewLayer.stageRasterHandoffFrame,
-    onRasterMediaClaimed: (_0xdfac54) => {
-      _fastPreviewContinuation.excludeNodes(_0xdfac54);
-      for (const _0x26b331 of _0xdfac54)
-        _fastPreviewLayer.removeNode(_0x26b331, { collect: false });
+    onRasterMediaClaimed: (payload) => {
+      _fastPreviewContinuation.excludeNodes(payload);
+      for (const handle of payload) _fastPreviewLayer.removeNode(handle, { collect: false });
     },
     onMediaPresented: () => {
       if (_rendererInteractionGrace.isBusy()) return;
@@ -163,20 +157,18 @@ const _multiSelectRenderCache = {
     },
   }),
   _mediaPresentation = createRendererMediaPresentationCoordinator({
-    getNode: (_0x4ce09f) => _currentSnapshot?.nodes?.[_0x4ce09f],
-    getComponent: (_0x2afcd6) => _componentMap.get(_0x2afcd6),
-    getWrapper: (_0x2d945a) => _wrapperMap.get(_0x2d945a),
-    getParkedWrapper: (_0x79fbb2) => _parkedWrapperMap.get(_0x79fbb2),
+    getNode: (state) => _currentSnapshot?.nodes?.[state],
+    getComponent: (config) => _componentMap.get(config),
+    getWrapper: (scope) => _wrapperMap.get(scope),
+    getParkedWrapper: (input) => _parkedWrapperMap.get(input),
     getWrappers: () => _wrapperMap.values(),
     getParkedWrappers: () => _parkedWrapperMap.values(),
-    isMounted: (_0x3b21d2) => _mountedNodeIds.has(_0x3b21d2),
+    isMounted: (output) => _mountedNodeIds.has(output),
     isInteractionBusy: _rendererInteractionGrace.isBusy,
-    isPinned: (_0x995bc1) => _getNodePinSet(_0x995bc1, false)?.size > 0,
-    isSelected: (_0x2854b3) => {
-      const _0x9c1d6 = _currentSnapshot?.selectedNodeIds;
-      return Array.isArray(_0x9c1d6)
-        ? _0x9c1d6.includes(_0x2854b3)
-        : _0x9c1d6?.has?.(_0x2854b3) === true;
+    isPinned: (value2) => _getNodePinSet(value2, false)?.size > 0,
+    isSelected: (value3) => {
+      const list = _currentSnapshot?.selectedNodeIds;
+      return Array.isArray(list) ? list.includes(value3) : list?.has?.(value3) === true;
     },
     preview: _fastPreviewLayer,
     previewRelease: _fastPreviewRelease,
@@ -242,28 +234,28 @@ let _edgeIndexRev = -1,
   _lastTimerSyncRev = -1;
 const MANIFEST_MODEL_NODE_TYPES = new Set(['ai-image', 'ai-text', 'ai-video', 'ai-audio']);
 export function refreshManifestModelNodeUis() {
-  const _0x410294 = [],
-    _0x4637a5 = [];
-  for (const [_0x3a9604, _0x47a3bc] of [..._componentMap.entries()]) {
-    const _0x397700 = _currentSnapshot?.nodes?.[_0x3a9604];
-    if (!_0x397700 || !MANIFEST_MODEL_NODE_TYPES.has(normalizeNodeType(_0x397700.type))) continue;
-    if (typeof _0x47a3bc?.refreshModelRegistryUi === 'function')
+  const refreshedNodeIds = [],
+    remountedNodeIds = [];
+  for (const [value4, value5] of [..._componentMap.entries()]) {
+    const enabled = _currentSnapshot?.nodes?.[value4];
+    if (!enabled || !MANIFEST_MODEL_NODE_TYPES.has(normalizeNodeType(enabled.type))) continue;
+    if (typeof value5?.refreshModelRegistryUi === 'function')
       try {
-        (_0x47a3bc.refreshModelRegistryUi(), _0x410294.push(_0x3a9604));
+        (value5.refreshModelRegistryUi(), refreshedNodeIds.push(value4));
         continue;
-      } catch (_0x25873e) {
-        console.warn('[Renderer] refresh model registry UI failed:', _0x25873e);
+      } catch (value6) {
+        console.warn('[Renderer] refresh model registry UI failed:', value6);
       }
-    (_destroyNode(_0x3a9604), _0x4637a5.push(_0x3a9604));
+    (_destroyNode(value4), remountedNodeIds.push(value4));
   }
-  return { refreshedNodeIds: _0x410294, remountedNodeIds: _0x4637a5 };
+  return { refreshedNodeIds: refreshedNodeIds, remountedNodeIds: remountedNodeIds };
 }
-function _hideTimer(_0x276321) {
-  const _0x33432 = _wrapperMap.get(_0x276321),
-    _0x2c2c18 = _0x33432?.__v2_timer_el;
-  if (!_0x2c2c18) return;
-  _0x2c2c18.textContent = '';
-  if (_0x2c2c18.style.display !== 'none') _0x2c2c18.style.display = 'none';
+function _hideTimer(value7) {
+  const value8 = _wrapperMap.get(value7),
+    el = value8?.__v2_timer_el;
+  if (!el) return;
+  el.textContent = '';
+  if (el.style.display !== 'none') el.style.display = 'none';
 }
 function _cancelTimerLoopIfNeeded() {
   (_timerRafId !== null && typeof cancelAnimationFrame === 'function' && cancelAnimationFrame(_timerRafId),
@@ -275,27 +267,27 @@ function _ensureTimerLoopActive() {
     typeof requestAnimationFrame === 'function' &&
     (_timerRafId = requestAnimationFrame(_updateTimers));
 }
-function _hasResolvedMediaValue(_0x4f2a69, _0x4c0fe6) {
+function _hasResolvedMediaValue(enabled2, list2) {
   return (
-    !!_0x4f2a69 &&
-    typeof _0x4f2a69 === 'object' &&
-    _0x4c0fe6.some((_0x5a76dc) => !!String(_0x4f2a69?.[_0x5a76dc] || '').trim())
+    !!enabled2 &&
+    typeof enabled2 === 'object' &&
+    list2.some((item2) => !!String(enabled2?.[item2] || '').trim())
   );
 }
-function _isResolvedSourceMediaNode(_0x1b6598) {
-  if (isNodeType(_0x1b6598, 'source-audio'))
-    return _hasResolvedMediaValue(_0x1b6598, ['src', 'audioUrl', 'localPath', 'resultUrl']);
+function _isResolvedSourceMediaNode(value9) {
+  if (isNodeType(value9, 'source-audio'))
+    return _hasResolvedMediaValue(value9, ['src', 'audioUrl', 'localPath', 'resultUrl']);
   if (
-    !isNodeType(_0x1b6598, 'source-video') ||
-    !!String(_0x1b6598?.rhTaskId || _0x1b6598?.asyncTaskId || _0x1b6598?.dreaminaSubmitId || '').trim() ||
-    _0x1b6598?.rhTaskRecovering === true ||
-    _0x1b6598?.asyncTaskRecovering === true ||
-    _0x1b6598?.dreaminaTaskRecovering === true
+    !isNodeType(value9, 'source-video') ||
+    !!String(value9?.rhTaskId || value9?.asyncTaskId || value9?.dreaminaSubmitId || '').trim() ||
+    value9?.rhTaskRecovering === true ||
+    value9?.asyncTaskRecovering === true ||
+    value9?.dreaminaTaskRecovering === true
   )
     return false;
-  const _0x58a2af = Array.isArray(_0x1b6598?.videos) ? _0x1b6598.videos : [];
+  const list3 = Array.isArray(value9?.videos) ? value9.videos : [];
   return (
-    _hasResolvedMediaValue(_0x1b6598, [
+    _hasResolvedMediaValue(value9, [
       'src',
       'videoUrl',
       'localPath',
@@ -304,8 +296,8 @@ function _isResolvedSourceMediaNode(_0x1b6598) {
       'resultUrl',
       'capturePreviewUrl',
     ]) ||
-    _0x58a2af.some((_0x119e7b) =>
-      _hasResolvedMediaValue(_0x119e7b, [
+    list3.some((item3) =>
+      _hasResolvedMediaValue(item3, [
         'url',
         'videoUrl',
         'localPath',
@@ -317,20 +309,20 @@ function _isResolvedSourceMediaNode(_0x1b6598) {
     )
   );
 }
-function _isRunningTimerNode(_0x1f6e4f) {
+function _isRunningTimerNode(value10) {
   return !!(
-    _0x1f6e4f?.generationStartTime &&
-    _0x1f6e4f.generationDuration == null &&
-    !_isResolvedSourceMediaNode(_0x1f6e4f)
+    value10?.generationStartTime &&
+    value10.generationDuration == null &&
+    !_isResolvedSourceMediaNode(value10)
   );
 }
-function _syncRunningTimerForNode(_0x4bdf88, _0x507822, { hide: hide = false } = {}) {
-  if (_isRunningTimerNode(_0x507822)) {
-    (_runningTimers.add(_0x4bdf88), _ensureTimerLoopActive());
+function _syncRunningTimerForNode(value11, value12, { hide: hide = false } = {}) {
+  if (_isRunningTimerNode(value12)) {
+    (_runningTimers.add(value11), _ensureTimerLoopActive());
     return;
   }
-  if (_runningTimers.delete(_0x4bdf88) && hide) _hideTimer(_0x4bdf88);
-  else hide && _hideTimer(_0x4bdf88);
+  if (_runningTimers.delete(value11) && hide) _hideTimer(value11);
+  else hide && _hideTimer(value11);
   _runningTimers.size === 0 && _cancelTimerLoopIfNeeded();
 }
 function _updateTimers() {
@@ -338,29 +330,29 @@ function _updateTimers() {
     _timerRafId = null;
     return;
   }
-  const _0xba33e0 = [];
-  for (const _0x4a181e of _runningTimers) {
-    const _0x464dfe = _currentSnapshot.nodes?.[_0x4a181e];
+  const list4 = [];
+  for (const value13 of _runningTimers) {
+    const enabled3 = _currentSnapshot.nodes?.[value13];
     if (
-      !_0x464dfe ||
-      !_0x464dfe.generationStartTime ||
-      _0x464dfe.generationDuration != null ||
-      _isResolvedSourceMediaNode(_0x464dfe)
+      !enabled3 ||
+      !enabled3.generationStartTime ||
+      enabled3.generationDuration != null ||
+      _isResolvedSourceMediaNode(enabled3)
     ) {
-      _0xba33e0.push(_0x4a181e);
+      list4.push(value13);
       continue;
     }
-    const _0x3446b3 = _wrapperMap.get(_0x4a181e),
-      _0x5336e2 = _0x3446b3?.__v2_timer_el;
-    if (_0x5336e2) {
-      const _0x259848 = Date.now() - _0x464dfe.generationStartTime;
-      _0x5336e2.textContent = _formatNodeTimerText(_0x464dfe, _0x259848);
-      if (_0x5336e2.style.display === 'none') _0x5336e2.style.display = '';
+    const value14 = _wrapperMap.get(value13),
+      el2 = value14?.__v2_timer_el;
+    if (el2) {
+      const value15 = Date.now() - enabled3.generationStartTime;
+      el2.textContent = _formatNodeTimerText(enabled3, value15);
+      if (el2.style.display === 'none') el2.style.display = '';
     }
   }
-  _0xba33e0.length > 0 &&
-    _0xba33e0.forEach((_0x445707) => {
-      (_runningTimers.delete(_0x445707), _hideTimer(_0x445707));
+  list4.length > 0 &&
+    list4.forEach((item4) => {
+      (_runningTimers.delete(item4), _hideTimer(item4));
     });
   if (_runningTimers.size === 0) {
     _timerRafId = null;
@@ -368,131 +360,130 @@ function _updateTimers() {
   }
   _timerRafId = requestAnimationFrame(_updateTimers);
 }
-function _syncRunningTimers(_0x787c25) {
-  const _0x1f6162 = Number.isFinite(_0x787c25?._persistRev)
-    ? _0x787c25._persistRev
-    : Number.isFinite(_0x787c25?._nodeCount)
-      ? _0x787c25._nodeCount
+function _syncRunningTimers(value16) {
+  const value17 = Number.isFinite(value16?._persistRev)
+    ? value16._persistRev
+    : Number.isFinite(value16?._nodeCount)
+      ? value16._nodeCount
       : 0;
-  if (_0x1f6162 === _lastTimerSyncRev) return;
-  _lastTimerSyncRev = _0x1f6162;
-  const _0x3656b6 = _0x787c25?.nodes || {};
-  for (const _0x1a35bc of Array.from(_runningTimers)) {
-    _syncRunningTimerForNode(_0x1a35bc, _0x3656b6[_0x1a35bc], { hide: true });
+  if (value17 === _lastTimerSyncRev) return;
+  _lastTimerSyncRev = value17;
+  const value18 = value16?.nodes || {};
+  for (const value19 of Array.from(_runningTimers)) {
+    _syncRunningTimerForNode(value19, value18[value19], { hide: true });
   }
-  for (const [_0x900bf9, _0x300278] of Object.entries(_0x3656b6)) {
-    if (!_isRunningTimerNode(_0x300278)) continue;
-    const _0xadc9b1 = String(_0x300278?.id || _0x900bf9 || '').trim();
-    if (!_0xadc9b1) continue;
-    _syncRunningTimerForNode(_0xadc9b1, _0x300278);
+  for (const [value20, value21] of Object.entries(value18)) {
+    if (!_isRunningTimerNode(value21)) continue;
+    const enabled4 = String(value21?.id || value20 || '').trim();
+    if (!enabled4) continue;
+    _syncRunningTimerForNode(enabled4, value21);
   }
   _ensureTimerLoopActive();
 }
 function _clearRunningTimerState() {
   (_cancelTimerLoopIfNeeded(), _runningTimers.clear(), (_lastTimerSyncRev = -1), (_currentSnapshot = null));
 }
-function _getNodePinSet(_0x3adcbe, _0x23e4f7 = false) {
-  let _0x370956 = _nodePinReasons.get(_0x3adcbe);
+function _getNodePinSet(value22, value23 = false) {
+  let enabled5 = _nodePinReasons.get(value22);
   return (
-    !_0x370956 && _0x23e4f7 && ((_0x370956 = new Set()), _nodePinReasons.set(_0x3adcbe, _0x370956)),
-    _0x370956 || null
+    !enabled5 && value23 && ((enabled5 = new Set()), _nodePinReasons.set(value22, enabled5)),
+    enabled5 || null
   );
 }
 function _getPinnedNodeIds() {
-  const _0x319270 = new Set();
-  for (const [_0x46169e, _0x5ad117] of _nodePinReasons.entries()) {
-    _0x5ad117 && _0x5ad117.size > 0 && _0x319270.add(_0x46169e);
+  const value24 = new Set();
+  for (const [value25, value26] of _nodePinReasons.entries()) {
+    value26 && value26.size > 0 && value24.add(value25);
   }
-  return _0x319270;
+  return value24;
 }
-function _clearNodePin(_0x505f7b) {
-  _nodePinReasons.delete(_0x505f7b);
+function _clearNodePin(value27) {
+  _nodePinReasons.delete(value27);
 }
-function _clearAnchoredUiForNode(_0x5f47d9) {
-  if (!_0x5f47d9) return;
-  const _0x38cd19 = _componentMap.get(_0x5f47d9);
-  _0x38cd19 && typeof _0x38cd19.highlightCell === 'function' && _0x38cd19.highlightCell(-1);
+function _clearAnchoredUiForNode(enabled6) {
+  if (!enabled6) return;
+  const value28 = _componentMap.get(enabled6);
+  value28 && typeof value28.highlightCell === 'function' && value28.highlightCell(-1);
 }
-function _resolveVideoMediaLeaseKey(_0x5ca464, _0x53070e) {
-  const _0xf2fe03 = _sourceVideoSlotLifecycle.isManagedNode(_0x5ca464)
-    ? _sourceVideoSlotLifecycle.read(_0x5ca464)
+function _resolveVideoMediaLeaseKey(value29, value30) {
+  const value31 = _sourceVideoSlotLifecycle.isManagedNode(value29)
+    ? _sourceVideoSlotLifecycle.read(value29)
     : null;
-  return resolveRendererVideoMediaLeaseKey(_0x53070e, _0xf2fe03);
+  return resolveRendererVideoMediaLeaseKey(value30, value31);
 }
-function _parkNode(_0x2883a2) {
-  const _0x3d51fd = _wrapperMap.get(_0x2883a2);
-  if (!_0x3d51fd) return null;
-  _sourceVideoSlotLifecycle.isManagedNode(_0x2883a2) &&
-    (_sourceVideoSlotLifecycle.syncVisibility(_0x2883a2, 'far'),
-    _sourceVideoSlotLifecycle.setResidency(_0x2883a2, 'parked'));
+function _parkNode(value32) {
+  const el3 = _wrapperMap.get(value32);
+  if (!el3) return null;
+  _sourceVideoSlotLifecycle.isManagedNode(value32) &&
+    (_sourceVideoSlotLifecycle.syncVisibility(value32, 'far'),
+    _sourceVideoSlotLifecycle.setResidency(value32, 'parked'));
   return (
-    _mediaPresentation.forgetHydration(_0x2883a2),
-    _syncRunningTimerForNode(_0x2883a2, null, { hide: true }),
-    _0x3d51fd.isConnected && _0x3d51fd.remove(),
-    _videoMediaResidency.park(_0x2883a2, {
+    _mediaPresentation.forgetHydration(value32),
+    _syncRunningTimerForNode(value32, null, { hide: true }),
+    el3.isConnected && el3.remove(),
+    _videoMediaResidency.park(value32, {
       retainPresentedMedia: (() => {
-        const _0x8ae6f = _componentMap.get(_0x2883a2);
+        const value33 = _componentMap.get(value32);
         try {
-          return _0x8ae6f?.hasPresentedRendererMedia?.() === true;
+          return value33?.hasPresentedRendererMedia?.() === true;
         } catch {
           return false;
         }
       })(),
-      leaseKey: _resolveVideoMediaLeaseKey(_0x2883a2, _currentSnapshot?.nodes?.[_0x2883a2]),
+      leaseKey: _resolveVideoMediaLeaseKey(value32, _currentSnapshot?.nodes?.[value32]),
     }),
-    _mountedNodeIds.delete(_0x2883a2),
-    _parkedNodeIds.add(_0x2883a2),
-    _parkedWrapperMap.set(_0x2883a2, _0x3d51fd),
-    _fastPreviewLifecycle.record(_nodeTypeSnapshotMap.get(_0x2883a2)),
-    _clearAnchoredUiForNode(_0x2883a2),
-    _nodeRuntimeBridge.unregister(_0x2883a2),
-    _0x3d51fd
+    _mountedNodeIds.delete(value32),
+    _parkedNodeIds.add(value32),
+    _parkedWrapperMap.set(value32, el3),
+    _fastPreviewLifecycle.record(_nodeTypeSnapshotMap.get(value32)),
+    _clearAnchoredUiForNode(value32),
+    _nodeRuntimeBridge.unregister(value32),
+    el3
   );
 }
-function _mountNode(_0x65fed0, _0x450728) {
-  const _0x118cc9 = _wrapperMap.get(_0x65fed0);
-  if (!_0x118cc9) return null;
+function _mountNode(value34, el4) {
+  const el5 = _wrapperMap.get(value34);
+  if (!el5) return null;
   return (
-    _videoMediaResidency.unpark(_0x65fed0),
-    !_0x118cc9.isConnected && _0x450728.appendChild(_0x118cc9),
-    _parkedWrapperMap.delete(_0x65fed0),
-    _parkedNodeIds.delete(_0x65fed0),
-    _mountedNodeIds.add(_0x65fed0),
-    _sourceVideoSlotLifecycle.setResidency(_0x65fed0, 'mounted'),
-    _fastPreviewLifecycle.record(_nodeTypeSnapshotMap.get(_0x65fed0)),
-    _nodeRuntimeBridge.register(_0x65fed0),
-    _0x118cc9
+    _videoMediaResidency.unpark(value34),
+    !el5.isConnected && el4.appendChild(el5),
+    _parkedWrapperMap.delete(value34),
+    _parkedNodeIds.delete(value34),
+    _mountedNodeIds.add(value34),
+    _sourceVideoSlotLifecycle.setResidency(value34, 'mounted'),
+    _fastPreviewLifecycle.record(_nodeTypeSnapshotMap.get(value34)),
+    _nodeRuntimeBridge.register(value34),
+    el5
   );
 }
-function _flushMountBatch(_0x2ff5b6, _0x1af636) {
-  if (!_0x2ff5b6 || !_0x1af636) return;
-  if (_0x1af636.childNodes && _0x1af636.childNodes.length === 0) return;
-  _0x2ff5b6.appendChild(_0x1af636);
+function _flushMountBatch(el6, enabled7) {
+  if (!el6 || !enabled7) return;
+  if (enabled7.childNodes && enabled7.childNodes.length === 0) return;
+  el6.appendChild(enabled7);
 }
-function _destroyNode(_0x17af1e) {
-  (_rendererMediaRuntimePreparer.forget(_0x17af1e),
-    _mediaPresentation.forget(_0x17af1e),
-    _syncRunningTimerForNode(_0x17af1e, null, { hide: true }));
-  const _0x17a345 = _componentMap.get(_0x17af1e);
+function _destroyNode(value35) {
+  (_rendererMediaRuntimePreparer.forget(value35),
+    _mediaPresentation.forget(value35),
+    _syncRunningTimerForNode(value35, null, { hide: true }));
+  const value36 = _componentMap.get(value35);
   try {
-    _0x17a345 && typeof _0x17a345.unmount === 'function' && _0x17a345.unmount();
+    value36 && typeof value36.unmount === 'function' && value36.unmount();
   } catch {}
-  const _0x4c886a = _wrapperMap.get(_0x17af1e) || _parkedWrapperMap.get(_0x17af1e);
-  (_0x4c886a && _0x4c886a.isConnected && _0x4c886a.remove(),
-    _componentMap.delete(_0x17af1e),
-    _nodeDataSnapshotMap.delete(_0x17af1e),
-    _wrapperMap.delete(_0x17af1e),
-    _mountedNodeIds.delete(_0x17af1e),
-    _parkedNodeIds.delete(_0x17af1e),
-    _parkedWrapperMap.delete(_0x17af1e),
-    _pendingNodeDataMap.delete(_0x17af1e),
-    _nodeTypeSnapshotMap.delete(_0x17af1e),
-    _nodeRuntimeBridge.unregister(_0x17af1e),
-    _sourceVideoSlotLifecycle.isManagedNode(_0x17af1e) &&
-      _sourceVideoSlotLifecycle.forget(_0x17af1e),
-    _clearNodePin(_0x17af1e),
-    _fastPreviewLayer.discardNode(_0x17af1e),
-    _fastPreviewContinuation.excludeNodes([_0x17af1e]));
+  const el7 = _wrapperMap.get(value35) || _parkedWrapperMap.get(value35);
+  (el7 && el7.isConnected && el7.remove(),
+    _componentMap.delete(value35),
+    _nodeDataSnapshotMap.delete(value35),
+    _wrapperMap.delete(value35),
+    _mountedNodeIds.delete(value35),
+    _parkedNodeIds.delete(value35),
+    _parkedWrapperMap.delete(value35),
+    _pendingNodeDataMap.delete(value35),
+    _nodeTypeSnapshotMap.delete(value35),
+    _nodeRuntimeBridge.unregister(value35),
+    _sourceVideoSlotLifecycle.isManagedNode(value35) && _sourceVideoSlotLifecycle.forget(value35),
+    _clearNodePin(value35),
+    _fastPreviewLayer.discardNode(value35),
+    _fastPreviewContinuation.excludeNodes([value35]));
 }
 function _syncRendererBridge() {
   syncRendererBridge(typeof window === 'undefined' ? null : window, {
@@ -510,34 +501,32 @@ function _syncRendererBridge() {
     captureRasterPreviewNode: _rasterPreviewCoordinator.captureNodeFrame,
     excludeRasterPreviewNode: _rasterPreviewCoordinator.excludeNode,
     syncFastPreviewDragProxy: _fastPreviewLayer.syncNodeDragPreview,
-    releaseFastPreviewForPlayback(_0x399529) {
-      if (!_0x399529) return false;
-      if (_sourceVideoSlotLifecycle.isManagedNode(_0x399529)) return false;
-      const _0x3ba665 = _fastPreviewLayer.releaseNode(_0x399529) === true;
-      if (!_0x3ba665) return false;
-      const _0x19a0e5 = _wrapperMap.get(_0x399529);
+    releaseFastPreviewForPlayback(enabled8) {
+      if (!enabled8) return false;
+      if (_sourceVideoSlotLifecycle.isManagedNode(enabled8)) return false;
+      const enabled9 = _fastPreviewLayer.releaseNode(enabled8) === true;
+      if (!enabled9) return false;
+      const el8 = _wrapperMap.get(enabled8);
       return (
-        _0x19a0e5?.dataset &&
-          (_0x19a0e5.dataset.fastPreviewReleasedForPlayback = '1'),
-        _fastPreviewRelease.forget(_0x399529),
+        el8?.dataset && (el8.dataset.fastPreviewReleasedForPlayback = '1'),
+        _fastPreviewRelease.forget(enabled8),
         true
       );
     },
-    prepareMediaSlotSource(_0x6d7867, _0x38eb06, _0x395b49 = {}) {
-      return _sourceVideoSlotLifecycle.prepareSource(_0x6d7867, _0x38eb06, _0x395b49);
+    prepareMediaSlotSource(value37, value38, value39 = {}) {
+      return _sourceVideoSlotLifecycle.prepareSource(value37, value38, value39);
     },
     reportMediaSlotFrame: _sourceVideoSlotLifecycle.reportFrame,
-    pinNode(_0x2043d9, _0x37f8e4 = 'src/ui/') {
-      if (!_0x2043d9) return;
-      const _0x3d3b9d = _getNodePinSet(_0x2043d9, true);
-      _0x3d3b9d.add(String(_0x37f8e4 || 'src/ui/'));
+    pinNode(enabled10, value40 = 'src/ui/') {
+      if (!enabled10) return;
+      const _getNodePinSet2 = _getNodePinSet(enabled10, true);
+      _getNodePinSet2.add(String(value40 || 'src/ui/'));
     },
-    unpinNode(_0x44dc77, _0x442b64 = 'src/ui/') {
-      if (!_0x44dc77) return;
-      const _0x18dc87 = _getNodePinSet(_0x44dc77, false);
-      if (!_0x18dc87) return;
-      (_0x18dc87.delete(String(_0x442b64 || 'src/ui/')),
-        _0x18dc87.size === 0 && _nodePinReasons.delete(_0x44dc77));
+    unpinNode(enabled11, value41 = 'src/ui/') {
+      if (!enabled11) return;
+      const map = _getNodePinSet(enabled11, false);
+      if (!map) return;
+      (map.delete(String(value41 || 'src/ui/')), map.size === 0 && _nodePinReasons.delete(enabled11));
     },
   });
 }
@@ -547,81 +536,80 @@ function _markRasterMediaInteractionBusy() {
 function _releaseRasterMediaInteractionBusy() {
   (_rasterPreviewCoordinator.setMediaLoadingBusy(false), _schedulePreparedMediaRuntimeCommit?.());
 }
-function _rebuildEdgeIndex(_0x2c906e) {
+function _rebuildEdgeIndex(value42) {
   (_nodeToEdgeIds.clear(), _incomingEdgeIdsByTarget.clear());
-  for (const _0x484a72 of Object.values(_0x2c906e || {})) {
-    if (!_0x484a72) continue;
-    const _0x2f93b1 = _0x484a72.sourceId,
-      _0x5f11a4 = _0x484a72.targetId;
-    if (_0x2f93b1) {
-      let _0xfaa17 = _nodeToEdgeIds.get(_0x2f93b1);
-      (!_0xfaa17 && ((_0xfaa17 = new Set()), _nodeToEdgeIds.set(_0x2f93b1, _0xfaa17)),
-        _0xfaa17.add(_0x484a72.id));
+  for (const enabled12 of Object.values(value42 || {})) {
+    if (!enabled12) continue;
+    const value43 = enabled12.sourceId,
+      value44 = enabled12.targetId;
+    if (value43) {
+      let enabled13 = _nodeToEdgeIds.get(value43);
+      (!enabled13 && ((enabled13 = new Set()), _nodeToEdgeIds.set(value43, enabled13)),
+        enabled13.add(enabled12.id));
     }
-    if (_0x5f11a4) {
-      let _0x574e62 = _nodeToEdgeIds.get(_0x5f11a4);
-      !_0x574e62 && ((_0x574e62 = new Set()), _nodeToEdgeIds.set(_0x5f11a4, _0x574e62));
-      _0x574e62.add(_0x484a72.id);
-      let _0x298c85 = _incomingEdgeIdsByTarget.get(_0x5f11a4);
-      (!_0x298c85 && ((_0x298c85 = []), _incomingEdgeIdsByTarget.set(_0x5f11a4, _0x298c85)),
-        _0x298c85.push(_0x484a72.id));
+    if (value44) {
+      let enabled14 = _nodeToEdgeIds.get(value44);
+      !enabled14 && ((enabled14 = new Set()), _nodeToEdgeIds.set(value44, enabled14));
+      enabled14.add(enabled12.id);
+      let list5 = _incomingEdgeIdsByTarget.get(value44);
+      (!list5 && ((list5 = []), _incomingEdgeIdsByTarget.set(value44, list5)), list5.push(enabled12.id));
     }
   }
 }
-function _ensureEdgeIndex(_0x5a47a4, _0x46ff48) {
-  const _0x275c7d = typeof _0x46ff48 === 'number' ? _0x46ff48 : 0;
-  if (_0x275c7d === _edgeIndexRev) return;
-  (_rebuildEdgeIndex(_0x5a47a4), (_edgeIndexRev = _0x275c7d));
+function _ensureEdgeIndex(value45, value46) {
+  const value47 = typeof value46 === 'number' ? value46 : 0;
+  if (value47 === _edgeIndexRev) return;
+  (_rebuildEdgeIndex(value45), (_edgeIndexRev = value47));
 }
-function _getEdgeEntries(_0x3aabff, _0x1ba81e) {
-  const _0x41d18b = typeof _0x1ba81e === 'number',
-    _0x2dbc15 = _0x41d18b ? _0x1ba81e : 0,
-    _0xdbaf2f = _0x41d18b
-      ? _0x2dbc15 === _edgeEntriesRev
-      : _0x2dbc15 === _edgeEntriesRev && _0x3aabff === _edgeEntriesSource;
-  if (_0xdbaf2f) return _edgeEntriesCache;
+function _getEdgeEntries(value48, value49) {
+  const value50 = typeof value49 === 'number',
+    value51 = value50 ? value49 : 0,
+    value52 = value50
+      ? value51 === _edgeEntriesRev
+      : value51 === _edgeEntriesRev && value48 === _edgeEntriesSource;
+  if (value52) return _edgeEntriesCache;
   return (
-    (_edgeEntriesCache = Object.values(_0x3aabff || {})),
-    (_edgeEntriesRev = _0x2dbc15),
-    (_edgeEntriesSource = _0x3aabff || null),
+    (_edgeEntriesCache = Object.values(value48 || {})),
+    (_edgeEntriesRev = value51),
+    (_edgeEntriesSource = value48 || null),
     _edgeEntriesCache
   );
 }
-function _buildSelectionRelatedSets(_0xe2985f, _0x4a9b27) {
-  const _0x5c1e91 = _0xe2985f instanceof Set ? _0xe2985f : new Set(Array.isArray(_0xe2985f) ? _0xe2985f : []),
-    _0xdfb18f = new Set(),
-    _0x3bd824 = new Set();
-  if (_0x5c1e91.size === 0) return { relatedNodeIds: _0xdfb18f, relatedEdgeIds: _0x3bd824 };
-  for (const _0x107d67 of _0x5c1e91) {
-    const _0x4de6d5 = _nodeToEdgeIds.get(_0x107d67);
-    if (!_0x4de6d5) continue;
-    for (const _0x525235 of _0x4de6d5) {
-      if (!_0x525235 || _0x3bd824.has(_0x525235)) continue;
-      const _0x4c9589 = _0x4a9b27?.[_0x525235];
-      if (!_0x4c9589?.id) continue;
-      const _0x3c38e8 = _0x4c9589.sourceId,
-        _0xce8e08 = _0x4c9589.targetId,
-        _0x1da90c = _0x5c1e91.has(_0x3c38e8),
-        _0x5f321b = _0x5c1e91.has(_0xce8e08);
-      if (!_0x1da90c && !_0x5f321b) continue;
-      _0x3bd824.add(_0x4c9589.id);
-      if (_0x3c38e8 && !_0x1da90c) _0xdfb18f.add(_0x3c38e8);
-      if (_0xce8e08 && !_0x5f321b) _0xdfb18f.add(_0xce8e08);
+function _buildSelectionRelatedSets(value53, value54) {
+  const map2 = value53 instanceof Set ? value53 : new Set(Array.isArray(value53) ? value53 : []),
+    relatedNodeIds = new Set(),
+    relatedEdgeIds = new Set();
+  if (map2.size === 0) return { relatedNodeIds: relatedNodeIds, relatedEdgeIds: relatedEdgeIds };
+  for (const value55 of map2) {
+    const enabled15 = _nodeToEdgeIds.get(value55);
+    if (!enabled15) continue;
+    for (const enabled16 of enabled15) {
+      if (!enabled16 || relatedEdgeIds.has(enabled16)) continue;
+      const enabled17 = value54?.[enabled16];
+      if (!enabled17?.id) continue;
+      const value56 = enabled17.sourceId,
+        value57 = enabled17.targetId,
+        enabled18 = map2.has(value56),
+        enabled19 = map2.has(value57);
+      if (!enabled18 && !enabled19) continue;
+      relatedEdgeIds.add(enabled17.id);
+      if (value56 && !enabled18) relatedNodeIds.add(value56);
+      if (value57 && !enabled19) relatedNodeIds.add(value57);
     }
   }
-  return { relatedNodeIds: _0xdfb18f, relatedEdgeIds: _0x3bd824 };
+  return { relatedNodeIds: relatedNodeIds, relatedEdgeIds: relatedEdgeIds };
 }
-function _normalizeSelectionRelatedHighlightColor(_0x391acf) {
-  const _0x5a9be9 = String(_0x391acf || '').trim();
-  return SELECTION_RELATED_HIGHLIGHT_COLORS.includes(_0x5a9be9) ? _0x5a9be9 : 'white';
+function _normalizeSelectionRelatedHighlightColor(value58) {
+  const value59 = String(value58 || '').trim();
+  return SELECTION_RELATED_HIGHLIGHT_COLORS.includes(value59) ? value59 : 'white';
 }
-function _syncContainerSizeCache(_0x46a905 = _containerSizeSourceEl) {
-  const _0x2a605c = _0x46a905 || _containerSizeSourceEl || null,
-    _0x665ec9 = _0x2a605c ? Number(_0x2a605c.clientWidth) : Number(window.innerWidth),
-    _0x5ea22f = _0x2a605c ? Number(_0x2a605c.clientHeight) : Number(window.innerHeight);
+function _syncContainerSizeCache(value60 = _containerSizeSourceEl) {
+  const el9 = value60 || _containerSizeSourceEl || null,
+    value61 = el9 ? Number(el9.clientWidth) : Number(window.innerWidth),
+    value62 = el9 ? Number(el9.clientHeight) : Number(window.innerHeight);
   return (
-    (_cachedContainerWidth = Number.isFinite(_0x665ec9) ? _0x665ec9 : Number(window.innerWidth)),
-    (_cachedContainerHeight = Number.isFinite(_0x5ea22f) ? _0x5ea22f : Number(window.innerHeight)),
+    (_cachedContainerWidth = Number.isFinite(value61) ? value61 : Number(window.innerWidth)),
+    (_cachedContainerHeight = Number.isFinite(value62) ? value62 : Number(window.innerHeight)),
     { width: _cachedContainerWidth, height: _cachedContainerHeight }
   );
 }
@@ -633,271 +621,273 @@ function _nowMs() {
 function _hasCachedContainerSize() {
   return Number.isFinite(_cachedContainerWidth) && Number.isFinite(_cachedContainerHeight);
 }
-function _getCachedContainerSize(_0x4bed07 = _containerSizeSourceEl, _0x174bcb = {}) {
-  const _0x594966 = _0x4bed07 || _containerSizeSourceEl || null,
-    _0x2f1031 = typeof ResizeObserver === 'function' && !!_containerResizeObserver,
-    _0x71244e =
-      _0x174bcb?.refresh === true ||
+function _getCachedContainerSize(value63 = _containerSizeSourceEl, timer = {}) {
+  const value64 = value63 || _containerSizeSourceEl || null,
+    enabled20 = typeof ResizeObserver === 'function' && !!_containerResizeObserver,
+    value65 =
+      timer?.refresh === true ||
       !_hasCachedContainerSize() ||
-      !_0x2f1031 ||
-      (_0x594966 && _containerSizeSourceEl && _0x594966 !== _containerSizeSourceEl);
-  if (_0x71244e) return _syncContainerSizeCache(_0x594966);
+      !enabled20 ||
+      (value64 && _containerSizeSourceEl && value64 !== _containerSizeSourceEl);
+  if (value65) return _syncContainerSizeCache(value64);
   return { width: _cachedContainerWidth, height: _cachedContainerHeight };
 }
-function _getEdgeContainerSize(_0x5d4fe6) {
-  const _0x589c75 = _nowMs(),
-    _0x742b94 = _getCachedContainerSize(_0x5d4fe6 || _containerSizeSourceEl),
-    _0x4fac22 = _nowMs();
+function _getEdgeContainerSize(value66) {
+  const _nowMs2 = _nowMs(),
+    box = _getCachedContainerSize(value66 || _containerSizeSourceEl),
+    _nowMs3 = _nowMs();
   return {
-    containerW: Number.isFinite(_0x742b94.width) ? _0x742b94.width : 0,
-    containerH: Number.isFinite(_0x742b94.height) ? _0x742b94.height : 0,
-    layoutReadMs: Math.max(0, _0x4fac22 - _0x589c75),
+    containerW: Number.isFinite(box.width) ? box.width : 0,
+    containerH: Number.isFinite(box.height) ? box.height : 0,
+    layoutReadMs: Math.max(0, _nowMs3 - _nowMs2),
   };
 }
 function _invalidateFullEdgeRenderSignature({ clearedDom: clearedDom = false } = {}) {
   ((_lastFullEdgeRenderSignature = ''), clearedDom && (_edgeDomClearedSinceLastFull = true));
 }
-function _normalizeSignaturePart(_0xb9ad11) {
-  if (_0xb9ad11 === null || _0xb9ad11 === undefined) return null;
-  if (typeof _0xb9ad11 === 'number') return Number.isFinite(_0xb9ad11) ? _0xb9ad11 : null;
-  if (typeof _0xb9ad11 === 'boolean') return _0xb9ad11;
-  if (typeof _0xb9ad11 === 'string') return _0xb9ad11;
-  if (Array.isArray(_0xb9ad11)) return _0xb9ad11.map((_0x5ca158) => _normalizeSignaturePart(_0x5ca158));
-  if (typeof _0xb9ad11 === 'object') {
-    const _0x5482b6 = {};
-    for (const _0x5e5d2c of Object.keys(_0xb9ad11).sort()) {
-      _0x5482b6[_0x5e5d2c] = _normalizeSignaturePart(_0xb9ad11[_0x5e5d2c]);
+function _normalizeSignaturePart(list6) {
+  if (list6 === null || list6 === undefined) return null;
+  if (typeof list6 === 'number') return Number.isFinite(list6) ? list6 : null;
+  if (typeof list6 === 'boolean') return list6;
+  if (typeof list6 === 'string') return list6;
+  if (Array.isArray(list6)) return list6.map((item5) => _normalizeSignaturePart(item5));
+  if (typeof list6 === 'object') {
+    const value67 = {};
+    for (const value68 of Object.keys(list6).sort()) {
+      value67[value68] = _normalizeSignaturePart(list6[value68]);
     }
-    return _0x5482b6;
+    return value67;
   }
-  return String(_0xb9ad11);
+  return String(list6);
 }
 function _buildVirtualizationCandidateSignature({
-  snapshotRev: _0x3014e3,
-  nodeCount: _0x5eeced,
-  viewport: _0x404d19,
-  selectedNodeIds: _0x8259ac,
-  connOverlay: _0xfe0f47,
-  pickConnectMode: _0x415c6a,
-  dragContext: _0x58ef55,
-  pinnedNodeIds: _0x1bca05,
-  containerW: _0x1b8d65,
-  containerH: _0x3f7353,
+  snapshotRev: snapshotRev,
+  nodeCount: nodeCount,
+  viewport: viewport,
+  selectedNodeIds: selectedNodeIds,
+  connOverlay: connOverlay,
+  pickConnectMode: pickConnectMode,
+  dragContext: dragContext,
+  pinnedNodeIds: pinnedNodeIds,
+  containerW: containerW,
+  containerH: containerH,
 } = {}) {
-  const _0x1f5351 = Array.from(
-      _0x8259ac instanceof Set ? _0x8259ac : Array.isArray(_0x8259ac) ? _0x8259ac : [],
+  const selectedNodeIds2 = Array.from(
+      selectedNodeIds instanceof Set
+        ? selectedNodeIds
+        : Array.isArray(selectedNodeIds)
+          ? selectedNodeIds
+          : [],
     )
-      .map((_0x33902a) => String(_0x33902a))
+      .map((item6) => String(item6))
       .sort(),
-    _0x2e4a7f = Array.from(_0x1bca05 instanceof Set ? _0x1bca05 : Array.isArray(_0x1bca05) ? _0x1bca05 : [])
-      .map((_0x3386f4) => String(_0x3386f4))
+    pinnedNodeIds2 = Array.from(
+      pinnedNodeIds instanceof Set ? pinnedNodeIds : Array.isArray(pinnedNodeIds) ? pinnedNodeIds : [],
+    )
+      .map((item7) => String(item7))
       .sort();
   return JSON.stringify(
     _normalizeSignaturePart({
-      snapshotRev: _0x3014e3,
-      nodeCount: _0x5eeced,
+      snapshotRev: snapshotRev,
+      nodeCount: nodeCount,
       viewport: {
-        x: Number.isFinite(_0x404d19?.x) ? _0x404d19.x : 0,
-        y: Number.isFinite(_0x404d19?.y) ? _0x404d19.y : 0,
-        zoom: Number.isFinite(_0x404d19?.zoom) ? _0x404d19.zoom : 1,
+        x: Number.isFinite(viewport?.x) ? viewport.x : 0,
+        y: Number.isFinite(viewport?.y) ? viewport.y : 0,
+        zoom: Number.isFinite(viewport?.zoom) ? viewport.zoom : 1,
       },
-      selectedNodeIds: _0x1f5351,
-      connOverlay: { srcId: _0xfe0f47?.srcId ?? null, hoverId: _0xfe0f47?.hoverId ?? null },
+      selectedNodeIds: selectedNodeIds2,
+      connOverlay: { srcId: connOverlay?.srcId ?? null, hoverId: connOverlay?.hoverId ?? null },
       pickConnectMode: {
-        active: !!_0x415c6a?.active,
-        sourceNodeId: _0x415c6a?.sourceNodeId ?? null,
-        hoverNodeId: _0x415c6a?.hoverNodeId ?? null,
-        handleDirection: _0x415c6a?.handleDirection ?? null,
+        active: !!pickConnectMode?.active,
+        sourceNodeId: pickConnectMode?.sourceNodeId ?? null,
+        hoverNodeId: pickConnectMode?.hoverNodeId ?? null,
+        handleDirection: pickConnectMode?.handleDirection ?? null,
       },
       dragContext: {
-        isDragging: !!_0x58ef55?.isDragging,
-        targetNodeId: _0x58ef55?.targetNodeId ?? null,
-        pendingDx: Number.isFinite(_0x58ef55?.pendingDx) ? _0x58ef55.pendingDx : 0,
-        pendingDy: Number.isFinite(_0x58ef55?.pendingDy) ? _0x58ef55.pendingDy : 0,
+        isDragging: !!dragContext?.isDragging,
+        targetNodeId: dragContext?.targetNodeId ?? null,
+        pendingDx: Number.isFinite(dragContext?.pendingDx) ? dragContext.pendingDx : 0,
+        pendingDy: Number.isFinite(dragContext?.pendingDy) ? dragContext.pendingDy : 0,
       },
-      pinnedNodeIds: _0x2e4a7f,
-      containerW: Number.isFinite(_0x1b8d65) ? _0x1b8d65 : 0,
-      containerH: Number.isFinite(_0x3f7353) ? _0x3f7353 : 0,
+      pinnedNodeIds: pinnedNodeIds2,
+      containerW: Number.isFinite(containerW) ? containerW : 0,
+      containerH: Number.isFinite(containerH) ? containerH : 0,
     }),
   );
 }
-export function buildRendererVirtualizationSignature(_0x14d920 = {}) {
-  return _buildVirtualizationCandidateSignature(_0x14d920);
+export function buildRendererVirtualizationSignature(options2 = {}) {
+  return _buildVirtualizationCandidateSignature(options2);
 }
-function _notifyVirtualizationProbe(_0x5eff6e) {
-  const _0x354fca = typeof window !== 'undefined' ? window.__rendererVirtualizationProbe : null;
-  if (!_0x354fca || typeof _0x354fca.onCandidateSignatureEvaluated !== 'function') return;
+function _notifyVirtualizationProbe(value69) {
+  const enabled21 = typeof window !== 'undefined' ? window.__rendererVirtualizationProbe : null;
+  if (!enabled21 || typeof enabled21.onCandidateSignatureEvaluated !== 'function') return;
   try {
-    _0x354fca.onCandidateSignatureEvaluated(_0x5eff6e);
+    enabled21.onCandidateSignatureEvaluated(value69);
   } catch {}
 }
-function _collectMovedNodeIds(_0x5afbd4, _0x53758e) {
-  const _0x204f46 = new Set(_0x5afbd4.selectedNodeIds || []),
-    _0x11ff25 = _0x53758e?.targetNodeId || null;
-  if (_0x11ff25) _0x204f46.add(_0x11ff25);
-  const _0x521738 = _0x5afbd4._parentToChildren || {},
-    _0x2189ca = Array.from(_0x204f46);
-  for (let _0x514522 = 0; _0x514522 < _0x2189ca.length; _0x514522++) {
-    const _0xbbddc6 = _0x2189ca[_0x514522],
-      _0x11e1f1 = _0x521738[_0xbbddc6];
-    if (!_0x11e1f1 || _0x11e1f1.size === 0) continue;
-    for (const _0xc0bbb5 of _0x11e1f1) {
-      !_0x204f46.has(_0xc0bbb5) && (_0x204f46.add(_0xc0bbb5), _0x2189ca.push(_0xc0bbb5));
+function _collectMovedNodeIds(value70, value71) {
+  const map3 = new Set(value70.selectedNodeIds || []),
+    value72 = value71?.targetNodeId || null;
+  if (value72) map3.add(value72);
+  const value73 = value70._parentToChildren || {},
+    list7 = Array.from(map3);
+  for (let value74 = 0; value74 < list7.length; value74++) {
+    const value75 = list7[value74],
+      enabled22 = value73[value75];
+    if (!enabled22 || enabled22.size === 0) continue;
+    for (const value76 of enabled22) {
+      !map3.has(value76) && (map3.add(value76), list7.push(value76));
     }
   }
-  return _0x204f46;
+  return map3;
 }
-function _resolveDragRenderOffset(_0x534fa5, _0xc11dae) {
-  if (!_0xc11dae?.isDragging) return null;
-  const _0x3fe7c6 = _collectMovedNodeIds(_0x534fa5, _0xc11dae);
-  if (!_0x3fe7c6 || _0x3fe7c6.size === 0) return null;
+function _resolveDragRenderOffset(value77, enabled23) {
+  if (!enabled23?.isDragging) return null;
+  const movedNodeIds = _collectMovedNodeIds(value77, enabled23);
+  if (!movedNodeIds || movedNodeIds.size === 0) return null;
   return {
-    movedNodeIds: _0x3fe7c6,
-    dx: Number.isFinite(_0xc11dae.pendingDx) ? _0xc11dae.pendingDx : 0,
-    dy: Number.isFinite(_0xc11dae.pendingDy) ? _0xc11dae.pendingDy : 0,
+    movedNodeIds: movedNodeIds,
+    dx: Number.isFinite(enabled23.pendingDx) ? enabled23.pendingDx : 0,
+    dy: Number.isFinite(enabled23.pendingDy) ? enabled23.pendingDy : 0,
   };
 }
-function _v2FormatNodeLabelText(_0x507628) {
-  const _0x5bc28e = String(_0x507628 || '').trim();
-  if (!_0x5bc28e) return '';
-  const _0x290106 = /^[\x00-\x7F]*$/.test(_0x5bc28e);
-  if (_0x290106 && _0x5bc28e.length > 20) return _0x5bc28e.slice(0, 20) + '...';
-  return _0x5bc28e;
+function _v2FormatNodeLabelText(value78) {
+  const list8 = String(value78 || '').trim();
+  if (!list8) return '';
+  const value79 = /^[\x00-\x7F]*$/.test(list8);
+  if (value79 && list8.length > 20) return list8.slice(0, 20) + '...';
+  return list8;
 }
-function _v2GetNodeLabelKind(_0x46838c) {
-  const _0x266292 = getRefKindByNodeType(_0x46838c);
-  if (_0x266292 === 'text' || _0x266292 === 'image' || _0x266292 === 'video' || _0x266292 === 'audio')
-    return _0x266292;
+function _v2GetNodeLabelKind(value80) {
+  const refKindByNodeType = getRefKindByNodeType(value80);
+  if (
+    refKindByNodeType === 'text' ||
+    refKindByNodeType === 'image' ||
+    refKindByNodeType === 'video' ||
+    refKindByNodeType === 'audio'
+  )
+    return refKindByNodeType;
   return '';
 }
-function _v2ClearNodeLabelTooltip(_0x465565) {
-  if (!_0x465565) return;
-  const _0x3af031 = (_0x255048, _0x31492d = '') => {
-    if (typeof _0x465565.removeAttribute === 'function') _0x465565.removeAttribute(_0x255048);
-    else
-      _0x465565.attributes &&
-        typeof _0x465565.attributes.delete === 'function' &&
-        _0x465565.attributes.delete(_0x255048);
-    _0x31492d && _0x465565.dataset && _0x31492d in _0x465565.dataset && delete _0x465565.dataset[_0x31492d];
+function _v2ClearNodeLabelTooltip(el10) {
+  if (!el10) return;
+  const run = (value81, value82 = '') => {
+    if (typeof el10.removeAttribute === 'function') el10.removeAttribute(value81);
+    else el10.attributes && typeof el10.attributes.delete === 'function' && el10.attributes.delete(value81);
+    value82 && el10.dataset && value82 in el10.dataset && delete el10.dataset[value82];
   };
-  _0x3af031('title');
-  if ('title' in _0x465565) _0x465565.title = '';
-  (_0x3af031('data-tooltip', 'tooltip'),
-    _0x3af031('data-tooltip-right', 'tooltipRight'),
-    _0x3af031('data-tooltip-source', 'tooltipSource'),
-    _0x3af031('data-native-title', 'nativeTitle'));
+  run('title');
+  if ('title' in el10) el10.title = '';
+  (run('data-tooltip', 'tooltip'),
+    run('data-tooltip-right', 'tooltipRight'),
+    run('data-tooltip-source', 'tooltipSource'),
+    run('data-native-title', 'nativeTitle'));
 }
 function _v2SetNodeLabelContent(
-  _0x5dc255,
+  el11,
   {
-    labelKind: _0x39ff1b,
-    displayLabelText: _0x2aa4ab,
-    defaultName: _0x2a324d,
-    isBeta: _0x5785de,
-    fullLabelText: _0x55afe8,
+    labelKind: labelKind,
+    displayLabelText: displayLabelText,
+    defaultName: defaultName,
+    isBeta: isBeta,
+    fullLabelText: fullLabelText,
   },
 ) {
-  if (!_0x5dc255) return;
-  _v2ClearNodeLabelTooltip(_0x5dc255);
-  const _0x2ea164 = [];
-  if (_0x39ff1b) {
-    const _0x572d89 = document.createElement('span');
-    ((_0x572d89.className = 'node-label-icon'),
-      _0x572d89.setAttribute('aria-hidden', 'true'),
-      (_0x572d89.dataset.labelKind = _0x39ff1b),
-      (_0x572d89.textContent = _0x39ff1b === 'text' ? 'T' : ''),
-      _0x2ea164.push(_0x572d89));
+  if (!el11) return;
+  _v2ClearNodeLabelTooltip(el11);
+  const list9 = [];
+  if (labelKind) {
+    const el12 = document.createElement('span');
+    ((el12.className = 'node-label-icon'),
+      el12.setAttribute('aria-hidden', 'true'),
+      (el12.dataset.labelKind = labelKind),
+      (el12.textContent = labelKind === 'text' ? 'T' : ''),
+      list9.push(el12));
   }
-  const _0xe2ee96 = document.createElement('span');
-  ((_0xe2ee96.className = 'node-label-text'),
-    (_0xe2ee96.textContent = _0x2aa4ab || _0x2a324d),
-    _0x2ea164.push(_0xe2ee96));
-  if (_0x5785de) {
-    const _0x1eb5fb = document.createElement('span');
-    ((_0x1eb5fb.className = 'v2-node-beta-pill'),
-      (_0x1eb5fb.textContent = 'Beta'),
-      _0x2ea164.push(_0x1eb5fb),
-      (_0x5dc255.dataset.betaLabel = _0x55afe8));
+  const el13 = document.createElement('span');
+  ((el13.className = 'node-label-text'),
+    (el13.textContent = displayLabelText || defaultName),
+    list9.push(el13));
+  if (isBeta) {
+    const el14 = document.createElement('span');
+    ((el14.className = 'v2-node-beta-pill'),
+      (el14.textContent = 'Beta'),
+      list9.push(el14),
+      (el11.dataset.betaLabel = fullLabelText));
   } else {
-    if ('betaLabel' in _0x5dc255.dataset) delete _0x5dc255.dataset.betaLabel;
+    if ('betaLabel' in el11.dataset) delete el11.dataset.betaLabel;
   }
-  _0x5dc255.replaceChildren(..._0x2ea164);
+  el11.replaceChildren(...list9);
 }
-function _v2EscapeHtml(_0x24f615) {
-  return String(_0x24f615 || '').replace(/[&<>"']/g, (_0x4516b0) => {
-    if (_0x4516b0 === '&') return '&amp;';
-    if (_0x4516b0 === '<') return '&lt;';
-    if (_0x4516b0 === '>') return '&gt;';
-    if (_0x4516b0 === '"') return '&quot;';
+function _v2EscapeHtml(value83) {
+  return String(value83 || '').replace(/[&<>"']/g, (value84) => {
+    if (value84 === '&') return '&amp;';
+    if (value84 === '<') return '&lt;';
+    if (value84 === '>') return '&gt;';
+    if (value84 === '"') return '&quot;';
     return '&#39;';
   });
 }
-function _getDreaminaTimerPhaseTitle(_0x2d5045) {
-  if (!_0x2d5045 || !isNodeType(_0x2d5045, 'ai-video')) return '';
-  const _0x1e1b34 =
-    resolveModelProvider(_0x2d5045.model, _0x2d5045.provider, { allowPrefixInference: false }) === 'dreamina';
-  if (!_0x1e1b34) return '';
-  const _0x1a89d8 = String(_0x2d5045.dreaminaTaskPhase || '')
+function _getDreaminaTimerPhaseTitle(enabled24) {
+  if (!enabled24 || !isNodeType(enabled24, 'ai-video')) return '';
+  const modelProvider =
+    resolveModelProvider(enabled24.model, enabled24.provider, { allowPrefixInference: false }) === 'dreamina';
+  if (!modelProvider) return '';
+  const value85 = String(enabled24.dreaminaTaskPhase || '')
       .trim()
       .toLowerCase(),
-    _0x263bfe = String(_0x2d5045.dreaminaTaskStatus || '')
+    value86 = String(enabled24.dreaminaTaskStatus || '')
       .trim()
       .toLowerCase();
-  if (_0x1a89d8 === 'failed' || _0x263bfe === 'failed') return t('coreUi.renderer.dreaminaPhase.failed');
-  if (_0x1a89d8 === 'syncing') return t('coreUi.renderer.dreaminaPhase.syncing');
-  if (_0x1a89d8 === 'queued') return t('coreUi.renderer.dreaminaPhase.queued');
-  if (_0x1a89d8 === 'generating') return t('coreUi.renderer.dreaminaPhase.generating');
-  if (_0x1a89d8 === 'done') return t('coreUi.renderer.dreaminaPhase.done');
-  const _0x57da88 = String(_0x2d5045.dreaminaTaskLabel || '').trim();
-  return _0x57da88 || '';
+  if (value85 === 'failed' || value86 === 'failed') return t('coreUi.renderer.dreaminaPhase.failed');
+  if (value85 === 'syncing') return t('coreUi.renderer.dreaminaPhase.syncing');
+  if (value85 === 'queued') return t('coreUi.renderer.dreaminaPhase.queued');
+  if (value85 === 'generating') return t('coreUi.renderer.dreaminaPhase.generating');
+  if (value85 === 'done') return t('coreUi.renderer.dreaminaPhase.done');
+  const value87 = String(enabled24.dreaminaTaskLabel || '').trim();
+  return value87 || '';
 }
-function _formatNodeTimerText(_0x4b5436, _0x27ced3) {
-  const _0x386687 = Math.max(0, Number(_0x27ced3) || 0),
-    _0x363186 = Math.floor(_0x386687 / 0x3e8),
-    _0x479989 = Math.floor((_0x386687 % 0x3e8) / 100),
-    _0x4b22d2 = _0x363186 + '.' + _0x479989 + 's',
-    _0x4f026c = _getDreaminaTimerPhaseTitle(_0x4b5436);
-  return _0x4f026c ? _0x4f026c + ' · ' + _0x4b22d2 : _0x4b22d2;
+function _formatNodeTimerText(value88, value89) {
+  const value90 = Math.max(0, Number(value89) || 0),
+    value91 = Math.floor(value90 / 0x3e8),
+    value92 = Math.floor((value90 % 0x3e8) / 100),
+    value93 = value91 + '.' + value92 + 's',
+    _getDreaminaTimerPhaseTitle2 = _getDreaminaTimerPhaseTitle(value88);
+  return _getDreaminaTimerPhaseTitle2 ? _getDreaminaTimerPhaseTitle2 + ' · ' + value93 : value93;
 }
-export function formatVideoMetaText({
-  fps: _0x2ea08c,
-  frames: _0x34d53e,
-  width: _0x1819ba,
-  height: _0x4196db,
-} = {}) {
-  const _0x52fccf = Number(_0x2ea08c),
-    _0x20a690 = Number(_0x34d53e);
-  if (!Number.isFinite(_0x52fccf) || _0x52fccf <= 0 || !Number.isFinite(_0x20a690) || _0x20a690 <= 0)
-    return '';
-  const _0x1f3a5c =
-      Math.abs(_0x52fccf - Math.round(_0x52fccf)) < 0.01
-        ? String(Math.round(_0x52fccf))
-        : String(Number(_0x52fccf.toFixed(2))),
-    _0x2db588 = Number(_0x1819ba),
-    _0x4c785d = Number(_0x4196db),
-    _0x56a856 = Number.isFinite(_0x2db588) && _0x2db588 > 0 && Number.isFinite(_0x4c785d) && _0x4c785d > 0,
-    _0x48021c = t('coreUi.renderer.videoMeta.framesFps', { frames: Math.round(_0x20a690), fps: _0x1f3a5c });
-  if (!_0x56a856) return _0x48021c;
-  return Math.round(_0x2db588) + '×' + Math.round(_0x4c785d) + ' · ' + _0x48021c;
+export function formatVideoMetaText({ fps: fps, frames: frames, width: width, height: height } = {}) {
+  const count = Number(fps),
+    count2 = Number(frames);
+  if (!Number.isFinite(count) || count <= 0 || !Number.isFinite(count2) || count2 <= 0) return '';
+  const fps2 =
+      Math.abs(count - Math.round(count)) < 0.01
+        ? String(Math.round(count))
+        : String(Number(count.toFixed(2))),
+    count3 = Number(width),
+    count4 = Number(height),
+    enabled25 = Number.isFinite(count3) && count3 > 0 && Number.isFinite(count4) && count4 > 0,
+    t2 = t('coreUi.renderer.videoMeta.framesFps', { frames: Math.round(count2), fps: fps2 });
+  if (!enabled25) return t2;
+  return Math.round(count3) + '×' + Math.round(count4) + ' · ' + t2;
 }
-function _getGroupColorWithOpacity(_0x2750f8, _0x1081c8) {
-  const _0x393a9f = _0x2750f8.match(/var\(--([^)]+)\)/);
-  if (!_0x393a9f) return _0x2750f8;
-  const _0x56c2d2 = _0x393a9f[1];
-  return 'var(--' + _0x56c2d2 + '-' + _0x1081c8 + ')';
+function _getGroupColorWithOpacity(value94, value95) {
+  const enabled26 = value94.match(/var\(--([^)]+)\)/);
+  if (!enabled26) return value94;
+  const value96 = enabled26[1];
+  return 'var(--' + value96 + '-' + value95 + ')';
 }
 export function clearRendererCache() {
   _rendererMediaRuntimePreparer.clear();
   console.log('[Renderer] 执行全盘物理清盘...');
-  const _0x86851f = new Set([
+  const value97 = new Set([
     ..._componentMap.keys(),
     ..._wrapperMap.keys(),
     ..._parkedWrapperMap.keys(),
     ..._mountedNodeIds,
     ..._parkedNodeIds,
   ]);
-  for (const _0x58be1a of _0x86851f) {
-    _destroyNode(_0x58be1a);
+  for (const value98 of value97) {
+    _destroyNode(value98);
   }
   (_clearRenderedEdgesFromDocument(),
     _msHiddenNodeIds.clear(),
@@ -938,375 +928,371 @@ export function clearRendererCache() {
     _clearRunningTimerState());
 }
 ((window._edgeDomCache = _edgeDomCache), _syncRendererBridge());
-function _isNodeVisible(_0xdb0b39, _0x59b94c, _0x2ea928, _0x4f871d, _0x10366b = 0, _0x22b884 = 0) {
-  return isNodeInsideViewportPadding(_0xdb0b39, _0x59b94c, _0x2ea928, _0x4f871d, 200, _0x10366b, _0x22b884);
+function _isNodeVisible(value99, value100, value101, value102, value103 = 0, value104 = 0) {
+  return isNodeInsideViewportPadding(value99, value100, value101, value102, 200, value103, value104);
 }
-function _renderCullingOnly(_0x5b8536, _0x3d0a46, _0x3d12b6, _0x5eea7a = {}) {
-  const _0x292c52 = _0x5eea7a?.hideInvisible !== false,
-    { width: _0x5d4fe8, height: _0x2577f5 } = _getCachedContainerSize(_0x5b8536.parentElement || _0x5b8536);
-  for (const _0x1fa098 of Object.values(_0x3d0a46 || {})) {
-    const _0xba328e = _wrapperMap.get(_0x1fa098.id);
-    if (!_0xba328e || !_0xba328e.isConnected) continue;
-    const _0x41e24d = _isNodeVisible(_0x1fa098, _0x3d12b6, _0x5d4fe8, _0x2577f5);
-    if (!_0x41e24d) {
-      if (!_0x292c52) continue;
-      _syncRunningTimerForNode(_0x1fa098.id, null, { hide: true });
-      if (_0xba328e.style.display !== 'none') _0xba328e.style.display = 'none';
+function _renderCullingOnly(value105, value106, value107, value108 = {}) {
+  const enabled27 = value108?.hideInvisible !== false,
+    { width: width2, height: height2 } = _getCachedContainerSize(value105.parentElement || value105);
+  for (const value109 of Object.values(value106 || {})) {
+    const el15 = _wrapperMap.get(value109.id);
+    if (!el15 || !el15.isConnected) continue;
+    const _isNodeVisible2 = _isNodeVisible(value109, value107, width2, height2);
+    if (!_isNodeVisible2) {
+      if (!enabled27) continue;
+      _syncRunningTimerForNode(value109.id, null, { hide: true });
+      if (el15.style.display !== 'none') el15.style.display = 'none';
     } else {
-      _syncRunningTimerForNode(_0x1fa098.id, _0x1fa098);
-      if (_0xba328e.style.display === 'none') _0xba328e.style.display = '';
+      _syncRunningTimerForNode(value109.id, value109);
+      if (el15.style.display === 'none') el15.style.display = '';
     }
   }
 }
-export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
-  ((_0x50065c.style.transformOrigin = '0 0'),
-    (_0x50065c.style.position = 'absolute'),
-    (_0x50065c.style.top = '0'),
-    (_0x50065c.style.left = '0'));
-  const _0x2e6a9c = _createSvgLayer();
-  _0x50065c.prepend(_0x2e6a9c);
-  const _0x1f858c = _0x2e6a9c.querySelector('svg');
-  ((_containerSizeSourceEl = _0x50065c.parentElement || _0x290e05),
-    _syncContainerSizeCache(_containerSizeSourceEl));
+export function initRenderer(el16, el17, value110) {
+  ((el17.style.transformOrigin = '0 0'),
+    (el17.style.position = 'absolute'),
+    (el17.style.top = '0'),
+    (el17.style.left = '0'));
+  const el18 = _createSvgLayer();
+  el17.prepend(el18);
+  const value111 = el18.querySelector('svg');
+  ((_containerSizeSourceEl = el17.parentElement || el16), _syncContainerSizeCache(_containerSizeSourceEl));
   typeof ResizeObserver === 'function' &&
     _containerSizeSourceEl &&
     ((_containerResizeObserver = new ResizeObserver(() => {
       _syncContainerSizeCache(_containerSizeSourceEl);
     })),
     _containerResizeObserver.observe(_containerSizeSourceEl));
-  const _0x496ecf = _createPickerEl();
-  _0x290e05.appendChild(_0x496ecf);
-  const _0x8cf9be = createPickConnectBannerEl();
-  _0x290e05.appendChild(_0x8cf9be);
-  const _0x2882b3 = _createMultiSelectBoxEl(_0x1df4a5);
-  _0x50065c.appendChild(_0x2882b3);
-  const _0x21dacb = _createAlignCenterPanelEl();
-  _0x50065c.appendChild(_0x21dacb);
-  const _0x22f85d = _createSelectionRectEl();
-  _0x290e05.appendChild(_0x22f85d);
-  const _0xa653f4 = createContextMenuEl();
-  (_0x290e05.appendChild(_0xa653f4), _syncRendererBridge());
+  const el19 = _createPickerEl();
+  el16.appendChild(el19);
+  const el20 = createPickConnectBannerEl();
+  el16.appendChild(el20);
+  const el21 = _createMultiSelectBoxEl(value110);
+  el17.appendChild(el21);
+  const el22 = _createAlignCenterPanelEl();
+  el17.appendChild(el22);
+  const el23 = _createSelectionRectEl();
+  el16.appendChild(el23);
+  const el24 = createContextMenuEl();
+  (el16.appendChild(el24), _syncRendererBridge());
   const _presentationSubscription = createRendererPresentationSubscription({
-    onSnapshot: (_0x58bb73) => {
-      _currentSnapshot = _0x58bb73;
+    onSnapshot: (value112) => {
+      _currentSnapshot = value112;
     },
-    render: (_0x58bb73) => {
-      (_syncRunningTimers(_0x58bb73), _0x19f4ce(_0x58bb73));
+    render: (value112) => {
+      (_syncRunningTimers(value112), run2(value112));
     },
     onSuspend: () => {
-      (_0x4e7d6e(), _rendererMediaRuntimePreparer.pause(), _mediaPresentation.pause());
+      (run3(), _rendererMediaRuntimePreparer.pause(), _mediaPresentation.pause());
     },
     onResume: () => {
       (_mediaPresentation.resume(), _rendererMediaRuntimePreparer.resume());
     },
   });
-  let _0x4d6a84 = -1,
-    _0x749f98 = -1,
-    _0x50eeb5 = 0,
-    _0x2db68f = null,
-    _0xaaf6b3 = null;
-  function _0x4e7d6e() {
-    (_0x2db68f !== null && (clearTimeout(_0x2db68f), (_0x2db68f = null)),
-      _0xaaf6b3 !== null && (cancelAnimationFrame(_0xaaf6b3), (_0xaaf6b3 = null)));
+  let value113 = -1,
+    value114 = -1,
+    count5 = 0,
+    setTimeout2 = null,
+    requestAnimationFrame2 = null;
+  function run3() {
+    (setTimeout2 !== null && (clearTimeout(setTimeout2), (setTimeout2 = null)),
+      requestAnimationFrame2 !== null &&
+        (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = null)));
   }
-  function _0x58868c(_0x5c3ff2 = RENDERER_VIRTUALIZATION_CONFIG.settleDelayMs) {
+  function run4(value115 = RENDERER_VIRTUALIZATION_CONFIG.settleDelayMs) {
     if (!_presentationSubscription.isActive()) return;
-    (_0x4e7d6e(),
-      (_0x2db68f = setTimeout(
+    (run3(),
+      (setTimeout2 = setTimeout(
         () => {
-          _0x2db68f = null;
-          if (_0xaaf6b3 !== null) return;
-          _0xaaf6b3 = requestAnimationFrame(() => {
-            _0xaaf6b3 = null;
+          setTimeout2 = null;
+          if (requestAnimationFrame2 !== null) return;
+          requestAnimationFrame2 = requestAnimationFrame(() => {
+            requestAnimationFrame2 = null;
             if (_presentationSubscription.hasPendingFrame()) return;
             if (!_currentSnapshot) return;
             if (_rendererInteractionGrace.isBusy()) {
-              _0x58868c(_0x5c3ff2);
+              run4(value115);
               return;
             }
-            _0x19f4ce(_currentSnapshot);
+            run2(_currentSnapshot);
           });
         },
-        Math.max(0, _0x5c3ff2),
+        Math.max(0, value115),
       )));
   }
-  const _schedulePreparedMediaRuntimeCommitForRenderer = () => _0x58868c(0);
+  const _schedulePreparedMediaRuntimeCommitForRenderer = () => run4(0);
   _schedulePreparedMediaRuntimeCommit = _schedulePreparedMediaRuntimeCommitForRenderer;
   installNodeResizeGeometryPreviewer(
     typeof window === 'undefined' ? null : window,
     () => _currentSnapshot,
     _ensureEdgeIndex,
     _nodeToEdgeIds,
-    (_0x17881d, _0x212aad, _0x535ac4) =>
-      _renderEdgesByIds(
-        _0x1f858c,
-        _0x17881d,
-        _0x535ac4.edges || {},
-        _0x212aad,
-        _0x535ac4.viewport,
-        _0x290e05,
-      ),
+    (value116, value117, value118) =>
+      _renderEdgesByIds(value111, value116, value118.edges || {}, value117, value118.viewport, el16),
   );
-  function _0xf2ac69(_0x2c0ce5) {
-    const _0x7a22ce =
-        typeof _0x2c0ce5._nodeCount === 'number'
-          ? _0x2c0ce5._nodeCount
-          : Object.keys(_0x2c0ce5.nodes || {}).length,
-      _0x3dddde = typeof _0x2c0ce5._edgesRev === 'number' ? _0x2c0ce5._edgesRev : 0,
-      _0x235422 = _0x3dddde !== _0x749f98;
-    (_0x7a22ce !== _0x4d6a84 || _0x235422) &&
-      ((_0x4d6a84 = _0x7a22ce),
-      (_0x749f98 = _0x3dddde),
-      _cleanupNodes(_0x50065c, _0x2c0ce5.nodes),
-      _cleanupEdges(_0x1f858c, _0x2c0ce5.edges));
-    _ensureEdgeIndex(_0x2c0ce5.edges, _0x3dddde);
-    const _0x13c2e0 =
-        _0x2c0ce5.ui?.selectionRelatedHighlightEnabled === false
+  function run5(nodes) {
+    const value119 =
+        typeof nodes._nodeCount === 'number' ? nodes._nodeCount : Object.keys(nodes.nodes || {}).length,
+      edgesRev = typeof nodes._edgesRev === 'number' ? nodes._edgesRev : 0,
+      value120 = edgesRev !== value114;
+    (value119 !== value113 || value120) &&
+      ((value113 = value119),
+      (value114 = edgesRev),
+      _cleanupNodes(el17, nodes.nodes),
+      _cleanupEdges(value111, nodes.edges));
+    _ensureEdgeIndex(nodes.edges, edgesRev);
+    const relatedEdgeIds2 =
+        nodes.ui?.selectionRelatedHighlightEnabled === false
           ? { relatedNodeIds: new Set(), relatedEdgeIds: new Set() }
-          : _buildSelectionRelatedSets(_0x2c0ce5.selectedNodeIds, _0x2c0ce5.edges),
-      _0x43f35b = _normalizeSelectionRelatedHighlightColor(_0x2c0ce5.ui?.selectionRelatedHighlightColor),
-      _0x2685db = _rendererInteractionGrace.getRemainingMs(),
-      { hasPendingStructuralOps: _0x2a2a80, deferredParkCount: deferredParkCount = 0 } = _renderNodes(
-        _0x50065c,
-        _0x2c0ce5.nodes,
-        _0x2c0ce5.selectedNodeIds,
-        _0x13c2e0.relatedNodeIds,
-        _0x43f35b,
-        _0x2c0ce5.connOverlay,
-        _0x2c0ce5.pickConnectMode,
-        _0x2c0ce5.viewport,
-        _0x2c0ce5.edges,
-        _0x2c0ce5._parentToChildren,
-        _0x2c0ce5.ui && typeof _0x2c0ce5.ui.showVideoMeta === 'boolean' ? _0x2c0ce5.ui.showVideoMeta : false,
-        _0x2c0ce5,
-        { deferParking: _0x2685db > 0 },
+          : _buildSelectionRelatedSets(nodes.selectedNodeIds, nodes.edges),
+      _normalizeSelectionRelatedHighlightColor2 = _normalizeSelectionRelatedHighlightColor(
+        nodes.ui?.selectionRelatedHighlightColor,
       ),
-      _0x59e95d = _0x2c0ce5.edges || {},
-      _0x1ba630 = _getEdgeEntries(_0x59e95d, _0x3dddde),
-      _0x4e5a6f = _0x1ba630.length,
-      _0x25b848 = document.documentElement,
-      _0x16131c = _0x4e5a6f >= MANY_EDGES_THRESHOLD;
-    if (_0x16131c)
-      !_0x25b848.classList.contains('has-many-edges') && _0x25b848.classList.add('has-many-edges');
-    else _0x25b848.classList.contains('has-many-edges') && _0x25b848.classList.remove('has-many-edges');
-    const _0x5e2ea0 = getDragContext(),
-      _0x48ab70 = _resolveDragRenderOffset(_0x2c0ce5, _0x5e2ea0),
-      _0x5a8d94 = _0x2c0ce5.ui?.connectionLinesVisible !== false,
-      _0x3d603d = normalizeConnectionLineStyle(_0x2c0ce5.ui?.connectionLineStyle);
-    let _0x520f4c = null,
-      _0x10ffa1 = '',
-      _0x482a3d = null;
-    function _0x441927() {
-      if (!_0x16131c) return '';
-      if (!_0x10ffa1)
-        _0x10ffa1 = getCachedEdgeGeometrySignature(_0x1ba630, _0x2c0ce5.nodes, {
-          edgesRev: _0x3dddde,
+      deferParking = _rendererInteractionGrace.getRemainingMs(),
+      { hasPendingStructuralOps: hasPendingStructuralOps, deferredParkCount: deferredParkCount = 0 } =
+        _renderNodes(
+          el17,
+          nodes.nodes,
+          nodes.selectedNodeIds,
+          relatedEdgeIds2.relatedNodeIds,
+          _normalizeSelectionRelatedHighlightColor2,
+          nodes.connOverlay,
+          nodes.pickConnectMode,
+          nodes.viewport,
+          nodes.edges,
+          nodes._parentToChildren,
+          nodes.ui && typeof nodes.ui.showVideoMeta === 'boolean' ? nodes.ui.showVideoMeta : false,
+          nodes,
+          { deferParking: deferParking > 0 },
+        ),
+      value121 = nodes.edges || {},
+      edgeEntries = _getEdgeEntries(value121, edgesRev),
+      value122 = edgeEntries.length,
+      el25 = document.documentElement,
+      enabled28 = value122 >= MANY_EDGES_THRESHOLD;
+    if (enabled28) !el25.classList.contains('has-many-edges') && el25.classList.add('has-many-edges');
+    else el25.classList.contains('has-many-edges') && el25.classList.remove('has-many-edges');
+    const dragContext2 = getDragContext(),
+      dragOffsetCtx = _resolveDragRenderOffset(nodes, dragContext2),
+      enabled29 = nodes.ui?.connectionLinesVisible !== false,
+      edgePathStyle = normalizeConnectionLineStyle(nodes.ui?.connectionLineStyle);
+    let containerW2 = null,
+      cachedEdgeGeometrySignature = '',
+      cachedEdgeVisibilityIndex = null;
+    function geometrySignature() {
+      if (!enabled28) return '';
+      if (!cachedEdgeGeometrySignature)
+        cachedEdgeGeometrySignature = getCachedEdgeGeometrySignature(edgeEntries, nodes.nodes, {
+          edgesRev: edgesRev,
           geometryRev: 0,
         });
-      return _0x10ffa1;
+      return cachedEdgeGeometrySignature;
     }
-    function _0x3def62() {
-      if (!_0x5a8d94 || !_0x16131c) return null;
-      if (!_0x482a3d)
-        _0x482a3d = getCachedEdgeVisibilityIndex(_0x1ba630, _0x2c0ce5.nodes, {
-          edgesRev: _0x3dddde,
+    function edgeVisibilityIndex() {
+      if (!enabled29 || !enabled28) return null;
+      if (!cachedEdgeVisibilityIndex)
+        cachedEdgeVisibilityIndex = getCachedEdgeVisibilityIndex(edgeEntries, nodes.nodes, {
+          edgesRev: edgesRev,
           geometryRev: 0,
-          geometrySignature: _0x441927(),
+          geometrySignature: geometrySignature(),
         });
-      return _0x482a3d;
+      return cachedEdgeVisibilityIndex;
     }
-    function _0x24c487(_0x3c8bf7 = false) {
-      !_0x520f4c && (_0x520f4c = _getEdgeContainerSize(_0x290e05));
-      const _0x36b56a = buildFullEdgeRenderSignature({
-        edgeEntries: _0x1ba630,
-        nodes: _0x2c0ce5.nodes,
-        viewport: _0x2c0ce5.viewport,
-        dragOffsetCtx: _0x48ab70,
-        relatedEdgeIds: _0x13c2e0.relatedEdgeIds,
-        containerW: _0x520f4c.containerW,
-        containerH: _0x520f4c.containerH,
-        edgesRev: _0x3dddde,
+    function run6(enabled30 = false) {
+      !containerW2 && (containerW2 = _getEdgeContainerSize(el16));
+      const renderSignature = buildFullEdgeRenderSignature({
+        edgeEntries: edgeEntries,
+        nodes: nodes.nodes,
+        viewport: nodes.viewport,
+        dragOffsetCtx: dragOffsetCtx,
+        relatedEdgeIds: relatedEdgeIds2.relatedEdgeIds,
+        containerW: containerW2.containerW,
+        containerH: containerW2.containerH,
+        edgesRev: edgesRev,
         geometryRev: 0,
-        geometrySignature: _0x441927(),
-        edgePathStyle: _0x3d603d,
+        geometrySignature: geometrySignature(),
+        edgePathStyle: edgePathStyle,
       });
-      if (!_0x3c8bf7 && _0x36b56a === _lastFullEdgeRenderSignature) return null;
+      if (!enabled30 && renderSignature === _lastFullEdgeRenderSignature) return null;
       return {
-        containerSize: _0x520f4c,
-        renderSignature: _0x36b56a,
-        geometryRevisionKey: 'edges:' + _0x3dddde + ':geometry:0',
-        pathStyle: _0x3d603d,
+        containerSize: containerW2,
+        renderSignature: renderSignature,
+        geometryRevisionKey: 'edges:' + edgesRev + ':geometry:0',
+        pathStyle: edgePathStyle,
       };
     }
-    if (!_0x5a8d94) _clearRenderedEdges(_0x1f858c);
+    if (!enabled29) _clearRenderedEdges(value111);
     else {
-      if (_0x235422) {
-        if (_0x235422) _ensureEdgeIndex(_0x2c0ce5.edges, _0x3dddde);
-        const _0x333363 = _0x24c487(true);
+      if (value120) {
+        if (value120) _ensureEdgeIndex(nodes.edges, edgesRev);
+        const args2 = run6(true);
         _renderEdges(
-          _0x1f858c,
-          _0x59e95d,
-          _0x2c0ce5.nodes,
-          _0x2c0ce5.viewport,
-          _0x290e05,
-          _0x48ab70,
-          _0x13c2e0.relatedEdgeIds,
-          _0x1ba630,
+          value111,
+          value121,
+          nodes.nodes,
+          nodes.viewport,
+          el16,
+          dragOffsetCtx,
+          relatedEdgeIds2.relatedEdgeIds,
+          edgeEntries,
           'edges-rev-changed',
-          { ..._0x333363, edgeVisibilityIndex: _0x3def62() },
+          { ...args2, edgeVisibilityIndex: edgeVisibilityIndex() },
         );
       } else {
-        if (_0x5e2ea0.isDragging) {
-          _ensureEdgeIndex(_0x2c0ce5.edges, _0x3dddde);
-          const _0x2e7dff = _0x48ab70?.movedNodeIds || _collectMovedNodeIds(_0x2c0ce5, _0x5e2ea0),
-            _0x487924 = new Set();
-          for (const _0x245de3 of _0x2e7dff) {
-            const _0xfc2fb7 = _nodeToEdgeIds.get(_0x245de3);
-            if (!_0xfc2fb7) continue;
-            for (const _0xcfe92d of _0xfc2fb7) _0x487924.add(_0xcfe92d);
+        if (dragContext2.isDragging) {
+          _ensureEdgeIndex(nodes.edges, edgesRev);
+          const enabled31 = dragOffsetCtx?.movedNodeIds || _collectMovedNodeIds(nodes, dragContext2),
+            value123 = new Set();
+          for (const value124 of enabled31) {
+            const enabled32 = _nodeToEdgeIds.get(value124);
+            if (!enabled32) continue;
+            for (const value125 of enabled32) value123.add(value125);
           }
-          if (_0x487924.size > 0)
+          if (value123.size > 0)
             _renderEdgesByIds(
-              _0x1f858c,
-              _0x487924,
-              _0x59e95d,
-              _0x2c0ce5.nodes,
-              _0x2c0ce5.viewport,
-              _0x290e05,
-              _0x48ab70,
-              _0x13c2e0.relatedEdgeIds,
-              { containerSize: _0x520f4c || null, pathStyle: _0x3d603d },
+              value111,
+              value123,
+              value121,
+              nodes.nodes,
+              nodes.viewport,
+              el16,
+              dragOffsetCtx,
+              relatedEdgeIds2.relatedEdgeIds,
+              { containerSize: containerW2 || null, pathStyle: edgePathStyle },
             );
           else {
-            if (!_0x2e7dff || _0x2e7dff.size === 0) {
-              const _0x34ea0c = _0x24c487(false);
-              _0x34ea0c &&
+            if (!enabled31 || enabled31.size === 0) {
+              const args3 = run6(false);
+              args3 &&
                 _renderEdges(
-                  _0x1f858c,
-                  _0x59e95d,
-                  _0x2c0ce5.nodes,
-                  _0x2c0ce5.viewport,
-                  _0x290e05,
-                  _0x48ab70,
-                  _0x13c2e0.relatedEdgeIds,
-                  _0x1ba630,
+                  value111,
+                  value121,
+                  nodes.nodes,
+                  nodes.viewport,
+                  el16,
+                  dragOffsetCtx,
+                  relatedEdgeIds2.relatedEdgeIds,
+                  edgeEntries,
                   'drag-related-edges-unavailable',
-                  { ..._0x34ea0c, edgeVisibilityIndex: _0x3def62() },
+                  { ...args3, edgeVisibilityIndex: edgeVisibilityIndex() },
                 );
             }
           }
         } else {
-          const _0x3b376f = _0x24c487(false);
-          _0x3b376f &&
+          const args4 = run6(false);
+          args4 &&
             _renderEdges(
-              _0x1f858c,
-              _0x59e95d,
-              _0x2c0ce5.nodes,
-              _0x2c0ce5.viewport,
-              _0x290e05,
-              _0x48ab70,
-              _0x13c2e0.relatedEdgeIds,
-              _0x1ba630,
+              value111,
+              value121,
+              nodes.nodes,
+              nodes.viewport,
+              el16,
+              dragOffsetCtx,
+              relatedEdgeIds2.relatedEdgeIds,
+              edgeEntries,
               'steady',
-              { ..._0x3b376f, edgeVisibilityIndex: _0x3def62() },
+              { ...args4, edgeVisibilityIndex: edgeVisibilityIndex() },
             );
         }
       }
     }
-    (_renderPicker(_0x496ecf, _0x2c0ce5.picker, _0x1df4a5),
-      _renderSelectionRect(_0x22f85d, _0x2c0ce5.selectionBox),
+    (_renderPicker(el19, nodes.picker, value110),
+      _renderSelectionRect(el23, nodes.selectionBox),
       _renderMultiSelectBox(
-        _0x2882b3,
-        _0x2c0ce5.selectedNodeIds,
-        _0x2c0ce5.nodes,
-        _0x2c0ce5.viewport,
-        _0x2c0ce5.ui?.imageVideoNodeResizeEnabled === true,
+        el21,
+        nodes.selectedNodeIds,
+        nodes.nodes,
+        nodes.viewport,
+        nodes.ui?.imageVideoNodeResizeEnabled === true,
       ),
-      _renderAlignCenterPanel(_0x21dacb, _0x2c0ce5.selectedNodeIds, _0x2c0ce5.nodes, _0x2c0ce5.ui),
-      renderContextMenu(_0xa653f4, _0x2c0ce5.contextMenu),
-      renderPickConnectBanner(_0x8cf9be, _0x2c0ce5.pickConnectMode));
-    if (_0x2a2a80) _0x58868c(getRendererStructuralReconcileDelayMs(_0x7a22ce));
-    else deferredParkCount > 0 && _0x2685db > 0 && _0x58868c(_0x2685db + 16);
+      _renderAlignCenterPanel(el22, nodes.selectedNodeIds, nodes.nodes, nodes.ui),
+      renderContextMenu(el24, nodes.contextMenu),
+      renderPickConnectBanner(el20, nodes.pickConnectMode));
+    if (hasPendingStructuralOps) run4(getRendererStructuralReconcileDelayMs(value119));
+    else deferredParkCount > 0 && deferParking > 0 && run4(deferParking + 16);
   }
-  function _0x19f4ce(_0x4ddc65) {
-    if (!_presentationSubscription.isActive() || !_0x4ddc65) return;
-    const _0x4af397 = isPerfProbeEnabled(),
-      _0x510a2c =
-        _0x4af397 && typeof performance !== 'undefined' && typeof performance.now === 'function'
+  function run2(enabled33) {
+    if (!_presentationSubscription.isActive() || !enabled33) return;
+    const isPerfProbeEnabled2 = isPerfProbeEnabled(),
+      value126 =
+        isPerfProbeEnabled2 && typeof performance !== 'undefined' && typeof performance.now === 'function'
           ? performance.now()
           : 0;
-    let _0xe4fe0d = 'steady';
+    let mode = 'steady';
     try {
-      const _0x6b61ce = getDragContext(),
-        _0x45ab1e = typeof document !== 'undefined' ? document.body?.classList : null,
-        _0xf6e30e = !!_0x45ab1e?.contains?.('is-panning'),
-        _0x5bd547 = !!_0x45ab1e?.contains?.('is-viewport-animating'),
-        _0x1f9623 = !!_0x45ab1e?.contains?.('is-zooming'),
-        _0x462f76 =
-          typeof _0x4ddc65._nodeCount === 'number'
-            ? _0x4ddc65._nodeCount
-            : Object.keys(_0x4ddc65.nodes || {}).length,
-        _0x283810 = typeof _0x4ddc65._edgesRev === 'number' ? _0x4ddc65._edgesRev : 0,
-        _0x41e773 = (_0x6b61ce.isDragging || _0x6b61ce.isDraggingCell) && _0x6b61ce.isCommittingDrag !== true,
-        _0x1a12df = _0x41e773 && (_0x462f76 !== _0x4d6a84 || _0x283810 !== _0x749f98),
-        _0x22fb80 =
-          _0x6b61ce.isPanning || _0x6b61ce.assistPanActive
-            ? getViewportPanPreview() || _0x4ddc65.viewport
-            : _0x4ddc65.viewport;
-      _0x5bd547 ||
-      _0x6b61ce.isPanning ||
-      _0x6b61ce.assistPanActive ||
-      _0xf6e30e ||
-      _0x41e773 ||
-      _0x1f9623 ||
-      _0x1a12df
+      const dragContext3 = getDragContext(),
+        enabled34 = typeof document !== 'undefined' ? document.body?.classList : null,
+        value127 = !!enabled34?.contains?.('is-panning'),
+        value128 = !!enabled34?.contains?.('is-viewport-animating'),
+        value129 = !!enabled34?.contains?.('is-zooming'),
+        value130 =
+          typeof enabled33._nodeCount === 'number'
+            ? enabled33._nodeCount
+            : Object.keys(enabled33.nodes || {}).length,
+        value131 = typeof enabled33._edgesRev === 'number' ? enabled33._edgesRev : 0,
+        value132 =
+          (dragContext3.isDragging || dragContext3.isDraggingCell) && dragContext3.isCommittingDrag !== true,
+        enabled35 = value132 && (value130 !== value113 || value131 !== value114),
+        value133 =
+          dragContext3.isPanning || dragContext3.assistPanActive
+            ? getViewportPanPreview() || enabled33.viewport
+            : enabled33.viewport;
+      value128 ||
+      dragContext3.isPanning ||
+      dragContext3.assistPanActive ||
+      value127 ||
+      value132 ||
+      value129 ||
+      enabled35
         ? _rendererMediaRuntimePreparer.pause()
         : _rendererMediaRuntimePreparer.resume();
-      _renderViewport(_0x50065c, _0x22fb80, _0x4ddc65.ui?.titleFollowsCanvasZoom === true);
-      if (_0x5bd547) {
-        (_rendererInteractionGrace.markBusy(), (_0xe4fe0d = 'viewport-animating'));
-        if (_0x2e6a9c.style.display === 'none') _0x2e6a9c.style.display = '';
-        _0x58868c();
+      _renderViewport(el17, value133, enabled33.ui?.titleFollowsCanvasZoom === true);
+      if (value128) {
+        (_rendererInteractionGrace.markBusy(), (mode = 'viewport-animating'));
+        if (el18.style.display === 'none') el18.style.display = '';
+        run4();
         return;
       }
-      if (_0x6b61ce.isPanning || _0x6b61ce.assistPanActive || _0xf6e30e) {
-        (_rendererInteractionGrace.markBusy(), (_0xe4fe0d = 'panning'));
-        const _0xa4f6ba = performance.now();
-        _0xa4f6ba - _0x50eeb5 > 80 &&
-          ((_0x50eeb5 = _0xa4f6ba), _renderCullingOnly(_0x50065c, _0x4ddc65.nodes, _0x22fb80));
-        if (_0x2e6a9c.style.display === 'none') _0x2e6a9c.style.display = '';
-        _0x58868c();
+      if (dragContext3.isPanning || dragContext3.assistPanActive || value127) {
+        (_rendererInteractionGrace.markBusy(), (mode = 'panning'));
+        const value134 = performance.now();
+        value134 - count5 > 80 && ((count5 = value134), _renderCullingOnly(el17, enabled33.nodes, value133));
+        if (el18.style.display === 'none') el18.style.display = '';
+        run4();
         return;
       }
-      if (_0x41e773 && !_0x1a12df) {
-        (_rendererInteractionGrace.markBusy(), (_0xe4fe0d = 'dragging'));
-        if (_0x2e6a9c.style.display === 'none') _0x2e6a9c.style.display = '';
-        _0x58868c();
+      if (value132 && !enabled35) {
+        (_rendererInteractionGrace.markBusy(), (mode = 'dragging'));
+        if (el18.style.display === 'none') el18.style.display = '';
+        run4();
         return;
       }
-      if (_0x1f9623) {
-        (_rendererInteractionGrace.markBusy(), (_0xe4fe0d = 'zooming'));
-        if (_0x2e6a9c.style.display === 'none') _0x2e6a9c.style.display = '';
-        _0x58868c();
+      if (value129) {
+        (_rendererInteractionGrace.markBusy(), (mode = 'zooming'));
+        if (el18.style.display === 'none') el18.style.display = '';
+        run4();
         return;
       }
-      _0x1a12df
-        ? (_rendererInteractionGrace.markBusy(), (_0xe4fe0d = 'dragging-structural'))
-        : (_0x4e7d6e(), _rendererInteractionGrace.markIdle());
-      if (_0x2e6a9c.style.display === 'none') _0x2e6a9c.style.display = '';
-      (_0xf2ac69(_0x4ddc65),
-        !_0x1a12df && _mediaPresentation.resume());
+      enabled35
+        ? (_rendererInteractionGrace.markBusy(), (mode = 'dragging-structural'))
+        : (run3(), _rendererInteractionGrace.markIdle());
+      if (el18.style.display === 'none') el18.style.display = '';
+      (run5(enabled33), !enabled35 && _mediaPresentation.resume());
     } finally {
-      if (_0x4af397 && typeof performance !== 'undefined' && typeof performance.now === 'function') {
-        const _0x2c6c2a =
-          typeof _0x4ddc65._nodeCount === 'number'
-            ? _0x4ddc65._nodeCount
-            : Object.keys(_0x4ddc65.nodes || {}).length;
+      if (
+        isPerfProbeEnabled2 &&
+        typeof performance !== 'undefined' &&
+        typeof performance.now === 'function'
+      ) {
+        const nodeCount2 =
+          typeof enabled33._nodeCount === 'number'
+            ? enabled33._nodeCount
+            : Object.keys(enabled33.nodes || {}).length;
         recordRenderFrameSample({
-          mode: _0xe4fe0d,
-          durationMs: performance.now() - _0x510a2c,
-          nodeCount: _0x2c6c2a,
-          edgeCount: Object.keys(_0x4ddc65.edges || {}).length,
+          mode: mode,
+          durationMs: performance.now() - value126,
+          nodeCount: nodeCount2,
+          edgeCount: Object.keys(enabled33.edges || {}).length,
           mountedNodeCount: _mountedNodeIds.size,
           parkedNodeCount: _parkedNodeIds.size,
           ..._fastPreviewLayer.getStats(),
@@ -1314,712 +1300,715 @@ export function initRenderer(_0x290e05, _0x50065c, _0x1df4a5) {
       }
     }
   }
-  function _0x40c520(_0x590417) {
-    if (!_0x590417) return false;
-    const _0x5df59e = _currentSnapshot,
-      _0x91f22c = _0x5df59e?.nodes?.[_0x590417];
-    if (!_0x91f22c) return false;
-    const _0x1471f9 = _componentMap.get(_0x590417),
-      _0x4a3aa7 = _wrapperMap.get(_0x590417);
-    if (!_0x1471f9 || typeof _0x1471f9.update !== 'function') return false;
-    if (!_mountedNodeIds.has(_0x590417) || !_0x4a3aa7?.isConnected) return false;
-    const _0x2a7fd3 = new Set(_0x5df59e.selectedNodeIds || []),
-      _0x29bf69 = _0x2a7fd3.has(_0x590417),
-      _0x326567 = _buildSelectionRelatedSets(_0x2a7fd3, _0x5df59e.edges || {}).relatedNodeIds,
-      _0x399d80 = !_0x29bf69 && _0x326567.has(_0x590417),
-      _0x5419a7 = _getIncomingEdgeSignature(_0x590417, _0x5df59e.edges || {}, _0x5df59e.nodes || {}),
-      _0xe60be9 = syncNodeMediaLodMode(_0x4a3aa7, _0x91f22c, _0x5df59e.viewport),
-      _0x44034c = buildRendererNodeSignature({
-        node: _0x91f22c,
-        inEdgeSig: _0x5419a7,
-        pickMode: _0x5df59e.pickConnectMode,
-        isSelected: _0x29bf69,
-        isSelectionRelated: _0x399d80,
-        showVideoMeta: _0x5df59e.ui?.showVideoMeta === true,
-        viewport: _0x5df59e.viewport,
-        mediaLodMode: _0xe60be9,
+  function flushNode(enabled36) {
+    if (!enabled36) return false;
+    const pickMode = _currentSnapshot,
+      node = pickMode?.nodes?.[enabled36];
+    if (!node) return false;
+    const enabled37 = _componentMap.get(enabled36),
+      el26 = _wrapperMap.get(enabled36);
+    if (!enabled37 || typeof enabled37.update !== 'function') return false;
+    if (!_mountedNodeIds.has(enabled36) || !el26?.isConnected) return false;
+    const map4 = new Set(pickMode.selectedNodeIds || []),
+      isSelected = map4.has(enabled36),
+      map5 = _buildSelectionRelatedSets(map4, pickMode.edges || {}).relatedNodeIds,
+      isSelectionRelated = !isSelected && map5.has(enabled36),
+      inEdgeSig = _getIncomingEdgeSignature(enabled36, pickMode.edges || {}, pickMode.nodes || {}),
+      mediaLodMode = syncNodeMediaLodMode(el26, node, pickMode.viewport),
+      rendererNodeSignature = buildRendererNodeSignature({
+        node: node,
+        inEdgeSig: inEdgeSig,
+        pickMode: pickMode.pickConnectMode,
+        isSelected: isSelected,
+        isSelectionRelated: isSelectionRelated,
+        showVideoMeta: pickMode.ui?.showVideoMeta === true,
+        viewport: pickMode.viewport,
+        mediaLodMode: mediaLodMode,
       });
     return (
-      _pendingNodeDataMap.delete(_0x590417),
-      _nodeDataSnapshotMap.set(_0x590417, _0x44034c),
-      _0x1471f9.update(_0x91f22c),
+      _pendingNodeDataMap.delete(enabled36),
+      _nodeDataSnapshotMap.set(enabled36, rendererNodeSignature),
+      enabled37.update(node),
       true
     );
   }
-  function _0x6ea2e9(_0x17ccf4) {
-    const _0x3b1202 = Array.isArray(_0x17ccf4) ? _0x17ccf4 : [_0x17ccf4];
-    let _0x374ef6 = false;
-    for (const _0x3421b6 of new Set(_0x3b1202.filter(Boolean))) {
-      _0x374ef6 = _0x40c520(_0x3421b6) || _0x374ef6;
+  function flushNodes(value135) {
+    const list10 = Array.isArray(value135) ? value135 : [value135];
+    let value136 = false;
+    for (const value137 of new Set(list10.filter(Boolean))) {
+      value136 = flushNode(value137) || value136;
     }
-    return _0x374ef6;
+    return value136;
   }
   typeof window !== 'undefined' &&
     ((window.v2Renderer = window.v2Renderer || {}),
-    Object.assign(window.v2Renderer, { flushNode: _0x40c520, flushNodes: _0x6ea2e9 }));
-  _presentationSubscription.connect(_0x1df4a5);
-  const _0x4830cf = () => {
-      (_presentationSubscription.dispose(),
-        _rendererMediaRuntimePreparer.clear(),
-        _schedulePreparedMediaRuntimeCommit === _schedulePreparedMediaRuntimeCommitForRenderer &&
-          (_schedulePreparedMediaRuntimeCommit = null),
-        _0x4e7d6e(),
-        _containerResizeObserver &&
-          (_containerResizeObserver.disconnect(), (_containerResizeObserver = null)),
-        (_containerResizeHandler = null),
-        (_containerSizeSourceEl = null),
-        _mediaPresentation.clear(),
-        _sourceVideoSlotLifecycle.reset(),
-        _rasterPreviewCoordinator.reset(),
-        _clearRunningTimerState(),
-        _0x2e6a9c?.remove?.(),
-        _0x496ecf?.remove?.(),
-        _0x8cf9be?.remove?.(),
-        _0x2882b3?.remove?.(),
-        _0x21dacb?.remove?.(),
-        _0x22f85d?.remove?.(),
-        _0xa653f4?.remove?.());
-    };
-  _0x4830cf.setPresentationActive = _presentationSubscription.setActive;
-  return _0x4830cf;
+    Object.assign(window.v2Renderer, { flushNode: flushNode, flushNodes: flushNodes }));
+  _presentationSubscription.connect(value110);
+  const value138 = () => {
+    (_presentationSubscription.dispose(),
+      _rendererMediaRuntimePreparer.clear(),
+      _schedulePreparedMediaRuntimeCommit === _schedulePreparedMediaRuntimeCommitForRenderer &&
+        (_schedulePreparedMediaRuntimeCommit = null),
+      run3(),
+      _containerResizeObserver && (_containerResizeObserver.disconnect(), (_containerResizeObserver = null)),
+      (_containerResizeHandler = null),
+      (_containerSizeSourceEl = null),
+      _mediaPresentation.clear(),
+      _sourceVideoSlotLifecycle.reset(),
+      _rasterPreviewCoordinator.reset(),
+      _clearRunningTimerState(),
+      el18?.remove?.(),
+      el19?.remove?.(),
+      el20?.remove?.(),
+      el21?.remove?.(),
+      el22?.remove?.(),
+      el23?.remove?.(),
+      el24?.remove?.());
+  };
+  value138.setPresentationActive = _presentationSubscription.setActive;
+  return value138;
 }
-function _renderViewport(_0x594e4d, _0x4ddaf8, _0x5d47c5 = false) {
-  !_0x594e4d._willChangeSet &&
-    ((_0x594e4d.style.willChange = 'transform'), (_0x594e4d._willChangeSet = true));
-  const _0x63d76f = '0 0';
-  _0x594e4d.style.transformOrigin !== _0x63d76f && (_0x594e4d.style.transformOrigin = _0x63d76f);
-  const _0x3a2b0a =
-    'translate3d(' + _0x4ddaf8.x + 'px, ' + _0x4ddaf8.y + 'px, 0) scale(' + _0x4ddaf8.zoom + ')';
-  (_0x594e4d._lastTransform !== _0x3a2b0a &&
-    ((_0x594e4d.style.transform = _0x3a2b0a), (_0x594e4d._lastTransform = _0x3a2b0a)),
-    _syncZoomCssVars(_0x4ddaf8.zoom, _0x5d47c5));
+function _renderViewport(el27, box2, value139 = false) {
+  !el27._willChangeSet && ((el27.style.willChange = 'transform'), (el27._willChangeSet = true));
+  const value140 = '0 0';
+  el27.style.transformOrigin !== value140 && (el27.style.transformOrigin = value140);
+  const value141 = 'translate3d(' + box2.x + 'px, ' + box2.y + 'px, 0) scale(' + box2.zoom + ')';
+  (el27._lastTransform !== value141 && ((el27.style.transform = value141), (el27._lastTransform = value141)),
+    _syncZoomCssVars(box2.zoom, value139));
 }
 let _lastZoomInv = null,
   _lastZoomInvRaw = null,
   _lastNodeLabelComp = null,
   _lastNodeLabelCompAt = 0;
-function _syncZoomCssVars(_0x591cbb, _0x21e158 = false) {
-  const _0xc7c420 = typeof document !== 'undefined' ? document.documentElement : null;
-  if (!_0xc7c420) return;
-  const _0x223837 = typeof document !== 'undefined' && document && document.body ? document.body : null,
-    _0x15e82a =
+function _syncZoomCssVars(value142, value143 = false) {
+  const el28 = typeof document !== 'undefined' ? document.documentElement : null;
+  if (!el28) return;
+  const el29 = typeof document !== 'undefined' && document && document.body ? document.body : null,
+    value144 =
       typeof performance !== 'undefined' && performance && typeof performance.now === 'function'
         ? performance.now()
         : Date.now(),
-    _0x4da970 = 0.2 + 0.05 * 1.8,
-    _0x264f7a = typeof _0x591cbb === 'number' && isFinite(_0x591cbb) ? _0x591cbb : 1,
-    _0x53d53c = _0x264f7a > 0 ? _0x264f7a : 1,
-    _0x1c257e = Math.min(1 / _0x53d53c, 1 / _0x4da970),
-    _0x5e85b3 = 1 / _0x53d53c,
-    _0x249bbc = _0x264f7a > 0 ? Math.pow(1 / _0x264f7a, 0.35) : 1,
-    _0x5e7f0b = _0x21e158 === true ? Math.min(_0x249bbc, 1.6) : 1;
-  _lastZoomInv !== _0x1c257e &&
-    ((_lastZoomInv = _0x1c257e), _0xc7c420.style.setProperty('--zoom-inv', _0x1c257e));
-  _lastZoomInvRaw !== _0x5e85b3 &&
-    ((_lastZoomInvRaw = _0x5e85b3), _0xc7c420.style.setProperty('--zoom-inv-raw', _0x5e85b3));
-  const _0x3b330d = _0x21e158 === true && !!(_0x223837 && _0x223837.classList.contains('is-zooming'));
-  if (_0x3b330d && _0x15e82a - _lastNodeLabelCompAt < 120 && _lastNodeLabelComp !== null) return;
-  (_lastNodeLabelComp !== _0x5e7f0b &&
-    ((_lastNodeLabelComp = _0x5e7f0b), _0xc7c420.style.setProperty('--node-label-comp', _0x5e7f0b)),
-    (_lastNodeLabelCompAt = _0x15e82a));
+    value145 = 0.2 + 0.05 * 1.8,
+    count6 = typeof value142 === 'number' && isFinite(value142) ? value142 : 1,
+    value146 = count6 > 0 ? count6 : 1,
+    value147 = Math.min(1 / value146, 1 / value145),
+    value148 = 1 / value146,
+    value149 = count6 > 0 ? Math.pow(1 / count6, 0.35) : 1,
+    value150 = value143 === true ? Math.min(value149, 1.6) : 1;
+  _lastZoomInv !== value147 && ((_lastZoomInv = value147), el28.style.setProperty('--zoom-inv', value147));
+  _lastZoomInvRaw !== value148 &&
+    ((_lastZoomInvRaw = value148), el28.style.setProperty('--zoom-inv-raw', value148));
+  const value151 = value143 === true && !!(el29 && el29.classList.contains('is-zooming'));
+  if (value151 && value144 - _lastNodeLabelCompAt < 120 && _lastNodeLabelComp !== null) return;
+  (_lastNodeLabelComp !== value150 &&
+    ((_lastNodeLabelComp = value150), el28.style.setProperty('--node-label-comp', value150)),
+    (_lastNodeLabelCompAt = value144));
 }
-function _buildGroupOutputOrderSignature(_0x587e34, _0xf766e8) {
-  const _0x593bb7 = [],
-    _0xca312d = Array.isArray(_0x587e34?.groupOutputSourceOrder)
-      ? _0x587e34.groupOutputSourceOrder.map((_0x3be72e) => String(_0x3be72e || '').trim()).join('>')
+function _buildGroupOutputOrderSignature(value152, value153) {
+  const list11 = [],
+    value154 = Array.isArray(value152?.groupOutputSourceOrder)
+      ? value152.groupOutputSourceOrder.map((item8) => String(item8 || '').trim()).join('>')
       : '';
-  if (_0xca312d) _0x593bb7.push('global:' + _0xca312d);
-  const _0xef7200 = String(_0xf766e8 || '').trim(),
-    _0x11f6c8 = _0x587e34?.groupOutputSourceOrderByTarget,
-    _0x2071fc =
-      _0xef7200 &&
-      _0x11f6c8 &&
-      typeof _0x11f6c8 === 'object' &&
-      !Array.isArray(_0x11f6c8) &&
-      Array.isArray(_0x11f6c8[_0xef7200])
-        ? _0x11f6c8[_0xef7200].map((_0x337d14) => String(_0x337d14 || '').trim()).join('>')
+  if (value154) list11.push('global:' + value154);
+  const value155 = String(value153 || '').trim(),
+    value156 = value152?.groupOutputSourceOrderByTarget,
+    value157 =
+      value155 &&
+      value156 &&
+      typeof value156 === 'object' &&
+      !Array.isArray(value156) &&
+      Array.isArray(value156[value155])
+        ? value156[value155].map((item9) => String(item9 || '').trim()).join('>')
         : '';
-  if (_0x2071fc) _0x593bb7.push('target:' + _0x2071fc);
-  return _0x593bb7.join('|');
+  if (value157) list11.push('target:' + value157);
+  return list11.join('|');
 }
-function _getIncomingEdgeSignature(_0x191098, _0x482106, _0x4f85db) {
-  const _0x225564 = [],
-    _0x5818ad = String(_0x4f85db?.[_0x191098]?.parentId || '').trim(),
-    _0x45dae7 = [['direct', _0x191098]];
-  if (_0x5818ad && isNodeType(_0x4f85db?.[_0x5818ad], 'group'))
-    _0x45dae7.push(['shared:' + _0x5818ad, _0x5818ad]);
-  for (const [_0x30ad1c, _0x5de252] of _0x45dae7) {
-    for (const _0x8d8b26 of _incomingEdgeIdsByTarget.get(_0x5de252) || []) {
-      const _0xdf1f60 = _0x482106?.[_0x8d8b26];
-      if (!_0xdf1f60 || _0xdf1f60.targetId !== _0x5de252) continue;
-      const _0x59e089 = _0x4f85db?.[_0xdf1f60.sourceId],
-        _0x462779 = typeof _0x59e089?._bizRev === 'number' ? _0x59e089._bizRev : 0,
-        _0x1778a2 = String(_0xdf1f60.refSlot || ''),
-        _0x1f66c6 = _buildGroupOutputOrderSignature(_0xdf1f60, _0x191098);
-      _0x225564.push(
-        _0x30ad1c +
+function _getIncomingEdgeSignature(value158, value159, value160) {
+  const list12 = [],
+    value161 = String(value160?.[value158]?.parentId || '').trim(),
+    list13 = [['direct', value158]];
+  if (value161 && isNodeType(value160?.[value161], 'group')) list13.push(['shared:' + value161, value161]);
+  for (const [value162, value163] of list13) {
+    for (const value164 of _incomingEdgeIdsByTarget.get(value163) || []) {
+      const enabled38 = value159?.[value164];
+      if (!enabled38 || enabled38.targetId !== value163) continue;
+      const value165 = value160?.[enabled38.sourceId],
+        value166 = typeof value165?._bizRev === 'number' ? value165._bizRev : 0,
+        value167 = String(enabled38.refSlot || ''),
+        _buildGroupOutputOrderSignature2 = _buildGroupOutputOrderSignature(enabled38, value158);
+      list12.push(
+        value162 +
           ':' +
-          _0xdf1f60.id +
+          enabled38.id +
           ':' +
-          _0xdf1f60.sourceId +
+          enabled38.sourceId +
           ':' +
-          _0x1778a2 +
+          value167 +
           ':' +
-          _0x462779 +
+          value166 +
           ':' +
-          buildGroupOutputMembershipSignature(_0x59e089, _0x4f85db) +
+          buildGroupOutputMembershipSignature(value165, value160) +
           ':' +
-          _0x1f66c6,
+          _buildGroupOutputOrderSignature2,
       );
     }
   }
-  return _0x225564.join(',');
+  return list12.join(',');
 }
 function isRendererMediaRuntimeInteractionPriority({
-  nodeId: _0x2ac779,
-  isSelected: _0x1304fc,
-  isSelectionRelated: _0x518052,
-  dragTargets: _0x20474f,
-  connOverlay: _0x1d5f76,
-  pickMode: _0x11ee59,
+  nodeId: nodeId2,
+  isSelected: isSelected2,
+  isSelectionRelated: isSelectionRelated2,
+  dragTargets: dragTargets,
+  connOverlay: connOverlay2,
+  pickMode: pickMode2,
 } = {}) {
-  if (!_0x2ac779) return false;
+  if (!nodeId2) return false;
   return !!(
-    _0x1304fc ||
-    _0x518052 ||
-    _0x20474f?.has?.(_0x2ac779) ||
-    _0x1d5f76?.srcId === _0x2ac779 ||
-    _0x1d5f76?.hoverId === _0x2ac779 ||
-    _0x11ee59?.sourceNodeId === _0x2ac779 ||
-    _0x11ee59?.hoverNodeId === _0x2ac779
+    isSelected2 ||
+    isSelectionRelated2 ||
+    dragTargets?.has?.(nodeId2) ||
+    connOverlay2?.srcId === nodeId2 ||
+    connOverlay2?.hoverId === nodeId2 ||
+    pickMode2?.sourceNodeId === nodeId2 ||
+    pickMode2?.hoverNodeId === nodeId2
   );
 }
-function _collectExactVisiblePreviewNodeIds(_0x757360) {
-  const _0x2f95be = _0x757360?.querySelector?.('.v2-fast-preview-layer');
-  if (!_0x2f95be) return new Set();
-  const _0x5a6e6a = new Set();
-  for (const _0x2896ea of _0x2f95be.children || []) {
-    const _0x4d10f5 = String(_0x2896ea?.dataset?.nodeId || '').trim();
-    if (_0x4d10f5 && _0x2896ea?.dataset?.hasMedia === '1') _0x5a6e6a.add(_0x4d10f5);
+function _collectExactVisiblePreviewNodeIds(canvasEl) {
+  const el30 = canvasEl?.querySelector?.('.v2-fast-preview-layer');
+  if (!el30) return new Set();
+  const value168 = new Set();
+  for (const el31 of el30.children || []) {
+    const value169 = String(el31?.dataset?.nodeId || '').trim();
+    if (value169 && el31?.dataset?.hasMedia === '1') value168.add(value169);
   }
-  return _0x5a6e6a;
+  return value168;
 }
-function _registerNodeRuntime(_0x16d9df) {
-  if (!_0x16d9df?.nodeId || !_0x16d9df.wrapperEl || !_0x16d9df.instance) return null;
-  const _0x47bac9 = document.getElementById(_0x16d9df.nodeId);
+function _registerNodeRuntime(enabled39) {
+  if (!enabled39?.nodeId || !enabled39.wrapperEl || !enabled39.instance) return null;
+  const el32 = document.getElementById(enabled39.nodeId);
   return (
-    _0x47bac9 &&
-      _0x47bac9 !== _0x16d9df.wrapperEl &&
-      !_wrapperMap.has(_0x16d9df.nodeId) &&
-      _0x47bac9.remove(),
-    _componentMap.set(_0x16d9df.nodeId, _0x16d9df.instance),
-    _wrapperMap.set(_0x16d9df.nodeId, _0x16d9df.wrapperEl),
-    _nodeTypeSnapshotMap.set(_0x16d9df.nodeId, _0x16d9df.canonicalType),
-    _0x16d9df
+    el32 && el32 !== enabled39.wrapperEl && !_wrapperMap.has(enabled39.nodeId) && el32.remove(),
+    _componentMap.set(enabled39.nodeId, enabled39.instance),
+    _wrapperMap.set(enabled39.nodeId, enabled39.wrapperEl),
+    _nodeTypeSnapshotMap.set(enabled39.nodeId, enabled39.canonicalType),
+    enabled39
   );
 }
-function _createNodeRuntime(_0x5ab9e4, _0x517b31, _0x1764c9, _0x1e0288, _0x143163, _0x30241c = {}) {
+function _createNodeRuntime(
+  node2,
+  selectedNodeSet,
+  selectedNodeRankMap,
+  dragContext4,
+  dragTargets2,
+  options3 = {},
+) {
   return _registerNodeRuntime(
     prepareRendererNodeRuntime({
-      node: _0x5ab9e4,
-      selectedNodeSet: _0x517b31,
-      selectedNodeRankMap: _0x1764c9,
-      dragContext: _0x1e0288,
-      dragTargets: _0x143163,
-      options: _0x30241c,
+      node: node2,
+      selectedNodeSet: selectedNodeSet,
+      selectedNodeRankMap: selectedNodeRankMap,
+      dragContext: dragContext4,
+      dragTargets: dragTargets2,
+      options: options3,
     }),
   );
 }
-function _ensureVideoMetaEl(_0x2109a3, _0x38759a) {
-  if (!_0x2109a3.__v2_video_meta_el) {
-    const _0x296c63 = document.createElement('div');
-    ((_0x296c63.className = 'node-video-meta'),
-      (_0x296c63.dataset.nodeId = _0x38759a),
-      (_0x296c63.dataset.visible = '0'),
-      (_0x296c63.textContent = ''),
-      _0x2109a3.appendChild(_0x296c63),
-      (_0x2109a3.__v2_video_meta_el = _0x296c63));
+function _ensureVideoMetaEl(el33, value170) {
+  if (!el33.__v2_video_meta_el) {
+    const el34 = document.createElement('div');
+    ((el34.className = 'node-video-meta'),
+      (el34.dataset.nodeId = value170),
+      (el34.dataset.visible = '0'),
+      (el34.textContent = ''),
+      el33.appendChild(el34),
+      (el33.__v2_video_meta_el = el34));
   }
 }
 function _syncMountedNodePresentation({
-  wrapperEl: _0x53b86a,
-  node: _0x285af9,
-  nodeId: _0x47e2c6,
-  selectedNodeSet: _0x3ca6e5,
-  selectedNodeRankMap: _0x2e2368,
-  connOverlay: _0x305df9,
-  pickMode: _0x20dca6,
-  viewport: _0x5a34cc,
-  containerW: _0x1763f5,
-  containerH: _0x4e86ad,
-  dragContext: _0x4c0cb3,
-  dragTargets: _0x1bceab,
-  showVideoMeta: _0xe1b01c,
-  relatedNodeIds: _0x15461b,
-  relatedHighlightColor: _0x7bdab1,
-  inEdgeSig: _0xeb515a,
-  signature: _0x8f9c6c,
+  wrapperEl: wrapperEl,
+  node: node3,
+  nodeId: nodeId3,
+  selectedNodeSet: selectedNodeSet2,
+  selectedNodeRankMap: selectedNodeRankMap2,
+  connOverlay: connOverlay3,
+  pickMode: pickMode3,
+  viewport: viewport2,
+  containerW: containerW3,
+  containerH: containerH2,
+  dragContext: dragContext5,
+  dragTargets: dragTargets3,
+  showVideoMeta: showVideoMeta,
+  relatedNodeIds: relatedNodeIds2,
+  relatedHighlightColor: relatedHighlightColor,
+  inEdgeSig: inEdgeSig2,
+  signature: signature,
   skipInstanceUpdate: skipInstanceUpdate = false,
 }) {
-  const _0x1cdb58 = _0x285af9.x + ',' + _0x285af9.y + ',' + _0x285af9.width + ',' + _0x285af9.height,
-    _0xe71526 = _0x53b86a._posKey !== _0x1cdb58,
-    _0x1f1a12 = _0x4c0cb3?.isDragging && _0x1bceab && _0x1bceab.has(_0x47e2c6),
-    _0x5c4dae = _0x1f1a12 ? (Number.isFinite(_0x4c0cb3.pendingDx) ? _0x4c0cb3.pendingDx : 0) : 0,
-    _0x207507 = _0x1f1a12 ? (Number.isFinite(_0x4c0cb3.pendingDy) ? _0x4c0cb3.pendingDy : 0) : 0,
-    _0x46f8de = _isNodeVisible(_0x285af9, _0x5a34cc, _0x1763f5, _0x4e86ad, _0x5c4dae, _0x207507),
-    _0x2daa30 = _componentMap.get(_0x47e2c6);
-  (syncNodeMediaLodMode(_0x53b86a, _0x285af9, _0x5a34cc), syncNodeMediaMetricsDataset(_0x53b86a, _0x285af9));
-  _0xe71526 &&
-    ((_0x53b86a._posKey = _0x1cdb58),
-    (!_0x1bceab || !_0x1bceab.has(_0x47e2c6)) &&
-      (_0x53b86a.style.transform = 'translate(' + _0x285af9.x + 'px, ' + _0x285af9.y + 'px)'),
-    (_0x53b86a.style.width = _0x285af9.width + 'px'),
-    (_0x53b86a.style.height = _0x285af9.height + 'px'));
-  isNodeType(_0x285af9, ['source-video', 'ai-video']) && _ensureVideoMetaEl(_0x53b86a, _0x47e2c6);
-  _0x4c0cb3.isDragging
-    ? _0x1bceab &&
-      _0x1bceab.has(_0x47e2c6) &&
-      (_0x4c0cb3.hasMoved || !_0x4c0cb3.wasSelectedOnDown) &&
-      _0x53b86a.classList.add('is-ui-hidden')
-    : _0x53b86a.classList.remove('is-ui-hidden');
-  if (!_0x46f8de) {
-    _0x2daa30 &&
-      typeof _0x2daa30.syncSelectionState === 'function' &&
-      _0x2daa30.syncSelectionState({ selected: false, singleSelected: false, visible: false });
-    _syncRunningTimerForNode(_0x47e2c6, null, { hide: true });
-    _0x53b86a.style.display !== 'none' && (_0x53b86a.style.display = 'none');
-    _0x2daa30?.update &&
+  const value171 = node3.x + ',' + node3.y + ',' + node3.width + ',' + node3.height,
+    value172 = wrapperEl._posKey !== value171,
+    value173 = dragContext5?.isDragging && dragTargets3 && dragTargets3.has(nodeId3),
+    value174 = value173 ? (Number.isFinite(dragContext5.pendingDx) ? dragContext5.pendingDx : 0) : 0,
+    value175 = value173 ? (Number.isFinite(dragContext5.pendingDy) ? dragContext5.pendingDy : 0) : 0,
+    _isNodeVisible3 = _isNodeVisible(node3, viewport2, containerW3, containerH2, value174, value175),
+    value176 = _componentMap.get(nodeId3);
+  (syncNodeMediaLodMode(wrapperEl, node3, viewport2), syncNodeMediaMetricsDataset(wrapperEl, node3));
+  value172 &&
+    ((wrapperEl._posKey = value171),
+    (!dragTargets3 || !dragTargets3.has(nodeId3)) &&
+      (wrapperEl.style.transform = 'translate(' + node3.x + 'px, ' + node3.y + 'px)'),
+    (wrapperEl.style.width = node3.width + 'px'),
+    (wrapperEl.style.height = node3.height + 'px'));
+  isNodeType(node3, ['source-video', 'ai-video']) && _ensureVideoMetaEl(wrapperEl, nodeId3);
+  dragContext5.isDragging
+    ? dragTargets3 &&
+      dragTargets3.has(nodeId3) &&
+      (dragContext5.hasMoved || !dragContext5.wasSelectedOnDown) &&
+      wrapperEl.classList.add('is-ui-hidden')
+    : wrapperEl.classList.remove('is-ui-hidden');
+  if (!_isNodeVisible3) {
+    value176 &&
+      typeof value176.syncSelectionState === 'function' &&
+      value176.syncSelectionState({ selected: false, singleSelected: false, visible: false });
+    _syncRunningTimerForNode(nodeId3, null, { hide: true });
+    wrapperEl.style.display !== 'none' && (wrapperEl.style.display = 'none');
+    value176?.update &&
       !skipInstanceUpdate &&
-      _0x8f9c6c !== _nodeDataSnapshotMap.get(_0x47e2c6) &&
-      (_nodeDataSnapshotMap.set(_0x47e2c6, _0x8f9c6c), _0x2daa30.update(_0x285af9));
+      signature !== _nodeDataSnapshotMap.get(nodeId3) &&
+      (_nodeDataSnapshotMap.set(nodeId3, signature), value176.update(node3));
     return;
   }
-  _0x53b86a.style.display === 'none' && (_0x53b86a.style.display = '');
-  const _0x2521ff = _0x3ca6e5.has(_0x47e2c6),
-    _0x4b9702 = !_0x2521ff && _0x15461b?.has(_0x47e2c6),
-    _0x458801 = _0x53b86a.classList.contains('selected');
-  _0x2521ff !== _0x458801 &&
-    (_0x2521ff
-      ? _0x53b86a.classList.add('selected', 'v2-selected')
-      : (_0x53b86a.classList.remove('selected', 'v2-selected'), (_0x53b86a.style.outline = '')));
-  if (_0x4b9702) {
-    _0x53b86a.classList.add('selection-related');
-    const _0x1f4a0e = 'selection-related-color-' + _normalizeSelectionRelatedHighlightColor(_0x7bdab1);
-    for (const _0x290f43 of SELECTION_RELATED_HIGHLIGHT_COLORS) {
-      const _0x3c47f8 = 'selection-related-color-' + _0x290f43;
-      if (_0x3c47f8 !== _0x1f4a0e) _0x53b86a.classList.remove(_0x3c47f8);
+  wrapperEl.style.display === 'none' && (wrapperEl.style.display = '');
+  const isSelected3 = selectedNodeSet2.has(nodeId3),
+    value177 = !isSelected3 && relatedNodeIds2?.has(nodeId3),
+    value178 = wrapperEl.classList.contains('selected');
+  isSelected3 !== value178 &&
+    (isSelected3
+      ? wrapperEl.classList.add('selected', 'v2-selected')
+      : (wrapperEl.classList.remove('selected', 'v2-selected'), (wrapperEl.style.outline = '')));
+  if (value177) {
+    wrapperEl.classList.add('selection-related');
+    const value179 =
+      'selection-related-color-' + _normalizeSelectionRelatedHighlightColor(relatedHighlightColor);
+    for (const value180 of SELECTION_RELATED_HIGHLIGHT_COLORS) {
+      const value181 = 'selection-related-color-' + value180;
+      if (value181 !== value179) wrapperEl.classList.remove(value181);
     }
-    _0x53b86a.classList.add(_0x1f4a0e);
+    wrapperEl.classList.add(value179);
   } else {
-    _0x53b86a.classList.remove('selection-related');
-    for (const _0xbcbee5 of SELECTION_RELATED_HIGHLIGHT_COLORS) {
-      _0x53b86a.classList.remove('selection-related-color-' + _0xbcbee5);
+    wrapperEl.classList.remove('selection-related');
+    for (const value182 of SELECTION_RELATED_HIGHLIGHT_COLORS) {
+      wrapperEl.classList.remove('selection-related-color-' + value182);
     }
   }
   _nodeDetailHydration.isNodeDetailActive({
-    node: _0x285af9,
-    nodeId: _0x47e2c6,
-    isSelected: _0x2521ff,
-    connOverlay: _0x305df9,
-    pickMode: _0x20dca6,
-    relatedNodeIds: _0x15461b,
-  }) && _nodeDetailHydration.hydrateNodeDetails(_0x47e2c6, _0x53b86a);
-  _0x2daa30 &&
-    typeof _0x2daa30.syncSelectionState === 'function' &&
-    _0x2daa30.syncSelectionState({
-      selected: _0x2521ff,
-      singleSelected: _0x3ca6e5.size === 1,
+    node: node3,
+    nodeId: nodeId3,
+    isSelected: isSelected3,
+    connOverlay: connOverlay3,
+    pickMode: pickMode3,
+    relatedNodeIds: relatedNodeIds2,
+  }) && _nodeDetailHydration.hydrateNodeDetails(nodeId3, wrapperEl);
+  value176 &&
+    typeof value176.syncSelectionState === 'function' &&
+    value176.syncSelectionState({
+      selected: isSelected3,
+      singleSelected: selectedNodeSet2.size === 1,
       visible: true,
     });
-  const _0x2a8990 = getRendererNodeZIndex(_0x285af9, _0x2521ff, _0x2e2368?.get?.(_0x47e2c6) ?? -1, {
-    isFocused:
-      typeof document !== 'undefined' &&
-      !!document.activeElement &&
-      _0x53b86a.contains(document.activeElement),
-  });
-  _0x53b86a.style.zIndex !== _0x2a8990 && (_0x53b86a.style.zIndex = _0x2a8990);
-  if (isNodeType(_0x285af9, 'group')) {
-    const _0x1d3b4a = _0x285af9.color || 'var(--indigo)',
-      _0x539dce = _getGroupColorWithOpacity(_0x1d3b4a, '60'),
-      _0x2b7cfa = _getGroupColorWithOpacity(_0x1d3b4a, '05');
-    (_0x53b86a.style.borderColor !== _0x539dce && (_0x53b86a.style.borderColor = _0x539dce),
-      _0x53b86a.style.backgroundColor !== _0x2b7cfa && (_0x53b86a.style.backgroundColor = _0x2b7cfa),
-      _0x53b86a.style.getPropertyValue('--current-group-color') !== _0x1d3b4a &&
-        _0x53b86a.style.setProperty('--current-group-color', _0x1d3b4a));
+  const rendererNodeZIndex = getRendererNodeZIndex(
+    node3,
+    isSelected3,
+    selectedNodeRankMap2?.get?.(nodeId3) ?? -1,
+    {
+      isFocused:
+        typeof document !== 'undefined' &&
+        !!document.activeElement &&
+        wrapperEl.contains(document.activeElement),
+    },
+  );
+  wrapperEl.style.zIndex !== rendererNodeZIndex && (wrapperEl.style.zIndex = rendererNodeZIndex);
+  if (isNodeType(node3, 'group')) {
+    const value183 = node3.color || 'var(--indigo)',
+      _getGroupColorWithOpacity2 = _getGroupColorWithOpacity(value183, '60'),
+      _getGroupColorWithOpacity3 = _getGroupColorWithOpacity(value183, '05');
+    (wrapperEl.style.borderColor !== _getGroupColorWithOpacity2 &&
+      (wrapperEl.style.borderColor = _getGroupColorWithOpacity2),
+      wrapperEl.style.backgroundColor !== _getGroupColorWithOpacity3 &&
+        (wrapperEl.style.backgroundColor = _getGroupColorWithOpacity3),
+      wrapperEl.style.getPropertyValue('--current-group-color') !== value183 &&
+        wrapperEl.style.setProperty('--current-group-color', value183));
   }
-  const _0x55e1ab = _0x53b86a.__v2_name_el,
-    _0x56f00d = normalizeNodeType(_0x285af9.type),
-    _0x2ad267 = _0x55e1ab ? _v2GetNodeLabelKind(_0x56f00d) : '';
-  if (_0x55e1ab) {
-    if (_0x2ad267) {
-      if (_0x55e1ab.dataset.labelKind !== _0x2ad267) _0x55e1ab.dataset.labelKind = _0x2ad267;
-    } else 'labelKind' in _0x55e1ab.dataset && delete _0x55e1ab.dataset.labelKind;
+  const el35 = wrapperEl.__v2_name_el,
+    nodeType = normalizeNodeType(node3.type),
+    labelKind2 = el35 ? _v2GetNodeLabelKind(nodeType) : '';
+  if (el35) {
+    if (labelKind2) {
+      if (el35.dataset.labelKind !== labelKind2) el35.dataset.labelKind = labelKind2;
+    } else 'labelKind' in el35.dataset && delete el35.dataset.labelKind;
   }
-  if (_0x55e1ab && _0x55e1ab.contentEditable !== 'true') {
-    const _0x512d59 = getRendererDefaultNodeLabel(_0x285af9),
-      _0x32876f = hasNodeTypeBetaBadge(_0x56f00d),
-      _0x446a52 = _0x285af9.name || _0x512d59,
-      _0x2ad032 = _v2FormatNodeLabelText(_0x446a52);
-    ((_0x55e1ab.dataset.fullName = _0x446a52),
-      (_0x55e1ab.dataset.isBeta = _0x32876f ? '1' : '0'),
-      _v2ClearNodeLabelTooltip(_0x55e1ab));
-    const _0x2294e3 = _0x55e1ab.querySelector('.node-label-icon'),
-      _0x416a07 = _0x55e1ab.querySelector('.node-label-text'),
-      _0x22b840 = _0x2ad032 || _0x512d59,
-      _0x117f84 = _0x2294e3?.dataset.labelKind || '';
-    (_0x117f84 !== _0x2ad267 ||
-      _0x416a07?.textContent !== _0x22b840 ||
-      (_0x32876f ? _0x55e1ab.dataset.betaLabel !== _0x446a52 : 'betaLabel' in _0x55e1ab.dataset)) &&
-      _v2SetNodeLabelContent(_0x55e1ab, {
-        labelKind: _0x2ad267,
-        displayLabelText: _0x2ad032,
-        defaultName: _0x512d59,
-        isBeta: _0x32876f,
-        fullLabelText: _0x446a52,
+  if (el35 && el35.contentEditable !== 'true') {
+    const defaultName2 = getRendererDefaultNodeLabel(node3),
+      isBeta2 = hasNodeTypeBetaBadge(nodeType),
+      fullLabelText2 = node3.name || defaultName2,
+      displayLabelText2 = _v2FormatNodeLabelText(fullLabelText2);
+    ((el35.dataset.fullName = fullLabelText2),
+      (el35.dataset.isBeta = isBeta2 ? '1' : '0'),
+      _v2ClearNodeLabelTooltip(el35));
+    const el36 = el35.querySelector('.node-label-icon'),
+      el37 = el35.querySelector('.node-label-text'),
+      value184 = displayLabelText2 || defaultName2,
+      value185 = el36?.dataset.labelKind || '';
+    (value185 !== labelKind2 ||
+      el37?.textContent !== value184 ||
+      (isBeta2 ? el35.dataset.betaLabel !== fullLabelText2 : 'betaLabel' in el35.dataset)) &&
+      _v2SetNodeLabelContent(el35, {
+        labelKind: labelKind2,
+        displayLabelText: displayLabelText2,
+        defaultName: defaultName2,
+        isBeta: isBeta2,
+        fullLabelText: fullLabelText2,
       });
   }
-  const _0x47ff1c = _0x53b86a.__v2_timer_el;
-  if (_0x47ff1c) {
-    let _0x2b6769 = '',
-      _0x4a5658 = false;
-    const _0x1b03df = _isResolvedSourceMediaNode(_0x285af9);
-    if (!_0x1b03df && _0x285af9.generationStartTime && _0x285af9.generationDuration == null) {
-      const _0x312e4f = Date.now() - _0x285af9.generationStartTime;
-      ((_0x2b6769 = _formatNodeTimerText(_0x285af9, _0x312e4f)), (_0x4a5658 = true));
+  const el38 = wrapperEl.__v2_timer_el;
+  if (el38) {
+    let _formatNodeTimerText2 = '',
+      value186 = false;
+    const _isResolvedSourceMediaNode2 = _isResolvedSourceMediaNode(node3);
+    if (!_isResolvedSourceMediaNode2 && node3.generationStartTime && node3.generationDuration == null) {
+      const value187 = Date.now() - node3.generationStartTime;
+      ((_formatNodeTimerText2 = _formatNodeTimerText(node3, value187)), (value186 = true));
     } else
-      !_0x1b03df &&
-        typeof _0x285af9.generationDuration === 'number' &&
-        ((_0x2b6769 = _formatNodeTimerText(_0x285af9, _0x285af9.generationDuration)), (_0x4a5658 = true));
-    _0x4a5658
-      ? (_0x47ff1c.textContent !== _0x2b6769 && (_0x47ff1c.textContent = _0x2b6769),
-        (_0x47ff1c.style.color = _0x2521ff ? 'var(--text-primary)' : 'var(--white-40)'),
-        _0x47ff1c.style.display === 'none' && (_0x47ff1c.style.display = ''))
-      : (_0x47ff1c.textContent && (_0x47ff1c.textContent = ''),
-        _0x47ff1c.style.display !== 'none' && (_0x47ff1c.style.display = 'none'));
+      !_isResolvedSourceMediaNode2 &&
+        typeof node3.generationDuration === 'number' &&
+        ((_formatNodeTimerText2 = _formatNodeTimerText(node3, node3.generationDuration)), (value186 = true));
+    value186
+      ? (el38.textContent !== _formatNodeTimerText2 && (el38.textContent = _formatNodeTimerText2),
+        (el38.style.color = isSelected3 ? 'var(--text-primary)' : 'var(--white-40)'),
+        el38.style.display === 'none' && (el38.style.display = ''))
+      : (el38.textContent && (el38.textContent = ''),
+        el38.style.display !== 'none' && (el38.style.display = 'none'));
   }
-  _syncRunningTimerForNode(_0x47e2c6, _0x285af9);
-  const _0x49743a = _0x53b86a.__v2_video_meta_el;
-  if (_0x49743a) {
-    if (!_0xe1b01c) {
-      if (_0x49743a.dataset.visible !== '0') _0x49743a.dataset.visible = '0';
+  _syncRunningTimerForNode(nodeId3, node3);
+  const el39 = wrapperEl.__v2_video_meta_el;
+  if (el39) {
+    if (!showVideoMeta) {
+      if (el39.dataset.visible !== '0') el39.dataset.visible = '0';
     } else {
-      const _0x2f3e46 = Number(_0x285af9.videoFps),
-        _0x43c1f8 = Number(_0x285af9.videoFrameCount),
-        _0x3ac1d9 = Number(_0x285af9.videoWidth),
-        _0x344fdd = Number(_0x285af9.videoHeight),
-        _0x4f3a9f =
-          Number.isFinite(_0x2f3e46) && _0x2f3e46 > 0 && Number.isFinite(_0x43c1f8) && _0x43c1f8 > 0,
-        _0x52b152 = _0x4f3a9f ? '1' : '0';
-      _0x49743a.dataset.visible !== _0x52b152 && (_0x49743a.dataset.visible = _0x52b152);
-      if (_0x4f3a9f) {
-        const _0x12ec03 = formatVideoMetaText({
-          fps: _0x2f3e46,
-          frames: _0x43c1f8,
-          width: _0x3ac1d9,
-          height: _0x344fdd,
+      const fps3 = Number(node3.videoFps),
+        frames2 = Number(node3.videoFrameCount),
+        width3 = Number(node3.videoWidth),
+        height3 = Number(node3.videoHeight),
+        value188 = Number.isFinite(fps3) && fps3 > 0 && Number.isFinite(frames2) && frames2 > 0,
+        value189 = value188 ? '1' : '0';
+      el39.dataset.visible !== value189 && (el39.dataset.visible = value189);
+      if (value188) {
+        const formatVideoMetaText2 = formatVideoMetaText({
+          fps: fps3,
+          frames: frames2,
+          width: width3,
+          height: height3,
         });
-        _0x49743a.textContent !== _0x12ec03 && (_0x49743a.textContent = _0x12ec03);
+        el39.textContent !== formatVideoMetaText2 && (el39.textContent = formatVideoMetaText2);
       }
     }
   }
-  if (_0x2daa30?.update && _0x8f9c6c !== _nodeDataSnapshotMap.get(_0x47e2c6)) {
-    _nodeDataSnapshotMap.set(_0x47e2c6, _0x8f9c6c);
-    if (!skipInstanceUpdate) _0x2daa30.update(_0x285af9);
+  if (value176?.update && signature !== _nodeDataSnapshotMap.get(nodeId3)) {
+    _nodeDataSnapshotMap.set(nodeId3, signature);
+    if (!skipInstanceUpdate) value176.update(node3);
   }
-  const _0xdd60fd = _0x20dca6 && _0x20dca6.active && _0x47e2c6 === _0x20dca6.sourceNodeId,
-    _0x484bb3 = isNodeType(_0x285af9, 'storyboard') && _0x285af9.isEditing;
-  if ((_0x305df9 && _0x305df9.srcId) || _0xdd60fd || _0x484bb3) {
-    if (_0x47e2c6 === _0x305df9?.srcId || _0xdd60fd || _0x484bb3)
-      (_0x53b86a.classList.add('conn-src'), _0x53b86a.classList.remove('conn-invalid'));
+  const value190 = pickMode3 && pickMode3.active && nodeId3 === pickMode3.sourceNodeId,
+    isNodeType2 = isNodeType(node3, 'storyboard') && node3.isEditing;
+  if ((connOverlay3 && connOverlay3.srcId) || value190 || isNodeType2) {
+    if (nodeId3 === connOverlay3?.srcId || value190 || isNodeType2)
+      (wrapperEl.classList.add('conn-src'), wrapperEl.classList.remove('conn-invalid'));
     else
-      _0x305df9?.invalidNodeIds?.includes(_0x47e2c6)
-        ? (_0x53b86a.classList.add('conn-invalid'), _0x53b86a.classList.remove('conn-src'))
-        : _0x53b86a.classList.remove('conn-invalid', 'conn-src');
-  } else _0x53b86a.classList.remove('conn-invalid', 'conn-src');
-  if (_0xdd60fd || _0x484bb3)
-    (_0x53b86a.style.setProperty(
+      connOverlay3?.invalidNodeIds?.includes(nodeId3)
+        ? (wrapperEl.classList.add('conn-invalid'), wrapperEl.classList.remove('conn-src'))
+        : wrapperEl.classList.remove('conn-invalid', 'conn-src');
+  } else wrapperEl.classList.remove('conn-invalid', 'conn-src');
+  if (value190 || isNodeType2)
+    (wrapperEl.style.setProperty(
       'box-shadow',
       '0 0 0 2px var(--white-70), 0 0 20px 0 var(--white-40)',
       'important',
     ),
-      _0x53b86a.style.setProperty('border-radius', '16px', 'important'));
+      wrapperEl.style.setProperty('border-radius', '16px', 'important'));
   else
-    _0x53b86a.style.getPropertyPriority('box-shadow') === 'important' &&
-      (_0x53b86a.style.removeProperty('box-shadow'), _0x53b86a.style.removeProperty('border-radius'));
-  const _0x353b53 = _0x20dca6 && _0x20dca6.active && _0x20dca6.hoverNodeId === _0x47e2c6;
-  if ((_0x305df9 && _0x305df9.hoverId === _0x47e2c6) || _0x353b53) {
-    if (!_0x53b86a.classList.contains('conn-hoverTarget')) {
-      _0x53b86a.classList.add('conn-hoverTarget');
-      const _0x1b4f65 = window.getComputedStyle(_0x53b86a).borderRadius;
-      let _0x454bda = parseFloat(_0x1b4f65);
-      if (isNaN(_0x454bda) || _0x454bda <= 0) _0x454bda = 16;
-      _0x53b86a.style.setProperty('--hover-br', _0x454bda + 4 + 'px');
+    wrapperEl.style.getPropertyPriority('box-shadow') === 'important' &&
+      (wrapperEl.style.removeProperty('box-shadow'), wrapperEl.style.removeProperty('border-radius'));
+  const value191 = pickMode3 && pickMode3.active && pickMode3.hoverNodeId === nodeId3;
+  if ((connOverlay3 && connOverlay3.hoverId === nodeId3) || value191) {
+    if (!wrapperEl.classList.contains('conn-hoverTarget')) {
+      wrapperEl.classList.add('conn-hoverTarget');
+      const value192 = window.getComputedStyle(wrapperEl).borderRadius;
+      let count7 = parseFloat(value192);
+      if (isNaN(count7) || count7 <= 0) count7 = 16;
+      wrapperEl.style.setProperty('--hover-br', count7 + 4 + 'px');
     }
-    let _0x4cbfe0 = false;
-    if (_0x305df9 && _0x305df9.side === 'left') _0x4cbfe0 = true;
-    else _0x353b53 && _0x20dca6 && _0x20dca6.handleDirection === 'left' && (_0x4cbfe0 = true);
-    _0x4cbfe0
-      ? (_0x53b86a.classList.add('conn-hover-output'), _0x53b86a.classList.remove('conn-hover-input'))
-      : (_0x53b86a.classList.add('conn-hover-input'), _0x53b86a.classList.remove('conn-hover-output'));
+    let value193 = false;
+    if (connOverlay3 && connOverlay3.side === 'left') value193 = true;
+    else value191 && pickMode3 && pickMode3.handleDirection === 'left' && (value193 = true);
+    value193
+      ? (wrapperEl.classList.add('conn-hover-output'), wrapperEl.classList.remove('conn-hover-input'))
+      : (wrapperEl.classList.add('conn-hover-input'), wrapperEl.classList.remove('conn-hover-output'));
   } else
-    _0x53b86a.classList.contains('conn-hoverTarget') &&
-      (_0x53b86a.classList.remove('conn-hoverTarget', 'conn-hover-input', 'conn-hover-output'),
-      _0x53b86a.style.removeProperty('--hover-br'));
-  syncNodeResultClass(_0x53b86a, _0x285af9, isNodeType);
+    wrapperEl.classList.contains('conn-hoverTarget') &&
+      (wrapperEl.classList.remove('conn-hoverTarget', 'conn-hover-input', 'conn-hover-output'),
+      wrapperEl.style.removeProperty('--hover-br'));
+  syncNodeResultClass(wrapperEl, node3, isNodeType);
 }
 function _renderNodes(
-  _0x757360,
-  _0x4b355d,
-  _0x37e07e,
-  _0x1677db,
-  _0x4f36a4,
-  _0x54d2e1,
-  _0x28f8b5,
-  _0x5b8986,
-  _0x3020b0,
-  _0xa903ea,
-  _0x353034,
-  _0x3716f9 = null,
-  _0x4730fc = {},
+  canvasEl,
+  nodes2,
+  selectedNodeIds3,
+  relatedNodeIds3,
+  relatedHighlightColor2,
+  connOverlay4,
+  value194,
+  value195,
+  value196,
+  value197,
+  value198,
+  snapshot = null,
+  deferInitialPlanning = {},
 ) {
-  const _0x18682e = _0x28f8b5,
-    _0x676f3a = _0x5b8986 || { x: 0, y: 0, zoom: 1 },
-    _0x543c8d = _0x3020b0 || {},
-    _0x17c51c = _0xa903ea || {},
-    _0x59aa60 = _0x353034 !== false,
-    _0x13d938 = _0x4730fc?.deferParking === true,
-    _0x4adfff = getDragContext(),
-    _0x44e39b = _0x37e07e instanceof Set ? _0x37e07e : new Set(_0x37e07e || []),
-    _0x4037dc = buildSelectedNodeRankMap(_0x37e07e),
-    _0x5987f3 = buildRendererDragTargetSet({
-      dragContext: _0x4adfff,
-      selectedNodeSet: _0x44e39b,
-      parentToChildren: _0x17c51c,
+  const pickConnectMode2 = value194,
+    viewport3 = value195 || { x: 0, y: 0, zoom: 1 },
+    value199 = value196 || {},
+    parentToChildren = value197 || {},
+    showVideoMeta2 = value198 !== false,
+    value200 = deferInitialPlanning?.deferParking === true,
+    dragContext6 = getDragContext(),
+    selectedNodeSet3 = selectedNodeIds3 instanceof Set ? selectedNodeIds3 : new Set(selectedNodeIds3 || []),
+    selectedNodeRankMap3 = buildSelectedNodeRankMap(selectedNodeIds3),
+    activeNodeIds = buildRendererDragTargetSet({
+      dragContext: dragContext6,
+      selectedNodeSet: selectedNodeSet3,
+      parentToChildren: parentToChildren,
     }),
     interactionBusy = _rendererInteractionGrace.isBusy(),
-    { width: _0x460fc9, height: _0x379dc0 } = _getCachedContainerSize(_0x757360.parentElement || _0x757360),
-    _0x3ed32d = Number.isFinite(_0x3716f9?._nodeCount)
-      ? _0x3716f9._nodeCount
-      : Object.keys(_0x4b355d || {}).length,
-    _0x2f4dd1 = Number.isFinite(_0x3716f9?._persistRev) ? _0x3716f9._persistRev : _0x3ed32d,
-    _0x55741a = _getPinnedNodeIds(),
-    _0x4c23a = getCachedRendererSpatialIndex(_0x4b355d, {
-      snapshotRev: _0x2f4dd1,
-      nodeCount: _0x3ed32d,
+    { width: width4, height: height4 } = _getCachedContainerSize(canvasEl.parentElement || canvasEl),
+    nodeCount3 = Number.isFinite(snapshot?._nodeCount)
+      ? snapshot._nodeCount
+      : Object.keys(nodes2 || {}).length,
+    snapshotRev2 = Number.isFinite(snapshot?._persistRev) ? snapshot._persistRev : nodeCount3,
+    pinnedNodeIds3 = _getPinnedNodeIds(),
+    spatialIndex = getCachedRendererSpatialIndex(nodes2, {
+      snapshotRev: snapshotRev2,
+      nodeCount: nodeCount3,
       denseNodeCount: RENDERER_VIRTUALIZATION_CONFIG.denseNodeCount,
     }),
-    _0x3a852d = _buildVirtualizationCandidateSignature({
-      snapshotRev: _0x2f4dd1,
-      nodeCount: _0x3ed32d,
-      viewport: _0x676f3a,
-      selectedNodeIds: _0x37e07e,
-      connOverlay: _0x54d2e1,
-      pickConnectMode: _0x18682e,
-      dragContext: _0x4adfff,
-      pinnedNodeIds: _0x55741a,
-      containerW: _0x460fc9,
-      containerH: _0x379dc0,
+    signature2 = _buildVirtualizationCandidateSignature({
+      snapshotRev: snapshotRev2,
+      nodeCount: nodeCount3,
+      viewport: viewport3,
+      selectedNodeIds: selectedNodeIds3,
+      connOverlay: connOverlay4,
+      pickConnectMode: pickConnectMode2,
+      dragContext: dragContext6,
+      pinnedNodeIds: pinnedNodeIds3,
+      containerW: width4,
+      containerH: height4,
     });
-  let _0x47b692 = _lastVirtualCandidateResult;
-  const _0x2e247e = _0x3a852d === _lastVirtualCandidateSignature && !!_0x47b692;
-  !_0x2e247e &&
-    ((_0x47b692 = buildVirtualizationCandidateSets({
-      nodes: _0x4b355d,
-      spatialIndex: _0x4c23a,
-      viewport: _0x676f3a,
-      containerWidth: _0x460fc9,
-      containerHeight: _0x379dc0,
-      selectedNodeIds: _0x37e07e,
-      connOverlay: _0x54d2e1,
-      pickConnectMode: _0x18682e,
-      dragContext: _0x4adfff,
-      parentToChildren: _0x17c51c,
-      pinnedNodeIds: _0x55741a,
+  let mountCandidateIds = _lastVirtualCandidateResult;
+  const cacheHit = signature2 === _lastVirtualCandidateSignature && !!mountCandidateIds;
+  !cacheHit &&
+    ((mountCandidateIds = buildVirtualizationCandidateSets({
+      nodes: nodes2,
+      spatialIndex: spatialIndex,
+      viewport: viewport3,
+      containerWidth: width4,
+      containerHeight: height4,
+      selectedNodeIds: selectedNodeIds3,
+      connOverlay: connOverlay4,
+      pickConnectMode: pickConnectMode2,
+      dragContext: dragContext6,
+      parentToChildren: parentToChildren,
+      pinnedNodeIds: pinnedNodeIds3,
       mountedNodeIds: _mountedNodeIds,
     })),
-    (_lastVirtualCandidateSignature = _0x3a852d),
-    (_lastVirtualCandidateResult = _0x47b692));
-  const _0x7b5205 = createRendererFramePlan({
-      snapshot: _0x3716f9,
-      nodes: _0x4b355d,
-      viewport: _0x676f3a,
-      containerRect: { width: _0x460fc9, height: _0x379dc0 },
-      nodeCount: _0x3ed32d,
-      geometryRev: _0x2f4dd1,
+    (_lastVirtualCandidateSignature = signature2),
+    (_lastVirtualCandidateResult = mountCandidateIds));
+  const rendererFramePlan = createRendererFramePlan({
+      snapshot: snapshot,
+      nodes: nodes2,
+      viewport: viewport3,
+      containerRect: { width: width4, height: height4 },
+      nodeCount: nodeCount3,
+      geometryRev: snapshotRev2,
     }),
-    _0x2c9a17 = _0x7b5205.buildScenePlan({
-      mountCandidateIds: _0x47b692.mountCandidateIds,
-      previewCandidateIds: _0x47b692.previewCandidateIds,
-      parkCandidateIds: _0x47b692.parkCandidateIds,
-      selectedNodeIds: _0x44e39b,
-      activeNodeIds: _0x5987f3,
-      keepAliveNodeIds: _0x47b692.keepAliveNodeIds,
+    mountCandidateIds2 = rendererFramePlan.buildScenePlan({
+      mountCandidateIds: mountCandidateIds.mountCandidateIds,
+      previewCandidateIds: mountCandidateIds.previewCandidateIds,
+      parkCandidateIds: mountCandidateIds.parkCandidateIds,
+      selectedNodeIds: selectedNodeSet3,
+      activeNodeIds: activeNodeIds,
+      keepAliveNodeIds: mountCandidateIds.keepAliveNodeIds,
       mountedNodeIds: _mountedNodeIds,
       includeParkIds: false,
-      deferInitialPlanning: _0x4730fc?.deferInitialRasterPlanning === true,
+      deferInitialPlanning: deferInitialPlanning?.deferInitialRasterPlanning === true,
     });
-  _0x47b692 = {
-    ..._0x47b692,
-    mountCandidateIds: _0x2c9a17.fullSurfaceIds,
-    previewCandidateIds: _0x2c9a17.presentationSurfaceIds,
-    parkCandidateIds: _0x2c9a17.fullSurfaceReleaseIds,
-    scenePlan: _0x2c9a17,
+  mountCandidateIds = {
+    ...mountCandidateIds,
+    mountCandidateIds: mountCandidateIds2.fullSurfaceIds,
+    previewCandidateIds: mountCandidateIds2.presentationSurfaceIds,
+    parkCandidateIds: mountCandidateIds2.fullSurfaceReleaseIds,
+    scenePlan: mountCandidateIds2,
   };
-  const _0x38c987 = _rasterPreviewCoordinator.sync({
-    canvasEl: _0x757360,
-    nodes: _0x4b355d,
-    scenePlan: _0x2c9a17,
-    selectedNodeIds: _0x44e39b,
-    dragNodeIds: _0x5987f3,
-    connOverlay: _0x54d2e1,
-    pickConnectMode: _0x18682e,
-    viewport: _0x676f3a,
+  const freezeRasterSurface = _rasterPreviewCoordinator.sync({
+    canvasEl: canvasEl,
+    nodes: nodes2,
+    scenePlan: mountCandidateIds2,
+    selectedNodeIds: selectedNodeSet3,
+    dragNodeIds: activeNodeIds,
+    connOverlay: connOverlay4,
+    pickConnectMode: pickConnectMode2,
+    viewport: viewport3,
     viewportBusy: interactionBusy,
-    containerWidth: _0x460fc9,
-    containerHeight: _0x379dc0,
+    containerWidth: width4,
+    containerHeight: height4,
     mediaLoadingBusy: interactionBusy,
     freezeRasterSurface: interactionBusy,
-    lockRasterParticipation: _0x4730fc?.lockRasterParticipation === true,
-    deferInitialPlanning: _0x4730fc?.deferInitialRasterPlanning === true,
-    releaseFullSurface(_0x16bce6) {
-      const _0x47e2c1 = _wrapperMap.get(_0x16bce6);
-      if (!_0x47e2c1?.style || _0x47e2c1.classList?.contains?.('is-dragging')) return;
-      _0x47e2c1.style.display = 'none';
-      _syncRunningTimerForNode(_0x16bce6, null, { hide: true });
+    lockRasterParticipation: deferInitialPlanning?.lockRasterParticipation === true,
+    deferInitialPlanning: deferInitialPlanning?.deferInitialRasterPlanning === true,
+    releaseFullSurface(value201) {
+      const el40 = _wrapperMap.get(value201);
+      if (!el40?.style || el40.classList?.contains?.('is-dragging')) return;
+      el40.style.display = 'none';
+      _syncRunningTimerForNode(value201, null, { hide: true });
     },
   });
   _notifyVirtualizationProbe({
-    signature: _0x3a852d,
-    cacheHit: _0x2e247e,
-    snapshotRev: _0x2f4dd1,
-    containerW: _0x460fc9,
-    containerH: _0x379dc0,
-    spatialIndex: !!_0x4c23a,
-    nodeCount: _0x3ed32d,
-    mountCandidateCount: _0x47b692.mountCandidateIds?.size || 0,
-    previewCandidateCount: _0x47b692.previewCandidateIds?.size || 0,
-    parkCandidateCount: _0x47b692.parkCandidateIds?.size || 0,
-    keepAliveCount: _0x47b692.keepAliveNodeIds?.size || 0,
+    signature: signature2,
+    cacheHit: cacheHit,
+    snapshotRev: snapshotRev2,
+    containerW: width4,
+    containerH: height4,
+    spatialIndex: !!spatialIndex,
+    nodeCount: nodeCount3,
+    mountCandidateCount: mountCandidateIds.mountCandidateIds?.size || 0,
+    previewCandidateCount: mountCandidateIds.previewCandidateIds?.size || 0,
+    parkCandidateCount: mountCandidateIds.parkCandidateIds?.size || 0,
+    keepAliveCount: mountCandidateIds.keepAliveNodeIds?.size || 0,
   });
-  const { mountCandidateIds: _0x186ec4 } = _0x47b692,
-    _0x67f5f0 = _0x38c987.domPreviewCandidateIds || _0x47b692.previewCandidateIds,
-    _0x50ef9a = _0x38c987.domPreviewMediaSourceOwnerIds || new Set(),
-    _0x20fdd9 = new Set([
-      ..._0x50ef9a,
-      ...[..._0x2c9a17.exactVisibleGenerationBusyIds].filter(
-        (_0x162b6a) => !_0x2c9a17.fullSurfaceIds.has(_0x162b6a) || !_mountedNodeIds.has(_0x162b6a),
+  const { mountCandidateIds: mountCandidateIds3 } = mountCandidateIds,
+    isPreviewCandidate = freezeRasterSurface.domPreviewCandidateIds || mountCandidateIds.previewCandidateIds,
+    mediaSourceOwnerIds = freezeRasterSurface.domPreviewMediaSourceOwnerIds || new Set(),
+    requiredImmediateMediaSourceOwnerIds = new Set([
+      ...mediaSourceOwnerIds,
+      ...[...mountCandidateIds2.exactVisibleGenerationBusyIds].filter(
+        (item10) => !mountCandidateIds2.fullSurfaceIds.has(item10) || !_mountedNodeIds.has(item10),
       ),
     ]),
-    _0x41faeb = _0x38c987.releasableFullSurfaceIds || _0x47b692.parkCandidateIds,
-    _0x50e3ad = collectVirtualizedRenderNodes({
-      nodes: _0x4b355d,
-      virtualizationResult: _0x47b692,
-      spatialIndex: _0x4c23a,
+    map6 = freezeRasterSurface.releasableFullSurfaceIds || mountCandidateIds.parkCandidateIds,
+    virtualizedRenderNodes = collectVirtualizedRenderNodes({
+      nodes: nodes2,
+      virtualizationResult: mountCandidateIds,
+      spatialIndex: spatialIndex,
       mountedNodeIds: _mountedNodeIds,
-      viewport: _0x676f3a,
-      containerWidth: _0x460fc9,
-      containerHeight: _0x379dc0,
+      viewport: viewport3,
+      containerWidth: width4,
+      containerHeight: height4,
     }),
-    _0x129f6f = createRendererStructuralBudget(),
-    exactVisiblePreviewNodeIds = _collectExactVisiblePreviewNodeIds(_0x757360);
-  _rendererMediaRuntimePreparer.prune(_0x186ec4);
-  let _0x38ea0f = false,
-    _0x21ef5e = 0,
-    _0x2cc9b8 = null;
-  for (const _0x360a17 of _0x50e3ad) {
-    if (!_0x360a17?.id) continue;
-    const _0x563f60 = _0x360a17.id;
-    let _0x540ac2 = _wrapperMap.get(_0x563f60),
-      _0x2e4456 = _componentMap.get(_0x563f60),
-      _0x52b5ea = false;
-    const _0x16f7d5 = normalizeNodeType(_0x360a17.type),
-      _0x1d267c = _nodeTypeSnapshotMap.get(_0x563f60);
-    _0x540ac2 &&
-      _0x2e4456 &&
-      _0x1d267c &&
-      _0x1d267c !== _0x16f7d5 &&
-      (_destroyNode(_0x563f60), (_0x540ac2 = null), (_0x2e4456 = null));
-    const _0x457bb9 = _0x44e39b.has(_0x563f60),
-      _0x4a3aea = !_0x457bb9 && _0x1677db?.has?.(_0x563f60),
-      _0x9714e9 = _mountedNodeIds.has(_0x563f60) && !!_0x540ac2?.isConnected;
-    _sourceVideoSlotLifecycle.isManagedNode(_0x563f60) &&
-      _sourceVideoSlotLifecycle.syncViewportVisibility(_0x563f60, {
-        isSelected: _0x457bb9,
-        isPreviewCandidate: _0x67f5f0.has(_0x563f60),
-        isVisible: _isNodeVisible(_0x360a17, _0x676f3a, _0x460fc9, _0x379dc0),
+    rendererStructuralBudget = createRendererStructuralBudget(),
+    exactVisiblePreviewNodeIds = _collectExactVisiblePreviewNodeIds(canvasEl);
+  _rendererMediaRuntimePreparer.prune(mountCandidateIds3);
+  let hasPendingStructuralOps2 = false,
+    deferredParkCount2 = 0,
+    enabled40 = null;
+  for (const node4 of virtualizedRenderNodes) {
+    if (!node4?.id) continue;
+    const nodeId4 = node4.id;
+    let wrapperEl2 = _wrapperMap.get(nodeId4),
+      instance = _componentMap.get(nodeId4),
+      deferDetailsOnMount = false;
+    const nodeType2 = normalizeNodeType(node4.type),
+      value202 = _nodeTypeSnapshotMap.get(nodeId4);
+    wrapperEl2 &&
+      instance &&
+      value202 &&
+      value202 !== nodeType2 &&
+      (_destroyNode(nodeId4), (wrapperEl2 = null), (instance = null));
+    const isSelected4 = selectedNodeSet3.has(nodeId4),
+      isSelectionRelated3 = !isSelected4 && relatedNodeIds3?.has?.(nodeId4),
+      enabled41 = _mountedNodeIds.has(nodeId4) && !!wrapperEl2?.isConnected;
+    _sourceVideoSlotLifecycle.isManagedNode(nodeId4) &&
+      _sourceVideoSlotLifecycle.syncViewportVisibility(nodeId4, {
+        isSelected: isSelected4,
+        isPreviewCandidate: isPreviewCandidate.has(nodeId4),
+        isVisible: _isNodeVisible(node4, viewport3, width4, height4),
       });
-    const _0x5227a7 = _sourceVideoSlotLifecycle.shouldRetainPresentedSurface(_0x563f60),
-      _0x1aa0a5 = _0x186ec4.has(_0x563f60) || _0x5227a7 || (_0x9714e9 && !_0x41faeb.has(_0x563f60));
-    let _0x4664c2 = false;
-    if (!_0x1aa0a5) {
-      if (_0x540ac2 && _0x2e4456) {
-        const _0x2c97e4 = _pendingNodeDataMap.get(_0x563f60);
-        (!_0x2c97e4 || _0x2c97e4.node !== _0x360a17) &&
-          _pendingNodeDataMap.set(_0x563f60, { node: _0x360a17, signature: null });
+    const value203 = _sourceVideoSlotLifecycle.shouldRetainPresentedSurface(nodeId4),
+      enabled42 = mountCandidateIds3.has(nodeId4) || value203 || (enabled41 && !map6.has(nodeId4));
+    let value204 = false;
+    if (!enabled42) {
+      if (wrapperEl2 && instance) {
+        const enabled43 = _pendingNodeDataMap.get(nodeId4);
+        (!enabled43 || enabled43.node !== node4) &&
+          _pendingNodeDataMap.set(nodeId4, { node: node4, signature: null });
       }
-      if (_0x9714e9 && _0x41faeb.has(_0x563f60)) {
-        if (_0x13d938) {
-          _0x21ef5e += 1;
+      if (enabled41 && map6.has(nodeId4)) {
+        if (value200) {
+          deferredParkCount2 += 1;
           continue;
         }
-        _0x129f6f.hasBudget() ? (_parkNode(_0x563f60), _0x129f6f.consume()) : (_0x38ea0f = true);
+        rendererStructuralBudget.hasBudget()
+          ? (_parkNode(nodeId4), rendererStructuralBudget.consume())
+          : (hasPendingStructuralOps2 = true);
       }
       continue;
     }
-    if (!_0x2e4456 || !_0x540ac2) {
-      if (!_0x129f6f.hasBudget()) {
-        _0x38ea0f = true;
+    if (!instance || !wrapperEl2) {
+      if (!rendererStructuralBudget.hasBudget()) {
+        hasPendingStructuralOps2 = true;
         continue;
       }
-      _0x52b5ea = _nodeDetailHydration.shouldDeferNodeDetails({
-        node: _0x360a17,
-        nodeId: _0x563f60,
-        isSelected: _0x457bb9,
-        connOverlay: _0x54d2e1,
-        pickMode: _0x18682e,
-        relatedNodeIds: _0x1677db,
-        viewport: _0x676f3a,
-        mountCandidateCount: _0x186ec4.size,
+      deferDetailsOnMount = _nodeDetailHydration.shouldDeferNodeDetails({
+        node: node4,
+        nodeId: nodeId4,
+        isSelected: isSelected4,
+        connOverlay: connOverlay4,
+        pickMode: pickConnectMode2,
+        relatedNodeIds: relatedNodeIds3,
+        viewport: viewport3,
+        mountCandidateCount: mountCandidateIds3.size,
       });
       const deferMediaOnMount =
-          _0x52b5ea ||
+          deferDetailsOnMount ||
           shouldDeferInitialVideoMediaOnMount({
-            node: _0x360a17,
-            nodeId: _0x563f60,
-            isSelected: _0x457bb9,
-            isSelectionRelated: _0x4a3aea,
-            dragTargets: _0x5987f3,
-            nodeCount: _0x3ed32d,
-            mountCandidateCount: _0x186ec4.size,
+            node: node4,
+            nodeId: nodeId4,
+            isSelected: isSelected4,
+            isSelectionRelated: isSelectionRelated3,
+            dragTargets: activeNodeIds,
+            nodeCount: nodeCount3,
+            mountCandidateCount: mountCandidateIds3.size,
           }),
         runtimeOptions = {
-          deferDetailsOnMount: _0x52b5ea,
+          deferDetailsOnMount: deferDetailsOnMount,
           deferMediaOnMount,
           eagerVideoPreviewOnMount: false,
         },
         runtimeVariant = [
-          _0x52b5ea ? 'details-deferred' : 'details-live',
+          deferDetailsOnMount ? 'details-deferred' : 'details-live',
           deferMediaOnMount ? 'media-deferred' : 'media-live',
           'eager-live',
         ].join('|'),
-        hasPreparedRuntime = _rendererMediaRuntimePreparer.hasPrepared(
-          _0x563f60,
-          _0x360a17,
-          runtimeVariant,
-        ),
+        hasPreparedRuntime = _rendererMediaRuntimePreparer.hasPrepared(nodeId4, node4, runtimeVariant),
         interactionPriority = isRendererMediaRuntimeInteractionPriority({
-          nodeId: _0x563f60,
-          isSelected: _0x457bb9,
-          isSelectionRelated: _0x4a3aea,
-          dragTargets: _0x5987f3,
-          connOverlay: _0x54d2e1,
-          pickMode: _0x18682e,
+          nodeId: nodeId4,
+          isSelected: isSelected4,
+          isSelectionRelated: isSelectionRelated3,
+          dragTargets: activeNodeIds,
+          connOverlay: connOverlay4,
+          pickMode: pickConnectMode2,
         }),
         shouldPrebuildRuntime = shouldPrebuildRendererMediaRuntime({
-          node: _0x360a17,
-          nodeCount: _0x3ed32d,
+          node: node4,
+          nodeCount: nodeCount3,
           veryDenseNodeCount: RENDERER_VIRTUALIZATION_CONFIG.veryDenseNodeCount,
-          hasExactVisiblePreview: exactVisiblePreviewNodeIds.has(_0x563f60),
+          hasExactVisiblePreview: exactVisiblePreviewNodeIds.has(nodeId4),
           interactionBusy,
           interactionPriority,
           deferMediaOnMount,
@@ -2028,263 +2017,262 @@ function _renderNodes(
         });
       if (!hasPreparedRuntime && shouldPrebuildRuntime) {
         _rendererMediaRuntimePreparer.enqueue({
-          nodeId: _0x563f60,
-          version: _0x360a17,
+          nodeId: nodeId4,
+          version: node4,
           variant: runtimeVariant,
-          isValid: () =>
-            _currentSnapshot?.nodes?.[_0x563f60] === _0x360a17 && !_componentMap.has(_0x563f60),
+          isValid: () => _currentSnapshot?.nodes?.[nodeId4] === node4 && !_componentMap.has(nodeId4),
           prepare: () =>
             prepareRendererNodeRuntime({
-              node: _0x360a17,
-              selectedNodeSet: _0x44e39b,
-              selectedNodeRankMap: _0x4037dc,
-              dragContext: _0x4adfff,
-              dragTargets: _0x5987f3,
+              node: node4,
+              selectedNodeSet: selectedNodeSet3,
+              selectedNodeRankMap: selectedNodeRankMap3,
+              dragContext: dragContext6,
+              dragTargets: activeNodeIds,
               options: { ...runtimeOptions, prebuildOffscreen: true },
             }),
           dispose: disposePreparedRendererNodeRuntime,
         });
         continue;
       }
-      !hasPreparedRuntime && !shouldPrebuildRuntime && _rendererMediaRuntimePreparer.forget(_0x563f60);
+      !hasPreparedRuntime && !shouldPrebuildRuntime && _rendererMediaRuntimePreparer.forget(nodeId4);
       const preparedRuntime = hasPreparedRuntime
-          ? _rendererMediaRuntimePreparer.take(_0x563f60, _0x360a17, runtimeVariant)
+          ? _rendererMediaRuntimePreparer.take(nodeId4, node4, runtimeVariant)
           : null,
         registeredRuntime = preparedRuntime
           ? _registerNodeRuntime(preparedRuntime)
           : _createNodeRuntime(
-              _0x360a17,
-              _0x44e39b,
-              _0x4037dc,
-              _0x4adfff,
-              _0x5987f3,
+              node4,
+              selectedNodeSet3,
+              selectedNodeRankMap3,
+              dragContext6,
+              activeNodeIds,
               runtimeOptions,
             );
       if (!registeredRuntime) {
         preparedRuntime && disposePreparedRendererNodeRuntime(preparedRuntime);
-        _0x38ea0f = true;
+        hasPendingStructuralOps2 = true;
         continue;
       }
-      ({ wrapperEl: _0x540ac2, instance: _0x2e4456 } = registeredRuntime);
-      (!_0x2cc9b8 && (_0x2cc9b8 = document.createDocumentFragment()),
-        _mountNode(_0x563f60, _0x2cc9b8),
-        (_0x4664c2 = true),
-        _0x129f6f.consume());
+      ({ wrapperEl: wrapperEl2, instance: instance } = registeredRuntime);
+      (!enabled40 && (enabled40 = document.createDocumentFragment()),
+        _mountNode(nodeId4, enabled40),
+        (value204 = true),
+        rendererStructuralBudget.consume());
     } else {
-      if (!_0x9714e9) {
-        if (!_0x129f6f.hasBudget()) {
-          _0x38ea0f = true;
+      if (!enabled41) {
+        if (!rendererStructuralBudget.hasBudget()) {
+          hasPendingStructuralOps2 = true;
           continue;
         }
-        (!_0x2cc9b8 && (_0x2cc9b8 = document.createDocumentFragment()),
-          _mountNode(_0x563f60, _0x2cc9b8),
-          (_0x4664c2 = true),
-          _0x129f6f.consume());
+        (!enabled40 && (enabled40 = document.createDocumentFragment()),
+          _mountNode(nodeId4, enabled40),
+          (value204 = true),
+          rendererStructuralBudget.consume());
       }
     }
-    (_0x4664c2 || _0x540ac2?.dataset?.detailStage === 'deferred') &&
+    (value204 || wrapperEl2?.dataset?.detailStage === 'deferred') &&
       _nodeDetailHydration.syncNodeDetailMountStage({
-        wrapperEl: _0x540ac2,
-        node: _0x360a17,
-        nodeId: _0x563f60,
-        isSelected: _0x457bb9,
-        connOverlay: _0x54d2e1,
-        pickMode: _0x18682e,
-        relatedNodeIds: _0x1677db,
-        viewport: _0x676f3a,
-        mountCandidateCount: _0x186ec4.size,
+        wrapperEl: wrapperEl2,
+        node: node4,
+        nodeId: nodeId4,
+        isSelected: isSelected4,
+        connOverlay: connOverlay4,
+        pickMode: pickConnectMode2,
+        relatedNodeIds: relatedNodeIds3,
+        viewport: viewport3,
+        mountCandidateCount: mountCandidateIds3.size,
         autoHydrate: false,
       });
-    const _0x1f5e15 = _pendingNodeDataMap.get(_0x563f60),
-      _0x7d4a8f = _0x1f5e15?.node || _0x360a17,
-      _0x3abed5 = _getIncomingEdgeSignature(_0x563f60, _0x543c8d, _0x4b355d),
-      _0x593891 = syncNodeMediaLodMode(_0x540ac2, _0x7d4a8f, _0x676f3a),
-      _0x5d2fba = buildRendererNodeSignature({
-        node: _0x7d4a8f,
-        inEdgeSig: _0x3abed5,
-        pickMode: _0x18682e,
-        isSelected: _0x457bb9,
-        isSelectionRelated: _0x4a3aea,
-        showVideoMeta: _0x59aa60,
-        viewport: _0x676f3a,
-        mediaLodMode: _0x593891,
+    const value205 = _pendingNodeDataMap.get(nodeId4),
+      node5 = value205?.node || node4,
+      inEdgeSig3 = _getIncomingEdgeSignature(nodeId4, value199, nodes2),
+      mediaLodMode2 = syncNodeMediaLodMode(wrapperEl2, node5, viewport3),
+      signature3 = buildRendererNodeSignature({
+        node: node5,
+        inEdgeSig: inEdgeSig3,
+        pickMode: pickConnectMode2,
+        isSelected: isSelected4,
+        isSelectionRelated: isSelectionRelated3,
+        showVideoMeta: showVideoMeta2,
+        viewport: viewport3,
+        mediaLodMode: mediaLodMode2,
       });
     (_syncMountedNodePresentation({
-      wrapperEl: _0x540ac2,
-      node: _0x7d4a8f,
-      nodeId: _0x563f60,
-      selectedNodeSet: _0x44e39b,
-      selectedNodeRankMap: _0x4037dc,
-      connOverlay: _0x54d2e1,
-      pickMode: _0x18682e,
-      viewport: _0x676f3a,
-      containerW: _0x460fc9,
-      containerH: _0x379dc0,
-      dragContext: _0x4adfff,
-      dragTargets: _0x5987f3,
-      showVideoMeta: _0x59aa60,
-      relatedNodeIds: _0x1677db,
-      relatedHighlightColor: _0x4f36a4,
-      inEdgeSig: _0x3abed5,
-      signature: _0x5d2fba,
-      skipInstanceUpdate: shouldSkipInitialMediaNodeUpdate(_0x7d4a8f, _0x4664c2),
+      wrapperEl: wrapperEl2,
+      node: node5,
+      nodeId: nodeId4,
+      selectedNodeSet: selectedNodeSet3,
+      selectedNodeRankMap: selectedNodeRankMap3,
+      connOverlay: connOverlay4,
+      pickMode: pickConnectMode2,
+      viewport: viewport3,
+      containerW: width4,
+      containerH: height4,
+      dragContext: dragContext6,
+      dragTargets: activeNodeIds,
+      showVideoMeta: showVideoMeta2,
+      relatedNodeIds: relatedNodeIds3,
+      relatedHighlightColor: relatedHighlightColor2,
+      inEdgeSig: inEdgeSig3,
+      signature: signature3,
+      skipInstanceUpdate: shouldSkipInitialMediaNodeUpdate(node5, value204),
     }),
-      _0x1f5e15 && _pendingNodeDataMap.delete(_0x563f60));
+      value205 && _pendingNodeDataMap.delete(nodeId4));
   }
   return (
-    _flushMountBatch(_0x757360, _0x2cc9b8),
+    _flushMountBatch(canvasEl, enabled40),
     syncRendererFastPreviewAfterNodeRender({
       continuation: _fastPreviewContinuation,
       layer: _fastPreviewLayer,
-      canvasEl: _0x757360,
-      nodes: _0x4b355d,
-      previewCandidateIds: _0x67f5f0,
-      selectedNodeSet: _0x44e39b,
-      candidateSignature: _0x3a852d,
-      hasPendingStructuralOps: _0x38ea0f,
-      connOverlay: _0x54d2e1,
-      pickConnectMode: _0x18682e,
-      nodeCount: _0x3ed32d,
-      viewport: _0x676f3a,
-      containerWidth: _0x460fc9,
-      containerHeight: _0x379dc0,
-      dragContext: _0x4adfff,
-      dragTargets: _0x5987f3,
-      freezeRasterSurface: _0x38c987.freezeActive === true,
-      mediaSourceOwnerIds: _0x50ef9a,
-      requiredImmediateMediaSourceOwnerIds: _0x20fdd9,
+      canvasEl: canvasEl,
+      nodes: nodes2,
+      previewCandidateIds: isPreviewCandidate,
+      selectedNodeSet: selectedNodeSet3,
+      candidateSignature: signature2,
+      hasPendingStructuralOps: hasPendingStructuralOps2,
+      connOverlay: connOverlay4,
+      pickConnectMode: pickConnectMode2,
+      nodeCount: nodeCount3,
+      viewport: viewport3,
+      containerWidth: width4,
+      containerHeight: height4,
+      dragContext: dragContext6,
+      dragTargets: activeNodeIds,
+      freezeRasterSurface: freezeRasterSurface.freezeActive === true,
+      mediaSourceOwnerIds: mediaSourceOwnerIds,
+      requiredImmediateMediaSourceOwnerIds: requiredImmediateMediaSourceOwnerIds,
       viewportBusy: interactionBusy,
       ..._fastPreviewLifecycle.getContinuationOptions(),
     }),
-    { hasPendingStructuralOps: _0x38ea0f, deferredParkCount: _0x21ef5e }
+    { hasPendingStructuralOps: hasPendingStructuralOps2, deferredParkCount: deferredParkCount2 }
   );
 }
-function _cleanupNodes(_0x2ad727, _0x33f0a3) {
-  let _0x5cf419 = false;
-  const _0x27ee49 = new Set(Object.keys(_0x33f0a3 || {})),
-    _0x6d5041 = new Set([
+function _cleanupNodes(el41, value206) {
+  let value207 = false;
+  const map7 = new Set(Object.keys(value206 || {})),
+    value208 = new Set([
       ..._componentMap.keys(),
       ..._wrapperMap.keys(),
       ..._parkedWrapperMap.keys(),
       ..._mountedNodeIds,
       ..._parkedNodeIds,
     ]);
-  for (const _0x1779b4 of _0x6d5041) {
-    !_0x27ee49.has(_0x1779b4) && (_destroyNode(_0x1779b4), (_0x5cf419 = true));
+  for (const value209 of value208) {
+    !map7.has(value209) && (_destroyNode(value209), (value207 = true));
   }
-  _0x2ad727.querySelectorAll('.v2-node').forEach((_0x4ac960) => {
-    const _0x275b36 = _0x4ac960.id || _0x4ac960.dataset.nodeId;
-    _0x275b36 && !_0x27ee49.has(_0x275b36) && (_0x4ac960.remove(), (_0x5cf419 = true));
+  el41.querySelectorAll('.v2-node').forEach((el42) => {
+    const value210 = el42.id || el42.dataset.nodeId;
+    value210 && !map7.has(value210) && (el42.remove(), (value207 = true));
   });
-  if (_0x5cf419) {
-    const _0xdd3304 = document.getElementById('v2-side-plus-holder');
-    _0xdd3304 && _0xdd3304.children.length > 0 && _0xdd3304.replaceChildren();
+  if (value207) {
+    const el43 = document.getElementById('v2-side-plus-holder');
+    el43 && el43.children.length > 0 && el43.replaceChildren();
   }
 }
 function _createSvgLayer() {
-  const _0x555df5 = document.createElement('div');
-  ((_0x555df5.id = 'v2-edges-wrapper'),
-    (_0x555df5.style.position = 'absolute'),
-    (_0x555df5.style.top = '0'),
-    (_0x555df5.style.left = '0'),
-    (_0x555df5.style.width = '100%'),
-    (_0x555df5.style.height = '100%'),
-    (_0x555df5.style.pointerEvents = 'none'),
-    (_0x555df5.style.zIndex = '5'));
-  const _0x546035 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const el44 = document.createElement('div');
+  ((el44.id = 'v2-edges-wrapper'),
+    (el44.style.position = 'absolute'),
+    (el44.style.top = '0'),
+    (el44.style.left = '0'),
+    (el44.style.width = '100%'),
+    (el44.style.height = '100%'),
+    (el44.style.pointerEvents = 'none'),
+    (el44.style.zIndex = '5'));
+  const el45 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   return (
-    (_0x546035.id = 'v2-edges'),
-    (_0x546035.style.overflow = 'visible'),
-    (_0x546035.style.pointerEvents = 'none'),
-    _0x555df5.appendChild(_0x546035),
-    _0x555df5
+    (el45.id = 'v2-edges'),
+    (el45.style.overflow = 'visible'),
+    (el45.style.pointerEvents = 'none'),
+    el44.appendChild(el45),
+    el44
   );
 }
 function _renderEdgesByIds(
-  _0x312e87,
-  _0x28b02b,
-  _0x202f86,
-  _0x40956d,
-  _0x3df112,
-  _0xc99a03,
-  _0x5cb7c4 = null,
-  _0x4d8540 = null,
-  _0x44b1fb = {},
+  svgEl,
+  edgeIds,
+  edges,
+  nodes3,
+  viewport4,
+  containerEl,
+  dragOffsetCtx2 = null,
+  relatedEdgeIds3 = null,
+  options4 = {},
 ) {
-  const _0x394a92 = _edgeLayer.renderPartial({
-    svgEl: _0x312e87,
-    edgeIds: _0x28b02b,
-    edges: _0x202f86,
-    nodes: _0x40956d,
-    viewport: _0x3df112,
-    containerEl: _0xc99a03,
-    dragOffsetCtx: _0x5cb7c4,
-    relatedEdgeIds: _0x4d8540,
-    options: _0x44b1fb,
+  const value211 = _edgeLayer.renderPartial({
+    svgEl: svgEl,
+    edgeIds: edgeIds,
+    edges: edges,
+    nodes: nodes3,
+    viewport: viewport4,
+    containerEl: containerEl,
+    dragOffsetCtx: dragOffsetCtx2,
+    relatedEdgeIds: relatedEdgeIds3,
+    options: options4,
   });
-  if (_0x394a92.mutated) _invalidateFullEdgeRenderSignature();
+  if (value211.mutated) _invalidateFullEdgeRenderSignature();
 }
 function _renderEdges(
-  _0x860ab4,
-  _0x2826c1,
-  _0x57c703,
-  _0x1889f6,
-  _0x248971,
-  _0x5513f2 = null,
-  _0x11154a = null,
-  _0x57c361 = null,
-  _0x1b3c6a = 'steady',
-  _0x4f77a1 = {},
+  svgEl2,
+  edges2,
+  nodes4,
+  viewport5,
+  containerEl2,
+  dragOffsetCtx3 = null,
+  relatedEdgeIds4 = null,
+  edgeEntries2 = null,
+  reason = 'steady',
+  args5 = {},
 ) {
   _edgeLayer.renderFull({
-    svgEl: _0x860ab4,
-    edges: _0x2826c1,
-    nodes: _0x57c703,
-    viewport: _0x1889f6,
-    containerEl: _0x248971,
-    dragOffsetCtx: _0x5513f2,
-    relatedEdgeIds: _0x11154a,
-    edgeEntries: _0x57c361,
-    reason: _0x1b3c6a,
+    svgEl: svgEl2,
+    edges: edges2,
+    nodes: nodes4,
+    viewport: viewport5,
+    containerEl: containerEl2,
+    dragOffsetCtx: dragOffsetCtx3,
+    relatedEdgeIds: relatedEdgeIds4,
+    edgeEntries: edgeEntries2,
+    reason: reason,
     options: {
-      ..._0x4f77a1,
+      ...args5,
       clearedDom: _edgeDomClearedSinceLastFull === true,
     },
   });
-  _0x4f77a1?.renderSignature && (_lastFullEdgeRenderSignature = _0x4f77a1.renderSignature);
+  args5?.renderSignature && (_lastFullEdgeRenderSignature = args5.renderSignature);
   _edgeDomClearedSinceLastFull = false;
 }
-function _clearRenderedEdges(_0x3d7480) {
-  const _0x40a2c2 = _edgeLayer.clearRenderedEdges(_0x3d7480);
-  _0x40a2c2 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true });
+function _clearRenderedEdges(value212) {
+  const count8 = _edgeLayer.clearRenderedEdges(value212);
+  count8 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true });
 }
 function _clearRenderedEdgesFromDocument() {
   if (typeof document === 'undefined') {
     _edgeLayer.reset();
     return;
   }
-  const _0x3be291 = document.getElementById?.('v2-edges');
-  (_0x3be291 && _clearRenderedEdges(_0x3be291),
+  const value213 = document.getElementById?.('v2-edges');
+  (value213 && _clearRenderedEdges(value213),
     document.getElementById?.('v2-draft-edge')?.remove?.(),
-    document.querySelectorAll?.('.v2-edge-thumbnail').forEach((_0x5cec39) => _0x5cec39.remove()),
-    document.querySelectorAll?.('[id^="v2-thumb-"]').forEach((_0xc6b343) => _0xc6b343.remove()));
+    document.querySelectorAll?.('.v2-edge-thumbnail').forEach((el46) => el46.remove()),
+    document.querySelectorAll?.('[id^="v2-thumb-"]').forEach((el47) => el47.remove()));
 }
-function _cleanupEdges(_0xf153b8, _0x38acd6) {
-  const _0x43cb9c = _edgeLayer.cleanupEdges(_0xf153b8, _0x38acd6);
-  (document.querySelectorAll('.v2-edge-thumbnail').forEach((_0x2fa06a) => _0x2fa06a.remove()),
-    document.querySelectorAll('[id^="v2-thumb-"]').forEach((_0x250aad) => _0x250aad.remove()),
-    _0x43cb9c > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true }));
+function _cleanupEdges(value214, value215) {
+  const count9 = _edgeLayer.cleanupEdges(value214, value215);
+  (document.querySelectorAll('.v2-edge-thumbnail').forEach((el48) => el48.remove()),
+    document.querySelectorAll('[id^="v2-thumb-"]').forEach((el49) => el49.remove()),
+    count9 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true }));
 }
-function _renderEdgeThumbnails_REMOVED(_0x2e856d, _0x49371f, _0x1e41eb) {
-  for (const _0x529055 of Object.values(_0x49371f)) {
+function _renderEdgeThumbnails_REMOVED(value216, value217, value218) {
+  for (const value219 of Object.values(value217)) {
   }
 }
 function _createPickerEl() {
-  const _0x1a9480 = document.createElement('div');
+  const el50 = document.createElement('div');
   return (
-    (_0x1a9480.id = 'v2-picker'),
-    (_0x1a9480.dataset.uiStop = '1'),
-    Object.assign(_0x1a9480.style, {
+    (el50.id = 'v2-picker'),
+    (el50.dataset.uiStop = '1'),
+    Object.assign(el50.style, {
       position: 'fixed',
       display: 'none',
       flexDirection: 'column',
@@ -2299,21 +2287,21 @@ function _createPickerEl() {
       zIndex: '1000',
       fontFamily: 'inherit',
     }),
-    _0x1a9480
+    el50
   );
 }
-function _renderPicker(_0x124770, _0xdf7299, _0x27eaaa) {
-  if (!_0xdf7299.visible) {
-    ((_0x124770.style.display = 'none'), _0x124770.replaceChildren());
+function _renderPicker(el51, enabled44, value220) {
+  if (!enabled44.visible) {
+    ((el51.style.display = 'none'), el51.replaceChildren());
     return;
   }
-  ((_0x124770.style.display = 'flex'),
-    (_0x124770.style.left = _0xdf7299.screenX + 'px'),
-    (_0x124770.style.top = _0xdf7299.screenY + 'px'));
-  if (_0x124770.children.length > 0) return;
-  const _0x2a73e5 = document.createElement('div');
-  ((_0x2a73e5.textContent = t('coreUi.renderer.picker.addNode')),
-    Object.assign(_0x2a73e5.style, {
+  ((el51.style.display = 'flex'),
+    (el51.style.left = enabled44.screenX + 'px'),
+    (el51.style.top = enabled44.screenY + 'px'));
+  if (el51.children.length > 0) return;
+  const el52 = document.createElement('div');
+  ((el52.textContent = t('coreUi.renderer.picker.addNode')),
+    Object.assign(el52.style, {
       fontSize: '11px',
       color: 'var(--text-muted)',
       padding: '2px 4px 6px',
@@ -2321,31 +2309,31 @@ function _renderPicker(_0x124770, _0xdf7299, _0x27eaaa) {
       marginBottom: '4px',
       userSelect: 'none',
     }),
-    _0x124770.appendChild(_0x2a73e5));
-  const _0x450806 = getAIGenerationDefaultSizeByType('ai-text'),
-    _0x512dfb = getAIGenerationDefaultSizeByType('ai-image'),
-    _0x181f62 = getAIGenerationDefaultSizeByType('ai-video'),
-    _0x1eadc5 = [
+    el51.appendChild(el52));
+  const width5 = getAIGenerationDefaultSizeByType('ai-text'),
+    width6 = getAIGenerationDefaultSizeByType('ai-image'),
+    width7 = getAIGenerationDefaultSizeByType('ai-video'),
+    value221 = [
       {
         type: 'ai-text',
         label: t('coreUi.renderer.picker.items.aiText'),
         defaultLabel: t('coreUi.renderer.picker.defaults.aiText'),
-        width: _0x450806.width,
-        height: _0x450806.height,
+        width: width5.width,
+        height: width5.height,
       },
       {
         type: 'ai-image',
         label: t('coreUi.renderer.picker.items.aiImage'),
         defaultLabel: t('coreUi.renderer.picker.defaults.aiImage'),
-        width: _0x512dfb.width,
-        height: _0x512dfb.height,
+        width: width6.width,
+        height: width6.height,
       },
       {
         type: 'ai-video',
         label: t('coreUi.renderer.picker.items.aiVideo'),
         defaultLabel: t('coreUi.renderer.picker.defaults.aiVideo'),
-        width: _0x181f62.width,
-        height: _0x181f62.height,
+        width: width7.width,
+        height: width7.height,
       },
       {
         type: 'ai-audio',
@@ -2356,19 +2344,19 @@ function _renderPicker(_0x124770, _0xdf7299, _0x27eaaa) {
       },
     ];
   for (const {
-    type: _0x32a19d,
-    label: _0x2ced09,
-    defaultLabel: _0x1366d6,
-    width: _0x1f5568,
-    height: _0x182a17,
-  } of _0x1eadc5) {
-    const _0x2683b8 = document.createElement('button');
-    ((_0x2683b8.textContent = _0x2ced09),
-      (_0x2683b8.dataset.nodeType = _0x32a19d),
-      (_0x2683b8.dataset.defaultLabel = _0x1366d6),
-      (_0x2683b8.dataset.width = String(_0x1f5568)),
-      (_0x2683b8.dataset.height = String(_0x182a17)),
-      Object.assign(_0x2683b8.style, {
+    type: type,
+    label: label,
+    defaultLabel: defaultLabel,
+    width: width8,
+    height: height5,
+  } of value221) {
+    const el53 = document.createElement('button');
+    ((el53.textContent = label),
+      (el53.dataset.nodeType = type),
+      (el53.dataset.defaultLabel = defaultLabel),
+      (el53.dataset.width = String(width8)),
+      (el53.dataset.height = String(height5)),
+      Object.assign(el53.style, {
         background: 'var(--blue-10)',
         border: '1px solid var(--blue-25)',
         borderRadius: '6px',
@@ -2379,14 +2367,14 @@ function _renderPicker(_0x124770, _0xdf7299, _0x27eaaa) {
         textAlign: 'left',
         transition: 'background 0.15s',
       }),
-      _0x124770.appendChild(_0x2683b8));
+      el51.appendChild(el53));
   }
 }
 function _createSelectionRectEl() {
-  const _0x2b90d7 = document.createElement('div');
+  const el54 = document.createElement('div');
   return (
-    (_0x2b90d7.id = 'v2-selection-rect'),
-    Object.assign(_0x2b90d7.style, {
+    (el54.id = 'v2-selection-rect'),
+    Object.assign(el54.style, {
       position: 'absolute',
       border: '1px dashed var(--white-50)',
       backgroundColor: 'var(--white-02)',
@@ -2394,154 +2382,145 @@ function _createSelectionRectEl() {
       display: 'none',
       zIndex: '1000',
     }),
-    _0x2b90d7
+    el54
   );
 }
-function _renderSelectionRect(_0x12dfc1, _0x455463) {
-  if (!_0x455463 || !_0x455463.active) {
-    _0x12dfc1.style.display = 'none';
+function _renderSelectionRect(el55, enabled45) {
+  if (!enabled45 || !enabled45.active) {
+    el55.style.display = 'none';
     return;
   }
-  _0x12dfc1.style.display = 'block';
-  const _0x1eb1c2 = Math.min(_0x455463.x1, _0x455463.x2),
-    _0x18b3fb = Math.min(_0x455463.y1, _0x455463.y2),
-    _0x498700 = Math.abs(_0x455463.x2 - _0x455463.x1),
-    _0x58f42b = Math.abs(_0x455463.y2 - _0x455463.y1);
-  ((_0x12dfc1.style.left = _0x1eb1c2 + 'px'),
-    (_0x12dfc1.style.top = _0x18b3fb + 'px'),
-    (_0x12dfc1.style.width = _0x498700 + 'px'),
-    (_0x12dfc1.style.height = _0x58f42b + 'px'));
+  el55.style.display = 'block';
+  const value222 = Math.min(enabled45.x1, enabled45.x2),
+    value223 = Math.min(enabled45.y1, enabled45.y2),
+    value224 = Math.abs(enabled45.x2 - enabled45.x1),
+    value225 = Math.abs(enabled45.y2 - enabled45.y1);
+  ((el55.style.left = value222 + 'px'),
+    (el55.style.top = value223 + 'px'),
+    (el55.style.width = value224 + 'px'),
+    (el55.style.height = value225 + 'px'));
 }
-function _createMultiSelectBoxEl(_0x4868e9) {
-  const _0x42ab5f = document.createElement('div');
-  ((_0x42ab5f.id = 'v2-multi-select-box'), (_0x42ab5f.className = 'v2-multi-select-box'));
-  const _0x23dfac = document.createElement('div');
-  ((_0x23dfac.className = 'v2-multi-select-tab'), (_0x23dfac.dataset.uiStop = '1'));
-  const _0x485cab = 'http://www.w3.org/2000/svg',
-    _0x1ee113 = (_0x146659 = '2') => {
-      const _0x387f2f = document.createElementNS(_0x485cab, 'svg');
+function _createMultiSelectBoxEl(value226) {
+  const el56 = document.createElement('div');
+  ((el56.id = 'v2-multi-select-box'), (el56.className = 'v2-multi-select-box'));
+  const el57 = document.createElement('div');
+  ((el57.className = 'v2-multi-select-tab'), (el57.dataset.uiStop = '1'));
+  const value227 = 'http://www.w3.org/2000/svg',
+    handler = (value228 = '2') => {
+      const el58 = document.createElementNS(value227, 'svg');
       return (
-        _0x387f2f.setAttribute('viewBox', '0 0 24 24'),
-        _0x387f2f.setAttribute('fill', 'none'),
-        _0x387f2f.setAttribute('stroke', 'currentColor'),
-        _0x387f2f.setAttribute('stroke-width', _0x146659),
-        _0x387f2f.setAttribute('stroke-linecap', 'round'),
-        _0x387f2f.setAttribute('stroke-linejoin', 'round'),
-        _0x387f2f
+        el58.setAttribute('viewBox', '0 0 24 24'),
+        el58.setAttribute('fill', 'none'),
+        el58.setAttribute('stroke', 'currentColor'),
+        el58.setAttribute('stroke-width', value228),
+        el58.setAttribute('stroke-linecap', 'round'),
+        el58.setAttribute('stroke-linejoin', 'round'),
+        el58
       );
     },
-    _0x1489cc = (_0x1db563, _0x45ad6e, _0x480c0b) => {
-      const _0x2ede84 = document.createElement('button');
+    handler2 = (value229, value230, value231) => {
+      const el59 = document.createElement('button');
       return (
-        (_0x2ede84.type = 'button'),
-        (_0x2ede84.className = 'v2-multi-select-btn'),
-        (_0x2ede84.dataset.uiAction = _0x1db563),
-        (_0x2ede84.title = _0x45ad6e),
-        _0x2ede84.setAttribute('aria-label', _0x45ad6e),
-        _0x2ede84.replaceChildren(_0x480c0b),
-        _0x2ede84
+        (el59.type = 'button'),
+        (el59.className = 'v2-multi-select-btn'),
+        (el59.dataset.uiAction = value229),
+        (el59.title = value230),
+        el59.setAttribute('aria-label', value230),
+        el59.replaceChildren(value231),
+        el59
       );
     },
-    _0x2edbca = (_0x429389, _0x154aa7) => {
-      const _0x4ad503 = document.createElementNS(_0x485cab, 'path');
-      return (_0x4ad503.setAttribute('d', _0x154aa7), _0x429389.appendChild(_0x4ad503), _0x4ad503);
+    handler3 = (el60, value232) => {
+      const el61 = document.createElementNS(value227, 'path');
+      return (el61.setAttribute('d', value232), el60.appendChild(el61), el61);
     },
-    _0x5d4ace = _0x1ee113('2.5'),
-    _0x2e6686 = document.createElementNS(_0x485cab, 'polygon');
-  (_0x2e6686.setAttribute('points', '5 3 19 12 5 21 5 3'), _0x5d4ace.appendChild(_0x2e6686));
-  const _0x1445ea = _0x1489cc(
-    'ms-sync-video-play',
-    t('coreUi.renderer.multiSelect.syncVideoPlay'),
-    _0x5d4ace,
-  );
-  _0x1445ea.style.display = 'none';
-  const _0x5400f0 = _0x1ee113('2');
+    el62 = handler('2.5'),
+    el63 = document.createElementNS(value227, 'polygon');
+  (el63.setAttribute('points', '5 3 19 12 5 21 5 3'), el62.appendChild(el63));
+  const el64 = handler2('ms-sync-video-play', t('coreUi.renderer.multiSelect.syncVideoPlay'), el62);
+  el64.style.display = 'none';
+  const value233 = handler('2');
   [
     'M12 3l1.2 4.1L17 8.3l-3.8 1.2L12 13.5l-1.2-4-3.8-1.2 3.8-1.2L12 3z',
     'M18 14l.7 2.3L21 17l-2.3.7L18 20l-.7-2.3L15 17l2.3-.7L18 14z',
     'M6 13l.8 2.7L9.5 16.5l-2.7.8L6 20l-.8-2.7-2.7-.8 2.7-.8L6 13z',
-  ].forEach((_0x1c2a65) => _0x2edbca(_0x5400f0, _0x1c2a65));
-  const _0x36504e = _0x1489cc('ms-run-selected', t('coreUi.renderer.multiSelect.runSelected'), _0x5400f0),
-    _0x5013b7 = _0x1ee113('1.8'),
-    _0x379668 = document.createElementNS(_0x485cab, 'polygon');
-  (_0x379668.setAttribute('points', '12 2 20 12 16 12 16 22 8 22 8 12 4 12 12 2'),
-    _0x5013b7.appendChild(_0x379668));
-  const _0x16e5b1 = _0x1489cc('ms-asset', t('coreUi.renderer.multiSelect.createAsset'), _0x5013b7),
-    _0x4c8773 = _0x1ee113('2');
-  for (const [_0x2d30a9, _0x2a9872] of [
+  ].forEach((item11) => handler3(value233, item11));
+  const value234 = handler2('ms-run-selected', t('coreUi.renderer.multiSelect.runSelected'), value233),
+    el65 = handler('1.8'),
+    el66 = document.createElementNS(value227, 'polygon');
+  (el66.setAttribute('points', '12 2 20 12 16 12 16 22 8 22 8 12 4 12 12 2'), el65.appendChild(el66));
+  const value235 = handler2('ms-asset', t('coreUi.renderer.multiSelect.createAsset'), el65),
+    el67 = handler('2');
+  for (const [value236, value237] of [
     [3, 3],
     [14, 3],
     [14, 14],
     [3, 14],
   ]) {
-    const _0x3859bd = document.createElementNS(_0x485cab, 'rect');
-    (_0x3859bd.setAttribute('x', String(_0x2d30a9)),
-      _0x3859bd.setAttribute('y', String(_0x2a9872)),
-      _0x3859bd.setAttribute('width', '7'),
-      _0x3859bd.setAttribute('height', '7'),
-      _0x4c8773.appendChild(_0x3859bd));
+    const el68 = document.createElementNS(value227, 'rect');
+    (el68.setAttribute('x', String(value236)),
+      el68.setAttribute('y', String(value237)),
+      el68.setAttribute('width', '7'),
+      el68.setAttribute('height', '7'),
+      el67.appendChild(el68));
   }
-  const _0x23b913 = _0x1489cc('ms-group', t('coreUi.renderer.multiSelect.group'), _0x4c8773),
-    _0x3e7fab = _0x1ee113('2'),
-    _0x49ad01 = document.createElementNS(_0x485cab, 'path');
-  _0x49ad01.setAttribute('d', 'M3 12a9 9 0 0 1 15.36-6.36');
-  const _0x346293 = document.createElementNS(_0x485cab, 'path');
-  _0x346293.setAttribute('d', 'M21 12a9 9 0 0 1-15.36 6.36');
-  const _0x3f70b4 = document.createElementNS(_0x485cab, 'polyline');
-  _0x3f70b4.setAttribute('points', '21 3 21 9 15 9');
-  const _0x2d8c80 = document.createElementNS(_0x485cab, 'polyline');
-  (_0x2d8c80.setAttribute('points', '3 21 3 15 9 15'),
-    _0x3e7fab.appendChild(_0x49ad01),
-    _0x3e7fab.appendChild(_0x346293),
-    _0x3e7fab.appendChild(_0x3f70b4),
-    _0x3e7fab.appendChild(_0x2d8c80));
-  const _0x2e4200 = _0x1489cc(
-    'ms-reset-image-size',
-    t('coreUi.renderer.multiSelect.resetDefaultSize'),
-    _0x3e7fab,
-  );
-  _0x2e4200.style.display = 'none';
-  const _0x1e2636 = _0x1ee113('2'),
-    _0x3ad8d5 = document.createElementNS(_0x485cab, 'rect');
-  (_0x3ad8d5.setAttribute('x', '3'),
-    _0x3ad8d5.setAttribute('y', '5'),
-    _0x3ad8d5.setAttribute('width', '18'),
-    _0x3ad8d5.setAttribute('height', '14'),
-    _0x3ad8d5.setAttribute('rx', '2'),
-    _0x1e2636.appendChild(_0x3ad8d5),
-    _0x2edbca(_0x1e2636, 'M3 9h18'),
-    _0x2edbca(_0x1e2636, 'M7 5l4 4'),
-    _0x2edbca(_0x1e2636, 'M13 5l4 4'));
-  const _0x42ffda = _0x1489cc('ms-compose-video', t('coreUi.renderer.multiSelect.composeVideo'), _0x1e2636);
-  _0x42ffda.style.display = 'none';
-  const _0x5d0900 = _0x1ee113('2');
+  const value238 = handler2('ms-group', t('coreUi.renderer.multiSelect.group'), el67),
+    el69 = handler('2'),
+    el70 = document.createElementNS(value227, 'path');
+  el70.setAttribute('d', 'M3 12a9 9 0 0 1 15.36-6.36');
+  const el71 = document.createElementNS(value227, 'path');
+  el71.setAttribute('d', 'M21 12a9 9 0 0 1-15.36 6.36');
+  const el72 = document.createElementNS(value227, 'polyline');
+  el72.setAttribute('points', '21 3 21 9 15 9');
+  const el73 = document.createElementNS(value227, 'polyline');
+  (el73.setAttribute('points', '3 21 3 15 9 15'),
+    el69.appendChild(el70),
+    el69.appendChild(el71),
+    el69.appendChild(el72),
+    el69.appendChild(el73));
+  const el74 = handler2('ms-reset-image-size', t('coreUi.renderer.multiSelect.resetDefaultSize'), el69);
+  el74.style.display = 'none';
+  const el75 = handler('2'),
+    el76 = document.createElementNS(value227, 'rect');
+  (el76.setAttribute('x', '3'),
+    el76.setAttribute('y', '5'),
+    el76.setAttribute('width', '18'),
+    el76.setAttribute('height', '14'),
+    el76.setAttribute('rx', '2'),
+    el75.appendChild(el76),
+    handler3(el75, 'M3 9h18'),
+    handler3(el75, 'M7 5l4 4'),
+    handler3(el75, 'M13 5l4 4'));
+  const el77 = handler2('ms-compose-video', t('coreUi.renderer.multiSelect.composeVideo'), el75);
+  el77.style.display = 'none';
+  const value239 = handler('2');
   [
     'M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
     'M3 10h18',
     'M12 10v10',
-  ].forEach((_0x52581b) => _0x2edbca(_0x5d0900, _0x52581b));
-  const _0x14a426 = _0x1489cc('ms-create-collage', t('coreUi.renderer.multiSelect.createCollage'), _0x5d0900);
+  ].forEach((item12) => handler3(value239, item12));
+  const el78 = handler2('ms-create-collage', t('coreUi.renderer.multiSelect.createCollage'), value239);
   return (
-    (_0x14a426.style.display = 'none'),
-    _0x23dfac.appendChild(_0x36504e),
-    _0x23dfac.appendChild(_0x1445ea),
-    _0x23dfac.appendChild(_0x16e5b1),
-    _0x23dfac.appendChild(_0x23b913),
-    _0x23dfac.appendChild(_0x2e4200),
-    _0x23dfac.appendChild(_0x14a426),
-    _0x23dfac.appendChild(_0x42ffda),
-    _0x42ab5f.appendChild(_0x23dfac),
-    _0x42ab5f
+    (el78.style.display = 'none'),
+    el57.appendChild(value234),
+    el57.appendChild(el64),
+    el57.appendChild(value235),
+    el57.appendChild(value238),
+    el57.appendChild(el74),
+    el57.appendChild(el78),
+    el57.appendChild(el77),
+    el56.appendChild(el57),
+    el56
   );
 }
 function _createAlignCenterPanelEl() {
-  const _0x389c25 = document.createElement('div');
-  ((_0x389c25.id = 'v2-align-center-panel'),
-    (_0x389c25.className = 'v2-align-center-panel'),
-    (_0x389c25.dataset.uiStop = '1'),
-    (_0x389c25.style.display = 'none'));
-  const _0x229bc4 = 'http://www.w3.org/2000/svg',
-    _0x361a81 = {
+  const el79 = document.createElement('div');
+  ((el79.id = 'v2-align-center-panel'),
+    (el79.className = 'v2-align-center-panel'),
+    (el79.dataset.uiStop = '1'),
+    (el79.style.display = 'none'));
+  const value240 = 'http://www.w3.org/2000/svg',
+    value241 = {
       'ms-align-left': ['M4 4v16', 'M8 7h10', 'M8 12h7', 'M8 17h9'],
       'ms-align-h-center': ['M12 4v16', 'M7 7h10', 'M9 12h6', 'M8 17h8'],
       'ms-align-right': ['M20 4v16', 'M6 7h10', 'M9 12h7', 'M7 17h9'],
@@ -2551,7 +2530,7 @@ function _createAlignCenterPanelEl() {
       'ms-distribute-h': ['M3 20h18', 'M5 8h3v8H5z', 'M11 5h3v11h-3z', 'M17 10h3v6h-3z'],
       'ms-distribute-v': ['M20 3v18', 'M8 5h8v3H8z', 'M5 11h11v3H5z', 'M10 17h6v3h-6z'],
     },
-    _0xc61d0f = [
+    list14 = [
       { action: 'ms-align-left', tooltip: t('coreUi.renderer.align.left'), slot: 'slot-1' },
       { action: 'ms-align-h-center', tooltip: t('coreUi.renderer.align.hCenter'), slot: 'slot-2' },
       { action: 'ms-align-right', tooltip: t('coreUi.renderer.align.right'), slot: 'slot-3' },
@@ -2562,127 +2541,126 @@ function _createAlignCenterPanelEl() {
       { action: 'ms-distribute-v', tooltip: t('coreUi.renderer.align.distributeV'), slot: 'slot-9' },
     ];
   return (
-    _0xc61d0f.forEach((_0x7bdb41) => {
-      const _0x25a691 = document.createElement('button');
-      ((_0x25a691.type = 'button'),
-        (_0x25a691.className = 'v2-align-center-btn ' + _0x7bdb41.slot),
-        (_0x25a691.dataset.uiAction = _0x7bdb41.action),
-        (_0x25a691.dataset.tooltip = _0x7bdb41.tooltip),
-        _0x25a691.setAttribute('aria-label', _0x7bdb41.tooltip));
-      const _0x23b925 = document.createElementNS(_0x229bc4, 'svg');
-      (_0x23b925.setAttribute('width', '16'),
-        _0x23b925.setAttribute('height', '16'),
-        _0x23b925.setAttribute('viewBox', '0 0 24 24'),
-        _0x23b925.setAttribute('fill', 'none'),
-        _0x23b925.setAttribute('stroke', 'currentColor'),
-        _0x23b925.setAttribute('stroke-width', '2'),
-        _0x23b925.setAttribute('stroke-linecap', 'round'),
-        _0x23b925.setAttribute('stroke-linejoin', 'round'));
-      const _0x1d3d5e = _0x361a81[_0x7bdb41.action] || [];
-      (_0x1d3d5e.forEach((_0x25fdfe) => {
-        const _0x698ea0 = document.createElementNS(_0x229bc4, 'path');
-        (_0x698ea0.setAttribute('d', _0x25fdfe), _0x23b925.appendChild(_0x698ea0));
+    list14.forEach((item13) => {
+      const el80 = document.createElement('button');
+      ((el80.type = 'button'),
+        (el80.className = 'v2-align-center-btn ' + item13.slot),
+        (el80.dataset.uiAction = item13.action),
+        (el80.dataset.tooltip = item13.tooltip),
+        el80.setAttribute('aria-label', item13.tooltip));
+      const el81 = document.createElementNS(value240, 'svg');
+      (el81.setAttribute('width', '16'),
+        el81.setAttribute('height', '16'),
+        el81.setAttribute('viewBox', '0 0 24 24'),
+        el81.setAttribute('fill', 'none'),
+        el81.setAttribute('stroke', 'currentColor'),
+        el81.setAttribute('stroke-width', '2'),
+        el81.setAttribute('stroke-linecap', 'round'),
+        el81.setAttribute('stroke-linejoin', 'round'));
+      const list15 = value241[item13.action] || [];
+      (list15.forEach((item14) => {
+        const el82 = document.createElementNS(value240, 'path');
+        (el82.setAttribute('d', item14), el81.appendChild(el82));
       }),
-        _0x25a691.appendChild(_0x23b925),
-        _0x389c25.appendChild(_0x25a691));
+        el80.appendChild(el81),
+        el79.appendChild(el80));
     }),
-    _0x389c25
+    el79
   );
 }
-function _renderAlignCenterPanel(_0x270eb9, _0x3986c5, _0x2b1297, _0xbd4da3 = {}) {
-  if (!_0x270eb9) return;
-  const _0x24ee1e = String(_0xbd4da3?.alignFeatureTriggerMode || 'click'),
-    _0x2ad217 = _0xbd4da3?.alignFeatureEnabled !== false && _0x24ee1e !== 'off',
-    _0x487118 = _0xbd4da3?.alignPanelVisible === true,
-    _0x3262db = Array.isArray(_0x3986c5) ? _0x3986c5 : [],
-    _0x4a5943 = getAlignableSelectionNodes(_0x2b1297 || {}, _0x3262db),
-    _0x216854 = _0x2ad217 && _0x487118 && _0x3262db.length >= 2 && _0x4a5943.length >= 2;
-  if (!_0x216854) {
-    if (_0x270eb9.style.display !== 'none') _0x270eb9.style.display = 'none';
+function _renderAlignCenterPanel(el83, value242, value243, value244 = {}) {
+  if (!el83) return;
+  const value245 = String(value244?.alignFeatureTriggerMode || 'click'),
+    value246 = value244?.alignFeatureEnabled !== false && value245 !== 'off',
+    value247 = value244?.alignPanelVisible === true,
+    list16 = Array.isArray(value242) ? value242 : [],
+    list17 = getAlignableSelectionNodes(value243 || {}, list16),
+    enabled46 = value246 && value247 && list16.length >= 2 && list17.length >= 2;
+  if (!enabled46) {
+    if (el83.style.display !== 'none') el83.style.display = 'none';
     ((_alignPanelRenderCache.centerSig = ''), (_alignPanelRenderCache.buttonStateSig = ''));
     return;
   }
-  const _0x44ecfa = _0xbd4da3?.alignPanelAnchorWorld,
-    _0x2453f3 = !!_0x44ecfa && Number.isFinite(_0x44ecfa.x) && Number.isFinite(_0x44ecfa.y);
-  let _0x2c4f26 = 0,
-    _0x4ecd57 = 0;
-  if (_0x2453f3) ((_0x2c4f26 = Number(_0x44ecfa.x)), (_0x4ecd57 = Number(_0x44ecfa.y)));
+  const box3 = value244?.alignPanelAnchorWorld,
+    value248 = !!box3 && Number.isFinite(box3.x) && Number.isFinite(box3.y);
+  let value249 = 0,
+    value250 = 0;
+  if (value248) ((value249 = Number(box3.x)), (value250 = Number(box3.y)));
   else {
-    const _0x1930fa = computeSelectionBounds(_0x4a5943);
-    if (!_0x1930fa) {
-      if (_0x270eb9.style.display !== 'none') _0x270eb9.style.display = 'none';
+    const selectionBounds = computeSelectionBounds(list17);
+    if (!selectionBounds) {
+      if (el83.style.display !== 'none') el83.style.display = 'none';
       ((_alignPanelRenderCache.centerSig = ''), (_alignPanelRenderCache.buttonStateSig = ''));
       return;
     }
-    ((_0x2c4f26 = _0x1930fa.centerX), (_0x4ecd57 = _0x1930fa.centerY));
+    ((value249 = selectionBounds.centerX), (value250 = selectionBounds.centerY));
   }
-  if (_0x270eb9.style.display !== 'block') _0x270eb9.style.display = 'block';
-  const _0x2f7b88 = _0x2c4f26.toFixed(2) + '|' + _0x4ecd57.toFixed(2);
-  _alignPanelRenderCache.centerSig !== _0x2f7b88 &&
-    ((_alignPanelRenderCache.centerSig = _0x2f7b88),
-    (_0x270eb9.style.left = _0x2c4f26 + 'px'),
-    (_0x270eb9.style.top = _0x4ecd57 + 'px'));
-  const _0x5ca79b = _0x4a5943.length >= 2,
-    _0x1cb7d0 = _0x5ca79b ? '1' : '0';
-  if (_alignPanelRenderCache.buttonStateSig !== _0x1cb7d0) {
-    _alignPanelRenderCache.buttonStateSig = _0x1cb7d0;
-    const _0x4df843 =
-      _0x270eb9._actionButtons || Array.from(_0x270eb9.querySelectorAll('button[data-ui-action]'));
-    ((_0x270eb9._actionButtons = _0x4df843),
-      _0x4df843.forEach((_0xd0ccb7) => {
-        const _0xe5b973 = _0xd0ccb7.dataset.uiAction,
-          _0x4b4e76 = _0xe5b973 === 'ms-distribute-h' || _0xe5b973 === 'ms-distribute-v',
-          _0x4108b9 = _0x4b4e76 ? !_0x5ca79b : false;
-        ((_0xd0ccb7.disabled = _0x4108b9), _0xd0ccb7.classList.toggle('is-disabled', _0x4108b9));
+  if (el83.style.display !== 'block') el83.style.display = 'block';
+  const value251 = value249.toFixed(2) + '|' + value250.toFixed(2);
+  _alignPanelRenderCache.centerSig !== value251 &&
+    ((_alignPanelRenderCache.centerSig = value251),
+    (el83.style.left = value249 + 'px'),
+    (el83.style.top = value250 + 'px'));
+  const enabled47 = list17.length >= 2,
+    value252 = enabled47 ? '1' : '0';
+  if (_alignPanelRenderCache.buttonStateSig !== value252) {
+    _alignPanelRenderCache.buttonStateSig = value252;
+    const list18 = el83._actionButtons || Array.from(el83.querySelectorAll('button[data-ui-action]'));
+    ((el83._actionButtons = list18),
+      list18.forEach((el84) => {
+        const value253 = el84.dataset.uiAction,
+          value254 = value253 === 'ms-distribute-h' || value253 === 'ms-distribute-v',
+          value255 = value254 ? !enabled47 : false;
+        ((el84.disabled = value255), el84.classList.toggle('is-disabled', value255));
       }));
   }
 }
-function _renderMultiSelectBox(_0x150855, _0x515ee7, _0x5ce393, _0x19702e, _0xd32360 = false) {
-  const _0x5aed7c = _0x515ee7 && _0x515ee7.length >= 2,
-    _0x1bec7c = (_0x598cc1, { mountedOnly: mountedOnly = false } = {}) => {
-      if (!_0x598cc1) return null;
-      if (mountedOnly && !_mountedNodeIds.has(_0x598cc1)) return null;
-      return _wrapperMap.get(_0x598cc1) || _parkedWrapperMap.get(_0x598cc1) || null;
+function _renderMultiSelectBox(el85, list19, value256, value257, value258 = false) {
+  const enabled48 = list19 && list19.length >= 2,
+    handler4 = (enabled49, { mountedOnly: mountedOnly = false } = {}) => {
+      if (!enabled49) return null;
+      if (mountedOnly && !_mountedNodeIds.has(enabled49)) return null;
+      return _wrapperMap.get(enabled49) || _parkedWrapperMap.get(enabled49) || null;
     },
-    _0x4a5158 = (_0x535e50) => {
-      if (!_0x535e50) return;
-      const _0x1e574e = _0x535e50.querySelector('.node-floating-toolbar'),
-        _0x2e6393 = _0x535e50.querySelector('.group-toolbar'),
-        _0x469acf = _0x535e50.querySelector('.text-prompt-panel');
-      if (_0x1e574e) _0x1e574e.style.display = '';
-      if (_0x2e6393) _0x2e6393.style.display = '';
-      if (_0x469acf) _0x469acf.style.display = '';
+    handler5 = (el86) => {
+      if (!el86) return;
+      const el87 = el86.querySelector('.node-floating-toolbar'),
+        el88 = el86.querySelector('.group-toolbar'),
+        el89 = el86.querySelector('.text-prompt-panel');
+      if (el87) el87.style.display = '';
+      if (el88) el88.style.display = '';
+      if (el89) el89.style.display = '';
     },
-    _0x4629bd = (_0x352a73) => {
-      if (!_0x352a73) return;
-      const _0xa9987f = _0x352a73.querySelector('.node-floating-toolbar'),
-        _0x385c5f = _0x352a73.querySelector('.group-toolbar'),
-        _0x5aa061 = _0x352a73.querySelector('.text-prompt-panel');
-      if (_0xa9987f) _0xa9987f.style.display = 'none';
-      if (_0x385c5f) _0x385c5f.style.display = 'none';
-      if (_0x5aa061) _0x5aa061.style.display = 'none';
+    handler6 = (el90) => {
+      if (!el90) return;
+      const el91 = el90.querySelector('.node-floating-toolbar'),
+        el92 = el90.querySelector('.group-toolbar'),
+        el93 = el90.querySelector('.text-prompt-panel');
+      if (el91) el91.style.display = 'none';
+      if (el92) el92.style.display = 'none';
+      if (el93) el93.style.display = 'none';
     };
-  if (!_0x5aed7c) {
-    for (const _0x54f225 of _msHiddenNodeIds) {
-      _0x4a5158(_0x1bec7c(_0x54f225));
+  if (!enabled48) {
+    for (const value259 of _msHiddenNodeIds) {
+      handler5(handler4(value259));
     }
     _msHiddenNodeIds = new Set();
   } else {
-    const _0x496252 = new Set(_0x515ee7 || []),
-      _0x440319 = new Set();
-    for (const _0x383b34 of _msHiddenNodeIds) {
-      if (_0x496252.has(_0x383b34)) continue;
-      _0x4a5158(_0x1bec7c(_0x383b34));
+    const map8 = new Set(list19 || []),
+      value260 = new Set();
+    for (const value261 of _msHiddenNodeIds) {
+      if (map8.has(value261)) continue;
+      handler5(handler4(value261));
     }
-    for (const _0x286255 of _0x496252) {
-      const _0x5cbf7e = _0x1bec7c(_0x286255, { mountedOnly: true });
-      if (!_0x5cbf7e) continue;
-      (_0x4629bd(_0x5cbf7e), _0x440319.add(_0x286255));
+    for (const value262 of map8) {
+      const enabled50 = handler4(value262, { mountedOnly: true });
+      if (!enabled50) continue;
+      (handler6(enabled50), value260.add(value262));
     }
-    _msHiddenNodeIds = _0x440319;
+    _msHiddenNodeIds = value260;
   }
-  if (!_0x5aed7c) {
-    if (_0x150855.style.display !== 'none') _0x150855.style.display = 'none';
+  if (!enabled48) {
+    if (el85.style.display !== 'none') el85.style.display = 'none';
     ((_multiSelectRenderCache.geometrySig = ''),
       (_multiSelectRenderCache.runBtnDisabled = null),
       (_multiSelectRenderCache.resetBtnVisible = null),
@@ -2690,109 +2668,98 @@ function _renderMultiSelectBox(_0x150855, _0x515ee7, _0x5ce393, _0x19702e, _0xd3
       (_multiSelectRenderCache.composeBtnKind = ''));
     return;
   }
-  const _0x36a5c0 = _0x150855.querySelector(
-      '.v2-multi-select-tab button[data-ui-action="ms-sync-video-play"]',
-    ),
-    _0x51329f = _0x150855.querySelector('.v2-multi-select-tab button[data-ui-action="ms-run-selected"]'),
-    _0x57715a = _0x150855.querySelector('.v2-multi-select-tab button[data-ui-action="ms-compose-video"]'),
-    _0x350faa = _0x150855.querySelector('.v2-multi-select-tab button[data-ui-action="ms-reset-image-size"]'),
-    _0x2744b4 = _0x150855.querySelector('.v2-multi-select-tab button[data-ui-action="ms-create-collage"]');
-  if (_0x36a5c0)
-    _0x36a5c0.style.display = getSelectedSyncPlayableVideoCount(_0x5ce393, _0x515ee7) >= 2 ? '' : 'none';
-  if (_0x51329f) {
-    _0x51329f.style.display = '';
-    let _0x161889 = false;
-    for (const _0x8c82e5 of _0x515ee7) {
-      if (isNodeType(_0x5ce393[_0x8c82e5], ['ai-text', 'ai-image', 'ai-video', 'ai-audio'])) {
-        _0x161889 = true;
+  const el94 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-sync-video-play"]'),
+    el95 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-run-selected"]'),
+    el96 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-compose-video"]'),
+    el97 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-reset-image-size"]'),
+    el98 = el85.querySelector('.v2-multi-select-tab button[data-ui-action="ms-create-collage"]');
+  if (el94) el94.style.display = getSelectedSyncPlayableVideoCount(value256, list19) >= 2 ? '' : 'none';
+  if (el95) {
+    el95.style.display = '';
+    let enabled51 = false;
+    for (const value263 of list19) {
+      if (isNodeType(value256[value263], ['ai-text', 'ai-image', 'ai-video', 'ai-audio'])) {
+        enabled51 = true;
         break;
       }
     }
-    const _0x3283a4 = !_0x161889;
-    ((_multiSelectRenderCache.runBtnDisabled = _0x3283a4),
-      (_0x51329f.disabled = _0x3283a4),
-      _0x51329f.classList.toggle('is-disabled', _0x3283a4));
+    const value264 = !enabled51;
+    ((_multiSelectRenderCache.runBtnDisabled = value264),
+      (el95.disabled = value264),
+      el95.classList.toggle('is-disabled', value264));
   }
-  if (_0x350faa) {
-    let _0x311206 = false;
-    for (const _0x1aec2e of _0x515ee7) {
-      const _0x11f4a3 = _0x5ce393[_0x1aec2e],
-        _0x25849d =
-          !!_0x11f4a3 && isNodeType(_0x11f4a3, ['source-image', 'source-video', 'ai-image', 'ai-video']);
-      if (_0x25849d) {
-        _0x311206 = true;
+  if (el97) {
+    let value265 = false;
+    for (const value266 of list19) {
+      const enabled52 = value256[value266],
+        value267 =
+          !!enabled52 && isNodeType(enabled52, ['source-image', 'source-video', 'ai-image', 'ai-video']);
+      if (value267) {
+        value265 = true;
         break;
       }
     }
-    const _0x4da47a = _0xd32360 && _0x311206;
-    _multiSelectRenderCache.resetBtnVisible !== _0x4da47a &&
-      ((_multiSelectRenderCache.resetBtnVisible = _0x4da47a),
-      (_0x350faa.style.display = _0x4da47a ? '' : 'none'));
+    const value268 = value258 && value265;
+    _multiSelectRenderCache.resetBtnVisible !== value268 &&
+      ((_multiSelectRenderCache.resetBtnVisible = value268), (el97.style.display = value268 ? '' : 'none'));
   }
-  if (_0x2744b4) {
-    const _0x2aeec1 = _0x515ee7.filter((_0x58adfe) =>
-      isNodeType(_0x5ce393[_0x58adfe], ['source-image', 'ai-image', 'storyboard']),
+  if (el98) {
+    const count10 = list19.filter((item15) =>
+      isNodeType(value256[item15], ['source-image', 'ai-image', 'storyboard']),
     ).length;
-    _0x2744b4.style.display = _0x2aeec1 >= 2 ? '' : 'none';
+    el98.style.display = count10 >= 2 ? '' : 'none';
   }
-  if (_0x57715a) {
-    const _0x329130 = getSelectedMediaComposeKind(_0x5ce393, _0x515ee7),
-      _0x48a0ce = !!_0x329130;
-    _multiSelectRenderCache.composeBtnVisible !== _0x48a0ce &&
-      ((_multiSelectRenderCache.composeBtnVisible = _0x48a0ce),
-      (_0x57715a.style.display = _0x48a0ce ? '' : 'none'));
-    if (_multiSelectRenderCache.composeBtnKind !== _0x329130) {
-      _multiSelectRenderCache.composeBtnKind = _0x329130;
-      const _0x2e029f = getMediaComposeButtonLabel(_0x329130);
-      ((_0x57715a.dataset.composeKind = _0x329130),
-        (_0x57715a.dataset.tooltip = _0x2e029f),
-        _0x57715a.setAttribute('aria-label', _0x2e029f));
+  if (el96) {
+    const selectedMediaComposeKind = getSelectedMediaComposeKind(value256, list19),
+      value269 = !!selectedMediaComposeKind;
+    _multiSelectRenderCache.composeBtnVisible !== value269 &&
+      ((_multiSelectRenderCache.composeBtnVisible = value269), (el96.style.display = value269 ? '' : 'none'));
+    if (_multiSelectRenderCache.composeBtnKind !== selectedMediaComposeKind) {
+      _multiSelectRenderCache.composeBtnKind = selectedMediaComposeKind;
+      const mediaComposeButtonLabel = getMediaComposeButtonLabel(selectedMediaComposeKind);
+      ((el96.dataset.composeKind = selectedMediaComposeKind),
+        (el96.dataset.tooltip = mediaComposeButtonLabel),
+        el96.setAttribute('aria-label', mediaComposeButtonLabel));
     }
   }
-  let _0x3be71a = Infinity,
-    _0x5853a7 = Infinity,
-    _0x9e50a = -Infinity,
-    _0x33b1c0 = -Infinity,
-    _0x3e9330 = 0;
-  _0x515ee7.forEach((_0x675cec) => {
-    const _0xcc374d = _0x5ce393[_0x675cec];
-    if (!_0xcc374d) return;
-    _0x3e9330++;
-    const _0xd8a82d = _0xcc374d.width || 0x104,
-      _0x45a88d = _0xcc374d.height || 100;
-    let _0x3b957a = _0xcc374d.x,
-      _0x74923d = _0xcc374d.y,
-      _0x3db09e = _0xcc374d.x + _0xd8a82d,
-      _0x6245c8 = _0xcc374d.y + _0x45a88d;
-    (_0xcc374d.type !== 'group' && (_0x74923d -= 30),
-      (_0x3be71a = Math.min(_0x3be71a, _0x3b957a)),
-      (_0x5853a7 = Math.min(_0x5853a7, _0x74923d)),
-      (_0x9e50a = Math.max(_0x9e50a, _0x3db09e)),
-      (_0x33b1c0 = Math.max(_0x33b1c0, _0x6245c8)));
+  let value270 = Infinity,
+    value271 = Infinity,
+    value272 = -Infinity,
+    value273 = -Infinity,
+    count11 = 0;
+  list19.forEach((item16) => {
+    const box4 = value256[item16];
+    if (!box4) return;
+    count11++;
+    const value274 = box4.width || 0x104,
+      value275 = box4.height || 100;
+    let value276 = box4.x,
+      value277 = box4.y,
+      value278 = box4.x + value274,
+      value279 = box4.y + value275;
+    (box4.type !== 'group' && (value277 -= 30),
+      (value270 = Math.min(value270, value276)),
+      (value271 = Math.min(value271, value277)),
+      (value272 = Math.max(value272, value278)),
+      (value273 = Math.max(value273, value279)));
   });
-  if (_0x3e9330 < 2) {
-    if (_0x150855.style.display !== 'none') _0x150855.style.display = 'none';
+  if (count11 < 2) {
+    if (el85.style.display !== 'none') el85.style.display = 'none';
     _multiSelectRenderCache.geometrySig = '';
     return;
   }
-  if (_0x150855.style.display !== 'block') _0x150855.style.display = 'block';
-  const _0x53212a = 18,
-    _0x2c395f = _0x3be71a - _0x53212a,
-    _0x96f9f6 = _0x5853a7 - _0x53212a,
-    _0x31503b = _0x9e50a - _0x3be71a + _0x53212a * 2,
-    _0x266579 = _0x33b1c0 - _0x5853a7 + _0x53212a * 2,
-    _0x5b011b =
-      _0x2c395f.toFixed(2) +
-      '|' +
-      _0x96f9f6.toFixed(2) +
-      '|' +
-      _0x31503b.toFixed(2) +
-      '|' +
-      _0x266579.toFixed(2);
-  _multiSelectRenderCache.geometrySig !== _0x5b011b &&
-    ((_multiSelectRenderCache.geometrySig = _0x5b011b),
-    (_0x150855.style.left = _0x2c395f + 'px'),
-    (_0x150855.style.top = _0x96f9f6 + 'px'),
-    (_0x150855.style.width = _0x31503b + 'px'),
-    (_0x150855.style.height = _0x266579 + 'px'));
+  if (el85.style.display !== 'block') el85.style.display = 'block';
+  const value280 = 18,
+    value281 = value270 - value280,
+    value282 = value271 - value280,
+    value283 = value272 - value270 + value280 * 2,
+    value284 = value273 - value271 + value280 * 2,
+    value285 =
+      value281.toFixed(2) + '|' + value282.toFixed(2) + '|' + value283.toFixed(2) + '|' + value284.toFixed(2);
+  _multiSelectRenderCache.geometrySig !== value285 &&
+    ((_multiSelectRenderCache.geometrySig = value285),
+    (el85.style.left = value281 + 'px'),
+    (el85.style.top = value282 + 'px'),
+    (el85.style.width = value283 + 'px'),
+    (el85.style.height = value284 + 'px'));
 }

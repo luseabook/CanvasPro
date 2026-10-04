@@ -34,66 +34,64 @@ export const STORY_PROJECT_CANVAS_NODE_SIZES = Object['freeze']({
   'storyboard-script': Object['freeze']({ width: 0x400, height: 0x240 }),
   'ai-video': Object['freeze']({ width: 0x200, height: 0x120 }),
 });
-function asObject(_0x22f158) {
-  return _0x22f158 && typeof _0x22f158 === 'object' && !Array['isArray'](_0x22f158) ? _0x22f158 : {};
+function asObject(value) {
+  return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
 }
-function normalizeText(_0x180eb1) {
-  return String(_0x180eb1 || '')['trim']();
+function normalizeText(item) {
+  return String(item || '')['trim']();
 }
-function normalizeIndex(_0x4a727f, _0x1ec13c) {
-  const _0x2ca793 = Number(_0x4a727f);
-  if (!Number['isFinite'](_0x2ca793) || _0x1ec13c <= 0x0) return 0x0;
-  return Math['max'](0x0, Math['min'](_0x1ec13c - 0x1, Math['trunc'](_0x2ca793)));
+function normalizeIndex(index, count) {
+  const result = Number(index);
+  if (!Number['isFinite'](result) || count <= 0x0) return 0x0;
+  return Math['max'](0x0, Math['min'](count - 0x1, Math['trunc'](result)));
 }
-function normalizeList(_0x23bb1f) {
-  return Array['isArray'](_0x23bb1f) ? _0x23bb1f['filter'](Boolean) : [];
+function normalizeList(list) {
+  return Array['isArray'](list) ? list['filter'](Boolean) : [];
 }
 export const storyWorkspaceCanvasMaterializationBindingPolicy = Object['freeze']({
-  getProjectId(_0x1a6ea2) {
-    return normalizeText(_0x1a6ea2?.['storyWorkspaceBinding']?.['projectId']);
+  getProjectId(data) {
+    return normalizeText(data?.['storyWorkspaceBinding']?.['projectId']);
   },
-  findProjectAnchor({ nodes: nodes = [], projectId: _0x35d571 } = {}) {
-    const _0x181d79 = normalizeText(_0x35d571);
-    if (!_0x181d79) return null;
-    const _0x2cb217 = (Array['isArray'](nodes) ? nodes : [])['filter'](
-      (_0x54cea5) => normalizeText(_0x54cea5?.['storyWorkspaceBinding']?.['projectId']) === _0x181d79,
+  findProjectAnchor({ nodes: nodes = [], projectId: projectId } = {}) {
+    const text = normalizeText(projectId);
+    if (!text) return null;
+    const list2 = (Array['isArray'](nodes) ? nodes : [])['filter'](
+      (options) => normalizeText(options?.['storyWorkspaceBinding']?.['projectId']) === text,
     );
     return (
-      _0x2cb217['find'](
-        (_0x25a20c) =>
-          _0x25a20c?.['storyWorkspaceBinding']?.['kind'] === 'stage-group' &&
-          _0x25a20c?.['storyWorkspaceBinding']?.['stage'] === 'project',
+      list2['find'](
+        (target) =>
+          target?.['storyWorkspaceBinding']?.['kind'] === 'stage-group' &&
+          target?.['storyWorkspaceBinding']?.['stage'] === 'project',
       ) ||
-      _0x2cb217['find']((_0x161623) => _0x161623?.['storyWorkspaceBinding']?.['kind'] === 'stage-group') ||
-      _0x2cb217['find'](
-        (_0x1853b9) => _0x1853b9?.['storyWorkspaceBinding']?.['kind'] === 'project-overview',
-      ) ||
+      list2['find']((source) => source?.['storyWorkspaceBinding']?.['kind'] === 'stage-group') ||
+      list2['find']((next) => next?.['storyWorkspaceBinding']?.['kind'] === 'project-overview') ||
       null
     );
   },
 });
-function pushLabeledLine(_0x19d832, _0x2de124, _0x22ace7) {
-  const _0x4299cf = normalizeText(_0x22ace7);
-  if (_0x4299cf) _0x19d832['push'](_0x2de124 + '：' + _0x4299cf);
+function pushLabeledLine(list3, current, entry) {
+  const text2 = normalizeText(entry);
+  if (text2) list3['push'](current + '：' + text2);
 }
-function getEpisodeLabel(_0x2e744f = {}) {
-  const _0x92ec05 = Math['max'](0x0, Math['trunc'](Number(_0x2e744f['number']) || 0x0));
-  return [_0x92ec05 > 0x0 ? '第\x20' + _0x92ec05 + '\x20集' : '分集', normalizeText(_0x2e744f['title'])]
+function getEpisodeLabel(options2 = {}) {
+  const count2 = Math['max'](0x0, Math['trunc'](Number(options2['number']) || 0x0));
+  return [count2 > 0x0 ? '第\x20' + count2 + '\x20集' : '分集', normalizeText(options2['title'])]
     ['filter'](Boolean)
     ['join'](' · ');
 }
-function getStableKeyPart(_0x42478a, _0x2e8173) {
-  return normalizeText(_0x42478a) || _0x2e8173;
+function getStableKeyPart(record, payload) {
+  return normalizeText(record) || payload;
 }
-function getAssetKindLabel(_0x3159f0) {
-  if (_0x3159f0 === 'scene') return '场景';
-  if (_0x3159f0 === 'prop') return '道具';
+function getAssetKindLabel(handle) {
+  if (handle === 'scene') return '场景';
+  if (handle === 'prop') return '道具';
   return '角色';
 }
-function getPositiveMediaDimension(..._0x340168) {
-  for (const _0x1d5e4e of _0x340168) {
-    const _0xc774b4 = Number(_0x1d5e4e);
-    if (Number['isFinite'](_0xc774b4) && _0xc774b4 > 0x0) return _0xc774b4;
+function getPositiveMediaDimension(...args) {
+  for (const state of args) {
+    const count3 = Number(state);
+    if (Number['isFinite'](count3) && count3 > 0x0) return count3;
   }
   return 0x0;
 }
@@ -102,10 +100,10 @@ function resolveStoryAssetCanvasGeometry({
   appearance: appearance = {},
   activeImage: activeImage = {},
 } = {}) {
-  const _0x391311 = STORY_PROJECT_CANVAS_NODE_SIZES['ai-image'],
-    _0x161db6 = asObject(appearance['generatedImage']),
-    _0x454b2f = asObject(asset['generatedImage']),
-    _0x53d7de = getPositiveMediaDimension(
+  const width = STORY_PROJECT_CANVAS_NODE_SIZES['ai-image'],
+    box = asObject(appearance['generatedImage']),
+    box2 = asObject(asset['generatedImage']),
+    imageWidth = getPositiveMediaDimension(
       appearance['imageWidth'],
       appearance['naturalWidth'],
       appearance['originalWidth'],
@@ -114,20 +112,20 @@ function resolveStoryAssetCanvasGeometry({
       activeImage['naturalWidth'],
       activeImage['originalWidth'],
       activeImage['width'],
-      _0x161db6['imageWidth'],
-      _0x161db6['naturalWidth'],
-      _0x161db6['originalWidth'],
-      _0x161db6['width'],
+      box['imageWidth'],
+      box['naturalWidth'],
+      box['originalWidth'],
+      box['width'],
       asset['imageWidth'],
       asset['naturalWidth'],
       asset['originalWidth'],
       asset['width'],
-      _0x454b2f['imageWidth'],
-      _0x454b2f['naturalWidth'],
-      _0x454b2f['originalWidth'],
-      _0x454b2f['width'],
+      box2['imageWidth'],
+      box2['naturalWidth'],
+      box2['originalWidth'],
+      box2['width'],
     ),
-    _0x213b4d = getPositiveMediaDimension(
+    imageHeight = getPositiveMediaDimension(
       appearance['imageHeight'],
       appearance['naturalHeight'],
       appearance['originalHeight'],
@@ -136,128 +134,122 @@ function resolveStoryAssetCanvasGeometry({
       activeImage['naturalHeight'],
       activeImage['originalHeight'],
       activeImage['height'],
-      _0x161db6['imageHeight'],
-      _0x161db6['naturalHeight'],
-      _0x161db6['originalHeight'],
-      _0x161db6['height'],
+      box['imageHeight'],
+      box['naturalHeight'],
+      box['originalHeight'],
+      box['height'],
       asset['imageHeight'],
       asset['naturalHeight'],
       asset['originalHeight'],
       asset['height'],
-      _0x454b2f['imageHeight'],
-      _0x454b2f['naturalHeight'],
-      _0x454b2f['originalHeight'],
-      _0x454b2f['height'],
+      box2['imageHeight'],
+      box2['naturalHeight'],
+      box2['originalHeight'],
+      box2['height'],
     );
-  if (!(_0x53d7de > 0x0 && _0x213b4d > 0x0))
-    return { width: _0x391311['width'], height: _0x391311['height'], imageWidth: 0x0, imageHeight: 0x0 };
+  if (!(imageWidth > 0x0 && imageHeight > 0x0))
+    return { width: width['width'], height: width['height'], imageWidth: 0x0, imageHeight: 0x0 };
   return {
-    ...getAutoMediaSizeByShortSide(_0x53d7de, _0x213b4d),
-    imageWidth: _0x53d7de,
-    imageHeight: _0x213b4d,
+    ...getAutoMediaSizeByShortSide(imageWidth, imageHeight),
+    imageWidth: imageWidth,
+    imageHeight: imageHeight,
   };
 }
-async function resolveStoryAssetImageRecordSize(_0x4a2875 = {}) {
-  const _0x5f256e = resolveStoryAssetCanvasGeometry({
-    asset: _0x4a2875,
-    appearance: _0x4a2875,
-    activeImage: asObject(_0x4a2875['generatedImage']),
+async function resolveStoryAssetImageRecordSize(asset2 = {}) {
+  const storyAssetCanvasGeometry = resolveStoryAssetCanvasGeometry({
+    asset: asset2,
+    appearance: asset2,
+    activeImage: asObject(asset2['generatedImage']),
   });
-  if (_0x5f256e['imageWidth'] > 0x0 && _0x5f256e['imageHeight'] > 0x0) return _0x4a2875;
-  const _0x31bee4 = asObject(_0x4a2875['generatedImage']),
-    _0x25c46a = await resolveOutputMediaSize({
-      localPath: normalizeText(
-        _0x31bee4['localPath'] || _0x31bee4['originalLocalPath'] || _0x4a2875['localPath'],
-      ),
-      imageUrl: normalizeText(_0x4a2875['imageUrl'] || _0x31bee4['imageUrl'] || _0x31bee4['url']),
-      sourceUrl: normalizeText(_0x31bee4['sourceUrl']),
-      thumbUrl: normalizeText(_0x31bee4['thumbUrl']),
+  if (storyAssetCanvasGeometry['imageWidth'] > 0x0 && storyAssetCanvasGeometry['imageHeight'] > 0x0)
+    return asset2;
+  const response = asObject(asset2['generatedImage']),
+    imageWidth2 = await resolveOutputMediaSize({
+      localPath: normalizeText(response['localPath'] || response['originalLocalPath'] || asset2['localPath']),
+      imageUrl: normalizeText(asset2['imageUrl'] || response['imageUrl'] || response['url']),
+      sourceUrl: normalizeText(response['sourceUrl']),
+      thumbUrl: normalizeText(response['thumbUrl']),
     });
-  return _0x25c46a
-    ? { ..._0x4a2875, imageWidth: _0x25c46a['width'], imageHeight: _0x25c46a['height'] }
-    : _0x4a2875;
+  return imageWidth2
+    ? { ...asset2, imageWidth: imageWidth2['width'], imageHeight: imageWidth2['height'] }
+    : asset2;
 }
-async function resolveStoryProjectAssetImageSizes(_0x21fe97 = []) {
+async function resolveStoryProjectAssetImageSizes(list4 = []) {
   return Promise['all'](
-    normalizeList(_0x21fe97)['map'](async (_0x1622c7) => {
-      const _0x43a0f1 = normalizeList(_0x1622c7['appearances']);
-      if (!_0x43a0f1['length']) return resolveStoryAssetImageRecordSize(_0x1622c7);
+    normalizeList(list4)['map'](async (args2) => {
+      const list5 = normalizeList(args2['appearances']);
+      if (!list5['length']) return resolveStoryAssetImageRecordSize(args2);
       return {
-        ..._0x1622c7,
-        appearances: await Promise['all'](
-          _0x43a0f1['map']((_0x4465e1) => resolveStoryAssetImageRecordSize(_0x4465e1)),
-        ),
+        ...args2,
+        appearances: await Promise['all'](list5['map']((config) => resolveStoryAssetImageRecordSize(config))),
       };
     }),
   );
 }
-function createPlanEntry(_0x56accd, _0x16068c, _0x173efa, _0x548ddb = {}) {
-  const _0xb5b153 = normalizeText(_0x16068c?.['type']),
-    _0x4515a0 = STORY_PROJECT_CANVAS_NODE_SIZES[_0xb5b153];
-  if (!_0xb5b153 || !_0x4515a0) throw new Error('不支持的项目画布节点类型：' + (_0xb5b153 || 'unknown'));
-  const _0xeaf807 = Math['max'](0x1, Number(_0x548ddb['width']) || _0x4515a0['width']),
-    _0x5e43eb = Math['max'](0x1, Number(_0x548ddb['height']) || _0x4515a0['height']),
-    _0x8ef7a1 = normalizeList(_0x548ddb['inputConnections'])
-      ['map']((_0x8304b2) => {
-        if (typeof _0x8304b2 === 'string') return { key: normalizeText(_0x8304b2), preferredRefSlot: '' };
+function createPlanEntry(key2, data2, box3, box4 = {}) {
+  const type = normalizeText(data2?.['type']),
+    box5 = STORY_PROJECT_CANVAS_NODE_SIZES[type];
+  if (!type || !box5) throw new Error('不支持的项目画布节点类型：' + (type || 'unknown'));
+  const width2 = Math['max'](0x1, Number(box4['width']) || box5['width']),
+    height = Math['max'](0x1, Number(box4['height']) || box5['height']),
+    inputConnections = normalizeList(box4['inputConnections'])
+      ['map']((event) => {
+        if (typeof event === 'string') return { key: normalizeText(event), preferredRefSlot: '' };
         return {
-          key: normalizeText(_0x8304b2?.['key']),
-          preferredRefSlot: normalizeText(_0x8304b2?.['preferredRefSlot']),
+          key: normalizeText(event?.['key']),
+          preferredRefSlot: normalizeText(event?.['preferredRefSlot']),
         };
       })
-      ['filter']((_0x384c8c) => _0x384c8c['key']);
+      ['filter']((event2) => event2['key']);
   return {
-    key: _0x56accd,
-    type: _0xb5b153,
-    data: _0x16068c,
-    width: _0xeaf807,
-    height: _0x5e43eb,
-    position: { x: Number(_0x173efa?.['x']) || 0x0, y: Number(_0x173efa?.['y']) || 0x0 },
-    ...(normalizeText(_0x548ddb['parentKey']) ? { parentKey: normalizeText(_0x548ddb['parentKey']) } : {}),
-    ...(normalizeList(_0x548ddb['inputKeys'])['length']
-      ? { inputKeys: normalizeList(_0x548ddb['inputKeys'])['map'](normalizeText)['filter'](Boolean) }
+    key: key2,
+    type: type,
+    data: data2,
+    width: width2,
+    height: height,
+    position: { x: Number(box3?.['x']) || 0x0, y: Number(box3?.['y']) || 0x0 },
+    ...(normalizeText(box4['parentKey']) ? { parentKey: normalizeText(box4['parentKey']) } : {}),
+    ...(normalizeList(box4['inputKeys'])['length']
+      ? { inputKeys: normalizeList(box4['inputKeys'])['map'](normalizeText)['filter'](Boolean) }
       : {}),
-    ...(_0x8ef7a1['length'] ? { inputConnections: _0x8ef7a1 } : {}),
+    ...(inputConnections['length'] ? { inputConnections: inputConnections } : {}),
   };
 }
-export function buildStoryProjectCanvasName(_0x11f23a = {}, _0x57095b = {}) {
-  return buildStoryLinkedCanvasName(_0x11f23a, _0x57095b);
+export function buildStoryProjectCanvasName(options3 = {}, scope = {}) {
+  return buildStoryLinkedCanvasName(options3, scope);
 }
 export function buildStoryProjectOverviewNodeData({ project: project = {} } = {}) {
-  const _0x310a9b = [];
+  const content2 = [];
   return (
-    pushLabeledLine(_0x310a9b, '项目名称', buildStoryProjectCanvasName(project)),
-    pushLabeledLine(_0x310a9b, '类型', project['storyType']),
-    pushLabeledLine(_0x310a9b, '目标受众', project['targetAudience']),
-    pushLabeledLine(_0x310a9b, '一句话故事', project['logline']),
-    pushLabeledLine(_0x310a9b, '故事摘要', project['summary']),
-    pushLabeledLine(_0x310a9b, '故事背景', project['background']),
-    pushLabeledLine(_0x310a9b, '世界设定', project['setting']),
-    pushLabeledLine(_0x310a9b, '核心钩子', project['coreHook']),
+    pushLabeledLine(content2, '项目名称', buildStoryProjectCanvasName(project)),
+    pushLabeledLine(content2, '类型', project['storyType']),
+    pushLabeledLine(content2, '目标受众', project['targetAudience']),
+    pushLabeledLine(content2, '一句话故事', project['logline']),
+    pushLabeledLine(content2, '故事摘要', project['summary']),
+    pushLabeledLine(content2, '故事背景', project['background']),
+    pushLabeledLine(content2, '世界设定', project['setting']),
+    pushLabeledLine(content2, '核心钩子', project['coreHook']),
     {
       type: 'source-text',
       name: buildStoryProjectCanvasName(project) + ' · 项目设定',
-      content: _0x310a9b['join']('\x0a\x0a'),
+      content: content2['join']('\x0a\x0a'),
       storyWorkspaceBinding: { projectId: normalizeText(project['id']), kind: 'project-overview' },
     }
   );
 }
 export function buildStoryProjectCopyNodeData({ project: project = {} } = {}) {
-  const _0x520a9f = [],
-    _0x3d6b54 = normalizeText(project['originalCreative'] || project['sourceDocument']?.['text']);
-  if (_0x3d6b54) _0x520a9f['push']('原始创意\n' + _0x3d6b54);
-  const _0xd369f4 = normalizeText(project['plotScript']);
-  if (_0xd369f4 && _0xd369f4 !== _0x3d6b54) _0x520a9f['push']('完整文案\n' + _0xd369f4);
-  const _0x21ca9a = normalizeText(project['narrationScript']);
+  const content3 = [],
+    text3 = normalizeText(project['originalCreative'] || project['sourceDocument']?.['text']);
+  if (text3) content3['push']('原始创意\n' + text3);
+  const text4 = normalizeText(project['plotScript']);
+  if (text4 && text4 !== text3) content3['push']('完整文案\n' + text4);
+  const text5 = normalizeText(project['narrationScript']);
   return (
-    _0x21ca9a &&
-      _0x21ca9a !== _0xd369f4 &&
-      _0x21ca9a !== _0x3d6b54 &&
-      _0x520a9f['push']('旁白文案\x0a' + _0x21ca9a),
+    text5 && text5 !== text4 && text5 !== text3 && content3['push']('旁白文案\x0a' + text5),
     {
       type: 'source-text',
       name: buildStoryProjectCanvasName(project) + '\x20·\x20完整文案',
-      content: _0x520a9f['join']('\x0a\x0a---\x0a\x0a'),
+      content: content3['join']('\x0a\x0a---\x0a\x0a'),
       storyWorkspaceBinding: { projectId: normalizeText(project['id']), kind: 'project-copy' },
     }
   );
@@ -270,35 +262,35 @@ export function buildStoryAssetCanvasNodeData({
   provider: provider = '',
   generationParams: generationParams = {},
 } = {}) {
-  const _0x34e3cc = asObject(appearance['generatedImage']),
-    _0x4efe95 = normalizeText(
+  const response2 = asObject(appearance['generatedImage']),
+    imageUrl = normalizeText(
       appearance['imageUrl'] ||
-        _0x34e3cc['imageUrl'] ||
-        _0x34e3cc['url'] ||
-        _0x34e3cc['sourceUrl'] ||
+        response2['imageUrl'] ||
+        response2['url'] ||
+        response2['sourceUrl'] ||
         asset['imageUrl'],
     ),
-    _0x8750c8 =
+    images =
       Array['isArray'](appearance['generatedImages']) && appearance['generatedImages']['length']
         ? appearance['generatedImages']
-        : Object['keys'](_0x34e3cc)['length'] > 0x0
-          ? [{ ..._0x34e3cc, imageUrl: _0x4efe95 || _0x34e3cc['imageUrl'] }]
-          : _0x4efe95
-            ? [{ url: _0x4efe95, imageUrl: _0x4efe95, sourceUrl: _0x4efe95, thumbUrl: _0x4efe95 }]
+        : Object['keys'](response2)['length'] > 0x0
+          ? [{ ...response2, imageUrl: imageUrl || response2['imageUrl'] }]
+          : imageUrl
+            ? [{ url: imageUrl, imageUrl: imageUrl, sourceUrl: imageUrl, thumbUrl: imageUrl }]
             : [],
-    _0x18899f = normalizeImageGenerationResult({ images: _0x8750c8 })['items'],
-    _0x22c28b = normalizeIndex(appearance['activeIndex'], _0x18899f['length']),
-    _0x579db7 = _0x18899f[_0x22c28b] || {},
-    _0x231da7 = resolveStoryAssetCanvasGeometry({
+    images2 = normalizeImageGenerationResult({ images: images })['items'],
+    mainImageIndex = normalizeIndex(appearance['activeIndex'], images2['length']),
+    activeImage2 = images2[mainImageIndex] || {},
+    width3 = resolveStoryAssetCanvasGeometry({
       asset: asset,
       appearance: appearance,
-      activeImage: _0x579db7,
+      activeImage: activeImage2,
     }),
-    _0xc22ae = normalizeText(appearance['name']),
-    _0x35fbdd = !_0xc22ae || _0xc22ae === '基础形象';
+    text6 = normalizeText(appearance['name']),
+    output = !text6 || text6 === '基础形象';
   return {
     type: 'ai-image',
-    name: [getAssetKindLabel(asset['kind']), normalizeText(asset['name']), _0x35fbdd ? '' : _0xc22ae]
+    name: [getAssetKindLabel(asset['kind']), normalizeText(asset['name']), output ? '' : text6]
       ['filter'](Boolean)
       ['join'](' · '),
     prompt: normalizeText(
@@ -307,22 +299,22 @@ export function buildStoryAssetCanvasNodeData({
     model: normalizeText(appearance['modelId'] || appearance['generation']?.['modelId'] || modelId),
     provider: normalizeText(appearance['provider'] || appearance['generation']?.['provider'] || provider),
     generationParams: { ...asObject(generationParams), ...asObject(appearance['generationParams']) },
-    images: _0x18899f,
-    mainImageIndex: _0x22c28b,
+    images: images2,
+    mainImageIndex: mainImageIndex,
     isImagesExpanded: ![],
-    imageUrl: normalizeText(_0x579db7['imageUrl'] || _0x579db7['url'] || _0x4efe95),
-    sourceUrl: normalizeText(_0x579db7['sourceUrl']),
-    thumbUrl: normalizeText(_0x579db7['thumbUrl']),
-    localPath: normalizeText(_0x579db7['localPath']),
-    originalLocalPath: normalizeText(_0x579db7['originalLocalPath']),
-    displayLocalPath: normalizeText(_0x579db7['displayLocalPath']),
-    thumbLocalPath: normalizeText(_0x579db7['thumbLocalPath']),
-    sourceId: normalizeText(_0x579db7['sourceId']),
-    thumbId: normalizeText(_0x579db7['thumbId']),
-    width: _0x231da7['width'],
-    height: _0x231da7['height'],
-    ...(_0x231da7['imageWidth'] > 0x0 && _0x231da7['imageHeight'] > 0x0
-      ? { imageWidth: _0x231da7['imageWidth'], imageHeight: _0x231da7['imageHeight'] }
+    imageUrl: normalizeText(activeImage2['imageUrl'] || activeImage2['url'] || imageUrl),
+    sourceUrl: normalizeText(activeImage2['sourceUrl']),
+    thumbUrl: normalizeText(activeImage2['thumbUrl']),
+    localPath: normalizeText(activeImage2['localPath']),
+    originalLocalPath: normalizeText(activeImage2['originalLocalPath']),
+    displayLocalPath: normalizeText(activeImage2['displayLocalPath']),
+    thumbLocalPath: normalizeText(activeImage2['thumbLocalPath']),
+    sourceId: normalizeText(activeImage2['sourceId']),
+    thumbId: normalizeText(activeImage2['thumbId']),
+    width: width3['width'],
+    height: width3['height'],
+    ...(width3['imageWidth'] > 0x0 && width3['imageHeight'] > 0x0
+      ? { imageWidth: width3['imageWidth'], imageHeight: width3['imageHeight'] }
       : {}),
     storyWorkspaceBinding: {
       projectId: normalizeText(project['id']),
@@ -334,18 +326,18 @@ export function buildStoryAssetCanvasNodeData({
   };
 }
 export function buildStoryEpisodeCopyNodeData({ project: project = {}, episode: episode = {} } = {}) {
-  const _0x37444e = [];
-  (pushLabeledLine(_0x37444e, '分集', getEpisodeLabel(episode)),
-    pushLabeledLine(_0x37444e, '本集梗概', episode['synopsis']),
-    pushLabeledLine(_0x37444e, '本集钩子', episode['hook'] || episode['coreHook']));
-  const _0x47c0cd = normalizeText(
+  const content4 = [];
+  (pushLabeledLine(content4, '分集', getEpisodeLabel(episode)),
+    pushLabeledLine(content4, '本集梗概', episode['synopsis']),
+    pushLabeledLine(content4, '本集钩子', episode['hook'] || episode['coreHook']));
+  const text7 = normalizeText(
     typeof episode['script'] === 'string' ? episode['script'] : episode['script']?.['fullText'],
   );
-  if (_0x47c0cd) _0x37444e['push']('完整剧本\n' + _0x47c0cd);
+  if (text7) content4['push']('完整剧本\n' + text7);
   return {
     type: 'source-text',
     name: getEpisodeLabel(episode) + ' · 分集文案',
-    content: _0x37444e['join']('\x0a\x0a'),
+    content: content4['join']('\x0a\x0a'),
     storyWorkspaceBinding: {
       projectId: normalizeText(project['id']),
       episodeId: normalizeText(episode['id']),
@@ -353,45 +345,42 @@ export function buildStoryEpisodeCopyNodeData({ project: project = {}, episode: 
     },
   };
 }
-function buildAssetLookup(_0x146f6d = []) {
-  const _0x7a935a = new Map();
+function buildAssetLookup(list6 = []) {
+  const map = new Map();
   return (
-    normalizeList(_0x146f6d)['forEach']((_0x2be1e3) => {
-      [_0x2be1e3['id'], _0x2be1e3['planningRef']]
+    normalizeList(list6)['forEach']((value2) => {
+      [value2['id'], value2['planningRef']]
         ['map'](normalizeText)
         ['filter'](Boolean)
-        ['forEach']((_0x3b0c3d) => {
-          _0x7a935a['set'](_0x3b0c3d, _0x2be1e3);
+        ['forEach']((value3) => {
+          map['set'](value3, value2);
         });
     }),
-    _0x7a935a
+    map
   );
 }
-function describeShotAssets(_0x478ec0, _0x2b9783) {
-  const _0x44e13b = { character: [], scene: [], prop: [], all: [] };
+function describeShotAssets(value4, map2) {
+  const promise = { character: [], scene: [], prop: [], all: [] };
   return (
-    normalizeList(_0x478ec0)['forEach']((_0x4975e5) => {
-      const _0x346cb2 = normalizeText(_0x4975e5?.['assetRef']),
-        _0x4a4432 = _0x2b9783['get'](_0x346cb2);
-      if (!_0x4a4432) return;
-      const _0x46fda7 = normalizeText(_0x4a4432['name']) || _0x346cb2,
-        _0x18ede2 = normalizeText(_0x4975e5?.['appearanceRef']),
-        _0x2fd853 = normalizeList(_0x4a4432['appearances'])['find'](
-          (_0x303b50) =>
-            normalizeText(_0x303b50?.['id']) === _0x18ede2 ||
-            normalizeText(_0x303b50?.['planningRef']) === _0x18ede2,
+    normalizeList(value4)['forEach']((value5) => {
+      const text8 = normalizeText(value5?.['assetRef']),
+        error = map2['get'](text8);
+      if (!error) return;
+      const text9 = normalizeText(error['name']) || text8,
+        text10 = normalizeText(value5?.['appearanceRef']),
+        error2 = normalizeList(error['appearances'])['find'](
+          (value6) =>
+            normalizeText(value6?.['id']) === text10 || normalizeText(value6?.['planningRef']) === text10,
         ),
-        _0x8bded9 =
-          _0x2fd853 && normalizeText(_0x2fd853['name']) !== '基础形象'
-            ? _0x46fda7 + '\x20·\x20' + normalizeText(_0x2fd853['name'])
-            : _0x46fda7,
-        _0x16fc71 = ['character', 'scene', 'prop']['includes'](_0x4a4432['kind'])
-          ? _0x4a4432['kind']
-          : 'character';
-      if (!_0x44e13b[_0x16fc71]['includes'](_0x8bded9)) _0x44e13b[_0x16fc71]['push'](_0x8bded9);
-      if (!_0x44e13b['all']['includes'](_0x8bded9)) _0x44e13b['all']['push'](_0x8bded9);
+        value7 =
+          error2 && normalizeText(error2['name']) !== '基础形象'
+            ? text9 + '\x20·\x20' + normalizeText(error2['name'])
+            : text9,
+        value8 = ['character', 'scene', 'prop']['includes'](error['kind']) ? error['kind'] : 'character';
+      if (!promise[value8]['includes'](value7)) promise[value8]['push'](value7);
+      if (!promise['all']['includes'](value7)) promise['all']['push'](value7);
     }),
-    _0x44e13b
+    promise
   );
 }
 export function buildStoryEpisodeStoryboardNodeData({
@@ -399,44 +388,41 @@ export function buildStoryEpisodeStoryboardNodeData({
   episode: episode = {},
   assets: assets = [],
 } = {}) {
-  const _0x897daf = buildAssetLookup(assets),
-    _0x77affe = [];
-  normalizeList(episode['clips'])['forEach']((_0x4a6d83, _0x2a36f0) => {
-    normalizeList(_0x4a6d83['shots'])['forEach']((_0x589f23, _0x4a6ca7) => {
-      const _0x163126 = describeShotAssets(_0x589f23['assetUsages'], _0x897daf),
-        _0x3698f8 = Number(_0x589f23['durationSec'] || _0x589f23['durationSeconds']);
-      _0x77affe['push']({
+  const assetLookup = buildAssetLookup(assets),
+    rows = [];
+  normalizeList(episode['clips'])['forEach']((value9, value10) => {
+    normalizeList(value9['shots'])['forEach']((value11, value12) => {
+      const promise2 = describeShotAssets(value11['assetUsages'], assetLookup),
+        count4 = Number(value11['durationSec'] || value11['durationSeconds']);
+      rows['push']({
         镜号:
-          Math['max'](0x1, Math['trunc'](Number(_0x4a6d83['number']) || _0x2a36f0 + 0x1)) +
-          '-' +
-          (_0x4a6ca7 + 0x1),
+          Math['max'](0x1, Math['trunc'](Number(value9['number']) || value10 + 0x1)) + '-' + (value12 + 0x1),
         时长:
-          normalizeText(_0x589f23['time']) ||
-          (Number['isFinite'](_0x3698f8) && _0x3698f8 > 0x0 ? _0x3698f8 + 's' : ''),
-        场景: _0x163126['scene']['join']('、'),
-        画面描述: normalizeText(_0x589f23['visual']),
-        角色: _0x163126['character']['join']('、'),
-        角色描述: _0x163126['character']['join']('、'),
-        角色动作: normalizeText(_0x589f23['action']),
-        情绪: normalizeText(_0x589f23['emotion'] || _0x4a6d83['creativeIntent']),
-        参考: _0x163126['all']['join']('、'),
-        图片提示词: normalizeText(_0x589f23['imagePrompt']),
-        视频提示词: normalizeText(_0x589f23['videoPrompt'] || _0x4a6d83['prompt']),
-        对白: [normalizeText(_0x589f23['dialogue']), normalizeText(_0x589f23['voiceover'])]
+          normalizeText(value11['time']) || (Number['isFinite'](count4) && count4 > 0x0 ? count4 + 's' : ''),
+        场景: promise2['scene']['join']('、'),
+        画面描述: normalizeText(value11['visual']),
+        角色: promise2['character']['join']('、'),
+        角色描述: promise2['character']['join']('、'),
+        角色动作: normalizeText(value11['action']),
+        情绪: normalizeText(value11['emotion'] || value9['creativeIntent']),
+        参考: promise2['all']['join']('、'),
+        图片提示词: normalizeText(value11['imagePrompt']),
+        视频提示词: normalizeText(value11['videoPrompt'] || value9['prompt']),
+        对白: [normalizeText(value11['dialogue']), normalizeText(value11['voiceover'])]
           ['filter'](Boolean)
           ['join']('\x0a'),
-        音效: normalizeText(_0x589f23['audio']),
+        音效: normalizeText(value11['audio']),
       });
     });
   });
-  const _0x9c789a = getEpisodeLabel(episode) + ' · 分镜表';
+  const name2 = getEpisodeLabel(episode) + ' · 分镜表';
   return {
     type: 'storyboard-script',
-    name: _0x9c789a,
+    name: name2,
     storyboardScript: createDefaultStoryboardScriptState({
-      title: _0x9c789a,
+      title: name2,
       mediaMode: 'video',
-      rows: _0x77affe,
+      rows: rows,
     }),
     storyWorkspaceBinding: {
       projectId: normalizeText(project['id']),
@@ -466,21 +452,21 @@ function buildStoryStageAnnotationNodeData({
     },
   };
 }
-function normalizeStoryAssetKind(_0x3cb158) {
-  const _0x3c09e9 = normalizeText(_0x3cb158);
-  return ['character', 'scene', 'prop']['includes'](_0x3c09e9) ? _0x3c09e9 : 'character';
+function normalizeStoryAssetKind(value13) {
+  const text11 = normalizeText(value13);
+  return ['character', 'scene', 'prop']['includes'](text11) ? text11 : 'character';
 }
-function buildStoryClipInputMediaLocation(_0x37ab12 = {}) {
-  const _0x343b4c = normalizeText(
-      _0x37ab12?.['url'] ||
-        _0x37ab12?.['localUrl'] ||
-        _0x37ab12?.['imageUrl'] ||
-        _0x37ab12?.['videoUrl'] ||
-        _0x37ab12?.['audioUrl'] ||
-        _0x37ab12?.['localPath'],
+function buildStoryClipInputMediaLocation(response3 = {}) {
+  const text12 = normalizeText(
+      response3?.['url'] ||
+        response3?.['localUrl'] ||
+        response3?.['imageUrl'] ||
+        response3?.['videoUrl'] ||
+        response3?.['audioUrl'] ||
+        response3?.['localPath'],
     ),
-    _0x4665fa = normalizeLocalPath(_0x343b4c);
-  return { localPath: _0x4665fa, url: localPathToUrl(_0x4665fa) || _0x343b4c };
+    localPath = normalizeLocalPath(text12);
+  return { localPath: localPath, url: localPathToUrl(localPath) || text12 };
 }
 function buildStoryClipInputCanvasNodeData({
   project: project = {},
@@ -490,15 +476,15 @@ function buildStoryClipInputCanvasNodeData({
   kind: kind = 'image',
   inputIndex: inputIndex = 0x0,
 } = {}) {
-  const _0x1a5873 = buildStoryClipInputMediaLocation(input);
-  if (!_0x1a5873['url']) return null;
-  const _0x1a2600 = getEpisodeLabel(episode),
-    _0x16289d = Math['max'](0x1, Math['trunc'](Number(clip['number']) || 0x1)),
-    _0x1c3faa = { image: '图片入参', video: '视频入参', audio: '音频入参' }[kind] || '媒体入参',
-    _0x1b61ee =
+  const localPath2 = buildStoryClipInputMediaLocation(input);
+  if (!localPath2['url']) return null;
+  const episodeLabel = getEpisodeLabel(episode),
+    value14 = Math['max'](0x1, Math['trunc'](Number(clip['number']) || 0x1)),
+    value15 = { image: '图片入参', video: '视频入参', audio: '音频入参' }[kind] || '媒体入参',
+    name3 =
       normalizeText(input['name']) ||
-      _0x1a2600 + ' · 片段 ' + _0x16289d + '\x20·\x20' + _0x1c3faa + '\x20' + (inputIndex + 0x1),
-    _0x2a6d92 = {
+      episodeLabel + ' · 片段 ' + value14 + '\x20·\x20' + value15 + '\x20' + (inputIndex + 0x1),
+    storyWorkspaceBinding = {
       projectId: normalizeText(project['id']),
       episodeId: normalizeText(episode['id']),
       clipId: normalizeText(clip['id']),
@@ -508,81 +494,78 @@ function buildStoryClipInputCanvasNodeData({
       canvasScope: 'project',
     };
   if (kind === 'video') {
-    const _0x4cc913 = normalizeVideoGenerationResult({
-      videos: [{ localPath: _0x1a5873['localPath'], videoUrl: _0x1a5873['url'] }],
+    const videos = normalizeVideoGenerationResult({
+      videos: [{ localPath: localPath2['localPath'], videoUrl: localPath2['url'] }],
     })['items'][0x0];
     return {
       type: 'source-video',
-      name: _0x1b61ee,
-      videos: _0x4cc913 ? [_0x4cc913] : [],
+      name: name3,
+      videos: videos ? [videos] : [],
       mainVideoIndex: 0x0,
-      videoUrl: normalizeText(_0x4cc913?.['videoUrl'] || _0x1a5873['url']),
-      localPath: normalizeText(_0x4cc913?.['localPath'] || _0x1a5873['localPath']),
-      storyWorkspaceBinding: _0x2a6d92,
+      videoUrl: normalizeText(videos?.['videoUrl'] || localPath2['url']),
+      localPath: normalizeText(videos?.['localPath'] || localPath2['localPath']),
+      storyWorkspaceBinding: storyWorkspaceBinding,
     };
   }
   if (kind === 'audio') {
-    const _0x30806c = normalizeAudioGenerationResult({
-      audios: [{ localPath: _0x1a5873['localPath'], audioUrl: _0x1a5873['url'] }],
+    const audios = normalizeAudioGenerationResult({
+      audios: [{ localPath: localPath2['localPath'], audioUrl: localPath2['url'] }],
     })['items'][0x0];
     return {
       type: 'source-audio',
-      name: _0x1b61ee,
-      fileName: _0x1b61ee,
-      audios: _0x30806c ? [_0x30806c] : [],
+      name: name3,
+      fileName: name3,
+      audios: audios ? [audios] : [],
       mainAudioIndex: 0x0,
-      audioUrl: normalizeText(_0x30806c?.['audioUrl'] || _0x1a5873['url']),
-      localPath: normalizeText(_0x30806c?.['localPath'] || _0x1a5873['localPath']),
-      storyWorkspaceBinding: _0x2a6d92,
+      audioUrl: normalizeText(audios?.['audioUrl'] || localPath2['url']),
+      localPath: normalizeText(audios?.['localPath'] || localPath2['localPath']),
+      storyWorkspaceBinding: storyWorkspaceBinding,
     };
   }
-  const _0x2027b2 = normalizeImageGenerationResult({
+  const images3 = normalizeImageGenerationResult({
     images: [
       {
-        localPath: _0x1a5873['localPath'],
-        imageUrl: _0x1a5873['url'],
-        sourceUrl: _0x1a5873['url'],
+        localPath: localPath2['localPath'],
+        imageUrl: localPath2['url'],
+        sourceUrl: localPath2['url'],
         ...buildCanvasLocalImageFields(input),
       },
     ],
   })['items'][0x0];
   return {
     type: 'source-image',
-    name: _0x1b61ee,
-    images: _0x2027b2 ? [_0x2027b2] : [],
+    name: name3,
+    images: images3 ? [images3] : [],
     mainImageIndex: 0x0,
-    imageUrl: normalizeText(_0x2027b2?.['imageUrl'] || _0x1a5873['url']),
-    sourceUrl: normalizeText(_0x2027b2?.['sourceUrl'] || _0x1a5873['url']),
-    localPath: normalizeText(_0x2027b2?.['localPath'] || _0x1a5873['localPath']),
-    ...buildCanvasLocalImageFields(_0x2027b2 || {}),
-    storyWorkspaceBinding: _0x2a6d92,
+    imageUrl: normalizeText(images3?.['imageUrl'] || localPath2['url']),
+    sourceUrl: normalizeText(images3?.['sourceUrl'] || localPath2['url']),
+    localPath: normalizeText(images3?.['localPath'] || localPath2['localPath']),
+    ...buildCanvasLocalImageFields(images3 || {}),
+    storyWorkspaceBinding: storyWorkspaceBinding,
   };
 }
-function findStoryAssetCanvasRecord(_0x5954ba = [], _0x1bcf9d = {}) {
-  const _0x3027d3 = normalizeText(
-      _0x1bcf9d['storyAssetId'] ||
-        _0x1bcf9d['sourceStoryAssetId'] ||
-        _0x1bcf9d['assetRef'] ||
-        _0x1bcf9d['assetId'],
+function findStoryAssetCanvasRecord(list7 = [], value16 = {}) {
+  const text13 = normalizeText(
+      value16['storyAssetId'] || value16['sourceStoryAssetId'] || value16['assetRef'] || value16['assetId'],
     ),
-    _0x1eb35a = normalizeText(
-      _0x1bcf9d['appearanceId'] || _0x1bcf9d['appearanceRef'] || _0x1bcf9d['storyAppearanceId'],
+    text14 = normalizeText(
+      value16['appearanceId'] || value16['appearanceRef'] || value16['storyAppearanceId'],
     ),
-    _0x28936b = buildStoryClipInputMediaLocation(_0x1bcf9d)['url'],
-    _0x44b95f = normalizeList(_0x5954ba)['filter'](
-      (_0xb351f9) => !_0x3027d3 || normalizeList(_0xb351f9['assetRefs'])['includes'](_0x3027d3),
+    storyClipInputMediaLocation = buildStoryClipInputMediaLocation(value16)['url'],
+    list8 = normalizeList(list7)['filter'](
+      (value17) => !text13 || normalizeList(value17['assetRefs'])['includes'](text13),
     ),
-    _0x501f56 = _0x44b95f['find'](
-      (_0x2e0f71) => _0x1eb35a && normalizeList(_0x2e0f71['appearanceRefs'])['includes'](_0x1eb35a),
+    value18 = list8['find'](
+      (value19) => text14 && normalizeList(value19['appearanceRefs'])['includes'](text14),
     );
-  if (_0x501f56) return _0x501f56;
-  if (_0x28936b) {
-    const _0x4f4b27 = normalizeList(_0x5954ba)['find']((_0x14dcb2) =>
-      normalizeList(_0x14dcb2['imageRefs'])['includes'](_0x28936b),
+  if (value18) return value18;
+  if (storyClipInputMediaLocation) {
+    const list9 = normalizeList(list7)['find']((value20) =>
+      normalizeList(value20['imageRefs'])['includes'](storyClipInputMediaLocation),
     );
-    if (_0x4f4b27) return _0x4f4b27;
+    if (list9) return list9;
   }
-  return _0x3027d3 ? _0x44b95f[0x0] || null : null;
+  return text13 ? list8[0x0] || null : null;
 }
 function buildStoryClipCanvasInputPlan({
   project: project = {},
@@ -592,79 +575,75 @@ function buildStoryClipCanvasInputPlan({
   assetRecords: assetRecords = [],
   clipKey: clipKey = '',
 } = {}) {
-  const _0x5532ae = new Map(),
-    _0x2c7d78 = (_0x565a2b, _0x3faeb5 = '') => {
-      const _0x42d930 = normalizeText(_0x565a2b);
-      if (!_0x42d930) return;
-      const _0x306ff5 = normalizeText(_0x3faeb5),
-        _0x2470c3 = _0x5532ae['get'](_0x42d930);
-      (!_0x2470c3 || (!_0x2470c3['preferredRefSlot'] && _0x306ff5)) &&
-        _0x5532ae['set'](_0x42d930, { key: _0x42d930, preferredRefSlot: _0x306ff5 });
+  const map3 = new Map(),
+    handler = (value21, value22 = '') => {
+      const key3 = normalizeText(value21);
+      if (!key3) return;
+      const preferredRefSlot = normalizeText(value22),
+        enabled = map3['get'](key3);
+      (!enabled || (!enabled['preferredRefSlot'] && preferredRefSlot)) &&
+        map3['set'](key3, { key: key3, preferredRefSlot: preferredRefSlot });
     },
-    _0x4465a5 = (_0x3ba568, _0x446927 = '') => {
-      const _0x595383 = findStoryAssetCanvasRecord(assetRecords, _0x3ba568);
-      if (_0x595383?.['key']) _0x2c7d78(_0x595383['key'], _0x446927);
-      return _0x595383;
+    handler2 = (value23, value24 = '') => {
+      const event3 = findStoryAssetCanvasRecord(assetRecords, value23);
+      if (event3?.['key']) handler(event3['key'], value24);
+      return event3;
     };
   ([
     ...normalizeList(clip['assetUsages']),
-    ...normalizeList(clip['shots'])['flatMap']((_0x5e7ac0) => normalizeList(_0x5e7ac0?.['assetUsages'])),
-  ]['forEach']((_0x148785) => _0x4465a5(_0x148785)),
-    normalizeList(clip['assetIds'])['forEach']((_0x5d17cb) => {
-      _0x4465a5({ assetId: _0x5d17cb });
+    ...normalizeList(clip['shots'])['flatMap']((value25) => normalizeList(value25?.['assetUsages'])),
+  ]['forEach']((value26) => handler2(value26)),
+    normalizeList(clip['assetIds'])['forEach']((assetId) => {
+      handler2({ assetId: assetId });
     }),
     resolveStoryClipPromptAssetRefs(clip['prompt'], { assets: assets, episode: episode })['forEach'](
-      (_0x5e3a1a) => _0x4465a5(_0x5e3a1a),
+      (value27) => handler2(value27),
     ));
-  const _0x1dd4fc = [],
-    _0x3e48e1 = normalizeStoryClipInputs(clip['inputs']);
+  const inputEntries = [],
+    storyClipInputs = normalizeStoryClipInputs(clip['inputs']);
   return (
-    ['image', 'video', 'audio']['forEach']((_0x522075) => {
-      normalizeList(_0x3e48e1[_0x522075])['forEach']((_0x25ca5e, _0x5dd1e4) => {
-        const _0x1c7833 = normalizeText(_0x25ca5e['slotId']),
-          _0x404a3e = _0x4465a5(_0x25ca5e, _0x1c7833);
-        if (_0x404a3e) return;
-        const _0x58564c = buildStoryClipInputCanvasNodeData({
+    ['image', 'video', 'audio']['forEach']((kind2) => {
+      normalizeList(storyClipInputs[kind2])['forEach']((input2, inputIndex2) => {
+        const text15 = normalizeText(input2['slotId']),
+          value28 = handler2(input2, text15);
+        if (value28) return;
+        const data3 = buildStoryClipInputCanvasNodeData({
           project: project,
           episode: episode,
           clip: clip,
-          input: _0x25ca5e,
-          kind: _0x522075,
-          inputIndex: _0x5dd1e4,
+          input: input2,
+          kind: kind2,
+          inputIndex: inputIndex2,
         });
-        if (!_0x58564c) return;
-        const _0x5abc0d = encodeURIComponent(_0x1c7833 || _0x522075 + '-' + (_0x5dd1e4 + 0x1)),
-          _0x39e730 = clipKey + ':input:' + _0x522075 + ':' + _0x5abc0d;
-        (_0x1dd4fc['push']({
-          key: _0x39e730,
-          data: _0x58564c,
-          width: STORY_PROJECT_CANVAS_NODE_SIZES[_0x58564c['type']]['width'],
-          height: STORY_PROJECT_CANVAS_NODE_SIZES[_0x58564c['type']]['height'],
+        if (!data3) return;
+        const encodeURIComponent2 = encodeURIComponent(text15 || kind2 + '-' + (inputIndex2 + 0x1)),
+          key4 = clipKey + ':input:' + kind2 + ':' + encodeURIComponent2;
+        (inputEntries['push']({
+          key: key4,
+          data: data3,
+          width: STORY_PROJECT_CANVAS_NODE_SIZES[data3['type']]['width'],
+          height: STORY_PROJECT_CANVAS_NODE_SIZES[data3['type']]['height'],
         }),
-          _0x2c7d78(_0x39e730, _0x1c7833));
+          handler(key4, text15));
       });
     }),
-    { inputEntries: _0x1dd4fc, inputConnections: [..._0x5532ae['values']()] }
+    { inputEntries: inputEntries, inputConnections: [...map3['values']()] }
   );
 }
-function getPlanBounds(_0x136ba0 = []) {
-  const _0x88a1bb = normalizeList(_0x136ba0);
-  if (!_0x88a1bb['length']) return { left: 0x0, top: 0x0, right: 0x0, bottom: 0x0, width: 0x0, height: 0x0 };
-  const _0x4bdf09 = Math['min'](..._0x88a1bb['map']((_0x30486c) => _0x30486c['position']['x'])),
-    _0x3725ba = Math['min'](..._0x88a1bb['map']((_0x5740de) => _0x5740de['position']['y'])),
-    _0x5df669 = Math['max'](
-      ..._0x88a1bb['map']((_0x5545e4) => _0x5545e4['position']['x'] + _0x5545e4['width']),
-    ),
-    _0x5b7e07 = Math['max'](
-      ..._0x88a1bb['map']((_0x16a1b5) => _0x16a1b5['position']['y'] + _0x16a1b5['height']),
-    );
+function getPlanBounds(list10 = []) {
+  const list11 = normalizeList(list10);
+  if (!list11['length']) return { left: 0x0, top: 0x0, right: 0x0, bottom: 0x0, width: 0x0, height: 0x0 };
+  const left = Math['min'](...list11['map']((value29) => value29['position']['x'])),
+    top = Math['min'](...list11['map']((value30) => value30['position']['y'])),
+    right = Math['max'](...list11['map']((box6) => box6['position']['x'] + box6['width'])),
+    bottom = Math['max'](...list11['map']((box7) => box7['position']['y'] + box7['height']));
   return {
-    left: _0x4bdf09,
-    top: _0x3725ba,
-    right: _0x5df669,
-    bottom: _0x5b7e07,
-    width: _0x5df669 - _0x4bdf09,
-    height: _0x5b7e07 - _0x3725ba,
+    left: left,
+    top: top,
+    right: right,
+    bottom: bottom,
+    width: right - left,
+    height: bottom - top,
   };
 }
 function wrapStoryStageEntriesInGroup({
@@ -676,25 +655,25 @@ function wrapStoryStageEntriesInGroup({
   name: name = '',
   color: color = 'var(--indigo)',
 } = {}) {
-  const _0x1892ff = normalizeList(entries)['filter']((_0x2f33ce) => _0x2f33ce['type'] !== 'group');
-  if (!_0x1892ff['length']) return [];
-  const _0x2224f2 = calculateGroupNodeBounds(
-      _0x1892ff['map']((_0x5008bb) => ({
-        x: _0x5008bb['position']['x'],
-        y: _0x5008bb['position']['y'],
-        width: _0x5008bb['width'],
-        height: _0x5008bb['height'],
+  const list12 = normalizeList(entries)['filter']((value31) => value31['type'] !== 'group');
+  if (!list12['length']) return [];
+  const width4 = calculateGroupNodeBounds(
+      list12['map']((x) => ({
+        x: x['position']['x'],
+        y: x['position']['y'],
+        width: x['width'],
+        height: x['height'],
       })),
     ),
-    _0xf20a40 = normalizeText(key),
-    _0x3410fa = createPlanEntry(
-      _0xf20a40,
+    parentKey = normalizeText(key),
+    planEntry = createPlanEntry(
+      parentKey,
       {
         type: 'group',
         name: normalizeText(name),
         color: color,
-        width: _0x2224f2['width'],
-        height: _0x2224f2['height'],
+        width: width4['width'],
+        height: width4['height'],
         storyWorkspaceBinding: {
           projectId: normalizeText(project['id']),
           episodeId: normalizeText(episode?.['id']),
@@ -703,37 +682,37 @@ function wrapStoryStageEntriesInGroup({
           canvasScope: 'project',
         },
       },
-      { x: _0x2224f2['x'], y: _0x2224f2['y'] },
-      { width: _0x2224f2['width'], height: _0x2224f2['height'] },
+      { x: width4['x'], y: width4['y'] },
+      { width: width4['width'], height: width4['height'] },
     );
-  return [_0x3410fa, ..._0x1892ff['map']((_0x104ada) => ({ ..._0x104ada, parentKey: _0xf20a40 }))];
+  return [planEntry, ...list12['map']((args3) => ({ ...args3, parentKey: parentKey }))];
 }
-function appendHorizontalStoryStage(_0x2c30e8, _0x3bb224, _0x2643b0) {
-  const _0x16cc36 = getPlanBounds(_0x3bb224),
-    _0x581486 = _0x2643b0 - _0x16cc36['left'],
-    _0x2f7291 = -_0x16cc36['top'];
+function appendHorizontalStoryStage(list13, list14, value32) {
+  const box8 = getPlanBounds(list14),
+    value33 = value32 - box8['left'],
+    value34 = -box8['top'];
   return (
-    _0x2c30e8['push'](
-      ..._0x3bb224['map']((_0x23452b) => ({
-        ..._0x23452b,
-        position: { x: _0x23452b['position']['x'] + _0x581486, y: _0x23452b['position']['y'] + _0x2f7291 },
+    list13['push'](
+      ...list14['map']((x2) => ({
+        ...x2,
+        position: { x: x2['position']['x'] + value33, y: x2['position']['y'] + value34 },
       })),
     ),
-    _0x2643b0 + _0x16cc36['width'] + STAGE_GAP
+    value32 + box8['width'] + STAGE_GAP
   );
 }
-function appendVerticalStoryStage(_0xe4af09, _0x3a2c28, _0x35f73b, _0x3a9832) {
-  const _0x40498b = getPlanBounds(_0x3a2c28),
-    _0x4207ca = _0x35f73b - _0x40498b['left'],
-    _0x50a8d9 = _0x3a9832 - _0x40498b['top'];
+function appendVerticalStoryStage(list15, list16, value35, value36) {
+  const box9 = getPlanBounds(list16),
+    value37 = value35 - box9['left'],
+    value38 = value36 - box9['top'];
   return (
-    _0xe4af09['push'](
-      ..._0x3a2c28['map']((_0x8ad39d) => ({
-        ..._0x8ad39d,
-        position: { x: _0x8ad39d['position']['x'] + _0x4207ca, y: _0x8ad39d['position']['y'] + _0x50a8d9 },
+    list15['push'](
+      ...list16['map']((x3) => ({
+        ...x3,
+        position: { x: x3['position']['x'] + value37, y: x3['position']['y'] + value38 },
       })),
     ),
-    _0x3a9832 + _0x40498b['height'] + STAGE_GAP
+    value36 + box9['height'] + STAGE_GAP
   );
 }
 export function buildStoryProjectCanvasPlan({
@@ -747,14 +726,14 @@ export function buildStoryProjectCanvasPlan({
   videoProvider: videoProvider = '',
   videoGenerationParams: videoGenerationParams = {},
 } = {}) {
-  const _0x474377 = [],
-    _0x3b9c64 = STORY_PROJECT_CANVAS_NODE_SIZES['comment-note'],
-    _0x208a04 = STORY_PROJECT_CANVAS_NODE_SIZES['source-text'],
-    _0x1fd7c4 = STORY_PROJECT_CANVAS_NODE_SIZES['ai-video'];
-  let _0x4f13b4 = 0x0;
-  const _0x24e71f = [],
-    _0x30e276 = _0x3b9c64['height'] + NODE_GAP;
-  (_0x24e71f['push'](
+  const value39 = [],
+    height2 = STORY_PROJECT_CANVAS_NODE_SIZES['comment-note'],
+    x4 = STORY_PROJECT_CANVAS_NODE_SIZES['source-text'],
+    box10 = STORY_PROJECT_CANVAS_NODE_SIZES['ai-video'];
+  let appendHorizontalStoryStage2 = 0x0;
+  const entries2 = [],
+    y = height2['height'] + NODE_GAP;
+  (entries2['push'](
     createPlanEntry(
       'stage:project:annotation',
       buildStoryStageAnnotationNodeData({
@@ -766,157 +745,153 @@ export function buildStoryProjectCanvasPlan({
       { x: 0x0, y: 0x0 },
     ),
   ),
-    _0x24e71f['push'](
+    entries2['push'](
       createPlanEntry('project:overview', buildStoryProjectOverviewNodeData({ project: project }), {
         x: 0x0,
-        y: _0x30e276,
+        y: y,
       }),
     ));
-  const _0x1463e6 = buildStoryProjectCopyNodeData({ project: project });
-  normalizeText(_0x1463e6['content']) &&
-    _0x24e71f['push'](
-      createPlanEntry('project:copy', _0x1463e6, { x: _0x208a04['width'] + NODE_GAP, y: _0x30e276 }),
+  const storyProjectCopyNodeData = buildStoryProjectCopyNodeData({ project: project });
+  normalizeText(storyProjectCopyNodeData['content']) &&
+    entries2['push'](
+      createPlanEntry('project:copy', storyProjectCopyNodeData, { x: x4['width'] + NODE_GAP, y: y }),
     );
-  _0x4f13b4 = appendHorizontalStoryStage(
-    _0x474377,
+  appendHorizontalStoryStage2 = appendHorizontalStoryStage(
+    value39,
     wrapStoryStageEntriesInGroup({
-      entries: _0x24e71f,
+      entries: entries2,
       project: project,
       key: 'stage:project:group',
       stage: 'project',
       name: '阶段\x201\x20·\x20项目设定',
       color: STAGE_GROUP_COLORS['project'],
     }),
-    _0x4f13b4,
+    appendHorizontalStoryStage2,
   );
-  const _0x5f60bb = [],
-    _0x1de10a = [];
-  normalizeList(assets)['forEach']((_0x4d668e, _0x5256bf) => {
-    const _0x1f27d9 = normalizeList(_0x4d668e['appearances']),
-      _0x201428 =
-        _0x1f27d9['length'] > 0x0
-          ? _0x1f27d9
+  const entries3 = [],
+    assetRecords2 = [];
+  normalizeList(assets)['forEach']((prompt, value40) => {
+    const list17 = normalizeList(prompt['appearances']),
+      list18 =
+        list17['length'] > 0x0
+          ? list17
           : [
               {
                 id:
-                  getStableKeyPart(
-                    _0x4d668e['id'] || _0x4d668e['planningRef'],
-                    'asset-' + (_0x5256bf + 0x1),
-                  ) + '-base',
+                  getStableKeyPart(prompt['id'] || prompt['planningRef'], 'asset-' + (value40 + 0x1)) +
+                  '-base',
                 name: '基础形象',
-                prompt: _0x4d668e['prompt'],
-                imageUrl: _0x4d668e['imageUrl'],
-                generatedImage: _0x4d668e['generatedImage'],
+                prompt: prompt['prompt'],
+                imageUrl: prompt['imageUrl'],
+                generatedImage: prompt['generatedImage'],
               },
             ];
-    _0x201428['forEach']((_0x132e07, _0x1f9fd9) => {
-      const _0x6d0736 = getStableKeyPart(
-          _0x4d668e['id'] || _0x4d668e['planningRef'],
-          'asset-' + (_0x5256bf + 0x1),
+    list18['forEach']((appearance2, value41) => {
+      const stableKeyPart = getStableKeyPart(
+          prompt['id'] || prompt['planningRef'],
+          'asset-' + (value40 + 0x1),
         ),
-        _0x4fcf24 = getStableKeyPart(
-          _0x132e07['id'] || _0x132e07['planningRef'],
-          'appearance-' + (_0x1f9fd9 + 0x1),
+        stableKeyPart2 = getStableKeyPart(
+          appearance2['id'] || appearance2['planningRef'],
+          'appearance-' + (value41 + 0x1),
         ),
-        _0x182762 = buildStoryAssetCanvasNodeData({
+        data4 = buildStoryAssetCanvasNodeData({
           project: project,
-          asset: _0x4d668e,
-          appearance: _0x132e07,
+          asset: prompt,
+          appearance: appearance2,
           modelId: imageModelId,
           provider: imageProvider,
           generationParams: imageGenerationParams,
         }),
-        _0x3fa174 = Math['max'](
+        width5 = Math['max'](
           0x1,
-          Number(_0x182762['width']) || STORY_PROJECT_CANVAS_NODE_SIZES['ai-image']['width'],
+          Number(data4['width']) || STORY_PROJECT_CANVAS_NODE_SIZES['ai-image']['width'],
         ),
-        _0xad902e = Math['max'](
+        height3 = Math['max'](
           0x1,
-          Number(_0x182762['height']) || STORY_PROJECT_CANVAS_NODE_SIZES['ai-image']['height'],
+          Number(data4['height']) || STORY_PROJECT_CANVAS_NODE_SIZES['ai-image']['height'],
         );
-      _0x1de10a['push']({
-        key: 'asset:' + _0x6d0736 + ':' + _0x4fcf24,
-        data: _0x182762,
-        width: _0x3fa174,
-        height: _0xad902e,
-        kind: normalizeStoryAssetKind(_0x4d668e['kind']),
-        assetRefs: [_0x4d668e['id'], _0x4d668e['planningRef']]['map'](normalizeText)['filter'](Boolean),
-        appearanceRefs: [_0x132e07['id'], _0x132e07['planningRef']]['map'](normalizeText)['filter'](Boolean),
+      assetRecords2['push']({
+        key: 'asset:' + stableKeyPart + ':' + stableKeyPart2,
+        data: data4,
+        width: width5,
+        height: height3,
+        kind: normalizeStoryAssetKind(prompt['kind']),
+        assetRefs: [prompt['id'], prompt['planningRef']]['map'](normalizeText)['filter'](Boolean),
+        appearanceRefs: [appearance2['id'], appearance2['planningRef']]
+          ['map'](normalizeText)
+          ['filter'](Boolean),
         imageRefs: [
-          _0x132e07['imageUrl'],
-          _0x132e07['localPath'],
-          _0x182762['imageUrl'],
-          _0x182762['localPath'],
-          _0x182762['sourceUrl'],
-          _0x182762['images']?.[0x0]?.['imageUrl'],
-          _0x182762['images']?.[0x0]?.['localPath'],
+          appearance2['imageUrl'],
+          appearance2['localPath'],
+          data4['imageUrl'],
+          data4['localPath'],
+          data4['sourceUrl'],
+          data4['images']?.[0x0]?.['imageUrl'],
+          data4['images']?.[0x0]?.['localPath'],
         ]
-          ['map']((_0x481a02) => buildStoryClipInputMediaLocation({ url: _0x481a02 })['url'])
+          ['map']((url) => buildStoryClipInputMediaLocation({ url: url })['url'])
           ['filter'](Boolean),
       });
     });
   });
-  const _0x21a46e = [
+  const list19 = [
       { kind: 'character', title: '角色素材', content: '人物角色及其形象。' },
       { kind: 'scene', title: '场景素材', content: '场景环境及其视觉参考。' },
       { kind: 'prop', title: '道具素材', content: '道具及其视觉参考。' },
     ],
-    _0x4005f6 = _0x3b9c64['height'] + NODE_GAP;
-  let _0x29bbf0 = _0x4005f6,
-    _0x1e0145 = _0x3b9c64['width'];
-  (_0x21a46e['forEach']((_0x3da376) => {
-    const _0x3885ce = _0x1de10a['filter']((_0x1cc153) => _0x1cc153['kind'] === _0x3da376['kind']),
-      _0x1b64de = [];
-    for (let _0x30baa2 = 0x0; _0x30baa2 < _0x3885ce['length']; _0x30baa2 += ASSET_COLUMNS) {
-      const _0x1930e8 = _0x3885ce['slice'](_0x30baa2, _0x30baa2 + ASSET_COLUMNS);
-      _0x1b64de['push']({
-        items: _0x1930e8,
-        width: _0x1930e8['reduce'](
-          (_0x35424d, _0x547896, _0x425443) =>
-            _0x35424d + _0x547896['width'] + (_0x425443 > 0x0 ? NODE_GAP : 0x0),
+    value42 = height2['height'] + NODE_GAP;
+  let y2 = value42,
+    width6 = height2['width'];
+  (list19['forEach']((title2) => {
+    const list20 = assetRecords2['filter']((value43) => value43['kind'] === title2['kind']),
+      list21 = [];
+    for (let value44 = 0x0; value44 < list20['length']; value44 += ASSET_COLUMNS) {
+      const items = list20['slice'](value44, value44 + ASSET_COLUMNS);
+      list21['push']({
+        items: items,
+        width: items['reduce'](
+          (value45, box11, count5) => value45 + box11['width'] + (count5 > 0x0 ? NODE_GAP : 0x0),
           0x0,
         ),
-        height: Math['max'](..._0x1930e8['map']((_0x18c64f) => _0x18c64f['height'])),
+        height: Math['max'](...items['map']((box12) => box12['height'])),
       });
     }
-    const _0x212438 = Math['max'](
-      ASSET_CATEGORY_MIN_WIDTH,
-      ..._0x1b64de['map']((_0x5ec749) => _0x5ec749['width']),
-    );
-    ((_0x1e0145 = Math['max'](_0x1e0145, _0x212438)),
-      _0x5f60bb['push'](
+    const width7 = Math['max'](ASSET_CATEGORY_MIN_WIDTH, ...list21['map']((box13) => box13['width']));
+    ((width6 = Math['max'](width6, width7)),
+      entries3['push'](
         createPlanEntry(
-          'stage:assets:' + _0x3da376['kind'] + ':annotation',
+          'stage:assets:' + title2['kind'] + ':annotation',
           buildStoryStageAnnotationNodeData({
             project: project,
-            stage: 'assets-' + _0x3da376['kind'],
-            title: _0x3da376['title'],
-            content: _0x3da376['content'],
+            stage: 'assets-' + title2['kind'],
+            title: title2['title'],
+            content: title2['content'],
           }),
-          { x: 0x0, y: _0x29bbf0 },
-          { width: _0x212438, height: ASSET_CATEGORY_NOTE_HEIGHT },
+          { x: 0x0, y: y2 },
+          { width: width7, height: ASSET_CATEGORY_NOTE_HEIGHT },
         ),
       ));
-    let _0x5bf3e1 = _0x29bbf0 + ASSET_CATEGORY_NOTE_HEIGHT + NODE_GAP;
-    _0x1b64de['forEach']((_0x3c627b) => {
-      let _0x388c07 = 0x0;
-      (_0x3c627b['items']['forEach']((_0x389281) => {
-        (_0x5f60bb['push'](
+    let y3 = y2 + ASSET_CATEGORY_NOTE_HEIGHT + NODE_GAP;
+    list21['forEach']((box14) => {
+      let x5 = 0x0;
+      (box14['items']['forEach']((width8) => {
+        (entries3['push'](
           createPlanEntry(
-            _0x389281['key'],
-            _0x389281['data'],
-            { x: _0x388c07, y: _0x5bf3e1 },
-            { width: _0x389281['width'], height: _0x389281['height'] },
+            width8['key'],
+            width8['data'],
+            { x: x5, y: y3 },
+            { width: width8['width'], height: width8['height'] },
           ),
         ),
-          (_0x388c07 += _0x389281['width'] + NODE_GAP));
+          (x5 += width8['width'] + NODE_GAP));
       }),
-        (_0x5bf3e1 += _0x3c627b['height'] + NODE_GAP));
+        (y3 += box14['height'] + NODE_GAP));
     });
-    const _0x1eeea6 = _0x1b64de['length'] ? _0x5bf3e1 - NODE_GAP : _0x29bbf0 + ASSET_CATEGORY_NOTE_HEIGHT;
-    _0x29bbf0 = _0x1eeea6 + ASSET_CATEGORY_GAP;
+    const value46 = list21['length'] ? y3 - NODE_GAP : y2 + ASSET_CATEGORY_NOTE_HEIGHT;
+    y2 = value46 + ASSET_CATEGORY_GAP;
   }),
-    _0x5f60bb['unshift'](
+    entries3['unshift'](
       createPlanEntry(
         'stage:assets:annotation',
         buildStoryStageAnnotationNodeData({
@@ -926,201 +901,200 @@ export function buildStoryProjectCanvasPlan({
           content: '角色、场景和道具素材。',
         }),
         { x: 0x0, y: 0x0 },
-        { width: _0x1e0145, height: _0x3b9c64['height'] },
+        { width: width6, height: height2['height'] },
       ),
     ),
-    (_0x4f13b4 = appendHorizontalStoryStage(
-      _0x474377,
+    (appendHorizontalStoryStage2 = appendHorizontalStoryStage(
+      value39,
       wrapStoryStageEntriesInGroup({
-        entries: _0x5f60bb,
+        entries: entries3,
         project: project,
         key: 'stage:assets:group',
         stage: 'assets',
         name: '阶段 2 · 素材设定',
         color: STAGE_GROUP_COLORS['assets'],
       }),
-      _0x4f13b4,
+      appendHorizontalStoryStage2,
     )));
-  const _0x3360d6 = _0x4f13b4;
-  let _0x2561f1 = 0x0;
+  const value47 = appendHorizontalStoryStage2;
+  let appendVerticalStoryStage2 = 0x0;
   return (
     normalizeList(episodes)
       ['slice'](0x0, 0x1)
-      ['forEach']((_0x20b811, _0x27a631) => {
-        const _0x7c5172 = [],
-          _0x4fadac = getStableKeyPart(
-            _0x20b811['id'] || _0x20b811['planningRef'],
-            'episode-' + (_0x27a631 + 0x1),
+      ['forEach']((episode2, episodeIndex) => {
+        const entries4 = [],
+          stableKeyPart3 = getStableKeyPart(
+            episode2['id'] || episode2['planningRef'],
+            'episode-' + (episodeIndex + 0x1),
           ),
-          _0x513306 = [
+          list22 = [
             createPlanEntry(
-              'episode:' + _0x4fadac + ':copy',
-              buildStoryEpisodeCopyNodeData({ project: project, episode: _0x20b811 }),
+              'episode:' + stableKeyPart3 + ':copy',
+              buildStoryEpisodeCopyNodeData({ project: project, episode: episode2 }),
               { x: 0x0, y: 0x0 },
             ),
           ],
-          _0x37bd21 = normalizeList(_0x20b811['clips'])['map']((_0x4f7372, _0x2dfb36) => {
-            const _0x85d464 = buildStoryClipCanvasBindingKey({
-                episode: _0x20b811,
-                clip: _0x4f7372,
-                episodeIndex: _0x27a631,
-                clipIndex: _0x2dfb36,
+          list23 = normalizeList(episode2['clips'])['map']((clip2, clipIndex) => {
+            const clipKey2 = buildStoryClipCanvasBindingKey({
+                episode: episode2,
+                clip: clip2,
+                episodeIndex: episodeIndex,
+                clipIndex: clipIndex,
               }),
-              _0x1348f1 = buildStoryClipCanvasInputPlan({
+              inputPlan = buildStoryClipCanvasInputPlan({
                 project: project,
-                episode: _0x20b811,
-                clip: _0x4f7372,
+                episode: episode2,
+                clip: clip2,
                 assets: assets,
-                assetRecords: _0x1de10a,
-                clipKey: _0x85d464,
+                assetRecords: assetRecords2,
+                clipKey: clipKey2,
               }),
-              _0x39b5fb = _0x1348f1['inputEntries']['reduce'](
-                (_0x4a2a90, _0x1ae80e, _0x8ce7e7) =>
-                  _0x4a2a90 + _0x1ae80e['width'] + (_0x8ce7e7 > 0x0 ? NODE_GAP : 0x0),
+              inputLaneWidth = inputPlan['inputEntries']['reduce'](
+                (value48, box15, count6) => value48 + box15['width'] + (count6 > 0x0 ? NODE_GAP : 0x0),
                 0x0,
               ),
-              _0x49ae4a = buildStoryClipCanvasNodeData({
+              clipData = buildStoryClipCanvasNodeData({
                 project: project,
-                episode: _0x20b811,
-                clip: _0x4f7372,
+                episode: episode2,
+                clip: clip2,
                 modelId: videoModelId,
                 provider: videoProvider,
                 generationParams: videoGenerationParams,
               });
             return (
-              (_0x49ae4a['storyWorkspaceBinding'] = {
-                ...asObject(_0x49ae4a['storyWorkspaceBinding']),
+              (clipData['storyWorkspaceBinding'] = {
+                ...asObject(clipData['storyWorkspaceBinding']),
                 kind: 'clip-video',
                 canvasScope: 'project',
               }),
-              { clipKey: _0x85d464, clipData: _0x49ae4a, inputPlan: _0x1348f1, inputLaneWidth: _0x39b5fb }
+              { clipKey: clipKey2, clipData: clipData, inputPlan: inputPlan, inputLaneWidth: inputLaneWidth }
             );
           }),
-          _0x224869 = Math['max'](0x0, ..._0x37bd21['map']((_0x34c4ac) => _0x34c4ac['inputLaneWidth'])),
-          _0x3314a3 = _0x224869 > 0x0 ? _0x224869 + NODE_GAP : 0x0;
-        let _0x3c6a05 = _0x208a04['height'] + NODE_GAP;
-        _0x37bd21['forEach'](({ clipKey: _0x28b6ee, clipData: _0x2a281c, inputPlan: _0x305ea6 }) => {
-          let _0x28e994 = 0x0;
-          (_0x305ea6['inputEntries']['forEach']((_0x4a98f5) => {
-            (_0x513306['push'](
+          count7 = Math['max'](0x0, ...list23['map']((value49) => value49['inputLaneWidth'])),
+          x6 = count7 > 0x0 ? count7 + NODE_GAP : 0x0;
+        let y4 = x4['height'] + NODE_GAP;
+        list23['forEach'](({ clipKey: clipKey3, clipData: clipData2, inputPlan: inputPlan2 }) => {
+          let x7 = 0x0;
+          (inputPlan2['inputEntries']['forEach']((width9) => {
+            (list22['push'](
               createPlanEntry(
-                _0x4a98f5['key'],
-                _0x4a98f5['data'],
-                { x: _0x28e994, y: _0x3c6a05 },
-                { width: _0x4a98f5['width'], height: _0x4a98f5['height'] },
+                width9['key'],
+                width9['data'],
+                { x: x7, y: y4 },
+                { width: width9['width'], height: width9['height'] },
               ),
             ),
-              (_0x28e994 += _0x4a98f5['width'] + NODE_GAP));
+              (x7 += width9['width'] + NODE_GAP));
           }),
-            _0x513306['push'](
+            list22['push'](
               createPlanEntry(
-                _0x28b6ee,
-                _0x2a281c,
-                { x: _0x3314a3, y: _0x3c6a05 },
-                { inputConnections: _0x305ea6['inputConnections'] },
+                clipKey3,
+                clipData2,
+                { x: x6, y: y4 },
+                { inputConnections: inputPlan2['inputConnections'] },
               ),
             ));
-          const _0x304a29 = Math['max'](
-            _0x1fd7c4['height'],
-            ..._0x305ea6['inputEntries']['map']((_0x2cc62b) => _0x2cc62b['height']),
+          const value50 = Math['max'](
+            box10['height'],
+            ...inputPlan2['inputEntries']['map']((box16) => box16['height']),
           );
-          _0x3c6a05 += _0x304a29 + NODE_GAP;
+          y4 += value50 + NODE_GAP;
         });
-        const _0x272cee = Math['max'](_0x208a04['width'], _0x224869, _0x3314a3 + _0x1fd7c4['width']);
-        _0x7c5172['push'](
+        const value51 = Math['max'](x4['width'], count7, x6 + box10['width']);
+        entries4['push'](
           createPlanEntry(
-            'episode:' + _0x4fadac + ':annotation',
+            'episode:' + stableKeyPart3 + ':annotation',
             buildStoryStageAnnotationNodeData({
               project: project,
-              episode: _0x20b811,
-              stage: 'episode-' + (_0x27a631 + 0x1),
-              title: getEpisodeLabel(_0x20b811) + '\x20·\x20分集制作',
+              episode: episode2,
+              stage: 'episode-' + (episodeIndex + 0x1),
+              title: getEpisodeLabel(episode2) + '\x20·\x20分集制作',
               content: '本集文案和视频片段。',
             }),
             { x: 0x0, y: 0x0 },
-            { width: Math['max'](_0x3b9c64['width'], _0x272cee), height: _0x3b9c64['height'] },
+            { width: Math['max'](height2['width'], value51), height: height2['height'] },
           ),
         );
-        const _0x21bd88 = _0x3b9c64['height'] + NODE_GAP;
-        (_0x7c5172['push'](
-          ..._0x513306['map']((_0x241cd0) => ({
-            ..._0x241cd0,
-            position: { x: _0x241cd0['position']['x'], y: _0x241cd0['position']['y'] + _0x21bd88 },
+        const value52 = height2['height'] + NODE_GAP;
+        (entries4['push'](
+          ...list22['map']((x8) => ({
+            ...x8,
+            position: { x: x8['position']['x'], y: x8['position']['y'] + value52 },
           })),
         ),
-          (_0x2561f1 = appendVerticalStoryStage(
-            _0x474377,
+          (appendVerticalStoryStage2 = appendVerticalStoryStage(
+            value39,
             wrapStoryStageEntriesInGroup({
-              entries: _0x7c5172,
+              entries: entries4,
               project: project,
-              episode: _0x20b811,
-              key: 'episode:' + _0x4fadac + ':group',
-              stage: 'episode-' + (_0x27a631 + 0x1),
-              name: getEpisodeLabel(_0x20b811),
-              color: STAGE_GROUP_COLORS['episode'][_0x27a631 % STAGE_GROUP_COLORS['episode']['length']],
+              episode: episode2,
+              key: 'episode:' + stableKeyPart3 + ':group',
+              stage: 'episode-' + (episodeIndex + 0x1),
+              name: getEpisodeLabel(episode2),
+              color: STAGE_GROUP_COLORS['episode'][episodeIndex % STAGE_GROUP_COLORS['episode']['length']],
             }),
-            _0x3360d6,
-            _0x2561f1,
+            value47,
+            appendVerticalStoryStage2,
           )));
       }),
-    _0x474377
+    value39
   );
 }
-function buildStoryProjectPlanLayout(_0x180a23 = []) {
+function buildStoryProjectPlanLayout(list24 = []) {
   return Object['fromEntries'](
-    normalizeList(_0x180a23)['map']((_0x1e71d9) => [
-      _0x1e71d9['key'],
+    normalizeList(list24)['map']((box17) => [
+      box17['key'],
       {
-        x: Number(_0x1e71d9['position']?.['x']) || 0x0,
-        y: Number(_0x1e71d9['position']?.['y']) || 0x0,
-        width: Number(_0x1e71d9['width']) || 0x0,
-        height: Number(_0x1e71d9['height']) || 0x0,
-        parentKey: normalizeText(_0x1e71d9['parentKey']),
+        x: Number(box17['position']?.['x']) || 0x0,
+        y: Number(box17['position']?.['y']) || 0x0,
+        width: Number(box17['width']) || 0x0,
+        height: Number(box17['height']) || 0x0,
+        parentKey: normalizeText(box17['parentKey']),
       },
     ]),
   );
 }
-function storyProjectLayoutsMatch(_0x2ad319 = {}, _0x91dcff = {}) {
-  const _0x36b387 = asObject(_0x2ad319),
-    _0x21ada8 = asObject(_0x91dcff),
-    _0x3c7628 = Object['keys'](_0x36b387)['sort'](),
-    _0x4d8b7b = Object['keys'](_0x21ada8)['sort']();
+function storyProjectLayoutsMatch(options4 = {}, value53 = {}) {
+  const asObject2 = asObject(options4),
+    asObject3 = asObject(value53),
+    list25 = Object['keys'](asObject2)['sort'](),
+    list26 = Object['keys'](asObject3)['sort']();
   if (
-    _0x3c7628['length'] !== _0x4d8b7b['length'] ||
-    _0x3c7628['some']((_0x58e5e8, _0x7e181d) => _0x58e5e8 !== _0x4d8b7b[_0x7e181d])
+    list25['length'] !== list26['length'] ||
+    list25['some']((value54, value55) => value54 !== list26[value55])
   )
     return ![];
-  return _0x4d8b7b['every']((_0x3d7dba) => {
-    const _0x49d487 = asObject(_0x36b387[_0x3d7dba]),
-      _0x31203f = asObject(_0x21ada8[_0x3d7dba]);
+  return list26['every']((value56) => {
+    const box18 = asObject(asObject2[value56]),
+      box19 = asObject(asObject3[value56]);
     return (
-      Number(_0x49d487['x']) === Number(_0x31203f['x']) &&
-      Number(_0x49d487['y']) === Number(_0x31203f['y']) &&
-      Number(_0x49d487['width']) === Number(_0x31203f['width']) &&
-      Number(_0x49d487['height']) === Number(_0x31203f['height']) &&
-      normalizeText(_0x49d487['parentKey']) === normalizeText(_0x31203f['parentKey'])
+      Number(box18['x']) === Number(box19['x']) &&
+      Number(box18['y']) === Number(box19['y']) &&
+      Number(box18['width']) === Number(box19['width']) &&
+      Number(box18['height']) === Number(box19['height']) &&
+      normalizeText(box18['parentKey']) === normalizeText(box19['parentKey'])
     );
   });
 }
-function shouldReflowStoryProjectCanvas(_0x4ef5f4, _0x41ae20) {
+function shouldReflowStoryProjectCanvas(value57, value58) {
   return (
-    Math['trunc'](Number(_0x4ef5f4?.['layoutVersion']) || 0x0) !== STORY_PROJECT_CANVAS_LAYOUT_VERSION ||
-    !storyProjectLayoutsMatch(_0x4ef5f4?.['layout'], _0x41ae20)
+    Math['trunc'](Number(value57?.['layoutVersion']) || 0x0) !== STORY_PROJECT_CANVAS_LAYOUT_VERSION ||
+    !storyProjectLayoutsMatch(value57?.['layout'], value58)
   );
 }
 async function rollbackStoryProjectCanvasMutation({
-  adapter: _0xc05c8f,
+  adapter: adapter,
   canvasId: canvasId = '',
   reused: reused = ![],
-  mutationSnapshot: _0x536e83,
+  mutationSnapshot: mutationSnapshot,
 } = {}) {
-  if (!reused && typeof _0xc05c8f?.['deleteCanvas'] === 'function')
+  if (!reused && typeof adapter?.['deleteCanvas'] === 'function')
     try {
-      if ((await _0xc05c8f['deleteCanvas'](canvasId, { skipDirtyConfirm: !![] })) !== ![]) return !![];
+      if ((await adapter['deleteCanvas'](canvasId, { skipDirtyConfirm: !![] })) !== ![]) return !![];
     } catch {}
-  if (_0x536e83 && typeof _0xc05c8f?.['restoreMutationSnapshot'] === 'function')
+  if (mutationSnapshot && typeof adapter?.['restoreMutationSnapshot'] === 'function')
     try {
-      return (await _0xc05c8f['restoreMutationSnapshot'](_0x536e83, { canvasId: canvasId })) !== ![];
+      return (await adapter['restoreMutationSnapshot'](mutationSnapshot, { canvasId: canvasId })) !== ![];
     } catch {}
   return ![];
 }
@@ -1134,9 +1108,9 @@ export async function syncStoryProjectCanvas({
   videoModelId: videoModelId = '',
   videoProvider: videoProvider = '',
   videoGenerationParams: videoGenerationParams = {},
-  adapter: _0x3e2a38,
+  adapter: adapter2,
 } = {}) {
-  const _0x6f903c = [
+  const list27 = [
     'canvasExists',
     'switchCanvas',
     'createCanvas',
@@ -1145,13 +1119,13 @@ export async function syncStoryProjectCanvas({
     'createNode',
     'updateNode',
   ];
-  if (_0x6f903c['some']((_0x447bfe) => typeof _0x3e2a38?.[_0x447bfe] !== 'function'))
+  if (list27['some']((value59) => typeof adapter2?.[value59] !== 'function'))
     throw new Error('syncStoryProjectCanvas requires a complete canvas adapter');
-  const _0x30cf95 = buildStoryProjectCanvasName(project, normalizeList(episodes)[0x0]),
-    _0x1a76a0 = await resolveStoryProjectAssetImageSizes(assets),
-    _0x2a555a = buildStoryProjectCanvasPlan({
+  const canvasName = buildStoryProjectCanvasName(project, normalizeList(episodes)[0x0]),
+    assets2 = await resolveStoryProjectAssetImageSizes(assets),
+    list28 = buildStoryProjectCanvasPlan({
       project: project,
-      assets: _0x1a76a0,
+      assets: assets2,
       episodes: episodes,
       imageModelId: imageModelId,
       imageProvider: imageProvider,
@@ -1160,140 +1134,135 @@ export async function syncStoryProjectCanvas({
       videoProvider: videoProvider,
       videoGenerationParams: videoGenerationParams,
     });
-  if (
-    _0x2a555a['some']((_0xfc6047) => _0xfc6047['parentKey']) &&
-    typeof _0x3e2a38['setNodeParent'] !== 'function'
-  )
+  if (list28['some']((value60) => value60['parentKey']) && typeof adapter2['setNodeParent'] !== 'function')
     throw new Error('剧本项目画布适配器缺少节点分组能力');
   if (
-    _0x2a555a['some']((_0x30ab6c) => normalizeList(_0x30ab6c['inputConnections'])['length']) &&
-    typeof _0x3e2a38['connectNodes'] !== 'function'
+    list28['some']((value61) => normalizeList(value61['inputConnections'])['length']) &&
+    typeof adapter2['connectNodes'] !== 'function'
   )
     throw new Error('剧本项目画布适配器缺少节点连线能力');
-  const _0x383fd4 = asObject(project['canvasBinding']),
-    _0x5bf457 = normalizeText(_0x383fd4['canvasId']),
-    _0x4dc9c3 = Boolean(_0x5bf457 && (await _0x3e2a38['canvasExists'](_0x5bf457)));
-  let _0x4a9685 = '';
-  if (_0x4dc9c3) {
-    const _0x2f7c97 = await _0x3e2a38['switchCanvas'](_0x5bf457);
-    if (_0x2f7c97 === ![]) throw new Error('无法切换到已绑定的项目画布：' + _0x5bf457);
-    _0x4a9685 = _0x5bf457;
+  const asObject4 = asObject(project['canvasBinding']),
+    text16 = normalizeText(asObject4['canvasId']),
+    reused2 = Boolean(text16 && (await adapter2['canvasExists'](text16)));
+  let canvasId2 = '';
+  if (reused2) {
+    const value62 = await adapter2['switchCanvas'](text16);
+    if (value62 === ![]) throw new Error('无法切换到已绑定的项目画布：' + text16);
+    canvasId2 = text16;
   } else {
-    _0x4a9685 = normalizeText(await _0x3e2a38['createCanvas'](_0x30cf95));
-    if (!_0x4a9685) throw new Error('新建项目画布后未获得活动画布 ID');
+    canvasId2 = normalizeText(await adapter2['createCanvas'](canvasName));
+    if (!canvasId2) throw new Error('新建项目画布后未获得活动画布 ID');
   }
-  const _0x52404e = asObject(_0x383fd4['nodes']),
-    _0x4c99ab = buildStoryProjectPlanLayout(_0x2a555a),
-    _0x58fdad = _0x4dc9c3 ? shouldReflowStoryProjectCanvas(_0x383fd4, _0x4c99ab) : ![],
-    _0x47b032 = {},
-    _0xf896d2 = [];
-  let _0x466eb5 = 0x0,
-    _0x107b03 = 0x0,
-    _0x17180c = 0x0;
-  const _0x2770c3 = 'story-project:' + (normalizeText(project['id']) || _0x4a9685),
-    _0x1f0ffa = await _0x3e2a38['createMutationSnapshot']?.({ canvasId: _0x4a9685 });
+  const asObject5 = asObject(asObject4['nodes']),
+    layout = buildStoryProjectPlanLayout(list28),
+    reflowed = reused2 ? shouldReflowStoryProjectCanvas(asObject4, layout) : ![],
+    nodes2 = {},
+    nodes3 = [];
+  let createdCount = 0x0,
+    updatedCount = 0x0,
+    deletedCount = 0x0;
+  const sequenceKey = 'story-project:' + (normalizeText(project['id']) || canvasId2),
+    mutationSnapshot2 = await adapter2['createMutationSnapshot']?.({ canvasId: canvasId2 });
   try {
-    if (_0x4dc9c3) {
-      const _0x5aa8a5 = [];
-      for (const [_0xb7fc24, _0x3d1c06] of Object['entries'](_0x52404e)) {
-        if (_0xb7fc24 in _0x4c99ab) continue;
-        const _0x330e23 = normalizeText(_0x3d1c06);
-        _0x330e23 && (await _0x3e2a38['nodeExists'](_0x330e23, _0x4a9685)) && _0x5aa8a5['push'](_0x330e23);
+    if (reused2) {
+      const list29 = [];
+      for (const [value63, value64] of Object['entries'](asObject5)) {
+        if (value63 in layout) continue;
+        const text17 = normalizeText(value64);
+        text17 && (await adapter2['nodeExists'](text17, canvasId2)) && list29['push'](text17);
       }
-      if (_0x5aa8a5['length']) {
-        if (typeof _0x3e2a38['deleteNodes'] !== 'function')
+      if (list29['length']) {
+        if (typeof adapter2['deleteNodes'] !== 'function')
           throw new Error('剧本项目画布适配器缺少旧节点清理能力');
-        const _0x316586 = [...new Set(_0x5aa8a5)];
-        if ((await _0x3e2a38['deleteNodes'](_0x316586, { canvasId: _0x4a9685 })) === ![])
+        const list30 = [...new Set(list29)];
+        if ((await adapter2['deleteNodes'](list30, { canvasId: canvasId2 })) === ![])
           throw new Error('清理已失效的剧本项目画布节点失败');
-        _0x17180c = _0x316586['length'];
+        deletedCount = list30['length'];
       }
     }
-    for (const _0x4695a4 of _0x2a555a) {
-      const _0x2cbf62 = normalizeText(_0x52404e[_0x4695a4['key']]),
-        _0x5f3a64 = Boolean(_0x4dc9c3 && _0x2cbf62 && (await _0x3e2a38['nodeExists'](_0x2cbf62, _0x4a9685))),
-        _0x21fa74 = _0x5f3a64
-          ? await _0x3e2a38['updateNode'](_0x2cbf62, _0x4695a4['data'], {
-              canvasId: _0x4a9685,
-              key: _0x4695a4['key'],
-              type: _0x4695a4['type'],
-              width: _0x4695a4['width'],
-              height: _0x4695a4['height'],
-              ...(_0x58fdad ? { position: _0x4695a4['position'] } : {}),
+    for (const key5 of list28) {
+      const text18 = normalizeText(asObject5[key5['key']]),
+        value65 = Boolean(reused2 && text18 && (await adapter2['nodeExists'](text18, canvasId2))),
+        node = value65
+          ? await adapter2['updateNode'](text18, key5['data'], {
+              canvasId: canvasId2,
+              key: key5['key'],
+              type: key5['type'],
+              width: key5['width'],
+              height: key5['height'],
+              ...(reflowed ? { position: key5['position'] } : {}),
             })
-          : await _0x3e2a38['createNode'](_0x4695a4['data'], {
-              canvasId: _0x4a9685,
-              key: _0x4695a4['key'],
-              type: _0x4695a4['type'],
-              width: _0x4695a4['width'],
-              height: _0x4695a4['height'],
-              position: _0x4695a4['position'],
-              sequenceKey: _0x2770c3,
-              parentNodeId: normalizeText(_0x47b032[_0x4695a4['parentKey']]),
+          : await adapter2['createNode'](key5['data'], {
+              canvasId: canvasId2,
+              key: key5['key'],
+              type: key5['type'],
+              width: key5['width'],
+              height: key5['height'],
+              position: key5['position'],
+              sequenceKey: sequenceKey,
+              parentNodeId: normalizeText(nodes2[key5['parentKey']]),
             });
-      if (_0x5f3a64) _0x107b03 += 0x1;
-      else _0x466eb5 += 0x1;
-      const _0x4fc2a9 = normalizeText(_0x21fa74?.['id'] || (_0x5f3a64 ? _0x2cbf62 : ''));
-      if (!_0x4fc2a9)
-        throw new Error('同步项目画布节点失败：' + (_0x4695a4['data']['name'] || _0x4695a4['key']));
-      ((_0x47b032[_0x4695a4['key']] = _0x4fc2a9),
-        _0xf896d2['push']({ ..._0x4695a4, nodeId: _0x4fc2a9, node: _0x21fa74 }));
+      if (value65) updatedCount += 0x1;
+      else createdCount += 0x1;
+      const nodeId = normalizeText(node?.['id'] || (value65 ? text18 : ''));
+      if (!nodeId) throw new Error('同步项目画布节点失败：' + (key5['data']['name'] || key5['key']));
+      ((nodes2[key5['key']] = nodeId), nodes3['push']({ ...key5, nodeId: nodeId, node: node }));
     }
-    for (const _0xe6e3e5 of _0x2a555a) {
-      if (!_0xe6e3e5['parentKey']) continue;
-      const _0x71d13b = normalizeText(_0x47b032[_0xe6e3e5['key']]),
-        _0x140b9e = normalizeText(_0x47b032[_0xe6e3e5['parentKey']]);
-      if (!_0x71d13b || !_0x140b9e) throw new Error('剧本项目画布分组缺少节点：' + _0xe6e3e5['key']);
-      if ((await _0x3e2a38['setNodeParent'](_0x71d13b, _0x140b9e, { canvasId: _0x4a9685 })) === ![])
-        throw new Error('剧本项目画布节点分组失败：' + _0xe6e3e5['key']);
+    for (const event4 of list28) {
+      if (!event4['parentKey']) continue;
+      const text19 = normalizeText(nodes2[event4['key']]),
+        text20 = normalizeText(nodes2[event4['parentKey']]);
+      if (!text19 || !text20) throw new Error('剧本项目画布分组缺少节点：' + event4['key']);
+      if ((await adapter2['setNodeParent'](text19, text20, { canvasId: canvasId2 })) === ![])
+        throw new Error('剧本项目画布节点分组失败：' + event4['key']);
     }
-    for (const _0x295953 of _0x2a555a) {
-      const _0x582eec = normalizeText(_0x47b032[_0x295953['key']]);
-      for (const _0x51fdc7 of normalizeList(_0x295953['inputConnections'])) {
-        const _0x50f3e7 = normalizeText(_0x47b032[_0x51fdc7?.['key']]);
-        if (!_0x50f3e7 || !_0x582eec)
-          throw new Error('剧本项目画布连线缺少节点：' + _0x51fdc7?.['key'] + '\x20→\x20' + _0x295953['key']);
+    for (const event5 of list28) {
+      const text21 = normalizeText(nodes2[event5['key']]);
+      for (const event6 of normalizeList(event5['inputConnections'])) {
+        const text22 = normalizeText(nodes2[event6?.['key']]);
+        if (!text22 || !text21)
+          throw new Error('剧本项目画布连线缺少节点：' + event6?.['key'] + '\x20→\x20' + event5['key']);
         if (
-          (await _0x3e2a38['connectNodes'](_0x50f3e7, _0x582eec, {
-            canvasId: _0x4a9685,
-            preferredRefSlot: normalizeText(_0x51fdc7?.['preferredRefSlot']),
+          (await adapter2['connectNodes'](text22, text21, {
+            canvasId: canvasId2,
+            preferredRefSlot: normalizeText(event6?.['preferredRefSlot']),
           })) === ![]
         )
-          throw new Error('剧本项目画布节点连线失败：' + _0x51fdc7?.['key'] + ' → ' + _0x295953['key']);
+          throw new Error('剧本项目画布节点连线失败：' + event6?.['key'] + ' → ' + event5['key']);
       }
     }
-    (await _0x3e2a38['renameCanvas']?.(_0x4a9685, _0x30cf95),
-      _0x3e2a38['commit']?.(),
-      typeof _0x3e2a38['focusNodes'] === 'function' &&
-        (await _0x3e2a38['focusNodes'](
-          _0xf896d2['map']((_0x2302aa) => _0x2302aa['nodeId']),
+    (await adapter2['renameCanvas']?.(canvasId2, canvasName),
+      adapter2['commit']?.(),
+      typeof adapter2['focusNodes'] === 'function' &&
+        (await adapter2['focusNodes'](
+          nodes3['map']((value66) => value66['nodeId']),
           { padding: 0x50, durationMs: 0x0, maxZoom: 0.2 },
         )));
-  } catch (_0x3561dc) {
+  } catch (value67) {
     await rollbackStoryProjectCanvasMutation({
-      adapter: _0x3e2a38,
-      canvasId: _0x4a9685,
-      reused: _0x4dc9c3,
-      mutationSnapshot: _0x1f0ffa,
+      adapter: adapter2,
+      canvasId: canvasId2,
+      reused: reused2,
+      mutationSnapshot: mutationSnapshot2,
     });
-    throw _0x3561dc;
+    throw value67;
   }
-  const _0xd2428d = {
-    canvasId: _0x4a9685,
+  const binding = {
+    canvasId: canvasId2,
     layoutVersion: STORY_PROJECT_CANVAS_LAYOUT_VERSION,
-    nodes: _0x47b032,
-    layout: _0x4c99ab,
+    nodes: nodes2,
+    layout: layout,
   };
   return {
-    canvasId: _0x4a9685,
-    canvasName: _0x30cf95,
-    reused: _0x4dc9c3,
-    createdCount: _0x466eb5,
-    updatedCount: _0x107b03,
-    deletedCount: _0x17180c,
-    reflowed: _0x58fdad,
-    nodes: _0xf896d2,
-    binding: _0xd2428d,
-    canvasBinding: _0xd2428d,
+    canvasId: canvasId2,
+    canvasName: canvasName,
+    reused: reused2,
+    createdCount: createdCount,
+    updatedCount: updatedCount,
+    deletedCount: deletedCount,
+    reflowed: reflowed,
+    nodes: nodes3,
+    binding: binding,
+    canvasBinding: binding,
   };
 }

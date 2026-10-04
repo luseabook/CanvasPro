@@ -67,51 +67,50 @@ function getStateRaw() {
 function getState() {
   return { ...graphStore.getState(), ...uiStore.getState(), ...workspaceStore.getState() };
 }
-function _buildOutEdgeMap(_0x2f7d97) {
-  const _0x26e25a = new Map();
-  for (const _0x3e7753 of _0x2f7d97) {
-    if (!_0x3e7753) continue;
-    const _0x44ed5d = _0x3e7753.sourceId,
-      _0x160379 = _0x3e7753.targetId;
-    if (!_0x44ed5d || !_0x160379) continue;
-    let _0x38e65b = _0x26e25a.get(_0x44ed5d);
-    (!_0x38e65b && ((_0x38e65b = new Set()), _0x26e25a.set(_0x44ed5d, _0x38e65b)), _0x38e65b.add(_0x160379));
+function _buildOutEdgeMap(value) {
+  const map = new Map();
+  for (const enabled of value) {
+    if (!enabled) continue;
+    const enabled2 = enabled.sourceId,
+      enabled3 = enabled.targetId;
+    if (!enabled2 || !enabled3) continue;
+    let enabled4 = map.get(enabled2);
+    (!enabled4 && ((enabled4 = new Set()), map.set(enabled2, enabled4)), enabled4.add(enabled3));
   }
-  return _0x26e25a;
+  return map;
 }
 const _edgeIndexCache = { edges: null, edgesRev: -1, outMap: new Map(), incomingByTarget: new Map() };
-function _applyNodeCreationMenuMeta(_0x225664) {
-  const _0x12ed1b = getNodeCreationMenuItem(_0x225664?.type);
-  if (!_0x12ed1b) return _0x225664;
+function _applyNodeCreationMenuMeta(args) {
+  const label = getNodeCreationMenuItem(args?.type);
+  if (!label) return args;
   return {
-    ..._0x225664,
-    label: _0x12ed1b.label || _0x225664.label,
-    desc: _0x12ed1b.subtitle || _0x225664.desc,
-    badge: _0x12ed1b.badge ?? _0x225664.badge,
-    defaultName: _0x12ed1b.defaultName || _0x12ed1b.label || _0x225664.label,
+    ...args,
+    label: label.label || args.label,
+    desc: label.subtitle || args.desc,
+    badge: label.badge ?? args.badge,
+    defaultName: label.defaultName || label.label || args.label,
   };
 }
-function _buildEdgeIndexes(_0x22b996) {
-  const _0xfd670d = new Map(),
-    _0x2329f2 = new Map();
-  for (const _0x1be15c of Object.values(_0x22b996 || {})) {
-    if (!_0x1be15c) continue;
-    const _0x3ed0b4 = _0x1be15c.sourceId,
-      _0x1a7009 = _0x1be15c.targetId;
-    if (_0x3ed0b4 && _0x1a7009) {
-      let _0x4539ce = _0xfd670d.get(_0x3ed0b4);
-      (!_0x4539ce && ((_0x4539ce = new Set()), _0xfd670d.set(_0x3ed0b4, _0x4539ce)),
-        _0x4539ce.add(_0x1a7009));
+function _buildEdgeIndexes(item) {
+  const outMap = new Map(),
+    incomingByTarget = new Map();
+  for (const enabled5 of Object.values(item || {})) {
+    if (!enabled5) continue;
+    const key = enabled5.sourceId,
+      index = enabled5.targetId;
+    if (key && index) {
+      let enabled6 = outMap.get(key);
+      (!enabled6 && ((enabled6 = new Set()), outMap.set(key, enabled6)), enabled6.add(index));
     }
-    if (_0x1a7009) {
-      let _0x325ca8 = _0x2329f2.get(_0x1a7009);
-      (!_0x325ca8 && ((_0x325ca8 = []), _0x2329f2.set(_0x1a7009, _0x325ca8)), _0x325ca8.push(_0x1be15c));
+    if (index) {
+      let list = incomingByTarget.get(index);
+      (!list && ((list = []), incomingByTarget.set(index, list)), list.push(enabled5));
     }
   }
-  return { outMap: _0xfd670d, incomingByTarget: _0x2329f2 };
+  return { outMap: outMap, incomingByTarget: incomingByTarget };
 }
-function _getEdgeIndexes(_0x55c5e6, _0x1bf1b) {
-  if (!_0x55c5e6 || typeof _0x55c5e6 !== 'object')
+function _getEdgeIndexes(enabled7, result) {
+  if (!enabled7 || typeof enabled7 !== 'object')
     return (
       (_edgeIndexCache.edges = null),
       (_edgeIndexCache.edgesRev = -1),
@@ -119,23 +118,23 @@ function _getEdgeIndexes(_0x55c5e6, _0x1bf1b) {
       (_edgeIndexCache.incomingByTarget = new Map()),
       _edgeIndexCache
     );
-  const _0x58872b = Number.isFinite(_0x1bf1b) ? _0x1bf1b : -1;
-  if (_edgeIndexCache.edges === _0x55c5e6 && _edgeIndexCache.edgesRev === _0x58872b) return _edgeIndexCache;
-  const { outMap: _0x54daac, incomingByTarget: _0x3e0bac } = _buildEdgeIndexes(_0x55c5e6);
+  const data = Number.isFinite(result) ? result : -1;
+  if (_edgeIndexCache.edges === enabled7 && _edgeIndexCache.edgesRev === data) return _edgeIndexCache;
+  const { outMap: outMap2, incomingByTarget: incomingByTarget2 } = _buildEdgeIndexes(enabled7);
   return (
-    (_edgeIndexCache.edges = _0x55c5e6),
-    (_edgeIndexCache.edgesRev = _0x58872b),
-    (_edgeIndexCache.outMap = _0x54daac),
-    (_edgeIndexCache.incomingByTarget = _0x3e0bac),
+    (_edgeIndexCache.edges = enabled7),
+    (_edgeIndexCache.edgesRev = data),
+    (_edgeIndexCache.outMap = outMap2),
+    (_edgeIndexCache.incomingByTarget = incomingByTarget2),
     _edgeIndexCache
   );
 }
-function _getOutEdgeMap(_0x5dc17d, _0x1ec9df) {
-  return _getEdgeIndexes(_0x5dc17d, _0x1ec9df).outMap;
+function _getOutEdgeMap(options, target) {
+  return _getEdgeIndexes(options, target).outMap;
 }
-function _getIncomingEdgesByTarget(_0x5c2f66, _0x1c56a8, _0x32a313) {
-  if (!_0x32a313) return [];
-  return _getEdgeIndexes(_0x5c2f66, _0x1c56a8).incomingByTarget.get(_0x32a313) || [];
+function _getIncomingEdgesByTarget(source, next, enabled8) {
+  if (!enabled8) return [];
+  return _getEdgeIndexes(source, next).incomingByTarget.get(enabled8) || [];
 }
 let _getDragContext = () => ({});
 const _SVG_NS = 'http://www.w3.org/2000/svg',
@@ -155,189 +154,175 @@ const _SVG_NS = 'http://www.w3.org/2000/svg',
   _NODE_SPATIAL_INDEX_DEFAULT_KEY = 'default',
   _NODE_SPATIAL_INDEX_EDGE_HOVER_KEY = 'edge-hover',
   _nodeSpatialIndexCache = new Map();
-function _resolveEdgeHoverNodeRect(_0xa19bac) {
-  if (!_0xa19bac || typeof _0xa19bac !== 'object') return null;
+function _resolveEdgeHoverNodeRect(x) {
+  if (!x || typeof x !== 'object') return null;
   return {
-    x: _0xa19bac.x,
-    y: _0xa19bac.y,
-    width: _0xa19bac.width || (isNodeType(_0xa19bac, 'group') ? 0x190 : 0x104),
-    height: _0xa19bac.height || (isNodeType(_0xa19bac, 'group') ? 0x12c : 80),
+    x: x.x,
+    y: x.y,
+    width: x.width || (isNodeType(x, 'group') ? 0x190 : 0x104),
+    height: x.height || (isNodeType(x, 'group') ? 0x12c : 80),
   };
 }
-function _getNodeSpatialIndex(_0x2db259, _0xef270c, _0xfab0c3 = _NODE_SPATIAL_INDEX_DEFAULT_KEY) {
-  if (!_0x2db259 || typeof _0x2db259 !== 'object') return null;
-  const _0x282554 = Number.isFinite(_0xef270c) ? _0xef270c : -1,
-    _0x6f7ddd = _nodeSpatialIndexCache.get(_0xfab0c3);
-  if (_0x6f7ddd && _0x6f7ddd.nodes === _0x2db259 && _0x6f7ddd.persistRev === _0x282554)
-    return _0x6f7ddd.index;
-  const _0x422213 =
-    _0xfab0c3 === _NODE_SPATIAL_INDEX_EDGE_HOVER_KEY
-      ? createNodeSpatialIndex(_0x2db259, { resolveRect: _resolveEdgeHoverNodeRect })
-      : createNodeSpatialIndex(_0x2db259);
+function _getNodeSpatialIndex(nodes, current, entry = _NODE_SPATIAL_INDEX_DEFAULT_KEY) {
+  if (!nodes || typeof nodes !== 'object') return null;
+  const persistRev = Number.isFinite(current) ? current : -1,
+    record = _nodeSpatialIndexCache.get(entry);
+  if (record && record.nodes === nodes && record.persistRev === persistRev) return record.index;
+  const index2 =
+    entry === _NODE_SPATIAL_INDEX_EDGE_HOVER_KEY
+      ? createNodeSpatialIndex(nodes, { resolveRect: _resolveEdgeHoverNodeRect })
+      : createNodeSpatialIndex(nodes);
+  return (_nodeSpatialIndexCache.set(entry, { nodes: nodes, persistRev: persistRev, index: index2 }), index2);
+}
+function _svgEl(payload, handle, state, config) {
+  const el = document.createElementNS(_SVG_NS, 'svg');
   return (
-    _nodeSpatialIndexCache.set(_0xfab0c3, { nodes: _0x2db259, persistRev: _0x282554, index: _0x422213 }),
-    _0x422213
+    el.setAttribute('width', String(payload)),
+    el.setAttribute('height', String(handle)),
+    el.setAttribute('viewBox', '0 0 24 24'),
+    el.setAttribute('fill', 'none'),
+    el.setAttribute('stroke', state),
+    el.setAttribute('stroke-width', String(config)),
+    el
   );
 }
-function _svgEl(_0x2a407d, _0x46082d, _0x463d3f, _0x1ea830) {
-  const _0x2317ca = document.createElementNS(_SVG_NS, 'svg');
+function _iconAiText(scope) {
+  const el2 = _svgEl(18, 18, scope, 1.8),
+    el3 = document.createElementNS(_SVG_NS, 'path');
+  el3.setAttribute('d', 'M12 20h9');
+  const el4 = document.createElementNS(_SVG_NS, 'path');
   return (
-    _0x2317ca.setAttribute('width', String(_0x2a407d)),
-    _0x2317ca.setAttribute('height', String(_0x46082d)),
-    _0x2317ca.setAttribute('viewBox', '0 0 24 24'),
-    _0x2317ca.setAttribute('fill', 'none'),
-    _0x2317ca.setAttribute('stroke', _0x463d3f),
-    _0x2317ca.setAttribute('stroke-width', String(_0x1ea830)),
-    _0x2317ca
+    el4.setAttribute('d', 'M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'),
+    el2.appendChild(el3),
+    el2.appendChild(el4),
+    el2
   );
 }
-function _iconAiText(_0x28309b) {
-  const _0x4c1519 = _svgEl(18, 18, _0x28309b, 1.8),
-    _0x1e1e99 = document.createElementNS(_SVG_NS, 'path');
-  _0x1e1e99.setAttribute('d', 'M12 20h9');
-  const _0x55e64b = document.createElementNS(_SVG_NS, 'path');
+function _iconAiImage(input) {
+  const el5 = _svgEl(18, 18, input, 1.8),
+    el6 = document.createElementNS(_SVG_NS, 'rect');
+  (el6.setAttribute('x', '3'),
+    el6.setAttribute('y', '3'),
+    el6.setAttribute('width', '18'),
+    el6.setAttribute('height', '18'),
+    el6.setAttribute('rx', '3'));
+  const el7 = document.createElementNS(_SVG_NS, 'circle');
+  (el7.setAttribute('cx', '8.5'),
+    el7.setAttribute('cy', '8.5'),
+    el7.setAttribute('r', '1.5'),
+    el7.setAttribute('fill', input));
+  const el8 = document.createElementNS(_SVG_NS, 'polyline');
   return (
-    _0x55e64b.setAttribute('d', 'M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'),
-    _0x4c1519.appendChild(_0x1e1e99),
-    _0x4c1519.appendChild(_0x55e64b),
-    _0x4c1519
+    el8.setAttribute('points', '21 15 16 10 5 21'),
+    el5.appendChild(el6),
+    el5.appendChild(el7),
+    el5.appendChild(el8),
+    el5
   );
 }
-function _iconAiImage(_0x3fb0d5) {
-  const _0x3a958b = _svgEl(18, 18, _0x3fb0d5, 1.8),
-    _0x3d82bf = document.createElementNS(_SVG_NS, 'rect');
-  (_0x3d82bf.setAttribute('x', '3'),
-    _0x3d82bf.setAttribute('y', '3'),
-    _0x3d82bf.setAttribute('width', '18'),
-    _0x3d82bf.setAttribute('height', '18'),
-    _0x3d82bf.setAttribute('rx', '3'));
-  const _0x39a8c9 = document.createElementNS(_SVG_NS, 'circle');
-  (_0x39a8c9.setAttribute('cx', '8.5'),
-    _0x39a8c9.setAttribute('cy', '8.5'),
-    _0x39a8c9.setAttribute('r', '1.5'),
-    _0x39a8c9.setAttribute('fill', _0x3fb0d5));
-  const _0x4289ee = document.createElementNS(_SVG_NS, 'polyline');
+function _iconAiVideo(output) {
+  const el9 = _svgEl(18, 18, output, 1.8),
+    el10 = document.createElementNS(_SVG_NS, 'rect');
+  (el10.setAttribute('x', '2'),
+    el10.setAttribute('y', '6'),
+    el10.setAttribute('width', '15'),
+    el10.setAttribute('height', '12'),
+    el10.setAttribute('rx', '2'));
+  const el11 = document.createElementNS(_SVG_NS, 'path');
+  return (el11.setAttribute('d', 'M17 9l5-3v12l-5-3V9z'), el9.appendChild(el10), el9.appendChild(el11), el9);
+}
+function _iconAiAudio(value2) {
+  const el12 = _svgEl(18, 18, value2, 1.8),
+    el13 = document.createElementNS(_SVG_NS, 'path');
+  el13.setAttribute('d', 'M9 18V5l12-2v13');
+  const el14 = document.createElementNS(_SVG_NS, 'circle');
+  (el14.setAttribute('cx', '6'), el14.setAttribute('cy', '18'), el14.setAttribute('r', '3'));
+  const el15 = document.createElementNS(_SVG_NS, 'circle');
   return (
-    _0x4289ee.setAttribute('points', '21 15 16 10 5 21'),
-    _0x3a958b.appendChild(_0x3d82bf),
-    _0x3a958b.appendChild(_0x39a8c9),
-    _0x3a958b.appendChild(_0x4289ee),
-    _0x3a958b
+    el15.setAttribute('cx', '18'),
+    el15.setAttribute('cy', '16'),
+    el15.setAttribute('r', '3'),
+    el12.appendChild(el13),
+    el12.appendChild(el14),
+    el12.appendChild(el15),
+    el12
   );
 }
-function _iconAiVideo(_0x4180a8) {
-  const _0x41e0cf = _svgEl(18, 18, _0x4180a8, 1.8),
-    _0x153d21 = document.createElementNS(_SVG_NS, 'rect');
-  (_0x153d21.setAttribute('x', '2'),
-    _0x153d21.setAttribute('y', '6'),
-    _0x153d21.setAttribute('width', '15'),
-    _0x153d21.setAttribute('height', '12'),
-    _0x153d21.setAttribute('rx', '2'));
-  const _0x33be38 = document.createElementNS(_SVG_NS, 'path');
+function _iconStoryboardScript(value3) {
+  const el16 = _svgEl(18, 18, value3, 1.8),
+    el17 = document.createElementNS(_SVG_NS, 'rect');
+  (el17.setAttribute('x', '3'),
+    el17.setAttribute('y', '4'),
+    el17.setAttribute('width', '18'),
+    el17.setAttribute('height', '16'),
+    el17.setAttribute('rx', '2'));
+  const el18 = document.createElementNS(_SVG_NS, 'line');
+  (el18.setAttribute('x1', '3'),
+    el18.setAttribute('y1', '9'),
+    el18.setAttribute('x2', '21'),
+    el18.setAttribute('y2', '9'));
+  const el19 = document.createElementNS(_SVG_NS, 'line');
+  (el19.setAttribute('x1', '3'),
+    el19.setAttribute('y1', '14'),
+    el19.setAttribute('x2', '21'),
+    el19.setAttribute('y2', '14'));
+  const el20 = document.createElementNS(_SVG_NS, 'line');
   return (
-    _0x33be38.setAttribute('d', 'M17 9l5-3v12l-5-3V9z'),
-    _0x41e0cf.appendChild(_0x153d21),
-    _0x41e0cf.appendChild(_0x33be38),
-    _0x41e0cf
+    el20.setAttribute('x1', '8'),
+    el20.setAttribute('y1', '4'),
+    el20.setAttribute('x2', '8'),
+    el20.setAttribute('y2', '20'),
+    el16.appendChild(el17),
+    el16.appendChild(el18),
+    el16.appendChild(el19),
+    el16.appendChild(el20),
+    el16
   );
 }
-function _iconAiAudio(_0x40071a) {
-  const _0x48d632 = _svgEl(18, 18, _0x40071a, 1.8),
-    _0x53561d = document.createElementNS(_SVG_NS, 'path');
-  _0x53561d.setAttribute('d', 'M9 18V5l12-2v13');
-  const _0x13383d = document.createElementNS(_SVG_NS, 'circle');
-  (_0x13383d.setAttribute('cx', '6'), _0x13383d.setAttribute('cy', '18'), _0x13383d.setAttribute('r', '3'));
-  const _0x2512b8 = document.createElementNS(_SVG_NS, 'circle');
+function _iconSourceText(value4) {
+  const el21 = _svgEl(18, 18, value4, 1.8),
+    el22 = document.createElementNS(_SVG_NS, 'polyline');
+  el22.setAttribute('points', '4 7 4 4 20 4 20 7');
+  const el23 = document.createElementNS(_SVG_NS, 'line');
+  (el23.setAttribute('x1', '9'),
+    el23.setAttribute('y1', '20'),
+    el23.setAttribute('x2', '15'),
+    el23.setAttribute('y2', '20'));
+  const el24 = document.createElementNS(_SVG_NS, 'line');
   return (
-    _0x2512b8.setAttribute('cx', '18'),
-    _0x2512b8.setAttribute('cy', '16'),
-    _0x2512b8.setAttribute('r', '3'),
-    _0x48d632.appendChild(_0x53561d),
-    _0x48d632.appendChild(_0x13383d),
-    _0x48d632.appendChild(_0x2512b8),
-    _0x48d632
+    el24.setAttribute('x1', '12'),
+    el24.setAttribute('y1', '4'),
+    el24.setAttribute('x2', '12'),
+    el24.setAttribute('y2', '20'),
+    el21.appendChild(el22),
+    el21.appendChild(el23),
+    el21.appendChild(el24),
+    el21
   );
 }
-function _iconStoryboardScript(_0x4f507b) {
-  const _0x39564e = _svgEl(18, 18, _0x4f507b, 1.8),
-    _0x241f8a = document.createElementNS(_SVG_NS, 'rect');
-  (_0x241f8a.setAttribute('x', '3'),
-    _0x241f8a.setAttribute('y', '4'),
-    _0x241f8a.setAttribute('width', '18'),
-    _0x241f8a.setAttribute('height', '16'),
-    _0x241f8a.setAttribute('rx', '2'));
-  const _0x10640a = document.createElementNS(_SVG_NS, 'line');
-  (_0x10640a.setAttribute('x1', '3'),
-    _0x10640a.setAttribute('y1', '9'),
-    _0x10640a.setAttribute('x2', '21'),
-    _0x10640a.setAttribute('y2', '9'));
-  const _0x3831db = document.createElementNS(_SVG_NS, 'line');
-  (_0x3831db.setAttribute('x1', '3'),
-    _0x3831db.setAttribute('y1', '14'),
-    _0x3831db.setAttribute('x2', '21'),
-    _0x3831db.setAttribute('y2', '14'));
-  const _0x42ea9d = document.createElementNS(_SVG_NS, 'line');
-  return (
-    _0x42ea9d.setAttribute('x1', '8'),
-    _0x42ea9d.setAttribute('y1', '4'),
-    _0x42ea9d.setAttribute('x2', '8'),
-    _0x42ea9d.setAttribute('y2', '20'),
-    _0x39564e.appendChild(_0x241f8a),
-    _0x39564e.appendChild(_0x10640a),
-    _0x39564e.appendChild(_0x3831db),
-    _0x39564e.appendChild(_0x42ea9d),
-    _0x39564e
-  );
+function _isPanorama360TargetType(value5) {
+  return _PANORAMA_360_TARGET_TYPES.has(String(value5 || '').trim());
 }
-function _iconSourceText(_0x15fea2) {
-  const _0x218551 = _svgEl(18, 18, _0x15fea2, 1.8),
-    _0x4af48d = document.createElementNS(_SVG_NS, 'polyline');
-  _0x4af48d.setAttribute('points', '4 7 4 4 20 4 20 7');
-  const _0x5b0b94 = document.createElementNS(_SVG_NS, 'line');
-  (_0x5b0b94.setAttribute('x1', '9'),
-    _0x5b0b94.setAttribute('y1', '20'),
-    _0x5b0b94.setAttribute('x2', '15'),
-    _0x5b0b94.setAttribute('y2', '20'));
-  const _0x2e267e = document.createElementNS(_SVG_NS, 'line');
-  return (
-    _0x2e267e.setAttribute('x1', '12'),
-    _0x2e267e.setAttribute('y1', '4'),
-    _0x2e267e.setAttribute('x2', '12'),
-    _0x2e267e.setAttribute('y2', '20'),
-    _0x218551.appendChild(_0x4af48d),
-    _0x218551.appendChild(_0x5b0b94),
-    _0x218551.appendChild(_0x2e267e),
-    _0x218551
-  );
+function _isBlockedOutputNodeType(value6) {
+  return _PANORAMA_SOURCE_BLOCKED_TYPES.has(String(value6 || '').trim());
 }
-function _isPanorama360TargetType(_0x19ec72) {
-  return _PANORAMA_360_TARGET_TYPES.has(String(_0x19ec72 || '').trim());
+function _isPanorama360ImageSourceType(value7) {
+  return _PANORAMA_360_IMAGE_SOURCE_TYPES.has(String(value7 || '').trim());
 }
-function _isBlockedOutputNodeType(_0x4ed193) {
-  return _PANORAMA_SOURCE_BLOCKED_TYPES.has(String(_0x4ed193 || '').trim());
+function _isStoryboardInputTargetType(value8) {
+  const value9 = String(value8 || '').trim();
+  return value9 === 'storyboard' || value9 === 'storyboard-script';
 }
-function _isPanorama360ImageSourceType(_0x48e847) {
-  return _PANORAMA_360_IMAGE_SOURCE_TYPES.has(String(_0x48e847 || '').trim());
+function _isModelPolicyTargetType(value10) {
+  const value11 = String(value10 || '').trim();
+  return value11 === 'ai-image' || value11 === 'ai-text' || value11 === 'ai-video' || value11 === 'ai-audio';
 }
-function _isStoryboardInputTargetType(_0x5c56fb) {
-  const _0x5e24bc = String(_0x5c56fb || '').trim();
-  return _0x5e24bc === 'storyboard' || _0x5e24bc === 'storyboard-script';
+function _isSharedInputPolicyTargetType(value12) {
+  return _isModelPolicyTargetType(value12) || _isStoryboardInputTargetType(value12);
 }
-function _isModelPolicyTargetType(_0x4cc57c) {
-  const _0x1f9ad6 = String(_0x4cc57c || '').trim();
-  return (
-    _0x1f9ad6 === 'ai-image' ||
-    _0x1f9ad6 === 'ai-text' ||
-    _0x1f9ad6 === 'ai-video' ||
-    _0x1f9ad6 === 'ai-audio'
-  );
-}
-function _isSharedInputPolicyTargetType(_0x2d1745) {
-  return _isModelPolicyTargetType(_0x2d1745) || _isStoryboardInputTargetType(_0x2d1745);
-}
-export function getAllowedInputNodeTypesForSidePlus(_0x547547) {
-  const _0x48bc35 = String(_0x547547 || '').trim(),
-    _0x32abdb = {
+export function getAllowedInputNodeTypesForSidePlus(value13) {
+  const value14 = String(value13 || '').trim(),
+    value15 = {
       'source-image': ['source-image', 'ai-image'],
       'ai-image': ['source-image', 'ai-image'],
       'ai-audio': ['source-text', 'ai-text', 'source-audio', 'source-video', 'ai-audio', 'ai-video'],
@@ -350,88 +335,87 @@ export function getAllowedInputNodeTypesForSidePlus(_0x547547) {
       panorama_360: ['source-image', 'ai-image'],
       panorama360: ['source-image', 'ai-image'],
     };
-  return _0x32abdb[_0x48bc35] || ['source-text'];
+  return value15[value14] || ['source-text'];
 }
-export function getAllowedGenerationNodeTypesForQuoteMenu(_0x4a887d = []) {
-  const _0x19a89a = ['ai-text', 'ai-image', 'ai-video', 'ai-audio', 'storyboard-script', 'panorama-360'],
-    _0x5e79c9 = Array.isArray(_0x4a887d) ? _0x4a887d.filter(Boolean) : [];
-  return _0x19a89a.filter((_0x32f908) =>
-    _0x5e79c9.some((_0x5a06c4) =>
-      isValidConnection(_0x5a06c4, { id: '__fake_' + _0x32f908, type: _0x32f908 }),
-    ),
+export function getAllowedGenerationNodeTypesForQuoteMenu(list2 = []) {
+  const list3 = ['ai-text', 'ai-image', 'ai-video', 'ai-audio', 'storyboard-script', 'panorama-360'],
+    list4 = Array.isArray(list2) ? list2.filter(Boolean) : [];
+  return list3.filter((type) =>
+    list4.some((item2) => isValidConnection(item2, { id: '__fake_' + type, type: type })),
   );
 }
-export function setDragContextGetter(_0x383fd0) {
-  _getDragContext = typeof _0x383fd0 === 'function' ? _0x383fd0 : () => ({});
+export function setDragContextGetter(value16) {
+  _getDragContext = typeof value16 === 'function' ? value16 : () => ({});
 }
-export function isValidConnection(_0xce8d47, _0x3107f5) {
-  if (!_0xce8d47 || !_0x3107f5) return false;
-  if (_0xce8d47.id === _0x3107f5.id) return false;
-  const _0x3dbe65 = _0xce8d47.type || '',
-    _0xb9d441 = _0x3107f5.type || '';
-  if (_0x3dbe65 === 'debug' || _isBlockedOutputNodeType(_0x3dbe65)) return false;
-  const _0xe74154 = (_0x5b0396) =>
-    _0x5b0396 === 'ai-image' ||
-    _0x5b0396 === 'ai-text' ||
-    _0x5b0396 === 'ai-video' ||
-    _0x5b0396 === 'ai-audio' ||
-    _0x5b0396 === 'media-clip' ||
-    _isStoryboardInputTargetType(_0x5b0396) ||
-    _0x5b0396 === 'group' ||
-    _isPanorama360TargetType(_0x5b0396);
-  if (!_0xe74154(_0xb9d441)) return false;
-  if (_0x3dbe65 === 'group') return _0xb9d441 === 'group' || _isSharedInputPolicyTargetType(_0xb9d441);
-  if (_isPanorama360TargetType(_0xb9d441)) {
-    if (!_isPanorama360ImageSourceType(_0x3dbe65)) return false;
+export function isValidConnection(enabled9, enabled10) {
+  if (!enabled9 || !enabled10) return false;
+  if (enabled9.id === enabled10.id) return false;
+  const value17 = enabled9.type || '',
+    value18 = enabled10.type || '';
+  if (value17 === 'debug' || _isBlockedOutputNodeType(value17)) return false;
+  const run = (value19) =>
+    value19 === 'ai-image' ||
+    value19 === 'ai-text' ||
+    value19 === 'ai-video' ||
+    value19 === 'ai-audio' ||
+    value19 === 'media-clip' ||
+    _isStoryboardInputTargetType(value19) ||
+    value19 === 'group' ||
+    _isPanorama360TargetType(value19);
+  if (!run(value18)) return false;
+  if (value17 === 'group') return value18 === 'group' || _isSharedInputPolicyTargetType(value18);
+  if (_isPanorama360TargetType(value18)) {
+    if (!_isPanorama360ImageSourceType(value17)) return false;
   }
-  if (isMediaClipNodeType(_0xb9d441)) return isSupportedMediaClipInput(_0xce8d47);
-  if (_0xb9d441 === 'ai-image') {
-    const _0x5db519 = ['source-image', 'image', 'ai-image', 'source-text', 'text', 'ai-text'];
-    if (!_0x5db519.includes(_0x3dbe65)) return false;
+  if (isMediaClipNodeType(value18)) return isSupportedMediaClipInput(enabled9);
+  if (value18 === 'ai-image') {
+    const list5 = ['source-image', 'image', 'ai-image', 'source-text', 'text', 'ai-text'];
+    if (!list5.includes(value17)) return false;
   }
-  if (_0xb9d441 === 'ai-audio') {
-    if (_0x3dbe65 === 'source-image' || _0x3dbe65 === 'image' || _0x3dbe65 === 'ai-image') return false;
+  if (value18 === 'ai-audio') {
+    if (value17 === 'source-image' || value17 === 'image' || value17 === 'ai-image') return false;
   }
-  if (_isSharedInputPolicyTargetType(_0xb9d441)) {
-    const _0x4f7965 = resolveEffectiveInputKind(_0xce8d47);
-    if (_0x4f7965 && !isInputKindAllowed(getTargetInputPolicy(_0x3107f5), _0x4f7965)) return false;
-    const _0x4fb0b4 = getFixedInputSlotConfigFromManifest(_0x3107f5);
-    if (_0x4fb0b4 && _0x4f7965 && _0x4f7965 !== 'text') {
-      const _0x1cd8e2 = new Set(_0x4fb0b4.visibleSlots || []),
-        _0x317c52 = _0x4fb0b4.slotOrderByType?.[_0x4f7965] || [],
-        _0x4ab2ab = _0x317c52.filter((_0x1d47fe) => _0x1cd8e2.has(_0x1d47fe)),
-        _0x424623 = _0x4ab2ab.length > 0 ? _0x4ab2ab : _0x317c52;
+  if (_isSharedInputPolicyTargetType(value18)) {
+    const effectiveInputKind = resolveEffectiveInputKind(enabled9);
+    if (effectiveInputKind && !isInputKindAllowed(getTargetInputPolicy(enabled10), effectiveInputKind))
+      return false;
+    const fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(enabled10);
+    if (fixedInputSlotConfigFromManifest && effectiveInputKind && effectiveInputKind !== 'text') {
+      const map2 = new Set(fixedInputSlotConfigFromManifest.visibleSlots || []),
+        list6 = fixedInputSlotConfigFromManifest.slotOrderByType?.[effectiveInputKind] || [],
+        list7 = list6.filter((item3) => map2.has(item3)),
+        list8 = list7.length > 0 ? list7 : list6;
       if (
-        _0x424623.length > 0 &&
-        !_0x424623.some((_0x51ac5d) => fixedInputSlotAcceptsSource(_0x4fb0b4, _0x51ac5d, _0xce8d47))
+        list8.length > 0 &&
+        !list8.some((item4) => fixedInputSlotAcceptsSource(fixedInputSlotConfigFromManifest, item4, enabled9))
       )
         return false;
     }
   }
-  if (resolveEffectiveInputKind(_0xce8d47) === 'video' && !hasUsableInputNodeSource(_0xce8d47)) return false;
+  if (resolveEffectiveInputKind(enabled9) === 'video' && !hasUsableInputNodeSource(enabled9)) return false;
   return true;
 }
-function _videoSourceKey(_0x5684fa) {
-  if (!_0x5684fa || typeof _0x5684fa !== 'object') return '';
+function _videoSourceKey(response) {
+  if (!response || typeof response !== 'object') return '';
   return (
-    String(_0x5684fa.localPath || '').trim() ||
-    String(_0x5684fa.displayLocalPath || '').trim() ||
-    String(_0x5684fa.originalLocalPath || '').trim() ||
-    String(_0x5684fa.videoLocalPath || '').trim() ||
-    String(_0x5684fa.videoUrl || '').trim() ||
-    String(_0x5684fa.src || '').trim() ||
-    String(_0x5684fa.url || '').trim() ||
-    String(_0x5684fa.resultUrl || '').trim() ||
-    String(_0x5684fa.sourceUrl || '').trim() ||
-    String(_0x5684fa.thumbId || '').trim()
+    String(response.localPath || '').trim() ||
+    String(response.displayLocalPath || '').trim() ||
+    String(response.originalLocalPath || '').trim() ||
+    String(response.videoLocalPath || '').trim() ||
+    String(response.videoUrl || '').trim() ||
+    String(response.src || '').trim() ||
+    String(response.url || '').trim() ||
+    String(response.resultUrl || '').trim() ||
+    String(response.sourceUrl || '').trim() ||
+    String(response.thumbId || '').trim()
   );
 }
-function _isUnavailableVideoRecord(_0x314326) {
-  const _0x1b03d4 = _videoSourceKey(_0x314326);
-  if (!_0x1b03d4) return false;
+function _isUnavailableVideoRecord(value20) {
+  const _videoSourceKey2 = _videoSourceKey(value20);
+  if (!_videoSourceKey2) return false;
   return (
-    _0x314326?.mediaUnavailable === true &&
-    String(_0x314326?.mediaUnavailableSource || '').trim() === _0x1b03d4
+    value20?.mediaUnavailable === true &&
+    String(value20?.mediaUnavailableSource || '').trim() === _videoSourceKey2
   );
 }
 const SIDE_PLUS_POINTER_BLOCKER_SELECTOR = [
@@ -450,18 +434,17 @@ const SIDE_PLUS_POINTER_BLOCKER_SELECTOR = [
   '.node-floating-toolbar',
   '[data-ui-stop="1"]',
 ].join(',');
-export function isSidePlusPointerBlockedByElement(_0x5484d5) {
-  const _0x26ba0a =
-    _0x5484d5 && typeof _0x5484d5.closest === 'function' ? _0x5484d5 : _0x5484d5?.parentElement || null;
-  if (!_0x26ba0a) return false;
-  if (_0x26ba0a.closest('.side-plus-btn, #v2-side-plus-holder')) return false;
-  return !!_0x26ba0a.closest(SIDE_PLUS_POINTER_BLOCKER_SELECTOR);
+export function isSidePlusPointerBlockedByElement(el25) {
+  const el26 = el25 && typeof el25.closest === 'function' ? el25 : el25?.parentElement || null;
+  if (!el26) return false;
+  if (el26.closest('.side-plus-btn, #v2-side-plus-holder')) return false;
+  return !!el26.closest(SIDE_PLUS_POINTER_BLOCKER_SELECTOR);
 }
-function _isSidePlusPointerBlockedAt(_0x1dbac6, _0x2f2228) {
+function _isSidePlusPointerBlockedAt(value21, value22) {
   if (typeof document === 'undefined') return false;
-  if (!Number.isFinite(_0x1dbac6) || !Number.isFinite(_0x2f2228)) return false;
-  const _0x399b0d = document.elementFromPoint?.(_0x1dbac6, _0x2f2228);
-  return isSidePlusPointerBlockedByElement(_0x399b0d);
+  if (!Number.isFinite(value21) || !Number.isFinite(value22)) return false;
+  const value23 = document.elementFromPoint?.(value21, value22);
+  return isSidePlusPointerBlockedByElement(value23);
 }
 export function resolveSidePlusRenderState({
   isDraggingPlus: isDraggingPlus = false,
@@ -475,21 +458,21 @@ export function resolveSidePlusRenderState({
   selectedCount: selectedCount = 0,
   requestedSelectionOnly: requestedSelectionOnly = false,
 } = {}) {
-  const _0x5b89c4 = Number(selectedCount) || 0,
-    _0xf075ac = _0x5b89c4 > 0,
-    _0x59c652 = _0x5b89c4 >= 2;
+  const count = Number(selectedCount) || 0,
+    value24 = count > 0,
+    value25 = count >= 2;
   if (isDraggingPlus) return { shouldClear: true, selectionOnly: false };
   if (isNodeDragging) return { shouldClear: true, selectionOnly: false };
-  if (_0xf075ac && (isBoxSelecting || isConnecting || isSpaceHeld))
+  if (value24 && (isBoxSelecting || isConnecting || isSpaceHeld))
     return { shouldClear: false, selectionOnly: true };
   if (isBoxSelecting || isConnecting) return { shouldClear: true, selectionOnly: false };
-  const _0x5ec43a = requestedSelectionOnly || _0x59c652;
-  if (isSpaceHeld && !isPanning && !_0x5ec43a) return { shouldClear: true, selectionOnly: false };
-  return { shouldClear: false, selectionOnly: _0x5ec43a };
+  const selectionOnly2 = requestedSelectionOnly || value25;
+  if (isSpaceHeld && !isPanning && !selectionOnly2) return { shouldClear: true, selectionOnly: false };
+  return { shouldClear: false, selectionOnly: selectionOnly2 };
 }
 export function shouldShowSidePlusForNode({
-  sideDistance: _0x28dccf,
-  threshold: _0x273b18,
+  sideDistance: sideDistance,
+  threshold: threshold,
   isSelected: isSelected = false,
   isHovered: isHovered = false,
   isInside: isInside = false,
@@ -497,49 +480,46 @@ export function shouldShowSidePlusForNode({
 } = {}) {
   if (isSelected) return true;
   if (!isHovered) return false;
-  const _0x437439 = Number(_0x28dccf),
-    _0x30496b = Number(_0x273b18);
-  if (Number.isFinite(_0x437439) && Number.isFinite(_0x30496b) && _0x437439 < _0x30496b) return true;
+  const value26 = Number(sideDistance),
+    value27 = Number(threshold);
+  if (Number.isFinite(value26) && Number.isFinite(value27) && value26 < value27) return true;
   return !!isInside && String(nodeType || '').trim() !== 'group';
 }
-export function shouldUseInlineMediaClipAddSlot(_0x3be2fe = '') {
-  return isMediaClipNodeType(_0x3be2fe);
+export function shouldUseInlineMediaClipAddSlot(value28 = '') {
+  return isMediaClipNodeType(value28);
 }
-export function shouldShowRightSidePlusForNodeType(_0x163357 = '') {
-  const _0x2e365c = String(_0x163357 || '').trim();
-  if (_0x2e365c === 'comment-note') return false;
-  if (_0x2e365c === 'storyboard') return false;
-  if (_0x2e365c === 'collage') return false;
-  return !_isBlockedOutputNodeType(_0x2e365c) && !shouldUseInlineMediaClipAddSlot(_0x2e365c);
+export function shouldShowRightSidePlusForNodeType(value29 = '') {
+  const value30 = String(value29 || '').trim();
+  if (value30 === 'comment-note') return false;
+  if (value30 === 'storyboard') return false;
+  if (value30 === 'collage') return false;
+  return !_isBlockedOutputNodeType(value30) && !shouldUseInlineMediaClipAddSlot(value30);
 }
 export function getGroupSidePlusAnchorCandidateIds({
-  nodes: _0x4121f5,
-  viewport: _0xab6abb,
-  mx: _0x5532ff,
-  my: _0x1f8989,
-  threshold: _0x115d7a,
+  nodes: nodes2,
+  viewport: viewport,
+  mx: mx,
+  my: my,
+  threshold: threshold2,
   gap: gap = 36,
 } = {}) {
-  if (!Number.isFinite(_0x5532ff) || !Number.isFinite(_0x1f8989)) return [];
-  const _0xeba8ab = Number(_0xab6abb?.zoom) || 1,
-    _0x5a7f89 = Number(_0x115d7a);
-  if (!Number.isFinite(_0x5a7f89)) return [];
-  const _0x3f8d24 = [];
-  for (const [_0x4429a7, _0x532d20] of Object.entries(_0x4121f5 || {})) {
-    if (!isNodeType(_0x532d20, 'group')) continue;
-    const _0x4e2f4e = String(_0x532d20?.id || _0x4429a7 || '').trim();
-    if (!_0x4e2f4e) continue;
-    const _0x54d946 = _0x532d20.width || 0x190,
-      _0x19b235 = _0x532d20.height || 0x12c,
-      _0x4a6574 = getNodeScreenRect(
-        { x: _0x532d20.x, y: _0x532d20.y, width: _0x54d946, height: _0x19b235 },
-        _0xab6abb,
-      ),
-      _0x58d4ff = _0x4a6574.right + gap * _0xeba8ab,
-      _0x1c479d = _0x4a6574.top + _0x4a6574.height / 2;
-    if (Math.hypot(_0x5532ff - _0x58d4ff, _0x1f8989 - _0x1c479d) < _0x5a7f89) _0x3f8d24.push(_0x4e2f4e);
+  if (!Number.isFinite(mx) || !Number.isFinite(my)) return [];
+  const value31 = Number(viewport?.zoom) || 1,
+    value32 = Number(threshold2);
+  if (!Number.isFinite(value32)) return [];
+  const list9 = [];
+  for (const [value33, x2] of Object.entries(nodes2 || {})) {
+    if (!isNodeType(x2, 'group')) continue;
+    const enabled11 = String(x2?.id || value33 || '').trim();
+    if (!enabled11) continue;
+    const width = x2.width || 0x190,
+      height = x2.height || 0x12c,
+      box = getNodeScreenRect({ x: x2.x, y: x2.y, width: width, height: height }, viewport),
+      value34 = box.right + gap * value31,
+      value35 = box.top + box.height / 2;
+    if (Math.hypot(mx - value34, my - value35) < value32) list9.push(enabled11);
   }
-  return _0x3f8d24;
+  return list9;
 }
 export function resolveSidePlusCandidateIds({
   selectedIds: selectedIds = [],
@@ -548,52 +528,52 @@ export function resolveSidePlusCandidateIds({
   hoverNodeId: hoverNodeId = null,
   groupAnchorIds: groupAnchorIds = [],
 } = {}) {
-  const _0xeec6fb = Array.isArray(groupAnchorIds) ? groupAnchorIds.filter(Boolean) : [],
-    _0x1c7e46 = Array.isArray(selectedIds) ? selectedIds.filter(Boolean) : [],
-    _0x7a8581 = isMultiSelection ? new Set() : new Set(_0x1c7e46),
-    _0x567be2 = new Set(),
-    _0x244e5f = !isMultiSelection && !selectionOnly && _0xeec6fb.length > 0;
-  !isMultiSelection && !selectionOnly && hoverNodeId && !_0x244e5f && _0x7a8581.add(hoverNodeId);
+  const list10 = Array.isArray(groupAnchorIds) ? groupAnchorIds.filter(Boolean) : [],
+    value36 = Array.isArray(selectedIds) ? selectedIds.filter(Boolean) : [],
+    candidateIds = isMultiSelection ? new Set() : new Set(value36),
+    sideAnchorHoverIds = new Set(),
+    enabled12 = !isMultiSelection && !selectionOnly && list10.length > 0;
+  !isMultiSelection && !selectionOnly && hoverNodeId && !enabled12 && candidateIds.add(hoverNodeId);
   if (!isMultiSelection && !selectionOnly)
-    for (const _0x5a64de of _0xeec6fb) {
-      (_0x7a8581.add(_0x5a64de), _0x567be2.add(_0x5a64de));
+    for (const value37 of list10) {
+      (candidateIds.add(value37), sideAnchorHoverIds.add(value37));
     }
-  return { candidateIds: _0x7a8581, sideAnchorHoverIds: _0x567be2 };
+  return { candidateIds: candidateIds, sideAnchorHoverIds: sideAnchorHoverIds };
 }
-export function computeMultiSelectionBoundsForSidePlus(_0x2ecb43, _0x3fdbbd, _0x1526a0 = {}) {
-  const _0x1e6bc3 = Array.isArray(_0x2ecb43) ? _0x2ecb43 : [];
-  if (_0x1e6bc3.length < 2) return null;
-  const _0x5234bd =
-      _0x1526a0?.movedNodeIds && typeof _0x1526a0.movedNodeIds[Symbol.iterator] === 'function'
-        ? new Set(_0x1526a0.movedNodeIds)
+export function computeMultiSelectionBoundsForSidePlus(value38, value39, value40 = {}) {
+  const list11 = Array.isArray(value38) ? value38 : [];
+  if (list11.length < 2) return null;
+  const map3 =
+      value40?.movedNodeIds && typeof value40.movedNodeIds[Symbol.iterator] === 'function'
+        ? new Set(value40.movedNodeIds)
         : null,
-    _0x5593b9 = Number.isFinite(_0x1526a0?.offsetX) ? _0x1526a0.offsetX : 0,
-    _0x1c3914 = Number.isFinite(_0x1526a0?.offsetY) ? _0x1526a0.offsetY : 0;
-  let _0x448428 = Infinity,
-    _0x455108 = Infinity,
-    _0x43c949 = -Infinity,
-    _0x31f52d = -Infinity,
-    _0x1c2e1c = 0;
-  for (const _0x4154a3 of _0x1e6bc3) {
-    const _0x490b6d = _0x3fdbbd?.[_0x4154a3];
-    if (!_0x490b6d) continue;
-    const _0x24b808 = _0x5234bd?.has(_0x4154a3) === true,
-      _0x4045d0 = _0x490b6d.x + (_0x24b808 ? _0x5593b9 : 0),
-      _0x235a74 = _0x490b6d.y + (_0x24b808 ? _0x1c3914 : 0);
-    _0x1c2e1c += 1;
-    const _0x4d603a = _0x490b6d.width || 0x104,
-      _0x12f8fe = _0x490b6d.height || 100,
-      _0x1016e6 = _0x4045d0,
-      _0x3c5e46 = _0x490b6d.type !== 'group' ? _0x235a74 - 30 : _0x235a74,
-      _0x3fd964 = _0x4045d0 + _0x4d603a,
-      _0x4e9d97 = _0x235a74 + _0x12f8fe;
-    ((_0x448428 = Math.min(_0x448428, _0x1016e6)),
-      (_0x455108 = Math.min(_0x455108, _0x3c5e46)),
-      (_0x43c949 = Math.max(_0x43c949, _0x3fd964)),
-      (_0x31f52d = Math.max(_0x31f52d, _0x4e9d97)));
+    value41 = Number.isFinite(value40?.offsetX) ? value40.offsetX : 0,
+    value42 = Number.isFinite(value40?.offsetY) ? value40.offsetY : 0;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity,
+    count2 = 0;
+  for (const value43 of list11) {
+    const box2 = value39?.[value43];
+    if (!box2) continue;
+    const value44 = map3?.has(value43) === true,
+      value45 = box2.x + (value44 ? value41 : 0),
+      value46 = box2.y + (value44 ? value42 : 0);
+    count2 += 1;
+    const value47 = box2.width || 0x104,
+      value48 = box2.height || 100,
+      value49 = value45,
+      value50 = box2.type !== 'group' ? value46 - 30 : value46,
+      value51 = value45 + value47,
+      value52 = value46 + value48;
+    ((minX = Math.min(minX, value49)),
+      (minY = Math.min(minY, value50)),
+      (maxX = Math.max(maxX, value51)),
+      (maxY = Math.max(maxY, value52)));
   }
-  if (_0x1c2e1c < 2 || !Number.isFinite(_0x448428) || !Number.isFinite(_0x455108)) return null;
-  return { minX: _0x448428, minY: _0x455108, maxX: _0x43c949, maxY: _0x31f52d };
+  if (count2 < 2 || !Number.isFinite(minX) || !Number.isFinite(minY)) return null;
+  return { minX: minX, minY: minY, maxX: maxX, maxY: maxY };
 }
 let _draftEdgeCache = {
   pathEl: null,
@@ -604,9 +584,9 @@ let _draftEdgeCache = {
   lastSide: '',
   lastZoom: 0,
 };
-function _resetDraftEdgeCache(_0x5f4e20 = null) {
+function _resetDraftEdgeCache(pathEl = null) {
   _draftEdgeCache = {
-    pathEl: _0x5f4e20,
+    pathEl: pathEl,
     lastStartX: 0,
     lastStartY: 0,
     lastEndX: 0,
@@ -617,165 +597,162 @@ function _resetDraftEdgeCache(_0x5f4e20 = null) {
 }
 function _getDraftEdgePath() {
   if (typeof document === 'undefined') return (_resetDraftEdgeCache(), null);
-  const _0x225235 = document.getElementById('v2-edges');
-  if (!_0x225235) return (_resetDraftEdgeCache(), null);
-  let _0x476b1c = _draftEdgeCache.pathEl;
+  const el27 = document.getElementById('v2-edges');
+  if (!el27) return (_resetDraftEdgeCache(), null);
+  let el28 = _draftEdgeCache.pathEl;
   return (
-    _0x476b1c &&
-      (_0x476b1c.parentNode !== _0x225235 || _0x476b1c.isConnected === false) &&
-      (_0x476b1c.remove?.(), (_0x476b1c = null)),
-    !_0x476b1c &&
-      ((_0x476b1c = _0x225235.querySelector?.('#v2-draft-edge') || null),
-      _0x476b1c &&
-        (_0x476b1c.parentNode !== _0x225235 || _0x476b1c.isConnected === false) &&
-        (_0x476b1c = null)),
-    !_0x476b1c &&
-      ((_0x476b1c = document.createElementNS('http://www.w3.org/2000/svg', 'path')),
-      (_0x476b1c.id = 'v2-draft-edge'),
-      _0x476b1c.setAttribute('class', 'conn-drag-path'),
-      _0x476b1c.setAttribute('fill', 'none'),
-      _0x476b1c.setAttribute('stroke', 'var(--indigo-70)'),
-      _0x476b1c.setAttribute('stroke-linecap', 'round'),
-      _0x225235.appendChild(_0x476b1c)),
-    _draftEdgeCache.pathEl !== _0x476b1c && _resetDraftEdgeCache(_0x476b1c),
-    _0x476b1c
+    el28 && (el28.parentNode !== el27 || el28.isConnected === false) && (el28.remove?.(), (el28 = null)),
+    !el28 &&
+      ((el28 = el27.querySelector?.('#v2-draft-edge') || null),
+      el28 && (el28.parentNode !== el27 || el28.isConnected === false) && (el28 = null)),
+    !el28 &&
+      ((el28 = document.createElementNS('http://www.w3.org/2000/svg', 'path')),
+      (el28.id = 'v2-draft-edge'),
+      el28.setAttribute('class', 'conn-drag-path'),
+      el28.setAttribute('fill', 'none'),
+      el28.setAttribute('stroke', 'var(--indigo-70)'),
+      el28.setAttribute('stroke-linecap', 'round'),
+      el27.appendChild(el28)),
+    _draftEdgeCache.pathEl !== el28 && _resetDraftEdgeCache(el28),
+    el28
   );
 }
-function _renderDraftEdgeDirectly(_0x2b24b3, _0x2e4776, _0xac5d47, _0x4be113, _0x2dd109, _0x47d3c8) {
-  const _0x1606d0 = _getDraftEdgePath();
-  if (!_0x1606d0) return;
-  const _0x152c91 = Math.hypot(_0xac5d47 - _0x2b24b3, _0x4be113 - _0x2e4776);
-  if (_0x152c91 < 5) {
-    _0x1606d0.style.display = 'none';
+function _renderDraftEdgeDirectly(value53, value54, value55, value56, value57, box3) {
+  const el29 = _getDraftEdgePath();
+  if (!el29) return;
+  const count3 = Math.hypot(value55 - value53, value56 - value54);
+  if (count3 < 5) {
+    el29.style.display = 'none';
     return;
   }
-  const _0x5d4f02 =
-      _0x2b24b3 !== _draftEdgeCache.lastStartX ||
-      _0x2e4776 !== _draftEdgeCache.lastStartY ||
-      _0xac5d47 !== _draftEdgeCache.lastEndX ||
-      _0x4be113 !== _draftEdgeCache.lastEndY ||
-      _0x2dd109 !== _draftEdgeCache.lastSide,
-    _0x333716 = _0x47d3c8.zoom !== _draftEdgeCache.lastZoom;
-  if (_0x5d4f02) {
-    const _0x27eed1 = _0x2dd109 === 'left',
-      _0x58fd36 = Math.abs(_0xac5d47 - _0x2b24b3),
-      _0x938310 = Math.min(_0x58fd36 * 0.75, 80),
-      _0x4282a1 = _0x27eed1 ? _0x2b24b3 - _0x938310 : _0x2b24b3 + _0x938310,
-      _0x372607 = _0x27eed1 ? _0xac5d47 + _0x938310 : _0xac5d47 - _0x938310,
-      _0x2b6290 =
+  const value58 =
+      value53 !== _draftEdgeCache.lastStartX ||
+      value54 !== _draftEdgeCache.lastStartY ||
+      value55 !== _draftEdgeCache.lastEndX ||
+      value56 !== _draftEdgeCache.lastEndY ||
+      value57 !== _draftEdgeCache.lastSide,
+    value59 = box3.zoom !== _draftEdgeCache.lastZoom;
+  if (value58) {
+    const value60 = value57 === 'left',
+      value61 = Math.abs(value55 - value53),
+      value62 = Math.min(value61 * 0.75, 80),
+      value63 = value60 ? value53 - value62 : value53 + value62,
+      value64 = value60 ? value55 + value62 : value55 - value62,
+      value65 =
         'M ' +
-        _0x2b24b3 +
+        value53 +
         ' ' +
-        _0x2e4776 +
+        value54 +
         ' C ' +
-        _0x4282a1 +
+        value63 +
         ' ' +
-        _0x2e4776 +
+        value54 +
         ', ' +
-        _0x372607 +
+        value64 +
         ' ' +
-        _0x4be113 +
+        value56 +
         ', ' +
-        _0xac5d47 +
+        value55 +
         ' ' +
-        _0x4be113;
-    (_0x1606d0.setAttribute('d', _0x2b6290),
-      (_draftEdgeCache.lastStartX = _0x2b24b3),
-      (_draftEdgeCache.lastStartY = _0x2e4776),
-      (_draftEdgeCache.lastEndX = _0xac5d47),
-      (_draftEdgeCache.lastEndY = _0x4be113),
-      (_draftEdgeCache.lastSide = _0x2dd109));
+        value56;
+    (el29.setAttribute('d', value65),
+      (_draftEdgeCache.lastStartX = value53),
+      (_draftEdgeCache.lastStartY = value54),
+      (_draftEdgeCache.lastEndX = value55),
+      (_draftEdgeCache.lastEndY = value56),
+      (_draftEdgeCache.lastSide = value57));
   }
-  (_0x333716 &&
-    (_0x1606d0.setAttribute('stroke-width', '' + 2 / _0x47d3c8.zoom),
-    (_0x1606d0.style.strokeDasharray = 6 / _0x47d3c8.zoom + ' ' + 4 / _0x47d3c8.zoom),
-    (_draftEdgeCache.lastZoom = _0x47d3c8.zoom)),
-    (_0x1606d0.style.display = 'block'));
+  (value59 &&
+    (el29.setAttribute('stroke-width', '' + 2 / box3.zoom),
+    (el29.style.strokeDasharray = 6 / box3.zoom + ' ' + 4 / box3.zoom),
+    (_draftEdgeCache.lastZoom = box3.zoom)),
+    (el29.style.display = 'block'));
 }
 function _clearDraftEdgeDirectly() {
-  const _0x1a2536 = document.getElementById('v2-draft-edge');
-  if (_0x1a2536) _0x1a2536.style.display = 'none';
+  const el30 = document.getElementById('v2-draft-edge');
+  if (el30) el30.style.display = 'none';
 }
 export function createEdgeController() {
-  function _0x163f29(_0x259c4e, _0x2ef569, _0xfd7b9a, _0xfb7699, _0x3c64ef) {
-    if (!_0x2ef569 || !_0x2ef569.target) return false;
-    const _0x1ebf84 = _0x2ef569.target.closest('.v2-handle');
-    if (!_0x1ebf84) return false;
+  function tryStartHandleConnect(value66, event, value67, value68, value69) {
+    if (!event || !event.target) return false;
+    const el31 = event.target.closest('.v2-handle');
+    if (!el31) return false;
     return (
-      _0x2ef569.preventDefault(),
-      _0x2ef569.stopPropagation(),
-      (_0x259c4e.isConnecting = true),
-      (_0x259c4e.connectSourceId = _0x1ebf84.dataset.nodeId),
-      (_0x259c4e.connectStartX = _0xfd7b9a),
-      (_0x259c4e.connectStartY = _0xfb7699),
-      (_0x259c4e.connectSide = 'left'),
-      _renderDraftEdgeDirectly(_0xfd7b9a, _0xfb7699, _0xfd7b9a, _0xfb7699, 'left', _0x3c64ef),
+      event.preventDefault(),
+      event.stopPropagation(),
+      (value66.isConnecting = true),
+      (value66.connectSourceId = el31.dataset.nodeId),
+      (value66.connectStartX = value67),
+      (value66.connectStartY = value68),
+      (value66.connectSide = 'left'),
+      _renderDraftEdgeDirectly(value67, value68, value67, value68, 'left', value69),
       true
     );
   }
-  function _0x43e68d(_0x4904eb, _0x561e6e, _0x28a177, _0x2a5581, _0x4943f6, _0x83a03e, _0x48f1a9, _0x3b2dc1) {
+  function updateHandleConnect(side, value70, value71, value72, value73, value74, value75, value76) {
     _renderDraftEdgeDirectly(
-      _0x4904eb.connectStartX || _0x2a5581,
-      _0x4904eb.connectStartY || _0x4943f6,
-      _0x2a5581,
-      _0x4943f6,
-      _0x4904eb.connectSide || 'left',
-      _0x83a03e,
+      side.connectStartX || value72,
+      side.connectStartY || value73,
+      value72,
+      value73,
+      side.connectSide || 'left',
+      value74,
     );
-    const _0x46a558 = _getNodeSpatialIndex(
-      _0x48f1a9,
+    const spatialIndex = _getNodeSpatialIndex(
+      value75,
       getStateRaw()._persistRev,
       _NODE_SPATIAL_INDEX_DEFAULT_KEY,
     );
-    let _0x276e85 = hitTestNode(
-      _0x561e6e,
-      _0x28a177,
-      _0x48f1a9,
-      _0x83a03e,
-      _0x4904eb.connectSourceId,
-      false,
-      { spatialIndex: _0x46a558 },
-    );
-    if (_0x276e85 && _0x3b2dc1?.invalidNodeIds?.includes(_0x276e85)) _0x276e85 = null;
+    let hoverId = hitTestNode(value70, value71, value75, value74, side.connectSourceId, false, {
+      spatialIndex: spatialIndex,
+    });
+    if (hoverId && value76?.invalidNodeIds?.includes(hoverId)) hoverId = null;
     return (
-      (_0x3b2dc1?.hoverId || null) !== _0x276e85 &&
-        graphStore.setConnOverlay({ hoverId: _0x276e85, side: _0x4904eb.connectSide }),
+      (value76?.hoverId || null) !== hoverId &&
+        graphStore.setConnOverlay({ hoverId: hoverId, side: side.connectSide }),
       true
     );
   }
-  function _0x44c388(_0x363740, _0x59577d, _0xa3ec5f) {
-    const _0x17c57f = getStateRaw(),
-      { viewport: _0x14e54b, nodes: _0x1422fe } = _0x17c57f,
-      _0x2986ae = _getNodeSpatialIndex(_0x1422fe, _0x17c57f._persistRev, _NODE_SPATIAL_INDEX_DEFAULT_KEY),
-      _0x15b1fa = hitTestNode(_0x59577d, _0xa3ec5f, _0x1422fe, _0x14e54b, _0x363740.connectSourceId, false, {
-        spatialIndex: _0x2986ae,
+  function finishHandleConnect(sourceId, value77, value78) {
+    const stateRaw = getStateRaw(),
+      { viewport: viewport2, nodes: nodes3 } = stateRaw,
+      spatialIndex2 = _getNodeSpatialIndex(nodes3, stateRaw._persistRev, _NODE_SPATIAL_INDEX_DEFAULT_KEY),
+      hitTestNode2 = hitTestNode(value77, value78, nodes3, viewport2, sourceId.connectSourceId, false, {
+        spatialIndex: spatialIndex2,
       }),
-      _0x4f62e4 = _0x15b1fa ? _0x1422fe[_0x15b1fa] : null;
-    let _0x46df7b = false;
+      targetId = hitTestNode2 ? nodes3[hitTestNode2] : null;
+    let addEdgeWithPolicies2 = false;
     return (
-      _0x4f62e4 &&
-        (_0x46df7b = addEdgeWithPolicies({ sourceId: _0x363740.connectSourceId, targetId: _0x4f62e4.id })),
+      targetId &&
+        (addEdgeWithPolicies2 = addEdgeWithPolicies({
+          sourceId: sourceId.connectSourceId,
+          targetId: targetId.id,
+        })),
       _clearDraftEdgeDirectly(),
       graphStore.clearConnOverlay(),
-      _0x46df7b
+      addEdgeWithPolicies2
     );
   }
-  return { tryStartHandleConnect: _0x163f29, updateHandleConnect: _0x43e68d, finishHandleConnect: _0x44c388 };
+  return {
+    tryStartHandleConnect: tryStartHandleConnect,
+    updateHandleConnect: updateHandleConnect,
+    finishHandleConnect: finishHandleConnect,
+  };
 }
-export function initConnectionHandles(_0x34f268) {
-  const _0x4a61e9 = document.createElement('div');
-  ((_0x4a61e9.id = 'v2-side-plus-holder'),
-    Object.assign(_0x4a61e9.style, {
+export function initConnectionHandles(value79) {
+  const el32 = document.createElement('div');
+  ((el32.id = 'v2-side-plus-holder'),
+    Object.assign(el32.style, {
       position: 'fixed',
       inset: '0',
       pointerEvents: 'none',
       zIndex: '95',
       overflow: 'visible',
     }),
-    document.body.appendChild(_0x4a61e9));
-  const _0x2e08e7 = new Map(),
-    _0x149b28 = new Map();
-  let _0x375c5c = {
+    document.body.appendChild(el32));
+  const map4 = new Map(),
+    map5 = new Map();
+  let side2 = {
     dragging: false,
     srcId: null,
     sourceNodeIds: [],
@@ -791,1292 +768,1257 @@ export function initConnectionHandles(_0x34f268) {
     anchorWorldY: null,
     didAssistPan: false,
   };
-  function _0x3d2cdf(_0x4c892d, _0x176ac8 = null) {
-    const _0x577574 = [],
-      _0x39aaaf = new Set(),
-      _0x2109c2 = Array.isArray(_0x4c892d) ? _0x4c892d : [];
-    for (const _0x3b221b of _0x2109c2) {
-      const _0x422cf3 = String(_0x3b221b || '').trim();
-      if (!_0x422cf3 || _0x39aaaf.has(_0x422cf3)) continue;
-      (_0x39aaaf.add(_0x422cf3), _0x577574.push(_0x422cf3));
+  function run2(value80, value81 = null) {
+    const list12 = [],
+      map6 = new Set(),
+      value82 = Array.isArray(value80) ? value80 : [];
+    for (const value83 of value82) {
+      const enabled13 = String(value83 || '').trim();
+      if (!enabled13 || map6.has(enabled13)) continue;
+      (map6.add(enabled13), list12.push(enabled13));
     }
-    const _0x3971e2 = String(_0x176ac8 || '').trim();
-    if (_0x577574.length === 0 && _0x3971e2) _0x577574.push(_0x3971e2);
-    return _0x577574;
+    const value84 = String(value81 || '').trim();
+    if (list12.length === 0 && value84) list12.push(value84);
+    return list12;
   }
-  function _0x16b783({
-    sourceNodeId: _0xe61b16,
-    targetNodeId: _0x475165,
-    side: _0x32e081,
-    nodes: _0xd6b82f,
-    edges: _0x5556a8,
-    outMap: _0x424c6f,
+  function run3({
+    sourceNodeId: sourceNodeId,
+    targetNodeId: targetNodeId,
+    side: side3,
+    nodes: nodes4,
+    edges: edges,
+    outMap: outMap3,
   }) {
-    if (!_0xe61b16 || !_0x475165 || _0xe61b16 === _0x475165) return false;
-    const _0x101667 = _0xd6b82f?.[_0xe61b16],
-      _0x54aa1f = _0xd6b82f?.[_0x475165];
-    if (!_0x101667 || !_0x54aa1f) return false;
-    const _0x100ed8 = _0x32e081 === 'right' ? _0x101667 : _0x54aa1f,
-      _0x48bbc0 = _0x32e081 === 'right' ? _0x54aa1f : _0x101667;
-    if (!_0x100ed8?.id || !_0x48bbc0?.id) return false;
-    const _0x221174 = !!_0x424c6f.get(_0x100ed8.id)?.has(_0x48bbc0.id);
-    if (_0x221174) return false;
+    if (!sourceNodeId || !targetNodeId || sourceNodeId === targetNodeId) return false;
+    const enabled14 = nodes4?.[sourceNodeId],
+      enabled15 = nodes4?.[targetNodeId];
+    if (!enabled14 || !enabled15) return false;
+    const sourceId2 = side3 === 'right' ? enabled14 : enabled15,
+      targetId2 = side3 === 'right' ? enabled15 : enabled14;
+    if (!sourceId2?.id || !targetId2?.id) return false;
+    const value85 = !!outMap3.get(sourceId2.id)?.has(targetId2.id);
+    if (value85) return false;
     if (
-      String(_0x100ed8.type || '').trim() === 'group' &&
-      String(_0x48bbc0.type || '').trim() === 'group' &&
+      String(sourceId2.type || '').trim() === 'group' &&
+      String(targetId2.type || '').trim() === 'group' &&
       wouldCreateGroupOutputCycle({
-        sourceId: _0x100ed8.id,
-        targetId: _0x48bbc0.id,
-        nodes: _0xd6b82f,
-        edges: _0x5556a8,
+        sourceId: sourceId2.id,
+        targetId: targetId2.id,
+        nodes: nodes4,
+        edges: edges,
       })
     )
       return false;
-    return isValidConnection(_0x100ed8, _0x48bbc0);
+    return isValidConnection(sourceId2, targetId2);
   }
-  function _0xedd222(_0x45baa5, _0x8c089, _0x24dfa1, _0x36b10d, _0x4d7e52) {
-    if (_0x4d7e52 !== 'right') return;
-    if (String(_0x24dfa1?.type || '') !== 'ai-video') return;
-    if (String(_0x36b10d?.type || '') !== 'ai-video') return;
-    const _0xb96e4c = getFixedInputSlotConfigFromManifest(_0x36b10d);
-    if (_0xb96e4c?.slotKindById?.sourceVideo === 'video' && _0xb96e4c?.slotKindById?.refImage === 'image')
+  function run4(value86, value87, value88, box4, value89) {
+    if (value89 !== 'right') return;
+    if (String(value88?.type || '') !== 'ai-video') return;
+    if (String(box4?.type || '') !== 'ai-video') return;
+    const fixedInputSlotConfigFromManifest2 = getFixedInputSlotConfigFromManifest(box4);
+    if (
+      fixedInputSlotConfigFromManifest2?.slotKindById?.sourceVideo === 'video' &&
+      fixedInputSlotConfigFromManifest2?.slotKindById?.refImage === 'image'
+    )
       return;
-    const _0x3b324a = Number(_0x36b10d.width || 0),
-      _0xac0510 = Number(_0x36b10d.height || 0),
-      _0x1d67c0 =
-        (Array.isArray(_0x36b10d.videos) && _0x36b10d.videos.length > 0) ||
-        String(_0x36b10d.videoUrl || '').trim() ||
-        String(_0x36b10d.localPath || '').trim() ||
-        String(_0x36b10d.thumbId || '').trim();
-    if (_0x3b324a !== 0x12c || _0xac0510 !== 0x12c || _0x1d67c0) return;
-    const _0x26607c = getStateRaw(),
-      _0x31b4bf = _0x26607c.nodes?.[_0x8c089];
-    if (!_0x31b4bf) return;
-    const _0xb8a00b = Number(_0x31b4bf.x || 0) + Number(_0x31b4bf.width || 0) / 2,
-      _0xbace3f = Number(_0x31b4bf.y || 0) + Number(_0x31b4bf.height || 0) / 2,
-      _0x1e3d21 = Date.now(),
-      _0x56416d = () => {
-        const _0x19efa3 = getDisplayedMediaSizeFromNode(_0x45baa5, 'video'),
-          _0x38fc07 = Number(_0x19efa3?.w || 0),
-          _0x56db81 = Number(_0x19efa3?.h || 0);
-        let _0x3995d0 = _0x38fc07,
-          _0x304081 = _0x56db81;
-        if (!(_0x3995d0 > 0 && _0x304081 > 0)) {
-          const _0x234fbe = getStateRaw(),
-            _0xfe4b5 = _0x234fbe.nodes?.[_0x45baa5];
-          if (_0xfe4b5) {
-            const _0x79efc1 = Number(_0xfe4b5.mainVideoIndex),
-              _0x37a8b5 = Number.isFinite(_0x79efc1) ? Math.max(0, Math.trunc(_0x79efc1)) : 0,
-              _0x1eaa4c = Array.isArray(_0xfe4b5.videos) ? _0xfe4b5.videos : [],
-              _0x9c03d9 = _0x1eaa4c[_0x37a8b5],
-              _0x898e3e = Number(_0x9c03d9?.videoWidth || 0),
-              _0x78e717 = Number(_0x9c03d9?.videoHeight || 0),
-              _0x445c6b = Number(_0xfe4b5.selectedVideoWidth || 0),
-              _0x14ab5e = Number(_0xfe4b5.selectedVideoHeight || 0),
-              _0x1261f3 = Number(_0xfe4b5.videoWidth || 0),
-              _0xd0aeb = Number(_0xfe4b5.videoHeight || 0);
-            if (_0x898e3e > 0 && _0x78e717 > 0) ((_0x3995d0 = _0x898e3e), (_0x304081 = _0x78e717));
+    const count4 = Number(box4.width || 0),
+      count5 = Number(box4.height || 0),
+      value90 =
+        (Array.isArray(box4.videos) && box4.videos.length > 0) ||
+        String(box4.videoUrl || '').trim() ||
+        String(box4.localPath || '').trim() ||
+        String(box4.thumbId || '').trim();
+    if (count4 !== 0x12c || count5 !== 0x12c || value90) return;
+    const stateRaw2 = getStateRaw(),
+      box5 = stateRaw2.nodes?.[value87];
+    if (!box5) return;
+    const x3 = Number(box5.x || 0) + Number(box5.width || 0) / 2,
+      y = Number(box5.y || 0) + Number(box5.height || 0) / 2,
+      count6 = Date.now(),
+      value91 = () => {
+        const displayedMediaSizeFromNode = getDisplayedMediaSizeFromNode(value86, 'video'),
+          value92 = Number(displayedMediaSizeFromNode?.w || 0),
+          value93 = Number(displayedMediaSizeFromNode?.h || 0);
+        let count7 = value92,
+          count8 = value93;
+        if (!(count7 > 0 && count8 > 0)) {
+          const stateRaw3 = getStateRaw(),
+            value94 = stateRaw3.nodes?.[value86];
+          if (value94) {
+            const value95 = Number(value94.mainVideoIndex),
+              value96 = Number.isFinite(value95) ? Math.max(0, Math.trunc(value95)) : 0,
+              value97 = Array.isArray(value94.videos) ? value94.videos : [],
+              value98 = value97[value96],
+              count9 = Number(value98?.videoWidth || 0),
+              count10 = Number(value98?.videoHeight || 0),
+              count11 = Number(value94.selectedVideoWidth || 0),
+              count12 = Number(value94.selectedVideoHeight || 0),
+              count13 = Number(value94.videoWidth || 0),
+              count14 = Number(value94.videoHeight || 0);
+            if (count9 > 0 && count10 > 0) ((count7 = count9), (count8 = count10));
             else {
-              if (_0x445c6b > 0 && _0x14ab5e > 0) ((_0x3995d0 = _0x445c6b), (_0x304081 = _0x14ab5e));
-              else _0x1261f3 > 0 && _0xd0aeb > 0 && ((_0x3995d0 = _0x1261f3), (_0x304081 = _0xd0aeb));
+              if (count11 > 0 && count12 > 0) ((count7 = count11), (count8 = count12));
+              else count13 > 0 && count14 > 0 && ((count7 = count13), (count8 = count14));
             }
           }
         }
-        if (_0x3995d0 > 0 && _0x304081 > 0) {
-          const _0xe886f5 = _0x3995d0 / _0x304081;
-          if (Number.isFinite(_0xe886f5) && _0xe886f5 > 0) {
-            const _0x52eee5 = getAIGenerationNodeSize(_0x3995d0, _0x304081),
-              _0x3ba9c1 = _0x52eee5.width,
-              _0xc2fc86 = _0x52eee5.height;
-            (graphStore.updateNodeData(_0x8c089, {
-              width: _0x3ba9c1,
-              height: _0xc2fc86,
-              x: _0xb8a00b - _0x3ba9c1 / 2,
-              y: _0xbace3f - _0xc2fc86 / 2,
+        if (count7 > 0 && count8 > 0) {
+          const count15 = count7 / count8;
+          if (Number.isFinite(count15) && count15 > 0) {
+            const box6 = getAIGenerationNodeSize(count7, count8),
+              width2 = box6.width,
+              height2 = box6.height;
+            (graphStore.updateNodeData(value87, {
+              width: width2,
+              height: height2,
+              x: x3 - width2 / 2,
+              y: y - height2 / 2,
             }),
               commit());
           }
           return;
         }
-        if (Date.now() - _0x1e3d21 < 0x4b0) requestAnimationFrame(_0x56416d);
+        if (Date.now() - count6 < 0x4b0) requestAnimationFrame(value91);
       };
-    requestAnimationFrame(_0x56416d);
+    requestAnimationFrame(value91);
   }
-  function _0x3d791a() {
-    const { nodes: _0x30173f, edges: _0x165eec, _edgesRev: _0x38058d } = getStateRaw(),
-      _0x4b6645 = _getOutEdgeMap(_0x165eec, _0x38058d),
-      _0x4a03d1 = _0x3d2cdf(_0x375c5c.sourceNodeIds, _0x375c5c.srcId),
-      _0x5ad59d = new Set(_0x4a03d1),
-      _0x2bb05e = [];
-    for (const [_0x9aca6f, _0x3c68a2] of Object.entries(_0x30173f)) {
-      if (_0x5ad59d.has(_0x9aca6f)) {
-        _0x2bb05e.push(_0x9aca6f);
+  function run5() {
+    const { nodes: nodes5, edges: edges2, _edgesRev: _edgesRev } = getStateRaw(),
+      outMap4 = _getOutEdgeMap(edges2, _edgesRev),
+      value99 = run2(side2.sourceNodeIds, side2.srcId),
+      map7 = new Set(value99),
+      invalidNodeIds = [];
+    for (const [targetNodeId2, value100] of Object.entries(nodes5)) {
+      if (map7.has(targetNodeId2)) {
+        invalidNodeIds.push(targetNodeId2);
         continue;
       }
-      let _0x1b28fe = false;
-      for (const _0x37af9c of _0x4a03d1) {
+      let enabled16 = false;
+      for (const sourceNodeId2 of value99) {
         if (
-          !_0x16b783({
-            sourceNodeId: _0x37af9c,
-            targetNodeId: _0x9aca6f,
-            side: _0x375c5c.side,
-            nodes: _0x30173f,
-            edges: _0x165eec,
-            outMap: _0x4b6645,
+          !run3({
+            sourceNodeId: sourceNodeId2,
+            targetNodeId: targetNodeId2,
+            side: side2.side,
+            nodes: nodes5,
+            edges: edges2,
+            outMap: outMap4,
           })
         )
           continue;
-        _0x1b28fe = true;
+        enabled16 = true;
         break;
       }
-      if (!_0x1b28fe) _0x2bb05e.push(_0x9aca6f);
+      if (!enabled16) invalidNodeIds.push(targetNodeId2);
     }
-    graphStore.setConnOverlay({ srcId: _0x375c5c.srcId, invalidNodeIds: _0x2bb05e, side: _0x375c5c.side });
+    graphStore.setConnOverlay({ srcId: side2.srcId, invalidNodeIds: invalidNodeIds, side: side2.side });
   }
-  function _0x3bd2b4() {
+  function run6() {
     graphStore.clearConnOverlay();
   }
-  function _0x3c97f8() {
-    for (const _0x4591b6 of _0x2e08e7.values()) _0x4591b6.remove();
-    (_0x2e08e7.clear(), _0x149b28.clear(), _0x4a61e9.classList.remove('is-selection-plus-visible'));
+  function run7() {
+    for (const el33 of map4.values()) el33.remove();
+    (map4.clear(), map5.clear(), el32.classList.remove('is-selection-plus-visible'));
   }
-  function _0xfe3c2c(_0x5de0a2, _0x122f02, _0x23c011) {
-    const _0x34c293 = _0x2e08e7.get(_0x5de0a2);
-    if (_0x34c293) return _0x34c293;
-    const _0x3c3786 = document.createElement('button');
+  function run8(value101, nodeId, side4) {
+    const value102 = map4.get(value101);
+    if (value102) return value102;
+    const el34 = document.createElement('button');
     return (
-      (_0x3c3786.type = 'button'),
-      (_0x3c3786.className = 'side-plus-btn'),
-      (_0x3c3786.textContent = ''),
-      (_0x3c3786.dataset.plusKind = 'node'),
-      _0x3c3786.setAttribute('aria-label', t('edgeController.addConnection')),
-      _0x3c3786.addEventListener('pointerdown', (_0x3095d6) => {
-        if (_0x3095d6.button === 1 || window._spaceHeld) return;
-        if (_0x3095d6.button !== 0) return;
-        const _0x2440c8 = _0x149b28.get(_0x5de0a2);
-        if (!_0x2440c8) return;
-        const _0x2cd442 = _0x3d2cdf(_0x2440c8.sourceNodeIds, _0x2440c8.nodeId),
-          _0x41cde0 = getStateRaw(),
-          _0x52522c =
-            _0x2440c8.plusKind === 'multi'
-              ? screenToWorld(_0x2440c8.ax, _0x2440c8.ay, _0x41cde0.viewport)
-              : null;
-        (_0x3095d6.stopPropagation(),
-          _0x3095d6.preventDefault(),
-          (_0x375c5c = {
+      (el34.type = 'button'),
+      (el34.className = 'side-plus-btn'),
+      (el34.textContent = ''),
+      (el34.dataset.plusKind = 'node'),
+      el34.setAttribute('aria-label', t('edgeController.addConnection')),
+      el34.addEventListener('pointerdown', (sx) => {
+        if (sx.button === 1 || window._spaceHeld) return;
+        if (sx.button !== 0) return;
+        const srcId = map5.get(value101);
+        if (!srcId) return;
+        const sourceNodeIds = run2(srcId.sourceNodeIds, srcId.nodeId),
+          stateRaw4 = getStateRaw(),
+          anchorWorldX =
+            srcId.plusKind === 'multi' ? screenToWorld(srcId.ax, srcId.ay, stateRaw4.viewport) : null;
+        (sx.stopPropagation(),
+          sx.preventDefault(),
+          (side2 = {
             dragging: true,
-            srcId: _0x2440c8.nodeId,
-            sourceNodeIds: _0x2cd442,
-            plusKind: _0x2440c8.plusKind === 'multi' ? 'multi' : 'node',
-            side: _0x2440c8.side,
-            ax: _0x2440c8.ax,
-            ay: _0x2440c8.ay,
-            sx: _0x3095d6.clientX,
-            sy: _0x3095d6.clientY,
-            lastX: _0x3095d6.clientX,
-            lastY: _0x3095d6.clientY,
-            anchorWorldX: _0x52522c?.x ?? null,
-            anchorWorldY: _0x52522c?.y ?? null,
+            srcId: srcId.nodeId,
+            sourceNodeIds: sourceNodeIds,
+            plusKind: srcId.plusKind === 'multi' ? 'multi' : 'node',
+            side: srcId.side,
+            ax: srcId.ax,
+            ay: srcId.ay,
+            sx: sx.clientX,
+            sy: sx.clientY,
+            lastX: sx.clientX,
+            lastY: sx.clientY,
+            anchorWorldX: anchorWorldX?.x ?? null,
+            anchorWorldY: anchorWorldX?.y ?? null,
             didAssistPan: false,
           }),
-          _0x3d791a(),
-          _0x3c97f8());
+          run5(),
+          run7());
       }),
-      _0x4a61e9.appendChild(_0x3c3786),
-      _0x2e08e7.set(_0x5de0a2, _0x3c3786),
-      _0x149b28.set(_0x5de0a2, {
-        nodeId: _0x122f02,
-        side: _0x23c011,
-        sourceNodeIds: _0x122f02 ? [_0x122f02] : [],
+      el32.appendChild(el34),
+      map4.set(value101, el34),
+      map5.set(value101, {
+        nodeId: nodeId,
+        side: side4,
+        sourceNodeIds: nodeId ? [nodeId] : [],
         plusKind: 'node',
         ax: 0,
         ay: 0,
       }),
-      _0x3c3786
+      el34
     );
   }
-  function _0x348d44(
-    _0x1b2930,
-    _0x3f252f,
-    _0x3e120f,
-    _0x4fcb35,
-    _0x13dc63,
-    _0x2d4064,
-    _0xa2573,
-    _0x409c64,
-    _0x381018,
-    _0x15d93c = {},
+  function run9(
+    value103,
+    value104,
+    value105,
+    value106,
+    value107,
+    value108,
+    value109,
+    value110,
+    enabled17,
+    event2 = {},
   ) {
-    const _0x338366 = Number(_0x15d93c?.sizeMultiplier),
-      _0x2127f4 = Number.isFinite(_0x338366) && _0x338366 > 0 ? _0x338366 : 1,
-      _0x417d5d = 20 * _0x2d4064 * _0x2127f4,
-      _0x50df88 = _0x417d5d / 2,
-      _0x330eca = String(_0x15d93c?.key || _0x3f252f + ':' + _0x3e120f),
-      _0x2ce93d = _0x15d93c?.plusKind === 'multi' ? 'multi' : 'node',
-      _0xfe85a2 = _0x3d2cdf(_0x15d93c?.sourceNodeIds, _0x3f252f),
-      _0xa0f861 = _0xfe3c2c(_0x330eca, _0x3f252f, _0x3e120f);
-    ((_0xa0f861.dataset.plusKind = _0x2ce93d),
-      _0xa0f861.classList.toggle('side-plus-btn--multi', _0x2ce93d === 'multi'),
-      (_0xa0f861.style.width = _0x417d5d + 'px'),
-      (_0xa0f861.style.height = _0x417d5d + 'px'),
-      (_0xa0f861.style.fontSize = _0x417d5d + 'px'),
-      (_0xa0f861.style.display = 'flex'),
-      (_0xa0f861.style.alignItems = 'center'),
-      (_0xa0f861.style.justifyContent = 'center'));
-    let _0x413213 = _0x4fcb35,
-      _0x2929ec = _0x13dc63,
-      _0x51cda3 = false;
-    if (_0xa2573 !== undefined && _0x409c64 !== undefined) {
-      const _0x307f09 = _0xa2573 - _0x4fcb35,
-        _0x210d36 = _0x409c64 - _0x13dc63,
-        _0x491ef8 = Math.hypot(_0x307f09, _0x210d36),
-        _0x3c20e5 = 100 * _0x2d4064;
-      if (_0x491ef8 < _0x3c20e5 && !_0x381018) {
-        const _0x8a86d = Math.min(_0x491ef8, 45 * _0x2d4064),
-          _0x358958 = Math.atan2(_0x210d36, _0x307f09);
-        ((_0x413213 += Math.cos(_0x358958) * _0x8a86d),
-          (_0x2929ec += Math.sin(_0x358958) * _0x8a86d),
-          (_0xa0f861.style.background = 'var(--white-10)'),
-          (_0x51cda3 = true));
+    const count16 = Number(event2?.sizeMultiplier),
+      value111 = Number.isFinite(count16) && count16 > 0 ? count16 : 1,
+      value112 = 20 * value108 * value111,
+      value113 = value112 / 2,
+      value114 = String(event2?.key || value104 + ':' + value105),
+      value115 = event2?.plusKind === 'multi' ? 'multi' : 'node',
+      value116 = run2(event2?.sourceNodeIds, value104),
+      el35 = run8(value114, value104, value105);
+    ((el35.dataset.plusKind = value115),
+      el35.classList.toggle('side-plus-btn--multi', value115 === 'multi'),
+      (el35.style.width = value112 + 'px'),
+      (el35.style.height = value112 + 'px'),
+      (el35.style.fontSize = value112 + 'px'),
+      (el35.style.display = 'flex'),
+      (el35.style.alignItems = 'center'),
+      (el35.style.justifyContent = 'center'));
+    let value117 = value106,
+      value118 = value107,
+      enabled18 = false;
+    if (value109 !== undefined && value110 !== undefined) {
+      const value119 = value109 - value106,
+        value120 = value110 - value107,
+        value121 = Math.hypot(value119, value120),
+        value122 = 100 * value108;
+      if (value121 < value122 && !enabled17) {
+        const value123 = Math.min(value121, 45 * value108),
+          value124 = Math.atan2(value120, value119);
+        ((value117 += Math.cos(value124) * value123),
+          (value118 += Math.sin(value124) * value123),
+          (el35.style.background = 'var(--white-10)'),
+          (enabled18 = true));
       }
     }
-    if (!_0x51cda3) _0xa0f861.style.background = '';
-    ((_0xa0f861.style.left = _0x413213 - _0x50df88 + 'px'),
-      (_0xa0f861.style.top = _0x2929ec - _0x50df88 + 'px'));
-    const _0x3ba417 = _0x149b28.get(_0x330eca);
-    (_0x3ba417 &&
-      ((_0x3ba417.nodeId = _0x3f252f),
-      (_0x3ba417.side = _0x3e120f),
-      (_0x3ba417.sourceNodeIds = _0xfe85a2),
-      (_0x3ba417.plusKind = _0x2ce93d),
-      (_0x3ba417.ax = _0x413213),
-      (_0x3ba417.ay = _0x2929ec)),
-      _0x1b2930.add(_0x330eca));
+    if (!enabled18) el35.style.background = '';
+    ((el35.style.left = value117 - value113 + 'px'), (el35.style.top = value118 - value113 + 'px'));
+    const value125 = map5.get(value114);
+    (value125 &&
+      ((value125.nodeId = value104),
+      (value125.side = value105),
+      (value125.sourceNodeIds = value116),
+      (value125.plusKind = value115),
+      (value125.ax = value117),
+      (value125.ay = value118)),
+      value103.add(value114));
   }
-  function _0x1a4de5(_0x54ac50, _0x1f2152, _0x4c32e4 = {}) {
-    const _0x2d7e0c = _getDragContext(),
-      _0x5e5d87 = _0x4c32e4 && typeof _0x4c32e4 === 'object' ? _0x4c32e4 : {},
-      _0x32abd0 = ['settingsModal', 'aboutModal', 'historyModal'];
+  function run10(mx2, my2, value126 = {}) {
+    const _getDragContext2 = _getDragContext(),
+      requestedSelectionOnly2 = value126 && typeof value126 === 'object' ? value126 : {},
+      list13 = ['settingsModal', 'aboutModal', 'historyModal'];
     if (
-      _0x32abd0.some((_0x33429e) => {
-        const _0x518976 = document.getElementById(_0x33429e);
-        return _0x518976 && _0x518976.style.display === 'flex';
+      list13.some((item5) => {
+        const el36 = document.getElementById(item5);
+        return el36 && el36.style.display === 'flex';
       })
     ) {
-      _0x3c97f8();
+      run7();
       return;
     }
-    if (!_0x375c5c.dragging && _isSidePlusPointerBlockedAt(_0x54ac50, _0x1f2152)) {
-      _0x3c97f8();
+    if (!side2.dragging && _isSidePlusPointerBlockedAt(mx2, my2)) {
+      run7();
       return;
     }
-    const _0x50f08e = getStateRaw(),
+    const stateRaw5 = getStateRaw(),
       {
-        nodes: _0x30ee97,
-        viewport: _0x42a532,
-        selectedNodeIds: _0x42468b,
-        _persistRev: _0x5e9614,
-      } = _0x50f08e;
-    if (!Object.keys(_0x30ee97).length) {
-      _0x3c97f8();
+        nodes: nodes6,
+        viewport: viewport3,
+        selectedNodeIds: selectedNodeIds,
+        _persistRev: _persistRev,
+      } = stateRaw5;
+    if (!Object.keys(nodes6).length) {
+      run7();
       return;
     }
-    let _0x1314f9 = _0x30ee97;
-    const _0x501db9 =
-      _0x5e5d87.nodeSizeOverrides && typeof _0x5e5d87.nodeSizeOverrides === 'object'
-        ? _0x5e5d87.nodeSizeOverrides
+    let nodes7 = nodes6;
+    const value127 =
+      requestedSelectionOnly2.nodeSizeOverrides &&
+      typeof requestedSelectionOnly2.nodeSizeOverrides === 'object'
+        ? requestedSelectionOnly2.nodeSizeOverrides
         : null;
-    if (_0x501db9)
-      for (const [_0x365689, _0x4e086a] of Object.entries(_0x501db9)) {
-        const _0x2c5b2a = _0x30ee97[_0x365689];
-        if (!_0x2c5b2a) continue;
-        const _0x58f9f5 = Number(_0x4e086a?.width),
-          _0x3cb5f0 = Number(_0x4e086a?.height);
-        if (!(Number.isFinite(_0x58f9f5) && Number.isFinite(_0x3cb5f0))) continue;
-        if (_0x1314f9 === _0x30ee97) _0x1314f9 = { ..._0x30ee97 };
-        _0x1314f9[_0x365689] = { ..._0x2c5b2a, width: _0x58f9f5, height: _0x3cb5f0 };
+    if (value127)
+      for (const [value128, box7] of Object.entries(value127)) {
+        const args2 = nodes6[value128];
+        if (!args2) continue;
+        const width3 = Number(box7?.width),
+          height3 = Number(box7?.height);
+        if (!(Number.isFinite(width3) && Number.isFinite(height3))) continue;
+        if (nodes7 === nodes6) nodes7 = { ...nodes6 };
+        nodes7[value128] = { ...args2, width: width3, height: height3 };
       }
-    const _0x208f87 = _0x1314f9 !== _0x30ee97,
-      _0x4b6555 = Array.isArray(_0x42468b) ? _0x42468b : [],
-      _0x41d008 = new Set(_0x4b6555),
-      _0x2989c4 = typeof document !== 'undefined' ? document.body : null,
-      _0x469fec = resolveSidePlusRenderState({
-        isDraggingPlus: _0x375c5c.dragging,
-        isNodeDragging: !!_0x2d7e0c.isDragging,
-        isBoxSelecting: !!_0x2d7e0c.isBoxSelecting,
-        isConnecting: !!_0x2d7e0c.isConnecting,
-        isPanning: !!_0x2d7e0c.isPanning,
-        isZooming: !!_0x2989c4?.classList?.contains('is-zooming'),
-        isViewportAnimating: !!_0x2989c4?.classList?.contains('is-viewport-animating'),
+    const value129 = nodes7 !== nodes6,
+      selectedIds2 = Array.isArray(selectedNodeIds) ? selectedNodeIds : [],
+      selectedCount2 = new Set(selectedIds2),
+      el37 = typeof document !== 'undefined' ? document.body : null,
+      sidePlusRenderState = resolveSidePlusRenderState({
+        isDraggingPlus: side2.dragging,
+        isNodeDragging: !!_getDragContext2.isDragging,
+        isBoxSelecting: !!_getDragContext2.isBoxSelecting,
+        isConnecting: !!_getDragContext2.isConnecting,
+        isPanning: !!_getDragContext2.isPanning,
+        isZooming: !!el37?.classList?.contains('is-zooming'),
+        isViewportAnimating: !!el37?.classList?.contains('is-viewport-animating'),
         isSpaceHeld: !!window._spaceHeld,
-        selectedCount: _0x41d008.size,
-        requestedSelectionOnly: _0x5e5d87.selectionOnly === true,
+        selectedCount: selectedCount2.size,
+        requestedSelectionOnly: requestedSelectionOnly2.selectionOnly === true,
       });
-    _0x4a61e9.classList.toggle('is-selection-plus-visible', _0x469fec.selectionOnly && _0x41d008.size > 0);
-    if (_0x469fec.shouldClear) {
-      _0x3c97f8();
+    el32.classList.toggle(
+      'is-selection-plus-visible',
+      sidePlusRenderState.selectionOnly && selectedCount2.size > 0,
+    );
+    if (sidePlusRenderState.shouldClear) {
+      run7();
       return;
     }
-    const _0x549a70 = _0x469fec.selectionOnly;
-    let _0x19950d = null,
-      _0x3804b1 = false;
-    if (_0x549a70) ((_0x19950d = null), (_0x3804b1 = false));
+    const selectionOnly3 = sidePlusRenderState.selectionOnly;
+    let hoverNodeId2 = null,
+      value130 = false;
+    if (selectionOnly3) ((hoverNodeId2 = null), (value130 = false));
     else {
-      if (_0x2d7e0c.isDragging && _0x2d7e0c.targetNodeId)
-        ((_0x19950d = _0x2d7e0c.targetNodeId), (_0x3804b1 = true));
+      if (_getDragContext2.isDragging && _getDragContext2.targetNodeId)
+        ((hoverNodeId2 = _getDragContext2.targetNodeId), (value130 = true));
       else {
-        const _0x194b8c = _0x208f87
+        const spatialIndex3 = value129
             ? null
-            : _getNodeSpatialIndex(_0x30ee97, _0x5e9614, _NODE_SPATIAL_INDEX_DEFAULT_KEY),
-          _0x4508ad = findClosestNode(_0x54ac50, _0x1f2152, _0x1314f9, _0x42a532, true, {
-            spatialIndex: _0x194b8c,
+            : _getNodeSpatialIndex(nodes6, _persistRev, _NODE_SPATIAL_INDEX_DEFAULT_KEY),
+          closestNode = findClosestNode(mx2, my2, nodes7, viewport3, true, {
+            spatialIndex: spatialIndex3,
           });
-        _0x4508ad && ((_0x19950d = _0x4508ad.nodeId), (_0x3804b1 = _0x4508ad.isInside));
+        closestNode && ((hoverNodeId2 = closestNode.nodeId), (value130 = closestNode.isInside));
       }
     }
-    const _0x53e504 = _0x42a532.zoom || 1,
-      _0x2f53fa = 36,
-      _0x472e11 = 70 * _0x53e504;
-    let _0x357d06 = Number.isFinite(_0x54ac50) ? _0x54ac50 : undefined,
-      _0xb7f980 = Number.isFinite(_0x1f2152) ? _0x1f2152 : undefined;
-    _0x549a70 && ((_0x357d06 = undefined), (_0xb7f980 = undefined));
-    const _0x92cb30 = _0x41d008.size >= 2,
-      _0x20dc59 =
-        !_0x92cb30 && !_0x549a70
+    const value131 = viewport3.zoom || 1,
+      gap2 = 36,
+      threshold3 = 70 * value131;
+    let value132 = Number.isFinite(mx2) ? mx2 : undefined,
+      value133 = Number.isFinite(my2) ? my2 : undefined;
+    selectionOnly3 && ((value132 = undefined), (value133 = undefined));
+    const isMultiSelection2 = selectedCount2.size >= 2,
+      groupAnchorIds2 =
+        !isMultiSelection2 && !selectionOnly3
           ? getGroupSidePlusAnchorCandidateIds({
-              nodes: _0x1314f9,
-              viewport: _0x42a532,
-              mx: _0x54ac50,
-              my: _0x1f2152,
-              threshold: _0x472e11,
-              gap: _0x2f53fa,
+              nodes: nodes7,
+              viewport: viewport3,
+              mx: mx2,
+              my: my2,
+              threshold: threshold3,
+              gap: gap2,
             })
           : [],
-      { candidateIds: _0x15a8ee, sideAnchorHoverIds: _0x340d3e } = resolveSidePlusCandidateIds({
-        selectedIds: _0x4b6555,
-        isMultiSelection: _0x92cb30,
-        selectionOnly: _0x549a70,
-        hoverNodeId: _0x19950d,
-        groupAnchorIds: _0x20dc59,
+      { candidateIds: candidateIds2, sideAnchorHoverIds: sideAnchorHoverIds2 } = resolveSidePlusCandidateIds({
+        selectedIds: selectedIds2,
+        isMultiSelection: isMultiSelection2,
+        selectionOnly: selectionOnly3,
+        hoverNodeId: hoverNodeId2,
+        groupAnchorIds: groupAnchorIds2,
       }),
-      _0x3e32d5 = new Set(),
-      _0x3b8b4f = shouldShowRightSidePlusForNodeType;
-    for (const _0x5c8514 of _0x15a8ee) {
-      const _0x25d803 = _0x1314f9[_0x5c8514];
-      if (!_0x25d803) continue;
-      if (shouldUseInlineMediaClipAddSlot(_0x25d803.type)) continue;
-      const _0x215f1b =
-          _0x2d7e0c.isDragging && (_0x41d008.has(_0x5c8514) || _0x2d7e0c.targetNodeId === _0x5c8514),
-        _0x110a4f = _0x215f1b && Number.isFinite(_0x2d7e0c.pendingDx) ? _0x2d7e0c.pendingDx : 0,
-        _0x44e847 = _0x215f1b && Number.isFinite(_0x2d7e0c.pendingDy) ? _0x2d7e0c.pendingDy : 0,
-        _0x3b08cc = _0x25d803.width || (isNodeType(_0x25d803, 'group') ? 0x190 : 0x104),
-        _0x3de05b = _0x25d803.height || (isNodeType(_0x25d803, 'group') ? 0x12c : 80),
-        _0x5df0ae = getNodeScreenRect(
-          { x: _0x25d803.x + _0x110a4f, y: _0x25d803.y + _0x44e847, width: _0x3b08cc, height: _0x3de05b },
-          _0x42a532,
+      map8 = new Set(),
+      handler = shouldShowRightSidePlusForNodeType;
+    for (const value134 of candidateIds2) {
+      const x4 = nodes7[value134];
+      if (!x4) continue;
+      if (shouldUseInlineMediaClipAddSlot(x4.type)) continue;
+      const value135 =
+          _getDragContext2.isDragging &&
+          (selectedCount2.has(value134) || _getDragContext2.targetNodeId === value134),
+        value136 = value135 && Number.isFinite(_getDragContext2.pendingDx) ? _getDragContext2.pendingDx : 0,
+        value137 = value135 && Number.isFinite(_getDragContext2.pendingDy) ? _getDragContext2.pendingDy : 0,
+        width4 = x4.width || (isNodeType(x4, 'group') ? 0x190 : 0x104),
+        height4 = x4.height || (isNodeType(x4, 'group') ? 0x12c : 80),
+        box8 = getNodeScreenRect(
+          { x: x4.x + value136, y: x4.y + value137, width: width4, height: height4 },
+          viewport3,
         ),
-        _0x3bd791 = _0x5df0ae.top + _0x5df0ae.height / 2,
-        _0x225f76 = _0x5df0ae.left - _0x2f53fa * _0x53e504,
-        _0x59814c = _0x5df0ae.right + _0x2f53fa * _0x53e504,
-        _0x155ddb = Math.hypot(_0x54ac50 - _0x225f76, _0x1f2152 - _0x3bd791),
-        _0x7b156 = Math.hypot(_0x54ac50 - _0x59814c, _0x1f2152 - _0x3bd791),
-        _0x5a2356 = _0x5c8514 === _0x19950d || _0x340d3e.has(_0x5c8514),
-        _0x9f38a3 = _0x41d008.has(_0x5c8514),
-        _0x224ea5 = _0x5c8514 === _0x19950d ? _0x3804b1 : false,
-        _0x3afbcb = _0x224ea5 || (_0x2d7e0c.isDragging && _0x5c8514 === _0x2d7e0c.targetNodeId),
-        _0x576551 = shouldShowSidePlusForNode({
-          sideDistance: _0x155ddb,
-          threshold: _0x472e11,
-          isSelected: _0x9f38a3,
-          isHovered: _0x5a2356,
-          isInside: _0x224ea5,
-          nodeType: _0x25d803.type,
+        value138 = box8.top + box8.height / 2,
+        value139 = box8.left - gap2 * value131,
+        value140 = box8.right + gap2 * value131,
+        sideDistance2 = Math.hypot(mx2 - value139, my2 - value138),
+        sideDistance3 = Math.hypot(mx2 - value140, my2 - value138),
+        isHovered2 = value134 === hoverNodeId2 || sideAnchorHoverIds2.has(value134),
+        isSelected2 = selectedCount2.has(value134),
+        isInside2 = value134 === hoverNodeId2 ? value130 : false,
+        value141 = isInside2 || (_getDragContext2.isDragging && value134 === _getDragContext2.targetNodeId),
+        shouldShowSidePlusForNode2 = shouldShowSidePlusForNode({
+          sideDistance: sideDistance2,
+          threshold: threshold3,
+          isSelected: isSelected2,
+          isHovered: isHovered2,
+          isInside: isInside2,
+          nodeType: x4.type,
         }),
-        _0xaa6e45 = shouldShowSidePlusForNode({
-          sideDistance: _0x7b156,
-          threshold: _0x472e11,
-          isSelected: _0x9f38a3,
-          isHovered: _0x5a2356,
-          isInside: _0x224ea5,
-          nodeType: _0x25d803.type,
+        shouldShowSidePlusForNode3 = shouldShowSidePlusForNode({
+          sideDistance: sideDistance3,
+          threshold: threshold3,
+          isSelected: isSelected2,
+          isHovered: isHovered2,
+          isInside: isInside2,
+          nodeType: x4.type,
         }),
-        _0x481fe6 = (_0x12160e) =>
-          _0x12160e === 'ai-image' ||
-          _0x12160e === 'ai-text' ||
-          _0x12160e === 'ai-video' ||
-          _0x12160e === 'ai-audio' ||
-          _isPanorama360TargetType(_0x12160e);
-      (_0x481fe6(_0x25d803.type) &&
-        _0x576551 &&
-        _0x348d44(
-          _0x3e32d5,
-          _0x5c8514,
-          'left',
-          _0x225f76,
-          _0x3bd791,
-          _0x53e504,
-          _0x357d06,
-          _0xb7f980,
-          _0x3afbcb,
-        ),
-        _0x3b8b4f(_0x25d803.type) &&
-          _0xaa6e45 &&
-          _0x348d44(
-            _0x3e32d5,
-            _0x5c8514,
-            'right',
-            _0x59814c,
-            _0x3bd791,
-            _0x53e504,
-            _0x357d06,
-            _0xb7f980,
-            _0x3afbcb,
-          ));
+        handler2 = (value142) =>
+          value142 === 'ai-image' ||
+          value142 === 'ai-text' ||
+          value142 === 'ai-video' ||
+          value142 === 'ai-audio' ||
+          _isPanorama360TargetType(value142);
+      (handler2(x4.type) &&
+        shouldShowSidePlusForNode2 &&
+        run9(map8, value134, 'left', value139, value138, value131, value132, value133, value141),
+        handler(x4.type) &&
+          shouldShowSidePlusForNode3 &&
+          run9(map8, value134, 'right', value140, value138, value131, value132, value133, value141));
     }
-    const _0x1e36cf = _0x4b6555.filter((_0x52e9d5) => {
-      const _0x2ef622 = _0x1314f9[_0x52e9d5];
-      return !!_0x2ef622 && _0x3b8b4f(_0x2ef622.type);
+    const sourceNodeIds2 = selectedIds2.filter((item6) => {
+      const enabled19 = nodes7[item6];
+      return !!enabled19 && handler(enabled19.type);
     });
-    if (_0x4b6555.length >= 2 && _0x1e36cf.length > 0) {
-      const _0xf0b892 = _0x2d7e0c.isDragging && _0x41d008.has(_0x2d7e0c.targetNodeId),
-        _0x1c8146 = computeMultiSelectionBoundsForSidePlus(
-          _0x4b6555,
-          _0x1314f9,
-          _0xf0b892
+    if (selectedIds2.length >= 2 && sourceNodeIds2.length > 0) {
+      const value143 = _getDragContext2.isDragging && selectedCount2.has(_getDragContext2.targetNodeId),
+        x5 = computeMultiSelectionBoundsForSidePlus(
+          selectedIds2,
+          nodes7,
+          value143
             ? {
-                movedNodeIds: _0x4b6555,
-                offsetX: Number.isFinite(_0x2d7e0c.pendingDx) ? _0x2d7e0c.pendingDx : 0,
-                offsetY: Number.isFinite(_0x2d7e0c.pendingDy) ? _0x2d7e0c.pendingDy : 0,
+                movedNodeIds: selectedIds2,
+                offsetX: Number.isFinite(_getDragContext2.pendingDx) ? _getDragContext2.pendingDx : 0,
+                offsetY: Number.isFinite(_getDragContext2.pendingDy) ? _getDragContext2.pendingDy : 0,
               }
             : undefined,
         );
-      if (_0x1c8146) {
-        const _0x3ed368 = 18,
-          _0x18668e = getNodeScreenRect(
+      if (x5) {
+        const value144 = 18,
+          box9 = getNodeScreenRect(
             {
-              x: _0x1c8146.minX - _0x3ed368,
-              y: _0x1c8146.minY - _0x3ed368,
-              width: _0x1c8146.maxX - _0x1c8146.minX + _0x3ed368 * 2,
-              height: _0x1c8146.maxY - _0x1c8146.minY + _0x3ed368 * 2,
+              x: x5.minX - value144,
+              y: x5.minY - value144,
+              width: x5.maxX - x5.minX + value144 * 2,
+              height: x5.maxY - x5.minY + value144 * 2,
             },
-            _0x42a532,
+            viewport3,
           ),
-          _0x1cea68 = _0x18668e.right + _0x2f53fa * _0x53e504,
-          _0x556eea = _0x18668e.top + _0x18668e.height / 2,
-          _0x5916ab =
-            Number.isFinite(_0x54ac50) &&
-            Number.isFinite(_0x1f2152) &&
-            _0x54ac50 >= _0x18668e.left &&
-            _0x54ac50 <= _0x18668e.right &&
-            _0x1f2152 >= _0x18668e.top &&
-            _0x1f2152 <= _0x18668e.bottom;
-        _0x348d44(
-          _0x3e32d5,
-          _0x1e36cf[0],
-          'right',
-          _0x1cea68,
-          _0x556eea,
-          _0x53e504,
-          _0x357d06,
-          _0xb7f980,
-          _0x5916ab,
-          { key: 'multi:right', plusKind: 'multi', sourceNodeIds: _0x1e36cf, sizeMultiplier: 1.5 },
-        );
+          value145 = box9.right + gap2 * value131,
+          value146 = box9.top + box9.height / 2,
+          value147 =
+            Number.isFinite(mx2) &&
+            Number.isFinite(my2) &&
+            mx2 >= box9.left &&
+            mx2 <= box9.right &&
+            my2 >= box9.top &&
+            my2 <= box9.bottom;
+        run9(map8, sourceNodeIds2[0], 'right', value145, value146, value131, value132, value133, value147, {
+          key: 'multi:right',
+          plusKind: 'multi',
+          sourceNodeIds: sourceNodeIds2,
+          sizeMultiplier: 1.5,
+        });
       }
     }
-    for (const [_0xc3b982, _0x2e3667] of _0x2e08e7.entries()) {
-      if (_0x3e32d5.has(_0xc3b982)) continue;
-      (_0x2e3667.remove(), _0x2e08e7.delete(_0xc3b982), _0x149b28.delete(_0xc3b982));
+    for (const [value148, el38] of map4.entries()) {
+      if (map8.has(value148)) continue;
+      (el38.remove(), map4.delete(value148), map5.delete(value148));
     }
   }
-  const _0x5dd57f = rafSampleLatest(_0x1a4de5);
-  ((window._v2UpdateSidePlus = _0x5dd57f),
-    (window._v2UpdateSidePlusNow = _0x1a4de5),
-    window.addEventListener('pointermove', (_0x4fc993) => {
-      if (_0x375c5c.dragging) {
+  const run11 = rafSampleLatest(run10);
+  ((window._v2UpdateSidePlus = run11),
+    (window._v2UpdateSidePlusNow = run10),
+    window.addEventListener('pointermove', (event3) => {
+      if (side2.dragging) {
         let {
-          viewport: _0x4361b1,
-          nodes: _0x52d7ad,
-          connOverlay: _0x5f2795,
-          _persistRev: _0x4d15da,
+          viewport: viewport4,
+          nodes: nodes8,
+          connOverlay: connOverlay,
+          _persistRev: _persistRev2,
         } = getStateRaw();
         if (window._spaceHeld === true) {
-          const _0x402c0d = _0x4fc993.clientX - _0x375c5c.lastX,
-            _0x32876e = _0x4fc993.clientY - _0x375c5c.lastY;
-          if (_0x402c0d || _0x32876e) {
-            ((_0x4361b1 = {
-              x: (Number(_0x4361b1?.x) || 0) + _0x402c0d,
-              y: (Number(_0x4361b1?.y) || 0) + _0x32876e,
-              zoom: Number(_0x4361b1?.zoom) || 1,
+          const value149 = event3.clientX - side2.lastX,
+            value150 = event3.clientY - side2.lastY;
+          if (value149 || value150) {
+            ((viewport4 = {
+              x: (Number(viewport4?.x) || 0) + value149,
+              y: (Number(viewport4?.y) || 0) + value150,
+              zoom: Number(viewport4?.zoom) || 1,
             }),
-              graphStore.updateViewport(_0x4361b1.x, _0x4361b1.y, _0x4361b1.zoom),
-              (_0x375c5c.didAssistPan = true));
-            const _0xd60529 = getStateRaw();
-            ((_0x4361b1 = _0xd60529.viewport),
-              (_0x52d7ad = _0xd60529.nodes),
-              (_0x5f2795 = _0xd60529.connOverlay),
-              (_0x4d15da = _0xd60529._persistRev));
+              graphStore.updateViewport(viewport4.x, viewport4.y, viewport4.zoom),
+              (side2.didAssistPan = true));
+            const stateRaw6 = getStateRaw();
+            ((viewport4 = stateRaw6.viewport),
+              (nodes8 = stateRaw6.nodes),
+              (connOverlay = stateRaw6.connOverlay),
+              (_persistRev2 = stateRaw6._persistRev));
           }
         }
-        ((_0x375c5c.lastX = _0x4fc993.clientX), (_0x375c5c.lastY = _0x4fc993.clientY));
-        const _0x559d1d = new Set(_0x5f2795?.invalidNodeIds || []),
-          _0x281968 = _0x3d2cdf(_0x375c5c.sourceNodeIds, _0x375c5c.srcId),
-          _0x1a4284 = new Set(_0x281968),
-          _0x42ef72 = _0x52d7ad[_0x375c5c.srcId];
-        let _0x488027 = 0,
-          _0x181924 = 0;
-        if (_0x375c5c.plusKind === 'multi') {
-          if (Number.isFinite(_0x375c5c.anchorWorldX) && Number.isFinite(_0x375c5c.anchorWorldY))
-            ((_0x488027 = _0x375c5c.anchorWorldX), (_0x181924 = _0x375c5c.anchorWorldY));
+        ((side2.lastX = event3.clientX), (side2.lastY = event3.clientY));
+        const map9 = new Set(connOverlay?.invalidNodeIds || []),
+          value151 = run2(side2.sourceNodeIds, side2.srcId),
+          map10 = new Set(value151),
+          box10 = nodes8[side2.srcId];
+        let value152 = 0,
+          value153 = 0;
+        if (side2.plusKind === 'multi') {
+          if (Number.isFinite(side2.anchorWorldX) && Number.isFinite(side2.anchorWorldY))
+            ((value152 = side2.anchorWorldX), (value153 = side2.anchorWorldY));
           else {
-            const _0x31fa33 = screenToWorld(_0x375c5c.ax, _0x375c5c.ay, _0x4361b1);
-            ((_0x488027 = _0x31fa33.x), (_0x181924 = _0x31fa33.y));
+            const box11 = screenToWorld(side2.ax, side2.ay, viewport4);
+            ((value152 = box11.x), (value153 = box11.y));
           }
         } else
-          _0x42ef72 &&
-            ((_0x488027 = _0x375c5c.side === 'right' ? _0x42ef72.x + (_0x42ef72.width || 0) : _0x42ef72.x),
-            (_0x181924 = _0x42ef72.y + (_0x42ef72.height || 0) / 2));
-        const { x: _0x9e9da9, y: _0x454848 } = screenToWorld(_0x4fc993.clientX, _0x4fc993.clientY, _0x4361b1);
-        _renderDraftEdgeDirectly(_0x488027, _0x181924, _0x9e9da9, _0x454848, _0x375c5c.side, _0x4361b1);
-        const _0x504577 = _getNodeSpatialIndex(_0x52d7ad, _0x4d15da, _NODE_SPATIAL_INDEX_EDGE_HOVER_KEY),
-          _0x3c8de0 = queryNodeSpatialIndexAtWorldPoint(_0x504577, _0x9e9da9, _0x454848);
-        let _0x390c44 = null;
-        for (const _0x52f908 of _0x3c8de0) {
-          const _0x2b74b8 = _0x52d7ad[_0x52f908];
-          if (!_0x2b74b8) continue;
-          if (_0x1a4284.has(_0x52f908)) continue;
-          if (_0x559d1d.has(_0x52f908)) continue;
-          const _0x27cd03 = _resolveEdgeHoverNodeRect(_0x2b74b8);
-          if (!_0x27cd03) continue;
-          if (
-            isPointInRect(_0x9e9da9, _0x454848, _0x27cd03.x, _0x27cd03.y, _0x27cd03.width, _0x27cd03.height)
-          ) {
-            _0x390c44 = _0x52f908;
+          box10 &&
+            ((value152 = side2.side === 'right' ? box10.x + (box10.width || 0) : box10.x),
+            (value153 = box10.y + (box10.height || 0) / 2));
+        const { x: x6, y: y2 } = screenToWorld(event3.clientX, event3.clientY, viewport4);
+        _renderDraftEdgeDirectly(value152, value153, x6, y2, side2.side, viewport4);
+        const _getNodeSpatialIndex2 = _getNodeSpatialIndex(
+            nodes8,
+            _persistRev2,
+            _NODE_SPATIAL_INDEX_EDGE_HOVER_KEY,
+          ),
+          queryNodeSpatialIndexAtWorldPoint2 = queryNodeSpatialIndexAtWorldPoint(
+            _getNodeSpatialIndex2,
+            x6,
+            y2,
+          );
+        let hoverId2 = null;
+        for (const value154 of queryNodeSpatialIndexAtWorldPoint2) {
+          const enabled20 = nodes8[value154];
+          if (!enabled20) continue;
+          if (map10.has(value154)) continue;
+          if (map9.has(value154)) continue;
+          const box12 = _resolveEdgeHoverNodeRect(enabled20);
+          if (!box12) continue;
+          if (isPointInRect(x6, y2, box12.x, box12.y, box12.width, box12.height)) {
+            hoverId2 = value154;
             break;
           }
         }
-        (_0x5f2795?.hoverId || null) !== _0x390c44 &&
-          graphStore.setConnOverlay({ hoverId: _0x390c44, side: _0x375c5c.side });
-      } else _0x5dd57f(_0x4fc993.clientX, _0x4fc993.clientY);
+        (connOverlay?.hoverId || null) !== hoverId2 &&
+          graphStore.setConnOverlay({ hoverId: hoverId2, side: side2.side });
+      } else run11(event3.clientX, event3.clientY);
     }),
     window.addEventListener(
       'pointerup',
-      (_0xca0f80) => {
-        if (!_0x375c5c.dragging) return;
-        _0x375c5c.dragging = false;
+      (event4) => {
+        if (!side2.dragging) return;
+        side2.dragging = false;
         const {
-            srcId: _0x18c1c6,
-            sourceNodeIds: _0x1269a2,
-            plusKind: _0x469830,
-            side: _0x2df2da,
-            sx: _0x1557e4,
-            sy: _0x530e5f,
-            didAssistPan: _0x1b4d66,
-          } = _0x375c5c,
-          _0x3e0cf4 = _0x3d2cdf(_0x1269a2, _0x18c1c6),
-          _0x720d2d = new Set(_0x3e0cf4);
-        ((_0x375c5c.srcId = null),
-          (_0x375c5c.sourceNodeIds = []),
-          (_0x375c5c.plusKind = 'node'),
-          (_0x375c5c.anchorWorldX = null),
-          (_0x375c5c.anchorWorldY = null),
-          (_0x375c5c.didAssistPan = false),
-          _0x3bd2b4());
-        const _0x545087 = () => {
+            srcId: srcId2,
+            sourceNodeIds: sourceNodeIds3,
+            plusKind: plusKind,
+            side: side5,
+            sx: sx2,
+            sy: sy,
+            didAssistPan: didAssistPan,
+          } = side2,
+          list14 = run2(sourceNodeIds3, srcId2),
+          map11 = new Set(list14);
+        ((side2.srcId = null),
+          (side2.sourceNodeIds = []),
+          (side2.plusKind = 'node'),
+          (side2.anchorWorldX = null),
+          (side2.anchorWorldY = null),
+          (side2.didAssistPan = false),
+          run6());
+        const run12 = () => {
           (_clearDraftEdgeDirectly(), graphStore.clearConnOverlay());
         };
-        if (
-          !_0x1b4d66 &&
-          Math.abs(_0xca0f80.clientX - _0x1557e4) < 5 &&
-          Math.abs(_0xca0f80.clientY - _0x530e5f) < 5
-        )
-          return _0x545087();
+        if (!didAssistPan && Math.abs(event4.clientX - sx2) < 5 && Math.abs(event4.clientY - sy) < 5)
+          return run12();
         const {
-            viewport: _0x472e92,
-            nodes: _0xcffdf7,
-            edges: _0x50e1bb,
-            _persistRev: _0x31f6d1,
-            _edgesRev: _0x1400c6,
+            viewport: viewport5,
+            nodes: nodes9,
+            edges: edges3,
+            _persistRev: _persistRev3,
+            _edgesRev: _edgesRev2,
           } = getStateRaw(),
-          _0x463098 = _getNodeSpatialIndex(_0xcffdf7, _0x31f6d1, _NODE_SPATIAL_INDEX_DEFAULT_KEY);
-        let _0x283ff8 = hitTestNode(
-          _0xca0f80.clientX,
-          _0xca0f80.clientY,
-          _0xcffdf7,
-          _0x472e92,
-          _0x18c1c6,
-          false,
-          { spatialIndex: _0x463098 },
-        );
-        if (_0x283ff8 && _0x720d2d.has(_0x283ff8)) _0x283ff8 = null;
-        if (_0x283ff8) {
-          _0x545087();
-          if (_0x469830 === 'multi') {
-            if (_0x2df2da !== 'right') return;
-            let _0x532956 = false;
-            for (const _0x5cb8e3 of _0x3e0cf4) {
-              if (!_0x5cb8e3 || _0x5cb8e3 === _0x283ff8) continue;
-              const _0x5ef14a = getStateRaw(),
-                _0x356cef = _0x5ef14a.nodes?.[_0x5cb8e3],
-                _0x14b1d9 = _0x5ef14a.nodes?.[_0x283ff8];
-              if (!_0x356cef || !_0x14b1d9) continue;
-              if (!isValidConnection(_0x356cef, _0x14b1d9)) continue;
-              const _0x3eb048 = addEdgeWithPolicies({ sourceId: _0x5cb8e3, targetId: _0x283ff8 });
-              if (!_0x3eb048) continue;
-              ((_0x532956 = true), _0xedd222(_0x5cb8e3, _0x283ff8, _0x356cef, _0x14b1d9, _0x2df2da));
+          spatialIndex4 = _getNodeSpatialIndex(nodes9, _persistRev3, _NODE_SPATIAL_INDEX_DEFAULT_KEY);
+        let targetId3 = hitTestNode(event4.clientX, event4.clientY, nodes9, viewport5, srcId2, false, {
+          spatialIndex: spatialIndex4,
+        });
+        if (targetId3 && map11.has(targetId3)) targetId3 = null;
+        if (targetId3) {
+          run12();
+          if (plusKind === 'multi') {
+            if (side5 !== 'right') return;
+            let enabled21 = false;
+            for (const sourceId3 of list14) {
+              if (!sourceId3 || sourceId3 === targetId3) continue;
+              const stateRaw7 = getStateRaw(),
+                enabled22 = stateRaw7.nodes?.[sourceId3],
+                enabled23 = stateRaw7.nodes?.[targetId3];
+              if (!enabled22 || !enabled23) continue;
+              if (!isValidConnection(enabled22, enabled23)) continue;
+              const addEdgeWithPolicies3 = addEdgeWithPolicies({ sourceId: sourceId3, targetId: targetId3 });
+              if (!addEdgeWithPolicies3) continue;
+              ((enabled21 = true), run4(sourceId3, targetId3, enabled22, enabled23, side5));
             }
-            if (!_0x532956) return;
+            if (!enabled21) return;
             return;
           }
-          const _0x1bfbb2 = _0x2df2da === 'right' ? _0x18c1c6 : _0x283ff8,
-            _0x2e87a0 = _0x2df2da === 'right' ? _0x283ff8 : _0x18c1c6,
-            _0x5a16c2 = _0xcffdf7[_0x1bfbb2],
-            _0xf7735f = _0xcffdf7[_0x2e87a0],
-            _0x174116 = _getOutEdgeMap(_0x50e1bb, _0x1400c6),
-            _0x9679c4 = _getIncomingEdgesByTarget(_0x50e1bb, _0x1400c6, _0x2e87a0),
-            _0x49e8d3 = !!_0x174116.get(_0x1bfbb2)?.has(_0x2e87a0);
-          if (!isValidConnection(_0x5a16c2, _0xf7735f) || _0x49e8d3) return;
-          const _0x2b5b20 = String(_0x5a16c2?.type || '').trim() === 'group';
-          if (_0x2b5b20) {
-            const _0x2afdf6 = addEdgeWithPolicies({ sourceId: _0x1bfbb2, targetId: _0x2e87a0 });
-            if (!_0x2afdf6) return;
-            _0xedd222(_0x1bfbb2, _0x2e87a0, _0x5a16c2, _0xf7735f, _0x2df2da);
+          const sourceId4 = side5 === 'right' ? srcId2 : targetId3,
+            targetId4 = side5 === 'right' ? targetId3 : srcId2,
+            srcData = nodes9[sourceId4],
+            tgtData = nodes9[targetId4],
+            map12 = _getOutEdgeMap(edges3, _edgesRev2),
+            incomingEdges = _getIncomingEdgesByTarget(edges3, _edgesRev2, targetId4),
+            value155 = !!map12.get(sourceId4)?.has(targetId4);
+          if (!isValidConnection(srcData, tgtData) || value155) return;
+          const value156 = String(srcData?.type || '').trim() === 'group';
+          if (value156) {
+            const addEdgeWithPolicies4 = addEdgeWithPolicies({ sourceId: sourceId4, targetId: targetId4 });
+            if (!addEdgeWithPolicies4) return;
+            run4(sourceId4, targetId4, srcData, tgtData, side5);
             return;
           }
-          if (_isAnimeRealTarget(_0xf7735f)) {
-            if (!_isAnimeRealImageSrc(_0x5a16c2)) return;
-            for (const _0x3b77b4 of _0x9679c4) graphStore.removeEdge(_0x3b77b4.id);
-            _0xf7735f.rhAnimeRealRefUrl &&
-              graphStore.updateNodeData(_0x2e87a0, {
+          if (_isAnimeRealTarget(tgtData)) {
+            if (!_isAnimeRealImageSrc(srcData)) return;
+            for (const value157 of incomingEdges) graphStore.removeEdge(value157.id);
+            tgtData.rhAnimeRealRefUrl &&
+              graphStore.updateNodeData(targetId4, {
                 rhAnimeRealRefUrl: '',
                 rhAnimeRealRefLocalPath: '',
                 rhAnimeRealRefFileName: '',
               });
           }
-          const _0x45e235 = _applyRhPersonReplaceV3FixedInputs({
-            srcData: _0x5a16c2,
-            tgtData: _0xf7735f,
-            incomingEdges: _0x9679c4,
-            nodes: _0xcffdf7,
-            targetId: _0x2e87a0,
+          const response2 = _applyRhPersonReplaceV3FixedInputs({
+            srcData: srcData,
+            tgtData: tgtData,
+            incomingEdges: incomingEdges,
+            nodes: nodes9,
+            targetId: targetId4,
           });
-          if (!_0x45e235.ok) return;
-          const _0x33be5b = addEdgeWithPolicies({ sourceId: _0x1bfbb2, targetId: _0x2e87a0 });
-          if (!_0x33be5b) return;
-          _0xedd222(_0x1bfbb2, _0x2e87a0, _0x5a16c2, _0xf7735f, _0x2df2da);
+          if (!response2.ok) return;
+          const addEdgeWithPolicies5 = addEdgeWithPolicies({ sourceId: sourceId4, targetId: targetId4 });
+          if (!addEdgeWithPolicies5) return;
+          run4(sourceId4, targetId4, srcData, tgtData, side5);
           return;
         }
-        if (_0x2df2da === 'left') {
-          _showLeftQuoteMenu(_0xca0f80.clientX, _0xca0f80.clientY, _0x18c1c6, _0x472e92, _0x545087);
+        if (side5 === 'left') {
+          _showLeftQuoteMenu(event4.clientX, event4.clientY, srcId2, viewport5, run12);
           return;
         }
-        if (_0x2df2da !== 'right') {
-          _0x545087();
+        if (side5 !== 'right') {
+          run12();
           return;
         }
-        if (_0x469830 === 'multi') {
-          const _0x1deef4 = _0x3e0cf4.filter((_0x1eb77c) => !!_0xcffdf7[_0x1eb77c]);
-          if (_0x1deef4.length === 0) {
-            _0x545087();
+        if (plusKind === 'multi') {
+          const sourceIds = list14.filter((item7) => !!nodes9[item7]);
+          if (sourceIds.length === 0) {
+            run12();
             return;
           }
-          _showQuoteMenu(_0xca0f80.clientX, _0xca0f80.clientY, _0x1deef4[0], _0x472e92, _0x545087, {
-            sourceIds: _0x1deef4,
+          _showQuoteMenu(event4.clientX, event4.clientY, sourceIds[0], viewport5, run12, {
+            sourceIds: sourceIds,
           });
           return;
         }
-        const _0x3cd141 = _0xcffdf7[_0x18c1c6];
-        if (!_0x3cd141) {
-          _0x545087();
+        const enabled24 = nodes9[srcId2];
+        if (!enabled24) {
+          run12();
           return;
         }
-        _showQuoteMenu(_0xca0f80.clientX, _0xca0f80.clientY, _0x18c1c6, _0x472e92, _0x545087);
+        _showQuoteMenu(event4.clientX, event4.clientY, srcId2, viewport5, run12);
       },
       { capture: true },
     ));
 }
 const _RH_ANIME_REAL_MODEL = ANIME_REAL_MODEL_ID,
-  _isAnimeRealTarget = (_0x383296) =>
-    !!_0x383296 && _0x383296.type === 'ai-image' && String(_0x383296.model || '') === _RH_ANIME_REAL_MODEL,
-  _isAnimeRealImageSrc = (_0x3d19fc) => {
-    const _0x49e008 = String(_0x3d19fc?.type || '');
-    return _0x49e008 === 'source-image' || _0x49e008 === 'image' || _0x49e008 === 'ai-image';
+  _isAnimeRealTarget = (enabled25) =>
+    !!enabled25 && enabled25.type === 'ai-image' && String(enabled25.model || '') === _RH_ANIME_REAL_MODEL,
+  _isAnimeRealImageSrc = (value158) => {
+    const value159 = String(value158?.type || '');
+    return value159 === 'source-image' || value159 === 'image' || value159 === 'ai-image';
   },
-  _isRhPersonReplaceV3Target = (_0x14b5e3) =>
-    !!_0x14b5e3 && _0x14b5e3.type === 'ai-image' && isRhPersonReplaceWorkflowModel(_0x14b5e3.model),
-  _getRhV54RefKind = (_0x20eaef) => {
-    return resolveEffectiveInputKind(_0x20eaef) || 'image';
+  _isRhPersonReplaceV3Target = (enabled26) =>
+    !!enabled26 && enabled26.type === 'ai-image' && isRhPersonReplaceWorkflowModel(enabled26.model),
+  _getRhV54RefKind = (value160) => {
+    return resolveEffectiveInputKind(value160) || 'image';
   },
-  _getAiAudioWorkflowKey = (_0x497eb0) => {
-    if (!_0x497eb0 || String(_0x497eb0.type || '') !== 'ai-audio') return '';
-    const _0x3c705b = String(_0x497eb0.audioWorkflowKey || '').trim();
-    if (_0x3c705b) return _0x3c705b;
-    const _0x508bde = String(_0x497eb0.model || '').trim();
-    return _0x508bde;
+  _getAiAudioWorkflowKey = (enabled27) => {
+    if (!enabled27 || String(enabled27.type || '') !== 'ai-audio') return '';
+    const value161 = String(enabled27.audioWorkflowKey || '').trim();
+    if (value161) return value161;
+    const value162 = String(enabled27.model || '').trim();
+    return value162;
   },
-  _getManifestFixedInputConfig = (_0x29a076) => {
-    const _0xa325cc = String(_0x29a076?.type || '').trim();
-    if (_0xa325cc === 'ai-audio') {
-      const _0x942a92 = _getAiAudioWorkflowKey(_0x29a076);
+  _getManifestFixedInputConfig = (args3) => {
+    const value163 = String(args3?.type || '').trim();
+    if (value163 === 'ai-audio') {
+      const audioWorkflowKey = _getAiAudioWorkflowKey(args3);
       return getFixedInputSlotConfigFromManifest({
-        ..._0x29a076,
-        audioWorkflowKey: _0x942a92,
-        model: _0x942a92,
+        ...args3,
+        audioWorkflowKey: audioWorkflowKey,
+        model: audioWorkflowKey,
       });
     }
-    return getFixedInputSlotConfigFromManifest(_0x29a076);
+    return getFixedInputSlotConfigFromManifest(args3);
   },
-  _edgeTimeKey = (_0x36ea2e) => {
-    const _0xc92a7f = Number(_0x36ea2e?.createdAt);
-    if (Number.isFinite(_0xc92a7f)) return _0xc92a7f;
-    const _0x1d36de = String(_0x36ea2e?.id || ''),
-      _0x342b57 = _0x1d36de.match(/(\d{10,})/g);
-    if (_0x342b57 && _0x342b57.length) return Number(_0x342b57[_0x342b57.length - 1]) || 0;
+  _edgeTimeKey = (value164) => {
+    const value165 = Number(value164?.createdAt);
+    if (Number.isFinite(value165)) return value165;
+    const value166 = String(value164?.id || ''),
+      list15 = value166.match(/(\d{10,})/g);
+    if (list15 && list15.length) return Number(list15[list15.length - 1]) || 0;
     return 0;
   };
-function _finishManifestFixedInputResult(_0x5410a1, _0x1dee81, _0x2bbf5e) {
-  const _0x2b4e40 = String(_0x2bbf5e || '').trim();
-  if (!_0x2b4e40) return { ok: true, refSlot: '' };
-  const _0x53d158 = getExclusiveSlotsForFixedSlot(_0x5410a1?.exclusiveGroups, _0x2b4e40);
-  if (_0x53d158.length > 1) {
-    const _0x16153b = new Set(_0x53d158);
-    for (const _0x5e1757 of Array.isArray(_0x1dee81) ? _0x1dee81 : []) {
-      const _0x483bfa = String(_0x5e1757?.refSlot || '').trim();
-      _0x5e1757?.id &&
-        _0x483bfa !== _0x2b4e40 &&
-        _0x16153b.has(_0x483bfa) &&
-        graphStore.removeEdge(_0x5e1757.id);
+function _finishManifestFixedInputResult(value167, value168, value169) {
+  const refSlot = String(value169 || '').trim();
+  if (!refSlot) return { ok: true, refSlot: '' };
+  const list16 = getExclusiveSlotsForFixedSlot(value167?.exclusiveGroups, refSlot);
+  if (list16.length > 1) {
+    const map13 = new Set(list16);
+    for (const value170 of Array.isArray(value168) ? value168 : []) {
+      const value171 = String(value170?.refSlot || '').trim();
+      value170?.id && value171 !== refSlot && map13.has(value171) && graphStore.removeEdge(value170.id);
     }
   }
-  return { ok: true, refSlot: _0x2b4e40 };
+  return { ok: true, refSlot: refSlot };
 }
 function _canUseManifestFixedInputOverflow({
-  config: _0xb15661,
-  srcKind: _0x316879,
-  tgtData: _0x4db174,
-  incomingEdges: _0x1285d8,
-  nodes: _0x3481cc,
+  config: config2,
+  srcKind: srcKind,
+  tgtData: tgtData2,
+  incomingEdges: incomingEdges2,
+  nodes: nodes10,
 }) {
-  const _0x4f95ea = String(_0x316879 || '').trim();
-  if (!_0x4f95ea || _0x4f95ea === 'text') return false;
-  const _0x160c4b = new Set(_0xb15661?.visibleSlots || []),
-    _0x5c4258 = (_0xb15661?.slotOrderByType?.[_0x4f95ea] || []).filter((_0xda8425) =>
-      _0x160c4b.has(_0xda8425),
-    ).length,
-    _0x261385 = getTargetInputPolicy(_0x4db174),
-    _0x1b584e = Number(_0x261385?.maxByKind?.[_0x4f95ea]);
-  if (!Number.isFinite(_0x1b584e) || _0x1b584e <= _0x5c4258) return false;
-  const _0x43e134 = (Array.isArray(_0x1285d8) ? _0x1285d8 : []).filter(
-    (_0x45d772) => _getRhV54RefKind(_0x3481cc?.[_0x45d772?.sourceId]) === _0x4f95ea,
+  const enabled28 = String(srcKind || '').trim();
+  if (!enabled28 || enabled28 === 'text') return false;
+  const map14 = new Set(config2?.visibleSlots || []),
+    value172 = (config2?.slotOrderByType?.[enabled28] || []).filter((item8) => map14.has(item8)).length,
+    targetInputPolicy = getTargetInputPolicy(tgtData2),
+    value173 = Number(targetInputPolicy?.maxByKind?.[enabled28]);
+  if (!Number.isFinite(value173) || value173 <= value172) return false;
+  const value174 = (Array.isArray(incomingEdges2) ? incomingEdges2 : []).filter(
+    (item9) => _getRhV54RefKind(nodes10?.[item9?.sourceId]) === enabled28,
   ).length;
-  return _0x43e134 < _0x1b584e;
+  return value174 < value173;
 }
-function _allowsManifestFixedInputOverflow({ config: _0x36bf28, srcKind: _0x3bb716, tgtData: _0x432506 }) {
-  const _0x49d7bf = String(_0x3bb716 || '').trim();
-  if (!_0x49d7bf || _0x49d7bf === 'text') return false;
-  const _0x2d9c5e = new Set(_0x36bf28?.visibleSlots || []),
-    _0x28c990 = (_0x36bf28?.slotOrderByType?.[_0x49d7bf] || []).filter((_0x108190) =>
-      _0x2d9c5e.has(_0x108190),
-    ).length,
-    _0x21c1d0 = getTargetInputPolicy(_0x432506),
-    _0xc48831 = Number(_0x21c1d0?.maxByKind?.[_0x49d7bf]);
-  return Number.isFinite(_0xc48831) && _0xc48831 > _0x28c990;
+function _allowsManifestFixedInputOverflow({ config: config3, srcKind: srcKind2, tgtData: tgtData3 }) {
+  const enabled29 = String(srcKind2 || '').trim();
+  if (!enabled29 || enabled29 === 'text') return false;
+  const map15 = new Set(config3?.visibleSlots || []),
+    value175 = (config3?.slotOrderByType?.[enabled29] || []).filter((item10) => map15.has(item10)).length,
+    targetInputPolicy2 = getTargetInputPolicy(tgtData3),
+    value176 = Number(targetInputPolicy2?.maxByKind?.[enabled29]);
+  return Number.isFinite(value176) && value176 > value175;
 }
 function _cycleManifestFixedInputWhenFull({
-  config: _0x2edd32,
-  srcKind: _0x17fa5d,
-  tgtData: _0x5770a0,
-  incomingEdges: _0x201139,
-  nodes: _0x292f44,
-  slotOrder: _0x4c41e6,
+  config: config4,
+  srcKind: srcKind3,
+  tgtData: tgtData4,
+  incomingEdges: incomingEdges3,
+  nodes: nodes11,
+  slotOrder: slotOrder,
 }) {
-  const _0x411b07 = String(_0x17fa5d || '').trim();
-  if (!_0x411b07 || _0x411b07 === 'text') return null;
-  if (_0x2edd32?.manifest?.inputSlots?.cycleFixedInputWhenFull !== true) return null;
-  const _0x11749a = getTargetInputPolicy(_0x5770a0),
-    _0x293926 = Number(_0x11749a?.maxByKind?.[_0x411b07]);
-  if (!Number.isFinite(_0x293926) || _0x293926 <= 0) return null;
-  const _0x20b29e = new Set(_0x2edd32?.visibleSlots || []),
-    _0xa57f95 = (_0x2edd32?.slotOrderByType?.[_0x411b07] || []).filter((_0x521d1f) =>
-      _0x20b29e.has(_0x521d1f),
-    ).length,
-    _0x3e6d9b = (Array.isArray(_0x201139) ? _0x201139 : [])
-      .filter((_0x46dc69) => _getRhV54RefKind(_0x292f44?.[_0x46dc69?.sourceId]) === _0x411b07)
-      .sort((_0x27532e, _0x564df9) => _edgeTimeKey(_0x27532e) - _edgeTimeKey(_0x564df9));
-  if (_0x3e6d9b.length < _0x293926) return null;
-  const _0x4bd1d1 = _0x3e6d9b[0];
-  if (!_0x4bd1d1?.id) return null;
-  const _0x2d6cde = String(_0x4bd1d1.refSlot || '');
-  graphStore.removeEdge(_0x4bd1d1.id);
-  const _0x46b88b =
-    _0x293926 <= _0xa57f95 && Array.isArray(_0x4c41e6) && _0x4c41e6.includes(_0x2d6cde) ? _0x2d6cde : '';
-  return { ok: true, refSlot: _0x46b88b };
+  const enabled30 = String(srcKind3 || '').trim();
+  if (!enabled30 || enabled30 === 'text') return null;
+  if (config4?.manifest?.inputSlots?.cycleFixedInputWhenFull !== true) return null;
+  const targetInputPolicy3 = getTargetInputPolicy(tgtData4),
+    count17 = Number(targetInputPolicy3?.maxByKind?.[enabled30]);
+  if (!Number.isFinite(count17) || count17 <= 0) return null;
+  const map16 = new Set(config4?.visibleSlots || []),
+    value177 = (config4?.slotOrderByType?.[enabled30] || []).filter((item11) => map16.has(item11)).length,
+    list17 = (Array.isArray(incomingEdges3) ? incomingEdges3 : [])
+      .filter((item12) => _getRhV54RefKind(nodes11?.[item12?.sourceId]) === enabled30)
+      .sort((item13, value178) => _edgeTimeKey(item13) - _edgeTimeKey(value178));
+  if (list17.length < count17) return null;
+  const enabled31 = list17[0];
+  if (!enabled31?.id) return null;
+  const value179 = String(enabled31.refSlot || '');
+  graphStore.removeEdge(enabled31.id);
+  const refSlot2 =
+    count17 <= value177 && Array.isArray(slotOrder) && slotOrder.includes(value179) ? value179 : '';
+  return { ok: true, refSlot: refSlot2 };
 }
 function _applyRhPersonReplaceV3FixedInputs({
-  srcData: _0x3f4faf,
-  tgtData: _0x41c7a2,
-  incomingEdges: _0x3be89d,
-  nodes: _0x475de3,
-  targetId: _0x1836b2,
+  srcData: srcData2,
+  tgtData: tgtData5,
+  incomingEdges: incomingEdges4,
+  nodes: nodes12,
+  targetId: targetId5,
 }) {
-  if (!_isRhPersonReplaceV3Target(_0x41c7a2)) return { ok: true, refSlot: '' };
-  if (!_isAnimeRealImageSrc(_0x3f4faf)) return { ok: false, refSlot: '' };
-  const _0x4b1908 = ['replaceTarget', 'replacedImage'],
-    _0x342fbf = Array.isArray(_0x3be89d) ? _0x3be89d : [],
-    _0x51075a = _0x342fbf.filter((_0x2b8a45) => {
-      const _0x708d7b = _0x475de3?.[_0x2b8a45.sourceId];
-      return _isAnimeRealImageSrc(_0x708d7b);
+  if (!_isRhPersonReplaceV3Target(tgtData5)) return { ok: true, refSlot: '' };
+  if (!_isAnimeRealImageSrc(srcData2)) return { ok: false, refSlot: '' };
+  const list18 = ['replaceTarget', 'replacedImage'],
+    list19 = Array.isArray(incomingEdges4) ? incomingEdges4 : [],
+    list20 = list19.filter((item14) => {
+      const value180 = nodes12?.[item14.sourceId];
+      return _isAnimeRealImageSrc(value180);
     }),
-    _0x7000bd = new Set(
-      _0x51075a
-        .map((_0x5c626f) => String(_0x5c626f.refSlot || ''))
-        .filter((_0x2926ee) => _0x4b1908.includes(_0x2926ee)),
+    map17 = new Set(
+      list20.map((item15) => String(item15.refSlot || '')).filter((item16) => list18.includes(item16)),
     ),
-    _0x2c4b2d = _0x4b1908.find((_0x435112) => !_0x7000bd.has(_0x435112)) || '';
-  if (_0x2c4b2d) return { ok: true, refSlot: _0x2c4b2d };
-  let _0x5ecfcc = null;
-  for (const _0x157608 of _0x51075a) {
-    if (_0x4b1908.includes(String(_0x157608.refSlot || ''))) {
-      if (!_0x5ecfcc || _edgeTimeKey(_0x157608) < _edgeTimeKey(_0x5ecfcc)) _0x5ecfcc = _0x157608;
+    refSlot3 = list18.find((item17) => !map17.has(item17)) || '';
+  if (refSlot3) return { ok: true, refSlot: refSlot3 };
+  let enabled32 = null;
+  for (const value181 of list20) {
+    if (list18.includes(String(value181.refSlot || ''))) {
+      if (!enabled32 || _edgeTimeKey(value181) < _edgeTimeKey(enabled32)) enabled32 = value181;
     }
   }
-  if (!_0x5ecfcc)
-    for (const _0x54771e of _0x51075a) {
-      if (!_0x5ecfcc || _edgeTimeKey(_0x54771e) < _edgeTimeKey(_0x5ecfcc)) _0x5ecfcc = _0x54771e;
+  if (!enabled32)
+    for (const value182 of list20) {
+      if (!enabled32 || _edgeTimeKey(value182) < _edgeTimeKey(enabled32)) enabled32 = value182;
     }
-  if (_0x5ecfcc) graphStore.removeEdge(_0x5ecfcc.id);
-  const _0x5cfd33 =
-    _0x5ecfcc && _0x4b1908.includes(String(_0x5ecfcc.refSlot || ''))
-      ? String(_0x5ecfcc.refSlot)
-      : _0x4b1908[0];
-  return { ok: true, refSlot: _0x5cfd33 };
+  if (enabled32) graphStore.removeEdge(enabled32.id);
+  const refSlot4 =
+    enabled32 && list18.includes(String(enabled32.refSlot || '')) ? String(enabled32.refSlot) : list18[0];
+  return { ok: true, refSlot: refSlot4 };
 }
 function _applyManifestFixedInputs({
-  srcData: _0x2e4285,
-  tgtData: _0x91dad1,
-  incomingEdges: _0x28f259,
-  nodes: _0x102761,
-  targetId: _0x5395a5,
-  preferredRefSlot: _0x50e6b4,
+  srcData: srcData3,
+  tgtData: tgtData6,
+  incomingEdges: incomingEdges5,
+  nodes: nodes13,
+  targetId: targetId6,
+  preferredRefSlot: preferredRefSlot,
 }) {
-  const _0x48a18a = String(_0x91dad1?.type || '').trim();
-  if (_0x48a18a !== 'ai-video' && _0x48a18a !== 'ai-audio' && _0x48a18a !== 'ai-image')
+  const value183 = String(tgtData6?.type || '').trim();
+  if (value183 !== 'ai-video' && value183 !== 'ai-audio' && value183 !== 'ai-image')
     return { ok: true, refSlot: '' };
-  if (_0x48a18a === 'ai-image' && _isRhPersonReplaceV3Target(_0x91dad1)) return { ok: true, refSlot: '' };
-  const _0x322392 = _getManifestFixedInputConfig(_0x91dad1);
-  if (!_0x322392) return { ok: true, refSlot: '' };
-  const _0x27e76a = _getRhV54RefKind(_0x2e4285);
-  if (_0x27e76a === 'text') return { ok: true, refSlot: '' };
-  const _0x18fc28 = new Set(_0x322392.visibleSlots || []),
-    _0xf71510 = _0x322392.slotOrderByType?.[_0x27e76a] || [],
-    _0x10cb4a = _0xf71510.filter(
-      (_0x331106) => _0x18fc28.has(_0x331106) && fixedInputSlotAcceptsSource(_0x322392, _0x331106, _0x2e4285),
+  if (value183 === 'ai-image' && _isRhPersonReplaceV3Target(tgtData6)) return { ok: true, refSlot: '' };
+  const config5 = _getManifestFixedInputConfig(tgtData6);
+  if (!config5) return { ok: true, refSlot: '' };
+  const srcKind4 = _getRhV54RefKind(srcData3);
+  if (srcKind4 === 'text') return { ok: true, refSlot: '' };
+  const map18 = new Set(config5.visibleSlots || []),
+    list21 = config5.slotOrderByType?.[srcKind4] || [],
+    list22 = list21.filter(
+      (item18) => map18.has(item18) && fixedInputSlotAcceptsSource(config5, item18, srcData3),
     ),
-    _0x5c2b8b = _0xf71510.filter(
-      (_0x2d3daa) =>
-        !_0x18fc28.has(_0x2d3daa) && fixedInputSlotAcceptsSource(_0x322392, _0x2d3daa, _0x2e4285),
+    value184 = list21.filter(
+      (item19) => !map18.has(item19) && fixedInputSlotAcceptsSource(config5, item19, srcData3),
     ),
-    _0x24ceff = _0x10cb4a.length > 0 ? _0x10cb4a : _0x5c2b8b;
-  if (_0x24ceff.length === 0) {
+    slotOrder2 = list22.length > 0 ? list22 : value184;
+  if (slotOrder2.length === 0) {
     if (
       _canUseManifestFixedInputOverflow({
-        config: _0x322392,
-        srcKind: _0x27e76a,
-        tgtData: _0x91dad1,
-        incomingEdges: _0x28f259,
-        nodes: _0x102761,
+        config: config5,
+        srcKind: srcKind4,
+        tgtData: tgtData6,
+        incomingEdges: incomingEdges5,
+        nodes: nodes13,
       })
     )
       return { ok: true, refSlot: '' };
     return { ok: false, refSlot: '' };
   }
-  const _0x5eced4 = _0x24ceff.includes(String(_0x50e6b4 || '')) ? String(_0x50e6b4 || '') : '',
-    _0x37baef = Array.isArray(_0x28f259) ? _0x28f259 : [],
-    _0x354f31 = _0x37baef.filter((_0x2de081) => {
-      const _0x469f5c = _0x102761?.[_0x2de081.sourceId];
-      return _getRhV54RefKind(_0x469f5c) === _0x27e76a;
+  const value185 = slotOrder2.includes(String(preferredRefSlot || '')) ? String(preferredRefSlot || '') : '',
+    incomingEdges6 = Array.isArray(incomingEdges5) ? incomingEdges5 : [],
+    list23 = incomingEdges6.filter((item20) => {
+      const value186 = nodes13?.[item20.sourceId];
+      return _getRhV54RefKind(value186) === srcKind4;
     }),
-    _0x581498 = _allowsManifestFixedInputOverflow({
-      config: _0x322392,
-      srcKind: _0x27e76a,
-      tgtData: _0x91dad1,
+    _allowsManifestFixedInputOverflow2 = _allowsManifestFixedInputOverflow({
+      config: config5,
+      srcKind: srcKind4,
+      tgtData: tgtData6,
     });
-  for (const _0x536a6e of _0x354f31) {
-    const _0x3d86a4 = String(_0x536a6e?.refSlot || '');
-    if (_0x581498 && !_0x3d86a4) continue;
-    (!_0x24ceff.includes(_0x3d86a4) ||
-      !fixedInputSlotAcceptsSource(_0x322392, _0x3d86a4, _0x102761?.[_0x536a6e.sourceId])) &&
-      graphStore.removeEdge(_0x536a6e.id);
+  for (const value187 of list23) {
+    const enabled33 = String(value187?.refSlot || '');
+    if (_allowsManifestFixedInputOverflow2 && !enabled33) continue;
+    (!slotOrder2.includes(enabled33) ||
+      !fixedInputSlotAcceptsSource(config5, enabled33, nodes13?.[value187.sourceId])) &&
+      graphStore.removeEdge(value187.id);
   }
-  const _0x20c862 = _0x354f31.filter(
-      (_0x3dda57) =>
-        _0x24ceff.includes(String(_0x3dda57?.refSlot || '')) &&
-        fixedInputSlotAcceptsSource(_0x322392, _0x3dda57?.refSlot, _0x102761?.[_0x3dda57.sourceId]),
+  const list24 = list23.filter(
+      (item21) =>
+        slotOrder2.includes(String(item21?.refSlot || '')) &&
+        fixedInputSlotAcceptsSource(config5, item21?.refSlot, nodes13?.[item21.sourceId]),
     ),
-    _0x52f4b2 = new Set(
-      _0x20c862
-        .map((_0x528f09) => String(_0x528f09.refSlot || ''))
-        .filter((_0x4dd6db) => _0x24ceff.includes(_0x4dd6db)),
+    map19 = new Set(
+      list24.map((item22) => String(item22.refSlot || '')).filter((item23) => slotOrder2.includes(item23)),
     ),
-    _0x6518b4 = _0x24ceff.find((_0x3cc4ff) => !_0x52f4b2.has(_0x3cc4ff)) || '';
-  if (_0x5eced4 && !_0x52f4b2.has(_0x5eced4))
-    return _finishManifestFixedInputResult(_0x322392, _0x37baef, _0x5eced4);
-  if (_0x6518b4) return _finishManifestFixedInputResult(_0x322392, _0x37baef, _0x6518b4);
+    value188 = slotOrder2.find((item24) => !map19.has(item24)) || '';
+  if (value185 && !map19.has(value185))
+    return _finishManifestFixedInputResult(config5, incomingEdges6, value185);
+  if (value188) return _finishManifestFixedInputResult(config5, incomingEdges6, value188);
   if (
     _canUseManifestFixedInputOverflow({
-      config: _0x322392,
-      srcKind: _0x27e76a,
-      tgtData: _0x91dad1,
-      incomingEdges: _0x37baef,
-      nodes: _0x102761,
+      config: config5,
+      srcKind: srcKind4,
+      tgtData: tgtData6,
+      incomingEdges: incomingEdges6,
+      nodes: nodes13,
     })
   )
     return { ok: true, refSlot: '' };
-  const _0x1bcd59 = _cycleManifestFixedInputWhenFull({
-    config: _0x322392,
-    srcKind: _0x27e76a,
-    tgtData: _0x91dad1,
-    incomingEdges: _0x37baef,
-    nodes: _0x102761,
-    slotOrder: _0x24ceff,
+  const _cycleManifestFixedInputWhenFull2 = _cycleManifestFixedInputWhenFull({
+    config: config5,
+    srcKind: srcKind4,
+    tgtData: tgtData6,
+    incomingEdges: incomingEdges6,
+    nodes: nodes13,
+    slotOrder: slotOrder2,
   });
-  if (_0x1bcd59) return _finishManifestFixedInputResult(_0x322392, _0x37baef, _0x1bcd59.refSlot);
-  if (_0x24ceff.length === 1)
-    return (
-      _0x20c862.forEach((_0x367af5) => graphStore.removeEdge(_0x367af5.id)),
-      _finishManifestFixedInputResult(_0x322392, _0x37baef, _0x24ceff[0])
+  if (_cycleManifestFixedInputWhenFull2)
+    return _finishManifestFixedInputResult(
+      config5,
+      incomingEdges6,
+      _cycleManifestFixedInputWhenFull2.refSlot,
     );
-  if (_0x5eced4) {
-    const _0x5d54c1 = _0x20c862.find((_0x3215fd) => String(_0x3215fd.refSlot || '') === _0x5eced4);
-    if (_0x5d54c1) graphStore.removeEdge(_0x5d54c1.id);
-    return _finishManifestFixedInputResult(_0x322392, _0x37baef, _0x5eced4);
+  if (slotOrder2.length === 1)
+    return (
+      list24.forEach((item25) => graphStore.removeEdge(item25.id)),
+      _finishManifestFixedInputResult(config5, incomingEdges6, slotOrder2[0])
+    );
+  if (value185) {
+    const value189 = list24.find((item26) => String(item26.refSlot || '') === value185);
+    if (value189) graphStore.removeEdge(value189.id);
+    return _finishManifestFixedInputResult(config5, incomingEdges6, value185);
   }
-  const _0x53853c = _0x20c862.reduce(
-      (_0x370a75, _0x40692e) =>
-        !_edgeTimeKey(_0x370a75) || _edgeTimeKey(_0x40692e) > _edgeTimeKey(_0x370a75) ? _0x40692e : _0x370a75,
+  const value190 = list24.reduce(
+      (item27, value191) =>
+        !_edgeTimeKey(item27) || _edgeTimeKey(value191) > _edgeTimeKey(item27) ? value191 : item27,
       null,
     ),
-    _0x45f788 = String(_0x53853c?.refSlot || ''),
-    _0x199dba = _0x24ceff.indexOf(_0x45f788),
-    _0x175bb5 = _0x199dba >= 0 ? _0x24ceff[(_0x199dba + 1) % _0x24ceff.length] : _0x24ceff[0];
-  let _0x238745 = null;
-  for (const _0x5a53b7 of _0x20c862) {
-    if (String(_0x5a53b7.refSlot || '') !== _0x175bb5) continue;
-    if (!_0x238745 || _edgeTimeKey(_0x5a53b7) < _edgeTimeKey(_0x238745)) _0x238745 = _0x5a53b7;
+    value192 = String(value190?.refSlot || ''),
+    count18 = slotOrder2.indexOf(value192),
+    value193 = count18 >= 0 ? slotOrder2[(count18 + 1) % slotOrder2.length] : slotOrder2[0];
+  let enabled34 = null;
+  for (const value194 of list24) {
+    if (String(value194.refSlot || '') !== value193) continue;
+    if (!enabled34 || _edgeTimeKey(value194) < _edgeTimeKey(enabled34)) enabled34 = value194;
   }
-  if (!_0x238745)
-    for (const _0x49ac20 of _0x20c862) {
-      if (!_0x238745 || _edgeTimeKey(_0x49ac20) < _edgeTimeKey(_0x238745)) _0x238745 = _0x49ac20;
+  if (!enabled34)
+    for (const value195 of list24) {
+      if (!enabled34 || _edgeTimeKey(value195) < _edgeTimeKey(enabled34)) enabled34 = value195;
     }
-  if (_0x238745) graphStore.removeEdge(_0x238745.id);
-  const _0x3ebd7c =
-    _0x238745 && _0x24ceff.includes(String(_0x238745.refSlot || '')) ? String(_0x238745.refSlot) : _0x175bb5;
-  return _finishManifestFixedInputResult(_0x322392, _0x37baef, _0x3ebd7c);
+  if (enabled34) graphStore.removeEdge(enabled34.id);
+  const value196 =
+    enabled34 && slotOrder2.includes(String(enabled34.refSlot || '')) ? String(enabled34.refSlot) : value193;
+  return _finishManifestFixedInputResult(config5, incomingEdges6, value196);
 }
-function _isDreaminaVideoTarget(_0x1be551) {
+function _isDreaminaVideoTarget(enabled35) {
   return (
-    !!_0x1be551 &&
-    String(_0x1be551.type || '') === 'ai-video' &&
-    isDreaminaStyleVideoModel(_0x1be551.model, _0x1be551.provider)
+    !!enabled35 &&
+    String(enabled35.type || '') === 'ai-video' &&
+    isDreaminaStyleVideoModel(enabled35.model, enabled35.provider)
   );
 }
 function _applyDreaminaVideoFixedInputs({
-  srcData: _0x5954d0,
-  tgtData: _0x5eca6b,
-  incomingEdges: _0x182ed1,
-  nodes: _0x37a77a,
-  targetId: _0x56b72e,
+  srcData: srcData4,
+  tgtData: tgtData7,
+  incomingEdges: incomingEdges7,
+  nodes: nodes14,
+  targetId: targetId7,
 }) {
-  if (!_isDreaminaVideoTarget(_0x5eca6b)) return { ok: true, refSlot: '' };
-  const _0x169b34 = normalizeDreaminaVideoRouteMode(_0x5eca6b?.dreaminaRouteMode, _0x5eca6b?.mode),
-    _0x26d359 = _getRhV54RefKind(_0x5954d0),
-    _0x454781 = Array.isArray(_0x182ed1) ? _0x182ed1 : [];
-  if (_0x169b34 === 'frames2video') {
-    if (_0x26d359 !== 'image') return { ok: false, refSlot: '' };
-    for (const _0x288b3c of _0x454781) {
-      const _0x58f0bd = _0x37a77a?.[_0x288b3c.sourceId];
-      _getRhV54RefKind(_0x58f0bd) !== 'image' && graphStore.removeEdge(_0x288b3c.id);
+  if (!_isDreaminaVideoTarget(tgtData7)) return { ok: true, refSlot: '' };
+  const dreaminaVideoRouteMode = normalizeDreaminaVideoRouteMode(tgtData7?.dreaminaRouteMode, tgtData7?.mode),
+    _getRhV54RefKind2 = _getRhV54RefKind(srcData4),
+    list25 = Array.isArray(incomingEdges7) ? incomingEdges7 : [];
+  if (dreaminaVideoRouteMode === 'frames2video') {
+    if (_getRhV54RefKind2 !== 'image') return { ok: false, refSlot: '' };
+    for (const value197 of list25) {
+      const value198 = nodes14?.[value197.sourceId];
+      _getRhV54RefKind(value198) !== 'image' && graphStore.removeEdge(value197.id);
     }
-    const _0xc9a459 = _0x454781
-      .filter((_0x2eb76d) => _getRhV54RefKind(_0x37a77a?.[_0x2eb76d.sourceId]) === 'image')
-      .sort((_0x5032c8, _0x1a2b62) => _edgeTimeKey(_0x5032c8) - _edgeTimeKey(_0x1a2b62));
-    while (_0xc9a459.length >= 2) {
-      const _0xcf9fd1 = _0xc9a459.shift();
-      if (_0xcf9fd1?.id) graphStore.removeEdge(_0xcf9fd1.id);
-    }
-    return { ok: true, refSlot: '' };
-  }
-  if (_0x169b34 === 'multiframe2video') {
-    if (_0x26d359 !== 'image') return { ok: false, refSlot: '' };
-    const _0x1129be = _0x454781
-      .filter((_0x581b28) => _getRhV54RefKind(_0x37a77a?.[_0x581b28.sourceId]) === 'image')
-      .sort((_0x27cc66, _0x5e5ea2) => _edgeTimeKey(_0x27cc66) - _edgeTimeKey(_0x5e5ea2));
-    while (_0x1129be.length >= 20) {
-      const _0x146c5f = _0x1129be.shift();
-      if (_0x146c5f?.id) graphStore.removeEdge(_0x146c5f.id);
+    const list26 = list25
+      .filter((item28) => _getRhV54RefKind(nodes14?.[item28.sourceId]) === 'image')
+      .sort((item29, value199) => _edgeTimeKey(item29) - _edgeTimeKey(value199));
+    while (list26.length >= 2) {
+      const value200 = list26.shift();
+      if (value200?.id) graphStore.removeEdge(value200.id);
     }
     return { ok: true, refSlot: '' };
   }
-  if (!['image', 'video', 'audio', 'text'].includes(_0x26d359)) return { ok: false, refSlot: '' };
-  if (_0x26d359 === 'text') return { ok: true, refSlot: '' };
-  const _0xde5e5e = _0x26d359 === 'image' ? 9 : 3,
-    _0x1b696b = _0x454781
-      .filter((_0x25fa59) => _getRhV54RefKind(_0x37a77a?.[_0x25fa59.sourceId]) === _0x26d359)
-      .sort((_0x1d1afb, _0x25c86f) => _edgeTimeKey(_0x1d1afb) - _edgeTimeKey(_0x25c86f));
-  while (_0x1b696b.length >= _0xde5e5e) {
-    const _0xb31ea7 = _0x1b696b.shift();
-    if (_0xb31ea7?.id) graphStore.removeEdge(_0xb31ea7.id);
+  if (dreaminaVideoRouteMode === 'multiframe2video') {
+    if (_getRhV54RefKind2 !== 'image') return { ok: false, refSlot: '' };
+    const list27 = list25
+      .filter((item30) => _getRhV54RefKind(nodes14?.[item30.sourceId]) === 'image')
+      .sort((item31, value201) => _edgeTimeKey(item31) - _edgeTimeKey(value201));
+    while (list27.length >= 20) {
+      const value202 = list27.shift();
+      if (value202?.id) graphStore.removeEdge(value202.id);
+    }
+    return { ok: true, refSlot: '' };
+  }
+  if (!['image', 'video', 'audio', 'text'].includes(_getRhV54RefKind2)) return { ok: false, refSlot: '' };
+  if (_getRhV54RefKind2 === 'text') return { ok: true, refSlot: '' };
+  const value203 = _getRhV54RefKind2 === 'image' ? 9 : 3,
+    list28 = list25
+      .filter((item32) => _getRhV54RefKind(nodes14?.[item32.sourceId]) === _getRhV54RefKind2)
+      .sort((item33, value204) => _edgeTimeKey(item33) - _edgeTimeKey(value204));
+  while (list28.length >= value203) {
+    const value205 = list28.shift();
+    if (value205?.id) graphStore.removeEdge(value205.id);
   }
   return { ok: true, refSlot: '' };
 }
 function _applyGenericInputKindLimit({
-  srcData: _0x56d3dd,
-  tgtData: _0x158393,
-  incomingEdges: _0x384968,
-  nodes: _0x232170,
-  sourceId: _0x58dbca,
+  srcData: srcData5,
+  tgtData: tgtData8,
+  incomingEdges: incomingEdges8,
+  nodes: nodes15,
+  sourceId: sourceId5,
 }) {
-  if (!_isModelPolicyTargetType(_0x158393?.type)) return { ok: true };
-  if (_getManifestFixedInputConfig(_0x158393)) return { ok: true };
-  if (_isDreaminaVideoTarget(_0x158393)) return { ok: true };
-  const _0x2f9019 = resolveEffectiveInputKind(_0x56d3dd);
-  if (!_0x2f9019 || _0x2f9019 === 'text') return { ok: true };
-  const _0x21f18b = getTargetInputPolicy(_0x158393);
-  if (!isInputKindAllowed(_0x21f18b, _0x2f9019)) return { ok: false };
-  const _0x3fe312 = Number(_0x21f18b?.maxByKind?.[_0x2f9019]);
-  if (!Number.isFinite(_0x3fe312)) return { ok: true };
-  if (_0x3fe312 <= 0) return { ok: false };
-  const _0x2dc0a7 = (Array.isArray(_0x384968) ? _0x384968 : []).some(
-    (_0x29ae34) => _0x29ae34?.sourceId === _0x58dbca,
+  if (!_isModelPolicyTargetType(tgtData8?.type)) return { ok: true };
+  if (_getManifestFixedInputConfig(tgtData8)) return { ok: true };
+  if (_isDreaminaVideoTarget(tgtData8)) return { ok: true };
+  const effectiveInputKind2 = resolveEffectiveInputKind(srcData5);
+  if (!effectiveInputKind2 || effectiveInputKind2 === 'text') return { ok: true };
+  const targetInputPolicy4 = getTargetInputPolicy(tgtData8);
+  if (!isInputKindAllowed(targetInputPolicy4, effectiveInputKind2)) return { ok: false };
+  const count19 = Number(targetInputPolicy4?.maxByKind?.[effectiveInputKind2]);
+  if (!Number.isFinite(count19)) return { ok: true };
+  if (count19 <= 0) return { ok: false };
+  const value206 = (Array.isArray(incomingEdges8) ? incomingEdges8 : []).some(
+    (item34) => item34?.sourceId === sourceId5,
   );
-  if (_0x2dc0a7) return { ok: true };
-  const _0x49fc44 = (Array.isArray(_0x384968) ? _0x384968 : [])
-    .filter((_0x1dcead) => _getRhV54RefKind(_0x232170?.[_0x1dcead?.sourceId]) === _0x2f9019)
-    .sort((_0xbb0d37, _0x472074) => _edgeTimeKey(_0xbb0d37) - _edgeTimeKey(_0x472074));
-  while (_0x49fc44.length >= _0x3fe312) {
-    const _0x93d97a = _0x49fc44.shift();
-    if (_0x93d97a?.id) graphStore.removeEdge(_0x93d97a.id);
+  if (value206) return { ok: true };
+  const list29 = (Array.isArray(incomingEdges8) ? incomingEdges8 : [])
+    .filter((item35) => _getRhV54RefKind(nodes15?.[item35?.sourceId]) === effectiveInputKind2)
+    .sort((item36, value207) => _edgeTimeKey(item36) - _edgeTimeKey(value207));
+  while (list29.length >= count19) {
+    const value208 = list29.shift();
+    if (value208?.id) graphStore.removeEdge(value208.id);
   }
   return { ok: true };
 }
-function _applyMediaClipInputLimit({ srcData: _0x592ccf, tgtData: _0x5654a9 }) {
-  if (!isMediaClipNodeType(_0x5654a9?.type)) return { ok: true };
-  const _0x74f62f = getMediaClipInputKind(_0x592ccf);
-  if (_0x74f62f !== 'video' && _0x74f62f !== 'image' && _0x74f62f !== 'audio') return { ok: false };
-  if (!isSupportedMediaClipInput(_0x592ccf)) return { ok: false };
+function _applyMediaClipInputLimit({ srcData: srcData6, tgtData: tgtData9 }) {
+  if (!isMediaClipNodeType(tgtData9?.type)) return { ok: true };
+  const mediaClipInputKind = getMediaClipInputKind(srcData6);
+  if (mediaClipInputKind !== 'video' && mediaClipInputKind !== 'image' && mediaClipInputKind !== 'audio')
+    return { ok: false };
+  if (!isSupportedMediaClipInput(srcData6)) return { ok: false };
   return { ok: true };
 }
-function _replacePanorama360IncomingEdges({ tgtData: _0xd9e6b5, incomingEdges: _0x485b98 }) {
-  if (!_isPanorama360TargetType(_0xd9e6b5?.type)) return;
-  const _0x59d913 = Array.isArray(_0x485b98) ? _0x485b98 : [];
-  for (const _0x2e044c of _0x59d913) {
-    if (_0x2e044c?.id) graphStore.removeEdge(_0x2e044c.id);
+function _replacePanorama360IncomingEdges({ tgtData: tgtData10, incomingEdges: incomingEdges9 }) {
+  if (!_isPanorama360TargetType(tgtData10?.type)) return;
+  const value209 = Array.isArray(incomingEdges9) ? incomingEdges9 : [];
+  for (const value210 of value209) {
+    if (value210?.id) graphStore.removeEdge(value210.id);
   }
 }
 export function addEdgeWithPolicies({
-  sourceId: _0x5bd9ef,
-  targetId: _0xe31155,
-  preferredRefSlot: _0x5ee42d,
+  sourceId: sourceId6,
+  targetId: targetId8,
+  preferredRefSlot: preferredRefSlot2,
 }) {
-  const _0x33ee29 = getStateRaw(),
-    _0x1911a6 = _0x33ee29.nodes || {},
-    _0x4b6419 = _0x1911a6[_0x5bd9ef],
-    _0x396aee = _0x1911a6[_0xe31155];
-  if (!_0x4b6419 || !_0x396aee) return false;
-  if (!isValidConnection(_0x4b6419, _0x396aee)) return false;
-  const _0x20254a = String(_0x4b6419.type || '').trim() === 'group';
-  if (_0x20254a) {
+  const edges4 = getStateRaw(),
+    nodes16 = edges4.nodes || {},
+    srcData7 = nodes16[sourceId6],
+    tgtData11 = nodes16[targetId8];
+  if (!srcData7 || !tgtData11) return false;
+  if (!isValidConnection(srcData7, tgtData11)) return false;
+  const value211 = String(srcData7.type || '').trim() === 'group';
+  if (value211) {
     if (
-      String(_0x396aee.type || '').trim() === 'group' &&
+      String(tgtData11.type || '').trim() === 'group' &&
       wouldCreateGroupOutputCycle({
-        sourceId: _0x5bd9ef,
-        targetId: _0xe31155,
-        nodes: _0x1911a6,
-        edges: _0x33ee29.edges || {},
+        sourceId: sourceId6,
+        targetId: targetId8,
+        nodes: nodes16,
+        edges: edges4.edges || {},
       })
     )
       return false;
-    const _0x1a2026 = getStateRaw(),
-      _0x2fd581 = !!_getOutEdgeMap(_0x1a2026.edges, _0x1a2026._edgesRev).get(_0x5bd9ef)?.has(_0xe31155);
-    if (_0x2fd581) return false;
+    const stateRaw8 = getStateRaw(),
+      value212 = !!_getOutEdgeMap(stateRaw8.edges, stateRaw8._edgesRev).get(sourceId6)?.has(targetId8);
+    if (value212) return false;
     return (
       graphStore.addEdge({
         id: 'edge-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
-        sourceId: _0x5bd9ef,
-        targetId: _0xe31155,
+        sourceId: sourceId6,
+        targetId: targetId8,
         isGroupOutputLink: true,
         createdAt: Date.now(),
       }),
       true
     );
   }
-  const _0x40ebce = _getIncomingEdgesByTarget(_0x33ee29.edges, _0x33ee29._edgesRev, _0xe31155);
-  _replacePanorama360IncomingEdges({ tgtData: _0x396aee, incomingEdges: _0x40ebce });
-  if (_isAnimeRealTarget(_0x396aee)) {
-    if (!_isAnimeRealImageSrc(_0x4b6419)) return false;
-    for (const _0x220020 of _0x40ebce) graphStore.removeEdge(_0x220020.id);
-    _0x396aee.rhAnimeRealRefUrl &&
-      graphStore.updateNodeData(_0xe31155, {
+  const incomingEdges10 = _getIncomingEdgesByTarget(edges4.edges, edges4._edgesRev, targetId8);
+  _replacePanorama360IncomingEdges({ tgtData: tgtData11, incomingEdges: incomingEdges10 });
+  if (_isAnimeRealTarget(tgtData11)) {
+    if (!_isAnimeRealImageSrc(srcData7)) return false;
+    for (const value213 of incomingEdges10) graphStore.removeEdge(value213.id);
+    tgtData11.rhAnimeRealRefUrl &&
+      graphStore.updateNodeData(targetId8, {
         rhAnimeRealRefUrl: '',
         rhAnimeRealRefLocalPath: '',
         rhAnimeRealRefFileName: '',
       });
   }
-  const _0x217dd3 = _applyRhPersonReplaceV3FixedInputs({
-    srcData: _0x4b6419,
-    tgtData: _0x396aee,
-    incomingEdges: _0x40ebce,
-    nodes: _0x1911a6,
-    targetId: _0xe31155,
+  const response3 = _applyRhPersonReplaceV3FixedInputs({
+    srcData: srcData7,
+    tgtData: tgtData11,
+    incomingEdges: incomingEdges10,
+    nodes: nodes16,
+    targetId: targetId8,
   });
-  if (!_0x217dd3.ok) return false;
-  const _0x575e08 = _applyManifestFixedInputs({
-    srcData: _0x4b6419,
-    tgtData: _0x396aee,
-    incomingEdges: _0x40ebce,
-    nodes: _0x1911a6,
-    targetId: _0xe31155,
-    preferredRefSlot: _0x5ee42d,
+  if (!response3.ok) return false;
+  const response4 = _applyManifestFixedInputs({
+    srcData: srcData7,
+    tgtData: tgtData11,
+    incomingEdges: incomingEdges10,
+    nodes: nodes16,
+    targetId: targetId8,
+    preferredRefSlot: preferredRefSlot2,
   });
-  if (!_0x575e08.ok) return false;
-  const _0x5af90a = _applyDreaminaVideoFixedInputs({
-    srcData: _0x4b6419,
-    tgtData: _0x396aee,
-    incomingEdges: _0x40ebce,
-    nodes: _0x1911a6,
-    targetId: _0xe31155,
+  if (!response4.ok) return false;
+  const response5 = _applyDreaminaVideoFixedInputs({
+    srcData: srcData7,
+    tgtData: tgtData11,
+    incomingEdges: incomingEdges10,
+    nodes: nodes16,
+    targetId: targetId8,
   });
-  if (!_0x5af90a.ok) return false;
-  const _0x106ac3 = _applyMediaClipInputLimit({
-    srcData: _0x4b6419,
-    tgtData: _0x396aee,
-    incomingEdges: _0x40ebce,
-    nodes: _0x1911a6,
-    sourceId: _0x5bd9ef,
+  if (!response5.ok) return false;
+  const response6 = _applyMediaClipInputLimit({
+    srcData: srcData7,
+    tgtData: tgtData11,
+    incomingEdges: incomingEdges10,
+    nodes: nodes16,
+    sourceId: sourceId6,
   });
-  if (!_0x106ac3.ok) return false;
-  const _0x321e35 = _applyGenericInputKindLimit({
-    srcData: _0x4b6419,
-    tgtData: _0x396aee,
-    incomingEdges: _0x40ebce,
-    nodes: _0x1911a6,
-    sourceId: _0x5bd9ef,
+  if (!response6.ok) return false;
+  const response7 = _applyGenericInputKindLimit({
+    srcData: srcData7,
+    tgtData: tgtData11,
+    incomingEdges: incomingEdges10,
+    nodes: nodes16,
+    sourceId: sourceId6,
   });
-  if (!_0x321e35.ok) return false;
-  const _0xc6512a = getStateRaw(),
-    _0x1054a5 = !!_getOutEdgeMap(_0xc6512a.edges, _0xc6512a._edgesRev).get(_0x5bd9ef)?.has(_0xe31155);
-  if (_0x1054a5) return false;
-  let _0x13c461 = '',
-    _0x1ec436 = 0,
-    _0x412598 = 0;
-  if (String(_0x4b6419.type || '').includes('video')) {
-    const _0x239296 = Array.isArray(_0x4b6419.videos) ? _0x4b6419.videos : [],
-      _0x67479e = Number(_0x4b6419.mainVideoIndex),
-      _0x1a6364 = Number.isFinite(_0x67479e) ? Math.max(0, Math.trunc(_0x67479e)) : 0,
-      _0x3f600a = _0x239296[_0x1a6364] || null,
-      _0x7de0ea = _0x239296.find(
-        (_0xf62e2e) => _videoSourceKey(_0xf62e2e) && !_isUnavailableVideoRecord(_0xf62e2e),
-      ),
-      _0x22391b = _0x3f600a && !_isUnavailableVideoRecord(_0x3f600a) ? _0x3f600a : _0x7de0ea,
-      _0x39cc74 =
-        String(_0x22391b?.localPath || '').trim() ||
-        String(_0x22391b?.displayLocalPath || '').trim() ||
-        String(_0x22391b?.originalLocalPath || '').trim() ||
-        String(_0x22391b?.videoLocalPath || '').trim() ||
-        String(_0x22391b?.videoUrl || '').trim() ||
-        (!_isUnavailableVideoRecord(_0x4b6419)
-          ? String(_0x4b6419.localPath || '').trim() ||
-            String(_0x4b6419.displayLocalPath || '').trim() ||
-            String(_0x4b6419.originalLocalPath || '').trim() ||
-            String(_0x4b6419.videoLocalPath || '').trim() ||
-            String(_0x4b6419.videoUrl || '').trim() ||
-            String(_0x4b6419.src || '').trim() ||
-            String(_0x4b6419.url || '').trim() ||
-            String(_0x4b6419.resultUrl || '').trim() ||
-            String(_0x4b6419.sourceUrl || '').trim()
+  if (!response7.ok) return false;
+  const targetNode = getStateRaw(),
+    value214 = !!_getOutEdgeMap(targetNode.edges, targetNode._edgesRev).get(sourceId6)?.has(targetId8);
+  if (value214) return false;
+  let sourceMediaKey = '',
+    sourceMediaW = 0,
+    sourceMediaH = 0;
+  if (String(srcData7.type || '').includes('video')) {
+    const list30 = Array.isArray(srcData7.videos) ? srcData7.videos : [],
+      value215 = Number(srcData7.mainVideoIndex),
+      value216 = Number.isFinite(value215) ? Math.max(0, Math.trunc(value215)) : 0,
+      value217 = list30[value216] || null,
+      value218 = list30.find((item37) => _videoSourceKey(item37) && !_isUnavailableVideoRecord(item37)),
+      value219 = value217 && !_isUnavailableVideoRecord(value217) ? value217 : value218,
+      value220 =
+        String(value219?.localPath || '').trim() ||
+        String(value219?.displayLocalPath || '').trim() ||
+        String(value219?.originalLocalPath || '').trim() ||
+        String(value219?.videoLocalPath || '').trim() ||
+        String(value219?.videoUrl || '').trim() ||
+        (!_isUnavailableVideoRecord(srcData7)
+          ? String(srcData7.localPath || '').trim() ||
+            String(srcData7.displayLocalPath || '').trim() ||
+            String(srcData7.originalLocalPath || '').trim() ||
+            String(srcData7.videoLocalPath || '').trim() ||
+            String(srcData7.videoUrl || '').trim() ||
+            String(srcData7.src || '').trim() ||
+            String(srcData7.url || '').trim() ||
+            String(srcData7.resultUrl || '').trim() ||
+            String(srcData7.sourceUrl || '').trim()
           : '');
-    if (_0x39cc74) _0x13c461 = _0x39cc74;
-    const _0x25eaff = Number(_0x3f600a?.videoWidth || 0),
-      _0x5e0a9d = Number(_0x3f600a?.videoHeight || 0),
-      _0x3028c2 = Number(_0x4b6419.selectedVideoWidth || 0),
-      _0x4b04be = Number(_0x4b6419.selectedVideoHeight || 0),
-      _0x1b3ec4 = Number(_0x4b6419.videoWidth || 0),
-      _0x46f0ac = Number(_0x4b6419.videoHeight || 0);
-    if (_0x25eaff > 0 && _0x5e0a9d > 0) ((_0x1ec436 = _0x25eaff), (_0x412598 = _0x5e0a9d));
+    if (value220) sourceMediaKey = value220;
+    const count20 = Number(value217?.videoWidth || 0),
+      count21 = Number(value217?.videoHeight || 0),
+      count22 = Number(srcData7.selectedVideoWidth || 0),
+      count23 = Number(srcData7.selectedVideoHeight || 0),
+      count24 = Number(srcData7.videoWidth || 0),
+      count25 = Number(srcData7.videoHeight || 0);
+    if (count20 > 0 && count21 > 0) ((sourceMediaW = count20), (sourceMediaH = count21));
     else {
-      if (_0x3028c2 > 0 && _0x4b04be > 0) ((_0x1ec436 = _0x3028c2), (_0x412598 = _0x4b04be));
-      else _0x1b3ec4 > 0 && _0x46f0ac > 0 && ((_0x1ec436 = _0x1b3ec4), (_0x412598 = _0x46f0ac));
+      if (count22 > 0 && count23 > 0) ((sourceMediaW = count22), (sourceMediaH = count23));
+      else count24 > 0 && count25 > 0 && ((sourceMediaW = count24), (sourceMediaH = count25));
     }
-    if (!(_0x1ec436 > 0 && _0x412598 > 0 && _0x13c461))
+    if (!(sourceMediaW > 0 && sourceMediaH > 0 && sourceMediaKey))
       try {
-        const _0x5d3516 = getDisplayedVideoMetaFromNode(_0x5bd9ef),
-          _0xa56763 = String(_0x5d3516?.src || '').trim(),
-          _0x4bdadd = Number(_0x5d3516?.w || 0),
-          _0x30946c = Number(_0x5d3516?.h || 0);
-        _0x4bdadd > 0 && _0x30946c > 0 && ((_0x1ec436 = _0x4bdadd), (_0x412598 = _0x30946c));
-        if (_0xa56763)
+        const displayedVideoMetaFromNode = getDisplayedVideoMetaFromNode(sourceId6),
+          value221 = String(displayedVideoMetaFromNode?.src || '').trim(),
+          count26 = Number(displayedVideoMetaFromNode?.w || 0),
+          count27 = Number(displayedVideoMetaFromNode?.h || 0);
+        count26 > 0 && count27 > 0 && ((sourceMediaW = count26), (sourceMediaH = count27));
+        if (value221)
           try {
-            const _0x255496 = new URL(_0xa56763, window.location.origin),
-              _0x43222d = String(_0x255496.pathname || '');
-            if (_0x43222d.startsWith('/output/')) _0x13c461 = _0x43222d.replace(/^\/+/, '');
+            const uRL = new URL(value221, window.location.origin),
+              value222 = String(uRL.pathname || '');
+            if (value222.startsWith('/output/')) sourceMediaKey = value222.replace(/^\/+/, '');
             else {
-              if (_0x43222d.startsWith('/data/')) _0x13c461 = _0x43222d.replace(/^\/+/, '');
+              if (value222.startsWith('/data/')) sourceMediaKey = value222.replace(/^\/+/, '');
               else {
-                if (_0x43222d.startsWith('/')) _0x13c461 = _0x43222d.replace(/^\/+/, '');
+                if (value222.startsWith('/')) sourceMediaKey = value222.replace(/^\/+/, '');
               }
             }
           } catch {
-            if (_0xa56763.startsWith('/')) _0x13c461 = _0xa56763.replace(/^\/+/, '');
+            if (value221.startsWith('/')) sourceMediaKey = value221.replace(/^\/+/, '');
           }
       } catch {}
   }
-  const _0x3b4e1f = _0x217dd3.refSlot || _0x575e08.refSlot || _0x5af90a.refSlot || '';
+  const refSlot5 = response3.refSlot || response4.refSlot || response5.refSlot || '';
   (removeCoveredAssetInputRefForConnection({
-    targetId: _0xe31155,
-    targetNode: _0xc6512a.nodes?.[_0xe31155] || _0x396aee,
-    sourceNode: _0x4b6419,
-    sourceKind: resolveEffectiveInputKind(_0x4b6419),
-    refSlot: _0x3b4e1f,
-    incomingEdges: _getIncomingEdgesByTarget(_0xc6512a.edges, _0xc6512a._edgesRev, _0xe31155),
-    nodes: _0xc6512a.nodes || _0x1911a6,
+    targetId: targetId8,
+    targetNode: targetNode.nodes?.[targetId8] || tgtData11,
+    sourceNode: srcData7,
+    sourceKind: resolveEffectiveInputKind(srcData7),
+    refSlot: refSlot5,
+    incomingEdges: _getIncomingEdgesByTarget(targetNode.edges, targetNode._edgesRev, targetId8),
+    nodes: targetNode.nodes || nodes16,
   }),
     graphStore.addEdge({
       id: 'edge-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
-      sourceId: _0x5bd9ef,
-      targetId: _0xe31155,
-      ...(_0x3b4e1f ? { refSlot: _0x3b4e1f } : null),
-      ...(_0x13c461 ? { sourceMediaKey: _0x13c461 } : null),
-      ...(_0x1ec436 > 0 && _0x412598 > 0 ? { sourceMediaW: _0x1ec436, sourceMediaH: _0x412598 } : null),
+      sourceId: sourceId6,
+      targetId: targetId8,
+      ...(refSlot5 ? { refSlot: refSlot5 } : null),
+      ...(sourceMediaKey ? { sourceMediaKey: sourceMediaKey } : null),
+      ...(sourceMediaW > 0 && sourceMediaH > 0
+        ? { sourceMediaW: sourceMediaW, sourceMediaH: sourceMediaH }
+        : null),
       createdAt: Date.now(),
     }));
   try {
-    const _0x52d768 = _getManifestFixedInputConfig(_0x396aee),
-      _0x88ba52 =
-        String(_0x396aee?.type || '') === 'ai-video' &&
-        (_0x52d768?.slotOrderByType?.video || []).includes('sourceVideo');
-    if (_0x88ba52 && _0x1ec436 > 0 && _0x412598 > 0) {
-      const _0xf6dbee =
-          (Array.isArray(_0x396aee.videos) && _0x396aee.videos.length > 0) ||
-          String(_0x396aee.videoUrl || '').trim() ||
-          String(_0x396aee.localPath || '').trim() ||
-          String(_0x396aee.thumbId || '').trim(),
-        _0x258adc = String(_0x396aee.aspectRatio || '自适应');
-      if (!_0xf6dbee && _0x258adc === '自适应') {
-        const _0x37f3ca = getStateRaw(),
-          _0x2b4a38 = _0x37f3ca.nodes?.[_0xe31155];
-        if (_0x2b4a38) {
-          const _0x392a12 = _0x1ec436 / _0x412598;
-          if (Number.isFinite(_0x392a12) && _0x392a12 > 0) {
-            const _0x2177e4 = getAIGenerationNodeSize(_0x1ec436, _0x412598),
-              _0x43fb9c = _0x2177e4.width,
-              _0x2572f1 = _0x2177e4.height,
-              _0xf13067 = Number(_0x2b4a38.x || 0) + Number(_0x2b4a38.width || 0) / 2,
-              _0x57bda3 = Number(_0x2b4a38.y || 0) + Number(_0x2b4a38.height || 0) / 2;
-            graphStore.updateNodeData(_0xe31155, {
-              width: _0x43fb9c,
-              height: _0x2572f1,
-              x: _0xf13067 - _0x43fb9c / 2,
-              y: _0x57bda3 - _0x2572f1 / 2,
+    const _getManifestFixedInputConfig2 = _getManifestFixedInputConfig(tgtData11),
+      value223 =
+        String(tgtData11?.type || '') === 'ai-video' &&
+        (_getManifestFixedInputConfig2?.slotOrderByType?.video || []).includes('sourceVideo');
+    if (value223 && sourceMediaW > 0 && sourceMediaH > 0) {
+      const enabled36 =
+          (Array.isArray(tgtData11.videos) && tgtData11.videos.length > 0) ||
+          String(tgtData11.videoUrl || '').trim() ||
+          String(tgtData11.localPath || '').trim() ||
+          String(tgtData11.thumbId || '').trim(),
+        value224 = String(tgtData11.aspectRatio || '自适应');
+      if (!enabled36 && value224 === '自适应') {
+        const stateRaw9 = getStateRaw(),
+          box13 = stateRaw9.nodes?.[targetId8];
+        if (box13) {
+          const count28 = sourceMediaW / sourceMediaH;
+          if (Number.isFinite(count28) && count28 > 0) {
+            const box14 = getAIGenerationNodeSize(sourceMediaW, sourceMediaH),
+              width5 = box14.width,
+              height5 = box14.height,
+              x7 = Number(box13.x || 0) + Number(box13.width || 0) / 2,
+              y3 = Number(box13.y || 0) + Number(box13.height || 0) / 2;
+            graphStore.updateNodeData(targetId8, {
+              width: width5,
+              height: height5,
+              x: x7 - width5 / 2,
+              y: y3 - height5 / 2,
             });
           }
         }
@@ -2085,307 +2027,302 @@ export function addEdgeWithPolicies({
   } catch {}
   return true;
 }
-export function initPickConnect(_0x22b613) {
-  function _0x3d76d5(_0x346835, _0x592a47, _0x2ebfb5, _0x4a8ec6, _0x4365d4) {
-    const _0x5759ef = _getOutEdgeMap(_0x4a8ec6, _0x4365d4),
-      _0x58d685 = _0x2ebfb5[_0x346835],
-      _0x32270f = [],
-      _0x3095fc = _0x592a47 === 'left',
-      _0x1637de = _0x592a47 === 'left' && _isAnimeRealTarget(_0x58d685),
-      _0x3f41f1 = _0x592a47 === 'left' && _isRhPersonReplaceV3Target(_0x58d685),
-      _0x460b69 = _0x592a47 === 'left' ? _getManifestFixedInputConfig(_0x58d685) : null,
-      _0x1f5185 = new Set(_0x460b69?.visibleSlots || []);
-    for (const [_0x696689, _0x206f58] of Object.entries(_0x2ebfb5)) {
-      if (_0x696689 === _0x346835) continue;
-      const _0x2264d4 = String(_0x206f58?.type || '').trim() === 'group';
-      if (_0x1637de) {
-        if (!_0x2264d4 && !_isAnimeRealImageSrc(_0x206f58)) {
-          _0x32270f.push(_0x696689);
+export function initPickConnect(el39) {
+  function run13(value225, value226, value227, value228, value229) {
+    const map20 = _getOutEdgeMap(value228, value229),
+      value230 = value227[value225],
+      list31 = [],
+      value231 = value226 === 'left',
+      value232 = value226 === 'left' && _isAnimeRealTarget(value230),
+      value233 = value226 === 'left' && _isRhPersonReplaceV3Target(value230),
+      value234 = value226 === 'left' ? _getManifestFixedInputConfig(value230) : null,
+      map21 = new Set(value234?.visibleSlots || []);
+    for (const [value235, value236] of Object.entries(value227)) {
+      if (value235 === value225) continue;
+      const enabled37 = String(value236?.type || '').trim() === 'group';
+      if (value232) {
+        if (!enabled37 && !_isAnimeRealImageSrc(value236)) {
+          list31.push(value235);
           continue;
         }
       }
-      if (_0x3f41f1) {
-        if (!_0x2264d4 && !_isAnimeRealImageSrc(_0x206f58)) {
-          _0x32270f.push(_0x696689);
+      if (value233) {
+        if (!enabled37 && !_isAnimeRealImageSrc(value236)) {
+          list31.push(value235);
           continue;
         }
       }
-      if (_0x460b69 && !_0x2264d4) {
-        const _0x46cb2f = _getRhV54RefKind(_0x206f58),
-          _0x2a816c = (_0x460b69.slotOrderByType?.[_0x46cb2f] || []).filter((_0x545bd1) =>
-            _0x1f5185.has(_0x545bd1),
+      if (value234 && !enabled37) {
+        const _getRhV54RefKind3 = _getRhV54RefKind(value236),
+          list32 = (value234.slotOrderByType?.[_getRhV54RefKind3] || []).filter((item38) =>
+            map21.has(item38),
           );
-        if (_0x46cb2f !== 'text' && _0x2a816c.length === 0) {
-          _0x32270f.push(_0x696689);
+        if (_getRhV54RefKind3 !== 'text' && list32.length === 0) {
+          list31.push(value235);
           continue;
         }
       }
-      const _0x62f679 = _0x3095fc ? _0x206f58 : _0x58d685,
-        _0x4369f5 = _0x3095fc ? _0x58d685 : _0x206f58,
-        _0x225d78 = !!(_0x62f679?.id && _0x4369f5?.id && _0x5759ef.get(_0x62f679.id)?.has(_0x4369f5.id));
-      (!isValidConnection(_0x62f679, _0x4369f5) || _0x225d78) && _0x32270f.push(_0x696689);
+      const value237 = value231 ? value236 : value230,
+        value238 = value231 ? value230 : value236,
+        value239 = !!(value237?.id && value238?.id && map20.get(value237.id)?.has(value238.id));
+      (!isValidConnection(value237, value238) || value239) && list31.push(value235);
     }
-    return _0x32270f;
+    return list31;
   }
-  function _0x219d25(_0x1adb59, _0x41f2fe) {
-    const { pickConnectMode: _0x35ac9e } = getStateRaw(),
-      _0x4b7e9d = String(_0x35ac9e?.preferredRefSlot || '').trim(),
-      _0x191506 = addEdgeWithPolicies({
-        sourceId: _0x1adb59,
-        targetId: _0x41f2fe,
-        preferredRefSlot: _0x4b7e9d,
+  function run14(sourceId7, targetId9) {
+    const { pickConnectMode: pickConnectMode } = getStateRaw(),
+      preferredRefSlot3 = String(pickConnectMode?.preferredRefSlot || '').trim(),
+      addEdgeWithPolicies6 = addEdgeWithPolicies({
+        sourceId: sourceId7,
+        targetId: targetId9,
+        preferredRefSlot: preferredRefSlot3,
       });
-    if (!_0x191506) return false;
+    if (!addEdgeWithPolicies6) return false;
     const {
-      pickConnectMode: _0x493c01,
-      nodes: _0xc066d5,
-      edges: _0x54bd66,
-      _edgesRev: _0x52c831,
+      pickConnectMode: pickConnectMode2,
+      nodes: nodes17,
+      edges: edges5,
+      _edgesRev: _edgesRev3,
     } = getStateRaw();
-    if (_0x493c01 && _0x493c01.active) {
-      const _0x1ea6f5 = _0x3d76d5(
-        _0x493c01.sourceNodeId,
-        _0x493c01.handleDirection,
-        _0xc066d5,
-        _0x54bd66,
-        _0x52c831,
+    if (pickConnectMode2 && pickConnectMode2.active) {
+      const invalidNodeIds2 = run13(
+        pickConnectMode2.sourceNodeId,
+        pickConnectMode2.handleDirection,
+        nodes17,
+        edges5,
+        _edgesRev3,
       );
-      graphStore.setConnOverlay({ srcId: _0x493c01.sourceNodeId, invalidNodeIds: _0x1ea6f5 });
+      graphStore.setConnOverlay({ srcId: pickConnectMode2.sourceNodeId, invalidNodeIds: invalidNodeIds2 });
     }
     return true;
   }
-  (_0x22b613.addEventListener(
+  (el39.addEventListener(
     'contextmenu',
-    (_0x4610c6) => {
-      const { pickConnectMode: _0x5cb525 } = getStateRaw();
-      if (!_0x5cb525 || !_0x5cb525.active) return;
-      (_0x4610c6.preventDefault?.(),
-        _0x4610c6.stopPropagation?.(),
-        _0x4610c6.stopImmediatePropagation?.(),
-        (_0x4610c6._pickConnectHandled = true),
+    (event5) => {
+      const { pickConnectMode: pickConnectMode3 } = getStateRaw();
+      if (!pickConnectMode3 || !pickConnectMode3.active) return;
+      (event5.preventDefault?.(),
+        event5.stopPropagation?.(),
+        event5.stopImmediatePropagation?.(),
+        (event5._pickConnectHandled = true),
         uiStore.setPickConnectMode({ active: false }));
     },
     true,
   ),
-    _0x22b613.addEventListener(
+    el39.addEventListener(
       'click',
-      (_0x599ce1) => {
-        const { pickConnectMode: _0x83951c } = getStateRaw();
-        if (!_0x83951c || !_0x83951c.active) return;
-        const _0x45c72c = _0x599ce1.target.closest('.prompt-attachment-btn');
-        if (_0x45c72c) {
-          const _0x2ff5ac = _0x45c72c.closest('.v2-node');
-          if (_0x2ff5ac && _0x2ff5ac.id === _0x83951c.sourceNodeId) {
-            ((_0x599ce1._pickConnectHandled = true),
-              _0x599ce1.stopImmediatePropagation(),
+      (event6) => {
+        const { pickConnectMode: pickConnectMode4 } = getStateRaw();
+        if (!pickConnectMode4 || !pickConnectMode4.active) return;
+        const el40 = event6.target.closest('.prompt-attachment-btn');
+        if (el40) {
+          const value240 = el40.closest('.v2-node');
+          if (value240 && value240.id === pickConnectMode4.sourceNodeId) {
+            ((event6._pickConnectHandled = true),
+              event6.stopImmediatePropagation(),
               uiStore.setPickConnectMode({ active: false }));
             return;
           }
         }
-        const _0x1cdfe4 = _0x599ce1.target.closest('.v2-node');
-        if (!_0x1cdfe4 || _0x1cdfe4.id === _0x83951c.sourceNodeId) return;
-        const _0x56b7a1 = getStateRaw(),
-          _0x3bf627 = _0x56b7a1.nodes[_0x1cdfe4.id];
-        if (!_0x3bf627) return;
-        const _0x19cfb9 = _0x83951c.handleDirection === 'left',
-          _0x311938 = _0x19cfb9 ? _0x3bf627.id : _0x83951c.sourceNodeId,
-          _0x3a4501 = _0x19cfb9 ? _0x83951c.sourceNodeId : _0x3bf627.id,
-          _0x41b10f = _0x56b7a1.nodes[_0x311938],
-          _0x3a5ac6 = _0x56b7a1.nodes[_0x3a4501];
-        if (!isValidConnection(_0x41b10f, _0x3a5ac6)) return;
-        _0x219d25(_0x311938, _0x3a4501) &&
-          ((_0x599ce1._pickConnectHandled = true), _0x599ce1.stopImmediatePropagation());
+        const enabled38 = event6.target.closest('.v2-node');
+        if (!enabled38 || enabled38.id === pickConnectMode4.sourceNodeId) return;
+        const stateRaw10 = getStateRaw(),
+          enabled39 = stateRaw10.nodes[enabled38.id];
+        if (!enabled39) return;
+        const value241 = pickConnectMode4.handleDirection === 'left',
+          value242 = value241 ? enabled39.id : pickConnectMode4.sourceNodeId,
+          value243 = value241 ? pickConnectMode4.sourceNodeId : enabled39.id,
+          value244 = stateRaw10.nodes[value242],
+          value245 = stateRaw10.nodes[value243];
+        if (!isValidConnection(value244, value245)) return;
+        run14(value242, value243) && ((event6._pickConnectHandled = true), event6.stopImmediatePropagation());
       },
       true,
     ),
-    _0x22b613.addEventListener('pointermove', (_0x2dff67) => {
+    el39.addEventListener('pointermove', (event7) => {
       const {
-        pickConnectMode: _0x2defc8,
-        nodes: _0x41de0e,
-        viewport: _0x3dc8b8,
-        connOverlay: _0x2b8385,
-        _persistRev: _0x1371c9,
+        pickConnectMode: pickConnectMode5,
+        nodes: nodes18,
+        viewport: viewport6,
+        connOverlay: connOverlay2,
+        _persistRev: _persistRev4,
       } = getStateRaw();
-      if (!_0x2defc8 || !_0x2defc8.active) return;
-      const _0x363957 = _getNodeSpatialIndex(_0x41de0e, _0x1371c9, _NODE_SPATIAL_INDEX_DEFAULT_KEY);
-      let _0x193f6f = hitTestNode(
-        _0x2dff67.clientX,
-        _0x2dff67.clientY,
-        _0x41de0e,
-        _0x3dc8b8,
-        _0x2defc8.sourceNodeId,
+      if (!pickConnectMode5 || !pickConnectMode5.active) return;
+      const spatialIndex5 = _getNodeSpatialIndex(nodes18, _persistRev4, _NODE_SPATIAL_INDEX_DEFAULT_KEY);
+      let hitTestNode3 = hitTestNode(
+        event7.clientX,
+        event7.clientY,
+        nodes18,
+        viewport6,
+        pickConnectMode5.sourceNodeId,
         false,
-        { spatialIndex: _0x363957 },
+        { spatialIndex: spatialIndex5 },
       );
-      (_0x193f6f &&
-        _0x2b8385 &&
-        _0x2b8385.invalidNodeIds &&
-        _0x2b8385.invalidNodeIds.includes(_0x193f6f) &&
-        (_0x193f6f = null),
-        _0x2defc8.hoverNodeId !== _0x193f6f && uiStore.setPickConnectHover(_0x193f6f));
+      (hitTestNode3 &&
+        connOverlay2 &&
+        connOverlay2.invalidNodeIds &&
+        connOverlay2.invalidNodeIds.includes(hitTestNode3) &&
+        (hitTestNode3 = null),
+        pickConnectMode5.hoverNodeId !== hitTestNode3 && uiStore.setPickConnectHover(hitTestNode3));
     }));
-  const _0x412441 = (_0x334758) => {
-    _0x334758.target.closest('[contenteditable="true"]') && _0x334758.target.blur();
+  const value246 = (event8) => {
+    event8.target.closest('[contenteditable="true"]') && event8.target.blur();
   };
-  let _0xd3826b = false,
-    _0x5778d4 = null,
-    _0x35d883 = null;
+  let enabled40 = false,
+    value247 = null,
+    value248 = null;
   uiStore.subscribeSelector(
-    (_0x26eff0) => ({
-      active: !!_0x26eff0.pickConnectMode?.active,
-      sourceNodeId: _0x26eff0.pickConnectMode?.sourceNodeId || null,
-      handleDirection: _0x26eff0.pickConnectMode?.handleDirection || null,
+    (sourceNodeId3) => ({
+      active: !!sourceNodeId3.pickConnectMode?.active,
+      sourceNodeId: sourceNodeId3.pickConnectMode?.sourceNodeId || null,
+      handleDirection: sourceNodeId3.pickConnectMode?.handleDirection || null,
     }),
-    ({ active: _0x591eb0, sourceNodeId: _0x5a4615, handleDirection: _0x183c9f }) => {
-      if (_0x591eb0) {
-        (_0x22b613.classList.add('is-connecting'), document.addEventListener('focusin', _0x412441, true));
-        const _0x53d6c4 = getCursorSize(),
-          _0x1d0ece = createLinkCursor({ size: _0x53d6c4 });
+    ({ active: active, sourceNodeId: sourceNodeId4, handleDirection: handleDirection }) => {
+      if (active) {
+        (el39.classList.add('is-connecting'), document.addEventListener('focusin', value246, true));
+        const size = getCursorSize(),
+          linkCursor = createLinkCursor({ size: size });
         (document.documentElement.classList.add('is-connecting-mode'),
-          document.documentElement.style.setProperty('--connect-cursor', _0x1d0ece));
-        if (!_0xd3826b || _0x5778d4 !== _0x5a4615 || _0x35d883 !== _0x183c9f) {
-          ((_0xd3826b = true), (_0x5778d4 = _0x5a4615), (_0x35d883 = _0x183c9f));
-          const { nodes: _0x3dfc97, edges: _0x5db1de, _edgesRev: _0x39d371 } = getStateRaw(),
-            _0x12d087 = _0x3d76d5(_0x5a4615, _0x183c9f, _0x3dfc97, _0x5db1de, _0x39d371);
-          graphStore.setConnOverlay({ srcId: _0x5a4615, invalidNodeIds: _0x12d087 });
+          document.documentElement.style.setProperty('--connect-cursor', linkCursor));
+        if (!enabled40 || value247 !== sourceNodeId4 || value248 !== handleDirection) {
+          ((enabled40 = true), (value247 = sourceNodeId4), (value248 = handleDirection));
+          const { nodes: nodes19, edges: edges6, _edgesRev: _edgesRev4 } = getStateRaw(),
+            invalidNodeIds3 = run13(sourceNodeId4, handleDirection, nodes19, edges6, _edgesRev4);
+          graphStore.setConnOverlay({ srcId: sourceNodeId4, invalidNodeIds: invalidNodeIds3 });
         }
       } else
-        (_0x22b613.classList.remove('is-connecting'),
-          document.removeEventListener('focusin', _0x412441, true),
+        (el39.classList.remove('is-connecting'),
+          document.removeEventListener('focusin', value246, true),
           document.documentElement.classList.remove('is-connecting-mode'),
           document.documentElement.style.removeProperty('--connect-cursor'),
-          _0xd3826b &&
-            ((_0xd3826b = false),
-            (_0x5778d4 = null),
+          enabled40 &&
+            ((enabled40 = false),
+            (value247 = null),
             graphStore.setSelectionBox({ active: false }),
             uiStore.setPickConnectHover(null),
             graphStore.clearConnOverlay()));
     },
   );
 }
-function _showQuoteMenu(_0x57b1b5, _0x9af7f2, _0x1b90d7, _0x2d5ac7, _0x14b710, _0x347d77 = {}) {
+function _showQuoteMenu(value249, value250, value251, value252, value253, value254 = {}) {
   document.querySelector('.v2-quote-menu')?.remove();
-  const { nodes: _0x7d3ac } = getStateRaw(),
-    _0x51c337 = (_0x2ef038, _0x1137f5 = null) => {
-      const _0x7335df = [],
-        _0x137e92 = new Set(),
-        _0x5b87f4 = Array.isArray(_0x2ef038) ? _0x2ef038 : [];
-      for (const _0x5b11e3 of _0x5b87f4) {
-        const _0x47f25d = String(_0x5b11e3 || '').trim();
-        if (!_0x47f25d || _0x137e92.has(_0x47f25d)) continue;
-        (_0x137e92.add(_0x47f25d), _0x7335df.push(_0x47f25d));
+  const { nodes: nodes20 } = getStateRaw(),
+    handler3 = (value255, value256 = null) => {
+      const list33 = [],
+        map22 = new Set(),
+        value257 = Array.isArray(value255) ? value255 : [];
+      for (const value258 of value257) {
+        const enabled41 = String(value258 || '').trim();
+        if (!enabled41 || map22.has(enabled41)) continue;
+        (map22.add(enabled41), list33.push(enabled41));
       }
-      const _0x28b75c = String(_0x1137f5 || '').trim();
-      if (_0x7335df.length === 0 && _0x28b75c) _0x7335df.push(_0x28b75c);
-      return _0x7335df;
+      const value259 = String(value256 || '').trim();
+      if (list33.length === 0 && value259) list33.push(value259);
+      return list33;
     },
-    _0x3e56d1 = _0x51c337(_0x347d77?.sourceIds, _0x1b90d7).filter((_0x4bb3d1) => !!_0x7d3ac[_0x4bb3d1]),
-    _0x537482 = _0x3e56d1.includes(_0x1b90d7) ? _0x1b90d7 : _0x3e56d1[0],
-    _0x536f04 = _0x537482 ? _0x7d3ac[_0x537482] : null;
-  if (!_0x536f04) {
-    _0x14b710?.();
+    sourceId8 = handler3(value254?.sourceIds, value251).filter((item39) => !!nodes20[item39]),
+    value260 = sourceId8.includes(value251) ? value251 : sourceId8[0],
+    box15 = value260 ? nodes20[value260] : null;
+  if (!box15) {
+    value253?.();
     return;
   }
-  const _0x5a68d4 = _0x3e56d1.map((_0x48084c) => _0x7d3ac[_0x48084c]).filter(Boolean),
-    _0x35bcfc = (_0x3564a9, _0x397f93) => {
-      const _0x1d06fa = getDisplayedMediaSizeFromNode(_0x3564a9, _0x397f93),
-        _0x22876f = Number(_0x1d06fa?.w || 0),
-        _0x22b722 = Number(_0x1d06fa?.h || 0),
-        _0x464c2a = _0x22876f > 0 && _0x22b722 > 0 ? _0x22876f / _0x22b722 : 0;
-      return Number.isFinite(_0x464c2a) && _0x464c2a > 0 ? _0x464c2a : 0;
+  const value261 = sourceId8.map((item40) => nodes20[item40]).filter(Boolean),
+    handler4 = (value262, value263) => {
+      const displayedMediaSizeFromNode2 = getDisplayedMediaSizeFromNode(value262, value263),
+        count29 = Number(displayedMediaSizeFromNode2?.w || 0),
+        count30 = Number(displayedMediaSizeFromNode2?.h || 0),
+        count31 = count29 > 0 && count30 > 0 ? count29 / count30 : 0;
+      return Number.isFinite(count31) && count31 > 0 ? count31 : 0;
     },
-    _0x3f7dc0 = (_0x57fb19, _0x457de0, _0x3789fc, _0x491136) => {
-      const _0x270d03 = Number(_0x491136);
-      if (!(Number.isFinite(_0x270d03) && _0x270d03 > 0)) return false;
-      const _0xa1d303 = getAIGenerationNodeSize(
-          _0x270d03 >= 1 ? _0x270d03 : 1,
-          _0x270d03 >= 1 ? 1 : 1 / _0x270d03,
-        ),
-        _0x504981 = _0xa1d303.width,
-        _0x2f645f = _0xa1d303.height,
-        _0x55d66b = getStateRaw(),
-        _0x1ac4bd = _0x55d66b.nodes?.[_0x57fb19];
-      if (!_0x1ac4bd) return false;
+    handler5 = (value264, x8, y4, value265) => {
+      const count32 = Number(value265);
+      if (!(Number.isFinite(count32) && count32 > 0)) return false;
+      const box16 = getAIGenerationNodeSize(count32 >= 1 ? count32 : 1, count32 >= 1 ? 1 : 1 / count32),
+        width6 = box16.width,
+        height6 = box16.height,
+        stateRaw11 = getStateRaw(),
+        enabled42 = stateRaw11.nodes?.[value264];
+      if (!enabled42) return false;
       return (
-        graphStore.updateNodeData(_0x57fb19, {
-          width: _0x504981,
-          height: _0x2f645f,
-          x: _0x457de0 - _0x504981 / 2,
-          y: _0x3789fc - _0x2f645f / 2,
+        graphStore.updateNodeData(value264, {
+          width: width6,
+          height: height6,
+          x: x8 - width6 / 2,
+          y: y4 - height6 / 2,
         }),
         commit(),
         true
       );
     },
-    _0x11424f = (_0x15c179, _0x17466a) => {
-      const _0x2a746f = getStateRaw(),
-        _0x2d116e = _0x2a746f.nodes || {},
-        _0x1f4e84 = _0x2d116e[_0x15c179],
-        _0x5f4ee7 = _0x2d116e[_0x17466a];
-      if (!_0x1f4e84 || !_0x5f4ee7) return;
-      if (String(_0x1f4e84.type || '') !== 'ai-video') return;
-      if (String(_0x5f4ee7.type || '') !== 'ai-video') return;
-      const _0x16b79e = Number(_0x5f4ee7.width || 0),
-        _0x452f1c = Number(_0x5f4ee7.height || 0);
-      if (!(_0x16b79e === _AI_VIDEO_DEFAULT_SIZE.width && _0x452f1c === _AI_VIDEO_DEFAULT_SIZE.height))
-        return;
-      const _0xc68944 =
-        (Array.isArray(_0x5f4ee7.videos) && _0x5f4ee7.videos.length > 0) ||
-        String(_0x5f4ee7.videoUrl || '').trim() ||
-        String(_0x5f4ee7.localPath || '').trim() ||
-        String(_0x5f4ee7.thumbId || '').trim();
-      if (_0xc68944) return;
-      const _0x4c4bdd = Number(_0x5f4ee7.x || 0) + _0x16b79e / 2,
-        _0x5d30b4 = Number(_0x5f4ee7.y || 0) + _0x452f1c / 2,
-        _0x140377 = Date.now(),
-        _0x44cd6c = () => {
-          const _0xba1689 = getDisplayedMediaSizeFromNode(_0x15c179, 'video'),
-            _0x2b5920 = Number(_0xba1689?.w || 0),
-            _0x98e057 = Number(_0xba1689?.h || 0);
-          let _0x3008ca = _0x2b5920,
-            _0x413e6e = _0x98e057;
-          if (!(_0x3008ca > 0 && _0x413e6e > 0)) {
-            const _0x7bcbf2 = getStateRaw(),
-              _0x5eac4a = _0x7bcbf2.nodes?.[_0x15c179];
-            if (_0x5eac4a) {
-              const _0x30f0c0 = Number(_0x5eac4a.mainVideoIndex),
-                _0xa0c71b = Number.isFinite(_0x30f0c0) ? Math.max(0, Math.trunc(_0x30f0c0)) : 0,
-                _0x5d82d6 = Array.isArray(_0x5eac4a.videos) ? _0x5eac4a.videos : [],
-                _0xcd4d08 = _0x5d82d6[_0xa0c71b],
-                _0x21a033 = Number(_0xcd4d08?.videoWidth || 0),
-                _0x5d5550 = Number(_0xcd4d08?.videoHeight || 0),
-                _0x3b0e9b = Number(_0x5eac4a.selectedVideoWidth || 0),
-                _0x96c032 = Number(_0x5eac4a.selectedVideoHeight || 0),
-                _0x53115c = Number(_0x5eac4a.videoWidth || 0),
-                _0x4fe482 = Number(_0x5eac4a.videoHeight || 0);
-              if (_0x21a033 > 0 && _0x5d5550 > 0) ((_0x3008ca = _0x21a033), (_0x413e6e = _0x5d5550));
+    handler6 = (value266, value267) => {
+      const stateRaw12 = getStateRaw(),
+        value268 = stateRaw12.nodes || {},
+        enabled43 = value268[value266],
+        box17 = value268[value267];
+      if (!enabled43 || !box17) return;
+      if (String(enabled43.type || '') !== 'ai-video') return;
+      if (String(box17.type || '') !== 'ai-video') return;
+      const value269 = Number(box17.width || 0),
+        value270 = Number(box17.height || 0);
+      if (!(value269 === _AI_VIDEO_DEFAULT_SIZE.width && value270 === _AI_VIDEO_DEFAULT_SIZE.height)) return;
+      const value271 =
+        (Array.isArray(box17.videos) && box17.videos.length > 0) ||
+        String(box17.videoUrl || '').trim() ||
+        String(box17.localPath || '').trim() ||
+        String(box17.thumbId || '').trim();
+      if (value271) return;
+      const value272 = Number(box17.x || 0) + value269 / 2,
+        value273 = Number(box17.y || 0) + value270 / 2,
+        count33 = Date.now(),
+        value274 = () => {
+          const displayedMediaSizeFromNode3 = getDisplayedMediaSizeFromNode(value266, 'video'),
+            value275 = Number(displayedMediaSizeFromNode3?.w || 0),
+            value276 = Number(displayedMediaSizeFromNode3?.h || 0);
+          let count34 = value275,
+            count35 = value276;
+          if (!(count34 > 0 && count35 > 0)) {
+            const stateRaw13 = getStateRaw(),
+              value277 = stateRaw13.nodes?.[value266];
+            if (value277) {
+              const value278 = Number(value277.mainVideoIndex),
+                value279 = Number.isFinite(value278) ? Math.max(0, Math.trunc(value278)) : 0,
+                value280 = Array.isArray(value277.videos) ? value277.videos : [],
+                value281 = value280[value279],
+                count36 = Number(value281?.videoWidth || 0),
+                count37 = Number(value281?.videoHeight || 0),
+                count38 = Number(value277.selectedVideoWidth || 0),
+                count39 = Number(value277.selectedVideoHeight || 0),
+                count40 = Number(value277.videoWidth || 0),
+                count41 = Number(value277.videoHeight || 0);
+              if (count36 > 0 && count37 > 0) ((count34 = count36), (count35 = count37));
               else {
-                if (_0x3b0e9b > 0 && _0x96c032 > 0) ((_0x3008ca = _0x3b0e9b), (_0x413e6e = _0x96c032));
-                else _0x53115c > 0 && _0x4fe482 > 0 && ((_0x3008ca = _0x53115c), (_0x413e6e = _0x4fe482));
+                if (count38 > 0 && count39 > 0) ((count34 = count38), (count35 = count39));
+                else count40 > 0 && count41 > 0 && ((count34 = count40), (count35 = count41));
               }
             }
           }
-          if (_0x3008ca > 0 && _0x413e6e > 0) {
-            _0x3f7dc0(_0x17466a, _0x4c4bdd, _0x5d30b4, _0x3008ca / _0x413e6e);
+          if (count34 > 0 && count35 > 0) {
+            handler5(value267, value272, value273, count34 / count35);
             return;
           }
-          if (Date.now() - _0x140377 < 0x4b0) requestAnimationFrame(_0x44cd6c);
+          if (Date.now() - count33 < 0x4b0) requestAnimationFrame(value274);
         };
-      requestAnimationFrame(_0x44cd6c);
+      requestAnimationFrame(value274);
     },
-    _0x1c9e56 = screenToWorld(_0x57b1b5, _0x9af7f2, _0x2d5ac7),
-    _0x496400 = document.createElement('div');
-  _0x496400.className = 'v2-quote-menu';
-  const _0x4f13a3 = document.createElement('div');
-  ((_0x4f13a3.className = 'v2-quote-title'),
-    (_0x4f13a3.textContent = t('edgeController.quoteMenuTitle')),
-    _0x496400.appendChild(_0x4f13a3));
-  const _0x136227 = 'var(--white-50)',
-    _0x3ed055 = 'var(--white-02)',
-    _0xf14637 = [
+    x9 = screenToWorld(value249, value250, value252),
+    el41 = document.createElement('div');
+  el41.className = 'v2-quote-menu';
+  const el42 = document.createElement('div');
+  ((el42.className = 'v2-quote-title'),
+    (el42.textContent = t('edgeController.quoteMenuTitle')),
+    el41.appendChild(el42));
+  const value282 = 'var(--white-50)',
+    iconBg = 'var(--white-02)',
+    list34 = [
       {
-        iconEl: _iconAiText(_0x136227),
-        iconBg: _0x3ed055,
+        iconEl: _iconAiText(value282),
+        iconBg: iconBg,
         label: '文本',
         desc: '文案、脚本、提示词',
         type: 'ai-text',
@@ -2393,8 +2330,8 @@ function _showQuoteMenu(_0x57b1b5, _0x9af7f2, _0x1b90d7, _0x2d5ac7, _0x14b710, _
         h: _AI_TEXT_DEFAULT_SIZE.height,
       },
       {
-        iconEl: _iconAiImage(_0x136227),
-        iconBg: _0x3ed055,
+        iconEl: _iconAiImage(value282),
+        iconBg: iconBg,
         label: '图像',
         desc: '图片、海报、角色素材',
         type: 'ai-image',
@@ -2402,8 +2339,8 @@ function _showQuoteMenu(_0x57b1b5, _0x9af7f2, _0x1b90d7, _0x2d5ac7, _0x14b710, _
         h: _AI_IMAGE_DEFAULT_SIZE.height,
       },
       {
-        iconEl: _iconAiVideo(_0x136227),
-        iconBg: _0x3ed055,
+        iconEl: _iconAiVideo(value282),
+        iconBg: iconBg,
         label: '视频',
         desc: '短片、转场、动态镜头',
         type: 'ai-video',
@@ -2411,8 +2348,8 @@ function _showQuoteMenu(_0x57b1b5, _0x9af7f2, _0x1b90d7, _0x2d5ac7, _0x14b710, _
         h: _AI_VIDEO_DEFAULT_SIZE.height,
       },
       {
-        iconEl: _iconAiAudio(_0x136227),
-        iconBg: _0x3ed055,
+        iconEl: _iconAiAudio(value282),
+        iconBg: iconBg,
         label: '音频',
         desc: '配音、音效、音乐',
         type: 'ai-audio',
@@ -2420,8 +2357,8 @@ function _showQuoteMenu(_0x57b1b5, _0x9af7f2, _0x1b90d7, _0x2d5ac7, _0x14b710, _
         h: _AI_AUDIO_DEFAULT_SIZE.height,
       },
       {
-        iconEl: _iconStoryboardScript(_0x136227),
-        iconBg: _0x3ed055,
+        iconEl: _iconStoryboardScript(value282),
+        iconBg: iconBg,
         label: '分镜脚本',
         desc: '镜头表、提示词、节奏',
         type: 'storyboard-script',
@@ -2430,8 +2367,8 @@ function _showQuoteMenu(_0x57b1b5, _0x9af7f2, _0x1b90d7, _0x2d5ac7, _0x14b710, _
         badge: 'BETA',
       },
       {
-        iconEl: _iconAiImage(_0x136227),
-        iconBg: _0x3ed055,
+        iconEl: _iconAiImage(value282),
+        iconBg: iconBg,
         label: '360全景图',
         desc: '全景画面与空间关系',
         type: 'panorama-360',
@@ -2439,205 +2376,188 @@ function _showQuoteMenu(_0x57b1b5, _0x9af7f2, _0x1b90d7, _0x2d5ac7, _0x14b710, _
         h: PANORAMA_SCENE_DEFAULT_SIZE.height,
       },
     ].map(_applyNodeCreationMenuMeta),
-    _0x369c7e = new Set(getAllowedGenerationNodeTypesForQuoteMenu(_0x5a68d4)),
-    _0x575fb6 = _0xf14637.filter((_0x3f0731) => _0x369c7e.has(_0x3f0731.type));
-  (_0x575fb6.forEach((_0x57c314) => {
-    const _0x47a635 = document.createElement('button');
-    _0x47a635.className = 'v2-menu-row' + (_0x57c314.desc ? ' has-desc' : '');
-    const _0x34ef5b = document.createElement('div');
-    ((_0x34ef5b.className = 'v2-menu-ico'), _0x34ef5b.replaceChildren());
-    if (_0x57c314.iconEl) _0x34ef5b.appendChild(_0x57c314.iconEl.cloneNode(true));
-    if (_0x57c314.iconBg) _0x34ef5b.style.background = _0x57c314.iconBg;
-    const _0x20f0a6 = document.createElement('div');
-    _0x20f0a6.className = 'v2-menu-txt-wrap';
-    const _0x4e82ca = document.createElement('span');
-    ((_0x4e82ca.className = 'v2-menu-lbl'), (_0x4e82ca.textContent = _0x57c314.label));
-    if (_0x57c314.badge) {
-      const _0x5247df = document.createElement('span');
-      ((_0x5247df.textContent = _0x57c314.badge),
-        (_0x5247df.className = 'v2-badge-beta'),
-        _0x4e82ca.appendChild(_0x5247df));
+    map23 = new Set(getAllowedGenerationNodeTypesForQuoteMenu(value261)),
+    list35 = list34.filter((item41) => map23.has(item41.type));
+  (list35.forEach((type2) => {
+    const el43 = document.createElement('button');
+    el43.className = 'v2-menu-row' + (type2.desc ? ' has-desc' : '');
+    const el44 = document.createElement('div');
+    ((el44.className = 'v2-menu-ico'), el44.replaceChildren());
+    if (type2.iconEl) el44.appendChild(type2.iconEl.cloneNode(true));
+    if (type2.iconBg) el44.style.background = type2.iconBg;
+    const el45 = document.createElement('div');
+    el45.className = 'v2-menu-txt-wrap';
+    const el46 = document.createElement('span');
+    ((el46.className = 'v2-menu-lbl'), (el46.textContent = type2.label));
+    if (type2.badge) {
+      const el47 = document.createElement('span');
+      ((el47.textContent = type2.badge), (el47.className = 'v2-badge-beta'), el46.appendChild(el47));
     }
-    _0x20f0a6.appendChild(_0x4e82ca);
-    if (_0x57c314.desc) {
-      const _0x93ef0f = document.createElement('span');
-      ((_0x93ef0f.className = 'v2-menu-sub'),
-        (_0x93ef0f.textContent = _0x57c314.desc),
-        _0x20f0a6.appendChild(_0x93ef0f));
+    el45.appendChild(el46);
+    if (type2.desc) {
+      const el48 = document.createElement('span');
+      ((el48.className = 'v2-menu-sub'), (el48.textContent = type2.desc), el45.appendChild(el48));
     }
-    (_0x47a635.appendChild(_0x34ef5b),
-      _0x47a635.appendChild(_0x20f0a6),
-      _0x47a635.addEventListener('click', (_0x3908a2) => {
-        _0x3908a2.stopPropagation();
-        const _0x2520d4 = generateId(_0x57c314.type);
-        let _0xda7be5 = _0x57c314.w,
-          _0x5d4ad5 = _0x57c314.h;
+    (el43.appendChild(el44),
+      el43.appendChild(el45),
+      el43.addEventListener('click', (event9) => {
+        event9.stopPropagation();
+        const id = generateId(type2.type);
+        let width7 = type2.w,
+          height7 = type2.h;
         if (
-          (_0x57c314.type === 'ai-image' || _0x57c314.type === 'ai-video') &&
-          ((_0x536f04.width && _0x536f04.height) || (_0x536f04.videoWidth && _0x536f04.videoHeight))
+          (type2.type === 'ai-image' || type2.type === 'ai-video') &&
+          ((box15.width && box15.height) || (box15.videoWidth && box15.videoHeight))
         ) {
-          let _0x4306da = 0;
-          if (_0x57c314.type === 'ai-video' && String(_0x536f04.type || '') !== 'ai-video') {
-            const _0x15f959 = Number(_0x536f04.mainVideoIndex) || 0,
-              _0x3c63a0 = Math.max(0, Math.trunc(_0x15f959)),
-              _0x595815 = Array.isArray(_0x536f04.videos) ? _0x536f04.videos : [],
-              _0x40b594 = String(_0x536f04.localPath || '').trim(),
-              _0x1f67a2 = String(_0x536f04.videoUrl || '').trim(),
-              _0x5e72aa = Number(_0x536f04.selectedVideoWidth || 0),
-              _0x31d47a = Number(_0x536f04.selectedVideoHeight || 0);
-            let _0x2052be = _0x3c63a0;
-            if (_0x595815.length) {
-              let _0x2a4bd7 = -1;
-              _0x40b594 &&
-                (_0x2a4bd7 = _0x595815.findIndex(
-                  (_0x5c523) => String(_0x5c523?.localPath || '').trim() === _0x40b594,
-                ));
-              _0x2a4bd7 < 0 &&
-                _0x1f67a2 &&
-                (_0x2a4bd7 = _0x595815.findIndex(
-                  (_0x2eaa88) => String(_0x2eaa88?.videoUrl || '').trim() === _0x1f67a2,
-                ));
-              if (_0x2a4bd7 >= 0) _0x2052be = _0x2a4bd7;
+          let count42 = 0;
+          if (type2.type === 'ai-video' && String(box15.type || '') !== 'ai-video') {
+            const value283 = Number(box15.mainVideoIndex) || 0,
+              value284 = Math.max(0, Math.trunc(value283)),
+              list36 = Array.isArray(box15.videos) ? box15.videos : [],
+              value285 = String(box15.localPath || '').trim(),
+              value286 = String(box15.videoUrl || '').trim(),
+              count43 = Number(box15.selectedVideoWidth || 0),
+              count44 = Number(box15.selectedVideoHeight || 0);
+            let value287 = value284;
+            if (list36.length) {
+              let count45 = -1;
+              value285 &&
+                (count45 = list36.findIndex((item42) => String(item42?.localPath || '').trim() === value285));
+              count45 < 0 &&
+                value286 &&
+                (count45 = list36.findIndex((item43) => String(item43?.videoUrl || '').trim() === value286));
+              if (count45 >= 0) value287 = count45;
               else {
-                if (_0x3c63a0 >= _0x595815.length) _0x2052be = 0;
+                if (value284 >= list36.length) value287 = 0;
               }
-            } else _0x2052be = 0;
-            const _0x4d3c47 = _0x595815[_0x2052be] || _0x595815[0] || null,
-              _0x38e7e9 = _0x4d3c47 ? Number(_0x4d3c47.videoWidth || _0x4d3c47.width || 0) : 0,
-              _0x13a57b = _0x4d3c47 ? Number(_0x4d3c47.videoHeight || _0x4d3c47.height || 0) : 0;
-            _0x4306da =
-              (_0x5e72aa > 0 && _0x31d47a > 0 ? _0x5e72aa / _0x31d47a : 0) ||
-              _0x35bcfc(_0x537482, 'video') ||
-              (_0x38e7e9 > 0 && _0x13a57b > 0 ? _0x38e7e9 / _0x13a57b : 0) ||
-              (_0x536f04.videoWidth && _0x536f04.videoHeight
-                ? _0x536f04.videoWidth / _0x536f04.videoHeight
-                : 0) ||
-              (_0x536f04.width && _0x536f04.height ? _0x536f04.width / _0x536f04.height : 0);
+            } else value287 = 0;
+            const box18 = list36[value287] || list36[0] || null,
+              count46 = box18 ? Number(box18.videoWidth || box18.width || 0) : 0,
+              count47 = box18 ? Number(box18.videoHeight || box18.height || 0) : 0;
+            count42 =
+              (count43 > 0 && count44 > 0 ? count43 / count44 : 0) ||
+              handler4(value260, 'video') ||
+              (count46 > 0 && count47 > 0 ? count46 / count47 : 0) ||
+              (box15.videoWidth && box15.videoHeight ? box15.videoWidth / box15.videoHeight : 0) ||
+              (box15.width && box15.height ? box15.width / box15.height : 0);
           } else
-            _0x4306da =
-              _0x35bcfc(_0x537482, 'image') ||
-              (_0x536f04.width && _0x536f04.height ? _0x536f04.width / _0x536f04.height : 0);
-          if (!(Number.isFinite(_0x4306da) && _0x4306da > 0)) _0x4306da = 1;
-          const _0x41dfbb = getAIGenerationNodeSize(
-            _0x4306da >= 1 ? _0x4306da : 1,
-            _0x4306da >= 1 ? 1 : 1 / _0x4306da,
-          );
-          ((_0xda7be5 = _0x41dfbb.width), (_0x5d4ad5 = _0x41dfbb.height));
+            count42 =
+              handler4(value260, 'image') || (box15.width && box15.height ? box15.width / box15.height : 0);
+          if (!(Number.isFinite(count42) && count42 > 0)) count42 = 1;
+          const box19 = getAIGenerationNodeSize(count42 >= 1 ? count42 : 1, count42 >= 1 ? 1 : 1 / count42);
+          ((width7 = box19.width), (height7 = box19.height));
         }
-        let _0x1fc743 = {
-          id: _0x2520d4,
-          type: _0x57c314.type,
-          x: _0x1c9e56.x - _0xda7be5 / 2,
-          y: _0x1c9e56.y - _0x5d4ad5 / 2,
-          width: _0xda7be5,
-          height: _0x5d4ad5,
-          name: _0x57c314.defaultName || _0x57c314.label,
+        let id2 = {
+          id: id,
+          type: type2.type,
+          x: x9.x - width7 / 2,
+          y: x9.y - height7 / 2,
+          width: width7,
+          height: height7,
+          name: type2.defaultName || type2.label,
         };
-        (_0x57c314.type === 'ai-image' || _0x57c314.type === 'ai-video') &&
-          !Object.prototype.hasOwnProperty.call(_0x1fc743, 'aspectRatio') &&
-          (_0x1fc743.aspectRatio = '自适应');
-        if (_0x536f04.type === _0x57c314.type) {
-          const _0x1772cc = { ..._0x536f04 };
-          (delete _0x1772cc.id,
-            delete _0x1772cc.x,
-            delete _0x1772cc.y,
-            delete _0x1772cc.width,
-            delete _0x1772cc.height,
-            delete _0x1772cc.name,
-            delete _0x1772cc.prompt,
-            delete _0x1772cc.outputText,
-            stripImageGenerationResultStateForDerivedNode(_0x1772cc),
-            delete _0x1772cc.batchSize,
-            (_0x1fc743 = { ..._0x1772cc, ..._0x1fc743 }));
+        (type2.type === 'ai-image' || type2.type === 'ai-video') &&
+          !Object.prototype.hasOwnProperty.call(id2, 'aspectRatio') &&
+          (id2.aspectRatio = '自适应');
+        if (box15.type === type2.type) {
+          const box20 = { ...box15 };
+          (delete box20.id,
+            delete box20.x,
+            delete box20.y,
+            delete box20.width,
+            delete box20.height,
+            delete box20.name,
+            delete box20.prompt,
+            delete box20.outputText,
+            stripImageGenerationResultStateForDerivedNode(box20),
+            delete box20.batchSize,
+            (id2 = { ...box20, ...id2 }));
         }
-        _isPanorama360TargetType(_0x1fc743.type) &&
-          (_0x1fc743 = createPanorama360NodeData({
-            id: _0x1fc743.id,
-            x: _0x1fc743.x,
-            y: _0x1fc743.y,
-            width: _0x1fc743.width,
-            height: _0x1fc743.height,
-            name: _0x1fc743.name,
+        _isPanorama360TargetType(id2.type) &&
+          (id2 = createPanorama360NodeData({
+            id: id2.id,
+            x: id2.x,
+            y: id2.y,
+            width: id2.width,
+            height: id2.height,
+            name: id2.name,
           }));
-        _0x1fc743.type === 'storyboard-script' &&
-          (_0x1fc743 = createStoryboardScriptNodeData({
-            id: _0x1fc743.id,
-            x: _0x1fc743.x,
-            y: _0x1fc743.y,
-            width: _0x1fc743.width,
-            height: _0x1fc743.height,
-            name: _0x1fc743.name,
+        id2.type === 'storyboard-script' &&
+          (id2 = createStoryboardScriptNodeData({
+            id: id2.id,
+            x: id2.x,
+            y: id2.y,
+            width: id2.width,
+            height: id2.height,
+            name: id2.name,
           }));
-        graphStore.addNode(_0x1fc743);
-        let _0x3799ed = false,
-          _0x4805dd = '';
-        for (const _0x56a0c6 of _0x3e56d1) {
-          const _0x1b963e = getStateRaw(),
-            _0x4a80d5 = _0x1b963e.nodes?.[_0x56a0c6],
-            _0x3ff464 = _0x1b963e.nodes?.[_0x2520d4];
-          if (!_0x4a80d5 || !_0x3ff464) continue;
-          if (!isValidConnection(_0x4a80d5, _0x3ff464)) continue;
-          const _0x930288 = addEdgeWithPolicies({ sourceId: _0x56a0c6, targetId: _0x2520d4 });
-          if (!_0x930288) continue;
-          _0x3799ed = true;
-          if (!_0x4805dd) _0x4805dd = _0x56a0c6;
+        graphStore.addNode(id2);
+        let enabled44 = false,
+          enabled45 = '';
+        for (const sourceId9 of sourceId8) {
+          const stateRaw14 = getStateRaw(),
+            enabled46 = stateRaw14.nodes?.[sourceId9],
+            enabled47 = stateRaw14.nodes?.[id];
+          if (!enabled46 || !enabled47) continue;
+          if (!isValidConnection(enabled46, enabled47)) continue;
+          const addEdgeWithPolicies7 = addEdgeWithPolicies({ sourceId: sourceId9, targetId: id });
+          if (!addEdgeWithPolicies7) continue;
+          enabled44 = true;
+          if (!enabled45) enabled45 = sourceId9;
         }
-        if (!_0x3799ed && _0x3e56d1.length === 1) {
-          const _0x2a611f = generateId('edge');
+        if (!enabled44 && sourceId8.length === 1) {
+          const id3 = generateId('edge');
           (graphStore.addEdge({
-            id: _0x2a611f,
-            sourceId: _0x3e56d1[0],
-            targetId: _0x2520d4,
+            id: id3,
+            sourceId: sourceId8[0],
+            targetId: id,
             createdAt: Date.now(),
           }),
-            (_0x3799ed = true),
-            (_0x4805dd = _0x3e56d1[0]));
+            (enabled44 = true),
+            (enabled45 = sourceId8[0]));
         }
-        (graphStore.setSelectedNodes([_0x2520d4]),
+        (graphStore.setSelectedNodes([id]),
           commit(),
-          _0x57c314.type === 'ai-video' && _0x4805dd && _0x11424f(_0x4805dd, _0x2520d4),
-          _0x2c600e?.(),
-          _0x496400.remove(),
-          _0x14b710?.());
+          type2.type === 'ai-video' && enabled45 && handler6(enabled45, id),
+          value288?.(),
+          el41.remove(),
+          value253?.());
       }),
-      _0x496400.appendChild(_0x47a635));
+      el41.appendChild(el43));
   }),
-    document.body.appendChild(_0x496400));
-  const _0x3d859b = () => {
-    const _0x5759e4 = getStateRaw().viewport || _0x2d5ac7,
-      _0x3eec94 = worldToScreen(_0x1c9e56.x, _0x1c9e56.y, _0x5759e4);
-    ((_0x496400.style.left = _0x3eec94.x + 'px'), (_0x496400.style.top = _0x3eec94.y + 'px'));
+    document.body.appendChild(el41));
+  const run15 = () => {
+    const stateRaw15 = getStateRaw().viewport || value252,
+      box21 = worldToScreen(x9.x, x9.y, stateRaw15);
+    ((el41.style.left = box21.x + 'px'), (el41.style.top = box21.y + 'px'));
   };
-  _0x3d859b();
-  const _0x2c600e = graphStore.subscribeSelector(
-      (_0x158e91) => _0x158e91.viewport,
-      () => _0x3d859b(),
+  run15();
+  const value288 = graphStore.subscribeSelector(
+      (value289) => value289.viewport,
+      () => run15(),
     ),
-    _0x51922a = (_0xa9e5b0) => {
-      if (_0x496400.contains(_0xa9e5b0.target)) return;
-      (_0x2c600e?.(),
-        _0x496400.remove(),
-        document.removeEventListener('mousedown', _0x51922a, true),
-        _0x14b710?.());
+    value290 = (event10) => {
+      if (el41.contains(event10.target)) return;
+      (value288?.(), el41.remove(), document.removeEventListener('mousedown', value290, true), value253?.());
     };
-  requestAnimationFrame(() => document.addEventListener('mousedown', _0x51922a, true));
+  requestAnimationFrame(() => document.addEventListener('mousedown', value290, true));
 }
-function _showLeftQuoteMenu(_0x276faa, _0x2a7cb7, _0x124aa9, _0x4d413a, _0x1803c7) {
+function _showLeftQuoteMenu(value291, value292, targetId10, value293, value294) {
   document.querySelector('.v2-quote-menu')?.remove();
-  const { nodes: _0x1fdb2a } = getState(),
-    _0x11eef9 = _0x1fdb2a[_0x124aa9];
-  if (!_0x11eef9) {
-    _0x1803c7?.();
+  const { nodes: nodes21 } = getState(),
+    args4 = nodes21[targetId10];
+  if (!args4) {
+    value294?.();
     return;
   }
-  const _0x261a02 = screenToWorld(_0x276faa, _0x2a7cb7, _0x4d413a),
-    _0x3f2fbf = document.createElement('div');
-  _0x3f2fbf.className = 'v2-quote-menu';
-  const _0x3e58de = document.createElement('div');
-  ((_0x3e58de.className = 'v2-quote-title'),
-    (_0x3e58de.textContent = t('edgeController.inputMenuTitle')),
-    _0x3f2fbf.appendChild(_0x3e58de));
-  const _0x5a8b63 = [
+  const x10 = screenToWorld(value291, value292, value293),
+    el49 = document.createElement('div');
+  el49.className = 'v2-quote-menu';
+  const el50 = document.createElement('div');
+  ((el50.className = 'v2-quote-title'),
+    (el50.textContent = t('edgeController.inputMenuTitle')),
+    el49.appendChild(el50));
+  const list37 = [
       {
         iconEl: _iconSourceText('var(--white-50)'),
         iconBg: 'var(--white-05)',
@@ -2707,39 +2627,38 @@ function _showLeftQuoteMenu(_0x276faa, _0x2a7cb7, _0x124aa9, _0x4d413a, _0x1803c
         h: _AI_AUDIO_DEFAULT_SIZE.height,
       },
     ].map(_applyNodeCreationMenuMeta),
-    _0x1302d2 = getAllowedInputNodeTypesForSidePlus(_0x11eef9.type),
-    _0x40b5c7 = _0x5a8b63.filter((_0x11e391) => _0x1302d2.includes(_0x11e391.type));
-  (_0x40b5c7.forEach((_0x26143c) => {
-    const _0x11688b = document.createElement('button');
-    ((_0x11688b.className = 'v2-menu-row' + (_0x26143c.desc ? ' has-desc' : '')),
-      (_0x11688b.style.marginBottom = '2px'));
-    const _0x19677a = document.createElement('div');
-    ((_0x19677a.className = 'v2-menu-ico'), _0x19677a.replaceChildren());
-    if (_0x26143c.iconEl) _0x19677a.appendChild(_0x26143c.iconEl.cloneNode(true));
-    if (_0x26143c.iconBg) _0x19677a.style.background = _0x26143c.iconBg;
-    const _0x7e6843 = document.createElement('div');
-    ((_0x7e6843.className = 'v2-menu-txt-wrap'),
-      Object.assign(_0x7e6843.style, {
+    list38 = getAllowedInputNodeTypesForSidePlus(args4.type),
+    list39 = list37.filter((item44) => list38.includes(item44.type));
+  (list39.forEach((type3) => {
+    const el51 = document.createElement('button');
+    ((el51.className = 'v2-menu-row' + (type3.desc ? ' has-desc' : '')), (el51.style.marginBottom = '2px'));
+    const el52 = document.createElement('div');
+    ((el52.className = 'v2-menu-ico'), el52.replaceChildren());
+    if (type3.iconEl) el52.appendChild(type3.iconEl.cloneNode(true));
+    if (type3.iconBg) el52.style.background = type3.iconBg;
+    const el53 = document.createElement('div');
+    ((el53.className = 'v2-menu-txt-wrap'),
+      Object.assign(el53.style, {
         display: 'flex',
         flexDirection: 'column',
         gap: '2px',
         flex: '1',
         minWidth: '0',
       }));
-    const _0x2e0c5f = document.createElement('span');
-    ((_0x2e0c5f.className = 'v2-menu-lbl'),
-      Object.assign(_0x2e0c5f.style, {
+    const el54 = document.createElement('span');
+    ((el54.className = 'v2-menu-lbl'),
+      Object.assign(el54.style, {
         fontSize: '16px',
         fontWeight: '500',
         display: 'flex',
         alignItems: 'center',
         gap: '6px',
       }),
-      (_0x2e0c5f.textContent = _0x26143c.label));
-    if (_0x26143c.badge) {
-      const _0x68f7cb = document.createElement('span');
-      ((_0x68f7cb.textContent = _0x26143c.badge),
-        Object.assign(_0x68f7cb.style, {
+      (el54.textContent = type3.label));
+    if (type3.badge) {
+      const el55 = document.createElement('span');
+      ((el55.textContent = type3.badge),
+        Object.assign(el55.style, {
           fontSize: '10px',
           padding: '1px 6px',
           borderRadius: '10px',
@@ -2749,93 +2668,84 @@ function _showLeftQuoteMenu(_0x276faa, _0x2a7cb7, _0x124aa9, _0x4d413a, _0x1803c
           fontWeight: '700',
           letterSpacing: '0.3px',
         }),
-        _0x2e0c5f.appendChild(_0x68f7cb));
+        el54.appendChild(el55));
     }
-    _0x7e6843.appendChild(_0x2e0c5f);
-    if (_0x26143c.desc) {
-      const _0xefdb = document.createElement('span');
-      ((_0xefdb.className = 'v2-menu-sub'),
-        (_0xefdb.textContent = _0x26143c.desc),
-        _0x7e6843.appendChild(_0xefdb));
+    el53.appendChild(el54);
+    if (type3.desc) {
+      const el56 = document.createElement('span');
+      ((el56.className = 'v2-menu-sub'), (el56.textContent = type3.desc), el53.appendChild(el56));
     }
-    (_0x11688b.appendChild(_0x19677a),
-      _0x11688b.appendChild(_0x7e6843),
-      _0x11688b.addEventListener('click', (_0x277cd2) => {
-        _0x277cd2.stopPropagation();
-        const _0x26567c = generateId(_0x26143c.type);
-        let _0x50820a = {
-          id: _0x26567c,
-          type: _0x26143c.type,
-          x: _0x261a02.x - 150,
-          y: _0x261a02.y,
-          width: _0x26143c.width ?? _0x26143c.w,
-          height: _0x26143c.height ?? _0x26143c.h,
-          name: _0x26143c.defaultName || _0x26143c.label,
+    (el51.appendChild(el52),
+      el51.appendChild(el53),
+      el51.addEventListener('click', (event11) => {
+        event11.stopPropagation();
+        const id4 = generateId(type3.type);
+        let id5 = {
+          id: id4,
+          type: type3.type,
+          x: x10.x - 150,
+          y: x10.y,
+          width: type3.width ?? type3.w,
+          height: type3.height ?? type3.h,
+          name: type3.defaultName || type3.label,
         };
-        (_0x26143c.type === 'ai-image' || _0x26143c.type === 'ai-video') &&
-          !Object.prototype.hasOwnProperty.call(_0x50820a, 'aspectRatio') &&
-          (_0x50820a.aspectRatio = '自适应');
-        if (_0x11eef9.type === _0x26143c.type) {
-          const _0x2cf82a = { ..._0x11eef9 };
-          (delete _0x2cf82a.id,
-            delete _0x2cf82a.x,
-            delete _0x2cf82a.y,
-            delete _0x2cf82a.width,
-            delete _0x2cf82a.height,
-            delete _0x2cf82a.name,
-            delete _0x2cf82a.prompt,
-            delete _0x2cf82a.outputText,
-            stripImageGenerationResultStateForDerivedNode(_0x2cf82a),
-            delete _0x2cf82a.batchSize,
-            (_0x50820a = { ..._0x2cf82a, ..._0x50820a }));
+        (type3.type === 'ai-image' || type3.type === 'ai-video') &&
+          !Object.prototype.hasOwnProperty.call(id5, 'aspectRatio') &&
+          (id5.aspectRatio = '自适应');
+        if (args4.type === type3.type) {
+          const box22 = { ...args4 };
+          (delete box22.id,
+            delete box22.x,
+            delete box22.y,
+            delete box22.width,
+            delete box22.height,
+            delete box22.name,
+            delete box22.prompt,
+            delete box22.outputText,
+            stripImageGenerationResultStateForDerivedNode(box22),
+            delete box22.batchSize,
+            (id5 = { ...box22, ...id5 }));
         }
-        if (_0x50820a.type === 'source-image' || _0x50820a.type === 'source-video')
-          _0x50820a = buildSourceMediaNodePayload(_0x50820a);
+        if (id5.type === 'source-image' || id5.type === 'source-video')
+          id5 = buildSourceMediaNodePayload(id5);
         else
-          _isPanorama360TargetType(_0x50820a.type) &&
-            (_0x50820a = createPanorama360NodeData({
-              id: _0x50820a.id,
-              x: _0x50820a.x,
-              y: _0x50820a.y,
-              width: _0x50820a.width,
-              height: _0x50820a.height,
+          _isPanorama360TargetType(id5.type) &&
+            (id5 = createPanorama360NodeData({
+              id: id5.id,
+              x: id5.x,
+              y: id5.y,
+              width: id5.width,
+              height: id5.height,
             }));
-        graphStore.addNode(_0x50820a);
-        const _0x106fe5 = addEdgeWithPolicies({ sourceId: _0x26567c, targetId: _0x124aa9 });
-        if (!_0x106fe5) {
-          const _0x599bd9 = generateId('edge');
+        graphStore.addNode(id5);
+        const addEdgeWithPolicies8 = addEdgeWithPolicies({ sourceId: id4, targetId: targetId10 });
+        if (!addEdgeWithPolicies8) {
+          const id6 = generateId('edge');
           graphStore.addEdge({
-            id: _0x599bd9,
-            sourceId: _0x26567c,
-            targetId: _0x124aa9,
+            id: id6,
+            sourceId: id4,
+            targetId: targetId10,
             createdAt: Date.now(),
           });
         }
-        (graphStore.setSelectedNodes([_0x26567c]),
-          commit(),
-          _0x187bf3?.(),
-          _0x3f2fbf.remove(),
-          _0x1803c7?.());
+        (graphStore.setSelectedNodes([id4]), commit(), value295?.(), el49.remove(), value294?.());
       }),
-      _0x3f2fbf.appendChild(_0x11688b));
+      el49.appendChild(el51));
   }),
-    document.body.appendChild(_0x3f2fbf));
-  const _0x558bc2 = () => {
-    const _0x239fc1 = getStateRaw().viewport || _0x4d413a,
-      _0x27bc1d = worldToScreen(_0x261a02.x, _0x261a02.y, _0x239fc1);
-    ((_0x3f2fbf.style.left = _0x27bc1d.x + 'px'), (_0x3f2fbf.style.top = _0x27bc1d.y + 'px'));
+    document.body.appendChild(el49));
+  const run16 = () => {
+    const stateRaw16 = getStateRaw().viewport || value293,
+      box23 = worldToScreen(x10.x, x10.y, stateRaw16);
+    ((el49.style.left = box23.x + 'px'), (el49.style.top = box23.y + 'px'));
   };
-  _0x558bc2();
-  const _0x187bf3 = graphStore.subscribeSelector(
-      (_0x282775) => _0x282775.viewport,
-      () => _0x558bc2(),
+  run16();
+  const value295 = graphStore.subscribeSelector(
+      (value296) => value296.viewport,
+      () => run16(),
     ),
-    _0x183f65 = (_0x5b57ea) => {
-      if (_0x3f2fbf.contains(_0x5b57ea.target)) return;
-      (_0x187bf3?.(),
-        _0x3f2fbf.remove(),
-        document.removeEventListener('mousedown', _0x183f65, true),
-        _0x1803c7?.());
+    value297 = (event12) => {
+      if (el49.contains(event12.target)) return;
+      (value295?.(), el49.remove(), document.removeEventListener('mousedown', value297, true), value294?.());
     };
-  requestAnimationFrame(() => document.addEventListener('mousedown', _0x183f65, true));
+  requestAnimationFrame(() => document.addEventListener('mousedown', value297, true));
 }

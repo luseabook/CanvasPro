@@ -17,673 +17,645 @@ const MAX_BATCH_CREATE_COUNT = 60,
   MIN_EXTRACT_IMAGE_AREA = 0x2ee0,
   STREAM_MEDIA_URL_EXTENSION_RE = /\.(?:m3u8|mpd|m4s)(?:[?#].*)?$/i,
   WEB_PREVIEW_REVERSE_IMAGE_PROMPT_NODE_NAME = '反推提示词-创建';
-function webPreviewCaptureText(_0x1f6835, _0x3ab5a2 = {}) {
-  return t('webPreview.capture.' + _0x1f6835, _0x3ab5a2);
+function webPreviewCaptureText(value, item = {}) {
+  return t('webPreview.capture.' + value, item);
 }
-function dispatchWebPreviewPickerSync(_0x32996e) {
-  const _0x3d90c5 = globalThis.window;
-  if (typeof _0x3d90c5?.dispatchEvent !== 'function') return;
+function dispatchWebPreviewPickerSync(reason) {
+  const key = globalThis.window;
+  if (typeof key?.dispatchEvent !== 'function') return;
   try {
-    const _0x7b9c2 =
+    const index =
       typeof globalThis.CustomEvent === 'function'
-        ? new CustomEvent('web-preview:force-sync', { detail: { reason: _0x32996e } })
-        : { type: 'web-preview:force-sync', detail: { reason: _0x32996e } };
-    _0x3d90c5.dispatchEvent(_0x7b9c2);
+        ? new CustomEvent('web-preview:force-sync', { detail: { reason: reason } })
+        : { type: 'web-preview:force-sync', detail: { reason: reason } };
+    key.dispatchEvent(index);
   } catch {}
 }
-function normalizeHttpUrl(_0x2dd682) {
-  const _0x9524b3 = String(_0x2dd682 || '').trim();
-  if (!_0x9524b3) return '';
+function normalizeHttpUrl(result) {
+  const enabled = String(result || '').trim();
+  if (!enabled) return '';
   try {
-    const _0x3e9de5 = new URL(_0x9524b3, globalThis.location?.href || 'https://example.invalid/');
-    if (_0x3e9de5.protocol !== 'http:' && _0x3e9de5.protocol !== 'https:') return '';
-    return ((_0x3e9de5.username = ''), (_0x3e9de5.password = ''), _0x3e9de5.href);
+    const uRL = new URL(enabled, globalThis.location?.href || 'https://example.invalid/');
+    if (uRL.protocol !== 'http:' && uRL.protocol !== 'https:') return '';
+    return ((uRL.username = ''), (uRL.password = ''), uRL.href);
   } catch {
     return '';
   }
 }
-function getGraphState(_0x4b0fd2 = appStore) {
-  return _0x4b0fd2.getStateRaw?.() || _0x4b0fd2.getState?.() || {};
+function getGraphState(store = appStore) {
+  return store.getStateRaw?.() || store.getState?.() || {};
 }
-function getAnchorNode(_0x2171a4, _0x38eca0 = appStore) {
-  const _0x3af383 = getGraphState(_0x38eca0);
-  return _0x3af383.nodes?.[_0x2171a4] || null;
+function getAnchorNode(data, options = appStore) {
+  const graphState = getGraphState(options);
+  return graphState.nodes?.[data] || null;
 }
-function isExtractableImageSize(_0x15a2ce, _0x423381) {
-  const _0x2b4b57 = Math.max(0, Math.round(Number(_0x15a2ce || 0) || 0)),
-    _0x3d09b7 = Math.max(0, Math.round(Number(_0x423381 || 0) || 0));
-  if (!_0x2b4b57 || !_0x3d09b7) return true;
+function isExtractableImageSize(target, source) {
+  const enabled2 = Math.max(0, Math.round(Number(target || 0) || 0)),
+    enabled3 = Math.max(0, Math.round(Number(source || 0) || 0));
+  if (!enabled2 || !enabled3) return true;
   return (
-    _0x2b4b57 >= MIN_EXTRACT_IMAGE_WIDTH &&
-    _0x3d09b7 >= MIN_EXTRACT_IMAGE_HEIGHT &&
-    _0x2b4b57 * _0x3d09b7 >= MIN_EXTRACT_IMAGE_AREA
+    enabled2 >= MIN_EXTRACT_IMAGE_WIDTH &&
+    enabled3 >= MIN_EXTRACT_IMAGE_HEIGHT &&
+    enabled2 * enabled3 >= MIN_EXTRACT_IMAGE_AREA
   );
 }
-function normalizeImageCandidate(_0x520e1c = {}) {
-  const _0x32ab18 = normalizeHttpUrl(_0x520e1c?.url);
-  if (!_0x32ab18) return null;
-  const _0x5e3c54 = {
-    url: _0x32ab18,
-    title: String(_0x520e1c?.title || _0x520e1c?.alt || webPreviewCaptureText('fallback.image'))
+function normalizeImageCandidate(box = {}) {
+  const url = normalizeHttpUrl(box?.url);
+  if (!url) return null;
+  const box2 = {
+    url: url,
+    title: String(box?.title || box?.alt || webPreviewCaptureText('fallback.image'))
       .trim()
       .slice(0, 160),
-    pageUrl: normalizeHttpUrl(_0x520e1c?.pageUrl || _0x520e1c?.sourceUrl || ''),
-    pageTitle: String(_0x520e1c?.pageTitle || '')
+    pageUrl: normalizeHttpUrl(box?.pageUrl || box?.sourceUrl || ''),
+    pageTitle: String(box?.pageTitle || '')
       .trim()
       .slice(0, 160),
-    nodeId: String(_0x520e1c?.nodeId || '').trim(),
-    tabId: String(_0x520e1c?.tabId || '').trim(),
-    width: Math.max(0, Math.round(Number(_0x520e1c?.width || 0) || 0)),
-    height: Math.max(0, Math.round(Number(_0x520e1c?.height || 0) || 0)),
+    nodeId: String(box?.nodeId || '').trim(),
+    tabId: String(box?.tabId || '').trim(),
+    width: Math.max(0, Math.round(Number(box?.width || 0) || 0)),
+    height: Math.max(0, Math.round(Number(box?.height || 0) || 0)),
   };
-  if (!isExtractableImageSize(_0x5e3c54.width, _0x5e3c54.height)) return null;
-  return _0x5e3c54;
+  if (!isExtractableImageSize(box2.width, box2.height)) return null;
+  return box2;
 }
-function normalizeImageCandidates(_0x3cd7e1 = []) {
-  const _0x4329db = new Set(),
-    _0xde6163 = [];
-  for (const _0x236efc of Array.isArray(_0x3cd7e1) ? _0x3cd7e1 : []) {
-    const _0x1f2e6c = normalizeImageCandidate(_0x236efc);
-    if (!_0x1f2e6c || _0x4329db.has(_0x1f2e6c.url)) continue;
-    (_0x4329db.add(_0x1f2e6c.url), _0xde6163.push(_0x1f2e6c));
+function normalizeImageCandidates(list = []) {
+  const map = new Set(),
+    list2 = [];
+  for (const next of Array.isArray(list) ? list : []) {
+    const response = normalizeImageCandidate(next);
+    if (!response || map.has(response.url)) continue;
+    (map.add(response.url), list2.push(response));
   }
-  return _0xde6163;
+  return list2;
 }
-function isStreamMediaUrl(_0x1566ea) {
-  const _0x36dde2 = normalizeHttpUrl(_0x1566ea);
-  if (!_0x36dde2) return false;
+function isStreamMediaUrl(current) {
+  const httpUrl = normalizeHttpUrl(current);
+  if (!httpUrl) return false;
   try {
-    return STREAM_MEDIA_URL_EXTENSION_RE.test(new URL(_0x36dde2).pathname);
+    return STREAM_MEDIA_URL_EXTENSION_RE.test(new URL(httpUrl).pathname);
   } catch {
     return false;
   }
 }
-function normalizeVideoCandidate(_0x2a8c8e = {}) {
-  const _0x5beb2a = normalizeHttpUrl(_0x2a8c8e?.url);
-  if (!_0x5beb2a || isStreamMediaUrl(_0x5beb2a)) return null;
+function normalizeVideoCandidate(box3 = {}) {
+  const url2 = normalizeHttpUrl(box3?.url);
+  if (!url2 || isStreamMediaUrl(url2)) return null;
   return {
     kind: 'video',
-    url: _0x5beb2a,
-    title: String(_0x2a8c8e?.title || webPreviewCaptureText('fallback.video'))
+    url: url2,
+    title: String(box3?.title || webPreviewCaptureText('fallback.video'))
       .trim()
       .slice(0, 160),
-    pageUrl: normalizeHttpUrl(_0x2a8c8e?.pageUrl || _0x2a8c8e?.sourceUrl || ''),
-    pageTitle: String(_0x2a8c8e?.pageTitle || '')
+    pageUrl: normalizeHttpUrl(box3?.pageUrl || box3?.sourceUrl || ''),
+    pageTitle: String(box3?.pageTitle || '')
       .trim()
       .slice(0, 160),
-    nodeId: String(_0x2a8c8e?.nodeId || '').trim(),
-    tabId: String(_0x2a8c8e?.tabId || '').trim(),
-    width: Math.max(0, Math.round(Number(_0x2a8c8e?.width || 0) || 0)),
-    height: Math.max(0, Math.round(Number(_0x2a8c8e?.height || 0) || 0)),
-    duration: Math.max(0, Number(_0x2a8c8e?.duration || 0) || 0),
-    mimeType: String(_0x2a8c8e?.mimeType || '').trim(),
-    sourceType: String(_0x2a8c8e?.sourceType || '')
+    nodeId: String(box3?.nodeId || '').trim(),
+    tabId: String(box3?.tabId || '').trim(),
+    width: Math.max(0, Math.round(Number(box3?.width || 0) || 0)),
+    height: Math.max(0, Math.round(Number(box3?.height || 0) || 0)),
+    duration: Math.max(0, Number(box3?.duration || 0) || 0),
+    mimeType: String(box3?.mimeType || '').trim(),
+    sourceType: String(box3?.sourceType || '')
       .trim()
       .toLowerCase(),
   };
 }
-function normalizeVideoCandidates(_0x194073 = []) {
-  const _0x31ff69 = new Set(),
-    _0x2bb370 = [];
-  for (const _0x52d6a2 of Array.isArray(_0x194073) ? _0x194073 : []) {
-    const _0x564c15 = normalizeVideoCandidate(_0x52d6a2);
-    if (!_0x564c15 || _0x31ff69.has(_0x564c15.url)) continue;
-    (_0x31ff69.add(_0x564c15.url), _0x2bb370.push(_0x564c15));
+function normalizeVideoCandidates(list3 = []) {
+  const map2 = new Set(),
+    list4 = [];
+  for (const entry of Array.isArray(list3) ? list3 : []) {
+    const response2 = normalizeVideoCandidate(entry);
+    if (!response2 || map2.has(response2.url)) continue;
+    (map2.add(response2.url), list4.push(response2));
   }
-  return _0x2bb370;
+  return list4;
 }
-function getViewportCenterTopLeft(_0x1e141a, _0x36575d = appStore) {
-  const _0x12e9fe = getGraphState(_0x36575d),
-    _0x58e7a0 = (globalThis.window?.innerWidth || 0x500) / 2,
-    _0x2ebc10 = (globalThis.window?.innerHeight || 0x2d0) / 2,
-    _0x59dfd2 = screenToWorld(_0x58e7a0, _0x2ebc10, _0x12e9fe.viewport || {});
-  return { x: _0x59dfd2.x - _0x1e141a.width / 2, y: _0x59dfd2.y - _0x1e141a.height / 2 };
+function getViewportCenterTopLeft(box4, record = appStore) {
+  const graphState2 = getGraphState(record),
+    handle = (globalThis.window?.innerWidth || 0x500) / 2,
+    state = (globalThis.window?.innerHeight || 0x2d0) / 2,
+    x = screenToWorld(handle, state, graphState2.viewport || {});
+  return { x: x.x - box4.width / 2, y: x.y - box4.height / 2 };
 }
 function getSingleNodeSpawnPosition({
-  nodeId: _0x5c3f70,
+  nodeId: nodeId,
   storeInstance: storeInstance = appStore,
-  size: _0x1673f8,
+  size: size,
 } = {}) {
-  const _0x28de6f = getGraphState(storeInstance),
-    _0xea15bb = getAnchorNode(_0x5c3f70, storeInstance);
-  return _0xea15bb
-    ? calcSafeSpawnPosNearNode(_0x28de6f.nodes || {}, _0xea15bb, _0x1673f8.width, _0x1673f8.height)
-    : getViewportCenterTopLeft(_0x1673f8, storeInstance);
+  const graphState3 = getGraphState(storeInstance),
+    anchorNode = getAnchorNode(nodeId, storeInstance);
+  return anchorNode
+    ? calcSafeSpawnPosNearNode(graphState3.nodes || {}, anchorNode, size.width, size.height)
+    : getViewportCenterTopLeft(size, storeInstance);
 }
 export function createWebPreviewTextNodeFromSelection({
-  nodeId: _0x50a241,
+  nodeId: nodeId2,
   payload: payload = {},
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
 } = {}) {
-  const _0x23720b = String(payload?.text || '').trim();
-  if (!_0x23720b) return null;
-  const _0xd2a1e8 = getAIGenerationDefaultSizeByType('ai-text'),
-    _0x419478 = getGraphState(storeInstance),
-    _0x53ce72 = getAnchorNode(_0x50a241 || payload?.nodeId, storeInstance),
-    _0x4ecdba = _0x53ce72
-      ? calcSafeSpawnPosNearNode(_0x419478.nodes || {}, _0x53ce72, _0xd2a1e8.width, _0xd2a1e8.height)
-      : getViewportCenterTopLeft(_0xd2a1e8, storeInstance),
-    _0x30fb34 = generateId('ai-text'),
-    _0x15e36f = {
-      id: _0x30fb34,
+  const prompt = String(payload?.text || '').trim();
+  if (!prompt) return null;
+  const width = getAIGenerationDefaultSizeByType('ai-text'),
+    graphState4 = getGraphState(storeInstance),
+    anchorNode2 = getAnchorNode(nodeId2 || payload?.nodeId, storeInstance),
+    x2 = anchorNode2
+      ? calcSafeSpawnPosNearNode(graphState4.nodes || {}, anchorNode2, width.width, width.height)
+      : getViewportCenterTopLeft(width, storeInstance),
+    id = generateId('ai-text'),
+    config = {
+      id: id,
       type: 'ai-text',
-      x: _0x4ecdba.x,
-      y: _0x4ecdba.y,
-      width: _0xd2a1e8.width,
-      height: _0xd2a1e8.height,
+      x: x2.x,
+      y: x2.y,
+      width: width.width,
+      height: width.height,
       name: webPreviewCaptureText('nodeNames.generatedText'),
-      prompt: _0x23720b,
+      prompt: prompt,
       webPageUrl: normalizeHttpUrl(payload?.pageUrl || ''),
       webSourceTitle: String(payload?.webSourceTitle || '')
         .trim()
         .slice(0, 160),
     };
-  return (
-    storeInstance.addNode?.(_0x15e36f),
-    storeInstance.setSelectedNodes?.([_0x30fb34]),
-    commitFn?.(),
-    _0x15e36f
-  );
+  return (storeInstance.addNode?.(config), storeInstance.setSelectedNodes?.([id]), commitFn?.(), config);
 }
 export function createWebPreviewSourceTextNodeFromSelection({
-  nodeId: _0x45b7d6,
+  nodeId: nodeId3,
   payload: payload = {},
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
 } = {}) {
-  const _0x8ca3a9 = String(payload?.text || '').trim();
-  if (!_0x8ca3a9) return null;
-  const _0x44d584 = getNodeDefaultSize('source-text'),
-    _0x5a89f3 = getSingleNodeSpawnPosition({
-      nodeId: _0x45b7d6 || payload?.nodeId,
+  const content = String(payload?.text || '').trim();
+  if (!content) return null;
+  const size2 = getNodeDefaultSize('source-text'),
+    x3 = getSingleNodeSpawnPosition({
+      nodeId: nodeId3 || payload?.nodeId,
       storeInstance: storeInstance,
-      size: _0x44d584,
+      size: size2,
     }),
-    _0x4e34f1 = generateId('source-text'),
-    _0x5068c7 = {
-      id: _0x4e34f1,
+    id2 = generateId('source-text'),
+    scope = {
+      id: id2,
       type: 'source-text',
-      x: _0x5a89f3.x,
-      y: _0x5a89f3.y,
-      width: _0x44d584.width,
-      height: _0x44d584.height,
+      x: x3.x,
+      y: x3.y,
+      width: size2.width,
+      height: size2.height,
       name: webPreviewCaptureText('nodeNames.sourceText'),
-      content: _0x8ca3a9,
+      content: content,
       webPageUrl: normalizeHttpUrl(payload?.pageUrl || ''),
       webSourceTitle: String(payload?.webSourceTitle || '')
         .trim()
         .slice(0, 160),
     };
-  return (
-    storeInstance.addNode?.(_0x5068c7),
-    storeInstance.setSelectedNodes?.([_0x4e34f1]),
-    commitFn?.(),
-    _0x5068c7
-  );
+  return (storeInstance.addNode?.(scope), storeInstance.setSelectedNodes?.([id2]), commitFn?.(), scope);
 }
 export function createWebPreviewImagePromptNodeFromSelection({
-  nodeId: _0x344b00,
+  nodeId: nodeId4,
   payload: payload = {},
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
 } = {}) {
-  const _0x127f5b = String(payload?.text || '').trim();
-  if (!_0x127f5b) return null;
-  const _0x48cec6 = getAIGenerationDefaultSizeByType('ai-image'),
-    _0x12f44f = getSingleNodeSpawnPosition({
-      nodeId: _0x344b00 || payload?.nodeId,
+  const prompt2 = String(payload?.text || '').trim();
+  if (!prompt2) return null;
+  const size3 = getAIGenerationDefaultSizeByType('ai-image'),
+    x4 = getSingleNodeSpawnPosition({
+      nodeId: nodeId4 || payload?.nodeId,
       storeInstance: storeInstance,
-      size: _0x48cec6,
+      size: size3,
     }),
-    _0x2e2c48 = generateId('ai-image'),
-    _0x54d4a0 = {
-      id: _0x2e2c48,
+    id3 = generateId('ai-image'),
+    input = {
+      id: id3,
       type: 'ai-image',
-      x: _0x12f44f.x,
-      y: _0x12f44f.y,
-      width: _0x48cec6.width,
-      height: _0x48cec6.height,
+      x: x4.x,
+      y: x4.y,
+      width: size3.width,
+      height: size3.height,
       name: webPreviewCaptureText('nodeNames.imagePrompt'),
-      prompt: _0x127f5b,
+      prompt: prompt2,
       webPageUrl: normalizeHttpUrl(payload?.pageUrl || ''),
       webSourceTitle: String(payload?.webSourceTitle || '')
         .trim()
         .slice(0, 160),
     };
-  return (
-    storeInstance.addNode?.(_0x54d4a0),
-    storeInstance.setSelectedNodes?.([_0x2e2c48]),
-    commitFn?.(),
-    _0x54d4a0
-  );
+  return (storeInstance.addNode?.(input), storeInstance.setSelectedNodes?.([id3]), commitFn?.(), input);
 }
 export function createWebPreviewVideoPromptNodeFromSelection({
-  nodeId: _0x506345,
+  nodeId: nodeId5,
   payload: payload = {},
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
 } = {}) {
-  const _0xdf7336 = String(payload?.text || '').trim();
-  if (!_0xdf7336) return null;
-  const _0x51767c = getAIGenerationDefaultSizeByType('ai-video'),
-    _0x3b2c9c = getSingleNodeSpawnPosition({
-      nodeId: _0x506345 || payload?.nodeId,
+  const prompt3 = String(payload?.text || '').trim();
+  if (!prompt3) return null;
+  const size4 = getAIGenerationDefaultSizeByType('ai-video'),
+    x5 = getSingleNodeSpawnPosition({
+      nodeId: nodeId5 || payload?.nodeId,
       storeInstance: storeInstance,
-      size: _0x51767c,
+      size: size4,
     }),
-    _0x371bda = generateId('ai-video'),
-    _0x363c42 = {
-      id: _0x371bda,
+    id4 = generateId('ai-video'),
+    output = {
+      id: id4,
       type: 'ai-video',
-      x: _0x3b2c9c.x,
-      y: _0x3b2c9c.y,
-      width: _0x51767c.width,
-      height: _0x51767c.height,
+      x: x5.x,
+      y: x5.y,
+      width: size4.width,
+      height: size4.height,
       name: webPreviewCaptureText('nodeNames.videoPrompt'),
-      prompt: _0xdf7336,
+      prompt: prompt3,
       webPageUrl: normalizeHttpUrl(payload?.pageUrl || ''),
       webSourceTitle: String(payload?.webSourceTitle || '')
         .trim()
         .slice(0, 160),
     };
-  return (
-    storeInstance.addNode?.(_0x363c42),
-    storeInstance.setSelectedNodes?.([_0x371bda]),
-    commitFn?.(),
-    _0x363c42
-  );
+  return (storeInstance.addNode?.(output), storeInstance.setSelectedNodes?.([id4]), commitFn?.(), output);
 }
 export function createWebPreviewImageNodeFromContext({
-  nodeId: _0x474c44,
+  nodeId: nodeId6,
   payload: payload = {},
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
   projectId: projectId = globalThis.window?.currentProjectId,
   importRemote: importRemote = true,
-  importRemoteAsset: _0x1d46a2,
+  importRemoteAsset: importRemoteAsset,
 } = {}) {
-  const _0x43f2b8 = normalizeImageCandidate(payload);
-  if (!_0x43f2b8) return null;
-  const _0x30db58 = getNodeDefaultSize('source-image'),
-    _0x50d4e6 = getSingleNodeSpawnPosition({
-      nodeId: _0x474c44 || _0x43f2b8.nodeId,
+  const title = normalizeImageCandidate(payload);
+  if (!title) return null;
+  const size5 = getNodeDefaultSize('source-image'),
+    worldX = getSingleNodeSpawnPosition({
+      nodeId: nodeId6 || title.nodeId,
       storeInstance: storeInstance,
-      size: _0x30db58,
+      size: size5,
     }),
-    _0x387f9c = createWebImageSourceNode({
+    webImageSourceNode = createWebImageSourceNode({
       payload: {
-        ..._0x43f2b8,
-        title: _0x43f2b8.title || _0x43f2b8.pageTitle || webPreviewCaptureText('fallback.image'),
-        pageUrl: _0x43f2b8.pageUrl,
+        ...title,
+        title: title.title || title.pageTitle || webPreviewCaptureText('fallback.image'),
+        pageUrl: title.pageUrl,
       },
-      worldX: _0x50d4e6.x,
-      worldY: _0x50d4e6.y,
+      worldX: worldX.x,
+      worldY: worldX.y,
       storeInstance: storeInstance,
       projectId: projectId,
       select: true,
       importRemote: importRemote,
-      importRemoteAsset: _0x1d46a2,
+      importRemoteAsset: importRemoteAsset,
     });
-  if (_0x387f9c) commitFn?.();
-  return _0x387f9c;
+  if (webImageSourceNode) commitFn?.();
+  return webImageSourceNode;
 }
 export function createWebPreviewReverseImagePromptNodes({
-  nodeId: _0x52f977,
+  nodeId: nodeId7,
   payload: payload = {},
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
   projectId: projectId = globalThis.window?.currentProjectId,
   importRemote: importRemote = true,
-  importRemoteAsset: _0x2e3f84,
+  importRemoteAsset: importRemoteAsset2,
 } = {}) {
-  const _0x351ec6 = normalizeImageCandidate(payload);
-  if (!_0x351ec6) return null;
-  const _0x818043 = getNodeDefaultSize('source-image'),
-    _0x176f9d = getSingleNodeSpawnPosition({
-      nodeId: _0x52f977 || _0x351ec6.nodeId,
+  const title2 = normalizeImageCandidate(payload);
+  if (!title2) return null;
+  const size6 = getNodeDefaultSize('source-image'),
+    worldX2 = getSingleNodeSpawnPosition({
+      nodeId: nodeId7 || title2.nodeId,
       storeInstance: storeInstance,
-      size: _0x818043,
+      size: size6,
     }),
-    _0x4c3f5e = createWebImageSourceNode({
+    sourceId = createWebImageSourceNode({
       payload: {
-        ..._0x351ec6,
-        title: _0x351ec6.title || _0x351ec6.pageTitle || webPreviewCaptureText('fallback.image'),
-        pageUrl: _0x351ec6.pageUrl,
+        ...title2,
+        title: title2.title || title2.pageTitle || webPreviewCaptureText('fallback.image'),
+        pageUrl: title2.pageUrl,
       },
-      worldX: _0x176f9d.x,
-      worldY: _0x176f9d.y,
+      worldX: worldX2.x,
+      worldY: worldX2.y,
       storeInstance: storeInstance,
       projectId: projectId,
       select: false,
       importRemote: importRemote,
-      importRemoteAsset: _0x2e3f84,
+      importRemoteAsset: importRemoteAsset2,
     });
-  if (!_0x4c3f5e) return null;
-  const _0x155fb0 = getAIGenerationDefaultSizeByType('ai-text'),
-    _0x517461 = getGraphState(storeInstance),
-    _0x505c81 = calcSafeSpawnPosNearNode(
-      { ...(_0x517461.nodes || {}), [_0x4c3f5e.id]: _0x4c3f5e },
-      _0x4c3f5e,
-      _0x155fb0.width,
-      _0x155fb0.height,
+  if (!sourceId) return null;
+  const width2 = getAIGenerationDefaultSizeByType('ai-text'),
+    graphState5 = getGraphState(storeInstance),
+    x6 = calcSafeSpawnPosNearNode(
+      { ...(graphState5.nodes || {}), [sourceId.id]: sourceId },
+      sourceId,
+      width2.width,
+      width2.height,
     ),
-    _0x28a45d = generateId('ai-text'),
-    _0x1d9d41 = {
-      id: _0x28a45d,
+    id5 = generateId('ai-text'),
+    targetId = {
+      id: id5,
       type: 'ai-text',
-      x: _0x505c81.x,
-      y: _0x505c81.y,
-      width: _0x155fb0.width,
-      height: _0x155fb0.height,
+      x: x6.x,
+      y: x6.y,
+      width: width2.width,
+      height: width2.height,
       name: WEB_PREVIEW_REVERSE_IMAGE_PROMPT_NODE_NAME,
       prompt: REVERSE_IMAGE_PROMPT_PRESET_PROMPT,
-      webPageUrl: _0x351ec6.pageUrl,
-      webSourceTitle: (_0x351ec6.pageTitle || _0x351ec6.title || '').slice(0, 160),
+      webPageUrl: title2.pageUrl,
+      webSourceTitle: (title2.pageTitle || title2.title || '').slice(0, 160),
     },
-    _0x3c2e1a = { id: generateId('edge'), sourceId: _0x4c3f5e.id, targetId: _0x1d9d41.id };
+    edge = { id: generateId('edge'), sourceId: sourceId.id, targetId: targetId.id };
   return (
-    storeInstance.addNode?.(_0x1d9d41),
-    storeInstance.addEdge?.(_0x3c2e1a),
-    storeInstance.setSelectedNodes?.([_0x1d9d41.id]),
+    storeInstance.addNode?.(targetId),
+    storeInstance.addEdge?.(edge),
+    storeInstance.setSelectedNodes?.([targetId.id]),
     commitFn?.(),
-    { imageNode: _0x4c3f5e, textNode: _0x1d9d41, edge: _0x3c2e1a }
+    { imageNode: sourceId, textNode: targetId, edge: edge }
   );
 }
 export function createBatchWebImageNodes({
-  nodeId: _0x2639c2,
+  nodeId: nodeId8,
   candidates: candidates = [],
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
   projectId: projectId = globalThis.window?.currentProjectId,
 } = {}) {
-  const _0xdbb60d = normalizeImageCandidates(candidates).slice(0, MAX_BATCH_CREATE_COUNT);
-  if (!_0xdbb60d.length) return [];
-  const _0x2003aa = getGraphState(storeInstance),
-    _0x3bce09 = getAnchorNode(_0x2639c2, storeInstance),
-    _0x2495eb = getNodeDefaultSize('source-image'),
-    _0x59c8da = _0x3bce09
+  const itemCount = normalizeImageCandidates(candidates).slice(0, MAX_BATCH_CREATE_COUNT);
+  if (!itemCount.length) return [];
+  const nodes = getGraphState(storeInstance),
+    anchorNode3 = getAnchorNode(nodeId8, storeInstance),
+    itemWidth = getNodeDefaultSize('source-image'),
+    value2 = anchorNode3
       ? createBatchSpawnLayoutNearNode({
-          nodes: _0x2003aa.nodes || {},
-          anchorNode: _0x3bce09,
-          itemCount: _0xdbb60d.length,
-          itemWidth: _0x2495eb.width,
-          itemHeight: _0x2495eb.height,
+          nodes: nodes.nodes || {},
+          anchorNode: anchorNode3,
+          itemCount: itemCount.length,
+          itemWidth: itemWidth.width,
+          itemHeight: itemWidth.height,
         })
       : null,
-    _0x441d68 = _0x59c8da ? null : getViewportCenterTopLeft(_0x2495eb, storeInstance),
-    _0x1e62c5 = [];
+    x7 = value2 ? null : getViewportCenterTopLeft(itemWidth, storeInstance),
+    list5 = [];
   return (
-    _0xdbb60d.forEach((_0x28e70f, _0x2324aa) => {
-      const _0x5c7cf8 = _0x59c8da
-          ? _0x59c8da.getItemPosition(_0x2324aa)
-          : { x: _0x441d68.x + _0x2324aa * 30, y: _0x441d68.y + _0x2324aa * 30 },
-        _0x3e6c8f = createWebImageSourceNode({
+    itemCount.forEach((title3, value3) => {
+      const worldX3 = value2
+          ? value2.getItemPosition(value3)
+          : { x: x7.x + value3 * 30, y: x7.y + value3 * 30 },
+        webImageSourceNode2 = createWebImageSourceNode({
           payload: {
-            ..._0x28e70f,
-            title: _0x28e70f.title || _0x28e70f.pageTitle || webPreviewCaptureText('fallback.image'),
-            pageUrl: _0x28e70f.pageUrl,
+            ...title3,
+            title: title3.title || title3.pageTitle || webPreviewCaptureText('fallback.image'),
+            pageUrl: title3.pageUrl,
           },
-          worldX: _0x5c7cf8.x,
-          worldY: _0x5c7cf8.y,
+          worldX: worldX3.x,
+          worldY: worldX3.y,
           storeInstance: storeInstance,
           projectId: projectId,
           select: false,
         });
-      if (_0x3e6c8f) _0x1e62c5.push(_0x3e6c8f);
+      if (webImageSourceNode2) list5.push(webImageSourceNode2);
     }),
-    _0x1e62c5.length &&
-      (storeInstance.setSelectedNodes?.(_0x1e62c5.map((_0x5a3531) => _0x5a3531.id)), commitFn?.()),
-    _0x1e62c5
+    list5.length && (storeInstance.setSelectedNodes?.(list5.map((item2) => item2.id)), commitFn?.()),
+    list5
   );
 }
 export function createBatchWebVideoNodes({
-  nodeId: _0x2f161b,
+  nodeId: nodeId9,
   candidates: candidates = [],
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
   projectId: projectId = globalThis.window?.currentProjectId,
   rightsConfirmed: rightsConfirmed = false,
-  importRemoteAsset: _0x2f74df,
+  importRemoteAsset: importRemoteAsset3,
 } = {}) {
-  const _0x16fc1b = normalizeVideoCandidates(candidates).slice(0, MAX_VIDEO_CREATE_COUNT);
-  if (!_0x16fc1b.length || rightsConfirmed !== true) return [];
-  const _0x463fd3 = getGraphState(storeInstance),
-    _0x4da816 = getAnchorNode(_0x2f161b, storeInstance),
-    _0x4c9d9e = getNodeDefaultSize('source-video'),
-    _0x480564 = _0x4da816
+  const itemCount2 = normalizeVideoCandidates(candidates).slice(0, MAX_VIDEO_CREATE_COUNT);
+  if (!itemCount2.length || rightsConfirmed !== true) return [];
+  const nodes2 = getGraphState(storeInstance),
+    anchorNode4 = getAnchorNode(nodeId9, storeInstance),
+    itemWidth2 = getNodeDefaultSize('source-video'),
+    value4 = anchorNode4
       ? createBatchSpawnLayoutNearNode({
-          nodes: _0x463fd3.nodes || {},
-          anchorNode: _0x4da816,
-          itemCount: _0x16fc1b.length,
-          itemWidth: _0x4c9d9e.width,
-          itemHeight: _0x4c9d9e.height,
+          nodes: nodes2.nodes || {},
+          anchorNode: anchorNode4,
+          itemCount: itemCount2.length,
+          itemWidth: itemWidth2.width,
+          itemHeight: itemWidth2.height,
         })
       : null,
-    _0xa11c46 = _0x480564 ? null : getViewportCenterTopLeft(_0x4c9d9e, storeInstance),
-    _0x47766d = [];
+    x8 = value4 ? null : getViewportCenterTopLeft(itemWidth2, storeInstance),
+    list6 = [];
   return (
-    _0x16fc1b.forEach((_0x16beaf, _0x3a1ba9) => {
-      const _0x181648 = _0x480564
-          ? _0x480564.getItemPosition(_0x3a1ba9)
-          : { x: _0xa11c46.x + _0x3a1ba9 * 30, y: _0xa11c46.y + _0x3a1ba9 * 30 },
-        _0x1e0489 = createWebVideoSourceNode({
+    itemCount2.forEach((title4, value5) => {
+      const worldX4 = value4
+          ? value4.getItemPosition(value5)
+          : { x: x8.x + value5 * 30, y: x8.y + value5 * 30 },
+        webVideoSourceNode = createWebVideoSourceNode({
           payload: {
-            ..._0x16beaf,
-            title: _0x16beaf.title || _0x16beaf.pageTitle || webPreviewCaptureText('fallback.video'),
-            pageUrl: _0x16beaf.pageUrl,
+            ...title4,
+            title: title4.title || title4.pageTitle || webPreviewCaptureText('fallback.video'),
+            pageUrl: title4.pageUrl,
             rightsConfirmed: rightsConfirmed,
           },
-          worldX: _0x181648.x,
-          worldY: _0x181648.y,
+          worldX: worldX4.x,
+          worldY: worldX4.y,
           storeInstance: storeInstance,
           projectId: projectId,
-          importRemoteAsset: _0x2f74df,
+          importRemoteAsset: importRemoteAsset3,
           select: false,
         });
-      if (_0x1e0489) _0x47766d.push(_0x1e0489);
+      if (webVideoSourceNode) list6.push(webVideoSourceNode);
     }),
-    _0x47766d.length &&
-      (storeInstance.setSelectedNodes?.(_0x47766d.map((_0x5c2761) => _0x5c2761.id)), commitFn?.()),
-    _0x47766d
+    list6.length && (storeInstance.setSelectedNodes?.(list6.map((item3) => item3.id)), commitFn?.()),
+    list6
   );
 }
 export function createBatchWebMediaNodes({
-  nodeId: _0x26349e,
+  nodeId: nodeId10,
   imageCandidates: imageCandidates = [],
   videoCandidates: videoCandidates = [],
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
   projectId: projectId = globalThis.window?.currentProjectId,
   rightsConfirmed: rightsConfirmed = false,
-  importRemoteAsset: _0x5cb147,
+  importRemoteAsset: importRemoteAsset4,
 } = {}) {
-  const _0x332025 = normalizeImageCandidates(imageCandidates).slice(0, MAX_BATCH_CREATE_COUNT),
-    _0x30a895 =
+  const list7 = normalizeImageCandidates(imageCandidates).slice(0, MAX_BATCH_CREATE_COUNT),
+    list8 =
       rightsConfirmed === true
         ? normalizeVideoCandidates(videoCandidates).slice(0, MAX_VIDEO_CREATE_COUNT)
         : [],
-    _0xd46c77 = [
-      ..._0x332025.map((_0x34c15d) => ({ kind: 'image', candidate: _0x34c15d })),
-      ..._0x30a895.map((_0x1db36e) => ({ kind: 'video', candidate: _0x1db36e })),
+    itemCount3 = [
+      ...list7.map((candidate) => ({ kind: 'image', candidate: candidate })),
+      ...list8.map((candidate2) => ({ kind: 'video', candidate: candidate2 })),
     ];
-  if (!_0xd46c77.length) return [];
-  const _0x401b90 = getGraphState(storeInstance),
-    _0x72a2e3 = getAnchorNode(_0x26349e, storeInstance),
-    _0x5e43c9 = getNodeDefaultSize('source-image'),
-    _0x5cb47f = _0x72a2e3
+  if (!itemCount3.length) return [];
+  const nodes3 = getGraphState(storeInstance),
+    anchorNode5 = getAnchorNode(nodeId10, storeInstance),
+    itemWidth3 = getNodeDefaultSize('source-image'),
+    value6 = anchorNode5
       ? createBatchSpawnLayoutNearNode({
-          nodes: _0x401b90.nodes || {},
-          anchorNode: _0x72a2e3,
-          itemCount: _0xd46c77.length,
-          itemWidth: _0x5e43c9.width,
-          itemHeight: _0x5e43c9.height,
+          nodes: nodes3.nodes || {},
+          anchorNode: anchorNode5,
+          itemCount: itemCount3.length,
+          itemWidth: itemWidth3.width,
+          itemHeight: itemWidth3.height,
         })
       : null,
-    _0xe3fb44 = _0x5cb47f ? null : getViewportCenterTopLeft(_0x5e43c9, storeInstance),
-    _0x486bd4 = [];
+    x9 = value6 ? null : getViewportCenterTopLeft(itemWidth3, storeInstance),
+    list9 = [];
   return (
-    _0xd46c77.forEach((_0xcb9fa7, _0x513aca) => {
-      const _0x5d8af0 = _0x5cb47f
-          ? _0x5cb47f.getItemPosition(_0x513aca)
-          : { x: _0xe3fb44.x + _0x513aca * 30, y: _0xe3fb44.y + _0x513aca * 30 },
-        _0x4301fd = {
-          worldX: _0x5d8af0.x,
-          worldY: _0x5d8af0.y,
+    itemCount3.forEach((title5, value7) => {
+      const worldX5 = value6
+          ? value6.getItemPosition(value7)
+          : { x: x9.x + value7 * 30, y: x9.y + value7 * 30 },
+        args = {
+          worldX: worldX5.x,
+          worldY: worldX5.y,
           storeInstance: storeInstance,
           projectId: projectId,
           select: false,
-          importRemoteAsset: _0x5cb147,
+          importRemoteAsset: importRemoteAsset4,
         },
-        _0xb060f6 =
-          _0xcb9fa7.kind === 'video'
+        value8 =
+          title5.kind === 'video'
             ? createWebVideoSourceNode({
-                ..._0x4301fd,
+                ...args,
                 payload: {
-                  ..._0xcb9fa7.candidate,
+                  ...title5.candidate,
                   title:
-                    _0xcb9fa7.candidate.title ||
-                    _0xcb9fa7.candidate.pageTitle ||
+                    title5.candidate.title ||
+                    title5.candidate.pageTitle ||
                     webPreviewCaptureText('fallback.video'),
-                  pageUrl: _0xcb9fa7.candidate.pageUrl,
+                  pageUrl: title5.candidate.pageUrl,
                   rightsConfirmed: true,
                 },
               })
             : createWebImageSourceNode({
-                ..._0x4301fd,
+                ...args,
                 payload: {
-                  ..._0xcb9fa7.candidate,
+                  ...title5.candidate,
                   title:
-                    _0xcb9fa7.candidate.title ||
-                    _0xcb9fa7.candidate.pageTitle ||
+                    title5.candidate.title ||
+                    title5.candidate.pageTitle ||
                     webPreviewCaptureText('fallback.image'),
-                  pageUrl: _0xcb9fa7.candidate.pageUrl,
+                  pageUrl: title5.candidate.pageUrl,
                 },
               });
-      if (_0xb060f6) _0x486bd4.push(_0xb060f6);
+      if (value8) list9.push(value8);
     }),
-    _0x486bd4.length &&
-      (storeInstance.setSelectedNodes?.(_0x486bd4.map((_0x522d9f) => _0x522d9f.id)), commitFn?.()),
-    _0x486bd4
+    list9.length && (storeInstance.setSelectedNodes?.(list9.map((item4) => item4.id)), commitFn?.()),
+    list9
   );
 }
 export function createWebReferenceCardNode({
-  nodeId: _0x5c3e93,
+  nodeId: nodeId11,
   payload: payload = {},
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
 } = {}) {
-  const _0x33f014 = normalizeHttpUrl(payload?.pageUrl || payload?.url || ''),
-    _0x1a7205 = String(
-      payload?.pageTitle || payload?.title || _0x33f014 || webPreviewCaptureText('fallback.reference'),
+  const webPageUrl = normalizeHttpUrl(payload?.pageUrl || payload?.url || ''),
+    webSourceTitle = String(
+      payload?.pageTitle || payload?.title || webPageUrl || webPreviewCaptureText('fallback.reference'),
     )
       .trim()
       .slice(0, 160),
-    _0x392976 = String(payload?.selectedText || payload?.text || '')
+    webSelectedText = String(payload?.selectedText || payload?.text || '')
       .trim()
       .slice(0, 0x1388),
-    _0x5cdfc0 = String(payload?.screenshotDataUrl || payload?.screenshot || ''),
-    _0x5415b5 = String(payload?.capturedAt || new Date().toISOString()).trim(),
-    _0x6d63af = getNodeDefaultSize('web-reference-card'),
-    _0xbd4bc8 = getGraphState(storeInstance),
-    _0x49a793 = getAnchorNode(_0x5c3e93 || payload?.nodeId, storeInstance),
-    _0x521936 = _0x49a793
-      ? calcSafeSpawnPosNearNode(_0xbd4bc8.nodes || {}, _0x49a793, _0x6d63af.width, _0x6d63af.height)
-      : getViewportCenterTopLeft(_0x6d63af, storeInstance),
-    _0x57b632 = generateId('web-reference-card'),
-    _0x3ad4a0 = {
-      id: _0x57b632,
+    webScreenshotUrl = String(payload?.screenshotDataUrl || payload?.screenshot || ''),
+    webCapturedAt = String(payload?.capturedAt || new Date().toISOString()).trim(),
+    width3 = getNodeDefaultSize('web-reference-card'),
+    graphState6 = getGraphState(storeInstance),
+    anchorNode6 = getAnchorNode(nodeId11 || payload?.nodeId, storeInstance),
+    x10 = anchorNode6
+      ? calcSafeSpawnPosNearNode(graphState6.nodes || {}, anchorNode6, width3.width, width3.height)
+      : getViewportCenterTopLeft(width3, storeInstance),
+    id6 = generateId('web-reference-card'),
+    value9 = {
+      id: id6,
       type: 'web-reference-card',
-      x: _0x521936.x,
-      y: _0x521936.y,
-      width: _0x6d63af.width,
-      height: _0x6d63af.height,
+      x: x10.x,
+      y: x10.y,
+      width: width3.width,
+      height: width3.height,
       name: webPreviewCaptureText('nodeNames.webReference'),
-      webSourceTitle: _0x1a7205,
-      webPageUrl: _0x33f014,
-      webScreenshotUrl: _0x5cdfc0.startsWith('data:image/') ? _0x5cdfc0 : '',
-      webSelectedText: _0x392976,
-      webCapturedAt: _0x5415b5,
+      webSourceTitle: webSourceTitle,
+      webPageUrl: webPageUrl,
+      webScreenshotUrl: webScreenshotUrl.startsWith('data:image/') ? webScreenshotUrl : '',
+      webSelectedText: webSelectedText,
+      webCapturedAt: webCapturedAt,
     };
+  return (storeInstance.addNode?.(value9), storeInstance.setSelectedNodes?.([id6]), commitFn?.(), value9);
+}
+function createImagePickerItem(el, box5, map3, handler) {
+  const el2 = el.createElement('label');
+  el2.className = 'web-preview-image-picker-item';
+  const el3 = el.createElement('input');
+  ((el3.type = 'checkbox'),
+    (el3.checked = map3.has(box5.url)),
+    el3.addEventListener('change', () => handler(box5.url, el3.checked)));
+  const value10 = el.createElement('img');
+  ((value10.className = 'web-preview-image-picker-thumb'),
+    (value10.src = box5.url),
+    (value10.alt = box5.title || ''),
+    (value10.loading = 'lazy'),
+    (value10.decoding = 'async'),
+    (value10.referrerPolicy = 'no-referrer'));
+  const el4 = el.createElement('span');
+  ((el4.className = 'web-preview-image-picker-title'),
+    (el4.textContent = box5.title || webPreviewCaptureText('fallback.image')));
+  const el5 = el.createElement('span');
   return (
-    storeInstance.addNode?.(_0x3ad4a0),
-    storeInstance.setSelectedNodes?.([_0x57b632]),
-    commitFn?.(),
-    _0x3ad4a0
+    (el5.className = 'web-preview-image-picker-meta'),
+    (el5.textContent = box5.width && box5.height ? box5.width + ' x ' + box5.height : ''),
+    el2.appendChild(el3),
+    el2.appendChild(value10),
+    el2.appendChild(el4),
+    el2.appendChild(el5),
+    el2
   );
 }
-function createImagePickerItem(_0x13f681, _0x2fa146, _0x13af02, _0x22abbc) {
-  const _0x20d7e4 = _0x13f681.createElement('label');
-  _0x20d7e4.className = 'web-preview-image-picker-item';
-  const _0x5c7062 = _0x13f681.createElement('input');
-  ((_0x5c7062.type = 'checkbox'),
-    (_0x5c7062.checked = _0x13af02.has(_0x2fa146.url)),
-    _0x5c7062.addEventListener('change', () => _0x22abbc(_0x2fa146.url, _0x5c7062.checked)));
-  const _0x264873 = _0x13f681.createElement('img');
-  ((_0x264873.className = 'web-preview-image-picker-thumb'),
-    (_0x264873.src = _0x2fa146.url),
-    (_0x264873.alt = _0x2fa146.title || ''),
-    (_0x264873.loading = 'lazy'),
-    (_0x264873.decoding = 'async'),
-    (_0x264873.referrerPolicy = 'no-referrer'));
-  const _0x5a2039 = _0x13f681.createElement('span');
-  ((_0x5a2039.className = 'web-preview-image-picker-title'),
-    (_0x5a2039.textContent = _0x2fa146.title || webPreviewCaptureText('fallback.image')));
-  const _0x589d1a = _0x13f681.createElement('span');
-  return (
-    (_0x589d1a.className = 'web-preview-image-picker-meta'),
-    (_0x589d1a.textContent =
-      _0x2fa146.width && _0x2fa146.height ? _0x2fa146.width + ' x ' + _0x2fa146.height : ''),
-    _0x20d7e4.appendChild(_0x5c7062),
-    _0x20d7e4.appendChild(_0x264873),
-    _0x20d7e4.appendChild(_0x5a2039),
-    _0x20d7e4.appendChild(_0x589d1a),
-    _0x20d7e4
-  );
+function formatVideoDuration(value11) {
+  const enabled4 = Math.round(Number(value11 || 0) || 0);
+  if (!enabled4) return '';
+  const value12 = Math.floor(enabled4 / 60),
+    value13 = enabled4 % 60;
+  return value12 + ':' + String(value13).padStart(2, '0');
 }
-function formatVideoDuration(_0x5b6792) {
-  const _0x47c369 = Math.round(Number(_0x5b6792 || 0) || 0);
-  if (!_0x47c369) return '';
-  const _0x2c7526 = Math.floor(_0x47c369 / 60),
-    _0x191cfb = _0x47c369 % 60;
-  return _0x2c7526 + ':' + String(_0x191cfb).padStart(2, '0');
+function formatVideoCandidateIndex(value14) {
+  const value15 = Math.max(1, Math.round(Number(value14 || 0) || 0) + 1);
+  return '#' + String(value15).padStart(2, '0');
 }
-function formatVideoCandidateIndex(_0x504441) {
-  const _0x4bd098 = Math.max(1, Math.round(Number(_0x504441 || 0) || 0) + 1);
-  return '#' + String(_0x4bd098).padStart(2, '0');
-}
-function getUrlHost(_0x498318) {
+function getUrlHost(value16) {
   try {
-    return new URL(_0x498318).hostname;
+    return new URL(value16).hostname;
   } catch {
     return '';
   }
 }
-function shortenVideoToken(_0x98dbc8, _0x4a27ca = 24) {
-  const _0x129fc1 = String(_0x98dbc8 || '').trim();
-  if (_0x129fc1.length <= _0x4a27ca) return _0x129fc1;
-  return _0x129fc1.slice(0, Math.max(6, _0x4a27ca - 7)) + '...' + _0x129fc1.slice(-4);
+function shortenVideoToken(value17, value18 = 24) {
+  const list10 = String(value17 || '').trim();
+  if (list10.length <= value18) return list10;
+  return list10.slice(0, Math.max(6, value18 - 7)) + '...' + list10.slice(-4);
 }
-function getVideoUrlFingerprint(_0x50d86b) {
+function getVideoUrlFingerprint(value19) {
   try {
-    const _0x812d84 = new URL(_0x50d86b),
-      _0x495b31 = ['video_id', 'vid', 'item_id', 'aweme_id', 'note_id', 'id', 'aid', 'file_id'];
-    for (const _0x7d30c1 of _0x495b31) {
-      const _0x2d8412 = _0x812d84.searchParams.get(_0x7d30c1);
-      if (_0x2d8412) return _0x7d30c1 + '=' + shortenVideoToken(_0x2d8412, 22);
+    const uRL2 = new URL(value19),
+      value20 = ['video_id', 'vid', 'item_id', 'aweme_id', 'note_id', 'id', 'aid', 'file_id'];
+    for (const value21 of value20) {
+      const value22 = uRL2.searchParams.get(value21);
+      if (value22) return value21 + '=' + shortenVideoToken(value22, 22);
     }
-    const _0x275d55 = _0x812d84.pathname.split('/').filter(Boolean),
-      _0x5371af = decodeURIComponent(_0x275d55.at(-1) || '').trim();
-    if (_0x5371af && _0x5371af !== 'play' && _0x5371af !== 'video') return shortenVideoToken(_0x5371af, 28);
-    const _0x22a499 = Array.from(_0x812d84.searchParams.entries())[0];
-    if (_0x22a499) return _0x22a499[0] + '=' + shortenVideoToken(_0x22a499[1], 22);
-    return _0x812d84.hostname;
+    const value23 = uRL2.pathname.split('/').filter(Boolean),
+      decodeURIComponent2 = decodeURIComponent(value23.at(-1) || '').trim();
+    if (decodeURIComponent2 && decodeURIComponent2 !== 'play' && decodeURIComponent2 !== 'video')
+      return shortenVideoToken(decodeURIComponent2, 28);
+    const value24 = Array.from(uRL2.searchParams.entries())[0];
+    if (value24) return value24[0] + '=' + shortenVideoToken(value24[1], 22);
+    return uRL2.hostname;
   } catch {
     return '';
   }
 }
-function getVideoSourceLabel(_0x26050c) {
-  const _0x6d0aeb = String(_0x26050c || '')
+function getVideoSourceLabel(value25) {
+  const value26 = String(value25 || '')
     .trim()
     .toLowerCase();
   return (
@@ -697,590 +669,568 @@ function getVideoSourceLabel(_0x26050c) {
       'embedded-url': webPreviewCaptureText('videoSources.scriptUrl'),
       'structured-data': webPreviewCaptureText('videoSources.structuredData'),
       'douyin-detail': webPreviewCaptureText('videoSources.douyinDetail'),
-    }[_0x6d0aeb] || webPreviewCaptureText('videoSources.videoSource')
+    }[value26] || webPreviewCaptureText('videoSources.videoSource')
   );
 }
-function buildVideoCandidateTooltip(_0x56e5b9, _0x54e9a2) {
-  const _0x29392a = [
-    _0x54e9a2 + ' ' + (_0x56e5b9.title || webPreviewCaptureText('fallback.video')),
-    webPreviewCaptureText('videoTooltip.source', { source: getVideoSourceLabel(_0x56e5b9.sourceType) }),
-    _0x56e5b9.url ? webPreviewCaptureText('videoTooltip.url', { url: _0x56e5b9.url }) : '',
-    _0x56e5b9.pageUrl ? webPreviewCaptureText('videoTooltip.page', { url: _0x56e5b9.pageUrl }) : '',
+function buildVideoCandidateTooltip(url3, value27) {
+  const list11 = [
+    value27 + ' ' + (url3.title || webPreviewCaptureText('fallback.video')),
+    webPreviewCaptureText('videoTooltip.source', { source: getVideoSourceLabel(url3.sourceType) }),
+    url3.url ? webPreviewCaptureText('videoTooltip.url', { url: url3.url }) : '',
+    url3.pageUrl ? webPreviewCaptureText('videoTooltip.page', { url: url3.pageUrl }) : '',
   ];
-  return _0x29392a.filter(Boolean).join('\n');
+  return list11.filter(Boolean).join('\n');
 }
-function createVideoPickerItem(_0x3f5f4f, _0x1b57fc, _0x2305a2, _0x1e1044, _0x4feda1 = 0) {
-  const _0x184dd4 = _0x3f5f4f.createElement('label');
-  _0x184dd4.className = 'web-preview-image-picker-item web-preview-video-picker-item';
-  const _0x14f453 = formatVideoCandidateIndex(_0x4feda1);
-  _0x184dd4.title = buildVideoCandidateTooltip(_0x1b57fc, _0x14f453);
-  const _0x373b41 = _0x3f5f4f.createElement('input');
-  ((_0x373b41.type = 'checkbox'),
-    (_0x373b41.checked = _0x2305a2.has(_0x1b57fc.url)),
-    _0x373b41.addEventListener('change', () => _0x1e1044(_0x1b57fc.url, _0x373b41.checked)));
-  const _0x65e18 = _0x3f5f4f.createElement('div');
-  _0x65e18.className = 'web-preview-video-picker-thumb';
-  const _0x5e71b6 = _0x3f5f4f.createElement('span');
-  ((_0x5e71b6.className = 'web-preview-video-picker-index'), (_0x5e71b6.textContent = _0x14f453));
-  const _0xea39ae = _0x3f5f4f.createElement('span');
-  ((_0xea39ae.className = 'web-preview-video-picker-source'),
-    (_0xea39ae.textContent = getVideoSourceLabel(_0x1b57fc.sourceType)));
-  const _0x2db67a = _0x3f5f4f.createElement('span');
-  ((_0x2db67a.className = 'web-preview-video-picker-fingerprint'),
-    (_0x2db67a.textContent = getVideoUrlFingerprint(_0x1b57fc.url) || getUrlHost(_0x1b57fc.url)),
-    _0x65e18.appendChild(_0x5e71b6),
-    _0x65e18.appendChild(_0xea39ae),
-    _0x65e18.appendChild(_0x2db67a));
-  const _0x8eb04b = _0x3f5f4f.createElement('span');
-  ((_0x8eb04b.className = 'web-preview-image-picker-title'),
-    (_0x8eb04b.textContent = _0x14f453 + ' ' + (_0x1b57fc.title || webPreviewCaptureText('fallback.video'))));
-  const _0x548216 = _0x3f5f4f.createElement('span');
-  _0x548216.className = 'web-preview-image-picker-meta';
-  const _0x2c4f82 = _0x1b57fc.width && _0x1b57fc.height ? _0x1b57fc.width + ' x ' + _0x1b57fc.height : '',
-    _0x4fc012 = formatVideoDuration(_0x1b57fc.duration),
-    _0x5a79c5 = getUrlHost(_0x1b57fc.url),
-    _0x43bdd6 = getVideoUrlFingerprint(_0x1b57fc.url);
+function createVideoPickerItem(el6, box6, map4, handler2, value28 = 0) {
+  const el7 = el6.createElement('label');
+  el7.className = 'web-preview-image-picker-item web-preview-video-picker-item';
+  const formatVideoCandidateIndex2 = formatVideoCandidateIndex(value28);
+  el7.title = buildVideoCandidateTooltip(box6, formatVideoCandidateIndex2);
+  const el8 = el6.createElement('input');
+  ((el8.type = 'checkbox'),
+    (el8.checked = map4.has(box6.url)),
+    el8.addEventListener('change', () => handler2(box6.url, el8.checked)));
+  const el9 = el6.createElement('div');
+  el9.className = 'web-preview-video-picker-thumb';
+  const el10 = el6.createElement('span');
+  ((el10.className = 'web-preview-video-picker-index'), (el10.textContent = formatVideoCandidateIndex2));
+  const el11 = el6.createElement('span');
+  ((el11.className = 'web-preview-video-picker-source'),
+    (el11.textContent = getVideoSourceLabel(box6.sourceType)));
+  const el12 = el6.createElement('span');
+  ((el12.className = 'web-preview-video-picker-fingerprint'),
+    (el12.textContent = getVideoUrlFingerprint(box6.url) || getUrlHost(box6.url)),
+    el9.appendChild(el10),
+    el9.appendChild(el11),
+    el9.appendChild(el12));
+  const el13 = el6.createElement('span');
+  ((el13.className = 'web-preview-image-picker-title'),
+    (el13.textContent =
+      formatVideoCandidateIndex2 + ' ' + (box6.title || webPreviewCaptureText('fallback.video'))));
+  const el14 = el6.createElement('span');
+  el14.className = 'web-preview-image-picker-meta';
+  const value29 = box6.width && box6.height ? box6.width + ' x ' + box6.height : '',
+    formatVideoDuration2 = formatVideoDuration(box6.duration),
+    urlHost = getUrlHost(box6.url),
+    videoUrlFingerprint = getVideoUrlFingerprint(box6.url);
   return (
-    (_0x548216.textContent = [
-      _0x2c4f82,
-      _0x4fc012,
-      _0x5a79c5,
-      _0x43bdd6 && _0x43bdd6 !== _0x5a79c5 ? _0x43bdd6 : '',
+    (el14.textContent = [
+      value29,
+      formatVideoDuration2,
+      urlHost,
+      videoUrlFingerprint && videoUrlFingerprint !== urlHost ? videoUrlFingerprint : '',
     ]
       .filter(Boolean)
       .join(' · ')),
-    _0x184dd4.appendChild(_0x373b41),
-    _0x184dd4.appendChild(_0x65e18),
-    _0x184dd4.appendChild(_0x8eb04b),
-    _0x184dd4.appendChild(_0x548216),
-    _0x184dd4
+    el7.appendChild(el8),
+    el7.appendChild(el9),
+    el7.appendChild(el13),
+    el7.appendChild(el14),
+    el7
   );
 }
-function createPickerSection(_0x4c50d1, _0x473b78, _0x1ba995) {
-  const _0x33b361 = _0x4c50d1.createElement('section');
-  _0x33b361.className = 'web-preview-media-picker-section';
-  const _0x2eba1 = _0x4c50d1.createElement('h4');
+function createPickerSection(el15, value30, value31) {
+  const el16 = el15.createElement('section');
+  el16.className = 'web-preview-media-picker-section';
+  const el17 = el15.createElement('h4');
   return (
-    (_0x2eba1.className = 'web-preview-media-picker-section-title'),
-    (_0x2eba1.textContent = _0x473b78),
-    _0x33b361.appendChild(_0x2eba1),
-    _0x33b361.appendChild(_0x1ba995),
-    _0x33b361
+    (el17.className = 'web-preview-media-picker-section-title'),
+    (el17.textContent = value30),
+    el16.appendChild(el17),
+    el16.appendChild(value31),
+    el16
   );
 }
-function createMediaFilterButton(_0x5edd43, _0x6305d4, _0x5d4db2, _0xe80855, _0x124558, _0x406799) {
-  const _0x459802 = _0x5edd43.createElement('button');
+function createMediaFilterButton(el18, value32, value33, value34, enabled5, handler3) {
+  const el19 = el18.createElement('button');
   return (
-    (_0x459802.type = 'button'),
-    (_0x459802.className = 'web-preview-media-picker-filter' + (_0x5d4db2 === _0xe80855 ? ' is-active' : '')),
-    (_0x459802.textContent = _0x6305d4),
-    (_0x459802.disabled = !!_0x124558),
-    (_0x459802.ariaPressed = _0x5d4db2 === _0xe80855 ? 'true' : 'false'),
-    _0x459802.addEventListener('click', () => {
-      if (_0x459802.disabled) return;
-      _0x406799(_0x5d4db2);
+    (el19.type = 'button'),
+    (el19.className = 'web-preview-media-picker-filter' + (value33 === value34 ? ' is-active' : '')),
+    (el19.textContent = value32),
+    (el19.disabled = !!enabled5),
+    (el19.ariaPressed = value33 === value34 ? 'true' : 'false'),
+    el19.addEventListener('click', () => {
+      if (el19.disabled) return;
+      handler3(value33);
     }),
-    _0x459802
+    el19
   );
 }
-function selectCandidateUrls(_0x503f86, _0x477634, _0x272695) {
-  _0x503f86.clear();
-  for (const _0x523ac3 of _0x477634.slice(0, _0x272695)) {
-    if (_0x523ac3?.url) _0x503f86.add(_0x523ac3.url);
+function selectCandidateUrls(map5, list12, value35) {
+  map5.clear();
+  for (const response3 of list12.slice(0, value35)) {
+    if (response3?.url) map5.add(response3.url);
   }
 }
 export function openWebPreviewMediaPicker({
-  nodeId: _0x5bed49,
+  nodeId: nodeId12,
   imageCandidates: imageCandidates = [],
   videoCandidates: videoCandidates = [],
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
   showToast: showToast = globalThis.window?.showToast,
 } = {}) {
-  const _0x4be5a2 = globalThis.document;
-  if (!_0x4be5a2?.body) return false;
-  const _0x54246e = normalizeImageCandidates(imageCandidates),
-    _0x3ef2ee = normalizeVideoCandidates(videoCandidates);
-  if (!_0x54246e.length && !_0x3ef2ee.length)
+  const el20 = globalThis.document;
+  if (!el20?.body) return false;
+  const list13 = normalizeImageCandidates(imageCandidates),
+    list14 = normalizeVideoCandidates(videoCandidates);
+  if (!list13.length && !list14.length)
     return (showToast?.(webPreviewCaptureText('toasts.noMedia'), 'warning'), false);
-  _0x4be5a2.querySelector('.web-preview-image-picker-overlay')?.remove();
-  const _0x157d80 = new Set(),
-    _0x3628ac = new Set(),
-    _0x310446 = _0x4be5a2.createElement('div');
-  let _0x14fe72 = false;
-  ((_0x310446.className = 'web-preview-image-picker-overlay'),
-    _0x310446.addEventListener('pointerdown', (_0x57c358) => {
-      _0x57c358.stopPropagation();
-      if (_0x57c358.target === _0x310446) _0x15d091();
+  el20.querySelector('.web-preview-image-picker-overlay')?.remove();
+  const imageSelected = new Set(),
+    videoSelected = new Set(),
+    el21 = el20.createElement('div');
+  let value36 = false;
+  ((el21.className = 'web-preview-image-picker-overlay'),
+    el21.addEventListener('pointerdown', (event) => {
+      event.stopPropagation();
+      if (event.target === el21) run();
     }));
-  const _0xd81d9c = _0x4be5a2.createElement('section');
-  ((_0xd81d9c.className = 'web-preview-image-picker web-preview-media-picker'),
-    _0xd81d9c.addEventListener('pointerdown', (_0x2bfd2e) => _0x2bfd2e.stopPropagation()));
-  const _0x3ee484 = _0x4be5a2.createElement('div');
-  _0x3ee484.className = 'web-preview-image-picker-header';
-  const _0x3509e9 = _0x4be5a2.createElement('h3');
-  _0x3509e9.textContent = webPreviewCaptureText('mediaPicker.title');
-  const _0x50de62 = _0x4be5a2.createElement('span');
-  ((_0x50de62.className = 'web-preview-image-picker-count'),
-    _0x3ee484.appendChild(_0x3509e9),
-    _0x3ee484.appendChild(_0x50de62));
-  const _0x49537b = _0x4be5a2.createElement('div');
-  _0x49537b.className = 'web-preview-media-picker-content';
-  let _0x1014be = 'all';
-  const _0x1d4e31 = _0x4be5a2.createElement('div');
-  _0x1d4e31.className = 'web-preview-image-picker-grid';
-  const _0x10cce2 = _0x4be5a2.createElement('div');
-  _0x10cce2.className = 'web-preview-image-picker-grid web-preview-video-picker-grid';
-  const _0x15a406 = _0x4be5a2.createElement('p');
-  ((_0x15a406.className = 'web-preview-video-picker-notice'),
-    (_0x15a406.textContent = webPreviewCaptureText('mediaPicker.videoNotice')));
-  const _0x3ac7a8 = _0x4be5a2.createElement('label');
-  _0x3ac7a8.className = 'web-preview-video-picker-consent';
-  const _0x14b810 = _0x4be5a2.createElement('input');
-  _0x14b810.type = 'checkbox';
-  const _0xc195c0 = _0x4be5a2.createElement('span');
-  ((_0xc195c0.textContent = webPreviewCaptureText('mediaPicker.consent')),
-    _0x3ac7a8.appendChild(_0x14b810),
-    _0x3ac7a8.appendChild(_0xc195c0));
-  const _0x301917 = _0x4be5a2.createElement('div');
-  _0x301917.className = 'web-preview-media-picker-controls';
-  const _0x1eec52 = _0x4be5a2.createElement('div');
-  ((_0x1eec52.className = 'web-preview-media-picker-filter-group'), _0x301917.appendChild(_0x1eec52));
-  const _0x47ce30 = _0x4be5a2.createElement('div');
-  _0x47ce30.className = 'web-preview-image-picker-actions';
-  const _0x3573c9 = _0x4be5a2.createElement('button');
-  ((_0x3573c9.type = 'button'),
-    (_0x3573c9.className = 'web-preview-image-picker-btn web-preview-media-picker-select-all'),
-    (_0x3573c9.textContent = webPreviewCaptureText('buttons.selectAll')),
-    _0x301917.appendChild(_0x3573c9));
-  const _0x1d877b = _0x4be5a2.createElement('button');
-  ((_0x1d877b.type = 'button'),
-    (_0x1d877b.className = 'web-preview-image-picker-btn'),
-    (_0x1d877b.textContent = webPreviewCaptureText('buttons.cancel')));
-  const _0x4fd9c9 = _0x4be5a2.createElement('button');
-  ((_0x4fd9c9.type = 'button'),
-    (_0x4fd9c9.className = 'web-preview-image-picker-btn web-preview-image-picker-btn--primary'),
-    (_0x4fd9c9.textContent = webPreviewCaptureText('buttons.addToCanvas')),
-    _0x47ce30.appendChild(_0x1d877b),
-    _0x47ce30.appendChild(_0x4fd9c9));
-  const _0x2d9034 = () => _0x1014be === 'all' || _0x1014be === 'image',
-    _0x5c0aee = () => _0x1014be === 'all' || _0x1014be === 'video',
-    _0x2c368f = () => {
-      if (_0x1014be === 'image') return _0x54246e.length > 0;
-      if (_0x1014be === 'video') return _0x3ef2ee.length > 0;
-      return _0x54246e.length > 0 || _0x3ef2ee.length > 0;
+  const el22 = el20.createElement('section');
+  ((el22.className = 'web-preview-image-picker web-preview-media-picker'),
+    el22.addEventListener('pointerdown', (event2) => event2.stopPropagation()));
+  const el23 = el20.createElement('div');
+  el23.className = 'web-preview-image-picker-header';
+  const el24 = el20.createElement('h3');
+  el24.textContent = webPreviewCaptureText('mediaPicker.title');
+  const el25 = el20.createElement('span');
+  ((el25.className = 'web-preview-image-picker-count'), el23.appendChild(el24), el23.appendChild(el25));
+  const value37 = el20.createElement('div');
+  value37.className = 'web-preview-media-picker-content';
+  let value38 = 'all';
+  const value39 = el20.createElement('div');
+  value39.className = 'web-preview-image-picker-grid';
+  const value40 = el20.createElement('div');
+  value40.className = 'web-preview-image-picker-grid web-preview-video-picker-grid';
+  const el26 = el20.createElement('p');
+  ((el26.className = 'web-preview-video-picker-notice'),
+    (el26.textContent = webPreviewCaptureText('mediaPicker.videoNotice')));
+  const el27 = el20.createElement('label');
+  el27.className = 'web-preview-video-picker-consent';
+  const el28 = el20.createElement('input');
+  el28.type = 'checkbox';
+  const el29 = el20.createElement('span');
+  ((el29.textContent = webPreviewCaptureText('mediaPicker.consent')),
+    el27.appendChild(el28),
+    el27.appendChild(el29));
+  const el30 = el20.createElement('div');
+  el30.className = 'web-preview-media-picker-controls';
+  const value41 = el20.createElement('div');
+  ((value41.className = 'web-preview-media-picker-filter-group'), el30.appendChild(value41));
+  const el31 = el20.createElement('div');
+  el31.className = 'web-preview-image-picker-actions';
+  const el32 = el20.createElement('button');
+  ((el32.type = 'button'),
+    (el32.className = 'web-preview-image-picker-btn web-preview-media-picker-select-all'),
+    (el32.textContent = webPreviewCaptureText('buttons.selectAll')),
+    el30.appendChild(el32));
+  const el33 = el20.createElement('button');
+  ((el33.type = 'button'),
+    (el33.className = 'web-preview-image-picker-btn'),
+    (el33.textContent = webPreviewCaptureText('buttons.cancel')));
+  const el34 = el20.createElement('button');
+  ((el34.type = 'button'),
+    (el34.className = 'web-preview-image-picker-btn web-preview-image-picker-btn--primary'),
+    (el34.textContent = webPreviewCaptureText('buttons.addToCanvas')),
+    el31.appendChild(el33),
+    el31.appendChild(el34));
+  const run2 = () => value38 === 'all' || value38 === 'image',
+    handler4 = () => value38 === 'all' || value38 === 'video',
+    handler5 = () => {
+      if (value38 === 'image') return list13.length > 0;
+      if (value38 === 'video') return list14.length > 0;
+      return list13.length > 0 || list14.length > 0;
     },
-    _0x2648ae = () => {
-      const _0x3df4e2 = Math.min(_0x54246e.length, MAX_BATCH_CREATE_COUNT),
-        _0x10faa3 = Math.min(_0x3ef2ee.length, MAX_VIDEO_CREATE_COUNT);
-      if (_0x1014be === 'image') return _0x3df4e2 > 0 && _0x157d80.size >= _0x3df4e2;
-      if (_0x1014be === 'video') return _0x10faa3 > 0 && _0x3628ac.size >= _0x10faa3;
-      return (
-        (_0x3df4e2 === 0 || _0x157d80.size >= _0x3df4e2) && (_0x10faa3 === 0 || _0x3628ac.size >= _0x10faa3)
-      );
+    handler6 = () => {
+      const count = Math.min(list13.length, MAX_BATCH_CREATE_COUNT),
+        count2 = Math.min(list14.length, MAX_VIDEO_CREATE_COUNT);
+      if (value38 === 'image') return count > 0 && imageSelected.size >= count;
+      if (value38 === 'video') return count2 > 0 && videoSelected.size >= count2;
+      return (count === 0 || imageSelected.size >= count) && (count2 === 0 || videoSelected.size >= count2);
     },
-    _0x144686 = () => {
-      _0x1eec52.replaceChildren(
+    handler7 = () => {
+      value41.replaceChildren(
+        createMediaFilterButton(el20, webPreviewCaptureText('filters.all'), 'all', value38, false, run3),
         createMediaFilterButton(
-          _0x4be5a2,
-          webPreviewCaptureText('filters.all'),
-          'all',
-          _0x1014be,
-          false,
-          _0x587187,
-        ),
-        createMediaFilterButton(
-          _0x4be5a2,
+          el20,
           webPreviewCaptureText('filters.image'),
           'image',
-          _0x1014be,
-          _0x54246e.length === 0,
-          _0x587187,
+          value38,
+          list13.length === 0,
+          run3,
         ),
         createMediaFilterButton(
-          _0x4be5a2,
+          el20,
           webPreviewCaptureText('filters.video'),
           'video',
-          _0x1014be,
-          _0x3ef2ee.length === 0,
-          _0x587187,
+          value38,
+          list14.length === 0,
+          run3,
         ),
       );
     };
-  function _0x587187(_0x28b0a6) {
-    ((_0x1014be = _0x28b0a6), _0x43fd2b(), _0x37171a());
+  function run3(value42) {
+    ((value38 = value42), run4(), run5());
   }
-  function _0x4debee() {
-    ((_0x1014be === 'all' || _0x1014be === 'image') &&
-      selectCandidateUrls(_0x157d80, _0x54246e, MAX_BATCH_CREATE_COUNT),
-      (_0x1014be === 'all' || _0x1014be === 'video') &&
-        selectCandidateUrls(_0x3628ac, _0x3ef2ee, MAX_VIDEO_CREATE_COUNT));
+  function run6() {
+    ((value38 === 'all' || value38 === 'image') &&
+      selectCandidateUrls(imageSelected, list13, MAX_BATCH_CREATE_COUNT),
+      (value38 === 'all' || value38 === 'video') &&
+        selectCandidateUrls(videoSelected, list14, MAX_VIDEO_CREATE_COUNT));
   }
-  function _0xb26d51() {
-    ((_0x1014be === 'all' || _0x1014be === 'image') &&
-      _0x54246e.forEach((_0x5dc4f6) => _0x157d80.delete(_0x5dc4f6.url)),
-      (_0x1014be === 'all' || _0x1014be === 'video') &&
-        _0x3ef2ee.forEach((_0x4bef41) => _0x3628ac.delete(_0x4bef41.url)));
+  function run7() {
+    ((value38 === 'all' || value38 === 'image') &&
+      list13.forEach((response4) => imageSelected.delete(response4.url)),
+      (value38 === 'all' || value38 === 'video') &&
+        list14.forEach((response5) => videoSelected.delete(response5.url)));
   }
-  const _0x37171a = () => {
-      const _0x3fdc1b = Math.min(_0x54246e.length, MAX_BATCH_CREATE_COUNT),
-        _0x325334 = Math.min(_0x3ef2ee.length, MAX_VIDEO_CREATE_COUNT);
-      _0x50de62.textContent = webPreviewCaptureText('mediaPicker.count', {
-        imageSelected: _0x157d80.size,
-        imageMax: _0x3fdc1b,
-        videoSelected: _0x3628ac.size,
-        videoMax: _0x325334,
+  const run5 = () => {
+      const imageMax = Math.min(list13.length, MAX_BATCH_CREATE_COUNT),
+        videoMax = Math.min(list14.length, MAX_VIDEO_CREATE_COUNT);
+      el25.textContent = webPreviewCaptureText('mediaPicker.count', {
+        imageSelected: imageSelected.size,
+        imageMax: imageMax,
+        videoSelected: videoSelected.size,
+        videoMax: videoMax,
       });
-      const _0x1fa2fb = _0x157d80.size > 0 || _0x3628ac.size > 0;
-      _0x4fd9c9.disabled = !_0x1fa2fb || (_0x3628ac.size > 0 && _0x14b810.checked !== true);
-      const _0x1bbcd6 = _0x2648ae();
-      ((_0x3573c9.textContent = _0x1bbcd6
+      const enabled6 = imageSelected.size > 0 || videoSelected.size > 0;
+      el34.disabled = !enabled6 || (videoSelected.size > 0 && el28.checked !== true);
+      const value43 = handler6();
+      ((el32.textContent = value43
         ? webPreviewCaptureText('buttons.clearSelection')
         : webPreviewCaptureText('buttons.selectAll')),
-        (_0x3573c9.disabled = !_0x2c368f()));
+        (el32.disabled = !handler5()));
     },
-    _0x21c63e = (_0x26456a, _0x3b7354) => {
-      if (_0x3b7354) {
-        if (_0x157d80.size >= MAX_BATCH_CREATE_COUNT) {
+    value44 = (value45, value46) => {
+      if (value46) {
+        if (imageSelected.size >= MAX_BATCH_CREATE_COUNT) {
           (showToast?.(
             webPreviewCaptureText('toasts.imageLimit', { limit: MAX_BATCH_CREATE_COUNT }),
             'warning',
           ),
-            _0x39270e());
+            handler8());
           return;
         }
-        _0x157d80.add(_0x26456a);
-      } else _0x157d80.delete(_0x26456a);
-      _0x37171a();
+        imageSelected.add(value45);
+      } else imageSelected.delete(value45);
+      run5();
     },
-    _0x3415ce = (_0x5a1721, _0x35c1cd) => {
-      if (_0x35c1cd) {
-        if (_0x3628ac.size >= MAX_VIDEO_CREATE_COUNT) {
+    value47 = (value48, value49) => {
+      if (value49) {
+        if (videoSelected.size >= MAX_VIDEO_CREATE_COUNT) {
           (showToast?.(
             webPreviewCaptureText('toasts.videoLimit', { limit: MAX_VIDEO_CREATE_COUNT }),
             'warning',
           ),
-            _0x376fe2());
+            handler9());
           return;
         }
-        _0x3628ac.add(_0x5a1721);
-      } else _0x3628ac.delete(_0x5a1721);
-      _0x37171a();
+        videoSelected.add(value48);
+      } else videoSelected.delete(value48);
+      run5();
     },
-    _0x39270e = () => {
-      (_0x1d4e31.replaceChildren(
-        ..._0x54246e.map((_0x3fb928) => createImagePickerItem(_0x4be5a2, _0x3fb928, _0x157d80, _0x21c63e)),
+    handler8 = () => {
+      (value39.replaceChildren(
+        ...list13.map((item5) => createImagePickerItem(el20, item5, imageSelected, value44)),
       ),
-        _0x37171a());
+        run5());
     },
-    _0x376fe2 = () => {
-      (_0x10cce2.replaceChildren(
-        ..._0x3ef2ee.map((_0x49b654, _0x206509) =>
-          createVideoPickerItem(_0x4be5a2, _0x49b654, _0x3628ac, _0x3415ce, _0x206509),
+    handler9 = () => {
+      (value40.replaceChildren(
+        ...list14.map((item6, value50) =>
+          createVideoPickerItem(el20, item6, videoSelected, value47, value50),
         ),
       ),
-        _0x37171a());
+        run5());
     };
-  function _0x43fd2b() {
-    _0x144686();
-    const _0x47a38d = [_0x301917];
-    (_0x2d9034() &&
-      _0x54246e.length &&
-      _0x47a38d.push(createPickerSection(_0x4be5a2, webPreviewCaptureText('filters.image'), _0x1d4e31)),
-      _0x5c0aee() &&
-        _0x3ef2ee.length &&
-        _0x47a38d.push(
-          _0x15a406,
-          _0x3ac7a8,
-          createPickerSection(_0x4be5a2, webPreviewCaptureText('filters.video'), _0x10cce2),
-        ),
-      _0x49537b.replaceChildren(..._0x47a38d));
+  function run4() {
+    handler7();
+    const list15 = [el30];
+    (run2() &&
+      list13.length &&
+      list15.push(createPickerSection(el20, webPreviewCaptureText('filters.image'), value39)),
+      handler4() &&
+        list14.length &&
+        list15.push(el26, el27, createPickerSection(el20, webPreviewCaptureText('filters.video'), value40)),
+      value37.replaceChildren(...list15));
   }
-  function _0x15d091() {
-    if (_0x14fe72) return;
-    ((_0x14fe72 = true),
-      _0x310446.remove(),
-      _0x4be5a2.removeEventListener('keydown', _0x8b834c, true),
+  function run() {
+    if (value36) return;
+    ((value36 = true),
+      el21.remove(),
+      el20.removeEventListener('keydown', value51, true),
       dispatchWebPreviewPickerSync('media-picker-close'));
   }
-  const _0x8b834c = (_0x28510e) => {
-    if (_0x28510e.key === 'Escape') _0x15d091();
+  const value51 = (event3) => {
+    if (event3.key === 'Escape') run();
   };
   return (
-    _0x14b810.addEventListener('change', _0x37171a),
-    _0x3573c9.addEventListener('click', () => {
-      (_0x2648ae() ? _0xb26d51() : _0x4debee(), _0x39270e(), _0x376fe2());
+    el28.addEventListener('change', run5),
+    el32.addEventListener('click', () => {
+      (handler6() ? run7() : run6(), handler8(), handler9());
     }),
-    _0x1d877b.addEventListener('click', _0x15d091),
-    _0x4fd9c9.addEventListener('click', () => {
-      const _0x206acd = _0x54246e.filter((_0xa0a535) => _0x157d80.has(_0xa0a535.url)),
-        _0x3277cf = _0x3ef2ee.filter((_0x5e88e2) => _0x3628ac.has(_0x5e88e2.url)),
-        _0x301622 = createBatchWebMediaNodes({
-          nodeId: _0x5bed49,
-          imageCandidates: _0x206acd,
-          videoCandidates: _0x3277cf,
+    el33.addEventListener('click', run),
+    el34.addEventListener('click', () => {
+      const imageCandidates2 = list13.filter((response6) => imageSelected.has(response6.url)),
+        videoCandidates2 = list14.filter((response7) => videoSelected.has(response7.url)),
+        count3 = createBatchWebMediaNodes({
+          nodeId: nodeId12,
+          imageCandidates: imageCandidates2,
+          videoCandidates: videoCandidates2,
           storeInstance: storeInstance,
           commitFn: commitFn,
-          rightsConfirmed: _0x3628ac.size > 0 && _0x14b810.checked === true,
+          rightsConfirmed: videoSelected.size > 0 && el28.checked === true,
         });
-      if (_0x301622.length)
-        showToast?.(webPreviewCaptureText('toasts.mediaAdded', { count: _0x301622.length }), 'success');
-      _0x15d091();
+      if (count3.length)
+        showToast?.(webPreviewCaptureText('toasts.mediaAdded', { count: count3.length }), 'success');
+      run();
     }),
-    _0x39270e(),
-    _0x376fe2(),
-    _0x43fd2b(),
-    _0xd81d9c.appendChild(_0x3ee484),
-    _0xd81d9c.appendChild(_0x49537b),
-    _0xd81d9c.appendChild(_0x47ce30),
-    _0x310446.appendChild(_0xd81d9c),
-    _0x4be5a2.body.appendChild(_0x310446),
-    _0x4be5a2.addEventListener('keydown', _0x8b834c, true),
+    handler8(),
+    handler9(),
+    run4(),
+    el22.appendChild(el23),
+    el22.appendChild(value37),
+    el22.appendChild(el31),
+    el21.appendChild(el22),
+    el20.body.appendChild(el21),
+    el20.addEventListener('keydown', value51, true),
     dispatchWebPreviewPickerSync('media-picker-open'),
     true
   );
 }
 export function openWebPreviewVideoPicker({
-  nodeId: _0x37d943,
+  nodeId: nodeId13,
   candidates: candidates = [],
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
   showToast: showToast = globalThis.window?.showToast,
 } = {}) {
-  const _0x597ef2 = globalThis.document;
-  if (!_0x597ef2?.body) return false;
-  const _0x5a38ce = normalizeVideoCandidates(candidates);
-  if (!_0x5a38ce.length) return (showToast?.(webPreviewCaptureText('toasts.noVideos'), 'warning'), false);
-  _0x597ef2.querySelector('.web-preview-image-picker-overlay')?.remove();
-  const _0x2eaa55 = new Set(),
-    _0x3209bb = _0x597ef2.createElement('div');
-  let _0x2a64ed = false;
-  ((_0x3209bb.className = 'web-preview-image-picker-overlay'),
-    _0x3209bb.addEventListener('pointerdown', (_0x1f613b) => {
-      _0x1f613b.stopPropagation();
-      if (_0x1f613b.target === _0x3209bb) _0xa1e7c0();
+  const el35 = globalThis.document;
+  if (!el35?.body) return false;
+  const list16 = normalizeVideoCandidates(candidates);
+  if (!list16.length) return (showToast?.(webPreviewCaptureText('toasts.noVideos'), 'warning'), false);
+  el35.querySelector('.web-preview-image-picker-overlay')?.remove();
+  const map6 = new Set(),
+    el36 = el35.createElement('div');
+  let value52 = false;
+  ((el36.className = 'web-preview-image-picker-overlay'),
+    el36.addEventListener('pointerdown', (event4) => {
+      event4.stopPropagation();
+      if (event4.target === el36) run8();
     }));
-  const _0x188254 = _0x597ef2.createElement('section');
-  ((_0x188254.className = 'web-preview-image-picker web-preview-video-picker'),
-    _0x188254.addEventListener('pointerdown', (_0x3fc4aa) => _0x3fc4aa.stopPropagation()));
-  const _0x3fe0a1 = _0x597ef2.createElement('div');
-  _0x3fe0a1.className = 'web-preview-image-picker-header';
-  const _0x50a257 = _0x597ef2.createElement('h3');
-  _0x50a257.textContent = webPreviewCaptureText('videoPicker.title');
-  const _0x3ca0d5 = _0x597ef2.createElement('span');
-  ((_0x3ca0d5.className = 'web-preview-image-picker-count'),
-    _0x3fe0a1.appendChild(_0x50a257),
-    _0x3fe0a1.appendChild(_0x3ca0d5));
-  const _0x488b11 = _0x597ef2.createElement('p');
-  ((_0x488b11.className = 'web-preview-video-picker-notice'),
-    (_0x488b11.textContent = webPreviewCaptureText('videoPicker.notice')));
-  const _0x2e0d19 = _0x597ef2.createElement('label');
-  _0x2e0d19.className = 'web-preview-video-picker-consent';
-  const _0x250436 = _0x597ef2.createElement('input');
-  _0x250436.type = 'checkbox';
-  const _0x3ce8c = _0x597ef2.createElement('span');
-  ((_0x3ce8c.textContent = webPreviewCaptureText('mediaPicker.consent')),
-    _0x2e0d19.appendChild(_0x250436),
-    _0x2e0d19.appendChild(_0x3ce8c));
-  const _0x205a79 = _0x597ef2.createElement('div');
-  _0x205a79.className = 'web-preview-image-picker-grid web-preview-video-picker-grid';
-  const _0x37ff84 = _0x597ef2.createElement('div');
-  _0x37ff84.className = 'web-preview-image-picker-actions';
-  const _0x2bc67b = _0x597ef2.createElement('button');
-  ((_0x2bc67b.type = 'button'),
-    (_0x2bc67b.className = 'web-preview-image-picker-btn'),
-    (_0x2bc67b.textContent = webPreviewCaptureText('buttons.selectAll')));
-  const _0x5ead9b = _0x597ef2.createElement('button');
-  ((_0x5ead9b.type = 'button'),
-    (_0x5ead9b.className = 'web-preview-image-picker-btn'),
-    (_0x5ead9b.textContent = webPreviewCaptureText('buttons.cancel')));
-  const _0x13f78c = _0x597ef2.createElement('button');
-  ((_0x13f78c.type = 'button'),
-    (_0x13f78c.className = 'web-preview-image-picker-btn web-preview-image-picker-btn--primary'),
-    (_0x13f78c.textContent = webPreviewCaptureText('buttons.saveAsSourceVideo')),
-    _0x37ff84.appendChild(_0x2bc67b),
-    _0x37ff84.appendChild(_0x5ead9b),
-    _0x37ff84.appendChild(_0x13f78c));
-  const _0x50a311 = () => {
-      const _0xdc387 = Math.min(_0x5a38ce.length, MAX_VIDEO_CREATE_COUNT);
-      ((_0x3ca0d5.textContent = _0x2eaa55.size + '/' + _0xdc387),
-        (_0x13f78c.disabled = _0x2eaa55.size === 0 || _0x250436.checked !== true),
-        (_0x2bc67b.disabled = _0x2eaa55.size >= _0xdc387));
+  const el37 = el35.createElement('section');
+  ((el37.className = 'web-preview-image-picker web-preview-video-picker'),
+    el37.addEventListener('pointerdown', (event5) => event5.stopPropagation()));
+  const el38 = el35.createElement('div');
+  el38.className = 'web-preview-image-picker-header';
+  const el39 = el35.createElement('h3');
+  el39.textContent = webPreviewCaptureText('videoPicker.title');
+  const el40 = el35.createElement('span');
+  ((el40.className = 'web-preview-image-picker-count'), el38.appendChild(el39), el38.appendChild(el40));
+  const el41 = el35.createElement('p');
+  ((el41.className = 'web-preview-video-picker-notice'),
+    (el41.textContent = webPreviewCaptureText('videoPicker.notice')));
+  const el42 = el35.createElement('label');
+  el42.className = 'web-preview-video-picker-consent';
+  const rightsConfirmed2 = el35.createElement('input');
+  rightsConfirmed2.type = 'checkbox';
+  const el43 = el35.createElement('span');
+  ((el43.textContent = webPreviewCaptureText('mediaPicker.consent')),
+    el42.appendChild(rightsConfirmed2),
+    el42.appendChild(el43));
+  const value53 = el35.createElement('div');
+  value53.className = 'web-preview-image-picker-grid web-preview-video-picker-grid';
+  const el44 = el35.createElement('div');
+  el44.className = 'web-preview-image-picker-actions';
+  const el45 = el35.createElement('button');
+  ((el45.type = 'button'),
+    (el45.className = 'web-preview-image-picker-btn'),
+    (el45.textContent = webPreviewCaptureText('buttons.selectAll')));
+  const el46 = el35.createElement('button');
+  ((el46.type = 'button'),
+    (el46.className = 'web-preview-image-picker-btn'),
+    (el46.textContent = webPreviewCaptureText('buttons.cancel')));
+  const el47 = el35.createElement('button');
+  ((el47.type = 'button'),
+    (el47.className = 'web-preview-image-picker-btn web-preview-image-picker-btn--primary'),
+    (el47.textContent = webPreviewCaptureText('buttons.saveAsSourceVideo')),
+    el44.appendChild(el45),
+    el44.appendChild(el46),
+    el44.appendChild(el47));
+  const run9 = () => {
+      const value54 = Math.min(list16.length, MAX_VIDEO_CREATE_COUNT);
+      ((el40.textContent = map6.size + '/' + value54),
+        (el47.disabled = map6.size === 0 || rightsConfirmed2.checked !== true),
+        (el45.disabled = map6.size >= value54));
     },
-    _0x2fcba1 = (_0x279746, _0x44c2a1) => {
-      if (_0x44c2a1) {
-        if (_0x2eaa55.size >= MAX_VIDEO_CREATE_COUNT) {
+    value55 = (value56, value57) => {
+      if (value57) {
+        if (map6.size >= MAX_VIDEO_CREATE_COUNT) {
           (showToast?.(
             webPreviewCaptureText('toasts.videoLimit', { limit: MAX_VIDEO_CREATE_COUNT }),
             'warning',
           ),
-            _0x1a7387());
+            handler10());
           return;
         }
-        _0x2eaa55.add(_0x279746);
-      } else _0x2eaa55.delete(_0x279746);
-      _0x50a311();
+        map6.add(value56);
+      } else map6.delete(value56);
+      run9();
     },
-    _0x1a7387 = () => {
-      (_0x205a79.replaceChildren(
-        ..._0x5a38ce.map((_0x15302c, _0xbaaf64) =>
-          createVideoPickerItem(_0x597ef2, _0x15302c, _0x2eaa55, _0x2fcba1, _0xbaaf64),
-        ),
+    handler10 = () => {
+      (value53.replaceChildren(
+        ...list16.map((item7, value58) => createVideoPickerItem(el35, item7, map6, value55, value58)),
       ),
-        _0x50a311());
+        run9());
     };
-  function _0xa1e7c0() {
-    if (_0x2a64ed) return;
-    ((_0x2a64ed = true),
-      _0x3209bb.remove(),
-      _0x597ef2.removeEventListener('keydown', _0x3c272d, true),
+  function run8() {
+    if (value52) return;
+    ((value52 = true),
+      el36.remove(),
+      el35.removeEventListener('keydown', value59, true),
       dispatchWebPreviewPickerSync('video-picker-close'));
   }
-  const _0x3c272d = (_0xa5ab7d) => {
-    if (_0xa5ab7d.key === 'Escape') _0xa1e7c0();
+  const value59 = (event6) => {
+    if (event6.key === 'Escape') run8();
   };
   return (
-    _0x250436.addEventListener('change', _0x50a311),
-    _0x2bc67b.addEventListener('click', () => {
-      (selectCandidateUrls(_0x2eaa55, _0x5a38ce, MAX_VIDEO_CREATE_COUNT), _0x1a7387());
+    rightsConfirmed2.addEventListener('change', run9),
+    el45.addEventListener('click', () => {
+      (selectCandidateUrls(map6, list16, MAX_VIDEO_CREATE_COUNT), handler10());
     }),
-    _0x5ead9b.addEventListener('click', _0xa1e7c0),
-    _0x13f78c.addEventListener('click', () => {
-      const _0x23cf3a = _0x5a38ce.filter((_0x235bde) => _0x2eaa55.has(_0x235bde.url)),
-        _0x2c3aa6 = createBatchWebVideoNodes({
-          nodeId: _0x37d943,
-          candidates: _0x23cf3a,
+    el46.addEventListener('click', run8),
+    el47.addEventListener('click', () => {
+      const candidates2 = list16.filter((response8) => map6.has(response8.url)),
+        count4 = createBatchWebVideoNodes({
+          nodeId: nodeId13,
+          candidates: candidates2,
           storeInstance: storeInstance,
           commitFn: commitFn,
-          rightsConfirmed: _0x250436.checked === true,
+          rightsConfirmed: rightsConfirmed2.checked === true,
         });
-      (_0x2c3aa6.length &&
-        showToast?.(webPreviewCaptureText('toasts.videosSaved', { count: _0x2c3aa6.length }), 'success'),
-        _0xa1e7c0());
+      (count4.length &&
+        showToast?.(webPreviewCaptureText('toasts.videosSaved', { count: count4.length }), 'success'),
+        run8());
     }),
-    _0x1a7387(),
-    _0x188254.appendChild(_0x3fe0a1),
-    _0x188254.appendChild(_0x488b11),
-    _0x188254.appendChild(_0x2e0d19),
-    _0x188254.appendChild(_0x205a79),
-    _0x188254.appendChild(_0x37ff84),
-    _0x3209bb.appendChild(_0x188254),
-    _0x597ef2.body.appendChild(_0x3209bb),
-    _0x597ef2.addEventListener('keydown', _0x3c272d, true),
+    handler10(),
+    el37.appendChild(el38),
+    el37.appendChild(el41),
+    el37.appendChild(el42),
+    el37.appendChild(value53),
+    el37.appendChild(el44),
+    el36.appendChild(el37),
+    el35.body.appendChild(el36),
+    el35.addEventListener('keydown', value59, true),
     dispatchWebPreviewPickerSync('video-picker-open'),
     true
   );
 }
 export function openWebPreviewImagePicker({
-  nodeId: _0x326fcd,
+  nodeId: nodeId14,
   candidates: candidates = [],
   storeInstance: storeInstance = appStore,
   commitFn: commitFn = commit,
   showToast: showToast = globalThis.window?.showToast,
 } = {}) {
-  const _0xbc5010 = globalThis.document;
-  if (!_0xbc5010?.body) return false;
-  const _0x234bb9 = normalizeImageCandidates(candidates);
-  if (!_0x234bb9.length) return (showToast?.(webPreviewCaptureText('toasts.noImages'), 'warning'), false);
-  _0xbc5010.querySelector('.web-preview-image-picker-overlay')?.remove();
-  const _0x4172cc = new Set(),
-    _0x19f6db = _0xbc5010.createElement('div');
-  let _0xcc56c1 = false;
-  ((_0x19f6db.className = 'web-preview-image-picker-overlay'),
-    _0x19f6db.addEventListener('pointerdown', (_0x704138) => {
-      _0x704138.stopPropagation();
-      if (_0x704138.target === _0x19f6db) _0x347003();
+  const el48 = globalThis.document;
+  if (!el48?.body) return false;
+  const list17 = normalizeImageCandidates(candidates);
+  if (!list17.length) return (showToast?.(webPreviewCaptureText('toasts.noImages'), 'warning'), false);
+  el48.querySelector('.web-preview-image-picker-overlay')?.remove();
+  const map7 = new Set(),
+    el49 = el48.createElement('div');
+  let value60 = false;
+  ((el49.className = 'web-preview-image-picker-overlay'),
+    el49.addEventListener('pointerdown', (event7) => {
+      event7.stopPropagation();
+      if (event7.target === el49) run10();
     }));
-  const _0x2e3c60 = _0xbc5010.createElement('section');
-  ((_0x2e3c60.className = 'web-preview-image-picker'),
-    _0x2e3c60.addEventListener('pointerdown', (_0xd064f0) => _0xd064f0.stopPropagation()));
-  const _0x4edf87 = _0xbc5010.createElement('div');
-  _0x4edf87.className = 'web-preview-image-picker-header';
-  const _0x15a9ba = _0xbc5010.createElement('h3');
-  _0x15a9ba.textContent = webPreviewCaptureText('imagePicker.title');
-  const _0x56b092 = _0xbc5010.createElement('span');
-  ((_0x56b092.className = 'web-preview-image-picker-count'),
-    _0x4edf87.appendChild(_0x15a9ba),
-    _0x4edf87.appendChild(_0x56b092));
-  const _0x5dcb42 = _0xbc5010.createElement('div');
-  _0x5dcb42.className = 'web-preview-image-picker-grid';
-  const _0x4ef996 = _0xbc5010.createElement('div');
-  _0x4ef996.className = 'web-preview-image-picker-actions';
-  const _0x6caf2a = _0xbc5010.createElement('button');
-  ((_0x6caf2a.type = 'button'),
-    (_0x6caf2a.className = 'web-preview-image-picker-btn'),
-    (_0x6caf2a.textContent = webPreviewCaptureText('buttons.selectAll')));
-  const _0x548a57 = _0xbc5010.createElement('button');
-  ((_0x548a57.type = 'button'),
-    (_0x548a57.className = 'web-preview-image-picker-btn'),
-    (_0x548a57.textContent = webPreviewCaptureText('buttons.cancel')));
-  const _0x2e7a51 = _0xbc5010.createElement('button');
-  ((_0x2e7a51.type = 'button'),
-    (_0x2e7a51.className = 'web-preview-image-picker-btn web-preview-image-picker-btn--primary'),
-    (_0x2e7a51.textContent = webPreviewCaptureText('buttons.addToCanvas')),
-    _0x4ef996.appendChild(_0x6caf2a),
-    _0x4ef996.appendChild(_0x548a57),
-    _0x4ef996.appendChild(_0x2e7a51));
-  const _0x3ce2bd = () => {
-      const _0x1086cd = Math.min(_0x234bb9.length, MAX_BATCH_CREATE_COUNT);
-      ((_0x56b092.textContent = _0x4172cc.size + '/' + _0x1086cd),
-        (_0x2e7a51.disabled = _0x4172cc.size === 0),
-        (_0x6caf2a.disabled = _0x4172cc.size >= _0x1086cd));
+  const el50 = el48.createElement('section');
+  ((el50.className = 'web-preview-image-picker'),
+    el50.addEventListener('pointerdown', (event8) => event8.stopPropagation()));
+  const el51 = el48.createElement('div');
+  el51.className = 'web-preview-image-picker-header';
+  const el52 = el48.createElement('h3');
+  el52.textContent = webPreviewCaptureText('imagePicker.title');
+  const el53 = el48.createElement('span');
+  ((el53.className = 'web-preview-image-picker-count'), el51.appendChild(el52), el51.appendChild(el53));
+  const value61 = el48.createElement('div');
+  value61.className = 'web-preview-image-picker-grid';
+  const el54 = el48.createElement('div');
+  el54.className = 'web-preview-image-picker-actions';
+  const el55 = el48.createElement('button');
+  ((el55.type = 'button'),
+    (el55.className = 'web-preview-image-picker-btn'),
+    (el55.textContent = webPreviewCaptureText('buttons.selectAll')));
+  const el56 = el48.createElement('button');
+  ((el56.type = 'button'),
+    (el56.className = 'web-preview-image-picker-btn'),
+    (el56.textContent = webPreviewCaptureText('buttons.cancel')));
+  const el57 = el48.createElement('button');
+  ((el57.type = 'button'),
+    (el57.className = 'web-preview-image-picker-btn web-preview-image-picker-btn--primary'),
+    (el57.textContent = webPreviewCaptureText('buttons.addToCanvas')),
+    el54.appendChild(el55),
+    el54.appendChild(el56),
+    el54.appendChild(el57));
+  const run11 = () => {
+      const value62 = Math.min(list17.length, MAX_BATCH_CREATE_COUNT);
+      ((el53.textContent = map7.size + '/' + value62),
+        (el57.disabled = map7.size === 0),
+        (el55.disabled = map7.size >= value62));
     },
-    _0x719d8a = (_0x430055, _0x3838dc) => {
-      if (_0x3838dc) {
-        if (_0x4172cc.size >= MAX_BATCH_CREATE_COUNT) {
+    value63 = (value64, value65) => {
+      if (value65) {
+        if (map7.size >= MAX_BATCH_CREATE_COUNT) {
           (showToast?.(
             webPreviewCaptureText('toasts.imageLimit', { limit: MAX_BATCH_CREATE_COUNT }),
             'warning',
           ),
-            _0x56d2e5());
+            handler11());
           return;
         }
-        _0x4172cc.add(_0x430055);
-      } else _0x4172cc.delete(_0x430055);
-      _0x3ce2bd();
+        map7.add(value64);
+      } else map7.delete(value64);
+      run11();
     },
-    _0x56d2e5 = () => {
-      (_0x5dcb42.replaceChildren(
-        ..._0x234bb9.map((_0x12a18f) => createImagePickerItem(_0xbc5010, _0x12a18f, _0x4172cc, _0x719d8a)),
-      ),
-        _0x3ce2bd());
+    handler11 = () => {
+      (value61.replaceChildren(...list17.map((item8) => createImagePickerItem(el48, item8, map7, value63))),
+        run11());
     };
-  function _0x347003() {
-    if (_0xcc56c1) return;
-    ((_0xcc56c1 = true),
-      _0x19f6db.remove(),
-      _0xbc5010.removeEventListener('keydown', _0x8f61a, true),
+  function run10() {
+    if (value60) return;
+    ((value60 = true),
+      el49.remove(),
+      el48.removeEventListener('keydown', value66, true),
       dispatchWebPreviewPickerSync('image-picker-close'));
   }
-  const _0x8f61a = (_0x290ad7) => {
-    if (_0x290ad7.key === 'Escape') _0x347003();
+  const value66 = (event9) => {
+    if (event9.key === 'Escape') run10();
   };
   return (
-    _0x6caf2a.addEventListener('click', () => {
-      (selectCandidateUrls(_0x4172cc, _0x234bb9, MAX_BATCH_CREATE_COUNT), _0x56d2e5());
+    el55.addEventListener('click', () => {
+      (selectCandidateUrls(map7, list17, MAX_BATCH_CREATE_COUNT), handler11());
     }),
-    _0x548a57.addEventListener('click', _0x347003),
-    _0x2e7a51.addEventListener('click', () => {
-      const _0x134b6a = _0x234bb9.filter((_0x194bd2) => _0x4172cc.has(_0x194bd2.url)),
-        _0x3ac293 = createBatchWebImageNodes({
-          nodeId: _0x326fcd,
-          candidates: _0x134b6a,
+    el56.addEventListener('click', run10),
+    el57.addEventListener('click', () => {
+      const candidates3 = list17.filter((response9) => map7.has(response9.url)),
+        count5 = createBatchWebImageNodes({
+          nodeId: nodeId14,
+          candidates: candidates3,
           storeInstance: storeInstance,
           commitFn: commitFn,
         });
-      (_0x3ac293.length &&
-        showToast?.(webPreviewCaptureText('toasts.imagesAdded', { count: _0x3ac293.length }), 'success'),
-        _0x347003());
+      (count5.length &&
+        showToast?.(webPreviewCaptureText('toasts.imagesAdded', { count: count5.length }), 'success'),
+        run10());
     }),
-    _0x56d2e5(),
-    _0x2e3c60.appendChild(_0x4edf87),
-    _0x2e3c60.appendChild(_0x5dcb42),
-    _0x2e3c60.appendChild(_0x4ef996),
-    _0x19f6db.appendChild(_0x2e3c60),
-    _0xbc5010.body.appendChild(_0x19f6db),
-    _0xbc5010.addEventListener('keydown', _0x8f61a, true),
+    handler11(),
+    el50.appendChild(el51),
+    el50.appendChild(value61),
+    el50.appendChild(el54),
+    el49.appendChild(el50),
+    el48.body.appendChild(el49),
+    el48.addEventListener('keydown', value66, true),
     dispatchWebPreviewPickerSync('image-picker-open'),
     true
   );

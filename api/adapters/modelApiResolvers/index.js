@@ -45,7 +45,7 @@ const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
     Object.freeze({ label: '4:5', w: 4, h: 5 }),
     Object.freeze({ label: '21:9', w: 21, h: 9 }),
   ]),
-  PPIO_RATIO_LABEL_SET = new Set(PPIO_RATIO_OPTIONS.map((_0x472caf) => _0x472caf.label)),
+  PPIO_RATIO_LABEL_SET = new Set(PPIO_RATIO_OPTIONS.map((item) => item.label)),
   RUNNINGHUB_MODEL_DIMENSION_MIN = 0x200,
   RUNNINGHUB_MODEL_DIMENSION_MAX = 0x2000,
   RUNNINGHUB_MODEL_DIMENSION_ALIGN = 8,
@@ -70,977 +70,996 @@ const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
     '21:9',
   ]),
   RUNNINGHUB_MODEL_RATIO_SET = new Set(RUNNINGHUB_MODEL_RATIO_LIST);
-function stripPrefix(_0x1ea0c, _0x53db12) {
-  const _0x1367db = String(_0x1ea0c || '').trim();
-  return _0x1367db.startsWith(_0x53db12) ? _0x1367db.slice(_0x53db12.length) : _0x1367db;
+function stripPrefix(key, list) {
+  const list2 = String(key || '').trim();
+  return list2.startsWith(list) ? list2.slice(list.length) : list2;
 }
-function isPresentValue(_0x1caeaa) {
-  return _0x1caeaa !== undefined && _0x1caeaa !== null && String(_0x1caeaa).trim() !== '';
+function isPresentValue(index) {
+  return index !== undefined && index !== null && String(index).trim() !== '';
 }
 const VEO3_MODEL_CHOICES = new Set(['fast', 'quality']),
   VEO3_IMAGE_GENERATION_TYPES = new Set(['frame', 'reference']),
   VIDU_Q3_VIDEO_MODELS = new Set(['viduq3-turbo', 'viduq3-pro']),
   VIDU_Q3_REFERENCE_MODELS = new Set(['viduq3', 'viduq3-mix']);
-export function normalizeApimartGptImage2Resolution(_0x3412bc) {
-  const _0x181379 = String(_0x3412bc || '')
+export function normalizeApimartGptImage2Resolution(result) {
+  const data = String(result || '')
     .trim()
     .toUpperCase();
-  if (_0x181379 === '1K' || _0x181379 === '2K' || _0x181379 === '4K') return _0x181379.toLowerCase();
+  if (data === '1K' || data === '2K' || data === '4K') return data.toLowerCase();
   return '2k';
 }
-export function normalizeApimartNanoBanana2Resolution(_0xc70228) {
-  const _0x682db = String(_0xc70228 || '')
+export function normalizeApimartNanoBanana2Resolution(options) {
+  const target = String(options || '')
     .trim()
     .toUpperCase();
-  if (_0x682db === '1K' || _0x682db === '2K' || _0x682db === '4K') return _0x682db;
+  if (target === '1K' || target === '2K' || target === '4K') return target;
   return '2K';
 }
-function apimartGptImage2Image({ currentBody: _0x45fbc0, payload: _0x13a29c }) {
+function apimartGptImage2Image({ currentBody: currentBody2, payload: payload2 }) {
   return {
-    ..._0x45fbc0,
-    resolution: normalizeApimartGptImage2Resolution(_0x45fbc0.resolution || _0x13a29c.imageSize),
+    ...currentBody2,
+    resolution: normalizeApimartGptImage2Resolution(currentBody2.resolution || payload2.imageSize),
   };
 }
-function pickClosestPpioRatio(_0x3dd55f, _0x5577f4) {
-  const _0x1cba60 = Number(_0x3dd55f || 1) / Number(_0x5577f4 || 1);
-  let _0x4f28d6 = PPIO_RATIO_OPTIONS[0],
-    _0x18f4f2 = Number.POSITIVE_INFINITY;
-  for (const _0x169893 of PPIO_RATIO_OPTIONS) {
-    const _0x382a43 = Math.abs(_0x169893.w / _0x169893.h - _0x1cba60);
-    _0x382a43 < _0x18f4f2 && ((_0x18f4f2 = _0x382a43), (_0x4f28d6 = _0x169893));
+function pickClosestPpioRatio(source, next) {
+  const current = Number(source || 1) / Number(next || 1);
+  let entry = PPIO_RATIO_OPTIONS[0],
+    record = Number.POSITIVE_INFINITY;
+  for (const handle of PPIO_RATIO_OPTIONS) {
+    const state = Math.abs(handle.w / handle.h - current);
+    state < record && ((record = state), (entry = handle));
   }
-  return _0x4f28d6.label;
+  return entry.label;
 }
-function normalizePpioQuality(_0xe1e9fa) {
-  const _0x12155e = String(_0xe1e9fa || '')
+function normalizePpioQuality(config) {
+  const scope = String(config || '')
     .trim()
     .toUpperCase();
-  return PPIO_QUALITY_PIXEL_MAP[_0x12155e] ? _0x12155e : PPIO_DEFAULT_QUALITY;
+  return PPIO_QUALITY_PIXEL_MAP[scope] ? scope : PPIO_DEFAULT_QUALITY;
 }
-function normalizePpioAspectRatioLabel(_0x4169b1) {
-  const _0x9887d7 = String(_0x4169b1 || '').trim();
-  if (!_0x9887d7) return PPIO_DEFAULT_RATIO;
-  const _0x2c3ca3 = normalizeRatioLabelText(_0x9887d7),
-    _0x107e42 = _0x2c3ca3.toLowerCase();
-  if (_0x107e42 === 'auto' || _0x107e42 === 'adaptive' || _0x2c3ca3 === '自适应' || _0x2c3ca3 === '默认')
+function normalizePpioAspectRatioLabel(input) {
+  const enabled = String(input || '').trim();
+  if (!enabled) return PPIO_DEFAULT_RATIO;
+  const list3 = normalizeRatioLabelText(enabled),
+    output = list3.toLowerCase();
+  if (output === 'auto' || output === 'adaptive' || list3 === '自适应' || list3 === '默认')
     return PPIO_DEFAULT_RATIO;
-  if (!_0x2c3ca3.includes(':')) return PPIO_DEFAULT_RATIO;
-  const [_0x166df6, _0xe8559b] = _0x2c3ca3.split(':'),
-    _0x233046 = Number.parseFloat(_0x166df6),
-    _0x480649 = Number.parseFloat(_0xe8559b);
-  if (!(_0x233046 > 0 && _0x480649 > 0)) return PPIO_DEFAULT_RATIO;
-  const _0x461896 = pickClosestPpioRatio(_0x233046, _0x480649);
-  return PPIO_RATIO_LABEL_SET.has(_0x461896) ? _0x461896 : PPIO_DEFAULT_RATIO;
+  if (!list3.includes(':')) return PPIO_DEFAULT_RATIO;
+  const [value2, value3] = list3.split(':'),
+    count = Number.parseFloat(value2),
+    count2 = Number.parseFloat(value3);
+  if (!(count > 0 && count2 > 0)) return PPIO_DEFAULT_RATIO;
+  const closestPpioRatio = pickClosestPpioRatio(count, count2);
+  return PPIO_RATIO_LABEL_SET.has(closestPpioRatio) ? closestPpioRatio : PPIO_DEFAULT_RATIO;
 }
-function calculatePpioSizeFromTargetPixels(_0xbcf65a, _0x39e9dc) {
-  const [_0x2ac9ed, _0x118dd9] = String(_0x39e9dc || PPIO_DEFAULT_RATIO).split(':'),
-    _0x364ef8 = Number.parseFloat(_0x2ac9ed) || 1,
-    _0x275471 = Number.parseFloat(_0x118dd9) || 1,
-    _0x4d77e5 = Math.max(PPIO_MIN_RATIO, Math.min(PPIO_MAX_RATIO, _0x364ef8 / _0x275471)),
-    _0x465424 = Math.max(
+function calculatePpioSizeFromTargetPixels(value4, value5) {
+  const [value6, value7] = String(value5 || PPIO_DEFAULT_RATIO).split(':'),
+    value8 = Number.parseFloat(value6) || 1,
+    value9 = Number.parseFloat(value7) || 1,
+    value10 = Math.max(PPIO_MIN_RATIO, Math.min(PPIO_MAX_RATIO, value8 / value9)),
+    value11 = Math.max(
       PPIO_MIN_PIXELS,
-      Math.min(Number(_0xbcf65a) || PPIO_QUALITY_PIXEL_MAP['2K'], PPIO_MAX_PIXELS),
+      Math.min(Number(value4) || PPIO_QUALITY_PIXEL_MAP['2K'], PPIO_MAX_PIXELS),
     );
-  let _0x3c103d = Math.round(Math.sqrt(_0x465424 / _0x4d77e5)),
-    _0x373c92 = Math.round(_0x3c103d * _0x4d77e5);
+  let value12 = Math.round(Math.sqrt(value11 / value10)),
+    value13 = Math.round(value12 * value10);
   return (
-    (_0x373c92 = Math.max(PPIO_ALIGN_STEP, Math.round(_0x373c92 / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
-    (_0x3c103d = Math.max(PPIO_ALIGN_STEP, Math.round(_0x3c103d / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
-    _0x373c92 + 'x' + _0x3c103d
+    (value13 = Math.max(PPIO_ALIGN_STEP, Math.round(value13 / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
+    (value12 = Math.max(PPIO_ALIGN_STEP, Math.round(value12 / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
+    value13 + 'x' + value12
   );
 }
-function resolvePpioSize(_0x49951f, _0x249fba) {
-  const _0x44b57e = normalizePpioQuality(_0x49951f),
-    _0x419db9 = normalizePpioAspectRatioLabel(_0x249fba),
-    _0x410667 = PPIO_QUALITY_PIXEL_MAP[_0x44b57e] || PPIO_QUALITY_PIXEL_MAP['2K'];
-  return calculatePpioSizeFromTargetPixels(_0x410667, _0x419db9) || PPIO_DEFAULT_SIZE;
+function resolvePpioSize(value14, value15) {
+  const ppioQuality = normalizePpioQuality(value14),
+    ppioAspectRatioLabel = normalizePpioAspectRatioLabel(value15),
+    value16 = PPIO_QUALITY_PIXEL_MAP[ppioQuality] || PPIO_QUALITY_PIXEL_MAP['2K'];
+  return calculatePpioSizeFromTargetPixels(value16, ppioAspectRatioLabel) || PPIO_DEFAULT_SIZE;
 }
 function ppioImageSize({
-  currentBody: _0x36be5f,
-  payload: _0x299c92,
-  modelToken: _0x37675a,
-  finalUrls: _0x122517,
-  executionManifest: _0x2d74ca,
-  modelManifest: _0x50e086,
+  currentBody: currentBody3,
+  payload: payload3,
+  modelToken: modelToken2,
+  finalUrls: finalUrls,
+  executionManifest: executionManifest,
+  modelManifest: modelManifest,
 }) {
-  const _0x29db8b = _0x37675a || stripPrefix(_0x299c92.model, 'ppio/'),
-    _0x4e8b54 = { ..._0x36be5f },
-    _0x497744 = _0x2d74ca?.extensions?.ppioImage || _0x50e086?.extensions?.ppioImage || {};
+  const value17 = modelToken2 || stripPrefix(payload3.model, 'ppio/'),
+    value18 = { ...currentBody3 },
+    args = executionManifest?.extensions?.ppioImage || modelManifest?.extensions?.ppioImage || {};
   return (
-    !_0x299c92.suppressImageSize &&
-      (_0x4e8b54.size = resolvePpioSize(
-        _0x299c92.imageSize,
-        _0x299c92.resolvedRatioLabel || _0x299c92.aspectRatio,
+    !payload3.suppressImageSize &&
+      (value18.size = resolvePpioSize(
+        payload3.imageSize,
+        payload3.resolvedRatioLabel || payload3.aspectRatio,
       )),
-    _0x497744.optimizePromptOptions &&
-      (_0x4e8b54.optimize_prompt_options = { ..._0x497744.optimizePromptOptions }),
-    _0x497744.batchSizeField &&
-      _0x299c92.batchSize &&
-      _0x299c92.batchSize > 1 &&
-      (_0x4e8b54[_0x497744.batchSizeField] = _0x299c92.batchSize),
-    _0x122517.length > 0 && (_0x4e8b54[_0x497744.imageInputField || 'image'] = _0x122517),
-    _0x4e8b54
+    args.optimizePromptOptions && (value18.optimize_prompt_options = { ...args.optimizePromptOptions }),
+    args.batchSizeField &&
+      payload3.batchSize &&
+      payload3.batchSize > 1 &&
+      (value18[args.batchSizeField] = payload3.batchSize),
+    finalUrls.length > 0 && (value18[args.imageInputField || 'image'] = finalUrls),
+    value18
   );
 }
-function normalizeGrsaiImageModel(_0x9a8187) {
-  const _0x65e677 = String(_0x9a8187 || '').trim();
-  if (!_0x65e677) return 'nano-banana-pro-vt';
-  return _0x65e677.replace(/^grsai\//i, '');
+function normalizeGrsaiImageModel(value19) {
+  const enabled2 = String(value19 || '').trim();
+  if (!enabled2) return 'nano-banana-pro-vt';
+  return enabled2.replace(/^grsai\//i, '');
 }
 const GRSAI_NANO_BANANA_IMAGE_SIZE_SET = new Set(['1K', '2K']);
-function getGrsaiNanoBananaSelection(_0x555614) {
-  const _0x99adcb = resolveNanoBananaSelectionFromModel(_0x555614, '2K', 'grsai');
-  if (!_0x99adcb || _0x99adcb.family === NANO_BANANA_FAMILIES.GPT_IMAGE_2) return null;
-  return _0x99adcb;
-}
-function getGrsaiImageSizePolicy(_0x4c2830) {
-  const _0x1ace17 = resolveModelExecution(_0x4c2830, { providerHint: 'grsai' }),
-    _0x5c810b = _0x1ace17?.modelManifest?.extensions?.imageSizePolicy;
-  return _0x5c810b && typeof _0x5c810b === 'object' ? _0x5c810b : null;
-}
-function normalizeGrsaiNanoBananaImageSize(_0x3fd064, _0x57ae13 = '') {
-  const _0x2d93d2 = String(getGrsaiImageSizePolicy(_0x57ae13)?.fixedSize || '')
-    .trim()
-    .toUpperCase();
-  if (_0x2d93d2) return _0x2d93d2;
-  const _0x3a511b = String(_0x3fd064 || '')
-    .trim()
-    .toUpperCase();
-  return GRSAI_NANO_BANANA_IMAGE_SIZE_SET.has(_0x3a511b) ? _0x3a511b : '2K';
-}
-function getGrsaiGptImage2Policy(_0x2b92d7) {
-  const _0x561efc = resolveModelExecution(_0x2b92d7, { providerHint: 'grsai' }),
-    _0x32a238 = _0x561efc?.modelManifest?.extensions?.gptImage2;
-  return _0x32a238 && typeof _0x32a238 === 'object' && !Array.isArray(_0x32a238) ? _0x32a238 : null;
-}
-function getGrsaiGptImage2PixelSizesByRatio(_0x349860) {
-  const _0x43f4e8 = getGrsaiGptImage2Policy(_0x349860)?.pixelSizesByRatio;
-  return _0x43f4e8 && typeof _0x43f4e8 === 'object' && !Array.isArray(_0x43f4e8) ? _0x43f4e8 : {};
-}
-function normalizeGrsaiNanoBananaAspectRatio(_0x47ae99, _0x3451dc) {
-  const _0x6f5dbb = normalizeRatioLabelText(_0x47ae99),
-    _0x1223ae = _0x6f5dbb.toLowerCase();
+function getGrsaiNanoBananaSelection(value20) {
+  const nanoBananaSelectionFromModel = resolveNanoBananaSelectionFromModel(value20, '2K', 'grsai');
   if (
-    !_0x6f5dbb ||
-    _0x1223ae === 'auto' ||
-    _0x1223ae === 'adaptive' ||
-    _0x1223ae === 'default' ||
-    _0x6f5dbb === '自适应' ||
-    _0x6f5dbb === '默认'
+    !nanoBananaSelectionFromModel ||
+    nanoBananaSelectionFromModel.family === NANO_BANANA_FAMILIES.GPT_IMAGE_2
+  )
+    return null;
+  return nanoBananaSelectionFromModel;
+}
+function getGrsaiImageSizePolicy(value21) {
+  const modelExecution = resolveModelExecution(value21, { providerHint: 'grsai' }),
+    value22 = modelExecution?.modelManifest?.extensions?.imageSizePolicy;
+  return value22 && typeof value22 === 'object' ? value22 : null;
+}
+function normalizeGrsaiNanoBananaImageSize(value23, value24 = '') {
+  const value25 = String(getGrsaiImageSizePolicy(value24)?.fixedSize || '')
+    .trim()
+    .toUpperCase();
+  if (value25) return value25;
+  const value26 = String(value23 || '')
+    .trim()
+    .toUpperCase();
+  return GRSAI_NANO_BANANA_IMAGE_SIZE_SET.has(value26) ? value26 : '2K';
+}
+function getGrsaiGptImage2Policy(value27) {
+  const modelExecution2 = resolveModelExecution(value27, { providerHint: 'grsai' }),
+    value28 = modelExecution2?.modelManifest?.extensions?.gptImage2;
+  return value28 && typeof value28 === 'object' && !Array.isArray(value28) ? value28 : null;
+}
+function getGrsaiGptImage2PixelSizesByRatio(value29) {
+  const grsaiGptImage2Policy = getGrsaiGptImage2Policy(value29)?.pixelSizesByRatio;
+  return grsaiGptImage2Policy &&
+    typeof grsaiGptImage2Policy === 'object' &&
+    !Array.isArray(grsaiGptImage2Policy)
+    ? grsaiGptImage2Policy
+    : {};
+}
+function normalizeGrsaiNanoBananaAspectRatio(value30, value31) {
+  const ratioLabelText = normalizeRatioLabelText(value30),
+    value32 = ratioLabelText.toLowerCase();
+  if (
+    !ratioLabelText ||
+    value32 === 'auto' ||
+    value32 === 'adaptive' ||
+    value32 === 'default' ||
+    ratioLabelText === '自适应' ||
+    ratioLabelText === '默认'
   )
     return 'auto';
-  const _0x46d3ed = parseRatioLabel(_0x6f5dbb);
-  if (!_0x46d3ed) return 'auto';
-  const _0x17a333 = _0x46d3ed.label,
-    _0x41df5f = new Set(getNanoBananaAllowedRatioLabels(_0x3451dc));
-  return _0x41df5f.has(_0x17a333) ? _0x17a333 : normalizeNanoBananaRatioForFamily(_0x17a333, _0x3451dc);
+  const ratioLabel = parseRatioLabel(ratioLabelText);
+  if (!ratioLabel) return 'auto';
+  const value33 = ratioLabel.label,
+    map = new Set(getNanoBananaAllowedRatioLabels(value31));
+  return map.has(value33) ? value33 : normalizeNanoBananaRatioForFamily(value33, value31);
 }
-function normalizeGrsaiGptImage2ImageSize(_0x5f471d, _0x5b797d) {
-  const _0x3bbffc = getGrsaiGptImage2Policy(_0x5b797d),
-    _0xf80650 = new Set(
-      (Array.isArray(_0x3bbffc?.allowedSizes) ? _0x3bbffc.allowedSizes : ['1K']).map((_0x329aeb) =>
-        String(_0x329aeb || '')
-          .trim()
-          .toUpperCase(),
+function normalizeGrsaiGptImage2ImageSize(value34, value35) {
+  const grsaiGptImage2Policy2 = getGrsaiGptImage2Policy(value35),
+    map2 = new Set(
+      (Array.isArray(grsaiGptImage2Policy2?.allowedSizes) ? grsaiGptImage2Policy2.allowedSizes : ['1K']).map(
+        (item2) =>
+          String(item2 || '')
+            .trim()
+            .toUpperCase(),
       ),
     ),
-    _0x3ad8f4 = String(_0x3bbffc?.defaultSize || '1K')
+    value36 = String(grsaiGptImage2Policy2?.defaultSize || '1K')
       .trim()
       .toUpperCase(),
-    _0x532db8 = String(_0x5f471d || '')
+    value37 = String(value34 || '')
       .trim()
       .toUpperCase();
-  if (_0xf80650.has(_0x532db8)) return _0x532db8;
-  return _0xf80650.has(_0x3ad8f4) ? _0x3ad8f4 : '1K';
+  if (map2.has(value37)) return value37;
+  return map2.has(value36) ? value36 : '1K';
 }
-function normalizePixelSize(_0x10585e) {
-  const _0x9f93c1 = String(_0x10585e || '')
+function normalizePixelSize(value38) {
+  const enabled3 = String(value38 || '')
     .trim()
     .match(/^(\d{2,5})\s*[xX]\s*(\d{2,5})$/);
-  if (!_0x9f93c1) return '';
-  return _0x9f93c1[1] + 'x' + _0x9f93c1[2];
+  if (!enabled3) return '';
+  return enabled3[1] + 'x' + enabled3[2];
 }
-function getGrsaiGptImage2RatioOptionsForSize(_0x310db4, _0x3c362d) {
-  const _0x27f113 = getGrsaiGptImage2PixelSizesByRatio(_0x3c362d);
-  return Object.keys(_0x27f113)
-    .filter((_0x3ea307) => _0x27f113[_0x3ea307]?.[_0x310db4])
-    .map((_0xa1d385) => {
-      const _0xbb6cc1 = parseRatioLabel(_0xa1d385) || { w: 1, h: 1 };
-      return Object.freeze({ label: _0xa1d385, value: _0xbb6cc1.w / _0xbb6cc1.h });
+function getGrsaiGptImage2RatioOptionsForSize(value39, value40) {
+  const grsaiGptImage2PixelSizesByRatio = getGrsaiGptImage2PixelSizesByRatio(value40);
+  return Object.keys(grsaiGptImage2PixelSizesByRatio)
+    .filter((item3) => grsaiGptImage2PixelSizesByRatio[item3]?.[value39])
+    .map((label2) => {
+      const value41 = parseRatioLabel(label2) || { w: 1, h: 1 };
+      return Object.freeze({ label: label2, value: value41.w / value41.h });
     });
 }
-function getDefaultGrsaiGptImage2PixelSize(_0x14835e, _0x112636) {
-  return _0x14835e['1:1']?.[_0x112636] || _0x14835e['1:1']?.['1K'] || '1024x1024';
+function getDefaultGrsaiGptImage2PixelSize(value42, value43) {
+  return value42['1:1']?.[value43] || value42['1:1']?.['1K'] || '1024x1024';
 }
-function pickClosestGrsaiGptImage2RatioLabel(_0x4cd4ad, _0x5da978, _0x3d1dba) {
-  const _0x25675e = parseRatioLabel(_0x4cd4ad),
-    _0x28b856 = _0x25675e ? _0x25675e.w / _0x25675e.h : 1,
-    _0x499a61 = getGrsaiGptImage2RatioOptionsForSize(_0x5da978, _0x3d1dba);
-  let _0x3c0fcc = _0x499a61[0] || { label: '1:1', value: 1 },
-    _0x13bf43 = Number.POSITIVE_INFINITY;
-  for (const _0x1b0f91 of _0x499a61) {
-    const _0x355ae7 = Math.abs(_0x28b856 - _0x1b0f91.value);
-    _0x355ae7 < _0x13bf43 && ((_0x3c0fcc = _0x1b0f91), (_0x13bf43 = _0x355ae7));
+function pickClosestGrsaiGptImage2RatioLabel(value44, value45, value46) {
+  const ratioLabel2 = parseRatioLabel(value44),
+    value47 = ratioLabel2 ? ratioLabel2.w / ratioLabel2.h : 1,
+    grsaiGptImage2RatioOptionsForSize = getGrsaiGptImage2RatioOptionsForSize(value45, value46);
+  let value48 = grsaiGptImage2RatioOptionsForSize[0] || { label: '1:1', value: 1 },
+    value49 = Number.POSITIVE_INFINITY;
+  for (const el of grsaiGptImage2RatioOptionsForSize) {
+    const value50 = Math.abs(value47 - el.value);
+    value50 < value49 && ((value48 = el), (value49 = value50));
   }
-  return _0x3c0fcc?.label || '1:1';
+  return value48?.label || '1:1';
 }
-function normalizeGrsaiGptImage2AspectRatio(_0x3a786a, _0x2d9a79, _0x4be92c) {
-  const _0x596c21 = getGrsaiGptImage2PixelSizesByRatio(_0x4be92c),
-    _0x261d8e = normalizePixelSize(_0x3a786a);
-  if (_0x261d8e) return _0x261d8e;
-  const _0x26d2e0 = normalizeRatioLabelText(_0x3a786a),
-    _0x45b3ef = _0x26d2e0.toLowerCase();
+function normalizeGrsaiGptImage2AspectRatio(value51, value52, value53) {
+  const grsaiGptImage2PixelSizesByRatio2 = getGrsaiGptImage2PixelSizesByRatio(value53),
+    pixelSize = normalizePixelSize(value51);
+  if (pixelSize) return pixelSize;
+  const ratioLabelText2 = normalizeRatioLabelText(value51),
+    value54 = ratioLabelText2.toLowerCase();
   if (
-    !_0x26d2e0 ||
-    _0x45b3ef === 'auto' ||
-    _0x45b3ef === 'adaptive' ||
-    _0x45b3ef === 'default' ||
-    _0x26d2e0 === '自适应' ||
-    _0x26d2e0 === '默认'
+    !ratioLabelText2 ||
+    value54 === 'auto' ||
+    value54 === 'adaptive' ||
+    value54 === 'default' ||
+    ratioLabelText2 === '自适应' ||
+    ratioLabelText2 === '默认'
   )
-    return getDefaultGrsaiGptImage2PixelSize(_0x596c21, _0x2d9a79);
-  const _0x365dbd = parseRatioLabel(_0x26d2e0),
-    _0x16e837 = _0x365dbd?.label || '1:1',
-    _0x3d5d0b = _0x596c21[_0x16e837]?.[_0x2d9a79];
-  if (_0x3d5d0b) return _0x3d5d0b;
-  const _0x5b0d2f = pickClosestGrsaiGptImage2RatioLabel(_0x16e837, _0x2d9a79, _0x4be92c);
-  return _0x596c21[_0x5b0d2f]?.[_0x2d9a79] || getDefaultGrsaiGptImage2PixelSize(_0x596c21, _0x2d9a79);
+    return getDefaultGrsaiGptImage2PixelSize(grsaiGptImage2PixelSizesByRatio2, value52);
+  const ratioLabel3 = parseRatioLabel(ratioLabelText2),
+    value55 = ratioLabel3?.label || '1:1',
+    value56 = grsaiGptImage2PixelSizesByRatio2[value55]?.[value52];
+  if (value56) return value56;
+  const closestGrsaiGptImage2RatioLabel = pickClosestGrsaiGptImage2RatioLabel(value55, value52, value53);
+  return (
+    grsaiGptImage2PixelSizesByRatio2[closestGrsaiGptImage2RatioLabel]?.[value52] ||
+    getDefaultGrsaiGptImage2PixelSize(grsaiGptImage2PixelSizesByRatio2, value52)
+  );
 }
 function grsaiImage({
-  payload: _0x3a0f3d,
-  finalPrompt: _0x57f3ea,
-  modelToken: _0x47eb8b,
-  finalUrls: _0x505628,
+  payload: payload4,
+  finalPrompt: finalPrompt2,
+  modelToken: modelToken3,
+  finalUrls: finalUrls2,
 }) {
-  const _0x5dd540 = normalizeGrsaiImageModel(_0x47eb8b || _0x3a0f3d.model || 'nano-banana-pro-vt'),
-    _0x4e0d61 = getGrsaiNanoBananaSelection(_0x5dd540),
-    _0x8d9cbe = _0x3a0f3d.resolvedRatioLabel || _0x3a0f3d.aspectRatio,
-    _0x3cf2e1 = _0x4e0d61 ? normalizeGrsaiNanoBananaAspectRatio(_0x8d9cbe, _0x4e0d61.family) : _0x8d9cbe,
-    _0x4e6db6 = _0x4e0d61
-      ? normalizeGrsaiNanoBananaImageSize(_0x3a0f3d.imageSize, _0x5dd540)
-      : _0x3a0f3d.imageSize || '2K';
+  const model = normalizeGrsaiImageModel(modelToken3 || payload4.model || 'nano-banana-pro-vt'),
+    grsaiNanoBananaSelection = getGrsaiNanoBananaSelection(model),
+    value57 = payload4.resolvedRatioLabel || payload4.aspectRatio,
+    aspectRatio2 = grsaiNanoBananaSelection
+      ? normalizeGrsaiNanoBananaAspectRatio(value57, grsaiNanoBananaSelection.family)
+      : value57,
+    imageSize2 = grsaiNanoBananaSelection
+      ? normalizeGrsaiNanoBananaImageSize(payload4.imageSize, model)
+      : payload4.imageSize || '2K';
   return {
-    model: _0x5dd540,
-    prompt: _0x57f3ea,
-    images: _0x505628,
+    model: model,
+    prompt: finalPrompt2,
+    images: finalUrls2,
     replyType: 'json',
-    ...(!_0x3a0f3d.suppressImageSize && !shouldOmitImageSizeParam(_0x5dd540) && { imageSize: _0x4e6db6 }),
-    ...(!_0x3a0f3d.suppressAspectRatio && _0x3cf2e1 && { aspectRatio: _0x3cf2e1 }),
+    ...(!payload4.suppressImageSize && !shouldOmitImageSizeParam(model) && { imageSize: imageSize2 }),
+    ...(!payload4.suppressAspectRatio && aspectRatio2 && { aspectRatio: aspectRatio2 }),
   };
 }
 function grsaiGptImage2Image({
-  payload: _0x4b5a2b,
-  finalPrompt: _0x13edfd,
-  modelToken: _0x19f0db,
-  finalUrls: _0x12d4a3,
+  payload: payload5,
+  finalPrompt: finalPrompt3,
+  modelToken: modelToken4,
+  finalUrls: finalUrls3,
 }) {
-  const _0x126d21 = normalizeGrsaiImageModel(_0x19f0db || _0x4b5a2b.model || 'gpt-image-2'),
-    _0x126876 = normalizeGrsaiGptImage2ImageSize(_0x4b5a2b.imageSize, _0x126d21),
-    _0x14c572 = normalizeGrsaiGptImage2AspectRatio(
-      _0x4b5a2b.resolvedRatioLabel || _0x4b5a2b.aspectRatio,
-      _0x126876,
-      _0x126d21,
+  const model2 = normalizeGrsaiImageModel(modelToken4 || payload5.model || 'gpt-image-2'),
+    grsaiGptImage2ImageSize = normalizeGrsaiGptImage2ImageSize(payload5.imageSize, model2),
+    aspectRatio3 = normalizeGrsaiGptImage2AspectRatio(
+      payload5.resolvedRatioLabel || payload5.aspectRatio,
+      grsaiGptImage2ImageSize,
+      model2,
     );
   return {
-    model: _0x126d21,
-    prompt: _0x13edfd,
-    images: _0x12d4a3,
+    model: model2,
+    prompt: finalPrompt3,
+    images: finalUrls3,
     replyType: 'json',
-    ...(!_0x4b5a2b.suppressAspectRatio && _0x14c572 && { aspectRatio: _0x14c572 }),
+    ...(!payload5.suppressAspectRatio && aspectRatio3 && { aspectRatio: aspectRatio3 }),
   };
 }
-function normalizeRunningHubModelId(_0x16bfb6) {
-  return stripPrefix(_0x16bfb6, 'runninghub-model/');
+function normalizeRunningHubModelId(value58) {
+  return stripPrefix(value58, 'runninghub-model/');
 }
-function getRunningHubImageExecutionPolicy({ executionManifest: _0x1abbb1, modelManifest: _0x23b322 } = {}) {
-  const _0x311e47 = _0x1abbb1?.extensions?.runningHubImage || _0x23b322?.extensions?.runningHubImage;
-  return _0x311e47 && typeof _0x311e47 === 'object' && !Array.isArray(_0x311e47) ? _0x311e47 : {};
+function getRunningHubImageExecutionPolicy({
+  executionManifest: executionManifest2,
+  modelManifest: modelManifest2,
+} = {}) {
+  const value59 =
+    executionManifest2?.extensions?.runningHubImage || modelManifest2?.extensions?.runningHubImage;
+  return value59 && typeof value59 === 'object' && !Array.isArray(value59) ? value59 : {};
 }
-function normalizeRunningHubImageRoute(_0x6d83cf = {}) {
-  const _0x2185f9 = String(_0x6d83cf?.rhModelRoute ?? _0x6d83cf?.generationParams?.rhModelRoute ?? '')
+function normalizeRunningHubImageRoute(options2 = {}) {
+  const value60 = String(options2?.rhModelRoute ?? options2?.generationParams?.rhModelRoute ?? '')
     .trim()
     .toLowerCase();
-  return _0x2185f9 || 'low';
+  return value60 || 'low';
 }
-function isPlainRunningHubPolicyObject(_0x788317) {
-  return _0x788317 && typeof _0x788317 === 'object' && !Array.isArray(_0x788317);
+function isPlainRunningHubPolicyObject(value61) {
+  return value61 && typeof value61 === 'object' && !Array.isArray(value61);
 }
-function pickRunningHubRouteValue(_0x3e0f90, _0x49c792) {
-  if (!isPlainRunningHubPolicyObject(_0x3e0f90)) return undefined;
-  if (Object.prototype.hasOwnProperty.call(_0x3e0f90, _0x49c792)) return _0x3e0f90[_0x49c792];
-  if (Object.prototype.hasOwnProperty.call(_0x3e0f90, 'default')) return _0x3e0f90.default;
+function pickRunningHubRouteValue(value62, value63) {
+  if (!isPlainRunningHubPolicyObject(value62)) return undefined;
+  if (Object.prototype.hasOwnProperty.call(value62, value63)) return value62[value63];
+  if (Object.prototype.hasOwnProperty.call(value62, 'default')) return value62.default;
   return undefined;
 }
-function pickRunningHubPolicyValue(_0x3cb6d2, _0x3f85f5, _0x2a4552) {
-  const _0x51866f = pickRunningHubRouteValue(_0x3cb6d2?.[_0x3f85f5 + 'ByRoute'], _0x2a4552);
-  return _0x51866f !== undefined ? _0x51866f : _0x3cb6d2?.[_0x3f85f5];
+function pickRunningHubPolicyValue(value64, value65, value66) {
+  const runningHubRouteValue = pickRunningHubRouteValue(value64?.[value65 + 'ByRoute'], value66);
+  return runningHubRouteValue !== undefined ? runningHubRouteValue : value64?.[value65];
 }
-function mergeRunningHubRoutePolicyObject(_0x19439b, _0x416684, _0x1861b4) {
-  const _0x28060d = isPlainRunningHubPolicyObject(_0x19439b?.[_0x416684]) ? _0x19439b[_0x416684] : {},
-    _0x32b48a = pickRunningHubRouteValue(_0x19439b?.[_0x416684 + 'ByRoute'], _0x1861b4);
-  if (!isPlainRunningHubPolicyObject(_0x32b48a)) return _0x28060d;
-  return { ..._0x28060d, ..._0x32b48a };
+function mergeRunningHubRoutePolicyObject(value67, value68, value69) {
+  const args2 = isPlainRunningHubPolicyObject(value67?.[value68]) ? value67[value68] : {},
+    args3 = pickRunningHubRouteValue(value67?.[value68 + 'ByRoute'], value69);
+  if (!isPlainRunningHubPolicyObject(args3)) return args2;
+  return { ...args2, ...args3 };
 }
-function resolveRunningHubImageRoutePolicy(_0x3b4894, _0x252e1b = {}) {
-  const _0x1f68dd = normalizeRunningHubImageRoute(_0x252e1b);
+function resolveRunningHubImageRoutePolicy(args4, value70 = {}) {
+  const route = normalizeRunningHubImageRoute(value70);
   return {
-    ..._0x3b4894,
-    route: _0x1f68dd,
-    textEndpoint: pickRunningHubPolicyValue(_0x3b4894, 'textEndpoint', _0x1f68dd),
-    inputEndpoint: pickRunningHubPolicyValue(_0x3b4894, 'inputEndpoint', _0x1f68dd),
-    omitResolution: pickRunningHubPolicyValue(_0x3b4894, 'omitResolution', _0x1f68dd),
-    quality: pickRunningHubPolicyValue(_0x3b4894, 'quality', _0x1f68dd),
-    omitAspectRatio: pickRunningHubPolicyValue(_0x3b4894, 'omitAspectRatio', _0x1f68dd),
-    aspectRatioValueMap: pickRunningHubPolicyValue(_0x3b4894, 'aspectRatioValueMap', _0x1f68dd),
-    omitAspectRatioWhenInput: pickRunningHubPolicyValue(_0x3b4894, 'omitAspectRatioWhenInput', _0x1f68dd),
-    inputSlotBodyFields: pickRunningHubPolicyValue(_0x3b4894, 'inputSlotBodyFields', _0x1f68dd),
-    constantParams: mergeRunningHubRoutePolicyObject(_0x3b4894, 'constantParams', _0x1f68dd),
-    defaultParams: mergeRunningHubRoutePolicyObject(_0x3b4894, 'defaultParams', _0x1f68dd),
-    bodyParamTypes: mergeRunningHubRoutePolicyObject(_0x3b4894, 'bodyParamTypes', _0x1f68dd),
-    bodyParamInputModes: mergeRunningHubRoutePolicyObject(_0x3b4894, 'bodyParamInputModes', _0x1f68dd),
+    ...args4,
+    route: route,
+    textEndpoint: pickRunningHubPolicyValue(args4, 'textEndpoint', route),
+    inputEndpoint: pickRunningHubPolicyValue(args4, 'inputEndpoint', route),
+    omitResolution: pickRunningHubPolicyValue(args4, 'omitResolution', route),
+    quality: pickRunningHubPolicyValue(args4, 'quality', route),
+    omitAspectRatio: pickRunningHubPolicyValue(args4, 'omitAspectRatio', route),
+    aspectRatioValueMap: pickRunningHubPolicyValue(args4, 'aspectRatioValueMap', route),
+    omitAspectRatioWhenInput: pickRunningHubPolicyValue(args4, 'omitAspectRatioWhenInput', route),
+    inputSlotBodyFields: pickRunningHubPolicyValue(args4, 'inputSlotBodyFields', route),
+    constantParams: mergeRunningHubRoutePolicyObject(args4, 'constantParams', route),
+    defaultParams: mergeRunningHubRoutePolicyObject(args4, 'defaultParams', route),
+    bodyParamTypes: mergeRunningHubRoutePolicyObject(args4, 'bodyParamTypes', route),
+    bodyParamInputModes: mergeRunningHubRoutePolicyObject(args4, 'bodyParamInputModes', route),
   };
 }
 function resolveRunningHubModelEndpoint({
-  hasInputImages: _0x330124,
-  executionManifest: _0x142d1e,
-  modelManifest: _0x31ac53,
-  payload: _0x101dc0,
+  hasInputImages: hasInputImages2,
+  executionManifest: executionManifest3,
+  modelManifest: modelManifest3,
+  payload: payload6,
 }) {
-  const _0x5134a5 = resolveRunningHubImageRoutePolicy(
-    getRunningHubImageExecutionPolicy({ executionManifest: _0x142d1e, modelManifest: _0x31ac53 }),
-    _0x101dc0,
+  const runningHubImageRoutePolicy = resolveRunningHubImageRoutePolicy(
+    getRunningHubImageExecutionPolicy({
+      executionManifest: executionManifest3,
+      modelManifest: modelManifest3,
+    }),
+    payload6,
   );
-  if (!_0x330124) return _0x5134a5.textEndpoint || 'text-to-image';
-  return _0x5134a5.inputEndpoint || 'image-to-image';
+  if (!hasInputImages2) return runningHubImageRoutePolicy.textEndpoint || 'text-to-image';
+  return runningHubImageRoutePolicy.inputEndpoint || 'image-to-image';
 }
-function normalizeRunningHubInputUrlsBySlot(_0x297ef7) {
-  if (!_0x297ef7 || typeof _0x297ef7 !== 'object' || Array.isArray(_0x297ef7)) return {};
+function normalizeRunningHubInputUrlsBySlot(enabled4) {
+  if (!enabled4 || typeof enabled4 !== 'object' || Array.isArray(enabled4)) return {};
   return Object.fromEntries(
-    Object.entries(_0x297ef7)
-      .map(([_0x1ba3ca, _0x2f4ef0]) => [String(_0x1ba3ca || '').trim(), String(_0x2f4ef0 || '').trim()])
-      .filter(([_0x299d38, _0x5d1604]) => _0x299d38 && _0x5d1604),
+    Object.entries(enabled4)
+      .map(([value71, value72]) => [String(value71 || '').trim(), String(value72 || '').trim()])
+      .filter(([value73, value74]) => value73 && value74),
   );
 }
-function normalizeRunningHubBodyParamValue(_0x299b79, _0x31aae0) {
-  const _0x5c48d3 = String(_0x31aae0 || 'string')
+function normalizeRunningHubBodyParamValue(value75, value76) {
+  const value77 = String(value76 || 'string')
     .trim()
     .toLowerCase();
-  if (_0x5c48d3 === 'boolean') {
-    if (_0x299b79 === true || _0x299b79 === false) return _0x299b79;
-    const _0x15f8c2 = String(_0x299b79 ?? '')
+  if (value77 === 'boolean') {
+    if (value75 === true || value75 === false) return value75;
+    const value78 = String(value75 ?? '')
       .trim()
       .toLowerCase();
-    if (['true', '1', 'yes', 'on'].includes(_0x15f8c2)) return true;
-    if (['false', '0', 'no', 'off', ''].includes(_0x15f8c2)) return false;
-    return Boolean(_0x299b79);
+    if (['true', '1', 'yes', 'on'].includes(value78)) return true;
+    if (['false', '0', 'no', 'off', ''].includes(value78)) return false;
+    return Boolean(value75);
   }
-  if (_0x5c48d3 === 'integer') {
-    const _0x9cd0a9 = Number.parseInt(String(_0x299b79 ?? '').trim(), 10);
-    return Number.isFinite(_0x9cd0a9) ? _0x9cd0a9 : null;
+  if (value77 === 'integer') {
+    const value79 = Number.parseInt(String(value75 ?? '').trim(), 10);
+    return Number.isFinite(value79) ? value79 : null;
   }
-  if (_0x5c48d3 === 'number') {
-    const _0x1c84a9 = Number(_0x299b79);
-    return Number.isFinite(_0x1c84a9) ? _0x1c84a9 : null;
+  if (value77 === 'number') {
+    const value80 = Number(value75);
+    return Number.isFinite(value80) ? value80 : null;
   }
-  return String(_0x299b79 ?? '').trim();
+  return String(value75 ?? '').trim();
 }
-function normalizeRunningHubAspectRatioValueMap(_0x2f5a07) {
-  return _0x2f5a07 && typeof _0x2f5a07 === 'object' && !Array.isArray(_0x2f5a07) ? _0x2f5a07 : {};
+function normalizeRunningHubAspectRatioValueMap(value81) {
+  return value81 && typeof value81 === 'object' && !Array.isArray(value81) ? value81 : {};
 }
-function hasRunningHubAspectRatioValueMap(_0x1d57c5) {
-  return Object.keys(normalizeRunningHubAspectRatioValueMap(_0x1d57c5?.aspectRatioValueMap)).length > 0;
+function hasRunningHubAspectRatioValueMap(value82) {
+  return Object.keys(normalizeRunningHubAspectRatioValueMap(value82?.aspectRatioValueMap)).length > 0;
 }
-function resolveRunningHubMappedAspectRatio(_0x4e4cbc, _0x4f89a6) {
-  const _0x282785 = String(_0x4e4cbc || '').trim();
-  if (!_0x282785) return '';
-  const _0x43177b = normalizeRunningHubAspectRatioValueMap(_0x4f89a6?.aspectRatioValueMap),
-    _0x2184ab = Object.entries(_0x43177b)
-      .map(([_0x47baa7, _0x36e7a4]) => [normalizeRatioLabelText(_0x47baa7), String(_0x36e7a4 || '').trim()])
-      .filter(([_0x1d8f05, _0x1f7165]) => _0x1d8f05 && _0x1f7165);
-  if (_0x2184ab.length === 0) return _0x282785;
-  const _0x19d642 = normalizeRatioLabelText(_0x282785),
-    _0x58f513 = _0x2184ab.find(([_0x2591a5]) => _0x2591a5 === _0x19d642);
-  if (_0x58f513) return _0x58f513[1];
-  const _0x23c80e = _0x19d642.toLowerCase(),
-    _0xf18a35 = _0x2184ab.find(([, _0x21bc6e]) => _0x21bc6e.toLowerCase() === _0x23c80e);
-  if (_0xf18a35) return _0xf18a35[1];
-  const _0x2635e4 = parseRatioLabel(_0x19d642);
-  if (!_0x2635e4) return _0x282785;
-  const _0x27d626 = _0x2635e4.w / _0x2635e4.h;
-  let _0xa1d39a = null,
-    _0x1cac8f = Number.POSITIVE_INFINITY;
+function resolveRunningHubMappedAspectRatio(value83, value84) {
+  const enabled5 = String(value83 || '').trim();
+  if (!enabled5) return '';
+  const runningHubAspectRatioValueMap = normalizeRunningHubAspectRatioValueMap(value84?.aspectRatioValueMap),
+    list4 = Object.entries(runningHubAspectRatioValueMap)
+      .map(([value85, value86]) => [normalizeRatioLabelText(value85), String(value86 || '').trim()])
+      .filter(([value87, value88]) => value87 && value88);
+  if (list4.length === 0) return enabled5;
+  const ratioLabelText3 = normalizeRatioLabelText(enabled5),
+    value89 = list4.find(([value90]) => value90 === ratioLabelText3);
+  if (value89) return value89[1];
+  const value91 = ratioLabelText3.toLowerCase(),
+    value92 = list4.find(([, value93]) => value93.toLowerCase() === value91);
+  if (value92) return value92[1];
+  const ratioLabel4 = parseRatioLabel(ratioLabelText3);
+  if (!ratioLabel4) return enabled5;
+  const value94 = ratioLabel4.w / ratioLabel4.h;
+  let value95 = null,
+    value96 = Number.POSITIVE_INFINITY;
   return (
-    _0x2184ab.forEach(([_0x2f9e62, _0x2a5eef]) => {
-      const _0x23310a = parseRatioLabel(_0x2f9e62);
-      if (!_0x23310a) return;
-      const _0x3f6255 = Math.abs(_0x23310a.w / _0x23310a.h - _0x27d626);
-      _0x3f6255 < _0x1cac8f && ((_0xa1d39a = _0x2a5eef), (_0x1cac8f = _0x3f6255));
+    list4.forEach(([value97, value98]) => {
+      const ratioLabel5 = parseRatioLabel(value97);
+      if (!ratioLabel5) return;
+      const value99 = Math.abs(ratioLabel5.w / ratioLabel5.h - value94);
+      value99 < value96 && ((value95 = value98), (value96 = value99));
     }),
-    _0xa1d39a || _0x282785
+    value95 || enabled5
   );
 }
-function assignRunningHubInputSlotFields(_0x1eb639, _0x368b9e, _0xb27134) {
-  const _0x55a4f3 =
-    _0x368b9e?.inputSlotBodyFields &&
-    typeof _0x368b9e.inputSlotBodyFields === 'object' &&
-    !Array.isArray(_0x368b9e.inputSlotBodyFields)
-      ? _0x368b9e.inputSlotBodyFields
+function assignRunningHubInputSlotFields(value100, value101, value102) {
+  const enabled6 =
+    value101?.inputSlotBodyFields &&
+    typeof value101.inputSlotBodyFields === 'object' &&
+    !Array.isArray(value101.inputSlotBodyFields)
+      ? value101.inputSlotBodyFields
       : null;
-  if (!_0x55a4f3) return {};
-  const _0x42d4f9 = normalizeRunningHubInputUrlsBySlot(_0xb27134);
+  if (!enabled6) return {};
+  const runningHubInputUrlsBySlot = normalizeRunningHubInputUrlsBySlot(value102);
   return (
-    Object.entries(_0x55a4f3).forEach(([_0x23565c, _0x28fbeb]) => {
-      const _0x143624 = String(_0x28fbeb || '').trim(),
-        _0x44d186 = _0x42d4f9[String(_0x23565c || '').trim()];
-      if (_0x143624 && _0x44d186) _0x1eb639[_0x143624] = _0x44d186;
+    Object.entries(enabled6).forEach(([value103, value104]) => {
+      const value105 = String(value104 || '').trim(),
+        value106 = runningHubInputUrlsBySlot[String(value103 || '').trim()];
+      if (value105 && value106) value100[value105] = value106;
     }),
-    _0x42d4f9
+    runningHubInputUrlsBySlot
   );
 }
-function shouldIncludeRunningHubPolicyParam(_0xfdb35f, _0x18447a, _0x47a9d1) {
-  const _0xb2a16c =
-      _0x18447a?.conditionalParams &&
-      typeof _0x18447a.conditionalParams === 'object' &&
-      !Array.isArray(_0x18447a.conditionalParams)
-        ? _0x18447a.conditionalParams
+function shouldIncludeRunningHubPolicyParam(value107, value108, enabled7) {
+  const value109 =
+      value108?.conditionalParams &&
+      typeof value108.conditionalParams === 'object' &&
+      !Array.isArray(value108.conditionalParams)
+        ? value108.conditionalParams
         : {},
-    _0x4a68ba = String(_0xb2a16c[_0xfdb35f] || '').trim();
-  if (!_0x4a68ba) return true;
-  return !!_0x47a9d1?.[_0x4a68ba];
+    enabled8 = String(value109[value107] || '').trim();
+  if (!enabled8) return true;
+  return !!enabled7?.[enabled8];
 }
-function shouldIncludeRunningHubParamForInputMode(_0x535480, _0x4456b4, _0x1cad59) {
-  const _0x4ed317 =
-      _0x4456b4?.bodyParamInputModes &&
-      typeof _0x4456b4.bodyParamInputModes === 'object' &&
-      !Array.isArray(_0x4456b4.bodyParamInputModes)
-        ? _0x4456b4.bodyParamInputModes
+function shouldIncludeRunningHubParamForInputMode(value110, value111, enabled9) {
+  const value112 =
+      value111?.bodyParamInputModes &&
+      typeof value111.bodyParamInputModes === 'object' &&
+      !Array.isArray(value111.bodyParamInputModes)
+        ? value111.bodyParamInputModes
         : {},
-    _0xabdde2 = String(_0x4ed317[_0x535480] || '')
+    enabled10 = String(value112[value110] || '')
       .trim()
       .toLowerCase();
-  if (!_0xabdde2) return true;
-  if (_0xabdde2 === 'textonly' || _0xabdde2 === 'text-only') return !_0x1cad59;
-  if (_0xabdde2 === 'inputonly' || _0xabdde2 === 'input-only') return _0x1cad59;
+  if (!enabled10) return true;
+  if (enabled10 === 'textonly' || enabled10 === 'text-only') return !enabled9;
+  if (enabled10 === 'inputonly' || enabled10 === 'input-only') return enabled9;
   return true;
 }
 function assignRunningHubPolicyParams(
-  _0x3c0a82,
-  _0x3f4dd1,
-  _0x7250,
-  _0x524d82,
+  value113,
+  value114,
+  value115,
+  value116,
   { hasInputImages: hasInputImages = false } = {},
 ) {
-  const _0x13291c =
-    _0x7250?.constantParams &&
-    typeof _0x7250.constantParams === 'object' &&
-    !Array.isArray(_0x7250.constantParams)
-      ? _0x7250.constantParams
+  const value117 =
+    value115?.constantParams &&
+    typeof value115.constantParams === 'object' &&
+    !Array.isArray(value115.constantParams)
+      ? value115.constantParams
       : {};
-  Object.entries(_0x13291c).forEach(([_0x2b5ce5, _0x528e60]) => {
-    if (!shouldIncludeRunningHubPolicyParam(_0x2b5ce5, _0x7250, _0x524d82)) return;
-    if (!shouldIncludeRunningHubParamForInputMode(_0x2b5ce5, _0x7250, hasInputImages)) return;
-    _0x3c0a82[_0x2b5ce5] = _0x528e60;
+  Object.entries(value117).forEach(([value118, value119]) => {
+    if (!shouldIncludeRunningHubPolicyParam(value118, value115, value116)) return;
+    if (!shouldIncludeRunningHubParamForInputMode(value118, value115, hasInputImages)) return;
+    value113[value118] = value119;
   });
-  const _0x1dc907 =
-    _0x7250?.bodyParamTypes &&
-    typeof _0x7250.bodyParamTypes === 'object' &&
-    !Array.isArray(_0x7250.bodyParamTypes)
-      ? _0x7250.bodyParamTypes
+  const value120 =
+    value115?.bodyParamTypes &&
+    typeof value115.bodyParamTypes === 'object' &&
+    !Array.isArray(value115.bodyParamTypes)
+      ? value115.bodyParamTypes
       : {};
-  Object.entries(_0x1dc907).forEach(([_0x4ec932, _0x4e73a1]) => {
-    if (Object.prototype.hasOwnProperty.call(_0x3c0a82, _0x4ec932)) return;
-    if (!Object.prototype.hasOwnProperty.call(_0x3f4dd1 || {}, _0x4ec932)) return;
-    if (!shouldIncludeRunningHubPolicyParam(_0x4ec932, _0x7250, _0x524d82)) return;
-    if (!shouldIncludeRunningHubParamForInputMode(_0x4ec932, _0x7250, hasInputImages)) return;
-    const _0x597c2a = _0x3f4dd1[_0x4ec932];
-    if (_0x597c2a === undefined || _0x597c2a === null) return;
-    if (typeof _0x597c2a === 'string' && _0x597c2a.trim() === '') return;
-    const _0x78bc5c = normalizeRunningHubBodyParamValue(_0x597c2a, _0x4e73a1);
-    if (_0x78bc5c === null || _0x78bc5c === '') return;
-    _0x3c0a82[_0x4ec932] = _0x78bc5c;
+  Object.entries(value120).forEach(([value121, value122]) => {
+    if (Object.prototype.hasOwnProperty.call(value113, value121)) return;
+    if (!Object.prototype.hasOwnProperty.call(value114 || {}, value121)) return;
+    if (!shouldIncludeRunningHubPolicyParam(value121, value115, value116)) return;
+    if (!shouldIncludeRunningHubParamForInputMode(value121, value115, hasInputImages)) return;
+    const value123 = value114[value121];
+    if (value123 === undefined || value123 === null) return;
+    if (typeof value123 === 'string' && value123.trim() === '') return;
+    const runningHubBodyParamValue = normalizeRunningHubBodyParamValue(value123, value122);
+    if (runningHubBodyParamValue === null || runningHubBodyParamValue === '') return;
+    value113[value121] = runningHubBodyParamValue;
   });
-  const _0xcc9eee =
-    _0x7250?.defaultParams &&
-    typeof _0x7250.defaultParams === 'object' &&
-    !Array.isArray(_0x7250.defaultParams)
-      ? _0x7250.defaultParams
+  const value124 =
+    value115?.defaultParams &&
+    typeof value115.defaultParams === 'object' &&
+    !Array.isArray(value115.defaultParams)
+      ? value115.defaultParams
       : {};
-  Object.entries(_0xcc9eee).forEach(([_0x359239, _0x346449]) => {
-    if (Object.prototype.hasOwnProperty.call(_0x3c0a82, _0x359239)) return;
-    if (!shouldIncludeRunningHubPolicyParam(_0x359239, _0x7250, _0x524d82)) return;
-    if (!shouldIncludeRunningHubParamForInputMode(_0x359239, _0x7250, hasInputImages)) return;
-    _0x3c0a82[_0x359239] = _0x346449;
+  Object.entries(value124).forEach(([value125, value126]) => {
+    if (Object.prototype.hasOwnProperty.call(value113, value125)) return;
+    if (!shouldIncludeRunningHubPolicyParam(value125, value115, value116)) return;
+    if (!shouldIncludeRunningHubParamForInputMode(value125, value115, hasInputImages)) return;
+    value113[value125] = value126;
   });
 }
-function normalizeRunningHubModelQuality(_0x61064e) {
-  const _0x15b761 = String(_0x61064e || '')
+function normalizeRunningHubModelQuality(value127) {
+  const value128 = String(value127 || '')
     .trim()
     .toUpperCase();
-  return RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[_0x15b761] ? _0x15b761 : RUNNINGHUB_MODEL_DEFAULT_QUALITY;
+  return RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[value128] ? value128 : RUNNINGHUB_MODEL_DEFAULT_QUALITY;
 }
-function normalizeRunningHubModelRatio(_0x55c074) {
-  const _0x501ba6 = String(_0x55c074 || '').trim();
-  if (!_0x501ba6) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
-  const _0x3c039e = normalizeRatioLabelText(_0x501ba6),
-    _0x360e17 = _0x3c039e.toLowerCase();
-  if (_0x360e17 === 'auto' || _0x360e17 === 'default' || _0x360e17 === 'original' || _0x360e17 === 'adaptive')
+function normalizeRunningHubModelRatio(value129) {
+  const enabled11 = String(value129 || '').trim();
+  if (!enabled11) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
+  const list5 = normalizeRatioLabelText(enabled11),
+    value130 = list5.toLowerCase();
+  if (value130 === 'auto' || value130 === 'default' || value130 === 'original' || value130 === 'adaptive')
     return RUNNINGHUB_MODEL_DEFAULT_RATIO;
-  if (!_0x3c039e.includes(':')) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
-  const [_0x288ffd, _0x2dfaad] = _0x3c039e.split(':'),
-    _0x56772c = Number.parseFloat(_0x288ffd),
-    _0x230ef3 = Number.parseFloat(_0x2dfaad);
-  if (!(_0x56772c > 0 && _0x230ef3 > 0)) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
-  const _0x3933f7 = _0x56772c + ':' + _0x230ef3;
-  return RUNNINGHUB_MODEL_RATIO_SET.has(_0x3933f7) ? _0x3933f7 : RUNNINGHUB_MODEL_DEFAULT_RATIO;
+  if (!list5.includes(':')) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
+  const [value131, value132] = list5.split(':'),
+    count3 = Number.parseFloat(value131),
+    count4 = Number.parseFloat(value132);
+  if (!(count3 > 0 && count4 > 0)) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
+  const value133 = count3 + ':' + count4;
+  return RUNNINGHUB_MODEL_RATIO_SET.has(value133) ? value133 : RUNNINGHUB_MODEL_DEFAULT_RATIO;
 }
-function alignRunningHubDimension(_0x4466ee) {
-  const _0x204c1d =
-    Math.round(Number(_0x4466ee || 0) / RUNNINGHUB_MODEL_DIMENSION_ALIGN) * RUNNINGHUB_MODEL_DIMENSION_ALIGN;
-  return Math.max(RUNNINGHUB_MODEL_DIMENSION_MIN, Math.min(RUNNINGHUB_MODEL_DIMENSION_MAX, _0x204c1d));
+function alignRunningHubDimension(value134) {
+  const value135 =
+    Math.round(Number(value134 || 0) / RUNNINGHUB_MODEL_DIMENSION_ALIGN) * RUNNINGHUB_MODEL_DIMENSION_ALIGN;
+  return Math.max(RUNNINGHUB_MODEL_DIMENSION_MIN, Math.min(RUNNINGHUB_MODEL_DIMENSION_MAX, value135));
 }
-function resolveRunningHubModelDimensions(_0x3412f5, _0x5bc26c) {
-  const _0x15056f = normalizeRunningHubModelQuality(_0x3412f5),
-    _0x75a845 = normalizeRunningHubModelRatio(_0x5bc26c),
-    [_0x704fee, _0x329e84] = _0x75a845.split(':'),
-    _0x312f7b = Number.parseFloat(_0x704fee) || 1,
-    _0x278577 = Number.parseFloat(_0x329e84) || 1,
-    _0x57ff59 =
-      RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[_0x15056f] ||
+function resolveRunningHubModelDimensions(value136, value137) {
+  const runningHubModelQuality = normalizeRunningHubModelQuality(value136),
+    runningHubModelRatio = normalizeRunningHubModelRatio(value137),
+    [value138, value139] = runningHubModelRatio.split(':'),
+    value140 = Number.parseFloat(value138) || 1,
+    value141 = Number.parseFloat(value139) || 1,
+    value142 =
+      RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[runningHubModelQuality] ||
       RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[RUNNINGHUB_MODEL_DEFAULT_QUALITY],
-    _0x1bd94a = _0x312f7b / _0x278577,
-    _0x3da0b4 = Math.sqrt(_0x57ff59 / _0x1bd94a),
-    _0x34067f = _0x3da0b4 * _0x1bd94a;
-  return { width: alignRunningHubDimension(_0x34067f), height: alignRunningHubDimension(_0x3da0b4) };
+    value143 = value140 / value141,
+    value144 = Math.sqrt(value142 / value143),
+    value145 = value144 * value143;
+  return { width: alignRunningHubDimension(value145), height: alignRunningHubDimension(value144) };
 }
-function isAdaptiveRatioInput(_0x1cf1ee) {
-  const _0x3fcbe7 = String(_0x1cf1ee || '').trim();
-  if (!_0x3fcbe7) return true;
-  const _0x325bfa = normalizeRatioLabelText(_0x3fcbe7),
-    _0x42ab45 = _0x325bfa.toLowerCase();
-  if (/^\d+x\d+$/i.test(_0x325bfa)) return false;
+function isAdaptiveRatioInput(value146) {
+  const enabled12 = String(value146 || '').trim();
+  if (!enabled12) return true;
+  const list6 = normalizeRatioLabelText(enabled12),
+    value147 = list6.toLowerCase();
+  if (/^\d+x\d+$/i.test(list6)) return false;
   return (
-    _0x42ab45 === 'auto' ||
-    _0x42ab45 === 'default' ||
-    _0x42ab45 === 'adaptive' ||
-    _0x42ab45 === 'original' ||
-    !_0x325bfa.includes(':')
+    value147 === 'auto' ||
+    value147 === 'default' ||
+    value147 === 'adaptive' ||
+    value147 === 'original' ||
+    !list6.includes(':')
   );
 }
 function runninghubImage({
-  payload: _0x369c0e,
-  finalPrompt: _0x4020ae,
-  modelToken: _0x460247,
-  finalUrls: _0x45892e,
+  payload: payload7,
+  finalPrompt: finalPrompt4,
+  modelToken: modelToken5,
+  finalUrls: finalUrls4,
   finalUrlsBySlot: finalUrlsBySlot = {},
-  executionManifest: _0x1cef5d,
-  modelManifest: _0xfe4ab0,
+  executionManifest: executionManifest4,
+  modelManifest: modelManifest4,
 }) {
-  const _0x515f91 = normalizeRunningHubModelId(_0x460247),
-    _0x525388 = resolveRunningHubImageRoutePolicy(
-      getRunningHubImageExecutionPolicy({ executionManifest: _0x1cef5d, modelManifest: _0xfe4ab0 }),
-      _0x369c0e,
+  const runningHubModelId = normalizeRunningHubModelId(modelToken5),
+    quality = resolveRunningHubImageRoutePolicy(
+      getRunningHubImageExecutionPolicy({
+        executionManifest: executionManifest4,
+        modelManifest: modelManifest4,
+      }),
+      payload7,
     ),
-    _0x518553 = _0xfe4ab0?.modelId || 'runninghub-model/' + _0x515f91,
-    _0x383d31 = _0x525388.omitResolution === true || isRunningHubModelWithoutImageSizeParam(_0x369c0e.model),
-    _0x1251c4 =
+    model3 = modelManifest4?.modelId || 'runninghub-model/' + runningHubModelId,
+    enabled13 = quality.omitResolution === true || isRunningHubModelWithoutImageSizeParam(payload7.model),
+    imageSize3 =
       normalizeImageSizeForProviderModel({
-        model: _0x518553,
+        model: model3,
         provider: 'runninghub',
-        imageSize: _0x369c0e.imageSize,
-      }) || _0x369c0e.imageSize,
-    _0x5122a2 = { '1K': '1k', '2K': '2k', '4K': '4k' },
-    _0x126ffd = _0x5122a2[_0x1251c4] || '2k',
-    _0x493887 = resolveProviderRatioPayload({
+        imageSize: payload7.imageSize,
+      }) || payload7.imageSize,
+    value148 = { '1K': '1k', '2K': '2k', '4K': '4k' },
+    resolution = value148[imageSize3] || '2k',
+    providerRatioPayload = resolveProviderRatioPayload({
       provider: 'runninghub',
-      model: 'runninghub-model/' + _0x515f91,
-      ratioLabel: _0x369c0e.resolvedRatioLabel || _0x369c0e.aspectRatio,
-      imageSize: _0x1251c4,
-      suppressAspectRatio: _0x369c0e.suppressAspectRatio,
+      model: 'runninghub-model/' + runningHubModelId,
+      ratioLabel: payload7.resolvedRatioLabel || payload7.aspectRatio,
+      imageSize: imageSize3,
+      suppressAspectRatio: payload7.suppressAspectRatio,
     }),
-    _0x2df6fa = String(_0x493887?.params?.aspectRatio || '').trim(),
-    _0xa5a463 = _0x369c0e.resolvedRatioLabel || _0x369c0e.aspectRatio,
-    _0x13726e = resolveRunningHubMappedAspectRatio(
-      hasRunningHubAspectRatioValueMap(_0x525388) ? _0xa5a463 || _0x2df6fa : _0x2df6fa,
-      _0x525388,
+    value149 = String(providerRatioPayload?.params?.aspectRatio || '').trim(),
+    value150 = payload7.resolvedRatioLabel || payload7.aspectRatio,
+    aspectRatio4 = resolveRunningHubMappedAspectRatio(
+      hasRunningHubAspectRatioValueMap(quality) ? value150 || value149 : value149,
+      quality,
     ),
-    _0x2db806 = _0x13726e.toLowerCase(),
-    _0x39d5f3 =
-      _0x525388.aspectRatioMode === 'dimensions' ||
-      _0xfe4ab0?.extensions?.ratioPolicy?.capability === 'dimensions',
-    _0x3902e9 = _0x39d5f3
-      ? _0x493887?.ratioCapability === 'dimensions'
+    value151 = aspectRatio4.toLowerCase(),
+    value152 =
+      quality.aspectRatioMode === 'dimensions' ||
+      modelManifest4?.extensions?.ratioPolicy?.capability === 'dimensions',
+    width = value152
+      ? providerRatioPayload?.ratioCapability === 'dimensions'
         ? {
-            width: Number(_0x493887?.params?.width) || 0x800,
-            height: Number(_0x493887?.params?.height) || 0x800,
+            width: Number(providerRatioPayload?.params?.width) || 0x800,
+            height: Number(providerRatioPayload?.params?.height) || 0x800,
           }
-        : resolveRunningHubModelDimensions(_0x1251c4, _0x369c0e.aspectRatio)
+        : resolveRunningHubModelDimensions(imageSize3, payload7.aspectRatio)
       : null,
-    _0x15f6a7 =
-      _0x39d5f3 ||
-      _0x525388.omitAspectRatio === true ||
-      (_0x525388.omitAspectRatioWhenInput === true && _0x45892e.length > 0) ||
-      _0x369c0e.suppressAspectRatio ||
-      isAdaptiveRatioInput(_0xa5a463) ||
-      !_0x13726e ||
-      _0x2db806 === 'auto' ||
-      _0x2db806 === 'default' ||
-      _0x2db806 === 'adaptive' ||
-      _0x2db806 === 'original',
-    _0x5c20f3 = {
-      prompt: _0x4020ae || '',
-      ...(_0x39d5f3
-        ? { width: _0x3902e9?.width || 0x800, height: _0x3902e9?.height || 0x800 }
-        : !_0x383d31
-          ? { resolution: _0x126ffd }
+    enabled14 =
+      value152 ||
+      quality.omitAspectRatio === true ||
+      (quality.omitAspectRatioWhenInput === true && finalUrls4.length > 0) ||
+      payload7.suppressAspectRatio ||
+      isAdaptiveRatioInput(value150) ||
+      !aspectRatio4 ||
+      value151 === 'auto' ||
+      value151 === 'default' ||
+      value151 === 'adaptive' ||
+      value151 === 'original',
+    value153 = {
+      prompt: finalPrompt4 || '',
+      ...(value152
+        ? { width: width?.width || 0x800, height: width?.height || 0x800 }
+        : !enabled13
+          ? { resolution: resolution }
           : {}),
-      ...(_0x525388.quality ? { quality: _0x525388.quality } : {}),
-      ...(!_0x15f6a7 && { aspectRatio: _0x13726e }),
-      ...(_0x369c0e.negativePrompt && { negativePrompt: _0x369c0e.negativePrompt }),
-      ...(_0x369c0e.seed && { seed: _0x369c0e.seed }),
+      ...(quality.quality ? { quality: quality.quality } : {}),
+      ...(!enabled14 && { aspectRatio: aspectRatio4 }),
+      ...(payload7.negativePrompt && { negativePrompt: payload7.negativePrompt }),
+      ...(payload7.seed && { seed: payload7.seed }),
     },
-    _0x2c629d = assignRunningHubInputSlotFields(_0x5c20f3, _0x525388, finalUrlsBySlot);
+    assignRunningHubInputSlotFields2 = assignRunningHubInputSlotFields(value153, quality, finalUrlsBySlot);
   return (
-    assignRunningHubPolicyParams(_0x5c20f3, _0x369c0e, _0x525388, _0x2c629d, {
-      hasInputImages: _0x45892e.length > 0,
+    assignRunningHubPolicyParams(value153, payload7, quality, assignRunningHubInputSlotFields2, {
+      hasInputImages: finalUrls4.length > 0,
     }),
-    _0x45892e.length > 0 && !_0x525388.inputSlotBodyFields && (_0x5c20f3.imageUrls = _0x45892e),
-    _0x5c20f3
+    finalUrls4.length > 0 && !quality.inputSlotBodyFields && (value153.imageUrls = finalUrls4),
+    value153
   );
 }
-function normalizeSeedanceVideoSize(_0x329e7b) {
-  const _0x2374a2 = String(_0x329e7b || '').trim();
-  if (!_0x2374a2 || _0x2374a2 === 'auto' || _0x2374a2 === 'default') return '16:9';
-  return normalizeRatioLabelText(_0x2374a2);
+function normalizeSeedanceVideoSize(value154) {
+  const enabled15 = String(value154 || '').trim();
+  if (!enabled15 || enabled15 === 'auto' || enabled15 === 'default') return '16:9';
+  return normalizeRatioLabelText(enabled15);
 }
-function normalizeSeedanceAspectRatio(_0x16e7c5) {
-  return normalizeSeedanceVideoSize(_0x16e7c5 || '16:9');
+function normalizeSeedanceAspectRatio(value155) {
+  return normalizeSeedanceVideoSize(value155 || '16:9');
 }
-function getApimartSeedanceVideoPolicy(_0x3980af) {
-  const _0x1ea5db = _0x3980af?.extensions?.seedanceVideo;
-  return _0x1ea5db && typeof _0x1ea5db === 'object' && !Array.isArray(_0x1ea5db) ? _0x1ea5db : {};
+function getApimartSeedanceVideoPolicy(value156) {
+  const value157 = value156?.extensions?.seedanceVideo;
+  return value157 && typeof value157 === 'object' && !Array.isArray(value157) ? value157 : {};
 }
-function normalizePositiveInteger(_0xc50ce2, _0x3c35e6) {
-  const _0x265029 = Number.parseInt(String(_0xc50ce2 ?? '').trim(), 10);
-  return Number.isFinite(_0x265029) && _0x265029 >= 0 ? _0x265029 : _0x3c35e6;
+function normalizePositiveInteger(value158, value159) {
+  const count5 = Number.parseInt(String(value158 ?? '').trim(), 10);
+  return Number.isFinite(count5) && count5 >= 0 ? count5 : value159;
 }
-function normalizeInputList(_0x3b5418) {
-  return Array.isArray(_0x3b5418)
-    ? _0x3b5418.map((_0x4dc2de) => String(_0x4dc2de || '').trim()).filter(Boolean)
-    : [];
+function normalizeInputList(list7) {
+  return Array.isArray(list7) ? list7.map((item4) => String(item4 || '').trim()).filter(Boolean) : [];
 }
-function normalizeApimartVeo3ModelChoice(_0xc1f1f) {
-  const _0x544fd7 = String(_0xc1f1f || '')
+function normalizeApimartVeo3ModelChoice(value160) {
+  const value161 = String(value160 || '')
     .trim()
     .toLowerCase();
-  return VEO3_MODEL_CHOICES.has(_0x544fd7) ? _0x544fd7 : 'fast';
+  return VEO3_MODEL_CHOICES.has(value161) ? value161 : 'fast';
 }
-function getApimartVeo3ModelChoice(_0x1e01dd = {}) {
-  return normalizeApimartVeo3ModelChoice(_0x1e01dd?.generationParams?.mode ?? _0x1e01dd?.mode);
+function getApimartVeo3ModelChoice(options3 = {}) {
+  return normalizeApimartVeo3ModelChoice(options3?.generationParams?.mode ?? options3?.mode);
 }
-function normalizeApimartVeo3GenerationType(_0x45cc78, { modelChoice: modelChoice = 'fast' } = {}) {
-  const _0x5b0c08 = String(_0x45cc78 || '')
+function normalizeApimartVeo3GenerationType(value162, { modelChoice: modelChoice = 'fast' } = {}) {
+  const value163 = String(value162 || '')
       .trim()
       .toLowerCase(),
-    _0x4b4ddb = VEO3_IMAGE_GENERATION_TYPES.has(_0x5b0c08) ? _0x5b0c08 : 'frame';
+    value164 = VEO3_IMAGE_GENERATION_TYPES.has(value163) ? value163 : 'frame';
   if (normalizeApimartVeo3ModelChoice(modelChoice) === 'quality') return 'frame';
-  return _0x4b4ddb;
+  return value164;
 }
-function getApimartVeo3GenerationType(_0x3c8317 = {}) {
-  const _0x58591f = getApimartVeo3ModelChoice(_0x3c8317);
+function getApimartVeo3GenerationType(options4 = {}) {
+  const modelChoice2 = getApimartVeo3ModelChoice(options4);
   return normalizeApimartVeo3GenerationType(
-    _0x3c8317?.generationParams?.generation_type ?? _0x3c8317?.generation_type,
-    { modelChoice: _0x58591f },
+    options4?.generationParams?.generation_type ?? options4?.generation_type,
+    { modelChoice: modelChoice2 },
   );
 }
 function validateApimartVeo3ImageCount(
-  _0x3c59dc = {},
-  _0x57c4f1 = 0,
+  options5 = {},
+  value165 = 0,
   { allowTextOnly: allowTextOnly = false } = {},
 ) {
-  const _0x5d2ee5 = Math.max(0, Math.trunc(Number(_0x57c4f1) || 0));
-  if (allowTextOnly && _0x5d2ee5 === 0) return Object.freeze({ ok: true, message: '' });
-  const _0x3eb019 = getApimartVeo3GenerationType(_0x3c59dc);
-  if (_0x3eb019 === 'reference')
+  const ok = Math.max(0, Math.trunc(Number(value165) || 0));
+  if (allowTextOnly && ok === 0) return Object.freeze({ ok: true, message: '' });
+  const apimartVeo3GenerationType = getApimartVeo3GenerationType(options5);
+  if (apimartVeo3GenerationType === 'reference')
     return Object.freeze({
-      ok: _0x5d2ee5 <= 3,
-      message: _0x5d2ee5 <= 3 ? '' : 'VEO3 参考图模式最多接入 3 张图片',
+      ok: ok <= 3,
+      message: ok <= 3 ? '' : 'VEO3 参考图模式最多接入 3 张图片',
     });
   return Object.freeze({
-    ok: _0x5d2ee5 <= 2,
-    message: _0x5d2ee5 <= 2 ? '' : 'VEO3 首尾帧模式最多接入 2 张图片',
+    ok: ok <= 2,
+    message: ok <= 2 ? '' : 'VEO3 首尾帧模式最多接入 2 张图片',
   });
 }
-function collectVideoInputUrls(_0x3c8c31) {
+function collectVideoInputUrls(value166) {
   return Array.from(
     new Set(
       [
-        String(_0x3c8c31.videoUrl || '').trim(),
-        ...normalizeInputList(_0x3c8c31.videos),
-        ...normalizeInputList(_0x3c8c31.videoUrls),
+        String(value166.videoUrl || '').trim(),
+        ...normalizeInputList(value166.videos),
+        ...normalizeInputList(value166.videoUrls),
       ].filter(Boolean),
     ),
   );
 }
-function collectAudioInputUrls(_0x2b80b2) {
+function collectAudioInputUrls(value167) {
   return Array.from(
     new Set(
       [
-        String(_0x2b80b2.audioUrl || '').trim(),
-        ...normalizeInputList(_0x2b80b2.audios),
-        ...normalizeInputList(_0x2b80b2.audioUrls),
+        String(value167.audioUrl || '').trim(),
+        ...normalizeInputList(value167.audios),
+        ...normalizeInputList(value167.audioUrls),
       ].filter(Boolean),
     ),
   );
 }
-async function resolveInputVideos(_0x8d821e, _0x11bab2, _0xcd735e) {
-  const _0x2903c0 = collectVideoInputUrls(_0x8d821e);
-  if (_0x2903c0.length === 0) return [];
-  if (typeof _0xcd735e.processInputVideos !== 'function')
+async function resolveInputVideos(value168, value169, value170) {
+  const list8 = collectVideoInputUrls(value168);
+  if (list8.length === 0) return [];
+  if (typeof value170.processInputVideos !== 'function')
     throw new Error('APIMART video input upload is not available');
-  const _0x2981e9 = await _0xcd735e.processInputVideos(_0x2903c0, _0x11bab2, {
+  const list9 = await value170.processInputVideos(list8, value169, {
     provider: 'apimart',
     strictUpload: true,
   });
-  if (!Array.isArray(_0x2981e9) || _0x2981e9.length === 0) throw new Error('APIMART video upload failed');
-  return _0x2981e9.map((_0x3dd990) => String(_0x3dd990 || '').trim()).filter(Boolean);
+  if (!Array.isArray(list9) || list9.length === 0) throw new Error('APIMART video upload failed');
+  return list9.map((item5) => String(item5 || '').trim()).filter(Boolean);
 }
-async function resolveInputAudios(_0x452948, _0x5e13f3, _0x4d5a15) {
-  const _0xf25446 = collectAudioInputUrls(_0x452948);
-  if (_0xf25446.length === 0) return [];
-  if (typeof _0x4d5a15.processInputAudios !== 'function')
+async function resolveInputAudios(value171, value172, value173) {
+  const list10 = collectAudioInputUrls(value171);
+  if (list10.length === 0) return [];
+  if (typeof value173.processInputAudios !== 'function')
     throw new Error('APIMART audio input upload is not available');
-  const _0x3285aa = await _0x4d5a15.processInputAudios(_0xf25446, _0x5e13f3, {
+  const list11 = await value173.processInputAudios(list10, value172, {
     provider: 'apimart',
     strictUpload: true,
   });
-  if (!Array.isArray(_0x3285aa) || _0x3285aa.length === 0) throw new Error('APIMART audio upload failed');
-  return _0x3285aa.map((_0x290d5b) => String(_0x290d5b || '').trim()).filter(Boolean);
+  if (!Array.isArray(list11) || list11.length === 0) throw new Error('APIMART audio upload failed');
+  return list11.map((item6) => String(item6 || '').trim()).filter(Boolean);
 }
 async function apimartSeedanceVideo({
-  payload: _0x4245eb,
-  finalPrompt: _0x434068,
-  modelToken: _0x1fed30,
-  apiKey: _0x1dcb35,
-  ctx: _0x5f2f7b,
-  executionManifest: _0x372dbf,
+  payload: payload8,
+  finalPrompt: finalPrompt5,
+  modelToken: modelToken6,
+  apiKey: apiKey,
+  ctx: ctx,
+  executionManifest: executionManifest5,
 }) {
-  const _0x9be448 = _0x1fed30 || stripPrefix(_0x4245eb.model, 'apimart/'),
-    _0x5069ad = getApimartSeedanceVideoPolicy(_0x372dbf),
-    _0x314f73 = supportsApimartPrivateAvatarAssets(_0x9be448, _0x5069ad),
-    _0x2f0077 = _0x5069ad.supportsVideoReferences === true,
-    _0x16a7cd = _0x5069ad.supportsAudioReferences === true,
-    _0x3ef2a6 = applyApimartPrivateAvatarAssetsToUrls(collectVideoInputUrls(_0x4245eb), _0x4245eb, {
+  const model4 = modelToken6 || stripPrefix(payload8.model, 'apimart/'),
+    apimartSeedanceVideoPolicy = getApimartSeedanceVideoPolicy(executionManifest5),
+    enabled16 = supportsApimartPrivateAvatarAssets(model4, apimartSeedanceVideoPolicy),
+    enabled17 = apimartSeedanceVideoPolicy.supportsVideoReferences === true,
+    enabled18 = apimartSeedanceVideoPolicy.supportsAudioReferences === true,
+    list12 = applyApimartPrivateAvatarAssetsToUrls(collectVideoInputUrls(payload8), payload8, {
       sourceKind: 'video',
-      enabled: _0x314f73,
+      enabled: enabled16,
     });
-  if (!_0x2f0077 && _0x3ef2a6.length > 0)
+  if (!enabled17 && list12.length > 0)
     throw new Error('APIMart Seedance model does not support video references');
-  const _0xd45e8d =
-      _0x3ef2a6.length > 0 && _0x2f0077 ? await resolveInputVideos(_0x4245eb, _0x1dcb35, _0x5f2f7b) : [],
-    _0x5e3e6c = applyApimartPrivateAvatarAssetsToUrls(
+  const list13 = list12.length > 0 && enabled17 ? await resolveInputVideos(payload8, apiKey, ctx) : [],
+    list14 = applyApimartPrivateAvatarAssetsToUrls(
       [
-        String(_0x4245eb.first || _0x4245eb.firstFrameUrl || '').trim(),
-        String(_0x4245eb.last || _0x4245eb.lastFrameUrl || '').trim(),
+        String(payload8.first || payload8.firstFrameUrl || '').trim(),
+        String(payload8.last || payload8.lastFrameUrl || '').trim(),
       ].filter(Boolean),
-      _0x4245eb,
-      { sourceKind: 'image', enabled: _0x314f73 },
+      payload8,
+      { sourceKind: 'image', enabled: enabled16 },
     ),
-    _0x197c62 = normalizePositiveInteger(_0x5069ad.maxRoleImageCount, 2);
-  if (_0x5e3e6c.length > _0x197c62)
+    positiveInteger = normalizePositiveInteger(apimartSeedanceVideoPolicy.maxRoleImageCount, 2);
+  if (list14.length > positiveInteger)
     throw new Error(
-      _0x5069ad.roleImageLimitError || 'APIMart Seedance model does not support this many role images',
+      apimartSeedanceVideoPolicy.roleImageLimitError ||
+        'APIMart Seedance model does not support this many role images',
     );
-  let _0x3510c3 = [];
-  if (_0x5e3e6c.length > 0) {
-    const _0x1fe488 = await _0x5f2f7b.processInputImages(_0x5e3e6c, _0x1dcb35, {
+  let list15 = [];
+  if (list14.length > 0) {
+    const value174 = await ctx.processInputImages(list14, apiKey, {
       applyInputQualityProfile: true,
       provider: 'apimart',
       strictUpload: true,
     });
-    _0x3510c3 = [
-      _0x1fe488?.[0] ? { url: String(_0x1fe488[0]).trim(), role: 'first_frame' } : null,
-      _0x1fe488?.[1] ? { url: String(_0x1fe488[1]).trim(), role: 'last_frame' } : null,
+    list15 = [
+      value174?.[0] ? { url: String(value174[0]).trim(), role: 'first_frame' } : null,
+      value174?.[1] ? { url: String(value174[1]).trim(), role: 'last_frame' } : null,
     ].filter(Boolean);
   }
-  const _0x447c3e = Array.isArray(_0x4245eb.images)
-      ? _0x4245eb.images
-      : Array.isArray(_0x4245eb.inputUrls)
-        ? _0x4245eb.inputUrls
+  const value175 = Array.isArray(payload8.images)
+      ? payload8.images
+      : Array.isArray(payload8.inputUrls)
+        ? payload8.inputUrls
         : [],
-    _0x13f24a = applyApimartPrivateAvatarAssetsToUrls(_0x447c3e, _0x4245eb, {
+    list16 = applyApimartPrivateAvatarAssetsToUrls(value175, payload8, {
       sourceKind: 'image',
-      enabled: _0x314f73,
+      enabled: enabled16,
     }),
-    _0xc4afe6 =
-      _0x13f24a.length > 0 && _0x3510c3.length <= 0
-        ? await _0x5f2f7b.processInputImages(_0x13f24a, _0x1dcb35, {
+    list17 =
+      list16.length > 0 && list15.length <= 0
+        ? await ctx.processInputImages(list16, apiKey, {
             applyInputQualityProfile: true,
             provider: 'apimart',
             strictUpload: true,
           })
         : [],
-    _0x352393 = applyApimartPrivateAvatarAssetsToUrls(collectAudioInputUrls(_0x4245eb), _0x4245eb, {
+    list18 = applyApimartPrivateAvatarAssetsToUrls(collectAudioInputUrls(payload8), payload8, {
       sourceKind: 'audio',
-      enabled: _0x314f73,
+      enabled: enabled16,
     });
-  if (!_0x16a7cd && _0x352393.length > 0)
+  if (!enabled18 && list18.length > 0)
     throw new Error('APIMart Seedance model does not support audio references');
-  const _0x354b85 =
-      _0x16a7cd && _0x352393.length > 0 ? await resolveInputAudios(_0x4245eb, _0x1dcb35, _0x5f2f7b) : [],
-    _0x52d5b4 = {
-      model: _0x9be448,
-      prompt: _0x434068,
-      duration: _0x4245eb.duration || 5,
-      resolution: _0x4245eb.resolution || _0x5069ad.defaultResolution || '720p',
+  const list19 = enabled18 && list18.length > 0 ? await resolveInputAudios(payload8, apiKey, ctx) : [],
+    value176 = {
+      model: model4,
+      prompt: finalPrompt5,
+      duration: payload8.duration || 5,
+      resolution: payload8.resolution || apimartSeedanceVideoPolicy.defaultResolution || '720p',
     };
-  _0x5069ad.ratioField === 'size'
-    ? (_0x52d5b4.size = normalizeSeedanceVideoSize(
-        _0x4245eb.resolvedRatioLabel || _0x4245eb.aspectRatio || _0x4245eb.size,
+  apimartSeedanceVideoPolicy.ratioField === 'size'
+    ? (value176.size = normalizeSeedanceVideoSize(
+        payload8.resolvedRatioLabel || payload8.aspectRatio || payload8.size,
       ))
-    : (_0x52d5b4.aspect_ratio = normalizeSeedanceAspectRatio(
-        _0x4245eb.resolvedRatioLabel || _0x4245eb.aspectRatio || _0x4245eb.aspect_ratio,
+    : (value176.aspect_ratio = normalizeSeedanceAspectRatio(
+        payload8.resolvedRatioLabel || payload8.aspectRatio || payload8.aspect_ratio,
       ));
-  if (isPresentValue(_0x4245eb.seed)) _0x52d5b4.seed = _0x4245eb.seed;
-  _0x5069ad.supportsGenerateAudioParam === true &&
-    (_0x4245eb.audio === true || _0x4245eb.generateAudio === true) &&
-    (_0x52d5b4.audio = true);
-  _0x5069ad.supportsCameraFixedParam === true &&
-    _0x4245eb.camerafixed === true &&
-    (_0x52d5b4.camerafixed = true);
-  if (_0x3510c3.length > 0) _0x52d5b4.image_with_roles = _0x3510c3;
+  if (isPresentValue(payload8.seed)) value176.seed = payload8.seed;
+  apimartSeedanceVideoPolicy.supportsGenerateAudioParam === true &&
+    (payload8.audio === true || payload8.generateAudio === true) &&
+    (value176.audio = true);
+  apimartSeedanceVideoPolicy.supportsCameraFixedParam === true &&
+    payload8.camerafixed === true &&
+    (value176.camerafixed = true);
+  if (list15.length > 0) value176.image_with_roles = list15;
   else {
-    if (_0xc4afe6.length > 0) {
-      const _0x5d6131 = normalizePositiveInteger(_0x5069ad.maxImageCount, 1);
-      _0x52d5b4.image_urls = _0xc4afe6.slice(0, _0x5d6131);
+    if (list17.length > 0) {
+      const positiveInteger2 = normalizePositiveInteger(apimartSeedanceVideoPolicy.maxImageCount, 1);
+      value176.image_urls = list17.slice(0, positiveInteger2);
     }
   }
   return (
-    _0x2f0077 &&
-      _0x3510c3.length <= 0 &&
-      _0xd45e8d.length > 0 &&
-      (_0x52d5b4.video_urls = _0xd45e8d.slice(
+    enabled17 &&
+      list15.length <= 0 &&
+      list13.length > 0 &&
+      (value176.video_urls = list13.slice(
         0,
-        normalizePositiveInteger(_0x5069ad.maxVideoReferenceCount, 3),
+        normalizePositiveInteger(apimartSeedanceVideoPolicy.maxVideoReferenceCount, 3),
       )),
-    _0x16a7cd &&
-      _0x3510c3.length <= 0 &&
-      _0x354b85.length > 0 &&
-      (_0x52d5b4.audio_urls = _0x354b85.slice(
+    enabled18 &&
+      list15.length <= 0 &&
+      list19.length > 0 &&
+      (value176.audio_urls = list19.slice(
         0,
-        normalizePositiveInteger(_0x5069ad.maxAudioReferenceCount, 3),
+        normalizePositiveInteger(apimartSeedanceVideoPolicy.maxAudioReferenceCount, 3),
       )),
-    _0x52d5b4
+    value176
   );
 }
-function apimartOmniFlashVideo({ currentBody: _0x15ed69 }) {
-  const _0x42a7ba = { ..._0x15ed69 };
-  return (normalizeInputList(_0x42a7ba.video_urls).length > 0 && delete _0x42a7ba.duration, _0x42a7ba);
+function apimartOmniFlashVideo({ currentBody: currentBody4 }) {
+  const value177 = { ...currentBody4 };
+  return (normalizeInputList(value177.video_urls).length > 0 && delete value177.duration, value177);
 }
-function apimartVeo3Video({ currentBody: _0xe8d9ae, inputImages: inputImages = [], payload: payload = {} }) {
-  const _0x241304 = { ..._0xe8d9ae },
-    _0x798af2 = normalizeInputList(inputImages),
-    _0x3d05c9 = getApimartVeo3ModelChoice(payload),
-    _0x2a70ea = getApimartVeo3GenerationType(payload);
-  ((_0x241304.duration = 8), delete _0x241304.official_fallback);
-  const _0x489858 = String(_0x241304.resolution || '')
+function apimartVeo3Video({
+  currentBody: currentBody5,
+  inputImages: inputImages = [],
+  payload: payload = {},
+}) {
+  const value178 = { ...currentBody5 },
+    list20 = normalizeInputList(inputImages),
+    mode = getApimartVeo3ModelChoice(payload),
+    generation_type = getApimartVeo3GenerationType(payload);
+  ((value178.duration = 8), delete value178.official_fallback);
+  const value179 = String(value178.resolution || '')
     .trim()
     .toLowerCase();
-  if (_0x241304.enable_gif === true && (_0x489858 === '1080p' || _0x489858 === '4k'))
+  if (value178.enable_gif === true && (value179 === '1080p' || value179 === '4k'))
     throw new Error('APIMart VEO3 GIF output only supports 720p resolution');
-  const _0x50cc79 = validateApimartVeo3ImageCount(
-    { generationParams: { mode: _0x3d05c9, generation_type: _0x2a70ea } },
-    _0x798af2.length,
+  const error = validateApimartVeo3ImageCount(
+    { generationParams: { mode: mode, generation_type: generation_type } },
+    list20.length,
     { allowTextOnly: true },
   );
-  if (!_0x50cc79.ok) throw new Error(_0x50cc79.message);
-  if (_0x798af2.length === 0)
-    return (delete _0x241304.generation_type, delete _0x241304.image_urls, _0x241304);
+  if (!error.ok) throw new Error(error.message);
+  if (list20.length === 0) return (delete value178.generation_type, delete value178.image_urls, value178);
   return (
-    (_0x241304.generation_type = _0x2a70ea === 'reference' ? 'reference' : 'frame'),
-    (_0x241304.image_urls =
-      _0x241304.generation_type === 'reference' ? _0x798af2.slice(0, 3) : _0x798af2.slice(0, 2)),
-    _0x241304
+    (value178.generation_type = generation_type === 'reference' ? 'reference' : 'frame'),
+    (value178.image_urls =
+      value178.generation_type === 'reference' ? list20.slice(0, 3) : list20.slice(0, 2)),
+    value178
   );
 }
 function apimartHappyHorseVideo({
-  currentBody: _0x3fba3e,
+  currentBody: currentBody6,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalPrompt: finalPrompt = '',
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x1a233e = { ..._0x3fba3e },
-    _0x4b5de3 = String(_0x1a233e.prompt || finalPrompt || payload?.prompt || '').trim();
-  if (!_0x4b5de3) throw new Error('HappyHorse 1.0 prompt is required');
-  const _0x4f10d7 = normalizeInputList(inputImages),
-    _0x3a9b73 = normalizeInputList(inputVideos),
-    _0x16ba1b = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
-    _0x46c726 = (_0x21e514 = [], _0x56e598 = []) => {
-      const _0x160e2a = [],
-        _0x26aadd = (_0x58f72f) => {
-          const _0x766239 = String(_0x58f72f || '').trim();
-          if (_0x766239 && !_0x160e2a.includes(_0x766239)) _0x160e2a.push(_0x766239);
+  const value180 = { ...currentBody6 },
+    enabled19 = String(value180.prompt || finalPrompt || payload?.prompt || '').trim();
+  if (!enabled19) throw new Error('HappyHorse 1.0 prompt is required');
+  const list21 = normalizeInputList(inputImages),
+    list22 = normalizeInputList(inputVideos),
+    runningHubInputUrlsBySlot2 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
+    handler = (list23 = [], value181 = []) => {
+      const list24 = [],
+        handler2 = (value182) => {
+          const value183 = String(value182 || '').trim();
+          if (value183 && !list24.includes(value183)) list24.push(value183);
         };
       return (
-        _0x21e514.forEach((_0x2e5e73) => _0x26aadd(_0x16ba1b[_0x2e5e73])),
-        normalizeInputList(_0x56e598).forEach(_0x26aadd),
-        _0x160e2a
+        list23.forEach((item7) => handler2(runningHubInputUrlsBySlot2[item7])),
+        normalizeInputList(value181).forEach(handler2),
+        list24
       );
     };
-  let _0x1ad729 = String(
+  let value184 = String(
     payload?.generationParams?.happyhorse_mode || payload?.happyhorse_mode || 'auto',
   ).trim();
-  const _0x2a1f4f = _0x4f10d7.length > 0 || _0x3a9b73.length > 0 || Object.keys(_0x16ba1b).length > 0;
-  (_0x1ad729 === 'image' || _0x1ad729 === 'reference' || _0x1ad729 === 'edit') &&
-    !_0x2a1f4f &&
-    (_0x1ad729 = 'auto');
-  delete _0x1a233e.happyhorse_mode;
-  if (_0x1ad729 === 'edit') {
-    if (!_0x3a9b73[0]) throw new Error('HappyHorse 1.0 video edit requires video_url input');
-    const _0x149a14 = _0x46c726(['editRefImage'], _0x4f10d7);
-    _0x1a233e.video_url = _0x3a9b73[0];
-    if (_0x149a14.length > 0) _0x1a233e.image_urls = _0x149a14.slice(0, 5);
-    const _0x19be32 = String(payload?.generationParams?.audio_setting || payload?.audio_setting || '').trim();
+  const enabled20 =
+    list21.length > 0 || list22.length > 0 || Object.keys(runningHubInputUrlsBySlot2).length > 0;
+  (value184 === 'image' || value184 === 'reference' || value184 === 'edit') &&
+    !enabled20 &&
+    (value184 = 'auto');
+  delete value180.happyhorse_mode;
+  if (value184 === 'edit') {
+    if (!list22[0]) throw new Error('HappyHorse 1.0 video edit requires video_url input');
+    const list25 = handler(['editRefImage'], list21);
+    value180.video_url = list22[0];
+    if (list25.length > 0) value180.image_urls = list25.slice(0, 5);
+    const value185 = String(payload?.generationParams?.audio_setting || payload?.audio_setting || '').trim();
     return (
-      (_0x19be32 === 'auto' || _0x19be32 === 'origin') && (_0x1a233e.audio_setting = _0x19be32),
-      delete _0x1a233e.first_frame_image,
-      delete _0x1a233e.size,
-      delete _0x1a233e.duration,
-      _0x1a233e
+      (value185 === 'auto' || value185 === 'origin') && (value180.audio_setting = value185),
+      delete value180.first_frame_image,
+      delete value180.size,
+      delete value180.duration,
+      value180
     );
   }
-  delete _0x1a233e.audio_setting;
-  if (_0x1ad729 === 'image') {
-    const _0x4ba7ea = _0x46c726(['firstFrame'], _0x4f10d7);
-    if (!_0x4ba7ea[0]) throw new Error('HappyHorse 1.0 image-to-video requires first_frame_image input');
+  delete value180.audio_setting;
+  if (value184 === 'image') {
+    const enabled21 = handler(['firstFrame'], list21);
+    if (!enabled21[0]) throw new Error('HappyHorse 1.0 image-to-video requires first_frame_image input');
     return (
-      (_0x1a233e.first_frame_image = _0x4ba7ea[0]),
-      delete _0x1a233e.image_urls,
-      delete _0x1a233e.video_url,
-      delete _0x1a233e.size,
-      _0x1a233e
+      (value180.first_frame_image = enabled21[0]),
+      delete value180.image_urls,
+      delete value180.video_url,
+      delete value180.size,
+      value180
     );
   }
-  if (_0x1ad729 === 'reference') {
-    const _0x143164 = _0x46c726(['referenceImage'], _0x4f10d7);
-    if (_0x143164.length <= 0) throw new Error('HappyHorse 1.0 reference mode requires image_urls input');
+  if (value184 === 'reference') {
+    const list26 = handler(['referenceImage'], list21);
+    if (list26.length <= 0) throw new Error('HappyHorse 1.0 reference mode requires image_urls input');
     return (
-      (_0x1a233e.image_urls = _0x143164.slice(0, 9)),
-      delete _0x1a233e.first_frame_image,
-      delete _0x1a233e.video_url,
-      _0x1a233e
+      (value180.image_urls = list26.slice(0, 9)),
+      delete value180.first_frame_image,
+      delete value180.video_url,
+      value180
     );
   }
-  if (_0x1ad729 !== 'auto') throw new Error('Unsupported HappyHorse 1.0 mode: ' + _0x1ad729);
-  if (_0x4f10d7.length > 0 || _0x3a9b73.length > 0)
+  if (value184 !== 'auto') throw new Error('Unsupported HappyHorse 1.0 mode: ' + value184);
+  if (list21.length > 0 || list22.length > 0)
     throw new Error('HappyHorse 1.0 media inputs require an explicit mode selection');
-  return (
-    delete _0x1a233e.first_frame_image,
-    delete _0x1a233e.image_urls,
-    delete _0x1a233e.video_url,
-    _0x1a233e
-  );
+  return (delete value180.first_frame_image, delete value180.image_urls, delete value180.video_url, value180);
 }
 const RUNNINGHUB_HAPPYHORSE_ENDPOINTS = Object.freeze({
   text: 'https://www.runninghub.cn/openapi/v2/alibaba/happyhorse-1.0/text-to-video',
@@ -1048,102 +1067,103 @@ const RUNNINGHUB_HAPPYHORSE_ENDPOINTS = Object.freeze({
   reference: 'https://www.runninghub.cn/openapi/v2/alibaba/happyhorse-1.0/reference-to-video',
   edit: 'https://www.runninghub.cn/openapi/v2/alibaba/happyhorse-1.0/video-edit',
 });
-function normalizeHappyHorseGenerationMode(_0x3f432e) {
-  const _0xcbe7e4 = String(_0x3f432e || '')
+function normalizeHappyHorseGenerationMode(value186) {
+  const value187 = String(value186 || '')
     .trim()
     .toLowerCase();
-  return _0xcbe7e4 === 'image' || _0xcbe7e4 === 'reference' || _0xcbe7e4 === 'edit' ? _0xcbe7e4 : 'auto';
+  return value187 === 'image' || value187 === 'reference' || value187 === 'edit' ? value187 : 'auto';
 }
-function getRunningHubHappyHorseMode(_0x2a59b7 = {}, _0x2a46fe = {}) {
+function getRunningHubHappyHorseMode(options6 = {}, value188 = {}) {
   return normalizeHappyHorseGenerationMode(
-    _0x2a46fe.happyhorse_mode || _0x2a59b7?.generationParams?.happyhorse_mode || _0x2a59b7?.happyhorse_mode,
+    value188.happyhorse_mode || options6?.generationParams?.happyhorse_mode || options6?.happyhorse_mode,
   );
 }
-function normalizeRunningHubHappyHorseAudioSettingValue(_0x5eba66) {
-  const _0x3d1269 = String(_0x5eba66 || '')
+function normalizeRunningHubHappyHorseAudioSettingValue(value189) {
+  const value190 = String(value189 || '')
     .trim()
     .toLowerCase();
-  return _0x3d1269 === 'origin' ? 'origin' : 'auto';
+  return value190 === 'origin' ? 'origin' : 'auto';
 }
 function runninghubHappyHorseVideo({
-  currentBody: _0x3a1e96,
+  currentBody: currentBody7,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalPrompt: finalPrompt = '',
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x373104 = { ..._0x3a1e96 },
-    _0x29fbd6 = String(_0x373104.prompt || finalPrompt || payload?.prompt || '').trim();
-  if (!_0x29fbd6) throw new Error('RunningHub HappyHorse 1.0 prompt is required');
-  const _0x327b45 = normalizeInputList(inputImages),
-    _0x5130ec = normalizeInputList(inputVideos),
-    _0x537f90 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
-    _0x650cea = (_0x21edf0 = [], _0x3dd507 = []) => {
-      const _0x26d0b5 = [],
-        _0x370f7d = (_0x502d60) => {
-          const _0x571438 = String(_0x502d60 || '').trim();
-          if (_0x571438 && !_0x26d0b5.includes(_0x571438)) _0x26d0b5.push(_0x571438);
+  const value191 = { ...currentBody7 },
+    enabled22 = String(value191.prompt || finalPrompt || payload?.prompt || '').trim();
+  if (!enabled22) throw new Error('RunningHub HappyHorse 1.0 prompt is required');
+  const list27 = normalizeInputList(inputImages),
+    list28 = normalizeInputList(inputVideos),
+    runningHubInputUrlsBySlot3 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
+    handler3 = (list29 = [], value192 = []) => {
+      const list30 = [],
+        handler4 = (value193) => {
+          const value194 = String(value193 || '').trim();
+          if (value194 && !list30.includes(value194)) list30.push(value194);
         };
       return (
-        _0x21edf0.forEach((_0x56f479) => _0x370f7d(_0x537f90[_0x56f479])),
-        normalizeInputList(_0x3dd507).forEach(_0x370f7d),
-        _0x26d0b5
+        list29.forEach((item8) => handler4(runningHubInputUrlsBySlot3[item8])),
+        normalizeInputList(value192).forEach(handler4),
+        list30
       );
     };
-  let _0x469459 = getRunningHubHappyHorseMode(payload, _0x373104);
-  const _0xedcce = _0x327b45.length > 0 || _0x5130ec.length > 0 || Object.keys(_0x537f90).length > 0;
-  _0x469459 !== 'auto' && !_0xedcce && (_0x469459 = 'auto');
-  ((_0x373104.prompt = _0x29fbd6),
-    delete _0x373104.happyhorse_mode,
-    delete _0x373104.imageUrl,
-    delete _0x373104.imageUrls,
-    delete _0x373104.videoUrl);
-  if (_0x469459 === 'edit') {
-    if (!_0x5130ec[0]) throw new Error('RunningHub HappyHorse 1.0 video edit requires videoUrl input');
-    const _0x427848 = _0x650cea(['editRefImage'], _0x327b45);
-    _0x373104.videoUrl = _0x5130ec[0];
-    if (_0x427848.length > 0) _0x373104.imageUrls = _0x427848.slice(0, 5);
+  let runningHubHappyHorseMode = getRunningHubHappyHorseMode(payload, value191);
+  const enabled23 =
+    list27.length > 0 || list28.length > 0 || Object.keys(runningHubInputUrlsBySlot3).length > 0;
+  runningHubHappyHorseMode !== 'auto' && !enabled23 && (runningHubHappyHorseMode = 'auto');
+  ((value191.prompt = enabled22),
+    delete value191.happyhorse_mode,
+    delete value191.imageUrl,
+    delete value191.imageUrls,
+    delete value191.videoUrl);
+  if (runningHubHappyHorseMode === 'edit') {
+    if (!list28[0]) throw new Error('RunningHub HappyHorse 1.0 video edit requires videoUrl input');
+    const list31 = handler3(['editRefImage'], list27);
+    value191.videoUrl = list28[0];
+    if (list31.length > 0) value191.imageUrls = list31.slice(0, 5);
     return (
-      (_0x373104.audioSetting = normalizeRunningHubHappyHorseAudioSettingValue(
-        _0x373104.audioSetting ??
+      (value191.audioSetting = normalizeRunningHubHappyHorseAudioSettingValue(
+        value191.audioSetting ??
           payload?.generationParams?.audioSetting ??
           payload?.generationParams?.audio_setting ??
           payload?.audioSetting ??
           payload?.audio_setting,
       )),
-      delete _0x373104.aspectRatio,
-      delete _0x373104.duration,
-      delete _0x373104.imageUrl,
-      _0x373104
+      delete value191.aspectRatio,
+      delete value191.duration,
+      delete value191.imageUrl,
+      value191
     );
   }
-  delete _0x373104.audioSetting;
-  if (_0x469459 === 'image') {
-    const _0x233780 = _0x650cea(['firstFrame'], _0x327b45);
-    if (!_0x233780[0]) throw new Error('RunningHub HappyHorse 1.0 image-to-video requires imageUrl input');
+  delete value191.audioSetting;
+  if (runningHubHappyHorseMode === 'image') {
+    const enabled24 = handler3(['firstFrame'], list27);
+    if (!enabled24[0]) throw new Error('RunningHub HappyHorse 1.0 image-to-video requires imageUrl input');
     return (
-      (_0x373104.imageUrl = _0x233780[0]),
-      delete _0x373104.imageUrls,
-      delete _0x373104.videoUrl,
-      delete _0x373104.aspectRatio,
-      _0x373104
+      (value191.imageUrl = enabled24[0]),
+      delete value191.imageUrls,
+      delete value191.videoUrl,
+      delete value191.aspectRatio,
+      value191
     );
   }
-  if (_0x469459 === 'reference') {
-    const _0x12fe70 = _0x650cea(['referenceImage'], _0x327b45);
-    if (_0x12fe70.length <= 0)
+  if (runningHubHappyHorseMode === 'reference') {
+    const list32 = handler3(['referenceImage'], list27);
+    if (list32.length <= 0)
       throw new Error('RunningHub HappyHorse 1.0 reference mode requires imageUrls input');
     return (
-      (_0x373104.imageUrls = _0x12fe70.slice(0, 9)),
-      delete _0x373104.imageUrl,
-      delete _0x373104.videoUrl,
-      _0x373104
+      (value191.imageUrls = list32.slice(0, 9)),
+      delete value191.imageUrl,
+      delete value191.videoUrl,
+      value191
     );
   }
-  if (_0x327b45.length > 0 || _0x5130ec.length > 0)
+  if (list27.length > 0 || list28.length > 0)
     throw new Error('RunningHub HappyHorse 1.0 media inputs require an explicit mode selection');
-  return (delete _0x373104.imageUrl, delete _0x373104.imageUrls, delete _0x373104.videoUrl, _0x373104);
+  return (delete value191.imageUrl, delete value191.imageUrls, delete value191.videoUrl, value191);
 }
 function hasRunningHubHappyHorseEndpointMedia({
   currentBody: currentBody = {},
@@ -1159,12 +1179,14 @@ function hasRunningHubHappyHorseEndpointMedia({
     normalizeInputList(currentBody?.imageUrls).length > 0
   );
 }
-function runninghubHappyHorseVideoEndpoint(_0x291f4f = {}) {
-  const { payload: payload = {}, currentBody: currentBody = {} } = _0x291f4f;
-  let _0x4b62a1 = getRunningHubHappyHorseMode(payload, currentBody);
+function runninghubHappyHorseVideoEndpoint(options7 = {}) {
+  const { payload: payload = {}, currentBody: currentBody = {} } = options7;
+  let runningHubHappyHorseMode2 = getRunningHubHappyHorseMode(payload, currentBody);
   return (
-    _0x4b62a1 !== 'auto' && !hasRunningHubHappyHorseEndpointMedia(_0x291f4f) && (_0x4b62a1 = 'auto'),
-    RUNNINGHUB_HAPPYHORSE_ENDPOINTS[_0x4b62a1] || RUNNINGHUB_HAPPYHORSE_ENDPOINTS.text
+    runningHubHappyHorseMode2 !== 'auto' &&
+      !hasRunningHubHappyHorseEndpointMedia(options7) &&
+      (runningHubHappyHorseMode2 = 'auto'),
+    RUNNINGHUB_HAPPYHORSE_ENDPOINTS[runningHubHappyHorseMode2] || RUNNINGHUB_HAPPYHORSE_ENDPOINTS.text
   );
 }
 const RUNNINGHUB_SEEDANCE_2_ENDPOINTS = Object.freeze({
@@ -1179,33 +1201,33 @@ const RUNNINGHUB_SEEDANCE_2_ENDPOINTS = Object.freeze({
     reference: 'https://www.runninghub.cn/openapi/v2/rhart-video/sparkvideo-2.0/multimodal-video',
   }),
 });
-function normalizeRunningHubSeedance2Model(_0x407242) {
-  const _0x151938 = String(_0x407242 || '')
+function normalizeRunningHubSeedance2Model(value195) {
+  const value196 = String(value195 || '')
     .trim()
     .toLowerCase();
-  return _0x151938 === 'standard' || _0x151938 === 'std' ? 'standard' : 'fast';
+  return value196 === 'standard' || value196 === 'std' ? 'standard' : 'fast';
 }
-function normalizeRunningHubSeedance2Mode(_0x145ec2) {
-  const _0x5d86ad = String(_0x145ec2 || '')
+function normalizeRunningHubSeedance2Mode(value197) {
+  const value198 = String(value197 || '')
     .trim()
     .toLowerCase();
-  if (_0x5d86ad === 'multimodal2video' || _0x5d86ad === 'reference') return 'multimodal2video';
-  if (_0x5d86ad === 'frames2video' || _0x5d86ad === 'frames') return 'frames2video';
-  if (_0x5d86ad === 'image2video' || _0x5d86ad === 'image' || _0x5d86ad === 'frame') return 'image2video';
+  if (value198 === 'multimodal2video' || value198 === 'reference') return 'multimodal2video';
+  if (value198 === 'frames2video' || value198 === 'frames') return 'frames2video';
+  if (value198 === 'image2video' || value198 === 'image' || value198 === 'frame') return 'image2video';
   return 'text2video';
 }
-function getRunningHubSeedance2Model(_0x24f71e = {}, _0x37eefa = {}) {
+function getRunningHubSeedance2Model(options8 = {}, value199 = {}) {
   return normalizeRunningHubSeedance2Model(
-    _0x37eefa.rh_seedance_2_model ||
-      _0x24f71e?.generationParams?.rh_seedance_2_model ||
-      _0x24f71e?.rh_seedance_2_model,
+    value199.rh_seedance_2_model ||
+      options8?.generationParams?.rh_seedance_2_model ||
+      options8?.rh_seedance_2_model,
   );
 }
-function getRunningHubSeedance2Mode(_0x23e593 = {}, _0x4af4f9 = {}) {
+function getRunningHubSeedance2Mode(options9 = {}, value200 = {}) {
   return normalizeRunningHubSeedance2Mode(
-    _0x4af4f9.rh_seedance_2_mode ||
-      _0x23e593?.generationParams?.rh_seedance_2_mode ||
-      _0x23e593?.rh_seedance_2_mode,
+    value200.rh_seedance_2_mode ||
+      options9?.generationParams?.rh_seedance_2_mode ||
+      options9?.rh_seedance_2_mode,
   );
 }
 function collectRunningHubSeedance2SlotImages({
@@ -1213,47 +1235,48 @@ function collectRunningHubSeedance2SlotImages({
   finalUrlsBySlot: finalUrlsBySlot = {},
   slotIds: slotIds = [],
 } = {}) {
-  const _0x4c8298 = [],
-    _0x470660 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
-    _0x2771b0 = new Set(normalizeInputList(Object.values(_0x470660)));
+  const value201 = [],
+    runningHubInputUrlsBySlot4 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
+    map3 = new Set(normalizeInputList(Object.values(runningHubInputUrlsBySlot4)));
   return (
-    slotIds.forEach((_0x3f15b5) => appendUniqueUrl(_0x4c8298, _0x470660[_0x3f15b5])),
-    normalizeInputList(inputImages).forEach((_0x2989fe) => {
-      if (!_0x2771b0.has(_0x2989fe)) appendUniqueUrl(_0x4c8298, _0x2989fe);
+    slotIds.forEach((item9) => appendUniqueUrl(value201, runningHubInputUrlsBySlot4[item9])),
+    normalizeInputList(inputImages).forEach((item10) => {
+      if (!map3.has(item10)) appendUniqueUrl(value201, item10);
     }),
-    _0x4c8298
+    value201
   );
 }
-function collectRunningHubSeedance2FrameImages(_0x5e7551 = {}) {
-  return collectRunningHubSeedance2SlotImages({ ..._0x5e7551, slotIds: ['firstFrame', 'lastFrame'] });
+function collectRunningHubSeedance2FrameImages(args5 = {}) {
+  return collectRunningHubSeedance2SlotImages({ ...args5, slotIds: ['firstFrame', 'lastFrame'] });
 }
-function collectRunningHubSeedance2ReferenceImages(_0x2e3c71 = {}) {
-  return collectRunningHubSeedance2SlotImages({ ..._0x2e3c71, slotIds: ['referenceImage'] });
+function collectRunningHubSeedance2ReferenceImages(args6 = {}) {
+  return collectRunningHubSeedance2SlotImages({ ...args6, slotIds: ['referenceImage'] });
 }
 function resolveRunningHubSeedance2Route({ payload: payload = {}, currentBody: currentBody = {} } = {}) {
-  const _0x35a7f7 = getRunningHubSeedance2Model(payload, currentBody),
-    _0x173c35 = getRunningHubSeedance2Mode(payload, currentBody);
-  if (_0x173c35 === 'multimodal2video') return Object.freeze({ model: _0x35a7f7, route: 'reference' });
-  if (_0x173c35 === 'image2video' || _0x173c35 === 'frames2video')
-    return Object.freeze({ model: _0x35a7f7, route: 'image' });
-  return Object.freeze({ model: _0x35a7f7, route: 'text' });
+  const model5 = getRunningHubSeedance2Model(payload, currentBody),
+    runningHubSeedance2Mode = getRunningHubSeedance2Mode(payload, currentBody);
+  if (runningHubSeedance2Mode === 'multimodal2video')
+    return Object.freeze({ model: model5, route: 'reference' });
+  if (runningHubSeedance2Mode === 'image2video' || runningHubSeedance2Mode === 'frames2video')
+    return Object.freeze({ model: model5, route: 'image' });
+  return Object.freeze({ model: model5, route: 'text' });
 }
-function removeRunningHubSeedance2TransientFields(_0x54a3fc) {
-  (delete _0x54a3fc.rh_seedance_2_model,
-    delete _0x54a3fc.rh_seedance_2_mode,
-    delete _0x54a3fc.firstFrameUrl,
-    delete _0x54a3fc.lastFrameUrl,
-    delete _0x54a3fc.imageUrls,
-    delete _0x54a3fc.videoUrls,
-    delete _0x54a3fc.audioUrls);
+function removeRunningHubSeedance2TransientFields(value202) {
+  (delete value202.rh_seedance_2_model,
+    delete value202.rh_seedance_2_mode,
+    delete value202.firstFrameUrl,
+    delete value202.lastFrameUrl,
+    delete value202.imageUrls,
+    delete value202.videoUrls,
+    delete value202.audioUrls);
 }
-function normalizeRunningHubSeedance2ConversionSlots(_0x333c23) {
-  const _0x5e721d = Array.isArray(_0x333c23) ? _0x333c23 : ['all'],
-    _0x3de7a2 = _0x5e721d.map((_0x2d7237) => String(_0x2d7237 || '').trim()).filter(Boolean);
-  return _0x3de7a2.length > 0 ? _0x3de7a2 : ['all'];
+function normalizeRunningHubSeedance2ConversionSlots(value203) {
+  const list33 = Array.isArray(value203) ? value203 : ['all'],
+    list34 = list33.map((item11) => String(item11 || '').trim()).filter(Boolean);
+  return list34.length > 0 ? list34 : ['all'];
 }
 function runninghubSeedance2Video({
-  currentBody: _0x439da8,
+  currentBody: currentBody8,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
@@ -1261,87 +1284,87 @@ function runninghubSeedance2Video({
   finalPrompt: finalPrompt = '',
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x1e3040 = { ..._0x439da8 },
-    _0x2f8406 = String(_0x1e3040.prompt || finalPrompt || payload?.prompt || '').trim();
-  if (!_0x2f8406) throw new Error('RunningHub Seedance 2.0 prompt is required');
-  const _0x58fa92 = getRunningHubSeedance2Mode(payload, _0x1e3040),
-    _0x132e64 = collectRunningHubSeedance2FrameImages({
+  const value204 = { ...currentBody8 },
+    enabled25 = String(value204.prompt || finalPrompt || payload?.prompt || '').trim();
+  if (!enabled25) throw new Error('RunningHub Seedance 2.0 prompt is required');
+  const runningHubSeedance2Mode2 = getRunningHubSeedance2Mode(payload, value204),
+    list35 = collectRunningHubSeedance2FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x37492d = collectRunningHubSeedance2ReferenceImages({
+    list36 = collectRunningHubSeedance2ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x1a26ef = normalizeInputList(inputVideos),
-    _0x475a47 = normalizeInputList(inputAudios),
-    _0x2b33f0 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video'),
-    _0x10da3e = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
-  ((_0x1e3040.prompt = _0x2f8406), removeRunningHubSeedance2TransientFields(_0x1e3040));
-  if (_0x58fa92 === 'multimodal2video') {
-    if (_0x37492d.length + _0x1a26ef.length <= 0)
+    list37 = normalizeInputList(inputVideos),
+    list38 = normalizeInputList(inputAudios),
+    runningHubKlingV3RawMediaCount = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video'),
+    runningHubKlingV3RawMediaCount2 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
+  ((value204.prompt = enabled25), removeRunningHubSeedance2TransientFields(value204));
+  if (runningHubSeedance2Mode2 === 'multimodal2video') {
+    if (list36.length + list37.length <= 0)
       throw new Error('RunningHub Seedance 2.0 multimodal mode requires image or video input');
-    if (_0x37492d.length > 9)
+    if (list36.length > 9)
       throw new Error('RunningHub Seedance 2.0 multimodal mode supports at most 9 image inputs');
-    if (_0x2b33f0 > 3)
+    if (runningHubKlingV3RawMediaCount > 3)
       throw new Error('RunningHub Seedance 2.0 multimodal mode supports at most 3 video inputs');
-    if (_0x10da3e > 3)
+    if (runningHubKlingV3RawMediaCount2 > 3)
       throw new Error('RunningHub Seedance 2.0 multimodal mode supports at most 3 audio inputs');
-    if (_0x475a47.length > 0 && _0x37492d.length + _0x1a26ef.length <= 0)
+    if (list38.length > 0 && list36.length + list37.length <= 0)
       throw new Error('RunningHub Seedance 2.0 audio input requires image or video input');
-    if (_0x37492d.length > 0) _0x1e3040.imageUrls = _0x37492d.slice(0, 9);
-    if (_0x1a26ef.length > 0) _0x1e3040.videoUrls = _0x1a26ef.slice(0, 3);
-    if (_0x475a47.length > 0) _0x1e3040.audioUrls = _0x475a47.slice(0, 3);
+    if (list36.length > 0) value204.imageUrls = list36.slice(0, 9);
+    if (list37.length > 0) value204.videoUrls = list37.slice(0, 3);
+    if (list38.length > 0) value204.audioUrls = list38.slice(0, 3);
     return (
-      _0x1e3040.realPersonMode === true
-        ? (_0x1e3040.conversionSlots = normalizeRunningHubSeedance2ConversionSlots(_0x1e3040.conversionSlots))
-        : delete _0x1e3040.conversionSlots,
-      delete _0x1e3040.webSearch,
-      _0x1e3040
+      value204.realPersonMode === true
+        ? (value204.conversionSlots = normalizeRunningHubSeedance2ConversionSlots(value204.conversionSlots))
+        : delete value204.conversionSlots,
+      delete value204.webSearch,
+      value204
     );
   }
-  if (_0x2b33f0 > 0)
+  if (runningHubKlingV3RawMediaCount > 0)
     throw new Error(
       'RunningHub Seedance 2.0 text/image/frame modes do not accept video input; use multimodal mode',
     );
-  if (_0x10da3e > 0)
+  if (runningHubKlingV3RawMediaCount2 > 0)
     throw new Error(
       'RunningHub Seedance 2.0 text/image/frame modes do not accept audio input; use multimodal mode',
     );
-  if (_0x58fa92 === 'text2video') {
-    if (_0x132e64.length > 0)
+  if (runningHubSeedance2Mode2 === 'text2video') {
+    if (list35.length > 0)
       throw new Error('RunningHub Seedance 2.0 text-to-video mode does not accept image input');
-    return (delete _0x1e3040.realPersonMode, delete _0x1e3040.conversionSlots, _0x1e3040);
+    return (delete value204.realPersonMode, delete value204.conversionSlots, value204);
   }
-  if (_0x58fa92 === 'image2video' && _0x132e64.length !== 1)
+  if (runningHubSeedance2Mode2 === 'image2video' && list35.length !== 1)
     throw new Error('RunningHub Seedance 2.0 image-to-video mode requires exactly 1 image input');
-  if (_0x58fa92 === 'frames2video' && _0x132e64.length !== 2)
+  if (runningHubSeedance2Mode2 === 'frames2video' && list35.length !== 2)
     throw new Error('RunningHub Seedance 2.0 first-last-frame mode requires exactly 2 image inputs');
-  _0x1e3040.firstFrameUrl = _0x132e64[0];
-  if (_0x132e64[1]) _0x1e3040.lastFrameUrl = _0x132e64[1];
+  value204.firstFrameUrl = list35[0];
+  if (list35[1]) value204.lastFrameUrl = list35[1];
   return (
-    delete _0x1e3040.webSearch,
-    _0x1e3040.realPersonMode === true
-      ? (_0x1e3040.conversionSlots = normalizeRunningHubSeedance2ConversionSlots(_0x1e3040.conversionSlots))
-      : delete _0x1e3040.conversionSlots,
-    _0x1e3040
+    delete value204.webSearch,
+    value204.realPersonMode === true
+      ? (value204.conversionSlots = normalizeRunningHubSeedance2ConversionSlots(value204.conversionSlots))
+      : delete value204.conversionSlots,
+    value204
   );
 }
 function runninghubSeedance2VideoEndpoint({ payload: payload = {} }) {
-  const { model: _0x2d35d6, route: _0x4fd0f0 } = resolveRunningHubSeedance2Route({ payload: payload });
-  return RUNNINGHUB_SEEDANCE_2_ENDPOINTS[_0x2d35d6]?.[_0x4fd0f0] || RUNNINGHUB_SEEDANCE_2_ENDPOINTS.fast.text;
+  const { model: model6, route: route2 } = resolveRunningHubSeedance2Route({ payload: payload });
+  return RUNNINGHUB_SEEDANCE_2_ENDPOINTS[model6]?.[route2] || RUNNINGHUB_SEEDANCE_2_ENDPOINTS.fast.text;
 }
-function normalizeVolcengineSeedance2Mode(_0x5b97fa) {
-  return normalizeRunningHubSeedance2Mode(_0x5b97fa);
+function normalizeVolcengineSeedance2Mode(value205) {
+  return normalizeRunningHubSeedance2Mode(value205);
 }
-function getVolcengineSeedance2Mode(_0x434638 = {}, _0x3de97b = {}) {
+function getVolcengineSeedance2Mode(options10 = {}, value206 = {}) {
   return normalizeVolcengineSeedance2Mode(
-    _0x434638?.dreaminaRouteMode ||
-      _0x434638?.dreaminaTaskType ||
-      _0x434638?.generationParams?.dreaminaRouteMode ||
-      _0x3de97b.volcengine_seedance_2_mode ||
-      _0x434638?.generationParams?.volcengine_seedance_2_mode ||
-      _0x434638?.volcengine_seedance_2_mode,
+    options10?.dreaminaRouteMode ||
+      options10?.dreaminaTaskType ||
+      options10?.generationParams?.dreaminaRouteMode ||
+      value206.volcengine_seedance_2_mode ||
+      options10?.generationParams?.volcengine_seedance_2_mode ||
+      options10?.volcengine_seedance_2_mode,
   );
 }
 function resolveVolcengineSeedance2TaskType({
@@ -1351,103 +1374,103 @@ function resolveVolcengineSeedance2TaskType({
   videoCount: videoCount = 0,
   audioCount: audioCount = 0,
 } = {}) {
-  const _0x205c66 = normalizeVolcengineSeedance2Mode(routeMode),
-    _0x1fdb8f = normalizePositiveInteger(frameImageCount, 0),
-    _0x455bda = normalizePositiveInteger(referenceImageCount, 0),
-    _0x28457e = normalizePositiveInteger(videoCount, 0),
-    _0xb87384 = normalizePositiveInteger(audioCount, 0);
-  if (_0x205c66 === 'frames2video') {
-    if (_0x1fdb8f >= 2) return 'frames2video';
-    if (_0x1fdb8f === 1) return 'image2video';
+  const volcengineSeedance2Mode = normalizeVolcengineSeedance2Mode(routeMode),
+    positiveInteger3 = normalizePositiveInteger(frameImageCount, 0),
+    positiveInteger4 = normalizePositiveInteger(referenceImageCount, 0),
+    positiveInteger5 = normalizePositiveInteger(videoCount, 0),
+    positiveInteger6 = normalizePositiveInteger(audioCount, 0);
+  if (volcengineSeedance2Mode === 'frames2video') {
+    if (positiveInteger3 >= 2) return 'frames2video';
+    if (positiveInteger3 === 1) return 'image2video';
     return 'text2video';
   }
-  if (_0x205c66 === 'image2video') return 'image2video';
-  if (_0x205c66 === 'text2video') return 'text2video';
-  if (_0x455bda > 0 || _0x28457e > 0 || _0xb87384 > 0) return 'multimodal2video';
+  if (volcengineSeedance2Mode === 'image2video') return 'image2video';
+  if (volcengineSeedance2Mode === 'text2video') return 'text2video';
+  if (positiveInteger4 > 0 || positiveInteger5 > 0 || positiveInteger6 > 0) return 'multimodal2video';
   return 'text2video';
 }
-function normalizeVolcengineSeedance2Resolution(_0x29ad7a, _0x1bd0b7 = {}, _0x320180 = '') {
-  const _0x74d400 = String(_0x29ad7a || _0x1bd0b7.defaultResolution || '720p')
+function normalizeVolcengineSeedance2Resolution(value207, value208 = {}, value209 = '') {
+  const value210 = String(value207 || value208.defaultResolution || '720p')
       .trim()
       .toLowerCase(),
-    _0x4ef509 = /fast/i.test(String(_0x320180 || ''));
-  if (_0x74d400 === '1080p' && !_0x4ef509) return '1080p';
-  if (_0x74d400 === '480p') return '480p';
+    enabled26 = /fast/i.test(String(value209 || ''));
+  if (value210 === '1080p' && !enabled26) return '1080p';
+  if (value210 === '480p') return '480p';
   return '720p';
 }
-function normalizeVolcengineSeedance2Ratio(_0x218a91, _0x5d55cb = {}) {
-  const _0x175a34 = String(_0x218a91 || '').trim();
-  if (!_0x175a34 || _0x175a34 === 'auto' || _0x175a34 === 'default' || _0x175a34 === '自适应')
-    return _0x5d55cb.defaultRatio || 'adaptive';
-  const _0x22870c = normalizeRatioLabelText(_0x175a34);
-  return ['16:9', '4:3', '1:1', '3:4', '9:16', '21:9'].includes(_0x22870c)
-    ? _0x22870c
-    : _0x5d55cb.defaultRatio || 'adaptive';
+function normalizeVolcengineSeedance2Ratio(value211, value212 = {}) {
+  const enabled27 = String(value211 || '').trim();
+  if (!enabled27 || enabled27 === 'auto' || enabled27 === 'default' || enabled27 === '自适应')
+    return value212.defaultRatio || 'adaptive';
+  const ratioLabelText4 = normalizeRatioLabelText(enabled27);
+  return ['16:9', '4:3', '1:1', '3:4', '9:16', '21:9'].includes(ratioLabelText4)
+    ? ratioLabelText4
+    : value212.defaultRatio || 'adaptive';
 }
-function normalizeVolcengineSeedance2Duration(_0x3006c2, _0xfeda37 = {}) {
-  const _0x4bd422 = Number(_0x3006c2);
-  if (_0x4bd422 === -1) return -1;
-  const _0x3a72f6 = normalizePositiveInteger(_0xfeda37.minDuration, 4),
-    _0x12573b = normalizePositiveInteger(_0xfeda37.maxDuration, 15);
-  if (!Number.isFinite(_0x4bd422)) return 5;
-  return Math.max(_0x3a72f6, Math.min(_0x12573b, Math.trunc(_0x4bd422)));
+function normalizeVolcengineSeedance2Duration(value213, value214 = {}) {
+  const value215 = Number(value213);
+  if (value215 === -1) return -1;
+  const positiveInteger7 = normalizePositiveInteger(value214.minDuration, 4),
+    positiveInteger8 = normalizePositiveInteger(value214.maxDuration, 15);
+  if (!Number.isFinite(value215)) return 5;
+  return Math.max(positiveInteger7, Math.min(positiveInteger8, Math.trunc(value215)));
 }
-function normalizeVolcengineSeedance2Seed(_0x5d70f5) {
-  if (!isPresentValue(_0x5d70f5)) return null;
-  const _0x41a7d6 = Number.parseInt(String(_0x5d70f5).trim(), 10);
-  return Number.isFinite(_0x41a7d6) ? _0x41a7d6 : null;
+function normalizeVolcengineSeedance2Seed(value216) {
+  if (!isPresentValue(value216)) return null;
+  const value217 = Number.parseInt(String(value216).trim(), 10);
+  return Number.isFinite(value217) ? value217 : null;
 }
-function getVolcengineSeedance2Policy(_0x2c8f2f) {
-  const _0x57a457 = _0x2c8f2f?.extensions?.seedanceVideo;
-  return _0x57a457 && typeof _0x57a457 === 'object' && !Array.isArray(_0x57a457) ? _0x57a457 : {};
+function getVolcengineSeedance2Policy(value218) {
+  const value219 = value218?.extensions?.seedanceVideo;
+  return value219 && typeof value219 === 'object' && !Array.isArray(value219) ? value219 : {};
 }
-function getVolcengineSlotMedia(_0x3ed1d0 = {}, _0x15de8d) {
-  return String(normalizeRunningHubInputUrlsBySlot(_0x3ed1d0)[_0x15de8d] || '').trim();
+function getVolcengineSlotMedia(options11 = {}, value220) {
+  return String(normalizeRunningHubInputUrlsBySlot(options11)[value220] || '').trim();
 }
 function collectVolcengineSeedance2FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x351248 = [];
+  const value221 = [];
   return (
-    appendUniqueUrl(_0x351248, getVolcengineSlotMedia(finalUrlsBySlot, 'firstFrame')),
-    appendUniqueUrl(_0x351248, getVolcengineSlotMedia(finalUrlsBySlot, 'lastFrame')),
-    normalizeInputList(inputImages).forEach((_0x3d22ea) => appendUniqueUrl(_0x351248, _0x3d22ea)),
-    _0x351248
+    appendUniqueUrl(value221, getVolcengineSlotMedia(finalUrlsBySlot, 'firstFrame')),
+    appendUniqueUrl(value221, getVolcengineSlotMedia(finalUrlsBySlot, 'lastFrame')),
+    normalizeInputList(inputImages).forEach((item12) => appendUniqueUrl(value221, item12)),
+    value221
   );
 }
 function collectVolcengineSeedance2ReferenceImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x1fa3ad = [];
-  appendUniqueUrl(_0x1fa3ad, getVolcengineSlotMedia(finalUrlsBySlot, 'referenceImage'));
-  const _0xf5d651 = new Set(
+  const value222 = [];
+  appendUniqueUrl(value222, getVolcengineSlotMedia(finalUrlsBySlot, 'referenceImage'));
+  const map4 = new Set(
     normalizeInputList(Object.values(normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot))),
   );
   return (
-    normalizeInputList(inputImages).forEach((_0x3e1368) => {
-      if (!_0xf5d651.has(_0x3e1368)) appendUniqueUrl(_0x1fa3ad, _0x3e1368);
+    normalizeInputList(inputImages).forEach((item13) => {
+      if (!map4.has(item13)) appendUniqueUrl(value222, item13);
     }),
-    _0x1fa3ad
+    value222
   );
 }
-function pushVolcengineContentItem(_0x29ead9, _0x109ddd, _0x590630, _0x61e4ac) {
-  const _0x3fa05e = String(_0x590630 || '').trim();
-  if (!_0x3fa05e) return;
-  const _0x5c8aaa = { type: _0x109ddd };
-  if (_0x109ddd === 'image_url') _0x5c8aaa.image_url = { url: _0x3fa05e };
+function pushVolcengineContentItem(list39, type, value223, value224) {
+  const url = String(value223 || '').trim();
+  if (!url) return;
+  const value225 = { type: type };
+  if (type === 'image_url') value225.image_url = { url: url };
   else {
-    if (_0x109ddd === 'video_url') _0x5c8aaa.video_url = { url: _0x3fa05e };
+    if (type === 'video_url') value225.video_url = { url: url };
     else {
-      if (_0x109ddd === 'audio_url') _0x5c8aaa.audio_url = { url: _0x3fa05e };
+      if (type === 'audio_url') value225.audio_url = { url: url };
     }
   }
-  if (_0x61e4ac) _0x5c8aaa.role = _0x61e4ac;
-  _0x29ead9.push(_0x5c8aaa);
+  if (value224) value225.role = value224;
+  list39.push(value225);
 }
 function volcengineSeedance2Video({
-  currentBody: _0x15f13f,
+  currentBody: currentBody9,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
@@ -1455,277 +1478,278 @@ function volcengineSeedance2Video({
   finalPrompt: finalPrompt = '',
   finalUrlsBySlot: finalUrlsBySlot = {},
   modelToken: modelToken = '',
-  executionManifest: _0x29f736,
+  executionManifest: executionManifest6,
 }) {
-  const _0x239b57 = { ..._0x15f13f },
-    _0x3806d9 = getVolcengineSeedance2Policy(_0x29f736),
-    _0xd6ce52 = String(_0x239b57.prompt || finalPrompt || payload?.prompt || '').trim(),
-    _0x1c925a = getVolcengineSeedance2Mode(payload, _0x239b57),
-    _0x19950c = collectVolcengineSeedance2FrameImages({
+  const generate_audio = { ...currentBody9 },
+    volcengineSeedance2Policy = getVolcengineSeedance2Policy(executionManifest6),
+    text = String(generate_audio.prompt || finalPrompt || payload?.prompt || '').trim(),
+    routeMode2 = getVolcengineSeedance2Mode(payload, generate_audio),
+    frameImageCount2 = collectVolcengineSeedance2FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x1b5f61 = collectVolcengineSeedance2ReferenceImages({
+    referenceImageCount2 = collectVolcengineSeedance2ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x39f2cc = normalizeInputList(inputVideos),
-    _0x32a437 = normalizeInputList(inputAudios),
-    _0x461e64 = resolveVolcengineSeedance2TaskType({
-      routeMode: _0x1c925a,
-      frameImageCount: _0x19950c.length,
-      referenceImageCount: _0x1b5f61.length,
-      videoCount: _0x39f2cc.length,
-      audioCount: _0x32a437.length,
+    videoCount2 = normalizeInputList(inputVideos),
+    audioCount2 = normalizeInputList(inputAudios),
+    volcengineSeedance2TaskType = resolveVolcengineSeedance2TaskType({
+      routeMode: routeMode2,
+      frameImageCount: frameImageCount2.length,
+      referenceImageCount: referenceImageCount2.length,
+      videoCount: videoCount2.length,
+      audioCount: audioCount2.length,
     }),
-    _0x50c2f7 = [];
-  if (_0xd6ce52) _0x50c2f7.push({ type: 'text', text: _0xd6ce52 });
-  if (_0x461e64 === 'text2video') {
-    if (!_0xd6ce52) throw new Error('Volcengine Seedance 2.0 prompt is required');
-    if (_0x19950c.length > 0 || _0x39f2cc.length > 0 || _0x32a437.length > 0)
+    content = [];
+  if (text) content.push({ type: 'text', text: text });
+  if (volcengineSeedance2TaskType === 'text2video') {
+    if (!text) throw new Error('Volcengine Seedance 2.0 prompt is required');
+    if (frameImageCount2.length > 0 || videoCount2.length > 0 || audioCount2.length > 0)
       throw new Error('Volcengine Seedance 2.0 text mode does not accept media input');
   } else {
-    if (_0x461e64 === 'image2video') {
-      if (_0x39f2cc.length > 0 || _0x32a437.length > 0)
+    if (volcengineSeedance2TaskType === 'image2video') {
+      if (videoCount2.length > 0 || audioCount2.length > 0)
         throw new Error('Volcengine Seedance 2.0 image mode does not accept video or audio input');
-      if (_0x19950c.length < 1) throw new Error('Volcengine Seedance 2.0 image mode requires 1 image input');
-      pushVolcengineContentItem(_0x50c2f7, 'image_url', _0x19950c[0], 'first_frame');
+      if (frameImageCount2.length < 1)
+        throw new Error('Volcengine Seedance 2.0 image mode requires 1 image input');
+      pushVolcengineContentItem(content, 'image_url', frameImageCount2[0], 'first_frame');
     } else {
-      if (_0x461e64 === 'frames2video') {
-        if (_0x39f2cc.length > 0 || _0x32a437.length > 0)
+      if (volcengineSeedance2TaskType === 'frames2video') {
+        if (videoCount2.length > 0 || audioCount2.length > 0)
           throw new Error('Volcengine Seedance 2.0 first-last-frame mode only accepts images');
-        if (_0x19950c.length < 2)
+        if (frameImageCount2.length < 2)
           throw new Error('Volcengine Seedance 2.0 first-last-frame mode requires 2 image inputs');
-        (pushVolcengineContentItem(_0x50c2f7, 'image_url', _0x19950c[0], 'first_frame'),
-          pushVolcengineContentItem(_0x50c2f7, 'image_url', _0x19950c[1], 'last_frame'));
+        (pushVolcengineContentItem(content, 'image_url', frameImageCount2[0], 'first_frame'),
+          pushVolcengineContentItem(content, 'image_url', frameImageCount2[1], 'last_frame'));
       } else {
-        const _0x9127ad = normalizePositiveInteger(_0x3806d9.maxImageCount, 9),
-          _0x4683f7 = normalizePositiveInteger(_0x3806d9.maxVideoReferenceCount, 3),
-          _0x194f7b = normalizePositiveInteger(_0x3806d9.maxAudioReferenceCount, 3);
-        if (_0x1b5f61.length + _0x39f2cc.length <= 0)
+        const positiveInteger9 = normalizePositiveInteger(volcengineSeedance2Policy.maxImageCount, 9),
+          positiveInteger10 = normalizePositiveInteger(volcengineSeedance2Policy.maxVideoReferenceCount, 3),
+          positiveInteger11 = normalizePositiveInteger(volcengineSeedance2Policy.maxAudioReferenceCount, 3);
+        if (referenceImageCount2.length + videoCount2.length <= 0)
           throw new Error('Volcengine Seedance 2.0 multimodal mode requires image or video input');
-        if (_0x1b5f61.length > _0x9127ad)
+        if (referenceImageCount2.length > positiveInteger9)
           throw new Error('Volcengine Seedance 2.0 multimodal mode supports at most 9 image inputs');
-        if (_0x39f2cc.length > _0x4683f7)
+        if (videoCount2.length > positiveInteger10)
           throw new Error('Volcengine Seedance 2.0 multimodal mode supports at most 3 video inputs');
-        if (_0x32a437.length > _0x194f7b)
+        if (audioCount2.length > positiveInteger11)
           throw new Error('Volcengine Seedance 2.0 multimodal mode supports at most 3 audio inputs');
-        (_0x1b5f61
-          .slice(0, _0x9127ad)
-          .forEach((_0x10c78a) =>
-            pushVolcengineContentItem(_0x50c2f7, 'image_url', _0x10c78a, 'reference_image'),
-          ),
-          _0x39f2cc
-            .slice(0, _0x4683f7)
-            .forEach((_0x23e1f2) =>
-              pushVolcengineContentItem(_0x50c2f7, 'video_url', _0x23e1f2, 'reference_video'),
-            ),
-          _0x32a437
-            .slice(0, _0x194f7b)
-            .forEach((_0x32680e) =>
-              pushVolcengineContentItem(_0x50c2f7, 'audio_url', _0x32680e, 'reference_audio'),
-            ));
+        (referenceImageCount2
+          .slice(0, positiveInteger9)
+          .forEach((item14) => pushVolcengineContentItem(content, 'image_url', item14, 'reference_image')),
+          videoCount2
+            .slice(0, positiveInteger10)
+            .forEach((item15) => pushVolcengineContentItem(content, 'video_url', item15, 'reference_video')),
+          audioCount2
+            .slice(0, positiveInteger11)
+            .forEach((item16) => pushVolcengineContentItem(content, 'audio_url', item16, 'reference_audio')));
       }
     }
   }
-  if (_0x50c2f7.length === 0) throw new Error('Volcengine Seedance 2.0 request content is empty');
-  const _0x33aa8e = normalizeVolcengineSeedance2Seed(_0x239b57.seed),
-    _0x55134e = {
-      model: modelToken || _0x239b57.model || stripPrefix(payload.model, 'volcengine/'),
-      content: _0x50c2f7,
-      resolution: normalizeVolcengineSeedance2Resolution(_0x239b57.resolution, _0x3806d9, modelToken),
-      ratio: normalizeVolcengineSeedance2Ratio(_0x239b57.ratio, _0x3806d9),
-      duration: normalizeVolcengineSeedance2Duration(_0x239b57.duration, _0x3806d9),
-      generate_audio: _0x239b57.generate_audio !== false,
+  if (content.length === 0) throw new Error('Volcengine Seedance 2.0 request content is empty');
+  const volcengineSeedance2Seed = normalizeVolcengineSeedance2Seed(generate_audio.seed),
+    value226 = {
+      model: modelToken || generate_audio.model || stripPrefix(payload.model, 'volcengine/'),
+      content: content,
+      resolution: normalizeVolcengineSeedance2Resolution(
+        generate_audio.resolution,
+        volcengineSeedance2Policy,
+        modelToken,
+      ),
+      ratio: normalizeVolcengineSeedance2Ratio(generate_audio.ratio, volcengineSeedance2Policy),
+      duration: normalizeVolcengineSeedance2Duration(generate_audio.duration, volcengineSeedance2Policy),
+      generate_audio: generate_audio.generate_audio !== false,
     };
-  if (_0x33aa8e !== null) _0x55134e.seed = _0x33aa8e;
-  return _0x55134e;
+  if (volcengineSeedance2Seed !== null) value226.seed = volcengineSeedance2Seed;
+  return value226;
 }
 function apimartHailuo02Video({
-  currentBody: _0x16e3b7,
+  currentBody: currentBody10,
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x56fe70 = { ..._0x16e3b7 },
-    _0x4247fa = normalizeInputList(inputImages),
-    _0xc63a60 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
-    _0xe0b8e8 = Object.keys(_0xc63a60).length > 0;
-  if (_0xe0b8e8) {
-    (delete _0x56fe70.first_frame_image, delete _0x56fe70.last_frame_image);
-    if (_0xc63a60.firstFrame) _0x56fe70.first_frame_image = _0xc63a60.firstFrame;
-    if (_0xc63a60.lastFrame) _0x56fe70.last_frame_image = _0xc63a60.lastFrame;
-    return _0x56fe70;
+  const value227 = { ...currentBody10 },
+    inputList = normalizeInputList(inputImages),
+    runningHubInputUrlsBySlot5 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
+    value228 = Object.keys(runningHubInputUrlsBySlot5).length > 0;
+  if (value228) {
+    (delete value227.first_frame_image, delete value227.last_frame_image);
+    if (runningHubInputUrlsBySlot5.firstFrame)
+      value227.first_frame_image = runningHubInputUrlsBySlot5.firstFrame;
+    if (runningHubInputUrlsBySlot5.lastFrame)
+      value227.last_frame_image = runningHubInputUrlsBySlot5.lastFrame;
+    return value227;
   }
-  if (_0x4247fa[0]) _0x56fe70.first_frame_image = _0x4247fa[0];
-  if (_0x4247fa[1]) _0x56fe70.last_frame_image = _0x4247fa[1];
-  return _0x56fe70;
+  if (inputList[0]) value227.first_frame_image = inputList[0];
+  if (inputList[1]) value227.last_frame_image = inputList[1];
+  return value227;
 }
 function apimartHailuo23Video({
-  currentBody: _0x323cb0,
+  currentBody: currentBody11,
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
   modelToken: modelToken = '',
 }) {
-  const _0x5d1a9d = { ..._0x323cb0 };
-  delete _0x5d1a9d.last_frame_image;
-  const _0x25bad1 = normalizeInputList(inputImages),
-    _0x3f9979 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
-    _0x549dc4 = Object.keys(_0x3f9979).length > 0;
-  if (_0x549dc4) {
-    delete _0x5d1a9d.first_frame_image;
-    if (_0x3f9979.firstFrame) _0x5d1a9d.first_frame_image = _0x3f9979.firstFrame;
-  } else _0x25bad1[0] && (_0x5d1a9d.first_frame_image = _0x25bad1[0]);
-  const _0x496754 = String(modelToken || _0x5d1a9d.model || '')
+  const value229 = { ...currentBody11 };
+  delete value229.last_frame_image;
+  const inputList2 = normalizeInputList(inputImages),
+    runningHubInputUrlsBySlot6 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
+    value230 = Object.keys(runningHubInputUrlsBySlot6).length > 0;
+  if (value230) {
+    delete value229.first_frame_image;
+    if (runningHubInputUrlsBySlot6.firstFrame)
+      value229.first_frame_image = runningHubInputUrlsBySlot6.firstFrame;
+  } else inputList2[0] && (value229.first_frame_image = inputList2[0]);
+  const value231 = String(modelToken || value229.model || '')
     .trim()
     .toLowerCase();
-  if (_0x496754 === 'minimax-hailuo-2.3-fast' && !String(_0x5d1a9d.first_frame_image || '').trim())
+  if (value231 === 'minimax-hailuo-2.3-fast' && !String(value229.first_frame_image || '').trim())
     throw new Error('APIMart Hailuo 2.3 Fast requires first_frame_image input');
-  return _0x5d1a9d;
+  return value229;
 }
 function apimartViduQ3Video({
-  currentBody: _0x1b81ae,
+  currentBody: currentBody12,
   inputImages: inputImages = [],
   payload: payload = {},
   finalPrompt: finalPrompt = '',
   modelToken: modelToken = '',
 }) {
-  const _0x3b3d69 = { ..._0x1b81ae },
-    _0x49950c = String(_0x3b3d69.prompt || finalPrompt || payload?.prompt || '').trim();
-  if (!_0x49950c) throw new Error('APIMart Vidu Q3 prompt is required');
-  _0x3b3d69.prompt = _0x49950c;
-  const _0x54093a = String(
+  const value232 = { ...currentBody12 },
+    enabled28 = String(value232.prompt || finalPrompt || payload?.prompt || '').trim();
+  if (!enabled28) throw new Error('APIMart Vidu Q3 prompt is required');
+  value232.prompt = enabled28;
+  const value233 = String(
       payload?.generationParams?.vidu_q3_generation_mode || payload?.vidu_q3_generation_mode || 'video',
     )
       .trim()
       .toLowerCase(),
-    _0xad7224 = String(modelToken || _0x3b3d69.model || 'viduq3-turbo')
+    value234 = String(modelToken || value232.model || 'viduq3-turbo')
       .trim()
       .toLowerCase(),
-    _0x6cec06 = normalizeInputList(inputImages),
-    _0x3f4cce = normalizeRunningHubInputUrlsBySlot(payload?.inputUrlsBySlot),
-    _0x35b2d9 = Math.max(
-      _0x6cec06.length,
+    list40 = normalizeInputList(inputImages),
+    runningHubInputUrlsBySlot7 = normalizeRunningHubInputUrlsBySlot(payload?.inputUrlsBySlot),
+    count6 = Math.max(
+      list40.length,
       normalizeInputList(payload?.inputUrls).length,
       normalizeInputList(payload?.images).length,
-      Object.keys(_0x3f4cce).length,
+      Object.keys(runningHubInputUrlsBySlot7).length,
     );
-  if (_0x54093a === 'reference') {
-    if (!VIDU_Q3_REFERENCE_MODELS.has(_0xad7224))
+  if (value233 === 'reference') {
+    if (!VIDU_Q3_REFERENCE_MODELS.has(value234))
       throw new Error('APIMart Vidu Q3 reference mode only supports viduq3 or viduq3-mix');
-    if (_0x6cec06.length < 1 || _0x35b2d9 > 7)
+    if (list40.length < 1 || count6 > 7)
       throw new Error('APIMart Vidu Q3 reference mode requires 1-7 image inputs');
     return (
-      (_0x3b3d69.model = _0xad7224),
-      (_0x3b3d69.image_urls = _0x6cec06.slice(0, 7)),
-      delete _0x3b3d69.audio,
-      _0x3b3d69
+      (value232.model = value234),
+      (value232.image_urls = list40.slice(0, 7)),
+      delete value232.audio,
+      value232
     );
   }
-  if (!VIDU_Q3_VIDEO_MODELS.has(_0xad7224))
+  if (!VIDU_Q3_VIDEO_MODELS.has(value234))
     throw new Error('APIMart Vidu Q3 video generation mode only supports viduq3-turbo or viduq3-pro');
-  if (_0x35b2d9 > 2) throw new Error('APIMart Vidu Q3 video generation mode supports at most 2 image inputs');
+  if (count6 > 2) throw new Error('APIMart Vidu Q3 video generation mode supports at most 2 image inputs');
   return (
-    (_0x3b3d69.model = _0xad7224),
-    _0x6cec06.length > 0
-      ? ((_0x3b3d69.image_urls = _0x6cec06.slice(0, 2)), delete _0x3b3d69.aspect_ratio)
-      : delete _0x3b3d69.image_urls,
-    _0x3b3d69
+    (value232.model = value234),
+    list40.length > 0
+      ? ((value232.image_urls = list40.slice(0, 2)), delete value232.aspect_ratio)
+      : delete value232.image_urls,
+    value232
   );
 }
-function normalizeKlingV3OmniMode(_0x435db9) {
-  const _0x2583fd = String(_0x435db9 || '')
+function normalizeKlingV3OmniMode(value235) {
+  const value236 = String(value235 || '')
     .trim()
     .toLowerCase();
-  return _0x2583fd === 'reference' || _0x2583fd === 'edit' ? _0x2583fd : 'image';
+  return value236 === 'reference' || value236 === 'edit' ? value236 : 'image';
 }
-function appendUniqueUrl(_0x2e04c0, _0x420657) {
-  const _0x31583a = String(_0x420657 || '').trim();
-  if (_0x31583a && !_0x2e04c0.includes(_0x31583a)) _0x2e04c0.push(_0x31583a);
+function appendUniqueUrl(list41, value237) {
+  const value238 = String(value237 || '').trim();
+  if (value238 && !list41.includes(value238)) list41.push(value238);
 }
-function normalizeKlingKeepOriginalSound(_0x366c43) {
-  if (_0x366c43 === true || _0x366c43 === false) return _0x366c43;
-  const _0x31aa5e = String(_0x366c43 ?? '')
+function normalizeKlingKeepOriginalSound(value239) {
+  if (value239 === true || value239 === false) return value239;
+  const value240 = String(value239 ?? '')
     .trim()
     .toLowerCase();
-  return _0x31aa5e === 'true' || _0x31aa5e === '1' || _0x31aa5e === 'yes';
+  return value240 === 'true' || value240 === '1' || value240 === 'yes';
 }
-function buildKlingV3OmniVideoItem(_0x1c6854, _0x6e6d55, _0x13a61f = false) {
+function buildKlingV3OmniVideoItem(video_url, refer_type, value241 = false) {
   return {
-    video_url: _0x1c6854,
-    refer_type: _0x6e6d55,
-    keep_original_sound: normalizeKlingKeepOriginalSound(_0x13a61f) ? 'yes' : 'no',
+    video_url: video_url,
+    refer_type: refer_type,
+    keep_original_sound: normalizeKlingKeepOriginalSound(value241) ? 'yes' : 'no',
   };
 }
-function normalizeKlingO1VideoRole(_0x123e80) {
-  const _0x515fa6 = String(_0x123e80 || '')
+function normalizeKlingO1VideoRole(value242) {
+  const value243 = String(value242 || '')
     .trim()
     .toLowerCase();
-  if (_0x515fa6 === 'feature' || _0x515fa6 === 'feature_reference') return 'feature';
-  return _0x515fa6 === 'base' || _0x515fa6 === 'edit' ? 'base' : '';
+  if (value243 === 'feature' || value243 === 'feature_reference') return 'feature';
+  return value243 === 'base' || value243 === 'edit' ? 'base' : '';
 }
-function replaceKlingO1PromptImageReferences(_0x20408e, _0x18b209) {
-  const _0x4e7f74 = Math.max(0, Math.trunc(Number(_0x18b209) || 0));
-  if (_0x4e7f74 <= 0) return String(_0x20408e || '');
-  return String(_0x20408e || '').replace(/@?图片\s*([1-9]\d*)/g, (_0x4bd60d, _0x5615a4) => {
-    const _0x408d57 = Number.parseInt(String(_0x5615a4 || ''), 10);
-    if (!Number.isFinite(_0x408d57) || _0x408d57 < 1 || _0x408d57 > _0x4e7f74) return _0x4bd60d;
-    return '<<<image_' + _0x408d57 + '>>>';
+function replaceKlingO1PromptImageReferences(value244, value245) {
+  const count7 = Math.max(0, Math.trunc(Number(value245) || 0));
+  if (count7 <= 0) return String(value244 || '');
+  return String(value244 || '').replace(/@?图片\s*([1-9]\d*)/g, (value246, value247) => {
+    const count8 = Number.parseInt(String(value247 || ''), 10);
+    if (!Number.isFinite(count8) || count8 < 1 || count8 > count7) return value246;
+    return '<<<image_' + count8 + '>>>';
   });
 }
 function apimartKlingO1Video({
-  currentBody: _0x336a2e,
+  currentBody: currentBody13,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
 }) {
-  const _0xa19bb = { ..._0x336a2e },
-    _0x362bc9 = normalizeInputList(inputImages).slice(0, 2),
-    _0x57beb6 = normalizeInputList(inputVideos).slice(0, 1),
-    _0x5dcbaa = normalizeKlingO1VideoRole(
+  const value248 = { ...currentBody13 },
+    list42 = normalizeInputList(inputImages).slice(0, 2),
+    list43 = normalizeInputList(inputVideos).slice(0, 1),
+    klingO1VideoRole = normalizeKlingO1VideoRole(
       payload?.klingO1VideoRole ||
         payload?.kling_o1_video_role ||
         payload?.generationParams?.kling_o1_video_role,
     ),
-    _0x19e6ae = normalizeKlingKeepOriginalSound(
-      _0xa19bb.keep_original_sound ??
+    klingKeepOriginalSound = normalizeKlingKeepOriginalSound(
+      value248.keep_original_sound ??
         payload?.generationParams?.keep_original_sound ??
         payload?.keep_original_sound,
     );
-  (delete _0xa19bb.kling_o1_video_role,
-    delete _0xa19bb.klingO1VideoRole,
-    delete _0xa19bb.keep_original_sound,
-    delete _0xa19bb.video_list);
-  if (_0x57beb6.length > 0) {
-    const _0x2541b2 = _0x5dcbaa || 'base';
-    _0xa19bb.video_list = [buildKlingV3OmniVideoItem(_0x57beb6[0], _0x2541b2, _0x19e6ae)];
-    if (_0x2541b2 === 'base') {
-      if (_0x362bc9.length > 0) throw new Error('APIMart Kling O1 base video cannot be used with image_urls');
+  (delete value248.kling_o1_video_role,
+    delete value248.klingO1VideoRole,
+    delete value248.keep_original_sound,
+    delete value248.video_list);
+  if (list43.length > 0) {
+    const value249 = klingO1VideoRole || 'base';
+    value248.video_list = [buildKlingV3OmniVideoItem(list43[0], value249, klingKeepOriginalSound)];
+    if (value249 === 'base') {
+      if (list42.length > 0) throw new Error('APIMart Kling O1 base video cannot be used with image_urls');
       return (
-        delete _0xa19bb.image_urls,
-        delete _0xa19bb.duration,
-        delete _0xa19bb.aspect_ratio,
-        (_0xa19bb.prompt = replaceKlingO1PromptImageReferences(_0xa19bb.prompt, 0)),
-        _0xa19bb
+        delete value248.image_urls,
+        delete value248.duration,
+        delete value248.aspect_ratio,
+        (value248.prompt = replaceKlingO1PromptImageReferences(value248.prompt, 0)),
+        value248
       );
     }
-    if (_0x362bc9.length > 1)
-      throw new Error('APIMart Kling O1 feature video supports at most one image_url');
+    if (list42.length > 1) throw new Error('APIMart Kling O1 feature video supports at most one image_url');
     return (
-      _0x362bc9.length > 0 ? (_0xa19bb.image_urls = _0x362bc9.slice(0, 1)) : delete _0xa19bb.image_urls,
-      (_0xa19bb.prompt = replaceKlingO1PromptImageReferences(
-        _0xa19bb.prompt,
-        _0xa19bb.image_urls?.length || 0,
+      list42.length > 0 ? (value248.image_urls = list42.slice(0, 1)) : delete value248.image_urls,
+      (value248.prompt = replaceKlingO1PromptImageReferences(
+        value248.prompt,
+        value248.image_urls?.length || 0,
       )),
-      _0xa19bb
+      value248
     );
   }
   return (
-    _0x362bc9.length > 0 ? (_0xa19bb.image_urls = _0x362bc9) : delete _0xa19bb.image_urls,
-    (_0xa19bb.prompt = replaceKlingO1PromptImageReferences(
-      _0xa19bb.prompt,
-      _0xa19bb.image_urls?.length || 0,
+    list42.length > 0 ? (value248.image_urls = list42) : delete value248.image_urls,
+    (value248.prompt = replaceKlingO1PromptImageReferences(
+      value248.prompt,
+      value248.image_urls?.length || 0,
     )),
-    _0xa19bb
+    value248
   );
 }
 const RUNNINGHUB_KLING_O1_ENDPOINTS = Object.freeze({
@@ -1735,57 +1759,57 @@ const RUNNINGHUB_KLING_O1_ENDPOINTS = Object.freeze({
   reference: 'https://www.runninghub.cn/openapi/v2/kling-video-o1-std/refrence-to-video',
   edit: 'https://www.runninghub.cn/openapi/v2/kling-video-o1-std/edit-video',
 });
-function normalizeRunningHubKlingO1GenerationMode(_0xad548c) {
-  const _0x516ced = String(_0xad548c || '')
+function normalizeRunningHubKlingO1GenerationMode(value250) {
+  const value251 = String(value250 || '')
     .trim()
     .toLowerCase();
-  if (_0x516ced === 'reference' || _0x516ced === 'edit') return _0x516ced;
+  if (value251 === 'reference' || value251 === 'edit') return value251;
   return 'frame';
 }
-function normalizeRunningHubKlingO1QualityMode(_0x56bc70) {
-  const _0x2ce33b = String(_0x56bc70 || '')
+function normalizeRunningHubKlingO1QualityMode(value252) {
+  const value253 = String(value252 || '')
     .trim()
     .toLowerCase();
-  return _0x2ce33b === 'pro' ? 'pro' : 'std';
+  return value253 === 'pro' ? 'pro' : 'std';
 }
-function normalizeRunningHubKlingO1AspectRatio(_0x3e5845) {
-  const _0x67ca53 = String(_0x3e5845 || '9:16').trim();
-  return ['16:9', '9:16', '1:1'].includes(_0x67ca53) ? _0x67ca53 : '9:16';
+function normalizeRunningHubKlingO1AspectRatio(value254) {
+  const value255 = String(value254 || '9:16').trim();
+  return ['16:9', '9:16', '1:1'].includes(value255) ? value255 : '9:16';
 }
-function normalizeRunningHubKlingO1Duration(_0x10efee) {
-  const _0x575a59 = Number(_0x10efee);
-  return Number.isFinite(_0x575a59) && Math.trunc(_0x575a59) === 10 ? '10' : '5';
+function normalizeRunningHubKlingO1Duration(value256) {
+  const value257 = Number(value256);
+  return Number.isFinite(value257) && Math.trunc(value257) === 10 ? '10' : '5';
 }
-function getRunningHubKlingO1GenerationMode(_0x549960 = {}, _0x5df2c1 = {}) {
+function getRunningHubKlingO1GenerationMode(options12 = {}, value258 = {}) {
   return normalizeRunningHubKlingO1GenerationMode(
-    _0x5df2c1.rh_kling_o1_generation_mode ||
-      _0x549960?.generationParams?.rh_kling_o1_generation_mode ||
-      _0x549960?.rh_kling_o1_generation_mode,
+    value258.rh_kling_o1_generation_mode ||
+      options12?.generationParams?.rh_kling_o1_generation_mode ||
+      options12?.rh_kling_o1_generation_mode,
   );
 }
 function collectRunningHubKlingO1FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0xa7a02c = [],
-    _0xfc300b = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
+  const value259 = [],
+    runningHubInputUrlsBySlot8 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0xa7a02c, _0xfc300b.firstFrame),
-    appendUniqueUrl(_0xa7a02c, _0xfc300b.lastFrame),
-    normalizeInputList(inputImages).forEach((_0x10297a) => appendUniqueUrl(_0xa7a02c, _0x10297a)),
-    _0xa7a02c
+    appendUniqueUrl(value259, runningHubInputUrlsBySlot8.firstFrame),
+    appendUniqueUrl(value259, runningHubInputUrlsBySlot8.lastFrame),
+    normalizeInputList(inputImages).forEach((item17) => appendUniqueUrl(value259, item17)),
+    value259
   );
 }
 function collectRunningHubKlingO1ReferenceImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x474714 = [],
-    _0x35947a = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
+  const value260 = [],
+    runningHubInputUrlsBySlot9 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x474714, _0x35947a.referenceImage),
-    normalizeInputList(inputImages).forEach((_0x4e8e9f) => appendUniqueUrl(_0x474714, _0x4e8e9f)),
-    _0x474714
+    appendUniqueUrl(value260, runningHubInputUrlsBySlot9.referenceImage),
+    normalizeInputList(inputImages).forEach((item18) => appendUniqueUrl(value260, item18)),
+    value260
   );
 }
 function resolveRunningHubKlingO1Route({
@@ -1795,111 +1819,107 @@ function resolveRunningHubKlingO1Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x2c7c0c = getRunningHubKlingO1GenerationMode(payload, currentBody);
-  if (_0x2c7c0c === 'reference') return 'reference';
-  if (_0x2c7c0c === 'edit') return 'edit';
-  const _0x5ff662 = collectRunningHubKlingO1FrameImages({
+  const runningHubKlingO1GenerationMode = getRunningHubKlingO1GenerationMode(payload, currentBody);
+  if (runningHubKlingO1GenerationMode === 'reference') return 'reference';
+  if (runningHubKlingO1GenerationMode === 'edit') return 'edit';
+  const runningHubKlingO1FrameImages = collectRunningHubKlingO1FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   }).length;
-  if (_0x5ff662 >= 2) return 'frames';
-  if (_0x5ff662 === 1) return 'image';
-  const _0x46b355 = normalizeInputList(inputVideos).length;
-  return _0x46b355 > 0 ? 'reference' : 'text';
+  if (runningHubKlingO1FrameImages >= 2) return 'frames';
+  if (runningHubKlingO1FrameImages === 1) return 'image';
+  const inputList3 = normalizeInputList(inputVideos).length;
+  return inputList3 > 0 ? 'reference' : 'text';
 }
 function runninghubKlingO1Video({
-  currentBody: _0x2b5ca4,
+  currentBody: currentBody14,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x54fb02 = { ..._0x2b5ca4 },
-    _0x5c0978 = getRunningHubKlingO1GenerationMode(payload, _0x54fb02),
-    _0x1332d8 = normalizeKlingKeepOriginalSound(
+  const value261 = { ...currentBody14 },
+    runningHubKlingO1GenerationMode2 = getRunningHubKlingO1GenerationMode(payload, value261),
+    klingKeepOriginalSound2 = normalizeKlingKeepOriginalSound(
       payload?.generationParams?.keepOriginalSound ??
         payload?.generationParams?.keep_original_sound ??
         payload?.keepOriginalSound ??
         payload?.keep_original_sound ??
-        _0x54fb02.keepOriginalSound ??
-        _0x54fb02.keep_original_sound,
+        value261.keepOriginalSound ??
+        value261.keep_original_sound,
     ),
-    _0x3e0988 = String(_0x54fb02.prompt || payload?.prompt || '').trim();
-  if (!_0x3e0988) throw new Error('RunningHub Kling O1 prompt is required');
-  ((_0x54fb02.prompt = _0x3e0988),
-    (_0x54fb02.mode = normalizeRunningHubKlingO1QualityMode(_0x54fb02.mode)),
-    (_0x54fb02.aspectRatio = normalizeRunningHubKlingO1AspectRatio(_0x54fb02.aspectRatio)),
-    (_0x54fb02.duration = normalizeRunningHubKlingO1Duration(_0x54fb02.duration)),
-    delete _0x54fb02.rh_kling_o1_generation_mode,
-    delete _0x54fb02.keep_original_sound,
-    delete _0x54fb02.keepOriginalSound,
-    delete _0x54fb02.firstImageUrl,
-    delete _0x54fb02.lastImageUrl,
-    delete _0x54fb02.imageUrls,
-    delete _0x54fb02.videoUrl);
-  const _0x525095 = normalizeInputList(inputVideos),
-    _0x16a205 = Math.max(
-      _0x525095.length,
+    enabled29 = String(value261.prompt || payload?.prompt || '').trim();
+  if (!enabled29) throw new Error('RunningHub Kling O1 prompt is required');
+  ((value261.prompt = enabled29),
+    (value261.mode = normalizeRunningHubKlingO1QualityMode(value261.mode)),
+    (value261.aspectRatio = normalizeRunningHubKlingO1AspectRatio(value261.aspectRatio)),
+    (value261.duration = normalizeRunningHubKlingO1Duration(value261.duration)),
+    delete value261.rh_kling_o1_generation_mode,
+    delete value261.keep_original_sound,
+    delete value261.keepOriginalSound,
+    delete value261.firstImageUrl,
+    delete value261.lastImageUrl,
+    delete value261.imageUrls,
+    delete value261.videoUrl);
+  const list44 = normalizeInputList(inputVideos),
+    count9 = Math.max(
+      list44.length,
       normalizeInputList(payload?.videos).length,
       normalizeInputList(payload?.videoUrls).length,
       String(payload?.videoUrl || '').trim() ? 1 : 0,
     );
-  if (_0x5c0978 === 'edit') {
-    const _0x1b4fb5 = [];
+  if (runningHubKlingO1GenerationMode2 === 'edit') {
+    const list45 = [];
     (collectRunningHubKlingO1FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
-    }).forEach((_0x5dd681) => appendUniqueUrl(_0x1b4fb5, _0x5dd681)),
+    }).forEach((item19) => appendUniqueUrl(list45, item19)),
       collectRunningHubKlingO1ReferenceImages({
         inputImages: inputImages,
         finalUrlsBySlot: finalUrlsBySlot,
-      }).forEach((_0x345880) => appendUniqueUrl(_0x1b4fb5, _0x345880)));
-    if (_0x1b4fb5.length > 0) throw new Error('RunningHub Kling O1 edit mode does not accept image input');
-    if (_0x16a205 < 1 || !_0x525095[0])
-      throw new Error('RunningHub Kling O1 edit mode requires 1 video input');
-    if (_0x16a205 > 1) throw new Error('RunningHub Kling O1 edit mode supports at most 1 video input');
+      }).forEach((item20) => appendUniqueUrl(list45, item20)));
+    if (list45.length > 0) throw new Error('RunningHub Kling O1 edit mode does not accept image input');
+    if (count9 < 1 || !list44[0]) throw new Error('RunningHub Kling O1 edit mode requires 1 video input');
+    if (count9 > 1) throw new Error('RunningHub Kling O1 edit mode supports at most 1 video input');
     return (
-      (_0x54fb02.mode = 'std'),
-      (_0x54fb02.videoUrl = _0x525095[0]),
-      (_0x54fb02.keepOriginalSound = _0x1332d8),
-      delete _0x54fb02.aspectRatio,
-      delete _0x54fb02.duration,
-      _0x54fb02
+      (value261.mode = 'std'),
+      (value261.videoUrl = list44[0]),
+      (value261.keepOriginalSound = klingKeepOriginalSound2),
+      delete value261.aspectRatio,
+      delete value261.duration,
+      value261
     );
   }
-  if (_0x5c0978 === 'reference') {
-    const _0xf16222 = collectRunningHubKlingO1ReferenceImages({
+  if (runningHubKlingO1GenerationMode2 === 'reference') {
+    const list46 = collectRunningHubKlingO1ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (_0xf16222.length < 1)
+    if (list46.length < 1)
       throw new Error('RunningHub Kling O1 reference mode requires at least 1 image input');
-    if (_0xf16222.length > 7)
+    if (list46.length > 7)
       throw new Error('RunningHub Kling O1 reference mode supports at most 7 image inputs');
-    if (_0x16a205 < 1 || !_0x525095[0])
+    if (count9 < 1 || !list44[0])
       throw new Error('RunningHub Kling O1 reference mode requires 1 video input');
-    if (_0x16a205 > 1) throw new Error('RunningHub Kling O1 reference mode supports at most 1 video input');
+    if (count9 > 1) throw new Error('RunningHub Kling O1 reference mode supports at most 1 video input');
     return (
-      (_0x54fb02.imageUrls = _0xf16222),
-      (_0x54fb02.videoUrl = _0x525095[0]),
-      (_0x54fb02.keepOriginalSound = _0x1332d8),
-      (_0x54fb02.prompt = replaceKlingO1PromptImageReferences(_0x54fb02.prompt, _0xf16222.length)),
-      _0x54fb02
+      (value261.imageUrls = list46),
+      (value261.videoUrl = list44[0]),
+      (value261.keepOriginalSound = klingKeepOriginalSound2),
+      (value261.prompt = replaceKlingO1PromptImageReferences(value261.prompt, list46.length)),
+      value261
     );
   }
-  const _0x47f009 = collectRunningHubKlingO1FrameImages({
+  const list47 = collectRunningHubKlingO1FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x525095.length > 0)
+  if (list44.length > 0)
     throw new Error('RunningHub Kling O1 frame mode does not accept video input; use reference mode');
-  if (_0x47f009.length > 2) throw new Error('RunningHub Kling O1 frame mode supports at most 2 image inputs');
-  if (_0x47f009[0]) _0x54fb02.firstImageUrl = _0x47f009[0];
-  if (_0x47f009[1]) _0x54fb02.lastImageUrl = _0x47f009[1];
-  return (
-    (_0x54fb02.prompt = replaceKlingO1PromptImageReferences(_0x54fb02.prompt, _0x47f009.length)),
-    _0x54fb02
-  );
+  if (list47.length > 2) throw new Error('RunningHub Kling O1 frame mode supports at most 2 image inputs');
+  if (list47[0]) value261.firstImageUrl = list47[0];
+  if (list47[1]) value261.lastImageUrl = list47[1];
+  return ((value261.prompt = replaceKlingO1PromptImageReferences(value261.prompt, list47.length)), value261);
 }
 function runninghubKlingO1VideoEndpoint({
   inputImages: inputImages = [],
@@ -1907,13 +1927,13 @@ function runninghubKlingO1VideoEndpoint({
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x47c7d5 = resolveRunningHubKlingO1Route({
+  const runningHubKlingO1Route = resolveRunningHubKlingO1Route({
     inputImages: inputImages,
     inputVideos: inputVideos,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return RUNNINGHUB_KLING_O1_ENDPOINTS[_0x47c7d5] || RUNNINGHUB_KLING_O1_ENDPOINTS.text;
+  return RUNNINGHUB_KLING_O1_ENDPOINTS[runningHubKlingO1Route] || RUNNINGHUB_KLING_O1_ENDPOINTS.text;
 }
 const RUNNINGHUB_KLING_V3_ENDPOINTS = Object.freeze({
   std: Object.freeze({
@@ -1929,41 +1949,41 @@ const RUNNINGHUB_KLING_V3_ENDPOINTS = Object.freeze({
     image: 'https://www.runninghub.cn/openapi/v2/kling-v3-4k/image-to-video',
   }),
 });
-function normalizeRunningHubKlingV3Model(_0x866a9b) {
-  const _0x4d4711 = String(_0x866a9b || '')
+function normalizeRunningHubKlingV3Model(value262) {
+  const value263 = String(value262 || '')
     .trim()
     .toLowerCase();
-  if (_0x4d4711 === '4k') return '4k';
-  if (_0x4d4711 === 'pro') return 'pro';
+  if (value263 === '4k') return '4k';
+  if (value263 === 'pro') return 'pro';
   return 'std';
 }
-function getRunningHubKlingV3Model(_0x1b891a = {}, _0x51f014 = {}) {
+function getRunningHubKlingV3Model(options13 = {}, value264 = {}) {
   return normalizeRunningHubKlingV3Model(
-    _0x51f014.rh_kling_v3_model || _0x1b891a?.generationParams?.resolution || _0x1b891a?.resolution,
+    value264.rh_kling_v3_model || options13?.generationParams?.resolution || options13?.resolution,
   );
 }
 function collectRunningHubKlingV3FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x444591 = [],
-    _0x5dc6ec = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
+  const value265 = [],
+    runningHubInputUrlsBySlot10 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x444591, _0x5dc6ec.firstFrame),
-    appendUniqueUrl(_0x444591, _0x5dc6ec.lastFrame),
-    normalizeInputList(inputImages).forEach((_0x6b64e1) => appendUniqueUrl(_0x444591, _0x6b64e1)),
-    _0x444591
+    appendUniqueUrl(value265, runningHubInputUrlsBySlot10.firstFrame),
+    appendUniqueUrl(value265, runningHubInputUrlsBySlot10.lastFrame),
+    normalizeInputList(inputImages).forEach((item21) => appendUniqueUrl(value265, item21)),
+    value265
   );
 }
-function getRunningHubKlingV3RawMediaCount(_0x5193ff = {}, _0x13f96e = [], _0x2acaf8 = '') {
-  const _0x37b5e6 = _0x2acaf8 === 'audio' ? 'audioUrl' : _0x2acaf8 + 'Url',
-    _0x8efb3d = _0x2acaf8 + 's',
-    _0x1721db = _0x2acaf8 + 'Urls';
+function getRunningHubKlingV3RawMediaCount(options14 = {}, value266 = [], value267 = '') {
+  const value268 = value267 === 'audio' ? 'audioUrl' : value267 + 'Url',
+    value269 = value267 + 's',
+    value270 = value267 + 'Urls';
   return Math.max(
-    normalizeInputList(_0x13f96e).length,
-    normalizeInputList(_0x5193ff?.[_0x8efb3d]).length,
-    normalizeInputList(_0x5193ff?.[_0x1721db]).length,
-    String(_0x5193ff?.[_0x37b5e6] || '').trim() ? 1 : 0,
+    normalizeInputList(value266).length,
+    normalizeInputList(options14?.[value269]).length,
+    normalizeInputList(options14?.[value270]).length,
+    String(options14?.[value268] || '').trim() ? 1 : 0,
   );
 }
 function resolveRunningHubKlingV3Route({
@@ -1972,63 +1992,65 @@ function resolveRunningHubKlingV3Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x122500 = getRunningHubKlingV3Model(payload, currentBody),
-    _0x195614 = collectRunningHubKlingV3FrameImages({
+  const model7 = getRunningHubKlingV3Model(payload, currentBody),
+    route3 = collectRunningHubKlingV3FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }).length;
-  return { model: _0x122500, route: _0x195614 > 0 ? 'image' : 'text' };
+  return { model: model7, route: route3 > 0 ? 'image' : 'text' };
 }
 function runninghubKlingV3Video({
-  currentBody: _0x335e1e,
+  currentBody: currentBody15,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x45447b = { ..._0x335e1e },
-    _0x4e65ea = getRunningHubKlingV3Model(payload, _0x45447b),
-    _0x46c22f = String(_0x45447b.prompt || payload?.prompt || '').trim();
-  if (!_0x46c22f) throw new Error('RunningHub Kling V3.0 prompt is required');
-  const _0x2b1281 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video');
-  if (_0x2b1281 > 0) throw new Error('RunningHub Kling V3.0 does not accept video input');
-  const _0x36e127 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
-  if (_0x36e127 > 0) throw new Error('RunningHub Kling V3.0 does not accept audio input');
-  ((_0x45447b.prompt = _0x46c22f),
-    delete _0x45447b.rh_kling_v3_model,
-    delete _0x45447b.imageUrl,
-    delete _0x45447b.firstImageUrl,
-    delete _0x45447b.lastImageUrl,
-    delete _0x45447b.imageUrls);
-  const _0x1125d4 = collectRunningHubKlingV3FrameImages({
+  const value271 = { ...currentBody15 },
+    runningHubKlingV3Model = getRunningHubKlingV3Model(payload, value271),
+    enabled30 = String(value271.prompt || payload?.prompt || '').trim();
+  if (!enabled30) throw new Error('RunningHub Kling V3.0 prompt is required');
+  const runningHubKlingV3RawMediaCount3 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video');
+  if (runningHubKlingV3RawMediaCount3 > 0)
+    throw new Error('RunningHub Kling V3.0 does not accept video input');
+  const runningHubKlingV3RawMediaCount4 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
+  if (runningHubKlingV3RawMediaCount4 > 0)
+    throw new Error('RunningHub Kling V3.0 does not accept audio input');
+  ((value271.prompt = enabled30),
+    delete value271.rh_kling_v3_model,
+    delete value271.imageUrl,
+    delete value271.firstImageUrl,
+    delete value271.lastImageUrl,
+    delete value271.imageUrls);
+  const list48 = collectRunningHubKlingV3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x1125d4.length > 2) throw new Error('RunningHub Kling V3.0 supports at most 2 image inputs');
-  if (_0x1125d4.length > 0) {
-    delete _0x45447b.aspectRatio;
-    if (_0x4e65ea === '4k') {
-      if (_0x1125d4.length > 1)
+  if (list48.length > 2) throw new Error('RunningHub Kling V3.0 supports at most 2 image inputs');
+  if (list48.length > 0) {
+    delete value271.aspectRatio;
+    if (runningHubKlingV3Model === '4k') {
+      if (list48.length > 1)
         throw new Error('RunningHub Kling V3.0 4K image-to-video supports only one imageUrl');
-      return ((_0x45447b.imageUrl = _0x1125d4[0]), _0x45447b);
+      return ((value271.imageUrl = list48[0]), value271);
     }
-    _0x45447b.firstImageUrl = _0x1125d4[0];
-    if (_0x1125d4[1]) _0x45447b.lastImageUrl = _0x1125d4[1];
+    value271.firstImageUrl = list48[0];
+    if (list48[1]) value271.lastImageUrl = list48[1];
   }
-  return _0x45447b;
+  return value271;
 }
 function runninghubKlingV3VideoEndpoint({
   inputImages: inputImages = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const { model: _0xe11ad, route: _0x4166de } = resolveRunningHubKlingV3Route({
+  const { model: model8, route: route4 } = resolveRunningHubKlingV3Route({
     inputImages: inputImages,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return RUNNINGHUB_KLING_V3_ENDPOINTS[_0xe11ad]?.[_0x4166de] || RUNNINGHUB_KLING_V3_ENDPOINTS.std.text;
+  return RUNNINGHUB_KLING_V3_ENDPOINTS[model8]?.[route4] || RUNNINGHUB_KLING_V3_ENDPOINTS.std.text;
 }
 const RUNNINGHUB_KLING_O3_ENDPOINTS = Object.freeze({
   std: Object.freeze({
@@ -2049,31 +2071,31 @@ const RUNNINGHUB_KLING_O3_ENDPOINTS = Object.freeze({
     reference: 'https://www.runninghub.cn/openapi/v2/kling-video-o3-4k/reference-to-video',
   }),
 });
-function normalizeRunningHubKlingO3GenerationMode(_0x5bd196) {
-  const _0x46834d = String(_0x5bd196 || '')
+function normalizeRunningHubKlingO3GenerationMode(value272) {
+  const value273 = String(value272 || '')
     .trim()
     .toLowerCase();
-  if (_0x46834d === 'reference' || _0x46834d === 'edit') return _0x46834d;
+  if (value273 === 'reference' || value273 === 'edit') return value273;
   return 'frame';
 }
-function normalizeRunningHubKlingO3Model(_0x1ed919) {
-  const _0x2fde2f = String(_0x1ed919 || '')
+function normalizeRunningHubKlingO3Model(value274) {
+  const value275 = String(value274 || '')
     .trim()
     .toLowerCase();
-  if (_0x2fde2f === '4k') return '4k';
-  if (_0x2fde2f === 'pro') return 'pro';
+  if (value275 === '4k') return '4k';
+  if (value275 === 'pro') return 'pro';
   return 'std';
 }
-function getRunningHubKlingO3GenerationMode(_0x879d5c = {}, _0x55753c = {}) {
+function getRunningHubKlingO3GenerationMode(options15 = {}, value276 = {}) {
   return normalizeRunningHubKlingO3GenerationMode(
-    _0x55753c.kling_v3_omni_mode ||
-      _0x879d5c?.generationParams?.kling_v3_omni_mode ||
-      _0x879d5c?.kling_v3_omni_mode,
+    value276.kling_v3_omni_mode ||
+      options15?.generationParams?.kling_v3_omni_mode ||
+      options15?.kling_v3_omni_mode,
   );
 }
-function getRunningHubKlingO3Model(_0x2f5fc2 = {}, _0x48ee4f = {}) {
+function getRunningHubKlingO3Model(options16 = {}, value277 = {}) {
   return normalizeRunningHubKlingO3Model(
-    _0x48ee4f.rh_kling_o3_model || _0x2f5fc2?.generationParams?.resolution || _0x2f5fc2?.resolution,
+    value277.rh_kling_o3_model || options16?.generationParams?.resolution || options16?.resolution,
   );
 }
 function collectRunningHubKlingO3SlotImages({
@@ -2081,25 +2103,25 @@ function collectRunningHubKlingO3SlotImages({
   finalUrlsBySlot: finalUrlsBySlot = {},
   slotIds: slotIds = [],
 } = {}) {
-  const _0x5b44af = [],
-    _0x12c8ed = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
-    _0x1f9e5d = new Set(normalizeInputList(Object.values(_0x12c8ed)));
+  const value278 = [],
+    runningHubInputUrlsBySlot11 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
+    map5 = new Set(normalizeInputList(Object.values(runningHubInputUrlsBySlot11)));
   return (
-    slotIds.forEach((_0x22835d) => appendUniqueUrl(_0x5b44af, _0x12c8ed[_0x22835d])),
-    normalizeInputList(inputImages).forEach((_0x1ad0db) => {
-      if (!_0x1f9e5d.has(_0x1ad0db)) appendUniqueUrl(_0x5b44af, _0x1ad0db);
+    slotIds.forEach((item22) => appendUniqueUrl(value278, runningHubInputUrlsBySlot11[item22])),
+    normalizeInputList(inputImages).forEach((item23) => {
+      if (!map5.has(item23)) appendUniqueUrl(value278, item23);
     }),
-    _0x5b44af
+    value278
   );
 }
-function collectRunningHubKlingO3FrameImages(_0x478acc = {}) {
-  return collectRunningHubKlingO3SlotImages({ ..._0x478acc, slotIds: ['firstFrame', 'lastFrame'] });
+function collectRunningHubKlingO3FrameImages(args7 = {}) {
+  return collectRunningHubKlingO3SlotImages({ ...args7, slotIds: ['firstFrame', 'lastFrame'] });
 }
-function collectRunningHubKlingO3ReferenceImages(_0x57952a = {}) {
-  return collectRunningHubKlingO3SlotImages({ ..._0x57952a, slotIds: ['referenceImage'] });
+function collectRunningHubKlingO3ReferenceImages(args8 = {}) {
+  return collectRunningHubKlingO3SlotImages({ ...args8, slotIds: ['referenceImage'] });
 }
-function collectRunningHubKlingO3EditImages(_0x3ec193 = {}) {
-  return collectRunningHubKlingO3SlotImages({ ..._0x3ec193, slotIds: ['editRefImage'] });
+function collectRunningHubKlingO3EditImages(args9 = {}) {
+  return collectRunningHubKlingO3SlotImages({ ...args9, slotIds: ['editRefImage'] });
 }
 function resolveRunningHubKlingO3Route({
   inputImages: inputImages = [],
@@ -2107,118 +2129,121 @@ function resolveRunningHubKlingO3Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x5760e7 = getRunningHubKlingO3Model(payload, currentBody),
-    _0x17ba32 = getRunningHubKlingO3GenerationMode(payload, currentBody);
-  if (_0x17ba32 === 'reference') return { model: _0x5760e7, route: 'reference' };
-  if (_0x17ba32 === 'edit') return { model: _0x5760e7, route: 'edit' };
-  const _0x5b5f89 = collectRunningHubKlingO3FrameImages({
+  const model9 = getRunningHubKlingO3Model(payload, currentBody),
+    runningHubKlingO3GenerationMode = getRunningHubKlingO3GenerationMode(payload, currentBody);
+  if (runningHubKlingO3GenerationMode === 'reference') return { model: model9, route: 'reference' };
+  if (runningHubKlingO3GenerationMode === 'edit') return { model: model9, route: 'edit' };
+  const route5 = collectRunningHubKlingO3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   }).length;
-  return { model: _0x5760e7, route: _0x5b5f89 > 0 ? 'image' : 'text' };
+  return { model: model9, route: route5 > 0 ? 'image' : 'text' };
 }
 function runninghubKlingO3Video({
-  currentBody: _0x3beab1,
+  currentBody: currentBody16,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x441e07 = { ..._0x3beab1 },
-    _0x370156 = getRunningHubKlingO3Model(payload, _0x441e07),
-    _0x24da35 = getRunningHubKlingO3GenerationMode(payload, _0x441e07),
-    _0x4a4c70 = String(_0x441e07.prompt || payload?.prompt || '').trim();
-  if (!_0x4a4c70) throw new Error('RunningHub Kling O3 prompt is required');
-  const _0x351822 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
-  if (_0x351822 > 0) throw new Error('RunningHub Kling O3 does not accept direct audio input');
-  const _0x3ec0e1 = normalizeInputList(inputVideos),
-    _0x309637 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video'),
-    _0x50f55a = normalizeKlingKeepOriginalSound(
-      _0x441e07.keepOriginalSound ??
-        _0x441e07.keep_original_sound ??
+  const value279 = { ...currentBody16 },
+    runningHubKlingO3Model = getRunningHubKlingO3Model(payload, value279),
+    runningHubKlingO3GenerationMode2 = getRunningHubKlingO3GenerationMode(payload, value279),
+    enabled31 = String(value279.prompt || payload?.prompt || '').trim();
+  if (!enabled31) throw new Error('RunningHub Kling O3 prompt is required');
+  const runningHubKlingV3RawMediaCount5 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
+  if (runningHubKlingV3RawMediaCount5 > 0)
+    throw new Error('RunningHub Kling O3 does not accept direct audio input');
+  const inputList4 = normalizeInputList(inputVideos),
+    runningHubKlingV3RawMediaCount6 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video'),
+    klingKeepOriginalSound3 = normalizeKlingKeepOriginalSound(
+      value279.keepOriginalSound ??
+        value279.keep_original_sound ??
         payload?.generationParams?.keepOriginalSound ??
         payload?.generationParams?.keep_original_sound ??
         payload?.keepOriginalSound ??
         payload?.keep_original_sound,
     );
-  ((_0x441e07.prompt = _0x4a4c70),
-    delete _0x441e07.kling_v3_omni_mode,
-    delete _0x441e07.rh_kling_o3_model,
-    delete _0x441e07.keep_original_sound,
-    delete _0x441e07.keepOriginalSound,
-    delete _0x441e07.firstImageUrl,
-    delete _0x441e07.lastImageUrl,
-    delete _0x441e07.imageUrl,
-    delete _0x441e07.imageUrls,
-    delete _0x441e07.videoUrl);
-  if (_0x24da35 === 'edit') {
-    if (_0x370156 === '4k') throw new Error('RunningHub Kling O3 4K does not support video edit');
-    if (_0x309637 < 1 || !_0x3ec0e1[0])
+  ((value279.prompt = enabled31),
+    delete value279.kling_v3_omni_mode,
+    delete value279.rh_kling_o3_model,
+    delete value279.keep_original_sound,
+    delete value279.keepOriginalSound,
+    delete value279.firstImageUrl,
+    delete value279.lastImageUrl,
+    delete value279.imageUrl,
+    delete value279.imageUrls,
+    delete value279.videoUrl);
+  if (runningHubKlingO3GenerationMode2 === 'edit') {
+    if (runningHubKlingO3Model === '4k')
+      throw new Error('RunningHub Kling O3 4K does not support video edit');
+    if (runningHubKlingV3RawMediaCount6 < 1 || !inputList4[0])
       throw new Error('RunningHub Kling O3 edit mode requires 1 video input');
-    if (_0x309637 > 1) throw new Error('RunningHub Kling O3 edit mode supports at most 1 video input');
-    const _0x18f945 = collectRunningHubKlingO3EditImages({
+    if (runningHubKlingV3RawMediaCount6 > 1)
+      throw new Error('RunningHub Kling O3 edit mode supports at most 1 video input');
+    const list49 = collectRunningHubKlingO3EditImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (_0x18f945.length > 7)
-      throw new Error('RunningHub Kling O3 edit mode supports at most 7 image inputs');
-    _0x441e07.videoUrl = _0x3ec0e1[0];
-    if (_0x18f945.length > 0) _0x441e07.imageUrls = _0x18f945;
+    if (list49.length > 7) throw new Error('RunningHub Kling O3 edit mode supports at most 7 image inputs');
+    value279.videoUrl = inputList4[0];
+    if (list49.length > 0) value279.imageUrls = list49;
     return (
-      (_0x441e07.keepOriginalSound = _0x50f55a),
-      delete _0x441e07.aspectRatio,
-      delete _0x441e07.duration,
-      delete _0x441e07.sound,
-      delete _0x441e07.multiShot,
-      delete _0x441e07.shotType,
-      _0x441e07
+      (value279.keepOriginalSound = klingKeepOriginalSound3),
+      delete value279.aspectRatio,
+      delete value279.duration,
+      delete value279.sound,
+      delete value279.multiShot,
+      delete value279.shotType,
+      value279
     );
   }
-  if (_0x24da35 === 'reference') {
-    const _0x24648c = collectRunningHubKlingO3ReferenceImages({
+  if (runningHubKlingO3GenerationMode2 === 'reference') {
+    const list50 = collectRunningHubKlingO3ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (_0x24648c.length < 1)
+    if (list50.length < 1)
       throw new Error('RunningHub Kling O3 reference mode requires at least 1 image input');
-    if (_0x309637 > 1) throw new Error('RunningHub Kling O3 reference mode supports at most 1 video input');
-    if (_0x3ec0e1[0] && _0x24648c.length > 4)
+    if (runningHubKlingV3RawMediaCount6 > 1)
+      throw new Error('RunningHub Kling O3 reference mode supports at most 1 video input');
+    if (inputList4[0] && list50.length > 4)
       throw new Error('RunningHub Kling O3 reference mode supports at most 4 image inputs with video input');
-    if (_0x24648c.length > 7)
+    if (list50.length > 7)
       throw new Error('RunningHub Kling O3 reference mode supports at most 7 image inputs');
-    _0x441e07.imageUrls = _0x24648c;
-    if (_0x3ec0e1[0]) _0x441e07.videoUrl = _0x3ec0e1[0];
-    _0x441e07.keepOriginalSound = _0x50f55a;
-    if (_0x370156 !== '4k') delete _0x441e07.shotType;
-    return _0x441e07;
+    value279.imageUrls = list50;
+    if (inputList4[0]) value279.videoUrl = inputList4[0];
+    value279.keepOriginalSound = klingKeepOriginalSound3;
+    if (runningHubKlingO3Model !== '4k') delete value279.shotType;
+    return value279;
   }
-  if (_0x309637 > 0)
+  if (runningHubKlingV3RawMediaCount6 > 0)
     throw new Error('RunningHub Kling O3 frame mode does not accept video input; use reference or edit mode');
-  const _0x66f817 = collectRunningHubKlingO3FrameImages({
+  const list51 = collectRunningHubKlingO3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x66f817.length > 2) throw new Error('RunningHub Kling O3 frame mode supports at most 2 image inputs');
-  if (_0x370156 === '4k' && _0x66f817.length > 1)
+  if (list51.length > 2) throw new Error('RunningHub Kling O3 frame mode supports at most 2 image inputs');
+  if (runningHubKlingO3Model === '4k' && list51.length > 1)
     throw new Error('RunningHub Kling O3 4K image-to-video supports only one firstImageUrl');
-  if (_0x66f817.length > 0) {
-    (delete _0x441e07.aspectRatio, (_0x441e07.firstImageUrl = _0x66f817[0]));
-    if (_0x66f817[1]) _0x441e07.lastImageUrl = _0x66f817[1];
+  if (list51.length > 0) {
+    (delete value279.aspectRatio, (value279.firstImageUrl = list51[0]));
+    if (list51[1]) value279.lastImageUrl = list51[1];
   }
-  return _0x441e07;
+  return value279;
 }
 function runninghubKlingO3VideoEndpoint({
   inputImages: inputImages = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const { model: _0x391be9, route: _0x1f0b36 } = resolveRunningHubKlingO3Route({
+  const { model: model10, route: route6 } = resolveRunningHubKlingO3Route({
     inputImages: inputImages,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return RUNNINGHUB_KLING_O3_ENDPOINTS[_0x391be9]?.[_0x1f0b36] || RUNNINGHUB_KLING_O3_ENDPOINTS.std.text;
+  return RUNNINGHUB_KLING_O3_ENDPOINTS[model10]?.[route6] || RUNNINGHUB_KLING_O3_ENDPOINTS.std.text;
 }
 const RUNNINGHUB_HAILUO_02_ENDPOINTS = Object.freeze({
   t2vStandard: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-02/t2v-standard',
@@ -2227,44 +2252,44 @@ const RUNNINGHUB_HAILUO_02_ENDPOINTS = Object.freeze({
   i2vPro: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-02/i2v-pro',
   i2vFast: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-02/fast',
 });
-function normalizeRunningHubHailuo02Quality(_0x4adae9) {
-  const _0x224f7c = String(_0x4adae9 || '')
+function normalizeRunningHubHailuo02Quality(value280) {
+  const value281 = String(value280 || '')
     .trim()
     .toLowerCase();
-  if (_0x224f7c === 'pro') return 'pro';
-  if (_0x224f7c === 'fast') return 'fast';
+  if (value281 === 'pro') return 'pro';
+  if (value281 === 'fast') return 'fast';
   return 'standard';
 }
-function normalizeRunningHubHailuo02Duration(_0x5dbec1) {
-  const _0x4f50c7 = Number(_0x5dbec1);
-  return Number.isFinite(_0x4f50c7) && Math.trunc(_0x4f50c7) === 10 ? '10' : '6';
+function normalizeRunningHubHailuo02Duration(value282) {
+  const value283 = Number(value282);
+  return Number.isFinite(value283) && Math.trunc(value283) === 10 ? '10' : '6';
 }
-function getRunningHubHailuo02Quality(_0x1b8e90 = {}, _0xd787e6 = {}) {
+function getRunningHubHailuo02Quality(options17 = {}, value284 = {}) {
   return normalizeRunningHubHailuo02Quality(
-    _0xd787e6.rh_hailuo_02_quality ||
-      _0x1b8e90?.generationParams?.rh_hailuo_02_quality ||
-      _0x1b8e90?.rh_hailuo_02_quality,
+    value284.rh_hailuo_02_quality ||
+      options17?.generationParams?.rh_hailuo_02_quality ||
+      options17?.rh_hailuo_02_quality,
   );
 }
 function collectRunningHubHailuo02FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x44a61d = [],
-    _0x1502b9 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
+  const value285 = [],
+    runningHubInputUrlsBySlot12 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x44a61d, _0x1502b9.firstFrame),
-    appendUniqueUrl(_0x44a61d, _0x1502b9.lastFrame),
-    normalizeInputList(inputImages).forEach((_0x3e72aa) => appendUniqueUrl(_0x44a61d, _0x3e72aa)),
-    _0x44a61d
+    appendUniqueUrl(value285, runningHubInputUrlsBySlot12.firstFrame),
+    appendUniqueUrl(value285, runningHubInputUrlsBySlot12.lastFrame),
+    normalizeInputList(inputImages).forEach((item24) => appendUniqueUrl(value285, item24)),
+    value285
   );
 }
-function getRunningHubHailuo02RawVideoCount(_0x1babde = {}, _0x3eb47c = []) {
+function getRunningHubHailuo02RawVideoCount(options18 = {}, value286 = []) {
   return Math.max(
-    normalizeInputList(_0x3eb47c).length,
-    normalizeInputList(_0x1babde?.videos).length,
-    normalizeInputList(_0x1babde?.videoUrls).length,
-    String(_0x1babde?.videoUrl || '').trim() ? 1 : 0,
+    normalizeInputList(value286).length,
+    normalizeInputList(options18?.videos).length,
+    normalizeInputList(options18?.videoUrls).length,
+    String(options18?.videoUrl || '').trim() ? 1 : 0,
   );
 }
 function resolveRunningHubHailuo02Route({
@@ -2273,67 +2298,70 @@ function resolveRunningHubHailuo02Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x108b58 = getRunningHubHailuo02Quality(payload, currentBody),
-    _0x4117a7 = collectRunningHubHailuo02FrameImages({
+  const runningHubHailuo02Quality = getRunningHubHailuo02Quality(payload, currentBody),
+    runningHubHailuo02FrameImages = collectRunningHubHailuo02FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }).length;
-  if (_0x108b58 === 'fast') return 'i2vFast';
-  if (_0x108b58 === 'pro') return _0x4117a7 > 0 ? 'i2vPro' : 't2vPro';
-  return _0x4117a7 > 0 ? 'i2vStandard' : 't2vStandard';
+  if (runningHubHailuo02Quality === 'fast') return 'i2vFast';
+  if (runningHubHailuo02Quality === 'pro') return runningHubHailuo02FrameImages > 0 ? 'i2vPro' : 't2vPro';
+  return runningHubHailuo02FrameImages > 0 ? 'i2vStandard' : 't2vStandard';
 }
 function runninghubHailuo02Video({
-  currentBody: _0x2744e1,
+  currentBody: currentBody17,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x4bef47 = { ..._0x2744e1 },
-    _0xf549f0 = String(_0x4bef47.prompt || payload?.prompt || '').trim();
-  if (!_0xf549f0) throw new Error('RunningHub Hailuo 02 prompt is required');
-  const _0x3605d1 = getRunningHubHailuo02Quality(payload, _0x4bef47),
-    _0xe4cb43 = collectRunningHubHailuo02FrameImages({
+  const value287 = { ...currentBody17 },
+    enabled32 = String(value287.prompt || payload?.prompt || '').trim();
+  if (!enabled32) throw new Error('RunningHub Hailuo 02 prompt is required');
+  const runningHubHailuo02Quality2 = getRunningHubHailuo02Quality(payload, value287),
+    list52 = collectRunningHubHailuo02FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x2e6fe8 = getRunningHubHailuo02RawVideoCount(payload, inputVideos);
-  if (_0x2e6fe8 > 0) throw new Error('RunningHub Hailuo 02 does not accept video input');
-  ((_0x4bef47.prompt = _0xf549f0),
-    (_0x4bef47.duration = normalizeRunningHubHailuo02Duration(_0x4bef47.duration)),
-    delete _0x4bef47.rh_hailuo_02_quality,
-    delete _0x4bef47.firstImageUrl,
-    delete _0x4bef47.lastImageUrl,
-    delete _0x4bef47.imageUrl,
-    delete _0x4bef47.imageUrls,
-    delete _0x4bef47.videoUrl);
-  if (_0x3605d1 === 'fast') {
-    if (_0xe4cb43.length < 1) throw new Error('RunningHub Hailuo 02 Fast requires imageUrl input');
-    if (_0xe4cb43.length > 1) throw new Error('RunningHub Hailuo 02 Fast supports only imageUrl input');
-    return ((_0x4bef47.imageUrl = _0xe4cb43[0]), _0x4bef47);
+    runningHubHailuo02RawVideoCount = getRunningHubHailuo02RawVideoCount(payload, inputVideos);
+  if (runningHubHailuo02RawVideoCount > 0)
+    throw new Error('RunningHub Hailuo 02 does not accept video input');
+  ((value287.prompt = enabled32),
+    (value287.duration = normalizeRunningHubHailuo02Duration(value287.duration)),
+    delete value287.rh_hailuo_02_quality,
+    delete value287.firstImageUrl,
+    delete value287.lastImageUrl,
+    delete value287.imageUrl,
+    delete value287.imageUrls,
+    delete value287.videoUrl);
+  if (runningHubHailuo02Quality2 === 'fast') {
+    if (list52.length < 1) throw new Error('RunningHub Hailuo 02 Fast requires imageUrl input');
+    if (list52.length > 1) throw new Error('RunningHub Hailuo 02 Fast supports only imageUrl input');
+    return ((value287.imageUrl = list52[0]), value287);
   }
-  if (_0x3605d1 === 'pro') {
-    delete _0x4bef47.duration;
-    if (_0xe4cb43.length > 1) throw new Error('RunningHub Hailuo 02 Pro supports only firstImageUrl input');
-    if (_0xe4cb43[0]) _0x4bef47.firstImageUrl = _0xe4cb43[0];
-    return _0x4bef47;
+  if (runningHubHailuo02Quality2 === 'pro') {
+    delete value287.duration;
+    if (list52.length > 1) throw new Error('RunningHub Hailuo 02 Pro supports only firstImageUrl input');
+    if (list52[0]) value287.firstImageUrl = list52[0];
+    return value287;
   }
-  if (_0xe4cb43.length > 2) throw new Error('RunningHub Hailuo 02 Standard supports at most 2 image inputs');
-  if (_0xe4cb43[0]) _0x4bef47.firstImageUrl = _0xe4cb43[0];
-  if (_0xe4cb43[1]) _0x4bef47.lastImageUrl = _0xe4cb43[1];
-  return _0x4bef47;
+  if (list52.length > 2) throw new Error('RunningHub Hailuo 02 Standard supports at most 2 image inputs');
+  if (list52[0]) value287.firstImageUrl = list52[0];
+  if (list52[1]) value287.lastImageUrl = list52[1];
+  return value287;
 }
 function runninghubHailuo02VideoEndpoint({
   inputImages: inputImages = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x54eace = resolveRunningHubHailuo02Route({
+  const runningHubHailuo02Route = resolveRunningHubHailuo02Route({
     inputImages: inputImages,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return RUNNINGHUB_HAILUO_02_ENDPOINTS[_0x54eace] || RUNNINGHUB_HAILUO_02_ENDPOINTS.t2vStandard;
+  return (
+    RUNNINGHUB_HAILUO_02_ENDPOINTS[runningHubHailuo02Route] || RUNNINGHUB_HAILUO_02_ENDPOINTS.t2vStandard
+  );
 }
 const RUNNINGHUB_HAILUO_23_ENDPOINTS = Object.freeze({
   t2vStandard: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-2.3/t2v-standard',
@@ -2343,44 +2371,44 @@ const RUNNINGHUB_HAILUO_23_ENDPOINTS = Object.freeze({
   i2vFast: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-2.3-fast/image-to-video',
   i2vFastPro: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-2.3-fast-pro/image-to-video',
 });
-function normalizeRunningHubHailuo23Quality(_0x494b90) {
-  const _0x24d699 = String(_0x494b90 || '')
+function normalizeRunningHubHailuo23Quality(value288) {
+  const value289 = String(value288 || '')
     .trim()
     .toLowerCase();
-  if (_0x24d699 === 'pro') return 'pro';
-  if (_0x24d699 === 'fast') return 'fast';
-  if (_0x24d699 === 'fastpro' || _0x24d699 === 'fast-pro' || _0x24d699 === 'fast_pro') return 'fastPro';
+  if (value289 === 'pro') return 'pro';
+  if (value289 === 'fast') return 'fast';
+  if (value289 === 'fastpro' || value289 === 'fast-pro' || value289 === 'fast_pro') return 'fastPro';
   return 'standard';
 }
-function normalizeRunningHubHailuo23Duration(_0x95bb47) {
-  const _0x51ab55 = Number(_0x95bb47);
-  return Number.isFinite(_0x51ab55) && Math.trunc(_0x51ab55) === 10 ? '10' : '6';
+function normalizeRunningHubHailuo23Duration(value290) {
+  const value291 = Number(value290);
+  return Number.isFinite(value291) && Math.trunc(value291) === 10 ? '10' : '6';
 }
-function getRunningHubHailuo23Quality(_0x2bc68b = {}, _0x4b2912 = {}) {
+function getRunningHubHailuo23Quality(options19 = {}, value292 = {}) {
   return normalizeRunningHubHailuo23Quality(
-    _0x4b2912.rh_hailuo_23_quality ||
-      _0x2bc68b?.generationParams?.rh_hailuo_23_quality ||
-      _0x2bc68b?.rh_hailuo_23_quality,
+    value292.rh_hailuo_23_quality ||
+      options19?.generationParams?.rh_hailuo_23_quality ||
+      options19?.rh_hailuo_23_quality,
   );
 }
 function collectRunningHubHailuo23FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x133535 = [],
-    _0x47b2bb = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
+  const value293 = [],
+    runningHubInputUrlsBySlot13 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x133535, _0x47b2bb.firstFrame),
-    normalizeInputList(inputImages).forEach((_0x97d3cb) => appendUniqueUrl(_0x133535, _0x97d3cb)),
-    _0x133535
+    appendUniqueUrl(value293, runningHubInputUrlsBySlot13.firstFrame),
+    normalizeInputList(inputImages).forEach((item25) => appendUniqueUrl(value293, item25)),
+    value293
   );
 }
-function getRunningHubHailuo23RawVideoCount(_0x47788f = {}, _0x545858 = []) {
+function getRunningHubHailuo23RawVideoCount(options20 = {}, value294 = []) {
   return Math.max(
-    normalizeInputList(_0x545858).length,
-    normalizeInputList(_0x47788f?.videos).length,
-    normalizeInputList(_0x47788f?.videoUrls).length,
-    String(_0x47788f?.videoUrl || '').trim() ? 1 : 0,
+    normalizeInputList(value294).length,
+    normalizeInputList(options20?.videos).length,
+    normalizeInputList(options20?.videoUrls).length,
+    String(options20?.videoUrl || '').trim() ? 1 : 0,
   );
 }
 function resolveRunningHubHailuo23Route({
@@ -2389,65 +2417,68 @@ function resolveRunningHubHailuo23Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x5d1b3f = getRunningHubHailuo23Quality(payload, currentBody),
-    _0x1f277b = collectRunningHubHailuo23FrameImages({
+  const runningHubHailuo23Quality = getRunningHubHailuo23Quality(payload, currentBody),
+    runningHubHailuo23FrameImages = collectRunningHubHailuo23FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }).length;
-  if (_0x5d1b3f === 'fast') return 'i2vFast';
-  if (_0x5d1b3f === 'fastPro') return 'i2vFastPro';
-  if (_0x5d1b3f === 'pro') return _0x1f277b > 0 ? 'i2vPro' : 't2vPro';
-  return _0x1f277b > 0 ? 'i2vStandard' : 't2vStandard';
+  if (runningHubHailuo23Quality === 'fast') return 'i2vFast';
+  if (runningHubHailuo23Quality === 'fastPro') return 'i2vFastPro';
+  if (runningHubHailuo23Quality === 'pro') return runningHubHailuo23FrameImages > 0 ? 'i2vPro' : 't2vPro';
+  return runningHubHailuo23FrameImages > 0 ? 'i2vStandard' : 't2vStandard';
 }
 function runninghubHailuo23Video({
-  currentBody: _0x52e7d9,
+  currentBody: currentBody18,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x57426d = { ..._0x52e7d9 },
-    _0x27c159 = String(_0x57426d.prompt || payload?.prompt || '').trim();
-  if (!_0x27c159) throw new Error('RunningHub Hailuo 2.3 prompt is required');
-  const _0x26a7d0 = getRunningHubHailuo23Quality(payload, _0x57426d),
-    _0x216514 = collectRunningHubHailuo23FrameImages({
+  const value295 = { ...currentBody18 },
+    enabled33 = String(value295.prompt || payload?.prompt || '').trim();
+  if (!enabled33) throw new Error('RunningHub Hailuo 2.3 prompt is required');
+  const runningHubHailuo23Quality2 = getRunningHubHailuo23Quality(payload, value295),
+    list53 = collectRunningHubHailuo23FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x5d0d12 = getRunningHubHailuo23RawVideoCount(payload, inputVideos);
-  if (_0x5d0d12 > 0) throw new Error('RunningHub Hailuo 2.3 does not accept video input');
-  if (_0x216514.length > 1) throw new Error('RunningHub Hailuo 2.3 supports only imageUrl input');
-  ((_0x57426d.prompt = _0x27c159),
-    (_0x57426d.duration = normalizeRunningHubHailuo23Duration(_0x57426d.duration)),
-    delete _0x57426d.rh_hailuo_23_quality,
-    delete _0x57426d.firstImageUrl,
-    delete _0x57426d.lastImageUrl,
-    delete _0x57426d.imageUrl,
-    delete _0x57426d.imageUrls,
-    delete _0x57426d.videoUrl);
-  if (_0x26a7d0 === 'fast' || _0x26a7d0 === 'fastPro') {
-    if (!_0x216514[0]) throw new Error('RunningHub Hailuo 2.3 Fast requires imageUrl input');
+    runningHubHailuo23RawVideoCount = getRunningHubHailuo23RawVideoCount(payload, inputVideos);
+  if (runningHubHailuo23RawVideoCount > 0)
+    throw new Error('RunningHub Hailuo 2.3 does not accept video input');
+  if (list53.length > 1) throw new Error('RunningHub Hailuo 2.3 supports only imageUrl input');
+  ((value295.prompt = enabled33),
+    (value295.duration = normalizeRunningHubHailuo23Duration(value295.duration)),
+    delete value295.rh_hailuo_23_quality,
+    delete value295.firstImageUrl,
+    delete value295.lastImageUrl,
+    delete value295.imageUrl,
+    delete value295.imageUrls,
+    delete value295.videoUrl);
+  if (runningHubHailuo23Quality2 === 'fast' || runningHubHailuo23Quality2 === 'fastPro') {
+    if (!list53[0]) throw new Error('RunningHub Hailuo 2.3 Fast requires imageUrl input');
     return (
-      (_0x57426d.imageUrl = _0x216514[0]),
-      _0x26a7d0 === 'fastPro' && (_0x57426d.duration = '6'),
-      _0x57426d
+      (value295.imageUrl = list53[0]),
+      runningHubHailuo23Quality2 === 'fastPro' && (value295.duration = '6'),
+      value295
     );
   }
-  _0x26a7d0 === 'pro' && delete _0x57426d.duration;
-  if (_0x216514[0]) _0x57426d.imageUrl = _0x216514[0];
-  return _0x57426d;
+  runningHubHailuo23Quality2 === 'pro' && delete value295.duration;
+  if (list53[0]) value295.imageUrl = list53[0];
+  return value295;
 }
 function runninghubHailuo23VideoEndpoint({
   inputImages: inputImages = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x5bb4da = resolveRunningHubHailuo23Route({
+  const runningHubHailuo23Route = resolveRunningHubHailuo23Route({
     inputImages: inputImages,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return RUNNINGHUB_HAILUO_23_ENDPOINTS[_0x5bb4da] || RUNNINGHUB_HAILUO_23_ENDPOINTS.t2vStandard;
+  return (
+    RUNNINGHUB_HAILUO_23_ENDPOINTS[runningHubHailuo23Route] || RUNNINGHUB_HAILUO_23_ENDPOINTS.t2vStandard
+  );
 }
 const RUNNINGHUB_VEO3_ENDPOINTS = Object.freeze({
   lowCost: Object.freeze({
@@ -2487,75 +2518,75 @@ const RUNNINGHUB_VEO3_ENDPOINTS = Object.freeze({
     }),
   }),
 });
-function normalizeRunningHubVeo3Channel(_0x4582ab) {
-  const _0x4debf7 = String(_0x4582ab || '')
+function normalizeRunningHubVeo3Channel(value296) {
+  const value297 = String(value296 || '')
     .trim()
     .toLowerCase();
-  if (_0x4debf7 === 'official' || _0x4debf7 === 'stable' || _0x4debf7 === 'officialstable') return 'official';
+  if (value297 === 'official' || value297 === 'stable' || value297 === 'officialstable') return 'official';
   return 'lowCost';
 }
-function normalizeRunningHubVeo3Mode(_0x2e0739, { channel: channel = 'lowCost' } = {}) {
-  const _0x3c8e38 = String(_0x2e0739 || '')
+function normalizeRunningHubVeo3Mode(value298, { channel: channel = 'lowCost' } = {}) {
+  const value299 = String(value298 || '')
     .trim()
     .toLowerCase();
-  if (_0x3c8e38 === 'quality' || _0x3c8e38 === 'pro') return 'pro';
-  if (_0x3c8e38 === 'lite' && channel === 'official') return 'lite';
+  if (value299 === 'quality' || value299 === 'pro') return 'pro';
+  if (value299 === 'lite' && channel === 'official') return 'lite';
   return 'fast';
 }
-function getRunningHubVeo3Channel(_0x3d13e9 = {}, _0x239dca = {}) {
+function getRunningHubVeo3Channel(options21 = {}, value300 = {}) {
   return normalizeRunningHubVeo3Channel(
-    _0x239dca.rh_veo3_channel || _0x3d13e9?.generationParams?.rh_veo3_channel || _0x3d13e9?.rh_veo3_channel,
+    value300.rh_veo3_channel || options21?.generationParams?.rh_veo3_channel || options21?.rh_veo3_channel,
   );
 }
-function getRunningHubVeo3Mode(_0x27479f = {}, _0x2b9af8 = {}) {
-  const _0x32c38f = getRunningHubVeo3Channel(_0x27479f, _0x2b9af8);
-  return normalizeRunningHubVeo3Mode(_0x2b9af8.mode || _0x27479f?.generationParams?.mode || _0x27479f?.mode, {
-    channel: _0x32c38f,
+function getRunningHubVeo3Mode(options22 = {}, value301 = {}) {
+  const channel2 = getRunningHubVeo3Channel(options22, value301);
+  return normalizeRunningHubVeo3Mode(value301.mode || options22?.generationParams?.mode || options22?.mode, {
+    channel: channel2,
   });
 }
-function getRunningHubVeo3GenerationType(_0x34fb6a = {}, _0xd6f0b3 = {}) {
-  const _0x5f2ec5 = String(
-    _0xd6f0b3.generation_type ||
-      _0x34fb6a?.generationParams?.generation_type ||
-      _0x34fb6a?.generation_type ||
+function getRunningHubVeo3GenerationType(options23 = {}, value302 = {}) {
+  const value303 = String(
+    value302.generation_type ||
+      options23?.generationParams?.generation_type ||
+      options23?.generation_type ||
       'frame',
   )
     .trim()
     .toLowerCase();
-  if (_0x5f2ec5 === 'reference' || _0x5f2ec5 === 'extend') return _0x5f2ec5;
+  if (value303 === 'reference' || value303 === 'extend') return value303;
   return 'frame';
 }
 function collectRunningHubVeo3FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x418cbb = [],
-    _0x15062f = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
+  const value304 = [],
+    runningHubInputUrlsBySlot14 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x418cbb, _0x15062f.firstFrame),
-    appendUniqueUrl(_0x418cbb, _0x15062f.lastFrame),
-    normalizeInputList(inputImages).forEach((_0x63f822) => appendUniqueUrl(_0x418cbb, _0x63f822)),
-    _0x418cbb
+    appendUniqueUrl(value304, runningHubInputUrlsBySlot14.firstFrame),
+    appendUniqueUrl(value304, runningHubInputUrlsBySlot14.lastFrame),
+    normalizeInputList(inputImages).forEach((item26) => appendUniqueUrl(value304, item26)),
+    value304
   );
 }
 function collectRunningHubVeo3ReferenceImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x575b96 = [],
-    _0x42cb51 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
+  const value305 = [],
+    runningHubInputUrlsBySlot15 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x575b96, _0x42cb51.referenceImage),
-    normalizeInputList(inputImages).forEach((_0x42ff74) => appendUniqueUrl(_0x575b96, _0x42ff74)),
-    _0x575b96
+    appendUniqueUrl(value305, runningHubInputUrlsBySlot15.referenceImage),
+    normalizeInputList(inputImages).forEach((item27) => appendUniqueUrl(value305, item27)),
+    value305
   );
 }
-function getRunningHubVeo3RawVideoCount(_0x4f5e17 = {}, _0x43aac8 = []) {
+function getRunningHubVeo3RawVideoCount(options24 = {}, value306 = []) {
   return Math.max(
-    normalizeInputList(_0x43aac8).length,
-    normalizeInputList(_0x4f5e17?.videos).length,
-    normalizeInputList(_0x4f5e17?.videoUrls).length,
-    String(_0x4f5e17?.videoUrl || '').trim() ? 1 : 0,
+    normalizeInputList(value306).length,
+    normalizeInputList(options24?.videos).length,
+    normalizeInputList(options24?.videoUrls).length,
+    String(options24?.videoUrl || '').trim() ? 1 : 0,
   );
 }
 function resolveRunningHubVeo3Route({
@@ -2565,147 +2596,148 @@ function resolveRunningHubVeo3Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x4b62c5 = getRunningHubVeo3Channel(payload, currentBody),
-    _0x8f3c27 = getRunningHubVeo3Mode(payload, currentBody),
-    _0x4d474f = getRunningHubVeo3GenerationType(payload, currentBody);
-  if (_0x4d474f === 'extend' || normalizeInputList(inputVideos).length > 0)
-    return Object.freeze({ channel: _0x4b62c5, mode: _0x8f3c27, route: 'extend' });
-  if (_0x4d474f === 'reference')
-    return Object.freeze({ channel: _0x4b62c5, mode: _0x8f3c27, route: 'reference' });
-  const _0x535e0a = collectRunningHubVeo3FrameImages({
+  const channel3 = getRunningHubVeo3Channel(payload, currentBody),
+    mode2 = getRunningHubVeo3Mode(payload, currentBody),
+    runningHubVeo3GenerationType = getRunningHubVeo3GenerationType(payload, currentBody);
+  if (runningHubVeo3GenerationType === 'extend' || normalizeInputList(inputVideos).length > 0)
+    return Object.freeze({ channel: channel3, mode: mode2, route: 'extend' });
+  if (runningHubVeo3GenerationType === 'reference')
+    return Object.freeze({ channel: channel3, mode: mode2, route: 'reference' });
+  const list54 = collectRunningHubVeo3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x535e0a.length >= 2) return Object.freeze({ channel: _0x4b62c5, mode: _0x8f3c27, route: 'frames' });
-  if (_0x535e0a.length === 1)
+  if (list54.length >= 2) return Object.freeze({ channel: channel3, mode: mode2, route: 'frames' });
+  if (list54.length === 1)
     return Object.freeze({
-      channel: _0x4b62c5,
-      mode: _0x8f3c27,
-      route: _0x4b62c5 === 'lowCost' && _0x8f3c27 === 'pro' ? 'frames' : 'image',
+      channel: channel3,
+      mode: mode2,
+      route: channel3 === 'lowCost' && mode2 === 'pro' ? 'frames' : 'image',
     });
-  return Object.freeze({ channel: _0x4b62c5, mode: _0x8f3c27, route: 'text' });
+  return Object.freeze({ channel: channel3, mode: mode2, route: 'text' });
 }
-function normalizeRunningHubVeo3BodyResolution(_0x312dc9, { channel: _0x3ea226, mode: _0x538148 }) {
-  const _0xf7ffaf = String(_0x312dc9 || '720p')
+function normalizeRunningHubVeo3BodyResolution(value307, { channel: channel4, mode: mode3 }) {
+  const value308 = String(value307 || '720p')
     .trim()
     .toLowerCase();
-  if (_0x3ea226 === 'lowCost') return '720p';
-  if (_0x538148 === 'lite' && _0xf7ffaf === '4k') return '1080p';
-  if (_0xf7ffaf === '4k' || _0xf7ffaf === '1080p') return _0xf7ffaf;
+  if (channel4 === 'lowCost') return '720p';
+  if (mode3 === 'lite' && value308 === '4k') return '1080p';
+  if (value308 === '4k' || value308 === '1080p') return value308;
   return '720p';
 }
-function normalizeRunningHubVeo3BodyDuration(_0x2ffff1, { channel: _0x58f957, mode: _0x2787fc }) {
-  if (_0x58f957 === 'lowCost') return '8';
-  const _0x576233 = Math.trunc(Number(_0x2ffff1));
-  if (_0x2787fc === 'lite') return _0x576233 === 8 ? '8' : '6';
-  return [4, 6, 8].includes(_0x576233) ? String(_0x576233) : '8';
+function normalizeRunningHubVeo3BodyDuration(value309, { channel: channel5, mode: mode4 }) {
+  if (channel5 === 'lowCost') return '8';
+  const count10 = Math.trunc(Number(value309));
+  if (mode4 === 'lite') return count10 === 8 ? '8' : '6';
+  return [4, 6, 8].includes(count10) ? String(count10) : '8';
 }
-function removeRunningHubVeo3TransientFields(_0x175972) {
-  (delete _0x175972.rh_veo3_channel,
-    delete _0x175972.mode,
-    delete _0x175972.generation_type,
-    delete _0x175972.imageUrl,
-    delete _0x175972.imageUrls,
-    delete _0x175972.firstFrameUrl,
-    delete _0x175972.lastFrameUrl,
-    delete _0x175972.firstImageUrl,
-    delete _0x175972.lastImageUrl,
-    delete _0x175972.videoUrl,
-    delete _0x175972.video);
+function removeRunningHubVeo3TransientFields(value310) {
+  (delete value310.rh_veo3_channel,
+    delete value310.mode,
+    delete value310.generation_type,
+    delete value310.imageUrl,
+    delete value310.imageUrls,
+    delete value310.firstFrameUrl,
+    delete value310.lastFrameUrl,
+    delete value310.firstImageUrl,
+    delete value310.lastImageUrl,
+    delete value310.videoUrl,
+    delete value310.video);
 }
 function runninghubVeo3Video({
-  currentBody: _0x4eb9df,
+  currentBody: currentBody19,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x58068a = { ..._0x4eb9df },
-    _0x594b56 = resolveRunningHubVeo3Route({
+  const currentBody20 = { ...currentBody19 },
+    runningHubVeo3Route = resolveRunningHubVeo3Route({
       inputImages: inputImages,
       inputVideos: inputVideos,
       payload: payload,
       finalUrlsBySlot: finalUrlsBySlot,
-      currentBody: _0x58068a,
+      currentBody: currentBody20,
     }),
-    { channel: _0x5d988f, mode: _0x2b32d2, route: _0x494a9b } = _0x594b56,
-    _0x4e43e0 = getRunningHubVeo3GenerationType(payload, _0x58068a),
-    _0xd56606 = getRunningHubVeo3RawVideoCount(payload, inputVideos);
-  if (_0xd56606 > 0 && _0x494a9b !== 'extend') throw new Error('RunningHub Veo3 does not accept video input');
-  const _0xa705f4 = String(_0x58068a.prompt || payload?.prompt || '').trim();
-  if (_0x494a9b !== 'extend') {
-    if (!_0xa705f4) throw new Error('RunningHub Veo3 prompt is required');
-    _0x58068a.prompt = _0xa705f4;
+    { channel: channel6, mode: mode5, route: route7 } = runningHubVeo3Route,
+    runningHubVeo3GenerationType2 = getRunningHubVeo3GenerationType(payload, currentBody20),
+    runningHubVeo3RawVideoCount = getRunningHubVeo3RawVideoCount(payload, inputVideos);
+  if (runningHubVeo3RawVideoCount > 0 && route7 !== 'extend')
+    throw new Error('RunningHub Veo3 does not accept video input');
+  const enabled34 = String(currentBody20.prompt || payload?.prompt || '').trim();
+  if (route7 !== 'extend') {
+    if (!enabled34) throw new Error('RunningHub Veo3 prompt is required');
+    currentBody20.prompt = enabled34;
   }
-  ((_0x58068a.resolution = normalizeRunningHubVeo3BodyResolution(_0x58068a.resolution, {
-    channel: _0x5d988f,
-    mode: _0x2b32d2,
+  ((currentBody20.resolution = normalizeRunningHubVeo3BodyResolution(currentBody20.resolution, {
+    channel: channel6,
+    mode: mode5,
   })),
-    (_0x58068a.duration = normalizeRunningHubVeo3BodyDuration(_0x58068a.duration, {
-      channel: _0x5d988f,
-      mode: _0x2b32d2,
+    (currentBody20.duration = normalizeRunningHubVeo3BodyDuration(currentBody20.duration, {
+      channel: channel6,
+      mode: mode5,
     })),
-    removeRunningHubVeo3TransientFields(_0x58068a));
-  if (_0x494a9b === 'extend') {
-    if (_0x5d988f !== 'official' || _0x2b32d2 === 'lite')
+    removeRunningHubVeo3TransientFields(currentBody20));
+  if (route7 === 'extend') {
+    if (channel6 !== 'official' || mode5 === 'lite')
       throw new Error('RunningHub Veo3 video extend only supports official Fast or Pro');
-    const _0x142bac = normalizeInputList(inputVideos);
-    if (_0xd56606 < 1 || !_0x142bac[0])
+    const inputList5 = normalizeInputList(inputVideos);
+    if (runningHubVeo3RawVideoCount < 1 || !inputList5[0])
       throw new Error('RunningHub Veo3 video extend requires 1 video input');
-    if (_0xd56606 > 1) throw new Error('RunningHub Veo3 video extend supports at most 1 video input');
-    const _0x102731 = [];
+    if (runningHubVeo3RawVideoCount > 1)
+      throw new Error('RunningHub Veo3 video extend supports at most 1 video input');
+    const list55 = [];
     (collectRunningHubVeo3FrameImages({ inputImages: inputImages, finalUrlsBySlot: finalUrlsBySlot }).forEach(
-      (_0x236cf8) => appendUniqueUrl(_0x102731, _0x236cf8),
+      (item28) => appendUniqueUrl(list55, item28),
     ),
       collectRunningHubVeo3ReferenceImages({
         inputImages: inputImages,
         finalUrlsBySlot: finalUrlsBySlot,
-      }).forEach((_0x489130) => appendUniqueUrl(_0x102731, _0x489130)));
-    if (_0x102731.length > 0) throw new Error('RunningHub Veo3 video extend does not accept image input');
+      }).forEach((item29) => appendUniqueUrl(list55, item29)));
+    if (list55.length > 0) throw new Error('RunningHub Veo3 video extend does not accept image input');
     return (
-      (_0x58068a.video = _0x142bac[0]),
-      delete _0x58068a.prompt,
-      delete _0x58068a.duration,
-      delete _0x58068a.aspectRatio,
-      delete _0x58068a.generateAudio,
-      _0x58068a
+      (currentBody20.video = inputList5[0]),
+      delete currentBody20.prompt,
+      delete currentBody20.duration,
+      delete currentBody20.aspectRatio,
+      delete currentBody20.generateAudio,
+      currentBody20
     );
   }
-  if (_0x4e43e0 === 'reference') {
-    if (_0x5d988f !== 'official' || _0x2b32d2 === 'lite')
+  if (runningHubVeo3GenerationType2 === 'reference') {
+    if (channel6 !== 'official' || mode5 === 'lite')
       throw new Error('RunningHub Veo3 reference mode only supports official Fast or Pro');
-    const _0x5f009b = collectRunningHubVeo3ReferenceImages({
+    const list56 = collectRunningHubVeo3ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (_0x5f009b.length < 1) throw new Error('RunningHub Veo3 reference mode requires 1-3 image inputs');
-    if (_0x5f009b.length > 3)
-      throw new Error('RunningHub Veo3 reference mode supports at most 3 image inputs');
-    ((_0x58068a.imageUrls = _0x5f009b), delete _0x58068a.duration);
-    if (_0x2b32d2 === 'pro') delete _0x58068a.aspectRatio;
-    return _0x58068a;
+    if (list56.length < 1) throw new Error('RunningHub Veo3 reference mode requires 1-3 image inputs');
+    if (list56.length > 3) throw new Error('RunningHub Veo3 reference mode supports at most 3 image inputs');
+    ((currentBody20.imageUrls = list56), delete currentBody20.duration);
+    if (mode5 === 'pro') delete currentBody20.aspectRatio;
+    return currentBody20;
   }
-  const _0x3b833d = collectRunningHubVeo3FrameImages({
+  const list57 = collectRunningHubVeo3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x3b833d.length > 2) throw new Error('RunningHub Veo3 frame mode supports at most 2 image inputs');
-  if (_0x3b833d.length >= 2 && _0x5d988f === 'official' && _0x2b32d2 !== 'lite')
+  if (list57.length > 2) throw new Error('RunningHub Veo3 frame mode supports at most 2 image inputs');
+  if (list57.length >= 2 && channel6 === 'official' && mode5 !== 'lite')
     throw new Error(
       'RunningHub Veo3 official Fast/Pro start-end endpoint is not published; use official Lite or low-cost channel',
     );
-  if (_0x3b833d.length === 1) {
-    if (_0x5d988f === 'official') _0x58068a.imageUrl = _0x3b833d[0];
+  if (list57.length === 1) {
+    if (channel6 === 'official') currentBody20.imageUrl = list57[0];
     else
-      _0x2b32d2 === 'pro' ? (_0x58068a.firstFrameUrl = _0x3b833d[0]) : (_0x58068a.imageUrls = [_0x3b833d[0]]);
+      mode5 === 'pro' ? (currentBody20.firstFrameUrl = list57[0]) : (currentBody20.imageUrls = [list57[0]]);
   } else
-    _0x3b833d.length === 2 &&
-      (_0x5d988f === 'official'
-        ? ((_0x58068a.firstImageUrl = _0x3b833d[0]),
-          (_0x58068a.lastImageUrl = _0x3b833d[1]),
-          delete _0x58068a.duration)
-        : ((_0x58068a.firstFrameUrl = _0x3b833d[0]), (_0x58068a.lastFrameUrl = _0x3b833d[1])));
-  return ((_0x5d988f === 'lowCost' || _0x2b32d2 === 'lite') && delete _0x58068a.generateAudio, _0x58068a);
+    list57.length === 2 &&
+      (channel6 === 'official'
+        ? ((currentBody20.firstImageUrl = list57[0]),
+          (currentBody20.lastImageUrl = list57[1]),
+          delete currentBody20.duration)
+        : ((currentBody20.firstFrameUrl = list57[0]), (currentBody20.lastFrameUrl = list57[1])));
+  return ((channel6 === 'lowCost' || mode5 === 'lite') && delete currentBody20.generateAudio, currentBody20);
 }
 function runninghubVeo3VideoEndpoint({
   inputImages: inputImages = [],
@@ -2714,9 +2746,9 @@ function runninghubVeo3VideoEndpoint({
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
   const {
-    channel: _0x335be9,
-    mode: _0x5570ba,
-    route: _0x1a939c,
+    channel: channel7,
+    mode: mode6,
+    route: route8,
   } = resolveRunningHubVeo3Route({
     inputImages: inputImages,
     inputVideos: inputVideos,
@@ -2724,8 +2756,7 @@ function runninghubVeo3VideoEndpoint({
     finalUrlsBySlot: finalUrlsBySlot,
   });
   return (
-    RUNNINGHUB_VEO3_ENDPOINTS[_0x335be9]?.[_0x1a939c]?.[_0x5570ba] ||
-    RUNNINGHUB_VEO3_ENDPOINTS.lowCost.text.fast
+    RUNNINGHUB_VEO3_ENDPOINTS[channel7]?.[route8]?.[mode6] || RUNNINGHUB_VEO3_ENDPOINTS.lowCost.text.fast
   );
 }
 const RUNNINGHUB_WAN27_ENDPOINTS = Object.freeze({
@@ -2735,44 +2766,42 @@ const RUNNINGHUB_WAN27_ENDPOINTS = Object.freeze({
   reference: 'https://www.runninghub.cn/openapi/v2/alibaba/wan-2.7/reference-to-video',
   edit: 'https://www.runninghub.cn/openapi/v2/alibaba/wan-2.7/video-edit',
 });
-function normalizeRunningHubWan27Mode(_0x318f94) {
-  const _0x3a3b80 = String(_0x318f94 || '')
+function normalizeRunningHubWan27Mode(value311) {
+  const value312 = String(value311 || '')
     .trim()
     .toLowerCase();
-  return _0x3a3b80 === 'video' || _0x3a3b80 === 'reference' || _0x3a3b80 === 'edit' ? _0x3a3b80 : 'image';
+  return value312 === 'video' || value312 === 'reference' || value312 === 'edit' ? value312 : 'image';
 }
-function getRunningHubWan27Mode(_0xd0cc04 = {}, _0xecfe7c = {}) {
+function getRunningHubWan27Mode(options25 = {}, value313 = {}) {
   return normalizeRunningHubWan27Mode(
-    _0xecfe7c.wan27_mode || _0xd0cc04?.generationParams?.wan27_mode || _0xd0cc04?.wan27_mode,
+    value313.wan27_mode || options25?.generationParams?.wan27_mode || options25?.wan27_mode,
   );
 }
 function collectRunningHubWan27Images({
-  mode: _0xaabc10,
+  mode: mode7,
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0xbf2a1a = [],
-    _0x431f7e = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
-  if (_0xaabc10 === 'image')
-    (appendUniqueUrl(_0xbf2a1a, _0x431f7e.firstFrame), appendUniqueUrl(_0xbf2a1a, _0x431f7e.lastFrame));
+  const value314 = [],
+    runningHubInputUrlsBySlot16 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot);
+  if (mode7 === 'image')
+    (appendUniqueUrl(value314, runningHubInputUrlsBySlot16.firstFrame),
+      appendUniqueUrl(value314, runningHubInputUrlsBySlot16.lastFrame));
   else {
-    if (_0xaabc10 === 'reference') appendUniqueUrl(_0xbf2a1a, _0x431f7e.referenceImage);
-    else _0xaabc10 === 'edit' && appendUniqueUrl(_0xbf2a1a, _0x431f7e.editRefImage);
+    if (mode7 === 'reference') appendUniqueUrl(value314, runningHubInputUrlsBySlot16.referenceImage);
+    else mode7 === 'edit' && appendUniqueUrl(value314, runningHubInputUrlsBySlot16.editRefImage);
   }
-  return (
-    normalizeInputList(inputImages).forEach((_0xd4bf21) => appendUniqueUrl(_0xbf2a1a, _0xd4bf21)),
-    _0xbf2a1a
-  );
+  return (normalizeInputList(inputImages).forEach((item30) => appendUniqueUrl(value314, item30)), value314);
 }
-function removeRunningHubWan27TransientFields(_0x38b116) {
-  (delete _0x38b116.wan27_mode,
-    delete _0x38b116.firstImageUrl,
-    delete _0x38b116.lastImageUrl,
-    delete _0x38b116.imageUrl,
-    delete _0x38b116.imageUrls,
-    delete _0x38b116.videoUrl,
-    delete _0x38b116.videoUrls);
-  if (!_0x38b116.aspectRatio) delete _0x38b116.aspectRatio;
+function removeRunningHubWan27TransientFields(enabled35) {
+  (delete enabled35.wan27_mode,
+    delete enabled35.firstImageUrl,
+    delete enabled35.lastImageUrl,
+    delete enabled35.imageUrl,
+    delete enabled35.imageUrls,
+    delete enabled35.videoUrl,
+    delete enabled35.videoUrls);
+  if (!enabled35.aspectRatio) delete enabled35.aspectRatio;
 }
 function resolveRunningHubWan27Route({
   inputImages: inputImages = [],
@@ -2781,69 +2810,69 @@ function resolveRunningHubWan27Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x21f844 = getRunningHubWan27Mode(payload, currentBody);
-  if (_0x21f844 === 'reference' || _0x21f844 === 'edit') return _0x21f844;
-  const _0x21817b = normalizeInputList(inputVideos);
-  if (_0x21f844 === 'video' && _0x21817b.length > 0) return 'video';
-  const _0x15efe5 = collectRunningHubWan27Images({
-    mode: _0x21f844,
+  const mode8 = getRunningHubWan27Mode(payload, currentBody);
+  if (mode8 === 'reference' || mode8 === 'edit') return mode8;
+  const list58 = normalizeInputList(inputVideos);
+  if (mode8 === 'video' && list58.length > 0) return 'video';
+  const list59 = collectRunningHubWan27Images({
+    mode: mode8,
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x15efe5.length > 0) return 'image';
+  if (list59.length > 0) return 'image';
   return 'text';
 }
 function runninghubWan27Video({
-  currentBody: _0x56b974,
+  currentBody: currentBody21,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x2af787 = { ..._0x56b974 },
-    _0x5860d1 = String(_0x2af787.prompt || payload?.prompt || '').trim();
-  if (!_0x5860d1) throw new Error('RunningHub Wan2.7 prompt is required');
-  const _0x45ccf9 = getRunningHubWan27Mode(payload, _0x2af787),
-    _0x57be38 = collectRunningHubWan27Images({
-      mode: _0x45ccf9,
+  const value315 = { ...currentBody21 },
+    enabled36 = String(value315.prompt || payload?.prompt || '').trim();
+  if (!enabled36) throw new Error('RunningHub Wan2.7 prompt is required');
+  const mode9 = getRunningHubWan27Mode(payload, value315),
+    list60 = collectRunningHubWan27Images({
+      mode: mode9,
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x3b81f6 = normalizeInputList(inputVideos),
-    _0x5bb823 = String(_0x2af787.audioUrl || '').trim() || normalizeInputList(inputAudios)[0] || '';
-  _0x2af787.prompt = _0x5860d1;
-  if (_0x5bb823) _0x2af787.audioUrl = _0x5bb823;
-  removeRunningHubWan27TransientFields(_0x2af787);
-  if (_0x45ccf9 === 'reference') {
-    const _0x1efc6d = _0x57be38.length + _0x3b81f6.length;
-    if (_0x1efc6d <= 0) throw new Error('RunningHub Wan2.7 reference mode requires image or video input');
-    if (_0x1efc6d > 5) throw new Error('RunningHub Wan2.7 reference mode supports at most 5 inputs');
-    if (_0x5bb823) throw new Error('RunningHub Wan2.7 reference mode does not accept audio input');
-    if (_0x57be38.length > 0) _0x2af787.imageUrls = _0x57be38;
-    if (_0x3b81f6.length > 0) _0x2af787.videoUrls = _0x3b81f6;
-    return _0x2af787;
+    list61 = normalizeInputList(inputVideos),
+    value316 = String(value315.audioUrl || '').trim() || normalizeInputList(inputAudios)[0] || '';
+  value315.prompt = enabled36;
+  if (value316) value315.audioUrl = value316;
+  removeRunningHubWan27TransientFields(value315);
+  if (mode9 === 'reference') {
+    const count11 = list60.length + list61.length;
+    if (count11 <= 0) throw new Error('RunningHub Wan2.7 reference mode requires image or video input');
+    if (count11 > 5) throw new Error('RunningHub Wan2.7 reference mode supports at most 5 inputs');
+    if (value316) throw new Error('RunningHub Wan2.7 reference mode does not accept audio input');
+    if (list60.length > 0) value315.imageUrls = list60;
+    if (list61.length > 0) value315.videoUrls = list61;
+    return value315;
   }
-  if (_0x45ccf9 === 'edit') {
-    if (!_0x3b81f6[0]) throw new Error('RunningHub Wan2.7 video edit requires original video input');
-    if (_0x3b81f6.length > 1) throw new Error('RunningHub Wan2.7 video edit accepts only one original video');
-    if (_0x57be38.length > 3) throw new Error('RunningHub Wan2.7 video edit supports at most 3 image inputs');
-    if (_0x5bb823) throw new Error('RunningHub Wan2.7 video edit does not accept audio input');
-    _0x2af787.videoUrl = _0x3b81f6[0];
-    if (_0x57be38.length > 0) _0x2af787.imageUrls = _0x57be38.slice(0, 3);
-    return _0x2af787;
+  if (mode9 === 'edit') {
+    if (!list61[0]) throw new Error('RunningHub Wan2.7 video edit requires original video input');
+    if (list61.length > 1) throw new Error('RunningHub Wan2.7 video edit accepts only one original video');
+    if (list60.length > 3) throw new Error('RunningHub Wan2.7 video edit supports at most 3 image inputs');
+    if (value316) throw new Error('RunningHub Wan2.7 video edit does not accept audio input');
+    value315.videoUrl = list61[0];
+    if (list60.length > 0) value315.imageUrls = list60.slice(0, 3);
+    return value315;
   }
-  if (_0x45ccf9 === 'video') {
-    if (_0x57be38.length > 0) throw new Error('RunningHub Wan2.7 video extend does not accept image input');
-    if (_0x3b81f6.length > 1) throw new Error('RunningHub Wan2.7 video extend accepts only one video input');
-    if (_0x3b81f6[0]) _0x2af787.videoUrl = _0x3b81f6[0];
-    return _0x2af787;
+  if (mode9 === 'video') {
+    if (list60.length > 0) throw new Error('RunningHub Wan2.7 video extend does not accept image input');
+    if (list61.length > 1) throw new Error('RunningHub Wan2.7 video extend accepts only one video input');
+    if (list61[0]) value315.videoUrl = list61[0];
+    return value315;
   }
-  if (_0x3b81f6.length > 0) throw new Error('RunningHub Wan2.7 image mode does not accept video input');
-  if (_0x57be38.length > 2) throw new Error('RunningHub Wan2.7 image mode supports at most 2 image inputs');
-  _0x57be38[0] && (delete _0x2af787.aspectRatio, (_0x2af787.firstImageUrl = _0x57be38[0]));
-  if (_0x57be38[1]) _0x2af787.lastImageUrl = _0x57be38[1];
-  return _0x2af787;
+  if (list61.length > 0) throw new Error('RunningHub Wan2.7 image mode does not accept video input');
+  if (list60.length > 2) throw new Error('RunningHub Wan2.7 image mode supports at most 2 image inputs');
+  list60[0] && (delete value315.aspectRatio, (value315.firstImageUrl = list60[0]));
+  if (list60[1]) value315.lastImageUrl = list60[1];
+  return value315;
 }
 function runninghubWan27VideoEndpoint({
   inputImages: inputImages = [],
@@ -2851,195 +2880,194 @@ function runninghubWan27VideoEndpoint({
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x481e13 = resolveRunningHubWan27Route({
+  const runningHubWan27Route = resolveRunningHubWan27Route({
     inputImages: inputImages,
     inputVideos: inputVideos,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return RUNNINGHUB_WAN27_ENDPOINTS[_0x481e13] || RUNNINGHUB_WAN27_ENDPOINTS.text;
+  return RUNNINGHUB_WAN27_ENDPOINTS[runningHubWan27Route] || RUNNINGHUB_WAN27_ENDPOINTS.text;
 }
 function apimartKlingV3OmniVideo({
-  currentBody: _0x2baf15,
+  currentBody: currentBody22,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x56341a = { ..._0x2baf15 },
-    _0x5be5a7 = normalizeInputList(inputImages),
-    _0x5d795d = normalizeInputList(inputVideos),
-    _0xad58a0 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
-    _0x1cf27d = normalizeKlingV3OmniMode(
+  const value317 = { ...currentBody22 },
+    list62 = normalizeInputList(inputImages),
+    list63 = normalizeInputList(inputVideos),
+    runningHubInputUrlsBySlot17 = normalizeRunningHubInputUrlsBySlot(finalUrlsBySlot),
+    klingV3OmniMode = normalizeKlingV3OmniMode(
       payload?.generationParams?.kling_v3_omni_mode || payload?.kling_v3_omni_mode || 'image',
     );
-  (delete _0x56341a.kling_v3_omni_mode, delete _0x56341a.image_with_roles, delete _0x56341a.video_list);
-  if (_0x1cf27d === 'edit') {
-    if (!_0x5d795d[0]) throw new Error('APIMart Kling V3 Omni video edit requires video_list input');
+  (delete value317.kling_v3_omni_mode, delete value317.image_with_roles, delete value317.video_list);
+  if (klingV3OmniMode === 'edit') {
+    if (!list63[0]) throw new Error('APIMart Kling V3 Omni video edit requires video_list input');
     return (
-      (_0x56341a.video_list = [buildKlingV3OmniVideoItem(_0x5d795d[0], 'base')]),
-      delete _0x56341a.image_urls,
-      delete _0x56341a.image_with_roles,
-      delete _0x56341a.audio,
-      delete _0x56341a.duration,
-      delete _0x56341a.aspect_ratio,
-      _0x56341a
+      (value317.video_list = [buildKlingV3OmniVideoItem(list63[0], 'base')]),
+      delete value317.image_urls,
+      delete value317.image_with_roles,
+      delete value317.audio,
+      delete value317.duration,
+      delete value317.aspect_ratio,
+      value317
     );
   }
-  if (_0x1cf27d === 'reference') {
-    const _0x5ec288 = [];
-    (appendUniqueUrl(_0x5ec288, _0xad58a0.referenceImage),
-      _0x5be5a7.forEach((_0x11bc24) => appendUniqueUrl(_0x5ec288, _0x11bc24)));
-    const _0x15878e = _0x5ec288.slice(0, 1),
-      _0x13d5cb = _0x5d795d[0] || '';
-    if (_0x15878e.length <= 0 && !_0x13d5cb)
+  if (klingV3OmniMode === 'reference') {
+    const list64 = [];
+    (appendUniqueUrl(list64, runningHubInputUrlsBySlot17.referenceImage),
+      list62.forEach((item31) => appendUniqueUrl(list64, item31)));
+    const list65 = list64.slice(0, 1),
+      enabled37 = list63[0] || '';
+    if (list65.length <= 0 && !enabled37)
       throw new Error('APIMart Kling V3 Omni reference mode requires image or video input');
     return (
-      _0x15878e.length > 0
-        ? (_0x56341a.image_with_roles = _0x15878e.map((_0x3eb7a3) => ({ url: _0x3eb7a3, role: 'reference' })))
-        : delete _0x56341a.image_with_roles,
-      _0x13d5cb
-        ? ((_0x56341a.video_list = [buildKlingV3OmniVideoItem(_0x13d5cb, 'feature')]), delete _0x56341a.audio)
-        : delete _0x56341a.video_list,
-      delete _0x56341a.image_urls,
-      _0x56341a
+      list65.length > 0
+        ? (value317.image_with_roles = list65.map((url2) => ({ url: url2, role: 'reference' })))
+        : delete value317.image_with_roles,
+      enabled37
+        ? ((value317.video_list = [buildKlingV3OmniVideoItem(enabled37, 'feature')]), delete value317.audio)
+        : delete value317.video_list,
+      delete value317.image_urls,
+      value317
     );
   }
-  if (_0x5d795d.length > 0)
+  if (list63.length > 0)
     throw new Error('APIMart Kling V3 Omni image mode does not support video_list input');
-  const _0x77c0cb =
-      Object.prototype.hasOwnProperty.call(_0xad58a0, 'firstFrame') ||
-      Object.prototype.hasOwnProperty.call(_0xad58a0, 'lastFrame'),
-    _0x480b4b = _0x77c0cb ? _0xad58a0.firstFrame || '' : _0x5be5a7[0] || '',
-    _0x3afbb0 = _0x77c0cb
-      ? _0xad58a0.lastFrame || ''
-      : _0x5be5a7.find((_0x15f77c) => _0x15f77c && _0x15f77c !== _0x480b4b) || '';
-  if (!_0x480b4b && _0x3afbb0) throw new Error('APIMart Kling V3 Omni last_frame requires first_frame input');
-  const _0x1dc8cc = [];
+  const value318 =
+      Object.prototype.hasOwnProperty.call(runningHubInputUrlsBySlot17, 'firstFrame') ||
+      Object.prototype.hasOwnProperty.call(runningHubInputUrlsBySlot17, 'lastFrame'),
+    url3 = value318 ? runningHubInputUrlsBySlot17.firstFrame || '' : list62[0] || '',
+    url4 = value318
+      ? runningHubInputUrlsBySlot17.lastFrame || ''
+      : list62.find((item32) => item32 && item32 !== url3) || '';
+  if (!url3 && url4) throw new Error('APIMart Kling V3 Omni last_frame requires first_frame input');
+  const list66 = [];
   return (
-    _0x480b4b && _0x1dc8cc.push({ url: _0x480b4b, role: 'first_frame' }),
-    _0x3afbb0 && _0x1dc8cc.push({ url: _0x3afbb0, role: 'last_frame' }),
-    _0x1dc8cc.length > 0
-      ? ((_0x56341a.image_with_roles = _0x1dc8cc), delete _0x56341a.image_urls)
-      : delete _0x56341a.image_urls,
-    _0x56341a
+    url3 && list66.push({ url: url3, role: 'first_frame' }),
+    url4 && list66.push({ url: url4, role: 'last_frame' }),
+    list66.length > 0
+      ? ((value317.image_with_roles = list66), delete value317.image_urls)
+      : delete value317.image_urls,
+    value317
   );
 }
-function apimartWan27Video({ currentBody: _0x128e7d, payload: payload = {} }) {
-  const _0x597fdc = { ..._0x128e7d },
-    _0x46eb89 = normalizeInputList(_0x597fdc.image_urls),
-    _0xa7fbc4 = normalizeInputList(_0x597fdc.video_urls),
-    _0x5a2d88 = isPresentValue(_0x597fdc.audio_url) ? String(_0x597fdc.audio_url || '').trim() : '',
-    _0x2f7877 = !!_0x5a2d88,
-    _0x4f3252 = String(payload?.generationParams?.wan27_mode || payload?.wan27_mode || 'image')
+function apimartWan27Video({ currentBody: currentBody23, payload: payload = {} }) {
+  const value319 = { ...currentBody23 },
+    list67 = normalizeInputList(value319.image_urls),
+    list68 = normalizeInputList(value319.video_urls),
+    reference_voice = isPresentValue(value319.audio_url) ? String(value319.audio_url || '').trim() : '',
+    value320 = !!reference_voice,
+    value321 = String(payload?.generationParams?.wan27_mode || payload?.wan27_mode || 'image')
       .trim()
       .toLowerCase();
-  (delete _0x597fdc.wan27_mode, delete _0x597fdc.wan27_reference_input, delete _0x597fdc.wan27_edit_input);
-  if (_0x4f3252 === 'reference') {
-    _0x597fdc.model = 'wan2.7-r2v';
-    const _0x8d878a = _0x46eb89.slice(0, 1),
-      _0xb9e3fc = _0xa7fbc4.slice(0, Math.max(0, 5 - _0x8d878a.length));
-    if (_0x8d878a.length <= 0 && _0xb9e3fc.length <= 0)
+  (delete value319.wan27_mode, delete value319.wan27_reference_input, delete value319.wan27_edit_input);
+  if (value321 === 'reference') {
+    value319.model = 'wan2.7-r2v';
+    const list69 = list67.slice(0, 1),
+      list70 = list68.slice(0, Math.max(0, 5 - list69.length));
+    if (list69.length <= 0 && list70.length <= 0)
       throw new Error('APIMart Wan2.7-R2V requires image_with_roles or video_urls input');
     return (
-      _0x8d878a.length > 0
-        ? (_0x597fdc.image_with_roles = _0x8d878a.map((_0x2fb7dd, _0x12abb5) => ({
-            url: _0x2fb7dd,
+      list69.length > 0
+        ? (value319.image_with_roles = list69.map((url5, count12) => ({
+            url: url5,
             role: 'reference_image',
-            ...(_0x12abb5 === 0 && _0x5a2d88 ? { reference_voice: _0x5a2d88 } : {}),
+            ...(count12 === 0 && reference_voice ? { reference_voice: reference_voice } : {}),
           })))
-        : delete _0x597fdc.image_with_roles,
-      _0xb9e3fc.length > 0 ? (_0x597fdc.video_urls = _0xb9e3fc) : delete _0x597fdc.video_urls,
-      delete _0x597fdc.image_urls,
-      delete _0x597fdc.audio_url,
-      _0x597fdc
+        : delete value319.image_with_roles,
+      list70.length > 0 ? (value319.video_urls = list70) : delete value319.video_urls,
+      delete value319.image_urls,
+      delete value319.audio_url,
+      value319
     );
   }
-  if (_0x4f3252 === 'edit') {
-    _0x597fdc.model = 'wan2.7-videoedit';
-    if (!_0xa7fbc4[0]) throw new Error('APIMart Wan2.7-VideoEdit requires video_urls input');
-    _0x597fdc.video_urls = _0xa7fbc4.slice(0, 2);
-    if (_0x46eb89.length > 0) _0x597fdc.image_urls = _0x46eb89.slice(0, 4);
-    else delete _0x597fdc.image_urls;
-    return (delete _0x597fdc.audio_url, _0x597fdc);
+  if (value321 === 'edit') {
+    value319.model = 'wan2.7-videoedit';
+    if (!list68[0]) throw new Error('APIMart Wan2.7-VideoEdit requires video_urls input');
+    value319.video_urls = list68.slice(0, 2);
+    if (list67.length > 0) value319.image_urls = list67.slice(0, 4);
+    else delete value319.image_urls;
+    return (delete value319.audio_url, value319);
   }
-  _0x597fdc.model = 'wan2.7';
-  if (_0x46eb89.length > 0 && _0xa7fbc4.length > 0)
+  value319.model = 'wan2.7';
+  if (list67.length > 0 && list68.length > 0)
     throw new Error('APIMart Wan2.7 image_urls cannot be used with video_urls');
-  if (_0xa7fbc4.length > 0 && _0x2f7877)
+  if (list68.length > 0 && value320)
     throw new Error('APIMart Wan2.7 video_urls cannot be used with audio_url');
-  return ((_0x46eb89.length > 0 || _0xa7fbc4.length > 0) && delete _0x597fdc.size, _0x597fdc);
+  return ((list67.length > 0 || list68.length > 0) && delete value319.size, value319);
 }
-function agnesImage({ currentBody: _0xbedef8, modelToken: _0x6f820e }) {
-  const _0x1a0067 = { ..._0xbedef8 },
-    _0x19489d = normalizeInputList(_0x1a0067.extra_body?.image),
-    _0xbfb1c3 = String(_0x6f820e || _0x1a0067.model || '').trim(),
-    _0x2adc13 = _0xbfb1c3 === 'agnes-image-2.0-flash',
-    _0x8398b6 =
-      _0x1a0067.extra_body && typeof _0x1a0067.extra_body === 'object' && !Array.isArray(_0x1a0067.extra_body)
-        ? { ..._0x1a0067.extra_body }
+function agnesImage({ currentBody: currentBody24, modelToken: modelToken7 }) {
+  const args10 = { ...currentBody24 },
+    list71 = normalizeInputList(args10.extra_body?.image),
+    value322 = String(modelToken7 || args10.model || '').trim(),
+    value323 = value322 === 'agnes-image-2.0-flash',
+    value324 =
+      args10.extra_body && typeof args10.extra_body === 'object' && !Array.isArray(args10.extra_body)
+        ? { ...args10.extra_body }
         : {};
   return (
-    _0x19489d.length > 0
-      ? ((_0x8398b6.image = _0x19489d),
-        (_0x8398b6.response_format = 'url'),
-        _0x2adc13 && (_0x1a0067.tags = ['img2img']))
-      : (delete _0x8398b6.image, _0x2adc13 && delete _0x1a0067.tags),
-    Object.keys(_0x8398b6).length > 0 ? (_0x1a0067.extra_body = _0x8398b6) : delete _0x1a0067.extra_body,
-    _0x1a0067
+    list71.length > 0
+      ? ((value324.image = list71),
+        (value324.response_format = 'url'),
+        value323 && (args10.tags = ['img2img']))
+      : (delete value324.image, value323 && delete args10.tags),
+    Object.keys(value324).length > 0 ? (args10.extra_body = value324) : delete args10.extra_body,
+    args10
   );
 }
-function normalizeAgnesVideoFrameCount(_0x3f5939) {
-  const _0x2848f9 = Number(_0x3f5939);
-  if (!Number.isFinite(_0x2848f9)) return _0x3f5939;
-  const _0x294f1a = 49,
-    _0x192075 = 0x1b9,
-    _0x50fabc = Math.min(Math.max(_0x294f1a, Math.trunc(_0x2848f9)), _0x192075),
-    _0x16a331 = Math.round((_0x50fabc - 1) / 8) * 8 + 1;
-  return Math.min(_0x192075, Math.max(_0x294f1a, _0x16a331));
+function normalizeAgnesVideoFrameCount(value325) {
+  const value326 = Number(value325);
+  if (!Number.isFinite(value326)) return value325;
+  const value327 = 49,
+    value328 = 0x1b9,
+    value329 = Math.min(Math.max(value327, Math.trunc(value326)), value328),
+    value330 = Math.round((value329 - 1) / 8) * 8 + 1;
+  return Math.min(value328, Math.max(value327, value330));
 }
-function agnesVideo({ currentBody: _0x1e265c, payload: payload = {} }) {
-  const _0xa29249 = { ..._0x1e265c },
-    _0x266070 = String(
+function agnesVideo({ currentBody: currentBody25, payload: payload = {} }) {
+  const value331 = { ...currentBody25 },
+    value332 = String(
       payload?.generationParams?.agnes_video_mode ||
         payload?.agnes_video_mode ||
-        _0xa29249.agnes_video_mode ||
+        value331.agnes_video_mode ||
         'reference',
     )
       .trim()
       .toLowerCase();
-  delete _0xa29249.agnes_video_mode;
-  _0xa29249.num_frames !== undefined &&
-    (_0xa29249.num_frames = normalizeAgnesVideoFrameCount(_0xa29249.num_frames));
-  const _0x2e3792 = normalizeInputList(_0xa29249.extra_body?.image),
-    _0x171342 = _0x266070 === 'keyframes' ? _0x2e3792.slice(0, 2) : _0x2e3792;
-  if (_0x171342.length === 0) return (delete _0xa29249.image, delete _0xa29249.extra_body, _0xa29249);
-  if (_0x171342.length === 1)
-    return ((_0xa29249.image = _0x171342[0]), delete _0xa29249.extra_body, _0xa29249);
+  delete value331.agnes_video_mode;
+  value331.num_frames !== undefined &&
+    (value331.num_frames = normalizeAgnesVideoFrameCount(value331.num_frames));
+  const list72 = normalizeInputList(value331.extra_body?.image),
+    image = value332 === 'keyframes' ? list72.slice(0, 2) : list72;
+  if (image.length === 0) return (delete value331.image, delete value331.extra_body, value331);
+  if (image.length === 1) return ((value331.image = image[0]), delete value331.extra_body, value331);
   return (
-    (_0xa29249.extra_body = {
-      image: _0x171342,
-      ...(_0x266070 === 'keyframes' ? { mode: 'keyframes' } : {}),
+    (value331.extra_body = {
+      image: image,
+      ...(value332 === 'keyframes' ? { mode: 'keyframes' } : {}),
     }),
-    delete _0xa29249.image,
-    _0xa29249
+    delete value331.image,
+    value331
   );
 }
 function runninghubImageEndpoint({
-  modelToken: _0x2d5fb3,
-  finalUrls: _0x5ad864,
-  executionManifest: _0x549c03,
-  modelManifest: _0x7f9499,
-  payload: _0x3d14de,
+  modelToken: modelToken8,
+  finalUrls: finalUrls5,
+  executionManifest: executionManifest7,
+  modelManifest: modelManifest5,
+  payload: payload9,
 }) {
-  const _0x5a8a4a = normalizeRunningHubModelId(_0x2d5fb3),
-    _0x2fa434 = resolveRunningHubModelEndpoint({
-      hasInputImages: _0x5ad864.length > 0,
-      executionManifest: _0x549c03,
-      modelManifest: _0x7f9499,
-      payload: _0x3d14de,
+  const runningHubModelId2 = normalizeRunningHubModelId(modelToken8),
+    runningHubModelEndpoint = resolveRunningHubModelEndpoint({
+      hasInputImages: finalUrls5.length > 0,
+      executionManifest: executionManifest7,
+      modelManifest: modelManifest5,
+      payload: payload9,
     });
-  return 'https://www.runninghub.cn/openapi/v2/' + _0x5a8a4a + '/' + _0x2fa434;
+  return 'https://www.runninghub.cn/openapi/v2/' + runningHubModelId2 + '/' + runningHubModelEndpoint;
 }
 function runninghubLlmChatEndpoint() {
   return 'https://llm.runninghub.cn/v1/chat/completions';
@@ -3086,9 +3114,9 @@ const BODY_RESOLVERS = Object.freeze({
     runninghubWan27VideoEndpoint: runninghubWan27VideoEndpoint,
     runninghubLlmChatEndpoint: runninghubLlmChatEndpoint,
   });
-export function getModelApiBodyResolver(_0x28686d) {
-  return BODY_RESOLVERS[String(_0x28686d || '').trim()] || null;
+export function getModelApiBodyResolver(value333) {
+  return BODY_RESOLVERS[String(value333 || '').trim()] || null;
 }
-export function getModelApiEndpointResolver(_0x9f9cbc) {
-  return ENDPOINT_RESOLVERS[String(_0x9f9cbc || '').trim()] || null;
+export function getModelApiEndpointResolver(value334) {
+  return ENDPOINT_RESOLVERS[String(value334 || '').trim()] || null;
 }

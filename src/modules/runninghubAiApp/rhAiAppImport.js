@@ -23,221 +23,221 @@ const RUNNINGHUB_AI_APP_URL_RE =
     defaultValue: 'default',
     options: RUNNINGHUB_INSTANCE_OPTIONS,
   });
-function normalizeText(_0x52e0af, _0x36c753 = '') {
-  const _0x4774b2 = String(_0x52e0af ?? '')['trim']();
-  return _0x4774b2 || _0x36c753;
+function normalizeText(value, item = '') {
+  const key = String(value ?? '')['trim']();
+  return key || item;
 }
-function normalizeOutputKind(_0x47812d) {
-  const _0xa5544d = String(_0x47812d || '')
+function normalizeOutputKind(index) {
+  const result = String(index || '')
     ['trim']()
     ['toLowerCase']();
-  return OUTPUT_KINDS['has'](_0xa5544d) ? _0xa5544d : 'image';
+  return OUTPUT_KINDS['has'](result) ? result : 'image';
 }
-function normalizeInstanceType(_0x351789) {
-  return normalizeRunningHubInstanceType(_0x351789);
+function normalizeInstanceType(data) {
+  return normalizeRunningHubInstanceType(data);
 }
-function sanitizeIdentifierPart(_0x90fc35, _0x444a8b = 'field') {
-  const _0x30592a = String(_0x90fc35 || '')
+function sanitizeIdentifierPart(options, target = 'field') {
+  const source = String(options || '')
     ['trim']()
     ['toLowerCase']()
     ['replace'](/[^a-z0-9_-]+/g, '_')
     ['replace'](/^_+|_+$/g, '');
-  return _0x30592a || _0x444a8b;
+  return source || target;
 }
-function createStableHash(_0x38fbc0) {
-  const _0x1e65bc = String(_0x38fbc0 || '');
-  let _0x5f50da = 0x811c9dc5;
-  for (let _0x5bdcc7 = 0x0; _0x5bdcc7 < _0x1e65bc['length']; _0x5bdcc7 += 0x1) {
-    ((_0x5f50da ^= _0x1e65bc['charCodeAt'](_0x5bdcc7)), (_0x5f50da = Math['imul'](_0x5f50da, 0x1000193)));
+function createStableHash(next) {
+  const list = String(next || '');
+  let current = 0x811c9dc5;
+  for (let entry = 0x0; entry < list['length']; entry += 0x1) {
+    ((current ^= list['charCodeAt'](entry)), (current = Math['imul'](current, 0x1000193)));
   }
-  return (_0x5f50da >>> 0x0)['toString'](0x24)['padStart'](0x7, '0')['slice'](0x0, 0x8);
+  return (current >>> 0x0)['toString'](0x24)['padStart'](0x7, '0')['slice'](0x0, 0x8);
 }
-function stripCurlLineContinuations(_0x17f080) {
-  return String(_0x17f080 || '')['replace'](/\\\r?\n/g, '\x0a');
+function stripCurlLineContinuations(record) {
+  return String(record || '')['replace'](/\\\r?\n/g, '\x0a');
 }
-function readQuotedCurlValue(_0x405a78, _0x51eaa1) {
-  let _0x35b2e6 = _0x51eaa1;
-  while (_0x35b2e6 < _0x405a78['length'] && /\s/['test'](_0x405a78[_0x35b2e6])) _0x35b2e6 += 0x1;
-  const _0x1a2557 = _0x405a78[_0x35b2e6];
-  if (_0x1a2557 !== '\x27' && _0x1a2557 !== '\x22') {
-    const _0x50fa9c = _0x405a78['slice'](_0x35b2e6),
-      _0x5ca6c0 = _0x50fa9c['split'](/\r?\n/)[0x0] || _0x50fa9c;
-    return _0x5ca6c0['trim']();
+function readQuotedCurlValue(list2, payload) {
+  let handle = payload;
+  while (handle < list2['length'] && /\s/['test'](list2[handle])) handle += 0x1;
+  const state = list2[handle];
+  if (state !== '\x27' && state !== '\x22') {
+    const config = list2['slice'](handle),
+      scope = config['split'](/\r?\n/)[0x0] || config;
+    return scope['trim']();
   }
-  _0x35b2e6 += 0x1;
-  let _0x51d1fc = '';
-  for (; _0x35b2e6 < _0x405a78['length']; _0x35b2e6 += 0x1) {
-    const _0x2fe0e6 = _0x405a78[_0x35b2e6];
-    if (_0x2fe0e6 === _0x1a2557) {
-      const _0x39b3ca = _0x405a78[_0x35b2e6 - 0x1] === '\x5c';
-      if (!_0x39b3ca || _0x1a2557 === '\x27') return _0x51d1fc;
+  handle += 0x1;
+  let input = '';
+  for (; handle < list2['length']; handle += 0x1) {
+    const output = list2[handle];
+    if (output === state) {
+      const enabled = list2[handle - 0x1] === '\x5c';
+      if (!enabled || state === '\x27') return input;
     }
-    _0x51d1fc += _0x2fe0e6;
+    input += output;
   }
-  return _0x51d1fc['trim']();
+  return input['trim']();
 }
-function extractCurlDataPayload(_0x54cfb1) {
-  const _0x42652b = stripCurlLineContinuations(_0x54cfb1),
-    _0x28cb4f = DATA_FLAG_RE['exec'](_0x42652b);
-  if (!_0x28cb4f) return '';
-  return readQuotedCurlValue(_0x42652b, _0x28cb4f['index'] + _0x28cb4f[0x0]['length']);
+function extractCurlDataPayload(value2) {
+  const stripCurlLineContinuations2 = stripCurlLineContinuations(value2),
+    enabled2 = DATA_FLAG_RE['exec'](stripCurlLineContinuations2);
+  if (!enabled2) return '';
+  return readQuotedCurlValue(stripCurlLineContinuations2, enabled2['index'] + enabled2[0x0]['length']);
 }
-function extractFirstJsonObject(_0x3bc354) {
-  const _0x4a009f = String(_0x3bc354 || ''),
-    _0x1a04be = _0x4a009f['indexOf']('{');
-  if (_0x1a04be < 0x0) return '';
-  let _0x329df8 = 0x0,
-    _0x4f249b = ![],
-    _0x3a595a = '',
-    _0x25e9d9 = ![];
-  for (let _0x19592b = _0x1a04be; _0x19592b < _0x4a009f['length']; _0x19592b += 0x1) {
-    const _0x4d3310 = _0x4a009f[_0x19592b];
-    if (_0x4f249b) {
-      if (_0x25e9d9) {
-        _0x25e9d9 = ![];
+function extractFirstJsonObject(value3) {
+  const list3 = String(value3 || ''),
+    count = list3['indexOf']('{');
+  if (count < 0x0) return '';
+  let count2 = 0x0,
+    enabled3 = ![],
+    value4 = '',
+    value5 = ![];
+  for (let value6 = count; value6 < list3['length']; value6 += 0x1) {
+    const value7 = list3[value6];
+    if (enabled3) {
+      if (value5) {
+        value5 = ![];
         continue;
       }
-      if (_0x4d3310 === '\x5c') {
-        _0x25e9d9 = !![];
+      if (value7 === '\x5c') {
+        value5 = !![];
         continue;
       }
-      _0x4d3310 === _0x3a595a && ((_0x4f249b = ![]), (_0x3a595a = ''));
+      value7 === value4 && ((enabled3 = ![]), (value4 = ''));
       continue;
     }
-    if (_0x4d3310 === '\x22' || _0x4d3310 === '\x27') {
-      ((_0x4f249b = !![]), (_0x3a595a = _0x4d3310));
+    if (value7 === '\x22' || value7 === '\x27') {
+      ((enabled3 = !![]), (value4 = value7));
       continue;
     }
-    if (_0x4d3310 === '{') _0x329df8 += 0x1;
-    if (_0x4d3310 === '}') {
-      _0x329df8 -= 0x1;
-      if (_0x329df8 === 0x0) return _0x4a009f['slice'](_0x1a04be, _0x19592b + 0x1);
+    if (value7 === '{') count2 += 0x1;
+    if (value7 === '}') {
+      count2 -= 0x1;
+      if (count2 === 0x0) return list3['slice'](count, value6 + 0x1);
     }
   }
   return '';
 }
-function extractAiAppId(_0x58ccbf, _0x1f770a = {}, _0x297605 = '') {
-  const _0x15dbaa = normalizeText(_0x297605);
-  if (_0x15dbaa) return _0x15dbaa;
-  const _0x2ebb30 = String(_0x58ccbf || ''),
-    _0x3b2102 = _0x2ebb30['match'](RUNNINGHUB_AI_APP_URL_RE),
-    _0x4f0023 = normalizeText(_0x3b2102?.[0x1]);
-  if (_0x4f0023) return _0x4f0023;
-  return normalizeText(_0x1f770a['appId'] || _0x1f770a['workflowId'] || _0x1f770a['aiAppId']);
+function extractAiAppId(value8, value9 = {}, value10 = '') {
+  const text = normalizeText(value10);
+  if (text) return text;
+  const value11 = String(value8 || ''),
+    value12 = value11['match'](RUNNINGHUB_AI_APP_URL_RE),
+    text2 = normalizeText(value12?.[0x1]);
+  if (text2) return text2;
+  return normalizeText(value9['appId'] || value9['workflowId'] || value9['aiAppId']);
 }
-function parseJsonPayload(_0x56146a) {
+function parseJsonPayload(value13) {
   try {
-    return JSON['parse'](_0x56146a);
-  } catch (_0x2609cd) {
-    throw new Error('RH AI应用 JSON 解析失败：' + (_0x2609cd?.['message'] || '格式错误'));
+    return JSON['parse'](value13);
+  } catch (error) {
+    throw new Error('RH AI应用 JSON 解析失败：' + (error?.['message'] || '格式错误'));
   }
 }
-export function parseRunningHubAiAppInput(_0x290364, { appId: _0x1b0b5c = '' } = {}) {
-  const _0x22c2d4 = String(_0x290364 || '')['trim']();
-  if (!_0x22c2d4) throw new Error('请粘贴 RunningHub AI App 的 curl 或 JSON');
-  const _0x191b79 =
-    (_0x22c2d4['startsWith']('{') ? _0x22c2d4 : '') ||
-    extractCurlDataPayload(_0x22c2d4) ||
-    extractFirstJsonObject(_0x22c2d4);
-  if (!_0x191b79) throw new Error('未找到\x20--data-raw\x20JSON\x20请求体');
-  const _0x1468d2 = parseJsonPayload(_0x191b79),
-    _0x4670c5 = extractAiAppId(_0x22c2d4, _0x1468d2, _0x1b0b5c);
-  if (!_0x4670c5) throw new Error('未找到 RunningHub AI App 的 appId');
-  if (!Array['isArray'](_0x1468d2['nodeInfoList']) || _0x1468d2['nodeInfoList']['length'] === 0x0)
+export function parseRunningHubAiAppInput(value14, { appId: appId2 = '' } = {}) {
+  const sourceText = String(value14 || '')['trim']();
+  if (!sourceText) throw new Error('请粘贴 RunningHub AI App 的 curl 或 JSON');
+  const enabled4 =
+    (sourceText['startsWith']('{') ? sourceText : '') ||
+    extractCurlDataPayload(sourceText) ||
+    extractFirstJsonObject(sourceText);
+  if (!enabled4) throw new Error('未找到\x20--data-raw\x20JSON\x20请求体');
+  const body = parseJsonPayload(enabled4),
+    appId3 = extractAiAppId(sourceText, body, appId2);
+  if (!appId3) throw new Error('未找到 RunningHub AI App 的 appId');
+  if (!Array['isArray'](body['nodeInfoList']) || body['nodeInfoList']['length'] === 0x0)
     throw new Error('JSON 中缺少 nodeInfoList');
   return {
-    appId: _0x4670c5,
-    body: _0x1468d2,
-    nodeInfoList: _0x1468d2['nodeInfoList'],
-    providerProfileId: _0x1468d2['providerProfileId'] || resolveRunningHubSiteProfileIdFromUrl(_0x22c2d4),
-    sourceText: _0x22c2d4,
+    appId: appId3,
+    body: body,
+    nodeInfoList: body['nodeInfoList'],
+    providerProfileId: body['providerProfileId'] || resolveRunningHubSiteProfileIdFromUrl(sourceText),
+    sourceText: sourceText,
   };
 }
-function normalizeFieldName(_0x40699d) {
-  return String(_0x40699d || '')['trim']();
+function normalizeFieldName(value15) {
+  return String(value15 || '')['trim']();
 }
-function getFieldKind(_0x5b1fc2) {
-  const _0x5907cd = normalizeFieldName(_0x5b1fc2)['toLowerCase']();
-  return MEDIA_FIELD_KINDS['has'](_0x5907cd) ? _0x5907cd : '';
+function getFieldKind(value16) {
+  const fieldName = normalizeFieldName(value16)['toLowerCase']();
+  return MEDIA_FIELD_KINDS['has'](fieldName) ? fieldName : '';
 }
-function getDefaultComponentKind(_0x5ebbc4) {
-  const _0x2afe52 = getFieldKind(_0x5ebbc4);
-  if (_0x2afe52) return _0x2afe52;
-  return String(_0x5ebbc4 || '')
+function getDefaultComponentKind(value17) {
+  const fieldKind = getFieldKind(value17);
+  if (fieldKind) return fieldKind;
+  return String(value17 || '')
     ['trim']()
     ['toLowerCase']() === 'prompt'
     ? 'prompt'
     : 'param';
 }
-function createLabelFromDescription(_0x17e491, _0x44ce24, _0x47ae1e) {
-  const _0x2aaa9e = normalizeText(_0x17e491),
-    _0x5bf728 = normalizeFieldName(_0x44ce24);
-  if (!_0x2aaa9e) return _0x47ae1e;
-  if (_0x5bf728 && _0x2aaa9e['toLowerCase']()['startsWith'](_0x5bf728['toLowerCase']()))
-    return normalizeText(_0x2aaa9e['slice'](_0x5bf728['length']), _0x2aaa9e);
-  return _0x2aaa9e;
+function createLabelFromDescription(value18, value19, value20) {
+  const list4 = normalizeText(value18),
+    list5 = normalizeFieldName(value19);
+  if (!list4) return value20;
+  if (list5 && list4['toLowerCase']()['startsWith'](list5['toLowerCase']()))
+    return normalizeText(list4['slice'](list5['length']), list4);
+  return list4;
 }
-function isBooleanLiteral(_0x3a53d0) {
-  const _0x5dc3ba = String(_0x3a53d0 ?? '')
+function isBooleanLiteral(value21) {
+  const value22 = String(value21 ?? '')
     ['trim']()
     ['toLowerCase']();
-  return _0x5dc3ba === 'true' || _0x5dc3ba === 'false';
+  return value22 === 'true' || value22 === 'false';
 }
-function isIntegerLiteral(_0x1f734d) {
-  return /^[+-]?\d+$/['test'](String(_0x1f734d ?? '')['trim']());
+function isIntegerLiteral(value23) {
+  return /^[+-]?\d+$/['test'](String(value23 ?? '')['trim']());
 }
-function isDecimalLiteral(_0x216f51) {
-  return /^[+-]?(?:\d+\.\d+|\.\d+)$/['test'](String(_0x216f51 ?? '')['trim']());
+function isDecimalLiteral(value24) {
+  return /^[+-]?(?:\d+\.\d+|\.\d+)$/['test'](String(value24 ?? '')['trim']());
 }
-function isAmbiguousZeroLiteral(_0x524795) {
-  return /^[+-]?0+$/['test'](String(_0x524795 ?? '')['trim']());
+function isAmbiguousZeroLiteral(value25) {
+  return /^[+-]?0+$/['test'](String(value25 ?? '')['trim']());
 }
-function containsCjkText(_0x69671e) {
-  return /[\u3400-\u9fff]/u['test'](String(_0x69671e ?? ''));
+function containsCjkText(value26) {
+  return /[\u3400-\u9fff]/u['test'](String(value26 ?? ''));
 }
-function looksLikeLongEnglishText(_0x112ec4) {
-  const _0x64dfe5 = String(_0x112ec4 ?? '')['trim'](),
-    _0x4f9433 = _0x64dfe5['match'](/[A-Za-z][A-Za-z'-]*/g) || [],
-    _0x4125d1 = (_0x64dfe5['match'](/[A-Za-z]/g) || [])['length'];
-  return _0x4f9433['length'] >= 0x4 || _0x4125d1 >= 0x1c;
+function looksLikeLongEnglishText(value27) {
+  const value28 = String(value27 ?? '')['trim'](),
+    list6 = value28['match'](/[A-Za-z][A-Za-z'-]*/g) || [],
+    count3 = (value28['match'](/[A-Za-z]/g) || [])['length'];
+  return list6['length'] >= 0x4 || count3 >= 0x1c;
 }
-function looksLikeStructuredText(_0x58ead3) {
-  const _0x4b61d1 = String(_0x58ead3 ?? '')['trim']();
-  if (!_0x4b61d1) return !![];
+function looksLikeStructuredText(value29) {
+  const list7 = String(value29 ?? '')['trim']();
+  if (!list7) return !![];
   return (
-    containsCjkText(_0x4b61d1) ||
-    looksLikeLongEnglishText(_0x4b61d1) ||
-    _0x4b61d1['length'] > 0x2a ||
-    /[\s,.;:!?，。；：！？、]/['test'](_0x4b61d1) ||
-    /^[\[{]/['test'](_0x4b61d1)
+    containsCjkText(list7) ||
+    looksLikeLongEnglishText(list7) ||
+    list7['length'] > 0x2a ||
+    /[\s,.;:!?，。；：！？、]/['test'](list7) ||
+    /^[\[{]/['test'](list7)
   );
 }
-function labelSuggestsPrompt(_0x4f1085, _0x4e5813) {
-  const _0x163e39 = String(_0x4f1085 || ''),
-    _0x1daf95 = String(_0x4e5813 || '')['toLowerCase']();
-  return _0x1daf95 === 'prompt' || /prompt|提示词|描述|文案|动作|内容|台词|歌词/i['test'](_0x163e39);
+function labelSuggestsPrompt(value30, value31) {
+  const value32 = String(value30 || ''),
+    value33 = String(value31 || '')['toLowerCase']();
+  return value33 === 'prompt' || /prompt|提示词|描述|文案|动作|内容|台词|歌词/i['test'](value32);
 }
-function inferTextControlType(_0x23f280, _0x278bfd, _0x33c8c5) {
-  if (labelSuggestsPrompt(_0x278bfd, _0x33c8c5) || looksLikeStructuredText(_0x23f280)) return 'textarea';
+function inferTextControlType(value34, value35, value36) {
+  if (labelSuggestsPrompt(value35, value36) || looksLikeStructuredText(value34)) return 'textarea';
   return 'text';
 }
-function inferComponentConfig(_0x14a35e, _0x4a142b, _0x243279, _0x4057fb = {}) {
-  const _0x3c014e = inferRunningHubFieldMetadata(_0x4057fb);
-  if (_0x3c014e) return _0x3c014e;
-  const _0x25cff5 = String(_0x243279 || '')
+function inferComponentConfig(value37, value38, value39, value40 = {}) {
+  const inferRunningHubFieldMetadata2 = inferRunningHubFieldMetadata(value40);
+  if (inferRunningHubFieldMetadata2) return inferRunningHubFieldMetadata2;
+  const value41 = String(value39 || '')
       ['trim']()
       ['toLowerCase'](),
-    _0x59a199 = getFieldKind(_0x243279);
-  if (_0x59a199)
+    componentKind = getFieldKind(value39);
+  if (componentKind)
     return {
-      componentKind: _0x59a199,
+      componentKind: componentKind,
       componentKindLocked: !![],
-      componentKindOptions: [_0x59a199],
+      componentKindOptions: [componentKind],
       controlType: 'text',
       controlTypeLocked: !![],
       controlTypeOptions: [],
     };
-  if (_0x25cff5 === 'prompt')
+  if (value41 === 'prompt')
     return {
       componentKind: 'prompt',
       componentKindLocked: !![],
@@ -246,7 +246,7 @@ function inferComponentConfig(_0x14a35e, _0x4a142b, _0x243279, _0x4057fb = {}) {
       controlTypeLocked: !![],
       controlTypeOptions: [],
     };
-  if (_0x25cff5 === 'index')
+  if (value41 === 'index')
     return {
       componentKind: 'param',
       componentKindLocked: !![],
@@ -255,7 +255,7 @@ function inferComponentConfig(_0x14a35e, _0x4a142b, _0x243279, _0x4057fb = {}) {
       controlTypeLocked: !![],
       controlTypeOptions: ['stepper'],
     };
-  if (isBooleanLiteral(_0x14a35e))
+  if (isBooleanLiteral(value37))
     return {
       componentKind: 'param',
       componentKindLocked: !![],
@@ -264,7 +264,7 @@ function inferComponentConfig(_0x14a35e, _0x4a142b, _0x243279, _0x4057fb = {}) {
       controlTypeLocked: !![],
       controlTypeOptions: ['toggle'],
     };
-  if (isDecimalLiteral(_0x14a35e))
+  if (isDecimalLiteral(value37))
     return {
       componentKind: 'param',
       componentKindLocked: !![],
@@ -273,14 +273,14 @@ function inferComponentConfig(_0x14a35e, _0x4a142b, _0x243279, _0x4057fb = {}) {
       controlTypeLocked: !![],
       controlTypeOptions: ['float'],
     };
-  if (isIntegerLiteral(_0x14a35e))
+  if (isIntegerLiteral(value37))
     return {
       componentKind: 'param',
       componentKindLocked: !![],
       componentKindOptions: ['param'],
       controlType: 'stepper',
-      controlTypeLocked: !isAmbiguousZeroLiteral(_0x14a35e),
-      controlTypeOptions: isAmbiguousZeroLiteral(_0x14a35e)
+      controlTypeLocked: !isAmbiguousZeroLiteral(value37),
+      controlTypeOptions: isAmbiguousZeroLiteral(value37)
         ? AMBIGUOUS_ZERO_CONTROL_OPTIONS['slice']()
         : ['stepper'],
     };
@@ -288,101 +288,95 @@ function inferComponentConfig(_0x14a35e, _0x4a142b, _0x243279, _0x4057fb = {}) {
     componentKind: 'param',
     componentKindLocked: ![],
     componentKindOptions: TEXT_COMPONENT_KIND_OPTIONS['slice'](),
-    controlType: inferTextControlType(_0x14a35e, _0x4a142b, _0x243279),
+    controlType: inferTextControlType(value37, value38, value39),
     controlTypeLocked: ![],
     controlTypeOptions: TEXT_CONTROL_OPTIONS['slice'](),
   };
 }
-function normalizeComponentKind(_0x1c2b72, _0x1a42d4 = 'param') {
-  const _0x5c7cd0 = String(_0x1c2b72 || '')
+function normalizeComponentKind(value42, value43 = 'param') {
+  const value44 = String(value42 || '')
     ['trim']()
     ['toLowerCase']();
-  return COMPONENT_KINDS['has'](_0x5c7cd0) ? _0x5c7cd0 : _0x1a42d4;
+  return COMPONENT_KINDS['has'](value44) ? value44 : value43;
 }
-function normalizeControlType(_0x6c4ac6, _0x5ab994 = 'text') {
-  const _0x2b10ce = String(_0x6c4ac6 || '')
+function normalizeControlType(value45, value46 = 'text') {
+  const value47 = String(value45 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x2b10ce === 'integer' || _0x2b10ce === 'number') return 'stepper';
-  if (_0x2b10ce === 'decimal') return 'float';
-  if (_0x2b10ce === 'boolean' || _0x2b10ce === 'bool') return 'toggle';
-  return CONTROL_TYPES['has'](_0x2b10ce) ? _0x2b10ce : _0x5ab994;
+  if (value47 === 'integer' || value47 === 'number') return 'stepper';
+  if (value47 === 'decimal') return 'float';
+  if (value47 === 'boolean' || value47 === 'bool') return 'toggle';
+  return CONTROL_TYPES['has'](value47) ? value47 : value46;
 }
-function normalizeBooleanDefault(_0xb70be5) {
-  const _0x487140 = String(_0xb70be5 ?? '')
+function normalizeBooleanDefault(value48) {
+  const value49 = String(value48 ?? '')
     ['trim']()
     ['toLowerCase']();
-  return (
-    _0xb70be5 === !![] ||
-    _0x487140 === 'true' ||
-    _0x487140 === '1' ||
-    _0x487140 === 'yes' ||
-    _0x487140 === 'on'
-  );
+  return value48 === !![] || value49 === 'true' || value49 === '1' || value49 === 'yes' || value49 === 'on';
 }
-function normalizeIntegerDefault(_0x323a57) {
-  const _0x445b3e = Number(_0x323a57);
-  return Number['isFinite'](_0x445b3e) ? Math['trunc'](_0x445b3e) : 0x0;
+function normalizeIntegerDefault(value50) {
+  const value51 = Number(value50);
+  return Number['isFinite'](value51) ? Math['trunc'](value51) : 0x0;
 }
-function normalizeFloatDefault(_0x678555) {
-  const _0x34e837 = Number(_0x678555);
-  return Number['isFinite'](_0x34e837) ? _0x34e837 : 0x0;
+function normalizeFloatDefault(value52) {
+  const value53 = Number(value52);
+  return Number['isFinite'](value53) ? value53 : 0x0;
 }
-function normalizeDefaultValueForControl(_0x26c63b, _0x41d31d) {
-  const _0x261397 = normalizeControlType(_0x26c63b);
-  if (_0x261397 === 'toggle') return normalizeBooleanDefault(_0x41d31d);
-  if (_0x261397 === 'stepper') return normalizeIntegerDefault(_0x41d31d);
-  if (_0x261397 === 'float') return normalizeFloatDefault(_0x41d31d);
-  return String(_0x41d31d ?? '');
+function normalizeDefaultValueForControl(value54, value55) {
+  const controlType = normalizeControlType(value54);
+  if (controlType === 'toggle') return normalizeBooleanDefault(value55);
+  if (controlType === 'stepper') return normalizeIntegerDefault(value55);
+  if (controlType === 'float') return normalizeFloatDefault(value55);
+  return String(value55 ?? '');
 }
-function normalizeOrderValue(_0x2edbf5, _0x4933f8) {
-  const _0x5c56f7 = Number(_0x2edbf5);
-  return Number['isFinite'](_0x5c56f7) ? _0x5c56f7 : _0x4933f8;
+function normalizeOrderValue(value56, value57) {
+  const value58 = Number(value56);
+  return Number['isFinite'](value58) ? value58 : value57;
 }
-function normalizePreviewPlacement(_0x2f6b74) {
-  return String(_0x2f6b74 || '')['trim']() === 'home' ? 'home' : 'advanced';
+function normalizePreviewPlacement(value59) {
+  return String(value59 || '')['trim']() === 'home' ? 'home' : 'advanced';
 }
-function getNodeTransformForControl(_0x26ab40) {
-  const _0x430556 = normalizeControlType(_0x26ab40);
-  if (_0x430556 === 'toggle') return 'booleanString';
-  if (_0x430556 === 'stepper') return 'integer';
-  if (_0x430556 === 'float') return 'number';
+function getNodeTransformForControl(value60) {
+  const controlType2 = normalizeControlType(value60);
+  if (controlType2 === 'toggle') return 'booleanString';
+  if (controlType2 === 'stepper') return 'integer';
+  if (controlType2 === 'float') return 'number';
   return '';
 }
-function getUiSchemaTypeForControl(_0x2c6935) {
-  const _0x3c2f95 = normalizeControlType(_0x2c6935);
-  return _0x3c2f95 === 'float' ? 'stepper' : _0x3c2f95;
+function getUiSchemaTypeForControl(value61) {
+  const controlType3 = normalizeControlType(value61);
+  return controlType3 === 'float' ? 'stepper' : controlType3;
 }
-function getFloatStep(_0x35fde0) {
-  const _0x4f58ba = String(_0x35fde0 ?? '')['trim'](),
-    _0x101b26 = _0x4f58ba['match'](/\.(\d+)/),
-    _0x5cff6b = _0x101b26 ? Math['max'](0x1, _0x101b26[0x1]['length']) : 0x2;
-  return Number('0.' + '0'['repeat'](Math['max'](0x0, _0x5cff6b - 0x1)) + '1');
+function getFloatStep(value62) {
+  const value63 = String(value62 ?? '')['trim'](),
+    value64 = value63['match'](/\.(\d+)/),
+    value65 = value64 ? Math['max'](0x1, value64[0x1]['length']) : 0x2;
+  return Number('0.' + '0'['repeat'](Math['max'](0x0, value65 - 0x1)) + '1');
 }
-function createParamFieldId(_0x58a4d8, _0xe9a929) {
-  const _0x1f0796 = sanitizeIdentifierPart(_0x58a4d8?.['nodeId'], 'node_' + _0xe9a929),
-    _0x46791e = sanitizeIdentifierPart(_0x58a4d8?.['fieldName'], 'value');
-  return 'rh_aiapp_' + _0x1f0796 + '_' + _0x46791e + '_' + _0xe9a929;
+function createParamFieldId(value66, value67) {
+  const sanitizeIdentifierPart2 = sanitizeIdentifierPart(value66?.['nodeId'], 'node_' + value67),
+    sanitizeIdentifierPart3 = sanitizeIdentifierPart(value66?.['fieldName'], 'value');
+  return 'rh_aiapp_' + sanitizeIdentifierPart2 + '_' + sanitizeIdentifierPart3 + '_' + value67;
 }
-function createSlotId(_0x3aa601, _0x2c4838, _0x7f952) {
-  const _0x2e25a0 = sanitizeIdentifierPart(_0x2c4838?.['nodeId'], 'node_' + _0x7f952);
-  return 'rh_aiapp_' + _0x3aa601 + '_' + _0x2e25a0 + '_' + _0x7f952;
+function createSlotId(value68, value69, value70) {
+  const sanitizeIdentifierPart4 = sanitizeIdentifierPart(value69?.['nodeId'], 'node_' + value70);
+  return 'rh_aiapp_' + value68 + '_' + sanitizeIdentifierPart4 + '_' + value70;
 }
-function buildInputSlotCounts(_0x1eee31) {
-  return _0x1eee31['reduce']((_0x2fa17e, _0x5e891d) => {
-    const _0x38d1f0 = String(_0x5e891d?.['kind'] || '')['trim']();
-    if (!_0x38d1f0) return _0x2fa17e;
-    return ((_0x2fa17e[_0x38d1f0] = (_0x2fa17e[_0x38d1f0] || 0x0) + 0x1), _0x2fa17e);
+function buildInputSlotCounts(list8) {
+  return list8['reduce']((value71, value72) => {
+    const enabled5 = String(value72?.['kind'] || '')['trim']();
+    if (!enabled5) return value71;
+    return ((value71[enabled5] = (value71[enabled5] || 0x0) + 0x1), value71);
   }, {});
 }
-function buildResultConfig(_0x2e7c55) {
-  if (_0x2e7c55 === 'video')
+function buildResultConfig(value73) {
+  if (value73 === 'video')
     return {
       outputType: 'video',
       taskIdPath: 'taskId',
       videoPaths: ['results[].videoUrl', 'results[].url', 'videoUrl', 'url'],
     };
-  if (_0x2e7c55 === 'audio')
+  if (value73 === 'audio')
     return {
       outputType: 'audio',
       taskIdPath: 'taskId',
@@ -394,350 +388,346 @@ function buildResultConfig(_0x2e7c55) {
     imagePaths: ['results[].imageUrl', 'results[].url', 'imageUrl', 'url'],
   };
 }
-export function buildRunningHubCustomAppExtensions(
-  _0x3ba145,
-  _0x77e054,
-  _0x2ded6d,
-  _0x32f9bd = '',
-  _0x4a9c8a = '',
-) {
-  const _0x1474c5 = normalizeText(_0x4a9c8a) || 'AI App ' + _0x77e054,
-    _0x5e9c9d = normalizeText(_0x32f9bd),
-    _0x23ea9d = Boolean(_0x5e9c9d),
-    _0x494741 = {
+export function buildRunningHubCustomAppExtensions(kind2, appId4, name, value74 = '', value75 = '') {
+  const subtitle = normalizeText(value75) || 'AI App ' + appId4,
+    appKey2 = normalizeText(value74),
+    isSavedApp = Boolean(appKey2),
+    value76 = {
       rhAiApp: {
-        appId: _0x77e054,
-        kind: _0x3ba145,
-        appKey: _0x5e9c9d,
-        name: _0x2ded6d,
-        description: normalizeText(_0x4a9c8a),
-        isSavedApp: _0x23ea9d,
+        appId: appId4,
+        kind: kind2,
+        appKey: appKey2,
+        name: name,
+        description: normalizeText(value75),
+        isSavedApp: isSavedApp,
       },
     };
   return (
-    _0x23ea9d &&
-      _0x3ba145 === 'image' &&
-      (_0x494741['imageMenu'] = {
+    isSavedApp &&
+      kind2 === 'image' &&
+      (value76['imageMenu'] = {
         group: 'rhAiApp',
         order: 0x3e7,
-        title: _0x2ded6d,
-        subtitle: _0x1474c5,
+        title: name,
+        subtitle: subtitle,
         icon: 'images/RH.png',
         iconAlt: 'runninghub',
       }),
-    _0x23ea9d &&
-      _0x3ba145 === 'video' &&
-      (_0x494741['videoMenu'] = {
+    isSavedApp &&
+      kind2 === 'video' &&
+      (value76['videoMenu'] = {
         role: 'rhAiApp',
         group: 'rhAiApp',
         order: 0x3e7,
-        label: _0x2ded6d,
-        subtitle: _0x1474c5,
+        label: name,
+        subtitle: subtitle,
       }),
-    _0x23ea9d && _0x3ba145 === 'audio' && (_0x494741['audioMenu'] = { group: 'rhAiApp', order: 0x3e7 }),
-    _0x494741
+    isSavedApp && kind2 === 'audio' && (value76['audioMenu'] = { group: 'rhAiApp', order: 0x3e7 }),
+    value76
   );
 }
-function normalizeNodeInfoItem(_0x2cda33, _0x288c26) {
-  if (!_0x2cda33 || typeof _0x2cda33 !== 'object' || Array['isArray'](_0x2cda33)) return null;
-  const _0x49f477 = normalizeText(_0x2cda33['nodeId']),
-    _0x236d76 = normalizeFieldName(_0x2cda33['fieldName']);
-  if (!_0x49f477 || !_0x236d76) return null;
+function normalizeNodeInfoItem(fieldValue, index2) {
+  if (!fieldValue || typeof fieldValue !== 'object' || Array['isArray'](fieldValue)) return null;
+  const nodeId = normalizeText(fieldValue['nodeId']),
+    fieldName2 = normalizeFieldName(fieldValue['fieldName']);
+  if (!nodeId || !fieldName2) return null;
   return {
-    nodeId: _0x49f477,
-    fieldName: _0x236d76,
-    fieldValue: _0x2cda33['fieldValue'] ?? '',
-    fieldType: _0x2cda33['fieldType'],
-    fieldData: _0x2cda33['fieldData'],
-    description: normalizeText(_0x2cda33['description']),
-    index: _0x288c26,
+    nodeId: nodeId,
+    fieldName: fieldName2,
+    fieldValue: fieldValue['fieldValue'] ?? '',
+    fieldType: fieldValue['fieldType'],
+    fieldData: fieldValue['fieldData'],
+    description: normalizeText(fieldValue['description']),
+    index: index2,
   };
 }
-export function createRunningHubAiAppComponentDrafts(_0x258238, { appId: appId = '' } = {}) {
-  const _0x4cb6a0 = parseRunningHubAiAppInput(_0x258238, { appId: appId });
+export function createRunningHubAiAppComponentDrafts(value77, { appId: appId = '' } = {}) {
+  const parsed = parseRunningHubAiAppInput(value77, { appId: appId });
   return {
-    parsed: _0x4cb6a0,
-    components: _0x4cb6a0['nodeInfoList']
+    parsed: parsed,
+    components: parsed['nodeInfoList']
       ['map'](normalizeNodeInfoItem)
       ['filter'](Boolean)
-      ['map']((_0x422f08) => {
-        const _0x437572 = getDefaultComponentKind(_0x422f08['fieldName']),
-          _0x4f65a8 = createLabelFromDescription(
-            _0x422f08['description'],
-            _0x422f08['fieldName'],
-            _0x422f08['fieldName'],
+      ['map']((index3) => {
+        const defaultComponentKind = getDefaultComponentKind(index3['fieldName']),
+          label = createLabelFromDescription(index3['description'], index3['fieldName'], index3['fieldName']),
+          componentKindLocked = inferComponentConfig(
+            index3['fieldValue'],
+            label,
+            index3['fieldName'],
+            index3,
           ),
-          _0x5b1a10 = inferComponentConfig(
-            _0x422f08['fieldValue'],
-            _0x4f65a8,
-            _0x422f08['fieldName'],
-            _0x422f08,
-          ),
-          _0x163b38 = _0x5b1a10['componentKind'] || _0x437572,
-          _0x4ef6d3 = {
-            index: _0x422f08['index'],
-            nodeId: _0x422f08['nodeId'],
-            fieldName: _0x422f08['fieldName'],
-            description: _0x422f08['description'],
-            label: _0x4f65a8,
-            componentKind: _0x163b38,
-            componentKindLocked: _0x5b1a10['componentKindLocked'] === !![],
-            componentKindOptions: _0x5b1a10['componentKindOptions'] || [_0x437572],
-            controlType: _0x5b1a10['controlType'],
-            controlTypeLocked: _0x5b1a10['controlTypeLocked'] === !![],
-            controlTypeOptions: _0x5b1a10['controlTypeOptions'] || [],
-            defaultValue: String(_0x422f08['fieldValue'] ?? ''),
-            options: getRunningHubFieldOptions(_0x422f08),
+          componentKind2 = componentKindLocked['componentKind'] || defaultComponentKind,
+          value78 = {
+            index: index3['index'],
+            nodeId: index3['nodeId'],
+            fieldName: index3['fieldName'],
+            description: index3['description'],
+            label: label,
+            componentKind: componentKind2,
+            componentKindLocked: componentKindLocked['componentKindLocked'] === !![],
+            componentKindOptions: componentKindLocked['componentKindOptions'] || [defaultComponentKind],
+            controlType: componentKindLocked['controlType'],
+            controlTypeLocked: componentKindLocked['controlTypeLocked'] === !![],
+            controlTypeOptions: componentKindLocked['controlTypeOptions'] || [],
+            defaultValue: String(index3['fieldValue'] ?? ''),
+            options: getRunningHubFieldOptions(index3),
           };
         return (
-          _0x163b38 === 'param' &&
-            ((_0x4ef6d3['previewPlacement'] = 'advanced'),
-            (_0x4ef6d3['advancedParamOrder'] = _0x422f08['index'])),
-          _0x4ef6d3
+          componentKind2 === 'param' &&
+            ((value78['previewPlacement'] = 'advanced'), (value78['advancedParamOrder'] = index3['index'])),
+          value78
         );
       }),
   };
 }
-function normalizeOptionList(_0x343181 = [], _0x2b4c73 = null) {
-  if (!Array['isArray'](_0x343181)) return [];
-  return _0x343181['map']((_0x17fa74) =>
-    String(_0x17fa74 || '')
+function normalizeOptionList(list9 = [], map = null) {
+  if (!Array['isArray'](list9)) return [];
+  return list9['map']((value79) =>
+    String(value79 || '')
       ['trim']()
       ['toLowerCase'](),
-  )['filter']((_0x50a13f, _0x2bd0c0, _0x30fb40) => {
-    if (!_0x50a13f || _0x30fb40['indexOf'](_0x50a13f) !== _0x2bd0c0) return ![];
-    return !_0x2b4c73 || _0x2b4c73['has'](_0x50a13f);
+  )['filter']((enabled6, value80, list10) => {
+    if (!enabled6 || list10['indexOf'](enabled6) !== value80) return ![];
+    return !map || map['has'](enabled6);
   });
 }
-function pickAllowedValue(_0xbf99dc, _0x56249e, _0x445817) {
-  const _0xffda07 = String(_0xbf99dc || '')
+function pickAllowedValue(value81, list11, value82) {
+  const value83 = String(value81 || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x56249e['includes'](_0xffda07) ? _0xffda07 : _0x445817;
+  return list11['includes'](value83) ? value83 : value82;
 }
-function normalizeComponentOverride(_0xbc5452, _0x136a76, _0x5309a5) {
-  const _0x417358 = getDefaultComponentKind(_0x136a76['fieldName']),
-    _0x485d4d = inferComponentConfig(_0x136a76['fieldValue'], _0x5309a5, _0x136a76['fieldName'], _0x136a76),
-    _0x1347ab = normalizeOptionList(_0x485d4d['componentKindOptions'], COMPONENT_KINDS),
-    _0x32644e = normalizeOptionList(_0x485d4d['controlTypeOptions'], CONTROL_TYPES),
-    _0xc827fd = normalizeControlType(_0x485d4d['controlType']),
-    _0xef7e6b = normalizeComponentKind(_0xbc5452?.['componentKind'], _0x485d4d['componentKind'] || _0x417358);
-  let _0x5f5905 =
-    _0x485d4d['componentKindLocked'] === !![]
-      ? _0x485d4d['componentKind']
+function normalizeComponentOverride(value84, value85, value86) {
+  const defaultComponentKind2 = getDefaultComponentKind(value85['fieldName']),
+    componentKindLocked2 = inferComponentConfig(
+      value85['fieldValue'],
+      value86,
+      value85['fieldName'],
+      value85,
+    ),
+    componentKindOptions = normalizeOptionList(componentKindLocked2['componentKindOptions'], COMPONENT_KINDS),
+    controlTypeOptions = normalizeOptionList(componentKindLocked2['controlTypeOptions'], CONTROL_TYPES),
+    controlType4 = normalizeControlType(componentKindLocked2['controlType']),
+    componentKind3 = normalizeComponentKind(
+      value84?.['componentKind'],
+      componentKindLocked2['componentKind'] || defaultComponentKind2,
+    );
+  let componentKind4 =
+    componentKindLocked2['componentKindLocked'] === !![]
+      ? componentKindLocked2['componentKind']
       : pickAllowedValue(
-          _0xef7e6b,
-          _0x1347ab['length'] ? _0x1347ab : [_0xef7e6b],
-          _0x485d4d['componentKind'] || _0x417358,
+          componentKind3,
+          componentKindOptions['length'] ? componentKindOptions : [componentKind3],
+          componentKindLocked2['componentKind'] || defaultComponentKind2,
         );
-  const _0x5c8a72 = normalizeControlType(_0xbc5452?.['controlType'], _0xc827fd);
-  let _0x118048 =
-    _0x5f5905 === 'prompt'
+  const controlType5 = normalizeControlType(value84?.['controlType'], controlType4);
+  let controlType6 =
+    componentKind4 === 'prompt'
       ? 'prompt'
-      : _0x485d4d['controlTypeLocked'] === !![]
-        ? _0xc827fd
-        : pickAllowedValue(_0x5c8a72, _0x32644e['length'] ? _0x32644e : [_0xc827fd], _0xc827fd);
+      : componentKindLocked2['controlTypeLocked'] === !![]
+        ? controlType4
+        : pickAllowedValue(
+            controlType5,
+            controlTypeOptions['length'] ? controlTypeOptions : [controlType4],
+            controlType4,
+          );
   return (
-    _0x118048 === 'prompt' &&
-      !_0x485d4d['componentKindLocked'] &&
-      _0x1347ab['includes']('prompt') &&
-      (_0x5f5905 = 'prompt'),
+    controlType6 === 'prompt' &&
+      !componentKindLocked2['componentKindLocked'] &&
+      componentKindOptions['includes']('prompt') &&
+      (componentKind4 = 'prompt'),
     {
-      label: normalizeText(_0xbc5452?.['label'], _0x5309a5),
-      description: normalizeText(_0xbc5452?.['description'], _0x136a76['description'] || _0x5309a5),
-      componentKind: _0x5f5905,
-      componentKindLocked: _0x485d4d['componentKindLocked'] === !![],
-      componentKindOptions: _0x1347ab['length'] ? _0x1347ab : [_0x5f5905],
-      controlType: _0x118048,
-      controlTypeLocked: _0x485d4d['controlTypeLocked'] === !![],
-      controlTypeOptions: _0x32644e,
-      inputOrder: normalizeOrderValue(_0xbc5452?.['inputOrder'], _0x136a76['index']),
-      homeParamOrder: normalizeOrderValue(_0xbc5452?.['homeParamOrder'], _0x136a76['index']),
-      advancedParamOrder: normalizeOrderValue(_0xbc5452?.['advancedParamOrder'], _0x136a76['index']),
-      previewPlacement: normalizePreviewPlacement(_0xbc5452?.['previewPlacement']),
-      footerGroupId: String(_0xbc5452?.['footerGroupId'] || '')['trim'](),
-      footerGroupLabel: String(_0xbc5452?.['footerGroupLabel'] || '参数组')['trim'](),
-      footerGroupDescription: String(_0xbc5452?.['footerGroupDescription'] || '')['trim'](),
+      label: normalizeText(value84?.['label'], value86),
+      description: normalizeText(value84?.['description'], value85['description'] || value86),
+      componentKind: componentKind4,
+      componentKindLocked: componentKindLocked2['componentKindLocked'] === !![],
+      componentKindOptions: componentKindOptions['length'] ? componentKindOptions : [componentKind4],
+      controlType: controlType6,
+      controlTypeLocked: componentKindLocked2['controlTypeLocked'] === !![],
+      controlTypeOptions: controlTypeOptions,
+      inputOrder: normalizeOrderValue(value84?.['inputOrder'], value85['index']),
+      homeParamOrder: normalizeOrderValue(value84?.['homeParamOrder'], value85['index']),
+      advancedParamOrder: normalizeOrderValue(value84?.['advancedParamOrder'], value85['index']),
+      previewPlacement: normalizePreviewPlacement(value84?.['previewPlacement']),
+      footerGroupId: String(value84?.['footerGroupId'] || '')['trim'](),
+      footerGroupLabel: String(value84?.['footerGroupLabel'] || '参数组')['trim'](),
+      footerGroupDescription: String(value84?.['footerGroupDescription'] || '')['trim'](),
       defaultValue: normalizeDefaultValueForControl(
-        _0x118048,
-        _0xbc5452?.['defaultValue'] === undefined ? _0x136a76['fieldValue'] : _0xbc5452['defaultValue'],
+        controlType6,
+        value84?.['defaultValue'] === undefined ? value85['fieldValue'] : value84['defaultValue'],
       ),
     }
   );
 }
-function buildComponentOverrideMap(_0x9a549c = []) {
-  const _0x444a35 = new Map();
-  if (!Array['isArray'](_0x9a549c)) return _0x444a35;
+function buildComponentOverrideMap(list12 = []) {
+  const map2 = new Map();
+  if (!Array['isArray'](list12)) return map2;
   return (
-    _0x9a549c['forEach']((_0x55d1a1) => {
-      const _0x4eec14 = Number(_0x55d1a1?.['index']);
-      if (!Number['isInteger'](_0x4eec14) || _0x4eec14 < 0x0) return;
-      _0x444a35['set'](_0x4eec14, _0x55d1a1);
+    list12['forEach']((value87) => {
+      const count4 = Number(value87?.['index']);
+      if (!Number['isInteger'](count4) || count4 < 0x0) return;
+      map2['set'](count4, value87);
     }),
-    _0x444a35
+    map2
   );
 }
-function buildManifestParts(_0x287c88, _0x305f56, _0x5ac4f5 = [], _0x4bacb7 = {}) {
-  const _0x961699 = [],
-    _0x5558d3 = [
-      { ...INSTANCE_FIELD, defaultValue: normalizeInstanceType(_0x287c88['body']?.['instanceType']) },
-    ],
-    _0x1018ac = [];
-  let _0x10d65a = ![],
-    _0x10035c = '';
-  const _0x2e9059 = buildComponentOverrideMap(_0x5ac4f5),
-    _0x4a0bf9 = _0x287c88['nodeInfoList']
+function buildManifestParts(dom, outputType, value88 = [], value89 = {}) {
+  const list13 = [],
+    list14 = [{ ...INSTANCE_FIELD, defaultValue: normalizeInstanceType(dom['body']?.['instanceType']) }],
+    nodeInfoList = [];
+  let visible = ![],
+    text3 = '';
+  const map3 = buildComponentOverrideMap(value88),
+    list15 = dom['nodeInfoList']
       ['map'](normalizeNodeInfoItem)
       ['filter'](Boolean)
-      ['map']((_0x30efdf, _0x1d8dfe) => {
-        const _0x5652bd = createLabelFromDescription(
-          _0x30efdf['description'],
-          _0x30efdf['fieldName'],
-          _0x30efdf['fieldName'],
+      ['map']((item2, index4) => {
+        const labelFromDescription = createLabelFromDescription(
+          item2['description'],
+          item2['fieldName'],
+          item2['fieldName'],
         );
         return {
-          item: _0x30efdf,
-          index: _0x1d8dfe,
-          component: normalizeComponentOverride(_0x2e9059['get'](_0x30efdf['index']), _0x30efdf, _0x5652bd),
+          item: item2,
+          index: index4,
+          component: normalizeComponentOverride(map3['get'](item2['index']), item2, labelFromDescription),
         };
       }),
-    _0xd4f988 = getParameterFooterFields(
-      _0x4a0bf9['map'](({ component: _0x2d7d22, item: _0x804f7d }) => ({
-        ..._0x2d7d22,
-        index: _0x804f7d['index'],
+    map4 = getParameterFooterFields(
+      list15['map'](({ component: component, item: item3 }) => ({
+        ...component,
+        index: item3['index'],
       })),
     );
-  _0x4a0bf9['forEach'](({ item: _0x434733, index: _0x1a69b9, component: _0x1d61ba }) => {
-    const _0x19fc1e = _0x1d61ba['label'],
-      _0x3a5f57 = _0x1d61ba['description'] || _0x434733['description'] || _0x19fc1e,
-      _0x3d12b6 = _0x1d61ba['componentKind'];
-    if (MEDIA_FIELD_KINDS['has'](_0x3d12b6)) {
-      const _0x94ff58 = createSlotId(_0x3d12b6, _0x434733, _0x1a69b9);
-      (_0x961699['push']({
-        id: _0x94ff58,
-        kind: _0x3d12b6,
-        label: _0x19fc1e,
-        description: _0x3a5f57,
+  list15['forEach'](({ item: item4, index: index5, component: component2 }) => {
+    const label2 = component2['label'],
+      description2 = component2['description'] || item4['description'] || label2,
+      kind3 = component2['componentKind'];
+    if (MEDIA_FIELD_KINDS['has'](kind3)) {
+      const id = createSlotId(kind3, item4, index5);
+      (list13['push']({
+        id: id,
+        kind: kind3,
+        label: label2,
+        description: description2,
         required: !![],
-        displayOrder: _0x1d61ba['inputOrder'],
-        customAiAppComponentIndex: _0x434733['index'],
-        rhAiAppComponentIndex: _0x434733['index'],
+        displayOrder: component2['inputOrder'],
+        customAiAppComponentIndex: item4['index'],
+        rhAiAppComponentIndex: item4['index'],
       }),
-        _0x1018ac['push']({
-          nodeId: _0x434733['nodeId'],
-          fieldName: _0x434733['fieldName'],
-          source: _0x3d12b6 + 'Input',
-          field: _0x94ff58,
-          slot: _0x94ff58,
-          urlField: _0x94ff58,
+        nodeInfoList['push']({
+          nodeId: item4['nodeId'],
+          fieldName: item4['fieldName'],
+          source: kind3 + 'Input',
+          field: id,
+          slot: id,
+          urlField: id,
           required: !![],
-          missingMessage: '请接入' + _0x19fc1e,
-          description: _0x3a5f57,
+          missingMessage: '请接入' + label2,
+          description: description2,
         }));
       return;
     }
-    if (_0x3d12b6 === 'prompt') {
-      _0x10d65a = !![];
-      !_0x10035c &&
-        (_0x10035c = normalizeText(
-          _0x2e9059['get'](_0x434733['index'])?.['description'] || _0x434733['description'],
-        ));
-      _0x1018ac['push']({
-        nodeId: _0x434733['nodeId'],
-        fieldName: _0x434733['fieldName'],
+    if (kind3 === 'prompt') {
+      visible = !![];
+      !text3 && (text3 = normalizeText(map3['get'](item4['index'])?.['description'] || item4['description']));
+      nodeInfoList['push']({
+        nodeId: item4['nodeId'],
+        fieldName: item4['fieldName'],
         source: 'prompt',
-        defaultValue: _0x1d61ba['defaultValue'],
-        description: _0x3a5f57 || '提示词',
+        defaultValue: component2['defaultValue'],
+        description: description2 || '提示词',
       });
       return;
     }
-    const _0x54901f = createParamFieldId(_0x434733, _0x1a69b9),
-      _0x4f1691 = normalizeControlType(_0x1d61ba['controlType']),
-      _0x52f82d = getUiSchemaTypeForControl(_0x4f1691),
-      _0x3acb60 = normalizeDefaultValueForControl(_0x4f1691, _0x1d61ba['defaultValue']),
-      _0x44c5cd = getNodeTransformForControl(_0x4f1691),
-      _0x2db905 = _0x1d61ba['previewPlacement'] === 'home' && _0xd4f988['has'](_0x434733['index']);
-    (_0x5558d3['push']({
-      id: _0x54901f,
-      type: _0x52f82d,
-      placement: _0x2db905 ? 'mode' : 'advanced',
-      ...(_0x2db905
-        ? { ..._0xd4f988['get'](_0x434733['index']) }
-        : { displayOrder: _0x1d61ba['advancedParamOrder'] }),
-      label: _0x19fc1e,
-      defaultValue: _0x3acb60,
-      description: _0x3a5f57,
-      ...(_0x4f1691 === 'select' ? { options: getRunningHubFieldOptions(_0x434733) } : {}),
-      customAiAppComponentIndex: _0x434733['index'],
-      rhAiAppComponentIndex: _0x434733['index'],
-      ...(_0x52f82d === 'stepper'
+    const id2 = createParamFieldId(item4, index5),
+      step = normalizeControlType(component2['controlType']),
+      type = getUiSchemaTypeForControl(step),
+      defaultValue = normalizeDefaultValueForControl(step, component2['defaultValue']),
+      transform = getNodeTransformForControl(step),
+      placement = component2['previewPlacement'] === 'home' && map4['has'](item4['index']);
+    (list14['push']({
+      id: id2,
+      type: type,
+      placement: placement ? 'mode' : 'advanced',
+      ...(placement
+        ? { ...map4['get'](item4['index']) }
+        : { displayOrder: component2['advancedParamOrder'] }),
+      label: label2,
+      defaultValue: defaultValue,
+      description: description2,
+      ...(step === 'select' ? { options: getRunningHubFieldOptions(item4) } : {}),
+      customAiAppComponentIndex: item4['index'],
+      rhAiAppComponentIndex: item4['index'],
+      ...(type === 'stepper'
         ? {
-            step: _0x4f1691 === 'float' ? getFloatStep(_0x3acb60) : 0x1,
-            ...(_0x4f1691 === 'float' ? { valueType: 'float' } : {}),
+            step: step === 'float' ? getFloatStep(defaultValue) : 0x1,
+            ...(step === 'float' ? { valueType: 'float' } : {}),
           }
         : {}),
     }),
-      _0x1018ac['push']({
-        nodeId: _0x434733['nodeId'],
-        fieldName: _0x434733['fieldName'],
+      nodeInfoList['push']({
+        nodeId: item4['nodeId'],
+        fieldName: item4['fieldName'],
         source: 'param',
-        field: _0x54901f,
-        defaultValue: _0x3acb60,
-        ...(_0x44c5cd ? { transform: _0x44c5cd } : {}),
-        description: _0x3a5f57,
+        field: id2,
+        defaultValue: defaultValue,
+        ...(transform ? { transform: transform } : {}),
+        description: description2,
       }));
   });
-  const _0x1fc0f1 = buildInputSlotCounts(_0x961699),
-    _0x3c8585 = Array['from'](
-      new Set([...(_0x10d65a ? ['text'] : []), ..._0x961699['map']((_0x5a4ce1) => _0x5a4ce1['kind'])]),
+  const args = buildInputSlotCounts(list13),
+    allowedKinds = Array['from'](
+      new Set([...(visible ? ['text'] : []), ...list13['map']((value90) => value90['kind'])]),
     ),
-    _0x1cf9d7 = _0x961699['map']((_0x14eed5, _0x1c64d1) => ({ ..._0x14eed5, _sourceOrder: _0x1c64d1 }))
-      ['sort']((_0x2b2eb7, _0x504148) => {
-        const _0x2abb4f =
-          normalizeOrderValue(_0x2b2eb7['displayOrder'], _0x2b2eb7['_sourceOrder']) -
-          normalizeOrderValue(_0x504148['displayOrder'], _0x504148['_sourceOrder']);
-        if (_0x2abb4f !== 0x0) return _0x2abb4f;
-        return _0x2b2eb7['_sourceOrder'] - _0x504148['_sourceOrder'];
+    fixedSlots = list13['map']((args2, _sourceOrder) => ({ ...args2, _sourceOrder: _sourceOrder }))
+      ['sort']((value91, value92) => {
+        const orderValue =
+          normalizeOrderValue(value91['displayOrder'], value91['_sourceOrder']) -
+          normalizeOrderValue(value92['displayOrder'], value92['_sourceOrder']);
+        if (orderValue !== 0x0) return orderValue;
+        return value91['_sourceOrder'] - value92['_sourceOrder'];
       })
-      ['map'](({ _sourceOrder: _0x4785ef, ..._0x5c11c0 }, _0x37ece8) => ({
-        ..._0x5c11c0,
-        displayOrder: _0x37ece8,
+      ['map'](({ _sourceOrder: _sourceOrder2, ...args3 }, displayOrder) => ({
+        ...args3,
+        displayOrder: displayOrder,
       })),
-    _0x5642dc = [
-      _0x5558d3[0x0],
-      ..._0x5558d3['slice'](0x1)['sort']((_0xc9888e, _0x2c4963) => {
-        const _0x3e3645 = String(_0xc9888e?.['placement'] || '')['localeCompare'](
-          String(_0x2c4963?.['placement'] || ''),
+    uiFields = [
+      list14[0x0],
+      ...list14['slice'](0x1)['sort']((value93, value94) => {
+        const count5 = String(value93?.['placement'] || '')['localeCompare'](
+          String(value94?.['placement'] || ''),
         );
-        if (_0x3e3645 !== 0x0) return _0x3e3645;
+        if (count5 !== 0x0) return count5;
         return (
-          normalizeOrderValue(_0xc9888e?.['displayOrder'], Number['MAX_SAFE_INTEGER']) -
-          normalizeOrderValue(_0x2c4963?.['displayOrder'], Number['MAX_SAFE_INTEGER'])
+          normalizeOrderValue(value93?.['displayOrder'], Number['MAX_SAFE_INTEGER']) -
+          normalizeOrderValue(value94?.['displayOrder'], Number['MAX_SAFE_INTEGER'])
         );
       }),
     ],
-    _0x3fc3a5 = normalizeText(_0x4bacb7['promptHelpTooltip']);
+    help = normalizeText(value89['promptHelpTooltip']);
   return {
-    fixedSlots: _0x1cf9d7,
-    uiFields: _0x5642dc,
-    nodeInfoList: _0x1018ac,
+    fixedSlots: fixedSlots,
+    uiFields: uiFields,
+    nodeInfoList: nodeInfoList,
     inputSlots: {
-      allowedKinds: _0x3c8585['slice'](),
-      minByKind: { ..._0x1fc0f1 },
-      maxByKind: { ..._0x1fc0f1 },
-      fixedSlots: _0x1cf9d7,
+      allowedKinds: allowedKinds['slice'](),
+      minByKind: { ...args },
+      maxByKind: { ...args },
+      fixedSlots: fixedSlots,
     },
     capabilities: {
-      inputKinds: _0x3c8585['slice'](),
-      outputType: _0x305f56,
-      fixedAssetSlots: _0x1cf9d7['map']((_0x141e56) => _0x141e56['id']),
+      inputKinds: allowedKinds['slice'](),
+      outputType: outputType,
+      fixedAssetSlots: fixedSlots['map']((value95) => value95['id']),
     },
-    help: _0x3fc3a5 || _0x10035c ? { tooltip: _0x3fc3a5 || _0x10035c } : null,
-    prompt: { emptyPolicy: 'allow', visible: _0x10d65a },
+    help: help || text3 ? { tooltip: help || text3 } : null,
+    prompt: { emptyPolicy: 'allow', visible: visible },
   };
 }
 export function buildRunningHubAiAppManifestBundle({
-  input: _0x4b30e5,
+  input: input2,
   appId: appId = '',
   kind: kind = 'image',
   components: components = [],
@@ -746,90 +736,87 @@ export function buildRunningHubAiAppManifestBundle({
   promptHelpTooltip: promptHelpTooltip = '',
   appKey: appKey = '',
 } = {}) {
-  const _0x582bc6 = parseRunningHubAiAppInput(_0x4b30e5, { appId: appId }),
-    _0xb6d935 = normalizeOutputKind(kind),
-    _0x53a289 = normalizeText(displayName, RH_AI_APP_DISPLAY_NAME),
-    _0x4aa367 = normalizeText(description) || 'RunningHub AI App ' + _0x582bc6['appId'],
-    _0x2e866f = normalizeText(promptHelpTooltip),
-    _0x5e64ee = createStableHash(
+  const appId5 = parseRunningHubAiAppInput(input2, { appId: appId }),
+    kind4 = normalizeOutputKind(kind),
+    displayName2 = normalizeText(displayName, RH_AI_APP_DISPLAY_NAME),
+    description3 = normalizeText(description) || 'RunningHub AI App ' + appId5['appId'],
+    promptHelpTooltip2 = normalizeText(promptHelpTooltip),
+    stableHash = createStableHash(
       JSON['stringify']({
-        appId: _0x582bc6['appId'],
+        appId: appId5['appId'],
         appKey: normalizeText(appKey),
-        ...(_0x582bc6['body']['providerProfileId']
-          ? { providerProfileId: _0x582bc6['body']['providerProfileId'] }
+        ...(appId5['body']['providerProfileId']
+          ? { providerProfileId: appId5['body']['providerProfileId'] }
           : {}),
-        kind: _0xb6d935,
-        description: _0x4aa367,
-        promptHelpTooltip: _0x2e866f,
-        nodeInfoList: _0x582bc6['nodeInfoList'],
+        kind: kind4,
+        description: description3,
+        promptHelpTooltip: promptHelpTooltip2,
+        nodeInfoList: appId5['nodeInfoList'],
         components: components,
       }),
     ),
-    _0x3e0f65 = 'runninghub/ai-app-' + _0xb6d935 + '-' + _0x582bc6['appId'] + '-' + _0x5e64ee,
-    _0x36e410 =
-      'runninghub.workflow.' + _0xb6d935 + '.ai-app-' + _0x582bc6['appId'] + '-' + _0x5e64ee + '.v1',
-    _0xd84b24 = buildManifestParts(_0x582bc6, _0xb6d935, components, { promptHelpTooltip: _0x2e866f });
+    modelId = 'runninghub/ai-app-' + kind4 + '-' + appId5['appId'] + '-' + stableHash,
+    executionId = 'runninghub.workflow.' + kind4 + '.ai-app-' + appId5['appId'] + '-' + stableHash + '.v1',
+    nodeInfoList2 = buildManifestParts(appId5, kind4, components, { promptHelpTooltip: promptHelpTooltip2 });
   return buildManifestDraftBundle({
-    sourceId: 'runninghub-ai-app:' + _0xb6d935 + ':' + _0x582bc6['appId'] + ':' + _0x5e64ee,
-    modelId: _0x3e0f65,
-    executionId: _0x36e410,
+    sourceId: 'runninghub-ai-app:' + kind4 + ':' + appId5['appId'] + ':' + stableHash,
+    modelId: modelId,
+    executionId: executionId,
     provider: 'runninghubwf',
     adapterType: 'workflow',
-    kind: _0xb6d935,
-    outputType: _0xb6d935,
-    displayName: _0x53a289,
-    description: _0x4aa367,
+    kind: kind4,
+    outputType: kind4,
+    displayName: displayName2,
+    description: description3,
     icon: 'images/RH.png',
     vip: !![],
-    appId: _0x582bc6['appId'],
+    appId: appId5['appId'],
     submitMode: 'openapi-v2-ai-app',
     queryMode: 'openapi-v2-query',
-    mapping: { nodeInfoList: _0xd84b24['nodeInfoList'] },
+    mapping: { nodeInfoList: nodeInfoList2['nodeInfoList'] },
     instanceType: {
       field: 'rhInstanceType',
-      defaultValue: normalizeInstanceType(_0x582bc6['body']?.['instanceType']),
+      defaultValue: normalizeInstanceType(appId5['body']?.['instanceType']),
     },
-    uiFields: _0xd84b24['uiFields'],
-    inputSlots: _0xd84b24['inputSlots'],
-    help: _0xd84b24['help'],
-    prompt: _0xd84b24['prompt'],
+    uiFields: nodeInfoList2['uiFields'],
+    inputSlots: nodeInfoList2['inputSlots'],
+    help: nodeInfoList2['help'],
+    prompt: nodeInfoList2['prompt'],
     modelExtensions: {
-      ...buildRunningHubCustomAppExtensions(_0xb6d935, _0x582bc6['appId'], _0x53a289, appKey, _0x4aa367),
-      ...(_0x582bc6['body']['providerProfileId']
-        ? { providerProfiles: [_0x582bc6['body']['providerProfileId']] }
+      ...buildRunningHubCustomAppExtensions(kind4, appId5['appId'], displayName2, appKey, description3),
+      ...(appId5['body']['providerProfileId']
+        ? { providerProfiles: [appId5['body']['providerProfileId']] }
         : {}),
     },
-    result: buildResultConfig(_0xb6d935),
+    result: buildResultConfig(kind4),
   });
 }
-export function summarizeRunningHubAiAppBundle(_0x3ca669) {
-  const _0x455e3a = _0x3ca669?.['models']?.[0x0] || {},
-    _0x19c3ce = _0x3ca669?.['executions']?.[0x0] || {},
-    _0x3748bd = Array['isArray'](_0x455e3a?.['inputSlots']?.['fixedSlots'])
-      ? _0x455e3a['inputSlots']['fixedSlots']
+export function summarizeRunningHubAiAppBundle(value96) {
+  const kind5 = value96?.['models']?.[0x0] || {},
+    appId6 = value96?.['executions']?.[0x0] || {},
+    slotCount = Array['isArray'](kind5?.['inputSlots']?.['fixedSlots'])
+      ? kind5['inputSlots']['fixedSlots']
       : [],
-    _0x1d73e5 = Array['isArray'](_0x455e3a?.['uiSchema']?.['fields']) ? _0x455e3a['uiSchema']['fields'] : [];
+    paramCount = Array['isArray'](kind5?.['uiSchema']?.['fields']) ? kind5['uiSchema']['fields'] : [];
   return {
-    appId: _0x19c3ce['appId'] || _0x19c3ce['workflowId'] || '',
-    kind: _0x455e3a['kind'] || _0x19c3ce['kind'] || '',
-    modelId: _0x455e3a['modelId'] || '',
-    displayName: _0x455e3a['displayName'] || '',
-    slotCount: _0x3748bd['length'],
-    paramCount: _0x1d73e5['filter']((_0x2aceab) => _0x2aceab?.['id'] !== 'rhInstanceType')['length'],
-    slots: _0x3748bd['map']((_0x1b1150) => ({
-      id: _0x1b1150['id'],
-      kind: _0x1b1150['kind'],
-      label: _0x1b1150['label'] || _0x1b1150['id'],
-      required: _0x1b1150['required'] === !![],
+    appId: appId6['appId'] || appId6['workflowId'] || '',
+    kind: kind5['kind'] || appId6['kind'] || '',
+    modelId: kind5['modelId'] || '',
+    displayName: kind5['displayName'] || '',
+    slotCount: slotCount['length'],
+    paramCount: paramCount['filter']((value97) => value97?.['id'] !== 'rhInstanceType')['length'],
+    slots: slotCount['map']((id3) => ({
+      id: id3['id'],
+      kind: id3['kind'],
+      label: id3['label'] || id3['id'],
+      required: id3['required'] === !![],
     })),
-    params: _0x1d73e5['filter']((_0x285610) => _0x285610?.['id'] !== 'rhInstanceType')['map'](
-      (_0x1ac300) => ({
-        id: _0x1ac300['id'],
-        label: _0x1ac300['label'] || _0x1ac300['id'],
-        type: _0x1ac300['type'] || 'text',
-        placement: _0x1ac300['placement'] || 'advanced',
-        variant: _0x1ac300['variant'] || '',
-      }),
-    ),
+    params: paramCount['filter']((value98) => value98?.['id'] !== 'rhInstanceType')['map']((id4) => ({
+      id: id4['id'],
+      label: id4['label'] || id4['id'],
+      type: id4['type'] || 'text',
+      placement: id4['placement'] || 'advanced',
+      variant: id4['variant'] || '',
+    })),
   };
 }

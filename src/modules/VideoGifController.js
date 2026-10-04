@@ -35,82 +35,81 @@ const QUALITY_OPTIONS = Object['freeze'](['compact', 'balanced', 'high']),
   GIF_PREFERENCES_STORAGE_KEY = 'v2-video-gif-preferences',
   GIF_EDITOR_MIN_RANGE_SEC = 0.1,
   GIF_EDITOR_VIEWPORT_MARGIN_PX = 0xc;
-function videoGifText(_0x89868, _0x331322 = {}) {
-  return t('videoGif.' + _0x89868, _0x331322);
+function videoGifText(value, item = {}) {
+  return t('videoGif.' + value, item);
 }
-function clamp(_0x597a4f, _0x5d2843, _0x37a17b) {
-  return Math['max'](_0x5d2843, Math['min'](_0x37a17b, Number(_0x597a4f) || 0x0));
+function clamp(key, index, result) {
+  return Math['max'](index, Math['min'](result, Number(key) || 0x0));
 }
-function roundTime(_0x312f94) {
-  return Math['round']((Number(_0x312f94) || 0x0) * 0x64) / 0x64;
+function roundTime(data) {
+  return Math['round']((Number(data) || 0x0) * 0x64) / 0x64;
 }
-function formatTime(_0x6b0a9d) {
-  const _0x510731 = Math['max'](0x0, Number(_0x6b0a9d) || 0x0),
-    _0xf3ba9 = Math['floor'](_0x510731 / 0x3c);
-  return _0xf3ba9 + ':' + (_0x510731 % 0x3c)['toFixed'](0x1)['padStart'](0x4, '0');
+function formatTime(options) {
+  const target = Math['max'](0x0, Number(options) || 0x0),
+    source = Math['floor'](target / 0x3c);
+  return source + ':' + (target % 0x3c)['toFixed'](0x1)['padStart'](0x4, '0');
 }
-export function formatVideoGifFileSize(_0x54f694) {
-  const _0x44c5b9 = Math['max'](0x0, Number(_0x54f694) || 0x0);
-  if (_0x44c5b9 < 0x400) return Math['round'](_0x44c5b9) + '\x20B';
-  if (_0x44c5b9 < 0x400 * 0x400) return Math['round'](_0x44c5b9 / 0x400) + ' KB';
-  return (_0x44c5b9 / (0x400 * 0x400))['toFixed'](0x1) + ' MB';
+export function formatVideoGifFileSize(next) {
+  const count = Math['max'](0x0, Number(next) || 0x0);
+  if (count < 0x400) return Math['round'](count) + '\x20B';
+  if (count < 0x400 * 0x400) return Math['round'](count / 0x400) + ' KB';
+  return (count / (0x400 * 0x400))['toFixed'](0x1) + ' MB';
 }
 export function resolveVideoGifOutputSize({
   size: size = 0xf0,
   sourceWidth: sourceWidth = 0x0,
   sourceHeight: sourceHeight = 0x0,
 } = {}) {
-  const _0x5690b6 = Math['max'](0x40, Math['round'](Number(size) || 0xf0));
-  if (!(sourceWidth > 0x0) || !(sourceHeight > 0x0)) return { width: _0x5690b6, height: _0x5690b6 };
-  const _0x50a1cb = sourceWidth / sourceHeight;
-  if (_0x50a1cb >= 0x1)
-    return { width: _0x5690b6, height: Math['max'](0x1, Math['round'](_0x5690b6 / _0x50a1cb)) };
-  return { width: Math['max'](0x1, Math['round'](_0x5690b6 * _0x50a1cb)), height: _0x5690b6 };
+  const width = Math['max'](0x40, Math['round'](Number(size) || 0xf0));
+  if (!(sourceWidth > 0x0) || !(sourceHeight > 0x0)) return { width: width, height: width };
+  const count2 = sourceWidth / sourceHeight;
+  if (count2 >= 0x1) return { width: width, height: Math['max'](0x1, Math['round'](width / count2)) };
+  return { width: Math['max'](0x1, Math['round'](width * count2)), height: width };
 }
 export function resolveVideoGifDrawRect({
-  sourceWidth: _0x1c186c,
-  sourceHeight: _0x481e,
-  targetWidth: _0x16573d,
-  targetHeight: _0x282613,
+  sourceWidth: sourceWidth2,
+  sourceHeight: sourceHeight2,
+  targetWidth: targetWidth,
+  targetHeight: targetHeight,
   fit: fit = 'contain',
 } = {}) {
-  const _0x378ea0 = Math['max'](0x1, Number(_0x1c186c) || 0x1),
-    _0x4aeb94 = Math['max'](0x1, Number(_0x481e) || 0x1),
-    _0x47af78 = Math['max'](0x1, Number(_0x16573d) || 0x1),
-    _0x381620 = Math['max'](0x1, Number(_0x282613) || 0x1),
-    _0x24f5a1 =
+  const current = Math['max'](0x1, Number(sourceWidth2) || 0x1),
+    entry = Math['max'](0x1, Number(sourceHeight2) || 0x1),
+    record = Math['max'](0x1, Number(targetWidth) || 0x1),
+    payload = Math['max'](0x1, Number(targetHeight) || 0x1),
+    handle =
       fit === 'cover'
-        ? Math['max'](_0x47af78 / _0x378ea0, _0x381620 / _0x4aeb94)
-        : Math['min'](_0x47af78 / _0x378ea0, _0x381620 / _0x4aeb94),
-    _0x4e1020 = _0x378ea0 * _0x24f5a1,
-    _0x55cace = _0x4aeb94 * _0x24f5a1;
+        ? Math['max'](record / current, payload / entry)
+        : Math['min'](record / current, payload / entry),
+    width2 = current * handle,
+    height = entry * handle;
   return {
-    x: (_0x47af78 - _0x4e1020) / 0x2,
-    y: (_0x381620 - _0x55cace) / 0x2,
-    width: _0x4e1020,
-    height: _0x55cace,
+    x: (record - width2) / 0x2,
+    y: (payload - height) / 0x2,
+    width: width2,
+    height: height,
   };
 }
-function getMainVideoItem(_0x28aa4b = {}) {
-  const _0x3a926d = Array['isArray'](_0x28aa4b['videos']) ? _0x28aa4b['videos'] : [],
-    _0x4ab1e8 = Number['isFinite'](Number(_0x28aa4b['mainVideoIndex']))
-      ? Math['max'](0x0, Math['trunc'](Number(_0x28aa4b['mainVideoIndex'])))
+function getMainVideoItem(options2 = {}) {
+  const state = Array['isArray'](options2['videos']) ? options2['videos'] : [],
+    config = Number['isFinite'](Number(options2['mainVideoIndex']))
+      ? Math['max'](0x0, Math['trunc'](Number(options2['mainVideoIndex'])))
       : 0x0;
-  return _0x3a926d[_0x4ab1e8] || _0x3a926d[0x0] || null;
+  return state[config] || state[0x0] || null;
 }
-function getSourceName(_0x49f43d = {}) {
-  return String(_0x49f43d['name'] || '')['trim']() || videoGifText('fallbackVideoName');
+function getSourceName(error = {}) {
+  return String(error['name'] || '')['trim']() || videoGifText('fallbackVideoName');
 }
-function getResultFilename(_0x56ea95 = {}) {
-  const _0xeabcf2 = String(_0x56ea95['filename'] || _0x56ea95['fileName'] || '')['trim']();
-  if (_0xeabcf2) return _0xeabcf2;
-  const _0x1f0135 = String(pickResultLocalPath(_0x56ea95) || '')['replace'](/\\/g, '/');
-  return _0x1f0135['split']('/')['filter'](Boolean)['pop']() || 'video-' + Date['now']() + '.gif';
+function getResultFilename(options3 = {}) {
+  const scope = String(options3['filename'] || options3['fileName'] || '')['trim']();
+  if (scope) return scope;
+  const input = String(pickResultLocalPath(options3) || '')['replace'](/\\/g, '/');
+  return input['split']('/')['filter'](Boolean)['pop']() || 'video-' + Date['now']() + '.gif';
 }
-function createIconMarkup(_0x1cbe96) {
-  if (_0x1cbe96 === 'play')
+function createIconMarkup(output) {
+  if (output === 'play')
     return '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z"/></svg>';
-  if (_0x1cbe96 === 'pause')
+  if (output === 'pause')
     return '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22currentColor\x22\x20width=\x2218\x22\x20height=\x2218\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22M7\x205h4v14H7zM13\x205h4v14h-4z\x22/></svg>';
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
 }
@@ -194,34 +193,33 @@ const VideoGifController = {
   _hiddenEls: null,
   _boundEvents: [],
   init({
-    nodeId: _0x36bbfd,
+    nodeId: nodeId,
     sourceUrl: sourceUrl = '',
     sourceLocalPath: sourceLocalPath = '',
     ensureLocalSource: ensureLocalSource = null,
   } = {}) {
-    const _0x3e53f1 = String(_0x36bbfd || '')['trim'](),
-      _0x430fbd = appStore['getStateRaw']()['nodes']?.[_0x3e53f1];
-    if (!_0x3e53f1 || !_0x430fbd) return ![];
-    const _0x27d2dd = getMainVideoItem(_0x430fbd),
-      _0x253c1f = String(
+    const enabled = String(nodeId || '')['trim'](),
+      enabled2 = appStore['getStateRaw']()['nodes']?.[enabled];
+    if (!enabled || !enabled2) return ![];
+    const mainVideoItem = getMainVideoItem(enabled2),
+      enabled3 = String(
         sourceUrl ||
-          _0x27d2dd?.['videoUrl'] ||
-          _0x27d2dd?.['src'] ||
-          _0x430fbd['videoUrl'] ||
-          _0x430fbd['src'] ||
+          mainVideoItem?.['videoUrl'] ||
+          mainVideoItem?.['src'] ||
+          enabled2['videoUrl'] ||
+          enabled2['src'] ||
           '',
       )['trim'](),
-      _0x47f14b = String(sourceLocalPath || _0x27d2dd?.['localPath'] || _0x430fbd['localPath'] || '')[
+      enabled4 = String(sourceLocalPath || mainVideoItem?.['localPath'] || enabled2['localPath'] || '')[
         'trim'
       ]();
-    if (!_0x253c1f && !_0x47f14b)
-      return (window['showToast']?.(videoGifText('errors.noSource'), 'warn'), ![]);
+    if (!enabled3 && !enabled4) return (window['showToast']?.(videoGifText('errors.noSource'), 'warn'), ![]);
     if (this['active']) this['exit']({ silent: !![] });
     return (
       (this['active'] = !![]),
-      (this['nodeId'] = _0x3e53f1),
-      (this['sourceUrl'] = _0x253c1f || localPathToUrl(_0x47f14b)),
-      (this['sourceLocalPath'] = _0x47f14b),
+      (this['nodeId'] = enabled),
+      (this['sourceUrl'] = enabled3 || localPathToUrl(enabled4)),
+      (this['sourceLocalPath'] = enabled4),
       (this['ensureLocalSource'] = typeof ensureLocalSource === 'function' ? ensureLocalSource : null),
       this['_restorePreferences'](),
       (this['durationSec'] = 0x0),
@@ -235,9 +233,9 @@ const VideoGifController = {
       ++this['_sessionToken'],
       (this['_retryCount'] = 0x0),
       (this['_unsubscribeNode'] = appStore['subscribeSelector'](
-        (_0x378742) => Boolean(_0x378742['nodes']?.[_0x3e53f1]),
-        (_0x52a3f7) => {
-          !_0x52a3f7 && this['active'] && this['nodeId'] === _0x3e53f1 && this['exit']({ silent: !![] });
+        (state2) => Boolean(state2['nodes']?.[enabled]),
+        (enabled5) => {
+          !enabled5 && this['active'] && this['nodeId'] === enabled && this['exit']({ silent: !![] });
         },
       )),
       this['_mountWhenReady'](),
@@ -245,20 +243,20 @@ const VideoGifController = {
     );
   },
   _mountWhenReady() {
-    const _0x1c1521 = this['nodeId'],
-      _0x5ada3e = () => {
-        if (!this['active'] || this['nodeId'] !== _0x1c1521) return;
-        const _0x1418a0 = document['getElementById'](_0x1c1521);
-        if (!_0x1418a0) {
+    const value2 = this['nodeId'],
+      value3 = () => {
+        if (!this['active'] || this['nodeId'] !== value2) return;
+        const enabled6 = document['getElementById'](value2);
+        if (!enabled6) {
           this['_retryCount'] += 0x1;
           if (this['_retryCount'] > 0xa) {
             this['exit']({ silent: !![] });
             return;
           }
-          this['_retryRaf'] = requestAnimationFrame(_0x5ada3e);
+          this['_retryRaf'] = requestAnimationFrame(value3);
           return;
         }
-        ((this['wrapperEl'] = _0x1418a0),
+        ((this['wrapperEl'] = enabled6),
           this['_applyFrozenUI'](!![]),
           this['_applyDimMode'](!![]),
           this['_createUI'](),
@@ -266,25 +264,25 @@ const VideoGifController = {
           this['_startRenderLoop'](),
           void this['_attachSource'](this['_sessionToken']));
       };
-    this['_retryRaf'] = requestAnimationFrame(_0x5ada3e);
+    this['_retryRaf'] = requestAnimationFrame(value3);
   },
-  _restorePreferences(_0x1aa538) {
-    let _0x5a6fdb = this['_preferences'];
-    if (!_0x5a6fdb)
+  _restorePreferences(value4) {
+    let enabled7 = this['_preferences'];
+    if (!enabled7)
       try {
-        _0x5a6fdb = JSON['parse'](
-          (_0x1aa538 || globalThis['localStorage'])?.['getItem'](GIF_PREFERENCES_STORAGE_KEY) || 'null',
+        enabled7 = JSON['parse'](
+          (value4 || globalThis['localStorage'])?.['getItem'](GIF_PREFERENCES_STORAGE_KEY) || 'null',
         );
       } catch {}
-    const _0x5ebdbf = VIDEO_GIF_SETTINGS['sizes']['indexOf'](_0x5a6fdb?.['size']),
-      _0x5758a5 = VIDEO_GIF_SETTINGS['fpsOptions']['indexOf'](_0x5a6fdb?.['fps']),
-      _0x1a82dc = QUALITY_OPTIONS['indexOf'](_0x5a6fdb?.['quality']);
-    ((this['sizeIndex'] = _0x5ebdbf >= 0x0 ? _0x5ebdbf : VIDEO_GIF_SETTINGS['defaultSizeIndex']),
-      (this['fpsIndex'] = _0x5758a5 >= 0x0 ? _0x5758a5 : VIDEO_GIF_SETTINGS['defaultFpsIndex']),
-      (this['qualityIndex'] = _0x1a82dc >= 0x0 ? _0x1a82dc : 0x1),
-      (this['limitSize'] = _0x5a6fdb?.['limitSize'] === !![]));
+    const count3 = VIDEO_GIF_SETTINGS['sizes']['indexOf'](enabled7?.['size']),
+      count4 = VIDEO_GIF_SETTINGS['fpsOptions']['indexOf'](enabled7?.['fps']),
+      count5 = QUALITY_OPTIONS['indexOf'](enabled7?.['quality']);
+    ((this['sizeIndex'] = count3 >= 0x0 ? count3 : VIDEO_GIF_SETTINGS['defaultSizeIndex']),
+      (this['fpsIndex'] = count4 >= 0x0 ? count4 : VIDEO_GIF_SETTINGS['defaultFpsIndex']),
+      (this['qualityIndex'] = count5 >= 0x0 ? count5 : 0x1),
+      (this['limitSize'] = enabled7?.['limitSize'] === !![]));
   },
-  _savePreferences(_0x282be3) {
+  _savePreferences(value5) {
     this['_preferences'] = {
       size: VIDEO_GIF_SETTINGS['sizes'][this['sizeIndex']],
       fps: VIDEO_GIF_SETTINGS['fpsOptions'][this['fpsIndex']],
@@ -292,24 +290,24 @@ const VideoGifController = {
       limitSize: this['limitSize'],
     };
     try {
-      (_0x282be3 || globalThis['localStorage'])?.['setItem'](
+      (value5 || globalThis['localStorage'])?.['setItem'](
         GIF_PREFERENCES_STORAGE_KEY,
         JSON['stringify'](this['_preferences']),
       );
     } catch {}
   },
-  _applyDimMode(_0x147139) {
-    const _0x285a14 = document['getElementById']('v2-wrap');
-    (_0x285a14?.['classList']['toggle']('is-video-gif-mode', _0x147139),
-      this['wrapperEl']?.['classList']['toggle']('is-video-gif-target', _0x147139));
+  _applyDimMode(value6) {
+    const el = document['getElementById']('v2-wrap');
+    (el?.['classList']['toggle']('is-video-gif-mode', value6),
+      this['wrapperEl']?.['classList']['toggle']('is-video-gif-target', value6));
   },
-  _applyFrozenUI(_0x4d3467) {
+  _applyFrozenUI(value7) {
     if (!this['wrapperEl']) return;
-    this['wrapperEl']['classList']['toggle']('is-video-gif-editing', _0x4d3467);
-    if (_0x4d3467) {
+    this['wrapperEl']['classList']['toggle']('is-video-gif-editing', value7);
+    if (value7) {
       if (Array['isArray'](this['_hiddenEls']) && this['_hiddenEls']['length']) return;
-      const _0x1d2e8b = [];
-      for (const _0x2d71ae of [
+      const list = [];
+      for (const value8 of [
         '.video-controls',
         '.video-mute-btn',
         '.node-upload-hint',
@@ -317,16 +315,16 @@ const VideoGifController = {
         '.gen-video-center-indicator',
         '.multi-toggle-btn',
       ]) {
-        this['wrapperEl']['querySelectorAll'](_0x2d71ae)['forEach']((_0x53a015) => {
-          (_0x1d2e8b['push']({ element: _0x53a015, display: _0x53a015['style']['display'] }),
-            (_0x53a015['style']['display'] = 'none'));
+        this['wrapperEl']['querySelectorAll'](value8)['forEach']((element) => {
+          (list['push']({ element: element, display: element['style']['display'] }),
+            (element['style']['display'] = 'none'));
         });
       }
-      this['_hiddenEls'] = _0x1d2e8b;
+      this['_hiddenEls'] = list;
       return;
     }
-    for (const { element: _0xaf37a6, display: _0x5a38a0 } of this['_hiddenEls'] || []) {
-      if (_0xaf37a6?.['isConnected']) _0xaf37a6['style']['display'] = _0x5a38a0 || '';
+    for (const { element: element2, display: display } of this['_hiddenEls'] || []) {
+      if (element2?.['isConnected']) element2['style']['display'] = display || '';
     }
     this['_hiddenEls'] = null;
   },
@@ -338,24 +336,20 @@ const VideoGifController = {
   },
   _createUI() {
     if (!this['wrapperEl']) return;
-    (this['wrapperEl']
-      ['querySelectorAll']('.v2-video-gifbar')
-      ['forEach']((_0x175605) => _0x175605['remove']()),
-      this['wrapperEl']
-        ['querySelectorAll']('.v2-gif-node-preview')
-        ['forEach']((_0x16d5d3) => _0x16d5d3['remove']()),
+    (this['wrapperEl']['querySelectorAll']('.v2-video-gifbar')['forEach']((el2) => el2['remove']()),
+      this['wrapperEl']['querySelectorAll']('.v2-gif-node-preview')['forEach']((el3) => el3['remove']()),
       (this['videoEl'] = this['_getVideoEl']()),
       (this['mediaCardEl'] =
         this['videoEl']?.['closest']('.video-card, .media-card, .node-card') ||
         this['wrapperEl']['querySelector']('.video-card, .media-card, .node-card') ||
         this['wrapperEl']));
-    const _0x21e289 = document['createElement']('div');
-    (setStaticInnerHTML(_0x21e289, VIDEO_GIF_PREVIEW_TEMPLATE_ID),
-      (this['previewEl'] = _0x21e289['firstElementChild']),
+    const value9 = document['createElement']('div');
+    (setStaticInnerHTML(value9, VIDEO_GIF_PREVIEW_TEMPLATE_ID),
+      (this['previewEl'] = value9['firstElementChild']),
       this['mediaCardEl']['appendChild'](this['previewEl']));
-    const _0x3053b5 = document['createElement']('div');
-    (setStaticInnerHTML(_0x3053b5, VIDEO_GIF_CONTROLS_TEMPLATE_ID),
-      (this['barEl'] = _0x3053b5['firstElementChild']),
+    const value10 = document['createElement']('div');
+    (setStaticInnerHTML(value10, VIDEO_GIF_CONTROLS_TEMPLATE_ID),
+      (this['barEl'] = value10['firstElementChild']),
       this['wrapperEl']['appendChild'](this['barEl']),
       applyI18n(this['previewEl']),
       applyI18n(this['barEl']),
@@ -365,16 +359,18 @@ const VideoGifController = {
       (this['toolbarEl'] = this['barEl']['querySelector']('[data-gif-toolbar]')),
       (this['rangeLabelEl'] = this['barEl']['querySelector']('[data-gif-range-label]')),
       (this['outputLabelEl'] = this['barEl']['querySelector']('[data-gif-output-label]')));
-    const _0x2e5df9 = createVideoRangeTimelineView({ documentRef: document });
-    (this['barEl']['querySelector']('[data-gif-timeline-host]')?.['appendChild'](_0x2e5df9['trackEl']),
-      (this['trackEl'] = _0x2e5df9['trackEl']),
+    const videoRangeTimelineView = createVideoRangeTimelineView({ documentRef: document });
+    (this['barEl']
+      ['querySelector']('[data-gif-timeline-host]')
+      ?.['appendChild'](videoRangeTimelineView['trackEl']),
+      (this['trackEl'] = videoRangeTimelineView['trackEl']),
       (this['trackEl']['tabIndex'] = -0x1),
-      (this['selectionEl'] = _0x2e5df9['selectionEl']),
-      (this['leftHandleEl'] = _0x2e5df9['leftHandleEl']),
-      (this['rightHandleEl'] = _0x2e5df9['rightHandleEl']),
-      (this['playheadEl'] = _0x2e5df9['playheadEl']),
-      (this['timelineLabelEl'] = _0x2e5df9['labelEl']),
-      (this['thumbEls'] = _0x2e5df9['thumbEls']),
+      (this['selectionEl'] = videoRangeTimelineView['selectionEl']),
+      (this['leftHandleEl'] = videoRangeTimelineView['leftHandleEl']),
+      (this['rightHandleEl'] = videoRangeTimelineView['rightHandleEl']),
+      (this['playheadEl'] = videoRangeTimelineView['playheadEl']),
+      (this['timelineLabelEl'] = videoRangeTimelineView['labelEl']),
+      (this['thumbEls'] = videoRangeTimelineView['thumbEls']),
       (this['playButtonEl'] = this['barEl']['querySelector']('[data-gif-action="play"]')),
       (this['sizeButtonEl'] = this['barEl']['querySelector']('[data-gif-action="size"]')),
       (this['fpsButtonEl'] = this['barEl']['querySelector']('[data-gif-action="fps"]')),
@@ -385,31 +381,29 @@ const VideoGifController = {
       this['_updateBarViewportOffset'](),
       void this['_renderTimelineThumbnails'](this['_sessionToken']));
   },
-  _listen(_0x407c3f, _0x79f6a3, _0x322080, _0x3d425b) {
-    (_0x407c3f?.['addEventListener']?.(_0x79f6a3, _0x322080, _0x3d425b),
-      this['_boundEvents']['push'](() =>
-        _0x407c3f?.['removeEventListener']?.(_0x79f6a3, _0x322080, _0x3d425b),
-      ));
+  _listen(el4, value11, value12, value13) {
+    (el4?.['addEventListener']?.(value11, value12, value13),
+      this['_boundEvents']['push'](() => el4?.['removeEventListener']?.(value11, value12, value13)));
   },
   _bindEvents() {
-    (this['_listen'](this['barEl'], 'pointerdown', (_0x50e8b2) => _0x50e8b2['stopPropagation']()),
-      this['_listen'](this['barEl'], 'dblclick', (_0x310770) => {
-        (_0x310770['preventDefault'](), _0x310770['stopPropagation']());
+    (this['_listen'](this['barEl'], 'pointerdown', (event) => event['stopPropagation']()),
+      this['_listen'](this['barEl'], 'dblclick', (event2) => {
+        (event2['preventDefault'](), event2['stopPropagation']());
       }),
       this['_listen'](this['barEl']?.['querySelector']('[data-gif-action=\x22cancel\x22]'), 'click', () =>
         this['exit'](),
       ),
       this['_listen'](this['playButtonEl'], 'click', () => void this['_togglePlayback']()),
       this['_listen'](this['sizeButtonEl'], 'click', () => {
-        const _0x375fe4 = VIDEO_GIF_SETTINGS['sizes'];
-        ((this['sizeIndex'] = (this['sizeIndex'] + 0x1) % _0x375fe4['length']),
+        const list2 = VIDEO_GIF_SETTINGS['sizes'];
+        ((this['sizeIndex'] = (this['sizeIndex'] + 0x1) % list2['length']),
           this['_savePreferences'](),
           this['_resizeCanvas'](),
           this['_updateControls']());
       }),
       this['_listen'](this['fpsButtonEl'], 'click', () => {
-        const _0x307ac2 = VIDEO_GIF_SETTINGS['fpsOptions'];
-        ((this['fpsIndex'] = (this['fpsIndex'] + 0x1) % _0x307ac2['length']),
+        const list3 = VIDEO_GIF_SETTINGS['fpsOptions'];
+        ((this['fpsIndex'] = (this['fpsIndex'] + 0x1) % list3['length']),
           this['_savePreferences'](),
           (this['_lastDrawAt'] = 0x0),
           (this['_drawDirty'] = !![]),
@@ -437,51 +431,51 @@ const VideoGifController = {
       }),
       this['_listen'](this['videoEl'], 'play', () => this['_updatePlayButton']()),
       this['_listen'](this['videoEl'], 'pause', () => this['_updatePlayButton']()),
-      (this['_onKeyDown'] = (_0x51e72c) => {
-        if (!this['active'] || _0x51e72c['isComposing']) return;
-        const _0x243a9c = String(_0x51e72c['target']?.['tagName'] || '')['toLowerCase'](),
-          _0x1b6012 =
-            _0x243a9c === 'button' ||
-            _0x243a9c === 'input' ||
-            _0x243a9c === 'select' ||
-            _0x243a9c === 'textarea' ||
-            _0x243a9c === 'a' ||
-            _0x51e72c['target']?.['isContentEditable'];
-        if (_0x51e72c['key'] === 'Escape') (_0x51e72c['preventDefault'](), this['exit']());
+      (this['_onKeyDown'] = (event3) => {
+        if (!this['active'] || event3['isComposing']) return;
+        const value14 = String(event3['target']?.['tagName'] || '')['toLowerCase'](),
+          enabled8 =
+            value14 === 'button' ||
+            value14 === 'input' ||
+            value14 === 'select' ||
+            value14 === 'textarea' ||
+            value14 === 'a' ||
+            event3['target']?.['isContentEditable'];
+        if (event3['key'] === 'Escape') (event3['preventDefault'](), this['exit']());
         else {
-          if ((_0x51e72c['key'] === '\x20' || _0x51e72c['code'] === 'Space') && !_0x1b6012) {
-            (_0x51e72c['preventDefault'](), _0x51e72c['stopPropagation'](), releaseCanvasPanShortcut());
-            if (!_0x51e72c['repeat']) void this['_togglePlayback']();
+          if ((event3['key'] === '\x20' || event3['code'] === 'Space') && !enabled8) {
+            (event3['preventDefault'](), event3['stopPropagation'](), releaseCanvasPanShortcut());
+            if (!event3['repeat']) void this['_togglePlayback']();
           } else
-            _0x51e72c['key'] === 'Enter' &&
-              !_0x1b6012 &&
+            event3['key'] === 'Enter' &&
+              !enabled8 &&
               !this['_busy'] &&
-              (_0x51e72c['preventDefault'](), void this['_generate']());
+              (event3['preventDefault'](), void this['_generate']());
         }
       }),
       window['addEventListener']('keydown', this['_onKeyDown'], !![]),
       (this['_onResize'] = () => this['_updatePreviewLayout']()),
       window['addEventListener']('resize', this['_onResize'], !![]));
   },
-  async _attachSource(_0x274f73) {
-    const _0x246e49 = this['videoEl'],
-      _0xb2413e = this['sourceUrl'] || localPathToUrl(this['sourceLocalPath']);
-    if (!_0x246e49 || !_0xb2413e) return;
+  async _attachSource(value15) {
+    const enabled9 = this['videoEl'],
+      enabled10 = this['sourceUrl'] || localPathToUrl(this['sourceLocalPath']);
+    if (!enabled9 || !enabled10) return;
     try {
-      const _0x4cc803 = String(_0x246e49['currentSrc'] || _0x246e49['getAttribute']('src') || '')['trim']();
-      !_0x4cc803 &&
-        (await attachDesktopMediaPlaybackSource(_0x246e49, _0xb2413e, {
+      const enabled11 = String(enabled9['currentSrc'] || enabled9['getAttribute']('src') || '')['trim']();
+      !enabled11 &&
+        (await attachDesktopMediaPlaybackSource(enabled9, enabled10, {
           preload: 'auto',
-          shouldAssign: () => this['active'] && this['_sessionToken'] === _0x274f73,
+          shouldAssign: () => this['active'] && this['_sessionToken'] === value15,
         }));
-      if (!this['active'] || this['_sessionToken'] !== _0x274f73) return;
-      if (_0x246e49['readyState'] >= 0x1) this['_handleMetadata']();
-    } catch (_0x3c17a7) {
-      if (!this['active'] || this['_sessionToken'] !== _0x274f73) return;
+      if (!this['active'] || this['_sessionToken'] !== value15) return;
+      if (enabled9['readyState'] >= 0x1) this['_handleMetadata']();
+    } catch (error2) {
+      if (!this['active'] || this['_sessionToken'] !== value15) return;
       (this['loadingEl']?.['setAttribute']('hidden', ''),
         window['showToast']?.(
           videoGifText('errors.previewFailed', {
-            error: _0x3c17a7 instanceof Error ? _0x3c17a7['message'] : String(_0x3c17a7 || ''),
+            error: error2 instanceof Error ? error2['message'] : String(error2 || ''),
           }),
           'error',
         ),
@@ -490,14 +484,14 @@ const VideoGifController = {
   },
   _handleMetadata() {
     if (!this['active'] || !this['videoEl']) return;
-    const _0x3bb204 = Number(this['videoEl']['duration']) || 0x0;
-    if (!(_0x3bb204 > 0x0)) return;
+    const count6 = Number(this['videoEl']['duration']) || 0x0;
+    if (!(count6 > 0x0)) return;
     if (this['durationSec'] > 0x0) return;
-    ((this['durationSec'] = _0x3bb204),
+    ((this['durationSec'] = count6),
       (this['sourceWidth'] = Number(this['videoEl']['videoWidth']) || 0x0),
       (this['sourceHeight'] = Number(this['videoEl']['videoHeight']) || 0x0),
       (this['startSec'] = 0x0),
-      (this['endSec'] = Math['min'](_0x3bb204, VIDEO_GIF_SETTINGS['defaultDurationSec'])),
+      (this['endSec'] = Math['min'](count6, VIDEO_GIF_SETTINGS['defaultDurationSec'])),
       this['_resizeCanvas'](),
       this['_updateControls'](),
       this['loadingEl']?.['setAttribute']('hidden', ''));
@@ -507,95 +501,94 @@ const VideoGifController = {
     this['_drawDirty'] = !![];
   },
   _getSettings() {
-    const _0x406acc = VIDEO_GIF_SETTINGS,
-      _0x4bd7ab = _0x406acc['sizes'][this['sizeIndex']] || _0x406acc['sizes'][0x0],
-      _0x12c06c = resolveVideoGifOutputSize({
-        size: _0x4bd7ab,
+    const fps = VIDEO_GIF_SETTINGS,
+      size2 = fps['sizes'][this['sizeIndex']] || fps['sizes'][0x0],
+      width3 = resolveVideoGifOutputSize({
+        size: size2,
         sourceWidth: this['sourceWidth'],
         sourceHeight: this['sourceHeight'],
       });
     return {
       preset: this['limitSize'] ? 'wechat' : 'hd',
-      size: _0x4bd7ab,
-      width: _0x12c06c['width'],
-      height: _0x12c06c['height'],
+      size: size2,
+      width: width3['width'],
+      height: width3['height'],
       sourceWidth: this['sourceWidth'],
       sourceHeight: this['sourceHeight'],
-      fps: _0x406acc['fpsOptions'][this['fpsIndex']] || _0x406acc['fpsOptions'][0x0],
+      fps: fps['fpsOptions'][this['fpsIndex']] || fps['fpsOptions'][0x0],
       quality: QUALITY_OPTIONS[this['qualityIndex']] || 'balanced',
-      targetBytes: this['limitSize'] ? _0x406acc['targetBytes'] : 0x0,
+      targetBytes: this['limitSize'] ? fps['targetBytes'] : 0x0,
       start: this['startSec'],
       end: this['endSec'],
     };
   },
   _resizeCanvas() {
-    const _0x37a83b = this['_getSettings']();
+    const box = this['_getSettings']();
     if (!this['canvasEl']) return;
-    if (this['canvasEl']['width'] !== _0x37a83b['width']) this['canvasEl']['width'] = _0x37a83b['width'];
-    if (this['canvasEl']['height'] !== _0x37a83b['height']) this['canvasEl']['height'] = _0x37a83b['height'];
-    ((this['canvasEl']['style']['aspectRatio'] = _0x37a83b['width'] + '\x20/\x20' + _0x37a83b['height']),
+    if (this['canvasEl']['width'] !== box['width']) this['canvasEl']['width'] = box['width'];
+    if (this['canvasEl']['height'] !== box['height']) this['canvasEl']['height'] = box['height'];
+    ((this['canvasEl']['style']['aspectRatio'] = box['width'] + '\x20/\x20' + box['height']),
       (this['_drawDirty'] = !![]),
       this['_updatePreviewLayout'](),
       this['_drawFrame']());
   },
   _updatePreviewLayout() {
     if (!this['canvasEl'] || !this['mediaCardEl']) return;
-    const _0x2d1a87 = this['_getSettings'](),
-      _0x2325ca = Math['max'](0x1, this['mediaCardEl']['clientWidth'] || 0x1),
-      _0x5aadae = Math['max'](0x1, this['mediaCardEl']['clientHeight'] || 0x1),
-      _0x178189 = Math['min'](_0x2325ca / _0x2d1a87['width'], _0x5aadae / _0x2d1a87['height']);
-    ((this['canvasEl']['style']['width'] =
-      Math['max'](0x1, Math['round'](_0x2d1a87['width'] * _0x178189)) + 'px'),
+    const box2 = this['_getSettings'](),
+      value16 = Math['max'](0x1, this['mediaCardEl']['clientWidth'] || 0x1),
+      value17 = Math['max'](0x1, this['mediaCardEl']['clientHeight'] || 0x1),
+      value18 = Math['min'](value16 / box2['width'], value17 / box2['height']);
+    ((this['canvasEl']['style']['width'] = Math['max'](0x1, Math['round'](box2['width'] * value18)) + 'px'),
       (this['canvasEl']['style']['height'] =
-        Math['max'](0x1, Math['round'](_0x2d1a87['height'] * _0x178189)) + 'px'),
+        Math['max'](0x1, Math['round'](box2['height'] * value18)) + 'px'),
       this['_updateBarViewportOffset']());
   },
   _updateBarViewportOffset() {
     if (!this['barEl']) return;
     this['barEl']['style']['left'] = '';
-    const _0x457fe1 = this['barEl']['getBoundingClientRect'](),
-      _0x3eae1c = Math['max'](0x0, Number(window['innerWidth']) || 0x0);
-    if (!(_0x457fe1['width'] > 0x0) || !(_0x3eae1c > 0x0)) return;
-    const _0x531581 = Math['min'](
+    const box3 = this['barEl']['getBoundingClientRect'](),
+      count7 = Math['max'](0x0, Number(window['innerWidth']) || 0x0);
+    if (!(box3['width'] > 0x0) || !(count7 > 0x0)) return;
+    const value19 = Math['min'](
       GIF_EDITOR_VIEWPORT_MARGIN_PX,
-      Math['max'](0x0, (_0x3eae1c - _0x457fe1['width']) / 0x2),
+      Math['max'](0x0, (count7 - box3['width']) / 0x2),
     );
-    let _0x5eae04 = 0x0;
-    if (_0x457fe1['left'] < _0x531581) _0x5eae04 = _0x531581 - _0x457fe1['left'];
-    else
-      _0x457fe1['right'] > _0x3eae1c - _0x531581 && (_0x5eae04 = _0x3eae1c - _0x531581 - _0x457fe1['right']);
-    if (Math['abs'](_0x5eae04) < 0.5) return;
-    const _0x3c07ec = Math['max'](0.0001, Number(appStore['getStateRaw']()['viewport']?.['zoom']) || 0x1);
-    this['barEl']['style']['left'] = 'calc(50% + ' + _0x5eae04 / _0x3c07ec + 'px)';
+    let value20 = 0x0;
+    if (box3['left'] < value19) value20 = value19 - box3['left'];
+    else box3['right'] > count7 - value19 && (value20 = count7 - value19 - box3['right']);
+    if (Math['abs'](value20) < 0.5) return;
+    const value21 = Math['max'](0.0001, Number(appStore['getStateRaw']()['viewport']?.['zoom']) || 0x1);
+    this['barEl']['style']['left'] = 'calc(50% + ' + value20 / value21 + 'px)';
   },
-  async _renderTimelineThumbnails(_0x472259) {
-    const _0x1b3671 = ++this['_thumbToken'],
-      _0x584777 = Array['isArray'](this['thumbEls']) ? this['thumbEls'] : [];
-    if (!_0x584777['length']) return;
-    const _0xfcefe = appStore['getStateRaw']()['nodes']?.[this['nodeId']] || {},
-      _0x68862a = await renderVideoTimelineThumbnails({
+  async _renderTimelineThumbnails(value22) {
+    const value23 = ++this['_thumbToken'],
+      thumbs = Array['isArray'](this['thumbEls']) ? this['thumbEls'] : [];
+    if (!thumbs['length']) return;
+    const value24 = appStore['getStateRaw']()['nodes']?.[this['nodeId']] || {},
+      renderVideoTimelineThumbnails2 = await renderVideoTimelineThumbnails({
         src: this['sourceUrl'] || localPathToUrl(this['sourceLocalPath']),
         posterUrl:
           String(this['videoEl']?.['poster'] || '')['trim']() ||
-          resolveCanvasVideoPosterUrl(getMainVideoItem(_0xfcefe) || _0xfcefe) ||
-          resolveCanvasVideoPosterUrl(_0xfcefe),
-        thumbs: _0x584777,
+          resolveCanvasVideoPosterUrl(getMainVideoItem(value24) || value24) ||
+          resolveCanvasVideoPosterUrl(value24),
+        thumbs: thumbs,
         isCurrent: () =>
-          this['active'] && this['_sessionToken'] === _0x472259 && this['_thumbToken'] === _0x1b3671,
+          this['active'] && this['_sessionToken'] === value22 && this['_thumbToken'] === value23,
       });
-    if (!this['active'] || this['_sessionToken'] !== _0x472259 || this['_thumbToken'] !== _0x1b3671) return;
-    this['trackEl']?.['dataset'] && (this['trackEl']['dataset']['thumbnailState'] = _0x68862a['source']);
+    if (!this['active'] || this['_sessionToken'] !== value22 || this['_thumbToken'] !== value23) return;
+    this['trackEl']?.['dataset'] &&
+      (this['trackEl']['dataset']['thumbnailState'] = renderVideoTimelineThumbnails2['source']);
   },
   _bindTimelineEvents() {
-    (this['_listen'](this['trackEl'], 'pointermove', (_0x51102b) => {
+    (this['_listen'](this['trackEl'], 'pointermove', (event4) => {
       if (this['_timelineDragMode'] || this['_busy'] || !this['selectionEl']) return;
-      const _0x18686c = this['selectionEl']['getBoundingClientRect'](),
-        _0x1cb9be = Math['abs'](_0x51102b['clientX'] - _0x18686c['left']) < 0x14,
-        _0x28a15e = Math['abs'](_0x51102b['clientX'] - _0x18686c['right']) < 0x14;
-      (this['leftHandleEl']?.['classList']['toggle']('hover-active', _0x1cb9be),
-        this['rightHandleEl']?.['classList']['toggle']('hover-active', _0x28a15e),
+      const box4 = this['selectionEl']['getBoundingClientRect'](),
+        value25 = Math['abs'](event4['clientX'] - box4['left']) < 0x14,
+        value26 = Math['abs'](event4['clientX'] - box4['right']) < 0x14;
+      (this['leftHandleEl']?.['classList']['toggle']('hover-active', value25),
+        this['rightHandleEl']?.['classList']['toggle']('hover-active', value26),
         (this['selectionEl']['style']['cursor'] =
-          _0x1cb9be || _0x28a15e ? 'var(--resize-ew-cursor)' : 'var(--grab-cursor)'));
+          value25 || value26 ? 'var(--resize-ew-cursor)' : 'var(--grab-cursor)'));
     }),
       this['_listen'](this['trackEl'], 'pointerleave', () => {
         if (this['_timelineDragMode']) return;
@@ -603,24 +596,18 @@ const VideoGifController = {
           this['rightHandleEl']?.['classList']['remove']('hover-active'));
         if (this['selectionEl']) this['selectionEl']['style']['cursor'] = '';
       }),
-      this['_listen'](this['trackEl'], 'pointerdown', (_0x2d42fc) => {
+      this['_listen'](this['trackEl'], 'pointerdown', (event5) => {
         if (this['_busy'] || !(this['durationSec'] > 0x0) || !this['selectionEl']) return;
         this['trackEl']['focus']({ preventScroll: !![] });
-        const _0x45585d = this['trackEl']['getBoundingClientRect'](),
-          _0x3be3d1 = this['selectionEl']['getBoundingClientRect']();
-        if (!_0x45585d['width']) return;
-        const _0x3adec3 = Math['abs'](_0x2d42fc['clientX'] - _0x3be3d1['left']) < 0x14,
-          _0x59c2db = Math['abs'](_0x2d42fc['clientX'] - _0x3be3d1['right']) < 0x14,
-          _0x4b4b92 = _0x2d42fc['clientX'] >= _0x3be3d1['left'] && _0x2d42fc['clientX'] <= _0x3be3d1['right'];
-        ((this['_timelineDragMode'] = _0x3adec3
-          ? 'left'
-          : _0x59c2db
-            ? 'right'
-            : _0x4b4b92
-              ? 'move'
-              : 'scrub'),
+        const box5 = this['trackEl']['getBoundingClientRect'](),
+          box6 = this['selectionEl']['getBoundingClientRect']();
+        if (!box5['width']) return;
+        const value27 = Math['abs'](event5['clientX'] - box6['left']) < 0x14,
+          value28 = Math['abs'](event5['clientX'] - box6['right']) < 0x14,
+          value29 = event5['clientX'] >= box6['left'] && event5['clientX'] <= box6['right'];
+        ((this['_timelineDragMode'] = value27 ? 'left' : value28 ? 'right' : value29 ? 'move' : 'scrub'),
           (this['_timelineDragSnapshot'] = {
-            clientX: Number(_0x2d42fc['clientX']) || 0x0,
+            clientX: Number(event5['clientX']) || 0x0,
             startSec: this['startSec'],
             endSec: this['endSec'],
           }),
@@ -629,34 +616,31 @@ const VideoGifController = {
             'hover-active',
             this['_timelineDragMode'] === 'right',
           ),
-          _0x2d42fc['preventDefault'](),
-          _0x2d42fc['stopPropagation']());
-        const _0x1cd81a = Number(_0x2d42fc['clientX']) || 0x0;
-        let _0x30bb57 = ![];
-        if (this['_timelineDragMode'] === 'scrub') this['_seekTimelineAtClientX'](_0x2d42fc['clientX']);
-        else
-          this['_timelineDragMode'] !== 'move' && this['_updateTimelineRangeAtClientX'](_0x2d42fc['clientX']);
+          event5['preventDefault'](),
+          event5['stopPropagation']());
+        const value30 = Number(event5['clientX']) || 0x0;
+        let enabled12 = ![];
+        if (this['_timelineDragMode'] === 'scrub') this['_seekTimelineAtClientX'](event5['clientX']);
+        else this['_timelineDragMode'] !== 'move' && this['_updateTimelineRangeAtClientX'](event5['clientX']);
         (this['_removeTimelineDragListeners'](),
-          (this['_onTimelinePointerMove'] = (_0x4c770d) => {
+          (this['_onTimelinePointerMove'] = (event6) => {
             if (!this['active'] || !this['_timelineDragMode']) return;
-            (_0x4c770d['preventDefault'](), _0x4c770d['stopPropagation']());
-            if (this['_timelineDragMode'] === 'scrub') this['_seekTimelineAtClientX'](_0x4c770d['clientX']);
+            (event6['preventDefault'](), event6['stopPropagation']());
+            if (this['_timelineDragMode'] === 'scrub') this['_seekTimelineAtClientX'](event6['clientX']);
             else {
               if (this['_timelineDragMode'] === 'move') {
-                if (!_0x30bb57 && Math['abs'](_0x4c770d['clientX'] - _0x1cd81a) <= 0x2) return;
-                _0x30bb57 = !![];
+                if (!enabled12 && Math['abs'](event6['clientX'] - value30) <= 0x2) return;
+                enabled12 = !![];
               }
-              this['_updateTimelineRangeAtClientX'](_0x4c770d['clientX']);
+              this['_updateTimelineRangeAtClientX'](event6['clientX']);
             }
           }),
-          (this['_onTimelinePointerUp'] = (_0x286faf) => {
-            (_0x286faf['preventDefault'](), _0x286faf['stopPropagation']());
-            const _0x579d9f = this['_timelineDragMode'] === 'move' && !_0x30bb57,
-              _0xbc3c53 = Number['isFinite'](Number(_0x286faf['clientX']))
-                ? Number(_0x286faf['clientX'])
-                : _0x1cd81a;
+          (this['_onTimelinePointerUp'] = (event7) => {
+            (event7['preventDefault'](), event7['stopPropagation']());
+            const value31 = this['_timelineDragMode'] === 'move' && !enabled12,
+              value32 = Number['isFinite'](Number(event7['clientX'])) ? Number(event7['clientX']) : value30;
             this['_finishTimelineDrag']();
-            if (_0x579d9f) this['_seekTimelineAtClientX'](_0xbc3c53);
+            if (value31) this['_seekTimelineAtClientX'](value32);
           }),
           window['addEventListener']('pointermove', this['_onTimelinePointerMove'], !![]),
           window['addEventListener']('pointerup', this['_onTimelinePointerUp'], !![]));
@@ -678,39 +662,38 @@ const VideoGifController = {
       this['rightHandleEl']?.['classList']['remove']('hover-active'));
     if (this['selectionEl']) this['selectionEl']['style']['cursor'] = '';
   },
-  _seekTimelineAtClientX(_0x2a8fc8) {
+  _seekTimelineAtClientX(value33) {
     if (!this['trackEl'] || !(this['durationSec'] > 0x0) || !this['videoEl']) return;
-    const _0x39b8f6 = this['trackEl']['getBoundingClientRect']();
-    if (!_0x39b8f6['width']) return;
-    const _0x42377f = clamp((_0x2a8fc8 - _0x39b8f6['left']) / _0x39b8f6['width'], 0x0, 0x1),
-      _0x3a76db = Math['min'](Math['max'](0x0, this['durationSec'] - 0.001), _0x42377f * this['durationSec']);
+    const box7 = this['trackEl']['getBoundingClientRect']();
+    if (!box7['width']) return;
+    const clamp2 = clamp((value33 - box7['left']) / box7['width'], 0x0, 0x1),
+      value34 = Math['min'](Math['max'](0x0, this['durationSec'] - 0.001), clamp2 * this['durationSec']);
     try {
-      (this['videoEl']['pause'](), (this['videoEl']['currentTime'] = _0x3a76db));
+      (this['videoEl']['pause'](), (this['videoEl']['currentTime'] = value34));
     } catch {}
     ((this['_drawDirty'] = !![]), this['_renderTimeline']());
   },
-  _updateTimelineRangeAtClientX(_0x20b3d9) {
+  _updateTimelineRangeAtClientX(value35) {
     if (!this['trackEl'] || !(this['durationSec'] > 0x0)) return;
-    const _0x1df1d1 = this['trackEl']['getBoundingClientRect'](),
-      _0x1536a6 = this['_timelineDragSnapshot'];
-    if (!_0x1df1d1['width'] || !_0x1536a6) return;
-    const _0x3ed06d = Math['min'](GIF_EDITOR_MIN_RANGE_SEC, this['durationSec']),
-      _0x138852 = clamp((_0x20b3d9 - _0x1df1d1['left']) / _0x1df1d1['width'], 0x0, 0x1),
-      _0x40617 = _0x138852 * this['durationSec'];
+    const box8 = this['trackEl']['getBoundingClientRect'](),
+      event8 = this['_timelineDragSnapshot'];
+    if (!box8['width'] || !event8) return;
+    const value36 = Math['min'](GIF_EDITOR_MIN_RANGE_SEC, this['durationSec']),
+      clamp3 = clamp((value35 - box8['left']) / box8['width'], 0x0, 0x1),
+      value37 = clamp3 * this['durationSec'];
     if (this['_timelineDragMode'] === 'left')
-      this['startSec'] = roundTime(clamp(_0x40617, 0x0, Math['max'](0x0, this['endSec'] - _0x3ed06d)));
+      this['startSec'] = roundTime(clamp(value37, 0x0, Math['max'](0x0, this['endSec'] - value36)));
     else {
       if (this['_timelineDragMode'] === 'right')
-        this['endSec'] = roundTime(clamp(_0x40617, this['startSec'] + _0x3ed06d, this['durationSec']));
+        this['endSec'] = roundTime(clamp(value37, this['startSec'] + value36, this['durationSec']));
       else {
         if (this['_timelineDragMode'] === 'move') {
-          const _0x3b1fc1 = _0x1536a6['endSec'] - _0x1536a6['startSec'],
-            _0x363c2f =
-              ((Number(_0x20b3d9) - _0x1536a6['clientX']) / _0x1df1d1['width']) * this['durationSec'];
+          const value38 = event8['endSec'] - event8['startSec'],
+            value39 = ((Number(value35) - event8['clientX']) / box8['width']) * this['durationSec'];
           ((this['startSec'] = roundTime(
-            clamp(_0x1536a6['startSec'] + _0x363c2f, 0x0, Math['max'](0x0, this['durationSec'] - _0x3b1fc1)),
+            clamp(event8['startSec'] + value39, 0x0, Math['max'](0x0, this['durationSec'] - value38)),
           )),
-            (this['endSec'] = roundTime(this['startSec'] + _0x3b1fc1)));
+            (this['endSec'] = roundTime(this['startSec'] + value38)));
         }
       }
     }
@@ -726,22 +709,22 @@ const VideoGifController = {
   },
   _renderTimeline() {
     if (!this['trackEl'] || !this['selectionEl'] || !this['leftHandleEl'] || !this['rightHandleEl']) return;
-    const _0x4fe982 = this['durationSec'],
-      _0x48a50e = Number['isFinite'](_0x4fe982) && _0x4fe982 > 0x0,
-      _0x5e412c = _0x48a50e ? clamp(this['startSec'], 0x0, _0x4fe982) : 0x0,
-      _0x234fce = _0x48a50e ? clamp(this['endSec'], _0x5e412c, _0x4fe982) : 0x0,
-      _0x9d54c9 = Math['max'](0x0, _0x234fce - _0x5e412c),
-      _0x388e19 = _0x48a50e ? (_0x5e412c / _0x4fe982) * 0x64 : 0x0,
-      _0x317dc5 = _0x48a50e ? (_0x9d54c9 / _0x4fe982) * 0x64 : 0x0;
-    ((this['selectionEl']['style']['left'] = _0x388e19 + '%'),
-      (this['selectionEl']['style']['width'] = _0x317dc5 + '%'),
-      (this['leftHandleEl']['style']['left'] = _0x388e19 + '%'),
-      (this['rightHandleEl']['style']['left'] = _0x388e19 + _0x317dc5 + '%'),
+    const count8 = this['durationSec'],
+      value40 = Number['isFinite'](count8) && count8 > 0x0,
+      value41 = value40 ? clamp(this['startSec'], 0x0, count8) : 0x0,
+      value42 = value40 ? clamp(this['endSec'], value41, count8) : 0x0,
+      value43 = Math['max'](0x0, value42 - value41),
+      value44 = value40 ? (value41 / count8) * 0x64 : 0x0,
+      value45 = value40 ? (value43 / count8) * 0x64 : 0x0;
+    ((this['selectionEl']['style']['left'] = value44 + '%'),
+      (this['selectionEl']['style']['width'] = value45 + '%'),
+      (this['leftHandleEl']['style']['left'] = value44 + '%'),
+      (this['rightHandleEl']['style']['left'] = value44 + value45 + '%'),
       this['timelineLabelEl'] &&
-        ((this['timelineLabelEl']['textContent'] = _0x48a50e
-          ? _0x9d54c9['toFixed'](0x2) + 's'
+        ((this['timelineLabelEl']['textContent'] = value40
+          ? value43['toFixed'](0x2) + 's'
           : videoGifText('loadingPreview')),
-        (this['timelineLabelEl']['style']['left'] = _0x388e19 + _0x317dc5 / 0x2 + '%')),
+        (this['timelineLabelEl']['style']['left'] = value44 + value45 / 0x2 + '%')),
       this['_renderTimelinePlayhead']());
   },
   _renderTimelinePlayhead() {
@@ -749,122 +732,115 @@ const VideoGifController = {
       if (this['playheadEl']) this['playheadEl']['style']['display'] = 'none';
       return;
     }
-    const _0x57cb60 = clamp((Number(this['videoEl']['currentTime']) || 0x0) / this['durationSec'], 0x0, 0x1);
+    const clamp4 = clamp((Number(this['videoEl']['currentTime']) || 0x0) / this['durationSec'], 0x0, 0x1);
     ((this['playheadEl']['style']['display'] = 'block'),
-      (this['playheadEl']['style']['left'] = _0x57cb60 * 0x64 + '%'));
+      (this['playheadEl']['style']['left'] = clamp4 * 0x64 + '%'));
   },
   async _togglePlayback() {
-    const _0x296eda = this['videoEl'];
-    if (!this['active'] || !_0x296eda || !(this['durationSec'] > 0x0)) return;
-    if (!_0x296eda['paused']) {
-      _0x296eda['pause']();
+    const enabled13 = this['videoEl'];
+    if (!this['active'] || !enabled13 || !(this['durationSec'] > 0x0)) return;
+    if (!enabled13['paused']) {
+      enabled13['pause']();
       return;
     }
-    ((_0x296eda['currentTime'] < this['startSec'] || _0x296eda['currentTime'] >= this['endSec'] - 0.02) &&
-      (_0x296eda['currentTime'] = this['startSec']),
-      await playVideoWithRecovery(_0x296eda, {
+    ((enabled13['currentTime'] < this['startSec'] || enabled13['currentTime'] >= this['endSec'] - 0.02) &&
+      (enabled13['currentTime'] = this['startSec']),
+      await playVideoWithRecovery(enabled13, {
         label: 'video-gif:' + this['nodeId'],
         sourceUrl: this['sourceUrl'],
       }));
   },
   _updatePlayButton() {
     if (!this['playButtonEl'] || !this['videoEl']) return;
-    const _0x235732 = !this['videoEl']['paused'],
-      _0xfe5625 = this['playButtonEl']['querySelector']('[data-gif-play-icon]'),
-      _0x45e783 = this['playButtonEl']['querySelector']('[data-gif-pause-icon]');
-    if (_0xfe5625) _0xfe5625['hidden'] = _0x235732;
-    if (_0x45e783) _0x45e783['hidden'] = !_0x235732;
-    const _0x5998b4 = videoGifText(_0x235732 ? 'pause' : 'play');
-    ((this['playButtonEl']['dataset']['tooltip'] = _0x5998b4),
-      this['playButtonEl']['setAttribute']('aria-label', _0x5998b4),
-      this['playButtonEl']['classList']['toggle']('active', _0x235732));
+    const enabled14 = !this['videoEl']['paused'],
+      el5 = this['playButtonEl']['querySelector']('[data-gif-play-icon]'),
+      el6 = this['playButtonEl']['querySelector']('[data-gif-pause-icon]');
+    if (el5) el5['hidden'] = enabled14;
+    if (el6) el6['hidden'] = !enabled14;
+    const videoGifText2 = videoGifText(enabled14 ? 'pause' : 'play');
+    ((this['playButtonEl']['dataset']['tooltip'] = videoGifText2),
+      this['playButtonEl']['setAttribute']('aria-label', videoGifText2),
+      this['playButtonEl']['classList']['toggle']('active', enabled14));
   },
   _startRenderLoop() {
     if (this['_raf']) cancelAnimationFrame(this['_raf']);
-    const _0x330861 = (_0x5e9f7f) => {
+    const value46 = (value47) => {
       if (!this['active']) return;
-      const _0x17f8fc = this['_getSettings'](),
-        _0x40de2d = 0x3e8 / Math['max'](0x1, _0x17f8fc['fps']),
-        _0x2d7b12 = this['videoEl'];
-      if (_0x2d7b12 && !_0x2d7b12['paused'] && _0x2d7b12['currentTime'] >= this['endSec'] - 0.015)
+      const value48 = this['_getSettings'](),
+        value49 = 0x3e8 / Math['max'](0x1, value48['fps']),
+        enabled15 = this['videoEl'];
+      if (enabled15 && !enabled15['paused'] && enabled15['currentTime'] >= this['endSec'] - 0.015)
         try {
-          _0x2d7b12['currentTime'] = this['startSec'];
+          enabled15['currentTime'] = this['startSec'];
         } catch {}
       (this['_renderTimelinePlayhead'](),
-        (this['_drawDirty'] || _0x5e9f7f - this['_lastDrawAt'] >= _0x40de2d) &&
-          (this['_drawFrame'](), (this['_lastDrawAt'] = _0x5e9f7f)),
-        (this['_raf'] = requestAnimationFrame(_0x330861)));
+        (this['_drawDirty'] || value47 - this['_lastDrawAt'] >= value49) &&
+          (this['_drawFrame'](), (this['_lastDrawAt'] = value47)),
+        (this['_raf'] = requestAnimationFrame(value46)));
     };
-    this['_raf'] = requestAnimationFrame(_0x330861);
+    this['_raf'] = requestAnimationFrame(value46);
   },
   _drawFrame() {
-    const _0x322726 = this['canvasEl'],
-      _0x1e259b = this['videoEl'];
+    const el7 = this['canvasEl'],
+      sourceWidth3 = this['videoEl'];
     if (
-      !_0x322726 ||
-      !_0x1e259b ||
-      _0x1e259b['readyState'] < 0x2 ||
-      !_0x1e259b['videoWidth'] ||
-      !_0x1e259b['videoHeight']
+      !el7 ||
+      !sourceWidth3 ||
+      sourceWidth3['readyState'] < 0x2 ||
+      !sourceWidth3['videoWidth'] ||
+      !sourceWidth3['videoHeight']
     )
       return;
-    const _0x204358 = _0x322726['getContext']('2d');
-    if (!_0x204358) return;
-    const _0x823978 = this['_getSettings'](),
-      _0x3b758b = resolveVideoGifDrawRect({
-        sourceWidth: _0x1e259b['videoWidth'],
-        sourceHeight: _0x1e259b['videoHeight'],
-        targetWidth: _0x823978['width'],
-        targetHeight: _0x823978['height'],
+    const ctx = el7['getContext']('2d');
+    if (!ctx) return;
+    const targetWidth2 = this['_getSettings'](),
+      box9 = resolveVideoGifDrawRect({
+        sourceWidth: sourceWidth3['videoWidth'],
+        sourceHeight: sourceWidth3['videoHeight'],
+        targetWidth: targetWidth2['width'],
+        targetHeight: targetWidth2['height'],
         fit: 'contain',
       });
-    (_0x204358['clearRect'](0x0, 0x0, _0x823978['width'], _0x823978['height']),
-      (_0x204358['imageSmoothingEnabled'] = !![]),
-      (_0x204358['imageSmoothingQuality'] = 'high'),
-      _0x204358['drawImage'](
-        _0x1e259b,
-        _0x3b758b['x'],
-        _0x3b758b['y'],
-        _0x3b758b['width'],
-        _0x3b758b['height'],
-      ),
+    (ctx['clearRect'](0x0, 0x0, targetWidth2['width'], targetWidth2['height']),
+      (ctx['imageSmoothingEnabled'] = !![]),
+      (ctx['imageSmoothingQuality'] = 'high'),
+      ctx['drawImage'](sourceWidth3, box9['x'], box9['y'], box9['width'], box9['height']),
       (this['_drawDirty'] = ![]));
   },
   _updateControls() {
-    const _0x198d6d = this['_getSettings']();
+    const size3 = this['_getSettings']();
     this['sizeButtonEl'] &&
-      (this['sizeButtonEl']['textContent'] = videoGifText('longEdge', { size: _0x198d6d['size'] }));
-    if (this['fpsButtonEl']) this['fpsButtonEl']['textContent'] = _0x198d6d['fps'] + ' FPS';
+      (this['sizeButtonEl']['textContent'] = videoGifText('longEdge', { size: size3['size'] }));
+    if (this['fpsButtonEl']) this['fpsButtonEl']['textContent'] = size3['fps'] + ' FPS';
     this['qualityButtonEl'] &&
-      (this['qualityButtonEl']['textContent'] = videoGifText('quality.' + _0x198d6d['quality']));
+      (this['qualityButtonEl']['textContent'] = videoGifText('quality.' + size3['quality']));
     this['limitSizeButtonEl'] &&
       (this['limitSizeButtonEl']['setAttribute']('aria-checked', String(this['limitSize'])),
       this['limitSizeButtonEl']['classList']['toggle']('active', this['limitSize']));
-    const _0x1a8608 = Math['max'](0x0, this['endSec'] - this['startSec']);
+    const duration = Math['max'](0x0, this['endSec'] - this['startSec']);
     (this['rangeLabelEl'] &&
       (this['rangeLabelEl']['textContent'] = videoGifText('rangeSummary', {
         start: formatTime(this['startSec']),
         end: formatTime(this['endSec']),
-        duration: _0x1a8608['toFixed'](0x1),
+        duration: duration['toFixed'](0x1),
       })),
       this['outputLabelEl'] &&
         (this['outputLabelEl']['textContent'] =
-          _0x198d6d['targetBytes'] > 0x0
-            ? videoGifText('wechatTarget', { size: formatVideoGifFileSize(_0x198d6d['targetBytes']) })
+          size3['targetBytes'] > 0x0
+            ? videoGifText('wechatTarget', { size: formatVideoGifFileSize(size3['targetBytes']) })
             : videoGifText('unlimitedOutput')),
       this['_renderTimeline'](),
       this['_updatePlayButton']());
   },
-  _setGenerateButtonLabel(_0x17abb7 = '') {
+  _setGenerateButtonLabel(value50 = '') {
     if (!this['generateButtonEl']) return;
-    const _0x29ad70 = String(_0x17abb7 || '')['trim']() || videoGifText('generate'),
-      _0x16dfda = this['generateButtonEl']['querySelector']('[data-gif-generate-label]');
-    if (_0x16dfda) _0x16dfda['textContent'] = _0x29ad70;
-    this['generateButtonEl']['setAttribute']('aria-label', _0x29ad70);
+    const value51 = String(value50 || '')['trim']() || videoGifText('generate'),
+      el8 = this['generateButtonEl']['querySelector']('[data-gif-generate-label]');
+    if (el8) el8['textContent'] = value51;
+    this['generateButtonEl']['setAttribute']('aria-label', value51);
   },
-  _setBusy(_0x267bba, _0x1cfc9f = '') {
-    ((this['_busy'] = _0x267bba === !![]),
-      this['barEl']?.['setAttribute']('aria-busy', String(this['_busy'])));
+  _setBusy(value52, value53 = '') {
+    ((this['_busy'] = value52 === !![]), this['barEl']?.['setAttribute']('aria-busy', String(this['_busy'])));
     this['generateButtonEl'] &&
       ((this['generateButtonEl']['disabled'] = this['_busy']),
       (this['generateButtonEl']['dataset']['loading'] = String(this['_busy'])),
@@ -872,143 +848,143 @@ const VideoGifController = {
       this['generateButtonEl']
         ['querySelector']('svg')
         ?.['classList']['toggle']('v2-spinning', this['_busy']));
-    for (const _0x4d0f5e of [
+    for (const el9 of [
       this['sizeButtonEl'],
       this['fpsButtonEl'],
       this['qualityButtonEl'],
       this['limitSizeButtonEl'],
     ]) {
-      if (_0x4d0f5e) _0x4d0f5e['disabled'] = this['_busy'];
+      if (el9) el9['disabled'] = this['_busy'];
     }
     (this['trackEl']?.['setAttribute']('aria-disabled', String(this['_busy'])),
       this['_setGenerateButtonLabel'](
-        this['_busy'] ? _0x1cfc9f || videoGifText('encoding') : videoGifText('generate'),
+        this['_busy'] ? value53 || videoGifText('encoding') : videoGifText('generate'),
       ));
   },
   async _resolveLocalSource() {
     if (this['sourceLocalPath']) return this['sourceLocalPath'];
     if (!this['ensureLocalSource']) throw new Error(videoGifText('errors.localSourceRequired'));
-    const _0x5413c9 = String((await this['ensureLocalSource'](this['sourceUrl'])) || '')['trim']();
-    if (!_0x5413c9) throw new Error(videoGifText('errors.localSourceRequired'));
-    return ((this['sourceLocalPath'] = _0x5413c9), _0x5413c9);
+    const enabled16 = String((await this['ensureLocalSource'](this['sourceUrl'])) || '')['trim']();
+    if (!enabled16) throw new Error(videoGifText('errors.localSourceRequired'));
+    return ((this['sourceLocalPath'] = enabled16), enabled16);
   },
-  _subscribeTaskProgress(_0x47995c, _0x5a3ee4) {
+  _subscribeTaskProgress(value54, value55) {
     (this['_unsubscribeTask']?.(),
-      (this['_unsubscribeTask'] = desktopBridge['mediaTask']['onUpdate']((_0x2ab314) => {
-        if (!this['active'] || this['_exportToken'] !== _0x5a3ee4) return;
-        if (String(_0x2ab314?.['taskId'] || '') !== _0x47995c) return;
+      (this['_unsubscribeTask'] = desktopBridge['mediaTask']['onUpdate']((value56) => {
+        if (!this['active'] || this['_exportToken'] !== value55) return;
+        if (String(value56?.['taskId'] || '') !== value54) return;
         this['_setGenerateButtonLabel'](
-          _0x2ab314?.['stage'] === 'optimize' ? videoGifText('optimizing') : videoGifText('encoding'),
+          value56?.['stage'] === 'optimize' ? videoGifText('optimizing') : videoGifText('encoding'),
         );
       })));
   },
   async _generate() {
     if (!this['active'] || this['_busy'] || !(this['endSec'] > this['startSec'])) return;
-    const _0xe738f4 = appStore['getStateRaw']()['nodes']?.[this['nodeId']];
-    if (!_0xe738f4) {
+    const enabled17 = appStore['getStateRaw']()['nodes']?.[this['nodeId']];
+    if (!enabled17) {
       this['exit']({ silent: !![] });
       return;
     }
-    const _0x25effe = ++this['_exportToken'];
+    const value57 = ++this['_exportToken'];
     this['_setBusy'](!![], videoGifText('preparing'));
     try {
-      const _0x5d4044 = await this['_resolveLocalSource']();
-      if (!this['active'] || _0x25effe !== this['_exportToken']) return;
-      const _0x43ca3e = this['_getSettings'](),
-        _0x2581f6 = await enqueueElectronMediaTask({
+      const src = await this['_resolveLocalSource']();
+      if (!this['active'] || value57 !== this['_exportToken']) return;
+      const args = this['_getSettings'](),
+        enqueueElectronMediaTask2 = await enqueueElectronMediaTask({
           kind: 'videoToGif',
           nodeId: this['nodeId'],
-          src: _0x5d4044,
-          args: _0x43ca3e,
+          src: src,
+          args: args,
           cancellable: !![],
         }),
-        _0x37a5c1 = String(_0x2581f6?.['taskId'] || '')['trim']();
-      if (!_0x37a5c1) throw new Error(videoGifText('errors.taskUnavailable'));
-      ((this['taskId'] = _0x37a5c1), this['_subscribeTaskProgress'](_0x37a5c1, _0x25effe));
-      const _0x1fc126 = await waitForElectronMediaTask(_0x37a5c1, {
+        enabled18 = String(enqueueElectronMediaTask2?.['taskId'] || '')['trim']();
+      if (!enabled18) throw new Error(videoGifText('errors.taskUnavailable'));
+      ((this['taskId'] = enabled18), this['_subscribeTaskProgress'](enabled18, value57));
+      const waitForElectronMediaTask2 = await waitForElectronMediaTask(enabled18, {
         timeout: 0xa * 0x3c * 0x3e8,
-        diagnosticPayload: { kind: 'videoToGif', nodeId: this['nodeId'], src: _0x5d4044 },
+        diagnosticPayload: { kind: 'videoToGif', nodeId: this['nodeId'], src: src },
       });
-      if (!this['active'] || _0x25effe !== this['_exportToken']) return;
-      await this['_createResultNode'](_0xe738f4, _0x1fc126);
-      const _0x1ac05b = formatVideoGifFileSize(_0x1fc126['fileSize']);
+      if (!this['active'] || value57 !== this['_exportToken']) return;
+      await this['_createResultNode'](enabled17, waitForElectronMediaTask2);
+      const size4 = formatVideoGifFileSize(waitForElectronMediaTask2['fileSize']);
       (this['exit']({ silent: !![], keepTask: !![] }),
-        _0x1fc126['targetExceeded']
-          ? window['showToast']?.(videoGifText('completedOverTarget', { size: _0x1ac05b }), 'warn')
-          : window['showToast']?.(videoGifText('completed', { size: _0x1ac05b }), 'success'));
-    } catch (_0x5d0fb7) {
-      if (!this['active'] || _0x25effe !== this['_exportToken']) return;
-      const _0x21ae38 = _0x5d0fb7 instanceof Error ? _0x5d0fb7['message'] : String(_0x5d0fb7 || '');
+        waitForElectronMediaTask2['targetExceeded']
+          ? window['showToast']?.(videoGifText('completedOverTarget', { size: size4 }), 'warn')
+          : window['showToast']?.(videoGifText('completed', { size: size4 }), 'success'));
+    } catch (error3) {
+      if (!this['active'] || value57 !== this['_exportToken']) return;
+      const error4 = error3 instanceof Error ? error3['message'] : String(error3 || '');
       ((this['taskId'] = ''),
         this['_unsubscribeTask']?.(),
         (this['_unsubscribeTask'] = null),
         this['_setBusy'](![]),
         this['_updateControls'](),
-        window['showToast']?.(videoGifText('errors.generateFailed', { error: _0x21ae38 }), 'error'));
+        window['showToast']?.(videoGifText('errors.generateFailed', { error: error4 }), 'error'));
     }
   },
-  async _createResultNode(_0x49e34a, _0x52392a = {}) {
-    const _0x285d8e = pickResultLocalPath(_0x52392a);
-    if (!_0x285d8e) throw new Error(videoGifText('errors.incompleteResult'));
-    const _0x21be57 = Math['max'](0x1, Number(_0x52392a['imageWidth']) || 0x1),
-      _0x1646c9 = Math['max'](0x1, Number(_0x52392a['imageHeight']) || 0x1),
-      _0x376f04 = getAutoMediaSizeByShortSide(_0x21be57, _0x1646c9),
-      _0x1ec179 = calcSafeSpawnPosNearNode(
+  async _createResultNode(value58, imageUrl = {}) {
+    const localPath = pickResultLocalPath(imageUrl);
+    if (!localPath) throw new Error(videoGifText('errors.incompleteResult'));
+    const naturalWidth = Math['max'](0x1, Number(imageUrl['imageWidth']) || 0x1),
+      naturalHeight = Math['max'](0x1, Number(imageUrl['imageHeight']) || 0x1),
+      box10 = getAutoMediaSizeByShortSide(naturalWidth, naturalHeight),
+      x = calcSafeSpawnPosNearNode(
         appStore['getStateRaw']()['nodes'],
-        _0x49e34a,
-        _0x376f04['width'],
-        _0x376f04['height'],
+        value58,
+        box10['width'],
+        box10['height'],
       ),
-      _0x64c8d1 = getResultFilename(_0x52392a),
-      _0x400fb6 = buildCanvasLocalImageFields(
+      fileName = getResultFilename(imageUrl),
+      src2 = buildCanvasLocalImageFields(
         {
-          ..._0x52392a,
-          localPath: _0x285d8e,
-          originalLocalPath: _0x285d8e,
-          imageUrl: _0x52392a['url'] || localPathToUrl(_0x285d8e),
-          sourceUrl: _0x52392a['url'] || localPathToUrl(_0x285d8e),
-          fileName: _0x64c8d1,
+          ...imageUrl,
+          localPath: localPath,
+          originalLocalPath: localPath,
+          imageUrl: imageUrl['url'] || localPathToUrl(localPath),
+          sourceUrl: imageUrl['url'] || localPathToUrl(localPath),
+          fileName: fileName,
         },
         { includeSrc: !![] },
       ),
-      _0x1bfde0 = generateId('source-image-gif');
+      id = generateId('source-image-gif');
     return (
       appStore['addNode'](
         buildSourceMediaNodePayload({
-          id: _0x1bfde0,
+          id: id,
           type: 'source-image',
-          x: _0x1ec179['x'],
-          y: _0x1ec179['y'],
-          naturalWidth: _0x21be57,
-          naturalHeight: _0x1646c9,
-          name: videoGifText('resultName', { name: getSourceName(_0x49e34a) }),
-          ..._0x400fb6,
-          src: _0x400fb6['src'] || _0x52392a['url'] || localPathToUrl(_0x285d8e),
-          localPath: _0x285d8e,
-          fileName: _0x64c8d1,
+          x: x['x'],
+          y: x['y'],
+          naturalWidth: naturalWidth,
+          naturalHeight: naturalHeight,
+          name: videoGifText('resultName', { name: getSourceName(value58) }),
+          ...src2,
+          src: src2['src'] || imageUrl['url'] || localPathToUrl(localPath),
+          localPath: localPath,
+          fileName: fileName,
           mimeType: 'image/gif',
-          gifPreset: _0x52392a['preset'] || this['_getSettings']()['preset'],
-          gifFps: Number(_0x52392a['fps']) || 0x0,
-          gifMaxColors: Number(_0x52392a['maxColors']) || 0x0,
-          gifDuration: Number(_0x52392a['duration']) || 0x0,
-          gifFileSize: Number(_0x52392a['fileSize']) || 0x0,
+          gifPreset: imageUrl['preset'] || this['_getSettings']()['preset'],
+          gifFps: Number(imageUrl['fps']) || 0x0,
+          gifMaxColors: Number(imageUrl['maxColors']) || 0x0,
+          gifDuration: Number(imageUrl['duration']) || 0x0,
+          gifFileSize: Number(imageUrl['fileSize']) || 0x0,
           needsAutoResize: ![],
           fixedSize: !![],
         }),
       ),
-      appStore['setSelectedNodes']([_0x1bfde0]),
+      appStore['setSelectedNodes']([id]),
       commit(),
-      window['v2Renderer']?.['flushNode']?.(_0x1bfde0),
+      window['v2Renderer']?.['flushNode']?.(id),
       await window['_triggerLocalCacheSave']?.(),
-      _0x1bfde0
+      id
     );
   },
   exit({ silent: silent = ![], keepTask: keepTask = ![] } = {}) {
     if (!this['active']) return;
-    const _0x49fe68 = this['taskId'],
-      _0x116ead = this['_busy'];
+    const value59 = this['taskId'],
+      value60 = this['_busy'];
     ((this['active'] = ![]), (this['_sessionToken'] += 0x1), (this['_exportToken'] += 0x1));
-    if (!keepTask && _0x49fe68) void cancelElectronMediaTask(_0x49fe68);
+    if (!keepTask && value59) void cancelElectronMediaTask(value59);
     ((this['taskId'] = ''),
       this['_unsubscribeTask']?.(),
       (this['_unsubscribeTask'] = null),
@@ -1016,7 +992,7 @@ const VideoGifController = {
       (this['_unsubscribeNode'] = null),
       this['_finishTimelineDrag'](),
       (this['_thumbToken'] += 0x1));
-    for (const _0x3f7b81 of this['_boundEvents']['splice'](0x0)) _0x3f7b81();
+    for (const run of this['_boundEvents']['splice'](0x0)) run();
     if (this['_onKeyDown']) window['removeEventListener']('keydown', this['_onKeyDown'], !![]);
     if (this['_onResize']) window['removeEventListener']('resize', this['_onResize'], !![]);
     ((this['_onKeyDown'] = null), (this['_onResize'] = null));
@@ -1031,7 +1007,7 @@ const VideoGifController = {
       this['barEl']?.['remove'](),
       this['_applyFrozenUI'](![]),
       this['_applyDimMode'](![]));
-    if (!silent && _0x116ead) window['showToast']?.(videoGifText('cancelled'), 'info');
+    if (!silent && value60) window['showToast']?.(videoGifText('cancelled'), 'info');
     ((this['nodeId'] = ''),
       (this['sourceUrl'] = ''),
       (this['sourceLocalPath'] = ''),

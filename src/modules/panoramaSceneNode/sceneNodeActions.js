@@ -45,15 +45,15 @@ import {
   upsertCameraKeyframe,
 } from './cameraTimeline.js';
 import { resolveSceneAsset } from './sceneAssetCatalog.js';
-function panoramaSceneText(_0x2a5123, _0x1c2d45 = {}) {
-  return t('panoramaSceneNode.' + _0x2a5123, _0x1c2d45);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
-function getStoreNode(_0xf1f3ea, _0x328992) {
-  return _0xf1f3ea?.getStateRaw?.().nodes?.[_0x328992] || null;
+function getStoreNode(store, key) {
+  return store?.getStateRaw?.().nodes?.[key] || null;
 }
-function normalizeSceneStateByNode(_0x23f27b, _0x472ba3) {
-  if (isPanorama360NodeType(_0x23f27b?.type)) return normalizePanorama360State(_0x472ba3);
-  return normalizeSceneOnlyPanoramaSceneState(_0x472ba3);
+function normalizeSceneStateByNode(index, result) {
+  if (isPanorama360NodeType(index?.type)) return normalizePanorama360State(result);
+  return normalizeSceneOnlyPanoramaSceneState(result);
 }
 const EQUIRECTANGULAR_RATIO = 2,
   EQUIRECTANGULAR_RATIO_TOLERANCE = 0.02,
@@ -61,1746 +61,1762 @@ const EQUIRECTANGULAR_RATIO = 2,
   CUBE_FORWARD_PLACEMENT_DISTANCE = 3,
   _panorama360SyncVersionByNodeId = new Map(),
   _panorama360SyncInflightByNodeId = new Map();
-function isNearEquirectangularRatio(_0x1a1002) {
-  const _0x245cd4 = Number(_0x1a1002?.width),
-    _0x82bd3d = Number(_0x1a1002?.height);
-  if (!Number.isFinite(_0x245cd4) || !Number.isFinite(_0x82bd3d) || _0x245cd4 <= 0 || _0x82bd3d <= 0)
-    return true;
-  const _0x50a9ef = _0x245cd4 / _0x82bd3d;
-  return Math.abs(_0x50a9ef - EQUIRECTANGULAR_RATIO) <= EQUIRECTANGULAR_RATIO_TOLERANCE;
+function isNearEquirectangularRatio(box) {
+  const count = Number(box?.width),
+    count2 = Number(box?.height);
+  if (!Number.isFinite(count) || !Number.isFinite(count2) || count <= 0 || count2 <= 0) return true;
+  const data = count / count2;
+  return Math.abs(data - EQUIRECTANGULAR_RATIO) <= EQUIRECTANGULAR_RATIO_TOLERANCE;
 }
-function getSceneState(_0x4d62d4, _0x177e41) {
-  const _0x1cc954 = getStoreNode(_0x4d62d4, _0x177e41);
-  if (!_0x1cc954) return normalizeSceneOnlyPanoramaSceneState(null);
-  const _0x44b3da = getPanoramaStateFieldByNodeType(_0x1cc954.type);
-  return normalizeSceneStateByNode(_0x1cc954, _0x44b3da ? _0x1cc954[_0x44b3da] : null);
+function getSceneState(options, target) {
+  const storeNode = getStoreNode(options, target);
+  if (!storeNode) return normalizeSceneOnlyPanoramaSceneState(null);
+  const panoramaStateFieldByNodeType = getPanoramaStateFieldByNodeType(storeNode.type);
+  return normalizeSceneStateByNode(
+    storeNode,
+    panoramaStateFieldByNodeType ? storeNode[panoramaStateFieldByNodeType] : null,
+  );
 }
-function writeSceneState(_0x433ba1, _0x45c57c, _0x6cd3b) {
-  const _0x488a47 = getStoreNode(_0x433ba1, _0x45c57c);
-  if (!_0x488a47) return null;
-  const _0x2689f5 = getPanoramaStateFieldByNodeType(_0x488a47.type);
-  if (!_0x2689f5) return null;
-  const _0x21a49b = normalizeSceneStateByNode(_0x488a47, _0x488a47[_0x2689f5]),
-    _0x620ead = typeof _0x6cd3b === 'function' ? _0x6cd3b(_0x21a49b, _0x488a47) : _0x6cd3b;
-  if (!_0x620ead) return _0x21a49b;
-  const _0xed02be = normalizeSceneStateByNode(_0x488a47, _0x620ead);
-  return (_0x433ba1.updateNodeData(_0x45c57c, { [_0x2689f5]: _0xed02be }), _0xed02be);
+function writeSceneState(store2, source, handler) {
+  const storeNode2 = getStoreNode(store2, source);
+  if (!storeNode2) return null;
+  const panoramaStateFieldByNodeType2 = getPanoramaStateFieldByNodeType(storeNode2.type);
+  if (!panoramaStateFieldByNodeType2) return null;
+  const sceneStateByNode = normalizeSceneStateByNode(storeNode2, storeNode2[panoramaStateFieldByNodeType2]),
+    enabled = typeof handler === 'function' ? handler(sceneStateByNode, storeNode2) : handler;
+  if (!enabled) return sceneStateByNode;
+  const sceneStateByNode2 = normalizeSceneStateByNode(storeNode2, enabled);
+  return (
+    store2.updateNodeData(source, { [panoramaStateFieldByNodeType2]: sceneStateByNode2 }),
+    sceneStateByNode2
+  );
 }
-function cloneSceneState(_0x48c3ff) {
-  return normalizePanoramaSceneState(_0x48c3ff);
+function cloneSceneState(next) {
+  return normalizePanoramaSceneState(next);
 }
-function pickViewYaw(_0x2398b6) {
-  if (Number.isFinite(_0x2398b6?.yaw)) return _0x2398b6.yaw;
-  if (Number.isFinite(_0x2398b6?.rotation?.y)) return _0x2398b6.rotation.y;
+function pickViewYaw(current) {
+  if (Number.isFinite(current?.yaw)) return current.yaw;
+  if (Number.isFinite(current?.rotation?.y)) return current.rotation.y;
   return 0;
 }
-function pickFacingCameraYaw(_0x182542) {
-  const _0xf45b2e = pickViewYaw(_0x182542) + Math.PI;
-  return Math.atan2(Math.sin(_0xf45b2e), Math.cos(_0xf45b2e));
+function pickFacingCameraYaw(entry) {
+  const viewYaw = pickViewYaw(entry) + Math.PI;
+  return Math.atan2(Math.sin(viewYaw), Math.cos(viewYaw));
 }
-function sanitizeObjectPose(_0x5c7096 = {}) {
-  const _0x38bf8c = {
-      x: Number.isFinite(_0x5c7096?.rotation?.x) ? _0x5c7096.rotation.x : 0,
-      y: Number.isFinite(_0x5c7096?.rotation?.y) ? _0x5c7096.rotation.y : 0,
-      z: Number.isFinite(_0x5c7096?.rotation?.z) ? _0x5c7096.rotation.z : 0,
+function sanitizeObjectPose(box2 = {}) {
+  const record = {
+      x: Number.isFinite(box2?.rotation?.x) ? box2.rotation.x : 0,
+      y: Number.isFinite(box2?.rotation?.y) ? box2.rotation.y : 0,
+      z: Number.isFinite(box2?.rotation?.z) ? box2.rotation.z : 0,
     },
-    _0x2f56cb =
-      Number.isFinite(Number(_0x5c7096?.quaternion?.x)) &&
-      Number.isFinite(Number(_0x5c7096?.quaternion?.y)) &&
-      Number.isFinite(Number(_0x5c7096?.quaternion?.z)) &&
-      Number.isFinite(Number(_0x5c7096?.quaternion?.w)),
-    _0x5b4ff3 = _0x2f56cb
-      ? normalizeQuaternion(_0x5c7096.quaternion, quaternionFromEulerXYZ(_0x38bf8c))
-      : null,
-    _0x49f961 = _0x2f56cb ? eulerFromQuaternionXYZ(_0x5b4ff3) : _0x38bf8c,
-    _0x1b6928 = Number.isFinite(_0x5c7096?.scale)
-      ? Math.max(0.01, Number(_0x5c7096.scale) || 1)
-      : _0x5c7096?.scale &&
-          Number.isFinite(_0x5c7096.scale.x) &&
-          Number.isFinite(_0x5c7096.scale.y) &&
-          Number.isFinite(_0x5c7096.scale.z)
+    payload =
+      Number.isFinite(Number(box2?.quaternion?.x)) &&
+      Number.isFinite(Number(box2?.quaternion?.y)) &&
+      Number.isFinite(Number(box2?.quaternion?.z)) &&
+      Number.isFinite(Number(box2?.quaternion?.w)),
+    quaternion = payload ? normalizeQuaternion(box2.quaternion, quaternionFromEulerXYZ(record)) : null,
+    rotation = payload ? eulerFromQuaternionXYZ(quaternion) : record,
+    scale = Number.isFinite(box2?.scale)
+      ? Math.max(0.01, Number(box2.scale) || 1)
+      : box2?.scale &&
+          Number.isFinite(box2.scale.x) &&
+          Number.isFinite(box2.scale.y) &&
+          Number.isFinite(box2.scale.z)
         ? {
-            x: Math.max(0.01, Number(_0x5c7096.scale.x) || 1),
-            y: Math.max(0.01, Number(_0x5c7096.scale.y) || 1),
-            z: Math.max(0.01, Number(_0x5c7096.scale.z) || 1),
+            x: Math.max(0.01, Number(box2.scale.x) || 1),
+            y: Math.max(0.01, Number(box2.scale.y) || 1),
+            z: Math.max(0.01, Number(box2.scale.z) || 1),
           }
         : null;
   return {
     position: {
-      x: Number.isFinite(_0x5c7096?.position?.x) ? _0x5c7096.position.x : 0,
-      y: Number.isFinite(_0x5c7096?.position?.y) ? _0x5c7096.position.y : 0,
-      z: Number.isFinite(_0x5c7096?.position?.z) ? _0x5c7096.position.z : 0,
+      x: Number.isFinite(box2?.position?.x) ? box2.position.x : 0,
+      y: Number.isFinite(box2?.position?.y) ? box2.position.y : 0,
+      z: Number.isFinite(box2?.position?.z) ? box2.position.z : 0,
     },
-    rotation: _0x49f961,
-    quaternion: _0x5b4ff3,
-    fov: Number.isFinite(_0x5c7096?.fov) ? _0x5c7096.fov : 58,
-    scale: _0x1b6928,
+    rotation: rotation,
+    quaternion: quaternion,
+    fov: Number.isFinite(box2?.fov) ? box2.fov : 58,
+    scale: scale,
   };
 }
-function normalizeQuaternion(_0x4fb819, _0x421df4 = { x: 0, y: 0, z: 0, w: 1 }) {
-  const _0x496882 = Number(_0x4fb819?.x),
-    _0x7880f7 = Number(_0x4fb819?.y),
-    _0x35fd0e = Number(_0x4fb819?.z),
-    _0x19bb05 = Number(_0x4fb819?.w);
-  if (
-    !Number.isFinite(_0x496882) ||
-    !Number.isFinite(_0x7880f7) ||
-    !Number.isFinite(_0x35fd0e) ||
-    !Number.isFinite(_0x19bb05)
-  )
-    return { ..._0x421df4 };
-  const _0x545ab0 = Math.hypot(_0x496882, _0x7880f7, _0x35fd0e, _0x19bb05);
-  if (_0x545ab0 < 0.000001) return { ..._0x421df4 };
+function normalizeQuaternion(box3, args = { x: 0, y: 0, z: 0, w: 1 }) {
+  const x = Number(box3?.x),
+    y = Number(box3?.y),
+    z = Number(box3?.z),
+    w = Number(box3?.w);
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z) || !Number.isFinite(w))
+    return { ...args };
+  const count3 = Math.hypot(x, y, z, w);
+  if (count3 < 0.000001) return { ...args };
   return {
-    x: _0x496882 / _0x545ab0,
-    y: _0x7880f7 / _0x545ab0,
-    z: _0x35fd0e / _0x545ab0,
-    w: _0x19bb05 / _0x545ab0,
+    x: x / count3,
+    y: y / count3,
+    z: z / count3,
+    w: w / count3,
   };
 }
-function quaternionFromEulerYXZ(_0x19cdb0) {
-  const _0xab6948 = Number(_0x19cdb0?.x) || 0,
-    _0x5db88c = Number(_0x19cdb0?.y) || 0,
-    _0x576797 = Number(_0x19cdb0?.z) || 0,
-    _0x59ab65 = Math.cos(_0xab6948 / 2),
-    _0x3213eb = Math.cos(_0x5db88c / 2),
-    _0x4aaa01 = Math.cos(_0x576797 / 2),
-    _0x3c8f13 = Math.sin(_0xab6948 / 2),
-    _0x5c6f78 = Math.sin(_0x5db88c / 2),
-    _0x5442e4 = Math.sin(_0x576797 / 2);
+function quaternionFromEulerYXZ(box4) {
+  const handle = Number(box4?.x) || 0,
+    state = Number(box4?.y) || 0,
+    config = Number(box4?.z) || 0,
+    y2 = Math.cos(handle / 2),
+    scope = Math.cos(state / 2),
+    input = Math.cos(config / 2),
+    x2 = Math.sin(handle / 2),
+    output = Math.sin(state / 2),
+    value2 = Math.sin(config / 2);
   return normalizeQuaternion({
-    x: _0x3c8f13 * _0x3213eb * _0x4aaa01 + _0x59ab65 * _0x5c6f78 * _0x5442e4,
-    y: _0x59ab65 * _0x5c6f78 * _0x4aaa01 - _0x3c8f13 * _0x3213eb * _0x5442e4,
-    z: _0x59ab65 * _0x3213eb * _0x5442e4 - _0x3c8f13 * _0x5c6f78 * _0x4aaa01,
-    w: _0x59ab65 * _0x3213eb * _0x4aaa01 + _0x3c8f13 * _0x5c6f78 * _0x5442e4,
+    x: x2 * scope * input + y2 * output * value2,
+    y: y2 * output * input - x2 * scope * value2,
+    z: y2 * scope * value2 - x2 * output * input,
+    w: y2 * scope * input + x2 * output * value2,
   });
 }
-function eulerFromQuaternionYXZ(_0xbf5ee5) {
-  const _0x5667a9 = normalizeQuaternion(_0xbf5ee5),
-    _0x139da8 = _0x5667a9.x * _0x5667a9.x,
-    _0x3fb163 = _0x5667a9.y * _0x5667a9.y,
-    _0x1e5093 = _0x5667a9.z * _0x5667a9.z,
-    _0x30c8eb = _0x5667a9.x * _0x5667a9.y,
-    _0x44a005 = _0x5667a9.x * _0x5667a9.z,
-    _0x284bf1 = _0x5667a9.y * _0x5667a9.z,
-    _0x3e15e9 = _0x5667a9.x * _0x5667a9.w,
-    _0xf8d679 = _0x5667a9.y * _0x5667a9.w,
-    _0x395ed7 = _0x5667a9.z * _0x5667a9.w,
-    _0x1ad077 = 1 - 2 * (_0x3fb163 + _0x1e5093),
-    _0x3f8bc2 = 2 * (_0x44a005 + _0xf8d679),
-    _0x118ae2 = 2 * (_0x30c8eb + _0x395ed7),
-    _0x107bc3 = 1 - 2 * (_0x139da8 + _0x1e5093),
-    _0x1199fc = 2 * (_0x284bf1 - _0x3e15e9),
-    _0x1c777f = 2 * (_0x44a005 - _0xf8d679),
-    _0x2aaa1e = 1 - 2 * (_0x139da8 + _0x3fb163),
-    _0x12ed82 = Math.asin(-clamp(_0x1199fc, -1, 1));
-  if (Math.abs(_0x1199fc) < 0.9999999)
-    return { x: _0x12ed82, y: Math.atan2(_0x3f8bc2, _0x2aaa1e), z: Math.atan2(_0x118ae2, _0x107bc3) };
-  return { x: _0x12ed82, y: Math.atan2(-_0x1c777f, _0x1ad077), z: 0 };
+function eulerFromQuaternionYXZ(value3) {
+  const box5 = normalizeQuaternion(value3),
+    value4 = box5.x * box5.x,
+    value5 = box5.y * box5.y,
+    value6 = box5.z * box5.z,
+    value7 = box5.x * box5.y,
+    value8 = box5.x * box5.z,
+    value9 = box5.y * box5.z,
+    value10 = box5.x * box5.w,
+    value11 = box5.y * box5.w,
+    value12 = box5.z * box5.w,
+    value13 = 1 - 2 * (value5 + value6),
+    value14 = 2 * (value8 + value11),
+    value15 = 2 * (value7 + value12),
+    value16 = 1 - 2 * (value4 + value6),
+    value17 = 2 * (value9 - value10),
+    value18 = 2 * (value8 - value11),
+    value19 = 1 - 2 * (value4 + value5),
+    x3 = Math.asin(-clamp(value17, -1, 1));
+  if (Math.abs(value17) < 0.9999999)
+    return { x: x3, y: Math.atan2(value14, value19), z: Math.atan2(value15, value16) };
+  return { x: x3, y: Math.atan2(-value18, value13), z: 0 };
 }
-function quaternionFromEulerXYZ(_0x1ef8b2) {
-  const _0x5c581e = Number(_0x1ef8b2?.x) || 0,
-    _0x50e69b = Number(_0x1ef8b2?.y) || 0,
-    _0x55cbc6 = Number(_0x1ef8b2?.z) || 0,
-    _0x37ea85 = Math.cos(_0x5c581e / 2),
-    _0x4007b4 = Math.cos(_0x50e69b / 2),
-    _0x32ea62 = Math.cos(_0x55cbc6 / 2),
-    _0x31d3c3 = Math.sin(_0x5c581e / 2),
-    _0x61811d = Math.sin(_0x50e69b / 2),
-    _0x5be761 = Math.sin(_0x55cbc6 / 2);
+function quaternionFromEulerXYZ(box6) {
+  const value20 = Number(box6?.x) || 0,
+    value21 = Number(box6?.y) || 0,
+    value22 = Number(box6?.z) || 0,
+    y3 = Math.cos(value20 / 2),
+    value23 = Math.cos(value21 / 2),
+    value24 = Math.cos(value22 / 2),
+    x4 = Math.sin(value20 / 2),
+    value25 = Math.sin(value21 / 2),
+    value26 = Math.sin(value22 / 2);
   return normalizeQuaternion({
-    x: _0x31d3c3 * _0x4007b4 * _0x32ea62 + _0x37ea85 * _0x61811d * _0x5be761,
-    y: _0x37ea85 * _0x61811d * _0x32ea62 - _0x31d3c3 * _0x4007b4 * _0x5be761,
-    z: _0x37ea85 * _0x4007b4 * _0x5be761 + _0x31d3c3 * _0x61811d * _0x32ea62,
-    w: _0x37ea85 * _0x4007b4 * _0x32ea62 - _0x31d3c3 * _0x61811d * _0x5be761,
+    x: x4 * value23 * value24 + y3 * value25 * value26,
+    y: y3 * value25 * value24 - x4 * value23 * value26,
+    z: y3 * value23 * value26 + x4 * value25 * value24,
+    w: y3 * value23 * value24 - x4 * value25 * value26,
   });
 }
-function eulerFromQuaternionXYZ(_0x1fe641) {
-  const _0x5c233d = normalizeQuaternion(_0x1fe641),
-    _0x41e034 = _0x5c233d.x * _0x5c233d.x,
-    _0x4fb11c = _0x5c233d.y * _0x5c233d.y,
-    _0x2cc5df = _0x5c233d.z * _0x5c233d.z,
-    _0x301e5e = _0x5c233d.x * _0x5c233d.y,
-    _0x1621a = _0x5c233d.x * _0x5c233d.z,
-    _0x2b8e30 = _0x5c233d.y * _0x5c233d.z,
-    _0x46c08c = _0x5c233d.x * _0x5c233d.w,
-    _0x563312 = _0x5c233d.y * _0x5c233d.w,
-    _0x3f6681 = _0x5c233d.z * _0x5c233d.w,
-    _0x327fa0 = 1 - 2 * (_0x4fb11c + _0x2cc5df),
-    _0x1276f2 = 2 * (_0x301e5e - _0x3f6681),
-    _0x2de6a0 = 2 * (_0x1621a + _0x563312),
-    _0x41da66 = 2 * (_0x2b8e30 - _0x46c08c),
-    _0x100283 = 1 - 2 * (_0x41e034 + _0x4fb11c),
-    _0x3b09db = 2 * (_0x2b8e30 + _0x46c08c),
-    _0x2e4050 = 1 - 2 * (_0x41e034 + _0x2cc5df),
-    _0x299602 = Math.asin(clamp(_0x2de6a0, -1, 1));
-  if (Math.abs(_0x2de6a0) < 0.9999999)
-    return { x: Math.atan2(-_0x41da66, _0x100283), y: _0x299602, z: Math.atan2(-_0x1276f2, _0x327fa0) };
-  return { x: Math.atan2(_0x3b09db, _0x2e4050), y: _0x299602, z: 0 };
+function eulerFromQuaternionXYZ(value27) {
+  const box7 = normalizeQuaternion(value27),
+    value28 = box7.x * box7.x,
+    value29 = box7.y * box7.y,
+    value30 = box7.z * box7.z,
+    value31 = box7.x * box7.y,
+    value32 = box7.x * box7.z,
+    value33 = box7.y * box7.z,
+    value34 = box7.x * box7.w,
+    value35 = box7.y * box7.w,
+    value36 = box7.z * box7.w,
+    value37 = 1 - 2 * (value29 + value30),
+    value38 = 2 * (value31 - value36),
+    value39 = 2 * (value32 + value35),
+    value40 = 2 * (value33 - value34),
+    value41 = 1 - 2 * (value28 + value29),
+    value42 = 2 * (value33 + value34),
+    value43 = 1 - 2 * (value28 + value30),
+    y4 = Math.asin(clamp(value39, -1, 1));
+  if (Math.abs(value39) < 0.9999999)
+    return { x: Math.atan2(-value40, value41), y: y4, z: Math.atan2(-value38, value37) };
+  return { x: Math.atan2(value42, value43), y: y4, z: 0 };
 }
-function sanitizeCameraPose(_0x587304 = {}) {
-  const _0x1a0521 = {
-      x: Number.isFinite(_0x587304?.position?.x) ? _0x587304.position.x : 0,
-      y: Number.isFinite(_0x587304?.position?.y) ? _0x587304.position.y : 0,
-      z: Number.isFinite(_0x587304?.position?.z) ? _0x587304.position.z : 0,
+function sanitizeCameraPose(options2 = {}) {
+  const position = {
+      x: Number.isFinite(options2?.position?.x) ? options2.position.x : 0,
+      y: Number.isFinite(options2?.position?.y) ? options2.position.y : 0,
+      z: Number.isFinite(options2?.position?.z) ? options2.position.z : 0,
     },
-    _0x339228 = {
-      x: Number.isFinite(_0x587304?.rotation?.x) ? _0x587304.rotation.x : 0,
-      y: Number.isFinite(_0x587304?.rotation?.y) ? _0x587304.rotation.y : 0,
-      z: Number.isFinite(_0x587304?.rotation?.z) ? _0x587304.rotation.z : 0,
+    value44 = {
+      x: Number.isFinite(options2?.rotation?.x) ? options2.rotation.x : 0,
+      y: Number.isFinite(options2?.rotation?.y) ? options2.rotation.y : 0,
+      z: Number.isFinite(options2?.rotation?.z) ? options2.rotation.z : 0,
     },
-    _0x301762 =
-      Number.isFinite(Number(_0x587304?.quaternion?.x)) &&
-      Number.isFinite(Number(_0x587304?.quaternion?.y)) &&
-      Number.isFinite(Number(_0x587304?.quaternion?.z)) &&
-      Number.isFinite(Number(_0x587304?.quaternion?.w)),
-    _0x3f089a = _0x301762
-      ? normalizeQuaternion(_0x587304.quaternion, quaternionFromEulerYXZ(_0x339228))
-      : quaternionFromEulerYXZ(_0x339228),
-    _0x3b7326 = _0x301762 ? eulerFromQuaternionYXZ(_0x3f089a) : _0x339228;
+    value45 =
+      Number.isFinite(Number(options2?.quaternion?.x)) &&
+      Number.isFinite(Number(options2?.quaternion?.y)) &&
+      Number.isFinite(Number(options2?.quaternion?.z)) &&
+      Number.isFinite(Number(options2?.quaternion?.w)),
+    quaternion2 = value45
+      ? normalizeQuaternion(options2.quaternion, quaternionFromEulerYXZ(value44))
+      : quaternionFromEulerYXZ(value44),
+    rotation2 = value45 ? eulerFromQuaternionYXZ(quaternion2) : value44;
   return {
-    position: _0x1a0521,
-    rotation: _0x3b7326,
-    quaternion: _0x3f089a,
-    focalLength: Object.prototype.hasOwnProperty.call(_0x587304 || {}, 'focalLength')
-      ? clampSceneFocalLength(_0x587304.focalLength)
-      : Object.prototype.hasOwnProperty.call(_0x587304 || {}, 'fov')
+    position: position,
+    rotation: rotation2,
+    quaternion: quaternion2,
+    focalLength: Object.prototype.hasOwnProperty.call(options2 || {}, 'focalLength')
+      ? clampSceneFocalLength(options2.focalLength)
+      : Object.prototype.hasOwnProperty.call(options2 || {}, 'fov')
         ? SCENE_DEFAULT_FOCAL_LENGTH_MM
         : SCENE_DEFAULT_FOCAL_LENGTH_MM,
   };
 }
-function normalizeCameraSlot(_0xcef21f) {
-  const _0x52c981 = Number(_0xcef21f);
-  if (!Number.isInteger(_0x52c981)) return null;
-  if (_0x52c981 < 1 || _0x52c981 > PANORAMA_SCENE_CAMERA_LIMIT) return null;
-  return _0x52c981;
+function normalizeCameraSlot(value46) {
+  const count4 = Number(value46);
+  if (!Number.isInteger(count4)) return null;
+  if (count4 < 1 || count4 > PANORAMA_SCENE_CAMERA_LIMIT) return null;
+  return count4;
 }
-function toCameraSlotLabel(_0x4b4199) {
-  return String(Number(_0x4b4199) || 1);
+function toCameraSlotLabel(value47) {
+  return String(Number(value47) || 1);
 }
-function resolveCameraSlotEntries(_0x245309 = []) {
-  const _0x26b2bc = Array.isArray(_0x245309) ? _0x245309 : [],
-    _0xb09014 = new Set(),
-    _0x322c62 = [];
-  _0x26b2bc.forEach((_0xb9024b) => {
-    const _0x3a9f77 = normalizeCameraSlot(_0xb9024b?.slot);
-    if (!_0x3a9f77 || _0xb09014.has(_0x3a9f77)) return;
-    (_0xb09014.add(_0x3a9f77), _0x322c62.push({ camera: _0xb9024b, slot: _0x3a9f77 }));
+function resolveCameraSlotEntries(list = []) {
+  const list2 = Array.isArray(list) ? list : [],
+    map = new Set(),
+    list3 = [];
+  list2.forEach((camera) => {
+    const slot = normalizeCameraSlot(camera?.slot);
+    if (!slot || map.has(slot)) return;
+    (map.add(slot), list3.push({ camera: camera, slot: slot }));
   });
-  const _0x3f0f7b = () => {
-    for (let _0x519a48 = 1; _0x519a48 <= PANORAMA_SCENE_CAMERA_LIMIT; _0x519a48 += 1) {
-      if (!_0xb09014.has(_0x519a48)) return (_0xb09014.add(_0x519a48), _0x519a48);
+  const run = () => {
+    for (let value48 = 1; value48 <= PANORAMA_SCENE_CAMERA_LIMIT; value48 += 1) {
+      if (!map.has(value48)) return (map.add(value48), value48);
     }
     return null;
   };
   return (
-    _0x26b2bc.forEach((_0x39bf97) => {
-      if (_0x322c62.some((_0x33d61c) => _0x33d61c.camera?.id === _0x39bf97?.id)) return;
-      const _0x17a37d = _0x3f0f7b();
-      if (!_0x17a37d) return;
-      _0x322c62.push({ camera: _0x39bf97, slot: _0x17a37d });
+    list2.forEach((camera2) => {
+      if (list3.some((item2) => item2.camera?.id === camera2?.id)) return;
+      const slot2 = run();
+      if (!slot2) return;
+      list3.push({ camera: camera2, slot: slot2 });
     }),
-    _0x322c62.sort((_0x1cbffb, _0x268354) => _0x1cbffb.slot - _0x268354.slot)
+    list3.sort((item3, value49) => item3.slot - value49.slot)
   );
 }
-function resolveFirstFreeCameraSlot(_0x40f5e2 = []) {
-  const _0x52655f = new Set(resolveCameraSlotEntries(_0x40f5e2).map((_0xc1c3e6) => _0xc1c3e6.slot));
-  for (let _0x482811 = 1; _0x482811 <= PANORAMA_SCENE_CAMERA_LIMIT; _0x482811 += 1) {
-    if (!_0x52655f.has(_0x482811)) return _0x482811;
+function resolveFirstFreeCameraSlot(list4 = []) {
+  const map2 = new Set(resolveCameraSlotEntries(list4).map((item4) => item4.slot));
+  for (let value50 = 1; value50 <= PANORAMA_SCENE_CAMERA_LIMIT; value50 += 1) {
+    if (!map2.has(value50)) return value50;
   }
   return null;
 }
-function resolveCameraBySlot(_0x47b3ad = [], _0x49f65e) {
-  const _0xcd7052 = normalizeCameraSlot(_0x49f65e);
-  if (!_0xcd7052) return null;
-  const _0xcb3441 = resolveCameraSlotEntries(_0x47b3ad).find((_0x7d6d36) => _0x7d6d36.slot === _0xcd7052);
-  return _0xcb3441 ? { camera: _0xcb3441.camera, slot: _0xcb3441.slot } : null;
+function resolveCameraBySlot(list5 = [], value51) {
+  const cameraSlot = normalizeCameraSlot(value51);
+  if (!cameraSlot) return null;
+  const camera3 = resolveCameraSlotEntries(list5).find((item5) => item5.slot === cameraSlot);
+  return camera3 ? { camera: camera3.camera, slot: camera3.slot } : null;
 }
-function normalizeScaleVector(_0x24eddb, _0x2625c5 = 1) {
-  if (Number.isFinite(_0x24eddb)) {
-    const _0x586011 = Math.max(0.01, Number(_0x24eddb) || Number(_0x2625c5) || 1);
-    return { x: _0x586011, y: _0x586011, z: _0x586011 };
+function normalizeScaleVector(box8, value52 = 1) {
+  if (Number.isFinite(box8)) {
+    const x5 = Math.max(0.01, Number(box8) || Number(value52) || 1);
+    return { x: x5, y: x5, z: x5 };
   }
-  if (
-    _0x24eddb &&
-    Number.isFinite(_0x24eddb.x) &&
-    Number.isFinite(_0x24eddb.y) &&
-    Number.isFinite(_0x24eddb.z)
-  )
+  if (box8 && Number.isFinite(box8.x) && Number.isFinite(box8.y) && Number.isFinite(box8.z))
     return {
-      x: Math.max(0.01, Number(_0x24eddb.x) || 1),
-      y: Math.max(0.01, Number(_0x24eddb.y) || 1),
-      z: Math.max(0.01, Number(_0x24eddb.z) || 1),
+      x: Math.max(0.01, Number(box8.x) || 1),
+      y: Math.max(0.01, Number(box8.y) || 1),
+      z: Math.max(0.01, Number(box8.z) || 1),
     };
-  const _0x250992 = Math.max(0.01, Number(_0x2625c5) || 1);
-  return { x: _0x250992, y: _0x250992, z: _0x250992 };
+  const x6 = Math.max(0.01, Number(value52) || 1);
+  return { x: x6, y: x6, z: x6 };
 }
-function composeCompatibleScale(_0x196203, _0x184387 = 1) {
-  if (_0x196203 == null) return _0x184387;
-  if (Number.isFinite(_0x196203)) return Math.max(0.01, Math.min(8, Number(_0x196203) || 1));
-  const _0x2aa6a7 = normalizeScaleVector(_0x196203, _0x184387),
-    _0x27f2c5 = 0.0001;
-  if (Math.abs(_0x2aa6a7.x - _0x2aa6a7.y) < _0x27f2c5 && Math.abs(_0x2aa6a7.y - _0x2aa6a7.z) < _0x27f2c5)
-    return Math.max(0.01, Math.min(8, (_0x2aa6a7.x + _0x2aa6a7.y + _0x2aa6a7.z) / 3));
+function composeCompatibleScale(value53, value54 = 1) {
+  if (value53 == null) return value54;
+  if (Number.isFinite(value53)) return Math.max(0.01, Math.min(8, Number(value53) || 1));
+  const box9 = normalizeScaleVector(value53, value54),
+    value55 = 0.0001;
+  if (Math.abs(box9.x - box9.y) < value55 && Math.abs(box9.y - box9.z) < value55)
+    return Math.max(0.01, Math.min(8, (box9.x + box9.y + box9.z) / 3));
   return {
-    x: Math.max(0.01, Math.min(8, _0x2aa6a7.x)),
-    y: Math.max(0.01, Math.min(8, _0x2aa6a7.y)),
-    z: Math.max(0.01, Math.min(8, _0x2aa6a7.z)),
+    x: Math.max(0.01, Math.min(8, box9.x)),
+    y: Math.max(0.01, Math.min(8, box9.y)),
+    z: Math.max(0.01, Math.min(8, box9.z)),
   };
 }
-function clamp(_0x2a78d9, _0x79f25b, _0x469652) {
-  return Math.min(_0x469652, Math.max(_0x79f25b, _0x2a78d9));
+function clamp(value56, value57, value58) {
+  return Math.min(value58, Math.max(value57, value56));
 }
-function computeCollapsedDimensions(_0x334ee9, _0x49199a) {
-  const _0x23e625 = Math.max(180, Number(_0x334ee9) || PANORAMA_SCENE_DEFAULT_SIZE.width),
-    _0x455f29 = Math.max(140, Number(_0x49199a) || PANORAMA_SCENE_DEFAULT_SIZE.height),
-    _0x6f8a9b = Math.min(_0x23e625, _0x455f29),
-    _0x2c4f37 =
-      _0x6f8a9b > PANORAMA_SCENE_COLLAPSED_MAX_SIZE ? PANORAMA_SCENE_COLLAPSED_MAX_SIZE / _0x6f8a9b : 1;
-  return { width: Math.round(_0x23e625 * _0x2c4f37), height: Math.round(_0x455f29 * _0x2c4f37) };
+function computeCollapsedDimensions(value59, value60) {
+  const value61 = Math.max(180, Number(value59) || PANORAMA_SCENE_DEFAULT_SIZE.width),
+    value62 = Math.max(140, Number(value60) || PANORAMA_SCENE_DEFAULT_SIZE.height),
+    value63 = Math.min(value61, value62),
+    value64 = value63 > PANORAMA_SCENE_COLLAPSED_MAX_SIZE ? PANORAMA_SCENE_COLLAPSED_MAX_SIZE / value63 : 1;
+  return { width: Math.round(value61 * value64), height: Math.round(value62 * value64) };
 }
-function getSelectedObject(_0x13559e) {
-  const { selectedObjectType: _0x625e8e, selectedObjectId: _0x529645 } = _0x13559e?.selection || {};
-  if (!_0x625e8e || !_0x529645) return null;
-  const _0x282253 = getSceneObjectList(_0x13559e, _0x625e8e),
-    _0x3133e2 = _0x282253.find((_0x35db85) => _0x35db85.id === _0x529645) || null;
-  if (!_0x3133e2) return null;
-  return { objectType: _0x625e8e, item: _0x3133e2 };
+function getSelectedObject(value65) {
+  const { selectedObjectType: selectedObjectType, selectedObjectId: selectedObjectId } =
+    value65?.selection || {};
+  if (!selectedObjectType || !selectedObjectId) return null;
+  const list6 = getSceneObjectList(value65, selectedObjectType),
+    item6 = list6.find((item7) => item7.id === selectedObjectId) || null;
+  if (!item6) return null;
+  return { objectType: selectedObjectType, item: item6 };
 }
-function getSceneObjectList(_0x35a61c, _0x252c50) {
-  if (_0x252c50 === 'camera') return Array.isArray(_0x35a61c?.cameras) ? _0x35a61c.cameras : [];
-  if (_0x252c50 === 'cube') return Array.isArray(_0x35a61c?.cubes) ? _0x35a61c.cubes : [];
-  return Array.isArray(_0x35a61c?.mannequins) ? _0x35a61c.mannequins : [];
+function getSceneObjectList(value66, value67) {
+  if (value67 === 'camera') return Array.isArray(value66?.cameras) ? value66.cameras : [];
+  if (value67 === 'cube') return Array.isArray(value66?.cubes) ? value66.cubes : [];
+  return Array.isArray(value66?.mannequins) ? value66.mannequins : [];
 }
-function getSceneObjectHeightOffset(_0x5dc86f) {
-  if (_0x5dc86f === 'cube') return 0;
-  if (_0x5dc86f === 'mannequin') return 1.1;
+function getSceneObjectHeightOffset(value68) {
+  if (value68 === 'cube') return 0;
+  if (value68 === 'mannequin') return 1.1;
   return 0;
 }
-function getSelectionPoolByType(_0x2636ff, _0x35989a) {
-  if (_0x35989a === 'cube') return Array.isArray(_0x2636ff?.cubes) ? _0x2636ff.cubes : [];
-  if (_0x35989a === 'mannequin') return Array.isArray(_0x2636ff?.mannequins) ? _0x2636ff.mannequins : [];
+function getSelectionPoolByType(value69, value70) {
+  if (value70 === 'cube') return Array.isArray(value69?.cubes) ? value69.cubes : [];
+  if (value70 === 'mannequin') return Array.isArray(value69?.mannequins) ? value69.mannequins : [];
   return [];
 }
-function normalizeSelectionObjectsInput(_0x3f91bd, _0x1c086f = []) {
-  const _0x1c125e = new Set(),
-    _0x5cc425 = [],
-    _0x316c53 = Array.isArray(_0x1c086f) ? _0x1c086f : [];
+function normalizeSelectionObjectsInput(value71, value72 = []) {
+  const map3 = new Set(),
+    list7 = [],
+    list8 = Array.isArray(value72) ? value72 : [];
   return (
-    _0x316c53.forEach((_0xd11f8c) => {
-      const _0x531fca =
-          _0xd11f8c?.objectType === 'cube' || _0xd11f8c?.objectType === 'mannequin'
-            ? _0xd11f8c.objectType
-            : null,
-        _0x2ccfea = String(_0xd11f8c?.objectId || '').trim();
-      if (!_0x531fca || !_0x2ccfea) return;
-      const _0x4eba0 = getSelectionPoolByType(_0x3f91bd, _0x531fca).some(
-        (_0x5e3054) => _0x5e3054.id === _0x2ccfea,
+    list8.forEach((item8) => {
+      const objectType =
+          item8?.objectType === 'cube' || item8?.objectType === 'mannequin' ? item8.objectType : null,
+        objectId = String(item8?.objectId || '').trim();
+      if (!objectType || !objectId) return;
+      const selectionPoolByType = getSelectionPoolByType(value71, objectType).some(
+        (item9) => item9.id === objectId,
       );
-      if (!_0x4eba0) return;
-      const _0x213c2e = _0x531fca + ':' + _0x2ccfea;
-      if (_0x1c125e.has(_0x213c2e)) return;
-      (_0x1c125e.add(_0x213c2e), _0x5cc425.push({ objectType: _0x531fca, objectId: _0x2ccfea }));
+      if (!selectionPoolByType) return;
+      const value73 = objectType + ':' + objectId;
+      if (map3.has(value73)) return;
+      (map3.add(value73), list7.push({ objectType: objectType, objectId: objectId }));
     }),
-    _0x5cc425
+    list7
   );
 }
-function collectSelectionObjects(_0xd9a055) {
-  const _0x2fbed8 = normalizeSelectionObjectsInput(_0xd9a055, _0xd9a055?.selection?.selectedObjects || []);
-  if (_0x2fbed8.length > 0) return _0x2fbed8;
-  const _0x48ae54 =
-    _0xd9a055?.selection?.selectedObjectType === 'cube' ||
-    _0xd9a055?.selection?.selectedObjectType === 'mannequin'
-      ? _0xd9a055.selection.selectedObjectType
+function collectSelectionObjects(value74) {
+  const list9 = normalizeSelectionObjectsInput(value74, value74?.selection?.selectedObjects || []);
+  if (list9.length > 0) return list9;
+  const objectType2 =
+    value74?.selection?.selectedObjectType === 'cube' ||
+    value74?.selection?.selectedObjectType === 'mannequin'
+      ? value74.selection.selectedObjectType
       : null;
-  if (!_0x48ae54) return [];
-  const _0x5b332c = Array.isArray(_0xd9a055?.selection?.selectedObjectIds)
-    ? _0xd9a055.selection.selectedObjectIds
-    : _0xd9a055?.selection?.selectedObjectId
-      ? [_0xd9a055.selection.selectedObjectId]
+  if (!objectType2) return [];
+  const list10 = Array.isArray(value74?.selection?.selectedObjectIds)
+    ? value74.selection.selectedObjectIds
+    : value74?.selection?.selectedObjectId
+      ? [value74.selection.selectedObjectId]
       : [];
   return normalizeSelectionObjectsInput(
-    _0xd9a055,
-    _0x5b332c.map((_0x205b06) => ({ objectType: _0x48ae54, objectId: _0x205b06 })),
+    value74,
+    list10.map((objectId2) => ({ objectType: objectType2, objectId: objectId2 })),
   );
 }
-function clearSelection(_0x4c3090) {
-  ((_0x4c3090.selection.selectedObjectType = null),
-    (_0x4c3090.selection.selectedObjectId = null),
-    (_0x4c3090.selection.selectedObjectIds = []),
-    (_0x4c3090.selection.selectedObjects = []),
-    (_0x4c3090.selection.selectedGroupId = null));
+function clearSelection(value75) {
+  ((value75.selection.selectedObjectType = null),
+    (value75.selection.selectedObjectId = null),
+    (value75.selection.selectedObjectIds = []),
+    (value75.selection.selectedObjects = []),
+    (value75.selection.selectedGroupId = null));
 }
 function setSelectionFromObjects(
-  _0x41ea37,
-  _0x314e51,
+  value76,
+  value77,
   {
     preferredGroupId: preferredGroupId = null,
     preferredActiveType: preferredActiveType = null,
     preferredActiveId: preferredActiveId = null,
   } = {},
 ) {
-  const _0x494d2a = normalizeSelectionObjectsInput(_0x41ea37, _0x314e51);
-  if (_0x494d2a.length === 0) {
-    clearSelection(_0x41ea37);
+  const list11 = normalizeSelectionObjectsInput(value76, value77);
+  if (list11.length === 0) {
+    clearSelection(value76);
     return;
   }
-  const _0x494969 = preferredGroupId ? String(preferredGroupId) : null;
-  if (_0x494969) {
-    const _0x68658f = (_0x41ea37.groups || []).find((_0x48b831) => _0x48b831.id === _0x494969);
-    if (_0x68658f) {
-      const _0x584028 = _0x494d2a
-          .filter((_0x17f1fb) => _0x17f1fb.objectType === 'mannequin')
-          .map((_0x3e53f4) => _0x3e53f4.objectId),
-        _0x4a282e = new Set(_0x584028),
-        _0x1d1d36 =
-          _0x494d2a.every((_0x1d7504) => _0x1d7504.objectType === 'mannequin') &&
-          _0x68658f.memberIds.length > 0 &&
-          _0x68658f.memberIds.length === _0x584028.length &&
-          _0x68658f.memberIds.every((_0x3e1558) => _0x4a282e.has(_0x3e1558));
-      if (_0x1d1d36) {
-        ((_0x41ea37.selection.selectedObjectType = 'mannequin'),
-          (_0x41ea37.selection.selectedObjectId = _0x68658f.memberIds[0] || null),
-          (_0x41ea37.selection.selectedObjectIds = [..._0x68658f.memberIds]),
-          (_0x41ea37.selection.selectedObjects = _0x68658f.memberIds.map((_0x1e9539) => ({
+  const value78 = preferredGroupId ? String(preferredGroupId) : null;
+  if (value78) {
+    const args2 = (value76.groups || []).find((item10) => item10.id === value78);
+    if (args2) {
+      const list12 = list11
+          .filter((item11) => item11.objectType === 'mannequin')
+          .map((item12) => item12.objectId),
+        map4 = new Set(list12),
+        value79 =
+          list11.every((item13) => item13.objectType === 'mannequin') &&
+          args2.memberIds.length > 0 &&
+          args2.memberIds.length === list12.length &&
+          args2.memberIds.every((item14) => map4.has(item14));
+      if (value79) {
+        ((value76.selection.selectedObjectType = 'mannequin'),
+          (value76.selection.selectedObjectId = args2.memberIds[0] || null),
+          (value76.selection.selectedObjectIds = [...args2.memberIds]),
+          (value76.selection.selectedObjects = args2.memberIds.map((objectId3) => ({
             objectType: 'mannequin',
-            objectId: _0x1e9539,
+            objectId: objectId3,
           }))),
-          (_0x41ea37.selection.selectedGroupId = _0x494969));
+          (value76.selection.selectedGroupId = value78));
         return;
       }
     }
   }
-  const _0x42fff1 =
+  const value80 =
       preferredActiveType === 'cube' || preferredActiveType === 'mannequin' ? preferredActiveType : null,
-    _0x11f0ec =
-      _0x42fff1 && _0x494d2a.some((_0x500972) => _0x500972.objectType === _0x42fff1)
-        ? _0x42fff1
-        : _0x494d2a[0].objectType,
-    _0xd6c2ad = _0x494d2a
-      .filter((_0x5c498f) => _0x5c498f.objectType === _0x11f0ec)
-      .map((_0xd1c3c2) => _0xd1c3c2.objectId),
-    _0x925a53 =
+    value81 =
+      value80 && list11.some((item15) => item15.objectType === value80) ? value80 : list11[0].objectType,
+    value82 = list11.filter((item16) => item16.objectType === value81).map((item17) => item17.objectId),
+    value83 =
       preferredActiveId &&
-      _0x494d2a.some(
-        (_0x4417e9) => _0x4417e9.objectType === _0x11f0ec && _0x4417e9.objectId === preferredActiveId,
-      )
+      list11.some((item18) => item18.objectType === value81 && item18.objectId === preferredActiveId)
         ? preferredActiveId
-        : _0xd6c2ad[0] || null;
-  ((_0x41ea37.selection.selectedObjectType = _0x11f0ec),
-    (_0x41ea37.selection.selectedObjectId = _0x925a53),
-    (_0x41ea37.selection.selectedObjectIds = _0xd6c2ad),
-    (_0x41ea37.selection.selectedObjects = _0x494d2a),
-    (_0x41ea37.selection.selectedGroupId = null));
+        : value82[0] || null;
+  ((value76.selection.selectedObjectType = value81),
+    (value76.selection.selectedObjectId = value83),
+    (value76.selection.selectedObjectIds = value82),
+    (value76.selection.selectedObjects = list11),
+    (value76.selection.selectedGroupId = null));
 }
-function setSingleSelection(_0x5e0a0f, _0x3940f7, _0x553e4a) {
+function setSingleSelection(value84, objectType3, objectId4) {
   setSelectionFromObjects(
-    _0x5e0a0f,
-    _0x3940f7 && _0x553e4a ? [{ objectType: _0x3940f7, objectId: _0x553e4a }] : [],
-    { preferredActiveType: _0x3940f7, preferredActiveId: _0x553e4a || null },
+    value84,
+    objectType3 && objectId4 ? [{ objectType: objectType3, objectId: objectId4 }] : [],
+    { preferredActiveType: objectType3, preferredActiveId: objectId4 || null },
   );
 }
-function finalizeSelectedObjectRemoval(_0x38c335, _0x429ffc, _0x378439) {
-  const _0x32e1e4 = cloneSceneState(_0x38c335),
-    _0x30a549 = collectSelectionObjects(_0x32e1e4).filter(
-      (_0x1e5f63) => !(_0x1e5f63.objectType === _0x429ffc && _0x1e5f63.objectId === _0x378439),
+function finalizeSelectedObjectRemoval(value85, value86, value87) {
+  const preferredActiveType2 = cloneSceneState(value85),
+    selectionObjects = collectSelectionObjects(preferredActiveType2).filter(
+      (item19) => !(item19.objectType === value86 && item19.objectId === value87),
     );
   return (
-    setSelectionFromObjects(_0x32e1e4, _0x30a549, {
-      preferredActiveType: _0x32e1e4?.selection?.selectedObjectType || null,
-      preferredActiveId: _0x32e1e4?.selection?.selectedObjectId || null,
-      preferredGroupId: _0x32e1e4?.selection?.selectedGroupId || null,
+    setSelectionFromObjects(preferredActiveType2, selectionObjects, {
+      preferredActiveType: preferredActiveType2?.selection?.selectedObjectType || null,
+      preferredActiveId: preferredActiveType2?.selection?.selectedObjectId || null,
+      preferredGroupId: preferredActiveType2?.selection?.selectedGroupId || null,
     }),
-    _0x429ffc === 'camera' &&
-      _0x32e1e4.viewport.activeCameraId === _0x378439 &&
-      ((_0x32e1e4.viewport.activeCameraId = null), (_0x32e1e4.viewport.activeView = 'default')),
-    _0x32e1e4
+    value86 === 'camera' &&
+      preferredActiveType2.viewport.activeCameraId === value87 &&
+      ((preferredActiveType2.viewport.activeCameraId = null),
+      (preferredActiveType2.viewport.activeView = 'default')),
+    preferredActiveType2
   );
 }
-function pruneGroups(_0xa4cfd1, _0x35ca1d = []) {
-  if (!Array.isArray(_0xa4cfd1)) return [];
-  if (!Array.isArray(_0x35ca1d) || _0x35ca1d.length === 0) return _0xa4cfd1;
-  const _0x4a2580 = new Set(_0x35ca1d);
-  return _0xa4cfd1
-    .map((_0x50ed4a) => ({
-      ..._0x50ed4a,
-      memberIds: Array.isArray(_0x50ed4a.memberIds)
-        ? _0x50ed4a.memberIds.filter((_0x407eae) => !_0x4a2580.has(_0x407eae))
-        : [],
+function pruneGroups(list13, list14 = []) {
+  if (!Array.isArray(list13)) return [];
+  if (!Array.isArray(list14) || list14.length === 0) return list13;
+  const map5 = new Set(list14);
+  return list13
+    .map((args3) => ({
+      ...args3,
+      memberIds: Array.isArray(args3.memberIds) ? args3.memberIds.filter((item20) => !map5.has(item20)) : [],
     }))
-    .filter((_0x282068) => _0x282068.memberIds.length > 0);
+    .filter((item21) => item21.memberIds.length > 0);
 }
-function resolveGroupByMember(_0x651480, _0x3c0190, _0x578f6a) {
-  if (_0x3c0190 !== 'mannequin' || !_0x578f6a) return null;
-  const _0x3e0944 = Array.isArray(_0x651480?.groups) ? _0x651480.groups : [];
-  return _0x3e0944.find((_0x299da3) => _0x299da3.memberIds?.includes(_0x578f6a)) || null;
+function resolveGroupByMember(value88, value89, enabled2) {
+  if (value89 !== 'mannequin' || !enabled2) return null;
+  const list15 = Array.isArray(value88?.groups) ? value88.groups : [];
+  return list15.find((item22) => item22.memberIds?.includes(enabled2)) || null;
 }
-function createNodeActionContext(_0x2b6ac0 = {}) {
+function createNodeActionContext(storeInstance2 = {}) {
   return {
-    storeInstance: _0x2b6ac0.storeInstance || appStore,
+    storeInstance: storeInstance2.storeInstance || appStore,
     getCurrentProjectId:
-      _0x2b6ac0.getCurrentProjectId || (() => window.currentProjectId || 'default_v2_project'),
+      storeInstance2.getCurrentProjectId || (() => window.currentProjectId || 'default_v2_project'),
   };
 }
 const DEFAULT_NODE_SPAWN_SPACING = 120,
   PANORAMA_360_IMAGE_SOURCE_TYPES = new Set(['source-image', 'ai-image', 'image']);
 function resolveNodeSpawnSpacing() {
-  const _0x1b112f = Number(globalThis?.window?.v2NodeSpacing);
-  return Number.isFinite(_0x1b112f) ? Math.max(0, _0x1b112f) : DEFAULT_NODE_SPAWN_SPACING;
+  const value90 = Number(globalThis?.window?.v2NodeSpacing);
+  return Number.isFinite(value90) ? Math.max(0, value90) : DEFAULT_NODE_SPAWN_SPACING;
 }
 function shouldAvoidNodeOverlap() {
   return globalThis?.window?.v2NodeAvoidOverlap !== false;
 }
-function isPanorama360IncomingImageSourceType(_0x2ea93b) {
-  return PANORAMA_360_IMAGE_SOURCE_TYPES.has(String(_0x2ea93b || '').trim());
+function isPanorama360IncomingImageSourceType(value91) {
+  return PANORAMA_360_IMAGE_SOURCE_TYPES.has(String(value91 || '').trim());
 }
-function pickFirstNonEmptyString(..._0x272012) {
-  for (const _0x9e8503 of _0x272012) {
-    const _0x9e5781 = String(_0x9e8503 || '').trim();
-    if (_0x9e5781) return _0x9e5781;
+function pickFirstNonEmptyString(...args4) {
+  for (const value92 of args4) {
+    const value93 = String(value92 || '').trim();
+    if (value93) return value93;
   }
   return '';
 }
-function inferFileNameFromPath(_0x583274) {
-  const _0x30d110 = String(_0x583274 || '').trim();
-  if (!_0x30d110) return '';
-  const _0x446be2 = _0x30d110.split('?')[0].split('#')[0],
-    _0x1e470a = _0x446be2.split(/[\\/]/).filter(Boolean);
-  return _0x1e470a.length > 0 ? _0x1e470a[_0x1e470a.length - 1] : '';
+function inferFileNameFromPath(value94) {
+  const enabled3 = String(value94 || '').trim();
+  if (!enabled3) return '';
+  const value95 = enabled3.split('?')[0].split('#')[0],
+    list16 = value95.split(/[\\/]/).filter(Boolean);
+  return list16.length > 0 ? list16[list16.length - 1] : '';
 }
-function resolveMainImageEntry(_0xbc661e) {
-  const _0x379146 = Array.isArray(_0xbc661e?.images) ? _0xbc661e.images : [];
-  if (_0x379146.length <= 0) return null;
-  const _0x1f2532 = Number(_0xbc661e?.mainImageIndex),
-    _0x4970ec = Number.isFinite(_0x1f2532)
-      ? Math.max(0, Math.min(_0x379146.length - 1, Math.trunc(_0x1f2532)))
-      : 0;
-  return _0x379146[_0x4970ec] || _0x379146[0] || null;
+function resolveMainImageEntry(value96) {
+  const list17 = Array.isArray(value96?.images) ? value96.images : [];
+  if (list17.length <= 0) return null;
+  const value97 = Number(value96?.mainImageIndex),
+    value98 = Number.isFinite(value97) ? Math.max(0, Math.min(list17.length - 1, Math.trunc(value97))) : 0;
+  return list17[value98] || list17[0] || null;
 }
-function resolveMainImageIndex(_0x3f62a1) {
-  const _0x1c1660 = Array.isArray(_0x3f62a1?.images) ? _0x3f62a1.images : [];
-  if (_0x1c1660.length <= 0) return 0;
-  const _0xb40865 = Number(_0x3f62a1?.mainImageIndex);
-  if (!Number.isFinite(_0xb40865)) return 0;
-  return Math.max(0, Math.min(_0x1c1660.length - 1, Math.trunc(_0xb40865)));
+function resolveMainImageIndex(value99) {
+  const list18 = Array.isArray(value99?.images) ? value99.images : [];
+  if (list18.length <= 0) return 0;
+  const value100 = Number(value99?.mainImageIndex);
+  if (!Number.isFinite(value100)) return 0;
+  return Math.max(0, Math.min(list18.length - 1, Math.trunc(value100)));
 }
-function resolvePanoramaImagePayloadFromSourceNode(_0x37a1c1) {
-  if (!_0x37a1c1 || !isPanorama360IncomingImageSourceType(_0x37a1c1.type)) return null;
-  const _0xa8837a = resolveMainImageEntry(_0x37a1c1),
-    _0x16a78a = pickFirstNonEmptyString(_0xa8837a?.localPath, _0x37a1c1.localPath),
-    _0x10ba24 = pickFirstNonEmptyString(
-      _0xa8837a?.imageUrl,
-      _0xa8837a?.src,
-      _0xa8837a?.sourceUrl,
-      _0xa8837a?.url,
-      _0x37a1c1.imageUrl,
-      _0x37a1c1.src,
-      _0x37a1c1.sourceUrl,
-      _0x37a1c1.thumbUrl,
+function resolvePanoramaImagePayloadFromSourceNode(enabled4) {
+  if (!enabled4 || !isPanorama360IncomingImageSourceType(enabled4.type)) return null;
+  const response = resolveMainImageEntry(enabled4),
+    localPath = pickFirstNonEmptyString(response?.localPath, enabled4.localPath),
+    imageUrl = pickFirstNonEmptyString(
+      response?.imageUrl,
+      response?.src,
+      response?.sourceUrl,
+      response?.url,
+      enabled4.imageUrl,
+      enabled4.src,
+      enabled4.sourceUrl,
+      enabled4.thumbUrl,
     );
-  if (!_0x16a78a && !_0x10ba24) return null;
-  const _0xbd2f8a = pickFirstNonEmptyString(
-    _0xa8837a?.fileName,
-    _0x37a1c1.fileName,
-    inferFileNameFromPath(_0x16a78a),
-    inferFileNameFromPath(_0x10ba24),
+  if (!localPath && !imageUrl) return null;
+  const fileName = pickFirstNonEmptyString(
+    response?.fileName,
+    enabled4.fileName,
+    inferFileNameFromPath(localPath),
+    inferFileNameFromPath(imageUrl),
   );
   return {
-    localPath: _0x16a78a || null,
-    imageUrl: _0x10ba24 || null,
-    fileName: _0xbd2f8a || null,
-    mainImageIndex: resolveMainImageIndex(_0x37a1c1),
+    localPath: localPath || null,
+    imageUrl: imageUrl || null,
+    fileName: fileName || null,
+    mainImageIndex: resolveMainImageIndex(enabled4),
   };
 }
-function buildPanoramaSourceSignature(_0x2a2622) {
-  if (!_0x2a2622 || typeof _0x2a2622 !== 'object') return '';
+function buildPanoramaSourceSignature(enabled5) {
+  if (!enabled5 || typeof enabled5 !== 'object') return '';
   return JSON.stringify({
-    localPath: String(_0x2a2622.localPath || '').trim(),
-    imageUrl: String(_0x2a2622.imageUrl || '').trim(),
-    fileName: String(_0x2a2622.fileName || '').trim(),
-    mainImageIndex: Number(_0x2a2622.mainImageIndex || 0) || 0,
+    localPath: String(enabled5.localPath || '').trim(),
+    imageUrl: String(enabled5.imageUrl || '').trim(),
+    fileName: String(enabled5.fileName || '').trim(),
+    mainImageIndex: Number(enabled5.mainImageIndex || 0) || 0,
   });
 }
-function hasPersistentPanoramaLocalPath(_0x20b99a) {
-  const _0x5b7d4f = String(_0x20b99a || '').trim();
-  if (!_0x5b7d4f) return false;
-  return !/^(blob:|data:|https?:)/i.test(_0x5b7d4f);
+function hasPersistentPanoramaLocalPath(value101) {
+  const enabled6 = String(value101 || '').trim();
+  if (!enabled6) return false;
+  return !/^(blob:|data:|https?:)/i.test(enabled6);
 }
-function bumpPanorama360SyncVersion(_0x35aeaa) {
-  const _0x8efaf3 = String(_0x35aeaa || '').trim(),
-    _0xc816e5 = Number(_panorama360SyncVersionByNodeId.get(_0x8efaf3) || 0) + 1;
-  return (_panorama360SyncVersionByNodeId.set(_0x8efaf3, _0xc816e5), _0xc816e5);
+function bumpPanorama360SyncVersion(value102) {
+  const value103 = String(value102 || '').trim(),
+    value104 = Number(_panorama360SyncVersionByNodeId.get(value103) || 0) + 1;
+  return (_panorama360SyncVersionByNodeId.set(value103, value104), value104);
 }
-function isPanorama360SyncCurrent(_0x26f722, _0x29433f) {
+function isPanorama360SyncCurrent(value105, value106) {
   return (
-    Number(_panorama360SyncVersionByNodeId.get(String(_0x26f722 || '').trim()) || 0) ===
-    Number(_0x29433f || 0)
+    Number(_panorama360SyncVersionByNodeId.get(String(value105 || '').trim()) || 0) === Number(value106 || 0)
   );
 }
-function getPanoramaIncomingEdgeSortValue(_0x4cf998) {
-  const _0x41064a = Number(_0x4cf998?.createdAt);
-  if (Number.isFinite(_0x41064a) && _0x41064a > 0) return _0x41064a;
-  const _0x4b439e = Number(_0x4cf998?.updatedAt);
-  if (Number.isFinite(_0x4b439e) && _0x4b439e > 0) return _0x4b439e;
+function getPanoramaIncomingEdgeSortValue(value107) {
+  const count5 = Number(value107?.createdAt);
+  if (Number.isFinite(count5) && count5 > 0) return count5;
+  const count6 = Number(value107?.updatedAt);
+  if (Number.isFinite(count6) && count6 > 0) return count6;
   return 0;
 }
-function comparePanoramaIncomingCandidatesDesc(_0x355130, _0x5e744d) {
-  const _0x20727e =
-    getPanoramaIncomingEdgeSortValue(_0x5e744d.edge) - getPanoramaIncomingEdgeSortValue(_0x355130.edge);
-  if (_0x20727e !== 0) return _0x20727e;
-  return String(_0x5e744d.edge?.id || '').localeCompare(String(_0x355130.edge?.id || ''));
+function comparePanoramaIncomingCandidatesDesc(value108, value109) {
+  const panoramaIncomingEdgeSortValue =
+    getPanoramaIncomingEdgeSortValue(value109.edge) - getPanoramaIncomingEdgeSortValue(value108.edge);
+  if (panoramaIncomingEdgeSortValue !== 0) return panoramaIncomingEdgeSortValue;
+  return String(value109.edge?.id || '').localeCompare(String(value108.edge?.id || ''));
 }
 function buildPanoramaUploadSourceNodeData({
-  storeInstance: _0x2125c9,
-  anchorNode: _0x1dabfb,
-  localPath: _0x718295,
-  imageUrl: _0x473d0b,
-  fileName: _0x5a817f,
-  uploadedSize: _0x389459,
+  storeInstance: storeInstance3,
+  anchorNode: anchorNode,
+  localPath: localPath2,
+  imageUrl: imageUrl2,
+  fileName: fileName2,
+  uploadedSize: uploadedSize,
 }) {
-  if (!_0x2125c9 || !_0x1dabfb) return null;
-  const _0x374234 = Number(_0x389459?.width),
-    _0x3706c5 = Number(_0x389459?.height),
-    _0x159b38 = buildSourceMediaNodePayload({
+  if (!storeInstance3 || !anchorNode) return null;
+  const naturalWidth = Number(uploadedSize?.width),
+    naturalHeight = Number(uploadedSize?.height),
+    box10 = buildSourceMediaNodePayload({
       id: '__seed__',
       type: 'source-image',
       x: 0,
       y: 0,
-      src: _0x473d0b || '',
-      localPath: _0x718295 || '',
-      fileName: _0x5a817f || '',
-      ...(_0x374234 > 0 && _0x3706c5 > 0 ? { naturalWidth: _0x374234, naturalHeight: _0x3706c5 } : null),
+      src: imageUrl2 || '',
+      localPath: localPath2 || '',
+      fileName: fileName2 || '',
+      ...(naturalWidth > 0 && naturalHeight > 0
+        ? { naturalWidth: naturalWidth, naturalHeight: naturalHeight }
+        : null),
     }),
-    _0x4ad28b = resolveNodeSpawnSpacing(),
-    _0x4ce9cf = Number(_0x1dabfb.x) || 0,
-    _0x1e176b = Number(_0x1dabfb.y) || 0,
-    _0x11521d = Number(_0x1dabfb.height) || _0x159b38.height,
-    _0x39e55d = _0x4ce9cf - _0x159b38.width - _0x4ad28b,
-    _0x1c5e23 = _0x1e176b + Math.round((_0x11521d - _0x159b38.height) / 2),
-    _0x16619a = _0x2125c9.getStateRaw?.().nodes || {},
-    _0x5321d1 = shouldAvoidNodeOverlap()
-      ? findAvailablePosition(
-          _0x16619a,
-          _0x39e55d,
-          _0x1c5e23,
-          _0x159b38.width,
-          _0x159b38.height,
-          _0x4ad28b,
-          'left',
-        )
-      : { x: _0x39e55d, y: _0x1c5e23 };
-  return { ..._0x159b38, id: generateId('source-image'), x: _0x5321d1.x, y: _0x5321d1.y };
+    nodeSpawnSpacing = resolveNodeSpawnSpacing(),
+    value110 = Number(anchorNode.x) || 0,
+    value111 = Number(anchorNode.y) || 0,
+    value112 = Number(anchorNode.height) || box10.height,
+    x7 = value110 - box10.width - nodeSpawnSpacing,
+    y5 = value111 + Math.round((value112 - box10.height) / 2),
+    value113 = storeInstance3.getStateRaw?.().nodes || {},
+    x8 = shouldAvoidNodeOverlap()
+      ? findAvailablePosition(value113, x7, y5, box10.width, box10.height, nodeSpawnSpacing, 'left')
+      : { x: x7, y: y5 };
+  return { ...box10, id: generateId('source-image'), x: x8.x, y: x8.y };
 }
 export function setPanoramaSceneMode({
-  nodeId: _0x527366,
-  mode: _0x2cabbb,
+  nodeId: nodeId,
+  mode: mode,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x527366, (_0x30f1ba, _0x563049) => {
-    const _0x4fe65b = cloneSceneState(_0x30f1ba);
+  writeSceneState(storeInstance, nodeId, (value114, value115) => {
+    const cloneSceneState2 = cloneSceneState(value114);
     return (
-      (_0x4fe65b.mode = isPanorama360NodeType(_0x563049?.type) ? 'panorama' : 'scene'),
-      (_0x4fe65b.viewport.activeView = 'default'),
-      (_0x4fe65b.viewport.activeCameraId = null),
-      _0x4fe65b
+      (cloneSceneState2.mode = isPanorama360NodeType(value115?.type) ? 'panorama' : 'scene'),
+      (cloneSceneState2.viewport.activeView = 'default'),
+      (cloneSceneState2.viewport.activeCameraId = null),
+      cloneSceneState2
     );
   });
 }
 export function setPanoramaSceneEnvironmentMode({
-  nodeId: _0x40088a,
-  environmentMode: _0x72d8a0,
+  nodeId: nodeId2,
+  environmentMode: environmentMode2,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x40088a, (_0x581f17) => {
-    const _0x1f91f3 = cloneSceneState(_0x581f17);
-    return ((_0x1f91f3.environmentMode = _0x72d8a0 === 'night' ? 'night' : 'day'), _0x1f91f3);
+  writeSceneState(storeInstance, nodeId2, (value116) => {
+    const cloneSceneState3 = cloneSceneState(value116);
+    return (
+      (cloneSceneState3.environmentMode = environmentMode2 === 'night' ? 'night' : 'day'),
+      cloneSceneState3
+    );
   });
 }
 export function setPanoramaSceneTool({
-  nodeId: _0x3834fb,
-  tool: _0x14b945,
+  nodeId: nodeId3,
+  tool: tool,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x3834fb, (_0x4b0c0f) => {
-    const _0x4ff7e8 = cloneSceneState(_0x4b0c0f),
-      _0xf6641b =
-        _0x14b945 === 'move' || _0x14b945 === 'rotate' || _0x14b945 === 'scale' || _0x14b945 === 'box-select'
-          ? _0x14b945
-          : 'navigate';
+  writeSceneState(storeInstance, nodeId3, (value117) => {
+    const cloneSceneState4 = cloneSceneState(value117),
+      value118 =
+        tool === 'move' || tool === 'rotate' || tool === 'scale' || tool === 'box-select' ? tool : 'navigate';
     return (
-      _0xf6641b === 'box-select' || _0xf6641b === 'navigate'
-        ? (_0x4ff7e8.ui.mouseTool = _0xf6641b)
-        : (_0x4ff7e8.ui.transformTool = _0xf6641b),
-      (_0x4ff7e8.ui.activeTool = _0xf6641b),
-      _0x4ff7e8
+      value118 === 'box-select' || value118 === 'navigate'
+        ? (cloneSceneState4.ui.mouseTool = value118)
+        : (cloneSceneState4.ui.transformTool = value118),
+      (cloneSceneState4.ui.activeTool = value118),
+      cloneSceneState4
     );
   });
 }
 export function setPanoramaSceneTransformSpace({
-  nodeId: _0x237a61,
-  transformSpace: _0x3dfde9,
+  nodeId: nodeId4,
+  transformSpace: transformSpace,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x237a61, (_0x25a22d) => {
-    const _0x415dae = cloneSceneState(_0x25a22d);
-    return ((_0x415dae.ui.transformSpace = 'local'), _0x415dae);
+  writeSceneState(storeInstance, nodeId4, (value119) => {
+    const cloneSceneState5 = cloneSceneState(value119);
+    return ((cloneSceneState5.ui.transformSpace = 'local'), cloneSceneState5);
   });
 }
 export function setPanoramaScenePivotMode({
-  nodeId: _0x2afe40,
-  pivotMode: _0x50be00,
+  nodeId: nodeId5,
+  pivotMode: pivotMode,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x2afe40, (_0x2087f7) => {
-    const _0x33708e = cloneSceneState(_0x2087f7);
-    return ((_0x33708e.ui.pivotMode = 'active'), _0x33708e);
+  writeSceneState(storeInstance, nodeId5, (value120) => {
+    const cloneSceneState6 = cloneSceneState(value120);
+    return ((cloneSceneState6.ui.pivotMode = 'active'), cloneSceneState6);
   });
 }
 export function setPanoramaSceneNavigationPreset({
-  nodeId: _0x36e391,
-  navigationPreset: _0x3ca4f4,
+  nodeId: nodeId6,
+  navigationPreset: navigationPreset,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x36e391, (_0x4c5469) => {
-    const _0x933539 = cloneSceneState(_0x4c5469);
-    return ((_0x933539.ui.navigationPreset = _0x3ca4f4 === 'dcc' ? 'dcc' : 'dcc'), _0x933539);
+  writeSceneState(storeInstance, nodeId6, (value121) => {
+    const cloneSceneState7 = cloneSceneState(value121);
+    return (
+      (cloneSceneState7.ui.navigationPreset = navigationPreset === 'dcc' ? 'dcc' : 'dcc'),
+      cloneSceneState7
+    );
   });
 }
 export function setPanoramaSceneEditing({
-  nodeId: _0x44ccdb,
-  isEditing: _0x3b7b14,
+  nodeId: nodeId7,
+  isEditing: isEditing,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x44ccdb, (_0x1ee91) => {
-    const _0x305787 = cloneSceneState(_0x1ee91);
+  writeSceneState(storeInstance, nodeId7, (value122) => {
+    const cloneSceneState8 = cloneSceneState(value122);
     return (
-      (_0x305787.ui.isEditing = _0x3b7b14 === true),
-      !_0x305787.ui.isEditing && (_0x305787.ui.showCameraList = false),
-      _0x305787
+      (cloneSceneState8.ui.isEditing = isEditing === true),
+      !cloneSceneState8.ui.isEditing && (cloneSceneState8.ui.showCameraList = false),
+      cloneSceneState8
     );
   });
 }
 export function setPanoramaSceneSelection({
-  nodeId: _0x3e9d6c,
-  objectType: _0x2eee02,
-  objectId: _0x542064,
+  nodeId: nodeId8,
+  objectType: objectType4,
+  objectId: objectId5,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x3e9d6c, (_0x22bd1d) => {
-    const _0x213b76 = cloneSceneState(_0x22bd1d);
-    if (_0x2eee02 === 'camera') return _0x213b76;
-    const _0x5eca80 = _0x2eee02 === 'mannequin' || _0x2eee02 === 'cube' ? _0x2eee02 : null,
-      _0x3302e1 = _0x542064 ? String(_0x542064) : null;
-    if (!_0x5eca80 || !_0x3302e1) return (clearSelection(_0x213b76), _0x213b76);
-    const _0x186f31 = resolveGroupByMember(_0x213b76, _0x5eca80, _0x3302e1);
-    if (_0x186f31)
+  writeSceneState(storeInstance, nodeId8, (value123) => {
+    const cloneSceneState9 = cloneSceneState(value123);
+    if (objectType4 === 'camera') return cloneSceneState9;
+    const objectType5 = objectType4 === 'mannequin' || objectType4 === 'cube' ? objectType4 : null,
+      preferredActiveId2 = objectId5 ? String(objectId5) : null;
+    if (!objectType5 || !preferredActiveId2) return (clearSelection(cloneSceneState9), cloneSceneState9);
+    const preferredGroupId2 = resolveGroupByMember(cloneSceneState9, objectType5, preferredActiveId2);
+    if (preferredGroupId2)
       return (
         setSelectionFromObjects(
-          _0x213b76,
-          _0x186f31.memberIds.map((_0x253c7c) => ({ objectType: 'mannequin', objectId: _0x253c7c })),
-          { preferredGroupId: _0x186f31.id, preferredActiveType: 'mannequin', preferredActiveId: _0x3302e1 },
+          cloneSceneState9,
+          preferredGroupId2.memberIds.map((objectId6) => ({ objectType: 'mannequin', objectId: objectId6 })),
+          {
+            preferredGroupId: preferredGroupId2.id,
+            preferredActiveType: 'mannequin',
+            preferredActiveId: preferredActiveId2,
+          },
         ),
-        _0x213b76
+        cloneSceneState9
       );
     return (
-      setSelectionFromObjects(_0x213b76, [{ objectType: _0x5eca80, objectId: _0x3302e1 }], {
-        preferredActiveType: _0x5eca80,
-        preferredActiveId: _0x3302e1,
+      setSelectionFromObjects(cloneSceneState9, [{ objectType: objectType5, objectId: preferredActiveId2 }], {
+        preferredActiveType: objectType5,
+        preferredActiveId: preferredActiveId2,
       }),
-      _0x213b76
+      cloneSceneState9
     );
   });
 }
 export function setPanoramaSceneSelectionBatch({
-  nodeId: _0x299da0,
-  objectType: _0x3d9e33,
+  nodeId: nodeId9,
+  objectType: objectType6,
   objectIds: objectIds = [],
   groupId: groupId = null,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x299da0, (_0x1937c9) => {
-    const _0x5a8e8c = cloneSceneState(_0x1937c9);
-    if (_0x3d9e33 === 'camera') return _0x5a8e8c;
-    const _0x2d5b6d = _0x3d9e33 === 'mannequin' || _0x3d9e33 === 'cube' ? _0x3d9e33 : null,
-      _0x2b9841 = [
+  writeSceneState(storeInstance, nodeId9, (value124) => {
+    const cloneSceneState10 = cloneSceneState(value124);
+    if (objectType6 === 'camera') return cloneSceneState10;
+    const objectType7 = objectType6 === 'mannequin' || objectType6 === 'cube' ? objectType6 : null,
+      preferredActiveId3 = [
         ...new Set(
           (Array.isArray(objectIds) ? objectIds : [])
-            .map((_0x3c9c26) => String(_0x3c9c26 || '').trim())
+            .map((item23) => String(item23 || '').trim())
             .filter(Boolean),
         ),
       ];
-    if (!_0x2d5b6d || _0x2b9841.length === 0) return (clearSelection(_0x5a8e8c), _0x5a8e8c);
-    let _0x4b0581 = groupId ? String(groupId) : null;
-    if (_0x4b0581) {
-      const _0x5636d6 = (_0x5a8e8c.groups || []).find((_0x1b149d) => _0x1b149d.id === _0x4b0581);
-      if (!_0x5636d6) _0x4b0581 = null;
+    if (!objectType7 || preferredActiveId3.length === 0)
+      return (clearSelection(cloneSceneState10), cloneSceneState10);
+    let preferredGroupId3 = groupId ? String(groupId) : null;
+    if (preferredGroupId3) {
+      const preferredActiveId4 = (cloneSceneState10.groups || []).find(
+        (item24) => item24.id === preferredGroupId3,
+      );
+      if (!preferredActiveId4) preferredGroupId3 = null;
       else
         return (
           setSelectionFromObjects(
-            _0x5a8e8c,
-            _0x5636d6.memberIds.map((_0x5290cc) => ({ objectType: 'mannequin', objectId: _0x5290cc })),
+            cloneSceneState10,
+            preferredActiveId4.memberIds.map((objectId7) => ({
+              objectType: 'mannequin',
+              objectId: objectId7,
+            })),
             {
-              preferredGroupId: _0x4b0581,
+              preferredGroupId: preferredGroupId3,
               preferredActiveType: 'mannequin',
-              preferredActiveId: _0x5636d6.memberIds[0] || null,
+              preferredActiveId: preferredActiveId4.memberIds[0] || null,
             },
           ),
-          _0x5a8e8c
+          cloneSceneState10
         );
     }
     return (
       setSelectionFromObjects(
-        _0x5a8e8c,
-        _0x2b9841.map((_0xd830dc) => ({ objectType: _0x2d5b6d, objectId: _0xd830dc })),
-        { preferredActiveType: _0x2d5b6d, preferredActiveId: _0x2b9841[0] || null },
+        cloneSceneState10,
+        preferredActiveId3.map((objectId8) => ({ objectType: objectType7, objectId: objectId8 })),
+        { preferredActiveType: objectType7, preferredActiveId: preferredActiveId3[0] || null },
       ),
-      _0x5a8e8c
+      cloneSceneState10
     );
   });
 }
 export function setPanoramaSceneSelectionObjects({
-  nodeId: _0x1e9b32,
+  nodeId: nodeId10,
   objects: objects = [],
   activeObjectType: activeObjectType = null,
   activeObjectId: activeObjectId = null,
   groupId: groupId = null,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x1e9b32, (_0x72a2f) => {
-    const _0x782123 = cloneSceneState(_0x72a2f);
+  writeSceneState(storeInstance, nodeId10, (value125) => {
+    const cloneSceneState11 = cloneSceneState(value125);
     return (
-      setSelectionFromObjects(_0x782123, objects, {
+      setSelectionFromObjects(cloneSceneState11, objects, {
         preferredGroupId: groupId,
         preferredActiveType: activeObjectType,
         preferredActiveId: activeObjectId,
       }),
-      _0x782123
+      cloneSceneState11
     );
   });
 }
-export function clearPanoramaSceneSelection({ nodeId: _0x3c00c7, storeInstance: storeInstance = appStore }) {
+export function clearPanoramaSceneSelection({ nodeId: nodeId11, storeInstance: storeInstance = appStore }) {
   setPanoramaSceneSelection({
-    nodeId: _0x3c00c7,
+    nodeId: nodeId11,
     objectType: null,
     objectId: null,
     storeInstance: storeInstance,
   });
 }
 export function setPanoramaSceneCameraListVisible({
-  nodeId: _0x2ec526,
-  visible: _0x61bedd,
+  nodeId: nodeId12,
+  visible: visible,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x2ec526, (_0x56583d) => {
-    const _0xd82b94 = cloneSceneState(_0x56583d);
-    return ((_0xd82b94.ui.showCameraList = _0x61bedd === true), _0xd82b94);
+  writeSceneState(storeInstance, nodeId12, (value126) => {
+    const cloneSceneState12 = cloneSceneState(value126);
+    return ((cloneSceneState12.ui.showCameraList = visible === true), cloneSceneState12);
   });
 }
 export function setPanoramaSceneGridPlacement({
-  nodeId: _0x13648c,
-  patch: _0x573a27,
+  nodeId: nodeId13,
+  patch: patch2,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x13648c, (_0x32a551) => {
-    const _0x15b344 = cloneSceneState(_0x32a551);
+  writeSceneState(storeInstance, nodeId13, (value127) => {
+    const args5 = cloneSceneState(value127);
     return (
-      (_0x15b344.gridPlacement = { ..._0x15b344.gridPlacement, ...(_0x573a27 || {}) }),
-      normalizePanoramaSceneState(_0x15b344)
+      (args5.gridPlacement = { ...args5.gridPlacement, ...(patch2 || {}) }),
+      normalizePanoramaSceneState(args5)
     );
   });
 }
-export function resetPanoramaSceneView({ nodeId: _0x3981a6, storeInstance: storeInstance = appStore }) {
-  writeSceneState(storeInstance, _0x3981a6, (_0x193957) => {
-    const _0x1965a2 = cloneSceneState(_0x193957);
+export function resetPanoramaSceneView({ nodeId: nodeId14, storeInstance: storeInstance = appStore }) {
+  writeSceneState(storeInstance, nodeId14, (value128) => {
+    const cloneSceneState13 = cloneSceneState(value128);
     return (
-      (_0x1965a2.viewport.activeView = 'default'),
-      (_0x1965a2.viewport.activeCameraId = null),
-      _0x1965a2.mode === 'panorama'
-        ? (_0x1965a2.viewport.panoramaView = createDefaultPanoramaView())
-        : (_0x1965a2.viewport.sceneView = createDefaultSceneView()),
-      _0x1965a2
+      (cloneSceneState13.viewport.activeView = 'default'),
+      (cloneSceneState13.viewport.activeCameraId = null),
+      cloneSceneState13.mode === 'panorama'
+        ? (cloneSceneState13.viewport.panoramaView = createDefaultPanoramaView())
+        : (cloneSceneState13.viewport.sceneView = createDefaultSceneView()),
+      cloneSceneState13
     );
   });
 }
 export function applyPanoramaSceneViewCommit({
-  nodeId: _0x3967c6,
-  sceneView: _0x2b29d2,
-  panoramaView: _0x3eaad5,
+  nodeId: nodeId15,
+  sceneView: sceneView,
+  panoramaView: panoramaView,
   activeView: activeView = 'default',
   activeCameraId: activeCameraId = null,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x3967c6, (_0x3b3d1a) => {
-    const _0x579a85 = cloneSceneState(_0x3b3d1a);
+  writeSceneState(storeInstance, nodeId15, (value129) => {
+    const args6 = cloneSceneState(value129);
     return (
-      (_0x579a85.viewport.activeView = activeView === 'camera' ? 'camera' : 'default'),
-      (_0x579a85.viewport.activeCameraId =
-        _0x579a85.viewport.activeView === 'camera' && activeCameraId ? String(activeCameraId) : null),
-      _0x2b29d2 && (_0x579a85.viewport.sceneView = { ..._0x579a85.viewport.sceneView, ..._0x2b29d2 }),
-      _0x3eaad5 && (_0x579a85.viewport.panoramaView = { ..._0x579a85.viewport.panoramaView, ..._0x3eaad5 }),
-      normalizePanoramaSceneState(_0x579a85)
+      (args6.viewport.activeView = activeView === 'camera' ? 'camera' : 'default'),
+      (args6.viewport.activeCameraId =
+        args6.viewport.activeView === 'camera' && activeCameraId ? String(activeCameraId) : null),
+      sceneView && (args6.viewport.sceneView = { ...args6.viewport.sceneView, ...sceneView }),
+      panoramaView && (args6.viewport.panoramaView = { ...args6.viewport.panoramaView, ...panoramaView }),
+      normalizePanoramaSceneState(args6)
     );
   });
 }
 export function activatePanoramaSceneCamera({
-  nodeId: _0x5c07a3,
-  cameraId: _0x862c9c,
+  nodeId: nodeId16,
+  cameraId: cameraId,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0xff4c53 = getStoreNode(storeInstance, _0x5c07a3);
-  if (isPanorama360NodeType(_0xff4c53?.type)) return;
-  writeSceneState(storeInstance, _0x5c07a3, (_0x4d81a5) => {
-    const _0x3475ea = cloneSceneState(_0x4d81a5),
-      _0x4f5dc2 = _0x3475ea.cameras.find((_0x36796a) => _0x36796a.id === _0x862c9c) || null;
-    if (!_0x4f5dc2) return _0x3475ea;
+  const storeNode3 = getStoreNode(storeInstance, nodeId16);
+  if (isPanorama360NodeType(storeNode3?.type)) return;
+  writeSceneState(storeInstance, nodeId16, (value130) => {
+    const cloneSceneState14 = cloneSceneState(value130),
+      enabled7 = cloneSceneState14.cameras.find((item25) => item25.id === cameraId) || null;
+    if (!enabled7) return cloneSceneState14;
     return (
-      _0x3475ea.mode === 'panorama'
-        ? ((_0x3475ea.viewport.activeView = 'camera'),
-          (_0x3475ea.viewport.activeCameraId = String(_0x862c9c)),
-          (_0x3475ea.viewport.panoramaView = cameraPoseToPanoramaView(_0x4f5dc2)))
-        : ((_0x3475ea.viewport.activeView = 'default'),
-          (_0x3475ea.viewport.activeCameraId = null),
-          (_0x3475ea.viewport.sceneView = cameraPoseToSceneViewFromReference(
-            _0x4f5dc2,
-            _0x3475ea.viewport.sceneView || createDefaultSceneView(),
+      cloneSceneState14.mode === 'panorama'
+        ? ((cloneSceneState14.viewport.activeView = 'camera'),
+          (cloneSceneState14.viewport.activeCameraId = String(cameraId)),
+          (cloneSceneState14.viewport.panoramaView = cameraPoseToPanoramaView(enabled7)))
+        : ((cloneSceneState14.viewport.activeView = 'default'),
+          (cloneSceneState14.viewport.activeCameraId = null),
+          (cloneSceneState14.viewport.sceneView = cameraPoseToSceneViewFromReference(
+            enabled7,
+            cloneSceneState14.viewport.sceneView || createDefaultSceneView(),
           ))),
-      _0x3475ea
+      cloneSceneState14
     );
   });
 }
 export function setPanoramaSceneCaptureMode({
-  nodeId: _0x295e3e,
-  mode: _0x1fb353,
+  nodeId: nodeId17,
+  mode: mode2,
   showSafeFrame: showSafeFrame = true,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x295e3e, (_0x2bca66) => {
-    const _0xea18b7 = cloneSceneState(_0x2bca66),
-      _0x1a999c = _0x1fb353 === '9:16' || _0x1fb353 === '2.35:1' ? _0x1fb353 : 'adaptive';
+  writeSceneState(storeInstance, nodeId17, (value131) => {
+    const cloneSceneState15 = cloneSceneState(value131),
+      value132 = mode2 === '9:16' || mode2 === '2.35:1' ? mode2 : 'adaptive';
     return (
-      (_0xea18b7.capture.mode = _0x1a999c),
-      (_0xea18b7.capture.showSafeFrame = _0x1a999c === 'adaptive' ? false : showSafeFrame === true),
-      normalizePanoramaSceneState(_0xea18b7)
+      (cloneSceneState15.capture.mode = value132),
+      (cloneSceneState15.capture.showSafeFrame = value132 === 'adaptive' ? false : showSafeFrame === true),
+      normalizePanoramaSceneState(cloneSceneState15)
     );
   });
 }
 export function setPanoramaSceneSafeFrameVisible({
-  nodeId: _0x5aea4a,
-  visible: _0x37a150,
+  nodeId: nodeId18,
+  visible: visible2,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x5aea4a, (_0x48eb0e) => {
-    const _0x2b865d = cloneSceneState(_0x48eb0e);
-    return ((_0x2b865d.capture.showSafeFrame = _0x37a150 === true), normalizePanoramaSceneState(_0x2b865d));
+  writeSceneState(storeInstance, nodeId18, (value133) => {
+    const cloneSceneState16 = cloneSceneState(value133);
+    return (
+      (cloneSceneState16.capture.showSafeFrame = visible2 === true),
+      normalizePanoramaSceneState(cloneSceneState16)
+    );
   });
 }
 export function activatePanoramaSceneCameraSlot({
-  nodeId: _0xb23676,
-  slot: _0x2c2733,
+  nodeId: nodeId19,
+  slot: slot3,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x439fbb = getStoreNode(storeInstance, _0xb23676);
-  if (isPanorama360NodeType(_0x439fbb?.type)) return null;
-  const _0x4d94ad = getSceneState(storeInstance, _0xb23676),
-    _0x3c86f1 = resolveCameraBySlot(_0x4d94ad.cameras, _0x2c2733);
-  if (!_0x3c86f1?.camera?.id) return null;
+  const storeNode4 = getStoreNode(storeInstance, nodeId19);
+  if (isPanorama360NodeType(storeNode4?.type)) return null;
+  const sceneState = getSceneState(storeInstance, nodeId19),
+    cameraId2 = resolveCameraBySlot(sceneState.cameras, slot3);
+  if (!cameraId2?.camera?.id) return null;
   return (
     activatePanoramaSceneCamera({
-      nodeId: _0xb23676,
-      cameraId: _0x3c86f1.camera.id,
+      nodeId: nodeId19,
+      cameraId: cameraId2.camera.id,
       storeInstance: storeInstance,
     }),
-    _0x3c86f1.camera.id
+    cameraId2.camera.id
   );
 }
 export function upsertPanoramaSceneCameraAtSlot({
-  nodeId: _0x1e3007,
-  slot: _0x2eb9ad,
-  viewPose: _0x489e69,
+  nodeId: nodeId20,
+  slot: slot4,
+  viewPose: viewPose2,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x1588f5 = getStoreNode(storeInstance, _0x1e3007);
-  if (isPanorama360NodeType(_0x1588f5?.type)) return null;
-  const _0x121e48 = normalizeCameraSlot(_0x2eb9ad);
-  if (!_0x121e48) return null;
-  const _0x260ed5 = getSceneState(storeInstance, _0x1e3007),
-    _0x1a46f1 = sanitizeCameraPose(_0x489e69),
-    _0x46cbbe = resolveCameraBySlot(_0x260ed5.cameras, _0x121e48);
-  let _0x3d563 = _0x46cbbe?.camera?.id || null,
-    _0x5b84b0 = false;
-  writeSceneState(storeInstance, _0x1e3007, (_0x333abc) => {
-    const _0x441aef = cloneSceneState(_0x333abc),
-      _0x128a85 = resolveCameraBySlot(_0x441aef.cameras, _0x121e48);
-    if (_0x128a85?.camera?.id) {
-      const _0x145782 = _0x128a85.camera.id;
+  const storeNode5 = getStoreNode(storeInstance, nodeId20);
+  if (isPanorama360NodeType(storeNode5?.type)) return null;
+  const slot5 = normalizeCameraSlot(slot4);
+  if (!slot5) return null;
+  const sceneState2 = getSceneState(storeInstance, nodeId20),
+    position2 = sanitizeCameraPose(viewPose2),
+    cameraBySlot = resolveCameraBySlot(sceneState2.cameras, slot5);
+  let value134 = cameraBySlot?.camera?.id || null,
+    enabled8 = false;
+  writeSceneState(storeInstance, nodeId20, (value135) => {
+    const cloneSceneState17 = cloneSceneState(value135),
+      cameraBySlot2 = resolveCameraBySlot(cloneSceneState17.cameras, slot5);
+    if (cameraBySlot2?.camera?.id) {
+      const value136 = cameraBySlot2.camera.id;
       return (
-        (_0x3d563 = _0x145782),
-        (_0x441aef.cameras = _0x441aef.cameras.map((_0x5c606e) =>
-          _0x5c606e.id === _0x145782
+        (value134 = value136),
+        (cloneSceneState17.cameras = cloneSceneState17.cameras.map((name) =>
+          name.id === value136
             ? {
-                ..._0x5c606e,
-                slot: _0x121e48,
+                ...name,
+                slot: slot5,
                 name:
-                  _0x5c606e.name ||
-                  panoramaSceneText('camera.defaultName', { slot: toCameraSlotLabel(_0x121e48) }),
-                position: _0x1a46f1.position,
-                quaternion: _0x1a46f1.quaternion,
-                rotation: _0x1a46f1.rotation,
-                focalLength: _0x1a46f1.focalLength,
+                  name.name || panoramaSceneText('camera.defaultName', { slot: toCameraSlotLabel(slot5) }),
+                position: position2.position,
+                quaternion: position2.quaternion,
+                rotation: position2.rotation,
+                focalLength: position2.focalLength,
               }
-            : _0x5c606e,
+            : name,
         )),
-        _0x441aef.mode === 'panorama' &&
-          ((_0x441aef.viewport.activeCameraId = _0x145782), (_0x441aef.viewport.activeView = 'camera')),
-        (_0x5b84b0 = true),
-        _0x441aef
+        cloneSceneState17.mode === 'panorama' &&
+          ((cloneSceneState17.viewport.activeCameraId = value136),
+          (cloneSceneState17.viewport.activeView = 'camera')),
+        (enabled8 = true),
+        cloneSceneState17
       );
     }
-    if (_0x441aef.cameras.length >= PANORAMA_SCENE_CAMERA_LIMIT) return _0x441aef;
-    const _0x289e07 = generateId('scene-camera');
+    if (cloneSceneState17.cameras.length >= PANORAMA_SCENE_CAMERA_LIMIT) return cloneSceneState17;
+    const id = generateId('scene-camera');
     return (
-      (_0x3d563 = _0x289e07),
-      _0x441aef.cameras.push({
-        id: _0x289e07,
-        slot: _0x121e48,
-        name: panoramaSceneText('camera.defaultName', { slot: toCameraSlotLabel(_0x121e48) }),
-        position: _0x1a46f1.position,
-        quaternion: _0x1a46f1.quaternion,
-        rotation: _0x1a46f1.rotation,
-        focalLength: _0x1a46f1.focalLength,
+      (value134 = id),
+      cloneSceneState17.cameras.push({
+        id: id,
+        slot: slot5,
+        name: panoramaSceneText('camera.defaultName', { slot: toCameraSlotLabel(slot5) }),
+        position: position2.position,
+        quaternion: position2.quaternion,
+        rotation: position2.rotation,
+        focalLength: position2.focalLength,
       }),
-      _0x441aef.mode === 'panorama' &&
-        ((_0x441aef.viewport.activeCameraId = _0x289e07), (_0x441aef.viewport.activeView = 'camera')),
-      (_0x5b84b0 = true),
-      _0x441aef
+      cloneSceneState17.mode === 'panorama' &&
+        ((cloneSceneState17.viewport.activeCameraId = id),
+        (cloneSceneState17.viewport.activeView = 'camera')),
+      (enabled8 = true),
+      cloneSceneState17
     );
   });
-  if (!_0x5b84b0)
+  if (!enabled8)
     return (
       showWarning(panoramaSceneText('camera.limitWarning', { count: PANORAMA_SCENE_CAMERA_LIMIT })),
       null
     );
-  return (commit(), _0x3d563);
+  return (commit(), value134);
 }
 export function activatePanoramaSceneDefaultView({
-  nodeId: _0x3e3f9e,
-  pose: _0x380f8b,
+  nodeId: nodeId21,
+  pose: pose,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x1b4d78 = getSceneState(storeInstance, _0x3e3f9e);
-  if (_0x1b4d78.mode === 'panorama') {
-    const _0x1e22a0 = _0x380f8b ? cameraPoseToPanoramaView(_0x380f8b) : _0x1b4d78.viewport.panoramaView;
+  const sceneState3 = getSceneState(storeInstance, nodeId21);
+  if (sceneState3.mode === 'panorama') {
+    const panoramaView2 = pose ? cameraPoseToPanoramaView(pose) : sceneState3.viewport.panoramaView;
     applyPanoramaSceneViewCommit({
-      nodeId: _0x3e3f9e,
-      panoramaView: _0x1e22a0,
+      nodeId: nodeId21,
+      panoramaView: panoramaView2,
       activeView: 'default',
       activeCameraId: null,
       storeInstance: storeInstance,
     });
     return;
   }
-  const _0x1cd0d1 = _0x380f8b
-    ? cameraPoseToSceneViewFromReference(_0x380f8b, _0x1b4d78.viewport.sceneView || createDefaultSceneView())
-    : _0x1b4d78.viewport.sceneView;
+  const sceneView2 = pose
+    ? cameraPoseToSceneViewFromReference(pose, sceneState3.viewport.sceneView || createDefaultSceneView())
+    : sceneState3.viewport.sceneView;
   applyPanoramaSceneViewCommit({
-    nodeId: _0x3e3f9e,
-    sceneView: _0x1cd0d1,
+    nodeId: nodeId21,
+    sceneView: sceneView2,
     activeView: 'default',
     activeCameraId: null,
     storeInstance: storeInstance,
   });
 }
 export async function uploadPanoramaSceneImage({
-  nodeId: _0xba2e98,
-  file: _0x45fb8b,
+  nodeId: nodeId22,
+  file: file,
   storeInstance: storeInstance = appStore,
   getCurrentProjectId: getCurrentProjectId = () => window.currentProjectId || 'default_v2_project',
 }) {
-  if (!_0x45fb8b) return null;
-  const _0x3069f8 = getStoreNode(storeInstance, _0xba2e98);
-  if (!_0x3069f8) return null;
-  if (!isPanorama360NodeType(_0x3069f8.type))
+  if (!file) return null;
+  const anchorNode2 = getStoreNode(storeInstance, nodeId22);
+  if (!anchorNode2) return null;
+  if (!isPanorama360NodeType(anchorNode2.type))
     return (showWarning(panoramaSceneText('upload.unsupportedNode')), null);
   try {
-    const _0x509745 = await uploadFile(_0x45fb8b, getCurrentProjectId()),
-      _0x45063c = _0x509745.filename || _0x45fb8b.name,
-      _0x400d60 = pickResultLocalPath(_0x509745),
-      _0x98167d = localPathToUrl(_0x400d60) || String(_0x509745.url || '').trim() || null,
-      _0x14fa5e = await resolveOutputMediaSize({ localPath: _0x400d60, imageUrl: _0x98167d });
-    if (_0x14fa5e && !isNearEquirectangularRatio(_0x14fa5e)) {
-      const _0x5dceb4 = _0x14fa5e.width / _0x14fa5e.height;
+    const response2 = await uploadFile(file, getCurrentProjectId()),
+      fileName3 = response2.filename || file.name,
+      localPath3 = pickResultLocalPath(response2),
+      imageUrl3 = localPathToUrl(localPath3) || String(response2.url || '').trim() || null,
+      width = await resolveOutputMediaSize({ localPath: localPath3, imageUrl: imageUrl3 });
+    if (width && !isNearEquirectangularRatio(width)) {
+      const ratio = width.width / width.height;
       showWarning(
         panoramaSceneText('upload.ratioWarning', {
-          width: _0x14fa5e.width,
-          height: _0x14fa5e.height,
-          ratio: _0x5dceb4.toFixed(3),
+          width: width.width,
+          height: width.height,
+          ratio: ratio.toFixed(3),
         }),
       );
     }
-    const _0x46bf39 = buildPanoramaUploadSourceNodeData({
+    const sourceId = buildPanoramaUploadSourceNodeData({
         storeInstance: storeInstance,
-        anchorNode: _0x3069f8,
-        localPath: _0x400d60,
-        imageUrl: _0x98167d,
-        fileName: _0x45063c,
-        uploadedSize: _0x14fa5e,
+        anchorNode: anchorNode2,
+        localPath: localPath3,
+        imageUrl: imageUrl3,
+        fileName: fileName3,
+        uploadedSize: width,
       }),
-      _0x24fd02 = Date.now();
+      createdAt = Date.now();
     return (
       storeInstance.batch(() => {
-        (writeSceneState(storeInstance, _0xba2e98, (_0x449b88) => {
-          const _0x10678b = cloneSceneState(_0x449b88);
+        (writeSceneState(storeInstance, nodeId22, (value137) => {
+          const cloneSceneState18 = cloneSceneState(value137);
           return (
-            (_0x10678b.mode = 'panorama'),
-            (_0x10678b.viewport.activeView = 'default'),
-            (_0x10678b.viewport.activeCameraId = null),
-            (_0x10678b.panorama = {
-              localPath: _0x400d60,
-              imageUrl: _0x98167d,
-              fileName: _0x45063c,
+            (cloneSceneState18.mode = 'panorama'),
+            (cloneSceneState18.viewport.activeView = 'default'),
+            (cloneSceneState18.viewport.activeCameraId = null),
+            (cloneSceneState18.panorama = {
+              localPath: localPath3,
+              imageUrl: imageUrl3,
+              fileName: fileName3,
               sourceSignature: null,
               isLoaded: false,
               error: null,
             }),
-            _0x10678b
+            cloneSceneState18
           );
         }),
-          _0x46bf39 &&
-            (storeInstance.addNode(_0x46bf39),
+          sourceId &&
+            (storeInstance.addNode(sourceId),
             storeInstance.addEdge({
               id: generateId('edge'),
-              sourceId: _0x46bf39.id,
-              targetId: _0xba2e98,
-              createdAt: _0x24fd02,
+              sourceId: sourceId.id,
+              targetId: nodeId22,
+              createdAt: createdAt,
             })),
-          storeInstance.setSelectedNodes([_0xba2e98]));
+          storeInstance.setSelectedNodes([nodeId22]));
       }),
       commit(),
       showSuccess(panoramaSceneText('upload.success')),
-      { localPath: _0x400d60, imageUrl: _0x98167d, fileName: _0x45063c, sourceNodeId: _0x46bf39?.id || null }
+      { localPath: localPath3, imageUrl: imageUrl3, fileName: fileName3, sourceNodeId: sourceId?.id || null }
     );
-  } catch (_0x302853) {
-    const _0x310018 = String(_0x302853?.message || panoramaSceneText('upload.failed'));
+  } catch (error2) {
+    const error3 = String(error2?.message || panoramaSceneText('upload.failed'));
     return (
-      writeSceneState(storeInstance, _0xba2e98, (_0x39c7b1) => {
-        const _0x344c32 = cloneSceneState(_0x39c7b1);
-        return ((_0x344c32.panorama.error = _0x310018), (_0x344c32.panorama.isLoaded = false), _0x344c32);
+      writeSceneState(storeInstance, nodeId22, (value138) => {
+        const cloneSceneState19 = cloneSceneState(value138);
+        return (
+          (cloneSceneState19.panorama.error = error3),
+          (cloneSceneState19.panorama.isLoaded = false),
+          cloneSceneState19
+        );
       }),
-      showError(panoramaSceneText('upload.failedWithError', { error: _0x310018 })),
+      showError(panoramaSceneText('upload.failedWithError', { error: error3 })),
       null
     );
   }
 }
 export function syncPanorama360FromIncomingImageEdge({
-  nodeId: _0x20f869,
+  nodeId: nodeId23,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x351d4c = String(_0x20f869 || '').trim(),
-    _0x2030e2 = getStoreNode(storeInstance, _0x351d4c);
-  if (!_0x2030e2 || !isPanorama360NodeType(_0x2030e2.type))
-    return (bumpPanorama360SyncVersion(_0x351d4c), null);
-  const _0x3a51c8 =
+  const value139 = String(nodeId23 || '').trim(),
+    storeNode6 = getStoreNode(storeInstance, value139);
+  if (!storeNode6 || !isPanorama360NodeType(storeNode6.type))
+    return (bumpPanorama360SyncVersion(value139), null);
+  const value140 =
       typeof storeInstance?.getIncomingEdges === 'function'
-        ? storeInstance.getIncomingEdges(_0x351d4c)
+        ? storeInstance.getIncomingEdges(value139)
         : Object.values(storeInstance.getStateRaw?.().edges || {}).filter(
-            (_0x2a829d) => _0x2a829d?.targetId === _0x351d4c,
+            (item26) => item26?.targetId === value139,
           ),
-    _0x487f53 = storeInstance.getStateRaw?.().nodes || {},
-    _0x2f71de = (Array.isArray(_0x3a51c8) ? _0x3a51c8 : [])
-      .map((_0x35ce9a) => {
-        const _0x4e629 = _0x487f53[_0x35ce9a?.sourceId] || null,
-          _0x23a80c = resolvePanoramaImagePayloadFromSourceNode(_0x4e629);
-        if (!_0x4e629 || !_0x23a80c) return null;
-        return { edge: _0x35ce9a, sourceNode: _0x4e629, payload: _0x23a80c };
+    value141 = storeInstance.getStateRaw?.().nodes || {},
+    value142 = (Array.isArray(value140) ? value140 : [])
+      .map((edge) => {
+        const sourceNode = value141[edge?.sourceId] || null,
+          payload2 = resolvePanoramaImagePayloadFromSourceNode(sourceNode);
+        if (!sourceNode || !payload2) return null;
+        return { edge: edge, sourceNode: sourceNode, payload: payload2 };
       })
       .filter(Boolean)
       .sort(comparePanoramaIncomingCandidatesDesc),
-    _0x4d8e10 = _0x2f71de[0] || null;
-  if (!_0x4d8e10?.payload) return (bumpPanorama360SyncVersion(_0x351d4c), null);
-  const _0xf64e43 = buildPanoramaSourceSignature(_0x4d8e10.payload),
-    _0x4001a3 = getSceneState(storeInstance, _0x351d4c),
-    _0x577738 = _0x4001a3?.panorama || {},
-    _0x5adaa2 = _0x577738.isLoaded === false && !_0x577738.error,
-    _0x4a62dd =
-      String(_0x577738.sourceSignature || '') === _0xf64e43 &&
-      hasPersistentPanoramaLocalPath(_0x577738.localPath);
-  if (_0x4a62dd) {
-    const _0x57c61e = {
-      localPath: String(_0x577738.localPath || '').trim() || _0x4d8e10.payload.localPath,
-      imageUrl: String(_0x577738.imageUrl || '').trim() || _0x4d8e10.payload.imageUrl,
-      fileName: String(_0x577738.fileName || '').trim() || _0x4d8e10.payload.fileName,
-      sourceSignature: _0xf64e43,
+    sourceNodeId = value142[0] || null;
+  if (!sourceNodeId?.payload) return (bumpPanorama360SyncVersion(value139), null);
+  const sourceSignature = buildPanoramaSourceSignature(sourceNodeId.payload),
+    sceneState4 = getSceneState(storeInstance, value139),
+    enabled9 = sceneState4?.panorama || {},
+    value143 = enabled9.isLoaded === false && !enabled9.error,
+    value144 =
+      String(enabled9.sourceSignature || '') === sourceSignature &&
+      hasPersistentPanoramaLocalPath(enabled9.localPath);
+  if (value144) {
+    const args7 = {
+      localPath: String(enabled9.localPath || '').trim() || sourceNodeId.payload.localPath,
+      imageUrl: String(enabled9.imageUrl || '').trim() || sourceNodeId.payload.imageUrl,
+      fileName: String(enabled9.fileName || '').trim() || sourceNodeId.payload.fileName,
+      sourceSignature: sourceSignature,
       isLoaded: false,
       error: null,
     };
-    if (_0x5adaa2) return { ..._0x57c61e, sourceNodeId: _0x4d8e10.sourceNode.id, updated: false };
+    if (value143) return { ...args7, sourceNodeId: sourceNodeId.sourceNode.id, updated: false };
     return (
-      writeSceneState(storeInstance, _0x351d4c, (_0x2b4b0d) => {
-        const _0x44c384 = cloneSceneState(_0x2b4b0d);
+      writeSceneState(storeInstance, value139, (value145) => {
+        const cloneSceneState20 = cloneSceneState(value145);
         return (
-          (_0x44c384.mode = 'panorama'),
-          (_0x44c384.viewport.activeView = 'default'),
-          (_0x44c384.viewport.activeCameraId = null),
-          (_0x44c384.panorama = _0x57c61e),
-          _0x44c384
+          (cloneSceneState20.mode = 'panorama'),
+          (cloneSceneState20.viewport.activeView = 'default'),
+          (cloneSceneState20.viewport.activeCameraId = null),
+          (cloneSceneState20.panorama = args7),
+          cloneSceneState20
         );
       }),
-      { ..._0x57c61e, sourceNodeId: _0x4d8e10.sourceNode.id, updated: true }
+      { ...args7, sourceNodeId: sourceNodeId.sourceNode.id, updated: true }
     );
   }
-  const _0x2399bf = _panorama360SyncInflightByNodeId.get(_0x351d4c);
-  if (_0x2399bf?.signature === _0xf64e43 && _0x2399bf?.promise) return _0x2399bf.promise;
-  const _0x13e0f3 = bumpPanorama360SyncVersion(_0x351d4c),
-    _0x1ffa58 = (async () => {
+  const value146 = _panorama360SyncInflightByNodeId.get(value139);
+  if (value146?.signature === sourceSignature && value146?.promise) return value146.promise;
+  const version = bumpPanorama360SyncVersion(value139),
+    promise = (async () => {
       try {
-        const _0x358cc4 = await ensurePersistedPanoramaInputPng({
-          localPath: _0x4d8e10.payload.localPath,
-          imageUrl: _0x4d8e10.payload.imageUrl,
-          fileName: _0x4d8e10.payload.fileName,
-          sourceSignature: _0xf64e43,
+        const localPath4 = await ensurePersistedPanoramaInputPng({
+          localPath: sourceNodeId.payload.localPath,
+          imageUrl: sourceNodeId.payload.imageUrl,
+          fileName: sourceNodeId.payload.fileName,
+          sourceSignature: sourceSignature,
         });
-        if (!isPanorama360SyncCurrent(_0x351d4c, _0x13e0f3))
-          return { ..._0x358cc4, sourceNodeId: _0x4d8e10.sourceNode.id, updated: false, stale: true };
-        const _0x5ed7c3 = getStoreNode(storeInstance, _0x351d4c);
-        if (!_0x5ed7c3 || !isPanorama360NodeType(_0x5ed7c3.type)) return null;
-        const _0x59e917 = getSceneState(storeInstance, _0x351d4c),
-          _0x2e95fd = _0x59e917?.panorama || {},
-          _0x2566e1 = {
-            localPath: _0x358cc4.localPath,
-            imageUrl: _0x358cc4.imageUrl,
-            fileName: _0x358cc4.fileName,
-            sourceSignature: _0xf64e43,
+        if (!isPanorama360SyncCurrent(value139, version))
+          return { ...localPath4, sourceNodeId: sourceNodeId.sourceNode.id, updated: false, stale: true };
+        const storeNode7 = getStoreNode(storeInstance, value139);
+        if (!storeNode7 || !isPanorama360NodeType(storeNode7.type)) return null;
+        const sceneState5 = getSceneState(storeInstance, value139),
+          enabled10 = sceneState5?.panorama || {},
+          args8 = {
+            localPath: localPath4.localPath,
+            imageUrl: localPath4.imageUrl,
+            fileName: localPath4.fileName,
+            sourceSignature: sourceSignature,
             isLoaded: false,
             error: null,
           },
-          _0x5dbf92 =
-            String(_0x2e95fd.localPath || '') === String(_0x2566e1.localPath || '') &&
-            String(_0x2e95fd.imageUrl || '') === String(_0x2566e1.imageUrl || '') &&
-            String(_0x2e95fd.fileName || '') === String(_0x2566e1.fileName || '') &&
-            String(_0x2e95fd.sourceSignature || '') === _0xf64e43,
-          _0x1777e8 = _0x2e95fd.isLoaded === false && !_0x2e95fd.error;
-        if (_0x5dbf92 && _0x1777e8)
-          return { ..._0x2566e1, sourceNodeId: _0x4d8e10.sourceNode.id, updated: false };
+          value147 =
+            String(enabled10.localPath || '') === String(args8.localPath || '') &&
+            String(enabled10.imageUrl || '') === String(args8.imageUrl || '') &&
+            String(enabled10.fileName || '') === String(args8.fileName || '') &&
+            String(enabled10.sourceSignature || '') === sourceSignature,
+          value148 = enabled10.isLoaded === false && !enabled10.error;
+        if (value147 && value148)
+          return { ...args8, sourceNodeId: sourceNodeId.sourceNode.id, updated: false };
         return (
-          writeSceneState(storeInstance, _0x351d4c, (_0x5f38ac) => {
-            const _0x4efd58 = cloneSceneState(_0x5f38ac);
+          writeSceneState(storeInstance, value139, (value149) => {
+            const cloneSceneState21 = cloneSceneState(value149);
             return (
-              (_0x4efd58.mode = 'panorama'),
-              (_0x4efd58.viewport.activeView = 'default'),
-              (_0x4efd58.viewport.activeCameraId = null),
-              (_0x4efd58.panorama = _0x2566e1),
-              _0x4efd58
+              (cloneSceneState21.mode = 'panorama'),
+              (cloneSceneState21.viewport.activeView = 'default'),
+              (cloneSceneState21.viewport.activeCameraId = null),
+              (cloneSceneState21.panorama = args8),
+              cloneSceneState21
             );
           }),
-          { ..._0x2566e1, sourceNodeId: _0x4d8e10.sourceNode.id, updated: true }
+          { ...args8, sourceNodeId: sourceNodeId.sourceNode.id, updated: true }
         );
-      } catch (_0x28abf3) {
-        if (!isPanorama360SyncCurrent(_0x351d4c, _0x13e0f3))
+      } catch (error4) {
+        if (!isPanorama360SyncCurrent(value139, version))
           return {
             updated: false,
             stale: true,
-            error: String(_0x28abf3?.message || _0x28abf3 || panoramaSceneText('errors.unknown')),
+            error: String(error4?.message || error4 || panoramaSceneText('errors.unknown')),
           };
-        const _0x3b44d7 = String(_0x28abf3?.message || panoramaSceneText('errors.pngNormalizeFailed'));
-        return (showError(_0x3b44d7), { updated: false, error: _0x3b44d7 });
+        const error5 = String(error4?.message || panoramaSceneText('errors.pngNormalizeFailed'));
+        return (showError(error5), { updated: false, error: error5 });
       } finally {
-        const _0x307734 = _panorama360SyncInflightByNodeId.get(_0x351d4c);
-        _0x307734?.promise === _0x1ffa58 && _panorama360SyncInflightByNodeId.delete(_0x351d4c);
+        const value150 = _panorama360SyncInflightByNodeId.get(value139);
+        value150?.promise === promise && _panorama360SyncInflightByNodeId.delete(value139);
       }
     })();
   return (
-    _panorama360SyncInflightByNodeId.set(_0x351d4c, {
-      signature: _0xf64e43,
-      version: _0x13e0f3,
-      promise: _0x1ffa58,
+    _panorama360SyncInflightByNodeId.set(value139, {
+      signature: sourceSignature,
+      version: version,
+      promise: promise,
     }),
-    _0x1ffa58
+    promise
   );
 }
 export function updatePanoramaSceneLoadState({
-  nodeId: _0x2e8170,
-  isLoaded: _0x267aa1,
+  nodeId: nodeId24,
+  isLoaded: isLoaded,
   error: error = null,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x2e8170, (_0x42c7fc) => {
-    const _0x418b69 = cloneSceneState(_0x42c7fc);
+  writeSceneState(storeInstance, nodeId24, (value151) => {
+    const cloneSceneState22 = cloneSceneState(value151);
     return (
-      (_0x418b69.panorama.isLoaded = _0x267aa1 === true),
-      (_0x418b69.panorama.error = error ? String(error) : null),
-      _0x418b69
+      (cloneSceneState22.panorama.isLoaded = isLoaded === true),
+      (cloneSceneState22.panorama.error = error ? String(error) : null),
+      cloneSceneState22
     );
   });
 }
 export function addPanoramaSceneMannequin({
-  nodeId: _0x2af587,
+  nodeId: nodeId25,
   gender: gender = 'male',
   colorKey: colorKey = 'blue',
-  viewPose: _0xbe2dc6,
+  viewPose: viewPose3,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x429d14 = getSceneState(storeInstance, _0x2af587),
-    _0x5a84f5 = resolveObjectPlacementPoint({
-      sceneMode: _0x429d14.mode,
-      sceneViewTarget: _0x429d14?.viewport?.sceneView?.target,
-      pose: _0xbe2dc6,
+  const sceneMode = getSceneState(storeInstance, nodeId25),
+    position3 = resolveObjectPlacementPoint({
+      sceneMode: sceneMode.mode,
+      sceneViewTarget: sceneMode?.viewport?.sceneView?.target,
+      pose: viewPose3,
       groundY: 0,
       forwardDistance: MANNEQUIN_FORWARD_PLACEMENT_DISTANCE,
     }),
-    _0x3d62d2 = pickFacingCameraYaw(_0xbe2dc6),
-    _0xa260f9 = generateId('mannequin');
+    y6 = pickFacingCameraYaw(viewPose3),
+    id2 = generateId('mannequin');
   return (
-    writeSceneState(storeInstance, _0x2af587, (_0x35fedd) => {
-      const _0x43d1ec = cloneSceneState(_0x35fedd);
+    writeSceneState(storeInstance, nodeId25, (value152) => {
+      const cloneSceneState23 = cloneSceneState(value152);
       return (
-        _0x43d1ec.mannequins.push({
-          id: _0xa260f9,
+        cloneSceneState23.mannequins.push({
+          id: id2,
           gender: gender === 'female' ? 'female' : 'male',
           colorKey: colorKey,
-          position: _0x5a84f5,
-          rotation: { x: 0, y: _0x3d62d2, z: 0 },
+          position: position3,
+          rotation: { x: 0, y: y6, z: 0 },
           scale: 1,
         }),
-        (_0x43d1ec.gridPlacement.gender = gender === 'female' ? 'female' : 'male'),
-        (_0x43d1ec.gridPlacement.colorKey = colorKey),
-        setSingleSelection(_0x43d1ec, 'mannequin', _0xa260f9),
-        _0x43d1ec
+        (cloneSceneState23.gridPlacement.gender = gender === 'female' ? 'female' : 'male'),
+        (cloneSceneState23.gridPlacement.colorKey = colorKey),
+        setSingleSelection(cloneSceneState23, 'mannequin', id2),
+        cloneSceneState23
       );
     }),
     commit(),
-    _0xa260f9
+    id2
   );
 }
 export function addPanoramaSceneCube({
-  nodeId: _0x22f9da,
+  nodeId: nodeId26,
   colorKey: colorKey = 'blue',
-  viewPose: _0x3c2aa2,
+  viewPose: viewPose4,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x42e45c = getStoreNode(storeInstance, _0x22f9da);
-  if (isPanorama360NodeType(_0x42e45c?.type)) return null;
-  const _0x509a75 = getSceneState(storeInstance, _0x22f9da),
-    _0x419d79 = resolveObjectPlacementPoint({
-      sceneMode: _0x509a75.mode,
-      sceneViewTarget: _0x509a75?.viewport?.sceneView?.target,
-      pose: _0x3c2aa2,
+  const storeNode8 = getStoreNode(storeInstance, nodeId26);
+  if (isPanorama360NodeType(storeNode8?.type)) return null;
+  const sceneMode2 = getSceneState(storeInstance, nodeId26),
+    x9 = resolveObjectPlacementPoint({
+      sceneMode: sceneMode2.mode,
+      sceneViewTarget: sceneMode2?.viewport?.sceneView?.target,
+      pose: viewPose4,
       groundY: 0,
       forwardDistance: CUBE_FORWARD_PLACEMENT_DISTANCE,
     }),
-    _0x33d69a = { x: _0x419d79.x, y: 0, z: _0x419d79.z },
-    _0x376191 = generateId('cube');
+    position4 = { x: x9.x, y: 0, z: x9.z },
+    id3 = generateId('cube');
   return (
-    writeSceneState(storeInstance, _0x22f9da, (_0x24984e) => {
-      const _0x52bf28 = cloneSceneState(_0x24984e);
+    writeSceneState(storeInstance, nodeId26, (value153) => {
+      const cloneSceneState24 = cloneSceneState(value153);
       return (
-        _0x52bf28.cubes.push({
-          id: _0x376191,
+        cloneSceneState24.cubes.push({
+          id: id3,
           colorKey: colorKey,
-          position: _0x33d69a,
+          position: position4,
           rotation: { x: 0, y: 0, z: 0 },
           scale: 1,
         }),
-        setSingleSelection(_0x52bf28, 'cube', _0x376191),
-        _0x52bf28
+        setSingleSelection(cloneSceneState24, 'cube', id3),
+        cloneSceneState24
       );
     }),
     commit(),
-    _0x376191
+    id3
   );
 }
 export function addPanoramaSceneMannequinGrid({
-  nodeId: _0xfdf4b7,
-  viewPose: _0x4474dc,
+  nodeId: nodeId27,
+  viewPose: viewPose5,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x493e58 = getSceneState(storeInstance, _0xfdf4b7),
-    _0x464bef = pickFacingCameraYaw(_0x4474dc),
-    _0x217a24 = resolveBatchPlacementOrigin({
-      sceneMode: _0x493e58.mode,
-      sceneViewTarget: _0x493e58?.viewport?.sceneView?.target,
-      pose: _0x4474dc,
+  const sceneMode3 = getSceneState(storeInstance, nodeId27),
+    yaw = pickFacingCameraYaw(viewPose5),
+    origin = resolveBatchPlacementOrigin({
+      sceneMode: sceneMode3.mode,
+      sceneViewTarget: sceneMode3?.viewport?.sceneView?.target,
+      pose: viewPose5,
       groundY: 0,
       forwardDistance: MANNEQUIN_FORWARD_PLACEMENT_DISTANCE,
     }),
-    _0x1bc216 = computeGridPlacement({
-      rows: _0x493e58.gridPlacement.rows,
-      cols: _0x493e58.gridPlacement.cols,
-      spacingX: _0x493e58.gridPlacement.spacingX,
-      spacingZ: _0x493e58.gridPlacement.spacingZ,
-      origin: _0x217a24,
-      yaw: _0x464bef,
+    list19 = computeGridPlacement({
+      rows: sceneMode3.gridPlacement.rows,
+      cols: sceneMode3.gridPlacement.cols,
+      spacingX: sceneMode3.gridPlacement.spacingX,
+      spacingZ: sceneMode3.gridPlacement.spacingZ,
+      origin: origin,
+      yaw: yaw,
     });
-  if (_0x1bc216.length === 0) return [];
-  const _0x2c3d50 = [],
-    _0x260418 = generateId('mannequin-group');
+  if (list19.length === 0) return [];
+  const preferredActiveId5 = [],
+    id4 = generateId('mannequin-group');
   return (
-    writeSceneState(storeInstance, _0xfdf4b7, (_0x36a744) => {
-      const _0x43ab0a = cloneSceneState(_0x36a744);
-      for (const _0x12c52f of _0x1bc216) {
-        const _0x1c06c1 = generateId('mannequin');
-        (_0x2c3d50.push(_0x1c06c1),
-          _0x43ab0a.mannequins.push({
-            id: _0x1c06c1,
-            gender: _0x43ab0a.gridPlacement.gender,
-            colorKey: _0x43ab0a.gridPlacement.colorKey,
-            position: _0x12c52f,
-            rotation: { x: 0, y: _0x464bef, z: 0 },
+    writeSceneState(storeInstance, nodeId27, (value154) => {
+      const gender2 = cloneSceneState(value154);
+      for (const position5 of list19) {
+        const id5 = generateId('mannequin');
+        (preferredActiveId5.push(id5),
+          gender2.mannequins.push({
+            id: id5,
+            gender: gender2.gridPlacement.gender,
+            colorKey: gender2.gridPlacement.colorKey,
+            position: position5,
+            rotation: { x: 0, y: yaw, z: 0 },
             scale: 1,
           }));
       }
       return (
-        (_0x43ab0a.groups = Array.isArray(_0x43ab0a.groups) ? _0x43ab0a.groups : []),
-        _0x43ab0a.groups.push({
-          id: _0x260418,
+        (gender2.groups = Array.isArray(gender2.groups) ? gender2.groups : []),
+        gender2.groups.push({
+          id: id4,
           type: 'mannequin-grid',
           memberObjectType: 'mannequin',
-          memberIds: [..._0x2c3d50],
+          memberIds: [...preferredActiveId5],
         }),
         setSelectionFromObjects(
-          _0x43ab0a,
-          _0x2c3d50.map((_0xdef642) => ({ objectType: 'mannequin', objectId: _0xdef642 })),
+          gender2,
+          preferredActiveId5.map((objectId9) => ({ objectType: 'mannequin', objectId: objectId9 })),
           {
-            preferredGroupId: _0x260418,
+            preferredGroupId: id4,
             preferredActiveType: 'mannequin',
-            preferredActiveId: _0x2c3d50[0] || null,
+            preferredActiveId: preferredActiveId5[0] || null,
           },
         ),
-        _0x43ab0a
+        gender2
       );
     }),
     commit(),
-    _0x2c3d50
+    preferredActiveId5
   );
 }
 export function addPanoramaSceneCamera({
-  nodeId: _0x4d008f,
-  viewPose: _0x288e59,
+  nodeId: nodeId28,
+  viewPose: viewPose6,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x2c017a = getStoreNode(storeInstance, _0x4d008f);
-  if (isPanorama360NodeType(_0x2c017a?.type)) return null;
-  const _0x4d38b0 = getSceneState(storeInstance, _0x4d008f);
-  if (_0x4d38b0.cameras.length >= PANORAMA_SCENE_CAMERA_LIMIT)
+  const storeNode9 = getStoreNode(storeInstance, nodeId28);
+  if (isPanorama360NodeType(storeNode9?.type)) return null;
+  const sceneState6 = getSceneState(storeInstance, nodeId28);
+  if (sceneState6.cameras.length >= PANORAMA_SCENE_CAMERA_LIMIT)
     return (
       showWarning(panoramaSceneText('camera.limitWarning', { count: PANORAMA_SCENE_CAMERA_LIMIT })),
       null
     );
-  const _0x427e30 = sanitizeCameraPose(_0x288e59),
-    _0x529390 = generateId('scene-camera'),
-    _0x3d08a8 = resolveFirstFreeCameraSlot(_0x4d38b0.cameras);
-  if (!_0x3d08a8)
+  const position6 = sanitizeCameraPose(viewPose6),
+    id6 = generateId('scene-camera'),
+    slot6 = resolveFirstFreeCameraSlot(sceneState6.cameras);
+  if (!slot6)
     return (
       showWarning(panoramaSceneText('camera.limitWarning', { count: PANORAMA_SCENE_CAMERA_LIMIT })),
       null
     );
   return (
-    writeSceneState(storeInstance, _0x4d008f, (_0x1f4e7f) => {
-      const _0x245414 = cloneSceneState(_0x1f4e7f);
+    writeSceneState(storeInstance, nodeId28, (value155) => {
+      const cloneSceneState25 = cloneSceneState(value155);
       return (
-        _0x245414.cameras.push({
-          id: _0x529390,
-          slot: _0x3d08a8,
-          name: panoramaSceneText('camera.defaultName', { slot: toCameraSlotLabel(_0x3d08a8) }),
-          position: _0x427e30.position,
-          quaternion: _0x427e30.quaternion,
-          rotation: _0x427e30.rotation,
-          focalLength: _0x427e30.focalLength,
+        cloneSceneState25.cameras.push({
+          id: id6,
+          slot: slot6,
+          name: panoramaSceneText('camera.defaultName', { slot: toCameraSlotLabel(slot6) }),
+          position: position6.position,
+          quaternion: position6.quaternion,
+          rotation: position6.rotation,
+          focalLength: position6.focalLength,
         }),
-        _0x245414.mode === 'panorama' &&
-          ((_0x245414.viewport.activeView = 'camera'), (_0x245414.viewport.activeCameraId = _0x529390)),
-        _0x245414
+        cloneSceneState25.mode === 'panorama' &&
+          ((cloneSceneState25.viewport.activeView = 'camera'),
+          (cloneSceneState25.viewport.activeCameraId = id6)),
+        cloneSceneState25
       );
     }),
     commit(),
-    _0x529390
+    id6
   );
 }
 export function updatePanoramaSceneObjectTransform({
-  nodeId: _0x552f64,
-  objectType: _0x4c1e9b,
-  objectId: _0x12f95a,
-  pose: _0x2fa75c,
-  targets: _0x2f1dd8,
+  nodeId: nodeId29,
+  objectType: objectType8,
+  objectId: objectId10,
+  pose: pose2,
+  targets: targets,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x362af9 = Array.isArray(_0x2f1dd8) ? _0x2f1dd8 : [],
-    _0x411e57 = _0x2fa75c ? sanitizeObjectPose(_0x2fa75c) : null;
-  (writeSceneState(storeInstance, _0x552f64, (_0x1ec72c) => {
-    const _0x45abc1 = cloneSceneState(_0x1ec72c);
-    if (_0x362af9.length > 0) {
-      const _0x323ae1 = new Map(),
-        _0x5adf98 = new Map();
-      _0x362af9.forEach((_0x9a5abc) => {
-        if (!_0x9a5abc?.objectId || !_0x9a5abc?.objectType || !_0x9a5abc?.pose) return;
-        const _0x2fdf37 = sanitizeObjectPose(_0x9a5abc.pose);
-        if (_0x9a5abc.objectType === 'mannequin') _0x323ae1.set(String(_0x9a5abc.objectId), _0x2fdf37);
-        else _0x9a5abc.objectType === 'cube' && _0x5adf98.set(String(_0x9a5abc.objectId), _0x2fdf37);
+  const list20 = Array.isArray(targets) ? targets : [],
+    position7 = pose2 ? sanitizeObjectPose(pose2) : null;
+  (writeSceneState(storeInstance, nodeId29, (value156) => {
+    const cloneSceneState26 = cloneSceneState(value156);
+    if (list20.length > 0) {
+      const map6 = new Map(),
+        map7 = new Map();
+      list20.forEach((enabled11) => {
+        if (!enabled11?.objectId || !enabled11?.objectType || !enabled11?.pose) return;
+        const sanitizeObjectPose2 = sanitizeObjectPose(enabled11.pose);
+        if (enabled11.objectType === 'mannequin') map6.set(String(enabled11.objectId), sanitizeObjectPose2);
+        else enabled11.objectType === 'cube' && map7.set(String(enabled11.objectId), sanitizeObjectPose2);
       });
-      _0x323ae1.size > 0 &&
-        (_0x45abc1.mannequins = _0x45abc1.mannequins.map((_0x173ec8) => {
-          const _0x39e000 = _0x323ae1.get(_0x173ec8.id);
-          if (!_0x39e000) return _0x173ec8;
-          const _0xf31059 = composeCompatibleScale(_0x39e000.scale, _0x173ec8.scale);
+      map6.size > 0 &&
+        (cloneSceneState26.mannequins = cloneSceneState26.mannequins.map((box11) => {
+          const position8 = map6.get(box11.id);
+          if (!position8) return box11;
+          const scale2 = composeCompatibleScale(position8.scale, box11.scale);
           return {
-            ..._0x173ec8,
-            position: _0x39e000.position,
-            rotation: _0x39e000.rotation,
-            quaternion: _0x39e000.quaternion,
-            scale: _0xf31059,
+            ...box11,
+            position: position8.position,
+            rotation: position8.rotation,
+            quaternion: position8.quaternion,
+            scale: scale2,
           };
         }));
-      _0x5adf98.size > 0 &&
-        (_0x45abc1.cubes = _0x45abc1.cubes.map((_0x507759) => {
-          const _0x2ab54d = _0x5adf98.get(_0x507759.id);
-          if (!_0x2ab54d) return _0x507759;
-          const _0x1db484 = composeCompatibleScale(_0x2ab54d.scale, _0x507759.scale);
+      map7.size > 0 &&
+        (cloneSceneState26.cubes = cloneSceneState26.cubes.map((box12) => {
+          const position9 = map7.get(box12.id);
+          if (!position9) return box12;
+          const scale3 = composeCompatibleScale(position9.scale, box12.scale);
           return {
-            ..._0x507759,
-            position: _0x2ab54d.position,
-            rotation: _0x2ab54d.rotation,
-            quaternion: _0x2ab54d.quaternion,
-            scale: _0x1db484,
+            ...box12,
+            position: position9.position,
+            rotation: position9.rotation,
+            quaternion: position9.quaternion,
+            scale: scale3,
           };
         }));
-      if (_0x45abc1.selection.selectedGroupId) {
-        const _0x16945e = (_0x45abc1.groups || []).find(
-          (_0x14a6fc) => _0x14a6fc.id === _0x45abc1.selection.selectedGroupId,
+      if (cloneSceneState26.selection.selectedGroupId) {
+        const preferredGroupId4 = (cloneSceneState26.groups || []).find(
+          (item27) => item27.id === cloneSceneState26.selection.selectedGroupId,
         );
-        _0x16945e &&
+        preferredGroupId4 &&
           setSelectionFromObjects(
-            _0x45abc1,
-            _0x16945e.memberIds.map((_0x38edd4) => ({ objectType: 'mannequin', objectId: _0x38edd4 })),
+            cloneSceneState26,
+            preferredGroupId4.memberIds.map((objectId11) => ({
+              objectType: 'mannequin',
+              objectId: objectId11,
+            })),
             {
-              preferredGroupId: _0x16945e.id,
+              preferredGroupId: preferredGroupId4.id,
               preferredActiveType: 'mannequin',
-              preferredActiveId: _0x16945e.memberIds[0] || null,
+              preferredActiveId: preferredGroupId4.memberIds[0] || null,
             },
           );
       }
-      return _0x45abc1;
+      return cloneSceneState26;
     }
-    if (_0x4c1e9b === 'camera') return _0x45abc1;
-    if (_0x4c1e9b === 'mannequin' && _0x411e57 && _0x12f95a)
-      ((_0x45abc1.mannequins = _0x45abc1.mannequins.map((_0x1c0aa2) =>
-        _0x1c0aa2.id === _0x12f95a
+    if (objectType8 === 'camera') return cloneSceneState26;
+    if (objectType8 === 'mannequin' && position7 && objectId10)
+      ((cloneSceneState26.mannequins = cloneSceneState26.mannequins.map((box13) =>
+        box13.id === objectId10
           ? {
-              ..._0x1c0aa2,
-              position: _0x411e57.position,
-              rotation: _0x411e57.rotation,
-              quaternion: _0x411e57.quaternion,
-              scale: composeCompatibleScale(_0x411e57.scale, _0x1c0aa2.scale),
+              ...box13,
+              position: position7.position,
+              rotation: position7.rotation,
+              quaternion: position7.quaternion,
+              scale: composeCompatibleScale(position7.scale, box13.scale),
             }
-          : _0x1c0aa2,
+          : box13,
       )),
-        setSingleSelection(_0x45abc1, 'mannequin', _0x12f95a));
+        setSingleSelection(cloneSceneState26, 'mannequin', objectId10));
     else
-      _0x4c1e9b === 'cube' &&
-        _0x411e57 &&
-        _0x12f95a &&
-        ((_0x45abc1.cubes = _0x45abc1.cubes.map((_0x1a200a) =>
-          _0x1a200a.id === _0x12f95a
+      objectType8 === 'cube' &&
+        position7 &&
+        objectId10 &&
+        ((cloneSceneState26.cubes = cloneSceneState26.cubes.map((box14) =>
+          box14.id === objectId10
             ? {
-                ..._0x1a200a,
-                position: _0x411e57.position,
-                rotation: _0x411e57.rotation,
-                quaternion: _0x411e57.quaternion,
-                scale: composeCompatibleScale(_0x411e57.scale, _0x1a200a.scale),
+                ...box14,
+                position: position7.position,
+                rotation: position7.rotation,
+                quaternion: position7.quaternion,
+                scale: composeCompatibleScale(position7.scale, box14.scale),
               }
-            : _0x1a200a,
+            : box14,
         )),
-        setSingleSelection(_0x45abc1, 'cube', _0x12f95a));
-    return _0x45abc1;
+        setSingleSelection(cloneSceneState26, 'cube', objectId10));
+    return cloneSceneState26;
   }),
     commit());
 }
 export function deletePanoramaSceneCamera({
-  nodeId: _0x5d469d,
-  cameraId: _0x5e2ace,
+  nodeId: nodeId30,
+  cameraId: cameraId3,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x5c02e8 = getStoreNode(storeInstance, _0x5d469d);
-  if (isPanorama360NodeType(_0x5c02e8?.type)) return;
-  const _0x256fe5 = getSceneState(storeInstance, _0x5d469d);
-  if (!_0x256fe5.cameras.some((_0x4c30a7) => _0x4c30a7.id === _0x5e2ace)) return;
-  (writeSceneState(storeInstance, _0x5d469d, (_0x3b9b71) => {
-    const _0x3a9478 = finalizeSelectedObjectRemoval(_0x3b9b71, 'camera', _0x5e2ace);
+  const storeNode10 = getStoreNode(storeInstance, nodeId30);
+  if (isPanorama360NodeType(storeNode10?.type)) return;
+  const sceneState7 = getSceneState(storeInstance, nodeId30);
+  if (!sceneState7.cameras.some((item28) => item28.id === cameraId3)) return;
+  (writeSceneState(storeInstance, nodeId30, (value157) => {
+    const finalizeSelectedObjectRemoval2 = finalizeSelectedObjectRemoval(value157, 'camera', cameraId3);
     return (
-      (_0x3a9478.cameras = _0x3a9478.cameras.filter((_0x848b69) => _0x848b69.id !== _0x5e2ace)),
-      _0x3a9478
+      (finalizeSelectedObjectRemoval2.cameras = finalizeSelectedObjectRemoval2.cameras.filter(
+        (item29) => item29.id !== cameraId3,
+      )),
+      finalizeSelectedObjectRemoval2
     );
   }),
     commit());
 }
 export function deleteSelectedPanoramaSceneObject({
-  nodeId: _0x1677ed,
+  nodeId: nodeId31,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x735d0d = getSceneState(storeInstance, _0x1677ed),
-    _0x45b2e2 = collectSelectionObjects(_0x735d0d),
-    _0x5507b3 = _0x735d0d.selection.selectedObjectType,
-    _0x22d828 = _0x735d0d.selection.selectedObjectId,
-    _0x5586a3 =
-      _0x735d0d?.viewport?.activeView === 'camera' && _0x735d0d?.viewport?.activeCameraId
-        ? String(_0x735d0d.viewport.activeCameraId)
+  const sceneState8 = getSceneState(storeInstance, nodeId31),
+    list21 = collectSelectionObjects(sceneState8),
+    objectType9 = sceneState8.selection.selectedObjectType,
+    objectId12 = sceneState8.selection.selectedObjectId,
+    objectId13 =
+      sceneState8?.viewport?.activeView === 'camera' && sceneState8?.viewport?.activeCameraId
+        ? String(sceneState8.viewport.activeCameraId)
         : null,
-    _0x3702de = _0x735d0d.selection.selectedGroupId || null;
-  if (_0x3702de) {
-    (writeSceneState(storeInstance, _0x1677ed, (_0x525793) => {
-      const _0x3f4577 = cloneSceneState(_0x525793),
-        _0x22ab53 = (_0x3f4577.groups || []).find((_0x3b9218) => _0x3b9218.id === _0x3702de);
-      if (!_0x22ab53) return (clearSelection(_0x3f4577), _0x3f4577);
-      const _0x2ab98f = new Set(_0x22ab53.memberIds);
+    value158 = sceneState8.selection.selectedGroupId || null;
+  if (value158) {
+    (writeSceneState(storeInstance, nodeId31, (value159) => {
+      const cloneSceneState27 = cloneSceneState(value159),
+        enabled12 = (cloneSceneState27.groups || []).find((item30) => item30.id === value158);
+      if (!enabled12) return (clearSelection(cloneSceneState27), cloneSceneState27);
+      const map8 = new Set(enabled12.memberIds);
       return (
-        (_0x3f4577.mannequins = _0x3f4577.mannequins.filter((_0x61821a) => !_0x2ab98f.has(_0x61821a.id))),
-        (_0x3f4577.groups = pruneGroups(_0x3f4577.groups, [..._0x2ab98f]).filter(
-          (_0x1cf006) => _0x1cf006.id !== _0x3702de,
+        (cloneSceneState27.mannequins = cloneSceneState27.mannequins.filter(
+          (item31) => !map8.has(item31.id),
         )),
-        clearSelection(_0x3f4577),
-        _0x3f4577
+        (cloneSceneState27.groups = pruneGroups(cloneSceneState27.groups, [...map8]).filter(
+          (item32) => item32.id !== value158,
+        )),
+        clearSelection(cloneSceneState27),
+        cloneSceneState27
       );
     }),
       commit());
     return;
   }
-  if (_0x45b2e2.length > 1) {
-    (writeSceneState(storeInstance, _0x1677ed, (_0x63862e) => {
-      const _0xd1bd09 = cloneSceneState(_0x63862e),
-        _0xa0d259 = new Set(
-          _0x45b2e2
-            .filter((_0x5c0a27) => _0x5c0a27.objectType === 'cube')
-            .map((_0x4d4f0d) => _0x4d4f0d.objectId),
+  if (list21.length > 1) {
+    (writeSceneState(storeInstance, nodeId31, (value160) => {
+      const cloneSceneState28 = cloneSceneState(value160),
+        map9 = new Set(
+          list21.filter((item33) => item33.objectType === 'cube').map((item34) => item34.objectId),
         ),
-        _0x46a538 = new Set(
-          _0x45b2e2
-            .filter((_0x4510f2) => _0x4510f2.objectType === 'mannequin')
-            .map((_0x1f3af0) => _0x1f3af0.objectId),
+        map10 = new Set(
+          list21.filter((item35) => item35.objectType === 'mannequin').map((item36) => item36.objectId),
         );
-      _0xa0d259.size > 0 &&
-        (_0xd1bd09.cubes = _0xd1bd09.cubes.filter((_0x5b5df4) => !_0xa0d259.has(_0x5b5df4.id)));
-      if (_0x46a538.size > 0) {
-        const _0x5753dc = [..._0x46a538];
-        ((_0xd1bd09.mannequins = _0xd1bd09.mannequins.filter((_0x13484d) => !_0x46a538.has(_0x13484d.id))),
-          (_0xd1bd09.groups = pruneGroups(_0xd1bd09.groups, _0x5753dc)));
+      map9.size > 0 &&
+        (cloneSceneState28.cubes = cloneSceneState28.cubes.filter((item37) => !map9.has(item37.id)));
+      if (map10.size > 0) {
+        const value161 = [...map10];
+        ((cloneSceneState28.mannequins = cloneSceneState28.mannequins.filter(
+          (item38) => !map10.has(item38.id),
+        )),
+          (cloneSceneState28.groups = pruneGroups(cloneSceneState28.groups, value161)));
       }
-      return (clearSelection(_0xd1bd09), _0xd1bd09);
+      return (clearSelection(cloneSceneState28), cloneSceneState28);
     }),
       commit());
     return;
   }
-  const _0x5e5446 =
-    _0x45b2e2.length === 1
-      ? _0x45b2e2[0]
-      : _0x5507b3 && _0x22d828
-        ? { objectType: _0x5507b3, objectId: _0x22d828 }
-        : _0x5586a3
-          ? { objectType: 'camera', objectId: _0x5586a3 }
+  const enabled13 =
+    list21.length === 1
+      ? list21[0]
+      : objectType9 && objectId12
+        ? { objectType: objectType9, objectId: objectId12 }
+        : objectId13
+          ? { objectType: 'camera', objectId: objectId13 }
           : null;
-  if (!_0x5e5446?.objectType || !_0x5e5446?.objectId) return;
-  (writeSceneState(storeInstance, _0x1677ed, (_0x277bc1) => {
-    const _0x46ab1d = finalizeSelectedObjectRemoval(_0x277bc1, _0x5e5446.objectType, _0x5e5446.objectId);
-    if (_0x5e5446.objectType === 'camera')
-      _0x46ab1d.cameras = _0x46ab1d.cameras.filter((_0x3d0068) => _0x3d0068.id !== _0x5e5446.objectId);
+  if (!enabled13?.objectType || !enabled13?.objectId) return;
+  (writeSceneState(storeInstance, nodeId31, (value162) => {
+    const finalizeSelectedObjectRemoval3 = finalizeSelectedObjectRemoval(
+      value162,
+      enabled13.objectType,
+      enabled13.objectId,
+    );
+    if (enabled13.objectType === 'camera')
+      finalizeSelectedObjectRemoval3.cameras = finalizeSelectedObjectRemoval3.cameras.filter(
+        (item39) => item39.id !== enabled13.objectId,
+      );
     else
-      _0x5e5446.objectType === 'cube'
-        ? (_0x46ab1d.cubes = _0x46ab1d.cubes.filter((_0x36e7f7) => _0x36e7f7.id !== _0x5e5446.objectId))
-        : ((_0x46ab1d.mannequins = _0x46ab1d.mannequins.filter(
-            (_0x533359) => _0x533359.id !== _0x5e5446.objectId,
+      enabled13.objectType === 'cube'
+        ? (finalizeSelectedObjectRemoval3.cubes = finalizeSelectedObjectRemoval3.cubes.filter(
+            (item40) => item40.id !== enabled13.objectId,
+          ))
+        : ((finalizeSelectedObjectRemoval3.mannequins = finalizeSelectedObjectRemoval3.mannequins.filter(
+            (item41) => item41.id !== enabled13.objectId,
           )),
-          (_0x46ab1d.groups = pruneGroups(_0x46ab1d.groups, [_0x5e5446.objectId])));
-    return _0x46ab1d;
+          (finalizeSelectedObjectRemoval3.groups = pruneGroups(finalizeSelectedObjectRemoval3.groups, [
+            enabled13.objectId,
+          ])));
+    return finalizeSelectedObjectRemoval3;
   }),
     commit());
 }
-function createCapturePreviewUrl(_0x38546d) {
-  const _0x33bdc8 = globalThis.window?.URL || globalThis.URL;
-  if (!_0x38546d || typeof _0x33bdc8?.createObjectURL !== 'function') return '';
+function createCapturePreviewUrl(enabled14) {
+  const value163 = globalThis.window?.URL || globalThis.URL;
+  if (!enabled14 || typeof value163?.createObjectURL !== 'function') return '';
   try {
-    return _0x33bdc8.createObjectURL(_0x38546d);
+    return value163.createObjectURL(enabled14);
   } catch {
     return '';
   }
 }
-function buildSavedCapturePatch(_0x37a59c, _0x1f488c = {}) {
-  const _0x359cc1 = pickResultLocalPath(_0x37a59c),
-    _0x1b9b6b = localPathToUrl(_0x359cc1) || String(_0x37a59c?.url || '').trim();
-  if (!_0x359cc1 || !_0x1b9b6b) throw new Error(panoramaSceneText('capture.saveInvalidPath'));
-  const _0x40aad8 = {
-      src: _0x1b9b6b,
-      localPath: _0x359cc1,
-      originalLocalPath: normalizeLocalPath(_0x37a59c?.originalLocalPath || _0x359cc1),
-      displayLocalPath: normalizeLocalPath(_0x37a59c?.displayLocalPath),
-      thumbLocalPath: normalizeLocalPath(_0x37a59c?.thumbLocalPath),
-      fileName: _0x37a59c?.filename || _0x1f488c.fileName || '',
+function buildSavedCapturePatch(fileName4, box15 = {}) {
+  const localPath5 = pickResultLocalPath(fileName4),
+    src = localPathToUrl(localPath5) || String(fileName4?.url || '').trim();
+  if (!localPath5 || !src) throw new Error(panoramaSceneText('capture.saveInvalidPath'));
+  const value164 = {
+      src: src,
+      localPath: localPath5,
+      originalLocalPath: normalizeLocalPath(fileName4?.originalLocalPath || localPath5),
+      displayLocalPath: normalizeLocalPath(fileName4?.displayLocalPath),
+      thumbLocalPath: normalizeLocalPath(fileName4?.thumbLocalPath),
+      fileName: fileName4?.filename || box15.fileName || '',
       captureSavePending: false,
       captureSaveError: null,
     },
-    _0x1dd2db = Number(_0x37a59c?.originalWidth || _0x1f488c.originalWidth || _0x1f488c.width || 0),
-    _0x2507ac = Number(_0x37a59c?.originalHeight || _0x1f488c.originalHeight || _0x1f488c.height || 0);
-  if (_0x1dd2db > 0) _0x40aad8.originalWidth = _0x1dd2db;
-  if (_0x2507ac > 0) _0x40aad8.originalHeight = _0x2507ac;
-  return _0x40aad8;
+    count7 = Number(fileName4?.originalWidth || box15.originalWidth || box15.width || 0),
+    count8 = Number(fileName4?.originalHeight || box15.originalHeight || box15.height || 0);
+  if (count7 > 0) value164.originalWidth = count7;
+  if (count8 > 0) value164.originalHeight = count8;
+  return value164;
 }
 export async function capturePanoramaSceneViewport({
-  nodeId: _0x2ff06b,
-  captureViewport: _0x3fe0bf,
-  captureBlob: _0xa79015,
+  nodeId: nodeId32,
+  captureViewport: captureViewport,
+  captureBlob: captureBlob,
   storeInstance: storeInstance = appStore,
   saveBlob: saveBlob = saveOutputBlob,
   createPreviewUrl: createPreviewUrl = createCapturePreviewUrl,
 }) {
-  const _0x54cf46 =
-    typeof _0xa79015 === 'function' ? _0xa79015 : typeof _0x3fe0bf === 'function' ? _0x3fe0bf : null;
-  if (!_0x54cf46) return null;
-  const _0x25c4a2 = createNodeActionContext({ storeInstance: storeInstance }),
-    _0x6b4262 = getStoreNode(_0x25c4a2.storeInstance, _0x2ff06b);
-  if (!_0x6b4262) return null;
-  const _0x12e422 = getSceneState(_0x25c4a2.storeInstance, _0x2ff06b);
-  if (_0x12e422.capture.pending) return (showWarning(panoramaSceneText('capture.pending')), null);
-  writeSceneState(_0x25c4a2.storeInstance, _0x2ff06b, (_0x2f9566) => {
-    const _0x1a1375 = cloneSceneState(_0x2f9566);
-    return ((_0x1a1375.capture.pending = true), (_0x1a1375.capture.error = null), _0x1a1375);
+  const run2 =
+    typeof captureBlob === 'function'
+      ? captureBlob
+      : typeof captureViewport === 'function'
+        ? captureViewport
+        : null;
+  if (!run2) return null;
+  const nodeActionContext = createNodeActionContext({ storeInstance: storeInstance }),
+    storeNode11 = getStoreNode(nodeActionContext.storeInstance, nodeId32);
+  if (!storeNode11) return null;
+  const sceneState9 = getSceneState(nodeActionContext.storeInstance, nodeId32);
+  if (sceneState9.capture.pending) return (showWarning(panoramaSceneText('capture.pending')), null);
+  writeSceneState(nodeActionContext.storeInstance, nodeId32, (value165) => {
+    const cloneSceneState29 = cloneSceneState(value165);
+    return (
+      (cloneSceneState29.capture.pending = true),
+      (cloneSceneState29.capture.error = null),
+      cloneSceneState29
+    );
   });
   try {
-    const _0x116421 = await _0x54cf46();
-    if (!_0x116421) throw new Error(panoramaSceneText('capture.noImage'));
-    const _0xe8deeb = 'scene_capture_' + Date.now() + '.png',
-      _0x53bc0f = buildSourceMediaNodePayload({
+    const enabled15 = await run2();
+    if (!enabled15) throw new Error(panoramaSceneText('capture.noImage'));
+    const fileName5 = 'scene_capture_' + Date.now() + '.png',
+      width2 = buildSourceMediaNodePayload({
         id: '__seed__',
         type: 'source-image',
         x: 0,
         y: 0,
         name: panoramaSceneText('capture.nodeName'),
-        fileName: _0xe8deeb,
+        fileName: fileName5,
       }),
-      _0x9f2d32 = _0x25c4a2.storeInstance.getStateRaw(),
-      _0x4378b4 = calcSafeSpawnPosNearNode(
-        _0x9f2d32.nodes || {},
-        _0x6b4262,
-        _0x53bc0f.width,
-        _0x53bc0f.height,
-      ),
-      _0x566647 = generateId('source-image'),
-      _0x35e8f5 = createPreviewUrl(_0x116421) || '';
+      value166 = nodeActionContext.storeInstance.getStateRaw(),
+      x10 = calcSafeSpawnPosNearNode(value166.nodes || {}, storeNode11, width2.width, width2.height),
+      id7 = generateId('source-image'),
+      capturePreviewUrl = createPreviewUrl(enabled15) || '';
     return (
-      _0x25c4a2.storeInstance.batch(() => {
-        (writeSceneState(_0x25c4a2.storeInstance, _0x2ff06b, (_0x21e14b) => {
-          const _0x3eff45 = cloneSceneState(_0x21e14b);
+      nodeActionContext.storeInstance.batch(() => {
+        (writeSceneState(nodeActionContext.storeInstance, nodeId32, (value167) => {
+          const cloneSceneState30 = cloneSceneState(value167);
           return (
-            (_0x3eff45.capture.pending = false),
-            (_0x3eff45.capture.error = null),
-            (_0x3eff45.capture.lastCaptureAt = Date.now()),
-            _0x3eff45
+            (cloneSceneState30.capture.pending = false),
+            (cloneSceneState30.capture.error = null),
+            (cloneSceneState30.capture.lastCaptureAt = Date.now()),
+            cloneSceneState30
           );
         }),
-          _0x25c4a2.storeInstance.addNode(
+          nodeActionContext.storeInstance.addNode(
             buildSourceMediaNodePayload({
-              id: _0x566647,
+              id: id7,
               type: 'source-image',
-              x: _0x4378b4.x,
-              y: _0x4378b4.y,
+              x: x10.x,
+              y: x10.y,
               name: panoramaSceneText('capture.nodeName'),
-              fileName: _0xe8deeb,
-              capturePreviewUrl: _0x35e8f5,
+              fileName: fileName5,
+              capturePreviewUrl: capturePreviewUrl,
               captureSavePending: true,
               captureSaveError: null,
             }),
@@ -1809,124 +1825,131 @@ export async function capturePanoramaSceneViewport({
       commit(),
       showSuccess(panoramaSceneText('capture.success')),
       Promise.resolve()
-        .then(() => saveBlob(_0x116421, { ext: 'png' }))
-        .then((_0x41e0ce) => {
-          if (!_0x25c4a2.storeInstance.getStateRaw().nodes?.[_0x566647]) return;
-          _0x25c4a2.storeInstance.updateNodeData(
-            _0x566647,
-            buildSavedCapturePatch(_0x41e0ce, {
-              fileName: _0xe8deeb,
-              width: _0x53bc0f.width,
-              height: _0x53bc0f.height,
+        .then(() => saveBlob(enabled15, { ext: 'png' }))
+        .then((value168) => {
+          if (!nodeActionContext.storeInstance.getStateRaw().nodes?.[id7]) return;
+          nodeActionContext.storeInstance.updateNodeData(
+            id7,
+            buildSavedCapturePatch(value168, {
+              fileName: fileName5,
+              width: width2.width,
+              height: width2.height,
             }),
           );
         })
-        .catch((_0x57b6e3) => {
-          const _0xb38d06 = String(_0x57b6e3?.message || panoramaSceneText('capture.localSaveFailed'));
-          (console.warn('[PanoramaScene] save capture failed:', _0x57b6e3),
-            _0x25c4a2.storeInstance.getStateRaw().nodes?.[_0x566647] &&
-              _0x25c4a2.storeInstance.updateNodeData(_0x566647, {
+        .catch((error6) => {
+          const captureSaveError = String(error6?.message || panoramaSceneText('capture.localSaveFailed'));
+          (console.warn('[PanoramaScene] save capture failed:', error6),
+            nodeActionContext.storeInstance.getStateRaw().nodes?.[id7] &&
+              nodeActionContext.storeInstance.updateNodeData(id7, {
                 captureSavePending: false,
-                captureSaveError: _0xb38d06,
+                captureSaveError: captureSaveError,
               }),
             showWarning(panoramaSceneText('capture.localSaveWarning')));
         }),
-      _0x566647
+      id7
     );
-  } catch (_0x4c6d58) {
-    const _0x4427db = String(_0x4c6d58?.message || panoramaSceneText('capture.failed'));
+  } catch (error7) {
+    const error8 = String(error7?.message || panoramaSceneText('capture.failed'));
     return (
-      writeSceneState(_0x25c4a2.storeInstance, _0x2ff06b, (_0xa0c59b) => {
-        const _0x1f63c4 = cloneSceneState(_0xa0c59b);
-        return ((_0x1f63c4.capture.pending = false), (_0x1f63c4.capture.error = _0x4427db), _0x1f63c4);
+      writeSceneState(nodeActionContext.storeInstance, nodeId32, (value169) => {
+        const cloneSceneState31 = cloneSceneState(value169);
+        return (
+          (cloneSceneState31.capture.pending = false),
+          (cloneSceneState31.capture.error = error8),
+          cloneSceneState31
+        );
       }),
-      showError(panoramaSceneText('capture.failedWithError', { error: _0x4427db })),
+      showError(panoramaSceneText('capture.failedWithError', { error: error8 })),
       null
     );
   }
 }
 export function renamePanoramaSceneCamera({
-  nodeId: _0x25d76e,
-  cameraId: _0x2a60cc,
-  name: _0x56a1ca,
+  nodeId: nodeId33,
+  cameraId: cameraId4,
+  name: name2,
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x25d76e, (_0x452e68) => {
-    const _0x2a35dc = cloneSceneState(_0x452e68);
+  writeSceneState(storeInstance, nodeId33, (value170) => {
+    const cloneSceneState32 = cloneSceneState(value170);
     return (
-      (_0x2a35dc.cameras = _0x2a35dc.cameras.map((_0x44157f) =>
-        _0x44157f.id === _0x2a60cc
+      (cloneSceneState32.cameras = cloneSceneState32.cameras.map((error9) =>
+        error9.id === cameraId4
           ? {
-              ..._0x44157f,
+              ...error9,
               name:
-                String(_0x56a1ca || _0x44157f.name || panoramaSceneText('camera.fallbackName')).trim() ||
-                _0x44157f.name,
+                String(name2 || error9.name || panoramaSceneText('camera.fallbackName')).trim() ||
+                error9.name,
             }
-          : _0x44157f,
+          : error9,
       )),
-      _0x2a35dc
+      cloneSceneState32
     );
   });
 }
 export function setPanoramaSceneCollapsed({
-  nodeId: _0x40b72b,
-  isCollapsed: _0x28e912,
+  nodeId: nodeId34,
+  isCollapsed: isCollapsed,
   enterEditingOnExpand: enterEditingOnExpand = false,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x571e12 = getStoreNode(storeInstance, _0x40b72b);
-  if (!_0x571e12) return;
-  const _0x11cc57 = typeof _0x28e912 === 'boolean' ? _0x28e912 : _0x571e12.isCollapsed !== true;
-  if (_0x11cc57 === (_0x571e12.isCollapsed === true)) return;
-  const _0x5d6ae1 = enterEditingOnExpand === true && _0x11cc57 === false,
-    _0x230f22 =
-      Number(_0x571e12._originalWidth) || Number(_0x571e12.width) || PANORAMA_SCENE_DEFAULT_SIZE.width,
-    _0x4615d6 =
-      Number(_0x571e12._originalHeight) || Number(_0x571e12.height) || PANORAMA_SCENE_DEFAULT_SIZE.height,
-    _0x3441fe = computeCollapsedDimensions(_0x230f22, _0x4615d6);
+  const box16 = getStoreNode(storeInstance, nodeId34);
+  if (!box16) return;
+  const isCollapsed2 = typeof isCollapsed === 'boolean' ? isCollapsed : box16.isCollapsed !== true;
+  if (isCollapsed2 === (box16.isCollapsed === true)) return;
+  const value171 = enterEditingOnExpand === true && isCollapsed2 === false,
+    _originalWidth = Number(box16._originalWidth) || Number(box16.width) || PANORAMA_SCENE_DEFAULT_SIZE.width,
+    _originalHeight =
+      Number(box16._originalHeight) || Number(box16.height) || PANORAMA_SCENE_DEFAULT_SIZE.height,
+    box17 = computeCollapsedDimensions(_originalWidth, _originalHeight);
   (storeInstance.batch(() => {
-    (writeSceneState(storeInstance, _0x40b72b, (_0x13f790) => {
-      const _0x522225 = cloneSceneState(_0x13f790);
-      return ((_0x522225.ui.isEditing = _0x5d6ae1), (_0x522225.ui.showCameraList = false), _0x522225);
+    (writeSceneState(storeInstance, nodeId34, (value172) => {
+      const cloneSceneState33 = cloneSceneState(value172);
+      return (
+        (cloneSceneState33.ui.isEditing = value171),
+        (cloneSceneState33.ui.showCameraList = false),
+        cloneSceneState33
+      );
     }),
-      storeInstance.updateNodeData(_0x40b72b, {
-        isCollapsed: _0x11cc57,
-        _originalWidth: _0x230f22,
-        _originalHeight: _0x4615d6,
-        width: _0x11cc57 ? _0x3441fe.width : _0x230f22,
-        height: _0x11cc57 ? _0x3441fe.height : _0x4615d6,
+      storeInstance.updateNodeData(nodeId34, {
+        isCollapsed: isCollapsed2,
+        _originalWidth: _originalWidth,
+        _originalHeight: _originalHeight,
+        width: isCollapsed2 ? box17.width : _originalWidth,
+        height: isCollapsed2 ? box17.height : _originalHeight,
       }));
   }),
     commit());
 }
-export function focusPanoramaSceneSelection({ nodeId: _0x3b16c0, storeInstance: storeInstance = appStore }) {
-  const _0x4dd737 = getSceneState(storeInstance, _0x3b16c0),
-    _0x4adf36 = getSelectedObject(_0x4dd737);
-  if (!_0x4adf36) return false;
-  if (_0x4adf36.objectType === 'camera')
+export function focusPanoramaSceneSelection({ nodeId: nodeId35, storeInstance: storeInstance = appStore }) {
+  const args9 = getSceneState(storeInstance, nodeId35),
+    cameraId5 = getSelectedObject(args9);
+  if (!cameraId5) return false;
+  if (cameraId5.objectType === 'camera')
     return (
       activatePanoramaSceneCamera({
-        nodeId: _0x3b16c0,
-        cameraId: _0x4adf36.item.id,
+        nodeId: nodeId35,
+        cameraId: cameraId5.item.id,
         storeInstance: storeInstance,
       }),
       true
     );
-  const _0x51a73b = _0x4adf36.item,
-    _0x289df7 = getSceneObjectHeightOffset(_0x4adf36.objectType);
-  if (_0x4dd737.mode === 'panorama') {
-    const _0x3bf2a9 = (Number(_0x51a73b.position?.y) || 0) + _0x289df7,
-      _0x69c25d = Number(_0x51a73b.position?.x) || 0,
-      _0x342a0c = _0x3bf2a9 - 1.6,
-      _0x40861c = Number(_0x51a73b.position?.z) || 0,
-      _0x49a91e = Math.hypot(_0x69c25d, _0x342a0c, _0x40861c) || 1;
+  const value173 = cameraId5.item,
+    sceneObjectHeightOffset = getSceneObjectHeightOffset(cameraId5.objectType);
+  if (args9.mode === 'panorama') {
+    const value174 = (Number(value173.position?.y) || 0) + sceneObjectHeightOffset,
+      value175 = Number(value173.position?.x) || 0,
+      value176 = value174 - 1.6,
+      value177 = Number(value173.position?.z) || 0,
+      value178 = Math.hypot(value175, value176, value177) || 1;
     return (
       applyPanoramaSceneViewCommit({
-        nodeId: _0x3b16c0,
+        nodeId: nodeId35,
         panoramaView: {
-          ..._0x4dd737.viewport.panoramaView,
-          yaw: Math.atan2(_0x69c25d, _0x40861c || 0.0001),
-          pitch: clampPanoramaPitch(Math.asin(_0x342a0c / _0x49a91e)),
+          ...args9.viewport.panoramaView,
+          yaw: Math.atan2(value175, value177 || 0.0001),
+          pitch: clampPanoramaPitch(Math.asin(value176 / value178)),
         },
         activeView: 'default',
         activeCameraId: null,
@@ -1937,13 +1960,13 @@ export function focusPanoramaSceneSelection({ nodeId: _0x3b16c0, storeInstance: 
   }
   return (
     applyPanoramaSceneViewCommit({
-      nodeId: _0x3b16c0,
+      nodeId: nodeId35,
       sceneView: {
-        ..._0x4dd737.viewport.sceneView,
+        ...args9.viewport.sceneView,
         target: {
-          x: Number(_0x51a73b.position?.x) || 0,
-          y: (Number(_0x51a73b.position?.y) || 0) + _0x289df7,
-          z: Number(_0x51a73b.position?.z) || 0,
+          x: Number(value173.position?.x) || 0,
+          y: (Number(value173.position?.y) || 0) + sceneObjectHeightOffset,
+          z: Number(value173.position?.z) || 0,
         },
       },
       activeView: 'default',
@@ -1953,217 +1976,227 @@ export function focusPanoramaSceneSelection({ nodeId: _0x3b16c0, storeInstance: 
     true
   );
 }
-function resolvePanoramaThumbnailUrl(_0x35c39a) {
-  if (!_0x35c39a || typeof _0x35c39a !== 'object') return '';
+function resolvePanoramaThumbnailUrl(enabled16) {
+  if (!enabled16 || typeof enabled16 !== 'object') return '';
   return pickFirstNonEmptyString(
-    localPathToUrl(_0x35c39a['thumbLocalPath']),
-    localPathToUrl(_0x35c39a['thumbnailLocalPath']),
-    _0x35c39a['thumbUrl'],
-    _0x35c39a['thumbnailUrl'],
+    localPathToUrl(enabled16['thumbLocalPath']),
+    localPathToUrl(enabled16['thumbnailLocalPath']),
+    enabled16['thumbUrl'],
+    enabled16['thumbnailUrl'],
   );
 }
 
 export function setPanoramaSceneInteractionOptions({
-  nodeId: _0x47b73f,
+  nodeId: nodeId36,
   patch: patch = {},
   storeInstance: storeInstance = appStore,
 }) {
-  writeSceneState(storeInstance, _0x47b73f, (_0x434f2d) => {
-    const _0x5858f6 = cloneSceneState(_0x434f2d);
+  writeSceneState(storeInstance, nodeId36, (value179) => {
+    const cloneSceneState34 = cloneSceneState(value179);
     return (
       Object['prototype']['hasOwnProperty']['call'](patch, 'transformSpace') &&
-        (_0x5858f6['ui']['transformSpace'] = patch['transformSpace'] === 'local' ? 'local' : 'world'),
+        (cloneSceneState34['ui']['transformSpace'] = patch['transformSpace'] === 'local' ? 'local' : 'world'),
       Object['prototype']['hasOwnProperty']['call'](patch, 'snapEnabled') &&
-        (_0x5858f6['ui']['snapEnabled'] = patch['snapEnabled'] === !![]),
+        (cloneSceneState34['ui']['snapEnabled'] = patch['snapEnabled'] === !![]),
       Number['isFinite'](Number(patch['translationSnap'])) &&
-        (_0x5858f6['ui']['translationSnap'] = Number(patch['translationSnap'])),
+        (cloneSceneState34['ui']['translationSnap'] = Number(patch['translationSnap'])),
       Number['isFinite'](Number(patch['rotationSnap'])) &&
-        (_0x5858f6['ui']['rotationSnap'] = Number(patch['rotationSnap'])),
+        (cloneSceneState34['ui']['rotationSnap'] = Number(patch['rotationSnap'])),
       Number['isFinite'](Number(patch['scaleSnap'])) &&
-        (_0x5858f6['ui']['scaleSnap'] = Number(patch['scaleSnap'])),
+        (cloneSceneState34['ui']['scaleSnap'] = Number(patch['scaleSnap'])),
       Object['prototype']['hasOwnProperty']['call'](patch, 'groundLock') &&
-        (_0x5858f6['ui']['groundLock'] = patch['groundLock'] === !![]),
+        (cloneSceneState34['ui']['groundLock'] = patch['groundLock'] === !![]),
       Object['prototype']['hasOwnProperty']['call'](patch, 'uniformScale') &&
-        (_0x5858f6['ui']['uniformScale'] = patch['uniformScale'] === !![]),
+        (cloneSceneState34['ui']['uniformScale'] = patch['uniformScale'] === !![]),
       Object['prototype']['hasOwnProperty']['call'](patch, 'navigationMode') &&
-        (_0x5858f6['ui']['navigationMode'] = patch['navigationMode'] === 'fly' ? 'fly' : 'orbit'),
+        (cloneSceneState34['ui']['navigationMode'] = patch['navigationMode'] === 'fly' ? 'fly' : 'orbit'),
       Number['isFinite'](Number(patch['flySpeed'])) &&
-        (_0x5858f6['ui']['flySpeed'] = Math['max'](0.25, Math['min'](0x28, Number(patch['flySpeed'])))),
+        (cloneSceneState34['ui']['flySpeed'] = Math['max'](
+          0.25,
+          Math['min'](0x28, Number(patch['flySpeed'])),
+        )),
       Object['prototype']['hasOwnProperty']['call'](patch, 'showTimeline') &&
-        (_0x5858f6['ui']['showTimeline'] = patch['showTimeline'] === !![]),
-      _0x5858f6
+        (cloneSceneState34['ui']['showTimeline'] = patch['showTimeline'] === !![]),
+      cloneSceneState34
     );
   });
 }
 
 export function upsertPanoramaSceneCustomPose({
-  nodeId: _0x4d6333,
-  pose: _0x27663c,
+  nodeId: nodeId37,
+  pose: pose3,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x12f316 = normalizeCustomMannequinPose(_0x27663c),
-    _0x54b11b =
-      _0x12f316['id'] && _0x12f316['id'] !== 'custom' ? _0x12f316['id'] : generateId('mannequin-pose'),
-    _0x2544e0 = { ..._0x12f316, id: _0x54b11b };
+  const args10 = normalizeCustomMannequinPose(pose3),
+    id8 = args10['id'] && args10['id'] !== 'custom' ? args10['id'] : generateId('mannequin-pose'),
+    value180 = { ...args10, id: id8 };
   return (
-    writeSceneState(storeInstance, _0x4d6333, (_0x22fa2e) => {
-      const _0x1a6dfa = cloneSceneState(_0x22fa2e),
-        _0x34332a = Array['isArray'](_0x1a6dfa['customPoses']) ? _0x1a6dfa['customPoses'] : [];
+    writeSceneState(storeInstance, nodeId37, (value181) => {
+      const cloneSceneState35 = cloneSceneState(value181),
+        list22 = Array['isArray'](cloneSceneState35['customPoses']) ? cloneSceneState35['customPoses'] : [];
       return (
-        (_0x1a6dfa['customPoses'] = [
-          ..._0x34332a['filter']((_0x318909) => _0x318909['id'] !== _0x54b11b),
-          _0x2544e0,
+        (cloneSceneState35['customPoses'] = [
+          ...list22['filter']((value182) => value182['id'] !== id8),
+          value180,
         ]),
-        _0x1a6dfa
+        cloneSceneState35
       );
     }),
     commit(),
-    _0x2544e0
+    value180
   );
 }
 
 export function applyPanoramaSceneMannequinPose({
-  nodeId: _0x3ae607,
-  mannequinId: _0x2deac4,
+  nodeId: nodeId38,
+  mannequinId: mannequinId,
   poseId: poseId = DEFAULT_MANNEQUIN_POSE_ID,
   bonePose: bonePose = null,
   customPose: customPose = null,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x1a84f8 = String(_0x2deac4 || '')['trim']();
-  if (!_0x1a84f8) return null;
-  let _0xa25357 = null;
+  const enabled17 = String(mannequinId || '')['trim']();
+  if (!enabled17) return null;
+  let value183 = null;
   return (
-    writeSceneState(storeInstance, _0x3ae607, (_0x1ab2ec) => {
-      const _0x1f1c67 = cloneSceneState(_0x1ab2ec),
-        _0x32f54a = customPose
+    writeSceneState(storeInstance, nodeId38, (value184) => {
+      const cloneSceneState36 = cloneSceneState(value184),
+        error10 = customPose
           ? {
               ...normalizeCustomMannequinPose(customPose),
               id: String(customPose['id'] || '')['trim']() || generateId('mannequin-pose'),
             }
           : null;
-      _0x32f54a &&
-        (_0x1f1c67['customPoses'] = [
-          ...(_0x1f1c67['customPoses'] || [])['filter']((_0x4a7811) => _0x4a7811['id'] !== _0x32f54a['id']),
-          _0x32f54a,
+      error10 &&
+        (cloneSceneState36['customPoses'] = [
+          ...(cloneSceneState36['customPoses'] || [])['filter'](
+            (value185) => value185['id'] !== error10['id'],
+          ),
+          error10,
         ]);
-      const _0x4d81e3 = _0x32f54a?.['id'] || (poseId !== 'custom' ? String(poseId || '')['trim']() : ''),
-        _0x11b843 = (_0x1f1c67['customPoses'] || [])['find']((_0x114723) => _0x114723['id'] === _0x4d81e3),
-        _0x51ce64 = bonePose
+      const value186 = error10?.['id'] || (poseId !== 'custom' ? String(poseId || '')['trim']() : ''),
+        id9 = (cloneSceneState36['customPoses'] || [])['find']((value187) => value187['id'] === value186),
+        poseId2 = bonePose
           ? createCustomMannequinPose({
-              id: _0x11b843?.['id'] || _0x32f54a?.['id'] || 'custom',
-              name: _0x11b843?.['name'] || _0x32f54a?.['name'] || 'Custom pose',
+              id: id9?.['id'] || error10?.['id'] || 'custom',
+              name: id9?.['name'] || error10?.['name'] || 'Custom pose',
               bones: bonePose,
             })
-          : _0x11b843 || resolveMannequinPose(poseId, _0x32f54a);
+          : id9 || resolveMannequinPose(poseId, error10);
       return (
-        (_0xa25357 = _0x51ce64),
-        (_0x1f1c67['mannequins'] = _0x1f1c67['mannequins']['map']((_0x26a313) =>
-          _0x26a313['id'] === _0x1a84f8
+        (value183 = poseId2),
+        (cloneSceneState36['mannequins'] = cloneSceneState36['mannequins']['map']((args11) =>
+          args11['id'] === enabled17
             ? {
-                ..._0x26a313,
+                ...args11,
                 poseId:
-                  _0x51ce64?.['category'] === 'custom'
+                  poseId2?.['category'] === 'custom'
                     ? 'custom'
-                    : _0x51ce64?.['id'] || DEFAULT_MANNEQUIN_POSE_ID,
-                customPoseId: _0x51ce64?.['category'] === 'custom' ? _0x51ce64['id'] : null,
-                bonePose: normalizeBonePose(_0x51ce64?.['bones']),
+                    : poseId2?.['id'] || DEFAULT_MANNEQUIN_POSE_ID,
+                customPoseId: poseId2?.['category'] === 'custom' ? poseId2['id'] : null,
+                bonePose: normalizeBonePose(poseId2?.['bones']),
               }
-            : _0x26a313,
+            : args11,
         )),
-        setSingleSelection(_0x1f1c67, 'mannequin', _0x1a84f8),
-        _0x1f1c67
+        setSingleSelection(cloneSceneState36, 'mannequin', enabled17),
+        cloneSceneState36
       );
     }),
     commit(),
-    _0xa25357
+    value183
   );
 }
 
 export function addPanoramaSceneCameraKeyframe({
-  nodeId: _0x19d60a,
+  nodeId: nodeId39,
   keyframe: keyframe = {},
   viewPose: viewPose = null,
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x409145 = getSceneState(storeInstance, _0x19d60a),
-    _0x30dd98 = normalizeCameraTimeline(_0x409145['cameraTimeline']),
-    _0x48ee4f = normalizeCompositionPoint(viewPose?.['position'], { x: 0x0, y: 1.6, z: 0x6 }),
-    _0x3aba2d = normalizeCompositionPoint(keyframe?.['position'], _0x48ee4f),
-    _0x53ce1b = normalizeCompositionPoint(viewPose?.['forward'], { x: 0x0, y: 0x0, z: -0x1 }),
-    _0x590525 = {
-      x: _0x3aba2d['x'] + _0x53ce1b['x'] * 0x5,
-      y: _0x3aba2d['y'] + _0x53ce1b['y'] * 0x5,
-      z: _0x3aba2d['z'] + _0x53ce1b['z'] * 0x5,
+  const sceneState10 = getSceneState(storeInstance, nodeId39),
+    cameraTimeline2 = normalizeCameraTimeline(sceneState10['cameraTimeline']),
+    compositionPoint = normalizeCompositionPoint(viewPose?.['position'], { x: 0x0, y: 1.6, z: 0x6 }),
+    x11 = normalizeCompositionPoint(keyframe?.['position'], compositionPoint),
+    box18 = normalizeCompositionPoint(viewPose?.['forward'], { x: 0x0, y: 0x0, z: -0x1 }),
+    value188 = {
+      x: x11['x'] + box18['x'] * 0x5,
+      y: x11['y'] + box18['y'] * 0x5,
+      z: x11['z'] + box18['z'] * 0x5,
     },
-    _0x160848 = normalizeCompositionPoint(keyframe?.['target'], _0x590525),
-    _0x214222 = Number(keyframe['fov'] ?? viewPose?.['fov']),
-    _0x2f6170 = {
+    target2 = normalizeCompositionPoint(keyframe?.['target'], value188),
+    value189 = Number(keyframe['fov'] ?? viewPose?.['fov']),
+    value190 = {
       id: String(keyframe['id'] || '')['trim']() || generateId('camera-keyframe'),
       time: Number['isFinite'](Number(keyframe['time']))
         ? Number(keyframe['time'])
-        : _0x30dd98['currentTime'],
-      position: _0x3aba2d,
-      target: _0x160848,
-      fov: Number['isFinite'](_0x214222) ? _0x214222 : 0x37,
+        : cameraTimeline2['currentTime'],
+      position: x11,
+      target: target2,
+      fov: Number['isFinite'](value189) ? value189 : 0x37,
       easing: keyframe['easing'] || 'ease-in-out',
     };
   return (
-    writeSceneState(storeInstance, _0x19d60a, (_0x499221) => {
-      const _0x103a33 = cloneSceneState(_0x499221);
+    writeSceneState(storeInstance, nodeId39, (value191) => {
+      const cloneSceneState37 = cloneSceneState(value191);
       return (
-        (_0x103a33['cameraTimeline'] = upsertCameraKeyframe(_0x103a33['cameraTimeline'], _0x2f6170)),
-        _0x103a33
+        (cloneSceneState37['cameraTimeline'] = upsertCameraKeyframe(
+          cloneSceneState37['cameraTimeline'],
+          value190,
+        )),
+        cloneSceneState37
       );
     }),
     commit(),
-    _0x2f6170['id']
+    value190['id']
   );
 }
 
 export function updatePanoramaSceneCameraTimeline({
-  nodeId: _0x51130f,
+  nodeId: nodeId40,
   timeline: timeline = null,
   patch: patch = null,
   storeInstance: storeInstance = appStore,
 }) {
-  (writeSceneState(storeInstance, _0x51130f, (_0x3bce32) => {
-    const _0x49ca90 = cloneSceneState(_0x3bce32);
+  (writeSceneState(storeInstance, nodeId40, (value192) => {
+    const cloneSceneState38 = cloneSceneState(value192);
     return (
-      (_0x49ca90['cameraTimeline'] = timeline
+      (cloneSceneState38['cameraTimeline'] = timeline
         ? normalizeCameraTimeline(timeline)
-        : updateCameraTimelineSettings(_0x49ca90['cameraTimeline'], patch || {})),
-      _0x49ca90
+        : updateCameraTimelineSettings(cloneSceneState38['cameraTimeline'], patch || {})),
+      cloneSceneState38
     );
   }),
     commit());
 }
 
 export function deletePanoramaSceneCameraKeyframe({
-  nodeId: _0xe6b95e,
-  keyframeId: _0x4427f5,
+  nodeId: nodeId41,
+  keyframeId: keyframeId,
   storeInstance: storeInstance = appStore,
 }) {
-  (writeSceneState(storeInstance, _0xe6b95e, (_0x313ccd) => {
-    const _0x22f46e = cloneSceneState(_0x313ccd);
+  (writeSceneState(storeInstance, nodeId41, (value193) => {
+    const cloneSceneState39 = cloneSceneState(value193);
     return (
-      (_0x22f46e['cameraTimeline'] = removeCameraKeyframe(_0x22f46e['cameraTimeline'], _0x4427f5)),
-      _0x22f46e
+      (cloneSceneState39['cameraTimeline'] = removeCameraKeyframe(
+        cloneSceneState39['cameraTimeline'],
+        keyframeId,
+      )),
+      cloneSceneState39
     );
   }),
     commit());
 }
 
-function normalizeCompositionPoint(_0x273238, _0x1e360f) {
+function normalizeCompositionPoint(box19, box20) {
   return {
-    x: Number['isFinite'](Number(_0x273238?.['x'])) ? Number(_0x273238['x']) : _0x1e360f['x'],
-    y: Number['isFinite'](Number(_0x273238?.['y'])) ? Number(_0x273238['y']) : _0x1e360f['y'],
-    z: Number['isFinite'](Number(_0x273238?.['z'])) ? Number(_0x273238['z']) : _0x1e360f['z'],
+    x: Number['isFinite'](Number(box19?.['x'])) ? Number(box19['x']) : box20['x'],
+    y: Number['isFinite'](Number(box19?.['y'])) ? Number(box19['y']) : box20['y'],
+    z: Number['isFinite'](Number(box19?.['z'])) ? Number(box19['z']) : box20['z'],
   };
 }
 
 export function composePanoramaScene({
-  nodeId: _0x444971,
+  nodeId: nodeId42,
   assets: assets = [],
   mannequins: mannequins = [],
   cameraTimeline: cameraTimeline = null,
@@ -2171,71 +2204,71 @@ export function composePanoramaScene({
   replaceExisting: replaceExisting = ![],
   storeInstance: storeInstance = appStore,
 }) {
-  const _0x10d2aa = getStoreNode(storeInstance, _0x444971);
-  if (!_0x10d2aa || isPanorama360NodeType(_0x10d2aa['type'])) return null;
-  const _0xa07b7c = [],
-    _0x19dfed = [];
+  const storeNode12 = getStoreNode(storeInstance, nodeId42);
+  if (!storeNode12 || isPanorama360NodeType(storeNode12['type'])) return null;
+  const assetIds = [],
+    mannequinIds = [];
   return (
-    writeSceneState(storeInstance, _0x444971, (_0x3aa1ff) => {
-      const _0x55cf38 = cloneSceneState(_0x3aa1ff);
+    writeSceneState(storeInstance, nodeId42, (value194) => {
+      const cloneSceneState40 = cloneSceneState(value194);
       replaceExisting &&
-        ((_0x55cf38['cubes'] = []),
-        (_0x55cf38['mannequins'] = []),
-        (_0x55cf38['groups'] = []),
-        clearSelection(_0x55cf38));
-      environmentMode && (_0x55cf38['environmentMode'] = environmentMode === 'day' ? 'day' : 'night');
-      const _0x4e2138 = Array['isArray'](assets) ? assets : [];
-      _0x4e2138['forEach']((_0x208955, _0x2ac7ad) => {
-        const _0x5d22f0 = resolveSceneAsset(_0x208955?.['assetId'] || _0x208955?.['id']);
-        if (!_0x5d22f0) return;
-        const _0x237509 = generateId('scene-asset');
-        _0xa07b7c['push'](_0x237509);
-        const _0x547e17 = {
-          x: ((_0x2ac7ad % 0x4) - Math['min'](1.5, (_0x4e2138['length'] - 0x1) / 0x2)) * 2.2,
+        ((cloneSceneState40['cubes'] = []),
+        (cloneSceneState40['mannequins'] = []),
+        (cloneSceneState40['groups'] = []),
+        clearSelection(cloneSceneState40));
+      environmentMode && (cloneSceneState40['environmentMode'] = environmentMode === 'day' ? 'day' : 'night');
+      const list23 = Array['isArray'](assets) ? assets : [];
+      list23['forEach']((colorKey2, value195) => {
+        const assetId = resolveSceneAsset(colorKey2?.['assetId'] || colorKey2?.['id']);
+        if (!assetId) return;
+        const id10 = generateId('scene-asset');
+        assetIds['push'](id10);
+        const value196 = {
+          x: ((value195 % 0x4) - Math['min'](1.5, (list23['length'] - 0x1) / 0x2)) * 2.2,
           y: 0x0,
-          z: Math['floor'](_0x2ac7ad / 0x4) * 2.2,
+          z: Math['floor'](value195 / 0x4) * 2.2,
         };
-        _0x55cf38['cubes']['push']({
-          id: _0x237509,
-          assetId: _0x5d22f0['id'],
-          colorKey: _0x208955?.['colorKey'] || _0x5d22f0['colorKey'] || 'blue',
-          position: normalizeCompositionPoint(_0x208955?.['position'], _0x547e17),
-          rotation: normalizeCompositionPoint(_0x208955?.['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
-          scale: _0x208955?.['scale'] ?? 0x1,
+        cloneSceneState40['cubes']['push']({
+          id: id10,
+          assetId: assetId['id'],
+          colorKey: colorKey2?.['colorKey'] || assetId['colorKey'] || 'blue',
+          position: normalizeCompositionPoint(colorKey2?.['position'], value196),
+          rotation: normalizeCompositionPoint(colorKey2?.['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
+          scale: colorKey2?.['scale'] ?? 0x1,
         });
       });
-      const _0x4c5cdf = Array['isArray'](mannequins) ? mannequins : [];
-      _0x4c5cdf['forEach']((_0x1f96d5, _0x65a997) => {
-        const _0x311a49 = generateId('mannequin');
-        _0x19dfed['push'](_0x311a49);
-        const _0x280685 = _0x1f96d5?.['bonePose']
-          ? createCustomMannequinPose({ bones: _0x1f96d5['bonePose'] })
-          : resolveMannequinPose(_0x1f96d5?.['poseId']);
-        _0x55cf38['mannequins']['push']({
-          id: _0x311a49,
-          gender: _0x1f96d5?.['gender'] === 'female' ? 'female' : 'male',
-          colorKey: _0x1f96d5?.['colorKey'] || 'blue',
+      const list24 = Array['isArray'](mannequins) ? mannequins : [];
+      list24['forEach']((bones, value197) => {
+        const id11 = generateId('mannequin');
+        mannequinIds['push'](id11);
+        const poseId3 = bones?.['bonePose']
+          ? createCustomMannequinPose({ bones: bones['bonePose'] })
+          : resolveMannequinPose(bones?.['poseId']);
+        cloneSceneState40['mannequins']['push']({
+          id: id11,
+          gender: bones?.['gender'] === 'female' ? 'female' : 'male',
+          colorKey: bones?.['colorKey'] || 'blue',
           poseId:
-            _0x280685?.['category'] === 'custom' ? 'custom' : _0x280685?.['id'] || DEFAULT_MANNEQUIN_POSE_ID,
+            poseId3?.['category'] === 'custom' ? 'custom' : poseId3?.['id'] || DEFAULT_MANNEQUIN_POSE_ID,
           customPoseId: null,
-          bonePose: normalizeBonePose(_0x280685?.['bones']),
-          position: normalizeCompositionPoint(_0x1f96d5?.['position'], {
-            x: (_0x65a997 - (_0x4c5cdf['length'] - 0x1) / 0x2) * 1.5,
+          bonePose: normalizeBonePose(poseId3?.['bones']),
+          position: normalizeCompositionPoint(bones?.['position'], {
+            x: (value197 - (list24['length'] - 0x1) / 0x2) * 1.5,
             y: 0x0,
             z: 0x0,
           }),
-          rotation: normalizeCompositionPoint(_0x1f96d5?.['rotation'], { x: 0x0, y: Math['PI'], z: 0x0 }),
-          scale: _0x1f96d5?.['scale'] ?? 0x1,
+          rotation: normalizeCompositionPoint(bones?.['rotation'], { x: 0x0, y: Math['PI'], z: 0x0 }),
+          scale: bones?.['scale'] ?? 0x1,
         });
       });
-      cameraTimeline && (_0x55cf38['cameraTimeline'] = normalizeCameraTimeline(cameraTimeline));
-      const _0x44f3d6 = _0x19dfed['at'](-0x1),
-        _0x3b3463 = _0xa07b7c['at'](-0x1);
-      if (_0x44f3d6) setSingleSelection(_0x55cf38, 'mannequin', _0x44f3d6);
-      else _0x3b3463 && setSingleSelection(_0x55cf38, 'cube', _0x3b3463);
-      return _0x55cf38;
+      cameraTimeline && (cloneSceneState40['cameraTimeline'] = normalizeCameraTimeline(cameraTimeline));
+      const value198 = mannequinIds['at'](-0x1),
+        value199 = assetIds['at'](-0x1);
+      if (value198) setSingleSelection(cloneSceneState40, 'mannequin', value198);
+      else value199 && setSingleSelection(cloneSceneState40, 'cube', value199);
+      return cloneSceneState40;
     }),
     commit(),
-    { nodeId: _0x444971, assetIds: _0xa07b7c, mannequinIds: _0x19dfed }
+    { nodeId: nodeId42, assetIds: assetIds, mannequinIds: mannequinIds }
   );
 }

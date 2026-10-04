@@ -19,57 +19,57 @@ import {
 import { buildTextModelSmallIconHTML, buildTextProviderMenuGroupsHTML } from './apimartTextModelMenu.js';
 import { renderMarkdownToHtml } from './markdownRenderer.js';
 import { bindReadonlyTextSelection } from './readonlyTextSelection.js';
-export function createAIGenTextNodeUiModule(_0x38ccdb) {
+export function createAIGenTextNodeUiModule(value) {
   const {
-      store: _0x41b315,
-      api: _0x65939d,
-      getDisplayModelName: _0x39631b,
-      ensureThumbDecoded: _0xee1b0,
-      revealRefThumbMedia: _0x22b86e,
-      commit: _0x3958e2,
-      TEXT_TOOLBAR_HTML: _0x554c23,
-      bindTextToolbarEvents: _0xd15dee,
-      getPromptPresets: _0x1749e8,
-      openCustomPresetsManager: _0x494143,
-      startLoading: _0x127c6a,
-      stopLoading: _0x3af18e,
-      bindRefThumbHoverPreview: _0x199d27,
-      checkSlashTrigger: _0x2f09ea,
-      handleSlashKeyboardNavigation: _0x3362f6,
-      closeSlashMenu: _0x433a57,
-      activateMenuKeyboard: _0x45cbf3,
-      _checkAtTrigger: _0x4dbae8,
-      _populateMentionMenu: _0x315796,
-      _handleMentionMenuKeyboard: _0x10476f,
-      _handlePillKeyboard: _0x3ac717,
-      _rehydratePromptPills: _0x2073cb,
-      _handlePillHover: _0x57f3ab,
-      _handlePillOut: _0x193562,
-      _syncEdgesOrderFromPills: _0x460ba6,
-      _syncPillLabels: _0x17c3df,
-      getCustomTextModels: _0x538cf7,
-      saveCustomTextModels: _0x571948,
-    } = _0x38ccdb,
-    _0x2e5252 = () =>
-      typeof _0x41b315.getStateRaw === 'function' ? _0x41b315.getStateRaw() : _0x41b315.getState(),
-    _0x149ee6 = 120;
-  class _0x23dde4 {
+      store: store,
+      api: api,
+      getDisplayModelName: getDisplayModelName,
+      ensureThumbDecoded: ensureThumbDecoded,
+      revealRefThumbMedia: revealRefThumbMedia,
+      commit: commit,
+      TEXT_TOOLBAR_HTML: TEXT_TOOLBAR_HTML,
+      bindTextToolbarEvents: bindTextToolbarEvents,
+      getPromptPresets: getPromptPresets,
+      openCustomPresetsManager: openCustomPresetsManager,
+      startLoading: startLoading,
+      stopLoading: stopLoading,
+      bindRefThumbHoverPreview: bindRefThumbHoverPreview,
+      checkSlashTrigger: checkSlashTrigger,
+      handleSlashKeyboardNavigation: handleSlashKeyboardNavigation,
+      closeSlashMenu: closeSlashMenu,
+      activateMenuKeyboard: activateMenuKeyboard,
+      _checkAtTrigger: _checkAtTrigger,
+      _populateMentionMenu: _populateMentionMenu,
+      _handleMentionMenuKeyboard: _handleMentionMenuKeyboard,
+      _handlePillKeyboard: _handlePillKeyboard,
+      _rehydratePromptPills: _rehydratePromptPills,
+      _handlePillHover: _handlePillHover,
+      _handlePillOut: _handlePillOut,
+      _syncEdgesOrderFromPills: _syncEdgesOrderFromPills,
+      _syncPillLabels: _syncPillLabels,
+      getCustomTextModels: getCustomTextModels,
+      saveCustomTextModels: saveCustomTextModels,
+    } = value,
+    getStateSnapshot = () =>
+      typeof store.getStateRaw === 'function' ? store.getStateRaw() : store.getState(),
+    item = 120;
+  class key {
     ['mount']() {
-      const _0x3aaea7 = document.createElement('div');
-      ((_0x3aaea7.className = 'aigen-node-root aigen-text-node-root'),
-        (this._root = _0x3aaea7),
-        (_0x3aaea7.innerHTML = _0x554c23),
+      const el = document.createElement('div');
+      ((el.className = 'aigen-node-root aigen-text-node-root'),
+        (this._root = el),
+        (el.innerHTML = TEXT_TOOLBAR_HTML),
         (this.previewEl = document.createElement('div')),
         (this.previewEl.className = 'img-node-preview aigen-node-preview-fill aigen-text-preview'),
         (this.outputEl = document.createElement('div')),
         (this.outputEl.className = 'text-output-content aigen-text-output'),
         this.outputEl.setAttribute('contenteditable', 'false'));
-      const _0x12b06c = document.createElement('div');
-      ((_0x12b06c.className = 'img-node-placeholder aigen-media-placeholder aigen-text-placeholder'),
-        (_0x12b06c.textContent = t('aigenText.previewPlaceholder')),
-        (this._placeholderEl = _0x12b06c),
+      const el2 = document.createElement('div');
+      ((el2.className = 'img-node-placeholder aigen-media-placeholder aigen-text-placeholder'),
+        (el2.textContent = t('aigenText.previewPlaceholder')),
+        (this._placeholderEl = el2),
         this.previewEl.appendChild(this.outputEl),
-        this.previewEl.appendChild(_0x12b06c),
+        this.previewEl.appendChild(el2),
         syncPreviewNodeLoading(this.nodeId, this.previewEl, this._getPreviewGenerateButtonLoadingOptions?.()),
         (this._unbindOutputTextSelection = bindReadonlyTextSelection(this.outputEl, {
           onActivate: () => this._enterOutputEditMode(),
@@ -82,8 +82,8 @@ export function createAIGenTextNodeUiModule(_0x38ccdb) {
         }),
         this.outputEl.addEventListener(
           'wheel',
-          (_0x104033) => {
-            _0x104033.stopPropagation();
+          (event) => {
+            event.stopPropagation();
           },
           { passive: false },
         ),
@@ -91,125 +91,124 @@ export function createAIGenTextNodeUiModule(_0x38ccdb) {
           this._markOutputScrollTopDirty();
         }));
       if (this._data.outputText) this._renderOutputText(this._data.outputText);
-      ((this.outputEl.scrollTop = this._outputScrollTop), _0x3aaea7.appendChild(this.previewEl));
-      const _0x542c70 = document.createElement('div');
-      ((_0x542c70.className = 'text-prompt-panel'),
-        (this._promptPanel = _0x542c70),
-        _0x542c70.addEventListener('pointerdown', (_0x564695) => {
-          _0x564695.stopPropagation();
+      ((this.outputEl.scrollTop = this._outputScrollTop), el.appendChild(this.previewEl));
+      const el3 = document.createElement('div');
+      ((el3.className = 'text-prompt-panel'),
+        (this._promptPanel = el3),
+        el3.addEventListener('pointerdown', (event2) => {
+          event2.stopPropagation();
         }),
-        _0x542c70.addEventListener('dblclick', (_0x2ad074) => {
-          !_0x2ad074.target.closest('.prompt-textarea') &&
-            !_0x2ad074.target.closest('.text-output-content') &&
-            (_0x2ad074.preventDefault(), _0x2ad074.stopPropagation());
+        el3.addEventListener('dblclick', (event3) => {
+          !event3.target.closest('.prompt-textarea') &&
+            !event3.target.closest('.text-output-content') &&
+            (event3.preventDefault(), event3.stopPropagation());
         }),
         (this.refBarEl = document.createElement('div')),
         (this.refBarEl.className = 'node-ref-bar'),
-        _0x542c70.appendChild(this.refBarEl),
-        this.refBarEl.addEventListener('click', (_0x19ddb6) => {
-          const _0x332827 = _0x19ddb6.target.closest('.ref-thumb-delete');
-          if (_0x332827) {
-            (_0x19ddb6.stopPropagation(), _0x19ddb6.preventDefault());
-            const _0xd5590b = _0x332827.closest('.ref-thumb-wrap')?.dataset.edgeId;
-            if (_0xd5590b) _0x41b315.removeEdge(_0xd5590b);
+        el3.appendChild(this.refBarEl),
+        this.refBarEl.addEventListener('click', (event4) => {
+          const el4 = event4.target.closest('.ref-thumb-delete');
+          if (el4) {
+            (event4.stopPropagation(), event4.preventDefault());
+            const index = el4.closest('.ref-thumb-wrap')?.dataset.edgeId;
+            if (index) store.removeEdge(index);
             return;
           }
-          const _0x209f49 = _0x19ddb6.target.closest('.prompt-attachment-btn');
-          if (!_0x209f49) return;
-          if (_0x19ddb6._pickConnectHandled) return;
-          (_0x19ddb6.stopPropagation(), _0x19ddb6.preventDefault());
-          const _0x2b3a71 = _0x41b315.getState().pickConnectMode;
-          _0x2b3a71 && _0x2b3a71.active && _0x2b3a71.sourceNodeId === this.nodeId
-            ? _0x41b315.setPickConnectMode({ active: false })
-            : _0x41b315.setPickConnectMode({
+          const enabled = event4.target.closest('.prompt-attachment-btn');
+          if (!enabled) return;
+          if (event4._pickConnectHandled) return;
+          (event4.stopPropagation(), event4.preventDefault());
+          const result = store.getState().pickConnectMode;
+          result && result.active && result.sourceNodeId === this.nodeId
+            ? store.setPickConnectMode({ active: false })
+            : store.setPickConnectMode({
                 active: true,
                 sourceNodeId: this.nodeId,
                 handleDirection: 'left',
               });
         }),
-        this.refBarEl.addEventListener('pointerdown', (_0x561a73) => {
-          if (_0x561a73.target.closest('.prompt-attachment-btn, .ref-thumb-delete'))
-            _0x561a73.stopPropagation();
+        this.refBarEl.addEventListener('pointerdown', (event5) => {
+          if (event5.target.closest('.prompt-attachment-btn, .ref-thumb-delete')) event5.stopPropagation();
         }),
-        (this._unbindRefThumbHoverPreview = _0x199d27(this.refBarEl)));
-      const _0x2cda57 = document.createElement('div');
-      ((_0x2cda57.className = 'prompt-input-wrapper'),
-        _0x2cda57.classList.add('is-resizable'),
-        (this._promptInputWrap = _0x2cda57),
+        (this._unbindRefThumbHoverPreview = bindRefThumbHoverPreview(this.refBarEl)));
+      const el5 = document.createElement('div');
+      ((el5.className = 'prompt-input-wrapper'),
+        el5.classList.add('is-resizable'),
+        (this._promptInputWrap = el5),
         (this.promptEl = document.createElement('div')),
         (this.promptEl.className = 'prompt-textarea custom-textarea'),
         (this.promptEl.contentEditable = 'true'),
         (this.promptEl.spellcheck = false),
         (this.promptEl.dataset.placeholder = t('aigenText.promptPlaceholder')));
       if (!document.head.querySelector('#v2-gen-node-css')) {
-        const _0xae4500 = document.createElement('style');
-        ((_0xae4500.id = 'v2-gen-node-css'),
-          (_0xae4500.textContent =
+        const el6 = document.createElement('style');
+        ((el6.id = 'v2-gen-node-css'),
+          (el6.textContent =
             '\n                .prompt-textarea:empty::before {\n                    content: attr(data-placeholder);\n                    color: var(--text-placeholder);\n                    pointer-events: none;\n                }\n                .ref-pill {\n                    display: inline-flex; align-items: center; gap: 3px;\n                    background: transparent; border: none;\n                    border-radius: 4px; padding: 1px 6px; font-size: 14px;\n                    color: var(--text-secondary); cursor: var(--pointer-cursor); user-select: text; -webkit-user-select: text; font-weight: 500;\n                    vertical-align: middle;\n                }\n                .ref-pill .pill-del {\n                    font-size: 16px; color: var(--text-muted);\n                    cursor: var(--link-cursor); margin-left: 2px; line-height: 1;\n                }\n                .ref-pill .pill-del:hover { color: var(--red); }\n                .ref-thumb-wrap.dragging { opacity: 0.3; }\n                .v2-slash-item {\n                    display: flex; flex-direction: column; justify-content: center;\n                    padding: 10px 12px; border-radius: 12px; cursor: var(--link-cursor);\n                    background: transparent; border: none;\n                    transition: all 0.2s; position: relative; height: 54px; overflow: hidden; box-sizing: border-box;\n                }\n                .v2-slash-item:hover, .v2-slash-item.active { background: var(--white-05); }\n                .v2-slash-title {\n                    color: var(--text-primary); font-size: 13px; font-weight: 600;\n                    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);\n                    transform: translateY(10px);\n                }\n                .v2-slash-desc {\n                    color: var(--text-muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: monospace; margin-top: 4px;\n                    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;\n                    transform: translateY(16px);\n                    opacity: 0;\n                }\n                .v2-slash-item:hover > .v2-slash-title, .v2-slash-item.active > .v2-slash-title,\n                .v2-slash-item:hover > .v2-slash-desc, .v2-slash-item.active > .v2-slash-desc {\n                    transform: translateY(0);\n                }\n                .v2-slash-item:hover > .v2-slash-desc, .v2-slash-item.active > .v2-slash-desc {\n                    opacity: 1;\n                }\n            '),
-          document.head.appendChild(_0xae4500));
+          document.head.appendChild(el6));
       }
       ((this._flushPromptHtmlCommit = () => flushPromptHtmlCommit(this)),
-        this.promptEl.addEventListener('input', (_0xcdcfbd) => {
+        this.promptEl.addEventListener('input', (data) => {
           (schedulePromptHtmlCommit(this),
-            this._checkAtTrigger(_0xcdcfbd),
-            _0x2f09ea(_0xcdcfbd, {
+            this._checkAtTrigger(data),
+            checkSlashTrigger(data, {
               promptEl: this.promptEl,
               nodeType: this._data.type,
               nodeId: this.nodeId,
-              onGenerate: (_0x24caac, _0x6a8628) => this._onGenerate(_0x24caac, _0x6a8628),
+              onGenerate: (options, target) => this._onGenerate(options, target),
             }),
-            _0x460ba6(this),
+            _syncEdgesOrderFromPills(this),
             this._updateSubmitButtonState());
         }),
         this.promptEl.addEventListener('blur', () => {
           flushPromptHtmlCommit(this);
         }),
-        this.promptEl.addEventListener('mouseover', (_0xdae309) => _0x57f3ab(_0xdae309, this)),
-        this.promptEl.addEventListener('mouseout', (_0x604c58) => _0x193562(_0x604c58, this)),
-        this.promptEl.addEventListener('keydown', (_0x64d59f) => {
-          if (handlePromptSelectAll(this, _0x64d59f)) return;
-          if (_0x10476f(_0x64d59f)) return;
-          if (_0x3362f6(_0x64d59f)) return;
-          if (shouldSubmitPromptByKeyboard(_0x64d59f)) {
-            (_0x64d59f.preventDefault(), flushPromptHtmlCommit(this), this.btnEl?.click());
+        this.promptEl.addEventListener('mouseover', (source) => _handlePillHover(source, this)),
+        this.promptEl.addEventListener('mouseout', (next) => _handlePillOut(next, this)),
+        this.promptEl.addEventListener('keydown', (event6) => {
+          if (handlePromptSelectAll(this, event6)) return;
+          if (_handleMentionMenuKeyboard(event6)) return;
+          if (handleSlashKeyboardNavigation(event6)) return;
+          if (shouldSubmitPromptByKeyboard(event6)) {
+            (event6.preventDefault(), flushPromptHtmlCommit(this), this.btnEl?.click());
             return;
           }
-          _0x3ac717(this, _0x64d59f);
+          _handlePillKeyboard(this, event6);
         }),
-        this.promptEl.addEventListener('paste', (_0x4c01cb) => {
-          handlePromptPaste(this, _0x4c01cb);
+        this.promptEl.addEventListener('paste', (current) => {
+          handlePromptPaste(this, current);
         }));
       this._data.prompt &&
-        ((this.promptEl.innerHTML = sanitizePromptHtml(this._data.prompt)), _0x2073cb(this));
-      (_0x2cda57.appendChild(this.promptEl),
+        ((this.promptEl.innerHTML = sanitizePromptHtml(this._data.prompt)), _rehydratePromptPills(this));
+      (el5.appendChild(this.promptEl),
         this._syncPromptBoxSizeFromData(this._data),
         this._setupPromptBoxResize(),
-        _0x542c70.appendChild(_0x2cda57));
-      const _0x4bf022 = document.createElement('div');
-      _0x4bf022.className = 'prompt-panel-footer';
-      const _0x194dae = String(this._data.provider || '')
+        el3.appendChild(el5));
+      const root = document.createElement('div');
+      root.className = 'prompt-panel-footer';
+      const entry = String(this._data.provider || '')
           .trim()
           .toLowerCase(),
-        _0x4b55bd = this._data.model || 'apimart/kimi-k2-instruct',
-        _0x2c3255 = () => {
-          const _0x5059fb = buildTextModelSmallIconHTML(_0x4b55bd);
-          if (_0x5059fb) return _0x5059fb;
-          if (_0x194dae === 'custom' || _0x194dae === 'openai')
+        record = this._data.model || 'apimart/kimi-k2-instruct',
+        handler = () => {
+          const textModelSmallIconHTML = buildTextModelSmallIconHTML(record);
+          if (textModelSmallIconHTML) return textModelSmallIconHTML;
+          if (entry === 'custom' || entry === 'openai')
             return '<div class="text-model-icon-small text-model-icon-badge">OA</div>';
           return '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
         },
-        _0x4eee7f = buildTextProviderMenuGroupsHTML(_0x4b55bd);
-      ((_0x4bf022.innerHTML =
+        textProviderMenuGroupsHTML = buildTextProviderMenuGroupsHTML(record);
+      ((root.innerHTML =
         '\n          <div class="img-model-pills">\n            <div class="img-model-wrap">\n              <button type="button" class="img-pill-btn img-model-btn-trigger">\n                ' +
-        _0x2c3255() +
+        handler() +
         '\n                <span class="img-model-label">' +
-        _0x39631b(_0x4b55bd) +
+        getDisplayModelName(record) +
         '</span>\n                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="node-menu-caret"><polyline points="6 9 12 15 18 9"></polyline></svg>\n              </button>\n              <div class="floating-menu img-model-menu node-model-menu">\n                <div class="custom-group-header floating-menu-item node-menu-group-header" data-custom-toggle data-node-menu-submenu=".custom-submenu">\n                  <div class="text-model-icon text-model-icon-badge">OA</div>\n                  <div class="fmi-content">\n                    <div class="fmi-title" data-aigen-text-locale="customModelTitle">' +
         t('aigenText.customModelTitle') +
         '</div>\n                    <div class="fmi-sub" data-aigen-text-locale="customModelSubtitle">' +
         t('aigenText.customModelSubtitle') +
         '</div>\n                  </div>\n                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="node-menu-caret"><polyline points="9 18 15 12 9 6"></polyline></svg>\n                </div>\n                <div class="custom-submenu node-model-submenu node-menu-submenu"></div>\n                ' +
-        _0x4eee7f +
+        textProviderMenuGroupsHTML +
         '\n              </div>\n            </div>\n          </div>\n          <div class="prompt-actions">\n            <button type="button" class="prompt-submit debug-wrench-btn" title="' +
         t('aigenText.debugApiParams') +
         '" data-aigen-text-title="debugApiParams">\n              ' +
@@ -217,19 +216,19 @@ export function createAIGenTextNodeUiModule(_0x38ccdb) {
         '\n            </button>\n            <button type="button" class="prompt-submit img-gen-btn" title="' +
         t('aigenText.generate') +
         '" data-aigen-text-title="generate">\n              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>\n            </button>\n          </div>'),
-        (this.modelWrap = _0x4bf022.querySelector('.img-model-wrap')),
-        (this.btnEl = _0x4bf022.querySelector('.img-gen-btn')));
-      const _0x41529f = _0x4bf022.querySelector('.debug-wrench-btn');
+        (this.modelWrap = root.querySelector('.img-model-wrap')),
+        (this.btnEl = root.querySelector('.img-gen-btn')));
+      const el7 = root.querySelector('.debug-wrench-btn');
       ((this._syncAigenTextLocale = () => {
         (this._placeholderEl && (this._placeholderEl.textContent = t('aigenText.previewPlaceholder')),
           this.promptEl && (this.promptEl.dataset.placeholder = t('aigenText.promptPlaceholder')),
-          _0x4bf022
+          root
             .querySelector('[data-aigen-text-locale="customModelTitle"]')
             ?.replaceChildren(document.createTextNode(t('aigenText.customModelTitle'))),
-          _0x4bf022
+          root
             .querySelector('[data-aigen-text-locale="customModelSubtitle"]')
             ?.replaceChildren(document.createTextNode(t('aigenText.customModelSubtitle'))),
-          _0x41529f?.setAttribute('title', t('aigenText.debugApiParams')),
+          el7?.setAttribute('title', t('aigenText.debugApiParams')),
           this.btnEl?.setAttribute('title', t('aigenText.generate')),
           (this._lastRefHTML = ''),
           this._renderRefBar?.(),
@@ -239,255 +238,247 @@ export function createAIGenTextNodeUiModule(_0x38ccdb) {
         this._unbindLocaleChange?.(),
         (this._unbindLocaleChange = onLocaleChange(() => this._syncAigenTextLocale?.())),
         this._syncAigenTextLocale());
-      const _0x4f13fe = _0x4bf022.querySelector('.img-model-btn-trigger'),
-        _0x188b86 = _0x4bf022.querySelector('.img-model-menu'),
-        _0x143678 = _0x4bf022.querySelector('.img-model-label'),
-        _0xec94eb = _0x188b86?.querySelector('.grsai-submenu'),
-        _0x4d8b57 = _0x188b86?.querySelector('.ppio-submenu'),
-        _0x1a0d45 = _0x188b86?.querySelector('.apimart-submenu'),
-        _0x520192 = _0x188b86?.querySelector('.agnes-submenu'),
-        _0x542010 = _0x188b86?.querySelector('.runninghub-submenu'),
-        _0x174d23 = _0x188b86?.querySelector('.volcengine-submenu'),
-        _0x3f5229 = Object.freeze({
-          grsai: _0xec94eb,
-          ppio: _0x4d8b57,
-          apimart: _0x1a0d45,
-          agnes: _0x520192,
-          runninghub: _0x542010,
-          volcengine: _0x174d23,
+      const trigger = root.querySelector('.img-model-btn-trigger'),
+        menu = root.querySelector('.img-model-menu'),
+        el8 = root.querySelector('.img-model-label'),
+        grsai = menu?.querySelector('.grsai-submenu'),
+        ppio = menu?.querySelector('.ppio-submenu'),
+        apimart = menu?.querySelector('.apimart-submenu'),
+        agnes = menu?.querySelector('.agnes-submenu'),
+        runninghub = menu?.querySelector('.runninghub-submenu'),
+        volcengine = menu?.querySelector('.volcengine-submenu'),
+        payload = Object.freeze({
+          grsai: grsai,
+          ppio: ppio,
+          apimart: apimart,
+          agnes: agnes,
+          runninghub: runninghub,
+          volcengine: volcengine,
         }),
-        _0x3678fe = (_0x192f47) => {
-          const _0x4af6f3 = _0x192f47?.querySelector('img, svg, div'),
-            _0x456b0b = _0x4f13fe?.firstElementChild;
-          if (!_0x456b0b || !_0x4af6f3 || _0x4af6f3.classList.contains('fmi-content')) return;
-          const _0x2bc4d8 = _0x4af6f3.cloneNode(true);
-          (_0x2bc4d8.removeAttribute?.('style'),
-            _0x2bc4d8.classList?.remove('text-model-icon', 'node-menu-icon'),
-            _0x2bc4d8.classList?.add('text-model-icon-small'),
-            _0x2bc4d8.tagName?.toLowerCase() === 'svg' &&
-              (_0x2bc4d8.setAttribute('width', '12'),
-              _0x2bc4d8.setAttribute('height', '12'),
-              _0x2bc4d8.classList.add('node-menu-icon-small')),
-            _0x456b0b.replaceWith(_0x2bc4d8));
+        handler2 = (el9) => {
+          const el10 = el9?.querySelector('img, svg, div'),
+            enabled2 = trigger?.firstElementChild;
+          if (!enabled2 || !el10 || el10.classList.contains('fmi-content')) return;
+          const el11 = el10.cloneNode(true);
+          (el11.removeAttribute?.('style'),
+            el11.classList?.remove('text-model-icon', 'node-menu-icon'),
+            el11.classList?.add('text-model-icon-small'),
+            el11.tagName?.toLowerCase() === 'svg' &&
+              (el11.setAttribute('width', '12'),
+              el11.setAttribute('height', '12'),
+              el11.classList.add('node-menu-icon-small')),
+            enabled2.replaceWith(el11));
         },
-        _0x9c706a = (_0x4e8116, _0x2141ed, _0x5d7943) => {
-          const _0x5117b1 = _0x4e8116?.dataset?.value;
-          if (!_0x5117b1) return;
-          const _0x3b20e1 = _0x4e8116.dataset.provider || _0x2141ed,
-            _0x59913a =
-              _0x4e8116.querySelector('.fmi-title') || _0x4e8116.querySelector('.floating-menu-label');
-          ((_0x143678.textContent = _0x59913a ? _0x59913a.textContent : _0x5117b1),
-            _0x188b86
-              .querySelectorAll('.floating-menu-item')
-              .forEach((_0x4a948f) => _0x4a948f.classList.remove('active')),
-            _0x4e8116.classList.add('active'),
-            _0x188b86.classList.remove('show'));
-          if (_0x5d7943) _0x5d7943.style.display = 'none';
-          (_0x41b315.updateNodeData(this.nodeId, { model: _0x5117b1, provider: _0x3b20e1 }),
-            _0x3678fe(_0x4e8116));
+        handler3 = (el12, handle, el13) => {
+          const model = el12?.dataset?.value;
+          if (!model) return;
+          const provider = el12.dataset.provider || handle,
+            el14 = el12.querySelector('.fmi-title') || el12.querySelector('.floating-menu-label');
+          ((el8.textContent = el14 ? el14.textContent : model),
+            menu.querySelectorAll('.floating-menu-item').forEach((el15) => el15.classList.remove('active')),
+            el12.classList.add('active'),
+            menu.classList.remove('show'));
+          if (el13) el13.style.display = 'none';
+          (store.updateNodeData(this.nodeId, { model: model, provider: provider }), handler2(el12));
         };
-      (_0x188b86?.addEventListener('click', (_0x5501b3) => {
-        const _0xc22099 = _0x5501b3.target?.closest?.('.floating-menu-item');
-        if (!_0xc22099 || !_0x188b86.contains(_0xc22099)) return;
-        const _0x422e41 = Object.entries(_0x3f5229),
-          _0x101f74 = _0x422e41.find(([, _0x361513]) => _0x361513?.contains(_0xc22099));
-        if (!_0x101f74) return;
-        (_0x5501b3.stopPropagation(), _0x9c706a(_0xc22099, _0x101f74[0], _0x101f74[1]));
+      (menu?.addEventListener('click', (event7) => {
+        const enabled3 = event7.target?.closest?.('.floating-menu-item');
+        if (!enabled3 || !menu.contains(enabled3)) return;
+        const list = Object.entries(payload),
+          enabled4 = list.find(([, state]) => state?.contains(enabled3));
+        if (!enabled4) return;
+        (event7.stopPropagation(), handler3(enabled3, enabled4[0], enabled4[1]));
       }),
-        _0x41529f?.addEventListener('click', async (_0x4fd638) => {
-          (_0x4fd638.stopPropagation(), flushPromptHtmlCommit(this));
-          let _0x51732a;
-          if (typeof this._buildPayload === 'function') _0x51732a = await this._buildPayload();
+        el7?.addEventListener('click', async (event8) => {
+          (event8.stopPropagation(), flushPromptHtmlCommit(this));
+          let enabled5;
+          if (typeof this._buildPayload === 'function') enabled5 = await this._buildPayload();
           else {
-            const _0x2dd864 = this.promptEl?.innerText?.trim() || '';
-            _0x51732a = { prompt: _0x2dd864, nodeType: this._data.type };
+            const prompt = this.promptEl?.innerText?.trim() || '';
+            enabled5 = { prompt: prompt, nodeType: this._data.type };
           }
-          if (!_0x51732a) return;
+          if (!enabled5) return;
           try {
-            const _0x461944 = await _0x65939d.buildGenerateTextRequest(_0x51732a),
-              _0x5cf002 = formatFinalApiDebugRequest(_0x461944),
-              _0x5ce385 = _0x41b315.getState(),
-              _0x5e5aa2 = this._data.x + (this._data.width || 0x17c) + 50,
-              _0x17f18f = this._data.y;
-            let _0x5662b3 = Object.values(_0x5ce385.nodes).find((_0x1b2729) => _0x1b2729.type === 'debug');
-            if (!_0x5662b3) {
-              const _0x3c1ce7 = 'debug-' + Date.now();
-              _0x41b315.addNode({
-                id: _0x3c1ce7,
+            const config = await api.buildGenerateTextRequest(enabled5),
+              outputText = formatFinalApiDebugRequest(config),
+              scope = store.getState(),
+              x = this._data.x + (this._data.width || 0x17c) + 50,
+              y = this._data.y;
+            let enabled6 = Object.values(scope.nodes).find((item2) => item2.type === 'debug');
+            if (!enabled6) {
+              const id = 'debug-' + Date.now();
+              store.addNode({
+                id: id,
                 type: 'debug',
-                x: _0x5e5aa2,
-                y: _0x17f18f,
+                x: x,
+                y: y,
                 width: 0x15e,
                 height: 0x104,
                 name: t('aigenText.debug.nodeName'),
-                outputText: _0x5cf002,
+                outputText: outputText,
               });
-            } else
-              _0x41b315.updateNodeData(_0x5662b3.id, { outputText: _0x5cf002, x: _0x5e5aa2, y: _0x17f18f });
+            } else store.updateNodeData(enabled6.id, { outputText: outputText, x: x, y: y });
             window.showToast?.(t('aigenText.debug.paramsShown'), 'warn');
-          } catch (_0x58231e) {
+          } catch (error) {
             window.showToast?.(
-              t('aigenText.debug.buildRequestFailed', { error: _0x58231e?.message || _0x58231e }),
+              t('aigenText.debug.buildRequestFailed', { error: error?.message || error }),
               'error',
             );
           }
         }),
         this._footerControllerCleanup?.(),
-        (this._footerControllerCleanup = bindNodeFooterController(_0x4bf022)),
+        (this._footerControllerCleanup = bindNodeFooterController(root)),
         bindNodeModelMenuTrigger({
-          root: _0x4bf022,
-          trigger: _0x4f13fe,
-          menu: _0x188b86,
-          closeOthers: () => closeNodeFooterMenus(_0x4bf022, _0x188b86),
-          activateMenuKeyboard: _0x45cbf3,
+          root: root,
+          trigger: trigger,
+          menu: menu,
+          closeOthers: () => closeNodeFooterMenus(root, menu),
+          activateMenuKeyboard: activateMenuKeyboard,
         }));
-      const _0x271e9a = _0x188b86.querySelector('[data-custom-toggle]'),
-        _0x25636f = _0x188b86.querySelector('.custom-submenu');
-      let _0x3d199b = null;
-      const _0x3b1bda = () => {
-          clearTimeout(_0x3d199b);
-          if (_0x25636f) _0x25636f.style.display = 'flex';
+      const el16 = menu.querySelector('[data-custom-toggle]'),
+        el17 = menu.querySelector('.custom-submenu');
+      let setTimeout2 = null;
+      const input = () => {
+          clearTimeout(setTimeout2);
+          if (el17) el17.style.display = 'flex';
         },
-        _0x25fc6c = (_0x288ba2 = 120) => {
-          _0x3d199b = setTimeout(() => {
-            if (_0x25636f && _0x25636f.querySelector('input:focus')) return;
-            if (_0x25636f) _0x25636f.style.display = 'none';
-          }, _0x288ba2);
+        handler4 = (output = 120) => {
+          setTimeout2 = setTimeout(() => {
+            if (el17 && el17.querySelector('input:focus')) return;
+            if (el17) el17.style.display = 'none';
+          }, output);
         };
-      _0x271e9a &&
-        (_0x271e9a.addEventListener('mouseenter', _0x3b1bda),
-        _0x271e9a.addEventListener('mouseleave', () => _0x25fc6c()));
-      _0x25636f &&
-        (_0x25636f.addEventListener('mouseenter', _0x3b1bda),
-        _0x25636f.addEventListener('mouseleave', () => _0x25fc6c()),
-        _0x25636f.addEventListener('click', (_0x211ec7) => _0x211ec7.stopPropagation()),
-        _0x25636f.addEventListener('pointerdown', (_0x38df3f) => _0x38df3f.stopPropagation()));
-      const _0x4828e4 = () => {
-        if (!_0x25636f) return;
-        const _0x414088 = _0x538cf7(),
-          _0x2626d8 = this._data.model || '';
-        ((_0x25636f.innerHTML = ''),
-          _0x414088.forEach((_0x1bb478, _0x4c577f) => {
-            const _0xc3e5d0 = document.createElement('div');
-            ((_0xc3e5d0.className =
-              'floating-menu-item custom-model-item' + (_0x2626d8 === _0x1bb478 ? ' active' : '')),
-              (_0xc3e5d0.dataset.value = _0x1bb478),
-              (_0xc3e5d0.innerHTML =
+      el16 &&
+        (el16.addEventListener('mouseenter', input), el16.addEventListener('mouseleave', () => handler4()));
+      el17 &&
+        (el17.addEventListener('mouseenter', input),
+        el17.addEventListener('mouseleave', () => handler4()),
+        el17.addEventListener('click', (event9) => event9.stopPropagation()),
+        el17.addEventListener('pointerdown', (event10) => event10.stopPropagation()));
+      const run = () => {
+        if (!el17) return;
+        const list2 = getCustomTextModels(),
+          value2 = this._data.model || '';
+        ((el17.innerHTML = ''),
+          list2.forEach((model2, value3) => {
+            const el18 = document.createElement('div');
+            ((el18.className = 'floating-menu-item custom-model-item' + (value2 === model2 ? ' active' : '')),
+              (el18.dataset.value = model2),
+              (el18.innerHTML =
                 '\n                    <div class="text-model-icon text-model-icon-badge custom-model-icon">OA</div>\n                    <span class="custom-model-label">' +
-                _0x1bb478 +
+                model2 +
                 '</span>\n                    <span class="custom-model-del">×</span>\n                '));
-            const _0xba8ac3 = _0xc3e5d0.querySelector('.custom-model-del');
-            (_0xc3e5d0.addEventListener('mouseenter', () => {
-              if (_0xba8ac3) _0xba8ac3.classList.add('show');
+            const el19 = el18.querySelector('.custom-model-del');
+            (el18.addEventListener('mouseenter', () => {
+              if (el19) el19.classList.add('show');
             }),
-              _0xc3e5d0.addEventListener('mouseleave', () => {
-                if (_0xba8ac3) _0xba8ac3.classList.remove('show');
+              el18.addEventListener('mouseleave', () => {
+                if (el19) el19.classList.remove('show');
               }),
-              _0xc3e5d0.addEventListener('click', (_0x50a8a6) => {
-                if (_0x50a8a6.target.closest('.custom-model-del')) return;
-                ((_0x143678.textContent = _0x1bb478),
-                  _0x188b86
+              el18.addEventListener('click', (event11) => {
+                if (event11.target.closest('.custom-model-del')) return;
+                ((el8.textContent = model2),
+                  menu
                     .querySelectorAll('.floating-menu-item')
-                    .forEach((_0xb6a4db) => _0xb6a4db.classList.remove('active')),
-                  _0xec94eb
+                    .forEach((el20) => el20.classList.remove('active')),
+                  grsai
                     ?.querySelectorAll('.floating-menu-item')
-                    .forEach((_0x3ec6c0) => _0x3ec6c0.classList.remove('active')),
-                  _0x4d8b57
+                    .forEach((el21) => el21.classList.remove('active')),
+                  ppio
                     ?.querySelectorAll('.floating-menu-item')
-                    .forEach((_0x3032bc) => _0x3032bc.classList.remove('active')),
-                  _0x25636f
+                    .forEach((el22) => el22.classList.remove('active')),
+                  el17
                     .querySelectorAll('.floating-menu-item')
-                    .forEach((_0x26e4c1) => _0x26e4c1.classList.remove('active')),
-                  _0xc3e5d0.classList.add('active'),
-                  _0x188b86.classList.remove('show'),
-                  (_0x25636f.style.display = 'none'),
-                  _0x41b315.updateNodeData(this.nodeId, { model: _0x1bb478, provider: 'custom' }));
-                const _0x183863 = _0x4f13fe.firstElementChild;
-                if (_0x183863) {
-                  const _0x197e50 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                  (_0x197e50.setAttribute('width', '12'),
-                    _0x197e50.setAttribute('height', '12'),
-                    _0x197e50.setAttribute('viewBox', '0 0 24 24'),
-                    _0x197e50.setAttribute('fill', 'none'),
-                    _0x197e50.setAttribute('stroke', 'currentColor'),
-                    _0x197e50.setAttribute('stroke-width', '2'),
-                    (_0x197e50.innerHTML =
+                    .forEach((el23) => el23.classList.remove('active')),
+                  el18.classList.add('active'),
+                  menu.classList.remove('show'),
+                  (el17.style.display = 'none'),
+                  store.updateNodeData(this.nodeId, { model: model2, provider: 'custom' }));
+                const value4 = trigger.firstElementChild;
+                if (value4) {
+                  const el24 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                  (el24.setAttribute('width', '12'),
+                    el24.setAttribute('height', '12'),
+                    el24.setAttribute('viewBox', '0 0 24 24'),
+                    el24.setAttribute('fill', 'none'),
+                    el24.setAttribute('stroke', 'currentColor'),
+                    el24.setAttribute('stroke-width', '2'),
+                    (el24.innerHTML =
                       '<rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>'),
-                    _0x183863.replaceWith(_0x197e50));
+                    value4.replaceWith(el24));
                 }
               }),
-              _0xba8ac3?.addEventListener('click', (_0x567130) => {
-                _0x567130.stopPropagation();
-                const _0x5b70de = _0x538cf7().filter((_0x27b2d1, _0x14f07a) => _0x14f07a !== _0x4c577f);
-                (_0x571948(_0x5b70de), _0x4828e4());
+              el19?.addEventListener('click', (event12) => {
+                event12.stopPropagation();
+                const value5 = getCustomTextModels().filter((item3, value6) => value6 !== value3);
+                (saveCustomTextModels(value5), run());
               }),
-              _0x25636f.appendChild(_0xc3e5d0));
+              el17.appendChild(el18));
           }));
-        if (_0x414088.length > 0) {
-          const _0x268269 = document.createElement('div');
-          ((_0x268269.className = 'custom-model-separator'), _0x25636f.appendChild(_0x268269));
+        if (list2.length > 0) {
+          const value7 = document.createElement('div');
+          ((value7.className = 'custom-model-separator'), el17.appendChild(value7));
         }
-        const _0x5a3fdf = document.createElement('div');
-        ((_0x5a3fdf.className = 'floating-menu-item custom-model-add'),
-          (_0x5a3fdf.innerHTML =
+        const el25 = document.createElement('div');
+        ((el25.className = 'floating-menu-item custom-model-add'),
+          (el25.innerHTML =
             '\n                <svg class="custom-model-add-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>\n                <span class="custom-model-add-label">' +
             t('aigenText.customModel.addModel') +
             '</span>\n            '),
-          _0x5a3fdf.addEventListener('click', (_0x468c52) => {
-            (_0x468c52.stopPropagation(), (_0x5a3fdf.innerHTML = ''), _0x5a3fdf.classList.add('editing'));
-            const _0x363176 = document.createElement('input');
-            ((_0x363176.type = 'text'),
-              (_0x363176.placeholder = t('aigenText.customModel.namePlaceholder')),
-              (_0x363176.className = 'custom-model-input'));
-            const _0x4d0096 = document.createElement('button');
-            ((_0x4d0096.type = 'button'),
-              (_0x4d0096.textContent = t('aigenText.customModel.confirm')),
-              (_0x4d0096.className = 'custom-model-confirm'));
-            const _0x1b866d = () => {
-              const _0xbd47cd = _0x363176.value.trim();
-              if (!_0xbd47cd) return;
-              const _0x398d53 = _0x538cf7();
-              (!_0x398d53.includes(_0xbd47cd) && (_0x398d53.push(_0xbd47cd), _0x571948(_0x398d53)),
-                _0x4828e4());
+          el25.addEventListener('click', (event13) => {
+            (event13.stopPropagation(), (el25.innerHTML = ''), el25.classList.add('editing'));
+            const el26 = document.createElement('input');
+            ((el26.type = 'text'),
+              (el26.placeholder = t('aigenText.customModel.namePlaceholder')),
+              (el26.className = 'custom-model-input'));
+            const el27 = document.createElement('button');
+            ((el27.type = 'button'),
+              (el27.textContent = t('aigenText.customModel.confirm')),
+              (el27.className = 'custom-model-confirm'));
+            const run2 = () => {
+              const enabled7 = el26.value.trim();
+              if (!enabled7) return;
+              const list3 = getCustomTextModels();
+              (!list3.includes(enabled7) && (list3.push(enabled7), saveCustomTextModels(list3)), run());
             };
-            (_0x363176.addEventListener('keydown', (_0x805799) => {
-              _0x805799.stopPropagation();
-              if (_0x805799.key === 'Enter') _0x1b866d();
+            (el26.addEventListener('keydown', (event14) => {
+              event14.stopPropagation();
+              if (event14.key === 'Enter') run2();
             }),
-              _0x363176.addEventListener('keyup', (_0x2bcaa7) => _0x2bcaa7.stopPropagation()),
-              _0x363176.addEventListener('keypress', (_0x5cfa21) => _0x5cfa21.stopPropagation()),
-              _0x363176.addEventListener('click', (_0x434de2) => _0x434de2.stopPropagation()),
-              _0x4d0096.addEventListener('click', (_0x282435) => {
-                (_0x282435.stopPropagation(), _0x1b866d());
+              el26.addEventListener('keyup', (event15) => event15.stopPropagation()),
+              el26.addEventListener('keypress', (event16) => event16.stopPropagation()),
+              el26.addEventListener('click', (event17) => event17.stopPropagation()),
+              el27.addEventListener('click', (event18) => {
+                (event18.stopPropagation(), run2());
               }),
-              _0x5a3fdf.appendChild(_0x363176),
-              _0x5a3fdf.appendChild(_0x4d0096),
-              _0x363176.focus());
+              el25.appendChild(el26),
+              el25.appendChild(el27),
+              el26.focus());
           }),
-          _0x25636f.appendChild(_0x5a3fdf));
+          el17.appendChild(el25));
       };
-      ((this._renderCustomTextModelSubmenu = _0x4828e4),
-        _0x4828e4(),
+      ((this._renderCustomTextModelSubmenu = run),
+        run(),
         this.btnEl.addEventListener('click', () => {
           (flushPromptHtmlCommit(this), this._onGenerate());
         }),
-        _0x542c70.appendChild(_0x4bf022),
-        _0x3aaea7.appendChild(_0x542c70),
+        el3.appendChild(root),
+        el.appendChild(el3),
         this._renderRefBar());
-      const _0x13ef78 = _0x3aaea7.querySelector('.node-floating-toolbar');
-      _0xd15dee(_0x13ef78, this._data, () => this._getOutputRawText?.() || '');
-      const _0x57d630 = createNodeResizeHandle(this, {
-        store: _0x41b315,
-        getStateSnapshot: _0x2e5252,
-        commit: _0x3958e2,
+      const value8 = el.querySelector('.node-floating-toolbar');
+      bindTextToolbarEvents(value8, this._data, () => this._getOutputRawText?.() || '');
+      const nodeResizeHandle = createNodeResizeHandle(this, {
+        store: store,
+        getStateSnapshot: getStateSnapshot,
+        commit: commit,
       });
-      return (_0x3aaea7.appendChild(_0x57d630), this._updateSubmitButtonState(), _0x3aaea7);
+      return (el.appendChild(nodeResizeHandle), this._updateSubmitButtonState(), el);
     }
     ['_enterOutputEditMode']() {
       this.outputEl && this.outputEl.setAttribute('contenteditable', 'false');
       this._commitOutputScrollTop();
-      const _0x5ac3f5 = _0x41b315.getState().selectedNodeIds;
-      if (!_0x5ac3f5.includes(this.nodeId)) _0x41b315.setSelectedNodes([this.nodeId]);
+      const list4 = store.getState().selectedNodeIds;
+      if (!list4.includes(this.nodeId)) store.setSelectedNodes([this.nodeId]);
     }
     ['_captureOutputScrollTop']() {
       return (
@@ -504,55 +495,53 @@ export function createAIGenTextNodeUiModule(_0x38ccdb) {
       (this._outputScrollTopCommitTimer && clearTimeout(this._outputScrollTopCommitTimer),
         (this._outputScrollTopCommitTimer = setTimeout(() => {
           ((this._outputScrollTopCommitTimer = null), this._commitOutputScrollTop());
-        }, _0x149ee6)));
+        }, item)));
     }
     ['_commitOutputScrollTop']() {
       if (!this.outputEl || !this.nodeId) return 0;
       this._outputScrollTopCommitTimer &&
         (clearTimeout(this._outputScrollTopCommitTimer), (this._outputScrollTopCommitTimer = null));
-      const _0x5bcc3c = this._captureOutputScrollTop();
+      const outputScrollTop = this._captureOutputScrollTop();
       this._outputScrollTopDirty = false;
-      const _0x43a213 =
-        typeof _0x41b315.getStateRaw === 'function'
-          ? _0x41b315.getStateRaw()?.nodes?.[this.nodeId]
-          : _0x41b315.getState?.()?.nodes?.[this.nodeId];
-      if (Number(_0x43a213?.outputScrollTop) === _0x5bcc3c) return _0x5bcc3c;
+      const value9 =
+        typeof store.getStateRaw === 'function'
+          ? store.getStateRaw()?.nodes?.[this.nodeId]
+          : store.getState?.()?.nodes?.[this.nodeId];
+      if (Number(value9?.outputScrollTop) === outputScrollTop) return outputScrollTop;
       return (
-        typeof _0x41b315.updateNodeData === 'function' &&
-          _0x41b315.updateNodeData(this.nodeId, { outputScrollTop: _0x5bcc3c }),
-        _0x5bcc3c
+        typeof store.updateNodeData === 'function' &&
+          store.updateNodeData(this.nodeId, { outputScrollTop: outputScrollTop }),
+        outputScrollTop
       );
     }
-    ['_getOutputRawText'](_0x110e48 = this._data) {
-      const _0x5dfe88 = typeof this.nodeId === 'string' ? this.nodeId : '',
-        _0x2620a6 =
-          _0x5dfe88 && typeof _0x41b315.getStateRaw === 'function'
-            ? _0x41b315.getStateRaw()?.nodes?.[_0x5dfe88]
-            : null;
-      return String(_0x2620a6?.outputText ?? _0x110e48?.outputText ?? '');
+    ['_getOutputRawText'](value10 = this._data) {
+      const value11 = typeof this.nodeId === 'string' ? this.nodeId : '',
+        value12 =
+          value11 && typeof store.getStateRaw === 'function' ? store.getStateRaw()?.nodes?.[value11] : null;
+      return String(value12?.outputText ?? value10?.outputText ?? '');
     }
-    ['_renderOutputText'](_0x89abb6 = this._getOutputRawText()) {
+    ['_renderOutputText'](value13 = this._getOutputRawText()) {
       if (!this.outputEl) return;
-      const _0x5292ba = String(_0x89abb6 ?? '');
-      this._lastRenderedOutputText = _0x5292ba;
-      if (!_0x5292ba) {
+      const enabled8 = String(value13 ?? '');
+      this._lastRenderedOutputText = enabled8;
+      if (!enabled8) {
         (this.outputEl.replaceChildren(), (this.outputEl.style.display = 'none'));
         if (this._placeholderEl) this._placeholderEl.style.display = 'flex';
         return;
       }
-      ((this.outputEl.innerHTML = renderMarkdownToHtml(_0x5292ba)), (this.outputEl.style.display = 'block'));
+      ((this.outputEl.innerHTML = renderMarkdownToHtml(enabled8)), (this.outputEl.style.display = 'block'));
       if (this._placeholderEl) this._placeholderEl.style.display = 'none';
     }
-    ['_handlePreviewDblclick'](_0x208b28) {
+    ['_handlePreviewDblclick'](event19) {
       if (!isPreviewModeEnabled()) return;
-      _0x208b28?.stopPropagation?.();
+      event19?.stopPropagation?.();
     }
-    ['_syncPromptBoxSizeFromData'](_0x1ab914 = this._data) {
-      syncPromptBoxSizeFromData(this, _0x1ab914);
+    ['_syncPromptBoxSizeFromData'](value14 = this._data) {
+      syncPromptBoxSizeFromData(this, value14);
     }
     ['_setupPromptBoxResize']() {
-      setupPromptBoxResize(this, { store: _0x41b315, getStateSnapshot: _0x2e5252 });
+      setupPromptBoxResize(this, { store: store, getStateSnapshot: getStateSnapshot });
     }
   }
-  return _0x23dde4.prototype;
+  return key.prototype;
 }

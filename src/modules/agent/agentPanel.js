@@ -127,51 +127,51 @@ const AGENT_QUICK_ACTIONS = Object.freeze([
       waiting: 'Thinking',
     }),
   });
-function normalizePanelLocale(_0x13a796 = getLocale()) {
-  return String(_0x13a796 || '')
+function normalizePanelLocale(locale = getLocale()) {
+  return String(locale || '')
     .toLowerCase()
     .startsWith('en')
     ? 'en-US'
     : 'zh-CN';
 }
-function panelText(_0x1785f1, _0x36660 = getLocale()) {
-  const _0x1dcd2a = normalizePanelLocale(_0x36660);
-  return PANEL_TEXT[_0x1dcd2a]?.[_0x1785f1] || PANEL_TEXT['zh-CN'][_0x1785f1] || _0x1785f1;
+function panelText(value, locale2 = getLocale()) {
+  const panelLocale = normalizePanelLocale(locale2);
+  return PANEL_TEXT[panelLocale]?.[value] || PANEL_TEXT['zh-CN'][value] || value;
 }
-function formatPanelText(_0x60140f, _0x3a8545 = {}, _0x29f6c6 = getLocale()) {
-  return panelText(_0x60140f, _0x29f6c6).replace(/\{(\w+)\}/g, (_0x484dca, _0x5411e2) =>
-    _0x3a8545[_0x5411e2] == null ? '' : String(_0x3a8545[_0x5411e2]),
+function formatPanelText(item, key = {}, locale3 = getLocale()) {
+  return panelText(item, locale3).replace(/\{(\w+)\}/g, (index, result) =>
+    key[result] == null ? '' : String(key[result]),
   );
 }
-function createEl(_0x486a58, _0x451d2a = '', _0x37bb2e = '') {
-  const _0x3c92f5 = document.createElement(_0x486a58);
-  if (_0x451d2a) _0x3c92f5.className = _0x451d2a;
-  if (_0x37bb2e) _0x3c92f5.textContent = _0x37bb2e;
-  return _0x3c92f5;
+function createEl(data, options = '', target = '') {
+  const el = document.createElement(data);
+  if (options) el.className = options;
+  if (target) el.textContent = target;
+  return el;
 }
 function createButton(
-  _0x3d0eb2,
-  _0x4e6937,
+  next,
+  current,
   { title: title = '', icon: icon = '', disabled: disabled = false } = {},
 ) {
-  const _0x5cd419 = createEl('button', _0x3d0eb2);
-  _0x5cd419.type = 'button';
-  title && ((_0x5cd419.title = title), _0x5cd419.setAttribute('aria-label', title));
+  const el2 = createEl('button', next);
+  el2.type = 'button';
+  title && ((el2.title = title), el2.setAttribute('aria-label', title));
   if (icon) {
-    _0x5cd419.innerHTML = icon;
-    if (_0x4e6937) {
-      const _0xeb6e9d = createEl('span', 'agent-btn-label', _0x4e6937);
-      _0x5cd419.appendChild(_0xeb6e9d);
+    el2.innerHTML = icon;
+    if (current) {
+      const el3 = createEl('span', 'agent-btn-label', current);
+      el2.appendChild(el3);
     }
-  } else _0x5cd419.textContent = _0x4e6937;
-  _0x5cd419.disabled = disabled;
-  if (disabled) _0x5cd419.setAttribute('aria-disabled', 'true');
-  return _0x5cd419;
+  } else el2.textContent = current;
+  el2.disabled = disabled;
+  if (disabled) el2.setAttribute('aria-disabled', 'true');
+  return el2;
 }
-function iconSvg(_0x54edc2) {
-  const _0x34c970 =
+function iconSvg(entry) {
+  const record =
       'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"',
-    _0x5c0ffc = {
+    payload = {
       collapse: '<rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M10 4v16"></path>',
       plus: '<path d="M12 5v14"></path><path d="M5 12h14"></path>',
       history:
@@ -188,1233 +188,1211 @@ function iconSvg(_0x54edc2) {
       upload: '<path d="M12 16V4"></path><path d="m7 9 5-5 5 5"></path><path d="M20 20H4"></path>',
       wand: '<path d="M15 4V2"></path><path d="M15 10v-2"></path><path d="M12 5h2"></path><path d="M18 5h-2"></path><path d="m5 19 14-14"></path><path d="m9 15-4-4"></path>',
     };
-  return (
-    '<svg class="agent-icon" width="18" height="18" ' +
-    _0x34c970 +
-    '>' +
-    (_0x5c0ffc[_0x54edc2] || '') +
-    '</svg>'
-  );
+  return '<svg class="agent-icon" width="18" height="18" ' + record + '>' + (payload[entry] || '') + '</svg>';
 }
 function createAgentPromptAttachmentButton({ title: title = '', className: className = '' } = {}) {
-  const _0x57f117 = document.createElement('div');
-  _0x57f117.innerHTML = createPromptAttachmentButtonHTML({
+  const el4 = document.createElement('div');
+  el4.innerHTML = createPromptAttachmentButtonHTML({
     tooltip: title,
     stroke: 'currentColor',
     fill: 'var(--white-05)',
     circleFill: 'currentColor',
   });
-  const _0x3413ee = _0x57f117.firstElementChild;
-  if (_0x3413ee)
+  const el5 = el4.firstElementChild;
+  if (el5)
     return (
       className
         .split(/\s+/)
         .filter(Boolean)
-        .forEach((_0x525afb) => _0x3413ee.classList.add(_0x525afb)),
-      _0x3413ee.setAttribute('role', 'button'),
-      (_0x3413ee.tabIndex = 0),
-      _0x3413ee
+        .forEach((item2) => el5.classList.add(item2)),
+      el5.setAttribute('role', 'button'),
+      (el5.tabIndex = 0),
+      el5
     );
-  const _0x276ac3 = createEl('div', ['prompt-attachment-btn', className].filter(Boolean).join(' '));
-  title && ((_0x276ac3.title = title), _0x276ac3.setAttribute('aria-label', title));
-  (_0x276ac3.setAttribute('role', 'button'), (_0x276ac3.tabIndex = 0));
-  const _0x29fc58 = createEl('span', 'btn-icon');
+  const el6 = createEl('div', ['prompt-attachment-btn', className].filter(Boolean).join(' '));
+  title && ((el6.title = title), el6.setAttribute('aria-label', title));
+  (el6.setAttribute('role', 'button'), (el6.tabIndex = 0));
+  const el7 = createEl('span', 'btn-icon');
   return (
-    (_0x29fc58.innerHTML =
+    (el7.innerHTML =
       '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l7.07 16.97 2.51-7.39 7.39-2.51L4 4z" fill="var(--white-05)" /><circle cx="20" cy="20" r="2.5" fill="currentColor" /><path d="M12 12 Q 17 12 19 18" stroke-dasharray="3 3" /></svg>'),
-    _0x276ac3.appendChild(_0x29fc58),
-    _0x276ac3
+    el6.appendChild(el7),
+    el6
   );
 }
-function appendMessage(_0x4e1fc9, _0x39f0cf, _0x22e8c0) {
-  const _0x5286f5 = String(_0x39f0cf || '') === 'user' ? 'user' : 'assistant',
-    _0x44517d = createEl('div', 'agent-message agent-message--' + _0x5286f5);
-  ((_0x44517d.textContent = String(_0x22e8c0 || '')),
-    _0x4e1fc9.appendChild(_0x44517d),
-    (_0x4e1fc9.scrollTop = _0x4e1fc9.scrollHeight));
+function appendMessage(el8, handle, state) {
+  const config = String(handle || '') === 'user' ? 'user' : 'assistant',
+    el9 = createEl('div', 'agent-message agent-message--' + config);
+  ((el9.textContent = String(state || '')), el8.appendChild(el9), (el8.scrollTop = el8.scrollHeight));
 }
-function renderMessages(_0x2e18e3, _0x16b8cb = []) {
-  (_0x2e18e3.replaceChildren(),
-    _0x16b8cb.forEach((_0x360cc2) => {
-      appendMessage(_0x2e18e3, _0x360cc2.role, _0x360cc2.content || _0x360cc2.status || '');
+function renderMessages(scope, list = []) {
+  (scope.replaceChildren(),
+    list.forEach((response) => {
+      appendMessage(scope, response.role, response.content || response.status || '');
     }));
 }
-function appendWaitingMessage(_0xae8ad0) {
-  const _0x325aa5 = createEl('div', 'agent-message agent-message--assistant agent-message--typing'),
-    _0x246267 = createEl('span', 'agent-typing-label', panelText('waiting')),
-    _0x14fc29 = createEl('span', 'agent-typing-dots');
+function appendWaitingMessage(el10) {
+  const el11 = createEl('div', 'agent-message agent-message--assistant agent-message--typing'),
+    el12 = createEl('span', 'agent-typing-label', panelText('waiting')),
+    el13 = createEl('span', 'agent-typing-dots');
   return (
-    _0x14fc29.append(createEl('span'), createEl('span'), createEl('span')),
-    _0x325aa5.append(_0x246267, _0x14fc29),
-    _0xae8ad0.appendChild(_0x325aa5),
-    (_0xae8ad0.scrollTop = _0xae8ad0.scrollHeight),
-    _0x325aa5
+    el13.append(createEl('span'), createEl('span'), createEl('span')),
+    el11.append(el12, el13),
+    el10.appendChild(el11),
+    (el10.scrollTop = el10.scrollHeight),
+    el11
   );
 }
-function removeWaitingMessage(_0x193e0f) {
-  if (!_0x193e0f?.parentNode) return;
-  if (typeof _0x193e0f.remove === 'function') {
-    _0x193e0f.remove();
+function removeWaitingMessage(el14) {
+  if (!el14?.parentNode) return;
+  if (typeof el14.remove === 'function') {
+    el14.remove();
     return;
   }
-  const _0x582325 = _0x193e0f.parentNode,
-    _0xceec4e = _0x582325.children?.indexOf?.(_0x193e0f) ?? -1;
-  if (_0xceec4e >= 0) _0x582325.children.splice(_0xceec4e, 1);
-  _0x193e0f.parentNode = null;
+  const el15 = el14.parentNode,
+    count = el15.children?.indexOf?.(el14) ?? -1;
+  if (count >= 0) el15.children.splice(count, 1);
+  el14.parentNode = null;
 }
-function setEditorText(_0x100012, _0x403264 = '') {
-  ((_0x100012.textContent = String(_0x403264 || '')),
-    _0x100012.dispatchEvent?.(new Event('input', { bubbles: true })));
+function setEditorText(el16, input = '') {
+  ((el16.textContent = String(input || '')), el16.dispatchEvent?.(new Event('input', { bubbles: true })));
 }
-function getEditorText(_0x51ebf7) {
-  return String(_0x51ebf7?.innerText || _0x51ebf7?.textContent || '').trim();
+function getEditorText(el17) {
+  return String(el17?.innerText || el17?.textContent || '').trim();
 }
-function truncateUiText(_0x3090fd, _0x1d1f79 = 40) {
-  const _0x4f3b8d = String(_0x3090fd || '')
+function truncateUiText(output, value2 = 40) {
+  const list2 = String(output || '')
     .replace(/\s+/g, ' ')
     .trim();
-  return _0x4f3b8d.length <= _0x1d1f79 ? _0x4f3b8d : _0x4f3b8d.slice(0, Math.max(0, _0x1d1f79 - 3)) + '...';
+  return list2.length <= value2 ? list2 : list2.slice(0, Math.max(0, value2 - 3)) + '...';
 }
-function readJsonArrayFromStorage(_0x56a50d, _0x21b928) {
+function readJsonArrayFromStorage(value3, value4) {
   try {
-    const _0xe39b18 = _0x56a50d?.localStorage?.getItem?.(_0x21b928),
-      _0x9a372c = _0xe39b18 ? JSON.parse(_0xe39b18) : [];
-    return Array.isArray(_0x9a372c) ? _0x9a372c : [];
+    const value5 = value3?.localStorage?.getItem?.(value4),
+      value6 = value5 ? JSON.parse(value5) : [];
+    return Array.isArray(value6) ? value6 : [];
   } catch {
     return [];
   }
 }
-function writeJsonArrayToStorage(_0x2952f4, _0x283691, _0x8afff1) {
+function writeJsonArrayToStorage(value7, value8, value9) {
   try {
-    _0x2952f4?.localStorage?.setItem?.(_0x283691, JSON.stringify(_0x8afff1));
+    value7?.localStorage?.setItem?.(value8, JSON.stringify(value9));
   } catch {}
 }
-function normalizeQuickAction(_0x1e1869 = {}, _0x246cc2 = '') {
-  const _0x1d7a4c = String(_0x1e1869.prompt || '').trim();
-  if (!_0x1d7a4c) return null;
-  const _0xa67d = String(_0x1e1869.id || _0x246cc2 || '').trim() || 'custom-' + Date.now();
+function normalizeQuickAction(custom = {}, value10 = '') {
+  const prompt = String(custom.prompt || '').trim();
+  if (!prompt) return null;
+  const id = String(custom.id || value10 || '').trim() || 'custom-' + Date.now();
   return {
-    id: _0xa67d,
-    label: truncateUiText(_0x1e1869.label || _0x1d7a4c, 28),
-    prompt: _0x1d7a4c,
-    custom: _0x1e1869.custom === true,
+    id: id,
+    label: truncateUiText(custom.label || prompt, 28),
+    prompt: prompt,
+    custom: custom.custom === true,
   };
 }
-function readCustomQuickActions(_0x3fd012 = globalThis.window) {
-  return readJsonArrayFromStorage(_0x3fd012, AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY)
-    .map((_0x2456f1, _0x4cdc48) => normalizeQuickAction(_0x2456f1, 'custom-' + _0x4cdc48))
+function readCustomQuickActions(value11 = globalThis.window) {
+  return readJsonArrayFromStorage(value11, AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY)
+    .map((item3, value12) => normalizeQuickAction(item3, 'custom-' + value12))
     .filter(Boolean)
     .slice(0, AGENT_CUSTOM_QUICK_ACTION_LIMIT);
 }
-function writeCustomQuickActions(_0x578823 = [], _0x35f5e5 = globalThis.window) {
-  const _0x30719a = _0x578823
-    .map((_0x3c70c5, _0x1ee4d1) => normalizeQuickAction(_0x3c70c5, 'custom-' + _0x1ee4d1))
+function writeCustomQuickActions(list3 = [], value13 = globalThis.window) {
+  const value14 = list3
+    .map((item4, value15) => normalizeQuickAction(item4, 'custom-' + value15))
     .filter(Boolean)
     .slice(0, AGENT_CUSTOM_QUICK_ACTION_LIMIT);
-  return (writeJsonArrayToStorage(_0x35f5e5, AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY, _0x30719a), _0x30719a);
+  return (writeJsonArrayToStorage(value13, AGENT_CUSTOM_QUICK_ACTIONS_STORAGE_KEY, value14), value14);
 }
-function inferAgentInputKind(_0x3667b6 = '') {
-  const _0x28bef8 = String(_0x3667b6 || '').trim();
-  if (_0x28bef8.includes('image')) return 'image';
-  if (_0x28bef8.includes('video')) return 'video';
-  if (_0x28bef8.includes('audio')) return 'audio';
-  if (_0x28bef8.includes('text')) return 'text';
-  return _0x28bef8 || 'node';
+function inferAgentInputKind(value16 = '') {
+  const list4 = String(value16 || '').trim();
+  if (list4.includes('image')) return 'image';
+  if (list4.includes('video')) return 'video';
+  if (list4.includes('audio')) return 'audio';
+  if (list4.includes('text')) return 'text';
+  return list4 || 'node';
 }
-function normalizeRenderableThumbUrl(_0x231719) {
-  const _0x55087c = String(_0x231719 || '').trim();
-  if (!_0x55087c) return '';
-  if (/^https?:\/\//i.test(_0x55087c) || _0x55087c.startsWith('/')) return _0x55087c;
-  if (/^data:image\//i.test(_0x55087c) && _0x55087c.length <= 0xc350) return _0x55087c;
-  return localPathToUrl(_0x55087c) || '';
+function normalizeRenderableThumbUrl(value17) {
+  const list5 = String(value17 || '').trim();
+  if (!list5) return '';
+  if (/^https?:\/\//i.test(list5) || list5.startsWith('/')) return list5;
+  if (/^data:image\//i.test(list5) && list5.length <= 0xc350) return list5;
+  return localPathToUrl(list5) || '';
 }
-function resolveAgentInputRefThumbUrl(_0x13c2f3 = {}) {
-  const _0x49b0fa = [
-    _0x13c2f3.thumbUrl,
-    _0x13c2f3.posterUrl,
-    _0x13c2f3.videoThumbSrc,
-    _0x13c2f3.imageUrl,
-    _0x13c2f3.src,
-    _0x13c2f3.coverUrl,
-    _0x13c2f3.waveformUrl,
-    _0x13c2f3.thumbLocalPath,
-    _0x13c2f3.posterLocalPath,
-    _0x13c2f3.displayLocalPath,
-    _0x13c2f3.localPath,
-    _0x13c2f3.originalLocalPath,
-    _0x13c2f3.waveformLocalPath,
+function resolveAgentInputRefThumbUrl(options2 = {}) {
+  const value18 = [
+    options2.thumbUrl,
+    options2.posterUrl,
+    options2.videoThumbSrc,
+    options2.imageUrl,
+    options2.src,
+    options2.coverUrl,
+    options2.waveformUrl,
+    options2.thumbLocalPath,
+    options2.posterLocalPath,
+    options2.displayLocalPath,
+    options2.localPath,
+    options2.originalLocalPath,
+    options2.waveformLocalPath,
   ];
-  for (const _0x573883 of _0x49b0fa) {
-    const _0x5be510 = normalizeRenderableThumbUrl(_0x573883);
-    if (_0x5be510) return _0x5be510;
+  for (const value19 of value18) {
+    const renderableThumbUrl = normalizeRenderableThumbUrl(value19);
+    if (renderableThumbUrl) return renderableThumbUrl;
   }
   return '';
 }
-function normalizeAgentInputRefFromNode(_0x554dad = {}, { source: source = 'canvas' } = {}) {
-  const _0x46296b = String(_0x554dad.id || _0x554dad.nodeId || '').trim();
-  if (!_0x46296b) return null;
-  const _0x856b4 = String(_0x554dad.type || '').trim(),
-    _0x255f77 = inferAgentInputKind(_0x856b4),
-    _0x43e16e = truncateUiText(_0x554dad.name || _0x554dad.label || _0x554dad.title || _0x46296b, 60),
-    _0x2b04d0 = Number(_0x554dad.width),
-    _0x353e6c = Number(_0x554dad.height),
-    _0x29272a = {
-      id: _0x46296b,
-      nodeId: _0x46296b,
-      type: _0x856b4,
-      kind: _0x255f77,
-      name: _0x43e16e,
-      label: _0x43e16e,
+function normalizeAgentInputRefFromNode(box = {}, { source: source = 'canvas' } = {}) {
+  const id2 = String(box.id || box.nodeId || '').trim();
+  if (!id2) return null;
+  const type = String(box.type || '').trim(),
+    kind = inferAgentInputKind(type),
+    name = truncateUiText(box.name || box.label || box.title || id2, 60),
+    count2 = Number(box.width),
+    count3 = Number(box.height),
+    box2 = {
+      id: id2,
+      nodeId: id2,
+      type: type,
+      kind: kind,
+      name: name,
+      label: name,
       source: source,
-      thumbUrl: resolveAgentInputRefThumbUrl(_0x554dad),
+      thumbUrl: resolveAgentInputRefThumbUrl(box),
     };
-  if (Number.isFinite(_0x2b04d0) && _0x2b04d0 > 0) _0x29272a.width = Math.round(_0x2b04d0);
-  if (Number.isFinite(_0x353e6c) && _0x353e6c > 0) _0x29272a.height = Math.round(_0x353e6c);
-  return _0x29272a;
+  if (Number.isFinite(count2) && count2 > 0) box2.width = Math.round(count2);
+  if (Number.isFinite(count3) && count3 > 0) box2.height = Math.round(count3);
+  return box2;
 }
-function isAgentMaterialRef(_0x941ab9 = {}) {
-  return ['image', 'video', 'audio', 'text'].includes(String(_0x941ab9.kind || ''));
+function isAgentMaterialRef(options3 = {}) {
+  return ['image', 'video', 'audio', 'text'].includes(String(options3.kind || ''));
 }
-function getStoreState(_0x5699d3) {
-  return _0x5699d3?.getStateRaw?.() || _0x5699d3?.getState?.() || {};
+function getStoreState(store2) {
+  return store2?.getStateRaw?.() || store2?.getState?.() || {};
 }
-function clampAgentSidebarWidth(_0x204b79, _0x43643d = globalThis.window?.innerWidth) {
-  const _0xf7b6e4 = Number(_0x204b79),
-    _0x73433 = Number.isFinite(Number(_0x43643d))
-      ? Math.max(0x140, Number(_0x43643d) - 24)
+function clampAgentSidebarWidth(value20, value21 = globalThis.window?.innerWidth) {
+  const value22 = Number(value20),
+    value23 = Number.isFinite(Number(value21))
+      ? Math.max(0x140, Number(value21) - 24)
       : AGENT_PANEL_WIDTH_LIMITS.max,
-    _0x1f9762 = Math.min(AGENT_PANEL_WIDTH_LIMITS.max, _0x73433),
-    _0x30262 = Math.min(AGENT_PANEL_WIDTH_LIMITS.min, _0x1f9762);
-  return Math.max(_0x30262, Math.min(_0x1f9762, _0xf7b6e4));
+    value24 = Math.min(AGENT_PANEL_WIDTH_LIMITS.max, value23),
+    value25 = Math.min(AGENT_PANEL_WIDTH_LIMITS.min, value24);
+  return Math.max(value25, Math.min(value24, value22));
 }
-function readStoredSidebarWidth(_0x13dbb0 = globalThis.window) {
-  const _0xc92d42 = Number(_0x13dbb0?.localStorage?.getItem?.(AGENT_PANEL_WIDTH_STORAGE_KEY));
-  return Number.isFinite(_0xc92d42) && _0xc92d42 > 0 ? _0xc92d42 : null;
+function readStoredSidebarWidth(value26 = globalThis.window) {
+  const count4 = Number(value26?.localStorage?.getItem?.(AGENT_PANEL_WIDTH_STORAGE_KEY));
+  return Number.isFinite(count4) && count4 > 0 ? count4 : null;
 }
-function writeStoredSidebarWidth(_0x43ff21, _0x2ac09f = globalThis.window) {
+function writeStoredSidebarWidth(value27, value28 = globalThis.window) {
   try {
-    _0x2ac09f?.localStorage?.setItem?.(AGENT_PANEL_WIDTH_STORAGE_KEY, String(Math.round(_0x43ff21)));
+    value28?.localStorage?.setItem?.(AGENT_PANEL_WIDTH_STORAGE_KEY, String(Math.round(value27)));
   } catch {}
 }
-export function normalizeAgentSidebarWidth(_0x15e5dd, _0x284757) {
-  return clampAgentSidebarWidth(_0x15e5dd, _0x284757);
+export function normalizeAgentSidebarWidth(value29, value30) {
+  return clampAgentSidebarWidth(value29, value30);
 }
-export function normalizeAgentExecutionMode(_0x4e6780) {
-  return String(_0x4e6780 || '').trim() === 'auto' ? 'auto' : 'manual';
+export function normalizeAgentExecutionMode(value31) {
+  return String(value31 || '').trim() === 'auto' ? 'auto' : 'manual';
 }
-export function getAgentExecutionModeLabel(_0x2a890d) {
-  return normalizeAgentExecutionMode(_0x2a890d) === 'auto' ? '自动执行' : '手动确认';
+export function getAgentExecutionModeLabel(value32) {
+  return normalizeAgentExecutionMode(value32) === 'auto' ? '自动执行' : '手动确认';
 }
-export function getAgentPlaceholderActionMessage(_0x2b3894) {
-  return PLACEHOLDER_ACTION_MESSAGES[_0x2b3894] || '该入口会在后续接入。';
+export function getAgentPlaceholderActionMessage(value33) {
+  return PLACEHOLDER_ACTION_MESSAGES[value33] || '该入口会在后续接入。';
 }
-export function resolveAgentModelLabel(_0x1c4f96) {
-  const _0x296540 = String(_0x1c4f96 || '').trim();
-  if (!_0x296540) return '模型选择';
-  return findTextModelMenuItem(_0x296540)?.title || _0x296540;
+export function resolveAgentModelLabel(value34) {
+  const enabled = String(value34 || '').trim();
+  if (!enabled) return '模型选择';
+  return findTextModelMenuItem(enabled)?.title || enabled;
 }
-export function commitAgentModelSelection(_0x27b29e, _0x4f7394 = {}) {
-  const _0x257f5f = String(_0x4f7394.model || _0x4f7394.modelId || '').trim(),
-    _0x14c6d = String(_0x4f7394.provider || '').trim();
-  if (!_0x257f5f) return null;
+export function commitAgentModelSelection(value35, value36 = {}) {
+  const model2 = String(value36.model || value36.modelId || '').trim(),
+    provider2 = String(value36.provider || '').trim();
+  if (!model2) return null;
   return (
-    _0x27b29e?.updateSettings?.({ model: _0x257f5f, provider: _0x14c6d }) || {
-      model: _0x257f5f,
-      provider: _0x14c6d,
+    value35?.updateSettings?.({ model: model2, provider: provider2 }) || {
+      model: model2,
+      provider: provider2,
     }
   );
 }
-function getCreateActionLabel(_0x5cca7d) {
-  const _0x455c9c = String(_0x5cca7d || '');
-  if (_0x455c9c === 'ai-image') return panelText('nodeCreateImage');
-  if (_0x455c9c === 'ai-video') return panelText('nodeCreateVideo');
-  if (_0x455c9c === 'ai-audio') return panelText('nodeCreateAudio');
-  if (_0x455c9c === 'ai-text' || _0x455c9c === 'source-text') return panelText('nodeCreateText');
+function getCreateActionLabel(value37) {
+  const value38 = String(value37 || '');
+  if (value38 === 'ai-image') return panelText('nodeCreateImage');
+  if (value38 === 'ai-video') return panelText('nodeCreateVideo');
+  if (value38 === 'ai-audio') return panelText('nodeCreateAudio');
+  if (value38 === 'ai-text' || value38 === 'source-text') return panelText('nodeCreateText');
   return panelText('nodeCreate');
 }
-function formatActionSummary(_0x4f4340 = {}) {
-  if (_0x4f4340.label) {
-    const _0x1f00d0 = [];
-    if (_0x4f4340.promptSummary) _0x1f00d0.push('“' + _0x4f4340.promptSummary + '”');
-    if (Number.isFinite(Number(_0x4f4340.args?.gap))) _0x1f00d0.push('间距 ' + Number(_0x4f4340.args.gap));
-    return _0x1f00d0.length ? _0x4f4340.label + '：' + _0x1f00d0.join('，') : _0x4f4340.label;
+function formatActionSummary(options4 = {}) {
+  if (options4.label) {
+    const list6 = [];
+    if (options4.promptSummary) list6.push('“' + options4.promptSummary + '”');
+    if (Number.isFinite(Number(options4.args?.gap))) list6.push('间距 ' + Number(options4.args.gap));
+    return list6.length ? options4.label + '：' + list6.join('，') : options4.label;
   }
-  const _0x1a4221 = String(_0x4f4340.type || ''),
-    _0x17a5b6 = _0x4f4340.args || {},
-    _0x1c7f9a =
-      _0x1a4221 === 'node.create'
-        ? getCreateActionLabel(_0x17a5b6.type)
-        : _0x1a4221 === 'node.setPrompt' || _0x1a4221 === 'node.appendPrompt'
+  const value39 = String(options4.type || ''),
+    response2 = options4.args || {},
+    value40 =
+      value39 === 'node.create'
+        ? getCreateActionLabel(response2.type)
+        : value39 === 'node.setPrompt' || value39 === 'node.appendPrompt'
           ? panelText('nodeSetPrompt')
-          : _0x1a4221 === 'node.setParams'
+          : value39 === 'node.setParams'
             ? panelText('nodeSetParams')
-            : _0x1a4221 === 'graph.connect'
+            : value39 === 'graph.connect'
               ? panelText('graphConnect')
-              : _0x1a4221 === 'layout.arrangeRow'
+              : value39 === 'layout.arrangeRow'
                 ? panelText('layoutArrangeRow')
-                : _0x1a4221 === 'layout.align'
+                : value39 === 'layout.align'
                   ? panelText('layoutAlign')
-                  : _0x1a4221 === 'generation.run'
+                  : value39 === 'generation.run'
                     ? panelText('generate')
-                    : _0x1a4221 === 'node.delete'
+                    : value39 === 'node.delete'
                       ? panelText('nodeDelete')
-                      : _0x1a4221,
-    _0x2f2866 = [],
-    _0x4b8264 = _0x17a5b6.prompt || _0x17a5b6.text;
-  if (_0x4b8264) _0x2f2866.push('“' + String(_0x4b8264).slice(0, 36) + '”');
-  if (Number.isFinite(Number(_0x17a5b6.gap))) _0x2f2866.push('间距 ' + Number(_0x17a5b6.gap));
-  return _0x2f2866.length ? _0x1c7f9a + '：' + _0x2f2866.join('，') : _0x1c7f9a;
+                      : value39,
+    list7 = [],
+    value41 = response2.prompt || response2.text;
+  if (value41) list7.push('“' + String(value41).slice(0, 36) + '”');
+  if (Number.isFinite(Number(response2.gap))) list7.push('间距 ' + Number(response2.gap));
+  return list7.length ? value40 + '：' + list7.join('，') : value40;
 }
-function formatParamValue(_0x7d0da2) {
-  if (_0x7d0da2 == null || _0x7d0da2 === '') return '';
-  if (typeof _0x7d0da2 === 'string' || typeof _0x7d0da2 === 'number' || typeof _0x7d0da2 === 'boolean')
-    return String(_0x7d0da2);
+function formatParamValue(value42) {
+  if (value42 == null || value42 === '') return '';
+  if (typeof value42 === 'string' || typeof value42 === 'number' || typeof value42 === 'boolean')
+    return String(value42);
   try {
-    return JSON.stringify(_0x7d0da2);
+    return JSON.stringify(value42);
   } catch {
-    return String(_0x7d0da2);
+    return String(value42);
   }
 }
-function formatParams(_0x225275 = {}) {
-  const _0x4ef2db =
-    _0x225275 && typeof _0x225275 === 'object' && !Array.isArray(_0x225275) ? Object.entries(_0x225275) : [];
-  if (_0x4ef2db.length === 0) return panelText('noParams');
-  return _0x4ef2db
+function formatParams(options5 = {}) {
+  const list8 =
+    options5 && typeof options5 === 'object' && !Array.isArray(options5) ? Object.entries(options5) : [];
+  if (list8.length === 0) return panelText('noParams');
+  return list8
     .slice(0, 8)
-    .map(([_0x4e005e, _0x583508]) => _0x4e005e + ': ' + formatParamValue(_0x583508))
+    .map(([value43, value44]) => value43 + ': ' + formatParamValue(value44))
     .join('，');
 }
-function renderActionGroup(_0xad1c3d, _0x21dbf7, _0x3e44fb = []) {
-  if (!Array.isArray(_0x3e44fb) || _0x3e44fb.length === 0) return;
-  const _0x4d6cd4 = createEl('div', 'agent-plan-group');
-  _0x4d6cd4.appendChild(createEl('div', 'agent-plan-group-title', _0x21dbf7));
-  const _0x4d2c8c = createEl('div', 'agent-plan-list');
-  (_0x3e44fb.forEach((_0x25baf1) => {
-    _0x4d2c8c.appendChild(createEl('div', 'agent-plan-item', formatActionSummary(_0x25baf1)));
+function renderActionGroup(el18, value45, list9 = []) {
+  if (!Array.isArray(list9) || list9.length === 0) return;
+  const el19 = createEl('div', 'agent-plan-group');
+  el19.appendChild(createEl('div', 'agent-plan-group-title', value45));
+  const el20 = createEl('div', 'agent-plan-list');
+  (list9.forEach((item5) => {
+    el20.appendChild(createEl('div', 'agent-plan-item', formatActionSummary(item5)));
   }),
-    _0x4d6cd4.appendChild(_0x4d2c8c),
-    _0xad1c3d.appendChild(_0x4d6cd4));
+    el19.appendChild(el20),
+    el18.appendChild(el19));
 }
-function renderTraceSummary(_0x44eb8a, _0x1b7dfd, _0x5eb997 = []) {
-  if (!Array.isArray(_0x5eb997) || _0x5eb997.length === 0) return;
-  const _0x1265fb = createEl('div', 'agent-plan-group');
-  _0x1265fb.appendChild(createEl('div', 'agent-plan-group-title', _0x1b7dfd));
-  const _0x5515c1 = createEl('div', 'agent-plan-list');
-  (_0x5eb997.forEach((_0x5cadf5) => {
-    _0x5515c1.appendChild(createEl('div', 'agent-plan-item', _0x5cadf5));
+function renderTraceSummary(el21, value46, list10 = []) {
+  if (!Array.isArray(list10) || list10.length === 0) return;
+  const el22 = createEl('div', 'agent-plan-group');
+  el22.appendChild(createEl('div', 'agent-plan-group-title', value46));
+  const el23 = createEl('div', 'agent-plan-list');
+  (list10.forEach((item6) => {
+    el23.appendChild(createEl('div', 'agent-plan-item', item6));
   }),
-    _0x1265fb.appendChild(_0x5515c1),
-    _0x44eb8a.appendChild(_0x1265fb));
+    el22.appendChild(el23),
+    el21.appendChild(el22));
 }
-function renderPlanPreview(_0x4b49b1, _0x26be54) {
-  _0x4b49b1.replaceChildren();
-  if (!_0x26be54) {
-    _0x4b49b1.hidden = true;
+function renderPlanPreview(el24, enabled2) {
+  el24.replaceChildren();
+  if (!enabled2) {
+    el24.hidden = true;
     return;
   }
-  const _0x1f9e01 = _0x26be54.confirmationSummary || null,
-    _0x1a51f4 = Array.isArray(_0x26be54.actions) ? _0x26be54.actions : [];
-  if (!_0x1f9e01 && _0x1a51f4.length === 0) {
-    _0x4b49b1.hidden = true;
+  const enabled3 = enabled2.confirmationSummary || null,
+    list11 = Array.isArray(enabled2.actions) ? enabled2.actions : [];
+  if (!enabled3 && list11.length === 0) {
+    el24.hidden = true;
     return;
   }
-  _0x4b49b1.hidden = false;
-  const _0x5c9f13 = createEl('div', 'agent-plan-title', panelText('confirmTitle')),
-    _0x982be4 = createEl('div', 'agent-plan-body');
-  if (_0x1f9e01) {
-    (renderActionGroup(_0x982be4, panelText('completed'), _0x1f9e01.completedActions || []),
-      renderActionGroup(_0x982be4, panelText('pending'), _0x1f9e01.pendingActions || []),
-      renderTraceSummary(_0x982be4, panelText('traceSummary'), _0x1f9e01.debugTraceSummary || []));
-    if (_0x1f9e01.generation) {
-      const _0x443ef5 = createEl('div', 'agent-plan-meta');
+  el24.hidden = false;
+  const el25 = createEl('div', 'agent-plan-title', panelText('confirmTitle')),
+    el26 = createEl('div', 'agent-plan-body');
+  if (enabled3) {
+    (renderActionGroup(el26, panelText('completed'), enabled3.completedActions || []),
+      renderActionGroup(el26, panelText('pending'), enabled3.pendingActions || []),
+      renderTraceSummary(el26, panelText('traceSummary'), enabled3.debugTraceSummary || []));
+    if (enabled3.generation) {
+      const el27 = createEl('div', 'agent-plan-meta');
       ([
-        [panelText('model'), _0x1f9e01.generation.modelLabel || _0x1f9e01.generation.model || ''],
-        [panelText('prompt'), _0x1f9e01.generation.promptSummary || ''],
-        [panelText('params'), formatParams(_0x1f9e01.generation.params)],
-        [panelText('inputSource'), _0x1f9e01.generation.inputSource || ''],
-      ].forEach(([_0x26414d, _0x25a4b]) => {
-        if (!_0x25a4b) return;
-        const _0x4614c9 = createEl('div', 'agent-plan-meta-row');
-        (_0x4614c9.append(
-          createEl('span', 'agent-plan-meta-label', _0x26414d),
-          createEl('span', 'agent-plan-meta-value', _0x25a4b),
+        [panelText('model'), enabled3.generation.modelLabel || enabled3.generation.model || ''],
+        [panelText('prompt'), enabled3.generation.promptSummary || ''],
+        [panelText('params'), formatParams(enabled3.generation.params)],
+        [panelText('inputSource'), enabled3.generation.inputSource || ''],
+      ].forEach(([value47, enabled4]) => {
+        if (!enabled4) return;
+        const el28 = createEl('div', 'agent-plan-meta-row');
+        (el28.append(
+          createEl('span', 'agent-plan-meta-label', value47),
+          createEl('span', 'agent-plan-meta-value', enabled4),
         ),
-          _0x443ef5.appendChild(_0x4614c9));
+          el27.appendChild(el28));
       }),
-        _0x982be4.appendChild(_0x443ef5));
+        el26.appendChild(el27));
     }
-    _0x1f9e01.cancelNotice &&
-      _0x982be4.appendChild(createEl('div', 'agent-plan-notice', _0x1f9e01.cancelNotice));
+    enabled3.cancelNotice && el26.appendChild(createEl('div', 'agent-plan-notice', enabled3.cancelNotice));
   } else {
-    const _0x57c110 = createEl('div', 'agent-plan-list');
-    (_0x1a51f4.forEach((_0x18967b) => {
-      _0x57c110.appendChild(createEl('div', 'agent-plan-item', formatActionSummary(_0x18967b)));
+    const el29 = createEl('div', 'agent-plan-list');
+    (list11.forEach((item7) => {
+      el29.appendChild(createEl('div', 'agent-plan-item', formatActionSummary(item7)));
     }),
-      _0x982be4.appendChild(_0x57c110));
+      el26.appendChild(el29));
   }
-  _0x4b49b1.append(_0x5c9f13, _0x982be4);
+  el24.append(el25, el26);
 }
 function renderClarification(
-  _0x4fae67,
-  _0x556f51,
-  _0x152d94,
-  _0x10fc8c,
-  _0x465d05 = null,
+  el30,
+  value48,
+  value49,
+  handler,
+  value50 = null,
   {
     onAnswer: onAnswer = null,
     onWaitingStart: onWaitingStart = null,
     onWaitingEnd: onWaitingEnd = null,
   } = {},
 ) {
-  _0x4fae67.replaceChildren();
-  const _0x2efac2 = Array.isArray(_0x556f51?.options) ? _0x556f51.options : [];
-  _0x4fae67.hidden = _0x2efac2.length === 0;
-  for (const _0x3986a6 of _0x2efac2) {
-    const _0x37bd09 = createEl('button', 'agent-option-btn', _0x3986a6.label);
-    ((_0x37bd09.type = 'button'),
-      _0x37bd09.addEventListener('click', async () => {
-        const _0x22eff7 = String(_0x3986a6.label || _0x3986a6.id || '').trim();
-        (onAnswer?.(_0x22eff7), (_0x4fae67.hidden = true));
-        const _0x3263ba = onWaitingStart?.();
-        _0x465d05?.(true);
+  el30.replaceChildren();
+  const list12 = Array.isArray(value48?.options) ? value48.options : [];
+  el30.hidden = list12.length === 0;
+  for (const value51 of list12) {
+    const el31 = createEl('button', 'agent-option-btn', value51.label);
+    ((el31.type = 'button'),
+      el31.addEventListener('click', async () => {
+        const displayAnswer = String(value51.label || value51.id || '').trim();
+        (onAnswer?.(displayAnswer), (el30.hidden = true));
+        const value52 = onWaitingStart?.();
+        value50?.(true);
         try {
-          const _0x34c8a0 = await _0x152d94.answerClarification(_0x3986a6.id, { displayAnswer: _0x22eff7 });
-          _0x10fc8c(_0x34c8a0);
-        } catch (_0x4ef22a) {
-          _0x10fc8c({
+          const value53 = await value49.answerClarification(value51.id, { displayAnswer: displayAnswer });
+          handler(value53);
+        } catch (reply2) {
+          handler({
             ok: false,
             status: 'failed',
-            reply: _0x4ef22a?.message || 'Agent clarification failed.',
+            reply: reply2?.message || 'Agent clarification failed.',
           });
         } finally {
-          (onWaitingEnd?.(_0x3263ba), _0x465d05?.(false));
+          (onWaitingEnd?.(value52), value50?.(false));
         }
       }),
-      _0x4fae67.appendChild(_0x37bd09));
+      el30.appendChild(el31));
   }
 }
 function renderRecovery(
-  _0x2ee566,
-  _0x48e14e,
-  _0x5ddf52,
-  _0x2ee505,
-  _0x1b4eec = null,
+  el32,
+  value54,
+  value55,
+  handler2,
+  value56 = null,
   { editor: editor = null, setNotice: setNotice = null } = {},
 ) {
-  _0x2ee566.replaceChildren();
-  const _0x3c0987 = _0x48e14e?.recovery || null,
-    _0x549a85 = Array.isArray(_0x3c0987?.options) ? _0x3c0987.options : [];
-  _0x2ee566.hidden = _0x549a85.length === 0;
-  if (_0x549a85.length === 0) return;
-  _0x2ee566.appendChild(createEl('div', 'agent-recovery-title', panelText('recoveryTitle')));
-  const _0x4f5f6f = createEl('div', 'agent-recovery-actions');
-  for (const _0x368edd of _0x549a85) {
-    const _0x4a62d9 = createEl('button', 'agent-recovery-btn', _0x368edd.label || _0x368edd.id);
-    ((_0x4a62d9.type = 'button'),
-      (_0x4a62d9.dataset.recoveryAction = _0x368edd.id),
-      _0x4a62d9.addEventListener('click', async () => {
-        const _0x47de46 = String(_0x368edd.id || '');
-        if (_0x47de46 === 'editPrompt') {
+  el32.replaceChildren();
+  const value57 = value54?.recovery || null,
+    list13 = Array.isArray(value57?.options) ? value57.options : [];
+  el32.hidden = list13.length === 0;
+  if (list13.length === 0) return;
+  el32.appendChild(createEl('div', 'agent-recovery-title', panelText('recoveryTitle')));
+  const el33 = createEl('div', 'agent-recovery-actions');
+  for (const value58 of list13) {
+    const el34 = createEl('button', 'agent-recovery-btn', value58.label || value58.id);
+    ((el34.type = 'button'),
+      (el34.dataset.recoveryAction = value58.id),
+      el34.addEventListener('click', async () => {
+        const value59 = String(value58.id || '');
+        if (value59 === 'editPrompt') {
           (setEditorText(editor, panelText('recoveryEditPromptDraft')),
             editor?.focus?.(),
             setNotice?.(panelText('recoveryEditPromptNotice')),
-            (_0x2ee566.hidden = true));
+            (el32.hidden = true));
           return;
         }
-        if (_0x47de46 === 'changeModel') {
+        if (value59 === 'changeModel') {
           (setEditorText(editor, panelText('recoveryChangeModelDraft')),
             editor?.focus?.(),
             setNotice?.(panelText('recoveryChangeModelNotice')),
-            (_0x2ee566.hidden = true));
+            (el32.hidden = true));
           return;
         }
-        _0x1b4eec?.(true);
+        value56?.(true);
         try {
-          const _0x3a144e =
-            _0x47de46 === 'keepPrepared'
-              ? await _0x5ddf52.keepPreparedPlan?.()
-              : await _0x5ddf52.retryFailedPlan?.();
-          _0x2ee505(_0x3a144e || { ok: false, status: 'failed', reply: 'Recovery failed.' });
-        } catch (_0x497a07) {
-          _0x2ee505({
+          const value60 =
+            value59 === 'keepPrepared'
+              ? await value55.keepPreparedPlan?.()
+              : await value55.retryFailedPlan?.();
+          handler2(value60 || { ok: false, status: 'failed', reply: 'Recovery failed.' });
+        } catch (reply3) {
+          handler2({
             ok: false,
             status: 'failed',
-            reply: _0x497a07?.message || 'Agent recovery failed.',
+            reply: reply3?.message || 'Agent recovery failed.',
           });
         } finally {
-          _0x1b4eec?.(false);
+          value56?.(false);
         }
       }),
-      _0x4f5f6f.appendChild(_0x4a62d9));
+      el33.appendChild(el34));
   }
-  _0x2ee566.appendChild(_0x4f5f6f);
+  el32.appendChild(el33);
 }
-function formatHistoryTime(_0x1e8c7e) {
-  const _0x174554 = new Date(Number(_0x1e8c7e) || Date.now());
-  return _0x174554.toLocaleString(getLocale(), {
+function formatHistoryTime(value61) {
+  const value62 = new Date(Number(value61) || Date.now());
+  return value62.toLocaleString(getLocale(), {
     month: 'numeric',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   });
 }
-function getLastMessageSummary(_0x5d6649 = {}) {
-  const _0x350ce0 = Array.isArray(_0x5d6649.messages) ? _0x5d6649.messages : [],
-    _0x227b79 = _0x350ce0[_0x350ce0.length - 1] || null;
-  return String(_0x227b79?.content || _0x5d6649.lastPlanSummary || _0x5d6649.title || '').trim();
+function getLastMessageSummary(options6 = {}) {
+  const list14 = Array.isArray(options6.messages) ? options6.messages : [],
+    value63 = list14[list14.length - 1] || null;
+  return String(value63?.content || options6.lastPlanSummary || options6.title || '').trim();
 }
-function renderHistory(_0x23e5fe, _0x367484, { onSelect: onSelect = null, onDelete: onDelete = null } = {}) {
-  _0x23e5fe.replaceChildren();
-  const _0x4f50ca = createEl('div', 'agent-history-title', panelText('historyTitle')),
-    _0x385823 = _0x367484?.listConversations?.() || [],
-    _0x5bcaaa = _0x367484?.getActiveConversation?.() || null;
-  if (!_0x385823.length) {
-    _0x23e5fe.append(_0x4f50ca, createEl('div', 'agent-history-empty', panelText('historyEmpty')));
+function renderHistory(value64, value65, { onSelect: onSelect = null, onDelete: onDelete = null } = {}) {
+  value64.replaceChildren();
+  const el35 = createEl('div', 'agent-history-title', panelText('historyTitle')),
+    list15 = value65?.listConversations?.() || [],
+    value66 = value65?.getActiveConversation?.() || null;
+  if (!list15.length) {
+    value64.append(el35, createEl('div', 'agent-history-empty', panelText('historyEmpty')));
     return;
   }
-  const _0x46906c = createEl('div', 'agent-history-list');
-  (_0x385823.forEach((_0x177b2a) => {
-    const _0x24b47b = createEl('div', 'agent-history-item');
-    ((_0x24b47b.dataset.conversationId = _0x177b2a.id),
-      _0x24b47b.classList.toggle('is-active', _0x177b2a.id === _0x5bcaaa?.id));
-    const _0x4bbb74 = createEl('button', 'agent-history-main');
-    ((_0x4bbb74.type = 'button'),
-      _0x4bbb74.append(
-        createEl('span', 'agent-history-name', _0x177b2a.title || '新对话'),
-        createEl('span', 'agent-history-time', formatHistoryTime(_0x177b2a.updatedAt)),
-        createEl('span', 'agent-history-content', getLastMessageSummary(_0x177b2a)),
+  const el36 = createEl('div', 'agent-history-list');
+  (list15.forEach((item8) => {
+    const el37 = createEl('div', 'agent-history-item');
+    ((el37.dataset.conversationId = item8.id), el37.classList.toggle('is-active', item8.id === value66?.id));
+    const el38 = createEl('button', 'agent-history-main');
+    ((el38.type = 'button'),
+      el38.append(
+        createEl('span', 'agent-history-name', item8.title || '新对话'),
+        createEl('span', 'agent-history-time', formatHistoryTime(item8.updatedAt)),
+        createEl('span', 'agent-history-content', getLastMessageSummary(item8)),
       ),
-      _0x4bbb74.addEventListener('click', () => onSelect?.(_0x177b2a.id)));
-    const _0x2d7121 = createButton('agent-history-delete', panelText('historyDelete'), {
+      el38.addEventListener('click', () => onSelect?.(item8.id)));
+    const el39 = createButton('agent-history-delete', panelText('historyDelete'), {
       title: panelText('historyDelete'),
     });
-    (_0x2d7121.addEventListener('click', (_0x28356b) => {
-      (_0x28356b.preventDefault?.(), _0x28356b.stopPropagation?.(), onDelete?.(_0x177b2a.id));
+    (el39.addEventListener('click', (event) => {
+      (event.preventDefault?.(), event.stopPropagation?.(), onDelete?.(item8.id));
     }),
-      _0x24b47b.append(_0x4bbb74, _0x2d7121),
-      _0x46906c.appendChild(_0x24b47b));
+      el37.append(el38, el39),
+      el36.appendChild(el37));
   }),
-    _0x23e5fe.append(_0x4f50ca, _0x46906c));
+    value64.append(el35, el36));
 }
-function updateModelTrigger(_0x10ca95, _0x5c54cc = {}) {
-  const _0x2c1fc6 = _0x5c54cc.model || '',
-    _0x35e0b4 = _0x10ca95.querySelector('.agent-model-label'),
-    _0x2d1579 = _0x10ca95.querySelector('.agent-model-icon-slot');
-  if (_0x35e0b4) _0x35e0b4.textContent = resolveAgentModelLabel(_0x2c1fc6);
-  _0x2d1579 && (_0x2d1579.innerHTML = buildTextModelSmallIconHTML(_0x2c1fc6) || iconSvg('model'));
+function updateModelTrigger(el40, value67 = {}) {
+  const value68 = value67.model || '',
+    el41 = el40.querySelector('.agent-model-label'),
+    el42 = el40.querySelector('.agent-model-icon-slot');
+  if (el41) el41.textContent = resolveAgentModelLabel(value68);
+  el42 && (el42.innerHTML = buildTextModelSmallIconHTML(value68) || iconSvg('model'));
 }
-function closeFloatingMenus(_0x5f0543, _0x1c1ddb = null) {
-  _0x5f0543?.querySelectorAll?.('.agent-floating-menu.show, .agent-model-menu.show')?.forEach((_0x1dcaa8) => {
-    if (_0x1dcaa8 !== _0x1c1ddb) _0x1dcaa8.classList.remove('show');
+function closeFloatingMenus(el43, enabled5 = null) {
+  el43?.querySelectorAll?.('.agent-floating-menu.show, .agent-model-menu.show')?.forEach((el44) => {
+    if (el44 !== enabled5) el44.classList.remove('show');
   });
-  if (!_0x1c1ddb) closeNodeFooterMenus(_0x5f0543);
+  if (!enabled5) closeNodeFooterMenus(el43);
 }
-function setMenuOpen(_0x4347c0, _0x3da51c, _0x535944) {
-  (closeFloatingMenus(_0x535944, _0x3da51c ? _0x4347c0 : null),
-    _0x4347c0?.classList.toggle('show', _0x3da51c));
+function setMenuOpen(el45, value69, value70) {
+  (closeFloatingMenus(value70, value69 ? el45 : null), el45?.classList.toggle('show', value69));
 }
-function isAgentMenuSurface(_0x5c6a95) {
-  return !!_0x5c6a95?.closest?.('.agent-menu-wrap, .agent-floating-menu, .agent-model-menu');
+function isAgentMenuSurface(el46) {
+  return !!el46?.closest?.('.agent-menu-wrap, .agent-floating-menu, .agent-model-menu');
 }
 export function initAgentPanel({
-  runtime: _0x5c09b1,
-  modelSettings: _0x23cce3,
+  runtime: runtime,
+  modelSettings: modelSettings,
   store: store = null,
   uploadMaterial: uploadMaterial = null,
   fabBtnEl: fabBtnEl = document.getElementById('fabBtn'),
   root: root = document.body,
 } = {}) {
-  if (!_0x5c09b1 || !fabBtnEl || !root) return null;
-  const _0x3772fc = createEl('aside', 'agent-sidebar');
-  (_0x3772fc.setAttribute('aria-label', 'Canvas Agent 侧边栏'),
-    _0x3772fc.setAttribute('aria-hidden', 'true'));
-  const _0x33ec09 = createEl('div', 'agent-sidebar-resize-handle');
-  (_0x33ec09.setAttribute('role', 'separator'),
-    _0x33ec09.setAttribute('aria-orientation', 'vertical'),
-    _0x33ec09.setAttribute('aria-label', '调整 Agent 侧边栏宽度'),
-    (_0x33ec09.tabIndex = 0));
-  const _0x37512b = createEl('div', 'agent-sidebar-header'),
-    _0x572be8 = createButton('agent-icon-btn agent-collapse-btn', '', {
+  if (!runtime || !fabBtnEl || !root) return null;
+  const panel = createEl('aside', 'agent-sidebar');
+  (panel.setAttribute('aria-label', 'Canvas Agent 侧边栏'), panel.setAttribute('aria-hidden', 'true'));
+  const el47 = createEl('div', 'agent-sidebar-resize-handle');
+  (el47.setAttribute('role', 'separator'),
+    el47.setAttribute('aria-orientation', 'vertical'),
+    el47.setAttribute('aria-label', '调整 Agent 侧边栏宽度'),
+    (el47.tabIndex = 0));
+  const el48 = createEl('div', 'agent-sidebar-header'),
+    el49 = createButton('agent-icon-btn agent-collapse-btn', '', {
       title: '折叠',
       icon: iconSvg('collapse'),
     });
-  _0x572be8.setAttribute('aria-expanded', 'true');
-  const _0x4d5df7 = createEl('div', 'agent-sidebar-title');
-  _0x4d5df7.append(
+  el49.setAttribute('aria-expanded', 'true');
+  const el50 = createEl('div', 'agent-sidebar-title');
+  el50.append(
     createEl('span', 'agent-sidebar-title-main', 'Ai CanvasPro Agent'),
     createEl('span', 'agent-sidebar-title-badge', '测试版'),
   );
-  const _0x298af1 = createEl('div', 'agent-header-actions'),
-    _0x83ac16 = createButton('agent-icon-btn agent-new-chat-btn', '', {
+  const el51 = createEl('div', 'agent-header-actions'),
+    el52 = createButton('agent-icon-btn agent-new-chat-btn', '', {
       title: '新建对话',
       icon: iconSvg('plus'),
     }),
-    _0x21b5dc = createButton('agent-icon-btn agent-history-btn', '', {
+    el53 = createButton('agent-icon-btn agent-history-btn', '', {
       title: '历史记录',
       icon: iconSvg('history'),
     }),
-    _0x2ec94e = createButton('agent-icon-btn', '', { title: '关闭', icon: iconSvg('close') });
-  (_0x298af1.append(_0x83ac16, _0x21b5dc, _0x2ec94e), _0x37512b.append(_0x572be8, _0x4d5df7, _0x298af1));
-  const _0x3ad456 = createEl('div', 'agent-sidebar-main'),
-    _0x42864b = createEl('div', 'agent-greeting');
-  _0x42864b.append(
+    el54 = createButton('agent-icon-btn', '', { title: '关闭', icon: iconSvg('close') });
+  (el51.append(el52, el53, el54), el48.append(el49, el50, el51));
+  const el55 = createEl('div', 'agent-sidebar-main'),
+    el56 = createEl('div', 'agent-greeting');
+  el56.append(
     createEl('div', 'agent-greeting-kicker', 'Hi，欢迎回来'),
     createEl('div', 'agent-greeting-title', '今天一起创作点什么？'),
   );
-  const _0x2ad577 = createEl('div', 'agent-messages'),
-    _0x49e6c5 = createEl('div', 'agent-history-popover');
-  ((_0x49e6c5.hidden = true), _0x3ad456.append(_0x42864b, _0x2ad577, _0x49e6c5));
-  const _0x502f4b = createEl('div', 'agent-quick-actions'),
-    _0x117d94 = globalThis.window;
-  function _0x282ffb() {
-    (_0x502f4b.replaceChildren(),
-      [...AGENT_QUICK_ACTIONS, ...readCustomQuickActions(_0x117d94)].forEach((_0x37e950) => {
-        const _0xf480c8 = createButton('agent-quick-card', _0x37e950.label, {
+  const el57 = createEl('div', 'agent-messages'),
+    el58 = createEl('div', 'agent-history-popover');
+  ((el58.hidden = true), el55.append(el56, el57, el58));
+  const el59 = createEl('div', 'agent-quick-actions'),
+    value71 = globalThis.window;
+  function run() {
+    (el59.replaceChildren(),
+      [...AGENT_QUICK_ACTIONS, ...readCustomQuickActions(value71)].forEach((icon2) => {
+        const el60 = createButton('agent-quick-card', icon2.label, {
           icon:
-            _0x37e950.custom === true
+            icon2.custom === true
               ? iconSvg('wand')
-              : _0x37e950.id === 'archive-assets'
+              : icon2.id === 'archive-assets'
                 ? iconSvg('grid')
-                : _0x37e950.id === 'check-style'
+                : icon2.id === 'check-style'
                   ? iconSvg('scan')
                   : iconSvg('flow'),
         });
-        ((_0xf480c8.dataset.prompt = _0x37e950.prompt), _0x502f4b.appendChild(_0xf480c8));
+        ((el60.dataset.prompt = icon2.prompt), el59.appendChild(el60));
       }));
   }
-  _0x282ffb();
-  const _0x3e0d3d = createEl('div', 'agent-notice');
-  _0x3e0d3d.hidden = true;
-  const _0x3d0f1e = createEl('div', 'agent-plan-preview');
-  _0x3d0f1e.hidden = true;
-  const _0x387448 = createEl('div', 'agent-options');
-  _0x387448.hidden = true;
-  const _0x41e3f4 = createEl('div', 'agent-recovery');
-  _0x41e3f4.hidden = true;
-  const _0x448ae7 = createEl('div', 'agent-actions');
-  _0x448ae7.hidden = true;
-  const _0x514b25 = createButton('agent-primary-btn', '确认执行'),
-    _0x5d6dd2 = createButton('agent-secondary-btn', '取消');
-  _0x448ae7.append(_0x514b25, _0x5d6dd2);
-  const _0x75b13f = createEl('form', 'agent-compose'),
-    _0x391508 = createEl('div', 'agent-prompt-panel text-prompt-panel'),
-    _0x3a2d32 = createEl('div', 'agent-ref-bar node-ref-bar active'),
-    _0x30d670 = createAgentPromptAttachmentButton({
+  run();
+  const el61 = createEl('div', 'agent-notice');
+  el61.hidden = true;
+  const el62 = createEl('div', 'agent-plan-preview');
+  el62.hidden = true;
+  const el63 = createEl('div', 'agent-options');
+  el63.hidden = true;
+  const el64 = createEl('div', 'agent-recovery');
+  el64.hidden = true;
+  const el65 = createEl('div', 'agent-actions');
+  el65.hidden = true;
+  const el66 = createButton('agent-primary-btn', '确认执行'),
+    el67 = createButton('agent-secondary-btn', '取消');
+  el65.append(el66, el67);
+  const el68 = createEl('form', 'agent-compose'),
+    el69 = createEl('div', 'agent-prompt-panel text-prompt-panel'),
+    el70 = createEl('div', 'agent-ref-bar node-ref-bar active'),
+    el71 = createAgentPromptAttachmentButton({
       title: '从选中素材添加入参',
       className: 'agent-connect-btn',
     }),
-    _0x39baee = createEl('div', 'agent-ref-placeholder', panelText('addReference')),
-    _0x3a0739 = createEl('div', 'ref-thumb-container agent-input-ref-list');
-  (_0x3a0739.setAttribute('role', 'list'), _0x3a2d32.append(_0x30d670, _0x39baee, _0x3a0739));
-  const _0x4404ec = createEl('div', 'agent-input-wrapper prompt-input-wrapper'),
-    _0x5b769d = createEl('div', 'agent-compose-input prompt-textarea custom-textarea');
-  ((_0x5b769d.contentEditable = 'true'),
-    (_0x5b769d.spellcheck = false),
-    (_0x5b769d.dataset.placeholder = '描述创意或需求，/ 使用技能，@ 引用参考'),
-    _0x4404ec.appendChild(_0x5b769d));
-  const _0x55879f = createEl('div', 'agent-compose-footer prompt-panel-footer'),
-    _0x2eb9b6 = createEl('div', 'agent-compose-left'),
-    _0x2ccb22 = createEl('div', 'agent-menu-wrap'),
-    _0x40f1e2 = createButton('agent-round-btn', '', { title: '添加', icon: iconSvg('plus') }),
-    _0x551b50 = createEl('div', 'agent-floating-menu agent-add-menu');
+    el72 = createEl('div', 'agent-ref-placeholder', panelText('addReference')),
+    el73 = createEl('div', 'ref-thumb-container agent-input-ref-list');
+  (el73.setAttribute('role', 'list'), el70.append(el71, el72, el73));
+  const el74 = createEl('div', 'agent-input-wrapper prompt-input-wrapper'),
+    editor2 = createEl('div', 'agent-compose-input prompt-textarea custom-textarea');
+  ((editor2.contentEditable = 'true'),
+    (editor2.spellcheck = false),
+    (editor2.dataset.placeholder = '描述创意或需求，/ 使用技能，@ 引用参考'),
+    el74.appendChild(editor2));
+  const el75 = createEl('div', 'agent-compose-footer prompt-panel-footer'),
+    el76 = createEl('div', 'agent-compose-left'),
+    el77 = createEl('div', 'agent-menu-wrap'),
+    el78 = createButton('agent-round-btn', '', { title: '添加', icon: iconSvg('plus') }),
+    el79 = createEl('div', 'agent-floating-menu agent-add-menu');
   ([
     ['canvas', '从画布添加', 'grid'],
     ['upload', '上传素材', 'upload'],
     ['custom', '自定义快捷用法', 'wand'],
-  ].forEach(([_0x3b2f5f, _0x4ba138, _0x462101]) => {
-    const _0x69265e = createButton('agent-menu-item', _0x4ba138, { icon: iconSvg(_0x462101) });
-    ((_0x69265e.dataset.placeholderAction = _0x3b2f5f), _0x551b50.appendChild(_0x69265e));
+  ].forEach(([value72, value73, value74]) => {
+    const el80 = createButton('agent-menu-item', value73, { icon: iconSvg(value74) });
+    ((el80.dataset.placeholderAction = value72), el79.appendChild(el80));
   }),
-    _0x2ccb22.append(_0x40f1e2, _0x551b50));
-  const _0x4bd2ef = createEl('input', 'agent-upload-input');
-  ((_0x4bd2ef.type = 'file'), (_0x4bd2ef.accept = 'image/*,video/*,audio/*'), (_0x4bd2ef.multiple = false));
-  const _0x3244f6 = createEl('div', 'agent-menu-wrap agent-model-wrap img-model-wrap'),
-    _0x588b5a = _0x23cce3?.getSettings?.() || {},
-    _0x485a45 = createButton('agent-pill-btn agent-model-btn img-model-btn-trigger', '', {
+    el77.append(el78, el79));
+  const el81 = createEl('input', 'agent-upload-input');
+  ((el81.type = 'file'), (el81.accept = 'image/*,video/*,audio/*'), (el81.multiple = false));
+  const el82 = createEl('div', 'agent-menu-wrap agent-model-wrap img-model-wrap'),
+    value75 = modelSettings?.getSettings?.() || {},
+    el83 = createButton('agent-pill-btn agent-model-btn img-model-btn-trigger', '', {
       title: '模型选择',
     }),
-    _0x1e58a9 = createEl('span', 'agent-model-icon-slot'),
-    _0x16b345 = createEl('span', 'agent-model-label'),
-    _0x39fc32 = createEl('span', 'agent-caret');
-  ((_0x39fc32.innerHTML =
+    el84 = createEl('span', 'agent-model-icon-slot'),
+    el85 = createEl('span', 'agent-model-label'),
+    el86 = createEl('span', 'agent-caret');
+  ((el86.innerHTML =
     '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'),
-    _0x485a45.append(_0x1e58a9, _0x16b345, _0x39fc32));
-  const _0x18e983 = createEl('div', 'floating-menu img-model-menu node-model-menu agent-model-menu');
-  ((_0x18e983.innerHTML = buildTextProviderMenuGroupsHTML(_0x588b5a.model || '')),
-    _0x3244f6.append(_0x485a45, _0x18e983),
-    updateModelTrigger(_0x485a45, _0x588b5a));
-  const _0x329684 = createEl('div', 'agent-menu-wrap'),
-    _0x3e25a7 = createButton('agent-pill-btn agent-mode-btn', '', {
+    el83.append(el84, el85, el86));
+  const el87 = createEl('div', 'floating-menu img-model-menu node-model-menu agent-model-menu');
+  ((el87.innerHTML = buildTextProviderMenuGroupsHTML(value75.model || '')),
+    el82.append(el83, el87),
+    updateModelTrigger(el83, value75));
+  const el88 = createEl('div', 'agent-menu-wrap'),
+    el89 = createButton('agent-pill-btn agent-mode-btn', '', {
       title: 'Agent 模式',
       icon: iconSvg('mode'),
     }),
-    _0x11f39c = createEl('span', 'agent-mode-label', getAgentExecutionModeLabel(_0x588b5a.executionMode)),
-    _0x2655bb = createEl('span', 'agent-caret');
-  ((_0x2655bb.innerHTML =
+    el90 = createEl('span', 'agent-mode-label', getAgentExecutionModeLabel(value75.executionMode)),
+    el91 = createEl('span', 'agent-caret');
+  ((el91.innerHTML =
     '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'),
-    _0x3e25a7.append(_0x11f39c, _0x2655bb));
-  const _0x583a1b = createEl('div', 'agent-floating-menu agent-mode-menu');
+    el89.append(el90, el91));
+  const el92 = createEl('div', 'agent-floating-menu agent-mode-menu');
   ([
     ['manual', '手动确认'],
     ['auto', '自动执行'],
-  ].forEach(([_0x44fa48, _0x3c4316]) => {
-    const _0x36ff83 = createButton('agent-menu-item', _0x3c4316, { icon: iconSvg('check') });
-    ((_0x36ff83.dataset.executionMode = _0x44fa48),
-      _0x36ff83.classList.toggle(
-        'active',
-        normalizeAgentExecutionMode(_0x588b5a.executionMode) === _0x44fa48,
-      ),
-      _0x583a1b.appendChild(_0x36ff83));
+  ].forEach(([value76, value77]) => {
+    const el93 = createButton('agent-menu-item', value77, { icon: iconSvg('check') });
+    ((el93.dataset.executionMode = value76),
+      el93.classList.toggle('active', normalizeAgentExecutionMode(value75.executionMode) === value76),
+      el92.appendChild(el93));
   }),
-    _0x329684.append(_0x3e25a7, _0x583a1b),
-    (_0x329684.hidden = true),
-    _0x2eb9b6.append(_0x2ccb22, _0x3244f6));
-  const _0x2ec7ea = createButton('agent-send-btn', '', { title: '发送', icon: iconSvg('send') });
-  ((_0x2ec7ea.type = 'submit'),
-    _0x55879f.append(_0x2eb9b6, _0x2ec7ea),
-    _0x391508.append(_0x3a2d32, _0x4404ec, _0x55879f),
-    _0x75b13f.append(_0x502f4b, _0x3d0f1e, _0x387448, _0x41e3f4, _0x448ae7, _0x391508, _0x4bd2ef),
-    _0x3772fc.append(_0x33ec09, _0x37512b, _0x3ad456, _0x75b13f),
-    root.appendChild(_0x3772fc),
-    (document?.body || root).appendChild(_0x3e0d3d),
-    bindNodeSubmenus(_0x18e983));
-  let _0x1806c2 = false;
-  const _0x4a9290 = readStoredSidebarWidth(_0x117d94);
-  _0x4a9290 &&
-    document?.body?.style?.setProperty?.('--agent-sidebar-width', clampAgentSidebarWidth(_0x4a9290) + 'px');
-  function _0x1fa11d(_0xb97b28) {
-    ((_0x3e0d3d.textContent = String(_0xb97b28 || '')), (_0x3e0d3d.hidden = !_0x3e0d3d.textContent));
+    el88.append(el89, el92),
+    (el88.hidden = true),
+    el76.append(el77, el82));
+  const el94 = createButton('agent-send-btn', '', { title: '发送', icon: iconSvg('send') });
+  ((el94.type = 'submit'),
+    el75.append(el76, el94),
+    el69.append(el70, el74, el75),
+    el68.append(el59, el62, el63, el64, el65, el69, el81),
+    panel.append(el47, el48, el55, el68),
+    root.appendChild(panel),
+    (document?.body || root).appendChild(el61),
+    bindNodeSubmenus(el87));
+  let value78 = false;
+  const storedSidebarWidth = readStoredSidebarWidth(value71);
+  storedSidebarWidth &&
+    document?.body?.style?.setProperty?.(
+      '--agent-sidebar-width',
+      clampAgentSidebarWidth(storedSidebarWidth) + 'px',
+    );
+  function setNotice2(value79) {
+    ((el61.textContent = String(value79 || '')), (el61.hidden = !el61.textContent));
   }
-  let _0x5827f0 = false,
-    _0x308cce = [],
-    _0x3ead2f = false,
-    _0xeda7f = null;
-  function _0x940313(_0x111dae = {}) {
-    if (_0x111dae.thumbUrl) {
-      const _0x133e90 = createEl('img', 'ref-thumb-media agent-input-ref-media');
+  let enabled6 = false,
+    list16 = [],
+    enabled7 = false,
+    el95 = null;
+  function run2(options7 = {}) {
+    if (options7.thumbUrl) {
+      const el96 = createEl('img', 'ref-thumb-media agent-input-ref-media');
       return (
-        (_0x133e90.src = _0x111dae.thumbUrl),
-        (_0x133e90.alt = _0x111dae.label || _0x111dae.nodeId || ''),
-        (_0x133e90.draggable = false),
-        _0x133e90
+        (el96.src = options7.thumbUrl),
+        (el96.alt = options7.label || options7.nodeId || ''),
+        (el96.draggable = false),
+        el96
       );
     }
-    const _0x2ebed9 = createEl(
+    const el97 = createEl(
       'div',
       'ref-thumb-media ref-thumb-fallback agent-input-ref-fallback',
-      String(_0x111dae.kind || 'node')
+      String(options7.kind || 'node')
         .slice(0, 3)
         .toUpperCase(),
     );
-    return (_0x2ebed9.setAttribute('aria-hidden', 'true'), _0x2ebed9);
+    return (el97.setAttribute('aria-hidden', 'true'), el97);
   }
-  function _0x4afc56() {
-    (_0x3a0739.replaceChildren(),
-      _0x308cce.forEach((_0x5b49d2) => {
-        const _0x4f251c = createEl('div', 'ref-thumb-wrap agent-input-ref-thumb'),
-          _0x128c2a = String(_0x5b49d2.label || _0x5b49d2.name || _0x5b49d2.nodeId || '').trim();
-        ((_0x4f251c.title = _0x128c2a),
-          _0x4f251c.setAttribute('aria-label', _0x128c2a),
-          _0x4f251c.setAttribute('role', 'listitem'),
-          (_0x4f251c.dataset.inputRefId = _0x5b49d2.nodeId),
-          _0x4f251c.appendChild(_0x940313(_0x5b49d2)));
-        const _0x2dc318 = createEl('button', 'ref-thumb-delete agent-input-ref-remove', 'x');
-        ((_0x2dc318.type = 'button'),
-          (_0x2dc318.title = 'Remove reference'),
-          _0x2dc318.setAttribute('aria-label', 'Remove reference'),
-          (_0x2dc318.dataset.inputRefRemove = _0x5b49d2.nodeId),
-          _0x4f251c.appendChild(_0x2dc318),
-          _0x3a0739.appendChild(_0x4f251c));
+  function run3() {
+    (el73.replaceChildren(),
+      list16.forEach((error) => {
+        const el98 = createEl('div', 'ref-thumb-wrap agent-input-ref-thumb'),
+          value80 = String(error.label || error.name || error.nodeId || '').trim();
+        ((el98.title = value80),
+          el98.setAttribute('aria-label', value80),
+          el98.setAttribute('role', 'listitem'),
+          (el98.dataset.inputRefId = error.nodeId),
+          el98.appendChild(run2(error)));
+        const el99 = createEl('button', 'ref-thumb-delete agent-input-ref-remove', 'x');
+        ((el99.type = 'button'),
+          (el99.title = 'Remove reference'),
+          el99.setAttribute('aria-label', 'Remove reference'),
+          (el99.dataset.inputRefRemove = error.nodeId),
+          el98.appendChild(el99),
+          el73.appendChild(el98));
       }),
-      _0x3a2d32.classList.add('active'),
-      _0x3a2d32.classList.toggle('has-input-refs', _0x308cce.length > 0),
-      (_0x39baee.hidden = _0x308cce.length > 0));
+      el70.classList.add('active'),
+      el70.classList.toggle('has-input-refs', list16.length > 0),
+      (el72.hidden = list16.length > 0));
   }
-  function _0x6004d4(_0x410ea2 = []) {
-    const _0x2519ee = new Map(_0x308cce.map((_0x132939) => [_0x132939.nodeId, _0x132939]));
+  function run4(list17 = []) {
+    const map = new Map(list16.map((item9) => [item9.nodeId, item9]));
     return (
-      _0x410ea2.filter(Boolean).forEach((_0x3e8f80) => {
-        if (!_0x3e8f80.nodeId || _0x2519ee.has(_0x3e8f80.nodeId)) return;
-        _0x2519ee.set(_0x3e8f80.nodeId, _0x3e8f80);
+      list17.filter(Boolean).forEach((enabled8) => {
+        if (!enabled8.nodeId || map.has(enabled8.nodeId)) return;
+        map.set(enabled8.nodeId, enabled8);
       }),
-      (_0x308cce = Array.from(_0x2519ee.values()).slice(0, AGENT_INPUT_REF_LIMIT)),
-      _0x4afc56(),
-      _0x308cce.length
+      (list16 = Array.from(map.values()).slice(0, AGENT_INPUT_REF_LIMIT)),
+      run3(),
+      list16.length
     );
   }
-  function _0x32b40c() {
-    ((_0x308cce = []), _0x4afc56());
+  function run5() {
+    ((list16 = []), run3());
   }
-  function _0x19c26f() {
+  function run6() {
     return document?.getElementById?.('v2-wrap') || null;
   }
-  function _0x19ea11() {
+  function run7() {
     return document?.documentElement || globalThis.document?.documentElement || null;
   }
-  function _0x508876() {
+  function run8() {
     try {
       return createLinkCursor({ size: getCursorSize() });
     } catch {
       return createLinkCursor({ size: 'small' });
     }
   }
-  function _0x3d6bfb() {
-    (_0xeda7f?.classList?.remove?.('agent-material-pick-hover'), (_0xeda7f = null));
+  function run9() {
+    (el95?.classList?.remove?.('agent-material-pick-hover'), (el95 = null));
   }
-  function _0x5ccbdd(_0x325b74) {
-    if (_0xeda7f === _0x325b74) return;
-    (_0x3d6bfb(), (_0xeda7f = _0x325b74 || null), _0xeda7f?.classList?.add?.('agent-material-pick-hover'));
+  function run10(value81) {
+    if (el95 === value81) return;
+    (run9(), (el95 = value81 || null), el95?.classList?.add?.('agent-material-pick-hover'));
   }
-  function _0x565b53({ noticeText: noticeText = '' } = {}) {
-    if (!_0x3ead2f) return;
-    ((_0x3ead2f = false),
-      _0x3d6bfb(),
-      _0x3772fc.classList.remove('is-material-picking'),
-      _0x30d670.classList.remove('is-picking', 'is-connecting-active'),
-      _0x30d670.setAttribute('aria-pressed', 'false'));
-    const _0x2be9b4 = _0x19c26f();
-    _0x2be9b4?.classList?.remove?.('is-connecting', 'agent-material-pick-mode');
-    const _0x437b04 = _0x19ea11();
-    (_0x437b04?.classList?.remove?.('is-connecting-mode'),
-      _0x437b04?.style?.removeProperty?.('--connect-cursor'),
-      document?.removeEventListener?.('click', _0x40f470, true),
-      document?.removeEventListener?.('pointermove', _0x33326a, true),
-      document?.removeEventListener?.('keydown', _0xd9d504, true));
-    if (noticeText) _0x1fa11d(noticeText);
+  function run11({ noticeText: noticeText = '' } = {}) {
+    if (!enabled7) return;
+    ((enabled7 = false),
+      run9(),
+      panel.classList.remove('is-material-picking'),
+      el71.classList.remove('is-picking', 'is-connecting-active'),
+      el71.setAttribute('aria-pressed', 'false'));
+    const el100 = run6();
+    el100?.classList?.remove?.('is-connecting', 'agent-material-pick-mode');
+    const el101 = run7();
+    (el101?.classList?.remove?.('is-connecting-mode'),
+      el101?.style?.removeProperty?.('--connect-cursor'),
+      document?.removeEventListener?.('click', run12, true),
+      document?.removeEventListener?.('pointermove', run13, true),
+      document?.removeEventListener?.('keydown', run14, true));
+    if (noticeText) setNotice2(noticeText);
   }
-  function _0x2f0029({ toggle: toggle = true } = {}) {
-    if (_0x3ead2f) {
-      toggle && _0x565b53({ noticeText: panelText('materialPickCancelled') });
+  function run15({ toggle: toggle = true } = {}) {
+    if (enabled7) {
+      toggle && run11({ noticeText: panelText('materialPickCancelled') });
       return;
     }
-    ((_0x3ead2f = true),
-      _0x3772fc.classList.add('is-material-picking'),
-      _0x30d670.classList.add('is-picking', 'is-connecting-active'),
-      _0x30d670.setAttribute('aria-pressed', 'true'));
-    const _0x37ab5f = _0x19c26f();
-    _0x37ab5f?.classList?.add?.('is-connecting', 'agent-material-pick-mode');
-    const _0x571c20 = _0x19ea11();
-    (_0x571c20?.classList?.add?.('is-connecting-mode'),
-      _0x571c20?.style?.setProperty?.('--connect-cursor', _0x508876()),
-      document?.addEventListener?.('click', _0x40f470, true),
-      document?.addEventListener?.('pointermove', _0x33326a, true),
-      document?.addEventListener?.('keydown', _0xd9d504, true),
-      _0x1fa11d(panelText('materialPickStarted')));
+    ((enabled7 = true),
+      panel.classList.add('is-material-picking'),
+      el71.classList.add('is-picking', 'is-connecting-active'),
+      el71.setAttribute('aria-pressed', 'true'));
+    const el102 = run6();
+    el102?.classList?.add?.('is-connecting', 'agent-material-pick-mode');
+    const el103 = run7();
+    (el103?.classList?.add?.('is-connecting-mode'),
+      el103?.style?.setProperty?.('--connect-cursor', run8()),
+      document?.addEventListener?.('click', run12, true),
+      document?.addEventListener?.('pointermove', run13, true),
+      document?.addEventListener?.('keydown', run14, true),
+      setNotice2(panelText('materialPickStarted')));
   }
-  function _0x414e0e(_0x6e494e) {
-    const _0x24c28b = _0x6e494e?.closest?.('.v2-node') || null,
-      _0x2129ce = String(_0x24c28b?.id || '').trim();
-    if (!_0x2129ce) return { nodeEl: null, node: null, ref: null };
-    const _0xbd98d7 = getStoreState(store).nodes?.[_0x2129ce] || null,
-      _0xe9013c = normalizeAgentInputRefFromNode(_0xbd98d7, { source: 'canvas-pick' });
-    return { nodeEl: _0x24c28b, node: _0xbd98d7, ref: _0xe9013c };
+  function run16(el104) {
+    const nodeEl = el104?.closest?.('.v2-node') || null,
+      enabled9 = String(nodeEl?.id || '').trim();
+    if (!enabled9) return { nodeEl: null, node: null, ref: null };
+    const node = getStoreState(store).nodes?.[enabled9] || null,
+      ref = normalizeAgentInputRefFromNode(node, { source: 'canvas-pick' });
+    return { nodeEl: nodeEl, node: node, ref: ref };
   }
-  function _0x33326a(_0xcc2c12) {
-    if (!_0x3ead2f || _0x3772fc.contains(_0xcc2c12.target)) return;
-    const { nodeEl: _0x262350, ref: _0x3fde78 } = _0x414e0e(_0xcc2c12.target);
-    _0x5ccbdd(_0x262350 && isAgentMaterialRef(_0x3fde78) ? _0x262350 : null);
+  function run13(event2) {
+    if (!enabled7 || panel.contains(event2.target)) return;
+    const { nodeEl: nodeEl2, ref: ref2 } = run16(event2.target);
+    run10(nodeEl2 && isAgentMaterialRef(ref2) ? nodeEl2 : null);
   }
-  function _0x40f470(_0x2760bd) {
-    if (!_0x3ead2f) return;
-    if (_0x3772fc.contains(_0x2760bd.target)) return;
-    const { ref: _0x3160f9 } = _0x414e0e(_0x2760bd.target);
-    if (!_0x3160f9) return;
-    (_0x2760bd.preventDefault?.(), _0x2760bd.stopPropagation?.(), _0x2760bd.stopImmediatePropagation?.());
-    if (!isAgentMaterialRef(_0x3160f9)) {
-      _0x1fa11d(panelText('materialPickUnsupported'));
+  function run12(event3) {
+    if (!enabled7) return;
+    if (panel.contains(event3.target)) return;
+    const { ref: ref3 } = run16(event3.target);
+    if (!ref3) return;
+    (event3.preventDefault?.(), event3.stopPropagation?.(), event3.stopImmediatePropagation?.());
+    if (!isAgentMaterialRef(ref3)) {
+      setNotice2(panelText('materialPickUnsupported'));
       return;
     }
-    (_0x6004d4([_0x3160f9]), _0x1fa11d(formatPanelText('attachSelected', { count: 1 })));
+    (run4([ref3]), setNotice2(formatPanelText('attachSelected', { count: 1 })));
   }
-  function _0xd9d504(_0x2f569f) {
-    if (!_0x3ead2f || _0x2f569f.key !== 'Escape') return;
-    (_0x2f569f.preventDefault?.(),
-      _0x2f569f.stopPropagation?.(),
-      _0x565b53({ noticeText: panelText('materialPickCancelled') }));
+  function run14(event4) {
+    if (!enabled7 || event4.key !== 'Escape') return;
+    (event4.preventDefault?.(),
+      event4.stopPropagation?.(),
+      run11({ noticeText: panelText('materialPickCancelled') }));
   }
-  function _0x32e851() {
-    const _0x463a0d = getStoreState(store),
-      _0x4b0cbc = Array.isArray(_0x463a0d.selectedNodeIds)
-        ? _0x463a0d.selectedNodeIds.map((_0x2fecf2) => String(_0x2fecf2 || '')).filter(Boolean)
+  function run17() {
+    const storeState = getStoreState(store),
+      list18 = Array.isArray(storeState.selectedNodeIds)
+        ? storeState.selectedNodeIds.map((item10) => String(item10 || '')).filter(Boolean)
         : [],
-      _0x140eae = _0x4b0cbc
-        .map((_0x567f65) =>
-          normalizeAgentInputRefFromNode(_0x463a0d.nodes?.[_0x567f65], { source: 'canvas-selection' }),
+      list19 = list18
+        .map((item11) =>
+          normalizeAgentInputRefFromNode(storeState.nodes?.[item11], { source: 'canvas-selection' }),
         )
         .filter(Boolean),
-      _0x55961a = _0x140eae.filter(isAgentMaterialRef);
-    if (_0x55961a.length === 0) return (_0x1fa11d(panelText('attachSelectedEmpty')), 0);
-    const _0x5dfd6f = _0x308cce.length;
-    _0x6004d4(_0x55961a);
-    const _0x508851 = Math.max(0, _0x308cce.length - _0x5dfd6f);
+      list20 = list19.filter(isAgentMaterialRef);
+    if (list20.length === 0) return (setNotice2(panelText('attachSelectedEmpty')), 0);
+    const value82 = list16.length;
+    run4(list20);
+    const count5 = Math.max(0, list16.length - value82);
     return (
-      _0x1fa11d(formatPanelText('attachSelected', { count: _0x508851 || _0x55961a.length })),
-      _0x5b769d.focus(),
-      _0x508851 || _0x55961a.length
+      setNotice2(formatPanelText('attachSelected', { count: count5 || list20.length })),
+      editor2.focus(),
+      count5 || list20.length
     );
   }
-  function _0x292f92({ toggle: toggle = true } = {}) {
-    if (_0x3ead2f) return (_0x2f0029({ toggle: toggle }), 0);
-    const _0x1a92c5 = _0x32e851();
-    if (_0x1a92c5 > 0) return _0x1a92c5;
-    return (_0x2f0029({ toggle: false }), 0);
+  function run18({ toggle: toggle = true } = {}) {
+    if (enabled7) return (run15({ toggle: toggle }), 0);
+    const count6 = run17();
+    if (count6 > 0) return count6;
+    return (run15({ toggle: false }), 0);
   }
-  function _0x3e46b8() {
-    const _0xdc45ae = getEditorText(_0x5b769d);
-    if (!_0xdc45ae) {
-      (_0x1fa11d(panelText('customShortcutEmpty')), _0x5b769d.focus());
+  function run19() {
+    const prompt2 = getEditorText(editor2);
+    if (!prompt2) {
+      (setNotice2(panelText('customShortcutEmpty')), editor2.focus());
       return;
     }
-    const _0x493ec8 = readCustomQuickActions(_0x117d94),
-      _0x4fb628 = _0x493ec8.filter((_0x28a841) => _0x28a841.prompt !== _0xdc45ae),
-      _0x26d784 = writeCustomQuickActions(
+    const list21 = readCustomQuickActions(value71),
+      args = list21.filter((item12) => item12.prompt !== prompt2),
+      writeCustomQuickActions2 = writeCustomQuickActions(
         [
           {
             id: 'custom-' + Date.now(),
-            label: truncateUiText(_0xdc45ae, 18),
-            prompt: _0xdc45ae,
+            label: truncateUiText(prompt2, 18),
+            prompt: prompt2,
             custom: true,
           },
-          ..._0x4fb628,
+          ...args,
         ],
-        _0x117d94,
+        value71,
       );
     return (
-      _0x282ffb(),
-      (_0x502f4b.hidden = _0x2ad577.children.length > 0),
-      _0x1fa11d(panelText('customShortcutSaved')),
-      _0x26d784
+      run(),
+      (el59.hidden = el57.children.length > 0),
+      setNotice2(panelText('customShortcutSaved')),
+      writeCustomQuickActions2
     );
   }
-  async function _0x3fadf3(_0x752924) {
-    if (!_0x752924) return;
+  async function run20(enabled10) {
+    if (!enabled10) return;
     if (typeof uploadMaterial !== 'function') {
-      _0x1fa11d(panelText('uploadMaterialMissing'));
+      setNotice2(panelText('uploadMaterialMissing'));
       return;
     }
-    _0x5d33bc(true);
+    run21(true);
     try {
-      const _0x3c6a9b = await uploadMaterial(_0x752924),
-        _0x167f19 = Array.isArray(_0x3c6a9b) ? _0x3c6a9b : [_0x3c6a9b],
-        _0x23c7f6 = _0x167f19
-          .map((_0x440c61) => normalizeAgentInputRefFromNode(_0x440c61, { source: 'upload' }))
+      const uploadMaterial2 = await uploadMaterial(enabled10),
+        list22 = Array.isArray(uploadMaterial2) ? uploadMaterial2 : [uploadMaterial2],
+        list23 = list22
+          .map((item13) => normalizeAgentInputRefFromNode(item13, { source: 'upload' }))
           .filter(Boolean);
-      if (_0x23c7f6.length === 0) {
-        _0x1fa11d(panelText('uploadMaterialFailed'));
+      if (list23.length === 0) {
+        setNotice2(panelText('uploadMaterialFailed'));
         return;
       }
-      (_0x6004d4(_0x23c7f6), _0x1fa11d(panelText('uploadMaterialReady')), _0x5b769d.focus());
-    } catch (_0x27b5ab) {
-      _0x1fa11d(_0x27b5ab?.message || panelText('uploadMaterialFailed'));
+      (run4(list23), setNotice2(panelText('uploadMaterialReady')), editor2.focus());
+    } catch (error2) {
+      setNotice2(error2?.message || panelText('uploadMaterialFailed'));
     } finally {
-      _0x5d33bc(false);
+      run21(false);
     }
   }
-  function _0x573c07() {
-    return _0x5c09b1?.sessionStore?.getHistory?.() || _0x5c09b1?.sessionStore?.getState?.().history || [];
+  function run22() {
+    return runtime?.sessionStore?.getHistory?.() || runtime?.sessionStore?.getState?.().history || [];
   }
-  function _0x48dae1() {
-    (renderPlanPreview(_0x3d0f1e, null),
-      _0x387448.replaceChildren(),
-      (_0x387448.hidden = true),
-      _0x41e3f4.replaceChildren(),
-      (_0x41e3f4.hidden = true),
-      (_0x448ae7.hidden = true));
+  function run23() {
+    (renderPlanPreview(el62, null),
+      el63.replaceChildren(),
+      (el63.hidden = true),
+      el64.replaceChildren(),
+      (el64.hidden = true),
+      (el65.hidden = true));
   }
-  function _0x89a400({ preserveNotice: preserveNotice = false } = {}) {
-    const _0x43c88b =
-      _0x5c09b1?.getActiveConversation?.() ||
-      _0x5c09b1?.sessionStore?.getState?.().activeConversation ||
-      null;
-    if (_0x43c88b?.hasUnfinishedOperation) {
-      _0x1fa11d(panelText('unfinishedNotice'));
+  function run24({ preserveNotice: preserveNotice = false } = {}) {
+    const value83 =
+      runtime?.getActiveConversation?.() || runtime?.sessionStore?.getState?.().activeConversation || null;
+    if (value83?.hasUnfinishedOperation) {
+      setNotice2(panelText('unfinishedNotice'));
       return;
     }
-    if (!preserveNotice) _0x1fa11d('');
+    if (!preserveNotice) setNotice2('');
   }
-  function _0x388e7f({ preserveNotice: preserveNotice = false } = {}) {
-    (_0x48dae1(), renderMessages(_0x2ad577, _0x573c07()));
-    const _0x1bdc98 = _0x2ad577.children.length > 0;
-    ((_0x42864b.hidden = _0x1bdc98),
-      (_0x502f4b.hidden = _0x1bdc98),
-      _0x89a400({ preserveNotice: preserveNotice }));
+  function run25({ preserveNotice: preserveNotice = false } = {}) {
+    (run23(), renderMessages(el57, run22()));
+    const value84 = el57.children.length > 0;
+    ((el56.hidden = value84), (el59.hidden = value84), run24({ preserveNotice: preserveNotice }));
   }
-  function _0x5d33bc(_0x265e8e) {
-    ((_0x1806c2 = _0x265e8e === true),
-      (_0x2ec7ea.disabled = _0x1806c2),
-      (_0x514b25.disabled = _0x1806c2),
-      (_0x5d6dd2.disabled = _0x1806c2),
-      _0x387448.querySelectorAll?.('.agent-option-btn')?.forEach((_0x4dc938) => {
-        _0x4dc938.disabled = _0x1806c2;
+  function run21(value85) {
+    ((value78 = value85 === true),
+      (el94.disabled = value78),
+      (el66.disabled = value78),
+      (el67.disabled = value78),
+      el63.querySelectorAll?.('.agent-option-btn')?.forEach((el105) => {
+        el105.disabled = value78;
       }),
-      _0x41e3f4.querySelectorAll?.('.agent-recovery-btn')?.forEach((_0x37b7f9) => {
-        _0x37b7f9.disabled = _0x1806c2;
+      el64.querySelectorAll?.('.agent-recovery-btn')?.forEach((el106) => {
+        el106.disabled = value78;
       }),
-      _0x3772fc.classList.toggle('is-busy', _0x1806c2));
+      panel.classList.toggle('is-busy', value78));
   }
-  function _0xca8b8c(_0x308717) {
-    (_0x3772fc.classList.toggle('is-open', _0x308717),
-      _0x3772fc.setAttribute('aria-hidden', _0x308717 ? 'false' : 'true'),
-      document?.body?.classList?.toggle('agent-sidebar-open', _0x308717),
-      document?.body?.classList?.toggle('agent-sidebar-collapsed', _0x308717 && _0x5827f0),
-      fabBtnEl.classList.toggle('is-agent-open', _0x308717));
-    if (_0x308717) {
-      if (!_0x5827f0) _0x5b769d.focus();
-      _0x89a400({ preserveNotice: true });
-    } else (_0x565b53(), closeFloatingMenus(_0x3772fc), _0x1fa11d(''));
+  function run26(value86) {
+    (panel.classList.toggle('is-open', value86),
+      panel.setAttribute('aria-hidden', value86 ? 'false' : 'true'),
+      document?.body?.classList?.toggle('agent-sidebar-open', value86),
+      document?.body?.classList?.toggle('agent-sidebar-collapsed', value86 && enabled6),
+      fabBtnEl.classList.toggle('is-agent-open', value86));
+    if (value86) {
+      if (!enabled6) editor2.focus();
+      run24({ preserveNotice: true });
+    } else (run11(), closeFloatingMenus(panel), setNotice2(''));
   }
-  function _0x30997d() {
-    _0xca8b8c(!_0x3772fc.classList.contains('is-open'));
+  function toggle2() {
+    run26(!panel.classList.contains('is-open'));
   }
-  function _0x3f19d9(_0x19d7ec) {
-    ((_0x5827f0 = _0x19d7ec === true),
-      _0x3772fc.classList.toggle('is-collapsed', _0x5827f0),
-      _0x572be8.setAttribute('aria-expanded', _0x5827f0 ? 'false' : 'true'),
-      (_0x572be8.title = _0x5827f0 ? '展开' : '折叠'),
-      _0x572be8.setAttribute('aria-label', _0x5827f0 ? '展开' : '折叠'),
+  function run27(value87) {
+    ((enabled6 = value87 === true),
+      panel.classList.toggle('is-collapsed', enabled6),
+      el49.setAttribute('aria-expanded', enabled6 ? 'false' : 'true'),
+      (el49.title = enabled6 ? '展开' : '折叠'),
+      el49.setAttribute('aria-label', enabled6 ? '展开' : '折叠'),
       document?.body?.classList?.toggle(
         'agent-sidebar-collapsed',
-        _0x5827f0 && _0x3772fc.classList.contains('is-open'),
+        enabled6 && panel.classList.contains('is-open'),
       ));
-    if (!_0x5827f0 && _0x3772fc.classList.contains('is-open')) _0x5b769d.focus();
-    _0x5827f0 && (_0x565b53(), closeFloatingMenus(_0x3772fc), _0x1fa11d(''));
+    if (!enabled6 && panel.classList.contains('is-open')) editor2.focus();
+    enabled6 && (run11(), closeFloatingMenus(panel), setNotice2(''));
   }
-  function _0x50c648(_0x48ee8f, { persist: persist = false } = {}) {
-    const _0x220b02 = clampAgentSidebarWidth(_0x48ee8f);
-    document?.body?.style?.setProperty?.('--agent-sidebar-width', _0x220b02 + 'px');
-    if (persist) writeStoredSidebarWidth(_0x220b02, _0x117d94);
-    return _0x220b02;
+  function run28(value88, { persist: persist = false } = {}) {
+    const clampAgentSidebarWidth2 = clampAgentSidebarWidth(value88);
+    document?.body?.style?.setProperty?.('--agent-sidebar-width', clampAgentSidebarWidth2 + 'px');
+    if (persist) writeStoredSidebarWidth(clampAgentSidebarWidth2, value71);
+    return clampAgentSidebarWidth2;
   }
-  function _0x27a09c(_0x18c8cb) {
-    (_0x18c8cb.preventDefault?.(), _0x18c8cb.stopPropagation?.());
-    const _0x4c97db = Number(_0x18c8cb.clientX),
-      _0x484194 = _0x3772fc.getBoundingClientRect?.().width || _0x3772fc.offsetWidth || 0;
-    if (!Number.isFinite(_0x4c97db) || !_0x484194) return;
+  function run29(event5) {
+    (event5.preventDefault?.(), event5.stopPropagation?.());
+    const value89 = Number(event5.clientX),
+      enabled11 = panel.getBoundingClientRect?.().width || panel.offsetWidth || 0;
+    if (!Number.isFinite(value89) || !enabled11) return;
     document?.body?.classList?.add?.('agent-sidebar-resizing');
-    const _0x2eac52 = (_0x21e063) => {
-        const _0x4b5352 = Number(_0x21e063.clientX);
-        if (!Number.isFinite(_0x4b5352)) return;
-        _0x50c648(_0x484194 + (_0x4c97db - _0x4b5352));
+    const value90 = (event6) => {
+        const value91 = Number(event6.clientX);
+        if (!Number.isFinite(value91)) return;
+        run28(enabled11 + (value89 - value91));
       },
-      _0x5b7606 = (_0x18badb) => {
-        (document?.removeEventListener?.('pointermove', _0x2eac52),
-          document?.removeEventListener?.('pointerup', _0x5b7606),
+      value92 = (event7) => {
+        (document?.removeEventListener?.('pointermove', value90),
+          document?.removeEventListener?.('pointerup', value92),
           document?.body?.classList?.remove?.('agent-sidebar-resizing'));
-        const _0x2bdf6b = Number(_0x18badb.clientX);
-        Number.isFinite(_0x2bdf6b) && _0x50c648(_0x484194 + (_0x4c97db - _0x2bdf6b), { persist: true });
+        const value93 = Number(event7.clientX);
+        Number.isFinite(value93) && run28(enabled11 + (value89 - value93), { persist: true });
       };
-    (document?.addEventListener?.('pointermove', _0x2eac52),
-      document?.addEventListener?.('pointerup', _0x5b7606));
+    (document?.addEventListener?.('pointermove', value90),
+      document?.addEventListener?.('pointerup', value92));
   }
-  function _0x1be514() {
-    (_0x565b53(),
-      _0x5c09b1.startNewConversation?.(),
-      _0x388e7f({ preserveNotice: true }),
-      setEditorText(_0x5b769d, ''),
-      _0x32b40c(),
-      (_0x49e6c5.hidden = true),
-      _0x1fa11d('已新建对话。'));
+  function reset() {
+    (run11(),
+      runtime.startNewConversation?.(),
+      run25({ preserveNotice: true }),
+      setEditorText(editor2, ''),
+      run5(),
+      (el58.hidden = true),
+      setNotice2('已新建对话。'));
   }
-  function _0x5379ca(_0x5aacff) {
-    if (!_0x5c09b1.switchConversation?.(_0x5aacff)) return;
-    (_0x565b53(), setEditorText(_0x5b769d, ''), _0x32b40c(), (_0x49e6c5.hidden = true), _0x388e7f());
+  function onSelect2(value94) {
+    if (!runtime.switchConversation?.(value94)) return;
+    (run11(), setEditorText(editor2, ''), run5(), (el58.hidden = true), run25());
   }
-  function _0xc25e74(_0x1b77d2) {
-    (_0x565b53(),
-      _0x5c09b1.deleteConversation?.(_0x1b77d2),
-      setEditorText(_0x5b769d, ''),
-      _0x32b40c(),
-      _0x388e7f(),
-      renderHistory(_0x49e6c5, _0x5c09b1, { onSelect: _0x5379ca, onDelete: _0xc25e74 }));
+  function onDelete2(value95) {
+    (run11(),
+      runtime.deleteConversation?.(value95),
+      setEditorText(editor2, ''),
+      run5(),
+      run25(),
+      renderHistory(el58, runtime, { onSelect: onSelect2, onDelete: onDelete2 }));
   }
-  function _0x202ee9(_0x5dd633) {
-    if (_0x5dd633?.reply) appendMessage(_0x2ad577, 'assistant', _0x5dd633.reply);
-    _0x42864b.hidden = _0x2ad577.children.length > 0;
-    const _0x13ddcc = _0x5dd633?.status === 'need_confirmation' ? _0x5dd633?.plan || null : null;
-    (renderPlanPreview(_0x3d0f1e, _0x13ddcc),
-      renderClarification(_0x387448, _0x5dd633, _0x5c09b1, _0x202ee9, _0x5d33bc, {
-        onAnswer: (_0x3e9003) => {
-          if (!_0x3e9003) return;
-          (appendMessage(_0x2ad577, 'user', _0x3e9003), (_0x42864b.hidden = true));
+  function run30(response3) {
+    if (response3?.reply) appendMessage(el57, 'assistant', response3.reply);
+    el56.hidden = el57.children.length > 0;
+    const value96 = response3?.status === 'need_confirmation' ? response3?.plan || null : null;
+    (renderPlanPreview(el62, value96),
+      renderClarification(el63, response3, runtime, run30, run21, {
+        onAnswer: (enabled12) => {
+          if (!enabled12) return;
+          (appendMessage(el57, 'user', enabled12), (el56.hidden = true));
         },
-        onWaitingStart: () => appendWaitingMessage(_0x2ad577),
+        onWaitingStart: () => appendWaitingMessage(el57),
         onWaitingEnd: removeWaitingMessage,
       }),
-      renderRecovery(_0x41e3f4, _0x5dd633, _0x5c09b1, _0x202ee9, _0x5d33bc, {
-        editor: _0x5b769d,
-        setNotice: _0x1fa11d,
+      renderRecovery(el64, response3, runtime, run30, run21, {
+        editor: editor2,
+        setNotice: setNotice2,
       }),
-      (_0x448ae7.hidden = _0x5dd633?.status !== 'need_confirmation'));
+      (el65.hidden = response3?.status !== 'need_confirmation'));
   }
-  async function _0x441b20() {
-    const _0x245f5c = getEditorText(_0x5b769d);
-    if (!_0x245f5c) return;
-    (_0x1fa11d(''), _0x565b53());
-    const _0x48e5d4 = _0x308cce.slice();
-    (_0x32b40c(),
-      setEditorText(_0x5b769d, ''),
-      (_0x502f4b.hidden = true),
-      appendMessage(_0x2ad577, 'user', _0x245f5c),
-      (_0x42864b.hidden = true),
-      _0x5d33bc(true));
-    const _0xf6b2f8 = appendWaitingMessage(_0x2ad577);
+  async function run31() {
+    const editorText = getEditorText(editor2);
+    if (!editorText) return;
+    (setNotice2(''), run11());
+    const inputRefs = list16.slice();
+    (run5(),
+      setEditorText(editor2, ''),
+      (el59.hidden = true),
+      appendMessage(el57, 'user', editorText),
+      (el56.hidden = true),
+      run21(true));
+    const appendWaitingMessage2 = appendWaitingMessage(el57);
     try {
-      _0x202ee9(await _0x5c09b1.handleUserMessage(_0x245f5c, { inputRefs: _0x48e5d4 }));
-    } catch (_0x202f9c) {
-      appendMessage(_0x2ad577, 'assistant', _0x202f9c?.message || 'Agent failed.');
+      run30(await runtime.handleUserMessage(editorText, { inputRefs: inputRefs }));
+    } catch (error3) {
+      appendMessage(el57, 'assistant', error3?.message || 'Agent failed.');
     } finally {
-      (removeWaitingMessage(_0xf6b2f8), _0x5d33bc(false));
+      (removeWaitingMessage(appendWaitingMessage2), run21(false));
     }
   }
   return (
-    fabBtnEl.addEventListener('click', (_0x3fdda5) => {
-      (_0x3fdda5.stopPropagation(), _0x30997d());
+    fabBtnEl.addEventListener('click', (event8) => {
+      (event8.stopPropagation(), toggle2());
     }),
-    _0x2ec94e.addEventListener('click', () => _0xca8b8c(false)),
-    _0x572be8.addEventListener('click', () => _0x3f19d9(!_0x5827f0)),
-    _0x83ac16.addEventListener('click', _0x1be514),
-    _0x21b5dc.addEventListener('click', () => {
-      const _0x29cbe1 = !_0x49e6c5.hidden;
-      ((_0x49e6c5.hidden = _0x29cbe1),
-        !_0x29cbe1 && renderHistory(_0x49e6c5, _0x5c09b1, { onSelect: _0x5379ca, onDelete: _0xc25e74 }));
+    el54.addEventListener('click', () => run26(false)),
+    el49.addEventListener('click', () => run27(!enabled6)),
+    el52.addEventListener('click', reset),
+    el53.addEventListener('click', () => {
+      const enabled13 = !el58.hidden;
+      ((el58.hidden = enabled13),
+        !enabled13 && renderHistory(el58, runtime, { onSelect: onSelect2, onDelete: onDelete2 }));
     }),
-    _0x502f4b.addEventListener('click', (_0x223c40) => {
-      const _0x12feba = _0x223c40.target?.closest?.('.agent-quick-card');
-      if (!_0x12feba) return;
-      (setEditorText(_0x5b769d, _0x12feba.dataset.prompt || _0x12feba.textContent || ''), _0x5b769d.focus());
+    el59.addEventListener('click', (event9) => {
+      const el107 = event9.target?.closest?.('.agent-quick-card');
+      if (!el107) return;
+      (setEditorText(editor2, el107.dataset.prompt || el107.textContent || ''), editor2.focus());
     }),
-    _0x40f1e2.addEventListener('click', (_0xc1b755) => {
-      (_0xc1b755.stopPropagation(), setMenuOpen(_0x551b50, !_0x551b50.classList.contains('show'), _0x3772fc));
+    el78.addEventListener('click', (event10) => {
+      (event10.stopPropagation(), setMenuOpen(el79, !el79.classList.contains('show'), panel));
     }),
-    _0x551b50.addEventListener('click', (_0x211dcb) => {
-      const _0x481b79 = _0x211dcb.target?.closest?.('[data-placeholder-action]');
-      if (!_0x481b79) return;
-      _0x211dcb.stopPropagation?.();
-      const _0x4ebefd = _0x481b79.dataset.placeholderAction;
-      if (_0x4ebefd === 'canvas') _0x292f92({ toggle: false });
+    el79.addEventListener('click', (event11) => {
+      const el108 = event11.target?.closest?.('[data-placeholder-action]');
+      if (!el108) return;
+      event11.stopPropagation?.();
+      const value97 = el108.dataset.placeholderAction;
+      if (value97 === 'canvas') run18({ toggle: false });
       else {
-        if (_0x4ebefd === 'upload')
-          ((_0x4bd2ef.value = ''), _0x4bd2ef.click?.(), _0x1fa11d(panelText('uploadMaterial')));
-        else _0x4ebefd === 'custom' && _0x3e46b8();
+        if (value97 === 'upload')
+          ((el81.value = ''), el81.click?.(), setNotice2(panelText('uploadMaterial')));
+        else value97 === 'custom' && run19();
       }
-      _0x551b50.classList.remove('show');
+      el79.classList.remove('show');
     }),
-    _0x30d670.addEventListener('click', (_0x24529a) => {
-      (_0x24529a.stopPropagation?.(), _0x292f92());
+    el71.addEventListener('click', (event12) => {
+      (event12.stopPropagation?.(), run18());
     }),
-    _0x30d670.addEventListener('keydown', (_0x4e3d4e) => {
-      if (_0x4e3d4e.key !== 'Enter' && _0x4e3d4e.key !== ' ') return;
-      (_0x4e3d4e.preventDefault?.(), _0x292f92());
+    el71.addEventListener('keydown', (event13) => {
+      if (event13.key !== 'Enter' && event13.key !== ' ') return;
+      (event13.preventDefault?.(), run18());
     }),
-    _0x3a0739.addEventListener('click', (_0x4bdae1) => {
-      const _0x3bef0d = _0x4bdae1.target?.closest?.('[data-input-ref-remove]'),
-        _0x73f99e = String(_0x3bef0d?.dataset?.inputRefRemove || '').trim();
-      if (!_0x73f99e) return;
-      ((_0x308cce = _0x308cce.filter((_0x3f9787) => _0x3f9787.nodeId !== _0x73f99e)), _0x4afc56());
+    el73.addEventListener('click', (event14) => {
+      const el109 = event14.target?.closest?.('[data-input-ref-remove]'),
+        enabled14 = String(el109?.dataset?.inputRefRemove || '').trim();
+      if (!enabled14) return;
+      ((list16 = list16.filter((item14) => item14.nodeId !== enabled14)), run3());
     }),
-    _0x4bd2ef.addEventListener('change', () => {
-      const _0x3208c2 = _0x4bd2ef.files?.[0];
-      (_0x3fadf3(_0x3208c2), (_0x4bd2ef.value = ''));
+    el81.addEventListener('change', () => {
+      const value98 = el81.files?.[0];
+      (run20(value98), (el81.value = ''));
     }),
-    _0x485a45.addEventListener('click', (_0xfa7aab) => {
-      (_0xfa7aab.stopPropagation(), setMenuOpen(_0x18e983, !_0x18e983.classList.contains('show'), _0x3772fc));
+    el83.addEventListener('click', (event15) => {
+      (event15.stopPropagation(), setMenuOpen(el87, !el87.classList.contains('show'), panel));
     }),
-    _0x18e983.addEventListener('click', (_0x17f180) => {
-      const _0x2b95b8 = _0x17f180.target?.closest?.('.floating-menu-item');
-      if (!_0x2b95b8 || _0x2b95b8.hasAttribute('data-node-menu-submenu')) return;
-      const _0x522fd1 = _0x2b95b8.dataset.value || '';
-      if (!_0x522fd1 || _0x2b95b8.dataset.disabled === 'true') return;
-      const _0x17082f = commitAgentModelSelection(_0x23cce3, {
-        model: _0x522fd1,
-        provider: _0x2b95b8.dataset.provider || '',
+    el87.addEventListener('click', (event16) => {
+      const provider3 = event16.target?.closest?.('.floating-menu-item');
+      if (!provider3 || provider3.hasAttribute('data-node-menu-submenu')) return;
+      const model3 = provider3.dataset.value || '';
+      if (!model3 || provider3.dataset.disabled === 'true') return;
+      const commitAgentModelSelection2 = commitAgentModelSelection(modelSettings, {
+        model: model3,
+        provider: provider3.dataset.provider || '',
       });
-      (_0x18e983
-        .querySelectorAll('.floating-menu-item')
-        .forEach((_0x623d8c) => _0x623d8c.classList.remove('active')),
-        _0x2b95b8.classList.add('active'),
-        _0x18e983.classList.remove('show'),
-        closeNodeFooterMenus(_0x18e983),
-        updateModelTrigger(_0x485a45, _0x17082f || { model: _0x522fd1 }));
+      (el87.querySelectorAll('.floating-menu-item').forEach((el110) => el110.classList.remove('active')),
+        provider3.classList.add('active'),
+        el87.classList.remove('show'),
+        closeNodeFooterMenus(el87),
+        updateModelTrigger(el83, commitAgentModelSelection2 || { model: model3 }));
     }),
-    _0x3e25a7.addEventListener('click', (_0x4705a5) => {
-      if (_0x329684.hidden) return;
-      (_0x4705a5.stopPropagation(), setMenuOpen(_0x583a1b, !_0x583a1b.classList.contains('show'), _0x3772fc));
+    el89.addEventListener('click', (event17) => {
+      if (el88.hidden) return;
+      (event17.stopPropagation(), setMenuOpen(el92, !el92.classList.contains('show'), panel));
     }),
-    _0x583a1b.addEventListener('click', (_0x4c2da9) => {
-      const _0x49ce4c = _0x4c2da9.target?.closest?.('[data-execution-mode]');
-      if (!_0x49ce4c) return;
-      const _0x4d76bc = normalizeAgentExecutionMode(_0x49ce4c.dataset.executionMode),
-        _0x58431d = _0x23cce3?.updateSettings?.({ executionMode: _0x4d76bc }) || { executionMode: _0x4d76bc };
-      ((_0x11f39c.textContent = getAgentExecutionModeLabel(_0x58431d.executionMode)),
-        _0x583a1b
+    el92.addEventListener('click', (event18) => {
+      const el111 = event18.target?.closest?.('[data-execution-mode]');
+      if (!el111) return;
+      const executionMode2 = normalizeAgentExecutionMode(el111.dataset.executionMode),
+        value99 = modelSettings?.updateSettings?.({ executionMode: executionMode2 }) || {
+          executionMode: executionMode2,
+        };
+      ((el90.textContent = getAgentExecutionModeLabel(value99.executionMode)),
+        el92
           .querySelectorAll('[data-execution-mode]')
-          .forEach((_0x49b937) =>
-            _0x49b937.classList.toggle('active', _0x49b937.dataset.executionMode === _0x58431d.executionMode),
+          .forEach((el112) =>
+            el112.classList.toggle('active', el112.dataset.executionMode === value99.executionMode),
           ),
-        _0x583a1b.classList.remove('show'),
-        _0x1fa11d('执行模式已保存；本轮不会改变确认策略。'));
+        el92.classList.remove('show'),
+        setNotice2('执行模式已保存；本轮不会改变确认策略。'));
     }),
-    _0x75b13f.addEventListener('submit', (_0x5dbdb0) => {
-      _0x5dbdb0.preventDefault();
-      if (_0x1806c2) return;
-      _0x441b20();
+    el68.addEventListener('submit', (event19) => {
+      event19.preventDefault();
+      if (value78) return;
+      run31();
     }),
-    _0x5b769d.addEventListener('keydown', (_0x48a865) => {
-      if (_0x48a865.key === 'Enter' && !_0x48a865.shiftKey) {
-        _0x48a865.preventDefault();
-        if (_0x1806c2) return;
-        _0x441b20();
+    editor2.addEventListener('keydown', (event20) => {
+      if (event20.key === 'Enter' && !event20.shiftKey) {
+        event20.preventDefault();
+        if (value78) return;
+        run31();
       }
     }),
-    _0x3772fc.addEventListener('pointerdown', (_0x1efacf) => _0x1efacf.stopPropagation()),
-    _0x3772fc.addEventListener('click', (_0x2f07d8) => {
-      if (isAgentMenuSurface(_0x2f07d8.target)) return;
-      closeFloatingMenus(_0x3772fc);
+    panel.addEventListener('pointerdown', (event21) => event21.stopPropagation()),
+    panel.addEventListener('click', (event22) => {
+      if (isAgentMenuSurface(event22.target)) return;
+      closeFloatingMenus(panel);
     }),
-    document?.addEventListener?.('click', (_0x3faba7) => {
-      if (!_0x3772fc.contains(_0x3faba7.target)) closeFloatingMenus(_0x3772fc);
+    document?.addEventListener?.('click', (event23) => {
+      if (!panel.contains(event23.target)) closeFloatingMenus(panel);
     }),
-    _0x33ec09.addEventListener('pointerdown', _0x27a09c),
-    _0x33ec09.addEventListener('keydown', (_0x507b7e) => {
-      if (_0x507b7e.key !== 'ArrowLeft' && _0x507b7e.key !== 'ArrowRight') return;
-      _0x507b7e.preventDefault();
-      const _0x1d5f52 = _0x3772fc.getBoundingClientRect?.().width || _0x3772fc.offsetWidth || 0,
-        _0x526a45 = _0x507b7e.key === 'ArrowLeft' ? 24 : -24;
-      _0x50c648(_0x1d5f52 + _0x526a45, { persist: true });
+    el47.addEventListener('pointerdown', run29),
+    el47.addEventListener('keydown', (event24) => {
+      if (event24.key !== 'ArrowLeft' && event24.key !== 'ArrowRight') return;
+      event24.preventDefault();
+      const value100 = panel.getBoundingClientRect?.().width || panel.offsetWidth || 0,
+        value101 = event24.key === 'ArrowLeft' ? 24 : -24;
+      run28(value100 + value101, { persist: true });
     }),
-    _0x514b25.addEventListener('click', async () => {
-      if (_0x1806c2) return;
-      const _0x5ae3bb = panelText('confirmUserMessage');
-      (appendMessage(_0x2ad577, 'user', _0x5ae3bb),
-        (_0x42864b.hidden = true),
-        (_0x448ae7.hidden = true),
-        _0x5d33bc(true));
-      const _0x103808 = appendWaitingMessage(_0x2ad577);
+    el66.addEventListener('click', async () => {
+      if (value78) return;
+      const displayAnswer2 = panelText('confirmUserMessage');
+      (appendMessage(el57, 'user', displayAnswer2), (el56.hidden = true), (el65.hidden = true), run21(true));
+      const appendWaitingMessage3 = appendWaitingMessage(el57);
       try {
-        _0x202ee9(await _0x5c09b1.confirmPendingPlan({ displayAnswer: _0x5ae3bb }));
-      } catch (_0x2dfd8c) {
-        appendMessage(_0x2ad577, 'assistant', _0x2dfd8c?.message || 'Agent confirmation failed.');
+        run30(await runtime.confirmPendingPlan({ displayAnswer: displayAnswer2 }));
+      } catch (error4) {
+        appendMessage(el57, 'assistant', error4?.message || 'Agent confirmation failed.');
       } finally {
-        (removeWaitingMessage(_0x103808), _0x5d33bc(false));
+        (removeWaitingMessage(appendWaitingMessage3), run21(false));
       }
     }),
-    _0x5d6dd2.addEventListener('click', () => {
-      if (_0x1806c2) return;
-      ((_0x448ae7.hidden = true), _0x202ee9(_0x5c09b1.cancelPendingPlan()));
+    el67.addEventListener('click', () => {
+      if (value78) return;
+      ((el65.hidden = true), run30(runtime.cancelPendingPlan()));
     }),
-    _0x388e7f(),
+    run25(),
     {
-      panel: _0x3772fc,
-      open: () => _0xca8b8c(true),
-      close: () => _0xca8b8c(false),
-      toggle: _0x30997d,
-      collapse: () => _0x3f19d9(true),
-      expand: () => _0x3f19d9(false),
-      reset: _0x1be514,
-      setWidth: (_0x419eaf) => _0x50c648(_0x419eaf, { persist: true }),
+      panel: panel,
+      open: () => run26(true),
+      close: () => run26(false),
+      toggle: toggle2,
+      collapse: () => run27(true),
+      expand: () => run27(false),
+      reset: reset,
+      setWidth: (value102) => run28(value102, { persist: true }),
     }
   );
 }
-export {
-  formatAgentAssistantMarkdown,
-} from './agentConversationPresentation.js';
+export { formatAgentAssistantMarkdown } from './agentConversationPresentation.js';

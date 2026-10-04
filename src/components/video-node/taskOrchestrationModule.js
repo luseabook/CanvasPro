@@ -64,8 +64,8 @@ import { resolveEffectiveInputKind } from '../../modules/modelInputPolicy.js';
 import { appendApimartPrivateAvatarProviderAssetRefs } from '../../modules/apimartPrivateAvatarAssets.js';
 import { t } from '../../i18n/index.js';
 const DREAMINA_UPLOAD_DURATION_ERROR_TOAST_MS = 0x2328;
-function videoTaskText(_0x32f421, _0x1e9ba2 = {}) {
-  return t('videoTask.' + _0x32f421, _0x1e9ba2);
+function videoTaskText(value, item = {}) {
+  return t('videoTask.' + value, item);
 }
 function getVideoGenerateTitle() {
   return videoTaskText('controls.generateTitle');
@@ -120,76 +120,72 @@ const APIMART_KLING_V3_OMNI_MODEL_ID = 'apimart/kling-v3-omni',
     'succeeded',
   ]),
   dreaminaBackgroundQueueToastKeys = new Set();
-function normalizeTaskStatus(_0x2b8854) {
-  return String(_0x2b8854 || '')
+function normalizeTaskStatus(key) {
+  return String(key || '')
     .trim()
     .toLowerCase();
 }
-function mapDreaminaSnapshotToTaskCenterStatus(_0x46f13e = {}) {
-  const _0x40fa5d = String(_0x46f13e?.phase || '')
+function mapDreaminaSnapshotToTaskCenterStatus(response = {}) {
+  const index = String(response?.phase || '')
       .trim()
       .toLowerCase(),
-    _0xc753b7 = String(_0x46f13e?.status || '')
+    result = String(response?.status || '')
       .trim()
       .toLowerCase();
-  if (_0x40fa5d === 'done' || _0xc753b7 === 'success') return 'complete';
-  if (_0x40fa5d === 'cancelled' || _0xc753b7 === 'cancelled' || _0xc753b7 === 'canceled') return 'cancelled';
-  if (_0x40fa5d === 'failed' || _0xc753b7 === 'failed') return 'failed';
-  if (_0x40fa5d === 'queued' || _0x40fa5d === 'pending') return 'waiting';
+  if (index === 'done' || result === 'success') return 'complete';
+  if (index === 'cancelled' || result === 'cancelled' || result === 'canceled') return 'cancelled';
+  if (index === 'failed' || result === 'failed') return 'failed';
+  if (index === 'queued' || index === 'pending') return 'waiting';
   return 'processing';
 }
-function buildDreaminaTaskCenterMessage(_0x2be673 = {}) {
-  const _0x58ef0e = String(_0x2be673?.label || '').trim(),
-    _0x386433 = Number(_0x2be673?.queueIndex),
-    _0x2cdaed = Number(_0x2be673?.queueLength);
-  if (Number.isFinite(_0x386433) && _0x386433 >= 0 && Number.isFinite(_0x2cdaed) && _0x2cdaed > 0)
+function buildDreaminaTaskCenterMessage(options = {}) {
+  const data = String(options?.label || '').trim(),
+    count = Number(options?.queueIndex),
+    count2 = Number(options?.queueLength);
+  if (Number.isFinite(count) && count >= 0 && Number.isFinite(count2) && count2 > 0)
     return (
-      (_0x58ef0e || videoTaskText('task.queueing')) +
-      ' ' +
-      (Math.trunc(_0x386433) + 1) +
-      '/' +
-      Math.trunc(_0x2cdaed)
+      (data || videoTaskText('task.queueing')) + ' ' + (Math.trunc(count) + 1) + '/' + Math.trunc(count2)
     );
-  return _0x58ef0e || '';
+  return data || '';
 }
-function isDreaminaUploadDurationErrorMessage(_0x3c9f58) {
-  const _0x4e5e38 = String(_0x3c9f58 || '').trim();
-  return _0x4e5e38.startsWith('上传源视频失败：') || _0x4e5e38.startsWith('上传源音频失败：');
+function isDreaminaUploadDurationErrorMessage(target) {
+  const source = String(target || '').trim();
+  return source.startsWith('上传源视频失败：') || source.startsWith('上传源音频失败：');
 }
 function pickVideoAdaptiveSourceSize({ inEdges: inEdges = [], nodes: nodes = {} } = {}) {
-  const _0x4ed0fe = [],
-    _0x7b3ae = [];
-  for (const _0x33ae18 of inEdges) {
-    const _0x2fc448 = nodes?.[_0x33ae18?.sourceId];
-    if (!_0x2fc448) continue;
-    const _0x255e4c = String(_0x2fc448?.type || '').toLowerCase(),
-      _0x130e44 = getGenerationRatioSizeWithDom({
-        nodeId: _0x33ae18?.sourceId,
-        nodeData: _0x2fc448,
-        edge: _0x33ae18,
+  const list = [],
+    list2 = [];
+  for (const nodeId of inEdges) {
+    const nodeData2 = nodes?.[nodeId?.sourceId];
+    if (!nodeData2) continue;
+    const list3 = String(nodeData2?.type || '').toLowerCase(),
+      box = getGenerationRatioSizeWithDom({
+        nodeId: nodeId?.sourceId,
+        nodeData: nodeData2,
+        edge: nodeId,
         includeNodeFrame: true,
       });
-    if (!(_0x130e44?.width > 0 && _0x130e44?.height > 0)) continue;
-    if (_0x255e4c.includes('image')) _0x4ed0fe.push(_0x130e44);
+    if (!(box?.width > 0 && box?.height > 0)) continue;
+    if (list3.includes('image')) list.push(box);
     else {
-      if (_0x255e4c.includes('video')) _0x7b3ae.push(_0x130e44);
+      if (list3.includes('video')) list2.push(box);
     }
   }
-  return _0x4ed0fe[0] || _0x7b3ae[0] || null;
+  return list[0] || list2[0] || null;
 }
-function findVideoAspectRatioField(_0x48a220) {
-  return (Array.isArray(_0x48a220?.uiSchema?.fields) ? _0x48a220.uiSchema.fields : []).find((_0x547776) => {
-    const _0x403bdd = String(_0x547776?.id || '').trim(),
-      _0x9c3790 = String(_0x547776?.displayRole || '').trim();
-    return _0x403bdd === 'aspectRatio' || _0x9c3790 === 'aspectRatio';
+function findVideoAspectRatioField(next) {
+  return (Array.isArray(next?.uiSchema?.fields) ? next.uiSchema.fields : []).find((item2) => {
+    const current = String(item2?.id || '').trim(),
+      entry = String(item2?.displayRole || '').trim();
+    return current === 'aspectRatio' || entry === 'aspectRatio';
   });
 }
-function pickManifestDefaultVideoRatio(_0x16fbe1) {
-  const _0x11e40b = findVideoAspectRatioField(_0x16fbe1),
-    _0x48ee0f = Array.isArray(_0x11e40b?.options) ? _0x11e40b.options : [];
-  for (const _0x2a1ed3 of _0x48ee0f) {
-    const _0x22198 = String(_0x2a1ed3?.value ?? _0x2a1ed3 ?? '').trim();
-    if (_0x22198 && _0x22198.includes(':') && !isAdaptiveRatioLabel(_0x22198)) return _0x22198;
+function pickManifestDefaultVideoRatio(record) {
+  const videoAspectRatioField = findVideoAspectRatioField(record),
+    handle = Array.isArray(videoAspectRatioField?.options) ? videoAspectRatioField.options : [];
+  for (const el of handle) {
+    const list4 = String(el?.value ?? el ?? '').trim();
+    if (list4 && list4.includes(':') && !isAdaptiveRatioLabel(list4)) return list4;
   }
   return '';
 }
@@ -198,26 +194,26 @@ function resolveVideoAspectRatioInput({
   payload: payload = {},
   modelManifest: modelManifest = null,
 } = {}) {
-  const _0x4416ed =
+  const state =
       nodeData?.generationParams &&
       typeof nodeData.generationParams === 'object' &&
       !Array.isArray(nodeData.generationParams)
         ? nodeData.generationParams
         : {},
-    _0x3d7b85 =
+    config =
       payload?.generationParams &&
       typeof payload.generationParams === 'object' &&
       !Array.isArray(payload.generationParams)
         ? payload.generationParams
         : {};
-  if (Object.prototype.hasOwnProperty.call(_0x4416ed, 'aspectRatio')) return _0x4416ed.aspectRatio;
-  const _0x20e875 = String(findVideoAspectRatioField(modelManifest)?.id || '').trim();
-  if (_0x20e875 && Object.prototype.hasOwnProperty.call(_0x4416ed, _0x20e875)) return _0x4416ed[_0x20e875];
+  if (Object.prototype.hasOwnProperty.call(state, 'aspectRatio')) return state.aspectRatio;
+  const scope = String(findVideoAspectRatioField(modelManifest)?.id || '').trim();
+  if (scope && Object.prototype.hasOwnProperty.call(state, scope)) return state[scope];
   if (Object.prototype.hasOwnProperty.call(nodeData || {}, 'aspectRatio')) return nodeData.aspectRatio;
-  if (Object.prototype.hasOwnProperty.call(_0x3d7b85, 'aspectRatio')) return _0x3d7b85.aspectRatio;
-  if (_0x20e875 && Object.prototype.hasOwnProperty.call(_0x3d7b85, _0x20e875)) return _0x3d7b85[_0x20e875];
+  if (Object.prototype.hasOwnProperty.call(config, 'aspectRatio')) return config.aspectRatio;
+  if (scope && Object.prototype.hasOwnProperty.call(config, scope)) return config[scope];
   if (Object.prototype.hasOwnProperty.call(payload || {}, 'aspectRatio')) return payload.aspectRatio;
-  if (_0x20e875 && Object.prototype.hasOwnProperty.call(payload || {}, _0x20e875)) return payload[_0x20e875];
+  if (scope && Object.prototype.hasOwnProperty.call(payload || {}, scope)) return payload[scope];
   return findVideoAspectRatioField(modelManifest)?.defaultValue ?? '';
 }
 function resolveModelApiVideoAdaptiveRatio({
@@ -228,22 +224,22 @@ function resolveModelApiVideoAdaptiveRatio({
   model: model = '',
   modelManifest: modelManifest = null,
 } = {}) {
-  const _0x384cc3 = pickVideoAdaptiveSourceSize({ inEdges: inEdges, nodes: nodes });
-  if (_0x384cc3?.width > 0 && _0x384cc3?.height > 0)
+  const width = pickVideoAdaptiveSourceSize({ inEdges: inEdges, nodes: nodes });
+  if (width?.width > 0 && width?.height > 0)
     return pickClosestRatioForProviderModel({
       provider: provider,
       model: model,
-      width: _0x384cc3.width,
-      height: _0x384cc3.height,
+      width: width.width,
+      height: width.height,
     });
-  const _0x2585e6 = Number(nodeData?.width || 0),
-    _0x63f495 = Number(nodeData?.height || 0);
-  if (Number.isFinite(_0x2585e6) && _0x2585e6 > 0 && Number.isFinite(_0x63f495) && _0x63f495 > 0)
+  const width2 = Number(nodeData?.width || 0),
+    height = Number(nodeData?.height || 0);
+  if (Number.isFinite(width2) && width2 > 0 && Number.isFinite(height) && height > 0)
     return pickClosestRatioForProviderModel({
       provider: provider,
       model: model,
-      width: _0x2585e6,
-      height: _0x63f495,
+      width: width2,
+      height: height,
     });
   return pickManifestDefaultVideoRatio(modelManifest);
 }
@@ -255,53 +251,57 @@ function resolveVideoManifestAdaptiveRatio({
   model: model = '',
   modelManifest: modelManifest = null,
 } = {}) {
-  const _0x4ae424 = Number(nodeData?.width || 0),
-    _0x350c95 = Number(nodeData?.height || 0);
-  if (Number.isFinite(_0x4ae424) && _0x4ae424 > 0 && Number.isFinite(_0x350c95) && _0x350c95 > 0)
+  const width3 = Number(nodeData?.width || 0),
+    height2 = Number(nodeData?.height || 0);
+  if (Number.isFinite(width3) && width3 > 0 && Number.isFinite(height2) && height2 > 0)
     return pickClosestRatioForProviderModel({
       provider: provider,
       model: model,
-      width: _0x4ae424,
-      height: _0x350c95,
+      width: width3,
+      height: height2,
     });
-  const _0x54ceef = pickVideoAdaptiveSourceSize({ inEdges: inEdges, nodes: nodes });
-  if (_0x54ceef?.width > 0 && _0x54ceef?.height > 0)
+  const width4 = pickVideoAdaptiveSourceSize({ inEdges: inEdges, nodes: nodes });
+  if (width4?.width > 0 && width4?.height > 0)
     return pickClosestRatioForProviderModel({
       provider: provider,
       model: model,
-      width: _0x54ceef.width,
-      height: _0x54ceef.height,
+      width: width4.width,
+      height: width4.height,
     });
   return pickManifestDefaultVideoRatio(modelManifest);
 }
-function applyModelApiVideoAdaptiveRatio(_0x42b05e, _0x36bebd = {}) {
-  const _0x1cf401 = _0x36bebd?.modelManifest || null;
-  if (!findVideoAspectRatioField(_0x1cf401)) return _0x42b05e;
-  const _0x3f617b = resolveVideoAspectRatioInput({
-    nodeData: _0x36bebd?.nodeData,
-    payload: _0x42b05e,
-    modelManifest: _0x1cf401,
+function applyModelApiVideoAdaptiveRatio(payload2, nodeData3 = {}) {
+  const modelManifest2 = nodeData3?.modelManifest || null;
+  if (!findVideoAspectRatioField(modelManifest2)) return payload2;
+  const videoAspectRatioInput = resolveVideoAspectRatioInput({
+    nodeData: nodeData3?.nodeData,
+    payload: payload2,
+    modelManifest: modelManifest2,
   });
-  if (!isAdaptiveRatioLabel(_0x3f617b)) return _0x42b05e;
-  const _0x33bfb2 = resolveModelApiVideoAdaptiveRatio(_0x36bebd);
+  if (!isAdaptiveRatioLabel(videoAspectRatioInput)) return payload2;
+  const modelApiVideoAdaptiveRatio = resolveModelApiVideoAdaptiveRatio(nodeData3);
   return (
-    _0x33bfb2 && !isAdaptiveRatioLabel(_0x33bfb2) && (_0x42b05e.resolvedRatioLabel = _0x33bfb2),
-    _0x42b05e
+    modelApiVideoAdaptiveRatio &&
+      !isAdaptiveRatioLabel(modelApiVideoAdaptiveRatio) &&
+      (payload2.resolvedRatioLabel = modelApiVideoAdaptiveRatio),
+    payload2
   );
 }
-function applyVideoManifestAdaptiveRatio(_0x1f5df8, _0x36d5ec = {}) {
-  const _0x3bb6f1 = _0x36d5ec?.modelManifest || null;
-  if (!findVideoAspectRatioField(_0x3bb6f1)) return _0x1f5df8;
-  const _0x4142c8 = resolveVideoAspectRatioInput({
-    nodeData: _0x36d5ec?.nodeData,
-    payload: _0x1f5df8,
-    modelManifest: _0x3bb6f1,
+function applyVideoManifestAdaptiveRatio(payload3, nodeData4 = {}) {
+  const modelManifest3 = nodeData4?.modelManifest || null;
+  if (!findVideoAspectRatioField(modelManifest3)) return payload3;
+  const videoAspectRatioInput2 = resolveVideoAspectRatioInput({
+    nodeData: nodeData4?.nodeData,
+    payload: payload3,
+    modelManifest: modelManifest3,
   });
-  if (!isAdaptiveRatioLabel(_0x4142c8)) return _0x1f5df8;
-  const _0x49848e = resolveVideoManifestAdaptiveRatio(_0x36d5ec);
+  if (!isAdaptiveRatioLabel(videoAspectRatioInput2)) return payload3;
+  const videoManifestAdaptiveRatio = resolveVideoManifestAdaptiveRatio(nodeData4);
   return (
-    _0x49848e && !isAdaptiveRatioLabel(_0x49848e) && (_0x1f5df8.resolvedRatioLabel = _0x49848e),
-    _0x1f5df8
+    videoManifestAdaptiveRatio &&
+      !isAdaptiveRatioLabel(videoManifestAdaptiveRatio) &&
+      (payload3.resolvedRatioLabel = videoManifestAdaptiveRatio),
+    payload3
   );
 }
 function pickDreaminaAdaptiveSourceRatio({
@@ -310,224 +310,227 @@ function pickDreaminaAdaptiveSourceRatio({
   provider: provider = '',
   model: model = '',
 } = {}) {
-  const _0x383e02 = pickVideoAdaptiveSourceSize({ inEdges: inEdges, nodes: nodes });
-  if (!_0x383e02) return '';
+  const width5 = pickVideoAdaptiveSourceSize({ inEdges: inEdges, nodes: nodes });
+  if (!width5) return '';
   return pickClosestRatioForProviderModel({
     provider: provider,
     model: model,
-    width: _0x383e02.width,
-    height: _0x383e02.height,
+    width: width5.width,
+    height: width5.height,
   });
 }
-function isHappyHorseVideoModel(_0x45f501, _0x3f6891) {
-  return isModelUsingBodyResolver(_0x45f501, _0x3f6891, HAPPYHORSE_BODY_RESOLVERS);
+function isHappyHorseVideoModel(input, output) {
+  return isModelUsingBodyResolver(input, output, HAPPYHORSE_BODY_RESOLVERS);
 }
-function isModelUsingBodyResolver(_0x2f545e, _0x16da52, _0x475971 = new Set()) {
-  const _0x30f0cb =
-      resolveModelExecution(_0x2f545e, { providerHint: _0x16da52 }) || resolveModelExecution(_0x2f545e),
-    _0x272fe6 = String(_0x30f0cb?.executionManifest?.extensions?.bodyResolver || '').trim();
-  return _0x272fe6 && _0x475971.has(_0x272fe6);
+function isModelUsingBodyResolver(value2, providerHint, map = new Set()) {
+  const modelExecution =
+      resolveModelExecution(value2, { providerHint: providerHint }) || resolveModelExecution(value2),
+    value3 = String(modelExecution?.executionManifest?.extensions?.bodyResolver || '').trim();
+  return value3 && map.has(value3);
 }
-function getHappyHorseVideoInputMaxSeconds(_0x1152a7, _0x6ae616) {
-  const _0x1e3045 =
-      resolveModelExecution(_0x1152a7, { providerHint: _0x6ae616 }) || resolveModelExecution(_0x1152a7),
-    _0x19a5e0 = String(_0x1e3045?.executionManifest?.extensions?.bodyResolver || '').trim();
-  return _0x19a5e0 === 'runninghubHappyHorseVideo' ? 60 : HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS;
+function getHappyHorseVideoInputMaxSeconds(value4, providerHint2) {
+  const modelExecution2 =
+      resolveModelExecution(value4, { providerHint: providerHint2 }) || resolveModelExecution(value4),
+    value5 = String(modelExecution2?.executionManifest?.extensions?.bodyResolver || '').trim();
+  return value5 === 'runninghubHappyHorseVideo' ? 60 : HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS;
 }
-function isWan27VideoModel(_0x6d1ca5, _0x87f7ef) {
-  return isModelUsingBodyResolver(_0x6d1ca5, _0x87f7ef, WAN27_BODY_RESOLVERS);
+function isWan27VideoModel(value6, value7) {
+  return isModelUsingBodyResolver(value6, value7, WAN27_BODY_RESOLVERS);
 }
-function isKlingV3OmniVideoModel(_0x332714, _0x24d0ab) {
-  const _0x383df9 =
-      resolveModelExecution(_0x332714, { providerHint: _0x24d0ab }) || resolveModelExecution(_0x332714),
-    _0x3ed183 = String(
-      _0x383df9?.canonicalModelId || _0x383df9?.modelManifest?.modelId || _0x332714 || '',
+function isKlingV3OmniVideoModel(value8, providerHint3) {
+  const modelExecution3 =
+      resolveModelExecution(value8, { providerHint: providerHint3 }) || resolveModelExecution(value8),
+    value9 = String(
+      modelExecution3?.canonicalModelId || modelExecution3?.modelManifest?.modelId || value8 || '',
     ).trim(),
-    _0x373645 = String(_0x383df9?.modelManifest?.provider || _0x24d0ab || '')
+    enabled = String(modelExecution3?.modelManifest?.provider || providerHint3 || '')
       .trim()
       .toLowerCase();
-  return _0x3ed183 === APIMART_KLING_V3_OMNI_MODEL_ID && (!_0x373645 || _0x373645 === 'apimart');
+  return value9 === APIMART_KLING_V3_OMNI_MODEL_ID && (!enabled || enabled === 'apimart');
 }
-function isKlingO1VideoModel(_0x3d5d04, _0x47e9ce) {
-  const _0x43e46e =
-      resolveModelExecution(_0x3d5d04, { providerHint: _0x47e9ce }) || resolveModelExecution(_0x3d5d04),
-    _0x49416c = String(
-      _0x43e46e?.canonicalModelId || _0x43e46e?.modelManifest?.modelId || _0x3d5d04 || '',
+function isKlingO1VideoModel(value10, providerHint4) {
+  const modelExecution4 =
+      resolveModelExecution(value10, { providerHint: providerHint4 }) || resolveModelExecution(value10),
+    value11 = String(
+      modelExecution4?.canonicalModelId || modelExecution4?.modelManifest?.modelId || value10 || '',
     ).trim(),
-    _0x39a527 = String(_0x43e46e?.modelManifest?.provider || _0x47e9ce || '')
+    enabled2 = String(modelExecution4?.modelManifest?.provider || providerHint4 || '')
       .trim()
       .toLowerCase();
-  return _0x49416c === APIMART_KLING_O1_MODEL_ID && (!_0x39a527 || _0x39a527 === 'apimart');
+  return value11 === APIMART_KLING_O1_MODEL_ID && (!enabled2 || enabled2 === 'apimart');
 }
-function getPlainObject(_0x205a8b) {
-  return _0x205a8b && typeof _0x205a8b === 'object' && !Array.isArray(_0x205a8b) ? _0x205a8b : {};
+function getPlainObject(value12) {
+  return value12 && typeof value12 === 'object' && !Array.isArray(value12) ? value12 : {};
 }
-function normalizeSubmitRandomSeedMode(_0x59df9b, _0x567499 = 'fixed') {
-  const _0x5c5ed5 = String(_0x59df9b ?? _0x567499)
+function normalizeSubmitRandomSeedMode(value13, value14 = 'fixed') {
+  const value15 = String(value13 ?? value14)
     .trim()
     .toLowerCase();
-  return _0x5c5ed5 === 'random' ? 'random' : 'fixed';
+  return value15 === 'random' ? 'random' : 'fixed';
 }
-function getSubmitRandomSeedParam(_0x5347a5, _0x54972c, _0x2f9f6b) {
-  const _0x158786 = String(_0x54972c || '').trim();
-  if (_0x158786 && Object.prototype.hasOwnProperty.call(_0x5347a5 || {}, _0x158786))
-    return _0x5347a5[_0x158786];
-  return _0x2f9f6b;
+function getSubmitRandomSeedParam(value16, value17, value18) {
+  const value19 = String(value17 || '').trim();
+  if (value19 && Object.prototype.hasOwnProperty.call(value16 || {}, value19)) return value16[value19];
+  return value18;
 }
-function generateSubmitRandomSeed(_0x2f6545 = {}) {
-  const _0x155da4 = Number.isFinite(Number(_0x2f6545?.randomSeedMin))
-      ? Math.trunc(Number(_0x2f6545.randomSeedMin))
-      : Number.isFinite(Number(_0x2f6545?.min))
-        ? Math.trunc(Number(_0x2f6545.min))
+function generateSubmitRandomSeed(options2 = {}) {
+  const value20 = Number.isFinite(Number(options2?.randomSeedMin))
+      ? Math.trunc(Number(options2.randomSeedMin))
+      : Number.isFinite(Number(options2?.min))
+        ? Math.trunc(Number(options2.min))
         : 0,
-    _0x3291c2 = Number.isFinite(Number(_0x2f6545?.randomSeedMax))
-      ? Math.trunc(Number(_0x2f6545.randomSeedMax))
-      : Number.isFinite(Number(_0x2f6545?.max))
-        ? Math.trunc(Number(_0x2f6545.max))
+    value21 = Number.isFinite(Number(options2?.randomSeedMax))
+      ? Math.trunc(Number(options2.randomSeedMax))
+      : Number.isFinite(Number(options2?.max))
+        ? Math.trunc(Number(options2.max))
         : 0x7fffffff,
-    _0xb4f1c1 = Math.min(_0x155da4, _0x3291c2),
-    _0x30c1e5 = Math.max(_0x155da4, _0x3291c2);
-  return String(_0xb4f1c1 + Math.floor(Math.random() * (_0x30c1e5 - _0xb4f1c1 + 1)));
+    value22 = Math.min(value20, value21),
+    value23 = Math.max(value20, value21);
+  return String(value22 + Math.floor(Math.random() * (value23 - value22 + 1)));
 }
 function buildSubmitRandomizedSeedPatch({
   modelManifest: modelManifest = null,
   nodeData: nodeData = {},
   payload: payload = {},
 } = {}) {
-  const _0x5d11f0 = Array.isArray(modelManifest?.uiSchema?.fields) ? modelManifest.uiSchema.fields : [],
-    _0x21a64e = _0x5d11f0.filter((_0x2bffd3) => {
-      if (_0x2bffd3?.randomizeOnSubmit !== true) return false;
-      const _0x113db3 = String(_0x2bffd3?.id || '').trim();
-      return _0x113db3 && String(_0x2bffd3?.variant || '') === 'randomSeedRow';
+  const list5 = Array.isArray(modelManifest?.uiSchema?.fields) ? modelManifest.uiSchema.fields : [],
+    list6 = list5.filter((item3) => {
+      if (item3?.randomizeOnSubmit !== true) return false;
+      const value24 = String(item3?.id || '').trim();
+      return value24 && String(item3?.variant || '') === 'randomSeedRow';
     });
-  if (_0x21a64e.length === 0) return null;
-  let _0x4d12bf = {
+  if (list6.length === 0) return null;
+  let generationParams = {
       ...getPlainObject(nodeData?.generationParams),
       ...getPlainObject(payload?.generationParams),
     },
-    _0x27b9cd = null,
-    _0x332139 = false;
-  _0x21a64e.forEach((_0x2df6e1) => {
-    const _0x544c2d = String(_0x2df6e1?.id || '').trim(),
-      _0x4e841e = String(_0x2df6e1?.randomSeedModeField || '').trim(),
-      _0x530390 = String(_0x2df6e1?.randomSeedDefaultMode || 'fixed').trim() || 'fixed',
-      _0x4720ff = _0x4e841e
-        ? normalizeSubmitRandomSeedMode(getSubmitRandomSeedParam(_0x4d12bf, _0x4e841e, _0x530390), _0x530390)
+    requestParams = null,
+    enabled3 = false;
+  list6.forEach((item4) => {
+    const value25 = String(item4?.id || '').trim(),
+      value26 = String(item4?.randomSeedModeField || '').trim(),
+      value27 = String(item4?.randomSeedDefaultMode || 'fixed').trim() || 'fixed',
+      value28 = value26
+        ? normalizeSubmitRandomSeedMode(getSubmitRandomSeedParam(generationParams, value26, value27), value27)
         : 'random';
-    if (_0x4720ff !== 'random') return;
-    const _0x442427 = generateSubmitRandomSeed(_0x2df6e1);
-    ((_0x4d12bf = { ..._0x4d12bf, [_0x544c2d]: _0x442427, ...(_0x4e841e ? { [_0x4e841e]: 'random' } : {}) }),
-      (_0x27b9cd = {
-        ...(_0x27b9cd || _0x4d12bf),
-        [_0x544c2d]: _0x442427,
-        ...(_0x4e841e ? { [_0x4e841e]: 'fixed' } : {}),
+    if (value28 !== 'random') return;
+    const generateSubmitRandomSeed2 = generateSubmitRandomSeed(item4);
+    ((generationParams = {
+      ...generationParams,
+      [value25]: generateSubmitRandomSeed2,
+      ...(value26 ? { [value26]: 'random' } : {}),
+    }),
+      (requestParams = {
+        ...(requestParams || generationParams),
+        [value25]: generateSubmitRandomSeed2,
+        ...(value26 ? { [value26]: 'fixed' } : {}),
       }),
-      (_0x332139 = true));
+      (enabled3 = true));
   });
-  if (!_0x332139) return null;
-  const _0x2fd374 = String(payload?.model || nodeData?.model || modelManifest?.modelId || '').trim(),
-    _0x4b84a6 = { generationParams: _0x4d12bf };
+  if (!enabled3) return null;
+  const value29 = String(payload?.model || nodeData?.model || modelManifest?.modelId || '').trim(),
+    storePatch = { generationParams: generationParams };
   return (
-    _0x2fd374 &&
-      (_0x4b84a6.generationParamsByModel = {
+    value29 &&
+      (storePatch.generationParamsByModel = {
         ...getPlainObject(nodeData?.generationParamsByModel),
-        [_0x2fd374]: _0x4d12bf,
+        [value29]: generationParams,
       }),
-    { requestParams: _0x27b9cd || _0x4d12bf, storePatch: _0x4b84a6 }
+    { requestParams: requestParams || generationParams, storePatch: storePatch }
   );
 }
-function normalizeHappyHorseMode(_0x2a845c) {
-  const _0x142bc1 = String(_0x2a845c || '')
+function normalizeHappyHorseMode(value30) {
+  const value31 = String(value30 || '')
     .trim()
     .toLowerCase();
-  return _0x142bc1 === 'image' || _0x142bc1 === 'reference' || _0x142bc1 === 'edit' ? _0x142bc1 : 'auto';
+  return value31 === 'image' || value31 === 'reference' || value31 === 'edit' ? value31 : 'auto';
 }
-function getHappyHorseMode(_0x346bc5 = {}) {
-  const _0x4715e9 = getPlainObject(_0x346bc5?.generationParams);
-  return normalizeHappyHorseMode(_0x4715e9.happyhorse_mode ?? _0x346bc5?.happyhorse_mode);
+function getHappyHorseMode(options3 = {}) {
+  const plainObject = getPlainObject(options3?.generationParams);
+  return normalizeHappyHorseMode(plainObject.happyhorse_mode ?? options3?.happyhorse_mode);
 }
-function normalizeWan27Mode(_0x2db053) {
-  const _0x1aa0d1 = String(_0x2db053 || '')
+function normalizeWan27Mode(value32) {
+  const value33 = String(value32 || '')
     .trim()
     .toLowerCase();
-  return _0x1aa0d1 === 'video' || _0x1aa0d1 === 'reference' || _0x1aa0d1 === 'edit' ? _0x1aa0d1 : 'image';
+  return value33 === 'video' || value33 === 'reference' || value33 === 'edit' ? value33 : 'image';
 }
-function getWan27Mode(_0x2ec95a = {}) {
-  const _0x4990e7 = getPlainObject(_0x2ec95a?.generationParams);
-  return normalizeWan27Mode(_0x4990e7.wan27_mode ?? _0x2ec95a?.wan27_mode);
+function getWan27Mode(options4 = {}) {
+  const plainObject2 = getPlainObject(options4?.generationParams);
+  return normalizeWan27Mode(plainObject2.wan27_mode ?? options4?.wan27_mode);
 }
-function normalizeKlingV3OmniMode(_0x391d3d) {
-  const _0xe1452a = String(_0x391d3d || '')
+function normalizeKlingV3OmniMode(value34) {
+  const value35 = String(value34 || '')
     .trim()
     .toLowerCase();
-  return _0xe1452a === 'reference' || _0xe1452a === 'edit' ? _0xe1452a : 'image';
+  return value35 === 'reference' || value35 === 'edit' ? value35 : 'image';
 }
-function getKlingV3OmniMode(_0x1b01af = {}) {
-  const _0x4cf570 = getPlainObject(_0x1b01af?.generationParams);
-  return normalizeKlingV3OmniMode(_0x4cf570.kling_v3_omni_mode ?? _0x1b01af?.kling_v3_omni_mode);
+function getKlingV3OmniMode(options5 = {}) {
+  const plainObject3 = getPlainObject(options5?.generationParams);
+  return normalizeKlingV3OmniMode(plainObject3.kling_v3_omni_mode ?? options5?.kling_v3_omni_mode);
 }
-function normalizeMediaDurationSeconds(..._0xbbc91) {
-  for (const _0x16185c of _0xbbc91) {
-    const _0x3c5064 = Number(_0x16185c);
-    if (Number.isFinite(_0x3c5064) && _0x3c5064 > 0) return _0x3c5064;
+function normalizeMediaDurationSeconds(...args) {
+  for (const value36 of args) {
+    const count3 = Number(value36);
+    if (Number.isFinite(count3) && count3 > 0) return count3;
   }
   return 0;
 }
-function getVideoDurationFromSource(_0x54ea74 = {}, _0x2b4bee = null) {
+function getVideoDurationFromSource(options6 = {}, value37 = null) {
   return normalizeMediaDurationSeconds(
-    _0x2b4bee?.videoDuration,
-    _0x2b4bee?.duration,
-    _0x54ea74?.videoDuration,
-    _0x54ea74?.duration,
+    value37?.videoDuration,
+    value37?.duration,
+    options6?.videoDuration,
+    options6?.duration,
   );
 }
-function getVideoDurationFromAssetRef(_0x197fdb = {}) {
+function getVideoDurationFromAssetRef(options7 = {}) {
   return normalizeMediaDurationSeconds(
-    _0x197fdb?.videoDuration,
-    _0x197fdb?.duration,
-    _0x197fdb?.nodeData?.videoDuration,
-    _0x197fdb?.nodeData?.duration,
+    options7?.videoDuration,
+    options7?.duration,
+    options7?.nodeData?.videoDuration,
+    options7?.nodeData?.duration,
   );
 }
-function normalizeMediaSizeBytes(..._0x4ba70c) {
-  for (const _0x539d50 of _0x4ba70c) {
-    const _0x361554 = Number(_0x539d50);
-    if (Number.isFinite(_0x361554) && _0x361554 > 0) return _0x361554;
+function normalizeMediaSizeBytes(...args2) {
+  for (const value38 of args2) {
+    const count4 = Number(value38);
+    if (Number.isFinite(count4) && count4 > 0) return count4;
   }
   return 0;
 }
-function getAudioDurationFromSource(_0x5e54f7 = {}) {
-  return normalizeMediaDurationSeconds(_0x5e54f7?.audioDuration, _0x5e54f7?.duration);
+function getAudioDurationFromSource(options8 = {}) {
+  return normalizeMediaDurationSeconds(options8?.audioDuration, options8?.duration);
 }
-function getAudioDurationFromAssetRef(_0x4eef68 = {}) {
+function getAudioDurationFromAssetRef(options9 = {}) {
   return normalizeMediaDurationSeconds(
-    _0x4eef68?.audioDuration,
-    _0x4eef68?.duration,
-    _0x4eef68?.nodeData?.audioDuration,
-    _0x4eef68?.nodeData?.duration,
+    options9?.audioDuration,
+    options9?.duration,
+    options9?.nodeData?.audioDuration,
+    options9?.nodeData?.duration,
   );
 }
-function getAudioSizeBytesFromSource(_0x25df9f = {}) {
+function getAudioSizeBytesFromSource(options10 = {}) {
   return normalizeMediaSizeBytes(
-    _0x25df9f?.audioSizeBytes,
-    _0x25df9f?.audioByteSize,
-    _0x25df9f?.fileSize,
-    _0x25df9f?.sizeBytes,
-    _0x25df9f?.byteSize,
+    options10?.audioSizeBytes,
+    options10?.audioByteSize,
+    options10?.fileSize,
+    options10?.sizeBytes,
+    options10?.byteSize,
   );
 }
-function getAudioSizeBytesFromAssetRef(_0x22994e = {}) {
+function getAudioSizeBytesFromAssetRef(options11 = {}) {
   return normalizeMediaSizeBytes(
-    _0x22994e?.audioSizeBytes,
-    _0x22994e?.audioByteSize,
-    _0x22994e?.fileSize,
-    _0x22994e?.sizeBytes,
-    _0x22994e?.byteSize,
-    _0x22994e?.nodeData?.audioSizeBytes,
-    _0x22994e?.nodeData?.audioByteSize,
-    _0x22994e?.nodeData?.fileSize,
-    _0x22994e?.nodeData?.sizeBytes,
-    _0x22994e?.nodeData?.byteSize,
+    options11?.audioSizeBytes,
+    options11?.audioByteSize,
+    options11?.fileSize,
+    options11?.sizeBytes,
+    options11?.byteSize,
+    options11?.nodeData?.audioSizeBytes,
+    options11?.nodeData?.audioByteSize,
+    options11?.nodeData?.fileSize,
+    options11?.nodeData?.sizeBytes,
+    options11?.nodeData?.byteSize,
   );
 }
 function buildVideoInputUrlsByFixedKindSlot({
@@ -536,65 +539,60 @@ function buildVideoInputUrlsByFixedKindSlot({
   assetInputRefs: assetInputRefs = [],
   kind: kind = 'image',
 } = {}) {
-  const _0x539131 = String(kind || '').trim(),
-    _0x5466b6 = (fixedInputConfig?.visibleSlots || [])
-      .map((_0x144944) => String(_0x144944 || '').trim())
-      .filter(
-        (_0x19564d) => _0x19564d && String(fixedInputConfig?.slotKindById?.[_0x19564d] || '') === _0x539131,
-      );
-  if (_0x5466b6.length === 0) return {};
-  const _0xe95a3b = {},
-    _0x4acaf9 = new Set(),
-    _0x265fb6 = (_0x3c5dce, _0x20acc5) => {
-      const _0x17a230 = String(_0x3c5dce || '').trim(),
-        _0x2f1a4d = String(_0x20acc5 || '').trim();
-      if (!_0x17a230 || !_0x2f1a4d || _0xe95a3b[_0x17a230]) return false;
-      if (!_0x5466b6.includes(_0x17a230)) return false;
-      return ((_0xe95a3b[_0x17a230] = _0x2f1a4d), _0x4acaf9.add(_0x2f1a4d), true);
+  const kind2 = String(kind || '').trim(),
+    list7 = (fixedInputConfig?.visibleSlots || [])
+      .map((item5) => String(item5 || '').trim())
+      .filter((item6) => item6 && String(fixedInputConfig?.slotKindById?.[item6] || '') === kind2);
+  if (list7.length === 0) return {};
+  const occupiedSlots = {},
+    map2 = new Set(),
+    handler = (value39, value40) => {
+      const enabled4 = String(value39 || '').trim(),
+        enabled5 = String(value40 || '').trim();
+      if (!enabled4 || !enabled5 || occupiedSlots[enabled4]) return false;
+      if (!list7.includes(enabled4)) return false;
+      return ((occupiedSlots[enabled4] = enabled5), map2.add(enabled5), true);
     },
-    _0x44daab = (_0x523f95, { allowAuto: allowAuto = true } = {}) => {
-      const _0x4c1bc7 = String(_0x523f95?.url || '').trim();
-      if (!_0x4c1bc7 || _0x4acaf9.has(_0x4c1bc7)) return false;
-      const _0xb821fa = resolveEffectiveInputKind(_0x523f95) || _0x523f95?.type || _0x539131;
-      if (String(_0xb821fa || '').trim() !== _0x539131) return false;
-      const _0x12008b = resolveFixedInputSlotForRef({
+    handler2 = (refSlot, { allowAuto: allowAuto = true } = {}) => {
+      const enabled6 = String(refSlot?.url || '').trim();
+      if (!enabled6 || map2.has(enabled6)) return false;
+      const effectiveInputKind = resolveEffectiveInputKind(refSlot) || refSlot?.type || kind2;
+      if (String(effectiveInputKind || '').trim() !== kind2) return false;
+      const fixedInputSlotForRef = resolveFixedInputSlotForRef({
         fixedInputConfig: fixedInputConfig,
-        refSlot: _0x523f95?.refSlot,
-        kind: _0x539131,
-        occupiedSlots: _0xe95a3b,
-        sourceNode: _0x523f95?.nodeData || _0x523f95,
+        refSlot: refSlot?.refSlot,
+        kind: kind2,
+        occupiedSlots: occupiedSlots,
+        sourceNode: refSlot?.nodeData || refSlot,
       });
-      if (!allowAuto && _0x12008b.reason !== 'explicit') return false;
-      return _0x265fb6(_0x12008b.slot, _0x4c1bc7);
+      if (!allowAuto && fixedInputSlotForRef.reason !== 'explicit') return false;
+      return handler(fixedInputSlotForRef.slot, enabled6);
     },
-    _0x161dc7 = (_0x4a6c80) => {
-      const _0x4810a7 = String(_0x4a6c80 || '').trim();
-      if (!_0x4810a7 || _0x4acaf9.has(_0x4810a7)) return false;
-      const _0x5d9733 = resolveFixedInputSlotForRef({
+    handler3 = (value41) => {
+      const url = String(value41 || '').trim();
+      if (!url || map2.has(url)) return false;
+      const fixedInputSlotForRef2 = resolveFixedInputSlotForRef({
         fixedInputConfig: fixedInputConfig,
         refSlot: '',
-        kind: _0x539131,
-        occupiedSlots: _0xe95a3b,
-        sourceNode: { type: _0x539131, url: _0x4810a7 },
+        kind: kind2,
+        occupiedSlots: occupiedSlots,
+        sourceNode: { type: kind2, url: url },
       });
-      return _0x265fb6(_0x5d9733.slot, _0x4810a7);
+      return handler(fixedInputSlotForRef2.slot, url);
     },
-    _0x436716 = [
-      ...(Array.isArray(refs) ? refs : []),
-      ...(Array.isArray(assetInputRefs) ? assetInputRefs : []),
-    ];
+    list8 = [...(Array.isArray(refs) ? refs : []), ...(Array.isArray(assetInputRefs) ? assetInputRefs : [])];
   return (
-    _0x436716.forEach((_0x2e0544) => {
-      _0x44daab(_0x2e0544, { allowAuto: false });
+    list8.forEach((item7) => {
+      handler2(item7, { allowAuto: false });
     }),
-    (Array.isArray(refs) ? refs : []).forEach((_0x476e21) => {
-      _0x44daab(_0x476e21);
+    (Array.isArray(refs) ? refs : []).forEach((item8) => {
+      handler2(item8);
     }),
-    (Array.isArray(assetInputRefs) ? assetInputRefs : []).forEach((_0x2e5028) => {
-      const _0x1ba25b = resolveEffectiveInputKind(_0x2e5028) || _0x2e5028?.type;
-      if (_0x1ba25b === _0x539131) _0x161dc7(_0x2e5028?.url);
+    (Array.isArray(assetInputRefs) ? assetInputRefs : []).forEach((response2) => {
+      const effectiveInputKind2 = resolveEffectiveInputKind(response2) || response2?.type;
+      if (effectiveInputKind2 === kind2) handler3(response2?.url);
     }),
-    _0xe95a3b
+    occupiedSlots
   );
 }
 function buildVideoInputUrlsByFixedImageSlot({
@@ -618,81 +616,77 @@ function buildHappyHorseMediaPayload({
   assetVideoCount: assetVideoCount = 0,
   maxVideoSeconds: maxVideoSeconds = HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS,
 } = {}) {
-  const _0x4608f1 = String(prompt || '').trim();
-  if (!_0x4608f1) return { ok: false, message: videoTaskText('validation.happyHorse.promptRequired') };
-  const _0x4b9283 = Array.from(
+  const enabled7 = String(prompt || '').trim();
+  if (!enabled7) return { ok: false, message: videoTaskText('validation.happyHorse.promptRequired') };
+  const images2 = Array.from(
       new Set(
-        (Array.isArray(images) ? images : [])
-          .map((_0x777217) => String(_0x777217 || '').trim())
-          .filter(Boolean),
+        (Array.isArray(images) ? images : []).map((item9) => String(item9 || '').trim()).filter(Boolean),
       ),
     ),
-    _0x1c26f0 = Array.from(
+    list9 = Array.from(
       new Set(
-        (Array.isArray(videos) ? videos : [])
-          .map((_0x45c33a) => String(_0x45c33a || '').trim())
-          .filter(Boolean),
+        (Array.isArray(videos) ? videos : []).map((item10) => String(item10 || '').trim()).filter(Boolean),
       ),
     ),
-    _0x206aea = normalizeHappyHorseMode(mode),
-    _0x1b9341 = _0x4b9283.length > 0 || _0x1c26f0.length > 0,
-    _0x152df4 = { ok: true, images: [], videos: [], inputUrls: [], mode: 'auto' },
-    _0x1dd089 = assetVideoCount > 0 ? videoTaskText('validation.removePromptVideoRefs') : '';
-  if (_0x206aea === 'auto') {
-    if (_0x4b9283.length > 0 || _0x1c26f0.length > 0)
+    happyHorseMode = normalizeHappyHorseMode(mode),
+    enabled8 = images2.length > 0 || list9.length > 0,
+    value42 = { ok: true, images: [], videos: [], inputUrls: [], mode: 'auto' },
+    hint = assetVideoCount > 0 ? videoTaskText('validation.removePromptVideoRefs') : '';
+  if (happyHorseMode === 'auto') {
+    if (images2.length > 0 || list9.length > 0)
       return { ok: false, message: videoTaskText('validation.happyHorse.chooseMode') };
-    return _0x152df4;
+    return value42;
   }
-  if (_0x206aea === 'image') {
-    if (_0x1c26f0.length > 0)
-      return { ok: false, message: videoTaskText('validation.imageModeRejectsVideo', { hint: _0x1dd089 }) };
-    if (!_0x4b9283[0]) {
-      if (!_0x1b9341) return _0x152df4;
+  if (happyHorseMode === 'image') {
+    if (list9.length > 0)
+      return { ok: false, message: videoTaskText('validation.imageModeRejectsVideo', { hint: hint }) };
+    if (!images2[0]) {
+      if (!enabled8) return value42;
       return { ok: false, message: videoTaskText('validation.imageModeNeedsFirstFrame') };
     }
     return {
       ok: true,
-      images: _0x4b9283.slice(0, 1),
+      images: images2.slice(0, 1),
       videos: [],
-      inputUrls: _0x4b9283.slice(0, 1),
+      inputUrls: images2.slice(0, 1),
       mode: 'image',
     };
   }
-  if (_0x206aea === 'reference') {
-    if (_0x1c26f0.length > 0)
+  if (happyHorseMode === 'reference') {
+    if (list9.length > 0)
       return {
         ok: false,
-        message: videoTaskText('validation.referenceImageModeRejectsVideo', { hint: _0x1dd089 }),
+        message: videoTaskText('validation.referenceImageModeRejectsVideo', { hint: hint }),
       };
-    if (_0x4b9283.length <= 0) {
-      if (!_0x1b9341) return _0x152df4;
+    if (images2.length <= 0) {
+      if (!enabled8) return value42;
       return { ok: false, message: videoTaskText('validation.referenceImageModeNeedsReference') };
     }
-    const _0x2fcd34 = _0x4b9283.slice(0, 9);
-    return { ok: true, images: _0x2fcd34, videos: [], inputUrls: _0x2fcd34, mode: 'reference' };
+    const images3 = images2.slice(0, 9);
+    return { ok: true, images: images3, videos: [], inputUrls: images3, mode: 'reference' };
   }
-  if (!_0x1c26f0[0]) {
-    if (!_0x1b9341) return _0x152df4;
+  if (!list9[0]) {
+    if (!enabled8) return value42;
     return { ok: false, message: videoTaskText('validation.videoEditNeedsVideo') };
   }
-  const _0x48e53c = _0x1c26f0[0],
-    _0x414d2a =
+  const value43 = list9[0],
+    value44 =
       (Array.isArray(videoEntries) ? videoEntries : []).find(
-        (_0x182ba8) => String(_0x182ba8?.url || '').trim() === _0x48e53c,
+        (response3) => String(response3?.url || '').trim() === value43,
       ) || {},
-    _0x21dcd2 = normalizeMediaDurationSeconds(_0x414d2a.duration),
-    _0x5abfde = Number(maxVideoSeconds),
-    _0x2ffca8 = Number.isFinite(_0x5abfde) && _0x5abfde > 0 ? _0x5abfde : HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS;
-  if (_0x21dcd2 > _0x2ffca8)
+    mediaDurationSeconds = normalizeMediaDurationSeconds(value44.duration),
+    count5 = Number(maxVideoSeconds),
+    seconds = Number.isFinite(count5) && count5 > 0 ? count5 : HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS;
+  if (mediaDurationSeconds > seconds)
     return {
       ok: false,
-      message: videoTaskText('validation.happyHorse.editVideoMaxSeconds', { seconds: _0x2ffca8 }),
+      message: videoTaskText('validation.happyHorse.editVideoMaxSeconds', { seconds: seconds }),
     };
   return {
     ok: true,
-    images: _0x4b9283.slice(0, 5),
-    videos: [_0x48e53c],
-    inputUrls: _0x4b9283.slice(0, 5),
+    images: images2.slice(0, 5),
+    videos: [value43],
+    inputUrls: images2.slice(0, 5),
     mode: 'edit',
   };
 }
@@ -701,18 +695,18 @@ function orderHappyHorseImageUrls({
   images: images = [],
   slotUrls: slotUrls = {},
 } = {}) {
-  const _0x1eaa62 = normalizeHappyHorseMode(mode),
-    _0x374ab1 = [],
-    _0x5f3603 = (_0x374d7a) => {
-      const _0x2d5127 = String(_0x374d7a || '').trim();
-      if (_0x2d5127 && !_0x374ab1.includes(_0x2d5127)) _0x374ab1.push(_0x2d5127);
+  const happyHorseMode2 = normalizeHappyHorseMode(mode),
+    list10 = [],
+    handler4 = (value45) => {
+      const value46 = String(value45 || '').trim();
+      if (value46 && !list10.includes(value46)) list10.push(value46);
     };
-  if (_0x1eaa62 === 'image') _0x5f3603(slotUrls.firstFrame);
+  if (happyHorseMode2 === 'image') handler4(slotUrls.firstFrame);
   else {
-    if (_0x1eaa62 === 'reference') _0x5f3603(slotUrls.referenceImage);
-    else _0x1eaa62 === 'edit' && _0x5f3603(slotUrls.editRefImage);
+    if (happyHorseMode2 === 'reference') handler4(slotUrls.referenceImage);
+    else happyHorseMode2 === 'edit' && handler4(slotUrls.editRefImage);
   }
-  return ((Array.isArray(images) ? images : []).forEach(_0x5f3603), _0x374ab1);
+  return ((Array.isArray(images) ? images : []).forEach(handler4), list10);
 }
 function buildWan27MediaPayload({
   mode: mode = 'image',
@@ -723,100 +717,97 @@ function buildWan27MediaPayload({
   audioEntries: audioEntries = [],
   assetVideoCount: assetVideoCount = 0,
 } = {}) {
-  const _0x86f5b0 = normalizeWan27Mode(mode),
-    _0x2d45df = (_0x19a958) =>
+  const wan27Mode = normalizeWan27Mode(mode),
+    handler5 = (value47) =>
       Array.from(
         new Set(
-          (Array.isArray(_0x19a958) ? _0x19a958 : [])
-            .map((_0x5d284d) => String(_0x5d284d || '').trim())
+          (Array.isArray(value47) ? value47 : [])
+            .map((item11) => String(item11 || '').trim())
             .filter(Boolean),
         ),
       ),
-    _0x239995 = _0x2d45df(images),
-    _0x4b3978 = _0x2d45df(videos),
-    _0x8a6f0 = _0x2d45df(audios),
-    _0x590aba = assetVideoCount > 0 ? videoTaskText('validation.removePromptVideoRefs') : '',
-    _0x4c48f6 = (_0x233587) => {
-      if (!_0x233587) return null;
-      const _0x9a61b =
+    list11 = handler5(images),
+    videos2 = handler5(videos),
+    list12 = handler5(audios),
+    hint2 = assetVideoCount > 0 ? videoTaskText('validation.removePromptVideoRefs') : '',
+    handler6 = (enabled9) => {
+      if (!enabled9) return null;
+      const value48 =
           (Array.isArray(audioEntries) ? audioEntries : []).find(
-            (_0x5818cc) => String(_0x5818cc?.url || '').trim() === _0x233587,
+            (response4) => String(response4?.url || '').trim() === enabled9,
           ) || {},
-        _0x4c7900 = normalizeMediaDurationSeconds(_0x9a61b.duration);
+        mediaDurationSeconds2 = normalizeMediaDurationSeconds(value48.duration);
       if (
-        _0x4c7900 > 0 &&
-        (_0x4c7900 < WAN27_AUDIO_INPUT_MIN_SECONDS || _0x4c7900 > WAN27_AUDIO_INPUT_MAX_SECONDS)
+        mediaDurationSeconds2 > 0 &&
+        (mediaDurationSeconds2 < WAN27_AUDIO_INPUT_MIN_SECONDS ||
+          mediaDurationSeconds2 > WAN27_AUDIO_INPUT_MAX_SECONDS)
       )
         return videoTaskText('validation.wan27.audioDuration');
-      const _0x5dccaf = normalizeMediaSizeBytes(_0x9a61b.sizeBytes);
-      if (_0x5dccaf > WAN27_AUDIO_INPUT_MAX_BYTES) return videoTaskText('validation.wan27.audioSize');
+      const mediaSizeBytes = normalizeMediaSizeBytes(value48.sizeBytes);
+      if (mediaSizeBytes > WAN27_AUDIO_INPUT_MAX_BYTES) return videoTaskText('validation.wan27.audioSize');
       return null;
     },
-    _0x4872c9 = (_0x1c6da0) =>
+    handler7 = (value49) =>
       (Array.isArray(videoEntries) ? videoEntries : []).find(
-        (_0x163d21) => String(_0x163d21?.url || '').trim() === _0x1c6da0,
+        (response5) => String(response5?.url || '').trim() === value49,
       ) || {},
-    _0x5389a6 = (_0x1c98de) => normalizeMediaDurationSeconds(_0x4872c9(_0x1c98de).duration);
-  if (_0x86f5b0 === 'video') {
-    if (_0x239995.length > 0)
-      return { ok: false, message: videoTaskText('validation.videoExtendRejectsImage', { hint: _0x590aba }) };
-    if (_0x8a6f0.length > 0)
-      return { ok: false, message: videoTaskText('validation.videoExtendRejectsAudio') };
-    if (!_0x4b3978[0]) return { ok: true, images: [], videos: [], audios: [], inputUrls: [] };
-    const _0x258065 = _0x4b3978[0],
-      _0xe26304 = _0x5389a6(_0x258065);
-    if (_0xe26304 > WAN27_VIDEO_EXTEND_MAX_SECONDS)
+    handler8 = (value50) => normalizeMediaDurationSeconds(handler7(value50).duration);
+  if (wan27Mode === 'video') {
+    if (list11.length > 0)
+      return { ok: false, message: videoTaskText('validation.videoExtendRejectsImage', { hint: hint2 }) };
+    if (list12.length > 0) return { ok: false, message: videoTaskText('validation.videoExtendRejectsAudio') };
+    if (!videos2[0]) return { ok: true, images: [], videos: [], audios: [], inputUrls: [] };
+    const value51 = videos2[0],
+      value52 = handler8(value51);
+    if (value52 > WAN27_VIDEO_EXTEND_MAX_SECONDS)
       return { ok: false, message: videoTaskText('validation.wan27.extendMaxSeconds') };
-    return { ok: true, images: [], videos: [_0x258065], audios: [], inputUrls: [] };
+    return { ok: true, images: [], videos: [value51], audios: [], inputUrls: [] };
   }
-  if (_0x86f5b0 === 'reference') {
-    const _0x38e84f = _0x239995.slice(0, 1),
-      _0x2993ed = _0x4b3978.slice(0, 1);
-    if (_0x38e84f.length <= 0 && _0x2993ed.length <= 0)
+  if (wan27Mode === 'reference') {
+    const images4 = list11.slice(0, 1),
+      videos3 = videos2.slice(0, 1);
+    if (images4.length <= 0 && videos3.length <= 0)
       return { ok: false, message: videoTaskText('validation.referenceVideoNeedsMedia') };
-    const _0x354b9a = _0x2993ed[0] || '',
-      _0x108f6f = _0x5389a6(_0x354b9a);
-    if (_0x108f6f > WAN27_REFERENCE_VIDEO_MAX_SECONDS)
+    const value53 = videos3[0] || '',
+      value54 = handler8(value53);
+    if (value54 > WAN27_REFERENCE_VIDEO_MAX_SECONDS)
       return { ok: false, message: videoTaskText('validation.wan27.referenceVideoMaxSeconds') };
-    const _0x8e4f7a = _0x8a6f0[0] || '',
-      _0x2aa3d6 = _0x4c48f6(_0x8e4f7a);
-    if (_0x2aa3d6) return { ok: false, message: _0x2aa3d6 };
-    if (_0x8e4f7a && _0x38e84f.length <= 0)
+    const audios2 = list12[0] || '',
+      message = handler6(audios2);
+    if (message) return { ok: false, message: message };
+    if (audios2 && images4.length <= 0)
       return { ok: false, message: videoTaskText('validation.referenceAudioNeedsImage') };
     return {
       ok: true,
-      images: _0x38e84f,
-      videos: _0x2993ed,
-      audios: _0x8e4f7a ? [_0x8e4f7a] : [],
-      inputUrls: _0x38e84f,
+      images: images4,
+      videos: videos3,
+      audios: audios2 ? [audios2] : [],
+      inputUrls: images4,
     };
   }
-  if (_0x86f5b0 === 'edit') {
-    if (!_0x4b3978[0]) return { ok: false, message: videoTaskText('validation.videoEditNeedsSourceVideo') };
-    if (_0x239995.length > 0)
+  if (wan27Mode === 'edit') {
+    if (!videos2[0]) return { ok: false, message: videoTaskText('validation.videoEditNeedsSourceVideo') };
+    if (list11.length > 0)
       return { ok: false, message: videoTaskText('validation.videoEditRejectsImageUseReferenceVideo') };
-    if (_0x8a6f0.length > 0) return { ok: false, message: videoTaskText('validation.videoEditRejectsAudio') };
-    const _0x29d482 = _0x4b3978[0],
-      _0x46306a = _0x5389a6(_0x29d482);
-    if (
-      _0x46306a > 0 &&
-      (_0x46306a < WAN27_EDIT_VIDEO_MIN_SECONDS || _0x46306a > WAN27_EDIT_VIDEO_MAX_SECONDS)
-    )
+    if (list12.length > 0) return { ok: false, message: videoTaskText('validation.videoEditRejectsAudio') };
+    const value55 = videos2[0],
+      count6 = handler8(value55);
+    if (count6 > 0 && (count6 < WAN27_EDIT_VIDEO_MIN_SECONDS || count6 > WAN27_EDIT_VIDEO_MAX_SECONDS))
       return { ok: false, message: videoTaskText('validation.wan27.editVideoDuration') };
-    return { ok: true, images: [], videos: _0x4b3978.slice(0, 2), audios: [], inputUrls: [] };
+    return { ok: true, images: [], videos: videos2.slice(0, 2), audios: [], inputUrls: [] };
   }
-  if (_0x4b3978.length > 0)
-    return { ok: false, message: videoTaskText('validation.imageModeRejectsVideo', { hint: _0x590aba }) };
-  const _0x593e77 = _0x8a6f0[0] || '',
-    _0x1c4d12 = _0x4c48f6(_0x593e77);
-  if (_0x1c4d12) return { ok: false, message: _0x1c4d12 };
-  const _0x4542e5 = _0x239995.slice(0, 2);
+  if (videos2.length > 0)
+    return { ok: false, message: videoTaskText('validation.imageModeRejectsVideo', { hint: hint2 }) };
+  const audios3 = list12[0] || '',
+    message2 = handler6(audios3);
+  if (message2) return { ok: false, message: message2 };
+  const images5 = list11.slice(0, 2);
   return {
     ok: true,
-    images: _0x4542e5,
+    images: images5,
     videos: [],
-    audios: _0x593e77 ? [_0x593e77] : [],
-    inputUrls: _0x4542e5,
+    audios: audios3 ? [audios3] : [],
+    inputUrls: images5,
   };
 }
 function buildKlingV3OmniMediaPayload({
@@ -826,60 +817,59 @@ function buildKlingV3OmniMediaPayload({
   videoEntries: videoEntries = [],
   assetVideoCount: assetVideoCount = 0,
 } = {}) {
-  const _0x112056 = normalizeKlingV3OmniMode(mode),
-    _0x5bfe59 = (_0x2f8a6f) =>
+  const klingV3OmniMode = normalizeKlingV3OmniMode(mode),
+    handler9 = (value56) =>
       Array.from(
         new Set(
-          (Array.isArray(_0x2f8a6f) ? _0x2f8a6f : [])
-            .map((_0xcfed40) => String(_0xcfed40 || '').trim())
+          (Array.isArray(value56) ? value56 : [])
+            .map((item12) => String(item12 || '').trim())
             .filter(Boolean),
         ),
       ),
-    _0x5afc51 = _0x5bfe59(images),
-    _0x1cff18 = _0x5bfe59(videos),
-    _0x5e4bef = assetVideoCount > 0 ? videoTaskText('validation.removePromptVideoRefs') : '',
-    _0x22557d = (_0x44d43d) =>
+    images6 = handler9(images),
+    list13 = handler9(videos),
+    hint3 = assetVideoCount > 0 ? videoTaskText('validation.removePromptVideoRefs') : '',
+    handler10 = (value57) =>
       (Array.isArray(videoEntries) ? videoEntries : []).find(
-        (_0x4207f9) => String(_0x4207f9?.url || '').trim() === _0x44d43d,
+        (response6) => String(response6?.url || '').trim() === value57,
       ) || {},
-    _0x5b4e20 = (_0x35db42) => normalizeMediaDurationSeconds(_0x22557d(_0x35db42).duration);
-  if (_0x112056 === 'reference') {
-    const _0x1765b5 = _0x5afc51.slice(0, 1),
-      _0x525f47 = _0x1cff18.slice(0, 1);
-    if (_0x1765b5.length <= 0 && _0x525f47.length <= 0)
+    handler11 = (value58) => normalizeMediaDurationSeconds(handler10(value58).duration);
+  if (klingV3OmniMode === 'reference') {
+    const images7 = images6.slice(0, 1),
+      videos4 = list13.slice(0, 1);
+    if (images7.length <= 0 && videos4.length <= 0)
       return { ok: false, message: videoTaskText('validation.referenceVideoNeedsMedia') };
-    return { ok: true, images: _0x1765b5, videos: _0x525f47, audios: [], inputUrls: _0x1765b5 };
+    return { ok: true, images: images7, videos: videos4, audios: [], inputUrls: images7 };
   }
-  if (_0x112056 === 'edit') {
-    if (!_0x1cff18[0]) return { ok: false, message: videoTaskText('validation.videoEditNeedsSourceVideo') };
-    if (_0x5afc51.length > 0)
-      return { ok: false, message: videoTaskText('validation.videoEditRejectsImage') };
-    const _0x4af394 = _0x1cff18[0],
-      _0x2e85f7 = _0x5b4e20(_0x4af394);
+  if (klingV3OmniMode === 'edit') {
+    if (!list13[0]) return { ok: false, message: videoTaskText('validation.videoEditNeedsSourceVideo') };
+    if (images6.length > 0) return { ok: false, message: videoTaskText('validation.videoEditRejectsImage') };
+    const value59 = list13[0],
+      count7 = handler11(value59);
     if (
-      _0x2e85f7 > 0 &&
-      (_0x2e85f7 < KLING_V3_OMNI_VIDEO_MIN_SECONDS || _0x2e85f7 > KLING_V3_OMNI_EDIT_VIDEO_MAX_SECONDS)
+      count7 > 0 &&
+      (count7 < KLING_V3_OMNI_VIDEO_MIN_SECONDS || count7 > KLING_V3_OMNI_EDIT_VIDEO_MAX_SECONDS)
     )
       return { ok: false, message: videoTaskText('validation.klingV3Omni.editVideoDuration') };
-    return { ok: true, images: [], videos: [_0x4af394], audios: [], inputUrls: [] };
+    return { ok: true, images: [], videos: [value59], audios: [], inputUrls: [] };
   }
-  if (_0x1cff18.length > 0)
-    return { ok: false, message: videoTaskText('validation.imageModeRejectsVideo', { hint: _0x5e4bef }) };
+  if (list13.length > 0)
+    return { ok: false, message: videoTaskText('validation.imageModeRejectsVideo', { hint: hint3 }) };
   return {
     ok: true,
-    images: _0x5afc51.slice(0, 2),
+    images: images6.slice(0, 2),
     videos: [],
     audios: [],
-    inputUrls: _0x5afc51.slice(0, 2),
+    inputUrls: images6.slice(0, 2),
   };
 }
-function replaceKlingO1PromptImageReferences(_0x575d95, _0x47a4fd) {
-  const _0x364b20 = Math.max(0, Math.trunc(Number(_0x47a4fd) || 0));
-  if (_0x364b20 <= 0) return String(_0x575d95 || '');
-  return String(_0x575d95 || '').replace(/@?图片\s*([1-9]\d*)/g, (_0x351864, _0x2d240e) => {
-    const _0x3049b5 = Number.parseInt(String(_0x2d240e || ''), 10);
-    if (!Number.isFinite(_0x3049b5) || _0x3049b5 < 1 || _0x3049b5 > _0x364b20) return _0x351864;
-    return '<<<image_' + _0x3049b5 + '>>>';
+function replaceKlingO1PromptImageReferences(value60, value61) {
+  const count8 = Math.max(0, Math.trunc(Number(value61) || 0));
+  if (count8 <= 0) return String(value60 || '');
+  return String(value60 || '').replace(/@?图片\s*([1-9]\d*)/g, (value62, value63) => {
+    const count9 = Number.parseInt(String(value63 || ''), 10);
+    if (!Number.isFinite(count9) || count9 < 1 || count9 > count8) return value62;
+    return '<<<image_' + count9 + '>>>';
   });
 }
 function buildKlingO1MediaPayload({
@@ -891,129 +881,128 @@ function buildKlingO1MediaPayload({
   hasEditVideo: hasEditVideo = false,
   hasFeatureVideo: hasFeatureVideo = false,
 } = {}) {
-  const _0x2b3226 = (_0x5221ad) =>
+  const run = (value64) =>
       Array.from(
         new Set(
-          (Array.isArray(_0x5221ad) ? _0x5221ad : [])
-            .map((_0x2fe426) => String(_0x2fe426 || '').trim())
+          (Array.isArray(value64) ? value64 : [])
+            .map((item13) => String(item13 || '').trim())
             .filter(Boolean),
         ),
       ),
-    _0xf45dd2 = _0x2b3226(images),
-    _0x1418a5 = _0x2b3226(videos),
-    _0x4081c7 = String(videoRole || '').trim() === 'feature' ? 'feature' : 'base',
-    _0x16a570 = (_0x5156c7) =>
+    list14 = run(images),
+    list15 = run(videos),
+    value65 = String(videoRole || '').trim() === 'feature' ? 'feature' : 'base',
+    handler12 = (value66) =>
       (Array.isArray(videoEntries) ? videoEntries : []).find(
-        (_0x462ef8) => String(_0x462ef8?.url || '').trim() === _0x5156c7,
+        (response7) => String(response7?.url || '').trim() === value66,
       ) || {},
-    _0x54270a = (_0x2d1b43) => normalizeMediaDurationSeconds(_0x16a570(_0x2d1b43).duration);
+    handler13 = (value67) => normalizeMediaDurationSeconds(handler12(value67).duration);
   if (hasEditVideo && hasFeatureVideo)
     return { ok: false, message: videoTaskText('validation.klingO1.editAndFeatureExclusive') };
-  if (_0x1418a5.length > 1) return { ok: false, message: videoTaskText('validation.klingO1.onlyOneVideo') };
-  const _0x8e3b = _0x1418a5[0] || '';
-  if (_0x8e3b) {
-    const _0x13e9cf = _0x54270a(_0x8e3b);
-    if (_0x13e9cf > 0 && (_0x13e9cf < KLING_O1_VIDEO_MIN_SECONDS || _0x13e9cf > KLING_O1_VIDEO_MAX_SECONDS))
+  if (list15.length > 1) return { ok: false, message: videoTaskText('validation.klingO1.onlyOneVideo') };
+  const value68 = list15[0] || '';
+  if (value68) {
+    const count10 = handler13(value68);
+    if (count10 > 0 && (count10 < KLING_O1_VIDEO_MIN_SECONDS || count10 > KLING_O1_VIDEO_MAX_SECONDS))
       return { ok: false, message: videoTaskText('validation.klingO1.referenceVideoDuration') };
-    if (_0x4081c7 === 'base') {
-      if (_0xf45dd2.length > 0)
+    if (value65 === 'base') {
+      if (list14.length > 0)
         return { ok: false, message: videoTaskText('validation.klingO1.editVideoRejectsImage') };
       return {
         ok: true,
         prompt: replaceKlingO1PromptImageReferences(prompt, 0),
         images: [],
-        videos: [_0x8e3b],
+        videos: [value68],
         inputUrls: [],
         videoRole: 'base',
       };
     }
-    if (_0xf45dd2.length > 1)
+    if (list14.length > 1)
       return { ok: false, message: videoTaskText('validation.klingO1.featureVideoMaxOneImage') };
-    const _0xabbc8d = _0xf45dd2.slice(0, 1);
+    const images8 = list14.slice(0, 1);
     return {
       ok: true,
-      prompt: replaceKlingO1PromptImageReferences(prompt, _0xabbc8d.length),
-      images: _0xabbc8d,
-      videos: [_0x8e3b],
-      inputUrls: _0xabbc8d,
+      prompt: replaceKlingO1PromptImageReferences(prompt, images8.length),
+      images: images8,
+      videos: [value68],
+      inputUrls: images8,
       videoRole: 'feature',
     };
   }
-  const _0x141c3d = _0xf45dd2.slice(0, 2);
+  const images9 = list14.slice(0, 2);
   return {
     ok: true,
-    prompt: replaceKlingO1PromptImageReferences(prompt, _0x141c3d.length),
-    images: _0x141c3d,
+    prompt: replaceKlingO1PromptImageReferences(prompt, images9.length),
+    images: images9,
     videos: [],
-    inputUrls: _0x141c3d,
+    inputUrls: images9,
     videoRole: '',
   };
 }
-export function createVideoNodeTaskOrchestrationModule(_0x267351) {
+export function createVideoNodeTaskOrchestrationModule(value69) {
   const {
-      store: _0x4cc8fc,
-      api: _0x285cdc,
-      getImage: _0x215b94,
-      startLoading: _0x55f9d6,
-      stopLoading: _0x11f58d,
-      ensureConfig: _0x568d9b,
-      getProviderConfig: _0x358106,
-      isVideoVipModel: _0x212b55,
-      ensureVipSessionRecheck: _0x9f6bfe,
-    } = _0x267351,
-    _0x22c9ed = 'DREAMINA_POLL_TIMEOUT',
-    _0x4fb3f5 = 20 * 60 * 0x3e8,
-    _0x297b39 = 20 * 0x3e8,
-    _0x52a04a = 24 * 60 * 60 * 0x3e8,
-    _0x336be9 = () =>
-      typeof _0x4cc8fc.getStateRaw === 'function' ? _0x4cc8fc.getStateRaw() : _0x4cc8fc.getState();
-  class _0x34e28e {
-    ['_isDreaminaPollTimeoutError'](_0x1390da) {
-      const _0x3ccd35 = String(_0x1390da?.code || '')
+      store: store,
+      api: api,
+      getImage: getImage,
+      startLoading: startLoading,
+      stopLoading: stopLoading,
+      ensureConfig: ensureConfig,
+      getProviderConfig: getProviderConfig,
+      isVideoVipModel: isVideoVipModel,
+      ensureVipSessionRecheck: ensureVipSessionRecheck,
+    } = value69,
+    value70 = 'DREAMINA_POLL_TIMEOUT',
+    maxWaitMs = 20 * 60 * 0x3e8,
+    intervalMs = 20 * 0x3e8,
+    maxWaitMs2 = 24 * 60 * 60 * 0x3e8,
+    handler14 = () => (typeof store.getStateRaw === 'function' ? store.getStateRaw() : store.getState());
+  class value71 {
+    ['_isDreaminaPollTimeoutError'](error2) {
+      const value72 = String(error2?.code || '')
         .trim()
         .toUpperCase();
-      if (_0x3ccd35 === _0x22c9ed || _0x3ccd35 === 'TIMEOUT') return true;
-      const _0x11dfd2 = String(_0x1390da?.type || '')
+      if (value72 === value70 || value72 === 'TIMEOUT') return true;
+      const value73 = String(error2?.type || '')
         .trim()
         .toUpperCase();
-      if (_0x11dfd2 === 'TIMEOUT' || _0x11dfd2 === 'TASK_TIMEOUT') return true;
-      const _0x56afbc = String(_0x1390da?.message || '')
+      if (value73 === 'TIMEOUT' || value73 === 'TASK_TIMEOUT') return true;
+      const list16 = String(error2?.message || '')
         .trim()
         .toLowerCase();
-      return _0x56afbc.includes('timeout') || _0x56afbc.includes('超时');
+      return list16.includes('timeout') || list16.includes('超时');
     }
-    ['_buildDreaminaBackgroundPendingSnapshot'](_0x465a86 = '') {
+    ['_buildDreaminaBackgroundPendingSnapshot'](submitId2 = '') {
       return this._buildDreaminaPendingSnapshot({
-        submitId: _0x465a86,
+        submitId: submitId2,
         phase: 'generating',
         label: videoTaskText('task.backgroundQueueing'),
       });
     }
-    ['_showDreaminaBackgroundQueueingToast'](_0x30fe16 = '') {
-      const _0x10d00b =
-        String(_0x30fe16 || '').trim() ||
-        String(_0x4cc8fc.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '').trim() ||
+    ['_showDreaminaBackgroundQueueingToast'](value74 = '') {
+      const value75 =
+        String(value74 || '').trim() ||
+        String(store.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '').trim() ||
         String(this.nodeId || '').trim();
-      if (_0x10d00b && dreaminaBackgroundQueueToastKeys.has(_0x10d00b)) return;
-      if (_0x10d00b) dreaminaBackgroundQueueToastKeys.add(_0x10d00b);
+      if (value75 && dreaminaBackgroundQueueToastKeys.has(value75)) return;
+      if (value75) dreaminaBackgroundQueueToastKeys.add(value75);
       window.showToast?.(videoTaskText('toasts.dreaminaBackgroundQueueing'), 'warning');
     }
-    ['_resolveDreaminaAdaptiveAspectRatioFromNode'](_0x5cbc2a = this._data) {
-      const _0x519285 = Number(_0x5cbc2a?.width || 0),
-        _0x64d8f8 = Number(_0x5cbc2a?.height || 0);
+    ['_resolveDreaminaAdaptiveAspectRatioFromNode'](model2 = this._data) {
+      const width6 = Number(model2?.width || 0),
+        height3 = Number(model2?.height || 0);
       return (
         pickClosestRatioForProviderModel({
-          provider: resolveDreaminaStyleVideoProvider(_0x5cbc2a?.model, _0x5cbc2a?.provider),
-          model: _0x5cbc2a?.model,
-          width: _0x519285,
-          height: _0x64d8f8,
+          provider: resolveDreaminaStyleVideoProvider(model2?.model, model2?.provider),
+          model: model2?.model,
+          width: width6,
+          height: height3,
         }) || '1:1'
       );
     }
-    ['_hasResolvedVideoResult'](_0x5c9761 = this._data) {
-      const _0x154ec6 = Array.isArray(_0x5c9761?.videos) ? _0x5c9761.videos : [];
-      if (_0x154ec6.length > 0) return true;
-      return !!String(_0x5c9761?.videoUrl || '').trim() || !!String(_0x5c9761?.localPath || '').trim();
+    ['_hasResolvedVideoResult'](value76 = this._data) {
+      const list17 = Array.isArray(value76?.videos) ? value76.videos : [];
+      if (list17.length > 0) return true;
+      return !!String(value76?.videoUrl || '').trim() || !!String(value76?.localPath || '').trim();
     }
     ['_persistDreaminaResumeCache']() {
       try {
@@ -1028,106 +1017,94 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
     ['_persistAsyncResumeCache']() {
       this._persistRunningHubResumeCache();
     }
-    ['_isDreaminaRecoverableRunningTask'](_0xad0372 = this._data) {
-      if (!this._isDreaminaVideoNode(_0xad0372)) return false;
-      const _0x2f711d = String(_0xad0372?.dreaminaSubmitId || '').trim();
-      if (!_0x2f711d) return false;
-      const _0x36a10a = normalizeTaskStatus(_0xad0372?.jobStatus),
-        _0x19940a = normalizeTaskStatus(_0xad0372?.dreaminaTaskPhase),
-        _0x4e0e10 = normalizeTaskStatus(_0xad0372?.dreaminaTaskStatus);
-      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(_0x36a10a)) return false;
-      if (DREAMINA_NON_RECOVERABLE_PHASES.has(_0x19940a)) return false;
-      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(_0x4e0e10)) return false;
+    ['_isDreaminaRecoverableRunningTask'](value77 = this._data) {
+      if (!this._isDreaminaVideoNode(value77)) return false;
+      const enabled10 = String(value77?.dreaminaSubmitId || '').trim();
+      if (!enabled10) return false;
+      const taskStatus = normalizeTaskStatus(value77?.jobStatus),
+        taskStatus2 = normalizeTaskStatus(value77?.dreaminaTaskPhase),
+        taskStatus3 = normalizeTaskStatus(value77?.dreaminaTaskStatus);
+      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(taskStatus)) return false;
+      if (DREAMINA_NON_RECOVERABLE_PHASES.has(taskStatus2)) return false;
+      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(taskStatus3)) return false;
       return true;
     }
-    ['_isStaleActiveDreaminaTask'](_0x3ce338 = this._data) {
+    ['_isStaleActiveDreaminaTask'](value78 = this._data) {
       if (!this._isGenerating) return false;
-      if (_0x3ce338?.dreaminaTaskRecovering === true) return false;
+      if (value78?.dreaminaTaskRecovering === true) return false;
       if (this._dreaminaResumePromise) return false;
-      const _0x31a6c9 = Number(
-        _0x3ce338?.dreaminaTaskLastCheckedAt ||
-          _0x3ce338?.dreaminaTaskStartedAt ||
-          _0x3ce338?.generationStartTime ||
+      const count11 = Number(
+        value78?.dreaminaTaskLastCheckedAt ||
+          value78?.dreaminaTaskStartedAt ||
+          value78?.generationStartTime ||
           0,
       );
-      if (!Number.isFinite(_0x31a6c9) || _0x31a6c9 <= 0) return false;
-      return Date.now() - _0x31a6c9 >= DREAMINA_STALE_ACTIVE_RESUME_MS;
+      if (!Number.isFinite(count11) || count11 <= 0) return false;
+      return Date.now() - count11 >= DREAMINA_STALE_ACTIVE_RESUME_MS;
     }
-    ['_shouldKeepDreaminaLoading'](
-      _0x8b64c3 = _0x4cc8fc.getState().nodes?.[this.nodeId] || this._data || {},
-    ) {
-      if (!this._isDreaminaVideoNode(_0x8b64c3)) return false;
-      const _0x5dc486 = normalizeTaskStatus(_0x8b64c3?.jobStatus),
-        _0x384938 = normalizeTaskStatus(_0x8b64c3?.dreaminaTaskPhase),
-        _0x116855 = normalizeTaskStatus(_0x8b64c3?.dreaminaTaskStatus);
-      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(_0x5dc486)) return false;
-      if (DREAMINA_NON_RECOVERABLE_PHASES.has(_0x384938)) return false;
-      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(_0x116855)) return false;
-      if (_0x8b64c3?.isGenerating === true) return true;
+    ['_shouldKeepDreaminaLoading'](value79 = store.getState().nodes?.[this.nodeId] || this._data || {}) {
+      if (!this._isDreaminaVideoNode(value79)) return false;
+      const taskStatus4 = normalizeTaskStatus(value79?.jobStatus),
+        taskStatus5 = normalizeTaskStatus(value79?.dreaminaTaskPhase),
+        taskStatus6 = normalizeTaskStatus(value79?.dreaminaTaskStatus);
+      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(taskStatus4)) return false;
+      if (DREAMINA_NON_RECOVERABLE_PHASES.has(taskStatus5)) return false;
+      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(taskStatus6)) return false;
+      if (value79?.isGenerating === true) return true;
       if (
-        String(_0x8b64c3?.jobStatus || '')
+        String(value79?.jobStatus || '')
           .trim()
           .toLowerCase() === 'running'
       )
         return true;
-      if (_0x8b64c3?.dreaminaTaskRecovering === true) return true;
+      if (value79?.dreaminaTaskRecovering === true) return true;
       if (this._dreaminaResumePromise) return true;
-      return this._isDreaminaRecoverableRunningTask(_0x8b64c3);
+      return this._isDreaminaRecoverableRunningTask(value79);
     }
-    ['_inferAsyncProviderFromModel'](_0x221b16, _0x45d8b0 = '') {
-      const _0x1002de = resolveModelProvider(_0x221b16, '', { allowProviderHint: false });
-      if (_0x1002de) return _0x1002de;
-      const _0x2f0529 = String(_0x45d8b0 || '')
+    ['_inferAsyncProviderFromModel'](value80, value81 = '') {
+      const modelProvider = resolveModelProvider(value80, '', { allowProviderHint: false });
+      if (modelProvider) return modelProvider;
+      const value82 = String(value81 || '')
         .trim()
         .toLowerCase();
-      if (_0x2f0529) return _0x2f0529;
-      const _0x466ab2 = String(_0x221b16 || '').trim();
-      if (_0x466ab2 && !_0x466ab2.includes('/')) return 'grsai';
+      if (value82) return value82;
+      const list18 = String(value80 || '').trim();
+      if (list18 && !list18.includes('/')) return 'grsai';
       return '';
     }
-    ['_isRunningHubRecoverableRunningTask'](_0x8e4f71 = this._data) {
-      if (!this._isRunninghubWorkflowModel(_0x8e4f71?.model, _0x8e4f71?.provider)) return false;
-      const _0x407f48 = String(_0x8e4f71?.rhTaskId || '').trim();
-      if (!_0x407f48) return false;
-      const _0x1ad4d9 = String(_0x8e4f71?.rhTaskStatus || '')
+    ['_isRunningHubRecoverableRunningTask'](value83 = this._data) {
+      if (!this._isRunninghubWorkflowModel(value83?.model, value83?.provider)) return false;
+      const enabled11 = String(value83?.rhTaskId || '').trim();
+      if (!enabled11) return false;
+      const value84 = String(value83?.rhTaskStatus || '')
         .trim()
         .toLowerCase();
-      if (
-        _0x1ad4d9 === 'success' ||
-        _0x1ad4d9 === 'failed' ||
-        _0x1ad4d9 === 'idle' ||
-        _0x1ad4d9 === 'cancelled'
-      )
+      if (value84 === 'success' || value84 === 'failed' || value84 === 'idle' || value84 === 'cancelled')
         return false;
       return true;
     }
-    ['_isAsyncRecoverableRunningTask'](_0x2553d3 = this._data) {
-      const _0x5dc3e3 = String(_0x2553d3?.asyncTaskId || '').trim();
-      if (!_0x5dc3e3) return false;
-      const _0x479ba6 = this._inferAsyncProviderFromModel(
-        _0x2553d3?.model,
-        _0x2553d3?.asyncTaskProvider || _0x2553d3?.provider || '',
+    ['_isAsyncRecoverableRunningTask'](value85 = this._data) {
+      const enabled12 = String(value85?.asyncTaskId || '').trim();
+      if (!enabled12) return false;
+      const enabled13 = this._inferAsyncProviderFromModel(
+        value85?.model,
+        value85?.asyncTaskProvider || value85?.provider || '',
       );
       if (
-        !_0x479ba6 ||
-        _0x479ba6 === 'runninghubwf' ||
-        _0x479ba6 === 'runninghub' ||
-        _0x479ba6 === 'dreamina'
+        !enabled13 ||
+        enabled13 === 'runninghubwf' ||
+        enabled13 === 'runninghub' ||
+        enabled13 === 'dreamina'
       )
         return false;
-      const _0x26e674 = String(_0x2553d3?.asyncTaskKind || '')
+      const value86 = String(value85?.asyncTaskKind || '')
         .trim()
         .toLowerCase();
-      if (_0x26e674 && _0x26e674 !== 'video') return false;
-      const _0x5735da = String(_0x2553d3?.asyncTaskStatus || '')
+      if (value86 && value86 !== 'video') return false;
+      const value87 = String(value85?.asyncTaskStatus || '')
         .trim()
         .toLowerCase();
-      if (
-        _0x5735da === 'success' ||
-        _0x5735da === 'failed' ||
-        _0x5735da === 'idle' ||
-        _0x5735da === 'cancelled'
-      )
+      if (value87 === 'success' || value87 === 'failed' || value87 === 'idle' || value87 === 'cancelled')
         return false;
       return true;
     }
@@ -1163,103 +1140,103 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
         asyncTaskRecovering: recovering === true,
       };
     }
-    async ['_buildResumePayload'](_0x1916dd = this._data, _0x899741 = {}) {
-      const _0x52fc66 = _0x1916dd || {},
-        _0x15f122 = String(_0x52fc66?.model || '').trim(),
-        _0x3aabfe = this._inferAsyncProviderFromModel(
-          _0x15f122,
-          _0x899741?.providerHint || _0x52fc66?.asyncTaskProvider || _0x52fc66?.provider || '',
+    async ['_buildResumePayload'](value88 = this._data, value89 = {}) {
+      const value90 = value88 || {},
+        model3 = String(value90?.model || '').trim(),
+        provider2 = this._inferAsyncProviderFromModel(
+          model3,
+          value89?.providerHint || value90?.asyncTaskProvider || value90?.provider || '',
         );
-      if (!_0x15f122 || !_0x3aabfe)
-        throw new Error(videoTaskText('errors.missingAsyncResumeModelOrProvider'));
-      await _0x568d9b();
-      const _0x511f07 = _0x358106(_0x3aabfe) || {},
-        _0x135800 = String(
-          _0x3aabfe === 'runninghub'
-            ? _0x511f07.modelApiKey || _0x511f07.apiKey || ''
-            : _0x511f07.apiKey || window._appApiKey || '',
+      if (!model3 || !provider2) throw new Error(videoTaskText('errors.missingAsyncResumeModelOrProvider'));
+      await ensureConfig();
+      const value91 = getProviderConfig(provider2) || {},
+        apiKey = String(
+          provider2 === 'runninghub'
+            ? value91.modelApiKey || value91.apiKey || ''
+            : value91.apiKey || window._appApiKey || '',
         ).trim();
-      return { nodeId: this.nodeId, model: _0x15f122, provider: _0x3aabfe, apiKey: _0x135800 };
+      return { nodeId: this.nodeId, model: model3, provider: provider2, apiKey: apiKey };
     }
     ['_syncLocalTaskNodeData']() {
-      const _0x219196 = _0x4cc8fc.getState().nodes?.[this.nodeId];
-      if (_0x219196) this._data = _0x219196;
+      const value92 = store.getState().nodes?.[this.nodeId];
+      if (value92) this._data = value92;
       return this._data || {};
     }
-    ['_emitDreaminaTaskCenterUpdate'](_0x3de99f = {}, _0x9365ee = {}) {
-      const _0x4ed3b3 = String(
-          _0x3de99f?.submitId ||
-            _0x9365ee.taskId ||
-            _0x4cc8fc.getState().nodes?.[this.nodeId]?.dreaminaSubmitId ||
+    ['_emitDreaminaTaskCenterUpdate'](options12 = {}, result2 = {}) {
+      const taskId2 = String(
+          options12?.submitId ||
+            result2.taskId ||
+            store.getState().nodes?.[this.nodeId]?.dreaminaSubmitId ||
             '',
         ).trim(),
-        _0x56e36c = globalThis.window;
-      if (!_0x4ed3b3 || typeof _0x56e36c?.dispatchEvent !== 'function') return;
-      const _0x56f4a7 = String(_0x9365ee.status || mapDreaminaSnapshotToTaskCenterStatus(_0x3de99f)).trim(),
-        _0x3ce357 = _0x56f4a7 === 'complete' || _0x56f4a7 === 'failed' || _0x56f4a7 === 'cancelled';
-      _0x56e36c.dispatchEvent(
+        value93 = globalThis.window;
+      if (!taskId2 || typeof value93?.dispatchEvent !== 'function') return;
+      const status2 = String(result2.status || mapDreaminaSnapshotToTaskCenterStatus(options12)).trim(),
+        finishedAt = status2 === 'complete' || status2 === 'failed' || status2 === 'cancelled';
+      value93.dispatchEvent(
         new CustomEvent(GENERATION_TASK_CENTER_EVENT, {
           detail: {
-            taskId: _0x4ed3b3,
+            taskId: taskId2,
             nodeId: this.nodeId,
             kind: 'dreaminaVideo',
-            status: _0x56f4a7,
-            progress: _0x56f4a7 === 'complete' ? 1 : _0x56f4a7 === 'waiting' ? 0 : 0.45,
-            message: String(_0x9365ee.message || buildDreaminaTaskCenterMessage(_0x3de99f)).trim(),
+            status: status2,
+            progress: status2 === 'complete' ? 1 : status2 === 'waiting' ? 0 : 0.45,
+            message: String(result2.message || buildDreaminaTaskCenterMessage(options12)).trim(),
             error:
-              _0x56f4a7 === 'failed'
-                ? String(_0x9365ee.error || _0x3de99f?.failReason || _0x3de99f?.label || '').trim()
+              status2 === 'failed'
+                ? String(result2.error || options12?.failReason || options12?.label || '').trim()
                 : '',
-            result: _0x9365ee.result && typeof _0x9365ee.result === 'object' ? _0x9365ee.result : null,
+            result: result2.result && typeof result2.result === 'object' ? result2.result : null,
             cancellable: true,
             createdAt: Number(
-              _0x9365ee.createdAt ||
-                _0x4cc8fc.getState().nodes?.[this.nodeId]?.dreaminaTaskStartedAt ||
-                Date.now(),
+              result2.createdAt || store.getState().nodes?.[this.nodeId]?.dreaminaTaskStartedAt || Date.now(),
             ),
             startedAt: Number(
-              _0x9365ee.startedAt || _0x4cc8fc.getState().nodes?.[this.nodeId]?.dreaminaTaskStartedAt || 0,
+              result2.startedAt || store.getState().nodes?.[this.nodeId]?.dreaminaTaskStartedAt || 0,
             ),
-            finishedAt: _0x3ce357 ? Date.now() : 0,
+            finishedAt: finishedAt ? Date.now() : 0,
           },
         }),
       );
     }
-    ['_buildDreaminaTaskPatch'](_0x55bfcf, _0x5802cc = {}) {
-      const _0x10a447 = {
-        dreaminaSubmitId: String(_0x55bfcf?.submitId || '').trim(),
-        dreaminaTaskStatus: String(_0x55bfcf?.status || 'pending').trim() || 'pending',
-        dreaminaTaskPhase: String(_0x55bfcf?.phase || 'generating').trim() || 'generating',
+    ['_buildDreaminaTaskPatch'](dreaminaTaskLastRaw, dreaminaTaskRecovering = {}) {
+      const value94 = {
+        dreaminaSubmitId: String(dreaminaTaskLastRaw?.submitId || '').trim(),
+        dreaminaTaskStatus: String(dreaminaTaskLastRaw?.status || 'pending').trim() || 'pending',
+        dreaminaTaskPhase: String(dreaminaTaskLastRaw?.phase || 'generating').trim() || 'generating',
         dreaminaTaskLabel:
-          String(_0x55bfcf?.label || videoTaskText('task.generating')).trim() ||
+          String(dreaminaTaskLastRaw?.label || videoTaskText('task.generating')).trim() ||
           videoTaskText('task.generating'),
-        dreaminaTaskLastCheckedAt: Number(_0x55bfcf?.lastCheckedAt || Date.now()),
-        dreaminaTaskRecovering: _0x5802cc.recovering === true,
+        dreaminaTaskLastCheckedAt: Number(dreaminaTaskLastRaw?.lastCheckedAt || Date.now()),
+        dreaminaTaskRecovering: dreaminaTaskRecovering.recovering === true,
         dreaminaTaskLastRaw:
-          _0x55bfcf?.raw && typeof _0x55bfcf.raw === 'object' && !Array.isArray(_0x55bfcf.raw)
-            ? _0x55bfcf.raw
+          dreaminaTaskLastRaw?.raw &&
+          typeof dreaminaTaskLastRaw.raw === 'object' &&
+          !Array.isArray(dreaminaTaskLastRaw.raw)
+            ? dreaminaTaskLastRaw.raw
             : {},
       };
       return (
-        _0x5802cc.startedAt != null && (_0x10a447.dreaminaTaskStartedAt = Number(_0x5802cc.startedAt || 0)),
-        _0x10a447
+        dreaminaTaskRecovering.startedAt != null &&
+          (value94.dreaminaTaskStartedAt = Number(dreaminaTaskRecovering.startedAt || 0)),
+        value94
       );
     }
-    ['_applyDreaminaTaskSnapshot'](_0x50a94e, _0x5710c3 = {}) {
-      const _0x47986d = _0x4cc8fc.getState().nodes?.[this.nodeId] || this._data || {},
-        _0x11c6d2 = this._buildDreaminaTaskPatch(_0x50a94e, {
-          recovering: _0x5710c3.recovering === true,
-          startedAt: _0x5710c3.startedAt != null ? _0x5710c3.startedAt : _0x47986d?.dreaminaTaskStartedAt,
+    ['_applyDreaminaTaskSnapshot'](value95, recovering2 = {}) {
+      const value96 = store.getState().nodes?.[this.nodeId] || this._data || {},
+        startedAt2 = this._buildDreaminaTaskPatch(value95, {
+          recovering: recovering2.recovering === true,
+          startedAt: recovering2.startedAt != null ? recovering2.startedAt : value96?.dreaminaTaskStartedAt,
         });
       return (
-        _0x4cc8fc.updateNodeData(this.nodeId, _0x11c6d2),
+        store.updateNodeData(this.nodeId, startedAt2),
         this._syncLocalTaskNodeData(),
         this._persistDreaminaResumeCache(),
-        this._emitDreaminaTaskCenterUpdate(_0x50a94e, { startedAt: _0x11c6d2.dreaminaTaskStartedAt }),
-        _0x11c6d2
+        this._emitDreaminaTaskCenterUpdate(value95, { startedAt: startedAt2.dreaminaTaskStartedAt }),
+        startedAt2
       );
     }
-    ['_stopDreaminaRecovery'](_0x167328 = false) {
+    ['_stopDreaminaRecovery'](value97 = false) {
       this._dreaminaResumeAbortController &&
         !this._dreaminaResumeAbortController.signal.aborted &&
         this._dreaminaResumeAbortController.abort();
@@ -1267,35 +1244,35 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
         (this._dreaminaResumeSubmitId = ''),
         (this._dreaminaResumePromise = null),
         (this._dreaminaActiveSubmitId = ''));
-      if (_0x167328) {
-        const _0x23568b = _0x4cc8fc.getState().nodes?.[this.nodeId];
-        _0x23568b?.dreaminaTaskRecovering &&
-          _0x4cc8fc.updateNodeData(this.nodeId, { dreaminaTaskRecovering: false });
+      if (value97) {
+        const value98 = store.getState().nodes?.[this.nodeId];
+        value98?.dreaminaTaskRecovering &&
+          store.updateNodeData(this.nodeId, { dreaminaTaskRecovering: false });
       }
     }
-    ['_stopRunningHubRecovery'](_0x49ed52 = false) {
+    ['_stopRunningHubRecovery'](value99 = false) {
       this._rhResumeAbortController &&
         !this._rhResumeAbortController.signal.aborted &&
         this._rhResumeAbortController.abort();
       ((this._rhResumeAbortController = null), (this._rhResumeTaskId = ''), (this._rhResumePromise = null));
-      if (_0x49ed52) {
-        const _0x2ee084 = _0x4cc8fc.getState().nodes?.[this.nodeId];
-        _0x2ee084?.rhTaskRecovering &&
-          (_0x4cc8fc.updateNodeData(this.nodeId, { rhTaskRecovering: false }),
+      if (value99) {
+        const value100 = store.getState().nodes?.[this.nodeId];
+        value100?.rhTaskRecovering &&
+          (store.updateNodeData(this.nodeId, { rhTaskRecovering: false }),
           this._persistRunningHubResumeCache());
       }
     }
-    ['_stopAsyncRecovery'](_0x1a65e4 = false) {
+    ['_stopAsyncRecovery'](value101 = false) {
       this._asyncResumeAbortController &&
         !this._asyncResumeAbortController.signal.aborted &&
         this._asyncResumeAbortController.abort();
       ((this._asyncResumeAbortController = null),
         (this._asyncResumeTaskId = ''),
         (this._asyncResumePromise = null));
-      if (_0x1a65e4) {
-        const _0x35bd25 = _0x4cc8fc.getState().nodes?.[this.nodeId];
-        _0x35bd25?.asyncTaskRecovering &&
-          (_0x4cc8fc.updateNodeData(this.nodeId, { asyncTaskRecovering: false }),
+      if (value101) {
+        const value102 = store.getState().nodes?.[this.nodeId];
+        value102?.asyncTaskRecovering &&
+          (store.updateNodeData(this.nodeId, { asyncTaskRecovering: false }),
           this._persistAsyncResumeCache());
       }
     }
@@ -1321,223 +1298,222 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
         lastCheckedAt: Date.now(),
       };
     }
-    ['_buildDreaminaFailedSnapshot'](_0x32dda8, _0x417bf4, _0x121570 = {}) {
+    ['_buildDreaminaFailedSnapshot'](value103, value104, raw2 = {}) {
       return {
-        submitId: String(_0x32dda8 || '').trim(),
+        submitId: String(value103 || '').trim(),
         status: 'failed',
         phase: 'failed',
-        label: String(_0x417bf4 || '').trim() || videoTaskText('task.queryFailed'),
+        label: String(value104 || '').trim() || videoTaskText('task.queryFailed'),
         queueStatus: '',
         queueIndex: null,
         queueLength: null,
         outputs: [],
-        failReason: String(_0x417bf4 || '').trim(),
-        raw: _0x121570 && typeof _0x121570 === 'object' && !Array.isArray(_0x121570) ? _0x121570 : {},
+        failReason: String(value104 || '').trim(),
+        raw: raw2 && typeof raw2 === 'object' && !Array.isArray(raw2) ? raw2 : {},
         isTerminal: true,
         hasOutputs: false,
         lastCheckedAt: Date.now(),
       };
     }
     ['_applyDreaminaSuccessResult'](
-      _0x2aa9d3,
-      _0x504388,
-      _0x2478d7 = null,
+      value105,
+      startedAt3,
+      value106 = null,
       { writeStore: writeStore = true, returnPatch: returnPatch = false } = {},
     ) {
-      const _0x121684 = normalizeVideoGenerationResult(_0x2aa9d3),
-        _0x1c4d78 = _0x121684.items,
-        _0x599132 = this._isDreaminaVideoNode(_0x4cc8fc.getState().nodes?.[this.nodeId] || this._data || {}),
-        _0x121483 =
-          String(_0x2478d7?.submitId || '').trim() ||
-          String(_0x4cc8fc.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '').trim(),
-        _0x31944c = _0x599132
-          ? _0x2478d7
-            ? this._buildDreaminaTaskPatch(_0x2478d7, { recovering: false, startedAt: _0x504388 })
+      const normalizedResult = normalizeVideoGenerationResult(value105),
+        result3 = normalizedResult.items,
+        value107 = this._isDreaminaVideoNode(store.getState().nodes?.[this.nodeId] || this._data || {}),
+        dreaminaSubmitId =
+          String(value106?.submitId || '').trim() ||
+          String(store.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '').trim(),
+        args3 = value107
+          ? value106
+            ? this._buildDreaminaTaskPatch(value106, { recovering: false, startedAt: startedAt3 })
             : {
                 isGenerating: false,
                 jobStatus: 'success',
-                dreaminaSubmitId: _0x121483,
+                dreaminaSubmitId: dreaminaSubmitId,
                 dreaminaTaskStatus: 'success',
                 dreaminaTaskPhase: 'done',
                 dreaminaTaskLabel: videoTaskText('task.completed'),
-                dreaminaTaskStartedAt: _0x504388,
+                dreaminaTaskStartedAt: startedAt3,
                 dreaminaTaskLastCheckedAt: Date.now(),
                 dreaminaTaskLastRaw: {},
                 dreaminaTaskRecovering: false,
               }
           : {},
-        _0x582570 = buildVideoGenerationResultPatch(_0x121684, { startedAt: _0x504388 }),
-        _0x49b508 = _0x582570 ? { ..._0x582570, ..._0x31944c } : null;
-      _0x582570 &&
-        (writeStore && (_0x4cc8fc.updateNodeData(this.nodeId, _0x49b508), this._persistDreaminaResumeCache()),
-        _0x599132 &&
+        args4 = buildVideoGenerationResultPatch(normalizedResult, { startedAt: startedAt3 }),
+        patch = args4 ? { ...args4, ...args3 } : null;
+      args4 &&
+        (writeStore && (store.updateNodeData(this.nodeId, patch), this._persistDreaminaResumeCache()),
+        value107 &&
           this._emitDreaminaTaskCenterUpdate(
-            _0x2478d7 || {
-              submitId: _0x121483,
+            value106 || {
+              submitId: dreaminaSubmitId,
               status: 'success',
               phase: 'done',
               label: videoTaskText('task.completed'),
             },
-            { status: 'complete', startedAt: _0x504388, result: _0x1c4d78[0] || _0x121684 },
+            { status: 'complete', startedAt: startedAt3, result: result3[0] || normalizedResult },
           ));
-      if (returnPatch) return { videos: _0x1c4d78, patch: _0x49b508 || {}, normalizedResult: _0x121684 };
-      return _0x1c4d78;
+      if (returnPatch) return { videos: result3, patch: patch || {}, normalizedResult: normalizedResult };
+      return result3;
     }
-    ['_scheduleDreaminaResultEnrichment'](_0x5a3034) {
-      if (!(Array.isArray(_0x5a3034) && _0x5a3034.length > 0)) return;
+    ['_scheduleDreaminaResultEnrichment'](list19) {
+      if (!(Array.isArray(list19) && list19.length > 0)) return;
       {
-        const _0x168bf8 = this.nodeId,
-          _0x199ab4 = ++this._resultThumbToken;
+        const nodeId2 = this.nodeId,
+          value108 = ++this._resultThumbToken;
         (async () => {
-          for (let _0xeb2bff = 0; _0xeb2bff < _0x5a3034.length; _0xeb2bff++) {
-            if (_0x199ab4 !== this._resultThumbToken) return;
-            const _0x2b536b = _0x4cc8fc.getState().nodes?.[_0x168bf8];
-            if (!_0x2b536b) return;
-            const _0x2e554b = Array.isArray(_0x2b536b.videos) ? _0x2b536b.videos : [],
-              _0x576fc9 = _0x2e554b[_0xeb2bff];
-            if (!_0x576fc9 || typeof _0x576fc9 !== 'object') continue;
-            const _0x350e80 = !!String(_0x576fc9.thumbUrl || '').trim();
-            if (_0x350e80) {
-              const _0x99c5ac = Number(_0x2b536b.mainVideoIndex),
-                _0x5ce493 = Number.isFinite(_0x99c5ac) ? Math.max(0, Math.trunc(_0x99c5ac)) : 0;
-              _0xeb2bff === _0x5ce493 &&
-                !String(_0x2b536b.thumbUrl || '').trim() &&
-                _0x4cc8fc.updateNodeData(_0x168bf8, { thumbUrl: String(_0x576fc9.thumbUrl).trim() });
+          for (let value109 = 0; value109 < list19.length; value109++) {
+            if (value108 !== this._resultThumbToken) return;
+            const enabled14 = store.getState().nodes?.[nodeId2];
+            if (!enabled14) return;
+            const value110 = Array.isArray(enabled14.videos) ? enabled14.videos : [],
+              enabled15 = value110[value109];
+            if (!enabled15 || typeof enabled15 !== 'object') continue;
+            const value111 = !!String(enabled15.thumbUrl || '').trim();
+            if (value111) {
+              const value112 = Number(enabled14.mainVideoIndex),
+                value113 = Number.isFinite(value112) ? Math.max(0, Math.trunc(value112)) : 0;
+              value109 === value113 &&
+                !String(enabled14.thumbUrl || '').trim() &&
+                store.updateNodeData(nodeId2, { thumbUrl: String(enabled15.thumbUrl).trim() });
               continue;
             }
-            const _0x34ff4a = this._resolveVideoMetaSrcFromVideoData(_0x576fc9);
-            if (!_0x34ff4a) continue;
-            if (!(_0x34ff4a.startsWith('/output/') || _0x34ff4a.startsWith('/data/'))) continue;
-            const _0x57567d = 'gen|' + _0x168bf8 + '|' + _0xeb2bff + '|' + _0x34ff4a;
-            if (this._videoThumbPending.has(_0x57567d)) continue;
-            this._videoThumbPending.add(_0x57567d);
-            let _0x39de25 = null;
+            const enabled16 = this._resolveVideoMetaSrcFromVideoData(enabled15);
+            if (!enabled16) continue;
+            if (!(enabled16.startsWith('/output/') || enabled16.startsWith('/data/'))) continue;
+            const value114 = 'gen|' + nodeId2 + '|' + value109 + '|' + enabled16;
+            if (this._videoThumbPending.has(value114)) continue;
+            this._videoThumbPending.add(value114);
+            let response8 = null;
             try {
-              _0x39de25 = await _0x285cdc.fetchVideoFirstFrameThumbFromServer(_0x34ff4a, {
-                nodeId: _0x168bf8,
-                assetId: String(_0x576fc9.assetId || _0x576fc9.thumbId || ''),
+              response8 = await api.fetchVideoFirstFrameThumbFromServer(enabled16, {
+                nodeId: nodeId2,
+                assetId: String(enabled15.assetId || enabled15.thumbId || ''),
               });
             } catch {
-              _0x39de25 = null;
+              response8 = null;
             } finally {
-              this._videoThumbPending.delete(_0x57567d);
+              this._videoThumbPending.delete(value114);
             }
-            if (_0x199ab4 !== this._resultThumbToken) return;
-            const _0x40bece = String(_0x39de25?.thumbUrl || _0x39de25?.url || '').trim();
-            if (!_0x40bece) continue;
-            const _0x56ad5a = _0x4cc8fc.getState().nodes?.[_0x168bf8];
-            if (!_0x56ad5a) return;
-            const _0x3c45a7 = Array.isArray(_0x56ad5a.videos) ? _0x56ad5a.videos : [],
-              _0x139523 = _0x3c45a7[_0xeb2bff];
-            if (!_0x139523 || typeof _0x139523 !== 'object') continue;
-            const _0x5b5c94 = { ..._0x139523 };
-            if (!String(_0x5b5c94.thumbUrl || '').trim() && _0x40bece) _0x5b5c94.thumbUrl = _0x40bece;
-            const _0x5e7d71 = _0x3c45a7.slice();
-            _0x5e7d71[_0xeb2bff] = _0x5b5c94;
-            const _0x3a3668 = { videos: _0x5e7d71 },
-              _0x191f45 = Number(_0x56ad5a.mainVideoIndex),
-              _0x314dfa = Number.isFinite(_0x191f45) ? Math.max(0, Math.trunc(_0x191f45)) : 0;
-            if (_0xeb2bff === _0x314dfa) {
-              if (!String(_0x56ad5a.thumbUrl || '').trim() && _0x40bece) _0x3a3668.thumbUrl = _0x40bece;
+            if (value108 !== this._resultThumbToken) return;
+            const enabled17 = String(response8?.thumbUrl || response8?.url || '').trim();
+            if (!enabled17) continue;
+            const enabled18 = store.getState().nodes?.[nodeId2];
+            if (!enabled18) return;
+            const list20 = Array.isArray(enabled18.videos) ? enabled18.videos : [],
+              args5 = list20[value109];
+            if (!args5 || typeof args5 !== 'object') continue;
+            const value115 = { ...args5 };
+            if (!String(value115.thumbUrl || '').trim() && enabled17) value115.thumbUrl = enabled17;
+            const videos5 = list20.slice();
+            videos5[value109] = value115;
+            const value116 = { videos: videos5 },
+              value117 = Number(enabled18.mainVideoIndex),
+              value118 = Number.isFinite(value117) ? Math.max(0, Math.trunc(value117)) : 0;
+            if (value109 === value118) {
+              if (!String(enabled18.thumbUrl || '').trim() && enabled17) value116.thumbUrl = enabled17;
             }
-            _0x4cc8fc.updateNodeData(_0x168bf8, _0x3a3668);
+            store.updateNodeData(nodeId2, value116);
           }
         })();
       }
       {
-        const _0x5ea1f5 = this.nodeId,
-          _0x27b408 = ++this._metaFetchToken;
+        const value119 = this.nodeId,
+          value120 = ++this._metaFetchToken;
         (async () => {
-          for (let _0x3dc44f = 0; _0x3dc44f < _0x5a3034.length; _0x3dc44f++) {
-            if (_0x27b408 !== this._metaFetchToken) return;
-            const _0x51bbbe = _0x4cc8fc.getState().nodes?.[_0x5ea1f5];
-            if (!_0x51bbbe) return;
-            const _0x3bd2ac = Array.isArray(_0x51bbbe.videos) ? _0x51bbbe.videos : [],
-              _0x14296a = _0x3bd2ac[_0x3dc44f];
-            if (!_0x14296a || typeof _0x14296a !== 'object') continue;
-            const _0x539059 = Number(_0x14296a.videoWidth || 0),
-              _0x4e8239 = Number(_0x14296a.videoHeight || 0);
-            if (_0x539059 > 0 && _0x4e8239 > 0) continue;
-            const _0x5bbaf5 = this._resolveVideoMetaSrcFromVideoData(_0x14296a);
-            if (!_0x5bbaf5) continue;
-            let _0x5bace8 = null;
+          for (let value121 = 0; value121 < list19.length; value121++) {
+            if (value120 !== this._metaFetchToken) return;
+            const enabled19 = store.getState().nodes?.[value119];
+            if (!enabled19) return;
+            const value122 = Array.isArray(enabled19.videos) ? enabled19.videos : [],
+              enabled20 = value122[value121];
+            if (!enabled20 || typeof enabled20 !== 'object') continue;
+            const count12 = Number(enabled20.videoWidth || 0),
+              count13 = Number(enabled20.videoHeight || 0);
+            if (count12 > 0 && count13 > 0) continue;
+            const enabled21 = this._resolveVideoMetaSrcFromVideoData(enabled20);
+            if (!enabled21) continue;
+            let box2 = null;
             try {
-              _0x5bace8 = await _0x285cdc.fetchVideoMetaFromServer(_0x5bbaf5);
+              box2 = await api.fetchVideoMetaFromServer(enabled21);
             } catch {
-              _0x5bace8 = null;
+              box2 = null;
             }
-            if (_0x27b408 !== this._metaFetchToken) return;
-            if (!_0x5bace8 || _0x5bace8.success !== true) continue;
-            const _0x5dc829 = Math.round(Number(_0x5bace8.width) || 0),
-              _0x5d6d4d = Math.round(Number(_0x5bace8.height) || 0),
-              _0x4d6800 = Number(_0x5bace8.duration);
-            if (!(_0x5dc829 > 0 && _0x5d6d4d > 0)) continue;
-            const _0x48b3e5 = _0x4cc8fc.getState().nodes?.[_0x5ea1f5];
-            if (!_0x48b3e5) return;
-            const _0x748608 = Array.isArray(_0x48b3e5.videos) ? _0x48b3e5.videos : [],
-              _0x24a53b = _0x748608[_0x3dc44f];
-            if (!_0x24a53b || typeof _0x24a53b !== 'object') continue;
-            const _0x53d070 = Number(_0x24a53b.videoWidth || 0),
-              _0x1374d8 = Number(_0x24a53b.videoHeight || 0);
-            if (_0x53d070 > 0 && _0x1374d8 > 0) continue;
-            const _0x17a4e1 = { ..._0x24a53b, videoWidth: _0x5dc829, videoHeight: _0x5d6d4d };
-            Number.isFinite(_0x4d6800) &&
-              _0x4d6800 > 0 &&
-              !(Number(_0x17a4e1.duration) > 0) &&
-              (_0x17a4e1.duration = _0x4d6800);
-            const _0x4f2d51 = _0x748608.slice();
-            _0x4f2d51[_0x3dc44f] = _0x17a4e1;
-            const _0x54e008 = { videos: _0x4f2d51 },
-              _0x3af25d = Number(_0x48b3e5.mainVideoIndex),
-              _0x20f77c = Number.isFinite(_0x3af25d) ? Math.max(0, Math.trunc(_0x3af25d)) : 0;
-            if (_0x3dc44f === _0x20f77c) {
-              ((_0x54e008.videoWidth = _0x5dc829),
-                (_0x54e008.videoHeight = _0x5d6d4d),
-                (_0x54e008.selectedVideoWidth = _0x5dc829),
-                (_0x54e008.selectedVideoHeight = _0x5d6d4d));
-              if (Number.isFinite(_0x4d6800) && _0x4d6800 > 0) _0x54e008.videoDuration = _0x4d6800;
+            if (value120 !== this._metaFetchToken) return;
+            if (!box2 || box2.success !== true) continue;
+            const videoWidth = Math.round(Number(box2.width) || 0),
+              videoHeight = Math.round(Number(box2.height) || 0),
+              count14 = Number(box2.duration);
+            if (!(videoWidth > 0 && videoHeight > 0)) continue;
+            const enabled22 = store.getState().nodes?.[value119];
+            if (!enabled22) return;
+            const list21 = Array.isArray(enabled22.videos) ? enabled22.videos : [],
+              args6 = list21[value121];
+            if (!args6 || typeof args6 !== 'object') continue;
+            const count15 = Number(args6.videoWidth || 0),
+              count16 = Number(args6.videoHeight || 0);
+            if (count15 > 0 && count16 > 0) continue;
+            const value123 = { ...args6, videoWidth: videoWidth, videoHeight: videoHeight };
+            Number.isFinite(count14) &&
+              count14 > 0 &&
+              !(Number(value123.duration) > 0) &&
+              (value123.duration = count14);
+            const videos6 = list21.slice();
+            videos6[value121] = value123;
+            const value124 = { videos: videos6 },
+              value125 = Number(enabled22.mainVideoIndex),
+              value126 = Number.isFinite(value125) ? Math.max(0, Math.trunc(value125)) : 0;
+            if (value121 === value126) {
+              ((value124.videoWidth = videoWidth),
+                (value124.videoHeight = videoHeight),
+                (value124.selectedVideoWidth = videoWidth),
+                (value124.selectedVideoHeight = videoHeight));
+              if (Number.isFinite(count14) && count14 > 0) value124.videoDuration = count14;
             }
-            _0x4cc8fc.updateNodeData(_0x5ea1f5, _0x54e008);
+            store.updateNodeData(value119, value124);
           }
         })();
       }
     }
-    ['_finalizeVideoSuccessSideEffects'](_0x228fe7, _0x3e4c1) {
-      (this._scheduleDreaminaResultEnrichment(_0x228fe7),
-        this._dispatchGenerationHistoryVideos(_0x228fe7, _0x3e4c1));
-      const _0x441e18 = _0x228fe7.find((_0x5b2996) => _0x5b2996?.saveError)?.saveError;
-      _0x441e18 &&
-        window.showToast?.(videoTaskText('toasts.localSaveFailed', { error: _0x441e18 }), 'warning');
+    ['_finalizeVideoSuccessSideEffects'](list22, value127) {
+      (this._scheduleDreaminaResultEnrichment(list22),
+        this._dispatchGenerationHistoryVideos(list22, value127));
+      const error3 = list22.find((item14) => item14?.saveError)?.saveError;
+      error3 && window.showToast?.(videoTaskText('toasts.localSaveFailed', { error: error3 }), 'warning');
     }
-    ['_finalizeDreaminaSuccessResult'](_0x354a36, _0x1a59ec, _0x362b83 = null, _0xf62df1 = {}) {
-      const _0x4fa8af = this._applyDreaminaSuccessResult(_0x354a36, _0x1a59ec, _0x362b83, {
-          writeStore: _0xf62df1.writeStore !== false,
-          returnPatch: _0xf62df1.returnPatch === true,
+    ['_finalizeDreaminaSuccessResult'](value128, value129, value130 = null, writeStore2 = {}) {
+      const value131 = this._applyDreaminaSuccessResult(value128, value129, value130, {
+          writeStore: writeStore2.writeStore !== false,
+          returnPatch: writeStore2.returnPatch === true,
         }),
-        _0x3e9259 = Array.isArray(_0x4fa8af) ? _0x4fa8af : _0x4fa8af?.videos || [];
+        videos7 = Array.isArray(value131) ? value131 : value131?.videos || [];
       return (
-        this._finalizeVideoSuccessSideEffects(_0x3e9259, _0x1a59ec),
-        _0xf62df1.returnPatch === true
-          ? { ...(_0x4fa8af && !Array.isArray(_0x4fa8af) ? _0x4fa8af : {}), videos: _0x3e9259 }
-          : _0x3e9259
+        this._finalizeVideoSuccessSideEffects(videos7, value129),
+        writeStore2.returnPatch === true
+          ? { ...(value131 && !Array.isArray(value131) ? value131 : {}), videos: videos7 }
+          : videos7
       );
     }
-    ['_dispatchGenerationHistoryVideos'](_0x2dbcdb, _0x1f31e9) {
+    ['_dispatchGenerationHistoryVideos'](list23, startedAt4) {
       if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return;
-      const _0x3eafd2 = Array.isArray(_0x2dbcdb)
-        ? _0x2dbcdb.filter((_0x4f6c12) => _0x4f6c12 && typeof _0x4f6c12 === 'object' && !_0x4f6c12.error)
+      const videos8 = Array.isArray(list23)
+        ? list23.filter((enabled23) => enabled23 && typeof enabled23 === 'object' && !enabled23.error)
         : [];
-      if (_0x3eafd2.length === 0) return;
-      const _0x43587a = _0x4cc8fc.getState().nodes?.[this.nodeId] || this._data || {};
+      if (videos8.length === 0) return;
+      const nodeData5 = store.getState().nodes?.[this.nodeId] || this._data || {};
       try {
         window.dispatchEvent(
           new CustomEvent(GENERATION_HISTORY_EVENT, {
             detail: {
               kind: 'video',
               sourceNodeId: this.nodeId,
-              nodeData: _0x43587a,
-              videos: _0x3eafd2,
-              startedAt: _0x1f31e9,
+              nodeData: nodeData5,
+              videos: videos8,
+              startedAt: startedAt4,
               createdAt: Date.now(),
             },
           }),
@@ -1546,616 +1522,615 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
     }
     async ['_maybeResumeDreaminaTaskImpl']() {
       if (this._videoSubmitInFlight === true) return;
-      const _0x2a7f64 = _0x336be9().nodes?.[this.nodeId] || this._data || {};
-      if (!this._isDreaminaVideoNode(_0x2a7f64)) {
+      const modelId = handler14().nodes?.[this.nodeId] || this._data || {};
+      if (!this._isDreaminaVideoNode(modelId)) {
         this._stopDreaminaRecovery(false);
         return;
       }
-      if (!this._isDreaminaRecoverableRunningTask(_0x2a7f64)) {
+      if (!this._isDreaminaRecoverableRunningTask(modelId)) {
         this._stopDreaminaRecovery(false);
         return;
       }
-      const _0x47de58 = String(_0x2a7f64?.dreaminaSubmitId || '').trim();
-      if (!_0x47de58) {
+      const taskId3 = String(modelId?.dreaminaSubmitId || '').trim();
+      if (!taskId3) {
         this._stopDreaminaRecovery(false);
         return;
       }
-      const _0xc9a850 = String(this._dreaminaActiveSubmitId || '').trim();
+      const value132 = String(this._dreaminaActiveSubmitId || '').trim();
       if (
         this._isGenerating &&
-        _0x2a7f64?.dreaminaTaskRecovering !== true &&
-        _0xc9a850 &&
-        _0xc9a850 === _0x47de58 &&
-        !this._isStaleActiveDreaminaTask(_0x2a7f64)
+        modelId?.dreaminaTaskRecovering !== true &&
+        value132 &&
+        value132 === taskId3 &&
+        !this._isStaleActiveDreaminaTask(modelId)
       )
         return;
-      if (this._dreaminaResumeSubmitId === _0x47de58) return;
+      if (this._dreaminaResumeSubmitId === taskId3) return;
       this._stopDreaminaRecovery(false);
-      const _0x2da7af = Number(
-        _0x2a7f64?.dreaminaTaskStartedAt || _0x2a7f64?.generationStartTime || Date.now(),
-      );
-      ((this._dreaminaResumeSubmitId = _0x47de58), (this._dreaminaActiveSubmitId = _0x47de58));
-      const _0x3143bc = (async () => {
-        let _0x85e926 = null;
+      const startedAt5 = Number(modelId?.dreaminaTaskStartedAt || modelId?.generationStartTime || Date.now());
+      ((this._dreaminaResumeSubmitId = taskId3), (this._dreaminaActiveSubmitId = taskId3));
+      const value133 = (async () => {
+        let signal = null;
         try {
-          ((_0x85e926 = new AbortController()),
-            (this._dreaminaResumeAbortController = _0x85e926),
+          ((signal = new AbortController()),
+            (this._dreaminaResumeAbortController = signal),
             (this._isGenerating = true),
             this._setGenerateButtonBusyUi({ cancellable: false }),
-            _0x55f9d6(this.previewEl));
-          const _0xf099b9 = resolveDreaminaStyleVideoProvider(_0x2a7f64?.model, _0x2a7f64?.provider),
-            _0x321462 = await resumeTask(
+            startLoading(this.previewEl));
+          const provider3 = resolveDreaminaStyleVideoProvider(modelId?.model, modelId?.provider),
+            response9 = await resumeTask(
               {
                 sourceNodeId: this.nodeId,
                 targetNodeId: this.nodeId,
                 trigger: 'node',
                 taskType: 'video-generation',
-                provider: _0xf099b9 || 'dreamina',
-                adapterType: _0xf099b9 === 'dreamina' ? 'localRuntime' : 'modelApi',
-                modelId: _0x2a7f64?.model || '',
-                executionId: (_0xf099b9 || 'dreamina') + '.video.cli',
+                provider: provider3 || 'dreamina',
+                adapterType: provider3 === 'dreamina' ? 'localRuntime' : 'modelApi',
+                modelId: modelId?.model || '',
+                executionId: (provider3 || 'dreamina') + '.video.cli',
                 payload: {
-                  ..._0x2a7f64,
-                  provider: _0xf099b9 || _0x2a7f64?.provider || 'dreamina',
+                  ...modelId,
+                  provider: provider3 || modelId?.provider || 'dreamina',
                   model:
-                    _0xf099b9 === 'apimart'
-                      ? _0x2a7f64?.model || APIMART_DREAMINA_VIDEO_DEFAULT_MODEL
-                      : _0x2a7f64?.model || '',
+                    provider3 === 'apimart'
+                      ? modelId?.model || APIMART_DREAMINA_VIDEO_DEFAULT_MODEL
+                      : modelId?.model || '',
                 },
-                taskId: _0x47de58,
+                taskId: taskId3,
                 cancellable: false,
                 resumable: true,
                 startBuilder: () => ({
                   ...this._buildDreaminaTaskPatch(
                     this._buildDreaminaPendingSnapshot({
-                      submitId: _0x47de58,
+                      submitId: taskId3,
                       phase: 'generating',
                       label:
-                        String(_0x2a7f64?.dreaminaTaskLabel || '').trim() || videoTaskText('task.generating'),
-                      raw: _0x2a7f64?.dreaminaTaskLastRaw || {},
+                        String(modelId?.dreaminaTaskLabel || '').trim() || videoTaskText('task.generating'),
+                      raw: modelId?.dreaminaTaskLastRaw || {},
                     }),
-                    { recovering: true, startedAt: _0x2da7af },
+                    { recovering: true, startedAt: startedAt5 },
                   ),
                 }),
                 onTaskStart: () => {
                   this._persistDreaminaResumeCache();
                 },
-                poll: async ({ payload: _0x534314 }) => {
-                  if (_0xf099b9 && _0xf099b9 !== 'dreamina')
-                    return _0x285cdc.resumeAsyncVideoTask(_0x47de58, _0x534314, { signal: _0x85e926.signal });
-                  return _0x285cdc.resumeDreaminaVideoTask(_0x47de58, {
-                    signal: _0x85e926.signal,
-                    intervalMs: _0x297b39,
-                    maxWaitMs: _0x52a04a,
-                    onProgress: async (_0x37d507) => {
-                      if (_0x85e926.signal.aborted) return;
-                      this._applyDreaminaTaskSnapshot(_0x37d507, { recovering: true, startedAt: _0x2da7af });
+                poll: async ({ payload: payload4 }) => {
+                  if (provider3 && provider3 !== 'dreamina')
+                    return api.resumeAsyncVideoTask(taskId3, payload4, { signal: signal.signal });
+                  return api.resumeDreaminaVideoTask(taskId3, {
+                    signal: signal.signal,
+                    intervalMs: intervalMs,
+                    maxWaitMs: maxWaitMs2,
+                    onProgress: async (value134) => {
+                      if (signal.signal.aborted) return;
+                      this._applyDreaminaTaskSnapshot(value134, { recovering: true, startedAt: startedAt5 });
                     },
                   });
                 },
-                resultBuilder: async (_0x545172, _0x41e570) => {
-                  const _0x365407 = _0x545172?.dreaminaSnapshot || null,
-                    _0x4cf250 = this._applyDreaminaSuccessResult(_0x545172, _0x41e570.startedAt, _0x365407, {
+                resultBuilder: async (value135, value136) => {
+                  const value137 = value135?.dreaminaSnapshot || null,
+                    value138 = this._applyDreaminaSuccessResult(value135, value136.startedAt, value137, {
                       writeStore: false,
                       returnPatch: true,
                     });
-                  return _0x4cf250?.patch || {};
+                  return value138?.patch || {};
                 },
-                failureBuilder: (_0x218569, _0x44a50a) => {
-                  if (this._isDreaminaPollTimeoutError(_0x218569)) {
-                    const _0x2bd60e = this._buildDreaminaBackgroundPendingSnapshot(_0x47de58);
+                failureBuilder: (error4, startedAt6) => {
+                  if (this._isDreaminaPollTimeoutError(error4)) {
+                    const value139 = this._buildDreaminaBackgroundPendingSnapshot(taskId3);
                     return Object.assign(
                       {
                         isGenerating: true,
                         jobStatus: 'running',
                         jobError: null,
-                        generationDuration: Date.now() - _0x44a50a.startedAt,
+                        generationDuration: Date.now() - startedAt6.startedAt,
                       },
-                      this._buildDreaminaTaskPatch(_0x2bd60e, {
+                      this._buildDreaminaTaskPatch(value139, {
                         recovering: false,
-                        startedAt: _0x44a50a.startedAt,
+                        startedAt: startedAt6.startedAt,
                       }),
                     );
                   }
-                  const _0x24ed74 = _0x218569?.dreaminaSnapshot || null,
-                    _0x581b20 =
-                      _0x218569?.message ||
-                      _0x24ed74?.failReason ||
-                      _0x24ed74?.label ||
+                  const value140 = error4?.dreaminaSnapshot || null,
+                    error5 =
+                      error4?.message ||
+                      value140?.failReason ||
+                      value140?.label ||
                       videoTaskText('task.queryFailed');
                   return Object.assign(
-                    buildVideoGenerationFailurePatch({ error: _0x581b20, startedAt: _0x44a50a.startedAt }),
-                    _0x24ed74
-                      ? this._buildDreaminaTaskPatch(_0x24ed74, {
+                    buildVideoGenerationFailurePatch({ error: error5, startedAt: startedAt6.startedAt }),
+                    value140
+                      ? this._buildDreaminaTaskPatch(value140, {
                           recovering: false,
-                          startedAt: _0x44a50a.startedAt,
+                          startedAt: startedAt6.startedAt,
                         })
-                      : this._buildDreaminaTaskPatch(
-                          this._buildDreaminaFailedSnapshot(_0x47de58, _0x581b20),
-                          { recovering: false, startedAt: _0x44a50a.startedAt },
-                        ),
+                      : this._buildDreaminaTaskPatch(this._buildDreaminaFailedSnapshot(taskId3, error5), {
+                          recovering: false,
+                          startedAt: startedAt6.startedAt,
+                        }),
                   );
                 },
-                cancelledBuilder: (_0xefe263) =>
+                cancelledBuilder: (startedAt7) =>
                   Object.assign(
-                    { generationDuration: Date.now() - _0xefe263.startedAt },
+                    { generationDuration: Date.now() - startedAt7.startedAt },
                     this._buildDreaminaTaskPatch(
                       this._buildDreaminaPendingSnapshot({
-                        submitId: _0x47de58,
+                        submitId: taskId3,
                         phase: 'generating',
                         label:
-                          String(_0x2a7f64?.dreaminaTaskLabel || '').trim() ||
-                          videoTaskText('task.generating'),
-                        raw: _0x2a7f64?.dreaminaTaskLastRaw || {},
+                          String(modelId?.dreaminaTaskLabel || '').trim() || videoTaskText('task.generating'),
+                        raw: modelId?.dreaminaTaskLastRaw || {},
                       }),
-                      { recovering: false, startedAt: _0xefe263.startedAt },
+                      { recovering: false, startedAt: startedAt7.startedAt },
                     ),
                   ),
-                parseError: (_0x514729) => _0x514729?.message || videoTaskText('task.queryFailed'),
+                parseError: (error6) => error6?.message || videoTaskText('task.queryFailed'),
               },
-              { store: _0x4cc8fc, startedAt: _0x2da7af, abortController: _0x85e926 },
+              { store: store, startedAt: startedAt5, abortController: signal },
             );
-          if (_0x321462.status === 'pending') {
+          if (response9.status === 'pending') {
             this._persistDreaminaResumeCache();
             return;
           }
-          if (_0x321462.status === 'success') {
-            const _0x5cd55e = normalizeVideoGenerationResult(_0x321462.result).items;
-            this._finalizeVideoSuccessSideEffects(_0x5cd55e, _0x2da7af);
+          if (response9.status === 'success') {
+            const videoGenerationResult = normalizeVideoGenerationResult(response9.result).items;
+            this._finalizeVideoSuccessSideEffects(videoGenerationResult, startedAt5);
           }
-          if (_0x321462.status === 'failed' && this._isDreaminaPollTimeoutError(_0x321462.error))
-            this._showDreaminaBackgroundQueueingToast(_0x47de58);
-          else _0x321462.status === 'failed' && (this._dreaminaActiveSubmitId = '');
+          if (response9.status === 'failed' && this._isDreaminaPollTimeoutError(response9.error))
+            this._showDreaminaBackgroundQueueingToast(taskId3);
+          else response9.status === 'failed' && (this._dreaminaActiveSubmitId = '');
           this._persistDreaminaResumeCache();
-        } catch (_0x2137d1) {
-          if (
-            _0x85e926?.signal?.aborted ||
-            _0x2137d1?.message === 'CANCELLED' ||
-            _0x2137d1?.name === 'AbortError'
-          )
+        } catch (error7) {
+          if (signal?.signal?.aborted || error7?.message === 'CANCELLED' || error7?.name === 'AbortError')
             return;
-          const _0x294d43 = _0x2137d1?.message || videoTaskText('task.queryFailed'),
-            _0x1438ed = this._buildDreaminaFailedSnapshot(_0x47de58, _0x294d43);
-          (_0x4cc8fc.updateNodeData(
+          const error8 = error7?.message || videoTaskText('task.queryFailed'),
+            value141 = this._buildDreaminaFailedSnapshot(taskId3, error8);
+          (store.updateNodeData(
             this.nodeId,
             Object.assign(
-              buildVideoGenerationFailurePatch({ error: _0x294d43, startedAt: _0x2da7af }),
-              this._buildDreaminaTaskPatch(_0x1438ed, { recovering: false, startedAt: _0x2da7af }),
+              buildVideoGenerationFailurePatch({ error: error8, startedAt: startedAt5 }),
+              this._buildDreaminaTaskPatch(value141, { recovering: false, startedAt: startedAt5 }),
             ),
           ),
             this._persistDreaminaResumeCache());
         } finally {
-          _0x85e926 &&
-            this._dreaminaResumeAbortController === _0x85e926 &&
+          signal &&
+            this._dreaminaResumeAbortController === signal &&
             (this._dreaminaResumeAbortController = null);
-          this._dreaminaResumeSubmitId === _0x47de58 && (this._dreaminaResumeSubmitId = '');
+          this._dreaminaResumeSubmitId === taskId3 && (this._dreaminaResumeSubmitId = '');
           this._dreaminaResumePromise = null;
-          const _0x5054b6 = this._syncLocalTaskNodeData(),
-            _0x540c11 = shouldShowGenerationBusyUi(_0x5054b6) || this._shouldKeepDreaminaLoading(_0x5054b6);
-          ((this._isGenerating = _0x540c11),
-            !_0x540c11 && (this._dreaminaActiveSubmitId = ''),
-            _0x540c11
+          const value142 = this._syncLocalTaskNodeData(),
+            shouldShowGenerationBusyUi2 =
+              shouldShowGenerationBusyUi(value142) || this._shouldKeepDreaminaLoading(value142);
+          ((this._isGenerating = shouldShowGenerationBusyUi2),
+            !shouldShowGenerationBusyUi2 && (this._dreaminaActiveSubmitId = ''),
+            shouldShowGenerationBusyUi2
               ? this._updateSubmitButtonState?.()
               : (this._resetGenerateButtonIdleUi({ cancellable: false }),
-                _0x11f58d(this.previewEl),
+                stopLoading(this.previewEl),
                 this._updateSubmitButtonState?.()));
         }
       })();
-      this._dreaminaResumePromise = _0x3143bc;
+      this._dreaminaResumePromise = value133;
     }
     async ['_maybeResumeRunningHubTaskImpl']() {
-      const _0x284b49 = _0x336be9().nodes?.[this.nodeId] || this._data || {};
-      if (!this._isRunninghubWorkflowModel(_0x284b49?.model, _0x284b49?.provider)) {
+      const value143 = handler14().nodes?.[this.nodeId] || this._data || {};
+      if (!this._isRunninghubWorkflowModel(value143?.model, value143?.provider)) {
         this._stopRunningHubRecovery(false);
         return;
       }
-      if (!this._isRunningHubRecoverableRunningTask(_0x284b49)) {
+      if (!this._isRunningHubRecoverableRunningTask(value143)) {
         this._stopRunningHubRecovery(false);
         return;
       }
-      const _0x3454f9 = String(_0x284b49?.rhTaskId || '').trim();
-      if (!_0x3454f9) {
+      const taskId4 = String(value143?.rhTaskId || '').trim();
+      if (!taskId4) {
         this._stopRunningHubRecovery(false);
         return;
       }
-      if (this._rhResumeTaskId === _0x3454f9 && this._rhResumePromise) return;
+      if (this._rhResumeTaskId === taskId4 && this._rhResumePromise) return;
       this._stopRunningHubRecovery(false);
-      const _0x58c156 = Number(_0x284b49?.rhTaskStartedAt || _0x284b49?.generationStartTime || Date.now()),
-        _0x2babf4 = _0x284b49?.rhTaskUseOpenapiQuery === true;
-      this._rhResumeTaskId = _0x3454f9;
-      const _0x4ed7c5 = (async () => {
-        let _0x245d03 = null;
+      const startedAt8 = Number(value143?.rhTaskStartedAt || value143?.generationStartTime || Date.now()),
+        rhTaskUseOpenapiQuery = value143?.rhTaskUseOpenapiQuery === true;
+      this._rhResumeTaskId = taskId4;
+      const value144 = (async () => {
+        let signal2 = null;
         try {
-          const _0x47043d = await this._buildPayload();
-          if (!_0x47043d) return;
-          ((_0x245d03 = new AbortController()),
-            (this._rhResumeAbortController = _0x245d03),
-            (this._rhAbortController = _0x245d03),
-            (this._rhTaskId = _0x3454f9),
-            (this._rhApiKey = String(_0x47043d?.apiKey || '').trim() || this._rhApiKey || null),
+          const provider4 = await this._buildPayload();
+          if (!provider4) return;
+          ((signal2 = new AbortController()),
+            (this._rhResumeAbortController = signal2),
+            (this._rhAbortController = signal2),
+            (this._rhTaskId = taskId4),
+            (this._rhApiKey = String(provider4?.apiKey || '').trim() || this._rhApiKey || null),
             (this._rhCancelRequested = false),
             (this._rhRemoteCancelSent = false),
             (this._isGenerating = true),
             this._setGenerateButtonBusyUi({ cancellable: true }),
-            _0x55f9d6(this.previewEl));
-          const _0x5a4244 = await resumeTask(
+            startLoading(this.previewEl));
+          const response10 = await resumeTask(
             {
               sourceNodeId: this.nodeId,
               targetNodeId: this.nodeId,
               trigger: 'node',
               taskType: 'video-generation',
-              provider: _0x47043d.provider || _0x284b49?.provider || 'runninghubwf',
+              provider: provider4.provider || value143?.provider || 'runninghubwf',
               adapterType: 'workflow',
-              modelId: _0x47043d.model || _0x284b49?.model || '',
-              executionId: 'runninghub.video.' + (_0x47043d.model || _0x284b49?.model || 'workflow'),
-              payload: _0x47043d,
-              taskId: _0x3454f9,
+              modelId: provider4.model || value143?.model || '',
+              executionId: 'runninghub.video.' + (provider4.model || value143?.model || 'workflow'),
+              payload: provider4,
+              taskId: taskId4,
               cancellable: true,
               resumable: true,
               pauseOnAbort: true,
               startBuilder: () => ({
                 rhStatusMessage: null,
                 rhStatusCode: null,
-                rhTaskUseOpenapiQuery: _0x2babf4,
+                rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery,
               }),
               onTaskStart: () => {
                 this._persistRunningHubResumeCache();
               },
               poll: async () =>
-                _0x285cdc.resumeRunningHubVideoTask(_0x3454f9, _0x47043d, {
-                  signal: _0x245d03.signal,
-                  useOpenapiQuery: _0x2babf4,
+                api.resumeRunningHubVideoTask(taskId4, provider4, {
+                  signal: signal2.signal,
+                  useOpenapiQuery: rhTaskUseOpenapiQuery,
                 }),
-              resultBuilder: async (_0x129145, _0x7be6d1) => {
-                const _0x45c323 = this._applyDreaminaSuccessResult(_0x129145, _0x7be6d1.startedAt, null, {
+              resultBuilder: async (value145, startedAt9) => {
+                const value146 = this._applyDreaminaSuccessResult(value145, startedAt9.startedAt, null, {
                   writeStore: false,
                   returnPatch: true,
                 });
                 return {
-                  ...(_0x45c323?.patch || {}),
+                  ...(value146?.patch || {}),
                   rhStatusMessage: null,
                   rhStatusCode: null,
                   ...this._buildRunningHubTaskPatch({
-                    taskId: _0x3454f9,
+                    taskId: taskId4,
                     status: 'success',
-                    startedAt: _0x7be6d1.startedAt,
+                    startedAt: startedAt9.startedAt,
                     recovering: false,
-                    useOpenapiQuery: _0x2babf4,
+                    useOpenapiQuery: rhTaskUseOpenapiQuery,
                   }),
                 };
               },
-              failureBuilder: (_0x4004bb, _0x295b9e) => ({
+              failureBuilder: (error9, startedAt10) => ({
                 ...buildVideoGenerationFailurePatch({
-                  error: _0x4004bb?.message || videoTaskText('task.generationFailed'),
-                  startedAt: _0x295b9e.startedAt,
-                  duration: Date.now() - _0x295b9e.startedAt,
+                  error: error9?.message || videoTaskText('task.generationFailed'),
+                  startedAt: startedAt10.startedAt,
+                  duration: Date.now() - startedAt10.startedAt,
                 }),
-                rhStatusMessage: _0x4004bb?.message || videoTaskText('task.generationFailed'),
-                rhStatusCode: Number.isFinite(Number(_0x4004bb?.code)) ? Number(_0x4004bb.code) : null,
+                rhStatusMessage: error9?.message || videoTaskText('task.generationFailed'),
+                rhStatusCode: Number.isFinite(Number(error9?.code)) ? Number(error9.code) : null,
                 ...this._buildRunningHubTaskPatch({
-                  taskId: _0x3454f9,
+                  taskId: taskId4,
                   status: 'failed',
-                  startedAt: _0x295b9e.startedAt,
+                  startedAt: startedAt10.startedAt,
                   recovering: false,
-                  useOpenapiQuery: _0x2babf4,
+                  useOpenapiQuery: rhTaskUseOpenapiQuery,
                 }),
               }),
-              cancelledBuilder: (_0x556f57) => ({
+              cancelledBuilder: (startedAt11) => ({
                 videos: [],
                 videoUrl: '',
                 localPath: '',
-                generationDuration: Date.now() - _0x556f57.startedAt,
+                generationDuration: Date.now() - startedAt11.startedAt,
                 rhStatusMessage: videoTaskText('cancel.interrupted'),
                 rhStatusCode: null,
                 ...this._buildRunningHubTaskPatch({
-                  taskId: _0x3454f9,
+                  taskId: taskId4,
                   status: 'cancelled',
-                  startedAt: _0x556f57.startedAt,
+                  startedAt: startedAt11.startedAt,
                   recovering: false,
-                  useOpenapiQuery: _0x2babf4,
+                  useOpenapiQuery: rhTaskUseOpenapiQuery,
                 }),
               }),
-              parseError: (_0x29cd1d) => _0x29cd1d?.message || videoTaskText('task.generationFailed'),
+              parseError: (error10) => error10?.message || videoTaskText('task.generationFailed'),
             },
-            { store: _0x4cc8fc, startedAt: _0x58c156, abortController: _0x245d03 },
+            { store: store, startedAt: startedAt8, abortController: signal2 },
           );
-          if (_0x5a4244.status === 'pending') {
+          if (response10.status === 'pending') {
             this._persistRunningHubResumeCache();
             return;
           }
-          if (_0x5a4244.status === 'success') {
-            const _0x2e84b1 = normalizeVideoGenerationResult(_0x5a4244.result).items;
-            this._finalizeVideoSuccessSideEffects(_0x2e84b1, _0x58c156);
+          if (response10.status === 'success') {
+            const videoGenerationResult2 = normalizeVideoGenerationResult(response10.result).items;
+            this._finalizeVideoSuccessSideEffects(videoGenerationResult2, startedAt8);
           }
           this._persistRunningHubResumeCache();
-        } catch (_0x367400) {
+        } catch (rhStatusMessage) {
           if (
-            _0x245d03?.signal?.aborted ||
-            _0x367400?.message === 'CANCELLED' ||
-            _0x367400?.name === 'AbortError'
+            signal2?.signal?.aborted ||
+            rhStatusMessage?.message === 'CANCELLED' ||
+            rhStatusMessage?.name === 'AbortError'
           )
             return;
-          (_0x4cc8fc.updateNodeData(this.nodeId, {
-            generationDuration: Math.max(0, Date.now() - _0x58c156),
-            rhStatusMessage: _0x367400?.message || videoTaskText('task.generationFailed'),
-            rhStatusCode: Number.isFinite(Number(_0x367400?.code)) ? Number(_0x367400.code) : null,
+          (store.updateNodeData(this.nodeId, {
+            generationDuration: Math.max(0, Date.now() - startedAt8),
+            rhStatusMessage: rhStatusMessage?.message || videoTaskText('task.generationFailed'),
+            rhStatusCode: Number.isFinite(Number(rhStatusMessage?.code))
+              ? Number(rhStatusMessage.code)
+              : null,
             ...this._buildRunningHubTaskPatch({
-              taskId: _0x3454f9,
+              taskId: taskId4,
               status: 'failed',
-              startedAt: _0x58c156,
+              startedAt: startedAt8,
               recovering: false,
-              useOpenapiQuery: _0x2babf4,
+              useOpenapiQuery: rhTaskUseOpenapiQuery,
             }),
           }),
             this._persistRunningHubResumeCache());
         } finally {
-          _0x245d03 && this._rhResumeAbortController === _0x245d03 && (this._rhResumeAbortController = null);
-          _0x245d03 && this._rhAbortController === _0x245d03 && (this._rhAbortController = null);
-          this._rhResumeTaskId === _0x3454f9 && (this._rhResumeTaskId = '');
+          signal2 && this._rhResumeAbortController === signal2 && (this._rhResumeAbortController = null);
+          signal2 && this._rhAbortController === signal2 && (this._rhAbortController = null);
+          this._rhResumeTaskId === taskId4 && (this._rhResumeTaskId = '');
           this._rhResumePromise = null;
-          const _0x864ada = this._syncLocalTaskNodeData(),
-            _0xf68708 = shouldShowGenerationBusyUi(_0x864ada);
-          this._isGenerating = _0xf68708;
-          if (_0xf68708) this._rhTaskId = String(_0x864ada?.rhTaskId || _0x3454f9 || '').trim();
+          const value147 = this._syncLocalTaskNodeData(),
+            shouldShowGenerationBusyUi3 = shouldShowGenerationBusyUi(value147);
+          this._isGenerating = shouldShowGenerationBusyUi3;
+          if (shouldShowGenerationBusyUi3)
+            this._rhTaskId = String(value147?.rhTaskId || taskId4 || '').trim();
           else {
             this._rhTaskId = null;
             if (!this._rhCancelRequested) this._rhApiKey = null;
-            (this._resetGenerateButtonIdleUi({ cancellable: true }), _0x11f58d(this.previewEl));
+            (this._resetGenerateButtonIdleUi({ cancellable: true }), stopLoading(this.previewEl));
           }
           this._updateSubmitButtonState();
         }
       })();
-      this._rhResumePromise = _0x4ed7c5;
+      this._rhResumePromise = value144;
     }
     async ['_maybeResumeAsyncTaskImpl']() {
-      const _0x37aee3 = _0x336be9().nodes?.[this.nodeId] || this._data || {};
-      if (this._isGenerating && _0x37aee3?.asyncTaskRecovering !== true) return;
-      if (!this._isAsyncRecoverableRunningTask(_0x37aee3)) {
+      const value148 = handler14().nodes?.[this.nodeId] || this._data || {};
+      if (this._isGenerating && value148?.asyncTaskRecovering !== true) return;
+      if (!this._isAsyncRecoverableRunningTask(value148)) {
         this._stopAsyncRecovery(false);
         return;
       }
-      const _0x47acd9 = String(_0x37aee3?.asyncTaskId || '').trim();
-      if (!_0x47acd9) {
+      const taskId5 = String(value148?.asyncTaskId || '').trim();
+      if (!taskId5) {
         this._stopAsyncRecovery(false);
         return;
       }
-      if (this._asyncResumeTaskId === _0x47acd9 && this._asyncResumePromise) return;
+      if (this._asyncResumeTaskId === taskId5 && this._asyncResumePromise) return;
       this._stopAsyncRecovery(false);
-      const _0xf0bf7e = Number(_0x37aee3?.asyncTaskStartedAt || _0x37aee3?.generationStartTime || Date.now()),
-        _0xf7bff6 = this._inferAsyncProviderFromModel(
-          _0x37aee3?.model,
-          _0x37aee3?.asyncTaskProvider || _0x37aee3?.provider || '',
+      const startedAt12 = Number(value148?.asyncTaskStartedAt || value148?.generationStartTime || Date.now()),
+        providerHint5 = this._inferAsyncProviderFromModel(
+          value148?.model,
+          value148?.asyncTaskProvider || value148?.provider || '',
         );
-      this._asyncResumeTaskId = _0x47acd9;
-      const _0x168f8e = (async () => {
-        let _0x40c64a = null;
+      this._asyncResumeTaskId = taskId5;
+      const value149 = (async () => {
+        let signal3 = null;
         try {
-          const _0x289366 = await this._buildResumePayload(_0x37aee3, { providerHint: _0xf7bff6 });
-          if (!_0x289366) return;
-          ((_0x40c64a = new AbortController()),
-            (this._asyncResumeAbortController = _0x40c64a),
+          const modelId2 = await this._buildResumePayload(value148, { providerHint: providerHint5 });
+          if (!modelId2) return;
+          ((signal3 = new AbortController()),
+            (this._asyncResumeAbortController = signal3),
             (this._isGenerating = true),
             this._setGenerateButtonBusyUi({ cancellable: false }),
-            _0x55f9d6(this.previewEl));
-          const _0x2c21e3 = await resumeTask(
+            startLoading(this.previewEl));
+          const response11 = await resumeTask(
             {
               sourceNodeId: this.nodeId,
               targetNodeId: this.nodeId,
               trigger: 'node',
               taskType: 'video-generation',
-              provider: _0xf7bff6 || _0x289366.provider || _0x37aee3?.provider || '',
+              provider: providerHint5 || modelId2.provider || value148?.provider || '',
               adapterType: 'modelApi',
-              modelId: _0x289366.model || _0x37aee3?.model || '',
-              executionId: (_0xf7bff6 || _0x289366.provider || 'model') + '.video.async',
-              payload: _0x289366,
-              taskId: _0x47acd9,
+              modelId: modelId2.model || value148?.model || '',
+              executionId: (providerHint5 || modelId2.provider || 'model') + '.video.async',
+              payload: modelId2,
+              taskId: taskId5,
               async: true,
               cancellable: false,
               resumable: true,
               pauseOnAbort: true,
               startBuilder: () =>
                 this._buildAsyncTaskPatch({
-                  provider: _0xf7bff6,
+                  provider: providerHint5,
                   kind: 'video',
-                  taskId: _0x47acd9,
+                  taskId: taskId5,
                   status: 'running',
-                  startedAt: _0xf0bf7e,
+                  startedAt: startedAt12,
                   recovering: true,
                 }),
               onTaskStart: () => {
                 this._persistAsyncResumeCache();
               },
-              poll: async () =>
-                _0x285cdc.resumeAsyncVideoTask(_0x47acd9, _0x289366, { signal: _0x40c64a.signal }),
-              resultBuilder: async (_0x3eb2c2, _0x304097) => {
-                const _0x4a21b1 = this._applyDreaminaSuccessResult(_0x3eb2c2, _0x304097.startedAt, null, {
+              poll: async () => api.resumeAsyncVideoTask(taskId5, modelId2, { signal: signal3.signal }),
+              resultBuilder: async (value150, startedAt13) => {
+                const value151 = this._applyDreaminaSuccessResult(value150, startedAt13.startedAt, null, {
                   writeStore: false,
                   returnPatch: true,
                 });
                 return {
-                  ...(_0x4a21b1?.patch || {}),
+                  ...(value151?.patch || {}),
                   ...this._buildAsyncTaskPatch({
-                    provider: _0xf7bff6,
+                    provider: providerHint5,
                     kind: 'video',
-                    taskId: _0x47acd9,
+                    taskId: taskId5,
                     status: 'success',
-                    startedAt: _0x304097.startedAt,
+                    startedAt: startedAt13.startedAt,
                     recovering: false,
                   }),
                 };
               },
-              failureBuilder: (_0x2d00ce, _0x287334) => ({
+              failureBuilder: (error11, startedAt14) => ({
                 ...buildVideoGenerationFailurePatch({
-                  error: _0x2d00ce?.message || videoTaskText('task.generationFailed'),
-                  startedAt: _0x287334.startedAt,
-                  duration: Math.max(0, Date.now() - _0x287334.startedAt),
+                  error: error11?.message || videoTaskText('task.generationFailed'),
+                  startedAt: startedAt14.startedAt,
+                  duration: Math.max(0, Date.now() - startedAt14.startedAt),
                 }),
                 ...this._buildAsyncTaskPatch({
-                  provider: _0xf7bff6,
+                  provider: providerHint5,
                   kind: 'video',
-                  taskId: _0x47acd9,
+                  taskId: taskId5,
                   status: 'failed',
-                  startedAt: _0x287334.startedAt,
+                  startedAt: startedAt14.startedAt,
                   recovering: false,
                 }),
               }),
-              cancelledBuilder: (_0x484092) => ({
+              cancelledBuilder: (startedAt15) => ({
                 videos: [],
                 videoUrl: '',
                 localPath: '',
-                generationDuration: Date.now() - _0x484092.startedAt,
+                generationDuration: Date.now() - startedAt15.startedAt,
                 ...this._buildAsyncTaskPatch({
-                  provider: _0xf7bff6,
+                  provider: providerHint5,
                   kind: 'video',
-                  taskId: _0x47acd9,
+                  taskId: taskId5,
                   status: 'cancelled',
-                  startedAt: _0x484092.startedAt,
+                  startedAt: startedAt15.startedAt,
                   recovering: false,
                 }),
               }),
-              parseError: (_0x1ac1b4) => _0x1ac1b4?.message || videoTaskText('task.generationFailed'),
+              parseError: (error12) => error12?.message || videoTaskText('task.generationFailed'),
             },
-            { store: _0x4cc8fc, startedAt: _0xf0bf7e, abortController: _0x40c64a },
+            { store: store, startedAt: startedAt12, abortController: signal3 },
           );
-          if (_0x2c21e3.status === 'pending') {
+          if (response11.status === 'pending') {
             this._persistAsyncResumeCache();
             return;
           }
-          if (_0x2c21e3.status === 'success') {
-            const _0xede3a7 = normalizeVideoGenerationResult(_0x2c21e3.result).items;
-            this._finalizeVideoSuccessSideEffects(_0xede3a7, _0xf0bf7e);
+          if (response11.status === 'success') {
+            const videoGenerationResult3 = normalizeVideoGenerationResult(response11.result).items;
+            this._finalizeVideoSuccessSideEffects(videoGenerationResult3, startedAt12);
           }
           this._persistAsyncResumeCache();
-        } catch (_0x4c8b5a) {
-          if (
-            _0x40c64a?.signal?.aborted ||
-            _0x4c8b5a?.message === 'CANCELLED' ||
-            _0x4c8b5a?.name === 'AbortError'
-          )
+        } catch (error13) {
+          if (signal3?.signal?.aborted || error13?.message === 'CANCELLED' || error13?.name === 'AbortError')
             return;
-          (_0x4cc8fc.updateNodeData(this.nodeId, {
+          (store.updateNodeData(this.nodeId, {
             ...buildVideoGenerationFailurePatch({
-              error: _0x4c8b5a?.message || videoTaskText('task.generationFailed'),
-              startedAt: _0xf0bf7e,
-              duration: Math.max(0, Date.now() - _0xf0bf7e),
+              error: error13?.message || videoTaskText('task.generationFailed'),
+              startedAt: startedAt12,
+              duration: Math.max(0, Date.now() - startedAt12),
             }),
             ...this._buildAsyncTaskPatch({
-              provider: _0xf7bff6,
+              provider: providerHint5,
               kind: 'video',
-              taskId: _0x47acd9,
+              taskId: taskId5,
               status: 'failed',
-              startedAt: _0xf0bf7e,
+              startedAt: startedAt12,
               recovering: false,
             }),
           }),
             this._persistAsyncResumeCache());
         } finally {
-          _0x40c64a &&
-            this._asyncResumeAbortController === _0x40c64a &&
+          signal3 &&
+            this._asyncResumeAbortController === signal3 &&
             (this._asyncResumeAbortController = null);
-          this._asyncResumeTaskId === _0x47acd9 && (this._asyncResumeTaskId = '');
+          this._asyncResumeTaskId === taskId5 && (this._asyncResumeTaskId = '');
           this._asyncResumePromise = null;
-          const _0x285109 = this._syncLocalTaskNodeData(),
-            _0x355061 = shouldShowGenerationBusyUi(_0x285109);
-          ((this._isGenerating = _0x355061),
-            !_0x355061 &&
-              (this._resetGenerateButtonIdleUi({ cancellable: false }), _0x11f58d(this.previewEl)),
+          const value152 = this._syncLocalTaskNodeData(),
+            shouldShowGenerationBusyUi4 = shouldShowGenerationBusyUi(value152);
+          ((this._isGenerating = shouldShowGenerationBusyUi4),
+            !shouldShowGenerationBusyUi4 &&
+              (this._resetGenerateButtonIdleUi({ cancellable: false }), stopLoading(this.previewEl)),
             this._updateSubmitButtonState());
         }
       })();
-      this._asyncResumePromise = _0x168f8e;
+      this._asyncResumePromise = value149;
     }
-    async ['_handleGenerateOrCancelImpl'](_0x49696b = null) {
-      const _0x36e7e7 = _0x4cc8fc.getState().nodes?.[this.nodeId] || this._data || {},
-        _0x445d51 = this._isRunninghubWorkflowModel(_0x36e7e7?.model, _0x36e7e7?.provider);
-      !_0x445d51 && this._dreaminaResumePromise && this._stopDreaminaRecovery(true);
-      !_0x445d51 && this._asyncResumePromise && this._stopAsyncRecovery(true);
+    async ['_handleGenerateOrCancelImpl'](value153 = null) {
+      const value154 = store.getState().nodes?.[this.nodeId] || this._data || {},
+        cancellable2 = this._isRunninghubWorkflowModel(value154?.model, value154?.provider);
+      !cancellable2 && this._dreaminaResumePromise && this._stopDreaminaRecovery(true);
+      !cancellable2 && this._asyncResumePromise && this._stopAsyncRecovery(true);
       if (
-        shouldAllowCancel(_0x36e7e7, {
-          cancellable: _0x445d51,
+        shouldAllowCancel(value154, {
+          cancellable: cancellable2,
           cancelInFlight: this._rhCancelInFlight === true,
         })
       ) {
         await this._cancelRunningHubWorkflowTask();
         return;
       }
-      await this._onGenerate(_0x49696b);
+      await this._onGenerate(value153);
     }
     async ['_cancelRunningHubWorkflowTaskImpl']() {
-      const _0x5f408f = _0x4cc8fc.getState().nodes?.[this.nodeId] || this._data || {},
-        _0xf074e4 = this._rhApiKey || '',
-        _0x3bebfb = String(this._rhTaskId || '').trim() || String(_0x5f408f?.rhTaskId || '').trim(),
-        _0x7f22df = Date.now(),
-        _0x2f0903 = Number(_0x5f408f?.generationStartTime),
-        _0x58ffaf =
-          _0x5f408f?.generationDuration != null
-            ? _0x5f408f.generationDuration
-            : Number.isFinite(_0x2f0903) && _0x2f0903 > 0
-              ? Math.max(0, _0x7f22df - _0x2f0903)
+      const useOpenapiQuery2 = store.getState().nodes?.[this.nodeId] || this._data || {},
+        apiKey2 = this._rhApiKey || '',
+        taskId6 = String(this._rhTaskId || '').trim() || String(useOpenapiQuery2?.rhTaskId || '').trim(),
+        value155 = Date.now(),
+        count17 = Number(useOpenapiQuery2?.generationStartTime),
+        generationDuration =
+          useOpenapiQuery2?.generationDuration != null
+            ? useOpenapiQuery2.generationDuration
+            : Number.isFinite(count17) && count17 > 0
+              ? Math.max(0, value155 - count17)
               : 0;
       this._rhCancelRequested = true;
       this._rhAbortController && !this._rhAbortController.signal.aborted && this._rhAbortController.abort();
-      const _0x3e7b86 = !_0xf074e4,
-        _0x247014 = !_0x3bebfb;
+      const enabled24 = !apiKey2,
+        rhStatusCode = !taskId6;
       try {
-        this._rhRemoteCancelSent = !_0x3e7b86 && !_0x247014;
-        const _0x2ad5ab = ({ remoteResult: _0x4668c1, remoteError: _0x578866, startedAt: _0x50e3ef }) => {
-          const _0x59322b = Number(_0x4668c1?.code),
-            _0x24d262 = _0x3e7b86
+        this._rhRemoteCancelSent = !enabled24 && !rhStatusCode;
+        const cancelledBuilder = ({
+          remoteResult: remoteResult,
+          remoteError: remoteError,
+          startedAt: startedAt16,
+        }) => {
+          const count18 = Number(remoteResult?.code),
+            value156 = enabled24
               ? videoTaskText('cancel.missingApiKey')
-              : _0x247014
+              : rhStatusCode
                 ? videoTaskText('cancel.interruptedNoTaskId')
                 : '',
-            _0x3d6e1f =
-              _0x24d262 ||
-              (_0x578866
-                ? _0x578866.message || videoTaskText('cancel.failed')
-                : _0x59322b === 0
+            rhStatusMessage2 =
+              value156 ||
+              (remoteError
+                ? remoteError.message || videoTaskText('cancel.failed')
+                : count18 === 0
                   ? videoTaskText('cancel.success')
-                  : _0x59322b === 0x327
+                  : count18 === 0x327
                     ? videoTaskText('cancel.taskNotFound')
-                    : _0x4668c1?.msg || videoTaskText('cancel.failed'));
+                    : remoteResult?.msg || videoTaskText('cancel.failed'));
           return {
-            rhStatusMessage: _0x3d6e1f,
-            rhStatusCode: _0x247014 ? 0x32d : Number.isFinite(_0x59322b) ? _0x59322b : null,
+            rhStatusMessage: rhStatusMessage2,
+            rhStatusCode: rhStatusCode ? 0x32d : Number.isFinite(count18) ? count18 : null,
             videos: [],
             videoUrl: '',
             localPath: '',
-            generationDuration: _0x58ffaf,
+            generationDuration: generationDuration,
             ...this._buildRunningHubTaskPatch({
-              taskId: _0x3bebfb,
+              taskId: taskId6,
               status: 'cancelled',
               startedAt: Number(
-                _0x50e3ef || _0x5f408f?.rhTaskStartedAt || _0x5f408f?.generationStartTime || 0,
+                startedAt16 ||
+                  useOpenapiQuery2?.rhTaskStartedAt ||
+                  useOpenapiQuery2?.generationStartTime ||
+                  0,
               ),
               recovering: false,
-              useOpenapiQuery: _0x5f408f?.rhTaskUseOpenapiQuery === true,
+              useOpenapiQuery: useOpenapiQuery2?.rhTaskUseOpenapiQuery === true,
             }),
           };
         };
         (await cancelTask(this.nodeId, {
-          store: _0x4cc8fc,
-          taskId: _0x3bebfb,
+          store: store,
+          taskId: taskId6,
           cancellable: true,
-          cancel: ({ taskId: _0x1b3a0e }) => {
-            if (!_0xf074e4) throw new Error(videoTaskText('cancel.missingApiKey'));
-            return _0x285cdc.cancelRunningHubWorkflowTask({ apiKey: _0xf074e4, taskId: _0x1b3a0e });
+          cancel: ({ taskId: taskId7 }) => {
+            if (!apiKey2) throw new Error(videoTaskText('cancel.missingApiKey'));
+            return api.cancelRunningHubWorkflowTask({ apiKey: apiKey2, taskId: taskId7 });
           },
-          cancelledBuilder: _0x2ad5ab,
+          cancelledBuilder: cancelledBuilder,
           spec: {
             sourceNodeId: this.nodeId,
             targetNodeId: this.nodeId,
             trigger: 'node',
             taskType: 'video-generation',
-            provider: _0x5f408f?.provider || 'runninghubwf',
+            provider: useOpenapiQuery2?.provider || 'runninghubwf',
             adapterType: 'workflow',
-            modelId: _0x5f408f?.model || '',
-            executionId: 'runninghub.video.' + (_0x5f408f?.model || 'workflow'),
-            payload: _0x5f408f,
+            modelId: useOpenapiQuery2?.model || '',
+            executionId: 'runninghub.video.' + (useOpenapiQuery2?.model || 'workflow'),
+            payload: useOpenapiQuery2,
             cancellable: true,
             resumable: true,
             resultBuilder: () => ({}),
-            cancelledBuilder: _0x2ad5ab,
+            cancelledBuilder: cancelledBuilder,
           },
         }),
           this._persistRunningHubResumeCache());
@@ -2167,63 +2142,63 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
           (this._rhRemoteCancelSent = false),
           this._stopRunningHubRecovery(true),
           this._resetGenerateButtonIdleUi({ cancellable: true }),
-          _0x11f58d(this.previewEl),
+          stopLoading(this.previewEl),
           this._updateSubmitButtonState());
       }
     }
     ['_setGenerateButtonBusyUi']({ cancellable: cancellable = false } = {}) {
       if (!this.btnEl) return;
       if (cancellable) {
-        const _0x28afb0 = getVideoCancelTooltip();
+        const title = getVideoCancelTooltip();
         setGenerateButtonCancellableUi(this.btnEl, {
-          title: _0x28afb0,
-          tooltip: _0x28afb0,
+          title: title,
+          tooltip: title,
           ariaLabel: videoTaskText('controls.cancelGenerateAria'),
           color: 'var(--red)',
           busy: true,
         });
         return;
       }
-      const _0x191fb7 = getVideoGenerateTitle();
-      setGenerateButtonLoadingUi(this.btnEl, { title: _0x191fb7, disabled: true, ariaLabel: _0x191fb7 });
+      const title2 = getVideoGenerateTitle();
+      setGenerateButtonLoadingUi(this.btnEl, { title: title2, disabled: true, ariaLabel: title2 });
     }
     ['_resetGenerateButtonIdleUi']({ cancellable: cancellable = false } = {}) {
       if (!this.btnEl) return;
-      const _0x216ea2 = getVideoGenerateTitle();
-      resetGenerateButtonIdleUi(this.btnEl, _0x216ea2);
+      const videoGenerateTitle = getVideoGenerateTitle();
+      resetGenerateButtonIdleUi(this.btnEl, videoGenerateTitle);
       if (cancellable) {
         (this.btnEl.removeAttribute('title'),
           this.btnEl.setAttribute('data-tooltip', getVideoCancelTooltip()));
         return;
       }
-      (this.btnEl.removeAttribute('data-tooltip'), (this.btnEl.title = _0x216ea2));
+      (this.btnEl.removeAttribute('data-tooltip'), (this.btnEl.title = videoGenerateTitle));
     }
     ['_getPreviewGenerateButtonLoadingOptions']() {
       return createPreviewGenerateButtonCallbacks(this, getVideoGenerateTitle());
     }
-    async ['_onGenerateImpl'](_0x133f9f = null, _0x4d1e6b = {}) {
+    async ['_onGenerateImpl'](template = null, value157 = {}) {
       if (this._isGenerating) return;
-      if (_0x4d1e6b?.insertPrompt === true) {
+      if (value157?.insertPrompt === true) {
         (insertPresetPromptIntoEditor({
-          storeApi: _0x4cc8fc,
+          storeApi: store,
           nodeId: this.nodeId,
           promptEl: this.promptEl,
-          template: _0x133f9f,
-          inEdges: _0x4cc8fc.getIncomingEdges(this.nodeId),
-          nodes: _0x4cc8fc.getState().nodes || {},
+          template: template,
+          inEdges: store.getIncomingEdges(this.nodeId),
+          nodes: store.getState().nodes || {},
           allowedAssetTypes: ['text', 'image', 'video', 'audio'],
         }),
           this._updateSubmitButtonState?.());
         return;
       }
-      if (shouldUsePromptPreviewForPreset(_0x133f9f)) {
-        const _0x2d467b = await this._buildPayload(_0x133f9f);
-        if (!_0x2d467b) return;
+      if (shouldUsePromptPreviewForPreset(template)) {
+        const promptText = await this._buildPayload(template);
+        if (!promptText) return;
         previewPresetPromptInEditor({
-          storeApi: _0x4cc8fc,
+          storeApi: store,
           nodeId: this.nodeId,
           promptEl: this.promptEl,
-          promptText: _0x2d467b.prompt,
+          promptText: promptText.prompt,
         });
         return;
       }
@@ -2237,80 +2212,90 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
         return;
       }
       if (this._videoSubmitInFlight === true) return;
-      const _0x33f6f3 = _0x4cc8fc.getState().nodes?.[this.nodeId] || this._data || {},
-        _0x30885d =
+      const value158 = store.getState().nodes?.[this.nodeId] || this._data || {},
+        value159 =
           typeof this._shouldKeepDreaminaLoading === 'function' &&
           typeof this._isDreaminaVideoNode === 'function'
-            ? this._shouldKeepDreaminaLoading(_0x33f6f3)
+            ? this._shouldKeepDreaminaLoading(value158)
             : false;
-      if (shouldShowGenerationBusyUi(_0x33f6f3) || _0x30885d) return;
+      if (shouldShowGenerationBusyUi(value158) || value159) return;
       this._videoSubmitInFlight = true;
       try {
         let storyReferenceGuard;
         try {
-          storyReferenceGuard = createStoryReferenceVideoGuard({ store: _0x4cc8fc, nodeId: this.nodeId,
-            resolveExecution: resolveModelExecution, getPromptHtml: () => this.promptEl?.innerHTML });
-          if (storyReferenceGuard && _0x133f9f != null) throw new Error('首帧任务不接受预设覆盖，请使用原节点普通生成按钮');
+          storyReferenceGuard = createStoryReferenceVideoGuard({
+            store: store,
+            nodeId: this.nodeId,
+            resolveExecution: resolveModelExecution,
+            getPromptHtml: () => this.promptEl?.innerHTML,
+          });
+          if (storyReferenceGuard && template != null)
+            throw new Error('首帧任务不接受预设覆盖，请使用原节点普通生成按钮');
           if (storyReferenceGuard && !window.confirm(storyReferenceGuard.confirmation)) return;
         } catch (error) {
-          window.showToast?.(error.message, 'error'); return;
+          window.showToast?.(error.message, 'error');
+          return;
         }
-        const _0x457103 = String(this._data?.model || '').trim(),
-          _0x51db0b = String(this._data?.provider || '').trim();
-        await _0x9f6bfe(_0x457103, _0x51db0b);
-        if (!this._guardVipSelection(this._data?.model || '', _0x51db0b)) return;
+        const value160 = String(this._data?.model || '').trim(),
+          value161 = String(this._data?.provider || '').trim();
+        await ensureVipSessionRecheck(value160, value161);
+        if (!this._guardVipSelection(this._data?.model || '', value161)) return;
         if (typeof window.ensureSubscriptionInstallId === 'function')
           try {
             await window.ensureSubscriptionInstallId();
           } catch {}
-        const _0x5bd3a7 = await this._buildPayload(_0x133f9f, { randomizeSubmitParams: true });
-        if (!_0x5bd3a7) return;
-        try { storyReferenceGuard?.assertCurrent(_0x5bd3a7); }
-        catch (error) { window.showToast?.(error.message, 'error'); return; }
-        const _0x4fdef3 = String(_0x5bd3a7.model || '').trim();
-        if (_0x212b55(_0x4fdef3, _0x5bd3a7.provider) && !String(_0x5bd3a7.installId || '').trim()) {
+        const provider5 = await this._buildPayload(template, { randomizeSubmitParams: true });
+        if (!provider5) return;
+        try {
+          storyReferenceGuard?.assertCurrent(provider5);
+        } catch (error) {
+          window.showToast?.(error.message, 'error');
+          return;
+        }
+        const value162 = String(provider5.model || '').trim();
+        if (isVideoVipModel(value162, provider5.provider) && !String(provider5.installId || '').trim()) {
           window.showToast?.(videoTaskText('toasts.missingInstallId'), 'error');
           return;
         }
-        const _0x30ee23 = this._isRunninghubWorkflowModel(_0x5bd3a7.model, _0x5bd3a7.provider),
-          _0x223447 = this._isDreaminaVideoNode(_0x5bd3a7),
-          _0x4a6399 = String(_0x5bd3a7?.provider || this._data?.provider || '')
+        const cancellable3 = this._isRunninghubWorkflowModel(provider5.model, provider5.provider),
+          resumable = this._isDreaminaVideoNode(provider5),
+          provider6 = String(provider5?.provider || this._data?.provider || '')
             .trim()
             .toLowerCase(),
-          _0x4b3bb6 = !_0x30ee23 && !_0x223447;
-        _0x223447 && this._stopDreaminaRecovery(true);
-        _0x30ee23 && this._stopRunningHubRecovery(true);
-        _0x4b3bb6 && this._stopAsyncRecovery(true);
+          async2 = !cancellable3 && !resumable;
+        resumable && this._stopDreaminaRecovery(true);
+        cancellable3 && this._stopRunningHubRecovery(true);
+        async2 && this._stopAsyncRecovery(true);
         this._rhGenToken = (this._rhGenToken || 0) + 1;
-        const _0x1739e8 = this._rhGenToken;
+        const value163 = this._rhGenToken;
         ((this._rhCancelRequested = false),
           (this._rhRemoteCancelSent = false),
-          (this._rhApiKey = _0x30ee23 ? _0x5bd3a7.apiKey : null),
+          (this._rhApiKey = cancellable3 ? provider5.apiKey : null),
           (this._rhTaskId = null),
-          (this._rhAbortController = _0x30ee23 ? new AbortController() : null),
+          (this._rhAbortController = cancellable3 ? new AbortController() : null),
           (this._isGenerating = true),
-          this._setGenerateButtonBusyUi({ cancellable: _0x30ee23 }),
-          _0x55f9d6(this.previewEl));
-        const _0x55c726 = Date.now(),
-          _0x2b1ef2 = {
-            ...buildGenerationStartPatch({ startedAt: _0x55c726 }),
-            generationStartTime: _0x55c726,
+          this._setGenerateButtonBusyUi({ cancellable: cancellable3 }),
+          startLoading(this.previewEl));
+        const startedAt17 = Date.now(),
+          value164 = {
+            ...buildGenerationStartPatch({ startedAt: startedAt17 }),
+            generationStartTime: startedAt17,
             generationDuration: null,
             rhStatusMessage: null,
             rhStatusCode: null,
           };
-        _0x223447 &&
-          (Object.assign(_0x2b1ef2, {
+        resumable &&
+          (Object.assign(value164, {
             dreaminaSubmitId: '',
             dreaminaTaskStatus: 'pending',
             dreaminaTaskPhase: 'generating',
             dreaminaTaskLabel: videoTaskText('task.submitting'),
-            dreaminaTaskStartedAt: _0x55c726,
+            dreaminaTaskStartedAt: startedAt17,
             dreaminaTaskLastCheckedAt: null,
             dreaminaTaskLastRaw: {},
             dreaminaTaskRecovering: false,
           }),
-          Object.assign(_0x2b1ef2, {
+          Object.assign(value164, {
             ...this._buildRunningHubTaskPatch({
               taskId: '',
               status: 'idle',
@@ -2327,15 +2312,15 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
               recovering: false,
             }),
           }));
-        _0x30ee23 &&
-          (Object.assign(_0x2b1ef2, {
+        cancellable3 &&
+          (Object.assign(value164, {
             rhTaskId: '',
             rhTaskStatus: 'pending',
-            rhTaskStartedAt: _0x55c726,
+            rhTaskStartedAt: startedAt17,
             rhTaskRecovering: false,
             rhTaskUseOpenapiQuery: false,
           }),
-          Object.assign(_0x2b1ef2, {
+          Object.assign(value164, {
             dreaminaSubmitId: '',
             dreaminaTaskStatus: 'idle',
             dreaminaTaskPhase: 'done',
@@ -2353,19 +2338,19 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
               recovering: false,
             }),
           }));
-        _0x4b3bb6 &&
+        async2 &&
           (Object.assign(
-            _0x2b1ef2,
+            value164,
             this._buildAsyncTaskPatch({
-              provider: _0x4a6399,
+              provider: provider6,
               kind: 'video',
               taskId: '',
               status: 'pending',
-              startedAt: _0x55c726,
+              startedAt: startedAt17,
               recovering: false,
             }),
           ),
-          Object.assign(_0x2b1ef2, {
+          Object.assign(value164, {
             ...this._buildRunningHubTaskPatch({
               taskId: '',
               status: 'idle',
@@ -2383,69 +2368,73 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
             dreaminaTaskRecovering: false,
           }));
         try {
-          const _0xc986d1 = await submitTask(
+          const response12 = await submitTask(
             {
               sourceNodeId: this.nodeId,
               targetNodeId: this.nodeId,
               trigger: 'node',
               taskType: 'video-generation',
-              provider: _0x5bd3a7.provider || _0x4a6399 || this._data?.provider || '',
-              adapterType: _0x30ee23 ? 'workflow' : 'modelApi',
-              modelId: _0x5bd3a7.model || this._data?.model || '',
+              provider: provider5.provider || provider6 || this._data?.provider || '',
+              adapterType: cancellable3 ? 'workflow' : 'modelApi',
+              modelId: provider5.model || this._data?.model || '',
               executionId:
                 'video.' +
-                (_0x5bd3a7.provider || _0x4a6399 || 'modelApi') +
+                (provider5.provider || provider6 || 'modelApi') +
                 '.' +
-                (_0x5bd3a7.model || 'default'),
-              payload: _0x5bd3a7,
-              cancellable: _0x30ee23,
-              resumable: _0x223447 || _0x30ee23 || _0x4b3bb6,
-              async: _0x4b3bb6,
-              startBuilder: () => _0x2b1ef2,
+                (provider5.model || 'default'),
+              payload: provider5,
+              cancellable: cancellable3,
+              resumable: resumable || cancellable3 || async2,
+              async: async2,
+              startBuilder: () => value164,
               onTaskStart: () => {
                 this._syncLocalTaskNodeData();
-                if (_0x223447) this._persistDreaminaResumeCache();
-                if (_0x30ee23) this._persistRunningHubResumeCache();
-                if (_0x4b3bb6) this._persistAsyncResumeCache();
+                if (resumable) this._persistDreaminaResumeCache();
+                if (cancellable3) this._persistRunningHubResumeCache();
+                if (async2) this._persistAsyncResumeCache();
               },
-              submit: async (_0x13d984, _0x2cdbc0 = {}) =>
-                _0x285cdc.generateVideo((storyReferenceGuard?.beforeSend(_0x5bd3a7), _0x5bd3a7), {
-                  ...(_0x30ee23 ? { signal: this._rhAbortController.signal } : {}),
-                  ...(_0x223447 ? { maxWaitMs: _0x4fb3f5 } : {}),
-                  onTaskMeta: ({ taskId: _0x5ebf88, useOpenapiQuery: _0x17b67a, provider: _0x272d83 }) => {
-                    if (_0x1739e8 !== this._rhGenToken) return;
-                    const _0x303ac2 = String(_0x5ebf88 || '').trim();
-                    if (!_0x303ac2) return;
-                    if (_0x30ee23) {
-                      ((this._rhTaskId = _0x303ac2),
-                        _0x2cdbc0.onTaskId?.(_0x303ac2),
-                        _0x4cc8fc.updateNodeData(this.nodeId, {
+              submit: async (value165, value166 = {}) =>
+                api.generateVideo((storyReferenceGuard?.beforeSend(provider5), provider5), {
+                  ...(cancellable3 ? { signal: this._rhAbortController.signal } : {}),
+                  ...(resumable ? { maxWaitMs: maxWaitMs } : {}),
+                  onTaskMeta: ({
+                    taskId: taskId8,
+                    useOpenapiQuery: useOpenapiQuery3,
+                    provider: provider7,
+                  }) => {
+                    if (value163 !== this._rhGenToken) return;
+                    const submitId3 = String(taskId8 || '').trim();
+                    if (!submitId3) return;
+                    if (cancellable3) {
+                      ((this._rhTaskId = submitId3),
+                        value166.onTaskId?.(submitId3),
+                        store.updateNodeData(this.nodeId, {
                           rhStatusMessage: null,
                           rhStatusCode: null,
-                          rhTaskUseOpenapiQuery: _0x17b67a === true,
+                          rhTaskUseOpenapiQuery: useOpenapiQuery3 === true,
                         }),
                         this._syncLocalTaskNodeData(),
                         this._persistRunningHubResumeCache());
                       return;
                     }
-                    if (_0x223447) {
-                      this._dreaminaActiveSubmitId = _0x303ac2;
-                      const _0x567b4d = this._buildDreaminaPendingSnapshot({
-                        submitId: _0x303ac2,
+                    if (resumable) {
+                      this._dreaminaActiveSubmitId = submitId3;
+                      const value167 = this._buildDreaminaPendingSnapshot({
+                        submitId: submitId3,
                         phase: 'generating',
                         label: videoTaskText('task.generating'),
                       });
-                      (this._applyDreaminaTaskSnapshot(_0x567b4d, {
+                      (this._applyDreaminaTaskSnapshot(value167, {
                         recovering: false,
-                        startedAt: _0x55c726,
+                        startedAt: startedAt17,
                       }),
-                        _0x2cdbc0.onTaskId?.(_0x303ac2));
+                        value166.onTaskId?.(submitId3));
                       return;
                     }
-                    _0x4b3bb6 &&
-                      (_0x2cdbc0.onTaskId?.(_0x303ac2),
-                      _0x4cc8fc.updateNodeData(this.nodeId, {
-                        asyncTaskProvider: String(_0x272d83 || _0x4a6399 || this._data?.provider || '')
+                    async2 &&
+                      (value166.onTaskId?.(submitId3),
+                      store.updateNodeData(this.nodeId, {
+                        asyncTaskProvider: String(provider7 || provider6 || this._data?.provider || '')
                           .trim()
                           .toLowerCase(),
                         asyncTaskKind: 'video',
@@ -2453,78 +2442,81 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
                       this._syncLocalTaskNodeData(),
                       this._persistAsyncResumeCache());
                   },
-                  onTaskId: (_0x39ff8e) => {
-                    if (_0x1739e8 !== this._rhGenToken) return;
-                    const _0x52353c = String(_0x39ff8e || '').trim();
-                    if (!_0x52353c) return;
-                    if (_0x223447) {
-                      this._dreaminaActiveSubmitId = _0x52353c;
-                      const _0x257177 = this._buildDreaminaPendingSnapshot({
-                        submitId: _0x52353c,
+                  onTaskId: (value168) => {
+                    if (value163 !== this._rhGenToken) return;
+                    const submitId4 = String(value168 || '').trim();
+                    if (!submitId4) return;
+                    if (resumable) {
+                      this._dreaminaActiveSubmitId = submitId4;
+                      const value169 = this._buildDreaminaPendingSnapshot({
+                        submitId: submitId4,
                         phase: 'generating',
                         label: videoTaskText('task.generating'),
                       });
-                      (this._applyDreaminaTaskSnapshot(_0x257177, {
+                      (this._applyDreaminaTaskSnapshot(value169, {
                         recovering: false,
-                        startedAt: _0x55c726,
+                        startedAt: startedAt17,
                       }),
-                        _0x2cdbc0.onTaskId?.(_0x52353c));
+                        value166.onTaskId?.(submitId4));
                       return;
                     }
-                    if (_0x30ee23) {
-                      ((this._rhTaskId = _0x52353c),
-                        _0x2cdbc0.onTaskId?.(_0x52353c),
-                        _0x4cc8fc.updateNodeData(this.nodeId, {
+                    if (cancellable3) {
+                      ((this._rhTaskId = submitId4),
+                        value166.onTaskId?.(submitId4),
+                        store.updateNodeData(this.nodeId, {
                           rhStatusMessage: null,
                           rhStatusCode: null,
                           rhTaskUseOpenapiQuery:
-                            _0x4cc8fc.getState().nodes?.[this.nodeId]?.rhTaskUseOpenapiQuery === true,
+                            store.getState().nodes?.[this.nodeId]?.rhTaskUseOpenapiQuery === true,
                         }),
                         this._syncLocalTaskNodeData(),
                         this._persistRunningHubResumeCache());
-                      const _0x2f098b = this._rhApiKey || '';
+                      const apiKey3 = this._rhApiKey || '';
                       this._rhCancelRequested &&
                         !this._rhRemoteCancelSent &&
-                        _0x2f098b &&
-                        _0x52353c &&
+                        apiKey3 &&
+                        submitId4 &&
                         ((this._rhRemoteCancelSent = true),
                         (async () => {
-                          if (_0x1739e8 !== this._rhGenToken) return;
-                          const _0x4bb28a = ({ remoteResult: _0x13163a, remoteError: _0x53c826 }) => {
-                            const _0x292da1 = Number(_0x13163a?.code),
-                              _0xac91c1 = _0x53c826
-                                ? _0x53c826.message || videoTaskText('cancel.failed')
-                                : _0x292da1 === 0
+                          if (value163 !== this._rhGenToken) return;
+                          const cancelledBuilder2 = ({
+                            remoteResult: remoteResult2,
+                            remoteError: remoteError2,
+                          }) => {
+                            const count19 = Number(remoteResult2?.code),
+                              rhStatusMessage3 = remoteError2
+                                ? remoteError2.message || videoTaskText('cancel.failed')
+                                : count19 === 0
                                   ? videoTaskText('cancel.success')
-                                  : _0x292da1 === 0x327
+                                  : count19 === 0x327
                                     ? videoTaskText('cancel.taskNotFound')
-                                    : _0x13163a?.msg || videoTaskText('cancel.failed');
+                                    : remoteResult2?.msg || videoTaskText('cancel.failed');
                             return {
-                              rhStatusMessage: _0xac91c1,
-                              rhStatusCode: Number.isFinite(_0x292da1) ? _0x292da1 : null,
+                              rhStatusMessage: rhStatusMessage3,
+                              rhStatusCode: Number.isFinite(count19) ? count19 : null,
                               videos: [],
                               videoUrl: '',
                               localPath: '',
                               ...this._buildRunningHubTaskPatch({
-                                taskId: _0x52353c,
+                                taskId: submitId4,
                                 status: 'cancelled',
-                                startedAt: _0x55c726,
+                                startedAt: startedAt17,
                                 recovering: false,
                                 useOpenapiQuery:
-                                  _0x4cc8fc.getState().nodes?.[this.nodeId]?.rhTaskUseOpenapiQuery === true,
+                                  store.getState().nodes?.[this.nodeId]?.rhTaskUseOpenapiQuery === true,
                               }),
                             };
                           };
                           await cancelTask(this.nodeId, {
-                            store: _0x4cc8fc,
-                            taskId: _0x52353c,
+                            store: store,
+                            taskId: submitId4,
                             cancellable: true,
-                            cancel: ({ taskId: _0x3673b2 }) =>
-                              _0x285cdc.cancelRunningHubWorkflowTask({
-                                apiKey: _0x2f098b,
-                                taskId: _0x3673b2,
+                            cancel: ({ taskId: taskId9 }) =>
+                              api.cancelRunningHubWorkflowTask({
+                                apiKey: apiKey3,
+                                taskId: taskId9,
                               }),
-                            cancelledBuilder: _0x4bb28a,
+                            cancelledBuilder: cancelledBuilder2,
                             spec: {
                               sourceNodeId: this.nodeId,
                               targetNodeId: this.nodeId,
@@ -2532,26 +2524,26 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
                               taskType: 'video-generation',
                               provider: 'runninghubwf',
                               adapterType: 'workflow',
-                              modelId: _0x5bd3a7?.model || '',
-                              executionId: 'runninghub.video.' + (_0x5bd3a7?.model || 'workflow'),
-                              payload: _0x5bd3a7,
+                              modelId: provider5?.model || '',
+                              executionId: 'runninghub.video.' + (provider5?.model || 'workflow'),
+                              payload: provider5,
                               cancellable: true,
                               resumable: true,
                               resultBuilder: () => ({}),
-                              cancelledBuilder: _0x4bb28a,
+                              cancelledBuilder: cancelledBuilder2,
                             },
                           });
-                          if (_0x1739e8 !== this._rhGenToken) return;
+                          if (value163 !== this._rhGenToken) return;
                           this._persistRunningHubResumeCache();
                         })());
                       return;
                     }
-                    if (_0x4b3bb6) {
-                      const _0x3185b1 = _0x4cc8fc.getState().nodes?.[this.nodeId] || {};
-                      (_0x2cdbc0.onTaskId?.(_0x52353c),
-                        _0x4cc8fc.updateNodeData(this.nodeId, {
+                    if (async2) {
+                      const value170 = store.getState().nodes?.[this.nodeId] || {};
+                      (value166.onTaskId?.(submitId4),
+                        store.updateNodeData(this.nodeId, {
                           asyncTaskProvider: String(
-                            _0x3185b1?.asyncTaskProvider || _0x4a6399 || this._data?.provider || '',
+                            value170?.asyncTaskProvider || provider6 || this._data?.provider || '',
                           )
                             .trim()
                             .toLowerCase(),
@@ -2561,1177 +2553,1190 @@ export function createVideoNodeTaskOrchestrationModule(_0x267351) {
                         this._persistAsyncResumeCache());
                     }
                   },
-                  onProgress: _0x223447
-                    ? async (_0x14eb05) => {
-                        if (_0x1739e8 !== this._rhGenToken) return;
-                        this._applyDreaminaTaskSnapshot(_0x14eb05, {
+                  onProgress: resumable
+                    ? async (value171) => {
+                        if (value163 !== this._rhGenToken) return;
+                        this._applyDreaminaTaskSnapshot(value171, {
                           recovering: false,
-                          startedAt: _0x55c726,
+                          startedAt: startedAt17,
                         });
                       }
                     : undefined,
                 }),
-              cancel: _0x30ee23
-                ? async ({ taskId: _0x1c302a }) => {
-                    const _0xa5cb0d = this._rhApiKey || _0x5bd3a7.apiKey || '',
-                      _0x2deb6c = String(_0x1c302a || '').trim();
-                    if (!_0xa5cb0d || !_0x2deb6c) return null;
-                    return _0x285cdc.cancelRunningHubWorkflowTask({ apiKey: _0xa5cb0d, taskId: _0x2deb6c });
+              cancel: cancellable3
+                ? async ({ taskId: taskId10 }) => {
+                    const apiKey4 = this._rhApiKey || provider5.apiKey || '',
+                      taskId11 = String(taskId10 || '').trim();
+                    if (!apiKey4 || !taskId11) return null;
+                    return api.cancelRunningHubWorkflowTask({ apiKey: apiKey4, taskId: taskId11 });
                   }
                 : undefined,
-              resultBuilder: (_0x19e28b, _0x14eaf1) => {
-                const _0xde4366 = this._applyDreaminaSuccessResult(_0x19e28b, _0x14eaf1.startedAt, null, {
+              resultBuilder: (value172, startedAt18) => {
+                const value173 = this._applyDreaminaSuccessResult(value172, startedAt18.startedAt, null, {
                     writeStore: false,
                     returnPatch: true,
                   }),
-                  _0x206eb3 = { ...(_0xde4366?.patch || {}) };
-                if (_0x30ee23) {
-                  const _0x116a6c = _0x4cc8fc.getState().nodes?.[this.nodeId] || {};
+                  value174 = { ...(value173?.patch || {}) };
+                if (cancellable3) {
+                  const useOpenapiQuery4 = store.getState().nodes?.[this.nodeId] || {};
                   Object.assign(
-                    _0x206eb3,
+                    value174,
                     { rhStatusMessage: null, rhStatusCode: null },
                     this._buildRunningHubTaskPatch({
-                      taskId: String(this._rhTaskId || '').trim() || String(_0x116a6c?.rhTaskId || '').trim(),
+                      taskId:
+                        String(this._rhTaskId || '').trim() ||
+                        String(useOpenapiQuery4?.rhTaskId || '').trim(),
                       status: 'success',
-                      startedAt: _0x14eaf1.startedAt,
+                      startedAt: startedAt18.startedAt,
                       recovering: false,
-                      useOpenapiQuery: _0x116a6c?.rhTaskUseOpenapiQuery === true,
+                      useOpenapiQuery: useOpenapiQuery4?.rhTaskUseOpenapiQuery === true,
                     }),
                   );
                 } else {
-                  if (_0x4b3bb6) {
-                    const _0x518936 = _0x4cc8fc.getState().nodes?.[this.nodeId] || {};
+                  if (async2) {
+                    const value175 = store.getState().nodes?.[this.nodeId] || {};
                     Object.assign(
-                      _0x206eb3,
+                      value174,
                       this._buildAsyncTaskPatch({
-                        provider: String(_0x518936?.asyncTaskProvider || _0x4a6399 || '').trim(),
+                        provider: String(value175?.asyncTaskProvider || provider6 || '').trim(),
                         kind: 'video',
-                        taskId: String(_0x518936?.asyncTaskId || '').trim(),
+                        taskId: String(value175?.asyncTaskId || '').trim(),
                         status: 'success',
-                        startedAt: _0x14eaf1.startedAt,
+                        startedAt: startedAt18.startedAt,
                         recovering: false,
                       }),
                     );
                   }
                 }
-                return _0x206eb3;
+                return value174;
               },
-              failureBuilder: (_0x4a1fbf, _0x3f1df1) => {
-                const _0x1fb5af = _0x4a1fbf?.message || videoTaskText('task.generationFailed');
-                if (_0x223447 && this._isDreaminaPollTimeoutError(_0x4a1fbf)) {
-                  const _0xf0ccc1 = _0x4cc8fc.getState().nodes?.[this.nodeId] || {},
-                    _0xfbd4ca = String(_0xf0ccc1?.dreaminaSubmitId || '').trim(),
-                    _0x1fa12a = this._buildDreaminaBackgroundPendingSnapshot(_0xfbd4ca);
+              failureBuilder: (error14, startedAt19) => {
+                const error15 = error14?.message || videoTaskText('task.generationFailed');
+                if (resumable && this._isDreaminaPollTimeoutError(error14)) {
+                  const value176 = store.getState().nodes?.[this.nodeId] || {},
+                    value177 = String(value176?.dreaminaSubmitId || '').trim(),
+                    value178 = this._buildDreaminaBackgroundPendingSnapshot(value177);
                   return Object.assign(
                     {
                       isGenerating: true,
                       jobStatus: 'running',
                       jobError: null,
-                      generationDuration: Date.now() - _0x3f1df1.startedAt,
+                      generationDuration: Date.now() - startedAt19.startedAt,
                     },
-                    this._buildDreaminaTaskPatch(_0x1fa12a, {
+                    this._buildDreaminaTaskPatch(value178, {
                       recovering: false,
                       startedAt: Number(
-                        _0xf0ccc1?.dreaminaTaskStartedAt ||
-                          _0xf0ccc1?.generationStartTime ||
-                          _0x3f1df1.startedAt,
+                        value176?.dreaminaTaskStartedAt ||
+                          value176?.generationStartTime ||
+                          startedAt19.startedAt,
                       ),
                     }),
                   );
                 }
-                const _0x54d701 =
-                  String(_0x4a1fbf?.code || '') === 'SUBSCRIPTION_REQUIRED'
+                const value179 =
+                  String(error14?.code || '') === 'SUBSCRIPTION_REQUIRED'
                     ? {}
                     : buildVideoGenerationFailurePatch({
-                        error: _0x1fb5af,
-                        startedAt: _0x3f1df1.startedAt,
-                        duration: Date.now() - _0x3f1df1.startedAt,
+                        error: error15,
+                        startedAt: startedAt19.startedAt,
+                        duration: Date.now() - startedAt19.startedAt,
                       });
-                if (_0x223447) {
-                  const _0x3944c0 = this._buildDreaminaFailedSnapshot(
-                    _0x4cc8fc.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '',
-                    _0x1fb5af,
+                if (resumable) {
+                  const value180 = this._buildDreaminaFailedSnapshot(
+                    store.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '',
+                    error15,
                   );
                   (Object.assign(
-                    _0x54d701,
-                    this._buildDreaminaTaskPatch(_0x3944c0, {
+                    value179,
+                    this._buildDreaminaTaskPatch(value180, {
                       recovering: false,
-                      startedAt: _0x3f1df1.startedAt,
+                      startedAt: startedAt19.startedAt,
                     }),
                   ),
-                    this._emitDreaminaTaskCenterUpdate(_0x3944c0, {
+                    this._emitDreaminaTaskCenterUpdate(value180, {
                       status: 'failed',
-                      error: _0x1fb5af,
-                      startedAt: _0x3f1df1.startedAt,
+                      error: error15,
+                      startedAt: startedAt19.startedAt,
                     }));
                 }
-                if (_0x30ee23) {
-                  const _0x1f97bf = _0x4cc8fc.getState().nodes?.[this.nodeId] || {};
+                if (cancellable3) {
+                  const useOpenapiQuery5 = store.getState().nodes?.[this.nodeId] || {};
                   Object.assign(
-                    _0x54d701,
+                    value179,
                     {
-                      rhStatusMessage: _0x1fb5af,
-                      rhStatusCode: Number.isFinite(Number(_0x4a1fbf?.code)) ? Number(_0x4a1fbf.code) : null,
+                      rhStatusMessage: error15,
+                      rhStatusCode: Number.isFinite(Number(error14?.code)) ? Number(error14.code) : null,
                     },
                     this._buildRunningHubTaskPatch({
-                      taskId: String(this._rhTaskId || '').trim() || String(_0x1f97bf?.rhTaskId || '').trim(),
+                      taskId:
+                        String(this._rhTaskId || '').trim() ||
+                        String(useOpenapiQuery5?.rhTaskId || '').trim(),
                       status: 'failed',
-                      startedAt: _0x3f1df1.startedAt,
+                      startedAt: startedAt19.startedAt,
                       recovering: false,
-                      useOpenapiQuery: _0x1f97bf?.rhTaskUseOpenapiQuery === true,
+                      useOpenapiQuery: useOpenapiQuery5?.rhTaskUseOpenapiQuery === true,
                     }),
                   );
                 }
-                if (_0x4b3bb6) {
-                  const _0x127140 = _0x4cc8fc.getState().nodes?.[this.nodeId] || {};
+                if (async2) {
+                  const value181 = store.getState().nodes?.[this.nodeId] || {};
                   Object.assign(
-                    _0x54d701,
+                    value179,
                     this._buildAsyncTaskPatch({
-                      provider: String(_0x127140?.asyncTaskProvider || _0x4a6399 || '').trim(),
+                      provider: String(value181?.asyncTaskProvider || provider6 || '').trim(),
                       kind: 'video',
-                      taskId: String(_0x127140?.asyncTaskId || '').trim(),
+                      taskId: String(value181?.asyncTaskId || '').trim(),
                       status: 'failed',
-                      startedAt: _0x3f1df1.startedAt,
+                      startedAt: startedAt19.startedAt,
                       recovering: false,
                     }),
                   );
                 }
-                return _0x54d701;
+                return value179;
               },
-              cancelledBuilder: (_0x101ebf) => ({
+              cancelledBuilder: (startedAt20) => ({
                 videos: [],
                 videoUrl: '',
                 localPath: '',
-                generationDuration: Date.now() - _0x101ebf.startedAt,
-                ...(_0x30ee23
+                generationDuration: Date.now() - startedAt20.startedAt,
+                ...(cancellable3
                   ? {
                       rhStatusMessage: videoTaskText('task.generationCancelled'),
                       rhStatusCode: null,
                       ...this._buildRunningHubTaskPatch({
                         taskId:
                           String(this._rhTaskId || '').trim() ||
-                          String(_0x4cc8fc.getState().nodes?.[this.nodeId]?.rhTaskId || '').trim(),
+                          String(store.getState().nodes?.[this.nodeId]?.rhTaskId || '').trim(),
                         status: 'cancelled',
-                        startedAt: _0x101ebf.startedAt,
+                        startedAt: startedAt20.startedAt,
                         recovering: false,
                         useOpenapiQuery:
-                          _0x4cc8fc.getState().nodes?.[this.nodeId]?.rhTaskUseOpenapiQuery === true,
+                          store.getState().nodes?.[this.nodeId]?.rhTaskUseOpenapiQuery === true,
                       }),
                     }
                   : {}),
               }),
-              parseError: (_0x7ba6cf) => _0x7ba6cf?.message || videoTaskText('task.generationFailed'),
+              parseError: (error16) => error16?.message || videoTaskText('task.generationFailed'),
             },
-            { store: _0x4cc8fc, startedAt: _0x55c726, abortController: this._rhAbortController },
+            { store: store, startedAt: startedAt17, abortController: this._rhAbortController },
           );
-          if (_0xc986d1.status === 'pending') return _0xc986d1;
-          if (_0xc986d1.status === 'success') {
-            const _0x2d6ace = normalizeVideoGenerationResult(_0xc986d1.result).items;
-            this._finalizeVideoSuccessSideEffects(_0x2d6ace, _0x55c726);
-            if (_0x223447) this._persistDreaminaResumeCache();
-            if (_0x30ee23) this._persistRunningHubResumeCache();
-            if (_0x4b3bb6) this._persistAsyncResumeCache();
-            return _0xc986d1;
+          if (response12.status === 'pending') return response12;
+          if (response12.status === 'success') {
+            const videoGenerationResult4 = normalizeVideoGenerationResult(response12.result).items;
+            this._finalizeVideoSuccessSideEffects(videoGenerationResult4, startedAt17);
+            if (resumable) this._persistDreaminaResumeCache();
+            if (cancellable3) this._persistRunningHubResumeCache();
+            if (async2) this._persistAsyncResumeCache();
+            return response12;
           }
-          const _0x7452b2 = _0xc986d1.error;
-          if (_0xc986d1.status === 'failed' && String(_0x7452b2?.code || '') === 'SUBSCRIPTION_REQUIRED') {
-            const _0x384a86 = String(_0x7452b2?.requiredModelId || '').trim(),
-              _0x15b940 = _0x384a86 || this._data?.model || '',
-              _0x44cbab = String(this._data?.provider || '').trim(),
-              _0x4a8e73 = window.handleSubscriptionRequired;
-            if (typeof _0x4a8e73 === 'function')
-              await _0x4a8e73({ modelId: _0x15b940, provider: _0x44cbab, error: _0x7452b2 });
+          const error17 = response12.error;
+          if (response12.status === 'failed' && String(error17?.code || '') === 'SUBSCRIPTION_REQUIRED') {
+            const value182 = String(error17?.requiredModelId || '').trim(),
+              modelId3 = value182 || this._data?.model || '',
+              provider8 = String(this._data?.provider || '').trim(),
+              handler15 = window.handleSubscriptionRequired;
+            if (typeof handler15 === 'function')
+              await handler15({ modelId: modelId3, provider: provider8, error: error17 });
             else {
               if (typeof window.openSubscriptionDialog === 'function') {
-                const _0x2501af = window.getSubscriptionState?.() || {};
-                String(_0x2501af.status || '').toLowerCase() !== 'active'
-                  ? window.openSubscriptionDialog({ modelId: _0x15b940, provider: _0x44cbab })
+                const response13 = window.getSubscriptionState?.() || {};
+                String(response13.status || '').toLowerCase() !== 'active'
+                  ? window.openSubscriptionDialog({ modelId: modelId3, provider: provider8 })
                   : window.showToast?.(
-                      _0x7452b2?.message || videoTaskText('toasts.subscriptionSyncing'),
+                      error17?.message || videoTaskText('toasts.subscriptionSyncing'),
                       'warning',
                     );
               }
             }
-            return _0xc986d1;
+            return response12;
           }
-          if (_0xc986d1.status === 'failed' && _0x223447 && this._isDreaminaPollTimeoutError(_0x7452b2))
+          if (response12.status === 'failed' && resumable && this._isDreaminaPollTimeoutError(error17))
             return (
               this._persistDreaminaResumeCache(),
               this._showDreaminaBackgroundQueueingToast(
-                _0x4cc8fc.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '',
+                store.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '',
               ),
-              _0xc986d1
+              response12
             );
-          if (_0xc986d1.status === 'failed') {
-            const _0x1dadff = _0x7452b2?.message || '';
+          if (response12.status === 'failed') {
+            const message3 = error17?.message || '';
             (void logDiagnosticEvent({
               type: 'generation.video_failed',
               level: 'error',
               source: 'renderer',
-              message: _0x1dadff || videoTaskText('task.videoGenerationFailed'),
-              error: _0x7452b2,
+              message: message3 || videoTaskText('task.videoGenerationFailed'),
+              error: error17,
               context: {
                 nodeId: this.nodeId,
-                provider: _0x5bd3a7?.provider || '',
-                model: _0x5bd3a7?.model || '',
-                isDreamina: _0x223447,
-                isRhWorkflow: _0x30ee23,
-                isAsyncTaskModel: _0x4b3bb6,
+                provider: provider5?.provider || '',
+                model: provider5?.model || '',
+                isDreamina: resumable,
+                isRhWorkflow: cancellable3,
+                isAsyncTaskModel: async2,
               },
             }),
               window.showToast?.(
-                _0x1dadff,
+                message3,
                 'error',
-                isDreaminaUploadDurationErrorMessage(_0x1dadff)
+                isDreaminaUploadDurationErrorMessage(message3)
                   ? DREAMINA_UPLOAD_DURATION_ERROR_TOAST_MS
                   : undefined,
               ));
-            if (_0x223447) this._persistDreaminaResumeCache();
-            if (_0x30ee23) this._persistRunningHubResumeCache();
-            if (_0x4b3bb6) this._persistAsyncResumeCache();
-            return _0xc986d1;
+            if (resumable) this._persistDreaminaResumeCache();
+            if (cancellable3) this._persistRunningHubResumeCache();
+            if (async2) this._persistAsyncResumeCache();
+            return response12;
           }
-          return _0xc986d1;
-        } catch (_0x3617ec) {
+          return response12;
+        } catch (error18) {
           if (
-            _0x30ee23 &&
-            (this._rhCancelRequested ||
-              _0x3617ec?.message === 'CANCELLED' ||
-              _0x3617ec?.name === 'AbortError')
+            cancellable3 &&
+            (this._rhCancelRequested || error18?.message === 'CANCELLED' || error18?.name === 'AbortError')
           )
             return;
-          if (String(_0x3617ec?.code || '') === 'SUBSCRIPTION_REQUIRED') {
-            const _0x49dc75 = String(_0x3617ec?.requiredModelId || '').trim(),
-              _0x3ba1e8 = _0x49dc75 || this._data?.model || '',
-              _0x18b54b = String(this._data?.provider || '').trim(),
-              _0x58f1ba = window.handleSubscriptionRequired;
-            if (typeof _0x58f1ba === 'function')
-              await _0x58f1ba({ modelId: _0x3ba1e8, provider: _0x18b54b, error: _0x3617ec });
+          if (String(error18?.code || '') === 'SUBSCRIPTION_REQUIRED') {
+            const value183 = String(error18?.requiredModelId || '').trim(),
+              modelId4 = value183 || this._data?.model || '',
+              provider9 = String(this._data?.provider || '').trim(),
+              handler16 = window.handleSubscriptionRequired;
+            if (typeof handler16 === 'function')
+              await handler16({ modelId: modelId4, provider: provider9, error: error18 });
             else {
               if (typeof window.openSubscriptionDialog === 'function') {
-                const _0x3e65af = window.getSubscriptionState?.() || {};
-                String(_0x3e65af.status || '').toLowerCase() !== 'active'
-                  ? window.openSubscriptionDialog({ modelId: _0x3ba1e8, provider: _0x18b54b })
+                const response14 = window.getSubscriptionState?.() || {};
+                String(response14.status || '').toLowerCase() !== 'active'
+                  ? window.openSubscriptionDialog({ modelId: modelId4, provider: provider9 })
                   : window.showToast?.(
-                      _0x3617ec?.message || videoTaskText('toasts.subscriptionSyncing'),
+                      error18?.message || videoTaskText('toasts.subscriptionSyncing'),
                       'warning',
                     );
               }
             }
             return;
           }
-          if (_0x223447 && this._isDreaminaPollTimeoutError(_0x3617ec)) {
-            const _0x3591ab = _0x4cc8fc.getState().nodes?.[this.nodeId] || {},
-              _0x970968 = String(_0x3591ab?.dreaminaSubmitId || '').trim(),
-              _0x453421 = this._buildDreaminaBackgroundPendingSnapshot(_0x970968);
-            (_0x4cc8fc.updateNodeData(
+          if (resumable && this._isDreaminaPollTimeoutError(error18)) {
+            const value184 = store.getState().nodes?.[this.nodeId] || {},
+              value185 = String(value184?.dreaminaSubmitId || '').trim(),
+              value186 = this._buildDreaminaBackgroundPendingSnapshot(value185);
+            (store.updateNodeData(
               this.nodeId,
               Object.assign(
                 {
                   isGenerating: true,
                   jobStatus: 'running',
                   jobError: null,
-                  generationDuration: Date.now() - _0x55c726,
+                  generationDuration: Date.now() - startedAt17,
                 },
-                this._buildDreaminaTaskPatch(_0x453421, {
+                this._buildDreaminaTaskPatch(value186, {
                   recovering: false,
                   startedAt: Number(
-                    _0x3591ab?.dreaminaTaskStartedAt || _0x3591ab?.generationStartTime || _0x55c726,
+                    value184?.dreaminaTaskStartedAt || value184?.generationStartTime || startedAt17,
                   ),
                 }),
               ),
             ),
               this._persistDreaminaResumeCache(),
-              this._showDreaminaBackgroundQueueingToast(_0x970968));
+              this._showDreaminaBackgroundQueueingToast(value185));
             return;
           }
-          const _0x312c84 = _0x3617ec?.message || '';
+          const message4 = error18?.message || '';
           (void logDiagnosticEvent({
             type: 'generation.video_failed',
             level: 'error',
             source: 'renderer',
-            message: _0x312c84 || videoTaskText('task.videoGenerationFailed'),
-            error: _0x3617ec,
+            message: message4 || videoTaskText('task.videoGenerationFailed'),
+            error: error18,
             context: {
               nodeId: this.nodeId,
-              provider: _0x5bd3a7?.provider || '',
-              model: _0x5bd3a7?.model || '',
-              isDreamina: _0x223447,
-              isRhWorkflow: _0x30ee23,
-              isAsyncTaskModel: _0x4b3bb6,
+              provider: provider5?.provider || '',
+              model: provider5?.model || '',
+              isDreamina: resumable,
+              isRhWorkflow: cancellable3,
+              isAsyncTaskModel: async2,
             },
           }),
             window.showToast?.(
-              _0x312c84,
+              message4,
               'error',
-              isDreaminaUploadDurationErrorMessage(_0x312c84)
+              isDreaminaUploadDurationErrorMessage(message4)
                 ? DREAMINA_UPLOAD_DURATION_ERROR_TOAST_MS
                 : undefined,
             ));
-          const _0x5b46ea = buildVideoGenerationFailurePatch({
-            error: _0x312c84 || videoTaskText('task.generationFailed'),
-            startedAt: _0x55c726,
-            duration: Date.now() - _0x55c726,
+          const submitId5 = buildVideoGenerationFailurePatch({
+            error: message4 || videoTaskText('task.generationFailed'),
+            startedAt: startedAt17,
+            duration: Date.now() - startedAt17,
           });
-          _0x223447 &&
+          resumable &&
             Object.assign(
-              _0x5b46ea,
+              submitId5,
               this._buildDreaminaTaskPatch(
                 this._buildDreaminaFailedSnapshot(
-                  _0x4cc8fc.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '',
-                  _0x3617ec?.message || videoTaskText('task.generationFailed'),
+                  store.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '',
+                  error18?.message || videoTaskText('task.generationFailed'),
                 ),
-                { recovering: false, startedAt: _0x55c726 },
+                { recovering: false, startedAt: startedAt17 },
               ),
             );
-          _0x30ee23 &&
+          cancellable3 &&
             Object.assign(
-              _0x5b46ea,
+              submitId5,
               {
-                rhStatusMessage: _0x3617ec?.message || videoTaskText('task.generationFailed'),
-                rhStatusCode: Number.isFinite(Number(_0x3617ec?.code)) ? Number(_0x3617ec.code) : null,
+                rhStatusMessage: error18?.message || videoTaskText('task.generationFailed'),
+                rhStatusCode: Number.isFinite(Number(error18?.code)) ? Number(error18.code) : null,
               },
               this._buildRunningHubTaskPatch({
                 taskId:
                   String(this._rhTaskId || '').trim() ||
-                  String(_0x4cc8fc.getState().nodes?.[this.nodeId]?.rhTaskId || '').trim(),
+                  String(store.getState().nodes?.[this.nodeId]?.rhTaskId || '').trim(),
                 status: 'failed',
-                startedAt: _0x55c726,
+                startedAt: startedAt17,
                 recovering: false,
-                useOpenapiQuery: _0x4cc8fc.getState().nodes?.[this.nodeId]?.rhTaskUseOpenapiQuery === true,
+                useOpenapiQuery: store.getState().nodes?.[this.nodeId]?.rhTaskUseOpenapiQuery === true,
               }),
             );
-          if (_0x4b3bb6) {
-            const _0x459145 = _0x4cc8fc.getState().nodes?.[this.nodeId] || {};
+          if (async2) {
+            const value187 = store.getState().nodes?.[this.nodeId] || {};
             Object.assign(
-              _0x5b46ea,
+              submitId5,
               this._buildAsyncTaskPatch({
-                provider: String(_0x459145?.asyncTaskProvider || _0x4a6399 || '').trim(),
+                provider: String(value187?.asyncTaskProvider || provider6 || '').trim(),
                 kind: 'video',
-                taskId: String(_0x459145?.asyncTaskId || '').trim(),
+                taskId: String(value187?.asyncTaskId || '').trim(),
                 status: 'failed',
-                startedAt: _0x55c726,
+                startedAt: startedAt17,
                 recovering: false,
               }),
             );
           }
-          _0x223447 &&
+          resumable &&
             this._emitDreaminaTaskCenterUpdate(
               {
-                submitId: _0x5b46ea.dreaminaSubmitId,
-                status: _0x5b46ea.dreaminaTaskStatus,
-                phase: _0x5b46ea.dreaminaTaskPhase,
-                label: _0x5b46ea.dreaminaTaskLabel,
-                failReason: _0x312c84,
+                submitId: submitId5.dreaminaSubmitId,
+                status: submitId5.dreaminaTaskStatus,
+                phase: submitId5.dreaminaTaskPhase,
+                label: submitId5.dreaminaTaskLabel,
+                failReason: message4,
               },
-              { status: 'failed', error: _0x312c84, startedAt: _0x55c726 },
+              { status: 'failed', error: message4, startedAt: startedAt17 },
             );
-          _0x4cc8fc.updateNodeData(this.nodeId, _0x5b46ea);
-          if (_0x223447) this._persistDreaminaResumeCache();
-          if (_0x30ee23) this._persistRunningHubResumeCache();
-          if (_0x4b3bb6) this._persistAsyncResumeCache();
+          store.updateNodeData(this.nodeId, submitId5);
+          if (resumable) this._persistDreaminaResumeCache();
+          if (cancellable3) this._persistRunningHubResumeCache();
+          if (async2) this._persistAsyncResumeCache();
         } finally {
-          const _0x192605 = this._syncLocalTaskNodeData(),
-            _0x5d4ba0 = shouldShowGenerationBusyUi(_0x192605);
-          this._isGenerating = _0x5d4ba0;
-          _0x223447 && !_0x5d4ba0 && (this._dreaminaActiveSubmitId = '');
+          const value188 = this._syncLocalTaskNodeData(),
+            shouldShowGenerationBusyUi5 = shouldShowGenerationBusyUi(value188);
+          this._isGenerating = shouldShowGenerationBusyUi5;
+          resumable && !shouldShowGenerationBusyUi5 && (this._dreaminaActiveSubmitId = '');
           this._rhAbortController = null;
-          if (_0x30ee23 && _0x5d4ba0) {
-            const _0x3b5b27 = String(_0x192605?.rhTaskId || '').trim();
-            if (_0x3b5b27) this._rhTaskId = _0x3b5b27;
+          if (cancellable3 && shouldShowGenerationBusyUi5) {
+            const value189 = String(value188?.rhTaskId || '').trim();
+            if (value189) this._rhTaskId = value189;
           } else {
             this._rhTaskId = null;
             if (!this._rhCancelRequested) this._rhApiKey = null;
           }
-          _0x5d4ba0
+          shouldShowGenerationBusyUi5
             ? this._updateSubmitButtonState?.()
-            : (this._resetGenerateButtonIdleUi({ cancellable: _0x30ee23 }),
-              _0x11f58d(this.previewEl),
+            : (this._resetGenerateButtonIdleUi({ cancellable: cancellable3 }),
+              stopLoading(this.previewEl),
               this._updateSubmitButtonState?.());
         }
       } finally {
         this._videoSubmitInFlight = false;
       }
     }
-    async ['_buildPayloadImpl'](_0x529ad1 = null, _0xdc43bb = {}) {
-      const _0x20df8b = _0x4cc8fc.getState?.() || {},
-        _0x5ccc04 = _0x20df8b.nodes?.[this.nodeId];
-      _0x5ccc04 && typeof _0x5ccc04 === 'object' && (this._data = _0x5ccc04);
-      let _0x52b585 = _0x4cc8fc.getIncomingEdges(this.nodeId);
+    async ['_buildPayloadImpl'](template2 = null, value190 = {}) {
+      const value191 = store.getState?.() || {},
+        value192 = value191.nodes?.[this.nodeId];
+      value192 && typeof value192 === 'object' && (this._data = value192);
+      let inEdges2 = store.getIncomingEdges(this.nodeId);
       shouldScopeRunningHubVideoSubmitEdges(this._data || {}) &&
-        (_0x52b585 = _0x52b585.filter((_0x11270d) => _0x11270d?.targetId === this.nodeId));
-      const _0x408e2a = _0x20df8b.nodes || {};
-      let _0x20af3f = [],
-        _0x535d75 = [];
-      for (const _0x4a0af5 of _0x52b585) {
-        const _0x2744c0 = _0x408e2a[_0x4a0af5.sourceId],
-          _0x197752 = String(_0x2744c0?.type || '').toLowerCase(),
-          _0x1bbeca = _0x197752 === 'source-image' || _0x197752 === 'image' || _0x197752 === 'ai-image';
-        let _0x2866c7 = '';
-        _0x1bbeca && (_0x2866c7 = resolveGenerationInputImageUrl(_0x2744c0));
-        let _0x564dc8 = _0x1bbeca ? _0x2866c7 : _0x2744c0?.videoUrl || _0x2744c0?.imageUrl || '';
-        if (String(_0x2744c0?.type || '') === 'ai-video') {
-          const _0x4b51ff = String(_0x4a0af5?.sourceMediaKey || '').trim();
-          if (_0x4b51ff) {
-            const _0x44620f = Array.isArray(_0x2744c0?.videos) ? _0x2744c0.videos : [],
-              _0x307a81 = _0x44620f.find((_0xf2f407) => {
-                const _0x10e80f =
-                  String(_0xf2f407?.localPath || '').trim() || String(_0xf2f407?.videoUrl || '').trim();
-                return _0x10e80f === _0x4b51ff;
+        (inEdges2 = inEdges2.filter((item15) => item15?.targetId === this.nodeId));
+      const nodes2 = value191.nodes || {};
+      let list24 = [],
+        list25 = [];
+      for (const value193 of inEdges2) {
+        const value194 = nodes2[value193.sourceId],
+          value195 = String(value194?.type || '').toLowerCase(),
+          value196 = value195 === 'source-image' || value195 === 'image' || value195 === 'ai-image';
+        let generationInputImageUrl = '';
+        value196 && (generationInputImageUrl = resolveGenerationInputImageUrl(value194));
+        let url2 = value196 ? generationInputImageUrl : value194?.videoUrl || value194?.imageUrl || '';
+        if (String(value194?.type || '') === 'ai-video') {
+          const value197 = String(value193?.sourceMediaKey || '').trim();
+          if (value197) {
+            const list26 = Array.isArray(value194?.videos) ? value194.videos : [],
+              value198 = list26.find((item16) => {
+                const value199 =
+                  String(item16?.localPath || '').trim() || String(item16?.videoUrl || '').trim();
+                return value199 === value197;
               });
-            _0x307a81 &&
-              (_0x564dc8 =
-                localPathToUrl(_0x307a81.localPath) || String(_0x307a81.videoUrl || '').trim() || _0x564dc8);
+            value198 &&
+              (url2 = localPathToUrl(value198.localPath) || String(value198.videoUrl || '').trim() || url2);
           }
         }
-        if (!_0x564dc8 && _0x408e2a[_0x4a0af5.sourceId]?.sourceId) {
-          const _0x4dddf4 = await _0x215b94(_0x408e2a[_0x4a0af5.sourceId].sourceId);
-          if (_0x4dddf4) _0x564dc8 = URL.createObjectURL(_0x4dddf4);
+        if (!url2 && nodes2[value193.sourceId]?.sourceId) {
+          const value200 = await getImage(nodes2[value193.sourceId].sourceId);
+          if (value200) url2 = URL.createObjectURL(value200);
         }
-        if (_0x564dc8 && !_0x20af3f.includes(_0x564dc8)) _0x20af3f.push(_0x564dc8);
-        if (_0x1bbeca) {
-          const _0x376b8a = String(_0x2866c7 || _0x564dc8 || '').trim();
-          _0x376b8a &&
-            !_0x376b8a.startsWith('blob:') &&
-            !_0x535d75.includes(_0x376b8a) &&
-            _0x535d75.push(_0x376b8a);
+        if (url2 && !list24.includes(url2)) list24.push(url2);
+        if (value196) {
+          const enabled25 = String(generationInputImageUrl || url2 || '').trim();
+          enabled25 &&
+            !enabled25.startsWith('blob:') &&
+            !list25.includes(enabled25) &&
+            list25.push(enabled25);
         }
       }
-      const _0x59d9e9 = [],
-        _0x54ecf4 = resolvePresetPromptTextWithTextRefs({
-          template: _0x529ad1,
+      const assetInputRefs2 = [],
+        prompt2 = resolvePresetPromptTextWithTextRefs({
+          template: template2,
           promptEl: this.promptEl,
-          inEdges: _0x52b585,
-          nodes: _0x408e2a,
-          assetInputRefs: _0x59d9e9,
+          inEdges: inEdges2,
+          nodes: nodes2,
+          assetInputRefs: assetInputRefs2,
           assetMediaCounts: { image: 0, video: 0, audio: 0 },
           allowedAssetTypes: ['text', 'image', 'video', 'audio'],
         }),
-        _0x6f1f7c = this._data.model || getDefaultRunningHubVideoWorkflowModelId(),
-        _0x3a2911 = isDreaminaStyleVideoModel(_0x6f1f7c, this._data.provider)
-          ? resolveDreaminaStyleVideoProvider(_0x6f1f7c, this._data.provider)
+        model4 = this._data.model || getDefaultRunningHubVideoWorkflowModelId(),
+        isDreaminaStyleVideoModel2 = isDreaminaStyleVideoModel(model4, this._data.provider)
+          ? resolveDreaminaStyleVideoProvider(model4, this._data.provider)
           : '',
-        _0x3de15f = this._data.provider || _0x3a2911 || resolveModelProvider(_0x6f1f7c) || 'grsai',
-        _0x45134a = isRunningHubWorkflowNode({ ...this._data, model: _0x6f1f7c, provider: _0x3de15f });
-      if (_0x45134a) {
-        const _0x49e57d = _0x408e2a?.[this.nodeId] || this._data || {};
-        _0x59d9e9.push(
-          ...getPromptAssetInputRefsFromNode(_0x49e57d, { allowedTypes: ['image', 'video', 'audio'] }),
+        provider10 =
+          this._data.provider || isDreaminaStyleVideoModel2 || resolveModelProvider(model4) || 'grsai',
+        isRunningHubWorkflowNode2 = isRunningHubWorkflowNode({
+          ...this._data,
+          model: model4,
+          provider: provider10,
+        });
+      if (isRunningHubWorkflowNode2) {
+        const value201 = nodes2?.[this.nodeId] || this._data || {};
+        assetInputRefs2.push(
+          ...getPromptAssetInputRefsFromNode(value201, { allowedTypes: ['image', 'video', 'audio'] }),
         );
       }
-      const _0x19d06d = _0x59d9e9
-          .filter((_0x1726af) => _0x1726af.type === 'image' && _0x1726af.url)
-          .map((_0x489bf0) => _0x489bf0.url),
-        _0x1a32f0 = _0x59d9e9
-          .filter((_0x55d5e8) => _0x55d5e8.type === 'video' && _0x55d5e8.url)
-          .map((_0x48136b) => _0x48136b.url),
-        _0x573707 = _0x59d9e9
-          .filter((_0x4c1d2c) => _0x4c1d2c.type === 'audio' && _0x4c1d2c.url)
-          .map((_0x488adc) => _0x488adc.url);
-      for (const _0x14225 of _0x59d9e9) {
-        if (_0x14225.url && !_0x20af3f.includes(_0x14225.url)) _0x20af3f.push(_0x14225.url);
-        _0x14225.type === 'image' &&
-          _0x14225.url &&
-          !_0x535d75.includes(_0x14225.url) &&
-          _0x535d75.push(_0x14225.url);
+      const list27 = assetInputRefs2
+          .filter((response15) => response15.type === 'image' && response15.url)
+          .map((response16) => response16.url),
+        assetVideoCount2 = assetInputRefs2
+          .filter((response17) => response17.type === 'video' && response17.url)
+          .map((response18) => response18.url),
+        list28 = assetInputRefs2
+          .filter((response19) => response19.type === 'audio' && response19.url)
+          .map((response20) => response20.url);
+      for (const response21 of assetInputRefs2) {
+        if (response21.url && !list24.includes(response21.url)) list24.push(response21.url);
+        response21.type === 'image' &&
+          response21.url &&
+          !list25.includes(response21.url) &&
+          list25.push(response21.url);
       }
-      const _0x4486e7 = isDreaminaStyleVideoModel(_0x6f1f7c, _0x3de15f),
-        _0x4b1f8b = _0x4486e7 ? _0x535d75.slice(0, 1) : _0x20af3f,
-        _0x4424fd =
-          resolveModelExecution(_0x6f1f7c, { providerHint: _0x3de15f }) || resolveModelExecution(_0x6f1f7c),
-        _0x102879 =
-          _0x4424fd?.modelManifest?.adapterType === 'modelApi' &&
-          _0x4424fd?.modelManifest?.kind === 'video' &&
-          _0x4424fd?.executionManifest?.adapterType === 'modelApi',
-        _0x2596d3 = this._isRunninghubWorkflowModel(_0x6f1f7c, _0x3de15f) || _0x45134a;
-      if (isHappyHorseVideoModel(_0x6f1f7c, _0x3de15f) && !_0x54ecf4)
+      const isDreaminaStyleVideoModel3 = isDreaminaStyleVideoModel(model4, provider10),
+        inputUrls = isDreaminaStyleVideoModel3 ? list25.slice(0, 1) : list24,
+        modelManifest4 =
+          resolveModelExecution(model4, { providerHint: provider10 }) || resolveModelExecution(model4),
+        value202 =
+          modelManifest4?.modelManifest?.adapterType === 'modelApi' &&
+          modelManifest4?.modelManifest?.kind === 'video' &&
+          modelManifest4?.executionManifest?.adapterType === 'modelApi',
+        enabled26 = this._isRunninghubWorkflowModel(model4, provider10) || isRunningHubWorkflowNode2;
+      if (isHappyHorseVideoModel(model4, provider10) && !prompt2)
         return (window.showToast?.(videoTaskText('validation.happyHorse.promptRequired'), 'warn'), null);
-      if (!_0x4486e7 && !_0x2596d3 && !_0x54ecf4 && !_0x4b1f8b.length) return null;
-      const _0xaf6a13 = this._data.resolution || '1080p',
-        _0x114547 = _0x2596d3
-          ? String(resolveVideoWorkflowSchemaParam(this._data, _0x6f1f7c, 'rhInstanceType')) === 'plus'
+      if (!isDreaminaStyleVideoModel3 && !enabled26 && !prompt2 && !inputUrls.length) return null;
+      const value203 = this._data.resolution || '1080p',
+        rhInstanceType = enabled26
+          ? String(resolveVideoWorkflowSchemaParam(this._data, model4, 'rhInstanceType')) === 'plus'
             ? 'plus'
             : 'default'
           : this._data.rhInstanceType;
-      await _0x568d9b();
-      const _0x109827 = _0x358106(_0x3de15f);
-      let _0x51ae76 = '';
-      if (_0x3de15f === 'runninghub')
-        _0x51ae76 = isModelApiModel(_0x6f1f7c, _0x3de15f)
-          ? _0x109827.modelApiKey || ''
-          : _0x109827.apiKey || '';
+      await ensureConfig();
+      const value204 = getProviderConfig(provider10);
+      let apiKey5 = '';
+      if (provider10 === 'runninghub')
+        apiKey5 = isModelApiModel(model4, provider10) ? value204.modelApiKey || '' : value204.apiKey || '';
       else
-        _0x3de15f === 'runninghubwf'
-          ? (_0x51ae76 = _0x109827.apiKey || '')
-          : (_0x51ae76 = _0x109827.apiKey || '');
-      const _0x13f241 = getPlainObject(this._data.generationParams),
-        _0x22ae09 = (_0xa221a4, _0x32a154) =>
-          Object.prototype.hasOwnProperty.call(_0x13f241, _0xa221a4) ? _0x13f241[_0xa221a4] : _0x32a154,
-        _0x20bdc6 = {
-          prompt: _0x54ecf4,
-          model: _0x6f1f7c,
-          generationParams: { ..._0x13f241 },
-          aspectRatio: _0x22ae09('aspectRatio', this._data.aspectRatio || '1:1'),
-          resolution: _0x22ae09('resolution', _0xaf6a13),
-          videoSize: _0x22ae09('resolution', _0xaf6a13),
-          duration: _0x22ae09('duration', this._data.duration || 5),
+        provider10 === 'runninghubwf' ? (apiKey5 = value204.apiKey || '') : (apiKey5 = value204.apiKey || '');
+      const args7 = getPlainObject(this._data.generationParams),
+        aspectRatio = (value205, value206) =>
+          Object.prototype.hasOwnProperty.call(args7, value205) ? args7[value205] : value206,
+        payload5 = {
+          prompt: prompt2,
+          model: model4,
+          generationParams: { ...args7 },
+          aspectRatio: aspectRatio('aspectRatio', this._data.aspectRatio || '1:1'),
+          resolution: aspectRatio('resolution', value203),
+          videoSize: aspectRatio('resolution', value203),
+          duration: aspectRatio('duration', this._data.duration || 5),
           mode: this._data.mode || '全能参考',
-          provider: _0x3de15f,
-          apiKey: _0x51ae76,
+          provider: provider10,
+          apiKey: apiKey5,
           cameraAngle: this._data.cameraAngle,
-          inputUrls: _0x4b1f8b,
-          rhInstanceType: _0x114547,
+          inputUrls: inputUrls,
+          rhInstanceType: rhInstanceType,
           installId: String(window.__aicInstallId || '').trim(),
         };
-      if (_0xdc43bb?.randomizeSubmitParams === true && _0x102879) {
-        const _0x4e0621 = buildSubmitRandomizedSeedPatch({
-          modelManifest: _0x4424fd?.modelManifest || null,
+      if (value190?.randomizeSubmitParams === true && value202) {
+        const args8 = buildSubmitRandomizedSeedPatch({
+          modelManifest: modelManifest4?.modelManifest || null,
           nodeData: this._data,
-          payload: _0x20bdc6,
+          payload: payload5,
         });
-        _0x4e0621 &&
-          ((_0x20bdc6.generationParams = _0x4e0621.requestParams),
-          _0x4cc8fc.updateNodeData?.(this.nodeId, _0x4e0621.storePatch),
-          (this._data = { ...(this._data || {}), ..._0x4e0621.storePatch }));
+        args8 &&
+          ((payload5.generationParams = args8.requestParams),
+          store.updateNodeData?.(this.nodeId, args8.storePatch),
+          (this._data = { ...(this._data || {}), ...args8.storePatch }));
       }
-      const _0x3ac64a = (_0x2f6af5, _0x3b8a3f) => {
-          const _0x573500 = Array.isArray(_0x2f6af5?.videos) ? _0x2f6af5.videos : [];
-          if (!_0x573500.length) return null;
-          const _0xc1e12b = String(_0x3b8a3f?.sourceMediaKey || '').trim();
-          if (_0xc1e12b) {
-            const _0x4cd269 = _0x573500.find((_0x27bc15) => {
-              const _0x563477 =
-                String(_0x27bc15?.localPath || '').trim() || String(_0x27bc15?.videoUrl || '').trim();
-              return _0x563477 === _0xc1e12b;
+      const run2 = (value207, value208) => {
+          const list29 = Array.isArray(value207?.videos) ? value207.videos : [];
+          if (!list29.length) return null;
+          const value209 = String(value208?.sourceMediaKey || '').trim();
+          if (value209) {
+            const value210 = list29.find((item17) => {
+              const value211 =
+                String(item17?.localPath || '').trim() || String(item17?.videoUrl || '').trim();
+              return value211 === value209;
             });
-            if (_0x4cd269) return _0x4cd269;
+            if (value210) return value210;
           }
-          const _0x44773e = Number(_0x2f6af5?.mainVideoIndex),
-            _0x150908 = Number.isFinite(_0x44773e) ? Math.max(0, Math.trunc(_0x44773e)) : 0;
-          return _0x573500[Math.min(_0x150908, _0x573500.length - 1)] || null;
+          const value212 = Number(value207?.mainVideoIndex),
+            value213 = Number.isFinite(value212) ? Math.max(0, Math.trunc(value212)) : 0;
+          return list29[Math.min(value213, list29.length - 1)] || null;
         },
-        _0x137192 = (_0x44b7b2, _0x1c152b = null) => {
-          const _0xe3cdd3 =
-              String(_0x44b7b2?.type || '') === 'ai-video' ? _0x3ac64a(_0x44b7b2, _0x1c152b) : null,
-            _0x4c4c55 = String(_0xe3cdd3?.localPath || '').trim(),
-            _0x47092c = localPathToUrl(_0x4c4c55);
-          if (_0x47092c) return this._resolveMediaUrl(_0x47092c);
-          const _0x38e9dc = String(_0xe3cdd3?.displayLocalPath || '').trim(),
-            _0x2c9d8f = localPathToUrl(_0x38e9dc);
-          if (_0x2c9d8f) return this._resolveMediaUrl(_0x2c9d8f);
-          const _0x2c03df = String(_0xe3cdd3?.originalLocalPath || '').trim(),
-            _0x357b92 = localPathToUrl(_0x2c03df);
-          if (_0x357b92) return this._resolveMediaUrl(_0x357b92);
-          const _0x2b54a0 = String(_0xe3cdd3?.videoUrl || '').trim();
-          if (_0x2b54a0) return this._resolveMediaUrl(_0x2b54a0);
-          const _0x4bb4a7 = String(_0x44b7b2?.localPath || '').trim(),
-            _0x4f5951 = localPathToUrl(_0x4bb4a7);
-          if (_0x4f5951) return this._resolveMediaUrl(_0x4f5951);
-          const _0x318db9 = String(_0x44b7b2?.displayLocalPath || '').trim(),
-            _0x548c29 = localPathToUrl(_0x318db9);
-          if (_0x548c29) return this._resolveMediaUrl(_0x548c29);
-          const _0x543df5 = String(_0x44b7b2?.originalLocalPath || '').trim(),
-            _0x51766a = localPathToUrl(_0x543df5);
-          if (_0x51766a) return this._resolveMediaUrl(_0x51766a);
-          const _0x6d5053 = String(_0x44b7b2?.videoLocalPath || '').trim(),
-            _0x157de4 = localPathToUrl(_0x6d5053);
-          if (_0x157de4) return this._resolveMediaUrl(_0x157de4);
-          const _0x32178e = String(_0x44b7b2?.videoUrl || '').trim();
-          if (_0x32178e) return this._resolveMediaUrl(_0x32178e);
-          const _0x21ac19 = String(_0x44b7b2?.src || '').trim();
-          if (_0x21ac19) return this._resolveMediaUrl(_0x21ac19);
-          const _0x429b95 = String(_0x44b7b2?.url || '').trim();
-          if (_0x429b95) return this._resolveMediaUrl(_0x429b95);
-          const _0x5337bf = String(_0x44b7b2?.resultUrl || '').trim();
-          if (_0x5337bf) return this._resolveMediaUrl(_0x5337bf);
-          const _0x32f5a0 = String(_0x44b7b2?.sourceUrl || '').trim();
-          if (_0x32f5a0) return this._resolveMediaUrl(_0x32f5a0);
+        getVideoUrl = (response22, value214 = null) => {
+          const value215 = String(response22?.type || '') === 'ai-video' ? run2(response22, value214) : null,
+            value216 = String(value215?.localPath || '').trim(),
+            url3 = localPathToUrl(value216);
+          if (url3) return this._resolveMediaUrl(url3);
+          const value217 = String(value215?.displayLocalPath || '').trim(),
+            url4 = localPathToUrl(value217);
+          if (url4) return this._resolveMediaUrl(url4);
+          const value218 = String(value215?.originalLocalPath || '').trim(),
+            url5 = localPathToUrl(value218);
+          if (url5) return this._resolveMediaUrl(url5);
+          const value219 = String(value215?.videoUrl || '').trim();
+          if (value219) return this._resolveMediaUrl(value219);
+          const value220 = String(response22?.localPath || '').trim(),
+            url6 = localPathToUrl(value220);
+          if (url6) return this._resolveMediaUrl(url6);
+          const value221 = String(response22?.displayLocalPath || '').trim(),
+            url7 = localPathToUrl(value221);
+          if (url7) return this._resolveMediaUrl(url7);
+          const value222 = String(response22?.originalLocalPath || '').trim(),
+            url8 = localPathToUrl(value222);
+          if (url8) return this._resolveMediaUrl(url8);
+          const value223 = String(response22?.videoLocalPath || '').trim(),
+            url9 = localPathToUrl(value223);
+          if (url9) return this._resolveMediaUrl(url9);
+          const value224 = String(response22?.videoUrl || '').trim();
+          if (value224) return this._resolveMediaUrl(value224);
+          const value225 = String(response22?.src || '').trim();
+          if (value225) return this._resolveMediaUrl(value225);
+          const value226 = String(response22?.url || '').trim();
+          if (value226) return this._resolveMediaUrl(value226);
+          const value227 = String(response22?.resultUrl || '').trim();
+          if (value227) return this._resolveMediaUrl(value227);
+          const value228 = String(response22?.sourceUrl || '').trim();
+          if (value228) return this._resolveMediaUrl(value228);
           return '';
         },
-        _0x37e9f6 = (_0x47ebf0) => {
-          const _0xe52149 = resolveGenerationInputImageUrl(_0x47ebf0);
-          return _0xe52149 ? this._resolveMediaUrl(_0xe52149) : '';
+        getImageUrl = (value229) => {
+          const generationInputImageUrl2 = resolveGenerationInputImageUrl(value229);
+          return generationInputImageUrl2 ? this._resolveMediaUrl(generationInputImageUrl2) : '';
         },
-        _0xdbeaaa = (_0x2dde51) => {
-          const _0x4649d4 = String(
-            _0x2dde51?.mask ||
-              _0x2dde51?.maskImageDataUrl ||
-              _0x2dde51?.maskImageUrl ||
-              _0x2dde51?.maskUrl ||
-              _0x2dde51?.maskLocalPath ||
+        getMaskImageUrl = (value230) => {
+          const enabled27 = String(
+            value230?.mask ||
+              value230?.maskImageDataUrl ||
+              value230?.maskImageUrl ||
+              value230?.maskUrl ||
+              value230?.maskLocalPath ||
               '',
           ).trim();
-          if (!_0x4649d4) return '';
-          const _0xa24fb3 = localPathToUrl(_0x4649d4);
-          return this._resolveMediaUrl(_0xa24fb3 || _0x4649d4);
+          if (!enabled27) return '';
+          const url10 = localPathToUrl(enabled27);
+          return this._resolveMediaUrl(url10 || enabled27);
         },
-        _0xfc639 = (_0x110ff7) => {
-          const _0x33bb13 = String(_0x110ff7?.localPath || '').trim(),
-            _0x11daff = localPathToUrl(_0x33bb13);
-          if (_0x11daff) return this._resolveMediaUrl(_0x11daff);
-          const _0x24b468 = String(_0x110ff7?.audioUrl || '').trim();
-          if (_0x24b468) return this._resolveMediaUrl(_0x24b468);
-          const _0x4c5730 = String(_0x110ff7?.src || '').trim();
-          if (_0x4c5730) return this._resolveMediaUrl(_0x4c5730);
+        getAudioUrl = (value231) => {
+          const value232 = String(value231?.localPath || '').trim(),
+            url11 = localPathToUrl(value232);
+          if (url11) return this._resolveMediaUrl(url11);
+          const value233 = String(value231?.audioUrl || '').trim();
+          if (value233) return this._resolveMediaUrl(value233);
+          const value234 = String(value231?.src || '').trim();
+          if (value234) return this._resolveMediaUrl(value234);
           return '';
         };
-      if (_0x4486e7) {
-        let _0x114d6a = this._data;
+      if (isDreaminaStyleVideoModel3) {
+        let value235 = this._data;
         typeof this._normalizeDreaminaNodeData === 'function' &&
-          ((_0x114d6a = this._normalizeDreaminaNodeData(this._data, { syncStore: true }) || this._data),
-          (this._data = _0x114d6a));
-        const _0x92db64 = getPlainObject(_0x114d6a?.generationParams),
-          _0x3f44f9 = (_0x1b868a, _0x1e5365) => {
-            const _0x110264 = Array.isArray(_0x1b868a) ? _0x1b868a : [_0x1b868a];
-            for (const _0x12da91 of _0x110264) {
-              const _0x20d9b4 = String(_0x12da91 || '').trim();
-              if (_0x20d9b4 && Object.prototype.hasOwnProperty.call(_0x92db64, _0x20d9b4))
-                return _0x92db64[_0x20d9b4];
+          ((value235 = this._normalizeDreaminaNodeData(this._data, { syncStore: true }) || this._data),
+          (this._data = value235));
+        const args9 = getPlainObject(value235?.generationParams),
+          handler17 = (value236, value237) => {
+            const value238 = Array.isArray(value236) ? value236 : [value236];
+            for (const value239 of value238) {
+              const value240 = String(value239 || '').trim();
+              if (value240 && Object.prototype.hasOwnProperty.call(args9, value240)) return args9[value240];
             }
-            return _0x1e5365;
+            return value237;
           },
-          _0x49bc56 = resolveDreaminaStyleVideoProvider(
-            _0x114d6a?.model || _0x6f1f7c,
-            _0x114d6a?.provider || _0x3de15f,
+          provider11 = resolveDreaminaStyleVideoProvider(
+            value235?.model || model4,
+            value235?.provider || provider10,
           ),
-          _0x5d995f = _0x19d06d.slice(),
-          _0x3b12a3 = _0x1a32f0.slice(),
-          _0x927fce = _0x573707.slice(),
-          _0x1c311b = [];
-        for (const _0xb3fca4 of _0x52b585) {
-          const _0x36eaf2 = _0x408e2a[_0xb3fca4.sourceId];
-          if (!_0x36eaf2) continue;
-          const _0x96e3e = String(_0x36eaf2?.type || '').toLowerCase();
-          if (_0x96e3e.includes('image')) {
-            const _0x11e108 = _0x37e9f6(_0x36eaf2);
-            _0x11e108 &&
-              (_0x5d995f.push(_0x11e108),
-              appendApimartPrivateAvatarProviderAssetRefs(_0x1c311b, _0x36eaf2, {
+          imageCount = list27.slice(),
+          videoCount = assetVideoCount2.slice(),
+          audioCount = list28.slice(),
+          providerAssetRefs = [];
+        for (const refSlot2 of inEdges2) {
+          const enabled28 = nodes2[refSlot2.sourceId];
+          if (!enabled28) continue;
+          const list30 = String(enabled28?.type || '').toLowerCase();
+          if (list30.includes('image')) {
+            const sourceUrl = getImageUrl(enabled28);
+            sourceUrl &&
+              (imageCount.push(sourceUrl),
+              appendApimartPrivateAvatarProviderAssetRefs(providerAssetRefs, enabled28, {
                 kind: 'image',
-                sourceUrl: _0x11e108,
-                refSlot: _0xb3fca4?.refSlot,
-                edgeId: _0xb3fca4?.id,
+                sourceUrl: sourceUrl,
+                refSlot: refSlot2?.refSlot,
+                edgeId: refSlot2?.id,
               }));
             continue;
           }
-          if (_0x96e3e.includes('video')) {
-            const _0x29f699 = _0x137192(_0x36eaf2, _0xb3fca4);
-            _0x29f699 &&
-              (_0x3b12a3.push(_0x29f699),
-              appendApimartPrivateAvatarProviderAssetRefs(_0x1c311b, _0x36eaf2, {
+          if (list30.includes('video')) {
+            const sourceUrl2 = getVideoUrl(enabled28, refSlot2);
+            sourceUrl2 &&
+              (videoCount.push(sourceUrl2),
+              appendApimartPrivateAvatarProviderAssetRefs(providerAssetRefs, enabled28, {
                 kind: 'video',
-                sourceUrl: _0x29f699,
-                refSlot: _0xb3fca4?.refSlot,
-                edgeId: _0xb3fca4?.id,
+                sourceUrl: sourceUrl2,
+                refSlot: refSlot2?.refSlot,
+                edgeId: refSlot2?.id,
               }));
             continue;
           }
-          if (_0x96e3e.includes('audio')) {
-            const _0x973171 = _0xfc639(_0x36eaf2);
-            if (_0x973171) _0x927fce.push(_0x973171);
+          if (list30.includes('audio')) {
+            const value241 = getAudioUrl(enabled28);
+            if (value241) audioCount.push(value241);
           }
         }
-        const _0x4d998c = normalizeDreaminaVideoRouteMode(
-          _0x3f44f9(
+        const routeMode = normalizeDreaminaVideoRouteMode(
+          handler17(
             ['dreaminaRouteMode', 'volcengine_seedance_2_mode', 'rh_seedance_2_mode'],
-            _0x114d6a?.dreaminaRouteMode,
+            value235?.dreaminaRouteMode,
           ),
-          _0x114d6a?.mode,
+          value235?.mode,
         );
-        if (!isDreaminaVideoRouteModeEnabled(_0x4d998c))
+        if (!isDreaminaVideoRouteModeEnabled(routeMode))
           return (window.showToast?.(videoTaskText('toasts.smartMultiframeUnavailable'), 'warn'), null);
-        const _0xd0f41c = resolveDreaminaVideoTaskType({
-            routeMode: _0x4d998c,
-            imageCount: _0x5d995f.length,
-            videoCount: _0x3b12a3.length,
-            audioCount: _0x927fce.length,
+        const taskType = resolveDreaminaVideoTaskType({
+            routeMode: routeMode,
+            imageCount: imageCount.length,
+            videoCount: videoCount.length,
+            audioCount: audioCount.length,
           }),
-          _0x34e3ad = validateDreaminaVideoRouteSelection({
-            routeMode: _0x4d998c,
-            taskType: _0xd0f41c,
-            imageCount: _0x5d995f.length,
-            videoCount: _0x3b12a3.length,
-            audioCount: _0x927fce.length,
+          validateDreaminaVideoRouteSelection2 = validateDreaminaVideoRouteSelection({
+            routeMode: routeMode,
+            taskType: taskType,
+            imageCount: imageCount.length,
+            videoCount: videoCount.length,
+            audioCount: audioCount.length,
           });
-        if (_0x34e3ad) return (window.showToast?.(_0x34e3ad, 'warn'), null);
-        const _0x3a347b =
+        if (validateDreaminaVideoRouteSelection2)
+          return (window.showToast?.(validateDreaminaVideoRouteSelection2, 'warn'), null);
+        const model5 =
             ensureDreaminaStyleVideoModelForTask(
-              _0xd0f41c,
-              normalizeDreaminaStyleVideoModel(_0x114d6a?.model, _0x49bc56),
-              _0x49bc56,
-            ) || normalizeDreaminaStyleVideoModel(_0x114d6a?.model, _0x49bc56),
-          _0xc9f96e = normalizeDreaminaStyleVideoResolution(
-            _0xd0f41c,
-            _0x3a347b,
-            _0x3f44f9('resolution', _0x114d6a?.resolution || _0x114d6a?.videoSize),
-            _0x49bc56,
+              taskType,
+              normalizeDreaminaStyleVideoModel(value235?.model, provider11),
+              provider11,
+            ) || normalizeDreaminaStyleVideoModel(value235?.model, provider11),
+          resolution = normalizeDreaminaStyleVideoResolution(
+            taskType,
+            model5,
+            handler17('resolution', value235?.resolution || value235?.videoSize),
+            provider11,
           ),
-          _0x1ebcf5 = normalizeDreaminaVideoAspectRatio(_0x3f44f9('aspectRatio', _0x114d6a?.aspectRatio));
-        let _0x3d1cd5 = _0x1ebcf5;
-        const _0x4be773 = String(_0x3f44f9('aspectRatio', _0x114d6a?.aspectRatio) || '').trim(),
-          _0x46cdfb = isAdaptiveRatioLabel(_0x4be773);
-        if (_0x46cdfb) {
-          const _0x34e5f3 = pickDreaminaAdaptiveSourceRatio({
-              inEdges: _0x52b585,
-              nodes: _0x408e2a,
-              provider: _0x49bc56,
-              model: _0x3a347b,
+          dreaminaVideoAspectRatio = normalizeDreaminaVideoAspectRatio(
+            handler17('aspectRatio', value235?.aspectRatio),
+          );
+        let aspectRatio2 = dreaminaVideoAspectRatio;
+        const value242 = String(handler17('aspectRatio', value235?.aspectRatio) || '').trim(),
+          isAdaptiveRatioLabel2 = isAdaptiveRatioLabel(value242);
+        if (isAdaptiveRatioLabel2) {
+          const dreaminaAdaptiveSourceRatio = pickDreaminaAdaptiveSourceRatio({
+              inEdges: inEdges2,
+              nodes: nodes2,
+              provider: provider11,
+              model: model5,
             }),
-            _0xc2cb0a = _0x34e5f3 || this._resolveDreaminaAdaptiveAspectRatioFromNode(_0x114d6a);
-          _0x3d1cd5 = _0xc2cb0a;
+            value243 =
+              dreaminaAdaptiveSourceRatio || this._resolveDreaminaAdaptiveAspectRatioFromNode(value235);
+          aspectRatio2 = value243;
         }
-        const _0x3e4b01 = normalizeDreaminaStyleVideoDuration(
-            _0xd0f41c,
-            _0x3a347b,
-            _0x3f44f9('duration', _0x114d6a?.duration),
-            _0x49bc56,
+        const duration = normalizeDreaminaStyleVideoDuration(
+            taskType,
+            model5,
+            handler17('duration', value235?.duration),
+            provider11,
           ),
-          _0xe61e9e = getDreaminaStyleVideoDefaultModel(_0xd0f41c, _0x49bc56),
-          _0x2f9328 = {
-            prompt: _0x54ecf4,
-            provider: _0x49bc56,
-            model: _0x3a347b || _0xe61e9e,
-            generationParams: { ..._0x92db64 },
+          dreaminaStyleVideoDefaultModel = getDreaminaStyleVideoDefaultModel(taskType, provider11),
+          enabled29 = {
+            prompt: prompt2,
+            provider: provider11,
+            model: model5 || dreaminaStyleVideoDefaultModel,
+            generationParams: { ...args9 },
             modelVersion:
-              _0x49bc56 === 'dreamina' ? getDreaminaStyleVideoModelVersion(_0x3a347b, _0x49bc56) : '',
-            dreaminaRouteMode: _0x4d998c,
-            dreaminaTaskType: _0xd0f41c,
-            aspectRatio: _0x3d1cd5,
-            duration: _0x3e4b01,
-            resolution: _0xc9f96e,
-            videoResolution: _0xc9f96e,
-            videoSize: _0xc9f96e,
-            images: _0x5d995f,
-            videos: _0x3b12a3,
-            audios: _0x927fce,
-            inputUrls: _0x5d995f.slice(),
-            providerAssetRefs: _0x1c311b,
+              provider11 === 'dreamina' ? getDreaminaStyleVideoModelVersion(model5, provider11) : '',
+            dreaminaRouteMode: routeMode,
+            dreaminaTaskType: taskType,
+            aspectRatio: aspectRatio2,
+            duration: duration,
+            resolution: resolution,
+            videoResolution: resolution,
+            videoSize: resolution,
+            images: imageCount,
+            videos: videoCount,
+            audios: audioCount,
+            inputUrls: imageCount.slice(),
+            providerAssetRefs: providerAssetRefs,
             installId: String(window.__aicInstallId || '').trim(),
           };
-        Object.keys(_0x92db64).length <= 0 && delete _0x2f9328.generationParams;
-        if (_0x1c311b.length <= 0) delete _0x2f9328.providerAssetRefs;
-        if (!_0x2f9328.modelVersion) delete _0x2f9328.modelVersion;
-        !_0xc9f96e &&
-          (delete _0x2f9328.resolution, delete _0x2f9328.videoResolution, delete _0x2f9328.videoSize);
-        if (_0xd0f41c === 'text2video') {
-          if (!_0x54ecf4) return null;
+        Object.keys(args9).length <= 0 && delete enabled29.generationParams;
+        if (providerAssetRefs.length <= 0) delete enabled29.providerAssetRefs;
+        if (!enabled29.modelVersion) delete enabled29.modelVersion;
+        !resolution &&
+          (delete enabled29.resolution, delete enabled29.videoResolution, delete enabled29.videoSize);
+        if (taskType === 'text2video') {
+          if (!prompt2) return null;
           return (
-            (_0x2f9328.inputUrls = []),
-            (_0x2f9328.images = []),
-            (_0x2f9328.videos = []),
-            (_0x2f9328.audios = []),
-            _0x2f9328
+            (enabled29.inputUrls = []),
+            (enabled29.images = []),
+            (enabled29.videos = []),
+            (enabled29.audios = []),
+            enabled29
           );
         }
-        if (_0xd0f41c === 'image2video') {
-          if (!_0x54ecf4 || !_0x5d995f[0]) return null;
-          ((_0x2f9328.image = _0x5d995f[0]),
-            (_0x2f9328.inputUrls = [_0x5d995f[0]]),
-            (_0x2f9328.images = [_0x5d995f[0]]));
-          if (_0x49bc56 === 'dreamina') delete _0x2f9328.aspectRatio;
-          return _0x2f9328;
+        if (taskType === 'image2video') {
+          if (!prompt2 || !imageCount[0]) return null;
+          ((enabled29.image = imageCount[0]),
+            (enabled29.inputUrls = [imageCount[0]]),
+            (enabled29.images = [imageCount[0]]));
+          if (provider11 === 'dreamina') delete enabled29.aspectRatio;
+          return enabled29;
         }
-        if (_0xd0f41c === 'frames2video') {
-          if (!_0x54ecf4 || _0x5d995f.length < 2) return null;
-          ((_0x2f9328.first = _0x5d995f[0]),
-            (_0x2f9328.last = _0x5d995f[1]),
-            (_0x2f9328.inputUrls = _0x5d995f.slice(0, 2)),
-            (_0x2f9328.images = _0x5d995f.slice(0, 2)));
-          if (_0x49bc56 === 'dreamina') delete _0x2f9328.aspectRatio;
-          return _0x2f9328;
+        if (taskType === 'frames2video') {
+          if (!prompt2 || imageCount.length < 2) return null;
+          ((enabled29.first = imageCount[0]),
+            (enabled29.last = imageCount[1]),
+            (enabled29.inputUrls = imageCount.slice(0, 2)),
+            (enabled29.images = imageCount.slice(0, 2)));
+          if (provider11 === 'dreamina') delete enabled29.aspectRatio;
+          return enabled29;
         }
-        if (_0xd0f41c === 'multiframe2video') {
-          const _0x100dcb = _0x5d995f.slice(0, 20);
-          if (_0x100dcb.length < 2) return null;
-          const _0x5b573e = Math.max(0, _0x100dcb.length - 1),
-            _0x5b662a = Array.isArray(_0x114d6a?.dreaminaTransitionPrompts)
-              ? _0x114d6a.dreaminaTransitionPrompts
+        if (taskType === 'multiframe2video') {
+          const list31 = imageCount.slice(0, 20);
+          if (list31.length < 2) return null;
+          const value244 = Math.max(0, list31.length - 1),
+            value245 = Array.isArray(value235?.dreaminaTransitionPrompts)
+              ? value235.dreaminaTransitionPrompts
               : [],
-            _0x5a496b = Array.isArray(_0x114d6a?.dreaminaTransitionDurations)
-              ? _0x114d6a.dreaminaTransitionDurations
+            value246 = Array.isArray(value235?.dreaminaTransitionDurations)
+              ? value235.dreaminaTransitionDurations
               : [],
-            _0x5242b8 = [],
-            _0x448af4 = [];
-          for (let _0x3142a4 = 0; _0x3142a4 < _0x5b573e; _0x3142a4 += 1) {
-            const _0x4fa2e4 = String(_0x5b662a[_0x3142a4] || '').trim() || _0x54ecf4,
-              _0x2e29e8 = Number(_0x5a496b[_0x3142a4]),
-              _0x31ade7 =
-                Number.isFinite(_0x2e29e8) && _0x2e29e8 > 0 ? Math.max(1, Math.trunc(_0x2e29e8)) : 3;
-            (_0x5242b8.push(_0x4fa2e4), _0x448af4.push(_0x31ade7));
+            list32 = [],
+            list33 = [];
+          for (let value247 = 0; value247 < value244; value247 += 1) {
+            const value248 = String(value245[value247] || '').trim() || prompt2,
+              count20 = Number(value246[value247]),
+              value249 = Number.isFinite(count20) && count20 > 0 ? Math.max(1, Math.trunc(count20)) : 3;
+            (list32.push(value248), list33.push(value249));
           }
-          if (!_0x54ecf4 && !_0x5242b8.some((_0x525912) => String(_0x525912 || '').trim())) return null;
+          if (!prompt2 && !list32.some((item18) => String(item18 || '').trim())) return null;
           return (
-            (_0x2f9328.images = _0x100dcb),
-            (_0x2f9328.inputUrls = _0x100dcb.slice()),
-            (_0x2f9328.transitionPrompts = _0x5242b8),
-            (_0x2f9328.transitionDurations = _0x448af4),
-            _0x100dcb.length === 2 &&
-              ((_0x2f9328.prompt = _0x5242b8[0] || _0x54ecf4),
-              (_0x2f9328.duration = _0x448af4[0] || 3),
-              delete _0x2f9328.transitionPrompts,
-              delete _0x2f9328.transitionDurations),
-            delete _0x2f9328.modelVersion,
-            delete _0x2f9328.model,
-            delete _0x2f9328.aspectRatio,
-            delete _0x2f9328.resolution,
-            delete _0x2f9328.videoResolution,
-            delete _0x2f9328.videoSize,
-            _0x2f9328
+            (enabled29.images = list31),
+            (enabled29.inputUrls = list31.slice()),
+            (enabled29.transitionPrompts = list32),
+            (enabled29.transitionDurations = list33),
+            list31.length === 2 &&
+              ((enabled29.prompt = list32[0] || prompt2),
+              (enabled29.duration = list33[0] || 3),
+              delete enabled29.transitionPrompts,
+              delete enabled29.transitionDurations),
+            delete enabled29.modelVersion,
+            delete enabled29.model,
+            delete enabled29.aspectRatio,
+            delete enabled29.resolution,
+            delete enabled29.videoResolution,
+            delete enabled29.videoSize,
+            enabled29
           );
         }
-        if (_0xd0f41c === 'multimodal2video') {
-          if (_0x5d995f.length <= 0 && _0x3b12a3.length <= 0) return null;
-          if (!_0x2f9328.modelVersion) {
-            if (_0x49bc56 === 'dreamina')
-              ((_0x2f9328.model = _0xe61e9e || _0x2f9328.model),
-                (_0x2f9328.modelVersion = getDreaminaStyleVideoModelVersion(_0x2f9328.model, _0x49bc56)));
-            else !_0x2f9328.model && (_0x2f9328.model = APIMART_DREAMINA_VIDEO_DEFAULT_MODEL);
+        if (taskType === 'multimodal2video') {
+          if (imageCount.length <= 0 && videoCount.length <= 0) return null;
+          if (!enabled29.modelVersion) {
+            if (provider11 === 'dreamina')
+              ((enabled29.model = dreaminaStyleVideoDefaultModel || enabled29.model),
+                (enabled29.modelVersion = getDreaminaStyleVideoModelVersion(enabled29.model, provider11)));
+            else !enabled29.model && (enabled29.model = APIMART_DREAMINA_VIDEO_DEFAULT_MODEL);
           }
-          return _0x2f9328;
+          return enabled29;
         }
         return null;
       }
-      if (_0x2596d3) {
-        const _0x221326 = await buildRunningHubVideoWorkflowSubmitPatch({
-          model: _0x6f1f7c,
+      if (enabled26) {
+        const runningHubVideoWorkflowSubmitPatch = await buildRunningHubVideoWorkflowSubmitPatch({
+          model: model4,
           nodeData: this._data,
-          inEdges: _0x52b585,
-          nodes: _0x408e2a,
-          assetInputRefs: _0x59d9e9,
-          prompt: _0x54ecf4,
+          inEdges: inEdges2,
+          nodes: nodes2,
+          assetInputRefs: assetInputRefs2,
+          prompt: prompt2,
           helpers: {
-            getVideoUrl: _0x137192,
-            getImageUrl: _0x37e9f6,
-            getMaskImageUrl: _0xdbeaaa,
-            getAudioUrl: _0xfc639,
+            getVideoUrl: getVideoUrl,
+            getImageUrl: getImageUrl,
+            getMaskImageUrl: getMaskImageUrl,
+            getAudioUrl: getAudioUrl,
           },
         });
-        if (_0x221326 === null) return null;
+        if (runningHubVideoWorkflowSubmitPatch === null) return null;
         return (
-          Object.assign(_0x20bdc6, _0x221326.payloadPatch || {}),
-          applyVideoManifestAdaptiveRatio(_0x20bdc6, {
-            inEdges: _0x52b585,
-            nodes: _0x408e2a,
+          Object.assign(payload5, runningHubVideoWorkflowSubmitPatch.payloadPatch || {}),
+          applyVideoManifestAdaptiveRatio(payload5, {
+            inEdges: inEdges2,
+            nodes: nodes2,
             nodeData: this._data,
-            provider: _0x3de15f,
-            model: _0x6f1f7c,
-            modelManifest: _0x4424fd?.modelManifest || null,
+            provider: provider10,
+            model: model4,
+            modelManifest: modelManifest4?.modelManifest || null,
           }),
-          Object.keys(_0x221326.updateData || {}).length > 0 &&
-            _0x4cc8fc.updateNodeData(this.nodeId, _0x221326.updateData),
-          _0x20bdc6
+          Object.keys(runningHubVideoWorkflowSubmitPatch.updateData || {}).length > 0 &&
+            store.updateNodeData(this.nodeId, runningHubVideoWorkflowSubmitPatch.updateData),
+          payload5
         );
       }
-      if (_0x102879 && !_0x4486e7) {
-        const _0x342d8f = _0x535d75.slice(),
-          _0x5ed361 = [],
-          _0x526688 = [],
-          _0x5bc234 = [],
-          _0xb7a3dd = [],
-          _0x1abed4 = [],
-          _0x39b821 = [],
-          _0x500e7f = [],
-          _0x19bbba = (_0x233f14, _0x1442e7) => {
-            const _0x225f01 = String(_0x1442e7 || '').trim();
-            if (_0x225f01 && !_0x233f14.includes(_0x225f01)) _0x233f14.push(_0x225f01);
+      if (value202 && !isDreaminaStyleVideoModel3) {
+        const images10 = list25.slice(),
+          imageRefs2 = [],
+          refs2 = [],
+          videos9 = [],
+          videoEntries2 = [],
+          audios4 = [],
+          audioEntries2 = [],
+          list34 = [],
+          handler18 = (list35, value250) => {
+            const value251 = String(value250 || '').trim();
+            if (value251 && !list35.includes(value251)) list35.push(value251);
           },
-          _0x10a4b0 = (_0x3e04d4, _0x2bf2e3 = {}) => {
-            const _0x5458e6 = String(_0x3e04d4 || '').trim();
-            if (!_0x5458e6) return;
-            const _0x318938 = _0x5bc234.indexOf(_0x5458e6),
-              _0x3bd65c = { ..._0x2bf2e3, url: _0x5458e6 };
-            if (_0x318938 < 0) {
-              (_0x5bc234.push(_0x5458e6), _0xb7a3dd.push(_0x3bd65c));
+          handler19 = (value252, args10 = {}) => {
+            const url12 = String(value252 || '').trim();
+            if (!url12) return;
+            const count21 = videos9.indexOf(url12),
+              args11 = { ...args10, url: url12 };
+            if (count21 < 0) {
+              (videos9.push(url12), videoEntries2.push(args11));
               return;
             }
-            const _0x4992fe = _0xb7a3dd[_0x318938] || {};
-            !(Number(_0x4992fe.duration) > 0) &&
-              Number(_0x3bd65c.duration) > 0 &&
-              (_0xb7a3dd[_0x318938] = { ..._0x4992fe, ..._0x3bd65c });
+            const args12 = videoEntries2[count21] || {};
+            !(Number(args12.duration) > 0) &&
+              Number(args11.duration) > 0 &&
+              (videoEntries2[count21] = { ...args12, ...args11 });
           },
-          _0x4d2efe = (_0x49f192, _0x303ed8 = {}) => {
-            const _0x48edc5 = String(_0x49f192 || '').trim();
-            if (!_0x48edc5) return;
-            const _0x2d769d = _0x1abed4.indexOf(_0x48edc5),
-              _0x16ecac = { ..._0x303ed8, url: _0x48edc5 };
-            if (_0x2d769d < 0) {
-              (_0x1abed4.push(_0x48edc5), _0x39b821.push(_0x16ecac));
+          handler20 = (value253, args13 = {}) => {
+            const url13 = String(value253 || '').trim();
+            if (!url13) return;
+            const count22 = audios4.indexOf(url13),
+              value254 = { ...args13, url: url13 };
+            if (count22 < 0) {
+              (audios4.push(url13), audioEntries2.push(value254));
               return;
             }
-            const _0x121823 = _0x39b821[_0x2d769d] || {};
-            _0x39b821[_0x2d769d] = {
-              ..._0x121823,
+            const args14 = audioEntries2[count22] || {};
+            audioEntries2[count22] = {
+              ...args14,
               ...Object.fromEntries(
-                Object.entries(_0x16ecac).filter(([, _0x35d441]) => {
-                  if (_0x35d441 === '' || _0x35d441 == null) return false;
-                  if (Number(_0x35d441) === 0) return false;
+                Object.entries(value254).filter(([, value255]) => {
+                  if (value255 === '' || value255 == null) return false;
+                  if (Number(value255) === 0) return false;
                   return true;
                 }),
               ),
             };
           };
-        (_0x59d9e9
-          .filter((_0x14452a) => _0x14452a?.type === 'audio' && _0x14452a?.url)
-          .forEach((_0x3d454a) => {
-            _0x4d2efe(_0x3d454a.url, {
-              duration: getAudioDurationFromAssetRef(_0x3d454a),
-              sizeBytes: getAudioSizeBytesFromAssetRef(_0x3d454a),
-              assetRefSource: _0x3d454a.assetRefSource || '',
+        (assetInputRefs2
+          .filter((response23) => response23?.type === 'audio' && response23?.url)
+          .forEach((assetRefSource) => {
+            handler20(assetRefSource.url, {
+              duration: getAudioDurationFromAssetRef(assetRefSource),
+              sizeBytes: getAudioSizeBytesFromAssetRef(assetRefSource),
+              assetRefSource: assetRefSource.assetRefSource || '',
             });
           }),
-          _0x59d9e9
-            .filter((_0x4f3152) => _0x4f3152?.type === 'video' && _0x4f3152?.url)
-            .forEach((_0x2f7dfd) => {
-              (_0x10a4b0(_0x2f7dfd.url, {
-                duration: getVideoDurationFromAssetRef(_0x2f7dfd),
-                assetRefSource: _0x2f7dfd.assetRefSource || '',
+          assetInputRefs2
+            .filter((response24) => response24?.type === 'video' && response24?.url)
+            .forEach((assetRefSource2) => {
+              (handler19(assetRefSource2.url, {
+                duration: getVideoDurationFromAssetRef(assetRefSource2),
+                assetRefSource: assetRefSource2.assetRefSource || '',
               }),
-                _0x526688.push({ refSlot: _0x2f7dfd?.refSlot || '', url: _0x2f7dfd.url }));
+                refs2.push({ refSlot: assetRefSource2?.refSlot || '', url: assetRefSource2.url }));
             }));
-        for (const _0x5075ac of _0x52b585) {
-          const _0x261252 = _0x408e2a[_0x5075ac.sourceId];
-          if (!_0x261252) continue;
-          const _0x136e6f = String(_0x261252?.type || '').toLowerCase();
-          if (_0x136e6f.includes('image')) {
-            const _0x10945b = _0x37e9f6(_0x261252) || _0x261252?.imageUrl || _0x261252?.src || _0x261252?.url;
-            (_0x19bbba(_0x342d8f, _0x10945b),
-              String(_0x10945b || '').trim() &&
-                (_0x5ed361.push({ refSlot: _0x5075ac?.refSlot || '', url: _0x10945b }),
-                appendApimartPrivateAvatarProviderAssetRefs(_0x500e7f, _0x261252, {
+        for (const refSlot3 of inEdges2) {
+          const response25 = nodes2[refSlot3.sourceId];
+          if (!response25) continue;
+          const list36 = String(response25?.type || '').toLowerCase();
+          if (list36.includes('image')) {
+            const url14 =
+              getImageUrl(response25) || response25?.imageUrl || response25?.src || response25?.url;
+            (handler18(images10, url14),
+              String(url14 || '').trim() &&
+                (imageRefs2.push({ refSlot: refSlot3?.refSlot || '', url: url14 }),
+                appendApimartPrivateAvatarProviderAssetRefs(list34, response25, {
                   kind: 'image',
-                  sourceUrl: _0x10945b,
-                  refSlot: _0x5075ac?.refSlot,
-                  edgeId: _0x5075ac?.id,
+                  sourceUrl: url14,
+                  refSlot: refSlot3?.refSlot,
+                  edgeId: refSlot3?.id,
                 })));
           } else {
-            if (_0x136e6f.includes('video')) {
-              const _0xd81b46 =
-                  String(_0x261252?.type || '') === 'ai-video' ? _0x3ac64a(_0x261252, _0x5075ac) : null,
-                _0x12d329 = _0x137192(_0x261252, _0x5075ac);
-              (_0x10a4b0(_0x12d329, {
-                duration: getVideoDurationFromSource(_0x261252, _0xd81b46),
-                edgeId: _0x5075ac?.id,
+            if (list36.includes('video')) {
+              const value256 =
+                  String(response25?.type || '') === 'ai-video' ? run2(response25, refSlot3) : null,
+                url15 = getVideoUrl(response25, refSlot3);
+              (handler19(url15, {
+                duration: getVideoDurationFromSource(response25, value256),
+                edgeId: refSlot3?.id,
               }),
-                String(_0x12d329 || '').trim() &&
-                  (_0x526688.push({ refSlot: _0x5075ac?.refSlot || '', url: _0x12d329 }),
-                  appendApimartPrivateAvatarProviderAssetRefs(_0x500e7f, _0x261252, {
+                String(url15 || '').trim() &&
+                  (refs2.push({ refSlot: refSlot3?.refSlot || '', url: url15 }),
+                  appendApimartPrivateAvatarProviderAssetRefs(list34, response25, {
                     kind: 'video',
-                    sourceUrl: _0x12d329,
-                    refSlot: _0x5075ac?.refSlot,
-                    edgeId: _0x5075ac?.id,
+                    sourceUrl: url15,
+                    refSlot: refSlot3?.refSlot,
+                    edgeId: refSlot3?.id,
                   })));
             } else
-              _0x136e6f.includes('audio') &&
-                _0x4d2efe(_0xfc639(_0x261252), {
-                  duration: getAudioDurationFromSource(_0x261252),
-                  sizeBytes: getAudioSizeBytesFromSource(_0x261252),
-                  edgeId: _0x5075ac?.id,
+              list36.includes('audio') &&
+                handler20(getAudioUrl(response25), {
+                  duration: getAudioDurationFromSource(response25),
+                  sizeBytes: getAudioSizeBytesFromSource(response25),
+                  edgeId: refSlot3?.id,
                 });
           }
         }
-        applyModelApiVideoAdaptiveRatio(_0x20bdc6, {
-          inEdges: _0x52b585,
-          nodes: _0x408e2a,
+        applyModelApiVideoAdaptiveRatio(payload5, {
+          inEdges: inEdges2,
+          nodes: nodes2,
           nodeData: this._data,
-          provider: _0x3de15f,
-          model: _0x6f1f7c,
-          modelManifest: _0x4424fd?.modelManifest || null,
+          provider: provider10,
+          model: model4,
+          modelManifest: modelManifest4?.modelManifest || null,
         });
-        if (isHappyHorseVideoModel(_0x6f1f7c, _0x3de15f)) {
-          const _0x5a304f = getHappyHorseMode(this._data),
-            _0x56cbff = getFixedInputSlotConfigFromManifest(this._data || {}),
-            _0x1ba0c5 = buildVideoInputUrlsByFixedImageSlot({
-              fixedInputConfig: _0x56cbff,
-              imageRefs: _0x5ed361,
-              assetInputRefs: _0x59d9e9,
+        if (isHappyHorseVideoModel(model4, provider10)) {
+          const mode2 = getHappyHorseMode(this._data),
+            fixedInputConfig2 = getFixedInputSlotConfigFromManifest(this._data || {}),
+            slotUrls2 = buildVideoInputUrlsByFixedImageSlot({
+              fixedInputConfig: fixedInputConfig2,
+              imageRefs: imageRefs2,
+              assetInputRefs: assetInputRefs2,
             }),
-            _0x66089f = orderHappyHorseImageUrls({ mode: _0x5a304f, images: _0x342d8f, slotUrls: _0x1ba0c5 }),
-            _0x356898 = buildHappyHorseMediaPayload({
-              prompt: _0x54ecf4,
-              mode: _0x5a304f,
-              images: _0x66089f,
-              videos: _0x5bc234,
-              videoEntries: _0xb7a3dd,
-              assetVideoCount: _0x1a32f0.length,
-              maxVideoSeconds: getHappyHorseVideoInputMaxSeconds(_0x6f1f7c, _0x3de15f),
+            images11 = orderHappyHorseImageUrls({ mode: mode2, images: images10, slotUrls: slotUrls2 }),
+            error19 = buildHappyHorseMediaPayload({
+              prompt: prompt2,
+              mode: mode2,
+              images: images11,
+              videos: videos9,
+              videoEntries: videoEntries2,
+              assetVideoCount: assetVideoCount2.length,
+              maxVideoSeconds: getHappyHorseVideoInputMaxSeconds(model4, provider10),
             });
-          if (!_0x356898.ok) return (window.showToast?.(_0x356898.message, 'warn'), null);
-          const _0x2210c5 = _0x356898.mode || _0x5a304f;
+          if (!error19.ok) return (window.showToast?.(error19.message, 'warn'), null);
+          const happyhorse_mode = error19.mode || mode2;
           return (
-            (_0x20bdc6.generationParams = { ..._0x20bdc6.generationParams, happyhorse_mode: _0x2210c5 }),
-            (_0x20bdc6.images = _0x356898.images),
-            (_0x20bdc6.videos = _0x356898.videos),
-            (_0x20bdc6.audios = []),
-            (_0x20bdc6.inputUrls = _0x356898.inputUrls),
-            _0x20bdc6
+            (payload5.generationParams = { ...payload5.generationParams, happyhorse_mode: happyhorse_mode }),
+            (payload5.images = error19.images),
+            (payload5.videos = error19.videos),
+            (payload5.audios = []),
+            (payload5.inputUrls = error19.inputUrls),
+            payload5
           );
         }
-        if (isWan27VideoModel(_0x6f1f7c, _0x3de15f)) {
-          const _0xf2a752 = getWan27Mode(this._data),
-            _0x54dc17 = getFixedInputSlotConfigFromManifest(this._data || {}),
-            _0x6cf96f = buildVideoInputUrlsByFixedKindSlot({
-              fixedInputConfig: _0x54dc17,
-              refs: _0x526688,
-              assetInputRefs: _0x59d9e9,
+        if (isWan27VideoModel(model4, provider10)) {
+          const mode3 = getWan27Mode(this._data),
+            fixedInputConfig3 = getFixedInputSlotConfigFromManifest(this._data || {}),
+            videoInputUrlsByFixedKindSlot = buildVideoInputUrlsByFixedKindSlot({
+              fixedInputConfig: fixedInputConfig3,
+              refs: refs2,
+              assetInputRefs: assetInputRefs2,
               kind: 'video',
             }),
-            _0x6ff894 = [],
-            _0xf927cb = (_0x59bb92) => {
-              const _0xe2fd37 = String(_0x59bb92 || '').trim();
-              _0xe2fd37 && !_0x6ff894.includes(_0xe2fd37) && _0x6ff894.push(_0xe2fd37);
+            videos10 = [],
+            handler21 = (value257) => {
+              const value258 = String(value257 || '').trim();
+              value258 && !videos10.includes(value258) && videos10.push(value258);
             };
-          if (_0xf2a752 === 'video') _0xf927cb(_0x6cf96f.sourceVideo);
+          if (mode3 === 'video') handler21(videoInputUrlsByFixedKindSlot.sourceVideo);
           else {
-            if (_0xf2a752 === 'reference') _0xf927cb(_0x6cf96f.referenceVideo);
+            if (mode3 === 'reference') handler21(videoInputUrlsByFixedKindSlot.referenceVideo);
             else
-              _0xf2a752 === 'edit' &&
-                (_0xf927cb(_0x6cf96f.originalVideo), _0xf927cb(_0x6cf96f.referenceVideo));
+              mode3 === 'edit' &&
+                (handler21(videoInputUrlsByFixedKindSlot.originalVideo),
+                handler21(videoInputUrlsByFixedKindSlot.referenceVideo));
           }
-          _0x5bc234.forEach(_0xf927cb);
-          const _0xaede2 = buildWan27MediaPayload({
-            mode: _0xf2a752,
-            images: _0x342d8f,
-            videos: _0x6ff894,
-            audios: _0x1abed4,
-            videoEntries: _0xb7a3dd,
-            audioEntries: _0x39b821,
-            assetVideoCount: _0x1a32f0.length,
+          videos9.forEach(handler21);
+          const error20 = buildWan27MediaPayload({
+            mode: mode3,
+            images: images10,
+            videos: videos10,
+            audios: audios4,
+            videoEntries: videoEntries2,
+            audioEntries: audioEntries2,
+            assetVideoCount: assetVideoCount2.length,
           });
-          if (!_0xaede2.ok) return (window.showToast?.(_0xaede2.message, 'warn'), null);
-          ((_0x20bdc6.generationParams = { ..._0x20bdc6.generationParams, wan27_mode: _0xf2a752 }),
-            (_0x20bdc6.images = _0xaede2.images),
-            (_0x20bdc6.videos = _0xaede2.videos),
-            (_0x20bdc6.audios = _0xaede2.audios),
-            (_0x20bdc6.inputUrls = _0xaede2.inputUrls));
-          if (_0xf2a752 === 'image' || _0xf2a752 === 'reference') {
-            const _0x254c4c = buildVideoInputUrlsByFixedImageSlot({
-              fixedInputConfig: _0x54dc17,
-              imageRefs: _0x5ed361,
-              assetInputRefs: _0x59d9e9,
+          if (!error20.ok) return (window.showToast?.(error20.message, 'warn'), null);
+          ((payload5.generationParams = { ...payload5.generationParams, wan27_mode: mode3 }),
+            (payload5.images = error20.images),
+            (payload5.videos = error20.videos),
+            (payload5.audios = error20.audios),
+            (payload5.inputUrls = error20.inputUrls));
+          if (mode3 === 'image' || mode3 === 'reference') {
+            const videoInputUrlsByFixedImageSlot = buildVideoInputUrlsByFixedImageSlot({
+              fixedInputConfig: fixedInputConfig3,
+              imageRefs: imageRefs2,
+              assetInputRefs: assetInputRefs2,
             });
-            Object.keys(_0x254c4c).length > 0 && (_0x20bdc6.inputUrlsBySlot = _0x254c4c);
+            Object.keys(videoInputUrlsByFixedImageSlot).length > 0 &&
+              (payload5.inputUrlsBySlot = videoInputUrlsByFixedImageSlot);
           }
-          return _0x20bdc6;
+          return payload5;
         }
-        if (isKlingV3OmniVideoModel(_0x6f1f7c, _0x3de15f)) {
-          const _0x13b558 = getKlingV3OmniMode(this._data),
-            _0x7360e6 = getFixedInputSlotConfigFromManifest(this._data || {}),
-            _0x34a655 = buildVideoInputUrlsByFixedImageSlot({
-              fixedInputConfig: _0x7360e6,
-              imageRefs: _0x5ed361,
-              assetInputRefs: _0x59d9e9,
+        if (isKlingV3OmniVideoModel(model4, provider10)) {
+          const mode4 = getKlingV3OmniMode(this._data),
+            fixedInputConfig4 = getFixedInputSlotConfigFromManifest(this._data || {}),
+            videoInputUrlsByFixedImageSlot2 = buildVideoInputUrlsByFixedImageSlot({
+              fixedInputConfig: fixedInputConfig4,
+              imageRefs: imageRefs2,
+              assetInputRefs: assetInputRefs2,
             }),
-            _0x34dc01 = [],
-            _0x321860 = (_0xb3e9a4) => {
-              const _0x4f5cf1 = String(_0xb3e9a4 || '').trim();
-              _0x4f5cf1 && !_0x34dc01.includes(_0x4f5cf1) && _0x34dc01.push(_0x4f5cf1);
+            images12 = [],
+            handler22 = (value259) => {
+              const value260 = String(value259 || '').trim();
+              value260 && !images12.includes(value260) && images12.push(value260);
             };
-          if (_0x13b558 === 'image') (_0x321860(_0x34a655.firstFrame), _0x321860(_0x34a655.lastFrame));
-          else _0x13b558 === 'reference' && _0x321860(_0x34a655.referenceImage);
-          _0x342d8f.forEach(_0x321860);
-          const _0x12a7ae = buildVideoInputUrlsByFixedKindSlot({
-              fixedInputConfig: _0x7360e6,
-              refs: _0x526688,
-              assetInputRefs: _0x59d9e9,
+          if (mode4 === 'image')
+            (handler22(videoInputUrlsByFixedImageSlot2.firstFrame),
+              handler22(videoInputUrlsByFixedImageSlot2.lastFrame));
+          else mode4 === 'reference' && handler22(videoInputUrlsByFixedImageSlot2.referenceImage);
+          images10.forEach(handler22);
+          const videoInputUrlsByFixedKindSlot2 = buildVideoInputUrlsByFixedKindSlot({
+              fixedInputConfig: fixedInputConfig4,
+              refs: refs2,
+              assetInputRefs: assetInputRefs2,
               kind: 'video',
             }),
-            _0x104e81 = [],
-            _0x35dfc9 = (_0x45f637) => {
-              const _0x264024 = String(_0x45f637 || '').trim();
-              _0x264024 && !_0x104e81.includes(_0x264024) && _0x104e81.push(_0x264024);
+            videos11 = [],
+            handler23 = (value261) => {
+              const value262 = String(value261 || '').trim();
+              value262 && !videos11.includes(value262) && videos11.push(value262);
             };
-          if (_0x13b558 === 'reference') _0x35dfc9(_0x12a7ae.referenceVideo);
-          else _0x13b558 === 'edit' && _0x35dfc9(_0x12a7ae.editVideo);
-          _0x5bc234.forEach(_0x35dfc9);
-          const _0xbdccf5 = buildKlingV3OmniMediaPayload({
-            mode: _0x13b558,
-            images: _0x34dc01,
-            videos: _0x104e81,
-            videoEntries: _0xb7a3dd,
-            assetVideoCount: _0x1a32f0.length,
+          if (mode4 === 'reference') handler23(videoInputUrlsByFixedKindSlot2.referenceVideo);
+          else mode4 === 'edit' && handler23(videoInputUrlsByFixedKindSlot2.editVideo);
+          videos9.forEach(handler23);
+          const error21 = buildKlingV3OmniMediaPayload({
+            mode: mode4,
+            images: images12,
+            videos: videos11,
+            videoEntries: videoEntries2,
+            assetVideoCount: assetVideoCount2.length,
           });
-          if (!_0xbdccf5.ok) return (window.showToast?.(_0xbdccf5.message, 'warn'), null);
-          ((_0x20bdc6.generationParams = { ..._0x20bdc6.generationParams, kling_v3_omni_mode: _0x13b558 }),
-            (_0x20bdc6.images = _0xbdccf5.images),
-            (_0x20bdc6.videos = _0xbdccf5.videos),
-            (_0x20bdc6.audios = []),
-            (_0x20bdc6.inputUrls = _0xbdccf5.inputUrls));
-          if (_0x13b558 === 'image' || _0x13b558 === 'reference') {
-            const _0x454fcf = {};
-            if (_0x13b558 === 'image')
-              (_0x34a655.firstFrame && (_0x454fcf.firstFrame = _0x34a655.firstFrame),
-                _0x34a655.lastFrame && (_0x454fcf.lastFrame = _0x34a655.lastFrame));
-            else _0x34a655.referenceImage && (_0x454fcf.referenceImage = _0x34a655.referenceImage);
-            Object.keys(_0x454fcf).length > 0 && (_0x20bdc6.inputUrlsBySlot = _0x454fcf);
+          if (!error21.ok) return (window.showToast?.(error21.message, 'warn'), null);
+          ((payload5.generationParams = { ...payload5.generationParams, kling_v3_omni_mode: mode4 }),
+            (payload5.images = error21.images),
+            (payload5.videos = error21.videos),
+            (payload5.audios = []),
+            (payload5.inputUrls = error21.inputUrls));
+          if (mode4 === 'image' || mode4 === 'reference') {
+            const value263 = {};
+            if (mode4 === 'image')
+              (videoInputUrlsByFixedImageSlot2.firstFrame &&
+                (value263.firstFrame = videoInputUrlsByFixedImageSlot2.firstFrame),
+                videoInputUrlsByFixedImageSlot2.lastFrame &&
+                  (value263.lastFrame = videoInputUrlsByFixedImageSlot2.lastFrame));
+            else
+              videoInputUrlsByFixedImageSlot2.referenceImage &&
+                (value263.referenceImage = videoInputUrlsByFixedImageSlot2.referenceImage);
+            Object.keys(value263).length > 0 && (payload5.inputUrlsBySlot = value263);
           }
-          return _0x20bdc6;
+          return payload5;
         }
-        if (isKlingO1VideoModel(_0x6f1f7c, _0x3de15f)) {
-          const _0xe386e4 = getFixedInputSlotConfigFromManifest(this._data || {}),
-            _0x8c3cc6 = buildVideoInputUrlsByFixedImageSlot({
-              fixedInputConfig: _0xe386e4,
-              imageRefs: _0x5ed361,
-              assetInputRefs: _0x59d9e9,
+        if (isKlingO1VideoModel(model4, provider10)) {
+          const fixedInputConfig5 = getFixedInputSlotConfigFromManifest(this._data || {}),
+            videoInputUrlsByFixedImageSlot3 = buildVideoInputUrlsByFixedImageSlot({
+              fixedInputConfig: fixedInputConfig5,
+              imageRefs: imageRefs2,
+              assetInputRefs: assetInputRefs2,
             }),
-            _0x27628d = [],
-            _0x913094 = (_0x5dcd5e) => {
-              const _0x26b471 = String(_0x5dcd5e || '').trim();
-              _0x26b471 && !_0x27628d.includes(_0x26b471) && _0x27628d.push(_0x26b471);
+            images13 = [],
+            handler24 = (value264) => {
+              const value265 = String(value264 || '').trim();
+              value265 && !images13.includes(value265) && images13.push(value265);
             };
-          (_0x913094(_0x8c3cc6.referenceImage), _0x342d8f.forEach(_0x913094));
-          const _0x5e81d1 = buildVideoInputUrlsByFixedKindSlot({
-              fixedInputConfig: _0xe386e4,
-              refs: _0x526688,
-              assetInputRefs: _0x59d9e9,
+          (handler24(videoInputUrlsByFixedImageSlot3.referenceImage), images10.forEach(handler24));
+          const videoInputUrlsByFixedKindSlot3 = buildVideoInputUrlsByFixedKindSlot({
+              fixedInputConfig: fixedInputConfig5,
+              refs: refs2,
+              assetInputRefs: assetInputRefs2,
               kind: 'video',
             }),
-            _0x56a852 = !!_0x5e81d1.editVideo,
-            _0x201b28 = !!_0x5e81d1.featureReferenceVideo,
-            _0x5e2672 = [],
-            _0x545c25 = (_0x3d86f4) => {
-              const _0x839a85 = String(_0x3d86f4 || '').trim();
-              _0x839a85 && !_0x5e2672.includes(_0x839a85) && _0x5e2672.push(_0x839a85);
+            hasEditVideo2 = !!videoInputUrlsByFixedKindSlot3.editVideo,
+            videoRole2 = !!videoInputUrlsByFixedKindSlot3.featureReferenceVideo,
+            videos12 = [],
+            handler25 = (value266) => {
+              const value267 = String(value266 || '').trim();
+              value267 && !videos12.includes(value267) && videos12.push(value267);
             };
-          (_0x545c25(_0x5e81d1.editVideo),
-            _0x545c25(_0x5e81d1.featureReferenceVideo),
-            _0x5bc234.forEach(_0x545c25));
-          const _0x22c298 = buildKlingO1MediaPayload({
-            prompt: _0x20bdc6.prompt,
-            images: _0x27628d,
-            videos: _0x5e2672,
-            videoEntries: _0xb7a3dd,
-            videoRole: _0x201b28 ? 'feature' : 'base',
-            hasEditVideo: _0x56a852,
-            hasFeatureVideo: _0x201b28,
+          (handler25(videoInputUrlsByFixedKindSlot3.editVideo),
+            handler25(videoInputUrlsByFixedKindSlot3.featureReferenceVideo),
+            videos9.forEach(handler25));
+          const error22 = buildKlingO1MediaPayload({
+            prompt: payload5.prompt,
+            images: images13,
+            videos: videos12,
+            videoEntries: videoEntries2,
+            videoRole: videoRole2 ? 'feature' : 'base',
+            hasEditVideo: hasEditVideo2,
+            hasFeatureVideo: videoRole2,
           });
-          if (!_0x22c298.ok) return (window.showToast?.(_0x22c298.message, 'warn'), null);
+          if (!error22.ok) return (window.showToast?.(error22.message, 'warn'), null);
           return (
-            (_0x20bdc6.prompt = _0x22c298.prompt),
-            (_0x20bdc6.images = _0x22c298.images),
-            (_0x20bdc6.videos = _0x22c298.videos),
-            (_0x20bdc6.audios = []),
-            (_0x20bdc6.inputUrls = _0x22c298.inputUrls),
-            _0x22c298.videoRole
-              ? (_0x20bdc6.klingO1VideoRole = _0x22c298.videoRole)
-              : delete _0x20bdc6.klingO1VideoRole,
-            _0x20bdc6
+            (payload5.prompt = error22.prompt),
+            (payload5.images = error22.images),
+            (payload5.videos = error22.videos),
+            (payload5.audios = []),
+            (payload5.inputUrls = error22.inputUrls),
+            error22.videoRole
+              ? (payload5.klingO1VideoRole = error22.videoRole)
+              : delete payload5.klingO1VideoRole,
+            payload5
           );
         }
-        ((_0x20bdc6.images = _0x342d8f),
-          (_0x20bdc6.videos = _0x5bc234),
-          (_0x20bdc6.audios = _0x1abed4),
-          (_0x20bdc6.inputUrls = _0x342d8f));
-        _0x500e7f.length > 0 && (_0x20bdc6.providerAssetRefs = _0x500e7f);
-        const _0x1fa066 = getFixedInputSlotConfigFromManifest(this._data || {}),
-          _0x51c119 = buildVideoInputUrlsByFixedImageSlot({
-            fixedInputConfig: _0x1fa066,
-            imageRefs: _0x5ed361,
-            assetInputRefs: _0x59d9e9,
+        ((payload5.images = images10),
+          (payload5.videos = videos9),
+          (payload5.audios = audios4),
+          (payload5.inputUrls = images10));
+        list34.length > 0 && (payload5.providerAssetRefs = list34);
+        const fixedInputConfig6 = getFixedInputSlotConfigFromManifest(this._data || {}),
+          videoInputUrlsByFixedImageSlot4 = buildVideoInputUrlsByFixedImageSlot({
+            fixedInputConfig: fixedInputConfig6,
+            imageRefs: imageRefs2,
+            assetInputRefs: assetInputRefs2,
           });
-        Object.keys(_0x51c119).length > 0 && (_0x20bdc6.inputUrlsBySlot = _0x51c119);
+        Object.keys(videoInputUrlsByFixedImageSlot4).length > 0 &&
+          (payload5.inputUrlsBySlot = videoInputUrlsByFixedImageSlot4);
       }
-      return _0x20bdc6;
+      return payload5;
     }
   }
-  return _0x34e28e.prototype;
+  return value71.prototype;
 }

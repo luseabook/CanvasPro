@@ -52,17 +52,17 @@ function buildWebPreviewContextImageProbeScript({
   x: x = 0,
   y: y = 0,
 } = {}) {
-  const _0x14b906 = Math.max(0, Math.round(Number(x || 0) || 0)),
-    _0x1b55e7 = Math.max(0, Math.round(Number(y || 0) || 0));
+  const value = Math.max(0, Math.round(Number(x || 0) || 0)),
+    item = Math.max(0, Math.round(Number(y || 0) || 0));
   return (
     '\n(() => {\n  const nodeId = ' +
     JSON.stringify(toNodeId(nodeId)) +
     ';\n  const tabId = ' +
     JSON.stringify(toTabId(tabId)) +
     ';\n  const contextX = ' +
-    _0x14b906 +
+    value +
     ';\n  const contextY = ' +
-    _0x1b55e7 +
+    item +
     ';\n  const normalizeUrl = (value) => {\n    try {\n      const url = new URL(String(value || ""), document.baseURI);\n      if (url.protocol !== "http:" && url.protocol !== "https:") return "";\n      url.username = "";\n      url.password = "";\n      return url.href;\n    } catch {\n      return "";\n    }\n  };\n  const pageUrl = normalizeUrl(location.href);\n  const pageTitle = String(document.title || "").slice(0, 160);\n  const parseSrcset = (value) => String(value || "")\n    .split(",")\n    .map((item) => normalizeUrl(item.trim().split(/\\s+/)[0] || ""))\n    .filter(Boolean);\n  const parseCssUrls = (value) => {\n    const urls = [];\n    const text = String(value || "");\n    const re = /url\\((["\']?)(.*?)\\1\\)/g;\n    let match = null;\n    while ((match = re.exec(text))) {\n      const url = normalizeUrl(match[2] || "");\n      if (url) urls.push(url);\n    }\n    return urls;\n  };\n  const getImageUrl = (image) => normalizeUrl(\n    image?.currentSrc ||\n      image?.src ||\n      image?.getAttribute?.("src") ||\n      image?.dataset?.src ||\n      image?.dataset?.original ||\n      image?.dataset?.lazySrc ||\n      parseSrcset(image?.srcset || image?.getAttribute?.("srcset") || "")[0] ||\n      "",\n  );\n  const getElementTitle = (element, fallback = "") =>\n    String(\n      element?.alt ||\n        element?.title ||\n        element?.getAttribute?.("aria-label") ||\n        fallback ||\n        pageTitle ||\n        "网页图片",\n    ).slice(0, 160);\n  const findImageElement = (target) => {\n    if (!target?.closest) return null;\n    return (\n      target.closest("img") ||\n      target.closest("picture")?.querySelector?.("img") ||\n      target.querySelector?.("img, picture img") ||\n      null\n    );\n  };\n  const findBackgroundImageSource = (target) => {\n    let element = target?.nodeType === 1 ? target : null;\n    for (let i = 0; element && i < 4; i += 1, element = element.parentElement) {\n      const url = parseCssUrls(window.getComputedStyle?.(element)?.backgroundImage || "")[0];\n      if (url) {\n        return {\n          element,\n          url,\n          title: getElementTitle(element),\n          width: Math.max(0, Math.round(Number(element.clientWidth || 0) || 0)),\n          height: Math.max(0, Math.round(Number(element.clientHeight || 0) || 0)),\n        };\n      }\n    }\n    return null;\n  };\n  const findImageSource = (target) => {\n    const image = findImageElement(target);\n    if (image) return { image, element: image, url: getImageUrl(image) };\n    return findBackgroundImageSource(target);\n  };\n  const findContextImageSource = () => {\n    const candidates = [];\n    try {\n      const pointElements = document.elementsFromPoint?.(contextX, contextY);\n      if (Array.isArray(pointElements)) candidates.push(...pointElements);\n    } catch {}\n    const seen = new Set();\n    for (const element of candidates) {\n      if (!element || seen.has(element)) continue;\n      seen.add(element);\n      const source = findImageSource(element);\n      if (source?.url) return source;\n    }\n    return null;\n  };\n  const buildImagePayload = (source) => {\n    const image = source?.image || null;\n    const element = source?.element || image || null;\n    const url = normalizeUrl(source?.url || getImageUrl(image));\n    if (!url) return null;\n    return {\n      kind: "image",\n      url,\n      title: getElementTitle(image || element, source?.title),\n      alt: String(image?.alt || "").slice(0, 160),\n      pageUrl,\n      pageTitle,\n      nodeId,\n      tabId,\n      contextX,\n      contextY,\n      width: Math.max(0, Math.round(Number(source?.width || image?.naturalWidth || image?.width || element?.clientWidth || 0) || 0)),\n      height: Math.max(0, Math.round(Number(source?.height || image?.naturalHeight || image?.height || element?.clientHeight || 0) || 0)),\n    };\n  };\n  const stored = window.__AI_CANVAS_WEB_PREVIEW_LAST_CONTEXT_IMAGE__;\n  if (stored?.url) {\n    return {\n      ok: true,\n      image: {\n        ...stored,\n        pageTitle: String(stored.pageTitle || pageTitle || "").slice(0, 160),\n        contextX,\n        contextY,\n      },\n      pageUrl,\n      pageTitle,\n    };\n  }\n  const payload = buildImagePayload(findContextImageSource());\n  return { ok: !!payload, image: payload, pageUrl, pageTitle };\n})()\n'
   );
 }
@@ -105,616 +105,599 @@ function buildWebPreviewReferenceSnapshotScript() {
     '),\n  };\n})()\n'
   );
 }
-function toNodeId(_0x589926) {
-  return String(_0x589926 || '').trim();
+function toNodeId(key) {
+  return String(key || '').trim();
 }
-function toTabId(_0xd65d44) {
-  return String(_0xd65d44 || 'default').trim() || 'default';
+function toTabId(index) {
+  return String(index || 'default').trim() || 'default';
 }
-function normalizeExtractedImageDimension(_0x2b270c) {
-  return Math.max(0, Math.round(Number(_0x2b270c || 0) || 0));
+function normalizeExtractedImageDimension(result) {
+  return Math.max(0, Math.round(Number(result || 0) || 0));
 }
-function hasExtractableImageSize(_0x35463f, _0x26eb34) {
-  const _0x2be2d7 = normalizeExtractedImageDimension(_0x35463f),
-    _0x56f8c4 = normalizeExtractedImageDimension(_0x26eb34);
-  if (!_0x2be2d7 || !_0x56f8c4) return true;
+function hasExtractableImageSize(data, options) {
+  const extractedImageDimension = normalizeExtractedImageDimension(data),
+    extractedImageDimension2 = normalizeExtractedImageDimension(options);
+  if (!extractedImageDimension || !extractedImageDimension2) return true;
   return (
-    _0x2be2d7 >= WEB_PREVIEW_EXTRACT_MIN_IMAGE_WIDTH &&
-    _0x56f8c4 >= WEB_PREVIEW_EXTRACT_MIN_IMAGE_HEIGHT &&
-    _0x2be2d7 * _0x56f8c4 >= WEB_PREVIEW_EXTRACT_MIN_IMAGE_AREA
+    extractedImageDimension >= WEB_PREVIEW_EXTRACT_MIN_IMAGE_WIDTH &&
+    extractedImageDimension2 >= WEB_PREVIEW_EXTRACT_MIN_IMAGE_HEIGHT &&
+    extractedImageDimension * extractedImageDimension2 >= WEB_PREVIEW_EXTRACT_MIN_IMAGE_AREA
   );
 }
-function filterExtractedImageCandidates(_0x7dd748 = []) {
-  if (!Array.isArray(_0x7dd748)) return [];
-  return _0x7dd748.filter((_0x342fb2) => hasExtractableImageSize(_0x342fb2?.width, _0x342fb2?.height));
+function filterExtractedImageCandidates(list = []) {
+  if (!Array.isArray(list)) return [];
+  return list.filter((box) => hasExtractableImageSize(box?.width, box?.height));
 }
-function normalizeExtractedMediaUrl(_0x11a4b7) {
-  const _0x59f658 = String(_0x11a4b7 || '').trim();
-  if (!_0x59f658) return '';
+function normalizeExtractedMediaUrl(target) {
+  const enabled = String(target || '').trim();
+  if (!enabled) return '';
   try {
-    const _0x83af7e = new URL(_0x59f658);
-    if (_0x83af7e.protocol !== 'http:' && _0x83af7e.protocol !== 'https:') return '';
-    return ((_0x83af7e.username = ''), (_0x83af7e.password = ''), _0x83af7e.href);
+    const uRL = new URL(enabled);
+    if (uRL.protocol !== 'http:' && uRL.protocol !== 'https:') return '';
+    return ((uRL.username = ''), (uRL.password = ''), uRL.href);
   } catch {
     return '';
   }
 }
-function isDirectVideoMediaUrl(_0xe62d4d) {
-  const _0xfe26d = normalizeExtractedMediaUrl(_0xe62d4d);
-  if (!_0xfe26d) return false;
+function isDirectVideoMediaUrl(source) {
+  const extractedMediaUrl = normalizeExtractedMediaUrl(source);
+  if (!extractedMediaUrl) return false;
   try {
-    const _0x356677 = new URL(_0xfe26d).pathname;
+    const uRL2 = new URL(extractedMediaUrl).pathname;
     return (
-      WEB_PREVIEW_DIRECT_VIDEO_EXTENSION_RE.test(_0x356677) &&
-      !WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE.test(_0x356677)
+      WEB_PREVIEW_DIRECT_VIDEO_EXTENSION_RE.test(uRL2) && !WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE.test(uRL2)
     );
   } catch {
     return false;
   }
 }
-function filterExtractedVideoCandidates(_0x34b004 = []) {
-  if (!Array.isArray(_0x34b004)) return [];
-  const _0x10fc1b = new Set(),
-    _0x331d8d = [];
-  for (const _0x509da3 of _0x34b004) {
-    const _0x28d61f = normalizeExtractedMediaUrl(_0x509da3?.url);
-    if (!_0x28d61f || _0x10fc1b.has(_0x28d61f)) continue;
-    let _0x2a060a = '';
+function filterExtractedVideoCandidates(list2 = []) {
+  if (!Array.isArray(list2)) return [];
+  const map = new Set(),
+    list3 = [];
+  for (const box2 of list2) {
+    const url2 = normalizeExtractedMediaUrl(box2?.url);
+    if (!url2 || map.has(url2)) continue;
+    let uRL3 = '';
     try {
-      _0x2a060a = new URL(_0x28d61f).pathname;
+      uRL3 = new URL(url2).pathname;
     } catch {}
-    if (WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE.test(_0x2a060a)) continue;
-    const _0x305566 = String(_0x509da3?.mimeType || '')
+    if (WEB_PREVIEW_STREAM_MEDIA_EXTENSION_RE.test(uRL3)) continue;
+    const mimeType = String(box2?.mimeType || '')
         .trim()
         .toLowerCase(),
-      _0xb69fe0 = String(_0x509da3?.sourceType || 'media')
+      sourceType = String(box2?.sourceType || 'media')
         .trim()
         .toLowerCase(),
-      _0xfb0a3 =
-        _0x305566.startsWith('video/') ||
-        isDirectVideoMediaUrl(_0x28d61f) ||
-        _0xb69fe0 === 'video' ||
-        _0xb69fe0 === 'video-source' ||
-        _0xb69fe0 === 'source' ||
-        _0xb69fe0 === 'video-resource' ||
-        _0xb69fe0 === 'douyin-detail';
-    if (!_0xfb0a3) continue;
-    (_0x10fc1b.add(_0x28d61f),
-      _0x331d8d.push({
+      enabled2 =
+        mimeType.startsWith('video/') ||
+        isDirectVideoMediaUrl(url2) ||
+        sourceType === 'video' ||
+        sourceType === 'video-source' ||
+        sourceType === 'source' ||
+        sourceType === 'video-resource' ||
+        sourceType === 'douyin-detail';
+    if (!enabled2) continue;
+    (map.add(url2),
+      list3.push({
         kind: 'video',
-        url: _0x28d61f,
-        title: String(_0x509da3?.title || _0x509da3?.pageTitle || '网页视频')
+        url: url2,
+        title: String(box2?.title || box2?.pageTitle || '网页视频')
           .trim()
           .slice(0, 160),
-        pageUrl: normalizeExtractedMediaUrl(_0x509da3?.pageUrl),
-        pageTitle: String(_0x509da3?.pageTitle || '')
+        pageUrl: normalizeExtractedMediaUrl(box2?.pageUrl),
+        pageTitle: String(box2?.pageTitle || '')
           .trim()
           .slice(0, 160),
-        nodeId: String(_0x509da3?.nodeId || '').trim(),
-        tabId: String(_0x509da3?.tabId || '').trim(),
-        width: Math.max(0, Math.round(Number(_0x509da3?.width || 0) || 0)),
-        height: Math.max(0, Math.round(Number(_0x509da3?.height || 0) || 0)),
-        duration: Math.max(0, Number(_0x509da3?.duration || 0) || 0),
-        sourceType: _0xb69fe0.slice(0, 40),
-        mimeType: _0x305566,
+        nodeId: String(box2?.nodeId || '').trim(),
+        tabId: String(box2?.tabId || '').trim(),
+        width: Math.max(0, Math.round(Number(box2?.width || 0) || 0)),
+        height: Math.max(0, Math.round(Number(box2?.height || 0) || 0)),
+        duration: Math.max(0, Number(box2?.duration || 0) || 0),
+        sourceType: sourceType.slice(0, 40),
+        mimeType: mimeType,
       }));
-    if (_0x331d8d.length >= WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT) break;
+    if (list3.length >= WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT) break;
   }
-  return _0x331d8d;
+  return list3;
 }
-function mergeExtractedImageCandidates(..._0x24522f) {
-  const _0x1dbec3 = new Set(),
-    _0x14383d = [];
-  for (const _0x36f848 of _0x24522f) {
-    for (const _0x268507 of filterExtractedImageCandidates(_0x36f848)) {
-      const _0x510d3f = normalizeExtractedMediaUrl(_0x268507?.url);
-      if (!_0x510d3f || _0x1dbec3.has(_0x510d3f)) continue;
-      (_0x1dbec3.add(_0x510d3f), _0x14383d.push({ ..._0x268507, url: _0x510d3f }));
-      if (_0x14383d.length >= WEB_PREVIEW_IMAGE_EXTRACTION_LIMIT) return _0x14383d;
+function mergeExtractedImageCandidates(...args) {
+  const map2 = new Set(),
+    list4 = [];
+  for (const next of args) {
+    for (const response of filterExtractedImageCandidates(next)) {
+      const url3 = normalizeExtractedMediaUrl(response?.url);
+      if (!url3 || map2.has(url3)) continue;
+      (map2.add(url3), list4.push({ ...response, url: url3 }));
+      if (list4.length >= WEB_PREVIEW_IMAGE_EXTRACTION_LIMIT) return list4;
     }
   }
-  return _0x14383d;
+  return list4;
 }
-function mergeExtractedVideoCandidates(..._0x27b371) {
-  const _0x1cbbfe = new Set(),
-    _0x69b750 = [];
-  for (const _0x11285b of _0x27b371) {
-    for (const _0xe7bfe8 of filterExtractedVideoCandidates(_0x11285b)) {
-      if (!_0xe7bfe8?.url || _0x1cbbfe.has(_0xe7bfe8.url)) continue;
-      (_0x1cbbfe.add(_0xe7bfe8.url), _0x69b750.push(_0xe7bfe8));
-      if (_0x69b750.length >= WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT) return _0x69b750;
+function mergeExtractedVideoCandidates(...args2) {
+  const map3 = new Set(),
+    list5 = [];
+  for (const current of args2) {
+    for (const response2 of filterExtractedVideoCandidates(current)) {
+      if (!response2?.url || map3.has(response2.url)) continue;
+      (map3.add(response2.url), list5.push(response2));
+      if (list5.length >= WEB_PREVIEW_VIDEO_EXTRACTION_LIMIT) return list5;
     }
   }
-  return _0x69b750;
+  return list5;
 }
-function toEntryKey(_0x3cd291, _0x5a0876 = 'default') {
-  return toNodeId(_0x3cd291) + '\n' + toTabId(_0x5a0876);
+function toEntryKey(entry, record = 'default') {
+  return toNodeId(entry) + '\n' + toTabId(record);
 }
-function toBrowserProfileId(_0x5540b2) {
-  const _0x3be42d = String(_0x5540b2 || '')
+function toBrowserProfileId(payload) {
+  const handle = String(payload || '')
     .trim()
     .replace(/[^a-zA-Z0-9_-]/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 80);
-  return _0x3be42d || DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID;
+  return handle || DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID;
 }
-function toPersistentPartitionId(_0x1293f0) {
-  return WEB_PREVIEW_PARTITION_PREFIX + '-' + toBrowserProfileId(_0x1293f0);
+function toPersistentPartitionId(state) {
+  return WEB_PREVIEW_PARTITION_PREFIX + '-' + toBrowserProfileId(state);
 }
-function isBlankPopupUrl(_0x4f06d7) {
-  const _0x2b3b7b = String(_0x4f06d7 || '')
+function isBlankPopupUrl(config) {
+  const enabled3 = String(config || '')
     .trim()
     .toLowerCase();
   return (
-    !_0x2b3b7b ||
-    _0x2b3b7b === 'about:blank' ||
-    _0x2b3b7b.startsWith('about:blank#') ||
-    _0x2b3b7b.startsWith('about:blank?')
+    !enabled3 ||
+    enabled3 === 'about:blank' ||
+    enabled3.startsWith('about:blank#') ||
+    enabled3.startsWith('about:blank?')
   );
 }
-function isGoogleAccountsUrl(_0x56d664) {
-  const _0x114dac = normalizeWebPreviewUrl(_0x56d664);
-  if (!_0x114dac) return false;
+function isGoogleAccountsUrl(scope) {
+  const webPreviewUrl = normalizeWebPreviewUrl(scope);
+  if (!webPreviewUrl) return false;
   try {
-    const _0x2e1aac = new URL(_0x114dac).hostname.toLowerCase();
-    return _0x2e1aac === 'accounts.google.com' || _0x2e1aac.startsWith('accounts.google.');
+    const uRL4 = new URL(webPreviewUrl).hostname.toLowerCase();
+    return uRL4 === 'accounts.google.com' || uRL4.startsWith('accounts.google.');
   } catch {
     return false;
   }
 }
-function shouldUseNativeAuthPopup(_0x10430b) {
-  return isBlankPopupUrl(_0x10430b) || isGoogleAccountsUrl(_0x10430b);
+function shouldUseNativeAuthPopup(input) {
+  return isBlankPopupUrl(input) || isGoogleAccountsUrl(input);
 }
-function normalizeBounds(_0x2540fe = {}) {
-  const _0x5972a1 = Math.round(Number(_0x2540fe.x)),
-    _0x404407 = Math.round(Number(_0x2540fe.y)),
-    _0x262634 = Math.round(Number(_0x2540fe.width)),
-    _0x3c2364 = Math.round(Number(_0x2540fe.height));
+function normalizeBounds(box3 = {}) {
+  const x2 = Math.round(Number(box3.x)),
+    y2 = Math.round(Number(box3.y)),
+    width = Math.round(Number(box3.width)),
+    height = Math.round(Number(box3.height));
   if (
-    !Number.isFinite(_0x5972a1) ||
-    !Number.isFinite(_0x404407) ||
-    !Number.isFinite(_0x262634) ||
-    !Number.isFinite(_0x3c2364) ||
-    _0x262634 < MIN_VIEW_SIZE ||
-    _0x3c2364 < MIN_VIEW_SIZE
+    !Number.isFinite(x2) ||
+    !Number.isFinite(y2) ||
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width < MIN_VIEW_SIZE ||
+    height < MIN_VIEW_SIZE
   )
     return null;
-  return { x: _0x5972a1, y: _0x404407, width: _0x262634, height: _0x3c2364 };
+  return { x: x2, y: y2, width: width, height: height };
 }
-function normalizeZoomFactor(_0xe135b6) {
-  const _0x1fa5f1 = Number(_0xe135b6);
-  if (!Number.isFinite(_0x1fa5f1) || _0x1fa5f1 <= 0) return 1;
-  return Math.min(5, Math.max(0.25, _0x1fa5f1));
+function normalizeZoomFactor(output) {
+  const count = Number(output);
+  if (!Number.isFinite(count) || count <= 0) return 1;
+  return Math.min(5, Math.max(0.25, count));
 }
-function boundsEqual(_0x4e7d26, _0x56ee0b) {
+function boundsEqual(box4, box5) {
   return (
-    _0x4e7d26?.x === _0x56ee0b?.x &&
-    _0x4e7d26?.y === _0x56ee0b?.y &&
-    _0x4e7d26?.width === _0x56ee0b?.width &&
-    _0x4e7d26?.height === _0x56ee0b?.height
+    box4?.x === box5?.x && box4?.y === box5?.y && box4?.width === box5?.width && box4?.height === box5?.height
   );
 }
-function zoomFactorEqual(_0x376555, _0x218eb0) {
-  return Math.abs(Number(_0x376555 || 1) - Number(_0x218eb0 || 1)) < 0.001;
+function zoomFactorEqual(value2, value3) {
+  return Math.abs(Number(value2 || 1) - Number(value3 || 1)) < 0.001;
 }
-function getViewsPayload(_0x10e29c) {
-  return Array.isArray(_0x10e29c?.views) ? _0x10e29c.views : [];
+function getViewsPayload(value4) {
+  return Array.isArray(value4?.views) ? value4.views : [];
 }
-function getNavigationState(_0x53edee) {
-  return { canGoBack: Boolean(_0x53edee?.canGoBack?.()), canGoForward: Boolean(_0x53edee?.canGoForward?.()) };
+function getNavigationState(value5) {
+  return { canGoBack: Boolean(value5?.canGoBack?.()), canGoForward: Boolean(value5?.canGoForward?.()) };
 }
 function createInputBridgeToken() {
   return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
 }
-function getConsoleMessageFromArgs(_0x2cd3c6 = []) {
-  for (const _0x557bbc of _0x2cd3c6) {
-    if (typeof _0x557bbc === 'string') return _0x557bbc;
-    if (_0x557bbc && typeof _0x557bbc.message === 'string') return _0x557bbc.message;
+function getConsoleMessageFromArgs(list6 = []) {
+  for (const error of list6) {
+    if (typeof error === 'string') return error;
+    if (error && typeof error.message === 'string') return error.message;
   }
   return '';
 }
-function parseWebPreviewInputBridgeMessage(_0x2a9b1b = '') {
-  const _0x372f5e = String(_0x2a9b1b || '');
-  if (!_0x372f5e.startsWith(WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX)) return null;
+function parseWebPreviewInputBridgeMessage(value6 = '') {
+  const list7 = String(value6 || '');
+  if (!list7.startsWith(WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX)) return null;
   try {
-    const _0x1d34ab = JSON.parse(_0x372f5e.slice(WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX.length));
-    if (_0x1d34ab?.type !== 'pan-start-preview' && _0x1d34ab?.type !== 'image-context-menu') return null;
-    return _0x1d34ab;
+    const value7 = JSON.parse(list7.slice(WEB_PREVIEW_INPUT_BRIDGE_MESSAGE_PREFIX.length));
+    if (value7?.type !== 'pan-start-preview' && value7?.type !== 'image-context-menu') return null;
+    return value7;
   } catch {
     return null;
   }
 }
 export function createWebPreviewViewManager({
-  WebContentsView: _0x355d44,
-  BrowserWindow: _0x34553a,
-  getMainWindow: _0x56e63b,
-  openExternalUrl: _0x2351f8,
-  createContextMenu: _0x215916,
-  logDiagnosticEvent: _0x58bf66,
+  WebContentsView: WebContentsView,
+  BrowserWindow: BrowserWindow,
+  getMainWindow: getMainWindow,
+  openExternalUrl: openExternalUrl,
+  createContextMenu: createContextMenu,
+  logDiagnosticEvent: logDiagnosticEvent,
   resolveDouyinMedia: resolveDouyinMedia = resolveDouyinCurrentPageMedia,
   setTimeoutFn: setTimeoutFn = globalThis.setTimeout?.bind(globalThis),
   clearTimeoutFn: clearTimeoutFn = globalThis.clearTimeout?.bind(globalThis),
   readySnapshotDelayMs: readySnapshotDelayMs = READY_SNAPSHOT_IDLE_DELAY_MS,
 } = {}) {
-  const _0x1c905a = new Map(),
-    _0x12e803 = new Set(),
-    _0x3606bd = new Set();
-  let _0x5bfabb = 0;
-  function _0x5dc532() {
-    const _0x5b3516 = typeof _0x56e63b === 'function' ? _0x56e63b() : null;
-    return _0x5b3516 && !_0x5b3516.isDestroyed?.() ? _0x5b3516 : null;
+  const count2 = new Map(),
+    map4 = new Set(),
+    map5 = new Set();
+  let value8 = 0;
+  function window() {
+    const enabled4 = typeof getMainWindow === 'function' ? getMainWindow() : null;
+    return enabled4 && !enabled4.isDestroyed?.() ? enabled4 : null;
   }
-  function _0x1d234c(_0x2c25d5, _0x2c1132, _0x107160 = '') {
-    const _0x3cab9c = _0x5dc532();
-    if (!_0x3cab9c?.webContents || _0x3cab9c.webContents.isDestroyed?.()) return;
-    _0x3cab9c.webContents.send('webPreview:event', {
-      nodeId: _0x2c25d5,
-      ...(_0x107160 ? { tabId: _0x107160 } : {}),
-      ..._0x2c1132,
+  function run(nodeId2, args3, tabId2 = '') {
+    const enabled5 = window();
+    if (!enabled5?.webContents || enabled5.webContents.isDestroyed?.()) return;
+    enabled5.webContents.send('webPreview:event', {
+      nodeId: nodeId2,
+      ...(tabId2 ? { tabId: tabId2 } : {}),
+      ...args3,
     });
   }
-  function _0x2effdd(_0x4f297c, _0x4fadda, _0x19249a = '') {
-    _0x1d234c(
-      _0x4f297c,
-      { type: 'blocked', url: String(_0x4fadda || ''), message: '浏览器节点仅允许打开 http/https 链接' },
-      _0x19249a,
+  function run2(value9, value10, value11 = '') {
+    run(
+      value9,
+      { type: 'blocked', url: String(value10 || ''), message: '浏览器节点仅允许打开 http/https 链接' },
+      value11,
     );
   }
-  function _0x2086ef(_0x21541e, _0xb4d20d, _0x4408e5 = '') {
-    _0x1d234c(_0x21541e, { type: 'navigation-state', ...getNavigationState(_0xb4d20d) }, _0x4408e5);
+  function run3(value12, value13, value14 = '') {
+    run(value12, { type: 'navigation-state', ...getNavigationState(value13) }, value14);
   }
-  function _0x2c7d3b(_0x5f2b12) {
-    let _0x12ece = '';
+  function run4(value15) {
+    let value16 = '';
     do {
-      ((_0x5bfabb += 1), (_0x12ece = 'popup-' + Date.now() + '-' + _0x5bfabb));
-    } while (_0x1c905a.has(toEntryKey(_0x5f2b12, _0x12ece)));
-    return _0x12ece;
+      ((value8 += 1), (value16 = 'popup-' + Date.now() + '-' + value8));
+    } while (count2.has(toEntryKey(value15, value16)));
+    return value16;
   }
-  function _0x498445(_0x2fe80b) {
-    return { nodeIntegration: false, contextIsolation: true, sandbox: true, partition: _0x2fe80b };
+  function webPreferences(partition) {
+    return { nodeIntegration: false, contextIsolation: true, sandbox: true, partition: partition };
   }
-  function _0x4e4462(_0x942a0 = []) {
-    if (!Array.isArray(_0x942a0)) return '';
-    for (const _0x5d2284 of _0x942a0) {
-      const _0x32b075 = normalizeWebPreviewFaviconUrl(_0x5d2284);
-      if (_0x32b075) return _0x32b075;
+  function run5(list8 = []) {
+    if (!Array.isArray(list8)) return '';
+    for (const value17 of list8) {
+      const webPreviewFaviconUrl = normalizeWebPreviewFaviconUrl(value17);
+      if (webPreviewFaviconUrl) return webPreviewFaviconUrl;
     }
     return '';
   }
-  function _0x3ffd65(_0x51549d) {
-    if (!_0x51549d?.readySnapshotTimer) return;
-    (clearTimeoutFn?.(_0x51549d.readySnapshotTimer), (_0x51549d.readySnapshotTimer = null));
+  function run6(enabled6) {
+    if (!enabled6?.readySnapshotTimer) return;
+    (clearTimeoutFn?.(enabled6.readySnapshotTimer), (enabled6.readySnapshotTimer = null));
   }
-  function _0x43c9ed(
-    _0x2cf322,
-    _0x4dd7a2,
-    _0x1b1a02,
-    _0x29aa5e,
-    _0xca8841 = '',
-    _0x5e06ba = _0x4dd7a2?.snapshotEpoch || 0,
-  ) {
-    const _0x509720 = _0x4dd7a2?.view?.webContents;
-    if (!_0x509720 || _0x509720.isDestroyed?.()) return false;
-    if (typeof _0x509720.capturePage !== 'function') return false;
-    const _0x68023d = _0xca8841 || _0x4dd7a2?.url || _0x4dd7a2?.requestedUrl || '';
-    let _0x41ff69 = null;
+  function run7(nodeId3, width2, freezeToken, value18, value19 = '', value20 = width2?.snapshotEpoch || 0) {
+    const enabled7 = width2?.view?.webContents;
+    if (!enabled7 || enabled7.isDestroyed?.()) return false;
+    if (typeof enabled7.capturePage !== 'function') return false;
+    const value21 = value19 || width2?.url || width2?.requestedUrl || '';
+    let value22 = null;
     try {
-      _0x41ff69 = _0x509720.capturePage();
-    } catch (_0x15689e) {
+      value22 = enabled7.capturePage();
+    } catch (error2) {
       return (
-        _0x58bf66?.({
+        logDiagnosticEvent?.({
           type: 'web_preview.snapshot_failed',
           level: 'warn',
           source: 'main',
           message: 'Web preview snapshot capture failed',
-          error: _0x15689e,
-          context: { nodeId: _0x2cf322, freezeToken: _0x1b1a02 },
+          error: error2,
+          context: { nodeId: nodeId3, freezeToken: freezeToken },
         }),
         false
       );
     }
     return (
-      Promise.resolve(_0x41ff69)
-        .then((_0xe625f4) => {
-          const _0xa4505c = _0xe625f4?.toDataURL?.();
-          if (!_0xa4505c) return;
-          if (_0x4dd7a2 && _0x4dd7a2.snapshotEpoch !== _0x5e06ba) return;
-          if (_0x68023d && _0x4dd7a2?.requestedUrl && _0x4dd7a2.requestedUrl !== _0x68023d) return;
-          ((_0x4dd7a2.hasSnapshot = true),
-            (_0x4dd7a2.snapshotUrl = _0x68023d),
-            (_0x4dd7a2.snapshotFreezeToken = String(_0x1b1a02 || '')),
-            _0x1d234c(
-              _0x2cf322,
+      Promise.resolve(value22)
+        .then((value23) => {
+          const dataUrl = value23?.toDataURL?.();
+          if (!dataUrl) return;
+          if (width2 && width2.snapshotEpoch !== value20) return;
+          if (value21 && width2?.requestedUrl && width2.requestedUrl !== value21) return;
+          ((width2.hasSnapshot = true),
+            (width2.snapshotUrl = value21),
+            (width2.snapshotFreezeToken = String(freezeToken || '')),
+            run(
+              nodeId3,
               {
                 type: 'snapshot',
-                dataUrl: _0xa4505c,
-                freezeToken: _0x1b1a02,
-                width: _0x4dd7a2.bounds?.width || 0,
-                height: _0x4dd7a2.bounds?.height || 0,
+                dataUrl: dataUrl,
+                freezeToken: freezeToken,
+                width: width2.bounds?.width || 0,
+                height: width2.bounds?.height || 0,
               },
-              _0x4dd7a2.tabId,
+              width2.tabId,
             ));
         })
-        .catch((_0xcd3b2) => {
-          _0x58bf66?.({
+        .catch((error3) => {
+          logDiagnosticEvent?.({
             type: 'web_preview.snapshot_failed',
             level: 'warn',
             source: 'main',
             message: 'Web preview snapshot capture failed',
-            error: _0xcd3b2,
-            context: { nodeId: _0x2cf322, freezeToken: _0x1b1a02 },
+            error: error3,
+            context: { nodeId: nodeId3, freezeToken: freezeToken },
           });
         })
         .finally(() => {
-          _0x29aa5e?.();
+          value18?.();
         }),
       true
     );
   }
-  function _0x4bacd8(_0x25a671, _0x4a4b52, _0x9ac552 = _0x4a4b52?.snapshotEpoch || 0) {
-    const _0x3bf7de = _0x4a4b52?.url || _0x4a4b52?.requestedUrl || '';
-    if (!_0x4a4b52?.bounds || !_0x3bf7de || _0x4a4b52.readySnapshotPending) return false;
-    if (_0x4a4b52.hasSnapshot && _0x4a4b52.snapshotUrl === _0x3bf7de) return false;
-    _0x4a4b52.readySnapshotPending = true;
-    const _0x41c121 = _0x43c9ed(
-      _0x25a671,
-      _0x4a4b52,
+  function run8(value24, response3, value25 = response3?.snapshotEpoch || 0) {
+    const enabled8 = response3?.url || response3?.requestedUrl || '';
+    if (!response3?.bounds || !enabled8 || response3.readySnapshotPending) return false;
+    if (response3.hasSnapshot && response3.snapshotUrl === enabled8) return false;
+    response3.readySnapshotPending = true;
+    const enabled9 = run7(
+      value24,
+      response3,
       'ready',
       () => {
-        _0x4a4b52.readySnapshotPending = false;
+        response3.readySnapshotPending = false;
       },
-      _0x3bf7de,
-      _0x9ac552,
+      enabled8,
+      value25,
     );
-    if (!_0x41c121) _0x4a4b52.readySnapshotPending = false;
-    return _0x41c121;
+    if (!enabled9) response3.readySnapshotPending = false;
+    return enabled9;
   }
-  function _0x48366a(_0x217c4c, _0x2ccba1) {
-    const _0x371759 = _0x2ccba1?.url || _0x2ccba1?.requestedUrl || '';
+  function run9(value26, response4) {
+    const enabled10 = response4?.url || response4?.requestedUrl || '';
     if (
-      !_0x2ccba1?.loaded ||
-      !_0x2ccba1.bounds ||
-      !_0x371759 ||
-      _0x2ccba1.visible !== true ||
-      _0x2ccba1.freezeToken ||
-      _0x2ccba1.readySnapshotPending ||
-      _0x2ccba1.readySnapshotTimer
+      !response4?.loaded ||
+      !response4.bounds ||
+      !enabled10 ||
+      response4.visible !== true ||
+      response4.freezeToken ||
+      response4.readySnapshotPending ||
+      response4.readySnapshotTimer
     )
       return false;
-    if (_0x2ccba1.hasSnapshot && _0x2ccba1.snapshotUrl === _0x371759) return false;
-    if (typeof setTimeoutFn !== 'function') return _0x4bacd8(_0x217c4c, _0x2ccba1);
-    const _0x19b731 = _0x2ccba1.snapshotEpoch,
-      _0x4df026 = Math.max(0, Number(readySnapshotDelayMs) || 0);
+    if (response4.hasSnapshot && response4.snapshotUrl === enabled10) return false;
+    if (typeof setTimeoutFn !== 'function') return run8(value26, response4);
+    const value27 = response4.snapshotEpoch,
+      value28 = Math.max(0, Number(readySnapshotDelayMs) || 0);
     return (
-      (_0x2ccba1.readySnapshotTimer = setTimeoutFn(() => {
-        _0x2ccba1.readySnapshotTimer = null;
-        const _0x201b1a = _0x1c905a.get(toEntryKey(_0x217c4c, _0x2ccba1.tabId)),
-          _0x26fa29 = _0x201b1a?.url || _0x201b1a?.requestedUrl || '';
+      (response4.readySnapshotTimer = setTimeoutFn(() => {
+        response4.readySnapshotTimer = null;
+        const response5 = count2.get(toEntryKey(value26, response4.tabId)),
+          value29 = response5?.url || response5?.requestedUrl || '';
         if (
-          _0x201b1a !== _0x2ccba1 ||
-          _0x201b1a.snapshotEpoch !== _0x19b731 ||
-          _0x26fa29 !== _0x371759 ||
-          _0x201b1a.loaded !== true ||
-          _0x201b1a.visible !== true
+          response5 !== response4 ||
+          response5.snapshotEpoch !== value27 ||
+          value29 !== enabled10 ||
+          response5.loaded !== true ||
+          response5.visible !== true
         )
           return;
-        if (_0x201b1a.freezeToken) {
-          _0x48366a(_0x217c4c, _0x201b1a);
+        if (response5.freezeToken) {
+          run9(value26, response5);
           return;
         }
-        _0x4bacd8(_0x217c4c, _0x201b1a, _0x19b731);
-      }, _0x4df026)),
+        run8(value26, response5, value27);
+      }, value28)),
       true
     );
   }
-  function _0x1c562e(_0x2e0d0d, _0x6782a4, _0x126b1c = '', _0x260861 = '') {
-    if (typeof _0x6782a4?.executeJavaScript !== 'function') return;
-    _0x6782a4
+  function run10(nodeId4, value30, tabId3 = '', inputBridgeToken2 = '') {
+    if (typeof value30?.executeJavaScript !== 'function') return;
+    value30
       .executeJavaScript(
-        buildWebPreviewDragBridgeScript({ nodeId: _0x2e0d0d, tabId: _0x126b1c, inputBridgeToken: _0x260861 }),
+        buildWebPreviewDragBridgeScript({
+          nodeId: nodeId4,
+          tabId: tabId3,
+          inputBridgeToken: inputBridgeToken2,
+        }),
         true,
       )
-      .catch((_0x4e81f5) => {
-        _0x58bf66?.({
+      .catch((error4) => {
+        logDiagnosticEvent?.({
           type: 'web_preview.drag_bridge_failed',
           level: 'warn',
           source: 'main',
           message: 'Web preview drag bridge injection failed',
-          error: _0x4e81f5,
-          context: { nodeId: _0x2e0d0d, tabId: _0x126b1c },
+          error: error4,
+          context: { nodeId: nodeId4, tabId: tabId3 },
         });
       });
   }
-  function _0x11dc9a(
-    _0x10834d,
-    _0x38851e,
-    _0x2b3ef5,
-    _0x590174 = {},
-    _0x9a6a75 = WEB_PREVIEW_TEXT_ACTION_PROMPT,
-  ) {
-    const _0x4cd87a = String(_0x590174?.selectionText || '').trim();
-    if (!_0x4cd87a) return false;
-    const _0x44236b = _0x1c905a.get(toEntryKey(_0x10834d, _0x38851e)),
-      _0x207e51 =
-        normalizeWebPreviewUrl(_0x590174?.pageURL) ||
-        normalizeWebPreviewUrl(_0x44236b?.url) ||
-        normalizeWebPreviewUrl(_0x44236b?.requestedUrl) ||
+  function run11(value31, value32, value33, box6 = {}, type = WEB_PREVIEW_TEXT_ACTION_PROMPT) {
+    const text = String(box6?.selectionText || '').trim();
+    if (!text) return false;
+    const response6 = count2.get(toEntryKey(value31, value32)),
+      pageUrl =
+        normalizeWebPreviewUrl(box6?.pageURL) ||
+        normalizeWebPreviewUrl(response6?.url) ||
+        normalizeWebPreviewUrl(response6?.requestedUrl) ||
         '',
-      _0x1ad6e0 = String(_0x2b3ef5?.getTitle?.() || '').trim();
+      webSourceTitle = String(value33?.getTitle?.() || '').trim();
     return (
-      _0x1d234c(
-        _0x10834d,
+      run(
+        value31,
         {
-          type: _0x9a6a75,
-          text: _0x4cd87a.slice(0, WEB_PREVIEW_SELECTED_TEXT_LIMIT),
-          pageUrl: _0x207e51,
-          webSourceTitle: _0x1ad6e0.slice(0, 160),
-          contextX: Math.max(0, Math.round(Number(_0x590174?.x || 0) || 0)),
-          contextY: Math.max(0, Math.round(Number(_0x590174?.y || 0) || 0)),
+          type: type,
+          text: text.slice(0, WEB_PREVIEW_SELECTED_TEXT_LIMIT),
+          pageUrl: pageUrl,
+          webSourceTitle: webSourceTitle.slice(0, 160),
+          contextX: Math.max(0, Math.round(Number(box6?.x || 0) || 0)),
+          contextY: Math.max(0, Math.round(Number(box6?.y || 0) || 0)),
         },
-        _0x38851e,
+        value32,
       ),
       true
     );
   }
-  function _0x3b0073(_0x5b92f3, _0x4a95d3 = {}) {
-    const _0x341a95 = String(_0x4a95d3?.selectionText || '').trim();
-    if (!_0x341a95) return false;
+  function run12(value34, value35 = {}) {
+    const enabled11 = String(value35?.selectionText || '').trim();
+    if (!enabled11) return false;
     try {
-      if (typeof _0x5b92f3?.copy === 'function') return (_0x5b92f3.copy(), true);
+      if (typeof value34?.copy === 'function') return (value34.copy(), true);
     } catch {}
     return false;
   }
-  function _0x22062d(_0x4efb15) {
-    return Math.max(0, Math.round(Number(_0x4efb15 || 0) || 0));
+  function x3(value36) {
+    return Math.max(0, Math.round(Number(value36 || 0) || 0));
   }
-  function _0x1590b6(_0x82a6ad = {}, _0xbada99 = null) {
-    const _0x251f1b =
-      normalizeWebPreviewUrl(_0x82a6ad?.pageUrl) ||
-      normalizeWebPreviewUrl(_0x82a6ad?.sourceUrl) ||
-      normalizeWebPreviewUrl(_0xbada99?.url) ||
-      normalizeWebPreviewUrl(_0xbada99?.requestedUrl) ||
+  function run13(event = {}, response7 = null) {
+    const pageURL =
+      normalizeWebPreviewUrl(event?.pageUrl) ||
+      normalizeWebPreviewUrl(event?.sourceUrl) ||
+      normalizeWebPreviewUrl(response7?.url) ||
+      normalizeWebPreviewUrl(response7?.requestedUrl) ||
       '';
     return {
       mediaType: 'image',
-      srcURL: normalizeWebPreviewUrl(_0x82a6ad?.url) || '',
-      titleText: String(_0x82a6ad?.title || _0x82a6ad?.alt || '')
+      srcURL: normalizeWebPreviewUrl(event?.url) || '',
+      titleText: String(event?.title || event?.alt || '')
         .trim()
         .slice(0, 160),
-      pageURL: _0x251f1b,
-      frameURL: _0x251f1b,
-      x: _0x22062d(_0x82a6ad?.contextX ?? _0x82a6ad?.clientX),
-      y: _0x22062d(_0x82a6ad?.contextY ?? _0x82a6ad?.clientY),
+      pageURL: pageURL,
+      frameURL: pageURL,
+      x: x3(event?.contextX ?? event?.clientX),
+      y: x3(event?.contextY ?? event?.clientY),
     };
   }
-  function _0x14012e(_0x5dc544, _0x277b8b = {}) {
-    if (!_0x5dc544) return;
-    ((_0x5dc544.lastBridgeImageContextMenuAt = Date.now()),
-      (_0x5dc544.lastBridgeImageContextMenuX = _0x22062d(_0x277b8b?.x)),
-      (_0x5dc544.lastBridgeImageContextMenuY = _0x22062d(_0x277b8b?.y)));
+  function run14(enabled12, box7 = {}) {
+    if (!enabled12) return;
+    ((enabled12.lastBridgeImageContextMenuAt = Date.now()),
+      (enabled12.lastBridgeImageContextMenuX = x3(box7?.x)),
+      (enabled12.lastBridgeImageContextMenuY = x3(box7?.y)));
   }
-  function _0xc484e6(_0x18be15, _0x5592ba = {}) {
-    const _0x272c81 = Number(_0x18be15?.lastBridgeImageContextMenuAt || 0);
-    if (!_0x272c81 || Date.now() - _0x272c81 > WEB_PREVIEW_CONTEXT_MENU_BRIDGE_DEDUPE_MS) return false;
-    const _0x5c2cbf = _0x22062d(_0x5592ba?.x),
-      _0x2e38a0 = _0x22062d(_0x5592ba?.y);
+  function run15(value37, box8 = {}) {
+    const enabled13 = Number(value37?.lastBridgeImageContextMenuAt || 0);
+    if (!enabled13 || Date.now() - enabled13 > WEB_PREVIEW_CONTEXT_MENU_BRIDGE_DEDUPE_MS) return false;
+    const value38 = x3(box8?.x),
+      value39 = x3(box8?.y);
     return (
-      Math.abs(_0x5c2cbf - _0x22062d(_0x18be15?.lastBridgeImageContextMenuX)) <= 2 &&
-      Math.abs(_0x2e38a0 - _0x22062d(_0x18be15?.lastBridgeImageContextMenuY)) <= 2
+      Math.abs(value38 - x3(value37?.lastBridgeImageContextMenuX)) <= 2 &&
+      Math.abs(value39 - x3(value37?.lastBridgeImageContextMenuY)) <= 2
     );
   }
-  function _0x166451(_0xdce18d, _0x2b4599, _0x5767c6, _0x4f046c = {}, _0x496151 = null) {
-    const _0xe50aec = String(_0x4f046c?.mediaType || '').toLowerCase() === 'image' || Boolean(_0x496151?.url);
-    if (!_0xe50aec) return null;
-    const _0x1a34cf = normalizeWebPreviewUrl(_0x496151?.url || _0x4f046c?.srcURL);
-    if (!_0x1a34cf) return null;
-    const _0x1d464e = _0x1c905a.get(toEntryKey(_0xdce18d, _0x2b4599)),
-      _0x42dcc4 =
-        normalizeWebPreviewUrl(_0x496151?.pageUrl) ||
-        normalizeWebPreviewUrl(_0x4f046c?.pageURL) ||
-        normalizeWebPreviewUrl(_0x4f046c?.frameURL) ||
-        normalizeWebPreviewUrl(_0x1d464e?.url) ||
-        normalizeWebPreviewUrl(_0x1d464e?.requestedUrl) ||
+  function run16(nodeId5, tabId4, value40, box9 = {}, box10 = null) {
+    const enabled14 = String(box9?.mediaType || '').toLowerCase() === 'image' || Boolean(box10?.url);
+    if (!enabled14) return null;
+    const url4 = normalizeWebPreviewUrl(box10?.url || box9?.srcURL);
+    if (!url4) return null;
+    const response8 = count2.get(toEntryKey(nodeId5, tabId4)),
+      pageUrl2 =
+        normalizeWebPreviewUrl(box10?.pageUrl) ||
+        normalizeWebPreviewUrl(box9?.pageURL) ||
+        normalizeWebPreviewUrl(box9?.frameURL) ||
+        normalizeWebPreviewUrl(response8?.url) ||
+        normalizeWebPreviewUrl(response8?.requestedUrl) ||
         '',
-      _0x271998 = String(_0x496151?.pageTitle || _0x5767c6?.getTitle?.() || '')
+      pageTitle = String(box10?.pageTitle || value40?.getTitle?.() || '')
         .trim()
         .slice(0, 160),
-      _0x461b2b = String(
-        _0x496151?.title || _0x496151?.alt || _0x4f046c?.titleText || _0x271998 || '网页图片',
-      )
+      title = String(box10?.title || box10?.alt || box9?.titleText || pageTitle || '网页图片')
         .trim()
         .slice(0, 160),
-      _0x2e1e3b = {
+      box11 = {
         kind: 'image',
-        url: _0x1a34cf,
-        title: _0x461b2b,
-        pageUrl: _0x42dcc4,
-        pageTitle: _0x271998,
-        nodeId: _0xdce18d,
-        tabId: _0x2b4599,
-        contextX: Math.max(0, Math.round(Number(_0x4f046c?.x || 0) || 0)),
-        contextY: Math.max(0, Math.round(Number(_0x4f046c?.y || 0) || 0)),
+        url: url4,
+        title: title,
+        pageUrl: pageUrl2,
+        pageTitle: pageTitle,
+        nodeId: nodeId5,
+        tabId: tabId4,
+        contextX: Math.max(0, Math.round(Number(box9?.x || 0) || 0)),
+        contextY: Math.max(0, Math.round(Number(box9?.y || 0) || 0)),
       },
-      _0xc93ef5 = Math.max(0, Math.round(Number(_0x496151?.width || 0) || 0)),
-      _0x428141 = Math.max(0, Math.round(Number(_0x496151?.height || 0) || 0));
-    if (_0xc93ef5) _0x2e1e3b.width = _0xc93ef5;
-    if (_0x428141) _0x2e1e3b.height = _0x428141;
-    return _0x2e1e3b;
+      value41 = Math.max(0, Math.round(Number(box10?.width || 0) || 0)),
+      value42 = Math.max(0, Math.round(Number(box10?.height || 0) || 0));
+    if (value41) box11.width = value41;
+    if (value42) box11.height = value42;
+    return box11;
   }
-  async function _0x1057ab(_0xcace14, _0x2ac15a, _0x5c9c84, _0x15d0c0 = {}) {
-    if (typeof _0x5c9c84?.executeJavaScript !== 'function') return null;
+  async function run17(nodeId6, tabId5, value43, x4 = {}) {
+    if (typeof value43?.executeJavaScript !== 'function') return null;
     try {
-      const _0x3e231c = await _0x5c9c84.executeJavaScript(
+      const value44 = await value43.executeJavaScript(
           buildWebPreviewContextImageProbeScript({
-            nodeId: _0xcace14,
-            tabId: _0x2ac15a,
-            x: _0x15d0c0?.x,
-            y: _0x15d0c0?.y,
+            nodeId: nodeId6,
+            tabId: tabId5,
+            x: x4?.x,
+            y: x4?.y,
           }),
           true,
         ),
-        _0x44c938 = _0x3e231c?.image && typeof _0x3e231c.image === 'object' ? _0x3e231c.image : _0x3e231c;
-      return _0x166451(_0xcace14, _0x2ac15a, _0x5c9c84, _0x15d0c0, _0x44c938);
-    } catch (_0x395512) {
+        value45 = value44?.image && typeof value44.image === 'object' ? value44.image : value44;
+      return run16(nodeId6, tabId5, value43, x4, value45);
+    } catch (error5) {
       return (
-        _0x58bf66?.({
+        logDiagnosticEvent?.({
           type: 'web_preview.context_image_probe_failed',
           level: 'warn',
           source: 'main',
           message: 'Web preview context image probe failed',
-          error: _0x395512,
-          context: { nodeId: _0xcace14, tabId: _0x2ac15a },
+          error: error5,
+          context: { nodeId: nodeId6, tabId: tabId5 },
         }),
         null
       );
     }
   }
-  async function _0x1f568d(_0xff0eb9, _0x28b325, _0x127f35, _0x3f5954 = {}) {
-    if (String(_0x3f5954?.mediaType || '').toLowerCase() !== 'image') return null;
-    const _0xff25 = await _0x1057ab(_0xff0eb9, _0x28b325, _0x127f35, _0x3f5954);
-    return _0xff25 || _0x166451(_0xff0eb9, _0x28b325, _0x127f35, _0x3f5954);
+  async function run18(value46, value47, value48, value49 = {}) {
+    if (String(value49?.mediaType || '').toLowerCase() !== 'image') return null;
+    const value50 = await run17(value46, value47, value48, value49);
+    return value50 || run16(value46, value47, value48, value49);
   }
-  function _0x3d099e(_0x143ee5, _0xd2324a, _0x1b8d64, _0x875e1 = 'send-image-to-canvas') {
-    if (!_0x1b8d64) return false;
-    return (_0x1d234c(_0x143ee5, { ..._0x1b8d64, type: _0x875e1 }, _0xd2324a), true);
+  function run19(value51, value52, args4, type2 = 'send-image-to-canvas') {
+    if (!args4) return false;
+    return (run(value51, { ...args4, type: type2 }, value52), true);
   }
-  async function _0x5ad7e3(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e = {}) {
-    if (typeof _0x215916 !== 'function') return;
-    const _0x31890 = [],
-      _0x453203 = await _0x1f568d(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e);
-    _0x453203 &&
-      _0x31890.push(
+  async function run20(value53, value54, value55, value56 = {}) {
+    if (typeof createContextMenu !== 'function') return;
+    const list9 = [],
+      value57 = await run18(value53, value54, value55, value56);
+    value57 &&
+      list9.push(
         {
           label: '加入到画布',
-          click: () => _0x3d099e(_0x5f445f, _0x282a4c, _0x453203, 'send-image-to-canvas'),
+          click: () => run19(value53, value54, value57, 'send-image-to-canvas'),
         },
         {
           label: '反推提示词-创建',
-          click: () => _0x3d099e(_0x5f445f, _0x282a4c, _0x453203, 'reverse-image-prompt'),
+          click: () => run19(value53, value54, value57, 'reverse-image-prompt'),
         },
         {
           label: '反推提示词-生成',
-          click: () => _0x3d099e(_0x5f445f, _0x282a4c, _0x453203, 'reverse-image-prompt-generate'),
+          click: () => run19(value53, value54, value57, 'reverse-image-prompt-generate'),
         },
       );
-    const _0x1e1603 = String(_0x55562e?.selectionText || '').trim();
-    if (_0x1e1603) {
-      if (_0x31890.length) _0x31890.push({ type: 'separator' });
-      _0x31890.push(
-        { label: '复制文本', click: () => _0x3b0073(_0x1a6073, _0x55562e) },
+    const value58 = String(value56?.selectionText || '').trim();
+    if (value58) {
+      if (list9.length) list9.push({ type: 'separator' });
+      list9.push(
+        { label: '复制文本', click: () => run12(value55, value56) },
         {
           label: '发送到文本节点',
           submenu: [
             {
               label: '源节点',
-              click: () =>
-                _0x11dc9a(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e, WEB_PREVIEW_TEXT_ACTION_SOURCE),
+              click: () => run11(value53, value54, value55, value56, WEB_PREVIEW_TEXT_ACTION_SOURCE),
             },
             {
               label: '生成文本',
-              click: () =>
-                _0x11dc9a(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e, WEB_PREVIEW_TEXT_ACTION_PROMPT),
+              click: () => run11(value53, value54, value55, value56, WEB_PREVIEW_TEXT_ACTION_PROMPT),
             },
           ],
         },
@@ -723,19 +706,12 @@ export function createWebPreviewViewManager({
           submenu: [
             {
               label: '创建',
-              click: () =>
-                _0x11dc9a(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e, WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT),
+              click: () => run11(value53, value54, value55, value56, WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT),
             },
             {
               label: '生成',
               click: () =>
-                _0x11dc9a(
-                  _0x5f445f,
-                  _0x282a4c,
-                  _0x1a6073,
-                  _0x55562e,
-                  WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT_GENERATE,
-                ),
+                run11(value53, value54, value55, value56, WEB_PREVIEW_TEXT_ACTION_IMAGE_PROMPT_GENERATE),
             },
           ],
         },
@@ -744,62 +720,51 @@ export function createWebPreviewViewManager({
           submenu: [
             {
               label: '创建',
-              click: () =>
-                _0x11dc9a(_0x5f445f, _0x282a4c, _0x1a6073, _0x55562e, WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT),
+              click: () => run11(value53, value54, value55, value56, WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT),
             },
             {
               label: '生成',
               click: () =>
-                _0x11dc9a(
-                  _0x5f445f,
-                  _0x282a4c,
-                  _0x1a6073,
-                  _0x55562e,
-                  WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT_GENERATE,
-                ),
+                run11(value53, value54, value55, value56, WEB_PREVIEW_TEXT_ACTION_VIDEO_PROMPT_GENERATE),
             },
           ],
         },
       );
     }
-    if (!_0x31890.length) return;
-    const _0x27e664 = _0x215916(_0x31890);
-    _0x27e664?.popup?.({ window: _0x5dc532() });
+    if (!list9.length) return;
+    const value59 = createContextMenu(list9);
+    value59?.popup?.({ window: window() });
   }
-  function _0x3d29e9(_0x290681, _0x5898e9, _0x294b26, _0x79c90) {
-    if (!_0x294b26?.isPopup || _0x294b26.popupOpened || !_0x79c90) return false;
+  function run21(value60, popupTabId, response9, url5) {
+    if (!response9?.isPopup || response9.popupOpened || !url5) return false;
     return (
-      (_0x294b26.popupOpened = true),
-      (_0x294b26.pendingPopup = false),
-      (_0x294b26.url = _0x79c90),
-      (_0x294b26.requestedUrl = _0x79c90),
-      _0x1d234c(
-        _0x290681,
-        { type: 'open-popup', url: _0x79c90, popupTabId: _0x5898e9 },
-        _0x294b26.openerTabId || '',
+      (response9.popupOpened = true),
+      (response9.pendingPopup = false),
+      (response9.url = url5),
+      (response9.requestedUrl = url5),
+      run(value60, { type: 'open-popup', url: url5, popupTabId: popupTabId }, response9.openerTabId || ''),
+      true
+    );
+  }
+  function run22(value61, popupTabId2, response10) {
+    if (!response10?.isPopup || response10.popupOpened) return false;
+    return (
+      (response10.popupOpened = true),
+      (response10.pendingPopup = true),
+      (response10.url = ''),
+      (response10.requestedUrl = ''),
+      run(
+        value61,
+        { type: 'open-popup', url: '', popupTabId: popupTabId2, pendingPopup: true },
+        response10.openerTabId || '',
       ),
       true
     );
   }
-  function _0x3a3360(_0x3cc126, _0x5f17c2, _0x42c41c) {
-    if (!_0x42c41c?.isPopup || _0x42c41c.popupOpened) return false;
-    return (
-      (_0x42c41c.popupOpened = true),
-      (_0x42c41c.pendingPopup = true),
-      (_0x42c41c.url = ''),
-      (_0x42c41c.requestedUrl = ''),
-      _0x1d234c(
-        _0x3cc126,
-        { type: 'open-popup', url: '', popupTabId: _0x5f17c2, pendingPopup: true },
-        _0x42c41c.openerTabId || '',
-      ),
-      true
-    );
-  }
-  function _0xa8aae3(_0x3ab0b3) {
-    const _0xbc3f15 = _0x5dc532(),
-      _0x32f241 = {
-        parent: _0xbc3f15 || undefined,
+  function overrideBrowserWindowOptions(value62) {
+    const parent = window(),
+      box12 = {
+        parent: parent || undefined,
         modal: false,
         show: true,
         width: WEB_PREVIEW_AUTH_POPUP_WIDTH,
@@ -808,366 +773,367 @@ export function createWebPreviewViewManager({
         minHeight: WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT,
         title: 'Login',
         autoHideMenuBar: true,
-        webPreferences: _0x498445(_0x3ab0b3),
+        webPreferences: webPreferences(value62),
       },
-      _0x3bf8b3 = _0xbc3f15?.getBounds?.();
+      box13 = parent?.getBounds?.();
     if (
-      _0x3bf8b3 &&
-      Number.isFinite(_0x3bf8b3.x) &&
-      Number.isFinite(_0x3bf8b3.y) &&
-      Number.isFinite(_0x3bf8b3.width) &&
-      Number.isFinite(_0x3bf8b3.height) &&
-      _0x3bf8b3.width > WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH &&
-      _0x3bf8b3.height > WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT
+      box13 &&
+      Number.isFinite(box13.x) &&
+      Number.isFinite(box13.y) &&
+      Number.isFinite(box13.width) &&
+      Number.isFinite(box13.height) &&
+      box13.width > WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH &&
+      box13.height > WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT
     ) {
-      const _0x5178d0 = Math.min(
+      const value63 = Math.min(
           WEB_PREVIEW_AUTH_POPUP_WIDTH,
-          Math.max(WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH, _0x3bf8b3.width - 48),
+          Math.max(WEB_PREVIEW_AUTH_POPUP_MIN_WIDTH, box13.width - 48),
         ),
-        _0x39cb6d = Math.min(
+        value64 = Math.min(
           WEB_PREVIEW_AUTH_POPUP_HEIGHT,
-          Math.max(WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT, _0x3bf8b3.height - 48),
+          Math.max(WEB_PREVIEW_AUTH_POPUP_MIN_HEIGHT, box13.height - 48),
         );
-      ((_0x32f241.width = _0x5178d0),
-        (_0x32f241.height = _0x39cb6d),
-        (_0x32f241.x = Math.round(_0x3bf8b3.x + (_0x3bf8b3.width - _0x5178d0) / 2)),
-        (_0x32f241.y = Math.round(_0x3bf8b3.y + (_0x3bf8b3.height - _0x39cb6d) / 2)));
+      ((box12.width = value63),
+        (box12.height = value64),
+        (box12.x = Math.round(box13.x + (box13.width - value63) / 2)),
+        (box12.y = Math.round(box13.y + (box13.height - value64) / 2)));
     }
-    return _0x32f241;
+    return box12;
   }
-  function _0x25b490(_0xd39145 = () => true) {
-    for (const _0x3859d2 of [..._0x3606bd]) {
-      if (_0xd39145(_0x3859d2)) _0x3606bd.delete(_0x3859d2);
+  function run23(handler = () => true) {
+    for (const value65 of [...map5]) {
+      if (handler(value65)) map5.delete(value65);
     }
-    for (const _0x5510ca of [..._0x12e803]) {
-      if (!_0xd39145(_0x5510ca)) continue;
-      _0x12e803.delete(_0x5510ca);
+    for (const value66 of [...map4]) {
+      if (!handler(value66)) continue;
+      map4.delete(value66);
       try {
-        _0x5510ca.popupWindow?.isDestroyed?.() !== true && _0x5510ca.popupWindow?.close?.();
+        value66.popupWindow?.isDestroyed?.() !== true && value66.popupWindow?.close?.();
       } catch {}
     }
   }
-  function _0x55abeb() {
-    const _0x4194e7 = Date.now();
-    for (const _0x24036d of [..._0x3606bd]) {
-      if (_0x24036d.expiresAt <= _0x4194e7) _0x3606bd.delete(_0x24036d);
+  function run24() {
+    const value67 = Date.now();
+    for (const value68 of [...map5]) {
+      if (value68.expiresAt <= value67) map5.delete(value68);
     }
   }
-  function _0x26304f({ nodeId: _0x22d63f, tabId: _0x3c473a, partition: _0x48ad32 }) {
-    _0x55abeb();
-    const _0xbb37d4 = {
-      nodeId: _0x22d63f,
-      tabId: _0x3c473a,
-      partition: _0x48ad32,
+  function run25({ nodeId: nodeId7, tabId: tabId6, partition: partition2 }) {
+    run24();
+    const value69 = {
+      nodeId: nodeId7,
+      tabId: tabId6,
+      partition: partition2,
       expiresAt: Date.now() + WEB_PREVIEW_AUTH_POPUP_REQUEST_TTL_MS,
     };
-    return (_0x3606bd.add(_0xbb37d4), _0xbb37d4);
+    return (map5.add(value69), value69);
   }
-  function _0x5065da({ nodeId: _0x3344ab, tabId: _0x8c8766, url: _0x2e8539 }) {
-    _0x55abeb();
-    let _0x6d1537 = null;
-    for (const _0x43c0a3 of _0x3606bd) {
-      if (_0x43c0a3.nodeId !== _0x3344ab || _0x43c0a3.tabId !== _0x8c8766) continue;
-      _0x6d1537 = _0x43c0a3;
-      if (shouldUseNativeAuthPopup(_0x2e8539)) break;
+  function run26({ nodeId: nodeId8, tabId: tabId7, url: url6 }) {
+    run24();
+    let value70 = null;
+    for (const value71 of map5) {
+      if (value71.nodeId !== nodeId8 || value71.tabId !== tabId7) continue;
+      value70 = value71;
+      if (shouldUseNativeAuthPopup(url6)) break;
     }
-    if (_0x6d1537) _0x3606bd.delete(_0x6d1537);
-    return _0x6d1537;
+    if (value70) map5.delete(value70);
+    return value70;
   }
-  function _0x162ea0({ nodeId: _0x52ba67, tabId: _0x24333d, partition: _0x2e0d2a, webContents: _0x22cc2d }) {
-    _0x22cc2d.setWindowOpenHandler?.(({ url: _0x4c3701 } = {}) => {
-      const _0x1d5c6c = normalizeWebPreviewUrl(_0x4c3701);
-      if (!_0x1d5c6c && !isBlankPopupUrl(_0x4c3701))
-        return (_0x2effdd(_0x52ba67, _0x4c3701, _0x24333d), { action: 'deny' });
+  function run27({ nodeId: nodeId9, tabId: tabId8, partition: partition3, webContents: webContents }) {
+    webContents.setWindowOpenHandler?.(({ url: url7 } = {}) => {
+      const webPreviewUrl2 = normalizeWebPreviewUrl(url7);
+      if (!webPreviewUrl2 && !isBlankPopupUrl(url7)) return (run2(nodeId9, url7, tabId8), { action: 'deny' });
       return {
         action: 'allow',
         outlivesOpener: true,
-        overrideBrowserWindowOptions: { webPreferences: _0x498445(_0x2e0d2a) },
+        overrideBrowserWindowOptions: { webPreferences: webPreferences(partition3) },
       };
     });
-    const _0x1bcb5f = (_0x5b4996, _0x408dc3) => {
-        if (isBlankPopupUrl(_0x408dc3) || normalizeWebPreviewUrl(_0x408dc3)) return;
-        (_0x5b4996?.preventDefault?.(), _0x2effdd(_0x52ba67, _0x408dc3, _0x24333d));
+    const run28 = (event2, value72) => {
+        if (isBlankPopupUrl(value72) || normalizeWebPreviewUrl(value72)) return;
+        (event2?.preventDefault?.(), run2(nodeId9, value72, tabId8));
       },
-      _0x4df50d = (_0x1829a7, _0x2a068c, ..._0x16c16b) => {
-        const _0x344b53 = _0x16c16b.some((_0x2d783f) => _0x2d783f === true);
-        if (!_0x344b53) return;
-        _0x1bcb5f(_0x1829a7, _0x2a068c);
+      value73 = (value74, value75, ...list10) => {
+        const enabled15 = list10.some((item2) => item2 === true);
+        if (!enabled15) return;
+        run28(value74, value75);
       };
-    (_0x22cc2d.on?.('will-navigate', _0x1bcb5f),
-      _0x22cc2d.on?.('will-frame-navigate', _0x4df50d),
-      _0x22cc2d.on?.('did-fail-load', (_0xdb9ea6, _0x1ed6df, _0x4e6354, _0x549ffb) => {
-        _0x1d234c(
-          _0x52ba67,
+    (webContents.on?.('will-navigate', run28),
+      webContents.on?.('will-frame-navigate', value73),
+      webContents.on?.('did-fail-load', (value76, errorCode, value77, value78) => {
+        run(
+          nodeId9,
           {
             type: 'failed',
-            url: String(_0x549ffb || ''),
-            errorCode: _0x1ed6df,
-            message: String(_0x4e6354 || 'Login popup load failed'),
+            url: String(value78 || ''),
+            errorCode: errorCode,
+            message: String(value77 || 'Login popup load failed'),
           },
-          _0x24333d,
+          tabId8,
         );
       }));
-    const _0x5622f9 = _0x22cc2d.session;
-    (_0x5622f9?.setPermissionRequestHandler?.((_0x3f1e70, _0x65bc67, _0x47e2b3) => {
-      _0x47e2b3(false);
+    const value79 = webContents.session;
+    (value79?.setPermissionRequestHandler?.((value80, value81, handler2) => {
+      handler2(false);
     }),
-      _0x5622f9?.on?.('will-download', (_0x4b3513) => {
-        _0x4b3513?.preventDefault?.();
+      value79?.on?.('will-download', (event3) => {
+        event3?.preventDefault?.();
       }));
   }
-  function _0x572875({ nodeId: _0x7f24ac, tabId: _0x2a9eaa, partition: _0x39a0b1, popupWindow: _0x502c9a }) {
-    const _0x2c4ab0 = _0x502c9a?.webContents;
-    if (!_0x502c9a || !_0x2c4ab0) return false;
-    const _0x31b714 = { nodeId: _0x7f24ac, tabId: _0x2a9eaa, popupWindow: _0x502c9a };
-    _0x12e803.add(_0x31b714);
-    const _0x34fcfb = () => _0x12e803.delete(_0x31b714);
+  function run29({ nodeId: nodeId10, tabId: tabId9, partition: partition4, popupWindow: popupWindow }) {
+    const webContents2 = popupWindow?.webContents;
+    if (!popupWindow || !webContents2) return false;
+    const value82 = { nodeId: nodeId10, tabId: tabId9, popupWindow: popupWindow };
+    map4.add(value82);
+    const value83 = () => map4.delete(value82);
     return (
-      _0x502c9a.on?.('closed', _0x34fcfb),
-      _0x2c4ab0.on?.('destroyed', _0x34fcfb),
-      _0x162ea0({ nodeId: _0x7f24ac, tabId: _0x2a9eaa, partition: _0x39a0b1, webContents: _0x2c4ab0 }),
+      popupWindow.on?.('closed', value83),
+      webContents2.on?.('destroyed', value83),
+      run27({ nodeId: nodeId10, tabId: tabId9, partition: partition4, webContents: webContents2 }),
       true
     );
   }
-  function _0x353ff1(_0x42a8eb, _0x1b318f, _0x40e4f6, _0x1f23bd = '') {
-    (_0x40e4f6.setWindowOpenHandler?.(({ url: _0x31d705 } = {}) => {
-      const _0x1daafe = normalizeWebPreviewUrl(_0x31d705),
-        _0x2528ab = isBlankPopupUrl(_0x31d705);
-      if (!_0x1daafe && !_0x2528ab) return (_0x2effdd(_0x42a8eb, _0x31d705, _0x1b318f), { action: 'deny' });
-      const _0x3f10a8 = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f)),
-        _0x460f7b = _0x2c7d3b(_0x42a8eb),
-        _0xe47a71 = _0x3f10a8?.browserProfileId || DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID,
-        _0x177c0f = _0x3f10a8?.partition || toPersistentPartitionId(_0xe47a71);
-      if (shouldUseNativeAuthPopup(_0x31d705) && typeof _0x34553a === 'function')
+  function run30(nodeId11, tabId10, value84, value85 = '') {
+    (value84.setWindowOpenHandler?.(({ url: url8 } = {}) => {
+      const url9 = normalizeWebPreviewUrl(url8),
+        isBlankPopupUrl2 = isBlankPopupUrl(url8);
+      if (!url9 && !isBlankPopupUrl2) return (run2(nodeId11, url8, tabId10), { action: 'deny' });
+      const value86 = count2.get(toEntryKey(nodeId11, tabId10)),
+        tabId11 = run4(nodeId11),
+        browserProfileId = value86?.browserProfileId || DEFAULT_WEB_PREVIEW_BROWSER_PROFILE_ID,
+        partition5 = value86?.partition || toPersistentPartitionId(browserProfileId);
+      if (shouldUseNativeAuthPopup(url8) && typeof BrowserWindow === 'function')
         return (
-          _0x26304f({ nodeId: _0x42a8eb, tabId: _0x1b318f, partition: _0x177c0f }),
-          { action: 'allow', outlivesOpener: true, overrideBrowserWindowOptions: _0xa8aae3(_0x177c0f) }
+          run25({ nodeId: nodeId11, tabId: tabId10, partition: partition5 }),
+          {
+            action: 'allow',
+            outlivesOpener: true,
+            overrideBrowserWindowOptions: overrideBrowserWindowOptions(partition5),
+          }
         );
-      if (typeof _0x355d44 !== 'function') {
-        if (_0x1daafe) _0x1d234c(_0x42a8eb, { type: 'open-popup', url: _0x1daafe }, _0x1b318f);
+      if (typeof WebContentsView !== 'function') {
+        if (url9) run(nodeId11, { type: 'open-popup', url: url9 }, tabId10);
         return { action: 'deny' };
       }
       return {
         action: 'allow',
         outlivesOpener: true,
-        overrideBrowserWindowOptions: { webPreferences: _0x498445(_0x177c0f) },
+        overrideBrowserWindowOptions: { webPreferences: webPreferences(partition5) },
         createWindow: () => {
-          const _0xaf7251 = _0x275599({
-            nodeId: _0x42a8eb,
-            tabId: _0x460f7b,
-            browserProfileId: _0xe47a71,
-            partition: _0x177c0f,
-            url: _0x1daafe || '',
-            openerTabId: _0x1b318f,
+          const value87 = run31({
+            nodeId: nodeId11,
+            tabId: tabId11,
+            browserProfileId: browserProfileId,
+            partition: partition5,
+            url: url9 || '',
+            openerTabId: tabId10,
           });
-          if (_0x1daafe) _0x3d29e9(_0x42a8eb, _0x460f7b, _0xaf7251, _0x1daafe);
-          else _0x3a3360(_0x42a8eb, _0x460f7b, _0xaf7251);
-          return _0xaf7251.view.webContents;
+          if (url9) run21(nodeId11, tabId11, value87, url9);
+          else run22(nodeId11, tabId11, value87);
+          return value87.view.webContents;
         },
       };
     }),
-      _0x40e4f6.on?.('did-create-window', (_0x25d916, _0x1f6973 = {}) => {
-        const _0x334e63 = _0x5065da({ nodeId: _0x42a8eb, tabId: _0x1b318f, url: _0x1f6973?.url });
-        if (!_0x334e63) return;
-        _0x572875({
-          nodeId: _0x42a8eb,
-          tabId: _0x1b318f,
-          partition: _0x334e63.partition,
-          popupWindow: _0x25d916,
+      value84.on?.('did-create-window', (popupWindow2, url10 = {}) => {
+        const partition6 = run26({ nodeId: nodeId11, tabId: tabId10, url: url10?.url });
+        if (!partition6) return;
+        run29({
+          nodeId: nodeId11,
+          tabId: tabId10,
+          partition: partition6.partition,
+          popupWindow: popupWindow2,
         });
       }));
-    const _0x1eb29f = (_0x496851, _0xda85e2) => {
-        const _0x1fd1b4 = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
-        if (_0x1fd1b4?.isPopup && isBlankPopupUrl(_0xda85e2) && !_0x1fd1b4.requestedUrl) return;
-        if (normalizeWebPreviewUrl(_0xda85e2)) return;
-        (_0x496851?.preventDefault?.(), _0x2effdd(_0x42a8eb, _0xda85e2, _0x1b318f));
+    const run32 = (event4, value88) => {
+        const enabled16 = count2.get(toEntryKey(nodeId11, tabId10));
+        if (enabled16?.isPopup && isBlankPopupUrl(value88) && !enabled16.requestedUrl) return;
+        if (normalizeWebPreviewUrl(value88)) return;
+        (event4?.preventDefault?.(), run2(nodeId11, value88, tabId10));
       },
-      _0x2eff02 = (_0xe5fdb5, _0x22d7c7, ..._0x48f7dd) => {
-        const _0x3dbb35 = _0x48f7dd.some((_0x3de78a) => _0x3de78a === true);
-        if (!_0x3dbb35) return;
-        _0x1eb29f(_0xe5fdb5, _0x22d7c7);
+      value89 = (value90, value91, ...list11) => {
+        const enabled17 = list11.some((item3) => item3 === true);
+        if (!enabled17) return;
+        run32(value90, value91);
       };
-    (_0x40e4f6.on?.('will-navigate', _0x1eb29f),
-      _0x40e4f6.on?.('will-frame-navigate', _0x2eff02),
-      _0x40e4f6.on?.('dom-ready', () => _0x1c562e(_0x42a8eb, _0x40e4f6, _0x1b318f, _0x1f23bd)),
-      _0x40e4f6.on?.('did-start-loading', () => {
-        const _0x26765b = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
-        let _0x4f0084 = '',
-          _0xe477a4 = false;
-        if (_0x26765b) {
-          const _0x449ec5 = _0x26765b.url || _0x26765b.requestedUrl || '';
-          _0x4f0084 = _0x449ec5;
-          const _0x2d24a6 =
-            _0x26765b.holdSnapshotOnNextLoadStart === true &&
-            _0x26765b.hasSnapshot === true &&
-            _0x26765b.snapshotUrl &&
-            _0x26765b.snapshotUrl === _0x449ec5;
-          ((_0xe477a4 = Boolean(_0x2d24a6)),
-            _0x3ffd65(_0x26765b),
-            (_0x26765b.snapshotEpoch += 1),
-            (_0x26765b.loaded = false),
-            _0xe477a4
-              ? (_0x26765b.snapshotStaleAfterLoad = true)
-              : ((_0x26765b.hasSnapshot = false),
-                (_0x26765b.snapshotUrl = ''),
-                (_0x26765b.snapshotFreezeToken = ''),
-                (_0x26765b.snapshotStaleAfterLoad = false)),
-            (_0x26765b.readySnapshotPending = false),
-            (_0x26765b.holdSnapshotOnNextLoadStart = false));
+    (value84.on?.('will-navigate', run32),
+      value84.on?.('will-frame-navigate', value89),
+      value84.on?.('dom-ready', () => run10(nodeId11, value84, tabId10, value85)),
+      value84.on?.('did-start-loading', () => {
+        const response11 = count2.get(toEntryKey(nodeId11, tabId10));
+        let url11 = '',
+          holdSnapshot = false;
+        if (response11) {
+          const value92 = response11.url || response11.requestedUrl || '';
+          url11 = value92;
+          const value93 =
+            response11.holdSnapshotOnNextLoadStart === true &&
+            response11.hasSnapshot === true &&
+            response11.snapshotUrl &&
+            response11.snapshotUrl === value92;
+          ((holdSnapshot = Boolean(value93)),
+            run6(response11),
+            (response11.snapshotEpoch += 1),
+            (response11.loaded = false),
+            holdSnapshot
+              ? (response11.snapshotStaleAfterLoad = true)
+              : ((response11.hasSnapshot = false),
+                (response11.snapshotUrl = ''),
+                (response11.snapshotFreezeToken = ''),
+                (response11.snapshotStaleAfterLoad = false)),
+            (response11.readySnapshotPending = false),
+            (response11.holdSnapshotOnNextLoadStart = false));
         }
-        _0x1d234c(_0x42a8eb, { type: 'loading', url: _0x4f0084, holdSnapshot: _0xe477a4 }, _0x1b318f);
+        run(nodeId11, { type: 'loading', url: url11, holdSnapshot: holdSnapshot }, tabId10);
       }),
-      _0x40e4f6.on?.('did-stop-loading', () => {
-        (_0x1c562e(_0x42a8eb, _0x40e4f6, _0x1b318f, _0x1f23bd),
-          _0x1d234c(_0x42a8eb, { type: 'loaded' }, _0x1b318f),
-          _0x2086ef(_0x42a8eb, _0x40e4f6, _0x1b318f));
-        const _0x3dc90a = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
-        _0x3dc90a &&
-          ((_0x3dc90a.loaded = true),
-          _0x3dc90a.snapshotStaleAfterLoad &&
-            ((_0x3dc90a.hasSnapshot = false),
-            (_0x3dc90a.snapshotUrl = ''),
-            (_0x3dc90a.snapshotFreezeToken = ''),
-            (_0x3dc90a.snapshotStaleAfterLoad = false)),
-          _0x48366a(_0x42a8eb, _0x3dc90a));
+      value84.on?.('did-stop-loading', () => {
+        (run10(nodeId11, value84, tabId10, value85),
+          run(nodeId11, { type: 'loaded' }, tabId10),
+          run3(nodeId11, value84, tabId10));
+        const value94 = count2.get(toEntryKey(nodeId11, tabId10));
+        value94 &&
+          ((value94.loaded = true),
+          value94.snapshotStaleAfterLoad &&
+            ((value94.hasSnapshot = false),
+            (value94.snapshotUrl = ''),
+            (value94.snapshotFreezeToken = ''),
+            (value94.snapshotStaleAfterLoad = false)),
+          run9(nodeId11, value94));
       }),
-      _0x40e4f6.on?.('did-fail-load', (_0x55d131, _0x23dcea, _0x508011, _0x26301b) => {
-        _0x1d234c(
-          _0x42a8eb,
+      value84.on?.('did-fail-load', (value95, errorCode2, value96, value97) => {
+        run(
+          nodeId11,
           {
             type: 'failed',
-            url: String(_0x26301b || ''),
-            errorCode: _0x23dcea,
-            message: String(_0x508011 || '网页加载失败'),
+            url: String(value97 || ''),
+            errorCode: errorCode2,
+            message: String(value96 || '网页加载失败'),
           },
-          _0x1b318f,
+          tabId10,
         );
       }),
-      _0x40e4f6.on?.('did-navigate', (_0x1d7286, _0x56116e) => {
-        const _0x3c328e = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
-        if (_0x3c328e?.isPopup && isBlankPopupUrl(_0x56116e) && !_0x3c328e.requestedUrl) return;
-        const _0xbd3f10 = normalizeWebPreviewUrl(_0x56116e) || String(_0x56116e || ''),
-          _0x5ae8d8 = normalizeWebPreviewUrl(_0xbd3f10);
-        if (_0x3c328e && _0x5ae8d8) {
-          if (_0x3d29e9(_0x42a8eb, _0x1b318f, _0x3c328e, _0x5ae8d8)) return;
-          const _0x557d51 = _0x3c328e.pendingPopup === true;
-          _0x3c328e.url = _0x5ae8d8;
-          if (_0x557d51) _0x3c328e.requestedUrl = _0x5ae8d8;
-          ((_0x3c328e.loadIssuedUrl = _0x5ae8d8), (_0x3c328e.pendingPopup = false));
+      value84.on?.('did-navigate', (value98, value99) => {
+        const response12 = count2.get(toEntryKey(nodeId11, tabId10));
+        if (response12?.isPopup && isBlankPopupUrl(value99) && !response12.requestedUrl) return;
+        const url12 = normalizeWebPreviewUrl(value99) || String(value99 || ''),
+          webPreviewUrl3 = normalizeWebPreviewUrl(url12);
+        if (response12 && webPreviewUrl3) {
+          if (run21(nodeId11, tabId10, response12, webPreviewUrl3)) return;
+          const value100 = response12.pendingPopup === true;
+          response12.url = webPreviewUrl3;
+          if (value100) response12.requestedUrl = webPreviewUrl3;
+          ((response12.loadIssuedUrl = webPreviewUrl3), (response12.pendingPopup = false));
         }
-        (_0x1d234c(_0x42a8eb, { type: 'navigated', url: _0xbd3f10 }, _0x1b318f),
-          _0x2086ef(_0x42a8eb, _0x40e4f6, _0x1b318f));
+        (run(nodeId11, { type: 'navigated', url: url12 }, tabId10), run3(nodeId11, value84, tabId10));
       }),
-      _0x40e4f6.on?.('did-navigate-in-page', (_0x4ed6a4, _0x52850f, _0x277b27) => {
-        if (_0x277b27 === false) return;
-        const _0x3d4324 = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
-        if (_0x3d4324?.isPopup && isBlankPopupUrl(_0x52850f) && !_0x3d4324.requestedUrl) return;
-        const _0x59ab99 = normalizeWebPreviewUrl(_0x52850f) || String(_0x52850f || ''),
-          _0xef71e = normalizeWebPreviewUrl(_0x59ab99);
-        if (_0x3d4324 && _0xef71e) {
-          if (_0x3d29e9(_0x42a8eb, _0x1b318f, _0x3d4324, _0xef71e)) return;
-          const _0x33db1d = _0x3d4324.pendingPopup === true;
-          _0x3d4324.url = _0xef71e;
-          if (_0x33db1d) _0x3d4324.requestedUrl = _0xef71e;
-          ((_0x3d4324.loadIssuedUrl = _0xef71e), (_0x3d4324.pendingPopup = false));
+      value84.on?.('did-navigate-in-page', (value101, value102, value103) => {
+        if (value103 === false) return;
+        const response13 = count2.get(toEntryKey(nodeId11, tabId10));
+        if (response13?.isPopup && isBlankPopupUrl(value102) && !response13.requestedUrl) return;
+        const url13 = normalizeWebPreviewUrl(value102) || String(value102 || ''),
+          webPreviewUrl4 = normalizeWebPreviewUrl(url13);
+        if (response13 && webPreviewUrl4) {
+          if (run21(nodeId11, tabId10, response13, webPreviewUrl4)) return;
+          const value104 = response13.pendingPopup === true;
+          response13.url = webPreviewUrl4;
+          if (value104) response13.requestedUrl = webPreviewUrl4;
+          ((response13.loadIssuedUrl = webPreviewUrl4), (response13.pendingPopup = false));
         }
-        (_0x1d234c(_0x42a8eb, { type: 'navigated', url: _0x59ab99 }, _0x1b318f),
-          _0x2086ef(_0x42a8eb, _0x40e4f6, _0x1b318f));
+        (run(nodeId11, { type: 'navigated', url: url13 }, tabId10), run3(nodeId11, value84, tabId10));
       }),
-      _0x40e4f6.on?.('page-favicon-updated', (_0x13fefe, _0x4dece1) => {
-        const _0x10f672 = _0x4e4462(_0x4dece1);
-        if (!_0x10f672) return;
-        _0x1d234c(_0x42a8eb, { type: 'favicon', faviconUrl: _0x10f672 }, _0x1b318f);
+      value84.on?.('page-favicon-updated', (value105, value106) => {
+        const faviconUrl = run5(value106);
+        if (!faviconUrl) return;
+        run(nodeId11, { type: 'favicon', faviconUrl: faviconUrl }, tabId10);
       }),
-      _0x40e4f6.on?.('context-menu', (_0x5528fe, _0x4dd48f) => {
-        const _0x9d85ea = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
-        if (_0xc484e6(_0x9d85ea, _0x4dd48f)) return;
-        void _0x5ad7e3(_0x42a8eb, _0x1b318f, _0x40e4f6, _0x4dd48f).catch((_0x5cf492) => {
-          _0x58bf66?.({
+      value84.on?.('context-menu', (value107, value108) => {
+        const value109 = count2.get(toEntryKey(nodeId11, tabId10));
+        if (run15(value109, value108)) return;
+        void run20(nodeId11, tabId10, value84, value108).catch((error6) => {
+          logDiagnosticEvent?.({
             type: 'web_preview.context_menu_failed',
             level: 'warn',
             source: 'main',
             message: 'Web preview context menu failed',
-            error: _0x5cf492,
-            context: { nodeId: _0x42a8eb, tabId: _0x1b318f },
+            error: error6,
+            context: { nodeId: nodeId11, tabId: tabId10 },
           });
         });
       }),
-      _0x40e4f6.on?.('console-message', (..._0x524db1) => {
-        const _0x3e2ff5 = parseWebPreviewInputBridgeMessage(getConsoleMessageFromArgs(_0x524db1));
-        if (!_0x3e2ff5) return;
-        const _0xeaae87 = _0x1c905a.get(toEntryKey(_0x42a8eb, _0x1b318f));
-        if (!_0xeaae87 || _0x3e2ff5.token !== _0xeaae87.inputBridgeToken) return;
-        if (_0x3e2ff5.type === 'image-context-menu') {
-          const _0xee9309 = _0x1590b6(_0x3e2ff5, _0xeaae87);
-          (_0x14012e(_0xeaae87, _0xee9309),
-            void _0x5ad7e3(_0x42a8eb, _0x1b318f, _0x40e4f6, _0xee9309).catch((_0x22143d) => {
-              _0x58bf66?.({
+      value84.on?.('console-message', (...args5) => {
+        const event5 = parseWebPreviewInputBridgeMessage(getConsoleMessageFromArgs(args5));
+        if (!event5) return;
+        const enabled18 = count2.get(toEntryKey(nodeId11, tabId10));
+        if (!enabled18 || event5.token !== enabled18.inputBridgeToken) return;
+        if (event5.type === 'image-context-menu') {
+          const value110 = run13(event5, enabled18);
+          (run14(enabled18, value110),
+            void run20(nodeId11, tabId10, value84, value110).catch((error7) => {
+              logDiagnosticEvent?.({
                 type: 'web_preview.context_menu_failed',
                 level: 'warn',
                 source: 'main',
                 message: 'Web preview context menu failed',
-                error: _0x22143d,
-                context: { nodeId: _0x42a8eb, tabId: _0x1b318f, source: 'bridge' },
+                error: error7,
+                context: { nodeId: nodeId11, tabId: tabId10, source: 'bridge' },
               });
             }));
           return;
         }
-        const _0x870033 = Number(_0x3e2ff5.button),
-          _0x346b62 = _0x870033 === 1,
-          _0x5beb5b = _0x870033 === 0 && (_0x3e2ff5.spaceHeld === true || _0xeaae87.canvasSpaceHeld === true);
-        if (!_0x346b62 && !_0x5beb5b) return;
-        _0x1d234c(
-          _0x42a8eb,
+        const button = Number(event5.button),
+          enabled19 = button === 1,
+          spaceHeld = button === 0 && (event5.spaceHeld === true || enabled18.canvasSpaceHeld === true);
+        if (!enabled19 && !spaceHeld) return;
+        run(
+          nodeId11,
           {
             type: 'pan-start-preview',
             source: 'web-contents-view',
-            button: _0x870033,
-            spaceHeld: _0x5beb5b,
-            clientX: Math.max(0, Math.round(Number(_0x3e2ff5.clientX || 0) || 0)),
-            clientY: Math.max(0, Math.round(Number(_0x3e2ff5.clientY || 0) || 0)),
+            button: button,
+            spaceHeld: spaceHeld,
+            clientX: Math.max(0, Math.round(Number(event5.clientX || 0) || 0)),
+            clientY: Math.max(0, Math.round(Number(event5.clientY || 0) || 0)),
           },
-          _0x1b318f,
+          tabId10,
         );
       }),
-      _0x40e4f6.on?.('destroyed', () => {
-        const _0x2ead5f = toEntryKey(_0x42a8eb, _0x1b318f),
-          _0x5606a3 = _0x1c905a.get(_0x2ead5f);
-        if (!_0x5606a3 || _0x5606a3.disposing) return;
-        const _0x2a0862 = _0x5dc532();
+      value84.on?.('destroyed', () => {
+        const toEntryKey2 = toEntryKey(nodeId11, tabId10),
+          enabled20 = count2.get(toEntryKey2);
+        if (!enabled20 || enabled20.disposing) return;
+        const value111 = window();
         try {
-          _0x2a0862?.contentView?.removeChildView?.(_0x5606a3.view);
+          value111?.contentView?.removeChildView?.(enabled20.view);
         } catch {}
-        (_0x3ffd65(_0x5606a3), _0x1c905a.delete(_0x2ead5f));
-        if (_0x5606a3.isPopup) _0x1d234c(_0x42a8eb, { type: 'closed' }, _0x1b318f);
+        (run6(enabled20), count2.delete(toEntryKey2));
+        if (enabled20.isPopup) run(nodeId11, { type: 'closed' }, tabId10);
       }));
-    const _0x47b492 = _0x40e4f6.session;
-    (_0x47b492?.setPermissionRequestHandler?.((_0x13bbe0, _0x327868, _0x1a178d) => {
-      _0x1a178d(false);
+    const value112 = value84.session;
+    (value112?.setPermissionRequestHandler?.((value113, value114, handler3) => {
+      handler3(false);
     }),
-      _0x47b492?.on?.('will-download', (_0x437b6a) => {
-        _0x437b6a?.preventDefault?.();
+      value112?.on?.('will-download', (event6) => {
+        event6?.preventDefault?.();
       }));
   }
-  function _0x2ad4a7({
-    nodeId: _0x5f0fde,
-    tabId: _0x35e0ee,
-    browserProfileId: _0x355de2,
-    partition: _0x3bfd4d,
-    view: _0x545ecb,
+  function run33({
+    nodeId: nodeId12,
+    tabId: tabId12,
+    browserProfileId: browserProfileId2,
+    partition: partition7,
+    view: view,
     url: url = '',
     isPopup: isPopup = false,
     openerTabId: openerTabId = '',
     pendingRegistrationUntil: pendingRegistrationUntil = 0,
   }) {
-    _0x545ecb.setVisible?.(false);
-    const _0x168fae = createInputBridgeToken(),
-      _0x52fdc8 = {
-        nodeId: _0x5f0fde,
-        tabId: _0x35e0ee,
-        browserProfileId: _0x355de2,
-        partition: _0x3bfd4d,
-        view: _0x545ecb,
+    view.setVisible?.(false);
+    const inputBridgeToken3 = createInputBridgeToken(),
+      value115 = {
+        nodeId: nodeId12,
+        tabId: tabId12,
+        browserProfileId: browserProfileId2,
+        partition: partition7,
+        view: view,
         url: url,
         requestedUrl: url,
         loadIssuedUrl: '',
@@ -1189,7 +1155,7 @@ export function createWebPreviewViewManager({
         snapshotFreezeToken: '',
         zoomFactor: 1,
         canvasSpaceHeld: false,
-        inputBridgeToken: _0x168fae,
+        inputBridgeToken: inputBridgeToken3,
         isPopup: isPopup,
         openerTabId: openerTabId,
         popupOpened: !isPopup,
@@ -1198,532 +1164,533 @@ export function createWebPreviewViewManager({
         pendingRegistrationUntil: pendingRegistrationUntil,
       };
     return (
-      _0x1c905a.set(toEntryKey(_0x5f0fde, _0x35e0ee), _0x52fdc8),
-      _0x353ff1(_0x5f0fde, _0x35e0ee, _0x545ecb.webContents, _0x168fae),
-      _0x52fdc8
+      count2.set(toEntryKey(nodeId12, tabId12), value115),
+      run30(nodeId12, tabId12, view.webContents, inputBridgeToken3),
+      value115
     );
   }
-  function _0xabe491(_0x2cfd9d, _0x5b5aed, _0x5bd30b) {
-    if (typeof _0x355d44 !== 'function') throw new Error('当前 Electron 环境不支持 WebContentsView');
-    const _0x2f2c94 = toBrowserProfileId(_0x5bd30b),
-      _0x5a6d38 = toPersistentPartitionId(_0x2f2c94),
-      _0x47d5ab = new _0x355d44({ webPreferences: _0x498445(_0x5a6d38) });
-    return _0x2ad4a7({
-      nodeId: _0x2cfd9d,
-      tabId: _0x5b5aed,
-      browserProfileId: _0x2f2c94,
-      partition: _0x5a6d38,
-      view: _0x47d5ab,
+  function run34(nodeId13, tabId13, value116) {
+    if (typeof WebContentsView !== 'function') throw new Error('当前 Electron 环境不支持 WebContentsView');
+    const browserProfileId3 = toBrowserProfileId(value116),
+      partition8 = toPersistentPartitionId(browserProfileId3),
+      view2 = new WebContentsView({ webPreferences: webPreferences(partition8) });
+    return run33({
+      nodeId: nodeId13,
+      tabId: tabId13,
+      browserProfileId: browserProfileId3,
+      partition: partition8,
+      view: view2,
     });
   }
-  function _0x275599({
-    nodeId: _0x20108f,
-    tabId: _0xa257cc,
-    browserProfileId: _0x1ef3e7,
-    partition: _0x136719,
-    url: _0x4c9509,
+  function run31({
+    nodeId: nodeId14,
+    tabId: tabId14,
+    browserProfileId: browserProfileId4,
+    partition: partition9,
+    url: url14,
     openerTabId: openerTabId = '',
   }) {
-    const _0x1da35e = toBrowserProfileId(_0x1ef3e7),
-      _0x259073 = _0x136719 || toPersistentPartitionId(_0x1da35e),
-      _0x181353 = new _0x355d44({ webPreferences: _0x498445(_0x259073) });
-    return _0x2ad4a7({
-      nodeId: _0x20108f,
-      tabId: _0xa257cc,
-      browserProfileId: _0x1da35e,
-      partition: _0x259073,
-      view: _0x181353,
-      url: _0x4c9509,
+    const browserProfileId5 = toBrowserProfileId(browserProfileId4),
+      partition10 = partition9 || toPersistentPartitionId(browserProfileId5),
+      view3 = new WebContentsView({ webPreferences: webPreferences(partition10) });
+    return run33({
+      nodeId: nodeId14,
+      tabId: tabId14,
+      browserProfileId: browserProfileId5,
+      partition: partition10,
+      view: view3,
+      url: url14,
       isPopup: true,
       openerTabId: openerTabId,
       pendingRegistrationUntil: Date.now() + POPUP_REGISTRATION_GRACE_MS,
     });
   }
-  function _0x105729(_0x520b37) {
-    const _0x32fb63 = _0x1c905a.get(_0x520b37);
-    if (!_0x32fb63) return false;
-    const _0x54300c = _0x5dc532();
-    _0x25b490((_0x980e3a) => _0x980e3a.nodeId === _0x32fb63.nodeId && _0x980e3a.tabId === _0x32fb63.tabId);
+  function run35(value117) {
+    const enabled21 = count2.get(value117);
+    if (!enabled21) return false;
+    const value118 = window();
+    run23((value119) => value119.nodeId === enabled21.nodeId && value119.tabId === enabled21.tabId);
     try {
-      _0x54300c?.contentView?.removeChildView?.(_0x32fb63.view);
+      value118?.contentView?.removeChildView?.(enabled21.view);
     } catch {}
-    (_0x3ffd65(_0x32fb63),
-      (_0x32fb63.attached = false),
-      (_0x32fb63.visible = false),
-      (_0x32fb63.disposing = true));
+    (run6(enabled21),
+      (enabled21.attached = false),
+      (enabled21.visible = false),
+      (enabled21.disposing = true));
     try {
-      !_0x32fb63.view?.webContents?.isDestroyed?.() && _0x32fb63.view?.webContents?.destroy?.();
+      !enabled21.view?.webContents?.isDestroyed?.() && enabled21.view?.webContents?.destroy?.();
     } catch {}
-    return (_0x1c905a.delete(_0x520b37), true);
+    return (count2.delete(value117), true);
   }
-  function _0x3a676c(_0x633e0b, _0x4ffd44 = null) {
-    if (_0x4ffd44 !== null && typeof _0x4ffd44 !== 'undefined')
-      return _0x105729(toEntryKey(_0x633e0b, _0x4ffd44));
-    let _0x4eb406 = false;
-    for (const [_0x3971b2, _0x345564] of [..._0x1c905a]) {
-      if (_0x345564.nodeId === _0x633e0b && _0x105729(_0x3971b2)) _0x4eb406 = true;
+  function run36(value120, value121 = null) {
+    if (value121 !== null && typeof value121 !== 'undefined') return run35(toEntryKey(value120, value121));
+    let value122 = false;
+    for (const [value123, value124] of [...count2]) {
+      if (value124.nodeId === value120 && run35(value123)) value122 = true;
     }
-    return _0x4eb406;
+    return value122;
   }
-  function _0x327c1e(_0x31262c) {
-    const _0x4a2cf8 = _0x1c905a.get(_0x31262c);
-    if (!_0x4a2cf8) return;
-    _0x4a2cf8.visible !== false && (_0x4a2cf8.view?.setVisible?.(false), (_0x4a2cf8.visible = false));
+  function run37(value125) {
+    const enabled22 = count2.get(value125);
+    if (!enabled22) return;
+    enabled22.visible !== false && (enabled22.view?.setVisible?.(false), (enabled22.visible = false));
   }
-  async function _0x3b094b(_0x45f938 = {}) {
-    const _0x8ed6e0 = _0x5dc532();
-    if (!_0x8ed6e0?.contentView) return { ok: false, error: '主窗口尚未就绪' };
-    const _0x2c5ad9 = new Set(),
-      _0x322874 = getViewsPayload(_0x45f938);
-    let _0x1e4fe0 = 0,
-      _0x106334 = false;
-    const _0x24f220 = [];
-    for (const _0x55ca0c of _0x322874) {
-      const _0x26df43 = toNodeId(_0x55ca0c?.nodeId);
-      if (!_0x26df43) continue;
-      const _0x25dde8 = toTabId(_0x55ca0c?.tabId),
-        _0xc3d922 = toEntryKey(_0x26df43, _0x25dde8);
-      _0x2c5ad9.add(_0xc3d922);
-      const _0x532acb = normalizeWebPreviewUrl(_0x55ca0c?.webUrl || _0x55ca0c?.url);
-      if (!_0x532acb) {
-        if (_0x55ca0c?.pendingPopup === true) {
-          const _0x16eb67 = _0x1c905a.get(_0xc3d922);
-          if (!_0x16eb67?.isPopup || _0x16eb67.requestedUrl) {
-            _0x1d234c(_0x26df43, { type: 'failed', message: '登录窗口尚未就绪' }, _0x25dde8);
+  async function syncViews(options2 = {}) {
+    const enabled23 = window();
+    if (!enabled23?.contentView) return { ok: false, error: '主窗口尚未就绪' };
+    const map6 = new Set(),
+      viewsPayload = getViewsPayload(options2);
+    let visibleCount = 0,
+      value126 = false;
+    const list12 = [];
+    for (const response14 of viewsPayload) {
+      const nodeId15 = toNodeId(response14?.nodeId);
+      if (!nodeId15) continue;
+      const tabId15 = toTabId(response14?.tabId),
+        toEntryKey3 = toEntryKey(nodeId15, tabId15);
+      map6.add(toEntryKey3);
+      const url15 = normalizeWebPreviewUrl(response14?.webUrl || response14?.url);
+      if (!url15) {
+        if (response14?.pendingPopup === true) {
+          const enabled24 = count2.get(toEntryKey3);
+          if (!enabled24?.isPopup || enabled24.requestedUrl) {
+            run(nodeId15, { type: 'failed', message: '登录窗口尚未就绪' }, tabId15);
             continue;
           }
-          if (_0x55ca0c?.visible === false) {
-            _0x327c1e(_0xc3d922);
+          if (response14?.visible === false) {
+            run37(toEntryKey3);
             continue;
           }
-          const _0x4da650 = normalizeBounds(_0x55ca0c?.bounds);
-          if (!_0x4da650) {
-            _0x327c1e(_0xc3d922);
+          const bounds = normalizeBounds(response14?.bounds);
+          if (!bounds) {
+            run37(toEntryKey3);
             continue;
           }
-          _0x16eb67.pendingRegistrationUntil = 0;
-          const _0x169c5d = Boolean(_0x55ca0c?.selected);
-          _0x16eb67.selected !== _0x169c5d && ((_0x16eb67.selected = _0x169c5d), (_0x106334 = true));
-          _0x16eb67.canvasSpaceHeld = _0x55ca0c?.canvasSpaceHeld === true;
-          !_0x16eb67.attached &&
-            (_0x8ed6e0.contentView.addChildView(_0x16eb67.view),
-            (_0x16eb67.attached = true),
-            (_0x106334 = true));
-          _0x24f220.push(_0xc3d922);
-          !boundsEqual(_0x16eb67.bounds, _0x4da650) &&
-            ((_0x16eb67.bounds = _0x4da650), _0x16eb67.view.setBounds(_0x4da650));
-          const _0x55865f = normalizeZoomFactor(_0x55ca0c?.zoomFactor);
-          _0x16eb67.pendingZoomFactor = _0x55865f;
-          _0x55ca0c?.deferZoomFactor !== true &&
-            !zoomFactorEqual(_0x16eb67.zoomFactor, _0x55865f) &&
-            ((_0x16eb67.zoomFactor = _0x55865f), _0x16eb67.view.webContents.setZoomFactor?.(_0x55865f));
-          _0x16eb67.visible !== true && (_0x16eb67.view.setVisible?.(true), (_0x16eb67.visible = true));
-          _0x1e4fe0 += 1;
+          enabled24.pendingRegistrationUntil = 0;
+          const value127 = Boolean(response14?.selected);
+          enabled24.selected !== value127 && ((enabled24.selected = value127), (value126 = true));
+          enabled24.canvasSpaceHeld = response14?.canvasSpaceHeld === true;
+          !enabled24.attached &&
+            (enabled23.contentView.addChildView(enabled24.view),
+            (enabled24.attached = true),
+            (value126 = true));
+          list12.push(toEntryKey3);
+          !boundsEqual(enabled24.bounds, bounds) &&
+            ((enabled24.bounds = bounds), enabled24.view.setBounds(bounds));
+          const zoomFactor = normalizeZoomFactor(response14?.zoomFactor);
+          enabled24.pendingZoomFactor = zoomFactor;
+          response14?.deferZoomFactor !== true &&
+            !zoomFactorEqual(enabled24.zoomFactor, zoomFactor) &&
+            ((enabled24.zoomFactor = zoomFactor), enabled24.view.webContents.setZoomFactor?.(zoomFactor));
+          enabled24.visible !== true && (enabled24.view.setVisible?.(true), (enabled24.visible = true));
+          visibleCount += 1;
           continue;
         }
-        (_0x105729(_0xc3d922), _0x1d234c(_0x26df43, { type: 'failed', message: '网页地址无效' }, _0x25dde8));
+        (run35(toEntryKey3), run(nodeId15, { type: 'failed', message: '网页地址无效' }, tabId15));
         continue;
       }
-      if (_0x55ca0c?.visible === false) {
-        const _0x2b9b5a = _0x1c905a.get(_0xc3d922);
-        if (_0x2b9b5a) _0x2b9b5a.pendingRegistrationUntil = 0;
-        _0x327c1e(_0xc3d922);
+      if (response14?.visible === false) {
+        const value128 = count2.get(toEntryKey3);
+        if (value128) value128.pendingRegistrationUntil = 0;
+        run37(toEntryKey3);
         continue;
       }
-      const _0x1af614 = normalizeBounds(_0x55ca0c?.bounds);
-      if (!_0x1af614) {
-        _0x327c1e(_0xc3d922);
+      const bounds2 = normalizeBounds(response14?.bounds);
+      if (!bounds2) {
+        run37(toEntryKey3);
         continue;
       }
-      const _0x15b977 = toBrowserProfileId(_0x55ca0c?.browserProfileId),
-        _0x480de7 = toPersistentPartitionId(_0x15b977);
-      let _0x3ffe16 = _0x1c905a.get(_0xc3d922);
-      _0x3ffe16 &&
-        _0x3ffe16.partition !== _0x480de7 &&
-        (_0x105729(_0xc3d922), (_0x3ffe16 = null), (_0x106334 = true));
-      !_0x3ffe16 && ((_0x3ffe16 = _0xabe491(_0x26df43, _0x25dde8, _0x15b977)), (_0x106334 = true));
-      _0x3ffe16.pendingRegistrationUntil = 0;
-      const _0x2dff6a = Boolean(_0x55ca0c?.selected);
-      _0x3ffe16.selected !== _0x2dff6a && ((_0x3ffe16.selected = _0x2dff6a), (_0x106334 = true));
-      _0x3ffe16.canvasSpaceHeld = _0x55ca0c?.canvasSpaceHeld === true;
-      !_0x3ffe16.attached &&
-        (_0x8ed6e0.contentView.addChildView(_0x3ffe16.view), (_0x3ffe16.attached = true), (_0x106334 = true));
-      _0x24f220.push(_0xc3d922);
-      const _0x3d52d9 = String(_0x55ca0c?.freezeToken || '0'),
-        _0x113f0b = _0x55ca0c?.frozen === true && _0x3ffe16.requestedUrl === _0x532acb;
-      if (_0x113f0b) {
-        _0x3ffd65(_0x3ffe16);
-        _0x3ffe16.freezeToken !== _0x3d52d9 &&
-          ((_0x3ffe16.freezeToken = _0x3d52d9), (_0x3ffe16.freezeHiddenWithSnapshot = false));
-        const _0x53fdf9 = _0x3ffe16.hasSnapshot === true && _0x3ffe16.snapshotUrl === _0x532acb,
-          _0x1c57c1 =
-            _0x53fdf9 && (_0x55ca0c?.snapshotReady === true || _0x3ffe16.freezeHiddenWithSnapshot === true);
-        if (_0x1c57c1)
-          ((_0x3ffe16.snapshotPending = false),
-            (_0x3ffe16.freezeHiddenWithSnapshot = true),
-            _0x327c1e(_0xc3d922));
+      const toBrowserProfileId2 = toBrowserProfileId(response14?.browserProfileId),
+        toPersistentPartitionId2 = toPersistentPartitionId(toBrowserProfileId2);
+      let response15 = count2.get(toEntryKey3);
+      response15 &&
+        response15.partition !== toPersistentPartitionId2 &&
+        (run35(toEntryKey3), (response15 = null), (value126 = true));
+      !response15 && ((response15 = run34(nodeId15, tabId15, toBrowserProfileId2)), (value126 = true));
+      response15.pendingRegistrationUntil = 0;
+      const value129 = Boolean(response14?.selected);
+      response15.selected !== value129 && ((response15.selected = value129), (value126 = true));
+      response15.canvasSpaceHeld = response14?.canvasSpaceHeld === true;
+      !response15.attached &&
+        (enabled23.contentView.addChildView(response15.view),
+        (response15.attached = true),
+        (value126 = true));
+      list12.push(toEntryKey3);
+      const value130 = String(response14?.freezeToken || '0'),
+        value131 = response14?.frozen === true && response15.requestedUrl === url15;
+      if (value131) {
+        run6(response15);
+        response15.freezeToken !== value130 &&
+          ((response15.freezeToken = value130), (response15.freezeHiddenWithSnapshot = false));
+        const value132 = response15.hasSnapshot === true && response15.snapshotUrl === url15,
+          value133 =
+            value132 && (response14?.snapshotReady === true || response15.freezeHiddenWithSnapshot === true);
+        if (value133)
+          ((response15.snapshotPending = false),
+            (response15.freezeHiddenWithSnapshot = true),
+            run37(toEntryKey3));
         else {
-          _0x3ffe16.freezeHiddenWithSnapshot = false;
-          !boundsEqual(_0x3ffe16.bounds, _0x1af614) &&
-            ((_0x3ffe16.bounds = _0x1af614), _0x3ffe16.view.setBounds(_0x1af614));
-          _0x3ffe16.visible !== true && (_0x3ffe16.view.setVisible?.(true), (_0x3ffe16.visible = true));
-          const _0x3c8472 =
-            _0x3ffe16.hasSnapshot === true &&
-            _0x3ffe16.snapshotUrl === _0x532acb &&
-            _0x3ffe16.snapshotFreezeToken === _0x3d52d9;
-          if (_0x55ca0c?.snapshotHold !== true && _0x3ffe16.snapshotPending !== true && !_0x3c8472) {
-            const _0x7c9735 = _0x43c9ed(
-              _0x26df43,
-              _0x3ffe16,
-              _0x3d52d9,
+          response15.freezeHiddenWithSnapshot = false;
+          !boundsEqual(response15.bounds, bounds2) &&
+            ((response15.bounds = bounds2), response15.view.setBounds(bounds2));
+          response15.visible !== true && (response15.view.setVisible?.(true), (response15.visible = true));
+          const enabled25 =
+            response15.hasSnapshot === true &&
+            response15.snapshotUrl === url15 &&
+            response15.snapshotFreezeToken === value130;
+          if (response14?.snapshotHold !== true && response15.snapshotPending !== true && !enabled25) {
+            const value134 = run7(
+              nodeId15,
+              response15,
+              value130,
               () => {
-                const _0x9eb472 = _0x1c905a.get(_0xc3d922);
-                if (_0x9eb472 === _0x3ffe16) _0x9eb472.snapshotPending = false;
+                const value135 = count2.get(toEntryKey3);
+                if (value135 === response15) value135.snapshotPending = false;
               },
-              _0x532acb,
+              url15,
             );
-            _0x3ffe16.snapshotPending = _0x7c9735;
+            response15.snapshotPending = value134;
           }
         }
-        _0x1e4fe0 += 1;
+        visibleCount += 1;
         continue;
       }
-      ((_0x3ffe16.freezeToken = ''),
-        (_0x3ffe16.snapshotPending = false),
-        (_0x3ffe16.freezeHiddenWithSnapshot = false));
-      !boundsEqual(_0x3ffe16.bounds, _0x1af614) &&
-        ((_0x3ffe16.bounds = _0x1af614), _0x3ffe16.view.setBounds(_0x1af614));
-      const _0x2179d7 = normalizeZoomFactor(_0x55ca0c?.zoomFactor);
-      _0x3ffe16.pendingZoomFactor = _0x2179d7;
-      _0x55ca0c?.deferZoomFactor !== true &&
-        !zoomFactorEqual(_0x3ffe16.zoomFactor, _0x2179d7) &&
-        ((_0x3ffe16.zoomFactor = _0x2179d7), _0x3ffe16.view.webContents.setZoomFactor?.(_0x2179d7));
-      _0x3ffe16.visible !== true && (_0x3ffe16.view.setVisible?.(true), (_0x3ffe16.visible = true));
-      (_0x48366a(_0x26df43, _0x3ffe16), (_0x1e4fe0 += 1));
-      const _0x48cbbb = _0x3ffe16.url === _0x532acb || _0x3ffe16.loadIssuedUrl === _0x532acb,
-        _0x2e12b1 =
-          (_0x3ffe16.requestedUrl !== _0x532acb && !_0x48cbbb) ||
-          (_0x3ffe16.isPopup &&
-            _0x3ffe16.requestedUrl === _0x532acb &&
-            _0x3ffe16.loadIssuedUrl !== _0x532acb &&
-            _0x3ffe16.loaded !== true);
-      !_0x2e12b1 && _0x3ffe16.requestedUrl !== _0x532acb && _0x48cbbb && (_0x3ffe16.requestedUrl = _0x532acb);
-      if (_0x2e12b1) {
-        (_0x3ffd65(_0x3ffe16),
-          (_0x3ffe16.requestedUrl = _0x532acb),
-          (_0x3ffe16.url = _0x532acb),
-          (_0x3ffe16.loadIssuedUrl = _0x532acb),
-          (_0x3ffe16.snapshotEpoch += 1),
-          (_0x3ffe16.loaded = false),
-          (_0x3ffe16.hasSnapshot = false),
-          (_0x3ffe16.snapshotUrl = ''),
-          (_0x3ffe16.snapshotFreezeToken = ''),
-          (_0x3ffe16.readySnapshotPending = false),
-          (_0x3ffe16.holdSnapshotOnNextLoadStart = false),
-          (_0x3ffe16.snapshotStaleAfterLoad = false));
+      ((response15.freezeToken = ''),
+        (response15.snapshotPending = false),
+        (response15.freezeHiddenWithSnapshot = false));
+      !boundsEqual(response15.bounds, bounds2) &&
+        ((response15.bounds = bounds2), response15.view.setBounds(bounds2));
+      const zoomFactor2 = normalizeZoomFactor(response14?.zoomFactor);
+      response15.pendingZoomFactor = zoomFactor2;
+      response14?.deferZoomFactor !== true &&
+        !zoomFactorEqual(response15.zoomFactor, zoomFactor2) &&
+        ((response15.zoomFactor = zoomFactor2), response15.view.webContents.setZoomFactor?.(zoomFactor2));
+      response15.visible !== true && (response15.view.setVisible?.(true), (response15.visible = true));
+      (run9(nodeId15, response15), (visibleCount += 1));
+      const enabled26 = response15.url === url15 || response15.loadIssuedUrl === url15,
+        enabled27 =
+          (response15.requestedUrl !== url15 && !enabled26) ||
+          (response15.isPopup &&
+            response15.requestedUrl === url15 &&
+            response15.loadIssuedUrl !== url15 &&
+            response15.loaded !== true);
+      !enabled27 && response15.requestedUrl !== url15 && enabled26 && (response15.requestedUrl = url15);
+      if (enabled27) {
+        (run6(response15),
+          (response15.requestedUrl = url15),
+          (response15.url = url15),
+          (response15.loadIssuedUrl = url15),
+          (response15.snapshotEpoch += 1),
+          (response15.loaded = false),
+          (response15.hasSnapshot = false),
+          (response15.snapshotUrl = ''),
+          (response15.snapshotFreezeToken = ''),
+          (response15.readySnapshotPending = false),
+          (response15.holdSnapshotOnNextLoadStart = false),
+          (response15.snapshotStaleAfterLoad = false));
         try {
-          const _0x9c6748 = _0x3ffe16.view.webContents.loadURL(_0x532acb);
-          _0x9c6748 &&
-            typeof _0x9c6748.catch === 'function' &&
-            void _0x9c6748.catch((_0x51a388) => {
-              (_0x58bf66?.({
+          const promise = response15.view.webContents.loadURL(url15);
+          promise &&
+            typeof promise.catch === 'function' &&
+            void promise.catch((error8) => {
+              (logDiagnosticEvent?.({
                 type: 'web_preview.load_failed',
                 level: 'warn',
                 source: 'main',
                 message: 'Web preview loadURL failed',
-                error: _0x51a388,
-                context: { nodeId: _0x26df43, tabId: _0x25dde8 },
+                error: error8,
+                context: { nodeId: nodeId15, tabId: tabId15 },
               }),
-                _0x1d234c(
-                  _0x26df43,
-                  { type: 'failed', url: _0x532acb, message: String(_0x51a388?.message || '网页加载失败') },
-                  _0x25dde8,
+                run(
+                  nodeId15,
+                  { type: 'failed', url: url15, message: String(error8?.message || '网页加载失败') },
+                  tabId15,
                 ));
             });
-        } catch (_0x5a0fa3) {
-          (_0x58bf66?.({
+        } catch (error9) {
+          (logDiagnosticEvent?.({
             type: 'web_preview.load_failed',
             level: 'warn',
             source: 'main',
             message: 'Web preview loadURL failed',
-            error: _0x5a0fa3,
-            context: { nodeId: _0x26df43, tabId: _0x25dde8 },
+            error: error9,
+            context: { nodeId: nodeId15, tabId: tabId15 },
           }),
-            _0x1d234c(
-              _0x26df43,
-              { type: 'failed', url: _0x532acb, message: String(_0x5a0fa3?.message || '网页加载失败') },
-              _0x25dde8,
+            run(
+              nodeId15,
+              { type: 'failed', url: url15, message: String(error9?.message || '网页加载失败') },
+              tabId15,
             ));
         }
       }
     }
-    if (_0x106334)
-      for (const _0x3fcb0e of _0x24f220) {
-        const _0x78abb9 = _0x1c905a.get(_0x3fcb0e);
-        _0x78abb9?.view && _0x78abb9.attached && _0x8ed6e0.contentView.addChildView(_0x78abb9.view);
+    if (value126)
+      for (const value136 of list12) {
+        const value137 = count2.get(value136);
+        value137?.view && value137.attached && enabled23.contentView.addChildView(value137.view);
       }
-    const _0x513cbd = Date.now();
-    for (const _0x5b7186 of [..._0x1c905a.keys()]) {
-      if (_0x2c5ad9.has(_0x5b7186)) continue;
-      const _0x1c6ecd = _0x1c905a.get(_0x5b7186);
-      if (_0x1c6ecd?.pendingRegistrationUntil > _0x513cbd) continue;
-      _0x105729(_0x5b7186);
+    const value138 = Date.now();
+    for (const value139 of [...count2.keys()]) {
+      if (map6.has(value139)) continue;
+      const value140 = count2.get(value139);
+      if (value140?.pendingRegistrationUntil > value138) continue;
+      run35(value139);
     }
-    return { ok: true, count: _0x1c905a.size, visibleCount: _0x1e4fe0 };
+    return { ok: true, count: count2.size, visibleCount: visibleCount };
   }
-  function _0x553cd7(_0x1bcc5d = {}) {
-    const _0x1907c5 = Array.isArray(_0x1bcc5d?.nodeIds)
-        ? _0x1bcc5d.nodeIds.map(toNodeId).filter(Boolean)
-        : [],
-      _0x504920 = Array.isArray(_0x1bcc5d?.tabIds) ? _0x1bcc5d.tabIds.map(toTabId).filter(Boolean) : [];
-    let _0x400be3 = 0;
-    if (_0x1907c5.length > 0 && _0x504920.length > 0) {
-      for (const _0x34ca7f of _0x1907c5) {
-        for (const _0x489a0 of _0x504920) {
-          if (_0x3a676c(_0x34ca7f, _0x489a0)) _0x400be3 += 1;
+  function disposeViews(options3 = {}) {
+    const list13 = Array.isArray(options3?.nodeIds) ? options3.nodeIds.map(toNodeId).filter(Boolean) : [],
+      list14 = Array.isArray(options3?.tabIds) ? options3.tabIds.map(toTabId).filter(Boolean) : [];
+    let disposed = 0;
+    if (list13.length > 0 && list14.length > 0) {
+      for (const value141 of list13) {
+        for (const value142 of list14) {
+          if (run36(value141, value142)) disposed += 1;
         }
       }
-      _0x25b490((_0xb819d7) => _0x1907c5.includes(_0xb819d7.nodeId) && _0x504920.includes(_0xb819d7.tabId));
+      run23((value143) => list13.includes(value143.nodeId) && list14.includes(value143.tabId));
     } else {
-      if (_0x1907c5.length > 0) {
-        for (const _0x1fb228 of _0x1907c5) {
-          for (const [_0xa602ef, _0xd922d8] of [..._0x1c905a]) {
-            if (_0xd922d8.nodeId === _0x1fb228 && _0x105729(_0xa602ef)) _0x400be3 += 1;
+      if (list13.length > 0) {
+        for (const value144 of list13) {
+          for (const [value145, value146] of [...count2]) {
+            if (value146.nodeId === value144 && run35(value145)) disposed += 1;
           }
         }
-        _0x25b490((_0x4047e2) => _0x1907c5.includes(_0x4047e2.nodeId));
+        run23((value147) => list13.includes(value147.nodeId));
       } else {
-        for (const _0x19f320 of [..._0x1c905a.keys()]) {
-          if (_0x105729(_0x19f320)) _0x400be3 += 1;
+        for (const value148 of [...count2.keys()]) {
+          if (run35(value148)) disposed += 1;
         }
-        _0x25b490();
+        run23();
       }
     }
-    return { ok: true, disposed: _0x400be3 };
+    return { ok: true, disposed: disposed };
   }
-  function _0x241b14(_0xec8643, _0x1378c7, _0x215305) {
+  function run38(value149, nodeId16, tabId16) {
     return Promise.resolve(
-      _0xec8643.executeJavaScript(
-        buildWebPreviewImageExtractionScript({ nodeId: _0x1378c7, tabId: _0x215305 }),
+      value149.executeJavaScript(
+        buildWebPreviewImageExtractionScript({ nodeId: nodeId16, tabId: tabId16 }),
         true,
       ),
     )
-      .then((_0x567774) => ({
+      .then((value150) => ({
         ok: true,
-        images: filterExtractedImageCandidates(_0x567774?.images),
-        pageUrl: String(_0x567774?.pageUrl || ''),
-        pageTitle: String(_0x567774?.pageTitle || ''),
+        images: filterExtractedImageCandidates(value150?.images),
+        pageUrl: String(value150?.pageUrl || ''),
+        pageTitle: String(value150?.pageTitle || ''),
       }))
-      .catch((_0x3d63c6) => {
+      .catch((error10) => {
         return (
-          _0x58bf66?.({
+          logDiagnosticEvent?.({
             type: 'web_preview.extract_images_failed',
             level: 'warn',
             source: 'main',
             message: 'Web preview image extraction failed',
-            error: _0x3d63c6,
-            context: { nodeId: _0x1378c7, tabId: _0x215305 },
+            error: error10,
+            context: { nodeId: nodeId16, tabId: tabId16 },
           }),
           { ok: false, error: 'extract-failed', images: [] }
         );
       });
   }
-  function _0x479d6b(_0x4c1e0f, _0x54ee39, _0x5065a9) {
+  function run39(value151, nodeId17, tabId17) {
     return Promise.resolve(
-      _0x4c1e0f.executeJavaScript(
-        buildWebPreviewVideoExtractionScript({ nodeId: _0x54ee39, tabId: _0x5065a9 }),
+      value151.executeJavaScript(
+        buildWebPreviewVideoExtractionScript({ nodeId: nodeId17, tabId: tabId17 }),
         true,
       ),
     )
-      .then((_0x402fdf) => ({
+      .then((value152) => ({
         ok: true,
-        videos: filterExtractedVideoCandidates(_0x402fdf?.videos),
-        douyinDetailApiUrls: Array.isArray(_0x402fdf?.douyinDetailApiUrls)
-          ? _0x402fdf.douyinDetailApiUrls
-          : [],
-        pageUrl: String(_0x402fdf?.pageUrl || ''),
-        pageTitle: String(_0x402fdf?.pageTitle || ''),
+        videos: filterExtractedVideoCandidates(value152?.videos),
+        douyinDetailApiUrls: Array.isArray(value152?.douyinDetailApiUrls) ? value152.douyinDetailApiUrls : [],
+        pageUrl: String(value152?.pageUrl || ''),
+        pageTitle: String(value152?.pageTitle || ''),
       }))
-      .catch((_0x27318d) => {
+      .catch((error11) => {
         return (
-          _0x58bf66?.({
+          logDiagnosticEvent?.({
             type: 'web_preview.extract_videos_failed',
             level: 'warn',
             source: 'main',
             message: 'Web preview video extraction failed',
-            error: _0x27318d,
-            context: { nodeId: _0x54ee39, tabId: _0x5065a9 },
+            error: error11,
+            context: { nodeId: nodeId17, tabId: tabId17 },
           }),
           { ok: false, error: 'extract-failed', videos: [], douyinDetailApiUrls: [] }
         );
       });
   }
-  function _0x21c775(_0x4df4da = {}) {
-    const _0x1e307c = toNodeId(_0x4df4da?.nodeId),
-      _0x4ad2b0 = toTabId(_0x4df4da?.tabId),
-      _0x1ecec4 = String(_0x4df4da?.action || '').trim();
-    if (!_0x1e307c) return { ok: false, error: 'missing-node' };
-    const _0x267105 = _0x1c905a.get(toEntryKey(_0x1e307c, _0x4ad2b0));
-    if (!_0x267105?.view?.webContents || _0x267105.view.webContents.isDestroyed?.())
+  function controlView(options4 = {}) {
+    const nodeId18 = toNodeId(options4?.nodeId),
+      tabId18 = toTabId(options4?.tabId),
+      action = String(options4?.action || '').trim();
+    if (!nodeId18) return { ok: false, error: 'missing-node' };
+    const response16 = count2.get(toEntryKey(nodeId18, tabId18));
+    if (!response16?.view?.webContents || response16.view.webContents.isDestroyed?.())
       return { ok: false, error: 'missing-view' };
-    const _0x2ed066 = _0x267105.view.webContents;
-    if (_0x1ecec4 === 'back') {
-      if (!_0x2ed066.canGoBack?.())
+    const webContents3 = response16.view.webContents;
+    if (action === 'back') {
+      if (!webContents3.canGoBack?.())
         return (
-          _0x1d234c(_0x1e307c, { type: 'blocked', message: '没有上一页' }, _0x4ad2b0),
-          { ok: false, error: 'no-history', ...getNavigationState(_0x2ed066) }
+          run(nodeId18, { type: 'blocked', message: '没有上一页' }, tabId18),
+          { ok: false, error: 'no-history', ...getNavigationState(webContents3) }
         );
-      _0x2ed066.goBack?.();
+      webContents3.goBack?.();
     } else {
-      if (_0x1ecec4 === 'forward') {
-        if (!_0x2ed066.canGoForward?.())
+      if (action === 'forward') {
+        if (!webContents3.canGoForward?.())
           return (
-            _0x1d234c(_0x1e307c, { type: 'blocked', message: '没有下一页' }, _0x4ad2b0),
-            { ok: false, error: 'no-history', ...getNavigationState(_0x2ed066) }
+            run(nodeId18, { type: 'blocked', message: '没有下一页' }, tabId18),
+            { ok: false, error: 'no-history', ...getNavigationState(webContents3) }
           );
-        _0x2ed066.goForward?.();
+        webContents3.goForward?.();
       } else {
-        if (_0x1ecec4 === 'reload') {
-          const _0x12e63f = _0x267105.url || _0x267105.requestedUrl || '';
-          ((_0x267105.holdSnapshotOnNextLoadStart = Boolean(
-            _0x267105.hasSnapshot === true &&
-            _0x267105.snapshotUrl &&
-            _0x12e63f &&
-            _0x267105.snapshotUrl === _0x12e63f,
+        if (action === 'reload') {
+          const value153 = response16.url || response16.requestedUrl || '';
+          ((response16.holdSnapshotOnNextLoadStart = Boolean(
+            response16.hasSnapshot === true &&
+            response16.snapshotUrl &&
+            value153 &&
+            response16.snapshotUrl === value153,
           )),
-            (_0x267105.snapshotStaleAfterLoad = false));
-          if (typeof _0x2ed066.reloadIgnoringCache === 'function') _0x2ed066.reloadIgnoringCache();
+            (response16.snapshotStaleAfterLoad = false));
+          if (typeof webContents3.reloadIgnoringCache === 'function') webContents3.reloadIgnoringCache();
           else {
-            if (typeof _0x2ed066.reload === 'function') _0x2ed066.reload();
+            if (typeof webContents3.reload === 'function') webContents3.reload();
             else
-              (_0x267105.url || _0x267105.requestedUrl) &&
-                void _0x2ed066.loadURL?.(_0x267105.url || _0x267105.requestedUrl);
+              (response16.url || response16.requestedUrl) &&
+                void webContents3.loadURL?.(response16.url || response16.requestedUrl);
           }
         } else {
-          if (_0x1ecec4 === 'extract-media') {
-            if (typeof _0x2ed066.executeJavaScript !== 'function')
+          if (action === 'extract-media') {
+            if (typeof webContents3.executeJavaScript !== 'function')
               return { ok: false, error: 'unsupported-action' };
             return Promise.all([
-              _0x241b14(_0x2ed066, _0x1e307c, _0x4ad2b0),
-              _0x479d6b(_0x2ed066, _0x1e307c, _0x4ad2b0),
-            ]).then(async ([_0x35da39, _0x164471]) => {
-              if (_0x35da39?.ok === false && _0x164471?.ok === false)
+              run38(webContents3, nodeId18, tabId18),
+              run39(webContents3, nodeId18, tabId18),
+            ]).then(async ([imageResult, videoResult]) => {
+              if (imageResult?.ok === false && videoResult?.ok === false)
                 return { ok: false, error: 'extract-failed' };
-              const _0x533cd8 = String(
-                  _0x164471?.pageUrl || _0x35da39?.pageUrl || _0x267105.url || _0x267105.requestedUrl || '',
+              const pageUrl3 = String(
+                  videoResult?.pageUrl ||
+                    imageResult?.pageUrl ||
+                    response16.url ||
+                    response16.requestedUrl ||
+                    '',
                 ),
-                _0x38f44c = String(_0x164471?.pageTitle || _0x35da39?.pageTitle || '');
-              let _0x12e192 = { images: [], videos: [], detailApiUrls: [], fetchedCount: 0 };
+                pageTitle2 = String(videoResult?.pageTitle || imageResult?.pageTitle || '');
+              let value154 = { images: [], videos: [], detailApiUrls: [], fetchedCount: 0 };
               if (typeof resolveDouyinMedia === 'function')
                 try {
-                  _0x12e192 =
+                  value154 =
                     (await resolveDouyinMedia({
-                      pageUrl: _0x533cd8,
-                      pageTitle: _0x38f44c,
-                      nodeId: _0x1e307c,
-                      tabId: _0x4ad2b0,
-                      imageResult: _0x35da39,
-                      videoResult: _0x164471,
-                      webContents: _0x2ed066,
-                      logDiagnosticEvent: _0x58bf66,
-                    })) || _0x12e192;
-                } catch (_0x21e31c) {
-                  _0x58bf66?.({
+                      pageUrl: pageUrl3,
+                      pageTitle: pageTitle2,
+                      nodeId: nodeId18,
+                      tabId: tabId18,
+                      imageResult: imageResult,
+                      videoResult: videoResult,
+                      webContents: webContents3,
+                      logDiagnosticEvent: logDiagnosticEvent,
+                    })) || value154;
+                } catch (error12) {
+                  logDiagnosticEvent?.({
                     type: 'web_preview.douyin_media_resolve_failed',
                     level: 'warn',
                     source: 'main',
                     message: 'Douyin media resolver failed',
-                    error: _0x21e31c,
-                    context: { nodeId: _0x1e307c, tabId: _0x4ad2b0, pageUrl: _0x533cd8 },
+                    error: error12,
+                    context: { nodeId: nodeId18, tabId: tabId18, pageUrl: pageUrl3 },
                   });
                 }
               return {
                 ok: true,
-                action: _0x1ecec4,
-                ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
-                images: mergeExtractedImageCandidates(_0x12e192?.images, _0x35da39?.images),
-                videos: mergeExtractedVideoCandidates(_0x12e192?.videos, _0x164471?.videos),
-                pageUrl: _0x533cd8,
-                pageTitle: _0x38f44c,
+                action: action,
+                ...(options4?.tabId ? { tabId: tabId18 } : {}),
+                images: mergeExtractedImageCandidates(value154?.images, imageResult?.images),
+                videos: mergeExtractedVideoCandidates(value154?.videos, videoResult?.videos),
+                pageUrl: pageUrl3,
+                pageTitle: pageTitle2,
                 douyin: {
-                  detailApiUrls: Array.isArray(_0x12e192?.detailApiUrls) ? _0x12e192.detailApiUrls : [],
-                  fetchedCount: Number(_0x12e192?.fetchedCount || 0) || 0,
+                  detailApiUrls: Array.isArray(value154?.detailApiUrls) ? value154.detailApiUrls : [],
+                  fetchedCount: Number(value154?.fetchedCount || 0) || 0,
                 },
-                ...getNavigationState(_0x2ed066),
+                ...getNavigationState(webContents3),
               };
             });
           } else {
-            if (_0x1ecec4 === 'extract-images') {
-              if (typeof _0x2ed066.executeJavaScript !== 'function')
+            if (action === 'extract-images') {
+              if (typeof webContents3.executeJavaScript !== 'function')
                 return { ok: false, error: 'unsupported-action' };
-              return _0x241b14(_0x2ed066, _0x1e307c, _0x4ad2b0).then((_0xfb719d) =>
-                _0xfb719d.ok === false
-                  ? { ok: false, error: _0xfb719d.error || 'extract-failed' }
+              return run38(webContents3, nodeId18, tabId18).then((error13) =>
+                error13.ok === false
+                  ? { ok: false, error: error13.error || 'extract-failed' }
                   : {
                       ok: true,
-                      action: _0x1ecec4,
-                      ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
-                      images: _0xfb719d.images,
-                      pageUrl: String(_0xfb719d.pageUrl || _0x267105.url || _0x267105.requestedUrl || ''),
-                      pageTitle: String(_0xfb719d?.pageTitle || ''),
-                      ...getNavigationState(_0x2ed066),
+                      action: action,
+                      ...(options4?.tabId ? { tabId: tabId18 } : {}),
+                      images: error13.images,
+                      pageUrl: String(error13.pageUrl || response16.url || response16.requestedUrl || ''),
+                      pageTitle: String(error13?.pageTitle || ''),
+                      ...getNavigationState(webContents3),
                     },
               );
             } else {
-              if (_0x1ecec4 === 'extract-videos') {
-                if (typeof _0x2ed066.executeJavaScript !== 'function')
+              if (action === 'extract-videos') {
+                if (typeof webContents3.executeJavaScript !== 'function')
                   return { ok: false, error: 'unsupported-action' };
-                return _0x479d6b(_0x2ed066, _0x1e307c, _0x4ad2b0).then((_0x1f4d94) =>
-                  _0x1f4d94.ok === false
-                    ? { ok: false, error: _0x1f4d94.error || 'extract-failed' }
+                return run39(webContents3, nodeId18, tabId18).then((error14) =>
+                  error14.ok === false
+                    ? { ok: false, error: error14.error || 'extract-failed' }
                     : {
                         ok: true,
-                        action: _0x1ecec4,
-                        ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
-                        videos: _0x1f4d94.videos,
-                        pageUrl: String(_0x1f4d94.pageUrl || _0x267105.url || _0x267105.requestedUrl || ''),
-                        pageTitle: String(_0x1f4d94?.pageTitle || ''),
-                        ...getNavigationState(_0x2ed066),
+                        action: action,
+                        ...(options4?.tabId ? { tabId: tabId18 } : {}),
+                        videos: error14.videos,
+                        pageUrl: String(error14.pageUrl || response16.url || response16.requestedUrl || ''),
+                        pageTitle: String(error14?.pageTitle || ''),
+                        ...getNavigationState(webContents3),
                       },
                 );
               } else {
-                if (_0x1ecec4 === 'capture-reference') {
+                if (action === 'capture-reference') {
                   if (
-                    typeof _0x2ed066.executeJavaScript !== 'function' ||
-                    typeof _0x2ed066.capturePage !== 'function'
+                    typeof webContents3.executeJavaScript !== 'function' ||
+                    typeof webContents3.capturePage !== 'function'
                   )
                     return { ok: false, error: 'unsupported-action' };
                   return Promise.all([
                     Promise.resolve(
-                      _0x2ed066.executeJavaScript(buildWebPreviewReferenceSnapshotScript(), true),
+                      webContents3.executeJavaScript(buildWebPreviewReferenceSnapshotScript(), true),
                     ),
-                    Promise.resolve(_0x2ed066.capturePage()).then(
-                      (_0x3be182) => _0x3be182?.toDataURL?.() || '',
+                    Promise.resolve(webContents3.capturePage()).then(
+                      (value155) => value155?.toDataURL?.() || '',
                     ),
                   ])
-                    .then(([_0x19c577, _0x4e03f7]) => ({
+                    .then(([value156, value157]) => ({
                       ok: true,
-                      action: _0x1ecec4,
-                      ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
-                      pageUrl: String(_0x19c577?.pageUrl || _0x267105.url || _0x267105.requestedUrl || ''),
-                      pageTitle: String(_0x19c577?.pageTitle || _0x2ed066.getTitle?.() || ''),
-                      selectedText: String(_0x19c577?.selectedText || '').slice(
+                      action: action,
+                      ...(options4?.tabId ? { tabId: tabId18 } : {}),
+                      pageUrl: String(value156?.pageUrl || response16.url || response16.requestedUrl || ''),
+                      pageTitle: String(value156?.pageTitle || webContents3.getTitle?.() || ''),
+                      selectedText: String(value156?.selectedText || '').slice(
                         0,
                         WEB_PREVIEW_SELECTED_TEXT_LIMIT,
                       ),
-                      screenshotDataUrl: String(_0x4e03f7 || ''),
+                      screenshotDataUrl: String(value157 || ''),
                       capturedAt: new Date().toISOString(),
-                      ...getNavigationState(_0x2ed066),
+                      ...getNavigationState(webContents3),
                     }))
-                    .catch((_0x3eb877) => {
+                    .catch((error15) => {
                       return (
-                        _0x58bf66?.({
+                        logDiagnosticEvent?.({
                           type: 'web_preview.capture_reference_failed',
                           level: 'warn',
                           source: 'main',
                           message: 'Web preview reference capture failed',
-                          error: _0x3eb877,
-                          context: { nodeId: _0x1e307c, tabId: _0x4ad2b0 },
+                          error: error15,
+                          context: { nodeId: nodeId18, tabId: tabId18 },
                         }),
                         { ok: false, error: 'capture-failed' }
                       );
@@ -1736,20 +1703,20 @@ export function createWebPreviewViewManager({
       }
     }
     return (
-      _0x2086ef(_0x1e307c, _0x2ed066, _0x4ad2b0),
+      run3(nodeId18, webContents3, tabId18),
       {
         ok: true,
-        action: _0x1ecec4,
-        ...(_0x4df4da?.tabId ? { tabId: _0x4ad2b0 } : {}),
-        ...getNavigationState(_0x2ed066),
+        action: action,
+        ...(options4?.tabId ? { tabId: tabId18 } : {}),
+        ...getNavigationState(webContents3),
       }
     );
   }
   return {
-    syncViews: _0x3b094b,
-    disposeViews: _0x553cd7,
-    controlView: _0x21c775,
-    getEntryCount: () => _0x1c905a.size,
-    _getEntry: (_0xae540b, _0xe81c0e = 'default') => _0x1c905a.get(toEntryKey(_0xae540b, _0xe81c0e)),
+    syncViews: syncViews,
+    disposeViews: disposeViews,
+    controlView: controlView,
+    getEntryCount: () => count2.size,
+    _getEntry: (value158, value159 = 'default') => count2.get(toEntryKey(value158, value159)),
   };
 }

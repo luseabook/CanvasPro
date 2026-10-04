@@ -45,8 +45,8 @@ const SOURCE_VIDEO_MIN_SIZE = 150,
   SOURCE_VIDEO_IDLE_MEDIA_TIMEOUT_MS = 120,
   SOURCE_VIDEO_BUSY_RETRY_MS = 80,
   SOURCE_VIDEO_MAX_BUSY_WAIT_MS = 0x384;
-function sourceVideoText(_0x14967f, _0x21681b = {}) {
-  return t('sourceVideoNode.' + _0x14967f, _0x21681b);
+function sourceVideoText(value, item = {}) {
+  return t('sourceVideoNode.' + value, item);
 }
 function isDesktopRenderer() {
   return !!globalThis.window?.electronAPI;
@@ -67,344 +67,337 @@ function getSourceVideoSchedulerNow() {
     : Date.now();
 }
 function isSourceVideoInteractionBusy() {
-  const _0x11e8c2 = typeof document !== 'undefined' ? document.body?.classList : null;
+  const key = typeof document !== 'undefined' ? document.body?.classList : null;
   return !!(
-    _0x11e8c2?.contains?.('is-panning') ||
-    _0x11e8c2?.contains?.('is-zooming') ||
-    _0x11e8c2?.contains?.('is-viewport-animating')
+    key?.contains?.('is-panning') ||
+    key?.contains?.('is-zooming') ||
+    key?.contains?.('is-viewport-animating')
   );
 }
 function scheduleSourceVideoIdleTask(
-  _0x8e2a13,
+  handler,
   { timeout: timeout = SOURCE_VIDEO_IDLE_MEDIA_TIMEOUT_MS } = {},
 ) {
-  if (typeof _0x8e2a13 !== 'function') return () => {};
-  let _0x489798 = false,
-    _0x1d4211 = () => {};
-  const _0x3d2d8a = getSourceVideoSchedulerNow(),
-    _0x176aeb = globalThis.window?.requestIdleCallback || globalThis.requestIdleCallback,
-    _0x1961f4 = globalThis.window?.cancelIdleCallback || globalThis.cancelIdleCallback;
-  function _0x3fd147(_0x4ccc32) {
-    const _0x539b5a = setTimeout(_0x3d43bd, _0x4ccc32);
-    _0x1d4211 = () => clearTimeout(_0x539b5a);
+  if (typeof handler !== 'function') return () => {};
+  let index = false,
+    handler2 = () => {};
+  const sourceVideoSchedulerNow = getSourceVideoSchedulerNow(),
+    handler3 = globalThis.window?.requestIdleCallback || globalThis.requestIdleCallback,
+    handler4 = globalThis.window?.cancelIdleCallback || globalThis.cancelIdleCallback;
+  function run(result) {
+    const setTimeout2 = setTimeout(data, result);
+    handler2 = () => clearTimeout(setTimeout2);
   }
-  const _0x3d43bd = () => {
-    if (_0x489798) return;
-    const _0x564d8c = getSourceVideoSchedulerNow() - _0x3d2d8a;
-    if (isSourceVideoInteractionBusy() && _0x564d8c < SOURCE_VIDEO_MAX_BUSY_WAIT_MS) {
-      _0x3fd147(SOURCE_VIDEO_BUSY_RETRY_MS);
+  const data = () => {
+    if (index) return;
+    const sourceVideoSchedulerNow2 = getSourceVideoSchedulerNow() - sourceVideoSchedulerNow;
+    if (isSourceVideoInteractionBusy() && sourceVideoSchedulerNow2 < SOURCE_VIDEO_MAX_BUSY_WAIT_MS) {
+      run(SOURCE_VIDEO_BUSY_RETRY_MS);
       return;
     }
-    _0x8e2a13();
+    handler();
   };
-  if (typeof _0x176aeb === 'function') {
-    const _0x53b5d1 = _0x176aeb(_0x3d43bd, { timeout: timeout });
-    _0x1d4211 = () => {
-      if (typeof _0x1961f4 === 'function') _0x1961f4(_0x53b5d1);
+  if (typeof handler3 === 'function') {
+    const options = handler3(data, { timeout: timeout });
+    handler2 = () => {
+      if (typeof handler4 === 'function') handler4(options);
     };
-  } else _0x3fd147(16);
+  } else run(16);
   return () => {
-    ((_0x489798 = true), _0x1d4211());
+    ((index = true), handler2());
   };
 }
 function buildSourceVideoRecoveryFailurePatch(
-  _0xda8720,
+  target,
   { error: error = '', startedAt: startedAt = 0, duration: duration = null } = {},
 ) {
-  const _0x499f4e =
+  const message =
       String(error?.message || error || sourceVideoText('recovery.taskFailed')).trim() ||
       sourceVideoText('recovery.taskFailed'),
-    _0xe0756 = String(_0xda8720?.outputText || '').trim(),
-    _0x634716 = _0xe0756
-      ? _0xe0756 + '\n' + sourceVideoText('recovery.failedWithMessage', { message: _0x499f4e })
-      : sourceVideoText('recovery.failedWithMessage', { message: _0x499f4e });
+    source = String(target?.outputText || '').trim(),
+    outputText = source
+      ? source + '\n' + sourceVideoText('recovery.failedWithMessage', { message: message })
+      : sourceVideoText('recovery.failedWithMessage', { message: message });
   return {
     ...buildVideoGenerationFailurePatch({
-      error: _0x499f4e,
+      error: message,
       startedAt: startedAt,
       duration: duration,
       clearMediaFields: false,
     }),
-    outputText: _0x634716,
+    outputText: outputText,
   };
 }
-function normalizeUploadMediaDimensions(_0x3d808c, _0x17f314) {
-  const _0x6c5032 = Math.round(Number(_0x3d808c) || 0),
-    _0x139c1a = Math.round(Number(_0x17f314) || 0);
-  if (_0x6c5032 <= 0 || _0x139c1a <= 0) return null;
-  return { width: _0x6c5032, height: _0x139c1a };
+function normalizeUploadMediaDimensions(next, current) {
+  const width = Math.round(Number(next) || 0),
+    height = Math.round(Number(current) || 0);
+  if (width <= 0 || height <= 0) return null;
+  return { width: width, height: height };
 }
-export function buildSourceVideoUploadSizePatch(..._0x26289d) {
-  for (const _0x3f2ec5 of _0x26289d) {
-    const _0x307fcb = normalizeUploadMediaDimensions(_0x3f2ec5?.width, _0x3f2ec5?.height);
-    if (!_0x307fcb) continue;
-    const _0x36d40e = getAutoMediaSizeByShortSide(_0x307fcb.width, _0x307fcb.height);
+export function buildSourceVideoUploadSizePatch(...args) {
+  for (const box of args) {
+    const videoWidth = normalizeUploadMediaDimensions(box?.width, box?.height);
+    if (!videoWidth) continue;
+    const width2 = getAutoMediaSizeByShortSide(videoWidth.width, videoWidth.height);
     return {
-      width: _0x36d40e.width,
-      height: _0x36d40e.height,
-      videoWidth: _0x307fcb.width,
-      videoHeight: _0x307fcb.height,
+      width: width2.width,
+      height: width2.height,
+      videoWidth: videoWidth.width,
+      videoHeight: videoWidth.height,
       needsAutoResize: false,
     };
   }
   return { needsAutoResize: true };
 }
-function readVideoFileNaturalSize(_0x1b2e99) {
-  const _0x23312e = globalThis.document;
-  if (!_0x1b2e99 || typeof _0x23312e?.createElement !== 'function') return Promise.resolve(null);
-  const _0x1f7c09 = globalThis.window?.URL || globalThis.URL;
-  if (typeof _0x1f7c09?.createObjectURL !== 'function') return Promise.resolve(null);
-  let _0x4a569e = '';
+function readVideoFileNaturalSize(enabled) {
+  const el = globalThis.document;
+  if (!enabled || typeof el?.createElement !== 'function') return Promise.resolve(null);
+  const entry = globalThis.window?.URL || globalThis.URL;
+  if (typeof entry?.createObjectURL !== 'function') return Promise.resolve(null);
+  let record = '';
   try {
-    _0x4a569e = _0x1f7c09.createObjectURL(_0x1b2e99);
+    record = entry.createObjectURL(enabled);
   } catch {
     return Promise.resolve(null);
   }
-  return new Promise((_0xc7c133) => {
-    const _0x56fd3a = _0x23312e.createElement('video');
-    let _0x3a6fe2 = false,
-      _0x5f43cd = null;
-    const _0x530a0a = (_0x5a1263) => {
-        if (_0x3a6fe2) return;
-        _0x3a6fe2 = true;
-        if (_0x5f43cd) clearTimeout(_0x5f43cd);
-        (_0x3c0e19(), _0xc7c133(_0x5a1263));
+  return new Promise((handler5) => {
+    const payload = el.createElement('video');
+    let handle = false,
+      setTimeout3 = null;
+    const run2 = (state) => {
+        if (handle) return;
+        handle = true;
+        if (setTimeout3) clearTimeout(setTimeout3);
+        (handler6(), handler5(state));
       },
-      _0x3c0e19 = () => {
-        _0x56fd3a.removeAttribute?.('src');
+      handler6 = () => {
+        payload.removeAttribute?.('src');
         try {
-          _0x56fd3a.load?.();
+          payload.load?.();
         } catch {}
         try {
-          _0x1f7c09.revokeObjectURL(_0x4a569e);
+          entry.revokeObjectURL(record);
         } catch {}
       };
-    ((_0x56fd3a.preload = 'metadata'),
-      (_0x56fd3a.muted = true),
-      (_0x56fd3a.onloadedmetadata = () => {
-        const _0x555945 = normalizeUploadMediaDimensions(_0x56fd3a.videoWidth, _0x56fd3a.videoHeight);
-        _0x530a0a(_0x555945);
+    ((payload.preload = 'metadata'),
+      (payload.muted = true),
+      (payload.onloadedmetadata = () => {
+        const uploadMediaDimensions = normalizeUploadMediaDimensions(payload.videoWidth, payload.videoHeight);
+        run2(uploadMediaDimensions);
       }),
-      (_0x56fd3a.onerror = () => _0x530a0a(null)),
-      (_0x5f43cd = setTimeout(() => _0x530a0a(null), 0xbb8)),
-      (_0x56fd3a.src = _0x4a569e));
+      (payload.onerror = () => run2(null)),
+      (setTimeout3 = setTimeout(() => run2(null), 0xbb8)),
+      (payload.src = record));
   });
 }
-function createVideoCapturePreviewUrl(_0x2fbb8f) {
-  if (!_0x2fbb8f || !String(_0x2fbb8f.type || '').startsWith('video/')) return '';
-  const _0x79fff = globalThis.window?.URL || globalThis.URL;
-  if (typeof _0x79fff?.createObjectURL !== 'function') return '';
+function createVideoCapturePreviewUrl(enabled2) {
+  if (!enabled2 || !String(enabled2.type || '').startsWith('video/')) return '';
+  const config = globalThis.window?.URL || globalThis.URL;
+  if (typeof config?.createObjectURL !== 'function') return '';
   try {
-    return _0x79fff.createObjectURL(_0x2fbb8f);
+    return config.createObjectURL(enabled2);
   } catch {
     return '';
   }
 }
 function waitForNextPaint() {
-  const _0x164c28 = globalThis.window?.requestAnimationFrame || globalThis.requestAnimationFrame;
-  if (typeof _0x164c28 === 'function')
-    return new Promise((_0x22a471) => {
-      let _0x16710c = false,
-        _0x11a5ed = null;
-      const _0x516464 = () => {
-        if (_0x16710c) return;
-        _0x16710c = true;
-        if (_0x11a5ed) clearTimeout(_0x11a5ed);
-        _0x22a471();
+  const run3 = globalThis.window?.requestAnimationFrame || globalThis.requestAnimationFrame;
+  if (typeof run3 === 'function')
+    return new Promise((handler7) => {
+      let scope = false,
+        setTimeout4 = null;
+      const input = () => {
+        if (scope) return;
+        scope = true;
+        if (setTimeout4) clearTimeout(setTimeout4);
+        handler7();
       };
-      ((_0x11a5ed = setTimeout(_0x516464, 50)), _0x164c28(_0x516464));
+      ((setTimeout4 = setTimeout(input, 50)), run3(input));
     });
-  return new Promise((_0x1d649e) => setTimeout(_0x1d649e, 0));
+  return new Promise((output) => setTimeout(output, 0));
 }
-function asStringArray(_0x52f6bb) {
-  return Array.isArray(_0x52f6bb)
-    ? _0x52f6bb.map((_0x4ea012) => String(_0x4ea012 || '').trim()).filter(Boolean)
-    : [];
+function asStringArray(list) {
+  return Array.isArray(list) ? list.map((item2) => String(item2 || '').trim()).filter(Boolean) : [];
 }
-function createManagedNameRegex(_0xd67639, _0x3cd8a5, _0x29a634) {
-  const _0x1bdd15 = String(_0xd67639 || '').trim();
-  if (!_0x1bdd15) return /^$/;
+function createManagedNameRegex(value2, value3, value4) {
+  const enabled3 = String(value2 || '').trim();
+  if (!enabled3) return /^$/;
   try {
-    return new RegExp(_0x1bdd15);
-  } catch (_0x41f8b6) {
+    return new RegExp(enabled3);
+  } catch (value5) {
     throw new Error(
       '[source-video] invalid sourceVideoTaskName pattern for ' +
-        (_0x3cd8a5?.modelId || '') +
+        (value3?.modelId || '') +
         '/' +
-        (_0x29a634 || ''),
+        (value4 || ''),
     );
   }
 }
-function getSourceVideoTaskNameConfigs(_0x44253e) {
-  const _0x79cb79 = _0x44253e?.extensions || {};
-  if (Array.isArray(_0x79cb79.sourceVideoTaskNameRules)) return _0x79cb79.sourceVideoTaskNameRules;
-  return _0x79cb79.sourceVideoTaskName ? [_0x79cb79.sourceVideoTaskName] : [];
+function getSourceVideoTaskNameConfigs(value6) {
+  const value7 = value6?.extensions || {};
+  if (Array.isArray(value7.sourceVideoTaskNameRules)) return value7.sourceVideoTaskNameRules;
+  return value7.sourceVideoTaskName ? [value7.sourceVideoTaskName] : [];
 }
-function createSourceVideoTaskNameRule(_0x1e5466, _0x2bb226) {
-  if (!_0x1e5466 || !_0x2bb226) return null;
-  const _0x2ff137 = String(_0x2bb226.modelId || _0x1e5466.modelId || '')
+function createSourceVideoTaskNameRule(enabled4, matchModel) {
+  if (!enabled4 || !matchModel) return null;
+  const value8 = String(matchModel.modelId || enabled4.modelId || '')
       .trim()
       .toLowerCase(),
-    _0x13cd0f = String(_0x2bb226.key || _0x2ff137 || 'sourceVideoTask').trim();
+    key2 = String(matchModel.key || value8 || 'sourceVideoTask').trim();
   return {
-    key: _0x13cd0f,
-    matchModel: _0x2bb226.matchModel !== false,
-    models: new Set(_0x2ff137 ? [_0x2ff137] : []),
-    textNeedles: asStringArray(_0x2bb226.textNeedles),
-    managedNameRe: createManagedNameRegex(_0x2bb226.managedNamePattern, _0x1e5466, _0x13cd0f),
-    names: { ...(_0x2bb226.names || {}) },
+    key: key2,
+    matchModel: matchModel.matchModel !== false,
+    models: new Set(value8 ? [value8] : []),
+    textNeedles: asStringArray(matchModel.textNeedles),
+    managedNameRe: createManagedNameRegex(matchModel.managedNamePattern, enabled4, key2),
+    names: { ...(matchModel.names || {}) },
   };
 }
 function buildSourceVideoTaskNameRules() {
   return listModelManifests()
-    .flatMap((_0x268055) =>
-      getSourceVideoTaskNameConfigs(_0x268055).map((_0x169dce) =>
-        createSourceVideoTaskNameRule(_0x268055, _0x169dce),
-      ),
+    .flatMap((item3) =>
+      getSourceVideoTaskNameConfigs(item3).map((item4) => createSourceVideoTaskNameRule(item3, item4)),
     )
     .filter(Boolean);
 }
 const RH_VIDEO_TASK_NAME_RULES = buildSourceVideoTaskNameRules();
-function normalizeRunningHubVideoStatus(_0x10e274) {
-  const _0x4213d4 = String(_0x10e274 || '')
+function normalizeRunningHubVideoStatus(value9) {
+  const value10 = String(value9 || '')
     .trim()
     .toLowerCase();
-  for (const [_0x3fde45, _0x158486] of Object.entries(RH_VIDEO_STATUS_ALIASES)) {
-    if (_0x158486.has(_0x4213d4)) return _0x3fde45;
+  for (const [value11, map] of Object.entries(RH_VIDEO_STATUS_ALIASES)) {
+    if (map.has(value10)) return value11;
   }
-  return _0x4213d4;
+  return value10;
 }
-function isRunningHubVideoTask(_0xb18aa7) {
-  if (!_0xb18aa7 || typeof _0xb18aa7 !== 'object') return false;
-  const _0x5e437d = normalizeProviderId(_0xb18aa7.provider);
-  if (_0x5e437d === 'runninghubwf' || _0x5e437d === 'runninghub') return true;
-  const _0x2f6335 = resolveModelExecution(_0xb18aa7.model, { providerHint: _0x5e437d }),
-    _0x3c3e08 = normalizeProviderId(_0x2f6335?.modelManifest?.provider),
-    _0x4716eb = normalizeProviderId(_0x2f6335?.executionManifest?.provider);
-  return _0x3c3e08 === 'runninghubwf' || _0x4716eb === 'runninghubwf';
+function isRunningHubVideoTask(enabled5) {
+  if (!enabled5 || typeof enabled5 !== 'object') return false;
+  const providerHint = normalizeProviderId(enabled5.provider);
+  if (providerHint === 'runninghubwf' || providerHint === 'runninghub') return true;
+  const modelExecution = resolveModelExecution(enabled5.model, { providerHint: providerHint }),
+    providerId = normalizeProviderId(modelExecution?.modelManifest?.provider),
+    providerId2 = normalizeProviderId(modelExecution?.executionManifest?.provider);
+  return providerId === 'runninghubwf' || providerId2 === 'runninghubwf';
 }
-function resolveRunningHubVideoTaskNameRule(_0xb4f8b5) {
-  if (!isRunningHubVideoTask(_0xb4f8b5)) return '';
-  const _0x3be210 = String(_0xb4f8b5?.model || '')
+function resolveRunningHubVideoTaskNameRule(error2) {
+  if (!isRunningHubVideoTask(error2)) return '';
+  const value12 = String(error2?.model || '')
       .trim()
       .toLowerCase(),
-    _0x502b32 = String(_0xb4f8b5?.name || '').trim(),
-    _0x3622cd = String(_0xb4f8b5?.outputText || ''),
-    _0x13390d = RH_VIDEO_TASK_NAME_RULES.find(
-      (_0x2f6b00) => _0x502b32 && _0x2f6b00.managedNameRe.test(_0x502b32),
-    );
-  if (_0x13390d) return _0x13390d;
-  const _0x1d6f81 = RH_VIDEO_TASK_NAME_RULES.find((_0x5a8f49) =>
-    _0x5a8f49.textNeedles.some((_0x49bae6) => _0x3622cd.includes(_0x49bae6)),
+    value13 = String(error2?.name || '').trim(),
+    list2 = String(error2?.outputText || ''),
+    value14 = RH_VIDEO_TASK_NAME_RULES.find((item5) => value13 && item5.managedNameRe.test(value13));
+  if (value14) return value14;
+  const value15 = RH_VIDEO_TASK_NAME_RULES.find((item6) =>
+    item6.textNeedles.some((item7) => list2.includes(item7)),
   );
-  if (_0x1d6f81) return _0x1d6f81;
+  if (value15) return value15;
   return (
-    RH_VIDEO_TASK_NAME_RULES.find((_0x5a5fa9) => {
-      if (_0x5a5fa9.matchModel !== false && _0x5a5fa9.models?.has(_0x3be210)) return true;
+    RH_VIDEO_TASK_NAME_RULES.find((item8) => {
+      if (item8.matchModel !== false && item8.models?.has(value12)) return true;
       return false;
     }) || null
   );
 }
-function resolveRunningHubVideoStatusName(_0x10feb9, _0x222bde) {
-  const _0x30f5e2 = resolveRunningHubVideoTaskNameRule(_0x10feb9);
-  if (!_0x30f5e2?.names) return '';
-  const _0x33ad10 = String(_0x10feb9?.name || '').trim();
-  if (!_0x33ad10 || !_0x30f5e2.managedNameRe.test(_0x33ad10)) return '';
-  return _0x30f5e2.names[normalizeRunningHubVideoStatus(_0x222bde)] || '';
+function resolveRunningHubVideoStatusName(error3, value16) {
+  const runningHubVideoTaskNameRule = resolveRunningHubVideoTaskNameRule(error3);
+  if (!runningHubVideoTaskNameRule?.names) return '';
+  const enabled6 = String(error3?.name || '').trim();
+  if (!enabled6 || !runningHubVideoTaskNameRule.managedNameRe.test(enabled6)) return '';
+  return runningHubVideoTaskNameRule.names[normalizeRunningHubVideoStatus(value16)] || '';
 }
-function buildChangedPatch(_0x3c234f, _0x4a757f) {
-  const _0x32c416 = {};
-  for (const [_0x1a4741, _0x509602] of Object.entries(_0x4a757f || {})) {
-    if (!Object.is(_0x3c234f?.[_0x1a4741], _0x509602)) _0x32c416[_0x1a4741] = _0x509602;
+function buildChangedPatch(value17, value18) {
+  const value19 = {};
+  for (const [value20, value21] of Object.entries(value18 || {})) {
+    if (!Object.is(value17?.[value20], value21)) value19[value20] = value21;
   }
-  return _0x32c416;
+  return value19;
 }
-function buildRunningHubVideoTerminalStatePatch(_0xbc7d3a, _0x563ddb, _0x572aa1) {
-  if (!isRunningHubVideoTask(_0xbc7d3a)) return null;
-  const _0x1f4355 = normalizeRunningHubVideoStatus(_0x563ddb || _0xbc7d3a?.rhTaskStatus);
-  if (!['success', 'failed', 'cancelled'].includes(_0x1f4355)) return null;
-  const _0x5d85bc = { isGenerating: false, rhTaskStatus: _0x1f4355, rhTaskRecovering: false };
-  if (_0x1f4355 === 'success') _0x5d85bc.jobStatus = 'success';
-  if (_0x1f4355 === 'failed') _0x5d85bc.jobStatus = 'error';
-  if (_0x1f4355 === 'cancelled') _0x5d85bc.jobStatus = null;
-  typeof _0xbc7d3a?.generationDuration !== 'number' && (_0x5d85bc.generationDuration = _0x572aa1);
-  const _0x2865ed = resolveRunningHubVideoStatusName(_0xbc7d3a, _0x1f4355);
-  if (_0x2865ed) _0x5d85bc.name = _0x2865ed;
-  const _0x1550a8 = buildChangedPatch(_0xbc7d3a, _0x5d85bc);
-  return Object.keys(_0x1550a8).length > 0 ? _0x1550a8 : null;
+function buildRunningHubVideoTerminalStatePatch(value22, value23, value24) {
+  if (!isRunningHubVideoTask(value22)) return null;
+  const rhTaskStatus = normalizeRunningHubVideoStatus(value23 || value22?.rhTaskStatus);
+  if (!['success', 'failed', 'cancelled'].includes(rhTaskStatus)) return null;
+  const error4 = { isGenerating: false, rhTaskStatus: rhTaskStatus, rhTaskRecovering: false };
+  if (rhTaskStatus === 'success') error4.jobStatus = 'success';
+  if (rhTaskStatus === 'failed') error4.jobStatus = 'error';
+  if (rhTaskStatus === 'cancelled') error4.jobStatus = null;
+  typeof value22?.generationDuration !== 'number' && (error4.generationDuration = value24);
+  const runningHubVideoStatusName = resolveRunningHubVideoStatusName(value22, rhTaskStatus);
+  if (runningHubVideoStatusName) error4.name = runningHubVideoStatusName;
+  const changedPatch = buildChangedPatch(value22, error4);
+  return Object.keys(changedPatch).length > 0 ? changedPatch : null;
 }
 function shouldFetchVideoMetaForNodeInfo() {
   try {
-    const _0x4b374c =
-      typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
-    return _0x4b374c?.ui?.showVideoMeta === true;
+    const value25 = typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
+    return value25?.ui?.showVideoMeta === true;
   } catch {
     return false;
   }
 }
-function normalizeVideoPreviewUrl(_0x5268d1, { localOnly: localOnly = false } = {}) {
-  const _0x526dc9 = String(_0x5268d1 || '').trim();
-  if (!_0x526dc9) return '';
-  if (/^data:image\//i.test(_0x526dc9) || /^blob:/i.test(_0x526dc9) || /^aic-local-preview:/i.test(_0x526dc9))
-    return _0x526dc9;
-  if (/^(?:https?:|file:)/i.test(_0x526dc9)) return '';
-  const _0x32de48 = localPathToUrl(_0x526dc9);
-  if (_0x32de48) return _0x32de48;
-  return localOnly ? '' : _0x526dc9;
+function normalizeVideoPreviewUrl(value26, { localOnly: localOnly = false } = {}) {
+  const enabled7 = String(value26 || '').trim();
+  if (!enabled7) return '';
+  if (/^data:image\//i.test(enabled7) || /^blob:/i.test(enabled7) || /^aic-local-preview:/i.test(enabled7))
+    return enabled7;
+  if (/^(?:https?:|file:)/i.test(enabled7)) return '';
+  const url = localPathToUrl(enabled7);
+  if (url) return url;
+  return localOnly ? '' : enabled7;
 }
-export function resolveSourceVideoPosterSrc(_0x60e30f = {}) {
-  const _0x21911d = Array.isArray(_0x60e30f?.videos) ? _0x60e30f.videos : [],
-    _0x4cf68c = Math.max(0, Number(_0x60e30f?.mainVideoIndex) || 0),
-    _0x5b8a35 = _0x21911d[_0x4cf68c] || _0x21911d[0] || null,
-    _0x4f0471 = [
-      [_0x5b8a35?.posterLocalPath, true],
-      [_0x5b8a35?.previewLocalPath, true],
-      [_0x5b8a35?.thumbLocalPath, true],
-      [_0x5b8a35?.thumbnailLocalPath, true],
-      [_0x5b8a35?.posterUrl, false],
-      [_0x5b8a35?.previewUrl, false],
-      [_0x5b8a35?.thumbUrl, false],
-      [_0x5b8a35?.thumbnailUrl, false],
-      [_0x60e30f?.posterLocalPath, true],
-      [_0x60e30f?.previewLocalPath, true],
-      [_0x60e30f?.thumbLocalPath, true],
-      [_0x60e30f?.thumbnailLocalPath, true],
-      [_0x60e30f?.posterUrl, false],
-      [_0x60e30f?.previewUrl, false],
-      [_0x60e30f?.thumbUrl, false],
-      [_0x60e30f?.thumbnailUrl, false],
+export function resolveSourceVideoPosterSrc(options2 = {}) {
+  const value27 = Array.isArray(options2?.videos) ? options2.videos : [],
+    value28 = Math.max(0, Number(options2?.mainVideoIndex) || 0),
+    value29 = value27[value28] || value27[0] || null,
+    value30 = [
+      [value29?.posterLocalPath, true],
+      [value29?.previewLocalPath, true],
+      [value29?.thumbLocalPath, true],
+      [value29?.thumbnailLocalPath, true],
+      [value29?.posterUrl, false],
+      [value29?.previewUrl, false],
+      [value29?.thumbUrl, false],
+      [value29?.thumbnailUrl, false],
+      [options2?.posterLocalPath, true],
+      [options2?.previewLocalPath, true],
+      [options2?.thumbLocalPath, true],
+      [options2?.thumbnailLocalPath, true],
+      [options2?.posterUrl, false],
+      [options2?.previewUrl, false],
+      [options2?.thumbUrl, false],
+      [options2?.thumbnailUrl, false],
     ];
-  for (const [_0x2d57ff, _0x3ffc18] of _0x4f0471) {
-    const _0x44d4e0 = normalizeVideoPreviewUrl(_0x2d57ff, { localOnly: _0x3ffc18 });
-    if (_0x44d4e0) return _0x44d4e0;
+  for (const [value31, localOnly2] of value30) {
+    const videoPreviewUrl = normalizeVideoPreviewUrl(value31, { localOnly: localOnly2 });
+    if (videoPreviewUrl) return videoPreviewUrl;
   }
   return '';
 }
-export function resolveSourceVideoMediaTaskSrc(_0x2cb261 = {}) {
-  const _0x3ad877 = Array.isArray(_0x2cb261?.videos) ? _0x2cb261.videos : [],
-    _0x57166d = Math.max(0, Number(_0x2cb261?.mainVideoIndex) || 0),
-    _0x4dad6a = _0x3ad877[_0x57166d] || _0x3ad877[0] || null,
-    _0x27ada9 = [
-      _0x2cb261?.originalLocalPath,
-      _0x2cb261?.localPath,
-      _0x2cb261?.displayLocalPath,
-      _0x2cb261?.videoLocalPath,
-      _0x2cb261?.videoUrl,
-      _0x2cb261?.src,
-      _0x2cb261?.url,
-      _0x2cb261?.resultUrl,
-      _0x2cb261?.sourceUrl,
-      _0x4dad6a?.originalLocalPath,
-      _0x4dad6a?.localPath,
-      _0x4dad6a?.displayLocalPath,
-      _0x4dad6a?.videoUrl,
-      _0x4dad6a?.src,
-      _0x4dad6a?.url,
-      _0x4dad6a?.resultUrl,
+export function resolveSourceVideoMediaTaskSrc(response = {}) {
+  const value32 = Array.isArray(response?.videos) ? response.videos : [],
+    value33 = Math.max(0, Number(response?.mainVideoIndex) || 0),
+    response2 = value32[value33] || value32[0] || null,
+    value34 = [
+      response?.originalLocalPath,
+      response?.localPath,
+      response?.displayLocalPath,
+      response?.videoLocalPath,
+      response?.videoUrl,
+      response?.src,
+      response?.url,
+      response?.resultUrl,
+      response?.sourceUrl,
+      response2?.originalLocalPath,
+      response2?.localPath,
+      response2?.displayLocalPath,
+      response2?.videoUrl,
+      response2?.src,
+      response2?.url,
+      response2?.resultUrl,
     ];
-  for (const _0x4a6773 of _0x27ada9) {
-    const _0x469383 = urlToLocalPath(_0x4a6773) || pickResultLocalPath(_0x4a6773);
-    if (_0x469383) return _0x469383;
+  for (const value35 of value34) {
+    const localPath = urlToLocalPath(value35) || pickResultLocalPath(value35);
+    if (localPath) return localPath;
   }
   return '';
 }
@@ -415,14 +408,14 @@ registerStaticInnerHTML(
     '\n        <div class="node-card media-card video-card" style="width: 100%; height: 100%; padding: 0; background: var(--white-05); border: 1px solid var(--stroke-08); border-radius: 18px; overflow: hidden; position: relative; display: flex; align-items: stretch; pointer-events: auto; cursor: var(--link-cursor);">\n        <img class="source-video-poster-frame" alt="" draggable="false">\n        \n        <div class="video-mute-btn">\n          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-unmuted" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>\n          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-muted"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="1" x2="1" y2="23"></line><line x1="15.54" y1="8.46" x2="19.07" y2="12"></line></svg>\n        </div>\n\n        <div class="video-center-indicator">\n          <div class="indicator-inner">\n          </div>\n        </div>\n        \n        <div class="node-upload-hint source-upload-hint">\n          <button type="button" class="upload-btn source-upload-btn">\n            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>\n            <span class="source-upload-label"></span>\n          </button>\n        </div>\n\n        <div class="video-controls">\n          <div class="video-play-btn">\n            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>\n          </div>\n          <span class="video-time-current">0:00</span>\n          <div class="media-progress-bar">\n             <div class="media-progress-fill">\n                <div class="media-progress-knob"></div>\n             </div>\n          </div>\n          <span class="video-time-total">0:00</span>\n          <div class="video-snap-btn">\n            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>\n          </div>\n        </div>\n        <div class="node-port out-port"></div>\n        <div class="node-resizer"></div>\n      </div>',
 );
 export class SourceVideoNode {
-  constructor(_0x17f5a8) {
-    ((this._data = _0x17f5a8),
+  constructor(value36) {
+    ((this._data = value36),
       (this.el = document.createElement('div')),
-      (this.id = _0x17f5a8.id),
+      (this.id = value36.id),
       (this.el.className = 'v2-node-component'),
       (this._currentSrc = null),
       (this._objUrl = null),
-      (this._isMuted = resolveVideoMutedPreference(_0x17f5a8)),
+      (this._isMuted = resolveVideoMutedPreference(value36)),
       (this._isManualControl = false),
       (this._isHovered = false),
       (this._hoverManualPause = false),
@@ -445,18 +438,18 @@ export class SourceVideoNode {
       (this._idleVideoThumbCancel = null),
       (this._isUploading = false),
       (this._unsubscribeLocale = null),
-      (this._rendererMediaDeferred = shouldDeferRendererMediaOnMount(_0x17f5a8)),
+      (this._rendererMediaDeferred = shouldDeferRendererMediaOnMount(value36)),
       (this._videoEventsBound = false));
   }
   ['_ensureVideoElement']() {
     if (this._video) return this._video;
     if (!this._card) return null;
-    const _0x5f1ba7 = document.createElement('video');
-    ((_0x5f1ba7.className = 'video-player'),
-      _0x5f1ba7.setAttribute('playsinline', ''),
-      (_0x5f1ba7.preload = 'none'),
-      (_0x5f1ba7.muted = this._isMuted),
-      Object.assign(_0x5f1ba7.style, {
+    const el2 = document.createElement('video');
+    ((el2.className = 'video-player'),
+      el2.setAttribute('playsinline', ''),
+      (el2.preload = 'none'),
+      (el2.muted = this._isMuted),
+      Object.assign(el2.style, {
         width: '100%',
         height: '100%',
         display: 'block',
@@ -467,12 +460,9 @@ export class SourceVideoNode {
         margin: '0',
         pointerEvents: 'none',
       }));
-    if (this._posterFrame?.parentNode === this._card) this._card.insertBefore(_0x5f1ba7, this._posterFrame);
-    else
-      typeof this._card.prepend === 'function'
-        ? this._card.prepend(_0x5f1ba7)
-        : this._card.appendChild(_0x5f1ba7);
-    return ((this._video = _0x5f1ba7), this._bindVideoElementEvents(), _0x5f1ba7);
+    if (this._posterFrame?.parentNode === this._card) this._card.insertBefore(el2, this._posterFrame);
+    else typeof this._card.prepend === 'function' ? this._card.prepend(el2) : this._card.appendChild(el2);
+    return ((this._video = el2), this._bindVideoElementEvents(), el2);
   }
   ['_bindVideoElementEvents']() {
     if (!this._video || this._videoEventsBound === true) return;
@@ -483,82 +473,79 @@ export class SourceVideoNode {
       this._video.addEventListener('pause', () => {
         (this._syncPosterFrameVisibility(), this._updatePlayIcon(true), this._showPausedCenterIndicator());
       }));
-    for (const _0x36404f of ['loadeddata', 'playing', 'timeupdate', 'seeked']) {
-      this._video.addEventListener(_0x36404f, () => this._syncPosterFrameVisibility());
+    for (const value37 of ['loadeddata', 'playing', 'timeupdate', 'seeked']) {
+      this._video.addEventListener(value37, () => this._syncPosterFrameVisibility());
     }
     (this._video.addEventListener('timeupdate', () => {
       if (this._isSeeking || (this._bar && this._bar.dataset.dragging === 'true')) return;
-      const _0x36a8d9 = this._getBaseDuration();
-      if (!_0x36a8d9 || !Number.isFinite(_0x36a8d9)) return;
-      const _0x17f72a = this._getClipRange(_0x36a8d9),
-        _0x1b495a = _0x17f72a.active ? Math.max(0, _0x17f72a.end - _0x17f72a.start) : _0x36a8d9;
-      if (!_0x1b495a || !Number.isFinite(_0x1b495a)) return;
-      let _0x46bde7 = this._video.currentTime || 0;
-      if (_0x17f72a.active) {
-        if (_0x46bde7 < _0x17f72a.start)
-          ((this._video.currentTime = _0x17f72a.start), (_0x46bde7 = _0x17f72a.start));
+      const enabled8 = this._getBaseDuration();
+      if (!enabled8 || !Number.isFinite(enabled8)) return;
+      const value38 = this._getClipRange(enabled8),
+        enabled9 = value38.active ? Math.max(0, value38.end - value38.start) : enabled8;
+      if (!enabled9 || !Number.isFinite(enabled9)) return;
+      let value39 = this._video.currentTime || 0;
+      if (value38.active) {
+        if (value39 < value38.start) ((this._video.currentTime = value38.start), (value39 = value38.start));
         else
-          _0x46bde7 > _0x17f72a.end - 0.03 &&
-            ((this._video.currentTime = _0x17f72a.start), (_0x46bde7 = _0x17f72a.start));
+          value39 > value38.end - 0.03 &&
+            ((this._video.currentTime = value38.start), (value39 = value38.start));
       }
-      const _0x367bbd = _0x17f72a.active
-        ? Math.max(0, Math.min(_0x1b495a, _0x46bde7 - _0x17f72a.start))
-        : _0x46bde7;
-      ((this._fill.style.width = (_0x367bbd / _0x1b495a) * 100 + '%'),
-        (this._timeCurrent.textContent = this._fmt(_0x367bbd)),
-        (this._timeTotal.textContent = this._fmt(_0x1b495a)));
+      const value40 = value38.active ? Math.max(0, Math.min(enabled9, value39 - value38.start)) : value39;
+      ((this._fill.style.width = (value40 / enabled9) * 100 + '%'),
+        (this._timeCurrent.textContent = this._fmt(value40)),
+        (this._timeTotal.textContent = this._fmt(enabled9)));
     }),
       this._video.addEventListener('loadedmetadata', () => {
         this._syncVideoDurationUi();
-        const _0x42c409 = this._video.videoWidth || 0,
-          _0xc75eb7 = this._video.videoHeight || 0;
-        if (_0x42c409 > 0 && _0xc75eb7 > 0) {
-          const _0x3ea90d = appStore.getState().nodes[this.id];
-          if (_0x3ea90d) {
-            const _0x1722e3 = {};
-            if (Number(_0x3ea90d.videoWidth || 0) !== _0x42c409) _0x1722e3.videoWidth = _0x42c409;
-            if (Number(_0x3ea90d.videoHeight || 0) !== _0xc75eb7) _0x1722e3.videoHeight = _0xc75eb7;
-            if (Object.keys(_0x1722e3).length) appStore.updateNodeData(this.id, _0x1722e3);
+        const count = this._video.videoWidth || 0,
+          count2 = this._video.videoHeight || 0;
+        if (count > 0 && count2 > 0) {
+          const value41 = appStore.getState().nodes[this.id];
+          if (value41) {
+            const value42 = {};
+            if (Number(value41.videoWidth || 0) !== count) value42.videoWidth = count;
+            if (Number(value41.videoHeight || 0) !== count2) value42.videoHeight = count2;
+            if (Object.keys(value42).length) appStore.updateNodeData(this.id, value42);
           }
         }
         if (this._data.fixedSize) return;
         if (!this._data.needsAutoResize) return;
-        const { width: _0x5b8f6c, height: _0x8b94a7 } = getAutoMediaSizeByShortSide(
-          _0x42c409 || 0x3e8,
-          _0xc75eb7 || 0x3e8,
+        const { width: width3, height: height2 } = getAutoMediaSizeByShortSide(
+          count || 0x3e8,
+          count2 || 0x3e8,
         );
-        appStore.updateNodeData(this.id, { width: _0x5b8f6c, height: _0x8b94a7, needsAutoResize: false });
+        appStore.updateNodeData(this.id, { width: width3, height: height2, needsAutoResize: false });
       }));
   }
   ['mount']() {
-    const _0x4420ba = this.el;
-    (setStaticInnerHTML(_0x4420ba, _SOURCE_VIDEO_NODE_TEMPLATE_ID),
-      (this._card = _0x4420ba.querySelector('.node-card')),
+    const el3 = this.el;
+    (setStaticInnerHTML(el3, _SOURCE_VIDEO_NODE_TEMPLATE_ID),
+      (this._card = el3.querySelector('.node-card')),
       (this._video = null),
-      (this._posterFrame = _0x4420ba.querySelector('.source-video-poster-frame')));
+      (this._posterFrame = el3.querySelector('.source-video-poster-frame')));
     this._posterFrame &&
       ((this._posterFrame.decoding = 'async'),
       (this._posterFrame.loading = 'eager'),
       'fetchPriority' in this._posterFrame && (this._posterFrame.fetchPriority = 'high'));
     (this._applyVideoPoster(this._data),
       this._attachPlaybackRecovery(),
-      (this._hint = _0x4420ba.querySelector('.node-upload-hint')),
-      (this._uploadBtn = _0x4420ba.querySelector('.upload-btn')),
-      (this._controls = _0x4420ba.querySelector('.video-controls')),
-      (this._playBtn = _0x4420ba.querySelector('.video-play-btn')),
-      (this._muteBtn = _0x4420ba.querySelector('.video-mute-btn')),
-      (this._iconUnmuted = _0x4420ba.querySelector('.icon-unmuted')),
-      (this._iconMuted = _0x4420ba.querySelector('.icon-muted')),
+      (this._hint = el3.querySelector('.node-upload-hint')),
+      (this._uploadBtn = el3.querySelector('.upload-btn')),
+      (this._controls = el3.querySelector('.video-controls')),
+      (this._playBtn = el3.querySelector('.video-play-btn')),
+      (this._muteBtn = el3.querySelector('.video-mute-btn')),
+      (this._iconUnmuted = el3.querySelector('.icon-unmuted')),
+      (this._iconMuted = el3.querySelector('.icon-muted')),
       this._syncMutedStateFromData(this._data),
-      (this._fill = _0x4420ba.querySelector('.media-progress-fill')),
-      (this._bar = _0x4420ba.querySelector('.media-progress-bar')),
-      (this._timeCurrent = _0x4420ba.querySelector('.video-time-current')),
-      (this._timeTotal = _0x4420ba.querySelector('.video-time-total')),
-      (this._snapBtn = _0x4420ba.querySelector('.video-snap-btn')),
-      (this._centerIndicator = _0x4420ba.querySelector('.video-center-indicator')),
-      (this._indicatorInner = _0x4420ba.querySelector('.indicator-inner')),
+      (this._fill = el3.querySelector('.media-progress-fill')),
+      (this._bar = el3.querySelector('.media-progress-bar')),
+      (this._timeCurrent = el3.querySelector('.video-time-current')),
+      (this._timeTotal = el3.querySelector('.video-time-total')),
+      (this._snapBtn = el3.querySelector('.video-snap-btn')),
+      (this._centerIndicator = el3.querySelector('.video-center-indicator')),
+      (this._indicatorInner = el3.querySelector('.indicator-inner')),
       (this._centerIndicatorTimer = null),
-      (this._resizer = _0x4420ba.querySelector('.node-resizer')),
+      (this._resizer = el3.querySelector('.node-resizer')),
       this._syncLocaleTexts(),
       (this._unsubscribeLocale = onLocaleChange(() => this._syncLocaleTexts())));
     if (this._data?.isGenerating && !this._resolveVideoSrc(this._data)) {
@@ -566,25 +553,25 @@ export class SourceVideoNode {
       if (this._hint) this._hint.style.display = 'none';
       if (this._uploadBtn) this._uploadBtn.disabled = true;
     }
-    (this._card.addEventListener('dblclick', (_0x343122) => {
-      _0x343122.stopPropagation();
+    (this._card.addEventListener('dblclick', (event) => {
+      event.stopPropagation();
       this._clickTimer && (clearTimeout(this._clickTimer), (this._clickTimer = null));
-      const _0x10d7ad =
+      const value43 =
         (this._video ? getVideoCurrentSource(this._video) : '') ||
         this._currentSrc ||
         this._resolveVideoSrc(this._data);
-      _0x10d7ad && ((this._currentSrc = _0x10d7ad), void this._openFullscreenFromCurrentVideo());
+      value43 && ((this._currentSrc = value43), void this._openFullscreenFromCurrentVideo());
     }),
-      this._card.addEventListener('click', (_0x59814e) => {
-        if (_0x59814e.detail && _0x59814e.detail > 1) return;
+      this._card.addEventListener('click', (event2) => {
+        if (event2.detail && event2.detail > 1) return;
         if (
-          _0x59814e.target.closest('.video-controls') ||
-          _0x59814e.target.closest('.video-mute-btn') ||
-          _0x59814e.target.closest('.node-upload-hint') ||
-          _0x59814e.target.closest('.node-floating-toolbar')
+          event2.target.closest('.video-controls') ||
+          event2.target.closest('.video-mute-btn') ||
+          event2.target.closest('.node-upload-hint') ||
+          event2.target.closest('.node-floating-toolbar')
         )
           return;
-        _0x59814e.stopPropagation();
+        event2.stopPropagation();
         if (this._clickTimer) clearTimeout(this._clickTimer);
         this._clickTimer = setTimeout(() => {
           this._clickTimer = null;
@@ -596,129 +583,127 @@ export class SourceVideoNode {
       (this._input.type = 'file'),
       (this._input.accept = 'video/*'),
       (this._input.style.display = 'none'),
-      _0x4420ba.appendChild(this._input),
-      this._uploadBtn.addEventListener('click', (_0x4f2a85) => {
-        (_0x4f2a85.stopPropagation(), this._input.click());
+      el3.appendChild(this._input),
+      this._uploadBtn.addEventListener('click', (event3) => {
+        (event3.stopPropagation(), this._input.click());
       }));
     this._resizer &&
-      this._resizer.addEventListener('pointerdown', (_0x381b9e) => {
-        const _0x3f042a = appStore.getStateRaw().ui?.imageVideoNodeResizeEnabled === true,
-          _0x3ea589 = document.getElementById('v2-wrap')?.classList.contains('v2-media-node-resize-enabled');
-        if (!(_0x3f042a && _0x3ea589)) return;
+      this._resizer.addEventListener('pointerdown', (event4) => {
+        const value44 = appStore.getStateRaw().ui?.imageVideoNodeResizeEnabled === true,
+          value45 = document.getElementById('v2-wrap')?.classList.contains('v2-media-node-resize-enabled');
+        if (!(value44 && value45)) return;
         startNodeResizePreview({
-          event: _0x381b9e,
+          event: event4,
           nodeId: this.id,
           getNode: () => appStore.getStateRaw().nodes?.[this.id] || this._data,
           getViewport: () => appStore.getStateRaw().viewport,
-          resolveSize: ({ startWidth: _0x20cf87, startHeight: _0x5e408d, dx: _0x3b98ca, dy: _0x3243ae }) => {
-            const _0x31c6f2 = _0x20cf87 / _0x5e408d,
-              _0x544e9e = Math.max(_0x3b98ca / _0x20cf87, _0x3243ae / _0x5e408d),
-              _0x17f65c = Math.max(SOURCE_VIDEO_MIN_SIZE / _0x20cf87, SOURCE_VIDEO_MIN_SIZE / _0x5e408d),
-              _0x2b25bd = Math.max(_0x17f65c, 1 + _0x544e9e),
-              _0x5f2235 = Math.max(SOURCE_VIDEO_MIN_SIZE, Math.round(_0x20cf87 * _0x2b25bd)),
-              _0x493adc = Math.max(SOURCE_VIDEO_MIN_SIZE, Math.round(_0x5f2235 / _0x31c6f2));
-            return { width: _0x5f2235, height: _0x493adc };
+          resolveSize: ({ startWidth: startWidth, startHeight: startHeight, dx: dx, dy: dy }) => {
+            const value46 = startWidth / startHeight,
+              value47 = Math.max(dx / startWidth, dy / startHeight),
+              value48 = Math.max(SOURCE_VIDEO_MIN_SIZE / startWidth, SOURCE_VIDEO_MIN_SIZE / startHeight),
+              value49 = Math.max(value48, 1 + value47),
+              width4 = Math.max(SOURCE_VIDEO_MIN_SIZE, Math.round(startWidth * value49)),
+              height3 = Math.max(SOURCE_VIDEO_MIN_SIZE, Math.round(width4 / value46));
+            return { width: width4, height: height3 };
           },
-          buildFinalPatch: ({ startNode: _0x1881ed }) =>
-            _0x1881ed?.needsAutoResize ? { needsAutoResize: false } : {},
-          applyPatch: (_0x16cc4f) => appStore.updateNodeData(this.id, _0x16cc4f),
+          buildFinalPatch: ({ startNode: startNode }) =>
+            startNode?.needsAutoResize ? { needsAutoResize: false } : {},
+          applyPatch: (value50) => appStore.updateNodeData(this.id, value50),
           commit: commit,
         });
       });
-    (this._input.addEventListener('change', async (_0x527e6b) => {
-      const _0x189616 = _0x527e6b.target.files[0];
-      if (!_0x189616) return;
-      await this._handleUploadInputFile(_0x189616);
+    (this._input.addEventListener('change', async (event5) => {
+      const enabled10 = event5.target.files[0];
+      if (!enabled10) return;
+      await this._handleUploadInputFile(enabled10);
     }),
-      this._muteBtn.addEventListener('click', (_0x496b93) => {
-        _0x496b93.stopPropagation();
+      this._muteBtn.addEventListener('click', (event6) => {
+        event6.stopPropagation();
         if (VideoKeyingController.isActiveFor(this._data?.id)) return;
         this._setMuted(!this._isMuted, { persist: true });
       }),
-      this._playBtn.addEventListener('click', (_0x107aff) => {
-        _0x107aff.stopPropagation();
+      this._playBtn.addEventListener('click', (loop2) => {
+        loop2.stopPropagation();
         if (VideoKeyingController.isActiveFor(this._data?.id)) return;
         if (!this._currentSrc) return;
         this._toggleManualPlayback({
-          loop: _0x107aff.altKey === true,
+          loop: loop2.altKey === true,
           forcePlay: this._shouldKeepHoverPlaybackOnManualClick(),
         });
       }));
     if (this._bar) {
-      let _0x2faf64 = false,
-        _0x31f29d = 0;
-      this._updateDragVisual = (_0x427f1f) => {
-        if (this._fill) this._fill.style.width = _0x427f1f * 100 + '%';
+      let enabled11 = false,
+        value51 = 0;
+      this._updateDragVisual = (value52) => {
+        if (this._fill) this._fill.style.width = value52 * 100 + '%';
         if (!this._timeCurrent) return;
-        const _0x429f3e = this._getBaseDuration(),
-          _0x503d50 = this._getClipRange(_0x429f3e),
-          _0xc50c03 = _0x503d50.active ? Math.max(0, _0x503d50.end - _0x503d50.start) : _0x429f3e;
-        if (_0xc50c03 && Number.isFinite(_0xc50c03))
-          this._timeCurrent.textContent = this._fmt(_0x427f1f * _0xc50c03);
+        const value53 = this._getBaseDuration(),
+          value54 = this._getClipRange(value53),
+          value55 = value54.active ? Math.max(0, value54.end - value54.start) : value53;
+        if (value55 && Number.isFinite(value55)) this._timeCurrent.textContent = this._fmt(value52 * value55);
       };
-      const _0x5c8dcc = (_0x5ce6e0) => {
-          const _0x36f63c = this._bar;
-          if (!_0x36f63c) return 0;
-          const _0x3a3881 = _0x36f63c.getBoundingClientRect(),
-            _0x8cceb4 = _0x3a3881.width || 0;
-          if (!_0x8cceb4) return 0;
-          const _0x468a63 = _0x5ce6e0.clientX - _0x3a3881.left;
-          if (!Number.isFinite(_0x468a63)) return 0;
-          return Math.max(0, Math.min(1, _0x468a63 / _0x8cceb4));
+      const run4 = (event7) => {
+          const el4 = this._bar;
+          if (!el4) return 0;
+          const box2 = el4.getBoundingClientRect(),
+            enabled12 = box2.width || 0;
+          if (!enabled12) return 0;
+          const value56 = event7.clientX - box2.left;
+          if (!Number.isFinite(value56)) return 0;
+          return Math.max(0, Math.min(1, value56 / enabled12));
         },
-        _0x4b4db4 = (_0x555328) => {
-          if (!Number.isFinite(_0x555328)) return;
-          const _0x5611e3 = this._getBaseDuration();
-          if (!_0x5611e3 || !Number.isFinite(_0x5611e3)) return;
-          const _0x480bb4 = this._getClipRange(_0x5611e3),
-            _0x2a4d8c = _0x480bb4.active ? Math.max(0, _0x480bb4.end - _0x480bb4.start) : _0x5611e3;
-          if (!_0x2a4d8c || !Number.isFinite(_0x2a4d8c)) return;
-          const _0x3f7174 = Math.max(
+        handler8 = (value57) => {
+          if (!Number.isFinite(value57)) return;
+          const enabled13 = this._getBaseDuration();
+          if (!enabled13 || !Number.isFinite(enabled13)) return;
+          const value58 = this._getClipRange(enabled13),
+            enabled14 = value58.active ? Math.max(0, value58.end - value58.start) : enabled13;
+          if (!enabled14 || !Number.isFinite(enabled14)) return;
+          const value59 = Math.max(
             0,
-            Math.min(_0x5611e3, (_0x480bb4.active ? _0x480bb4.start : 0) + _0x555328 * _0x2a4d8c),
+            Math.min(enabled13, (value58.active ? value58.start : 0) + value57 * enabled14),
           );
-          if (!Number.isFinite(_0x3f7174)) return;
-          const _0x3b0880 = this._ensureVideoElement();
-          if (!_0x3b0880) return;
+          if (!Number.isFinite(value59)) return;
+          const el5 = this._ensureVideoElement();
+          if (!el5) return;
           this._isSeeking = true;
-          const _0x343b62 = ++this._seekToken;
-          _0x3b0880.currentTime = _0x3f7174;
-          const _0x163523 = () => {
-            if (_0x343b62 !== this._seekToken) return;
+          const value60 = ++this._seekToken;
+          el5.currentTime = value59;
+          const value61 = () => {
+            if (value60 !== this._seekToken) return;
             this._isSeeking = false;
-            const _0x52fa0c = this._getBaseDuration(),
-              _0x502752 = this._getClipRange(_0x52fa0c),
-              _0xcf3e95 = _0x502752.active ? Math.max(0, _0x502752.end - _0x502752.start) : _0x52fa0c,
-              _0x1f43e5 = _0x3b0880.currentTime || 0;
-            if (_0xcf3e95 && Number.isFinite(_0xcf3e95)) {
-              const _0x4837c4 = _0x502752.active
-                ? Math.max(0, Math.min(_0xcf3e95, _0x1f43e5 - _0x502752.start))
-                : _0x1f43e5;
-              ((this._fill.style.width = (_0x4837c4 / _0xcf3e95) * 100 + '%'),
-                (this._timeCurrent.textContent = this._fmt(_0x4837c4)),
-                (this._timeTotal.textContent = this._fmt(_0xcf3e95)));
+            const value62 = this._getBaseDuration(),
+              value63 = this._getClipRange(value62),
+              value64 = value63.active ? Math.max(0, value63.end - value63.start) : value62,
+              value65 = el5.currentTime || 0;
+            if (value64 && Number.isFinite(value64)) {
+              const value66 = value63.active
+                ? Math.max(0, Math.min(value64, value65 - value63.start))
+                : value65;
+              ((this._fill.style.width = (value66 / value64) * 100 + '%'),
+                (this._timeCurrent.textContent = this._fmt(value66)),
+                (this._timeTotal.textContent = this._fmt(value64)));
             }
           };
-          (_0x3b0880.addEventListener('seeked', _0x163523, { once: true }),
-            window.setTimeout(_0x163523, 0x12c));
+          (el5.addEventListener('seeked', value61, { once: true }), window.setTimeout(value61, 0x12c));
         },
-        _0xbfcc9a = (_0x50988d) => {
-          if (!_0x2faf64) return;
-          (_0x50988d.stopPropagation(),
-            _0x50988d.preventDefault(),
-            (_0x31f29d = _0x5c8dcc(_0x50988d)),
-            this._updateDragVisual(_0x31f29d));
+        value67 = (event8) => {
+          if (!enabled11) return;
+          (event8.stopPropagation(),
+            event8.preventDefault(),
+            (value51 = run4(event8)),
+            this._updateDragVisual(value51));
         },
-        _0x52dbfa = (_0x67149) => {
-          if (!_0x2faf64) return;
-          ((_0x2faf64 = false),
+        value68 = (value69) => {
+          if (!enabled11) return;
+          ((enabled11 = false),
             (this._bar.dataset.dragging = 'false'),
-            window.removeEventListener('pointermove', _0xbfcc9a, true),
-            window.removeEventListener('pointerup', _0x52dbfa, true),
-            _0x4b4db4(_0x31f29d));
+            window.removeEventListener('pointermove', value67, true),
+            window.removeEventListener('pointerup', value68, true),
+            handler8(value51));
         };
-      this._bar.addEventListener('pointerdown', (_0x33d2a1) => {
-        (_0x33d2a1.stopPropagation(), _0x33d2a1.preventDefault());
+      this._bar.addEventListener('pointerdown', (event9) => {
+        (event9.stopPropagation(), event9.preventDefault());
         if (VideoKeyingController.isActiveFor(this._data?.id)) return;
         if (!this._currentSrc) return;
         ((this._isManualControl = true),
@@ -726,85 +711,83 @@ export class SourceVideoNode {
           this._autoPlayToken++,
           (this._hoverManualPause = true),
           this._ensureVideoElement()?.pause?.(),
-          (_0x2faf64 = true),
+          (enabled11 = true),
           (this._bar.dataset.dragging = 'true'),
-          (_0x31f29d = _0x5c8dcc(_0x33d2a1)),
-          this._updateDragVisual(_0x31f29d),
-          _0x4b4db4(_0x31f29d),
-          window.addEventListener('pointermove', _0xbfcc9a, true),
-          window.addEventListener('pointerup', _0x52dbfa, true));
+          (value51 = run4(event9)),
+          this._updateDragVisual(value51),
+          handler8(value51),
+          window.addEventListener('pointermove', value67, true),
+          window.addEventListener('pointerup', value68, true));
       });
     }
-    (this._snapBtn.addEventListener('click', (_0x45bd89) => {
-      _0x45bd89.stopPropagation();
+    (this._snapBtn.addEventListener('click', (event10) => {
+      event10.stopPropagation();
       if (VideoKeyingController.isActiveFor(this._data?.id)) return;
       void this._captureFrame();
     }),
-      _0x4420ba.addEventListener('mouseenter', () => {
-        const _0x406085 = appStore.getState().videoClip;
-        if (_0x406085 && _0x406085.active && _0x406085.nodeId === this._data?.id) return;
+      el3.addEventListener('mouseenter', () => {
+        const value70 = appStore.getState().videoClip;
+        if (value70 && value70.active && value70.nodeId === this._data?.id) return;
         if (this._currentSrc && this._rendererMediaDeferred !== true) {
-          const _0x47d412 = this._ensureVideoElement();
-          if (!_0x47d412) return;
+          const enabled15 = this._ensureVideoElement();
+          if (!enabled15) return;
           this._isHovered = true;
           if (VideoKeyingController.isActiveFor(this._data?.id)) {
-            _0x47d412.pause();
+            enabled15.pause();
             return;
           }
           if (this._hoverManualPause) return;
           if (this._isManualLoopPlayback) return;
-          const _0x33ee4a = this._getBaseDuration(),
-            _0x46ab17 = this._getClipRange(_0x33ee4a);
-          _0x47d412.loop = _0x46ab17.active ? false : true;
-          if (_0x46ab17.active) {
-            const _0x35d9dc = _0x47d412.currentTime || 0;
-            if (_0x35d9dc < _0x46ab17.start || _0x35d9dc > _0x46ab17.end)
-              _0x47d412.currentTime = _0x46ab17.start;
+          const value71 = this._getBaseDuration(),
+            value72 = this._getClipRange(value71);
+          enabled15.loop = value72.active ? false : true;
+          if (value72.active) {
+            const value73 = enabled15.currentTime || 0;
+            if (value73 < value72.start || value73 > value72.end) enabled15.currentTime = value72.start;
           }
-          const _0x33054c = ++this._autoPlayToken;
-          (logVideoPlaybackEvent(_0x47d412, 'hover-enter', { label: this._getPlaybackLabel('hover') }),
+          const value74 = ++this._autoPlayToken;
+          (logVideoPlaybackEvent(enabled15, 'hover-enter', { label: this._getPlaybackLabel('hover') }),
             void this._playVideoWithRecovery(
               'hover',
-              () => this._autoPlayToken === _0x33054c && !this._hoverManualPause,
+              () => this._autoPlayToken === value74 && !this._hoverManualPause,
             ));
         }
       }),
-      _0x4420ba.addEventListener('mouseleave', () => {
-        const _0x28a6fe = appStore.getState().videoClip;
-        if (_0x28a6fe && _0x28a6fe.active && _0x28a6fe.nodeId === this._data?.id) return;
+      el3.addEventListener('mouseleave', () => {
+        const value75 = appStore.getState().videoClip;
+        if (value75 && value75.active && value75.nodeId === this._data?.id) return;
         if (this._currentSrc) {
-          const _0x2cb7de = this._isManualControl;
+          const enabled16 = this._isManualControl;
           ((this._isHovered = false), this._autoPlayToken++);
-          const _0xab9a3c = this._video;
-          if (!_0xab9a3c) {
+          const enabled17 = this._video;
+          if (!enabled17) {
             this._hoverManualPause = false;
             if (!this._isManualLoopPlayback) this._isManualControl = false;
             return;
           }
-          !this._isManualLoopPlayback && (_0xab9a3c.loop = false);
-          logVideoPlaybackEvent(_0xab9a3c, 'hover-leave', { label: this._getPlaybackLabel('hover') });
-          !_0x2cb7de && _0xab9a3c.pause();
+          !this._isManualLoopPlayback && (enabled17.loop = false);
+          logVideoPlaybackEvent(enabled17, 'hover-leave', { label: this._getPlaybackLabel('hover') });
+          !enabled16 && enabled17.pause();
           this._hoverManualPause = false;
           if (!this._isManualLoopPlayback) this._isManualControl = false;
         }
       }),
-      this._controls.addEventListener('pointerdown', (_0xc94325) => _0xc94325.stopPropagation()),
-      this._muteBtn.addEventListener('pointerdown', (_0x48a0c1) => _0x48a0c1.stopPropagation()));
-    const _0x4693ab = this._resolveVideoSrc(this._data);
+      this._controls.addEventListener('pointerdown', (event11) => event11.stopPropagation()),
+      this._muteBtn.addEventListener('pointerdown', (event12) => event12.stopPropagation()));
+    const value76 = this._resolveVideoSrc(this._data);
     if (this._rendererMediaDeferred === true)
-      ((this._currentSrc = _0x4693ab || ''),
-        this._syncPosterFrameVisibility({ force: !!this._lastPosterSrc }));
+      ((this._currentSrc = value76 || ''), this._syncPosterFrameVisibility({ force: !!this._lastPosterSrc }));
     else {
-      if (_0x4693ab) this._loadVideo(_0x4693ab);
+      if (value76) this._loadVideo(value76);
       else this._loadVideo('');
     }
-    this._clearResolvedVideoTimer(this._data, _0x4693ab);
+    this._clearResolvedVideoTimer(this._data, value76);
     this._rendererMediaDeferred !== true && this._maybeFetchVideoMeta(this._data);
     (this._syncRunningHubVideoTaskState(this._data),
       this._maybeResumeRunningHubTask(),
       this._maybeResumeAsyncTask());
-    const _0x3ca216 = _0x4420ba.querySelector('.node-floating-toolbar');
-    return (bindVideoToolbarEvents(_0x3ca216, this._data), _0x4420ba);
+    const value77 = el3.querySelector('.node-floating-toolbar');
+    return (bindVideoToolbarEvents(value77, this._data), el3);
   }
   ['_waitForUploadPaint']() {
     return waitForNextPaint();
@@ -813,9 +796,9 @@ export class SourceVideoNode {
     if (this._muteBtn) this._muteBtn.title = sourceVideoText('controls.toggleMute');
     if (this._snapBtn) this._snapBtn.title = sourceVideoText('controls.captureFrame');
     if (this._uploadBtn && !this._isUploading) {
-      const _0x5a7d4f = this._uploadBtn.querySelector?.('.source-upload-label');
-      _0x5a7d4f
-        ? (_0x5a7d4f.textContent = sourceVideoText('upload.button'))
+      const el6 = this._uploadBtn.querySelector?.('.source-upload-label');
+      el6
+        ? (el6.textContent = sourceVideoText('upload.button'))
         : (this._uploadBtn.textContent = sourceVideoText('upload.button'));
     }
   }
@@ -828,115 +811,119 @@ export class SourceVideoNode {
     if (this._video) this._video.muted = !!this._isMuted;
     this._syncMuteButtonIcon();
   }
-  ['_syncMutedStateFromData'](_0x1bf310 = this._data) {
-    ((this._isMuted = resolveVideoMutedPreference(_0x1bf310)), this._applyMutedState());
+  ['_syncMutedStateFromData'](value78 = this._data) {
+    ((this._isMuted = resolveVideoMutedPreference(value78)), this._applyMutedState());
   }
-  ['_setMuted'](_0x5724d5, { persist: persist = false } = {}) {
-    ((this._isMuted = !!_0x5724d5), this._applyMutedState());
+  ['_setMuted'](enabled18, { persist: persist = false } = {}) {
+    ((this._isMuted = !!enabled18), this._applyMutedState());
     if (!persist) return;
-    const _0x21721a = appStore.getState().nodes?.[this.id] || this._data || {},
-      _0x10ea34 = buildVideoMutedPatch(_0x21721a, this._isMuted);
-    if (!_0x10ea34) return;
-    (appStore.updateNodeData(this.id, _0x10ea34), (this._data = { ..._0x21721a, ..._0x10ea34 }));
+    const args2 = appStore.getState().nodes?.[this.id] || this._data || {},
+      args3 = buildVideoMutedPatch(args2, this._isMuted);
+    if (!args3) return;
+    (appStore.updateNodeData(this.id, args3), (this._data = { ...args2, ...args3 }));
   }
-  ['_readUploadVideoNaturalSize'](_0x40e622) {
-    return readVideoFileNaturalSize(_0x40e622);
+  ['_readUploadVideoNaturalSize'](value79) {
+    return readVideoFileNaturalSize(value79);
   }
-  ['_uploadSourceVideoFile'](_0x4fe96b, _0x240729) {
-    return uploadFile(_0x4fe96b, _0x240729);
+  ['_uploadSourceVideoFile'](value80, value81) {
+    return uploadFile(value80, value81);
   }
-  async ['_handleUploadInputFile'](_0x4a500e) {
+  async ['_handleUploadInputFile'](error5) {
     ((this._isUploading = true), startLoading(this._card, { variant: 'static' }));
-    const _0x444ce5 = this._ensureVideoElement();
-    if (_0x444ce5) _0x444ce5.style.display = 'none';
+    const el7 = this._ensureVideoElement();
+    if (el7) el7.style.display = 'none';
     this._controls.style.opacity = '0';
-    const _0x501190 = Array.from(this._uploadBtn.childNodes).map((_0x30147f) => _0x30147f.cloneNode(true));
+    const list3 = Array.from(this._uploadBtn.childNodes).map((item9) => item9.cloneNode(true));
     ((this._uploadBtn.textContent = sourceVideoText('upload.uploading')),
       (this._uploadBtn.style.pointerEvents = 'none'));
-    const _0x490f94 = this._currentSrc,
-      _0x789555 = createVideoCapturePreviewUrl(_0x4a500e);
-    _0x789555 && ((this._data = { ...this._data, capturePreviewUrl: _0x789555 }), this._loadVideo(_0x789555));
+    const value82 = this._currentSrc,
+      capturePreviewUrl = createVideoCapturePreviewUrl(error5);
+    capturePreviewUrl &&
+      ((this._data = { ...this._data, capturePreviewUrl: capturePreviewUrl }),
+      this._loadVideo(capturePreviewUrl));
     try {
-      const _0x8a5812 = window.currentProjectId || 'default_v2_project';
+      const value83 = window.currentProjectId || 'default_v2_project';
       await this._waitForUploadPaint();
-      const _0x1bd193 = Promise.resolve()
-          .then(() => this._readUploadVideoNaturalSize(_0x4a500e))
+      const value84 = Promise.resolve()
+          .then(() => this._readUploadVideoNaturalSize(error5))
           .catch(() => null),
-        _0x57ebec = await this._uploadSourceVideoFile(_0x4a500e, _0x8a5812),
-        _0x3462a3 = await _0x1bd193,
-        _0xecacd1 = _0x4a500e.name.replace(/\.[^/.]+$/, '');
-      appStore.renameNode(this.id, _0xecacd1);
-      const _0x1f5775 = document.getElementById(this.id),
-        _0x478a78 = _0x1f5775?.__v2_name_el;
-      if (_0x478a78) _0x478a78.textContent = _0xecacd1;
-      const _0x1d3cc9 = _0x57ebec.url,
-        _0x175d52 = pickResultLocalPath(_0x57ebec) || urlToLocalPath(_0x1d3cc9),
-        _0xd9b633 = String(_0x57ebec.videoProxyStatus || '').trim(),
-        _0x538997 = _0xd9b633 === 'processing' && !!_0x789555,
-        _0x3d5506 =
-          _0xd9b633 === 'processing'
+        width5 = await this._uploadSourceVideoFile(error5, value83),
+        value85 = await value84,
+        value86 = error5.name.replace(/\.[^/.]+$/, '');
+      appStore.renameNode(this.id, value86);
+      const value87 = document.getElementById(this.id),
+        el8 = value87?.__v2_name_el;
+      if (el8) el8.textContent = value86;
+      const value88 = width5.url,
+        localPath2 = pickResultLocalPath(width5) || urlToLocalPath(value88),
+        videoProxyStatus = String(width5.videoProxyStatus || '').trim(),
+        capturePreviewUrl2 = videoProxyStatus === 'processing' && !!capturePreviewUrl,
+        src =
+          videoProxyStatus === 'processing'
             ? ''
-            : String(_0x57ebec.displayUrl || '').trim() ||
-              String(_0x57ebec.displayLocalPath ? '/' + _0x57ebec.displayLocalPath : '').trim() ||
-              _0x1d3cc9,
-        _0x19d852 = buildSourceVideoUploadSizePatch(
+            : String(width5.displayUrl || '').trim() ||
+              String(width5.displayLocalPath ? '/' + width5.displayLocalPath : '').trim() ||
+              value88,
+        args4 = buildSourceVideoUploadSizePatch(
           {
-            width: _0x57ebec.videoWidth || _0x57ebec.width,
-            height: _0x57ebec.videoHeight || _0x57ebec.height,
+            width: width5.videoWidth || width5.width,
+            height: width5.videoHeight || width5.height,
           },
-          _0x3462a3,
+          value85,
         );
       appStore.updateNodeData(this.id, {
-        src: _0x3d5506,
-        localPath: _0x175d52,
-        assetId: _0x57ebec.assetId || '',
-        originalLocalPath: _0x57ebec.originalLocalPath || _0x57ebec.localPath || '',
-        displayLocalPath: _0x57ebec.displayLocalPath || '',
-        posterLocalPath: _0x57ebec.posterLocalPath || '',
-        thumbLocalPath: _0x57ebec.posterLocalPath || _0x57ebec.thumbLocalPath || '',
-        thumbUrl: _0x57ebec.posterUrl || _0x57ebec.thumbUrl || '',
-        derivativeStatus: _0x57ebec.derivativeStatus || _0x57ebec.status || '',
-        mediaTaskId: _0x57ebec.mediaTaskId || '',
-        mediaTaskKind: _0x57ebec.mediaTaskKind || '',
-        mediaTaskStatus: _0x57ebec.mediaTaskStatus || '',
-        mediaTaskProgress: Number(_0x57ebec.mediaTaskProgress || 0) || 0,
-        mediaTaskError: _0x57ebec.mediaTaskError || '',
-        videoProxyStatus: _0xd9b633,
-        videoCodec: _0x57ebec.videoCodec || '',
-        videoDuration: Number(_0x57ebec.videoDuration || 0) || 0,
-        videoFps: Number(_0x57ebec.videoFps || 0) || 0,
-        fileName: _0x57ebec.filename || _0x4a500e.name,
-        capturePreviewUrl: _0x538997 ? _0x789555 : '',
-        ..._0x19d852,
+        src: src,
+        localPath: localPath2,
+        assetId: width5.assetId || '',
+        originalLocalPath: width5.originalLocalPath || width5.localPath || '',
+        displayLocalPath: width5.displayLocalPath || '',
+        posterLocalPath: width5.posterLocalPath || '',
+        thumbLocalPath: width5.posterLocalPath || width5.thumbLocalPath || '',
+        thumbUrl: width5.posterUrl || width5.thumbUrl || '',
+        derivativeStatus: width5.derivativeStatus || width5.status || '',
+        mediaTaskId: width5.mediaTaskId || '',
+        mediaTaskKind: width5.mediaTaskKind || '',
+        mediaTaskStatus: width5.mediaTaskStatus || '',
+        mediaTaskProgress: Number(width5.mediaTaskProgress || 0) || 0,
+        mediaTaskError: width5.mediaTaskError || '',
+        videoProxyStatus: videoProxyStatus,
+        videoCodec: width5.videoCodec || '',
+        videoDuration: Number(width5.videoDuration || 0) || 0,
+        videoFps: Number(width5.videoFps || 0) || 0,
+        fileName: width5.filename || error5.name,
+        capturePreviewUrl: capturePreviewUrl2 ? capturePreviewUrl : '',
+        ...args4,
       });
-    } catch (_0xa37ae7) {
-      (console.error('视频上传失败:', _0xa37ae7),
+    } catch (value89) {
+      (console.error('视频上传失败:', value89),
         window.showToast(sourceVideoText('upload.failedRetry')),
         stopLoading(this._card));
-      if (_0x789555 && this._currentSrc === _0x789555) {
+      if (capturePreviewUrl && this._currentSrc === capturePreviewUrl) {
         this._releaseActiveCapturePreviewUrl();
-        if (_0x490f94) this._loadVideo(_0x490f94);
+        if (value82) this._loadVideo(value82);
         else ((this._currentSrc = ''), this._loadVideo(''));
       }
       if (this._currentSrc) {
-        const _0x34565b = this._ensureVideoElement();
-        if (_0x34565b) _0x34565b.style.display = 'block';
+        const el9 = this._ensureVideoElement();
+        if (el9) el9.style.display = 'block';
         this._controls.style.opacity = '1';
       }
     } finally {
       ((this._isUploading = false),
-        this._uploadBtn.replaceChildren(..._0x501190.map((_0x577ae4) => _0x577ae4.cloneNode(true))),
+        this._uploadBtn.replaceChildren(...list3.map((item10) => item10.cloneNode(true))),
         this._syncLocaleTexts(),
         (this._uploadBtn.style.pointerEvents = 'auto'),
         (this._input.value = ''));
     }
   }
-  ['_applyVideoPoster'](_0x4f2c22 = this._data) {
-    const _0x24534b = resolveSourceVideoPosterSrc(_0x4f2c22);
-    if (_0x24534b)
-      (this._video && this._video.poster !== _0x24534b && (this._video.poster = _0x24534b),
-        (this._lastPosterSrc = _0x24534b),
-        this._applyPosterFrameSource(_0x24534b));
+  ['_applyVideoPoster'](value90 = this._data) {
+    const sourceVideoPosterSrc = resolveSourceVideoPosterSrc(value90);
+    if (sourceVideoPosterSrc)
+      (this._video &&
+        this._video.poster !== sourceVideoPosterSrc &&
+        (this._video.poster = sourceVideoPosterSrc),
+        (this._lastPosterSrc = sourceVideoPosterSrc),
+        this._applyPosterFrameSource(sourceVideoPosterSrc));
     else {
       if (this._video?.poster) {
         this._video.removeAttribute?.('poster');
@@ -947,64 +934,64 @@ export class SourceVideoNode {
         this._lastPosterSrc = '';
       }
     }
-    return (this._syncPosterFrameVisibility({ force: !!_0x24534b }), _0x24534b);
+    return (this._syncPosterFrameVisibility({ force: !!sourceVideoPosterSrc }), sourceVideoPosterSrc);
   }
   ['_getPosterFrameSrc']() {
     if (!this._posterFrame) return '';
     return String(this._posterFrame.getAttribute?.('src') || this._posterFrame.src || '').trim();
   }
-  ['_setPosterFrameSrc'](_0x3bd124) {
+  ['_setPosterFrameSrc'](value91) {
     if (!this._posterFrame) return;
     typeof this._posterFrame.setAttribute === 'function'
-      ? this._posterFrame.setAttribute('src', _0x3bd124)
-      : (this._posterFrame.src = _0x3bd124);
+      ? this._posterFrame.setAttribute('src', value91)
+      : (this._posterFrame.src = value91);
   }
-  ['_applyPosterFrameSource'](_0x2caa8e) {
-    if (!this._posterFrame || !_0x2caa8e) return;
-    const _0x2a525e = this._getPosterFrameSrc();
-    if (_0x2a525e === _0x2caa8e) return;
-    const _0x5a078a = ({ requireConnected: requireConnected = false } = {}) => {
+  ['_applyPosterFrameSource'](enabled19) {
+    if (!this._posterFrame || !enabled19) return;
+    const enabled20 = this._getPosterFrameSrc();
+    if (enabled20 === enabled19) return;
+    const run5 = ({ requireConnected: requireConnected = false } = {}) => {
       if (
         !this._posterFrame ||
         (requireConnected && this._posterFrame.isConnected === false) ||
-        this._lastPosterSrc !== _0x2caa8e
+        this._lastPosterSrc !== enabled19
       )
         return;
-      (this._setPosterFrameSrc(_0x2caa8e), this._syncPosterFrameVisibility({ force: true }));
+      (this._setPosterFrameSrc(enabled19), this._syncPosterFrameVisibility({ force: true }));
     };
-    if (!_0x2a525e || _0x2caa8e.startsWith('data:') || typeof Image !== 'function') {
-      _0x5a078a();
+    if (!enabled20 || enabled19.startsWith('data:') || typeof Image !== 'function') {
+      run5();
       return;
     }
-    const _0x52a829 = (this._posterFramePreloadToken || 0) + 1;
-    ((this._posterFramePreloadToken = _0x52a829),
-      preloadCanvasImage(_0x2caa8e, { priority: 85, fetchPriority: 'auto' }).then(
+    const value92 = (this._posterFramePreloadToken || 0) + 1;
+    ((this._posterFramePreloadToken = value92),
+      preloadCanvasImage(enabled19, { priority: 85, fetchPriority: 'auto' }).then(
         () => {
-          if (this._posterFramePreloadToken === _0x52a829) _0x5a078a({ requireConnected: true });
+          if (this._posterFramePreloadToken === value92) run5({ requireConnected: true });
         },
         () => {
-          if (this._posterFramePreloadToken === _0x52a829) _0x5a078a({ requireConnected: true });
+          if (this._posterFramePreloadToken === value92) run5({ requireConnected: true });
         },
       ));
   }
-  ['_setPosterFrameVisible'](_0x3c5f11) {
+  ['_setPosterFrameVisible'](enabled21) {
     if (!this._posterFrame) return;
-    this._posterFrame.classList?.toggle('is-visible', !!_0x3c5f11);
+    this._posterFrame.classList?.toggle('is-visible', !!enabled21);
   }
   ['_isVideoFrameReadyToShow']() {
     if (!this._video) return false;
-    const _0x545552 = Number(this._video.readyState || 0);
-    if (_0x545552 < 2) return false;
+    const count3 = Number(this._video.readyState || 0);
+    if (count3 < 2) return false;
     if (!String(this._lastPosterSrc || '').trim()) return true;
     if (this._video.paused === false) return true;
-    const _0x9bfad = Number(this._video.currentTime || 0);
-    return _0x9bfad > 0.05;
+    const count4 = Number(this._video.currentTime || 0);
+    return count4 > 0.05;
   }
   ['_syncVideoElementFrameVisibility']({ forceHidden: forceHidden = false } = {}) {
     if (!this._video) return;
     if (!this._video.style) this._video.style = {};
-    const _0x3a7b4f = !!(this._currentSrc || getVideoCurrentSource(this._video));
-    if (!_0x3a7b4f) {
+    const enabled22 = !!(this._currentSrc || getVideoCurrentSource(this._video));
+    if (!enabled22) {
       ((this._video.style.display = 'none'),
         (this._video.style.opacity = ''),
         (this._video.style.visibility = ''));
@@ -1015,21 +1002,21 @@ export class SourceVideoNode {
       ((this._video.style.opacity = '1'), (this._video.style.visibility = 'visible'));
       return;
     }
-    const _0x845f4e = forceHidden ? false : this._isVideoFrameReadyToShow();
-    ((this._video.style.opacity = _0x845f4e ? '1' : '0'),
-      (this._video.style.visibility = _0x845f4e ? 'visible' : 'hidden'));
+    const value93 = forceHidden ? false : this._isVideoFrameReadyToShow();
+    ((this._video.style.opacity = value93 ? '1' : '0'),
+      (this._video.style.visibility = value93 ? 'visible' : 'hidden'));
   }
-  ['_syncPosterFrameVisibility'](_0x2611e9 = {}) {
+  ['_syncPosterFrameVisibility'](enabled23 = {}) {
     this._syncVideoElementFrameVisibility();
     if (!this._posterFrame) return;
-    const _0x1715f3 = String(this._lastPosterSrc || '').trim();
-    if (!_0x1715f3) {
+    const enabled24 = String(this._lastPosterSrc || '').trim();
+    if (!enabled24) {
       this._setPosterFrameVisible(false);
       return;
     }
-    if (Object.prototype.hasOwnProperty.call(_0x2611e9, 'force')) {
-      this._setPosterFrameVisible(!!_0x2611e9.force);
-      _0x2611e9.force === true && this._syncVideoElementFrameVisibility({ forceHidden: true });
+    if (Object.prototype.hasOwnProperty.call(enabled23, 'force')) {
+      this._setPosterFrameVisible(!!enabled23.force);
+      enabled23.force === true && this._syncVideoElementFrameVisibility({ forceHidden: true });
       return;
     }
     if (this._isVideoFrameReadyToShow()) {
@@ -1046,147 +1033,147 @@ export class SourceVideoNode {
         this._video.load?.();
       } catch {}
   }
-  ['_resolveVideoSrc'](_0x1cdfc8) {
-    return resolveCanvasVideoUrl(_0x1cdfc8) || this._getCapturePreviewUrl(_0x1cdfc8);
+  ['_resolveVideoSrc'](value94) {
+    return resolveCanvasVideoUrl(value94) || this._getCapturePreviewUrl(value94);
   }
-  ['_clearResolvedVideoTimer'](_0x3e25d4, _0xcb44e1) {
-    if (!_0xcb44e1 || !_0x3e25d4 || typeof _0x3e25d4 !== 'object') return;
-    const _0x456efa =
-      !!String(_0x3e25d4.rhTaskId || _0x3e25d4.asyncTaskId || _0x3e25d4.dreaminaSubmitId || '').trim() ||
-      _0x3e25d4.rhTaskRecovering === true ||
-      _0x3e25d4.asyncTaskRecovering === true ||
-      _0x3e25d4.dreaminaTaskRecovering === true;
-    if (_0x456efa) return;
-    if (!_0x3e25d4.generationStartTime && _0x3e25d4.generationDuration == null) return;
-    const _0x138034 = appStore.getState().nodes?.[this.id];
-    if (!_0x138034) return;
-    const _0x256ddb = {};
-    if (_0x138034.generationStartTime) _0x256ddb.generationStartTime = null;
-    if (_0x138034.generationDuration != null) _0x256ddb.generationDuration = null;
-    if (_0x138034.isGenerating === true) _0x256ddb.isGenerating = false;
-    Object.keys(_0x256ddb).length > 0 && appStore.updateNodeData(this.id, _0x256ddb);
+  ['_clearResolvedVideoTimer'](enabled25, enabled26) {
+    if (!enabled26 || !enabled25 || typeof enabled25 !== 'object') return;
+    const value95 =
+      !!String(enabled25.rhTaskId || enabled25.asyncTaskId || enabled25.dreaminaSubmitId || '').trim() ||
+      enabled25.rhTaskRecovering === true ||
+      enabled25.asyncTaskRecovering === true ||
+      enabled25.dreaminaTaskRecovering === true;
+    if (value95) return;
+    if (!enabled25.generationStartTime && enabled25.generationDuration == null) return;
+    const enabled27 = appStore.getState().nodes?.[this.id];
+    if (!enabled27) return;
+    const value96 = {};
+    if (enabled27.generationStartTime) value96.generationStartTime = null;
+    if (enabled27.generationDuration != null) value96.generationDuration = null;
+    if (enabled27.isGenerating === true) value96.isGenerating = false;
+    Object.keys(value96).length > 0 && appStore.updateNodeData(this.id, value96);
   }
-  ['_clearMediaUnavailableAfterPlayback'](_0x50e068) {
-    const _0x4a4b4c = appStore.getState().nodes?.[this.id] || this._data || null;
-    if (!_0x4a4b4c || _0x4a4b4c.mediaUnavailable !== true) return;
-    const _0x396344 = String(_0x4a4b4c.mediaUnavailableSource || '').trim();
-    if (!_0x396344) return;
-    const _0x2fcfdd = new Set(),
-      _0x223107 = (_0x4dca99) => {
-        const _0x5e62cf = String(_0x4dca99 || '').trim();
-        if (!_0x5e62cf) return;
-        _0x2fcfdd.add(_0x5e62cf);
-        const _0x1cc3e3 = urlToLocalPath(_0x5e62cf);
-        if (_0x1cc3e3) _0x2fcfdd.add(_0x1cc3e3);
-        const _0x48a22a = localPathToUrl(_0x5e62cf);
-        if (_0x48a22a) _0x2fcfdd.add(_0x48a22a);
+  ['_clearMediaUnavailableAfterPlayback'](value97) {
+    const response3 = appStore.getState().nodes?.[this.id] || this._data || null;
+    if (!response3 || response3.mediaUnavailable !== true) return;
+    const enabled28 = String(response3.mediaUnavailableSource || '').trim();
+    if (!enabled28) return;
+    const map2 = new Set(),
+      item11 = (value98) => {
+        const enabled29 = String(value98 || '').trim();
+        if (!enabled29) return;
+        map2.add(enabled29);
+        const localPath3 = urlToLocalPath(enabled29);
+        if (localPath3) map2.add(localPath3);
+        const url2 = localPathToUrl(enabled29);
+        if (url2) map2.add(url2);
       };
     [
-      _0x4a4b4c.localPath,
-      _0x4a4b4c.displayLocalPath,
-      _0x4a4b4c.originalLocalPath,
-      _0x4a4b4c.videoLocalPath,
-      _0x4a4b4c.videoUrl,
-      _0x4a4b4c.src,
-      _0x4a4b4c.url,
-      _0x4a4b4c.resultUrl,
-      _0x4a4b4c.sourceUrl,
-      _0x50e068,
-    ].forEach(_0x223107);
-    if (!_0x2fcfdd.has(_0x396344)) return;
+      response3.localPath,
+      response3.displayLocalPath,
+      response3.originalLocalPath,
+      response3.videoLocalPath,
+      response3.videoUrl,
+      response3.src,
+      response3.url,
+      response3.resultUrl,
+      response3.sourceUrl,
+      value97,
+    ].forEach(item11);
+    if (!map2.has(enabled28)) return;
     appStore.updateNodeData(this.id, { mediaUnavailable: false, mediaUnavailableSource: '' });
   }
-  ['_getCapturePreviewUrl'](_0x4f2517 = this._data) {
-    const _0x117692 = String(_0x4f2517?.capturePreviewUrl || '').trim();
-    return _0x117692.startsWith('blob:') || _0x117692.startsWith('aic-local-preview:') ? _0x117692 : '';
+  ['_getCapturePreviewUrl'](value99 = this._data) {
+    const value100 = String(value99?.capturePreviewUrl || '').trim();
+    return value100.startsWith('blob:') || value100.startsWith('aic-local-preview:') ? value100 : '';
   }
-  ['_revokeCapturePreviewUrl'](_0x3b1efd) {
-    const _0x1c5855 = String(_0x3b1efd || '').trim();
-    if (!_0x1c5855.startsWith('blob:')) return;
-    const _0x911d86 = globalThis.window?.URL || globalThis.URL;
-    if (typeof _0x911d86?.revokeObjectURL !== 'function') return;
+  ['_revokeCapturePreviewUrl'](value101) {
+    const enabled30 = String(value101 || '').trim();
+    if (!enabled30.startsWith('blob:')) return;
+    const value102 = globalThis.window?.URL || globalThis.URL;
+    if (typeof value102?.revokeObjectURL !== 'function') return;
     try {
-      _0x911d86.revokeObjectURL(_0x1c5855);
+      value102.revokeObjectURL(enabled30);
     } catch {}
   }
-  ['_adoptCapturePreviewUrl'](_0x18515f) {
-    const _0x565295 = String(_0x18515f || '').trim();
+  ['_adoptCapturePreviewUrl'](value103) {
+    const value104 = String(value103 || '').trim();
     (this._activeCapturePreviewUrl &&
-      this._activeCapturePreviewUrl !== _0x565295 &&
+      this._activeCapturePreviewUrl !== value104 &&
       this._revokeCapturePreviewUrl(this._activeCapturePreviewUrl),
-      (this._activeCapturePreviewUrl = _0x565295));
+      (this._activeCapturePreviewUrl = value104));
   }
   ['_releaseActiveCapturePreviewUrl']() {
     if (!this._activeCapturePreviewUrl) return;
-    const _0xa7d44a = this._activeCapturePreviewUrl;
-    ((this._activeCapturePreviewUrl = ''), this._revokeCapturePreviewUrl(_0xa7d44a));
+    const value105 = this._activeCapturePreviewUrl;
+    ((this._activeCapturePreviewUrl = ''), this._revokeCapturePreviewUrl(value105));
   }
-  ['_resolveVideoMetaSrc'](_0x44cf5b) {
-    if (!_0x44cf5b) return '';
-    const _0x47e581 = resolveSourceVideoMediaTaskSrc(_0x44cf5b);
-    if (_0x47e581) return _0x47e581;
-    const _0xb6ac42 = this._resolveVideoSrc(_0x44cf5b);
-    if (!_0xb6ac42) return '';
-    const _0x4e214f = String(_0xb6ac42);
+  ['_resolveVideoMetaSrc'](enabled31) {
+    if (!enabled31) return '';
+    const sourceVideoMediaTaskSrc = resolveSourceVideoMediaTaskSrc(enabled31);
+    if (sourceVideoMediaTaskSrc) return sourceVideoMediaTaskSrc;
+    const enabled32 = this._resolveVideoSrc(enabled31);
+    if (!enabled32) return '';
+    const value106 = String(enabled32);
     if (
-      _0x4e214f.startsWith('http://') ||
-      _0x4e214f.startsWith('https://') ||
-      _0x4e214f.startsWith('blob:') ||
-      _0x4e214f.startsWith('aic-local-preview:') ||
-      _0x4e214f.startsWith('data:')
+      value106.startsWith('http://') ||
+      value106.startsWith('https://') ||
+      value106.startsWith('blob:') ||
+      value106.startsWith('aic-local-preview:') ||
+      value106.startsWith('data:')
     )
       return '';
-    return urlToLocalPath(_0x4e214f) || '';
+    return urlToLocalPath(value106) || '';
   }
-  async ['_maybeFetchVideoMeta'](_0x117ed7) {
+  async ['_maybeFetchVideoMeta'](value107) {
     if (!shouldFetchVideoMetaForNodeInfo()) return;
-    const _0x55e406 = this._resolveVideoMetaSrc(_0x117ed7);
-    if (!_0x55e406) return;
-    const _0x362823 = appStore.getState().nodes[this.id];
-    if (!_0x362823) return;
-    const _0x572539 = String(_0x362823.videoMetaSrc || ''),
-      _0x32a461 =
-        Number.isFinite(Number(_0x362823.videoFps)) &&
-        Number(_0x362823.videoFps) > 0 &&
-        Number.isFinite(Number(_0x362823.videoFrameCount)) &&
-        Number(_0x362823.videoFrameCount) > 0;
-    if (_0x32a461 && _0x572539 === _0x55e406) return;
-    _0x572539 &&
-      _0x572539 !== _0x55e406 &&
+    const videoMetaSrc = this._resolveVideoMetaSrc(value107);
+    if (!videoMetaSrc) return;
+    const enabled33 = appStore.getState().nodes[this.id];
+    if (!enabled33) return;
+    const value108 = String(enabled33.videoMetaSrc || ''),
+      value109 =
+        Number.isFinite(Number(enabled33.videoFps)) &&
+        Number(enabled33.videoFps) > 0 &&
+        Number.isFinite(Number(enabled33.videoFrameCount)) &&
+        Number(enabled33.videoFrameCount) > 0;
+    if (value109 && value108 === videoMetaSrc) return;
+    value108 &&
+      value108 !== videoMetaSrc &&
       appStore.updateNodeData(this.id, {
-        videoMetaSrc: _0x55e406,
+        videoMetaSrc: videoMetaSrc,
         videoFps: null,
         videoFrameCount: null,
         videoDuration: null,
         videoWidth: null,
         videoHeight: null,
       });
-    const _0x574e75 = ++this._metaFetchToken;
+    const value110 = ++this._metaFetchToken;
     try {
-      const _0x32249b = await fetchVideoMetaFromServer(_0x55e406);
-      if (_0x574e75 !== this._metaFetchToken) return;
-      if (!_0x32249b || _0x32249b.success !== true) return;
-      const _0x56bfbd = Number(_0x32249b.fps),
-        _0x177100 = Number(_0x32249b.frameCount),
-        _0x35ae5c = Number(_0x32249b.duration),
-        _0x4d6f7f = Number(_0x32249b.width),
-        _0x49fa43 = Number(_0x32249b.height),
-        _0x3acfb4 = { videoMetaSrc: _0x55e406 };
-      if (Number.isFinite(_0x56bfbd) && _0x56bfbd > 0) _0x3acfb4.videoFps = _0x56bfbd;
-      if (Number.isFinite(_0x177100) && _0x177100 > 0) _0x3acfb4.videoFrameCount = Math.round(_0x177100);
-      if (Number.isFinite(_0x35ae5c) && _0x35ae5c > 0) _0x3acfb4.videoDuration = _0x35ae5c;
-      if (Number.isFinite(_0x4d6f7f) && _0x4d6f7f > 0) _0x3acfb4.videoWidth = Math.round(_0x4d6f7f);
-      if (Number.isFinite(_0x49fa43) && _0x49fa43 > 0) _0x3acfb4.videoHeight = Math.round(_0x49fa43);
-      const _0x3c9bfc = appStore.getState().nodes[this.id];
-      if (!_0x3c9bfc) return;
-      const _0x3e66c9 =
-        String(_0x3c9bfc.videoMetaSrc || '') !== String(_0x3acfb4.videoMetaSrc || '') ||
-        Number(_0x3c9bfc.videoFps || 0) !== Number(_0x3acfb4.videoFps || 0) ||
-        Number(_0x3c9bfc.videoFrameCount || 0) !== Number(_0x3acfb4.videoFrameCount || 0) ||
-        Number(_0x3c9bfc.videoDuration || 0) !== Number(_0x3acfb4.videoDuration || 0) ||
-        Number(_0x3c9bfc.videoWidth || 0) !== Number(_0x3acfb4.videoWidth || 0) ||
-        Number(_0x3c9bfc.videoHeight || 0) !== Number(_0x3acfb4.videoHeight || 0);
-      if (_0x3e66c9) appStore.updateNodeData(this.id, _0x3acfb4);
+      const box3 = await fetchVideoMetaFromServer(videoMetaSrc);
+      if (value110 !== this._metaFetchToken) return;
+      if (!box3 || box3.success !== true) return;
+      const count5 = Number(box3.fps),
+        count6 = Number(box3.frameCount),
+        count7 = Number(box3.duration),
+        count8 = Number(box3.width),
+        count9 = Number(box3.height),
+        value111 = { videoMetaSrc: videoMetaSrc };
+      if (Number.isFinite(count5) && count5 > 0) value111.videoFps = count5;
+      if (Number.isFinite(count6) && count6 > 0) value111.videoFrameCount = Math.round(count6);
+      if (Number.isFinite(count7) && count7 > 0) value111.videoDuration = count7;
+      if (Number.isFinite(count8) && count8 > 0) value111.videoWidth = Math.round(count8);
+      if (Number.isFinite(count9) && count9 > 0) value111.videoHeight = Math.round(count9);
+      const enabled34 = appStore.getState().nodes[this.id];
+      if (!enabled34) return;
+      const value112 =
+        String(enabled34.videoMetaSrc || '') !== String(value111.videoMetaSrc || '') ||
+        Number(enabled34.videoFps || 0) !== Number(value111.videoFps || 0) ||
+        Number(enabled34.videoFrameCount || 0) !== Number(value111.videoFrameCount || 0) ||
+        Number(enabled34.videoDuration || 0) !== Number(value111.videoDuration || 0) ||
+        Number(enabled34.videoWidth || 0) !== Number(value111.videoWidth || 0) ||
+        Number(enabled34.videoHeight || 0) !== Number(value111.videoHeight || 0);
+      if (value112) appStore.updateNodeData(this.id, value111);
     } catch {}
   }
   ['_scheduleMaybeEnsureVideoThumb']() {
@@ -1195,120 +1182,120 @@ export class SourceVideoNode {
       ((this._idleVideoThumbCancel = null), void this._maybeEnsureVideoThumb(this._data));
     });
   }
-  async ['_maybeEnsureVideoThumb'](_0x41ccc7) {
-    const _0x585a95 = this._resolveVideoMetaSrc(_0x41ccc7);
-    if (!_0x585a95) return;
-    const _0x257b68 = appStore.getState().nodes[this.id];
-    if (!_0x257b68) return;
-    const _0x1ad733 = String(_0x257b68.videoThumbSrc || ''),
-      _0x1492a2 = !!String(_0x257b68.thumbUrl || '').trim();
-    if (_0x1492a2 && _0x1ad733 === _0x585a95) return;
+  async ['_maybeEnsureVideoThumb'](value113) {
+    const videoThumbSrc = this._resolveVideoMetaSrc(value113);
+    if (!videoThumbSrc) return;
+    const enabled35 = appStore.getState().nodes[this.id];
+    if (!enabled35) return;
+    const enabled36 = String(enabled35.videoThumbSrc || ''),
+      value114 = !!String(enabled35.thumbUrl || '').trim();
+    if (value114 && enabled36 === videoThumbSrc) return;
     if (
-      _0x1ad733 === _0x585a95 &&
-      ['waiting', 'processing'].includes(String(_0x257b68.mediaTaskStatus || '')) &&
-      ['videoFirstFrame', 'videoPoster'].includes(String(_0x257b68.mediaTaskKind || ''))
+      enabled36 === videoThumbSrc &&
+      ['waiting', 'processing'].includes(String(enabled35.mediaTaskStatus || '')) &&
+      ['videoFirstFrame', 'videoPoster'].includes(String(enabled35.mediaTaskKind || ''))
     )
       return;
-    if (_0x1ad733 && _0x1ad733 !== _0x585a95)
-      appStore.updateNodeData(this.id, { videoThumbSrc: _0x585a95, thumbUrl: null });
-    else !_0x1ad733 && appStore.updateNodeData(this.id, { videoThumbSrc: _0x585a95 });
-    const _0x43d3ea = ++this._thumbFetchToken;
+    if (enabled36 && enabled36 !== videoThumbSrc)
+      appStore.updateNodeData(this.id, { videoThumbSrc: videoThumbSrc, thumbUrl: null });
+    else !enabled36 && appStore.updateNodeData(this.id, { videoThumbSrc: videoThumbSrc });
+    const value115 = ++this._thumbFetchToken;
     try {
-      const _0x41db1b = await fetchVideoFirstFrameThumbFromServer(_0x585a95, {
+      const response4 = await fetchVideoFirstFrameThumbFromServer(videoThumbSrc, {
         nodeId: this.id,
-        assetId: String(_0x257b68.assetId || ''),
+        assetId: String(enabled35.assetId || ''),
       });
-      if (_0x43d3ea !== this._thumbFetchToken) return;
-      if (!_0x41db1b || _0x41db1b.success === false) return;
-      const _0x3c5b0b = String(_0x41db1b.thumbUrl || _0x41db1b.url || '').trim();
-      if (!_0x3c5b0b) return;
-      const _0x52e108 = appStore.getState().nodes[this.id];
-      if (!_0x52e108) return;
-      const _0x1f12ee =
-        String(_0x52e108.videoThumbSrc || '') !== String(_0x585a95 || '') ||
-        String(_0x52e108.thumbUrl || '') !== _0x3c5b0b;
-      _0x1f12ee && appStore.updateNodeData(this.id, { videoThumbSrc: _0x585a95, thumbUrl: _0x3c5b0b });
+      if (value115 !== this._thumbFetchToken) return;
+      if (!response4 || response4.success === false) return;
+      const thumbUrl = String(response4.thumbUrl || response4.url || '').trim();
+      if (!thumbUrl) return;
+      const enabled37 = appStore.getState().nodes[this.id];
+      if (!enabled37) return;
+      const value116 =
+        String(enabled37.videoThumbSrc || '') !== String(videoThumbSrc || '') ||
+        String(enabled37.thumbUrl || '') !== thumbUrl;
+      value116 && appStore.updateNodeData(this.id, { videoThumbSrc: videoThumbSrc, thumbUrl: thumbUrl });
     } catch {}
   }
   ['_getBaseDuration']() {
-    const _0x3ed3d5 = this._video;
-    if (!_0x3ed3d5) return 0;
-    const _0x3fb73b = Number(_0x3ed3d5.duration);
-    if (Number.isFinite(_0x3fb73b) && _0x3fb73b > 0) return _0x3fb73b;
-    const _0x504c7c = _0x3ed3d5.seekable;
-    if (_0x504c7c && _0x504c7c.length) {
-      const _0x2f8fbb = Number(_0x504c7c.end(_0x504c7c.length - 1));
-      if (Number.isFinite(_0x2f8fbb) && _0x2f8fbb > 0) return _0x2f8fbb;
+    const enabled38 = this._video;
+    if (!enabled38) return 0;
+    const count10 = Number(enabled38.duration);
+    if (Number.isFinite(count10) && count10 > 0) return count10;
+    const list4 = enabled38.seekable;
+    if (list4 && list4.length) {
+      const count11 = Number(list4.end(list4.length - 1));
+      if (Number.isFinite(count11) && count11 > 0) return count11;
     }
     return 0;
   }
-  ['_getClipRange'](_0x343ad5) {
-    const _0x26c3fb = Number(_0x343ad5);
-    if (!Number.isFinite(_0x26c3fb) || _0x26c3fb <= 0) return { active: false, start: 0, end: 0 };
-    const _0x5f1a7b = Number(this._data?.clipStart),
-      _0x5f48a1 = Number(this._data?.clipEnd);
-    if (!Number.isFinite(_0x5f1a7b) || !Number.isFinite(_0x5f48a1) || !(_0x5f48a1 > _0x5f1a7b))
-      return { active: false, start: 0, end: _0x26c3fb };
-    const _0x413135 = Math.max(0, Math.min(_0x26c3fb, _0x5f1a7b)),
-      _0x3917b0 = Math.max(0, Math.min(_0x26c3fb, _0x5f48a1));
-    if (!(_0x3917b0 > _0x413135)) return { active: false, start: 0, end: _0x26c3fb };
-    return { active: true, start: _0x413135, end: _0x3917b0 };
+  ['_getClipRange'](value117) {
+    const end = Number(value117);
+    if (!Number.isFinite(end) || end <= 0) return { active: false, start: 0, end: 0 };
+    const value118 = Number(this._data?.clipStart),
+      value119 = Number(this._data?.clipEnd);
+    if (!Number.isFinite(value118) || !Number.isFinite(value119) || !(value119 > value118))
+      return { active: false, start: 0, end: end };
+    const start = Math.max(0, Math.min(end, value118)),
+      end2 = Math.max(0, Math.min(end, value119));
+    if (!(end2 > start)) return { active: false, start: 0, end: end };
+    return { active: true, start: start, end: end2 };
   }
-  ['_setManualLoopPlayback'](_0x1a39fb) {
-    this._isManualLoopPlayback = _0x1a39fb === true;
+  ['_setManualLoopPlayback'](value120) {
+    this._isManualLoopPlayback = value120 === true;
     if (!this._video) return;
     if (!this._isManualLoopPlayback) {
       this._video.loop = false;
       return;
     }
-    const _0xfc1710 = this._getClipRange(this._getBaseDuration());
-    this._video.loop = !_0xfc1710.active;
+    const enabled39 = this._getClipRange(this._getBaseDuration());
+    this._video.loop = !enabled39.active;
   }
   ['_shouldKeepHoverPlaybackOnManualClick']() {
     if (!this._video) return false;
     if (!this._isHovered || this._isManualControl || this._hoverManualPause) return false;
     if (this._video.paused) return false;
-    const _0x11f0d3 = Number(this._video.currentTime || 0);
-    return !(_0x11f0d3 > 0.05);
+    const count12 = Number(this._video.currentTime || 0);
+    return !(count12 > 0.05);
   }
   ['_toggleManualPlayback']({ loop: loop = false, forcePlay: forcePlay = false } = {}) {
     if (!this._currentSrc) return;
-    const _0x391fd3 = this._ensureVideoElement();
-    if (!_0x391fd3) return;
+    const enabled40 = this._ensureVideoElement();
+    if (!enabled40) return;
     ((this._isManualControl = true), this._autoPlayToken++);
-    if (_0x391fd3.paused || forcePlay === true) {
+    if (enabled40.paused || forcePlay === true) {
       ((this._hoverManualPause = false), this._setManualLoopPlayback(loop === true));
-      const _0x28ba64 = this._getBaseDuration(),
-        _0x119676 = this._getClipRange(_0x28ba64);
-      if (_0x119676.active) {
-        const _0x3f0cb7 = _0x391fd3.currentTime || 0;
-        if (_0x3f0cb7 < _0x119676.start || _0x3f0cb7 > _0x119676.end) _0x391fd3.currentTime = _0x119676.start;
+      const value121 = this._getBaseDuration(),
+        value122 = this._getClipRange(value121);
+      if (value122.active) {
+        const value123 = enabled40.currentTime || 0;
+        if (value123 < value122.start || value123 > value122.end) enabled40.currentTime = value122.start;
       }
-      void this._playVideoWithRecovery('manual', () => this._isManualControl).then((_0x5e9ec5) => {
-        _0x5e9ec5 ? this._flashCenterIndicator('play') : this._setManualLoopPlayback(false);
+      void this._playVideoWithRecovery('manual', () => this._isManualControl).then((value124) => {
+        value124 ? this._flashCenterIndicator('play') : this._setManualLoopPlayback(false);
       });
     } else
       ((this._hoverManualPause = true),
         this._setManualLoopPlayback(false),
-        _0x391fd3.pause(),
+        enabled40.pause(),
         this._flashCenterIndicator('pause'));
   }
-  ['_getPlaybackLabel'](_0x4ca9d5 = 'preview') {
-    return 'source-video:' + this.id + ':' + _0x4ca9d5;
+  ['_getPlaybackLabel'](value125 = 'preview') {
+    return 'source-video:' + this.id + ':' + value125;
   }
   async ['_openFullscreenFromCurrentVideo']() {
-    const _0x37acce = this._ensureVideoElement();
-    if (!_0x37acce) return;
-    const _0x3c5726 = getVideoCurrentSource(_0x37acce) || this._currentSrc;
-    if (!_0x3c5726) return;
-    !getVideoCurrentSource(_0x37acce) &&
-      (await attachMediaElementPlaybackSource(_0x37acce, _0x3c5726, {
+    const controls = this._ensureVideoElement();
+    if (!controls) return;
+    const videoCurrentSource = getVideoCurrentSource(controls) || this._currentSrc;
+    if (!videoCurrentSource) return;
+    !getVideoCurrentSource(controls) &&
+      (await attachMediaElementPlaybackSource(controls, videoCurrentSource, {
         preload: 'auto',
         warmRanges: false,
         load: false,
       }));
-    const _0x137112 = document.createElement('div');
-    Object.assign(_0x137112.style, {
+    const el10 = document.createElement('div');
+    Object.assign(el10.style, {
       position: 'fixed',
       inset: '0',
       background: 'var(--overlay-dim)',
@@ -1318,32 +1305,32 @@ export class SourceVideoNode {
       justifyContent: 'center',
       cursor: 'zoom-out',
     });
-    const _0x2efffa = _0x37acce.parentNode,
-      _0x4d5b45 = _0x37acce.nextSibling,
-      _0x35eb3c = this._isManualControl,
-      _0x13ac84 = this._hoverManualPause,
-      _0x21f669 = {
-        controls: _0x37acce.controls,
-        loop: _0x37acce.loop,
-        muted: _0x37acce.muted,
-        position: _0x37acce.style.position,
-        inset: _0x37acce.style.inset,
-        width: _0x37acce.style.width,
-        height: _0x37acce.style.height,
-        maxWidth: _0x37acce.style.maxWidth,
-        maxHeight: _0x37acce.style.maxHeight,
-        objectFit: _0x37acce.style.objectFit,
-        borderRadius: _0x37acce.style.borderRadius,
-        margin: _0x37acce.style.margin,
-        pointerEvents: _0x37acce.style.pointerEvents,
-        boxShadow: _0x37acce.style.boxShadow,
+    const el11 = controls.parentNode,
+      value126 = controls.nextSibling,
+      value127 = this._isManualControl,
+      value128 = this._hoverManualPause,
+      position = {
+        controls: controls.controls,
+        loop: controls.loop,
+        muted: controls.muted,
+        position: controls.style.position,
+        inset: controls.style.inset,
+        width: controls.style.width,
+        height: controls.style.height,
+        maxWidth: controls.style.maxWidth,
+        maxHeight: controls.style.maxHeight,
+        objectFit: controls.style.objectFit,
+        borderRadius: controls.style.borderRadius,
+        margin: controls.style.margin,
+        pointerEvents: controls.style.pointerEvents,
+        boxShadow: controls.style.boxShadow,
       };
     ((this._isManualControl = true),
       (this._hoverManualPause = false),
-      (_0x37acce.controls = true),
-      (_0x37acce.loop = true),
-      (_0x37acce.muted = !!this._isMuted),
-      Object.assign(_0x37acce.style, {
+      (controls.controls = true),
+      (controls.loop = true),
+      (controls.muted = !!this._isMuted),
+      Object.assign(controls.style, {
         position: 'static',
         inset: '',
         width: 'auto',
@@ -1356,68 +1343,68 @@ export class SourceVideoNode {
         pointerEvents: 'auto',
         boxShadow: '0 0 50px var(--black-80)',
       }),
-      attachVideoPlaybackRecovery(_0x37acce, {
+      attachVideoPlaybackRecovery(controls, {
         label: this._getPlaybackLabel('fullscreen'),
         minBufferAhead: 0.5,
         readyTimeoutMs: 0x15e,
         recoveryDebounceMs: 150,
         recoveryCooldownMs: 0x1f4,
-        shouldRecover: () => _0x37acce.isConnected !== false && !_0x37acce.paused,
+        shouldRecover: () => controls.isConnected !== false && !controls.paused,
       }));
-    let _0x4347f9 = false;
-    const _0x56b80e = () => {
-      if (_0x4347f9) return;
-      _0x4347f9 = true;
+    let value129 = false;
+    const run6 = () => {
+      if (value129) return;
+      value129 = true;
       try {
-        _0x37acce.pause();
+        controls.pause();
       } catch {}
-      ((_0x37acce.controls = _0x21f669.controls),
-        (_0x37acce.loop = _0x21f669.loop),
-        (_0x37acce.muted = _0x21f669.muted),
-        Object.assign(_0x37acce.style, {
-          position: _0x21f669.position,
-          inset: _0x21f669.inset,
-          width: _0x21f669.width,
-          height: _0x21f669.height,
-          maxWidth: _0x21f669.maxWidth,
-          maxHeight: _0x21f669.maxHeight,
-          objectFit: _0x21f669.objectFit,
-          borderRadius: _0x21f669.borderRadius,
-          margin: _0x21f669.margin,
-          pointerEvents: _0x21f669.pointerEvents,
-          boxShadow: _0x21f669.boxShadow,
+      ((controls.controls = position.controls),
+        (controls.loop = position.loop),
+        (controls.muted = position.muted),
+        Object.assign(controls.style, {
+          position: position.position,
+          inset: position.inset,
+          width: position.width,
+          height: position.height,
+          maxWidth: position.maxWidth,
+          maxHeight: position.maxHeight,
+          objectFit: position.objectFit,
+          borderRadius: position.borderRadius,
+          margin: position.margin,
+          pointerEvents: position.pointerEvents,
+          boxShadow: position.boxShadow,
         }));
-      if (_0x2efffa) _0x2efffa.insertBefore(_0x37acce, _0x4d5b45);
-      (_0x137112.remove(),
-        (this._isManualControl = _0x35eb3c),
-        (this._hoverManualPause = _0x13ac84),
+      if (el11) el11.insertBefore(controls, value126);
+      (el10.remove(),
+        (this._isManualControl = value127),
+        (this._hoverManualPause = value128),
         this._attachPlaybackRecovery());
     };
-    (_0x137112.addEventListener('click', (_0xd28ca6) => {
-      if (_0xd28ca6.target === _0x137112) _0x56b80e();
+    (el10.addEventListener('click', (event13) => {
+      if (event13.target === el10) run6();
     }),
-      _0x137112.appendChild(_0x37acce),
-      document.body.appendChild(_0x137112),
-      void playVideoWithRecovery(_0x37acce, {
+      el10.appendChild(controls),
+      document.body.appendChild(el10),
+      void playVideoWithRecovery(controls, {
         label: this._getPlaybackLabel('fullscreen'),
         minBufferAhead: 0.5,
         readyTimeoutMs: 0x15e,
         recoveryDebounceMs: 150,
         recoveryCooldownMs: 0x1f4,
-        shouldRecover: () => _0x37acce.isConnected !== false && !_0x37acce.paused,
+        shouldRecover: () => controls.isConnected !== false && !controls.paused,
       }));
   }
   async ['_ensurePlaybackVideoSrc']({ forPlayback: forPlayback = false } = {}) {
-    const _0x58d922 = this._ensureVideoElement();
-    if (!_0x58d922) return false;
-    if (getVideoCurrentSource(_0x58d922))
-      return (forPlayback && _0x58d922.preload !== 'auto' && (_0x58d922.preload = 'auto'), true);
-    const _0x50ebc0 = String(this._currentSrc || this._resolveVideoSrc(this._data) || '').trim();
-    if (!_0x50ebc0) return false;
-    this._currentSrc = _0x50ebc0;
-    if (this._currentSrc !== _0x50ebc0) return false;
+    const enabled41 = this._ensureVideoElement();
+    if (!enabled41) return false;
+    if (getVideoCurrentSource(enabled41))
+      return (forPlayback && enabled41.preload !== 'auto' && (enabled41.preload = 'auto'), true);
+    const enabled42 = String(this._currentSrc || this._resolveVideoSrc(this._data) || '').trim();
+    if (!enabled42) return false;
+    this._currentSrc = enabled42;
+    if (this._currentSrc !== enabled42) return false;
     return (
-      await attachMediaElementPlaybackSource(_0x58d922, _0x50ebc0, {
+      await attachMediaElementPlaybackSource(enabled41, enabled42, {
         preload: forPlayback ? 'auto' : SOURCE_VIDEO_POSTER_PRELOAD,
         warmRanges: false,
         load: forPlayback || (!forPlayback && !isDesktopRenderer()),
@@ -1425,49 +1412,49 @@ export class SourceVideoNode {
       true
     );
   }
-  ['_attachPlaybackRecovery'](_0x1d6540 = 'preview') {
+  ['_attachPlaybackRecovery'](value130 = 'preview') {
     if (!this._video) return null;
-    const _0xc4c614 = _0x1d6540 === 'hover' || _0x1d6540 === 'fullscreen';
+    const minBufferAhead = value130 === 'hover' || value130 === 'fullscreen';
     return attachVideoPlaybackRecovery(this._video, {
-      label: this._getPlaybackLabel(_0x1d6540),
+      label: this._getPlaybackLabel(value130),
       ensureSrc: () => this._ensurePlaybackVideoSrc({ forPlayback: true }),
-      minBufferAhead: _0xc4c614 ? 0.5 : undefined,
-      readyTimeoutMs: _0xc4c614 ? 0x15e : undefined,
-      recoveryDebounceMs: _0xc4c614 ? 150 : undefined,
-      recoveryCooldownMs: _0xc4c614 ? 0x1f4 : undefined,
+      minBufferAhead: minBufferAhead ? 0.5 : undefined,
+      readyTimeoutMs: minBufferAhead ? 0x15e : undefined,
+      recoveryDebounceMs: minBufferAhead ? 150 : undefined,
+      recoveryCooldownMs: minBufferAhead ? 0x1f4 : undefined,
       shouldRecover: () =>
         this._video?.isConnected !== false &&
         (this._isHovered || this._isManualControl || !this._video?.paused),
     });
   }
-  async ['_playVideoWithRecovery'](_0x553876, _0x6d200) {
-    const _0x4b5467 = this._ensureVideoElement();
-    if (!_0x4b5467) return false;
+  async ['_playVideoWithRecovery'](minBufferAhead2, shouldContinue) {
+    const enabled43 = this._ensureVideoElement();
+    if (!enabled43) return false;
     return (
-      this._attachPlaybackRecovery(_0x553876),
-      playVideoWithRecovery(_0x4b5467, {
-        label: this._getPlaybackLabel(_0x553876),
+      this._attachPlaybackRecovery(minBufferAhead2),
+      playVideoWithRecovery(enabled43, {
+        label: this._getPlaybackLabel(minBufferAhead2),
         ensureSrc: () => this._ensurePlaybackVideoSrc({ forPlayback: true }),
-        minBufferAhead: _0x553876 === 'hover' ? 0.5 : undefined,
-        readyTimeoutMs: _0x553876 === 'hover' ? 0x15e : undefined,
-        recoveryDebounceMs: _0x553876 === 'hover' ? 150 : undefined,
-        recoveryCooldownMs: _0x553876 === 'hover' ? 0x1f4 : undefined,
+        minBufferAhead: minBufferAhead2 === 'hover' ? 0.5 : undefined,
+        readyTimeoutMs: minBufferAhead2 === 'hover' ? 0x15e : undefined,
+        recoveryDebounceMs: minBufferAhead2 === 'hover' ? 150 : undefined,
+        recoveryCooldownMs: minBufferAhead2 === 'hover' ? 0x1f4 : undefined,
         shouldRecover: () =>
           this._video?.isConnected !== false &&
           (this._isHovered || this._isManualControl || !this._video?.paused),
-        shouldContinue: _0x6d200,
+        shouldContinue: shouldContinue,
       })
     );
   }
-  ['_loadVideo'](_0x13664b) {
-    const _0x4251bc = String(_0x13664b || '').trim();
+  ['_loadVideo'](value131) {
+    const enabled44 = String(value131 || '').trim();
     if (this._rendererMediaDeferred === true) {
-      ((this._currentSrc = _0x4251bc), this._applyVideoPoster(this._data));
+      ((this._currentSrc = enabled44), this._applyVideoPoster(this._data));
       return;
     }
     this._setManualLoopPlayback(false);
-    const _0x3ea479 = this._applyVideoPoster(this._data);
-    if (!_0x4251bc) {
+    const enabled45 = this._applyVideoPoster(this._data);
+    if (!enabled44) {
       this._idleVideoThumbCancel && (this._idleVideoThumbCancel(), (this._idleVideoThumbCancel = null));
       ((this._loadVideoToken = null), this._releaseActiveCapturePreviewUrl());
       this._video &&
@@ -1485,17 +1472,19 @@ export class SourceVideoNode {
       if (this._uploadBtn) this._uploadBtn.disabled = !!this._data?.isGenerating;
       return;
     }
-    const _0x20470e = this._getCapturePreviewUrl(this._data);
-    if (_0x4251bc === _0x20470e) this._adoptCapturePreviewUrl(_0x4251bc);
+    const value132 = this._getCapturePreviewUrl(this._data);
+    if (enabled44 === value132) this._adoptCapturePreviewUrl(enabled44);
     else this._activeCapturePreviewUrl && this._releaseActiveCapturePreviewUrl();
-    this._currentSrc = _0x4251bc;
-    if (_0x3ea479) {
+    this._currentSrc = enabled44;
+    if (enabled45) {
       this._idleVideoThumbCancel && (this._idleVideoThumbCancel(), (this._idleVideoThumbCancel = null));
       this._loadVideoToken = null;
       if (this._video) {
         ((this._video.onloadeddata = null), (this._video.onerror = null));
-        const _0x480cda = getVideoCurrentSource(this._video);
-        (_0x480cda && _0x480cda !== _0x4251bc && this._clearVideoElementSource({ load: false }),
+        const videoCurrentSource2 = getVideoCurrentSource(this._video);
+        (videoCurrentSource2 &&
+          videoCurrentSource2 !== enabled44 &&
+          this._clearVideoElementSource({ load: false }),
           (this._video.preload = 'none'),
           this._syncVideoElementFrameVisibility({ forceHidden: true }));
       }
@@ -1509,12 +1498,12 @@ export class SourceVideoNode {
       if (this._hint) this._hint.style.display = 'block';
       return;
     }
-    let _0x3392dd = false;
-    const _0x2d064d = () => {
-      if (_0x3392dd || this._currentSrc !== _0x4251bc) return;
-      ((_0x3392dd = true), stopLoading(this._card), this._clearMediaUnavailableAfterPlayback(_0x4251bc));
+    let value133 = false;
+    const run7 = () => {
+      if (value133 || this._currentSrc !== enabled44) return;
+      ((value133 = true), stopLoading(this._card), this._clearMediaUnavailableAfterPlayback(enabled44));
       this._activeCapturePreviewUrl &&
-        this._activeCapturePreviewUrl !== _0x4251bc &&
+        this._activeCapturePreviewUrl !== enabled44 &&
         this._releaseActiveCapturePreviewUrl();
       ((this._controls.style.opacity = '1'), (this._muteBtn.style.display = 'flex'));
       this._centerIndicator &&
@@ -1527,13 +1516,13 @@ export class SourceVideoNode {
       this._loadVideoToken = null;
       this._video && getVideoCurrentSource(this._video) && this._clearVideoElementSource();
       this._video &&
-        ((this._video.onloadeddata = _0x2d064d),
+        ((this._video.onloadeddata = run7),
         (this._video.onerror = () => {
-          if (this._currentSrc === _0x4251bc) stopLoading(this._card);
+          if (this._currentSrc === enabled44) stopLoading(this._card);
         }),
         (this._video.preload = 'none'),
         this._syncVideoElementFrameVisibility({ forceHidden: true }));
-      (this._syncPosterFrameVisibility({ force: !!_0x3ea479 }),
+      (this._syncPosterFrameVisibility({ force: !!enabled45 }),
         (this._controls.style.opacity = '1'),
         (this._muteBtn.style.display = 'flex'));
       this._centerIndicator &&
@@ -1542,71 +1531,71 @@ export class SourceVideoNode {
       (stopLoading(this._card), this._scheduleMaybeEnsureVideoThumb(), this._attachPlaybackRecovery());
       return;
     }
-    const _0x1c3a96 = this._ensureVideoElement();
-    if (!_0x1c3a96) {
+    const el12 = this._ensureVideoElement();
+    if (!el12) {
       stopLoading(this._card);
       return;
     }
-    ((_0x1c3a96.onloadeddata = _0x2d064d),
-      (_0x1c3a96.onerror = () => {
-        if (this._currentSrc === _0x4251bc) stopLoading(this._card);
+    ((el12.onloadeddata = run7),
+      (el12.onerror = () => {
+        if (this._currentSrc === enabled44) stopLoading(this._card);
       }),
       startLoading(this._card, { variant: 'static' }),
-      (_0x1c3a96.style.display = 'block'),
+      (el12.style.display = 'block'),
       this._syncVideoElementFrameVisibility(),
       this._setPosterFrameVisible(false),
       (this._controls.style.opacity = '0'),
       (this._muteBtn.style.display = 'none'));
     if (this._centerIndicator) this._centerIndicator.style.display = 'none';
-    const _0x1cf916 = {};
-    this._loadVideoToken = _0x1cf916;
-    const _0x2c6b4a = () => {
-      if (!this._video || this._loadVideoToken !== _0x1cf916 || this._currentSrc !== _0x4251bc) return;
-      ((this._video.preload = 'auto'), (this._video.src = _0x4251bc));
+    const value134 = {};
+    this._loadVideoToken = value134;
+    const run8 = () => {
+      if (!this._video || this._loadVideoToken !== value134 || this._currentSrc !== enabled44) return;
+      ((this._video.preload = 'auto'), (this._video.src = enabled44));
       try {
         this._video.load?.();
       } catch {}
-      if (Number(this._video.readyState || 0) >= 2) _0x2d064d();
+      if (Number(this._video.readyState || 0) >= 2) run7();
     };
-    (_0x2c6b4a(), this._attachPlaybackRecovery());
+    (run8(), this._attachPlaybackRecovery());
     if (this._hint) this._hint.style.display = 'block';
   }
-  ['_fmt'](_0x1f6ff1) {
-    if (!_0x1f6ff1 || isNaN(_0x1f6ff1)) return '0:00';
-    return Math.floor(_0x1f6ff1 / 60) + ':' + String(Math.floor(_0x1f6ff1 % 60)).padStart(2, '0');
+  ['_fmt'](enabled46) {
+    if (!enabled46 || isNaN(enabled46)) return '0:00';
+    return Math.floor(enabled46 / 60) + ':' + String(Math.floor(enabled46 % 60)).padStart(2, '0');
   }
-  ['_getNodeDuration'](_0x5cff46 = this._data) {
-    const _0x34a5cf = Number(_0x5cff46?.videoDuration || _0x5cff46?.duration || 0);
-    if (Number.isFinite(_0x34a5cf) && _0x34a5cf > 0) return _0x34a5cf;
-    const _0x4ab51c = Number(_0x5cff46?.videoFrameCount || _0x5cff46?.frameCount || 0),
-      _0xe38a36 = Number(_0x5cff46?.videoFps || _0x5cff46?.fps || 0);
-    if (Number.isFinite(_0x4ab51c) && _0x4ab51c > 0 && Number.isFinite(_0xe38a36) && _0xe38a36 > 0)
-      return _0x4ab51c / _0xe38a36;
+  ['_getNodeDuration'](value135 = this._data) {
+    const count13 = Number(value135?.videoDuration || value135?.duration || 0);
+    if (Number.isFinite(count13) && count13 > 0) return count13;
+    const count14 = Number(value135?.videoFrameCount || value135?.frameCount || 0),
+      count15 = Number(value135?.videoFps || value135?.fps || 0);
+    if (Number.isFinite(count14) && count14 > 0 && Number.isFinite(count15) && count15 > 0)
+      return count14 / count15;
     return 0;
   }
   ['_syncVideoDurationUi']() {
     if (!this._timeTotal) return;
-    const _0x2b163a = this._getBaseDuration() || this._getNodeDuration(this._data);
-    if (!_0x2b163a || !Number.isFinite(_0x2b163a)) return;
-    const _0x2d4c01 = this._getClipRange(_0x2b163a),
-      _0x258982 = _0x2d4c01.active ? Math.max(0, _0x2d4c01.end - _0x2d4c01.start) : _0x2b163a;
-    if (!_0x258982 || !Number.isFinite(_0x258982)) return;
-    this._timeTotal.textContent = this._fmt(_0x258982);
+    const enabled47 = this._getBaseDuration() || this._getNodeDuration(this._data);
+    if (!enabled47 || !Number.isFinite(enabled47)) return;
+    const value136 = this._getClipRange(enabled47),
+      enabled48 = value136.active ? Math.max(0, value136.end - value136.start) : enabled47;
+    if (!enabled48 || !Number.isFinite(enabled48)) return;
+    this._timeTotal.textContent = this._fmt(enabled48);
   }
-  ['_setCenterIndicatorIcon'](_0x1045b0) {
+  ['_setCenterIndicatorIcon'](value137) {
     if (!this._indicatorInner) return;
-    const _0x375596 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    (_0x375596.setAttribute('width', '28'),
-      _0x375596.setAttribute('height', '28'),
-      _0x375596.setAttribute('viewBox', '0 0 24 24'),
-      _0x375596.setAttribute('fill', 'currentColor'),
-      (_0x375596.style.color = 'var(--canvas-white)'),
-      _0x1045b0 === 'play'
-        ? (_0x375596.innerHTML = '<polygon points="6 4 20 12 6 20 6 4"></polygon>')
-        : (_0x375596.innerHTML =
+    const el13 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    (el13.setAttribute('width', '28'),
+      el13.setAttribute('height', '28'),
+      el13.setAttribute('viewBox', '0 0 24 24'),
+      el13.setAttribute('fill', 'currentColor'),
+      (el13.style.color = 'var(--canvas-white)'),
+      value137 === 'play'
+        ? (el13.innerHTML = '<polygon points="6 4 20 12 6 20 6 4"></polygon>')
+        : (el13.innerHTML =
             '<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>'),
       (this._indicatorInner.innerHTML = ''),
-      this._indicatorInner.appendChild(_0x375596));
+      this._indicatorInner.appendChild(el13));
   }
   ['_showPausedCenterIndicator']() {
     if (!this._indicatorInner) return;
@@ -1623,160 +1612,160 @@ export class SourceVideoNode {
       (this._indicatorInner.style.opacity = '0'),
       (this._indicatorInner.style.transform = 'scale(0.92)'));
   }
-  ['_flashCenterIndicator'](_0x125930) {
+  ['_flashCenterIndicator'](value138) {
     if (!this._indicatorInner) return;
     (this._centerIndicatorTimer &&
       (clearTimeout(this._centerIndicatorTimer), (this._centerIndicatorTimer = null)),
-      this._setCenterIndicatorIcon(_0x125930),
+      this._setCenterIndicatorIcon(value138),
       (this._indicatorInner.style.opacity = '1'),
       (this._indicatorInner.style.transform = 'scale(1)'),
       (this._centerIndicatorTimer = setTimeout(() => {
         if (!this._indicatorInner) return;
-        if (_0x125930 === 'pause') this._showPausedCenterIndicator();
+        if (value138 === 'pause') this._showPausedCenterIndicator();
         else this._hideCenterIndicator();
         this._centerIndicatorTimer = null;
       }, 0x208)));
   }
-  ['_updatePlayIcon'](_0x2b97a8) {
+  ['_updatePlayIcon'](value139) {
     if (!this._playBtn) return;
     this._playBtn.replaceChildren();
-    const _0x3743a5 = 'http://www.w3.org/2000/svg',
-      _0x364aaf = document.createElementNS(_0x3743a5, 'svg');
-    (_0x364aaf.setAttribute('width', '16'),
-      _0x364aaf.setAttribute('height', '16'),
-      _0x364aaf.setAttribute('viewBox', '0 0 24 24'),
-      _0x364aaf.setAttribute('fill', 'currentColor'));
-    if (_0x2b97a8) {
-      const _0x1b1942 = document.createElementNS(_0x3743a5, 'polygon');
-      (_0x1b1942.setAttribute('points', '5 3 19 12 5 21 5 3'), _0x364aaf.appendChild(_0x1b1942));
+    const value140 = 'http://www.w3.org/2000/svg',
+      el14 = document.createElementNS(value140, 'svg');
+    (el14.setAttribute('width', '16'),
+      el14.setAttribute('height', '16'),
+      el14.setAttribute('viewBox', '0 0 24 24'),
+      el14.setAttribute('fill', 'currentColor'));
+    if (value139) {
+      const el15 = document.createElementNS(value140, 'polygon');
+      (el15.setAttribute('points', '5 3 19 12 5 21 5 3'), el14.appendChild(el15));
     } else {
-      const _0x449141 = document.createElementNS(_0x3743a5, 'rect');
-      (_0x449141.setAttribute('x', '6'),
-        _0x449141.setAttribute('y', '4'),
-        _0x449141.setAttribute('width', '4'),
-        _0x449141.setAttribute('height', '16'));
-      const _0x19388d = document.createElementNS(_0x3743a5, 'rect');
-      (_0x19388d.setAttribute('x', '14'),
-        _0x19388d.setAttribute('y', '4'),
-        _0x19388d.setAttribute('width', '4'),
-        _0x19388d.setAttribute('height', '16'),
-        _0x364aaf.appendChild(_0x449141),
-        _0x364aaf.appendChild(_0x19388d));
+      const el16 = document.createElementNS(value140, 'rect');
+      (el16.setAttribute('x', '6'),
+        el16.setAttribute('y', '4'),
+        el16.setAttribute('width', '4'),
+        el16.setAttribute('height', '16'));
+      const el17 = document.createElementNS(value140, 'rect');
+      (el17.setAttribute('x', '14'),
+        el17.setAttribute('y', '4'),
+        el17.setAttribute('width', '4'),
+        el17.setAttribute('height', '16'),
+        el14.appendChild(el16),
+        el14.appendChild(el17));
     }
-    this._playBtn.appendChild(_0x364aaf);
+    this._playBtn.appendChild(el14);
   }
   async ['_captureFrame']() {
-    const _0x3ed9e7 = await this._ensurePlaybackVideoSrc();
-    if (!_0x3ed9e7 || !this._video) return;
+    const enabled49 = await this._ensurePlaybackVideoSrc();
+    if (!enabled49 || !this._video) return;
     await extractCurrentVideoFrameToImageNode({
       videoEl: this._video,
       anchorNodeId: this.id,
       fallbackDurationSec: this._getBaseDuration(),
-      onMissingMetadata: (_0x2e1920) => this._maybeFetchVideoMeta(_0x2e1920),
+      onMissingMetadata: (value141) => this._maybeFetchVideoMeta(value141),
       logPrefix: '[SourceVideoNode]',
     });
   }
-  ['_computeGenerationDuration'](_0x3c6a3e = this._data) {
-    if (!_0x3c6a3e) return 0;
-    if (typeof _0x3c6a3e.generationDuration === 'number') return _0x3c6a3e.generationDuration;
-    const _0x203b93 = Number(_0x3c6a3e.generationStartTime || 0);
-    if (!Number.isFinite(_0x203b93) || _0x203b93 <= 0) return 0;
-    return Math.max(0, Date.now() - _0x203b93);
+  ['_computeGenerationDuration'](enabled50 = this._data) {
+    if (!enabled50) return 0;
+    if (typeof enabled50.generationDuration === 'number') return enabled50.generationDuration;
+    const count16 = Number(enabled50.generationStartTime || 0);
+    if (!Number.isFinite(count16) || count16 <= 0) return 0;
+    return Math.max(0, Date.now() - count16);
   }
-  ['_isRunningHubRecoverableTask'](_0x53dd34 = this._data) {
-    if (!_0x53dd34 || typeof _0x53dd34 !== 'object') return false;
-    const _0x5a81e6 = String(_0x53dd34.rhTaskId || '').trim();
-    if (!_0x5a81e6) return false;
-    const _0x329b65 = String(_0x53dd34.rhTaskStatus || '')
+  ['_isRunningHubRecoverableTask'](enabled51 = this._data) {
+    if (!enabled51 || typeof enabled51 !== 'object') return false;
+    const enabled52 = String(enabled51.rhTaskId || '').trim();
+    if (!enabled52) return false;
+    const value142 = String(enabled51.rhTaskStatus || '')
       .trim()
       .toLowerCase();
-    if (['success', 'failed', 'idle', 'cancelled'].includes(_0x329b65)) return false;
-    return isRunningHubVideoTask(_0x53dd34);
+    if (['success', 'failed', 'idle', 'cancelled'].includes(value142)) return false;
+    return isRunningHubVideoTask(enabled51);
   }
-  ['_syncRunningHubVideoTaskState'](_0x53b16b = this._data) {
-    if (!_0x53b16b || typeof _0x53b16b !== 'object') return false;
-    const _0x288c35 = buildRunningHubVideoTerminalStatePatch(
-      _0x53b16b,
-      _0x53b16b.rhTaskStatus,
-      this._computeGenerationDuration(_0x53b16b),
+  ['_syncRunningHubVideoTaskState'](enabled53 = this._data) {
+    if (!enabled53 || typeof enabled53 !== 'object') return false;
+    const runningHubVideoTerminalStatePatch = buildRunningHubVideoTerminalStatePatch(
+      enabled53,
+      enabled53.rhTaskStatus,
+      this._computeGenerationDuration(enabled53),
     );
-    if (!_0x288c35) return false;
-    return (appStore.updateNodeData(this.id, _0x288c35), true);
+    if (!runningHubVideoTerminalStatePatch) return false;
+    return (appStore.updateNodeData(this.id, runningHubVideoTerminalStatePatch), true);
   }
-  ['_isAsyncRecoverableTask'](_0x2804b7 = this._data) {
-    if (!_0x2804b7 || typeof _0x2804b7 !== 'object') return false;
-    const _0x1b0246 = String(_0x2804b7.asyncTaskId || '').trim();
-    if (!_0x1b0246) return false;
-    const _0xe87727 = String(_0x2804b7.asyncTaskProvider || _0x2804b7.provider || '')
+  ['_isAsyncRecoverableTask'](enabled54 = this._data) {
+    if (!enabled54 || typeof enabled54 !== 'object') return false;
+    const enabled55 = String(enabled54.asyncTaskId || '').trim();
+    if (!enabled55) return false;
+    const enabled56 = String(enabled54.asyncTaskProvider || enabled54.provider || '')
       .trim()
       .toLowerCase();
-    if (!_0xe87727 || _0xe87727 === 'runninghubwf' || _0xe87727 === 'runninghub' || _0xe87727 === 'dreamina')
+    if (!enabled56 || enabled56 === 'runninghubwf' || enabled56 === 'runninghub' || enabled56 === 'dreamina')
       return false;
-    const _0x2eee49 = String(_0x2804b7.asyncTaskKind || '')
+    const value143 = String(enabled54.asyncTaskKind || '')
       .trim()
       .toLowerCase();
-    if (_0x2eee49 && _0x2eee49 !== 'video') return false;
-    const _0x480230 = String(_0x2804b7.asyncTaskStatus || '')
+    if (value143 && value143 !== 'video') return false;
+    const value144 = String(enabled54.asyncTaskStatus || '')
       .trim()
       .toLowerCase();
-    if (['success', 'failed', 'idle', 'cancelled'].includes(_0x480230)) return false;
+    if (['success', 'failed', 'idle', 'cancelled'].includes(value144)) return false;
     return true;
   }
-  ['_stopRunningHubRecovery'](_0x367081 = true) {
+  ['_stopRunningHubRecovery'](enabled57 = true) {
     try {
       this._rhResumeAbortController?.abort?.();
     } catch {}
     ((this._rhResumeAbortController = null), (this._rhResumePromise = null), (this._rhResumeTaskId = ''));
-    if (!_0x367081) return;
-    const _0x24487f = appStore.getState().nodes?.[this.id];
-    if (!_0x24487f || _0x24487f.rhTaskRecovering !== true) return;
+    if (!enabled57) return;
+    const enabled58 = appStore.getState().nodes?.[this.id];
+    if (!enabled58 || enabled58.rhTaskRecovering !== true) return;
     appStore.updateNodeData(this.id, { rhTaskRecovering: false });
   }
-  ['_stopAsyncRecovery'](_0x5a3b58 = true) {
+  ['_stopAsyncRecovery'](enabled59 = true) {
     try {
       this._asyncResumeAbortController?.abort?.();
     } catch {}
     ((this._asyncResumeAbortController = null),
       (this._asyncResumePromise = null),
       (this._asyncResumeTaskId = ''));
-    if (!_0x5a3b58) return;
-    const _0x54f297 = appStore.getState().nodes?.[this.id];
-    if (!_0x54f297 || _0x54f297.asyncTaskRecovering !== true) return;
+    if (!enabled59) return;
+    const enabled60 = appStore.getState().nodes?.[this.id];
+    if (!enabled60 || enabled60.asyncTaskRecovering !== true) return;
     appStore.updateNodeData(this.id, { asyncTaskRecovering: false });
   }
-  ['_extractFirstVideoUrl'](_0x28e3f1) {
-    const _0x1a1266 = new Set(),
-      _0x55b9d9 = (_0x4a2b39) => {
-        if (_0x4a2b39 == null) return '';
-        if (typeof _0x4a2b39 === 'string') {
-          const _0x4af949 = _0x4a2b39.trim();
-          if (!_0x4af949) return '';
+  ['_extractFirstVideoUrl'](value145) {
+    const map3 = new Set(),
+      handler9 = (value146) => {
+        if (value146 == null) return '';
+        if (typeof value146 === 'string') {
+          const enabled61 = value146.trim();
+          if (!enabled61) return '';
           if (
-            _0x4af949.startsWith('http://') ||
-            _0x4af949.startsWith('https://') ||
-            _0x4af949.startsWith('/')
+            enabled61.startsWith('http://') ||
+            enabled61.startsWith('https://') ||
+            enabled61.startsWith('/')
           )
-            return _0x4af949;
-          if (_0x4af949.startsWith('{') || _0x4af949.startsWith('['))
+            return enabled61;
+          if (enabled61.startsWith('{') || enabled61.startsWith('['))
             try {
-              return _0x55b9d9(JSON.parse(_0x4af949));
+              return handler9(JSON.parse(enabled61));
             } catch {
               return '';
             }
-          const _0x1555a3 = _0x4af949.match(/https?:\/\/[^\s"'<>]+/);
-          return _0x1555a3 && _0x1555a3[0] ? _0x1555a3[0] : '';
+          const value147 = enabled61.match(/https?:\/\/[^\s"'<>]+/);
+          return value147 && value147[0] ? value147[0] : '';
         }
-        if (typeof _0x4a2b39 !== 'object') return '';
-        if (_0x1a1266.has(_0x4a2b39)) return '';
-        _0x1a1266.add(_0x4a2b39);
-        if (Array.isArray(_0x4a2b39)) {
-          for (const _0x3d2f89 of _0x4a2b39) {
-            const _0xabf367 = _0x55b9d9(_0x3d2f89);
-            if (_0xabf367) return _0xabf367;
+        if (typeof value146 !== 'object') return '';
+        if (map3.has(value146)) return '';
+        map3.add(value146);
+        if (Array.isArray(value146)) {
+          for (const value148 of value146) {
+            const value149 = handler9(value148);
+            if (value149) return value149;
           }
           return '';
         }
-        const _0x386ea2 = [
+        const value150 = [
           'url',
           'videoUrl',
           'video_url',
@@ -1789,375 +1778,378 @@ export class SourceVideoNode {
           'results',
           'outputs',
         ];
-        for (const _0x5ee08b of _0x386ea2) {
-          const _0x230e9b = _0x55b9d9(_0x4a2b39[_0x5ee08b]);
-          if (_0x230e9b) return _0x230e9b;
+        for (const value151 of value150) {
+          const value152 = handler9(value146[value151]);
+          if (value152) return value152;
         }
         return '';
       };
-    return _0x55b9d9(_0x28e3f1);
+    return handler9(value145);
   }
-  ['_toLocalPathIfSameOrigin'](_0x4f3a2d) {
-    return urlToLocalPath(_0x4f3a2d);
+  ['_toLocalPathIfSameOrigin'](value153) {
+    return urlToLocalPath(value153);
   }
-  async ['_saveVideoToOutput'](_0x5e1434) {
-    const _0x1d766b = String(_0x5e1434 || '').trim();
-    if (!/^https?:\/\//i.test(_0x1d766b)) return this._toLocalPathIfSameOrigin(_0x1d766b);
-    let _0x5bf2e0 = '';
+  async ['_saveVideoToOutput'](value154) {
+    const url3 = String(value154 || '').trim();
+    if (!/^https?:\/\//i.test(url3)) return this._toLocalPathIfSameOrigin(url3);
+    let resultLocalPath = '';
     try {
-      const _0x3cdcbf = new AbortController(),
-        _0x5782d7 = setTimeout(() => _0x3cdcbf.abort(), 0x1d4c0);
-      let _0x377239 = null;
+      const signal = new AbortController(),
+        setTimeout5 = setTimeout(() => signal.abort(), 0x1d4c0);
+      let fetchRemoteBlob2 = null;
       try {
-        _0x377239 = await fetchRemoteBlob(_0x1d766b, { signal: _0x3cdcbf.signal });
+        fetchRemoteBlob2 = await fetchRemoteBlob(url3, { signal: signal.signal });
       } finally {
-        clearTimeout(_0x5782d7);
+        clearTimeout(setTimeout5);
       }
-      const _0x277017 = await saveOutputToServer(_0x377239, { ext: 'mp4' });
-      _0x277017?.success && (_0x5bf2e0 = pickResultLocalPath(_0x277017));
-    } catch (_0x24f61c) {
-      const _0x3cadff = _0x24f61c instanceof Error ? _0x24f61c.message : String(_0x24f61c || ''),
-        _0x2a9961 =
-          _0x3cadff.includes('Failed to fetch') ||
-          _0x3cadff.includes('NetworkError') ||
-          _0x3cadff.toLowerCase().includes('cors');
-      if (_0x2a9961) {
-        const _0x5213d8 = await saveOutputFromUrlToServer({ url: _0x1d766b, ext: 'mp4' });
-        _0x5bf2e0 = pickResultLocalPath(_0x5213d8);
+      const response5 = await saveOutputToServer(fetchRemoteBlob2, { ext: 'mp4' });
+      response5?.success && (resultLocalPath = pickResultLocalPath(response5));
+    } catch (error6) {
+      const list5 = error6 instanceof Error ? error6.message : String(error6 || ''),
+        value155 =
+          list5.includes('Failed to fetch') ||
+          list5.includes('NetworkError') ||
+          list5.toLowerCase().includes('cors');
+      if (value155) {
+        const server = await saveOutputFromUrlToServer({ url: url3, ext: 'mp4' });
+        resultLocalPath = pickResultLocalPath(server);
       }
     }
-    return _0x5bf2e0;
+    return resultLocalPath;
   }
-  async ['_buildRecoveredVideoResultPatch'](_0x37f33b) {
-    let _0x1eee48 = buildCanvasLocalVideoFields(_0x37f33b);
-    if (_0x1eee48.src && _0x1eee48.localPath) return _0x1eee48;
-    const _0x22dede = this._extractFirstVideoUrl(_0x37f33b);
-    if (!_0x22dede) throw new Error(sourceVideoText('recovery.noOutputVideoUrl'));
-    const _0x468689 = this._toLocalPathIfSameOrigin(_0x22dede) || (await this._saveVideoToOutput(_0x22dede));
-    _0x1eee48 = buildCanvasLocalVideoFields({ localPath: _0x468689, videoUrl: _0x22dede });
-    if (!_0x1eee48.src || !_0x1eee48.localPath) throw new Error(sourceVideoText('recovery.noOutputVideoUrl'));
-    return _0x1eee48;
+  async ['_buildRecoveredVideoResultPatch'](value156) {
+    let canvasLocalVideoFields = buildCanvasLocalVideoFields(value156);
+    if (canvasLocalVideoFields.src && canvasLocalVideoFields.localPath) return canvasLocalVideoFields;
+    const videoUrl = this._extractFirstVideoUrl(value156);
+    if (!videoUrl) throw new Error(sourceVideoText('recovery.noOutputVideoUrl'));
+    const localPath4 = this._toLocalPathIfSameOrigin(videoUrl) || (await this._saveVideoToOutput(videoUrl));
+    canvasLocalVideoFields = buildCanvasLocalVideoFields({ localPath: localPath4, videoUrl: videoUrl });
+    if (!canvasLocalVideoFields.src || !canvasLocalVideoFields.localPath)
+      throw new Error(sourceVideoText('recovery.noOutputVideoUrl'));
+    return canvasLocalVideoFields;
   }
-  ['_resolveAsyncResumePayload'](_0x4272d5) {
+  ['_resolveAsyncResumePayload'](value157) {
     return {
-      model: String(_0x4272d5?.model || '').trim(),
-      provider: String(_0x4272d5?.asyncTaskProvider || _0x4272d5?.provider || '').trim(),
+      model: String(value157?.model || '').trim(),
+      provider: String(value157?.asyncTaskProvider || value157?.provider || '').trim(),
     };
   }
   ['_maybeResumeRunningHubTask']() {
-    const _0x1c0862 = appStore.getState().nodes?.[this.id] || this._data;
-    if (!this._isRunningHubRecoverableTask(_0x1c0862)) {
+    const value158 = appStore.getState().nodes?.[this.id] || this._data;
+    if (!this._isRunningHubRecoverableTask(value158)) {
       this._stopRunningHubRecovery(true);
       return;
     }
-    const _0x13142f = String(_0x1c0862?.rhTaskId || '').trim();
-    if (!_0x13142f) return;
-    if (this._rhResumePromise && this._rhResumeTaskId === _0x13142f) return;
-    const _0x51c154 = Number(_0x1c0862?.rhTaskStartedAt || _0x1c0862?.generationStartTime || 0) || Date.now(),
-      _0x3eb6c6 = String(_0x1c0862?.model || '')
+    const taskId = String(value158?.rhTaskId || '').trim();
+    if (!taskId) return;
+    if (this._rhResumePromise && this._rhResumeTaskId === taskId) return;
+    const startedAt2 = Number(value158?.rhTaskStartedAt || value158?.generationStartTime || 0) || Date.now(),
+      value159 = String(value158?.model || '')
         .trim()
         .toLowerCase(),
-      _0x10988d = _0x1c0862?.rhTaskUseOpenapiQuery === true,
-      _0x800e77 = getVideoMattingModelId(),
-      _0x1e6e07 = _0x3eb6c6 === _0x800e77,
-      _0x61eaea = _0x1e6e07
-        ? { provider: 'runninghubwf', model: _0x800e77 }
+      rhTaskUseOpenapiQuery = value158?.rhTaskUseOpenapiQuery === true,
+      model = getVideoMattingModelId(),
+      value160 = value159 === model,
+      provider = value160
+        ? { provider: 'runninghubwf', model: model }
         : {
-            provider: String(_0x1c0862?.provider || 'runninghubwf').trim() || 'runninghubwf',
-            model: String(_0x1c0862?.model || '').trim(),
+            provider: String(value158?.provider || 'runninghubwf').trim() || 'runninghubwf',
+            model: String(value158?.model || '').trim(),
           },
-      _0x13f163 =
+      handler10 =
         typeof this._resumeRunningHubTaskPoller === 'function' ? this._resumeRunningHubTaskPoller : null,
-      _0x518a8a = new AbortController();
-    ((this._rhResumeAbortController = _0x518a8a), (this._rhResumeTaskId = _0x13142f));
-    const _0x380969 = (async () => {
+      signal2 = new AbortController();
+    ((this._rhResumeAbortController = signal2), (this._rhResumeTaskId = taskId));
+    const value161 = (async () => {
       try {
-        const _0x4ee1da = await resumeTask(
+        const response6 = await resumeTask(
           {
             sourceNodeId: this.id,
             targetNodeId: this.id,
             trigger: 'node',
             taskType: 'video-generation',
-            provider: _0x61eaea.provider || _0x1c0862?.provider || 'runninghubwf',
+            provider: provider.provider || value158?.provider || 'runninghubwf',
             adapterType: 'workflow',
-            modelId: _0x61eaea.model || _0x1c0862?.model || '',
-            executionId: 'runninghub.source-video.' + (_0x61eaea.model || _0x1c0862?.model || 'workflow'),
-            payload: _0x61eaea,
-            taskId: _0x13142f,
+            modelId: provider.model || value158?.model || '',
+            executionId: 'runninghub.source-video.' + (provider.model || value158?.model || 'workflow'),
+            payload: provider,
+            taskId: taskId,
             cancellable: false,
             resumable: true,
             pauseOnAbort: true,
             startBuilder: () => ({
               rhTaskStatus:
-                String(_0x1c0862?.rhTaskStatus || '')
+                String(value158?.rhTaskStatus || '')
                   .trim()
                   .toLowerCase() === 'pending'
                   ? 'pending'
                   : 'running',
-              rhTaskUseOpenapiQuery: _0x10988d,
+              rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery,
             }),
             poll: async () => {
-              if (_0x13f163)
-                return _0x13f163(_0x13142f, _0x1c0862, {
-                  signal: _0x518a8a.signal,
-                  payload: _0x61eaea,
-                  useOpenapiQuery: _0x10988d,
+              if (handler10)
+                return handler10(taskId, value158, {
+                  signal: signal2.signal,
+                  payload: provider,
+                  useOpenapiQuery: rhTaskUseOpenapiQuery,
                 });
-              if (_0x1e6e07)
-                return resumeRunningHubVideoTask(_0x13142f, _0x61eaea, {
-                  signal: _0x518a8a.signal,
-                  useOpenapiQuery: _0x10988d,
+              if (value160)
+                return resumeRunningHubVideoTask(taskId, provider, {
+                  signal: signal2.signal,
+                  useOpenapiQuery: rhTaskUseOpenapiQuery,
                 });
               await ensureConfig();
-              const _0x2c4e1d = getProviderConfig('runninghubwf'),
-                _0x3fbdd1 = String(_0x2c4e1d?.apiKey || '').trim();
-              if (!_0x3fbdd1) throw new Error(sourceVideoText('recovery.runninghubApiKeyMissing'));
+              const providerConfig = getProviderConfig('runninghubwf'),
+                apiKey = String(providerConfig?.apiKey || '').trim();
+              if (!apiKey) throw new Error(sourceVideoText('recovery.runninghubApiKeyMissing'));
               return resumeRunninghubWorkflowTask(
-                { apiKey: _0x3fbdd1, taskId: _0x13142f },
-                { signal: _0x518a8a.signal, useOpenapiQuery: _0x10988d },
+                { apiKey: apiKey, taskId: taskId },
+                { signal: signal2.signal, useOpenapiQuery: rhTaskUseOpenapiQuery },
               );
             },
-            resultBuilder: async (_0x59cfc8) => {
-              const _0x2ddab4 = appStore.getState().nodes?.[this.id] || {},
-                _0x50a5aa =
-                  resolveRunningHubVideoStatusName(_0x2ddab4, 'success') ||
-                  (_0x2ddab4?.name?.includes(sourceVideoText('result.hdVideo'))
+            resultBuilder: async (value162) => {
+              const error7 = appStore.getState().nodes?.[this.id] || {},
+                name =
+                  resolveRunningHubVideoStatusName(error7, 'success') ||
+                  (error7?.name?.includes(sourceVideoText('result.hdVideo'))
                     ? sourceVideoText('result.hdVideo')
-                    : _0x2ddab4?.name || sourceVideoText('result.defaultName'));
+                    : error7?.name || sourceVideoText('result.defaultName'));
               return {
-                ...(await this._buildRecoveredVideoResultPatch(_0x59cfc8)),
-                name: _0x50a5aa,
-                generationDuration: this._computeGenerationDuration(_0x2ddab4),
+                ...(await this._buildRecoveredVideoResultPatch(value162)),
+                name: name,
+                generationDuration: this._computeGenerationDuration(error7),
               };
             },
-            failureBuilder: (_0x2edfe6, _0x54d224) => {
-              const _0x15e5de =
-                  _0x2edfe6 instanceof Error
-                    ? _0x2edfe6.message
-                    : String(_0x2edfe6 || sourceVideoText('recovery.taskFailed')),
-                _0x4882b3 = appStore.getState().nodes?.[this.id] || {},
-                _0x567751 =
+            failureBuilder: (error8, startedAt3) => {
+              const error9 =
+                  error8 instanceof Error
+                    ? error8.message
+                    : String(error8 || sourceVideoText('recovery.taskFailed')),
+                value163 = appStore.getState().nodes?.[this.id] || {},
+                args5 =
                   buildRunningHubVideoTerminalStatePatch(
-                    _0x4882b3,
+                    value163,
                     'failed',
-                    this._computeGenerationDuration(_0x4882b3),
+                    this._computeGenerationDuration(value163),
                   ) || {},
-                _0x28488a = _0x567751.generationDuration ?? this._computeGenerationDuration(_0x4882b3);
+                duration2 = args5.generationDuration ?? this._computeGenerationDuration(value163);
               return {
-                ...buildSourceVideoRecoveryFailurePatch(_0x4882b3, {
-                  error: _0x15e5de,
-                  startedAt: _0x54d224.startedAt,
-                  duration: _0x28488a,
+                ...buildSourceVideoRecoveryFailurePatch(value163, {
+                  error: error9,
+                  startedAt: startedAt3.startedAt,
+                  duration: duration2,
                 }),
-                ..._0x567751,
-                generationDuration: _0x28488a,
+                ...args5,
+                generationDuration: duration2,
               };
             },
-            parseError: (_0x2863e6) =>
-              _0x2863e6 instanceof Error
-                ? _0x2863e6.message
-                : String(_0x2863e6 || sourceVideoText('recovery.taskFailed')),
+            parseError: (error10) =>
+              error10 instanceof Error
+                ? error10.message
+                : String(error10 || sourceVideoText('recovery.taskFailed')),
           },
-          { store: appStore, startedAt: _0x51c154, abortController: _0x518a8a },
+          { store: appStore, startedAt: startedAt2, abortController: signal2 },
         );
-        _0x4ee1da.status === 'success' && window._triggerLocalCacheSave?.();
-      } catch (_0x3ee998) {
-        if (_0x518a8a.signal.aborted || String(_0x3ee998?.message || '') === 'CANCELLED') return;
-        const _0x304372 =
-            _0x3ee998 instanceof Error
-              ? _0x3ee998.message
-              : String(_0x3ee998 || sourceVideoText('recovery.taskFailed')),
-          _0x3860c5 = appStore.getState().nodes?.[this.id];
-        if (!_0x3860c5) return;
-        const _0x31666f =
+        response6.status === 'success' && window._triggerLocalCacheSave?.();
+      } catch (error11) {
+        if (signal2.signal.aborted || String(error11?.message || '') === 'CANCELLED') return;
+        const error12 =
+            error11 instanceof Error
+              ? error11.message
+              : String(error11 || sourceVideoText('recovery.taskFailed')),
+          enabled62 = appStore.getState().nodes?.[this.id];
+        if (!enabled62) return;
+        const duration3 =
           buildRunningHubVideoTerminalStatePatch(
-            _0x3860c5,
+            enabled62,
             'failed',
-            this._computeGenerationDuration(_0x3860c5),
+            this._computeGenerationDuration(enabled62),
           ) || {};
         appStore.updateNodeData(this.id, {
-          ...buildSourceVideoRecoveryFailurePatch(_0x3860c5, {
-            error: _0x304372,
-            startedAt: _0x51c154,
-            duration: _0x31666f.generationDuration ?? this._computeGenerationDuration(_0x3860c5),
+          ...buildSourceVideoRecoveryFailurePatch(enabled62, {
+            error: error12,
+            startedAt: startedAt2,
+            duration: duration3.generationDuration ?? this._computeGenerationDuration(enabled62),
           }),
-          ..._0x31666f,
+          ...duration3,
           isGenerating: false,
-          generationDuration: _0x31666f.generationDuration ?? this._computeGenerationDuration(_0x3860c5),
+          generationDuration: duration3.generationDuration ?? this._computeGenerationDuration(enabled62),
           rhTaskStatus: 'failed',
           rhTaskRecovering: false,
         });
       } finally {
-        (this._rhResumeAbortController === _0x518a8a && (this._rhResumeAbortController = null),
-          this._rhResumeTaskId === _0x13142f && (this._rhResumeTaskId = ''),
+        (this._rhResumeAbortController === signal2 && (this._rhResumeAbortController = null),
+          this._rhResumeTaskId === taskId && (this._rhResumeTaskId = ''),
           (this._rhResumePromise = null));
       }
     })();
-    this._rhResumePromise = _0x380969;
+    this._rhResumePromise = value161;
   }
   ['_maybeResumeAsyncTask']() {
-    const _0x54a355 = appStore.getState().nodes?.[this.id] || this._data;
-    if (!this._isAsyncRecoverableTask(_0x54a355)) {
+    const value164 = appStore.getState().nodes?.[this.id] || this._data;
+    if (!this._isAsyncRecoverableTask(value164)) {
       this._stopAsyncRecovery(true);
       return;
     }
-    const _0x1c1b77 = String(_0x54a355?.asyncTaskId || '').trim();
-    if (!_0x1c1b77) return;
-    if (this._asyncResumePromise && this._asyncResumeTaskId === _0x1c1b77) return;
-    const _0x49885c =
-        Number(_0x54a355?.asyncTaskStartedAt || _0x54a355?.generationStartTime || 0) || Date.now(),
-      _0x312ddc = this._resolveAsyncResumePayload(_0x54a355),
-      _0x179b4d = String(_0x312ddc.provider || _0x54a355?.asyncTaskProvider || _0x54a355?.provider || '')
+    const taskId2 = String(value164?.asyncTaskId || '').trim();
+    if (!taskId2) return;
+    if (this._asyncResumePromise && this._asyncResumeTaskId === taskId2) return;
+    const startedAt4 =
+        Number(value164?.asyncTaskStartedAt || value164?.generationStartTime || 0) || Date.now(),
+      modelId = this._resolveAsyncResumePayload(value164),
+      provider2 = String(modelId.provider || value164?.asyncTaskProvider || value164?.provider || '')
         .trim()
         .toLowerCase(),
-      _0x5c697e =
+      handler11 =
         typeof this._resumeAsyncTaskPoller === 'function'
           ? this._resumeAsyncTaskPoller
           : resumeAsyncVideoTask,
-      _0x70ab51 = new AbortController();
-    ((this._asyncResumeAbortController = _0x70ab51), (this._asyncResumeTaskId = _0x1c1b77));
-    const _0x22dda1 = (async () => {
+      signal3 = new AbortController();
+    ((this._asyncResumeAbortController = signal3), (this._asyncResumeTaskId = taskId2));
+    const value165 = (async () => {
       try {
-        const _0x2298b0 = await resumeTask(
+        const response7 = await resumeTask(
           {
             sourceNodeId: this.id,
             targetNodeId: this.id,
             trigger: 'node',
             taskType: 'video-generation',
-            provider: _0x179b4d || _0x312ddc.provider || _0x54a355?.provider || '',
+            provider: provider2 || modelId.provider || value164?.provider || '',
             adapterType: 'modelApi',
-            modelId: _0x312ddc.model || _0x54a355?.model || '',
-            executionId: (_0x179b4d || _0x312ddc.provider || 'model') + '.source-video.async',
-            payload: _0x312ddc,
-            taskId: _0x1c1b77,
+            modelId: modelId.model || value164?.model || '',
+            executionId: (provider2 || modelId.provider || 'model') + '.source-video.async',
+            payload: modelId,
+            taskId: taskId2,
             async: true,
             cancellable: false,
             resumable: true,
             pauseOnAbort: true,
             startBuilder: () => ({
-              asyncTaskProvider: _0x179b4d,
+              asyncTaskProvider: provider2,
               asyncTaskKind: 'video',
               asyncTaskStatus:
-                String(_0x54a355?.asyncTaskStatus || '')
+                String(value164?.asyncTaskStatus || '')
                   .trim()
                   .toLowerCase() === 'pending'
                   ? 'pending'
                   : 'running',
             }),
-            poll: async () => _0x5c697e(_0x1c1b77, _0x312ddc, { signal: _0x70ab51.signal }),
-            resultBuilder: async (_0x2a7f82) => {
-              const _0x51aadc = appStore.getState().nodes?.[this.id] || {};
+            poll: async () => handler11(taskId2, modelId, { signal: signal3.signal }),
+            resultBuilder: async (value166) => {
+              const name2 = appStore.getState().nodes?.[this.id] || {};
               return {
-                ...(await this._buildRecoveredVideoResultPatch(_0x2a7f82)),
-                name: _0x51aadc?.name?.includes(sourceVideoText('result.hdVideo'))
+                ...(await this._buildRecoveredVideoResultPatch(value166)),
+                name: name2?.name?.includes(sourceVideoText('result.hdVideo'))
                   ? sourceVideoText('result.hdVideo')
-                  : _0x51aadc?.name || sourceVideoText('result.defaultName'),
-                generationDuration: this._computeGenerationDuration(_0x51aadc),
+                  : name2?.name || sourceVideoText('result.defaultName'),
+                generationDuration: this._computeGenerationDuration(name2),
               };
             },
-            failureBuilder: (_0x425452, _0x425d3d) => {
-              const _0x4bf888 =
-                  _0x425452 instanceof Error
-                    ? _0x425452.message
-                    : String(_0x425452 || sourceVideoText('recovery.taskFailed')),
-                _0x32f7f7 = appStore.getState().nodes?.[this.id] || {};
-              return buildSourceVideoRecoveryFailurePatch(_0x32f7f7, {
-                error: _0x4bf888,
-                startedAt: _0x425d3d.startedAt,
-                duration: this._computeGenerationDuration(_0x32f7f7),
+            failureBuilder: (error13, startedAt5) => {
+              const error14 =
+                  error13 instanceof Error
+                    ? error13.message
+                    : String(error13 || sourceVideoText('recovery.taskFailed')),
+                value167 = appStore.getState().nodes?.[this.id] || {};
+              return buildSourceVideoRecoveryFailurePatch(value167, {
+                error: error14,
+                startedAt: startedAt5.startedAt,
+                duration: this._computeGenerationDuration(value167),
               });
             },
-            parseError: (_0x123ff3) =>
-              _0x123ff3 instanceof Error
-                ? _0x123ff3.message
-                : String(_0x123ff3 || sourceVideoText('recovery.taskFailed')),
+            parseError: (error15) =>
+              error15 instanceof Error
+                ? error15.message
+                : String(error15 || sourceVideoText('recovery.taskFailed')),
           },
-          { store: appStore, startedAt: _0x49885c, abortController: _0x70ab51 },
+          { store: appStore, startedAt: startedAt4, abortController: signal3 },
         );
-        _0x2298b0.status === 'success' && window._triggerLocalCacheSave?.();
-      } catch (_0x398ef1) {
+        response7.status === 'success' && window._triggerLocalCacheSave?.();
+      } catch (error16) {
         if (
-          _0x70ab51.signal.aborted ||
-          String(_0x398ef1?.message || '') === 'CANCELLED' ||
-          _0x398ef1?.name === 'AbortError'
+          signal3.signal.aborted ||
+          String(error16?.message || '') === 'CANCELLED' ||
+          error16?.name === 'AbortError'
         )
           return;
-        const _0x4e9b4a =
-            _0x398ef1 instanceof Error
-              ? _0x398ef1.message
-              : String(_0x398ef1 || sourceVideoText('recovery.taskFailed')),
-          _0x15f65a = appStore.getState().nodes?.[this.id];
-        if (!_0x15f65a) return;
+        const error17 =
+            error16 instanceof Error
+              ? error16.message
+              : String(error16 || sourceVideoText('recovery.taskFailed')),
+          enabled63 = appStore.getState().nodes?.[this.id];
+        if (!enabled63) return;
         appStore.updateNodeData(this.id, {
-          ...buildSourceVideoRecoveryFailurePatch(_0x15f65a, {
-            error: _0x4e9b4a,
-            startedAt: _0x49885c,
-            duration: this._computeGenerationDuration(_0x15f65a),
+          ...buildSourceVideoRecoveryFailurePatch(enabled63, {
+            error: error17,
+            startedAt: startedAt4,
+            duration: this._computeGenerationDuration(enabled63),
           }),
           isGenerating: false,
           asyncTaskStatus: 'failed',
           asyncTaskRecovering: false,
         });
       } finally {
-        (this._asyncResumeAbortController === _0x70ab51 && (this._asyncResumeAbortController = null),
-          this._asyncResumeTaskId === _0x1c1b77 && (this._asyncResumeTaskId = ''),
+        (this._asyncResumeAbortController === signal3 && (this._asyncResumeAbortController = null),
+          this._asyncResumeTaskId === taskId2 && (this._asyncResumeTaskId = ''),
           (this._asyncResumePromise = null));
       }
     })();
-    this._asyncResumePromise = _0x22dda1;
+    this._asyncResumePromise = value165;
   }
-  ['update'](_0x2efbda) {
-    this._data = _0x2efbda;
-    this._syncRunningHubVideoTaskState(_0x2efbda) &&
-      ((this._data = appStore.getState().nodes?.[this.id] || _0x2efbda), (_0x2efbda = this._data));
-    this._syncMutedStateFromData(_0x2efbda);
-    const _0x43b3c4 = this._resolveVideoSrc(_0x2efbda),
-      _0x40bddc = shouldShowGenerationResultLoadingUi(_0x2efbda, { hasResult: !!_0x43b3c4 });
-    if (_0x40bddc) {
+  ['update'](error18) {
+    this._data = error18;
+    this._syncRunningHubVideoTaskState(error18) &&
+      ((this._data = appStore.getState().nodes?.[this.id] || error18), (error18 = this._data));
+    this._syncMutedStateFromData(error18);
+    const enabled64 = this._resolveVideoSrc(error18),
+      shouldShowGenerationResultLoadingUi2 = shouldShowGenerationResultLoadingUi(error18, {
+        hasResult: !!enabled64,
+      });
+    if (shouldShowGenerationResultLoadingUi2) {
       startLoading(this._card, { variant: 'full' });
       if (this._hint) this._hint.style.display = 'none';
       if (this._uploadBtn) this._uploadBtn.disabled = true;
     } else {
-      if (isTaskTerminal(_0x2efbda)) {
+      if (isTaskTerminal(error18)) {
         stopLoading(this._card);
         if (this._uploadBtn) this._uploadBtn.disabled = false;
       } else {
         if (this._uploadBtn) this._uploadBtn.disabled = false;
-        if (!_0x43b3c4) stopLoading(this._card);
+        if (!enabled64) stopLoading(this._card);
       }
     }
-    this._clearResolvedVideoTimer(_0x2efbda, _0x43b3c4);
-    const _0x4af7a9 = resolveSourceVideoPosterSrc(_0x2efbda),
-      _0x1d1db1 = _0x4af7a9 !== this._lastPosterSrc;
+    this._clearResolvedVideoTimer(error18, enabled64);
+    const sourceVideoPosterSrc2 = resolveSourceVideoPosterSrc(error18),
+      value168 = sourceVideoPosterSrc2 !== this._lastPosterSrc;
     if (this._rendererMediaDeferred === true) {
-      this._currentSrc = _0x43b3c4 || '';
+      this._currentSrc = enabled64 || '';
       this._video && ((this._video.preload = 'none'), this._clearVideoElementSource({ load: false }));
-      if (_0x1d1db1 || _0x4af7a9) this._applyVideoPoster(_0x2efbda);
+      if (value168 || sourceVideoPosterSrc2) this._applyVideoPoster(error18);
       else this._setPosterFrameVisible(false);
       (this._maybeResumeRunningHubTask(), this._maybeResumeAsyncTask());
       this._label &&
-        _0x2efbda.name &&
+        error18.name &&
         document.activeElement !== this._label &&
-        (this._label.innerText = _0x2efbda.name);
+        (this._label.innerText = error18.name);
       return;
     }
-    if (_0x43b3c4 && _0x43b3c4 !== this._currentSrc) this._loadVideo(_0x43b3c4);
+    if (enabled64 && enabled64 !== this._currentSrc) this._loadVideo(enabled64);
     else {
-      if (_0x43b3c4 && _0x1d1db1 && (!this._video || this._video.paused)) this._loadVideo(_0x43b3c4);
+      if (enabled64 && value168 && (!this._video || this._video.paused)) this._loadVideo(enabled64);
       else {
-        if (_0x1d1db1) this._applyVideoPoster(_0x2efbda);
+        if (value168) this._applyVideoPoster(error18);
         else {
-          if (!_0x43b3c4) this._loadVideo('');
+          if (!enabled64) this._loadVideo('');
         }
       }
     }
-    (this._maybeFetchVideoMeta(_0x2efbda),
+    (this._maybeFetchVideoMeta(error18),
       this._maybeResumeRunningHubTask(),
       this._maybeResumeAsyncTask(),
       this._label &&
-        _0x2efbda.name &&
+        error18.name &&
         document.activeElement !== this._label &&
-        (this._label.innerText = _0x2efbda.name));
+        (this._label.innerText = error18.name));
   }
   ['unmount']() {
     (this._unsubscribeLocale?.(),
@@ -2175,10 +2167,10 @@ export class SourceVideoNode {
   ['hydrateDeferredMedia']() {
     if (this._rendererMediaDeferred !== true) return;
     this._rendererMediaDeferred = false;
-    const _0x67d090 = appStore.getStateRaw().nodes?.[this.id] || this._data,
-      _0x32d288 = this._resolveVideoSrc(_0x67d090);
-    if (_0x32d288) this._loadVideo(_0x32d288);
+    const value169 = appStore.getStateRaw().nodes?.[this.id] || this._data,
+      value170 = this._resolveVideoSrc(value169);
+    if (value170) this._loadVideo(value170);
     else this._loadVideo('');
-    this._maybeFetchVideoMeta(_0x67d090);
+    this._maybeFetchVideoMeta(value169);
   }
 }

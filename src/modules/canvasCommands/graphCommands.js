@@ -42,352 +42,339 @@ const SUPPORTED_CREATE_TYPES = new Set([
     'videos',
     'audios',
   ]);
-function getState(_0x319c89) {
-  return _0x319c89.store?.getStateRaw?.() || _0x319c89.store?.getState?.() || {};
+function getState(value) {
+  return value.store?.getStateRaw?.() || value.store?.getState?.() || {};
 }
-function getStore(_0x204867) {
-  return _0x204867.graphStore || _0x204867.store;
+function getStore(item) {
+  return item.graphStore || item.store;
 }
-function clonePlain(_0x480975) {
-  if (typeof structuredClone === 'function') return structuredClone(_0x480975);
-  return JSON.parse(JSON.stringify(_0x480975));
+function clonePlain(key) {
+  if (typeof structuredClone === 'function') return structuredClone(key);
+  return JSON.parse(JSON.stringify(key));
 }
-function normalizeNodeType(_0xdc8991) {
-  return String(_0xdc8991 || '').trim();
+function normalizeNodeType(index) {
+  return String(index || '').trim();
 }
-function toFinitePositiveNumber(_0x24aee4, _0x4ff600) {
-  const _0x5ce00e = Number(_0x24aee4);
-  return Number.isFinite(_0x5ce00e) && _0x5ce00e > 0 ? _0x5ce00e : _0x4ff600;
+function toFinitePositiveNumber(result, data) {
+  const count = Number(result);
+  return Number.isFinite(count) && count > 0 ? count : data;
 }
-function toFiniteNumber(_0x324bae, _0xc571d7 = 0) {
-  const _0x5480a4 = Number(_0x324bae);
-  return Number.isFinite(_0x5480a4) ? _0x5480a4 : _0xc571d7;
+function toFiniteNumber(options, target = 0) {
+  const source = Number(options);
+  return Number.isFinite(source) ? source : target;
 }
-function getNode(_0x49132a, _0x578745) {
-  const _0x144217 = String(_0x578745 || '').trim();
-  return _0x144217 ? getState(_0x49132a).nodes?.[_0x144217] || null : null;
+function getNode(next, current) {
+  const entry = String(current || '').trim();
+  return entry ? getState(next).nodes?.[entry] || null : null;
 }
-function getNodes(_0x30d247) {
-  return getState(_0x30d247).nodes || {};
+function getNodes(record) {
+  return getState(record).nodes || {};
 }
-function getEdges(_0x58bc6a) {
-  return getState(_0x58bc6a).edges || {};
+function getEdges(payload) {
+  return getState(payload).edges || {};
 }
-function getInitialText(_0x4ab811 = {}) {
-  if (Object.prototype.hasOwnProperty.call(_0x4ab811, 'prompt')) return _0x4ab811.prompt;
-  if (Object.prototype.hasOwnProperty.call(_0x4ab811, 'text')) return _0x4ab811.text;
-  if (Object.prototype.hasOwnProperty.call(_0x4ab811, 'content')) return _0x4ab811.content;
+function getInitialText(response = {}) {
+  if (Object.prototype.hasOwnProperty.call(response, 'prompt')) return response.prompt;
+  if (Object.prototype.hasOwnProperty.call(response, 'text')) return response.text;
+  if (Object.prototype.hasOwnProperty.call(response, 'content')) return response.content;
   return undefined;
 }
-function truncateText(_0x1e7e02, _0x540e3b = 0x1f4) {
-  const _0x296441 = String(_0x1e7e02 || '')
+function truncateText(handle, state = 0x1f4) {
+  const list = String(handle || '')
     .replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  if (_0x296441.length <= _0x540e3b) return _0x296441;
-  return _0x296441.slice(0, Math.max(0, _0x540e3b - 3)) + '...';
+  if (list.length <= state) return list;
+  return list.slice(0, Math.max(0, state - 3)) + '...';
 }
-function omitLargeMedia(_0x2e50e3, _0x582f28 = 0) {
-  if (_0x2e50e3 == null) return _0x2e50e3;
-  if (typeof _0x2e50e3 !== 'object') return _0x2e50e3;
-  if (_0x582f28 > 2) return '[omitted]';
-  if (Array.isArray(_0x2e50e3)) return '[array:' + _0x2e50e3.length + ']';
-  const _0x2fdb56 = {};
-  for (const [_0x2c0a9e, _0x193e16] of Object.entries(_0x2e50e3)) {
-    if (MEDIA_PREVIEW_KEYS.has(_0x2c0a9e)) _0x2fdb56[_0x2c0a9e] = '[omitted]';
+function omitLargeMedia(list2, count2 = 0) {
+  if (list2 == null) return list2;
+  if (typeof list2 !== 'object') return list2;
+  if (count2 > 2) return '[omitted]';
+  if (Array.isArray(list2)) return '[array:' + list2.length + ']';
+  const config = {};
+  for (const [scope, list3] of Object.entries(list2)) {
+    if (MEDIA_PREVIEW_KEYS.has(scope)) config[scope] = '[omitted]';
     else {
-      if (typeof _0x193e16 === 'string' && _0x193e16.length > 0x1f4)
-        _0x2fdb56[_0x2c0a9e] = _0x193e16.slice(0, 120) + '...';
+      if (typeof list3 === 'string' && list3.length > 0x1f4) config[scope] = list3.slice(0, 120) + '...';
       else
-        _0x193e16 && typeof _0x193e16 === 'object'
-          ? (_0x2fdb56[_0x2c0a9e] = omitLargeMedia(_0x193e16, _0x582f28 + 1))
-          : (_0x2fdb56[_0x2c0a9e] = _0x193e16);
+        list3 && typeof list3 === 'object'
+          ? (config[scope] = omitLargeMedia(list3, count2 + 1))
+          : (config[scope] = list3);
     }
   }
-  return _0x2fdb56;
+  return config;
 }
 function normalizeNodeIds(
-  _0x2969ce = {},
-  _0xe02f7e = {},
+  options2 = {},
+  input = {},
   { min: min = 1, allowSelection: allowSelection = true } = {},
 ) {
-  const _0x4bdb41 = getNodes(_0xe02f7e),
-    _0x1e37b5 = getState(_0xe02f7e),
-    _0x5a2801 =
-      Array.isArray(_0x2969ce.ids) && _0x2969ce.ids.length > 0
-        ? _0x2969ce.ids
-        : _0x2969ce.nodeId
-          ? [_0x2969ce.nodeId]
+  const nodes = getNodes(input),
+    state2 = getState(input),
+    output =
+      Array.isArray(options2.ids) && options2.ids.length > 0
+        ? options2.ids
+        : options2.nodeId
+          ? [options2.nodeId]
           : allowSelection
-            ? _0x1e37b5.selectedNodeIds || []
+            ? state2.selectedNodeIds || []
             : [],
-    _0x5da206 = [],
-    _0x42e334 = new Set();
-  for (const _0x4463e2 of _0x5a2801) {
-    const _0x3b7b38 = String(_0x4463e2 || '').trim();
-    if (!_0x3b7b38 || _0x42e334.has(_0x3b7b38)) continue;
-    if (!_0x4bdb41[_0x3b7b38])
-      throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas node not found: ' + _0x3b7b38, {
-        nodeId: _0x3b7b38,
+    list4 = [],
+    map = new Set();
+  for (const value2 of output) {
+    const nodeId = String(value2 || '').trim();
+    if (!nodeId || map.has(nodeId)) continue;
+    if (!nodes[nodeId])
+      throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas node not found: ' + nodeId, {
+        nodeId: nodeId,
       });
-    (_0x5da206.push(_0x3b7b38), _0x42e334.add(_0x3b7b38));
+    (list4.push(nodeId), map.add(nodeId));
   }
-  if (_0x5da206.length < min)
+  if (list4.length < min)
     throw createCanvasCommandError(
       'INSUFFICIENT_NODES',
       'At least ' + min + ' canvas node id(s) are required.',
     );
-  return _0x5da206;
+  return list4;
 }
-function normalizeEdgeId(_0xc1c79f) {
-  return String(_0xc1c79f || '').trim();
+function normalizeEdgeId(value3) {
+  return String(value3 || '').trim();
 }
-function normalizeEdgeArgs(_0x393983 = {}) {
+function normalizeEdgeArgs(event = {}) {
   return {
-    edgeId: normalizeEdgeId(_0x393983.edgeId || _0x393983.id),
-    sourceId: String(_0x393983.sourceId || _0x393983.source || '').trim(),
-    targetId: String(_0x393983.targetId || _0x393983.target || '').trim(),
-    refSlot: String(_0x393983.refSlot || _0x393983.slot || '').trim(),
+    edgeId: normalizeEdgeId(event.edgeId || event.id),
+    sourceId: String(event.sourceId || event.source || '').trim(),
+    targetId: String(event.targetId || event.target || '').trim(),
+    refSlot: String(event.refSlot || event.slot || '').trim(),
   };
 }
-function findEdgesByEndpoints(
-  _0x1c81a8,
-  { sourceId: _0x2c88fe, targetId: _0x2d3817, refSlot: refSlot = '' },
-) {
-  return Object.values(getEdges(_0x1c81a8)).filter((_0x2c49f2) => {
-    if (!_0x2c49f2) return false;
-    if (_0x2c88fe && _0x2c49f2.sourceId !== _0x2c88fe) return false;
-    if (_0x2d3817 && _0x2c49f2.targetId !== _0x2d3817) return false;
-    if (refSlot && String(_0x2c49f2.refSlot || '') !== refSlot) return false;
+function findEdgesByEndpoints(value4, { sourceId: sourceId, targetId: targetId, refSlot: refSlot = '' }) {
+  return Object.values(getEdges(value4)).filter((enabled) => {
+    if (!enabled) return false;
+    if (sourceId && enabled.sourceId !== sourceId) return false;
+    if (targetId && enabled.targetId !== targetId) return false;
+    if (refSlot && String(enabled.refSlot || '') !== refSlot) return false;
     return true;
   });
 }
-function hasExplicitCreatePosition(_0x272665 = {}) {
-  return Number['isFinite'](Number(_0x272665['x'])) && Number['isFinite'](Number(_0x272665['y']));
+function hasExplicitCreatePosition(box = {}) {
+  return Number['isFinite'](Number(box['x'])) && Number['isFinite'](Number(box['y']));
 }
-function resolveCreateSize(_0x106fdf, _0x43b010 = {}, _0x46ac6f = {}) {
-  const _0x45e1e1 = DEFAULT_NODE_SIZES[_0x106fdf] || { width: 0x12c, height: 0x12c };
-  let _0x889012 = null;
-  if (PROMPT_NODE_TYPES.has(_0x106fdf) && typeof _0x46ac6f.getAIGenerationDefaultSizeByType === 'function')
-    _0x889012 = _0x46ac6f.getAIGenerationDefaultSizeByType(_0x106fdf);
-  else
-    typeof _0x46ac6f.getNodeDefaultSize === 'function' &&
-      (_0x889012 = _0x46ac6f.getNodeDefaultSize(_0x106fdf));
-  const _0xf23c4b = _0x889012 && typeof _0x889012 === 'object' ? _0x889012 : _0x45e1e1;
+function resolveCreateSize(value5, box2 = {}, value6 = {}) {
+  const box3 = DEFAULT_NODE_SIZES[value5] || { width: 0x12c, height: 0x12c };
+  let value7 = null;
+  if (PROMPT_NODE_TYPES.has(value5) && typeof value6.getAIGenerationDefaultSizeByType === 'function')
+    value7 = value6.getAIGenerationDefaultSizeByType(value5);
+  else typeof value6.getNodeDefaultSize === 'function' && (value7 = value6.getNodeDefaultSize(value5));
+  const box4 = value7 && typeof value7 === 'object' ? value7 : box3;
   return {
-    width: toFinitePositiveNumber(_0x43b010.width, toFinitePositiveNumber(_0xf23c4b.width, _0x45e1e1.width)),
-    height: toFinitePositiveNumber(
-      _0x43b010.height,
-      toFinitePositiveNumber(_0xf23c4b.height, _0x45e1e1.height),
-    ),
+    width: toFinitePositiveNumber(box2.width, toFinitePositiveNumber(box4.width, box3.width)),
+    height: toFinitePositiveNumber(box2.height, toFinitePositiveNumber(box4.height, box3.height)),
   };
 }
-function applyInitialNodeText(_0x4c2ac5, _0x201977, _0x5ce3c2) {
-  const _0x4471ef = getInitialText(_0x201977);
-  if (_0x4471ef === undefined || _0x4471ef === null) return _0x4c2ac5;
-  const _0x355258 = String(_0x4c2ac5?.id || '').trim(),
-    _0x1ee9e9 = String(_0x4c2ac5?.type || '').trim();
-  if (!_0x355258) return _0x4c2ac5;
-  let _0x4774f3 = null;
-  if (PROMPT_NODE_TYPES.has(_0x1ee9e9))
-    _0x4774f3 = { prompt: sanitizePromptHtmlForCommit(String(_0x4471ef)) };
+function applyInitialNodeText(args, value8, store) {
+  const initialText = getInitialText(value8);
+  if (initialText === undefined || initialText === null) return args;
+  const enabled2 = String(args?.id || '').trim(),
+    value9 = String(args?.type || '').trim();
+  if (!enabled2) return args;
+  let args2 = null;
+  if (PROMPT_NODE_TYPES.has(value9)) args2 = { prompt: sanitizePromptHtmlForCommit(String(initialText)) };
   else
-    (_0x1ee9e9 === 'source-text' || _0x1ee9e9 === 'comment-note') &&
-      (_0x4774f3 = { content: String(_0x4471ef || '') });
-  if (!_0x4774f3) return _0x4c2ac5;
+    (value9 === 'source-text' || value9 === 'comment-note') &&
+      (args2 = { content: String(initialText || '') });
+  if (!args2) return args;
   return (
-    getStore(_0x5ce3c2)?.updateNodeData?.(_0x355258, _0x4774f3),
-    _0x5ce3c2.commit?.(),
-    getNode(_0x5ce3c2, _0x355258) || { ..._0x4c2ac5, ..._0x4774f3 }
+    getStore(store)?.updateNodeData?.(enabled2, args2),
+    store.commit?.(),
+    getNode(store, enabled2) || { ...args, ...args2 }
   );
 }
-function isImageNodeType(_0x375721 = '') {
-  const _0x2b5f94 = String(_0x375721 || '');
-  return _0x2b5f94 === 'ai-image' || _0x2b5f94 === 'source-image';
+function isImageNodeType(value10 = '') {
+  const value11 = String(value10 || '');
+  return value11 === 'ai-image' || value11 === 'source-image';
 }
-function hasSelectedImageInput(_0x5f4feb = {}) {
-  const _0x74b9e5 = getState(_0x5f4feb),
-    _0x31b8a8 = Array.isArray(_0x74b9e5.selectedNodeIds) ? _0x74b9e5.selectedNodeIds : [];
-  return _0x31b8a8.some((_0x1f350e) => isImageNodeType(_0x74b9e5.nodes?.[_0x1f350e]?.type));
+function hasSelectedImageInput(options3 = {}) {
+  const state3 = getState(options3),
+    list5 = Array.isArray(state3.selectedNodeIds) ? state3.selectedNodeIds : [];
+  return list5.some((item2) => isImageNodeType(state3.nodes?.[item2]?.type));
 }
-function manifestAllowsImageInput(_0x11a1aa = {}) {
-  const _0x1f536d =
-      _0x11a1aa?.inputSlots && typeof _0x11a1aa.inputSlots === 'object' ? _0x11a1aa.inputSlots : {},
-    _0x363df3 = Array.isArray(_0x1f536d.allowedKinds) ? _0x1f536d.allowedKinds : [];
-  if (_0x363df3.includes('image')) return true;
-  const _0x1c9fb8 = Number(_0x1f536d.maxByKind?.image);
-  return Number.isFinite(_0x1c9fb8) && _0x1c9fb8 > 0;
+function manifestAllowsImageInput(options4 = {}) {
+  const value12 = options4?.inputSlots && typeof options4.inputSlots === 'object' ? options4.inputSlots : {},
+    list6 = Array.isArray(value12.allowedKinds) ? value12.allowedKinds : [];
+  if (list6.includes('image')) return true;
+  const count3 = Number(value12.maxByKind?.image);
+  return Number.isFinite(count3) && count3 > 0;
 }
-function manifestAllowsTextInput(_0xf26e9f = {}) {
-  const _0x3062b5 =
-      _0xf26e9f?.inputSlots && typeof _0xf26e9f.inputSlots === 'object' ? _0xf26e9f.inputSlots : {},
-    _0x1277cd = Array.isArray(_0x3062b5.allowedKinds) ? _0x3062b5.allowedKinds : [];
-  return _0x1277cd.length === 0 || _0x1277cd.includes('text');
+function manifestAllowsTextInput(options5 = {}) {
+  const value13 = options5?.inputSlots && typeof options5.inputSlots === 'object' ? options5.inputSlots : {},
+    list7 = Array.isArray(value13.allowedKinds) ? value13.allowedKinds : [];
+  return list7.length === 0 || list7.includes('text');
 }
-function manifestRequiresMissingMedia(_0x153914 = {}, { hasImageInput: hasImageInput = false } = {}) {
-  const _0x13cd30 =
-      _0x153914?.inputSlots && typeof _0x153914.inputSlots === 'object' ? _0x153914.inputSlots : {},
-    _0xedf34d = _0x13cd30.minByKind || {};
-  if (!hasImageInput && Number(_0xedf34d.image) > 0) return true;
-  if (Number(_0xedf34d.video) > 0) return true;
-  if (Number(_0xedf34d.audio) > 0) return true;
-  const _0x48e4b5 = Array.isArray(_0x13cd30.fixedSlots) ? _0x13cd30.fixedSlots : [];
-  return _0x48e4b5.some((_0x50227f) => {
-    if (_0x50227f?.required !== true) return false;
-    const _0x2b8fed = String(_0x50227f?.kind || '');
-    if (_0x2b8fed === 'image') return !hasImageInput;
-    return _0x2b8fed === 'video' || _0x2b8fed === 'audio';
+function manifestRequiresMissingMedia(options6 = {}, { hasImageInput: hasImageInput = false } = {}) {
+  const value14 = options6?.inputSlots && typeof options6.inputSlots === 'object' ? options6.inputSlots : {},
+    value15 = value14.minByKind || {};
+  if (!hasImageInput && Number(value15.image) > 0) return true;
+  if (Number(value15.video) > 0) return true;
+  if (Number(value15.audio) > 0) return true;
+  const list8 = Array.isArray(value14.fixedSlots) ? value14.fixedSlots : [];
+  return list8.some((item3) => {
+    if (item3?.required !== true) return false;
+    const value16 = String(item3?.kind || '');
+    if (value16 === 'image') return !hasImageInput;
+    return value16 === 'video' || value16 === 'audio';
   });
 }
-function getManifestFieldIds(_0x40f819 = {}) {
+function getManifestFieldIds(options7 = {}) {
   return new Set(
-    (Array.isArray(_0x40f819?.uiSchema?.fields) ? _0x40f819.uiSchema.fields : [])
-      .map((_0x117fc3) => String(_0x117fc3?.id || '').trim())
+    (Array.isArray(options7?.uiSchema?.fields) ? options7.uiSchema.fields : [])
+      .map((item4) => String(item4?.id || '').trim())
       .filter(Boolean),
   );
 }
-function findAutoCreateModel(_0x547dea = {}, _0x3cb769 = '', _0x4596d8 = {}) {
-  if (_0x3cb769 !== 'ai-video') return null;
-  const _0x2f18ff = hasSelectedImageInput(_0x4596d8),
-    _0x3fc1f2 =
-      _0x547dea.params && typeof _0x547dea.params === 'object' && !Array.isArray(_0x547dea.params)
-        ? Object.keys(_0x547dea.params)
+function findAutoCreateModel(options8 = {}, value17 = '', value18 = {}) {
+  if (value17 !== 'ai-video') return null;
+  const hasImageInput2 = hasSelectedImageInput(value18),
+    value19 =
+      options8.params && typeof options8.params === 'object' && !Array.isArray(options8.params)
+        ? Object.keys(options8.params)
         : [],
-    _0x1867b8 = listModelManifests()
+    listModelManifests2 = listModelManifests()
       .filter(
-        (_0x3bf39b) =>
-          _0x3bf39b?.kind === 'video' &&
-          _0x3bf39b?.modelId &&
-          (_0x2f18ff ? manifestAllowsImageInput(_0x3bf39b) : manifestAllowsTextInput(_0x3bf39b)) &&
-          !manifestRequiresMissingMedia(_0x3bf39b, { hasImageInput: _0x2f18ff }),
+        (item5) =>
+          item5?.kind === 'video' &&
+          item5?.modelId &&
+          (hasImageInput2 ? manifestAllowsImageInput(item5) : manifestAllowsTextInput(item5)) &&
+          !manifestRequiresMissingMedia(item5, { hasImageInput: hasImageInput2 }),
       )
-      .map((_0x2f64d6) => {
-        const _0x58d1cf = getManifestFieldIds(_0x2f64d6);
-        let _0x4dce0a = _0x2f64d6.vip === true ? 0 : 10;
-        if (!_0x2f18ff && !manifestAllowsImageInput(_0x2f64d6)) _0x4dce0a += 8;
-        for (const _0x2faa6a of _0x3fc1f2) {
-          if (_0x58d1cf.has(_0x2faa6a)) _0x4dce0a += 20;
+      .map((manifest) => {
+        const map2 = getManifestFieldIds(manifest);
+        let score = manifest.vip === true ? 0 : 10;
+        if (!hasImageInput2 && !manifestAllowsImageInput(manifest)) score += 8;
+        for (const value20 of value19) {
+          if (map2.has(value20)) score += 20;
         }
-        if (_0x58d1cf.has('duration')) _0x4dce0a += 8;
-        if (_0x58d1cf.has('aspectRatio')) _0x4dce0a += 4;
-        const _0xfaee70 = Number(_0x2f64d6.extensions?.videoMenu?.order) || 0;
-        return ((_0x4dce0a += Math.max(0, 100 - _0xfaee70) / 100), { manifest: _0x2f64d6, score: _0x4dce0a });
+        if (map2.has('duration')) score += 8;
+        if (map2.has('aspectRatio')) score += 4;
+        const value21 = Number(manifest.extensions?.videoMenu?.order) || 0;
+        return ((score += Math.max(0, 100 - value21) / 100), { manifest: manifest, score: score });
       })
-      .sort((_0x243865, _0x5cd76a) => {
-        if (_0x5cd76a.score !== _0x243865.score) return _0x5cd76a.score - _0x243865.score;
-        return String(_0x243865.manifest.modelId).localeCompare(String(_0x5cd76a.manifest.modelId));
+      .sort((item6, value22) => {
+        if (value22.score !== item6.score) return value22.score - item6.score;
+        return String(item6.manifest.modelId).localeCompare(String(value22.manifest.modelId));
       });
-  return _0x1867b8[0]?.manifest || null;
+  return listModelManifests2[0]?.manifest || null;
 }
-function isAutoModelPlaceholder(_0x46144e = '') {
-  const _0x4d08c2 = String(_0x46144e || '')
+function isAutoModelPlaceholder(value23 = '') {
+  const enabled3 = String(value23 || '')
     .trim()
     .toLowerCase();
-  return !_0x4d08c2 || _0x4d08c2 === 'auto' || _0x4d08c2 === 'default' || _0x4d08c2 === 'unknown';
+  return !enabled3 || enabled3 === 'auto' || enabled3 === 'default' || enabled3 === 'unknown';
 }
-function validateCreateModelArgs(_0x2ad2a3 = {}, _0x3174d7 = '', _0x59c6b8 = {}) {
-  const _0xb80d45 = String(_0x2ad2a3.model || _0x2ad2a3.modelId || '').trim();
-  if (isAutoModelPlaceholder(_0xb80d45)) {
-    const _0x57153d = findAutoCreateModel(_0x2ad2a3, _0x3174d7, _0x59c6b8);
-    return _0x57153d
-      ? { args: { model: _0x57153d.modelId, provider: _0x57153d.provider || '' } }
-      : { args: {} };
+function validateCreateModelArgs(options9 = {}, value24 = '', value25 = {}) {
+  const value26 = String(options9.model || options9.modelId || '').trim();
+  if (isAutoModelPlaceholder(value26)) {
+    const model = findAutoCreateModel(options9, value24, value25);
+    return model ? { args: { model: model.modelId, provider: model.provider || '' } } : { args: {} };
   }
-  const _0x5158d2 = String(_0x2ad2a3.provider || '').trim(),
-    _0x321a2c = resolveModelExecution(_0xb80d45, { providerHint: _0x5158d2 }),
-    _0x8b76 = _0x321a2c?.modelManifest;
-  if (!_0x8b76)
+  const providerHint = String(options9.provider || '').trim(),
+    modelExecution = resolveModelExecution(value26, { providerHint: providerHint }),
+    model2 = modelExecution?.modelManifest;
+  if (!model2)
     return {
       ok: false,
       errorCode: 'MODEL_MANIFEST_NOT_FOUND',
-      message: 'Model manifest not found: ' + _0xb80d45,
+      message: 'Model manifest not found: ' + value26,
     };
-  const _0x46e9b6 = CREATE_TYPE_MODEL_KINDS[_0x3174d7] || '';
-  if (_0x46e9b6 && String(_0x8b76.kind || '') !== _0x46e9b6)
+  const value27 = CREATE_TYPE_MODEL_KINDS[value24] || '';
+  if (value27 && String(model2.kind || '') !== value27)
     return {
       ok: false,
       errorCode: 'MODEL_KIND_MISMATCH',
-      message: 'Model ' + _0xb80d45 + ' is ' + (_0x8b76.kind || '(unknown)') + ', not ' + _0x46e9b6 + '.',
+      message: 'Model ' + value26 + ' is ' + (model2.kind || '(unknown)') + ', not ' + value27 + '.',
     };
-  return { args: { model: _0x8b76.modelId || _0xb80d45, provider: _0x8b76.provider || _0x5158d2 } };
+  return { args: { model: model2.modelId || value26, provider: model2.provider || providerHint } };
 }
-function applyInitialNodeModel(_0x517ef3, _0x163acf, _0x4bab25) {
-  const _0x479842 = String(_0x163acf.model || '').trim();
-  if (!_0x479842) return _0x517ef3;
-  const _0x47080a = String(_0x517ef3?.id || '').trim();
-  if (!_0x47080a) return _0x517ef3;
-  const _0x27689b = { model: _0x479842, provider: String(_0x163acf.provider || '').trim() };
+function applyInitialNodeModel(args3, value28, store2) {
+  const model3 = String(value28.model || '').trim();
+  if (!model3) return args3;
+  const enabled4 = String(args3?.id || '').trim();
+  if (!enabled4) return args3;
+  const args4 = { model: model3, provider: String(value28.provider || '').trim() };
   return (
-    getStore(_0x4bab25)?.updateNodeData?.(_0x47080a, _0x27689b),
-    _0x4bab25.commit?.(),
-    getNode(_0x4bab25, _0x47080a) || { ..._0x517ef3, ..._0x27689b }
+    getStore(store2)?.updateNodeData?.(enabled4, args4),
+    store2.commit?.(),
+    getNode(store2, enabled4) || { ...args3, ...args4 }
   );
 }
-function buildNodeSummary(_0x26bab7, _0x592014, { includeData: includeData = false } = {}) {
-  const _0x5a63b0 = getNode(_0x26bab7, _0x592014);
-  if (!_0x5a63b0) return null;
-  const _0x524580 = resolveModelExecution(_0x5a63b0.model, { providerHint: _0x5a63b0.provider }),
-    _0x4b0d38 = {
-      id: String(_0x5a63b0.id || _0x592014),
-      type: String(_0x5a63b0.type || ''),
-      name: String(_0x5a63b0.name || ''),
-      promptPreview: truncateText(_0x5a63b0.prompt || _0x5a63b0.storyboardScript?.prompt || ''),
-      contentPreview: truncateText(_0x5a63b0.content || ''),
-      model: String(_0x5a63b0.model || ''),
-      provider: String(_0x5a63b0.provider || ''),
+function buildNodeSummary(value29, value30, { includeData: includeData = false } = {}) {
+  const providerHint2 = getNode(value29, value30);
+  if (!providerHint2) return null;
+  const modelExecution2 = resolveModelExecution(providerHint2.model, {
+      providerHint: providerHint2.provider,
+    }),
+    value31 = {
+      id: String(providerHint2.id || value30),
+      type: String(providerHint2.type || ''),
+      name: String(providerHint2.name || ''),
+      promptPreview: truncateText(providerHint2.prompt || providerHint2.storyboardScript?.prompt || ''),
+      contentPreview: truncateText(providerHint2.content || ''),
+      model: String(providerHint2.model || ''),
+      provider: String(providerHint2.provider || ''),
       adapterType: String(
-        _0x524580?.modelManifest?.adapterType || _0x524580?.executionManifest?.adapterType || '',
+        modelExecution2?.modelManifest?.adapterType || modelExecution2?.executionManifest?.adapterType || '',
       ),
-      x: toFiniteNumber(_0x5a63b0.x),
-      y: toFiniteNumber(_0x5a63b0.y),
-      width: toFiniteNumber(_0x5a63b0.width),
-      height: toFiniteNumber(_0x5a63b0.height),
+      x: toFiniteNumber(providerHint2.x),
+      y: toFiniteNumber(providerHint2.y),
+      width: toFiniteNumber(providerHint2.width),
+      height: toFiniteNumber(providerHint2.height),
       jobStatus: String(
-        _0x5a63b0.jobStatus ||
-          _0x5a63b0.storyboardScript?.jobStatus ||
-          (_0x5a63b0.isGenerating ? 'running' : 'idle'),
+        providerHint2.jobStatus ||
+          providerHint2.storyboardScript?.jobStatus ||
+          (providerHint2.isGenerating ? 'running' : 'idle'),
       ),
     };
-  if (includeData) _0x4b0d38.data = omitLargeMedia(_0x5a63b0);
-  return _0x4b0d38;
+  if (includeData) value31.data = omitLargeMedia(providerHint2);
+  return value31;
 }
-function buildCanvasSummary(_0x371373) {
-  const _0x1aacab = getState(_0x371373),
-    _0x459f9f = Object.keys(_0x1aacab.nodes || {}).map((_0x2eae75) => buildNodeSummary(_0x371373, _0x2eae75)),
-    _0x35b9e6 = Object.values(_0x1aacab.edges || {}).map((_0x48538d) => ({
-      id: String(_0x48538d?.id || ''),
-      sourceId: String(_0x48538d?.sourceId || ''),
-      targetId: String(_0x48538d?.targetId || ''),
-      refSlot: String(_0x48538d?.refSlot || ''),
-      type: String(_0x48538d?.type || ''),
+function buildCanvasSummary(value32) {
+  const args5 = getState(value32),
+    nodes2 = Object.keys(args5.nodes || {}).map((item7) => buildNodeSummary(value32, item7)),
+    edges = Object.values(args5.edges || {}).map((item8) => ({
+      id: String(item8?.id || ''),
+      sourceId: String(item8?.sourceId || ''),
+      targetId: String(item8?.targetId || ''),
+      refSlot: String(item8?.refSlot || ''),
+      type: String(item8?.type || ''),
     }));
   return {
-    selectedNodeIds: Array.isArray(_0x1aacab.selectedNodeIds) ? [..._0x1aacab.selectedNodeIds] : [],
-    nodes: _0x459f9f,
-    edges: _0x35b9e6,
+    selectedNodeIds: Array.isArray(args5.selectedNodeIds) ? [...args5.selectedNodeIds] : [],
+    nodes: nodes2,
+    edges: edges,
     viewport: {
-      x: toFiniteNumber(_0x1aacab.viewport?.x),
-      y: toFiniteNumber(_0x1aacab.viewport?.y),
-      zoom: toFiniteNumber(_0x1aacab.viewport?.zoom, 1),
+      x: toFiniteNumber(args5.viewport?.x),
+      y: toFiniteNumber(args5.viewport?.y),
+      zoom: toFiniteNumber(args5.viewport?.zoom, 1),
     },
-    nodeCount: _0x459f9f.length,
-    edgeCount: _0x35b9e6.length,
+    nodeCount: nodes2.length,
+    edgeCount: edges.length,
   };
 }
-function validateNodeIds(_0x482891, _0x3d5b58, _0x3749e9) {
+function validateNodeIds(args6, value33, value34) {
   try {
-    return { args: { ..._0x482891, ids: normalizeNodeIds(_0x482891, _0x3d5b58, _0x3749e9) } };
-  } catch (_0x538d90) {
+    return { args: { ...args6, ids: normalizeNodeIds(args6, value33, value34) } };
+  } catch (errorCode) {
     return {
       ok: false,
-      errorCode: _0x538d90.errorCode || 'INVALID_NODE_IDS',
-      message: _0x538d90.message,
-      details: _0x538d90.details,
+      errorCode: errorCode.errorCode || 'INVALID_NODE_IDS',
+      message: errorCode.message,
+      details: errorCode.details,
     };
   }
 }
-export function registerGraphCommands(_0x3030e3) {
-  (_0x3030e3.register({
+export function registerGraphCommands(value35) {
+  (value35.register({
     id: 'node.create',
     description: 'Create a canvas node.',
     riskLevel: 'safe',
@@ -414,100 +401,89 @@ export function registerGraphCommands(_0x3030e3) {
     },
     capabilitySchema: { reads: ['cursor', 'selection', 'modelRegistry'], writes: ['nodes', 'selection'] },
     returnSchema: { aliasFields: ['nodeId', 'node'] },
-    validate(_0xe54d94 = {}, _0x3441a2 = {}) {
-      const _0x2b16b3 = normalizeNodeType(_0xe54d94.type);
-      if (!SUPPORTED_CREATE_TYPES.has(_0x2b16b3))
+    validate(args7 = {}, value36 = {}) {
+      const type = normalizeNodeType(args7.type);
+      if (!SUPPORTED_CREATE_TYPES.has(type))
         return {
           ok: false,
           errorCode: 'UNSUPPORTED_NODE_TYPE',
-          message: 'Unsupported node.create type: ' + (_0x2b16b3 || '(empty)'),
+          message: 'Unsupported node.create type: ' + (type || '(empty)'),
         };
-      const _0x264310 =
-        hasExplicitCreatePosition(_0xe54d94) && typeof _0x3441a2['buildNodeData'] === 'function';
-      if (!_0x264310 && typeof _0x3441a2['createNodeAtCursor'] !== 'function')
+      const hasExplicitCreatePosition2 =
+        hasExplicitCreatePosition(args7) && typeof value36['buildNodeData'] === 'function';
+      if (!hasExplicitCreatePosition2 && typeof value36['createNodeAtCursor'] !== 'function')
         return {
           ok: false,
           errorCode: 'NODE_CREATE_UNAVAILABLE',
           message: 'Canvas node creation flow is unavailable.',
         };
-      const _0x5ed415 = validateCreateModelArgs(_0xe54d94, _0x2b16b3, _0x3441a2);
-      if (_0x5ed415.ok === false) return _0x5ed415;
-      return { args: { ..._0xe54d94, ..._0x5ed415.args, type: _0x2b16b3 } };
+      const response2 = validateCreateModelArgs(args7, type, value36);
+      if (response2.ok === false) return response2;
+      return { args: { ...args7, ...response2.args, type: type } };
     },
-    execute(_0x1c25e4, _0x3e312a) {
-      const { width: _0x54e37d, height: _0x5930a6 } = resolveCreateSize(
-          _0x1c25e4['type'],
-          _0x1c25e4,
-          _0x3e312a,
-        ),
-        _0xaff048 = String(_0x1c25e4['name'] || _0x1c25e4['label'] || ''),
-        _0x3ff79f = _0x1c25e4['agentReservation'] === !![],
-        _0xd98c54 = _0x3ff79f
+    execute(type2, store3) {
+      const { width: width2, height: height2 } = resolveCreateSize(type2['type'], type2, store3),
+        name = String(type2['name'] || type2['label'] || ''),
+        value37 = type2['agentReservation'] === !![],
+        value38 = value37
           ? [
-              ...(Array['isArray'](getState(_0x3e312a)['selectedNodeIds'])
-                ? getState(_0x3e312a)['selectedNodeIds']
+              ...(Array['isArray'](getState(store3)['selectedNodeIds'])
+                ? getState(store3)['selectedNodeIds']
                 : []),
             ]
           : [],
-        _0x2baee0 = String(_0x1c25e4['reuseNodeId'] || '')['trim'](),
-        _0x4cea57 = _0x2baee0 ? getNode(_0x3e312a, _0x2baee0) : null;
-      if (_0x4cea57 && String(_0x4cea57['type'] || '')['trim']() === _0x1c25e4['type']) {
-        const _0x1d0908 = getStore(_0x3e312a),
-          _0x5cb9c2 = { ..._0x3e312a, commit: null };
-        (Object['prototype']['hasOwnProperty']['call'](_0x1c25e4, 'name') || _0x1c25e4['label'] != null) &&
-          _0x1d0908?.['updateNodeData']?.(_0x2baee0, { name: _0xaff048 });
-        const _0x2ce34a = applyInitialNodeModel(
-            getNode(_0x3e312a, _0x2baee0) || _0x4cea57,
-            _0x1c25e4,
-            _0x5cb9c2,
-          ),
-          _0xfd4956 = applyInitialNodeText(_0x2ce34a, _0x1c25e4, _0x5cb9c2);
+        nodeId2 = String(type2['reuseNodeId'] || '')['trim'](),
+        value39 = nodeId2 ? getNode(store3, nodeId2) : null;
+      if (value39 && String(value39['type'] || '')['trim']() === type2['type']) {
+        const store4 = getStore(store3),
+          value40 = { ...store3, commit: null };
+        (Object['prototype']['hasOwnProperty']['call'](type2, 'name') || type2['label'] != null) &&
+          store4?.['updateNodeData']?.(nodeId2, { name: name });
+        const initialNodeModel = applyInitialNodeModel(getNode(store3, nodeId2) || value39, type2, value40),
+          initialNodeText = applyInitialNodeText(initialNodeModel, type2, value40);
         return (
-          _0x1d0908?.['setSelectedNodes']?.([_0x2baee0]),
-          _0x3e312a['commit']?.(),
-          { nodeId: _0x2baee0, node: getNode(_0x3e312a, _0x2baee0) || _0xfd4956 || _0x4cea57, reused: !![] }
+          store4?.['setSelectedNodes']?.([nodeId2]),
+          store3['commit']?.(),
+          { nodeId: nodeId2, node: getNode(store3, nodeId2) || initialNodeText || value39, reused: !![] }
         );
       }
-      if (hasExplicitCreatePosition(_0x1c25e4) && typeof _0x3e312a['buildNodeData'] === 'function') {
-        const _0x47d206 = generateId(_0x1c25e4['type']),
-          _0x429d97 = _0x3e312a['buildNodeData']({
-            ..._0x1c25e4,
-            id: _0x47d206,
-            type: _0x1c25e4['type'],
-            name: _0xaff048,
-            width: _0x54e37d,
-            height: _0x5930a6,
-            x: Number(_0x1c25e4['x']),
-            y: Number(_0x1c25e4['y']),
+      if (hasExplicitCreatePosition(type2) && typeof store3['buildNodeData'] === 'function') {
+        const id = generateId(type2['type']),
+          enabled5 = store3['buildNodeData']({
+            ...type2,
+            id: id,
+            type: type2['type'],
+            name: name,
+            width: width2,
+            height: height2,
+            x: Number(type2['x']),
+            y: Number(type2['y']),
           });
-        if (!_0x429d97 || typeof _0x429d97 !== 'object')
+        if (!enabled5 || typeof enabled5 !== 'object')
           throw createCanvasCommandError(
             'NODE_CREATE_FAILED',
-            'Canvas node factory did not return data for type: ' + _0x1c25e4['type'],
+            'Canvas node factory did not return data for type: ' + type2['type'],
           );
-        (getStore(_0x3e312a)?.['addNode']?.(_0x429d97),
-          getStore(_0x3e312a)?.['setSelectedNodes']?.(_0x3ff79f ? _0xd98c54 : [_0x47d206]));
-        const _0x4c7f17 = { ..._0x3e312a, commit: null },
-          _0x1cc2d8 = applyInitialNodeModel(_0x429d97, _0x1c25e4, _0x4c7f17),
-          _0x26f868 = applyInitialNodeText(_0x1cc2d8, _0x1c25e4, _0x4c7f17);
-        return (
-          _0x3e312a['commit']?.(),
-          { nodeId: _0x26f868?.['id'] || _0x47d206, node: _0x26f868 || _0x429d97 }
-        );
+        (getStore(store3)?.['addNode']?.(enabled5),
+          getStore(store3)?.['setSelectedNodes']?.(value37 ? value38 : [id]));
+        const value41 = { ...store3, commit: null },
+          initialNodeModel2 = applyInitialNodeModel(enabled5, type2, value41),
+          nodeId3 = applyInitialNodeText(initialNodeModel2, type2, value41);
+        return (store3['commit']?.(), { nodeId: nodeId3?.['id'] || id, node: nodeId3 || enabled5 });
       }
-      const _0x537841 = String(_0x1c25e4['placement'] || 'viewport-center-sequence')['trim'](),
-        _0x513c09 = String(_0x1c25e4['sequenceKey'] || _0x3e312a['createNodeSequenceKey'] || '')['trim'](),
-        _0x48e365 = _0x3e312a['createNodeAtCursor'](_0x1c25e4['type'], _0x54e37d, _0x5930a6, _0xaff048, {
-          placement: _0x537841,
-          sequenceKey: _0x513c09,
+      const placement = String(type2['placement'] || 'viewport-center-sequence')['trim'](),
+        sequenceKey = String(type2['sequenceKey'] || store3['createNodeSequenceKey'] || '')['trim'](),
+        value42 = store3['createNodeAtCursor'](type2['type'], width2, height2, name, {
+          placement: placement,
+          sequenceKey: sequenceKey,
         });
-      if (_0x3ff79f) getStore(_0x3e312a)?.['setSelectedNodes']?.(_0xd98c54);
-      const _0x332660 = applyInitialNodeModel(_0x48e365, _0x1c25e4, _0x3e312a),
-        _0x218b1a = applyInitialNodeText(_0x332660, _0x1c25e4, _0x3e312a);
-      return { nodeId: _0x218b1a?.['id'] || _0x48e365?.['id'] || '', node: _0x218b1a || _0x48e365 };
+      if (value37) getStore(store3)?.['setSelectedNodes']?.(value38);
+      const initialNodeModel3 = applyInitialNodeModel(value42, type2, store3),
+        nodeId4 = applyInitialNodeText(initialNodeModel3, type2, store3);
+      return { nodeId: nodeId4?.['id'] || value42?.['id'] || '', node: nodeId4 || value42 };
     },
   }),
-    _0x3030e3.register({
+    value35.register({
       id: 'node.delete',
       description: 'Delete canvas nodes.',
       riskLevel: 'danger',
@@ -521,18 +497,14 @@ export function registerGraphCommands(_0x3030e3) {
         selectionFallback: true,
       },
       returnSchema: { aliasFields: ['ids'] },
-      validate(_0x5849e7 = {}, _0x3469eb = {}) {
-        return validateNodeIds(_0x5849e7, _0x3469eb, { min: 1, allowSelection: true });
+      validate(options10 = {}, value43 = {}) {
+        return validateNodeIds(options10, value43, { min: 1, allowSelection: true });
       },
-      execute(_0x51aa83, _0x4f0552) {
-        return (
-          getStore(_0x4f0552)?.deleteNodes?.(_0x51aa83.ids),
-          _0x4f0552.commit?.(),
-          { ids: _0x51aa83.ids }
-        );
+      execute(ids, store5) {
+        return (getStore(store5)?.deleteNodes?.(ids.ids), store5.commit?.(), { ids: ids.ids });
       },
     }),
-    _0x3030e3.register({
+    value35.register({
       id: 'node.rename',
       description: 'Rename a canvas node.',
       riskLevel: 'safe',
@@ -542,28 +514,28 @@ export function registerGraphCommands(_0x3030e3) {
       },
       capabilitySchema: { reads: ['nodes'], writes: ['nodes'] },
       returnSchema: { aliasFields: ['nodeId', 'name'] },
-      validate(_0x4cd2b9 = {}, _0x13527c = {}) {
-        const _0x363afb = String(_0x4cd2b9.nodeId || '').trim();
-        if (!_0x363afb)
+      validate(error = {}, value44 = {}) {
+        const nodeId5 = String(error.nodeId || '').trim();
+        if (!nodeId5)
           return { ok: false, errorCode: 'MISSING_NODE_ID', message: 'node.rename requires nodeId.' };
-        if (!getNode(_0x13527c, _0x363afb))
-          return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + _0x363afb };
-        if (!Object.prototype.hasOwnProperty.call(_0x4cd2b9, 'name'))
+        if (!getNode(value44, nodeId5))
+          return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId5 };
+        if (!Object.prototype.hasOwnProperty.call(error, 'name'))
           return { ok: false, errorCode: 'MISSING_NODE_NAME', message: 'node.rename requires name.' };
-        return { args: { nodeId: _0x363afb, name: String(_0x4cd2b9.name || '').trim() } };
+        return { args: { nodeId: nodeId5, name: String(error.name || '').trim() } };
       },
-      execute(_0x44391a, _0x3600bf) {
-        const _0x55ff06 = getStore(_0x3600bf);
+      execute(name2, store6) {
+        const store7 = getStore(store6);
         return (
-          typeof _0x55ff06?.renameNode === 'function'
-            ? _0x55ff06.renameNode(_0x44391a.nodeId, _0x44391a.name)
-            : _0x55ff06?.updateNodeData?.(_0x44391a.nodeId, { name: _0x44391a.name }),
-          _0x3600bf.commit?.(),
-          { nodeId: _0x44391a.nodeId, name: _0x44391a.name }
+          typeof store7?.renameNode === 'function'
+            ? store7.renameNode(name2.nodeId, name2.name)
+            : store7?.updateNodeData?.(name2.nodeId, { name: name2.name }),
+          store6.commit?.(),
+          { nodeId: name2.nodeId, name: name2.name }
         );
       },
     }),
-    _0x3030e3.register({
+    value35.register({
       id: 'node.duplicate',
       description: 'Duplicate canvas nodes.',
       riskLevel: 'confirm',
@@ -583,48 +555,48 @@ export function registerGraphCommands(_0x3030e3) {
         selectionFallback: true,
       },
       returnSchema: { aliasFields: ['ids', 'sourceIds'] },
-      validate(_0x162fdc = {}, _0x430dae = {}) {
-        return validateNodeIds(_0x162fdc, _0x430dae, { min: 1, allowSelection: true });
+      validate(options11 = {}, value45 = {}) {
+        return validateNodeIds(options11, value45, { min: 1, allowSelection: true });
       },
-      execute(_0xf5e28a, _0x59a77c) {
-        const _0x394894 = getState(_0x59a77c),
-          _0xa18114 = getStore(_0x59a77c),
-          _0x3c7d26 = toFiniteNumber(_0xf5e28a.dx, 40),
-          _0x4c9d05 = toFiniteNumber(_0xf5e28a.dy, 40),
-          _0x58c5a0 = new Map(),
-          _0x19d356 = [],
-          _0x3b2879 = () => {
-            for (const _0x59978f of _0xf5e28a.ids) {
-              const _0x302a3f = _0x394894.nodes?.[_0x59978f];
-              if (!_0x302a3f) continue;
-              const _0x34147a = generateId(String(_0x302a3f.type || 'node'));
-              _0x58c5a0.set(_0x59978f, _0x34147a);
-              const _0x50ea31 = {
-                ...clonePlain(_0x302a3f),
-                id: _0x34147a,
-                x: toFiniteNumber(_0x302a3f.x) + _0x3c7d26,
-                y: toFiniteNumber(_0x302a3f.y) + _0x4c9d05,
+      execute(sourceIds, store8) {
+        const state4 = getState(store8),
+          store9 = getStore(store8),
+          toFiniteNumber2 = toFiniteNumber(sourceIds.dx, 40),
+          toFiniteNumber3 = toFiniteNumber(sourceIds.dy, 40),
+          sourceId2 = new Map(),
+          ids2 = [],
+          handler = () => {
+            for (const value46 of sourceIds.ids) {
+              const box5 = state4.nodes?.[value46];
+              if (!box5) continue;
+              const id2 = generateId(String(box5.type || 'node'));
+              sourceId2.set(value46, id2);
+              const value47 = {
+                ...clonePlain(box5),
+                id: id2,
+                x: toFiniteNumber(box5.x) + toFiniteNumber2,
+                y: toFiniteNumber(box5.y) + toFiniteNumber3,
                 _bizRev: undefined,
               };
-              (delete _0x50ea31._bizRev, _0xa18114?.addNode?.(_0x50ea31), _0x19d356.push(_0x34147a));
+              (delete value47._bizRev, store9?.addNode?.(value47), ids2.push(id2));
             }
-            for (const _0x3410cd of Object.values(_0x394894.edges || {})) {
-              if (!_0x58c5a0.has(_0x3410cd?.sourceId) || !_0x58c5a0.has(_0x3410cd?.targetId)) continue;
-              _0xa18114?.addEdge?.({
-                ...clonePlain(_0x3410cd),
+            for (const value48 of Object.values(state4.edges || {})) {
+              if (!sourceId2.has(value48?.sourceId) || !sourceId2.has(value48?.targetId)) continue;
+              store9?.addEdge?.({
+                ...clonePlain(value48),
                 id: generateId('edge'),
-                sourceId: _0x58c5a0.get(_0x3410cd.sourceId),
-                targetId: _0x58c5a0.get(_0x3410cd.targetId),
+                sourceId: sourceId2.get(value48.sourceId),
+                targetId: sourceId2.get(value48.targetId),
               });
             }
-            _0xa18114?.setSelectedNodes?.(_0x19d356);
+            store9?.setSelectedNodes?.(ids2);
           };
-        if (typeof _0xa18114?.batch === 'function') _0xa18114.batch(_0x3b2879);
-        else _0x3b2879();
-        return (_0x59a77c.commit?.(), { ids: _0x19d356, sourceIds: _0xf5e28a.ids });
+        if (typeof store9?.batch === 'function') store9.batch(handler);
+        else handler();
+        return (store8.commit?.(), { ids: ids2, sourceIds: sourceIds.ids });
       },
     }),
-    _0x3030e3.register({
+    value35.register({
       id: 'node.getSummary',
       description: 'Get a canvas node summary.',
       riskLevel: 'safe',
@@ -635,19 +607,19 @@ export function registerGraphCommands(_0x3030e3) {
       },
       capabilitySchema: { reads: ['nodes'], writes: [] },
       returnSchema: { aliasFields: ['id', 'type', 'name', 'model', 'provider'] },
-      validate(_0x2d60ab = {}, _0x58108c = {}) {
-        const _0x54ff5d = String(_0x2d60ab.nodeId || '').trim();
-        if (!_0x54ff5d)
+      validate(includeData2 = {}, value49 = {}) {
+        const nodeId6 = String(includeData2.nodeId || '').trim();
+        if (!nodeId6)
           return { ok: false, errorCode: 'MISSING_NODE_ID', message: 'node.getSummary requires nodeId.' };
-        if (!getNode(_0x58108c, _0x54ff5d))
-          return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + _0x54ff5d };
-        return { args: { nodeId: _0x54ff5d, includeData: _0x2d60ab.includeData === true } };
+        if (!getNode(value49, nodeId6))
+          return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId6 };
+        return { args: { nodeId: nodeId6, includeData: includeData2.includeData === true } };
       },
-      execute(_0x42966f, _0x5463b2) {
-        return buildNodeSummary(_0x5463b2, _0x42966f.nodeId, { includeData: _0x42966f.includeData });
+      execute(includeData3, value50) {
+        return buildNodeSummary(value50, includeData3.nodeId, { includeData: includeData3.includeData });
       },
     }),
-    _0x3030e3.register({
+    value35.register({
       id: 'graph.connect',
       description: 'Connect two canvas nodes.',
       riskLevel: 'safe',
@@ -663,58 +635,58 @@ export function registerGraphCommands(_0x3030e3) {
       },
       capabilitySchema: { reads: ['nodes', 'edges'], writes: ['edges'] },
       returnSchema: { aliasFields: ['edgeId', 'edge'] },
-      validate(_0x4f34bd = {}, _0x112e8a = {}) {
-        const _0x1cfa36 = normalizeEdgeArgs(_0x4f34bd);
-        if (!_0x1cfa36.sourceId || !_0x1cfa36.targetId)
+      validate(type3 = {}, value51 = {}) {
+        const edgeId = normalizeEdgeArgs(type3);
+        if (!edgeId.sourceId || !edgeId.targetId)
           return {
             ok: false,
             errorCode: 'MISSING_EDGE_ENDPOINTS',
             message: 'graph.connect requires sourceId and targetId.',
           };
-        if (_0x1cfa36.sourceId === _0x1cfa36.targetId)
+        if (edgeId.sourceId === edgeId.targetId)
           return {
             ok: false,
             errorCode: 'INVALID_EDGE_ENDPOINTS',
             message: 'graph.connect cannot connect a node to itself.',
           };
-        if (!getNode(_0x112e8a, _0x1cfa36.sourceId))
+        if (!getNode(value51, edgeId.sourceId))
           return {
             ok: false,
             errorCode: 'NODE_NOT_FOUND',
-            message: 'Canvas node not found: ' + _0x1cfa36.sourceId,
+            message: 'Canvas node not found: ' + edgeId.sourceId,
           };
-        if (!getNode(_0x112e8a, _0x1cfa36.targetId))
+        if (!getNode(value51, edgeId.targetId))
           return {
             ok: false,
             errorCode: 'NODE_NOT_FOUND',
-            message: 'Canvas node not found: ' + _0x1cfa36.targetId,
+            message: 'Canvas node not found: ' + edgeId.targetId,
           };
         return {
           args: {
-            ..._0x1cfa36,
-            edgeId: _0x1cfa36.edgeId || generateId('edge'),
-            type: _0x4f34bd.type ?? null,
+            ...edgeId,
+            edgeId: edgeId.edgeId || generateId('edge'),
+            type: type3.type ?? null,
           },
         };
       },
-      execute(_0x13a4e2, _0x1f1371) {
-        const _0x4b0083 = findEdgesByEndpoints(_0x1f1371, _0x13a4e2)[0];
-        if (_0x4b0083) return { edgeId: _0x4b0083.id, edge: _0x4b0083, reused: true };
-        const _0x15881d = {
-          id: _0x13a4e2.edgeId,
-          sourceId: _0x13a4e2.sourceId,
-          targetId: _0x13a4e2.targetId,
-          type: _0x13a4e2.type,
+      execute(id3, store10) {
+        const edgeId2 = findEdgesByEndpoints(store10, id3)[0];
+        if (edgeId2) return { edgeId: edgeId2.id, edge: edgeId2, reused: true };
+        const edgeId3 = {
+          id: id3.edgeId,
+          sourceId: id3.sourceId,
+          targetId: id3.targetId,
+          type: id3.type,
         };
-        if (_0x13a4e2.refSlot) _0x15881d.refSlot = _0x13a4e2.refSlot;
+        if (id3.refSlot) edgeId3.refSlot = id3.refSlot;
         return (
-          getStore(_0x1f1371)?.addEdge?.(_0x15881d),
-          _0x1f1371.commit?.(),
-          { edgeId: _0x15881d.id, edge: _0x15881d, reused: false }
+          getStore(store10)?.addEdge?.(edgeId3),
+          store10.commit?.(),
+          { edgeId: edgeId3.id, edge: edgeId3, reused: false }
         );
       },
     }),
-    _0x3030e3.register({
+    value35.register({
       id: 'node.setInputSlot',
       description: 'Set or clear the input slot/refSlot on an existing edge.',
       riskLevel: 'safe',
@@ -731,65 +703,65 @@ export function registerGraphCommands(_0x3030e3) {
       },
       capabilitySchema: { reads: ['edges'], writes: ['edges'] },
       returnSchema: { aliasFields: ['edgeId', 'refSlot', 'edge'] },
-      validate(_0x3c9c0e = {}, _0x36c058 = {}) {
-        const _0x4b7ea4 = normalizeEdgeArgs(_0x3c9c0e),
-          _0x284e79 =
-            Object.prototype.hasOwnProperty.call(_0x3c9c0e, 'refSlot') ||
-            Object.prototype.hasOwnProperty.call(_0x3c9c0e, 'slot') ||
-            Object.prototype.hasOwnProperty.call(_0x3c9c0e, 'inputSlot');
-        if (!_0x284e79)
+      validate(options12 = {}, value52 = {}) {
+        const edgeArgs = normalizeEdgeArgs(options12),
+          enabled6 =
+            Object.prototype.hasOwnProperty.call(options12, 'refSlot') ||
+            Object.prototype.hasOwnProperty.call(options12, 'slot') ||
+            Object.prototype.hasOwnProperty.call(options12, 'inputSlot');
+        if (!enabled6)
           return {
             ok: false,
             errorCode: 'MISSING_REF_SLOT',
             message: 'node.setInputSlot requires refSlot, slot, or inputSlot.',
           };
-        const _0x462ff1 = String(_0x3c9c0e.refSlot ?? _0x3c9c0e.slot ?? _0x3c9c0e.inputSlot ?? '').trim();
-        let _0x1a1dd8 = null;
-        if (_0x4b7ea4.edgeId) {
-          _0x1a1dd8 = getEdges(_0x36c058)[_0x4b7ea4.edgeId] || null;
-          if (!_0x1a1dd8)
+        const refSlot2 = String(options12.refSlot ?? options12.slot ?? options12.inputSlot ?? '').trim();
+        let edges2 = null;
+        if (edgeArgs.edgeId) {
+          edges2 = getEdges(value52)[edgeArgs.edgeId] || null;
+          if (!edges2)
             return {
               ok: false,
               errorCode: 'EDGE_NOT_FOUND',
-              message: 'Canvas edge not found: ' + _0x4b7ea4.edgeId,
+              message: 'Canvas edge not found: ' + edgeArgs.edgeId,
             };
         } else {
-          if (!_0x4b7ea4.sourceId || !_0x4b7ea4.targetId)
+          if (!edgeArgs.sourceId || !edgeArgs.targetId)
             return {
               ok: false,
               errorCode: 'MISSING_EDGE_SELECTOR',
               message: 'node.setInputSlot requires edgeId or sourceId/targetId.',
             };
-          _0x1a1dd8 = findEdgesByEndpoints(_0x36c058, _0x4b7ea4)[0] || null;
-          if (!_0x1a1dd8)
+          edges2 = findEdgesByEndpoints(value52, edgeArgs)[0] || null;
+          if (!edges2)
             return {
               ok: false,
               errorCode: 'EDGE_NOT_FOUND',
               message: 'No canvas edge matched node.setInputSlot.',
             };
         }
-        return { args: { edgeId: String(_0x1a1dd8.id || ''), refSlot: _0x462ff1 } };
+        return { args: { edgeId: String(edges2.id || ''), refSlot: refSlot2 } };
       },
-      execute(_0x447678, _0x3a7d65) {
-        const _0x42a365 = getEdges(_0x3a7d65)[_0x447678.edgeId];
-        if (!_0x42a365)
-          throw createCanvasCommandError('EDGE_NOT_FOUND', 'Canvas edge not found: ' + _0x447678.edgeId, {
-            edgeId: _0x447678.edgeId,
+      execute(edgeId4, store11) {
+        const args8 = getEdges(store11)[edgeId4.edgeId];
+        if (!args8)
+          throw createCanvasCommandError('EDGE_NOT_FOUND', 'Canvas edge not found: ' + edgeId4.edgeId, {
+            edgeId: edgeId4.edgeId,
           });
-        const _0xfa706c = { ..._0x42a365 };
-        if (_0x447678.refSlot) _0xfa706c.refSlot = _0x447678.refSlot;
-        else delete _0xfa706c.refSlot;
-        const _0x36389a = getStore(_0x3a7d65);
+        const edge = { ...args8 };
+        if (edgeId4.refSlot) edge.refSlot = edgeId4.refSlot;
+        else delete edge.refSlot;
+        const store12 = getStore(store11);
         return (
-          typeof _0x36389a?.updateEdgesBatch === 'function'
-            ? _0x36389a.updateEdgesBatch([_0x447678.edgeId], [_0xfa706c])
-            : (_0x36389a?.removeEdge?.(_0x447678.edgeId), _0x36389a?.addEdge?.(_0xfa706c)),
-          _0x3a7d65.commit?.(),
-          { edgeId: _0x447678.edgeId, refSlot: _0x447678.refSlot, edge: _0xfa706c }
+          typeof store12?.updateEdgesBatch === 'function'
+            ? store12.updateEdgesBatch([edgeId4.edgeId], [edge])
+            : (store12?.removeEdge?.(edgeId4.edgeId), store12?.addEdge?.(edge)),
+          store11.commit?.(),
+          { edgeId: edgeId4.edgeId, refSlot: edgeId4.refSlot, edge: edge }
         );
       },
     }),
-    _0x3030e3.register({
+    value35.register({
       id: 'graph.disconnect',
       description: 'Disconnect canvas nodes.',
       riskLevel: 'safe',
@@ -803,48 +775,48 @@ export function registerGraphCommands(_0x3030e3) {
       },
       capabilitySchema: { reads: ['edges'], writes: ['edges'] },
       returnSchema: { aliasFields: ['edgeIds'] },
-      validate(_0x21214a = {}, _0x5c30d8 = {}) {
-        const _0x1c5ece = normalizeEdgeArgs(_0x21214a);
-        if (_0x1c5ece.edgeId) {
-          const _0x2af4cd = getEdges(_0x5c30d8)[_0x1c5ece.edgeId];
-          if (!_0x2af4cd)
+      validate(options13 = {}, value53 = {}) {
+        const edgeArgs2 = normalizeEdgeArgs(options13);
+        if (edgeArgs2.edgeId) {
+          const edges3 = getEdges(value53)[edgeArgs2.edgeId];
+          if (!edges3)
             return {
               ok: false,
               errorCode: 'EDGE_NOT_FOUND',
-              message: 'Canvas edge not found: ' + _0x1c5ece.edgeId,
+              message: 'Canvas edge not found: ' + edgeArgs2.edgeId,
             };
-          return { args: { edgeIds: [_0x1c5ece.edgeId] } };
+          return { args: { edgeIds: [edgeArgs2.edgeId] } };
         }
-        if (!_0x1c5ece.sourceId && !_0x1c5ece.targetId)
+        if (!edgeArgs2.sourceId && !edgeArgs2.targetId)
           return {
             ok: false,
             errorCode: 'MISSING_EDGE_SELECTOR',
             message: 'graph.disconnect requires edgeId or endpoint selectors.',
           };
-        const _0x51cb0a = findEdgesByEndpoints(_0x5c30d8, _0x1c5ece);
-        if (_0x51cb0a.length === 0)
+        const edgeIds = findEdgesByEndpoints(value53, edgeArgs2);
+        if (edgeIds.length === 0)
           return {
             ok: false,
             errorCode: 'EDGE_NOT_FOUND',
             message: 'No canvas edge matched graph.disconnect.',
           };
-        return { args: { edgeIds: _0x51cb0a.map((_0x15fd5e) => _0x15fd5e.id) } };
+        return { args: { edgeIds: edgeIds.map((item9) => item9.id) } };
       },
-      execute(_0x146d4f, _0x146147) {
-        const _0x3742b2 = getStore(_0x146147);
-        for (const _0x4c5bb8 of _0x146d4f.edgeIds) _0x3742b2?.removeEdge?.(_0x4c5bb8);
-        return (_0x146147.commit?.(), { edgeIds: _0x146d4f.edgeIds });
+      execute(edgeIds2, store13) {
+        const store14 = getStore(store13);
+        for (const value54 of edgeIds2.edgeIds) store14?.removeEdge?.(value54);
+        return (store13.commit?.(), { edgeIds: edgeIds2.edgeIds });
       },
     }),
-    _0x3030e3.register({
+    value35.register({
       id: 'graph.getCanvasSummary',
       description: 'Get a safe canvas summary.',
       riskLevel: 'safe',
       argsSchema: {},
       capabilitySchema: { reads: ['nodes', 'edges', 'selection', 'viewport'], writes: [] },
       returnSchema: { aliasFields: ['selectedNodeIds', 'nodes', 'edges', 'nodeCount', 'edgeCount'] },
-      execute(_0x3a37f7, _0x33655c) {
-        return buildCanvasSummary(_0x33655c);
+      execute(value55, value56) {
+        return buildCanvasSummary(value56);
       },
     }));
 }

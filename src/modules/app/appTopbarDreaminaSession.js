@@ -3,130 +3,129 @@ import { openExternalLink } from '../../services/externalLinkService.js';
 import { CLI_COMPONENT_CHANGED } from '../../../api/cliComponentApi.js';
 const DREAMINA_LOGIN_PAGE_URL = 'https://jimeng.jianying.com/',
   DREAMINA_I18N_PREFIX = 'settings.apiInput.providers.dreamina';
-function trTemplate(_0x37d5e8, _0x22cd4f = {}) {
-  let _0x2c8290 = t(_0x37d5e8);
+function trTemplate(value, item = {}) {
+  let t2 = t(value);
   return (
-    Object['entries'](_0x22cd4f || {})['forEach'](([_0x7270c3, _0x458989]) => {
-      _0x2c8290 = _0x2c8290['split']('{' + _0x7270c3 + '}')['join'](String(_0x458989 ?? ''));
+    Object['entries'](item || {})['forEach'](([key, index]) => {
+      t2 = t2['split']('{' + key + '}')['join'](String(index ?? ''));
     }),
-    _0x2c8290
+    t2
   );
 }
-function trDreamina(_0xf346fd, _0x24cfae = {}) {
-  return trTemplate(DREAMINA_I18N_PREFIX + '.' + _0xf346fd, _0x24cfae);
+function trDreamina(result, data = {}) {
+  return trTemplate(DREAMINA_I18N_PREFIX + '.' + result, data);
 }
-function normalizeDreaminaManualUrlCandidate(_0x3cfa7c) {
-  const _0x5b0492 = String(_0x3cfa7c || '')['trim']();
-  if (!_0x5b0492) return '';
-  const _0xcda608 = _0x5b0492['replace'](/^[<（(【\["'“‘]+/, '')
+function normalizeDreaminaManualUrlCandidate(options) {
+  const enabled = String(options || '')['trim']();
+  if (!enabled) return '';
+  const target = enabled['replace'](/^[<（(【\["'“‘]+/, '')
     ['replace'](/[>）)】\]"'”’]+$/, '')
     ['replace'](/[，。；;、]+$/, '');
-  return /^https?:\/\//['test'](_0xcda608) ? _0xcda608 : '';
+  return /^https?:\/\//['test'](target) ? target : '';
 }
-export function extractDreaminaManualLinksFromOutputLines(_0x5c659b) {
-  const _0x389fbc = Array['isArray'](_0x5c659b) ? _0x5c659b : [],
-    _0x2b8a82 = [];
-  let _0x4960ea = '';
-  _0x389fbc['forEach']((_0x2b264e) => {
-    const _0x2978a2 = String(_0x2b264e || '');
-    if (!_0x4960ea && _0x2978a2['includes']('请在浏览器中打开以下链接')) _0x4960ea = '__PENDING__';
-    else _0x4960ea === '__PENDING__' && (_0x4960ea = _0x2978a2['trim']());
-    const _0x31ad31 = _0x2978a2['match'](/https?:\/\/[^\s]+/g);
-    if (!_0x31ad31) return;
-    _0x31ad31['forEach']((_0x4feab7) => {
-      const _0x1ee19b = normalizeDreaminaManualUrlCandidate(_0x4feab7);
-      if (_0x1ee19b && !_0x2b8a82['includes'](_0x1ee19b)) _0x2b8a82['push'](_0x1ee19b);
+export function extractDreaminaManualLinksFromOutputLines(source) {
+  const list = Array['isArray'](source) ? source : [],
+    list2 = [];
+  let enabled2 = '';
+  list['forEach']((next) => {
+    const list3 = String(next || '');
+    if (!enabled2 && list3['includes']('请在浏览器中打开以下链接')) enabled2 = '__PENDING__';
+    else enabled2 === '__PENDING__' && (enabled2 = list3['trim']());
+    const list4 = list3['match'](/https?:\/\/[^\s]+/g);
+    if (!list4) return;
+    list4['forEach']((current) => {
+      const dreaminaManualUrlCandidate = normalizeDreaminaManualUrlCandidate(current);
+      if (dreaminaManualUrlCandidate && !list2['includes'](dreaminaManualUrlCandidate))
+        list2['push'](dreaminaManualUrlCandidate);
     });
   });
-  const _0x4a68c8 =
-      _0x4960ea && _0x4960ea !== '__PENDING__' ? normalizeDreaminaManualUrlCandidate(_0x4960ea) : '',
-    _0x32e515 =
-      _0x4a68c8 ||
-      _0x2b8a82['find']((_0x21023c) => _0x21023c['includes']('/passport/web_login')) ||
-      _0x2b8a82['find']((_0x59199e) => _0x59199e['includes']('/passport/web/web_login')) ||
+  const entry = enabled2 && enabled2 !== '__PENDING__' ? normalizeDreaminaManualUrlCandidate(enabled2) : '',
+    strictAuthorizeUrl =
+      entry ||
+      list2['find']((list5) => list5['includes']('/passport/web_login')) ||
+      list2['find']((list6) => list6['includes']('/passport/web/web_login')) ||
       '',
-    _0x19f45a =
-      _0x2b8a82['find']((_0xbde52d) => _0xbde52d['includes']('/dreamina/cli/v1/dreamina_cli_login')) || '',
-    _0x5491b1 = _0x19f45a || _0x2b8a82['find']((_0x34c78a) => _0x34c78a !== DREAMINA_LOGIN_PAGE_URL) || '';
+    authorizeUrl = list2['find']((list7) => list7['includes']('/dreamina/cli/v1/dreamina_cli_login')) || '',
+    record = authorizeUrl || list2['find']((payload) => payload !== DREAMINA_LOGIN_PAGE_URL) || '';
   return {
-    authorizeUrl: _0x19f45a || _0x32e515 || _0x5491b1 || '',
-    strictAuthorizeUrl: _0x32e515,
-    callbackUrl: _0x19f45a,
+    authorizeUrl: authorizeUrl || strictAuthorizeUrl || record || '',
+    strictAuthorizeUrl: strictAuthorizeUrl,
+    callbackUrl: authorizeUrl,
   };
 }
-export function getDreaminaWebLoginButtonText(_0x21524c) {
-  const _0x393a8e = _0x21524c?.['runtime'] || {},
-    _0x217445 = !!_0x21524c?.['loggedIn'],
-    _0x19a4f5 = !!_0x393a8e?.['active'];
-  if (_0x19a4f5) return trDreamina('viewLogin');
-  return _0x217445 ? trDreamina('relogin') : trDreamina('login');
+export function getDreaminaWebLoginButtonText(enabled3) {
+  const enabled4 = enabled3?.['runtime'] || {},
+    handle = !!enabled3?.['loggedIn'],
+    state = !!enabled4?.['active'];
+  if (state) return trDreamina('viewLogin');
+  return handle ? trDreamina('relogin') : trDreamina('login');
 }
-export function getDreaminaQrLoginButtonText(_0x2cb595) {
-  const _0x443077 = _0x2cb595?.['runtime'] || {},
-    _0x2c485e = !!_0x443077?.['active'];
-  if (_0x2c485e) return trDreamina('viewLogin');
+export function getDreaminaQrLoginButtonText(config) {
+  const enabled5 = config?.['runtime'] || {},
+    scope = !!enabled5?.['active'];
+  if (scope) return trDreamina('viewLogin');
   return trDreamina('login');
 }
-export function getDreaminaStatusSessionKey(_0x3674ec) {
-  const _0x5efa61 = _0x3674ec?.['runtime'] || {},
-    _0x48abdc = Number(_0x5efa61?.['startedAt'] || 0x0);
-  if (_0x48abdc > 0x0) return 'login:' + _0x48abdc;
-  const _0x18d053 = Number(_0x5efa61?.['qrVersion'] || 0x0);
-  if (_0x18d053 > 0x0) return 'qr:' + _0x18d053;
+export function getDreaminaStatusSessionKey(input) {
+  const output = input?.['runtime'] || {},
+    count = Number(output?.['startedAt'] || 0x0);
+  if (count > 0x0) return 'login:' + count;
+  const count2 = Number(output?.['qrVersion'] || 0x0);
+  if (count2 > 0x0) return 'qr:' + count2;
   return '';
 }
-export function mergeDreaminaLoginRuntimeStatus(_0x5b0831 = {}, _0x140d6c = {}) {
-  const _0x3ac1e3 = String(_0x140d6c?.['phase'] || ''),
-    _0x21c063 = ['success', 'reused', 'done']['includes'](_0x3ac1e3);
+export function mergeDreaminaLoginRuntimeStatus(error = {}, runtime = {}) {
+  const value2 = String(runtime?.['phase'] || ''),
+    loggedIn = ['success', 'reused', 'done']['includes'](value2);
   return {
-    ...(_0x5b0831 || {}),
-    loggedIn: _0x21c063 ? !![] : !!_0x5b0831?.['loggedIn'],
-    message: String(_0x140d6c?.['message'] || '')['trim']() || String(_0x5b0831?.['message'] || '')['trim'](),
-    runtime: _0x140d6c || {},
+    ...(error || {}),
+    loggedIn: loggedIn ? !![] : !!error?.['loggedIn'],
+    message: String(runtime?.['message'] || '')['trim']() || String(error?.['message'] || '')['trim'](),
+    runtime: runtime || {},
   };
 }
-export function reconcileDreaminaSessionUiState(_0x476421, _0xf0d18c = {}) {
-  const _0x37a377 = getDreaminaStatusSessionKey(_0x476421),
-    _0x28950f = !!_0x476421?.['runtime']?.['active'],
-    _0x2d2cf7 = !!_0xf0d18c['manualGuideOpen'] && Number(_0xf0d18c['loginLaunchRequestedAt'] || 0x0) > 0x0;
-  if (_0x37a377 && _0x37a377 !== _0xf0d18c['currentSessionKey'])
+export function reconcileDreaminaSessionUiState(enabled6, enabled7 = {}) {
+  const dreaminaStatusSessionKey = getDreaminaStatusSessionKey(enabled6),
+    enabled8 = !!enabled6?.['runtime']?.['active'],
+    enabled9 = !!enabled7['manualGuideOpen'] && Number(enabled7['loginLaunchRequestedAt'] || 0x0) > 0x0;
+  if (dreaminaStatusSessionKey && dreaminaStatusSessionKey !== enabled7['currentSessionKey'])
     return (
-      (_0xf0d18c['currentSessionKey'] = _0x37a377),
-      (_0xf0d18c['dismissedSessionKey'] = ''),
-      !_0x2d2cf7 && ((_0xf0d18c['manualGuideOpen'] = ![]), (_0xf0d18c['loginLaunchRequestedAt'] = 0x0)),
+      (enabled7['currentSessionKey'] = dreaminaStatusSessionKey),
+      (enabled7['dismissedSessionKey'] = ''),
+      !enabled9 && ((enabled7['manualGuideOpen'] = ![]), (enabled7['loginLaunchRequestedAt'] = 0x0)),
       !![]
     );
-  if (!_0x28950f && !_0x37a377 && !_0x2d2cf7)
+  if (!enabled8 && !dreaminaStatusSessionKey && !enabled9)
     return (
-      (_0xf0d18c['currentSessionKey'] = ''),
-      (_0xf0d18c['dismissedSessionKey'] = ''),
-      (_0xf0d18c['manualGuideOpen'] = ![]),
-      (_0xf0d18c['loginLaunchRequestedAt'] = 0x0),
+      (enabled7['currentSessionKey'] = ''),
+      (enabled7['dismissedSessionKey'] = ''),
+      (enabled7['manualGuideOpen'] = ![]),
+      (enabled7['loginLaunchRequestedAt'] = 0x0),
       !![]
     );
   return ![];
 }
-export function shouldDreaminaManualGuideOpenByDefault(_0x51eeb7, _0x2c3dd6 = '') {
-  const _0x5437f5 = _0x51eeb7?.['runtime'] || {},
-    _0x35c7c0 = String(_0x5437f5?.['loginMode'] || '');
-  if (!_0x5437f5?.['active'] || !['oauth', 'web', 'headless']['includes'](_0x35c7c0)) return ![];
-  const _0x3da2c6 = getDreaminaStatusSessionKey(_0x51eeb7);
-  return !_0x3da2c6 || String(_0x2c3dd6 || '') !== _0x3da2c6;
+export function shouldDreaminaManualGuideOpenByDefault(value3, value4 = '') {
+  const enabled10 = value3?.['runtime'] || {},
+    value5 = String(enabled10?.['loginMode'] || '');
+  if (!enabled10?.['active'] || !['oauth', 'web', 'headless']['includes'](value5)) return ![];
+  const dreaminaStatusSessionKey2 = getDreaminaStatusSessionKey(value3);
+  return !dreaminaStatusSessionKey2 || String(value4 || '') !== dreaminaStatusSessionKey2;
 }
 export function createDreaminaLoginSessionController({
-  fetchDreaminaCliStatusFromServer: _0x40331b,
-  fetchDreaminaCliLoginRuntimeFromServer: _0xf8afbc,
-  startDreaminaWebLoginFromServer: _0x5e8c9f,
-  importDreaminaLoginResponseFromServer: _0x2d8553,
-  logoutDreaminaFromServer: _0x5801e7,
-  buildDreaminaQrImageUrl: _0x487c92,
+  fetchDreaminaCliStatusFromServer: fetchDreaminaCliStatusFromServer,
+  fetchDreaminaCliLoginRuntimeFromServer: fetchDreaminaCliLoginRuntimeFromServer,
+  startDreaminaWebLoginFromServer: startDreaminaWebLoginFromServer,
+  importDreaminaLoginResponseFromServer: importDreaminaLoginResponseFromServer,
+  logoutDreaminaFromServer: logoutDreaminaFromServer,
+  buildDreaminaQrImageUrl: buildDreaminaQrImageUrl,
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis['window'],
 } = {}) {
-  const _0x58380c = documentObject,
-    _0x581cb5 = windowObject,
-    _0x101314 = 0x55 * 0x3e8,
-    _0x37e9f8 = {
+  const settingsCardEl = documentObject,
+    value6 = windowObject,
+    value7 = 0x55 * 0x3e8,
+    enabled11 = {
       pollTimer: null,
       pollInFlight: ![],
       pollInFlightGeneration: 0x0,
@@ -148,680 +147,681 @@ export function createDreaminaLoginSessionController({
       loginLaunchRequestedAt: 0x0,
       observer: null,
     };
-  function _0x2e7a44() {
+  function run() {
     return {
-      settingsCardEl: _0x58380c['getElementById']('dreaminaSettingsCard'),
-      statusTextEl: _0x58380c['getElementById']('dreaminaStatusText'),
-      messageTextEl: _0x58380c['getElementById']('dreaminaStatusMessage'),
-      creditTextEl: _0x58380c['getElementById']('dreaminaCreditText'),
-      btnAuthEl: _0x58380c['getElementById']('btnDreaminaAuth'),
-      btnQrAuthEl: _0x58380c['getElementById']('btnDreaminaQrAuth'),
-      btnLogoutEl: _0x58380c['getElementById']('btnDreaminaLogout'),
-      modalOverlayEl: _0x58380c['getElementById']('dreaminaLoginModal'),
-      modalCardEl: _0x58380c['getElementById']('dreaminaLoginModalCard'),
-      modalCloseEl: _0x58380c['getElementById']('dreaminaModalClose'),
-      modalMessageEl: _0x58380c['getElementById']('dreaminaModalMessage'),
-      modalQrWrapEl: _0x58380c['getElementById']('dreaminaModalQrWrap'),
-      modalQrImageEl: _0x58380c['getElementById']('dreaminaModalQrImage'),
-      modalWaitEl: _0x58380c['getElementById']('dreaminaModalWait'),
-      modalWaitTextEl: _0x58380c['getElementById']('dreaminaModalWaitText'),
-      modalRetryEl: _0x58380c['getElementById']('dreaminaModalRetry'),
-      manualGuideEl: _0x58380c['getElementById']('dreaminaManualGuide'),
-      manualAuthUrlEl: _0x58380c['getElementById']('dreaminaManualAuthUrl'),
-      manualImportJsonEl: _0x58380c['getElementById']('dreaminaManualImportJson'),
-      manualOpenAuthEl: _0x58380c['getElementById']('dreaminaManualOpenAuth'),
-      manualCopyAuthEl: _0x58380c['getElementById']('dreaminaManualCopyAuth'),
-      manualImportJsonBtnEl: _0x58380c['getElementById']('dreaminaManualImportJsonBtn'),
+      settingsCardEl: settingsCardEl['getElementById']('dreaminaSettingsCard'),
+      statusTextEl: settingsCardEl['getElementById']('dreaminaStatusText'),
+      messageTextEl: settingsCardEl['getElementById']('dreaminaStatusMessage'),
+      creditTextEl: settingsCardEl['getElementById']('dreaminaCreditText'),
+      btnAuthEl: settingsCardEl['getElementById']('btnDreaminaAuth'),
+      btnQrAuthEl: settingsCardEl['getElementById']('btnDreaminaQrAuth'),
+      btnLogoutEl: settingsCardEl['getElementById']('btnDreaminaLogout'),
+      modalOverlayEl: settingsCardEl['getElementById']('dreaminaLoginModal'),
+      modalCardEl: settingsCardEl['getElementById']('dreaminaLoginModalCard'),
+      modalCloseEl: settingsCardEl['getElementById']('dreaminaModalClose'),
+      modalMessageEl: settingsCardEl['getElementById']('dreaminaModalMessage'),
+      modalQrWrapEl: settingsCardEl['getElementById']('dreaminaModalQrWrap'),
+      modalQrImageEl: settingsCardEl['getElementById']('dreaminaModalQrImage'),
+      modalWaitEl: settingsCardEl['getElementById']('dreaminaModalWait'),
+      modalWaitTextEl: settingsCardEl['getElementById']('dreaminaModalWaitText'),
+      modalRetryEl: settingsCardEl['getElementById']('dreaminaModalRetry'),
+      manualGuideEl: settingsCardEl['getElementById']('dreaminaManualGuide'),
+      manualAuthUrlEl: settingsCardEl['getElementById']('dreaminaManualAuthUrl'),
+      manualImportJsonEl: settingsCardEl['getElementById']('dreaminaManualImportJson'),
+      manualOpenAuthEl: settingsCardEl['getElementById']('dreaminaManualOpenAuth'),
+      manualCopyAuthEl: settingsCardEl['getElementById']('dreaminaManualCopyAuth'),
+      manualImportJsonBtnEl: settingsCardEl['getElementById']('dreaminaManualImportJsonBtn'),
     };
   }
-  function _0x28c1fb() {
-    const { settingsCardEl: _0x9da0fd } = _0x2e7a44();
-    if (!_0x9da0fd) return ![];
-    const _0x3be33a = !![];
+  function syncDevVisibility() {
+    const { settingsCardEl: settingsCardEl2 } = run();
+    if (!settingsCardEl2) return ![];
+    const enabled12 = !![];
     return (
-      (_0x9da0fd['hidden'] = !_0x3be33a),
-      !_0x3be33a && (_0x87872f({ force: !![], rememberDismissal: ![] }), _0x308414()),
-      _0x3be33a
+      (settingsCardEl2['hidden'] = !enabled12),
+      !enabled12 && (run2({ force: !![], rememberDismissal: ![] }), run3()),
+      enabled12
     );
   }
-  function _0x308414() {
-    (_0x37e9f8['pollTimer'] && (clearTimeout(_0x37e9f8['pollTimer']), (_0x37e9f8['pollTimer'] = null)),
-      (_0x37e9f8['pollGeneration'] += 0x1));
+  function run3() {
+    (enabled11['pollTimer'] && (clearTimeout(enabled11['pollTimer']), (enabled11['pollTimer'] = null)),
+      (enabled11['pollGeneration'] += 0x1));
   }
-  function _0x5e6e08() {
-    const _0x4c1731 = _0x37e9f8['pollGeneration'];
+  function run4() {
+    const value8 = enabled11['pollGeneration'];
     if (
-      _0x37e9f8['pollTimer'] ||
-      (_0x37e9f8['pollInFlight'] && _0x37e9f8['pollInFlightGeneration'] === _0x4c1731)
+      enabled11['pollTimer'] ||
+      (enabled11['pollInFlight'] && enabled11['pollInFlightGeneration'] === value8)
     )
       return;
-    const _0x2f4586 = async () => {
-      if (_0x4c1731 !== _0x37e9f8['pollGeneration']) return;
-      _0x37e9f8['pollTimer'] = null;
-      if (_0x37e9f8['pollInFlight'] && _0x37e9f8['pollInFlightGeneration'] === _0x4c1731) return;
-      ((_0x37e9f8['pollInFlight'] = !![]), (_0x37e9f8['pollInFlightGeneration'] = _0x4c1731));
+    const run5 = async () => {
+      if (value8 !== enabled11['pollGeneration']) return;
+      enabled11['pollTimer'] = null;
+      if (enabled11['pollInFlight'] && enabled11['pollInFlightGeneration'] === value8) return;
+      ((enabled11['pollInFlight'] = !![]), (enabled11['pollInFlightGeneration'] = value8));
       try {
-        await _0x39d25f({ silent: !![] });
+        await run6({ silent: !![] });
       } finally {
-        _0x37e9f8['pollInFlightGeneration'] === _0x4c1731 && (_0x37e9f8['pollInFlight'] = ![]);
-        if (_0x4c1731 !== _0x37e9f8['pollGeneration']) return;
-        _0x37e9f8['lastStatus']?.['runtime']?.['active'] &&
-          (_0x37e9f8['pollTimer'] = setTimeout(_0x2f4586, 0x320));
+        enabled11['pollInFlightGeneration'] === value8 && (enabled11['pollInFlight'] = ![]);
+        if (value8 !== enabled11['pollGeneration']) return;
+        enabled11['lastStatus']?.['runtime']?.['active'] &&
+          (enabled11['pollTimer'] = setTimeout(run5, 0x320));
       }
     };
-    void _0x2f4586();
+    void run5();
   }
-  function _0x5746cc() {
-    ((_0x37e9f8['qrImageLoadError'] = ![]),
-      (_0x37e9f8['lastQrImageUrl'] = ''),
-      (_0x37e9f8['lastQrImageRequestedAt'] = 0x0),
-      (_0x37e9f8['lastQrImageLoadedAt'] = 0x0),
-      (_0x37e9f8['lastQrImageErrorAt'] = 0x0),
-      (_0x37e9f8['lastQrImageErrorMessage'] = ''));
+  function run7() {
+    ((enabled11['qrImageLoadError'] = ![]),
+      (enabled11['lastQrImageUrl'] = ''),
+      (enabled11['lastQrImageRequestedAt'] = 0x0),
+      (enabled11['lastQrImageLoadedAt'] = 0x0),
+      (enabled11['lastQrImageErrorAt'] = 0x0),
+      (enabled11['lastQrImageErrorMessage'] = ''));
   }
-  function _0x2f6083(_0x1b63ab, _0x4990f0 = Date['now']()) {
-    const _0x34525c = String(_0x1b63ab || '')['trim']();
-    if (!_0x34525c) return '';
-    const _0x5006de = _0x34525c['includes']('?') ? '&' : '?';
-    return '' + _0x34525c + _0x5006de + 'cb=' + encodeURIComponent(String(_0x4990f0));
+  function run8(value9, value10 = Date['now']()) {
+    const list8 = String(value9 || '')['trim']();
+    if (!list8) return '';
+    const value11 = list8['includes']('?') ? '&' : '?';
+    return '' + list8 + value11 + 'cb=' + encodeURIComponent(String(value10));
   }
-  function _0x8236e(_0xf930b9, { withCacheBust: withCacheBust = ![] } = {}) {
-    const _0x30b68a = Number(_0xf930b9?.['qrVersion'] || 0x0),
-      _0x154aed = _0x487c92?.(_0x30b68a || Date['now']()) || '';
-    if (!_0x154aed) return '';
-    return withCacheBust ? _0x2f6083(_0x154aed) : _0x154aed;
+  function run9(value12, { withCacheBust: withCacheBust = ![] } = {}) {
+    const value13 = Number(value12?.['qrVersion'] || 0x0),
+      enabled13 = buildDreaminaQrImageUrl?.(value13 || Date['now']()) || '';
+    if (!enabled13) return '';
+    return withCacheBust ? run8(enabled13) : enabled13;
   }
-  function _0x2c111b(_0x45c4b9) {
-    const _0x3b4eaf = _0x45c4b9?.['runtime'] || {},
-      _0x47ebbb = String(_0x3b4eaf?.['phase'] || ''),
-      _0x13cbde = !!_0x3b4eaf?.['qrAvailable'];
-    return _0x47ebbb === 'qr_ready' && _0x13cbde && !!_0x37e9f8['qrImageLoadError'];
+  function run10(value14) {
+    const enabled14 = value14?.['runtime'] || {},
+      value15 = String(enabled14?.['phase'] || ''),
+      value16 = !!enabled14?.['qrAvailable'];
+    return value15 === 'qr_ready' && value16 && !!enabled11['qrImageLoadError'];
   }
-  function _0x5ae502(_0x1456bb) {
-    const _0x492a47 = _0x1456bb?.['runtime'] || {};
-    return Array['isArray'](_0x492a47?.['outputTail']) ? _0x492a47['outputTail'] : [];
+  function run11(value17) {
+    const value18 = value17?.['runtime'] || {};
+    return Array['isArray'](value18?.['outputTail']) ? value18['outputTail'] : [];
   }
-  function _0x33b713(_0x12aaa6) {
-    const _0x4ba8ee = _0x5ae502(_0x12aaa6);
-    return _0x4ba8ee['some']((_0x380b07) => {
-      const _0x2ed24a = String(_0x380b07 || '')['toLowerCase']();
+  function run12(value19) {
+    const list9 = run11(value19);
+    return list9['some']((value20) => {
+      const list10 = String(value20 || '')['toLowerCase']();
       return (
-        _0x2ed24a['includes']('自动打开浏览器失败') ||
-        _0x2ed24a['includes']('open headless login page') ||
-        _0x2ed24a['includes']('executable file not found') ||
-        _0x2ed24a['includes']('google-chrome')
+        list10['includes']('自动打开浏览器失败') ||
+        list10['includes']('open headless login page') ||
+        list10['includes']('executable file not found') ||
+        list10['includes']('google-chrome')
       );
     });
   }
-  function _0x32353f(_0x3ff82b) {
-    const _0x270537 = _0x3ff82b?.['runtime'] || {},
-      _0x5b984f = extractDreaminaManualLinksFromOutputLines(_0x5ae502(_0x3ff82b));
+  function run13(value21) {
+    const value22 = value21?.['runtime'] || {},
+      args = extractDreaminaManualLinksFromOutputLines(run11(value21));
     return {
-      ..._0x5b984f,
-      authorizeUrl: String(_0x270537?.['authorizeUrl'] || '')['trim']() || _0x5b984f['authorizeUrl'],
-      callbackUrl: String(_0x270537?.['callbackUrl'] || '')['trim']() || _0x5b984f['callbackUrl'],
+      ...args,
+      authorizeUrl: String(value22?.['authorizeUrl'] || '')['trim']() || args['authorizeUrl'],
+      callbackUrl: String(value22?.['callbackUrl'] || '')['trim']() || args['callbackUrl'],
     };
   }
-  function _0x2bfc6f(_0x4546b3) {
+  function run14(value23) {
     const {
-      manualAuthUrlEl: _0x2ce08b,
-      manualOpenAuthEl: _0x3dfe61,
-      manualCopyAuthEl: _0x2a643f,
-    } = _0x2e7a44();
-    if (!_0x2ce08b || !_0x3dfe61 || !_0x2a643f) return;
-    const _0x47e148 = _0x32353f(_0x4546b3 || _0x37e9f8['lastStatus'] || {}),
-      _0x133447 = String(_0x47e148?.['authorizeUrl'] || '')['trim']();
-    ((_0x2ce08b['value'] = _0x133447 || trDreamina('waitingAuthUrl')),
-      (_0x3dfe61['disabled'] = !_0x133447),
-      (_0x2a643f['disabled'] = !_0x133447));
+      manualAuthUrlEl: manualAuthUrlEl,
+      manualOpenAuthEl: manualOpenAuthEl,
+      manualCopyAuthEl: manualCopyAuthEl,
+    } = run();
+    if (!manualAuthUrlEl || !manualOpenAuthEl || !manualCopyAuthEl) return;
+    const value24 = run13(value23 || enabled11['lastStatus'] || {}),
+      enabled15 = String(value24?.['authorizeUrl'] || '')['trim']();
+    ((manualAuthUrlEl['value'] = enabled15 || trDreamina('waitingAuthUrl')),
+      (manualOpenAuthEl['disabled'] = !enabled15),
+      (manualCopyAuthEl['disabled'] = !enabled15));
   }
-  function _0x2cbe94(_0x8fea49) {
-    const { manualGuideEl: _0x3ad9e6 } = _0x2e7a44();
-    if (!_0x3ad9e6) return;
-    (_0x2bfc6f(_0x8fea49 || _0x37e9f8['lastStatus'] || {}),
-      (_0x3ad9e6['hidden'] = !_0x37e9f8['manualGuideOpen']));
+  function run15(value25) {
+    const { manualGuideEl: manualGuideEl } = run();
+    if (!manualGuideEl) return;
+    (run14(value25 || enabled11['lastStatus'] || {}),
+      (manualGuideEl['hidden'] = !enabled11['manualGuideOpen']));
   }
-  function _0x5e1b3a(_0x536fd4 = _0x37e9f8['lastStatus'] || {}) {
-    const _0x20b1ea = _0x32353f(_0x536fd4);
-    return String(_0x20b1ea?.['authorizeUrl'] || '')['trim']();
+  function run16(value26 = enabled11['lastStatus'] || {}) {
+    const value27 = run13(value26);
+    return String(value27?.['authorizeUrl'] || '')['trim']();
   }
-  async function _0x3eaee7(_0x343947, _0x7a1c46) {
-    const _0x42a0b9 = String(_0x343947 || '')['trim']();
-    if (!_0x42a0b9)
-      return (_0x581cb5['showToast']?.(trDreamina('missingValue', { label: _0x7a1c46 }), 'warning'), ![]);
+  async function run17(value28, label) {
+    const enabled16 = String(value28 || '')['trim']();
+    if (!enabled16)
+      return (value6['showToast']?.(trDreamina('missingValue', { label: label }), 'warning'), ![]);
     try {
-      return (await openExternalLink(_0x42a0b9, { label: _0x7a1c46 }), !![]);
-    } catch (_0x256589) {}
-    const _0x226c51 = await _0x53e1f1(_0x42a0b9);
+      return (await openExternalLink(enabled16, { label: label }), !![]);
+    } catch (value29) {}
+    const value30 = await run18(enabled16);
     return (
-      _0x226c51
-        ? _0x581cb5['showToast']?.(trDreamina('browserOpenFailedCopied', { label: _0x7a1c46 }), 'warning')
-        : _0x581cb5['showToast']?.(trDreamina('browserOpenFailedCopyFirst', { label: _0x7a1c46 }), 'warning'),
+      value30
+        ? value6['showToast']?.(trDreamina('browserOpenFailedCopied', { label: label }), 'warning')
+        : value6['showToast']?.(trDreamina('browserOpenFailedCopyFirst', { label: label }), 'warning'),
       ![]
     );
   }
-  async function _0x49876b(_0x13828a, _0x10b00e) {
-    const _0x19d2b2 = String(_0x13828a || '')['trim']();
-    if (!_0x19d2b2) {
-      _0x581cb5['showToast']?.(trDreamina('missingValue', { label: _0x10b00e }), 'warning');
+  async function run19(value31, label2) {
+    const enabled17 = String(value31 || '')['trim']();
+    if (!enabled17) {
+      value6['showToast']?.(trDreamina('missingValue', { label: label2 }), 'warning');
       return;
     }
-    const _0xd49d73 = await _0x53e1f1(_0x19d2b2);
-    _0xd49d73
-      ? _0x581cb5['showToast']?.(trDreamina('copySuccess', { label: _0x10b00e }), 'success')
-      : _0x581cb5['showToast']?.(trDreamina('copyFailed', { label: _0x10b00e }), 'error');
+    const value32 = await run18(enabled17);
+    value32
+      ? value6['showToast']?.(trDreamina('copySuccess', { label: label2 }), 'success')
+      : value6['showToast']?.(trDreamina('copyFailed', { label: label2 }), 'error');
   }
-  async function _0x4b7468() {
-    await _0x3eaee7(_0x5e1b3a(), trDreamina('authLinkLabel'));
+  async function run20() {
+    await run17(run16(), trDreamina('authLinkLabel'));
   }
-  async function _0x957cca() {
-    await _0x49876b(_0x5e1b3a(), trDreamina('authLinkLabel'));
+  async function run21() {
+    await run19(run16(), trDreamina('authLinkLabel'));
   }
-  function _0x5d57e2(_0x241eef) {
-    const _0x17a0fd = String(_0x241eef || '')['trim']();
-    if (!_0x17a0fd) throw new Error(trDreamina('jsonPasteRequired'));
-    const _0x4f86b7 = [];
-    _0x4f86b7['push'](_0x17a0fd);
-    const _0x26a2a4 = _0x17a0fd['match'](/```(?:json)?\s*([\s\S]*?)```/i);
-    _0x26a2a4?.[0x1] && _0x4f86b7['push'](String(_0x26a2a4[0x1])['trim']());
-    const _0x4db21c = _0x17a0fd['indexOf']('{'),
-      _0x27463d = _0x17a0fd['lastIndexOf']('}');
-    _0x4db21c >= 0x0 &&
-      _0x27463d > _0x4db21c &&
-      _0x4f86b7['push'](_0x17a0fd['slice'](_0x4db21c, _0x27463d + 0x1)['trim']());
-    for (const _0x59631b of _0x4f86b7) {
-      if (!_0x59631b) continue;
+  function run22(value33) {
+    const list11 = String(value33 || '')['trim']();
+    if (!list11) throw new Error(trDreamina('jsonPasteRequired'));
+    const list12 = [];
+    list12['push'](list11);
+    const value34 = list11['match'](/```(?:json)?\s*([\s\S]*?)```/i);
+    value34?.[0x1] && list12['push'](String(value34[0x1])['trim']());
+    const count3 = list11['indexOf']('{'),
+      value35 = list11['lastIndexOf']('}');
+    count3 >= 0x0 && value35 > count3 && list12['push'](list11['slice'](count3, value35 + 0x1)['trim']());
+    for (const enabled18 of list12) {
+      if (!enabled18) continue;
       try {
-        const _0x45064e = JSON['parse'](_0x59631b);
-        if (!_0x45064e || typeof _0x45064e !== 'object' || Array['isArray'](_0x45064e))
+        const enabled19 = JSON['parse'](enabled18);
+        if (!enabled19 || typeof enabled19 !== 'object' || Array['isArray'](enabled19))
           throw new Error('INVALID_OBJECT');
-        return _0x45064e;
-      } catch (_0x2b3105) {
-        if (_0x2b3105?.['message'] === 'INVALID_OBJECT') throw new Error(trDreamina('jsonMustBeObject'));
+        return enabled19;
+      } catch (error2) {
+        if (error2?.['message'] === 'INVALID_OBJECT') throw new Error(trDreamina('jsonMustBeObject'));
       }
     }
     throw new Error(trDreamina('jsonFormatInvalid'));
   }
-  async function _0x2b10bf() {
-    if (typeof _0x2d8553 !== 'function') {
-      _0x581cb5['showToast']?.(trDreamina('jsonImportUnsupported'), 'error');
+  async function run23() {
+    if (typeof importDreaminaLoginResponseFromServer !== 'function') {
+      value6['showToast']?.(trDreamina('jsonImportUnsupported'), 'error');
       return;
     }
-    const { manualImportJsonEl: _0x73c0e5 } = _0x2e7a44(),
-      _0x198a9b = String(_0x73c0e5?.['value'] || '');
-    let _0xe3d09d = null;
+    const { manualImportJsonEl: manualImportJsonEl } = run(),
+      value36 = String(manualImportJsonEl?.['value'] || '');
+    let value37 = null;
     try {
-      _0xe3d09d = _0x5d57e2(_0x198a9b);
-    } catch (_0xd5c6f3) {
-      _0x581cb5['showToast']?.(_0xd5c6f3?.['message'] || trDreamina('jsonParseFailed'), 'warning');
+      value37 = run22(value36);
+    } catch (error3) {
+      value6['showToast']?.(error3?.['message'] || trDreamina('jsonParseFailed'), 'warning');
       return;
     }
     try {
-      const _0x2df082 = await _0x2d8553(_0xe3d09d);
-      if (_0x2df082?.['success'] === ![])
-        throw new Error(_0x2df082?.['message'] || trDreamina('importFailed'));
-      (_0x2df082?.['status']
-        ? _0x57513f(_0x2df082['status'])
-        : await _0x2e5bc3({ force: !![], silent: !![] }),
-        _0x73c0e5 && (_0x73c0e5['value'] = ''),
-        _0x5e6e08(),
-        _0x581cb5['showToast']?.(trDreamina('importedSyncing'), 'success'));
-    } catch (_0x1b36c7) {
-      _0x581cb5['showToast']?.(_0x1b36c7?.['message'] || trDreamina('importFailed'), 'error');
+      const response = await importDreaminaLoginResponseFromServer(value37);
+      if (response?.['success'] === ![]) throw new Error(response?.['message'] || trDreamina('importFailed'));
+      (response?.['status'] ? run24(response['status']) : await refreshStatus({ force: !![], silent: !![] }),
+        manualImportJsonEl && (manualImportJsonEl['value'] = ''),
+        run4(),
+        value6['showToast']?.(trDreamina('importedSyncing'), 'success'));
+    } catch (error4) {
+      value6['showToast']?.(error4?.['message'] || trDreamina('importFailed'), 'error');
     }
   }
-  function _0x518c6b(_0x20f4aa, _0x5335e6 = {}) {
-    _0x37e9f8['qrImageLoadError'] = !!_0x20f4aa;
-    if (_0x20f4aa) {
-      ((_0x37e9f8['lastQrImageErrorAt'] = Date['now']()),
-        (_0x37e9f8['lastQrImageErrorMessage'] =
-          String(_0x5335e6?.['message'] || '')['trim']() || trDreamina('qrLoadFailed')));
+  function run25(enabled20, error5 = {}) {
+    enabled11['qrImageLoadError'] = !!enabled20;
+    if (enabled20) {
+      ((enabled11['lastQrImageErrorAt'] = Date['now']()),
+        (enabled11['lastQrImageErrorMessage'] =
+          String(error5?.['message'] || '')['trim']() || trDreamina('qrLoadFailed')));
       return;
     }
-    ((_0x37e9f8['lastQrImageLoadedAt'] = Date['now']()),
-      (_0x37e9f8['lastQrImageErrorAt'] = 0x0),
-      (_0x37e9f8['lastQrImageErrorMessage'] = ''));
+    ((enabled11['lastQrImageLoadedAt'] = Date['now']()),
+      (enabled11['lastQrImageErrorAt'] = 0x0),
+      (enabled11['lastQrImageErrorMessage'] = ''));
   }
-  function _0x2dc36a(_0x1c9b42, _0x504467, _0x31db98 = {}) {
-    if (!_0x1c9b42) return ![];
-    const _0x194009 = !!_0x31db98?.['withCacheBust'],
-      _0x586313 = _0x8236e(_0x504467, { withCacheBust: _0x194009 });
-    if (!_0x586313) return ![];
-    const _0x5e77b5 = String(_0x1c9b42['getAttribute']('src') || '')['trim']();
-    if (!_0x194009 && _0x5e77b5 === _0x586313) return ![];
+  function run26(enabled21, value38, enabled22 = {}) {
+    if (!enabled21) return ![];
+    const withCacheBust2 = !!enabled22?.['withCacheBust'],
+      enabled23 = run9(value38, { withCacheBust: withCacheBust2 });
+    if (!enabled23) return ![];
+    const value39 = String(enabled21['getAttribute']('src') || '')['trim']();
+    if (!withCacheBust2 && value39 === enabled23) return ![];
     return (
-      (_0x37e9f8['lastQrImageUrl'] = _0x586313),
-      (_0x37e9f8['lastQrImageRequestedAt'] = Date['now']()),
-      (_0x37e9f8['qrImageLoadError'] = ![]),
-      (_0x37e9f8['lastQrImageErrorMessage'] = ''),
-      (_0x1c9b42['src'] = _0x586313),
+      (enabled11['lastQrImageUrl'] = enabled23),
+      (enabled11['lastQrImageRequestedAt'] = Date['now']()),
+      (enabled11['qrImageLoadError'] = ![]),
+      (enabled11['lastQrImageErrorMessage'] = ''),
+      (enabled21['src'] = enabled23),
       !![]
     );
   }
-  function _0x49bf13(_0x27ab71) {
-    if (!_0x27ab71 || _0x37e9f8['qrImageListenersBound']) return;
-    (_0x27ab71['addEventListener']('load', () => {
-      (_0x518c6b(![]), _0x37e9f8['lastStatus'] && _0x49d053(_0x37e9f8['lastStatus']));
+  function run27(el) {
+    if (!el || enabled11['qrImageListenersBound']) return;
+    (el['addEventListener']('load', () => {
+      (run25(![]), enabled11['lastStatus'] && run28(enabled11['lastStatus']));
     }),
-      _0x27ab71['addEventListener']('error', () => {
-        (_0x518c6b(!![], { message: trDreamina('qrLoadFailed') }),
-          _0x37e9f8['lastStatus'] && _0x49d053(_0x37e9f8['lastStatus']));
+      el['addEventListener']('error', () => {
+        (run25(!![], { message: trDreamina('qrLoadFailed') }),
+          enabled11['lastStatus'] && run28(enabled11['lastStatus']));
       }),
-      (_0x37e9f8['qrImageListenersBound'] = !![]));
+      (enabled11['qrImageListenersBound'] = !![]));
   }
-  function _0x5e749a(_0x2823c2) {
-    const _0x50803b = Number(_0x2823c2?.['startedAt'] || 0x0);
-    if (_0x50803b <= 0x0) return 0x0;
-    const _0x17a3b5 = Number(_0x2823c2?.['completedAt'] || 0x0),
-      _0x41d1ee = _0x17a3b5 > 0x0 ? _0x17a3b5 : Date['now']();
-    return Math['max'](0x0, _0x41d1ee - _0x50803b);
+  function run29(value40) {
+    const count4 = Number(value40?.['startedAt'] || 0x0);
+    if (count4 <= 0x0) return 0x0;
+    const count5 = Number(value40?.['completedAt'] || 0x0),
+      value41 = count5 > 0x0 ? count5 : Date['now']();
+    return Math['max'](0x0, value41 - count4);
   }
-  function _0x10dcff(_0x351ca6) {
-    const _0x31abfb = _0x351ca6?.['runtime'] || {};
-    if (!_0x31abfb?.['active']) return ![];
-    const _0x24f287 = String(_0x31abfb?.['phase'] || '');
-    if (!['preparing', 'starting']['includes'](_0x24f287)) return ![];
-    return _0x5e749a(_0x31abfb) >= _0x101314;
+  function run30(value42) {
+    const enabled24 = value42?.['runtime'] || {};
+    if (!enabled24?.['active']) return ![];
+    const value43 = String(enabled24?.['phase'] || '');
+    if (!['preparing', 'starting']['includes'](value43)) return ![];
+    return run29(enabled24) >= value7;
   }
-  async function _0x53e1f1(_0x1f6a15) {
-    const _0x3505c1 = String(_0x1f6a15 || '');
-    if (!_0x3505c1) return ![];
+  async function run18(value44) {
+    const enabled25 = String(value44 || '');
+    if (!enabled25) return ![];
     try {
       if (navigator?.['clipboard']?.['writeText'])
-        return (await navigator['clipboard']['writeText'](_0x3505c1), !![]);
-    } catch (_0x394eac) {}
+        return (await navigator['clipboard']['writeText'](enabled25), !![]);
+    } catch (value45) {}
     try {
-      const _0x6278a6 = _0x58380c['createElement']('textarea');
-      ((_0x6278a6['value'] = _0x3505c1),
-        _0x6278a6['setAttribute']('readonly', 'readonly'),
-        (_0x6278a6['style']['position'] = 'fixed'),
-        (_0x6278a6['style']['left'] = '-9999px'),
-        _0x58380c['body']?.['appendChild'](_0x6278a6),
-        _0x6278a6['select']());
-      const _0x1a7243 = _0x58380c['execCommand']('copy');
-      return (_0x6278a6['remove'](), !!_0x1a7243);
-    } catch (_0x2ebf1c) {
+      const el2 = settingsCardEl['createElement']('textarea');
+      ((el2['value'] = enabled25),
+        el2['setAttribute']('readonly', 'readonly'),
+        (el2['style']['position'] = 'fixed'),
+        (el2['style']['left'] = '-9999px'),
+        settingsCardEl['body']?.['appendChild'](el2),
+        el2['select']());
+      const enabled26 = settingsCardEl['execCommand']('copy');
+      return (el2['remove'](), !!enabled26);
+    } catch (value46) {
       return ![];
     }
   }
-  function _0x4783af(_0x53bcd8) {
-    if (!_0x53bcd8 || typeof _0x53bcd8 !== 'object') return trDreamina('creditPlaceholder');
-    const _0x4447b1 = Number(_0x53bcd8['total_credit'] || 0x0),
-      _0x4c4ca6 = Number(_0x53bcd8['vip_credit'] || 0x0),
-      _0x518af1 = Number(_0x53bcd8['gift_credit'] || 0x0),
-      _0x1bf0ce = Number(_0x53bcd8['purchase_credit'] || 0x0);
+  function run31(enabled27) {
+    if (!enabled27 || typeof enabled27 !== 'object') return trDreamina('creditPlaceholder');
+    const total = Number(enabled27['total_credit'] || 0x0),
+      vip = Number(enabled27['vip_credit'] || 0x0),
+      gift = Number(enabled27['gift_credit'] || 0x0),
+      purchase = Number(enabled27['purchase_credit'] || 0x0);
     return trDreamina('creditTotal', {
-      total: _0x4447b1,
-      vip: _0x4c4ca6,
-      gift: _0x518af1,
-      purchase: _0x1bf0ce,
+      total: total,
+      vip: vip,
+      gift: gift,
+      purchase: purchase,
     });
   }
-  function _0x394383(_0x232d72) {
-    const _0x29514a = String(_0x232d72?.['phase'] || ''),
-      _0x2ab04f = Number(_0x232d72?.['completedAt'] || 0x0),
-      _0x597d7a = _0x2ab04f > 0x0 ? _0x29514a + ':' + _0x2ab04f + ':' + (_0x232d72?.['error'] || '') : '';
-    if (!_0x597d7a || _0x597d7a === _0x37e9f8['lastToastKey']) return;
-    _0x37e9f8['lastToastKey'] = _0x597d7a;
-    if (_0x29514a === 'success') {
-      _0x581cb5['showToast']?.(trDreamina('loginSuccess'), 'success');
+  function run32(value47) {
+    const value48 = String(value47?.['phase'] || ''),
+      count6 = Number(value47?.['completedAt'] || 0x0),
+      enabled28 = count6 > 0x0 ? value48 + ':' + count6 + ':' + (value47?.['error'] || '') : '';
+    if (!enabled28 || enabled28 === enabled11['lastToastKey']) return;
+    enabled11['lastToastKey'] = enabled28;
+    if (value48 === 'success') {
+      value6['showToast']?.(trDreamina('loginSuccess'), 'success');
       return;
     }
-    if (_0x29514a === 'reused') {
-      _0x581cb5['showToast']?.(trDreamina('loginReused'), 'info');
+    if (value48 === 'reused') {
+      value6['showToast']?.(trDreamina('loginReused'), 'info');
       return;
     }
-    _0x29514a === 'failed' &&
-      _0x581cb5['showToast']?.(_0x232d72?.['error'] || trDreamina('loginFailed'), 'error');
+    value48 === 'failed' && value6['showToast']?.(value47?.['error'] || trDreamina('loginFailed'), 'error');
   }
-  function _0x5ee1a2(_0x2303e0) {
-    const _0x5360f7 = _0x2303e0?.['runtime'] || {},
-      _0x1f61fd = !!_0x2303e0?.['loggedIn'],
-      _0x5b835b = !!_0x5360f7?.['active'],
-      _0x158a30 = String(_0x5360f7?.['phase'] || '');
-    if (_0x5b835b && _0x158a30 === 'preparing') return trDreamina('statusPreparing');
-    if (_0x5b835b && ['oauth_ready', 'polling']['includes'](_0x158a30))
-      return trDreamina('statusWaitingAuth');
-    if (_0x5b835b) return trDreamina('statusLoggingIn');
-    if (_0x1f61fd) return trDreamina('statusLoggedIn');
+  function run33(enabled29) {
+    const enabled30 = enabled29?.['runtime'] || {},
+      value49 = !!enabled29?.['loggedIn'],
+      value50 = !!enabled30?.['active'],
+      value51 = String(enabled30?.['phase'] || '');
+    if (value50 && value51 === 'preparing') return trDreamina('statusPreparing');
+    if (value50 && ['oauth_ready', 'polling']['includes'](value51)) return trDreamina('statusWaitingAuth');
+    if (value50) return trDreamina('statusLoggingIn');
+    if (value49) return trDreamina('statusLoggedIn');
     return trDreamina('statusLoggedOut');
   }
-  function _0x1a3c16(_0x22fe7e) {
-    return getDreaminaStatusSessionKey(_0x22fe7e);
+  function run34(value52) {
+    return getDreaminaStatusSessionKey(value52);
   }
-  function _0x2ada90(_0x56c4b8) {
-    reconcileDreaminaSessionUiState(_0x56c4b8, _0x37e9f8) && _0x5746cc();
+  function run35(value53) {
+    reconcileDreaminaSessionUiState(value53, enabled11) && run7();
   }
-  function _0x32e5b0() {
-    _0x37e9f8['modalCloseTimer'] &&
-      (clearTimeout(_0x37e9f8['modalCloseTimer']), (_0x37e9f8['modalCloseTimer'] = null));
+  function run36() {
+    enabled11['modalCloseTimer'] &&
+      (clearTimeout(enabled11['modalCloseTimer']), (enabled11['modalCloseTimer'] = null));
   }
-  function _0x11f864({ clearDismissed: clearDismissed = ![] } = {}) {
-    const { modalOverlayEl: _0x119330 } = _0x2e7a44();
-    if (!_0x119330) return;
-    (_0x32e5b0(), clearDismissed && (_0x37e9f8['dismissedSessionKey'] = ''), (_0x119330['hidden'] = ![]));
+  function run37({ clearDismissed: clearDismissed = ![] } = {}) {
+    const { modalOverlayEl: modalOverlayEl } = run();
+    if (!modalOverlayEl) return;
+    (run36(), clearDismissed && (enabled11['dismissedSessionKey'] = ''), (modalOverlayEl['hidden'] = ![]));
   }
-  function _0x87872f({ force: force = ![], rememberDismissal: rememberDismissal = !![] } = {}) {
+  function run2({ force: force = ![], rememberDismissal: rememberDismissal = !![] } = {}) {
     const {
-      modalOverlayEl: _0x3ebf84,
-      modalQrImageEl: _0x1340c3,
-      manualImportJsonEl: _0x2f52a9,
-    } = _0x2e7a44();
-    _0x32e5b0();
+      modalOverlayEl: modalOverlayEl2,
+      modalQrImageEl: modalQrImageEl,
+      manualImportJsonEl: manualImportJsonEl2,
+    } = run();
+    run36();
     if (rememberDismissal) {
-      const _0x136107 = _0x1a3c16(_0x37e9f8['lastStatus']);
-      _0x136107 && (_0x37e9f8['dismissedSessionKey'] = _0x136107);
+      const value54 = run34(enabled11['lastStatus']);
+      value54 && (enabled11['dismissedSessionKey'] = value54);
     }
-    if (_0x3ebf84) _0x3ebf84['hidden'] = !![];
-    if (_0x1340c3) _0x1340c3['removeAttribute']('src');
-    if (_0x2f52a9) _0x2f52a9['value'] = '';
-    ((_0x37e9f8['manualGuideOpen'] = ![]), _0x2cbe94(_0x37e9f8['lastStatus'] || {}));
+    if (modalOverlayEl2) modalOverlayEl2['hidden'] = !![];
+    if (modalQrImageEl) modalQrImageEl['removeAttribute']('src');
+    if (manualImportJsonEl2) manualImportJsonEl2['value'] = '';
+    ((enabled11['manualGuideOpen'] = ![]), run15(enabled11['lastStatus'] || {}));
   }
-  function _0x2273d1(_0x21a71e = 0x0) {
-    (_0x32e5b0(),
-      (_0x37e9f8['modalCloseTimer'] = setTimeout(
+  function run38(value55 = 0x0) {
+    (run36(),
+      (enabled11['modalCloseTimer'] = setTimeout(
         () => {
-          _0x87872f({ force: !![], rememberDismissal: ![] });
+          run2({ force: !![], rememberDismissal: ![] });
         },
-        Math['max'](0x0, Number(_0x21a71e) || 0x0),
+        Math['max'](0x0, Number(value55) || 0x0),
       )));
   }
-  function _0x332593(_0x128312) {
-    const _0x4dd2a4 = _0x128312?.['runtime'] || {},
-      _0x5a8c1c = String(_0x4dd2a4?.['phase'] || ''),
-      _0x461f52 = ['oauth', 'web', 'headless']['includes'](String(_0x4dd2a4?.['loginMode'] || '')),
-      _0x7d177 = _0x10dcff(_0x128312),
-      _0x3c56b5 = _0x2c111b(_0x128312),
-      _0x143b3e = _0x33b713(_0x128312);
-    if (_0x143b3e) return trDreamina('waitBrowserFailed');
-    if (shouldDreaminaManualGuideOpenByDefault(_0x128312, _0x37e9f8['dismissedSessionKey']))
+  function run39(value56) {
+    const value57 = value56?.['runtime'] || {},
+      value58 = String(value57?.['phase'] || ''),
+      value59 = ['oauth', 'web', 'headless']['includes'](String(value57?.['loginMode'] || '')),
+      value60 = run30(value56),
+      value61 = run10(value56),
+      value62 = run12(value56);
+    if (value62) return trDreamina('waitBrowserFailed');
+    if (shouldDreaminaManualGuideOpenByDefault(value56, enabled11['dismissedSessionKey']))
       return trDreamina('waitOpenAuth');
-    if (_0x7d177) return trDreamina('waitPendingTooLong');
-    if (_0x3c56b5) return trDreamina('waitQrDeprecated');
-    if (_0x5a8c1c === 'failed') return trDreamina('waitFailed');
-    if (_0x5a8c1c === 'oauth_ready' || _0x5a8c1c === 'polling') return trDreamina('waitConfirm');
-    if (_0x5a8c1c === 'qr_ready') return trDreamina('waitUseOAuth');
-    if (_0x5a8c1c === 'success' || _0x5a8c1c === 'reused') return trDreamina('waitDone');
-    if (_0x461f52) return trDreamina('waitOAuthPreparing');
+    if (value60) return trDreamina('waitPendingTooLong');
+    if (value61) return trDreamina('waitQrDeprecated');
+    if (value58 === 'failed') return trDreamina('waitFailed');
+    if (value58 === 'oauth_ready' || value58 === 'polling') return trDreamina('waitConfirm');
+    if (value58 === 'qr_ready') return trDreamina('waitUseOAuth');
+    if (value58 === 'success' || value58 === 'reused') return trDreamina('waitDone');
+    if (value59) return trDreamina('waitOAuthPreparing');
     return trDreamina('waitPreparing');
   }
-  function _0x49d053(_0x1c5fc4) {
+  function run28(error6) {
     const {
-      modalCardEl: _0x4ef024,
-      modalCloseEl: _0x1aeb65,
-      modalMessageEl: _0x4a90fb,
-      modalQrWrapEl: _0x2c54d3,
-      modalQrImageEl: _0x3a7735,
-      modalWaitEl: _0x435077,
-      modalWaitTextEl: _0x4a00a1,
-      modalRetryEl: _0xe0750f,
-      manualGuideEl: _0x2c7f81,
-    } = _0x2e7a44();
-    if (!_0x4a90fb) return;
-    const _0x289607 = _0x1c5fc4?.['runtime'] || {},
-      _0x53d712 = !!_0x289607?.['active'],
-      _0x7c2b45 = String(_0x289607?.['phase'] || ''),
-      _0x547d77 = !!_0x1c5fc4?.['loggedIn'],
-      _0x9ef8ba = ['oauth', 'web', 'headless']['includes'](String(_0x289607?.['loginMode'] || '')),
-      _0x2d64b1 = _0x10dcff(_0x1c5fc4),
-      _0x44277d = !_0x9ef8ba && !!_0x289607?.['qrAvailable'] && _0x7c2b45 === 'qr_ready',
-      _0x422703 = _0x2c111b(_0x1c5fc4),
-      _0x2ef861 = _0x33b713(_0x1c5fc4),
-      _0x359dc6 = _0x547d77 || ['success', 'reused', 'done']['includes'](_0x7c2b45);
-    _0x359dc6 && (_0x37e9f8['manualGuideOpen'] = ![]);
-    !_0x359dc6 && _0x2ef861 && (_0x37e9f8['manualGuideOpen'] = !![]);
-    const _0x1786b8 = _0x1a3c16(_0x1c5fc4),
-      _0x49d129 = shouldDreaminaManualGuideOpenByDefault(_0x1c5fc4, _0x37e9f8['dismissedSessionKey']);
-    !_0x359dc6 && _0x49d129 && (_0x37e9f8['manualGuideOpen'] = !![]);
-    const _0x5ad4e9 =
-      _0x37e9f8['manualGuideOpen'] ||
-      ((_0x53d712 || _0x44277d) && (!!_0x1786b8 ? _0x37e9f8['dismissedSessionKey'] !== _0x1786b8 : !![]));
-    if (_0x5ad4e9) _0x11f864();
+      modalCardEl: modalCardEl,
+      modalCloseEl: modalCloseEl,
+      modalMessageEl: modalMessageEl,
+      modalQrWrapEl: modalQrWrapEl,
+      modalQrImageEl: modalQrImageEl2,
+      modalWaitEl: modalWaitEl,
+      modalWaitTextEl: modalWaitTextEl,
+      modalRetryEl: modalRetryEl,
+      manualGuideEl: manualGuideEl2,
+    } = run();
+    if (!modalMessageEl) return;
+    const error7 = error6?.['runtime'] || {},
+      value63 = !!error7?.['active'],
+      value64 = String(error7?.['phase'] || ''),
+      value65 = !!error6?.['loggedIn'],
+      enabled31 = ['oauth', 'web', 'headless']['includes'](String(error7?.['loginMode'] || '')),
+      value66 = run30(error6),
+      enabled32 = !enabled31 && !!error7?.['qrAvailable'] && value64 === 'qr_ready',
+      value67 = run10(error6),
+      value68 = run12(error6),
+      enabled33 = value65 || ['success', 'reused', 'done']['includes'](value64);
+    enabled33 && (enabled11['manualGuideOpen'] = ![]);
+    !enabled33 && value68 && (enabled11['manualGuideOpen'] = !![]);
+    const enabled34 = run34(error6),
+      shouldDreaminaManualGuideOpenByDefault2 = shouldDreaminaManualGuideOpenByDefault(
+        error6,
+        enabled11['dismissedSessionKey'],
+      );
+    !enabled33 && shouldDreaminaManualGuideOpenByDefault2 && (enabled11['manualGuideOpen'] = !![]);
+    const value69 =
+      enabled11['manualGuideOpen'] ||
+      ((value63 || enabled32) && (!!enabled34 ? enabled11['dismissedSessionKey'] !== enabled34 : !![]));
+    if (value69) run37();
     else
-      ['success', 'reused', 'failed', 'done']['includes'](_0x7c2b45)
-        ? _0x2273d1(_0x7c2b45 === 'failed' ? 0x0 : 0x258)
-        : _0x87872f({ force: !![], rememberDismissal: ![] });
-    (_0x4ef024 &&
-      _0x4ef024['classList']['toggle']('dreamina-login-modal--guide-open', !!_0x37e9f8['manualGuideOpen']),
-      _0x4a90fb &&
-        (_0x4a90fb['textContent'] = _0x359dc6
+      ['success', 'reused', 'failed', 'done']['includes'](value64)
+        ? run38(value64 === 'failed' ? 0x0 : 0x258)
+        : run2({ force: !![], rememberDismissal: ![] });
+    (modalCardEl &&
+      modalCardEl['classList']['toggle']('dreamina-login-modal--guide-open', !!enabled11['manualGuideOpen']),
+      modalMessageEl &&
+        (modalMessageEl['textContent'] = enabled33
           ? trDreamina('modalSynced')
-          : _0x2ef861
+          : value68
             ? trDreamina('modalBrowserFailed')
-            : _0x49d129
+            : shouldDreaminaManualGuideOpenByDefault2
               ? trDreamina('modalOAuthStarted')
-              : _0x2d64b1
+              : value66
                 ? trDreamina('modalPendingTooLong')
-                : _0x422703
+                : value67
                   ? trDreamina('modalQrAbnormal')
-                  : _0x7c2b45 === 'failed'
+                  : value64 === 'failed'
                     ? trDreamina('modalRetryAuth')
-                    : _0x7c2b45 === 'oauth_ready' || _0x7c2b45 === 'polling'
+                    : value64 === 'oauth_ready' || value64 === 'polling'
                       ? trDreamina('modalAuthorizeOnPage')
-                      : _0x44277d
+                      : enabled32
                         ? trDreamina('modalScanQr')
-                        : String(_0x289607?.['message'] || '')['trim']() ||
-                          String(_0x1c5fc4?.['message'] || '')['trim']() ||
+                        : String(error7?.['message'] || '')['trim']() ||
+                          String(error6?.['message'] || '')['trim']() ||
                           trDreamina('modalProcessing')),
-      _0x4a00a1 && (_0x4a00a1['textContent'] = _0x332593(_0x1c5fc4)),
-      _0x435077 && (_0x435077['hidden'] = ![]),
-      _0x2c54d3 && (_0x2c54d3['hidden'] = !_0x44277d),
-      _0x3a7735 && (_0x44277d ? _0x2dc36a(_0x3a7735, _0x289607) : _0x3a7735['removeAttribute']('src')),
-      _0x1aeb65 && (_0x1aeb65['disabled'] = ![]),
-      _0xe0750f &&
-        ((_0xe0750f['hidden'] = ![]),
-        (_0xe0750f['disabled'] = ![]),
-        _0x37e9f8['manualGuideOpen']
-          ? (_0xe0750f['textContent'] = trDreamina('guideCollapse'))
-          : (_0xe0750f['textContent'] = _0x2ef861 ? trDreamina('guideRecommended') : trDreamina('guide'))),
-      _0x2c7f81 && _0x2cbe94(_0x1c5fc4));
+      modalWaitTextEl && (modalWaitTextEl['textContent'] = run39(error6)),
+      modalWaitEl && (modalWaitEl['hidden'] = ![]),
+      modalQrWrapEl && (modalQrWrapEl['hidden'] = !enabled32),
+      modalQrImageEl2 &&
+        (enabled32 ? run26(modalQrImageEl2, error7) : modalQrImageEl2['removeAttribute']('src')),
+      modalCloseEl && (modalCloseEl['disabled'] = ![]),
+      modalRetryEl &&
+        ((modalRetryEl['hidden'] = ![]),
+        (modalRetryEl['disabled'] = ![]),
+        enabled11['manualGuideOpen']
+          ? (modalRetryEl['textContent'] = trDreamina('guideCollapse'))
+          : (modalRetryEl['textContent'] = value68 ? trDreamina('guideRecommended') : trDreamina('guide'))),
+      manualGuideEl2 && run15(error6));
   }
-  function _0x57513f(_0x1c89ea) {
+  function run24(error8) {
     const {
-      statusTextEl: _0x4cc4dc,
-      messageTextEl: _0x203267,
-      creditTextEl: _0x4572b5,
-      btnAuthEl: _0x5e5924,
-      btnQrAuthEl: _0x5476a2,
-      btnLogoutEl: _0x51943a,
-    } = _0x2e7a44();
-    if (!_0x4cc4dc) return;
-    if (!_0x28c1fb()) return;
-    const _0x54ebe3 = _0x1c89ea?.['runtime'] || {},
-      _0x41bb42 = !!_0x1c89ea?.['loggedIn'],
-      _0x30f299 = !!_0x54ebe3?.['active'],
-      _0x51f41a = String(_0x54ebe3?.['phase'] || ''),
-      _0x2b81f2 =
-        String(_0x54ebe3?.['message'] || '')['trim']() ||
-        String(_0x1c89ea?.['message'] || '')['trim']() ||
+      statusTextEl: statusTextEl,
+      messageTextEl: messageTextEl,
+      creditTextEl: creditTextEl,
+      btnAuthEl: btnAuthEl,
+      btnQrAuthEl: btnQrAuthEl,
+      btnLogoutEl: btnLogoutEl,
+    } = run();
+    if (!statusTextEl) return;
+    if (!syncDevVisibility()) return;
+    const error9 = error8?.['runtime'] || {},
+      enabled35 = !!error8?.['loggedIn'],
+      value70 = !!error9?.['active'],
+      value71 = String(error9?.['phase'] || ''),
+      value72 =
+        String(error9?.['message'] || '')['trim']() ||
+        String(error8?.['message'] || '')['trim']() ||
         trDreamina('notLoggedInHint');
-    _0x4cc4dc['textContent'] = _0x5ee1a2(_0x1c89ea);
-    _0x203267 && (_0x203267['textContent'] = _0x2b81f2);
-    _0x4572b5 &&
-      (_0x4572b5['textContent'] = _0x41bb42
-        ? _0x4783af(_0x1c89ea?.['credit'])
-        : trDreamina('creditPlaceholder'));
-    _0x5e5924 &&
-      ((_0x5e5924['disabled'] = ![]), (_0x5e5924['textContent'] = getDreaminaWebLoginButtonText(_0x1c89ea)));
-    _0x5476a2 &&
-      ((_0x5476a2['hidden'] = !![]),
-      (_0x5476a2['disabled'] = !![]),
-      (_0x5476a2['textContent'] = getDreaminaQrLoginButtonText(_0x1c89ea)));
-    _0x51943a && (_0x51943a['disabled'] = _0x30f299 || !_0x41bb42);
-    if (_0x30f299) _0x5e6e08();
-    else _0x308414();
-    ((_0x37e9f8['lastStatus'] = _0x1c89ea), _0x2ada90(_0x1c89ea), _0x49d053(_0x1c89ea), _0x394383(_0x54ebe3));
+    statusTextEl['textContent'] = run33(error8);
+    messageTextEl && (messageTextEl['textContent'] = value72);
+    creditTextEl &&
+      (creditTextEl['textContent'] = enabled35 ? run31(error8?.['credit']) : trDreamina('creditPlaceholder'));
+    btnAuthEl &&
+      ((btnAuthEl['disabled'] = ![]), (btnAuthEl['textContent'] = getDreaminaWebLoginButtonText(error8)));
+    btnQrAuthEl &&
+      ((btnQrAuthEl['hidden'] = !![]),
+      (btnQrAuthEl['disabled'] = !![]),
+      (btnQrAuthEl['textContent'] = getDreaminaQrLoginButtonText(error8)));
+    btnLogoutEl && (btnLogoutEl['disabled'] = value70 || !enabled35);
+    if (value70) run4();
+    else run3();
+    ((enabled11['lastStatus'] = error8), run35(error8), run28(error8), run32(error9));
   }
-  async function _0x2e5bc3({ force: force = ![], silent: silent = ![] } = {}) {
-    if (!_0x28c1fb()) return null;
-    if (typeof _0x40331b !== 'function') return null;
-    const _0x162017 = ++_0x37e9f8['statusRequestGeneration'];
+  async function refreshStatus({ force: force = ![], silent: silent = ![] } = {}) {
+    if (!syncDevVisibility()) return null;
+    if (typeof fetchDreaminaCliStatusFromServer !== 'function') return null;
+    const value73 = ++enabled11['statusRequestGeneration'];
     try {
-      const _0x2a8435 = await _0x40331b({ refresh: force });
-      if (_0x162017 !== _0x37e9f8['statusRequestGeneration']) return _0x2a8435 || {};
-      return (_0x57513f(_0x2a8435 || {}), _0x2a8435 || {});
-    } catch (_0x5cf8f9) {
-      if (_0x162017 !== _0x37e9f8['statusRequestGeneration']) return null;
+      const value74 = await fetchDreaminaCliStatusFromServer({ refresh: force });
+      if (value73 !== enabled11['statusRequestGeneration']) return value74 || {};
+      return (run24(value74 || {}), value74 || {});
+    } catch (error10) {
+      if (value73 !== enabled11['statusRequestGeneration']) return null;
       if (!silent) {
-        const _0x3be03b = _0x5cf8f9?.['message'] || trDreamina('fetchStatusFailed');
-        _0x581cb5['showToast']?.(_0x3be03b, 'error');
+        const value75 = error10?.['message'] || trDreamina('fetchStatusFailed');
+        value6['showToast']?.(value75, 'error');
       }
       return null;
     }
   }
-  async function _0x39d25f({ silent: silent = ![] } = {}) {
-    if (!_0x28c1fb()) return null;
-    if (typeof _0xf8afbc !== 'function') return _0x2e5bc3({ silent: silent });
+  async function run6({ silent: silent = ![] } = {}) {
+    if (!syncDevVisibility()) return null;
+    if (typeof fetchDreaminaCliLoginRuntimeFromServer !== 'function')
+      return refreshStatus({ silent: silent });
     try {
-      const _0x40d9c8 = await _0xf8afbc(),
-        _0xa47f40 = String(_0x40d9c8?.['phase'] || ''),
-        _0x38a61b =
-          _0xa47f40 === 'idle' &&
-          !_0x40d9c8?.['active'] &&
-          !Number(_0x40d9c8?.['startedAt'] || 0x0) &&
-          Number(_0x37e9f8['loginLaunchRequestedAt'] || 0x0) > 0x0;
-      if (_0x38a61b) return _0x37e9f8['lastStatus'] || null;
-      const _0x817d06 = mergeDreaminaLoginRuntimeStatus(_0x37e9f8['lastStatus'] || {}, _0x40d9c8 || {});
-      _0x57513f(_0x817d06);
-      const _0x5844d8 = ['success', 'reused', 'done']['includes'](_0xa47f40),
-        _0x3a0df9 = _0x5844d8 || _0xa47f40 === 'failed';
-      if (_0x3a0df9) _0x37e9f8['loginLaunchRequestedAt'] = 0x0;
-      return (_0x5844d8 && _0x2e5bc3({ force: !![], silent: !![] })['catch'](() => {}), _0x817d06);
-    } catch (_0x23979) {
+      const enabled36 = await fetchDreaminaCliLoginRuntimeFromServer(),
+        value76 = String(enabled36?.['phase'] || ''),
+        value77 =
+          value76 === 'idle' &&
+          !enabled36?.['active'] &&
+          !Number(enabled36?.['startedAt'] || 0x0) &&
+          Number(enabled11['loginLaunchRequestedAt'] || 0x0) > 0x0;
+      if (value77) return enabled11['lastStatus'] || null;
+      const dreaminaLoginRuntimeStatus = mergeDreaminaLoginRuntimeStatus(
+        enabled11['lastStatus'] || {},
+        enabled36 || {},
+      );
+      run24(dreaminaLoginRuntimeStatus);
+      const value78 = ['success', 'reused', 'done']['includes'](value76),
+        value79 = value78 || value76 === 'failed';
+      if (value79) enabled11['loginLaunchRequestedAt'] = 0x0;
+      return (
+        value78 && refreshStatus({ force: !![], silent: !![] })['catch'](() => {}),
+        dreaminaLoginRuntimeStatus
+      );
+    } catch (error11) {
       if (!silent) {
-        const _0x15fc1e = _0x23979?.['message'] || trDreamina('fetchStatusFailed');
-        _0x581cb5['showToast']?.(_0x15fc1e, 'error');
+        const value80 = error11?.['message'] || trDreamina('fetchStatusFailed');
+        value6['showToast']?.(value80, 'error');
       }
       return null;
     }
   }
-  async function _0x2199b1() {
-    if (!_0x28c1fb()) return;
-    const _0x1c5b50 = _0x37e9f8['lastStatus']?.['runtime'] || {};
-    if (_0x1c5b50?.['active']) {
-      (_0x11f864({ clearDismissed: !![] }),
-        (_0x37e9f8['manualGuideOpen'] = !![]),
-        _0x49d053(_0x37e9f8['lastStatus'] || {}));
+  async function run40() {
+    if (!syncDevVisibility()) return;
+    const value81 = enabled11['lastStatus']?.['runtime'] || {};
+    if (value81?.['active']) {
+      (run37({ clearDismissed: !![] }),
+        (enabled11['manualGuideOpen'] = !![]),
+        run28(enabled11['lastStatus'] || {}));
       return;
     }
-    const _0xef5e3a = !!_0x37e9f8['lastStatus']?.['loggedIn'];
-    if (typeof _0x5e8c9f !== 'function') return;
-    ((_0x37e9f8['manualGuideOpen'] = !![]),
-      (_0x37e9f8['loginLaunchRequestedAt'] = Date['now']()),
-      _0x11f864({ clearDismissed: !![] }));
+    const force2 = !!enabled11['lastStatus']?.['loggedIn'];
+    if (typeof startDreaminaWebLoginFromServer !== 'function') return;
+    ((enabled11['manualGuideOpen'] = !![]),
+      (enabled11['loginLaunchRequestedAt'] = Date['now']()),
+      run37({ clearDismissed: !![] }));
     try {
-      const _0x55224e = await _0x5e8c9f({ force: _0xef5e3a });
-      if (_0x55224e?.['success'] === ![])
-        throw new Error(_0x55224e?.['message'] || trDreamina('startFailed'));
-      ((_0x37e9f8['manualGuideOpen'] = !![]),
-        _0x55224e?.['status'] && _0x57513f(_0x55224e['status']),
-        _0x581cb5['showToast']?.(
-          _0xef5e3a ? trDreamina('reloginStarted') : trDreamina('loginStarted'),
-          'info',
-        ),
-        _0x5e6e08());
-    } catch (_0x351b6d) {
-      _0x581cb5['showToast']?.(_0x351b6d?.['message'] || trDreamina('startFailed'), 'error');
+      const response2 = await startDreaminaWebLoginFromServer({ force: force2 });
+      if (response2?.['success'] === ![])
+        throw new Error(response2?.['message'] || trDreamina('startFailed'));
+      ((enabled11['manualGuideOpen'] = !![]),
+        response2?.['status'] && run24(response2['status']),
+        value6['showToast']?.(force2 ? trDreamina('reloginStarted') : trDreamina('loginStarted'), 'info'),
+        run4());
+    } catch (error12) {
+      value6['showToast']?.(error12?.['message'] || trDreamina('startFailed'), 'error');
     }
   }
-  async function _0x6655d4() {
-    await _0x2199b1();
+  async function run41() {
+    await run40();
   }
-  function _0x3e537a() {
-    ((_0x37e9f8['manualGuideOpen'] = !_0x37e9f8['manualGuideOpen']),
-      _0x49d053(_0x37e9f8['lastStatus'] || {}));
+  function run42() {
+    ((enabled11['manualGuideOpen'] = !enabled11['manualGuideOpen']), run28(enabled11['lastStatus'] || {}));
   }
-  async function _0x39e21d() {
-    if (!_0x28c1fb()) return;
-    if (typeof _0x5801e7 !== 'function') return;
+  async function run43() {
+    if (!syncDevVisibility()) return;
+    if (typeof logoutDreaminaFromServer !== 'function') return;
     try {
-      const _0x39155b = await _0x5801e7();
-      if (_0x39155b?.['success'] === ![])
-        throw new Error(_0x39155b?.['message'] || trDreamina('logoutFailed'));
-      (_0x39155b?.['status']
-        ? _0x57513f(_0x39155b['status'])
-        : await _0x2e5bc3({ force: !![], silent: !![] }),
-        _0x308414(),
-        _0x581cb5['showToast']?.(trDreamina('loggedOut'), 'success'));
-    } catch (_0x1fe372) {
-      _0x581cb5['showToast']?.(_0x1fe372?.['message'] || trDreamina('logoutFailed'), 'error');
+      const response3 = await logoutDreaminaFromServer();
+      if (response3?.['success'] === ![])
+        throw new Error(response3?.['message'] || trDreamina('logoutFailed'));
+      (response3?.['status']
+        ? run24(response3['status'])
+        : await refreshStatus({ force: !![], silent: !![] }),
+        run3(),
+        value6['showToast']?.(trDreamina('loggedOut'), 'success'));
+    } catch (error13) {
+      value6['showToast']?.(error13?.['message'] || trDreamina('logoutFailed'), 'error');
     }
   }
-  function _0x231e57() {
+  function init() {
     const {
-      btnAuthEl: _0x14e277,
-      btnQrAuthEl: _0x503bfc,
-      btnLogoutEl: _0x2a36e4,
-      modalOverlayEl: _0x1f7075,
-      modalCloseEl: _0x1cc26b,
-      modalQrImageEl: _0x1c628d,
-      modalRetryEl: _0x212f9d,
-      manualOpenAuthEl: _0x51ac1c,
-      manualCopyAuthEl: _0x1b84f0,
-      manualImportJsonBtnEl: _0x3f7a78,
-    } = _0x2e7a44();
-    (_0x49bf13(_0x1c628d),
-      _0x14e277?.['addEventListener']('click', () => {
-        _0x2199b1()['catch'](() => {});
+      btnAuthEl: btnAuthEl2,
+      btnQrAuthEl: btnQrAuthEl2,
+      btnLogoutEl: btnLogoutEl2,
+      modalOverlayEl: modalOverlayEl3,
+      modalCloseEl: modalCloseEl2,
+      modalQrImageEl: modalQrImageEl3,
+      modalRetryEl: modalRetryEl2,
+      manualOpenAuthEl: manualOpenAuthEl2,
+      manualCopyAuthEl: manualCopyAuthEl2,
+      manualImportJsonBtnEl: manualImportJsonBtnEl,
+    } = run();
+    (run27(modalQrImageEl3),
+      btnAuthEl2?.['addEventListener']('click', () => {
+        run40()['catch'](() => {});
       }),
-      _0x503bfc?.['addEventListener']('click', () => {
-        _0x6655d4()['catch'](() => {});
+      btnQrAuthEl2?.['addEventListener']('click', () => {
+        run41()['catch'](() => {});
       }),
-      _0x2a36e4?.['addEventListener']('click', () => {
-        _0x39e21d()['catch'](() => {});
+      btnLogoutEl2?.['addEventListener']('click', () => {
+        run43()['catch'](() => {});
       }),
-      _0x1cc26b?.['addEventListener']('click', () => {
-        _0x87872f({ force: !![] });
+      modalCloseEl2?.['addEventListener']('click', () => {
+        run2({ force: !![] });
       }),
-      _0x212f9d?.['addEventListener']('click', () => {
-        _0x3e537a();
+      modalRetryEl2?.['addEventListener']('click', () => {
+        run42();
       }),
-      _0x51ac1c?.['addEventListener']('click', () => {
-        _0x4b7468()['catch'](() => {});
+      manualOpenAuthEl2?.['addEventListener']('click', () => {
+        run20()['catch'](() => {});
       }),
-      _0x1b84f0?.['addEventListener']('click', () => {
-        _0x957cca()['catch'](() => {});
+      manualCopyAuthEl2?.['addEventListener']('click', () => {
+        run21()['catch'](() => {});
       }),
-      _0x3f7a78?.['addEventListener']('click', () => {
-        _0x2b10bf()['catch'](() => {});
+      manualImportJsonBtnEl?.['addEventListener']('click', () => {
+        run23()['catch'](() => {});
       }),
-      _0x1f7075?.['addEventListener']('click', (_0xa8c8a6) => {
-        if (_0xa8c8a6['target'] !== _0x1f7075) return;
-        _0x87872f();
+      modalOverlayEl3?.['addEventListener']('click', (event) => {
+        if (event['target'] !== modalOverlayEl3) return;
+        run2();
       }),
-      _0x58380c['addEventListener']('keydown', (_0x445d0f) => {
-        if (_0x445d0f['key'] !== 'Escape') return;
-        _0x87872f();
+      settingsCardEl['addEventListener']('keydown', (event2) => {
+        if (event2['key'] !== 'Escape') return;
+        run2();
       }));
-    if (_0x58380c['body']) {
-      const _0x53ad31 = new MutationObserver(() => {
-        const _0x1b7fa4 = _0x28c1fb();
-        _0x1b7fa4 && _0x2e5bc3({ force: !![], silent: !![] })['catch'](() => {});
+    if (settingsCardEl['body']) {
+      const mutationObserver = new MutationObserver(() => {
+        const value82 = syncDevVisibility();
+        value82 && refreshStatus({ force: !![], silent: !![] })['catch'](() => {});
       });
-      (_0x37e9f8['observer']?.['disconnect']?.(),
-        (_0x37e9f8['observer'] = _0x53ad31),
-        _0x53ad31['observe'](_0x58380c['body'], { attributes: !![], attributeFilter: ['class'] }));
+      (enabled11['observer']?.['disconnect']?.(),
+        (enabled11['observer'] = mutationObserver),
+        mutationObserver['observe'](settingsCardEl['body'], {
+          attributes: !![],
+          attributeFilter: ['class'],
+        }));
     }
   }
-  const _0x5c201a = (_0x529307) => {
-    _0x529307['detail']?.['provider'] === 'dreamina' &&
-      ['installed', 'missing']['includes'](_0x529307['detail']['phase']) &&
-      _0x2e5bc3({ force: !![], silent: !![] })['catch'](() => {});
+  const value83 = (value84) => {
+    value84['detail']?.['provider'] === 'dreamina' &&
+      ['installed', 'missing']['includes'](value84['detail']['phase']) &&
+      refreshStatus({ force: !![], silent: !![] })['catch'](() => {});
   };
   return (
-    globalThis['window']?.['addEventListener']?.(CLI_COMPONENT_CHANGED, _0x5c201a),
+    globalThis['window']?.['addEventListener']?.(CLI_COMPONENT_CHANGED, value83),
     {
       destroy() {
-        (globalThis['window']?.['removeEventListener']?.(CLI_COMPONENT_CHANGED, _0x5c201a),
-          (_0x37e9f8['statusRequestGeneration'] += 0x1),
-          _0x308414(),
-          _0x32e5b0(),
-          _0x37e9f8['observer']?.['disconnect']?.(),
-          (_0x37e9f8['observer'] = null));
+        (globalThis['window']?.['removeEventListener']?.(CLI_COMPONENT_CHANGED, value83),
+          (enabled11['statusRequestGeneration'] += 0x1),
+          run3(),
+          run36(),
+          enabled11['observer']?.['disconnect']?.(),
+          (enabled11['observer'] = null));
       },
-      init: _0x231e57,
-      refreshStatus: _0x2e5bc3,
-      syncDevVisibility: _0x28c1fb,
+      init: init,
+      refreshStatus: refreshStatus,
+      syncDevVisibility: syncDevVisibility,
     }
   );
 }

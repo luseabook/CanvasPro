@@ -46,7 +46,7 @@ const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
     Object['freeze']({ label: '4:5', w: 0x4, h: 0x5 }),
     Object['freeze']({ label: '21:9', w: 0x15, h: 0x9 }),
   ]),
-  PPIO_RATIO_LABEL_SET = new Set(PPIO_RATIO_OPTIONS['map']((_0x3a29cc) => _0x3a29cc['label'])),
+  PPIO_RATIO_LABEL_SET = new Set(PPIO_RATIO_OPTIONS['map']((item) => item['label'])),
   RUNNINGHUB_MODEL_DIMENSION_MIN = 0x200,
   RUNNINGHUB_MODEL_DIMENSION_MAX = 0x2000,
   RUNNINGHUB_MODEL_DIMENSION_ALIGN = 0x8,
@@ -71,65 +71,64 @@ const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
     '21:9',
   ]),
   RUNNINGHUB_MODEL_RATIO_SET = new Set(RUNNINGHUB_MODEL_RATIO_LIST);
-export function normalizeApimartGptImage2Resolution(_0x53e526) {
-  const _0x336467 = String(_0x53e526 || '')
+export function normalizeApimartGptImage2Resolution(key) {
+  const index = String(key || '')
     ['trim']()
     ['toUpperCase']();
-  if (_0x336467 === '1K' || _0x336467 === '2K' || _0x336467 === '4K') return _0x336467['toLowerCase']();
+  if (index === '1K' || index === '2K' || index === '4K') return index['toLowerCase']();
   return '2k';
 }
-export function normalizeApimartNanoBanana2Resolution(_0x47d7f3) {
-  const _0x3bda88 = String(_0x47d7f3 || '')
+export function normalizeApimartNanoBanana2Resolution(result) {
+  const data = String(result || '')
     ['trim']()
     ['toUpperCase']();
-  if (_0x3bda88 === '1K' || _0x3bda88 === '2K' || _0x3bda88 === '4K') return _0x3bda88;
+  if (data === '1K' || data === '2K' || data === '4K') return data;
   return '2K';
 }
-export function apimartGptImage2Image({ currentBody: _0x41aafb, payload: _0x1afbf4 }) {
+export function apimartGptImage2Image({ currentBody: currentBody2, payload: payload2 }) {
   return {
-    ..._0x41aafb,
-    resolution: normalizeApimartGptImage2Resolution(_0x41aafb['resolution'] || _0x1afbf4['imageSize']),
+    ...currentBody2,
+    resolution: normalizeApimartGptImage2Resolution(currentBody2['resolution'] || payload2['imageSize']),
   };
 }
-function hasApimartGrokImagineImageInput(_0x35f20c = []) {
-  return Array['isArray'](_0x35f20c) && _0x35f20c['some']((_0x69ad06) => String(_0x69ad06 || '')['trim']());
+function hasApimartGrokImagineImageInput(list = []) {
+  return Array['isArray'](list) && list['some']((options) => String(options || '')['trim']());
 }
 export function apimartGrokImagineImage({ currentBody: currentBody = {}, finalUrls: finalUrls = [] }) {
-  const _0x8b2cd7 = Array['isArray'](finalUrls) ? String(finalUrls[0x0] || '')['trim']() : '',
-    _0x3826a9 = {
+  const model = Array['isArray'](finalUrls) ? String(finalUrls[0x0] || '')['trim']() : '',
+    target = {
       ...currentBody,
-      model: _0x8b2cd7 ? 'grok-imagine-1.5-edit-apimart' : 'grok-imagine-1.5-apimart',
+      model: model ? 'grok-imagine-1.5-edit-apimart' : 'grok-imagine-1.5-apimart',
     };
-  delete _0x3826a9['image_urls'];
-  if (_0x8b2cd7) _0x3826a9['image_url'] = _0x8b2cd7;
-  else delete _0x3826a9['image_url'];
-  return _0x3826a9;
+  delete target['image_urls'];
+  if (model) target['image_url'] = model;
+  else delete target['image_url'];
+  return target;
 }
 export function apimartGrokImagineImageEndpoint({
-  cfg: _0x3fb302,
-  executionManifest: _0x214991,
+  cfg: cfg,
+  executionManifest: executionManifest,
   finalUrls: finalUrls = [],
 }) {
-  const _0x1be383 = String(_0x3fb302?.['apiUrl'] || '')['replace'](/\/+$/, ''),
-    _0x1b12cb = hasApimartGrokImagineImageInput(finalUrls)
+  const source = String(cfg?.['apiUrl'] || '')['replace'](/\/+$/, ''),
+    hasApimartGrokImagineImageInput2 = hasApimartGrokImagineImageInput(finalUrls)
       ? '/v1/images/edits'
-      : String(_0x214991?.['endpoint'] || '/v1/images/generations')['trim']();
-  return '' + _0x1be383 + (_0x1b12cb || '/v1/images/generations');
+      : String(executionManifest?.['endpoint'] || '/v1/images/generations')['trim']();
+  return '' + source + (hasApimartGrokImagineImageInput2 || '/v1/images/generations');
 }
-function inferGeminiImageMimeType(_0x5455b0) {
-  let _0xe475a0 = '';
+function inferGeminiImageMimeType(next) {
+  let current = '';
   try {
-    const _0x334235 = new URL(String(_0x5455b0 || ''));
-    if (_0x334235['protocol'] !== 'https:' && _0x334235['protocol'] !== 'http:')
-      throw new Error('unsupported protocol');
-    _0xe475a0 = _0x334235['pathname']['toLowerCase']();
+    const uRL = new URL(String(next || ''));
+    if (uRL['protocol'] !== 'https:' && uRL['protocol'] !== 'http:') throw new Error('unsupported protocol');
+    current = uRL['pathname']['toLowerCase']();
   } catch {
     throw new Error('Gemini image input upload did not return a public URL');
   }
-  if (/\.jpe?g$/['test'](_0xe475a0)) return 'image/jpeg';
-  if (/\.webp$/['test'](_0xe475a0)) return 'image/webp';
-  if (/\.gif$/['test'](_0xe475a0)) return 'image/gif';
-  if (/\.avif$/['test'](_0xe475a0)) return 'image/avif';
+  if (/\.jpe?g$/['test'](current)) return 'image/jpeg';
+  if (/\.webp$/['test'](current)) return 'image/webp';
+  if (/\.gif$/['test'](current)) return 'image/gif';
+  if (/\.avif$/['test'](current)) return 'image/avif';
   return 'image/png';
 }
 export async function customProviderGeminiImage({
@@ -137,48 +136,48 @@ export async function customProviderGeminiImage({
   finalPrompt: finalPrompt = '',
   finalUrls: finalUrls = [],
 }) {
-  const _0x1121e3 = String(currentBody['prompt'] || finalPrompt || '')['trim'](),
-    _0x13e817 =
+  const text = String(currentBody['prompt'] || finalPrompt || '')['trim'](),
+    args =
       currentBody['generationConfig'] &&
       typeof currentBody['generationConfig'] === 'object' &&
       !Array['isArray'](currentBody['generationConfig'])
         ? currentBody['generationConfig']
         : {},
-    _0x49eefb = { ...currentBody };
-  (delete _0x49eefb['model'], delete _0x49eefb['prompt']);
-  const _0x3b9817 = [{ text: _0x1121e3 }],
-    _0x33ce4d = Array['isArray'](finalUrls)
-      ? finalUrls['map']((_0x30278b) => String(_0x30278b || '')['trim']())['filter'](Boolean)
+    entry = { ...currentBody };
+  (delete entry['model'], delete entry['prompt']);
+  const parts = [{ text: text }],
+    record = Array['isArray'](finalUrls)
+      ? finalUrls['map']((handle) => String(handle || '')['trim']())['filter'](Boolean)
       : [];
-  for (const _0x5560de of _0x33ce4d) {
-    _0x3b9817['push']({ file_data: { mime_type: inferGeminiImageMimeType(_0x5560de), file_uri: _0x5560de } });
+  for (const file_uri of record) {
+    parts['push']({ file_data: { mime_type: inferGeminiImageMimeType(file_uri), file_uri: file_uri } });
   }
   return (
-    (_0x49eefb['contents'] = [{ role: 'user', parts: _0x3b9817 }]),
-    (_0x49eefb['generationConfig'] = { ..._0x13e817, responseModalities: ['IMAGE'] }),
-    _0x49eefb
+    (entry['contents'] = [{ role: 'user', parts: parts }]),
+    (entry['generationConfig'] = { ...args, responseModalities: ['IMAGE'] }),
+    entry
   );
 }
 export function customProviderGeminiImageEndpoint({
-  cfg: _0x2f65fb,
-  executionManifest: _0x5460e3,
-  modelToken: _0x1bd637,
+  cfg: cfg2,
+  executionManifest: executionManifest2,
+  modelToken: modelToken,
 }) {
-  const _0x6cdac1 = String(_0x5460e3?.['endpoint'] || '')['trim']();
-  if (!/^\/v1(?:alpha|beta)?\/models\/\{model\}:generateContent$/['test'](_0x6cdac1))
+  const state = String(executionManifest2?.['endpoint'] || '')['trim']();
+  if (!/^\/v1(?:alpha|beta)?\/models\/\{model\}:generateContent$/['test'](state))
     throw new Error('Invalid custom provider Gemini image endpoint template');
-  const _0x2a5d9b = String(_0x1bd637 || '')['trim']();
-  if (!_0x2a5d9b) throw new Error('Missing custom provider Gemini image model');
-  let _0x2800a2;
+  const enabled = String(modelToken || '')['trim']();
+  if (!enabled) throw new Error('Missing custom provider Gemini image model');
+  let uRL2;
   try {
-    _0x2800a2 = new URL(String(_0x2f65fb?.['apiUrl'] || ''));
+    uRL2 = new URL(String(cfg2?.['apiUrl'] || ''));
   } catch {
     throw new Error('Invalid custom provider Gemini image base URL');
   }
-  if (_0x2800a2['protocol'] !== 'https:' && _0x2800a2['protocol'] !== 'http:')
+  if (uRL2['protocol'] !== 'https:' && uRL2['protocol'] !== 'http:')
     throw new Error('Invalid custom provider Gemini image base URL protocol');
-  const _0x5bf0fb = _0x6cdac1['replace']('{model}', encodeURIComponent(_0x2a5d9b));
-  return new URL(_0x5bf0fb, _0x2800a2['origin'])['toString']();
+  const config = state['replace']('{model}', encodeURIComponent(enabled));
+  return new URL(config, uRL2['origin'])['toString']();
 }
 const APIMART_MIDJOURNEY_MODEL_OPTIONS = Object['freeze']({
   'v8.2': Object['freeze']({ version: '8.2', niji: ![] }),
@@ -200,754 +199,772 @@ const APIMART_MIDJOURNEY_MODEL_OPTIONS = Object['freeze']({
   'niji-6': Object['freeze']({ version: '6', niji: !![] }),
   'niji\x206': Object['freeze']({ version: '6', niji: !![] }),
 });
-function resolveApimartMidjourneyModel(_0x81c5a0 = {}) {
-  const _0x1e2bf7 =
-      _0x81c5a0['mjModel'] ||
-      _0x81c5a0['midjourneyModel'] ||
-      _0x81c5a0['version'] ||
-      _0x81c5a0['generationParams']?.['mjModel'] ||
+function resolveApimartMidjourneyModel(options2 = {}) {
+  const scope =
+      options2['mjModel'] ||
+      options2['midjourneyModel'] ||
+      options2['version'] ||
+      options2['generationParams']?.['mjModel'] ||
       'v8.2',
-    _0x5d3aff = String(_0x1e2bf7 || '')
+    input = String(scope || '')
       ['trim']()
       ['toLowerCase']();
-  return APIMART_MIDJOURNEY_MODEL_OPTIONS[_0x5d3aff] || APIMART_MIDJOURNEY_MODEL_OPTIONS['v8.2'];
+  return APIMART_MIDJOURNEY_MODEL_OPTIONS[input] || APIMART_MIDJOURNEY_MODEL_OPTIONS['v8.2'];
 }
-function normalizeApimartMidjourneyNumber(_0x81954f, { integer: integer = ![] } = {}) {
-  const _0x389161 = String(_0x81954f ?? '')['trim']();
-  if (!_0x389161 || _0x389161['toLowerCase']() === 'auto' || _0x389161['toLowerCase']() === 'none')
+function normalizeApimartMidjourneyNumber(output, { integer: integer = ![] } = {}) {
+  const enabled2 = String(output ?? '')['trim']();
+  if (!enabled2 || enabled2['toLowerCase']() === 'auto' || enabled2['toLowerCase']() === 'none')
     return undefined;
-  const _0x4b28ba = Number(_0x389161);
-  if (!Number['isFinite'](_0x4b28ba)) return undefined;
-  return integer ? Math['trunc'](_0x4b28ba) : _0x4b28ba;
+  const value2 = Number(enabled2);
+  if (!Number['isFinite'](value2)) return undefined;
+  return integer ? Math['trunc'](value2) : value2;
 }
-function normalizeApimartMidjourneyBoolean(_0x1b1646) {
-  if (_0x1b1646 === !![] || _0x1b1646 === ![]) return _0x1b1646;
-  const _0x2a4249 = String(_0x1b1646 ?? '')
+function normalizeApimartMidjourneyBoolean(value3) {
+  if (value3 === !![] || value3 === ![]) return value3;
+  const enabled3 = String(value3 ?? '')
     ['trim']()
     ['toLowerCase']();
-  if (!_0x2a4249) return ![];
-  return _0x2a4249 === 'true' || _0x2a4249 === '1' || _0x2a4249 === 'yes';
+  if (!enabled3) return ![];
+  return enabled3 === 'true' || enabled3 === '1' || enabled3 === 'yes';
 }
-function omitApimartMidjourneyAdaptiveSize(_0x3de861) {
-  const _0x5ad63e = String(_0x3de861 || '')['trim'](),
-    _0x596ce6 = _0x5ad63e['toLowerCase']();
+function omitApimartMidjourneyAdaptiveSize(value4) {
+  const enabled4 = String(value4 || '')['trim'](),
+    value5 = enabled4['toLowerCase']();
   return (
-    !_0x5ad63e ||
-    _0x5ad63e === '自适应' ||
-    _0x596ce6 === 'auto' ||
-    _0x596ce6 === 'adaptive' ||
-    _0x596ce6 === 'default'
+    !enabled4 || enabled4 === '自适应' || value5 === 'auto' || value5 === 'adaptive' || value5 === 'default'
   );
 }
-function assignApimartMidjourneyNumber(_0x5aed17, _0x30e6a9, _0x305b3c, _0x4d58cd = {}) {
-  const _0x48a11b = normalizeApimartMidjourneyNumber(_0x305b3c, _0x4d58cd);
-  if (_0x48a11b !== undefined) _0x5aed17[_0x30e6a9] = _0x48a11b;
+function assignApimartMidjourneyNumber(value6, value7, value8, value9 = {}) {
+  const apimartMidjourneyNumber = normalizeApimartMidjourneyNumber(value8, value9);
+  if (apimartMidjourneyNumber !== undefined) value6[value7] = apimartMidjourneyNumber;
 }
-function assignApimartMidjourneyBoolean(_0x508528, _0x3c96b8, _0x509ea7) {
-  if (normalizeApimartMidjourneyBoolean(_0x509ea7)) _0x508528[_0x3c96b8] = !![];
+function assignApimartMidjourneyBoolean(value10, value11, value12) {
+  if (normalizeApimartMidjourneyBoolean(value12)) value10[value11] = !![];
 }
 export function apimartMidjourneyImage({
   currentBody: currentBody = {},
   payload: payload = {},
-  finalPrompt: _0x7fdd8c,
+  finalPrompt: finalPrompt2,
   finalUrls: finalUrls = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x367612 = resolveApimartMidjourneyModel(payload),
-    _0x3d6f0b = normalizeInputUrlsBySlot(finalUrlsBySlot),
-    _0x10f2cc = Object['keys'](_0x3d6f0b)['length'] > 0x0,
-    _0x442feb = [];
-  if (_0x3d6f0b['imageUrl']) _0x442feb['push'](_0x3d6f0b['imageUrl']);
+  const version = resolveApimartMidjourneyModel(payload),
+    inputUrlsBySlot = normalizeInputUrlsBySlot(finalUrlsBySlot),
+    enabled5 = Object['keys'](inputUrlsBySlot)['length'] > 0x0,
+    list2 = [];
+  if (inputUrlsBySlot['imageUrl']) list2['push'](inputUrlsBySlot['imageUrl']);
   else
-    !_0x10f2cc &&
+    !enabled5 &&
       Array['isArray'](finalUrls) &&
-      finalUrls['map']((_0x3e3c55) => String(_0x3e3c55 || '')['trim']())
+      finalUrls['map']((value13) => String(value13 || '')['trim']())
         ['filter'](Boolean)
-        ['forEach']((_0x594867) => {
-          if (!_0x442feb['includes'](_0x594867)) _0x442feb['push'](_0x594867);
+        ['forEach']((value14) => {
+          if (!list2['includes'](value14)) list2['push'](value14);
         });
-  const _0x45bfc9 = {
-    prompt: _0x7fdd8c || currentBody['prompt'] || '',
-    version: _0x367612['version'],
-    ...(_0x367612['niji'] ? { niji: !![] } : {}),
+  const value15 = {
+    prompt: finalPrompt2 || currentBody['prompt'] || '',
+    version: version['version'],
+    ...(version['niji'] ? { niji: !![] } : {}),
   };
-  !omitApimartMidjourneyAdaptiveSize(currentBody['size']) && (_0x45bfc9['size'] = currentBody['size']);
-  const _0x5924a7 = String(currentBody['speed'] || payload['speed'] || '')
+  !omitApimartMidjourneyAdaptiveSize(currentBody['size']) && (value15['size'] = currentBody['size']);
+  const value16 = String(currentBody['speed'] || payload['speed'] || '')
     ['trim']()
     ['toLowerCase']();
-  (_0x5924a7 === 'relax' || _0x5924a7 === 'fast' || _0x5924a7 === 'turbo') &&
-    (_0x45bfc9['speed'] = _0x5924a7);
-  const _0x36118a = String(currentBody['quality'] || payload['quality'] || '1')['trim']();
-  if (_0x36118a) _0x45bfc9['quality'] = _0x36118a;
-  if (_0x442feb['length'] > 0x0) _0x45bfc9['image_urls'] = _0x442feb;
-  if (_0x3d6f0b['cref']) _0x45bfc9['cref'] = _0x3d6f0b['cref'];
-  if (_0x3d6f0b['sref']) _0x45bfc9['sref'] = _0x3d6f0b['sref'];
-  if (_0x3d6f0b['dref']) _0x45bfc9['dref'] = _0x3d6f0b['dref'];
-  assignApimartMidjourneyNumber(_0x45bfc9, 'seed', currentBody['seed'], { integer: !![] });
+  (value16 === 'relax' || value16 === 'fast' || value16 === 'turbo') && (value15['speed'] = value16);
+  const value17 = String(currentBody['quality'] || payload['quality'] || '1')['trim']();
+  if (value17) value15['quality'] = value17;
+  if (list2['length'] > 0x0) value15['image_urls'] = list2;
+  if (inputUrlsBySlot['cref']) value15['cref'] = inputUrlsBySlot['cref'];
+  if (inputUrlsBySlot['sref']) value15['sref'] = inputUrlsBySlot['sref'];
+  if (inputUrlsBySlot['dref']) value15['dref'] = inputUrlsBySlot['dref'];
+  assignApimartMidjourneyNumber(value15, 'seed', currentBody['seed'], { integer: !![] });
   currentBody['negative_prompt'] &&
-    (_0x45bfc9['negative_prompt'] = String(currentBody['negative_prompt'])['trim']());
-  (assignApimartMidjourneyNumber(_0x45bfc9, 'stylize', currentBody['stylize'], { integer: !![] }),
-    assignApimartMidjourneyNumber(_0x45bfc9, 'chaos', currentBody['chaos'], { integer: !![] }),
-    assignApimartMidjourneyNumber(_0x45bfc9, 'weird', currentBody['weird'], { integer: !![] }));
-  _0x442feb['length'] > 0x0 && assignApimartMidjourneyNumber(_0x45bfc9, 'iw', currentBody['iw']);
-  _0x3d6f0b['cref'] && assignApimartMidjourneyNumber(_0x45bfc9, 'cw', currentBody['cw'], { integer: !![] });
-  _0x3d6f0b['sref'] && assignApimartMidjourneyNumber(_0x45bfc9, 'sw', currentBody['sw'], { integer: !![] });
-  _0x3d6f0b['dref'] && assignApimartMidjourneyNumber(_0x45bfc9, 'dw', currentBody['dw']);
-  const _0x387085 =
-    (!_0x367612['niji'] &&
-      (_0x367612['version'] === '6.1' || _0x367612['version'] === '5.2' || _0x367612['version'] === '5.1')) ||
-    (_0x367612['niji'] && _0x367612['version'] === '6');
-  _0x387085 && assignApimartMidjourneyNumber(_0x45bfc9, 'stop', currentBody['stop'], { integer: !![] });
-  (assignApimartMidjourneyBoolean(_0x45bfc9, 'tile', currentBody['tile']),
-    assignApimartMidjourneyBoolean(_0x45bfc9, 'raw', currentBody['raw']));
-  (_0x367612['version'] === '8.2' || _0x367612['version'] === '8.1' || _0x367612['version'] === '7') &&
-    assignApimartMidjourneyBoolean(_0x45bfc9, 'draft', currentBody['draft']);
-  (_0x367612['version'] === '8.2' || _0x367612['version'] === '8.1') &&
-    assignApimartMidjourneyBoolean(_0x45bfc9, 'hd', currentBody['hd']);
-  if (currentBody['extra']) _0x45bfc9['extra'] = String(currentBody['extra'])['trim']();
-  return _0x45bfc9;
+    (value15['negative_prompt'] = String(currentBody['negative_prompt'])['trim']());
+  (assignApimartMidjourneyNumber(value15, 'stylize', currentBody['stylize'], { integer: !![] }),
+    assignApimartMidjourneyNumber(value15, 'chaos', currentBody['chaos'], { integer: !![] }),
+    assignApimartMidjourneyNumber(value15, 'weird', currentBody['weird'], { integer: !![] }));
+  list2['length'] > 0x0 && assignApimartMidjourneyNumber(value15, 'iw', currentBody['iw']);
+  inputUrlsBySlot['cref'] &&
+    assignApimartMidjourneyNumber(value15, 'cw', currentBody['cw'], { integer: !![] });
+  inputUrlsBySlot['sref'] &&
+    assignApimartMidjourneyNumber(value15, 'sw', currentBody['sw'], { integer: !![] });
+  inputUrlsBySlot['dref'] && assignApimartMidjourneyNumber(value15, 'dw', currentBody['dw']);
+  const value18 =
+    (!version['niji'] &&
+      (version['version'] === '6.1' || version['version'] === '5.2' || version['version'] === '5.1')) ||
+    (version['niji'] && version['version'] === '6');
+  value18 && assignApimartMidjourneyNumber(value15, 'stop', currentBody['stop'], { integer: !![] });
+  (assignApimartMidjourneyBoolean(value15, 'tile', currentBody['tile']),
+    assignApimartMidjourneyBoolean(value15, 'raw', currentBody['raw']));
+  (version['version'] === '8.2' || version['version'] === '8.1' || version['version'] === '7') &&
+    assignApimartMidjourneyBoolean(value15, 'draft', currentBody['draft']);
+  (version['version'] === '8.2' || version['version'] === '8.1') &&
+    assignApimartMidjourneyBoolean(value15, 'hd', currentBody['hd']);
+  if (currentBody['extra']) value15['extra'] = String(currentBody['extra'])['trim']();
+  return value15;
 }
-function pickClosestPpioRatio(_0x7b59b5, _0x42d435) {
-  const _0x46ad21 = Number(_0x7b59b5 || 0x1) / Number(_0x42d435 || 0x1);
-  let _0x5cf5da = PPIO_RATIO_OPTIONS[0x0],
-    _0x3ebf53 = Number['POSITIVE_INFINITY'];
-  for (const _0x25e523 of PPIO_RATIO_OPTIONS) {
-    const _0x2020fe = Math['abs'](_0x25e523['w'] / _0x25e523['h'] - _0x46ad21);
-    _0x2020fe < _0x3ebf53 && ((_0x3ebf53 = _0x2020fe), (_0x5cf5da = _0x25e523));
+function pickClosestPpioRatio(value19, value20) {
+  const value21 = Number(value19 || 0x1) / Number(value20 || 0x1);
+  let value22 = PPIO_RATIO_OPTIONS[0x0],
+    value23 = Number['POSITIVE_INFINITY'];
+  for (const value24 of PPIO_RATIO_OPTIONS) {
+    const value25 = Math['abs'](value24['w'] / value24['h'] - value21);
+    value25 < value23 && ((value23 = value25), (value22 = value24));
   }
-  return _0x5cf5da['label'];
+  return value22['label'];
 }
-function normalizePpioQuality(_0x3b079f) {
-  const _0x301b8b = String(_0x3b079f || '')
+function normalizePpioQuality(value26) {
+  const value27 = String(value26 || '')
     ['trim']()
     ['toUpperCase']();
-  return PPIO_QUALITY_PIXEL_MAP[_0x301b8b] ? _0x301b8b : PPIO_DEFAULT_QUALITY;
+  return PPIO_QUALITY_PIXEL_MAP[value27] ? value27 : PPIO_DEFAULT_QUALITY;
 }
-function normalizePpioAspectRatioLabel(_0x1d3bad) {
-  const _0x439768 = String(_0x1d3bad || '')['trim']();
-  if (!_0x439768) return PPIO_DEFAULT_RATIO;
-  const _0x1a8683 = normalizeRatioLabelText(_0x439768),
-    _0x416b5b = _0x1a8683['toLowerCase']();
-  if (_0x416b5b === 'auto' || _0x416b5b === 'adaptive' || _0x1a8683 === '自适应' || _0x1a8683 === '默认')
+function normalizePpioAspectRatioLabel(value28) {
+  const enabled6 = String(value28 || '')['trim']();
+  if (!enabled6) return PPIO_DEFAULT_RATIO;
+  const list3 = normalizeRatioLabelText(enabled6),
+    value29 = list3['toLowerCase']();
+  if (value29 === 'auto' || value29 === 'adaptive' || list3 === '自适应' || list3 === '默认')
     return PPIO_DEFAULT_RATIO;
-  if (!_0x1a8683['includes'](':')) return PPIO_DEFAULT_RATIO;
-  const [_0x156dcc, _0x44082a] = _0x1a8683['split'](':'),
-    _0xa7b990 = Number['parseFloat'](_0x156dcc),
-    _0x26c7c0 = Number['parseFloat'](_0x44082a);
-  if (!(_0xa7b990 > 0x0 && _0x26c7c0 > 0x0)) return PPIO_DEFAULT_RATIO;
-  const _0x3bc5b4 = pickClosestPpioRatio(_0xa7b990, _0x26c7c0);
-  return PPIO_RATIO_LABEL_SET['has'](_0x3bc5b4) ? _0x3bc5b4 : PPIO_DEFAULT_RATIO;
+  if (!list3['includes'](':')) return PPIO_DEFAULT_RATIO;
+  const [value30, value31] = list3['split'](':'),
+    count = Number['parseFloat'](value30),
+    count2 = Number['parseFloat'](value31);
+  if (!(count > 0x0 && count2 > 0x0)) return PPIO_DEFAULT_RATIO;
+  const closestPpioRatio = pickClosestPpioRatio(count, count2);
+  return PPIO_RATIO_LABEL_SET['has'](closestPpioRatio) ? closestPpioRatio : PPIO_DEFAULT_RATIO;
 }
-function calculatePpioSizeFromTargetPixels(_0x506bac, _0x40cd8c) {
-  const [_0x159411, _0x17b74d] = String(_0x40cd8c || PPIO_DEFAULT_RATIO)['split'](':'),
-    _0xc1a8e0 = Number['parseFloat'](_0x159411) || 0x1,
-    _0x18c5ca = Number['parseFloat'](_0x17b74d) || 0x1,
-    _0x24168d = Math['max'](PPIO_MIN_RATIO, Math['min'](PPIO_MAX_RATIO, _0xc1a8e0 / _0x18c5ca)),
-    _0x5d031f = Math['max'](
+function calculatePpioSizeFromTargetPixels(value32, value33) {
+  const [value34, value35] = String(value33 || PPIO_DEFAULT_RATIO)['split'](':'),
+    value36 = Number['parseFloat'](value34) || 0x1,
+    value37 = Number['parseFloat'](value35) || 0x1,
+    value38 = Math['max'](PPIO_MIN_RATIO, Math['min'](PPIO_MAX_RATIO, value36 / value37)),
+    value39 = Math['max'](
       PPIO_MIN_PIXELS,
-      Math['min'](Number(_0x506bac) || PPIO_QUALITY_PIXEL_MAP['2K'], PPIO_MAX_PIXELS),
+      Math['min'](Number(value32) || PPIO_QUALITY_PIXEL_MAP['2K'], PPIO_MAX_PIXELS),
     );
-  let _0x2294d1 = Math['round'](Math['sqrt'](_0x5d031f / _0x24168d)),
-    _0x58f6fa = Math['round'](_0x2294d1 * _0x24168d);
+  let value40 = Math['round'](Math['sqrt'](value39 / value38)),
+    value41 = Math['round'](value40 * value38);
   return (
-    (_0x58f6fa = Math['max'](PPIO_ALIGN_STEP, Math['round'](_0x58f6fa / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
-    (_0x2294d1 = Math['max'](PPIO_ALIGN_STEP, Math['round'](_0x2294d1 / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
-    _0x58f6fa + 'x' + _0x2294d1
+    (value41 = Math['max'](PPIO_ALIGN_STEP, Math['round'](value41 / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
+    (value40 = Math['max'](PPIO_ALIGN_STEP, Math['round'](value40 / PPIO_ALIGN_STEP) * PPIO_ALIGN_STEP)),
+    value41 + 'x' + value40
   );
 }
-function resolvePpioSize(_0x366b1a, _0x3400a2) {
-  const _0x48a23a = normalizePpioQuality(_0x366b1a),
-    _0x51bba6 = normalizePpioAspectRatioLabel(_0x3400a2),
-    _0x322294 = PPIO_QUALITY_PIXEL_MAP[_0x48a23a] || PPIO_QUALITY_PIXEL_MAP['2K'];
-  return calculatePpioSizeFromTargetPixels(_0x322294, _0x51bba6) || PPIO_DEFAULT_SIZE;
+function resolvePpioSize(value42, value43) {
+  const ppioQuality = normalizePpioQuality(value42),
+    ppioAspectRatioLabel = normalizePpioAspectRatioLabel(value43),
+    value44 = PPIO_QUALITY_PIXEL_MAP[ppioQuality] || PPIO_QUALITY_PIXEL_MAP['2K'];
+  return calculatePpioSizeFromTargetPixels(value44, ppioAspectRatioLabel) || PPIO_DEFAULT_SIZE;
 }
 export function ppioImageSize({
-  currentBody: _0xf5f0f5,
-  payload: _0x333172,
-  modelToken: _0x4aacf4,
-  finalUrls: _0x1d64d0,
-  executionManifest: _0x5624ee,
-  modelManifest: _0x1debf2,
+  currentBody: currentBody3,
+  payload: payload3,
+  modelToken: modelToken2,
+  finalUrls: finalUrls2,
+  executionManifest: executionManifest3,
+  modelManifest: modelManifest,
 }) {
-  const _0x220336 = _0x4aacf4 || stripPrefix(_0x333172['model'], 'ppio/'),
-    _0x3ad202 = { ..._0xf5f0f5 },
-    _0x171145 = _0x5624ee?.['extensions']?.['ppioImage'] || _0x1debf2?.['extensions']?.['ppioImage'] || {};
+  const value45 = modelToken2 || stripPrefix(payload3['model'], 'ppio/'),
+    value46 = { ...currentBody3 },
+    args2 =
+      executionManifest3?.['extensions']?.['ppioImage'] || modelManifest?.['extensions']?.['ppioImage'] || {};
   return (
-    !_0x333172['suppressImageSize'] &&
-      (_0x3ad202['size'] = resolvePpioSize(
-        _0x333172['imageSize'],
-        _0x333172['resolvedRatioLabel'] || _0x333172['aspectRatio'],
+    !payload3['suppressImageSize'] &&
+      (value46['size'] = resolvePpioSize(
+        payload3['imageSize'],
+        payload3['resolvedRatioLabel'] || payload3['aspectRatio'],
       )),
-    _0x171145['optimizePromptOptions'] &&
-      (_0x3ad202['optimize_prompt_options'] = { ..._0x171145['optimizePromptOptions'] }),
-    _0x171145['batchSizeField'] &&
-      _0x333172['batchSize'] &&
-      _0x333172['batchSize'] > 0x1 &&
-      (_0x3ad202[_0x171145['batchSizeField']] = _0x333172['batchSize']),
-    _0x1d64d0['length'] > 0x0 && (_0x3ad202[_0x171145['imageInputField'] || 'image'] = _0x1d64d0),
-    _0x3ad202
+    args2['optimizePromptOptions'] &&
+      (value46['optimize_prompt_options'] = { ...args2['optimizePromptOptions'] }),
+    args2['batchSizeField'] &&
+      payload3['batchSize'] &&
+      payload3['batchSize'] > 0x1 &&
+      (value46[args2['batchSizeField']] = payload3['batchSize']),
+    finalUrls2['length'] > 0x0 && (value46[args2['imageInputField'] || 'image'] = finalUrls2),
+    value46
   );
 }
-function normalizeGrsaiImageModel(_0x31c63b) {
-  const _0xa44982 = String(_0x31c63b || '')['trim']();
-  if (!_0xa44982) return 'nano-banana-pro-vt';
-  return _0xa44982['replace'](/^grsai\//i, '');
+function normalizeGrsaiImageModel(value47) {
+  const enabled7 = String(value47 || '')['trim']();
+  if (!enabled7) return 'nano-banana-pro-vt';
+  return enabled7['replace'](/^grsai\//i, '');
 }
 const GRSAI_NANO_BANANA_IMAGE_SIZE_SET = new Set(['1K', '2K']),
   GRSAI_NANO_BANANA_4K_IMAGE_SIZE_SET = new Set(['1K', '2K', '4K']);
-function getGrsaiNanoBananaSelection(_0x25d904) {
-  const _0x133acc = resolveNanoBananaSelectionFromModel(_0x25d904, '2K', 'grsai');
-  if (!_0x133acc || _0x133acc['family'] === NANO_BANANA_FAMILIES['GPT_IMAGE_2']) return null;
-  return _0x133acc;
+function getGrsaiNanoBananaSelection(value48) {
+  const nanoBananaSelectionFromModel = resolveNanoBananaSelectionFromModel(value48, '2K', 'grsai');
+  if (
+    !nanoBananaSelectionFromModel ||
+    nanoBananaSelectionFromModel['family'] === NANO_BANANA_FAMILIES['GPT_IMAGE_2']
+  )
+    return null;
+  return nanoBananaSelectionFromModel;
 }
-function getGrsaiImageSizePolicy(_0x44569d) {
-  const _0x4833c6 = resolveModelExecution(_0x44569d, { providerHint: 'grsai' }),
-    _0x89da98 = _0x4833c6?.['modelManifest']?.['extensions']?.['imageSizePolicy'];
-  return _0x89da98 && typeof _0x89da98 === 'object' ? _0x89da98 : null;
+function getGrsaiImageSizePolicy(value49) {
+  const modelExecution = resolveModelExecution(value49, { providerHint: 'grsai' }),
+    value50 = modelExecution?.['modelManifest']?.['extensions']?.['imageSizePolicy'];
+  return value50 && typeof value50 === 'object' ? value50 : null;
 }
-function normalizeGrsaiNanoBananaImageSize(_0x2475be, _0x55eabc = '') {
-  const _0x1fd41e = getGrsaiImageSizePolicy(_0x55eabc),
-    _0x56463a = String(_0x1fd41e?.['fixedSize'] || '')
+function normalizeGrsaiNanoBananaImageSize(value51, value52 = '') {
+  const grsaiImageSizePolicy = getGrsaiImageSizePolicy(value52),
+    value53 = String(grsaiImageSizePolicy?.['fixedSize'] || '')
       ['trim']()
       ['toUpperCase']();
-  if (_0x56463a) return _0x56463a;
-  const _0x156b57 = String(_0x2475be || '')
+  if (value53) return value53;
+  const value54 = String(value51 || '')
       ['trim']()
       ['toUpperCase'](),
-    _0x2a93de = _0x1fd41e?.['allow4KSelection']
+    map = grsaiImageSizePolicy?.['allow4KSelection']
       ? GRSAI_NANO_BANANA_4K_IMAGE_SIZE_SET
       : GRSAI_NANO_BANANA_IMAGE_SIZE_SET;
-  return _0x2a93de['has'](_0x156b57) ? _0x156b57 : '2K';
+  return map['has'](value54) ? value54 : '2K';
 }
-function getGrsaiGptImage2Policy(_0x5381b5) {
-  if (_0x5381b5 && typeof _0x5381b5 === 'object' && !Array['isArray'](_0x5381b5)) return _0x5381b5;
-  const _0x26a05d = resolveModelExecution(_0x5381b5, { providerHint: 'grsai' }),
-    _0x144e7c = _0x26a05d?.['modelManifest']?.['extensions']?.['gptImage2'];
-  return _0x144e7c && typeof _0x144e7c === 'object' && !Array['isArray'](_0x144e7c) ? _0x144e7c : null;
+function getGrsaiGptImage2Policy(value55) {
+  if (value55 && typeof value55 === 'object' && !Array['isArray'](value55)) return value55;
+  const modelExecution2 = resolveModelExecution(value55, { providerHint: 'grsai' }),
+    value56 = modelExecution2?.['modelManifest']?.['extensions']?.['gptImage2'];
+  return value56 && typeof value56 === 'object' && !Array['isArray'](value56) ? value56 : null;
 }
-function getGrsaiGptImage2PixelSizesByRatio(_0x31262b) {
-  const _0x28a12e = getGrsaiGptImage2Policy(_0x31262b)?.['pixelSizesByRatio'];
-  return _0x28a12e && typeof _0x28a12e === 'object' && !Array['isArray'](_0x28a12e) ? _0x28a12e : {};
+function getGrsaiGptImage2PixelSizesByRatio(value57) {
+  const grsaiGptImage2Policy = getGrsaiGptImage2Policy(value57)?.['pixelSizesByRatio'];
+  return grsaiGptImage2Policy &&
+    typeof grsaiGptImage2Policy === 'object' &&
+    !Array['isArray'](grsaiGptImage2Policy)
+    ? grsaiGptImage2Policy
+    : {};
 }
-function normalizeGrsaiNanoBananaAspectRatio(_0x31d3e1, _0x34b29e) {
-  const _0x60e87b = normalizeRatioLabelText(_0x31d3e1),
-    _0x3a5176 = _0x60e87b['toLowerCase']();
+function normalizeGrsaiNanoBananaAspectRatio(value58, value59) {
+  const ratioLabelText = normalizeRatioLabelText(value58),
+    value60 = ratioLabelText['toLowerCase']();
   if (
-    !_0x60e87b ||
-    _0x3a5176 === 'auto' ||
-    _0x3a5176 === 'adaptive' ||
-    _0x3a5176 === 'default' ||
-    _0x60e87b === '自适应' ||
-    _0x60e87b === '默认'
+    !ratioLabelText ||
+    value60 === 'auto' ||
+    value60 === 'adaptive' ||
+    value60 === 'default' ||
+    ratioLabelText === '自适应' ||
+    ratioLabelText === '默认'
   )
     return 'auto';
-  const _0x154d4a = parseRatioLabel(_0x60e87b);
-  if (!_0x154d4a) return 'auto';
-  const _0x5b7a7d = _0x154d4a['label'],
-    _0x3c2d9e = new Set(getNanoBananaAllowedRatioLabels(_0x34b29e));
-  return _0x3c2d9e['has'](_0x5b7a7d) ? _0x5b7a7d : normalizeNanoBananaRatioForFamily(_0x5b7a7d, _0x34b29e);
+  const ratioLabel = parseRatioLabel(ratioLabelText);
+  if (!ratioLabel) return 'auto';
+  const value61 = ratioLabel['label'],
+    map2 = new Set(getNanoBananaAllowedRatioLabels(value59));
+  return map2['has'](value61) ? value61 : normalizeNanoBananaRatioForFamily(value61, value59);
 }
-function normalizeGrsaiGptImage2ImageSize(_0x39e239, _0x8c81ba) {
-  const _0x2fac59 = getGrsaiGptImage2Policy(_0x8c81ba),
-    _0x204d9c = new Set(
-      (Array['isArray'](_0x2fac59?.['allowedSizes']) ? _0x2fac59['allowedSizes'] : ['1K'])['map'](
-        (_0x22e81d) =>
-          String(_0x22e81d || '')
-            ['trim']()
-            ['toUpperCase'](),
+function normalizeGrsaiGptImage2ImageSize(value62, value63) {
+  const grsaiGptImage2Policy2 = getGrsaiGptImage2Policy(value63),
+    map3 = new Set(
+      (Array['isArray'](grsaiGptImage2Policy2?.['allowedSizes'])
+        ? grsaiGptImage2Policy2['allowedSizes']
+        : ['1K'])['map']((value64) =>
+        String(value64 || '')
+          ['trim']()
+          ['toUpperCase'](),
       ),
     ),
-    _0x729d60 = String(_0x2fac59?.['defaultSize'] || '1K')
+    value65 = String(grsaiGptImage2Policy2?.['defaultSize'] || '1K')
       ['trim']()
       ['toUpperCase'](),
-    _0x3815d0 = String(_0x39e239 || '')
+    value66 = String(value62 || '')
       ['trim']()
       ['toUpperCase']();
-  if (_0x204d9c['has'](_0x3815d0)) return _0x3815d0;
-  return _0x204d9c['has'](_0x729d60) ? _0x729d60 : '1K';
+  if (map3['has'](value66)) return value66;
+  return map3['has'](value65) ? value65 : '1K';
 }
-function normalizePixelSize(_0x54eab8) {
-  const _0x8997d1 = String(_0x54eab8 || '')
+function normalizePixelSize(value67) {
+  const enabled8 = String(value67 || '')
     ['trim']()
     ['match'](/^(\d{2,5})\s*[xX]\s*(\d{2,5})$/);
-  if (!_0x8997d1) return '';
-  return _0x8997d1[0x1] + 'x' + _0x8997d1[0x2];
+  if (!enabled8) return '';
+  return enabled8[0x1] + 'x' + enabled8[0x2];
 }
-function getGrsaiGptImage2RatioOptionsForSize(_0x5f2d62, _0x3aae98) {
-  const _0x17fcd4 = getGrsaiGptImage2PixelSizesByRatio(_0x3aae98);
-  return Object['keys'](_0x17fcd4)
-    ['filter']((_0x21c76f) => _0x17fcd4[_0x21c76f]?.[_0x5f2d62])
-    ['map']((_0x49dfb2) => {
-      const _0x31b24f = parseRatioLabel(_0x49dfb2) || { w: 0x1, h: 0x1 };
-      return Object['freeze']({ label: _0x49dfb2, value: _0x31b24f['w'] / _0x31b24f['h'] });
+function getGrsaiGptImage2RatioOptionsForSize(value68, value69) {
+  const grsaiGptImage2PixelSizesByRatio = getGrsaiGptImage2PixelSizesByRatio(value69);
+  return Object['keys'](grsaiGptImage2PixelSizesByRatio)
+    ['filter']((value70) => grsaiGptImage2PixelSizesByRatio[value70]?.[value68])
+    ['map']((label2) => {
+      const value71 = parseRatioLabel(label2) || { w: 0x1, h: 0x1 };
+      return Object['freeze']({ label: label2, value: value71['w'] / value71['h'] });
     });
 }
-function getDefaultGrsaiGptImage2PixelSize(_0x3c8ecc, _0x5ed4b3) {
-  return _0x3c8ecc['1:1']?.[_0x5ed4b3] || _0x3c8ecc['1:1']?.['1K'] || '1024x1024';
+function getDefaultGrsaiGptImage2PixelSize(value72, value73) {
+  return value72['1:1']?.[value73] || value72['1:1']?.['1K'] || '1024x1024';
 }
-function pickClosestGrsaiGptImage2RatioLabel(_0x5ec1aa, _0x1179a9, _0x5b6257) {
-  const _0x4a40ac = parseRatioLabel(_0x5ec1aa),
-    _0x44765e = _0x4a40ac ? _0x4a40ac['w'] / _0x4a40ac['h'] : 0x1,
-    _0x1fac05 = getGrsaiGptImage2RatioOptionsForSize(_0x1179a9, _0x5b6257);
-  let _0x2f8bdc = _0x1fac05[0x0] || { label: '1:1', value: 0x1 },
-    _0xf030ef = Number['POSITIVE_INFINITY'];
-  for (const _0x3d050b of _0x1fac05) {
-    const _0x25bec5 = Math['abs'](_0x44765e - _0x3d050b['value']);
-    _0x25bec5 < _0xf030ef && ((_0x2f8bdc = _0x3d050b), (_0xf030ef = _0x25bec5));
+function pickClosestGrsaiGptImage2RatioLabel(value74, value75, value76) {
+  const ratioLabel2 = parseRatioLabel(value74),
+    value77 = ratioLabel2 ? ratioLabel2['w'] / ratioLabel2['h'] : 0x1,
+    grsaiGptImage2RatioOptionsForSize = getGrsaiGptImage2RatioOptionsForSize(value75, value76);
+  let value78 = grsaiGptImage2RatioOptionsForSize[0x0] || { label: '1:1', value: 0x1 },
+    value79 = Number['POSITIVE_INFINITY'];
+  for (const el of grsaiGptImage2RatioOptionsForSize) {
+    const value80 = Math['abs'](value77 - el['value']);
+    value80 < value79 && ((value78 = el), (value79 = value80));
   }
-  return _0x2f8bdc?.['label'] || '1:1';
+  return value78?.['label'] || '1:1';
 }
-function normalizeGrsaiGptImage2AspectRatio(_0x2c3b9b, _0xefcb91, _0x171d7c) {
-  const _0x5d0abb = getGrsaiGptImage2PixelSizesByRatio(_0x171d7c),
-    _0x229747 = normalizePixelSize(_0x2c3b9b);
-  if (_0x229747) return _0x229747;
-  const _0x3e2186 = normalizeRatioLabelText(_0x2c3b9b),
-    _0x1a9482 = _0x3e2186['toLowerCase']();
+function normalizeGrsaiGptImage2AspectRatio(value81, value82, value83) {
+  const grsaiGptImage2PixelSizesByRatio2 = getGrsaiGptImage2PixelSizesByRatio(value83),
+    pixelSize = normalizePixelSize(value81);
+  if (pixelSize) return pixelSize;
+  const ratioLabelText2 = normalizeRatioLabelText(value81),
+    value84 = ratioLabelText2['toLowerCase']();
   if (
-    !_0x3e2186 ||
-    _0x1a9482 === 'auto' ||
-    _0x1a9482 === 'adaptive' ||
-    _0x1a9482 === 'default' ||
-    _0x3e2186 === '自适应' ||
-    _0x3e2186 === '默认'
+    !ratioLabelText2 ||
+    value84 === 'auto' ||
+    value84 === 'adaptive' ||
+    value84 === 'default' ||
+    ratioLabelText2 === '自适应' ||
+    ratioLabelText2 === '默认'
   )
-    return getDefaultGrsaiGptImage2PixelSize(_0x5d0abb, _0xefcb91);
-  const _0x115970 = parseRatioLabel(_0x3e2186),
-    _0x469389 = _0x115970?.['label'] || '1:1',
-    _0xf159b1 = _0x5d0abb[_0x469389]?.[_0xefcb91];
-  if (_0xf159b1) return _0xf159b1;
-  const _0x3467ab = pickClosestGrsaiGptImage2RatioLabel(_0x469389, _0xefcb91, _0x171d7c);
-  return _0x5d0abb[_0x3467ab]?.[_0xefcb91] || getDefaultGrsaiGptImage2PixelSize(_0x5d0abb, _0xefcb91);
+    return getDefaultGrsaiGptImage2PixelSize(grsaiGptImage2PixelSizesByRatio2, value82);
+  const ratioLabel3 = parseRatioLabel(ratioLabelText2),
+    value85 = ratioLabel3?.['label'] || '1:1',
+    value86 = grsaiGptImage2PixelSizesByRatio2[value85]?.[value82];
+  if (value86) return value86;
+  const closestGrsaiGptImage2RatioLabel = pickClosestGrsaiGptImage2RatioLabel(value85, value82, value83);
+  return (
+    grsaiGptImage2PixelSizesByRatio2[closestGrsaiGptImage2RatioLabel]?.[value82] ||
+    getDefaultGrsaiGptImage2PixelSize(grsaiGptImage2PixelSizesByRatio2, value82)
+  );
 }
 export function grsaiImage({
-  payload: _0x2aae6c,
-  finalPrompt: _0x4dacec,
-  modelToken: _0x1c0043,
-  finalUrls: _0x1df776,
+  payload: payload4,
+  finalPrompt: finalPrompt3,
+  modelToken: modelToken3,
+  finalUrls: finalUrls3,
 }) {
-  const _0x4c865f = normalizeGrsaiImageModel(_0x1c0043 || _0x2aae6c['model'] || 'nano-banana-pro-vt'),
-    _0x1ced60 = getGrsaiNanoBananaSelection(_0x4c865f),
-    _0x3db870 = _0x2aae6c['resolvedRatioLabel'] || _0x2aae6c['aspectRatio'],
-    _0x1aff97 = _0x1ced60 ? normalizeGrsaiNanoBananaAspectRatio(_0x3db870, _0x1ced60['family']) : _0x3db870,
-    _0x4151f3 = _0x1ced60
-      ? normalizeGrsaiNanoBananaImageSize(_0x2aae6c['imageSize'], _0x4c865f)
-      : _0x2aae6c['imageSize'] || '2K';
+  const model2 = normalizeGrsaiImageModel(modelToken3 || payload4['model'] || 'nano-banana-pro-vt'),
+    grsaiNanoBananaSelection = getGrsaiNanoBananaSelection(model2),
+    value87 = payload4['resolvedRatioLabel'] || payload4['aspectRatio'],
+    aspectRatio2 = grsaiNanoBananaSelection
+      ? normalizeGrsaiNanoBananaAspectRatio(value87, grsaiNanoBananaSelection['family'])
+      : value87,
+    imageSize2 = grsaiNanoBananaSelection
+      ? normalizeGrsaiNanoBananaImageSize(payload4['imageSize'], model2)
+      : payload4['imageSize'] || '2K';
   return {
-    model: _0x4c865f,
-    prompt: _0x4dacec,
-    images: _0x1df776,
+    model: model2,
+    prompt: finalPrompt3,
+    images: finalUrls3,
     replyType: 'json',
-    ...(!_0x2aae6c['suppressImageSize'] && !shouldOmitImageSizeParam(_0x4c865f) && { imageSize: _0x4151f3 }),
-    ...(!_0x2aae6c['suppressAspectRatio'] && _0x1aff97 && { aspectRatio: _0x1aff97 }),
+    ...(!payload4['suppressImageSize'] && !shouldOmitImageSizeParam(model2) && { imageSize: imageSize2 }),
+    ...(!payload4['suppressAspectRatio'] && aspectRatio2 && { aspectRatio: aspectRatio2 }),
   };
 }
 export function grsaiGptImage2Image({
-  payload: _0x5d59b1,
-  finalPrompt: _0xba996c,
-  modelToken: _0x33d36d,
-  finalUrls: _0xfb75bb,
+  payload: payload5,
+  finalPrompt: finalPrompt4,
+  modelToken: modelToken4,
+  finalUrls: finalUrls4,
   currentBody: currentBody = {},
-  executionManifest: _0x50cfe4,
+  executionManifest: executionManifest4,
 }) {
-  const _0xdd0689 = normalizeGrsaiImageModel(_0x33d36d || _0x5d59b1['model'] || 'gpt-image-2'),
-    _0x2ede83 = _0x5d59b1['generationParams']?.['mode'] ?? _0x5d59b1['mode'],
-    _0x48d7fb =
-      _0x50cfe4?.['extensions']?.['gptImage2ByMode']?.[_0x2ede83] ||
-      _0x50cfe4?.['extensions']?.['gptImage2'] ||
-      _0xdd0689,
-    _0x57d813 = _0x5d59b1['generationParams']?.['aspectRatio'],
-    _0x5667d4 = normalizeGrsaiGptImage2ImageSize(
-      _0x5d59b1['generationParams']?.['imageSize'] ?? _0x5d59b1['imageSize'],
-      _0x48d7fb,
+  const model3 = normalizeGrsaiImageModel(modelToken4 || payload5['model'] || 'gpt-image-2'),
+    value88 = payload5['generationParams']?.['mode'] ?? payload5['mode'],
+    value89 =
+      executionManifest4?.['extensions']?.['gptImage2ByMode']?.[value88] ||
+      executionManifest4?.['extensions']?.['gptImage2'] ||
+      model3,
+    value90 = payload5['generationParams']?.['aspectRatio'],
+    grsaiGptImage2ImageSize = normalizeGrsaiGptImage2ImageSize(
+      payload5['generationParams']?.['imageSize'] ?? payload5['imageSize'],
+      value89,
     ),
-    _0x1799c7 = normalizeGrsaiGptImage2AspectRatio(
-      (!isAdaptiveRatioInput(_0x57d813) ? _0x57d813 : _0x5d59b1['resolvedRatioLabel']) ||
-        _0x5d59b1['aspectRatio'],
-      _0x5667d4,
-      _0x48d7fb,
+    aspectRatio3 = normalizeGrsaiGptImage2AspectRatio(
+      (!isAdaptiveRatioInput(value90) ? value90 : payload5['resolvedRatioLabel']) || payload5['aspectRatio'],
+      grsaiGptImage2ImageSize,
+      value89,
     );
   return {
     ...currentBody,
-    model: _0xdd0689,
-    prompt: _0xba996c,
-    images: _0xfb75bb,
+    model: model3,
+    prompt: finalPrompt4,
+    images: finalUrls4,
     replyType: currentBody['replyType'] || 'json',
-    ...(!_0x5d59b1['suppressAspectRatio'] && _0x1799c7 && { aspectRatio: _0x1799c7 }),
+    ...(!payload5['suppressAspectRatio'] && aspectRatio3 && { aspectRatio: aspectRatio3 }),
   };
 }
-function normalizeRunningHubModelId(_0x468d53) {
-  return stripPrefix(_0x468d53, 'runninghub-model/');
+function normalizeRunningHubModelId(value91) {
+  return stripPrefix(value91, 'runninghub-model/');
 }
-function getRunningHubImageExecutionPolicy({ executionManifest: _0x56e7e7, modelManifest: _0x59ea7c } = {}) {
-  const _0x228acc =
-    _0x56e7e7?.['extensions']?.['runningHubImage'] || _0x59ea7c?.['extensions']?.['runningHubImage'];
-  return _0x228acc && typeof _0x228acc === 'object' && !Array['isArray'](_0x228acc) ? _0x228acc : {};
+function getRunningHubImageExecutionPolicy({
+  executionManifest: executionManifest5,
+  modelManifest: modelManifest2,
+} = {}) {
+  const value92 =
+    executionManifest5?.['extensions']?.['runningHubImage'] ||
+    modelManifest2?.['extensions']?.['runningHubImage'];
+  return value92 && typeof value92 === 'object' && !Array['isArray'](value92) ? value92 : {};
 }
-function normalizeRunningHubImageRoute(_0x106e50 = {}) {
-  const _0x26ac01 = String(
-    _0x106e50?.['rhModelRoute'] ?? _0x106e50?.['generationParams']?.['rhModelRoute'] ?? '',
-  )
+function normalizeRunningHubImageRoute(options3 = {}) {
+  const value93 = String(options3?.['rhModelRoute'] ?? options3?.['generationParams']?.['rhModelRoute'] ?? '')
     ['trim']()
     ['toLowerCase']();
-  return _0x26ac01 || 'low';
+  return value93 || 'low';
 }
-function isPlainRunningHubPolicyObject(_0x1f9742) {
-  return _0x1f9742 && typeof _0x1f9742 === 'object' && !Array['isArray'](_0x1f9742);
+function isPlainRunningHubPolicyObject(value94) {
+  return value94 && typeof value94 === 'object' && !Array['isArray'](value94);
 }
-function pickRunningHubRouteValue(_0x1e121c, _0x175bc5) {
-  if (!isPlainRunningHubPolicyObject(_0x1e121c)) return undefined;
-  if (Object['prototype']['hasOwnProperty']['call'](_0x1e121c, _0x175bc5)) return _0x1e121c[_0x175bc5];
-  if (Object['prototype']['hasOwnProperty']['call'](_0x1e121c, 'default')) return _0x1e121c['default'];
+function pickRunningHubRouteValue(value95, value96) {
+  if (!isPlainRunningHubPolicyObject(value95)) return undefined;
+  if (Object['prototype']['hasOwnProperty']['call'](value95, value96)) return value95[value96];
+  if (Object['prototype']['hasOwnProperty']['call'](value95, 'default')) return value95['default'];
   return undefined;
 }
-function pickRunningHubPolicyValue(_0x504d86, _0x275b10, _0xc13175) {
-  const _0x213f9b = pickRunningHubRouteValue(_0x504d86?.[_0x275b10 + 'ByRoute'], _0xc13175);
-  return _0x213f9b !== undefined ? _0x213f9b : _0x504d86?.[_0x275b10];
+function pickRunningHubPolicyValue(value97, value98, value99) {
+  const runningHubRouteValue = pickRunningHubRouteValue(value97?.[value98 + 'ByRoute'], value99);
+  return runningHubRouteValue !== undefined ? runningHubRouteValue : value97?.[value98];
 }
-function mergeRunningHubRoutePolicyObject(_0x320c03, _0x2f0f12, _0x571e31) {
-  const _0x465039 = isPlainRunningHubPolicyObject(_0x320c03?.[_0x2f0f12]) ? _0x320c03[_0x2f0f12] : {},
-    _0x443675 = pickRunningHubRouteValue(_0x320c03?.[_0x2f0f12 + 'ByRoute'], _0x571e31);
-  if (!isPlainRunningHubPolicyObject(_0x443675)) return _0x465039;
-  return { ..._0x465039, ..._0x443675 };
+function mergeRunningHubRoutePolicyObject(value100, value101, value102) {
+  const args3 = isPlainRunningHubPolicyObject(value100?.[value101]) ? value100[value101] : {},
+    args4 = pickRunningHubRouteValue(value100?.[value101 + 'ByRoute'], value102);
+  if (!isPlainRunningHubPolicyObject(args4)) return args3;
+  return { ...args3, ...args4 };
 }
-function resolveRunningHubImageRoutePolicy(_0x34415b, _0x4276c3 = {}) {
-  const _0xa5fb31 = normalizeRunningHubImageRoute(_0x4276c3);
+function resolveRunningHubImageRoutePolicy(args5, value103 = {}) {
+  const route = normalizeRunningHubImageRoute(value103);
   return {
-    ..._0x34415b,
-    route: _0xa5fb31,
-    textEndpoint: pickRunningHubPolicyValue(_0x34415b, 'textEndpoint', _0xa5fb31),
-    inputEndpoint: pickRunningHubPolicyValue(_0x34415b, 'inputEndpoint', _0xa5fb31),
-    omitResolution: pickRunningHubPolicyValue(_0x34415b, 'omitResolution', _0xa5fb31),
-    quality: pickRunningHubPolicyValue(_0x34415b, 'quality', _0xa5fb31),
-    omitAspectRatio: pickRunningHubPolicyValue(_0x34415b, 'omitAspectRatio', _0xa5fb31),
-    aspectRatioValueMap: pickRunningHubPolicyValue(_0x34415b, 'aspectRatioValueMap', _0xa5fb31),
-    omitAspectRatioWhenInput: pickRunningHubPolicyValue(_0x34415b, 'omitAspectRatioWhenInput', _0xa5fb31),
-    inputSlotBodyFields: pickRunningHubPolicyValue(_0x34415b, 'inputSlotBodyFields', _0xa5fb31),
-    constantParams: mergeRunningHubRoutePolicyObject(_0x34415b, 'constantParams', _0xa5fb31),
-    defaultParams: mergeRunningHubRoutePolicyObject(_0x34415b, 'defaultParams', _0xa5fb31),
-    bodyParamTypes: mergeRunningHubRoutePolicyObject(_0x34415b, 'bodyParamTypes', _0xa5fb31),
-    bodyParamInputModes: mergeRunningHubRoutePolicyObject(_0x34415b, 'bodyParamInputModes', _0xa5fb31),
+    ...args5,
+    route: route,
+    textEndpoint: pickRunningHubPolicyValue(args5, 'textEndpoint', route),
+    inputEndpoint: pickRunningHubPolicyValue(args5, 'inputEndpoint', route),
+    omitResolution: pickRunningHubPolicyValue(args5, 'omitResolution', route),
+    quality: pickRunningHubPolicyValue(args5, 'quality', route),
+    omitAspectRatio: pickRunningHubPolicyValue(args5, 'omitAspectRatio', route),
+    aspectRatioValueMap: pickRunningHubPolicyValue(args5, 'aspectRatioValueMap', route),
+    omitAspectRatioWhenInput: pickRunningHubPolicyValue(args5, 'omitAspectRatioWhenInput', route),
+    inputSlotBodyFields: pickRunningHubPolicyValue(args5, 'inputSlotBodyFields', route),
+    constantParams: mergeRunningHubRoutePolicyObject(args5, 'constantParams', route),
+    defaultParams: mergeRunningHubRoutePolicyObject(args5, 'defaultParams', route),
+    bodyParamTypes: mergeRunningHubRoutePolicyObject(args5, 'bodyParamTypes', route),
+    bodyParamInputModes: mergeRunningHubRoutePolicyObject(args5, 'bodyParamInputModes', route),
   };
 }
 function resolveRunningHubModelEndpoint({
-  hasInputImages: _0x2ea774,
-  executionManifest: _0x41341a,
-  modelManifest: _0x5bf998,
-  payload: _0x3f01c9,
+  hasInputImages: hasInputImages2,
+  executionManifest: executionManifest6,
+  modelManifest: modelManifest3,
+  payload: payload6,
 }) {
-  const _0x3e5cb8 = resolveRunningHubImageRoutePolicy(
-    getRunningHubImageExecutionPolicy({ executionManifest: _0x41341a, modelManifest: _0x5bf998 }),
-    _0x3f01c9,
+  const runningHubImageRoutePolicy = resolveRunningHubImageRoutePolicy(
+    getRunningHubImageExecutionPolicy({
+      executionManifest: executionManifest6,
+      modelManifest: modelManifest3,
+    }),
+    payload6,
   );
-  if (!_0x2ea774) return _0x3e5cb8['textEndpoint'] || 'text-to-image';
-  return _0x3e5cb8['inputEndpoint'] || 'image-to-image';
+  if (!hasInputImages2) return runningHubImageRoutePolicy['textEndpoint'] || 'text-to-image';
+  return runningHubImageRoutePolicy['inputEndpoint'] || 'image-to-image';
 }
-function normalizeRunningHubBodyParamValue(_0x166c30, _0x56a8a9) {
-  const _0x5b32f9 = String(_0x56a8a9 || 'string')
+function normalizeRunningHubBodyParamValue(value104, value105) {
+  const value106 = String(value105 || 'string')
     ['trim']()
     ['toLowerCase']();
-  if (_0x5b32f9 === 'boolean') {
-    if (_0x166c30 === !![] || _0x166c30 === ![]) return _0x166c30;
-    const _0x4ffee3 = String(_0x166c30 ?? '')
+  if (value106 === 'boolean') {
+    if (value104 === !![] || value104 === ![]) return value104;
+    const value107 = String(value104 ?? '')
       ['trim']()
       ['toLowerCase']();
-    if (['true', '1', 'yes', 'on']['includes'](_0x4ffee3)) return !![];
-    if (['false', '0', 'no', 'off', '']['includes'](_0x4ffee3)) return ![];
-    return Boolean(_0x166c30);
+    if (['true', '1', 'yes', 'on']['includes'](value107)) return !![];
+    if (['false', '0', 'no', 'off', '']['includes'](value107)) return ![];
+    return Boolean(value104);
   }
-  if (_0x5b32f9 === 'integer') {
-    const _0x88a808 = Number['parseInt'](String(_0x166c30 ?? '')['trim'](), 0xa);
-    return Number['isFinite'](_0x88a808) ? _0x88a808 : null;
+  if (value106 === 'integer') {
+    const value108 = Number['parseInt'](String(value104 ?? '')['trim'](), 0xa);
+    return Number['isFinite'](value108) ? value108 : null;
   }
-  if (_0x5b32f9 === 'number') {
-    const _0x1259a3 = Number(_0x166c30);
-    return Number['isFinite'](_0x1259a3) ? _0x1259a3 : null;
+  if (value106 === 'number') {
+    const value109 = Number(value104);
+    return Number['isFinite'](value109) ? value109 : null;
   }
-  return String(_0x166c30 ?? '')['trim']();
+  return String(value104 ?? '')['trim']();
 }
-function normalizeRunningHubAspectRatioValueMap(_0x19b8f3) {
-  return _0x19b8f3 && typeof _0x19b8f3 === 'object' && !Array['isArray'](_0x19b8f3) ? _0x19b8f3 : {};
+function normalizeRunningHubAspectRatioValueMap(value110) {
+  return value110 && typeof value110 === 'object' && !Array['isArray'](value110) ? value110 : {};
 }
-function hasRunningHubAspectRatioValueMap(_0xa6c3de) {
+function hasRunningHubAspectRatioValueMap(value111) {
   return (
-    Object['keys'](normalizeRunningHubAspectRatioValueMap(_0xa6c3de?.['aspectRatioValueMap']))['length'] > 0x0
+    Object['keys'](normalizeRunningHubAspectRatioValueMap(value111?.['aspectRatioValueMap']))['length'] > 0x0
   );
 }
-function resolveRunningHubMappedAspectRatio(_0x1c4c0f, _0x2cbff2) {
-  const _0x4cd959 = String(_0x1c4c0f || '')['trim']();
-  if (!_0x4cd959) return '';
-  const _0xc528b8 = normalizeRunningHubAspectRatioValueMap(_0x2cbff2?.['aspectRatioValueMap']),
-    _0x99ee8d = Object['entries'](_0xc528b8)
-      ['map'](([_0x3cdac2, _0x34f461]) => [
-        normalizeRatioLabelText(_0x3cdac2),
-        String(_0x34f461 || '')['trim'](),
-      ])
-      ['filter'](([_0x5cb657, _0x58c038]) => _0x5cb657 && _0x58c038);
-  if (_0x99ee8d['length'] === 0x0) return _0x4cd959;
-  const _0x11fbb4 = normalizeRatioLabelText(_0x4cd959),
-    _0xae0dd1 = _0x99ee8d['find'](([_0x1741fc]) => _0x1741fc === _0x11fbb4);
-  if (_0xae0dd1) return _0xae0dd1[0x1];
-  const _0x1e6fdc = _0x11fbb4['toLowerCase'](),
-    _0x86c7c0 = _0x99ee8d['find'](([, _0x2110b8]) => _0x2110b8['toLowerCase']() === _0x1e6fdc);
-  if (_0x86c7c0) return _0x86c7c0[0x1];
-  const _0xf68cc6 = parseRatioLabel(_0x11fbb4);
-  if (!_0xf68cc6) return _0x4cd959;
-  const _0x12dea0 = _0xf68cc6['w'] / _0xf68cc6['h'];
-  let _0x5148d7 = null,
-    _0x4a3e44 = Number['POSITIVE_INFINITY'];
+function resolveRunningHubMappedAspectRatio(value112, value113) {
+  const enabled9 = String(value112 || '')['trim']();
+  if (!enabled9) return '';
+  const runningHubAspectRatioValueMap = normalizeRunningHubAspectRatioValueMap(
+      value113?.['aspectRatioValueMap'],
+    ),
+    list4 = Object['entries'](runningHubAspectRatioValueMap)
+      ['map'](([value114, value115]) => [normalizeRatioLabelText(value114), String(value115 || '')['trim']()])
+      ['filter'](([value116, value117]) => value116 && value117);
+  if (list4['length'] === 0x0) return enabled9;
+  const ratioLabelText3 = normalizeRatioLabelText(enabled9),
+    value118 = list4['find'](([value119]) => value119 === ratioLabelText3);
+  if (value118) return value118[0x1];
+  const value120 = ratioLabelText3['toLowerCase'](),
+    value121 = list4['find'](([, value122]) => value122['toLowerCase']() === value120);
+  if (value121) return value121[0x1];
+  const ratioLabel4 = parseRatioLabel(ratioLabelText3);
+  if (!ratioLabel4) return enabled9;
+  const value123 = ratioLabel4['w'] / ratioLabel4['h'];
+  let value124 = null,
+    value125 = Number['POSITIVE_INFINITY'];
   return (
-    _0x99ee8d['forEach'](([_0x273991, _0x499ee3]) => {
-      const _0x2762a3 = parseRatioLabel(_0x273991);
-      if (!_0x2762a3) return;
-      const _0x1237dc = Math['abs'](_0x2762a3['w'] / _0x2762a3['h'] - _0x12dea0);
-      _0x1237dc < _0x4a3e44 && ((_0x5148d7 = _0x499ee3), (_0x4a3e44 = _0x1237dc));
+    list4['forEach'](([value126, value127]) => {
+      const ratioLabel5 = parseRatioLabel(value126);
+      if (!ratioLabel5) return;
+      const value128 = Math['abs'](ratioLabel5['w'] / ratioLabel5['h'] - value123);
+      value128 < value125 && ((value124 = value127), (value125 = value128));
     }),
-    _0x5148d7 || _0x4cd959
+    value124 || enabled9
   );
 }
-function assignRunningHubInputSlotFields(_0x51da63, _0x5a0df5, _0x319c3a) {
-  const _0x67ccb4 =
-    _0x5a0df5?.['inputSlotBodyFields'] &&
-    typeof _0x5a0df5['inputSlotBodyFields'] === 'object' &&
-    !Array['isArray'](_0x5a0df5['inputSlotBodyFields'])
-      ? _0x5a0df5['inputSlotBodyFields']
+function assignRunningHubInputSlotFields(value129, value130, value131) {
+  const enabled10 =
+    value130?.['inputSlotBodyFields'] &&
+    typeof value130['inputSlotBodyFields'] === 'object' &&
+    !Array['isArray'](value130['inputSlotBodyFields'])
+      ? value130['inputSlotBodyFields']
       : null;
-  if (!_0x67ccb4) return {};
-  const _0x30422e = normalizeInputUrlsBySlot_2(_0x319c3a);
+  if (!enabled10) return {};
+  const inputUrlsBySlot_2 = normalizeInputUrlsBySlot_2(value131);
   return (
-    Object['entries'](_0x67ccb4)['forEach'](([_0x4194e3, _0xa7de1f]) => {
-      const _0x52da42 = String(_0xa7de1f || '')['trim'](),
-        _0xcf29d1 = _0x30422e[String(_0x4194e3 || '')['trim']()];
-      if (_0x52da42 && _0xcf29d1) _0x51da63[_0x52da42] = _0xcf29d1;
+    Object['entries'](enabled10)['forEach'](([value132, value133]) => {
+      const value134 = String(value133 || '')['trim'](),
+        value135 = inputUrlsBySlot_2[String(value132 || '')['trim']()];
+      if (value134 && value135) value129[value134] = value135;
     }),
-    _0x30422e
+    inputUrlsBySlot_2
   );
 }
-function shouldIncludeRunningHubPolicyParam(_0x41c311, _0x7c30df, _0x4f251c) {
-  const _0x91eec =
-      _0x7c30df?.['conditionalParams'] &&
-      typeof _0x7c30df['conditionalParams'] === 'object' &&
-      !Array['isArray'](_0x7c30df['conditionalParams'])
-        ? _0x7c30df['conditionalParams']
+function shouldIncludeRunningHubPolicyParam(value136, value137, enabled11) {
+  const value138 =
+      value137?.['conditionalParams'] &&
+      typeof value137['conditionalParams'] === 'object' &&
+      !Array['isArray'](value137['conditionalParams'])
+        ? value137['conditionalParams']
         : {},
-    _0x87489f = String(_0x91eec[_0x41c311] || '')['trim']();
-  if (!_0x87489f) return !![];
-  return !!_0x4f251c?.[_0x87489f];
+    enabled12 = String(value138[value136] || '')['trim']();
+  if (!enabled12) return !![];
+  return !!enabled11?.[enabled12];
 }
-function shouldIncludeRunningHubParamForInputMode(_0x3ba51d, _0xb8f9be, _0x15e131) {
-  const _0x225982 =
-      _0xb8f9be?.['bodyParamInputModes'] &&
-      typeof _0xb8f9be['bodyParamInputModes'] === 'object' &&
-      !Array['isArray'](_0xb8f9be['bodyParamInputModes'])
-        ? _0xb8f9be['bodyParamInputModes']
+function shouldIncludeRunningHubParamForInputMode(value139, value140, enabled13) {
+  const value141 =
+      value140?.['bodyParamInputModes'] &&
+      typeof value140['bodyParamInputModes'] === 'object' &&
+      !Array['isArray'](value140['bodyParamInputModes'])
+        ? value140['bodyParamInputModes']
         : {},
-    _0x57f73 = String(_0x225982[_0x3ba51d] || '')
+    enabled14 = String(value141[value139] || '')
       ['trim']()
       ['toLowerCase']();
-  if (!_0x57f73) return !![];
-  if (_0x57f73 === 'textonly' || _0x57f73 === 'text-only') return !_0x15e131;
-  if (_0x57f73 === 'inputonly' || _0x57f73 === 'input-only') return _0x15e131;
+  if (!enabled14) return !![];
+  if (enabled14 === 'textonly' || enabled14 === 'text-only') return !enabled13;
+  if (enabled14 === 'inputonly' || enabled14 === 'input-only') return enabled13;
   return !![];
 }
 function assignRunningHubPolicyParams(
-  _0x2f6de3,
-  _0x53812a,
-  _0x3471d7,
-  _0x4d1f09,
+  value142,
+  value143,
+  value144,
+  value145,
   { hasInputImages: hasInputImages = ![] } = {},
 ) {
-  const _0x223cb3 =
-    _0x3471d7?.['constantParams'] &&
-    typeof _0x3471d7['constantParams'] === 'object' &&
-    !Array['isArray'](_0x3471d7['constantParams'])
-      ? _0x3471d7['constantParams']
+  const value146 =
+    value144?.['constantParams'] &&
+    typeof value144['constantParams'] === 'object' &&
+    !Array['isArray'](value144['constantParams'])
+      ? value144['constantParams']
       : {};
-  Object['entries'](_0x223cb3)['forEach'](([_0x8455d9, _0x16ec0c]) => {
-    if (!shouldIncludeRunningHubPolicyParam(_0x8455d9, _0x3471d7, _0x4d1f09)) return;
-    if (!shouldIncludeRunningHubParamForInputMode(_0x8455d9, _0x3471d7, hasInputImages)) return;
-    _0x2f6de3[_0x8455d9] = _0x16ec0c;
+  Object['entries'](value146)['forEach'](([value147, value148]) => {
+    if (!shouldIncludeRunningHubPolicyParam(value147, value144, value145)) return;
+    if (!shouldIncludeRunningHubParamForInputMode(value147, value144, hasInputImages)) return;
+    value142[value147] = value148;
   });
-  const _0x59143c =
-    _0x3471d7?.['bodyParamTypes'] &&
-    typeof _0x3471d7['bodyParamTypes'] === 'object' &&
-    !Array['isArray'](_0x3471d7['bodyParamTypes'])
-      ? _0x3471d7['bodyParamTypes']
+  const value149 =
+    value144?.['bodyParamTypes'] &&
+    typeof value144['bodyParamTypes'] === 'object' &&
+    !Array['isArray'](value144['bodyParamTypes'])
+      ? value144['bodyParamTypes']
       : {};
-  Object['entries'](_0x59143c)['forEach'](([_0x23cd9c, _0x19822c]) => {
-    if (Object['prototype']['hasOwnProperty']['call'](_0x2f6de3, _0x23cd9c)) return;
-    if (!Object['prototype']['hasOwnProperty']['call'](_0x53812a || {}, _0x23cd9c)) return;
-    if (!shouldIncludeRunningHubPolicyParam(_0x23cd9c, _0x3471d7, _0x4d1f09)) return;
-    if (!shouldIncludeRunningHubParamForInputMode(_0x23cd9c, _0x3471d7, hasInputImages)) return;
-    const _0x58f8bf = _0x53812a[_0x23cd9c];
-    if (_0x58f8bf === undefined || _0x58f8bf === null) return;
-    if (typeof _0x58f8bf === 'string' && _0x58f8bf['trim']() === '') return;
-    const _0x107b41 = normalizeRunningHubBodyParamValue(_0x58f8bf, _0x19822c);
-    if (_0x107b41 === null || _0x107b41 === '') return;
-    _0x2f6de3[_0x23cd9c] = _0x107b41;
+  Object['entries'](value149)['forEach'](([value150, value151]) => {
+    if (Object['prototype']['hasOwnProperty']['call'](value142, value150)) return;
+    if (!Object['prototype']['hasOwnProperty']['call'](value143 || {}, value150)) return;
+    if (!shouldIncludeRunningHubPolicyParam(value150, value144, value145)) return;
+    if (!shouldIncludeRunningHubParamForInputMode(value150, value144, hasInputImages)) return;
+    const value152 = value143[value150];
+    if (value152 === undefined || value152 === null) return;
+    if (typeof value152 === 'string' && value152['trim']() === '') return;
+    const runningHubBodyParamValue = normalizeRunningHubBodyParamValue(value152, value151);
+    if (runningHubBodyParamValue === null || runningHubBodyParamValue === '') return;
+    value142[value150] = runningHubBodyParamValue;
   });
-  const _0x343215 =
-    _0x3471d7?.['defaultParams'] &&
-    typeof _0x3471d7['defaultParams'] === 'object' &&
-    !Array['isArray'](_0x3471d7['defaultParams'])
-      ? _0x3471d7['defaultParams']
+  const value153 =
+    value144?.['defaultParams'] &&
+    typeof value144['defaultParams'] === 'object' &&
+    !Array['isArray'](value144['defaultParams'])
+      ? value144['defaultParams']
       : {};
-  Object['entries'](_0x343215)['forEach'](([_0x234bb8, _0x1bd506]) => {
-    if (Object['prototype']['hasOwnProperty']['call'](_0x2f6de3, _0x234bb8)) return;
-    if (!shouldIncludeRunningHubPolicyParam(_0x234bb8, _0x3471d7, _0x4d1f09)) return;
-    if (!shouldIncludeRunningHubParamForInputMode(_0x234bb8, _0x3471d7, hasInputImages)) return;
-    _0x2f6de3[_0x234bb8] = _0x1bd506;
+  Object['entries'](value153)['forEach'](([value154, value155]) => {
+    if (Object['prototype']['hasOwnProperty']['call'](value142, value154)) return;
+    if (!shouldIncludeRunningHubPolicyParam(value154, value144, value145)) return;
+    if (!shouldIncludeRunningHubParamForInputMode(value154, value144, hasInputImages)) return;
+    value142[value154] = value155;
   });
 }
-function normalizeRunningHubModelQuality(_0x51a939) {
-  const _0x345e8f = String(_0x51a939 || '')
+function normalizeRunningHubModelQuality(value156) {
+  const value157 = String(value156 || '')
     ['trim']()
     ['toUpperCase']();
-  return RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[_0x345e8f] ? _0x345e8f : RUNNINGHUB_MODEL_DEFAULT_QUALITY;
+  return RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[value157] ? value157 : RUNNINGHUB_MODEL_DEFAULT_QUALITY;
 }
-function normalizeRunningHubModelRatio(_0x5562e6) {
-  const _0x301b45 = String(_0x5562e6 || '')['trim']();
-  if (!_0x301b45) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
-  const _0x378bd8 = normalizeRatioLabelText(_0x301b45),
-    _0x3fb82b = _0x378bd8['toLowerCase']();
-  if (_0x3fb82b === 'auto' || _0x3fb82b === 'default' || _0x3fb82b === 'original' || _0x3fb82b === 'adaptive')
+function normalizeRunningHubModelRatio(value158) {
+  const enabled15 = String(value158 || '')['trim']();
+  if (!enabled15) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
+  const list5 = normalizeRatioLabelText(enabled15),
+    value159 = list5['toLowerCase']();
+  if (value159 === 'auto' || value159 === 'default' || value159 === 'original' || value159 === 'adaptive')
     return RUNNINGHUB_MODEL_DEFAULT_RATIO;
-  if (!_0x378bd8['includes'](':')) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
-  const [_0x351710, _0x303826] = _0x378bd8['split'](':'),
-    _0x112f28 = Number['parseFloat'](_0x351710),
-    _0x1861be = Number['parseFloat'](_0x303826);
-  if (!(_0x112f28 > 0x0 && _0x1861be > 0x0)) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
-  const _0x569d67 = _0x112f28 + ':' + _0x1861be;
-  return RUNNINGHUB_MODEL_RATIO_SET['has'](_0x569d67) ? _0x569d67 : RUNNINGHUB_MODEL_DEFAULT_RATIO;
+  if (!list5['includes'](':')) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
+  const [value160, value161] = list5['split'](':'),
+    count3 = Number['parseFloat'](value160),
+    count4 = Number['parseFloat'](value161);
+  if (!(count3 > 0x0 && count4 > 0x0)) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
+  const value162 = count3 + ':' + count4;
+  return RUNNINGHUB_MODEL_RATIO_SET['has'](value162) ? value162 : RUNNINGHUB_MODEL_DEFAULT_RATIO;
 }
-function alignRunningHubDimension(_0x4a0ecf) {
-  const _0x4b5583 =
-    Math['round'](Number(_0x4a0ecf || 0x0) / RUNNINGHUB_MODEL_DIMENSION_ALIGN) *
+function alignRunningHubDimension(value163) {
+  const value164 =
+    Math['round'](Number(value163 || 0x0) / RUNNINGHUB_MODEL_DIMENSION_ALIGN) *
     RUNNINGHUB_MODEL_DIMENSION_ALIGN;
-  return Math['max'](RUNNINGHUB_MODEL_DIMENSION_MIN, Math['min'](RUNNINGHUB_MODEL_DIMENSION_MAX, _0x4b5583));
+  return Math['max'](RUNNINGHUB_MODEL_DIMENSION_MIN, Math['min'](RUNNINGHUB_MODEL_DIMENSION_MAX, value164));
 }
-function resolveRunningHubModelDimensions(_0x5a24da, _0x13d0d6) {
-  const _0x6866c2 = normalizeRunningHubModelQuality(_0x5a24da),
-    _0x5d2554 = normalizeRunningHubModelRatio(_0x13d0d6),
-    [_0x254ad6, _0x2343f9] = _0x5d2554['split'](':'),
-    _0x5da558 = Number['parseFloat'](_0x254ad6) || 0x1,
-    _0x4269cd = Number['parseFloat'](_0x2343f9) || 0x1,
-    _0x344481 =
-      RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[_0x6866c2] ||
+function resolveRunningHubModelDimensions(value165, value166) {
+  const runningHubModelQuality = normalizeRunningHubModelQuality(value165),
+    runningHubModelRatio = normalizeRunningHubModelRatio(value166),
+    [value167, value168] = runningHubModelRatio['split'](':'),
+    value169 = Number['parseFloat'](value167) || 0x1,
+    value170 = Number['parseFloat'](value168) || 0x1,
+    value171 =
+      RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[runningHubModelQuality] ||
       RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[RUNNINGHUB_MODEL_DEFAULT_QUALITY],
-    _0x5a57a2 = _0x5da558 / _0x4269cd,
-    _0x1e2c7d = Math['sqrt'](_0x344481 / _0x5a57a2),
-    _0x131144 = _0x1e2c7d * _0x5a57a2;
-  return { width: alignRunningHubDimension(_0x131144), height: alignRunningHubDimension(_0x1e2c7d) };
+    value172 = value169 / value170,
+    value173 = Math['sqrt'](value171 / value172),
+    value174 = value173 * value172;
+  return { width: alignRunningHubDimension(value174), height: alignRunningHubDimension(value173) };
 }
-function isAdaptiveRatioInput(_0x139fb3) {
-  const _0x47e699 = String(_0x139fb3 || '')['trim']();
-  if (!_0x47e699) return !![];
-  const _0x4d0543 = normalizeRatioLabelText(_0x47e699),
-    _0x232eb9 = _0x4d0543['toLowerCase']();
-  if (/^\d+x\d+$/i['test'](_0x4d0543)) return ![];
+function isAdaptiveRatioInput(value175) {
+  const enabled16 = String(value175 || '')['trim']();
+  if (!enabled16) return !![];
+  const list6 = normalizeRatioLabelText(enabled16),
+    value176 = list6['toLowerCase']();
+  if (/^\d+x\d+$/i['test'](list6)) return ![];
   return (
-    _0x232eb9 === 'auto' ||
-    _0x232eb9 === 'default' ||
-    _0x232eb9 === 'adaptive' ||
-    _0x232eb9 === 'original' ||
-    !_0x4d0543['includes'](':')
+    value176 === 'auto' ||
+    value176 === 'default' ||
+    value176 === 'adaptive' ||
+    value176 === 'original' ||
+    !list6['includes'](':')
   );
 }
 export function runninghubImage({
-  payload: _0x4ab582,
-  finalPrompt: _0x513e75,
-  modelToken: _0x3547de,
-  finalUrls: _0x577586,
+  payload: payload7,
+  finalPrompt: finalPrompt5,
+  modelToken: modelToken5,
+  finalUrls: finalUrls5,
   finalUrlsBySlot: finalUrlsBySlot = {},
-  executionManifest: _0x4dde92,
-  modelManifest: _0x447409,
+  executionManifest: executionManifest7,
+  modelManifest: modelManifest4,
 }) {
-  const _0x521806 = normalizeRunningHubModelId(_0x3547de),
-    _0x30c6dc = resolveRunningHubImageRoutePolicy(
-      getRunningHubImageExecutionPolicy({ executionManifest: _0x4dde92, modelManifest: _0x447409 }),
-      _0x4ab582,
+  const runningHubModelId = normalizeRunningHubModelId(modelToken5),
+    quality = resolveRunningHubImageRoutePolicy(
+      getRunningHubImageExecutionPolicy({
+        executionManifest: executionManifest7,
+        modelManifest: modelManifest4,
+      }),
+      payload7,
     ),
-    _0x539da6 = _0x447409?.['modelId'] || 'runninghub-model/' + _0x521806,
-    _0x357613 =
-      _0x30c6dc['omitResolution'] === !![] || isRunningHubModelWithoutImageSizeParam(_0x4ab582['model']),
-    _0x44ad43 =
+    model4 = modelManifest4?.['modelId'] || 'runninghub-model/' + runningHubModelId,
+    enabled17 =
+      quality['omitResolution'] === !![] || isRunningHubModelWithoutImageSizeParam(payload7['model']),
+    imageSize3 =
       normalizeImageSizeForProviderModel({
-        model: _0x539da6,
+        model: model4,
         provider: 'runninghub',
-        imageSize: _0x4ab582['imageSize'],
-      }) || _0x4ab582['imageSize'],
-    _0x33b731 = { '1K': '1k', '2K': '2k', '4K': '4k' },
-    _0x4a380a = _0x33b731[_0x44ad43] || '2k',
-    _0x57cd56 = resolveProviderRatioPayload({
+        imageSize: payload7['imageSize'],
+      }) || payload7['imageSize'],
+    value177 = { '1K': '1k', '2K': '2k', '4K': '4k' },
+    resolution = value177[imageSize3] || '2k',
+    providerRatioPayload = resolveProviderRatioPayload({
       provider: 'runninghub',
-      model: 'runninghub-model/' + _0x521806,
-      ratioLabel: _0x4ab582['resolvedRatioLabel'] || _0x4ab582['aspectRatio'],
-      imageSize: _0x44ad43,
-      suppressAspectRatio: _0x4ab582['suppressAspectRatio'],
+      model: 'runninghub-model/' + runningHubModelId,
+      ratioLabel: payload7['resolvedRatioLabel'] || payload7['aspectRatio'],
+      imageSize: imageSize3,
+      suppressAspectRatio: payload7['suppressAspectRatio'],
     }),
-    _0x307983 = String(_0x57cd56?.['params']?.['aspectRatio'] || '')['trim'](),
-    _0x4f8228 = _0x4ab582['resolvedRatioLabel'] || _0x4ab582['aspectRatio'],
-    _0x430386 = resolveRunningHubMappedAspectRatio(
-      hasRunningHubAspectRatioValueMap(_0x30c6dc) ? _0x4f8228 || _0x307983 : _0x307983,
-      _0x30c6dc,
+    value178 = String(providerRatioPayload?.['params']?.['aspectRatio'] || '')['trim'](),
+    value179 = payload7['resolvedRatioLabel'] || payload7['aspectRatio'],
+    aspectRatio4 = resolveRunningHubMappedAspectRatio(
+      hasRunningHubAspectRatioValueMap(quality) ? value179 || value178 : value178,
+      quality,
     ),
-    _0x4cc3de = _0x430386['toLowerCase'](),
-    _0x5095a0 =
-      _0x30c6dc['aspectRatioMode'] === 'dimensions' ||
-      _0x447409?.['extensions']?.['ratioPolicy']?.['capability'] === 'dimensions',
-    _0x4c4023 = _0x5095a0
-      ? _0x57cd56?.['ratioCapability'] === 'dimensions'
+    value180 = aspectRatio4['toLowerCase'](),
+    value181 =
+      quality['aspectRatioMode'] === 'dimensions' ||
+      modelManifest4?.['extensions']?.['ratioPolicy']?.['capability'] === 'dimensions',
+    width = value181
+      ? providerRatioPayload?.['ratioCapability'] === 'dimensions'
         ? {
-            width: Number(_0x57cd56?.['params']?.['width']) || 0x800,
-            height: Number(_0x57cd56?.['params']?.['height']) || 0x800,
+            width: Number(providerRatioPayload?.['params']?.['width']) || 0x800,
+            height: Number(providerRatioPayload?.['params']?.['height']) || 0x800,
           }
-        : resolveRunningHubModelDimensions(_0x44ad43, _0x4ab582['aspectRatio'])
+        : resolveRunningHubModelDimensions(imageSize3, payload7['aspectRatio'])
       : null,
-    _0x2e6c52 =
-      _0x5095a0 ||
-      _0x30c6dc['omitAspectRatio'] === !![] ||
-      (_0x30c6dc['omitAspectRatioWhenInput'] === !![] && _0x577586['length'] > 0x0) ||
-      _0x4ab582['suppressAspectRatio'] ||
-      isAdaptiveRatioInput(_0x4f8228) ||
-      !_0x430386 ||
-      _0x4cc3de === 'auto' ||
-      _0x4cc3de === 'default' ||
-      _0x4cc3de === 'adaptive' ||
-      _0x4cc3de === 'original',
-    _0x475aac = {
-      prompt: _0x513e75 || '',
-      ...(_0x5095a0
-        ? { width: _0x4c4023?.['width'] || 0x800, height: _0x4c4023?.['height'] || 0x800 }
-        : !_0x357613
-          ? { resolution: _0x4a380a }
+    enabled18 =
+      value181 ||
+      quality['omitAspectRatio'] === !![] ||
+      (quality['omitAspectRatioWhenInput'] === !![] && finalUrls5['length'] > 0x0) ||
+      payload7['suppressAspectRatio'] ||
+      isAdaptiveRatioInput(value179) ||
+      !aspectRatio4 ||
+      value180 === 'auto' ||
+      value180 === 'default' ||
+      value180 === 'adaptive' ||
+      value180 === 'original',
+    value182 = {
+      prompt: finalPrompt5 || '',
+      ...(value181
+        ? { width: width?.['width'] || 0x800, height: width?.['height'] || 0x800 }
+        : !enabled17
+          ? { resolution: resolution }
           : {}),
-      ...(_0x30c6dc['quality'] ? { quality: _0x30c6dc['quality'] } : {}),
-      ...(!_0x2e6c52 && { aspectRatio: _0x430386 }),
-      ...(_0x4ab582['negativePrompt'] && { negativePrompt: _0x4ab582['negativePrompt'] }),
-      ...(_0x4ab582['seed'] && { seed: _0x4ab582['seed'] }),
+      ...(quality['quality'] ? { quality: quality['quality'] } : {}),
+      ...(!enabled18 && { aspectRatio: aspectRatio4 }),
+      ...(payload7['negativePrompt'] && { negativePrompt: payload7['negativePrompt'] }),
+      ...(payload7['seed'] && { seed: payload7['seed'] }),
     },
-    _0x323667 = assignRunningHubInputSlotFields(_0x475aac, _0x30c6dc, finalUrlsBySlot);
+    assignRunningHubInputSlotFields2 = assignRunningHubInputSlotFields(value182, quality, finalUrlsBySlot);
   return (
-    assignRunningHubPolicyParams(_0x475aac, _0x4ab582, _0x30c6dc, _0x323667, {
-      hasInputImages: _0x577586['length'] > 0x0,
+    assignRunningHubPolicyParams(value182, payload7, quality, assignRunningHubInputSlotFields2, {
+      hasInputImages: finalUrls5['length'] > 0x0,
     }),
-    _0x577586['length'] > 0x0 && !_0x30c6dc['inputSlotBodyFields'] && (_0x475aac['imageUrls'] = _0x577586),
-    _0x475aac
+    finalUrls5['length'] > 0x0 && !quality['inputSlotBodyFields'] && (value182['imageUrls'] = finalUrls5),
+    value182
   );
 }
 export function runninghubImageEndpoint({
-  modelToken: _0xcb8e7a,
-  finalUrls: _0x587987,
-  executionManifest: _0xc22d94,
-  modelManifest: _0x2e6792,
-  payload: _0x1715c6,
+  modelToken: modelToken6,
+  finalUrls: finalUrls6,
+  executionManifest: executionManifest8,
+  modelManifest: modelManifest5,
+  payload: payload8,
 }) {
-  const _0x4baed5 = normalizeRunningHubModelId(_0xcb8e7a),
-    _0x2d3b18 = resolveRunningHubModelEndpoint({
-      hasInputImages: _0x587987['length'] > 0x0,
-      executionManifest: _0xc22d94,
-      modelManifest: _0x2e6792,
-      payload: _0x1715c6,
+  const runningHubModelId2 = normalizeRunningHubModelId(modelToken6),
+    runningHubModelEndpoint = resolveRunningHubModelEndpoint({
+      hasInputImages: finalUrls6['length'] > 0x0,
+      executionManifest: executionManifest8,
+      modelManifest: modelManifest5,
+      payload: payload8,
     });
-  return 'https://www.runninghub.cn/openapi/v2/' + _0x4baed5 + '/' + _0x2d3b18;
+  return 'https://www.runninghub.cn/openapi/v2/' + runningHubModelId2 + '/' + runningHubModelEndpoint;
 }

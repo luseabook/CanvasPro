@@ -61,8 +61,8 @@ import {
 } from './imageEditorBrushStyle.js';
 import { formatFinalApiDebugRequest } from '../utils/debugRequestPreview.js';
 import { applyI18n, t } from '../i18n/index.js';
-function imageAnnotateText(_0x45dd2f, _0xf5016e = {}) {
-  return t('imageAnnotate.' + _0x45dd2f, _0xf5016e);
+function imageAnnotateText(value, item = {}) {
+  return t('imageAnnotate.' + value, item);
 }
 const COLOR_VAR_MAP = {
     black: '--black',
@@ -74,33 +74,32 @@ const COLOR_VAR_MAP = {
     purple: '--annotate-purple',
     white: '--canvas-white',
   },
-  getCssVar = (_0x51d3f7) => getComputedStyle(document.documentElement).getPropertyValue(_0x51d3f7).trim(),
+  getCssVar = (key) => getComputedStyle(document.documentElement).getPropertyValue(key).trim(),
   COLOR_NAME_BY_VAR = Object.fromEntries(
-    Object.entries(COLOR_VAR_MAP).map(([_0x1c28d6, _0x59dbb3]) => [_0x59dbb3, _0x1c28d6]),
+    Object.entries(COLOR_VAR_MAP).map(([index, result]) => [result, index]),
   ),
-  normalizeColorName = (_0x879a57) => {
-    const _0x361683 = String(_0x879a57 || '').trim();
-    if (!_0x361683) return 'red';
-    if (COLOR_VAR_MAP[_0x361683]) return _0x361683;
-    const _0x1560f4 = _0x361683.match(/^var\(\s*(--[^)]+)\s*\)$/);
-    if (_0x1560f4 && COLOR_NAME_BY_VAR[_0x1560f4[1]]) return COLOR_NAME_BY_VAR[_0x1560f4[1]];
+  normalizeColorName = (data) => {
+    const enabled = String(data || '').trim();
+    if (!enabled) return 'red';
+    if (COLOR_VAR_MAP[enabled]) return enabled;
+    const options = enabled.match(/^var\(\s*(--[^)]+)\s*\)$/);
+    if (options && COLOR_NAME_BY_VAR[options[1]]) return COLOR_NAME_BY_VAR[options[1]];
     return 'red';
   },
-  getColorCss = (_0x527499) => {
-    const _0x99d4a1 = COLOR_VAR_MAP[_0x527499];
-    return _0x99d4a1 ? 'var(' + _0x99d4a1 + ')' : _0x527499;
+  getColorCss = (target) => {
+    const source = COLOR_VAR_MAP[target];
+    return source ? 'var(' + source + ')' : target;
   },
-  getColorCanvas = (_0x27fc52) => {
-    const _0x129021 = COLOR_VAR_MAP[_0x27fc52];
-    if (!_0x129021) return _0x27fc52;
-    return getCssVar(_0x129021) || _0x27fc52;
+  getColorCanvas = (next) => {
+    const enabled2 = COLOR_VAR_MAP[next];
+    if (!enabled2) return next;
+    return getCssVar(enabled2) || next;
   },
-  isFiniteCommandPoint = (_0xeca2b2) =>
-    Number.isFinite(Number(_0xeca2b2?.x)) && Number.isFinite(Number(_0xeca2b2?.y)),
-  hasDrawableStrokePoints = (_0x3deaa0) =>
-    Array.isArray(_0x3deaa0?.points) && _0x3deaa0.points.some(isFiniteCommandPoint),
-  shouldDiscardStrokeCommand = (_0x458baa) =>
-    (_0x458baa?.type === 'brush' || _0x458baa?.type === 'eraser') && !hasDrawableStrokePoints(_0x458baa);
+  isFiniteCommandPoint = (box) => Number.isFinite(Number(box?.x)) && Number.isFinite(Number(box?.y)),
+  hasDrawableStrokePoints = (current) =>
+    Array.isArray(current?.points) && current.points.some(isFiniteCommandPoint),
+  shouldDiscardStrokeCommand = (entry) =>
+    (entry?.type === 'brush' || entry?.type === 'eraser') && !hasDrawableStrokePoints(entry);
 export const __textControlTestUtils = { clampTextScale: clampTextScale, getTextScalePair: getTextScalePair };
 export const __strokeCommandTestUtils = {
   hasDrawableStrokePoints: hasDrawableStrokePoints,
@@ -152,118 +151,119 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     _fillRegionCache: null,
     _unbindGenerationToolbarUpMenus: null,
     _unbindGenerationFunctionMenus: null,
-    init(_0x1dd5df, _0x29e356 = {}) {
+    init(nodeId, record = {}) {
       if (this.active) return;
-      const _0x18e2f0 = appStore.getStateRaw(),
-        _0x1b7850 = _0x18e2f0.nodes?.[_0x1dd5df];
-      if (!_0x1b7850) return;
-      const _0xb38f0c = this._resolveNodeImageUrl(_0x1b7850);
-      if (!_0xb38f0c) {
+      const viewport = appStore.getStateRaw(),
+        enabled3 = viewport.nodes?.[nodeId];
+      if (!enabled3) return;
+      const enabled4 = this._resolveNodeImageUrl(enabled3);
+      if (!enabled4) {
         window.showToast?.(imageAnnotateText('toasts.noImage'), 'warn');
         return;
       }
-      const _0x2fb1e4 = String(_0x29e356.scene || 'annotate'),
-        _0x3764c8 = _0x2fb1e4 === 'erase' ? readPersistedEraseSelectionState(_0x1b7850) : null,
-        _0x51b321 =
-          _0x2fb1e4 === 'erase'
-            ? _0x3764c8?.tool || 'brush'
-            : _0x2fb1e4 === 'repaint'
+      const scene = String(record.scene || 'annotate'),
+        payload = scene === 'erase' ? readPersistedEraseSelectionState(enabled3) : null,
+        tool =
+          scene === 'erase'
+            ? payload?.tool || 'brush'
+            : scene === 'repaint'
               ? 'brush'
-              : _0x18e2f0.annotate?.tool === 'bucket'
+              : viewport.annotate?.tool === 'bucket'
                 ? 'brush'
-                : _0x18e2f0.annotate?.tool || 'brush',
-        _0x2e17b2 = normalizeColorName(_0x18e2f0.annotate?.color),
-        _0x2ead26 =
-          _0x2fb1e4 === 'erase'
-            ? clampImageBrushSize(_0x3764c8?.brushSizePx, 40)
-            : clampImageBrushSize(_0x18e2f0.annotate?.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX);
+                : viewport.annotate?.tool || 'brush',
+        color = normalizeColorName(viewport.annotate?.color),
+        brushSizePx =
+          scene === 'erase'
+            ? clampImageBrushSize(payload?.brushSizePx, 40)
+            : clampImageBrushSize(viewport.annotate?.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX);
       ((this.active = true),
-        (this.nodeId = _0x1dd5df),
+        (this.nodeId = nodeId),
         (this._generationModelCatalog = buildGenerationModelCatalog()));
-      const _0x576537 = this._normalizeLegacySeedreamNode(_0x1b7850);
-      ((this.nodeData = _0x576537),
-        (this._commands = _0x3764c8?.commands || []),
+      const node = this._normalizeLegacySeedreamNode(enabled3);
+      ((this.nodeData = node),
+        (this._commands = payload?.commands || []),
         (this._redoStack = []),
         (this._draft = null),
         (this._selectedTextCommandIndex = null),
         (this._dirty = false),
         (this._useWhiteboardBase = false),
         (this._fillRegionCache = new Map()));
-      const _0x2fb1ce = imageAnnotateText('actions.save'),
-        _0x1ee46 = imageAnnotateText('actions.generate'),
-        _0x833f10 = t('imageAnnotate.actions.generate', {}, { locale: 'zh-CN' }),
-        _0x14506b = String(_0x29e356.submitLabel || _0x2fb1ce).trim(),
-        _0x4e21bd = _0x14506b || _0x2fb1ce,
-        _0x553ced = _0x4e21bd === _0x1ee46 || _0x4e21bd === _0x833f10;
+      const imageAnnotateText2 = imageAnnotateText('actions.save'),
+        imageAnnotateText3 = imageAnnotateText('actions.generate'),
+        t2 = t('imageAnnotate.actions.generate', {}, { locale: 'zh-CN' }),
+        handle = String(record.submitLabel || imageAnnotateText2).trim(),
+        submitLabel = handle || imageAnnotateText2,
+        state = submitLabel === imageAnnotateText3 || submitLabel === t2;
       this._mode = {
-        scene: _0x2fb1e4,
-        submitLabel: _0x4e21bd,
+        scene: scene,
+        submitLabel: submitLabel,
         submitBusyLabel:
-          String(_0x29e356.submitBusyLabel || '').trim() ||
-          (_0x553ced ? imageAnnotateText('actions.generating') : imageAnnotateText('actions.saving')),
-        submitNoop: Boolean(_0x29e356.submitNoop),
+          String(record.submitBusyLabel || '').trim() ||
+          (state ? imageAnnotateText('actions.generating') : imageAnnotateText('actions.saving')),
+        submitNoop: Boolean(record.submitNoop),
       };
-      const _0x5d6606 = this._getGenerationModelCatalog(),
-        _0x73b02 = getDefaultGenerationModelState(_0x5d6606);
+      const config = this._getGenerationModelCatalog(),
+        defaultGenerationModelState = getDefaultGenerationModelState(config);
       this.imageSize = '1K';
-      const _0x270a2e = String(_0x576537?.model || '').trim(),
-        _0x81fb18 = String(_0x576537?.provider || '').trim(),
-        _0xe0d8d4 = findProviderKeyByModel(_0x5d6606, _0x270a2e);
-      (_0xe0d8d4
-        ? ((this.model = _0x270a2e), (this.provider = _0xe0d8d4))
-        : ((this.model = _0x73b02.model || _0x270a2e || null),
-          (this.provider = _0x73b02.provider || _0x81fb18 || getModelProvider(this.model) || null)),
-        (this.promptText = _0x2fb1e4 === 'repaint' ? String(_0x29e356.promptText || '').trim() : ''),
+      const scope = String(node?.model || '').trim(),
+        input = String(node?.provider || '').trim(),
+        providerKeyByModel = findProviderKeyByModel(config, scope);
+      (providerKeyByModel
+        ? ((this.model = scope), (this.provider = providerKeyByModel))
+        : ((this.model = defaultGenerationModelState.model || scope || null),
+          (this.provider =
+            defaultGenerationModelState.provider || input || getModelProvider(this.model) || null)),
+        (this.promptText = scene === 'repaint' ? String(record.promptText || '').trim() : ''),
         (this._view = {
-          tool: _0x51b321,
-          color: _0x2e17b2,
-          brushSizePx: _0x2ead26,
-          viewport: _0x18e2f0.viewport,
-          node: _0x576537,
+          tool: tool,
+          color: color,
+          brushSizePx: brushSizePx,
+          viewport: viewport.viewport,
+          node: node,
         }),
         appStore.setAnnotateState({
           active: true,
-          nodeId: _0x1dd5df,
-          tool: _0x51b321,
-          color: _0x2e17b2,
-          brushSizePx: _0x2ead26,
+          nodeId: nodeId,
+          tool: tool,
+          color: color,
+          brushSizePx: brushSizePx,
         }),
-        this._createUI(_0xb38f0c, { tool: _0x51b321, color: _0x2e17b2, brushSizePx: _0x2ead26 }),
+        this._createUI(enabled4, { tool: tool, color: color, brushSizePx: brushSizePx }),
         this._bindEvents(),
         (this._unsubscribe = appStore.subscribeSelector(
-          (_0x36c5d6) => {
-            const _0x1cc30e = _0x36c5d6.nodes?.[_0x1dd5df],
-              _0x3725fa = _0x36c5d6.viewport || { x: 0, y: 0, zoom: 1 },
-              _0x29528d = _0x36c5d6.annotate || {};
+          (output) => {
+            const nx = output.nodes?.[nodeId],
+              vx = output.viewport || { x: 0, y: 0, zoom: 1 },
+              tool2 = output.annotate || {};
             return {
-              hasNode: !!_0x1cc30e,
-              nx: _0x1cc30e ? _0x1cc30e.x : 0,
-              ny: _0x1cc30e ? _0x1cc30e.y : 0,
-              nw: _0x1cc30e ? _0x1cc30e.width : 0,
-              nh: _0x1cc30e ? _0x1cc30e.height : 0,
-              vx: _0x3725fa.x,
-              vy: _0x3725fa.y,
-              vz: _0x3725fa.zoom || 1,
-              tool: _0x29528d.tool || 'brush',
-              color: normalizeColorName(_0x29528d.color),
-              brushSizePx: clampImageBrushSize(_0x29528d.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX),
+              hasNode: !!nx,
+              nx: nx ? nx.x : 0,
+              ny: nx ? nx.y : 0,
+              nw: nx ? nx.width : 0,
+              nh: nx ? nx.height : 0,
+              vx: vx.x,
+              vy: vx.y,
+              vz: vx.zoom || 1,
+              tool: tool2.tool || 'brush',
+              color: normalizeColorName(tool2.color),
+              brushSizePx: clampImageBrushSize(tool2.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX),
             };
           },
-          (_0x2162f9) => {
-            if (!_0x2162f9?.hasNode) return;
-            const _0x2ac28e = appStore.getStateRaw().nodes?.[_0x1dd5df],
-              _0x1bd463 = this._normalizeLegacySeedreamNode(_0x2ac28e);
-            ((this.nodeData = _0x1bd463 || null),
+          (tool3) => {
+            if (!tool3?.hasNode) return;
+            const value2 = appStore.getStateRaw().nodes?.[nodeId],
+              box2 = this._normalizeLegacySeedreamNode(value2);
+            ((this.nodeData = box2 || null),
               (this._view = {
-                tool: _0x2162f9.tool,
-                color: _0x2162f9.color,
-                brushSizePx: _0x2162f9.brushSizePx,
-                viewport: { x: _0x2162f9.vx, y: _0x2162f9.vy, zoom: _0x2162f9.vz },
+                tool: tool3.tool,
+                color: tool3.color,
+                brushSizePx: tool3.brushSizePx,
+                viewport: { x: tool3.vx, y: tool3.vy, zoom: tool3.vz },
                 node: {
-                  x: Number(_0x1bd463?.x ?? _0x2162f9.nx),
-                  y: Number(_0x1bd463?.y ?? _0x2162f9.ny),
-                  width: Number(_0x1bd463?.width ?? _0x2162f9.nw),
-                  height: Number(_0x1bd463?.height ?? _0x2162f9.nh),
+                  x: Number(box2?.x ?? tool3.nx),
+                  y: Number(box2?.y ?? tool3.ny),
+                  width: Number(box2?.width ?? tool3.nw),
+                  height: Number(box2?.height ?? tool3.nh),
                 },
               }),
               this._updateView(this._view));
@@ -272,15 +272,15 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         this._waitForImageAndShow());
     },
     _waitForImageAndShow() {
-      const _0x2872df = () => {
+      const run = () => {
         if (this.imgEl && this.imgEl.complete && this.imgEl.naturalWidth > 0) {
           if (this._view) this._updateView(this._view);
           requestAnimationFrame(() => {
             if (this.overlayEl) this.overlayEl.classList.add('visible');
           });
-        } else requestAnimationFrame(_0x2872df);
+        } else requestAnimationFrame(run);
       };
-      _0x2872df();
+      run();
     },
     _getGenerationModelCatalog() {
       return (
@@ -288,12 +288,12 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         this._generationModelCatalog
       );
     },
-    _normalizeLegacySeedreamNode(_0x28631c) {
-      const _0x1d2a07 = buildSeedreamMigrationPatch(_0x28631c);
-      if (!_0x1d2a07) return _0x28631c;
-      const _0x50e428 = { ...(_0x28631c || {}), ..._0x1d2a07 },
-        _0x4aba08 = appStore.getStateRaw().nodes?.[this.nodeId];
-      return (_0x4aba08 && appStore.updateNodeData(this.nodeId, _0x1d2a07), _0x50e428);
+    _normalizeLegacySeedreamNode(value3) {
+      const args = buildSeedreamMigrationPatch(value3);
+      if (!args) return value3;
+      const value4 = { ...(value3 || {}), ...args },
+        value5 = appStore.getStateRaw().nodes?.[this.nodeId];
+      return (value5 && appStore.updateNodeData(this.nodeId, args), value4);
     },
     exit({ silent: silent = false } = {}) {
       if (!this.active) return;
@@ -362,99 +362,97 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     _isAnnotateScene() {
       return this._mode?.scene === 'annotate';
     },
-    _getFlipState(_0x51b42d = this._commands) {
-      const _0x4b5c7 = { horizontal: false, vertical: false };
+    _getFlipState(value6 = this._commands) {
+      const enabled5 = { horizontal: false, vertical: false };
       return (
-        (Array.isArray(_0x51b42d) ? _0x51b42d : []).forEach((_0x24454c) => {
-          if (_0x24454c?.type === 'flip-horizontal') _0x4b5c7.horizontal = !_0x4b5c7.horizontal;
-          else _0x24454c?.type === 'flip-vertical' && (_0x4b5c7.vertical = !_0x4b5c7.vertical);
+        (Array.isArray(value6) ? value6 : []).forEach((item2) => {
+          if (item2?.type === 'flip-horizontal') enabled5.horizontal = !enabled5.horizontal;
+          else item2?.type === 'flip-vertical' && (enabled5.vertical = !enabled5.vertical);
         }),
-        _0x4b5c7
+        enabled5
       );
     },
     _getCurrentFlipState() {
       if (!this._isAnnotateScene()) return { horizontal: false, vertical: false };
       return this._getFlipState(this._commands);
     },
-    _applyFlipToLocalPoint(_0x4b5e5a, _0x2bdf20, _0x3193bb = this._getCurrentFlipState()) {
-      const _0x236b55 = { x: Number(_0x4b5e5a?.x) || 0, y: Number(_0x4b5e5a?.y) || 0 },
-        _0x48cad2 = Math.max(1, Number(_0x2bdf20?.width) || 1),
-        _0x1f866c = Math.max(1, Number(_0x2bdf20?.height) || 1);
-      if (_0x3193bb?.horizontal) _0x236b55.x = _0x48cad2 - _0x236b55.x;
-      if (_0x3193bb?.vertical) _0x236b55.y = _0x1f866c - _0x236b55.y;
-      return _0x236b55;
+    _applyFlipToLocalPoint(box3, box4, value7 = this._getCurrentFlipState()) {
+      const box5 = { x: Number(box3?.x) || 0, y: Number(box3?.y) || 0 },
+        value8 = Math.max(1, Number(box4?.width) || 1),
+        value9 = Math.max(1, Number(box4?.height) || 1);
+      if (value7?.horizontal) box5.x = value8 - box5.x;
+      if (value7?.vertical) box5.y = value9 - box5.y;
+      return box5;
     },
-    _getLocalFromClient(_0x494c03, _0x250b45, _0x1ccc53, _0x350672) {
-      const _0x49ad07 = screenToWorld(_0x494c03, _0x250b45, _0x1ccc53.viewport),
-        _0x3af7f2 = { x: _0x49ad07.x - _0x350672.x, y: _0x49ad07.y - _0x350672.y };
-      if (!this._isAnnotateScene()) return _0x3af7f2;
-      return this._applyFlipToLocalPoint(_0x3af7f2, _0x350672, this._getCurrentFlipState());
+    _getLocalFromClient(value10, value11, value12, box6) {
+      const x2 = screenToWorld(value10, value11, value12.viewport),
+        value13 = { x: x2.x - box6.x, y: x2.y - box6.y };
+      if (!this._isAnnotateScene()) return value13;
+      return this._applyFlipToLocalPoint(value13, box6, this._getCurrentFlipState());
     },
-    _applyStageFlip(_0x4579b8 = this._getCurrentFlipState()) {
+    _applyStageFlip(value14 = this._getCurrentFlipState()) {
       if (!this.stageEl) return;
       if (!this._isAnnotateScene()) {
         this.stageEl.style.transform = 'none';
         return;
       }
-      const _0x5c1478 = _0x4579b8?.horizontal ? -1 : 1,
-        _0x4052c1 = _0x4579b8?.vertical ? -1 : 1;
+      const value15 = value14?.horizontal ? -1 : 1,
+        value16 = value14?.vertical ? -1 : 1;
       ((this.stageEl.style.transformOrigin = '50% 50%'),
-        (this.stageEl.style.transform = 'scale(' + _0x5c1478 + ', ' + _0x4052c1 + ')'));
+        (this.stageEl.style.transform = 'scale(' + value15 + ', ' + value16 + ')'));
     },
-    _applyFlipTransformToContext(_0x4fc5b3, _0x2013de, _0x1373f8, _0xf2d6c = this._getCurrentFlipState()) {
-      if (!_0x4fc5b3) return;
-      (_0xf2d6c?.horizontal && (_0x4fc5b3.translate(_0x2013de, 0), _0x4fc5b3.scale(-1, 1)),
-        _0xf2d6c?.vertical && (_0x4fc5b3.translate(0, _0x1373f8), _0x4fc5b3.scale(1, -1)));
+    _applyFlipTransformToContext(box7, value17, value18, value19 = this._getCurrentFlipState()) {
+      if (!box7) return;
+      (value19?.horizontal && (box7.translate(value17, 0), box7.scale(-1, 1)),
+        value19?.vertical && (box7.translate(0, value18), box7.scale(1, -1)));
     },
     _closeGenerationMenus() {
       if (!this.generationToolbarEl) return;
-      (this.generationToolbarEl.querySelectorAll('[data-toolbar-up-menu-menu]').forEach((_0x35b067) => {
-        const _0x38b34d = String(_0x35b067?.dataset?.toolbarUpMenuOpenClass || 'open').trim() || 'open';
-        (_0x35b067.classList.remove(_0x38b34d),
-          _0x35b067.classList.remove('open'),
-          _0x35b067.classList.remove('show'));
+      (this.generationToolbarEl.querySelectorAll('[data-toolbar-up-menu-menu]').forEach((el) => {
+        const value20 = String(el?.dataset?.toolbarUpMenuOpenClass || 'open').trim() || 'open';
+        (el.classList.remove(value20), el.classList.remove('open'), el.classList.remove('show'));
       }),
         this.generationToolbarEl.querySelector('.model-menu')?.classList.remove('show'),
         this.generationToolbarEl.querySelector('.image-function-mode-menu')?.classList.remove('show'),
         closeImageFunctionModelSubmenus(this.generationToolbarEl.querySelector('.model-menu')));
     },
-    _createUI(_0x52b9bc, _0x20dfde = {}) {
-      const _0x179316 = document.createElement('div');
-      _0x179316.className = 'v2-annotate-overlay';
-      const _0xf12546 = document.createElement('div');
-      _0xf12546.className = 'v2-annotate-container';
-      const _0x4e34a3 = document.createElement('div');
-      _0x4e34a3.className = 'v2-annotate-stage';
-      const _0x2cc3fe = document.createElement('img');
-      ((_0x2cc3fe.className = 'v2-annotate-img'), (_0x2cc3fe.src = _0x52b9bc), (_0x2cc3fe.draggable = false));
-      const _0xf40b6 = document.createElement('canvas');
-      ((_0xf40b6.className = 'v2-annotate-canvas'),
-        _0x4e34a3.appendChild(_0x2cc3fe),
-        _0x4e34a3.appendChild(_0xf40b6),
-        _0xf12546.appendChild(_0x4e34a3));
-      const _0x18927d = document.createElement('div');
-      ((_0x18927d.className = 'v2-annotate-cursor'),
-        (_0x18927d.style.display = 'none'),
-        _0x179316.appendChild(_0x18927d),
-        _0x179316.appendChild(_0xf12546),
-        document.body.appendChild(_0x179316),
-        (this.overlayEl = _0x179316),
-        (this.containerEl = _0xf12546),
-        (this.stageEl = _0x4e34a3),
-        (this.imgEl = _0x2cc3fe),
-        (this.canvasEl = _0xf40b6),
-        (this.cursorEl = _0x18927d),
+    _createUI(value21, value22 = {}) {
+      const el2 = document.createElement('div');
+      el2.className = 'v2-annotate-overlay';
+      const el3 = document.createElement('div');
+      el3.className = 'v2-annotate-container';
+      const el4 = document.createElement('div');
+      el4.className = 'v2-annotate-stage';
+      const value23 = document.createElement('img');
+      ((value23.className = 'v2-annotate-img'), (value23.src = value21), (value23.draggable = false));
+      const value24 = document.createElement('canvas');
+      ((value24.className = 'v2-annotate-canvas'),
+        el4.appendChild(value23),
+        el4.appendChild(value24),
+        el3.appendChild(el4));
+      const el5 = document.createElement('div');
+      ((el5.className = 'v2-annotate-cursor'),
+        (el5.style.display = 'none'),
+        el2.appendChild(el5),
+        el2.appendChild(el3),
+        document.body.appendChild(el2),
+        (this.overlayEl = el2),
+        (this.containerEl = el3),
+        (this.stageEl = el4),
+        (this.imgEl = value23),
+        (this.canvasEl = value24),
+        (this.cursorEl = el5),
         this._applyBaseSurface());
-      const _0x20060f = document.createElement('div');
-      ((_0x20060f.className = 'v2-annotate-toolbar'),
-        setStaticInnerHTML(_0x20060f, ANNOTATE_TOOLBAR_TEMPLATE_ID),
-        applyI18n(_0x20060f),
-        document.body.appendChild(_0x20060f),
-        (this.toolbarEl = _0x20060f));
+      const el6 = document.createElement('div');
+      ((el6.className = 'v2-annotate-toolbar'),
+        setStaticInnerHTML(el6, ANNOTATE_TOOLBAR_TEMPLATE_ID),
+        applyI18n(el6),
+        document.body.appendChild(el6),
+        (this.toolbarEl = el6));
       if (this._isGenerationScene()) {
-        const _0x546702 = document.createElement('div');
-        ((_0x546702.className = 'v2-annotate-toolbar v2-annotate-generation-toolbar'),
-          (_0x546702.innerHTML = createGenerationToolbarMarkup({
+        const el7 = document.createElement('div');
+        ((el7.className = 'v2-annotate-toolbar v2-annotate-generation-toolbar'),
+          (el7.innerHTML = createGenerationToolbarMarkup({
             scene: this._mode?.scene || 'annotate',
             promptText: this.promptText,
             imageSize: this.imageSize,
@@ -463,21 +461,21 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
             modelCatalog: this._getGenerationModelCatalog(),
             submitTooltip: this._mode?.submitLabel || imageAnnotateText('actions.generate'),
           })),
-          applyI18n(_0x546702),
-          document.body.appendChild(_0x546702),
-          (this.generationToolbarEl = _0x546702));
+          applyI18n(el7),
+          document.body.appendChild(el7),
+          (this.generationToolbarEl = el7));
       }
-      ((this.sizeValueEl = _0x20060f.querySelector('.v2-annotate-size-value')),
-        (this.sizeRangeEl = _0x20060f.querySelector('.v2-annotate-size-range')),
-        (this.colorWrapEl = _0x20060f.querySelector('.v2-annotate-colorwrap')),
-        (this.colorDotEl = _0x20060f.querySelector('.v2-annotate-color-dot')),
-        (this.colorMenuEl = _0x20060f.querySelector('.v2-annotate-color-menu')),
-        (this.colorButtons = Array.from(_0x20060f.querySelectorAll('.v2-annotate-swatch'))));
-      const _0x36649b = getAnnotateToolbarToolsForScene(this._mode?.scene || 'annotate');
-      (_0x20060f.querySelectorAll('.tool-btn').forEach((_0x5df653) => {
-        if (!_0x36649b.includes(_0x5df653.dataset.tool)) _0x5df653.remove();
+      ((this.sizeValueEl = el6.querySelector('.v2-annotate-size-value')),
+        (this.sizeRangeEl = el6.querySelector('.v2-annotate-size-range')),
+        (this.colorWrapEl = el6.querySelector('.v2-annotate-colorwrap')),
+        (this.colorDotEl = el6.querySelector('.v2-annotate-color-dot')),
+        (this.colorMenuEl = el6.querySelector('.v2-annotate-color-menu')),
+        (this.colorButtons = Array.from(el6.querySelectorAll('.v2-annotate-swatch'))));
+      const list = getAnnotateToolbarToolsForScene(this._mode?.scene || 'annotate');
+      (el6.querySelectorAll('.tool-btn').forEach((el8) => {
+        if (!list.includes(el8.dataset.tool)) el8.remove();
       }),
-        (this.toolButtons = Array.from(_0x20060f.querySelectorAll('.tool-btn'))));
+        (this.toolButtons = Array.from(el6.querySelectorAll('.tool-btn'))));
       this._isGenerationScene() &&
         (this.colorWrapEl?.remove(),
         (this.colorWrapEl = null),
@@ -485,477 +483,452 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         (this.colorMenuEl = null),
         (this.colorButtons = []));
       !this._isAnnotateScene() &&
-        (_0x20060f.querySelector('.act-flip-horizontal')?.remove(),
-        _0x20060f.querySelector('.act-flip-vertical')?.remove());
-      const _0x376fcf = _0x20060f.querySelector('.act-save'),
-        _0x560691 = _0x20060f.querySelector('.act-new-board'),
-        _0x5b29a1 = _0x376fcf?.querySelector('span'),
-        _0xcc78fb = this._mode?.submitLabel || '保存';
-      if (_0x5b29a1) _0x5b29a1.textContent = _0xcc78fb;
-      if (_0x376fcf) _0x376fcf.setAttribute('data-tooltip', _0xcc78fb);
-      _0x376fcf && this._isGenerationScene() && (_0x376fcf.style.display = 'none');
-      _0x560691 && this._isGenerationScene() && (_0x560691.style.display = 'none');
-      const _0x153a7c = clampImageBrushSize(_0x20dfde.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX),
-        _0x43a46c = _0x20dfde.tool || 'brush',
-        _0x19eb64 = _0x36649b.includes(_0x43a46c) ? _0x43a46c : 'brush',
-        _0x19f5e5 = normalizeColorName(_0x20dfde.color);
-      ((this.sizeRangeEl.value = String(_0x153a7c)),
-        (this.sizeValueEl.textContent = String(_0x153a7c)),
-        this._updateToolActive(_0x19eb64, _0x153a7c),
-        this._syncPaletteActive(_0x19f5e5));
+        (el6.querySelector('.act-flip-horizontal')?.remove(),
+        el6.querySelector('.act-flip-vertical')?.remove());
+      const el9 = el6.querySelector('.act-save'),
+        el10 = el6.querySelector('.act-new-board'),
+        el11 = el9?.querySelector('span'),
+        value25 = this._mode?.submitLabel || '保存';
+      if (el11) el11.textContent = value25;
+      if (el9) el9.setAttribute('data-tooltip', value25);
+      el9 && this._isGenerationScene() && (el9.style.display = 'none');
+      el10 && this._isGenerationScene() && (el10.style.display = 'none');
+      const clampImageBrushSize2 = clampImageBrushSize(value22.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX),
+        value26 = value22.tool || 'brush',
+        value27 = list.includes(value26) ? value26 : 'brush',
+        colorName = normalizeColorName(value22.color);
+      ((this.sizeRangeEl.value = String(clampImageBrushSize2)),
+        (this.sizeValueEl.textContent = String(clampImageBrushSize2)),
+        this._updateToolActive(value27, clampImageBrushSize2),
+        this._syncPaletteActive(colorName));
       if (this._view) this._updateView(this._view);
     },
     _bindEvents() {
-      const _0x282a0f = (_0x233b5b) => {
-        const _0x4eb8c7 =
-          this.canvasEl && (_0x233b5b.target === this.canvasEl || this.canvasEl.contains(_0x233b5b.target));
-        if (_0x4eb8c7) {
-          this._onCanvasWheel(_0x233b5b);
+      const value28 = (event) => {
+        const value29 =
+          this.canvasEl && (event.target === this.canvasEl || this.canvasEl.contains(event.target));
+        if (value29) {
+          this._onCanvasWheel(event);
           return;
         }
-        (_0x233b5b.preventDefault(), _0x233b5b.stopPropagation());
+        (event.preventDefault(), event.stopPropagation());
       };
-      this.overlayEl.addEventListener('wheel', _0x282a0f, { passive: false });
-      const _0x518cd8 = () => {
+      this.overlayEl.addEventListener('wheel', value28, { passive: false });
+      const value30 = () => {
         if (this._view) this._updateView(this._view);
       };
-      window.addEventListener('resize', _0x518cd8);
-      const _0x210a30 = (_0x11a1c7) => {
+      window.addEventListener('resize', value30);
+      const value31 = (event2) => {
         if (!this.active) return;
-        const _0x3db390 = _0x11a1c7.target,
-          _0x13d445 = _0x3db390?.tagName?.toLowerCase?.() || '',
-          _0xf1112c =
-            _0x13d445 === 'input' || _0x13d445 === 'textarea' || _0x3db390?.isContentEditable === true;
-        if (_0xf1112c) return;
-        if (_0x11a1c7.altKey || _0x11a1c7.ctrlKey || _0x11a1c7.metaKey) return;
-        const _0x3e2b1d = String(_0x11a1c7.key || '').toLowerCase();
-        if (_0x3e2b1d === 't' && !this._isGenerationScene()) {
-          (_0x11a1c7.preventDefault(), this._setTool('text'));
+        const value32 = event2.target,
+          value33 = value32?.tagName?.toLowerCase?.() || '',
+          value34 = value33 === 'input' || value33 === 'textarea' || value32?.isContentEditable === true;
+        if (value34) return;
+        if (event2.altKey || event2.ctrlKey || event2.metaKey) return;
+        const value35 = String(event2.key || '').toLowerCase();
+        if (value35 === 't' && !this._isGenerationScene()) {
+          (event2.preventDefault(), this._setTool('text'));
           return;
         }
-        const _0x40385a = _0x11a1c7.key === 'Delete' || _0x11a1c7.key === 'Backspace';
-        if (!_0x40385a) return;
-        const _0x1a39ab = Number(this._selectedTextCommandIndex);
-        if (!Number.isInteger(_0x1a39ab) || _0x1a39ab < 0 || _0x1a39ab >= this._commands.length) return;
-        if (this._commands[_0x1a39ab]?.type !== 'text') return;
-        (_0x11a1c7.preventDefault(), this._deleteTextCommand(_0x1a39ab));
+        const enabled6 = event2.key === 'Delete' || event2.key === 'Backspace';
+        if (!enabled6) return;
+        const count = Number(this._selectedTextCommandIndex);
+        if (!Number.isInteger(count) || count < 0 || count >= this._commands.length) return;
+        if (this._commands[count]?.type !== 'text') return;
+        (event2.preventDefault(), this._deleteTextCommand(count));
       };
-      window.addEventListener('keydown', _0x210a30);
-      const _0xee8cf5 = () => {
-          (window.removeEventListener('resize', _0x518cd8),
-            window.removeEventListener('keydown', _0x210a30),
-            this.overlayEl?.removeEventListener('wheel', _0x282a0f),
-            document.removeEventListener('pointerdown', _0x3ced82, true));
+      window.addEventListener('keydown', value31);
+      const run2 = () => {
+          (window.removeEventListener('resize', value30),
+            window.removeEventListener('keydown', value31),
+            this.overlayEl?.removeEventListener('wheel', value28),
+            document.removeEventListener('pointerdown', value36, true));
         },
-        _0x1fe41e = this.exit.bind(this);
-      ((this.exit = (_0xa5191 = {}) => {
-        (_0xee8cf5(), _0x1fe41e(_0xa5191));
+        handler = this.exit.bind(this);
+      ((this.exit = (options2 = {}) => {
+        (run2(), handler(options2));
       }),
-        this.toolbarEl.addEventListener('pointerdown', (_0x258064) => _0x258064.stopPropagation()),
-        this.toolbarEl.querySelector('.act-cancel').addEventListener('click', (_0x183a96) => {
-          (_0x183a96.stopPropagation(), this.exit());
+        this.toolbarEl.addEventListener('pointerdown', (event3) => event3.stopPropagation()),
+        this.toolbarEl.querySelector('.act-cancel').addEventListener('click', (event4) => {
+          (event4.stopPropagation(), this.exit());
         }),
-        this.toolButtons.forEach((_0x27c08c) => {
-          _0x27c08c.addEventListener('click', (_0x5025a2) => {
-            _0x5025a2.stopPropagation();
-            const _0x3ffcf7 = _0x27c08c.dataset.tool;
-            this._setTool(_0x3ffcf7);
+        this.toolButtons.forEach((el12) => {
+          el12.addEventListener('click', (event5) => {
+            event5.stopPropagation();
+            const value37 = el12.dataset.tool;
+            this._setTool(value37);
           });
         }));
-      const _0x530a0e = () => {
+      const run3 = () => {
           if (!this.colorWrapEl) return;
           this.colorWrapEl.classList.remove('open');
         },
-        _0x3ced82 = (_0xfa3374) => {
+        value36 = (event6) => {
           (this.colorWrapEl &&
             this.colorWrapEl.classList.contains('open') &&
-            !this.colorWrapEl.contains(_0xfa3374.target) &&
-            _0x530a0e(),
+            !this.colorWrapEl.contains(event6.target) &&
+            run3(),
             this.generationToolbarEl &&
-              !this.generationToolbarEl.contains(_0xfa3374.target) &&
+              !this.generationToolbarEl.contains(event6.target) &&
               this._closeGenerationMenus());
         };
-      (document.addEventListener('pointerdown', _0x3ced82, true),
-        this.colorWrapEl?.addEventListener('pointerdown', (_0x470454) => _0x470454.stopPropagation()),
-        this.colorWrapEl
-          ?.querySelector('.v2-annotate-color-toggle')
-          ?.addEventListener('click', (_0x2d8c0b) => {
-            _0x2d8c0b.stopPropagation();
-            if (!this.colorWrapEl) return;
-            this.colorWrapEl.classList.toggle('open');
-          }),
-        this.colorButtons.forEach((_0x30bb20) => {
-          _0x30bb20.addEventListener('click', (_0x5aa26b) => {
-            _0x5aa26b.stopPropagation();
-            const _0x48916b = _0x30bb20.dataset.color;
-            (appStore.setAnnotateState({ color: _0x48916b }), _0x530a0e());
+      (document.addEventListener('pointerdown', value36, true),
+        this.colorWrapEl?.addEventListener('pointerdown', (event7) => event7.stopPropagation()),
+        this.colorWrapEl?.querySelector('.v2-annotate-color-toggle')?.addEventListener('click', (event8) => {
+          event8.stopPropagation();
+          if (!this.colorWrapEl) return;
+          this.colorWrapEl.classList.toggle('open');
+        }),
+        this.colorButtons.forEach((el13) => {
+          el13.addEventListener('click', (event9) => {
+            event9.stopPropagation();
+            const color2 = el13.dataset.color;
+            (appStore.setAnnotateState({ color: color2 }), run3());
           });
         }),
-        this.sizeRangeEl.addEventListener('input', (_0x377a9c) => {
-          const _0x197b46 = clampImageBrushSize(_0x377a9c.target.value, 1);
-          (appStore.setAnnotateState({ brushSizePx: _0x197b46 }),
-            (this.sizeValueEl.textContent = String(_0x197b46)),
+        this.sizeRangeEl.addEventListener('input', (event10) => {
+          const brushSizePx2 = clampImageBrushSize(event10.target.value, 1);
+          (appStore.setAnnotateState({ brushSizePx: brushSizePx2 }),
+            (this.sizeValueEl.textContent = String(brushSizePx2)),
             this._syncCursor(),
             this._persistEraseSelectionState());
         }),
-        this.toolbarEl.querySelector('.act-undo').addEventListener('click', (_0xf219f2) => {
-          (_0xf219f2.stopPropagation(), this._undo());
+        this.toolbarEl.querySelector('.act-undo').addEventListener('click', (event11) => {
+          (event11.stopPropagation(), this._undo());
         }),
-        this.toolbarEl.querySelector('.act-flip-horizontal')?.addEventListener('click', (_0x42e1e5) => {
-          (_0x42e1e5.stopPropagation(), this._flipHorizontal());
+        this.toolbarEl.querySelector('.act-flip-horizontal')?.addEventListener('click', (event12) => {
+          (event12.stopPropagation(), this._flipHorizontal());
         }),
-        this.toolbarEl.querySelector('.act-flip-vertical')?.addEventListener('click', (_0x2994b7) => {
-          (_0x2994b7.stopPropagation(), this._flipVertical());
+        this.toolbarEl.querySelector('.act-flip-vertical')?.addEventListener('click', (event13) => {
+          (event13.stopPropagation(), this._flipVertical());
         }),
-        this.toolbarEl.querySelector('.act-redo').addEventListener('click', (_0x201095) => {
-          (_0x201095.stopPropagation(), this._redo());
+        this.toolbarEl.querySelector('.act-redo').addEventListener('click', (event14) => {
+          (event14.stopPropagation(), this._redo());
         }),
-        this.toolbarEl.querySelector('.act-clear').addEventListener('click', (_0x188d00) => {
-          (_0x188d00.stopPropagation(), this._clear());
+        this.toolbarEl.querySelector('.act-clear').addEventListener('click', (event15) => {
+          (event15.stopPropagation(), this._clear());
         }),
-        this.toolbarEl.querySelector('.act-new-board')?.addEventListener('click', (_0xd32536) => {
-          (_0xd32536.stopPropagation(), this._createNewWhiteboard());
+        this.toolbarEl.querySelector('.act-new-board')?.addEventListener('click', (event16) => {
+          (event16.stopPropagation(), this._createNewWhiteboard());
         }),
-        this.toolbarEl.querySelector('.act-save').addEventListener('click', async (_0x4c3ca7) => {
-          _0x4c3ca7.stopPropagation();
+        this.toolbarEl.querySelector('.act-save').addEventListener('click', async (event17) => {
+          event17.stopPropagation();
           if (this._mode?.submitNoop) return;
           await this._save();
         }));
       if (this.generationToolbarEl) {
-        this.generationToolbarEl.addEventListener('pointerdown', (_0x1b977b) => _0x1b977b.stopPropagation());
-        const _0x56823c = this.generationToolbarEl.querySelector('.v2-annotate-gen-prompt-input'),
-          _0x36e023 = this.generationToolbarEl.querySelector('.size-menu'),
-          _0x24bdab = this.generationToolbarEl.querySelector('.model-menu'),
-          _0x47398b = this.generationToolbarEl.querySelector('.model-text'),
-          _0x372d2f = this.generationToolbarEl.querySelector('.image-function-model-trigger-icon-slot'),
-          _0x3aa18a = this.generationToolbarEl.querySelector('.size-toggle'),
-          _0x2f9748 = this.generationToolbarEl.querySelector('.image-function-mode-toggle'),
-          _0x152298 = this.generationToolbarEl.querySelector('.image-function-mode-menu'),
-          _0xd853c0 = () => {
-            const _0x292a13 = shouldDisableImageSizeControl(this.model, this.provider);
-            (_0x3aa18a &&
-              ((_0x3aa18a.disabled = _0x292a13),
-              _0x3aa18a.classList.toggle('is-disabled', _0x292a13),
-              _0x3aa18a.setAttribute('aria-disabled', _0x292a13 ? 'true' : 'false')),
-              _0x36e023?.querySelectorAll('[data-toolbar-up-menu-field="size"]').forEach((_0x18b920) => {
-                (_0x18b920.classList.toggle('disabled', _0x292a13),
-                  (_0x18b920.dataset.disabled = _0x292a13 ? 'true' : 'false'));
+        this.generationToolbarEl.addEventListener('pointerdown', (event18) => event18.stopPropagation());
+        const el14 = this.generationToolbarEl.querySelector('.v2-annotate-gen-prompt-input'),
+          el15 = this.generationToolbarEl.querySelector('.size-menu'),
+          modelMenu = this.generationToolbarEl.querySelector('.model-menu'),
+          el16 = this.generationToolbarEl.querySelector('.model-text'),
+          el17 = this.generationToolbarEl.querySelector('.image-function-model-trigger-icon-slot'),
+          el18 = this.generationToolbarEl.querySelector('.size-toggle'),
+          el19 = this.generationToolbarEl.querySelector('.image-function-mode-toggle'),
+          modeMenu = this.generationToolbarEl.querySelector('.image-function-mode-menu'),
+          handler2 = () => {
+            const shouldDisableImageSizeControl2 = shouldDisableImageSizeControl(this.model, this.provider);
+            (el18 &&
+              ((el18.disabled = shouldDisableImageSizeControl2),
+              el18.classList.toggle('is-disabled', shouldDisableImageSizeControl2),
+              el18.setAttribute('aria-disabled', shouldDisableImageSizeControl2 ? 'true' : 'false')),
+              el15?.querySelectorAll('[data-toolbar-up-menu-field="size"]').forEach((el20) => {
+                (el20.classList.toggle('disabled', shouldDisableImageSizeControl2),
+                  (el20.dataset.disabled = shouldDisableImageSizeControl2 ? 'true' : 'false'));
               }),
-              _0x292a13 && _0x36e023?.classList.remove('open'));
+              shouldDisableImageSizeControl2 && el15?.classList.remove('open'));
           },
-          _0x6db838 = () =>
+          handler3 = () =>
             syncImageFunctionModeControl({
               root: this.generationToolbarEl,
               model: this.model,
               provider: this.provider,
               imageSize: this.imageSize,
             }),
-          _0x42882e = (_0x2da478, _0x24c1b1, { syncStore: syncStore = true } = {}) => {
-            const _0x18b62a = String(_0x2da478 || '').trim(),
-              _0x5e91da = String(_0x24c1b1 || getModelProvider(_0x18b62a) || '').trim();
-            if (!_0x18b62a || !_0x5e91da) return;
-            const _0x191818 = this.model !== _0x18b62a || this.provider !== _0x5e91da;
-            ((this.model = _0x18b62a),
-              (this.provider = _0x5e91da),
-              _0x47398b &&
-                (_0x47398b.textContent = getImageFunctionModelDisplayName(
-                  _0x18b62a,
+          handler4 = (value38, value39, { syncStore: syncStore = true } = {}) => {
+            const model = String(value38 || '').trim(),
+              provider = String(value39 || getModelProvider(model) || '').trim();
+            if (!model || !provider) return;
+            const value40 = this.model !== model || this.provider !== provider;
+            ((this.model = model),
+              (this.provider = provider),
+              el16 &&
+                (el16.textContent = getImageFunctionModelDisplayName(
+                  model,
                   this._getGenerationModelCatalog(),
                 )),
-              _0x372d2f && (_0x372d2f.innerHTML = getImageFunctionModelTriggerIconHTML(_0x18b62a, _0x5e91da)),
+              el17 && (el17.innerHTML = getImageFunctionModelTriggerIconHTML(model, provider)),
               syncImageFunctionModelMenuActive({
-                modelMenu: _0x24bdab,
-                model: _0x18b62a,
-                provider: _0x5e91da,
+                modelMenu: modelMenu,
+                model: model,
+                provider: provider,
               }),
-              _0x6db838(),
-              _0xd853c0(),
+              handler3(),
+              handler2(),
               syncStore &&
-                _0x191818 &&
+                value40 &&
                 this.nodeId &&
-                appStore.updateNodeData(this.nodeId, { model: _0x18b62a, provider: _0x5e91da }));
+                appStore.updateNodeData(this.nodeId, { model: model, provider: provider }));
           },
-          _0x51d0cd = (_0x16cb31 = null) => {
-            this.generationToolbarEl?.querySelectorAll('[data-toolbar-up-menu-menu]').forEach((_0x162f57) => {
-              if (_0x162f57 === _0x16cb31) return;
-              const _0x47bd23 = String(_0x162f57?.dataset?.toolbarUpMenuOpenClass || 'open').trim() || 'open';
-              (_0x162f57.classList.remove(_0x47bd23),
-                _0x162f57.classList.remove('open'),
-                _0x162f57.classList.remove('show'));
+          handler5 = (value41 = null) => {
+            this.generationToolbarEl?.querySelectorAll('[data-toolbar-up-menu-menu]').forEach((el21) => {
+              if (el21 === value41) return;
+              const value42 = String(el21?.dataset?.toolbarUpMenuOpenClass || 'open').trim() || 'open';
+              (el21.classList.remove(value42), el21.classList.remove('open'), el21.classList.remove('show'));
             });
           },
-          _0x5342e7 = () => {
-            (_0x51d0cd(),
-              _0x24bdab?.classList.remove('show'),
-              _0x152298?.classList.remove('show'),
-              closeImageFunctionModelSubmenus(_0x24bdab));
+          value43 = () => {
+            (handler5(),
+              modelMenu?.classList.remove('show'),
+              modeMenu?.classList.remove('show'),
+              closeImageFunctionModelSubmenus(modelMenu));
           };
-        (_0x56823c?.addEventListener('input', (_0x11052a) => {
-          this.promptText = String(_0x11052a.target.value || '');
+        (el14?.addEventListener('input', (event19) => {
+          this.promptText = String(event19.target.value || '');
         }),
           (this._unbindGenerationToolbarUpMenus = bindToolbarUpMenus(this.generationToolbarEl, {
             onBeforeOpen: () => {
-              (_0x24bdab?.classList.remove('show'),
-                _0x152298?.classList.remove('show'),
-                closeImageFunctionModelSubmenus(_0x24bdab));
+              (modelMenu?.classList.remove('show'),
+                modeMenu?.classList.remove('show'),
+                closeImageFunctionModelSubmenus(modelMenu));
             },
-            onSelect: ({ fieldId: _0x48f564, value: _0xa8def4 }) => {
-              if (_0x48f564 !== 'size') return;
+            onSelect: ({ fieldId: fieldId, value: value44 }) => {
+              if (fieldId !== 'size') return;
               if (shouldDisableImageSizeControl(this.model, this.provider)) return;
-              this.imageSize = String(_0xa8def4 || '1K').trim() || '1K';
-              const _0x27b77e = getImageFunctionNanoSelection(this.model, this.provider, this.imageSize);
-              if (_0x27b77e) {
-                const _0x403af9 = resolveImageFunctionModelByMode({
+              this.imageSize = String(value44 || '1K').trim() || '1K';
+              const mode = getImageFunctionNanoSelection(this.model, this.provider, this.imageSize);
+              if (mode) {
+                const imageFunctionModelByMode = resolveImageFunctionModelByMode({
                   model: this.model,
                   provider: this.provider,
                   imageSize: this.imageSize,
-                  mode: _0x27b77e.mode,
+                  mode: mode.mode,
                 });
-                _0x403af9?.model && _0x42882e(_0x403af9.model, _0x403af9.provider);
+                imageFunctionModelByMode?.model &&
+                  handler4(imageFunctionModelByMode.model, imageFunctionModelByMode.provider);
               }
-              (_0x6db838(), _0xd853c0());
+              (handler3(), handler2());
             },
           })),
-          this.generationToolbarEl.querySelector('.model-toggle')?.addEventListener('click', (_0x11e896) => {
-            (_0x11e896.stopPropagation(),
-              _0x24bdab?.classList.toggle('show'),
-              _0x51d0cd(),
-              _0x152298?.classList.remove('show'));
+          this.generationToolbarEl.querySelector('.model-toggle')?.addEventListener('click', (event20) => {
+            (event20.stopPropagation(),
+              modelMenu?.classList.toggle('show'),
+              handler5(),
+              modeMenu?.classList.remove('show'));
           }));
-        const _0x4276b1 = bindImageFunctionModelMenu({
-            modelMenu: _0x24bdab,
-            onSelect: ({ model: _0x3ada83, provider: _0x4f294d }) => {
-              _0x42882e(_0x3ada83, _0x4f294d);
+        const bindImageFunctionModelMenu2 = bindImageFunctionModelMenu({
+            modelMenu: modelMenu,
+            onSelect: ({ model: model2, provider: provider2 }) => {
+              handler4(model2, provider2);
             },
             closeMenu: () => {
-              _0x24bdab?.classList.remove('show');
+              modelMenu?.classList.remove('show');
             },
           }),
-          _0x398473 = bindImageFunctionModeMenu({
-            modeMenu: _0x152298,
-            onSelect: ({ mode: _0x2f2be8 }) => {
-              const _0x2db8f1 = resolveImageFunctionModelByMode({
+          bindImageFunctionModeMenu2 = bindImageFunctionModeMenu({
+            modeMenu: modeMenu,
+            onSelect: ({ mode: mode2 }) => {
+              const imageFunctionModelByMode2 = resolveImageFunctionModelByMode({
                 model: this.model,
                 provider: this.provider,
                 imageSize: this.imageSize,
-                mode: _0x2f2be8,
+                mode: mode2,
               });
-              if (!_0x2db8f1?.model) return;
-              (_0x42882e(_0x2db8f1.model, _0x2db8f1.provider), _0x152298?.classList.remove('show'));
+              if (!imageFunctionModelByMode2?.model) return;
+              (handler4(imageFunctionModelByMode2.model, imageFunctionModelByMode2.provider),
+                modeMenu?.classList.remove('show'));
             },
           });
         ((this._unbindGenerationFunctionMenus = () => {
-          (_0x4276b1?.(), _0x398473?.());
+          (bindImageFunctionModelMenu2?.(), bindImageFunctionModeMenu2?.());
         }),
-          _0x2f9748?.addEventListener('click', (_0x2b5955) => {
-            _0x2b5955.stopPropagation();
-            if (_0x2f9748.closest('.image-function-mode-wrap')?.classList.contains('is-hidden')) return;
-            (_0x152298?.classList.toggle('show'),
-              _0x51d0cd(_0x152298),
-              _0x24bdab?.classList.remove('show'),
-              closeImageFunctionModelSubmenus(_0x24bdab));
+          el19?.addEventListener('click', (event21) => {
+            event21.stopPropagation();
+            if (el19.closest('.image-function-mode-wrap')?.classList.contains('is-hidden')) return;
+            (modeMenu?.classList.toggle('show'),
+              handler5(modeMenu),
+              modelMenu?.classList.remove('show'),
+              closeImageFunctionModelSubmenus(modelMenu));
           }),
-          _0x6db838(),
-          _0xd853c0(),
-          this.generationToolbarEl.querySelector('.go')?.addEventListener('click', async (_0x159922) => {
-            (_0x159922.stopPropagation(), await this._save());
+          handler3(),
+          handler2(),
+          this.generationToolbarEl.querySelector('.go')?.addEventListener('click', async (event22) => {
+            (event22.stopPropagation(), await this._save());
           }),
           this.generationToolbarEl
             .querySelector('.debug-wrench-btn')
-            ?.addEventListener('click', async (_0x34b007) => {
-              (_0x34b007.stopPropagation(), await this._handleDebugRequest());
+            ?.addEventListener('click', async (event23) => {
+              (event23.stopPropagation(), await this._handleDebugRequest());
             }));
       }
-      const _0x5ba86e = this.canvasEl.getContext('2d');
-      ((_0x5ba86e.lineCap = 'round'),
-        (_0x5ba86e.lineJoin = 'round'),
-        (this._checkerPattern = createEraseCheckerboardPattern(_0x5ba86e, 1)));
-      const _0x57a4b3 = {
+      const value45 = this.canvasEl.getContext('2d');
+      ((value45.lineCap = 'round'),
+        (value45.lineJoin = 'round'),
+        (this._checkerPattern = createEraseCheckerboardPattern(value45, 1)));
+      const event24 = {
           down: false,
           pointerId: null,
           previousTool: null,
           temporaryTool: null,
           textTransform: null,
         },
-        _0x426eb3 = (_0x456f77, _0x538f56) => {
-          this._cursorLast = { x: _0x456f77, y: _0x538f56 };
+        handler6 = (x3, y2) => {
+          this._cursorLast = { x: x3, y: y2 };
           if (this._cursorRaf) return;
           this._cursorRaf = requestAnimationFrame(() => {
             ((this._cursorRaf = 0), this._syncCursor());
           });
         },
-        _0x12c5e7 = (_0x3921a6, _0x346c62, _0x12afdf, _0x2cd122 = 0) => {
-          const _0x3e70f2 = appStore.getStateRaw(),
-            _0x1d38ba = _0x3e70f2.nodes?.[this.nodeId];
-          if (!_0x1d38ba) return false;
-          const _0x33bb2d = screenToWorld(_0x3921a6, _0x346c62, _0x3e70f2.viewport);
-          if (
-            !isPointInRect(
-              _0x33bb2d.x,
-              _0x33bb2d.y,
-              _0x1d38ba.x,
-              _0x1d38ba.y,
-              _0x1d38ba.width,
-              _0x1d38ba.height,
-            )
-          )
-            return false;
-          const _0x26f278 = this._getLocalFromClient(_0x3921a6, _0x346c62, _0x3e70f2, _0x1d38ba),
-            _0xbe1870 = _0x3e70f2.annotate?.tool || 'brush',
-            _0x29f782 = _0x2cd122 === 1 || _0x2cd122 === 2,
-            _0x3da93b = _0x29f782 ? 'eraser' : _0xbe1870;
-          if (_0x3da93b !== 'text') this._selectedTextCommandIndex = null;
-          const _0x255c63 = clampImageBrushSize(_0x3e70f2.annotate?.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX),
-            _0x3f819a = _0x255c63 / (_0x3e70f2.viewport.zoom || 1);
-          _0x29f782
-            ? ((_0x57a4b3.previousTool = _0xbe1870),
-              (_0x57a4b3.temporaryTool = 'eraser'),
+        handler7 = (value46, value47, value48, count2 = 0) => {
+          const value49 = appStore.getStateRaw(),
+            box8 = value49.nodes?.[this.nodeId];
+          if (!box8) return false;
+          const box9 = screenToWorld(value46, value47, value49.viewport);
+          if (!isPointInRect(box9.x, box9.y, box8.x, box8.y, box8.width, box8.height)) return false;
+          const x1 = this._getLocalFromClient(value46, value47, value49, box8),
+            value50 = value49.annotate?.tool || 'brush',
+            value51 = count2 === 1 || count2 === 2,
+            value52 = value51 ? 'eraser' : value50;
+          if (value52 !== 'text') this._selectedTextCommandIndex = null;
+          const clampImageBrushSize3 = clampImageBrushSize(
+              value49.annotate?.brushSizePx,
+              IMAGE_BRUSH_DEFAULT_SIZE_PX,
+            ),
+            sizeWorld = clampImageBrushSize3 / (value49.viewport.zoom || 1);
+          value51
+            ? ((event24.previousTool = value50),
+              (event24.temporaryTool = 'eraser'),
               (this._temporaryTool = 'eraser'),
-              this._syncCursor('eraser', _0x255c63))
-            : ((_0x57a4b3.previousTool = null),
-              (_0x57a4b3.temporaryTool = null),
-              (this._temporaryTool = null));
-          if (_0x3da93b === 'bucket' && !this._isEraseScene())
-            return (this._fillArea(_0x26f278, _0x3f819a), true);
-          if (_0x3da93b === 'number-label' && this._isAnnotateScene())
-            return (this._addNumberLabel(_0x26f278, _0x3f819a), true);
-          if (_0x3da93b === 'text') {
-            const _0x44768d = this._findTextHit(_0x26f278, _0x3e70f2.viewport);
-            if (_0x44768d) {
-              (this._removeTextInput(true), (this._selectedTextCommandIndex = _0x44768d.index));
-              if (_0x44768d.mode === 'delete') return (this._deleteTextCommand(_0x44768d.index), true);
-              if (_0x44768d.mode === 'copy')
-                return (this._copyTextCommand(_0x44768d.index, _0x3e70f2.viewport), true);
+              this._syncCursor('eraser', clampImageBrushSize3))
+            : ((event24.previousTool = null), (event24.temporaryTool = null), (this._temporaryTool = null));
+          if (value52 === 'bucket' && !this._isEraseScene()) return (this._fillArea(x1, sizeWorld), true);
+          if (value52 === 'number-label' && this._isAnnotateScene())
+            return (this._addNumberLabel(x1, sizeWorld), true);
+          if (value52 === 'text') {
+            const value53 = this._findTextHit(x1, value49.viewport);
+            if (value53) {
+              (this._removeTextInput(true), (this._selectedTextCommandIndex = value53.index));
+              if (value53.mode === 'delete') return (this._deleteTextCommand(value53.index), true);
+              if (value53.mode === 'copy')
+                return (this._copyTextCommand(value53.index, value49.viewport), true);
               return (
-                (_0x57a4b3.down = true),
-                (_0x57a4b3.pointerId = _0x12afdf),
-                (_0x57a4b3.textTransform = this._createTextTransformState(
-                  _0x44768d,
-                  _0x26f278,
-                  _0x3e70f2.viewport,
-                )),
-                this.canvasEl.setPointerCapture(_0x12afdf),
+                (event24.down = true),
+                (event24.pointerId = value48),
+                (event24.textTransform = this._createTextTransformState(value53, x1, value49.viewport)),
+                this.canvasEl.setPointerCapture(value48),
                 this._render(),
                 true
               );
             }
             return (
               (this._selectedTextCommandIndex = null),
-              this._openTextInput(_0x26f278, _0x3e70f2, _0x3f819a, _0x3921a6, _0x346c62),
+              this._openTextInput(x1, value49, sizeWorld, value46, value47),
               true
             );
           }
-          if (_0x3da93b === 'rect')
+          if (value52 === 'rect')
             this._draft = {
               type: 'rect',
-              color: getColorCanvas(_0x3e70f2.annotate?.color || 'red'),
-              sizeWorld: _0x3f819a,
-              x1: _0x26f278.x,
-              y1: _0x26f278.y,
-              x2: _0x26f278.x,
-              y2: _0x26f278.y,
+              color: getColorCanvas(value49.annotate?.color || 'red'),
+              sizeWorld: sizeWorld,
+              x1: x1.x,
+              y1: x1.y,
+              x2: x1.x,
+              y2: x1.y,
             };
           else
-            _0x3da93b === 'eraser'
-              ? (this._draft = { type: 'eraser', sizeWorld: _0x3f819a, points: [_0x26f278] })
+            value52 === 'eraser'
+              ? (this._draft = { type: 'eraser', sizeWorld: sizeWorld, points: [x1] })
               : (this._draft = {
                   type: 'brush',
-                  color: getColorCanvas(_0x3e70f2.annotate?.color || 'red'),
-                  sizeWorld: _0x3f819a,
-                  points: [_0x26f278],
+                  color: getColorCanvas(value49.annotate?.color || 'red'),
+                  sizeWorld: sizeWorld,
+                  points: [x1],
                 });
           return (
-            (_0x57a4b3.down = true),
-            (_0x57a4b3.pointerId = _0x12afdf),
-            this.canvasEl.setPointerCapture(_0x12afdf),
+            (event24.down = true),
+            (event24.pointerId = value48),
+            this.canvasEl.setPointerCapture(value48),
             this._render(),
             true
           );
         },
-        _0x180298 = (_0xf6cb4, _0xe550d2) => {
-          const _0x521739 = appStore.getStateRaw(),
-            _0x291aa = _0x521739.nodes?.[this.nodeId];
-          if (!_0x291aa) return;
-          const _0x630a45 = this._getLocalFromClient(_0xf6cb4, _0xe550d2, _0x521739, _0x291aa);
-          if (_0x57a4b3.down && _0x57a4b3.textTransform) {
-            const _0x1a0c58 = _0x57a4b3.textTransform,
-              _0x5bc894 = this._commands[_0x1a0c58.index];
-            if (_0x5bc894?.type === 'text') {
-              const _0x249df6 = _0x521739.viewport?.zoom || 1,
-                _0x1e3398 = {
-                  x: Number(_0x630a45.x || 0) * _0x249df6,
-                  y: Number(_0x630a45.y || 0) * _0x249df6,
+        handler8 = (value54, value55) => {
+          const value56 = appStore.getStateRaw(),
+            enabled7 = value56.nodes?.[this.nodeId];
+          if (!enabled7) return;
+          const box10 = this._getLocalFromClient(value54, value55, value56, enabled7);
+          if (event24.down && event24.textTransform) {
+            const x4 = event24.textTransform,
+              box11 = this._commands[x4.index];
+            if (box11?.type === 'text') {
+              const value57 = value56.viewport?.zoom || 1,
+                box12 = {
+                  x: Number(box10.x || 0) * value57,
+                  y: Number(box10.y || 0) * value57,
                 };
-              if (_0x1a0c58.mode === 'move')
-                ((_0x5bc894.x = _0x630a45.x - _0x1a0c58.offsetWorldX),
-                  (_0x5bc894.y = _0x630a45.y - _0x1a0c58.offsetWorldY));
+              if (x4.mode === 'move')
+                ((box11.x = box10.x - x4.offsetWorldX), (box11.y = box10.y - x4.offsetWorldY));
               else {
-                if (_0x1a0c58.mode === 'scale-x' || _0x1a0c58.mode === 'scale-y') {
-                  const _0x104ae0 = this._resolveAxisTextScale(_0x1a0c58, _0x1e3398);
-                  ((_0x5bc894.scale = undefined),
-                    (_0x5bc894.scaleX = _0x104ae0.scaleX),
-                    (_0x5bc894.scaleY = _0x104ae0.scaleY),
-                    (_0x5bc894.x = _0x104ae0.originPx.x / _0x249df6),
-                    (_0x5bc894.y = _0x104ae0.originPx.y / _0x249df6));
+                if (x4.mode === 'scale-x' || x4.mode === 'scale-y') {
+                  const value58 = this._resolveAxisTextScale(x4, box12);
+                  ((box11.scale = undefined),
+                    (box11.scaleX = value58.scaleX),
+                    (box11.scaleY = value58.scaleY),
+                    (box11.x = value58.originPx.x / value57),
+                    (box11.y = value58.originPx.y / value57));
                 } else {
-                  if (_0x1a0c58.mode === 'scale-uniform') {
-                    const _0x243d10 = this._toTextLocalTransformSpace(
-                        _0x1e3398,
-                        _0x1a0c58.originPx,
-                        _0x1a0c58.rotation,
-                      ),
-                      _0x3c3572 = _0x243d10.x / _0x1a0c58.baseWidthPx,
-                      _0x125880 = _0x243d10.y / _0x1a0c58.baseHeightPx,
-                      _0x1c49ea = Math.max(_0x3c3572, _0x125880),
-                      _0x24e08d = Number.isFinite(_0x1c49ea) && _0x1c49ea > 0 ? _0x1c49ea : 1;
-                    ((_0x5bc894.scale = undefined),
-                      (_0x5bc894.scaleX = clampTextScale(_0x1a0c58.baseScaleX * _0x24e08d)),
-                      (_0x5bc894.scaleY = clampTextScale(_0x1a0c58.baseScaleY * _0x24e08d)),
-                      (_0x5bc894.x = _0x1a0c58.originPx.x / _0x249df6),
-                      (_0x5bc894.y = _0x1a0c58.originPx.y / _0x249df6));
+                  if (x4.mode === 'scale-uniform') {
+                    const box13 = this._toTextLocalTransformSpace(box12, x4.originPx, x4.rotation),
+                      value59 = box13.x / x4.baseWidthPx,
+                      value60 = box13.y / x4.baseHeightPx,
+                      count3 = Math.max(value59, value60),
+                      value61 = Number.isFinite(count3) && count3 > 0 ? count3 : 1;
+                    ((box11.scale = undefined),
+                      (box11.scaleX = clampTextScale(x4.baseScaleX * value61)),
+                      (box11.scaleY = clampTextScale(x4.baseScaleY * value61)),
+                      (box11.x = x4.originPx.x / value57),
+                      (box11.y = x4.originPx.y / value57));
                   } else {
-                    if (_0x1a0c58.mode === 'rotate') {
-                      const _0x23d489 = Math.atan2(
-                          _0x1e3398.y - _0x1a0c58.centerPx.y,
-                          _0x1e3398.x - _0x1a0c58.centerPx.x,
-                        ),
-                        _0x122b19 = _0x1a0c58.baseRotation + (_0x23d489 - _0x1a0c58.baseAngle);
-                      _0x5bc894.rotation = _0x122b19;
-                      const { scaleX: _0x31e8cf, scaleY: _0x3f2264 } = getTextScalePair(_0x5bc894),
-                        _0x411754 = {
-                          x: (_0x1a0c58.layoutWidth * _0x31e8cf) / 2,
-                          y: (_0x1a0c58.layoutHeight * _0x3f2264) / 2,
+                    if (x4.mode === 'rotate') {
+                      const value62 = Math.atan2(box12.y - x4.centerPx.y, box12.x - x4.centerPx.x),
+                        value63 = x4.baseRotation + (value62 - x4.baseAngle);
+                      box11.rotation = value63;
+                      const { scaleX: scaleX, scaleY: scaleY } = getTextScalePair(box11),
+                        box14 = {
+                          x: (x4.layoutWidth * scaleX) / 2,
+                          y: (x4.layoutHeight * scaleY) / 2,
                         },
-                        _0x2e57cc = Math.cos(_0x122b19),
-                        _0x5ea1be = Math.sin(_0x122b19),
-                        _0x110c01 = _0x411754.x * _0x2e57cc - _0x411754.y * _0x5ea1be,
-                        _0x348fc0 = _0x411754.x * _0x5ea1be + _0x411754.y * _0x2e57cc,
-                        _0x25b2b7 = {
-                          x: _0x1a0c58.centerPx.x - _0x110c01,
-                          y: _0x1a0c58.centerPx.y - _0x348fc0,
+                        value64 = Math.cos(value63),
+                        value65 = Math.sin(value63),
+                        value66 = box14.x * value64 - box14.y * value65,
+                        value67 = box14.x * value65 + box14.y * value64,
+                        box15 = {
+                          x: x4.centerPx.x - value66,
+                          y: x4.centerPx.y - value67,
                         };
-                      ((_0x5bc894.x = _0x25b2b7.x / _0x249df6), (_0x5bc894.y = _0x25b2b7.y / _0x249df6));
+                      ((box11.x = box15.x / value57), (box11.y = box15.y / value57));
                     }
                   }
                 }
               }
-              ((this._selectedTextCommandIndex = _0x1a0c58.index), this._render());
+              ((this._selectedTextCommandIndex = x4.index), this._render());
             }
             return;
           }
-          if (!_0x57a4b3.down || !this._draft) return;
+          if (!event24.down || !this._draft) return;
           (this._draft.type === 'rect'
-            ? ((this._draft.x2 = _0x630a45.x), (this._draft.y2 = _0x630a45.y))
-            : this._draft.points.push(_0x630a45),
+            ? ((this._draft.x2 = box10.x), (this._draft.y2 = box10.y))
+            : this._draft.points.push(box10),
             this._render());
         },
-        _0x117a90 = () => {
-          if (_0x57a4b3.down && _0x57a4b3.textTransform) {
-            ((_0x57a4b3.down = false),
-              (_0x57a4b3.pointerId = null),
-              (_0x57a4b3.textTransform = null),
-              (_0x57a4b3.previousTool = null),
-              (_0x57a4b3.temporaryTool = null),
+        handler9 = () => {
+          if (event24.down && event24.textTransform) {
+            ((event24.down = false),
+              (event24.pointerId = null),
+              (event24.textTransform = null),
+              (event24.previousTool = null),
+              (event24.temporaryTool = null),
               (this._temporaryTool = null),
               (this._redoStack = []),
               (this._dirty = true),
@@ -963,64 +936,64 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
               this._render());
             return;
           }
-          if (!_0x57a4b3.down || !this._draft) return;
-          const _0x580ba9 = this._draft;
-          ((this._draft = null), (_0x57a4b3.down = false), (_0x57a4b3.pointerId = null));
-          const _0x7a7278 = _0x57a4b3.previousTool;
-          ((_0x57a4b3.previousTool = null),
-            (_0x57a4b3.temporaryTool = null),
-            (_0x57a4b3.textTransform = null),
+          if (!event24.down || !this._draft) return;
+          const value68 = this._draft;
+          ((this._draft = null), (event24.down = false), (event24.pointerId = null));
+          const value69 = event24.previousTool;
+          ((event24.previousTool = null),
+            (event24.temporaryTool = null),
+            (event24.textTransform = null),
             (this._temporaryTool = null));
-          if (shouldDiscardStrokeCommand(_0x580ba9)) {
-            _0x7a7278 ? this._syncCursor(_0x7a7278, this._view?.brushSizePx) : this._syncCursor();
+          if (shouldDiscardStrokeCommand(value68)) {
+            value69 ? this._syncCursor(value69, this._view?.brushSizePx) : this._syncCursor();
             this._render();
             return;
           }
-          if (_0x580ba9.type === 'rect') {
-            const _0x5e1fca = Math.abs(_0x580ba9.x2 - _0x580ba9.x1),
-              _0xb945fc = Math.abs(_0x580ba9.y2 - _0x580ba9.y1);
-            if (_0x5e1fca < 0.5 && _0xb945fc < 0.5) {
-              _0x7a7278 ? this._syncCursor(_0x7a7278, this._view?.brushSizePx) : this._syncCursor();
+          if (value68.type === 'rect') {
+            const count4 = Math.abs(value68.x2 - value68.x1),
+              count5 = Math.abs(value68.y2 - value68.y1);
+            if (count4 < 0.5 && count5 < 0.5) {
+              value69 ? this._syncCursor(value69, this._view?.brushSizePx) : this._syncCursor();
               this._render();
               return;
             }
           }
-          (this._commands.push(_0x580ba9),
+          (this._commands.push(value68),
             (this._redoStack = []),
             (this._dirty = true),
             this._persistEraseSelectionState(),
-            _0x7a7278 && this._syncCursor(_0x7a7278, this._view?.brushSizePx),
+            value69 && this._syncCursor(value69, this._view?.brushSizePx),
             this._render());
         };
-      (this.canvasEl.addEventListener('pointerdown', (_0x27bd19) => {
-        (_0x27bd19.preventDefault(),
-          _0x27bd19.stopPropagation(),
-          _0x426eb3(_0x27bd19.clientX, _0x27bd19.clientY),
-          _0x12c5e7(_0x27bd19.clientX, _0x27bd19.clientY, _0x27bd19.pointerId, _0x27bd19.button));
+      (this.canvasEl.addEventListener('pointerdown', (event25) => {
+        (event25.preventDefault(),
+          event25.stopPropagation(),
+          handler6(event25.clientX, event25.clientY),
+          handler7(event25.clientX, event25.clientY, event25.pointerId, event25.button));
       }),
-        this.canvasEl.addEventListener('contextmenu', (_0x5851a3) => {
-          (_0x5851a3.preventDefault(), _0x5851a3.stopPropagation());
+        this.canvasEl.addEventListener('contextmenu', (event26) => {
+          (event26.preventDefault(), event26.stopPropagation());
         }),
-        this.canvasEl.addEventListener('pointermove', (_0x3c1059) => {
-          (_0x3c1059.preventDefault(),
-            _0x3c1059.stopPropagation(),
-            _0x426eb3(_0x3c1059.clientX, _0x3c1059.clientY),
-            _0x180298(_0x3c1059.clientX, _0x3c1059.clientY));
+        this.canvasEl.addEventListener('pointermove', (event27) => {
+          (event27.preventDefault(),
+            event27.stopPropagation(),
+            handler6(event27.clientX, event27.clientY),
+            handler8(event27.clientX, event27.clientY));
         }),
-        this.canvasEl.addEventListener('pointerup', (_0x4d71ac) => {
-          (_0x4d71ac.preventDefault(),
-            _0x4d71ac.stopPropagation(),
-            _0x426eb3(_0x4d71ac.clientX, _0x4d71ac.clientY),
-            _0x117a90());
+        this.canvasEl.addEventListener('pointerup', (event28) => {
+          (event28.preventDefault(),
+            event28.stopPropagation(),
+            handler6(event28.clientX, event28.clientY),
+            handler9());
         }),
-        this.canvasEl.addEventListener('pointercancel', (_0x498adf) => {
-          (_0x498adf.preventDefault(),
-            _0x498adf.stopPropagation(),
-            _0x426eb3(_0x498adf.clientX, _0x498adf.clientY),
-            _0x117a90());
+        this.canvasEl.addEventListener('pointercancel', (event29) => {
+          (event29.preventDefault(),
+            event29.stopPropagation(),
+            handler6(event29.clientX, event29.clientY),
+            handler9());
         }),
-        this.canvasEl.addEventListener('pointerenter', (_0x457814) => {
-          ((this._cursorHover = true), _0x426eb3(_0x457814.clientX, _0x457814.clientY));
+        this.canvasEl.addEventListener('pointerenter', (event30) => {
+          ((this._cursorHover = true), handler6(event30.clientX, event30.clientY));
         }),
         this.canvasEl.addEventListener('pointerleave', () => {
           ((this._cursorHover = false), this._syncCursor());
@@ -1028,50 +1001,50 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     },
     _syncPaletteActive() {
       if (!this.colorButtons) return;
-      const _0x90da07 = normalizeColorName(this._view?.color) || 'red',
-        _0x8a72cd = getColorCss(_0x90da07);
+      const colorName2 = normalizeColorName(this._view?.color) || 'red',
+        colorCss = getColorCss(colorName2);
       (this.colorDotEl &&
-        ((this.colorDotEl.style.background = _0x8a72cd),
+        ((this.colorDotEl.style.background = colorCss),
         (this.colorDotEl.style.borderColor =
-          _0x90da07 === 'black'
+          colorName2 === 'black'
             ? 'var(--white-35)'
-            : _0x90da07 === 'white'
+            : colorName2 === 'white'
               ? 'var(--white-25)'
               : 'var(--black-20)')),
-        this.colorButtons.forEach((_0x15cdc2) => {
-          if (_0x15cdc2.dataset.color === _0x90da07) _0x15cdc2.classList.add('active');
-          else _0x15cdc2.classList.remove('active');
+        this.colorButtons.forEach((el22) => {
+          if (el22.dataset.color === colorName2) el22.classList.add('active');
+          else el22.classList.remove('active');
         }));
     },
-    _onCanvasWheel(_0x19b088) {
-      (_0x19b088.preventDefault(), _0x19b088.stopPropagation());
+    _onCanvasWheel(event31) {
+      (event31.preventDefault(), event31.stopPropagation());
       if (!this.active) return;
       if (!this._cursorHover) return;
-      const _0x3c6495 = this._view?.tool || 'brush';
+      const value70 = this._view?.tool || 'brush';
       if (
-        _0x3c6495 !== 'brush' &&
-        _0x3c6495 !== 'eraser' &&
-        _0x3c6495 !== 'bucket' &&
-        _0x3c6495 !== 'number-label' &&
-        _0x3c6495 !== 'text'
+        value70 !== 'brush' &&
+        value70 !== 'eraser' &&
+        value70 !== 'bucket' &&
+        value70 !== 'number-label' &&
+        value70 !== 'text'
       )
         return;
-      const _0x97ff07 = _0x19b088.deltaY || 0,
-        _0x526d26 = _0x97ff07 < 0 ? 1 : -1,
-        _0x3b7158 = clampImageBrushSize(this._view?.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX),
-        _0x2cffc1 = clampImageBrushSize(_0x3b7158 + _0x526d26 * 2, IMAGE_BRUSH_DEFAULT_SIZE_PX);
-      if (_0x2cffc1 === _0x3b7158) return;
-      appStore.setAnnotateState({ brushSizePx: _0x2cffc1 });
-      if (this.sizeRangeEl) this.sizeRangeEl.value = String(_0x2cffc1);
-      if (this.sizeValueEl) this.sizeValueEl.textContent = String(_0x2cffc1);
+      const count6 = event31.deltaY || 0,
+        value71 = count6 < 0 ? 1 : -1,
+        clampImageBrushSize4 = clampImageBrushSize(this._view?.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX),
+        brushSizePx3 = clampImageBrushSize(clampImageBrushSize4 + value71 * 2, IMAGE_BRUSH_DEFAULT_SIZE_PX);
+      if (brushSizePx3 === clampImageBrushSize4) return;
+      appStore.setAnnotateState({ brushSizePx: brushSizePx3 });
+      if (this.sizeRangeEl) this.sizeRangeEl.value = String(brushSizePx3);
+      if (this.sizeValueEl) this.sizeValueEl.textContent = String(brushSizePx3);
       this._syncCursor();
     },
     _syncCursor(
-      _0x3cb000 = this._temporaryTool || this._view?.tool || 'brush',
-      _0x12e9e6 = this._view?.brushSizePx || IMAGE_BRUSH_DEFAULT_SIZE_PX,
+      tool4 = this._temporaryTool || this._view?.tool || 'brush',
+      sizePx = this._view?.brushSizePx || IMAGE_BRUSH_DEFAULT_SIZE_PX,
     ) {
       if (!this.cursorEl) return;
-      if (_0x3cb000 === 'text') {
+      if (tool4 === 'text') {
         ((this.cursorEl.style.display = 'none'),
           this.cursorEl.classList.remove('is-erase-brush'),
           this._syncTextToolCursor());
@@ -1081,20 +1054,20 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         cursorEl: this.cursorEl,
         canvasEl: this.canvasEl,
         visible: this._cursorHover,
-        tool: _0x3cb000,
+        tool: tool4,
         allowedTools: ['brush', 'eraser', 'bucket', 'number-label'],
-        sizePx: _0x12e9e6,
+        sizePx: sizePx,
         cursorLast: this._cursorLast,
-        isEraseBrush: this._isGenerationScene() || _0x3cb000 === 'eraser',
+        isEraseBrush: this._isGenerationScene() || tool4 === 'eraser',
       });
     },
-    _getTextScaleCursor(_0x513501) {
-      const _0x50a74b =
+    _getTextScaleCursor(value72) {
+      const value73 =
         document.querySelector('#v2-wrap .group-resizer.v2-resize-move') ||
         document.querySelector('#v2-wrap .v2-resize-move');
-      if (_0x50a74b) {
-        const _0x4dd226 = getComputedStyle(_0x50a74b).cursor;
-        if (_0x4dd226 && _0x4dd226 !== 'auto') return _0x4dd226;
+      if (value73) {
+        const computedStyle = getComputedStyle(value73).cursor;
+        if (computedStyle && computedStyle !== 'auto') return computedStyle;
       }
       return 'move';
     },
@@ -1103,94 +1076,83 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     },
     _syncTextToolCursor() {
       if (!this.canvasEl) return;
-      const _0x19e996 = this._getCanvasPointerCursor();
+      const value74 = this._getCanvasPointerCursor();
       if (!this._cursorHover) {
-        this.canvasEl.style.cursor = _0x19e996;
+        this.canvasEl.style.cursor = value74;
         return;
       }
-      const _0x5e07c3 = appStore.getStateRaw(),
-        _0xa07114 = _0x5e07c3.nodes?.[this.nodeId];
-      if (!_0xa07114) {
-        this.canvasEl.style.cursor = _0x19e996;
+      const value75 = appStore.getStateRaw(),
+        enabled8 = value75.nodes?.[this.nodeId];
+      if (!enabled8) {
+        this.canvasEl.style.cursor = value74;
         return;
       }
-      const _0x3444f4 = this._getLocalFromClient(
-          this._cursorLast.x,
-          this._cursorLast.y,
-          _0x5e07c3,
-          _0xa07114,
-        ),
-        _0x232c88 = this._findTextHit(_0x3444f4, _0x5e07c3.viewport);
-      if (!_0x232c88) {
-        this.canvasEl.style.cursor = _0x19e996;
+      const value76 = this._getLocalFromClient(this._cursorLast.x, this._cursorLast.y, value75, enabled8),
+        enabled9 = this._findTextHit(value76, value75.viewport);
+      if (!enabled9) {
+        this.canvasEl.style.cursor = value74;
         return;
       }
-      if (_0x232c88.mode === 'delete' || _0x232c88.mode === 'copy') {
+      if (enabled9.mode === 'delete' || enabled9.mode === 'copy') {
         this.canvasEl.style.cursor = 'var(--link-cursor)';
         return;
       }
-      if (_0x232c88.mode === 'rotate') {
-        this.canvasEl.style.cursor = ROTATE_CURSOR_CSS + ', ' + _0x19e996;
+      if (enabled9.mode === 'rotate') {
+        this.canvasEl.style.cursor = ROTATE_CURSOR_CSS + ', ' + value74;
         return;
       }
-      if (_0x232c88.mode === 'scale-uniform') {
-        this.canvasEl.style.cursor = this._getTextScaleCursor(_0x232c88);
+      if (enabled9.mode === 'scale-uniform') {
+        this.canvasEl.style.cursor = this._getTextScaleCursor(enabled9);
         return;
       }
-      if (_0x232c88.mode === 'scale-x') {
+      if (enabled9.mode === 'scale-x') {
         this.canvasEl.style.cursor = 'var(--resize-ew-cursor)';
         return;
       }
-      if (_0x232c88.mode === 'scale-y') {
+      if (enabled9.mode === 'scale-y') {
         this.canvasEl.style.cursor = 'var(--resize-ns-cursor)';
         return;
       }
-      this.canvasEl.style.cursor = _0x19e996;
+      this.canvasEl.style.cursor = value74;
     },
     _updateToolActive(
-      _0xe0a1aa = this._view?.tool || 'brush',
-      _0x552a11 = this._view?.brushSizePx || IMAGE_BRUSH_DEFAULT_SIZE_PX,
+      value77 = this._view?.tool || 'brush',
+      value78 = this._view?.brushSizePx || IMAGE_BRUSH_DEFAULT_SIZE_PX,
     ) {
-      (this.toolButtons.forEach((_0x2f497e) => {
-        if (_0x2f497e.dataset.tool === _0xe0a1aa) _0x2f497e.classList.add('active');
-        else _0x2f497e.classList.remove('active');
+      (this.toolButtons.forEach((el23) => {
+        if (el23.dataset.tool === value77) el23.classList.add('active');
+        else el23.classList.remove('active');
       }),
-        this._syncCursor(_0xe0a1aa, _0x552a11));
+        this._syncCursor(value77, value78));
     },
-    _setTool(_0x3f7bbb) {
-      if (_0x3f7bbb !== 'text') this._removeTextInput(true);
-      if (_0x3f7bbb !== 'text') this._selectedTextCommandIndex = null;
-      const _0x11f578 = getAnnotateToolbarToolsForScene(this._mode?.scene || 'annotate'),
-        _0xa8ed63 = _0x11f578.includes(_0x3f7bbb) ? _0x3f7bbb : 'brush';
-      (appStore.setAnnotateState({ tool: _0xa8ed63 }), this._persistEraseSelectionState());
+    _setTool(value79) {
+      if (value79 !== 'text') this._removeTextInput(true);
+      if (value79 !== 'text') this._selectedTextCommandIndex = null;
+      const list2 = getAnnotateToolbarToolsForScene(this._mode?.scene || 'annotate'),
+        tool5 = list2.includes(value79) ? value79 : 'brush';
+      (appStore.setAnnotateState({ tool: tool5 }), this._persistEraseSelectionState());
     },
-    _removeTextInput(_0x321d05 = true, _0x4a0b58 = null) {
-      const _0x107453 = _0x4a0b58 || this._textInputEl;
-      if (!_0x107453) return;
-      const _0x45ecdb = this._textInputEl === _0x107453,
-        _0x175fa0 = String(_0x107453.value || '').trim(),
-        _0x3a1cce = Number(_0x107453.dataset.localX),
-        _0x289419 = Number(_0x107453.dataset.localY),
-        _0x1db14c = Number(_0x107453.dataset.sizeWorld),
-        _0x53b39b = String(_0x107453.dataset.color || '');
-      _0x107453.parentElement && _0x107453.parentElement.removeChild(_0x107453);
-      _0x45ecdb && (this._textInputEl = null);
-      if (!_0x45ecdb) return;
-      if (
-        !_0x321d05 ||
-        !_0x175fa0 ||
-        !Number.isFinite(_0x3a1cce) ||
-        !Number.isFinite(_0x289419) ||
-        !Number.isFinite(_0x1db14c)
-      )
+    _removeTextInput(enabled10 = true, value80 = null) {
+      const el24 = value80 || this._textInputEl;
+      if (!el24) return;
+      const enabled11 = this._textInputEl === el24,
+        text = String(el24.value || '').trim(),
+        x5 = Number(el24.dataset.localX),
+        y3 = Number(el24.dataset.localY),
+        sizeWorld2 = Number(el24.dataset.sizeWorld),
+        color3 = String(el24.dataset.color || '');
+      el24.parentElement && el24.parentElement.removeChild(el24);
+      enabled11 && (this._textInputEl = null);
+      if (!enabled11) return;
+      if (!enabled10 || !text || !Number.isFinite(x5) || !Number.isFinite(y3) || !Number.isFinite(sizeWorld2))
         return;
       (this._commands.push({
         type: 'text',
-        text: _0x175fa0.slice(0, 200),
-        color: _0x53b39b || getColorCanvas('red'),
-        sizeWorld: _0x1db14c,
-        x: _0x3a1cce,
-        y: _0x289419,
+        text: text.slice(0, 200),
+        color: color3 || getColorCanvas('red'),
+        sizeWorld: sizeWorld2,
+        x: x5,
+        y: y3,
         scale: 1,
         scaleX: 1,
         scaleY: 1,
@@ -1202,64 +1164,60 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         this._persistEraseSelectionState(),
         this._render());
     },
-    _openTextInput(_0x52a4bb, _0xd5ff34, _0x37f8bb, _0x202b33, _0x17ffc9) {
+    _openTextInput(box16, value81, value82, value83, value84) {
       this._removeTextInput(true);
-      const _0x38e743 = document.createElement('input');
-      ((_0x38e743.type = 'text'),
-        (_0x38e743.maxLength = 200),
-        (_0x38e743.className = 'v2-annotate-text-input'),
-        (_0x38e743.dataset.localX = String(_0x52a4bb.x)),
-        (_0x38e743.dataset.localY = String(_0x52a4bb.y)),
-        (_0x38e743.dataset.sizeWorld = String(_0x37f8bb)),
-        (_0x38e743.dataset.color = getColorCanvas(_0xd5ff34.annotate?.color || 'red')),
-        (_0x38e743.style.left = _0x202b33 + 'px'),
-        (_0x38e743.style.top = _0x17ffc9 + 'px'),
-        _0x38e743.style.setProperty(
+      const el25 = document.createElement('input');
+      ((el25.type = 'text'),
+        (el25.maxLength = 200),
+        (el25.className = 'v2-annotate-text-input'),
+        (el25.dataset.localX = String(box16.x)),
+        (el25.dataset.localY = String(box16.y)),
+        (el25.dataset.sizeWorld = String(value82)),
+        (el25.dataset.color = getColorCanvas(value81.annotate?.color || 'red')),
+        (el25.style.left = value83 + 'px'),
+        (el25.style.top = value84 + 'px'),
+        el25.style.setProperty(
           '--annotate-text-input-size',
-          clampImageBrushSize(_0xd5ff34.annotate?.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX) + 'px',
+          clampImageBrushSize(value81.annotate?.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX) + 'px',
         ),
-        _0x38e743.style.setProperty(
-          '--annotate-text-input-color',
-          _0x38e743.dataset.color || getColorCanvas('red'),
-        ));
-      let _0x586e9c = false;
-      const _0x4e67b6 = (_0x4706cf) => {
-        if (_0x586e9c) return;
-        ((_0x586e9c = true), this._removeTextInput(_0x4706cf, _0x38e743));
+        el25.style.setProperty('--annotate-text-input-color', el25.dataset.color || getColorCanvas('red')));
+      let value85 = false;
+      const run4 = (value86) => {
+        if (value85) return;
+        ((value85 = true), this._removeTextInput(value86, el25));
       };
-      (_0x38e743.addEventListener('pointerdown', (_0x56d76e) => _0x56d76e.stopPropagation()),
-        _0x38e743.addEventListener('keydown', (_0x7372e0) => {
-          if (_0x7372e0.key === 'Enter' && !_0x7372e0.isComposing)
-            (_0x7372e0.preventDefault(), _0x4e67b6(true));
-          else _0x7372e0.key === 'Escape' && (_0x7372e0.preventDefault(), _0x4e67b6(false));
+      (el25.addEventListener('pointerdown', (event32) => event32.stopPropagation()),
+        el25.addEventListener('keydown', (event33) => {
+          if (event33.key === 'Enter' && !event33.isComposing) (event33.preventDefault(), run4(true));
+          else event33.key === 'Escape' && (event33.preventDefault(), run4(false));
         }),
-        _0x38e743.addEventListener('blur', () => _0x4e67b6(true)),
-        this.overlayEl?.appendChild(_0x38e743),
-        (this._textInputEl = _0x38e743),
+        el25.addEventListener('blur', () => run4(true)),
+        this.overlayEl?.appendChild(el25),
+        (this._textInputEl = el25),
         requestAnimationFrame(() => {
-          if (this._textInputEl === _0x38e743) _0x38e743.focus();
+          if (this._textInputEl === el25) el25.focus();
         }));
     },
-    _getTextLayout(_0x5bb04e, _0x28475f) {
-      return getTextLayout({ canvasEl: this.canvasEl, cmd: _0x5bb04e, viewport: _0x28475f });
+    _getTextLayout(cmd, viewport2) {
+      return getTextLayout({ canvasEl: this.canvasEl, cmd: cmd, viewport: viewport2 });
     },
-    _getTextGeometry(_0x589c62, _0x292564) {
-      return getTextGeometry({ canvasEl: this.canvasEl, cmd: _0x589c62, viewport: _0x292564 });
+    _getTextGeometry(cmd2, viewport3) {
+      return getTextGeometry({ canvasEl: this.canvasEl, cmd: cmd2, viewport: viewport3 });
     },
-    _toTextLocalTransformSpace(_0xf6056, _0x477924, _0x3e31c0) {
-      return toTextLocalTransformSpace(_0xf6056, _0x477924, _0x3e31c0);
+    _toTextLocalTransformSpace(value87, value88, value89) {
+      return toTextLocalTransformSpace(value87, value88, value89);
     },
-    _rotateTextLocalPoint(_0x4af369, _0x508bc9) {
-      return rotateTextLocalPoint(_0x4af369, _0x508bc9);
+    _rotateTextLocalPoint(value90, value91) {
+      return rotateTextLocalPoint(value90, value91);
     },
-    _resolveAxisTextScale(_0x116c94, _0x51da68) {
-      return resolveAxisTextScale(_0x116c94, _0x51da68);
+    _resolveAxisTextScale(value92, value93) {
+      return resolveAxisTextScale(value92, value93);
     },
-    _deleteTextCommand(_0x5c2751) {
-      const _0x5b2071 = Number(_0x5c2751);
-      if (!Number.isInteger(_0x5b2071) || this._commands[_0x5b2071]?.type !== 'text') return false;
+    _deleteTextCommand(value94) {
+      const value95 = Number(value94);
+      if (!Number.isInteger(value95) || this._commands[value95]?.type !== 'text') return false;
       return (
-        this._commands.splice(_0x5b2071, 1),
+        this._commands.splice(value95, 1),
         (this._selectedTextCommandIndex = null),
         (this._redoStack = []),
         (this._dirty = true),
@@ -1268,14 +1226,14 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         true
       );
     },
-    _copyTextCommand(_0x2d69ec, _0x1a3aa3 = this._view?.viewport) {
-      const _0x35f4e3 = Number(_0x2d69ec),
-        _0x94e44f = this._commands[_0x35f4e3];
-      if (!Number.isInteger(_0x35f4e3) || _0x94e44f?.type !== 'text') return false;
-      const _0x411de4 = buildCopiedTextCommand(_0x94e44f, _0x1a3aa3);
+    _copyTextCommand(value96, value97 = this._view?.viewport) {
+      const value98 = Number(value96),
+        value99 = this._commands[value98];
+      if (!Number.isInteger(value98) || value99?.type !== 'text') return false;
+      const copiedTextCommand = buildCopiedTextCommand(value99, value97);
       return (
-        this._commands.splice(_0x35f4e3 + 1, 0, _0x411de4),
-        (this._selectedTextCommandIndex = _0x35f4e3 + 1),
+        this._commands.splice(value98 + 1, 0, copiedTextCommand),
+        (this._selectedTextCommandIndex = value98 + 1),
         (this._redoStack = []),
         (this._dirty = true),
         this._persistEraseSelectionState(),
@@ -1284,119 +1242,120 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
       );
     },
     deleteSelectedTextCommand() {
-      const _0x1cb97d = Number(this._selectedTextCommandIndex);
-      if (!Number.isInteger(_0x1cb97d)) return false;
-      return this._deleteTextCommand(_0x1cb97d);
+      const value100 = Number(this._selectedTextCommandIndex);
+      if (!Number.isInteger(value100)) return false;
+      return this._deleteTextCommand(value100);
     },
-    _findTextHit(_0x492a1b, _0xe799a3) {
+    _findTextHit(local, viewport4) {
       return findTextHit({
         commands: this._commands,
         selectedTextCommandIndex: this._selectedTextCommandIndex,
-        local: _0x492a1b,
-        viewport: _0xe799a3,
+        local: local,
+        viewport: viewport4,
         canvasEl: this.canvasEl,
       });
     },
-    _createTextTransformState(_0x5f3104, _0x37fab2, _0x4ce9cf) {
+    _createTextTransformState(hit, local2, viewport5) {
       return createTextTransformState({
         commands: this._commands,
-        hit: _0x5f3104,
-        local: _0x37fab2,
-        viewport: _0x4ce9cf,
+        hit: hit,
+        local: local2,
+        viewport: viewport5,
         canvasEl: this.canvasEl,
       });
     },
     _normalizeSelectedTextCommand() {
-      const _0x16cd03 = Number(this._selectedTextCommandIndex);
-      if (!Number.isInteger(_0x16cd03) || _0x16cd03 < 0 || _0x16cd03 >= this._commands.length) {
+      const count7 = Number(this._selectedTextCommandIndex);
+      if (!Number.isInteger(count7) || count7 < 0 || count7 >= this._commands.length) {
         this._selectedTextCommandIndex = null;
         return;
       }
-      this._commands[_0x16cd03]?.type !== 'text' && (this._selectedTextCommandIndex = null);
+      this._commands[count7]?.type !== 'text' && (this._selectedTextCommandIndex = null);
     },
-    _updateView(_0x4f39cd) {
+    _updateView(value101) {
       if (!this.active) return;
-      const _0x57aa85 = _0x4f39cd?.node,
-        _0x2740b0 = _0x4f39cd?.viewport;
-      if (!_0x57aa85) return;
-      this.nodeData = _0x57aa85;
-      const _0x1f7ba2 = clampImageBrushSize(_0x4f39cd?.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX);
-      if (this.sizeRangeEl && Number(this.sizeRangeEl.value) !== _0x1f7ba2)
-        this.sizeRangeEl.value = String(_0x1f7ba2);
-      if (this.sizeValueEl && this.sizeValueEl.textContent !== String(_0x1f7ba2))
-        this.sizeValueEl.textContent = String(_0x1f7ba2);
-      (this._updateToolActive(_0x4f39cd?.tool, _0x1f7ba2), this._syncPaletteActive(_0x4f39cd?.color));
-      const _0x2c76d3 = worldToScreen(_0x57aa85.x, _0x57aa85.y, _0x2740b0),
-        _0xa6852e = Math.round(_0x57aa85.width * _0x2740b0.zoom),
-        _0x1ebfe0 = Math.round(_0x57aa85.height * _0x2740b0.zoom);
-      ((this.containerEl.style.left = Math.round(_0x2c76d3.x) + 'px'),
-        (this.containerEl.style.top = Math.round(_0x2c76d3.y) + 'px'),
-        (this.containerEl.style.width = _0xa6852e + 'px'),
-        (this.containerEl.style.height = _0x1ebfe0 + 'px'));
-      const _0x430019 = window.devicePixelRatio || 1,
-        _0xd1eb56 = Math.max(1, _0xa6852e),
-        _0x176e51 = Math.max(1, _0x1ebfe0);
+      const box17 = value101?.node,
+        box18 = value101?.viewport;
+      if (!box17) return;
+      this.nodeData = box17;
+      const clampImageBrushSize5 = clampImageBrushSize(value101?.brushSizePx, IMAGE_BRUSH_DEFAULT_SIZE_PX);
+      if (this.sizeRangeEl && Number(this.sizeRangeEl.value) !== clampImageBrushSize5)
+        this.sizeRangeEl.value = String(clampImageBrushSize5);
+      if (this.sizeValueEl && this.sizeValueEl.textContent !== String(clampImageBrushSize5))
+        this.sizeValueEl.textContent = String(clampImageBrushSize5);
+      (this._updateToolActive(value101?.tool, clampImageBrushSize5),
+        this._syncPaletteActive(value101?.color));
+      const box19 = worldToScreen(box17.x, box17.y, box18),
+        value102 = Math.round(box17.width * box18.zoom),
+        value103 = Math.round(box17.height * box18.zoom);
+      ((this.containerEl.style.left = Math.round(box19.x) + 'px'),
+        (this.containerEl.style.top = Math.round(box19.y) + 'px'),
+        (this.containerEl.style.width = value102 + 'px'),
+        (this.containerEl.style.height = value103 + 'px'));
+      const value104 = window.devicePixelRatio || 1,
+        value105 = Math.max(1, value102),
+        value106 = Math.max(1, value103);
       if (
-        this.canvasEl.width !== Math.round(_0xd1eb56 * _0x430019) ||
-        this.canvasEl.height !== Math.round(_0x176e51 * _0x430019)
+        this.canvasEl.width !== Math.round(value105 * value104) ||
+        this.canvasEl.height !== Math.round(value106 * value104)
       ) {
-        ((this.canvasEl.width = Math.round(_0xd1eb56 * _0x430019)),
-          (this.canvasEl.height = Math.round(_0x176e51 * _0x430019)),
-          (this.canvasEl.style.width = _0xd1eb56 + 'px'),
-          (this.canvasEl.style.height = _0x176e51 + 'px'));
-        const _0x126506 = this.canvasEl.getContext('2d');
-        (_0x126506.setTransform(_0x430019, 0, 0, _0x430019, 0, 0),
-          (_0x126506.lineCap = 'round'),
-          (_0x126506.lineJoin = 'round'));
+        ((this.canvasEl.width = Math.round(value105 * value104)),
+          (this.canvasEl.height = Math.round(value106 * value104)),
+          (this.canvasEl.style.width = value105 + 'px'),
+          (this.canvasEl.style.height = value106 + 'px'));
+        const value107 = this.canvasEl.getContext('2d');
+        (value107.setTransform(value104, 0, 0, value104, 0, 0),
+          (value107.lineCap = 'round'),
+          (value107.lineJoin = 'round'));
       }
-      const _0x5abb08 = Math.max(12, Math.round(_0x2c76d3.y) - 54);
-      ((this.toolbarEl.style.left = Math.round(_0x2c76d3.x + _0xa6852e / 2) + 'px'),
-        (this.toolbarEl.style.top = _0x5abb08 + 'px'),
+      const value108 = Math.max(12, Math.round(box19.y) - 54);
+      ((this.toolbarEl.style.left = Math.round(box19.x + value102 / 2) + 'px'),
+        (this.toolbarEl.style.top = value108 + 'px'),
         this.generationToolbarEl &&
-          ((this.generationToolbarEl.style.left = Math.round(_0x2c76d3.x + _0xa6852e / 2) + 'px'),
-          (this.generationToolbarEl.style.top = Math.round(_0x2c76d3.y + _0x1ebfe0 + 14) + 'px'),
+          ((this.generationToolbarEl.style.left = Math.round(box19.x + value102 / 2) + 'px'),
+          (this.generationToolbarEl.style.top = Math.round(box19.y + value103 + 14) + 'px'),
           (this.generationToolbarEl.style.bottom = 'auto'),
           (this.generationToolbarEl.style.transform = 'translateX(-50%)')),
         this._applyStageFlip(this._getCurrentFlipState()),
-        this._render(_0x2740b0));
+        this._render(box18));
     },
-    _render(_0x254bea = this._view?.viewport) {
+    _render(value109 = this._view?.viewport) {
       if (!this.active || !this.canvasEl) return;
       this._applyStageFlip(this._getCurrentFlipState());
-      const _0xcc2048 = this.canvasEl.getContext('2d'),
-        _0x2cfdf6 = Number(this.canvasEl.style.width.replace('px', '')) || 1,
-        _0x31ac84 = Number(this.canvasEl.style.height.replace('px', '')) || 1;
-      _0xcc2048.clearRect(0, 0, _0x2cfdf6, _0x31ac84);
+      const ctx = this.canvasEl.getContext('2d'),
+        value110 = Number(this.canvasEl.style.width.replace('px', '')) || 1,
+        value111 = Number(this.canvasEl.style.height.replace('px', '')) || 1;
+      ctx.clearRect(0, 0, value110, value111);
       if (this._isGenerationScene()) {
-        this._renderEraseSceneCommands(_0xcc2048, _0x254bea, this._commands, this._draft);
+        this._renderEraseSceneCommands(ctx, value109, this._commands, this._draft);
         return;
       }
-      this._renderCommands(_0xcc2048, _0x254bea, this._commands);
-      if (this._draft) this._renderCommands(_0xcc2048, _0x254bea, [this._draft], true);
+      this._renderCommands(ctx, value109, this._commands);
+      if (this._draft) this._renderCommands(ctx, value109, [this._draft], true);
     },
-    _renderEraseSceneCommands(_0x273d93, _0x492f30, _0x6443af = [], _0x552257 = null) {
+    _renderEraseSceneCommands(ctx2, viewport6, commands = [], draft = null) {
       this._eraseMaskCanvasEl = renderEraseSceneCommands({
         documentRef: document,
         canvasEl: this.canvasEl,
-        ctx: _0x273d93,
-        viewport: _0x492f30,
-        commands: _0x6443af,
-        draft: _0x552257,
+        ctx: ctx2,
+        viewport: viewport6,
+        commands: commands,
+        draft: draft,
         checkerPattern: this._checkerPattern,
         eraseMaskCanvasEl: this._eraseMaskCanvasEl,
       });
     },
-    _renderCommands(_0x15de10, _0x3a636a, _0x3b98fb, _0x221a84 = false) {
+    _renderCommands(ctx3, viewport7, commands2, isDraft = false) {
       renderCommands({
-        ctx: _0x15de10,
-        viewport: _0x3a636a,
+        ctx: ctx3,
+        viewport: viewport7,
         canvasEl: this.canvasEl,
-        commands: _0x3b98fb,
-        isDraft: _0x221a84,
+        commands: commands2,
+        isDraft: isDraft,
         isEraseScene: this._isEraseScene(),
         checkerPattern: this._checkerPattern,
         defaultTextColor: getColorCanvas('red'),
-        getTextGeometry: (_0x247dde, _0x2d8298) => this._getTextGeometry(_0x247dde, _0x2d8298),
+        getTextGeometry: (value112, value113) => this._getTextGeometry(value112, value113),
         selectedTextCommandIndex: this._selectedTextCommandIndex,
         selectedCommandsRef: this._commands,
         resolveCssVar: getCssVar,
@@ -1404,48 +1363,48 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         numberLabelBackgroundColor: getCssVar('--canvas-white'),
       });
     },
-    _addNumberLabel(_0x2e1672, _0x132390) {
+    _addNumberLabel(box20, sizeWorld3) {
       if (!this.active || !this._isAnnotateScene()) return null;
-      const _0x4c317a = appStore.getStateRaw(),
-        _0x5d3060 = Number(_0x2e1672?.x),
-        _0x893361 = Number(_0x2e1672?.y);
-      if (!Number.isFinite(_0x5d3060) || !Number.isFinite(_0x893361)) return null;
-      const _0x290f7a = {
+      const value114 = appStore.getStateRaw(),
+        x6 = Number(box20?.x),
+        y4 = Number(box20?.y);
+      if (!Number.isFinite(x6) || !Number.isFinite(y4)) return null;
+      const value115 = {
         type: 'number-label',
         number: getNextNumberLabelValue(this._commands),
-        x: _0x5d3060,
-        y: _0x893361,
-        color: getColorCanvas(_0x4c317a.annotate?.color || 'red'),
-        sizeWorld: _0x132390,
+        x: x6,
+        y: y4,
+        color: getColorCanvas(value114.annotate?.color || 'red'),
+        sizeWorld: sizeWorld3,
       };
       return (
-        this._commands.push(_0x290f7a),
+        this._commands.push(value115),
         (this._redoStack = []),
         (this._dirty = true),
         this._persistEraseSelectionState(),
         this._render(),
-        _0x290f7a
+        value115
       );
     },
-    _fillArea(_0x16e841, _0x59ef12) {
-      const _0x4ed746 = appStore.getStateRaw(),
-        _0x5c5daa = {
+    _fillArea(box21, value116) {
+      const value117 = appStore.getStateRaw(),
+        value118 = {
           type: 'fill',
-          x: Number(_0x16e841?.x) || 0,
-          y: Number(_0x16e841?.y) || 0,
-          color: getColorCanvas(_0x4ed746.annotate?.color || 'red'),
+          x: Number(box21?.x) || 0,
+          y: Number(box21?.y) || 0,
+          color: getColorCanvas(value117.annotate?.color || 'red'),
         };
-      (this._commands.push(_0x5c5daa),
+      (this._commands.push(value118),
         (this._redoStack = []),
         (this._dirty = true),
         this._persistEraseSelectionState(),
         this._render());
     },
-    _pushFlipCommand(_0x33482f) {
+    _pushFlipCommand(type) {
       if (!this.active || !this._isAnnotateScene()) return;
-      if (_0x33482f !== 'flip-horizontal' && _0x33482f !== 'flip-vertical') return;
+      if (type !== 'flip-horizontal' && type !== 'flip-vertical') return;
       (this._removeTextInput(true),
-        this._commands.push({ type: _0x33482f }),
+        this._commands.push({ type: type }),
         (this._redoStack = []),
         (this._dirty = true),
         this._normalizeSelectedTextCommand(),
@@ -1459,8 +1418,8 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     },
     _undo() {
       if (this._commands.length === 0) return;
-      const _0x3584b1 = this._commands.pop();
-      (this._redoStack.push(_0x3584b1),
+      const value119 = this._commands.pop();
+      (this._redoStack.push(value119),
         (this._dirty = true),
         this._normalizeSelectedTextCommand(),
         this._persistEraseSelectionState(),
@@ -1468,8 +1427,8 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     },
     _redo() {
       if (this._redoStack.length === 0) return;
-      const _0x33cdf5 = this._redoStack.pop();
-      (this._commands.push(_0x33cdf5),
+      const value120 = this._redoStack.pop();
+      (this._commands.push(value120),
         (this._dirty = true),
         this._normalizeSelectedTextCommand(),
         this._persistEraseSelectionState(),
@@ -1487,10 +1446,10 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     },
     _applyBaseSurface() {
       if (!this.stageEl || !this.imgEl) return;
-      const _0x3c11d7 = Boolean(this._useWhiteboardBase);
-      (this.stageEl.classList.toggle('is-whiteboard', _0x3c11d7),
-        this.overlayEl?.classList.toggle('is-whiteboard', _0x3c11d7),
-        this.imgEl.setAttribute('aria-hidden', _0x3c11d7 ? 'true' : 'false'));
+      const value121 = Boolean(this._useWhiteboardBase);
+      (this.stageEl.classList.toggle('is-whiteboard', value121),
+        this.overlayEl?.classList.toggle('is-whiteboard', value121),
+        this.imgEl.setAttribute('aria-hidden', value121 ? 'true' : 'false'));
     },
     _createNewWhiteboard() {
       if (!this.active || this._isGenerationScene()) return;
@@ -1508,196 +1467,192 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     },
     _persistEraseSelectionState() {
       if (!this._isEraseScene() || !this.nodeId) return;
-      const _0x328b20 = appStore.getStateRaw().nodes?.[this.nodeId];
-      if (!_0x328b20) return;
-      const _0x420a5d = appStore.getStateRaw().annotate || {},
-        _0x127869 = buildPersistedEraseSelectionState({
+      const enabled12 = appStore.getStateRaw().nodes?.[this.nodeId];
+      if (!enabled12) return;
+      const tool6 = appStore.getStateRaw().annotate || {},
+        persistedEraseSelectionState = buildPersistedEraseSelectionState({
           commands: this._commands,
-          tool: _0x420a5d.tool,
-          brushSizePx: _0x420a5d.brushSizePx,
+          tool: tool6.tool,
+          brushSizePx: tool6.brushSizePx,
         });
-      appStore.updateNodeData(this.nodeId, { [ERASE_SELECTION_STATE_KEY]: _0x127869 });
+      appStore.updateNodeData(this.nodeId, { [ERASE_SELECTION_STATE_KEY]: persistedEraseSelectionState });
     },
-    _buildSelectionMaskCanvas(_0x2350cb, _0x555189, _0x24c7cf, _0x3b4bef) {
+    _buildSelectionMaskCanvas(naturalW, naturalH, scaleX2, scaleY2) {
       return buildSelectionMaskCanvas({
         documentRef: document,
         commands: this._commands,
-        naturalW: _0x2350cb,
-        naturalH: _0x555189,
-        scaleX: _0x24c7cf,
-        scaleY: _0x3b4bef,
+        naturalW: naturalW,
+        naturalH: naturalH,
+        scaleX: scaleX2,
+        scaleY: scaleY2,
       });
     },
-    async _buildGenerationPayload(_0xd42756, _0x2c86b3) {
+    async _buildGenerationPayload(node2, imgUrl) {
       return buildGenerationPayload({
         scene: this._mode?.scene,
         commands: this._commands,
         promptText: this.promptText,
-        node: _0xd42756,
-        imgUrl: _0x2c86b3,
+        node: node2,
+        imgUrl: imgUrl,
         model: this.model,
         provider: this.provider,
         imageSize: this.imageSize,
         erasePrompt: ERASE_GENERATE_PROMPT,
-        loadImage: (_0x34e02f) => this._loadImage(_0x34e02f),
-        createSelectionMaskCanvas: (_0x95ace6, _0x15c746, _0x1eb1ea, _0x388548) =>
-          this._buildSelectionMaskCanvas(_0x95ace6, _0x15c746, _0x1eb1ea, _0x388548),
+        loadImage: (value122) => this._loadImage(value122),
+        createSelectionMaskCanvas: (value123, value124, value125, value126) =>
+          this._buildSelectionMaskCanvas(value123, value124, value125, value126),
         getModelProvider: getModelProvider,
-        notify: (_0x47e140, _0x3295f2) => window.showToast?.(_0x47e140, _0x3295f2),
+        notify: (value127, value128) => window.showToast?.(value127, value128),
         documentRef: document,
         urlApi: URL,
       });
     },
     async _handleDebugRequest() {
       if (!this.active || !this._isGenerationScene()) return;
-      const _0x116935 = appStore.getState(),
-        _0x883383 = _0x116935.nodes?.[this.nodeId];
-      if (!_0x883383) return;
-      const _0x326290 = this._resolveNodeImageUrl(_0x883383);
-      if (!_0x326290) return;
-      let _0x54ea87 = '';
+      const value129 = appStore.getState(),
+        box22 = value129.nodes?.[this.nodeId];
+      if (!box22) return;
+      const enabled13 = this._resolveNodeImageUrl(box22);
+      if (!enabled13) return;
+      let value130 = '';
       try {
-        const _0xbfe9b7 = await this._buildGenerationPayload(_0x883383, _0x326290);
-        if (!_0xbfe9b7?.payload) return;
-        _0x54ea87 = _0xbfe9b7.inputUrl || '';
-        const _0x27dcd5 = await buildGenerateImageRequest(_0xbfe9b7.payload),
-          _0x2a6c30 = formatFinalApiDebugRequest(_0x27dcd5),
-          _0x330dd9 = _0x883383.x + (_0x883383.width || 0x17c) + 50,
-          _0xa5f516 = _0x883383.y;
-        let _0x226d58 = Object.values(_0x116935.nodes).find((_0x2a843f) => _0x2a843f.type === 'debug');
-        (!_0x226d58
+        const enabled14 = await this._buildGenerationPayload(box22, enabled13);
+        if (!enabled14?.payload) return;
+        value130 = enabled14.inputUrl || '';
+        const generateImageRequest = await buildGenerateImageRequest(enabled14.payload),
+          outputText = formatFinalApiDebugRequest(generateImageRequest),
+          x7 = box22.x + (box22.width || 0x17c) + 50,
+          y5 = box22.y;
+        let enabled15 = Object.values(value129.nodes).find((item3) => item3.type === 'debug');
+        (!enabled15
           ? appStore.addNode({
               id: 'debug-' + Date.now(),
               type: 'debug',
-              x: _0x330dd9,
-              y: _0xa5f516,
+              x: x7,
+              y: y5,
               width: 0x17c,
               height: 0x12c,
               name: imageAnnotateText('debug.nodeName'),
-              outputText: _0x2a6c30,
+              outputText: outputText,
             })
-          : appStore.updateNodeData(_0x226d58.id, { outputText: _0x2a6c30, x: _0x330dd9, y: _0xa5f516 }),
+          : appStore.updateNodeData(enabled15.id, { outputText: outputText, x: x7, y: y5 }),
           window.showToast?.(imageAnnotateText('debug.shown'), 'warn'));
-      } catch (_0x49518b) {
-        window.showToast?.(
-          imageAnnotateText('debug.buildRequestFailed', { error: _0x49518b.message }),
-          'error',
-        );
+      } catch (error) {
+        window.showToast?.(imageAnnotateText('debug.buildRequestFailed', { error: error.message }), 'error');
       } finally {
-        if (_0x54ea87) URL.revokeObjectURL(_0x54ea87);
+        if (value130) URL.revokeObjectURL(value130);
       }
     },
-    async _generateEraseResult(_0x5065cf, _0x1754ad) {
-      const _0x75072b = await this._buildGenerationPayload(_0x5065cf, _0x1754ad);
-      if (!_0x75072b?.payload) return;
+    async _generateEraseResult(sourceNode, value131) {
+      const built = await this._buildGenerationPayload(sourceNode, value131);
+      if (!built?.payload) return;
       await runGenerationResultFlow({
         scene: 'erase',
-        built: _0x75072b,
-        sourceNode: _0x5065cf,
+        built: built,
+        sourceNode: sourceNode,
         fallbackModel: this.model,
         fallbackProvider: this.provider,
-        exitController: (_0x5557eb) => this.exit(_0x5557eb),
-        notify: (_0x5051e5, _0xcd049f) => window.showToast?.(_0x5051e5, _0xcd049f),
+        exitController: (value132) => this.exit(value132),
+        notify: (value133, value134) => window.showToast?.(value133, value134),
       });
     },
-    async _generateRepaintResult(_0x4d46de, _0x4caeca) {
-      const _0x5a1f40 = await this._buildGenerationPayload(_0x4d46de, _0x4caeca);
-      if (!_0x5a1f40?.payload) return;
+    async _generateRepaintResult(sourceNode2, value135) {
+      const built2 = await this._buildGenerationPayload(sourceNode2, value135);
+      if (!built2?.payload) return;
       await runGenerationResultFlow({
         scene: 'repaint',
-        built: _0x5a1f40,
-        sourceNode: _0x4d46de,
+        built: built2,
+        sourceNode: sourceNode2,
         fallbackModel: this.model,
         fallbackProvider: this.provider,
-        exitController: (_0x3af909) => this.exit(_0x3af909),
-        notify: (_0x4e7193, _0x2552e2) => window.showToast?.(_0x4e7193, _0x2552e2),
+        exitController: (value136) => this.exit(value136),
+        notify: (value137, value138) => window.showToast?.(value137, value138),
       });
     },
     async _save() {
       if (!this.active) return;
       this._removeTextInput(true);
-      const _0xdb9af6 = appStore.getState(),
-        _0x16bbef = _0xdb9af6.nodes[this.nodeId];
-      if (!_0x16bbef) return;
-      const _0x475033 = this._resolveNodeImageUrl(_0x16bbef);
-      if (!_0x475033) return;
-      const _0x284964 =
+      const value139 = appStore.getState(),
+        node3 = value139.nodes[this.nodeId];
+      if (!node3) return;
+      const imgUrl2 = this._resolveNodeImageUrl(node3);
+      if (!imgUrl2) return;
+      const el26 =
           this.generationToolbarEl?.querySelector('.go') || this.toolbarEl.querySelector('.act-save'),
-        _0x20e224 = _0x284964?.querySelector('span') || null,
-        _0x276f2f = _0x20e224 ? _0x20e224.textContent : '';
-      _0x20e224 &&
-        (_0x20e224.textContent = this._mode?.submitBusyLabel || imageAnnotateText('actions.saving'));
-      if (!_0x284964) return;
-      _0x284964.style.pointerEvents = 'none';
+        el27 = el26?.querySelector('span') || null,
+        value140 = el27 ? el27.textContent : '';
+      el27 && (el27.textContent = this._mode?.submitBusyLabel || imageAnnotateText('actions.saving'));
+      if (!el26) return;
+      el26.style.pointerEvents = 'none';
       try {
         if (this._isEraseScene()) {
-          await this._generateEraseResult(_0x16bbef, _0x475033);
+          await this._generateEraseResult(node3, imgUrl2);
           return;
         }
         if (this._isRepaintScene()) {
-          await this._generateRepaintResult(_0x16bbef, _0x475033);
+          await this._generateRepaintResult(node3, imgUrl2);
           return;
         }
-        const _0x2bf5f8 = this._isEraseScene(),
-          _0x2ae44c = !_0x2bf5f8 && this._useWhiteboardBase,
-          { blob: _0x43bbe0, exportType: _0x4078ac } = await exportAnnotateCanvasBlob({
+        const isEraseScene = this._isEraseScene(),
+          useWhiteboardBase = !isEraseScene && this._useWhiteboardBase,
+          { blob: blob, exportType: exportType } = await exportAnnotateCanvasBlob({
             documentRef: document,
-            node: _0x16bbef,
+            node: node3,
             imgEl: this.imgEl,
-            imgUrl: _0x475033,
+            imgUrl: imgUrl2,
             commands: this._commands,
-            useWhiteboardBase: _0x2ae44c,
-            isEraseScene: _0x2bf5f8,
-            loadImage: (_0x28b7ef) => this._loadImage(_0x28b7ef),
+            useWhiteboardBase: useWhiteboardBase,
+            isEraseScene: isEraseScene,
+            loadImage: (value141) => this._loadImage(value141),
             getCurrentFlipState: () => this._getCurrentFlipState(),
-            applyFlipTransformToContext: (_0x597d9f, _0x5655f8, _0x1c1b9, _0x2fafb9) =>
-              this._applyFlipTransformToContext(_0x597d9f, _0x5655f8, _0x1c1b9, _0x2fafb9),
-            createSelectionMaskCanvas: (_0x6694d1, _0x43a98c, _0x4d356c, _0x5d8c88) =>
-              this._buildSelectionMaskCanvas(_0x6694d1, _0x43a98c, _0x4d356c, _0x5d8c88),
+            applyFlipTransformToContext: (value142, value143, value144, value145) =>
+              this._applyFlipTransformToContext(value142, value143, value144, value145),
+            createSelectionMaskCanvas: (value146, value147, value148, value149) =>
+              this._buildSelectionMaskCanvas(value146, value147, value148, value149),
             canvasWhiteColor: getCssVar('--canvas-white'),
             defaultTextColor: getColorCanvas('red'),
           });
         (await saveAnnotateExportResult({
-          blob: _0x43bbe0,
-          exportType: _0x4078ac,
+          blob: blob,
+          exportType: exportType,
           scene: this._mode?.scene,
           sourceNodeId: this.nodeId,
-          baseNode: _0x16bbef,
-          notify: (_0x50f127, _0x39d170) => window.showToast?.(_0x50f127, _0x39d170),
+          baseNode: node3,
+          notify: (value150, value151) => window.showToast?.(value150, value151),
           triggerLocalCacheSave: () => window._triggerLocalCacheSave?.(),
         }),
           this.exit({ silent: true }));
-      } catch (_0x6e0ae7) {
-        (console.error('[Annotate] save failed:', _0x6e0ae7),
+      } catch (value152) {
+        (console.error('[Annotate] save failed:', value152),
           window.showToast?.(imageAnnotateText('toasts.saveFailed'), 'error'));
       } finally {
-        if (_0x20e224) _0x20e224.textContent = _0x276f2f;
-        _0x284964.style.pointerEvents = 'auto';
+        if (el27) el27.textContent = value140;
+        el26.style.pointerEvents = 'auto';
       }
     },
-    _resolveNodeImageUrl(_0x530a28) {
-      const _0x44ffe9 = _0x530a28.mainImageIndex || 0,
-        _0x5f35ba = _0x530a28.images && _0x530a28.images[_0x44ffe9],
-        _0xd880b4 = _0x530a28.localPath || _0x5f35ba?.localPath,
-        _0x1efe34 = localPathToUrl(_0xd880b4);
-      if (_0x1efe34) return _0x1efe34;
+    _resolveNodeImageUrl(value153) {
+      const value154 = value153.mainImageIndex || 0,
+        value155 = value153.images && value153.images[value154],
+        value156 = value153.localPath || value155?.localPath,
+        url = localPathToUrl(value156);
+      if (url) return url;
       return (
-        _0x530a28.src ||
-        _0x530a28.sourceUrl ||
-        _0x530a28.imageUrl ||
-        _0x530a28.thumbUrl ||
-        _0x5f35ba?.imageUrl ||
-        _0x5f35ba?.thumbUrl ||
+        value153.src ||
+        value153.sourceUrl ||
+        value153.imageUrl ||
+        value153.thumbUrl ||
+        value155?.imageUrl ||
+        value155?.thumbUrl ||
         ''
       );
     },
-    _loadImage(_0x5979c6) {
-      return new Promise((_0x4cc61e, _0x18d28f) => {
-        const _0x275baa = new Image();
-        ((_0x275baa.crossOrigin = 'anonymous'),
-          (_0x275baa.onload = () => _0x4cc61e(_0x275baa)),
-          (_0x275baa.onerror = () => _0x18d28f(new Error(imageAnnotateText('errors.imageLoadFailed')))),
-          (_0x275baa.src = _0x5979c6));
+    _loadImage(value157) {
+      return new Promise((handler10, handler11) => {
+        const image = new Image();
+        ((image.crossOrigin = 'anonymous'),
+          (image.onload = () => handler10(image)),
+          (image.onerror = () => handler11(new Error(imageAnnotateText('errors.imageLoadFailed')))),
+          (image.src = value157));
       });
     },
   };

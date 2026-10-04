@@ -1,782 +1,752 @@
 import { bindUiSchemaBindingEvents, notifyUiSchemaMenuAfterOpen } from './uiSchemaBindingEvents.js';
 export function createUiSchemaBindingSession(
-  _0x1d9d33,
-  { getNodeData: _0x17a8f5, commitFieldValue: _0x3acfb5 } = {},
-  _0x3c7264 = {},
+  root,
+  { getNodeData: getNodeData, commitFieldValue: commitFieldValue } = {},
+  value = {},
 ) {
   const {
-    RANDOM_SEED_DEFAULT_MAX: _0x15b754,
-    RANDOM_SEED_DEFAULT_MIN: _0x8f9d6b,
-    UI_SCHEMA_POPUP_EXIT_MS: _0x2dfb47,
-    evaluateUiSchemaNumberExpression: _0x274ac2,
-    formatRhV54BreastJiggle: _0xd8ce1,
-    getNodeFieldValue: _0x42b8cf,
-    getOptionDisableRepairPatch: _0xb9670f,
-    getRangeValueDisplayLabel: _0x10f103,
-    getRenderedOptionDisableWhen: _0x32fd5a,
-    getRhV54BreastJiggleRangeFromFieldEl: _0x1b5461,
-    getUiSchemaFieldAdapterDefinition: _0x3dcdf1,
-    normalizeRhV54MaskExpand: _0x5bf43c,
-    openExternalLink: _0x2a7516,
-    parseRangeValuesFromFieldEl: _0x13bb11,
-    syncInstanceToggleField: _0x403225,
-    syncModelUiSchemaControls: _0x535fa6,
-    syncRhAiAppFooterParamField: _0x13c453,
-    t: _0x33d09d,
-  } = _0x3c7264;
-  if (!_0x1d9d33 || typeof _0x3acfb5 !== 'function') return () => {};
-  const _0x14c2af = (_0x2d2938, _0x5a89e7, { skipSync: skipSync = ![] } = {}) => {
-    const _0x34c087 = typeof _0x17a8f5 === 'function' ? _0x17a8f5() || {} : {},
-      _0x350530 = _0x3acfb5(_0x2d2938, _0x5a89e7, _0x34c087),
-      _0x2bba03 =
-        _0x350530 && typeof _0x350530 === 'object'
-          ? _0x350530
-          : typeof _0x17a8f5 === 'function'
-            ? _0x17a8f5() || _0x34c087
-            : _0x34c087;
-    return (!skipSync && _0x535fa6(_0x1d9d33, { ..._0x34c087, ..._0x2bba03 }), _0x2bba03);
+    RANDOM_SEED_DEFAULT_MAX: RANDOM_SEED_DEFAULT_MAX,
+    RANDOM_SEED_DEFAULT_MIN: RANDOM_SEED_DEFAULT_MIN,
+    UI_SCHEMA_POPUP_EXIT_MS: UI_SCHEMA_POPUP_EXIT_MS,
+    evaluateUiSchemaNumberExpression: evaluateUiSchemaNumberExpression,
+    formatRhV54BreastJiggle: formatRhV54BreastJiggle,
+    getNodeFieldValue: getNodeFieldValue,
+    getOptionDisableRepairPatch: getOptionDisableRepairPatch,
+    getRangeValueDisplayLabel: getRangeValueDisplayLabel,
+    getRenderedOptionDisableWhen: getRenderedOptionDisableWhen,
+    getRhV54BreastJiggleRangeFromFieldEl: getRhV54BreastJiggleRangeFromFieldEl,
+    getUiSchemaFieldAdapterDefinition: getUiSchemaFieldAdapterDefinition,
+    normalizeRhV54MaskExpand: normalizeRhV54MaskExpand,
+    openExternalLink: openExternalLink,
+    parseRangeValuesFromFieldEl: parseRangeValuesFromFieldEl,
+    syncInstanceToggleField: syncInstanceToggleField,
+    syncModelUiSchemaControls: syncModelUiSchemaControls,
+    syncRhAiAppFooterParamField: syncRhAiAppFooterParamField,
+    t: t,
+  } = value;
+  if (!root || typeof commitFieldValue !== 'function') return () => {};
+  const commitValue = (item, key, { skipSync: skipSync = ![] } = {}) => {
+    const args = typeof getNodeData === 'function' ? getNodeData() || {} : {},
+      index = commitFieldValue(item, key, args),
+      args2 =
+        index && typeof index === 'object'
+          ? index
+          : typeof getNodeData === 'function'
+            ? getNodeData() || args
+            : args;
+    return (!skipSync && syncModelUiSchemaControls(root, { ...args, ...args2 }), args2);
   };
-  let _0x313241 = null,
-    _0x1a0e97 = ![],
-    _0x113407 = null,
-    _0x1002ba = ![],
-    _0x167a77 = null,
-    _0x1775e2 = 0x0;
-  const _0x231c8b = new Map(),
-    _0x2630bf = () => {
-      _0x1775e2 += 0x1;
+  let box = null,
+    result = ![],
+    box2 = null,
+    data = ![],
+    box3 = null,
+    options = 0x0;
+  const map = new Map(),
+    invalidatePendingMenuRestore = () => {
+      options += 0x1;
     },
-    _0x456bf7 = (_0x26d74f) =>
-      _0x26d74f?.['classList']?.['contains']('ui-schema-duration-pop') ? 'flex' : 'block',
-    _0x4fa3e7 = (_0x3bd65e) => {
-      if (!_0x3bd65e) return;
-      (_0x3bd65e['classList']?.['remove']?.('is-closing'),
-        _0x3bd65e['setAttribute']?.('aria-hidden', 'false'),
-        _0x3bd65e['closest']?.('.ui-schema-pill-menu')
+    handler = (el) => (el?.['classList']?.['contains']('ui-schema-duration-pop') ? 'flex' : 'block'),
+    handler2 = (el2) => {
+      if (!el2) return;
+      (el2['classList']?.['remove']?.('is-closing'),
+        el2['setAttribute']?.('aria-hidden', 'false'),
+        el2['closest']?.('.ui-schema-pill-menu')
           ?.['querySelector']?.('[data-ui-schema-menu-trigger]')
           ?.['setAttribute']?.('aria-expanded', 'true'));
-      if (_0x3bd65e['classList']?.['contains']('floating-menu')) {
-        ((_0x3bd65e['style']['display'] = ''), _0x3bd65e['classList']?.['add']?.('show'));
+      if (el2['classList']?.['contains']('floating-menu')) {
+        ((el2['style']['display'] = ''), el2['classList']?.['add']?.('show'));
         return;
       }
-      ((_0x3bd65e['style']['display'] = _0x456bf7(_0x3bd65e)), _0x3bd65e['classList']?.['add']?.('show'));
+      ((el2['style']['display'] = handler(el2)), el2['classList']?.['add']?.('show'));
     },
-    _0x2b516e = (_0xc3822, _0x19269e = {}) => {
-      if (!_0xc3822) return;
-      const _0xc9fcd0 = _0xc3822['classList']?.['contains']('floating-menu'),
-        _0x7623d0 = _0xc9fcd0
-          ? _0xc3822['classList']?.['contains']('show')
-          : _0xc3822['style']['display'] !== 'none' || _0xc3822['classList']?.['contains']('show');
-      (_0xc3822['classList']?.['remove']('show'),
-        _0xc3822['setAttribute']?.('aria-hidden', 'true'),
-        _0xc3822['closest']?.('.ui-schema-pill-menu')
+    handler3 = (el3, target = {}) => {
+      if (!el3) return;
+      const source = el3['classList']?.['contains']('floating-menu'),
+        enabled = source
+          ? el3['classList']?.['contains']('show')
+          : el3['style']['display'] !== 'none' || el3['classList']?.['contains']('show');
+      (el3['classList']?.['remove']('show'),
+        el3['setAttribute']?.('aria-hidden', 'true'),
+        el3['closest']?.('.ui-schema-pill-menu')
           ?.['querySelector']?.('[data-ui-schema-menu-trigger]')
           ?.['setAttribute']?.('aria-expanded', 'false'));
-      if (_0x19269e?.['immediate']) {
-        _0xc3822['classList']?.['remove']('is-closing');
-        _0xc9fcd0 ? (_0xc3822['style']['display'] = '') : (_0xc3822['style']['display'] = 'none');
+      if (target?.['immediate']) {
+        el3['classList']?.['remove']('is-closing');
+        source ? (el3['style']['display'] = '') : (el3['style']['display'] = 'none');
         return;
       }
-      if (_0xc3822['classList']?.['contains']('is-closing')) return;
-      if (!_0x7623d0) {
-        if (_0xc9fcd0) _0xc3822['style']['display'] = '';
-        else _0xc3822['style']['display'] = 'none';
+      if (el3['classList']?.['contains']('is-closing')) return;
+      if (!enabled) {
+        if (source) el3['style']['display'] = '';
+        else el3['style']['display'] = 'none';
         return;
       }
-      (_0xc3822['classList']?.['add']('is-closing'),
+      (el3['classList']?.['add']('is-closing'),
         setTimeout(() => {
-          if (!_0xc3822['classList']?.['contains']('is-closing')) return;
-          (_0xc3822['classList']['remove']('is-closing'),
-            _0xc9fcd0 ? (_0xc3822['style']['display'] = '') : (_0xc3822['style']['display'] = 'none'));
-        }, _0x2dfb47));
+          if (!el3['classList']?.['contains']('is-closing')) return;
+          (el3['classList']['remove']('is-closing'),
+            source ? (el3['style']['display'] = '') : (el3['style']['display'] = 'none'));
+        }, UI_SCHEMA_POPUP_EXIT_MS));
     },
-    _0x52aabe = (_0x15d5d1 = {}) => {
-      const _0x4827c9 = _0x15d5d1?.['except'] || null;
-      _0x1d9d33['querySelectorAll']('.ui-schema-floating-menu, .ui-schema-popup')['forEach']((_0x106c9c) => {
-        if (_0x106c9c === _0x4827c9) return;
-        _0x2b516e(_0x106c9c, _0x15d5d1);
+    handler4 = (options2 = {}) => {
+      const next = options2?.['except'] || null;
+      root['querySelectorAll']('.ui-schema-floating-menu, .ui-schema-popup')['forEach']((current) => {
+        if (current === next) return;
+        handler3(current, options2);
       });
     },
-    _0xcc68a = (_0x463863, _0x4eced8) => {
-      const _0x3328ad = _0x463863?.['closest']?.('[data-ui-schema-composite-field]') || null,
-        _0x5f43c1 = String(_0x3328ad?.['dataset']?.['uiSchemaCompositeField'] || '')['trim'](),
-        _0x489bbb = String(_0x463863?.['dataset']?.['uiSchemaField'] || '')['trim']();
-      return { compositeField: _0x5f43c1, fieldId: _0x489bbb, menu: _0x4eced8 };
+    handler5 = (el4, menu) => {
+      const el5 = el4?.['closest']?.('[data-ui-schema-composite-field]') || null,
+        compositeField = String(el5?.['dataset']?.['uiSchemaCompositeField'] || '')['trim'](),
+        fieldId = String(el4?.['dataset']?.['uiSchemaField'] || '')['trim']();
+      return { compositeField: compositeField, fieldId: fieldId, menu: menu };
     },
-    _0xf11e84 = (_0x1e610f) => {
-      if (!_0x1e610f) return null;
-      if (_0x1e610f['menu'] && _0x1e610f['menu']['isConnected'] !== ![]) return _0x1e610f['menu'];
-      if (_0x1e610f['compositeField']) {
-        const _0x1a3bb3 = Array['from'](
-            _0x1d9d33['querySelectorAll']?.('[data-ui-schema-composite-field]') || [],
-          )['find'](
-            (_0xffa22) =>
-              String(_0xffa22?.['dataset']?.['uiSchemaCompositeField'] || '')['trim']() ===
-              _0x1e610f['compositeField'],
-          ),
-          _0x511e15 = _0x1a3bb3?.['querySelector']?.('.ui-schema-popup');
-        if (_0x511e15) return _0x511e15;
-      }
-      if (_0x1e610f['fieldId']) {
-        const _0x522ea7 = Array['from'](_0x1d9d33['querySelectorAll']?.('[data-ui-schema-field]') || [])[
+    handler6 = (enabled2) => {
+      if (!enabled2) return null;
+      if (enabled2['menu'] && enabled2['menu']['isConnected'] !== ![]) return enabled2['menu'];
+      if (enabled2['compositeField']) {
+        const el6 = Array['from'](root['querySelectorAll']?.('[data-ui-schema-composite-field]') || [])[
             'find'
           ](
-            (_0x38447f) =>
-              String(_0x38447f?.['dataset']?.['uiSchemaField'] || '')['trim']() === _0x1e610f['fieldId'],
+            (el7) =>
+              String(el7?.['dataset']?.['uiSchemaCompositeField'] || '')['trim']() ===
+              enabled2['compositeField'],
           ),
-          _0x2a1522 =
-            _0x522ea7?.['querySelector']?.('.ui-schema-popup') ||
-            _0x522ea7?.['closest']?.('[data-ui-schema-composite-field]')?.['querySelector']?.(
-              '.ui-schema-popup',
-            );
-        if (_0x2a1522) return _0x2a1522;
+          entry = el6?.['querySelector']?.('.ui-schema-popup');
+        if (entry) return entry;
+      }
+      if (enabled2['fieldId']) {
+        const el8 = Array['from'](root['querySelectorAll']?.('[data-ui-schema-field]') || [])['find'](
+            (el9) => String(el9?.['dataset']?.['uiSchemaField'] || '')['trim']() === enabled2['fieldId'],
+          ),
+          record =
+            el8?.['querySelector']?.('.ui-schema-popup') ||
+            el8?.['closest']?.('[data-ui-schema-composite-field]')?.['querySelector']?.('.ui-schema-popup');
+        if (record) return record;
       }
       return null;
     },
-    _0x27adbc = (_0x1e3744) => {
-      if (!_0x1e3744 || _0x1e3744['classList']?.['contains']('is-closing')) return ![];
-      if (_0x1e3744['classList']?.['contains']('floating-menu'))
-        return _0x1e3744['classList']['contains']('show');
-      return _0x1e3744['style']['display'] !== 'none';
+    handler7 = (el10) => {
+      if (!el10 || el10['classList']?.['contains']('is-closing')) return ![];
+      if (el10['classList']?.['contains']('floating-menu')) return el10['classList']['contains']('show');
+      return el10['style']['display'] !== 'none';
     },
-    _0x8a5b2e = (_0x341df6) => {
-      const _0xde1345 = _0x231c8b['get'](_0x341df6);
-      if (_0xde1345?.['timer']) clearTimeout(_0xde1345['timer']);
-      _0x231c8b['delete'](_0x341df6);
+    handler8 = (payload) => {
+      const handle = map['get'](payload);
+      if (handle?.['timer']) clearTimeout(handle['timer']);
+      map['delete'](payload);
     },
-    _0xdfc1c1 = () => {
-      Array['from'](_0x231c8b['entries']())['forEach'](([_0x5d39ce, _0x4e169f]) => {
-        if (_0x4e169f?.['timer']) clearTimeout(_0x4e169f['timer']);
-        (_0x231c8b['delete'](_0x5d39ce), _0x14c2af(_0x5d39ce, _0x4e169f?.['value'] ?? ''));
+    handler9 = () => {
+      Array['from'](map['entries']())['forEach'](([state, el11]) => {
+        if (el11?.['timer']) clearTimeout(el11['timer']);
+        (map['delete'](state), commitValue(state, el11?.['value'] ?? ''));
       });
     },
-    _0x5eaa1c = (_0x7aea1c, _0x22105c) => {
-      _0x8a5b2e(_0x7aea1c);
-      const _0x4154d5 = setTimeout(() => {
-        (_0x231c8b['delete'](_0x7aea1c), _0x14c2af(_0x7aea1c, _0x22105c));
+    handler10 = (config, value2) => {
+      handler8(config);
+      const timer = setTimeout(() => {
+        (map['delete'](config), commitValue(config, value2));
       }, 0xb4);
-      _0x231c8b['set'](_0x7aea1c, { timer: _0x4154d5, value: _0x22105c });
+      map['set'](config, { timer: timer, value: value2 });
     },
-    _0x318270 = (_0x45d9c6) => {
-      const _0x9d4dbd = String(
-          _0x45d9c6?.['closest']?.('[data-ui-schema-field]')?.['dataset']?.['uiSchemaType'] || '',
-        )
+    handler11 = (el12) => {
+      const scope = String(el12?.['closest']?.('[data-ui-schema-field]')?.['dataset']?.['uiSchemaType'] || '')
           ['trim']()
           ['toLowerCase'](),
-        _0x46c683 = String(_0x45d9c6?.['tagName'] || '')
+        input = String(el12?.['tagName'] || '')
           ['trim']()
           ['toLowerCase'](),
-        _0x44ea4a = String(_0x45d9c6?.['type'] || '')
+        output = String(el12?.['type'] || '')
           ['trim']()
           ['toLowerCase']();
-      return (
-        _0x9d4dbd === 'text' || _0x9d4dbd === 'textarea' || _0x46c683 === 'textarea' || _0x44ea4a === 'text'
-      );
+      return scope === 'text' || scope === 'textarea' || input === 'textarea' || output === 'text';
     },
-    _0x4a44ef = (_0x384ce3) => {
-      if (!_0x384ce3?.['addEventListener']) return ![];
-      let _0x32c22d = null;
-      const _0x77b525 = () => {
-          (_0x384ce3['removeEventListener']('click', _0x2e364f, !![]),
-            _0x32c22d && (clearTimeout(_0x32c22d), (_0x32c22d = null)));
+    handler12 = (el13) => {
+      if (!el13?.['addEventListener']) return ![];
+      let setTimeout2 = null;
+      const run = () => {
+          (el13['removeEventListener']('click', value3, !![]),
+            setTimeout2 && (clearTimeout(setTimeout2), (setTimeout2 = null)));
         },
-        _0x2e364f = (_0x4c9d1a) => {
-          (_0x4c9d1a['preventDefault']?.(),
-            _0x4c9d1a['stopPropagation']?.(),
-            _0x4c9d1a['stopImmediatePropagation']?.(),
-            _0x77b525());
+        value3 = (event) => {
+          (event['preventDefault']?.(),
+            event['stopPropagation']?.(),
+            event['stopImmediatePropagation']?.(),
+            run());
         };
-      return (
-        _0x384ce3['addEventListener']('click', _0x2e364f, !![]),
-        (_0x32c22d = setTimeout(_0x77b525, 0x15e)),
-        !![]
-      );
+      return (el13['addEventListener']('click', value3, !![]), (setTimeout2 = setTimeout(run, 0x15e)), !![]);
     },
-    _0x67fd0a = (_0x1fa130, _0x4083b3) => {
-      const _0x4acfe5 = Number(_0x1fa130);
-      return Number['isFinite'](_0x4acfe5) ? _0x4acfe5 : _0x4083b3;
+    handler13 = (value4, value5) => {
+      const value6 = Number(value4);
+      return Number['isFinite'](value6) ? value6 : value5;
     },
-    _0xdce99c = () => {
-      const _0x87b802 = globalThis['crypto'] || globalThis['window']?.['crypto'];
-      if (_0x87b802?.['getRandomValues']) {
-        const _0x47764c = new Uint32Array(0x1);
-        return (_0x87b802['getRandomValues'](_0x47764c), _0x47764c[0x0] / 0x100000000);
+    handler14 = () => {
+      const value7 = globalThis['crypto'] || globalThis['window']?.['crypto'];
+      if (value7?.['getRandomValues']) {
+        const uint32Array = new Uint32Array(0x1);
+        return (value7['getRandomValues'](uint32Array), uint32Array[0x0] / 0x100000000);
       }
       return Math['random']();
     },
-    _0xf594a7 = (_0x55f804) => {
-      const _0x373d85 = Math['trunc'](
-          _0x67fd0a(_0x55f804?.['dataset']?.['uiSchemaRandomSeedMin'], _0x8f9d6b),
+    generateRandomSeedForField = (el14) => {
+      const value8 = Math['trunc'](
+          handler13(el14?.['dataset']?.['uiSchemaRandomSeedMin'], RANDOM_SEED_DEFAULT_MIN),
         ),
-        _0x184501 = Math['trunc'](_0x67fd0a(_0x55f804?.['dataset']?.['uiSchemaRandomSeedMax'], _0x15b754)),
-        _0x1b5a58 = Math['min'](_0x373d85, _0x184501),
-        _0x565392 = Math['max'](_0x373d85, _0x184501);
-      return String(_0x1b5a58 + Math['floor'](_0xdce99c() * (_0x565392 - _0x1b5a58 + 0x1)));
+        value9 = Math['trunc'](
+          handler13(el14?.['dataset']?.['uiSchemaRandomSeedMax'], RANDOM_SEED_DEFAULT_MAX),
+        ),
+        value10 = Math['min'](value8, value9),
+        value11 = Math['max'](value8, value9);
+      return String(value10 + Math['floor'](handler14() * (value11 - value10 + 0x1)));
     },
-    _0x23c05c = (_0x555bf5, _0x5484f6) => {
-      const _0x2d9c4e = _0x67fd0a(_0x555bf5?.['dataset']?.['uiSchemaDefault'], 0x0),
-        _0x4439b7 = _0x67fd0a(_0x555bf5?.['dataset']?.['uiSchemaMin'], -Infinity),
-        _0x1ee073 = _0x67fd0a(_0x555bf5?.['dataset']?.['uiSchemaMax'], Infinity),
-        _0x4c2ead = _0x274ac2(_0x5484f6),
-        _0x261f06 = _0x555bf5?.['dataset']?.['uiSchemaNumberMode'] === 'float',
-        _0x375c71 = Number['isFinite'](_0x4c2ead)
-          ? _0x261f06
-            ? _0x4c2ead
-            : Math['trunc'](_0x4c2ead)
-          : _0x2d9c4e;
-      return Math['max'](_0x4439b7, Math['min'](_0x1ee073, _0x375c71));
+    handler15 = (el15, value12) => {
+      const value13 = handler13(el15?.['dataset']?.['uiSchemaDefault'], 0x0),
+        value14 = handler13(el15?.['dataset']?.['uiSchemaMin'], -Infinity),
+        value15 = handler13(el15?.['dataset']?.['uiSchemaMax'], Infinity),
+        value16 = evaluateUiSchemaNumberExpression(value12),
+        value17 = el15?.['dataset']?.['uiSchemaNumberMode'] === 'float',
+        value18 = Number['isFinite'](value16) ? (value17 ? value16 : Math['trunc'](value16)) : value13;
+      return Math['max'](value14, Math['min'](value15, value18));
     },
-    _0x4f0699 = (_0x4cfae5, _0x2f5146) => {
-      const _0x36bc4a = String(_0x4cfae5?.['dataset']?.['uiSchemaField'] || '')['trim']();
-      return _0x36bc4a === 'rhVideoFrames' && Number(_0x2f5146) === 0x0
-        ? _0x33d09d('aigenImage.uiSchema.fullLength')
-        : String(_0x2f5146);
+    handler16 = (el16, value19) => {
+      const value20 = String(el16?.['dataset']?.['uiSchemaField'] || '')['trim']();
+      return value20 === 'rhVideoFrames' && Number(value19) === 0x0
+        ? t('aigenImage.uiSchema.fullLength')
+        : String(value19);
     },
-    _0x35437d = (_0x456861, _0x484814) => {
-      const _0x8b4287 = _0x23c05c(_0x456861, _0x484814),
-        _0x552d17 = _0x456861?.['querySelector']?.('.rh-stepper-value');
+    setRhVideoStepperValueEl = (el17, value21) => {
+      const value22 = handler15(el17, value21),
+        el18 = el17?.['querySelector']?.('.rh-stepper-value');
       return (
-        _0x552d17 &&
-          ((_0x552d17['textContent'] = _0x4f0699(_0x456861, _0x8b4287)),
-          _0x552d17['setAttribute']('aria-valuenow', String(_0x8b4287))),
-        _0x8b4287
+        el18 &&
+          ((el18['textContent'] = handler16(el17, value22)),
+          el18['setAttribute']('aria-valuenow', String(value22))),
+        value22
       );
     },
-    _0x3fef09 = (_0x299b04, _0x5e6294) => {
-      const _0x2aea79 = Number(_0x5e6294);
-      if (!Number['isFinite'](_0x2aea79)) return String(_0x5e6294 ?? '');
-      if (_0x299b04?.['dataset']?.['uiSchemaNumberMode'] === 'float')
-        return String(Number(_0x2aea79['toFixed'](0xa)));
-      return String(Math['trunc'](_0x2aea79));
+    handler17 = (el19, value23) => {
+      const value24 = Number(value23);
+      if (!Number['isFinite'](value24)) return String(value23 ?? '');
+      if (el19?.['dataset']?.['uiSchemaNumberMode'] === 'float')
+        return String(Number(value24['toFixed'](0xa)));
+      return String(Math['trunc'](value24));
     },
-    _0x188e28 = (_0x452cd8, _0x55f367) => {
-      const _0x42884f = _0x23c05c(_0x452cd8, _0x55f367),
-        _0x45ce45 = _0x452cd8?.['querySelector']?.('.ui-schema-rh-aiapp-footer-input');
-      if (_0x45ce45) _0x45ce45['value'] = _0x3fef09(_0x452cd8, _0x42884f);
-      return (_0x13c453(_0x452cd8, _0x42884f), _0x42884f);
+    handler18 = (el20, value25) => {
+      const value26 = handler15(el20, value25),
+        el21 = el20?.['querySelector']?.('.ui-schema-rh-aiapp-footer-input');
+      if (el21) el21['value'] = handler17(el20, value26);
+      return (syncRhAiAppFooterParamField(el20, value26), value26);
     },
-    _0x4680ee = (_0x48435e) => {
-      const _0x1e05c6 = String(_0x48435e?.['dataset']?.['uiSchemaField'] || '')['trim'](),
-        _0x5948e4 = typeof _0x17a8f5 === 'function' ? _0x17a8f5() || {} : {};
-      return _0x23c05c(
-        _0x48435e,
-        _0x42b8cf(_0x5948e4, _0x1e05c6, _0x48435e?.['dataset']?.['uiSchemaDefault'] ?? 0x0),
+    handler19 = (el22) => {
+      const value27 = String(el22?.['dataset']?.['uiSchemaField'] || '')['trim'](),
+        value28 = typeof getNodeData === 'function' ? getNodeData() || {} : {};
+      return handler15(
+        el22,
+        getNodeFieldValue(value28, value27, el22?.['dataset']?.['uiSchemaDefault'] ?? 0x0),
       );
     },
-    _0x64de26 = (_0x561f23, _0x1503f0) => {
-      const _0x51a347 = _0x561f23?.['target']?.['closest']?.(
-          '[data-ui-schema-field][data-ui-schema-adapter]',
-        ),
-        _0xbe2bd1 = String(_0x51a347?.['dataset']?.['uiSchemaAdapter'] || '')['trim'](),
-        _0x465f53 = _0xbe2bd1 ? _0x3dcdf1(_0xbe2bd1) : null;
-      if (!_0x51a347 || !_0x465f53 || typeof _0x465f53['bind'] !== 'function') return ![];
+    handler20 = (event2, eventName) => {
+      const fieldEl = event2?.['target']?.['closest']?.('[data-ui-schema-field][data-ui-schema-adapter]'),
+        value29 = String(fieldEl?.['dataset']?.['uiSchemaAdapter'] || '')['trim'](),
+        enabled3 = value29 ? getUiSchemaFieldAdapterDefinition(value29) : null;
+      if (!fieldEl || !enabled3 || typeof enabled3['bind'] !== 'function') return ![];
       return (
-        _0x465f53['bind']({
-          event: _0x561f23,
-          eventName: _0x1503f0,
-          root: _0x1d9d33,
-          fieldEl: _0x51a347,
+        enabled3['bind']({
+          event: event2,
+          eventName: eventName,
+          root: root,
+          fieldEl: fieldEl,
           helpers: {
-            commitValue: _0x14c2af,
-            generateRandomSeedForField: _0xf594a7,
-            setRhVideoStepperValueEl: _0x35437d,
+            commitValue: commitValue,
+            generateRandomSeedForField: generateRandomSeedForField,
+            setRhVideoStepperValueEl: setRhVideoStepperValueEl,
           },
         }) === !![]
       );
     },
-    _0x54577b = (_0x51729b) => {
-      const _0x81831d = String(_0x51729b?.['dataset']?.['uiSchemaField'] || '')['trim'](),
-        _0x264cd3 = typeof _0x17a8f5 === 'function' ? _0x17a8f5() || {} : {};
-      return _0x23c05c(
-        _0x51729b,
-        _0x42b8cf(_0x264cd3, _0x81831d, _0x51729b?.['dataset']?.['uiSchemaDefault'] ?? 0x0),
+    handler21 = (el23) => {
+      const value30 = String(el23?.['dataset']?.['uiSchemaField'] || '')['trim'](),
+        value31 = typeof getNodeData === 'function' ? getNodeData() || {} : {};
+      return handler15(
+        el23,
+        getNodeFieldValue(value31, value30, el23?.['dataset']?.['uiSchemaDefault'] ?? 0x0),
       );
     },
-    _0xa61f30 = (_0x5d490b) => {
-      const _0x338812 = _0x5d490b?.['closest']?.('.ui-schema-rh-video-stepper'),
-        _0x4ef20d = String(_0x338812?.['dataset']?.['uiSchemaField'] || '')['trim']();
-      if (!_0x338812 || !_0x4ef20d) return;
-      const _0x6c516e = _0x54577b(_0x338812),
-        _0x40327c = _0x1d9d33['ownerDocument']?.['createElement']?.('input');
-      if (!_0x40327c) return;
-      ((_0x40327c['className'] = 'rh-stepper-input'),
-        (_0x40327c['type'] = 'text'),
-        (_0x40327c['autocomplete'] = 'off'),
-        (_0x40327c['step'] = String(_0x338812['dataset']['uiSchemaStep'] || '1')),
-        (_0x40327c['min'] = String(_0x338812['dataset']['uiSchemaMin'] || '0')),
-        (_0x40327c['max'] = String(_0x338812['dataset']['uiSchemaMax'] || '')),
-        (_0x40327c['value'] = String(_0x6c516e)));
-      let _0x4308ed = ![];
-      const _0x2d3e11 = (_0x16a81e) => {
-        if (_0x4308ed) return;
-        _0x4308ed = !![];
-        const _0x556f2e = _0x16a81e ? _0x23c05c(_0x338812, _0x40327c['value']) : _0x6c516e,
-          _0x59a909 = _0x1d9d33['ownerDocument']['createElement']('div');
-        ((_0x59a909['className'] = 'rh-stepper-value'),
-          _0x59a909['setAttribute']('role', 'spinbutton'),
-          _0x59a909['setAttribute']('tabindex', '0'),
-          _0x59a909['setAttribute'](
+    handler22 = (el24) => {
+      const el25 = el24?.['closest']?.('.ui-schema-rh-video-stepper'),
+        enabled4 = String(el25?.['dataset']?.['uiSchemaField'] || '')['trim']();
+      if (!el25 || !enabled4) return;
+      const value32 = handler21(el25),
+        el26 = root['ownerDocument']?.['createElement']?.('input');
+      if (!el26) return;
+      ((el26['className'] = 'rh-stepper-input'),
+        (el26['type'] = 'text'),
+        (el26['autocomplete'] = 'off'),
+        (el26['step'] = String(el25['dataset']['uiSchemaStep'] || '1')),
+        (el26['min'] = String(el25['dataset']['uiSchemaMin'] || '0')),
+        (el26['max'] = String(el25['dataset']['uiSchemaMax'] || '')),
+        (el26['value'] = String(value32)));
+      let value33 = ![];
+      const run2 = (value34) => {
+        if (value33) return;
+        value33 = !![];
+        const value35 = value34 ? handler15(el25, el26['value']) : value32,
+          el27 = root['ownerDocument']['createElement']('div');
+        ((el27['className'] = 'rh-stepper-value'),
+          el27['setAttribute']('role', 'spinbutton'),
+          el27['setAttribute']('tabindex', '0'),
+          el27['setAttribute'](
             'aria-label',
-            _0x5d490b['getAttribute']('aria-label') ||
-              _0x338812['querySelector']('.rh-vram-adv-label span')?.['textContent'] ||
-              _0x4ef20d,
+            el24['getAttribute']('aria-label') ||
+              el25['querySelector']('.rh-vram-adv-label span')?.['textContent'] ||
+              enabled4,
           ),
-          (_0x59a909['textContent'] = _0x4f0699(_0x338812, _0x556f2e)),
-          _0x59a909['setAttribute']('aria-valuenow', String(_0x556f2e)),
-          _0x40327c['replaceWith'](_0x59a909));
-        if (_0x16a81e) _0x14c2af(_0x4ef20d, _0x556f2e);
+          (el27['textContent'] = handler16(el25, value35)),
+          el27['setAttribute']('aria-valuenow', String(value35)),
+          el26['replaceWith'](el27));
+        if (value34) commitValue(enabled4, value35);
       };
-      (_0x40327c['addEventListener']('click', (_0x1d3a1e) => _0x1d3a1e['stopPropagation']()),
-        _0x40327c['addEventListener']('mousedown', (_0x458ec6) => _0x458ec6['stopPropagation']()),
-        _0x40327c['addEventListener']('keydown', (_0x1adc63) => {
-          if (_0x1adc63['key'] === 'Enter') _0x2d3e11(!![]);
-          if (_0x1adc63['key'] === 'Escape') _0x2d3e11(![]);
+      (el26['addEventListener']('click', (event3) => event3['stopPropagation']()),
+        el26['addEventListener']('mousedown', (event4) => event4['stopPropagation']()),
+        el26['addEventListener']('keydown', (event5) => {
+          if (event5['key'] === 'Enter') run2(!![]);
+          if (event5['key'] === 'Escape') run2(![]);
         }),
-        _0x40327c['addEventListener']('blur', () => _0x2d3e11(!![])),
-        _0x5d490b['replaceWith'](_0x40327c),
-        _0x40327c['focus'](),
-        _0x40327c['select']());
+        el26['addEventListener']('blur', () => run2(!![])),
+        el24['replaceWith'](el26),
+        el26['focus'](),
+        el26['select']());
     },
-    _0x1fa538 = () => {
-      if (!_0x113407) return;
-      (_0x113407['el']?.['classList']?.['remove']('is-dragging'),
-        _0x113407['doc']?.['removeEventListener']?.('mousemove', _0x221194),
-        _0x113407['doc']?.['removeEventListener']?.('mouseup', _0x4595fd),
-        (_0x113407 = null));
+    handler23 = () => {
+      if (!box2) return;
+      (box2['el']?.['classList']?.['remove']('is-dragging'),
+        box2['doc']?.['removeEventListener']?.('mousemove', value36),
+        box2['doc']?.['removeEventListener']?.('mouseup', value37),
+        (box2 = null));
     },
-    _0x221194 = (_0x4364bd) => {
-      if (!_0x113407) return;
-      const _0x18b210 = _0x4364bd['clientX'] - _0x113407['x'];
-      if (Math['abs'](_0x18b210) >= 0x2) _0x113407['dragged'] = !![];
-      const _0x1c4cf0 = Math['trunc'](_0x18b210 / 0x6),
-        _0x4b74be = _0x67fd0a(_0x113407['fieldEl']?.['dataset']?.['uiSchemaStep'], 0x1),
-        _0x598228 = _0x23c05c(_0x113407['fieldEl'], _0x113407['base'] + _0x1c4cf0 * _0x4b74be);
-      _0x598228 !== _0x113407['last'] &&
-        ((_0x113407['moved'] = !![]),
-        (_0x113407['last'] = _0x598228),
-        _0x35437d(_0x113407['fieldEl'], _0x598228));
+    value36 = (event6) => {
+      if (!box2) return;
+      const value38 = event6['clientX'] - box2['x'];
+      if (Math['abs'](value38) >= 0x2) box2['dragged'] = !![];
+      const value39 = Math['trunc'](value38 / 0x6),
+        value40 = handler13(box2['fieldEl']?.['dataset']?.['uiSchemaStep'], 0x1),
+        value41 = handler15(box2['fieldEl'], box2['base'] + value39 * value40);
+      value41 !== box2['last'] &&
+        ((box2['moved'] = !![]),
+        (box2['last'] = value41),
+        setRhVideoStepperValueEl(box2['fieldEl'], value41));
     },
-    _0x4595fd = () => {
-      if (!_0x113407) return;
-      const _0x129ab1 = _0x113407;
-      (_0x1fa538(),
-        (_0x129ab1['dragged'] || _0x129ab1['moved']) && (_0x1002ba = !_0x4a44ef(_0x129ab1['doc'])),
-        _0x129ab1['moved'] && _0x14c2af(_0x129ab1['fieldId'], _0x129ab1['last']));
+    value37 = () => {
+      if (!box2) return;
+      const value42 = box2;
+      (handler23(),
+        (value42['dragged'] || value42['moved']) && (data = !handler12(value42['doc'])),
+        value42['moved'] && commitValue(value42['fieldId'], value42['last']));
     },
-    _0x5676c5 = () => {
-      if (!_0x167a77) return;
-      (_0x167a77['input']?.['classList']?.['remove']('is-dragging'),
-        _0x167a77['doc']?.['removeEventListener']?.('mousemove', _0x12acbb),
-        _0x167a77['doc']?.['removeEventListener']?.('mouseup', _0x3be310),
-        (_0x167a77 = null));
+    handler24 = () => {
+      if (!box3) return;
+      (box3['input']?.['classList']?.['remove']('is-dragging'),
+        box3['doc']?.['removeEventListener']?.('mousemove', value43),
+        box3['doc']?.['removeEventListener']?.('mouseup', value44),
+        (box3 = null));
     },
-    _0x12acbb = (_0x2dcc91) => {
-      if (!_0x167a77) return;
-      _0x2dcc91['preventDefault']?.();
-      const _0x144524 = _0x2dcc91['clientX'] - _0x167a77['x'];
-      if (Math['abs'](_0x144524) >= 0x2) _0x167a77['dragged'] = !![];
-      const _0x4e9940 = Math['trunc'](_0x144524 / 0x6),
-        _0x39f744 = _0x67fd0a(_0x167a77['fieldEl']?.['dataset']?.['uiSchemaStep'], 0x1),
-        _0x35cfa6 = _0x23c05c(_0x167a77['fieldEl'], _0x167a77['base'] + _0x4e9940 * _0x39f744);
-      _0x35cfa6 !== _0x167a77['last'] &&
-        ((_0x167a77['moved'] = !![]),
-        (_0x167a77['last'] = _0x35cfa6),
-        _0x188e28(_0x167a77['fieldEl'], _0x35cfa6));
+    value43 = (event7) => {
+      if (!box3) return;
+      event7['preventDefault']?.();
+      const value45 = event7['clientX'] - box3['x'];
+      if (Math['abs'](value45) >= 0x2) box3['dragged'] = !![];
+      const value46 = Math['trunc'](value45 / 0x6),
+        value47 = handler13(box3['fieldEl']?.['dataset']?.['uiSchemaStep'], 0x1),
+        value48 = handler15(box3['fieldEl'], box3['base'] + value46 * value47);
+      value48 !== box3['last'] &&
+        ((box3['moved'] = !![]), (box3['last'] = value48), handler18(box3['fieldEl'], value48));
     },
-    _0x3be310 = () => {
-      if (!_0x167a77) return;
-      const _0xfb1ab7 = _0x167a77;
-      _0x5676c5();
-      if (_0xfb1ab7['moved']) {
-        (_0x14c2af(_0xfb1ab7['fieldId'], _0xfb1ab7['last']), _0x4a44ef(_0xfb1ab7['doc']));
+    value44 = () => {
+      if (!box3) return;
+      const enabled5 = box3;
+      handler24();
+      if (enabled5['moved']) {
+        (commitValue(enabled5['fieldId'], enabled5['last']), handler12(enabled5['doc']));
         return;
       }
-      !_0xfb1ab7['dragged'] && (_0xfb1ab7['input']?.['focus']?.(), _0xfb1ab7['input']?.['select']?.());
+      !enabled5['dragged'] && (enabled5['input']?.['focus']?.(), enabled5['input']?.['select']?.());
     },
-    _0x53a657 = (_0x3f661e, _0x2261f5) => {
-      const _0x284932 = _0x67fd0a(_0x3f661e?.['dataset']?.['uiSchemaDefault'], 0x19),
-        _0x43b0e0 = _0x67fd0a(_0x3f661e?.['dataset']?.['uiSchemaMin'], -0x270f),
-        _0x1420a4 = _0x67fd0a(_0x3f661e?.['dataset']?.['uiSchemaMax'], 0x270f),
-        _0x29e363 = _0x5bf43c(_0x2261f5, _0x284932);
-      return Math['max'](_0x43b0e0, Math['min'](_0x1420a4, _0x29e363));
+    handler25 = (el28, value49) => {
+      const value50 = handler13(el28?.['dataset']?.['uiSchemaDefault'], 0x19),
+        value51 = handler13(el28?.['dataset']?.['uiSchemaMin'], -0x270f),
+        value52 = handler13(el28?.['dataset']?.['uiSchemaMax'], 0x270f),
+        value53 = normalizeRhV54MaskExpand(value49, value50);
+      return Math['max'](value51, Math['min'](value52, value53));
     },
-    _0x52825d = (_0x2f5e9b, _0x57a8a2) => {
-      const _0x58afc0 = _0x53a657(_0x2f5e9b, _0x57a8a2),
-        _0x23b1fe = _0x2f5e9b?.['querySelector']?.('.rh-stepper-value');
+    handler26 = (el29, value54) => {
+      const value55 = handler25(el29, value54),
+        el30 = el29?.['querySelector']?.('.rh-stepper-value');
       return (
-        _0x23b1fe &&
-          ((_0x23b1fe['textContent'] = String(_0x58afc0)),
-          _0x23b1fe['setAttribute']('aria-valuenow', String(_0x58afc0))),
-        _0x58afc0
+        el30 &&
+          ((el30['textContent'] = String(value55)), el30['setAttribute']('aria-valuenow', String(value55))),
+        value55
       );
     },
-    _0x196bc4 = (_0xa1676) => {
-      const _0x311efb = String(_0xa1676?.['dataset']?.['uiSchemaField'] || '')['trim'](),
-        _0x17858c = typeof _0x17a8f5 === 'function' ? _0x17a8f5() || {} : {};
-      return _0x53a657(
-        _0xa1676,
-        _0x42b8cf(_0x17858c, _0x311efb, _0xa1676?.['dataset']?.['uiSchemaDefault'] ?? 0x19),
+    handler27 = (el31) => {
+      const value56 = String(el31?.['dataset']?.['uiSchemaField'] || '')['trim'](),
+        value57 = typeof getNodeData === 'function' ? getNodeData() || {} : {};
+      return handler25(
+        el31,
+        getNodeFieldValue(value57, value56, el31?.['dataset']?.['uiSchemaDefault'] ?? 0x19),
       );
     },
-    _0x49ccec = (_0x5130cd) => {
-      const _0x485eba = _0x5130cd?.['closest']?.('.ui-schema-rh-v54-mask-expand'),
-        _0x3772c1 = String(_0x485eba?.['dataset']?.['uiSchemaField'] || '')['trim']();
-      if (!_0x485eba || !_0x3772c1 || _0x485eba['classList']?.['contains']('is-rh-disabled')) return;
-      const _0x436109 = _0x196bc4(_0x485eba),
-        _0x2a0443 = _0x1d9d33['ownerDocument']?.['createElement']?.('input');
-      if (!_0x2a0443) return;
-      ((_0x2a0443['className'] = 'rh-stepper-input'),
-        (_0x2a0443['type'] = 'number'),
-        (_0x2a0443['step'] = String(_0x485eba['dataset']['uiSchemaStep'] || '1')),
-        (_0x2a0443['min'] = String(_0x485eba['dataset']['uiSchemaMin'] || '-9999')),
-        (_0x2a0443['max'] = String(_0x485eba['dataset']['uiSchemaMax'] || '9999')),
-        (_0x2a0443['value'] = String(_0x436109)));
-      let _0x2e52e2 = ![];
-      const _0x1506f4 = (_0x39d1a3) => {
-        if (_0x2e52e2) return;
-        _0x2e52e2 = !![];
-        const _0xfb1e72 = _0x39d1a3 ? _0x53a657(_0x485eba, _0x2a0443['value']) : _0x436109,
-          _0x26f429 = _0x1d9d33['ownerDocument']['createElement']('div');
-        ((_0x26f429['className'] = 'rh-stepper-value'),
-          _0x26f429['setAttribute']('role', 'spinbutton'),
-          _0x26f429['setAttribute']('tabindex', '0'),
-          _0x26f429['setAttribute'](
+    handler28 = (el32) => {
+      const el33 = el32?.['closest']?.('.ui-schema-rh-v54-mask-expand'),
+        enabled6 = String(el33?.['dataset']?.['uiSchemaField'] || '')['trim']();
+      if (!el33 || !enabled6 || el33['classList']?.['contains']('is-rh-disabled')) return;
+      const value58 = handler27(el33),
+        el34 = root['ownerDocument']?.['createElement']?.('input');
+      if (!el34) return;
+      ((el34['className'] = 'rh-stepper-input'),
+        (el34['type'] = 'number'),
+        (el34['step'] = String(el33['dataset']['uiSchemaStep'] || '1')),
+        (el34['min'] = String(el33['dataset']['uiSchemaMin'] || '-9999')),
+        (el34['max'] = String(el33['dataset']['uiSchemaMax'] || '9999')),
+        (el34['value'] = String(value58)));
+      let value59 = ![];
+      const run3 = (value60) => {
+        if (value59) return;
+        value59 = !![];
+        const value61 = value60 ? handler25(el33, el34['value']) : value58,
+          el35 = root['ownerDocument']['createElement']('div');
+        ((el35['className'] = 'rh-stepper-value'),
+          el35['setAttribute']('role', 'spinbutton'),
+          el35['setAttribute']('tabindex', '0'),
+          el35['setAttribute'](
             'aria-label',
-            _0x5130cd['getAttribute']('aria-label') || _0x33d09d('aigenImage.uiSchema.maskExpandValue'),
+            el32['getAttribute']('aria-label') || t('aigenImage.uiSchema.maskExpandValue'),
           ),
-          (_0x26f429['textContent'] = String(_0xfb1e72)),
-          _0x26f429['setAttribute']('aria-valuenow', String(_0xfb1e72)),
-          _0x2a0443['replaceWith'](_0x26f429));
-        if (_0x39d1a3) _0x14c2af(_0x3772c1, _0xfb1e72);
+          (el35['textContent'] = String(value61)),
+          el35['setAttribute']('aria-valuenow', String(value61)),
+          el34['replaceWith'](el35));
+        if (value60) commitValue(enabled6, value61);
       };
-      (_0x2a0443['addEventListener']('click', (_0x3a113f) => _0x3a113f['stopPropagation']()),
-        _0x2a0443['addEventListener']('mousedown', (_0x29ce90) => _0x29ce90['stopPropagation']()),
-        _0x2a0443['addEventListener']('keydown', (_0x57b0c5) => {
-          if (_0x57b0c5['key'] === 'Enter') _0x1506f4(!![]);
-          if (_0x57b0c5['key'] === 'Escape') _0x1506f4(![]);
+      (el34['addEventListener']('click', (event8) => event8['stopPropagation']()),
+        el34['addEventListener']('mousedown', (event9) => event9['stopPropagation']()),
+        el34['addEventListener']('keydown', (event10) => {
+          if (event10['key'] === 'Enter') run3(!![]);
+          if (event10['key'] === 'Escape') run3(![]);
         }),
-        _0x2a0443['addEventListener']('blur', () => _0x1506f4(!![])),
-        _0x5130cd['replaceWith'](_0x2a0443),
-        _0x2a0443['focus'](),
-        _0x2a0443['select']());
+        el34['addEventListener']('blur', () => run3(!![])),
+        el32['replaceWith'](el34),
+        el34['focus'](),
+        el34['select']());
     },
-    _0x164767 = () => {
-      if (!_0x313241) return;
-      (_0x313241['el']?.['classList']?.['remove']('is-dragging'),
-        _0x313241['doc']?.['removeEventListener']?.('mousemove', _0x2f965e),
-        _0x313241['doc']?.['removeEventListener']?.('mouseup', _0x28f476),
-        (_0x313241 = null));
+    handler29 = () => {
+      if (!box) return;
+      (box['el']?.['classList']?.['remove']('is-dragging'),
+        box['doc']?.['removeEventListener']?.('mousemove', value62),
+        box['doc']?.['removeEventListener']?.('mouseup', value63),
+        (box = null));
     },
-    _0x2f965e = (_0xebaba4) => {
-      if (!_0x313241) return;
-      const _0x1c40aa = _0xebaba4['clientX'] - _0x313241['x'];
-      if (Math['abs'](_0x1c40aa) >= 0x2) _0x313241['dragged'] = !![];
-      const _0x1b5e7a = Math['trunc'](_0x1c40aa / 0x6),
-        _0x5af56c = _0x53a657(_0x313241['fieldEl'], _0x313241['base'] + _0x1b5e7a);
-      _0x5af56c !== _0x313241['last'] &&
-        ((_0x313241['moved'] = !![]),
-        (_0x313241['last'] = _0x5af56c),
-        _0x52825d(_0x313241['fieldEl'], _0x5af56c));
+    value62 = (event11) => {
+      if (!box) return;
+      const value64 = event11['clientX'] - box['x'];
+      if (Math['abs'](value64) >= 0x2) box['dragged'] = !![];
+      const value65 = Math['trunc'](value64 / 0x6),
+        value66 = handler25(box['fieldEl'], box['base'] + value65);
+      value66 !== box['last'] &&
+        ((box['moved'] = !![]), (box['last'] = value66), handler26(box['fieldEl'], value66));
     },
-    _0x28f476 = () => {
-      if (!_0x313241) return;
-      const _0x27e06f = _0x313241;
-      (_0x164767(),
-        (_0x27e06f['dragged'] || _0x27e06f['moved']) && (_0x1a0e97 = !_0x4a44ef(_0x27e06f['doc'])),
-        _0x27e06f['moved'] && _0x14c2af(_0x27e06f['fieldId'], _0x27e06f['last']));
+    value63 = () => {
+      if (!box) return;
+      const value67 = box;
+      (handler29(),
+        (value67['dragged'] || value67['moved']) && (result = !handler12(value67['doc'])),
+        value67['moved'] && commitValue(value67['fieldId'], value67['last']));
     },
-    _0x231619 = (_0x5ae6e1, _0x5d59df = null) => {
-      const _0x2f795c = _0x5ae6e1['target']?.['closest']?.(
+    handleMouseDown = (x, value68 = null) => {
+      const input2 = x['target']?.['closest']?.(
         '.ui-schema-rh-aiapp-footer-param--input .ui-schema-rh-aiapp-footer-input',
       );
-      if (_0x2f795c && _0x5ae6e1['button'] === 0x0) {
-        const _0x4332cc = _0x2f795c['closest']('.ui-schema-rh-aiapp-footer-param--input') || _0x5d59df,
-          _0x40ff03 = String(_0x4332cc?.['dataset']?.['uiSchemaField'] || '')['trim']();
+      if (input2 && x['button'] === 0x0) {
+        const fieldEl2 = input2['closest']('.ui-schema-rh-aiapp-footer-param--input') || value68,
+          fieldId2 = String(fieldEl2?.['dataset']?.['uiSchemaField'] || '')['trim']();
         if (
-          !_0x4332cc ||
-          !_0x40ff03 ||
-          _0x2f795c['disabled'] ||
-          _0x2f795c['getAttribute']?.('aria-disabled') === 'true'
+          !fieldEl2 ||
+          !fieldId2 ||
+          input2['disabled'] ||
+          input2['getAttribute']?.('aria-disabled') === 'true'
         )
           return;
-        const _0x483f16 = _0x1d9d33['ownerDocument'] || globalThis['document'];
-        if (!_0x483f16?.['addEventListener']) return;
-        (_0x5ae6e1['preventDefault'](), _0x5ae6e1['stopPropagation']());
-        const _0x4ec905 = _0x4680ee(_0x4332cc);
-        (_0x5676c5(),
-          (_0x167a77 = {
-            x: _0x5ae6e1['clientX'],
-            base: _0x4ec905,
-            last: _0x4ec905,
+        const doc = root['ownerDocument'] || globalThis['document'];
+        if (!doc?.['addEventListener']) return;
+        (x['preventDefault'](), x['stopPropagation']());
+        const base = handler19(fieldEl2);
+        (handler24(),
+          (box3 = {
+            x: x['clientX'],
+            base: base,
+            last: base,
             moved: ![],
             dragged: ![],
-            fieldEl: _0x4332cc,
-            fieldId: _0x40ff03,
-            input: _0x2f795c,
-            doc: _0x483f16,
+            fieldEl: fieldEl2,
+            fieldId: fieldId2,
+            input: input2,
+            doc: doc,
           }),
-          _0x2f795c['classList']['add']('is-dragging'),
-          _0x483f16['addEventListener']('mousemove', _0x12acbb),
-          _0x483f16['addEventListener']('mouseup', _0x3be310));
+          input2['classList']['add']('is-dragging'),
+          doc['addEventListener']('mousemove', value43),
+          doc['addEventListener']('mouseup', value44));
         return;
       }
-      const _0x18a088 = _0x5ae6e1['target']?.['closest']?.('.ui-schema-rh-video-stepper .rh-stepper-value');
-      if (_0x18a088 && _0x5ae6e1['button'] === 0x0) {
-        const _0x4aa3fe = _0x18a088['closest']('.ui-schema-rh-video-stepper') || _0x5d59df,
-          _0x21fc3e = String(_0x4aa3fe?.['dataset']?.['uiSchemaField'] || '')['trim']();
-        if (!_0x4aa3fe || !_0x21fc3e) return;
-        const _0x4ba762 = _0x1d9d33['ownerDocument'] || globalThis['document'];
-        if (!_0x4ba762) return;
-        (_0x5ae6e1['preventDefault'](), _0x5ae6e1['stopPropagation']());
-        const _0x4208de = _0x54577b(_0x4aa3fe);
-        (_0x1fa538(),
-          (_0x113407 = {
-            x: _0x5ae6e1['clientX'],
-            base: _0x4208de,
-            last: _0x4208de,
+      const el36 = x['target']?.['closest']?.('.ui-schema-rh-video-stepper .rh-stepper-value');
+      if (el36 && x['button'] === 0x0) {
+        const fieldEl3 = el36['closest']('.ui-schema-rh-video-stepper') || value68,
+          fieldId3 = String(fieldEl3?.['dataset']?.['uiSchemaField'] || '')['trim']();
+        if (!fieldEl3 || !fieldId3) return;
+        const doc2 = root['ownerDocument'] || globalThis['document'];
+        if (!doc2) return;
+        (x['preventDefault'](), x['stopPropagation']());
+        const base2 = handler21(fieldEl3);
+        (handler23(),
+          (box2 = {
+            x: x['clientX'],
+            base: base2,
+            last: base2,
             moved: ![],
             dragged: ![],
-            fieldEl: _0x4aa3fe,
-            fieldId: _0x21fc3e,
-            el: _0x18a088,
-            doc: _0x4ba762,
+            fieldEl: fieldEl3,
+            fieldId: fieldId3,
+            el: el36,
+            doc: doc2,
           }),
-          _0x18a088['classList']['add']('is-dragging'),
-          _0x4ba762['addEventListener']('mousemove', _0x221194),
-          _0x4ba762['addEventListener']('mouseup', _0x4595fd));
+          el36['classList']['add']('is-dragging'),
+          doc2['addEventListener']('mousemove', value36),
+          doc2['addEventListener']('mouseup', value37));
         return;
       }
-      const _0x30e2ef = _0x5ae6e1['target']?.['closest']?.('.ui-schema-rh-v54-mask-expand .rh-stepper-value');
-      if (!_0x30e2ef || _0x5ae6e1['button'] !== 0x0) return;
-      const _0x218e77 = _0x30e2ef['closest']('.ui-schema-rh-v54-mask-expand') || _0x5d59df,
-        _0x115f36 = String(_0x218e77?.['dataset']?.['uiSchemaField'] || '')['trim']();
-      if (!_0x218e77 || !_0x115f36 || _0x218e77['classList']?.['contains']('is-rh-disabled')) return;
-      const _0x142af2 = _0x1d9d33['ownerDocument'] || globalThis['document'];
-      if (!_0x142af2) return;
-      (_0x5ae6e1['preventDefault'](), _0x5ae6e1['stopPropagation']());
-      const _0x203901 = _0x196bc4(_0x218e77);
-      (_0x164767(),
-        (_0x313241 = {
-          x: _0x5ae6e1['clientX'],
-          base: _0x203901,
-          last: _0x203901,
+      const el37 = x['target']?.['closest']?.('.ui-schema-rh-v54-mask-expand .rh-stepper-value');
+      if (!el37 || x['button'] !== 0x0) return;
+      const fieldEl4 = el37['closest']('.ui-schema-rh-v54-mask-expand') || value68,
+        fieldId4 = String(fieldEl4?.['dataset']?.['uiSchemaField'] || '')['trim']();
+      if (!fieldEl4 || !fieldId4 || fieldEl4['classList']?.['contains']('is-rh-disabled')) return;
+      const doc3 = root['ownerDocument'] || globalThis['document'];
+      if (!doc3) return;
+      (x['preventDefault'](), x['stopPropagation']());
+      const base3 = handler27(fieldEl4);
+      (handler29(),
+        (box = {
+          x: x['clientX'],
+          base: base3,
+          last: base3,
           moved: ![],
           dragged: ![],
-          fieldEl: _0x218e77,
-          fieldId: _0x115f36,
-          el: _0x30e2ef,
-          doc: _0x142af2,
+          fieldEl: fieldEl4,
+          fieldId: fieldId4,
+          el: el37,
+          doc: doc3,
         }),
-        _0x30e2ef['classList']['add']('is-dragging'),
-        _0x142af2['addEventListener']('mousemove', _0x2f965e),
-        _0x142af2['addEventListener']('mouseup', _0x28f476));
+        el37['classList']['add']('is-dragging'),
+        doc3['addEventListener']('mousemove', value62),
+        doc3['addEventListener']('mouseup', value63));
     },
-    _0x53d78a = (_0x145db8, _0x23c9be = null) => {
-      _0xdfc1c1();
-      const _0x4fe15f = _0x145db8['target']?.['closest']?.('[data-ui-schema-field-help-url]');
-      if (_0x4fe15f) {
-        (_0x145db8['preventDefault'](), _0x145db8['stopPropagation']());
-        const _0x5925e4 = String(_0x4fe15f['dataset']['uiSchemaFieldHelpUrl'] || '')['trim']();
-        if (_0x5925e4) void _0x2a7516(_0x5925e4)['catch'](() => {});
+    handleClick = (event12, value69 = null) => {
+      handler9();
+      const el38 = event12['target']?.['closest']?.('[data-ui-schema-field-help-url]');
+      if (el38) {
+        (event12['preventDefault'](), event12['stopPropagation']());
+        const value70 = String(el38['dataset']['uiSchemaFieldHelpUrl'] || '')['trim']();
+        if (value70) void openExternalLink(value70)['catch'](() => {});
         return;
       }
-      if (_0x64de26(_0x145db8, 'click')) return;
-      const _0x260dd7 = _0x145db8['target']?.['closest']?.('.ui-schema-rh-video-stepper .rh-stepper-value');
-      if (_0x260dd7) {
-        _0x145db8['stopPropagation']();
-        if (_0x1002ba) {
-          _0x1002ba = ![];
+      if (handler20(event12, 'click')) return;
+      const value71 = event12['target']?.['closest']?.('.ui-schema-rh-video-stepper .rh-stepper-value');
+      if (value71) {
+        event12['stopPropagation']();
+        if (data) {
+          data = ![];
           return;
         }
-        _0xa61f30(_0x260dd7);
+        handler22(value71);
         return;
       }
-      const _0x421c44 = _0x145db8['target']?.['closest']?.(
-        '.ui-schema-rh-v54-mask-expand\x20.rh-stepper-value',
-      );
-      if (_0x421c44) {
-        _0x145db8['stopPropagation']();
-        if (_0x1a0e97) {
-          _0x1a0e97 = ![];
+      const value72 = event12['target']?.['closest']?.('.ui-schema-rh-v54-mask-expand\x20.rh-stepper-value');
+      if (value72) {
+        event12['stopPropagation']();
+        if (result) {
+          result = ![];
           return;
         }
-        _0x49ccec(_0x421c44);
+        handler28(value72);
         return;
       }
-      const _0x461961 = _0x145db8['target']?.['closest']?.('[data-ui-schema-menu-trigger]');
-      if (_0x461961) {
-        _0x145db8['stopPropagation']();
-        const _0x26e853 =
-            _0x461961['closest']('[data-ui-schema-field], [data-ui-schema-composite-field]') || _0x23c9be,
-          _0x76d811 =
-            _0x26e853?.['querySelector']('.ui-schema-floating-menu') ||
-            _0x26e853?.['querySelector']('.ui-schema-popup') ||
-            _0x26e853?.['__uiSchemaPortaledPopup'],
-          _0xad3d3f = _0x76d811 ? !_0x27adbc(_0x76d811) : ![];
-        (_0x1d9d33['dispatchEvent'](
+      const el39 = event12['target']?.['closest']?.('[data-ui-schema-menu-trigger]');
+      if (el39) {
+        event12['stopPropagation']();
+        const fieldEl5 =
+            el39['closest']('[data-ui-schema-field], [data-ui-schema-composite-field]') || value69,
+          popup =
+            fieldEl5?.['querySelector']('.ui-schema-floating-menu') ||
+            fieldEl5?.['querySelector']('.ui-schema-popup') ||
+            fieldEl5?.['__uiSchemaPortaledPopup'],
+          shouldOpen = popup ? !handler7(popup) : ![];
+        (root['dispatchEvent'](
           new CustomEvent('ui-schema-menu-before-open', {
-            detail: { fieldEl: _0x26e853, popup: _0x76d811, shouldOpen: _0xad3d3f },
+            detail: { fieldEl: fieldEl5, popup: popup, shouldOpen: shouldOpen },
           }),
         ),
-          _0x1d9d33['querySelectorAll']('.ui-schema-floating-menu')['forEach']((_0x5251e9) => {
-            if (_0x5251e9 !== _0x76d811) _0x2b516e(_0x5251e9);
+          root['querySelectorAll']('.ui-schema-floating-menu')['forEach']((value73) => {
+            if (value73 !== popup) handler3(value73);
           }),
-          _0x1d9d33['querySelectorAll']('.ui-schema-popup')['forEach']((_0x1407f6) => {
-            if (_0x1407f6 === _0x76d811) return;
-            _0x2b516e(_0x1407f6);
+          root['querySelectorAll']('.ui-schema-popup')['forEach']((value74) => {
+            if (value74 === popup) return;
+            handler3(value74);
           }));
-        if (_0xad3d3f) _0x4fa3e7(_0x76d811);
-        else _0x2b516e(_0x76d811);
-        notifyUiSchemaMenuAfterOpen(_0x1d9d33, {
-          fieldEl: _0x26e853,
-          popup: _0x76d811,
-          shouldOpen: _0xad3d3f,
+        if (shouldOpen) handler2(popup);
+        else handler3(popup);
+        notifyUiSchemaMenuAfterOpen(root, {
+          fieldEl: fieldEl5,
+          popup: popup,
+          shouldOpen: shouldOpen,
         });
         return;
       }
-      _0x145db8['target']?.['closest']?.('.ui-schema-popup, .ui-schema-floating-menu') &&
-        _0x145db8['stopPropagation']();
-      const _0x3f0a71 = _0x145db8['target']?.['closest']?.('[data-ui-schema-field]') || _0x23c9be;
-      if (!_0x3f0a71) return;
-      const _0x593735 = String(_0x3f0a71['dataset']['uiSchemaField'] || '')['trim']();
-      if (!_0x593735) return;
-      const _0x1cafe5 = _0x145db8['target']['closest']('[data-ui-schema-value]');
-      if (!_0x1cafe5) return;
-      const _0x277296 = typeof _0x17a8f5 === 'function' ? _0x17a8f5() || {} : {},
-        _0x4953d8 = _0xb9670f(_0x32fd5a(_0x1cafe5), _0x277296),
-        _0x4e0b69 =
-          _0x1cafe5['dataset']['uiSchemaStaticDisabled'] === 'true' ||
-          _0x1cafe5['hasAttribute']?.('data-ui-schema-static-disabled');
+      event12['target']?.['closest']?.('.ui-schema-popup, .ui-schema-floating-menu') &&
+        event12['stopPropagation']();
+      const el40 = event12['target']?.['closest']?.('[data-ui-schema-field]') || value69;
+      if (!el40) return;
+      const enabled7 = String(el40['dataset']['uiSchemaField'] || '')['trim']();
+      if (!enabled7) return;
+      const el41 = event12['target']['closest']('[data-ui-schema-value]');
+      if (!el41) return;
+      const value75 = typeof getNodeData === 'function' ? getNodeData() || {} : {},
+        enabled8 = getOptionDisableRepairPatch(getRenderedOptionDisableWhen(el41), value75),
+        value76 =
+          el41['dataset']['uiSchemaStaticDisabled'] === 'true' ||
+          el41['hasAttribute']?.('data-ui-schema-static-disabled');
       if (
-        _0x4e0b69 ||
-        ((_0x1cafe5['dataset']['uiSchemaDisabled'] === 'true' || _0x1cafe5['disabled'] === !![]) &&
-          !_0x4953d8)
+        value76 ||
+        ((el41['dataset']['uiSchemaDisabled'] === 'true' || el41['disabled'] === !![]) && !enabled8)
       )
         return;
-      _0x145db8['stopPropagation']();
-      const _0x440cbb = _0x1cafe5['dataset']['uiSchemaValue'],
-        _0x53ced9 =
-          _0x3f0a71['dataset']['uiSchemaValueType'] === 'boolean'
-            ? _0x440cbb === 'true'
-            : _0x3f0a71['dataset']['uiSchemaValueType'] === 'number'
-              ? Number(_0x440cbb)
-              : _0x440cbb,
-        _0x5f53b1 =
-          _0x145db8['target']?.['closest']?.(
+      event12['stopPropagation']();
+      const value77 = el41['dataset']['uiSchemaValue'],
+        value78 =
+          el40['dataset']['uiSchemaValueType'] === 'boolean'
+            ? value77 === 'true'
+            : el40['dataset']['uiSchemaValueType'] === 'number'
+              ? Number(value77)
+              : value77,
+        except =
+          event12['target']?.['closest']?.(
             '.ui-schema-popup, .ui-schema-floating-menu, .img-ratio-popup, .rh-res-popup',
           ) || null,
-        _0x18edc2 = _0x5f53b1?.['classList']?.['contains']?.('ui-schema-popup') === !![],
-        _0x58e98f = _0x18edc2 ? _0xcc68a(_0x3f0a71, _0x5f53b1) : null,
-        _0x4eb62d = () => {
-          if (!_0x18edc2) return;
-          _0x4fa3e7(_0xf11e84(_0x58e98f));
+        enabled9 = except?.['classList']?.['contains']?.('ui-schema-popup') === !![],
+        value79 = enabled9 ? handler5(el40, except) : null,
+        handler30 = () => {
+          if (!enabled9) return;
+          handler2(handler6(value79));
         },
-        _0x887d0b = () => {
-          const _0x50cd31 = _0x1775e2 + 0x1;
-          ((_0x1775e2 = _0x50cd31), _0x4eb62d());
-          const _0x3f0399 =
+        handler31 = () => {
+          const value80 = options + 0x1;
+          ((options = value80), handler30());
+          const run4 =
             typeof requestAnimationFrame === 'function'
               ? requestAnimationFrame
-              : (_0x39e2ca) => setTimeout(_0x39e2ca, 0x0);
-          _0x3f0399(() => {
-            if (_0x50cd31 === _0x1775e2) _0x4eb62d();
+              : (value81) => setTimeout(value81, 0x0);
+          run4(() => {
+            if (value80 === options) handler30();
           });
         };
-      _0x18edc2 && _0x5f53b1
-        ? _0x52aabe({ immediate: !![], except: _0x5f53b1 })
-        : (_0x52aabe({ immediate: !![] }),
-          _0x5f53b1?.['__uiSchemaPortalRoot'] === _0x1d9d33 &&
-            _0x1d9d33['dispatchEvent'](
-              new CustomEvent('ui-schema-portaled-close-request', { detail: { popup: _0x5f53b1 } }),
+      enabled9 && except
+        ? handler4({ immediate: !![], except: except })
+        : (handler4({ immediate: !![] }),
+          except?.['__uiSchemaPortalRoot'] === root &&
+            root['dispatchEvent'](
+              new CustomEvent('ui-schema-portaled-close-request', { detail: { popup: except } }),
             ));
-      (_0x3f0a71['querySelectorAll']('[data-ui-schema-value]')['forEach']((_0x690ab9) => {
-        (_0x690ab9['classList']['remove']('active'),
-          _0x690ab9['hasAttribute']?.('aria-selected') &&
-            _0x690ab9['setAttribute']('aria-selected', 'false'));
+      (el40['querySelectorAll']('[data-ui-schema-value]')['forEach']((el42) => {
+        (el42['classList']['remove']('active'),
+          el42['hasAttribute']?.('aria-selected') && el42['setAttribute']('aria-selected', 'false'));
       }),
-        _0x1cafe5['classList']['add']('active'));
-      _0x1cafe5['hasAttribute']?.('aria-selected') && _0x1cafe5['setAttribute']('aria-selected', 'true');
-      const _0x36dad8 = _0x3f0a71['querySelector']('.ui-schema-menu-trigger .ui-schema-pill-label');
-      if (_0x36dad8) {
-        const _0x27b19c =
-          _0x1cafe5['dataset']['uiSchemaOptionLabel'] ||
-          _0x1cafe5['textContent']?.['trim']?.() ||
-          String(_0x53ced9);
-        _0x36dad8['textContent'] = _0x27b19c;
+        el41['classList']['add']('active'));
+      el41['hasAttribute']?.('aria-selected') && el41['setAttribute']('aria-selected', 'true');
+      const el43 = el40['querySelector']('.ui-schema-menu-trigger .ui-schema-pill-label');
+      if (el43) {
+        const value82 =
+          el41['dataset']['uiSchemaOptionLabel'] || el41['textContent']?.['trim']?.() || String(value78);
+        el43['textContent'] = value82;
       }
-      (_0x13c453(_0x3f0a71, _0x53ced9), _0x403225(_0x3f0a71, _0x53ced9));
-      for (const [_0x188362, _0x3d5835] of Object['entries'](_0x4953d8 || {})) {
-        _0x188362 !== _0x593735 && _0x14c2af(_0x188362, _0x3d5835, { skipSync: !![] });
+      (syncRhAiAppFooterParamField(el40, value78), syncInstanceToggleField(el40, value78));
+      for (const [value83, value84] of Object['entries'](enabled8 || {})) {
+        value83 !== enabled7 && commitValue(value83, value84, { skipSync: !![] });
       }
-      const _0xc3a92c = _0x3f0a71['closest']('[data-ui-schema-composite-field="voiceQualityRatio"]'),
-        _0x2f21a8 = String(_0xc3a92c?.['dataset']?.['uiSchemaPrimaryField'] || '')['trim'](),
-        _0x366a2e = String(_0xc3a92c?.['dataset']?.['uiSchemaSecondaryField'] || '')['trim']();
-      if (_0xc3a92c && _0x593735 === _0x2f21a8) {
-        if (_0x366a2e) _0x8a5b2e(_0x366a2e);
-        const _0xc0dd7e = _0x14c2af(_0x593735, _0x53ced9, { skipSync: !![] });
-        _0x535fa6(_0x1d9d33, _0xc0dd7e);
-      } else _0x14c2af(_0x593735, _0x53ced9);
-      _0x887d0b();
+      const el44 = el40['closest']('[data-ui-schema-composite-field="voiceQualityRatio"]'),
+        value85 = String(el44?.['dataset']?.['uiSchemaPrimaryField'] || '')['trim'](),
+        value86 = String(el44?.['dataset']?.['uiSchemaSecondaryField'] || '')['trim']();
+      if (el44 && enabled7 === value85) {
+        if (value86) handler8(value86);
+        const value87 = commitValue(enabled7, value78, { skipSync: !![] });
+        syncModelUiSchemaControls(root, value87);
+      } else commitValue(enabled7, value78);
+      handler31();
     },
-    _0x233df9 = (_0x2ea076, _0x2a471d = null) => {
-      const _0x24cbde = _0x2ea076['target']?.['closest']?.('[data-ui-schema-input]');
-      if (!_0x24cbde) return;
-      const _0x370b09 = String(_0x24cbde['dataset']['uiSchemaInput'] || '')['trim']();
-      if (!_0x370b09) return;
-      const _0x36a683 = _0x24cbde['closest']('[data-ui-schema-field]') || _0x2a471d,
-        _0x466539 = _0x24cbde['closest']('[data-ui-schema-range-values]') || _0x36a683,
-        _0xd68b98 = _0x13bb11(_0x466539),
-        _0x5f4038 =
-          _0x24cbde['type'] === 'range' && _0xd68b98?.['length']
-            ? _0xd68b98[Math['max'](0x0, Math['min'](_0xd68b98['length'] - 0x1, Number(_0x24cbde['value'])))]
-            : _0x24cbde['type'] === 'range' || _0x24cbde['type'] === 'number'
-              ? _0x36a683?.['classList']?.['contains']('ui-schema-rh-aiapp-footer-param--input')
-                ? _0x23c05c(_0x36a683, _0x24cbde['value'])
-                : Number(_0x24cbde['value'])
-              : _0x24cbde['value'];
-      _0x2ea076['type'] === 'change' &&
-        _0x24cbde['type'] === 'number' &&
-        _0x36a683?.['classList']?.['contains']('ui-schema-rh-aiapp-footer-param--input') &&
-        (_0x24cbde['value'] = String(_0x5f4038));
-      const _0x5a9627 = _0x36a683?.['querySelector']('.ui-schema-value');
-      if (_0x5a9627) _0x5a9627['textContent'] = String(_0x5f4038);
-      _0x13c453(_0x36a683, _0x5f4038);
-      const _0x54e566 = _0x24cbde['closest']('.ui-schema-rh-v54-breast-jiggle'),
-        _0x4c8a19 = _0x54e566?.['querySelector']('.rh-breast-jiggle-value');
-      _0x4c8a19 && (_0x4c8a19['textContent'] = _0xd8ce1(_0x5f4038, _0x1b5461(_0x54e566)));
-      const _0x5817ee =
-          _0x24cbde['closest']('.ui-schema-duration-pill') ||
-          _0x36a683?.['closest']?.('.ui-schema-duration-pill'),
-        _0x3db1d = _0x5817ee?.['querySelector']('.ui-schema-duration-label');
-      _0x3db1d && (_0x3db1d['textContent'] = _0x10f103(_0x466539, _0x5f4038, _0x5f4038 + 'S'));
-      const _0x1a0517 = _0x24cbde['closest']('.ui-schema-field') || _0x36a683,
-        _0x5c668d = _0x1a0517?.['querySelector']('.ui-schema-pill-label'),
-        _0x18131e = _0x1a0517?.['querySelector']('.rh-res-title');
-      if (_0x5c668d && _0x18131e) {
-        const _0x4c70fb = _0x5c668d['querySelector']('.ui-schema-resolution-value');
-        _0x4c70fb
-          ? (_0x4c70fb['textContent'] = String(_0x5f4038))
-          : (_0x5c668d['textContent'] = (_0x18131e['textContent'] || 'Resolution') + '\x20' + _0x5f4038);
+    handleInput = (event13, value88 = null) => {
+      const el45 = event13['target']?.['closest']?.('[data-ui-schema-input]');
+      if (!el45) return;
+      const enabled10 = String(el45['dataset']['uiSchemaInput'] || '')['trim']();
+      if (!enabled10) return;
+      const el46 = el45['closest']('[data-ui-schema-field]') || value88,
+        value89 = el45['closest']('[data-ui-schema-range-values]') || el46,
+        list = parseRangeValuesFromFieldEl(value89),
+        value90 =
+          el45['type'] === 'range' && list?.['length']
+            ? list[Math['max'](0x0, Math['min'](list['length'] - 0x1, Number(el45['value'])))]
+            : el45['type'] === 'range' || el45['type'] === 'number'
+              ? el46?.['classList']?.['contains']('ui-schema-rh-aiapp-footer-param--input')
+                ? handler15(el46, el45['value'])
+                : Number(el45['value'])
+              : el45['value'];
+      event13['type'] === 'change' &&
+        el45['type'] === 'number' &&
+        el46?.['classList']?.['contains']('ui-schema-rh-aiapp-footer-param--input') &&
+        (el45['value'] = String(value90));
+      const el47 = el46?.['querySelector']('.ui-schema-value');
+      if (el47) el47['textContent'] = String(value90);
+      syncRhAiAppFooterParamField(el46, value90);
+      const el48 = el45['closest']('.ui-schema-rh-v54-breast-jiggle'),
+        el49 = el48?.['querySelector']('.rh-breast-jiggle-value');
+      el49 &&
+        (el49['textContent'] = formatRhV54BreastJiggle(value90, getRhV54BreastJiggleRangeFromFieldEl(el48)));
+      const el50 =
+          el45['closest']('.ui-schema-duration-pill') || el46?.['closest']?.('.ui-schema-duration-pill'),
+        el51 = el50?.['querySelector']('.ui-schema-duration-label');
+      el51 && (el51['textContent'] = getRangeValueDisplayLabel(value89, value90, value90 + 'S'));
+      const el52 = el45['closest']('.ui-schema-field') || el46,
+        el53 = el52?.['querySelector']('.ui-schema-pill-label'),
+        el54 = el52?.['querySelector']('.rh-res-title');
+      if (el53 && el54) {
+        const el55 = el53['querySelector']('.ui-schema-resolution-value');
+        el55
+          ? (el55['textContent'] = String(value90))
+          : (el53['textContent'] = (el54['textContent'] || 'Resolution') + '\x20' + value90);
       }
-      if (_0x318270(_0x24cbde)) {
-        _0x2ea076['type'] === 'input'
-          ? _0x5eaa1c(_0x370b09, _0x5f4038)
-          : (_0x8a5b2e(_0x370b09), _0x14c2af(_0x370b09, _0x5f4038));
+      if (handler11(el45)) {
+        event13['type'] === 'input'
+          ? handler10(enabled10, value90)
+          : (handler8(enabled10), commitValue(enabled10, value90));
         return;
       }
-      _0x14c2af(_0x370b09, _0x5f4038);
+      commitValue(enabled10, value90);
     },
-    _0x4f4ab = bindUiSchemaBindingEvents(_0x1d9d33, {
-      handleClick: _0x53d78a,
-      handleMouseDown: _0x231619,
-      handleInput: _0x233df9,
-      invalidatePendingMenuRestore: _0x2630bf,
-      commitValue: _0x14c2af,
-      getNodeData: _0x17a8f5,
-      getNodeFieldValue: _0x42b8cf,
+    handler32 = bindUiSchemaBindingEvents(root, {
+      handleClick: handleClick,
+      handleMouseDown: handleMouseDown,
+      handleInput: handleInput,
+      invalidatePendingMenuRestore: invalidatePendingMenuRestore,
+      commitValue: commitValue,
+      getNodeData: getNodeData,
+      getNodeFieldValue: getNodeFieldValue,
     }),
-    _0x520dce = () => {
-      (_0xdfc1c1(), _0x164767(), _0x1fa538(), _0x5676c5(), _0x4f4ab());
+    value91 = () => {
+      (handler9(), handler29(), handler23(), handler24(), handler32());
     };
-  return ((_0x520dce['flushPendingTextCommits'] = _0xdfc1c1), _0x520dce);
+  return ((value91['flushPendingTextCommits'] = handler9), value91);
 }

@@ -13,23 +13,23 @@ export function createRhAiAppPreviewDragController({
       PREVIEW_DRAG_START_THRESHOLD_PX: PREVIEW_DRAG_START_THRESHOLD_PX = 0xa,
       PREVIEW_RENAME_CLICK_TOLERANCE_PX: PREVIEW_RENAME_CLICK_TOLERANCE_PX = 0x3,
       PREVIEW_MOVE_ANIMATION_MS: PREVIEW_MOVE_ANIMATION_MS = 0x104,
-      assignSequentialOrder: _0x4a1992,
-      buildComponentByIndex: _0x3a2b4b,
-      canPreviewComponentBecomePrompt: _0x10f2b3,
-      canPreviewPromptBecomeParam: _0x1ade41,
-      getComponentByIndex: _0x44483b,
-      getPreviewAdvancedParamComponents: _0x596728,
-      getPreviewHomeParamComponents: _0x705e20,
-      getPreviewInputComponents: _0x5126d9,
-      getPreviewParamText: _0x21c1b2,
-      getPreviewPromptReturnControlType: _0x5748c8,
-      isParamComponent: _0x18a04a,
-      moveComponentToOrder: _0x8e1e5f,
-      shouldReduceMotion: _0x317d32,
+      assignSequentialOrder: assignSequentialOrder,
+      buildComponentByIndex: buildComponentByIndex,
+      canPreviewComponentBecomePrompt: canPreviewComponentBecomePrompt,
+      canPreviewPromptBecomeParam: canPreviewPromptBecomeParam,
+      getComponentByIndex: getComponentByIndex,
+      getPreviewAdvancedParamComponents: getPreviewAdvancedParamComponents,
+      getPreviewHomeParamComponents: getPreviewHomeParamComponents,
+      getPreviewInputComponents: getPreviewInputComponents,
+      getPreviewParamText: getPreviewParamText,
+      getPreviewPromptReturnControlType: getPreviewPromptReturnControlType,
+      isParamComponent: isParamComponent,
+      moveComponentToOrder: moveComponentToOrder,
+      shouldReduceMotion: shouldReduceMotion,
     } = primitives,
-    _0x36d86a = runtime['document'] || globalThis['document'],
-    _0x315178 = runtime['window'] || globalThis['window'];
-  class _0x432ef0 {
+    el = runtime['document'] || globalThis['document'],
+    value = runtime['window'] || globalThis['window'];
+  class handler {
     constructor() {
       ((this['previewDrag'] = null),
         (this['suppressPreviewRenameClick'] = ![]),
@@ -43,119 +43,119 @@ export function createRhAiAppPreviewDragController({
       return readState()?.['nodePreviewEl'] || null;
     }
     get ['componentDrafts']() {
-      const _0xd114aa = readState()?.['componentDrafts'];
-      return Array['isArray'](_0xd114aa) ? _0xd114aa : [];
+      const state = readState()?.['componentDrafts'];
+      return Array['isArray'](state) ? state : [];
     }
-    ['handlePointerDown'](_0x5e9f96) {
-      return (this['bindGroups'](), this['_handlePreviewPointerDown'](_0x5e9f96));
+    ['handlePointerDown'](item) {
+      return (this['bindGroups'](), this['_handlePreviewPointerDown'](item));
     }
     ['bindGroups']() {
       if (!this['groupCleanup'] && this['panel']?.['addEventListener'])
         this['groupCleanup'] = this['parameterGroups']['bind'](this['panel']);
     }
-    ['handlePointerMove'](_0x19691c) {
-      return this['_handlePreviewPointerMove'](_0x19691c);
+    ['handlePointerMove'](key) {
+      return this['_handlePreviewPointerMove'](key);
     }
-    ['handlePointerEnd'](_0x1bcbae) {
-      return this['_handlePreviewPointerEnd'](_0x1bcbae);
+    ['handlePointerEnd'](index) {
+      return this['_handlePreviewPointerEnd'](index);
     }
-    ['consumeSuppressedRenameClickForTarget'](_0x202a6f) {
+    ['consumeSuppressedRenameClickForTarget'](event) {
       if (
         this['suppressPreviewRenameClick'] &&
-        _0x202a6f['target']?.['closest']?.('.rh-ai-app-preview-draggable')
+        event['target']?.['closest']?.('.rh-ai-app-preview-draggable')
       )
-        return (this['_consumeSuppressedPreviewRenameClick'](_0x202a6f), !![]);
+        return (this['_consumeSuppressedPreviewRenameClick'](event), !![]);
       return ![];
     }
-    ['captureComponentRect'](_0x5a50e5) {
-      return this['_capturePreviewComponentRect'](_0x5a50e5);
+    ['captureComponentRect'](result) {
+      return this['_capturePreviewComponentRect'](result);
     }
-    ['animateComponentFromRect'](_0x39cccd, _0x4fe162) {
-      return this['_animatePreviewComponentFromRect'](_0x39cccd, _0x4fe162);
+    ['animateComponentFromRect'](data, options) {
+      return this['_animatePreviewComponentFromRect'](data, options);
     }
-    ['placeParamDraft'](_0x1dcc9b, _0x2bf345, _0x8f7eb8 = {}) {
-      return this['_placePreviewParamDraft'](_0x1dcc9b, _0x2bf345, _0x8f7eb8);
+    ['placeParamDraft'](target, source, next = {}) {
+      return this['_placePreviewParamDraft'](target, source, next);
     }
     ['destroy']() {
       (this['groupCleanup']?.(), (this['groupCleanup'] = null));
-      const _0x3430b1 = this['previewDrag'];
-      (_0x3430b1?.['didLiveOrder'] &&
-        _0x3430b1['layoutSnapshot'] &&
-        this['_restorePreviewLayoutSnapshot'](_0x3430b1['layoutSnapshot']),
+      const current = this['previewDrag'];
+      (current?.['didLiveOrder'] &&
+        current['layoutSnapshot'] &&
+        this['_restorePreviewLayoutSnapshot'](current['layoutSnapshot']),
         this['_clearPreviewDragState'](),
-        _0x315178?.['clearTimeout']?.(this['suppressPreviewRenameClickTimer']),
+        value?.['clearTimeout']?.(this['suppressPreviewRenameClickTimer']),
         (this['suppressPreviewRenameClick'] = ![]),
         (this['suppressPreviewRenameClickTimer'] = 0x0));
     }
-    ['_isPreviewControlTarget'](_0x5ab217) {
-      return actions['isPreviewControlTarget']?.(_0x5ab217) === !![];
+    ['_isPreviewControlTarget'](entry) {
+      return actions['isPreviewControlTarget']?.(entry) === !![];
     }
-    ['_startPreviewInlineRename'](_0x24c905, _0x1ab49c) {
-      return actions['startPreviewInlineRename']?.(_0x24c905, _0x1ab49c);
+    ['_startPreviewInlineRename'](record, payload) {
+      return actions['startPreviewInlineRename']?.(record, payload);
     }
-    ['_refreshBundleFromComponents'](_0x1c1569) {
-      return actions['refreshBundleFromComponents']?.(_0x1c1569) || null;
+    ['_refreshBundleFromComponents'](handle) {
+      return actions['refreshBundleFromComponents']?.(handle) || null;
     }
-    ['_patchPreviewWithoutRebuild'](_0x1680d4, _0x2e2273) {
-      return actions['patchPreviewWithoutRebuild']?.(_0x1680d4, _0x2e2273);
+    ['_patchPreviewWithoutRebuild'](config, scope) {
+      return actions['patchPreviewWithoutRebuild']?.(config, scope);
     }
-    ['_getPreviewZoneElement'](_0xf2f090) {
-      return actions['getPreviewZoneElement']?.(_0xf2f090) || null;
+    ['_getPreviewZoneElement'](input) {
+      return actions['getPreviewZoneElement']?.(input) || null;
     }
-    ['_getPreviewDropZone'](_0x8a0014, _0x587817) {
-      for (const _0x2bed04 of PREVIEW_DROP_ZONES) {
-        const _0x2d60b4 = this['_getPreviewZoneElement'](_0x2bed04);
-        if (!_0x2d60b4) continue;
-        const _0x5661d4 = _0x2d60b4['getBoundingClientRect']();
+    ['_getPreviewDropZone'](output, value2) {
+      for (const value3 of PREVIEW_DROP_ZONES) {
+        const el2 = this['_getPreviewZoneElement'](value3);
+        if (!el2) continue;
+        const box = el2['getBoundingClientRect']();
         if (
-          _0x8a0014 >= _0x5661d4['left'] &&
-          _0x8a0014 <= _0x5661d4['right'] &&
-          _0x587817 >= _0x5661d4['top'] &&
-          _0x587817 <= _0x5661d4['bottom']
+          output >= box['left'] &&
+          output <= box['right'] &&
+          value2 >= box['top'] &&
+          value2 <= box['bottom']
         )
-          return _0x2bed04;
+          return value3;
       }
       return '';
     }
-    ['_getPreviewMotionTarget'](_0x409d54) {
-      const _0x159274 = Number(_0x409d54);
-      if (!Number['isInteger'](_0x159274)) return null;
-      const _0x3b4989 = [
+    ['_getPreviewMotionTarget'](value4) {
+      const value5 = Number(value4);
+      if (!Number['isInteger'](value5)) return null;
+      const value6 = [
         '.rh-ai-app-preview-prompt-target',
         '.rh-ai-app-preview-param-chip',
         '.rh-ai-app-preview-advanced-param',
         '.rh-ai-app-preview-input-slot',
       ]
-        ['map']((_0x23bc69) => _0x23bc69 + '[data-preview-component-index=\x22' + _0x159274 + '\x22]')
+        ['map']((value7) => value7 + '[data-preview-component-index=\x22' + value5 + '\x22]')
         ['join'](',\x20');
-      return this['nodePreviewEl']?.['querySelector']?.(_0x3b4989) || null;
+      return this['nodePreviewEl']?.['querySelector']?.(value6) || null;
     }
-    ['_snapshotPreviewRect'](_0x16aea5) {
-      const _0x8520e2 = _0x16aea5?.['getBoundingClientRect']?.();
-      if (!_0x8520e2) return null;
+    ['_snapshotPreviewRect'](el3) {
+      const left = el3?.['getBoundingClientRect']?.();
+      if (!left) return null;
       return {
-        left: _0x8520e2['left'],
-        top: _0x8520e2['top'],
-        width: _0x8520e2['width'],
-        height: _0x8520e2['height'],
+        left: left['left'],
+        top: left['top'],
+        width: left['width'],
+        height: left['height'],
       };
     }
-    ['_capturePreviewComponentRect'](_0x135e90) {
-      return this['_snapshotPreviewRect'](this['_getPreviewMotionTarget'](_0x135e90));
+    ['_capturePreviewComponentRect'](value8) {
+      return this['_snapshotPreviewRect'](this['_getPreviewMotionTarget'](value8));
     }
-    ['_animatePreviewComponentFromRect'](_0x1ebfbe, _0xc028f2) {
-      if (_0x317d32() || !_0xc028f2) return ![];
-      const _0x2f2fff = this['_getPreviewMotionTarget'](_0x1ebfbe);
-      if (!_0x2f2fff?.['animate']) return ![];
-      const _0x2903e1 = _0x2f2fff['getBoundingClientRect']?.();
-      if (!_0x2903e1) return ![];
-      const _0x1bf428 = Math['round'](Number(_0xc028f2['left']) - _0x2903e1['left']),
-        _0x214047 = Math['round'](Number(_0xc028f2['top']) - _0x2903e1['top']);
-      if (Math['abs'](_0x1bf428) < 0x1 && Math['abs'](_0x214047) < 0x1) return ![];
+    ['_animatePreviewComponentFromRect'](value9, box2) {
+      if (shouldReduceMotion() || !box2) return ![];
+      const el4 = this['_getPreviewMotionTarget'](value9);
+      if (!el4?.['animate']) return ![];
+      const box3 = el4['getBoundingClientRect']?.();
+      if (!box3) return ![];
+      const value10 = Math['round'](Number(box2['left']) - box3['left']),
+        value11 = Math['round'](Number(box2['top']) - box3['top']);
+      if (Math['abs'](value10) < 0x1 && Math['abs'](value11) < 0x1) return ![];
       return (
-        _0x2f2fff['animate'](
+        el4['animate'](
           [
-            { transform: 'translate(' + _0x1bf428 + 'px,\x20' + _0x214047 + 'px)', opacity: 0.72 },
+            { transform: 'translate(' + value10 + 'px,\x20' + value11 + 'px)', opacity: 0.72 },
             { transform: 'translate(0, 0)', opacity: 0x1 },
           ],
           { duration: PREVIEW_MOVE_ANIMATION_MS, easing: 'cubic-bezier(0.2, 0, 0.2, 1)' },
@@ -163,517 +163,520 @@ export function createRhAiAppPreviewDragController({
         !![]
       );
     }
-    ['_setPreviewDragTransform'](_0x3a1074, _0x2eaf3c, _0x5159ff) {
-      if (!_0x3a1074?.['target']) return;
-      ((_0x3a1074['currentClientX'] = _0x2eaf3c), (_0x3a1074['currentClientY'] = _0x5159ff));
-      if (_0x3a1074['ghost']?.['element']) {
-        (_0x3a1074['ghost']['element']['style']['setProperty'](
+    ['_setPreviewDragTransform'](event2, value12, value13) {
+      if (!event2?.['target']) return;
+      ((event2['currentClientX'] = value12), (event2['currentClientY'] = value13));
+      if (event2['ghost']?.['element']) {
+        (event2['ghost']['element']['style']['setProperty'](
           '--rh-ghost-x',
-          Math['round'](_0x2eaf3c - _0x3a1074['ghost']['offsetX']) + 'px',
+          Math['round'](value12 - event2['ghost']['offsetX']) + 'px',
         ),
-          _0x3a1074['ghost']['element']['style']['setProperty'](
+          event2['ghost']['element']['style']['setProperty'](
             '--rh-ghost-y',
-            Math['round'](_0x5159ff - _0x3a1074['ghost']['offsetY']) + 'px',
+            Math['round'](value13 - event2['ghost']['offsetY']) + 'px',
           ));
         return;
       }
-      const _0x5355ba = Math['round'](_0x2eaf3c - _0x3a1074['startClientX']),
-        _0x59e4dd = Math['round'](_0x5159ff - _0x3a1074['startClientY']);
-      (_0x3a1074['target']['style']['setProperty']('--rh-drag-x', _0x5355ba + 'px'),
-        _0x3a1074['target']['style']['setProperty']('--rh-drag-y', _0x59e4dd + 'px'));
+      const value14 = Math['round'](value12 - event2['startClientX']),
+        value15 = Math['round'](value13 - event2['startClientY']);
+      (event2['target']['style']['setProperty']('--rh-drag-x', value14 + 'px'),
+        event2['target']['style']['setProperty']('--rh-drag-y', value15 + 'px'));
     }
     ['_clearPreviewDragState']() {
       this['parameterGroups']['reset']();
-      const _0xe98042 = this['previewDrag'];
-      if (!_0xe98042) return;
+      const event3 = this['previewDrag'];
+      if (!event3) return;
       try {
-        _0xe98042['target']?.['releasePointerCapture']?.(_0xe98042['pointerId']);
+        event3['target']?.['releasePointerCapture']?.(event3['pointerId']);
       } catch {}
-      (_0xe98042['target']?.['classList']?.['remove']('is-dragging'),
-        _0xe98042['target']?.['classList']?.['remove']('is-drag-placeholder'),
-        _0xe98042['target']?.['style']?.['removeProperty']('--rh-drag-x'),
-        _0xe98042['target']?.['style']?.['removeProperty']('--rh-drag-y'),
-        this['_clearPreviewHomeParamDropPlaceholder'](_0xe98042),
-        this['_clearPreviewAdvancedParamDropPlaceholder'](_0xe98042),
-        _0xe98042['ghost']?.['element']?.['remove']?.(),
+      (event3['target']?.['classList']?.['remove']('is-dragging'),
+        event3['target']?.['classList']?.['remove']('is-drag-placeholder'),
+        event3['target']?.['style']?.['removeProperty']('--rh-drag-x'),
+        event3['target']?.['style']?.['removeProperty']('--rh-drag-y'),
+        this['_clearPreviewHomeParamDropPlaceholder'](event3),
+        this['_clearPreviewAdvancedParamDropPlaceholder'](event3),
+        event3['ghost']?.['element']?.['remove']?.(),
         this['panel']?.['classList']['remove']('is-preview-dragging'),
         this['nodePreviewEl']
           ?.['querySelectorAll']('[data-preview-zone]')
-          ['forEach']((_0x2fd3a1) =>
-            _0x2fd3a1['classList']['remove'](
-              'is-drop-target',
-              'is-param-drop-target',
-              'is-prompt-drop-target',
-            ),
+          ['forEach']((el5) =>
+            el5['classList']['remove']('is-drop-target', 'is-param-drop-target', 'is-prompt-drop-target'),
           ),
         (this['previewDrag'] = null));
     }
     ['_suppressNextPreviewRenameClick']() {
-      (_0x315178['clearTimeout'](this['suppressPreviewRenameClickTimer']),
+      (value['clearTimeout'](this['suppressPreviewRenameClickTimer']),
         (this['suppressPreviewRenameClick'] = !![]),
-        (this['suppressPreviewRenameClickTimer'] = _0x315178['setTimeout'](() => {
+        (this['suppressPreviewRenameClickTimer'] = value['setTimeout'](() => {
           ((this['suppressPreviewRenameClick'] = ![]), (this['suppressPreviewRenameClickTimer'] = 0x0));
         }, 0xa0)));
     }
-    ['_consumeSuppressedPreviewRenameClick'](_0x411751) {
+    ['_consumeSuppressedPreviewRenameClick'](event4) {
       if (!this['suppressPreviewRenameClick']) return ![];
       return (
         (this['suppressPreviewRenameClick'] = ![]),
-        _0x315178['clearTimeout'](this['suppressPreviewRenameClickTimer']),
+        value['clearTimeout'](this['suppressPreviewRenameClickTimer']),
         (this['suppressPreviewRenameClickTimer'] = 0x0),
-        _0x411751?.['preventDefault']?.(),
-        _0x411751?.['stopPropagation']?.(),
+        event4?.['preventDefault']?.(),
+        event4?.['stopPropagation']?.(),
         !![]
       );
     }
-    ['_updatePreviewDropTarget'](_0x461445, _0x3696a4) {
-      const _0x25bf34 = this['_getPreviewDropZone'](_0x461445, _0x3696a4);
+    ['_updatePreviewDropTarget'](value16, value17) {
+      const value18 = this['_getPreviewDropZone'](value16, value17);
       return (
-        this['nodePreviewEl']?.['querySelectorAll']('[data-preview-zone]')['forEach']((_0x594362) => {
-          const _0x4fcdc2 = _0x25bf34 && _0x594362['dataset']['previewZone'] === _0x25bf34;
-          _0x594362['classList']['toggle']('is-drop-target', !!_0x4fcdc2);
+        this['nodePreviewEl']?.['querySelectorAll']('[data-preview-zone]')['forEach']((el6) => {
+          const enabled = value18 && el6['dataset']['previewZone'] === value18;
+          el6['classList']['toggle']('is-drop-target', !!enabled);
         }),
-        _0x25bf34
+        value18
       );
     }
-    ['_activatePreviewDrag'](_0x193b3d, _0x295b07) {
-      if (!_0x193b3d?.['target'] || _0x193b3d['isActive']) return ![];
-      const _0x544bee = this['_createPreviewDragGhost'](_0x193b3d['target'], _0x295b07);
-      ((_0x193b3d['ghost'] = _0x544bee),
-        (_0x193b3d['isActive'] = !![]),
-        (_0x193b3d['moved'] = !![]),
-        (_0x193b3d['layoutSnapshot'] = this['_capturePreviewLayoutSnapshot']()),
-        _0x193b3d['target']['classList']['add']('is-dragging'));
-      if (_0x544bee) _0x193b3d['target']['classList']['add']('is-drag-placeholder');
+    ['_activatePreviewDrag'](event5, event6) {
+      if (!event5?.['target'] || event5['isActive']) return ![];
+      const value19 = this['_createPreviewDragGhost'](event5['target'], event6);
+      ((event5['ghost'] = value19),
+        (event5['isActive'] = !![]),
+        (event5['moved'] = !![]),
+        (event5['layoutSnapshot'] = this['_capturePreviewLayoutSnapshot']()),
+        event5['target']['classList']['add']('is-dragging'));
+      if (value19) event5['target']['classList']['add']('is-drag-placeholder');
       return (
         this['panel']?.['classList']['add']('is-preview-dragging'),
-        this['_setPreviewDragTransform'](_0x193b3d, _0x295b07['clientX'], _0x295b07['clientY']),
+        this['_setPreviewDragTransform'](event5, event6['clientX'], event6['clientY']),
         !![]
       );
     }
     ['_capturePreviewLayoutSnapshot']() {
-      return this['componentDrafts']['map']((_0x27502d) => ({
-        index: Number(_0x27502d?.['index']),
-        inputOrder: _0x27502d?.['inputOrder'],
-        homeParamOrder: _0x27502d?.['homeParamOrder'],
-        advancedParamOrder: _0x27502d?.['advancedParamOrder'],
-        previewPlacement: _0x27502d?.['previewPlacement'],
-        hasInputOrder: Object['hasOwn'](_0x27502d || {}, 'inputOrder'),
-        hasHomeParamOrder: Object['hasOwn'](_0x27502d || {}, 'homeParamOrder'),
-        hasAdvancedParamOrder: Object['hasOwn'](_0x27502d || {}, 'advancedParamOrder'),
-        hasPreviewPlacement: Object['hasOwn'](_0x27502d || {}, 'previewPlacement'),
+      return this['componentDrafts']['map']((inputOrder) => ({
+        index: Number(inputOrder?.['index']),
+        inputOrder: inputOrder?.['inputOrder'],
+        homeParamOrder: inputOrder?.['homeParamOrder'],
+        advancedParamOrder: inputOrder?.['advancedParamOrder'],
+        previewPlacement: inputOrder?.['previewPlacement'],
+        hasInputOrder: Object['hasOwn'](inputOrder || {}, 'inputOrder'),
+        hasHomeParamOrder: Object['hasOwn'](inputOrder || {}, 'homeParamOrder'),
+        hasAdvancedParamOrder: Object['hasOwn'](inputOrder || {}, 'advancedParamOrder'),
+        hasPreviewPlacement: Object['hasOwn'](inputOrder || {}, 'previewPlacement'),
       }));
     }
-    ['_restorePreviewLayoutSnapshot'](_0x38d3ee = []) {
-      const _0x175802 = _0x3a2b4b(this['componentDrafts']);
-      _0x38d3ee['forEach']((_0x1ad71f) => {
-        const _0x18eebb = _0x175802['get'](Number(_0x1ad71f?.['index']));
-        if (!_0x18eebb) return;
-        if (_0x1ad71f['hasInputOrder']) _0x18eebb['inputOrder'] = _0x1ad71f['inputOrder'];
-        else delete _0x18eebb['inputOrder'];
-        if (_0x1ad71f['hasHomeParamOrder']) _0x18eebb['homeParamOrder'] = _0x1ad71f['homeParamOrder'];
-        else delete _0x18eebb['homeParamOrder'];
-        if (_0x1ad71f['hasAdvancedParamOrder'])
-          _0x18eebb['advancedParamOrder'] = _0x1ad71f['advancedParamOrder'];
-        else delete _0x18eebb['advancedParamOrder'];
-        if (_0x1ad71f['hasPreviewPlacement']) _0x18eebb['previewPlacement'] = _0x1ad71f['previewPlacement'];
-        else delete _0x18eebb['previewPlacement'];
+    ['_restorePreviewLayoutSnapshot'](list = []) {
+      const map = buildComponentByIndex(this['componentDrafts']);
+      list['forEach']((value20) => {
+        const enabled2 = map['get'](Number(value20?.['index']));
+        if (!enabled2) return;
+        if (value20['hasInputOrder']) enabled2['inputOrder'] = value20['inputOrder'];
+        else delete enabled2['inputOrder'];
+        if (value20['hasHomeParamOrder']) enabled2['homeParamOrder'] = value20['homeParamOrder'];
+        else delete enabled2['homeParamOrder'];
+        if (value20['hasAdvancedParamOrder']) enabled2['advancedParamOrder'] = value20['advancedParamOrder'];
+        else delete enabled2['advancedParamOrder'];
+        if (value20['hasPreviewPlacement']) enabled2['previewPlacement'] = value20['previewPlacement'];
+        else delete enabled2['previewPlacement'];
       });
     }
-    ['_getPreviewDropOrder'](_0x8b1436, _0x278b99, _0x32ae00, _0x16d6f0 = null) {
-      const _0x556aab = this['_getPreviewZoneElement'](_0x8b1436);
-      if (!_0x556aab) return 0x0;
-      const _0x9428bb = Array['from'](_0x556aab['querySelectorAll'](_0x32ae00))['filter'](
-          (_0x436057) => !_0x436057['classList']['contains']('is-dragging'),
+    ['_getPreviewDropOrder'](value21, value22, value23, value24 = null) {
+      const el7 = this['_getPreviewZoneElement'](value21);
+      if (!el7) return 0x0;
+      const list2 = Array['from'](el7['querySelectorAll'](value23))['filter'](
+          (el8) => !el8['classList']['contains']('is-dragging'),
         ),
-        _0x4088eb = _0x8b1436 === 'advanced' && Number['isFinite'](Number(_0x16d6f0));
-      let _0x9ef67c = 0x0;
+        value25 = value21 === 'advanced' && Number['isFinite'](Number(value24));
+      let value26 = 0x0;
       return (
-        _0x9428bb['forEach']((_0x30d06f) => {
-          const _0x2faf68 = _0x30d06f['getBoundingClientRect']();
-          if (_0x4088eb) {
-            if (_0x16d6f0 > _0x2faf68['top'] + _0x2faf68['height'] / 0x2) _0x9ef67c += 0x1;
+        list2['forEach']((el9) => {
+          const box4 = el9['getBoundingClientRect']();
+          if (value25) {
+            if (value24 > box4['top'] + box4['height'] / 0x2) value26 += 0x1;
             return;
           }
-          if (_0x278b99 > _0x2faf68['left'] + _0x2faf68['width'] / 0x2) _0x9ef67c += 0x1;
+          if (value22 > box4['left'] + box4['width'] / 0x2) value26 += 0x1;
         }),
-        _0x9ef67c
+        value26
       );
     }
-    ['_getPreviewOrderedIndexesDuringDrag'](_0x5b72d1, _0x22500a, _0x5e3d1f) {
-      const _0x147b9d = Number(_0x5b72d1?.['index']);
-      if (!Number['isInteger'](_0x147b9d)) return [];
-      const _0x1ead27 =
-          _0x22500a === 'input'
-            ? _0x5126d9(this['componentDrafts'])
-            : _0x22500a === 'params'
-              ? _0x705e20(this['componentDrafts'])
-              : _0x22500a === 'advanced'
-                ? _0x596728(this['componentDrafts'])
+    ['_getPreviewOrderedIndexesDuringDrag'](value27, value28, value29) {
+      const value30 = Number(value27?.['index']);
+      if (!Number['isInteger'](value30)) return [];
+      const list3 =
+          value28 === 'input'
+            ? getPreviewInputComponents(this['componentDrafts'])
+            : value28 === 'params'
+              ? getPreviewHomeParamComponents(this['componentDrafts'])
+              : value28 === 'advanced'
+                ? getPreviewAdvancedParamComponents(this['componentDrafts'])
                 : [],
-        _0x39301a = _0x1ead27['map']((_0x20d554) => Number(_0x20d554['index'])),
-        _0x465b6b = _0x39301a['includes'](_0x147b9d);
-      if (_0x22500a === 'input' && !_0x465b6b) return _0x39301a;
-      if ((_0x22500a === 'params' || _0x22500a === 'advanced') && !_0x465b6b) {
-        const _0x4ec1c7 = _0x44483b(this['componentDrafts'], _0x147b9d);
-        if (!_0x4ec1c7 || !_0x18a04a(_0x4ec1c7)) return _0x39301a;
-        if (_0x22500a === 'params' && _0x39301a['length'] >= PREVIEW_CUSTOM_COMPONENT_LIMIT) return _0x39301a;
+        list4 = list3['map']((value31) => Number(value31['index'])),
+        enabled3 = list4['includes'](value30);
+      if (value28 === 'input' && !enabled3) return list4;
+      if ((value28 === 'params' || value28 === 'advanced') && !enabled3) {
+        const enabled4 = getComponentByIndex(this['componentDrafts'], value30);
+        if (!enabled4 || !isParamComponent(enabled4)) return list4;
+        if (value28 === 'params' && list4['length'] >= PREVIEW_CUSTOM_COMPONENT_LIMIT) return list4;
       }
-      const _0x16845c = _0x39301a['filter']((_0x36d845) => _0x36d845 !== _0x147b9d),
-        _0x1bcf74 = Math['max'](0x0, Math['min'](_0x16845c['length'], Number(_0x5e3d1f) || 0x0));
+      const list5 = list4['filter']((value32) => value32 !== value30),
+        value33 = Math['max'](0x0, Math['min'](list5['length'], Number(value29) || 0x0));
       return (
-        _0x16845c['splice'](_0x1bcf74, 0x0, _0x147b9d),
-        _0x22500a === 'params' ? _0x16845c['slice'](0x0, PREVIEW_CUSTOM_COMPONENT_LIMIT) : _0x16845c
+        list5['splice'](value33, 0x0, value30),
+        value28 === 'params' ? list5['slice'](0x0, PREVIEW_CUSTOM_COMPONENT_LIMIT) : list5
       );
     }
-    ['_animatePreviewZoneOrder'](_0x46bfb0, _0x580996, _0x265d9d = []) {
-      const _0x3711c5 = this['_getPreviewZoneElement'](_0x46bfb0);
-      if (!_0x3711c5) return ![];
-      const _0x5d9d38 = Array['from'](_0x3711c5['querySelectorAll'](_0x580996)),
-        _0x56cd61 = new Map(
-          _0x5d9d38['map']((_0x47239e) => [Number(_0x47239e['dataset']['previewComponentIndex']), _0x47239e]),
-        );
+    ['_animatePreviewZoneOrder'](value34, value35, list6 = []) {
+      const el10 = this['_getPreviewZoneElement'](value34);
+      if (!el10) return ![];
+      const list7 = Array['from'](el10['querySelectorAll'](value35)),
+        map2 = new Map(list7['map']((el11) => [Number(el11['dataset']['previewComponentIndex']), el11]));
       return (
-        animatePreviewOrder(_0x5d9d38, () =>
-          _0x265d9d['forEach']((_0x8d06d8) => {
-            const _0x2dd137 = _0x56cd61['get'](Number(_0x8d06d8));
-            if (_0x2dd137) _0x3711c5['appendChild'](_0x2dd137);
+        animatePreviewOrder(list7, () =>
+          list6['forEach']((value36) => {
+            const value37 = map2['get'](Number(value36));
+            if (value37) el10['appendChild'](value37);
           }),
         ),
         !![]
       );
     }
-    ['_createPreviewDragGhost'](_0x15a83d, _0x4ddf3c) {
-      const _0x56950f = _0x15a83d?.['getBoundingClientRect']?.();
-      if (!_0x56950f) return null;
-      const _0x4f1f57 = _0x15a83d['classList']?.['contains']('rh-ai-app-preview-prompt-draggable'),
-        _0x2c4456 = _0x4f1f57 ? _0x36d86a['createElement']('div') : _0x15a83d['cloneNode'](!![]);
-      if (_0x4f1f57) {
-        const _0xb47b4 = Number(_0x15a83d['dataset']['previewComponentIndex']),
-          _0xd9e1b = _0x44483b(this['componentDrafts'], _0xb47b4);
-        ((_0x2c4456['textContent'] =
-          String(_0xd9e1b?.['label'] || _0xd9e1b?.['fieldName'] || '提示词')['trim']() || '提示词'),
-          (_0x2c4456['className'] = 'rh-ai-app-preview-drag-ghost rh-ai-app-preview-prompt-ghost'));
+    ['_createPreviewDragGhost'](el12, event7) {
+      const box5 = el12?.['getBoundingClientRect']?.();
+      if (!box5) return null;
+      const value38 = el12['classList']?.['contains']('rh-ai-app-preview-prompt-draggable'),
+        element = value38 ? el['createElement']('div') : el12['cloneNode'](!![]);
+      if (value38) {
+        const value39 = Number(el12['dataset']['previewComponentIndex']),
+          value40 = getComponentByIndex(this['componentDrafts'], value39);
+        ((element['textContent'] =
+          String(value40?.['label'] || value40?.['fieldName'] || '提示词')['trim']() || '提示词'),
+          (element['className'] = 'rh-ai-app-preview-drag-ghost rh-ai-app-preview-prompt-ghost'));
       } else
-        (_0x2c4456['classList']['add']('rh-ai-app-preview-drag-ghost'),
-          _0x2c4456['classList']['remove']('is-dragging', 'is-drag-placeholder'),
-          _0x2c4456['removeAttribute']('data-preview-component-index'),
-          _0x2c4456['querySelectorAll']?.('.rh-ai-app-preview-typebar')['forEach']((_0x1d44e8) => {
-            _0x1d44e8['remove']();
+        (element['classList']['add']('rh-ai-app-preview-drag-ghost'),
+          element['classList']['remove']('is-dragging', 'is-drag-placeholder'),
+          element['removeAttribute']('data-preview-component-index'),
+          element['querySelectorAll']?.('.rh-ai-app-preview-typebar')['forEach']((el13) => {
+            el13['remove']();
           }),
-          _0x2c4456['querySelectorAll']?.('[data-preview-component-index]')['forEach']((_0x183b40) => {
-            _0x183b40['removeAttribute']('data-preview-component-index');
+          element['querySelectorAll']?.('[data-preview-component-index]')['forEach']((value41) => {
+            value41['removeAttribute']('data-preview-component-index');
           }));
-      const _0x3e72e4 = _0x4f1f57
-          ? Math['min'](Math['max'](0x78, Math['round'](_0x56950f['width'] * 0.46)), 0x104)
-          : Math['round'](_0x56950f['width']),
-        _0x5340a1 = _0x4f1f57 ? 0x28 : Math['round'](_0x56950f['height']),
-        _0x24f12f = _0x4f1f57
-          ? Math['max'](0x12, Math['min'](_0x3e72e4 - 0x12, _0x4ddf3c['clientX'] - _0x56950f['left']))
-          : _0x4ddf3c['clientX'] - _0x56950f['left'],
-        _0x1bed10 = _0x4f1f57
-          ? Math['max'](0xc, Math['min'](_0x5340a1 - 0xc, _0x4ddf3c['clientY'] - _0x56950f['top']))
-          : _0x4ddf3c['clientY'] - _0x56950f['top'];
+      const value42 = value38
+          ? Math['min'](Math['max'](0x78, Math['round'](box5['width'] * 0.46)), 0x104)
+          : Math['round'](box5['width']),
+        value43 = value38 ? 0x28 : Math['round'](box5['height']),
+        offsetX = value38
+          ? Math['max'](0x12, Math['min'](value42 - 0x12, event7['clientX'] - box5['left']))
+          : event7['clientX'] - box5['left'],
+        offsetY = value38
+          ? Math['max'](0xc, Math['min'](value43 - 0xc, event7['clientY'] - box5['top']))
+          : event7['clientY'] - box5['top'];
       return (
-        _0x2c4456['style']['setProperty']('--rh-ghost-width', _0x3e72e4 + 'px'),
-        _0x2c4456['style']['setProperty']('--rh-ghost-height', _0x5340a1 + 'px'),
-        _0x36d86a['body']['appendChild'](_0x2c4456),
-        { element: _0x2c4456, offsetX: _0x24f12f, offsetY: _0x1bed10 }
+        element['style']['setProperty']('--rh-ghost-width', value42 + 'px'),
+        element['style']['setProperty']('--rh-ghost-height', value43 + 'px'),
+        el['body']['appendChild'](element),
+        { element: element, offsetX: offsetX, offsetY: offsetY }
       );
     }
-    ['_createPreviewHomeParamDropPlaceholder'](_0x4b8334) {
-      if (!_0x4b8334 || _0x4b8334['homePlaceholder']?.['isConnected'])
-        return _0x4b8334?.['homePlaceholder'] || null;
-      const _0x4874d2 = this['_getPreviewZoneElement']('params'),
-        _0x4d3692 = _0x44483b(this['componentDrafts'], _0x4b8334['index']);
-      if (!_0x4874d2 || !_0x4d3692 || !_0x18a04a(_0x4d3692)) return null;
-      const _0x501dc5 = _0x36d86a['createElement']('div');
-      ((_0x501dc5['className'] =
+    ['_createPreviewHomeParamDropPlaceholder'](enabled5) {
+      if (!enabled5 || enabled5['homePlaceholder']?.['isConnected'])
+        return enabled5?.['homePlaceholder'] || null;
+      const el14 = this['_getPreviewZoneElement']('params'),
+        enabled6 = getComponentByIndex(this['componentDrafts'], enabled5['index']);
+      if (!el14 || !enabled6 || !isParamComponent(enabled6)) return null;
+      const el15 = el['createElement']('div');
+      ((el15['className'] =
         'img-pill-btn ui-schema-menu-trigger rh-ai-app-preview-component ' +
         'rh-ai-app-preview-draggable\x20rh-ai-app-preview-param-chip\x20' +
         'rh-ai-app-preview-drop-placeholder is-dragging is-drag-placeholder'),
-        (_0x501dc5['dataset']['previewDragKind'] = 'param'),
-        (_0x501dc5['dataset']['previewComponentIndex'] = String(_0x4b8334['index'])),
-        _0x501dc5['setAttribute']('aria-hidden', 'true'));
-      const _0x51f58a = _0x36d86a['createElement']('span');
-      ((_0x51f58a['className'] = 'rh-ai-app-preview-param-label'),
-        (_0x51f58a['textContent'] = _0x21c1b2(_0x4d3692)),
-        _0x501dc5['appendChild'](_0x51f58a));
-      const _0x273f9b = _0x36d86a['createElement']('span');
+        (el15['dataset']['previewDragKind'] = 'param'),
+        (el15['dataset']['previewComponentIndex'] = String(enabled5['index'])),
+        el15['setAttribute']('aria-hidden', 'true'));
+      const el16 = el['createElement']('span');
+      ((el16['className'] = 'rh-ai-app-preview-param-label'),
+        (el16['textContent'] = getPreviewParamText(enabled6)),
+        el15['appendChild'](el16));
+      const el17 = el['createElement']('span');
       return (
-        (_0x273f9b['className'] = 'rh-ai-app-preview-drag-pad'),
-        _0x273f9b['setAttribute']('aria-hidden', 'true'),
-        _0x501dc5['appendChild'](_0x273f9b),
-        _0x4874d2['appendChild'](_0x501dc5),
-        (_0x4b8334['homePlaceholder'] = _0x501dc5),
-        _0x501dc5
+        (el17['className'] = 'rh-ai-app-preview-drag-pad'),
+        el17['setAttribute']('aria-hidden', 'true'),
+        el15['appendChild'](el17),
+        el14['appendChild'](el15),
+        (enabled5['homePlaceholder'] = el15),
+        el15
       );
     }
-    ['_clearPreviewHomeParamDropPlaceholder'](_0x97e5eb, { animate: animate = ![] } = {}) {
-      const _0xfb3917 = _0x97e5eb?.['homePlaceholder'];
-      if (!_0xfb3917) return;
-      if (!_0xfb3917['isConnected']) {
-        _0x97e5eb['homePlaceholder'] = null;
+    ['_clearPreviewHomeParamDropPlaceholder'](value44, { animate: animate = ![] } = {}) {
+      const el18 = value44?.['homePlaceholder'];
+      if (!el18) return;
+      if (!el18['isConnected']) {
+        value44['homePlaceholder'] = null;
         return;
       }
-      const _0x97b647 = _0xfb3917['closest']?.('[data-preview-zone]'),
-        _0x412a24 =
-          animate && _0x97b647
-            ? Array['from'](_0x97b647['querySelectorAll']('.rh-ai-app-preview-param-chip'))['filter'](
-                (_0x4457c6) => _0x4457c6 !== _0xfb3917,
+      const el19 = el18['closest']?.('[data-preview-zone]'),
+        value45 =
+          animate && el19
+            ? Array['from'](el19['querySelectorAll']('.rh-ai-app-preview-param-chip'))['filter'](
+                (value46) => value46 !== el18,
               )
             : [];
-      (animatePreviewOrder(_0x412a24, () => _0xfb3917['remove']()), (_0x97e5eb['homePlaceholder'] = null));
+      (animatePreviewOrder(value45, () => el18['remove']()), (value44['homePlaceholder'] = null));
     }
-    ['_createPreviewAdvancedParamDropPlaceholder'](_0x2d31a2) {
-      if (!_0x2d31a2 || _0x2d31a2['advancedPlaceholder']?.['isConnected'])
-        return _0x2d31a2?.['advancedPlaceholder'] || null;
-      const _0x1a754b = this['_getPreviewZoneElement']('advanced'),
-        _0x4f93fe = _0x44483b(this['componentDrafts'], _0x2d31a2['index']);
-      if (!_0x1a754b || !_0x4f93fe || !_0x18a04a(_0x4f93fe)) return null;
-      const _0x3b78df = _0x36d86a['createElement']('div');
-      ((_0x3b78df['className'] =
+    ['_createPreviewAdvancedParamDropPlaceholder'](enabled7) {
+      if (!enabled7 || enabled7['advancedPlaceholder']?.['isConnected'])
+        return enabled7?.['advancedPlaceholder'] || null;
+      const el20 = this['_getPreviewZoneElement']('advanced'),
+        enabled8 = getComponentByIndex(this['componentDrafts'], enabled7['index']);
+      if (!el20 || !enabled8 || !isParamComponent(enabled8)) return null;
+      const el21 = el['createElement']('div');
+      ((el21['className'] =
         'ui-schema-field rh-vram-adv-row rh-ai-app-preview-draggable ' +
         'rh-ai-app-preview-advanced-param\x20rh-ai-app-preview-drop-placeholder\x20' +
         'is-dragging is-drag-placeholder'),
-        (_0x3b78df['dataset']['previewDragKind'] = 'advanced-param'),
-        (_0x3b78df['dataset']['previewComponentIndex'] = String(_0x2d31a2['index'])),
-        _0x3b78df['setAttribute']('aria-hidden', 'true'));
-      const _0x4314b3 = _0x36d86a['createElement']('div');
-      _0x4314b3['className'] = 'rh-vram-adv-label';
-      const _0x27303e = _0x36d86a['createElement']('span');
-      ((_0x27303e['className'] = 'rh-adv-title ui-schema-field-label'),
-        (_0x27303e['textContent'] = _0x21c1b2(_0x4f93fe)),
-        _0x4314b3['appendChild'](_0x27303e),
-        _0x3b78df['appendChild'](_0x4314b3));
-      const _0x430e9b = _0x36d86a['createElement']('span');
-      ((_0x430e9b['className'] = 'rh-ai-app-preview-drag-pad'),
-        _0x430e9b['setAttribute']('aria-hidden', 'true'),
-        _0x3b78df['appendChild'](_0x430e9b));
-      const _0x5bbf8a = _0x36d86a['createElement']('div');
+        (el21['dataset']['previewDragKind'] = 'advanced-param'),
+        (el21['dataset']['previewComponentIndex'] = String(enabled7['index'])),
+        el21['setAttribute']('aria-hidden', 'true'));
+      const el22 = el['createElement']('div');
+      el22['className'] = 'rh-vram-adv-label';
+      const el23 = el['createElement']('span');
+      ((el23['className'] = 'rh-adv-title ui-schema-field-label'),
+        (el23['textContent'] = getPreviewParamText(enabled8)),
+        el22['appendChild'](el23),
+        el21['appendChild'](el22));
+      const el24 = el['createElement']('span');
+      ((el24['className'] = 'rh-ai-app-preview-drag-pad'),
+        el24['setAttribute']('aria-hidden', 'true'),
+        el21['appendChild'](el24));
+      const value47 = el['createElement']('div');
       return (
-        (_0x5bbf8a['className'] = 'ui-schema-field-control rh-ai-app-preview-placeholder-control'),
-        _0x3b78df['appendChild'](_0x5bbf8a),
-        _0x1a754b['appendChild'](_0x3b78df),
-        (_0x2d31a2['advancedPlaceholder'] = _0x3b78df),
-        _0x3b78df
+        (value47['className'] = 'ui-schema-field-control rh-ai-app-preview-placeholder-control'),
+        el21['appendChild'](value47),
+        el20['appendChild'](el21),
+        (enabled7['advancedPlaceholder'] = el21),
+        el21
       );
     }
-    ['_clearPreviewAdvancedParamDropPlaceholder'](_0x11fa4d, { animate: animate = ![] } = {}) {
-      const _0x665583 = _0x11fa4d?.['advancedPlaceholder'];
-      if (!_0x665583) return;
-      if (!_0x665583['isConnected']) {
-        _0x11fa4d['advancedPlaceholder'] = null;
+    ['_clearPreviewAdvancedParamDropPlaceholder'](value48, { animate: animate = ![] } = {}) {
+      const el25 = value48?.['advancedPlaceholder'];
+      if (!el25) return;
+      if (!el25['isConnected']) {
+        value48['advancedPlaceholder'] = null;
         return;
       }
-      const _0xfe65df = _0x665583['closest']?.('[data-preview-zone]'),
-        _0x26be59 =
-          animate && _0xfe65df
-            ? Array['from'](_0xfe65df['querySelectorAll']('.rh-ai-app-preview-advanced-param'))['filter'](
-                (_0xb1966d) => _0xb1966d !== _0x665583,
+      const el26 = el25['closest']?.('[data-preview-zone]'),
+        value49 =
+          animate && el26
+            ? Array['from'](el26['querySelectorAll']('.rh-ai-app-preview-advanced-param'))['filter'](
+                (value50) => value50 !== el25,
               )
             : [];
-      (animatePreviewOrder(_0x26be59, () => _0x665583['remove']()),
-        (_0x11fa4d['advancedPlaceholder'] = null));
+      (animatePreviewOrder(value49, () => el25['remove']()), (value48['advancedPlaceholder'] = null));
     }
-    ['_reorderPreviewInputsDuringDrag'](_0x4e825c) {
-      if (!_0x4e825c || _0x4e825c['dragKind'] !== 'input') return;
-      const _0x441f3f = _0x5126d9(this['componentDrafts']);
-      if (_0x441f3f['length'] <= 0x1) return;
-      const _0x4d5fff = this['_getPreviewDropOrder'](
+    ['_reorderPreviewInputsDuringDrag'](enabled9) {
+      if (!enabled9 || enabled9['dragKind'] !== 'input') return;
+      const list8 = getPreviewInputComponents(this['componentDrafts']);
+      if (list8['length'] <= 0x1) return;
+      const value51 = this['_getPreviewDropOrder'](
         'input',
-        _0x4e825c['currentClientX'],
+        enabled9['currentClientX'],
         '.rh-ai-app-preview-input-slot',
       );
-      _0x8e1e5f(_0x441f3f, _0x4e825c['index'], 'inputOrder', _0x4d5fff);
-      const _0x5b5164 = _0x5126d9(this['componentDrafts'])['map']((_0x43b599) => Number(_0x43b599['index'])),
-        _0x1e6eff = 'input:' + _0x5b5164['join'](',');
-      if (_0x4e825c['lastPreviewOrderKey'] === _0x1e6eff) return;
-      (this['_animatePreviewZoneOrder']('input', '.rh-ai-app-preview-input-slot', _0x5b5164),
-        (_0x4e825c['lastPreviewOrderKey'] = _0x1e6eff),
-        (_0x4e825c['didLiveOrder'] = !![]));
+      moveComponentToOrder(list8, enabled9['index'], 'inputOrder', value51);
+      const list9 = getPreviewInputComponents(this['componentDrafts'])['map']((value52) =>
+          Number(value52['index']),
+        ),
+        value53 = 'input:' + list9['join'](',');
+      if (enabled9['lastPreviewOrderKey'] === value53) return;
+      (this['_animatePreviewZoneOrder']('input', '.rh-ai-app-preview-input-slot', list9),
+        (enabled9['lastPreviewOrderKey'] = value53),
+        (enabled9['didLiveOrder'] = !![]));
     }
     ['_placePreviewParamDraft'](
-      _0x47dd0e,
-      _0x218a96,
+      enabled10,
+      value54,
       { clientX: clientX = null, clientY: clientY = null } = {},
     ) {
-      if (!_0x47dd0e || !_0x18a04a(_0x47dd0e)) return ![];
-      const _0x417e7a = _0x218a96 === 'home' ? 'home' : 'advanced';
-      if (_0x417e7a === 'home') {
-        const _0x23e99c = _0x47dd0e['previewPlacement'] === 'home';
+      if (!enabled10 || !isParamComponent(enabled10)) return ![];
+      const value55 = value54 === 'home' ? 'home' : 'advanced';
+      if (value55 === 'home') {
+        const enabled11 = enabled10['previewPlacement'] === 'home';
         if (
-          !_0x23e99c &&
+          !enabled11 &&
           getParameterEntries(this['componentDrafts'])['length'] >= PREVIEW_CUSTOM_COMPONENT_LIMIT
         )
           return ![];
-        ((_0x47dd0e['previewPlacement'] = 'home'), delete _0x47dd0e['advancedParamOrder']);
-        const _0x44b651 = _0x705e20(this['componentDrafts']),
-          _0x1a7fef =
+        ((enabled10['previewPlacement'] = 'home'), delete enabled10['advancedParamOrder']);
+        const list10 = getPreviewHomeParamComponents(this['componentDrafts']),
+          value56 =
             clientX !== null && Number['isFinite'](Number(clientX))
               ? this['_getPreviewDropOrder']('params', clientX, '.rh-ai-app-preview-param-chip')
-              : _0x44b651['length'];
-        return (_0x8e1e5f(_0x44b651, _0x47dd0e['index'], 'homeParamOrder', _0x1a7fef), !![]);
+              : list10['length'];
+        return (moveComponentToOrder(list10, enabled10['index'], 'homeParamOrder', value56), !![]);
       }
-      ((_0x47dd0e['previewPlacement'] = 'advanced'),
-        delete _0x47dd0e['homeParamOrder'],
-        _0x4a1992(_0x705e20(this['componentDrafts']), 'homeParamOrder'));
-      const _0x26cb66 = _0x596728(this['componentDrafts']),
-        _0x426f17 = clientX !== null && Number['isFinite'](Number(clientX)),
-        _0x29e4ea = clientY !== null && Number['isFinite'](Number(clientY)),
-        _0x1b20e6 =
-          _0x426f17 || _0x29e4ea
+      ((enabled10['previewPlacement'] = 'advanced'),
+        delete enabled10['homeParamOrder'],
+        assignSequentialOrder(getPreviewHomeParamComponents(this['componentDrafts']), 'homeParamOrder'));
+      const list11 = getPreviewAdvancedParamComponents(this['componentDrafts']),
+        value57 = clientX !== null && Number['isFinite'](Number(clientX)),
+        value58 = clientY !== null && Number['isFinite'](Number(clientY)),
+        value59 =
+          value57 || value58
             ? this['_getPreviewDropOrder']('advanced', clientX, '.rh-ai-app-preview-advanced-param', clientY)
-            : _0x26cb66['length'];
-      return (_0x8e1e5f(_0x26cb66, _0x47dd0e['index'], 'advancedParamOrder', _0x1b20e6), !![]);
+            : list11['length'];
+      return (moveComponentToOrder(list11, enabled10['index'], 'advancedParamOrder', value59), !![]);
     }
-    ['_movePreviewTextParamToPrompt'](_0x3136d8) {
-      const _0x1e1a6c = _0x44483b(this['componentDrafts'], _0x3136d8?.['index']);
-      if (!_0x1e1a6c || !_0x18a04a(_0x1e1a6c) || !_0x10f2b3(_0x1e1a6c)) return ![];
+    ['_movePreviewTextParamToPrompt'](value60) {
+      const enabled12 = getComponentByIndex(this['componentDrafts'], value60?.['index']);
+      if (!enabled12 || !isParamComponent(enabled12) || !canPreviewComponentBecomePrompt(enabled12))
+        return ![];
       return (
-        (_0x1e1a6c['componentKind'] = 'prompt'),
-        (_0x1e1a6c['controlType'] = 'prompt'),
-        delete _0x1e1a6c['homeParamOrder'],
-        delete _0x1e1a6c['advancedParamOrder'],
-        delete _0x1e1a6c['previewPlacement'],
-        _0x4a1992(_0x705e20(this['componentDrafts']), 'homeParamOrder'),
+        (enabled12['componentKind'] = 'prompt'),
+        (enabled12['controlType'] = 'prompt'),
+        delete enabled12['homeParamOrder'],
+        delete enabled12['advancedParamOrder'],
+        delete enabled12['previewPlacement'],
+        assignSequentialOrder(getPreviewHomeParamComponents(this['componentDrafts']), 'homeParamOrder'),
         !![]
       );
     }
-    ['_movePreviewPromptToParam'](_0x2f0799, _0x4ec58b, _0x4dd117 = '') {
-      const _0x5123c4 = _0x44483b(this['componentDrafts'], _0x2f0799?.['index']);
-      if (!_0x5123c4 || !_0x1ade41(_0x5123c4)) return ![];
-      const _0x1bcf18 = _0x5748c8(_0x5123c4, _0x4dd117);
-      if (!_0x1bcf18) return ![];
-      ((_0x5123c4['componentKind'] = 'param'), (_0x5123c4['controlType'] = _0x1bcf18));
-      const _0x1633fd = this['_placePreviewParamDraft'](_0x5123c4, _0x4ec58b, {
-        clientX: _0x2f0799?.['currentClientX'],
-        clientY: _0x2f0799?.['currentClientY'],
+    ['_movePreviewPromptToParam'](clientX2, value61, value62 = '') {
+      const enabled13 = getComponentByIndex(this['componentDrafts'], clientX2?.['index']);
+      if (!enabled13 || !canPreviewPromptBecomeParam(enabled13)) return ![];
+      const enabled14 = getPreviewPromptReturnControlType(enabled13, value62);
+      if (!enabled14) return ![];
+      ((enabled13['componentKind'] = 'param'), (enabled13['controlType'] = enabled14));
+      const enabled15 = this['_placePreviewParamDraft'](enabled13, value61, {
+        clientX: clientX2?.['currentClientX'],
+        clientY: clientX2?.['currentClientY'],
       });
       return (
-        !_0x1633fd &&
-          ((_0x5123c4['componentKind'] = 'prompt'),
-          (_0x5123c4['controlType'] = 'prompt'),
-          delete _0x5123c4['homeParamOrder'],
-          delete _0x5123c4['advancedParamOrder'],
-          delete _0x5123c4['previewPlacement']),
-        _0x1633fd
+        !enabled15 &&
+          ((enabled13['componentKind'] = 'prompt'),
+          (enabled13['controlType'] = 'prompt'),
+          delete enabled13['homeParamOrder'],
+          delete enabled13['advancedParamOrder'],
+          delete enabled13['previewPlacement']),
+        enabled15
       );
     }
-    ['_movePreviewParamToHome'](_0x188015) {
-      return this['_placePreviewParamDraft'](_0x44483b(this['componentDrafts'], _0x188015['index']), 'home', {
-        clientX: _0x188015['currentClientX'],
-      });
+    ['_movePreviewParamToHome'](clientX3) {
+      return this['_placePreviewParamDraft'](
+        getComponentByIndex(this['componentDrafts'], clientX3['index']),
+        'home',
+        {
+          clientX: clientX3['currentClientX'],
+        },
+      );
     }
-    ['_movePreviewParamToAdvanced'](_0x311135) {
-      const _0x49b24e = _0x44483b(this['componentDrafts'], _0x311135['index']);
-      if (!_0x49b24e || !_0x18a04a(_0x49b24e)) return ![];
-      const _0xdce1ea = _0x596728(this['componentDrafts'])
-          ['map']((_0x3d738e) => Number(_0x3d738e['index']))
+    ['_movePreviewParamToAdvanced'](value63) {
+      const enabled16 = getComponentByIndex(this['componentDrafts'], value63['index']);
+      if (!enabled16 || !isParamComponent(enabled16)) return ![];
+      const value64 = getPreviewAdvancedParamComponents(this['componentDrafts'])
+          ['map']((value65) => Number(value65['index']))
           ['join'](','),
-        _0x305e56 = _0x49b24e['previewPlacement'] === 'advanced',
-        _0x9725ab = Object['hasOwn'](_0x49b24e, 'homeParamOrder');
-      ((_0x49b24e['previewPlacement'] = 'advanced'),
-        delete _0x49b24e['homeParamOrder'],
-        _0x4a1992(_0x705e20(this['componentDrafts']), 'homeParamOrder'));
-      const _0x18a971 = _0x596728(this['componentDrafts']),
-        _0x190724 = this['_getPreviewDropOrder'](
+        enabled17 = enabled16['previewPlacement'] === 'advanced',
+        value66 = Object['hasOwn'](enabled16, 'homeParamOrder');
+      ((enabled16['previewPlacement'] = 'advanced'),
+        delete enabled16['homeParamOrder'],
+        assignSequentialOrder(getPreviewHomeParamComponents(this['componentDrafts']), 'homeParamOrder'));
+      const value67 = getPreviewAdvancedParamComponents(this['componentDrafts']),
+        value68 = this['_getPreviewDropOrder'](
           'advanced',
-          _0x311135['currentClientX'],
+          value63['currentClientX'],
           '.rh-ai-app-preview-advanced-param',
-          _0x311135['currentClientY'],
+          value63['currentClientY'],
         );
-      _0x8e1e5f(_0x18a971, _0x311135['index'], 'advancedParamOrder', _0x190724);
-      const _0x578dea = _0x596728(this['componentDrafts'])
-        ['map']((_0x51de24) => Number(_0x51de24['index']))
+      moveComponentToOrder(value67, value63['index'], 'advancedParamOrder', value68);
+      const value69 = getPreviewAdvancedParamComponents(this['componentDrafts'])
+        ['map']((value70) => Number(value70['index']))
         ['join'](',');
-      return !_0x305e56 || _0x9725ab || _0xdce1ea !== _0x578dea;
+      return !enabled17 || value66 || value64 !== value69;
     }
-    ['_reorderPreviewHomeParamsDuringDrag'](_0x4cdb25) {
-      if (!_0x4cdb25 || (_0x4cdb25['dragKind'] !== 'param' && _0x4cdb25['dragKind'] !== 'advanced-param'))
+    ['_reorderPreviewHomeParamsDuringDrag'](enabled18) {
+      if (!enabled18 || (enabled18['dragKind'] !== 'param' && enabled18['dragKind'] !== 'advanced-param'))
         return;
-      const _0x36fbb1 = this['_getPreviewDropOrder'](
+      const value71 = this['_getPreviewDropOrder'](
           'params',
-          _0x4cdb25['currentClientX'],
+          enabled18['currentClientX'],
           '.rh-ai-app-preview-param-chip',
         ),
-        _0x5d7368 = this['_getPreviewOrderedIndexesDuringDrag'](_0x4cdb25, 'params', _0x36fbb1);
-      if (!_0x5d7368['includes'](Number(_0x4cdb25['index']))) {
-        this['_clearPreviewHomeParamDropPlaceholder'](_0x4cdb25, { animate: !![] });
+        list12 = this['_getPreviewOrderedIndexesDuringDrag'](enabled18, 'params', value71);
+      if (!list12['includes'](Number(enabled18['index']))) {
+        this['_clearPreviewHomeParamDropPlaceholder'](enabled18, { animate: !![] });
         return;
       }
-      if (_0x4cdb25['dragKind'] === 'advanced-param')
-        this['_createPreviewHomeParamDropPlaceholder'](_0x4cdb25);
+      if (enabled18['dragKind'] === 'advanced-param')
+        this['_createPreviewHomeParamDropPlaceholder'](enabled18);
       else {
-        const _0x7ce14d = _0x705e20(this['componentDrafts']);
-        _0x8e1e5f(_0x7ce14d, _0x4cdb25['index'], 'homeParamOrder', _0x36fbb1);
+        const value72 = getPreviewHomeParamComponents(this['componentDrafts']);
+        moveComponentToOrder(value72, enabled18['index'], 'homeParamOrder', value71);
       }
-      const _0x4d9e41 =
-          _0x4cdb25['dragKind'] === 'advanced-param'
-            ? _0x5d7368
-            : _0x705e20(this['componentDrafts'])['map']((_0xe7421d) => Number(_0xe7421d['index'])),
-        _0x7e2ab = 'params:' + _0x4d9e41['join'](',');
-      if (_0x4cdb25['lastPreviewOrderKey'] === _0x7e2ab) return;
-      (this['_animatePreviewZoneOrder']('params', '.rh-ai-app-preview-param-chip', _0x4d9e41),
-        (_0x4cdb25['lastPreviewOrderKey'] = _0x7e2ab));
-      if (_0x4cdb25['dragKind'] === 'param') _0x4cdb25['didLiveOrder'] = !![];
+      const list13 =
+          enabled18['dragKind'] === 'advanced-param'
+            ? list12
+            : getPreviewHomeParamComponents(this['componentDrafts'])['map']((value73) =>
+                Number(value73['index']),
+              ),
+        value74 = 'params:' + list13['join'](',');
+      if (enabled18['lastPreviewOrderKey'] === value74) return;
+      (this['_animatePreviewZoneOrder']('params', '.rh-ai-app-preview-param-chip', list13),
+        (enabled18['lastPreviewOrderKey'] = value74));
+      if (enabled18['dragKind'] === 'param') enabled18['didLiveOrder'] = !![];
     }
-    ['_reorderPreviewAdvancedParamsDuringDrag'](_0x334170) {
-      if (!_0x334170 || !['param', 'advanced-param', 'group-param']['includes'](_0x334170['dragKind']))
+    ['_reorderPreviewAdvancedParamsDuringDrag'](enabled19) {
+      if (!enabled19 || !['param', 'advanced-param', 'group-param']['includes'](enabled19['dragKind']))
         return;
-      const _0x3f92c5 = this['_getPreviewDropOrder'](
+      const value75 = this['_getPreviewDropOrder'](
           'advanced',
-          _0x334170['currentClientX'],
+          enabled19['currentClientX'],
           '.rh-ai-app-preview-advanced-param',
-          _0x334170['currentClientY'],
+          enabled19['currentClientY'],
         ),
-        _0x272b17 = this['_getPreviewOrderedIndexesDuringDrag'](_0x334170, 'advanced', _0x3f92c5);
-      if (!_0x272b17['includes'](Number(_0x334170['index']))) {
-        this['_clearPreviewAdvancedParamDropPlaceholder'](_0x334170, { animate: !![] });
+        list14 = this['_getPreviewOrderedIndexesDuringDrag'](enabled19, 'advanced', value75);
+      if (!list14['includes'](Number(enabled19['index']))) {
+        this['_clearPreviewAdvancedParamDropPlaceholder'](enabled19, { animate: !![] });
         return;
       }
-      if (_0x334170['dragKind'] !== 'advanced-param')
-        this['_createPreviewAdvancedParamDropPlaceholder'](_0x334170);
+      if (enabled19['dragKind'] !== 'advanced-param')
+        this['_createPreviewAdvancedParamDropPlaceholder'](enabled19);
       else {
-        const _0x9cc4c3 = _0x596728(this['componentDrafts']);
-        _0x8e1e5f(_0x9cc4c3, _0x334170['index'], 'advancedParamOrder', _0x3f92c5);
+        const value76 = getPreviewAdvancedParamComponents(this['componentDrafts']);
+        moveComponentToOrder(value76, enabled19['index'], 'advancedParamOrder', value75);
       }
-      const _0x4ee3c8 =
-          _0x334170['dragKind'] !== 'advanced-param'
-            ? _0x272b17
-            : _0x596728(this['componentDrafts'])['map']((_0x4ce984) => Number(_0x4ce984['index'])),
-        _0x816f0f = 'advanced:' + _0x4ee3c8['join'](',');
-      if (_0x334170['lastPreviewOrderKey'] === _0x816f0f) return;
-      (this['_animatePreviewZoneOrder']('advanced', '.rh-ai-app-preview-advanced-param', _0x4ee3c8),
-        (_0x334170['lastPreviewOrderKey'] = _0x816f0f));
-      if (_0x334170['dragKind'] === 'advanced-param') _0x334170['didLiveOrder'] = !![];
+      const list15 =
+          enabled19['dragKind'] !== 'advanced-param'
+            ? list14
+            : getPreviewAdvancedParamComponents(this['componentDrafts'])['map']((value77) =>
+                Number(value77['index']),
+              ),
+        value78 = 'advanced:' + list15['join'](',');
+      if (enabled19['lastPreviewOrderKey'] === value78) return;
+      (this['_animatePreviewZoneOrder']('advanced', '.rh-ai-app-preview-advanced-param', list15),
+        (enabled19['lastPreviewOrderKey'] = value78));
+      if (enabled19['dragKind'] === 'advanced-param') enabled19['didLiveOrder'] = !![];
     }
-    ['_handlePreviewPointerDown'](_0xaa417c) {
-      if (_0xaa417c['button'] !== 0x0) return;
+    ['_handlePreviewPointerDown'](pointerId) {
+      if (pointerId['button'] !== 0x0) return;
       if (
-        _0xaa417c['target']?.['closest']?.('.rh-ai-app-group-panel') &&
-        !_0xaa417c['target']?.['closest']?.('[data-preview-drag-kind=\x22group-param\x22]')
+        pointerId['target']?.['closest']?.('.rh-ai-app-group-panel') &&
+        !pointerId['target']?.['closest']?.('[data-preview-drag-kind=\x22group-param\x22]')
       )
         return;
-      if (this['_isPreviewControlTarget'](_0xaa417c['target'])) return;
-      const _0x407d40 = _0xaa417c['target']?.['closest']?.('.rh-ai-app-preview-draggable');
-      if (!_0x407d40 || !this['panel']?.['contains'](_0x407d40)) return;
-      const _0x4a0ec9 = Number(_0x407d40['dataset']['previewComponentIndex']);
-      if (!Number['isInteger'](_0x4a0ec9)) return;
-      const _0x3ddfcd = String(_0x407d40['dataset']['previewDragKind'] || 'param'),
-        _0x5f27d1 = _0xaa417c['target']?.['closest']?.('.rh-ai-app-preview-rename-target') || null,
-        _0x334155 = _0x5f27d1 && _0x407d40['contains'](_0x5f27d1) ? _0x5f27d1 : null;
+      if (this['_isPreviewControlTarget'](pointerId['target'])) return;
+      const target2 = pointerId['target']?.['closest']?.('.rh-ai-app-preview-draggable');
+      if (!target2 || !this['panel']?.['contains'](target2)) return;
+      const index2 = Number(target2['dataset']['previewComponentIndex']);
+      if (!Number['isInteger'](index2)) return;
+      const dragKind = String(target2['dataset']['previewDragKind'] || 'param'),
+        value79 = pointerId['target']?.['closest']?.('.rh-ai-app-preview-rename-target') || null,
+        renameTarget = value79 && target2['contains'](value79) ? value79 : null;
       ((this['previewDrag'] = {
-        index: _0x4a0ec9,
-        target: _0x407d40,
-        renameTarget: _0x334155,
+        index: index2,
+        target: target2,
+        renameTarget: renameTarget,
         ghost: null,
-        pointerId: _0xaa417c['pointerId'],
-        dragKind: _0x3ddfcd,
-        startClientX: _0xaa417c['clientX'],
-        startClientY: _0xaa417c['clientY'],
-        currentClientX: _0xaa417c['clientX'],
-        currentClientY: _0xaa417c['clientY'],
+        pointerId: pointerId['pointerId'],
+        dragKind: dragKind,
+        startClientX: pointerId['clientX'],
+        startClientY: pointerId['clientY'],
+        currentClientX: pointerId['clientX'],
+        currentClientY: pointerId['clientY'],
         moved: ![],
         isActive: ![],
         lastPreviewOrderKey: '',
@@ -682,199 +685,195 @@ export function createRhAiAppPreviewDragController({
         advancedPlaceholder: null,
         layoutSnapshot: null,
       }),
-        _0x407d40['setPointerCapture']?.(_0xaa417c['pointerId']));
+        target2['setPointerCapture']?.(pointerId['pointerId']));
     }
-    ['_handlePreviewPointerMove'](_0x583fa0) {
-      const _0x2439ed = this['previewDrag'];
-      if (!_0x2439ed) return;
-      const _0x41b385 =
-        Math['abs'](_0x583fa0['clientX'] - _0x2439ed['startClientX']) >= PREVIEW_DRAG_START_THRESHOLD_PX ||
-        Math['abs'](_0x583fa0['clientY'] - _0x2439ed['startClientY']) >= PREVIEW_DRAG_START_THRESHOLD_PX;
-      if (!_0x2439ed['isActive'] && !_0x41b385) {
-        ((_0x2439ed['currentClientX'] = _0x583fa0['clientX']),
-          (_0x2439ed['currentClientY'] = _0x583fa0['clientY']));
+    ['_handlePreviewPointerMove'](event8) {
+      const enabled20 = this['previewDrag'];
+      if (!enabled20) return;
+      const enabled21 =
+        Math['abs'](event8['clientX'] - enabled20['startClientX']) >= PREVIEW_DRAG_START_THRESHOLD_PX ||
+        Math['abs'](event8['clientY'] - enabled20['startClientY']) >= PREVIEW_DRAG_START_THRESHOLD_PX;
+      if (!enabled20['isActive'] && !enabled21) {
+        ((enabled20['currentClientX'] = event8['clientX']),
+          (enabled20['currentClientY'] = event8['clientY']));
         return;
       }
-      if (!_0x2439ed['isActive'] && !this['_activatePreviewDrag'](_0x2439ed, _0x583fa0)) return;
-      ((_0x2439ed['moved'] = !![]),
-        this['_setPreviewDragTransform'](_0x2439ed, _0x583fa0['clientX'], _0x583fa0['clientY']));
-      const _0x589e7c = this['_updatePreviewDropTarget'](_0x583fa0['clientX'], _0x583fa0['clientY']);
-      if (this['parameterGroups']['move'](_0x2439ed, _0x589e7c)) {
-        _0x583fa0['preventDefault']();
+      if (!enabled20['isActive'] && !this['_activatePreviewDrag'](enabled20, event8)) return;
+      ((enabled20['moved'] = !![]),
+        this['_setPreviewDragTransform'](enabled20, event8['clientX'], event8['clientY']));
+      const value80 = this['_updatePreviewDropTarget'](event8['clientX'], event8['clientY']);
+      if (this['parameterGroups']['move'](enabled20, value80)) {
+        event8['preventDefault']();
         return;
       }
-      const _0xc8cd80 = _0x44483b(this['componentDrafts'], _0x2439ed['index']),
-        _0xf4c78e =
-          (_0x2439ed['dragKind'] === 'param' || _0x2439ed['dragKind'] === 'advanced-param') &&
-          _0x10f2b3(_0xc8cd80),
-        _0x552d96 = _0x2439ed['dragKind'] === 'prompt' && _0x1ade41(_0xc8cd80);
-      _0x589e7c === 'params' &&
-      _0x2439ed['moved'] &&
-      (_0x2439ed['dragKind'] === 'param' || _0x2439ed['dragKind'] === 'advanced-param' || _0x552d96)
+      const value81 = getComponentByIndex(this['componentDrafts'], enabled20['index']),
+        value82 =
+          (enabled20['dragKind'] === 'param' || enabled20['dragKind'] === 'advanced-param') &&
+          canPreviewComponentBecomePrompt(value81),
+        value83 = enabled20['dragKind'] === 'prompt' && canPreviewPromptBecomeParam(value81);
+      value80 === 'params' &&
+      enabled20['moved'] &&
+      (enabled20['dragKind'] === 'param' || enabled20['dragKind'] === 'advanced-param' || value83)
         ? this['_getPreviewZoneElement']('params')?.['classList']['add']('is-param-drop-target')
         : this['_getPreviewZoneElement']('params')?.['classList']['remove']('is-param-drop-target');
       this['_getPreviewZoneElement']('prompt')?.['classList']['toggle'](
         'is-prompt-drop-target',
-        _0x589e7c === 'prompt' && _0xf4c78e,
+        value80 === 'prompt' && value82,
       );
-      _0x2439ed['moved'] &&
-        _0x2439ed['dragKind'] === 'input' &&
-        _0x589e7c === 'input' &&
-        this['_reorderPreviewInputsDuringDrag'](_0x2439ed);
+      enabled20['moved'] &&
+        enabled20['dragKind'] === 'input' &&
+        value80 === 'input' &&
+        this['_reorderPreviewInputsDuringDrag'](enabled20);
       if (
-        _0x2439ed['moved'] &&
-        (_0x2439ed['dragKind'] === 'param' || _0x2439ed['dragKind'] === 'advanced-param')
+        enabled20['moved'] &&
+        (enabled20['dragKind'] === 'param' || enabled20['dragKind'] === 'advanced-param')
       ) {
-        if (_0x589e7c === 'params')
-          (_0x2439ed['advancedPlaceholder'] &&
-            this['_clearPreviewAdvancedParamDropPlaceholder'](_0x2439ed, { animate: !![] }),
-            this['_reorderPreviewHomeParamsDuringDrag'](_0x2439ed));
+        if (value80 === 'params')
+          (enabled20['advancedPlaceholder'] &&
+            this['_clearPreviewAdvancedParamDropPlaceholder'](enabled20, { animate: !![] }),
+            this['_reorderPreviewHomeParamsDuringDrag'](enabled20));
         else {
-          if (_0x589e7c === 'advanced')
-            (_0x2439ed['homePlaceholder'] &&
-              this['_clearPreviewHomeParamDropPlaceholder'](_0x2439ed, { animate: !![] }),
-              this['_reorderPreviewAdvancedParamsDuringDrag'](_0x2439ed));
+          if (value80 === 'advanced')
+            (enabled20['homePlaceholder'] &&
+              this['_clearPreviewHomeParamDropPlaceholder'](enabled20, { animate: !![] }),
+              this['_reorderPreviewAdvancedParamsDuringDrag'](enabled20));
           else {
-            if (_0x2439ed['homePlaceholder'])
-              (this['_clearPreviewHomeParamDropPlaceholder'](_0x2439ed, { animate: !![] }),
-                (_0x2439ed['lastPreviewOrderKey'] = ''));
+            if (enabled20['homePlaceholder'])
+              (this['_clearPreviewHomeParamDropPlaceholder'](enabled20, { animate: !![] }),
+                (enabled20['lastPreviewOrderKey'] = ''));
             else
-              _0x2439ed['advancedPlaceholder'] &&
-                (this['_clearPreviewAdvancedParamDropPlaceholder'](_0x2439ed, { animate: !![] }),
-                (_0x2439ed['lastPreviewOrderKey'] = ''));
+              enabled20['advancedPlaceholder'] &&
+                (this['_clearPreviewAdvancedParamDropPlaceholder'](enabled20, { animate: !![] }),
+                (enabled20['lastPreviewOrderKey'] = ''));
           }
         }
       }
-      _0x583fa0['preventDefault']();
+      event8['preventDefault']();
     }
-    ['_handlePreviewPointerEnd'](_0x4e685e) {
-      const _0x55d2b1 = this['previewDrag'];
-      if (!_0x55d2b1) return;
-      if (!_0x55d2b1['isActive']) {
-        const _0x25f889 = _0x55d2b1['renameTarget'],
-          _0xc85033 = Number(_0x25f889?.['dataset']?.['previewComponentIndex']),
-          _0x31dfcb =
-            Math['abs'](_0x4e685e['clientX'] - _0x55d2b1['startClientX']) >
-              PREVIEW_RENAME_CLICK_TOLERANCE_PX ||
-            Math['abs'](_0x4e685e['clientY'] - _0x55d2b1['startClientY']) > PREVIEW_RENAME_CLICK_TOLERANCE_PX,
-          _0x8b3ded =
-            _0x4e685e['type'] === 'pointerup' &&
-            _0x25f889 &&
-            this['panel']?.['contains'](_0x25f889) &&
-            Number['isInteger'](_0xc85033) &&
-            !_0x31dfcb;
+    ['_handlePreviewPointerEnd'](event9) {
+      const event10 = this['previewDrag'];
+      if (!event10) return;
+      if (!event10['isActive']) {
+        const el27 = event10['renameTarget'],
+          value84 = Number(el27?.['dataset']?.['previewComponentIndex']),
+          enabled22 =
+            Math['abs'](event9['clientX'] - event10['startClientX']) > PREVIEW_RENAME_CLICK_TOLERANCE_PX ||
+            Math['abs'](event9['clientY'] - event10['startClientY']) > PREVIEW_RENAME_CLICK_TOLERANCE_PX,
+          value85 =
+            event9['type'] === 'pointerup' &&
+            el27 &&
+            this['panel']?.['contains'](el27) &&
+            Number['isInteger'](value84) &&
+            !enabled22;
         this['_clearPreviewDragState']();
-        if (_0x31dfcb) {
+        if (enabled22) {
           (this['_suppressNextPreviewRenameClick'](),
-            _0x4e685e['preventDefault'](),
-            _0x4e685e['stopPropagation']());
+            event9['preventDefault'](),
+            event9['stopPropagation']());
           return;
         }
-        _0x8b3ded &&
+        value85 &&
           (this['_suppressNextPreviewRenameClick'](),
-          _0x4e685e['preventDefault'](),
-          _0x4e685e['stopPropagation'](),
-          this['_startPreviewInlineRename'](_0x25f889, _0xc85033));
+          event9['preventDefault'](),
+          event9['stopPropagation'](),
+          this['_startPreviewInlineRename'](el27, value84));
         return;
       }
       (this['_suppressNextPreviewRenameClick'](),
-        this['_setPreviewDragTransform'](_0x55d2b1, _0x4e685e['clientX'], _0x4e685e['clientY']));
-      const _0x3078d6 = this['_getPreviewDropZone'](_0x55d2b1['currentClientX'], _0x55d2b1['currentClientY']);
-      if (this['parameterGroups']['end'](_0x55d2b1, _0x4e685e, _0x3078d6)) {
+        this['_setPreviewDragTransform'](event10, event9['clientX'], event9['clientY']));
+      const renderPrompt = this['_getPreviewDropZone'](event10['currentClientX'], event10['currentClientY']);
+      if (this['parameterGroups']['end'](event10, event9, renderPrompt)) {
         this['_clearPreviewDragState']();
-        const _0x1e7ed9 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
-        (this['_patchPreviewWithoutRebuild'](_0x1e7ed9, {
+        const value86 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+        (this['_patchPreviewWithoutRebuild'](value86, {
           renderParams: !![],
           renderAdvanced: !![],
-          renderPrompt: _0x3078d6 === 'prompt',
+          renderPrompt: renderPrompt === 'prompt',
         }),
           this['parameterGroups']['restorePanel']());
         return;
       }
-      const _0x181527 = this['_snapshotPreviewRect'](_0x55d2b1['ghost']?.['element'] || _0x55d2b1['target']),
-        _0x21ce0a = _0x44483b(this['componentDrafts'], _0x55d2b1['index']),
-        _0x5c91d9 =
-          (_0x55d2b1['dragKind'] === 'param' || _0x55d2b1['dragKind'] === 'advanced-param') &&
-          _0x10f2b3(_0x21ce0a),
-        _0x2392de = _0x55d2b1['dragKind'] === 'prompt' && _0x1ade41(_0x21ce0a),
-        _0x5d4ff1 =
-          _0x2392de &&
-          _0x3078d6 === 'params' &&
+      const value87 = this['_snapshotPreviewRect'](event10['ghost']?.['element'] || event10['target']),
+        value88 = getComponentByIndex(this['componentDrafts'], event10['index']),
+        value89 =
+          (event10['dragKind'] === 'param' || event10['dragKind'] === 'advanced-param') &&
+          canPreviewComponentBecomePrompt(value88),
+        value90 = event10['dragKind'] === 'prompt' && canPreviewPromptBecomeParam(value88),
+        value91 =
+          value90 &&
+          renderPrompt === 'params' &&
           getParameterEntries(this['componentDrafts'])['length'] < PREVIEW_CUSTOM_COMPONENT_LIMIT,
-        _0x41e1d9 = _0x2392de && _0x3078d6 === 'advanced';
-      let _0x4d2f5e = ![],
-        _0x309093 = ![],
-        _0x2e476c = ![],
-        _0x5755af = ![],
-        _0xc9cedc = ![];
-      const _0x171689 = _0x55d2b1['dragKind'] === 'input' && _0x3078d6 === 'input',
-        _0x5be6dd =
-          (_0x55d2b1['dragKind'] === 'param' || _0x55d2b1['dragKind'] === 'advanced-param') &&
-          (_0x3078d6 === 'params' || _0x3078d6 === 'advanced'),
-        _0x47ad39 = (_0x5c91d9 && _0x3078d6 === 'prompt') || _0x5d4ff1 || _0x41e1d9;
-      _0x55d2b1['moved'] &&
-        _0x55d2b1['didLiveOrder'] &&
-        !_0x171689 &&
-        !_0x5be6dd &&
-        !_0x47ad39 &&
-        (this['_restorePreviewLayoutSnapshot'](_0x55d2b1['layoutSnapshot']),
-        (_0x4d2f5e = !![]),
-        (_0x309093 = _0x55d2b1['dragKind'] === 'input'),
-        (_0x2e476c = _0x55d2b1['dragKind'] === 'param' || _0x55d2b1['dragKind'] === 'advanced-param'),
-        (_0x5755af = _0x55d2b1['dragKind'] === 'advanced-param'));
-      if (
-        _0x55d2b1['moved'] &&
-        (_0x55d2b1['dragKind'] === 'param' || _0x55d2b1['dragKind'] === 'advanced-param')
-      ) {
-        if (_0x3078d6 === 'params' && _0x55d2b1['dragKind'] === 'advanced-param') {
-          const _0x2e08fe = this['_movePreviewParamToHome'](_0x55d2b1);
-          ((_0x4d2f5e = _0x2e08fe || _0x4d2f5e),
-            (_0x2e476c = _0x2e08fe || _0x2e476c),
-            (_0x5755af = _0x2e08fe || _0x5755af));
+        value92 = value90 && renderPrompt === 'advanced';
+      let value93 = ![],
+        renderInputs = ![],
+        renderParams = ![],
+        renderAdvanced = ![],
+        renderPrompt2 = ![];
+      const enabled23 = event10['dragKind'] === 'input' && renderPrompt === 'input',
+        enabled24 =
+          (event10['dragKind'] === 'param' || event10['dragKind'] === 'advanced-param') &&
+          (renderPrompt === 'params' || renderPrompt === 'advanced'),
+        enabled25 = (value89 && renderPrompt === 'prompt') || value91 || value92;
+      event10['moved'] &&
+        event10['didLiveOrder'] &&
+        !enabled23 &&
+        !enabled24 &&
+        !enabled25 &&
+        (this['_restorePreviewLayoutSnapshot'](event10['layoutSnapshot']),
+        (value93 = !![]),
+        (renderInputs = event10['dragKind'] === 'input'),
+        (renderParams = event10['dragKind'] === 'param' || event10['dragKind'] === 'advanced-param'),
+        (renderAdvanced = event10['dragKind'] === 'advanced-param'));
+      if (event10['moved'] && (event10['dragKind'] === 'param' || event10['dragKind'] === 'advanced-param')) {
+        if (renderPrompt === 'params' && event10['dragKind'] === 'advanced-param') {
+          const value94 = this['_movePreviewParamToHome'](event10);
+          ((value93 = value94 || value93),
+            (renderParams = value94 || renderParams),
+            (renderAdvanced = value94 || renderAdvanced));
         } else {
-          if (_0x3078d6 === 'advanced' && _0x55d2b1['dragKind'] === 'param') {
-            const _0x213a2b = this['_movePreviewParamToAdvanced'](_0x55d2b1);
-            ((_0x4d2f5e = _0x213a2b || _0x4d2f5e),
-              (_0x2e476c = _0x213a2b || _0x2e476c),
-              (_0x5755af = _0x213a2b || _0x5755af));
+          if (renderPrompt === 'advanced' && event10['dragKind'] === 'param') {
+            const value95 = this['_movePreviewParamToAdvanced'](event10);
+            ((value93 = value95 || value93),
+              (renderParams = value95 || renderParams),
+              (renderAdvanced = value95 || renderAdvanced));
           }
         }
       }
-      if (_0x55d2b1['moved'] && _0x5c91d9 && _0x3078d6 === 'prompt') {
-        const _0x5bb5c6 = this['_movePreviewTextParamToPrompt'](_0x55d2b1);
-        ((_0x4d2f5e = _0x5bb5c6 || _0x4d2f5e),
-          (_0xc9cedc = _0x5bb5c6 || _0xc9cedc),
-          (_0x2e476c = _0x55d2b1['dragKind'] === 'param' || _0x2e476c),
-          (_0x5755af = _0x55d2b1['dragKind'] === 'advanced-param' || _0x5755af));
+      if (event10['moved'] && value89 && renderPrompt === 'prompt') {
+        const value96 = this['_movePreviewTextParamToPrompt'](event10);
+        ((value93 = value96 || value93),
+          (renderPrompt2 = value96 || renderPrompt2),
+          (renderParams = event10['dragKind'] === 'param' || renderParams),
+          (renderAdvanced = event10['dragKind'] === 'advanced-param' || renderAdvanced));
       } else {
-        if (_0x55d2b1['moved'] && _0x2392de) {
-          if (_0x5d4ff1) {
-            const _0x2799e3 = this['_movePreviewPromptToParam'](_0x55d2b1, 'home');
-            ((_0x4d2f5e = _0x2799e3 || _0x4d2f5e),
-              (_0xc9cedc = _0x2799e3 || _0xc9cedc),
-              (_0x2e476c = _0x2799e3 || _0x2e476c));
+        if (event10['moved'] && value90) {
+          if (value91) {
+            const value97 = this['_movePreviewPromptToParam'](event10, 'home');
+            ((value93 = value97 || value93),
+              (renderPrompt2 = value97 || renderPrompt2),
+              (renderParams = value97 || renderParams));
           } else {
-            if (_0x41e1d9) {
-              const _0x291648 = this['_movePreviewPromptToParam'](_0x55d2b1, 'advanced');
-              ((_0x4d2f5e = _0x291648 || _0x4d2f5e),
-                (_0xc9cedc = _0x291648 || _0xc9cedc),
-                (_0x5755af = _0x291648 || _0x5755af));
+            if (value92) {
+              const value98 = this['_movePreviewPromptToParam'](event10, 'advanced');
+              ((value93 = value98 || value93),
+                (renderPrompt2 = value98 || renderPrompt2),
+                (renderAdvanced = value98 || renderAdvanced));
             }
           }
         }
       }
       this['_clearPreviewDragState']();
-      const _0x3fbea1 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
-      if (_0x4d2f5e || _0xc9cedc) {
-        this['_patchPreviewWithoutRebuild'](_0x3fbea1, {
-          renderInputs: _0x309093,
-          renderParams: _0x2e476c,
-          renderAdvanced: _0x5755af,
-          renderPrompt: _0xc9cedc,
+      const value99 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+      if (value93 || renderPrompt2) {
+        this['_patchPreviewWithoutRebuild'](value99, {
+          renderInputs: renderInputs,
+          renderParams: renderParams,
+          renderAdvanced: renderAdvanced,
+          renderPrompt: renderPrompt2,
         });
-        if (_0x181527) this['_animatePreviewComponentFromRect'](_0x55d2b1['index'], _0x181527);
+        if (value87) this['_animatePreviewComponentFromRect'](event10['index'], value87);
       }
     }
   }
-  return new _0x432ef0();
+  return new handler();
 }

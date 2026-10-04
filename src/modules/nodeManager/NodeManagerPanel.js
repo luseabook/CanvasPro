@@ -30,609 +30,586 @@ const SIDEBAR_KEY = 'node-manager',
     video: '.nam-item[data-type=\x22video\x22]\x20svg',
     videoPlay: '.video-play-btn svg',
   });
-function createSharedIcon(_0x2bcbfd) {
-  const _0x5e4959 =
-    _0x2bcbfd === 'more'
+function createSharedIcon(value) {
+  const item =
+    value === 'more'
       ? NODE_TOOLBAR_MORE_ICON_SVG
-      : _0x2bcbfd === 'treeChevron'
+      : value === 'treeChevron'
         ? MATERIAL_TREE_CHEVRON_ICON_SVG
-        : _0x2bcbfd === 'collapse'
+        : value === 'collapse'
           ? PANEL_COLLAPSE_LEFT_ICON_SVG
           : '';
-  return _0x5e4959 ? createSafeSvg(_0x5e4959) : null;
+  return item ? createSafeSvg(item) : null;
 }
-function getStoreState(_0x15e83a) {
-  return _0x15e83a?.['getStateRaw']?.() || _0x15e83a?.['getState']?.() || {};
+function getStoreState(store) {
+  return store?.['getStateRaw']?.() || store?.['getState']?.() || {};
 }
-function createElement(_0x2b2ca0, _0x24d9d5 = '', _0x1a265d = {}) {
-  const _0x7b2e16 = document['createElement'](_0x2b2ca0);
-  if (_0x24d9d5) _0x7b2e16['className'] = _0x24d9d5;
+function createElement(key, index = '', result = {}) {
+  const el = document['createElement'](key);
+  if (index) el['className'] = index;
   return (
-    Object['entries'](_0x1a265d)['forEach'](([_0x242f56, _0x129dd9]) => {
-      if (_0x129dd9 == null) return;
-      _0x7b2e16['setAttribute'](_0x242f56, String(_0x129dd9));
+    Object['entries'](result)['forEach'](([data, options]) => {
+      if (options == null) return;
+      el['setAttribute'](data, String(options));
     }),
-    _0x7b2e16
+    el
   );
 }
-function cloneExistingIcon(_0x1d70bf, _0x5cd5c5 = '', _0x95a576) {
-  const _0x5981e7 = ICON_SELECTORS[_0x1d70bf] || '';
-  !_0x95a576['has'](_0x1d70bf) &&
-    _0x95a576['set'](
-      _0x1d70bf,
-      (_0x5981e7 ? document['querySelector'](_0x5981e7) : null) || createSharedIcon(_0x1d70bf),
-    );
-  const _0x1e5c97 = _0x95a576['get'](_0x1d70bf),
-    _0x40e20f = _0x1e5c97?.['cloneNode']?.(!![]);
-  if (!_0x40e20f) return null;
-  (_0x40e20f['removeAttribute']?.('id'),
-    _0x40e20f['setAttribute']?.('aria-hidden', 'true'),
-    _0x40e20f['setAttribute']?.('focusable', 'false'));
-  if (_0x5cd5c5) _0x40e20f['classList']?.['add'](_0x5cd5c5);
-  return _0x40e20f;
+function cloneExistingIcon(target, source = '', map) {
+  const next = ICON_SELECTORS[target] || '';
+  !map['has'](target) &&
+    map['set'](target, (next ? document['querySelector'](next) : null) || createSharedIcon(target));
+  const current = map['get'](target),
+    el2 = current?.['cloneNode']?.(!![]);
+  if (!el2) return null;
+  (el2['removeAttribute']?.('id'),
+    el2['setAttribute']?.('aria-hidden', 'true'),
+    el2['setAttribute']?.('focusable', 'false'));
+  if (source) el2['classList']?.['add'](source);
+  return el2;
 }
-function installNodeManagerButtonIcon(_0x3873b8) {
-  if (!_0x3873b8 || _0x3873b8['querySelector']?.('svg')) return;
-  const _0x49a9ce = document['querySelector']('#btnToggleDots svg'),
-    _0x5abcb1 = _0x49a9ce?.['cloneNode']?.(!![]);
-  if (!_0x5abcb1) return;
-  (_0x5abcb1['removeAttribute']?.('id'),
-    _0x5abcb1['setAttribute']?.('width', '20'),
-    _0x5abcb1['setAttribute']?.('height', '20'),
-    _0x5abcb1['setAttribute']?.('aria-hidden', 'true'),
-    _0x5abcb1['setAttribute']?.('focusable', 'false'),
-    _0x3873b8['appendChild'](_0x5abcb1));
+function installNodeManagerButtonIcon(el3) {
+  if (!el3 || el3['querySelector']?.('svg')) return;
+  const entry = document['querySelector']('#btnToggleDots svg'),
+    el4 = entry?.['cloneNode']?.(!![]);
+  if (!el4) return;
+  (el4['removeAttribute']?.('id'),
+    el4['setAttribute']?.('width', '20'),
+    el4['setAttribute']?.('height', '20'),
+    el4['setAttribute']?.('aria-hidden', 'true'),
+    el4['setAttribute']?.('focusable', 'false'),
+    el3['appendChild'](el4));
 }
 function getProjectName() {
-  const _0x468ea6 = window['CanvasTabManager']?.['getCanvasProjectContext']?.(),
-    _0x133c12 = document['getElementById']('projectNameText')?.['textContent'];
-  return String(_0x468ea6?.['projectName'] || _0x133c12 || t('projectDropdown.unnamedCanvas'))
+  const record = window['CanvasTabManager']?.['getCanvasProjectContext']?.(),
+    payload = document['getElementById']('projectNameText')?.['textContent'];
+  return String(record?.['projectName'] || payload || t('projectDropdown.unnamedCanvas'))
     ['replace'](/\s+/g, '\x20')
     ['trim']();
 }
-function normalizeWheelDelta(_0x21a27b, _0x2afd91) {
-  const _0x1a9b9b =
-    _0x21a27b['deltaMode'] === 0x1
-      ? 0x10
-      : _0x21a27b['deltaMode'] === 0x2
-        ? Math['max'](0x1, _0x2afd91)
-        : 0x1;
-  return (Number(_0x21a27b['deltaY']) || Number(_0x21a27b['deltaX']) || 0x0) * _0x1a9b9b;
+function normalizeWheelDelta(event, handle) {
+  const state =
+    event['deltaMode'] === 0x1 ? 0x10 : event['deltaMode'] === 0x2 ? Math['max'](0x1, handle) : 0x1;
+  return (Number(event['deltaY']) || Number(event['deltaX']) || 0x0) * state;
 }
-export function installScrollableWheelBoundary(_0x3de3dd, { getAxis: getAxis = () => 'vertical' } = {}) {
-  const _0x2b4162 = (_0x468000) => {
+export function installScrollableWheelBoundary(el5, { getAxis: getAxis = () => 'vertical' } = {}) {
+  const config = (event2) => {
     if (getAxis() === 'horizontal') {
-      const _0x4e7d68 = Math['max'](0x0, Number(_0x3de3dd['clientWidth']) || 0x0),
-        _0x1efe23 = Math['max'](0x0, (Number(_0x3de3dd['scrollWidth']) || 0x0) - _0x4e7d68);
-      if (_0x1efe23 <= 0x0) return;
-      if (!scrollElementHorizontallyWithWheel(_0x468000, _0x3de3dd, { stopPropagation: !![] })) {
-        const _0x11809e = Number(_0x468000['deltaY']) || Number(_0x468000['deltaX']) || 0x0;
-        if (!_0x11809e) return;
-        (_0x468000['preventDefault'](), _0x468000['stopPropagation']());
+      const scope = Math['max'](0x0, Number(el5['clientWidth']) || 0x0),
+        count = Math['max'](0x0, (Number(el5['scrollWidth']) || 0x0) - scope);
+      if (count <= 0x0) return;
+      if (!scrollElementHorizontallyWithWheel(event2, el5, { stopPropagation: !![] })) {
+        const enabled = Number(event2['deltaY']) || Number(event2['deltaX']) || 0x0;
+        if (!enabled) return;
+        (event2['preventDefault'](), event2['stopPropagation']());
       }
       return;
     }
-    const _0x131f6d = Math['max'](0x0, Number(_0x3de3dd['clientHeight']) || 0x0),
-      _0x51a370 = Math['max'](0x0, (Number(_0x3de3dd['scrollHeight']) || 0x0) - _0x131f6d);
-    if (_0x51a370 <= 0x0) return;
-    const _0x3d7503 = normalizeWheelDelta(_0x468000, _0x131f6d);
-    if (!_0x3d7503) return;
-    ((_0x3de3dd['scrollTop'] = Math['min'](
-      _0x51a370,
-      Math['max'](0x0, (Number(_0x3de3dd['scrollTop']) || 0x0) + _0x3d7503),
+    const input = Math['max'](0x0, Number(el5['clientHeight']) || 0x0),
+      count2 = Math['max'](0x0, (Number(el5['scrollHeight']) || 0x0) - input);
+    if (count2 <= 0x0) return;
+    const wheelDelta = normalizeWheelDelta(event2, input);
+    if (!wheelDelta) return;
+    ((el5['scrollTop'] = Math['min'](
+      count2,
+      Math['max'](0x0, (Number(el5['scrollTop']) || 0x0) + wheelDelta),
     )),
-      _0x468000['preventDefault'](),
-      _0x468000['stopPropagation']());
+      event2['preventDefault'](),
+      event2['stopPropagation']());
   };
   return (
-    _0x3de3dd['addEventListener']('wheel', _0x2b4162, { passive: ![] }),
-    () => _0x3de3dd['removeEventListener']('wheel', _0x2b4162)
+    el5['addEventListener']('wheel', config, { passive: ![] }),
+    () => el5['removeEventListener']('wheel', config)
   );
 }
-function normalizeRect(_0x44f350) {
-  const _0x2983ef = Number(_0x44f350?.['left']) || 0x0,
-    _0x3a368d = Number(_0x44f350?.['top']) || 0x0,
-    _0x326a58 = Math['max'](0x0, Number(_0x44f350?.['width']) || 0x0),
-    _0x3e2ca4 = Math['max'](0x0, Number(_0x44f350?.['height']) || 0x0);
+function normalizeRect(box) {
+  const left = Number(box?.['left']) || 0x0,
+    top = Number(box?.['top']) || 0x0,
+    width = Math['max'](0x0, Number(box?.['width']) || 0x0),
+    height = Math['max'](0x0, Number(box?.['height']) || 0x0);
   return {
-    left: _0x2983ef,
-    top: _0x3a368d,
-    width: _0x326a58,
-    height: _0x3e2ca4,
-    right: Number['isFinite'](Number(_0x44f350?.['right']))
-      ? Number(_0x44f350['right'])
-      : _0x2983ef + _0x326a58,
-    bottom: Number['isFinite'](Number(_0x44f350?.['bottom']))
-      ? Number(_0x44f350['bottom'])
-      : _0x3a368d + _0x3e2ca4,
+    left: left,
+    top: top,
+    width: width,
+    height: height,
+    right: Number['isFinite'](Number(box?.['right'])) ? Number(box['right']) : left + width,
+    bottom: Number['isFinite'](Number(box?.['bottom'])) ? Number(box['bottom']) : top + height,
   };
 }
 export function resolveNodeManagerViewportInsets({
-  placement: _0x34edce,
-  panelRect: _0x2d89bb,
-  canvasRect: _0x54a8c6,
+  placement: placement,
+  panelRect: panelRect,
+  canvasRect: canvasRect,
   gap: gap = 0xc,
 } = {}) {
-  const _0x60d216 = normalizeRect(_0x2d89bb),
-    _0x3ec2b5 = normalizeRect(_0x54a8c6),
-    _0x5486d8 = Math['max'](0x0, Number(gap) || 0x0),
-    _0x22e4b9 = { top: 0x0, right: 0x0, bottom: 0x0, left: 0x0 };
-  if (!(_0x3ec2b5['width'] > 0x0 && _0x3ec2b5['height'] > 0x0)) return _0x22e4b9;
-  const _0x2ff9a4 = _0x60d216['right'] > _0x3ec2b5['left'] && _0x60d216['left'] < _0x3ec2b5['right'],
-    _0x8d8c4 = _0x60d216['bottom'] > _0x3ec2b5['top'] && _0x60d216['top'] < _0x3ec2b5['bottom'];
-  if (!_0x2ff9a4 || !_0x8d8c4) return _0x22e4b9;
-  const _0xa0cb14 = normalizeNodeManagerPlacement(_0x34edce);
-  if (_0xa0cb14 === 'left')
-    _0x22e4b9['left'] = Math['min'](
-      _0x3ec2b5['width'] - 0x1,
-      Math['max'](0x0, _0x60d216['right'] - _0x3ec2b5['left'] + _0x5486d8),
-    );
+  const box2 = normalizeRect(panelRect),
+    box3 = normalizeRect(canvasRect),
+    output = Math['max'](0x0, Number(gap) || 0x0),
+    box4 = { top: 0x0, right: 0x0, bottom: 0x0, left: 0x0 };
+  if (!(box3['width'] > 0x0 && box3['height'] > 0x0)) return box4;
+  const enabled2 = box2['right'] > box3['left'] && box2['left'] < box3['right'],
+    enabled3 = box2['bottom'] > box3['top'] && box2['top'] < box3['bottom'];
+  if (!enabled2 || !enabled3) return box4;
+  const nodeManagerPlacement = normalizeNodeManagerPlacement(placement);
+  if (nodeManagerPlacement === 'left')
+    box4['left'] = Math['min'](box3['width'] - 0x1, Math['max'](0x0, box2['right'] - box3['left'] + output));
   else
-    _0xa0cb14 === 'right'
-      ? (_0x22e4b9['right'] = Math['min'](
-          _0x3ec2b5['width'] - 0x1,
-          Math['max'](0x0, _0x3ec2b5['right'] - _0x60d216['left'] + _0x5486d8),
+    nodeManagerPlacement === 'right'
+      ? (box4['right'] = Math['min'](
+          box3['width'] - 0x1,
+          Math['max'](0x0, box3['right'] - box2['left'] + output),
         ))
-      : (_0x22e4b9['bottom'] = Math['min'](
-          _0x3ec2b5['height'] - 0x1,
-          Math['max'](0x0, _0x3ec2b5['bottom'] - _0x60d216['top'] + _0x5486d8),
+      : (box4['bottom'] = Math['min'](
+          box3['height'] - 0x1,
+          Math['max'](0x0, box3['bottom'] - box2['top'] + output),
         ));
-  return _0x22e4b9;
+  return box4;
 }
 export function createNodeManagerPanel({
-  graphStore: _0x3cf865,
-  uiStore: _0x3850c2,
-  appViewport: _0x3bdf49,
-  executeCanvasCommand: _0x3a6360,
-  renameCurrentProject: _0x1ecaec,
+  graphStore: graphStore,
+  uiStore: uiStore,
+  appViewport: appViewport,
+  executeCanvasCommand: executeCanvasCommand,
+  renameCurrentProject: renameCurrentProject,
   wrap: wrap = document['getElementById']('v2-wrap'),
   canvasStage: canvasStage = document['querySelector']('.v2-canvas-stage'),
   button: button = document['getElementById']('btnNodeManager'),
   showToast: showToast = window['showToast'],
 } = {}) {
-  if (!_0x3cf865 || !wrap || !button) return null;
+  if (!graphStore || !wrap || !button) return null;
   installNodeManagerButtonIcon(button);
-  const _0x23785e = new Map(),
-    _0x3857a4 = (_0x1ef1d7, _0x30a87e) => cloneExistingIcon(_0x1ef1d7, _0x30a87e, _0x23785e);
-  function _0x447511(_0x275c59, _0x585b79, _0x4a1e7f = '') {
-    const _0x3bc077 = _0x3857a4(_0x585b79, _0x4a1e7f);
-    if (_0x3bc077) _0x275c59['appendChild'](_0x3bc077);
-    return _0x3bc077;
+  const map2 = new Map(),
+    handler = (value2, value3) => cloneExistingIcon(value2, value3, map2);
+  function run(el6, value4, value5 = '') {
+    const value6 = handler(value4, value5);
+    if (value6) el6['appendChild'](value6);
+    return value6;
   }
-  let _0x3f8216 = 'all',
-    _0x234bba = '',
-    _0x39ce90 = ![],
-    _0x5db663 = null;
-  const _0x2aacbe = createNodeManagerListSnapshot(),
-    _0x22bee1 = new Map();
-  let _0x30fd3c = null,
-    _0x2dcc8b = null,
-    _0x48030b = ![],
-    _0x126d01 = buildNodeManagerModel({ nodes: {} });
-  const _0x33c939 = new Set(),
-    _0x5edd29 = new Set(),
-    _0x5721c4 = new Map(),
-    _0x49250f = [];
-  let _0x3d51a2 = null;
-  const _0x55b438 = () => ({
+  let filter = 'all',
+    query = '',
+    value7 = ![],
+    value8 = null;
+  const map3 = createNodeManagerListSnapshot(),
+    map4 = new Map();
+  let value9 = null,
+    enabled4 = null,
+    value10 = ![],
+    count3 = buildNodeManagerModel({ nodes: {} });
+  const collapsedGroupIds = new Set(),
+    map5 = new Set(),
+    map6 = new Map(),
+    list = [];
+  let placement2 = null;
+  const run2 = () => ({
       maxZoom: 1.15,
       viewportInsets: resolveNodeManagerViewportInsets({
-        placement: _0x3d51a2?.['dataset']?.['placement'],
-        panelRect: _0x3d51a2?.['getBoundingClientRect']?.(),
+        placement: placement2?.['dataset']?.['placement'],
+        panelRect: placement2?.['getBoundingClientRect']?.(),
         canvasRect: canvasStage?.['getBoundingClientRect']?.(),
       }),
     }),
-    _0x2e904f = createNodeManagerDragController({
-      graphStore: _0x3cf865,
+    nodeManagerDragController = createNodeManagerDragController({
+      graphStore: graphStore,
       wrap: wrap,
       canvasStage: canvasStage,
-      executeCanvasCommand: _0x3a6360,
-      onDuplicateFailed: (_0x363f6a) => {
-        showToast?.(_0x363f6a?.['message'] || t('nodeManager.toasts.duplicateFailed'), 'error');
+      executeCanvasCommand: executeCanvasCommand,
+      onDuplicateFailed: (error) => {
+        showToast?.(error?.['message'] || t('nodeManager.toasts.duplicateFailed'), 'error');
       },
-      onDuplicated: (_0x3750d4) => {
-        _0x3bdf49?.['focusNode']?.(_0x3750d4, 0x60, 0xf0, _0x55b438());
+      onDuplicated: (value11) => {
+        appViewport?.['focusNode']?.(value11, 0x60, 0xf0, run2());
       },
     });
-  (_0x49250f['push'](() => _0x2e904f['destroy']()),
-    (_0x3d51a2 = createElement('section', 'node-manager-panel\x20canvas-toolbar-panel-surface', {
+  (list['push'](() => nodeManagerDragController['destroy']()),
+    (placement2 = createElement('section', 'node-manager-panel\x20canvas-toolbar-panel-surface', {
       id: 'nodeManagerPanel',
       role: 'complementary',
       'aria-hidden': 'true',
       'data-ui-stop': '1',
     })));
-  const _0x5d6459 = createElement('h2', 'node-manager-visually-hidden'),
-    _0x4a8171 = createElement('div', 'node-manager-project-row'),
-    _0x1ed2a1 = createElement('div', 'node-manager-project-name-host'),
-    _0x433d98 = createElement('button', 'node-manager-project-name', { type: 'button' }),
-    _0x227737 = createElement('span', 'node-manager-project-name-text', { 'data-tooltip-overflow': 'true' });
-  (_0x433d98['append'](_0x227737), _0x1ed2a1['appendChild'](_0x433d98));
-  const _0x22a083 = createElement('button', 'node-manager-icon-button\x20node-manager-header-collapse', {
+  const el7 = createElement('h2', 'node-manager-visually-hidden'),
+    el8 = createElement('div', 'node-manager-project-row'),
+    el9 = createElement('div', 'node-manager-project-name-host'),
+    el10 = createElement('button', 'node-manager-project-name', { type: 'button' }),
+    el11 = createElement('span', 'node-manager-project-name-text', { 'data-tooltip-overflow': 'true' });
+  (el10['append'](el11), el9['appendChild'](el10));
+  const el12 = createElement('button', 'node-manager-icon-button\x20node-manager-header-collapse', {
     type: 'button',
   });
-  (_0x447511(_0x22a083, 'collapse', 'node-manager-collapse-icon'), _0x4a8171['append'](_0x1ed2a1, _0x22a083));
-  const _0x3997f3 = createElement('div', 'node-manager-controls'),
-    _0x4838be = createElement('div', 'node-manager-default-controls'),
-    _0x31a79a = createElement('span', 'node-manager-list-title'),
-    _0x28d0e7 = createElement('button', 'node-manager-icon-button node-manager-group-toggle', {
+  (run(el12, 'collapse', 'node-manager-collapse-icon'), el8['append'](el9, el12));
+  const ownerRoot = createElement('div', 'node-manager-controls'),
+    element = createElement('div', 'node-manager-default-controls'),
+    el13 = createElement('span', 'node-manager-list-title'),
+    el14 = createElement('button', 'node-manager-icon-button node-manager-group-toggle', {
       type: 'button',
     });
-  _0x447511(_0x28d0e7, 'chevron', 'node-manager-group-toggle-icon');
-  const _0x30dfe8 = createElement('button', 'node-manager-filter-button', {
+  run(el14, 'chevron', 'node-manager-group-toggle-icon');
+  const el15 = createElement('button', 'node-manager-filter-button', {
       type: 'button',
       'aria-haspopup': 'menu',
       'aria-expanded': 'false',
     }),
-    _0x28acd7 = createElement('span', 'node-manager-filter-label'),
-    _0xcda5c3 = _0x3857a4('chevron', 'node-manager-filter-chevron');
-  _0x30dfe8['appendChild'](_0x28acd7);
-  if (_0xcda5c3) _0x30dfe8['appendChild'](_0xcda5c3);
-  const _0x3b45be = createElement('button', 'node-manager-icon-button', { type: 'button' });
-  (_0x447511(_0x3b45be, 'search'), _0x4838be['append'](_0x31a79a, _0x28d0e7, _0x30dfe8, _0x3b45be));
-  const _0x2386b3 = createElement('div', 'node-manager-search-controls'),
-    _0x3e1e21 = createElement('label', 'node-manager-search-field'),
-    _0x454172 = createElement('input', 'node-manager-search-input', {
+    el16 = createElement('span', 'node-manager-filter-label'),
+    value12 = handler('chevron', 'node-manager-filter-chevron');
+  el15['appendChild'](el16);
+  if (value12) el15['appendChild'](value12);
+  const el17 = createElement('button', 'node-manager-icon-button', { type: 'button' });
+  (run(el17, 'search'), element['append'](el13, el14, el15, el17));
+  const element2 = createElement('div', 'node-manager-search-controls'),
+    el18 = createElement('label', 'node-manager-search-field'),
+    el19 = createElement('input', 'node-manager-search-input', {
       type: 'search',
       autocomplete: 'off',
       spellcheck: 'false',
     });
-  (_0x447511(_0x3e1e21, 'search', 'node-manager-search-field-icon'), _0x3e1e21['appendChild'](_0x454172));
-  const _0x9f06ab = createElement('button', 'node-manager-icon-button node-manager-search-filter-button', {
+  (run(el18, 'search', 'node-manager-search-field-icon'), el18['appendChild'](el19));
+  const el20 = createElement('button', 'node-manager-icon-button node-manager-search-filter-button', {
     type: 'button',
     'aria-haspopup': 'menu',
     'aria-expanded': 'false',
   });
-  _0x447511(_0x9f06ab, 'filter', 'node-manager-filter-search-icon');
-  const _0x3bbf24 = createElement('button', 'node-manager-icon-button', { type: 'button' });
-  (_0x447511(_0x3bbf24, 'close'),
-    _0x2386b3['append'](_0x3e1e21, _0x9f06ab, _0x3bbf24),
-    _0x3997f3['append'](_0x4838be, _0x2386b3));
-  const _0x373f00 = createElement('div', 'node-manager-list', { role: 'list', tabindex: '0' }),
-    _0x30064e = createElement('footer', 'node-manager-footer'),
-    _0x3d6650 = createElement('button', 'node-manager-collapse-button', { type: 'button' });
-  _0x447511(_0x3d6650, 'collapse', 'node-manager-collapse-icon');
-  const _0x27e919 = createElement('span', 'node-manager-collapse-label');
-  _0x3d6650['appendChild'](_0x27e919);
-  const _0x75d484 = createElement('span', 'node-manager-total');
-  (_0x30064e['append'](_0x3d6650, _0x75d484),
-    _0x3d51a2['append'](_0x5d6459, _0x4a8171, _0x3997f3, _0x373f00, _0x30064e),
-    wrap['appendChild'](_0x3d51a2));
-  function _0x22d5f8() {
-    return _0x3d51a2['classList']['contains']('show');
+  run(el20, 'filter', 'node-manager-filter-search-icon');
+  const el21 = createElement('button', 'node-manager-icon-button', { type: 'button' });
+  (run(el21, 'close'), element2['append'](el18, el20, el21), ownerRoot['append'](element, element2));
+  const ownerRoot2 = createElement('div', 'node-manager-list', { role: 'list', tabindex: '0' }),
+    element3 = createElement('footer', 'node-manager-footer'),
+    el22 = createElement('button', 'node-manager-collapse-button', { type: 'button' });
+  run(el22, 'collapse', 'node-manager-collapse-icon');
+  const el23 = createElement('span', 'node-manager-collapse-label');
+  el22['appendChild'](el23);
+  const el24 = createElement('span', 'node-manager-total');
+  (element3['append'](el22, el24),
+    placement2['append'](el7, el8, ownerRoot, ownerRoot2, element3),
+    wrap['appendChild'](placement2));
+  function isOpen() {
+    return placement2['classList']['contains']('show');
   }
-  function _0x3ffaba() {
-    (_0x5db663?.['close']?.({ restoreFocus: ![] }), (_0x5db663 = null));
+  function run3() {
+    (value8?.['close']?.({ restoreFocus: ![] }), (value8 = null));
   }
-  function _0x1f1cb8(_0x2b1c4e) {
-    const _0x26e042 = normalizeNodeManagerPlacement(_0x2b1c4e);
-    return ((_0x3d51a2['dataset']['placement'] = _0x26e042), _0x26e042);
+  function run4(value13) {
+    const nodeManagerPlacement2 = normalizeNodeManagerPlacement(value13);
+    return ((placement2['dataset']['placement'] = nodeManagerPlacement2), nodeManagerPlacement2);
   }
-  function _0x499abe() {
-    const _0x3fef44 = getProjectName();
-    ((_0x227737['textContent'] = _0x3fef44), _0x227737['setAttribute']('data-tooltip', _0x3fef44));
+  function run5() {
+    const projectName = getProjectName();
+    ((el11['textContent'] = projectName), el11['setAttribute']('data-tooltip', projectName));
   }
-  function _0x5aeaac() {
-    const _0xa708a4 = _0x126d01['groupIds'] || [],
-      _0x255ba7 = _0xa708a4['length'] > 0x0 && _0xa708a4['every']((_0x58cec8) => _0x33c939['has'](_0x58cec8)),
-      _0x4c2941 = t(_0x255ba7 ? 'nodeManager.expandAll' : 'nodeManager.collapseAll');
-    ((_0x28d0e7['hidden'] = _0xa708a4['length'] === 0x0),
-      _0x28d0e7['classList']['toggle']('is-expand-action', _0x255ba7),
-      _0x28d0e7['setAttribute']('aria-label', _0x4c2941),
-      (_0x28d0e7['title'] = _0x4c2941));
+  function run6() {
+    const list2 = count3['groupIds'] || [],
+      value14 = list2['length'] > 0x0 && list2['every']((value15) => collapsedGroupIds['has'](value15)),
+      t2 = t(value14 ? 'nodeManager.expandAll' : 'nodeManager.collapseAll');
+    ((el14['hidden'] = list2['length'] === 0x0),
+      el14['classList']['toggle']('is-expand-action', value14),
+      el14['setAttribute']('aria-label', t2),
+      (el14['title'] = t2));
   }
-  function _0x596497() {
-    ((_0x5d6459['textContent'] = t('nodeManager.title')),
-      _0x3d51a2['setAttribute']('aria-label', t('nodeManager.title')),
-      _0x433d98['setAttribute']('aria-label', t('nodeManager.renameProjectAria')),
-      (_0x31a79a['textContent'] = t('nodeManager.listTitle')),
-      _0x373f00['setAttribute']('aria-label', t('nodeManager.listAria')),
-      _0x3b45be['setAttribute']('aria-label', t('nodeManager.search')),
-      (_0x3b45be['title'] = t('nodeManager.search')),
-      (_0x454172['placeholder'] = t('nodeManager.searchPlaceholder')),
-      _0x454172['setAttribute']('aria-label', t('nodeManager.search')),
-      _0x3bbf24['setAttribute']('aria-label', t('nodeManager.closeSearch')),
-      (_0x3bbf24['title'] = t('nodeManager.closeSearch')),
-      _0x30dfe8['setAttribute']('aria-label', t('nodeManager.filter')),
-      (_0x30dfe8['title'] = t('nodeManager.filter')),
-      _0x9f06ab['setAttribute']('aria-label', t('nodeManager.filter')),
-      (_0x9f06ab['title'] = t('nodeManager.filter')),
-      (_0x28acd7['textContent'] = t('nodeManager.filters.' + _0x3f8216)),
-      _0x3d6650['setAttribute']('aria-label', t('nodeManager.collapsePanel')),
-      (_0x3d6650['title'] = t('nodeManager.collapsePanel')),
-      _0x22a083['setAttribute']('aria-label', t('nodeManager.collapsePanel')),
-      (_0x22a083['title'] = t('nodeManager.collapsePanel')),
-      (_0x27e919['textContent'] = t('nodeManager.collapsePanel')),
-      (_0x75d484['textContent'] = t('nodeManager.total', { count: _0x126d01['totalNodeCount'] || 0x0 })),
-      _0x499abe(),
-      _0x5aeaac());
+  function run7() {
+    ((el7['textContent'] = t('nodeManager.title')),
+      placement2['setAttribute']('aria-label', t('nodeManager.title')),
+      el10['setAttribute']('aria-label', t('nodeManager.renameProjectAria')),
+      (el13['textContent'] = t('nodeManager.listTitle')),
+      ownerRoot2['setAttribute']('aria-label', t('nodeManager.listAria')),
+      el17['setAttribute']('aria-label', t('nodeManager.search')),
+      (el17['title'] = t('nodeManager.search')),
+      (el19['placeholder'] = t('nodeManager.searchPlaceholder')),
+      el19['setAttribute']('aria-label', t('nodeManager.search')),
+      el21['setAttribute']('aria-label', t('nodeManager.closeSearch')),
+      (el21['title'] = t('nodeManager.closeSearch')),
+      el15['setAttribute']('aria-label', t('nodeManager.filter')),
+      (el15['title'] = t('nodeManager.filter')),
+      el20['setAttribute']('aria-label', t('nodeManager.filter')),
+      (el20['title'] = t('nodeManager.filter')),
+      (el16['textContent'] = t('nodeManager.filters.' + filter)),
+      el22['setAttribute']('aria-label', t('nodeManager.collapsePanel')),
+      (el22['title'] = t('nodeManager.collapsePanel')),
+      el12['setAttribute']('aria-label', t('nodeManager.collapsePanel')),
+      (el12['title'] = t('nodeManager.collapsePanel')),
+      (el23['textContent'] = t('nodeManager.collapsePanel')),
+      (el24['textContent'] = t('nodeManager.total', { count: count3['totalNodeCount'] || 0x0 })),
+      run5(),
+      run6());
   }
-  function _0x578250() {
-    if (!_0x22d5f8()) return;
-    const _0x2f5e23 = new Set(getStoreState(_0x3cf865)['selectedNodeIds'] || []);
-    _0x373f00['querySelectorAll']('.node-manager-row[data-node-id]')['forEach']((_0x150676) => {
-      const _0x478880 = _0x2f5e23['has'](_0x150676['dataset']['nodeId']);
-      _0x150676['classList']['toggle']('is-selected', _0x478880);
-      const _0x338f6 = _0x150676['querySelector']('.node-manager-row-main');
-      if (_0x478880) _0x338f6?.['setAttribute']('aria-current', 'true');
-      else _0x338f6?.['removeAttribute']('aria-current');
+  function run8() {
+    if (!isOpen()) return;
+    const map7 = new Set(getStoreState(graphStore)['selectedNodeIds'] || []);
+    ownerRoot2['querySelectorAll']('.node-manager-row[data-node-id]')['forEach']((el25) => {
+      const value16 = map7['has'](el25['dataset']['nodeId']);
+      el25['classList']['toggle']('is-selected', value16);
+      const el26 = el25['querySelector']('.node-manager-row-main');
+      if (value16) el26?.['setAttribute']('aria-current', 'true');
+      else el26?.['removeAttribute']('aria-current');
     });
   }
-  function _0x1e9d96(_0x4b3587) {
-    const _0x4e8c37 = String(_0x4b3587 || '');
+  function run9(value17) {
+    const value18 = String(value17 || '');
     return (
-      Array['from'](_0x373f00['querySelectorAll']('.node-manager-row[data-node-id]'))['find'](
-        (_0x1b72dd) => _0x1b72dd['dataset']['nodeId'] === _0x4e8c37,
+      Array['from'](ownerRoot2['querySelectorAll']('.node-manager-row[data-node-id]'))['find'](
+        (el27) => el27['dataset']['nodeId'] === value18,
       ) || null
     );
   }
-  function _0xe382b5(_0x40ff08, _0x4865a5) {
-    const _0x850744 = _0x4865a5 === 'group' ? 'folder' : ICON_SELECTORS[_0x4865a5] ? _0x4865a5 : 'node';
-    _0x447511(_0x40ff08, _0x850744, 'node-manager-thumb-fallback-icon');
+  function run10(value19, value20) {
+    const value21 = value20 === 'group' ? 'folder' : ICON_SELECTORS[value20] ? value20 : 'node';
+    run(value19, value21, 'node-manager-thumb-fallback-icon');
   }
-  function _0x27e6af(_0x388d47, _0x201f68) {
-    const _0x4e0559 = createElement('span', 'node-manager-thumb\x20is-' + _0x388d47['category']);
-    if (_0x388d47['kind'] === 'group')
+  function run11(value22, src) {
+    const el28 = createElement('span', 'node-manager-thumb\x20is-' + value22['category']);
+    if (value22['kind'] === 'group')
       return (
-        _0x4e0559['classList']['add']('node-manager-folder-icon'),
-        (_0x4e0559['innerHTML'] = MATERIAL_FOLDER_ICON_MARKUP),
-        _0x4e0559
+        el28['classList']['add']('node-manager-folder-icon'),
+        (el28['innerHTML'] = MATERIAL_FOLDER_ICON_MARKUP),
+        el28
       );
-    if (!_0x201f68) return (_0xe382b5(_0x4e0559, _0x388d47['category']), _0x4e0559);
-    const _0x4c1c6e = createElement('img', 'node-manager-thumb-image', {
-      src: _0x201f68,
+    if (!src) return (run10(el28, value22['category']), el28);
+    const el29 = createElement('img', 'node-manager-thumb-image', {
+      src: src,
       alt: '',
       loading: 'lazy',
       decoding: 'async',
       draggable: 'false',
     });
-    (_0x4c1c6e['addEventListener'](
+    (el29['addEventListener'](
       'error',
       () => {
-        (_0x4c1c6e['remove'](), _0xe382b5(_0x4e0559, _0x388d47['category']));
+        (el29['remove'](), run10(el28, value22['category']));
       },
       { once: !![] },
     ),
-      _0x4e0559['appendChild'](_0x4c1c6e));
-    if (_0x388d47['category'] === 'video') {
-      const _0x1fddb0 = createElement('span', 'node-manager-video-badge');
-      if (_0x447511(_0x1fddb0, 'videoPlay')) _0x4e0559['appendChild'](_0x1fddb0);
+      el28['appendChild'](el29));
+    if (value22['category'] === 'video') {
+      const element4 = createElement('span', 'node-manager-video-badge');
+      if (run(element4, 'videoPlay')) el28['appendChild'](element4);
     }
-    return _0x4e0559;
+    return el28;
   }
-  function _0x5ef07d(_0x209d93) {
-    const _0x346d46 = document['getElementById'](_0x209d93),
-      _0x4029c8 = _0x346d46?.['querySelector']?.('video');
-    if (_0x4029c8 && _0x4029c8['paused'] === ![]) return !![];
-    const _0x51c663 = _0x346d46?.['querySelector']?.('.video-play-btn');
-    if (_0x51c663) return (_0x51c663['click'](), !![]);
-    if (_0x4029c8?.['play']) return (Promise['resolve'](_0x4029c8['play']())['catch'](() => {}), !![]);
+  function run12(value23) {
+    const el30 = document['getElementById'](value23),
+      value24 = el30?.['querySelector']?.('video');
+    if (value24 && value24['paused'] === ![]) return !![];
+    const el31 = el30?.['querySelector']?.('.video-play-btn');
+    if (el31) return (el31['click'](), !![]);
+    if (value24?.['play']) return (Promise['resolve'](value24['play']())['catch'](() => {}), !![]);
     return ![];
   }
-  function _0x27952a(_0x5ea14c) {
-    const _0x1286d5 = performance['now'](),
-      _0x1095a2 = () => {
-        if (_0x5ef07d(_0x5ea14c)) return;
-        performance['now']() - _0x1286d5 < VIDEO_PLAY_RETRY_MS && requestAnimationFrame(_0x1095a2);
+  function run13(value25) {
+    const value26 = performance['now'](),
+      value27 = () => {
+        if (run12(value25)) return;
+        performance['now']() - value26 < VIDEO_PLAY_RETRY_MS && requestAnimationFrame(value27);
       };
-    window['setTimeout'](_0x1095a2, 0x118);
+    window['setTimeout'](value27, 0x118);
   }
-  function _0x1bc081(_0x3f9994) {
-    const _0x4ddaad = _0x3a6360?.('node.select', { ids: [_0x3f9994['id']] });
-    if (_0x4ddaad?.['ok'] === ![]) return;
-    if (_0x3f9994['category'] === 'video') _0x5ef07d(_0x3f9994['id']);
-    _0x3bdf49?.['focusNode']?.(_0x3f9994['id'], 0x60, 0x140, _0x55b438());
-    if (_0x3f9994['category'] === 'video') _0x27952a(_0x3f9994['id']);
+  function run14(value28) {
+    const response = executeCanvasCommand?.('node.select', { ids: [value28['id']] });
+    if (response?.['ok'] === ![]) return;
+    if (value28['category'] === 'video') run12(value28['id']);
+    appViewport?.['focusNode']?.(value28['id'], 0x60, 0x140, run2());
+    if (value28['category'] === 'video') run13(value28['id']);
   }
-  function _0x30a3f5(_0x2055ba, _0x330683) {
-    const _0x4238f0 = _0x1e9d96(_0x2055ba);
-    if (!_0x4238f0) return;
-    (_0x4238f0['classList']['toggle']('is-busy', _0x330683),
-      _0x4238f0['setAttribute']('aria-busy', String(_0x330683)),
-      _0x4238f0['querySelector']('.node-manager-row-spinner')?.['remove']());
-    if (_0x330683) {
-      const _0x50a2ff = createElement('span', 'project-package-loading-spinner\x20node-manager-row-spinner', {
+  function run15(value29, value30) {
+    const el32 = run9(value29);
+    if (!el32) return;
+    (el32['classList']['toggle']('is-busy', value30),
+      el32['setAttribute']('aria-busy', String(value30)),
+      el32['querySelector']('.node-manager-row-spinner')?.['remove']());
+    if (value30) {
+      const element5 = createElement('span', 'project-package-loading-spinner\x20node-manager-row-spinner', {
         'aria-hidden': 'true',
       });
-      _0x4238f0['appendChild'](_0x50a2ff);
+      el32['appendChild'](element5);
     }
   }
-  function _0x28b410() {
-    _0x30fd3c?.['cancel']();
+  function run16() {
+    value9?.['cancel']();
   }
-  function _0xc37659(_0xb7fda4) {
-    _0x28b410();
-    const _0xa50d6b = _0x1e9d96(_0xb7fda4['id']),
-      _0xf0c344 = _0xa50d6b?.['querySelector']('.node-manager-row-name');
-    if (!_0xa50d6b || !_0xf0c344) return;
-    const _0x519768 = resolveNodeManagerName(
-        getStoreState(_0x3cf865)['nodes']?.[_0xb7fda4['id']],
-        _0xb7fda4['id'],
-      ),
-      _0x8ca763 = createElement('input', 'node-manager-row-rename', {
+  function run17(id) {
+    run16();
+    const el33 = run9(id['id']),
+      el34 = el33?.['querySelector']('.node-manager-row-name');
+    if (!el33 || !el34) return;
+    const nodeManagerName = resolveNodeManagerName(getStoreState(graphStore)['nodes']?.[id['id']], id['id']),
+      input2 = createElement('input', 'node-manager-row-rename', {
         type: 'text',
         'aria-label': t('nodeManager.actions.rename'),
       });
-    ((_0x8ca763['value'] = _0x519768),
-      _0xf0c344['replaceChildren'](_0x8ca763),
-      _0xa50d6b['classList']['add']('is-renaming'));
-    let _0x266a1a = ![];
-    const _0x3aca24 = () => {
-      ((_0x266a1a = !![]),
-        (_0x30fd3c = null),
-        (_0xf0c344['textContent'] = resolveNodeManagerName(
-          getStoreState(_0x3cf865)['nodes']?.[_0xb7fda4['id']],
-          _0xb7fda4['id'],
+    ((input2['value'] = nodeManagerName),
+      el34['replaceChildren'](input2),
+      el33['classList']['add']('is-renaming'));
+    let value31 = ![];
+    const cancel = () => {
+      ((value31 = !![]),
+        (value9 = null),
+        (el34['textContent'] = resolveNodeManagerName(
+          getStoreState(graphStore)['nodes']?.[id['id']],
+          id['id'],
         )),
-        (_0xf0c344['dataset']['tooltip'] = _0xf0c344['textContent']),
-        _0xa50d6b['classList']['remove']('is-renaming'),
-        _0x22bee1['delete'](_0xb7fda4['id']));
+        (el34['dataset']['tooltip'] = el34['textContent']),
+        el33['classList']['remove']('is-renaming'),
+        map4['delete'](id['id']));
     };
-    _0x30fd3c = { id: _0xb7fda4['id'], input: _0x8ca763, cancel: _0x3aca24 };
-    const _0x4ed675 = () => {
-      if (_0x266a1a || _0x48030b) return;
-      const _0x275115 = String(_0x8ca763['value'] || '')
+    value9 = { id: id['id'], input: input2, cancel: cancel };
+    const value32 = () => {
+      if (value31 || value10) return;
+      const name = String(input2['value'] || '')
           ['replace'](/\s+/g, '\x20')
           ['trim'](),
-        _0xa1518a = _0x8ca763['isConnected'];
-      _0x3aca24();
-      if (!_0xa1518a) return;
-      if (!_0x275115 || _0x275115 === _0x519768) return;
-      const _0x32c0da = _0x3a6360?.('node.rename', { nodeId: _0xb7fda4['id'], name: _0x275115 });
-      _0x32c0da?.['ok'] === ![] &&
-        (showToast?.(_0x32c0da['message'] || t('nodeManager.toasts.renameFailed'), 'error'), _0x49391e());
+        enabled5 = input2['isConnected'];
+      cancel();
+      if (!enabled5) return;
+      if (!name || name === nodeManagerName) return;
+      const error2 = executeCanvasCommand?.('node.rename', { nodeId: id['id'], name: name });
+      error2?.['ok'] === ![] &&
+        (showToast?.(error2['message'] || t('nodeManager.toasts.renameFailed'), 'error'), run18());
     };
-    (_0x8ca763['addEventListener']('pointerdown', (_0x12e4ab) => _0x12e4ab['stopPropagation']()),
-      _0x8ca763['addEventListener']('keydown', (_0x258f03) => {
-        if (_0x258f03['isComposing']) return;
-        if (_0x258f03['key'] === 'Enter')
-          (_0x258f03['preventDefault'](), _0x258f03['stopPropagation'](), _0x8ca763['blur']());
+    (input2['addEventListener']('pointerdown', (event3) => event3['stopPropagation']()),
+      input2['addEventListener']('keydown', (event4) => {
+        if (event4['isComposing']) return;
+        if (event4['key'] === 'Enter')
+          (event4['preventDefault'](), event4['stopPropagation'](), input2['blur']());
         else
-          _0x258f03['key'] === 'Escape' &&
-            (_0x258f03['preventDefault'](),
-            _0x258f03['stopPropagation'](),
-            _0x28b410(),
-            _0xa50d6b['querySelector']('.node-manager-row-main')?.['focus']({ preventScroll: !![] }));
+          event4['key'] === 'Escape' &&
+            (event4['preventDefault'](),
+            event4['stopPropagation'](),
+            run16(),
+            el33['querySelector']('.node-manager-row-main')?.['focus']({ preventScroll: !![] }));
       }),
-      _0x8ca763['addEventListener']('blur', _0x4ed675),
-      _0x8ca763['focus'](),
-      _0x8ca763['select']());
+      input2['addEventListener']('blur', value32),
+      input2['focus'](),
+      input2['select']());
   }
-  async function _0x4e6ab8(_0x48476d) {
-    if (_0x5edd29['has'](_0x48476d['id'])) return;
-    (_0x5edd29['add'](_0x48476d['id']), _0x30a3f5(_0x48476d['id'], !![]));
+  async function run19(nodeId) {
+    if (map5['has'](nodeId['id'])) return;
+    (map5['add'](nodeId['id']), run15(nodeId['id'], !![]));
     try {
       await downloadNodeOutput({
-        node: getStoreState(_0x3cf865)['nodes']?.[_0x48476d['id']] || _0x48476d['node'],
-        nodeId: _0x48476d['id'],
+        node: getStoreState(graphStore)['nodes']?.[nodeId['id']] || nodeId['node'],
+        nodeId: nodeId['id'],
         showToast: showToast,
       });
     } finally {
-      (_0x5edd29['delete'](_0x48476d['id']), _0x30a3f5(_0x48476d['id'], ![]));
+      (map5['delete'](nodeId['id']), run15(nodeId['id'], ![]));
     }
   }
-  function _0x4af253(_0x377a8a) {
-    const _0x5f293f = _0x3a6360?.('node.delete', { ids: [_0x377a8a['id']] });
-    _0x5f293f?.['ok'] === ![] &&
-      showToast?.(_0x5f293f['message'] || t('nodeManager.toasts.deleteFailed'), 'error');
+  function run20(value33) {
+    const error3 = executeCanvasCommand?.('node.delete', { ids: [value33['id']] });
+    error3?.['ok'] === ![] && showToast?.(error3['message'] || t('nodeManager.toasts.deleteFailed'), 'error');
   }
-  function _0x29e1a2(_0x49732e, _0x55f3ce, _0x5dda33, _0x40ecbc) {
-    const _0x468a58 = _0x40ecbc?.['closest']?.('.node-manager-more-button');
-    if (_0x468a58?.['getAttribute']?.('aria-expanded') === 'true') {
-      _0x3ffaba();
+  function run21(disabled, value34, value35, restoreTarget) {
+    const dismissOnOwnerPointerDown = restoreTarget?.['closest']?.('.node-manager-more-button');
+    if (dismissOnOwnerPointerDown?.['getAttribute']?.('aria-expanded') === 'true') {
+      run3();
       return;
     }
-    (_0x3ffaba(), _0x468a58?.['setAttribute']?.('aria-expanded', 'true'));
-    let _0x5f3dcd = null;
-    ((_0x5f3dcd = showContextMenu(
-      _0x55f3ce,
-      _0x5dda33,
+    (run3(), dismissOnOwnerPointerDown?.['setAttribute']?.('aria-expanded', 'true'));
+    let showContextMenu2 = null;
+    ((showContextMenu2 = showContextMenu(
+      value34,
+      value35,
       [
         {
           label: t('nodeManager.actions.rename'),
           icon: 'edit',
           shortcutActionId: 'context-node-manager-rename',
-          action: () => _0xc37659(_0x49732e),
+          action: () => run17(disabled),
         },
         {
           label: t('nodeManager.actions.download'),
           icon: 'download',
-          disabled: _0x49732e['kind'] === 'group' || _0x5edd29['has'](_0x49732e['id']),
+          disabled: disabled['kind'] === 'group' || map5['has'](disabled['id']),
           shortcutActionId: 'context-node-manager-download',
-          action: () => void _0x4e6ab8(_0x49732e),
+          action: () => void run19(disabled),
         },
         {
           label: t('nodeManager.actions.delete'),
           icon: 'delete',
           danger: !![],
           shortcutActionId: 'context-node-manager-delete',
-          action: () => _0x4af253(_0x49732e),
+          action: () => run20(disabled),
         },
       ],
       {
-        ariaLabel: t('nodeManager.actions.menuAria', { name: _0x49732e['name'] }),
+        ariaLabel: t('nodeManager.actions.menuAria', { name: disabled['name'] }),
         ensureItemIcons: !![],
-        dismissOnOwnerPointerDown: _0x468a58 ? ![] : undefined,
-        ownerElement: _0x468a58 || _0x40ecbc?.['closest']?.('.node-manager-row') || _0x40ecbc,
-        ownerRoot: _0x373f00,
-        restoreTarget: _0x40ecbc,
+        dismissOnOwnerPointerDown: dismissOnOwnerPointerDown ? ![] : undefined,
+        ownerElement:
+          dismissOnOwnerPointerDown || restoreTarget?.['closest']?.('.node-manager-row') || restoreTarget,
+        ownerRoot: ownerRoot2,
+        restoreTarget: restoreTarget,
         sidebarSubmenuOwner: SIDEBAR_KEY,
         onClose: () => {
-          _0x468a58?.['setAttribute']?.('aria-expanded', 'false');
-          if (_0x5db663 === _0x5f3dcd) _0x5db663 = null;
+          dismissOnOwnerPointerDown?.['setAttribute']?.('aria-expanded', 'false');
+          if (value8 === showContextMenu2) value8 = null;
         },
       },
     )),
-      (_0x5db663 = _0x5f3dcd));
+      (value8 = showContextMenu2));
   }
-  function _0x1975e3(_0x1dee24, _0x734610) {
-    const _0x5e8703 = _0x5edd29['has'](_0x1dee24['id']),
-      _0x4ec6df = createElement('div', 'node-manager-row is-' + _0x1dee24['kind'], {
+  function row(name2, value36) {
+    const value37 = map5['has'](name2['id']),
+      row2 = createElement('div', 'node-manager-row is-' + name2['kind'], {
         role: 'listitem',
-        'aria-busy': String(_0x5e8703),
-        'data-node-id': _0x1dee24['id'],
+        'aria-busy': String(value37),
+        'data-node-id': name2['id'],
       });
-    (_0x4ec6df['classList']['toggle']('is-busy', _0x5e8703),
-      _0x4ec6df['style']['setProperty'](
-        '--node-manager-indent',
-        Math['max'](0x0, _0x1dee24['depth']) * 0x10 + 'px',
-      ));
-    _0x1dee24['kind'] === 'group' &&
-      _0x4ec6df['setAttribute']('aria-expanded', String(!_0x1dee24['collapsed']));
-    if (_0x1dee24['kind'] === 'group') {
-      const _0x28d442 = createElement('button', 'node-manager-group-chevron', {
+    (row2['classList']['toggle']('is-busy', value37),
+      row2['style']['setProperty']('--node-manager-indent', Math['max'](0x0, name2['depth']) * 0x10 + 'px'));
+    name2['kind'] === 'group' && row2['setAttribute']('aria-expanded', String(!name2['collapsed']));
+    if (name2['kind'] === 'group') {
+      const el35 = createElement('button', 'node-manager-group-chevron', {
         type: 'button',
-        'aria-expanded': String(!_0x1dee24['collapsed']),
-        'aria-label': t(_0x1dee24['collapsed'] ? 'nodeManager.expandGroup' : 'nodeManager.collapseGroup', {
-          name: _0x1dee24['name'],
+        'aria-expanded': String(!name2['collapsed']),
+        'aria-label': t(name2['collapsed'] ? 'nodeManager.expandGroup' : 'nodeManager.collapseGroup', {
+          name: name2['name'],
         }),
       });
-      (_0x447511(_0x28d442, 'treeChevron'),
-        _0x28d442['classList']['toggle']('is-open', !_0x1dee24['collapsed']),
-        _0x28d442['addEventListener']('click', (_0x3dc452) => {
-          (_0x3dc452['preventDefault'](), _0x3dc452['stopPropagation']());
-          if (_0x33c939['has'](_0x1dee24['id'])) _0x33c939['delete'](_0x1dee24['id']);
-          else _0x33c939['add'](_0x1dee24['id']);
-          const _0x3c15b3 = !_0x33c939['has'](_0x1dee24['id']);
-          (_0x4ec6df['setAttribute']('aria-expanded', String(_0x3c15b3)),
-            _0x28d442['setAttribute']('aria-expanded', String(_0x3c15b3)),
-            _0x28d442['setAttribute'](
+      (run(el35, 'treeChevron'),
+        el35['classList']['toggle']('is-open', !name2['collapsed']),
+        el35['addEventListener']('click', (event5) => {
+          (event5['preventDefault'](), event5['stopPropagation']());
+          if (collapsedGroupIds['has'](name2['id'])) collapsedGroupIds['delete'](name2['id']);
+          else collapsedGroupIds['add'](name2['id']);
+          const value38 = !collapsedGroupIds['has'](name2['id']);
+          (row2['setAttribute']('aria-expanded', String(value38)),
+            el35['setAttribute']('aria-expanded', String(value38)),
+            el35['setAttribute'](
               'aria-label',
-              t(_0x3c15b3 ? 'nodeManager.collapseGroup' : 'nodeManager.expandGroup', {
-                name: _0x1dee24['name'],
+              t(value38 ? 'nodeManager.collapseGroup' : 'nodeManager.expandGroup', {
+                name: name2['name'],
               }),
             ),
-            _0x28d442['classList']['toggle']('is-open', _0x3c15b3));
-          const _0x216265 = _0x5721c4['get'](_0x1dee24['id']);
-          if (_0x216265) window['clearTimeout'](_0x216265);
-          const _0x3da94d = window['matchMedia']?.('(prefers-reduced-motion:\x20reduce)')?.['matches'];
-          if (_0x3da94d) {
-            _0x5eb882();
+            el35['classList']['toggle']('is-open', value38));
+          const value39 = map6['get'](name2['id']);
+          if (value39) window['clearTimeout'](value39);
+          const value40 = window['matchMedia']?.('(prefers-reduced-motion:\x20reduce)')?.['matches'];
+          if (value40) {
+            run22();
             return;
           }
-          _0x5721c4['set'](
-            _0x1dee24['id'],
+          map6['set'](
+            name2['id'],
             window['setTimeout'](() => {
-              (_0x5721c4['delete'](_0x1dee24['id']), _0x5eb882());
+              (map6['delete'](name2['id']), run22());
             }, GROUP_DISCLOSURE_MOTION_MS),
           );
         }),
-        _0x4ec6df['appendChild'](_0x28d442));
-    } else _0x4ec6df['appendChild'](createElement('span', 'node-manager-group-chevron-spacer'));
-    const _0x425148 = createElement('button', 'node-manager-row-main', { type: 'button' });
-    _0x425148['appendChild'](_0x27e6af(_0x1dee24, _0x734610));
-    const _0x40c123 = _0x1dee24['name'] || t('nodeManager.unnamed'),
-      _0x2fdd36 = createElement('span', 'node-manager-row-name', {
-        'data-tooltip': _0x40c123,
+        row2['appendChild'](el35));
+    } else row2['appendChild'](createElement('span', 'node-manager-group-chevron-spacer'));
+    const trigger = createElement('button', 'node-manager-row-main', { type: 'button' });
+    trigger['appendChild'](run11(name2, value36));
+    const value41 = name2['name'] || t('nodeManager.unnamed'),
+      el36 = createElement('span', 'node-manager-row-name', {
+        'data-tooltip': value41,
         'data-tooltip-overflow': 'true',
       });
-    ((_0x2fdd36['textContent'] = _0x40c123), _0x425148['appendChild'](_0x2fdd36));
-    if (_0x1dee24['kind'] === 'group') {
-      const _0x2535b0 = createElement('span', 'node-manager-group-count');
-      ((_0x2535b0['textContent'] = t('nodeManager.groupCount', { count: _0x1dee24['childCount'] || 0x0 })),
-        _0x425148['appendChild'](_0x2535b0));
-    } else _0x2e904f['bindNodeRow']({ trigger: _0x425148, row: _0x4ec6df, nodeId: _0x1dee24['id'] });
-    (_0x425148['addEventListener']('click', () => _0x1bc081(_0x1dee24)), _0x4ec6df['appendChild'](_0x425148));
-    const _0x267812 = createElement('button', 'node-manager-more-button', {
+    ((el36['textContent'] = value41), trigger['appendChild'](el36));
+    if (name2['kind'] === 'group') {
+      const el37 = createElement('span', 'node-manager-group-count');
+      ((el37['textContent'] = t('nodeManager.groupCount', { count: name2['childCount'] || 0x0 })),
+        trigger['appendChild'](el37));
+    } else nodeManagerDragController['bindNodeRow']({ trigger: trigger, row: row2, nodeId: name2['id'] });
+    (trigger['addEventListener']('click', () => run14(name2)), row2['appendChild'](trigger));
+    const el38 = createElement('button', 'node-manager-more-button', {
       type: 'button',
       'aria-haspopup': 'menu',
       'aria-expanded': 'false',
@@ -640,326 +617,320 @@ export function createNodeManagerPanel({
       title: t('nodeManager.actions.more'),
     });
     return (
-      _0x447511(_0x267812, 'more', 'node-manager-more-icon'),
-      _0x267812['addEventListener']('click', (_0x3b87b7) => {
-        (_0x3b87b7['preventDefault'](), _0x3b87b7['stopPropagation']());
-        const _0x1b3951 = _0x267812['getBoundingClientRect']();
-        _0x29e1a2(_0x1dee24, _0x1b3951['right'], _0x1b3951['bottom'] + 0x4, _0x267812);
+      run(el38, 'more', 'node-manager-more-icon'),
+      el38['addEventListener']('click', (event6) => {
+        (event6['preventDefault'](), event6['stopPropagation']());
+        const box5 = el38['getBoundingClientRect']();
+        run21(name2, box5['right'], box5['bottom'] + 0x4, el38);
       }),
-      _0x4ec6df['appendChild'](_0x267812),
-      _0x5e8703 &&
-        _0x4ec6df['appendChild'](
+      row2['appendChild'](el38),
+      value37 &&
+        row2['appendChild'](
           createElement('span', 'project-package-loading-spinner\x20node-manager-row-spinner', {
             'aria-hidden': 'true',
           }),
         ),
-      _0x4ec6df['addEventListener']('contextmenu', (_0x55e902) => {
-        if (_0x55e902['target']?.['closest']?.('input')) return;
-        (_0x55e902['preventDefault'](),
-          _0x55e902['stopPropagation'](),
-          _0x29e1a2(_0x1dee24, _0x55e902['clientX'], _0x55e902['clientY'], _0x425148));
+      row2['addEventListener']('contextmenu', (event7) => {
+        if (event7['target']?.['closest']?.('input')) return;
+        (event7['preventDefault'](),
+          event7['stopPropagation'](),
+          run21(name2, event7['clientX'], event7['clientY'], trigger));
       }),
-      _0x4ec6df
+      row2
     );
   }
-  function _0x49391e({ force: force = ![] } = {}) {
-    const _0x309b0d = getStoreState(_0x3cf865),
-      _0x38f281 = _0x2aacbe['read'](_0x309b0d['nodes'] || {});
-    if (!force && !_0x38f281['changed']) return;
-    _0x23785e['clear']();
-    const _0x3298dc = _0x373f00['scrollTop'],
-      _0x5f5cd3 = _0x373f00['scrollLeft'];
-    _0x126d01 = buildNodeManagerModel({
-      nodes: _0x309b0d['nodes'] || {},
-      filter: _0x3f8216,
-      query: _0x234bba,
-      collapsedGroupIds: _0x33c939,
+  function run18({ force: force = ![] } = {}) {
+    const nodes = getStoreState(graphStore),
+      enabled6 = map3['read'](nodes['nodes'] || {});
+    if (!force && !enabled6['changed']) return;
+    map2['clear']();
+    const value42 = ownerRoot2['scrollTop'],
+      value43 = ownerRoot2['scrollLeft'];
+    count3 = buildNodeManagerModel({
+      nodes: nodes['nodes'] || {},
+      filter: filter,
+      query: query,
+      collapsedGroupIds: collapsedGroupIds,
     });
-    const _0x144968 = [],
-      _0x4a431a = new Set(_0x126d01['items']['map']((_0x1139bb) => _0x1139bb['id']));
-    if (_0x30fd3c && !_0x4a431a['has'](_0x30fd3c['id'])) _0x28b410();
-    if (_0x126d01['items']['length'] === 0x0) {
-      const _0x196413 = createElement('div', 'node-manager-empty', { role: 'status' });
-      ((_0x196413['textContent'] = t('nodeManager.empty')), _0x144968['push'](_0x196413));
+    const list3 = [],
+      map8 = new Set(count3['items']['map']((value44) => value44['id']));
+    if (value9 && !map8['has'](value9['id'])) run16();
+    if (count3['items']['length'] === 0x0) {
+      const el39 = createElement('div', 'node-manager-empty', { role: 'status' });
+      ((el39['textContent'] = t('nodeManager.empty')), list3['push'](el39));
     } else
-      _0x126d01['items']['forEach']((_0x5e071f) => {
-        const _0x4f2fcc = _0x38f281['byId']['get'](_0x5e071f['id']),
-          _0x501794 = JSON['stringify']([
-            _0x5e071f['name'],
-            _0x5e071f['kind'],
-            _0x5e071f['depth'],
-            _0x5e071f['childCount'],
-            _0x5e071f['collapsed'],
+      count3['items']['forEach']((error4) => {
+        const presentation = enabled6['byId']['get'](error4['id']),
+          signature = JSON['stringify']([
+            error4['name'],
+            error4['kind'],
+            error4['depth'],
+            error4['childCount'],
+            error4['collapsed'],
             t('nodeManager.actions.more'),
           ]);
-        let _0x2cc855 = _0x22bee1['get'](_0x5e071f['id']);
-        ((!_0x2cc855 ||
-          ((_0x2cc855['signature'] !== _0x501794 || _0x2cc855['presentation'] !== _0x4f2fcc) &&
-            _0x30fd3c?.['id'] !== _0x5e071f['id'])) &&
-          ((_0x2cc855 = {
-            signature: _0x501794,
-            presentation: _0x4f2fcc,
-            row: _0x1975e3(_0x5e071f, _0x4f2fcc?.['coverUrl'] || ''),
+        let enabled7 = map4['get'](error4['id']);
+        ((!enabled7 ||
+          ((enabled7['signature'] !== signature || enabled7['presentation'] !== presentation) &&
+            value9?.['id'] !== error4['id'])) &&
+          ((enabled7 = {
+            signature: signature,
+            presentation: presentation,
+            row: row(error4, presentation?.['coverUrl'] || ''),
           }),
-          _0x22bee1['set'](_0x5e071f['id'], _0x2cc855)),
-          _0x144968['push'](_0x2cc855['row']));
+          map4['set'](error4['id'], enabled7)),
+          list3['push'](enabled7['row']));
       });
-    _0x3ffaba();
-    const _0x455f0d = _0x30fd3c?.['input'],
-      _0x471d82 = _0x455f0d && document['activeElement'] === _0x455f0d,
-      _0x3d2ec7 = _0x471d82 ? [_0x455f0d['selectionStart'], _0x455f0d['selectionEnd']] : null;
-    _0x48030b = !![];
+    run3();
+    const el40 = value9?.['input'],
+      value45 = el40 && document['activeElement'] === el40,
+      args = value45 ? [el40['selectionStart'], el40['selectionEnd']] : null;
+    value10 = !![];
     try {
-      let _0x1183ec = _0x373f00['firstChild'];
-      for (const _0x2e2888 of _0x144968) {
-        if (_0x2e2888 !== _0x1183ec) _0x373f00['insertBefore'](_0x2e2888, _0x1183ec);
-        _0x1183ec = _0x2e2888['nextSibling'];
+      let el41 = ownerRoot2['firstChild'];
+      for (const value46 of list3) {
+        if (value46 !== el41) ownerRoot2['insertBefore'](value46, el41);
+        el41 = value46['nextSibling'];
       }
-      while (_0x1183ec) {
-        const _0x2da964 = _0x1183ec['nextSibling'];
-        (_0x1183ec['remove'](), (_0x1183ec = _0x2da964));
+      while (el41) {
+        const value47 = el41['nextSibling'];
+        (el41['remove'](), (el41 = value47));
       }
-      _0x471d82 &&
-        _0x455f0d['isConnected'] &&
-        document['activeElement'] !== _0x455f0d &&
-        (_0x455f0d['focus']({ preventScroll: !![] }), _0x455f0d['setSelectionRange'](..._0x3d2ec7));
+      value45 &&
+        el40['isConnected'] &&
+        document['activeElement'] !== el40 &&
+        (el40['focus']({ preventScroll: !![] }), el40['setSelectionRange'](...args));
     } finally {
-      _0x48030b = ![];
+      value10 = ![];
     }
-    for (const _0x988728 of _0x22bee1['keys']())
-      if (!_0x4a431a['has'](_0x988728)) _0x22bee1['delete'](_0x988728);
-    ((_0x373f00['scrollTop'] = _0x3298dc),
-      (_0x373f00['scrollLeft'] = _0x5f5cd3),
-      (_0x28acd7['textContent'] = t('nodeManager.filters.' + _0x3f8216)),
-      (_0x75d484['textContent'] = t('nodeManager.total', { count: _0x126d01['totalNodeCount'] })),
-      _0x5aeaac(),
-      _0x578250());
+    for (const value48 of map4['keys']()) if (!map8['has'](value48)) map4['delete'](value48);
+    ((ownerRoot2['scrollTop'] = value42),
+      (ownerRoot2['scrollLeft'] = value43),
+      (el16['textContent'] = t('nodeManager.filters.' + filter)),
+      (el24['textContent'] = t('nodeManager.total', { count: count3['totalNodeCount'] })),
+      run6(),
+      run8());
   }
-  function _0x5eb882() {
-    _0x49391e({ force: !![] });
+  function run22() {
+    run18({ force: !![] });
   }
-  function _0x80daad(_0x482490 = _0x30dfe8) {
-    if (_0x482490['getAttribute']('aria-expanded') === 'true') {
-      _0x3ffaba();
+  function run23(ownerElement = el15) {
+    if (ownerElement['getAttribute']('aria-expanded') === 'true') {
+      run3();
       return;
     }
-    (_0x3ffaba(), _0x482490['setAttribute']('aria-expanded', 'true'));
-    const _0x23ef50 = _0x482490['getBoundingClientRect']();
-    let _0x54d38e = null;
-    ((_0x54d38e = showContextMenu(
-      _0x23ef50['left'],
-      _0x23ef50['bottom'] + 0x4,
-      NODE_MANAGER_FILTERS['map']((_0x3022d7) => ({
-        label: t('nodeManager.filters.' + _0x3022d7),
-        checked: _0x3022d7 === _0x3f8216,
+    (run3(), ownerElement['setAttribute']('aria-expanded', 'true'));
+    const box6 = ownerElement['getBoundingClientRect']();
+    let showContextMenu3 = null;
+    ((showContextMenu3 = showContextMenu(
+      box6['left'],
+      box6['bottom'] + 0x4,
+      NODE_MANAGER_FILTERS['map']((checked) => ({
+        label: t('nodeManager.filters.' + checked),
+        checked: checked === filter,
         action: () => {
-          if (_0x3022d7 === _0x3f8216) return;
-          ((_0x3f8216 = _0x3022d7), _0x5eb882());
+          if (checked === filter) return;
+          ((filter = checked), run22());
         },
       })),
       {
         ariaLabel: t('nodeManager.filter'),
         dismissOnOwnerPointerDown: ![],
-        ownerElement: _0x482490,
-        ownerRoot: _0x3997f3,
-        restoreTarget: _0x482490,
+        ownerElement: ownerElement,
+        ownerRoot: ownerRoot,
+        restoreTarget: ownerElement,
         sidebarSubmenuOwner: SIDEBAR_KEY,
         onClose: () => {
-          _0x482490['setAttribute']('aria-expanded', 'false');
-          if (_0x5db663 === _0x54d38e) _0x5db663 = null;
+          ownerElement['setAttribute']('aria-expanded', 'false');
+          if (value8 === showContextMenu3) value8 = null;
         },
       },
     )),
-      (_0x5db663 = _0x54d38e));
+      (value8 = showContextMenu3));
   }
-  function _0x9462d7(_0x205408, { clear: clear = ![], focus: focus = !![] } = {}) {
-    _0x39ce90 = _0x205408 === !![];
-    clear && ((_0x234bba = ''), (_0x454172['value'] = ''));
-    _0x3d51a2['classList']['toggle']('is-searching', _0x39ce90);
-    if (focus && _0x39ce90) requestAnimationFrame(() => _0x454172['focus']());
-    _0x5eb882();
+  function run24(value49, { clear: clear = ![], focus: focus = !![] } = {}) {
+    value7 = value49 === !![];
+    clear && ((query = ''), (el19['value'] = ''));
+    placement2['classList']['toggle']('is-searching', value7);
+    if (focus && value7) requestAnimationFrame(() => el19['focus']());
+    run22();
   }
-  function _0xffa3a5() {
-    _0x2dcc8b?.();
-    const _0x54fbf0 = window['CanvasTabManager']?.['getActiveCanvasId']?.(),
-      _0x42aa28 = getProjectName(),
-      _0x379950 = createElement('input', 'node-manager-project-rename', {
+  function run25() {
+    enabled4?.();
+    const value50 = window['CanvasTabManager']?.['getActiveCanvasId']?.(),
+      projectName2 = getProjectName(),
+      el42 = createElement('input', 'node-manager-project-rename', {
         type: 'text',
         'aria-label': t('nodeManager.projectNameAria'),
       });
-    ((_0x379950['value'] = _0x42aa28), _0x1ed2a1['replaceChildren'](_0x379950));
-    let _0x53828f = ![],
-      _0x6ac0b0 = ![];
-    const _0xed80e3 = () => {
-        (_0x2dcc8b === _0x3cad01 && ((_0x2dcc8b = null), _0x4a8171['removeAttribute']('aria-busy')),
-          _0x1ed2a1['replaceChildren'](_0x433d98),
-          _0x499abe());
+    ((el42['value'] = projectName2), el9['replaceChildren'](el42));
+    let value51 = ![],
+      enabled8 = ![];
+    const run26 = () => {
+        (enabled4 === handler2 && ((enabled4 = null), el8['removeAttribute']('aria-busy')),
+          el9['replaceChildren'](el10),
+          run5());
       },
-      _0x3cad01 = () => {
-        if (_0x53828f) return;
-        ((_0x53828f = !![]), _0xed80e3());
+      handler2 = () => {
+        if (value51) return;
+        ((value51 = !![]), run26());
       };
-    _0x2dcc8b = _0x3cad01;
-    const _0x194a27 = async () => {
-      if (_0x53828f || _0x6ac0b0) return;
-      if (window['CanvasTabManager']?.['getActiveCanvasId']?.() !== _0x54fbf0) {
-        _0x3cad01();
+    enabled4 = handler2;
+    const run27 = async () => {
+      if (value51 || enabled8) return;
+      if (window['CanvasTabManager']?.['getActiveCanvasId']?.() !== value50) {
+        handler2();
         return;
       }
-      const _0x4f6dd1 = String(_0x379950['value'] || '')
+      const enabled9 = String(el42['value'] || '')
         ['replace'](/\s+/g, '\x20')
         ['trim']();
-      if (!_0x4f6dd1 || _0x4f6dd1 === _0x42aa28) {
-        _0x3cad01();
+      if (!enabled9 || enabled9 === projectName2) {
+        handler2();
         return;
       }
-      ((_0x6ac0b0 = !![]), (_0x379950['disabled'] = !![]), _0x4a8171['setAttribute']('aria-busy', 'true'));
-      const _0x1aa373 = createElement(
-        'span',
-        'project-package-loading-spinner\x20node-manager-project-spinner',
-        { 'aria-hidden': 'true' },
-      );
-      _0x1ed2a1['appendChild'](_0x1aa373);
+      ((enabled8 = !![]), (el42['disabled'] = !![]), el8['setAttribute']('aria-busy', 'true'));
+      const el43 = createElement('span', 'project-package-loading-spinner\x20node-manager-project-spinner', {
+        'aria-hidden': 'true',
+      });
+      el9['appendChild'](el43);
       try {
-        const _0x18bccc = await Promise['resolve'](_0x1ecaec?.(_0x4f6dd1));
-        if (_0x53828f) return;
-        if (!_0x18bccc) throw new Error(t('nodeManager.toasts.projectRenameFailed'));
-        ((_0x53828f = !![]), _0xed80e3());
-      } catch (_0x234f22) {
-        if (_0x53828f) return;
-        ((_0x6ac0b0 = ![]),
-          (_0x379950['disabled'] = ![]),
-          _0x1aa373['remove'](),
-          showToast?.(_0x234f22?.['message'] || t('nodeManager.toasts.projectRenameFailed'), 'error'),
-          _0x379950['focus'](),
-          _0x379950['select']());
+        const enabled10 = await Promise['resolve'](renameCurrentProject?.(enabled9));
+        if (value51) return;
+        if (!enabled10) throw new Error(t('nodeManager.toasts.projectRenameFailed'));
+        ((value51 = !![]), run26());
+      } catch (error5) {
+        if (value51) return;
+        ((enabled8 = ![]),
+          (el42['disabled'] = ![]),
+          el43['remove'](),
+          showToast?.(error5?.['message'] || t('nodeManager.toasts.projectRenameFailed'), 'error'),
+          el42['focus'](),
+          el42['select']());
       } finally {
-        (!_0x2dcc8b || _0x2dcc8b === _0x3cad01) && _0x4a8171['removeAttribute']('aria-busy');
+        (!enabled4 || enabled4 === handler2) && el8['removeAttribute']('aria-busy');
       }
     };
-    (_0x379950['addEventListener']('keydown', (_0x111518) => {
-      if (_0x111518['isComposing']) return;
-      if (_0x111518['key'] === 'Enter')
-        (_0x111518['preventDefault'](), _0x111518['stopPropagation'](), void _0x194a27());
+    (el42['addEventListener']('keydown', (event8) => {
+      if (event8['isComposing']) return;
+      if (event8['key'] === 'Enter') (event8['preventDefault'](), event8['stopPropagation'](), void run27());
       else
-        _0x111518['key'] === 'Escape' &&
-          (_0x111518['preventDefault'](), _0x111518['stopPropagation'](), _0x3cad01());
+        event8['key'] === 'Escape' && (event8['preventDefault'](), event8['stopPropagation'](), handler2());
     }),
-      _0x379950['addEventListener']('blur', () => void _0x194a27()),
-      _0x379950['focus'](),
-      _0x379950['select']());
+      el42['addEventListener']('blur', () => void run27()),
+      el42['focus'](),
+      el42['select']());
   }
-  function _0x45e7ee() {
-    (_0x3d51a2['classList']['add']('show'),
-      _0x3d51a2['setAttribute']('aria-hidden', 'false'),
+  function open() {
+    (placement2['classList']['add']('show'),
+      placement2['setAttribute']('aria-hidden', 'false'),
       wrap['classList']['add']('node-manager-open'),
-      _0x596497(),
-      _0x49391e({ force: !![] }));
+      run7(),
+      run18({ force: !![] }));
   }
-  function _0x1d935a() {
-    (_0x28b410(), _0x2dcc8b?.());
-    const _0x2262cf = _0x3d51a2['contains'](document['activeElement']);
-    (_0x3ffaba(),
-      _0x3d51a2['classList']['remove']('show'),
-      _0x3d51a2['setAttribute']('aria-hidden', 'true'),
+  function close() {
+    (run16(), enabled4?.());
+    const value52 = placement2['contains'](document['activeElement']);
+    (run3(),
+      placement2['classList']['remove']('show'),
+      placement2['setAttribute']('aria-hidden', 'true'),
       wrap['classList']['remove']('node-manager-open'));
-    if (_0x2262cf) requestAnimationFrame(() => button['focus']());
+    if (value52) requestAnimationFrame(() => button['focus']());
   }
   (registerSidebarSubmenu({
     key: SIDEBAR_KEY,
     button: button,
-    panel: _0x3d51a2,
-    open: _0x45e7ee,
-    close: _0x1d935a,
-    isOpen: _0x22d5f8,
+    panel: placement2,
+    open: open,
+    close: close,
+    isOpen: isOpen,
     closeOnOutsidePointerDown: ![],
-    ignorePointerDown: (_0xc6bbbb) =>
-      !!_0xc6bbbb?.['target']?.['closest']?.('[data-sidebar-submenu-owner="' + SIDEBAR_KEY + '\x22]'),
+    ignorePointerDown: (event9) =>
+      !!event9?.['target']?.['closest']?.('[data-sidebar-submenu-owner="' + SIDEBAR_KEY + '\x22]'),
   }),
     button['removeAttribute']('aria-haspopup'),
-    _0x433d98['addEventListener']('click', _0xffa3a5),
-    _0x3b45be['addEventListener']('click', () => _0x9462d7(!![])),
-    _0x3bbf24['addEventListener']('click', () => _0x9462d7(![], { clear: !![], focus: ![] })),
-    _0x30dfe8['addEventListener']('click', () => _0x80daad(_0x30dfe8)),
-    _0x9f06ab['addEventListener']('click', () => _0x80daad(_0x9f06ab)),
-    _0x28d0e7['addEventListener']('click', () => {
-      const _0x5a3cd2 = _0x126d01['groupIds'] || [],
-        _0x4f892d =
-          _0x5a3cd2['length'] > 0x0 && _0x5a3cd2['every']((_0x430e84) => _0x33c939['has'](_0x430e84));
-      if (_0x4f892d) _0x33c939['clear']();
-      else _0x5a3cd2['forEach']((_0x19fb41) => _0x33c939['add'](_0x19fb41));
-      _0x5eb882();
+    el10['addEventListener']('click', run25),
+    el17['addEventListener']('click', () => run24(!![])),
+    el21['addEventListener']('click', () => run24(![], { clear: !![], focus: ![] })),
+    el15['addEventListener']('click', () => run23(el15)),
+    el20['addEventListener']('click', () => run23(el20)),
+    el14['addEventListener']('click', () => {
+      const list4 = count3['groupIds'] || [],
+        value53 = list4['length'] > 0x0 && list4['every']((value54) => collapsedGroupIds['has'](value54));
+      if (value53) collapsedGroupIds['clear']();
+      else list4['forEach']((value55) => collapsedGroupIds['add'](value55));
+      run22();
     }),
-    _0x3d6650['addEventListener']('click', () => closeSidebarSubmenu(SIDEBAR_KEY)),
-    _0x22a083['addEventListener']('click', () => closeSidebarSubmenu(SIDEBAR_KEY)),
-    _0x454172['addEventListener']('input', () => {
-      ((_0x234bba = _0x454172['value']), _0x5eb882());
+    el22['addEventListener']('click', () => closeSidebarSubmenu(SIDEBAR_KEY)),
+    el12['addEventListener']('click', () => closeSidebarSubmenu(SIDEBAR_KEY)),
+    el19['addEventListener']('input', () => {
+      ((query = el19['value']), run22());
     }),
-    _0x454172['addEventListener']('keydown', (_0x2662a7) => {
-      if (_0x2662a7['key'] !== 'Escape') return;
-      (_0x2662a7['preventDefault'](),
-        _0x2662a7['stopPropagation'](),
-        _0x9462d7(![], { clear: !![], focus: ![] }),
-        _0x3b45be['focus']());
+    el19['addEventListener']('keydown', (event10) => {
+      if (event10['key'] !== 'Escape') return;
+      (event10['preventDefault'](),
+        event10['stopPropagation'](),
+        run24(![], { clear: !![], focus: ![] }),
+        el17['focus']());
     }),
-    _0x49250f['push'](
-      installScrollableWheelBoundary(_0x373f00, {
-        getAxis: () => (_0x3d51a2['dataset']['placement'] === 'bottom' ? 'horizontal' : 'vertical'),
+    list['push'](
+      installScrollableWheelBoundary(ownerRoot2, {
+        getAxis: () => (placement2['dataset']['placement'] === 'bottom' ? 'horizontal' : 'vertical'),
       }),
     ),
-    _0x49250f['push'](() => {
-      (_0x5721c4['forEach']((_0x42931d) => window['clearTimeout'](_0x42931d)), _0x5721c4['clear']());
+    list['push'](() => {
+      (map6['forEach']((value56) => window['clearTimeout'](value56)), map6['clear']());
     }));
-  const _0x11204a = _0x3cf865['subscribeSelector']?.(
-      (_0x2d737b) => Number(_0x2d737b['_nodesRev'] || 0x0),
+  const value57 = graphStore['subscribeSelector']?.(
+      (value58) => Number(value58['_nodesRev'] || 0x0),
       () => {
-        if (!_0x22d5f8()) return;
-        _0x49391e();
+        if (!isOpen()) return;
+        run18();
       },
     ),
-    _0x57ada7 = _0x3cf865['subscribeSelector']?.(
-      (_0x3862fb) => (_0x3862fb['selectedNodeIds'] || [])['join']('|'),
-      _0x578250,
+    value59 = graphStore['subscribeSelector']?.(
+      (state2) => (state2['selectedNodeIds'] || [])['join']('|'),
+      run8,
     ),
-    _0x53a125 = _0x3850c2?.['subscribeSelector']?.(
-      (_0x1936e5) => normalizeNodeManagerPlacement(_0x1936e5['ui']?.['nodeManagerPlacement']),
-      _0x1f1cb8,
+    value60 = uiStore?.['subscribeSelector']?.(
+      (value61) => normalizeNodeManagerPlacement(value61['ui']?.['nodeManagerPlacement']),
+      run4,
     );
-  _0x49250f['push'](_0x11204a, _0x57ada7, _0x53a125);
-  const _0x318ca6 = (_0x381529) => _0x1f1cb8(_0x381529?.['detail']?.['placement']),
-    _0x3285d9 = () => {
-      (_0x28b410(), _0x2dcc8b?.(), _0x499abe(), _0x2aacbe['clear']());
-      if (_0x22d5f8()) _0x49391e({ force: !![] });
+  list['push'](value57, value59, value60);
+  const value62 = (value63) => run4(value63?.['detail']?.['placement']),
+    value64 = () => {
+      (run16(), enabled4?.(), run5(), map3['clear']());
+      if (isOpen()) run18({ force: !![] });
     },
-    _0x500664 = () => {
-      _0x596497();
-      if (_0x22d5f8()) _0x5eb882();
+    value65 = () => {
+      run7();
+      if (isOpen()) run22();
     };
-  (window['addEventListener'](NODE_MANAGER_PLACEMENT_EVENT, _0x318ca6),
-    window['addEventListener']('aicanvas:active-canvas-changed', _0x3285d9),
-    window['addEventListener']('aicanvas:locale-change', _0x500664),
-    _0x49250f['push'](() => window['removeEventListener'](NODE_MANAGER_PLACEMENT_EVENT, _0x318ca6)),
-    _0x49250f['push'](() => window['removeEventListener']('aicanvas:active-canvas-changed', _0x3285d9)),
-    _0x49250f['push'](() => window['removeEventListener']('aicanvas:locale-change', _0x500664)));
-  const _0xadbdc5 = document['getElementById']('projectNameText'),
-    _0x2d3b70 = _0xadbdc5 && typeof MutationObserver === 'function' ? new MutationObserver(_0x499abe) : null;
+  (window['addEventListener'](NODE_MANAGER_PLACEMENT_EVENT, value62),
+    window['addEventListener']('aicanvas:active-canvas-changed', value64),
+    window['addEventListener']('aicanvas:locale-change', value65),
+    list['push'](() => window['removeEventListener'](NODE_MANAGER_PLACEMENT_EVENT, value62)),
+    list['push'](() => window['removeEventListener']('aicanvas:active-canvas-changed', value64)),
+    list['push'](() => window['removeEventListener']('aicanvas:locale-change', value65)));
+  const value66 = document['getElementById']('projectNameText'),
+    value67 = value66 && typeof MutationObserver === 'function' ? new MutationObserver(run5) : null;
   return (
-    _0x2d3b70?.['observe'](_0xadbdc5, { childList: !![], characterData: !![], subtree: !![] }),
-    _0x49250f['push'](() => _0x2d3b70?.['disconnect']()),
-    _0x1f1cb8(getStoreState(_0x3850c2)['ui']?.['nodeManagerPlacement']),
-    _0x596497(),
-    _0x49391e({ force: !![] }),
+    value67?.['observe'](value66, { childList: !![], characterData: !![], subtree: !![] }),
+    list['push'](() => value67?.['disconnect']()),
+    run4(getStoreState(uiStore)['ui']?.['nodeManagerPlacement']),
+    run7(),
+    run18({ force: !![] }),
     {
-      panel: _0x3d51a2,
-      open: () => _0x45e7ee(),
+      panel: placement2,
+      open: () => open(),
       close: () => closeSidebarSubmenu(SIDEBAR_KEY),
       destroy() {
-        (_0x1d935a(),
-          _0x22bee1['clear'](),
-          _0x2aacbe['clear'](),
-          _0x23785e['clear'](),
-          _0x49250f['forEach']((_0x566798) => _0x566798?.()),
-          _0x3d51a2['remove']());
+        (close(),
+          map4['clear'](),
+          map3['clear'](),
+          map2['clear'](),
+          list['forEach']((value68) => value68?.()),
+          placement2['remove']());
       },
     }
   );

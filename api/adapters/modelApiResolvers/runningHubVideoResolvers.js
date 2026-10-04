@@ -17,47 +17,41 @@ const RUNNINGHUB_HAPPYHORSE_ENDPOINTS = Object['freeze']({
     image: 'https://www.runninghub.cn/openapi/v2/alibaba/happyhorse-1.1/image-to-video',
     reference: 'https://www.runninghub.cn/openapi/v2/alibaba/happyhorse-1.1/reference-to-video',
   });
-function normalizeHappyHorseGenerationMode(_0x4ff33e) {
-  const _0x3eab77 = String(_0x4ff33e || '')
+function normalizeHappyHorseGenerationMode(value) {
+  const item = String(value || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x3eab77 === 'image' || _0x3eab77 === 'reference' || _0x3eab77 === 'edit' ? _0x3eab77 : 'auto';
+  return item === 'image' || item === 'reference' || item === 'edit' ? item : 'auto';
 }
-function getRunningHubHappyHorseMode(_0x4c2a90 = {}, _0x1319d9 = {}) {
+function getRunningHubHappyHorseMode(options = {}, key = {}) {
   return normalizeHappyHorseGenerationMode(
-    _0x1319d9['happyhorse_mode'] ||
-      _0x4c2a90?.['generationParams']?.['happyhorse_mode'] ||
-      _0x4c2a90?.['happyhorse_mode'],
+    key['happyhorse_mode'] ||
+      options?.['generationParams']?.['happyhorse_mode'] ||
+      options?.['happyhorse_mode'],
   );
 }
-function isRunningHubHappyHorse11Model(
-  _0x383027 = {},
-  _0x58c57c = {},
-  _0x1fafc7 = '',
-  _0x405bb5 = {},
-  _0x4e5513 = {},
-) {
-  const _0xadda84 = String(
-    _0x405bb5?.['id'] ||
-      _0x4e5513?.['modelId'] ||
-      _0x1fafc7 ||
-      _0x383027?.['model'] ||
-      _0x383027?.['generationParams']?.['model'] ||
-      _0x58c57c?.['model'] ||
+function isRunningHubHappyHorse11Model(options2 = {}, index = {}, result = '', data = {}, target = {}) {
+  const list = String(
+    data?.['id'] ||
+      target?.['modelId'] ||
+      result ||
+      options2?.['model'] ||
+      options2?.['generationParams']?.['model'] ||
+      index?.['model'] ||
       '',
   )
     ['trim']()
     ['toLowerCase']();
-  return _0xadda84['includes']('happyhorse-1.1') || _0xadda84['includes']('happyhorse-1-1');
+  return list['includes']('happyhorse-1.1') || list['includes']('happyhorse-1-1');
 }
-function normalizeRunningHubHappyHorseAudioSettingValue(_0x24296d) {
-  const _0x3cd75a = String(_0x24296d || '')
+function normalizeRunningHubHappyHorseAudioSettingValue(source) {
+  const next = String(source || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x3cd75a === 'origin' ? 'origin' : 'auto';
+  return next === 'origin' ? 'origin' : 'auto';
 }
 export function runninghubHappyHorseVideo({
-  currentBody: _0xe2f733,
+  currentBody: currentBody2,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
@@ -67,96 +61,95 @@ export function runninghubHappyHorseVideo({
   executionManifest: executionManifest = {},
   modelManifest: modelManifest = {},
 }) {
-  const _0x2bd153 = { ..._0xe2f733 },
-    _0x1a70fb = isRunningHubHappyHorse11Model(
+  const current = { ...currentBody2 },
+    isRunningHubHappyHorse11Model2 = isRunningHubHappyHorse11Model(
       payload,
-      _0xe2f733,
+      currentBody2,
       modelToken,
       executionManifest,
       modelManifest,
     ),
-    _0x4f5160 = String(_0x2bd153['prompt'] || finalPrompt || payload?.['prompt'] || '')['trim']();
-  if (!_0x4f5160) throw new Error('RunningHub\x20HappyHorse\x201.0\x20prompt\x20is\x20required');
-  const _0xe8f871 = normalizeInputList(inputImages),
-    _0x490790 = normalizeInputList(inputVideos),
-    _0x4547c4 = normalizeInputUrlsBySlot(finalUrlsBySlot),
-    _0x496c99 = (_0x25015f = [], _0x19cd55 = []) => {
-      const _0x3ba8e9 = [],
-        _0x4a8e9d = (_0x30fc79) => {
-          const _0x55cf5e = String(_0x30fc79 || '')['trim']();
-          if (_0x55cf5e && !_0x3ba8e9['includes'](_0x55cf5e)) _0x3ba8e9['push'](_0x55cf5e);
+    enabled = String(current['prompt'] || finalPrompt || payload?.['prompt'] || '')['trim']();
+  if (!enabled) throw new Error('RunningHub\x20HappyHorse\x201.0\x20prompt\x20is\x20required');
+  const list2 = normalizeInputList(inputImages),
+    list3 = normalizeInputList(inputVideos),
+    inputUrlsBySlot = normalizeInputUrlsBySlot(finalUrlsBySlot),
+    handler = (list4 = [], entry = []) => {
+      const list5 = [],
+        handler2 = (record) => {
+          const handle = String(record || '')['trim']();
+          if (handle && !list5['includes'](handle)) list5['push'](handle);
         };
       return (
-        _0x25015f['forEach']((_0x2cadb8) => _0x4a8e9d(_0x4547c4[_0x2cadb8])),
-        normalizeInputList(_0x19cd55)['forEach'](_0x4a8e9d),
-        _0x3ba8e9
+        list4['forEach']((state) => handler2(inputUrlsBySlot[state])),
+        normalizeInputList(entry)['forEach'](handler2),
+        list5
       );
     };
-  let _0x2f4210 = getRunningHubHappyHorseMode(payload, _0x2bd153);
-  const _0x302a7e =
-    _0xe8f871['length'] > 0x0 || _0x490790['length'] > 0x0 || Object['keys'](_0x4547c4)['length'] > 0x0;
-  _0x2f4210 !== 'auto' && !_0x302a7e && (_0x2f4210 = 'auto');
-  _0x2bd153['prompt'] = _0x4f5160;
-  const _0x1316af = normalizeOptionalIntegerInRange(_0x2bd153['seed'], { min: 0x0, max: 0x7fffffff });
-  if (_0x1316af === null) delete _0x2bd153['seed'];
-  else _0x2bd153['seed'] = _0x1316af;
-  (delete _0x2bd153['happyhorse_mode'],
-    delete _0x2bd153['imageUrl'],
-    delete _0x2bd153['imageUrls'],
-    delete _0x2bd153['videoUrl']);
-  if (_0x1a70fb && _0x490790['length'] > 0x0)
+  let runningHubHappyHorseMode = getRunningHubHappyHorseMode(payload, current);
+  const enabled2 =
+    list2['length'] > 0x0 || list3['length'] > 0x0 || Object['keys'](inputUrlsBySlot)['length'] > 0x0;
+  runningHubHappyHorseMode !== 'auto' && !enabled2 && (runningHubHappyHorseMode = 'auto');
+  current['prompt'] = enabled;
+  const optionalIntegerInRange = normalizeOptionalIntegerInRange(current['seed'], {
+    min: 0x0,
+    max: 0x7fffffff,
+  });
+  if (optionalIntegerInRange === null) delete current['seed'];
+  else current['seed'] = optionalIntegerInRange;
+  (delete current['happyhorse_mode'],
+    delete current['imageUrl'],
+    delete current['imageUrls'],
+    delete current['videoUrl']);
+  if (isRunningHubHappyHorse11Model2 && list3['length'] > 0x0)
     throw new Error('RunningHub HappyHorse 1.1 does not support video edit mode');
-  if (_0x2f4210 === 'edit') {
-    if (_0x1a70fb) throw new Error('RunningHub HappyHorse 1.1 does not support video edit mode');
-    if (!_0x490790[0x0]) throw new Error('RunningHub HappyHorse 1.0 video edit requires videoUrl input');
-    const _0x51358b = _0x496c99(['editRefImage'], _0xe8f871);
-    _0x2bd153['videoUrl'] = _0x490790[0x0];
-    if (_0x51358b['length'] > 0x0) _0x2bd153['imageUrls'] = _0x51358b['slice'](0x0, 0x5);
+  if (runningHubHappyHorseMode === 'edit') {
+    if (isRunningHubHappyHorse11Model2)
+      throw new Error('RunningHub HappyHorse 1.1 does not support video edit mode');
+    if (!list3[0x0]) throw new Error('RunningHub HappyHorse 1.0 video edit requires videoUrl input');
+    const list6 = handler(['editRefImage'], list2);
+    current['videoUrl'] = list3[0x0];
+    if (list6['length'] > 0x0) current['imageUrls'] = list6['slice'](0x0, 0x5);
     return (
-      (_0x2bd153['audioSetting'] = normalizeRunningHubHappyHorseAudioSettingValue(
-        _0x2bd153['audioSetting'] ??
+      (current['audioSetting'] = normalizeRunningHubHappyHorseAudioSettingValue(
+        current['audioSetting'] ??
           payload?.['generationParams']?.['audioSetting'] ??
           payload?.['generationParams']?.['audio_setting'] ??
           payload?.['audioSetting'] ??
           payload?.['audio_setting'],
       )),
-      delete _0x2bd153['aspectRatio'],
-      delete _0x2bd153['duration'],
-      delete _0x2bd153['imageUrl'],
-      _0x2bd153
+      delete current['aspectRatio'],
+      delete current['duration'],
+      delete current['imageUrl'],
+      current
     );
   }
-  delete _0x2bd153['audioSetting'];
-  if (_0x2f4210 === 'image') {
-    const _0x1f6dac = _0x496c99(['firstFrame'], _0xe8f871);
-    if (!_0x1f6dac[0x0]) throw new Error('RunningHub HappyHorse 1.0 image-to-video requires imageUrl input');
+  delete current['audioSetting'];
+  if (runningHubHappyHorseMode === 'image') {
+    const enabled3 = handler(['firstFrame'], list2);
+    if (!enabled3[0x0]) throw new Error('RunningHub HappyHorse 1.0 image-to-video requires imageUrl input');
     return (
-      (_0x2bd153['imageUrl'] = _0x1f6dac[0x0]),
-      delete _0x2bd153['imageUrls'],
-      delete _0x2bd153['videoUrl'],
-      delete _0x2bd153['aspectRatio'],
-      _0x2bd153
+      (current['imageUrl'] = enabled3[0x0]),
+      delete current['imageUrls'],
+      delete current['videoUrl'],
+      delete current['aspectRatio'],
+      current
     );
   }
-  if (_0x2f4210 === 'reference') {
-    const _0x519bd3 = _0x496c99(['referenceImage'], _0xe8f871);
-    if (_0x519bd3['length'] <= 0x0)
+  if (runningHubHappyHorseMode === 'reference') {
+    const list7 = handler(['referenceImage'], list2);
+    if (list7['length'] <= 0x0)
       throw new Error('RunningHub HappyHorse 1.0 reference mode requires imageUrls input');
     return (
-      (_0x2bd153['imageUrls'] = _0x519bd3['slice'](0x0, 0x9)),
-      delete _0x2bd153['imageUrl'],
-      delete _0x2bd153['videoUrl'],
-      _0x2bd153
+      (current['imageUrls'] = list7['slice'](0x0, 0x9)),
+      delete current['imageUrl'],
+      delete current['videoUrl'],
+      current
     );
   }
-  if (_0xe8f871['length'] > 0x0 || _0x490790['length'] > 0x0)
+  if (list2['length'] > 0x0 || list3['length'] > 0x0)
     throw new Error('RunningHub HappyHorse 1.0 media inputs require an explicit mode selection');
-  return (
-    delete _0x2bd153['imageUrl'],
-    delete _0x2bd153['imageUrls'],
-    delete _0x2bd153['videoUrl'],
-    _0x2bd153
-  );
+  return (delete current['imageUrl'], delete current['imageUrls'], delete current['videoUrl'], current);
 }
 function hasRunningHubHappyHorseEndpointMedia({
   currentBody: currentBody = {},
@@ -172,15 +165,15 @@ function hasRunningHubHappyHorseEndpointMedia({
     normalizeInputList(currentBody?.['imageUrls'])['length'] > 0x0
   );
 }
-export function runninghubHappyHorseVideoEndpoint(_0x474b2d = {}) {
+export function runninghubHappyHorseVideoEndpoint(options3 = {}) {
   const {
       payload: payload = {},
       currentBody: currentBody = {},
       modelToken: modelToken = '',
       executionManifest: executionManifest = {},
       modelManifest: modelManifest = {},
-    } = _0x474b2d,
-    _0x2d82d7 = isRunningHubHappyHorse11Model(
+    } = options3,
+    response = isRunningHubHappyHorse11Model(
       payload,
       currentBody,
       modelToken,
@@ -189,10 +182,12 @@ export function runninghubHappyHorseVideoEndpoint(_0x474b2d = {}) {
     )
       ? RUNNINGHUB_HAPPYHORSE_11_ENDPOINTS
       : RUNNINGHUB_HAPPYHORSE_ENDPOINTS;
-  let _0x5e2dca = getRunningHubHappyHorseMode(payload, currentBody);
+  let runningHubHappyHorseMode2 = getRunningHubHappyHorseMode(payload, currentBody);
   return (
-    _0x5e2dca !== 'auto' && !hasRunningHubHappyHorseEndpointMedia(_0x474b2d) && (_0x5e2dca = 'auto'),
-    _0x2d82d7[_0x5e2dca] || _0x2d82d7['text']
+    runningHubHappyHorseMode2 !== 'auto' &&
+      !hasRunningHubHappyHorseEndpointMedia(options3) &&
+      (runningHubHappyHorseMode2 = 'auto'),
+    response[runningHubHappyHorseMode2] || response['text']
   );
 }
 const RUNNINGHUB_SEEDANCE_2_ENDPOINTS = Object['freeze']({
@@ -212,52 +207,46 @@ const RUNNINGHUB_SEEDANCE_2_ENDPOINTS = Object['freeze']({
     reference: 'https://www.runninghub.cn/openapi/v2/rhart-video/sparkvideo-2.0/multimodal-video',
   }),
 });
-function normalizeRunningHubSeedance2Model(_0xce5bfc) {
-  const _0x2284a7 = String(_0xce5bfc || '')
+function normalizeRunningHubSeedance2Model(config) {
+  const scope = String(config || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x2284a7 === 'standard' || _0x2284a7 === 'std' ? 'standard' : 'fast';
+  return scope === 'standard' || scope === 'std' ? 'standard' : 'fast';
 }
-function normalizeRunningHubSeedance2Mode(_0x422ca6) {
-  const _0x4a2fb9 = String(_0x422ca6 || '')
+function normalizeRunningHubSeedance2Mode(input) {
+  const output = String(input || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x4a2fb9 === 'multimodal2video' || _0x4a2fb9 === 'reference') return 'multimodal2video';
-  if (_0x4a2fb9 === 'frames2video' || _0x4a2fb9 === 'frames') return 'frames2video';
-  if (_0x4a2fb9 === 'image2video' || _0x4a2fb9 === 'image' || _0x4a2fb9 === 'frame') return 'image2video';
+  if (output === 'multimodal2video' || output === 'reference') return 'multimodal2video';
+  if (output === 'frames2video' || output === 'frames') return 'frames2video';
+  if (output === 'image2video' || output === 'image' || output === 'frame') return 'image2video';
   return 'text2video';
 }
-function getRunningHubSeedance2Model(
-  _0x41883e = {},
-  _0x356c37 = {},
-  _0x201fd5 = '',
-  _0x38df65 = {},
-  _0x3aa176 = {},
-) {
-  const _0x2ab974 = String(_0x201fd5 || _0x41883e?.['model'] || _0x356c37?.['model'] || '')
+function getRunningHubSeedance2Model(options4 = {}, value2 = {}, value3 = '', value4 = {}, value5 = {}) {
+  const list8 = String(value3 || options4?.['model'] || value2?.['model'] || '')
       ['trim']()
       ['toLowerCase'](),
-    _0x5c03d7 = String(_0x38df65?.['id'] || _0x3aa176?.['modelId'] || '')
+    list9 = String(value4?.['id'] || value5?.['modelId'] || '')
       ['trim']()
       ['toLowerCase']();
   if (
-    _0x2ab974['includes']('seedance-2.0-mini') ||
-    _0x2ab974['includes']('sparkvideo-2.0-mini') ||
-    _0x5c03d7['includes']('seedance-2-mini') ||
-    _0x5c03d7['includes']('sparkvideo-2.0-mini')
+    list8['includes']('seedance-2.0-mini') ||
+    list8['includes']('sparkvideo-2.0-mini') ||
+    list9['includes']('seedance-2-mini') ||
+    list9['includes']('sparkvideo-2.0-mini')
   )
     return 'mini';
   return normalizeRunningHubSeedance2Model(
-    _0x356c37['rh_seedance_2_model'] ||
-      _0x41883e?.['generationParams']?.['rh_seedance_2_model'] ||
-      _0x41883e?.['rh_seedance_2_model'],
+    value2['rh_seedance_2_model'] ||
+      options4?.['generationParams']?.['rh_seedance_2_model'] ||
+      options4?.['rh_seedance_2_model'],
   );
 }
-function getRunningHubSeedance2Mode(_0x25fae9 = {}, _0x45180d = {}) {
+function getRunningHubSeedance2Mode(options5 = {}, value6 = {}) {
   return normalizeRunningHubSeedance2Mode(
-    _0x45180d['rh_seedance_2_mode'] ||
-      _0x25fae9?.['generationParams']?.['rh_seedance_2_mode'] ||
-      _0x25fae9?.['rh_seedance_2_mode'],
+    value6['rh_seedance_2_mode'] ||
+      options5?.['generationParams']?.['rh_seedance_2_mode'] ||
+      options5?.['rh_seedance_2_mode'],
   );
 }
 function collectRunningHubSeedance2SlotImages({
@@ -265,22 +254,22 @@ function collectRunningHubSeedance2SlotImages({
   finalUrlsBySlot: finalUrlsBySlot = {},
   slotIds: slotIds = [],
 } = {}) {
-  const _0x21f706 = [],
-    _0x21dc23 = normalizeInputUrlsBySlot(finalUrlsBySlot),
-    _0x2ef48f = new Set(normalizeInputList(Object['values'](_0x21dc23)));
+  const value7 = [],
+    inputUrlsBySlot2 = normalizeInputUrlsBySlot(finalUrlsBySlot),
+    map = new Set(normalizeInputList(Object['values'](inputUrlsBySlot2)));
   return (
-    slotIds['forEach']((_0x9d3d0d) => appendUniqueUrl(_0x21f706, _0x21dc23[_0x9d3d0d])),
-    normalizeInputList(inputImages)['forEach']((_0x5464d7) => {
-      if (!_0x2ef48f['has'](_0x5464d7)) appendUniqueUrl(_0x21f706, _0x5464d7);
+    slotIds['forEach']((value8) => appendUniqueUrl(value7, inputUrlsBySlot2[value8])),
+    normalizeInputList(inputImages)['forEach']((value9) => {
+      if (!map['has'](value9)) appendUniqueUrl(value7, value9);
     }),
-    _0x21f706
+    value7
   );
 }
-function collectRunningHubSeedance2FrameImages(_0x30d2a2 = {}) {
-  return collectRunningHubSeedance2SlotImages({ ..._0x30d2a2, slotIds: ['firstFrame', 'lastFrame'] });
+function collectRunningHubSeedance2FrameImages(args = {}) {
+  return collectRunningHubSeedance2SlotImages({ ...args, slotIds: ['firstFrame', 'lastFrame'] });
 }
-function collectRunningHubSeedance2ReferenceImages(_0x43353e = {}) {
-  return collectRunningHubSeedance2SlotImages({ ..._0x43353e, slotIds: ['referenceImage'] });
+function collectRunningHubSeedance2ReferenceImages(args2 = {}) {
+  return collectRunningHubSeedance2SlotImages({ ...args2, slotIds: ['referenceImage'] });
 }
 function resolveRunningHubSeedance2Route({
   payload: payload = {},
@@ -289,35 +278,36 @@ function resolveRunningHubSeedance2Route({
   executionManifest: executionManifest = {},
   modelManifest: modelManifest = {},
 } = {}) {
-  const _0x47164f = getRunningHubSeedance2Model(
+  const model = getRunningHubSeedance2Model(
       payload,
       currentBody,
       modelToken,
       executionManifest,
       modelManifest,
     ),
-    _0x1f4f35 = getRunningHubSeedance2Mode(payload, currentBody);
-  if (_0x1f4f35 === 'multimodal2video') return Object['freeze']({ model: _0x47164f, route: 'reference' });
-  if (_0x1f4f35 === 'image2video' || _0x1f4f35 === 'frames2video')
-    return Object['freeze']({ model: _0x47164f, route: 'image' });
-  return Object['freeze']({ model: _0x47164f, route: 'text' });
+    runningHubSeedance2Mode = getRunningHubSeedance2Mode(payload, currentBody);
+  if (runningHubSeedance2Mode === 'multimodal2video')
+    return Object['freeze']({ model: model, route: 'reference' });
+  if (runningHubSeedance2Mode === 'image2video' || runningHubSeedance2Mode === 'frames2video')
+    return Object['freeze']({ model: model, route: 'image' });
+  return Object['freeze']({ model: model, route: 'text' });
 }
-function removeRunningHubSeedance2TransientFields(_0x2458df) {
-  (delete _0x2458df['rh_seedance_2_model'],
-    delete _0x2458df['rh_seedance_2_mode'],
-    delete _0x2458df['firstFrameUrl'],
-    delete _0x2458df['lastFrameUrl'],
-    delete _0x2458df['imageUrls'],
-    delete _0x2458df['videoUrls'],
-    delete _0x2458df['audioUrls']);
+function removeRunningHubSeedance2TransientFields(value10) {
+  (delete value10['rh_seedance_2_model'],
+    delete value10['rh_seedance_2_mode'],
+    delete value10['firstFrameUrl'],
+    delete value10['lastFrameUrl'],
+    delete value10['imageUrls'],
+    delete value10['videoUrls'],
+    delete value10['audioUrls']);
 }
-function normalizeRunningHubSeedance2ConversionSlots(_0x10b67b) {
-  const _0x1c3d81 = Array['isArray'](_0x10b67b) ? _0x10b67b : ['all'],
-    _0x48aa06 = _0x1c3d81['map']((_0x32fc44) => String(_0x32fc44 || '')['trim']())['filter'](Boolean);
-  return _0x48aa06['length'] > 0x0 ? _0x48aa06 : ['all'];
+function normalizeRunningHubSeedance2ConversionSlots(value11) {
+  const list10 = Array['isArray'](value11) ? value11 : ['all'],
+    list11 = list10['map']((value12) => String(value12 || '')['trim']())['filter'](Boolean);
+  return list11['length'] > 0x0 ? list11 : ['all'];
 }
 export function runninghubSeedance2Video({
-  currentBody: _0x1a810b,
+  currentBody: currentBody3,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
@@ -328,84 +318,85 @@ export function runninghubSeedance2Video({
   executionManifest: executionManifest = {},
   modelManifest: modelManifest = {},
 }) {
-  const _0x41fb73 = { ..._0x1a810b },
-    _0x2a1011 = String(_0x41fb73['prompt'] || finalPrompt || payload?.['prompt'] || '')['trim']();
-  if (!_0x2a1011) throw new Error('RunningHub\x20Seedance\x202.0\x20prompt\x20is\x20required');
-  const _0x42c61b = getRunningHubSeedance2Mode(payload, _0x41fb73),
-    _0xad7ead = collectRunningHubSeedance2FrameImages({
+  const value13 = { ...currentBody3 },
+    enabled4 = String(value13['prompt'] || finalPrompt || payload?.['prompt'] || '')['trim']();
+  if (!enabled4) throw new Error('RunningHub\x20Seedance\x202.0\x20prompt\x20is\x20required');
+  const runningHubSeedance2Mode2 = getRunningHubSeedance2Mode(payload, value13),
+    list12 = collectRunningHubSeedance2FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x5cef1a = collectRunningHubSeedance2ReferenceImages({
+    list13 = collectRunningHubSeedance2ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x4ff026 = normalizeInputList(inputVideos),
-    _0x53a8e3 = normalizeInputList(inputAudios),
-    _0x4d338a = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video'),
-    _0x12c7af = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
-  _0x41fb73['prompt'] = _0x2a1011;
-  const _0x1462ed = normalizeOptionalIntegerInRange(_0x41fb73['seed'], { min: -0x1, max: 0x7fffffff });
-  if (_0x1462ed === null) delete _0x41fb73['seed'];
-  else _0x41fb73['seed'] = _0x1462ed;
-  removeRunningHubSeedance2TransientFields(_0x41fb73);
-  if (_0x42c61b === 'multimodal2video') {
-    if (_0x5cef1a['length'] + _0x4ff026['length'] <= 0x0)
+    list14 = normalizeInputList(inputVideos),
+    list15 = normalizeInputList(inputAudios),
+    runningHubKlingV3RawMediaCount = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video'),
+    runningHubKlingV3RawMediaCount2 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
+  value13['prompt'] = enabled4;
+  const optionalIntegerInRange2 = normalizeOptionalIntegerInRange(value13['seed'], {
+    min: -0x1,
+    max: 0x7fffffff,
+  });
+  if (optionalIntegerInRange2 === null) delete value13['seed'];
+  else value13['seed'] = optionalIntegerInRange2;
+  removeRunningHubSeedance2TransientFields(value13);
+  if (runningHubSeedance2Mode2 === 'multimodal2video') {
+    if (list13['length'] + list14['length'] <= 0x0)
       throw new Error('RunningHub Seedance 2.0 multimodal mode requires image or video input');
-    if (_0x5cef1a['length'] > 0x9)
+    if (list13['length'] > 0x9)
       throw new Error('RunningHub Seedance 2.0 multimodal mode supports at most 9 image inputs');
-    if (_0x4d338a > 0x3)
+    if (runningHubKlingV3RawMediaCount > 0x3)
       throw new Error(
         'RunningHub\x20Seedance\x202.0\x20multimodal\x20mode\x20supports\x20at\x20most\x203\x20video\x20inputs',
       );
-    if (_0x12c7af > 0x3)
+    if (runningHubKlingV3RawMediaCount2 > 0x3)
       throw new Error(
         'RunningHub\x20Seedance\x202.0\x20multimodal\x20mode\x20supports\x20at\x20most\x203\x20audio\x20inputs',
       );
-    if (_0x53a8e3['length'] > 0x0 && _0x5cef1a['length'] + _0x4ff026['length'] <= 0x0)
+    if (list15['length'] > 0x0 && list13['length'] + list14['length'] <= 0x0)
       throw new Error('RunningHub Seedance 2.0 audio input requires image or video input');
-    if (_0x5cef1a['length'] > 0x0) _0x41fb73['imageUrls'] = _0x5cef1a['slice'](0x0, 0x9);
-    if (_0x4ff026['length'] > 0x0) _0x41fb73['videoUrls'] = _0x4ff026['slice'](0x0, 0x3);
-    if (_0x53a8e3['length'] > 0x0) _0x41fb73['audioUrls'] = _0x53a8e3['slice'](0x0, 0x3);
+    if (list13['length'] > 0x0) value13['imageUrls'] = list13['slice'](0x0, 0x9);
+    if (list14['length'] > 0x0) value13['videoUrls'] = list14['slice'](0x0, 0x3);
+    if (list15['length'] > 0x0) value13['audioUrls'] = list15['slice'](0x0, 0x3);
     return (
-      _0x41fb73['realPersonMode'] === !![]
-        ? (_0x41fb73['conversionSlots'] = normalizeRunningHubSeedance2ConversionSlots(
-            _0x41fb73['conversionSlots'],
+      value13['realPersonMode'] === !![]
+        ? (value13['conversionSlots'] = normalizeRunningHubSeedance2ConversionSlots(
+            value13['conversionSlots'],
           ))
-        : delete _0x41fb73['conversionSlots'],
-      delete _0x41fb73['webSearch'],
-      _0x41fb73
+        : delete value13['conversionSlots'],
+      delete value13['webSearch'],
+      value13
     );
   }
-  if (_0x4d338a > 0x0)
+  if (runningHubKlingV3RawMediaCount > 0x0)
     throw new Error(
       'RunningHub Seedance 2.0 text/image/frame modes do not accept video input; use multimodal mode',
     );
-  if (_0x12c7af > 0x0)
+  if (runningHubKlingV3RawMediaCount2 > 0x0)
     throw new Error(
       'RunningHub Seedance 2.0 text/image/frame modes do not accept audio input; use multimodal mode',
     );
-  if (_0x42c61b === 'text2video') {
-    if (_0xad7ead['length'] > 0x0)
+  if (runningHubSeedance2Mode2 === 'text2video') {
+    if (list12['length'] > 0x0)
       throw new Error('RunningHub Seedance 2.0 text-to-video mode does not accept image input');
-    return (delete _0x41fb73['realPersonMode'], delete _0x41fb73['conversionSlots'], _0x41fb73);
+    return (delete value13['realPersonMode'], delete value13['conversionSlots'], value13);
   }
-  if (_0x42c61b === 'image2video' && _0xad7ead['length'] !== 0x1)
+  if (runningHubSeedance2Mode2 === 'image2video' && list12['length'] !== 0x1)
     throw new Error('RunningHub Seedance 2.0 image-to-video mode requires exactly 1 image input');
-  if (_0x42c61b === 'frames2video' && _0xad7ead['length'] !== 0x2)
+  if (runningHubSeedance2Mode2 === 'frames2video' && list12['length'] !== 0x2)
     throw new Error(
       'RunningHub\x20Seedance\x202.0\x20first-last-frame\x20mode\x20requires\x20exactly\x202\x20image\x20inputs',
     );
-  _0x41fb73['firstFrameUrl'] = _0xad7ead[0x0];
-  if (_0xad7ead[0x1]) _0x41fb73['lastFrameUrl'] = _0xad7ead[0x1];
+  value13['firstFrameUrl'] = list12[0x0];
+  if (list12[0x1]) value13['lastFrameUrl'] = list12[0x1];
   return (
-    delete _0x41fb73['webSearch'],
-    _0x41fb73['realPersonMode'] === !![]
-      ? (_0x41fb73['conversionSlots'] = normalizeRunningHubSeedance2ConversionSlots(
-          _0x41fb73['conversionSlots'],
-        ))
-      : delete _0x41fb73['conversionSlots'],
-    _0x41fb73
+    delete value13['webSearch'],
+    value13['realPersonMode'] === !![]
+      ? (value13['conversionSlots'] = normalizeRunningHubSeedance2ConversionSlots(value13['conversionSlots']))
+      : delete value13['conversionSlots'],
+    value13
   );
 }
 export function runninghubSeedance2VideoEndpoint({
@@ -414,16 +405,14 @@ export function runninghubSeedance2VideoEndpoint({
   executionManifest: executionManifest = {},
   modelManifest: modelManifest = {},
 }) {
-  const { model: _0x4bbfb9, route: _0x411866 } = resolveRunningHubSeedance2Route({
+  const { model: model2, route: route } = resolveRunningHubSeedance2Route({
     payload: payload,
     currentBody: {},
     modelToken: modelToken || payload?.['model'] || '',
     executionManifest: executionManifest,
     modelManifest: modelManifest,
   });
-  return (
-    RUNNINGHUB_SEEDANCE_2_ENDPOINTS[_0x4bbfb9]?.[_0x411866] || RUNNINGHUB_SEEDANCE_2_ENDPOINTS['fast']['text']
-  );
+  return RUNNINGHUB_SEEDANCE_2_ENDPOINTS[model2]?.[route] || RUNNINGHUB_SEEDANCE_2_ENDPOINTS['fast']['text'];
 }
 const RUNNINGHUB_KLING_O1_ENDPOINTS = Object['freeze']({
   text: 'https://www.runninghub.cn/openapi/v2/kling-video-o1/text-to-video',
@@ -432,57 +421,57 @@ const RUNNINGHUB_KLING_O1_ENDPOINTS = Object['freeze']({
   reference: 'https://www.runninghub.cn/openapi/v2/kling-video-o1-std/refrence-to-video',
   edit: 'https://www.runninghub.cn/openapi/v2/kling-video-o1-std/edit-video',
 });
-function normalizeRunningHubKlingO1GenerationMode(_0x253156) {
-  const _0x5121c9 = String(_0x253156 || '')
+function normalizeRunningHubKlingO1GenerationMode(value14) {
+  const value15 = String(value14 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x5121c9 === 'reference' || _0x5121c9 === 'edit') return _0x5121c9;
+  if (value15 === 'reference' || value15 === 'edit') return value15;
   return 'frame';
 }
-function normalizeRunningHubKlingO1QualityMode(_0xe3f1c3) {
-  const _0x57b33d = String(_0xe3f1c3 || '')
+function normalizeRunningHubKlingO1QualityMode(value16) {
+  const value17 = String(value16 || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x57b33d === 'pro' ? 'pro' : 'std';
+  return value17 === 'pro' ? 'pro' : 'std';
 }
-function normalizeRunningHubKlingO1AspectRatio(_0x190a9e) {
-  const _0x5e122e = String(_0x190a9e || '9:16')['trim']();
-  return ['16:9', '9:16', '1:1']['includes'](_0x5e122e) ? _0x5e122e : '9:16';
+function normalizeRunningHubKlingO1AspectRatio(value18) {
+  const value19 = String(value18 || '9:16')['trim']();
+  return ['16:9', '9:16', '1:1']['includes'](value19) ? value19 : '9:16';
 }
-function normalizeRunningHubKlingO1Duration(_0x2bd6a7) {
-  const _0x419c9a = Number(_0x2bd6a7);
-  return Number['isFinite'](_0x419c9a) && Math['trunc'](_0x419c9a) === 0xa ? '10' : '5';
+function normalizeRunningHubKlingO1Duration(value20) {
+  const value21 = Number(value20);
+  return Number['isFinite'](value21) && Math['trunc'](value21) === 0xa ? '10' : '5';
 }
-function getRunningHubKlingO1GenerationMode(_0x305e20 = {}, _0x1c286b = {}) {
+function getRunningHubKlingO1GenerationMode(options6 = {}, value22 = {}) {
   return normalizeRunningHubKlingO1GenerationMode(
-    _0x1c286b['rh_kling_o1_generation_mode'] ||
-      _0x305e20?.['generationParams']?.['rh_kling_o1_generation_mode'] ||
-      _0x305e20?.['rh_kling_o1_generation_mode'],
+    value22['rh_kling_o1_generation_mode'] ||
+      options6?.['generationParams']?.['rh_kling_o1_generation_mode'] ||
+      options6?.['rh_kling_o1_generation_mode'],
   );
 }
 function collectRunningHubKlingO1FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x1ea244 = [],
-    _0x5576ed = normalizeInputUrlsBySlot(finalUrlsBySlot);
+  const value23 = [],
+    inputUrlsBySlot3 = normalizeInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x1ea244, _0x5576ed['firstFrame']),
-    appendUniqueUrl(_0x1ea244, _0x5576ed['lastFrame']),
-    normalizeInputList(inputImages)['forEach']((_0x19c4ef) => appendUniqueUrl(_0x1ea244, _0x19c4ef)),
-    _0x1ea244
+    appendUniqueUrl(value23, inputUrlsBySlot3['firstFrame']),
+    appendUniqueUrl(value23, inputUrlsBySlot3['lastFrame']),
+    normalizeInputList(inputImages)['forEach']((value24) => appendUniqueUrl(value23, value24)),
+    value23
   );
 }
 function collectRunningHubKlingO1ReferenceImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x573bca = [],
-    _0x3e723e = normalizeInputUrlsBySlot(finalUrlsBySlot);
+  const value25 = [],
+    inputUrlsBySlot4 = normalizeInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x573bca, _0x3e723e['referenceImage']),
-    normalizeInputList(inputImages)['forEach']((_0x18d790) => appendUniqueUrl(_0x573bca, _0x18d790)),
-    _0x573bca
+    appendUniqueUrl(value25, inputUrlsBySlot4['referenceImage']),
+    normalizeInputList(inputImages)['forEach']((value26) => appendUniqueUrl(value25, value26)),
+    value25
   );
 }
 function resolveRunningHubKlingO1Route({
@@ -492,113 +481,112 @@ function resolveRunningHubKlingO1Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x2364e8 = getRunningHubKlingO1GenerationMode(payload, currentBody);
-  if (_0x2364e8 === 'reference') return 'reference';
-  if (_0x2364e8 === 'edit') return 'edit';
-  const _0x420525 = collectRunningHubKlingO1FrameImages({
+  const runningHubKlingO1GenerationMode = getRunningHubKlingO1GenerationMode(payload, currentBody);
+  if (runningHubKlingO1GenerationMode === 'reference') return 'reference';
+  if (runningHubKlingO1GenerationMode === 'edit') return 'edit';
+  const runningHubKlingO1FrameImages = collectRunningHubKlingO1FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   })['length'];
-  if (_0x420525 >= 0x2) return 'frames';
-  if (_0x420525 === 0x1) return 'image';
-  const _0x26ea6b = normalizeInputList(inputVideos)['length'];
-  return _0x26ea6b > 0x0 ? 'reference' : 'text';
+  if (runningHubKlingO1FrameImages >= 0x2) return 'frames';
+  if (runningHubKlingO1FrameImages === 0x1) return 'image';
+  const inputList = normalizeInputList(inputVideos)['length'];
+  return inputList > 0x0 ? 'reference' : 'text';
 }
 export function runninghubKlingO1Video({
-  currentBody: _0xf2d185,
+  currentBody: currentBody4,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x50c909 = { ..._0xf2d185 },
-    _0x5deff5 = getRunningHubKlingO1GenerationMode(payload, _0x50c909),
-    _0x439526 = normalizeKlingKeepOriginalSound(
+  const value27 = { ...currentBody4 },
+    runningHubKlingO1GenerationMode2 = getRunningHubKlingO1GenerationMode(payload, value27),
+    klingKeepOriginalSound = normalizeKlingKeepOriginalSound(
       payload?.['generationParams']?.['keepOriginalSound'] ??
         payload?.['generationParams']?.['keep_original_sound'] ??
         payload?.['keepOriginalSound'] ??
         payload?.['keep_original_sound'] ??
-        _0x50c909['keepOriginalSound'] ??
-        _0x50c909['keep_original_sound'],
+        value27['keepOriginalSound'] ??
+        value27['keep_original_sound'],
     ),
-    _0xa24cc0 = String(_0x50c909['prompt'] || payload?.['prompt'] || '')['trim']();
-  if (!_0xa24cc0) throw new Error('RunningHub\x20Kling\x20O1\x20prompt\x20is\x20required');
-  ((_0x50c909['prompt'] = _0xa24cc0),
-    (_0x50c909['mode'] = normalizeRunningHubKlingO1QualityMode(_0x50c909['mode'])),
-    (_0x50c909['aspectRatio'] = normalizeRunningHubKlingO1AspectRatio(_0x50c909['aspectRatio'])),
-    (_0x50c909['duration'] = normalizeRunningHubKlingO1Duration(_0x50c909['duration'])),
-    delete _0x50c909['rh_kling_o1_generation_mode'],
-    delete _0x50c909['keep_original_sound'],
-    delete _0x50c909['keepOriginalSound'],
-    delete _0x50c909['firstImageUrl'],
-    delete _0x50c909['lastImageUrl'],
-    delete _0x50c909['imageUrls'],
-    delete _0x50c909['videoUrl']);
-  const _0x503375 = normalizeInputList(inputVideos),
-    _0x2a8589 = Math['max'](
-      _0x503375['length'],
+    enabled5 = String(value27['prompt'] || payload?.['prompt'] || '')['trim']();
+  if (!enabled5) throw new Error('RunningHub\x20Kling\x20O1\x20prompt\x20is\x20required');
+  ((value27['prompt'] = enabled5),
+    (value27['mode'] = normalizeRunningHubKlingO1QualityMode(value27['mode'])),
+    (value27['aspectRatio'] = normalizeRunningHubKlingO1AspectRatio(value27['aspectRatio'])),
+    (value27['duration'] = normalizeRunningHubKlingO1Duration(value27['duration'])),
+    delete value27['rh_kling_o1_generation_mode'],
+    delete value27['keep_original_sound'],
+    delete value27['keepOriginalSound'],
+    delete value27['firstImageUrl'],
+    delete value27['lastImageUrl'],
+    delete value27['imageUrls'],
+    delete value27['videoUrl']);
+  const list16 = normalizeInputList(inputVideos),
+    count = Math['max'](
+      list16['length'],
       normalizeInputList(payload?.['videos'])['length'],
       normalizeInputList(payload?.['videoUrls'])['length'],
       String(payload?.['videoUrl'] || '')['trim']() ? 0x1 : 0x0,
     );
-  if (_0x5deff5 === 'edit') {
-    const _0x323620 = [];
+  if (runningHubKlingO1GenerationMode2 === 'edit') {
+    const list17 = [];
     (collectRunningHubKlingO1FrameImages({ inputImages: inputImages, finalUrlsBySlot: finalUrlsBySlot })[
       'forEach'
-    ]((_0x12c6ec) => appendUniqueUrl(_0x323620, _0x12c6ec)),
+    ]((value28) => appendUniqueUrl(list17, value28)),
       collectRunningHubKlingO1ReferenceImages({ inputImages: inputImages, finalUrlsBySlot: finalUrlsBySlot })[
         'forEach'
-      ]((_0x44ebe5) => appendUniqueUrl(_0x323620, _0x44ebe5)));
-    if (_0x323620['length'] > 0x0)
+      ]((value29) => appendUniqueUrl(list17, value29)));
+    if (list17['length'] > 0x0)
       throw new Error('RunningHub\x20Kling\x20O1\x20edit\x20mode\x20does\x20not\x20accept\x20image\x20input');
-    if (_0x2a8589 < 0x1 || !_0x503375[0x0])
-      throw new Error('RunningHub Kling O1 edit mode requires 1 video input');
-    if (_0x2a8589 > 0x1) throw new Error('RunningHub Kling O1 edit mode supports at most 1 video input');
+    if (count < 0x1 || !list16[0x0]) throw new Error('RunningHub Kling O1 edit mode requires 1 video input');
+    if (count > 0x1) throw new Error('RunningHub Kling O1 edit mode supports at most 1 video input');
     return (
-      (_0x50c909['mode'] = 'std'),
-      (_0x50c909['videoUrl'] = _0x503375[0x0]),
-      (_0x50c909['keepOriginalSound'] = _0x439526),
-      delete _0x50c909['aspectRatio'],
-      delete _0x50c909['duration'],
-      _0x50c909
+      (value27['mode'] = 'std'),
+      (value27['videoUrl'] = list16[0x0]),
+      (value27['keepOriginalSound'] = klingKeepOriginalSound),
+      delete value27['aspectRatio'],
+      delete value27['duration'],
+      value27
     );
   }
-  if (_0x5deff5 === 'reference') {
-    const _0x427f2d = collectRunningHubKlingO1ReferenceImages({
+  if (runningHubKlingO1GenerationMode2 === 'reference') {
+    const list18 = collectRunningHubKlingO1ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (_0x427f2d['length'] < 0x1)
+    if (list18['length'] < 0x1)
       throw new Error('RunningHub Kling O1 reference mode requires at least 1 image input');
-    if (_0x427f2d['length'] > 0x7)
+    if (list18['length'] > 0x7)
       throw new Error('RunningHub Kling O1 reference mode supports at most 7 image inputs');
-    if (_0x2a8589 < 0x1 || !_0x503375[0x0])
+    if (count < 0x1 || !list16[0x0])
       throw new Error('RunningHub Kling O1 reference mode requires 1 video input');
-    if (_0x2a8589 > 0x1)
+    if (count > 0x1)
       throw new Error(
         'RunningHub\x20Kling\x20O1\x20reference\x20mode\x20supports\x20at\x20most\x201\x20video\x20input',
       );
     return (
-      (_0x50c909['imageUrls'] = _0x427f2d),
-      (_0x50c909['videoUrl'] = _0x503375[0x0]),
-      (_0x50c909['keepOriginalSound'] = _0x439526),
-      (_0x50c909['prompt'] = replaceKlingO1PromptImageReferences(_0x50c909['prompt'], _0x427f2d['length'])),
-      _0x50c909
+      (value27['imageUrls'] = list18),
+      (value27['videoUrl'] = list16[0x0]),
+      (value27['keepOriginalSound'] = klingKeepOriginalSound),
+      (value27['prompt'] = replaceKlingO1PromptImageReferences(value27['prompt'], list18['length'])),
+      value27
     );
   }
-  const _0x3b7c1d = collectRunningHubKlingO1FrameImages({
+  const list19 = collectRunningHubKlingO1FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x503375['length'] > 0x0)
+  if (list16['length'] > 0x0)
     throw new Error('RunningHub Kling O1 frame mode does not accept video input; use reference mode');
-  if (_0x3b7c1d['length'] > 0x2)
+  if (list19['length'] > 0x2)
     throw new Error('RunningHub Kling O1 frame mode supports at most 2 image inputs');
-  if (_0x3b7c1d[0x0]) _0x50c909['firstImageUrl'] = _0x3b7c1d[0x0];
-  if (_0x3b7c1d[0x1]) _0x50c909['lastImageUrl'] = _0x3b7c1d[0x1];
+  if (list19[0x0]) value27['firstImageUrl'] = list19[0x0];
+  if (list19[0x1]) value27['lastImageUrl'] = list19[0x1];
   return (
-    (_0x50c909['prompt'] = replaceKlingO1PromptImageReferences(_0x50c909['prompt'], _0x3b7c1d['length'])),
-    _0x50c909
+    (value27['prompt'] = replaceKlingO1PromptImageReferences(value27['prompt'], list19['length'])),
+    value27
   );
 }
 export function runninghubKlingO1VideoEndpoint({
@@ -607,13 +595,13 @@ export function runninghubKlingO1VideoEndpoint({
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x55dd71 = resolveRunningHubKlingO1Route({
+  const runningHubKlingO1Route = resolveRunningHubKlingO1Route({
     inputImages: inputImages,
     inputVideos: inputVideos,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return RUNNINGHUB_KLING_O1_ENDPOINTS[_0x55dd71] || RUNNINGHUB_KLING_O1_ENDPOINTS['text'];
+  return RUNNINGHUB_KLING_O1_ENDPOINTS[runningHubKlingO1Route] || RUNNINGHUB_KLING_O1_ENDPOINTS['text'];
 }
 const RUNNINGHUB_KLING_V3_ENDPOINTS = Object['freeze']({
   'turbo-pro': Object['freeze']({
@@ -633,57 +621,51 @@ const RUNNINGHUB_KLING_V3_ENDPOINTS = Object['freeze']({
     image: 'https://www.runninghub.cn/openapi/v2/kling-v3-4k/image-to-video',
   }),
 });
-function normalizeRunningHubKlingV3Model(_0x57ea6e) {
-  const _0x21d03e = String(_0x57ea6e || '')
+function normalizeRunningHubKlingV3Model(value30) {
+  const value31 = String(value30 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x21d03e === '4k') return '4k';
-  if (_0x21d03e === 'pro') return 'pro';
+  if (value31 === '4k') return '4k';
+  if (value31 === 'pro') return 'pro';
   return 'std';
 }
-function getRunningHubKlingV3Model(
-  _0x3cdb6d = {},
-  _0x34cadc = {},
-  _0x5794ef = '',
-  _0x218997 = {},
-  _0x12df69 = {},
-) {
-  const _0x19eca4 = String(_0x5794ef || _0x3cdb6d?.['model'] || _0x34cadc?.['model'] || '')
+function getRunningHubKlingV3Model(options7 = {}, value32 = {}, value33 = '', value34 = {}, value35 = {}) {
+  const list20 = String(value33 || options7?.['model'] || value32?.['model'] || '')
       ['trim']()
       ['toLowerCase'](),
-    _0x4c3ca2 = String(_0x218997?.['id'] || _0x12df69?.['modelId'] || '')
+    list21 = String(value34?.['id'] || value35?.['modelId'] || '')
       ['trim']()
       ['toLowerCase']();
-  if (_0x19eca4['includes']('kling-v3-turbo-pro') || _0x4c3ca2['includes']('kling-v3-turbo-pro'))
+  if (list20['includes']('kling-v3-turbo-pro') || list21['includes']('kling-v3-turbo-pro'))
     return 'turbo-pro';
   return normalizeRunningHubKlingV3Model(
-    _0x34cadc['rh_kling_v3_model'] ||
-      _0x3cdb6d?.['generationParams']?.['resolution'] ||
-      _0x3cdb6d?.['resolution'],
+    value32['rh_kling_v3_model'] ||
+      options7?.['generationParams']?.['resolution'] ||
+      options7?.['resolution'],
   );
 }
 function collectRunningHubKlingV3FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x50a197 = [],
-    _0x1e1fb2 = normalizeInputUrlsBySlot(finalUrlsBySlot);
+  const value36 = [],
+    inputUrlsBySlot5 = normalizeInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x50a197, _0x1e1fb2['firstFrame']),
-    appendUniqueUrl(_0x50a197, _0x1e1fb2['lastFrame']),
-    normalizeInputList(inputImages)['forEach']((_0x163c3c) => appendUniqueUrl(_0x50a197, _0x163c3c)),
-    _0x50a197
+    appendUniqueUrl(value36, inputUrlsBySlot5['firstFrame']),
+    appendUniqueUrl(value36, inputUrlsBySlot5['lastFrame']),
+    normalizeInputList(inputImages)['forEach']((value37) => appendUniqueUrl(value36, value37)),
+    value36
   );
 }
-function getRunningHubKlingV3RawMediaCount(_0xbaf282 = {}, _0x240d9c = [], _0x2213af = '') {
-  const _0x1e5606 = _0x2213af === 'audio' ? 'audioUrl' : _0x2213af + 'Url',
-    _0x258832 = _0x2213af + 's',
-    _0x535209 = _0x2213af + 'Urls';
+function getRunningHubKlingV3RawMediaCount(options8 = {}, value38 = [], value39 = '') {
+  const value40 = value39 === 'audio' ? 'audioUrl' : value39 + 'Url',
+    value41 = value39 + 's',
+    value42 = value39 + 'Urls';
   return Math['max'](
-    normalizeInputList(_0x240d9c)['length'],
-    normalizeInputList(_0xbaf282?.[_0x258832])['length'],
-    normalizeInputList(_0xbaf282?.[_0x535209])['length'],
-    String(_0xbaf282?.[_0x1e5606] || '')['trim']() ? 0x1 : 0x0,
+    normalizeInputList(value38)['length'],
+    normalizeInputList(options8?.[value41])['length'],
+    normalizeInputList(options8?.[value42])['length'],
+    String(options8?.[value40] || '')['trim']() ? 0x1 : 0x0,
   );
 }
 function resolveRunningHubKlingV3Route({
@@ -695,21 +677,21 @@ function resolveRunningHubKlingV3Route({
   executionManifest: executionManifest = {},
   modelManifest: modelManifest = {},
 } = {}) {
-  const _0x355716 = getRunningHubKlingV3Model(
+  const model3 = getRunningHubKlingV3Model(
       payload,
       currentBody,
       modelToken,
       executionManifest,
       modelManifest,
     ),
-    _0x10dd9c = collectRunningHubKlingV3FrameImages({
+    route2 = collectRunningHubKlingV3FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     })['length'];
-  return { model: _0x355716, route: _0x10dd9c > 0x0 ? 'image' : 'text' };
+  return { model: model3, route: route2 > 0x0 ? 'image' : 'text' };
 }
 export function runninghubKlingV3Video({
-  currentBody: _0x5db79a,
+  currentBody: currentBody5,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
@@ -719,36 +701,44 @@ export function runninghubKlingV3Video({
   executionManifest: executionManifest = {},
   modelManifest: modelManifest = {},
 }) {
-  const _0xe420e6 = { ..._0x5db79a },
-    _0x47d308 = getRunningHubKlingV3Model(payload, _0xe420e6, modelToken, executionManifest, modelManifest),
-    _0x27ccb4 = String(_0xe420e6['prompt'] || payload?.['prompt'] || '')['trim']();
-  if (!_0x27ccb4) throw new Error('RunningHub Kling V3.0 prompt is required');
-  const _0xf35984 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video');
-  if (_0xf35984 > 0x0) throw new Error('RunningHub Kling V3.0 does not accept video input');
-  const _0x455b21 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
-  if (_0x455b21 > 0x0) throw new Error('RunningHub Kling V3.0 does not accept audio input');
-  ((_0xe420e6['prompt'] = _0x27ccb4),
-    delete _0xe420e6['rh_kling_v3_model'],
-    delete _0xe420e6['imageUrl'],
-    delete _0xe420e6['firstImageUrl'],
-    delete _0xe420e6['lastImageUrl'],
-    delete _0xe420e6['imageUrls']);
-  const _0x4a0672 = collectRunningHubKlingV3FrameImages({
+  const value43 = { ...currentBody5 },
+    runningHubKlingV3Model = getRunningHubKlingV3Model(
+      payload,
+      value43,
+      modelToken,
+      executionManifest,
+      modelManifest,
+    ),
+    enabled6 = String(value43['prompt'] || payload?.['prompt'] || '')['trim']();
+  if (!enabled6) throw new Error('RunningHub Kling V3.0 prompt is required');
+  const runningHubKlingV3RawMediaCount3 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video');
+  if (runningHubKlingV3RawMediaCount3 > 0x0)
+    throw new Error('RunningHub Kling V3.0 does not accept video input');
+  const runningHubKlingV3RawMediaCount4 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
+  if (runningHubKlingV3RawMediaCount4 > 0x0)
+    throw new Error('RunningHub Kling V3.0 does not accept audio input');
+  ((value43['prompt'] = enabled6),
+    delete value43['rh_kling_v3_model'],
+    delete value43['imageUrl'],
+    delete value43['firstImageUrl'],
+    delete value43['lastImageUrl'],
+    delete value43['imageUrls']);
+  const list22 = collectRunningHubKlingV3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x4a0672['length'] > 0x2) throw new Error('RunningHub Kling V3.0 supports at most 2 image inputs');
-  if (_0x4a0672['length'] > 0x0) {
-    delete _0xe420e6['aspectRatio'];
-    if (_0x47d308 === '4k') {
-      if (_0x4a0672['length'] > 0x1)
+  if (list22['length'] > 0x2) throw new Error('RunningHub Kling V3.0 supports at most 2 image inputs');
+  if (list22['length'] > 0x0) {
+    delete value43['aspectRatio'];
+    if (runningHubKlingV3Model === '4k') {
+      if (list22['length'] > 0x1)
         throw new Error('RunningHub Kling V3.0 4K image-to-video supports only one imageUrl');
-      return ((_0xe420e6['imageUrl'] = _0x4a0672[0x0]), _0xe420e6);
+      return ((value43['imageUrl'] = list22[0x0]), value43);
     }
-    _0xe420e6['firstImageUrl'] = _0x4a0672[0x0];
-    if (_0x4a0672[0x1]) _0xe420e6['lastImageUrl'] = _0x4a0672[0x1];
+    value43['firstImageUrl'] = list22[0x0];
+    if (list22[0x1]) value43['lastImageUrl'] = list22[0x1];
   }
-  return _0xe420e6;
+  return value43;
 }
 export function runninghubKlingV3VideoEndpoint({
   inputImages: inputImages = [],
@@ -758,7 +748,7 @@ export function runninghubKlingV3VideoEndpoint({
   executionManifest: executionManifest = {},
   modelManifest: modelManifest = {},
 }) {
-  const { model: _0x128c5a, route: _0x4ab9fe } = resolveRunningHubKlingV3Route({
+  const { model: model4, route: route3 } = resolveRunningHubKlingV3Route({
     inputImages: inputImages,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
@@ -767,9 +757,7 @@ export function runninghubKlingV3VideoEndpoint({
     executionManifest: executionManifest,
     modelManifest: modelManifest,
   });
-  return (
-    RUNNINGHUB_KLING_V3_ENDPOINTS[_0x128c5a]?.[_0x4ab9fe] || RUNNINGHUB_KLING_V3_ENDPOINTS['std']['text']
-  );
+  return RUNNINGHUB_KLING_V3_ENDPOINTS[model4]?.[route3] || RUNNINGHUB_KLING_V3_ENDPOINTS['std']['text'];
 }
 const RUNNINGHUB_KLING_O3_ENDPOINTS = Object['freeze']({
   std: Object['freeze']({
@@ -790,33 +778,33 @@ const RUNNINGHUB_KLING_O3_ENDPOINTS = Object['freeze']({
     reference: 'https://www.runninghub.cn/openapi/v2/kling-video-o3-4k/reference-to-video',
   }),
 });
-function normalizeRunningHubKlingO3GenerationMode(_0xe49cae) {
-  const _0x5cc045 = String(_0xe49cae || '')
+function normalizeRunningHubKlingO3GenerationMode(value44) {
+  const value45 = String(value44 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x5cc045 === 'reference' || _0x5cc045 === 'edit') return _0x5cc045;
+  if (value45 === 'reference' || value45 === 'edit') return value45;
   return 'frame';
 }
-function normalizeRunningHubKlingO3Model(_0x10d62f) {
-  const _0x5c9c00 = String(_0x10d62f || '')
+function normalizeRunningHubKlingO3Model(value46) {
+  const value47 = String(value46 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x5c9c00 === '4k') return '4k';
-  if (_0x5c9c00 === 'pro') return 'pro';
+  if (value47 === '4k') return '4k';
+  if (value47 === 'pro') return 'pro';
   return 'std';
 }
-function getRunningHubKlingO3GenerationMode(_0xfe90b9 = {}, _0x46cb12 = {}) {
+function getRunningHubKlingO3GenerationMode(options9 = {}, value48 = {}) {
   return normalizeRunningHubKlingO3GenerationMode(
-    _0x46cb12['kling_v3_omni_mode'] ||
-      _0xfe90b9?.['generationParams']?.['kling_v3_omni_mode'] ||
-      _0xfe90b9?.['kling_v3_omni_mode'],
+    value48['kling_v3_omni_mode'] ||
+      options9?.['generationParams']?.['kling_v3_omni_mode'] ||
+      options9?.['kling_v3_omni_mode'],
   );
 }
-function getRunningHubKlingO3Model(_0x592507 = {}, _0x34cc46 = {}) {
+function getRunningHubKlingO3Model(options10 = {}, value49 = {}) {
   return normalizeRunningHubKlingO3Model(
-    _0x34cc46['rh_kling_o3_model'] ||
-      _0x592507?.['generationParams']?.['resolution'] ||
-      _0x592507?.['resolution'],
+    value49['rh_kling_o3_model'] ||
+      options10?.['generationParams']?.['resolution'] ||
+      options10?.['resolution'],
   );
 }
 function collectRunningHubKlingO3SlotImages({
@@ -824,25 +812,25 @@ function collectRunningHubKlingO3SlotImages({
   finalUrlsBySlot: finalUrlsBySlot = {},
   slotIds: slotIds = [],
 } = {}) {
-  const _0x5330eb = [],
-    _0x469fba = normalizeInputUrlsBySlot(finalUrlsBySlot),
-    _0x1456f4 = new Set(normalizeInputList(Object['values'](_0x469fba)));
+  const value50 = [],
+    inputUrlsBySlot6 = normalizeInputUrlsBySlot(finalUrlsBySlot),
+    map2 = new Set(normalizeInputList(Object['values'](inputUrlsBySlot6)));
   return (
-    slotIds['forEach']((_0xef37cc) => appendUniqueUrl(_0x5330eb, _0x469fba[_0xef37cc])),
-    normalizeInputList(inputImages)['forEach']((_0xa486c1) => {
-      if (!_0x1456f4['has'](_0xa486c1)) appendUniqueUrl(_0x5330eb, _0xa486c1);
+    slotIds['forEach']((value51) => appendUniqueUrl(value50, inputUrlsBySlot6[value51])),
+    normalizeInputList(inputImages)['forEach']((value52) => {
+      if (!map2['has'](value52)) appendUniqueUrl(value50, value52);
     }),
-    _0x5330eb
+    value50
   );
 }
-function collectRunningHubKlingO3FrameImages(_0x2a78ce = {}) {
-  return collectRunningHubKlingO3SlotImages({ ..._0x2a78ce, slotIds: ['firstFrame', 'lastFrame'] });
+function collectRunningHubKlingO3FrameImages(args3 = {}) {
+  return collectRunningHubKlingO3SlotImages({ ...args3, slotIds: ['firstFrame', 'lastFrame'] });
 }
-function collectRunningHubKlingO3ReferenceImages(_0x17938a = {}) {
-  return collectRunningHubKlingO3SlotImages({ ..._0x17938a, slotIds: ['referenceImage'] });
+function collectRunningHubKlingO3ReferenceImages(args4 = {}) {
+  return collectRunningHubKlingO3SlotImages({ ...args4, slotIds: ['referenceImage'] });
 }
-function collectRunningHubKlingO3EditImages(_0x15e786 = {}) {
-  return collectRunningHubKlingO3SlotImages({ ..._0x15e786, slotIds: ['editRefImage'] });
+function collectRunningHubKlingO3EditImages(args5 = {}) {
+  return collectRunningHubKlingO3SlotImages({ ...args5, slotIds: ['editRefImage'] });
 }
 function resolveRunningHubKlingO3Route({
   inputImages: inputImages = [],
@@ -850,124 +838,125 @@ function resolveRunningHubKlingO3Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x1fa122 = getRunningHubKlingO3Model(payload, currentBody),
-    _0x134ba1 = getRunningHubKlingO3GenerationMode(payload, currentBody);
-  if (_0x134ba1 === 'reference') return { model: _0x1fa122, route: 'reference' };
-  if (_0x134ba1 === 'edit') return { model: _0x1fa122, route: 'edit' };
-  const _0x33da49 = collectRunningHubKlingO3FrameImages({
+  const model5 = getRunningHubKlingO3Model(payload, currentBody),
+    runningHubKlingO3GenerationMode = getRunningHubKlingO3GenerationMode(payload, currentBody);
+  if (runningHubKlingO3GenerationMode === 'reference') return { model: model5, route: 'reference' };
+  if (runningHubKlingO3GenerationMode === 'edit') return { model: model5, route: 'edit' };
+  const route4 = collectRunningHubKlingO3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   })['length'];
-  return { model: _0x1fa122, route: _0x33da49 > 0x0 ? 'image' : 'text' };
+  return { model: model5, route: route4 > 0x0 ? 'image' : 'text' };
 }
 export function runninghubKlingO3Video({
-  currentBody: _0x264334,
+  currentBody: currentBody6,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x323ccb = { ..._0x264334 },
-    _0x5136cb = getRunningHubKlingO3Model(payload, _0x323ccb),
-    _0x493b07 = getRunningHubKlingO3GenerationMode(payload, _0x323ccb),
-    _0x34cae1 = String(_0x323ccb['prompt'] || payload?.['prompt'] || '')['trim']();
-  if (!_0x34cae1) throw new Error('RunningHub Kling O3 prompt is required');
-  const _0x428f62 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
-  if (_0x428f62 > 0x0) throw new Error('RunningHub Kling O3 does not accept direct audio input');
-  const _0x163500 = normalizeInputList(inputVideos),
-    _0x390ff7 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video'),
-    _0x5053a7 = normalizeKlingKeepOriginalSound(
-      _0x323ccb['keepOriginalSound'] ??
-        _0x323ccb['keep_original_sound'] ??
+  const value53 = { ...currentBody6 },
+    runningHubKlingO3Model = getRunningHubKlingO3Model(payload, value53),
+    runningHubKlingO3GenerationMode2 = getRunningHubKlingO3GenerationMode(payload, value53),
+    enabled7 = String(value53['prompt'] || payload?.['prompt'] || '')['trim']();
+  if (!enabled7) throw new Error('RunningHub Kling O3 prompt is required');
+  const runningHubKlingV3RawMediaCount5 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
+  if (runningHubKlingV3RawMediaCount5 > 0x0)
+    throw new Error('RunningHub Kling O3 does not accept direct audio input');
+  const inputList2 = normalizeInputList(inputVideos),
+    runningHubKlingV3RawMediaCount6 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video'),
+    klingKeepOriginalSound2 = normalizeKlingKeepOriginalSound(
+      value53['keepOriginalSound'] ??
+        value53['keep_original_sound'] ??
         payload?.['generationParams']?.['keepOriginalSound'] ??
         payload?.['generationParams']?.['keep_original_sound'] ??
         payload?.['keepOriginalSound'] ??
         payload?.['keep_original_sound'],
     );
-  ((_0x323ccb['prompt'] = _0x34cae1),
-    delete _0x323ccb['kling_v3_omni_mode'],
-    delete _0x323ccb['rh_kling_o3_model'],
-    delete _0x323ccb['keep_original_sound'],
-    delete _0x323ccb['keepOriginalSound'],
-    delete _0x323ccb['firstImageUrl'],
-    delete _0x323ccb['lastImageUrl'],
-    delete _0x323ccb['imageUrl'],
-    delete _0x323ccb['imageUrls'],
-    delete _0x323ccb['videoUrl']);
-  if (_0x493b07 === 'edit') {
-    if (_0x5136cb === '4k')
+  ((value53['prompt'] = enabled7),
+    delete value53['kling_v3_omni_mode'],
+    delete value53['rh_kling_o3_model'],
+    delete value53['keep_original_sound'],
+    delete value53['keepOriginalSound'],
+    delete value53['firstImageUrl'],
+    delete value53['lastImageUrl'],
+    delete value53['imageUrl'],
+    delete value53['imageUrls'],
+    delete value53['videoUrl']);
+  if (runningHubKlingO3GenerationMode2 === 'edit') {
+    if (runningHubKlingO3Model === '4k')
       throw new Error('RunningHub\x20Kling\x20O3\x204K\x20does\x20not\x20support\x20video\x20edit');
-    if (_0x390ff7 < 0x1 || !_0x163500[0x0])
+    if (runningHubKlingV3RawMediaCount6 < 0x1 || !inputList2[0x0])
       throw new Error('RunningHub Kling O3 edit mode requires 1 video input');
-    if (_0x390ff7 > 0x1) throw new Error('RunningHub Kling O3 edit mode supports at most 1 video input');
-    const _0x4f9999 = collectRunningHubKlingO3EditImages({
+    if (runningHubKlingV3RawMediaCount6 > 0x1)
+      throw new Error('RunningHub Kling O3 edit mode supports at most 1 video input');
+    const list23 = collectRunningHubKlingO3EditImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (_0x4f9999['length'] > 0x7)
+    if (list23['length'] > 0x7)
       throw new Error('RunningHub Kling O3 edit mode supports at most 7 image inputs');
-    _0x323ccb['videoUrl'] = _0x163500[0x0];
-    if (_0x4f9999['length'] > 0x0) _0x323ccb['imageUrls'] = _0x4f9999;
+    value53['videoUrl'] = inputList2[0x0];
+    if (list23['length'] > 0x0) value53['imageUrls'] = list23;
     return (
-      (_0x323ccb['keepOriginalSound'] = _0x5053a7),
-      delete _0x323ccb['aspectRatio'],
-      delete _0x323ccb['duration'],
-      delete _0x323ccb['sound'],
-      delete _0x323ccb['multiShot'],
-      delete _0x323ccb['shotType'],
-      _0x323ccb
+      (value53['keepOriginalSound'] = klingKeepOriginalSound2),
+      delete value53['aspectRatio'],
+      delete value53['duration'],
+      delete value53['sound'],
+      delete value53['multiShot'],
+      delete value53['shotType'],
+      value53
     );
   }
-  if (_0x493b07 === 'reference') {
-    const _0x3b1a2f = collectRunningHubKlingO3ReferenceImages({
+  if (runningHubKlingO3GenerationMode2 === 'reference') {
+    const list24 = collectRunningHubKlingO3ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (_0x3b1a2f['length'] < 0x1)
+    if (list24['length'] < 0x1)
       throw new Error('RunningHub Kling O3 reference mode requires at least 1 image input');
-    if (_0x390ff7 > 0x1) throw new Error('RunningHub Kling O3 reference mode supports at most 1 video input');
-    if (_0x163500[0x0] && _0x3b1a2f['length'] > 0x4)
+    if (runningHubKlingV3RawMediaCount6 > 0x1)
+      throw new Error('RunningHub Kling O3 reference mode supports at most 1 video input');
+    if (inputList2[0x0] && list24['length'] > 0x4)
       throw new Error('RunningHub Kling O3 reference mode supports at most 4 image inputs with video input');
-    if (_0x3b1a2f['length'] > 0x7)
+    if (list24['length'] > 0x7)
       throw new Error('RunningHub Kling O3 reference mode supports at most 7 image inputs');
-    _0x323ccb['imageUrls'] = _0x3b1a2f;
-    if (_0x163500[0x0]) _0x323ccb['videoUrl'] = _0x163500[0x0];
-    _0x323ccb['keepOriginalSound'] = _0x5053a7;
-    if (_0x5136cb !== '4k') delete _0x323ccb['shotType'];
-    return _0x323ccb;
+    value53['imageUrls'] = list24;
+    if (inputList2[0x0]) value53['videoUrl'] = inputList2[0x0];
+    value53['keepOriginalSound'] = klingKeepOriginalSound2;
+    if (runningHubKlingO3Model !== '4k') delete value53['shotType'];
+    return value53;
   }
-  if (_0x390ff7 > 0x0)
+  if (runningHubKlingV3RawMediaCount6 > 0x0)
     throw new Error('RunningHub Kling O3 frame mode does not accept video input; use reference or edit mode');
-  const _0x4a6904 = collectRunningHubKlingO3FrameImages({
+  const list25 = collectRunningHubKlingO3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x4a6904['length'] > 0x2)
+  if (list25['length'] > 0x2)
     throw new Error('RunningHub Kling O3 frame mode supports at most 2 image inputs');
-  if (_0x5136cb === '4k' && _0x4a6904['length'] > 0x1)
+  if (runningHubKlingO3Model === '4k' && list25['length'] > 0x1)
     throw new Error(
       'RunningHub\x20Kling\x20O3\x204K\x20image-to-video\x20supports\x20only\x20one\x20firstImageUrl',
     );
-  if (_0x4a6904['length'] > 0x0) {
-    (delete _0x323ccb['aspectRatio'], (_0x323ccb['firstImageUrl'] = _0x4a6904[0x0]));
-    if (_0x4a6904[0x1]) _0x323ccb['lastImageUrl'] = _0x4a6904[0x1];
+  if (list25['length'] > 0x0) {
+    (delete value53['aspectRatio'], (value53['firstImageUrl'] = list25[0x0]));
+    if (list25[0x1]) value53['lastImageUrl'] = list25[0x1];
   }
-  return _0x323ccb;
+  return value53;
 }
 export function runninghubKlingO3VideoEndpoint({
   inputImages: inputImages = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const { model: _0x277526, route: _0x111b4b } = resolveRunningHubKlingO3Route({
+  const { model: model6, route: route5 } = resolveRunningHubKlingO3Route({
     inputImages: inputImages,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return (
-    RUNNINGHUB_KLING_O3_ENDPOINTS[_0x277526]?.[_0x111b4b] || RUNNINGHUB_KLING_O3_ENDPOINTS['std']['text']
-  );
+  return RUNNINGHUB_KLING_O3_ENDPOINTS[model6]?.[route5] || RUNNINGHUB_KLING_O3_ENDPOINTS['std']['text'];
 }
 const RUNNINGHUB_HAILUO_23_ENDPOINTS = Object['freeze']({
   t2vStandard: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-2.3/t2v-standard',
@@ -977,44 +966,44 @@ const RUNNINGHUB_HAILUO_23_ENDPOINTS = Object['freeze']({
   i2vFast: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-2.3-fast/image-to-video',
   i2vFastPro: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-2.3-fast-pro/image-to-video',
 });
-function normalizeRunningHubHailuo23Quality(_0x4d9b94) {
-  const _0x136efa = String(_0x4d9b94 || '')
+function normalizeRunningHubHailuo23Quality(value54) {
+  const value55 = String(value54 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x136efa === 'pro') return 'pro';
-  if (_0x136efa === 'fast') return 'fast';
-  if (_0x136efa === 'fastpro' || _0x136efa === 'fast-pro' || _0x136efa === 'fast_pro') return 'fastPro';
+  if (value55 === 'pro') return 'pro';
+  if (value55 === 'fast') return 'fast';
+  if (value55 === 'fastpro' || value55 === 'fast-pro' || value55 === 'fast_pro') return 'fastPro';
   return 'standard';
 }
-function normalizeRunningHubHailuo23Duration(_0x3b4c54) {
-  const _0x1f2911 = Number(_0x3b4c54);
-  return Number['isFinite'](_0x1f2911) && Math['trunc'](_0x1f2911) === 0xa ? '10' : '6';
+function normalizeRunningHubHailuo23Duration(value56) {
+  const value57 = Number(value56);
+  return Number['isFinite'](value57) && Math['trunc'](value57) === 0xa ? '10' : '6';
 }
-function getRunningHubHailuo23Quality(_0x481153 = {}, _0x272a35 = {}) {
+function getRunningHubHailuo23Quality(options11 = {}, value58 = {}) {
   return normalizeRunningHubHailuo23Quality(
-    _0x272a35['rh_hailuo_23_quality'] ||
-      _0x481153?.['generationParams']?.['rh_hailuo_23_quality'] ||
-      _0x481153?.['rh_hailuo_23_quality'],
+    value58['rh_hailuo_23_quality'] ||
+      options11?.['generationParams']?.['rh_hailuo_23_quality'] ||
+      options11?.['rh_hailuo_23_quality'],
   );
 }
 function collectRunningHubHailuo23FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x474c43 = [],
-    _0x549a91 = normalizeInputUrlsBySlot(finalUrlsBySlot);
+  const value59 = [],
+    inputUrlsBySlot7 = normalizeInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x474c43, _0x549a91['firstFrame']),
-    normalizeInputList(inputImages)['forEach']((_0x5c091e) => appendUniqueUrl(_0x474c43, _0x5c091e)),
-    _0x474c43
+    appendUniqueUrl(value59, inputUrlsBySlot7['firstFrame']),
+    normalizeInputList(inputImages)['forEach']((value60) => appendUniqueUrl(value59, value60)),
+    value59
   );
 }
-function getRunningHubHailuo23RawVideoCount(_0x457602 = {}, _0x157644 = []) {
+function getRunningHubHailuo23RawVideoCount(options12 = {}, value61 = []) {
   return Math['max'](
-    normalizeInputList(_0x157644)['length'],
-    normalizeInputList(_0x457602?.['videos'])['length'],
-    normalizeInputList(_0x457602?.['videoUrls'])['length'],
-    String(_0x457602?.['videoUrl'] || '')['trim']() ? 0x1 : 0x0,
+    normalizeInputList(value61)['length'],
+    normalizeInputList(options12?.['videos'])['length'],
+    normalizeInputList(options12?.['videoUrls'])['length'],
+    String(options12?.['videoUrl'] || '')['trim']() ? 0x1 : 0x0,
   );
 }
 function resolveRunningHubHailuo23Route({
@@ -1023,67 +1012,69 @@ function resolveRunningHubHailuo23Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x5b4e5b = getRunningHubHailuo23Quality(payload, currentBody),
-    _0x1827e4 = collectRunningHubHailuo23FrameImages({
+  const runningHubHailuo23Quality = getRunningHubHailuo23Quality(payload, currentBody),
+    runningHubHailuo23FrameImages = collectRunningHubHailuo23FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     })['length'];
-  if (_0x5b4e5b === 'fast') return 'i2vFast';
-  if (_0x5b4e5b === 'fastPro') return 'i2vFastPro';
-  if (_0x5b4e5b === 'pro') return _0x1827e4 > 0x0 ? 'i2vPro' : 't2vPro';
-  return _0x1827e4 > 0x0 ? 'i2vStandard' : 't2vStandard';
+  if (runningHubHailuo23Quality === 'fast') return 'i2vFast';
+  if (runningHubHailuo23Quality === 'fastPro') return 'i2vFastPro';
+  if (runningHubHailuo23Quality === 'pro') return runningHubHailuo23FrameImages > 0x0 ? 'i2vPro' : 't2vPro';
+  return runningHubHailuo23FrameImages > 0x0 ? 'i2vStandard' : 't2vStandard';
 }
 export function runninghubHailuo23Video({
-  currentBody: _0x17ef36,
+  currentBody: currentBody7,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0xbe8b82 = { ..._0x17ef36 },
-    _0x4989f6 = String(_0xbe8b82['prompt'] || payload?.['prompt'] || '')['trim']();
-  if (!_0x4989f6) throw new Error('RunningHub\x20Hailuo\x202.3\x20prompt\x20is\x20required');
-  const _0x358142 = getRunningHubHailuo23Quality(payload, _0xbe8b82),
-    _0x515f3c = collectRunningHubHailuo23FrameImages({
+  const value62 = { ...currentBody7 },
+    enabled8 = String(value62['prompt'] || payload?.['prompt'] || '')['trim']();
+  if (!enabled8) throw new Error('RunningHub\x20Hailuo\x202.3\x20prompt\x20is\x20required');
+  const runningHubHailuo23Quality2 = getRunningHubHailuo23Quality(payload, value62),
+    list26 = collectRunningHubHailuo23FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0x56ab41 = getRunningHubHailuo23RawVideoCount(payload, inputVideos);
-  if (_0x56ab41 > 0x0)
+    runningHubHailuo23RawVideoCount = getRunningHubHailuo23RawVideoCount(payload, inputVideos);
+  if (runningHubHailuo23RawVideoCount > 0x0)
     throw new Error('RunningHub\x20Hailuo\x202.3\x20does\x20not\x20accept\x20video\x20input');
-  if (_0x515f3c['length'] > 0x1)
+  if (list26['length'] > 0x1)
     throw new Error('RunningHub\x20Hailuo\x202.3\x20supports\x20only\x20imageUrl\x20input');
-  ((_0xbe8b82['prompt'] = _0x4989f6),
-    (_0xbe8b82['duration'] = normalizeRunningHubHailuo23Duration(_0xbe8b82['duration'])),
-    delete _0xbe8b82['rh_hailuo_23_quality'],
-    delete _0xbe8b82['firstImageUrl'],
-    delete _0xbe8b82['lastImageUrl'],
-    delete _0xbe8b82['imageUrl'],
-    delete _0xbe8b82['imageUrls'],
-    delete _0xbe8b82['videoUrl']);
-  if (_0x358142 === 'fast' || _0x358142 === 'fastPro') {
-    if (!_0x515f3c[0x0]) throw new Error('RunningHub Hailuo 2.3 Fast requires imageUrl input');
+  ((value62['prompt'] = enabled8),
+    (value62['duration'] = normalizeRunningHubHailuo23Duration(value62['duration'])),
+    delete value62['rh_hailuo_23_quality'],
+    delete value62['firstImageUrl'],
+    delete value62['lastImageUrl'],
+    delete value62['imageUrl'],
+    delete value62['imageUrls'],
+    delete value62['videoUrl']);
+  if (runningHubHailuo23Quality2 === 'fast' || runningHubHailuo23Quality2 === 'fastPro') {
+    if (!list26[0x0]) throw new Error('RunningHub Hailuo 2.3 Fast requires imageUrl input');
     return (
-      (_0xbe8b82['imageUrl'] = _0x515f3c[0x0]),
-      _0x358142 === 'fastPro' && (_0xbe8b82['duration'] = '6'),
-      _0xbe8b82
+      (value62['imageUrl'] = list26[0x0]),
+      runningHubHailuo23Quality2 === 'fastPro' && (value62['duration'] = '6'),
+      value62
     );
   }
-  _0x358142 === 'pro' && delete _0xbe8b82['duration'];
-  if (_0x515f3c[0x0]) _0xbe8b82['imageUrl'] = _0x515f3c[0x0];
-  return _0xbe8b82;
+  runningHubHailuo23Quality2 === 'pro' && delete value62['duration'];
+  if (list26[0x0]) value62['imageUrl'] = list26[0x0];
+  return value62;
 }
 export function runninghubHailuo23VideoEndpoint({
   inputImages: inputImages = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x3fd991 = resolveRunningHubHailuo23Route({
+  const runningHubHailuo23Route = resolveRunningHubHailuo23Route({
     inputImages: inputImages,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return RUNNINGHUB_HAILUO_23_ENDPOINTS[_0x3fd991] || RUNNINGHUB_HAILUO_23_ENDPOINTS['t2vStandard'];
+  return (
+    RUNNINGHUB_HAILUO_23_ENDPOINTS[runningHubHailuo23Route] || RUNNINGHUB_HAILUO_23_ENDPOINTS['t2vStandard']
+  );
 }
 const RUNNINGHUB_VEO3_ENDPOINTS = Object['freeze']({
   lowCost: Object['freeze']({
@@ -1123,78 +1114,78 @@ const RUNNINGHUB_VEO3_ENDPOINTS = Object['freeze']({
     }),
   }),
 });
-function normalizeRunningHubVeo3Channel(_0x3d32a3) {
-  const _0x4eff97 = String(_0x3d32a3 || '')
+function normalizeRunningHubVeo3Channel(value63) {
+  const value64 = String(value63 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x4eff97 === 'official' || _0x4eff97 === 'stable' || _0x4eff97 === 'officialstable') return 'official';
+  if (value64 === 'official' || value64 === 'stable' || value64 === 'officialstable') return 'official';
   return 'lowCost';
 }
-function normalizeRunningHubVeo3Mode(_0x26c2a4, { channel: channel = 'lowCost' } = {}) {
-  const _0x32d084 = String(_0x26c2a4 || '')
+function normalizeRunningHubVeo3Mode(value65, { channel: channel = 'lowCost' } = {}) {
+  const value66 = String(value65 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x32d084 === 'quality' || _0x32d084 === 'pro') return 'pro';
-  if (_0x32d084 === 'lite' && channel === 'official') return 'lite';
+  if (value66 === 'quality' || value66 === 'pro') return 'pro';
+  if (value66 === 'lite' && channel === 'official') return 'lite';
   return 'fast';
 }
-function getRunningHubVeo3Channel(_0x18340e = {}, _0x4a493c = {}) {
+function getRunningHubVeo3Channel(options13 = {}, value67 = {}) {
   return normalizeRunningHubVeo3Channel(
-    _0x4a493c['rh_veo3_channel'] ||
-      _0x18340e?.['generationParams']?.['rh_veo3_channel'] ||
-      _0x18340e?.['rh_veo3_channel'],
+    value67['rh_veo3_channel'] ||
+      options13?.['generationParams']?.['rh_veo3_channel'] ||
+      options13?.['rh_veo3_channel'],
   );
 }
-function getRunningHubVeo3Mode(_0x33f192 = {}, _0x560877 = {}) {
-  const _0x2aa93a = getRunningHubVeo3Channel(_0x33f192, _0x560877);
+function getRunningHubVeo3Mode(options14 = {}, value68 = {}) {
+  const channel2 = getRunningHubVeo3Channel(options14, value68);
   return normalizeRunningHubVeo3Mode(
-    _0x560877['mode'] || _0x33f192?.['generationParams']?.['mode'] || _0x33f192?.['mode'],
-    { channel: _0x2aa93a },
+    value68['mode'] || options14?.['generationParams']?.['mode'] || options14?.['mode'],
+    { channel: channel2 },
   );
 }
-function getRunningHubVeo3GenerationType(_0x1d94bb = {}, _0x2540c6 = {}) {
-  const _0x208f2b = String(
-    _0x2540c6['generation_type'] ||
-      _0x1d94bb?.['generationParams']?.['generation_type'] ||
-      _0x1d94bb?.['generation_type'] ||
+function getRunningHubVeo3GenerationType(options15 = {}, value69 = {}) {
+  const value70 = String(
+    value69['generation_type'] ||
+      options15?.['generationParams']?.['generation_type'] ||
+      options15?.['generation_type'] ||
       'frame',
   )
     ['trim']()
     ['toLowerCase']();
-  if (_0x208f2b === 'reference' || _0x208f2b === 'extend') return _0x208f2b;
+  if (value70 === 'reference' || value70 === 'extend') return value70;
   return 'frame';
 }
 function collectRunningHubVeo3FrameImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x2a15c8 = [],
-    _0x2dc80f = normalizeInputUrlsBySlot(finalUrlsBySlot);
+  const value71 = [],
+    inputUrlsBySlot8 = normalizeInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x2a15c8, _0x2dc80f['firstFrame']),
-    appendUniqueUrl(_0x2a15c8, _0x2dc80f['lastFrame']),
-    normalizeInputList(inputImages)['forEach']((_0x264c06) => appendUniqueUrl(_0x2a15c8, _0x264c06)),
-    _0x2a15c8
+    appendUniqueUrl(value71, inputUrlsBySlot8['firstFrame']),
+    appendUniqueUrl(value71, inputUrlsBySlot8['lastFrame']),
+    normalizeInputList(inputImages)['forEach']((value72) => appendUniqueUrl(value71, value72)),
+    value71
   );
 }
 function collectRunningHubVeo3ReferenceImages({
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x1b5fd2 = [],
-    _0x24050c = normalizeInputUrlsBySlot(finalUrlsBySlot);
+  const value73 = [],
+    inputUrlsBySlot9 = normalizeInputUrlsBySlot(finalUrlsBySlot);
   return (
-    appendUniqueUrl(_0x1b5fd2, _0x24050c['referenceImage']),
-    normalizeInputList(inputImages)['forEach']((_0x858ed5) => appendUniqueUrl(_0x1b5fd2, _0x858ed5)),
-    _0x1b5fd2
+    appendUniqueUrl(value73, inputUrlsBySlot9['referenceImage']),
+    normalizeInputList(inputImages)['forEach']((value74) => appendUniqueUrl(value73, value74)),
+    value73
   );
 }
-function getRunningHubVeo3RawVideoCount(_0x4b2fe7 = {}, _0x2dd219 = []) {
+function getRunningHubVeo3RawVideoCount(options16 = {}, value75 = []) {
   return Math['max'](
-    normalizeInputList(_0x2dd219)['length'],
-    normalizeInputList(_0x4b2fe7?.['videos'])['length'],
-    normalizeInputList(_0x4b2fe7?.['videoUrls'])['length'],
-    String(_0x4b2fe7?.['videoUrl'] || '')['trim']() ? 0x1 : 0x0,
+    normalizeInputList(value75)['length'],
+    normalizeInputList(options16?.['videos'])['length'],
+    normalizeInputList(options16?.['videoUrls'])['length'],
+    String(options16?.['videoUrl'] || '')['trim']() ? 0x1 : 0x0,
   );
 }
 function resolveRunningHubVeo3Route({
@@ -1204,155 +1195,153 @@ function resolveRunningHubVeo3Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x305daa = getRunningHubVeo3Channel(payload, currentBody),
-    _0x1f1aa2 = getRunningHubVeo3Mode(payload, currentBody),
-    _0x355c8d = getRunningHubVeo3GenerationType(payload, currentBody);
-  if (_0x355c8d === 'extend' || normalizeInputList(inputVideos)['length'] > 0x0)
-    return Object['freeze']({ channel: _0x305daa, mode: _0x1f1aa2, route: 'extend' });
-  if (_0x355c8d === 'reference')
-    return Object['freeze']({ channel: _0x305daa, mode: _0x1f1aa2, route: 'reference' });
-  const _0x3a9ee7 = collectRunningHubVeo3FrameImages({
+  const channel3 = getRunningHubVeo3Channel(payload, currentBody),
+    mode = getRunningHubVeo3Mode(payload, currentBody),
+    runningHubVeo3GenerationType = getRunningHubVeo3GenerationType(payload, currentBody);
+  if (runningHubVeo3GenerationType === 'extend' || normalizeInputList(inputVideos)['length'] > 0x0)
+    return Object['freeze']({ channel: channel3, mode: mode, route: 'extend' });
+  if (runningHubVeo3GenerationType === 'reference')
+    return Object['freeze']({ channel: channel3, mode: mode, route: 'reference' });
+  const list27 = collectRunningHubVeo3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x3a9ee7['length'] >= 0x2)
-    return Object['freeze']({ channel: _0x305daa, mode: _0x1f1aa2, route: 'frames' });
-  if (_0x3a9ee7['length'] === 0x1)
+  if (list27['length'] >= 0x2) return Object['freeze']({ channel: channel3, mode: mode, route: 'frames' });
+  if (list27['length'] === 0x1)
     return Object['freeze']({
-      channel: _0x305daa,
-      mode: _0x1f1aa2,
-      route: _0x305daa === 'lowCost' && _0x1f1aa2 === 'pro' ? 'frames' : 'image',
+      channel: channel3,
+      mode: mode,
+      route: channel3 === 'lowCost' && mode === 'pro' ? 'frames' : 'image',
     });
-  return Object['freeze']({ channel: _0x305daa, mode: _0x1f1aa2, route: 'text' });
+  return Object['freeze']({ channel: channel3, mode: mode, route: 'text' });
 }
-function normalizeRunningHubVeo3BodyResolution(_0x4fe155, { channel: _0x5a3c8b, mode: _0x3f97ff }) {
-  const _0x4a7529 = String(_0x4fe155 || '720p')
+function normalizeRunningHubVeo3BodyResolution(value76, { channel: channel4, mode: mode2 }) {
+  const value77 = String(value76 || '720p')
     ['trim']()
     ['toLowerCase']();
-  if (_0x5a3c8b === 'lowCost') return '720p';
-  if (_0x3f97ff === 'lite' && _0x4a7529 === '4k') return '1080p';
-  if (_0x4a7529 === '4k' || _0x4a7529 === '1080p') return _0x4a7529;
+  if (channel4 === 'lowCost') return '720p';
+  if (mode2 === 'lite' && value77 === '4k') return '1080p';
+  if (value77 === '4k' || value77 === '1080p') return value77;
   return '720p';
 }
-function normalizeRunningHubVeo3BodyDuration(_0x14e220, { channel: _0x20551c, mode: _0x500d86 }) {
-  if (_0x20551c === 'lowCost') return '8';
-  const _0x8d1769 = Math['trunc'](Number(_0x14e220));
-  if (_0x500d86 === 'lite') return _0x8d1769 === 0x8 ? '8' : '6';
-  return [0x4, 0x6, 0x8]['includes'](_0x8d1769) ? String(_0x8d1769) : '8';
+function normalizeRunningHubVeo3BodyDuration(value78, { channel: channel5, mode: mode3 }) {
+  if (channel5 === 'lowCost') return '8';
+  const count2 = Math['trunc'](Number(value78));
+  if (mode3 === 'lite') return count2 === 0x8 ? '8' : '6';
+  return [0x4, 0x6, 0x8]['includes'](count2) ? String(count2) : '8';
 }
-function removeRunningHubVeo3TransientFields(_0x11253b) {
-  (delete _0x11253b['rh_veo3_channel'],
-    delete _0x11253b['mode'],
-    delete _0x11253b['generation_type'],
-    delete _0x11253b['imageUrl'],
-    delete _0x11253b['imageUrls'],
-    delete _0x11253b['firstFrameUrl'],
-    delete _0x11253b['lastFrameUrl'],
-    delete _0x11253b['firstImageUrl'],
-    delete _0x11253b['lastImageUrl'],
-    delete _0x11253b['videoUrl'],
-    delete _0x11253b['video']);
+function removeRunningHubVeo3TransientFields(value79) {
+  (delete value79['rh_veo3_channel'],
+    delete value79['mode'],
+    delete value79['generation_type'],
+    delete value79['imageUrl'],
+    delete value79['imageUrls'],
+    delete value79['firstFrameUrl'],
+    delete value79['lastFrameUrl'],
+    delete value79['firstImageUrl'],
+    delete value79['lastImageUrl'],
+    delete value79['videoUrl'],
+    delete value79['video']);
 }
 export function runninghubVeo3Video({
-  currentBody: _0x2129d1,
+  currentBody: currentBody8,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x24571f = { ..._0x2129d1 },
-    _0x5bbc53 = resolveRunningHubVeo3Route({
+  const currentBody9 = { ...currentBody8 },
+    runningHubVeo3Route = resolveRunningHubVeo3Route({
       inputImages: inputImages,
       inputVideos: inputVideos,
       payload: payload,
       finalUrlsBySlot: finalUrlsBySlot,
-      currentBody: _0x24571f,
+      currentBody: currentBody9,
     }),
-    { channel: _0x4caa8d, mode: _0xa08581, route: _0x3cccc2 } = _0x5bbc53,
-    _0x5de497 = getRunningHubVeo3GenerationType(payload, _0x24571f),
-    _0x5c686c = getRunningHubVeo3RawVideoCount(payload, inputVideos);
-  if (_0x5c686c > 0x0 && _0x3cccc2 !== 'extend')
+    { channel: channel6, mode: mode4, route: route6 } = runningHubVeo3Route,
+    runningHubVeo3GenerationType2 = getRunningHubVeo3GenerationType(payload, currentBody9),
+    runningHubVeo3RawVideoCount = getRunningHubVeo3RawVideoCount(payload, inputVideos);
+  if (runningHubVeo3RawVideoCount > 0x0 && route6 !== 'extend')
     throw new Error('RunningHub Veo3 does not accept video input');
-  const _0x2162ed = String(_0x24571f['prompt'] || payload?.['prompt'] || '')['trim']();
-  if (_0x3cccc2 !== 'extend') {
-    if (!_0x2162ed) throw new Error('RunningHub Veo3 prompt is required');
-    _0x24571f['prompt'] = _0x2162ed;
+  const enabled9 = String(currentBody9['prompt'] || payload?.['prompt'] || '')['trim']();
+  if (route6 !== 'extend') {
+    if (!enabled9) throw new Error('RunningHub Veo3 prompt is required');
+    currentBody9['prompt'] = enabled9;
   }
-  ((_0x24571f['resolution'] = normalizeRunningHubVeo3BodyResolution(_0x24571f['resolution'], {
-    channel: _0x4caa8d,
-    mode: _0xa08581,
+  ((currentBody9['resolution'] = normalizeRunningHubVeo3BodyResolution(currentBody9['resolution'], {
+    channel: channel6,
+    mode: mode4,
   })),
-    (_0x24571f['duration'] = normalizeRunningHubVeo3BodyDuration(_0x24571f['duration'], {
-      channel: _0x4caa8d,
-      mode: _0xa08581,
+    (currentBody9['duration'] = normalizeRunningHubVeo3BodyDuration(currentBody9['duration'], {
+      channel: channel6,
+      mode: mode4,
     })),
-    removeRunningHubVeo3TransientFields(_0x24571f));
-  if (_0x3cccc2 === 'extend') {
-    if (_0x4caa8d !== 'official' || _0xa08581 === 'lite')
+    removeRunningHubVeo3TransientFields(currentBody9));
+  if (route6 === 'extend') {
+    if (channel6 !== 'official' || mode4 === 'lite')
       throw new Error('RunningHub Veo3 video extend only supports official Fast or Pro');
-    const _0x3196ed = normalizeInputList(inputVideos);
-    if (_0x5c686c < 0x1 || !_0x3196ed[0x0])
+    const inputList3 = normalizeInputList(inputVideos);
+    if (runningHubVeo3RawVideoCount < 0x1 || !inputList3[0x0])
       throw new Error('RunningHub Veo3 video extend requires 1 video input');
-    if (_0x5c686c > 0x1) throw new Error('RunningHub Veo3 video extend supports at most 1 video input');
-    const _0xd25d61 = [];
+    if (runningHubVeo3RawVideoCount > 0x1)
+      throw new Error('RunningHub Veo3 video extend supports at most 1 video input');
+    const list28 = [];
     (collectRunningHubVeo3FrameImages({ inputImages: inputImages, finalUrlsBySlot: finalUrlsBySlot })[
       'forEach'
-    ]((_0x14a89a) => appendUniqueUrl(_0xd25d61, _0x14a89a)),
+    ]((value80) => appendUniqueUrl(list28, value80)),
       collectRunningHubVeo3ReferenceImages({ inputImages: inputImages, finalUrlsBySlot: finalUrlsBySlot })[
         'forEach'
-      ]((_0x2562bf) => appendUniqueUrl(_0xd25d61, _0x2562bf)));
-    if (_0xd25d61['length'] > 0x0)
-      throw new Error('RunningHub Veo3 video extend does not accept image input');
+      ]((value81) => appendUniqueUrl(list28, value81)));
+    if (list28['length'] > 0x0) throw new Error('RunningHub Veo3 video extend does not accept image input');
     return (
-      (_0x24571f['video'] = _0x3196ed[0x0]),
-      delete _0x24571f['prompt'],
-      delete _0x24571f['duration'],
-      delete _0x24571f['aspectRatio'],
-      delete _0x24571f['generateAudio'],
-      _0x24571f
+      (currentBody9['video'] = inputList3[0x0]),
+      delete currentBody9['prompt'],
+      delete currentBody9['duration'],
+      delete currentBody9['aspectRatio'],
+      delete currentBody9['generateAudio'],
+      currentBody9
     );
   }
-  if (_0x5de497 === 'reference') {
-    if (_0x4caa8d !== 'official' || _0xa08581 === 'lite')
+  if (runningHubVeo3GenerationType2 === 'reference') {
+    if (channel6 !== 'official' || mode4 === 'lite')
       throw new Error(
         'RunningHub\x20Veo3\x20reference\x20mode\x20only\x20supports\x20official\x20Fast\x20or\x20Pro',
       );
-    const _0x513950 = collectRunningHubVeo3ReferenceImages({
+    const list29 = collectRunningHubVeo3ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (_0x513950['length'] < 0x1)
+    if (list29['length'] < 0x1)
       throw new Error('RunningHub\x20Veo3\x20reference\x20mode\x20requires\x201-3\x20image\x20inputs');
-    if (_0x513950['length'] > 0x3)
+    if (list29['length'] > 0x3)
       throw new Error('RunningHub Veo3 reference mode supports at most 3 image inputs');
-    ((_0x24571f['imageUrls'] = _0x513950), delete _0x24571f['duration']);
-    if (_0xa08581 === 'pro') delete _0x24571f['aspectRatio'];
-    return _0x24571f;
+    ((currentBody9['imageUrls'] = list29), delete currentBody9['duration']);
+    if (mode4 === 'pro') delete currentBody9['aspectRatio'];
+    return currentBody9;
   }
-  const _0x507f1b = collectRunningHubVeo3FrameImages({
+  const list30 = collectRunningHubVeo3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x507f1b['length'] > 0x2)
-    throw new Error('RunningHub Veo3 frame mode supports at most 2 image inputs');
-  if (_0x507f1b['length'] >= 0x2 && _0x4caa8d === 'official' && _0xa08581 !== 'lite')
+  if (list30['length'] > 0x2) throw new Error('RunningHub Veo3 frame mode supports at most 2 image inputs');
+  if (list30['length'] >= 0x2 && channel6 === 'official' && mode4 !== 'lite')
     throw new Error(
       'RunningHub Veo3 official Fast/Pro start-end endpoint is not published; use official Lite or low-cost channel',
     );
-  if (_0x507f1b['length'] === 0x1) {
-    if (_0x4caa8d === 'official') _0x24571f['imageUrl'] = _0x507f1b[0x0];
+  if (list30['length'] === 0x1) {
+    if (channel6 === 'official') currentBody9['imageUrl'] = list30[0x0];
     else
-      _0xa08581 === 'pro'
-        ? (_0x24571f['firstFrameUrl'] = _0x507f1b[0x0])
-        : (_0x24571f['imageUrls'] = [_0x507f1b[0x0]]);
+      mode4 === 'pro'
+        ? (currentBody9['firstFrameUrl'] = list30[0x0])
+        : (currentBody9['imageUrls'] = [list30[0x0]]);
   } else
-    _0x507f1b['length'] === 0x2 &&
-      (_0x4caa8d === 'official'
-        ? ((_0x24571f['firstImageUrl'] = _0x507f1b[0x0]),
-          (_0x24571f['lastImageUrl'] = _0x507f1b[0x1]),
-          delete _0x24571f['duration'])
-        : ((_0x24571f['firstFrameUrl'] = _0x507f1b[0x0]), (_0x24571f['lastFrameUrl'] = _0x507f1b[0x1])));
-  return ((_0x4caa8d === 'lowCost' || _0xa08581 === 'lite') && delete _0x24571f['generateAudio'], _0x24571f);
+    list30['length'] === 0x2 &&
+      (channel6 === 'official'
+        ? ((currentBody9['firstImageUrl'] = list30[0x0]),
+          (currentBody9['lastImageUrl'] = list30[0x1]),
+          delete currentBody9['duration'])
+        : ((currentBody9['firstFrameUrl'] = list30[0x0]), (currentBody9['lastFrameUrl'] = list30[0x1])));
+  return ((channel6 === 'lowCost' || mode4 === 'lite') && delete currentBody9['generateAudio'], currentBody9);
 }
 export function runninghubVeo3VideoEndpoint({
   inputImages: inputImages = [],
@@ -1361,9 +1350,9 @@ export function runninghubVeo3VideoEndpoint({
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
   const {
-    channel: _0x109ecc,
-    mode: _0x3c73e1,
-    route: _0xebea4b,
+    channel: channel7,
+    mode: mode5,
+    route: route7,
   } = resolveRunningHubVeo3Route({
     inputImages: inputImages,
     inputVideos: inputVideos,
@@ -1371,7 +1360,7 @@ export function runninghubVeo3VideoEndpoint({
     finalUrlsBySlot: finalUrlsBySlot,
   });
   return (
-    RUNNINGHUB_VEO3_ENDPOINTS[_0x109ecc]?.[_0xebea4b]?.[_0x3c73e1] ||
+    RUNNINGHUB_VEO3_ENDPOINTS[channel7]?.[route7]?.[mode5] ||
     RUNNINGHUB_VEO3_ENDPOINTS['lowCost']['text']['fast']
   );
 }
@@ -1382,44 +1371,45 @@ const RUNNINGHUB_WAN27_ENDPOINTS = Object['freeze']({
   reference: 'https://www.runninghub.cn/openapi/v2/alibaba/wan-2.7/reference-to-video',
   edit: 'https://www.runninghub.cn/openapi/v2/alibaba/wan-2.7/video-edit',
 });
-function normalizeRunningHubWan27Mode(_0x44414a) {
-  const _0x321d88 = String(_0x44414a || '')
+function normalizeRunningHubWan27Mode(value82) {
+  const value83 = String(value82 || '')
     ['trim']()
     ['toLowerCase']();
-  return _0x321d88 === 'video' || _0x321d88 === 'reference' || _0x321d88 === 'edit' ? _0x321d88 : 'image';
+  return value83 === 'video' || value83 === 'reference' || value83 === 'edit' ? value83 : 'image';
 }
-function getRunningHubWan27Mode(_0x1439a7 = {}, _0x2cb313 = {}) {
+function getRunningHubWan27Mode(options17 = {}, value84 = {}) {
   return normalizeRunningHubWan27Mode(
-    _0x2cb313['wan27_mode'] || _0x1439a7?.['generationParams']?.['wan27_mode'] || _0x1439a7?.['wan27_mode'],
+    value84['wan27_mode'] || options17?.['generationParams']?.['wan27_mode'] || options17?.['wan27_mode'],
   );
 }
 function collectRunningHubWan27Images({
-  mode: _0x4dab18,
+  mode: mode6,
   inputImages: inputImages = [],
   finalUrlsBySlot: finalUrlsBySlot = {},
 } = {}) {
-  const _0x39e9d8 = [],
-    _0xa7221a = normalizeInputUrlsBySlot(finalUrlsBySlot);
-  if (_0x4dab18 === 'image')
-    (appendUniqueUrl(_0x39e9d8, _0xa7221a['firstFrame']), appendUniqueUrl(_0x39e9d8, _0xa7221a['lastFrame']));
+  const value85 = [],
+    inputUrlsBySlot10 = normalizeInputUrlsBySlot(finalUrlsBySlot);
+  if (mode6 === 'image')
+    (appendUniqueUrl(value85, inputUrlsBySlot10['firstFrame']),
+      appendUniqueUrl(value85, inputUrlsBySlot10['lastFrame']));
   else {
-    if (_0x4dab18 === 'reference') appendUniqueUrl(_0x39e9d8, _0xa7221a['referenceImage']);
-    else _0x4dab18 === 'edit' && appendUniqueUrl(_0x39e9d8, _0xa7221a['editRefImage']);
+    if (mode6 === 'reference') appendUniqueUrl(value85, inputUrlsBySlot10['referenceImage']);
+    else mode6 === 'edit' && appendUniqueUrl(value85, inputUrlsBySlot10['editRefImage']);
   }
   return (
-    normalizeInputList(inputImages)['forEach']((_0x19620c) => appendUniqueUrl(_0x39e9d8, _0x19620c)),
-    _0x39e9d8
+    normalizeInputList(inputImages)['forEach']((value86) => appendUniqueUrl(value85, value86)),
+    value85
   );
 }
-function removeRunningHubWan27TransientFields(_0x55bcf4) {
-  (delete _0x55bcf4['wan27_mode'],
-    delete _0x55bcf4['firstImageUrl'],
-    delete _0x55bcf4['lastImageUrl'],
-    delete _0x55bcf4['imageUrl'],
-    delete _0x55bcf4['imageUrls'],
-    delete _0x55bcf4['videoUrl'],
-    delete _0x55bcf4['videoUrls']);
-  if (!_0x55bcf4['aspectRatio']) delete _0x55bcf4['aspectRatio'];
+function removeRunningHubWan27TransientFields(enabled10) {
+  (delete enabled10['wan27_mode'],
+    delete enabled10['firstImageUrl'],
+    delete enabled10['lastImageUrl'],
+    delete enabled10['imageUrl'],
+    delete enabled10['imageUrls'],
+    delete enabled10['videoUrl'],
+    delete enabled10['videoUrls']);
+  if (!enabled10['aspectRatio']) delete enabled10['aspectRatio'];
 }
 function resolveRunningHubWan27Route({
   inputImages: inputImages = [],
@@ -1428,77 +1418,75 @@ function resolveRunningHubWan27Route({
   finalUrlsBySlot: finalUrlsBySlot = {},
   currentBody: currentBody = {},
 } = {}) {
-  const _0x3a022b = getRunningHubWan27Mode(payload, currentBody);
-  if (_0x3a022b === 'reference' || _0x3a022b === 'edit') return _0x3a022b;
-  const _0x50578c = normalizeInputList(inputVideos);
-  if (_0x3a022b === 'video' && _0x50578c['length'] > 0x0) return 'video';
-  const _0x3d58eb = collectRunningHubWan27Images({
-    mode: _0x3a022b,
+  const mode7 = getRunningHubWan27Mode(payload, currentBody);
+  if (mode7 === 'reference' || mode7 === 'edit') return mode7;
+  const list31 = normalizeInputList(inputVideos);
+  if (mode7 === 'video' && list31['length'] > 0x0) return 'video';
+  const list32 = collectRunningHubWan27Images({
+    mode: mode7,
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (_0x3d58eb['length'] > 0x0) return 'image';
+  if (list32['length'] > 0x0) return 'image';
   return 'text';
 }
 export function runninghubWan27Video({
-  currentBody: _0x1e4caa,
+  currentBody: currentBody10,
   inputImages: inputImages = [],
   inputVideos: inputVideos = [],
   inputAudios: inputAudios = [],
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x5e14cd = { ..._0x1e4caa },
-    _0x45eac3 = String(_0x5e14cd['prompt'] || payload?.['prompt'] || '')['trim']();
-  if (!_0x45eac3) throw new Error('RunningHub Wan2.7 prompt is required');
-  const _0x4c4a7e = getRunningHubWan27Mode(payload, _0x5e14cd),
-    _0x22609b = collectRunningHubWan27Images({
-      mode: _0x4c4a7e,
+  const value87 = { ...currentBody10 },
+    enabled11 = String(value87['prompt'] || payload?.['prompt'] || '')['trim']();
+  if (!enabled11) throw new Error('RunningHub Wan2.7 prompt is required');
+  const mode8 = getRunningHubWan27Mode(payload, value87),
+    list33 = collectRunningHubWan27Images({
+      mode: mode8,
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
-    _0xd03e5c = normalizeInputList(inputVideos),
-    _0x5ceacc = String(_0x5e14cd['audioUrl'] || '')['trim']() || normalizeInputList(inputAudios)[0x0] || '';
-  _0x5e14cd['prompt'] = _0x45eac3;
-  if (_0x5ceacc) _0x5e14cd['audioUrl'] = _0x5ceacc;
-  removeRunningHubWan27TransientFields(_0x5e14cd);
-  if (_0x4c4a7e === 'reference') {
-    const _0x19a404 = _0x22609b['length'] + _0xd03e5c['length'];
-    if (_0x19a404 <= 0x0) throw new Error('RunningHub Wan2.7 reference mode requires image or video input');
-    if (_0x19a404 > 0x5) throw new Error('RunningHub Wan2.7 reference mode supports at most 5 inputs');
-    if (_0x5ceacc) throw new Error('RunningHub Wan2.7 reference mode does not accept audio input');
-    if (_0x22609b['length'] > 0x0) _0x5e14cd['imageUrls'] = _0x22609b;
-    if (_0xd03e5c['length'] > 0x0) _0x5e14cd['videoUrls'] = _0xd03e5c;
-    return _0x5e14cd;
+    list34 = normalizeInputList(inputVideos),
+    value88 = String(value87['audioUrl'] || '')['trim']() || normalizeInputList(inputAudios)[0x0] || '';
+  value87['prompt'] = enabled11;
+  if (value88) value87['audioUrl'] = value88;
+  removeRunningHubWan27TransientFields(value87);
+  if (mode8 === 'reference') {
+    const count3 = list33['length'] + list34['length'];
+    if (count3 <= 0x0) throw new Error('RunningHub Wan2.7 reference mode requires image or video input');
+    if (count3 > 0x5) throw new Error('RunningHub Wan2.7 reference mode supports at most 5 inputs');
+    if (value88) throw new Error('RunningHub Wan2.7 reference mode does not accept audio input');
+    if (list33['length'] > 0x0) value87['imageUrls'] = list33;
+    if (list34['length'] > 0x0) value87['videoUrls'] = list34;
+    return value87;
   }
-  if (_0x4c4a7e === 'edit') {
-    if (!_0xd03e5c[0x0]) throw new Error('RunningHub Wan2.7 video edit requires original video input');
-    if (_0xd03e5c['length'] > 0x1)
+  if (mode8 === 'edit') {
+    if (!list34[0x0]) throw new Error('RunningHub Wan2.7 video edit requires original video input');
+    if (list34['length'] > 0x1)
       throw new Error('RunningHub Wan2.7 video edit accepts only one original video');
-    if (_0x22609b['length'] > 0x3)
+    if (list33['length'] > 0x3)
       throw new Error(
         'RunningHub\x20Wan2.7\x20video\x20edit\x20supports\x20at\x20most\x203\x20image\x20inputs',
       );
-    if (_0x5ceacc) throw new Error('RunningHub Wan2.7 video edit does not accept audio input');
-    _0x5e14cd['videoUrl'] = _0xd03e5c[0x0];
-    if (_0x22609b['length'] > 0x0) _0x5e14cd['imageUrls'] = _0x22609b['slice'](0x0, 0x3);
-    return _0x5e14cd;
+    if (value88) throw new Error('RunningHub Wan2.7 video edit does not accept audio input');
+    value87['videoUrl'] = list34[0x0];
+    if (list33['length'] > 0x0) value87['imageUrls'] = list33['slice'](0x0, 0x3);
+    return value87;
   }
-  if (_0x4c4a7e === 'video') {
-    if (_0x22609b['length'] > 0x0)
-      throw new Error('RunningHub Wan2.7 video extend does not accept image input');
-    if (_0xd03e5c['length'] > 0x1)
+  if (mode8 === 'video') {
+    if (list33['length'] > 0x0) throw new Error('RunningHub Wan2.7 video extend does not accept image input');
+    if (list34['length'] > 0x1)
       throw new Error('RunningHub\x20Wan2.7\x20video\x20extend\x20accepts\x20only\x20one\x20video\x20input');
-    if (_0xd03e5c[0x0]) _0x5e14cd['videoUrl'] = _0xd03e5c[0x0];
-    return _0x5e14cd;
+    if (list34[0x0]) value87['videoUrl'] = list34[0x0];
+    return value87;
   }
-  if (_0xd03e5c['length'] > 0x0)
+  if (list34['length'] > 0x0)
     throw new Error('RunningHub\x20Wan2.7\x20image\x20mode\x20does\x20not\x20accept\x20video\x20input');
-  if (_0x22609b['length'] > 0x2)
-    throw new Error('RunningHub Wan2.7 image mode supports at most 2 image inputs');
-  _0x22609b[0x0] && (delete _0x5e14cd['aspectRatio'], (_0x5e14cd['firstImageUrl'] = _0x22609b[0x0]));
-  if (_0x22609b[0x1]) _0x5e14cd['lastImageUrl'] = _0x22609b[0x1];
-  return _0x5e14cd;
+  if (list33['length'] > 0x2) throw new Error('RunningHub Wan2.7 image mode supports at most 2 image inputs');
+  list33[0x0] && (delete value87['aspectRatio'], (value87['firstImageUrl'] = list33[0x0]));
+  if (list33[0x1]) value87['lastImageUrl'] = list33[0x1];
+  return value87;
 }
 export function runninghubWan27VideoEndpoint({
   inputImages: inputImages = [],
@@ -1506,11 +1494,11 @@ export function runninghubWan27VideoEndpoint({
   payload: payload = {},
   finalUrlsBySlot: finalUrlsBySlot = {},
 }) {
-  const _0x8b93c = resolveRunningHubWan27Route({
+  const runningHubWan27Route = resolveRunningHubWan27Route({
     inputImages: inputImages,
     inputVideos: inputVideos,
     payload: payload,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  return RUNNINGHUB_WAN27_ENDPOINTS[_0x8b93c] || RUNNINGHUB_WAN27_ENDPOINTS['text'];
+  return RUNNINGHUB_WAN27_ENDPOINTS[runningHubWan27Route] || RUNNINGHUB_WAN27_ENDPOINTS['text'];
 }

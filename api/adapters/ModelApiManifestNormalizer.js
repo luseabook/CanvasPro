@@ -1,4 +1,9 @@
-import { getRunningHubProviderProfileId, remapRunningHubModelApiUrl, resolveRunningHubModelApiBaseUrl, resolveRunningHubModelApiProfileId } from '../../src/modules/runningHubProviderProfiles.js';
+import {
+  getRunningHubProviderProfileId,
+  remapRunningHubModelApiUrl,
+  resolveRunningHubModelApiBaseUrl,
+  resolveRunningHubModelApiProfileId,
+} from '../../src/modules/runningHubProviderProfiles.js';
 import { normalizeModelProviderProfileId } from '../../src/modules/modelProviderProfileSelection.js';
 import { parseRatioLabel } from '../imageRatioPolicy.js';
 import { normalizeTextStructuredOutput } from './textStructuredOutput.js';
@@ -12,791 +17,779 @@ import {
   normalizeApimartNanoBanana2Resolution,
   normalizeApimartGptImage2Resolution,
 } from './modelApiResolvers/index.js';
-function normalizeManifestOptionKey(_0x4c59c3) {
-  return String(_0x4c59c3 || '')
+function normalizeManifestOptionKey(value) {
+  return String(value || '')
     .trim()
     .toLowerCase();
 }
-function findVideoAspectRatioField(_0x18246c) {
-  return (Array.isArray(_0x18246c?.uiSchema?.fields) ? _0x18246c.uiSchema.fields : []).find(
-    (_0x25c9a2) => String(_0x25c9a2?.id || '').trim() === 'aspectRatio',
+function findVideoAspectRatioField(item) {
+  return (Array.isArray(item?.uiSchema?.fields) ? item.uiSchema.fields : []).find(
+    (item2) => String(item2?.id || '').trim() === 'aspectRatio',
   );
 }
-function pickFirstConcreteVideoAspectRatio(_0x28adb4) {
-  const _0x3a7f64 = findVideoAspectRatioField(_0x28adb4),
-    _0x3e20ce = Array.isArray(_0x3a7f64?.options) ? _0x3a7f64.options : [];
-  for (const _0x3e1084 of _0x3e20ce) {
-    const _0x98597d = String(_0x3e1084?.value ?? _0x3e1084 ?? '').trim();
-    if (_0x98597d && _0x98597d.includes(':') && !isAdaptiveRatioLabel(_0x98597d)) return _0x98597d;
+function pickFirstConcreteVideoAspectRatio(key) {
+  const videoAspectRatioField = findVideoAspectRatioField(key),
+    index = Array.isArray(videoAspectRatioField?.options) ? videoAspectRatioField.options : [];
+  for (const el of index) {
+    const list = String(el?.value ?? el ?? '').trim();
+    if (list && list.includes(':') && !isAdaptiveRatioLabel(list)) return list;
   }
   return '';
 }
-function resolvePayloadAspectRatioInput(_0x2ef001 = {}, _0x40204f = null) {
-  const _0x51c27f =
-    _0x2ef001?.generationParams &&
-    typeof _0x2ef001.generationParams === 'object' &&
-    !Array.isArray(_0x2ef001.generationParams)
-      ? _0x2ef001.generationParams
+function resolvePayloadAspectRatioInput(options = {}, result = null) {
+  const data =
+    options?.generationParams &&
+    typeof options.generationParams === 'object' &&
+    !Array.isArray(options.generationParams)
+      ? options.generationParams
       : {};
-  if (Object.prototype.hasOwnProperty.call(_0x51c27f, 'aspectRatio')) return _0x51c27f.aspectRatio;
-  for (const _0x58c142 of ['aspectRatio', 'aspect_ratio', 'size']) {
-    if (Object.prototype.hasOwnProperty.call(_0x2ef001 || {}, _0x58c142)) return _0x2ef001[_0x58c142];
+  if (Object.prototype.hasOwnProperty.call(data, 'aspectRatio')) return data.aspectRatio;
+  for (const target of ['aspectRatio', 'aspect_ratio', 'size']) {
+    if (Object.prototype.hasOwnProperty.call(options || {}, target)) return options[target];
   }
-  return findVideoAspectRatioField(_0x40204f)?.defaultValue ?? '';
+  return findVideoAspectRatioField(result)?.defaultValue ?? '';
 }
-function applyVideoAspectRatioExecutionFallback(_0x2fc544 = {}, _0x3287fc = null) {
-  if (!findVideoAspectRatioField(_0x3287fc)) return _0x2fc544;
-  const _0x5bd9fa = _0x3287fc?.extensions?.ratioPolicy || _0x3287fc?.ratioPolicy || {};
-  if (_0x5bd9fa?.preserveAdaptive === true) return _0x2fc544;
-  const _0x3d88eb = resolvePayloadAspectRatioInput(_0x2fc544, _0x3287fc);
-  if (!isAdaptiveRatioLabel(_0x3d88eb)) return _0x2fc544;
-  const _0x2034fe = String(_0x2fc544?.resolvedRatioLabel || '').trim(),
-    _0x56d00e =
-      _0x2034fe && !isAdaptiveRatioLabel(_0x2034fe)
-        ? _0x2034fe
-        : pickFirstConcreteVideoAspectRatio(_0x3287fc);
-  if (!_0x56d00e) return _0x2fc544;
+function applyVideoAspectRatioExecutionFallback(args = {}, source = null) {
+  if (!findVideoAspectRatioField(source)) return args;
+  const next = source?.extensions?.ratioPolicy || source?.ratioPolicy || {};
+  if (next?.preserveAdaptive === true) return args;
+  const payloadAspectRatioInput = resolvePayloadAspectRatioInput(args, source);
+  if (!isAdaptiveRatioLabel(payloadAspectRatioInput)) return args;
+  const current = String(args?.resolvedRatioLabel || '').trim(),
+    aspectRatio =
+      current && !isAdaptiveRatioLabel(current) ? current : pickFirstConcreteVideoAspectRatio(source);
+  if (!aspectRatio) return args;
   return {
-    ..._0x2fc544,
-    aspectRatio: _0x56d00e,
-    resolvedRatioLabel: _0x56d00e,
-    generationParams: { ...(_0x2fc544.generationParams || {}), aspectRatio: _0x56d00e },
+    ...args,
+    aspectRatio: aspectRatio,
+    resolvedRatioLabel: aspectRatio,
+    generationParams: { ...(args.generationParams || {}), aspectRatio: aspectRatio },
   };
 }
-function mergeRootAspectRatioIntoGenerationParams(_0x3681f8 = {}, _0x324e59 = {}) {
-  const _0x5b2466 =
-      _0x324e59 && typeof _0x324e59 === 'object' && !Array.isArray(_0x324e59) ? { ..._0x324e59 } : {},
-    _0x4b234d =
-      _0x3681f8?.generationParams &&
-      typeof _0x3681f8.generationParams === 'object' &&
-      !Array.isArray(_0x3681f8.generationParams)
-        ? _0x3681f8.generationParams
+function mergeRootAspectRatioIntoGenerationParams(options2 = {}, args2 = {}) {
+  const entry = args2 && typeof args2 === 'object' && !Array.isArray(args2) ? { ...args2 } : {},
+    record =
+      options2?.generationParams &&
+      typeof options2.generationParams === 'object' &&
+      !Array.isArray(options2.generationParams)
+        ? options2.generationParams
         : {};
-  if (Object.prototype.hasOwnProperty.call(_0x4b234d, 'aspectRatio')) return _0x5b2466;
-  if (String(_0x3681f8?.resolvedRatioLabel || '').trim()) return _0x5b2466;
+  if (Object.prototype.hasOwnProperty.call(record, 'aspectRatio')) return entry;
+  if (String(options2?.resolvedRatioLabel || '').trim()) return entry;
   return (
-    Object.prototype.hasOwnProperty.call(_0x3681f8 || {}, 'aspectRatio') &&
-      !isAdaptiveRatioLabel(_0x3681f8.aspectRatio) &&
-      (_0x5b2466.aspectRatio = _0x3681f8.aspectRatio),
-    _0x5b2466
+    Object.prototype.hasOwnProperty.call(options2 || {}, 'aspectRatio') &&
+      !isAdaptiveRatioLabel(options2.aspectRatio) &&
+      (entry.aspectRatio = options2.aspectRatio),
+    entry
   );
 }
-function resolveMappedModelValue(_0x2d7635, _0x143a46) {
-  if (!_0x2d7635) return '';
-  if (typeof _0x2d7635 === 'string') return _0x2d7635;
-  if (typeof _0x2d7635 !== 'object' || Array.isArray(_0x2d7635)) return '';
-  const _0x4f0ff7 = String(_0x143a46?.imageSize || '')
+function resolveMappedModelValue(enabled, payload) {
+  if (!enabled) return '';
+  if (typeof enabled === 'string') return enabled;
+  if (typeof enabled !== 'object' || Array.isArray(enabled)) return '';
+  const handle = String(payload?.imageSize || '')
       .trim()
       .toUpperCase(),
-    _0x2c8b59 = _0x2d7635.byImageSize || {};
-  return (_0x4f0ff7 && _0x2c8b59[_0x4f0ff7]) || _0x2d7635.default || _0x2d7635.model || '';
+    state = enabled.byImageSize || {};
+  return (handle && state[handle]) || enabled.default || enabled.model || '';
 }
-export function resolveExecutionModelToken(_0x477d4c, _0x10b049) {
-  let _0x5cc91c = _0x477d4c.model || _0x10b049.model || '';
-  const _0x24a8bc = normalizeManifestOptionKey(_0x10b049.mode ?? _0x10b049.generationParams?.mode);
-  let _0x19c698 = false;
-  if (_0x24a8bc && _0x477d4c.modeModels) {
-    const _0x461b20 = resolveMappedModelValue(_0x477d4c.modeModels[_0x24a8bc], _0x10b049);
-    _0x461b20 && ((_0x5cc91c = _0x461b20), (_0x19c698 = true));
+export function resolveExecutionModelToken(config, scope) {
+  let input = config.model || scope.model || '';
+  const manifestOptionKey = normalizeManifestOptionKey(scope.mode ?? scope.generationParams?.mode);
+  let enabled2 = false;
+  if (manifestOptionKey && config.modeModels) {
+    const mappedModelValue = resolveMappedModelValue(config.modeModels[manifestOptionKey], scope);
+    mappedModelValue && ((input = mappedModelValue), (enabled2 = true));
   }
-  const _0x5df2ef = normalizeManifestOptionKey(
-    _0x10b049.rhModelRoute ?? _0x10b049.generationParams?.rhModelRoute,
+  const manifestOptionKey2 = normalizeManifestOptionKey(
+    scope.rhModelRoute ?? scope.generationParams?.rhModelRoute,
   );
-  if (_0x5df2ef && _0x477d4c.routeModels) {
-    const _0x461555 = resolveMappedModelValue(_0x477d4c.routeModels[_0x5df2ef], _0x10b049);
-    _0x461555 && ((_0x5cc91c = _0x461555), (_0x19c698 = true));
+  if (manifestOptionKey2 && config.routeModels) {
+    const mappedModelValue2 = resolveMappedModelValue(config.routeModels[manifestOptionKey2], scope);
+    mappedModelValue2 && ((input = mappedModelValue2), (enabled2 = true));
   }
-  if (_0x477d4c.imageSizeModels && !_0x19c698) {
-    const _0x49a048 = String(_0x10b049.imageSize || '')
+  if (config.imageSizeModels && !enabled2) {
+    const output = String(scope.imageSize || '')
       .trim()
       .toUpperCase();
-    _0x5cc91c = _0x477d4c.imageSizeModels[_0x49a048] || _0x477d4c.imageSizeModels.default || _0x5cc91c;
+    input = config.imageSizeModels[output] || config.imageSizeModels.default || input;
   }
-  return _0x5cc91c;
+  return input;
 }
-function resolveApiKey(_0xb772bb, _0x2a4023, _0x416d10) {
-  const _0x372f10 = _0x416d10.getProviderConfig(_0xb772bb);
-  if (_0xb772bb === 'runninghub') return _0x372f10.modelApiKey || _0x2a4023.apiKey;
-  return _0x372f10.apiKey || _0x2a4023.apiKey;
+function resolveApiKey(value2, value3, value4) {
+  const value5 = value4.getProviderConfig(value2);
+  if (value2 === 'runninghub') return value5.modelApiKey || value3.apiKey;
+  return value5.apiKey || value3.apiKey;
 }
-function throwMissingApiKey(_0x2cfbb2) {
-  throw ApiError.authError(_0x2cfbb2, null, 'API Key 未配置（厂商：' + (_0x2cfbb2 || 'unknown') + '）');
+function throwMissingApiKey(value6) {
+  throw ApiError.authError(value6, null, 'API Key 未配置（厂商：' + (value6 || 'unknown') + '）');
 }
-function getManifestMaxInputCount(_0x555078, _0x1dd418) {
-  const _0x547039 = Number(_0x555078?.inputSlots?.maxByKind?.[_0x1dd418]);
-  return Number.isFinite(_0x547039) ? Math.max(0, _0x547039) : null;
+function getManifestMaxInputCount(value7, value8) {
+  const value9 = Number(value7?.inputSlots?.maxByKind?.[value8]);
+  return Number.isFinite(value9) ? Math.max(0, value9) : null;
 }
-function getImageInputUploadPolicy(_0x2272fa = {}) {
-  const _0xccf45d = _0x2272fa.executionManifest?.extensions?.imageInputUpload;
-  return _0xccf45d && typeof _0xccf45d === 'object' && !Array.isArray(_0xccf45d) ? _0xccf45d : null;
+function getImageInputUploadPolicy(options3 = {}) {
+  const value10 = options3.executionManifest?.extensions?.imageInputUpload;
+  return value10 && typeof value10 === 'object' && !Array.isArray(value10) ? value10 : null;
 }
-function shouldApplyImageInputUploadPolicy(_0x94b464) {
-  if (!_0x94b464) return false;
-  const _0x22e1f3 = Array.isArray(_0x94b464.inputKinds)
-    ? _0x94b464.inputKinds.map((_0x1bf57c) =>
-        String(_0x1bf57c || '')
+function shouldApplyImageInputUploadPolicy(enabled3) {
+  if (!enabled3) return false;
+  const list2 = Array.isArray(enabled3.inputKinds)
+    ? enabled3.inputKinds.map((item3) =>
+        String(item3 || '')
           .trim()
           .toLowerCase(),
       )
     : ['image'];
-  return _0x22e1f3.includes('image');
+  return list2.includes('image');
 }
-async function resolveConfiguredImageInputUpload(_0x28cdd9, _0x462422, _0x49fcf6, _0xe19491, _0xfd8f87 = {}) {
-  const _0x412058 = getImageInputUploadPolicy(_0xfd8f87);
-  if (!shouldApplyImageInputUploadPolicy(_0x412058)) return { handled: false, urls: [] };
-  const _0x54397e = String(_0x412058.provider || '').trim(),
-    _0xe6fdc6 = _0x54397e.toLowerCase().replace(/[\s_-]+/g, '');
-  if (_0xe6fdc6 === 'freeimagehost') {
-    if (typeof _0xe19491.processInputImages !== 'function')
-      throw new Error((_0x28cdd9 || 'modelApi') + ' image input upload is not available');
-    const _0x59b3a3 = await _0xe19491.processInputImages(_0x462422, '', {
-      applyInputQualityProfile: _0x412058.applyInputQualityProfile !== false,
+async function resolveConfiguredImageInputUpload(value11, value12, value13, value14, baseUrl = {}) {
+  const applyInputQualityProfile = getImageInputUploadPolicy(baseUrl);
+  if (!shouldApplyImageInputUploadPolicy(applyInputQualityProfile)) return { handled: false, urls: [] };
+  const value15 = String(applyInputQualityProfile.provider || '').trim(),
+    value16 = value15.toLowerCase().replace(/[\s_-]+/g, '');
+  if (value16 === 'freeimagehost') {
+    if (typeof value14.processInputImages !== 'function')
+      throw new Error((value11 || 'modelApi') + ' image input upload is not available');
+    const urls = await value14.processInputImages(value12, '', {
+      applyInputQualityProfile: applyInputQualityProfile.applyInputQualityProfile !== false,
       provider: 'freeImageHost',
-      strictUpload: _0x412058.strictUpload !== false,
+      strictUpload: applyInputQualityProfile.strictUpload !== false,
     });
-    return { handled: true, urls: _0x59b3a3 };
+    return { handled: true, urls: urls };
   }
-  if (_0xe6fdc6 === 'volcenginefiles') {
-    if (typeof _0xe19491.uploadInputsToVolcengineFiles !== 'function')
+  if (value16 === 'volcenginefiles') {
+    if (typeof value14.uploadInputsToVolcengineFiles !== 'function')
       throw new Error('Volcengine file upload is not available');
-    const _0x5d6966 = await _0xe19491.uploadInputsToVolcengineFiles(_0x462422, _0x49fcf6, {
-      baseUrl: _0xfd8f87.baseUrl,
+    const urls2 = await value14.uploadInputsToVolcengineFiles(value12, value13, {
+      baseUrl: baseUrl.baseUrl,
       kind: 'image',
-      model: _0xfd8f87.executionManifest?.model,
+      model: baseUrl.executionManifest?.model,
     });
-    return { handled: true, urls: _0x5d6966 };
+    return { handled: true, urls: urls2 };
   }
-  throw new Error('Unsupported image input upload provider: ' + _0x54397e);
+  throw new Error('Unsupported image input upload provider: ' + value15);
 }
-function getMediaInputUploadPolicy(_0x4ef7bd = {}, _0x177000) {
-  const _0x469bc1 = String(_0x177000 || '')
+function getMediaInputUploadPolicy(options4 = {}, value17) {
+  const value18 = String(value17 || '')
       .trim()
       .toLowerCase(),
-    _0x450f03 = _0x469bc1 === 'video' ? 'videoInputUpload' : _0x469bc1 === 'audio' ? 'audioInputUpload' : '',
-    _0x44e2ab = _0x450f03 ? _0x4ef7bd.executionManifest?.extensions?.[_0x450f03] : null;
-  return _0x44e2ab && typeof _0x44e2ab === 'object' && !Array.isArray(_0x44e2ab) ? _0x44e2ab : null;
+    value19 = value18 === 'video' ? 'videoInputUpload' : value18 === 'audio' ? 'audioInputUpload' : '',
+    value20 = value19 ? options4.executionManifest?.extensions?.[value19] : null;
+  return value20 && typeof value20 === 'object' && !Array.isArray(value20) ? value20 : null;
 }
-function shouldApplyMediaInputUploadPolicy(_0x401def, _0x24b6a9) {
-  if (!_0x401def) return false;
-  const _0x6fdaa7 = String(_0x24b6a9 || '')
+function shouldApplyMediaInputUploadPolicy(enabled4, value21) {
+  if (!enabled4) return false;
+  const value22 = String(value21 || '')
       .trim()
       .toLowerCase(),
-    _0x597303 = Array.isArray(_0x401def.inputKinds)
-      ? _0x401def.inputKinds.map((_0x541dd8) =>
-          String(_0x541dd8 || '')
+    list3 = Array.isArray(enabled4.inputKinds)
+      ? enabled4.inputKinds.map((item4) =>
+          String(item4 || '')
             .trim()
             .toLowerCase(),
         )
-      : [_0x6fdaa7];
-  return _0x597303.includes(_0x6fdaa7);
+      : [value22];
+  return list3.includes(value22);
 }
-function getUploadProviderConfig(_0x263ec6, _0x23bd81) {
-  return typeof _0x263ec6.getProviderConfig === 'function' ? _0x263ec6.getProviderConfig(_0x23bd81) : {};
+function getUploadProviderConfig(value23, value24) {
+  return typeof value23.getProviderConfig === 'function' ? value23.getProviderConfig(value24) : {};
 }
-async function resolveConfiguredMediaInputUpload(_0xd04dff, _0x840180, _0x5019f2, _0x52439c, _0x424639 = {}) {
-  const _0x4c013a = getMediaInputUploadPolicy(_0x424639, _0x840180);
-  if (!shouldApplyMediaInputUploadPolicy(_0x4c013a, _0x840180)) return { handled: false, urls: [] };
-  const _0x16a0b8 = String(_0x4c013a.provider || '').trim(),
-    _0x2e2fa8 = _0x16a0b8.toLowerCase().replace(/[\s_-]+/g, '');
-  if (_0x2e2fa8 !== 'apimart')
-    throw new Error('Unsupported ' + _0x840180 + ' input upload provider: ' + _0x16a0b8);
-  const _0x484e90 = getUploadProviderConfig(_0x52439c, 'apimart'),
-    _0x4edf70 = {
+async function resolveConfiguredMediaInputUpload(value25, value26, value27, value28, value29 = {}) {
+  const strictUpload = getMediaInputUploadPolicy(value29, value26);
+  if (!shouldApplyMediaInputUploadPolicy(strictUpload, value26)) return { handled: false, urls: [] };
+  const value30 = String(strictUpload.provider || '').trim(),
+    value31 = value30.toLowerCase().replace(/[\s_-]+/g, '');
+  if (value31 !== 'apimart') throw new Error('Unsupported ' + value26 + ' input upload provider: ' + value30);
+  const apiUrl = getUploadProviderConfig(value28, 'apimart'),
+    value32 = {
       provider: 'apimart',
-      strictUpload: _0x4c013a.strictUpload !== false,
-      apiUrl: _0x484e90.apiUrl,
-      permanent: _0x4c013a.permanent === true,
-      uploadTimeout: _0x4c013a.uploadTimeout,
+      strictUpload: strictUpload.strictUpload !== false,
+      apiUrl: apiUrl.apiUrl,
+      permanent: strictUpload.permanent === true,
+      uploadTimeout: strictUpload.uploadTimeout,
     };
-  if (_0x840180 === 'video') {
-    if (typeof _0x52439c.processInputVideos !== 'function')
-      throw new Error((_0xd04dff || 'modelApi') + ' video input upload is not available');
-    const _0xea83aa = await _0x52439c.processInputVideos(_0x5019f2, _0x484e90.apiKey || '', _0x4edf70);
-    return { handled: true, urls: _0xea83aa };
+  if (value26 === 'video') {
+    if (typeof value28.processInputVideos !== 'function')
+      throw new Error((value25 || 'modelApi') + ' video input upload is not available');
+    const urls3 = await value28.processInputVideos(value27, apiUrl.apiKey || '', value32);
+    return { handled: true, urls: urls3 };
   }
-  if (_0x840180 === 'audio') {
-    if (typeof _0x52439c.processInputAudios !== 'function')
-      throw new Error((_0xd04dff || 'modelApi') + ' audio input upload is not available');
-    const _0x456a3a = await _0x52439c.processInputAudios(_0x5019f2, _0x484e90.apiKey || '', _0x4edf70);
-    return { handled: true, urls: _0x456a3a };
+  if (value26 === 'audio') {
+    if (typeof value28.processInputAudios !== 'function')
+      throw new Error((value25 || 'modelApi') + ' audio input upload is not available');
+    const urls4 = await value28.processInputAudios(value27, apiUrl.apiKey || '', value32);
+    return { handled: true, urls: urls4 };
   }
-  throw new Error('Unsupported media input upload kind: ' + _0x840180);
+  throw new Error('Unsupported media input upload kind: ' + value26);
 }
-async function resolveInputImages(_0x170d44, _0x4f5e4e, _0x422fae, _0x634dad, _0x5c5728 = {}) {
-  const _0xe3b622 = getManifestMaxInputCount(_0x5c5728.modelManifest, 'image');
-  if (_0xe3b622 === 0) return [];
-  const _0x578aee = Array.isArray(_0x4f5e4e.inputUrls) ? _0x4f5e4e.inputUrls : [];
-  if (_0x578aee.length === 0) return [];
-  const _0x50ce2d = _0xe3b622 === null ? _0x578aee : _0x578aee.slice(0, _0xe3b622),
-    _0x1e9b41 = await resolveConfiguredImageInputUpload(
-      _0x170d44,
-      _0x50ce2d,
-      _0x422fae,
-      _0x634dad,
-      _0x5c5728,
+async function resolveInputImages(provider, value33, value34, value35, baseUrl2 = {}) {
+  const manifestMaxInputCount = getManifestMaxInputCount(baseUrl2.modelManifest, 'image');
+  if (manifestMaxInputCount === 0) return [];
+  const list4 = Array.isArray(value33.inputUrls) ? value33.inputUrls : [];
+  if (list4.length === 0) return [];
+  const value36 = manifestMaxInputCount === null ? list4 : list4.slice(0, manifestMaxInputCount),
+    configuredImageInputUpload = await resolveConfiguredImageInputUpload(
+      provider,
+      value36,
+      value34,
+      value35,
+      baseUrl2,
     );
-  if (_0x1e9b41.handled) return _0x1e9b41.urls;
-  if (_0x170d44 === 'ppio') {
-    const _0x11b5fb = _0x634dad.getProviderConfig('grsai'),
-      _0x26121e = _0x11b5fb.apiKey || _0x4f5e4e.apiKey,
-      _0x5a5a64 = await _0x634dad.processInputImages(_0x50ce2d, _0x26121e, {
+  if (configuredImageInputUpload.handled) return configuredImageInputUpload.urls;
+  if (provider === 'ppio') {
+    const value37 = value35.getProviderConfig('grsai'),
+      value38 = value37.apiKey || value33.apiKey,
+      list5 = await value35.processInputImages(value36, value38, {
         applyInputQualityProfile: true,
         provider: 'grsai',
       });
-    if (_0x5a5a64.length === 0) throw new Error('参考素材上传云端失败，无法继续生成');
-    return _0x5a5a64;
+    if (list5.length === 0) throw new Error('参考素材上传云端失败，无法继续生成');
+    return list5;
   }
-  if (_0x170d44 === 'volcengine') {
-    if (typeof _0x634dad.uploadInputsToVolcengineFiles !== 'function')
+  if (provider === 'volcengine') {
+    if (typeof value35.uploadInputsToVolcengineFiles !== 'function')
       throw new Error('Volcengine file upload is not available');
-    return _0x634dad.uploadInputsToVolcengineFiles(_0x50ce2d, _0x422fae, {
-      baseUrl: _0x5c5728.baseUrl,
+    return value35.uploadInputsToVolcengineFiles(value36, value34, {
+      baseUrl: baseUrl2.baseUrl,
       kind: 'image',
-      model: _0x5c5728.executionManifest?.model,
+      model: baseUrl2.executionManifest?.model,
     });
   }
-  if (_0x170d44 === 'agnes')
-    return _0x634dad.processInputImages(_0x50ce2d, '', {
+  if (provider === 'agnes')
+    return value35.processInputImages(value36, '', {
       applyInputQualityProfile: true,
       provider: 'freeImageHost',
       strictUpload: true,
     });
-  return _0x634dad.processInputImages(_0x50ce2d, _0x422fae, {
+  return value35.processInputImages(value36, value34, {
     applyInputQualityProfile: true,
-    provider: _0x170d44,
-    strictUpload: _0x170d44 === 'apimart' || _0x170d44 === 'runninghub',
+    provider: provider,
+    strictUpload: provider === 'apimart' || provider === 'runninghub',
   });
 }
-function normalizeInputUrlsBySlot(_0x282ac4) {
-  if (!_0x282ac4 || typeof _0x282ac4 !== 'object' || Array.isArray(_0x282ac4)) return {};
+function normalizeInputUrlsBySlot(enabled5) {
+  if (!enabled5 || typeof enabled5 !== 'object' || Array.isArray(enabled5)) return {};
   return Object.fromEntries(
-    Object.entries(_0x282ac4)
-      .map(([_0x5ba273, _0x19457f]) => [String(_0x5ba273 || '').trim(), String(_0x19457f || '').trim()])
-      .filter(([_0x3b6061, _0x2859a0]) => _0x3b6061 && _0x2859a0),
+    Object.entries(enabled5)
+      .map(([value39, value40]) => [String(value39 || '').trim(), String(value40 || '').trim()])
+      .filter(([value41, value42]) => value41 && value42),
   );
 }
-function getOrderedInputSlotEntries(_0x29697e = {}, _0x551066 = null) {
-  const _0x1c4e9e = normalizeInputUrlsBySlot(_0x29697e),
-    _0x582b5b = Array.isArray(_0x551066?.inputSlots?.fixedSlots) ? _0x551066.inputSlots.fixedSlots : [],
-    _0xc51409 = _0x582b5b
-      .filter((_0x4ed591) => String(_0x4ed591?.kind || '').trim() === 'image')
-      .map((_0x65f2ec) => String(_0x65f2ec?.id || '').trim())
+function getOrderedInputSlotEntries(options5 = {}, value43 = null) {
+  const inputUrlsBySlot = normalizeInputUrlsBySlot(options5),
+    list6 = Array.isArray(value43?.inputSlots?.fixedSlots) ? value43.inputSlots.fixedSlots : [],
+    list7 = list6
+      .filter((item5) => String(item5?.kind || '').trim() === 'image')
+      .map((item6) => String(item6?.id || '').trim())
       .filter(Boolean),
-    _0xecb243 = new Set(),
-    _0x3a57e2 = [];
+    map = new Set(),
+    list8 = [];
   return (
-    _0xc51409.forEach((_0x151e3c) => {
-      const _0x91f687 = _0x1c4e9e[_0x151e3c];
-      if (!_0x91f687 || _0xecb243.has(_0x151e3c)) return;
-      (_0x3a57e2.push({ slot: _0x151e3c, url: _0x91f687 }), _0xecb243.add(_0x151e3c));
+    list7.forEach((slot) => {
+      const url = inputUrlsBySlot[slot];
+      if (!url || map.has(slot)) return;
+      (list8.push({ slot: slot, url: url }), map.add(slot));
     }),
-    Object.entries(_0x1c4e9e).forEach(([_0x5958cc, _0x3ce239]) => {
-      if (_0xecb243.has(_0x5958cc)) return;
-      (_0x3a57e2.push({ slot: _0x5958cc, url: _0x3ce239 }), _0xecb243.add(_0x5958cc));
+    Object.entries(inputUrlsBySlot).forEach(([slot2, url2]) => {
+      if (map.has(slot2)) return;
+      (list8.push({ slot: slot2, url: url2 }), map.add(slot2));
     }),
-    _0x3a57e2
+    list8
   );
 }
-async function resolveInputImagesBySlot(_0x1d8820, _0x1b2ccb, _0x50471b, _0x3539a9, _0x38558c = {}) {
-  const _0x28978a = getOrderedInputSlotEntries(_0x1b2ccb?.inputUrlsBySlot, _0x38558c.modelManifest);
-  if (_0x28978a.length === 0) return {};
-  const _0x2d2d88 = getManifestMaxInputCount(_0x38558c.modelManifest, 'image'),
-    _0x3eb55e = _0x2d2d88 === null ? _0x28978a : _0x28978a.slice(0, Math.max(0, _0x2d2d88)),
-    _0x362c30 = await resolveInputImages(
-      _0x1d8820,
-      { ..._0x1b2ccb, inputUrls: _0x3eb55e.map((_0x25143b) => _0x25143b.url) },
-      _0x50471b,
-      _0x3539a9,
-      _0x38558c,
+async function resolveInputImagesBySlot(value44, args3, value45, value46, value47 = {}) {
+  const list9 = getOrderedInputSlotEntries(args3?.inputUrlsBySlot, value47.modelManifest);
+  if (list9.length === 0) return {};
+  const manifestMaxInputCount2 = getManifestMaxInputCount(value47.modelManifest, 'image'),
+    inputUrls = manifestMaxInputCount2 === null ? list9 : list9.slice(0, Math.max(0, manifestMaxInputCount2)),
+    inputImages = await resolveInputImages(
+      value44,
+      { ...args3, inputUrls: inputUrls.map((response) => response.url) },
+      value45,
+      value46,
+      value47,
     );
   return Object.fromEntries(
-    _0x3eb55e
-      .map((_0x3a2631, _0x4ebe25) => [_0x3a2631.slot, String(_0x362c30[_0x4ebe25] || '').trim()])
-      .filter(([, _0x5b5090]) => _0x5b5090),
+    inputUrls
+      .map((item7, value48) => [item7.slot, String(inputImages[value48] || '').trim()])
+      .filter(([, value49]) => value49),
   );
 }
-function normalizeInputList(_0x3d3e71) {
-  return Array.isArray(_0x3d3e71)
-    ? _0x3d3e71.map((_0x52d97a) => String(_0x52d97a || '').trim()).filter(Boolean)
-    : [];
+function normalizeInputList(list10) {
+  return Array.isArray(list10) ? list10.map((item8) => String(item8 || '').trim()).filter(Boolean) : [];
 }
-function collectVideoInputUrls(_0x126626) {
+function collectVideoInputUrls(value50) {
   return Array.from(
     new Set(
       [
-        String(_0x126626.videoUrl || '').trim(),
-        ...normalizeInputList(_0x126626.videos),
-        ...normalizeInputList(_0x126626.videoUrls),
+        String(value50.videoUrl || '').trim(),
+        ...normalizeInputList(value50.videos),
+        ...normalizeInputList(value50.videoUrls),
       ].filter(Boolean),
     ),
   );
 }
-function collectAudioInputUrls(_0x364622) {
+function collectAudioInputUrls(value51) {
   return Array.from(
     new Set(
       [
-        String(_0x364622.audioUrl || '').trim(),
-        ...normalizeInputList(_0x364622.audios),
-        ...normalizeInputList(_0x364622.audioUrls),
+        String(value51.audioUrl || '').trim(),
+        ...normalizeInputList(value51.audios),
+        ...normalizeInputList(value51.audioUrls),
       ].filter(Boolean),
     ),
   );
 }
-function collectVideoImageInputUrls(_0x5ad3ac) {
-  const _0x4c4c36 = Array.isArray(_0x5ad3ac.images)
-    ? _0x5ad3ac.images
-    : Array.isArray(_0x5ad3ac.inputUrls)
-      ? _0x5ad3ac.inputUrls
+function collectVideoImageInputUrls(value52) {
+  const list11 = Array.isArray(value52.images)
+    ? value52.images
+    : Array.isArray(value52.inputUrls)
+      ? value52.inputUrls
       : [];
-  return Array.from(new Set(_0x4c4c36.map((_0x28a9b4) => String(_0x28a9b4 || '').trim()).filter(Boolean)));
+  return Array.from(new Set(list11.map((item9) => String(item9 || '').trim()).filter(Boolean)));
 }
-function omitSlotImageUrlsFromVideoInputs(_0xc39e0 = {}) {
-  const _0x13bd78 = new Set(
-    Object.values(normalizeInputUrlsBySlot(_0xc39e0.inputUrlsBySlot))
-      .map((_0x21bf22) => String(_0x21bf22 || '').trim())
+function omitSlotImageUrlsFromVideoInputs(args4 = {}) {
+  const map2 = new Set(
+    Object.values(normalizeInputUrlsBySlot(args4.inputUrlsBySlot))
+      .map((item10) => String(item10 || '').trim())
       .filter(Boolean),
   );
-  if (_0x13bd78.size === 0) return _0xc39e0;
-  const _0x1fd76 = (_0x153b4d) =>
-    Array.isArray(_0x153b4d)
-      ? _0x153b4d.filter((_0x123523) => !_0x13bd78.has(String(_0x123523 || '').trim()))
-      : _0x153b4d;
-  return { ..._0xc39e0, images: _0x1fd76(_0xc39e0.images), inputUrls: _0x1fd76(_0xc39e0.inputUrls) };
+  if (map2.size === 0) return args4;
+  const images = (list12) =>
+    Array.isArray(list12) ? list12.filter((item11) => !map2.has(String(item11 || '').trim())) : list12;
+  return { ...args4, images: images(args4.images), inputUrls: images(args4.inputUrls) };
 }
 const VIDEO_MODEL_API_PROVIDERS = new Set(['agnes', 'apimart', 'runninghub', 'volcengine']);
-function getProviderUploadLabel(_0x54d045) {
-  const _0x55ebff = String(_0x54d045 || '')
+function getProviderUploadLabel(value53) {
+  const value54 = String(value53 || '')
     .trim()
     .toLowerCase();
-  if (_0x55ebff === 'agnes') return 'Agnes AI';
-  if (_0x55ebff === 'runninghub') return 'RunningHub';
-  if (_0x55ebff === 'apimart') return 'APIMART';
-  if (_0x55ebff === 'volcengine') return 'Volcengine';
-  return _0x55ebff || 'Model API';
+  if (value54 === 'agnes') return 'Agnes AI';
+  if (value54 === 'runninghub') return 'RunningHub';
+  if (value54 === 'apimart') return 'APIMART';
+  if (value54 === 'volcengine') return 'Volcengine';
+  return value54 || 'Model API';
 }
-function isVolcengineContentGenerationMediaUrl(_0xbc2e90) {
-  return /^(?:https?:|data:|asset:\/\/)/i.test(String(_0xbc2e90 || '').trim());
+function isVolcengineContentGenerationMediaUrl(value55) {
+  return /^(?:https?:|data:|asset:\/\/)/i.test(String(value55 || '').trim());
 }
-function getVolcengineContentGenerationMediaLabel(_0x3490cb) {
-  if (_0x3490cb === 'image') return '图片';
-  if (_0x3490cb === 'video') return '视频';
-  if (_0x3490cb === 'audio') return '音频';
+function getVolcengineContentGenerationMediaLabel(value56) {
+  if (value56 === 'image') return '图片';
+  if (value56 === 'video') return '视频';
+  if (value56 === 'audio') return '音频';
   return '素材';
 }
-function normalizeVolcengineContentGenerationMediaUrls(_0x553af0, _0x50a073) {
-  const _0xad3524 = getVolcengineContentGenerationMediaLabel(_0x50a073);
-  return normalizeInputList(_0x553af0).map((_0x5a0884) => {
-    if (isVolcengineContentGenerationMediaUrl(_0x5a0884)) return _0x5a0884;
+function normalizeVolcengineContentGenerationMediaUrls(value57, value58) {
+  const volcengineContentGenerationMediaLabel = getVolcengineContentGenerationMediaLabel(value58);
+  return normalizeInputList(value57).map((item12) => {
+    if (isVolcengineContentGenerationMediaUrl(item12)) return item12;
     throw new Error(
       '火山方舟 Seedance 2.0 ' +
-        _0xad3524 +
+        volcengineContentGenerationMediaLabel +
         '入参需要公网 URL、Base64 data URI 或 asset:// 素材 ID；当前本地文件不能通过 Files API 作为 content.' +
-        _0x50a073 +
+        value58 +
         '_url.url 使用',
     );
   });
 }
-async function resolveVideoInputImages(_0x194414, _0x14a628, _0x134362, _0x22abdd = {}) {
-  const _0x41419b = String(_0x22abdd.provider || 'apimart')
+async function resolveVideoInputImages(value59, value60, value61, value62 = {}) {
+  const provider2 = String(value62.provider || 'apimart')
       .trim()
       .toLowerCase(),
-    _0x3c77e3 = getProviderUploadLabel(_0x41419b),
-    _0xffb562 = getManifestMaxInputCount(_0x22abdd.modelManifest, 'image');
-  if (_0xffb562 === 0) return [];
-  const _0x1fa78f = collectVideoImageInputUrls(_0x194414);
-  if (_0x1fa78f.length === 0) return [];
-  const _0x485196 = _0xffb562 === null ? _0x1fa78f : _0x1fa78f.slice(0, Math.max(0, _0xffb562)),
-    _0x3ebb60 = await resolveConfiguredImageInputUpload(
-      _0x41419b,
-      _0x485196,
-      _0x14a628,
-      _0x134362,
-      _0x22abdd,
+    providerUploadLabel = getProviderUploadLabel(provider2),
+    manifestMaxInputCount3 = getManifestMaxInputCount(value62.modelManifest, 'image');
+  if (manifestMaxInputCount3 === 0) return [];
+  const list13 = collectVideoImageInputUrls(value59);
+  if (list13.length === 0) return [];
+  const value63 =
+      manifestMaxInputCount3 === null ? list13 : list13.slice(0, Math.max(0, manifestMaxInputCount3)),
+    configuredImageInputUpload2 = await resolveConfiguredImageInputUpload(
+      provider2,
+      value63,
+      value60,
+      value61,
+      value62,
     );
-  if (_0x3ebb60.handled)
-    return Array.isArray(_0x3ebb60.urls)
-      ? _0x3ebb60.urls.map((_0x5e059b) => String(_0x5e059b || '').trim()).filter(Boolean)
+  if (configuredImageInputUpload2.handled)
+    return Array.isArray(configuredImageInputUpload2.urls)
+      ? configuredImageInputUpload2.urls.map((item13) => String(item13 || '').trim()).filter(Boolean)
       : [];
-  if (_0x41419b === 'volcengine') return normalizeVolcengineContentGenerationMediaUrls(_0x485196, 'image');
-  if (typeof _0x134362.processInputImages !== 'function')
-    throw new Error(_0x3c77e3 + ' image input upload is not available');
-  if (_0x41419b === 'agnes') {
-    const _0x5b6f4f = await _0x134362.processInputImages(_0x485196, '', {
+  if (provider2 === 'volcengine') return normalizeVolcengineContentGenerationMediaUrls(value63, 'image');
+  if (typeof value61.processInputImages !== 'function')
+    throw new Error(providerUploadLabel + ' image input upload is not available');
+  if (provider2 === 'agnes') {
+    const list14 = await value61.processInputImages(value63, '', {
       applyInputQualityProfile: true,
       provider: 'freeImageHost',
       strictUpload: true,
     });
-    return Array.isArray(_0x5b6f4f)
-      ? _0x5b6f4f.map((_0x1a9e6c) => String(_0x1a9e6c || '').trim()).filter(Boolean)
-      : [];
+    return Array.isArray(list14) ? list14.map((item14) => String(item14 || '').trim()).filter(Boolean) : [];
   }
-  const _0x2e4303 = await _0x134362.processInputImages(_0x485196, _0x14a628, {
+  const list15 = await value61.processInputImages(value63, value60, {
     applyInputQualityProfile: true,
-    provider: _0x41419b,
+    provider: provider2,
     strictUpload: true,
   });
-  return Array.isArray(_0x2e4303)
-    ? _0x2e4303.map((_0x938bf5) => String(_0x938bf5 || '').trim()).filter(Boolean)
-    : [];
+  return Array.isArray(list15) ? list15.map((item15) => String(item15 || '').trim()).filter(Boolean) : [];
 }
-async function resolveInputVideos(_0x393c8e, _0x210fe4, _0x300e22, _0x20e42d = {}) {
-  const _0x3ef962 = String(_0x20e42d.provider || 'apimart')
+async function resolveInputVideos(value64, value65, value66, value67 = {}) {
+  const provider3 = String(value67.provider || 'apimart')
       .trim()
       .toLowerCase(),
-    _0x3f50fa = getProviderUploadLabel(_0x3ef962),
-    _0x46449f = getManifestMaxInputCount(_0x20e42d.modelManifest, 'video');
-  if (_0x46449f === 0) return [];
-  const _0x143c83 = collectVideoInputUrls(_0x393c8e);
-  if (_0x143c83.length === 0) return [];
-  const _0x5e36b1 = _0x46449f === null ? _0x143c83 : _0x143c83.slice(0, _0x46449f),
-    _0x55c027 = await resolveConfiguredMediaInputUpload(_0x3ef962, 'video', _0x5e36b1, _0x300e22, _0x20e42d);
-  if (_0x55c027.handled)
-    return Array.isArray(_0x55c027.urls)
-      ? _0x55c027.urls.map((_0x16c47c) => String(_0x16c47c || '').trim()).filter(Boolean)
+    providerUploadLabel2 = getProviderUploadLabel(provider3),
+    manifestMaxInputCount4 = getManifestMaxInputCount(value67.modelManifest, 'video');
+  if (manifestMaxInputCount4 === 0) return [];
+  const list16 = collectVideoInputUrls(value64);
+  if (list16.length === 0) return [];
+  const value68 = manifestMaxInputCount4 === null ? list16 : list16.slice(0, manifestMaxInputCount4),
+    configuredMediaInputUpload = await resolveConfiguredMediaInputUpload(
+      provider3,
+      'video',
+      value68,
+      value66,
+      value67,
+    );
+  if (configuredMediaInputUpload.handled)
+    return Array.isArray(configuredMediaInputUpload.urls)
+      ? configuredMediaInputUpload.urls.map((item16) => String(item16 || '').trim()).filter(Boolean)
       : [];
-  if (_0x3ef962 === 'volcengine') return normalizeVolcengineContentGenerationMediaUrls(_0x5e36b1, 'video');
-  if (typeof _0x300e22.processInputVideos !== 'function')
-    throw new Error(_0x3f50fa + ' video input upload is not available');
-  const _0x44c2a8 = await _0x300e22.processInputVideos(_0x5e36b1, _0x210fe4, {
-    provider: _0x3ef962,
+  if (provider3 === 'volcengine') return normalizeVolcengineContentGenerationMediaUrls(value68, 'video');
+  if (typeof value66.processInputVideos !== 'function')
+    throw new Error(providerUploadLabel2 + ' video input upload is not available');
+  const list17 = await value66.processInputVideos(value68, value65, {
+    provider: provider3,
     strictUpload: true,
   });
-  if (!Array.isArray(_0x44c2a8) || _0x44c2a8.length === 0)
-    throw new Error(_0x3f50fa + ' video upload failed');
-  return _0x44c2a8.map((_0x2c02ba) => String(_0x2c02ba || '').trim()).filter(Boolean);
+  if (!Array.isArray(list17) || list17.length === 0)
+    throw new Error(providerUploadLabel2 + ' video upload failed');
+  return list17.map((item17) => String(item17 || '').trim()).filter(Boolean);
 }
-async function resolveInputAudios(_0x48245f, _0x12019f, _0x39bedb, _0x4d848a = {}) {
-  const _0x335051 = String(_0x4d848a.provider || 'apimart')
+async function resolveInputAudios(value69, value70, value71, value72 = {}) {
+  const provider4 = String(value72.provider || 'apimart')
       .trim()
       .toLowerCase(),
-    _0x2fbf38 = getProviderUploadLabel(_0x335051),
-    _0x30eabc = getManifestMaxInputCount(_0x4d848a.modelManifest, 'audio');
-  if (_0x30eabc === 0) return [];
-  const _0x3b1d0d = collectAudioInputUrls(_0x48245f);
-  if (_0x3b1d0d.length === 0) return [];
-  const _0x4db3d2 = _0x30eabc === null ? _0x3b1d0d : _0x3b1d0d.slice(0, _0x30eabc),
-    _0x4d61ba = await resolveConfiguredMediaInputUpload(_0x335051, 'audio', _0x4db3d2, _0x39bedb, _0x4d848a);
-  if (_0x4d61ba.handled)
-    return Array.isArray(_0x4d61ba.urls)
-      ? _0x4d61ba.urls.map((_0x58a2ca) => String(_0x58a2ca || '').trim()).filter(Boolean)
+    providerUploadLabel3 = getProviderUploadLabel(provider4),
+    manifestMaxInputCount5 = getManifestMaxInputCount(value72.modelManifest, 'audio');
+  if (manifestMaxInputCount5 === 0) return [];
+  const list18 = collectAudioInputUrls(value69);
+  if (list18.length === 0) return [];
+  const value73 = manifestMaxInputCount5 === null ? list18 : list18.slice(0, manifestMaxInputCount5),
+    configuredMediaInputUpload2 = await resolveConfiguredMediaInputUpload(
+      provider4,
+      'audio',
+      value73,
+      value71,
+      value72,
+    );
+  if (configuredMediaInputUpload2.handled)
+    return Array.isArray(configuredMediaInputUpload2.urls)
+      ? configuredMediaInputUpload2.urls.map((item18) => String(item18 || '').trim()).filter(Boolean)
       : [];
-  if (_0x335051 === 'volcengine') return normalizeVolcengineContentGenerationMediaUrls(_0x4db3d2, 'audio');
-  if (typeof _0x39bedb.processInputAudios !== 'function')
-    throw new Error(_0x2fbf38 + ' audio input upload is not available');
-  const _0x330882 = await _0x39bedb.processInputAudios(_0x4db3d2, _0x12019f, {
-    provider: _0x335051,
+  if (provider4 === 'volcengine') return normalizeVolcengineContentGenerationMediaUrls(value73, 'audio');
+  if (typeof value71.processInputAudios !== 'function')
+    throw new Error(providerUploadLabel3 + ' audio input upload is not available');
+  const list19 = await value71.processInputAudios(value73, value70, {
+    provider: provider4,
     strictUpload: true,
   });
-  if (!Array.isArray(_0x330882) || _0x330882.length === 0)
-    throw new Error(_0x2fbf38 + ' audio upload failed');
-  return _0x330882.map((_0x29b9d1) => String(_0x29b9d1 || '').trim()).filter(Boolean);
+  if (!Array.isArray(list19) || list19.length === 0)
+    throw new Error(providerUploadLabel3 + ' audio upload failed');
+  return list19.map((item19) => String(item19 || '').trim()).filter(Boolean);
 }
-function resolveProviderRatioSize(_0x16fb17, { context: _0xded9a1 }) {
-  const _0x42ac75 = _0xded9a1.payload || {};
-  if (_0x42ac75.suppressAspectRatio) return undefined;
-  const _0xffc67c = String(_0x16fb17 || _0x42ac75.resolvedRatioLabel || _0x42ac75.aspectRatio || '')
+function resolveProviderRatioSize(ratioLabel, { context: context }) {
+  const model = context.payload || {};
+  if (model.suppressAspectRatio) return undefined;
+  const value74 = String(ratioLabel || model.resolvedRatioLabel || model.aspectRatio || '')
       .trim()
       .toLowerCase(),
-    _0x7f0c45 =
-      _0xffc67c === 'auto' || _0xffc67c === 'adaptive' || _0xffc67c === 'default' || _0xffc67c === '自适应',
-    _0x1cb7fd = getApimartSeedreamPolicy(_0xded9a1);
-  if (_0x1cb7fd.preserveAdaptiveInputRatio === true && _0x7f0c45 && hasSeedreamInputImages(_0xded9a1))
+    value75 = value74 === 'auto' || value74 === 'adaptive' || value74 === 'default' || value74 === '自适应',
+    apimartSeedreamPolicy = getApimartSeedreamPolicy(context);
+  if (apimartSeedreamPolicy.preserveAdaptiveInputRatio === true && value75 && hasSeedreamInputImages(context))
     return 'auto';
-  const _0x15ecf2 = _0xded9a1.body?.resolution || _0x42ac75.imageSize || '2K',
-    _0x2a9f0e = resolveProviderRatioPayload({
-      provider: _0xded9a1.provider,
-      model: _0x42ac75.model,
-      ratioLabel: _0x16fb17 || _0x42ac75.resolvedRatioLabel || _0x42ac75.aspectRatio,
-      imageSize: _0x15ecf2,
-      suppressAspectRatio: _0x42ac75.suppressAspectRatio,
+  const imageSize = context.body?.resolution || model.imageSize || '2K',
+    providerRatioPayload = resolveProviderRatioPayload({
+      provider: context.provider,
+      model: model.model,
+      ratioLabel: ratioLabel || model.resolvedRatioLabel || model.aspectRatio,
+      imageSize: imageSize,
+      suppressAspectRatio: model.suppressAspectRatio,
     });
-  return _0x2a9f0e?.params?.size || undefined;
+  return providerRatioPayload?.params?.size || undefined;
 }
-function firstArrayItem(_0x2372ad) {
-  if (Array.isArray(_0x2372ad)) return _0x2372ad[0] || undefined;
-  return _0x2372ad || undefined;
+function firstArrayItem(value76) {
+  if (Array.isArray(value76)) return value76[0] || undefined;
+  return value76 || undefined;
 }
-function secondArrayItem(_0x251fb5) {
-  if (Array.isArray(_0x251fb5)) return _0x251fb5[1] || undefined;
+function secondArrayItem(value77) {
+  if (Array.isArray(value77)) return value77[1] || undefined;
   return undefined;
 }
-function normalizeBooleanParam(_0xbe768b) {
-  if (_0xbe768b === true || _0xbe768b === false) return _0xbe768b;
-  const _0x2749b4 = String(_0xbe768b ?? '')
+function normalizeBooleanParam(value78) {
+  if (value78 === true || value78 === false) return value78;
+  const value79 = String(value78 ?? '')
     .trim()
     .toLowerCase();
-  if (['true', '1', 'yes', 'on'].includes(_0x2749b4)) return true;
-  if (['false', '0', 'no', 'off', ''].includes(_0x2749b4)) return false;
-  return Boolean(_0xbe768b);
+  if (['true', '1', 'yes', 'on'].includes(value79)) return true;
+  if (['false', '0', 'no', 'off', ''].includes(value79)) return false;
+  return Boolean(value78);
 }
-function normalizeApimartImageCount(_0x1a2dfd) {
-  const _0x34da40 = Number.parseInt(String(_0x1a2dfd ?? '').trim(), 10);
-  if (!Number.isFinite(_0x34da40)) return 1;
-  return Math.max(1, Math.min(4, _0x34da40));
+function normalizeApimartImageCount(value80) {
+  const value81 = Number.parseInt(String(value80 ?? '').trim(), 10);
+  if (!Number.isFinite(value81)) return 1;
+  return Math.max(1, Math.min(4, value81));
 }
-function normalizeApimartQwenImageCount(_0x54f5ba) {
-  const _0xea0e7a = Number.parseInt(String(_0x54f5ba ?? '').trim(), 10);
-  if (!Number.isFinite(_0xea0e7a)) return 1;
-  return Math.max(1, Math.min(6, _0xea0e7a));
+function normalizeApimartQwenImageCount(value82) {
+  const value83 = Number.parseInt(String(value82 ?? '').trim(), 10);
+  if (!Number.isFinite(value83)) return 1;
+  return Math.max(1, Math.min(6, value83));
 }
-function normalizeApimartQwenImageResolution(_0x18e579) {
-  const _0x495a10 = String(_0x18e579 || '1K')
+function normalizeApimartQwenImageResolution(value84) {
+  const value85 = String(value84 || '1K')
     .trim()
     .toUpperCase();
-  return _0x495a10 === '2K' ? '2K' : '1K';
+  return value85 === '2K' ? '2K' : '1K';
 }
-function getApimartSeedreamPolicy(_0x11dfac = {}) {
-  const _0x1b7aad = _0x11dfac.executionManifest?.extensions?.apimartSeedream;
-  return _0x1b7aad && typeof _0x1b7aad === 'object' && !Array.isArray(_0x1b7aad) ? _0x1b7aad : {};
+function getApimartSeedreamPolicy(options6 = {}) {
+  const value86 = options6.executionManifest?.extensions?.apimartSeedream;
+  return value86 && typeof value86 === 'object' && !Array.isArray(value86) ? value86 : {};
 }
-function getVolcengineSeedreamPolicy(_0x3f9bf2 = {}) {
-  const _0x4fe608 = _0x3f9bf2.executionManifest?.extensions?.volcengineSeedream;
-  return _0x4fe608 && typeof _0x4fe608 === 'object' && !Array.isArray(_0x4fe608) ? _0x4fe608 : {};
+function getVolcengineSeedreamPolicy(options7 = {}) {
+  const value87 = options7.executionManifest?.extensions?.volcengineSeedream;
+  return value87 && typeof value87 === 'object' && !Array.isArray(value87) ? value87 : {};
 }
-function normalizeResolutionList(_0x53ff17) {
-  return Array.isArray(_0x53ff17)
-    ? _0x53ff17
-        .map((_0x477339) =>
-          String(_0x477339 || '')
+function normalizeResolutionList(list20) {
+  return Array.isArray(list20)
+    ? list20
+        .map((item20) =>
+          String(item20 || '')
             .trim()
             .toUpperCase(),
         )
         .filter(Boolean)
     : [];
 }
-function normalizeApimartSeedreamResolution(_0x5e5128, { context: _0x9e3497 } = {}) {
-  const _0x441f6d = getApimartSeedreamPolicy(_0x9e3497),
-    _0x14a7d2 = String(_0x5e5128 || '2K')
+function normalizeApimartSeedreamResolution(value88, { context: context2 } = {}) {
+  const apimartSeedreamPolicy2 = getApimartSeedreamPolicy(context2),
+    value89 = String(value88 || '2K')
       .trim()
       .toUpperCase(),
-    _0x574bcd = normalizeResolutionList(_0x441f6d.allowedResolutions);
-  return _0x574bcd.includes(_0x14a7d2) ? _0x14a7d2 : '2K';
+    list21 = normalizeResolutionList(apimartSeedreamPolicy2.allowedResolutions);
+  return list21.includes(value89) ? value89 : '2K';
 }
-function normalizeVolcengineSeedreamResolution(_0x51fb32, { context: _0x8d5b6e } = {}) {
-  const _0x524afc = getVolcengineSeedreamPolicy(_0x8d5b6e),
-    _0x4e827a = String(_0x524afc.defaultResolution || '2K')
+function normalizeVolcengineSeedreamResolution(value90, { context: context3 } = {}) {
+  const volcengineSeedreamPolicy = getVolcengineSeedreamPolicy(context3),
+    value91 = String(volcengineSeedreamPolicy.defaultResolution || '2K')
       .trim()
       .toUpperCase(),
-    _0x16ab87 = String(_0x51fb32 || _0x4e827a)
+    value92 = String(value90 || value91)
       .trim()
       .toUpperCase(),
-    _0x253c50 = normalizeResolutionList(_0x524afc.allowedResolutions);
-  return _0x253c50.includes(_0x16ab87) ? _0x16ab87 : _0x4e827a;
+    list22 = normalizeResolutionList(volcengineSeedreamPolicy.allowedResolutions);
+  return list22.includes(value92) ? value92 : value91;
 }
-function hasSeedreamInputImages(_0x18499e = {}) {
-  if (Array.isArray(_0x18499e.inputImages) && _0x18499e.inputImages.length > 0) return true;
-  const _0x3049ce = _0x18499e.payload || {},
-    _0x4a3429 = [
-      _0x3049ce.inputUrls,
-      _0x3049ce.image_urls,
-      _0x3049ce.imageUrls,
-      _0x3049ce.image,
-      _0x3049ce.images,
-    ];
-  return _0x4a3429.some((_0x3a1508) =>
-    Array.isArray(_0x3a1508)
-      ? _0x3a1508.some((_0x234b2a) => String(_0x234b2a || '').trim())
-      : String(_0x3a1508 || '').trim(),
+function hasSeedreamInputImages(options8 = {}) {
+  if (Array.isArray(options8.inputImages) && options8.inputImages.length > 0) return true;
+  const value93 = options8.payload || {},
+    list23 = [value93.inputUrls, value93.image_urls, value93.imageUrls, value93.image, value93.images];
+  return list23.some((list24) =>
+    Array.isArray(list24)
+      ? list24.some((item21) => String(item21 || '').trim())
+      : String(list24 || '').trim(),
   );
 }
-function hasManifestInputImages(_0x1d5756 = {}) {
-  if (Array.isArray(_0x1d5756.inputImages) && _0x1d5756.inputImages.length > 0) return true;
-  const _0x27de03 = _0x1d5756.payload || {},
-    _0x56f97a = [
-      _0x27de03.inputUrls,
-      _0x27de03.image_urls,
-      _0x27de03.imageUrls,
-      _0x27de03.image,
-      _0x27de03.images,
-    ];
+function hasManifestInputImages(options9 = {}) {
+  if (Array.isArray(options9.inputImages) && options9.inputImages.length > 0) return true;
+  const value94 = options9.payload || {},
+    list25 = [value94.inputUrls, value94.image_urls, value94.imageUrls, value94.image, value94.images];
   return (
-    _0x56f97a.some((_0x2c8331) =>
-      Array.isArray(_0x2c8331)
-        ? _0x2c8331.some((_0x2eb668) => String(_0x2eb668 || '').trim())
-        : String(_0x2c8331 || '').trim(),
-    ) || Object.values(normalizeInputUrlsBySlot(_0x27de03.inputUrlsBySlot)).some(Boolean)
+    list25.some((list26) =>
+      Array.isArray(list26)
+        ? list26.some((item22) => String(item22 || '').trim())
+        : String(list26 || '').trim(),
+    ) || Object.values(normalizeInputUrlsBySlot(value94.inputUrlsBySlot)).some(Boolean)
   );
 }
-function normalizeApimartSeedreamImageCount(_0x4ed19e, { context: _0x22c9c8 } = {}) {
-  const _0x249fd5 = getApimartSeedreamPolicy(_0x22c9c8),
-    _0x56e0b2 = Number.parseInt(String(_0x4ed19e ?? '').trim(), 10),
-    _0x45a601 = Number.isFinite(_0x56e0b2) ? _0x56e0b2 : 1,
-    _0x18f946 = Number.parseInt(String(_0x249fd5.maxBatchSize ?? 1).trim(), 10),
-    _0x4c55ea = Number.isFinite(_0x18f946) && _0x18f946 >= 1 ? _0x18f946 : 1,
-    _0xd225aa = Math.max(1, Math.min(_0x4c55ea, _0x45a601));
-  if (!hasSeedreamInputImages(_0x22c9c8)) {
-    const _0x49deaf = Number.parseInt(String(_0x249fd5.textToImageBatchSize ?? '').trim(), 10);
-    if (Number.isFinite(_0x49deaf) && _0x49deaf >= 1) return Math.min(_0xd225aa, _0x49deaf);
+function normalizeApimartSeedreamImageCount(value95, { context: context4 } = {}) {
+  const apimartSeedreamPolicy3 = getApimartSeedreamPolicy(context4),
+    value96 = Number.parseInt(String(value95 ?? '').trim(), 10),
+    value97 = Number.isFinite(value96) ? value96 : 1,
+    count = Number.parseInt(String(apimartSeedreamPolicy3.maxBatchSize ?? 1).trim(), 10),
+    value98 = Number.isFinite(count) && count >= 1 ? count : 1,
+    value99 = Math.max(1, Math.min(value98, value97));
+  if (!hasSeedreamInputImages(context4)) {
+    const count2 = Number.parseInt(String(apimartSeedreamPolicy3.textToImageBatchSize ?? '').trim(), 10);
+    if (Number.isFinite(count2) && count2 >= 1) return Math.min(value99, count2);
   }
-  return _0xd225aa;
+  return value99;
 }
-function normalizeVolcengineSeedreamCountValue(_0x3845a3, _0x360859 = {}) {
-  const _0x22b9c9 = getVolcengineSeedreamPolicy(_0x360859),
-    _0x28337d = Number.parseInt(String(_0x3845a3 ?? '').trim(), 10),
-    _0xc03ad2 = Number.isFinite(_0x28337d) ? _0x28337d : 1,
-    _0x43cee6 = Number.parseInt(String(_0x22b9c9.maxBatchSize ?? 1).trim(), 10),
-    _0x50f29c = Number.isFinite(_0x43cee6) && _0x43cee6 >= 1 ? _0x43cee6 : 1;
-  return Math.max(1, Math.min(_0x50f29c, _0xc03ad2));
+function normalizeVolcengineSeedreamCountValue(value100, value101 = {}) {
+  const volcengineSeedreamPolicy2 = getVolcengineSeedreamPolicy(value101),
+    value102 = Number.parseInt(String(value100 ?? '').trim(), 10),
+    value103 = Number.isFinite(value102) ? value102 : 1,
+    count3 = Number.parseInt(String(volcengineSeedreamPolicy2.maxBatchSize ?? 1).trim(), 10),
+    value104 = Number.isFinite(count3) && count3 >= 1 ? count3 : 1;
+  return Math.max(1, Math.min(value104, value103));
 }
-function normalizeVolcengineSeedreamImageCount(_0x135268, { context: _0xb5752e } = {}) {
-  const _0x1e39f6 = normalizeVolcengineSeedreamCountValue(_0x135268, _0xb5752e);
-  return _0x1e39f6 > 1 ? _0x1e39f6 : undefined;
+function normalizeVolcengineSeedreamImageCount(value105, { context: context5 } = {}) {
+  const volcengineSeedreamCountValue = normalizeVolcengineSeedreamCountValue(value105, context5);
+  return volcengineSeedreamCountValue > 1 ? volcengineSeedreamCountValue : undefined;
 }
-function resolveVolcengineSeedreamSequentialMode(_0x387edc, { context: _0x539c36 } = {}) {
-  const _0xd57890 = normalizeVolcengineSeedreamCountValue(_0x387edc, _0x539c36);
-  return _0xd57890 > 1 ? 'auto' : 'disabled';
+function resolveVolcengineSeedreamSequentialMode(value106, { context: context6 } = {}) {
+  const volcengineSeedreamCountValue2 = normalizeVolcengineSeedreamCountValue(value106, context6);
+  return volcengineSeedreamCountValue2 > 1 ? 'auto' : 'disabled';
 }
-function resolveVolcengineSeedreamSize(_0x29ef88, { context: _0x1ed71f } = {}) {
-  const _0x17b417 = _0x1ed71f?.payload || {},
-    _0x57e57b = getVolcengineSeedreamPolicy(_0x1ed71f),
-    _0x4e61d7 = normalizeVolcengineSeedreamResolution(_0x17b417.imageSize, { context: _0x1ed71f });
-  if (_0x17b417.suppressAspectRatio) return _0x4e61d7;
-  const _0x4e9e42 = String(_0x29ef88 || _0x17b417.resolvedRatioLabel || _0x17b417.aspectRatio || '').trim(),
-    _0x773c7d = _0x4e9e42.toLowerCase(),
-    _0x3588ac = !_0x4e9e42 || _0x773c7d === 'auto' || _0x773c7d === 'adaptive' || _0x773c7d === '自适应';
+function resolveVolcengineSeedreamSize(value107, { context: context7 } = {}) {
+  const model2 = context7?.payload || {},
+    volcengineSeedreamPolicy3 = getVolcengineSeedreamPolicy(context7),
+    imageSize2 = normalizeVolcengineSeedreamResolution(model2.imageSize, { context: context7 });
+  if (model2.suppressAspectRatio) return imageSize2;
+  const ratioLabel2 = String(value107 || model2.resolvedRatioLabel || model2.aspectRatio || '').trim(),
+    value108 = ratioLabel2.toLowerCase(),
+    value109 = !ratioLabel2 || value108 === 'auto' || value108 === 'adaptive' || value108 === '自适应';
   if (
-    _0x57e57b.preserveAdaptiveInputRatio === true &&
-    _0x57e57b.supportsAdaptiveSize === true &&
-    _0x3588ac &&
-    hasSeedreamInputImages(_0x1ed71f)
+    volcengineSeedreamPolicy3.preserveAdaptiveInputRatio === true &&
+    volcengineSeedreamPolicy3.supportsAdaptiveSize === true &&
+    value109 &&
+    hasSeedreamInputImages(context7)
   )
     return 'adaptive';
-  const _0x488a12 = resolveProviderRatioPayload({
-      provider: _0x1ed71f.provider,
-      model: _0x17b417.model,
-      ratioLabel: _0x4e9e42 || _0x17b417.resolvedRatioLabel || _0x17b417.aspectRatio || '1:1',
-      imageSize: _0x4e61d7,
+  const providerRatioPayload2 = resolveProviderRatioPayload({
+      provider: context7.provider,
+      model: model2.model,
+      ratioLabel: ratioLabel2 || model2.resolvedRatioLabel || model2.aspectRatio || '1:1',
+      imageSize: imageSize2,
       suppressAspectRatio: false,
     }),
-    _0x279265 = _0x488a12?.resolvedRatioLabel || '1:1',
-    _0x1530ae =
-      _0x57e57b.dimensionMapByResolution && typeof _0x57e57b.dimensionMapByResolution === 'object'
-        ? _0x57e57b.dimensionMapByResolution[_0x4e61d7]
+    value110 = providerRatioPayload2?.resolvedRatioLabel || '1:1',
+    value111 =
+      volcengineSeedreamPolicy3.dimensionMapByResolution &&
+      typeof volcengineSeedreamPolicy3.dimensionMapByResolution === 'object'
+        ? volcengineSeedreamPolicy3.dimensionMapByResolution[imageSize2]
         : null;
-  if (_0x1530ae?.[_0x279265]) return _0x1530ae[_0x279265];
-  const _0x175279 = Number(_0x488a12?.params?.width),
-    _0x4ed546 = Number(_0x488a12?.params?.height);
-  if (Number.isFinite(_0x175279) && _0x175279 > 0 && Number.isFinite(_0x4ed546) && _0x4ed546 > 0)
-    return Math.round(_0x175279) + 'x' + Math.round(_0x4ed546);
-  return _0x4e61d7;
+  if (value111?.[value110]) return value111[value110];
+  const count4 = Number(providerRatioPayload2?.params?.width),
+    count5 = Number(providerRatioPayload2?.params?.height);
+  if (Number.isFinite(count4) && count4 > 0 && Number.isFinite(count5) && count5 > 0)
+    return Math.round(count4) + 'x' + Math.round(count5);
+  return imageSize2;
 }
-function normalizeApimartWanImageResolution(_0x1a1687, { context: _0xc4c08c } = {}) {
-  const _0x43f941 = String(_0x1a1687 || '2K')
+function normalizeApimartWanImageResolution(value112, { context: context8 } = {}) {
+  const value113 = String(value112 || '2K')
       .trim()
       .toUpperCase(),
-    _0x3d4857 = String(_0xc4c08c?.modelToken || '')
+    value114 = String(context8?.modelToken || '')
       .trim()
       .toLowerCase();
-  if (_0x43f941 === '1K') return '1K';
-  if (_0x43f941 === '4K' && _0x3d4857 === 'wan2.7-image-pro' && !hasManifestInputImages(_0xc4c08c))
-    return '4K';
+  if (value113 === '1K') return '1K';
+  if (value113 === '4K' && value114 === 'wan2.7-image-pro' && !hasManifestInputImages(context8)) return '4K';
   return '2K';
 }
-function normalizeApimartVideoResolutionUpper(_0x3228f8) {
-  const _0x1bc20f = String(_0x3228f8 || '720P')
+function normalizeApimartVideoResolutionUpper(value115) {
+  const value116 = String(value115 || '720P')
     .trim()
     .toUpperCase();
-  if (_0x1bc20f === '1080P') return '1080P';
-  if (_0x1bc20f === '720P') return '720P';
-  if (_0x1bc20f === '540P') return '540P';
-  if (_0x1bc20f === '480P') return '480P';
+  if (value116 === '1080P') return '1080P';
+  if (value116 === '720P') return '720P';
+  if (value116 === '540P') return '540P';
+  if (value116 === '480P') return '480P';
   return '720P';
 }
-function normalizeApimartVideoResolutionLower(_0x56c6aa) {
-  const _0x42aa70 = String(_0x56c6aa || '720p')
+function normalizeApimartVideoResolutionLower(value117) {
+  const value118 = String(value117 || '720p')
     .trim()
     .toLowerCase();
-  if (_0x42aa70 === '1080p') return '1080p';
+  if (value118 === '1080p') return '1080p';
   return '720p';
 }
-function normalizeApimartVeo3VideoResolution(_0x26c41a) {
-  const _0x1353b9 = String(_0x26c41a || '720p')
+function normalizeApimartVeo3VideoResolution(value119) {
+  const value120 = String(value119 || '720p')
     .trim()
     .toLowerCase();
-  if (_0x1353b9 === '4k') return '4k';
-  if (_0x1353b9 === '1080p') return '1080p';
+  if (value120 === '4k') return '4k';
+  if (value120 === '1080p') return '1080p';
   return '720p';
 }
-function normalizeApimartViduQ3ModelToken(_0x12eb71 = {}) {
+function normalizeApimartViduQ3ModelToken(dom = {}) {
   return String(
-    _0x12eb71?.modelToken ||
-      _0x12eb71?.body?.model ||
-      _0x12eb71?.payload?.generationParams?.mode ||
-      _0x12eb71?.payload?.mode ||
+    dom?.modelToken ||
+      dom?.body?.model ||
+      dom?.payload?.generationParams?.mode ||
+      dom?.payload?.mode ||
       'viduq3-turbo',
   )
     .trim()
     .toLowerCase();
 }
-function normalizeApimartViduVideoResolution(_0x5218c6, { context: _0x290af0 } = {}) {
-  const _0x4001c8 = String(_0x5218c6 || '720p')
+function normalizeApimartViduVideoResolution(value121, { context: context9 } = {}) {
+  const value122 = String(value121 || '720p')
       .trim()
       .toLowerCase(),
-    _0x52bdff = normalizeApimartViduQ3ModelToken(_0x290af0);
-  if (_0x52bdff === 'viduq3-mix') return _0x4001c8 === '1080p' ? '1080p' : '720p';
-  if (_0x4001c8 === '540p' || _0x4001c8 === '720p' || _0x4001c8 === '1080p') return _0x4001c8;
+    apimartViduQ3ModelToken = normalizeApimartViduQ3ModelToken(context9);
+  if (apimartViduQ3ModelToken === 'viduq3-mix') return value122 === '1080p' ? '1080p' : '720p';
+  if (value122 === '540p' || value122 === '720p' || value122 === '1080p') return value122;
   return '720p';
 }
-function normalizeApimartViduVideoDuration(_0x5027a5, { context: _0x3fd7ac } = {}) {
-  const _0x2d847b = normalizeApimartViduQ3ModelToken(_0x3fd7ac),
-    _0x1bd1d1 = _0x2d847b === 'viduq3' ? 3 : 1,
-    _0x26d9a9 = 16,
-    _0x28ee61 = Number(_0x5027a5),
-    _0x14d016 = 5,
-    _0x95836d = Number.isFinite(_0x28ee61) ? Math.trunc(_0x28ee61) : _0x14d016;
-  return Math.min(_0x26d9a9, Math.max(_0x1bd1d1, _0x95836d));
+function normalizeApimartViduVideoDuration(value123, { context: context10 } = {}) {
+  const apimartViduQ3ModelToken2 = normalizeApimartViduQ3ModelToken(context10),
+    value124 = apimartViduQ3ModelToken2 === 'viduq3' ? 3 : 1,
+    value125 = 16,
+    value126 = Number(value123),
+    value127 = 5,
+    value128 = Number.isFinite(value126) ? Math.trunc(value126) : value127;
+  return Math.min(value125, Math.max(value124, value128));
 }
-function normalizeApimartHailuoVideoResolution(_0x45bf5d) {
-  const _0x40be82 = String(_0x45bf5d || '768p')
+function normalizeApimartHailuoVideoResolution(value129) {
+  const value130 = String(value129 || '768p')
     .trim()
     .toLowerCase();
-  if (_0x40be82 === '512p' || _0x40be82 === '768p' || _0x40be82 === '1080p') return _0x40be82;
+  if (value130 === '512p' || value130 === '768p' || value130 === '1080p') return value130;
   return '768p';
 }
-function normalizeApimartHailuoVideoDuration(_0x10704a, { context: _0x4e76df } = {}) {
-  const _0x272994 = String(
-    _0x4e76df?.body?.resolution ||
-      _0x4e76df?.payload?.generationParams?.resolution ||
-      _0x4e76df?.payload?.resolution ||
+function normalizeApimartHailuoVideoDuration(value131, { context: context11 } = {}) {
+  const value132 = String(
+    context11?.body?.resolution ||
+      context11?.payload?.generationParams?.resolution ||
+      context11?.payload?.resolution ||
       '',
   )
     .trim()
     .toLowerCase();
-  if (_0x272994 === '1080p') return 5;
-  return Number(_0x10704a) === 10 ? 10 : 5;
+  if (value132 === '1080p') return 5;
+  return Number(value131) === 10 ? 10 : 5;
 }
-function normalizeApimartHailuo23VideoResolution(_0x575816) {
-  const _0x44a3f9 = String(_0x575816 || '768p')
+function normalizeApimartHailuo23VideoResolution(value133) {
+  const value134 = String(value133 || '768p')
     .trim()
     .toLowerCase();
-  if (_0x44a3f9 === '1080p') return '1080p';
+  if (value134 === '1080p') return '1080p';
   return '768p';
 }
-function normalizeApimartHailuo23VideoDuration(_0x1021a3, { context: _0x2aed73 } = {}) {
-  const _0x3e678f = String(
-    _0x2aed73?.body?.resolution ||
-      _0x2aed73?.payload?.generationParams?.resolution ||
-      _0x2aed73?.payload?.resolution ||
+function normalizeApimartHailuo23VideoDuration(value135, { context: context12 } = {}) {
+  const value136 = String(
+    context12?.body?.resolution ||
+      context12?.payload?.generationParams?.resolution ||
+      context12?.payload?.resolution ||
       '',
   )
     .trim()
     .toLowerCase();
-  if (_0x3e678f === '1080p') return 6;
-  return Number(_0x1021a3) === 10 ? 10 : 6;
+  if (value136 === '1080p') return 6;
+  return Number(value135) === 10 ? 10 : 6;
 }
-function normalizeApimartVideoRatio(_0x455f18) {
-  const _0x4d01de = String(_0x455f18 ?? '').trim(),
-    _0x3b3197 = _0x4d01de.toLowerCase();
+function normalizeApimartVideoRatio(value137) {
+  const enabled6 = String(value137 ?? '').trim(),
+    value138 = enabled6.toLowerCase();
   if (
-    !_0x4d01de ||
-    _0x3b3197 === 'auto' ||
-    _0x3b3197 === 'adaptive' ||
-    _0x3b3197 === 'default' ||
-    _0x4d01de === '自适应' ||
-    _0x4d01de === '默认'
+    !enabled6 ||
+    value138 === 'auto' ||
+    value138 === 'adaptive' ||
+    value138 === 'default' ||
+    enabled6 === '自适应' ||
+    enabled6 === '默认'
   )
     return undefined;
-  return _0x4d01de;
+  return enabled6;
 }
 const AGNES_IMAGE_SIZE_BY_RATIO = Object.freeze({
     '1:1': '1024x1024',
@@ -816,322 +809,321 @@ const AGNES_IMAGE_SIZE_BY_RATIO = Object.freeze({
     '16:9': Object.freeze({ width: 0x480, height: 0x288 }),
     '9:16': Object.freeze({ width: 0x288, height: 0x480 }),
   });
-function normalizeAgnesRatioLabel(_0x54cbea, _0x2d5ffe = '4:3') {
-  const _0x4fd2f6 = String(_0x54cbea || '').trim();
-  if (/^\d+x\d+$/i.test(_0x4fd2f6)) return _0x4fd2f6.toLowerCase();
-  const _0x1d1fe0 = _0x4fd2f6.replace(/\s+/g, '').replace('：', ':').toLowerCase();
-  if (!_0x1d1fe0 || ['auto', 'adaptive', 'default'].includes(_0x1d1fe0)) return _0x2d5ffe;
-  const _0x2681db = /^(\d+)[/:x](\d+)$/i.exec(_0x1d1fe0);
-  if (!_0x2681db) return _0x2d5ffe;
-  return Number(_0x2681db[1]) + ':' + Number(_0x2681db[2]);
+function normalizeAgnesRatioLabel(value139, value140 = '4:3') {
+  const value141 = String(value139 || '').trim();
+  if (/^\d+x\d+$/i.test(value141)) return value141.toLowerCase();
+  const enabled7 = value141.replace(/\s+/g, '').replace('：', ':').toLowerCase();
+  if (!enabled7 || ['auto', 'adaptive', 'default'].includes(enabled7)) return value140;
+  const enabled8 = /^(\d+)[/:x](\d+)$/i.exec(enabled7);
+  if (!enabled8) return value140;
+  return Number(enabled8[1]) + ':' + Number(enabled8[2]);
 }
-function normalizeAgnesVideoResolution(_0x3280ec, _0x4c7f9a = {}) {
-  const _0x176e18 = String(
-    _0x3280ec ||
-      _0x4c7f9a?.payload?.generationParams?.resolution ||
-      _0x4c7f9a?.payload?.resolution ||
-      _0x4c7f9a?.payload?.videoSize ||
+function normalizeAgnesVideoResolution(value142, value143 = {}) {
+  const value144 = String(
+    value142 ||
+      value143?.payload?.generationParams?.resolution ||
+      value143?.payload?.resolution ||
+      value143?.payload?.videoSize ||
       '720P',
   )
     .trim()
     .toUpperCase();
-  return _0x176e18 === '1080P' ? '1080P' : '720P';
+  return value144 === '1080P' ? '1080P' : '720P';
 }
-function normalizeAgnesImageSize(_0x1bc49a, { context: _0x472998 } = {}) {
-  const _0x40b36a =
-      _0x1bc49a ||
-      _0x472998?.payload?.resolvedRatioLabel ||
-      _0x472998?.payload?.generationParams?.aspectRatio ||
-      _0x472998?.payload?.aspectRatio,
-    _0x83a2c9 = String(_0x40b36a || '').trim();
-  if (/^\d+x\d+$/i.test(_0x83a2c9)) return _0x83a2c9.toLowerCase();
-  const _0xc7c4a = normalizeAgnesRatioLabel(_0x40b36a, '4:3');
-  return AGNES_IMAGE_SIZE_BY_RATIO[_0xc7c4a] || AGNES_IMAGE_SIZE_BY_RATIO['4:3'];
+function normalizeAgnesImageSize(value145, { context: context13 } = {}) {
+  const value146 =
+      value145 ||
+      context13?.payload?.resolvedRatioLabel ||
+      context13?.payload?.generationParams?.aspectRatio ||
+      context13?.payload?.aspectRatio,
+    value147 = String(value146 || '').trim();
+  if (/^\d+x\d+$/i.test(value147)) return value147.toLowerCase();
+  const agnesRatioLabel = normalizeAgnesRatioLabel(value146, '4:3');
+  return AGNES_IMAGE_SIZE_BY_RATIO[agnesRatioLabel] || AGNES_IMAGE_SIZE_BY_RATIO['4:3'];
 }
-function resolveAgnesVideoDimensions(_0x5ac7f6, _0x2ff9ba = {}) {
-  const _0x3c925c =
-      _0x5ac7f6 ||
-      _0x2ff9ba?.payload?.resolvedRatioLabel ||
-      _0x2ff9ba?.payload?.generationParams?.aspectRatio ||
-      _0x2ff9ba?.payload?.aspectRatio,
-    _0x40b986 = normalizeAgnesRatioLabel(_0x3c925c, '3:2'),
-    _0x36e063 = AGNES_VIDEO_DIMENSIONS_BY_RATIO[_0x40b986] || AGNES_VIDEO_DIMENSIONS_BY_RATIO['3:2'];
-  if (normalizeAgnesVideoResolution('', _0x2ff9ba) !== '1080P') return _0x36e063;
+function resolveAgnesVideoDimensions(value148, value149 = {}) {
+  const value150 =
+      value148 ||
+      value149?.payload?.resolvedRatioLabel ||
+      value149?.payload?.generationParams?.aspectRatio ||
+      value149?.payload?.aspectRatio,
+    agnesRatioLabel2 = normalizeAgnesRatioLabel(value150, '3:2'),
+    box = AGNES_VIDEO_DIMENSIONS_BY_RATIO[agnesRatioLabel2] || AGNES_VIDEO_DIMENSIONS_BY_RATIO['3:2'];
+  if (normalizeAgnesVideoResolution('', value149) !== '1080P') return box;
   return Object.freeze({
-    width: Math.round(_0x36e063.width * 1.5),
-    height: Math.round(_0x36e063.height * 1.5),
+    width: Math.round(box.width * 1.5),
+    height: Math.round(box.height * 1.5),
   });
 }
-function normalizeAgnesVideoWidth(_0x3d2b4e, { context: _0x115ec9 } = {}) {
-  return resolveAgnesVideoDimensions(_0x3d2b4e, _0x115ec9).width;
+function normalizeAgnesVideoWidth(value151, { context: context14 } = {}) {
+  return resolveAgnesVideoDimensions(value151, context14).width;
 }
-function normalizeAgnesVideoHeight(_0xd8bd57, { context: _0x1044dd } = {}) {
-  return resolveAgnesVideoDimensions(_0xd8bd57, _0x1044dd).height;
+function normalizeAgnesVideoHeight(value152, { context: context15 } = {}) {
+  return resolveAgnesVideoDimensions(value152, context15).height;
 }
-function normalizeAgnesVideoNumFrames(_0x13fcb, { spec: _0x342079 } = {}) {
-  const _0x64fb8c = Number(_0x13fcb),
-    _0x8a1e55 = Number.isFinite(_0x64fb8c) && _0x64fb8c > 0 ? _0x64fb8c : 5,
-    _0x177d0b = Number.isFinite(Number(_0x342079?.frameRate)) ? Number(_0x342079.frameRate) : 24,
-    _0x2e2fc6 = Number.isFinite(Number(_0x342079?.min)) ? Math.trunc(Number(_0x342079.min)) : 49,
-    _0x2a0af1 = Number.isFinite(Number(_0x342079?.max)) ? Math.trunc(Number(_0x342079.max)) : 0x1b9,
-    _0x19b2b3 = Math.max(1, _0x2e2fc6),
-    _0x212ecb = Math.max(_0x19b2b3, _0x2a0af1),
-    _0x5cdeb7 = Math.max(_0x19b2b3, Math.round(_0x8a1e55 * _0x177d0b) + 1),
-    _0x21aa53 = Math.min(_0x5cdeb7, _0x212ecb),
-    _0x2d159c = Math.round((_0x21aa53 - 1) / 8) * 8 + 1;
-  return Math.min(_0x212ecb, Math.max(_0x19b2b3, _0x2d159c));
+function normalizeAgnesVideoNumFrames(value153, { spec: spec } = {}) {
+  const count6 = Number(value153),
+    value154 = Number.isFinite(count6) && count6 > 0 ? count6 : 5,
+    value155 = Number.isFinite(Number(spec?.frameRate)) ? Number(spec.frameRate) : 24,
+    value156 = Number.isFinite(Number(spec?.min)) ? Math.trunc(Number(spec.min)) : 49,
+    value157 = Number.isFinite(Number(spec?.max)) ? Math.trunc(Number(spec.max)) : 0x1b9,
+    value158 = Math.max(1, value156),
+    value159 = Math.max(value158, value157),
+    value160 = Math.max(value158, Math.round(value154 * value155) + 1),
+    value161 = Math.min(value160, value159),
+    value162 = Math.round((value161 - 1) / 8) * 8 + 1;
+  return Math.min(value159, Math.max(value158, value162));
 }
-function normalizeApimartOptionalText(_0x448c87) {
-  const _0x35c9bd = String(_0x448c87 ?? '').trim(),
-    _0x11a962 = _0x35c9bd.toLowerCase();
-  if (!_0x35c9bd || _0x11a962 === 'auto' || _0x11a962 === 'none') return undefined;
-  return _0x35c9bd;
+function normalizeApimartOptionalText(value163) {
+  const enabled9 = String(value163 ?? '').trim(),
+    value164 = enabled9.toLowerCase();
+  if (!enabled9 || value164 === 'auto' || value164 === 'none') return undefined;
+  return enabled9;
 }
-function normalizeApimartOptionalInteger(_0x479c13) {
-  const _0x456ca0 = String(_0x479c13 ?? '').trim(),
-    _0x1e1d40 = _0x456ca0.toLowerCase();
-  if (!_0x456ca0 || _0x1e1d40 === 'auto' || _0x1e1d40 === 'none') return undefined;
-  const _0x34b2b2 = Number(_0x456ca0);
-  return Number.isFinite(_0x34b2b2) ? Math.trunc(_0x34b2b2) : undefined;
+function normalizeApimartOptionalInteger(value165) {
+  const enabled10 = String(value165 ?? '').trim(),
+    value166 = enabled10.toLowerCase();
+  if (!enabled10 || value166 === 'auto' || value166 === 'none') return undefined;
+  const value167 = Number(enabled10);
+  return Number.isFinite(value167) ? Math.trunc(value167) : undefined;
 }
-function resolveSeedModeValue(_0x1c09b5 = {}, _0x5eae7a = 'seed_mode', _0x4f361c = 'fixed') {
-  const _0x9fd799 = String(_0x5eae7a || 'seed_mode').trim(),
-    _0x10a7cb =
-      _0x1c09b5?.generationParams &&
-      typeof _0x1c09b5.generationParams === 'object' &&
-      !Array.isArray(_0x1c09b5.generationParams)
-        ? _0x1c09b5.generationParams
+function resolveSeedModeValue(options10 = {}, value168 = 'seed_mode', value169 = 'fixed') {
+  const value170 = String(value168 || 'seed_mode').trim(),
+    value171 =
+      options10?.generationParams &&
+      typeof options10.generationParams === 'object' &&
+      !Array.isArray(options10.generationParams)
+        ? options10.generationParams
         : {},
-    _0x452184 =
-      _0x10a7cb[_0x9fd799] ?? _0x10a7cb.seedMode ?? _0x1c09b5[_0x9fd799] ?? _0x1c09b5.seedMode ?? _0x4f361c,
-    _0x58e16d = String(_0x452184 ?? _0x4f361c)
+    value172 =
+      value171[value170] ?? value171.seedMode ?? options10[value170] ?? options10.seedMode ?? value169,
+    value173 = String(value172 ?? value169)
       .trim()
       .toLowerCase();
-  return _0x58e16d === 'random' ? 'random' : 'fixed';
+  return value173 === 'random' ? 'random' : 'fixed';
 }
-function generateIntegerSeed(_0x36483e, _0x5d803d) {
-  const _0x4c3c60 = Math.min(_0x36483e, _0x5d803d),
-    _0x4b32d9 = Math.max(_0x36483e, _0x5d803d);
-  return _0x4c3c60 + Math.floor(Math.random() * (_0x4b32d9 - _0x4c3c60 + 1));
+function generateIntegerSeed(value174, value175) {
+  const value176 = Math.min(value174, value175),
+    value177 = Math.max(value174, value175);
+  return value176 + Math.floor(Math.random() * (value177 - value176 + 1));
 }
-function normalizeAgnesVideoSeed(_0x48e8ec, { context: _0x1101c3, spec: _0x4ecce6 } = {}) {
-  const _0xd2b08 = resolveSeedModeValue(
-    _0x1101c3?.payload || {},
-    _0x4ecce6?.modeField,
-    _0x4ecce6?.defaultMode || 'random',
+function normalizeAgnesVideoSeed(value178, { context: context16, spec: spec2 } = {}) {
+  const seedModeValue = resolveSeedModeValue(
+    context16?.payload || {},
+    spec2?.modeField,
+    spec2?.defaultMode || 'random',
   );
-  if (_0xd2b08 === 'random') {
-    const _0xcc3ac3 = Number.isFinite(Number(_0x4ecce6?.min)) ? Math.trunc(Number(_0x4ecce6.min)) : 0,
-      _0x42ce66 = Number.isFinite(Number(_0x4ecce6?.max)) ? Math.trunc(Number(_0x4ecce6.max)) : 0x7fffffff;
-    return generateIntegerSeed(_0xcc3ac3, _0x42ce66);
+  if (seedModeValue === 'random') {
+    const value179 = Number.isFinite(Number(spec2?.min)) ? Math.trunc(Number(spec2.min)) : 0,
+      value180 = Number.isFinite(Number(spec2?.max)) ? Math.trunc(Number(spec2.max)) : 0x7fffffff;
+    return generateIntegerSeed(value179, value180);
   }
-  return normalizeApimartOptionalInteger(_0x48e8ec);
+  return normalizeApimartOptionalInteger(value178);
 }
-function normalizeIntegerRange(_0x36eecd, { spec: _0x583cde } = {}) {
-  const _0x3c21e5 = Number(_0x36eecd),
-    _0x327238 = Number.isFinite(Number(_0x583cde?.fallback)) ? Math.trunc(Number(_0x583cde.fallback)) : 0,
-    _0xdaed66 = Number.isFinite(_0x3c21e5) ? Math.trunc(_0x3c21e5) : _0x327238,
-    _0x16dbdf = Number.isFinite(Number(_0x583cde?.min)) ? Math.trunc(Number(_0x583cde.min)) : _0xdaed66,
-    _0x4976b3 = Number.isFinite(Number(_0x583cde?.max)) ? Math.trunc(Number(_0x583cde.max)) : _0xdaed66;
-  return Math.min(Math.max(_0xdaed66, _0x16dbdf), _0x4976b3);
+function normalizeIntegerRange(value181, { spec: spec3 } = {}) {
+  const value182 = Number(value181),
+    value183 = Number.isFinite(Number(spec3?.fallback)) ? Math.trunc(Number(spec3.fallback)) : 0,
+    value184 = Number.isFinite(value182) ? Math.trunc(value182) : value183,
+    value185 = Number.isFinite(Number(spec3?.min)) ? Math.trunc(Number(spec3.min)) : value184,
+    value186 = Number.isFinite(Number(spec3?.max)) ? Math.trunc(Number(spec3.max)) : value184;
+  return Math.min(Math.max(value184, value185), value186);
 }
-function formatAllowedImageCounts(_0x40e80a) {
-  if (_0x40e80a.length <= 1) return String(_0x40e80a[0] ?? '');
-  if (_0x40e80a.length === 2) return _0x40e80a[0] + ' or ' + _0x40e80a[1];
-  return _0x40e80a.slice(0, -1).join(', ') + ', or ' + _0x40e80a.at(-1);
+function formatAllowedImageCounts(list27) {
+  if (list27.length <= 1) return String(list27[0] ?? '');
+  if (list27.length === 2) return list27[0] + ' or ' + list27[1];
+  return list27.slice(0, -1).join(', ') + ', or ' + list27.at(-1);
 }
-function normalizeImageCountOptions(_0x7d6fed, { spec: _0x155965 } = {}) {
-  const _0x32e1b6 = (Array.isArray(_0x7d6fed) ? _0x7d6fed : [])
-    .map((_0x565738) => String(_0x565738 || '').trim())
+function normalizeImageCountOptions(value187, { spec: spec4 } = {}) {
+  const list28 = (Array.isArray(value187) ? value187 : [])
+    .map((item23) => String(item23 || '').trim())
     .filter(Boolean);
-  if (_0x32e1b6.length === 0) return _0x32e1b6;
-  const _0x4d5d4b = (Array.isArray(_0x155965?.allowedCounts) ? _0x155965.allowedCounts : [])
-    .map((_0x4fb142) => Number(_0x4fb142))
-    .filter((_0x3f570b) => Number.isInteger(_0x3f570b) && _0x3f570b >= 0);
-  if (_0x4d5d4b.length === 0 || _0x4d5d4b.includes(_0x32e1b6.length)) return _0x32e1b6;
-  const _0x37b0e3 = String(_0x155965?.label || 'This model').trim() || 'This model';
-  throw new Error(_0x37b0e3 + ' supports only ' + formatAllowedImageCounts(_0x4d5d4b) + ' reference images');
+  if (list28.length === 0) return list28;
+  const list29 = (Array.isArray(spec4?.allowedCounts) ? spec4.allowedCounts : [])
+    .map((item24) => Number(item24))
+    .filter((count7) => Number.isInteger(count7) && count7 >= 0);
+  if (list29.length === 0 || list29.includes(list28.length)) return list28;
+  const value188 = String(spec4?.label || 'This model').trim() || 'This model';
+  throw new Error(value188 + ' supports only ' + formatAllowedImageCounts(list29) + ' reference images');
 }
-function normalizeApimartKlingVideoMode(_0x17a0cb) {
-  const _0x581bd2 = String(_0x17a0cb || '')
+function normalizeApimartKlingVideoMode(value189) {
+  const value190 = String(value189 || '')
     .trim()
     .toLowerCase();
-  return _0x581bd2 === 'pro' ? 'pro' : 'std';
+  return value190 === 'pro' ? 'pro' : 'std';
 }
-function normalizeApimartKlingVideoMode4k(_0x33f4ba) {
-  const _0x1963e8 = String(_0x33f4ba || '')
+function normalizeApimartKlingVideoMode4k(value191) {
+  const value192 = String(value191 || '')
     .trim()
     .toLowerCase();
-  if (_0x1963e8 === '4k') return '4k';
-  return _0x1963e8 === 'pro' ? 'pro' : 'std';
+  if (value192 === '4k') return '4k';
+  return value192 === 'pro' ? 'pro' : 'std';
 }
-function normalizeRunningHubKlingVideoMode(_0x4a4565) {
-  return normalizeApimartKlingVideoMode(_0x4a4565);
+function normalizeRunningHubKlingVideoMode(value193) {
+  return normalizeApimartKlingVideoMode(value193);
 }
-function normalizeRunningHubKlingV3Model(_0x4b1c8a) {
-  const _0x4d8119 = String(_0x4b1c8a || '')
+function normalizeRunningHubKlingV3Model(value194) {
+  const value195 = String(value194 || '')
     .trim()
     .toLowerCase();
-  if (_0x4d8119 === '4k') return '4k';
-  if (_0x4d8119 === 'pro') return 'pro';
+  if (value195 === '4k') return '4k';
+  if (value195 === 'pro') return 'pro';
   return 'std';
 }
-function normalizeRunningHubKlingV3AspectRatio(_0x3c30c6) {
-  const _0x48d9e9 = normalizeApimartVideoRatio(_0x3c30c6);
-  return ['16:9', '9:16', '1:1'].includes(_0x48d9e9) ? _0x48d9e9 : undefined;
+function normalizeRunningHubKlingV3AspectRatio(value196) {
+  const apimartVideoRatio = normalizeApimartVideoRatio(value196);
+  return ['16:9', '9:16', '1:1'].includes(apimartVideoRatio) ? apimartVideoRatio : undefined;
 }
-function normalizeRunningHubKlingV3Duration(_0x1aeb14) {
-  const _0x4b0e7e = Math.trunc(Number(_0x1aeb14)),
-    _0x59f892 = Number.isFinite(_0x4b0e7e) ? _0x4b0e7e : 5;
-  return String(Math.min(15, Math.max(3, _0x59f892)));
+function normalizeRunningHubKlingV3Duration(value197) {
+  const value198 = Math.trunc(Number(value197)),
+    value199 = Number.isFinite(value198) ? value198 : 5;
+  return String(Math.min(15, Math.max(3, value199)));
 }
-function normalizeRunningHubKlingV3CfgScale(_0x5ac450) {
-  const _0x5d6918 = Number(_0x5ac450);
-  if (!Number.isFinite(_0x5d6918)) return 0.5;
-  return Math.min(1, Math.max(0, Math.round(_0x5d6918 * 10) / 10));
+function normalizeRunningHubKlingV3CfgScale(value200) {
+  const value201 = Number(value200);
+  if (!Number.isFinite(value201)) return 0.5;
+  return Math.min(1, Math.max(0, Math.round(value201 * 10) / 10));
 }
-function normalizeRunningHubKlingV3ShotType(_0x1a82eb) {
-  const _0x39d686 = String(_0x1a82eb || '')
+function normalizeRunningHubKlingV3ShotType(value202) {
+  const value203 = String(value202 || '')
     .trim()
     .toLowerCase();
-  return _0x39d686 === 'intelligence' ? 'intelligence' : 'customize';
+  return value203 === 'intelligence' ? 'intelligence' : 'customize';
 }
-function normalizeRunningHubKlingO3Model(_0x342873) {
-  return normalizeRunningHubKlingV3Model(_0x342873);
+function normalizeRunningHubKlingO3Model(value204) {
+  return normalizeRunningHubKlingV3Model(value204);
 }
-function normalizeRunningHubKlingO3AspectRatio(_0x257aa2) {
-  return normalizeRunningHubKlingV3AspectRatio(_0x257aa2);
+function normalizeRunningHubKlingO3AspectRatio(value205) {
+  return normalizeRunningHubKlingV3AspectRatio(value205);
 }
-function normalizeRunningHubKlingO3Duration(_0x185192) {
-  return normalizeRunningHubKlingV3Duration(_0x185192);
+function normalizeRunningHubKlingO3Duration(value206) {
+  return normalizeRunningHubKlingV3Duration(value206);
 }
-function normalizeRunningHubKlingO3ShotType(_0x574d20) {
-  return normalizeRunningHubKlingV3ShotType(_0x574d20);
+function normalizeRunningHubKlingO3ShotType(value207) {
+  return normalizeRunningHubKlingV3ShotType(value207);
 }
-function normalizeRunningHubKlingO1AspectRatio(_0x3bad49) {
-  const _0x46ddae = String(_0x3bad49 || '9:16').trim();
-  return ['16:9', '9:16', '1:1'].includes(_0x46ddae) ? _0x46ddae : '9:16';
+function normalizeRunningHubKlingO1AspectRatio(value208) {
+  const value209 = String(value208 || '9:16').trim();
+  return ['16:9', '9:16', '1:1'].includes(value209) ? value209 : '9:16';
 }
-function normalizeRunningHubKlingO1Duration(_0x94d91d) {
-  const _0x502e9b = Number(_0x94d91d);
-  return Number.isFinite(_0x502e9b) && Math.trunc(_0x502e9b) === 10 ? '10' : '5';
+function normalizeRunningHubKlingO1Duration(value210) {
+  const value211 = Number(value210);
+  return Number.isFinite(value211) && Math.trunc(value211) === 10 ? '10' : '5';
 }
-function normalizeRunningHubHailuo02Duration(_0x3861d7) {
-  const _0x5c1cc0 = Number(_0x3861d7);
-  return Number.isFinite(_0x5c1cc0) && Math.trunc(_0x5c1cc0) === 10 ? '10' : '6';
+function normalizeRunningHubHailuo02Duration(value212) {
+  const value213 = Number(value212);
+  return Number.isFinite(value213) && Math.trunc(value213) === 10 ? '10' : '6';
 }
-function normalizeRunningHubHailuo23Duration(_0x35fc74) {
-  const _0x28f8a7 = Number(_0x35fc74);
-  return Number.isFinite(_0x28f8a7) && Math.trunc(_0x28f8a7) === 10 ? '10' : '6';
+function normalizeRunningHubHailuo23Duration(value214) {
+  const value215 = Number(value214);
+  return Number.isFinite(value215) && Math.trunc(value215) === 10 ? '10' : '6';
 }
-function normalizeRunningHubHappyHorseResolution(_0x23e539) {
-  return normalizeApimartVideoResolutionLower(_0x23e539);
+function normalizeRunningHubHappyHorseResolution(value216) {
+  return normalizeApimartVideoResolutionLower(value216);
 }
-function normalizeRunningHubHappyHorseAspectRatio(_0x52e7cc) {
-  const _0x2fb17b = normalizeApimartVideoRatio(_0x52e7cc);
-  return ['16:9', '9:16', '1:1', '4:3', '3:4'].includes(_0x2fb17b) ? _0x2fb17b : undefined;
+function normalizeRunningHubHappyHorseAspectRatio(value217) {
+  const apimartVideoRatio2 = normalizeApimartVideoRatio(value217);
+  return ['16:9', '9:16', '1:1', '4:3', '3:4'].includes(apimartVideoRatio2) ? apimartVideoRatio2 : undefined;
 }
-function normalizeRunningHubHappyHorseDuration(_0x14271c) {
-  const _0x161173 = Math.trunc(Number(_0x14271c)),
-    _0x29fac6 = Number.isFinite(_0x161173) ? _0x161173 : 5;
-  return String(Math.min(15, Math.max(3, _0x29fac6)));
+function normalizeRunningHubHappyHorseDuration(value218) {
+  const value219 = Math.trunc(Number(value218)),
+    value220 = Number.isFinite(value219) ? value219 : 5;
+  return String(Math.min(15, Math.max(3, value220)));
 }
-function normalizeRunningHubHappyHorseAudioSetting(_0x30fc44) {
-  const _0x2b81ca = String(_0x30fc44 || '')
+function normalizeRunningHubHappyHorseAudioSetting(value221) {
+  const value222 = String(value221 || '')
     .trim()
     .toLowerCase();
-  return _0x2b81ca === 'origin' ? 'origin' : 'auto';
+  return value222 === 'origin' ? 'origin' : 'auto';
 }
-function normalizeRunningHubSeedance2Resolution(_0x503510) {
-  const _0x1424d3 = String(_0x503510 || '720p')
+function normalizeRunningHubSeedance2Resolution(value223) {
+  const value224 = String(value223 || '720p')
     .trim()
     .toLowerCase();
-  if (_0x1424d3 === 'native1080p') return 'native1080p';
-  if (['480p', '720p', '1080p', '2k', '4k'].includes(_0x1424d3)) return _0x1424d3;
+  if (value224 === 'native1080p') return 'native1080p';
+  if (['480p', '720p', '1080p', '2k', '4k'].includes(value224)) return value224;
   return '720p';
 }
-function normalizeRunningHubSeedance2Duration(_0x93ec14) {
-  const _0x1e359a = Math.trunc(Number(_0x93ec14)),
-    _0x3d5636 = Number.isFinite(_0x1e359a) ? _0x1e359a : 5;
-  return String(Math.min(15, Math.max(4, _0x3d5636)));
+function normalizeRunningHubSeedance2Duration(value225) {
+  const value226 = Math.trunc(Number(value225)),
+    value227 = Number.isFinite(value226) ? value226 : 5;
+  return String(Math.min(15, Math.max(4, value227)));
 }
-function normalizeRunningHubSeedance2Ratio(_0x2bf5bc) {
-  const _0x45bde2 = String(_0x2bf5bc ?? '').trim(),
-    _0x491d34 = _0x45bde2.toLowerCase();
+function normalizeRunningHubSeedance2Ratio(value228) {
+  const enabled11 = String(value228 ?? '').trim(),
+    value229 = enabled11.toLowerCase();
   if (
-    !_0x45bde2 ||
-    _0x491d34 === 'auto' ||
-    _0x491d34 === 'adaptive' ||
-    _0x491d34 === 'default' ||
-    _0x45bde2 === '自适应' ||
-    _0x45bde2 === '默认'
+    !enabled11 ||
+    value229 === 'auto' ||
+    value229 === 'adaptive' ||
+    value229 === 'default' ||
+    enabled11 === '自适应' ||
+    enabled11 === '默认'
   )
     return 'adaptive';
-  return ['16:9', '4:3', '1:1', '3:4', '9:16', '21:9'].includes(_0x45bde2) ? _0x45bde2 : 'adaptive';
+  return ['16:9', '4:3', '1:1', '3:4', '9:16', '21:9'].includes(enabled11) ? enabled11 : 'adaptive';
 }
-function normalizeRunningHubVeo3Resolution(_0x2fc724) {
-  const _0x34e3e7 = String(_0x2fc724 || '720p')
+function normalizeRunningHubVeo3Resolution(value230) {
+  const value231 = String(value230 || '720p')
     .trim()
     .toLowerCase();
-  if (_0x34e3e7 === '4k') return '4k';
-  if (_0x34e3e7 === '1080p') return '1080p';
+  if (value231 === '4k') return '4k';
+  if (value231 === '1080p') return '1080p';
   return '720p';
 }
-function normalizeRunningHubVeo3AspectRatio(_0x41c1ee) {
-  const _0xf930c0 = normalizeApimartVideoRatio(_0x41c1ee);
-  return ['16:9', '9:16'].includes(_0xf930c0) ? _0xf930c0 : undefined;
+function normalizeRunningHubVeo3AspectRatio(value232) {
+  const apimartVideoRatio3 = normalizeApimartVideoRatio(value232);
+  return ['16:9', '9:16'].includes(apimartVideoRatio3) ? apimartVideoRatio3 : undefined;
 }
-function normalizeRunningHubVeo3Duration(_0x2296bd) {
-  const _0x13ee79 = Math.trunc(Number(_0x2296bd));
-  return [4, 6, 8].includes(_0x13ee79) ? String(_0x13ee79) : '8';
+function normalizeRunningHubVeo3Duration(value233) {
+  const value234 = Math.trunc(Number(value233));
+  return [4, 6, 8].includes(value234) ? String(value234) : '8';
 }
-function normalizeRunningHubWan27Mode(_0x25555c = {}) {
-  const _0x1bbbe3 = String(
-    _0x25555c?.payload?.generationParams?.wan27_mode ||
-      _0x25555c?.payload?.wan27_mode ||
-      _0x25555c?.body?.wan27_mode ||
+function normalizeRunningHubWan27Mode(dom2 = {}) {
+  const value235 = String(
+    dom2?.payload?.generationParams?.wan27_mode ||
+      dom2?.payload?.wan27_mode ||
+      dom2?.body?.wan27_mode ||
       'image',
   )
     .trim()
     .toLowerCase();
-  return _0x1bbbe3 === 'video' || _0x1bbbe3 === 'reference' || _0x1bbbe3 === 'edit' ? _0x1bbbe3 : 'image';
+  return value235 === 'video' || value235 === 'reference' || value235 === 'edit' ? value235 : 'image';
 }
-function normalizeRunningHubWan27Resolution(_0x3062b9) {
-  const _0x38bcde = String(_0x3062b9 || '720P')
+function normalizeRunningHubWan27Resolution(value236) {
+  const value237 = String(value236 || '720P')
     .trim()
     .toUpperCase();
-  return _0x38bcde === '1080P' ? '1080P' : '720P';
+  return value237 === '1080P' ? '1080P' : '720P';
 }
-function normalizeRunningHubWan27AspectRatio(_0x3a1a4a) {
-  const _0x5b92ca = normalizeApimartVideoRatio(_0x3a1a4a);
-  return ['16:9', '9:16', '1:1', '4:3', '3:4'].includes(_0x5b92ca) ? _0x5b92ca : undefined;
+function normalizeRunningHubWan27AspectRatio(value238) {
+  const apimartVideoRatio4 = normalizeApimartVideoRatio(value238);
+  return ['16:9', '9:16', '1:1', '4:3', '3:4'].includes(apimartVideoRatio4) ? apimartVideoRatio4 : undefined;
 }
-function normalizeRunningHubWan27Duration(_0x31d563, { context: _0x38fa0b } = {}) {
-  const _0x46f8db = Math.trunc(Number(_0x31d563)),
-    _0xde1736 = normalizeRunningHubWan27Mode(_0x38fa0b);
-  if (_0xde1736 === 'edit') {
-    if (_0x46f8db === 0) return '0';
-    const _0x458028 = Number.isFinite(_0x46f8db) ? _0x46f8db : 5;
-    return String(Math.min(10, Math.max(2, _0x458028)));
+function normalizeRunningHubWan27Duration(value239, { context: context17 } = {}) {
+  const count8 = Math.trunc(Number(value239)),
+    runningHubWan27Mode = normalizeRunningHubWan27Mode(context17);
+  if (runningHubWan27Mode === 'edit') {
+    if (count8 === 0) return '0';
+    const value240 = Number.isFinite(count8) ? count8 : 5;
+    return String(Math.min(10, Math.max(2, value240)));
   }
-  const _0x1a2aca = Number.isFinite(_0x46f8db) ? _0x46f8db : 5;
-  return String(Math.min(15, Math.max(5, _0x1a2aca)));
+  const value241 = Number.isFinite(count8) ? count8 : 5;
+  return String(Math.min(15, Math.max(5, value241)));
 }
-function resolveApimartGoogleSearch(_0x12efd9, { context: _0x2ab850 }) {
-  const _0x4efd20 = _0x2ab850?.payload || {};
-  return normalizeBooleanParam(_0x12efd9) || normalizeBooleanParam(_0x4efd20.google_image_search);
+function resolveApimartGoogleSearch(value242, { context: context18 }) {
+  const value243 = context18?.payload || {};
+  return normalizeBooleanParam(value242) || normalizeBooleanParam(value243.google_image_search);
 }
-function resolveApimartGoogleImageSearch(_0x56cd10, { context: _0xb8e7ba }) {
-  const _0x2394ed = _0xb8e7ba?.body || {},
-    _0x25b0e1 = _0xb8e7ba?.payload || {};
+function resolveApimartGoogleImageSearch(value244, { context: context19 }) {
+  const value245 = context19?.body || {},
+    value246 = context19?.payload || {};
   return (
-    normalizeBooleanParam(_0x56cd10) &&
-    normalizeBooleanParam(_0x2394ed.google_search ?? _0x25b0e1.google_search)
+    normalizeBooleanParam(value244) && normalizeBooleanParam(value245.google_search ?? value246.google_search)
   );
 }
 const BODY_MAPPING_TRANSFORMS = Object.freeze({
-  apimartNanoBanana2Resolution: (_0x547033) => normalizeApimartNanoBanana2Resolution(_0x547033),
-  apimartGptImage2Resolution: (_0x34afd5) => normalizeApimartGptImage2Resolution(_0x34afd5),
+  apimartNanoBanana2Resolution: (value247) => normalizeApimartNanoBanana2Resolution(value247),
+  apimartGptImage2Resolution: (value248) => normalizeApimartGptImage2Resolution(value248),
   apimartImageCount: normalizeApimartImageCount,
   apimartQwenImageCount: normalizeApimartQwenImageCount,
   apimartQwenImageResolution: normalizeApimartQwenImageResolution,
@@ -1196,391 +1188,409 @@ const BODY_MAPPING_TRANSFORMS = Object.freeze({
   second: secondArrayItem,
   providerRatioSize: resolveProviderRatioSize,
 });
-function resolveRequestManifest(_0x3cbe51, _0x576778, _0x1cedfe) {
-  let _0x1f3f72 = _0x3cbe51,
-    _0x4d23ba = resolveModelExecution(_0x3cbe51.model, { providerHint: _0x576778 });
+function resolveRequestManifest(args5, providerHint, value249) {
+  let effectivePayload = args5,
+    model3 = resolveModelExecution(args5.model, { providerHint: providerHint });
   if (
-    _0x576778 &&
-    (!_0x4d23ba?.modelManifest || _0x4d23ba.modelManifest.provider !== _0x576778) &&
-    !String(_0x3cbe51.model || '').includes('/')
+    providerHint &&
+    (!model3?.modelManifest || model3.modelManifest.provider !== providerHint) &&
+    !String(args5.model || '').includes('/')
   ) {
-    const _0x2481bc = _0x576778 + '/' + _0x3cbe51.model,
-      _0x487696 = resolveModelExecution(_0x2481bc);
-    _0x487696?.modelManifest?.provider === _0x576778 &&
-      ((_0x4d23ba = _0x487696), (_0x1f3f72 = { ..._0x3cbe51, model: _0x2481bc }));
+    const model4 = providerHint + '/' + args5.model,
+      modelExecution = resolveModelExecution(model4);
+    modelExecution?.modelManifest?.provider === providerHint &&
+      ((model3 = modelExecution), (effectivePayload = { ...args5, model: model4 }));
   }
-  _0x4d23ba?.canonicalModelId &&
-    _0x4d23ba.canonicalModelId !== String(_0x3cbe51.model || '').trim() &&
-    (_0x1f3f72 = { ..._0x3cbe51, model: _0x4d23ba.canonicalModelId });
-  const _0x516b20 = _0x4d23ba?.modelManifest,
-    _0xd4fc45 = _0x4d23ba?.executionManifest;
+  model3?.canonicalModelId &&
+    model3.canonicalModelId !== String(args5.model || '').trim() &&
+    (effectivePayload = { ...args5, model: model3.canonicalModelId });
+  const modelManifest = model3?.modelManifest,
+    executionManifest = model3?.executionManifest;
   if (
-    !_0x516b20 ||
-    !_0xd4fc45 ||
-    _0x516b20.adapterType !== 'modelApi' ||
-    _0xd4fc45.adapterType !== 'modelApi' ||
-    _0x516b20.kind !== _0x1cedfe ||
-    _0xd4fc45.kind !== _0x1cedfe
+    !modelManifest ||
+    !executionManifest ||
+    modelManifest.adapterType !== 'modelApi' ||
+    executionManifest.adapterType !== 'modelApi' ||
+    modelManifest.kind !== value249 ||
+    executionManifest.kind !== value249
   )
     return null;
-  const _0x106a86 = _0x516b20.provider;
-  if (_0x576778 && _0x106a86 !== _0x576778) return null;
+  const provider5 = modelManifest.provider;
+  if (providerHint && provider5 !== providerHint) return null;
   return {
-    provider: _0x106a86,
-    modelManifest: _0x516b20,
-    executionManifest: _0xd4fc45,
-    effectivePayload: _0x1f3f72,
+    provider: provider5,
+    modelManifest: modelManifest,
+    executionManifest: executionManifest,
+    effectivePayload: effectivePayload,
   };
 }
-export async function buildManifestMappedBody(_0x37aaf4) {
-  const _0x587337 = await buildBodyFromMapping({
-      bodyMapping: _0x37aaf4.executionManifest.bodyMapping,
-      context: _0x37aaf4,
+export async function buildManifestMappedBody(bodyMapping) {
+  const currentBody = await buildBodyFromMapping({
+      bodyMapping: bodyMapping.executionManifest.bodyMapping,
+      context: bodyMapping,
       transforms: BODY_MAPPING_TRANSFORMS,
     }),
-    _0x20cc36 = _0x37aaf4.executionManifest.extensions?.bodyResolver;
-  if (!_0x20cc36) return _0x587337;
-  const _0x29084d = getModelApiBodyResolver(_0x20cc36);
-  if (typeof _0x29084d !== 'function') throw new Error('Unsupported model API bodyResolver: ' + _0x20cc36);
-  return _0x29084d({ ..._0x37aaf4, currentBody: _0x587337 });
+    enabled12 = bodyMapping.executionManifest.extensions?.bodyResolver;
+  if (!enabled12) return currentBody;
+  const run = getModelApiBodyResolver(enabled12);
+  if (typeof run !== 'function') throw new Error('Unsupported model API bodyResolver: ' + enabled12);
+  return run({ ...bodyMapping, currentBody: currentBody });
 }
-function resolveDefaultApiUrl(_0x177364, _0x14db3d, _0x5bfa97) {
-  const _0x4c8590 =
-    _0x177364 === 'grsai'
-      ? String(_0x14db3d.apiUrl || '')
+function resolveDefaultApiUrl(value250, value251, value252) {
+  const value253 =
+    value250 === 'grsai'
+      ? String(value251.apiUrl || '')
           .replace(/\/v1\/?$/, '')
           .replace(/\/+$/, '')
-      : String(_0x14db3d.apiUrl || '').replace(/\/+$/, '');
-  return '' + _0x4c8590 + _0x5bfa97.endpoint;
+      : String(value251.apiUrl || '').replace(/\/+$/, '');
+  return '' + value253 + value252.endpoint;
 }
-export function resolveManifestTaskPolling(_0x9fe3c9, _0x2c18de, _0xf82a49, _0x19c472) {
-  const _0x56c9d1 = _0xf82a49.extensions?.taskPolling;
-  if (!_0x56c9d1 || typeof _0x56c9d1 !== 'object' || Array.isArray(_0x56c9d1)) return null;
-  const _0x27214c = String(_0x2c18de.apiUrl || '')
+export function resolveManifestTaskPolling(provider6, value254, executionId, modelId) {
+  const enabled13 = executionId.extensions?.taskPolling;
+  if (!enabled13 || typeof enabled13 !== 'object' || Array.isArray(enabled13)) return null;
+  const value255 = String(value254.apiUrl || '')
       .replace(/\/v1\/?$/, '')
       .replace(/\/+$/, ''),
-    _0x414da9 = String(_0x56c9d1.urlTemplate || '').trim();
+    urlTemplate = String(enabled13.urlTemplate || '').trim();
   return {
     method:
-      String(_0x56c9d1.method || 'GET')
+      String(enabled13.method || 'GET')
         .trim()
         .toUpperCase() || 'GET',
-    mode: String(_0x56c9d1.mode || 'task-proxy').trim() || 'task-proxy',
-    urlTemplate: _0x414da9.replace('{baseUrl}', _0x27214c),
-    headersMode: String(_0x56c9d1.headersMode || 'bearer').trim() || 'bearer',
-    provider: _0x9fe3c9,
-    executionId: _0xf82a49.id,
-    modelId: _0x19c472?.modelManifest?.modelId || '',
+    mode: String(enabled13.mode || 'task-proxy').trim() || 'task-proxy',
+    urlTemplate: urlTemplate.replace('{baseUrl}', value255),
+    headersMode: String(enabled13.headersMode || 'bearer').trim() || 'bearer',
+    provider: provider6,
+    executionId: executionId.id,
+    modelId: modelId?.modelManifest?.modelId || '',
   };
 }
-export function resolveManifestApiUrl(_0x3f06cb, _0x153412, _0x4f5af3, _0x4efce8) {
-  const _0x1285be = _0x4f5af3.extensions?.endpointResolver;
-  if (!_0x1285be) return resolveDefaultApiUrl(_0x3f06cb, _0x153412, _0x4f5af3);
-  const _0x44297d = getModelApiEndpointResolver(_0x1285be);
-  if (typeof _0x44297d !== 'function')
-    throw new Error('Unsupported model API endpointResolver: ' + _0x1285be);
-  const _0x40a076 = _0x44297d({
-    provider: _0x3f06cb,
-    cfg: _0x153412,
-    executionManifest: _0x4f5af3,
-    ..._0x4efce8,
+export function resolveManifestApiUrl(provider7, cfg, executionManifest2, args6) {
+  const enabled14 = executionManifest2.extensions?.endpointResolver;
+  if (!enabled14) return resolveDefaultApiUrl(provider7, cfg, executionManifest2);
+  const run2 = getModelApiEndpointResolver(enabled14);
+  if (typeof run2 !== 'function') throw new Error('Unsupported model API endpointResolver: ' + enabled14);
+  const enabled15 = run2({
+    provider: provider7,
+    cfg: cfg,
+    executionManifest: executionManifest2,
+    ...args6,
   });
-  if (!_0x40a076) throw new Error('Model API endpointResolver returned empty url: ' + _0x1285be);
-  return _0x40a076;
+  if (!enabled15) throw new Error('Model API endpointResolver returned empty url: ' + enabled14);
+  return enabled15;
 }
-export async function buildVideoRequestFromManifest(_0x5967ab, _0x7d5fcf, _0x272451, _0x4d31db = {}) {
-  const _0x248d83 = String(_0x4d31db.expectedProvider || '')
+export async function buildVideoRequestFromManifest(modelId2, finalPrompt, ctx, value256 = {}) {
+  const value257 = String(value256.expectedProvider || '')
       .trim()
       .toLowerCase(),
-    _0xea6638 = resolveRequestManifest(_0x5967ab, _0x248d83, 'video');
-  if (!_0xea6638) return null;
+    requestManifest = resolveRequestManifest(modelId2, value257, 'video');
+  if (!requestManifest) return null;
   const {
-    provider: _0x344087,
-    modelManifest: _0x15e39d,
-    executionManifest: _0x4d3c37,
-    effectivePayload: _0x1f9bfa,
-  } = _0xea6638;
-  if (!VIDEO_MODEL_API_PROVIDERS.has(_0x344087)) return null;
-  const _0x4e628e = sanitizeModelUiSchemaParams(_0x15e39d.modelId, _0x1f9bfa.generationParams, {
-      includeDefaults: true,
-    }),
-    _0x2cdd80 = applyVideoAspectRatioExecutionFallback(
-      { ..._0x1f9bfa, generationParams: mergeRootAspectRatioIntoGenerationParams(_0x1f9bfa, _0x4e628e) },
-      _0x15e39d,
+    provider: provider8,
+    modelManifest: modelManifest2,
+    executionManifest: executionManifest3,
+    effectivePayload: effectivePayload2,
+  } = requestManifest;
+  if (!VIDEO_MODEL_API_PROVIDERS.has(provider8)) return null;
+  const sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(
+      modelManifest2.modelId,
+      effectivePayload2.generationParams,
+      {
+        includeDefaults: true,
+      },
     ),
-    _0x395c28 = _0x272451.getProviderConfig(_0x344087),
-    _0x1e5c0c = resolveApiKey(_0x344087, _0x2cdd80, _0x272451);
-  !_0x1e5c0c && throwMissingApiKey(_0x344087);
-  const _0x247647 = _0x4d3c37.extensions?.bodyResolver === 'apimartSeedanceVideo',
-    _0x2811f9 = _0x247647
+    payload2 = applyVideoAspectRatioExecutionFallback(
+      {
+        ...effectivePayload2,
+        generationParams: mergeRootAspectRatioIntoGenerationParams(
+          effectivePayload2,
+          sanitizeModelUiSchemaParams2,
+        ),
+      },
+      modelManifest2,
+    ),
+    baseUrl3 = ctx.getProviderConfig(provider8),
+    apiKey = resolveApiKey(provider8, payload2, ctx);
+  !apiKey && throwMissingApiKey(provider8);
+  const enabled16 = executionManifest3.extensions?.bodyResolver === 'apimartSeedanceVideo',
+    finalUrlsBySlot = enabled16
       ? {}
-      : await resolveInputImagesBySlot(_0x344087, _0x2cdd80, _0x1e5c0c, _0x272451, {
-          modelManifest: _0x15e39d,
-          baseUrl: _0x395c28.apiUrl,
-          executionManifest: _0x4d3c37,
+      : await resolveInputImagesBySlot(provider8, payload2, apiKey, ctx, {
+          modelManifest: modelManifest2,
+          baseUrl: baseUrl3.apiUrl,
+          executionManifest: executionManifest3,
         }),
-    _0x24e78a = Object.keys(_0x2811f9).length > 0,
-    _0xd75ace = _0x24e78a
-      ? Object.values(_0x2811f9)
-          .map((_0x56757b) => String(_0x56757b || '').trim())
+    enabled17 = Object.keys(finalUrlsBySlot).length > 0,
+    args7 = enabled17
+      ? Object.values(finalUrlsBySlot)
+          .map((item25) => String(item25 || '').trim())
           .filter(Boolean)
       : [],
-    _0x31a336 =
-      !_0x247647 && (!_0x24e78a || _0x344087 === 'runninghub')
+    args8 =
+      !enabled16 && (!enabled17 || provider8 === 'runninghub')
         ? await resolveVideoInputImages(
-            _0x24e78a && _0x344087 === 'runninghub' ? omitSlotImageUrlsFromVideoInputs(_0x2cdd80) : _0x2cdd80,
-            _0x1e5c0c,
-            _0x272451,
+            enabled17 && provider8 === 'runninghub' ? omitSlotImageUrlsFromVideoInputs(payload2) : payload2,
+            apiKey,
+            ctx,
             {
-              modelManifest: _0x4d3c37.extensions?.bodyResolver ? null : _0x15e39d,
-              provider: _0x344087,
-              baseUrl: _0x395c28.apiUrl,
-              executionManifest: _0x4d3c37,
+              modelManifest: executionManifest3.extensions?.bodyResolver ? null : modelManifest2,
+              provider: provider8,
+              baseUrl: baseUrl3.apiUrl,
+              executionManifest: executionManifest3,
             },
           )
         : [],
-    _0x3f3d8e = _0x247647 ? [] : _0x24e78a ? Array.from(new Set([..._0xd75ace, ..._0x31a336])) : _0x31a336,
-    _0x58afef = _0x247647
+    finalUrls = enabled16 ? [] : enabled17 ? Array.from(new Set([...args7, ...args8])) : args8,
+    inputVideos = enabled16
       ? []
-      : await resolveInputVideos(_0x2cdd80, _0x1e5c0c, _0x272451, {
-          modelManifest: _0x15e39d,
-          provider: _0x344087,
-          baseUrl: _0x395c28.apiUrl,
-          executionManifest: _0x4d3c37,
+      : await resolveInputVideos(payload2, apiKey, ctx, {
+          modelManifest: modelManifest2,
+          provider: provider8,
+          baseUrl: baseUrl3.apiUrl,
+          executionManifest: executionManifest3,
         }),
-    _0x5117c0 = _0x247647
+    inputAudios = enabled16
       ? []
-      : await resolveInputAudios(_0x2cdd80, _0x1e5c0c, _0x272451, {
-          modelManifest: _0x15e39d,
-          provider: _0x344087,
-          baseUrl: _0x395c28.apiUrl,
-          executionManifest: _0x4d3c37,
+      : await resolveInputAudios(payload2, apiKey, ctx, {
+          modelManifest: modelManifest2,
+          provider: provider8,
+          baseUrl: baseUrl3.apiUrl,
+          executionManifest: executionManifest3,
         }),
-    _0x2fdd4c = resolveExecutionModelToken(_0x4d3c37, _0x2cdd80),
-    _0x22dabe = {
-      provider: _0x344087,
-      modelManifest: _0x15e39d,
-      executionManifest: _0x4d3c37,
-      payload: _0x2cdd80,
-      finalPrompt: _0x7d5fcf,
-      modelToken: _0x2fdd4c,
-      apiKey: _0x1e5c0c,
-      ctx: _0x272451,
-      finalUrls: _0x3f3d8e,
-      finalUrlsBySlot: _0x2811f9,
-      inputImages: _0x3f3d8e,
-      inputVideos: _0x58afef,
-      inputAudios: _0x5117c0,
+    modelToken = resolveExecutionModelToken(executionManifest3, payload2),
+    value258 = {
+      provider: provider8,
+      modelManifest: modelManifest2,
+      executionManifest: executionManifest3,
+      payload: payload2,
+      finalPrompt: finalPrompt,
+      modelToken: modelToken,
+      apiKey: apiKey,
+      ctx: ctx,
+      finalUrls: finalUrls,
+      finalUrlsBySlot: finalUrlsBySlot,
+      inputImages: finalUrls,
+      inputVideos: inputVideos,
+      inputAudios: inputAudios,
     },
-    _0x5f4ded = await buildManifestMappedBody(_0x22dabe);
+    args9 = await buildManifestMappedBody(value258);
   return {
     url: '/api/v2/proxy/image',
-    headers: _0x4d3c37.headers || { 'Content-Type': 'application/json' },
+    headers: executionManifest3.headers || { 'Content-Type': 'application/json' },
     body: {
-      apiUrl: resolveManifestApiUrl(_0x344087, _0x395c28, _0x4d3c37, _0x22dabe),
-      apiKey: _0x1e5c0c,
-      ..._0x5f4ded,
+      apiUrl: resolveManifestApiUrl(provider8, baseUrl3, executionManifest3, value258),
+      apiKey: apiKey,
+      ...args9,
     },
-    responseMapping: _0x4d3c37.responseMapping,
-    taskPolling: resolveManifestTaskPolling(_0x344087, _0x395c28, _0x4d3c37, _0x22dabe),
-    useOpenapiQuery: _0x344087 === 'runninghub',
-    adapterTrace: { source: 'manifest', executionId: _0x4d3c37.id, modelId: _0x5967ab.model },
+    responseMapping: executionManifest3.responseMapping,
+    taskPolling: resolveManifestTaskPolling(provider8, baseUrl3, executionManifest3, value258),
+    useOpenapiQuery: provider8 === 'runninghub',
+    adapterTrace: { source: 'manifest', executionId: executionManifest3.id, modelId: modelId2.model },
   };
 }
-export async function buildTextRequestFromManifest(_0x54caa7, _0x4e1b21, _0x56bb6d, _0x4e0467 = {}) {
-  const _0x15a9be = String(_0x4e0467.expectedProvider || '')
+export async function buildTextRequestFromManifest(value259, finalPrompt2, ctx2, value260 = {}) {
+  const value261 = String(value260.expectedProvider || '')
       .trim()
       .toLowerCase(),
-    _0x461c4a = resolveRequestManifest(_0x54caa7, _0x15a9be, 'text');
-  if (!_0x461c4a) return null;
+    requestManifest2 = resolveRequestManifest(value259, value261, 'text');
+  if (!requestManifest2) return null;
   const {
-      provider: _0x2a3816,
-      modelManifest: _0x5f55e7,
-      executionManifest: _0x4990e2,
-      effectivePayload: _0x487047,
-    } = _0x461c4a,
-    _0x14f0dc = _0x56bb6d.getProviderConfig(_0x2a3816),
-    _0x467995 = resolveApiKey(_0x2a3816, _0x487047, _0x56bb6d) || _0x14f0dc.apiKey;
-  if (!_0x467995) throwMissingApiKey(_0x2a3816);
-  const _0x4b8698 = resolveExecutionModelToken(_0x4990e2, _0x487047),
-    _0x23b2eb = {
-      provider: _0x2a3816,
-      modelManifest: _0x5f55e7,
-      executionManifest: _0x4990e2,
-      payload: _0x487047,
-      finalPrompt: _0x4e1b21,
-      modelToken: _0x4b8698,
-      apiKey: _0x467995,
-      ctx: _0x56bb6d,
+      provider: provider9,
+      modelManifest: modelManifest3,
+      executionManifest: executionManifest4,
+      effectivePayload: effectivePayload3,
+    } = requestManifest2,
+    baseUrl4 = ctx2.getProviderConfig(provider9),
+    apiKey2 = resolveApiKey(provider9, effectivePayload3, ctx2) || baseUrl4.apiKey;
+  if (!apiKey2) throwMissingApiKey(provider9);
+  const modelToken2 = resolveExecutionModelToken(executionManifest4, effectivePayload3),
+    value262 = {
+      provider: provider9,
+      modelManifest: modelManifest3,
+      executionManifest: executionManifest4,
+      payload: effectivePayload3,
+      finalPrompt: finalPrompt2,
+      modelToken: modelToken2,
+      apiKey: apiKey2,
+      ctx: ctx2,
       inputImages: [],
       inputVideos: [],
       inputAudios: [],
     };
-  if (_0x4990e2.endpointMode === 'responses') {
-    if (typeof _0x56bb6d.buildVolcengineResponsesUserContent !== 'function')
+  if (executionManifest4.endpointMode === 'responses') {
+    if (typeof ctx2.buildVolcengineResponsesUserContent !== 'function')
       throw new Error('responses text manifest requires user content resolver');
-    const _0x147ccb =
-        typeof _0x56bb6d.resolveChatCompletionInputUrls === 'function'
-          ? _0x56bb6d.resolveChatCompletionInputUrls({
-              providerId: _0x2a3816,
-              mediaPolicy: _0x4990e2.extensions?.chatCompletionInputPolicy,
-              inputUrls: _0x487047.inputUrls || [],
-              inputImageUrls: _0x487047.inputImageUrls || [],
-              inputVideoUrls: _0x487047.inputVideoUrls || [],
+    const value263 =
+        typeof ctx2.resolveChatCompletionInputUrls === 'function'
+          ? ctx2.resolveChatCompletionInputUrls({
+              providerId: provider9,
+              mediaPolicy: executionManifest4.extensions?.chatCompletionInputPolicy,
+              inputUrls: effectivePayload3.inputUrls || [],
+              inputImageUrls: effectivePayload3.inputImageUrls || [],
+              inputVideoUrls: effectivePayload3.inputVideoUrls || [],
             })
-          : _0x487047.inputImageUrls || _0x487047.inputUrls || [],
-      _0x295ca9 = await _0x56bb6d.buildVolcengineResponsesUserContent(
-        _0x4e1b21,
-        _0x147ccb,
-        _0x467995,
-        _0x2a3816,
-        {
-          mediaPolicy: _0x4990e2.extensions?.chatCompletionInputPolicy,
-          inputImageUrls: _0x487047.inputImageUrls || [],
-          inputVideoUrls: _0x487047.inputVideoUrls || [],
-          baseUrl: _0x14f0dc.apiUrl,
-          model: _0x4b8698,
-          videoFps: _0x4990e2.extensions?.volcengineFiles?.videoFps,
-        },
-      );
-    return {
-      url: '/api/v2/proxy/completions',
-      headers: _0x4990e2.headers || { 'Content-Type': 'application/json' },
-      body: {
-        apiUrl: resolveManifestApiUrl(_0x2a3816, _0x14f0dc, _0x4990e2, _0x23b2eb),
-        apiKey: _0x467995,
-        model: _0x4b8698,
-        stream: false,
-        ...(_0x487047.systemPrompt ? { instructions: _0x487047.systemPrompt } : {}),
-        input: [{ role: 'user', content: _0x295ca9 }],
-      },
-      responseMapping: _0x4990e2.responseMapping,
-      isProxy: true,
-      adapterTrace: { source: 'manifest', executionId: _0x4990e2.id, modelId: _0x487047.model },
-    };
-  }
-  if (_0x4990e2.endpointMode === 'chat-completion') {
-    if (typeof _0x56bb6d.buildChatCompletionUserContent !== 'function')
-      throw new Error('chat-completion text manifest requires user content resolver');
-    const _0x18189e =
-        typeof _0x56bb6d.resolveChatCompletionInputUrls === 'function'
-          ? _0x56bb6d.resolveChatCompletionInputUrls({
-              providerId: _0x2a3816,
-              mediaPolicy: _0x4990e2.extensions?.chatCompletionInputPolicy,
-              inputUrls: _0x487047.inputUrls || [],
-              inputImageUrls: _0x487047.inputImageUrls || [],
-              inputVideoUrls: _0x487047.inputVideoUrls || [],
-            })
-          : _0x487047.inputImageUrls || _0x487047.inputUrls || [],
-      _0x17a778 = await _0x56bb6d.buildChatCompletionUserContent(_0x4e1b21, _0x18189e, _0x467995, _0x2a3816, {
-        mediaPolicy: _0x4990e2.extensions?.chatCompletionInputPolicy,
-        inputImageUrls: _0x487047.inputImageUrls || [],
-        inputVideoUrls: _0x487047.inputVideoUrls || [],
+          : effectivePayload3.inputImageUrls || effectivePayload3.inputUrls || [],
+      content = await ctx2.buildVolcengineResponsesUserContent(finalPrompt2, value263, apiKey2, provider9, {
+        mediaPolicy: executionManifest4.extensions?.chatCompletionInputPolicy,
+        inputImageUrls: effectivePayload3.inputImageUrls || [],
+        inputVideoUrls: effectivePayload3.inputVideoUrls || [],
+        baseUrl: baseUrl4.apiUrl,
+        model: modelToken2,
+        videoFps: executionManifest4.extensions?.volcengineFiles?.videoFps,
       });
     return {
       url: '/api/v2/proxy/completions',
-      headers: _0x4990e2.headers || { 'Content-Type': 'application/json' },
+      headers: executionManifest4.headers || { 'Content-Type': 'application/json' },
       body: {
-        apiUrl: resolveManifestApiUrl(_0x2a3816, _0x14f0dc, _0x4990e2, _0x23b2eb),
-        apiKey: _0x467995,
-        model: _0x4b8698,
+        apiUrl: resolveManifestApiUrl(provider9, baseUrl4, executionManifest4, value262),
+        apiKey: apiKey2,
+        model: modelToken2,
         stream: false,
-        messages: [
-          { role: 'system', content: _0x487047.systemPrompt || 'You are a helpful assistant.' },
-          { role: 'user', content: _0x17a778 },
-        ],
+        ...(effectivePayload3.systemPrompt ? { instructions: effectivePayload3.systemPrompt } : {}),
+        input: [{ role: 'user', content: content }],
       },
-      responseMapping: _0x4990e2.responseMapping,
+      responseMapping: executionManifest4.responseMapping,
       isProxy: true,
-      adapterTrace: { source: 'manifest', executionId: _0x4990e2.id, modelId: _0x487047.model },
+      adapterTrace: {
+        source: 'manifest',
+        executionId: executionManifest4.id,
+        modelId: effectivePayload3.model,
+      },
     };
   }
-  const _0x537dbb = Array.isArray(_0x487047.inputImageUrls) ? _0x487047.inputImageUrls : [];
-  if (_0x537dbb.length === 0) throw new Error('RunningHub image-to-text manifest requires an image input');
-  const _0x2c13c6 = await _0x56bb6d.buildRunningHubTextImageUrl(_0x537dbb, _0x467995);
-  if (!_0x2c13c6) throw new Error('RunningHub image-to-text image upload failed');
+  if (executionManifest4.endpointMode === 'chat-completion') {
+    if (typeof ctx2.buildChatCompletionUserContent !== 'function')
+      throw new Error('chat-completion text manifest requires user content resolver');
+    const value264 =
+        typeof ctx2.resolveChatCompletionInputUrls === 'function'
+          ? ctx2.resolveChatCompletionInputUrls({
+              providerId: provider9,
+              mediaPolicy: executionManifest4.extensions?.chatCompletionInputPolicy,
+              inputUrls: effectivePayload3.inputUrls || [],
+              inputImageUrls: effectivePayload3.inputImageUrls || [],
+              inputVideoUrls: effectivePayload3.inputVideoUrls || [],
+            })
+          : effectivePayload3.inputImageUrls || effectivePayload3.inputUrls || [],
+      content2 = await ctx2.buildChatCompletionUserContent(finalPrompt2, value264, apiKey2, provider9, {
+        mediaPolicy: executionManifest4.extensions?.chatCompletionInputPolicy,
+        inputImageUrls: effectivePayload3.inputImageUrls || [],
+        inputVideoUrls: effectivePayload3.inputVideoUrls || [],
+      });
+    return {
+      url: '/api/v2/proxy/completions',
+      headers: executionManifest4.headers || { 'Content-Type': 'application/json' },
+      body: {
+        apiUrl: resolveManifestApiUrl(provider9, baseUrl4, executionManifest4, value262),
+        apiKey: apiKey2,
+        model: modelToken2,
+        stream: false,
+        messages: [
+          { role: 'system', content: effectivePayload3.systemPrompt || 'You are a helpful assistant.' },
+          { role: 'user', content: content2 },
+        ],
+      },
+      responseMapping: executionManifest4.responseMapping,
+      isProxy: true,
+      adapterTrace: {
+        source: 'manifest',
+        executionId: executionManifest4.id,
+        modelId: effectivePayload3.model,
+      },
+    };
+  }
+  const list30 = Array.isArray(effectivePayload3.inputImageUrls) ? effectivePayload3.inputImageUrls : [];
+  if (list30.length === 0) throw new Error('RunningHub image-to-text manifest requires an image input');
+  const imageUrl = await ctx2.buildRunningHubTextImageUrl(list30, apiKey2);
+  if (!imageUrl) throw new Error('RunningHub image-to-text image upload failed');
   return {
     url: '/api/v2/proxy/image',
-    headers: _0x4990e2.headers || { 'Content-Type': 'application/json' },
+    headers: executionManifest4.headers || { 'Content-Type': 'application/json' },
     body: {
-      apiUrl: 'https://www.runninghub.cn/openapi/v2/' + _0x4990e2.model,
-      apiKey: _0x467995,
-      prompt: _0x4e1b21,
-      imageUrl: _0x2c13c6,
+      apiUrl: 'https://www.runninghub.cn/openapi/v2/' + executionManifest4.model,
+      apiKey: apiKey2,
+      prompt: finalPrompt2,
+      imageUrl: imageUrl,
     },
-    responseMapping: _0x4990e2.responseMapping,
+    responseMapping: executionManifest4.responseMapping,
     isProxy: true,
-    adapterTrace: { source: 'manifest', executionId: _0x4990e2.id, modelId: _0x487047.model },
+    adapterTrace: {
+      source: 'manifest',
+      executionId: executionManifest4.id,
+      modelId: effectivePayload3.model,
+    },
   };
 }
-export async function buildImageRequestFromManifest(_0x39f3e3, _0x88ce33, _0x1a3d58, _0xe0e90 = {}) {
-  const _0x4ece81 = String(_0xe0e90.expectedProvider || '')
+export async function buildImageRequestFromManifest(modelId3, finalPrompt3, ctx3, value265 = {}) {
+  const value266 = String(value265.expectedProvider || '')
       .trim()
       .toLowerCase(),
-    _0x4836c8 = resolveRequestManifest(_0x39f3e3, _0x4ece81, 'image');
-  if (!_0x4836c8) return null;
+    requestManifest3 = resolveRequestManifest(modelId3, value266, 'image');
+  if (!requestManifest3) return null;
   const {
-    provider: _0x52c3d4,
-    modelManifest: _0x444908,
-    executionManifest: _0x26bda7,
-    effectivePayload: _0x2a7e2b,
-  } = _0x4836c8;
-  if (!['agnes', 'apimart', 'ppio', 'grsai', 'runninghub', 'volcengine'].includes(_0x52c3d4)) return null;
-  const _0x39c55a = _0x1a3d58.getProviderConfig(_0x52c3d4),
-    _0x3165f5 = resolveApiKey(_0x52c3d4, _0x39f3e3, _0x1a3d58);
-  !_0x3165f5 && throwMissingApiKey(_0x52c3d4);
-  const _0x21a50f = await resolveInputImagesBySlot(_0x52c3d4, _0x2a7e2b, _0x3165f5, _0x1a3d58, {
-      modelManifest: _0x444908,
-      executionManifest: _0x26bda7,
-      baseUrl: _0x39c55a.apiUrl,
+    provider: provider10,
+    modelManifest: modelManifest4,
+    executionManifest: executionManifest5,
+    effectivePayload: effectivePayload4,
+  } = requestManifest3;
+  if (!['agnes', 'apimart', 'ppio', 'grsai', 'runninghub', 'volcengine'].includes(provider10)) return null;
+  const baseUrl5 = ctx3.getProviderConfig(provider10),
+    apiKey3 = resolveApiKey(provider10, modelId3, ctx3);
+  !apiKey3 && throwMissingApiKey(provider10);
+  const finalUrlsBySlot2 = await resolveInputImagesBySlot(provider10, effectivePayload4, apiKey3, ctx3, {
+      modelManifest: modelManifest4,
+      executionManifest: executionManifest5,
+      baseUrl: baseUrl5.apiUrl,
     }),
-    _0x289dbe = Object.keys(_0x21a50f).length > 0,
-    _0x2af5f8 = _0x289dbe
-      ? Object.values(_0x21a50f)
-      : await resolveInputImages(_0x52c3d4, _0x2a7e2b, _0x3165f5, _0x1a3d58, {
-          modelManifest: _0x444908,
-          executionManifest: _0x26bda7,
-          baseUrl: _0x39c55a.apiUrl,
+    value267 = Object.keys(finalUrlsBySlot2).length > 0,
+    finalUrls2 = value267
+      ? Object.values(finalUrlsBySlot2)
+      : await resolveInputImages(provider10, effectivePayload4, apiKey3, ctx3, {
+          modelManifest: modelManifest4,
+          executionManifest: executionManifest5,
+          baseUrl: baseUrl5.apiUrl,
         }),
-    _0x500ed8 = resolveExecutionModelToken(_0x26bda7, _0x2a7e2b),
-    _0x5575aa = {
-      provider: _0x52c3d4,
-      modelManifest: _0x444908,
-      executionManifest: _0x26bda7,
-      payload: _0x2a7e2b,
-      finalPrompt: _0x88ce33,
-      modelToken: _0x500ed8,
-      apiKey: _0x3165f5,
-      ctx: _0x1a3d58,
-      finalUrls: _0x2af5f8,
-      finalUrlsBySlot: _0x21a50f,
-      inputImages: _0x2af5f8,
+    modelToken3 = resolveExecutionModelToken(executionManifest5, effectivePayload4),
+    value268 = {
+      provider: provider10,
+      modelManifest: modelManifest4,
+      executionManifest: executionManifest5,
+      payload: effectivePayload4,
+      finalPrompt: finalPrompt3,
+      modelToken: modelToken3,
+      apiKey: apiKey3,
+      ctx: ctx3,
+      finalUrls: finalUrls2,
+      finalUrlsBySlot: finalUrlsBySlot2,
+      inputImages: finalUrls2,
       inputVideos: [],
       inputAudios: [],
     },
-    _0x36f39f = await buildManifestMappedBody(_0x5575aa),
-    _0x583892 = _0x52c3d4 === 'runninghub';
+    args10 = await buildManifestMappedBody(value268),
+    value269 = provider10 === 'runninghub';
   return {
     url: '/api/v2/proxy/image',
-    headers: _0x26bda7.headers || { 'Content-Type': 'application/json' },
+    headers: executionManifest5.headers || { 'Content-Type': 'application/json' },
     body: {
-      apiUrl: resolveManifestApiUrl(_0x52c3d4, _0x39c55a, _0x26bda7, _0x5575aa),
-      apiKey: _0x3165f5,
-      ..._0x36f39f,
+      apiUrl: resolveManifestApiUrl(provider10, baseUrl5, executionManifest5, value268),
+      apiKey: apiKey3,
+      ...args10,
     },
-    responseMapping: _0x26bda7.responseMapping,
-    taskPolling: resolveManifestTaskPolling(_0x52c3d4, _0x39c55a, _0x26bda7, _0x5575aa),
-    adapterTrace: { source: 'manifest', executionId: _0x26bda7.id, modelId: _0x39f3e3.model },
-    ...(_0x583892
+    responseMapping: executionManifest5.responseMapping,
+    taskPolling: resolveManifestTaskPolling(provider10, baseUrl5, executionManifest5, value268),
+    adapterTrace: { source: 'manifest', executionId: executionManifest5.id, modelId: modelId3.model },
+    ...(value269
       ? {
           isAsync: true,
-          taskIdPath: _0x26bda7.responseMapping?.taskIdPath || _0x26bda7.result?.taskIdPath || 'taskId',
+          taskIdPath:
+            executionManifest5.responseMapping?.taskIdPath ||
+            executionManifest5.result?.taskIdPath ||
+            'taskId',
           useOpenapiQuery: true,
           pollUrlBuilder: () => 'https://www.runninghub.cn/openapi/v2/query',
-          resultExtractor: (_0x273343) => {
-            if (_0x273343.status === 'COMPLETED' && Array.isArray(_0x273343.results))
-              return _0x273343.results
-                .map((_0x3713f5) => _0x3713f5.url || _0x3713f5.imageUrl || _0x3713f5.videoUrl)
+          resultExtractor: (response2) => {
+            if (response2.status === 'COMPLETED' && Array.isArray(response2.results))
+              return response2.results
+                .map((response3) => response3.url || response3.imageUrl || response3.videoUrl)
                 .filter(Boolean);
             return [];
           },
@@ -1589,119 +1599,942 @@ export async function buildImageRequestFromManifest(_0x39f3e3, _0x88ce33, _0x1a3
   };
 }
 
-function pickDefaultConcreteVideoAspectRatio(_0x171ce0){const _0x5e214c=findVideoAspectRatioField(_0x171ce0),_0x30e4fb=Array['isArray'](_0x5e214c?.["options"])?_0x5e214c['options']:[];let _0x1be3fa='';for(const _0x214d31 of _0x30e4fb){const _0x2700e1=String(_0x214d31?.["value"]??_0x214d31??'')['trim']();if(_0x2700e1&&_0x2700e1['includes'](':')&&!isAdaptiveRatioLabel(_0x2700e1)){if(_0x2700e1==="1:1")return _0x2700e1;if(!_0x1be3fa)_0x1be3fa=_0x2700e1;}}return _0x1be3fa;}
+function pickDefaultConcreteVideoAspectRatio(value270) {
+  const videoAspectRatioField2 = findVideoAspectRatioField(value270),
+    value271 = Array['isArray'](videoAspectRatioField2?.['options']) ? videoAspectRatioField2['options'] : [];
+  let enabled18 = '';
+  for (const value272 of value271) {
+    const list31 = String(value272?.['value'] ?? value272 ?? '')['trim']();
+    if (list31 && list31['includes'](':') && !isAdaptiveRatioLabel(list31)) {
+      if (list31 === '1:1') return list31;
+      if (!enabled18) enabled18 = list31;
+    }
+  }
+  return enabled18;
+}
 
-function mergeUiSchemaDefaultsIntoPayload(_0x22b189={},_0x447f70=null){const _0x479e71=Array["isArray"](_0x447f70?.['uiSchema']?.["fields"])?_0x447f70["uiSchema"]["fields"]:[];if(_0x479e71["length"]===0x0)return _0x22b189;const _0x37659e=_0x22b189?.["generationParams"]&&typeof _0x22b189["generationParams"]==="object"&&!Array["isArray"](_0x22b189['generationParams'])?{..._0x22b189["generationParams"]}:{};_0x479e71["forEach"](_0x40597c=>{const _0x47ee29=String(_0x40597c?.['id']||'')['trim']();if(!_0x47ee29||Object["prototype"]["hasOwnProperty"]["call"](_0x37659e,_0x47ee29))return;if(_0x47ee29==="aspectRatio"&&String(_0x22b189?.["resolvedRatioLabel"]||'')["trim"]()){_0x37659e[_0x47ee29]=_0x22b189['resolvedRatioLabel'];return;}Object["prototype"]["hasOwnProperty"]['call'](_0x22b189||{},_0x47ee29)&&(_0x37659e[_0x47ee29]=_0x22b189[_0x47ee29]);});const _0x37f0e7=sanitizeModelUiSchemaParams(_0x447f70["modelId"],_0x37659e,{'includeDefaults':!![]}),_0x313a40={..._0x22b189,'generationParams':_0x37f0e7};return _0x479e71["forEach"](_0x4d6ebe=>{const _0x2aa7f7=String(_0x4d6ebe?.['id']||'')["trim"]();if(!_0x2aa7f7||Object["prototype"]['hasOwnProperty']['call'](_0x313a40,_0x2aa7f7))return;Object["prototype"]["hasOwnProperty"]["call"](_0x37f0e7,_0x2aa7f7)&&(_0x313a40[_0x2aa7f7]=_0x37f0e7[_0x2aa7f7]);}),_0x313a40;}
+function mergeUiSchemaDefaultsIntoPayload(args11 = {}, value273 = null) {
+  const value274 = Array['isArray'](value273?.['uiSchema']?.['fields']) ? value273['uiSchema']['fields'] : [];
+  if (value274['length'] === 0x0) return args11;
+  const value275 =
+    args11?.['generationParams'] &&
+    typeof args11['generationParams'] === 'object' &&
+    !Array['isArray'](args11['generationParams'])
+      ? { ...args11['generationParams'] }
+      : {};
+  value274['forEach']((value276) => {
+    const enabled19 = String(value276?.['id'] || '')['trim']();
+    if (!enabled19 || Object['prototype']['hasOwnProperty']['call'](value275, enabled19)) return;
+    if (enabled19 === 'aspectRatio' && String(args11?.['resolvedRatioLabel'] || '')['trim']()) {
+      value275[enabled19] = args11['resolvedRatioLabel'];
+      return;
+    }
+    Object['prototype']['hasOwnProperty']['call'](args11 || {}, enabled19) &&
+      (value275[enabled19] = args11[enabled19]);
+  });
+  const sanitizeModelUiSchemaParams3 = sanitizeModelUiSchemaParams(value273['modelId'], value275, {
+      includeDefaults: !![],
+    }),
+    value277 = { ...args11, generationParams: sanitizeModelUiSchemaParams3 };
+  return (
+    value274['forEach']((value278) => {
+      const enabled20 = String(value278?.['id'] || '')['trim']();
+      if (!enabled20 || Object['prototype']['hasOwnProperty']['call'](value277, enabled20)) return;
+      Object['prototype']['hasOwnProperty']['call'](sanitizeModelUiSchemaParams3, enabled20) &&
+        (value277[enabled20] = sanitizeModelUiSchemaParams3[enabled20]);
+    }),
+    value277
+  );
+}
 
-function resolveProviderConfig(_0x2f2faa,_0x5cad76,_0x1920c1){const _0x2559d9=getRunningHubProviderProfileId(_0x5cad76),_0x361acb=normalizeModelProviderProfileId(_0x5cad76?.['model'],_0x2559d9),_0x4cb13d=_0x361acb||(_0x2f2faa==="runninghub"?resolveRunningHubModelApiProfileId(_0x5cad76?.["model"],_0x2559d9):_0x2f2faa),_0x3dbad9=_0x1920c1["getProviderConfig"](_0x4cb13d);if(_0x2f2faa!=="runninghub")return _0x3dbad9;return{..._0x3dbad9,'apiUrl':resolveRunningHubModelApiBaseUrl(_0x4cb13d)};}
+function resolveProviderConfig(value279, value280, value281) {
+  const runningHubProviderProfileId = getRunningHubProviderProfileId(value280),
+    modelProviderProfileId = normalizeModelProviderProfileId(
+      value280?.['model'],
+      runningHubProviderProfileId,
+    ),
+    value282 =
+      modelProviderProfileId ||
+      (value279 === 'runninghub'
+        ? resolveRunningHubModelApiProfileId(value280?.['model'], runningHubProviderProfileId)
+        : value279),
+    args12 = value281['getProviderConfig'](value282);
+  if (value279 !== 'runninghub') return args12;
+  return { ...args12, apiUrl: resolveRunningHubModelApiBaseUrl(value282) };
+}
 
-function isCustomProviderId(_0x3cdd5c){return/^custom_[a-z0-9_-]+$/i['test'](String(_0x3cdd5c||'')["trim"]());}
+function isCustomProviderId(value283) {
+  return /^custom_[a-z0-9_-]+$/i['test'](String(value283 || '')['trim']());
+}
 
-const AIC_IMAGE_TASK_PROBE_CONTROL_KEY='__aicAllowTaskProbe',AIC_MODEL_CATALOG_ID_KEY='__aicModelCatalogId';
+const AIC_IMAGE_TASK_PROBE_CONTROL_KEY = '__aicAllowTaskProbe',
+  AIC_MODEL_CATALOG_ID_KEY = '__aicModelCatalogId';
 
-function buildModelCatalogIdentity(_0x376e0d,_0x25e941){const _0x2e3216=String(_0x25e941?.['modelId']||'')['trim']();return _0x376e0d==='binghuo'&&_0x2e3216?{[AIC_MODEL_CATALOG_ID_KEY]:_0x2e3216}:{};}
+function buildModelCatalogIdentity(value284, value285) {
+  const value286 = String(value285?.['modelId'] || '')['trim']();
+  return value284 === 'binghuo' && value286 ? { [AIC_MODEL_CATALOG_ID_KEY]: value286 } : {};
+}
 
-function supportsManifestImageTaskPolling(_0x3766ca){return Boolean(_0x3766ca&&(String(_0x3766ca['urlTemplate']||'')["trim"]()||String(_0x3766ca["mode"]||'')["trim"]()==="comfyui-history"));}
+function supportsManifestImageTaskPolling(value287) {
+  return Boolean(
+    value287 &&
+    (String(value287['urlTemplate'] || '')['trim']() ||
+      String(value287['mode'] || '')['trim']() === 'comfyui-history'),
+  );
+}
 
-function isCustomProviderModelManifest(_0x1c1717){const _0x31867c=_0x1c1717?.["extensions"]?.['customProvider'];return Boolean(_0x31867c&&typeof _0x31867c==="object"&&!Array["isArray"](_0x31867c));}
+function isCustomProviderModelManifest(value288) {
+  const value289 = value288?.['extensions']?.['customProvider'];
+  return Boolean(value289 && typeof value289 === 'object' && !Array['isArray'](value289));
+}
 
-function isSupportedModelApiProvider(_0x364beb,_0x2a6f49=new Set()){const _0x4f480f=String(_0x364beb||'')["trim"]()["toLowerCase"]();return _0x2a6f49["has"](_0x4f480f)||isCustomProviderId(_0x4f480f);}
+function isSupportedModelApiProvider(value290, value291 = new Set()) {
+  const value292 = String(value290 || '')
+    ['trim']()
+    ['toLowerCase']();
+  return value291['has'](value292) || isCustomProviderId(value292);
+}
 
-function collectRawImageInputUrls(_0x77c136={},_0x3182a1=null){const _0x531b6b=getOrderedInputSlotEntries(_0x77c136?.["inputUrlsBySlot"],_0x3182a1),_0x7841a9=_0x531b6b["length"]>0x0?_0x531b6b['map'](_0x28654e=>_0x28654e["url"]):Array["isArray"](_0x77c136?.["inputUrls"])?_0x77c136["inputUrls"]:[];return Array["from"](new Set(_0x7841a9['map'](_0xa47deb=>String(_0xa47deb||'')['trim']())["filter"](Boolean)));}
+function collectRawImageInputUrls(options11 = {}, value293 = null) {
+  const list32 = getOrderedInputSlotEntries(options11?.['inputUrlsBySlot'], value293),
+    list33 =
+      list32['length'] > 0x0
+        ? list32['map']((value294) => value294['url'])
+        : Array['isArray'](options11?.['inputUrls'])
+          ? options11['inputUrls']
+          : [];
+  return Array['from'](
+    new Set(list33['map']((value295) => String(value295 || '')['trim']())['filter'](Boolean)),
+  );
+}
 
-function collectResolverOwnedImageInputUrls(_0x135818={},_0x30a807=null){const _0x4604c3=collectRawImageInputUrls(_0x135818,_0x30a807),_0x2e9c61=getManifestMaxInputCount(_0x30a807,'image');return _0x2e9c61===null?_0x4604c3:_0x4604c3["slice"](0x0,Math['max'](0x0,_0x2e9c61));}
+function collectResolverOwnedImageInputUrls(options12 = {}, value296 = null) {
+  const rawImageInputUrls = collectRawImageInputUrls(options12, value296),
+    manifestMaxInputCount6 = getManifestMaxInputCount(value296, 'image');
+  return manifestMaxInputCount6 === null
+    ? rawImageInputUrls
+    : rawImageInputUrls['slice'](0x0, Math['max'](0x0, manifestMaxInputCount6));
+}
 
-function resolveInputRouteExecutionManifest(_0x1e33e8,_0x35ac26,_0x14ca9f){const _0x1d6abb=_0x1e33e8?.["extensions"]?.["inputRoutes"],_0x26717d=_0x1d6abb&&typeof _0x1d6abb==="object"&&!Array["isArray"](_0x1d6abb)?_0x1d6abb["image"]:null;if(!_0x26717d||typeof _0x26717d!=='object'||Array['isArray'](_0x26717d)||collectRawImageInputUrls(_0x35ac26,_0x14ca9f)["length"]===0x0)return _0x1e33e8;return{..._0x1e33e8,..._0x26717d,'extensions':{..._0x1e33e8?.["extensions"]||{},..._0x26717d['extensions']||{}}};}
+function resolveInputRouteExecutionManifest(args13, value297, value298) {
+  const value299 = args13?.['extensions']?.['inputRoutes'],
+    args14 =
+      value299 && typeof value299 === 'object' && !Array['isArray'](value299) ? value299['image'] : null;
+  if (
+    !args14 ||
+    typeof args14 !== 'object' ||
+    Array['isArray'](args14) ||
+    collectRawImageInputUrls(value297, value298)['length'] === 0x0
+  )
+    return args13;
+  return {
+    ...args13,
+    ...args14,
+    extensions: { ...(args13?.['extensions'] || {}), ...(args14['extensions'] || {}) },
+  };
+}
 
-function isMultipartFormExecution(_0x39ce78){return String(_0x39ce78?.["requestEncoding"]||'')["trim"]()["toLowerCase"]()==="multipart/form-data";}
+function isMultipartFormExecution(value300) {
+  return (
+    String(value300?.['requestEncoding'] || '')
+      ['trim']()
+      ['toLowerCase']() === 'multipart/form-data'
+  );
+}
 
-async function resolveMultipartInputImages(_0x3dba35,_0x292102,_0x11b06b){if(typeof _0x11b06b["loadInputImageBlob"]!=="function")throw new Error("Model API multipart image input loader is not available");const _0x1350e0=collectRawImageInputUrls(_0x3dba35,_0x292102),_0x10f982=getManifestMaxInputCount(_0x292102,"image"),_0x50178a=_0x10f982===null?_0x1350e0:_0x1350e0['slice'](0x0,_0x10f982),_0x348d38=[];for(const _0xebbd52 of _0x50178a){const _0x2561f1=await _0x11b06b["loadInputImageBlob"](_0xebbd52);if(typeof Blob==="undefined"||!(_0x2561f1 instanceof Blob))throw new Error("Model API multipart image input did not resolve to a file");_0x348d38['push'](_0x2561f1);}return _0x348d38;}
+async function resolveMultipartInputImages(value301, value302, value303) {
+  if (typeof value303['loadInputImageBlob'] !== 'function')
+    throw new Error('Model API multipart image input loader is not available');
+  const list34 = collectRawImageInputUrls(value301, value302),
+    manifestMaxInputCount7 = getManifestMaxInputCount(value302, 'image'),
+    value304 = manifestMaxInputCount7 === null ? list34 : list34['slice'](0x0, manifestMaxInputCount7),
+    list35 = [];
+  for (const value305 of value304) {
+    const value306 = await value303['loadInputImageBlob'](value305);
+    if (typeof Blob === 'undefined' || !(value306 instanceof Blob))
+      throw new Error('Model API multipart image input did not resolve to a file');
+    list35['push'](value306);
+  }
+  return list35;
+}
 
-function multipartFileName(_0x3de1c9,_0x17ae15){const _0x15b360=String(_0x3de1c9?.["type"]||'')["trim"]()["toLowerCase"](),_0x487d6f=_0x15b360==="image/jpeg"?'jpg':_0x15b360==="image/webp"?"webp":_0x15b360==='image/gif'?"gif":'png';return "image-"+(_0x17ae15+0x1)+'.'+_0x487d6f;}
+function multipartFileName(value307, value308) {
+  const value309 = String(value307?.['type'] || '')
+      ['trim']()
+      ['toLowerCase'](),
+    value310 =
+      value309 === 'image/jpeg'
+        ? 'jpg'
+        : value309 === 'image/webp'
+          ? 'webp'
+          : value309 === 'image/gif'
+            ? 'gif'
+            : 'png';
+  return 'image-' + (value308 + 0x1) + '.' + value310;
+}
 
-function appendMultipartValue(_0x5cc7c7,_0x37752d,_0x5b98c4,_0x44939f=0x0){if(_0x5b98c4===undefined||_0x5b98c4===null||_0x5b98c4==='')return;if(typeof Blob!=='undefined'&&_0x5b98c4 instanceof Blob){_0x5cc7c7["append"](_0x37752d,_0x5b98c4,multipartFileName(_0x5b98c4,_0x44939f));return;}if(Array['isArray'](_0x5b98c4)){_0x5b98c4['forEach']((_0x2d8cba,_0x441fb7)=>appendMultipartValue(_0x5cc7c7,_0x37752d,_0x2d8cba,_0x441fb7));return;}if(typeof _0x5b98c4==='object'){_0x5cc7c7["append"](_0x37752d,JSON["stringify"](_0x5b98c4));return;}_0x5cc7c7["append"](_0x37752d,String(_0x5b98c4));}
+function appendMultipartValue(value311, value312, list36, value313 = 0x0) {
+  if (list36 === undefined || list36 === null || list36 === '') return;
+  if (typeof Blob !== 'undefined' && list36 instanceof Blob) {
+    value311['append'](value312, list36, multipartFileName(list36, value313));
+    return;
+  }
+  if (Array['isArray'](list36)) {
+    list36['forEach']((value314, value315) => appendMultipartValue(value311, value312, value314, value315));
+    return;
+  }
+  if (typeof list36 === 'object') {
+    value311['append'](value312, JSON['stringify'](list36));
+    return;
+  }
+  value311['append'](value312, String(list36));
+}
 
-function buildMultipartFormData(_0x2845cc={}){const _0x4de657=new FormData();return Object["entries"](_0x2845cc||{})["forEach"](([_0x542f1a,_0x56385a])=>{appendMultipartValue(_0x4de657,_0x542f1a,_0x56385a);}),_0x4de657;}
+function buildMultipartFormData(options13 = {}) {
+  const formData = new FormData();
+  return (
+    Object['entries'](options13 || {})['forEach'](([value316, value317]) => {
+      appendMultipartValue(formData, value316, value317);
+    }),
+    formData
+  );
+}
 
-function resolveCustomProviderAssetUploadApiUrl(_0x426ea5,_0x5c6f8b){const _0x57ff05=String(_0x426ea5||'')['trim'](),_0x207d24=String(_0x5c6f8b||'')["trim"]();if(!_0x57ff05||!_0x207d24["startsWith"]('/'))throw new Error('Custom\x20provider\x20asset\x20upload\x20manifest\x20is\x20missing\x20a\x20relative\x20endpoint');let _0x106e28,_0x4c7313;try{_0x106e28=new URL(_0x57ff05),_0x4c7313=new URL(_0x207d24,_0x106e28["origin"]);}catch{throw new Error('Custom\x20provider\x20asset\x20upload\x20manifest\x20has\x20an\x20invalid\x20endpoint');}if(_0x4c7313['origin']!==_0x106e28["origin"]||_0x4c7313["search"]||_0x4c7313['hash'])throw new Error("Custom provider asset upload endpoint must remain on the provider origin");return _0x4c7313["toString"]();}
+function resolveCustomProviderAssetUploadApiUrl(value318, value319) {
+  const enabled21 = String(value318 || '')['trim'](),
+    enabled22 = String(value319 || '')['trim']();
+  if (!enabled21 || !enabled22['startsWith']('/'))
+    throw new Error(
+      'Custom\x20provider\x20asset\x20upload\x20manifest\x20is\x20missing\x20a\x20relative\x20endpoint',
+    );
+  let uRL, uRL2;
+  try {
+    ((uRL = new URL(enabled21)), (uRL2 = new URL(enabled22, uRL['origin'])));
+  } catch {
+    throw new Error('Custom\x20provider\x20asset\x20upload\x20manifest\x20has\x20an\x20invalid\x20endpoint');
+  }
+  if (uRL2['origin'] !== uRL['origin'] || uRL2['search'] || uRL2['hash'])
+    throw new Error('Custom provider asset upload endpoint must remain on the provider origin');
+  return uRL2['toString']();
+}
 
-function getCustomProviderAssetUploadOptions(_0x4c1a22,_0x41bef9){return{'provider':"customProviderAsset",'apiUrl':resolveCustomProviderAssetUploadApiUrl(_0x41bef9,_0x4c1a22['endpoint']),'multipartField':String(_0x4c1a22['multipartField']||"file")['trim']()||'file','responsePath':String(_0x4c1a22["responsePath"]||"url")["trim"]()||'url',..._0x4c1a22["formFields"]?{'formFields':_0x4c1a22["formFields"]}:{},'forceProviderUpload':_0x4c1a22["forceProviderUpload"]===!![],'allowedExtensions':Array['isArray'](_0x4c1a22['allowedExtensions'])?_0x4c1a22['allowedExtensions']:[],'maxBytes':_0x4c1a22["maxBytes"],'uploadTimeout':_0x4c1a22["uploadTimeout"],'compress':_0x4c1a22["compress"]===!![],'applyInputQualityProfile':_0x4c1a22["applyInputQualityProfile"]===!![],'strictUpload':_0x4c1a22["strictUpload"]!==![]};}
+function getCustomProviderAssetUploadOptions(args15, value320) {
+  return {
+    provider: 'customProviderAsset',
+    apiUrl: resolveCustomProviderAssetUploadApiUrl(value320, args15['endpoint']),
+    multipartField: String(args15['multipartField'] || 'file')['trim']() || 'file',
+    responsePath: String(args15['responsePath'] || 'url')['trim']() || 'url',
+    ...(args15['formFields'] ? { formFields: args15['formFields'] } : {}),
+    forceProviderUpload: args15['forceProviderUpload'] === !![],
+    allowedExtensions: Array['isArray'](args15['allowedExtensions']) ? args15['allowedExtensions'] : [],
+    maxBytes: args15['maxBytes'],
+    uploadTimeout: args15['uploadTimeout'],
+    compress: args15['compress'] === !![],
+    applyInputQualityProfile: args15['applyInputQualityProfile'] === !![],
+    strictUpload: args15['strictUpload'] !== ![],
+  };
+}
 
-function isApimartPrivateAssetUrl(_0x3b5cb0){return/^asset:\/\//i['test'](String(_0x3b5cb0||'')["trim"]());}
+function isApimartPrivateAssetUrl(value321) {
+  return /^asset:\/\//i['test'](String(value321 || '')['trim']());
+}
 
-function assertNoUnsupportedApimartAssetUrls(_0x3f49cb,_0x37d56b,_0x3979de={},_0x5c4773="image"){if(String(_0x3f49cb||'')["trim"]()['toLowerCase']()!=='apimart')return;if(_0x3979de["executionManifest"]?.["extensions"]?.["allowApimartAssetUrls"]===!![])return;const _0x4eae86=normalizeInputList(_0x37d56b)["find"](isApimartPrivateAssetUrl);if(!_0x4eae86)return;const _0x26e9fc=_0x5c4773==="video"?'视频':_0x5c4773==='audio'?'音频':'图片';throw new Error("APIMart "+_0x26e9fc+'输入不支持\x20asset://\x20私有素材\x20URL；请连接原始素材，或使用可公网访问的\x20'+_0x26e9fc+" URL 后重试");}
+function assertNoUnsupportedApimartAssetUrls(value322, value323, value324 = {}, value325 = 'image') {
+  if (
+    String(value322 || '')
+      ['trim']()
+      ['toLowerCase']() !== 'apimart'
+  )
+    return;
+  if (value324['executionManifest']?.['extensions']?.['allowApimartAssetUrls'] === !![]) return;
+  const inputList = normalizeInputList(value323)['find'](isApimartPrivateAssetUrl);
+  if (!inputList) return;
+  const value326 = value325 === 'video' ? '视频' : value325 === 'audio' ? '音频' : '图片';
+  throw new Error(
+    'APIMart ' +
+      value326 +
+      '输入不支持\x20asset://\x20私有素材\x20URL；请连接原始素材，或使用可公网访问的\x20' +
+      value326 +
+      ' URL 后重试',
+  );
+}
 
-function validateStrictVideoInputCounts(_0x5d3f88,_0x55f9c4,_0x7f0074){if(_0x7f0074?.["extensions"]?.["strictInputCounts"]!==!![])return;const _0x1585ce={'image':Array["from"](new Set([...collectRawImageInputUrls(_0x5d3f88,_0x55f9c4),...collectVideoImageInputUrls(_0x5d3f88)])),'video':collectVideoInputUrls(_0x5d3f88),'audio':collectAudioInputUrls(_0x5d3f88)},_0x301573={'image':"参考图",'video':"参考视频",'audio':'参考音频'};for(const [_0x4f1f76,_0x2f39eb]of Object["entries"](_0x1585ce)){const _0x253362=getManifestMaxInputCount(_0x55f9c4,_0x4f1f76),_0x3eb0fa=_0x55f9c4?.["inputSlots"]?.["allowedKinds"],_0xdf71d3=_0x253362===null&&Array["isArray"](_0x3eb0fa)&&!_0x3eb0fa["map"](_0x1eb35b=>String(_0x1eb35b||'')['trim']())["includes"](_0x4f1f76)?0x0:_0x253362;if(_0xdf71d3!==null&&_0x2f39eb["length"]>_0xdf71d3)throw new Error((_0x55f9c4["displayName"]||"当前模型")+"最多支持 "+_0xdf71d3+'\x20个'+_0x301573[_0x4f1f76]+'，当前传入\x20'+_0x2f39eb["length"]+" 个，请删减后重试");}}
+function validateStrictVideoInputCounts(value327, value328, value329) {
+  if (value329?.['extensions']?.['strictInputCounts'] !== !![]) return;
+  const value330 = {
+      image: Array['from'](
+        new Set([...collectRawImageInputUrls(value327, value328), ...collectVideoImageInputUrls(value327)]),
+      ),
+      video: collectVideoInputUrls(value327),
+      audio: collectAudioInputUrls(value327),
+    },
+    value331 = { image: '参考图', video: '参考视频', audio: '参考音频' };
+  for (const [value332, value333] of Object['entries'](value330)) {
+    const manifestMaxInputCount8 = getManifestMaxInputCount(value328, value332),
+      enabled23 = value328?.['inputSlots']?.['allowedKinds'],
+      value334 =
+        manifestMaxInputCount8 === null &&
+        Array['isArray'](enabled23) &&
+        !enabled23['map']((value335) => String(value335 || '')['trim']())['includes'](value332)
+          ? 0x0
+          : manifestMaxInputCount8;
+    if (value334 !== null && value333['length'] > value334)
+      throw new Error(
+        (value328['displayName'] || '当前模型') +
+          '最多支持 ' +
+          value334 +
+          '\x20个' +
+          value331[value332] +
+          '，当前传入\x20' +
+          value333['length'] +
+          ' 个，请删减后重试',
+      );
+  }
+}
 
-function resolveStrictUiSchemaFieldLabel(_0xfc1c55){const _0x116f96=String(_0xfc1c55?.['id']||'')["trim"](),_0x552a1a={'aspectRatio':'比例','batchSize':"生成数量",'imageSize':"图片分辨率",'qualityLevel':'质量'};return _0x552a1a[_0x116f96]||String(_0xfc1c55?.["label"]||_0x116f96||'参数')["trim"]();}
+function resolveStrictUiSchemaFieldLabel(value336) {
+  const value337 = String(value336?.['id'] || '')['trim'](),
+    value338 = { aspectRatio: '比例', batchSize: '生成数量', imageSize: '图片分辨率', qualityLevel: '质量' };
+  return value338[value337] || String(value336?.['label'] || value337 || '参数')['trim']();
+}
 
-function readExplicitUiSchemaValue(_0x4184c0,_0x37b667){const _0x8db109=_0x4184c0?.['generationParams']&&typeof _0x4184c0["generationParams"]==="object"&&!Array["isArray"](_0x4184c0['generationParams'])?_0x4184c0['generationParams']:{};if(Object["prototype"]["hasOwnProperty"]["call"](_0x8db109,_0x37b667))return{'provided':!![],'value':_0x8db109[_0x37b667]};if(Object["prototype"]["hasOwnProperty"]["call"](_0x4184c0||{},_0x37b667))return{'provided':!![],'value':_0x4184c0[_0x37b667]};return{'provided':![],'value':undefined};}
+function readExplicitUiSchemaValue(value339, value340) {
+  const value341 =
+    value339?.['generationParams'] &&
+    typeof value339['generationParams'] === 'object' &&
+    !Array['isArray'](value339['generationParams'])
+      ? value339['generationParams']
+      : {};
+  if (Object['prototype']['hasOwnProperty']['call'](value341, value340))
+    return { provided: !![], value: value341[value340] };
+  if (Object['prototype']['hasOwnProperty']['call'](value339 || {}, value340))
+    return { provided: !![], value: value339[value340] };
+  return { provided: ![], value: undefined };
+}
 
-function isSameStrictUiSchemaOption(_0xc40ca9,_0x1dda83){const _0x415195=Number(_0xc40ca9),_0x57c356=Number(_0x1dda83);if(String(_0xc40ca9??'')["trim"]()!==''&&String(_0x1dda83??'')["trim"]()!==''&&Number["isFinite"](_0x415195)&&Number["isFinite"](_0x57c356))return _0x415195===_0x57c356;return String(_0xc40ca9??'')["trim"]()["toLowerCase"]()===String(_0x1dda83??'')['trim']()["toLowerCase"]();}
+function isSameStrictUiSchemaOption(value342, value343) {
+  const value344 = Number(value342),
+    value345 = Number(value343);
+  if (
+    String(value342 ?? '')['trim']() !== '' &&
+    String(value343 ?? '')['trim']() !== '' &&
+    Number['isFinite'](value344) &&
+    Number['isFinite'](value345)
+  )
+    return value344 === value345;
+  return (
+    String(value342 ?? '')
+      ['trim']()
+      ['toLowerCase']() ===
+    String(value343 ?? '')
+      ['trim']()
+      ['toLowerCase']()
+  );
+}
 
-function validateStrictModelUiSchemaParams(_0x3a31d0,_0x415d14,_0x2b2637){if(_0x2b2637?.['extensions']?.['strictUiSchemaParams']!==!![])return;const _0x839b85=Array["isArray"](_0x415d14?.["uiSchema"]?.["fields"])?_0x415d14["uiSchema"]["fields"]:[],_0x3bd66c=String(_0x415d14?.["displayName"]||_0x415d14?.["modelId"]||'当前模型')["trim"]();for(const _0x29a433 of _0x839b85){const _0x2ad3ac=String(_0x29a433?.['id']||'')['trim']();if(!_0x2ad3ac)continue;const _0x236481=readExplicitUiSchemaValue(_0x3a31d0,_0x2ad3ac);if(!_0x236481['provided']||_0x236481["value"]===undefined||_0x236481["value"]===null||String(_0x236481["value"])["trim"]()==='')continue;const _0x1517ff=(Array["isArray"](_0x29a433?.["options"])?_0x29a433["options"]:[])["map"](_0x2120c4=>_0x2120c4&&typeof _0x2120c4==="object"&&!Array['isArray'](_0x2120c4)?_0x2120c4["value"]:_0x2120c4),_0x37a4ad=resolveStrictUiSchemaFieldLabel(_0x29a433);if(_0x1517ff['length']>0x0&&!_0x1517ff["some"](_0xe24eaf=>isSameStrictUiSchemaOption(_0xe24eaf,_0x236481['value'])))throw new Error('便宜渠道\x20'+_0x3bd66c+'\x20的'+_0x37a4ad+"不支持“"+_0x236481["value"]+"”，可选："+_0x1517ff["join"](" / "));const _0x5cbb56=String(_0x29a433?.["type"]||'')["trim"]()["toLowerCase"]();if(_0x5cbb56==="toggle"){const _0x106972=String(_0x236481["value"])["trim"]()["toLowerCase"]();if(_0x236481["value"]!==!![]&&_0x236481["value"]!==![]&&!["true","false",'1','0',"yes",'no','on',"off"]["includes"](_0x106972))throw new Error('便宜渠道\x20'+_0x3bd66c+'\x20的'+_0x37a4ad+'只能开启或关闭');continue;}if(!["slider","stepper"]["includes"](_0x5cbb56)||_0x1517ff["length"]>0x0)continue;const _0x3d01e7=Number(_0x236481["value"]),_0x26f708=Number(_0x29a433?.["min"]),_0x5c3d99=Number(_0x29a433?.["max"]),_0x23677a=Number(_0x29a433?.["step"]);if(!Number["isFinite"](_0x3d01e7))throw new Error("便宜渠道 "+_0x3bd66c+'\x20的'+_0x37a4ad+"必须是数字");if(Number["isFinite"](_0x26f708)&&_0x3d01e7<_0x26f708)throw new Error("便宜渠道 "+_0x3bd66c+'\x20的'+_0x37a4ad+"不能小于 "+_0x26f708);if(Number["isFinite"](_0x5c3d99)&&_0x3d01e7>_0x5c3d99)throw new Error('便宜渠道\x20'+_0x3bd66c+'\x20的'+_0x37a4ad+'不能大于\x20'+_0x5c3d99);if(Number["isFinite"](_0x23677a)&&_0x23677a>0x0&&Number["isFinite"](_0x26f708)&&Math["abs"]((_0x3d01e7-_0x26f708)/_0x23677a-Math["round"]((_0x3d01e7-_0x26f708)/_0x23677a))>1e-9)throw new Error("便宜渠道 "+_0x3bd66c+'\x20的'+_0x37a4ad+"必须按 "+_0x23677a+" 递增");}}
+function validateStrictModelUiSchemaParams(value346, value347, value348) {
+  if (value348?.['extensions']?.['strictUiSchemaParams'] !== !![]) return;
+  const value349 = Array['isArray'](value347?.['uiSchema']?.['fields']) ? value347['uiSchema']['fields'] : [],
+    value350 = String(value347?.['displayName'] || value347?.['modelId'] || '当前模型')['trim']();
+  for (const value351 of value349) {
+    const enabled24 = String(value351?.['id'] || '')['trim']();
+    if (!enabled24) continue;
+    const el2 = readExplicitUiSchemaValue(value346, enabled24);
+    if (
+      !el2['provided'] ||
+      el2['value'] === undefined ||
+      el2['value'] === null ||
+      String(el2['value'])['trim']() === ''
+    )
+      continue;
+    const list37 = (Array['isArray'](value351?.['options']) ? value351['options'] : [])['map']((value352) =>
+        value352 && typeof value352 === 'object' && !Array['isArray'](value352)
+          ? value352['value']
+          : value352,
+      ),
+      strictUiSchemaFieldLabel = resolveStrictUiSchemaFieldLabel(value351);
+    if (
+      list37['length'] > 0x0 &&
+      !list37['some']((value353) => isSameStrictUiSchemaOption(value353, el2['value']))
+    )
+      throw new Error(
+        '便宜渠道\x20' +
+          value350 +
+          '\x20的' +
+          strictUiSchemaFieldLabel +
+          '不支持“' +
+          el2['value'] +
+          '”，可选：' +
+          list37['join'](' / '),
+      );
+    const value354 = String(value351?.['type'] || '')
+      ['trim']()
+      ['toLowerCase']();
+    if (value354 === 'toggle') {
+      const value355 = String(el2['value'])['trim']()['toLowerCase']();
+      if (
+        el2['value'] !== !![] &&
+        el2['value'] !== ![] &&
+        !['true', 'false', '1', '0', 'yes', 'no', 'on', 'off']['includes'](value355)
+      )
+        throw new Error('便宜渠道\x20' + value350 + '\x20的' + strictUiSchemaFieldLabel + '只能开启或关闭');
+      continue;
+    }
+    if (!['slider', 'stepper']['includes'](value354) || list37['length'] > 0x0) continue;
+    const value356 = Number(el2['value']),
+      value357 = Number(value351?.['min']),
+      value358 = Number(value351?.['max']),
+      count9 = Number(value351?.['step']);
+    if (!Number['isFinite'](value356))
+      throw new Error('便宜渠道 ' + value350 + '\x20的' + strictUiSchemaFieldLabel + '必须是数字');
+    if (Number['isFinite'](value357) && value356 < value357)
+      throw new Error('便宜渠道 ' + value350 + '\x20的' + strictUiSchemaFieldLabel + '不能小于 ' + value357);
+    if (Number['isFinite'](value358) && value356 > value358)
+      throw new Error(
+        '便宜渠道\x20' + value350 + '\x20的' + strictUiSchemaFieldLabel + '不能大于\x20' + value358,
+      );
+    if (
+      Number['isFinite'](count9) &&
+      count9 > 0x0 &&
+      Number['isFinite'](value357) &&
+      Math['abs']((value356 - value357) / count9 - Math['round']((value356 - value357) / count9)) > 1e-9
+    )
+      throw new Error(
+        '便宜渠道 ' + value350 + '\x20的' + strictUiSchemaFieldLabel + '必须按 ' + count9 + ' 递增',
+      );
+  }
+}
 
-function validateStrictImageInputCounts(_0x1e10fd,_0x5074f7,_0x2861fa){if(_0x2861fa?.["extensions"]?.["strictInputCounts"]!==!![])return;const _0x613889=getManifestMaxInputCount(_0x5074f7,"image");if(_0x613889===null)return;const _0x54b6a2=Array['from'](new Set([...collectRawImageInputUrls(_0x1e10fd,_0x5074f7),...Array["isArray"](_0x1e10fd?.["images"])?_0x1e10fd['images']:[]]["map"](_0x3b956f=>String(_0x3b956f||'')['trim']())["filter"](Boolean)));if(_0x54b6a2['length']<=_0x613889)return;throw new Error((_0x5074f7["displayName"]||'当前模型')+'最多支持\x20'+_0x613889+" 张参考图，当前传入 "+_0x54b6a2["length"]+" 张，请删减后重试");}
+function validateStrictImageInputCounts(value359, value360, value361) {
+  if (value361?.['extensions']?.['strictInputCounts'] !== !![]) return;
+  const manifestMaxInputCount9 = getManifestMaxInputCount(value360, 'image');
+  if (manifestMaxInputCount9 === null) return;
+  const list38 = Array['from'](
+    new Set(
+      [
+        ...collectRawImageInputUrls(value359, value360),
+        ...(Array['isArray'](value359?.['images']) ? value359['images'] : []),
+      ]
+        ['map']((value362) => String(value362 || '')['trim']())
+        ['filter'](Boolean),
+    ),
+  );
+  if (list38['length'] <= manifestMaxInputCount9) return;
+  throw new Error(
+    (value360['displayName'] || '当前模型') +
+      '最多支持\x20' +
+      manifestMaxInputCount9 +
+      ' 张参考图，当前传入 ' +
+      list38['length'] +
+      ' 张，请删减后重试',
+  );
+}
 
-const IMAGE_MODEL_API_PROVIDERS = new Set(['bailian',"agnes","apimart","binghuo","ppio","grsai","runninghub","volcengine"]);
-const AUDIO_MODEL_API_PROVIDERS = new Set(["volcengine-speech"]);
+const IMAGE_MODEL_API_PROVIDERS = new Set([
+  'bailian',
+  'agnes',
+  'apimart',
+  'binghuo',
+  'ppio',
+  'grsai',
+  'runninghub',
+  'volcengine',
+]);
+const AUDIO_MODEL_API_PROVIDERS = new Set(['volcengine-speech']);
 
-function isVolcengineFileId(_0x5c47e5){return/^file-[A-Za-z0-9_-]+/["test"](String(_0x5c47e5||'')["trim"]());}
+function isVolcengineFileId(value363) {
+  return /^file-[A-Za-z0-9_-]+/['test'](String(value363 || '')['trim']());
+}
 
-function throwVolcengineFilesApiInputError(_0x134303){const _0x35c438=getVolcengineContentGenerationMediaLabel(_0x134303);throw new Error("Volcengine Seedance "+_0x35c438+'\x20input\x20cannot\x20use\x20Files\x20API\x20file_id\x20directly;\x20use\x20a\x20public\x20URL\x20or\x20asset://\x20asset\x20ID');}
+function throwVolcengineFilesApiInputError(value364) {
+  const volcengineContentGenerationMediaLabel2 = getVolcengineContentGenerationMediaLabel(value364);
+  throw new Error(
+    'Volcengine Seedance ' +
+      volcengineContentGenerationMediaLabel2 +
+      '\x20input\x20cannot\x20use\x20Files\x20API\x20file_id\x20directly;\x20use\x20a\x20public\x20URL\x20or\x20asset://\x20asset\x20ID',
+  );
+}
 
-function assertNoVolcengineFileIds(_0x160a6e,_0x3f4d0d){for(const _0x1fd107 of normalizeInputList(_0x160a6e)){if(isVolcengineFileId(_0x1fd107))throwVolcengineFilesApiInputError(_0x3f4d0d);}}
+function assertNoVolcengineFileIds(value365, value366) {
+  for (const value367 of normalizeInputList(value365)) {
+    if (isVolcengineFileId(value367)) throwVolcengineFilesApiInputError(value366);
+  }
+}
 
-function resolveVolcengineContentGenerationMediaUrls(_0x1dd213,_0x2e3750){const _0x19f181=getVolcengineContentGenerationMediaLabel(_0x2e3750),_0x43c0bb=[];for(const _0x161ef3 of normalizeInputList(_0x1dd213)){if(isVolcengineContentGenerationMediaUrl(_0x161ef3)){_0x43c0bb['push'](_0x161ef3);continue;}isVolcengineFileId(_0x161ef3)&&throwVolcengineFilesApiInputError(_0x2e3750);throw new Error('Volcengine\x20Seedance\x20'+_0x19f181+" input needs a public URL or asset:// asset ID; local files require an upload channel that returns a model-usable URL");}return _0x43c0bb;}
+function resolveVolcengineContentGenerationMediaUrls(value368, value369) {
+  const volcengineContentGenerationMediaLabel3 = getVolcengineContentGenerationMediaLabel(value369),
+    list39 = [];
+  for (const value370 of normalizeInputList(value368)) {
+    if (isVolcengineContentGenerationMediaUrl(value370)) {
+      list39['push'](value370);
+      continue;
+    }
+    isVolcengineFileId(value370) && throwVolcengineFilesApiInputError(value369);
+    throw new Error(
+      'Volcengine\x20Seedance\x20' +
+        volcengineContentGenerationMediaLabel3 +
+        ' input needs a public URL or asset:// asset ID; local files require an upload channel that returns a model-usable URL',
+    );
+  }
+  return list39;
+}
 
-function normalizeCustomProviderOpenAiImageSize(_0x120e1e,{context:_0x12d97f}={}){const _0x15c5cd=_0x12d97f?.["payload"]||{},_0x5083ec=String(_0x120e1e||_0x15c5cd?.["generationParams"]?.['imageSize']||_0x15c5cd?.["imageSize"]||'1024x1024')["trim"](),_0x336729=_0x5083ec["match"](/^(\d{2,5})\s*[xX×]\s*(\d{2,5})$/);if(_0x336729)return Number(_0x336729[0x1])+'x'+Number(_0x336729[0x2]);const _0xca0aa0=String(_0x15c5cd?.['generationParams']?.["aspectRatio"]||_0x15c5cd?.["resolvedRatioLabel"]||_0x15c5cd?.['aspectRatio']||'')["trim"]();if(!_0xca0aa0||isAdaptiveRatioLabel(_0xca0aa0))return'1024x1024';const _0x7ac321=parseRatioLabel(_0xca0aa0);if(!_0x7ac321)return'1024x1024';const _0x3722fa=_0x7ac321['w']/_0x7ac321['h'];if(Math['abs'](_0x3722fa-0x1)<0.05)return "1024x1024";return _0x3722fa>0x1?"1536x1024":"1024x1536";}
+function normalizeCustomProviderOpenAiImageSize(value371, { context: context20 } = {}) {
+  const value372 = context20?.['payload'] || {},
+    value373 = String(
+      value371 || value372?.['generationParams']?.['imageSize'] || value372?.['imageSize'] || '1024x1024',
+    )['trim'](),
+    value374 = value373['match'](/^(\d{2,5})\s*[xX×]\s*(\d{2,5})$/);
+  if (value374) return Number(value374[0x1]) + 'x' + Number(value374[0x2]);
+  const enabled25 = String(
+    value372?.['generationParams']?.['aspectRatio'] ||
+      value372?.['resolvedRatioLabel'] ||
+      value372?.['aspectRatio'] ||
+      '',
+  )['trim']();
+  if (!enabled25 || isAdaptiveRatioLabel(enabled25)) return '1024x1024';
+  const ratioLabel3 = parseRatioLabel(enabled25);
+  if (!ratioLabel3) return '1024x1024';
+  const count10 = ratioLabel3['w'] / ratioLabel3['h'];
+  if (Math['abs'](count10 - 0x1) < 0.05) return '1024x1024';
+  return count10 > 0x1 ? '1536x1024' : '1024x1536';
+}
 
-function normalizeCustomProviderDocumentedValueMap(_0x54e1ca,{spec:_0x557dd3}={}){const _0x45acd8=Array["isArray"](_0x557dd3?.["values"])?_0x557dd3["values"]:[],_0x301c8c=_0x45acd8["find"](_0x198ab1=>_0x198ab1&&(Object['is'](_0x198ab1["uiValue"],_0x54e1ca)||String(_0x198ab1['uiValue'])===String(_0x54e1ca)));if(!_0x301c8c||!Object["prototype"]["hasOwnProperty"]["call"](_0x301c8c,"requestValue"))throw new Error("Custom provider documented value mapping is missing for the selected option");return _0x301c8c["requestValue"];}
+function normalizeCustomProviderDocumentedValueMap(value375, { spec: spec5 } = {}) {
+  const value376 = Array['isArray'](spec5?.['values']) ? spec5['values'] : [],
+    enabled26 = value376['find'](
+      (value377) =>
+        value377 &&
+        (Object['is'](value377['uiValue'], value375) || String(value377['uiValue']) === String(value375)),
+    );
+  if (!enabled26 || !Object['prototype']['hasOwnProperty']['call'](enabled26, 'requestValue'))
+    throw new Error('Custom provider documented value mapping is missing for the selected option');
+  return enabled26['requestValue'];
+}
 
-function normalizeCustomProviderDimensionMap(_0xa382a5,{context:_0x31d412,spec:_0x3649db}={}){const _0x6fea59=_0x31d412?.["payload"]||{},_0x4748a8=_0x6fea59['generationParams']||{},_0x409a13=_0x4748a8["imageSize"]??_0x6fea59["imageSize"],_0x4cc806=_0xa382a5??_0x4748a8["aspectRatio"]??_0x6fea59['resolvedRatioLabel']??_0x6fea59["aspectRatio"],_0x5b2812=Array["isArray"](_0x3649db?.['values'])?_0x3649db["values"]:[],_0x1675cd=_0x5b2812['find'](_0x4ef36d=>_0x4ef36d&&String(_0x4ef36d["imageSize"])===String(_0x409a13)&&String(_0x4ef36d["aspectRatio"])===String(_0x4cc806));if(!_0x1675cd||!Object["prototype"]["hasOwnProperty"]["call"](_0x1675cd,'requestValue'))throw new Error("Custom provider documented dimension mapping is missing for the selected resolution and ratio");return _0x1675cd["requestValue"];}
+function normalizeCustomProviderDimensionMap(value378, { context: context21, spec: spec6 } = {}) {
+  const value379 = context21?.['payload'] || {},
+    value380 = value379['generationParams'] || {},
+    value381 = value380['imageSize'] ?? value379['imageSize'],
+    value382 =
+      value378 ?? value380['aspectRatio'] ?? value379['resolvedRatioLabel'] ?? value379['aspectRatio'],
+    list40 = Array['isArray'](spec6?.['values']) ? spec6['values'] : [],
+    enabled27 = list40['find'](
+      (value383) =>
+        value383 &&
+        String(value383['imageSize']) === String(value381) &&
+        String(value383['aspectRatio']) === String(value382),
+    );
+  if (!enabled27 || !Object['prototype']['hasOwnProperty']['call'](enabled27, 'requestValue'))
+    throw new Error(
+      'Custom provider documented dimension mapping is missing for the selected resolution and ratio',
+    );
+  return enabled27['requestValue'];
+}
 
-function normalizeNumberParam(_0xb726a3){if(_0xb726a3===undefined||_0xb726a3===null||String(_0xb726a3)["trim"]()==='')return undefined;const _0x11ac14=Number(_0xb726a3);return Number["isFinite"](_0x11ac14)?_0x11ac14:undefined;}
+function normalizeNumberParam(value384) {
+  if (value384 === undefined || value384 === null || String(value384)['trim']() === '') return undefined;
+  const value385 = Number(value384);
+  return Number['isFinite'](value385) ? value385 : undefined;
+}
 
-function normalizeIntegerParam(_0x41b42b){const _0x9f0df3=normalizeNumberParam(_0x41b42b);return Number["isFinite"](_0x9f0df3)?Math['trunc'](_0x9f0df3):undefined;}
+function normalizeIntegerParam(value386) {
+  const numberParam = normalizeNumberParam(value386);
+  return Number['isFinite'](numberParam) ? Math['trunc'](numberParam) : undefined;
+}
 
-function normalizeStringParam(_0x2b2d9d){if(_0x2b2d9d===undefined||_0x2b2d9d===null)return undefined;return String(_0x2b2d9d);}
+function normalizeStringParam(value387) {
+  if (value387 === undefined || value387 === null) return undefined;
+  return String(value387);
+}
 
-const AGNES_IMAGE_SIZE_SCALE_BY_QUALITY = Object["freeze"]({'1K':0x1,'2K':0x2,'3K':0x3,'4K':0x4});
+const AGNES_IMAGE_SIZE_SCALE_BY_QUALITY = Object['freeze']({ '1K': 0x1, '2K': 0x2, '3K': 0x3, '4K': 0x4 });
 
-function normalizeAgnesImageQuality(_0x4e456c,_0x257e35='1K'){const _0x35fef0=String(_0x4e456c||'')["trim"]()['toUpperCase']();return Object['prototype']['hasOwnProperty']["call"](AGNES_IMAGE_SIZE_SCALE_BY_QUALITY,_0x35fef0)?_0x35fef0:_0x257e35;}
+function normalizeAgnesImageQuality(value388, value389 = '1K') {
+  const value390 = String(value388 || '')
+    ['trim']()
+    ['toUpperCase']();
+  return Object['prototype']['hasOwnProperty']['call'](AGNES_IMAGE_SIZE_SCALE_BY_QUALITY, value390)
+    ? value390
+    : value389;
+}
 
-function normalizeAgnesVideoFrameRate(_0x4b1504,{spec:_0x16b4b5}={}){const _0x42b364=Number(_0x4b1504),_0x5e65ff=Number['isFinite'](Number(_0x16b4b5?.["fallback"]))?Math["trunc"](Number(_0x16b4b5["fallback"])):0x18,_0xd83715=Number["isFinite"](_0x42b364)?Math["trunc"](_0x42b364):_0x5e65ff,_0x575908=Number["isFinite"](Number(_0x16b4b5?.['min']))?Math['trunc'](Number(_0x16b4b5["min"])):0x1,_0x1368ae=Number["isFinite"](Number(_0x16b4b5?.["max"]))?Math["trunc"](Number(_0x16b4b5["max"])):0x3c;return Math['min'](Math["max"](_0xd83715,_0x575908),_0x1368ae);}
+function normalizeAgnesVideoFrameRate(value391, { spec: spec7 } = {}) {
+  const value392 = Number(value391),
+    value393 = Number['isFinite'](Number(spec7?.['fallback']))
+      ? Math['trunc'](Number(spec7['fallback']))
+      : 0x18,
+    value394 = Number['isFinite'](value392) ? Math['trunc'](value392) : value393,
+    value395 = Number['isFinite'](Number(spec7?.['min'])) ? Math['trunc'](Number(spec7['min'])) : 0x1,
+    value396 = Number['isFinite'](Number(spec7?.['max'])) ? Math['trunc'](Number(spec7['max'])) : 0x3c;
+  return Math['min'](Math['max'](value394, value395), value396);
+}
 
-function resolveAgnesVideoFrameRate(_0x21ef8c={},_0x452060={}){const _0x5c3cd6=[_0x21ef8c?.["body"]?.["frame_rate"],_0x21ef8c?.['payload']?.['generationParams']?.['frame_rate'],_0x21ef8c?.["payload"]?.["generationParams"]?.["frameRate"],_0x21ef8c?.["payload"]?.["frame_rate"],_0x21ef8c?.["payload"]?.["frameRate"],_0x452060?.["frameRate"]];for(const _0x52942b of _0x5c3cd6){if(_0x52942b===undefined||_0x52942b===null||String(_0x52942b)["trim"]()==='')continue;return normalizeAgnesVideoFrameRate(_0x52942b,{'spec':{'min':_0x452060?.['frameRateMin'],'max':_0x452060?.["frameRateMax"],'fallback':_0x452060?.['frameRate']}});}return normalizeAgnesVideoFrameRate(undefined,{'spec':{'min':_0x452060?.['frameRateMin'],'max':_0x452060?.["frameRateMax"],'fallback':_0x452060?.["frameRate"]}});}
+function resolveAgnesVideoFrameRate(options14 = {}, value397 = {}) {
+  const value398 = [
+    options14?.['body']?.['frame_rate'],
+    options14?.['payload']?.['generationParams']?.['frame_rate'],
+    options14?.['payload']?.['generationParams']?.['frameRate'],
+    options14?.['payload']?.['frame_rate'],
+    options14?.['payload']?.['frameRate'],
+    value397?.['frameRate'],
+  ];
+  for (const value399 of value398) {
+    if (value399 === undefined || value399 === null || String(value399)['trim']() === '') continue;
+    return normalizeAgnesVideoFrameRate(value399, {
+      spec: {
+        min: value397?.['frameRateMin'],
+        max: value397?.['frameRateMax'],
+        fallback: value397?.['frameRate'],
+      },
+    });
+  }
+  return normalizeAgnesVideoFrameRate(undefined, {
+    spec: {
+      min: value397?.['frameRateMin'],
+      max: value397?.['frameRateMax'],
+      fallback: value397?.['frameRate'],
+    },
+  });
+}
 
-function normalizeRunningHubSeedance25Duration(_0x1c8ce7){const _0x52f22e=Math['trunc'](Number(_0x1c8ce7));if(_0x52f22e===-0x1)return'-1';const _0x4d6cfa=Number['isFinite'](_0x52f22e)?_0x52f22e:-0x1;return _0x4d6cfa===-0x1?'-1':String(Math["min"](0x1e,Math["max"](0x4,_0x4d6cfa)));}
+function normalizeRunningHubSeedance25Duration(value400) {
+  const value401 = Math['trunc'](Number(value400));
+  if (value401 === -0x1) return '-1';
+  const value402 = Number['isFinite'](value401) ? value401 : -0x1;
+  return value402 === -0x1 ? '-1' : String(Math['min'](0x1e, Math['max'](0x4, value402)));
+}
 
-const CUSTOM_PROVIDER_TASK_SUCCESS_STATUS_ALIASES=Object["freeze"](['succeeded',"success",'completed','complete',"done","finished"]),CUSTOM_PROVIDER_TASK_FAILURE_STATUS_ALIASES=Object["freeze"](['failed',"failure","fail","error","cancelled",'canceled','expired']);
+const CUSTOM_PROVIDER_TASK_SUCCESS_STATUS_ALIASES = Object['freeze']([
+    'succeeded',
+    'success',
+    'completed',
+    'complete',
+    'done',
+    'finished',
+  ]),
+  CUSTOM_PROVIDER_TASK_FAILURE_STATUS_ALIASES = Object['freeze']([
+    'failed',
+    'failure',
+    'fail',
+    'error',
+    'cancelled',
+    'canceled',
+    'expired',
+  ]);
 
-const SAFE_MANIFEST_ERROR_RULE_TYPES=new Set(["AUTH_ERROR","CONTENT_FILTERED","FORBIDDEN","INSUFFICIENT_BALANCE","INVALID_PARAMS",'MODEL_UNAVAILABLE',"NETWORK_ERROR","RATE_LIMIT","SERVER_ERROR","SERVICE_UNAVAILABLE","TASK_FAILED","TIMEOUT","UNKNOWN"]);
+const SAFE_MANIFEST_ERROR_RULE_TYPES = new Set([
+  'AUTH_ERROR',
+  'CONTENT_FILTERED',
+  'FORBIDDEN',
+  'INSUFFICIENT_BALANCE',
+  'INVALID_PARAMS',
+  'MODEL_UNAVAILABLE',
+  'NETWORK_ERROR',
+  'RATE_LIMIT',
+  'SERVER_ERROR',
+  'SERVICE_UNAVAILABLE',
+  'TASK_FAILED',
+  'TIMEOUT',
+  'UNKNOWN',
+]);
 
-export function resolveManifestErrorRules(_0x40dff2={}){const _0x492194=_0x40dff2?.["extensions"]?.["errorRules"];if(!Array["isArray"](_0x492194))return[];return _0x492194["slice"](0x0,0xc)["flatMap"](_0x2a77ff=>{if(!_0x2a77ff||typeof _0x2a77ff!=="object"||Array["isArray"](_0x2a77ff))return[];const _0x59e420=String(_0x2a77ff["phase"]||"any")["trim"]()['toLowerCase'](),_0x566936=String(_0x2a77ff["type"]||'')["trim"]()["toUpperCase"](),_0x23f044=[...new Set((Array["isArray"](_0x2a77ff["httpStatuses"])?_0x2a77ff['httpStatuses']:[])["map"](_0xa496a8=>Number(_0xa496a8))['filter'](_0x5aeb23=>Number["isInteger"](_0x5aeb23)&&_0x5aeb23>=0x190&&_0x5aeb23<=0x257))]["slice"](0x0,0xc),_0x917c12=[...new Set((Array["isArray"](_0x2a77ff["messageIncludesAny"])?_0x2a77ff["messageIncludesAny"]:[])["map"](_0x1d65b8=>String(_0x1d65b8||'')["replace"](/\s+/g,'\x20')["trim"]())["filter"](_0x56e6e7=>_0x56e6e7&&_0x56e6e7["length"]<=0xf0))]["slice"](0x0,0x6);if(!['any','submit',"poll"]["includes"](_0x59e420)||!SAFE_MANIFEST_ERROR_RULE_TYPES['has'](_0x566936)||typeof _0x2a77ff["retryable"]!=="boolean"||_0x23f044["length"]===0x0&&_0x917c12['length']===0x0)return[];const _0xdadcae=String(_0x2a77ff["userMessage"]||'')['replace'](/\s+/g,'\x20')["trim"]()["slice"](0x0,0x1f4),_0x436581=String(_0x2a77ff['hint']||'')["replace"](/\s+/g,'\x20')["trim"]()["slice"](0x0,0x1f4);return[{'phase':_0x59e420,..._0x23f044["length"]>0x0?{'httpStatuses':_0x23f044}:{},..._0x917c12['length']>0x0?{'messageIncludesAny':_0x917c12}:{},'type':_0x566936,'retryable':_0x2a77ff["retryable"],..._0xdadcae?{'userMessage':_0xdadcae}:{},..._0x436581?{'hint':_0x436581}:{}}];});}
+export function resolveManifestErrorRules(options15 = {}) {
+  const value403 = options15?.['extensions']?.['errorRules'];
+  if (!Array['isArray'](value403)) return [];
+  return value403['slice'](0x0, 0xc)['flatMap']((enabled28) => {
+    if (!enabled28 || typeof enabled28 !== 'object' || Array['isArray'](enabled28)) return [];
+    const value404 = String(enabled28['phase'] || 'any')
+        ['trim']()
+        ['toLowerCase'](),
+      value405 = String(enabled28['type'] || '')
+        ['trim']()
+        ['toUpperCase'](),
+      args16 = [
+        ...new Set(
+          (Array['isArray'](enabled28['httpStatuses']) ? enabled28['httpStatuses'] : [])
+            ['map']((value406) => Number(value406))
+            ['filter']((count11) => Number['isInteger'](count11) && count11 >= 0x190 && count11 <= 0x257),
+        ),
+      ]['slice'](0x0, 0xc),
+      list41 = [
+        ...new Set(
+          (Array['isArray'](enabled28['messageIncludesAny']) ? enabled28['messageIncludesAny'] : [])
+            ['map']((value407) =>
+              String(value407 || '')
+                ['replace'](/\s+/g, '\x20')
+                ['trim'](),
+            )
+            ['filter']((value408) => value408 && value408['length'] <= 0xf0),
+        ),
+      ]['slice'](0x0, 0x6);
+    if (
+      !['any', 'submit', 'poll']['includes'](value404) ||
+      !SAFE_MANIFEST_ERROR_RULE_TYPES['has'](value405) ||
+      typeof enabled28['retryable'] !== 'boolean' ||
+      (args16['length'] === 0x0 && list41['length'] === 0x0)
+    )
+      return [];
+    const args17 = String(enabled28['userMessage'] || '')
+        ['replace'](/\s+/g, '\x20')
+        ['trim']()
+        ['slice'](0x0, 0x1f4),
+      args18 = String(enabled28['hint'] || '')
+        ['replace'](/\s+/g, '\x20')
+        ['trim']()
+        ['slice'](0x0, 0x1f4);
+    return [
+      {
+        phase: value404,
+        ...(args16['length'] > 0x0 ? { httpStatuses: args16 } : {}),
+        ...(list41['length'] > 0x0 ? { messageIncludesAny: list41 } : {}),
+        type: value405,
+        retryable: enabled28['retryable'],
+        ...(args17 ? { userMessage: args17 } : {}),
+        ...(args18 ? { hint: args18 } : {}),
+      },
+    ];
+  });
+}
 
-function doesResolverOwnInputResolution(_0x31d263){const _0x2ca6f1=_0x31d263?.["extensions"]||{};return _0x2ca6f1["resolverOwnsInputs"]===!![]||String(_0x2ca6f1["inputResolutionMode"]||'')["trim"]()==='resolverOwned';}
+function doesResolverOwnInputResolution(value409) {
+  const value410 = value409?.['extensions'] || {};
+  return (
+    value410['resolverOwnsInputs'] === !![] ||
+    String(value410['inputResolutionMode'] || '')['trim']() === 'resolverOwned'
+  );
+}
 
-function getFixedInputSlotOrderByKind(_0xe3022f=null,_0x285e64=''){const _0x233e62=String(_0x285e64||'')['trim'](),_0x4cc1ed=Array["isArray"](_0xe3022f?.["inputSlots"]?.['fixedSlots'])?_0xe3022f["inputSlots"]['fixedSlots']:[];return _0x4cc1ed['filter'](_0x4c0bad=>String(_0x4c0bad?.["kind"]||'')['trim']()===_0x233e62)["map"](_0x514d90=>String(_0x514d90?.['id']||'')['trim']())["filter"](Boolean);}
+function getFixedInputSlotOrderByKind(value411 = null, value412 = '') {
+  const value413 = String(value412 || '')['trim'](),
+    list42 = Array['isArray'](value411?.['inputSlots']?.['fixedSlots'])
+      ? value411['inputSlots']['fixedSlots']
+      : [];
+  return list42['filter']((value414) => String(value414?.['kind'] || '')['trim']() === value413)
+    ['map']((value415) => String(value415?.['id'] || '')['trim']())
+    ['filter'](Boolean);
+}
 
-function getAudioRefUrl(_0x32af9c={}){return String(_0x32af9c?.["url"]||_0x32af9c?.["audioUrl"]||_0x32af9c?.["src"]||'')["trim"]();}
+function getAudioRefUrl(options16 = {}) {
+  return String(options16?.['url'] || options16?.['audioUrl'] || options16?.['src'] || '')['trim']();
+}
 
-function orderAudioRefsByManifestSlots(_0x412267=[],_0x1fa8c3=null){const _0xde2e48=(Array["isArray"](_0x412267)?_0x412267:[])["filter"](_0x45ce36=>getAudioRefUrl(_0x45ce36)),_0x5e3b25=getFixedInputSlotOrderByKind(_0x1fa8c3,"audio");if(_0x5e3b25["length"]===0x0||_0xde2e48["length"]<=0x1)return _0xde2e48;const _0x465f27=new Set(),_0x441c5f=[];return _0x5e3b25["forEach"](_0x1688f5=>{const _0x3f117a=_0xde2e48['findIndex']((_0x5da7d7,_0x5cfa92)=>!_0x465f27["has"](_0x5cfa92)&&String(_0x5da7d7?.["refSlot"]||'')["trim"]()===_0x1688f5);if(_0x3f117a<0x0)return;_0x465f27["add"](_0x3f117a),_0x441c5f["push"](_0xde2e48[_0x3f117a]);}),_0xde2e48['forEach']((_0x345f76,_0x1e41c1)=>{if(!_0x465f27["has"](_0x1e41c1))_0x441c5f["push"](_0x345f76);}),_0x441c5f;}
+function orderAudioRefsByManifestSlots(list43 = [], value416 = null) {
+  const list44 = (Array['isArray'](list43) ? list43 : [])['filter']((value417) => getAudioRefUrl(value417)),
+    fixedInputSlotOrderByKind = getFixedInputSlotOrderByKind(value416, 'audio');
+  if (fixedInputSlotOrderByKind['length'] === 0x0 || list44['length'] <= 0x1) return list44;
+  const enabled29 = new Set(),
+    value418 = [];
+  return (
+    fixedInputSlotOrderByKind['forEach']((value419) => {
+      const count12 = list44['findIndex'](
+        (value420, value421) =>
+          !enabled29['has'](value421) && String(value420?.['refSlot'] || '')['trim']() === value419,
+      );
+      if (count12 < 0x0) return;
+      (enabled29['add'](count12), value418['push'](list44[count12]));
+    }),
+    list44['forEach']((value422, value423) => {
+      if (!enabled29['has'](value423)) value418['push'](value422);
+    }),
+    value418
+  );
+}
 
-function mergeAudioRefsIntoPayload(_0x214c48={},_0x444362=null){const _0x22c42d=Array["isArray"](_0x214c48?.["audioRefs"])?_0x214c48["audioRefs"]:[],_0x50b24b=orderAudioRefsByManifestSlots(_0x22c42d,_0x444362)["map"](_0x16276a=>getAudioRefUrl(_0x16276a))["filter"](Boolean);if(_0x50b24b["length"]===0x0)return _0x214c48;const _0x35624c=normalizeInputList(_0x214c48['audioUrls']),_0x3a1339=new Set(_0x50b24b);return{..._0x214c48,'audioUrls':[..._0x35624c["filter"](_0x776b9b=>!_0x3a1339["has"](_0x776b9b)),..._0x50b24b]};}
+function mergeAudioRefsIntoPayload(args19 = {}, value424 = null) {
+  const value425 = Array['isArray'](args19?.['audioRefs']) ? args19['audioRefs'] : [],
+    args20 = orderAudioRefsByManifestSlots(value425, value424)
+      ['map']((value426) => getAudioRefUrl(value426))
+      ['filter'](Boolean);
+  if (args20['length'] === 0x0) return args19;
+  const args21 = normalizeInputList(args19['audioUrls']),
+    enabled30 = new Set(args20);
+  return {
+    ...args19,
+    audioUrls: [...args21['filter']((value427) => !enabled30['has'](value427)), ...args20],
+  };
+}
 
-function createModelApiRequestId(){const _0x3171c3=Math['random']()["toString"](0x10)["slice"](0x2,0xa);return Date["now"]()+'-'+_0x3171c3;}
+function createModelApiRequestId() {
+  const value428 = Math['random']()['toString'](0x10)['slice'](0x2, 0xa);
+  return Date['now']() + '-' + value428;
+}
 
-function buildTaskProxyHeaders(_0xb54e07,_0x1601d2,_0xc5bedf){const _0x156ff7={..._0xb54e07||{}},_0x201859=String(_0xc5bedf?.["extensions"]?.['apiKeyHeader']||'')['trim']();_0x201859&&_0x1601d2&&!Object["prototype"]["hasOwnProperty"]["call"](_0x156ff7,_0x201859)&&(_0x156ff7[_0x201859]=_0x1601d2);const _0x1391ae=String(_0xc5bedf?.["extensions"]?.["requestIdHeader"]||'')["trim"]();_0x1391ae&&!Object["keys"](_0x156ff7)['some'](_0x3309f4=>_0x3309f4["toLowerCase"]()===_0x1391ae["toLowerCase"]())&&(_0x156ff7[_0x1391ae]=createModelApiRequestId());const _0x1fee08=String(_0xc5bedf?.["extensions"]?.["resourceId"]||'')["trim"]();return _0x1fee08&&!Object["keys"](_0x156ff7)["some"](_0x6cfe5f=>_0x6cfe5f['toLowerCase']()==="x-api-resource-id")&&(_0x156ff7['X-Api-Resource-Id']=_0x1fee08),_0x156ff7;}
+function buildTaskProxyHeaders(args22, value429, value430) {
+  const value431 = { ...(args22 || {}) },
+    value432 = String(value430?.['extensions']?.['apiKeyHeader'] || '')['trim']();
+  value432 &&
+    value429 &&
+    !Object['prototype']['hasOwnProperty']['call'](value431, value432) &&
+    (value431[value432] = value429);
+  const value433 = String(value430?.['extensions']?.['requestIdHeader'] || '')['trim']();
+  value433 &&
+    !Object['keys'](value431)['some'](
+      (value434) => value434['toLowerCase']() === value433['toLowerCase'](),
+    ) &&
+    (value431[value433] = createModelApiRequestId());
+  const value435 = String(value430?.['extensions']?.['resourceId'] || '')['trim']();
+  return (
+    value435 &&
+      !Object['keys'](value431)['some']((value436) => value436['toLowerCase']() === 'x-api-resource-id') &&
+      (value431['X-Api-Resource-Id'] = value435),
+    value431
+  );
+}
 
-export async function buildAudioRequestFromManifest(_0x35569a,_0x1f2265,_0x2020f6,_0x5c1bbb={}){const _0x511832=String(_0x5c1bbb["expectedProvider"]||'')["trim"]()["toLowerCase"](),_0x321461=resolveRequestManifest(_0x35569a,_0x511832,"audio");if(!_0x321461)return null;const {provider:_0x565da2,modelManifest:_0x368103,executionManifest:_0x375aa5,effectivePayload:_0x36d163}=_0x321461;if(!isSupportedModelApiProvider(_0x565da2,AUDIO_MODEL_API_PROVIDERS))return null;const _0x516083=mergeAudioRefsIntoPayload(_0x36d163,_0x368103),_0x21b131=mergeUiSchemaDefaultsIntoPayload(_0x516083,_0x368103),_0x2db82a=resolveProviderConfig(_0x565da2,_0x21b131,_0x2020f6),_0x5bbacd=resolveApiKey(_0x565da2,_0x21b131,_0x2020f6,_0x2db82a);!_0x5bbacd&&throwMissingApiKey(_0x565da2);const _0x2778ae=await resolveInputImagesBySlot(_0x565da2,_0x21b131,_0x5bbacd,_0x2020f6,{'modelManifest':_0x368103,'provider':_0x565da2,'baseUrl':_0x2db82a["apiUrl"],'executionManifest':_0x375aa5}),_0x105d3d=Object["keys"](_0x2778ae)["length"]>0x0?Object['values'](_0x2778ae):await resolveInputImages(_0x565da2,_0x21b131,_0x5bbacd,_0x2020f6,{'modelManifest':_0x368103,'provider':_0x565da2,'baseUrl':_0x2db82a["apiUrl"],'executionManifest':_0x375aa5}),_0x25fb70=await resolveInputAudios(_0x21b131,_0x5bbacd,_0x2020f6,{'modelManifest':_0x368103,'provider':_0x565da2,'baseUrl':_0x2db82a["apiUrl"],'executionManifest':_0x375aa5}),_0xce50ef=resolveExecutionModelToken(_0x375aa5,_0x21b131),_0x30b6b1={'provider':_0x565da2,'modelManifest':_0x368103,'executionManifest':_0x375aa5,'payload':_0x21b131,'finalPrompt':_0x1f2265,'modelToken':_0xce50ef,'apiKey':_0x5bbacd,'ctx':_0x2020f6,'inputImages':_0x105d3d,'inputVideos':[],'inputAudios':_0x25fb70},_0x281ac0=await buildManifestMappedBody(_0x30b6b1),_0xddb8fd=resolveManifestApiUrl(_0x565da2,_0x2db82a,_0x375aa5,_0x30b6b1),_0x13d3a2=String(_0x375aa5["extensions"]?.["proxyMode"]||'')["trim"]()['toLowerCase']();if(_0x13d3a2==="task")return{'url':"/api/v2/proxy/task?apiUrl="+encodeURIComponent(_0xddb8fd),'headers':buildTaskProxyHeaders(_0x375aa5['headers']||{'Content-Type':"application/json"},_0x5bbacd,_0x375aa5),'body':_0x281ac0,'responseMapping':_0x375aa5["responseMapping"],'errorRules':resolveManifestErrorRules(_0x375aa5),'adapterTrace':{'source':'manifest','executionId':_0x375aa5['id'],'modelId':_0x21b131["model"]},'meta':{'provider':_0x565da2,'adapterType':"modelApi",'audioWorkflowKey':_0x368103["modelId"],'audioWorkflowLabel':_0x368103["displayName"]||_0x368103["modelId"],'model':_0x368103['modelId'],'executionId':_0x375aa5['id'],'isManifestAudioModelApi':!![]}};return{'url':'/api/v2/proxy/image','headers':_0x375aa5["headers"]||{'Content-Type':'application/json'},'body':{'apiUrl':_0xddb8fd,'apiKey':_0x5bbacd,..._0x281ac0},'responseMapping':_0x375aa5["responseMapping"],'errorRules':resolveManifestErrorRules(_0x375aa5),'adapterTrace':{'source':"manifest",'executionId':_0x375aa5['id'],'modelId':_0x21b131['model']},'meta':{'provider':_0x565da2,'adapterType':"modelApi",'audioWorkflowKey':_0x368103["modelId"],'audioWorkflowLabel':_0x368103["displayName"]||_0x368103["modelId"],'model':_0x368103["modelId"],'executionId':_0x375aa5['id'],'isManifestAudioModelApi':!![]}};}
+export async function buildAudioRequestFromManifest(value437, value438, value439, value440 = {}) {
+  const value441 = String(value440['expectedProvider'] || '')
+      ['trim']()
+      ['toLowerCase'](),
+    requestManifest4 = resolveRequestManifest(value437, value441, 'audio');
+  if (!requestManifest4) return null;
+  const {
+    provider: provider11,
+    modelManifest: modelManifest5,
+    executionManifest: executionManifest6,
+    effectivePayload: effectivePayload5,
+  } = requestManifest4;
+  if (!isSupportedModelApiProvider(provider11, AUDIO_MODEL_API_PROVIDERS)) return null;
+  const audioRefsIntoPayload = mergeAudioRefsIntoPayload(effectivePayload5, modelManifest5),
+    uiSchemaDefaultsIntoPayload = mergeUiSchemaDefaultsIntoPayload(audioRefsIntoPayload, modelManifest5),
+    providerConfig = resolveProviderConfig(provider11, uiSchemaDefaultsIntoPayload, value439),
+    apiKey4 = resolveApiKey(provider11, uiSchemaDefaultsIntoPayload, value439, providerConfig);
+  !apiKey4 && throwMissingApiKey(provider11);
+  const inputImagesBySlot = await resolveInputImagesBySlot(
+      provider11,
+      uiSchemaDefaultsIntoPayload,
+      apiKey4,
+      value439,
+      {
+        modelManifest: modelManifest5,
+        provider: provider11,
+        baseUrl: providerConfig['apiUrl'],
+        executionManifest: executionManifest6,
+      },
+    ),
+    value442 =
+      Object['keys'](inputImagesBySlot)['length'] > 0x0
+        ? Object['values'](inputImagesBySlot)
+        : await resolveInputImages(provider11, uiSchemaDefaultsIntoPayload, apiKey4, value439, {
+            modelManifest: modelManifest5,
+            provider: provider11,
+            baseUrl: providerConfig['apiUrl'],
+            executionManifest: executionManifest6,
+          }),
+    inputAudios2 = await resolveInputAudios(uiSchemaDefaultsIntoPayload, apiKey4, value439, {
+      modelManifest: modelManifest5,
+      provider: provider11,
+      baseUrl: providerConfig['apiUrl'],
+      executionManifest: executionManifest6,
+    }),
+    executionModelToken = resolveExecutionModelToken(executionManifest6, uiSchemaDefaultsIntoPayload),
+    value443 = {
+      provider: provider11,
+      modelManifest: modelManifest5,
+      executionManifest: executionManifest6,
+      payload: uiSchemaDefaultsIntoPayload,
+      finalPrompt: value438,
+      modelToken: executionModelToken,
+      apiKey: apiKey4,
+      ctx: value439,
+      inputImages: value442,
+      inputVideos: [],
+      inputAudios: inputAudios2,
+    },
+    args23 = await buildManifestMappedBody(value443),
+    manifestApiUrl = resolveManifestApiUrl(provider11, providerConfig, executionManifest6, value443),
+    value444 = String(executionManifest6['extensions']?.['proxyMode'] || '')
+      ['trim']()
+      ['toLowerCase']();
+  if (value444 === 'task')
+    return {
+      url: '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(manifestApiUrl),
+      headers: buildTaskProxyHeaders(
+        executionManifest6['headers'] || { 'Content-Type': 'application/json' },
+        apiKey4,
+        executionManifest6,
+      ),
+      body: args23,
+      responseMapping: executionManifest6['responseMapping'],
+      errorRules: resolveManifestErrorRules(executionManifest6),
+      adapterTrace: {
+        source: 'manifest',
+        executionId: executionManifest6['id'],
+        modelId: uiSchemaDefaultsIntoPayload['model'],
+      },
+      meta: {
+        provider: provider11,
+        adapterType: 'modelApi',
+        audioWorkflowKey: modelManifest5['modelId'],
+        audioWorkflowLabel: modelManifest5['displayName'] || modelManifest5['modelId'],
+        model: modelManifest5['modelId'],
+        executionId: executionManifest6['id'],
+        isManifestAudioModelApi: !![],
+      },
+    };
+  return {
+    url: '/api/v2/proxy/image',
+    headers: executionManifest6['headers'] || { 'Content-Type': 'application/json' },
+    body: { apiUrl: manifestApiUrl, apiKey: apiKey4, ...args23 },
+    responseMapping: executionManifest6['responseMapping'],
+    errorRules: resolveManifestErrorRules(executionManifest6),
+    adapterTrace: {
+      source: 'manifest',
+      executionId: executionManifest6['id'],
+      modelId: uiSchemaDefaultsIntoPayload['model'],
+    },
+    meta: {
+      provider: provider11,
+      adapterType: 'modelApi',
+      audioWorkflowKey: modelManifest5['modelId'],
+      audioWorkflowLabel: modelManifest5['displayName'] || modelManifest5['modelId'],
+      model: modelManifest5['modelId'],
+      executionId: executionManifest6['id'],
+      isManifestAudioModelApi: !![],
+    },
+  };
+}
 
-function normalizeTextMaxOutputTokens(_0x367b07){const _0x5a0bb4=Math["trunc"](Number(_0x367b07)||0x0);return _0x5a0bb4>0x0?_0x5a0bb4:0x0;}
+function normalizeTextMaxOutputTokens(value445) {
+  const count13 = Math['trunc'](Number(value445) || 0x0);
+  return count13 > 0x0 ? count13 : 0x0;
+}
 
-function resolveGeminiNativeVideoApiUrl(_0x3cd7c0,_0x50bce0,_0x51d3c6,_0x3b0e71){const _0x577c32=_0x51d3c6["extensions"]?.["geminiNativeVideo"],_0x1e8eaa=String(_0x577c32?.["endpointTemplate"]||'')["trim"]();if(!_0x1e8eaa||!_0x1e8eaa["includes"]("{model}"))throw new Error("Gemini native video manifest requires an endpointTemplate with {model}");const _0x3f9472=_0x1e8eaa["replace"]("{model}",encodeURIComponent(_0x3b0e71["modelToken"])),_0x216129=resolveDefaultApiUrl(_0x3cd7c0,_0x50bce0,{'endpoint':_0x3f9472});return _0x3cd7c0==="runninghub"?remapRunningHubModelApiUrl(_0x216129,_0x3b0e71?.["payload"]?.["providerProfileId"]):_0x216129;}
+function resolveGeminiNativeVideoApiUrl(value446, value447, value448, value449) {
+  const value450 = value448['extensions']?.['geminiNativeVideo'],
+    enabled31 = String(value450?.['endpointTemplate'] || '')['trim']();
+  if (!enabled31 || !enabled31['includes']('{model}'))
+    throw new Error('Gemini native video manifest requires an endpointTemplate with {model}');
+  const value451 = enabled31['replace']('{model}', encodeURIComponent(value449['modelToken'])),
+    defaultApiUrl = resolveDefaultApiUrl(value446, value447, { endpoint: value451 });
+  return value446 === 'runninghub'
+    ? remapRunningHubModelApiUrl(defaultApiUrl, value449?.['payload']?.['providerProfileId'])
+    : defaultApiUrl;
+}
 
-function buildGeminiNativeThinkingConfig(_0x953181,_0x1217c7){const _0x18ceab=String(_0x953181?.["type"]||'')["trim"]()["toLowerCase"]();if(_0x18ceab!=="disabled")return{};const _0xbb27c1=_0x1217c7?.["thinkingControl"];if(_0xbb27c1?.['disabledUnsupported']===!![])throw new Error("当前 Gemini 模型不支持关闭思考，请改用支持无思考模式的模型");const _0x22c9f4=Number(_0xbb27c1?.["disabledBudget"]);if(!Number["isFinite"](_0x22c9f4)||_0x22c9f4<0x0)return{};return{'thinkingConfig':{'thinkingBudget':Math["trunc"](_0x22c9f4),'includeThoughts':_0xbb27c1?.["includeThoughts"]===!![]}};}
+function buildGeminiNativeThinkingConfig(value452, value453) {
+  const value454 = String(value452?.['type'] || '')
+    ['trim']()
+    ['toLowerCase']();
+  if (value454 !== 'disabled') return {};
+  const value455 = value453?.['thinkingControl'];
+  if (value455?.['disabledUnsupported'] === !![])
+    throw new Error('当前 Gemini 模型不支持关闭思考，请改用支持无思考模式的模型');
+  const count14 = Number(value455?.['disabledBudget']);
+  if (!Number['isFinite'](count14) || count14 < 0x0) return {};
+  return {
+    thinkingConfig: {
+      thinkingBudget: Math['trunc'](count14),
+      includeThoughts: value455?.['includeThoughts'] === !![],
+    },
+  };
+}
 
-function buildGeminiNativeGenerationConfig(_0x1dcbc3,_0x45254a,_0x1ce3f2,_0x3696d4){const _0x29c3bf=normalizeTextStructuredOutput(_0x1dcbc3);return{..._0x45254a?{'maxOutputTokens':_0x45254a}:{},...buildGeminiNativeThinkingConfig(_0x1ce3f2,_0x3696d4),..._0x29c3bf?{'responseMimeType':'application/json','responseJsonSchema':_0x29c3bf["schema"]}:{}};}
+function buildGeminiNativeGenerationConfig(value456, args24, value457, value458) {
+  const args25 = normalizeTextStructuredOutput(value456);
+  return {
+    ...(args24 ? { maxOutputTokens: args24 } : {}),
+    ...buildGeminiNativeThinkingConfig(value457, value458),
+    ...(args25 ? { responseMimeType: 'application/json', responseJsonSchema: args25['schema'] } : {}),
+  };
+}

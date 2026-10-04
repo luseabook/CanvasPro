@@ -35,8 +35,8 @@ import {
 } from './scene3dTheme.js';
 import { resolveAxisScreenDragMetric } from './scene3dScreenProjection.js';
 import { t } from '../../i18n/index.js';
-function panoramaSceneText(_0x2a7b3f, _0x3a4688 = {}) {
-  return t('panoramaSceneNode.' + _0x2a7b3f, _0x3a4688);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
 const GRID_MINOR_STEP = 1,
   GRID_MAJOR_STEP = 10,
@@ -60,102 +60,102 @@ const GRID_MINOR_STEP = 1,
   GIZMO_MARGIN_WORLD_MIN = 0.12,
   GIZMO_MARGIN_WORLD_RATIO = 0.12,
   DEFAULT_BG_FALLBACK = { day: '--white-90', night: '--bg' };
-function createLineGeometry(_0x5af297, _0x46cdcd) {
-  return new threeRuntime['BufferGeometry']().setFromPoints([_0x5af297, _0x46cdcd]);
+function createLineGeometry(key, index) {
+  return new threeRuntime['BufferGeometry']().setFromPoints([key, index]);
 }
-function setLineGeometryPoints(_0x549247, _0x5bfe72, _0x493fa0) {
-  if (!_0x549247?.geometry) return;
-  const _0x486438 = _0x5bfe72?.isVector3 ? _0x5bfe72 : toVector3Like(_0x5bfe72),
-    _0x84296e = _0x493fa0?.isVector3 ? _0x493fa0 : toVector3Like(_0x493fa0),
-    _0x134435 = _0x549247.geometry.getAttribute('position');
-  if (!_0x134435 || _0x134435.count < 2) {
-    (_0x549247.geometry.dispose?.(), (_0x549247.geometry = createLineGeometry(_0x486438, _0x84296e)));
+function setLineGeometryPoints(enabled, result, data) {
+  if (!enabled?.geometry) return;
+  const box = result?.isVector3 ? result : toVector3Like(result),
+    box2 = data?.isVector3 ? data : toVector3Like(data),
+    enabled2 = enabled.geometry.getAttribute('position');
+  if (!enabled2 || enabled2.count < 2) {
+    (enabled.geometry.dispose?.(), (enabled.geometry = createLineGeometry(box, box2)));
     return;
   }
-  (_0x134435.setXYZ(0, _0x486438.x, _0x486438.y, _0x486438.z),
-    _0x134435.setXYZ(1, _0x84296e.x, _0x84296e.y, _0x84296e.z),
-    (_0x134435.needsUpdate = true),
-    _0x549247.geometry.computeBoundingSphere?.(),
-    _0x549247.geometry.computeBoundingBox?.());
+  (enabled2.setXYZ(0, box.x, box.y, box.z),
+    enabled2.setXYZ(1, box2.x, box2.y, box2.z),
+    (enabled2.needsUpdate = true),
+    enabled.geometry.computeBoundingSphere?.(),
+    enabled.geometry.computeBoundingBox?.());
 }
-function configureGizmoMaterial(_0x443f51, { transparent: transparent = false, opacity: opacity = 1 } = {}) {
-  if (!_0x443f51) return _0x443f51;
-  _0x443f51.transparent = transparent;
-  if ('opacity' in _0x443f51) _0x443f51.opacity = opacity;
+function configureGizmoMaterial(enabled3, { transparent: transparent = false, opacity: opacity = 1 } = {}) {
+  if (!enabled3) return enabled3;
+  enabled3.transparent = transparent;
+  if ('opacity' in enabled3) enabled3.opacity = opacity;
   return (
-    (_0x443f51.depthWrite = false),
-    (_0x443f51.depthTest = false),
-    (_0x443f51.toneMapped = false),
-    (_0x443f51.fog = false),
-    _0x443f51
+    (enabled3.depthWrite = false),
+    (enabled3.depthTest = false),
+    (enabled3.toneMapped = false),
+    (enabled3.fog = false),
+    enabled3
   );
 }
-function configureGizmoObject(_0x45d1c0) {
-  if (!_0x45d1c0) return _0x45d1c0;
-  return ((_0x45d1c0.frustumCulled = false), (_0x45d1c0.renderOrder = 100), _0x45d1c0);
+function configureGizmoObject(enabled4) {
+  if (!enabled4) return enabled4;
+  return ((enabled4.frustumCulled = false), (enabled4.renderOrder = 100), enabled4);
 }
-function orientAxisHead(_0x4cb16e, _0x4464ad) {
-  if (!_0x4cb16e) return;
-  _0x4cb16e.rotation.set(0, 0, 0);
-  if (_0x4464ad === 'x') _0x4cb16e.rotation.z = -Math.PI / 2;
-  if (_0x4464ad === 'z') _0x4cb16e.rotation.x = Math.PI / 2;
+function orientAxisHead(enabled5, options) {
+  if (!enabled5) return;
+  enabled5.rotation.set(0, 0, 0);
+  if (options === 'x') enabled5.rotation.z = -Math.PI / 2;
+  if (options === 'z') enabled5.rotation.x = Math.PI / 2;
 }
-function setAxisLineEnd(_0x2172ce, _0x203b8a, _0x46bd15) {
-  if (!_0x2172ce?.geometry) return;
-  const _0x2e440b = vectorFromAxisName(_0x203b8a),
-    _0x50a24c = Math.max(0, Number(_0x46bd15) || 0),
-    _0x5ed683 = _0x2172ce.geometry.getAttribute('position');
-  if (!_0x5ed683 || _0x5ed683.count < 2) return;
-  (_0x5ed683.setXYZ(0, 0, 0, 0),
-    _0x5ed683.setXYZ(1, _0x2e440b.x * _0x50a24c, _0x2e440b.y * _0x50a24c, _0x2e440b.z * _0x50a24c),
-    (_0x5ed683.needsUpdate = true),
-    _0x2172ce.geometry.computeBoundingSphere?.(),
-    _0x2172ce.geometry.computeBoundingBox?.());
+function setAxisLineEnd(enabled6, target, source) {
+  if (!enabled6?.geometry) return;
+  const box3 = vectorFromAxisName(target),
+    next = Math.max(0, Number(source) || 0),
+    enabled7 = enabled6.geometry.getAttribute('position');
+  if (!enabled7 || enabled7.count < 2) return;
+  (enabled7.setXYZ(0, 0, 0, 0),
+    enabled7.setXYZ(1, box3.x * next, box3.y * next, box3.z * next),
+    (enabled7.needsUpdate = true),
+    enabled6.geometry.computeBoundingSphere?.(),
+    enabled6.geometry.computeBoundingBox?.());
 }
-function setAxisHandleLayout(_0x54ea0f, _0x335532, _0x5a03b5 = 0) {
-  if (!_0x54ea0f) return;
-  const _0x2edeab = _0x54ea0f.userData?.axisName || _0x54ea0f.axisName;
-  if (!_0x2edeab) return;
-  const _0x1adae4 = vectorFromAxisName(_0x2edeab),
-    _0x5e91e1 = Math.max(0, Number(_0x335532) || 0),
-    _0x5116aa = Number(_0x5a03b5) || 0;
-  _0x54ea0f.position.copy(_0x1adae4.multiplyScalar(_0x5e91e1 + _0x5116aa));
+function setAxisHandleLayout(enabled8, current, entry = 0) {
+  if (!enabled8) return;
+  const enabled9 = enabled8.userData?.axisName || enabled8.axisName;
+  if (!enabled9) return;
+  const vectorFromAxisName2 = vectorFromAxisName(enabled9),
+    record = Math.max(0, Number(current) || 0),
+    payload = Number(entry) || 0;
+  enabled8.position.copy(vectorFromAxisName2.multiplyScalar(record + payload));
 }
-function createMoveAxis(_0x4a337b, _0x538c41) {
-  const _0x596344 = _0x4a337b.isColor ? _0x4a337b.clone() : new threeRuntime.Color(_0x4a337b),
-    _0x78174f = vectorFromAxisName(_0x538c41),
-    _0xff7881 = new threeRuntime['Group']();
-  configureGizmoObject(_0xff7881);
-  const _0x5862ca = configureGizmoMaterial(
-      new threeRuntime.LineBasicMaterial({ color: _0x596344.clone(), transparent: true, opacity: 0.96 }),
+function createMoveAxis(handle, axisName) {
+  const color = handle.isColor ? handle.clone() : new threeRuntime.Color(handle),
+    axis = vectorFromAxisName(axisName),
+    group = new threeRuntime['Group']();
+  configureGizmoObject(group);
+  const material = configureGizmoMaterial(
+      new threeRuntime.LineBasicMaterial({ color: color.clone(), transparent: true, opacity: 0.96 }),
       { transparent: true, opacity: 0.96 },
     ),
-    _0x2f238b = new threeRuntime['Line'](
+    shaftLine = new threeRuntime['Line'](
       createLineGeometry(
         new threeRuntime['Vector3'](0, 0, 0),
-        _0x78174f.clone().multiplyScalar(GIZMO_MOVE_SHAFT_LENGTH),
+        axis.clone().multiplyScalar(GIZMO_MOVE_SHAFT_LENGTH),
       ),
-      _0x5862ca,
+      material,
     );
-  (configureGizmoObject(_0x2f238b), _0xff7881.add(_0x2f238b));
-  const _0x1367fd = configureGizmoMaterial(
-      new threeRuntime.MeshBasicMaterial({ color: _0x596344.clone(), transparent: true, opacity: 0.98 }),
+  (configureGizmoObject(shaftLine), group.add(shaftLine));
+  const material2 = configureGizmoMaterial(
+      new threeRuntime.MeshBasicMaterial({ color: color.clone(), transparent: true, opacity: 0.98 }),
       { transparent: true, opacity: 0.98 },
     ),
-    _0x4f6beb = new threeRuntime['Mesh'](
+    headMesh = new threeRuntime['Mesh'](
       new threeRuntime['ConeGeometry'](0.06, GIZMO_MOVE_HEAD_LENGTH, 14),
-      _0x1367fd,
+      material2,
     );
-  ((_0x4f6beb.userData.axisName = _0x538c41),
+  ((headMesh.userData.axisName = axisName),
     setAxisHandleLayout(
-      _0x4f6beb,
+      headMesh,
       GIZMO_BASE_AXIS_LENGTH - GIZMO_MOVE_HEAD_LENGTH * 0.5,
       GIZMO_MOVE_HEAD_LENGTH * 0.5,
     ),
-    orientAxisHead(_0x4f6beb, _0x538c41),
-    configureGizmoObject(_0x4f6beb),
-    _0xff7881.add(_0x4f6beb));
-  const _0x237bce = new threeRuntime['Mesh'](
+    orientAxisHead(headMesh, axisName),
+    configureGizmoObject(headMesh),
+    group.add(headMesh));
+  const pickMesh = new threeRuntime['Mesh'](
     new threeRuntime['CylinderGeometry'](0.14, 0.14, GIZMO_MOVE_PICK_LENGTH, 10),
     configureGizmoMaterial(
       new threeRuntime['MeshBasicMaterial']({
@@ -168,60 +168,60 @@ function createMoveAxis(_0x4a337b, _0x538c41) {
     ),
   );
   return (
-    (_0x237bce.userData.axisName = _0x538c41),
-    setAxisHandleLayout(_0x237bce, GIZMO_MOVE_PICK_LENGTH * 0.5),
-    orientAxisHead(_0x237bce, _0x538c41),
-    configureGizmoObject(_0x237bce),
-    _0xff7881.add(_0x237bce),
+    (pickMesh.userData.axisName = axisName),
+    setAxisHandleLayout(pickMesh, GIZMO_MOVE_PICK_LENGTH * 0.5),
+    orientAxisHead(pickMesh, axisName),
+    configureGizmoObject(pickMesh),
+    group.add(pickMesh),
     {
-      axisName: _0x538c41,
-      axis: _0x78174f.clone(),
-      group: _0xff7881,
-      shaftLine: _0x2f238b,
-      headMesh: _0x4f6beb,
+      axisName: axisName,
+      axis: axis.clone(),
+      group: group,
+      shaftLine: shaftLine,
+      headMesh: headMesh,
       visuals: [
-        { material: _0x5862ca, color: _0x596344.clone(), opacity: 1 },
-        { material: _0x1367fd, color: _0x596344.clone(), opacity: 1 },
+        { material: material, color: color.clone(), opacity: 1 },
+        { material: material2, color: color.clone(), opacity: 1 },
       ],
-      pickMesh: _0x237bce,
+      pickMesh: pickMesh,
     }
   );
 }
-function createScaleAxis(_0x131201, _0x34bf5f) {
-  const _0x38cc64 = _0x131201.isColor ? _0x131201.clone() : new threeRuntime['Color'](_0x131201),
-    _0x34ae70 = vectorFromAxisName(_0x34bf5f),
-    _0x36f2bc = new threeRuntime['Group']();
-  configureGizmoObject(_0x36f2bc);
-  const _0x124013 = configureGizmoMaterial(
-      new threeRuntime['LineBasicMaterial']({ color: _0x38cc64.clone(), transparent: true, opacity: 0.96 }),
+function createScaleAxis(state, axisName2) {
+  const color2 = state.isColor ? state.clone() : new threeRuntime['Color'](state),
+    axis2 = vectorFromAxisName(axisName2),
+    group2 = new threeRuntime['Group']();
+  configureGizmoObject(group2);
+  const material3 = configureGizmoMaterial(
+      new threeRuntime['LineBasicMaterial']({ color: color2.clone(), transparent: true, opacity: 0.96 }),
       { transparent: true, opacity: 0.96 },
     ),
-    _0x22f7e4 = new threeRuntime.Line(
+    shaftLine2 = new threeRuntime.Line(
       createLineGeometry(
         new threeRuntime['Vector3'](0, 0, 0),
-        _0x34ae70.clone().multiplyScalar(GIZMO_SCALE_SHAFT_LENGTH),
+        axis2.clone().multiplyScalar(GIZMO_SCALE_SHAFT_LENGTH),
       ),
-      _0x124013,
+      material3,
     );
-  (configureGizmoObject(_0x22f7e4), _0x36f2bc.add(_0x22f7e4));
-  const _0x183306 = configureGizmoMaterial(
-      new threeRuntime['MeshBasicMaterial']({ color: _0x38cc64.clone(), transparent: true, opacity: 0.98 }),
+  (configureGizmoObject(shaftLine2), group2.add(shaftLine2));
+  const material4 = configureGizmoMaterial(
+      new threeRuntime['MeshBasicMaterial']({ color: color2.clone(), transparent: true, opacity: 0.98 }),
       { transparent: true, opacity: 0.98 },
     ),
-    _0x2658f5 = new threeRuntime.Mesh(
+    headMesh2 = new threeRuntime.Mesh(
       new threeRuntime['BoxGeometry'](GIZMO_SCALE_HEAD_SIZE, GIZMO_SCALE_HEAD_SIZE, GIZMO_SCALE_HEAD_SIZE),
-      _0x183306,
+      material4,
     );
-  ((_0x2658f5.userData.axisName = _0x34bf5f),
+  ((headMesh2.userData.axisName = axisName2),
     setAxisHandleLayout(
-      _0x2658f5,
+      headMesh2,
       GIZMO_BASE_SCALE_LENGTH - GIZMO_SCALE_HEAD_SIZE * 0.5,
       GIZMO_SCALE_HEAD_SIZE * 0.5,
     ),
-    orientAxisHead(_0x2658f5, _0x34bf5f),
-    configureGizmoObject(_0x2658f5),
-    _0x36f2bc.add(_0x2658f5));
-  const _0x4c7013 = new threeRuntime['Mesh'](
+    orientAxisHead(headMesh2, axisName2),
+    configureGizmoObject(headMesh2),
+    group2.add(headMesh2));
+  const pickMesh2 = new threeRuntime['Mesh'](
     new threeRuntime['CylinderGeometry'](0.14, 0.14, GIZMO_SCALE_PICK_LENGTH, 10),
     configureGizmoMaterial(
       new threeRuntime.MeshBasicMaterial({
@@ -234,46 +234,46 @@ function createScaleAxis(_0x131201, _0x34bf5f) {
     ),
   );
   return (
-    (_0x4c7013.userData.axisName = _0x34bf5f),
-    setAxisHandleLayout(_0x4c7013, GIZMO_SCALE_PICK_LENGTH * 0.5),
-    orientAxisHead(_0x4c7013, _0x34bf5f),
-    configureGizmoObject(_0x4c7013),
-    _0x36f2bc.add(_0x4c7013),
+    (pickMesh2.userData.axisName = axisName2),
+    setAxisHandleLayout(pickMesh2, GIZMO_SCALE_PICK_LENGTH * 0.5),
+    orientAxisHead(pickMesh2, axisName2),
+    configureGizmoObject(pickMesh2),
+    group2.add(pickMesh2),
     {
-      axisName: _0x34bf5f,
-      axis: _0x34ae70.clone(),
-      group: _0x36f2bc,
-      shaftLine: _0x22f7e4,
-      headMesh: _0x2658f5,
+      axisName: axisName2,
+      axis: axis2.clone(),
+      group: group2,
+      shaftLine: shaftLine2,
+      headMesh: headMesh2,
       visuals: [
-        { material: _0x124013, color: _0x38cc64.clone(), opacity: 1 },
-        { material: _0x183306, color: _0x38cc64.clone(), opacity: 1 },
+        { material: material3, color: color2.clone(), opacity: 1 },
+        { material: material4, color: color2.clone(), opacity: 1 },
       ],
-      pickMesh: _0x4c7013,
+      pickMesh: pickMesh2,
     }
   );
 }
-function createRotateRing(_0x5bc253, _0x164412) {
-  const _0x548eee = _0x5bc253.isColor ? _0x5bc253.clone() : new threeRuntime['Color'](_0x5bc253),
-    _0x51a365 = new threeRuntime['Group']();
-  configureGizmoObject(_0x51a365);
-  const _0x39a15a = configureGizmoMaterial(
+function createRotateRing(config, axisName3) {
+  const color3 = config.isColor ? config.clone() : new threeRuntime['Color'](config),
+    group3 = new threeRuntime['Group']();
+  configureGizmoObject(group3);
+  const material5 = configureGizmoMaterial(
       new threeRuntime['MeshBasicMaterial']({
-        color: _0x548eee.clone(),
+        color: color3.clone(),
         transparent: true,
         opacity: 0.86,
         depthWrite: false,
       }),
       { transparent: true, opacity: 0.86 },
     ),
-    _0x1baf57 = new threeRuntime['Mesh'](
+    scope = new threeRuntime['Mesh'](
       new threeRuntime.TorusGeometry(GIZMO_BASE_ROTATE_RADIUS, 0.016, 8, 64),
-      _0x39a15a,
+      material5,
     );
-  if (_0x164412 === 'x') _0x1baf57.rotation.y = Math.PI / 2;
-  else _0x164412 === 'y' && (_0x1baf57.rotation.x = Math.PI / 2);
-  (configureGizmoObject(_0x1baf57), _0x51a365.add(_0x1baf57));
-  const _0x405073 = new threeRuntime['Mesh'](
+  if (axisName3 === 'x') scope.rotation.y = Math.PI / 2;
+  else axisName3 === 'y' && (scope.rotation.x = Math.PI / 2);
+  (configureGizmoObject(scope), group3.add(scope));
+  const pickMesh3 = new threeRuntime['Mesh'](
     new threeRuntime['TorusGeometry'](GIZMO_BASE_ROTATE_RADIUS, 0.11, 8, 64),
     configureGizmoMaterial(
       new threeRuntime.MeshBasicMaterial({
@@ -286,77 +286,98 @@ function createRotateRing(_0x5bc253, _0x164412) {
     ),
   );
   return (
-    _0x405073.rotation.copy(_0x1baf57.rotation),
-    configureGizmoObject(_0x405073),
-    _0x51a365.add(_0x405073),
+    pickMesh3.rotation.copy(scope.rotation),
+    configureGizmoObject(pickMesh3),
+    group3.add(pickMesh3),
     {
-      axisName: _0x164412,
-      group: _0x51a365,
-      visuals: [{ material: _0x39a15a, color: _0x548eee.clone(), opacity: 0.9 }],
-      pickMesh: _0x405073,
+      axisName: axisName3,
+      group: group3,
+      visuals: [{ material: material5, color: color3.clone(), opacity: 0.9 }],
+      pickMesh: pickMesh3,
     }
   );
 }
-function getPlaneCornerMetrics(_0x480525 = GIZMO_BASE_PLANE_SIZE, _0x1224ee = 0) {
-  const _0x24a38e = _0x480525 * 0.56,
-    _0x5809b0 = Math.max(_0x480525 * 0.065, 0.012),
-    _0x515593 = _0x480525 * 0.06,
-    _0x1be83a = _0x480525 * 0.5 - _0x515593,
-    _0x67f4ca = _0x1be83a - _0x24a38e,
-    _0x385f96 = (_0x1be83a + _0x67f4ca) * 0.5,
-    _0x5a8df0 = _0x5809b0 * 0.5 + _0x1224ee,
-    _0x41973d = _0x24a38e * 0.46 - _0x1224ee * 0.35;
+function getPlaneCornerMetrics(input = GIZMO_BASE_PLANE_SIZE, output = 0) {
+  const armLength = input * 0.56,
+    armThickness = Math.max(input * 0.065, 0.012),
+    cornerInset = input * 0.06,
+    outer = input * 0.5 - cornerInset,
+    inner = outer - armLength,
+    armCenter = (outer + inner) * 0.5,
+    halfThickness = armThickness * 0.5 + output,
+    value2 = armLength * 0.46 - output * 0.35;
   return {
-    armLength: _0x24a38e,
-    armThickness: _0x5809b0,
-    cornerInset: _0x515593,
-    outer: _0x1be83a,
-    inner: _0x67f4ca,
-    armCenter: _0x385f96,
-    halfThickness: _0x5a8df0,
-    diagonalStart: Math.max(_0x67f4ca, _0x67f4ca + _0x41973d),
-    diagonalEnd: Math.max(_0x67f4ca, _0x67f4ca + _0x41973d),
+    armLength: armLength,
+    armThickness: armThickness,
+    cornerInset: cornerInset,
+    outer: outer,
+    inner: inner,
+    armCenter: armCenter,
+    halfThickness: halfThickness,
+    diagonalStart: Math.max(inner, inner + value2),
+    diagonalEnd: Math.max(inner, inner + value2),
   };
 }
-function createPlaneCornerPickGeometry(_0x4da2a2 = GIZMO_BASE_PLANE_SIZE) {
-  const _0x4066df = Math.max(_0x4da2a2 * 0.018, 0.006),
-    _0x3525c4 = getPlaneCornerMetrics(_0x4da2a2, _0x4066df),
-    _0x3c0bc9 = new threeRuntime.Shape();
+function createPlaneCornerPickGeometry(value3 = GIZMO_BASE_PLANE_SIZE) {
+  const value4 = Math.max(value3 * 0.018, 0.006),
+    planeCornerMetrics = getPlaneCornerMetrics(value3, value4),
+    ctx = new threeRuntime.Shape();
   return (
-    _0x3c0bc9.moveTo(_0x3525c4.inner - _0x4066df, _0x3525c4.outer + _0x3525c4.halfThickness),
-    _0x3c0bc9.lineTo(_0x3525c4.outer + _0x3525c4.halfThickness, _0x3525c4.outer + _0x3525c4.halfThickness),
-    _0x3c0bc9.lineTo(_0x3525c4.outer + _0x3525c4.halfThickness, _0x3525c4.inner - _0x4066df),
-    _0x3c0bc9.lineTo(_0x3525c4.outer - _0x3525c4.halfThickness, _0x3525c4.inner - _0x4066df),
-    _0x3c0bc9.lineTo(_0x3525c4.outer - _0x3525c4.halfThickness, _0x3525c4.diagonalEnd - _0x4066df),
-    _0x3c0bc9.lineTo(_0x3525c4.diagonalStart - _0x4066df, _0x3525c4.outer - _0x3525c4.halfThickness),
-    _0x3c0bc9.lineTo(_0x3525c4.inner - _0x4066df, _0x3525c4.outer - _0x3525c4.halfThickness),
-    _0x3c0bc9.closePath(),
-    new threeRuntime.ShapeGeometry(_0x3c0bc9)
+    ctx.moveTo(
+      planeCornerMetrics.inner - value4,
+      planeCornerMetrics.outer + planeCornerMetrics.halfThickness,
+    ),
+    ctx.lineTo(
+      planeCornerMetrics.outer + planeCornerMetrics.halfThickness,
+      planeCornerMetrics.outer + planeCornerMetrics.halfThickness,
+    ),
+    ctx.lineTo(
+      planeCornerMetrics.outer + planeCornerMetrics.halfThickness,
+      planeCornerMetrics.inner - value4,
+    ),
+    ctx.lineTo(
+      planeCornerMetrics.outer - planeCornerMetrics.halfThickness,
+      planeCornerMetrics.inner - value4,
+    ),
+    ctx.lineTo(
+      planeCornerMetrics.outer - planeCornerMetrics.halfThickness,
+      planeCornerMetrics.diagonalEnd - value4,
+    ),
+    ctx.lineTo(
+      planeCornerMetrics.diagonalStart - value4,
+      planeCornerMetrics.outer - planeCornerMetrics.halfThickness,
+    ),
+    ctx.lineTo(
+      planeCornerMetrics.inner - value4,
+      planeCornerMetrics.outer - planeCornerMetrics.halfThickness,
+    ),
+    ctx.closePath(),
+    new threeRuntime.ShapeGeometry(ctx)
   );
 }
 function createPlaneCornerVisual(
-  { horizontalColor: _0x4d9254, verticalColor: _0x2055e0 } = {},
-  _0x231cff = GIZMO_BASE_PLANE_SIZE,
+  { horizontalColor: horizontalColor, verticalColor: verticalColor } = {},
+  value5 = GIZMO_BASE_PLANE_SIZE,
 ) {
-  const _0x37d48b = _0x4d9254?.isColor
-      ? _0x4d9254.clone()
-      : _0x4d9254
-        ? new threeRuntime['Color'](_0x4d9254)
+  const value6 = horizontalColor?.isColor
+      ? horizontalColor.clone()
+      : horizontalColor
+        ? new threeRuntime['Color'](horizontalColor)
         : resolveThemeColor('--white', '--white'),
-    _0xffe608 = _0x2055e0?.isColor
-      ? _0x2055e0.clone()
-      : _0x2055e0
-        ? new threeRuntime.Color(_0x2055e0)
+    value7 = verticalColor?.isColor
+      ? verticalColor.clone()
+      : verticalColor
+        ? new threeRuntime.Color(verticalColor)
         : resolveThemeColor('--white', '--white'),
-    _0x4df37d = new threeRuntime['Group']();
-  configureGizmoObject(_0x4df37d);
-  const _0x2ae40b = getPlaneCornerMetrics(_0x231cff),
-    _0x5739a4 = [],
-    _0x4c802a = _0x37d48b.clone().lerp(_0xffe608, 0.5),
-    _0x18663a = (_0x8f584, _0x41cdda, _0x134d4e, _0xcad6bf, _0xb777d) => {
-      const _0x2c872f = configureGizmoMaterial(
+    group4 = new threeRuntime['Group']();
+  configureGizmoObject(group4);
+  const planeCornerMetrics2 = getPlaneCornerMetrics(value5),
+    visuals = [],
+    color4 = value6.clone().lerp(value7, 0.5),
+    handler = (value8, value9, value10, value11, color5) => {
+      const material6 = configureGizmoMaterial(
           new threeRuntime['MeshBasicMaterial']({
-            color: _0xb777d.clone(),
+            color: color5.clone(),
             transparent: true,
             opacity: 0.98,
             side: threeRuntime.DoubleSide,
@@ -364,18 +385,30 @@ function createPlaneCornerVisual(
           }),
           { transparent: true, opacity: 0.98 },
         ),
-        _0x173a73 = new threeRuntime['Mesh'](new threeRuntime.PlaneGeometry(_0x8f584, _0x41cdda), _0x2c872f);
-      (_0x173a73.position.set(_0x134d4e, _0xcad6bf, 0),
-        configureGizmoObject(_0x173a73),
-        _0x4df37d.add(_0x173a73),
-        _0x5739a4.push({ material: _0x2c872f, color: _0xb777d.clone(), opacity: 0.98 }));
+        value12 = new threeRuntime['Mesh'](new threeRuntime.PlaneGeometry(value8, value9), material6);
+      (value12.position.set(value10, value11, 0),
+        configureGizmoObject(value12),
+        group4.add(value12),
+        visuals.push({ material: material6, color: color5.clone(), opacity: 0.98 }));
     };
-  (_0x18663a(_0x2ae40b.armLength, _0x2ae40b.armThickness, _0x2ae40b.armCenter, _0x2ae40b.outer, _0x37d48b),
-    _0x18663a(_0x2ae40b.armThickness, _0x2ae40b.armLength, _0x2ae40b.outer, _0x2ae40b.armCenter, _0xffe608));
+  (handler(
+    planeCornerMetrics2.armLength,
+    planeCornerMetrics2.armThickness,
+    planeCornerMetrics2.armCenter,
+    planeCornerMetrics2.outer,
+    value6,
+  ),
+    handler(
+      planeCornerMetrics2.armThickness,
+      planeCornerMetrics2.armLength,
+      planeCornerMetrics2.outer,
+      planeCornerMetrics2.armCenter,
+      value7,
+    ));
   {
-    const _0x525919 = configureGizmoMaterial(
+    const material7 = configureGizmoMaterial(
         new threeRuntime.MeshBasicMaterial({
-          color: _0x4c802a.clone(),
+          color: color4.clone(),
           transparent: true,
           opacity: 0.98,
           side: threeRuntime.DoubleSide,
@@ -383,19 +416,19 @@ function createPlaneCornerVisual(
         }),
         { transparent: true, opacity: 0.98 },
       ),
-      _0x3ad915 = new threeRuntime['Mesh'](
-        new threeRuntime['PlaneGeometry'](_0x2ae40b.armThickness, _0x2ae40b.armThickness),
-        _0x525919,
+      value13 = new threeRuntime['Mesh'](
+        new threeRuntime['PlaneGeometry'](planeCornerMetrics2.armThickness, planeCornerMetrics2.armThickness),
+        material7,
       );
-    (_0x3ad915.position.set(_0x2ae40b.outer, _0x2ae40b.outer, 0),
-      configureGizmoObject(_0x3ad915),
-      _0x4df37d.add(_0x3ad915),
-      _0x5739a4.push({ material: _0x525919, color: _0x4c802a.clone(), opacity: 0.98 }));
+    (value13.position.set(planeCornerMetrics2.outer, planeCornerMetrics2.outer, 0),
+      configureGizmoObject(value13),
+      group4.add(value13),
+      visuals.push({ material: material7, color: color4.clone(), opacity: 0.98 }));
   }
   {
-    const _0x1c78f8 = configureGizmoMaterial(
+    const material8 = configureGizmoMaterial(
         new threeRuntime['MeshBasicMaterial']({
-          color: _0x4c802a,
+          color: color4,
           transparent: true,
           opacity: 0.38,
           side: threeRuntime.DoubleSide,
@@ -403,81 +436,81 @@ function createPlaneCornerVisual(
         }),
         { transparent: true, opacity: 0.38 },
       ),
-      _0x4e0837 = new threeRuntime.BufferGeometry(),
-      _0x496994 = _0x2ae40b.armThickness * 0.5;
-    (_0x4e0837.setAttribute(
+      el = new threeRuntime.BufferGeometry(),
+      value14 = planeCornerMetrics2.armThickness * 0.5;
+    (el.setAttribute(
       'position',
       new threeRuntime['Float32BufferAttribute'](
         [
-          _0x2ae40b.diagonalStart,
-          _0x2ae40b.outer - _0x496994,
+          planeCornerMetrics2.diagonalStart,
+          planeCornerMetrics2.outer - value14,
           0,
-          _0x2ae40b.outer - _0x496994,
-          _0x2ae40b.outer - _0x496994,
+          planeCornerMetrics2.outer - value14,
+          planeCornerMetrics2.outer - value14,
           0,
-          _0x2ae40b.outer - _0x496994,
-          _0x2ae40b.diagonalEnd,
+          planeCornerMetrics2.outer - value14,
+          planeCornerMetrics2.diagonalEnd,
           0,
         ],
         3,
       ),
     ),
-      _0x4e0837.setIndex([0, 1, 2]),
-      _0x4e0837.computeVertexNormals());
-    const _0x1a1e69 = new threeRuntime['Mesh'](_0x4e0837, _0x1c78f8);
-    (configureGizmoObject(_0x1a1e69),
-      _0x4df37d.add(_0x1a1e69),
-      _0x5739a4.push({ material: _0x1c78f8, color: _0x4c802a.clone(), opacity: 0.38 }));
+      el.setIndex([0, 1, 2]),
+      el.computeVertexNormals());
+    const value15 = new threeRuntime['Mesh'](el, material8);
+    (configureGizmoObject(value15),
+      group4.add(value15),
+      visuals.push({ material: material8, color: color4.clone(), opacity: 0.38 }));
   }
-  return { group: _0x4df37d, visuals: _0x5739a4 };
+  return { group: group4, visuals: visuals };
 }
 function createGizmoVisual() {
-  const _0x5510fe = resolveThemeColor('--red', '--red'),
-    _0x50ffac = resolveThemeColor('--green', '--green'),
-    _0x2657be = resolveThemeColor('--blue', '--blue'),
-    _0x1bcc1a = new threeRuntime['Group']();
-  ((_0x1bcc1a.visible = false), configureGizmoObject(_0x1bcc1a));
-  const _0x38274b = new threeRuntime['Group'](),
-    _0x114664 = new Map(),
-    _0x5f5550 = [],
-    _0x87f2e8 = {},
-    _0x25bc69 = {},
-    _0x1bf185 = {},
-    _0x27b81d = {},
-    _0x99aafd = {},
-    _0x33da9c = createMoveAxis(_0x5510fe, 'x'),
-    _0x2e258d = createMoveAxis(_0x50ffac, 'y'),
-    _0x13982e = createMoveAxis(_0x2657be, 'z');
-  (_0x38274b.add(_0x33da9c.group),
-    _0x38274b.add(_0x2e258d.group),
-    _0x38274b.add(_0x13982e.group),
-    (_0x87f2e8.x = _0x33da9c),
-    (_0x87f2e8.y = _0x2e258d),
-    (_0x87f2e8.z = _0x13982e),
-    _0x114664.set('axis-x', { key: 'axis-x', mode: 'axis', axis: 'x', visuals: _0x33da9c.visuals }),
-    _0x114664.set('axis-y', { key: 'axis-y', mode: 'axis', axis: 'y', visuals: _0x2e258d.visuals }),
-    _0x114664.set('axis-z', { key: 'axis-z', mode: 'axis', axis: 'z', visuals: _0x13982e.visuals }),
-    (_0x33da9c.pickMesh.userData.gizmoHandleKey = 'axis-x'),
-    (_0x2e258d.pickMesh.userData.gizmoHandleKey = 'axis-y'),
-    (_0x13982e.pickMesh.userData.gizmoHandleKey = 'axis-z'),
-    _0x5f5550.push(_0x33da9c.pickMesh, _0x2e258d.pickMesh, _0x13982e.pickMesh));
-  const _0x11b81a = ({
-    key: _0x359213,
-    group: _0x26776d,
-    handleStore: _0x7df7c3,
+  const horizontalColor2 = resolveThemeColor('--red', '--red'),
+    horizontalColor3 = resolveThemeColor('--green', '--green'),
+    horizontalColor4 = resolveThemeColor('--blue', '--blue'),
+    root = new threeRuntime['Group']();
+  ((root.visible = false), configureGizmoObject(root));
+  const group5 = new threeRuntime['Group'](),
+    handles = new Map(),
+    pickMeshes = [],
+    moveAxes = {},
+    scaleAxes = {},
+    rotateRings = {},
+    handleStore = {},
+    handleStore2 = {},
+    visuals2 = createMoveAxis(horizontalColor2, 'x'),
+    visuals3 = createMoveAxis(horizontalColor3, 'y'),
+    visuals4 = createMoveAxis(horizontalColor4, 'z');
+  (group5.add(visuals2.group),
+    group5.add(visuals3.group),
+    group5.add(visuals4.group),
+    (moveAxes.x = visuals2),
+    (moveAxes.y = visuals3),
+    (moveAxes.z = visuals4),
+    handles.set('axis-x', { key: 'axis-x', mode: 'axis', axis: 'x', visuals: visuals2.visuals }),
+    handles.set('axis-y', { key: 'axis-y', mode: 'axis', axis: 'y', visuals: visuals3.visuals }),
+    handles.set('axis-z', { key: 'axis-z', mode: 'axis', axis: 'z', visuals: visuals4.visuals }),
+    (visuals2.pickMesh.userData.gizmoHandleKey = 'axis-x'),
+    (visuals3.pickMesh.userData.gizmoHandleKey = 'axis-y'),
+    (visuals4.pickMesh.userData.gizmoHandleKey = 'axis-z'),
+    pickMeshes.push(visuals2.pickMesh, visuals3.pickMesh, visuals4.pickMesh));
+  const run = ({
+    key: key2,
+    group: group6,
+    handleStore: handleStore3,
     mode: mode = 'plane',
-    normalAxis: _0x7d00c9,
-    offset: _0x5cb0dc,
-    horizontalColor: _0x45cbb5,
-    verticalColor: _0x469931,
-    linkedAxes: _0x4cc086,
-    rotation: _0x54d1b9,
+    normalAxis: normalAxis,
+    offset: offset,
+    horizontalColor: horizontalColor5,
+    verticalColor: verticalColor2,
+    linkedAxes: linkedAxes,
+    rotation: rotation,
   }) => {
-    const { group: _0x18a6b0, visuals: _0x28f128 } = createPlaneCornerVisual(
-        { horizontalColor: _0x45cbb5, verticalColor: _0x469931 },
+    const { group: group7, visuals: visuals5 } = createPlaneCornerVisual(
+        { horizontalColor: horizontalColor5, verticalColor: verticalColor2 },
         GIZMO_BASE_PLANE_SIZE,
       ),
-      _0x428b20 = configureGizmoMaterial(
+      configureGizmoMaterial2 = configureGizmoMaterial(
         new threeRuntime['MeshBasicMaterial']({
           color: 0xffffff,
           transparent: true,
@@ -487,150 +520,153 @@ function createGizmoVisual() {
         }),
         { transparent: true, opacity: 0 },
       ),
-      _0xfc932b = new threeRuntime['Mesh'](createPlaneCornerPickGeometry(GIZMO_BASE_PLANE_SIZE), _0x428b20);
-    (_0x18a6b0.position.copy(_0x5cb0dc),
-      _0xfc932b.position.copy(_0x5cb0dc),
-      _0x54d1b9?.x && ((_0x18a6b0.rotation.x = _0x54d1b9.x), (_0xfc932b.rotation.x = _0x54d1b9.x)),
-      _0x54d1b9?.y && ((_0x18a6b0.rotation.y = _0x54d1b9.y), (_0xfc932b.rotation.y = _0x54d1b9.y)),
-      _0x54d1b9?.z && ((_0x18a6b0.rotation.z = _0x54d1b9.z), (_0xfc932b.rotation.z = _0x54d1b9.z)),
-      configureGizmoObject(_0x18a6b0),
-      configureGizmoObject(_0xfc932b),
-      (_0xfc932b.userData.gizmoHandleKey = _0x359213),
-      _0x26776d.add(_0x18a6b0),
-      _0x26776d.add(_0xfc932b),
-      _0x114664.set(_0x359213, {
-        key: _0x359213,
+      pickMesh4 = new threeRuntime['Mesh'](
+        createPlaneCornerPickGeometry(GIZMO_BASE_PLANE_SIZE),
+        configureGizmoMaterial2,
+      );
+    (group7.position.copy(offset),
+      pickMesh4.position.copy(offset),
+      rotation?.x && ((group7.rotation.x = rotation.x), (pickMesh4.rotation.x = rotation.x)),
+      rotation?.y && ((group7.rotation.y = rotation.y), (pickMesh4.rotation.y = rotation.y)),
+      rotation?.z && ((group7.rotation.z = rotation.z), (pickMesh4.rotation.z = rotation.z)),
+      configureGizmoObject(group7),
+      configureGizmoObject(pickMesh4),
+      (pickMesh4.userData.gizmoHandleKey = key2),
+      group6.add(group7),
+      group6.add(pickMesh4),
+      handles.set(key2, {
+        key: key2,
         mode: mode,
-        normalAxis: _0x7d00c9,
-        linkedAxes: Array.isArray(_0x4cc086) ? [..._0x4cc086] : [],
-        visuals: _0x28f128,
+        normalAxis: normalAxis,
+        linkedAxes: Array.isArray(linkedAxes) ? [...linkedAxes] : [],
+        visuals: visuals5,
       }),
-      _0x5f5550.push(_0xfc932b),
-      (_0x7df7c3[_0x359213] = { visualGroup: _0x18a6b0, pickMesh: _0xfc932b }));
+      pickMeshes.push(pickMesh4),
+      (handleStore3[key2] = { visualGroup: group7, pickMesh: pickMesh4 }));
   };
-  (_0x11b81a({
+  (run({
     key: 'plane-xy',
-    group: _0x38274b,
-    handleStore: _0x27b81d,
+    group: group5,
+    handleStore: handleStore,
     normalAxis: 'z',
     offset: new threeRuntime.Vector3(0.38, 0.38, 0),
-    horizontalColor: _0x2657be,
-    verticalColor: _0x2657be,
+    horizontalColor: horizontalColor4,
+    verticalColor: horizontalColor4,
     linkedAxes: ['x', 'y'],
     rotation: null,
   }),
-    _0x11b81a({
+    run({
       key: 'plane-xz',
-      group: _0x38274b,
-      handleStore: _0x27b81d,
+      group: group5,
+      handleStore: handleStore,
       normalAxis: 'y',
       offset: new threeRuntime.Vector3(0.38, 0, 0.38),
-      horizontalColor: _0x50ffac,
-      verticalColor: _0x50ffac,
+      horizontalColor: horizontalColor3,
+      verticalColor: horizontalColor3,
       linkedAxes: ['x', 'z'],
       rotation: { x: -Math.PI / 2, z: -Math.PI / 2 },
     }),
-    _0x11b81a({
+    run({
       key: 'plane-yz',
-      group: _0x38274b,
-      handleStore: _0x27b81d,
+      group: group5,
+      handleStore: handleStore,
       normalAxis: 'x',
       offset: new threeRuntime['Vector3'](0, 0.38, 0.38),
-      horizontalColor: _0x5510fe,
-      verticalColor: _0x5510fe,
+      horizontalColor: horizontalColor2,
+      verticalColor: horizontalColor2,
       linkedAxes: ['y', 'z'],
       rotation: { y: Math.PI / 2, z: Math.PI / 2 },
     }),
-    _0x1bcc1a.add(_0x38274b));
-  const _0x3e25c7 = new threeRuntime['Group'](),
-    _0xcebf7c = createRotateRing(_0x5510fe, 'x'),
-    _0x4fc00f = createRotateRing(_0x50ffac, 'y'),
-    _0x17017d = createRotateRing(_0x2657be, 'z');
-  (_0x3e25c7.add(_0xcebf7c.group),
-    _0x3e25c7.add(_0x4fc00f.group),
-    _0x3e25c7.add(_0x17017d.group),
-    (_0x1bf185.x = _0xcebf7c),
-    (_0x1bf185.y = _0x4fc00f),
-    (_0x1bf185.z = _0x17017d),
-    _0x114664.set('rotate-x', { key: 'rotate-x', mode: 'rotate', axis: 'x', visuals: _0xcebf7c.visuals }),
-    _0x114664.set('rotate-y', { key: 'rotate-y', mode: 'rotate', axis: 'y', visuals: _0x4fc00f.visuals }),
-    _0x114664.set('rotate-z', { key: 'rotate-z', mode: 'rotate', axis: 'z', visuals: _0x17017d.visuals }),
-    (_0xcebf7c.pickMesh.userData.gizmoHandleKey = 'rotate-x'),
-    (_0x4fc00f.pickMesh.userData.gizmoHandleKey = 'rotate-y'),
-    (_0x17017d.pickMesh.userData.gizmoHandleKey = 'rotate-z'),
-    _0x5f5550.push(_0xcebf7c.pickMesh, _0x4fc00f.pickMesh, _0x17017d.pickMesh),
-    _0x1bcc1a.add(_0x3e25c7));
-  const _0x3f6c4a = new threeRuntime['Group'](),
-    _0x125fac = createScaleAxis(_0x5510fe, 'x'),
-    _0x3895e2 = createScaleAxis(_0x50ffac, 'y'),
-    _0x356e5a = createScaleAxis(_0x2657be, 'z');
+    root.add(group5));
+  const rotateGroup = new threeRuntime['Group'](),
+    visuals6 = createRotateRing(horizontalColor2, 'x'),
+    visuals7 = createRotateRing(horizontalColor3, 'y'),
+    visuals8 = createRotateRing(horizontalColor4, 'z');
+  (rotateGroup.add(visuals6.group),
+    rotateGroup.add(visuals7.group),
+    rotateGroup.add(visuals8.group),
+    (rotateRings.x = visuals6),
+    (rotateRings.y = visuals7),
+    (rotateRings.z = visuals8),
+    handles.set('rotate-x', { key: 'rotate-x', mode: 'rotate', axis: 'x', visuals: visuals6.visuals }),
+    handles.set('rotate-y', { key: 'rotate-y', mode: 'rotate', axis: 'y', visuals: visuals7.visuals }),
+    handles.set('rotate-z', { key: 'rotate-z', mode: 'rotate', axis: 'z', visuals: visuals8.visuals }),
+    (visuals6.pickMesh.userData.gizmoHandleKey = 'rotate-x'),
+    (visuals7.pickMesh.userData.gizmoHandleKey = 'rotate-y'),
+    (visuals8.pickMesh.userData.gizmoHandleKey = 'rotate-z'),
+    pickMeshes.push(visuals6.pickMesh, visuals7.pickMesh, visuals8.pickMesh),
+    root.add(rotateGroup));
+  const group8 = new threeRuntime['Group'](),
+    visuals9 = createScaleAxis(horizontalColor2, 'x'),
+    visuals10 = createScaleAxis(horizontalColor3, 'y'),
+    visuals11 = createScaleAxis(horizontalColor4, 'z');
   return (
-    _0x3f6c4a.add(_0x125fac.group),
-    _0x3f6c4a.add(_0x3895e2.group),
-    _0x3f6c4a.add(_0x356e5a.group),
-    (_0x25bc69.x = _0x125fac),
-    (_0x25bc69.y = _0x3895e2),
-    (_0x25bc69.z = _0x356e5a),
-    _0x114664.set('scale-x', { key: 'scale-x', mode: 'scale-axis', axis: 'x', visuals: _0x125fac.visuals }),
-    _0x114664.set('scale-y', { key: 'scale-y', mode: 'scale-axis', axis: 'y', visuals: _0x3895e2.visuals }),
-    _0x114664.set('scale-z', { key: 'scale-z', mode: 'scale-axis', axis: 'z', visuals: _0x356e5a.visuals }),
-    (_0x125fac.pickMesh.userData.gizmoHandleKey = 'scale-x'),
-    (_0x3895e2.pickMesh.userData.gizmoHandleKey = 'scale-y'),
-    (_0x356e5a.pickMesh.userData.gizmoHandleKey = 'scale-z'),
-    _0x5f5550.push(_0x125fac.pickMesh, _0x3895e2.pickMesh, _0x356e5a.pickMesh),
-    _0x11b81a({
+    group8.add(visuals9.group),
+    group8.add(visuals10.group),
+    group8.add(visuals11.group),
+    (scaleAxes.x = visuals9),
+    (scaleAxes.y = visuals10),
+    (scaleAxes.z = visuals11),
+    handles.set('scale-x', { key: 'scale-x', mode: 'scale-axis', axis: 'x', visuals: visuals9.visuals }),
+    handles.set('scale-y', { key: 'scale-y', mode: 'scale-axis', axis: 'y', visuals: visuals10.visuals }),
+    handles.set('scale-z', { key: 'scale-z', mode: 'scale-axis', axis: 'z', visuals: visuals11.visuals }),
+    (visuals9.pickMesh.userData.gizmoHandleKey = 'scale-x'),
+    (visuals10.pickMesh.userData.gizmoHandleKey = 'scale-y'),
+    (visuals11.pickMesh.userData.gizmoHandleKey = 'scale-z'),
+    pickMeshes.push(visuals9.pickMesh, visuals10.pickMesh, visuals11.pickMesh),
+    run({
       key: 'scale-plane-xy',
-      group: _0x3f6c4a,
-      handleStore: _0x99aafd,
+      group: group8,
+      handleStore: handleStore2,
       mode: 'scale-uniform',
       normalAxis: 'z',
       offset: new threeRuntime['Vector3'](0.38, 0.38, 0),
-      horizontalColor: _0x2657be,
-      verticalColor: _0x2657be,
+      horizontalColor: horizontalColor4,
+      verticalColor: horizontalColor4,
       linkedAxes: ['x', 'y'],
       rotation: null,
     }),
-    _0x11b81a({
+    run({
       key: 'scale-plane-xz',
-      group: _0x3f6c4a,
-      handleStore: _0x99aafd,
+      group: group8,
+      handleStore: handleStore2,
       mode: 'scale-uniform',
       normalAxis: 'y',
       offset: new threeRuntime.Vector3(0.38, 0, 0.38),
-      horizontalColor: _0x50ffac,
-      verticalColor: _0x50ffac,
+      horizontalColor: horizontalColor3,
+      verticalColor: horizontalColor3,
       linkedAxes: ['x', 'z'],
       rotation: { x: -Math.PI / 2, z: -Math.PI / 2 },
     }),
-    _0x11b81a({
+    run({
       key: 'scale-plane-yz',
-      group: _0x3f6c4a,
-      handleStore: _0x99aafd,
+      group: group8,
+      handleStore: handleStore2,
       mode: 'scale-uniform',
       normalAxis: 'x',
       offset: new threeRuntime['Vector3'](0, 0.38, 0.38),
-      horizontalColor: _0x5510fe,
-      verticalColor: _0x5510fe,
+      horizontalColor: horizontalColor2,
+      verticalColor: horizontalColor2,
       linkedAxes: ['y', 'z'],
       rotation: { y: Math.PI / 2, z: Math.PI / 2 },
     }),
-    _0x1bcc1a.add(_0x3f6c4a),
+    root.add(group8),
     {
-      root: _0x1bcc1a,
-      moveGroup: _0x38274b,
-      rotateGroup: _0x3e25c7,
-      scaleGroup: _0x3f6c4a,
-      handles: _0x114664,
-      pickMeshes: _0x5f5550,
+      root: root,
+      moveGroup: group5,
+      rotateGroup: rotateGroup,
+      scaleGroup: group8,
+      handles: handles,
+      pickMeshes: pickMeshes,
       hoverHandle: null,
       activeHandle: null,
       dragLock: null,
       currentTool: 'move',
-      moveAxes: _0x87f2e8,
-      scaleAxes: _0x25bc69,
-      rotateRings: _0x1bf185,
-      planeHandles: _0x27b81d,
-      scalePlaneHandles: _0x99aafd,
+      moveAxes: moveAxes,
+      scaleAxes: scaleAxes,
+      rotateRings: rotateRings,
+      planeHandles: handleStore,
+      scalePlaneHandles: handleStore2,
       baseLayout: {
         axisLength: GIZMO_BASE_AXIS_LENGTH,
         scaleLength: GIZMO_BASE_SCALE_LENGTH,
@@ -641,735 +677,694 @@ function createGizmoVisual() {
     }
   );
 }
-function eachMaterial(_0x5a896c, _0xc3959) {
-  if (!_0x5a896c) return;
-  if (Array.isArray(_0x5a896c)) {
-    _0x5a896c.forEach((_0x3b3147) => _0xc3959(_0x3b3147));
+function eachMaterial(list, handler2) {
+  if (!list) return;
+  if (Array.isArray(list)) {
+    list.forEach((item2) => handler2(item2));
     return;
   }
-  _0xc3959(_0x5a896c);
+  handler2(list);
 }
-function createMannequinVisual(_0x260062) {
-  const _0x44a944 = new threeRuntime['Group'](),
-    _0x688f0a = new threeRuntime['Group']();
-  _0x44a944.add(_0x688f0a);
-  const _0x32c26c = [],
-    _0x3df959 = new threeRuntime['MeshStandardMaterial']({
-      color: _0x260062,
+function createMannequinVisual(color6) {
+  const group9 = new threeRuntime['Group'](),
+    proxyRoot = new threeRuntime['Group']();
+  group9.add(proxyRoot);
+  const fallbackObjects = [],
+    material9 = new threeRuntime['MeshStandardMaterial']({
+      color: color6,
       roughness: 0.62,
       metalness: 0.08,
     }),
-    _0x1238a2 = _0x3df959.clone();
-  _0x1238a2.color = _0x3df959.color.clone().offsetHSL(0, 0, 0.08);
-  const _0x5dcc27 = new threeRuntime['Mesh'](new threeRuntime.SphereGeometry(0.155, 18, 16), _0x1238a2);
-  ((_0x5dcc27.position.y = 1.7),
-    _0x5dcc27.scale.set(0.96, 1.08, 0.94),
-    _0x688f0a.add(_0x5dcc27),
-    _0x32c26c.push(_0x5dcc27));
-  const _0x5a6e4e = new threeRuntime.Mesh(
-    new threeRuntime['CylinderGeometry'](0.052, 0.064, 0.12, 12),
-    _0x3df959,
-  );
-  ((_0x5a6e4e.position.y = 1.51), _0x688f0a.add(_0x5a6e4e), _0x32c26c.push(_0x5a6e4e));
-  const _0x2da694 = new threeRuntime['Mesh'](
-    new threeRuntime['CapsuleGeometry'](0.17, 0.42, 6, 12),
-    _0x3df959,
-  );
-  ((_0x2da694.position.y = 1.26),
-    _0x2da694.scale.set(1.38, 1.02, 0.92),
-    _0x688f0a.add(_0x2da694),
-    _0x32c26c.push(_0x2da694));
-  const _0x233e02 = new threeRuntime.Mesh(new threeRuntime.CapsuleGeometry(0.105, 0.18, 5, 10), _0x3df959);
-  ((_0x233e02.position.y = 0.98),
-    _0x233e02.scale.set(1.02, 0.94, 0.86),
-    _0x688f0a.add(_0x233e02),
-    _0x32c26c.push(_0x233e02));
-  const _0x43abd7 = new threeRuntime['Mesh'](
-    new threeRuntime['CapsuleGeometry'](0.14, 0.2, 5, 12),
-    _0x3df959,
-  );
-  ((_0x43abd7.position.y = 0.77),
-    _0x43abd7.scale.set(1.28, 0.96, 0.98),
-    _0x688f0a.add(_0x43abd7),
-    _0x32c26c.push(_0x43abd7));
-  const _0x3a810d = new threeRuntime['Mesh'](new threeRuntime['SphereGeometry'](0.07, 12, 12), _0x3df959);
-  (_0x3a810d.position.set(-0.31, 1.43, 0), _0x688f0a.add(_0x3a810d), _0x32c26c.push(_0x3a810d));
-  const _0x48ffe5 = _0x3a810d.clone();
-  ((_0x48ffe5.position.x = 0.31), _0x688f0a.add(_0x48ffe5), _0x32c26c.push(_0x48ffe5));
-  const _0x366672 = new threeRuntime['Mesh'](
+    headMaterial = material9.clone();
+  headMaterial.color = material9.color.clone().offsetHSL(0, 0, 0.08);
+  const head = new threeRuntime['Mesh'](new threeRuntime.SphereGeometry(0.155, 18, 16), headMaterial);
+  ((head.position.y = 1.7),
+    head.scale.set(0.96, 1.08, 0.94),
+    proxyRoot.add(head),
+    fallbackObjects.push(head));
+  const neck = new threeRuntime.Mesh(new threeRuntime['CylinderGeometry'](0.052, 0.064, 0.12, 12), material9);
+  ((neck.position.y = 1.51), proxyRoot.add(neck), fallbackObjects.push(neck));
+  const chest = new threeRuntime['Mesh'](new threeRuntime['CapsuleGeometry'](0.17, 0.42, 6, 12), material9);
+  ((chest.position.y = 1.26),
+    chest.scale.set(1.38, 1.02, 0.92),
+    proxyRoot.add(chest),
+    fallbackObjects.push(chest));
+  const waist = new threeRuntime.Mesh(new threeRuntime.CapsuleGeometry(0.105, 0.18, 5, 10), material9);
+  ((waist.position.y = 0.98),
+    waist.scale.set(1.02, 0.94, 0.86),
+    proxyRoot.add(waist),
+    fallbackObjects.push(waist));
+  const pelvis = new threeRuntime['Mesh'](new threeRuntime['CapsuleGeometry'](0.14, 0.2, 5, 12), material9);
+  ((pelvis.position.y = 0.77),
+    pelvis.scale.set(1.28, 0.96, 0.98),
+    proxyRoot.add(pelvis),
+    fallbackObjects.push(pelvis));
+  const value16 = new threeRuntime['Mesh'](new threeRuntime['SphereGeometry'](0.07, 12, 12), material9);
+  (value16.position.set(-0.31, 1.43, 0), proxyRoot.add(value16), fallbackObjects.push(value16));
+  const value17 = value16.clone();
+  ((value17.position.x = 0.31), proxyRoot.add(value17), fallbackObjects.push(value17));
+  const value18 = new threeRuntime['Mesh'](
     new threeRuntime['CapsuleGeometry'](0.048, 0.28, 4, 10),
-    _0x3df959,
+    material9,
   );
-  (_0x366672.position.set(-0.39, 1.17, 0),
-    (_0x366672.rotation.z = 0.16),
-    (_0x366672.rotation.x = 0.03),
-    _0x688f0a.add(_0x366672),
-    _0x32c26c.push(_0x366672));
-  const _0x1b145a = _0x366672.clone();
-  ((_0x1b145a.position.x = 0.39),
-    (_0x1b145a.rotation.z = -0.16),
-    (_0x1b145a.rotation.x = -0.03),
-    _0x688f0a.add(_0x1b145a),
-    _0x32c26c.push(_0x1b145a));
-  const _0x169902 = new threeRuntime['Mesh'](
+  (value18.position.set(-0.39, 1.17, 0),
+    (value18.rotation.z = 0.16),
+    (value18.rotation.x = 0.03),
+    proxyRoot.add(value18),
+    fallbackObjects.push(value18));
+  const value19 = value18.clone();
+  ((value19.position.x = 0.39),
+    (value19.rotation.z = -0.16),
+    (value19.rotation.x = -0.03),
+    proxyRoot.add(value19),
+    fallbackObjects.push(value19));
+  const value20 = new threeRuntime['Mesh'](
     new threeRuntime['CapsuleGeometry'](0.038, 0.26, 4, 10),
-    _0x3df959,
+    material9,
   );
-  (_0x169902.position.set(-0.42, 0.86, 0.01),
-    (_0x169902.rotation.z = 0.03),
-    (_0x169902.rotation.x = 0.04),
-    _0x688f0a.add(_0x169902),
-    _0x32c26c.push(_0x169902));
-  const _0x5d6880 = _0x169902.clone();
-  ((_0x5d6880.position.x = 0.42),
-    (_0x5d6880.rotation.z = -0.03),
-    (_0x5d6880.rotation.x = -0.04),
-    _0x688f0a.add(_0x5d6880),
-    _0x32c26c.push(_0x5d6880));
-  const _0x4df25e = new threeRuntime['Mesh'](new threeRuntime['SphereGeometry'](0.048, 10, 10), _0x3df959);
-  (_0x4df25e.position.set(-0.425, 0.62, 0.01),
-    _0x4df25e.scale.set(0.9, 1, 0.72),
-    _0x688f0a.add(_0x4df25e),
-    _0x32c26c.push(_0x4df25e));
-  const _0x2195b2 = _0x4df25e.clone();
-  ((_0x2195b2.position.x = 0.425), _0x688f0a.add(_0x2195b2), _0x32c26c.push(_0x2195b2));
-  const _0xc1e9fd = new threeRuntime.Mesh(new threeRuntime.CapsuleGeometry(0.072, 0.34, 5, 12), _0x3df959);
-  (_0xc1e9fd.position.set(-0.12, 0.47, 0),
-    (_0xc1e9fd.rotation.z = 0.03),
-    _0x688f0a.add(_0xc1e9fd),
-    _0x32c26c.push(_0xc1e9fd));
-  const _0x1ba723 = _0xc1e9fd.clone();
-  ((_0x1ba723.position.x = 0.12),
-    (_0x1ba723.rotation.z = -0.03),
-    _0x688f0a.add(_0x1ba723),
-    _0x32c26c.push(_0x1ba723));
-  const _0x53ac74 = new threeRuntime['Mesh'](
+  (value20.position.set(-0.42, 0.86, 0.01),
+    (value20.rotation.z = 0.03),
+    (value20.rotation.x = 0.04),
+    proxyRoot.add(value20),
+    fallbackObjects.push(value20));
+  const value21 = value20.clone();
+  ((value21.position.x = 0.42),
+    (value21.rotation.z = -0.03),
+    (value21.rotation.x = -0.04),
+    proxyRoot.add(value21),
+    fallbackObjects.push(value21));
+  const box4 = new threeRuntime['Mesh'](new threeRuntime['SphereGeometry'](0.048, 10, 10), material9);
+  (box4.position.set(-0.425, 0.62, 0.01),
+    box4.scale.set(0.9, 1, 0.72),
+    proxyRoot.add(box4),
+    fallbackObjects.push(box4));
+  const value22 = box4.clone();
+  ((value22.position.x = 0.425), proxyRoot.add(value22), fallbackObjects.push(value22));
+  const value23 = new threeRuntime.Mesh(new threeRuntime.CapsuleGeometry(0.072, 0.34, 5, 12), material9);
+  (value23.position.set(-0.12, 0.47, 0),
+    (value23.rotation.z = 0.03),
+    proxyRoot.add(value23),
+    fallbackObjects.push(value23));
+  const value24 = value23.clone();
+  ((value24.position.x = 0.12),
+    (value24.rotation.z = -0.03),
+    proxyRoot.add(value24),
+    fallbackObjects.push(value24));
+  const value25 = new threeRuntime['Mesh'](
     new threeRuntime['CapsuleGeometry'](0.055, 0.34, 5, 12),
-    _0x3df959,
+    material9,
   );
-  (_0x53ac74.position.set(-0.12, 0.03, 0.01), _0x688f0a.add(_0x53ac74), _0x32c26c.push(_0x53ac74));
-  const _0x4692cc = _0x53ac74.clone();
-  ((_0x4692cc.position.x = 0.12), _0x688f0a.add(_0x4692cc), _0x32c26c.push(_0x4692cc));
-  const _0x2e285c = new threeRuntime['Mesh'](new threeRuntime['BoxGeometry'](0.115, 0.075, 0.27), _0x3df959);
-  (_0x2e285c.position.set(-0.12, -0.19, 0.07),
-    (_0x2e285c.rotation.x = -0.08),
-    _0x688f0a.add(_0x2e285c),
-    _0x32c26c.push(_0x2e285c));
-  const _0xbb48c0 = _0x2e285c.clone();
-  ((_0xbb48c0.position.x = 0.12), _0x688f0a.add(_0xbb48c0), _0x32c26c.push(_0xbb48c0));
-  const _0x31cd64 = createSelectionRing(0x7db4ff);
+  (value25.position.set(-0.12, 0.03, 0.01), proxyRoot.add(value25), fallbackObjects.push(value25));
+  const value26 = value25.clone();
+  ((value26.position.x = 0.12), proxyRoot.add(value26), fallbackObjects.push(value26));
+  const value27 = new threeRuntime['Mesh'](new threeRuntime['BoxGeometry'](0.115, 0.075, 0.27), material9);
+  (value27.position.set(-0.12, -0.19, 0.07),
+    (value27.rotation.x = -0.08),
+    proxyRoot.add(value27),
+    fallbackObjects.push(value27));
+  const value28 = value27.clone();
+  ((value28.position.x = 0.12), proxyRoot.add(value28), fallbackObjects.push(value28));
+  const selectionRing = createSelectionRing(0x7db4ff);
   return (
-    _0x44a944.add(_0x31cd64),
+    group9.add(selectionRing),
     {
-      group: _0x44a944,
-      material: _0x3df959,
-      headMaterial: _0x1238a2,
-      selectionRing: _0x31cd64,
-      proxyRoot: _0x688f0a,
-      fallbackObjects: _0x32c26c,
+      group: group9,
+      material: material9,
+      headMaterial: headMaterial,
+      selectionRing: selectionRing,
+      proxyRoot: proxyRoot,
+      fallbackObjects: fallbackObjects,
       modelGender: null,
       modelLoadToken: 0,
       modelRoot: null,
       parts: {
-        head: _0x5dcc27,
-        neck: _0x5a6e4e,
-        chest: _0x2da694,
-        waist: _0x233e02,
-        pelvis: _0x43abd7,
-        shoulders: [_0x3a810d, _0x48ffe5],
-        upperArms: [_0x366672, _0x1b145a],
-        lowerArms: [_0x169902, _0x5d6880],
-        hands: [_0x4df25e, _0x2195b2],
-        upperLegs: [_0xc1e9fd, _0x1ba723],
-        lowerLegs: [_0x53ac74, _0x4692cc],
-        feet: [_0x2e285c, _0xbb48c0],
+        head: head,
+        neck: neck,
+        chest: chest,
+        waist: waist,
+        pelvis: pelvis,
+        shoulders: [value16, value17],
+        upperArms: [value18, value19],
+        lowerArms: [value20, value21],
+        hands: [box4, value22],
+        upperLegs: [value23, value24],
+        lowerLegs: [value25, value26],
+        feet: [value27, value28],
       },
     }
   );
 }
-function createCubeVisual(_0x14987f) {
-  const _0x275dd3 = new threeRuntime.Group(),
-    _0x4fd079 = new threeRuntime['MeshStandardMaterial']({
-      color: _0x14987f,
+function createCubeVisual(color7) {
+  const group10 = new threeRuntime.Group(),
+    material10 = new threeRuntime['MeshStandardMaterial']({
+      color: color7,
       roughness: 0.42,
       metalness: 0.06,
     }),
-    _0x33a6d5 = new threeRuntime['LineBasicMaterial']({
-      color: new threeRuntime['Color'](_0x14987f).clone().offsetHSL(0, 0, -0.18),
+    edgeMaterial = new threeRuntime['LineBasicMaterial']({
+      color: new threeRuntime['Color'](color7).clone().offsetHSL(0, 0, -0.18),
       transparent: true,
       opacity: 0.9,
     }),
-    _0xe2adda = new threeRuntime['Mesh'](new threeRuntime.BoxGeometry(1, 1, 1), _0x4fd079);
-  _0x275dd3.add(_0xe2adda);
-  const _0x1fd4af = new threeRuntime['LineSegments'](
+    value29 = new threeRuntime['Mesh'](new threeRuntime.BoxGeometry(1, 1, 1), material10);
+  group10.add(value29);
+  const value30 = new threeRuntime['LineSegments'](
     new threeRuntime['EdgesGeometry'](new threeRuntime.BoxGeometry(1, 1, 1)),
-    _0x33a6d5,
+    edgeMaterial,
   );
-  _0x275dd3.add(_0x1fd4af);
-  const _0x4e4dcd = createSelectionRing(0x7db4ff);
+  group10.add(value30);
+  const selectionRing2 = createSelectionRing(0x7db4ff);
   return (
-    _0x275dd3.add(_0x4e4dcd),
-    { group: _0x275dd3, material: _0x4fd079, edgeMaterial: _0x33a6d5, selectionRing: _0x4e4dcd }
+    group10.add(selectionRing2),
+    { group: group10, material: material10, edgeMaterial: edgeMaterial, selectionRing: selectionRing2 }
   );
 }
-function setMannequinProxyMode(_0x1a1f38) {
-  ((_0x1a1f38?.fallbackObjects || []).forEach((_0x5c98bb) => {
-    _0x5c98bb.visible = true;
+function setMannequinProxyMode(value31) {
+  ((value31?.fallbackObjects || []).forEach((item3) => {
+    item3.visible = true;
   }),
-    [_0x1a1f38?.material, _0x1a1f38?.headMaterial].forEach((_0x4e9d03) => {
-      if (!_0x4e9d03) return;
-      ((_0x4e9d03.transparent = true),
-        (_0x4e9d03.opacity = 0.001),
-        (_0x4e9d03.depthWrite = false),
-        (_0x4e9d03.colorWrite = false));
+    [value31?.material, value31?.headMaterial].forEach((enabled10) => {
+      if (!enabled10) return;
+      ((enabled10.transparent = true),
+        (enabled10.opacity = 0.001),
+        (enabled10.depthWrite = false),
+        (enabled10.colorWrite = false));
     }));
 }
-function createCharacterClayMaterial(_0x17526f) {
+function createCharacterClayMaterial(color8) {
   return new threeRuntime['MeshStandardMaterial']({
-    color: _0x17526f?.isColor ? _0x17526f.clone() : new threeRuntime.Color(_0x17526f || 0xffffff),
+    color: color8?.isColor ? color8.clone() : new threeRuntime.Color(color8 || 0xffffff),
     roughness: 0.78,
     metalness: 0,
   });
 }
-function applyCharacterClayMaterial(_0x1e064d, _0x2bda8f) {
-  if (!_0x1e064d?.modelRoot) return;
-  (!_0x1e064d.modelMaterial &&
-    ((_0x1e064d.modelMaterial = createCharacterClayMaterial(_0x2bda8f)),
-    _0x1e064d.modelRoot.traverse((_0x1647fe) => {
-      if (!_0x1647fe.isMesh) return;
-      (disposeMaterial(_0x1647fe.material), (_0x1647fe.material = _0x1e064d.modelMaterial));
+function applyCharacterClayMaterial(enabled11, value32) {
+  if (!enabled11?.modelRoot) return;
+  (!enabled11.modelMaterial &&
+    ((enabled11.modelMaterial = createCharacterClayMaterial(value32)),
+    enabled11.modelRoot.traverse((enabled12) => {
+      if (!enabled12.isMesh) return;
+      (disposeMaterial(enabled12.material), (enabled12.material = enabled11.modelMaterial));
     })),
-    _0x1e064d.modelMaterial.color.copy(
-      _0x2bda8f?.isColor ? _0x2bda8f : new threeRuntime['Color'](_0x2bda8f || 0xffffff),
+    enabled11.modelMaterial.color.copy(
+      value32?.isColor ? value32 : new threeRuntime['Color'](value32 || 0xffffff),
     ));
 }
-function applyObjectSelectionEmphasis(_0x33af90, _0x3d213c, _0x3a8018 = 0.12) {
-  if (!_0x33af90) return;
-  _0x33af90.traverse((_0x57b5a0) => {
-    eachMaterial(_0x57b5a0.material, (_0x5eca15) => {
-      applySelectionEmphasis(_0x5eca15, _0x3d213c, _0x3a8018);
+function applyObjectSelectionEmphasis(enabled13, value33, value34 = 0.12) {
+  if (!enabled13) return;
+  enabled13.traverse((value35) => {
+    eachMaterial(value35.material, (value36) => {
+      applySelectionEmphasis(value36, value33, value34);
     });
   });
 }
 function createCameraVisual() {
-  const _0x479295 = new threeRuntime['Group'](),
-    _0x599f22 = new threeRuntime['Group']();
-  _0x479295.add(_0x599f22);
-  const _0x1b3421 = new threeRuntime['LineBasicMaterial']({
+  const group11 = new threeRuntime['Group'](),
+    marker = new threeRuntime['Group']();
+  group11.add(marker);
+  const bodyMaterial = new threeRuntime['LineBasicMaterial']({
       color: resolveThemeColor('--white', '--white'),
       transparent: true,
       opacity: 0.8,
     }),
-    _0x1204e0 = new threeRuntime['LineBasicMaterial']({
+    helperLineMaterial = new threeRuntime['LineBasicMaterial']({
       color: resolveThemeColor('--blue', '--blue'),
       transparent: true,
       opacity: 0.8,
     }),
-    _0x130a91 = (_0x6db8f9, _0x1a4b30, _0x3baa33, _0x41e812) =>
+    handler3 = (value37, value38, value39, value40) =>
       new threeRuntime['LineSegments'](
-        new threeRuntime['EdgesGeometry'](new threeRuntime['BoxGeometry'](_0x6db8f9, _0x1a4b30, _0x3baa33)),
-        _0x41e812,
+        new threeRuntime['EdgesGeometry'](new threeRuntime['BoxGeometry'](value37, value38, value39)),
+        value40,
       ),
-    _0x5be83b = _0x130a91(0.26, 0.16, 0.14, _0x1b3421);
-  (_0x5be83b.position.set(0, 0, 0.075), _0x599f22.add(_0x5be83b));
-  const _0x8f57cb = _0x130a91(0.1, 0.045, 0.06, _0x1b3421);
-  (_0x8f57cb.position.set(0, 0.102, 0.08), _0x599f22.add(_0x8f57cb));
-  const _0x5a3108 = _0x130a91(0.06, 0.045, 0.08, _0x1b3421);
-  (_0x5a3108.position.set(-0.105, 0.05, 0.155), _0x599f22.add(_0x5a3108));
-  const _0x585ed8 = _0x130a91(0.12, 0.09, 0.02, _0x1b3421);
-  (_0x585ed8.position.set(0, 0, -0.01), _0x599f22.add(_0x585ed8));
-  const _0x3c78fa = new threeRuntime.BufferGeometry().setFromPoints([
+    value41 = handler3(0.26, 0.16, 0.14, bodyMaterial);
+  (value41.position.set(0, 0, 0.075), marker.add(value41));
+  const value42 = handler3(0.1, 0.045, 0.06, bodyMaterial);
+  (value42.position.set(0, 0.102, 0.08), marker.add(value42));
+  const value43 = handler3(0.06, 0.045, 0.08, bodyMaterial);
+  (value43.position.set(-0.105, 0.05, 0.155), marker.add(value43));
+  const value44 = handler3(0.12, 0.09, 0.02, bodyMaterial);
+  (value44.position.set(0, 0, -0.01), marker.add(value44));
+  const value45 = new threeRuntime.BufferGeometry().setFromPoints([
     new threeRuntime.Vector3(-0.025, 0, 0),
     new threeRuntime['Vector3'](0.025, 0, 0),
     new threeRuntime['Vector3'](0, -0.025, 0),
     new threeRuntime['Vector3'](0, 0.025, 0),
   ]);
-  _0x599f22.add(new threeRuntime['LineSegments'](_0x3c78fa, _0x1b3421));
-  const _0x49bfbd = new threeRuntime['Vector3'](0, 0, -0.02),
-    _0x2c9273 = 0.55,
-    _0x173cfc = 0.18,
-    _0x277821 = 0.1,
-    _0x373802 = _0x49bfbd,
-    _0xc4b075 = new threeRuntime['Vector3'](
-      _0x49bfbd.x - _0x173cfc,
-      _0x49bfbd.y + _0x277821,
-      _0x49bfbd.z - _0x2c9273,
-    ),
-    _0x2c3b8d = new threeRuntime.Vector3(
-      _0x49bfbd.x + _0x173cfc,
-      _0x49bfbd.y + _0x277821,
-      _0x49bfbd.z - _0x2c9273,
-    ),
-    _0x409362 = new threeRuntime['Vector3'](
-      _0x49bfbd.x - _0x173cfc,
-      _0x49bfbd.y - _0x277821,
-      _0x49bfbd.z - _0x2c9273,
-    ),
-    _0x593efd = new threeRuntime['Vector3'](
-      _0x49bfbd.x + _0x173cfc,
-      _0x49bfbd.y - _0x277821,
-      _0x49bfbd.z - _0x2c9273,
-    ),
-    _0x2b1980 = new threeRuntime['BufferGeometry']().setFromPoints([
-      _0x373802,
-      _0xc4b075,
-      _0x373802,
-      _0x2c3b8d,
-      _0x373802,
-      _0x409362,
-      _0x373802,
-      _0x593efd,
-      _0xc4b075,
-      _0x2c3b8d,
-      _0x2c3b8d,
-      _0x593efd,
-      _0x593efd,
-      _0x409362,
-      _0x409362,
-      _0xc4b075,
+  marker.add(new threeRuntime['LineSegments'](value45, bodyMaterial));
+  const box5 = new threeRuntime['Vector3'](0, 0, -0.02),
+    value46 = 0.55,
+    value47 = 0.18,
+    value48 = 0.1,
+    value49 = box5,
+    value50 = new threeRuntime['Vector3'](box5.x - value47, box5.y + value48, box5.z - value46),
+    value51 = new threeRuntime.Vector3(box5.x + value47, box5.y + value48, box5.z - value46),
+    value52 = new threeRuntime['Vector3'](box5.x - value47, box5.y - value48, box5.z - value46),
+    value53 = new threeRuntime['Vector3'](box5.x + value47, box5.y - value48, box5.z - value46),
+    value54 = new threeRuntime['BufferGeometry']().setFromPoints([
+      value49,
+      value50,
+      value49,
+      value51,
+      value49,
+      value52,
+      value49,
+      value53,
+      value50,
+      value51,
+      value51,
+      value53,
+      value53,
+      value52,
+      value52,
+      value50,
     ]),
-    _0xdd391a = new threeRuntime['LineSegments'](_0x2b1980, _0x1204e0);
+    value55 = new threeRuntime['LineSegments'](value54, helperLineMaterial);
   return (
-    _0x599f22.add(_0xdd391a),
-    { group: _0x479295, marker: _0x599f22, bodyMaterial: _0x1b3421, helperLineMaterial: _0x1204e0 }
+    marker.add(value55),
+    { group: group11, marker: marker, bodyMaterial: bodyMaterial, helperLineMaterial: helperLineMaterial }
   );
 }
-function applyGenderShape(_0x117835, _0x12284e) {
-  const _0x206da1 = _0x117835?.parts;
-  if (!_0x206da1) return;
-  const [_0x3c317a, _0x1ecac2] = _0x206da1.shoulders || [],
-    [_0x1621a4, _0x5de585] = _0x206da1.upperArms || [],
-    [_0x13a5e4, _0x345f5d] = _0x206da1.lowerArms || [],
-    [_0x3579f2, _0x41e804] = _0x206da1.hands || [],
-    [_0x17c351, _0x59171a] = _0x206da1.upperLegs || [],
-    [_0x481424, _0x59deca] = _0x206da1.lowerLegs || [],
-    [_0x446020, _0x30bdde] = _0x206da1.feet || [];
-  if (_0x12284e === 'female') {
-    (_0x206da1.head?.scale.set(0.94, 1.08, 0.92),
-      _0x206da1.neck?.scale.set(0.92, 1, 0.92),
-      _0x206da1.chest?.scale.set(1.2, 0.98, 0.82),
-      _0x206da1.waist?.scale.set(0.84, 0.92, 0.72),
-      _0x206da1.pelvis?.scale.set(1.38, 0.98, 1.08));
-    if (_0x3c317a) _0x3c317a.position.set(-0.27, 1.42, 0);
-    if (_0x1ecac2) _0x1ecac2.position.set(0.27, 1.42, 0);
-    if (_0x1621a4) _0x1621a4.position.set(-0.34, 1.14, 0);
-    if (_0x5de585) _0x5de585.position.set(0.34, 1.14, 0);
-    if (_0x13a5e4) _0x13a5e4.position.set(-0.37, 0.84, 0.01);
-    if (_0x345f5d) _0x345f5d.position.set(0.37, 0.84, 0.01);
-    if (_0x3579f2) _0x3579f2.position.set(-0.375, 0.59, 0.01);
-    if (_0x41e804) _0x41e804.position.set(0.375, 0.59, 0.01);
-    _0x17c351 && (_0x17c351.position.set(-0.115, 0.45, 0), _0x17c351.scale.set(0.94, 1, 0.94));
-    _0x59171a && (_0x59171a.position.set(0.115, 0.45, 0), _0x59171a.scale.set(0.94, 1, 0.94));
-    _0x481424 && (_0x481424.position.set(-0.115, 0.01, 0.01), _0x481424.scale.set(0.92, 1.02, 0.9));
-    _0x59deca && (_0x59deca.position.set(0.115, 0.01, 0.01), _0x59deca.scale.set(0.92, 1.02, 0.9));
-    if (_0x446020) _0x446020.scale.set(0.88, 0.96, 0.95);
-    if (_0x30bdde) _0x30bdde.scale.set(0.88, 0.96, 0.95);
+function applyGenderShape(value56, value57) {
+  const dom = value56?.parts;
+  if (!dom) return;
+  const [value58, value59] = dom.shoulders || [],
+    [value60, value61] = dom.upperArms || [],
+    [value62, value63] = dom.lowerArms || [],
+    [value64, value65] = dom.hands || [],
+    [box6, box7] = dom.upperLegs || [],
+    [box8, box9] = dom.lowerLegs || [],
+    [box10, box11] = dom.feet || [];
+  if (value57 === 'female') {
+    (dom.head?.scale.set(0.94, 1.08, 0.92),
+      dom.neck?.scale.set(0.92, 1, 0.92),
+      dom.chest?.scale.set(1.2, 0.98, 0.82),
+      dom.waist?.scale.set(0.84, 0.92, 0.72),
+      dom.pelvis?.scale.set(1.38, 0.98, 1.08));
+    if (value58) value58.position.set(-0.27, 1.42, 0);
+    if (value59) value59.position.set(0.27, 1.42, 0);
+    if (value60) value60.position.set(-0.34, 1.14, 0);
+    if (value61) value61.position.set(0.34, 1.14, 0);
+    if (value62) value62.position.set(-0.37, 0.84, 0.01);
+    if (value63) value63.position.set(0.37, 0.84, 0.01);
+    if (value64) value64.position.set(-0.375, 0.59, 0.01);
+    if (value65) value65.position.set(0.375, 0.59, 0.01);
+    box6 && (box6.position.set(-0.115, 0.45, 0), box6.scale.set(0.94, 1, 0.94));
+    box7 && (box7.position.set(0.115, 0.45, 0), box7.scale.set(0.94, 1, 0.94));
+    box8 && (box8.position.set(-0.115, 0.01, 0.01), box8.scale.set(0.92, 1.02, 0.9));
+    box9 && (box9.position.set(0.115, 0.01, 0.01), box9.scale.set(0.92, 1.02, 0.9));
+    if (box10) box10.scale.set(0.88, 0.96, 0.95);
+    if (box11) box11.scale.set(0.88, 0.96, 0.95);
   } else {
-    (_0x206da1.head?.scale.set(0.98, 1.08, 0.95),
-      _0x206da1.neck?.scale.set(1.02, 1, 1.02),
-      _0x206da1.chest?.scale.set(1.48, 1.04, 0.98),
-      _0x206da1.waist?.scale.set(1.02, 0.96, 0.84),
-      _0x206da1.pelvis?.scale.set(1.2, 0.94, 0.96));
-    if (_0x3c317a) _0x3c317a.position.set(-0.33, 1.44, 0);
-    if (_0x1ecac2) _0x1ecac2.position.set(0.33, 1.44, 0);
-    if (_0x1621a4) _0x1621a4.position.set(-0.42, 1.18, 0);
-    if (_0x5de585) _0x5de585.position.set(0.42, 1.18, 0);
-    if (_0x13a5e4) _0x13a5e4.position.set(-0.45, 0.87, 0.01);
-    if (_0x345f5d) _0x345f5d.position.set(0.45, 0.87, 0.01);
-    if (_0x3579f2) _0x3579f2.position.set(-0.455, 0.63, 0.01);
-    if (_0x41e804) _0x41e804.position.set(0.455, 0.63, 0.01);
-    _0x17c351 && (_0x17c351.position.set(-0.125, 0.47, 0), _0x17c351.scale.set(1.06, 1, 1.02));
-    _0x59171a && (_0x59171a.position.set(0.125, 0.47, 0), _0x59171a.scale.set(1.06, 1, 1.02));
-    _0x481424 && (_0x481424.position.set(-0.125, 0.03, 0.01), _0x481424.scale.set(1, 1, 1));
-    _0x59deca && (_0x59deca.position.set(0.125, 0.03, 0.01), _0x59deca.scale.set(1, 1, 1));
-    if (_0x446020) _0x446020.scale.set(1, 1, 1);
-    if (_0x30bdde) _0x30bdde.scale.set(1, 1, 1);
+    (dom.head?.scale.set(0.98, 1.08, 0.95),
+      dom.neck?.scale.set(1.02, 1, 1.02),
+      dom.chest?.scale.set(1.48, 1.04, 0.98),
+      dom.waist?.scale.set(1.02, 0.96, 0.84),
+      dom.pelvis?.scale.set(1.2, 0.94, 0.96));
+    if (value58) value58.position.set(-0.33, 1.44, 0);
+    if (value59) value59.position.set(0.33, 1.44, 0);
+    if (value60) value60.position.set(-0.42, 1.18, 0);
+    if (value61) value61.position.set(0.42, 1.18, 0);
+    if (value62) value62.position.set(-0.45, 0.87, 0.01);
+    if (value63) value63.position.set(0.45, 0.87, 0.01);
+    if (value64) value64.position.set(-0.455, 0.63, 0.01);
+    if (value65) value65.position.set(0.455, 0.63, 0.01);
+    box6 && (box6.position.set(-0.125, 0.47, 0), box6.scale.set(1.06, 1, 1.02));
+    box7 && (box7.position.set(0.125, 0.47, 0), box7.scale.set(1.06, 1, 1.02));
+    box8 && (box8.position.set(-0.125, 0.03, 0.01), box8.scale.set(1, 1, 1));
+    box9 && (box9.position.set(0.125, 0.03, 0.01), box9.scale.set(1, 1, 1));
+    if (box10) box10.scale.set(1, 1, 1);
+    if (box11) box11.scale.set(1, 1, 1);
   }
 }
-function disposeMaterial(_0x24d401) {
-  if (!_0x24d401) return;
-  if (Array.isArray(_0x24d401)) {
-    _0x24d401.forEach(disposeMaterial);
+function disposeMaterial(list2) {
+  if (!list2) return;
+  if (Array.isArray(list2)) {
+    list2.forEach(disposeMaterial);
     return;
   }
-  (_0x24d401.map && (_0x24d401.map.dispose(), (_0x24d401.map = null)), _0x24d401.dispose?.());
+  (list2.map && (list2.map.dispose(), (list2.map = null)), list2.dispose?.());
 }
-function disposeObject3D(_0x2af598) {
-  _0x2af598.traverse((_0x21e63c) => {
-    (_0x21e63c.geometry?.dispose?.(), disposeMaterial(_0x21e63c.material));
+function disposeObject3D(value66) {
+  value66.traverse((value67) => {
+    (value67.geometry?.dispose?.(), disposeMaterial(value67.material));
   });
 }
-function vectorFromAxisName(_0x58a440) {
-  if (_0x58a440 === 'x') return new threeRuntime['Vector3'](1, 0, 0);
-  if (_0x58a440 === 'y') return new threeRuntime['Vector3'](0, 1, 0);
+function vectorFromAxisName(value68) {
+  if (value68 === 'x') return new threeRuntime['Vector3'](1, 0, 0);
+  if (value68 === 'y') return new threeRuntime['Vector3'](0, 1, 0);
   return new threeRuntime['Vector3'](0, 0, 1);
 }
-function toVector3Like(_0x1af759, _0x572808 = { x: 0, y: 0, z: 0 }) {
+function toVector3Like(box12, box13 = { x: 0, y: 0, z: 0 }) {
   return new threeRuntime.Vector3(
-    Number.isFinite(Number(_0x1af759?.x)) ? Number(_0x1af759.x) : Number(_0x572808?.x) || 0,
-    Number.isFinite(Number(_0x1af759?.y)) ? Number(_0x1af759.y) : Number(_0x572808?.y) || 0,
-    Number.isFinite(Number(_0x1af759?.z)) ? Number(_0x1af759.z) : Number(_0x572808?.z) || 0,
+    Number.isFinite(Number(box12?.x)) ? Number(box12.x) : Number(box13?.x) || 0,
+    Number.isFinite(Number(box12?.y)) ? Number(box12.y) : Number(box13?.y) || 0,
+    Number.isFinite(Number(box12?.z)) ? Number(box12.z) : Number(box13?.z) || 0,
   );
 }
-function toEulerLike(_0x2a77e0, _0x49fffd = { x: 0, y: 0, z: 0 }, _0x4f7417 = 'XYZ') {
+function toEulerLike(box14, box15 = { x: 0, y: 0, z: 0 }, value69 = 'XYZ') {
   return new threeRuntime['Euler'](
-    Number.isFinite(Number(_0x2a77e0?.x)) ? Number(_0x2a77e0.x) : Number(_0x49fffd?.x) || 0,
-    Number.isFinite(Number(_0x2a77e0?.y)) ? Number(_0x2a77e0.y) : Number(_0x49fffd?.y) || 0,
-    Number.isFinite(Number(_0x2a77e0?.z)) ? Number(_0x2a77e0.z) : Number(_0x49fffd?.z) || 0,
-    _0x4f7417,
+    Number.isFinite(Number(box14?.x)) ? Number(box14.x) : Number(box15?.x) || 0,
+    Number.isFinite(Number(box14?.y)) ? Number(box14.y) : Number(box15?.y) || 0,
+    Number.isFinite(Number(box14?.z)) ? Number(box14.z) : Number(box15?.z) || 0,
+    value69,
   );
 }
-function toScaleVector(_0x50c0ec) {
-  if (Number.isFinite(_0x50c0ec)) {
-    const _0x28ee8c = Math.max(0.01, Number(_0x50c0ec) || 1);
-    return { x: _0x28ee8c, y: _0x28ee8c, z: _0x28ee8c };
+function toScaleVector(box16) {
+  if (Number.isFinite(box16)) {
+    const x2 = Math.max(0.01, Number(box16) || 1);
+    return { x: x2, y: x2, z: x2 };
   }
-  if (
-    _0x50c0ec &&
-    Number.isFinite(_0x50c0ec.x) &&
-    Number.isFinite(_0x50c0ec.y) &&
-    Number.isFinite(_0x50c0ec.z)
-  )
+  if (box16 && Number.isFinite(box16.x) && Number.isFinite(box16.y) && Number.isFinite(box16.z))
     return {
-      x: Math.max(0.01, Number(_0x50c0ec.x) || 1),
-      y: Math.max(0.01, Number(_0x50c0ec.y) || 1),
-      z: Math.max(0.01, Number(_0x50c0ec.z) || 1),
+      x: Math.max(0.01, Number(box16.x) || 1),
+      y: Math.max(0.01, Number(box16.y) || 1),
+      z: Math.max(0.01, Number(box16.z) || 1),
     };
   return { x: 1, y: 1, z: 1 };
 }
-function applyGroupScale(_0xf50c0c, _0x530f2e) {
-  const _0x23609b = toScaleVector(_0x530f2e);
-  _0xf50c0c.scale.set(_0x23609b.x, _0x23609b.y, _0x23609b.z);
+function applyGroupScale(box17, value70) {
+  const box18 = toScaleVector(value70);
+  box17.scale.set(box18.x, box18.y, box18.z);
 }
-function applyGroupTransform(_0x519d68, _0x42fb6f) {
-  _0x519d68.position.set(
-    Number(_0x42fb6f?.position?.x) || 0,
-    Number(_0x42fb6f?.position?.y) || 0,
-    Number(_0x42fb6f?.position?.z) || 0,
+function applyGroupTransform(value71, value72) {
+  value71.position.set(
+    Number(value72?.position?.x) || 0,
+    Number(value72?.position?.y) || 0,
+    Number(value72?.position?.z) || 0,
   );
-  if (hasFiniteQuaternion(_0x42fb6f?.quaternion)) {
-    const _0x44ec23 = normalizeQuaternionData(_0x42fb6f.quaternion, { x: 0, y: 0, z: 0, w: 1 });
-    _0x519d68.quaternion.set(_0x44ec23.x, _0x44ec23.y, _0x44ec23.z, _0x44ec23.w);
+  if (hasFiniteQuaternion(value72?.quaternion)) {
+    const box19 = normalizeQuaternionData(value72.quaternion, { x: 0, y: 0, z: 0, w: 1 });
+    value71.quaternion.set(box19.x, box19.y, box19.z, box19.w);
     return;
   }
-  _0x519d68.rotation.set(
-    Number(_0x42fb6f?.rotation?.x) || 0,
-    Number(_0x42fb6f?.rotation?.y) || 0,
-    Number(_0x42fb6f?.rotation?.z) || 0,
+  value71.rotation.set(
+    Number(value72?.rotation?.x) || 0,
+    Number(value72?.rotation?.y) || 0,
+    Number(value72?.rotation?.z) || 0,
   );
 }
-function hasFiniteQuaternion(_0x3a78e9) {
+function hasFiniteQuaternion(box20) {
   return (
-    Number.isFinite(Number(_0x3a78e9?.x)) &&
-    Number.isFinite(Number(_0x3a78e9?.y)) &&
-    Number.isFinite(Number(_0x3a78e9?.z)) &&
-    Number.isFinite(Number(_0x3a78e9?.w))
+    Number.isFinite(Number(box20?.x)) &&
+    Number.isFinite(Number(box20?.y)) &&
+    Number.isFinite(Number(box20?.z)) &&
+    Number.isFinite(Number(box20?.w))
   );
 }
-function normalizeQuaternionData(_0x1ab3ce, _0x7c23e7 = { x: 0, y: 0, z: 0, w: 1 }) {
-  const _0x11f268 = Number(_0x1ab3ce?.x),
-    _0x1da17e = Number(_0x1ab3ce?.y),
-    _0x5e2c00 = Number(_0x1ab3ce?.z),
-    _0x4bbd51 = Number(_0x1ab3ce?.w);
-  if (
-    !Number.isFinite(_0x11f268) ||
-    !Number.isFinite(_0x1da17e) ||
-    !Number.isFinite(_0x5e2c00) ||
-    !Number.isFinite(_0x4bbd51)
-  )
-    return { ..._0x7c23e7 };
-  const _0x3d5a65 = Math.hypot(_0x11f268, _0x1da17e, _0x5e2c00, _0x4bbd51);
-  if (_0x3d5a65 < 0.000001) return { ..._0x7c23e7 };
+function normalizeQuaternionData(box21, args = { x: 0, y: 0, z: 0, w: 1 }) {
+  const x3 = Number(box21?.x),
+    y2 = Number(box21?.y),
+    z2 = Number(box21?.z),
+    w = Number(box21?.w);
+  if (!Number.isFinite(x3) || !Number.isFinite(y2) || !Number.isFinite(z2) || !Number.isFinite(w))
+    return { ...args };
+  const count = Math.hypot(x3, y2, z2, w);
+  if (count < 0.000001) return { ...args };
   return {
-    x: _0x11f268 / _0x3d5a65,
-    y: _0x1da17e / _0x3d5a65,
-    z: _0x5e2c00 / _0x3d5a65,
-    w: _0x4bbd51 / _0x3d5a65,
+    x: x3 / count,
+    y: y2 / count,
+    z: z2 / count,
+    w: w / count,
   };
 }
-function toQuaternionFromPose(_0x4077ac, _0x3297f0 = { x: 0, y: 0, z: 0, w: 1 }, _0x17445c = 'XYZ') {
-  if (hasFiniteQuaternion(_0x4077ac?.quaternion)) {
-    const _0x3bcd9a = normalizeQuaternionData(_0x4077ac.quaternion, _0x3297f0);
-    return new threeRuntime['Quaternion'](_0x3bcd9a.x, _0x3bcd9a.y, _0x3bcd9a.z, _0x3bcd9a.w);
+function toQuaternionFromPose(value73, value74 = { x: 0, y: 0, z: 0, w: 1 }, value75 = 'XYZ') {
+  if (hasFiniteQuaternion(value73?.quaternion)) {
+    const box22 = normalizeQuaternionData(value73.quaternion, value74);
+    return new threeRuntime['Quaternion'](box22.x, box22.y, box22.z, box22.w);
   }
-  const _0x58966b = toEulerLike(_0x4077ac?.rotation, { x: 0, y: 0, z: 0 }, _0x17445c);
-  return new threeRuntime['Quaternion']().setFromEuler(_0x58966b);
+  const toEulerLike2 = toEulerLike(value73?.rotation, { x: 0, y: 0, z: 0 }, value75);
+  return new threeRuntime['Quaternion']().setFromEuler(toEulerLike2);
 }
-function composeMatrixFromPose(_0x4f6c34 = {}, _0xd39c51 = 'XYZ') {
-  const _0x307eb5 = toVector3Like(_0x4f6c34?.position, { x: 0, y: 0, z: 0 }),
-    _0x1ff52f = toQuaternionFromPose(_0x4f6c34, { x: 0, y: 0, z: 0, w: 1 }, _0xd39c51),
-    _0x4d4e16 = toVector3Like(toScaleVector(_0x4f6c34?.scale), { x: 1, y: 1, z: 1 });
-  return new threeRuntime['Matrix4']().compose(_0x307eb5, _0x1ff52f, _0x4d4e16);
+function composeMatrixFromPose(box23 = {}, value76 = 'XYZ') {
+  const toVector3Like2 = toVector3Like(box23?.position, { x: 0, y: 0, z: 0 }),
+    toQuaternionFromPose2 = toQuaternionFromPose(box23, { x: 0, y: 0, z: 0, w: 1 }, value76),
+    toVector3Like3 = toVector3Like(toScaleVector(box23?.scale), { x: 1, y: 1, z: 1 });
+  return new threeRuntime['Matrix4']().compose(toVector3Like2, toQuaternionFromPose2, toVector3Like3);
 }
-function quaternionFromRotationYXZ(_0x21111c) {
-  const _0x51e3a9 = new threeRuntime['Quaternion']().setFromEuler(
-    new threeRuntime['Euler'](
-      Number(_0x21111c?.x) || 0,
-      Number(_0x21111c?.y) || 0,
-      Number(_0x21111c?.z) || 0,
-      'YXZ',
-    ),
+function quaternionFromRotationYXZ(box24) {
+  const value77 = new threeRuntime['Quaternion']().setFromEuler(
+    new threeRuntime['Euler'](Number(box24?.x) || 0, Number(box24?.y) || 0, Number(box24?.z) || 0, 'YXZ'),
   );
-  return normalizeQuaternionData(_0x51e3a9);
+  return normalizeQuaternionData(value77);
 }
-function resolveObjectPivot(_0x559205, _0x27c0ae) {
+function resolveObjectPivot(value78, value79) {
   if (
-    Number.isFinite(Number(_0x559205?.pivot?.x)) &&
-    Number.isFinite(Number(_0x559205?.pivot?.y)) &&
-    Number.isFinite(Number(_0x559205?.pivot?.z))
+    Number.isFinite(Number(value78?.pivot?.x)) &&
+    Number.isFinite(Number(value78?.pivot?.y)) &&
+    Number.isFinite(Number(value78?.pivot?.z))
   )
-    return toVector3Like(_0x559205.pivot);
-  if (_0x559205) {
-    const _0x5589e7 = composeMatrixFromPose(_0x559205),
-      _0x59b90b = new threeRuntime.Vector3();
-    return (_0x59b90b.setFromMatrixPosition(_0x5589e7), _0x59b90b);
+    return toVector3Like(value78.pivot);
+  if (value78) {
+    const composeMatrixFromPose2 = composeMatrixFromPose(value78),
+      value80 = new threeRuntime.Vector3();
+    return (value80.setFromMatrixPosition(composeMatrixFromPose2), value80);
   }
-  if (_0x27c0ae?.group) {
-    const _0xd04f56 = new threeRuntime['Vector3']();
-    return (_0x27c0ae.group.getWorldPosition(_0xd04f56), _0xd04f56);
+  if (value79?.group) {
+    const value81 = new threeRuntime['Vector3']();
+    return (value79.group.getWorldPosition(value81), value81);
   }
   return new threeRuntime['Vector3']();
 }
-function resolveActiveTransformTool(_0x3d052d) {
-  const _0x39be63 = String(_0x3d052d?.ui?.transformTool || '').trim();
-  if (_0x39be63 === 'move' || _0x39be63 === 'rotate' || _0x39be63 === 'scale') return _0x39be63;
-  const _0x5df4fb = String(_0x3d052d?.ui?.activeTool || '').trim();
-  if (_0x5df4fb === 'move' || _0x5df4fb === 'rotate' || _0x5df4fb === 'scale') return _0x5df4fb;
+function resolveActiveTransformTool(value82) {
+  const value83 = String(value82?.ui?.transformTool || '').trim();
+  if (value83 === 'move' || value83 === 'rotate' || value83 === 'scale') return value83;
+  const value84 = String(value82?.ui?.activeTool || '').trim();
+  if (value84 === 'move' || value84 === 'rotate' || value84 === 'scale') return value84;
   return 'move';
 }
-function resolveObjectOrientationQuaternion(_0x3c3c6f, _0x3d8f5c) {
-  if (_0x3d8f5c?.group) {
-    const _0x4af861 = new threeRuntime['Quaternion']();
-    return (_0x3d8f5c.group.getWorldQuaternion(_0x4af861), _0x4af861);
+function resolveObjectOrientationQuaternion(value85, value86) {
+  if (value86?.group) {
+    const value87 = new threeRuntime['Quaternion']();
+    return (value86.group.getWorldQuaternion(value87), value87);
   }
-  return toQuaternionFromPose(_0x3c3c6f, { x: 0, y: 0, z: 0, w: 1 });
+  return toQuaternionFromPose(value85, { x: 0, y: 0, z: 0, w: 1 });
 }
-function areOrientationQuaternionsAligned(_0x365ad9, _0x3ebaae, _0x279c31 = 0.00001) {
-  if (!_0x365ad9 || !_0x3ebaae) return false;
-  const _0x882b0d = Math.abs(
-    (Number(_0x365ad9.x) || 0) * (Number(_0x3ebaae.x) || 0) +
-      (Number(_0x365ad9.y) || 0) * (Number(_0x3ebaae.y) || 0) +
-      (Number(_0x365ad9.z) || 0) * (Number(_0x3ebaae.z) || 0) +
-      (Number(_0x365ad9.w) || 0) * (Number(_0x3ebaae.w) || 0),
+function areOrientationQuaternionsAligned(box25, box26, value88 = 0.00001) {
+  if (!box25 || !box26) return false;
+  const value89 = Math.abs(
+    (Number(box25.x) || 0) * (Number(box26.x) || 0) +
+      (Number(box25.y) || 0) * (Number(box26.y) || 0) +
+      (Number(box25.z) || 0) * (Number(box26.z) || 0) +
+      (Number(box25.w) || 0) * (Number(box26.w) || 0),
   );
-  return Math.abs(1 - _0x882b0d) <= _0x279c31;
+  return Math.abs(1 - value89) <= value88;
 }
-function resolveSelectionGizmoOrientation(_0x1367cf, _0x326051, _0xdcd01f) {
-  const _0x1eb9e8 = _0x326051?.orientationQuaternion?.clone?.() || new threeRuntime['Quaternion']();
-  if (!_0xdcd01f) return { orientationQuaternion: _0x1eb9e8, usesLocalOrientation: true };
-  const _0xfce801 =
-    _0x1367cf.length > 0 &&
-    _0x1367cf.every((_0xe9ec50) =>
-      areOrientationQuaternionsAligned(_0x1eb9e8, _0xe9ec50.orientationQuaternion),
+function resolveSelectionGizmoOrientation(list3, value90, enabled14) {
+  const orientationQuaternion = value90?.orientationQuaternion?.clone?.() || new threeRuntime['Quaternion']();
+  if (!enabled14) return { orientationQuaternion: orientationQuaternion, usesLocalOrientation: true };
+  const orientationQuaternion2 =
+    list3.length > 0 &&
+    list3.every((item4) =>
+      areOrientationQuaternionsAligned(orientationQuaternion, item4.orientationQuaternion),
     );
   return {
-    orientationQuaternion: _0xfce801 ? _0x1eb9e8 : new threeRuntime.Quaternion(),
-    usesLocalOrientation: _0xfce801,
+    orientationQuaternion: orientationQuaternion2 ? orientationQuaternion : new threeRuntime.Quaternion(),
+    usesLocalOrientation: orientationQuaternion2,
   };
 }
-function rotationFromQuaternionYXZ(_0x620da7) {
-  const _0x5ef417 = normalizeQuaternionData(_0x620da7),
-    _0x4c03c9 = new threeRuntime['Euler']().setFromQuaternion(
-      new threeRuntime['Quaternion'](_0x5ef417.x, _0x5ef417.y, _0x5ef417.z, _0x5ef417.w),
+function rotationFromQuaternionYXZ(value91) {
+  const box27 = normalizeQuaternionData(value91),
+    x4 = new threeRuntime['Euler']().setFromQuaternion(
+      new threeRuntime['Quaternion'](box27.x, box27.y, box27.z, box27.w),
       'YXZ',
     );
-  return { x: _0x4c03c9.x, y: _0x4c03c9.y, z: _0x4c03c9.z };
+  return { x: x4.x, y: x4.y, z: x4.z };
 }
-function normalizeCameraPoseData(_0x1a6e75 = {}) {
-  const _0x144964 = {
-      x: Number(_0x1a6e75?.position?.x) || 0,
-      y: Number(_0x1a6e75?.position?.y) || 0,
-      z: Number(_0x1a6e75?.position?.z) || 0,
+function normalizeCameraPoseData(options2 = {}) {
+  const position = {
+      x: Number(options2?.position?.x) || 0,
+      y: Number(options2?.position?.y) || 0,
+      z: Number(options2?.position?.z) || 0,
     },
-    _0x5dd241 = hasFiniteQuaternion(_0x1a6e75?.quaternion),
-    _0x4736a2 = _0x5dd241
-      ? normalizeQuaternionData(_0x1a6e75.quaternion, quaternionFromRotationYXZ(_0x1a6e75?.rotation))
-      : quaternionFromRotationYXZ(_0x1a6e75?.rotation),
-    _0x4181e3 = _0x5dd241
-      ? rotationFromQuaternionYXZ(_0x4736a2)
+    hasFiniteQuaternion2 = hasFiniteQuaternion(options2?.quaternion),
+    quaternion = hasFiniteQuaternion2
+      ? normalizeQuaternionData(options2.quaternion, quaternionFromRotationYXZ(options2?.rotation))
+      : quaternionFromRotationYXZ(options2?.rotation),
+    rotation2 = hasFiniteQuaternion2
+      ? rotationFromQuaternionYXZ(quaternion)
       : {
-          x: Number(_0x1a6e75?.rotation?.x) || 0,
-          y: Number(_0x1a6e75?.rotation?.y) || 0,
-          z: Number(_0x1a6e75?.rotation?.z) || 0,
+          x: Number(options2?.rotation?.x) || 0,
+          y: Number(options2?.rotation?.y) || 0,
+          z: Number(options2?.rotation?.z) || 0,
         };
   return {
-    position: _0x144964,
-    quaternion: _0x4736a2,
-    rotation: _0x4181e3,
-    fov: Number.isFinite(Number(_0x1a6e75?.fov))
-      ? Number(_0x1a6e75.fov)
+    position: position,
+    quaternion: quaternion,
+    rotation: rotation2,
+    fov: Number.isFinite(Number(options2?.fov))
+      ? Number(options2.fov)
       : focalLengthToFov(
-          Object.prototype.hasOwnProperty.call(_0x1a6e75 || {}, 'focalLength')
-            ? _0x1a6e75.focalLength
+          Object.prototype.hasOwnProperty.call(options2 || {}, 'focalLength')
+            ? options2.focalLength
             : SCENE_DEFAULT_FOCAL_LENGTH_MM,
         ),
-    focalLength: Object.prototype.hasOwnProperty.call(_0x1a6e75 || {}, 'focalLength')
-      ? Number(_0x1a6e75.focalLength) || SCENE_DEFAULT_FOCAL_LENGTH_MM
-      : Number.isFinite(Number(_0x1a6e75?.fov))
-        ? fovToFocalLength(_0x1a6e75.fov)
+    focalLength: Object.prototype.hasOwnProperty.call(options2 || {}, 'focalLength')
+      ? Number(options2.focalLength) || SCENE_DEFAULT_FOCAL_LENGTH_MM
+      : Number.isFinite(Number(options2?.fov))
+        ? fovToFocalLength(options2.fov)
         : SCENE_DEFAULT_FOCAL_LENGTH_MM,
   };
 }
-function collectSelectedObjects(_0x5a87cd) {
-  const _0xe0216 = Array.isArray(_0x5a87cd?.cubes) ? _0x5a87cd.cubes : [],
-    _0x20fc7b = Array.isArray(_0x5a87cd?.mannequins) ? _0x5a87cd.mannequins : [],
-    _0x3af8da = new Set(_0xe0216.map((_0x307076) => _0x307076.id)),
-    _0xfd79a7 = new Set(_0x20fc7b.map((_0x53a633) => _0x53a633.id)),
-    _0x1b42f7 = new Set(),
-    _0x2ebeab = [],
-    _0x2ff413 = (_0xc2fcf2, _0x50e035) => {
-      if (_0xc2fcf2 !== 'cube' && _0xc2fcf2 !== 'mannequin') return;
-      const _0x33981a = String(_0x50e035 || '').trim();
-      if (!_0x33981a) return;
-      const _0x23fd21 = _0xc2fcf2 === 'cube' ? _0x3af8da.has(_0x33981a) : _0xfd79a7.has(_0x33981a);
-      if (!_0x23fd21) return;
-      const _0x1ed8c0 = _0xc2fcf2 + ':' + _0x33981a;
-      if (_0x1b42f7.has(_0x1ed8c0)) return;
-      (_0x1b42f7.add(_0x1ed8c0), _0x2ebeab.push({ objectType: _0xc2fcf2, objectId: _0x33981a }));
+function collectSelectedObjects(value92) {
+  const list4 = Array.isArray(value92?.cubes) ? value92.cubes : [],
+    list5 = Array.isArray(value92?.mannequins) ? value92.mannequins : [],
+    map = new Set(list4.map((item5) => item5.id)),
+    map2 = new Set(list5.map((item6) => item6.id)),
+    map3 = new Set(),
+    list6 = [],
+    handler4 = (objectType, value93) => {
+      if (objectType !== 'cube' && objectType !== 'mannequin') return;
+      const objectId = String(value93 || '').trim();
+      if (!objectId) return;
+      const enabled15 = objectType === 'cube' ? map.has(objectId) : map2.has(objectId);
+      if (!enabled15) return;
+      const value94 = objectType + ':' + objectId;
+      if (map3.has(value94)) return;
+      (map3.add(value94), list6.push({ objectType: objectType, objectId: objectId }));
     },
-    _0x300cb9 = Array.isArray(_0x5a87cd?.selection?.selectedObjects)
-      ? _0x5a87cd.selection.selectedObjects
-      : [];
-  _0x300cb9.forEach((_0xb35258) => {
-    _0x2ff413(_0xb35258?.objectType, _0xb35258?.objectId);
+    list7 = Array.isArray(value92?.selection?.selectedObjects) ? value92.selection.selectedObjects : [];
+  list7.forEach((item7) => {
+    handler4(item7?.objectType, item7?.objectId);
   });
-  if (_0x2ebeab.length > 0) return _0x2ebeab;
-  const _0x3f86b1 = _0x5a87cd?.selection?.selectedGroupId || null;
-  if (_0x3f86b1) {
-    const _0x1a4f93 = (_0x5a87cd?.groups || []).find((_0x2d7667) => _0x2d7667.id === _0x3f86b1),
-      _0x588760 = Array.isArray(_0x1a4f93?.memberIds) ? _0x1a4f93.memberIds : [];
-    _0x588760.forEach((_0xfe4a1e) => {
-      _0x2ff413('mannequin', _0xfe4a1e);
+  if (list6.length > 0) return list6;
+  const value95 = value92?.selection?.selectedGroupId || null;
+  if (value95) {
+    const value96 = (value92?.groups || []).find((item8) => item8.id === value95),
+      list8 = Array.isArray(value96?.memberIds) ? value96.memberIds : [];
+    list8.forEach((item9) => {
+      handler4('mannequin', item9);
     });
-    if (_0x2ebeab.length > 0) return _0x2ebeab;
+    if (list6.length > 0) return list6;
   }
-  const _0x2341b1 =
-    _0x5a87cd?.selection?.selectedObjectType === 'cube' ||
-    _0x5a87cd?.selection?.selectedObjectType === 'mannequin'
-      ? _0x5a87cd.selection.selectedObjectType
+  const enabled16 =
+    value92?.selection?.selectedObjectType === 'cube' ||
+    value92?.selection?.selectedObjectType === 'mannequin'
+      ? value92.selection.selectedObjectType
       : null;
-  if (!_0x2341b1) return _0x2ebeab;
-  const _0x4f3a8f = Array.isArray(_0x5a87cd?.selection?.selectedObjectIds)
-    ? _0x5a87cd.selection.selectedObjectIds
+  if (!enabled16) return list6;
+  const list9 = Array.isArray(value92?.selection?.selectedObjectIds)
+    ? value92.selection.selectedObjectIds
     : [];
-  if (_0x4f3a8f.length > 0) {
-    _0x4f3a8f.forEach((_0x8432b4) => {
-      _0x2ff413(_0x2341b1, _0x8432b4);
+  if (list9.length > 0) {
+    list9.forEach((item10) => {
+      handler4(enabled16, item10);
     });
-    if (_0x2ebeab.length > 0) return _0x2ebeab;
+    if (list6.length > 0) return list6;
   }
-  return (_0x2ff413(_0x2341b1, _0x5a87cd?.selection?.selectedObjectId || null), _0x2ebeab);
+  return (handler4(enabled16, value92?.selection?.selectedObjectId || null), list6);
 }
-function collectSelectedObjectIds(_0x585495, _0x3b3f77) {
-  return collectSelectedObjects(_0x585495)
-    .filter((_0xd0dac5) => _0xd0dac5.objectType === _0x3b3f77)
-    .map((_0x102b50) => _0x102b50.objectId);
+function collectSelectedObjectIds(value97, value98) {
+  return collectSelectedObjects(value97)
+    .filter((item11) => item11.objectType === value98)
+    .map((item12) => item12.objectId);
 }
-function buildTransformSelectionSignature(_0x555d8f) {
-  const _0x31fca5 = collectSelectedObjects(_0x555d8f);
-  if (_0x31fca5.length === 0) return '';
-  return _0x31fca5
-    .map((_0x31f2ee) => _0x31f2ee.objectType + ':' + _0x31f2ee.objectId)
+function buildTransformSelectionSignature(value99) {
+  const list10 = collectSelectedObjects(value99);
+  if (list10.length === 0) return '';
+  return list10
+    .map((item13) => item13.objectType + ':' + item13.objectId)
     .sort()
     .join('|');
 }
-function cloneGizmoDisplayContext(_0x2aa052) {
-  if (!_0x2aa052) return null;
+function cloneGizmoDisplayContext(isMultiSelection) {
+  if (!isMultiSelection) return null;
   return {
-    isMultiSelection: _0x2aa052.isMultiSelection === true,
-    usesLocalOrientation: _0x2aa052.usesLocalOrientation === true,
-    position: _0x2aa052.position?.clone?.() || new threeRuntime['Vector3'](),
-    orientationQuaternion: _0x2aa052.orientationQuaternion?.clone?.() || new threeRuntime['Quaternion'](),
+    isMultiSelection: isMultiSelection.isMultiSelection === true,
+    usesLocalOrientation: isMultiSelection.usesLocalOrientation === true,
+    position: isMultiSelection.position?.clone?.() || new threeRuntime['Vector3'](),
+    orientationQuaternion:
+      isMultiSelection.orientationQuaternion?.clone?.() || new threeRuntime['Quaternion'](),
     bounds: {
-      box: _0x2aa052.bounds?.box?.clone?.() || createFallbackBounds().box,
-      size: _0x2aa052.bounds?.size?.clone?.() || new threeRuntime.Vector3(1, 1, 1),
-      sphere: _0x2aa052.bounds?.sphere
+      box: isMultiSelection.bounds?.box?.clone?.() || createFallbackBounds().box,
+      size: isMultiSelection.bounds?.size?.clone?.() || new threeRuntime.Vector3(1, 1, 1),
+      sphere: isMultiSelection.bounds?.sphere
         ? new threeRuntime['Sphere'](
-            _0x2aa052.bounds.sphere.center?.clone?.() || new threeRuntime.Vector3(),
-            Number(_0x2aa052.bounds.sphere.radius) || 0,
+            isMultiSelection.bounds.sphere.center?.clone?.() || new threeRuntime.Vector3(),
+            Number(isMultiSelection.bounds.sphere.radius) || 0,
           )
         : new threeRuntime['Sphere'](new threeRuntime.Vector3(0, 0.5, 0), Math.sqrt(0.75)),
       extents: {
-        x: Number(_0x2aa052.bounds?.extents?.x) || 0,
-        y: Number(_0x2aa052.bounds?.extents?.y) || 0,
-        z: Number(_0x2aa052.bounds?.extents?.z) || 0,
+        x: Number(isMultiSelection.bounds?.extents?.x) || 0,
+        y: Number(isMultiSelection.bounds?.extents?.y) || 0,
+        z: Number(isMultiSelection.bounds?.extents?.z) || 0,
       },
     },
     gizmoWorldMetrics: {
       extents: {
-        x: Number(_0x2aa052.gizmoWorldMetrics?.extents?.x) || 0,
-        y: Number(_0x2aa052.gizmoWorldMetrics?.extents?.y) || 0,
-        z: Number(_0x2aa052.gizmoWorldMetrics?.extents?.z) || 0,
+        x: Number(isMultiSelection.gizmoWorldMetrics?.extents?.x) || 0,
+        y: Number(isMultiSelection.gizmoWorldMetrics?.extents?.y) || 0,
+        z: Number(isMultiSelection.gizmoWorldMetrics?.extents?.z) || 0,
       },
-      sphereRadius: Number(_0x2aa052.gizmoWorldMetrics?.sphereRadius) || 0.01,
-      margin: Number(_0x2aa052.gizmoWorldMetrics?.margin) || GIZMO_MARGIN_WORLD_MIN,
+      sphereRadius: Number(isMultiSelection.gizmoWorldMetrics?.sphereRadius) || 0.01,
+      margin: Number(isMultiSelection.gizmoWorldMetrics?.margin) || GIZMO_MARGIN_WORLD_MIN,
     },
   };
 }
-function measureVisualBounds(_0x21b606) {
-  const _0x1d6b3c = _0x21b606?.proxyRoot || _0x21b606?.group;
-  if (!_0x1d6b3c) return null;
-  const _0x604d97 = new threeRuntime.Box3().setFromObject(_0x1d6b3c);
-  if (_0x604d97.isEmpty()) return null;
-  const _0x44237e = new threeRuntime['Vector3'](),
-    _0x3cdcd3 = new threeRuntime['Sphere']();
+function measureVisualBounds(value100) {
+  const enabled17 = value100?.proxyRoot || value100?.group;
+  if (!enabled17) return null;
+  const box28 = new threeRuntime.Box3().setFromObject(enabled17);
+  if (box28.isEmpty()) return null;
+  const size = new threeRuntime['Vector3'](),
+    sphere = new threeRuntime['Sphere']();
   return (
-    _0x604d97.getSize(_0x44237e),
-    _0x604d97.getBoundingSphere(_0x3cdcd3),
+    box28.getSize(size),
+    box28.getBoundingSphere(sphere),
     {
-      box: _0x604d97,
-      size: _0x44237e,
-      sphere: _0x3cdcd3,
+      box: box28,
+      size: size,
+      sphere: sphere,
       extents: {
-        x: Math.max(0, _0x44237e.x * 0.5),
-        y: Math.max(0, _0x44237e.y * 0.5),
-        z: Math.max(0, _0x44237e.z * 0.5),
+        x: Math.max(0, size.x * 0.5),
+        y: Math.max(0, size.y * 0.5),
+        z: Math.max(0, size.z * 0.5),
       },
     }
   );
 }
-function resolveVisualBoundsCenter(_0x36d663) {
-  const _0x5904f7 = measureVisualBounds(_0x36d663);
-  if (!_0x5904f7?.box || _0x5904f7.box.isEmpty()) return null;
-  const _0x3b8bc4 = new threeRuntime['Vector3']();
-  return (_0x5904f7.box.getCenter(_0x3b8bc4), _0x3b8bc4);
+function resolveVisualBoundsCenter(value101) {
+  const measureVisualBounds2 = measureVisualBounds(value101);
+  if (!measureVisualBounds2?.box || measureVisualBounds2.box.isEmpty()) return null;
+  const value102 = new threeRuntime['Vector3']();
+  return (measureVisualBounds2.box.getCenter(value102), value102);
 }
-function resolveObjectToolPivot(_0x2cf33c, _0x233a31, _0x258b10, _0x4ce03a) {
-  const _0x33dca6 = String(_0x4ce03a || '').trim();
-  if (_0x33dca6 !== 'camera') {
-    const _0x258f04 = resolveVisualBoundsCenter(_0x233a31);
-    if (_0x258f04) return _0x258f04;
+function resolveObjectToolPivot(value103, value104, value105, value106) {
+  const value107 = String(value106 || '').trim();
+  if (value107 !== 'camera') {
+    const visualBoundsCenter = resolveVisualBoundsCenter(value104);
+    if (visualBoundsCenter) return visualBoundsCenter;
   }
-  return resolveObjectPivot(_0x2cf33c, _0x233a31);
+  return resolveObjectPivot(value103, value104);
 }
-function measureVisualBoundsForSelection(_0x325266 = []) {
-  const _0x1d22fb = new threeRuntime['Box3']();
-  let _0x457003 = false;
-  _0x325266.forEach((_0x4715e7) => {
-    const _0x562fef = _0x4715e7?.visual?.proxyRoot || _0x4715e7?.visual?.group;
-    if (!_0x562fef) return;
-    const _0x137d1b = new threeRuntime['Box3']().setFromObject(_0x562fef);
-    if (_0x137d1b.isEmpty()) return;
-    if (!_0x457003) {
-      (_0x1d22fb.copy(_0x137d1b), (_0x457003 = true));
+function measureVisualBoundsForSelection(list11 = []) {
+  const box29 = new threeRuntime['Box3']();
+  let enabled18 = false;
+  list11.forEach((item14) => {
+    const enabled19 = item14?.visual?.proxyRoot || item14?.visual?.group;
+    if (!enabled19) return;
+    const value108 = new threeRuntime['Box3']().setFromObject(enabled19);
+    if (value108.isEmpty()) return;
+    if (!enabled18) {
+      (box29.copy(value108), (enabled18 = true));
       return;
     }
-    _0x1d22fb.union(_0x137d1b);
+    box29.union(value108);
   });
-  if (!_0x457003) return null;
-  const _0x3da2b3 = new threeRuntime.Vector3(),
-    _0x127d60 = new threeRuntime['Sphere']();
+  if (!enabled18) return null;
+  const size2 = new threeRuntime.Vector3(),
+    sphere2 = new threeRuntime['Sphere']();
   return (
-    _0x1d22fb.getSize(_0x3da2b3),
-    _0x1d22fb.getBoundingSphere(_0x127d60),
+    box29.getSize(size2),
+    box29.getBoundingSphere(sphere2),
     {
-      box: _0x1d22fb,
-      size: _0x3da2b3,
-      sphere: _0x127d60,
+      box: box29,
+      size: size2,
+      sphere: sphere2,
       extents: {
-        x: Math.max(0, _0x3da2b3.x * 0.5),
-        y: Math.max(0, _0x3da2b3.y * 0.5),
-        z: Math.max(0, _0x3da2b3.z * 0.5),
+        x: Math.max(0, size2.x * 0.5),
+        y: Math.max(0, size2.y * 0.5),
+        z: Math.max(0, size2.z * 0.5),
       },
     }
   );
@@ -1385,99 +1380,97 @@ function createFallbackBounds() {
     extents: { x: 0.5, y: 0.5, z: 0.5 },
   };
 }
-function computeGizmoWorldMetrics(_0x1c040c) {
-  const _0x237d0 = _0x1c040c?.extents || { x: 0.5, y: 0.5, z: 0.5 },
-    _0x124244 = Math.max(0.01, Number(_0x237d0.x) || 0, Number(_0x237d0.y) || 0, Number(_0x237d0.z) || 0),
-    _0x2c1d13 = Math.max(0.01, Number(_0x1c040c?.sphere?.radius) || 0.01),
-    _0x45c80a = Math.max(GIZMO_MARGIN_WORLD_MIN, _0x2c1d13 * GIZMO_MARGIN_WORLD_RATIO, _0x124244 * 0.18);
-  return { extents: _0x237d0, maxExtent: _0x124244, sphereRadius: _0x2c1d13, margin: _0x45c80a };
+function computeGizmoWorldMetrics(value109) {
+  const extents = value109?.extents || { x: 0.5, y: 0.5, z: 0.5 },
+    maxExtent = Math.max(0.01, Number(extents.x) || 0, Number(extents.y) || 0, Number(extents.z) || 0),
+    sphereRadius = Math.max(0.01, Number(value109?.sphere?.radius) || 0.01),
+    margin = Math.max(GIZMO_MARGIN_WORLD_MIN, sphereRadius * GIZMO_MARGIN_WORLD_RATIO, maxExtent * 0.18);
+  return { extents: extents, maxExtent: maxExtent, sphereRadius: sphereRadius, margin: margin };
 }
-function cloneRenderPose(_0x4e013b) {
-  if (!_0x4e013b) return null;
-  if (_0x4e013b.kind === 'camera') {
-    const _0x1a7544 = normalizeCameraPoseData(_0x4e013b);
+function cloneRenderPose(event) {
+  if (!event) return null;
+  if (event.kind === 'camera') {
+    const fov = normalizeCameraPoseData(event);
     return {
       kind: 'camera',
-      position: { ..._0x1a7544.position },
-      quaternion: { ..._0x1a7544.quaternion },
-      rotation: { ..._0x1a7544.rotation },
-      fov: _0x1a7544.fov,
+      position: { ...fov.position },
+      quaternion: { ...fov.quaternion },
+      rotation: { ...fov.rotation },
+      fov: fov.fov,
     };
   }
-  if (_0x4e013b.kind === 'panorama-default')
+  if (event.kind === 'panorama-default')
     return {
       kind: 'panorama-default',
-      position: { ..._0x4e013b.position },
-      yaw: Number(_0x4e013b.yaw) || 0,
-      pitch: Number(_0x4e013b.pitch) || 0,
-      fov: Number(_0x4e013b.fov) || 72,
+      position: { ...event.position },
+      yaw: Number(event.yaw) || 0,
+      pitch: Number(event.pitch) || 0,
+      fov: Number(event.fov) || 72,
     };
   return {
     kind: 'scene-default',
-    position: { ..._0x4e013b.position },
-    target: { ..._0x4e013b.target },
-    yaw: Number(_0x4e013b.yaw) || 0,
-    pitch: Number(_0x4e013b.pitch) || 0,
-    distance: Number(_0x4e013b.distance) || 0,
-    fov: Number(_0x4e013b.fov) || 58,
+    position: { ...event.position },
+    target: { ...event.target },
+    yaw: Number(event.yaw) || 0,
+    pitch: Number(event.pitch) || 0,
+    distance: Number(event.distance) || 0,
+    fov: Number(event.fov) || 58,
   };
 }
-function measurePoseDistance(_0x13c5d6, _0x16f409) {
-  if (!_0x13c5d6 || !_0x16f409 || _0x13c5d6.kind !== _0x16f409.kind) return Number.POSITIVE_INFINITY;
-  if (_0x16f409.kind === 'camera') {
-    const _0x4c7bef = normalizeCameraPoseData(_0x13c5d6),
-      _0x878c64 = normalizeCameraPoseData(_0x16f409),
-      _0x499ff0 =
-        Math.abs(_0x878c64.position.x - _0x4c7bef.position.x) +
-        Math.abs(_0x878c64.position.y - _0x4c7bef.position.y) +
-        Math.abs(_0x878c64.position.z - _0x4c7bef.position.z),
-      _0x27777b = Math.abs(
-        _0x878c64.quaternion.x * _0x4c7bef.quaternion.x +
-          _0x878c64.quaternion.y * _0x4c7bef.quaternion.y +
-          _0x878c64.quaternion.z * _0x4c7bef.quaternion.z +
-          _0x878c64.quaternion.w * _0x4c7bef.quaternion.w,
+function measurePoseDistance(event2, event3) {
+  if (!event2 || !event3 || event2.kind !== event3.kind) return Number.POSITIVE_INFINITY;
+  if (event3.kind === 'camera') {
+    const cameraPoseData = normalizeCameraPoseData(event2),
+      cameraPoseData2 = normalizeCameraPoseData(event3),
+      value110 =
+        Math.abs(cameraPoseData2.position.x - cameraPoseData.position.x) +
+        Math.abs(cameraPoseData2.position.y - cameraPoseData.position.y) +
+        Math.abs(cameraPoseData2.position.z - cameraPoseData.position.z),
+      value111 = Math.abs(
+        cameraPoseData2.quaternion.x * cameraPoseData.quaternion.x +
+          cameraPoseData2.quaternion.y * cameraPoseData.quaternion.y +
+          cameraPoseData2.quaternion.z * cameraPoseData.quaternion.z +
+          cameraPoseData2.quaternion.w * cameraPoseData.quaternion.w,
       ),
-      _0x38539c = 1 - Math.min(1, Math.max(0, _0x27777b));
-    return _0x499ff0 + _0x38539c + Math.abs(_0x878c64.fov - _0x4c7bef.fov);
+      value112 = 1 - Math.min(1, Math.max(0, value111));
+    return value110 + value112 + Math.abs(cameraPoseData2.fov - cameraPoseData.fov);
   }
-  if (_0x16f409.kind === 'panorama-default') {
-    const _0x3690f8 =
-        Math.abs((_0x16f409.position?.x || 0) - (_0x13c5d6.position?.x || 0)) +
-        Math.abs((_0x16f409.position?.y || 0) - (_0x13c5d6.position?.y || 0)) +
-        Math.abs((_0x16f409.position?.z || 0) - (_0x13c5d6.position?.z || 0)),
-      _0x4ca37c =
-        Math.abs((_0x16f409.yaw || 0) - (_0x13c5d6.yaw || 0)) +
-        Math.abs((_0x16f409.pitch || 0) - (_0x13c5d6.pitch || 0));
-    return _0x3690f8 + _0x4ca37c + Math.abs((_0x16f409.fov || 0) - (_0x13c5d6.fov || 0));
+  if (event3.kind === 'panorama-default') {
+    const value113 =
+        Math.abs((event3.position?.x || 0) - (event2.position?.x || 0)) +
+        Math.abs((event3.position?.y || 0) - (event2.position?.y || 0)) +
+        Math.abs((event3.position?.z || 0) - (event2.position?.z || 0)),
+      value114 =
+        Math.abs((event3.yaw || 0) - (event2.yaw || 0)) + Math.abs((event3.pitch || 0) - (event2.pitch || 0));
+    return value113 + value114 + Math.abs((event3.fov || 0) - (event2.fov || 0));
   }
-  const _0x30b0ca =
-      Math.abs((_0x16f409.position?.x || 0) - (_0x13c5d6.position?.x || 0)) +
-      Math.abs((_0x16f409.position?.y || 0) - (_0x13c5d6.position?.y || 0)) +
-      Math.abs((_0x16f409.position?.z || 0) - (_0x13c5d6.position?.z || 0)),
-    _0x2e2749 =
-      Math.abs((_0x16f409.target?.x || 0) - (_0x13c5d6.target?.x || 0)) +
-      Math.abs((_0x16f409.target?.y || 0) - (_0x13c5d6.target?.y || 0)) +
-      Math.abs((_0x16f409.target?.z || 0) - (_0x13c5d6.target?.z || 0));
-  return _0x30b0ca + _0x2e2749 + Math.abs((_0x16f409.fov || 0) - (_0x13c5d6.fov || 0));
+  const value115 =
+      Math.abs((event3.position?.x || 0) - (event2.position?.x || 0)) +
+      Math.abs((event3.position?.y || 0) - (event2.position?.y || 0)) +
+      Math.abs((event3.position?.z || 0) - (event2.position?.z || 0)),
+    value116 =
+      Math.abs((event3.target?.x || 0) - (event2.target?.x || 0)) +
+      Math.abs((event3.target?.y || 0) - (event2.target?.y || 0)) +
+      Math.abs((event3.target?.z || 0) - (event2.target?.z || 0));
+  return value115 + value116 + Math.abs((event3.fov || 0) - (event2.fov || 0));
 }
-function areSceneViewsEquivalent(_0x2f8c70, _0x30b3b6, _0x5f52b7 = 0.00001) {
-  if (!_0x2f8c70 || !_0x30b3b6) return false;
-  const _0x81c256 = _0x2f8c70.target || {},
-    _0xcb9fb2 = _0x30b3b6.target || {};
+function areSceneViewsEquivalent(event4, event5, value117 = 0.00001) {
+  if (!event4 || !event5) return false;
+  const box30 = event4.target || {},
+    box31 = event5.target || {};
   return (
-    Math.abs((Number(_0x81c256.x) || 0) - (Number(_0xcb9fb2.x) || 0)) <= _0x5f52b7 &&
-    Math.abs((Number(_0x81c256.y) || 0) - (Number(_0xcb9fb2.y) || 0)) <= _0x5f52b7 &&
-    Math.abs((Number(_0x81c256.z) || 0) - (Number(_0xcb9fb2.z) || 0)) <= _0x5f52b7 &&
-    Math.abs(normalizeAngle((Number(_0x2f8c70.orbitYaw) || 0) - (Number(_0x30b3b6.orbitYaw) || 0))) <=
-      _0x5f52b7 &&
-    Math.abs((Number(_0x2f8c70.orbitPitch) || 0) - (Number(_0x30b3b6.orbitPitch) || 0)) <= _0x5f52b7 &&
-    Math.abs((Number(_0x2f8c70.orbitDistance) || 0) - (Number(_0x30b3b6.orbitDistance) || 0)) <= _0x5f52b7
+    Math.abs((Number(box30.x) || 0) - (Number(box31.x) || 0)) <= value117 &&
+    Math.abs((Number(box30.y) || 0) - (Number(box31.y) || 0)) <= value117 &&
+    Math.abs((Number(box30.z) || 0) - (Number(box31.z) || 0)) <= value117 &&
+    Math.abs(normalizeAngle((Number(event4.orbitYaw) || 0) - (Number(event5.orbitYaw) || 0))) <= value117 &&
+    Math.abs((Number(event4.orbitPitch) || 0) - (Number(event5.orbitPitch) || 0)) <= value117 &&
+    Math.abs((Number(event4.orbitDistance) || 0) - (Number(event5.orbitDistance) || 0)) <= value117
   );
 }
 export class PanoramaScene3DBridge {
-  constructor({ container: _0x32a8a5, onPanoramaStatusChange: _0x3c5fd9 } = {}) {
-    ((this.container = _0x32a8a5),
-      (this.onPanoramaStatusChange = _0x3c5fd9),
+  constructor({ container: container, onPanoramaStatusChange: onPanoramaStatusChange } = {}) {
+    ((this.container = container),
+      (this.onPanoramaStatusChange = onPanoramaStatusChange),
       (this.scene = new threeRuntime['Scene']()),
       (this.camera = new threeRuntime['PerspectiveCamera'](55, 1, 0.1, 250)),
       (this.camera.rotation.order = 'YXZ'),
@@ -1499,32 +1492,32 @@ export class PanoramaScene3DBridge {
       (this._rimLight = new threeRuntime['DirectionalLight'](0x88b6ff, 0.38)),
       this._rimLight.position.set(-6, 8, -10),
       this.scene.add(this._ambientLight, this._keyLight, this._rimLight));
-    const _0x579f5e = resolveThemeColorValue('--panorama-scene-grid-night', '--indigo-35');
+    const themeColorValue = resolveThemeColorValue('--panorama-scene-grid-night', '--indigo-35');
     ((this._gridMinor = new threeRuntime['GridHelper'](
       GRID_BASE_SPAN,
       Math.round(GRID_BASE_SPAN / GRID_MINOR_STEP),
-      _0x579f5e,
-      _0x579f5e,
+      themeColorValue,
+      themeColorValue,
     )),
-      eachMaterial(this._gridMinor.material, (_0x4b2ca4) => {
-        ((_0x4b2ca4.transparent = true),
-          (_0x4b2ca4.opacity = 0.2),
-          (_0x4b2ca4.depthWrite = false),
-          (_0x4b2ca4.depthTest = true));
+      eachMaterial(this._gridMinor.material, (value118) => {
+        ((value118.transparent = true),
+          (value118.opacity = 0.2),
+          (value118.depthWrite = false),
+          (value118.depthTest = true));
       }),
       (this._gridMinor.renderOrder = 1),
       this.scene.add(this._gridMinor),
       (this._gridMajor = new threeRuntime.GridHelper(
         GRID_BASE_SPAN,
         Math.round(GRID_BASE_SPAN / GRID_MAJOR_STEP),
-        _0x579f5e,
-        _0x579f5e,
+        themeColorValue,
+        themeColorValue,
       )),
-      eachMaterial(this._gridMajor.material, (_0x5d1dc7) => {
-        ((_0x5d1dc7.transparent = true),
-          (_0x5d1dc7.opacity = 0.34),
-          (_0x5d1dc7.depthWrite = false),
-          (_0x5d1dc7.depthTest = true));
+      eachMaterial(this._gridMajor.material, (value119) => {
+        ((value119.transparent = true),
+          (value119.opacity = 0.34),
+          (value119.depthWrite = false),
+          (value119.depthTest = true));
       }),
       (this._gridMajor.renderOrder = 2),
       this.scene.add(this._gridMajor),
@@ -1598,26 +1591,26 @@ export class PanoramaScene3DBridge {
       this.resize(0x280, 0x168),
       this.requestRender());
   }
-  ['resize'](_0x5ba652, _0x5b4da5) {
-    const _0x47167a = Math.max(1, Math.floor(_0x5ba652 || this.container?.clientWidth || 1)),
-      _0x50c8c7 = Math.max(1, Math.floor(_0x5b4da5 || this.container?.clientHeight || 1));
+  ['resize'](value120, value121) {
+    const value122 = Math.max(1, Math.floor(value120 || this.container?.clientWidth || 1)),
+      value123 = Math.max(1, Math.floor(value121 || this.container?.clientHeight || 1));
     (this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)),
-      (this.camera.aspect = _0x47167a / _0x50c8c7),
+      (this.camera.aspect = value122 / value123),
       this.camera.updateProjectionMatrix(),
-      this.renderer.setSize(_0x47167a, _0x50c8c7, false),
+      this.renderer.setSize(value122, value123, false),
       this.requestRender());
   }
-  ['_isPanorama360Mode'](_0x21502a = this._sceneState) {
-    return _0x21502a?.type === 'panorama-360';
+  ['_isPanorama360Mode'](value124 = this._sceneState) {
+    return value124?.type === 'panorama-360';
   }
-  ['setDraftView'](_0x4e21f2) {
-    ((this._draftView = _0x4e21f2 || null), this.requestRender());
+  ['setDraftView'](value125) {
+    ((this._draftView = value125 || null), this.requestRender());
   }
-  ['setDefaultSceneFocalLength'](_0x1118ea) {
-    const _0xf920ee = PANORAMA_SCENE_CAMERA_CONSTRAINTS.scene.focalLength;
+  ['setDefaultSceneFocalLength'](value126) {
+    const value127 = PANORAMA_SCENE_CAMERA_CONSTRAINTS.scene.focalLength;
     ((this._defaultSceneFocalLength = Math.max(
-      _0xf920ee.min,
-      Math.min(_0xf920ee.max, Number(_0x1118ea) || _0xf920ee.default),
+      value127.min,
+      Math.min(value127.max, Number(value126) || value127.default),
     )),
       this.requestRender());
   }
@@ -1627,27 +1620,27 @@ export class PanoramaScene3DBridge {
   ['clearDraftView']() {
     ((this._draftView = null), this.requestRender());
   }
-  ['setDraftObjectTransform'](_0x2d74b4, _0x153770, _0x50969f) {
-    const _0x160dac = _0x2d74b4 + ':' + _0x153770;
-    (this._draftObjects.set(_0x160dac, {
-      position: { ..._0x50969f.position },
-      rotation: { ..._0x50969f.rotation },
-      quaternion: hasFiniteQuaternion(_0x50969f?.quaternion)
-        ? normalizeQuaternionData(_0x50969f.quaternion, { x: 0, y: 0, z: 0, w: 1 })
+  ['setDraftObjectTransform'](value128, value129, box32) {
+    const value130 = value128 + ':' + value129;
+    (this._draftObjects.set(value130, {
+      position: { ...box32.position },
+      rotation: { ...box32.rotation },
+      quaternion: hasFiniteQuaternion(box32?.quaternion)
+        ? normalizeQuaternionData(box32.quaternion, { x: 0, y: 0, z: 0, w: 1 })
         : undefined,
       scale:
-        Number.isFinite(_0x50969f?.scale) ||
-        (_0x50969f?.scale &&
-          Number.isFinite(_0x50969f.scale.x) &&
-          Number.isFinite(_0x50969f.scale.y) &&
-          Number.isFinite(_0x50969f.scale.z))
-          ? _0x50969f.scale
+        Number.isFinite(box32?.scale) ||
+        (box32?.scale &&
+          Number.isFinite(box32.scale.x) &&
+          Number.isFinite(box32.scale.y) &&
+          Number.isFinite(box32.scale.z))
+          ? box32.scale
           : undefined,
     }),
       this.requestRender());
   }
-  ['clearDraftObjectTransform'](_0xfd1e31, _0x50cf1d) {
-    (this._draftObjects.delete(_0xfd1e31 + ':' + _0x50cf1d), this.requestRender());
+  ['clearDraftObjectTransform'](value131, value132) {
+    (this._draftObjects.delete(value131 + ':' + value132), this.requestRender());
   }
   ['clearAllDrafts']() {
     ((this._draftView = null),
@@ -1655,13 +1648,13 @@ export class PanoramaScene3DBridge {
       this.clearGizmoMoveGuideLine(),
       this.requestRender());
   }
-  ['markViewSmoothingWindow'](_0x2cce7f = VIEW_DAMPING_WINDOW_MS) {
-    const _0x2aa3a1 = Math.max(0, Number(_0x2cce7f) || VIEW_DAMPING_WINDOW_MS),
-      _0x4c51ae = performance.now();
-    this._viewSmoothingUntil = Math.max(this._viewSmoothingUntil || 0, _0x4c51ae + _0x2aa3a1);
+  ['markViewSmoothingWindow'](value133 = VIEW_DAMPING_WINDOW_MS) {
+    const value134 = Math.max(0, Number(value133) || VIEW_DAMPING_WINDOW_MS),
+      value135 = performance.now();
+    this._viewSmoothingUntil = Math.max(this._viewSmoothingUntil || 0, value135 + value134);
   }
   ['readCurrentViewPose']() {
-    const _0x3b05df = new threeRuntime.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
+    const x5 = new threeRuntime.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
     return {
       position: { x: this.camera.position.x, y: this.camera.position.y, z: this.camera.position.z },
       rotation: { x: this.camera.rotation.x, y: this.camera.rotation.y, z: this.camera.rotation.z },
@@ -1671,489 +1664,484 @@ export class PanoramaScene3DBridge {
         z: this.camera.quaternion.z,
         w: this.camera.quaternion.w,
       },
-      forward: { x: _0x3b05df.x, y: _0x3b05df.y, z: _0x3b05df.z },
-      yaw: Math.atan2(_0x3b05df.x, _0x3b05df.z),
-      pitch: Math.asin(Math.max(-1, Math.min(1, _0x3b05df.y))),
+      forward: { x: x5.x, y: x5.y, z: x5.z },
+      yaw: Math.atan2(x5.x, x5.z),
+      pitch: Math.asin(Math.max(-1, Math.min(1, x5.y))),
       fov: this.camera.fov,
       focalLength: fovToFocalLength(this.camera.fov),
     };
   }
-  ['_resolvePointerRay'](_0x2dc500, _0x1ca0c1) {
-    const _0x2bcdcc = this.renderer.domElement.getBoundingClientRect(),
-      _0x54a691 = new threeRuntime['Vector2'](
-        ((_0x2dc500 - _0x2bcdcc.left) / _0x2bcdcc.width) * 2 - 1,
-        -(((_0x1ca0c1 - _0x2bcdcc.top) / _0x2bcdcc.height) * 2 - 1),
+  ['_resolvePointerRay'](value136, value137) {
+    const box33 = this.renderer.domElement.getBoundingClientRect(),
+      value138 = new threeRuntime['Vector2'](
+        ((value136 - box33.left) / box33.width) * 2 - 1,
+        -(((value137 - box33.top) / box33.height) * 2 - 1),
       ),
-      _0x455817 = new threeRuntime['Raycaster']();
-    return (_0x455817.setFromCamera(_0x54a691, this.camera), _0x455817);
+      value139 = new threeRuntime['Raycaster']();
+    return (value139.setFromCamera(value138, this.camera), value139);
   }
-  ['setGizmoHoverHandle'](_0x1a7a5a) {
-    const _0x21f523 = _0x1a7a5a || null;
-    if ((this._gizmo?.hoverHandle || null) === _0x21f523) return;
-    ((this._gizmo.hoverHandle = _0x21f523), this._applyGizmoHighlight(), this.requestRender());
+  ['setGizmoHoverHandle'](value140) {
+    const value141 = value140 || null;
+    if ((this._gizmo?.hoverHandle || null) === value141) return;
+    ((this._gizmo.hoverHandle = value141), this._applyGizmoHighlight(), this.requestRender());
   }
-  ['setGizmoActiveHandle'](_0x54bb24) {
-    const _0x4b322c = _0x54bb24 || null,
-      _0x52a4f6 = _0x4b322c === null && this._gizmo?.dragLock;
-    if ((this._gizmo?.activeHandle || null) === _0x4b322c && !_0x52a4f6) return;
-    ((this._gizmo.activeHandle = _0x4b322c),
-      _0x4b322c === null && (this._gizmo.dragLock = null),
+  ['setGizmoActiveHandle'](value142) {
+    const value143 = value142 || null,
+      enabled20 = value143 === null && this._gizmo?.dragLock;
+    if ((this._gizmo?.activeHandle || null) === value143 && !enabled20) return;
+    ((this._gizmo.activeHandle = value143),
+      value143 === null && (this._gizmo.dragLock = null),
       this._applyGizmoHighlight(),
       this.requestRender());
   }
   ['clearGizmoHandleState']() {
     if (!this._gizmo) return;
-    const _0x568eab = this._gizmo.hoverHandle || this._gizmo.activeHandle || this._gizmo.dragLock;
+    const value144 = this._gizmo.hoverHandle || this._gizmo.activeHandle || this._gizmo.dragLock;
     ((this._gizmo.hoverHandle = null),
       (this._gizmo.activeHandle = null),
       (this._gizmo.dragLock = null),
-      _0x568eab && (this._applyGizmoHighlight(), this.requestRender()));
+      value144 && (this._applyGizmoHighlight(), this.requestRender()));
   }
-  ['setGizmoMoveGuideLine']({ from: _0x59c1bb, to: _0x5db483 } = {}) {
-    const _0x148241 = this._gizmoMoveGuideLine;
-    if (!_0x148241) return;
-    const _0x26460f = toVector3Like(_0x59c1bb, { x: 0, y: 0, z: 0 }),
-      _0x4756ce = toVector3Like(_0x5db483, _0x26460f);
-    (setLineGeometryPoints(_0x148241, _0x26460f, _0x4756ce),
-      (_0x148241.visible = true),
+  ['setGizmoMoveGuideLine']({ from: from2, to: to } = {}) {
+    const enabled21 = this._gizmoMoveGuideLine;
+    if (!enabled21) return;
+    const toVector3Like4 = toVector3Like(from2, { x: 0, y: 0, z: 0 }),
+      toVector3Like5 = toVector3Like(to, toVector3Like4);
+    (setLineGeometryPoints(enabled21, toVector3Like4, toVector3Like5),
+      (enabled21.visible = true),
       this.requestRender());
   }
   ['clearGizmoMoveGuideLine']() {
-    const _0x585569 = this._gizmoMoveGuideLine;
-    if (!_0x585569?.visible) return;
-    ((_0x585569.visible = false), this.requestRender());
+    const enabled22 = this._gizmoMoveGuideLine;
+    if (!enabled22?.visible) return;
+    ((enabled22.visible = false), this.requestRender());
   }
   ['_clearStableGizmoContext']() {
     ((this._lastStableGizmoSelectionSignature = ''), (this._lastStableGizmoContext = null));
   }
-  ['_cacheStableGizmoContext'](_0x282602, _0x241e35) {
-    const _0x34ebe4 = buildTransformSelectionSignature(_0x282602);
-    if (!_0x34ebe4 || !_0x241e35) return;
-    ((this._lastStableGizmoSelectionSignature = _0x34ebe4),
-      (this._lastStableGizmoContext = cloneGizmoDisplayContext(_0x241e35)));
+  ['_cacheStableGizmoContext'](value145, enabled23) {
+    const transformSelectionSignature = buildTransformSelectionSignature(value145);
+    if (!transformSelectionSignature || !enabled23) return;
+    ((this._lastStableGizmoSelectionSignature = transformSelectionSignature),
+      (this._lastStableGizmoContext = cloneGizmoDisplayContext(enabled23)));
   }
-  ['_resolveStableGizmoContext'](_0x4572d8) {
-    const _0x1cf1b6 = buildTransformSelectionSignature(_0x4572d8);
-    if (!_0x1cf1b6) return null;
-    if (_0x1cf1b6 !== this._lastStableGizmoSelectionSignature) return null;
+  ['_resolveStableGizmoContext'](value146) {
+    const transformSelectionSignature2 = buildTransformSelectionSignature(value146);
+    if (!transformSelectionSignature2) return null;
+    if (transformSelectionSignature2 !== this._lastStableGizmoSelectionSignature) return null;
     return this._lastStableGizmoContext || null;
   }
-  ['pickGizmoHandle'](_0x47805c, _0x3501fb) {
+  ['pickGizmoHandle'](value147, value148) {
     if (this._isPanorama360Mode()) return null;
     if (!this._gizmo?.root?.visible) return null;
-    const _0x3f697b =
+    const enabled24 =
       this._gizmo?.moveGroup?.visible ||
       this._gizmo?.rotateGroup?.visible ||
       this._gizmo?.scaleGroup?.visible;
-    if (!_0x3f697b) return null;
-    const _0x3b4279 = Array.isArray(this._gizmo.pickMeshes) ? this._gizmo.pickMeshes : [];
-    if (_0x3b4279.length === 0) return null;
-    const _0xba1d10 = this._resolvePointerRay(_0x47805c, _0x3501fb),
-      _0x11bd81 = _0xba1d10.intersectObjects(_0x3b4279, true);
-    for (const _0x5c8308 of _0x11bd81) {
-      let _0x1ce0c2 = _0x5c8308.object;
-      while (_0x1ce0c2) {
-        const _0x6a0db0 = _0x1ce0c2.userData?.gizmoHandleKey;
-        if (_0x6a0db0) {
-          const _0x4903e6 = this._gizmo.handles?.get?.(_0x6a0db0) || null;
-          if (!_0x4903e6) return null;
-          const _0x566314 = this._gizmo?.currentTool || 'move',
-            _0x31feec = _0x4903e6.mode === 'scale-axis' || _0x4903e6.mode === 'scale-uniform',
-            _0x48a284 =
-              (_0x566314 === 'move' && (_0x4903e6.mode === 'axis' || _0x4903e6.mode === 'plane')) ||
-              (_0x566314 === 'rotate' && _0x4903e6.mode === 'rotate') ||
-              (_0x566314 === 'scale' && _0x31feec);
-          if (!_0x48a284) {
-            _0x1ce0c2 = _0x1ce0c2.parent;
+    if (!enabled24) return null;
+    const list12 = Array.isArray(this._gizmo.pickMeshes) ? this._gizmo.pickMeshes : [];
+    if (list12.length === 0) return null;
+    const value149 = this._resolvePointerRay(value147, value148),
+      value150 = value149.intersectObjects(list12, true);
+    for (const x6 of value150) {
+      let value151 = x6.object;
+      while (value151) {
+        const handleKey = value151.userData?.gizmoHandleKey;
+        if (handleKey) {
+          const mode2 = this._gizmo.handles?.get?.(handleKey) || null;
+          if (!mode2) return null;
+          const value152 = this._gizmo?.currentTool || 'move',
+            value153 = mode2.mode === 'scale-axis' || mode2.mode === 'scale-uniform',
+            enabled25 =
+              (value152 === 'move' && (mode2.mode === 'axis' || mode2.mode === 'plane')) ||
+              (value152 === 'rotate' && mode2.mode === 'rotate') ||
+              (value152 === 'scale' && value153);
+          if (!enabled25) {
+            value151 = value151.parent;
             continue;
           }
           return {
             kind: 'gizmo-handle',
-            handleKey: _0x6a0db0,
-            mode: _0x4903e6.mode,
-            axis: _0x4903e6.axis || null,
-            normalAxis: _0x4903e6.normalAxis || null,
-            point: { x: _0x5c8308.point.x, y: _0x5c8308.point.y, z: _0x5c8308.point.z },
+            handleKey: handleKey,
+            mode: mode2.mode,
+            axis: mode2.axis || null,
+            normalAxis: mode2.normalAxis || null,
+            point: { x: x6.point.x, y: x6.point.y, z: x6.point.z },
           };
         }
-        _0x1ce0c2 = _0x1ce0c2.parent;
+        value151 = value151.parent;
       }
     }
     return null;
   }
-  ['beginMoveGizmoDrag']({ handleKey: _0x474c23, clientX: _0x2b30d2, clientY: _0x44de4f } = {}) {
-    if (!_0x474c23) return null;
-    const _0x4fdf52 = this._gizmo?.handles?.get?.(_0x474c23);
-    if (!_0x4fdf52) return null;
-    const _0x48b12a = this._gizmo.root.position.clone(),
-      _0x4deece = this._gizmo.root.quaternion.clone(),
-      _0x3442d2 = _0x4fdf52.mode === 'axis' ? _0x4fdf52.axis : _0x4fdf52.normalAxis;
-    if (!_0x3442d2) return null;
-    const _0x4903b2 = vectorFromAxisName(_0x3442d2).applyQuaternion(_0x4deece).normalize();
-    let _0x419998 = _0x4903b2.clone();
-    if (_0x4fdf52.mode === 'axis') {
-      const _0x438a03 = this.camera.getWorldDirection(new threeRuntime.Vector3()).normalize(),
-        _0x596990 = new threeRuntime['Vector3']().crossVectors(_0x438a03, _0x4903b2);
-      (_0x596990.lengthSq() < 0.00001 &&
-        (_0x596990.copy(new threeRuntime['Vector3'](0, 1, 0).cross(_0x4903b2)),
-        _0x596990.lengthSq() < 0.00001 &&
-          _0x596990.copy(new threeRuntime['Vector3'](1, 0, 0).cross(_0x4903b2))),
-        (_0x419998 = new threeRuntime['Vector3']().crossVectors(_0x4903b2, _0x596990).normalize()));
+  ['beginMoveGizmoDrag']({ handleKey: handleKey2, clientX: clientX, clientY: clientY } = {}) {
+    if (!handleKey2) return null;
+    const mode3 = this._gizmo?.handles?.get?.(handleKey2);
+    if (!mode3) return null;
+    const pivot = this._gizmo.root.position.clone(),
+      gizmoQuaternion = this._gizmo.root.quaternion.clone(),
+      enabled26 = mode3.mode === 'axis' ? mode3.axis : mode3.normalAxis;
+    if (!enabled26) return null;
+    const vectorFromAxisName3 = vectorFromAxisName(enabled26).applyQuaternion(gizmoQuaternion).normalize();
+    let planeNormalWorld = vectorFromAxisName3.clone();
+    if (mode3.mode === 'axis') {
+      const value154 = this.camera.getWorldDirection(new threeRuntime.Vector3()).normalize(),
+        value155 = new threeRuntime['Vector3']().crossVectors(value154, vectorFromAxisName3);
+      (value155.lengthSq() < 0.00001 &&
+        (value155.copy(new threeRuntime['Vector3'](0, 1, 0).cross(vectorFromAxisName3)),
+        value155.lengthSq() < 0.00001 &&
+          value155.copy(new threeRuntime['Vector3'](1, 0, 0).cross(vectorFromAxisName3))),
+        (planeNormalWorld = new threeRuntime['Vector3']()
+          .crossVectors(vectorFromAxisName3, value155)
+          .normalize()));
     }
-    _0x419998.lengthSq() < 0.000001 && (_0x419998 = new threeRuntime['Vector3'](0, 1, 0));
-    const _0x1270ed = new threeRuntime['Plane']().setFromNormalAndCoplanarPoint(_0x419998, _0x48b12a),
-      _0x33b15a = this._resolvePointerRay(_0x2b30d2, _0x44de4f),
-      _0x36ce58 = new threeRuntime.Vector3(),
-      _0x3e1d1c = _0x33b15a.ray.intersectPlane(_0x1270ed, _0x36ce58),
-      _0x10fbd0 = _0x3e1d1c ? _0x36ce58.clone() : _0x48b12a.clone();
+    planeNormalWorld.lengthSq() < 0.000001 && (planeNormalWorld = new threeRuntime['Vector3'](0, 1, 0));
+    const dragPlane = new threeRuntime['Plane']().setFromNormalAndCoplanarPoint(planeNormalWorld, pivot),
+      value156 = this._resolvePointerRay(clientX, clientY),
+      value157 = new threeRuntime.Vector3(),
+      value158 = value156.ray.intersectPlane(dragPlane, value157),
+      startPoint = value158 ? value157.clone() : pivot.clone();
     return {
-      handleKey: _0x474c23,
-      mode: _0x4fdf52.mode,
-      axisWorld: _0x4fdf52.mode === 'axis' ? _0x4903b2.clone() : null,
-      axis: _0x4fdf52.mode === 'axis' ? _0x4903b2.clone() : null,
-      planeNormalWorld: _0x419998.clone(),
-      planeNormal: _0x419998.clone(),
-      pivot: _0x48b12a.clone(),
-      gizmoQuaternion: _0x4deece.clone(),
-      startPoint: _0x10fbd0.clone(),
-      dragPlane: _0x1270ed,
+      handleKey: handleKey2,
+      mode: mode3.mode,
+      axisWorld: mode3.mode === 'axis' ? vectorFromAxisName3.clone() : null,
+      axis: mode3.mode === 'axis' ? vectorFromAxisName3.clone() : null,
+      planeNormalWorld: planeNormalWorld.clone(),
+      planeNormal: planeNormalWorld.clone(),
+      pivot: pivot.clone(),
+      gizmoQuaternion: gizmoQuaternion.clone(),
+      startPoint: startPoint.clone(),
+      dragPlane: dragPlane,
     };
   }
-  ['beginRotateGizmoDrag']({ handleKey: _0x1c954b, clientX: _0x33fe64, clientY: _0x24fb8f } = {}) {
-    if (!_0x1c954b) return null;
-    const _0x4d9baf = this._gizmo?.handles?.get?.(_0x1c954b);
-    if (!_0x4d9baf || _0x4d9baf.mode !== 'rotate') return null;
-    const _0x2fb0ef = this._resolveGizmoContext(this._sceneState);
-    if (!_0x2fb0ef) return null;
-    const _0x329c21 = this._gizmo.root.position.clone(),
-      _0x40ab72 = this._gizmo.root.quaternion.clone(),
-      _0x30a608 = vectorFromAxisName(_0x4d9baf.axis).applyQuaternion(_0x40ab72).normalize(),
-      _0x2d7331 = new threeRuntime['Plane']().setFromNormalAndCoplanarPoint(_0x30a608, _0x329c21),
-      _0x536a27 = this._resolvePointerRay(_0x33fe64, _0x24fb8f),
-      _0x32716f = new threeRuntime['Vector3'](),
-      _0x15efdc = _0x536a27.ray.intersectPlane(_0x2d7331, _0x32716f);
-    if (!_0x15efdc) return null;
+  ['beginRotateGizmoDrag']({ handleKey: handleKey3, clientX: clientX2, clientY: clientY2 } = {}) {
+    if (!handleKey3) return null;
+    const enabled27 = this._gizmo?.handles?.get?.(handleKey3);
+    if (!enabled27 || enabled27.mode !== 'rotate') return null;
+    const enabled28 = this._resolveGizmoContext(this._sceneState);
+    if (!enabled28) return null;
+    const pivot2 = this._gizmo.root.position.clone(),
+      gizmoQuaternion2 = this._gizmo.root.quaternion.clone(),
+      axisWorld = vectorFromAxisName(enabled27.axis).applyQuaternion(gizmoQuaternion2).normalize(),
+      dragPlane2 = new threeRuntime['Plane']().setFromNormalAndCoplanarPoint(axisWorld, pivot2),
+      value159 = this._resolvePointerRay(clientX2, clientY2),
+      startPoint2 = new threeRuntime['Vector3'](),
+      enabled29 = value159.ray.intersectPlane(dragPlane2, startPoint2);
+    if (!enabled29) return null;
     return (
-      this._captureGizmoDragLock(_0x2fb0ef),
+      this._captureGizmoDragLock(enabled28),
       {
-        handleKey: _0x1c954b,
+        handleKey: handleKey3,
         mode: 'rotate',
-        axisWorld: _0x30a608.clone(),
-        axis: _0x30a608.clone(),
-        pivot: _0x329c21.clone(),
-        gizmoQuaternion: _0x40ab72.clone(),
-        dragPlane: _0x2d7331,
-        startPoint: _0x32716f.clone(),
+        axisWorld: axisWorld.clone(),
+        axis: axisWorld.clone(),
+        pivot: pivot2.clone(),
+        gizmoQuaternion: gizmoQuaternion2.clone(),
+        dragPlane: dragPlane2,
+        startPoint: startPoint2.clone(),
       }
     );
   }
-  ['computeRotateGizmoAngle'](_0x12f238, _0x2446d9) {
-    if (!_0x12f238?.startPoint || !_0x2446d9) return 0;
+  ['computeRotateGizmoAngle'](x7, currentPoint) {
+    if (!x7?.startPoint || !currentPoint) return 0;
     return computeSignedRotationDelta({
-      startPoint: { x: _0x12f238.startPoint.x, y: _0x12f238.startPoint.y, z: _0x12f238.startPoint.z },
-      currentPoint: _0x2446d9,
-      pivot: { x: _0x12f238.pivot.x, y: _0x12f238.pivot.y, z: _0x12f238.pivot.z },
+      startPoint: { x: x7.startPoint.x, y: x7.startPoint.y, z: x7.startPoint.z },
+      currentPoint: currentPoint,
+      pivot: { x: x7.pivot.x, y: x7.pivot.y, z: x7.pivot.z },
       axis: {
-        x: _0x12f238.axisWorld?.x ?? _0x12f238.axis?.x,
-        y: _0x12f238.axisWorld?.y ?? _0x12f238.axis?.y,
-        z: _0x12f238.axisWorld?.z ?? _0x12f238.axis?.z,
+        x: x7.axisWorld?.x ?? x7.axis?.x,
+        y: x7.axisWorld?.y ?? x7.axis?.y,
+        z: x7.axisWorld?.z ?? x7.axis?.z,
       },
     });
   }
-  ['beginScaleGizmoDrag']({ handleKey: _0x4239a5, clientX: _0x54605d, clientY: _0x26c97a } = {}) {
-    if (!_0x4239a5) return null;
-    const _0xb68675 = this._gizmo?.handles?.get?.(_0x4239a5);
-    if (!_0xb68675 || (_0xb68675.mode !== 'scale-axis' && _0xb68675.mode !== 'scale-uniform')) return null;
-    const _0x595ebb = this._resolveGizmoContext(this._sceneState);
-    if (!_0x595ebb) return null;
-    const _0x5a3a2d = this._gizmo.root.position.clone(),
-      _0x412a7c = this._gizmo.root.quaternion.clone(),
-      _0x3cfc62 = this._resolvePointerRay(_0x54605d, _0x26c97a);
-    if (_0xb68675.mode === 'scale-uniform') {
-      const _0x34fa00 = this.camera.getWorldDirection(new threeRuntime.Vector3()).normalize(),
-        _0x1bb730 = new threeRuntime['Plane']().setFromNormalAndCoplanarPoint(_0x34fa00, _0x5a3a2d),
-        _0x3c8715 = new threeRuntime['Vector3'](),
-        _0x28c7c5 = _0x3cfc62.ray.intersectPlane(_0x1bb730, _0x3c8715);
-      if (!_0x28c7c5) return null;
+  ['beginScaleGizmoDrag']({ handleKey: handleKey4, clientX: clientX3, clientY: clientY3 } = {}) {
+    if (!handleKey4) return null;
+    const enabled30 = this._gizmo?.handles?.get?.(handleKey4);
+    if (!enabled30 || (enabled30.mode !== 'scale-axis' && enabled30.mode !== 'scale-uniform')) return null;
+    const enabled31 = this._resolveGizmoContext(this._sceneState);
+    if (!enabled31) return null;
+    const pivot3 = this._gizmo.root.position.clone(),
+      gizmoQuaternion3 = this._gizmo.root.quaternion.clone(),
+      value160 = this._resolvePointerRay(clientX3, clientY3);
+    if (enabled30.mode === 'scale-uniform') {
+      const value161 = this.camera.getWorldDirection(new threeRuntime.Vector3()).normalize(),
+        dragPlane3 = new threeRuntime['Plane']().setFromNormalAndCoplanarPoint(value161, pivot3),
+        startPoint3 = new threeRuntime['Vector3'](),
+        enabled32 = value160.ray.intersectPlane(dragPlane3, startPoint3);
+      if (!enabled32) return null;
       return (
-        this._captureGizmoDragLock(_0x595ebb),
+        this._captureGizmoDragLock(enabled31),
         {
-          handleKey: _0x4239a5,
+          handleKey: handleKey4,
           mode: 'scale-uniform',
-          pivot: _0x5a3a2d.clone(),
+          pivot: pivot3.clone(),
           axisWorld: null,
-          gizmoQuaternion: _0x412a7c.clone(),
-          dragPlane: _0x1bb730,
-          startPoint: _0x3c8715.clone(),
-          referenceDistance: Math.max(0.25, _0x3c8715.distanceTo(_0x5a3a2d)),
+          gizmoQuaternion: gizmoQuaternion3.clone(),
+          dragPlane: dragPlane3,
+          startPoint: startPoint3.clone(),
+          referenceDistance: Math.max(0.25, startPoint3.distanceTo(pivot3)),
         }
       );
     }
-    const _0x28977e = vectorFromAxisName(_0xb68675.axis).applyQuaternion(_0x412a7c).normalize(),
-      _0x47b74a = this.camera.getWorldDirection(new threeRuntime['Vector3']()).normalize();
-    let _0x5644a4 = new threeRuntime['Vector3']().crossVectors(_0x47b74a, _0x28977e);
-    _0x5644a4.lengthSq() < 0.00001 &&
-      ((_0x5644a4 = new threeRuntime.Vector3(0, 1, 0).cross(_0x28977e)),
-      _0x5644a4.lengthSq() < 0.00001 && (_0x5644a4 = new threeRuntime.Vector3(1, 0, 0).cross(_0x28977e)));
-    const _0x43a7c2 = new threeRuntime.Vector3().crossVectors(_0x28977e, _0x5644a4).normalize(),
-      _0x2f104e = new threeRuntime['Plane']().setFromNormalAndCoplanarPoint(_0x43a7c2, _0x5a3a2d),
-      _0x521c47 = new threeRuntime['Vector3'](),
-      _0x8e2794 = _0x3cfc62.ray.intersectPlane(_0x2f104e, _0x521c47);
-    if (!_0x8e2794) return null;
-    this._captureGizmoDragLock(_0x595ebb);
-    const _0x26fb4d = Math.max(
+    const axisWorld2 = vectorFromAxisName(enabled30.axis).applyQuaternion(gizmoQuaternion3).normalize(),
+      value162 = this.camera.getWorldDirection(new threeRuntime['Vector3']()).normalize();
+    let value163 = new threeRuntime['Vector3']().crossVectors(value162, axisWorld2);
+    value163.lengthSq() < 0.00001 &&
+      ((value163 = new threeRuntime.Vector3(0, 1, 0).cross(axisWorld2)),
+      value163.lengthSq() < 0.00001 && (value163 = new threeRuntime.Vector3(1, 0, 0).cross(axisWorld2)));
+    const planeNormalWorld2 = new threeRuntime.Vector3().crossVectors(axisWorld2, value163).normalize(),
+      dragPlane4 = new threeRuntime['Plane']().setFromNormalAndCoplanarPoint(planeNormalWorld2, pivot3),
+      startPoint4 = new threeRuntime['Vector3'](),
+      enabled33 = value160.ray.intersectPlane(dragPlane4, startPoint4);
+    if (!enabled33) return null;
+    this._captureGizmoDragLock(enabled31);
+    const worldDistance = Math.max(
         0.35,
-        Math.abs(_0x521c47.clone().sub(_0x5a3a2d).dot(_0x28977e)),
+        Math.abs(startPoint4.clone().sub(pivot3).dot(axisWorld2)),
         (Number(this._gizmo?.root?.scale?.x) || 1) * 0.9,
       ),
-      _0x33644f = resolveAxisScreenDragMetric({
-        pivot: _0x5a3a2d,
-        axisWorld: _0x28977e,
+      axisScreenDirection = resolveAxisScreenDragMetric({
+        pivot: pivot3,
+        axisWorld: axisWorld2,
         camera: this.camera,
         domElement: this.renderer?.domElement,
-        worldDistance: _0x26fb4d,
+        worldDistance: worldDistance,
       });
     return {
-      handleKey: _0x4239a5,
+      handleKey: handleKey4,
       mode: 'scale-axis',
-      axisWorld: _0x28977e.clone(),
-      dragDirectionWorld: _0x28977e.clone(),
-      axis: _0x28977e.clone(),
-      pivot: _0x5a3a2d.clone(),
-      planeNormalWorld: _0x43a7c2.clone(),
-      gizmoQuaternion: _0x412a7c.clone(),
-      dragPlane: _0x2f104e,
-      startPoint: _0x521c47.clone(),
-      startClientX: Number(_0x54605d) || 0,
-      startClientY: Number(_0x26c97a) || 0,
-      axisScreenDirection: _0x33644f?.axisScreenDirection || null,
-      screenReferencePixels: _0x33644f?.screenReferencePixels || null,
-      referenceDistance: _0x26fb4d,
+      axisWorld: axisWorld2.clone(),
+      dragDirectionWorld: axisWorld2.clone(),
+      axis: axisWorld2.clone(),
+      pivot: pivot3.clone(),
+      planeNormalWorld: planeNormalWorld2.clone(),
+      gizmoQuaternion: gizmoQuaternion3.clone(),
+      dragPlane: dragPlane4,
+      startPoint: startPoint4.clone(),
+      startClientX: Number(clientX3) || 0,
+      startClientY: Number(clientY3) || 0,
+      axisScreenDirection: axisScreenDirection?.axisScreenDirection || null,
+      screenReferencePixels: axisScreenDirection?.screenReferencePixels || null,
+      referenceDistance: worldDistance,
     };
   }
-  ['computeScaleGizmoFactor'](_0x357dbd, _0x5479dc) {
-    if (!_0x357dbd?.startPoint || !_0x5479dc) return 1;
-    if (_0x357dbd.mode === 'scale-axis') {
+  ['computeScaleGizmoFactor'](startX, currentX) {
+    if (!startX?.startPoint || !currentX) return 1;
+    if (startX.mode === 'scale-axis') {
       if (
-        _0x357dbd.axisScreenDirection &&
-        Number.isFinite(Number(_0x5479dc.clientX)) &&
-        Number.isFinite(Number(_0x5479dc.clientY))
+        startX.axisScreenDirection &&
+        Number.isFinite(Number(currentX.clientX)) &&
+        Number.isFinite(Number(currentX.clientY))
       )
         return computeAxisScaleFactorFromScreenDelta({
-          startX: _0x357dbd.startClientX,
-          startY: _0x357dbd.startClientY,
-          currentX: _0x5479dc.clientX,
-          currentY: _0x5479dc.clientY,
-          axisDirection: _0x357dbd.axisScreenDirection,
-          referencePixels: _0x357dbd.screenReferencePixels,
+          startX: startX.startClientX,
+          startY: startX.startClientY,
+          currentX: currentX.clientX,
+          currentY: currentX.clientY,
+          axisDirection: startX.axisScreenDirection,
+          referencePixels: startX.screenReferencePixels,
         });
       return computeAxisScaleFactor({
-        startPoint: { x: _0x357dbd.startPoint.x, y: _0x357dbd.startPoint.y, z: _0x357dbd.startPoint.z },
-        currentPoint: _0x5479dc,
-        pivot: { x: _0x357dbd.pivot.x, y: _0x357dbd.pivot.y, z: _0x357dbd.pivot.z },
+        startPoint: { x: startX.startPoint.x, y: startX.startPoint.y, z: startX.startPoint.z },
+        currentPoint: currentX,
+        pivot: { x: startX.pivot.x, y: startX.pivot.y, z: startX.pivot.z },
         axis: {
-          x: _0x357dbd.axisWorld?.x ?? _0x357dbd.axis?.x,
-          y: _0x357dbd.axisWorld?.y ?? _0x357dbd.axis?.y,
-          z: _0x357dbd.axisWorld?.z ?? _0x357dbd.axis?.z,
+          x: startX.axisWorld?.x ?? startX.axis?.x,
+          y: startX.axisWorld?.y ?? startX.axis?.y,
+          z: startX.axisWorld?.z ?? startX.axis?.z,
         },
         dragDirection: {
-          x: _0x357dbd.dragDirectionWorld?.x ?? _0x357dbd.axisWorld?.x ?? _0x357dbd.axis?.x,
-          y: _0x357dbd.dragDirectionWorld?.y ?? _0x357dbd.axisWorld?.y ?? _0x357dbd.axis?.y,
-          z: _0x357dbd.dragDirectionWorld?.z ?? _0x357dbd.axisWorld?.z ?? _0x357dbd.axis?.z,
+          x: startX.dragDirectionWorld?.x ?? startX.axisWorld?.x ?? startX.axis?.x,
+          y: startX.dragDirectionWorld?.y ?? startX.axisWorld?.y ?? startX.axis?.y,
+          z: startX.dragDirectionWorld?.z ?? startX.axisWorld?.z ?? startX.axis?.z,
         },
-        referenceDistance: _0x357dbd.referenceDistance,
+        referenceDistance: startX.referenceDistance,
       });
     }
     return computeUniformScaleFactor({
-      startPoint: { x: _0x357dbd.startPoint.x, y: _0x357dbd.startPoint.y, z: _0x357dbd.startPoint.z },
-      currentPoint: _0x5479dc,
-      pivot: { x: _0x357dbd.pivot.x, y: _0x357dbd.pivot.y, z: _0x357dbd.pivot.z },
-      minDistance: _0x357dbd.referenceDistance,
+      startPoint: { x: startX.startPoint.x, y: startX.startPoint.y, z: startX.startPoint.z },
+      currentPoint: currentX,
+      pivot: { x: startX.pivot.x, y: startX.pivot.y, z: startX.pivot.z },
+      minDistance: startX.referenceDistance,
     });
   }
-  ['sampleMoveGizmoDragPoint'](_0x460650, _0x534ef7, _0x51a168) {
-    if (!_0x460650?.dragPlane) return null;
-    const _0x137a22 = this._resolvePointerRay(_0x534ef7, _0x51a168),
-      _0x564bae = new threeRuntime['Vector3'](),
-      _0x4b009c = _0x137a22.ray.intersectPlane(_0x460650.dragPlane, _0x564bae);
-    if (!_0x4b009c) return null;
-    return { x: _0x564bae.x, y: _0x564bae.y, z: _0x564bae.z, clientX: _0x534ef7, clientY: _0x51a168 };
+  ['sampleMoveGizmoDragPoint'](enabled34, clientX4, clientY4) {
+    if (!enabled34?.dragPlane) return null;
+    const value164 = this._resolvePointerRay(clientX4, clientY4),
+      x8 = new threeRuntime['Vector3'](),
+      enabled35 = value164.ray.intersectPlane(enabled34.dragPlane, x8);
+    if (!enabled35) return null;
+    return { x: x8.x, y: x8.y, z: x8.z, clientX: clientX4, clientY: clientY4 };
   }
-  ['computeMoveGizmoDelta'](_0x1d254e, _0x318ddc) {
-    if (!_0x1d254e?.startPoint || !_0x318ddc) return null;
-    const _0x1efd5f = computeConstrainedMoveDelta({
-      startPoint: { x: _0x1d254e.startPoint.x, y: _0x1d254e.startPoint.y, z: _0x1d254e.startPoint.z },
-      currentPoint: _0x318ddc,
-      axis: _0x1d254e?.axisWorld
-        ? { x: _0x1d254e.axisWorld.x, y: _0x1d254e.axisWorld.y, z: _0x1d254e.axisWorld.z }
-        : _0x1d254e?.axis
-          ? { x: _0x1d254e.axis.x, y: _0x1d254e.axis.y, z: _0x1d254e.axis.z }
+  ['computeMoveGizmoDelta'](x9, currentPoint2) {
+    if (!x9?.startPoint || !currentPoint2) return null;
+    const constrainedMoveDelta = computeConstrainedMoveDelta({
+      startPoint: { x: x9.startPoint.x, y: x9.startPoint.y, z: x9.startPoint.z },
+      currentPoint: currentPoint2,
+      axis: x9?.axisWorld
+        ? { x: x9.axisWorld.x, y: x9.axisWorld.y, z: x9.axisWorld.z }
+        : x9?.axis
+          ? { x: x9.axis.x, y: x9.axis.y, z: x9.axis.z }
           : null,
       planeNormal: {
-        x: _0x1d254e?.planeNormalWorld?.x ?? _0x1d254e?.planeNormal?.x,
-        y: _0x1d254e?.planeNormalWorld?.y ?? _0x1d254e?.planeNormal?.y,
-        z: _0x1d254e?.planeNormalWorld?.z ?? _0x1d254e?.planeNormal?.z,
+        x: x9?.planeNormalWorld?.x ?? x9?.planeNormal?.x,
+        y: x9?.planeNormalWorld?.y ?? x9?.planeNormal?.y,
+        z: x9?.planeNormalWorld?.z ?? x9?.planeNormal?.z,
       },
-      mode: _0x1d254e.mode,
+      mode: x9.mode,
     });
-    return _0x1efd5f;
+    return constrainedMoveDelta;
   }
-  ['pick'](_0x372598, _0x594da8) {
+  ['pick'](value165, value166) {
     if (this._isPanorama360Mode()) return null;
     if (!this._pickRoots.length) return null;
-    const _0x6e0793 = this._resolvePointerRay(_0x372598, _0x594da8),
-      _0x4f3f48 = _0x6e0793.intersectObjects(this._pickRoots, true);
-    for (const _0x1bcbec of _0x4f3f48) {
-      let _0xe291b2 = _0x1bcbec.object;
-      while (_0xe291b2) {
-        const _0x3c26bd = this._pickMap.get(_0xe291b2.id);
-        if (_0x3c26bd)
+    const value167 = this._resolvePointerRay(value165, value166),
+      value168 = value167.intersectObjects(this._pickRoots, true);
+    for (const x10 of value168) {
+      let value169 = x10.object;
+      while (value169) {
+        const args2 = this._pickMap.get(value169.id);
+        if (args2)
           return {
-            ..._0x3c26bd,
-            point: { x: _0x1bcbec.point.x, y: _0x1bcbec.point.y, z: _0x1bcbec.point.z },
+            ...args2,
+            point: { x: x10.point.x, y: x10.point.y, z: x10.point.z },
           };
-        _0xe291b2 = _0xe291b2.parent;
+        value169 = value169.parent;
       }
     }
     return null;
   }
-  ['pickObjectsInRect'](_0x1a1fe2) {
+  ['pickObjectsInRect'](box34) {
     if (this._isPanorama360Mode()) return [];
-    const _0x995af1 = this.renderer.domElement.getBoundingClientRect(),
-      _0x580381 = [],
-      _0x5d8895 = (_0x5b9c9a, _0x1805fc) => {
-        _0x5b9c9a.forEach((_0x1cc326, _0x22dcf9) => {
-          const _0x1195ca = new threeRuntime['Vector3']();
-          _0x1cc326.group.getWorldPosition(_0x1195ca);
-          const _0x1f25d2 = _0x1195ca.clone().project(this.camera);
-          if (
-            _0x1f25d2.x < -1 ||
-            _0x1f25d2.x > 1 ||
-            _0x1f25d2.y < -1 ||
-            _0x1f25d2.y > 1 ||
-            _0x1f25d2.z < -1 ||
-            _0x1f25d2.z > 1
-          )
+    const box35 = this.renderer.domElement.getBoundingClientRect(),
+      list13 = [],
+      handler5 = (list14, objectType2) => {
+        list14.forEach((item15, objectId2) => {
+          const value170 = new threeRuntime['Vector3']();
+          item15.group.getWorldPosition(value170);
+          const depth = value170.clone().project(this.camera);
+          if (depth.x < -1 || depth.x > 1 || depth.y < -1 || depth.y > 1 || depth.z < -1 || depth.z > 1)
             return;
-          const _0x25053f = _0x995af1.left + (_0x1f25d2.x + 1) * 0.5 * _0x995af1.width,
-            _0x2dd099 = _0x995af1.top + (1 - _0x1f25d2.y) * 0.5 * _0x995af1.height;
-          _0x25053f >= _0x1a1fe2.left &&
-            _0x25053f <= _0x1a1fe2.right &&
-            _0x2dd099 >= _0x1a1fe2.top &&
-            _0x2dd099 <= _0x1a1fe2.bottom &&
-            _0x580381.push({ objectType: _0x1805fc, objectId: _0x22dcf9, depth: _0x1f25d2.z });
+          const value171 = box35.left + (depth.x + 1) * 0.5 * box35.width,
+            value172 = box35.top + (1 - depth.y) * 0.5 * box35.height;
+          value171 >= box34.left &&
+            value171 <= box34.right &&
+            value172 >= box34.top &&
+            value172 <= box34.bottom &&
+            list13.push({ objectType: objectType2, objectId: objectId2, depth: depth.z });
         });
       };
     return (
-      _0x5d8895(this._mannequinMap, 'mannequin'),
-      _0x5d8895(this._cubeMap, 'cube'),
-      _0x580381.sort((_0x4c9670, _0x31a69f) => _0x4c9670.depth - _0x31a69f.depth),
-      _0x580381
+      handler5(this._mannequinMap, 'mannequin'),
+      handler5(this._cubeMap, 'cube'),
+      list13.sort((item16, value173) => item16.depth - value173.depth),
+      list13
     );
   }
-  ['intersectGround'](_0x1f0c9d, _0x570bca, _0x591d63 = 0) {
+  ['intersectGround'](value174, value175, value176 = 0) {
     if (this._isPanorama360Mode()) return null;
-    const _0x1a387e = this._resolvePointerRay(_0x1f0c9d, _0x570bca),
-      _0x1c7080 = new threeRuntime['Plane'](new threeRuntime.Vector3(0, 1, 0), -_0x591d63),
-      _0x33323c = new threeRuntime['Vector3'](),
-      _0xa79fae = _0x1a387e.ray.intersectPlane(_0x1c7080, _0x33323c);
-    if (!_0xa79fae) return null;
-    return { x: _0x33323c.x, y: _0x33323c.y, z: _0x33323c.z };
+    const value177 = this._resolvePointerRay(value174, value175),
+      value178 = new threeRuntime['Plane'](new threeRuntime.Vector3(0, 1, 0), -value176),
+      x11 = new threeRuntime['Vector3'](),
+      enabled36 = value177.ray.intersectPlane(value178, x11);
+    if (!enabled36) return null;
+    return { x: x11.x, y: x11.y, z: x11.z };
   }
-  async ['_withCleanCaptureFrame'](_0x189a48) {
-    const _0x1c012e = [
+  async ['_withCleanCaptureFrame'](handler6) {
+    const list15 = [
         this._gizmo?.root,
         this._gizmoMoveGuideLine,
-        ...Array.from(this._cameraMap.values()).map((_0x5b30dc) => _0x5b30dc?.group),
+        ...Array.from(this._cameraMap.values()).map((item17) => item17?.group),
       ].filter(Boolean),
-      _0x488ab8 = _0x1c012e.map((_0x31f33d) => ({ object3d: _0x31f33d, visible: _0x31f33d.visible })),
-      _0x1370f9 = [],
-      _0xe283f0 = (_0x5d832d) => {
-        if (!_0x5d832d || _0x1370f9.some((_0x336a66) => _0x336a66.material === _0x5d832d)) return;
-        _0x1370f9.push({
-          material: _0x5d832d,
-          emissive: _0x5d832d.emissive?.isColor ? _0x5d832d.emissive.clone() : undefined,
+      list16 = list15.map((object3d) => ({ object3d: object3d, visible: object3d.visible })),
+      list17 = [],
+      value179 = (material11) => {
+        if (!material11 || list17.some((item18) => item18.material === material11)) return;
+        list17.push({
+          material: material11,
+          emissive: material11.emissive?.isColor ? material11.emissive.clone() : undefined,
           emissiveIntensity:
-            typeof _0x5d832d.emissiveIntensity === 'number' ? _0x5d832d.emissiveIntensity : undefined,
-          opacity: typeof _0x5d832d.opacity === 'number' ? _0x5d832d.opacity : undefined,
+            typeof material11.emissiveIntensity === 'number' ? material11.emissiveIntensity : undefined,
+          opacity: typeof material11.opacity === 'number' ? material11.opacity : undefined,
         });
       };
-    (this._mannequinMap.forEach((_0x18b4ae) => {
-      _0x18b4ae?.group?.traverse?.((_0x2cc1c2) => eachMaterial(_0x2cc1c2.material, _0xe283f0));
+    (this._mannequinMap.forEach((item19) => {
+      item19?.group?.traverse?.((value180) => eachMaterial(value180.material, value179));
     }),
-      this._cubeMap.forEach((_0x3ca46b) => {
-        _0x3ca46b?.group?.traverse?.((_0xa310e9) => eachMaterial(_0xa310e9.material, _0xe283f0));
+      this._cubeMap.forEach((item20) => {
+        item20?.group?.traverse?.((value181) => eachMaterial(value181.material, value179));
       }),
-      _0x488ab8.forEach(({ object3d: _0x3cf0ba }) => {
-        _0x3cf0ba.visible = false;
+      list16.forEach(({ object3d: object3d2 }) => {
+        object3d2.visible = false;
       }),
-      this._mannequinMap.forEach((_0x2a3bc4) => applyObjectSelectionEmphasis(_0x2a3bc4?.group, false)),
-      this._cubeMap.forEach((_0xc46ef4) => applyObjectSelectionEmphasis(_0xc46ef4?.group, false)));
+      this._mannequinMap.forEach((item21) => applyObjectSelectionEmphasis(item21?.group, false)),
+      this._cubeMap.forEach((item22) => applyObjectSelectionEmphasis(item22?.group, false)));
     try {
-      return await _0x189a48();
+      return await handler6();
     } finally {
-      (_0x488ab8.forEach(({ object3d: _0x18d4fd, visible: _0x1e2881 }) => {
-        _0x18d4fd.visible = _0x1e2881;
+      (list16.forEach(({ object3d: object3d3, visible: visible }) => {
+        object3d3.visible = visible;
       }),
-        _0x1370f9.forEach(
+        list17.forEach(
           ({
-            material: _0x5c443f,
-            emissive: _0x435433,
-            emissiveIntensity: _0x4a451f,
-            opacity: _0x38e7a2,
+            material: material12,
+            emissive: emissive,
+            emissiveIntensity: emissiveIntensity,
+            opacity: opacity2,
           }) => {
-            (_0x435433?.isColor && _0x5c443f.emissive?.isColor && _0x5c443f.emissive.copy(_0x435433),
-              typeof _0x4a451f === 'number' && (_0x5c443f.emissiveIntensity = _0x4a451f),
-              typeof _0x38e7a2 === 'number' && (_0x5c443f.opacity = _0x38e7a2),
-              (_0x5c443f.needsUpdate = true));
+            (emissive?.isColor && material12.emissive?.isColor && material12.emissive.copy(emissive),
+              typeof emissiveIntensity === 'number' && (material12.emissiveIntensity = emissiveIntensity),
+              typeof opacity2 === 'number' && (material12.opacity = opacity2),
+              (material12.needsUpdate = true));
           },
         ),
         this.requestRender());
     }
   }
   ['captureBlob']({ includeEditorOverlays: includeEditorOverlays = true } = {}) {
-    const _0xbfa2a = () =>
-      new Promise((_0x23d0b4, _0x112845) => {
+    const run2 = () =>
+      new Promise((handler7, handler8) => {
         this.renderNow();
-        const _0x34f4ce = this.renderer.domElement;
-        if (typeof _0x34f4ce.toBlob === 'function') {
-          _0x34f4ce.toBlob((_0x3a2fa1) => {
-            if (!_0x3a2fa1) {
-              _0x112845(new Error(panoramaSceneText('errors.captureExportFailed')));
+        const value182 = this.renderer.domElement;
+        if (typeof value182.toBlob === 'function') {
+          value182.toBlob((enabled37) => {
+            if (!enabled37) {
+              handler8(new Error(panoramaSceneText('errors.captureExportFailed')));
               return;
             }
-            _0x23d0b4(_0x3a2fa1);
+            handler7(enabled37);
           }, 'image/png');
           return;
         }
         try {
-          const _0x4afade = _0x34f4ce.toDataURL('image/png'),
-            [, _0x185e1b] = _0x4afade.split(','),
-            _0x1bd7a6 = _0x4afade.slice(_0x4afade.indexOf(':') + 1, _0x4afade.indexOf(';')),
-            _0x53e201 = atob(_0x185e1b || ''),
-            _0x2e8f0c = new Uint8Array(_0x53e201.length);
-          for (let _0x218f08 = 0; _0x218f08 < _0x53e201.length; _0x218f08 += 1) {
-            _0x2e8f0c[_0x218f08] = _0x53e201.charCodeAt(_0x218f08);
+          const list18 = value182.toDataURL('image/png'),
+            [, value183] = list18.split(','),
+            type = list18.slice(list18.indexOf(':') + 1, list18.indexOf(';')),
+            list19 = atob(value183 || ''),
+            uint8Array = new Uint8Array(list19.length);
+          for (let value184 = 0; value184 < list19.length; value184 += 1) {
+            uint8Array[value184] = list19.charCodeAt(value184);
           }
-          _0x23d0b4(new Blob([_0x2e8f0c], { type: _0x1bd7a6 || 'image/png' }));
-        } catch (_0x4fe657) {
-          _0x112845(_0x4fe657);
+          handler7(new Blob([uint8Array], { type: type || 'image/png' }));
+        } catch (value185) {
+          handler8(value185);
         }
       });
-    if (includeEditorOverlays === false) return this._withCleanCaptureFrame(_0xbfa2a);
-    return _0xbfa2a();
+    if (includeEditorOverlays === false) return this._withCleanCaptureFrame(run2);
+    return run2();
   }
-  ['sync'](_0x5dbee3) {
-    this._sceneState = _0x5dbee3;
-    const _0x53d5d6 = this._isPanorama360Mode(_0x5dbee3);
-    (this._syncEnvironment(_0x5dbee3?.environmentMode),
-      this._syncPanorama(_0x5dbee3?.panorama),
-      this._syncMannequins(_0x5dbee3, _0x53d5d6),
-      this._syncCubes(_0x5dbee3, _0x53d5d6),
-      this._syncCameras(_0x5dbee3, _0x53d5d6),
-      this._syncGizmo(_0x5dbee3, _0x53d5d6),
-      this._syncPanoramaModeVisibility(_0x53d5d6),
-      this._syncPanoramaCanvasVisibility(_0x53d5d6),
+  ['sync'](value186) {
+    this._sceneState = value186;
+    const value187 = this._isPanorama360Mode(value186);
+    (this._syncEnvironment(value186?.environmentMode),
+      this._syncPanorama(value186?.panorama),
+      this._syncMannequins(value186, value187),
+      this._syncCubes(value186, value187),
+      this._syncCameras(value186, value187),
+      this._syncGizmo(value186, value187),
+      this._syncPanoramaModeVisibility(value187),
+      this._syncPanoramaCanvasVisibility(value187),
       this.requestRender());
   }
   ['requestRender']() {
@@ -2167,13 +2155,13 @@ export class PanoramaScene3DBridge {
       this.renderer.render(this.scene, this.camera);
       return;
     }
-    const _0x393bf4 = this._isPanorama360Mode(this._sceneState),
-      _0x405457 = this._applyRenderView();
-    (!_0x393bf4 && this._syncInfiniteGrid(),
+    const enabled38 = this._isPanorama360Mode(this._sceneState),
+      value188 = this._applyRenderView();
+    (!enabled38 && this._syncInfiniteGrid(),
       this._applyDraftObjects(),
-      !_0x393bf4 && this._applyGizmoPosition(),
+      !enabled38 && this._applyGizmoPosition(),
       this.renderer.render(this.scene, this.camera),
-      _0x405457?.keepAnimating && this.requestRender());
+      value188?.keepAnimating && this.requestRender());
   }
   ['dispose']() {
     (this._rafId !== null && (cancelAnimationFrame(this._rafId), (this._rafId = null)),
@@ -2181,14 +2169,14 @@ export class PanoramaScene3DBridge {
       (this._smoothedPose = null),
       (this._lastRenderTime = 0),
       (this._viewSmoothingUntil = 0),
-      this._mannequinMap.forEach((_0x58e5a5) => {
-        (this.scene.remove(_0x58e5a5.group), disposeObject3D(_0x58e5a5.group));
+      this._mannequinMap.forEach((item23) => {
+        (this.scene.remove(item23.group), disposeObject3D(item23.group));
       }),
-      this._cubeMap.forEach((_0x5da532) => {
-        (this.scene.remove(_0x5da532.group), disposeObject3D(_0x5da532.group));
+      this._cubeMap.forEach((item24) => {
+        (this.scene.remove(item24.group), disposeObject3D(item24.group));
       }),
-      this._cameraMap.forEach((_0x528f34) => {
-        (this.scene.remove(_0x528f34.group), disposeObject3D(_0x528f34.group));
+      this._cameraMap.forEach((item25) => {
+        (this.scene.remove(item25.group), disposeObject3D(item25.group));
       }),
       this._mannequinMap.clear(),
       this._mannequinStateById.clear(),
@@ -2211,139 +2199,140 @@ export class PanoramaScene3DBridge {
       this.renderer.forceContextLoss?.(),
       this.renderer.domElement.remove());
   }
-  ['_syncEnvironment'](_0x1a33c3) {
-    const _0xdbbb84 = _0x1a33c3 === 'night',
-      _0xc5f492 = resolveThemeColor(
-        _0xdbbb84 ? '--panorama-scene-fog-night' : '--panorama-scene-fog-day',
-        _0xdbbb84 ? '--panorama-scene-fog-night' : '--panorama-scene-fog-day',
+  ['_syncEnvironment'](value189) {
+    const value190 = value189 === 'night',
+      themeColor = resolveThemeColor(
+        value190 ? '--panorama-scene-fog-night' : '--panorama-scene-fog-day',
+        value190 ? '--panorama-scene-fog-night' : '--panorama-scene-fog-day',
       );
     ((this.scene.background = null),
       this.renderer.setClearColor(0, 0),
       (this.scene.fog = this._isPanorama360Mode(this._sceneState)
         ? null
-        : new threeRuntime.Fog(_0xc5f492, _0xdbbb84 ? 46 : 58, _0xdbbb84 ? 138 : 170)),
-      (this._ambientLight.intensity = _0xdbbb84 ? 0.56 : 0.94),
-      (this._keyLight.intensity = _0xdbbb84 ? 0.72 : 1.12),
-      (this._rimLight.intensity = _0xdbbb84 ? 0.2 : 0.16),
-      eachMaterial(this._gridMinor.material, (_0x4a7325) => {
-        ((_0x4a7325.opacity = _0xdbbb84 ? 0.28 : 0.24),
-          _0x4a7325.color.copy(
+        : new threeRuntime.Fog(themeColor, value190 ? 46 : 58, value190 ? 138 : 170)),
+      (this._ambientLight.intensity = value190 ? 0.56 : 0.94),
+      (this._keyLight.intensity = value190 ? 0.72 : 1.12),
+      (this._rimLight.intensity = value190 ? 0.2 : 0.16),
+      eachMaterial(this._gridMinor.material, (value191) => {
+        ((value191.opacity = value190 ? 0.28 : 0.24),
+          value191.color.copy(
             resolveThemeColor(
-              _0xdbbb84 ? '--panorama-scene-grid-night' : '--panorama-scene-grid-day',
-              _0xdbbb84 ? '--indigo-35' : '--black-20',
+              value190 ? '--panorama-scene-grid-night' : '--panorama-scene-grid-day',
+              value190 ? '--indigo-35' : '--black-20',
             ),
           ),
-          (_0x4a7325.needsUpdate = true));
+          (value191.needsUpdate = true));
       }),
-      eachMaterial(this._gridMajor.material, (_0x4c506b) => {
-        ((_0x4c506b.opacity = _0xdbbb84 ? 0.52 : 0.42),
-          _0x4c506b.color.copy(
+      eachMaterial(this._gridMajor.material, (value192) => {
+        ((value192.opacity = value190 ? 0.52 : 0.42),
+          value192.color.copy(
             resolveThemeColor(
-              _0xdbbb84 ? '--panorama-scene-grid-night-major' : '--panorama-scene-grid-day-major',
-              _0xdbbb84 ? '--indigo-35' : '--black-20',
+              value190 ? '--panorama-scene-grid-night-major' : '--panorama-scene-grid-day-major',
+              value190 ? '--indigo-35' : '--black-20',
             ),
           ),
-          (_0x4c506b.needsUpdate = true));
+          (value192.needsUpdate = true));
       }),
-      (this._ground.material.opacity = _0xdbbb84 ? 0.96 : 0.92),
+      (this._ground.material.opacity = value190 ? 0.96 : 0.92),
       (this._ground.material.color = resolveThemeColor(
-        _0xdbbb84 ? '--panorama-scene-ground-night' : '--panorama-scene-ground-day',
-        _0xdbbb84 ? '--indigo-12' : '--black-10',
+        value190 ? '--panorama-scene-ground-night' : '--panorama-scene-ground-day',
+        value190 ? '--indigo-12' : '--black-10',
       )),
       (this._ground.material.needsUpdate = true));
   }
-  ['_syncPanoramaModeVisibility'](_0xcb80be) {
-    ((this._gridMinor.visible = !_0xcb80be),
-      (this._gridMajor.visible = !_0xcb80be),
-      (this._ground.visible = !_0xcb80be));
-    if (!_0xcb80be) return;
+  ['_syncPanoramaModeVisibility'](enabled39) {
+    ((this._gridMinor.visible = !enabled39),
+      (this._gridMajor.visible = !enabled39),
+      (this._ground.visible = !enabled39));
+    if (!enabled39) return;
     ((this._gizmo.root.visible = false),
       this.clearGizmoHandleState(),
-      this._mannequinMap.forEach((_0x4144b4) => {
-        ((_0x4144b4.group.visible = false), (_0x4144b4.selectionRing.visible = false));
+      this._mannequinMap.forEach((item26) => {
+        ((item26.group.visible = false), (item26.selectionRing.visible = false));
       }),
-      this._cubeMap.forEach((_0x57b3a8) => {
-        ((_0x57b3a8.group.visible = false), (_0x57b3a8.selectionRing.visible = false));
+      this._cubeMap.forEach((item27) => {
+        ((item27.group.visible = false), (item27.selectionRing.visible = false));
       }),
-      this._cameraMap.forEach((_0x2acadb) => {
-        _0x2acadb.group.visible = false;
+      this._cameraMap.forEach((item28) => {
+        item28.group.visible = false;
       }),
       (this._panoramaSphere.visible = Boolean(this._panoramaSphere.material?.map)));
   }
-  ['_syncPanoramaCanvasVisibility'](_0x53f6e7 = this._isPanorama360Mode(this._sceneState)) {
-    const _0x5c6680 = this.renderer?.domElement;
-    if (!_0x5c6680) return;
-    const _0x5d2349 = Boolean(this._panoramaSphere?.material?.map),
-      _0x21cdad = _0x53f6e7 && !_0x5d2349;
-    ((_0x5c6680.style.opacity = _0x21cdad ? '0' : '1'),
-      (_0x5c6680.style.background = 'transparent'),
-      (_0x5c6680.dataset.panoramaEmpty = _0x21cdad ? '1' : '0'));
+  ['_syncPanoramaCanvasVisibility'](value193 = this._isPanorama360Mode(this._sceneState)) {
+    const el2 = this.renderer?.domElement;
+    if (!el2) return;
+    const enabled40 = Boolean(this._panoramaSphere?.material?.map),
+      value194 = value193 && !enabled40;
+    ((el2.style.opacity = value194 ? '0' : '1'),
+      (el2.style.background = 'transparent'),
+      (el2.dataset.panoramaEmpty = value194 ? '1' : '0'));
   }
   ['_syncInfiniteGrid']() {
-    const _0x441b2c = Number(this.camera?.position?.x) || 0,
-      _0x731d5 = Number(this.camera?.position?.z) || 0,
-      _0xd85b05 = computeStableGridSnap(
-        _0x441b2c,
+    const value195 = Number(this.camera?.position?.x) || 0,
+      value196 = Number(this.camera?.position?.z) || 0,
+      stableGridSnap = computeStableGridSnap(
+        value195,
         GRID_MINOR_STEP,
         this._gridSnapState.minorX,
         GRID_SNAP_HYSTERESIS,
       ),
-      _0x58b36e = computeStableGridSnap(
-        _0x731d5,
+      stableGridSnap2 = computeStableGridSnap(
+        value196,
         GRID_MINOR_STEP,
         this._gridSnapState.minorZ,
         GRID_SNAP_HYSTERESIS,
       ),
-      _0x45ae8a = computeStableGridSnap(
-        _0x441b2c,
+      stableGridSnap3 = computeStableGridSnap(
+        value195,
         GRID_MAJOR_STEP,
         this._gridSnapState.majorX,
         GRID_SNAP_HYSTERESIS,
       ),
-      _0x5a1f48 = computeStableGridSnap(
-        _0x731d5,
+      stableGridSnap4 = computeStableGridSnap(
+        value196,
         GRID_MAJOR_STEP,
         this._gridSnapState.majorZ,
         GRID_SNAP_HYSTERESIS,
       );
-    ((this._gridSnapState.minorX = _0xd85b05),
-      (this._gridSnapState.minorZ = _0x58b36e),
-      (this._gridSnapState.majorX = _0x45ae8a),
-      (this._gridSnapState.majorZ = _0x5a1f48),
-      this._gridMinor.position.set(_0xd85b05, 0, _0x58b36e),
-      this._gridMajor.position.set(_0x45ae8a, 0.0002, _0x5a1f48));
-    const _0x2203ba = Number(this._renderPose?.distance) || 0,
-      _0x15437 = Math.max(
+    ((this._gridSnapState.minorX = stableGridSnap),
+      (this._gridSnapState.minorZ = stableGridSnap2),
+      (this._gridSnapState.majorX = stableGridSnap3),
+      (this._gridSnapState.majorZ = stableGridSnap4),
+      this._gridMinor.position.set(stableGridSnap, 0, stableGridSnap2),
+      this._gridMajor.position.set(stableGridSnap3, 0.0002, stableGridSnap4));
+    const value197 = Number(this._renderPose?.distance) || 0,
+      value198 = Math.max(
         GRID_BASE_SPAN,
         Math.abs(Number(this.camera?.position?.y) || 0) * 26,
-        _0x2203ba * 28,
+        value197 * 28,
       );
-    (this._ground.position.set(_0x45ae8a, -0.001, _0x5a1f48), this._ground.scale.set(_0x15437, _0x15437, 1));
-    const _0x449ba0 = this._sceneState?.environmentMode === 'night',
-      _0x1fb1e1 = _0x449ba0 ? 0.28 : 0.24,
-      _0x451de5 = _0x449ba0 ? 0.52 : 0.42,
-      _0x506ca3 = Math.abs(
+    (this._ground.position.set(stableGridSnap3, -0.001, stableGridSnap4),
+      this._ground.scale.set(value198, value198, 1));
+    const value199 = this._sceneState?.environmentMode === 'night',
+      value200 = value199 ? 0.28 : 0.24,
+      value201 = value199 ? 0.52 : 0.42,
+      value202 = Math.abs(
         Number.isFinite(this._renderPose?.pitch)
           ? this._renderPose.pitch
           : Number(this.camera?.rotation?.x) || 0,
       ),
-      _0xa6243d = clamp01((_0x506ca3 - 0.08) / 0.32),
-      _0x314dcf = 0.18 + 0.82 * _0xa6243d,
-      _0x406dcc = clamp01((_0x2203ba - 8) / 26),
-      _0x446326 = 1 - 0.52 * _0x406dcc,
-      _0x1eb837 = _0x314dcf * _0x446326,
-      _0x2a6444 = _0x1fb1e1 * _0x1eb837,
-      _0x404467 = _0x451de5 * (0.32 + 0.68 * _0x1eb837);
-    (eachMaterial(this._gridMinor.material, (_0x259ef6) => {
-      _0x259ef6.opacity = _0x2a6444;
+      clamp012 = clamp01((value202 - 0.08) / 0.32),
+      value203 = 0.18 + 0.82 * clamp012,
+      clamp013 = clamp01((value197 - 8) / 26),
+      value204 = 1 - 0.52 * clamp013,
+      value205 = value203 * value204,
+      value206 = value200 * value205,
+      value207 = value201 * (0.32 + 0.68 * value205);
+    (eachMaterial(this._gridMinor.material, (value208) => {
+      value208.opacity = value206;
     }),
-      eachMaterial(this._gridMajor.material, (_0x46ff7a) => {
-        _0x46ff7a.opacity = _0x404467;
+      eachMaterial(this._gridMajor.material, (value209) => {
+        value209.opacity = value207;
       }));
   }
-  ['_syncPanorama'](_0x37eb04) {
-    const _0x332c5c = normalizePanoramaTextureUrl(_0x37eb04?.imageUrl, _0x37eb04?.localPath);
-    if (!_0x332c5c) {
+  ['_syncPanorama'](value210) {
+    const panoramaTextureUrl = normalizePanoramaTextureUrl(value210?.imageUrl, value210?.localPath);
+    if (!panoramaTextureUrl) {
       ((this._panoramaLoadToken += 1),
         (this._loadedPanoramaUrl = ''),
         (this._pendingPanoramaUrl = ''),
@@ -2353,27 +2342,28 @@ export class PanoramaScene3DBridge {
         this._syncPanoramaCanvasVisibility());
       return;
     }
-    if (_0x332c5c === this._loadedPanoramaUrl || _0x332c5c === this._pendingPanoramaUrl) return;
-    this._pendingPanoramaUrl = _0x332c5c;
-    const _0x2be69d = ++this._panoramaLoadToken;
+    if (panoramaTextureUrl === this._loadedPanoramaUrl || panoramaTextureUrl === this._pendingPanoramaUrl)
+      return;
+    this._pendingPanoramaUrl = panoramaTextureUrl;
+    const value211 = ++this._panoramaLoadToken;
     this._textureLoader.load(
-      _0x332c5c,
-      (_0x282d73) => {
-        if (_0x2be69d !== this._panoramaLoadToken) {
-          _0x282d73.dispose();
+      panoramaTextureUrl,
+      (value212) => {
+        if (value211 !== this._panoramaLoadToken) {
+          value212.dispose();
           return;
         }
-        ((_0x282d73.colorSpace = threeRuntime.SRGBColorSpace),
-          (_0x282d73.minFilter = threeRuntime.LinearMipmapLinearFilter),
-          (_0x282d73.magFilter = threeRuntime.LinearFilter),
-          (_0x282d73.generateMipmaps = true),
-          (_0x282d73.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy?.() || 1)),
-          (_0x282d73.needsUpdate = true),
+        ((value212.colorSpace = threeRuntime.SRGBColorSpace),
+          (value212.minFilter = threeRuntime.LinearMipmapLinearFilter),
+          (value212.magFilter = threeRuntime.LinearFilter),
+          (value212.generateMipmaps = true),
+          (value212.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy?.() || 1)),
+          (value212.needsUpdate = true),
           this._panoramaTexture && this._panoramaTexture.dispose(),
-          (this._panoramaTexture = _0x282d73),
-          (this._loadedPanoramaUrl = _0x332c5c),
+          (this._panoramaTexture = value212),
+          (this._loadedPanoramaUrl = panoramaTextureUrl),
           (this._pendingPanoramaUrl = ''),
-          (this._panoramaSphere.material.map = _0x282d73),
+          (this._panoramaSphere.material.map = value212),
           (this._panoramaSphere.material.needsUpdate = true),
           (this._panoramaSphere.visible = true),
           this._syncPanoramaCanvasVisibility(),
@@ -2382,7 +2372,7 @@ export class PanoramaScene3DBridge {
       },
       undefined,
       () => {
-        if (_0x2be69d !== this._panoramaLoadToken) return;
+        if (value211 !== this._panoramaLoadToken) return;
         ((this._pendingPanoramaUrl = ''),
           (this._panoramaSphere.visible = false),
           this._syncPanoramaCanvasVisibility(),
@@ -2393,722 +2383,726 @@ export class PanoramaScene3DBridge {
       },
     );
   }
-  ['_resolveMannequinColor'](_0x19c9d4) {
-    const _0x1d1898 = PANORAMA_SCENE_COLOR_TOKENS[_0x19c9d4] || PANORAMA_SCENE_COLOR_TOKENS.blue;
-    return resolveThemeColor(_0x1d1898, '--blue');
+  ['_resolveMannequinColor'](value213) {
+    const value214 = PANORAMA_SCENE_COLOR_TOKENS[value213] || PANORAMA_SCENE_COLOR_TOKENS.blue;
+    return resolveThemeColor(value214, '--blue');
   }
-  ['_registerPickable'](_0x51667e, _0x55182b) {
-    (_0x51667e.traverse((_0x5ccbb5) => {
-      this._pickMap.set(_0x5ccbb5.id, _0x55182b);
+  ['_registerPickable'](value215, value216) {
+    (value215.traverse((value217) => {
+      this._pickMap.set(value217.id, value216);
     }),
-      this._pickRoots.push(_0x51667e));
+      this._pickRoots.push(value215));
   }
   ['_rebuildPickRoots']() {
     (this._pickMap.clear(),
       (this._pickRoots = []),
-      this._mannequinMap.forEach((_0x496b45, _0x18e80a) => {
-        this._registerPickable(_0x496b45.proxyRoot || _0x496b45.group, {
+      this._mannequinMap.forEach((item29, objectId3) => {
+        this._registerPickable(item29.proxyRoot || item29.group, {
           objectType: 'mannequin',
-          objectId: _0x18e80a,
+          objectId: objectId3,
         });
       }),
-      this._cubeMap.forEach((_0x226b79, _0x144722) => {
-        this._registerPickable(_0x226b79.group, { objectType: 'cube', objectId: _0x144722 });
+      this._cubeMap.forEach((item30, objectId4) => {
+        this._registerPickable(item30.group, { objectType: 'cube', objectId: objectId4 });
       }));
   }
-  ['_loadCharacterModelForVisual'](_0xd80042, _0x581a5f, _0x4bd5ba) {
-    if (!_0xd80042) return;
-    const _0x5155b9 = resolvePanoramaCharacterGender(_0x4bd5ba),
-      _0x504a11 = (_0xd80042.modelLoadToken || 0) + 1;
-    ((_0xd80042.modelLoadToken = _0x504a11),
-      (_0xd80042.modelGender = _0x5155b9),
-      (_0xd80042.modelLoadError = null),
-      setMannequinProxyMode(_0xd80042),
-      createPanoramaCharacterModelInstance(_0x5155b9)
-        .then((_0x5edead) => {
-          if (this._mannequinMap.get(_0x581a5f) !== _0xd80042 || _0xd80042.modelLoadToken !== _0x504a11) {
-            disposeObject3D(_0x5edead);
+  ['_loadCharacterModelForVisual'](enabled41, value218, value219) {
+    if (!enabled41) return;
+    const panoramaCharacterGender = resolvePanoramaCharacterGender(value219),
+      value220 = (enabled41.modelLoadToken || 0) + 1;
+    ((enabled41.modelLoadToken = value220),
+      (enabled41.modelGender = panoramaCharacterGender),
+      (enabled41.modelLoadError = null),
+      setMannequinProxyMode(enabled41),
+      createPanoramaCharacterModelInstance(panoramaCharacterGender)
+        .then((value221) => {
+          if (this._mannequinMap.get(value218) !== enabled41 || enabled41.modelLoadToken !== value220) {
+            disposeObject3D(value221);
             return;
           }
-          _0xd80042.modelRoot &&
-            (_0xd80042.group.remove(_0xd80042.modelRoot), disposeObject3D(_0xd80042.modelRoot));
-          ((_0xd80042.modelMaterial = null),
-            (_0xd80042.modelRoot = _0x5edead),
-            _0xd80042.group.add(_0x5edead));
-          const _0x57b803 = this._mannequinStateById.get(_0x581a5f)?.colorKey;
-          (applyCharacterClayMaterial(_0xd80042, this._resolveMannequinColor(_0x57b803)),
-            setMannequinProxyMode(_0xd80042),
+          enabled41.modelRoot &&
+            (enabled41.group.remove(enabled41.modelRoot), disposeObject3D(enabled41.modelRoot));
+          ((enabled41.modelMaterial = null), (enabled41.modelRoot = value221), enabled41.group.add(value221));
+          const value222 = this._mannequinStateById.get(value218)?.colorKey;
+          (applyCharacterClayMaterial(enabled41, this._resolveMannequinColor(value222)),
+            setMannequinProxyMode(enabled41),
             this._rebuildPickRoots());
           if (typeof requestAnimationFrame === 'function') this.requestRender();
         })
-        .catch((_0x2ac573) => {
-          if (this._mannequinMap.get(_0x581a5f) !== _0xd80042 || _0xd80042.modelLoadToken !== _0x504a11)
-            return;
-          _0xd80042.modelLoadError = _0x2ac573 || new Error('Quaternius character model failed to load');
-          _0xd80042.modelRoot &&
-            (_0xd80042.group.remove(_0xd80042.modelRoot),
-            disposeObject3D(_0xd80042.modelRoot),
-            (_0xd80042.modelRoot = null));
-          ((_0xd80042.modelMaterial = null), setMannequinProxyMode(_0xd80042));
+        .catch((value223) => {
+          if (this._mannequinMap.get(value218) !== enabled41 || enabled41.modelLoadToken !== value220) return;
+          enabled41.modelLoadError = value223 || new Error('Quaternius character model failed to load');
+          enabled41.modelRoot &&
+            (enabled41.group.remove(enabled41.modelRoot),
+            disposeObject3D(enabled41.modelRoot),
+            (enabled41.modelRoot = null));
+          ((enabled41.modelMaterial = null), setMannequinProxyMode(enabled41));
           if (typeof requestAnimationFrame === 'function') this.requestRender();
         }));
   }
-  ['_syncMannequins'](_0x39168f, _0x6dcf76 = false) {
-    const _0x41f02c = _0x39168f?.mannequins || [],
-      _0x31a20e = new Set(collectSelectedObjectIds(_0x39168f, 'mannequin')),
-      _0x290480 = !_0x6dcf76,
-      _0x3009f0 = new Set();
-    _0x41f02c.forEach((_0x300dcf) => {
-      (_0x3009f0.add(_0x300dcf.id), this._mannequinStateById.set(_0x300dcf.id, _0x300dcf));
-      let _0x46b8c5 = this._mannequinMap.get(_0x300dcf.id);
-      if (!_0x46b8c5)
-        ((_0x46b8c5 = createMannequinVisual(this._resolveMannequinColor(_0x300dcf.colorKey))),
-          this._mannequinMap.set(_0x300dcf.id, _0x46b8c5),
-          this.scene.add(_0x46b8c5.group),
-          this._loadCharacterModelForVisual(_0x46b8c5, _0x300dcf.id, _0x300dcf.gender));
+  ['_syncMannequins'](value224, enabled42 = false) {
+    const list20 = value224?.mannequins || [],
+      map4 = new Set(collectSelectedObjectIds(value224, 'mannequin')),
+      value225 = !enabled42,
+      map5 = new Set();
+    list20.forEach((box36) => {
+      (map5.add(box36.id), this._mannequinStateById.set(box36.id, box36));
+      let mannequinVisual = this._mannequinMap.get(box36.id);
+      if (!mannequinVisual)
+        ((mannequinVisual = createMannequinVisual(this._resolveMannequinColor(box36.colorKey))),
+          this._mannequinMap.set(box36.id, mannequinVisual),
+          this.scene.add(mannequinVisual.group),
+          this._loadCharacterModelForVisual(mannequinVisual, box36.id, box36.gender));
       else
-        _0x46b8c5.modelGender !== resolvePanoramaCharacterGender(_0x300dcf.gender) &&
-          (_0x46b8c5.modelRoot &&
-            (_0x46b8c5.group.remove(_0x46b8c5.modelRoot),
-            disposeObject3D(_0x46b8c5.modelRoot),
-            (_0x46b8c5.modelRoot = null)),
-          this._loadCharacterModelForVisual(_0x46b8c5, _0x300dcf.id, _0x300dcf.gender));
-      const _0x5a58bf = this._resolveMannequinColor(_0x300dcf.colorKey);
-      (_0x46b8c5.material.color.copy(_0x5a58bf),
-        _0x46b8c5.headMaterial.color.copy(_0x5a58bf.clone().offsetHSL(0, 0, 0.08)),
-        applyGenderShape(_0x46b8c5, _0x300dcf.gender));
-      const _0x2ac4c5 = this._draftObjects.get('mannequin:' + _0x300dcf.id);
-      (applyGroupTransform(_0x46b8c5.group, _0x2ac4c5 || _0x300dcf),
-        (_0x46b8c5.group.position.y = _0x2ac4c5?.position?.y ?? _0x300dcf.position.y ?? 0),
-        applyGroupScale(_0x46b8c5.group, _0x2ac4c5?.scale ?? _0x300dcf.scale ?? 1));
-      const _0x1c44dc = _0x290480 && _0x39168f?.ui?.isEditing === true && _0x31a20e.has(_0x300dcf.id);
-      ((_0x46b8c5.group.visible = _0x290480),
-        (_0x46b8c5.selectionRing.visible = false),
-        setMannequinProxyMode(_0x46b8c5),
-        applyCharacterClayMaterial(_0x46b8c5, _0x5a58bf),
-        applySelectionEmphasis(_0x46b8c5.material, _0x1c44dc, 0.18),
-        applySelectionEmphasis(_0x46b8c5.headMaterial, _0x1c44dc, 0.26),
-        applyObjectSelectionEmphasis(_0x46b8c5.modelRoot, _0x1c44dc, 0.12));
+        mannequinVisual.modelGender !== resolvePanoramaCharacterGender(box36.gender) &&
+          (mannequinVisual.modelRoot &&
+            (mannequinVisual.group.remove(mannequinVisual.modelRoot),
+            disposeObject3D(mannequinVisual.modelRoot),
+            (mannequinVisual.modelRoot = null)),
+          this._loadCharacterModelForVisual(mannequinVisual, box36.id, box36.gender));
+      const value226 = this._resolveMannequinColor(box36.colorKey);
+      (mannequinVisual.material.color.copy(value226),
+        mannequinVisual.headMaterial.color.copy(value226.clone().offsetHSL(0, 0, 0.08)),
+        applyGenderShape(mannequinVisual, box36.gender));
+      const box37 = this._draftObjects.get('mannequin:' + box36.id);
+      (applyGroupTransform(mannequinVisual.group, box37 || box36),
+        (mannequinVisual.group.position.y = box37?.position?.y ?? box36.position.y ?? 0),
+        applyGroupScale(mannequinVisual.group, box37?.scale ?? box36.scale ?? 1));
+      const value227 = value225 && value224?.ui?.isEditing === true && map4.has(box36.id);
+      ((mannequinVisual.group.visible = value225),
+        (mannequinVisual.selectionRing.visible = false),
+        setMannequinProxyMode(mannequinVisual),
+        applyCharacterClayMaterial(mannequinVisual, value226),
+        applySelectionEmphasis(mannequinVisual.material, value227, 0.18),
+        applySelectionEmphasis(mannequinVisual.headMaterial, value227, 0.26),
+        applyObjectSelectionEmphasis(mannequinVisual.modelRoot, value227, 0.12));
     });
-    for (const [_0x3af543, _0x3c3a4c] of this._mannequinMap.entries()) {
-      if (_0x3009f0.has(_0x3af543)) continue;
-      (this.scene.remove(_0x3c3a4c.group),
-        disposeObject3D(_0x3c3a4c.group),
-        this._mannequinMap.delete(_0x3af543),
-        this._mannequinStateById.delete(_0x3af543));
+    for (const [value228, value229] of this._mannequinMap.entries()) {
+      if (map5.has(value228)) continue;
+      (this.scene.remove(value229.group),
+        disposeObject3D(value229.group),
+        this._mannequinMap.delete(value228),
+        this._mannequinStateById.delete(value228));
     }
     this._rebuildPickRoots();
   }
-  ['_syncCubes'](_0x295382, _0x40b420 = false) {
-    const _0x2f18d2 = _0x295382?.cubes || [],
-      _0x29f7f8 = new Set(collectSelectedObjectIds(_0x295382, 'cube')),
-      _0x3af657 = !_0x40b420,
-      _0x807312 = new Set();
-    _0x2f18d2.forEach((_0x120864) => {
-      (_0x807312.add(_0x120864.id), this._cubeStateById.set(_0x120864.id, _0x120864));
-      let _0x4af6ef = this._cubeMap.get(_0x120864.id);
-      !_0x4af6ef &&
-        ((_0x4af6ef = createCubeVisual(this._resolveMannequinColor(_0x120864.colorKey))),
-        this._cubeMap.set(_0x120864.id, _0x4af6ef),
-        this.scene.add(_0x4af6ef.group));
-      const _0xac5775 = this._resolveMannequinColor(_0x120864.colorKey);
-      (_0x4af6ef.material.color.copy(_0xac5775),
-        _0x4af6ef.edgeMaterial.color.copy(_0xac5775.clone().offsetHSL(0, 0, -0.18)));
-      const _0x253883 = this._draftObjects.get('cube:' + _0x120864.id),
-        _0x31fc1a = _0x253883 || _0x120864;
-      (applyGroupTransform(_0x4af6ef.group, _0x31fc1a),
-        (_0x4af6ef.group.position.y = Number(_0x31fc1a?.position?.y) || 0),
-        applyGroupScale(_0x4af6ef.group, _0x31fc1a?.scale ?? _0x120864?.scale ?? 1));
-      const _0x5dd5c3 = _0x3af657 && _0x295382?.ui?.isEditing === true && _0x29f7f8.has(_0x120864.id);
-      ((_0x4af6ef.group.visible = _0x3af657),
-        (_0x4af6ef.selectionRing.visible = false),
-        applySelectionEmphasis(_0x4af6ef.material, _0x5dd5c3, 0.22),
-        (_0x4af6ef.edgeMaterial.opacity = _0x5dd5c3 ? 1 : 0.9));
+  ['_syncCubes'](value230, enabled43 = false) {
+    const list21 = value230?.cubes || [],
+      map6 = new Set(collectSelectedObjectIds(value230, 'cube')),
+      value231 = !enabled43,
+      map7 = new Set();
+    list21.forEach((box38) => {
+      (map7.add(box38.id), this._cubeStateById.set(box38.id, box38));
+      let cubeVisual = this._cubeMap.get(box38.id);
+      !cubeVisual &&
+        ((cubeVisual = createCubeVisual(this._resolveMannequinColor(box38.colorKey))),
+        this._cubeMap.set(box38.id, cubeVisual),
+        this.scene.add(cubeVisual.group));
+      const value232 = this._resolveMannequinColor(box38.colorKey);
+      (cubeVisual.material.color.copy(value232),
+        cubeVisual.edgeMaterial.color.copy(value232.clone().offsetHSL(0, 0, -0.18)));
+      const value233 = this._draftObjects.get('cube:' + box38.id),
+        box39 = value233 || box38;
+      (applyGroupTransform(cubeVisual.group, box39),
+        (cubeVisual.group.position.y = Number(box39?.position?.y) || 0),
+        applyGroupScale(cubeVisual.group, box39?.scale ?? box38?.scale ?? 1));
+      const value234 = value231 && value230?.ui?.isEditing === true && map6.has(box38.id);
+      ((cubeVisual.group.visible = value231),
+        (cubeVisual.selectionRing.visible = false),
+        applySelectionEmphasis(cubeVisual.material, value234, 0.22),
+        (cubeVisual.edgeMaterial.opacity = value234 ? 1 : 0.9));
     });
-    for (const [_0x1f591b, _0x2c1f86] of this._cubeMap.entries()) {
-      if (_0x807312.has(_0x1f591b)) continue;
-      (this.scene.remove(_0x2c1f86.group),
-        disposeObject3D(_0x2c1f86.group),
-        this._cubeMap.delete(_0x1f591b),
-        this._cubeStateById.delete(_0x1f591b));
+    for (const [value235, value236] of this._cubeMap.entries()) {
+      if (map7.has(value235)) continue;
+      (this.scene.remove(value236.group),
+        disposeObject3D(value236.group),
+        this._cubeMap.delete(value235),
+        this._cubeStateById.delete(value235));
     }
     this._rebuildPickRoots();
   }
-  ['_syncCameras'](_0x589451, _0x47c5ab = false) {
-    const _0x1d6378 = Array.isArray(_0x589451?.cameras) ? _0x589451.cameras : [],
-      _0x3c98ef =
-        _0x589451?.viewport?.activeView === 'camera' && _0x589451?.viewport?.activeCameraId
-          ? String(_0x589451.viewport.activeCameraId)
+  ['_syncCameras'](value237, enabled44 = false) {
+    const list22 = Array.isArray(value237?.cameras) ? value237.cameras : [],
+      value238 =
+        value237?.viewport?.activeView === 'camera' && value237?.viewport?.activeCameraId
+          ? String(value237.viewport.activeCameraId)
           : null,
-      _0x4b757c =
+      value239 =
         this._draftView?.kind === 'camera' && this._draftView?.cameraId
           ? String(this._draftView.cameraId)
           : null,
-      _0x2a124a =
-        !_0x47c5ab &&
-        _0x1d6378.some((_0x3d9e39) => {
-          if (!_0x3d9e39?.id) return false;
-          const _0x2a17ff = normalizeCameraPoseData(_0x3d9e39),
-            _0x11a2d6 = cameraPoseToSceneViewFromReference(_0x2a17ff, _0x589451?.viewport?.sceneView);
-          return areSceneViewsEquivalent(_0x589451?.viewport?.sceneView, _0x11a2d6);
+      value240 =
+        !enabled44 &&
+        list22.some((enabled45) => {
+          if (!enabled45?.id) return false;
+          const cameraPoseData3 = normalizeCameraPoseData(enabled45),
+            sceneViewFromReference = cameraPoseToSceneViewFromReference(
+              cameraPoseData3,
+              value237?.viewport?.sceneView,
+            );
+          return areSceneViewsEquivalent(value237?.viewport?.sceneView, sceneViewFromReference);
         }),
-      _0x263e5b = Boolean(_0x3c98ef || _0x4b757c || _0x2a124a),
-      _0x206c6e = !_0x47c5ab && !_0x263e5b,
-      _0x11092f = new Set();
-    _0x1d6378.forEach((_0x261259) => {
-      if (!_0x261259?.id) return;
-      const _0x5aaab9 = String(_0x261259.id);
-      (_0x11092f.add(_0x5aaab9), this._cameraStateById.set(_0x5aaab9, _0x261259));
-      let _0x74e7a3 = this._cameraMap.get(_0x5aaab9);
-      !_0x74e7a3 &&
-        ((_0x74e7a3 = createCameraVisual()),
-        this._cameraMap.set(_0x5aaab9, _0x74e7a3),
-        this.scene.add(_0x74e7a3.group));
-      const _0x1570fd = normalizeCameraPoseData(_0x261259);
-      (_0x74e7a3.group.position.set(_0x1570fd.position.x, _0x1570fd.position.y, _0x1570fd.position.z),
-        _0x74e7a3.group.quaternion.set(
-          _0x1570fd.quaternion.x,
-          _0x1570fd.quaternion.y,
-          _0x1570fd.quaternion.z,
-          _0x1570fd.quaternion.w,
+      enabled46 = Boolean(value238 || value239 || value240),
+      value241 = !enabled44 && !enabled46,
+      map8 = new Set();
+    list22.forEach((enabled47) => {
+      if (!enabled47?.id) return;
+      const value242 = String(enabled47.id);
+      (map8.add(value242), this._cameraStateById.set(value242, enabled47));
+      let cameraVisual = this._cameraMap.get(value242);
+      !cameraVisual &&
+        ((cameraVisual = createCameraVisual()),
+        this._cameraMap.set(value242, cameraVisual),
+        this.scene.add(cameraVisual.group));
+      const cameraPoseData4 = normalizeCameraPoseData(enabled47);
+      (cameraVisual.group.position.set(
+        cameraPoseData4.position.x,
+        cameraPoseData4.position.y,
+        cameraPoseData4.position.z,
+      ),
+        cameraVisual.group.quaternion.set(
+          cameraPoseData4.quaternion.x,
+          cameraPoseData4.quaternion.y,
+          cameraPoseData4.quaternion.z,
+          cameraPoseData4.quaternion.w,
         ),
-        (_0x74e7a3.group.visible = _0x206c6e));
+        (cameraVisual.group.visible = value241));
     });
-    for (const [_0x40a4fd, _0x3ec161] of this._cameraMap.entries()) {
-      if (_0x11092f.has(_0x40a4fd)) continue;
-      (this.scene.remove(_0x3ec161.group),
-        disposeObject3D(_0x3ec161.group),
-        this._cameraMap.delete(_0x40a4fd),
-        this._cameraStateById.delete(_0x40a4fd));
+    for (const [value243, value244] of this._cameraMap.entries()) {
+      if (map8.has(value243)) continue;
+      (this.scene.remove(value244.group),
+        disposeObject3D(value244.group),
+        this._cameraMap.delete(value243),
+        this._cameraStateById.delete(value243));
     }
   }
-  ['_resolveGizmoContext'](_0x52393b) {
-    const _0x3de35b = collectSelectedObjects(_0x52393b);
-    if (_0x3de35b.length === 0) return null;
-    const _0x243be6 = resolveActiveTransformTool(_0x52393b),
-      _0x51cbfa = _0x3de35b
-        .map((_0x26463d) => ({
-          objectType: _0x26463d.objectType,
-          id: _0x26463d.objectId,
+  ['_resolveGizmoContext'](value245) {
+    const list23 = collectSelectedObjects(value245);
+    if (list23.length === 0) return null;
+    const activeTransformTool = resolveActiveTransformTool(value245),
+      selectedObjects = list23
+        .map((objectType3) => ({
+          objectType: objectType3.objectType,
+          id: objectType3.objectId,
           item:
-            this._draftObjects.get(_0x26463d.objectType + ':' + _0x26463d.objectId) ||
-            this._getObjectStateByObjectType(_0x26463d.objectType, _0x26463d.objectId),
-          visual: this._getVisualByObjectType(_0x26463d.objectType, _0x26463d.objectId),
+            this._draftObjects.get(objectType3.objectType + ':' + objectType3.objectId) ||
+            this._getObjectStateByObjectType(objectType3.objectType, objectType3.objectId),
+          visual: this._getVisualByObjectType(objectType3.objectType, objectType3.objectId),
         }))
-        .filter((_0x3f47da) => !!_0x3f47da.visual && !!_0x3f47da.item);
-    if (_0x51cbfa.length === 0) return null;
-    _0x51cbfa.forEach((_0x29e53e) => {
-      ((_0x29e53e.pivotWorld = resolveObjectToolPivot(
-        _0x29e53e.item,
-        _0x29e53e.visual,
-        _0x243be6,
-        _0x29e53e.objectType,
+        .filter((enabled48) => !!enabled48.visual && !!enabled48.item);
+    if (selectedObjects.length === 0) return null;
+    selectedObjects.forEach((item31) => {
+      ((item31.pivotWorld = resolveObjectToolPivot(
+        item31.item,
+        item31.visual,
+        activeTransformTool,
+        item31.objectType,
       )),
-        (_0x29e53e.orientationQuaternion = resolveObjectOrientationQuaternion(
-          _0x29e53e.item,
-          _0x29e53e.visual,
-        )));
+        (item31.orientationQuaternion = resolveObjectOrientationQuaternion(item31.item, item31.visual)));
     });
-    const _0x281673 =
-        _0x52393b?.selection?.selectedObjectType === 'cube' ||
-        _0x52393b?.selection?.selectedObjectType === 'mannequin'
-          ? _0x52393b.selection.selectedObjectType
+    const value246 =
+        value245?.selection?.selectedObjectType === 'cube' ||
+        value245?.selection?.selectedObjectType === 'mannequin'
+          ? value245.selection.selectedObjectType
           : null,
-      _0xd5c0ea = _0x52393b?.selection?.selectedObjectId || null,
-      _0x4f26d3 =
-        _0xd5c0ea && _0x281673
-          ? _0x51cbfa.find((_0xdab524) => _0xdab524.objectType === _0x281673 && _0xdab524.id === _0xd5c0ea) ||
-            null
+      value247 = value245?.selection?.selectedObjectId || null,
+      value248 =
+        value247 && value246
+          ? selectedObjects.find((item32) => item32.objectType === value246 && item32.id === value247) || null
           : null,
-      _0x25a9ba = _0x4f26d3 || _0x51cbfa[0],
-      _0x1b2708 = new threeRuntime['Vector3'](),
-      _0x335036 = _0x51cbfa.length > 1;
-    if (_0x335036)
-      (_0x51cbfa.forEach((_0x320c56) => {
-        _0x1b2708.add(_0x320c56.pivotWorld);
+      activeEntry = value248 || selectedObjects[0],
+      pivot4 = new threeRuntime['Vector3'](),
+      isMultiSelection2 = selectedObjects.length > 1;
+    if (isMultiSelection2)
+      (selectedObjects.forEach((item33) => {
+        pivot4.add(item33.pivotWorld);
       }),
-        _0x1b2708.multiplyScalar(1 / _0x51cbfa.length));
-    else _0x25a9ba?.pivotWorld && _0x1b2708.copy(_0x25a9ba.pivotWorld);
-    const _0x5bb504 = _0x335036
-        ? measureVisualBoundsForSelection(_0x51cbfa) || createFallbackBounds()
-        : measureVisualBounds(_0x25a9ba.visual) || createFallbackBounds(),
-      _0x1e6c41 = computeGizmoWorldMetrics(_0x5bb504),
-      { orientationQuaternion: _0x47aff4, usesLocalOrientation: _0x499f82 } =
-        resolveSelectionGizmoOrientation(_0x51cbfa, _0x25a9ba, _0x335036),
-      _0x3e4e16 = _0x25a9ba?.objectType || null,
-      _0x2607a3 = _0x51cbfa
-        .filter((_0x3691f9) => _0x3691f9.objectType === _0x3e4e16)
-        .map((_0x524028) => _0x524028.id);
+        pivot4.multiplyScalar(1 / selectedObjects.length));
+    else activeEntry?.pivotWorld && pivot4.copy(activeEntry.pivotWorld);
+    const bounds = isMultiSelection2
+        ? measureVisualBoundsForSelection(selectedObjects) || createFallbackBounds()
+        : measureVisualBounds(activeEntry.visual) || createFallbackBounds(),
+      gizmoWorldMetrics = computeGizmoWorldMetrics(bounds),
+      { orientationQuaternion: orientationQuaternion3, usesLocalOrientation: usesLocalOrientation } =
+        resolveSelectionGizmoOrientation(selectedObjects, activeEntry, isMultiSelection2),
+      selectedObjectType = activeEntry?.objectType || null,
+      selectedIds = selectedObjects
+        .filter((item34) => item34.objectType === selectedObjectType)
+        .map((item35) => item35.id);
     return {
-      selectedObjectType: _0x3e4e16,
-      selectedIds: _0x2607a3,
-      selectedObjects: _0x51cbfa.map((_0xa0a61c) => ({
-        objectType: _0xa0a61c.objectType,
-        objectId: _0xa0a61c.id,
+      selectedObjectType: selectedObjectType,
+      selectedIds: selectedIds,
+      selectedObjects: selectedObjects.map((objectType4) => ({
+        objectType: objectType4.objectType,
+        objectId: objectType4.id,
       })),
-      selectedVisuals: _0x51cbfa,
-      activeEntry: _0x25a9ba,
-      isMultiSelection: _0x335036,
-      pivot: _0x1b2708.clone(),
-      position: _0x1b2708.clone(),
-      orientationQuaternion: _0x47aff4,
-      usesLocalOrientation: _0x499f82,
-      bounds: _0x5bb504,
-      gizmoWorldMetrics: _0x1e6c41,
+      selectedVisuals: selectedObjects,
+      activeEntry: activeEntry,
+      isMultiSelection: isMultiSelection2,
+      pivot: pivot4.clone(),
+      position: pivot4.clone(),
+      orientationQuaternion: orientationQuaternion3,
+      usesLocalOrientation: usesLocalOrientation,
+      bounds: bounds,
+      gizmoWorldMetrics: gizmoWorldMetrics,
     };
   }
-  ['_computeWorldUnitsPerPixelAt'](_0x39c3af) {
-    if (!_0x39c3af || !this.camera?.position) return 0;
-    const _0x28abe1 = Math.max(0.001, this.camera.position.distanceTo(_0x39c3af)),
-      _0xa618ca = ((Number(this.camera?.fov) || 58) * Math.PI) / 180,
-      _0x547054 = Math.max(
+  ['_computeWorldUnitsPerPixelAt'](enabled49) {
+    if (!enabled49 || !this.camera?.position) return 0;
+    const value249 = Math.max(0.001, this.camera.position.distanceTo(enabled49)),
+      value250 = ((Number(this.camera?.fov) || 58) * Math.PI) / 180,
+      value251 = Math.max(
         1,
         Number(this.renderer?.domElement?.clientHeight) || Number(this.renderer?.domElement?.height) || 1,
       ),
-      _0x361784 = 2 * Math.tan(_0xa618ca / 2) * _0x28abe1;
-    return _0x361784 / _0x547054;
+      value252 = 2 * Math.tan(value250 / 2) * value249;
+    return value252 / value251;
   }
-  ['_computeScreenConstantGizmoScale'](_0x57c33b, _0x1953ea = 104) {
-    const _0x4005db = this._computeWorldUnitsPerPixelAt(_0x57c33b);
-    if (!(_0x4005db > 0)) return 1;
-    return Math.max(0.35, Math.min(6, _0x4005db * _0x1953ea));
+  ['_computeScreenConstantGizmoScale'](value253, value254 = 104) {
+    const count2 = this._computeWorldUnitsPerPixelAt(value253);
+    if (!(count2 > 0)) return 1;
+    return Math.max(0.35, Math.min(6, count2 * value254));
   }
-  ['_captureGizmoDragLock'](_0x13ebc4) {
-    if (!this._gizmo || !_0x13ebc4) return null;
-    const _0x5c61c8 = this._gizmo.root.position.clone(),
-      _0x21c168 = this._gizmo.root.quaternion.clone(),
-      _0x3fcef2 = {
-        box: _0x13ebc4.bounds?.box?.clone?.() || createFallbackBounds().box,
-        size: _0x13ebc4.bounds?.size?.clone?.() || new threeRuntime['Vector3'](1, 1, 1),
-        sphere: _0x13ebc4.bounds?.sphere
+  ['_captureGizmoDragLock'](box40) {
+    if (!this._gizmo || !box40) return null;
+    const position2 = this._gizmo.root.position.clone(),
+      orientationQuaternion4 = this._gizmo.root.quaternion.clone(),
+      bounds2 = {
+        box: box40.bounds?.box?.clone?.() || createFallbackBounds().box,
+        size: box40.bounds?.size?.clone?.() || new threeRuntime['Vector3'](1, 1, 1),
+        sphere: box40.bounds?.sphere
           ? new threeRuntime['Sphere'](
-              _0x13ebc4.bounds.sphere.center?.clone?.() || new threeRuntime['Vector3'](),
-              Number(_0x13ebc4.bounds.sphere.radius) || 0,
+              box40.bounds.sphere.center?.clone?.() || new threeRuntime['Vector3'](),
+              Number(box40.bounds.sphere.radius) || 0,
             )
           : new threeRuntime['Sphere'](new threeRuntime['Vector3'](0, 0.5, 0), Math.sqrt(0.75)),
         extents: {
-          x: Number(_0x13ebc4.bounds?.extents?.x) || 0,
-          y: Number(_0x13ebc4.bounds?.extents?.y) || 0,
-          z: Number(_0x13ebc4.bounds?.extents?.z) || 0,
+          x: Number(box40.bounds?.extents?.x) || 0,
+          y: Number(box40.bounds?.extents?.y) || 0,
+          z: Number(box40.bounds?.extents?.z) || 0,
         },
       },
-      _0x49bec6 = {
+      gizmoWorldMetrics2 = {
         extents: {
-          x: Number(_0x13ebc4.gizmoWorldMetrics?.extents?.x) || 0,
-          y: Number(_0x13ebc4.gizmoWorldMetrics?.extents?.y) || 0,
-          z: Number(_0x13ebc4.gizmoWorldMetrics?.extents?.z) || 0,
+          x: Number(box40.gizmoWorldMetrics?.extents?.x) || 0,
+          y: Number(box40.gizmoWorldMetrics?.extents?.y) || 0,
+          z: Number(box40.gizmoWorldMetrics?.extents?.z) || 0,
         },
-        sphereRadius: Number(_0x13ebc4.gizmoWorldMetrics?.sphereRadius) || 0.01,
-        margin: Number(_0x13ebc4.gizmoWorldMetrics?.margin) || GIZMO_MARGIN_WORLD_MIN,
+        sphereRadius: Number(box40.gizmoWorldMetrics?.sphereRadius) || 0.01,
+        margin: Number(box40.gizmoWorldMetrics?.margin) || GIZMO_MARGIN_WORLD_MIN,
       },
-      _0x4aba1d = {
-        ..._0x13ebc4,
-        position: _0x5c61c8,
-        pivot: _0x13ebc4.pivot?.clone?.() || _0x5c61c8.clone(),
-        orientationQuaternion: _0x21c168,
-        bounds: _0x3fcef2,
-        gizmoWorldMetrics: _0x49bec6,
+      context = {
+        ...box40,
+        position: position2,
+        pivot: box40.pivot?.clone?.() || position2.clone(),
+        orientationQuaternion: orientationQuaternion4,
+        bounds: bounds2,
+        gizmoWorldMetrics: gizmoWorldMetrics2,
       },
-      _0x463f21 = this._computeScreenConstantGizmoScale(_0x5c61c8);
+      scale = this._computeScreenConstantGizmoScale(position2);
     return (
       (this._gizmo.dragLock = {
-        context: _0x4aba1d,
-        position: _0x5c61c8.clone(),
-        orientationQuaternion: _0x21c168.clone(),
-        bounds: _0x3fcef2,
-        gizmoWorldMetrics: _0x49bec6,
-        scale: _0x463f21,
+        context: context,
+        position: position2.clone(),
+        orientationQuaternion: orientationQuaternion4.clone(),
+        bounds: bounds2,
+        gizmoWorldMetrics: gizmoWorldMetrics2,
+        scale: scale,
       }),
       this._gizmo.dragLock
     );
   }
-  ['_applyGizmoLayoutFromContext'](_0x3c741a, _0x2c2b18) {
-    const _0x4bf2cc = this._gizmo?.baseLayout,
-      _0x270caf = _0x3c741a?.gizmoWorldMetrics;
-    if (!_0x4bf2cc || !_0x270caf) return;
-    const _0x17c857 = _0x270caf.extents,
-      _0x466952 = _0x270caf.margin,
-      _0x341cbc = Math.max(0.01, Number(_0x270caf.maxExtent) || 0.01),
-      _0x394550 = Math.max(0.001, Number(_0x2c2b18) || 1),
-      _0x474e4b = GIZMO_MOVE_HEAD_LENGTH * 0.5,
-      _0x1463d3 = GIZMO_SCALE_HEAD_SIZE * 0.5,
-      _0x512497 = GIZMO_MOVE_PICK_LENGTH - GIZMO_BASE_AXIS_LENGTH,
-      _0x26a370 = GIZMO_SCALE_PICK_LENGTH - GIZMO_BASE_SCALE_LENGTH,
-      _0x147dbc = { x: _0x17c857.x + _0x466952, y: _0x17c857.y + _0x466952, z: _0x17c857.z + _0x466952 };
-    (['x', 'y', 'z'].forEach((_0x5cdc02) => {
-      const _0x367797 = this._gizmo?.moveAxes?.[_0x5cdc02],
-        _0x153b53 = this._gizmo?.scaleAxes?.[_0x5cdc02],
-        _0x26d91d = Math.max(_0x4bf2cc.axisLength, _0x147dbc[_0x5cdc02] / _0x394550),
-        _0x32b5bb = Math.max(GIZMO_MOVE_SHAFT_LENGTH, _0x26d91d - _0x474e4b),
-        _0x1f6612 = Math.max(GIZMO_MOVE_PICK_LENGTH, _0x26d91d + _0x512497);
-      _0x367797?.shaftLine && setAxisLineEnd(_0x367797.shaftLine, _0x5cdc02, _0x32b5bb);
-      _0x367797?.headMesh && setAxisHandleLayout(_0x367797.headMesh, _0x26d91d - _0x474e4b, _0x474e4b);
-      _0x367797?.pickMesh &&
-        (setAxisHandleLayout(_0x367797.pickMesh, _0x1f6612 * 0.5),
-        _0x367797.pickMesh.scale.set(1, _0x1f6612 / GIZMO_MOVE_PICK_LENGTH, 1));
-      const _0x3f735d = _0x4bf2cc.scaleLength,
-        _0xc429b6 = Math.max(GIZMO_SCALE_SHAFT_LENGTH, _0x3f735d - _0x1463d3),
-        _0x1e8b0d = Math.max(GIZMO_SCALE_PICK_LENGTH, _0x3f735d + _0x26a370);
-      (_0x153b53?.shaftLine && setAxisLineEnd(_0x153b53.shaftLine, _0x5cdc02, _0xc429b6),
-        _0x153b53?.headMesh && setAxisHandleLayout(_0x153b53.headMesh, _0x3f735d - _0x1463d3, _0x1463d3),
-        _0x153b53?.pickMesh &&
-          (setAxisHandleLayout(_0x153b53.pickMesh, _0x1e8b0d * 0.5),
-          _0x153b53.pickMesh.scale.set(1, _0x1e8b0d / GIZMO_SCALE_PICK_LENGTH, 1)));
+  ['_applyGizmoLayoutFromContext'](value255, value256) {
+    const enabled50 = this._gizmo?.baseLayout,
+      enabled51 = value255?.gizmoWorldMetrics;
+    if (!enabled50 || !enabled51) return;
+    const x12 = enabled51.extents,
+      value257 = enabled51.margin,
+      value258 = Math.max(0.01, Number(enabled51.maxExtent) || 0.01),
+      value259 = Math.max(0.001, Number(value256) || 1),
+      value260 = GIZMO_MOVE_HEAD_LENGTH * 0.5,
+      value261 = GIZMO_SCALE_HEAD_SIZE * 0.5,
+      value262 = GIZMO_MOVE_PICK_LENGTH - GIZMO_BASE_AXIS_LENGTH,
+      value263 = GIZMO_SCALE_PICK_LENGTH - GIZMO_BASE_SCALE_LENGTH,
+      value264 = { x: x12.x + value257, y: x12.y + value257, z: x12.z + value257 };
+    (['x', 'y', 'z'].forEach((item36) => {
+      const value265 = this._gizmo?.moveAxes?.[item36],
+        value266 = this._gizmo?.scaleAxes?.[item36],
+        value267 = Math.max(enabled50.axisLength, value264[item36] / value259),
+        value268 = Math.max(GIZMO_MOVE_SHAFT_LENGTH, value267 - value260),
+        value269 = Math.max(GIZMO_MOVE_PICK_LENGTH, value267 + value262);
+      value265?.shaftLine && setAxisLineEnd(value265.shaftLine, item36, value268);
+      value265?.headMesh && setAxisHandleLayout(value265.headMesh, value267 - value260, value260);
+      value265?.pickMesh &&
+        (setAxisHandleLayout(value265.pickMesh, value269 * 0.5),
+        value265.pickMesh.scale.set(1, value269 / GIZMO_MOVE_PICK_LENGTH, 1));
+      const value270 = enabled50.scaleLength,
+        value271 = Math.max(GIZMO_SCALE_SHAFT_LENGTH, value270 - value261),
+        value272 = Math.max(GIZMO_SCALE_PICK_LENGTH, value270 + value263);
+      (value266?.shaftLine && setAxisLineEnd(value266.shaftLine, item36, value271),
+        value266?.headMesh && setAxisHandleLayout(value266.headMesh, value270 - value261, value261),
+        value266?.pickMesh &&
+          (setAxisHandleLayout(value266.pickMesh, value272 * 0.5),
+          value266.pickMesh.scale.set(1, value272 / GIZMO_SCALE_PICK_LENGTH, 1)));
     }),
-      ['x', 'y', 'z'].forEach((_0x465348) => {
-        const _0xecb2c2 = this._gizmo?.rotateRings?.[_0x465348];
-        if (_0xecb2c2?.group) _0xecb2c2.group.scale.setScalar(1);
+      ['x', 'y', 'z'].forEach((item37) => {
+        const value273 = this._gizmo?.rotateRings?.[item37];
+        if (value273?.group) value273.group.scale.setScalar(1);
       }));
-    const _0x346950 = Math.max(_0x4bf2cc.planeOffset * 0.5, _0x466952 * 0.42),
-      _0x28323a = Math.max(_0x4bf2cc.planeOffset, (_0x17c857.x + _0x346950) / _0x394550),
-      _0x4e5e12 = Math.max(_0x4bf2cc.planeOffset, (_0x17c857.y + _0x346950) / _0x394550),
-      _0x193ae2 = Math.max(_0x4bf2cc.planeOffset, (_0x17c857.z + _0x346950) / _0x394550),
-      _0x20ef5f = _0x4bf2cc.planeSize * 0.86,
-      _0x35af15 = Math.max(_0x4bf2cc.planeSize * 1.2, (_0x341cbc / _0x394550) * 0.32),
-      _0x494ec9 = (_0x19586a, _0xdc0a1a) =>
-        Math.max(_0x20ef5f, Math.min(_0x35af15, Math.min(_0x19586a, _0xdc0a1a) * 0.34)),
-      _0x267310 = _0x494ec9(_0x28323a, _0x4e5e12),
-      _0x348693 = _0x494ec9(_0x28323a, _0x193ae2),
-      _0x21c7f6 = _0x494ec9(_0x4e5e12, _0x193ae2),
-      _0xf640c6 = Math.max(_0x4bf2cc.planeSize * 0.18, _0x466952 * 0.28) / _0x394550,
-      _0xabd4d7 = (_0x4485e1, _0x908fd5, _0x3e1702, _0x3c737e, _0x4ea506, _0x5b857d = 1, _0x5565b4 = 1) => {
-        if (!_0x4485e1) return;
-        const _0x407193 = _0x4ea506 / Math.max(0.001, _0x4bf2cc.planeSize);
-        (_0x4485e1.visualGroup &&
-          (_0x4485e1.visualGroup.position.set(_0x908fd5, _0x3e1702, _0x3c737e),
-          _0x4485e1.visualGroup.scale.set(_0x5b857d * _0x407193, _0x5565b4 * _0x407193, _0x407193)),
-          _0x4485e1.pickMesh &&
-            (_0x4485e1.pickMesh.position.set(_0x908fd5, _0x3e1702, _0x3c737e),
-            _0x4485e1.pickMesh.scale.setScalar(_0x407193)));
+    const value274 = Math.max(enabled50.planeOffset * 0.5, value257 * 0.42),
+      value275 = Math.max(enabled50.planeOffset, (x12.x + value274) / value259),
+      value276 = Math.max(enabled50.planeOffset, (x12.y + value274) / value259),
+      value277 = Math.max(enabled50.planeOffset, (x12.z + value274) / value259),
+      value278 = enabled50.planeSize * 0.86,
+      value279 = Math.max(enabled50.planeSize * 1.2, (value258 / value259) * 0.32),
+      handler9 = (value280, value281) =>
+        Math.max(value278, Math.min(value279, Math.min(value280, value281) * 0.34)),
+      value282 = handler9(value275, value276),
+      value283 = handler9(value275, value277),
+      value284 = handler9(value276, value277),
+      value285 = Math.max(enabled50.planeSize * 0.18, value257 * 0.28) / value259,
+      handler10 = (enabled52, value286, value287, value288, value289, value290 = 1, value291 = 1) => {
+        if (!enabled52) return;
+        const value292 = value289 / Math.max(0.001, enabled50.planeSize);
+        (enabled52.visualGroup &&
+          (enabled52.visualGroup.position.set(value286, value287, value288),
+          enabled52.visualGroup.scale.set(value290 * value292, value291 * value292, value292)),
+          enabled52.pickMesh &&
+            (enabled52.pickMesh.position.set(value286, value287, value288),
+            enabled52.pickMesh.scale.setScalar(value292)));
       },
-      _0x9de507 = (_0x503bff, _0x277b95) => {
-        const _0x24964e = _0x503bff?.[_0x277b95 + 'xy'];
-        _0x24964e && _0xabd4d7(_0x24964e, _0x28323a, _0x4e5e12, _0xf640c6, _0x267310, 1, 1);
-        const _0x5a77cc = _0x503bff?.[_0x277b95 + 'xz'];
-        _0x5a77cc && _0xabd4d7(_0x5a77cc, _0x28323a, _0xf640c6, _0x193ae2, _0x348693, 1, 1);
-        const _0x5834a6 = _0x503bff?.[_0x277b95 + 'yz'];
-        _0x5834a6 && _0xabd4d7(_0x5834a6, _0xf640c6, _0x4e5e12, _0x193ae2, _0x21c7f6, 1, 1);
+      handler11 = (value293, value294) => {
+        const value295 = value293?.[value294 + 'xy'];
+        value295 && handler10(value295, value275, value276, value285, value282, 1, 1);
+        const value296 = value293?.[value294 + 'xz'];
+        value296 && handler10(value296, value275, value285, value277, value283, 1, 1);
+        const value297 = value293?.[value294 + 'yz'];
+        value297 && handler10(value297, value285, value276, value277, value284, 1, 1);
       };
-    (_0x9de507(this._gizmo?.planeHandles, 'plane-'),
-      _0x9de507(this._gizmo?.scalePlaneHandles, 'scale-plane-'));
+    (handler11(this._gizmo?.planeHandles, 'plane-'),
+      handler11(this._gizmo?.scalePlaneHandles, 'scale-plane-'));
   }
-  ['_applyGizmoOrientationFromContext'](_0x61e33e) {
+  ['_applyGizmoOrientationFromContext'](enabled53) {
     if (!this._gizmo?.root?.quaternion) return;
-    if (!_0x61e33e) {
+    if (!enabled53) {
       this._gizmo.root.quaternion.identity();
       return;
     }
-    if (_0x61e33e.isMultiSelection && _0x61e33e.usesLocalOrientation !== true) {
+    if (enabled53.isMultiSelection && enabled53.usesLocalOrientation !== true) {
       this._gizmo.root.quaternion.identity();
       return;
     }
-    if (_0x61e33e.orientationQuaternion) {
-      this._gizmo.root.quaternion.copy(_0x61e33e.orientationQuaternion);
+    if (enabled53.orientationQuaternion) {
+      this._gizmo.root.quaternion.copy(enabled53.orientationQuaternion);
       return;
     }
     this._gizmo.root.quaternion.identity();
   }
-  ['_syncGizmo'](_0x236195, _0x98eb98 = false) {
-    if (_0x98eb98 || _0x236195?.mode !== 'scene') {
+  ['_syncGizmo'](enabled54, value298 = false) {
+    if (value298 || enabled54?.mode !== 'scene') {
       ((this._gizmo.root.visible = false), this._clearStableGizmoContext(), this.clearGizmoHandleState());
       return;
     }
-    if (!_0x236195?.ui?.isEditing) {
+    if (!enabled54?.ui?.isEditing) {
       ((this._gizmo.root.visible = false), this._clearStableGizmoContext(), this.clearGizmoHandleState());
       return;
     }
-    const _0x4289c9 = resolveActiveTransformTool(_0x236195);
-    ((this._gizmo.currentTool = _0x4289c9),
-      (this._gizmo.root.visible = _0x4289c9 === 'move' || _0x4289c9 === 'rotate' || _0x4289c9 === 'scale'));
+    const activeTransformTool2 = resolveActiveTransformTool(enabled54);
+    ((this._gizmo.currentTool = activeTransformTool2),
+      (this._gizmo.root.visible =
+        activeTransformTool2 === 'move' ||
+        activeTransformTool2 === 'rotate' ||
+        activeTransformTool2 === 'scale'));
     if (!this._gizmo.root.visible) {
       (this._clearStableGizmoContext(), this.clearGizmoHandleState());
       return;
     }
-    const _0x57367b = buildTransformSelectionSignature(_0x236195);
-    if (!_0x57367b) {
+    const transformSelectionSignature3 = buildTransformSelectionSignature(enabled54);
+    if (!transformSelectionSignature3) {
       ((this._gizmo.root.visible = false), this._clearStableGizmoContext(), this.clearGizmoHandleState());
       return;
     }
-    const _0x4fecad = this._resolveGizmoContext(_0x236195),
-      _0x34b865 = _0x4fecad || this._resolveStableGizmoContext(_0x236195);
-    if (!_0x34b865) {
+    const value299 = this._resolveGizmoContext(enabled54),
+      enabled55 = value299 || this._resolveStableGizmoContext(enabled54);
+    if (!enabled55) {
       ((this._gizmo.root.visible = false), this.clearGizmoHandleState());
       return;
     }
-    (_0x4fecad && this._cacheStableGizmoContext(_0x236195, _0x4fecad),
-      (this._gizmo.moveGroup.visible = _0x4289c9 === 'move'),
-      (this._gizmo.rotateGroup.visible = _0x4289c9 === 'rotate'),
-      (this._gizmo.scaleGroup.visible = _0x4289c9 === 'scale'),
-      this._gizmo.root.position.copy(_0x34b865.position),
-      this._applyGizmoOrientationFromContext(_0x34b865),
+    (value299 && this._cacheStableGizmoContext(enabled54, value299),
+      (this._gizmo.moveGroup.visible = activeTransformTool2 === 'move'),
+      (this._gizmo.rotateGroup.visible = activeTransformTool2 === 'rotate'),
+      (this._gizmo.scaleGroup.visible = activeTransformTool2 === 'scale'),
+      this._gizmo.root.position.copy(enabled55.position),
+      this._applyGizmoOrientationFromContext(enabled55),
       this._applyGizmoHighlight());
   }
   ['_applyGizmoPosition']() {
     if (!this._sceneState?.ui?.isEditing) return;
     if (!this._gizmo.root.visible) return;
-    const _0x35d0e8 = this._gizmo.dragLock;
-    if (_0x35d0e8) {
-      (this._gizmo.root.position.copy(_0x35d0e8.position),
-        this._gizmo.root.quaternion.copy(_0x35d0e8.orientationQuaternion),
-        this._gizmo.root.scale.setScalar(_0x35d0e8.scale),
-        this._applyGizmoLayoutFromContext(_0x35d0e8.context, _0x35d0e8.scale));
+    const box41 = this._gizmo.dragLock;
+    if (box41) {
+      (this._gizmo.root.position.copy(box41.position),
+        this._gizmo.root.quaternion.copy(box41.orientationQuaternion),
+        this._gizmo.root.scale.setScalar(box41.scale),
+        this._applyGizmoLayoutFromContext(box41.context, box41.scale));
       return;
     }
-    const _0x5bb47b = this._resolveGizmoContext(this._sceneState),
-      _0x43fcf7 = _0x5bb47b || this._resolveStableGizmoContext(this._sceneState);
-    if (!_0x43fcf7) return;
-    _0x5bb47b && this._cacheStableGizmoContext(this._sceneState, _0x5bb47b);
-    (this._gizmo.root.position.copy(_0x43fcf7.position), this._applyGizmoOrientationFromContext(_0x43fcf7));
-    const _0x4450d9 = this._computeScreenConstantGizmoScale(_0x43fcf7.position);
-    (this._gizmo.root.scale.setScalar(_0x4450d9), this._applyGizmoLayoutFromContext(_0x43fcf7, _0x4450d9));
+    const value300 = this._resolveGizmoContext(this._sceneState),
+      enabled56 = value300 || this._resolveStableGizmoContext(this._sceneState);
+    if (!enabled56) return;
+    value300 && this._cacheStableGizmoContext(this._sceneState, value300);
+    (this._gizmo.root.position.copy(enabled56.position), this._applyGizmoOrientationFromContext(enabled56));
+    const value301 = this._computeScreenConstantGizmoScale(enabled56.position);
+    (this._gizmo.root.scale.setScalar(value301), this._applyGizmoLayoutFromContext(enabled56, value301));
   }
   ['_applyGizmoHighlight']() {
-    const _0x1073e7 = this._gizmo?.hoverHandle || null,
-      _0x4d0813 = this._gizmo?.activeHandle || null,
-      _0x4a85a8 = (_0x2d41da) => {
-        const _0x7cfb1f = new Set();
-        if (!_0x2d41da) return _0x7cfb1f;
-        _0x7cfb1f.add(_0x2d41da);
-        const _0x23d02a = this._gizmo?.handles?.get?.(_0x2d41da) || null;
+    const value302 = this._gizmo?.hoverHandle || null,
+      value303 = this._gizmo?.activeHandle || null,
+      handler12 = (enabled57) => {
+        const value304 = new Set();
+        if (!enabled57) return value304;
+        value304.add(enabled57);
+        const value305 = this._gizmo?.handles?.get?.(enabled57) || null;
         return (
-          _0x23d02a?.mode === 'plane' &&
-            (_0x23d02a.linkedAxes || []).forEach((_0x3ad386) => {
-              if (_0x3ad386) _0x7cfb1f.add('axis-' + _0x3ad386);
+          value305?.mode === 'plane' &&
+            (value305.linkedAxes || []).forEach((item38) => {
+              if (item38) value304.add('axis-' + item38);
             }),
-          _0x7cfb1f
+          value304
         );
       },
-      _0x249056 = _0x4a85a8(_0x4d0813),
-      _0x3a51f6 = _0x4a85a8(_0x1073e7);
-    this._gizmo?.handles?.forEach((_0x496612, _0x409c65) => {
-      const _0x1a0218 = _0x249056.has(_0x409c65),
-        _0x3a2451 = !_0x1a0218 && _0x3a51f6.has(_0x409c65),
-        _0x11332a = _0x1a0218 ? 0.52 : _0x3a2451 ? 0.3 : 0,
-        _0x358e44 = _0x1a0218 ? 1 : _0x3a2451 ? 0.92 : 0.8;
-      (_0x496612.visuals || []).forEach((_0x180e0f) => {
-        const _0x484c43 = _0x180e0f?.material,
-          _0x49a758 = _0x180e0f?.color;
-        if (!_0x484c43?.color || !_0x49a758) return;
-        (_0x484c43.color.copy(_0x49a758).lerp(new threeRuntime.Color(0xffffff), _0x11332a),
-          typeof _0x180e0f.opacity === 'number' &&
-            'opacity' in _0x484c43 &&
-            (_0x484c43.opacity = _0x180e0f.opacity * _0x358e44),
-          (_0x484c43.needsUpdate = true));
+      map9 = handler12(value303),
+      map10 = handler12(value302);
+    this._gizmo?.handles?.forEach((item39, value306) => {
+      const enabled58 = map9.has(value306),
+        value307 = !enabled58 && map10.has(value306),
+        value308 = enabled58 ? 0.52 : value307 ? 0.3 : 0,
+        value309 = enabled58 ? 1 : value307 ? 0.92 : 0.8;
+      (item39.visuals || []).forEach((item40) => {
+        const enabled59 = item40?.material,
+          enabled60 = item40?.color;
+        if (!enabled59?.color || !enabled60) return;
+        (enabled59.color.copy(enabled60).lerp(new threeRuntime.Color(0xffffff), value308),
+          typeof item40.opacity === 'number' &&
+            'opacity' in enabled59 &&
+            (enabled59.opacity = item40.opacity * value309),
+          (enabled59.needsUpdate = true));
       });
     });
   }
   ['_applyRenderView']() {
-    const _0x3bc3cd = this._resolveTargetRenderPose(),
-      _0x26390a = performance.now(),
-      _0x33f238 = this._shouldSmoothTargetPose(_0x3bc3cd, _0x26390a),
-      _0x20f325 = _0x33f238 ? this._applyPoseSmoothing(_0x3bc3cd, _0x26390a) : cloneRenderPose(_0x3bc3cd),
-      _0x402b08 = _0x33f238 && measurePoseDistance(_0x20f325, _0x3bc3cd) > POSE_SETTLE_EPSILON;
+    const value310 = this._resolveTargetRenderPose(),
+      value311 = performance.now(),
+      enabled61 = this._shouldSmoothTargetPose(value310, value311),
+      value312 = enabled61 ? this._applyPoseSmoothing(value310, value311) : cloneRenderPose(value310),
+      keepAnimating = enabled61 && measurePoseDistance(value312, value310) > POSE_SETTLE_EPSILON;
     return (
-      (!_0x33f238 || !_0x402b08) &&
-        ((this._smoothedPose = cloneRenderPose(_0x3bc3cd)), (this._lastRenderTime = _0x26390a)),
-      (this._renderPose = _0x20f325),
-      this._commitCameraFromPose(_0x20f325),
-      { keepAnimating: _0x402b08 }
+      (!enabled61 || !keepAnimating) &&
+        ((this._smoothedPose = cloneRenderPose(value310)), (this._lastRenderTime = value311)),
+      (this._renderPose = value312),
+      this._commitCameraFromPose(value312),
+      { keepAnimating: keepAnimating }
     );
   }
   ['_resolveTargetRenderPose']() {
-    const _0x8795ff = this._sceneState,
-      _0x1c175e = this._draftView,
-      _0x5b76bb = this._isPanorama360Mode(_0x8795ff);
-    let _0x2bab4e;
-    if (_0x5b76bb) {
-      const _0xed22a6 =
-        _0x1c175e?.kind === 'panorama-default'
-          ? _0x1c175e.panoramaView || _0x8795ff?.viewport?.panoramaView
-          : _0x8795ff?.viewport?.panoramaView;
-      _0x2bab4e = resolvePanoramaViewPose(_0xed22a6, { x: 0, y: 0, z: 0 });
+    const value313 = this._sceneState,
+      value314 = this._draftView,
+      value315 = this._isPanorama360Mode(value313);
+    let panoramaViewPose;
+    if (value315) {
+      const value316 =
+        value314?.kind === 'panorama-default'
+          ? value314.panoramaView || value313?.viewport?.panoramaView
+          : value313?.viewport?.panoramaView;
+      panoramaViewPose = resolvePanoramaViewPose(value316, { x: 0, y: 0, z: 0 });
     } else {
-      if (_0x1c175e?.kind === 'camera') {
-        const _0x1cb46b = normalizeCameraPoseData(_0x1c175e);
-        _0x2bab4e = {
+      if (value314?.kind === 'camera') {
+        const position3 = normalizeCameraPoseData(value314);
+        panoramaViewPose = {
           kind: 'camera',
-          position: _0x1cb46b.position,
-          quaternion: _0x1cb46b.quaternion,
-          rotation: _0x1cb46b.rotation,
-          fov: _0x1cb46b.fov,
+          position: position3.position,
+          quaternion: position3.quaternion,
+          rotation: position3.rotation,
+          fov: position3.fov,
         };
       } else {
-        if (_0x1c175e?.kind === 'scene-default')
-          _0x2bab4e = resolveSceneCameraPose(
-            _0x1c175e.sceneView || _0x8795ff.viewport.sceneView,
-            Number.isFinite(Number(_0x1c175e.fov))
-              ? Number(_0x1c175e.fov)
+        if (value314?.kind === 'scene-default')
+          panoramaViewPose = resolveSceneCameraPose(
+            value314.sceneView || value313.viewport.sceneView,
+            Number.isFinite(Number(value314.fov))
+              ? Number(value314.fov)
               : focalLengthToFov(this._defaultSceneFocalLength),
           );
         else {
-          if (_0x1c175e?.kind === 'panorama-default')
-            _0x2bab4e = resolvePanoramaViewPose(_0x1c175e.panoramaView || _0x8795ff.viewport.panoramaView);
+          if (value314?.kind === 'panorama-default')
+            panoramaViewPose = resolvePanoramaViewPose(
+              value314.panoramaView || value313.viewport.panoramaView,
+            );
           else {
-            if (_0x8795ff.mode === 'panorama')
-              _0x2bab4e = resolvePanoramaViewPose(_0x8795ff.viewport.panoramaView);
+            if (value313.mode === 'panorama')
+              panoramaViewPose = resolvePanoramaViewPose(value313.viewport.panoramaView);
             else
-              _0x8795ff?.viewport?.activeView === 'camera' && _0x8795ff?.viewport?.activeCameraId
-                ? (_0x2bab4e = resolveSceneCameraPose(
-                    _0x8795ff.viewport.sceneView,
+              value313?.viewport?.activeView === 'camera' && value313?.viewport?.activeCameraId
+                ? (panoramaViewPose = resolveSceneCameraPose(
+                    value313.viewport.sceneView,
                     focalLengthToFov(this._defaultSceneFocalLength),
                   ))
-                : (_0x2bab4e = resolveSceneCameraPose(
-                    _0x8795ff.viewport.sceneView,
+                : (panoramaViewPose = resolveSceneCameraPose(
+                    value313.viewport.sceneView,
                     focalLengthToFov(this._defaultSceneFocalLength),
                   ));
           }
         }
       }
     }
-    return _0x2bab4e;
+    return panoramaViewPose;
   }
-  ['_shouldSmoothTargetPose'](_0x41c91e, _0x1d6197 = performance.now()) {
+  ['_shouldSmoothTargetPose'](enabled62, value317 = performance.now()) {
     if (this._draftView?.disableSmoothing === true) return false;
-    if (!_0x41c91e || _0x41c91e.kind === 'camera') return false;
-    if (_0x1d6197 <= (this._viewSmoothingUntil || 0)) return true;
-    if (!this._smoothedPose || this._smoothedPose.kind !== _0x41c91e.kind) return false;
-    return measurePoseDistance(this._smoothedPose, _0x41c91e) > POSE_SETTLE_EPSILON;
+    if (!enabled62 || enabled62.kind === 'camera') return false;
+    if (value317 <= (this._viewSmoothingUntil || 0)) return true;
+    if (!this._smoothedPose || this._smoothedPose.kind !== enabled62.kind) return false;
+    return measurePoseDistance(this._smoothedPose, enabled62) > POSE_SETTLE_EPSILON;
   }
-  ['_applyPoseSmoothing'](_0x1fa06d, _0x4f57a7 = performance.now()) {
-    if (!this._smoothedPose || this._smoothedPose.kind !== _0x1fa06d.kind)
+  ['_applyPoseSmoothing'](event6, value318 = performance.now()) {
+    if (!this._smoothedPose || this._smoothedPose.kind !== event6.kind)
       return (
-        (this._smoothedPose = cloneRenderPose(_0x1fa06d)),
-        (this._lastRenderTime = _0x4f57a7),
-        cloneRenderPose(_0x1fa06d)
+        (this._smoothedPose = cloneRenderPose(event6)),
+        (this._lastRenderTime = value318),
+        cloneRenderPose(event6)
       );
-    const _0x5e719c = Math.min(
+    const value319 = Math.min(
       VIEW_DAMPING_MAX_DT_MS,
-      Math.max(0, _0x4f57a7 - (this._lastRenderTime || _0x4f57a7)),
+      Math.max(0, value318 - (this._lastRenderTime || value318)),
     );
-    this._lastRenderTime = _0x4f57a7;
-    const _0x363b64 = this._smoothedPose;
-    if (_0x1fa06d.kind === 'panorama-default')
+    this._lastRenderTime = value318;
+    const event7 = this._smoothedPose;
+    if (event6.kind === 'panorama-default')
       return (
-        (_0x363b64.position.x = dampScalar(
-          _0x363b64.position.x,
-          _0x1fa06d.position.x,
-          _0x5e719c,
+        (event7.position.x = dampScalar(
+          event7.position.x,
+          event6.position.x,
+          value319,
           VIEW_DAMPING_TIME_CONSTANT_MS,
         )),
-        (_0x363b64.position.y = dampScalar(
-          _0x363b64.position.y,
-          _0x1fa06d.position.y,
-          _0x5e719c,
+        (event7.position.y = dampScalar(
+          event7.position.y,
+          event6.position.y,
+          value319,
           VIEW_DAMPING_TIME_CONSTANT_MS,
         )),
-        (_0x363b64.position.z = dampScalar(
-          _0x363b64.position.z,
-          _0x1fa06d.position.z,
-          _0x5e719c,
+        (event7.position.z = dampScalar(
+          event7.position.z,
+          event6.position.z,
+          value319,
           VIEW_DAMPING_TIME_CONSTANT_MS,
         )),
-        (_0x363b64.yaw = dampAngle(_0x363b64.yaw, _0x1fa06d.yaw, _0x5e719c, VIEW_DAMPING_TIME_CONSTANT_MS)),
-        (_0x363b64.pitch = dampScalar(
-          _0x363b64.pitch,
-          _0x1fa06d.pitch,
-          _0x5e719c,
-          VIEW_DAMPING_TIME_CONSTANT_MS,
-        )),
-        (_0x363b64.fov = dampScalar(_0x363b64.fov, _0x1fa06d.fov, _0x5e719c, VIEW_DAMPING_TIME_CONSTANT_MS)),
-        cloneRenderPose(_0x363b64)
+        (event7.yaw = dampAngle(event7.yaw, event6.yaw, value319, VIEW_DAMPING_TIME_CONSTANT_MS)),
+        (event7.pitch = dampScalar(event7.pitch, event6.pitch, value319, VIEW_DAMPING_TIME_CONSTANT_MS)),
+        (event7.fov = dampScalar(event7.fov, event6.fov, value319, VIEW_DAMPING_TIME_CONSTANT_MS)),
+        cloneRenderPose(event7)
       );
     return (
-      (_0x363b64.position.x = dampScalar(
-        _0x363b64.position.x,
-        _0x1fa06d.position.x,
-        _0x5e719c,
+      (event7.position.x = dampScalar(
+        event7.position.x,
+        event6.position.x,
+        value319,
         VIEW_DAMPING_TIME_CONSTANT_MS,
       )),
-      (_0x363b64.position.y = dampScalar(
-        _0x363b64.position.y,
-        _0x1fa06d.position.y,
-        _0x5e719c,
+      (event7.position.y = dampScalar(
+        event7.position.y,
+        event6.position.y,
+        value319,
         VIEW_DAMPING_TIME_CONSTANT_MS,
       )),
-      (_0x363b64.position.z = dampScalar(
-        _0x363b64.position.z,
-        _0x1fa06d.position.z,
-        _0x5e719c,
+      (event7.position.z = dampScalar(
+        event7.position.z,
+        event6.position.z,
+        value319,
         VIEW_DAMPING_TIME_CONSTANT_MS,
       )),
-      (_0x363b64.target.x = dampScalar(
-        _0x363b64.target.x,
-        _0x1fa06d.target.x,
-        _0x5e719c,
+      (event7.target.x = dampScalar(
+        event7.target.x,
+        event6.target.x,
+        value319,
         VIEW_DAMPING_TIME_CONSTANT_MS,
       )),
-      (_0x363b64.target.y = dampScalar(
-        _0x363b64.target.y,
-        _0x1fa06d.target.y,
-        _0x5e719c,
+      (event7.target.y = dampScalar(
+        event7.target.y,
+        event6.target.y,
+        value319,
         VIEW_DAMPING_TIME_CONSTANT_MS,
       )),
-      (_0x363b64.target.z = dampScalar(
-        _0x363b64.target.z,
-        _0x1fa06d.target.z,
-        _0x5e719c,
+      (event7.target.z = dampScalar(
+        event7.target.z,
+        event6.target.z,
+        value319,
         VIEW_DAMPING_TIME_CONSTANT_MS,
       )),
-      (_0x363b64.fov = dampScalar(_0x363b64.fov, _0x1fa06d.fov, _0x5e719c, VIEW_DAMPING_TIME_CONSTANT_MS)),
-      (_0x363b64.yaw = _0x1fa06d.yaw),
-      (_0x363b64.pitch = _0x1fa06d.pitch),
-      (_0x363b64.distance = _0x1fa06d.distance),
-      cloneRenderPose(_0x363b64)
+      (event7.fov = dampScalar(event7.fov, event6.fov, value319, VIEW_DAMPING_TIME_CONSTANT_MS)),
+      (event7.yaw = event6.yaw),
+      (event7.pitch = event6.pitch),
+      (event7.distance = event6.distance),
+      cloneRenderPose(event7)
     );
   }
-  ['_commitCameraFromPose'](_0xbdc6eb) {
-    if (!_0xbdc6eb) return;
-    const _0x551fc4 = _0xbdc6eb?.kind === 'panorama-default' ? 55 : 58;
-    ((this.camera.fov = Number.isFinite(Number(_0xbdc6eb?.fov)) ? Number(_0xbdc6eb.fov) : _0x551fc4),
+  ['_commitCameraFromPose'](event8) {
+    if (!event8) return;
+    const value320 = event8?.kind === 'panorama-default' ? 55 : 58;
+    ((this.camera.fov = Number.isFinite(Number(event8?.fov)) ? Number(event8.fov) : value320),
       this.camera.updateProjectionMatrix());
-    if (_0xbdc6eb.kind === 'camera') {
-      const _0x27817c = normalizeCameraPoseData(_0xbdc6eb);
-      (this.camera.position.set(_0x27817c.position.x, _0x27817c.position.y, _0x27817c.position.z),
+    if (event8.kind === 'camera') {
+      const cameraPoseData5 = normalizeCameraPoseData(event8);
+      (this.camera.position.set(
+        cameraPoseData5.position.x,
+        cameraPoseData5.position.y,
+        cameraPoseData5.position.z,
+      ),
         this.camera.quaternion.set(
-          _0x27817c.quaternion.x,
-          _0x27817c.quaternion.y,
-          _0x27817c.quaternion.z,
-          _0x27817c.quaternion.w,
+          cameraPoseData5.quaternion.x,
+          cameraPoseData5.quaternion.y,
+          cameraPoseData5.quaternion.z,
+          cameraPoseData5.quaternion.w,
         ));
       return;
     }
-    if (_0xbdc6eb.kind === 'panorama-default') {
-      const _0x1bdd2f = forwardVectorFromYawPitch(_0xbdc6eb.yaw, _0xbdc6eb.pitch);
-      (this.camera.position.set(0, 0, 0), this.camera.lookAt(_0x1bdd2f.x, _0x1bdd2f.y, _0x1bdd2f.z));
+    if (event8.kind === 'panorama-default') {
+      const box42 = forwardVectorFromYawPitch(event8.yaw, event8.pitch);
+      (this.camera.position.set(0, 0, 0), this.camera.lookAt(box42.x, box42.y, box42.z));
       return;
     }
-    (this.camera.position.set(_0xbdc6eb.position.x, _0xbdc6eb.position.y, _0xbdc6eb.position.z),
-      this.camera.lookAt(_0xbdc6eb.target.x, _0xbdc6eb.target.y, _0xbdc6eb.target.z));
+    (this.camera.position.set(event8.position.x, event8.position.y, event8.position.z),
+      this.camera.lookAt(event8.target.x, event8.target.y, event8.target.z));
   }
   ['_applyDraftObjects']() {
     if (!this._sceneState) return;
-    (this._mannequinMap.forEach((_0x28a6b2, _0x49809a) => {
-      const _0xe152ae = this._mannequinStateById.get(_0x49809a);
-      if (!_0xe152ae) return;
-      const _0x5d26b7 = this._draftObjects.get('mannequin:' + _0x49809a),
-        _0x406ea6 = _0x5d26b7 || _0xe152ae;
-      (applyGroupTransform(_0x28a6b2.group, _0x406ea6),
-        (_0x28a6b2.group.position.y = Number(_0x406ea6?.position?.y) || 0),
-        applyGroupScale(_0x28a6b2.group, _0x406ea6?.scale ?? _0xe152ae?.scale ?? 1));
+    (this._mannequinMap.forEach((item41, value321) => {
+      const box43 = this._mannequinStateById.get(value321);
+      if (!box43) return;
+      const value322 = this._draftObjects.get('mannequin:' + value321),
+        box44 = value322 || box43;
+      (applyGroupTransform(item41.group, box44),
+        (item41.group.position.y = Number(box44?.position?.y) || 0),
+        applyGroupScale(item41.group, box44?.scale ?? box43?.scale ?? 1));
     }),
-      this._cubeMap.forEach((_0x164249, _0x348758) => {
-        const _0x2fae1a = this._cubeStateById.get(_0x348758);
-        if (!_0x2fae1a) return;
-        const _0x23fc32 = this._draftObjects.get('cube:' + _0x348758),
-          _0x57091d = _0x23fc32 || _0x2fae1a;
-        (applyGroupTransform(_0x164249.group, _0x57091d),
-          (_0x164249.group.position.y = Number(_0x57091d?.position?.y) || 0),
-          applyGroupScale(_0x164249.group, _0x57091d?.scale ?? _0x2fae1a?.scale ?? 1));
+      this._cubeMap.forEach((item42, value323) => {
+        const box45 = this._cubeStateById.get(value323);
+        if (!box45) return;
+        const value324 = this._draftObjects.get('cube:' + value323),
+          box46 = value324 || box45;
+        (applyGroupTransform(item42.group, box46),
+          (item42.group.position.y = Number(box46?.position?.y) || 0),
+          applyGroupScale(item42.group, box46?.scale ?? box45?.scale ?? 1));
       }));
   }
-  ['_getObjectStateByObjectType'](_0xae93da, _0x4926b2) {
-    if (_0xae93da === 'cube') return this._cubeStateById.get(_0x4926b2) || null;
-    if (_0xae93da === 'mannequin') return this._mannequinStateById.get(_0x4926b2) || null;
+  ['_getObjectStateByObjectType'](value325, value326) {
+    if (value325 === 'cube') return this._cubeStateById.get(value326) || null;
+    if (value325 === 'mannequin') return this._mannequinStateById.get(value326) || null;
     return null;
   }
-  ['_getVisualByObjectType'](_0x529348, _0x38e950) {
-    if (_0x529348 === 'cube') return this._cubeMap.get(_0x38e950);
-    if (_0x529348 === 'mannequin') return this._mannequinMap.get(_0x38e950);
+  ['_getVisualByObjectType'](value327, value328) {
+    if (value327 === 'cube') return this._cubeMap.get(value328);
+    if (value327 === 'mannequin') return this._mannequinMap.get(value328);
     return null;
   }
 }

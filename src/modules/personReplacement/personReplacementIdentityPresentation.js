@@ -35,146 +35,144 @@ const PERSON_REPLACEMENT_ORIENTATION_LABELS = Object['freeze']({
   over_shoulder_right: '右过肩',
   unknown: '待确认',
 });
-function escapeHtml(_0x324962) {
-  return String(_0x324962 ?? '')
+function escapeHtml(value) {
+  return String(value ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
     ['replaceAll']('\x22', '&quot;')
     ['replaceAll']('\x27', '&#39;');
 }
-function normalizeText(_0x48ef30, _0x1807cd = '') {
-  const _0x457adf = String(_0x48ef30 ?? '')['trim']();
-  return _0x457adf || _0x1807cd;
+function normalizeText(item, key = '') {
+  const index = String(item ?? '')['trim']();
+  return index || key;
 }
-function normalizeMediaUrl(_0x4b3f20) {
-  const _0x43bd60 = normalizeText(_0x4b3f20);
-  return _0x43bd60 ? localPathToUrl(_0x43bd60) || _0x43bd60 : '';
+function normalizeMediaUrl(result) {
+  const text = normalizeText(result);
+  return text ? localPathToUrl(text) || text : '';
 }
-function formatPersonOrientation(_0x3f19da) {
+function formatPersonOrientation(data) {
   return (
-    PERSON_REPLACEMENT_ORIENTATION_LABELS[normalizeText(_0x3f19da)] ||
+    PERSON_REPLACEMENT_ORIENTATION_LABELS[normalizeText(data)] ||
     PERSON_REPLACEMENT_ORIENTATION_LABELS['unknown']
   );
 }
-function getCharacterAppearance(_0x198685, _0x4c5915 = '') {
-  const _0x355a5d = getWorkspaceAssetAppearances(_0x198685);
+function getCharacterAppearance(options, target = '') {
+  const list = getWorkspaceAssetAppearances(options);
   return (
-    _0x355a5d['find']((_0x5999ca) => _0x5999ca['id'] === _0x4c5915) ||
-    getWorkspaceAssetBaseAppearance(_0x198685) ||
-    _0x355a5d[0x0] ||
+    list['find']((source) => source['id'] === target) ||
+    getWorkspaceAssetBaseAppearance(options) ||
+    list[0x0] ||
     null
   );
 }
-function normalizeProjectAssetMediaForRender(_0x54d18c = {}) {
+function normalizeProjectAssetMediaForRender(args = {}) {
   return {
-    ..._0x54d18c,
-    appearances: getWorkspaceAssetAppearances(_0x54d18c)['map']((_0x3d543d) => ({
-      ..._0x3d543d,
-      imageUrl: normalizeMediaUrl(_0x3d543d['imageUrl']),
-      referenceImageUrl: normalizeMediaUrl(_0x3d543d['referenceImageUrl']),
+    ...args,
+    appearances: getWorkspaceAssetAppearances(args)['map']((args2) => ({
+      ...args2,
+      imageUrl: normalizeMediaUrl(args2['imageUrl']),
+      referenceImageUrl: normalizeMediaUrl(args2['referenceImageUrl']),
     })),
   };
 }
-function renderPersonReplacementVoiceReferenceStatus(_0x28c95c = {}, _0x44cc79 = '') {
-  const _0x1cdbca = normalizeMediaUrl(
-      _0x28c95c['voiceReference']?.['audioUrl'] ||
-        _0x28c95c['voiceReference']?.['localPath'] ||
-        _0x28c95c['voiceRef'],
+function renderPersonReplacementVoiceReferenceStatus(options2 = {}, next = '') {
+  const mediaUrl = normalizeMediaUrl(
+      options2['voiceReference']?.['audioUrl'] ||
+        options2['voiceReference']?.['localPath'] ||
+        options2['voiceRef'],
     ),
-    _0x3504fe = Boolean(_0x1cdbca);
+    current = Boolean(mediaUrl);
   return (
     '<span class="person-replacement-target-voice-status' +
-    (_0x44cc79 ? '\x20' + escapeHtml(_0x44cc79) : '') +
+    (next ? '\x20' + escapeHtml(next) : '') +
     '\x20' +
-    (_0x3504fe ? 'has-reference' : 'is-missing') +
+    (current ? 'has-reference' : 'is-missing') +
     '\x22><i\x20aria-hidden=\x22true\x22></i>' +
-    (_0x3504fe ? '有声音参考' : '无声音参考') +
+    (current ? '有声音参考' : '无声音参考') +
     '</span>'
   );
 }
 function renderPersonDetectionPicker({
-  kind: _0x9140a9,
-  value: _0x28860a,
-  label: _0x130139,
-  ariaLabel: _0x1efb30,
+  kind: kind,
+  value: value2,
+  label: label,
+  ariaLabel: ariaLabel,
   customInputValue: customInputValue = '',
   sourceCharacterId: sourceCharacterId = '',
 } = {}) {
-  const _0x254522 = normalizeText(_0x28860a),
-    _0x22593a = normalizeText(_0x130139, '请选择'),
-    _0x57bb87 = _0x9140a9 === 'label',
-    _0x3fcce9 = _0x57bb87
+  const text2 = normalizeText(value2),
+    text3 = normalizeText(label, '请选择'),
+    entry = kind === 'label',
+    record = entry
       ? 'data-person-replacement-person-label'
-      : _0x9140a9 === 'scope'
+      : kind === 'scope'
         ? 'data-person-replacement-person-scope'
         : 'data-person-replacement-person-orientation';
   return (
     '<span class="person-replacement-detection-picker is-' +
-    escapeHtml(_0x9140a9) +
+    escapeHtml(kind) +
     '\x22\x20data-person-replacement-detection-picker=\x22' +
-    escapeHtml(_0x9140a9) +
+    escapeHtml(kind) +
     '">\n    <button type="button" class="person-replacement-detection-picker-trigger" data-person-replacement-action="toggle-detection-picker" data-person-replacement-detection-picker-trigger="' +
-    escapeHtml(_0x9140a9) +
+    escapeHtml(kind) +
     '\x22\x20' +
-    _0x3fcce9 +
+    record +
     '\x20value=\x22' +
-    escapeHtml(_0x254522) +
+    escapeHtml(text2) +
     '\x22' +
-    (_0x57bb87
+    (entry
       ? ' data-person-replacement-selected-source-character-id="' + escapeHtml(sourceCharacterId) + '\x22'
       : '') +
     ' aria-label="' +
-    escapeHtml(_0x1efb30) +
+    escapeHtml(ariaLabel) +
     '\x22\x20aria-haspopup=\x22listbox\x22\x20aria-expanded=\x22false\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20data-person-replacement-detection-picker-value>' +
-    escapeHtml(_0x22593a) +
+    escapeHtml(text3) +
     '</span><span class="story-project-sort-chevron" aria-hidden="true"></span>\n    </button>\n    ' +
-    (_0x57bb87
+    (entry
       ? '<input type="text" class="person-replacement-detection-name-input" value="' +
-        escapeHtml(customInputValue || _0x22593a) +
+        escapeHtml(customInputValue || text3) +
         '" maxlength="24" placeholder="输入人物名称" aria-label="自定义人物名称" data-person-replacement-person-custom-label hidden>'
       : '') +
     '\n    <div class="story-project-sort-menu person-replacement-detection-picker-menu" data-person-replacement-detection-picker-menu data-person-replacement-picker-options-lazy="true" role="listbox" aria-label="' +
-    escapeHtml(_0x1efb30) +
+    escapeHtml(ariaLabel) +
     '选项" aria-hidden="true"></div>\n  </span>'
   );
 }
-function renderPersonDetectionPickerOptions(_0x508bde = [], _0x1e1fbb = '') {
-  const _0x4b3d50 = normalizeText(_0x1e1fbb);
-  return (Array['isArray'](_0x508bde) ? _0x508bde : [])
-    ['map']((_0x36ce14) => {
-      const _0x5b95dc = normalizeText(_0x36ce14?.['value']),
-        _0x4701ae = normalizeText(_0x36ce14?.['label'], _0x5b95dc),
-        _0x5da939 = _0x5b95dc === _0x4b3d50,
-        _0x22d909 = _0x36ce14?.['deletable']
+function renderPersonDetectionPickerOptions(list2 = [], payload = '') {
+  const text4 = normalizeText(payload);
+  return (Array['isArray'](list2) ? list2 : [])
+    ['map']((el) => {
+      const text5 = normalizeText(el?.['value']),
+        text6 = normalizeText(el?.['label'], text5),
+        handle = text5 === text4,
+        state = el?.['deletable']
           ? '<button type="button" class="person-replacement-detection-picker-option-delete" data-person-replacement-action="delete-detection-custom-label" data-person-replacement-custom-label="' +
-            escapeHtml(_0x5b95dc) +
+            escapeHtml(text5) +
             '" aria-label="删除自定义名称' +
-            escapeHtml(_0x4701ae) +
+            escapeHtml(text6) +
             '\x22>' +
             renderWorkspaceActionIcon('delete') +
             '</button>'
           : '',
-        _0x2a0369 = _0x36ce14?.['sourceCharacterId']
-          ? ' data-person-replacement-source-character-id="' +
-            escapeHtml(_0x36ce14['sourceCharacterId']) +
-            '\x22'
+        config = el?.['sourceCharacterId']
+          ? ' data-person-replacement-source-character-id="' + escapeHtml(el['sourceCharacterId']) + '\x22'
           : '';
       return (
         '<span class="person-replacement-detection-picker-option-row' +
-        (_0x36ce14?.['deletable'] ? '\x20is-deletable' : '') +
+        (el?.['deletable'] ? '\x20is-deletable' : '') +
         '"><button type="button" class="story-project-sort-option' +
-        (_0x5da939 ? ' is-selected' : '') +
+        (handle ? ' is-selected' : '') +
         '" data-person-replacement-action="select-detection-picker-option" data-person-replacement-detection-picker-option="' +
-        escapeHtml(_0x5b95dc) +
+        escapeHtml(text5) +
         '\x22' +
-        _0x2a0369 +
+        config +
         ' role="option" aria-selected="' +
-        _0x5da939 +
+        handle +
         '"><span>' +
-        escapeHtml(_0x4701ae) +
+        escapeHtml(text6) +
         '</span></button>' +
-        _0x22d909 +
+        state +
         '</span>'
       );
     })
@@ -195,23 +193,22 @@ function renderPersonMappingScopeMenu({
     '</small>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22person-replacement-mapping-scope-option\x22\x20data-person-replacement-action=\x22confirm-person-mapping-scope\x22\x20data-person-replacement-mapping-scope=\x22current\x22\x20role=\x22menuitem\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-mapping-scope-option-copy\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-mapping-scope-option-title\x22>仅当前片段</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<small\x20class=\x22person-replacement-mapping-scope-option-subtitle\x22>只替换这个片段中的人物形象</small>\x0a\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22person-replacement-mapping-scope-option\x22\x20data-person-replacement-action=\x22confirm-person-mapping-scope\x22\x20data-person-replacement-mapping-scope=\x22all\x22\x20role=\x22menuitem\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-mapping-scope-option-copy\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-mapping-scope-option-title\x22>应用全部片段</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<small\x20class=\x22person-replacement-mapping-scope-option-subtitle\x22>同步替换该人物在所有片段中的形象</small>\x0a\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20</button>\x0a\x20\x20</div>'
   );
 }
-function hasTargetAssetBinding(_0x25a3b1, _0x2f04e3) {
-  const _0x4d9058 = Array['isArray'](_0x2f04e3?.['referenceImages']) ? _0x2f04e3['referenceImages'] : [];
-  return _0x4d9058['some'](
-    (_0x25bf72) =>
-      _0x25bf72['role'] === 'target-character' && _0x25bf72['targetCharacterId'] === _0x25a3b1['id'],
+function hasTargetAssetBinding(scope, input) {
+  const list3 = Array['isArray'](input?.['referenceImages']) ? input['referenceImages'] : [];
+  return list3['some'](
+    (output) => output['role'] === 'target-character' && output['targetCharacterId'] === scope['id'],
   );
 }
-function renderTargetAssetGroup(_0xc8fafa, _0x30126c, _0xba22cf) {
-  const _0x3a49e0 = _0x30126c === 'scene',
-    _0x56ddcf = _0x3a49e0 ? _0xc8fafa['scenes'] : _0xc8fafa['characters'],
-    _0x55dbb1 = _0x56ddcf['map'](normalizeProjectAssetMediaForRender),
-    _0x1c36a4 = {
+function renderTargetAssetGroup(args3, characterAssetTab, value3) {
+  const characters = characterAssetTab === 'scene',
+    list4 = characters ? args3['scenes'] : args3['characters'],
+    list5 = list4['map'](normalizeProjectAssetMediaForRender),
+    value4 = {
       ...buildPersonReplacementAssetViewState({
-        ..._0xc8fafa,
-        characters: _0x3a49e0 ? _0xc8fafa['characters'] : _0x55dbb1,
-        scenes: _0x3a49e0 ? _0x55dbb1 : _0xc8fafa['scenes'],
-        workspace: { ..._0xc8fafa['workspace'], characterAssetTab: _0x30126c },
+        ...args3,
+        characters: characters ? args3['characters'] : list5,
+        scenes: characters ? list5 : args3['scenes'],
+        workspace: { ...args3['workspace'], characterAssetTab: characterAssetTab },
       }),
       allowDeleteAssetCard: ![],
       allowAssetRename: ![],
@@ -219,604 +216,620 @@ function renderTargetAssetGroup(_0xc8fafa, _0x30126c, _0xba22cf) {
       assetSelectionMode: ![],
       selectedAssetIds: [],
     },
-    _0x426a59 = _0x55dbb1['map']((_0x1a621e) => {
-      const _0x592d1b = getWorkspaceAssetAppearances(_0x1a621e),
-        _0x44d7ac = _0x592d1b['filter']((_0x15ddbc) => _0x15ddbc['imageUrl']),
-        _0x355d03 = Math['max'](
+    list6 = list5['map']((asset) => {
+      const list7 = getWorkspaceAssetAppearances(asset),
+        appearances = list7['filter']((value5) => value5['imageUrl']),
+        value6 = Math['max'](
           0x0,
           Math['min'](
-            _0x592d1b['length'] - 0x1,
-            Math['trunc'](Number(_0xc8fafa['workspace']['assetAppearanceIndexes']?.[_0x1a621e['id']]) || 0x0),
+            list7['length'] - 0x1,
+            Math['trunc'](Number(args3['workspace']['assetAppearanceIndexes']?.[asset['id']]) || 0x0),
           ),
         ),
-        _0x1c8bb6 = _0x592d1b[_0x355d03]?.['id'],
-        _0x82b66b = Math['max'](
+        value7 = list7[value6]?.['id'],
+        selectedIndex = Math['max'](
           0x0,
-          _0x44d7ac['findIndex']((_0x4e231f) => _0x4e231f['id'] === _0x1c8bb6),
+          appearances['findIndex']((value8) => value8['id'] === value7),
         );
       return {
-        asset: _0x1a621e,
-        appearances: _0x44d7ac,
-        appearance: _0x44d7ac[_0x82b66b] || null,
-        selectedIndex: _0x82b66b,
+        asset: asset,
+        appearances: appearances,
+        appearance: appearances[selectedIndex] || null,
+        selectedIndex: selectedIndex,
       };
-    })['filter']((_0x3ddf0d) => _0x3ddf0d['appearance']),
-    _0x1b5444 = _0x426a59['map'](
-      ({ asset: _0x146fd7, appearances: _0x518622, appearance: _0x12d44d, selectedIndex: _0x1f6267 }) => {
-        if (_0x3a49e0)
-          return renderPersonReplacementAssetCard(_0x1c36a4, _0x146fd7, {
-            previewAppearance: _0x12d44d,
-            statusText: '场景图\x20' + (_0x1f6267 + 0x1) + '/' + _0x518622['length'],
+    })['filter']((value9) => value9['appearance']),
+    enabled = list6['map'](
+      ({
+        asset: asset2,
+        appearances: appearances2,
+        appearance: appearance,
+        selectedIndex: selectedIndex2,
+      }) => {
+        if (characters)
+          return renderPersonReplacementAssetCard(value4, asset2, {
+            previewAppearance: appearance,
+            statusText: '场景图\x20' + (selectedIndex2 + 0x1) + '/' + appearances2['length'],
             draggable: !![],
             cardClassName: 'person-replacement-target-asset person-replacement-scene-reference-asset',
             cardAttributes:
               'data-person-replacement-replacement-asset-kind="scene" data-person-replacement-target-scene-id="' +
-              escapeHtml(_0x146fd7['id']) +
+              escapeHtml(asset2['id']) +
               '" data-person-replacement-target-scene-appearance-id="' +
-              escapeHtml(_0x12d44d['id']) +
+              escapeHtml(appearance['id']) +
               '\x22\x20aria-label=\x22' +
-              escapeHtml('拖拽' + _0x146fd7['name'] + '到首帧画面作为场景参考') +
+              escapeHtml('拖拽' + asset2['name'] + '到首帧画面作为场景参考') +
               '\x22',
             shellClassName: 'person-replacement-target-asset-shell',
           });
-        const _0x1db297 = _0x518622['length'] > 0x1,
-          _0x1c8d20 = _0x1db297
+        const value10 = appearances2['length'] > 0x1,
+          accessoryHtml = value10
             ? '<span class="person-replacement-target-appearance-controls" data-person-replacement-target-controls="' +
-              escapeHtml(_0x146fd7['id']) +
+              escapeHtml(asset2['id']) +
               '" data-story-asset-hover-id="' +
-              escapeHtml(_0x146fd7['id']) +
+              escapeHtml(asset2['id']) +
               '\x22>' +
               renderPersonReplacementPreviewArrow('previous', {
                 action: 'target-previous-appearance',
-                label: _0x146fd7['name'] + '上一个形象',
+                label: asset2['name'] + '上一个形象',
                 className: 'person-replacement-target-appearance-arrow',
               }) +
               renderPersonReplacementPreviewArrow('next', {
                 action: 'target-next-appearance',
-                label: _0x146fd7['name'] + '下一个形象',
+                label: asset2['name'] + '下一个形象',
                 className: 'person-replacement-target-appearance-arrow',
               }) +
               '</span>'
             : '',
-          _0x567af6 = hasTargetAssetBinding(_0x146fd7, _0xba22cf);
-        return renderPersonReplacementAssetCard(_0x1c36a4, _0x146fd7, {
-          previewAppearance: _0x12d44d,
-          statusText: '形象 ' + (_0x1f6267 + 0x1) + '/' + _0x518622['length'],
-          cardMetaHtml: renderPersonReplacementVoiceReferenceStatus(_0x146fd7),
+          hasTargetAssetBinding2 = hasTargetAssetBinding(asset2, value3);
+        return renderPersonReplacementAssetCard(value4, asset2, {
+          previewAppearance: appearance,
+          statusText: '形象 ' + (selectedIndex2 + 0x1) + '/' + appearances2['length'],
+          cardMetaHtml: renderPersonReplacementVoiceReferenceStatus(asset2),
           draggable: !![],
           cardClassName:
-            'person-replacement-target-asset' + (_0x567af6 ? ' has-person-replacement-input' : ''),
+            'person-replacement-target-asset' +
+            (hasTargetAssetBinding2 ? ' has-person-replacement-input' : ''),
           cardAttributes:
             'data-person-replacement-target-character-id="' +
-            escapeHtml(_0x146fd7['id']) +
+            escapeHtml(asset2['id']) +
             '\x22\x20data-person-replacement-target-appearance-id=\x22' +
-            escapeHtml(_0x12d44d['id']) +
+            escapeHtml(appearance['id']) +
             '" data-person-replacement-target-appearance-index="' +
-            _0x1f6267 +
+            selectedIndex2 +
             '" data-person-replacement-target-appearance-count="' +
-            _0x518622['length'] +
+            appearances2['length'] +
             '" data-person-replacement-target-appearance-wheel="' +
-            _0x1db297 +
+            value10 +
             '\x22\x20aria-label=\x22拖拽' +
-            escapeHtml(_0x146fd7['name']) +
+            escapeHtml(asset2['name']) +
             '的' +
-            escapeHtml(_0x12d44d['name']) +
+            escapeHtml(appearance['name']) +
             '到视频人物框"',
           shellClassName: 'person-replacement-target-asset-shell',
-          accessoryHtml: _0x1c8d20,
+          accessoryHtml: accessoryHtml,
         });
       },
     )['join']('');
-  if (_0x3a49e0 && !_0x1b5444) return '';
-  const _0x55f3e7 = _0x3a49e0 ? '场景' : '角色',
-    _0x59fa37 = '请先在素材设定上传基础形象';
+  if (characters && !enabled) return '';
+  const value11 = characters ? '场景' : '角色',
+    value12 = '请先在素材设定上传基础形象';
   return (
     '<div\x20class=\x22person-replacement-target-asset-group\x22\x20data-person-replacement-target-asset-group=\x22' +
-    _0x30126c +
+    characterAssetTab +
     '" role="group" aria-labelledby="person-replacement-target-asset-group-' +
-    _0x30126c +
+    characterAssetTab +
     '">\n    <h3 class="person-replacement-target-asset-group-heading" id="person-replacement-target-asset-group-' +
-    _0x30126c +
+    characterAssetTab +
     '\x22>' +
-    _0x55f3e7 +
+    value11 +
     '：</h3>\n    <div class="person-replacement-target-asset-group-items">' +
-    (_0x1b5444 || '<p\x20class=\x22person-replacement-inline-empty\x22>' + _0x59fa37 + '</p>') +
+    (enabled || '<p\x20class=\x22person-replacement-inline-empty\x22>' + value12 + '</p>') +
     '</div>\n  </div>'
   );
 }
-function renderTargetAssetRail(_0x1bb9be, _0x3e58cc) {
-  const _0x3d77b9 = _0x3e58cc?.['promptPackage'] || null;
+function renderTargetAssetRail(value13, value14) {
+  const value15 = value14?.['promptPackage'] || null;
   return (
     '<aside class="person-replacement-target-assets">\n    <div class="person-replacement-target-assets-heading">\n      <strong>替换素材</strong>\n      <small>拖拽角色到首帧人物框；拖拽场景到首帧画面</small>\n    </div>\n    <div class="person-replacement-target-asset-list">\n      ' +
-    renderTargetAssetGroup(_0x1bb9be, 'character', _0x3d77b9) +
+    renderTargetAssetGroup(value13, 'character', value15) +
     '\n      ' +
-    renderTargetAssetGroup(_0x1bb9be, 'scene', _0x3d77b9) +
+    renderTargetAssetGroup(value13, 'scene', value15) +
     '\n    </div>\n  </aside>'
   );
 }
-function renderVideoReplacementReferenceRail(_0x2fc662, _0x10b094) {
-  const _0x2ec007 = _0x10b094?.['shot'] || null,
-    _0x2b53f1 = _0x10b094?.['imageInput'] || {},
-    _0x25d859 = Array['isArray'](_0x2b53f1['referenceOptions']) ? _0x2b53f1['referenceOptions'] : [],
-    _0x3c01ff = Math['trunc'](Number(_0x2b53f1['activeReferenceIndex'])),
-    _0x9686a5 = _0x2b53f1['mode'] === PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE,
-    _0x580f2b = _0x9686a5
+function renderVideoReplacementReferenceRail(value16, value17) {
+  const value18 = value17?.['shot'] || null,
+    value19 = value17?.['imageInput'] || {},
+    list8 = Array['isArray'](value19['referenceOptions']) ? value19['referenceOptions'] : [],
+    value20 = Math['trunc'](Number(value19['activeReferenceIndex'])),
+    value21 = value19['mode'] === PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE,
+    value22 = value21
       ? '包含上一轮全部图像替换结果与当前镜头的角色绑定图'
       : '来自上一轮图像替换的全部片段结果',
-    _0x2795e5 = _0x25d859['map']((_0x7818b5, _0x8668ad) => {
-      const _0x561e4c = _0x7818b5['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
-        _0x4c58d8 = _0x7818b5['reference'] || {},
-        _0x542b1b = normalizeText(_0x7818b5['sourceShotId']),
-        _0x44d661 = Math['max'](0x0, Math['trunc'](Number(_0x7818b5['sourceShotIndex']) || 0x0)),
-        _0x1e1ac8 = Math['max'](0x0, Math['trunc'](Number(_0x7818b5['resultIndex']) || 0x0)),
-        _0x3b3496 = Math['max'](0x1, Math['trunc'](Number(_0x7818b5['resultCount']) || 0x1)),
-        _0x462b27 = _0x561e4c
-          ? normalizeText(_0x4c58d8['characterName']) || '人物参考图'
-          : '片段' + (_0x44d661 + 0x1) + '.图片' + (_0x1e1ac8 + 0x1),
-        _0x8be8ae = _0x561e4c
-          ? '角色绑定图 · ' + (normalizeText(_0x4c58d8['appearanceName']) || '基础形象')
+    list9 = list8['map']((value23, value24) => {
+      const isCharacterReference =
+          value23['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
+        value25 = value23['reference'] || {},
+        text7 = normalizeText(value23['sourceShotId']),
+        value26 = Math['max'](0x0, Math['trunc'](Number(value23['sourceShotIndex']) || 0x0)),
+        value27 = Math['max'](0x0, Math['trunc'](Number(value23['resultIndex']) || 0x0)),
+        count = Math['max'](0x1, Math['trunc'](Number(value23['resultCount']) || 0x1)),
+        label2 = isCharacterReference
+          ? normalizeText(value25['characterName']) || '人物参考图'
+          : '片段' + (value26 + 0x1) + '.图片' + (value27 + 0x1),
+        value28 = isCharacterReference
+          ? '角色绑定图 · ' + (normalizeText(value25['appearanceName']) || '基础形象')
           : '图像替换结果',
-        _0xe60a06 = _0x561e4c
-          ? '<small>' + escapeHtml(_0x8be8ae) + '</small>'
+        value29 = isCharacterReference
+          ? '<small>' + escapeHtml(value28) + '</small>'
           : '<span class="person-replacement-video-reference-status" aria-label="图像替换结果 ' +
-            (_0x1e1ac8 + 0x1) +
+            (value27 + 0x1) +
             '/' +
-            _0x3b3496 +
+            count +
             '\x22>' +
-            escapeHtml(_0x8be8ae) +
+            escapeHtml(value28) +
             '\x20' +
-            (_0x1e1ac8 + 0x1) +
+            (value27 + 0x1) +
             '/' +
-            _0x3b3496 +
+            count +
             '</span>',
-        _0x4036b5 = normalizeMediaUrl(_0x7818b5['imageRef']),
-        _0x14eaf0 = _0x8668ad === _0x3c01ff,
-        _0x470fe1 = _0x4036b5
+        mediaUrl2 = normalizeMediaUrl(value23['imageRef']),
+        value30 = value24 === value20,
+        value31 = mediaUrl2
           ? ' data-story-asset-hover-id="' +
-            escapeHtml(_0x542b1b || _0x2ec007?.['id'] || '') +
+            escapeHtml(text7 || value18?.['id'] || '') +
             '" data-person-replacement-video-reference-hover-preview="true"'
           : '',
-        _0x3c3182 = _0x561e4c
-          ? normalizeText(_0x4c58d8['personId'] || _0x4c58d8['characterId'] + ':' + _0x4c58d8['appearanceId'])
+        characterReferenceId = isCharacterReference
+          ? normalizeText(value25['personId'] || value25['characterId'] + ':' + value25['appearanceId'])
           : '',
-        _0x3b721e = _0x561e4c ? 'character:' + _0x3c3182 : 'shot:' + _0x542b1b,
-        _0x51b838 = _0x561e4c
+        value32 = isCharacterReference ? 'character:' + characterReferenceId : 'shot:' + text7,
+        value33 = isCharacterReference
           ? ''
           : '\x20data-person-replacement-video-reference-source-shot-id=\x22' +
-            escapeHtml(_0x542b1b) +
+            escapeHtml(text7) +
             '" data-person-replacement-video-reference-result-index="' +
-            _0x1e1ac8 +
+            value27 +
             '" data-person-replacement-video-reference-result-count="' +
-            _0x3b3496 +
+            count +
             '\x22' +
-            (_0x3b3496 > 0x1 ? ' data-person-replacement-video-reference-wheel="true"' : ''),
-        _0x240640 =
-          !_0x561e4c && _0x3b3496 > 0x1
+            (count > 0x1 ? ' data-person-replacement-video-reference-wheel="true"' : ''),
+        value34 =
+          !isCharacterReference && count > 0x1
             ? '<span class="person-replacement-target-appearance-controls person-replacement-video-reference-controls" data-person-replacement-video-reference-controls="' +
-              escapeHtml(_0x542b1b) +
+              escapeHtml(text7) +
               '" data-person-replacement-video-reference-result-index="' +
-              _0x1e1ac8 +
+              value27 +
               '\x22>' +
               renderPersonReplacementPreviewArrow('previous', {
                 action: 'video-reference-previous-result',
-                label: _0x462b27 + '的上一张图片',
+                label: label2 + '的上一张图片',
                 className:
                   'person-replacement-target-appearance-arrow\x20person-replacement-video-reference-arrow',
               }) +
               renderPersonReplacementPreviewArrow('next', {
                 action: 'video-reference-next-result',
-                label: _0x462b27 + '的下一张图片',
+                label: label2 + '的下一张图片',
                 className:
                   'person-replacement-target-appearance-arrow person-replacement-video-reference-arrow',
               }) +
               '</span>'
             : '',
-        _0x418653 =
+        cardHtml =
           '<span\x20class=\x22story-asset-card-shell\x20person-replacement-target-asset-shell\x20person-replacement-video-reference-shell\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22person-replacement-video-reference-card\x20' +
-          (_0x14eaf0 ? 'is-selected' : '') +
+          (value30 ? 'is-selected' : '') +
           '" data-story-action="select-video-shot-reference" data-shot-id="' +
-          escapeHtml(_0x2ec007?.['id'] || '') +
+          escapeHtml(value18?.['id'] || '') +
           '\x22\x20data-person-replacement-video-reference-index=\x22' +
-          _0x8668ad +
+          value24 +
           '" data-person-replacement-video-reference-key="' +
-          escapeHtml(_0x3b721e) +
+          escapeHtml(value32) +
           '" data-person-replacement-video-reference-kind="' +
-          escapeHtml(_0x7818b5['kind']) +
+          escapeHtml(value23['kind']) +
           '\x22' +
-          (_0x561e4c
-            ? '\x20data-person-replacement-video-character-reference=\x22' + escapeHtml(_0x3c3182) + '\x22'
+          (isCharacterReference
+            ? '\x20data-person-replacement-video-character-reference=\x22' +
+              escapeHtml(characterReferenceId) +
+              '\x22'
             : '') +
-          _0x51b838 +
-          _0x470fe1 +
+          value33 +
+          value31 +
           '\x20aria-pressed=\x22' +
-          _0x14eaf0 +
+          value30 +
           '\x22\x20aria-label=\x22' +
           escapeHtml(
             '选择' +
-              _0x462b27 +
+              label2 +
               '作为视频替换参考图' +
-              (_0x3b3496 > 0x1 && !_0x561e4c ? '，可滚动鼠标滚轮切换图片' : ''),
+              (count > 0x1 && !isCharacterReference ? '，可滚动鼠标滚轮切换图片' : ''),
           ) +
           '\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-video-reference-media\x22>' +
-          (_0x4036b5
+          (mediaUrl2
             ? '<img src="' +
-              escapeHtml(_0x4036b5) +
+              escapeHtml(mediaUrl2) +
               '" alt="' +
-              escapeHtml(_0x462b27) +
+              escapeHtml(label2) +
               '" loading="lazy" decoding="async" draggable="false">'
             : '') +
           '</span>\n      <span class="person-replacement-video-reference-copy' +
-          (_0x561e4c ? '' : ' has-result-status') +
+          (isCharacterReference ? '' : ' has-result-status') +
           '\x22><strong>' +
-          escapeHtml(_0x462b27) +
+          escapeHtml(label2) +
           '</strong>' +
-          _0xe60a06 +
+          value29 +
           '</span>\n      <span class="person-replacement-video-reference-selection" aria-hidden="true"' +
-          (_0x14eaf0 ? '' : ' hidden') +
+          (value30 ? '' : ' hidden') +
           '>当前</span>\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20' +
-          _0x240640 +
+          value34 +
           '\x0a\x20\x20\x20\x20</span>';
-      return { cardHtml: _0x418653, characterReferenceId: _0x3c3182, isCharacterReference: _0x561e4c };
+      return {
+        cardHtml: cardHtml,
+        characterReferenceId: characterReferenceId,
+        isCharacterReference: isCharacterReference,
+      };
     }),
-    _0x20b44f = _0x2795e5['filter'](({ isCharacterReference: _0x2415c6 }) => !_0x2415c6)
-      ['map'](({ cardHtml: _0x2016e6 }) => _0x2016e6)
+    cardsHtml = list9['filter'](({ isCharacterReference: isCharacterReference2 }) => !isCharacterReference2)
+      ['map'](({ cardHtml: cardHtml2 }) => cardHtml2)
       ['join'](''),
-    _0x46917c = new Map(
-      _0x2795e5['filter'](({ isCharacterReference: _0x25d5de }) => _0x25d5de)['map']((_0x589ba2) => [
-        _0x589ba2['characterReferenceId'],
-        _0x589ba2['cardHtml'],
-      ]),
+    map = new Map(
+      list9['filter'](({ isCharacterReference: isCharacterReference3 }) => isCharacterReference3)['map'](
+        (value35) => [value35['characterReferenceId'], value35['cardHtml']],
+      ),
     ),
-    _0x4c9acc = Array['isArray'](_0x2b53f1['references'])
-      ? _0x2b53f1['references']['filter']((_0x46d467) => normalizeText(_0x46d467?.['imageRef']))
+    list10 = Array['isArray'](value19['references'])
+      ? value19['references']['filter']((value36) => normalizeText(value36?.['imageRef']))
       : [],
-    _0x248e72 = _0x4c9acc['map']((_0x1bff1f) => {
-      const _0x332210 = normalizeText(
-          _0x1bff1f['personId'] || _0x1bff1f['characterId'] + ':' + _0x1bff1f['appearanceId'],
+    cardsHtml2 = list10['map']((value37) => {
+      const text8 = normalizeText(
+          value37['personId'] || value37['characterId'] + ':' + value37['appearanceId'],
         ),
-        _0x5d35ab = _0x46917c['get'](_0x332210);
-      return _0x5d35ab || '';
+        value38 = map['get'](text8);
+      return value38 || '';
     })['join'](''),
-    _0x4c5821 =
-      _0x9686a5 && _0x4c9acc['length'] > 0x1
+    noteHtml2 =
+      value21 && list10['length'] > 0x1
         ? '<p class="person-replacement-reference-note">每次生成使用一张人物参考图，请选择本次入参。</p>'
         : '',
-    _0x4743d4 = ({
-      kind: _0x30bf5d,
-      label: _0x49ee7c,
-      cardsHtml: _0xd9685b,
-      emptyText: _0x1be88b,
+    handler = ({
+      kind: kind2,
+      label: label3,
+      cardsHtml: cardsHtml3,
+      emptyText: emptyText,
       noteHtml: noteHtml = '',
     }) =>
       '<section class="person-replacement-target-asset-group person-replacement-video-reference-group" data-person-replacement-video-reference-group="' +
-      escapeHtml(_0x30bf5d) +
+      escapeHtml(kind2) +
       '" role="group" aria-label="' +
-      escapeHtml(_0x49ee7c) +
+      escapeHtml(label3) +
       '">\n      <h3 class="person-replacement-target-asset-group-heading">' +
-      escapeHtml(_0x49ee7c) +
+      escapeHtml(label3) +
       '：</h3>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22person-replacement-target-asset-group-items\x22>' +
-      (_0xd9685b || '<p\x20class=\x22person-replacement-inline-empty\x22>' + escapeHtml(_0x1be88b) + '</p>') +
+      (cardsHtml3 ||
+        '<p\x20class=\x22person-replacement-inline-empty\x22>' + escapeHtml(emptyText) + '</p>') +
       noteHtml +
       '</div>\n    </section>',
-    _0x595ec7 = _0x9686a5
-      ? _0x4743d4({
+    value39 = value21
+      ? handler({
           kind: 'character',
           label: '人物参考',
-          cardsHtml: _0x248e72,
+          cardsHtml: cardsHtml2,
           emptyText: '当前片段没有已绑定的人物参考图',
-          noteHtml: _0x4c5821,
+          noteHtml: noteHtml2,
         })
       : '',
-    _0x4863de = _0x4743d4({
+    value40 = handler({
       kind: 'first-frame',
       label: '首帧参考',
-      cardsHtml: _0x20b44f,
+      cardsHtml: cardsHtml,
       emptyText: '请先在图像替换中生成替换首帧',
     });
   return (
     '<aside class="person-replacement-target-assets person-replacement-video-reference-assets">\n    <div class="person-replacement-target-assets-heading"><strong>替换参考图</strong><small>' +
-    escapeHtml(_0x580f2b) +
+    escapeHtml(value22) +
     '</small></div>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-target-asset-list\x20person-replacement-video-reference-list\x22\x20data-person-replacement-video-reference-list\x20tabindex=\x220\x22>' +
-    _0x595ec7 +
-    _0x4863de +
+    value39 +
+    value40 +
     '</div>\n  </aside>'
   );
 }
 function renderDetectionBox(
-  _0x5941bd,
-  _0x7f900a,
-  _0xff8594,
+  value41,
+  value42,
+  value43,
   { duplicateRoleLabels: duplicateRoleLabels = new Set() } = {},
 ) {
-  const _0x3319e8 = _0x5941bd['locator']?.['bbox'] || _0x5941bd['bbox'];
-  if (!_0x3319e8) return '';
-  const _0x5801ae = _0x5941bd['detectionMethod'] === 'manual',
-    _0x3a3bef = normalizeText(_0xff8594['workspace']['selectedShotId']),
-    _0x51852d = getPersonReplacementIdentityCorrectionDraftKey(_0x3a3bef, _0x5941bd['id']),
-    _0x5caa8d = _0xff8594['workspace']['identityCorrectionDrafts'][_0x51852d] || {},
-    _0x211096 = _0xff8594['characters']['find'](
-      (_0x23f90) => _0x23f90['id'] === _0x5941bd['targetCharacterId'],
+  const box = value41['locator']?.['bbox'] || value41['bbox'];
+  if (!box) return '';
+  const value44 = value41['detectionMethod'] === 'manual',
+    text9 = normalizeText(value43['workspace']['selectedShotId']),
+    personReplacementIdentityCorrectionDraftKey = getPersonReplacementIdentityCorrectionDraftKey(
+      text9,
+      value41['id'],
     ),
-    _0x402072 = _0x211096 ? getCharacterAppearance(_0x211096, _0x5941bd['targetAppearanceId']) : null,
-    _0x1095aa =
-      _0x5941bd['identityReviewStatus'] === 'needs_review' || _0x5941bd['identityReviewRequired'] === !![],
-    _0x1bc6cc = Object['keys'](_0x5caa8d)['length'] > 0x0,
-    _0x423dab = normalizeText(_0x5caa8d['orientation'], normalizeText(_0x5941bd['orientation'])),
-    _0xc56cea = formatPersonOrientation(_0x423dab),
-    _0x1bc380 = resolvePersonReplacementDetectionLabel(_0x5941bd, _0x7f900a, _0xff8594, _0x3a3bef),
-    _0x851e38 = duplicateRoleLabels['has'](_0x1bc380),
-    _0xcca52b = normalizeText(_0x5caa8d['sourceCharacterId'], normalizeText(_0x5941bd['sourceCharacterId'])),
-    _0x2632da = _0x851e38 ? '角色名重复' : _0x211096 ? '已绑定' : '未绑定',
-    _0x53c8f8 =
-      PERSON_REPLACEMENT_ORIENTATIONS['includes'](_0x423dab) && _0x423dab !== 'unknown' ? _0x423dab : '',
-    _0x23e9b3 = normalizePersonReplacementScope(_0x5941bd['replacementScope']),
-    _0x98ae6f = formatPersonReplacementScopeLabel(_0x23e9b3),
-    _0x1a847a = _0x1095aa || _0x1bc6cc || (PERSON_REPLACEMENT_ORIENTATION_ENABLED && !_0x53c8f8),
-    _0x861c8 = PERSON_REPLACEMENT_ORIENTATION_ENABLED
+    value45 =
+      value43['workspace']['identityCorrectionDrafts'][personReplacementIdentityCorrectionDraftKey] || {},
+    error = value43['characters']['find']((value46) => value46['id'] === value41['targetCharacterId']),
+    error2 = error ? getCharacterAppearance(error, value41['targetAppearanceId']) : null,
+    value47 =
+      value41['identityReviewStatus'] === 'needs_review' || value41['identityReviewRequired'] === !![],
+    value48 = Object['keys'](value45)['length'] > 0x0,
+    text10 = normalizeText(value45['orientation'], normalizeText(value41['orientation'])),
+    formatPersonOrientation2 = formatPersonOrientation(text10),
+    value49 = resolvePersonReplacementDetectionLabel(value41, value42, value43, text9),
+    value50 = duplicateRoleLabels['has'](value49),
+    sourceCharacterId2 = normalizeText(
+      value45['sourceCharacterId'],
+      normalizeText(value41['sourceCharacterId']),
+    ),
+    value51 = value50 ? '角色名重复' : error ? '已绑定' : '未绑定',
+    value52 = PERSON_REPLACEMENT_ORIENTATIONS['includes'](text10) && text10 !== 'unknown' ? text10 : '',
+    value53 = normalizePersonReplacementScope(value41['replacementScope']),
+    label4 = formatPersonReplacementScopeLabel(value53),
+    value54 = value47 || value48 || (PERSON_REPLACEMENT_ORIENTATION_ENABLED && !value52),
+    value55 = PERSON_REPLACEMENT_ORIENTATION_ENABLED
       ? '<span class="person-replacement-detection-separator" aria-hidden="true">·</span>' +
         renderPersonDetectionPicker({
           kind: 'orientation',
-          value: _0x53c8f8,
-          label: _0x53c8f8 ? _0xc56cea : '选择朝向',
-          ariaLabel: '人物朝向：' + (_0x53c8f8 ? _0xc56cea : '待选择'),
+          value: value52,
+          label: value52 ? formatPersonOrientation2 : '选择朝向',
+          ariaLabel: '人物朝向：' + (value52 ? formatPersonOrientation2 : '待选择'),
         })
       : '',
-    _0x320683 =
+    value56 =
       '<span class="person-replacement-detection-separator" aria-hidden="true">·</span>' +
       renderPersonDetectionPicker({
         kind: 'scope',
-        value: _0x23e9b3,
-        label: _0x98ae6f,
-        ariaLabel: '替换范围：' + _0x98ae6f,
+        value: value53,
+        label: label4,
+        ariaLabel: '替换范围：' + label4,
       }),
-    _0xb0c7a6 = !_0x211096 ? 'is-unready' : _0x1a847a ? 'is-partially-ready' : 'is-ready',
-    _0x13cdaa =
+    value57 = !error ? 'is-unready' : value54 ? 'is-partially-ready' : 'is-ready',
+    value58 =
       '' +
       renderPersonDetectionPicker({
         kind: 'label',
-        value: _0x1bc380,
-        label: _0x1bc380,
-        ariaLabel: '人物名称：' + _0x1bc380,
-        customInputValue: _0x1bc380,
-        sourceCharacterId: _0xcca52b,
+        value: value49,
+        label: value49,
+        ariaLabel: '人物名称：' + value49,
+        customInputValue: value49,
+        sourceCharacterId: sourceCharacterId2,
       }) +
-      _0x320683 +
-      _0x861c8 +
+      value56 +
+      value55 +
       '<span class="person-replacement-detection-separator" aria-hidden="true">·</span><span class="person-replacement-detection-binding-status ' +
-      (_0x851e38 ? 'is-conflict' : _0x211096 ? 'is-bound' : 'is-unbound') +
+      (value50 ? 'is-conflict' : error ? 'is-bound' : 'is-unbound') +
       '\x22>' +
-      _0x2632da +
+      value51 +
       '</span>',
-    _0xde9d5f =
-      _0x211096 && _0x402072?.['imageUrl']
+    value59 =
+      error && error2?.['imageUrl']
         ? ' data-story-asset-hover-id="' +
-          escapeHtml(_0x211096['id']) +
+          escapeHtml(error['id']) +
           '" data-story-asset-hover-appearance-id="' +
-          escapeHtml(_0x402072['id']) +
+          escapeHtml(error2['id']) +
           '\x22'
         : '',
-    _0x3ddb37 =
+    value60 =
       '<button type="button" class="story-action-icon-button is-danger person-replacement-detection-delete-action" data-person-replacement-action="delete-person" data-shot-id="' +
-      escapeHtml(_0xff8594['workspace']['selectedShotId']) +
+      escapeHtml(value43['workspace']['selectedShotId']) +
       '" data-person-id="' +
-      escapeHtml(_0x5941bd['id']) +
+      escapeHtml(value41['id']) +
       '" aria-label="删除' +
-      escapeHtml(_0x1bc380) +
+      escapeHtml(value49) +
       '检测框">' +
       renderWorkspaceActionIcon('delete') +
       '</button>',
-    _0x269ba1 = ['n', 'e', 's', 'w', 'nw', 'ne', 'sw', 'se']
+    value61 = ['n', 'e', 's', 'w', 'nw', 'ne', 'sw', 'se']
       ['map'](
-        (_0x202b97) =>
+        (value62) =>
           '<span class="person-replacement-manual-resize-handle is-' +
-          _0x202b97 +
+          value62 +
           '\x22\x20data-person-replacement-manual-resize=\x22' +
-          _0x202b97 +
+          value62 +
           '" aria-hidden="true"></span>',
       )
       ['join'](''),
-    _0x3bbca6 = _0x5801ae
+    value63 = value44
       ? ' data-person-replacement-manual-person tabindex="0" aria-keyshortcuts="Delete D"'
       : ' tabindex="0" aria-keyshortcuts="Delete D"',
-    _0x4a2371 =
+    value64 =
       '<svg\x20class=\x22person-replacement-detection-readiness-border\x22\x20width=\x22100%\x22\x20height=\x22100%\x22\x20aria-hidden=\x22true\x22\x20focusable=\x22false\x22><rect\x20class=\x22person-replacement-detection-readiness-stroke\x22></rect></svg>';
   return (
     '<div class="person-replacement-detection-box has-identity-controls is-movable ' +
-    (_0x211096 ? 'is-mapped' : '') +
+    (error ? 'is-mapped' : '') +
     '\x20' +
-    (_0x1095aa ? 'needs-identity-review' : '') +
+    (value47 ? 'needs-identity-review' : '') +
     '\x20' +
-    (_0x1a847a ? 'is-identity-editing' : '') +
+    (value54 ? 'is-identity-editing' : '') +
     '\x20' +
-    _0xb0c7a6 +
+    value57 +
     '\x20' +
-    (_0x5801ae ? 'is-manual' : '') +
+    (value44 ? 'is-manual' : '') +
     '\x20' +
-    (_0x851e38 ? 'has-role-conflict' : '') +
+    (value50 ? 'has-role-conflict' : '') +
     '" style="--box-x:' +
-    _0x3319e8['x'] * 0x64 +
+    box['x'] * 0x64 +
     '%;--box-y:' +
-    _0x3319e8['y'] * 0x64 +
+    box['y'] * 0x64 +
     '%;--box-width:' +
-    _0x3319e8['width'] * 0x64 +
+    box['width'] * 0x64 +
     '%;--box-height:' +
-    _0x3319e8['height'] * 0x64 +
+    box['height'] * 0x64 +
     '%\x22\x20data-person-replacement-person-drop' +
-    _0xde9d5f +
-    _0x3bbca6 +
+    value59 +
+    value63 +
     ' data-person-id="' +
-    escapeHtml(_0x5941bd['id']) +
+    escapeHtml(value41['id']) +
     '" data-shot-id="' +
-    escapeHtml(_0x3a3bef) +
+    escapeHtml(text9) +
     '" aria-label="' +
-    escapeHtml(_0x851e38 ? _0x1bc380 + '，角色名重复' : _0x1bc380) +
+    escapeHtml(value50 ? value49 + '，角色名重复' : value49) +
     '\x22' +
-    (_0x851e38 ? '\x20aria-invalid=\x22true\x22' : '') +
+    (value50 ? '\x20aria-invalid=\x22true\x22' : '') +
     '>' +
-    _0x4a2371 +
+    value64 +
     '<div class="person-replacement-detection-label"><span class="person-replacement-detection-summary">' +
-    _0x13cdaa +
+    value58 +
     '</span><span\x20class=\x22person-replacement-detection-actions\x22>' +
-    _0x3ddb37 +
+    value60 +
     '</span></div>' +
-    (_0x211096
+    (error
       ? '<div class="person-replacement-mapping-badge"><span class="person-replacement-mapping-badge-text">→ ' +
-        escapeHtml(_0x211096['name']) +
+        escapeHtml(error['name']) +
         ' · ' +
-        escapeHtml(_0x402072?.['name'] || '基础形象') +
+        escapeHtml(error2?.['name'] || '基础形象') +
         '</span><button\x20type=\x22button\x22\x20class=\x22story-action-icon-button\x20is-danger\x20story-project-delete-trigger\x20person-replacement-mapping-remove\x20person-replacement-detection-delete-action\x22\x20data-person-replacement-action=\x22clear-person-mapping\x22\x20data-shot-id=\x22' +
-        escapeHtml(_0x3a3bef) +
+        escapeHtml(text9) +
         '" data-person-id="' +
-        escapeHtml(_0x5941bd['id']) +
+        escapeHtml(value41['id']) +
         '" aria-label="解除' +
-        escapeHtml(_0x1bc380) +
+        escapeHtml(value49) +
         '的人物绑定">' +
         renderWorkspaceActionIcon('unlink') +
         '</button></div>'
       : '<div\x20class=\x22person-replacement-mapping-badge\x22>拖入目标形象</div>') +
-    _0x269ba1 +
+    value61 +
     '</div>'
   );
 }
-function renderVideoReplacementReferenceInputs(_0x208872) {
-  const _0x2df42c = _0x208872?.['slotState'] || {},
-    { fixedInputConfig: _0x5e5d6a } = _0x2df42c;
-  if (!_0x5e5d6a?.['visibleSlots']?.['length']) return '';
-  const _0x4151f3 = Object['fromEntries'](
-    Object['entries'](_0x2df42c['inputsBySlot'])['map'](([_0x10a781, _0x41e764]) => [
-      _0x10a781,
+function renderVideoReplacementReferenceInputs(value65) {
+  const readOnlyFixedInputSlots = value65?.['slotState'] || {},
+    { fixedInputConfig: fixedInputConfig } = readOnlyFixedInputSlots;
+  if (!fixedInputConfig?.['visibleSlots']?.['length']) return '';
+  const inputsBySlot = Object['fromEntries'](
+    Object['entries'](readOnlyFixedInputSlots['inputsBySlot'])['map'](([value66, previewVideoUrl]) => [
+      value66,
       {
-        ..._0x41e764,
-        url: normalizeMediaUrl(_0x41e764['url']),
-        thumbUrl: normalizeMediaUrl(_0x41e764['thumbUrl']),
-        previewVideoUrl: _0x41e764['kind'] === 'video' ? normalizeMediaUrl(_0x41e764['url']) : '',
+        ...previewVideoUrl,
+        url: normalizeMediaUrl(previewVideoUrl['url']),
+        thumbUrl: normalizeMediaUrl(previewVideoUrl['thumbUrl']),
+        previewVideoUrl: previewVideoUrl['kind'] === 'video' ? normalizeMediaUrl(previewVideoUrl['url']) : '',
       },
     ]),
   );
   return renderVideoReferenceBarMarkup({
-    fixedInputConfig: _0x5e5d6a,
-    inputsBySlot: _0x4151f3,
-    readOnlyFixedInputSlots: _0x2df42c['readOnlySlots'],
+    fixedInputConfig: fixedInputConfig,
+    inputsBySlot: inputsBySlot,
+    readOnlyFixedInputSlots: readOnlyFixedInputSlots['readOnlySlots'],
     showItemTitles: ![],
     attachmentButtonHtml: '',
   });
 }
-function renderPromptReferenceInputs(_0x525801, _0x2e4d04) {
-  const _0x15f830 = Array['isArray'](_0x2e4d04?.['referenceImages']) ? _0x2e4d04['referenceImages'] : [];
-  if (!_0x15f830['length']) return '';
-  const _0x30b40a = new Map(_0x525801['characters']['map']((_0x35b626) => [_0x35b626['id'], _0x35b626])),
-    _0x436b76 = new Map(_0x525801['scenes']['map']((_0x516551) => [_0x516551['id'], _0x516551])),
-    _0x21c511 = _0x15f830['map']((_0x107377) => {
-      const _0x35c6ec = Math['max'](0x1, Number(_0x107377['slot']) || 0x1),
-        _0x1704e6 = _0x30b40a['get'](_0x107377['targetCharacterId']),
-        _0x564228 = _0x436b76['get'](_0x107377['targetSceneId']),
-        _0x504e7a =
-          _0x107377['role'] === 'source-keyframe'
+function renderPromptReferenceInputs(shotId, value67) {
+  const list11 = Array['isArray'](value67?.['referenceImages']) ? value67['referenceImages'] : [];
+  if (!list11['length']) return '';
+  const map2 = new Map(shotId['characters']['map']((value68) => [value68['id'], value68])),
+    map3 = new Map(shotId['scenes']['map']((value69) => [value69['id'], value69])),
+    readOnlyInputs = list11['map']((url) => {
+      const value70 = Math['max'](0x1, Number(url['slot']) || 0x1),
+        error3 = map2['get'](url['targetCharacterId']),
+        error4 = map3['get'](url['targetSceneId']),
+        name =
+          url['role'] === 'source-keyframe'
             ? '图' +
-              _0x35c6ec +
+              value70 +
               '\x20·\x20当前首帧' +
-              (_0x2e4d04['annotatedSource'] ? '（提交时叠加人物框）' : '')
-            : _0x107377['role'] === 'person-location-guide'
-              ? '图' + _0x35c6ec + ' · A–H 定位图'
-              : _0x107377['role'] === 'target-scene'
-                ? '图' + _0x35c6ec + ' · 场景 · ' + (_0x564228?.['name'] || '场景参考')
-                : '图' + _0x35c6ec + '\x20·\x20' + (_0x1704e6?.['name'] || '目标形象'),
-        _0x4f36de = _0x107377['role'] === 'target-character',
-        _0x33d464 = _0x107377['role'] === 'target-scene';
+              (value67['annotatedSource'] ? '（提交时叠加人物框）' : '')
+            : url['role'] === 'person-location-guide'
+              ? '图' + value70 + ' · A–H 定位图'
+              : url['role'] === 'target-scene'
+                ? '图' + value70 + ' · 场景 · ' + (error4?.['name'] || '场景参考')
+                : '图' + value70 + '\x20·\x20' + (error3?.['name'] || '目标形象'),
+        removeAction = url['role'] === 'target-character',
+        value71 = url['role'] === 'target-scene';
       return {
         kind: 'image',
-        slotId: 'image-' + _0x35c6ec,
-        name: _0x504e7a,
+        slotId: 'image-' + value70,
+        name: name,
         url:
-          _0x107377['role'] === 'person-location-guide'
-            ? resolvePersonReplacementLocationGuidePreview(_0x107377['ref'])
-            : normalizeMediaUrl(_0x107377['ref']),
-        removeAction: _0x4f36de
+          url['role'] === 'person-location-guide'
+            ? resolvePersonReplacementLocationGuidePreview(url['ref'])
+            : normalizeMediaUrl(url['ref']),
+        removeAction: removeAction
           ? 'clear-person-replacement-target'
-          : _0x33d464
+          : value71
             ? 'clear-person-replacement-scene-reference'
             : '',
-        removeValue: _0x4f36de
+        removeValue: removeAction
           ? JSON['stringify']({
-              shotId: _0x525801['workspace']['selectedShotId'],
-              targetCharacterId: _0x107377['targetCharacterId'],
-              targetAppearanceId: _0x107377['targetAppearanceId'],
+              shotId: shotId['workspace']['selectedShotId'],
+              targetCharacterId: url['targetCharacterId'],
+              targetAppearanceId: url['targetAppearanceId'],
             })
-          : _0x33d464
-            ? JSON['stringify']({ shotId: _0x525801['workspace']['selectedShotId'] })
+          : value71
+            ? JSON['stringify']({ shotId: shotId['workspace']['selectedShotId'] })
             : '',
       };
     });
   return (
     '<div class="person-replacement-prompt-reference-inputs" aria-label="图像生成入参">' +
     renderVideoReferenceBarMarkup({
-      readOnlyInputs: _0x21c511,
+      readOnlyInputs: readOnlyInputs,
       showItemTitles: ![],
       attachmentButtonHtml: '',
     }) +
     '</div>'
   );
 }
-export function syncPersonReplacementPromptReferenceInputs(_0x59d10e, _0x564460, _0x30e3f3) {
-  const _0x1ed6dd = _0x59d10e?.['querySelector']?.('.person-replacement-prompt-reference-inputs');
-  if (!_0x1ed6dd?.['ownerDocument']?.['createElement']) return;
-  const _0x37d674 = _0x1ed6dd['ownerDocument']['createElement']('template');
-  _0x37d674['innerHTML'] = renderPromptReferenceInputs(_0x564460, _0x30e3f3);
-  const _0x4f8d34 = _0x37d674['content']['firstElementChild'];
-  if (!_0x4f8d34 || _0x1ed6dd['innerHTML'] === _0x4f8d34['innerHTML']) return;
-  const _0x598853 = _0x1ed6dd['querySelector']('.ref-thumb-container--readonly'),
-    _0x333a14 = _0x4f8d34['querySelector']('.ref-thumb-container--readonly');
-  if (!_0x598853 || !_0x333a14) {
-    (_0x1ed6dd['querySelectorAll']('img')['forEach']((_0x1c1267) => _0x1c1267['removeAttribute']('src')),
-      _0x1ed6dd['replaceChildren'](..._0x4f8d34['childNodes']));
+export function syncPersonReplacementPromptReferenceInputs(el2, value72, value73) {
+  const el3 = el2?.['querySelector']?.('.person-replacement-prompt-reference-inputs');
+  if (!el3?.['ownerDocument']?.['createElement']) return;
+  const el4 = el3['ownerDocument']['createElement']('template');
+  el4['innerHTML'] = renderPromptReferenceInputs(value72, value73);
+  const el5 = el4['content']['firstElementChild'];
+  if (!el5 || el3['innerHTML'] === el5['innerHTML']) return;
+  const el6 = el3['querySelector']('.ref-thumb-container--readonly'),
+    el7 = el5['querySelector']('.ref-thumb-container--readonly');
+  if (!el6 || !el7) {
+    (el3['querySelectorAll']('img')['forEach']((value74) => value74['removeAttribute']('src')),
+      el3['replaceChildren'](...el5['childNodes']));
     return;
   }
-  const _0x445981 = [..._0x1ed6dd['querySelectorAll']('[data-ref-readonly-key]')];
-  let _0x15a488 = _0x598853['firstElementChild'];
-  for (const _0x203ffb of _0x333a14['querySelectorAll']('[data-ref-readonly-key]')) {
-    const _0x5592ec = _0x445981['findIndex'](
-        (_0x3f9559) => _0x3f9559['dataset']['refReadonlyKey'] === _0x203ffb['dataset']['refReadonlyKey'],
+  const list12 = [...el3['querySelectorAll']('[data-ref-readonly-key]')];
+  let value75 = el6['firstElementChild'];
+  for (const el8 of el7['querySelectorAll']('[data-ref-readonly-key]')) {
+    const count2 = list12['findIndex'](
+        (el9) => el9['dataset']['refReadonlyKey'] === el8['dataset']['refReadonlyKey'],
       ),
-      _0x5ecafe = _0x5592ec < 0x0 ? _0x203ffb : _0x445981['splice'](_0x5592ec, 0x1)[0x0];
-    if (_0x5ecafe !== _0x203ffb)
-      for (const { name: _0x53ea8c, value: _0x5e46cc } of _0x203ffb['attributes']) {
-        if (_0x5ecafe['getAttribute'](_0x53ea8c) !== _0x5e46cc)
-          _0x5ecafe['setAttribute'](_0x53ea8c, _0x5e46cc);
+      el10 = count2 < 0x0 ? el8 : list12['splice'](count2, 0x1)[0x0];
+    if (el10 !== el8)
+      for (const { name: name2, value: value76 } of el8['attributes']) {
+        if (el10['getAttribute'](name2) !== value76) el10['setAttribute'](name2, value76);
       }
-    if (_0x5ecafe !== _0x15a488) _0x598853['insertBefore'](_0x5ecafe, _0x15a488);
-    _0x15a488 = _0x5ecafe['nextElementSibling'];
+    if (el10 !== value75) el6['insertBefore'](el10, value75);
+    value75 = el10['nextElementSibling'];
   }
-  for (const _0x1c211d of _0x445981) {
-    (_0x1c211d['querySelectorAll']('img')['forEach']((_0xbff231) => _0xbff231['removeAttribute']('src')),
-      _0x1c211d['remove']());
+  for (const el11 of list12) {
+    (el11['querySelectorAll']('img')['forEach']((value77) => value77['removeAttribute']('src')),
+      el11['remove']());
   }
 }
 export function createPersonReplacementIdentityPresentation() {
   return Object['freeze']({
     buildImage(
-      _0x305c16,
-      _0x5b8894,
+      value78,
+      value79,
       { people: people = [], duplicateRoleLabels: duplicateRoleLabels = new Set() } = {},
     ) {
-      const _0x17036e = Array['isArray'](people) ? people : [];
+      const detectionBoxesHtml = Array['isArray'](people) ? people : [];
       return Object['freeze']({
-        targetAssetRailHtml: renderTargetAssetRail(_0x305c16, _0x5b8894),
-        detectionBoxesHtml: _0x17036e['map']((_0x539d56, _0x4f5ced) =>
-          renderDetectionBox(_0x539d56, _0x4f5ced, _0x305c16, { duplicateRoleLabels: duplicateRoleLabels }),
+        targetAssetRailHtml: renderTargetAssetRail(value78, value79),
+        detectionBoxesHtml: detectionBoxesHtml['map']((value80, value81) =>
+          renderDetectionBox(value80, value81, value78, { duplicateRoleLabels: duplicateRoleLabels }),
         )['join'](''),
-        promptReferenceInputsHtml: renderPromptReferenceInputs(_0x305c16, _0x5b8894?.['promptPackage']),
+        promptReferenceInputsHtml: renderPromptReferenceInputs(value78, value79?.['promptPackage']),
       });
     },
-    buildVideo(_0x142c39, _0x3b8888) {
+    buildVideo(value82, value83) {
       return Object['freeze']({
-        referenceRailHtml: renderVideoReplacementReferenceRail(_0x142c39, _0x3b8888),
-        referenceInputsHtml: renderVideoReplacementReferenceInputs(_0x3b8888),
+        referenceRailHtml: renderVideoReplacementReferenceRail(value82, value83),
+        referenceInputsHtml: renderVideoReplacementReferenceInputs(value83),
       });
     },
-    renderOverlay(_0x57bdb3, _0x4d305f = {}) {
-      if (_0x57bdb3 === 'picker-options')
-        return renderPersonDetectionPickerOptions(_0x4d305f['options'], _0x4d305f['selectedValue']);
-      if (_0x57bdb3 === 'mapping-scope') return renderPersonMappingScopeMenu(_0x4d305f);
+    renderOverlay(value84, value85 = {}) {
+      if (value84 === 'picker-options')
+        return renderPersonDetectionPickerOptions(value85['options'], value85['selectedValue']);
+      if (value84 === 'mapping-scope') return renderPersonMappingScopeMenu(value85);
       return '';
     },
   });

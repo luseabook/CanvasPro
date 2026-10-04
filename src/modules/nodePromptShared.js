@@ -1,5 +1,8 @@
 import { normalizePromptMentionType } from './promptAssetInputRefs.js';
-import { rememberVirtualizedPromptCommit, serializeVirtualizedPromptHtml } from './promptPasteVirtualization.js';
+import {
+  rememberVirtualizedPromptCommit,
+  serializeVirtualizedPromptHtml,
+} from './promptPasteVirtualization.js';
 import appStore from '../core/stores/appStore.js';
 import {
   getInputLimitReason,
@@ -15,8 +18,8 @@ import { localPathToUrl } from '../utils/localMediaPath.js';
 import { hasPromptPresetTemplateContent, resolvePromptPresetTemplate } from './promptPresetTemplate.js';
 import { normalizeProviderId, resolveModelExecution } from '../manifests/index.js';
 import { t } from '../i18n/index.js';
-function nodePromptSharedText(_0x232edc, _0x213deb = {}) {
-  return t('nodePromptShared.' + _0x232edc, _0x213deb);
+function nodePromptSharedText(value, item = {}) {
+  return t('nodePromptShared.' + value, item);
 }
 const AT_TYPE_MAP = { text: '文本', image: '图片', video: '视频', audio: '音频' },
   MENTION_TYPE_ORDER = ['text', 'image', 'video', 'audio'],
@@ -41,88 +44,82 @@ const PROMPT_INPUT_REF_UNRESOLVED_ATTR = 'data-ref-unresolved',
     'source-audio': 'audio',
     'ai-audio': 'audio',
   };
-function _getMentionType(_0x2c0694) {
-  return normalizeInputKind(AT_TYPE_CANDIDATE_MAP[String(_0x2c0694 || '').trim()] || _0x2c0694);
+function _getMentionType(key) {
+  return normalizeInputKind(AT_TYPE_CANDIDATE_MAP[String(key || '').trim()] || key);
 }
-function _normalizeQuery(_0xbaffc3) {
-  return String(_0xbaffc3 || '')
+function _normalizeQuery(index) {
+  return String(index || '')
     .trim()
     .replace(/^@+/, '');
 }
-function _stripMentionDisplayMarker(_0xdab4d7) {
-  return String(_0xdab4d7 || '')
+function _stripMentionDisplayMarker(result) {
+  return String(result || '')
     .trim()
     .replace(/^@+/, '')
     .trim();
 }
-function _formatMentionSubmitLabel(_0x14f0c1) {
-  const _0x423c36 = _stripMentionDisplayMarker(_0x14f0c1);
-  return _0x423c36 ? '@' + _0x423c36 : '';
+function _formatMentionSubmitLabel(data) {
+  const _stripMentionDisplayMarker2 = _stripMentionDisplayMarker(data);
+  return _stripMentionDisplayMarker2 ? '@' + _stripMentionDisplayMarker2 : '';
 }
-function _normalizePromptWhitespace(_0x4891bd) {
-  return String(_0x4891bd || '')
+function _normalizePromptWhitespace(options) {
+  return String(options || '')
     .replace(/[\s\u00A0\u200B-\u200D\uFEFF]+/g, ' ')
     .trim();
 }
-export function normalizePromptEnterBehavior(_0x59deab) {
-  return _0x59deab === 'newline' ? 'newline' : 'submit';
+export function normalizePromptEnterBehavior(target) {
+  return target === 'newline' ? 'newline' : 'submit';
 }
 function getPromptEnterBehaviorFromStore() {
   try {
-    const _0x14501e = appStore.getStateRaw?.() || appStore.getState?.() || {};
-    return normalizePromptEnterBehavior(_0x14501e?.ui?.promptEnterBehavior);
+    const source = appStore.getStateRaw?.() || appStore.getState?.() || {};
+    return normalizePromptEnterBehavior(source?.ui?.promptEnterBehavior);
   } catch {
     return 'submit';
   }
 }
-export function shouldSubmitPromptByKeyboard(_0x322423, _0x3badb4 = {}) {
-  if (!_0x322423 || _0x322423.key !== 'Enter' || _0x322423.isComposing === true) return false;
-  const _0x4d9f29 = Object.prototype.hasOwnProperty.call(_0x3badb4, 'behavior')
-      ? _0x3badb4.behavior
+export function shouldSubmitPromptByKeyboard(event, next = {}) {
+  if (!event || event.key !== 'Enter' || event.isComposing === true) return false;
+  const current = Object.prototype.hasOwnProperty.call(next, 'behavior')
+      ? next.behavior
       : getPromptEnterBehaviorFromStore(),
-    _0x561096 = normalizePromptEnterBehavior(_0x4d9f29);
-  if (_0x561096 === 'newline') return _0x322423.ctrlKey === true || _0x322423.metaKey === true;
-  return _0x322423.shiftKey !== true;
+    promptEnterBehavior = normalizePromptEnterBehavior(current);
+  if (promptEnterBehavior === 'newline') return event.ctrlKey === true || event.metaKey === true;
+  return event.shiftKey !== true;
 }
-function _getAssetTypeMenuLabel(_0xc96a68) {
-  const _0x1a788b = ASSET_TYPE_MENU_LABELS[_0xc96a68];
-  if (_0x1a788b) return nodePromptSharedText('assetTypes.' + _0x1a788b);
-  return _0xc96a68 || nodePromptSharedText('materialFallback');
+function _getAssetTypeMenuLabel(entry) {
+  const record = ASSET_TYPE_MENU_LABELS[entry];
+  if (record) return nodePromptSharedText('assetTypes.' + record);
+  return entry || nodePromptSharedText('materialFallback');
 }
-function _escapeRegExp(_0x34e673) {
-  return String(_0x34e673 || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function _escapeRegExp(payload) {
+  return String(payload || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-function _getTextRefContent(_0x2d1dd6) {
+function _getTextRefContent(response) {
   return String(
-    _0x2d1dd6?.outputText ||
-      _0x2d1dd6?.text ||
-      _0x2d1dd6?.content ||
-      _0x2d1dd6?.prompt ||
-      _0x2d1dd6?.label ||
-      '',
+    response?.outputText || response?.text || response?.content || response?.prompt || response?.label || '',
   ).trim();
 }
-function _getChildNodes(_0x23d6fa) {
-  if (!_0x23d6fa?.childNodes) return [];
-  return Array.from(_0x23d6fa.childNodes);
+function _getChildNodes(enabled) {
+  if (!enabled?.childNodes) return [];
+  return Array.from(enabled.childNodes);
 }
-function _isRefPillNode(_0x3f9b48) {
-  if (!_0x3f9b48) return false;
-  if (typeof _0x3f9b48.classList?.contains === 'function') return _0x3f9b48.classList.contains('ref-pill');
-  return String(_0x3f9b48.className || '')
+function _isRefPillNode(el) {
+  if (!el) return false;
+  if (typeof el.classList?.contains === 'function') return el.classList.contains('ref-pill');
+  return String(el.className || '')
     .split(/\s+/)
     .filter(Boolean)
     .includes('ref-pill');
 }
-function _getDatasetValue(_0x231bd9, _0x2c592c, _0x2bccc3 = '') {
-  const _0xc6d1aa = String(_0x231bd9?.dataset?.[_0x2c592c] || '').trim();
-  if (_0xc6d1aa) return _0xc6d1aa;
-  if (_0x2bccc3 && typeof _0x231bd9?.getAttribute === 'function')
-    return String(_0x231bd9.getAttribute(_0x2bccc3) || '').trim();
+function _getDatasetValue(el2, handle, state = '') {
+  const config = String(el2?.dataset?.[handle] || '').trim();
+  if (config) return config;
+  if (state && typeof el2?.getAttribute === 'function') return String(el2.getAttribute(state) || '').trim();
   return '';
 }
-function _decodeHtmlAttrValue(_0x187dbf) {
-  return String(_0x187dbf || '')
+function _decodeHtmlAttrValue(scope) {
+  return String(scope || '')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'")
@@ -130,379 +127,373 @@ function _decodeHtmlAttrValue(_0x187dbf) {
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
 }
-function _getHtmlAttrValue(_0x55441e = '', _0x333cfe = '') {
-  const _0x3886ef = String(_0x333cfe || '').trim();
-  if (!_0x3886ef) return '';
-  const _0x38dfea = new RegExp(
-      _escapeRegExp(_0x3886ef) + '\\s*=\\s*(?:"([^"]*)"|\'([^\']*)\'|([^\\s>]+))',
-      'i',
-    ),
-    _0x47e118 = String(_0x55441e || '').match(_0x38dfea);
-  if (!_0x47e118) return '';
-  return _decodeHtmlAttrValue(_0x47e118[1] ?? _0x47e118[2] ?? _0x47e118[3] ?? '').trim();
+function _getHtmlAttrValue(input = '', output = '') {
+  const enabled2 = String(output || '').trim();
+  if (!enabled2) return '';
+  const regExp = new RegExp(_escapeRegExp(enabled2) + '\\s*=\\s*(?:"([^"]*)"|\'([^\']*)\'|([^\\s>]+))', 'i'),
+    enabled3 = String(input || '').match(regExp);
+  if (!enabled3) return '';
+  return _decodeHtmlAttrValue(enabled3[1] ?? enabled3[2] ?? enabled3[3] ?? '').trim();
 }
-function _htmlClassAttrContains(_0x239417 = '', _0xf4db53 = '') {
-  const _0x28563f = _getHtmlAttrValue(_0x239417, 'class');
-  return _0x28563f.split(/\s+/).filter(Boolean).includes(_0xf4db53);
+function _htmlClassAttrContains(value2 = '', value3 = '') {
+  const _getHtmlAttrValue2 = _getHtmlAttrValue(value2, 'class');
+  return _getHtmlAttrValue2.split(/\s+/).filter(Boolean).includes(value3);
 }
-function _isAssetMentionPill(_0x393e07) {
-  return _getDatasetValue(_0x393e07, 'refOrigin', 'data-ref-origin') === 'asset';
+function _isAssetMentionPill(value4) {
+  return _getDatasetValue(value4, 'refOrigin', 'data-ref-origin') === 'asset';
 }
-function _isUnresolvedInputMentionPill(_0x58c18d) {
+function _isUnresolvedInputMentionPill(value5) {
   return (
-    !_isAssetMentionPill(_0x58c18d) &&
-    _getDatasetValue(_0x58c18d, 'refUnresolved', PROMPT_INPUT_REF_UNRESOLVED_ATTR) === 'true'
+    !_isAssetMentionPill(value5) &&
+    _getDatasetValue(value5, 'refUnresolved', PROMPT_INPUT_REF_UNRESOLVED_ATTR) === 'true'
   );
 }
-function _normalizeMentionLabelKey(_0xba2b5b) {
-  return _stripMentionDisplayMarker(_0xba2b5b).replace(/[\s\u00A0]+/g, '');
+function _normalizeMentionLabelKey(value6) {
+  return _stripMentionDisplayMarker(value6).replace(/[\s\u00A0]+/g, '');
 }
-function _inferMentionTypeFromLabel(_0x41a0cc = '') {
-  const _0x15067b = _normalizeMentionLabelKey(_0x41a0cc);
-  if (!_0x15067b) return '';
-  for (const _0x2645d1 of MENTION_TYPE_ORDER) {
-    const _0x24a36e = String(AT_TYPE_MAP[_0x2645d1] || '').trim();
-    if (_0x24a36e && _0x15067b.startsWith(_0x24a36e)) return _0x2645d1;
+function _inferMentionTypeFromLabel(value7 = '') {
+  const _normalizeMentionLabelKey2 = _normalizeMentionLabelKey(value7);
+  if (!_normalizeMentionLabelKey2) return '';
+  for (const value8 of MENTION_TYPE_ORDER) {
+    const value9 = String(AT_TYPE_MAP[value8] || '').trim();
+    if (value9 && _normalizeMentionLabelKey2.startsWith(value9)) return value8;
   }
   return '';
 }
-function _getPillMentionType(_0x1e8707) {
+function _getPillMentionType(el3) {
   return (
-    _getMentionType(_getDatasetValue(_0x1e8707, 'refType', 'data-ref-type')) ||
-    _inferMentionTypeFromLabel(
-      _getDatasetValue(_0x1e8707, 'label', 'data-label') || _0x1e8707?.textContent || '',
-    )
+    _getMentionType(_getDatasetValue(el3, 'refType', 'data-ref-type')) ||
+    _inferMentionTypeFromLabel(_getDatasetValue(el3, 'label', 'data-label') || el3?.textContent || '')
   );
 }
-function _getPromptInputDisplayLabel(_0x4d0540) {
+function _getPromptInputDisplayLabel(el4) {
+  return _stripMentionDisplayMarker(_getDatasetValue(el4, 'label', 'data-label') || el4?.textContent || '');
+}
+function _getPromptInputRefLabel(value10, value11 = '') {
   return _stripMentionDisplayMarker(
-    _getDatasetValue(_0x4d0540, 'label', 'data-label') || _0x4d0540?.textContent || '',
+    _getDatasetValue(value10, 'refLabel', PROMPT_INPUT_REF_LABEL_ATTR) || value11,
   );
 }
-function _getPromptInputRefLabel(_0x9e6d9a, _0x274d1e = '') {
-  return _stripMentionDisplayMarker(
-    _getDatasetValue(_0x9e6d9a, 'refLabel', PROMPT_INPUT_REF_LABEL_ATTR) || _0x274d1e,
-  );
-}
-export function getPromptInputSubmitLabelFromPillNode(_0x2c4722, _0x174f70 = '') {
-  if (_isAssetMentionPill(_0x2c4722))
-    return String(
-      _getDatasetValue(_0x2c4722, 'label', 'data-label') || _0x2c4722?.textContent || _0x174f70 || '',
-    ).trim();
+export function getPromptInputSubmitLabelFromPillNode(el5, value12 = '') {
+  if (_isAssetMentionPill(el5))
+    return String(_getDatasetValue(el5, 'label', 'data-label') || el5?.textContent || value12 || '').trim();
   return _formatMentionSubmitLabel(
-    _getPromptInputRefLabel(_0x2c4722, _0x174f70) ||
-      _getPromptInputDisplayLabel(_0x2c4722) ||
-      _0x174f70,
+    _getPromptInputRefLabel(el5, value12) || _getPromptInputDisplayLabel(el5) || value12,
   );
 }
-function _setInputMentionPillUnresolved(_0x3597cc, { label: label = '', type: type = '' } = {}) {
-  if (!_isRefPillNode(_0x3597cc) || _isAssetMentionPill(_0x3597cc)) return false;
-  const _0x176297 = _stripMentionDisplayMarker(
-      label || _0x3597cc?.dataset?.label || _0x3597cc?.textContent || '',
+function _setInputMentionPillUnresolved(el6, { label: label = '', type: type = '' } = {}) {
+  if (!_isRefPillNode(el6) || _isAssetMentionPill(el6)) return false;
+  const _stripMentionDisplayMarker3 = _stripMentionDisplayMarker(
+      label || el6?.dataset?.label || el6?.textContent || '',
     ),
-    _0x247c53 = _getPromptInputRefLabel(_0x3597cc, _0x176297),
-    _0x2db370 = _getMentionType(type) || _getPillMentionType(_0x3597cc);
-  ((_0x3597cc.dataset.label = _0x176297),
-    (_0x3597cc.dataset.refOrigin = 'node'),
-    (_0x3597cc.dataset.refUnresolved = 'true'));
-  if (_0x247c53) _0x3597cc.dataset.refLabel = _0x247c53;
-  if (_0x2db370) _0x3597cc.dataset.refType = _0x2db370;
+    _getPromptInputRefLabel2 = _getPromptInputRefLabel(el6, _stripMentionDisplayMarker3),
+    _getMentionType2 = _getMentionType(type) || _getPillMentionType(el6);
+  ((el6.dataset.label = _stripMentionDisplayMarker3),
+    (el6.dataset.refOrigin = 'node'),
+    (el6.dataset.refUnresolved = 'true'));
+  if (_getPromptInputRefLabel2) el6.dataset.refLabel = _getPromptInputRefLabel2;
+  if (_getMentionType2) el6.dataset.refType = _getMentionType2;
   return (
-    delete _0x3597cc.dataset.nodeId,
-    _0x3597cc.removeAttribute?.('data-node-id'),
-    _0x3597cc.classList?.add?.('ref-pill--unresolved'),
-    (_0x3597cc.title = 'Input reference is not bound in this node.'),
-    _renderMentionPillContent(_0x3597cc, _0x176297, _getMentionVisual(null, null, _0x3597cc)),
+    delete el6.dataset.nodeId,
+    el6.removeAttribute?.('data-node-id'),
+    el6.classList?.add?.('ref-pill--unresolved'),
+    (el6.title = 'Input reference is not bound in this node.'),
+    _renderMentionPillContent(el6, _stripMentionDisplayMarker3, _getMentionVisual(null, null, el6)),
     true
   );
 }
-function _clearInputMentionPillUnresolved(_0x446485) {
-  if (!_isRefPillNode(_0x446485)) return false;
-  (delete _0x446485.dataset.refUnresolved,
-    _0x446485.removeAttribute?.(PROMPT_INPUT_REF_UNRESOLVED_ATTR),
-    _0x446485.classList?.remove?.('ref-pill--unresolved'));
-  if (_0x446485.title === 'Input reference is not bound in this node.') {
-    _0x446485.removeAttribute?.('title');
-    if ('title' in _0x446485) _0x446485.title = '';
+function _clearInputMentionPillUnresolved(el7) {
+  if (!_isRefPillNode(el7)) return false;
+  (delete el7.dataset.refUnresolved,
+    el7.removeAttribute?.(PROMPT_INPUT_REF_UNRESOLVED_ATTR),
+    el7.classList?.remove?.('ref-pill--unresolved'));
+  if (el7.title === 'Input reference is not bound in this node.') {
+    el7.removeAttribute?.('title');
+    if ('title' in el7) el7.title = '';
   }
   return true;
 }
-function _getTargetNodeData(_0x4b1862 = null) {
-  const _0x3bc6e3 = String(_0x4b1862?.nodeId || '').trim(),
-    _0x9db107 = _0x3bc6e3 ? appStore.getState?.()?.nodes?.[_0x3bc6e3] : null;
-  return _0x9db107 || _0x4b1862?._data || {};
+function _getTargetNodeData(value13 = null) {
+  const value14 = String(value13?.nodeId || '').trim(),
+    value15 = value14 ? appStore.getState?.()?.nodes?.[value14] : null;
+  return value15 || value13?._data || {};
 }
-function _isAdvancedVoiceCloneTarget(_0x5dec81 = {}) {
-  if (String(_0x5dec81?.type || '').trim() !== 'ai-audio') return false;
-  return [_0x5dec81.audioWorkflowKey, _0x5dec81.model, _0x5dec81.audioWorkflowLabel].some(
-    (_0x35a78d) => String(_0x35a78d || '').trim() === ADVANCED_VOICE_CLONE_WORKFLOW_KEY,
+function _isAdvancedVoiceCloneTarget(options2 = {}) {
+  if (String(options2?.type || '').trim() !== 'ai-audio') return false;
+  return [options2.audioWorkflowKey, options2.model, options2.audioWorkflowLabel].some(
+    (item2) => String(item2 || '').trim() === ADVANCED_VOICE_CLONE_WORKFLOW_KEY,
   );
 }
-function _getMentionAudioInputKey(_0x354219 = {}) {
-  if (_getMentionType(_0x354219?.type) !== 'audio') return '';
-  if (_0x354219?.origin === 'asset') {
-    const _0x102e69 = _getPromptAssetInputRefRecordForMention(_0x354219);
-    return _0x102e69 ? 'asset:' + _0x102e69.assetId + ':' + _0x102e69.itemIndex : '';
+function _getMentionAudioInputKey(options3 = {}) {
+  if (_getMentionType(options3?.type) !== 'audio') return '';
+  if (options3?.origin === 'asset') {
+    const _getPromptAssetInputRefRecordForMention2 = _getPromptAssetInputRefRecordForMention(options3);
+    return _getPromptAssetInputRefRecordForMention2
+      ? 'asset:' +
+          _getPromptAssetInputRefRecordForMention2.assetId +
+          ':' +
+          _getPromptAssetInputRefRecordForMention2.itemIndex
+      : '';
   }
-  const _0x25cc44 = String(_0x354219?.nodeId || _0x354219?.sourceId || '').trim();
-  return _0x25cc44 ? 'node:' + _0x25cc44 : '';
+  const value16 = String(options3?.nodeId || options3?.sourceId || '').trim();
+  return value16 ? 'node:' + value16 : '';
 }
-function _getActualAudioInputKeysForTarget(_0x4292ba = '', _0x48b1c7 = {}, _0x17101c = null) {
-  const _0x569a2f = new Set(),
-    _0x29e954 = _0x17101c || appStore.getState(),
-    _0x34890d = _0x29e954.nodes || {};
+function _getActualAudioInputKeysForTarget(value17 = '', value18 = {}, value19 = null) {
+  const value20 = new Set(),
+    value21 = value19 || appStore.getState(),
+    value22 = value21.nodes || {};
   return (
-    appStore.getIncomingEdges(_0x4292ba).forEach((_0x274445) => {
-      const _0x38927a = _0x34890d?.[_0x274445?.sourceId];
-      resolveEffectiveInputKind(_0x38927a, _0x274445) === 'audio' &&
-        _0x274445?.sourceId &&
-        _0x569a2f.add('node:' + _0x274445.sourceId);
+    appStore.getIncomingEdges(value17).forEach((item3) => {
+      const value23 = value22?.[item3?.sourceId];
+      resolveEffectiveInputKind(value23, item3) === 'audio' &&
+        item3?.sourceId &&
+        value20.add('node:' + item3.sourceId);
     }),
-    _getPromptAssetInputRefRecords(_0x48b1c7 || {}).forEach((_0x2e8e84) => {
-      _0x2e8e84.type === 'audio' && _0x569a2f.add('asset:' + _0x2e8e84.assetId + ':' + _0x2e8e84.itemIndex);
+    _getPromptAssetInputRefRecords(value18 || {}).forEach((item4) => {
+      item4.type === 'audio' && value20.add('asset:' + item4.assetId + ':' + item4.itemIndex);
     }),
-    _0x569a2f
+    value20
   );
 }
-function _getAdvancedVoiceCloneAudioLimitReason(_0x1b286d, _0x11cf3f = {}, _0x27599b = {}, _0xabc946 = null) {
-  if (!_isAdvancedVoiceCloneTarget(_0x27599b)) return null;
-  if (_getMentionType(_0x11cf3f?.type) !== 'audio') return null;
-  const _0x54378e = getTargetInputPolicy(_0x27599b),
-    _0x59082e = Number(_0x54378e?.maxByKind?.audio);
-  if (!Number.isFinite(_0x59082e) || _0x59082e <= 0) return null;
-  const _0x52097e = _getActualAudioInputKeysForTarget(_0x1b286d?.nodeId, _0x27599b, _0xabc946),
-    _0x5be934 = _getMentionAudioInputKey(_0x11cf3f);
-  if (_0x5be934 && _0x52097e.has(_0x5be934)) return '';
-  return _0x52097e.size >= _0x59082e
-    ? getInputLimitReason(_0x54378e, 'audio', { audio: _0x52097e.size })
-    : '';
+function _getAdvancedVoiceCloneAudioLimitReason(value24, value25 = {}, value26 = {}, value27 = null) {
+  if (!_isAdvancedVoiceCloneTarget(value26)) return null;
+  if (_getMentionType(value25?.type) !== 'audio') return null;
+  const targetInputPolicy = getTargetInputPolicy(value26),
+    count = Number(targetInputPolicy?.maxByKind?.audio);
+  if (!Number.isFinite(count) || count <= 0) return null;
+  const audio = _getActualAudioInputKeysForTarget(value24?.nodeId, value26, value27),
+    _getMentionAudioInputKey2 = _getMentionAudioInputKey(value25);
+  if (_getMentionAudioInputKey2 && audio.has(_getMentionAudioInputKey2)) return '';
+  return audio.size >= count ? getInputLimitReason(targetInputPolicy, 'audio', { audio: audio.size }) : '';
 }
-export function isRunningHubWorkflowNode(_0x1d5194 = {}) {
-  const _0x31db3f = normalizeProviderId(_0x1d5194?.provider);
-  if (_0x31db3f === 'runninghubwf') return true;
-  const _0x4d0271 = String(_0x1d5194?.model || '').trim();
-  if (!_0x4d0271) return false;
-  const _0x376171 =
-      resolveModelExecution(_0x4d0271, { providerHint: _0x31db3f }) || resolveModelExecution(_0x4d0271),
-    _0x227c63 = normalizeProviderId(_0x376171?.modelManifest?.provider),
-    _0xb8da9d = normalizeProviderId(_0x376171?.executionManifest?.provider);
+export function isRunningHubWorkflowNode(options4 = {}) {
+  const providerHint = normalizeProviderId(options4?.provider);
+  if (providerHint === 'runninghubwf') return true;
+  const enabled4 = String(options4?.model || '').trim();
+  if (!enabled4) return false;
+  const modelExecution =
+      resolveModelExecution(enabled4, { providerHint: providerHint }) || resolveModelExecution(enabled4),
+    providerId = normalizeProviderId(modelExecution?.modelManifest?.provider),
+    providerId2 = normalizeProviderId(modelExecution?.executionManifest?.provider);
   return (
-    _0x376171?.executionManifest?.adapterType === 'workflow' &&
-    (_0x227c63 === 'runninghubwf' || _0xb8da9d === 'runninghubwf')
+    modelExecution?.executionManifest?.adapterType === 'workflow' &&
+    (providerId === 'runninghubwf' || providerId2 === 'runninghubwf')
   );
 }
-function _normalizePromptAssetInputRefRecord(_0x735ed2 = {}) {
-  if (!_0x735ed2 || typeof _0x735ed2 !== 'object') return null;
-  const _0x5705fd = String(_0x735ed2.assetId || '').trim(),
-    _0x3665ba =
-      _0x735ed2.itemIndex !== undefined && _0x735ed2.itemIndex !== null
-        ? _0x735ed2.itemIndex
-        : _0x735ed2.assetIndex,
-    _0x1b2434 = Number(_0x3665ba),
-    _0x27e05c = _getMentionType(_0x735ed2.type);
-  if (!_0x5705fd || !Number.isFinite(_0x1b2434) || !_0x27e05c || _0x27e05c === 'text') return null;
-  return { assetId: _0x5705fd, itemIndex: Math.max(0, Math.trunc(_0x1b2434)), type: _0x27e05c };
+function _normalizePromptAssetInputRefRecord(enabled5 = {}) {
+  if (!enabled5 || typeof enabled5 !== 'object') return null;
+  const assetId2 = String(enabled5.assetId || '').trim(),
+    value28 =
+      enabled5.itemIndex !== undefined && enabled5.itemIndex !== null
+        ? enabled5.itemIndex
+        : enabled5.assetIndex,
+    value29 = Number(value28),
+    type2 = _getMentionType(enabled5.type);
+  if (!assetId2 || !Number.isFinite(value29) || !type2 || type2 === 'text') return null;
+  return { assetId: assetId2, itemIndex: Math.max(0, Math.trunc(value29)), type: type2 };
 }
-function _getPromptAssetInputRefRecords(_0x675a66 = {}) {
-  const _0x4fba20 = _0x675a66?.[PROMPT_ASSET_INPUT_REFS_FIELD];
-  if (!Array.isArray(_0x4fba20)) return [];
-  return _0x4fba20.map((_0x22efe6) => _normalizePromptAssetInputRefRecord(_0x22efe6)).filter(Boolean);
+function _getPromptAssetInputRefRecords(options5 = {}) {
+  const list = options5?.[PROMPT_ASSET_INPUT_REFS_FIELD];
+  if (!Array.isArray(list)) return [];
+  return list.map((item5) => _normalizePromptAssetInputRefRecord(item5)).filter(Boolean);
 }
-function _toLocalPathUrl(_0x4a2245) {
-  return localPathToUrl(_0x4a2245);
+function _toLocalPathUrl(value30) {
+  return localPathToUrl(value30);
 }
-function _isLikelyImageUrl(_0x164034) {
-  const _0x42b507 = String(_0x164034 || '')
+function _isLikelyImageUrl(value31) {
+  const enabled6 = String(value31 || '')
     .trim()
     .toLowerCase();
-  if (!_0x42b507) return false;
-  if (_0x42b507.startsWith('data:image/') || _0x42b507.startsWith('blob:')) return true;
-  return /\.(png|jpe?g|webp|gif|bmp|svg|avif)(\?|#|$)/i.test(_0x42b507);
+  if (!enabled6) return false;
+  if (enabled6.startsWith('data:image/') || enabled6.startsWith('blob:')) return true;
+  return /\.(png|jpe?g|webp|gif|bmp|svg|avif)(\?|#|$)/i.test(enabled6);
 }
-function _firstNonEmpty(_0x31f991 = []) {
-  return _0x31f991.map((_0x4b731f) => String(_0x4b731f || '').trim()).find(Boolean) || '';
+function _firstNonEmpty(list2 = []) {
+  return list2.map((item6) => String(item6 || '').trim()).find(Boolean) || '';
 }
-function _pickIndexedItem(_0x151b53, _0x150172) {
-  if (!Array.isArray(_0x151b53) || _0x151b53.length === 0) return null;
-  const _0x3e9e67 = Number.isFinite(Number(_0x150172)) ? Math.max(0, Math.trunc(Number(_0x150172))) : 0;
-  return _0x151b53[_0x3e9e67] || _0x151b53[0] || null;
+function _pickIndexedItem(list3, value32) {
+  if (!Array.isArray(list3) || list3.length === 0) return null;
+  const value33 = Number.isFinite(Number(value32)) ? Math.max(0, Math.trunc(Number(value32))) : 0;
+  return list3[value33] || list3[0] || null;
 }
-function _resolveNodeThumbUrl(_0x37d643 = {}, _0xbd8b2b = '') {
-  const _0x1ba437 = _getMentionType(_0xbd8b2b || _0x37d643?.type);
-  if (_0x1ba437 === 'text' || _0x1ba437 === 'audio') return '';
-  if (_0x1ba437 === 'image') {
-    const _0x1c0fa7 = _pickIndexedItem(_0x37d643.images || _0x37d643.outputImages, _0x37d643.mainImageIndex);
+function _resolveNodeThumbUrl(response2 = {}, value34 = '') {
+  const _getMentionType3 = _getMentionType(value34 || response2?.type);
+  if (_getMentionType3 === 'text' || _getMentionType3 === 'audio') return '';
+  if (_getMentionType3 === 'image') {
+    const response3 = _pickIndexedItem(response2.images || response2.outputImages, response2.mainImageIndex);
     return _firstNonEmpty([
-      _0x1c0fa7?.thumbUrl,
-      _0x1c0fa7?.src,
-      _0x1c0fa7?.imageUrl,
-      _0x1c0fa7?.sourceUrl,
-      _0x1c0fa7?.url,
-      _toLocalPathUrl(_0x1c0fa7?.localPath),
-      _0x37d643.thumbUrl,
-      _0x37d643.src,
-      _0x37d643.imageUrl,
-      _0x37d643.sourceUrl,
-      _0x37d643.url,
-      _toLocalPathUrl(_0x37d643.localPath),
+      response3?.thumbUrl,
+      response3?.src,
+      response3?.imageUrl,
+      response3?.sourceUrl,
+      response3?.url,
+      _toLocalPathUrl(response3?.localPath),
+      response2.thumbUrl,
+      response2.src,
+      response2.imageUrl,
+      response2.sourceUrl,
+      response2.url,
+      _toLocalPathUrl(response2.localPath),
     ]);
   }
-  if (_0x1ba437 === 'video') {
-    const _0x4109d2 = _pickIndexedItem(_0x37d643.videos, _0x37d643.mainVideoIndex),
-      _0x45718d = [
-        _0x4109d2?.thumbUrl,
-        _0x4109d2?.posterUrl,
-        _toLocalPathUrl(_0x4109d2?.posterLocalPath),
-        _0x37d643.thumbUrl,
-        _0x37d643.videoThumbSrc,
-        _0x37d643.firstFrameThumbUrl,
-        _0x37d643.firstFrameUrl,
-        _0x37d643.posterUrl,
-        _toLocalPathUrl(_0x37d643.posterLocalPath),
-        _0x37d643.imageUrl,
-        _0x37d643.src,
+  if (_getMentionType3 === 'video') {
+    const _pickIndexedItem2 = _pickIndexedItem(response2.videos, response2.mainVideoIndex),
+      list4 = [
+        _pickIndexedItem2?.thumbUrl,
+        _pickIndexedItem2?.posterUrl,
+        _toLocalPathUrl(_pickIndexedItem2?.posterLocalPath),
+        response2.thumbUrl,
+        response2.videoThumbSrc,
+        response2.firstFrameThumbUrl,
+        response2.firstFrameUrl,
+        response2.posterUrl,
+        _toLocalPathUrl(response2.posterLocalPath),
+        response2.imageUrl,
+        response2.src,
       ];
     return (
-      _0x45718d
-        .map((_0x2517dd) => String(_0x2517dd || '').trim())
-        .find((_0x27cda8) => _0x27cda8 && _isLikelyImageUrl(_0x27cda8)) || ''
+      list4.map((item7) => String(item7 || '').trim()).find((item8) => item8 && _isLikelyImageUrl(item8)) ||
+      ''
     );
   }
   return '';
 }
-function _resolveRefBarThumbNode(_0x293c62, _0x5847d3) {
-  const _0xd2c7e4 = String(_0x5847d3 || '').trim();
-  if (!_0xd2c7e4 || !_0x293c62?.refBarEl || typeof _0x293c62.refBarEl.querySelector !== 'function')
-    return null;
-  const _0x526597 =
+function _resolveRefBarThumbNode(enabled7, value35) {
+  const enabled8 = String(value35 || '').trim();
+  if (!enabled8 || !enabled7?.refBarEl || typeof enabled7.refBarEl.querySelector !== 'function') return null;
+  const value36 =
       typeof CSS !== 'undefined' && typeof CSS.escape === 'function'
-        ? CSS.escape(_0xd2c7e4)
-        : _0xd2c7e4.replace(/["\\]/g, '\\$&'),
-    _0x5a0ef9 = _0x293c62.refBarEl.querySelector('.ref-thumb-wrap[data-source-id="' + _0x526597 + '"]');
-  return _0x5a0ef9?.querySelector?.('.ref-thumb-media') || null;
+        ? CSS.escape(enabled8)
+        : enabled8.replace(/["\\]/g, '\\$&'),
+    el8 = enabled7.refBarEl.querySelector('.ref-thumb-wrap[data-source-id="' + value36 + '"]');
+  return el8?.querySelector?.('.ref-thumb-media') || null;
 }
-function _getThumbNodeUrl(_0x1bae3a) {
-  const _0x38f6a2 =
-    _0x1bae3a?.tagName && String(_0x1bae3a.tagName).toLowerCase() === 'img' ? _0x1bae3a : null;
-  return String(_0x38f6a2?.currentSrc || _0x38f6a2?.src || '').trim();
+function _getThumbNodeUrl(value37) {
+  const value38 = value37?.tagName && String(value37.tagName).toLowerCase() === 'img' ? value37 : null;
+  return String(value38?.currentSrc || value38?.src || '').trim();
 }
-function _getRenderableMentionThumbUrl(_0x2f905e, _0x466fb1 = '') {
-  const _0x4fa8b3 = String(_0x2f905e || '').trim();
-  if (!_0x4fa8b3) return '';
-  const _0x498595 = _getMentionType(_0x466fb1);
-  if (_0x498595 === 'text' || _0x498595 === 'audio') return _isLikelyImageUrl(_0x4fa8b3) ? _0x4fa8b3 : '';
-  return _0x4fa8b3;
+function _getRenderableMentionThumbUrl(value39, value40 = '') {
+  const enabled9 = String(value39 || '').trim();
+  if (!enabled9) return '';
+  const _getMentionType4 = _getMentionType(value40);
+  if (_getMentionType4 === 'text' || _getMentionType4 === 'audio')
+    return _isLikelyImageUrl(enabled9) ? enabled9 : '';
+  return enabled9;
 }
-function _getMentionVisual(_0x27d4b0, _0x1affa7 = null, _0x1304ba = null) {
-  const _0x35cb6b = _getMentionType(
-      _0x1affa7?.type || _getDatasetValue(_0x1304ba, 'refType', 'data-ref-type'),
+function _getMentionVisual(value41, value42 = null, value43 = null) {
+  const _getMentionType5 = _getMentionType(
+      value42?.type || _getDatasetValue(value43, 'refType', 'data-ref-type'),
     ),
-    _0x44372a = _0x35cb6b || 'text';
-  if (_0x1affa7?.origin === 'asset' || _isAssetMentionPill(_0x1304ba)) {
-    const _0x3c7594 = _0x1affa7?.origin === 'asset' ? null : getAssetMentionRefFromPillNode(_0x1304ba),
-      _0x36436a = _getRenderableMentionThumbUrl(_0x1affa7?.thumbUrl || _0x3c7594?.thumbUrl || '', _0x35cb6b);
-    return { thumbUrl: _0x36436a, iconType: _0x44372a };
+    iconType2 = _getMentionType5 || 'text';
+  if (value42?.origin === 'asset' || _isAssetMentionPill(value43)) {
+    const value44 = value42?.origin === 'asset' ? null : getAssetMentionRefFromPillNode(value43),
+      thumbUrl2 = _getRenderableMentionThumbUrl(
+        value42?.thumbUrl || value44?.thumbUrl || '',
+        _getMentionType5,
+      );
+    return { thumbUrl: thumbUrl2, iconType: iconType2 };
   }
-  const _0x34e2dd = String(
-      _0x1affa7?.nodeId || _0x1affa7?.sourceId || _getDatasetValue(_0x1304ba, 'nodeId', 'data-node-id'),
+  const value45 = String(
+      value42?.nodeId || value42?.sourceId || _getDatasetValue(value43, 'nodeId', 'data-node-id'),
     ).trim(),
-    _0x10f2ba = appStore.getState?.()?.nodes?.[_0x34e2dd] || {},
-    _0x463e92 = _0x35cb6b || _getMentionType(_0x10f2ba.type),
-    _0x17d581 = _resolveRefBarThumbNode(_0x27d4b0, _0x34e2dd),
-    _0x253fa5 = _getThumbNodeUrl(_0x17d581),
-    _0x3f6a87 =
-      _0x253fa5 ||
-      _getRenderableMentionThumbUrl(_0x1affa7?.thumbUrl || '', _0x463e92) ||
-      _resolveNodeThumbUrl(_0x10f2ba, _0x463e92);
-  return { thumbUrl: _0x3f6a87, thumbNode: _0x3f6a87 ? null : _0x17d581, iconType: _0x463e92 || _0x44372a };
+    value46 = appStore.getState?.()?.nodes?.[value45] || {},
+    iconType3 = _getMentionType5 || _getMentionType(value46.type),
+    _resolveRefBarThumbNode2 = _resolveRefBarThumbNode(value41, value45),
+    _getThumbNodeUrl2 = _getThumbNodeUrl(_resolveRefBarThumbNode2),
+    thumbUrl3 =
+      _getThumbNodeUrl2 ||
+      _getRenderableMentionThumbUrl(value42?.thumbUrl || '', iconType3) ||
+      _resolveNodeThumbUrl(value46, iconType3);
+  return {
+    thumbUrl: thumbUrl3,
+    thumbNode: thumbUrl3 ? null : _resolveRefBarThumbNode2,
+    iconType: iconType3 || iconType2,
+  };
 }
-function _createTextAudioMentionThumb(_0x23c67b, _0x1a1eba) {
-  return createReferenceFallbackThumbElement(_getMentionType(_0x23c67b), _0x1a1eba);
+function _createTextAudioMentionThumb(value47, value48) {
+  return createReferenceFallbackThumbElement(_getMentionType(value47), value48);
 }
-function _cloneMentionThumbNode(_0x111f8e, _0x3bbf6d, _0x3ae41c = '') {
-  const _0x31398e = _createTextAudioMentionThumb(_0x3ae41c, _0x3bbf6d);
-  if (_0x31398e) return _0x31398e;
-  if (!_0x111f8e) return null;
-  if (typeof _0x111f8e.cloneNode !== 'function') return null;
-  const _0xd16166 = _0x111f8e.cloneNode(true);
+function _cloneMentionThumbNode(enabled10, value49, value50 = '') {
+  const _createTextAudioMentionThumb2 = _createTextAudioMentionThumb(value50, value49);
+  if (_createTextAudioMentionThumb2) return _createTextAudioMentionThumb2;
+  if (!enabled10) return null;
+  if (typeof enabled10.cloneNode !== 'function') return null;
+  const value51 = enabled10.cloneNode(true);
   return (
-    (_0xd16166.className = _0x3bbf6d),
-    (_0xd16166.draggable = false),
-    (_0xd16166.contentEditable = 'false'),
-    _0xd16166
+    (value51.className = value49),
+    (value51.draggable = false),
+    (value51.contentEditable = 'false'),
+    value51
   );
 }
 function _appendMentionVisualNode(
-  _0x993e58,
+  el9,
   { thumbUrl: thumbUrl = '', thumbNode: thumbNode = null, iconType: iconType = '' } = {},
 ) {
   if (thumbUrl) {
-    const _0x35723c = document.createElement('img');
+    const value52 = document.createElement('img');
     return (
-      (_0x35723c.className = 'ref-pill-thumb'),
-      (_0x35723c.src = thumbUrl),
-      (_0x35723c.alt = ''),
-      (_0x35723c.draggable = false),
-      (_0x35723c.contentEditable = 'false'),
-      _0x993e58.appendChild(_0x35723c),
+      (value52.className = 'ref-pill-thumb'),
+      (value52.src = thumbUrl),
+      (value52.alt = ''),
+      (value52.draggable = false),
+      (value52.contentEditable = 'false'),
+      el9.appendChild(value52),
       true
     );
   }
-  const _0x26dcd3 = _cloneMentionThumbNode(thumbNode, 'ref-pill-thumb', iconType);
-  if (!_0x26dcd3) return false;
-  return (_0x993e58.appendChild(_0x26dcd3), true);
+  const _cloneMentionThumbNode2 = _cloneMentionThumbNode(thumbNode, 'ref-pill-thumb', iconType);
+  if (!_cloneMentionThumbNode2) return false;
+  return (el9.appendChild(_cloneMentionThumbNode2), true);
 }
-function _renderMentionPillContent(_0x14012d, _0x2ef493, _0x23cb33 = {}) {
-  const _0x5de91a = _stripMentionDisplayMarker(_0x2ef493);
+function _renderMentionPillContent(el10, value53, value54 = {}) {
+  const _stripMentionDisplayMarker4 = _stripMentionDisplayMarker(value53);
   if (
     typeof document === 'undefined' ||
     typeof document.createElement !== 'function' ||
-    typeof _0x14012d?.replaceChildren !== 'function'
+    typeof el10?.replaceChildren !== 'function'
   ) {
-    _0x14012d.textContent = _0x5de91a;
+    el10.textContent = _stripMentionDisplayMarker4;
     return;
   }
-  const _0x49903d = document.createElement('span');
-  ((_0x49903d.className = 'ref-pill-label'),
-    (_0x49903d.textContent = _0x5de91a),
-    _0x14012d.replaceChildren(),
-    _appendMentionVisualNode(_0x14012d, _0x23cb33),
-    _0x14012d.appendChild(_0x49903d));
+  const el11 = document.createElement('span');
+  ((el11.className = 'ref-pill-label'),
+    (el11.textContent = _stripMentionDisplayMarker4),
+    el10.replaceChildren(),
+    _appendMentionVisualNode(el10, value54),
+    el10.appendChild(el11));
 }
-function _isPillVisualCurrent(_0x3881ac, _0x51a501 = {}) {
-  if (!_0x3881ac || typeof _0x3881ac.querySelector !== 'function') return true;
-  const _0x520a23 = _getMentionType(_0x51a501.iconType);
-  if (_0x51a501.thumbUrl) {
-    const _0x272fbd = _0x3881ac.querySelector('img.ref-pill-thumb');
-    return String(_0x272fbd?.currentSrc || _0x272fbd?.src || '').trim() === _0x51a501.thumbUrl;
+function _isPillVisualCurrent(el12, value55 = {}) {
+  if (!el12 || typeof el12.querySelector !== 'function') return true;
+  const _getMentionType6 = _getMentionType(value55.iconType);
+  if (value55.thumbUrl) {
+    const value56 = el12.querySelector('img.ref-pill-thumb');
+    return String(value56?.currentSrc || value56?.src || '').trim() === value55.thumbUrl;
   }
-  if (_0x520a23 === 'text' || _0x520a23 === 'audio') {
-    const _0x32a9e4 = _0x3881ac.querySelector('.ref-pill-thumb'),
-      _0x22df43 =
-        typeof _0x32a9e4?.className === 'string'
-          ? _0x32a9e4.className
-          : String(_0x32a9e4?.getAttribute?.('class') || '');
+  if (_getMentionType6 === 'text' || _getMentionType6 === 'audio') {
+    const el13 = el12.querySelector('.ref-pill-thumb'),
+      list5 =
+        typeof el13?.className === 'string' ? el13.className : String(el13?.getAttribute?.('class') || '');
     return (
-      !!_0x32a9e4 &&
-      (_0x32a9e4.classList?.contains?.('ref-thumb-fallback') || _0x22df43.includes('ref-thumb-fallback'))
+      !!el13 && (el13.classList?.contains?.('ref-thumb-fallback') || list5.includes('ref-thumb-fallback'))
     );
   }
-  if (_0x51a501.thumbNode) return !!_0x3881ac.querySelector('.ref-pill-thumb');
-  return !_0x3881ac.querySelector('.ref-pill-thumb') && !_0x3881ac.querySelector('.ref-pill-icon');
+  if (value55.thumbNode) return !!el12.querySelector('.ref-pill-thumb');
+  return !el12.querySelector('.ref-pill-thumb') && !el12.querySelector('.ref-pill-icon');
 }
-export function getAssetMentionRefFromPillNode(_0x5e0f9c) {
-  if (!_isRefPillNode(_0x5e0f9c) || !_isAssetMentionPill(_0x5e0f9c)) return null;
-  const _0x1386c3 = _getDatasetValue(_0x5e0f9c, 'assetId', 'data-asset-id'),
-    _0xd237d = _getDatasetValue(_0x5e0f9c, 'assetIndex', 'data-asset-index'),
-    _0x282260 = Number(_0xd237d);
-  if (!_0x1386c3 || !Number.isFinite(_0x282260)) return null;
-  return resolveAssetMentionRef({ assetId: _0x1386c3, itemIndex: _0x282260 });
+export function getAssetMentionRefFromPillNode(value57) {
+  if (!_isRefPillNode(value57) || !_isAssetMentionPill(value57)) return null;
+  const assetId3 = _getDatasetValue(value57, 'assetId', 'data-asset-id'),
+    _getDatasetValue2 = _getDatasetValue(value57, 'assetIndex', 'data-asset-index'),
+    itemIndex2 = Number(_getDatasetValue2);
+  if (!assetId3 || !Number.isFinite(itemIndex2)) return null;
+  return resolveAssetMentionRef({ assetId: assetId3, itemIndex: itemIndex2 });
 }
-export function getMentionPlaceholderLabel(_0x233cf0, _0x44ea16) {
-  const _0x51ee49 = _getMentionType(_0x233cf0),
-    _0x5abc1f = AT_TYPE_MAP[_0x51ee49] || _0x51ee49 || '素材',
-    _0x392b78 = Math.max(1, Math.trunc(Number(_0x44ea16) || 1));
-  return '@' + _0x5abc1f + _0x392b78;
+export function getMentionPlaceholderLabel(value58, value59) {
+  const _getMentionType7 = _getMentionType(value58),
+    value60 = AT_TYPE_MAP[_getMentionType7] || _getMentionType7 || '素材',
+    value61 = Math.max(1, Math.trunc(Number(value59) || 1));
+  return '@' + value60 + value61;
 }
 export function appendAssetMentionToPrompt({
   domNode: domNode = null,
@@ -512,197 +503,196 @@ export function appendAssetMentionToPrompt({
   mediaCounts: mediaCounts = null,
   allowedTypes: allowedTypes = null,
 } = {}) {
-  const _0xd7869b = getAssetMentionRefFromPillNode(domNode);
-  if (!_0xd7869b) return false;
-  const _0x4c7a97 = resolveEffectiveInputKind(_0xd7869b) || _getMentionType(_0xd7869b.type);
-  if (Array.isArray(allowedTypes) && !allowedTypes.includes(_0x4c7a97)) {
-    if (Array.isArray(promptParts)) promptParts.push(' ' + (rawLabel || _0xd7869b.label) + ' ');
+  const response4 = getAssetMentionRefFromPillNode(domNode);
+  if (!response4) return false;
+  const type3 = resolveEffectiveInputKind(response4) || _getMentionType(response4.type);
+  if (Array.isArray(allowedTypes) && !allowedTypes.includes(type3)) {
+    if (Array.isArray(promptParts)) promptParts.push(' ' + (rawLabel || response4.label) + ' ');
     return true;
   }
-  if (_0x4c7a97 === 'text') {
-    if (Array.isArray(promptParts)) promptParts.push(' ' + (_0xd7869b.content || '') + ' ');
+  if (type3 === 'text') {
+    if (Array.isArray(promptParts)) promptParts.push(' ' + (response4.content || '') + ' ');
     return true;
   }
-  if (!_0xd7869b.url) {
-    if (Array.isArray(promptParts)) promptParts.push(' ' + (rawLabel || _0xd7869b.label) + ' ');
+  if (!response4.url) {
+    if (Array.isArray(promptParts)) promptParts.push(' ' + (rawLabel || response4.label) + ' ');
     return true;
   }
-  const _0xb52656 = mediaCounts || {};
-  _0xb52656[_0x4c7a97] = Number(_0xb52656[_0x4c7a97] || 0) + 1;
-  const _0x503341 = getMentionPlaceholderLabel(_0x4c7a97, _0xb52656[_0x4c7a97]);
-  if (Array.isArray(promptParts)) promptParts.push(' ' + _0x503341 + ' ');
+  const value62 = mediaCounts || {};
+  value62[type3] = Number(value62[type3] || 0) + 1;
+  const placeholder = getMentionPlaceholderLabel(type3, value62[type3]);
+  if (Array.isArray(promptParts)) promptParts.push(' ' + placeholder + ' ');
   return (
-    Array.isArray(inputRefs) && inputRefs.push({ ..._0xd7869b, type: _0x4c7a97, placeholder: _0x503341 }),
+    Array.isArray(inputRefs) && inputRefs.push({ ...response4, type: type3, placeholder: placeholder }),
     true
   );
 }
-export function appendMentionPillToPrompt(_0x14cef7, _0x336af3, { focus: focus = true } = {}) {
-  const _0x2a1c97 = _0x14cef7?.promptEl;
-  if (!_0x2a1c97 || !_0x336af3) return null;
-  const _0x506d9e = _createMentionPillForCandidate(_0x336af3, _0x14cef7);
-  _bindPromptPill(_0x14cef7, _0x506d9e);
-  const _0x2b3fa6 = Boolean(String(_0x2a1c97.textContent || '').trim() || _0x2a1c97.childNodes?.length);
-  if (_0x2b3fa6) _0x2a1c97.appendChild(document.createTextNode(' '));
-  _0x2a1c97.appendChild(_0x506d9e);
-  const _0x47cc7b = document.createTextNode('\u00a0');
-  _0x2a1c97.appendChild(_0x47cc7b);
-  _updatePromptHtml(_0x14cef7);
+export function appendMentionPillToPrompt(value63, enabled11, { focus: focus = true } = {}) {
+  const el14 = value63?.promptEl;
+  if (!el14 || !enabled11) return null;
+  const _createMentionPillForCandidate2 = _createMentionPillForCandidate(enabled11, value63);
+  _bindPromptPill(value63, _createMentionPillForCandidate2);
+  const value64 = Boolean(String(el14.textContent || '').trim() || el14.childNodes?.length);
+  if (value64) el14.appendChild(document.createTextNode(' '));
+  el14.appendChild(_createMentionPillForCandidate2);
+  const el15 = document.createTextNode('\u00a0');
+  el14.appendChild(el15);
+  _updatePromptHtml(value63);
   if (focus) {
-    const _0x249d24 = globalThis.window?.getSelection?.(),
-      _0x5bc204 =
+    const value65 = globalThis.window?.getSelection?.(),
+      value66 =
         typeof globalThis.document?.createRange === 'function' ? globalThis.document.createRange() : null;
-    _0x249d24 &&
-      _0x5bc204 &&
-      (_0x5bc204.setStart(_0x47cc7b, _0x47cc7b.textContent.length),
-      _0x5bc204.collapse(true),
-      _0x249d24.removeAllRanges(),
-      _0x249d24.addRange(_0x5bc204),
-      _0x2a1c97.focus?.());
+    value65 &&
+      value66 &&
+      (value66.setStart(el15, el15.textContent.length),
+      value66.collapse(true),
+      value65.removeAllRanges(),
+      value65.addRange(value66),
+      el14.focus?.());
   }
-  return _0x506d9e;
+  return _createMentionPillForCandidate2;
 }
-export function getAssetInputRefsFromPrompt(_0x5d76c8 = null, { allowedTypes: allowedTypes = null } = {}) {
-  if (!_0x5d76c8 || typeof _0x5d76c8.querySelectorAll !== 'function') return [];
-  const _0x593915 =
+export function getAssetInputRefsFromPrompt(el16 = null, { allowedTypes: allowedTypes = null } = {}) {
+  if (!el16 || typeof el16.querySelectorAll !== 'function') return [];
+  const map =
       Array.isArray(allowedTypes) && allowedTypes.length
-        ? new Set(allowedTypes.map((_0x3eef44) => _getMentionType(_0x3eef44)).filter(Boolean))
+        ? new Set(allowedTypes.map((item9) => _getMentionType(item9)).filter(Boolean))
         : null,
-    _0x3db1b6 = [],
-    _0x554865 = new Map();
+    list6 = [],
+    map2 = new Map();
   return (
-    _0x5d76c8.querySelectorAll('.ref-pill').forEach((_0x53ecb6) => {
-      if (!_isAssetMentionPill(_0x53ecb6)) return;
-      const _0x492886 = getAssetMentionRefFromPillNode(_0x53ecb6);
-      if (!_0x492886) return;
-      const _0x42fd3e = resolveEffectiveInputKind(_0x492886) || _getMentionType(_0x492886.type);
-      if (!_0x42fd3e || (_0x593915 && !_0x593915.has(_0x42fd3e))) return;
-      if (_0x42fd3e === 'text') {
-        if (!String(_0x492886.content || '').trim()) return;
+    el16.querySelectorAll('.ref-pill').forEach((item10) => {
+      if (!_isAssetMentionPill(item10)) return;
+      const response5 = getAssetMentionRefFromPillNode(item10);
+      if (!response5) return;
+      const type4 = resolveEffectiveInputKind(response5) || _getMentionType(response5.type);
+      if (!type4 || (map && !map.has(type4))) return;
+      if (type4 === 'text') {
+        if (!String(response5.content || '').trim()) return;
       } else {
-        if (!String(_0x492886.url || '').trim()) return;
+        if (!String(response5.url || '').trim()) return;
       }
-      const _0xb8a9d8 = _0x492886.assetId + ':' + _0x492886.itemIndex + ':' + _0x42fd3e,
-        _0x1c63f0 = _0x554865.get(_0xb8a9d8) || 0;
-      (_0x554865.set(_0xb8a9d8, _0x1c63f0 + 1),
-        _0x3db1b6.push({
-          ..._0x492886,
-          type: _0x42fd3e,
-          assetMentionOccurrence: _0x1c63f0,
+      const value67 = response5.assetId + ':' + response5.itemIndex + ':' + type4,
+        assetMentionOccurrence = map2.get(value67) || 0;
+      (map2.set(value67, assetMentionOccurrence + 1),
+        list6.push({
+          ...response5,
+          type: type4,
+          assetMentionOccurrence: assetMentionOccurrence,
           assetRefSource: 'prompt',
         }));
     }),
-    _0x3db1b6
+    list6
   );
 }
-function _normalizeAllowedMentionTypes(_0x180ed7 = null) {
-  return Array.isArray(_0x180ed7) && _0x180ed7.length
-    ? new Set(_0x180ed7.map((_0xd2cd78) => _getMentionType(_0xd2cd78)).filter(Boolean))
+function _normalizeAllowedMentionTypes(list7 = null) {
+  return Array.isArray(list7) && list7.length
+    ? new Set(list7.map((item11) => _getMentionType(item11)).filter(Boolean))
     : null;
 }
 function _appendResolvedAssetInputRefFromRecord(
-  _0x510bc5,
-  _0x5295a4,
-  _0x42bc59,
+  list8,
+  map3,
+  value68,
   {
     allowed: allowed = null,
     assetRefSource: assetRefSource = 'prompt',
     promptAssetRefIndex: promptAssetRefIndex = null,
   } = {},
 ) {
-  const _0x32040f = String(_0x42bc59?.assetId || '').trim(),
-    _0x2adbd2 =
-      _0x42bc59?.itemIndex !== undefined && _0x42bc59?.itemIndex !== null
-        ? _0x42bc59.itemIndex
-        : _0x42bc59?.assetIndex,
-    _0x3464fa = Number(_0x2adbd2),
-    _0x314139 = resolveEffectiveInputKind(_0x42bc59) || _getMentionType(_0x42bc59?.type);
-  if (!_0x32040f || !Number.isFinite(_0x3464fa) || !_0x314139 || (allowed && !allowed.has(_0x314139)))
-    return false;
-  const _0x52d515 = Math.max(0, Math.trunc(_0x3464fa)),
-    _0x5eaa0b = resolveAssetMentionRef({ assetId: _0x32040f, itemIndex: _0x52d515 });
-  if (!_0x5eaa0b) return false;
-  const _0x108bd0 = resolveEffectiveInputKind(_0x5eaa0b) || _getMentionType(_0x5eaa0b.type || _0x314139);
-  if (!_0x108bd0 || _0x108bd0 !== _0x314139) return false;
-  if (_0x314139 === 'text') {
-    if (!String(_0x5eaa0b.content || '').trim()) return false;
+  const assetId4 = String(value68?.assetId || '').trim(),
+    value69 =
+      value68?.itemIndex !== undefined && value68?.itemIndex !== null
+        ? value68.itemIndex
+        : value68?.assetIndex,
+    value70 = Number(value69),
+    type5 = resolveEffectiveInputKind(value68) || _getMentionType(value68?.type);
+  if (!assetId4 || !Number.isFinite(value70) || !type5 || (allowed && !allowed.has(type5))) return false;
+  const itemIndex3 = Math.max(0, Math.trunc(value70)),
+    response6 = resolveAssetMentionRef({ assetId: assetId4, itemIndex: itemIndex3 });
+  if (!response6) return false;
+  const effectiveInputKind = resolveEffectiveInputKind(response6) || _getMentionType(response6.type || type5);
+  if (!effectiveInputKind || effectiveInputKind !== type5) return false;
+  if (type5 === 'text') {
+    if (!String(response6.content || '').trim()) return false;
   } else {
-    if (!String(_0x5eaa0b.url || '').trim()) return false;
+    if (!String(response6.url || '').trim()) return false;
   }
-  const _0x8c7532 = _0x32040f + ':' + _0x52d515 + ':' + _0x314139,
-    _0x311baf = _0x5295a4.get(_0x8c7532) || 0;
-  _0x5295a4.set(_0x8c7532, _0x311baf + 1);
-  const _0x5dc7f4 = {
-    ..._0x5eaa0b,
-    type: _0x314139,
-    assetMentionOccurrence: _0x311baf,
+  const value71 = assetId4 + ':' + itemIndex3 + ':' + type5,
+    assetMentionOccurrence2 = map3.get(value71) || 0;
+  map3.set(value71, assetMentionOccurrence2 + 1);
+  const value72 = {
+    ...response6,
+    type: type5,
+    assetMentionOccurrence: assetMentionOccurrence2,
     assetRefSource: assetRefSource,
   };
   return (
     Number.isFinite(Number(promptAssetRefIndex)) &&
-      (_0x5dc7f4.promptAssetRefIndex = Math.max(0, Math.trunc(Number(promptAssetRefIndex)))),
-    _0x510bc5.push(_0x5dc7f4),
+      (value72.promptAssetRefIndex = Math.max(0, Math.trunc(Number(promptAssetRefIndex)))),
+    list8.push(value72),
     true
   );
 }
-export function getAssetInputRefsFromPromptHtml(_0x5e3aeb = '', { allowedTypes: allowedTypes = null } = {}) {
-  const _0x206613 = _normalizeAllowedMentionTypes(allowedTypes),
-    _0x59e12f = sanitizePromptHtml(_0x5e3aeb);
-  if (!_0x59e12f) return [];
-  const _0x64d6f1 = [],
-    _0x5a67ac = new Map(),
-    _0xf46daa = /<span\b([^>]*)>([\s\S]*?)<\/span>/gi;
-  let _0x9b1ca3 = null;
-  while ((_0x9b1ca3 = _0xf46daa.exec(_0x59e12f))) {
-    const _0x184360 = _0x9b1ca3[1] || '';
-    if (!_htmlClassAttrContains(_0x184360, 'ref-pill')) continue;
-    if (_getHtmlAttrValue(_0x184360, 'data-ref-origin') !== 'asset') continue;
+export function getAssetInputRefsFromPromptHtml(value73 = '', { allowedTypes: allowedTypes = null } = {}) {
+  const allowed2 = _normalizeAllowedMentionTypes(allowedTypes),
+    sanitizePromptHtml2 = sanitizePromptHtml(value73);
+  if (!sanitizePromptHtml2) return [];
+  const value74 = [],
+    value75 = new Map(),
+    value76 = /<span\b([^>]*)>([\s\S]*?)<\/span>/gi;
+  let value77 = null;
+  while ((value77 = value76.exec(sanitizePromptHtml2))) {
+    const value78 = value77[1] || '';
+    if (!_htmlClassAttrContains(value78, 'ref-pill')) continue;
+    if (_getHtmlAttrValue(value78, 'data-ref-origin') !== 'asset') continue;
     _appendResolvedAssetInputRefFromRecord(
-      _0x64d6f1,
-      _0x5a67ac,
+      value74,
+      value75,
       {
-        assetId: _getHtmlAttrValue(_0x184360, 'data-asset-id'),
-        itemIndex: _getHtmlAttrValue(_0x184360, 'data-asset-index'),
-        type: _getHtmlAttrValue(_0x184360, 'data-ref-type'),
+        assetId: _getHtmlAttrValue(value78, 'data-asset-id'),
+        itemIndex: _getHtmlAttrValue(value78, 'data-asset-index'),
+        type: _getHtmlAttrValue(value78, 'data-ref-type'),
       },
-      { allowed: _0x206613, assetRefSource: 'prompt' },
+      { allowed: allowed2, assetRefSource: 'prompt' },
     );
   }
-  return _0x64d6f1;
+  return value74;
 }
-export function getPromptAssetInputRefsFromNode(_0xd605cd = {}, { allowedTypes: allowedTypes = null } = {}) {
-  const _0x5d4d5e = _normalizeAllowedMentionTypes(allowedTypes),
-    _0x1f5042 = [],
-    _0x299f80 = new Map();
+export function getPromptAssetInputRefsFromNode(options6 = {}, { allowedTypes: allowedTypes = null } = {}) {
+  const allowed3 = _normalizeAllowedMentionTypes(allowedTypes),
+    value79 = [],
+    value80 = new Map();
   return (
-    _getPromptAssetInputRefRecords(_0xd605cd).forEach((_0x60e870, _0x4cee72) => {
-      const _0x1e200a = _getMentionType(_0x60e870.type);
-      if (!_0x1e200a || _0x1e200a === 'text') return;
-      _appendResolvedAssetInputRefFromRecord(_0x1f5042, _0x299f80, _0x60e870, {
-        allowed: _0x5d4d5e,
+    _getPromptAssetInputRefRecords(options6).forEach((item12, promptAssetRefIndex2) => {
+      const _getMentionType8 = _getMentionType(item12.type);
+      if (!_getMentionType8 || _getMentionType8 === 'text') return;
+      _appendResolvedAssetInputRefFromRecord(value79, value80, item12, {
+        allowed: allowed3,
         assetRefSource: 'hidden',
-        promptAssetRefIndex: _0x4cee72,
+        promptAssetRefIndex: promptAssetRefIndex2,
       });
     }),
-    _0x1f5042
+    value79
   );
 }
-export function getAssetInputRefsFromNodeData(_0x8f83c8 = {}, { allowedTypes: allowedTypes = null } = {}) {
+export function getAssetInputRefsFromNodeData(options7 = {}, { allowedTypes: allowedTypes = null } = {}) {
   return [
-    ...getAssetInputRefsFromPromptHtml(_0x8f83c8?.prompt || '', { allowedTypes: allowedTypes }),
-    ...getPromptAssetInputRefsFromNode(_0x8f83c8 || {}, { allowedTypes: allowedTypes }),
+    ...getAssetInputRefsFromPromptHtml(options7?.prompt || '', { allowedTypes: allowedTypes }),
+    ...getPromptAssetInputRefsFromNode(options7 || {}, { allowedTypes: allowedTypes }),
   ];
 }
 export function getAssetInputRefsFromPromptAndNode(
-  _0x4fae8f = null,
+  value81 = null,
   { nodeData: nodeData = null, allowedTypes: allowedTypes = null } = {},
 ) {
   return [
-    ...getAssetInputRefsFromPrompt(_0x4fae8f, { allowedTypes: allowedTypes }),
+    ...getAssetInputRefsFromPrompt(value81, { allowedTypes: allowedTypes }),
     ...getPromptAssetInputRefsFromNode(nodeData || {}, { allowedTypes: allowedTypes }),
   ];
 }
 export function removeAssetMentionPillFromPrompt(
-  _0x2dc9a1,
+  value82,
   {
     assetId: assetId = '',
     assetIndex: assetIndex = '',
@@ -711,35 +701,37 @@ export function removeAssetMentionPillFromPrompt(
     occurrence: occurrence = null,
   } = {},
 ) {
-  const _0x58d54d = _0x2dc9a1?.promptEl;
-  if (!_0x58d54d || typeof _0x58d54d.querySelectorAll !== 'function') return false;
-  const _0x104214 = String(assetId || '').trim(),
-    _0x4294ab =
+  const el17 = value82?.promptEl;
+  if (!el17 || typeof el17.querySelectorAll !== 'function') return false;
+  const enabled12 = String(assetId || '').trim(),
+    value83 =
       assetIndex !== null && assetIndex !== undefined && String(assetIndex) !== '' ? assetIndex : itemIndex,
-    _0x4b90aa = String(_0x4294ab ?? '').trim(),
-    _0x2c9b87 = _getMentionType(type),
-    _0x1c0ec4 = Number(occurrence),
-    _0x1ae165 = Number.isFinite(_0x1c0ec4) && _0x1c0ec4 >= 0;
-  if (!_0x104214 || !_0x4b90aa) return false;
-  const _0x14390f = Array.from(_0x58d54d.querySelectorAll('.ref-pill'));
-  let _0x3a03d2 = 0;
-  const _0x81e260 = _0x14390f.find((_0x42f698) => {
-    if (!_isAssetMentionPill(_0x42f698)) return false;
-    const _0x46ca09 = _getDatasetValue(_0x42f698, 'assetId', 'data-asset-id'),
-      _0x402afb = _getDatasetValue(_0x42f698, 'assetIndex', 'data-asset-index'),
-      _0x3e2cc6 = _getMentionType(_getDatasetValue(_0x42f698, 'refType', 'data-ref-type')),
-      _0x46bdd6 =
-        _0x46ca09 === _0x104214 && _0x402afb === _0x4b90aa && (!_0x2c9b87 || _0x3e2cc6 === _0x2c9b87);
-    if (!_0x46bdd6) return false;
-    if (!_0x1ae165) return true;
-    const _0x229f7c = _0x3a03d2 === _0x1c0ec4;
-    return ((_0x3a03d2 += 1), _0x229f7c);
+    enabled13 = String(value83 ?? '').trim(),
+    _getMentionType9 = _getMentionType(type),
+    count2 = Number(occurrence),
+    enabled14 = Number.isFinite(count2) && count2 >= 0;
+  if (!enabled12 || !enabled13) return false;
+  const list9 = Array.from(el17.querySelectorAll('.ref-pill'));
+  let value84 = 0;
+  const el18 = list9.find((item13) => {
+    if (!_isAssetMentionPill(item13)) return false;
+    const _getDatasetValue3 = _getDatasetValue(item13, 'assetId', 'data-asset-id'),
+      _getDatasetValue4 = _getDatasetValue(item13, 'assetIndex', 'data-asset-index'),
+      _getMentionType10 = _getMentionType(_getDatasetValue(item13, 'refType', 'data-ref-type')),
+      enabled15 =
+        _getDatasetValue3 === enabled12 &&
+        _getDatasetValue4 === enabled13 &&
+        (!_getMentionType9 || _getMentionType10 === _getMentionType9);
+    if (!enabled15) return false;
+    if (!enabled14) return true;
+    const value85 = value84 === count2;
+    return ((value84 += 1), value85);
   });
-  if (!_0x81e260) return false;
-  return (_0x81e260.remove?.(), _updatePromptHtml(_0x2dc9a1), true);
+  if (!el18) return false;
+  return (el18.remove?.(), _updatePromptHtml(value82), true);
 }
 export function removePromptAssetInputRefFromNode(
-  _0x308b36,
+  value86,
   {
     assetId: assetId = '',
     assetIndex: assetIndex = '',
@@ -748,141 +740,149 @@ export function removePromptAssetInputRefFromNode(
     occurrence: occurrence = null,
   } = {},
 ) {
-  const _0x3aef91 = String(_0x308b36?.nodeId || '').trim();
-  if (!_0x3aef91) return false;
-  const _0x502171 = String(assetId || '').trim(),
-    _0x339efa =
+  const enabled16 = String(value86?.nodeId || '').trim();
+  if (!enabled16) return false;
+  const enabled17 = String(assetId || '').trim(),
+    value87 =
       assetIndex !== null && assetIndex !== undefined && String(assetIndex) !== '' ? assetIndex : itemIndex,
-    _0x4cf1ce = Number(_0x339efa),
-    _0x324a11 = _getMentionType(type),
-    _0x43cb94 = Number(occurrence),
-    _0x1f86bc = Number.isFinite(_0x43cb94) && _0x43cb94 >= 0;
-  if (!_0x502171 || !Number.isFinite(_0x4cf1ce)) return false;
-  const _0x5f2710 = _getPromptAssetInputRefRecords(_getTargetNodeData(_0x308b36));
-  let _0x3ad61c = 0,
-    _0x155cfb = false;
-  const _0x31ed26 = _0x5f2710.filter((_0x4e695d) => {
-    if (_0x155cfb) return true;
-    const _0x1bee73 =
-      _0x4e695d.assetId === _0x502171 &&
-      _0x4e695d.itemIndex === Math.max(0, Math.trunc(_0x4cf1ce)) &&
-      (!_0x324a11 || _0x4e695d.type === _0x324a11);
-    if (!_0x1bee73) return true;
-    if (_0x1f86bc && _0x3ad61c !== _0x43cb94) return ((_0x3ad61c += 1), true);
-    return ((_0x155cfb = true), false);
+    value88 = Number(value87),
+    _getMentionType11 = _getMentionType(type),
+    count3 = Number(occurrence),
+    value89 = Number.isFinite(count3) && count3 >= 0;
+  if (!enabled17 || !Number.isFinite(value88)) return false;
+  const list10 = _getPromptAssetInputRefRecords(_getTargetNodeData(value86));
+  let value90 = 0,
+    enabled18 = false;
+  const value91 = list10.filter((item14) => {
+    if (enabled18) return true;
+    const enabled19 =
+      item14.assetId === enabled17 &&
+      item14.itemIndex === Math.max(0, Math.trunc(value88)) &&
+      (!_getMentionType11 || item14.type === _getMentionType11);
+    if (!enabled19) return true;
+    if (value89 && value90 !== count3) return ((value90 += 1), true);
+    return ((enabled18 = true), false);
   });
-  if (!_0x155cfb) return false;
+  if (!enabled18) return false;
   return (
-    appStore.updateNodeData(_0x3aef91, { [PROMPT_ASSET_INPUT_REFS_FIELD]: _0x31ed26 }),
-    _notifyPromptHtmlUpdated(_0x308b36),
+    appStore.updateNodeData(enabled16, { [PROMPT_ASSET_INPUT_REFS_FIELD]: value91 }),
+    _notifyPromptHtmlUpdated(value86),
     true
   );
 }
-function _assetInputRefTargetMatches(_0x5baa09 = {}, _0x1ae3cc = {}) {
-  const _0xb96c1e = String(_0x1ae3cc?.assetId || '').trim(),
-    _0x4d882b =
-      _0x1ae3cc?.itemIndex !== undefined && _0x1ae3cc?.itemIndex !== null
-        ? _0x1ae3cc.itemIndex
-        : _0x1ae3cc?.assetIndex,
-    _0x361dc8 = Number(_0x4d882b),
-    _0x114ee8 = _getMentionType(_0x1ae3cc?.type || _0x1ae3cc?.refType || '');
-  if (!_0xb96c1e || !Number.isFinite(_0x361dc8)) return false;
+function _assetInputRefTargetMatches(options8 = {}, value92 = {}) {
+  const enabled20 = String(value92?.assetId || '').trim(),
+    value93 =
+      value92?.itemIndex !== undefined && value92?.itemIndex !== null
+        ? value92.itemIndex
+        : value92?.assetIndex,
+    value94 = Number(value93),
+    _getMentionType12 = _getMentionType(value92?.type || value92?.refType || '');
+  if (!enabled20 || !Number.isFinite(value94)) return false;
   return (
-    String(_0x5baa09?.assetId || '').trim() === _0xb96c1e &&
-    Number(_0x5baa09?.itemIndex) === Math.max(0, Math.trunc(_0x361dc8)) &&
-    (!_0x114ee8 || _getMentionType(_0x5baa09?.type) === _0x114ee8)
+    String(options8?.assetId || '').trim() === enabled20 &&
+    Number(options8?.itemIndex) === Math.max(0, Math.trunc(value94)) &&
+    (!_getMentionType12 || _getMentionType(options8?.type) === _getMentionType12)
   );
 }
-function _removePromptAssetInputRecordFromNodeData(_0x1c5ca8 = {}, _0x28afbf = {}) {
-  const _0x16b5e7 = _getPromptAssetInputRefRecords(_0x1c5ca8);
-  if (!_0x16b5e7.length) return { removed: false, records: _0x16b5e7 };
-  const _0x2345bb = String(_0x28afbf?.assetRefSource || '').trim();
-  if (_0x2345bb && _0x2345bb !== 'hidden') return { removed: false, records: _0x16b5e7 };
-  const _0x2a73c8 = Number(_0x28afbf?.promptAssetRefIndex);
-  if (Number.isFinite(_0x2a73c8) && _0x2a73c8 >= 0) {
-    const _0x2365d7 = Math.max(0, Math.trunc(_0x2a73c8));
-    if (_assetInputRefTargetMatches(_0x16b5e7[_0x2365d7], _0x28afbf)) {
-      const _0x5df117 = _0x16b5e7.slice();
-      return (_0x5df117.splice(_0x2365d7, 1), { removed: true, records: _0x5df117 });
+function _removePromptAssetInputRecordFromNodeData(options9 = {}, value95 = {}) {
+  const records = _getPromptAssetInputRefRecords(options9);
+  if (!records.length) return { removed: false, records: records };
+  const value96 = String(value95?.assetRefSource || '').trim();
+  if (value96 && value96 !== 'hidden') return { removed: false, records: records };
+  const count4 = Number(value95?.promptAssetRefIndex);
+  if (Number.isFinite(count4) && count4 >= 0) {
+    const value97 = Math.max(0, Math.trunc(count4));
+    if (_assetInputRefTargetMatches(records[value97], value95)) {
+      const records2 = records.slice();
+      return (records2.splice(value97, 1), { removed: true, records: records2 });
     }
   }
-  const _0x543164 = Number(_0x28afbf?.assetMentionOccurrence ?? _0x28afbf?.occurrence),
-    _0x73632a = Number.isFinite(_0x543164) && _0x543164 >= 0;
-  let _0x51dc8b = 0,
-    _0x392749 = false;
-  const _0x52da6a = _0x16b5e7.filter((_0x4bc9c0) => {
-    if (_0x392749 || !_assetInputRefTargetMatches(_0x4bc9c0, _0x28afbf)) return true;
-    if (_0x73632a && _0x51dc8b !== Math.trunc(_0x543164)) return ((_0x51dc8b += 1), true);
-    return ((_0x392749 = true), false);
+  const count5 = Number(value95?.assetMentionOccurrence ?? value95?.occurrence),
+    value98 = Number.isFinite(count5) && count5 >= 0;
+  let value99 = 0,
+    removed = false;
+  const records3 = records.filter((item15) => {
+    if (removed || !_assetInputRefTargetMatches(item15, value95)) return true;
+    if (value98 && value99 !== Math.trunc(count5)) return ((value99 += 1), true);
+    return ((removed = true), false);
   });
-  return { removed: _0x392749, records: _0x52da6a };
+  return { removed: removed, records: records3 };
 }
-function _removeAssetMentionPillFromPromptHtml(_0x3b1f83 = '', _0x9af16a = {}) {
-  const _0x1361d5 = String(_0x9af16a?.assetRefSource || '').trim();
-  if (_0x1361d5 && _0x1361d5 !== 'prompt') return { removed: false, prompt: _0x3b1f83 };
-  const _0x2bc899 = sanitizePromptHtml(_0x3b1f83);
-  if (!_0x2bc899) return { removed: false, prompt: _0x2bc899 };
-  const _0x51e384 = Number(_0x9af16a?.assetMentionOccurrence ?? _0x9af16a?.occurrence),
-    _0x1e96f1 = Number.isFinite(_0x51e384) && _0x51e384 >= 0;
-  let _0x2fdab4 = 0,
-    _0x7b7930 = false;
-  const _0x15861e = _0x2bc899.replace(/<span\b([^>]*)>([\s\S]*?)<\/span>/gi, (_0x996f5, _0x124e71) => {
-    if (_0x7b7930) return _0x996f5;
-    if (!_htmlClassAttrContains(_0x124e71, 'ref-pill')) return _0x996f5;
-    if (_getHtmlAttrValue(_0x124e71, 'data-ref-origin') !== 'asset') return _0x996f5;
-    const _0x516de8 = {
-      assetId: _getHtmlAttrValue(_0x124e71, 'data-asset-id'),
-      itemIndex: _getHtmlAttrValue(_0x124e71, 'data-asset-index'),
-      type: _getHtmlAttrValue(_0x124e71, 'data-ref-type'),
+function _removeAssetMentionPillFromPromptHtml(prompt = '', value100 = {}) {
+  const value101 = String(value100?.assetRefSource || '').trim();
+  if (value101 && value101 !== 'prompt') return { removed: false, prompt: prompt };
+  const prompt2 = sanitizePromptHtml(prompt);
+  if (!prompt2) return { removed: false, prompt: prompt2 };
+  const count6 = Number(value100?.assetMentionOccurrence ?? value100?.occurrence),
+    value102 = Number.isFinite(count6) && count6 >= 0;
+  let value103 = 0,
+    removed2 = false;
+  const value104 = prompt2.replace(/<span\b([^>]*)>([\s\S]*?)<\/span>/gi, (value105, value106) => {
+    if (removed2) return value105;
+    if (!_htmlClassAttrContains(value106, 'ref-pill')) return value105;
+    if (_getHtmlAttrValue(value106, 'data-ref-origin') !== 'asset') return value105;
+    const value107 = {
+      assetId: _getHtmlAttrValue(value106, 'data-asset-id'),
+      itemIndex: _getHtmlAttrValue(value106, 'data-asset-index'),
+      type: _getHtmlAttrValue(value106, 'data-ref-type'),
     };
-    if (!_assetInputRefTargetMatches(_0x516de8, _0x9af16a)) return _0x996f5;
-    if (_0x1e96f1 && _0x2fdab4 !== Math.trunc(_0x51e384)) return ((_0x2fdab4 += 1), _0x996f5);
-    return ((_0x7b7930 = true), '');
+    if (!_assetInputRefTargetMatches(value107, value100)) return value105;
+    if (value102 && value103 !== Math.trunc(count6)) return ((value103 += 1), value105);
+    return ((removed2 = true), '');
   });
-  return { removed: _0x7b7930, prompt: _0x7b7930 ? sanitizePromptHtml(_0x15861e) : _0x2bc899 };
+  return { removed: removed2, prompt: removed2 ? sanitizePromptHtml(value104) : prompt2 };
 }
-export function buildRemoveAssetInputRefPatchFromNodeData(_0x4fcd62 = {}, _0x56ce6e = {}) {
-  const _0x4d60f5 = {},
-    _0x534d57 = _removePromptAssetInputRecordFromNodeData(_0x4fcd62, _0x56ce6e);
-  _0x534d57.removed && (_0x4d60f5[PROMPT_ASSET_INPUT_REFS_FIELD] = _0x534d57.records);
-  const _0xc7ff4c = _removeAssetMentionPillFromPromptHtml(_0x4fcd62?.prompt || '', _0x56ce6e);
+export function buildRemoveAssetInputRefPatchFromNodeData(options10 = {}, value108 = {}) {
+  const value109 = {},
+    _removePromptAssetInputRecordFromNodeData2 = _removePromptAssetInputRecordFromNodeData(
+      options10,
+      value108,
+    );
+  _removePromptAssetInputRecordFromNodeData2.removed &&
+    (value109[PROMPT_ASSET_INPUT_REFS_FIELD] = _removePromptAssetInputRecordFromNodeData2.records);
+  const _removeAssetMentionPillFromPromptHtml2 = _removeAssetMentionPillFromPromptHtml(
+    options10?.prompt || '',
+    value108,
+  );
   return (
-    _0xc7ff4c.removed && (_0x4d60f5.prompt = _0xc7ff4c.prompt),
-    Object.keys(_0x4d60f5).length ? _0x4d60f5 : null
+    _removeAssetMentionPillFromPromptHtml2.removed &&
+      (value109.prompt = _removeAssetMentionPillFromPromptHtml2.prompt),
+    Object.keys(value109).length ? value109 : null
   );
 }
-export function removeAssetInputRefFromNodeData(_0xb0fa72 = '', _0x57b1ba = {}) {
-  const _0x1a8289 = String(_0xb0fa72 || '').trim();
-  if (!_0x1a8289) return false;
-  const _0x343890 = appStore.getState?.()?.nodes?.[_0x1a8289] || {},
-    _0x4505df = buildRemoveAssetInputRefPatchFromNodeData(_0x343890, _0x57b1ba);
-  if (!_0x4505df) return false;
-  return (appStore.updateNodeData(_0x1a8289, _0x4505df), true);
+export function removeAssetInputRefFromNodeData(value110 = '', value111 = {}) {
+  const enabled21 = String(value110 || '').trim();
+  if (!enabled21) return false;
+  const value112 = appStore.getState?.()?.nodes?.[enabled21] || {},
+    removeAssetInputRefPatchFromNodeData = buildRemoveAssetInputRefPatchFromNodeData(value112, value111);
+  if (!removeAssetInputRefPatchFromNodeData) return false;
+  return (appStore.updateNodeData(enabled21, removeAssetInputRefPatchFromNodeData), true);
 }
-export function handleRefThumbDeleteClick(_0x1dea2b, _0x9e9a) {
-  const _0x353583 = _0x9e9a?.target?.closest?.('.ref-thumb-delete');
-  if (!_0x353583) return false;
-  typeof _0x9e9a.stopImmediatePropagation === 'function'
-    ? _0x9e9a.stopImmediatePropagation()
-    : _0x9e9a.stopPropagation?.();
-  _0x9e9a.preventDefault?.();
-  const _0x746b84 = _0x353583.closest?.('.ref-thumb-wrap'),
-    _0x7df7e0 = _0x746b84?.dataset?.edgeId || '';
-  if (_0x7df7e0) return (appStore.removeEdge(_0x7df7e0), _0x1dea2b?._updateSubmitButtonState?.(), true);
-  if (_0x746b84?.dataset?.refOrigin === 'asset') {
-    const _0x6c5ca9 = {
-        assetId: _0x746b84.dataset.assetId,
-        assetIndex: _0x746b84.dataset.assetIndex,
-        type: _0x746b84.dataset.refType || _0x746b84.dataset.kind,
-        occurrence: _0x746b84.dataset.assetOccurrence,
+export function handleRefThumbDeleteClick(value113, event2) {
+  const el19 = event2?.target?.closest?.('.ref-thumb-delete');
+  if (!el19) return false;
+  typeof event2.stopImmediatePropagation === 'function'
+    ? event2.stopImmediatePropagation()
+    : event2.stopPropagation?.();
+  event2.preventDefault?.();
+  const assetId5 = el19.closest?.('.ref-thumb-wrap'),
+    value114 = assetId5?.dataset?.edgeId || '';
+  if (value114) return (appStore.removeEdge(value114), value113?._updateSubmitButtonState?.(), true);
+  if (assetId5?.dataset?.refOrigin === 'asset') {
+    const value115 = {
+        assetId: assetId5.dataset.assetId,
+        assetIndex: assetId5.dataset.assetIndex,
+        type: assetId5.dataset.refType || assetId5.dataset.kind,
+        occurrence: assetId5.dataset.assetOccurrence,
       },
-      _0x5cb4fd = String(_0x746b84.dataset.assetRefSource || '').trim(),
-      _0x28a28b =
-        _0x5cb4fd === 'hidden'
-          ? removePromptAssetInputRefFromNode(_0x1dea2b, _0x6c5ca9)
-          : removeAssetMentionPillFromPrompt(_0x1dea2b, _0x6c5ca9) ||
-            removePromptAssetInputRefFromNode(_0x1dea2b, _0x6c5ca9);
-    !_0x28a28b && (_0x1dea2b?._renderRefBar?.(), _0x1dea2b?._updateSubmitButtonState?.());
+      value116 = String(assetId5.dataset.assetRefSource || '').trim(),
+      enabled22 =
+        value116 === 'hidden'
+          ? removePromptAssetInputRefFromNode(value113, value115)
+          : removeAssetMentionPillFromPrompt(value113, value115) ||
+            removePromptAssetInputRefFromNode(value113, value115);
+    !enabled22 && (value113?._renderRefBar?.(), value113?._updateSubmitButtonState?.());
   }
   return true;
 }
@@ -892,29 +892,29 @@ function _createInputCountState() {
     keysByType: { text: new Set(), image: new Set(), video: new Set(), audio: new Set() },
   };
 }
-function _cloneInputCountState(_0x1f4aab = null) {
-  const _0x1233e1 = _createInputCountState();
+function _cloneInputCountState(value117 = null) {
+  const _createInputCountState2 = _createInputCountState();
   return (
-    MENTION_TYPE_ORDER.forEach((_0x57b7e9) => {
-      ((_0x1233e1.counts[_0x57b7e9] = Number(_0x1f4aab?.counts?.[_0x57b7e9] || 0)),
-        (_0x1233e1.keysByType[_0x57b7e9] = new Set(_0x1f4aab?.keysByType?.[_0x57b7e9] || [])));
+    MENTION_TYPE_ORDER.forEach((item16) => {
+      ((_createInputCountState2.counts[item16] = Number(value117?.counts?.[item16] || 0)),
+        (_createInputCountState2.keysByType[item16] = new Set(value117?.keysByType?.[item16] || [])));
     }),
-    _0x1233e1
+    _createInputCountState2
   );
 }
-function _addInputCount(_0x5a7c9e, _0x59e3ab, _0x3c0297 = '') {
-  const _0x3deaa8 = _getMentionType(_0x59e3ab);
-  if (!_0x5a7c9e || _0x5a7c9e.counts?.[_0x3deaa8] == null) return false;
-  const _0x322c60 = String(_0x3c0297 || '').trim(),
-    _0x371dd3 = _0x5a7c9e.keysByType?.[_0x3deaa8];
-  if (_0x322c60 && _0x371dd3?.has(_0x322c60)) return false;
-  if (_0x322c60 && _0x371dd3) _0x371dd3.add(_0x322c60);
-  return ((_0x5a7c9e.counts[_0x3deaa8] += 1), true);
+function _addInputCount(enabled23, value118, value119 = '') {
+  const _getMentionType13 = _getMentionType(value118);
+  if (!enabled23 || enabled23.counts?.[_getMentionType13] == null) return false;
+  const value120 = String(value119 || '').trim(),
+    map4 = enabled23.keysByType?.[_getMentionType13];
+  if (value120 && map4?.has(value120)) return false;
+  if (value120 && map4) map4.add(value120);
+  return ((enabled23.counts[_getMentionType13] += 1), true);
 }
-function _getNodeInputCountKey(_0x212b12 = '', _0x466ba1 = '') {
-  const _0x529afc = String(_0x212b12 || '').trim(),
-    _0x160e00 = _getMentionType(_0x466ba1);
-  return _0x529afc && _0x160e00 ? 'node:' + _0x529afc + ':' + _0x160e00 : '';
+function _getNodeInputCountKey(value121 = '', value122 = '') {
+  const value123 = String(value121 || '').trim(),
+    _getMentionType14 = _getMentionType(value122);
+  return value123 && _getMentionType14 ? 'node:' + value123 + ':' + _getMentionType14 : '';
 }
 function _getAssetInputCountKey({
   assetId: assetId = '',
@@ -922,79 +922,86 @@ function _getAssetInputCountKey({
   assetIndex: assetIndex = null,
   type: type = '',
 } = {}) {
-  const _0x1bdac6 = String(assetId || '').trim(),
-    _0xee7899 = itemIndex !== null && itemIndex !== undefined ? itemIndex : assetIndex,
-    _0x398b09 = Number(_0xee7899),
-    _0x250417 = _getMentionType(type);
-  if (!_0x1bdac6 || !Number.isFinite(_0x398b09) || !_0x250417) return '';
-  return 'asset:' + _0x1bdac6 + ':' + Math.max(0, Math.trunc(_0x398b09)) + ':' + _0x250417;
+  const enabled24 = String(assetId || '').trim(),
+    value124 = itemIndex !== null && itemIndex !== undefined ? itemIndex : assetIndex,
+    value125 = Number(value124),
+    _getMentionType15 = _getMentionType(type);
+  if (!enabled24 || !Number.isFinite(value125) || !_getMentionType15) return '';
+  return 'asset:' + enabled24 + ':' + Math.max(0, Math.trunc(value125)) + ':' + _getMentionType15;
 }
-function _getMentionInputCountKey(_0x1900b = {}, _0x239797 = '') {
-  const _0x1338e4 = _getMentionType(_0x239797 || _0x1900b?.type);
-  if (_0x1900b?.origin === 'asset')
+function _getMentionInputCountKey(assetId6 = {}, value126 = '') {
+  const type6 = _getMentionType(value126 || assetId6?.type);
+  if (assetId6?.origin === 'asset')
     return _getAssetInputCountKey({
-      assetId: _0x1900b.assetId,
-      itemIndex: _0x1900b.itemIndex,
-      assetIndex: _0x1900b.assetIndex,
-      type: _0x1338e4,
+      assetId: assetId6.assetId,
+      itemIndex: assetId6.itemIndex,
+      assetIndex: assetId6.assetIndex,
+      type: type6,
     });
-  return _getNodeInputCountKey(_0x1900b?.nodeId || _0x1900b?.sourceId, _0x1338e4);
+  return _getNodeInputCountKey(assetId6?.nodeId || assetId6?.sourceId, type6);
 }
-function _isMentionAlreadyCounted(_0x344c89, _0x3ac51b = {}, _0x403a2d = '') {
-  const _0x4f4dfa = _getMentionType(_0x403a2d || _0x3ac51b?.type),
-    _0x262ad4 = _getMentionInputCountKey(_0x3ac51b, _0x4f4dfa);
-  return !!(_0x4f4dfa && _0x262ad4 && _0x344c89?.keysByType?.[_0x4f4dfa]?.has(_0x262ad4));
-}
-function _canReuseAlreadyCountedInputForLimit(_0x4048a6 = '') {
-  return _getMentionType(_0x4048a6) !== 'audio';
-}
-function _getPromptInputCountState(_0x12a8ec, _0xf838fe = null, { nodeData: nodeData = null } = {}) {
-  const _0x43b30f = _createInputCountState(),
-    _0xb50ed2 = appStore.getState(),
-    _0x3dce0a = _0xb50ed2.nodes || {};
-  return (
-    _0x12a8ec &&
-      typeof _0x12a8ec.querySelectorAll === 'function' &&
-      _0x12a8ec.querySelectorAll('.ref-pill').forEach((_0x4315cb) => {
-        if (_0x4315cb === _0xf838fe) return;
-        let _0x319ff7 = '',
-          _0x4558a1 = '';
-        if (_isAssetMentionPill(_0x4315cb)) {
-          const _0x13bf6e = getAssetMentionRefFromPillNode(_0x4315cb);
-          ((_0x319ff7 = _0x13bf6e?.type || _getDatasetValue(_0x4315cb, 'refType', 'data-ref-type')),
-            (_0x4558a1 = _getAssetInputCountKey({
-              assetId: _0x13bf6e?.assetId || _getDatasetValue(_0x4315cb, 'assetId', 'data-asset-id'),
-              itemIndex: _0x13bf6e?.itemIndex,
-              assetIndex: _getDatasetValue(_0x4315cb, 'assetIndex', 'data-asset-index'),
-              type: _0x319ff7,
-            })));
-        } else {
-          const _0x18f251 = _getDatasetValue(_0x4315cb, 'nodeId', 'data-node-id');
-          if (_isUnresolvedInputMentionPill(_0x4315cb)) return;
-          ((_0x319ff7 =
-            _getPillMentionType(_0x4315cb) || _getMentionType(_0x3dce0a?.[_0x18f251]?.type || '')),
-            (_0x4558a1 = _getNodeInputCountKey(_0x18f251, _0x319ff7)));
-        }
-        _addInputCount(_0x43b30f, _0x319ff7, _0x4558a1);
-      }),
-    _getPromptAssetInputRefRecords(nodeData || {}).forEach((_0x397ef0) => {
-      _addInputCount(_0x43b30f, _0x397ef0.type, _getAssetInputCountKey(_0x397ef0));
-    }),
-    _0x43b30f
+function _isMentionAlreadyCounted(value127, value128 = {}, value129 = '') {
+  const _getMentionType16 = _getMentionType(value129 || value128?.type),
+    _getMentionInputCountKey2 = _getMentionInputCountKey(value128, _getMentionType16);
+  return !!(
+    _getMentionType16 &&
+    _getMentionInputCountKey2 &&
+    value127?.keysByType?.[_getMentionType16]?.has(_getMentionInputCountKey2)
   );
 }
-function _countPromptPillsByType(_0x4c2be6, _0x3207b5 = null, { nodeData: nodeData = null } = {}) {
-  return _getPromptInputCountState(_0x4c2be6, _0x3207b5, { nodeData: nodeData }).counts;
+function _canReuseAlreadyCountedInputForLimit(value130 = '') {
+  return _getMentionType(value130) !== 'audio';
+}
+function _getPromptInputCountState(el20, value131 = null, { nodeData: nodeData = null } = {}) {
+  const _createInputCountState3 = _createInputCountState(),
+    value132 = appStore.getState(),
+    value133 = value132.nodes || {};
+  return (
+    el20 &&
+      typeof el20.querySelectorAll === 'function' &&
+      el20.querySelectorAll('.ref-pill').forEach((item17) => {
+        if (item17 === value131) return;
+        let type7 = '',
+          _getAssetInputCountKey2 = '';
+        if (_isAssetMentionPill(item17)) {
+          const assetId7 = getAssetMentionRefFromPillNode(item17);
+          ((type7 = assetId7?.type || _getDatasetValue(item17, 'refType', 'data-ref-type')),
+            (_getAssetInputCountKey2 = _getAssetInputCountKey({
+              assetId: assetId7?.assetId || _getDatasetValue(item17, 'assetId', 'data-asset-id'),
+              itemIndex: assetId7?.itemIndex,
+              assetIndex: _getDatasetValue(item17, 'assetIndex', 'data-asset-index'),
+              type: type7,
+            })));
+        } else {
+          const _getDatasetValue5 = _getDatasetValue(item17, 'nodeId', 'data-node-id');
+          if (_isUnresolvedInputMentionPill(item17)) return;
+          ((type7 =
+            _getPillMentionType(item17) || _getMentionType(value133?.[_getDatasetValue5]?.type || '')),
+            (_getAssetInputCountKey2 = _getNodeInputCountKey(_getDatasetValue5, type7)));
+        }
+        _addInputCount(_createInputCountState3, type7, _getAssetInputCountKey2);
+      }),
+    _getPromptAssetInputRefRecords(nodeData || {}).forEach((item18) => {
+      _addInputCount(_createInputCountState3, item18.type, _getAssetInputCountKey(item18));
+    }),
+    _createInputCountState3
+  );
+}
+function _countPromptPillsByType(value134, value135 = null, { nodeData: nodeData = null } = {}) {
+  return _getPromptInputCountState(value134, value135, { nodeData: nodeData }).counts;
 }
 function _candidateMatchesQuery(
   { label: label = '', type: type = '', assetName: assetName = '' },
-  _0x43e510 = '',
+  value136 = '',
 ) {
-  const _0x30bd57 = _normalizeQuery(_0x43e510).toLowerCase();
-  if (!_0x30bd57) return true;
-  const _0x5785ef = AT_TYPE_MAP[type] || type,
-    _0x1223a0 = _getAssetTypeMenuLabel(type);
-  return [label, _0x5785ef, _0x1223a0, assetName].join(' ').toLowerCase().includes(_0x30bd57);
+  const _normalizeQuery2 = _normalizeQuery(value136).toLowerCase();
+  if (!_normalizeQuery2) return true;
+  const value137 = AT_TYPE_MAP[type] || type,
+    _getAssetTypeMenuLabel2 = _getAssetTypeMenuLabel(type);
+  return [label, value137, _getAssetTypeMenuLabel2, assetName]
+    .join(' ')
+    .toLowerCase()
+    .includes(_normalizeQuery2);
 }
 export function _resolvePromptTextWithTextRefs({
   promptEl: promptEl = null,
@@ -1005,99 +1012,103 @@ export function _resolvePromptTextWithTextRefs({
   allowedAssetTypes: allowedAssetTypes = null,
   prependUnusedTextRefs: prependUnusedTextRefs = true,
 } = {}) {
-  const _0x162945 = [];
-  let _0x433690 = 0;
-  for (const _0xca3f24 of inEdges) {
-    const _0x25a9d6 = nodes?.[_0xca3f24?.sourceId];
-    if (!_0x25a9d6) continue;
-    if (_getMentionType(_0x25a9d6.type) !== 'text') continue;
-    const _0x106cc8 = _getTextRefContent(_0x25a9d6);
-    if (!_0x106cc8) continue;
-    ((_0x433690 += 1),
-      _0x162945.push({
-        label: '@' + AT_TYPE_MAP.text + _0x433690,
-        content: _0x106cc8,
-        sourceId: String(_0xca3f24?.sourceId || ''),
+  const list11 = [];
+  let value138 = 0;
+  for (const value139 of inEdges) {
+    const enabled25 = nodes?.[value139?.sourceId];
+    if (!enabled25) continue;
+    if (_getMentionType(enabled25.type) !== 'text') continue;
+    const content = _getTextRefContent(enabled25);
+    if (!content) continue;
+    ((value138 += 1),
+      list11.push({
+        label: '@' + AT_TYPE_MAP.text + value138,
+        content: content,
+        sourceId: String(value139?.sourceId || ''),
         used: false,
       }));
   }
-  if (!promptEl && _0x162945.length === 0) return '';
-  const _0x3f31ff = Object.create(null),
-    _0x226f2b = Object.create(null);
-  _0x162945.forEach((_0x35df7e) => {
-    _0x3f31ff[_0x35df7e.label.replace(/\s+/g, '')] = _0x35df7e;
-    if (_0x35df7e.sourceId) _0x226f2b[_0x35df7e.sourceId] = _0x35df7e;
+  if (!promptEl && list11.length === 0) return '';
+  const value140 = Object.create(null),
+    value141 = Object.create(null);
+  list11.forEach((item19) => {
+    value140[item19.label.replace(/\s+/g, '')] = item19;
+    if (item19.sourceId) value141[item19.sourceId] = item19;
   });
-  const _0x1fb921 = globalThis.Node?.TEXT_NODE ?? 3,
-    _0x41c759 = globalThis.Node?.ELEMENT_NODE ?? 1;
-  let _0x4fad8a = '';
-  const _0x2727b5 = (_0x3af4bc) => {
-    for (const _0x51aaba of _getChildNodes(_0x3af4bc)) {
-      const _0x3bcabc = Number(_0x51aaba?.nodeType);
-      if (_0x3bcabc === _0x1fb921) {
-        _0x4fad8a += String(_0x51aaba?.textContent || '');
+  const value142 = globalThis.Node?.TEXT_NODE ?? 3,
+    value143 = globalThis.Node?.ELEMENT_NODE ?? 1;
+  let value144 = '';
+  const run = (value145) => {
+    for (const domNode2 of _getChildNodes(value145)) {
+      const value146 = Number(domNode2?.nodeType);
+      if (value146 === value142) {
+        value144 += String(domNode2?.textContent || '');
         continue;
       }
-      if (_0x3bcabc !== _0x41c759) continue;
-      if (_isRefPillNode(_0x51aaba)) {
-        const _0x2e298e = [];
+      if (value146 !== value143) continue;
+      if (_isRefPillNode(domNode2)) {
+        const promptParts2 = [];
         if (
           appendAssetMentionToPrompt({
-            domNode: _0x51aaba,
-            rawLabel: String(_0x51aaba?.dataset?.label || _0x51aaba?.textContent || '').trim(),
-            promptParts: _0x2e298e,
+            domNode: domNode2,
+            rawLabel: String(domNode2?.dataset?.label || domNode2?.textContent || '').trim(),
+            promptParts: promptParts2,
             inputRefs: assetInputRefs,
             mediaCounts: assetMediaCounts,
             allowedTypes: allowedAssetTypes,
           })
         ) {
-          _0x4fad8a += _0x2e298e.join('');
+          value144 += promptParts2.join('');
           continue;
         }
-        const _0x44abe1 = String(_0x51aaba?.dataset?.nodeId || ''),
-          _0x53daa6 = String(_0x51aaba?.dataset?.label || _0x51aaba?.textContent || '').trim();
-        if (_isUnresolvedInputMentionPill(_0x51aaba)) {
-          _0x4fad8a += ' ' + _0x53daa6 + ' ';
+        const value147 = String(domNode2?.dataset?.nodeId || ''),
+          value148 = String(domNode2?.dataset?.label || domNode2?.textContent || '').trim();
+        if (_isUnresolvedInputMentionPill(domNode2)) {
+          value144 += ' ' + value148 + ' ';
           continue;
         }
-        const _0x3ca506 = _0x53daa6.replace(/\s+/g, ''),
-          _0x4122e4 = (_0x44abe1 && _0x226f2b[_0x44abe1]) || _0x3f31ff[_0x3ca506];
-        _0x4122e4
-          ? ((_0x4122e4.used = true), (_0x4fad8a += ' ' + _0x4122e4.content + ' '))
-          : (_0x4fad8a += ' ' + _0x53daa6 + ' ');
+        const value149 = value148.replace(/\s+/g, ''),
+          value150 = (value147 && value141[value147]) || value140[value149];
+        value150
+          ? ((value150.used = true), (value144 += ' ' + value150.content + ' '))
+          : (value144 += ' ' + value148 + ' ');
         continue;
       }
-      if (String(_0x51aaba?.tagName || '').toUpperCase() === 'BR') {
-        _0x4fad8a += '\n';
+      if (String(domNode2?.tagName || '').toUpperCase() === 'BR') {
+        value144 += '\n';
         continue;
       }
-      _0x2727b5(_0x51aaba);
+      run(domNode2);
     }
   };
   _getChildNodes(promptEl).length > 0
-    ? _0x2727b5(promptEl)
-    : (_0x4fad8a = String(promptEl?.innerText || promptEl?.textContent || ''));
-  let _0x15a8c5 = _normalizePromptWhitespace(_0x4fad8a);
-  (_0x162945.forEach((_0x44197a) => {
-    if (_0x44197a.used) return;
-    const _0x46d80a = new RegExp(_escapeRegExp(_0x44197a.label).replace(/\s+/g, '[\\s\\u00A0]*'), 'g');
-    _0x46d80a.test(_0x15a8c5) &&
-      ((_0x44197a.used = true), (_0x15a8c5 = _0x15a8c5.replace(_0x46d80a, ' ' + _0x44197a.content + ' ')));
+    ? run(promptEl)
+    : (value144 = String(promptEl?.innerText || promptEl?.textContent || ''));
+  let _normalizePromptWhitespace2 = _normalizePromptWhitespace(value144);
+  (list11.forEach((item20) => {
+    if (item20.used) return;
+    const regExp2 = new RegExp(_escapeRegExp(item20.label).replace(/\s+/g, '[\\s\\u00A0]*'), 'g');
+    regExp2.test(_normalizePromptWhitespace2) &&
+      ((item20.used = true),
+      (_normalizePromptWhitespace2 = _normalizePromptWhitespace2.replace(
+        regExp2,
+        ' ' + item20.content + ' ',
+      )));
   }),
-    (_0x15a8c5 = _normalizePromptWhitespace(_0x15a8c5)));
-  let _0x253329 = '';
+    (_normalizePromptWhitespace2 = _normalizePromptWhitespace(_normalizePromptWhitespace2)));
+  let enabled26 = '';
   prependUnusedTextRefs &&
-    _0x162945.forEach((_0x3969b3) => {
-      !_0x3969b3.used &&
-        _0x3969b3.content &&
-        ((_0x253329 += _0x3969b3.content + '\n'), (_0x3969b3.used = true));
+    list11.forEach((enabled27) => {
+      !enabled27.used &&
+        enabled27.content &&
+        ((enabled26 += enabled27.content + '\n'), (enabled27.used = true));
     });
-  if (!_0x253329) return _0x15a8c5;
-  if (!_0x15a8c5) return _0x253329.replace(/\n+$/g, '');
-  return '' + _0x253329 + _0x15a8c5;
+  if (!enabled26) return _normalizePromptWhitespace2;
+  if (!_normalizePromptWhitespace2) return enabled26.replace(/\n+$/g, '');
+  return '' + enabled26 + _normalizePromptWhitespace2;
 }
-export function resolvePromptTextWithTextRefs(_0x24b591 = {}) {
-  return _resolvePromptTextWithTextRefs(_0x24b591);
+export function resolvePromptTextWithTextRefs(options11 = {}) {
+  return _resolvePromptTextWithTextRefs(options11);
 }
 export function resolvePresetPromptTextWithTextRefs({
   template: template = null,
@@ -1108,7 +1119,7 @@ export function resolvePresetPromptTextWithTextRefs({
   assetMediaCounts: assetMediaCounts = null,
   allowedAssetTypes: allowedAssetTypes = null,
 } = {}) {
-  const _0x7f1306 = _resolvePromptTextWithTextRefs({
+  const _resolvePromptTextWithTextRefs2 = _resolvePromptTextWithTextRefs({
     promptEl: promptEl,
     inEdges: inEdges,
     nodes: nodes,
@@ -1116,10 +1127,10 @@ export function resolvePresetPromptTextWithTextRefs({
     assetMediaCounts: assetMediaCounts,
     allowedAssetTypes: allowedAssetTypes,
   });
-  if (template == null) return _0x7f1306;
-  const _0x18e564 = resolvePromptPresetTemplate(template, _0x7f1306);
+  if (template == null) return _resolvePromptTextWithTextRefs2;
+  const innerText = resolvePromptPresetTemplate(template, _resolvePromptTextWithTextRefs2);
   return _resolvePromptTextWithTextRefs({
-    promptEl: { innerText: _0x18e564, textContent: _0x18e564, childNodes: [] },
+    promptEl: { innerText: innerText, textContent: innerText, childNodes: [] },
     inEdges: inEdges,
     nodes: nodes,
     assetInputRefs: assetInputRefs,
@@ -1128,10 +1139,10 @@ export function resolvePresetPromptTextWithTextRefs({
     prependUnusedTextRefs: false,
   });
 }
-function _templateConsumesPresetUserInput(_0xf695f = null) {
-  if (_0xf695f == null) return false;
-  const _0x1c66a9 = '__PROMPT_PRESET_USER_INPUT_MARKER__';
-  return resolvePromptPresetTemplate(_0xf695f, _0x1c66a9).includes(_0x1c66a9);
+function _templateConsumesPresetUserInput(value151 = null) {
+  if (value151 == null) return false;
+  const value152 = '__PROMPT_PRESET_USER_INPUT_MARKER__';
+  return resolvePromptPresetTemplate(value151, value152).includes(value152);
 }
 function _resolveInsertedPresetPromptText({
   template: template = null,
@@ -1140,7 +1151,7 @@ function _resolveInsertedPresetPromptText({
   nodes: nodes = {},
   allowedAssetTypes: allowedAssetTypes = null,
 } = {}) {
-  const _0x492372 = _resolvePromptTextWithTextRefs({
+  const _resolvePromptTextWithTextRefs3 = _resolvePromptTextWithTextRefs({
       promptEl: promptEl,
       inEdges: inEdges,
       nodes: nodes,
@@ -1148,177 +1159,181 @@ function _resolveInsertedPresetPromptText({
       assetMediaCounts: { image: 0, video: 0, audio: 0 },
       allowedAssetTypes: allowedAssetTypes,
     }),
-    _0xe511d6 = resolvePromptPresetTemplate(template, _0x492372);
-  if (!_0x492372 || _templateConsumesPresetUserInput(template)) return _0xe511d6;
-  if (!_0xe511d6) return _0x492372;
-  return _0x492372 + '\n' + _0xe511d6;
+    promptPresetTemplate = resolvePromptPresetTemplate(template, _resolvePromptTextWithTextRefs3);
+  if (!_resolvePromptTextWithTextRefs3 || _templateConsumesPresetUserInput(template))
+    return promptPresetTemplate;
+  if (!promptPresetTemplate) return _resolvePromptTextWithTextRefs3;
+  return _resolvePromptTextWithTextRefs3 + '\n' + promptPresetTemplate;
 }
-function _notifyPromptHtmlUpdated(_0x566959, _0x446bf9 = {}) {
-  const _0x31e860 = _0x446bf9?.renderRefBar !== false;
-  if (typeof _0x566959._handlePromptHtmlUpdated === 'function') {
-    _0x566959._handlePromptHtmlUpdated();
+function _notifyPromptHtmlUpdated(value153, value154 = {}) {
+  const value155 = value154?.renderRefBar !== false;
+  if (typeof value153._handlePromptHtmlUpdated === 'function') {
+    value153._handlePromptHtmlUpdated();
     return;
   }
-  (_0x31e860 && typeof _0x566959._renderRefBar === 'function' && _0x566959._renderRefBar(),
-    typeof _0x566959._updateSubmitButtonState === 'function' && _0x566959._updateSubmitButtonState());
+  (value155 && typeof value153._renderRefBar === 'function' && value153._renderRefBar(),
+    typeof value153._updateSubmitButtonState === 'function' && value153._updateSubmitButtonState());
 }
-function _isEmptyPromptHtml(_0x3f44ee = '') {
-  const _0x2310d8 = String(_0x3f44ee || '')
+function _isEmptyPromptHtml(value156 = '') {
+  const value157 = String(value156 || '')
     .replace(/<br\b[^>]*\/?>/gi, '')
     .replace(/<\/?(?:div|p|section|article|blockquote)\b[^>]*>/gi, '')
     .replace(/&nbsp;|\u00a0/g, '')
     .trim();
-  return _0x2310d8 === '';
+  return value157 === '';
 }
-function _sanitizePromptHtmlForCommit(_0x494e53 = '') {
-  const _0x943968 = sanitizePromptHtml(_0x494e53);
-  return _isEmptyPromptHtml(_0x943968) ? '' : _0x943968;
+function _sanitizePromptHtmlForCommit(value158 = '') {
+  const sanitizePromptHtml3 = sanitizePromptHtml(value158);
+  return _isEmptyPromptHtml(sanitizePromptHtml3) ? '' : sanitizePromptHtml3;
 }
-export function sanitizePromptHtmlForCommit(_0x41d4ca = '') {
-  return _sanitizePromptHtmlForCommit(_0x41d4ca);
+export function sanitizePromptHtmlForCommit(value159 = '') {
+  return _sanitizePromptHtmlForCommit(value159);
 }
-function _clearPromptHtmlCommitTimer(_0x2c7705) {
-  if (!_0x2c7705?._promptHtmlCommitTimer) return;
-  (clearTimeout(_0x2c7705._promptHtmlCommitTimer), (_0x2c7705._promptHtmlCommitTimer = null));
+function _clearPromptHtmlCommitTimer(enabled28) {
+  if (!enabled28?._promptHtmlCommitTimer) return;
+  (clearTimeout(enabled28._promptHtmlCommitTimer), (enabled28._promptHtmlCommitTimer = null));
 }
-export function schedulePromptHtmlCommit(_0x3f63e5, { delayMs: delayMs = PROMPT_HTML_COMMIT_DELAY_MS } = {}) {
-  if (!_0x3f63e5?.promptEl || !_0x3f63e5?.nodeId) return false;
-  (_clearPromptHtmlCommitTimer(_0x3f63e5),
-    (_0x3f63e5._hasPendingPromptHtmlCommit = true),
-    _pendingPromptHtmlCommitTargets.add(_0x3f63e5));
-  const _0x1c9505 = Math.max(0, Number(delayMs) || 0);
+export function schedulePromptHtmlCommit(enabled29, { delayMs: delayMs = PROMPT_HTML_COMMIT_DELAY_MS } = {}) {
+  if (!enabled29?.promptEl || !enabled29?.nodeId) return false;
+  (_clearPromptHtmlCommitTimer(enabled29),
+    (enabled29._hasPendingPromptHtmlCommit = true),
+    _pendingPromptHtmlCommitTargets.add(enabled29));
+  const value160 = Math.max(0, Number(delayMs) || 0);
   return (
-    (_0x3f63e5._promptHtmlCommitTimer = setTimeout(() => {
-      flushPromptHtmlCommit(_0x3f63e5);
-    }, _0x1c9505)),
+    (enabled29._promptHtmlCommitTimer = setTimeout(() => {
+      flushPromptHtmlCommit(enabled29);
+    }, value160)),
     true
   );
 }
-export function cancelPromptHtmlCommit(_0x1b2964) {
-  if (!_0x1b2964) return false;
+export function cancelPromptHtmlCommit(enabled30) {
+  if (!enabled30) return false;
   return (
-    _clearPromptHtmlCommitTimer(_0x1b2964),
-    (_0x1b2964._hasPendingPromptHtmlCommit = false),
-    _pendingPromptHtmlCommitTargets.delete(_0x1b2964),
+    _clearPromptHtmlCommitTimer(enabled30),
+    (enabled30._hasPendingPromptHtmlCommit = false),
+    _pendingPromptHtmlCommitTargets.delete(enabled30),
     true
   );
 }
-export function flushPromptHtmlCommit(_0x3aa01e) {
-  if (!_0x3aa01e) return false;
-  _clearPromptHtmlCommitTimer(_0x3aa01e);
-  const _0x2e2803 = _0x3aa01e._hasPendingPromptHtmlCommit === true;
-  ((_0x3aa01e._hasPendingPromptHtmlCommit = false), _pendingPromptHtmlCommitTargets.delete(_0x3aa01e));
-  if (!_0x3aa01e?.promptEl || !_0x3aa01e?.nodeId) return false;
-  const _0x461478 = _sanitizePromptHtmlForCommit(_0x3aa01e.promptEl.innerHTML),
-    _0x5aa690 = appStore.getState?.()?.nodes?.[_0x3aa01e.nodeId];
-  if (!_0x5aa690) return false;
-  const _0x472303 = _0x5aa690.prompt;
-  if (!_0x2e2803 && _0x472303 === _0x461478) return false;
-  if (_0x472303 === _0x461478) return false;
-  return (appStore.updateNodeData(_0x3aa01e.nodeId, { prompt: _0x461478 }), true);
+export function flushPromptHtmlCommit(enabled31) {
+  if (!enabled31) return false;
+  _clearPromptHtmlCommitTimer(enabled31);
+  const enabled32 = enabled31._hasPendingPromptHtmlCommit === true;
+  ((enabled31._hasPendingPromptHtmlCommit = false), _pendingPromptHtmlCommitTargets.delete(enabled31));
+  if (!enabled31?.promptEl || !enabled31?.nodeId) return false;
+  const prompt3 = _sanitizePromptHtmlForCommit(enabled31.promptEl.innerHTML),
+    enabled33 = appStore.getState?.()?.nodes?.[enabled31.nodeId];
+  if (!enabled33) return false;
+  const value161 = enabled33.prompt;
+  if (!enabled32 && value161 === prompt3) return false;
+  if (value161 === prompt3) return false;
+  return (appStore.updateNodeData(enabled31.nodeId, { prompt: prompt3 }), true);
 }
 export function flushAllPendingPromptHtmlCommits() {
-  let _0x331bb7 = false;
+  let flushPromptHtmlCommit2 = false;
   return (
-    Array.from(_pendingPromptHtmlCommitTargets).forEach((_0x1e4e8e) => {
-      _0x331bb7 = flushPromptHtmlCommit(_0x1e4e8e) || _0x331bb7;
+    Array.from(_pendingPromptHtmlCommitTargets).forEach((item21) => {
+      flushPromptHtmlCommit2 = flushPromptHtmlCommit(item21) || flushPromptHtmlCommit2;
     }),
-    _0x331bb7
+    flushPromptHtmlCommit2
   );
 }
-function _updatePromptHtml(_0x152c9e, _0x1bb831 = {}) {
-  if (!_0x152c9e?.promptEl || !_0x152c9e?.nodeId) return;
-  (cancelPromptHtmlCommit(_0x152c9e),
-    appStore.updateNodeData(_0x152c9e.nodeId, {
-      prompt: _sanitizePromptHtmlForCommit(_0x152c9e.promptEl.innerHTML),
+function _updatePromptHtml(enabled34, value162 = {}) {
+  if (!enabled34?.promptEl || !enabled34?.nodeId) return;
+  (cancelPromptHtmlCommit(enabled34),
+    appStore.updateNodeData(enabled34.nodeId, {
+      prompt: _sanitizePromptHtmlForCommit(enabled34.promptEl.innerHTML),
     }),
-    _notifyPromptHtmlUpdated(_0x152c9e, _0x1bb831));
+    _notifyPromptHtmlUpdated(enabled34, value162));
 }
-function _commitPromptAndAssetInputRefs(_0x459474, _0x3d9cb4) {
-  if (!_0x459474?.nodeId) return false;
-  const _0x249065 = { [PROMPT_ASSET_INPUT_REFS_FIELD]: Array.isArray(_0x3d9cb4) ? _0x3d9cb4 : [] };
+function _commitPromptAndAssetInputRefs(enabled35, value163) {
+  if (!enabled35?.nodeId) return false;
+  const value164 = { [PROMPT_ASSET_INPUT_REFS_FIELD]: Array.isArray(value163) ? value163 : [] };
   return (
-    _0x459474?.promptEl &&
-      (cancelPromptHtmlCommit(_0x459474),
-      (_0x249065.prompt = _sanitizePromptHtmlForCommit(_0x459474.promptEl.innerHTML))),
-    appStore.updateNodeData(_0x459474.nodeId, _0x249065),
-    _notifyPromptHtmlUpdated(_0x459474),
+    enabled35?.promptEl &&
+      (cancelPromptHtmlCommit(enabled35),
+      (value164.prompt = _sanitizePromptHtmlForCommit(enabled35.promptEl.innerHTML))),
+    appStore.updateNodeData(enabled35.nodeId, value164),
+    _notifyPromptHtmlUpdated(enabled35),
     true
   );
 }
-function _getPromptAssetInputRefRecordForMention(_0x4c99f3 = {}) {
-  if (_0x4c99f3?.origin !== 'asset') return null;
+function _getPromptAssetInputRefRecordForMention(assetId8 = {}) {
+  if (assetId8?.origin !== 'asset') return null;
   return _normalizePromptAssetInputRefRecord({
-    assetId: _0x4c99f3.assetId,
-    itemIndex: _0x4c99f3.assetIndex ?? _0x4c99f3.itemIndex,
-    type: _0x4c99f3.type,
+    assetId: assetId8.assetId,
+    itemIndex: assetId8.assetIndex ?? assetId8.itemIndex,
+    type: assetId8.type,
   });
 }
-function _appendPromptAssetInputRefRecords(_0x337d22, _0x4f367c = []) {
-  const _0x5ad9bd = _getPromptAssetInputRefRecords(_getTargetNodeData(_0x337d22)),
-    _0x2359f9 = _0x5ad9bd.slice();
+function _appendPromptAssetInputRefRecords(value165, value166 = []) {
+  const list12 = _getPromptAssetInputRefRecords(_getTargetNodeData(value165)),
+    list13 = list12.slice();
   return (
-    (Array.isArray(_0x4f367c) ? _0x4f367c : [_0x4f367c]).forEach((_0x512774) => {
-      const _0x418d04 = _getPromptAssetInputRefRecordForMention(_0x512774);
-      if (_0x418d04) _0x2359f9.push(_0x418d04);
+    (Array.isArray(value166) ? value166 : [value166]).forEach((item22) => {
+      const _getPromptAssetInputRefRecordForMention3 = _getPromptAssetInputRefRecordForMention(item22);
+      if (_getPromptAssetInputRefRecordForMention3) list13.push(_getPromptAssetInputRefRecordForMention3);
     }),
-    _0x2359f9
+    list13
   );
 }
-function _shouldStoreMentionAsPromptAssetInput(_0x391152, _0x5c27ff = {}) {
-  const _0x455956 = _getMentionType(_0x5c27ff?.type);
+function _shouldStoreMentionAsPromptAssetInput(value167, value168 = {}) {
+  const _getMentionType17 = _getMentionType(value168?.type);
   return (
-    _0x5c27ff?.origin === 'asset' &&
-    _0x455956 &&
-    _0x455956 !== 'text' &&
-    isRunningHubWorkflowNode(_getTargetNodeData(_0x391152))
+    value168?.origin === 'asset' &&
+    _getMentionType17 &&
+    _getMentionType17 !== 'text' &&
+    isRunningHubWorkflowNode(_getTargetNodeData(value167))
   );
 }
 function _consumeMentionTriggerText({ triggerRange: triggerRange = null, atIndex: atIndex = -1 } = {}) {
   if (typeof window === 'undefined' || typeof document === 'undefined') return false;
-  const _0x7512f = window.getSelection?.(),
-    _0x5f0be2 = triggerRange || (_0x7512f && _0x7512f.rangeCount ? _0x7512f.getRangeAt(0) : null);
-  if (!_0x5f0be2 || _0x5f0be2.startContainer.nodeType !== Node.TEXT_NODE) return false;
-  const _0x30f9bd = _0x5f0be2.startContainer,
-    _0x119c54 = String(_0x30f9bd.textContent || ''),
-    _0x5da688 = _0x5f0be2.startOffset,
-    _0x363cbc =
-      Number.isFinite(atIndex) && atIndex >= 0 ? atIndex : _0x119c54.lastIndexOf('@', _0x5da688 - 1);
-  if (_0x363cbc < 0) return false;
-  const _0x3b7683 = _0x30f9bd.parentNode;
-  if (!_0x3b7683) return false;
-  const _0x392c4d = document.createTextNode(_0x119c54.slice(0, _0x363cbc)),
-    _0x555365 = document.createTextNode(_0x119c54.slice(_0x5da688));
-  (_0x3b7683.replaceChild(_0x555365, _0x30f9bd), _0x3b7683.insertBefore(_0x392c4d, _0x555365));
-  const _0x2aecbd = document.createRange();
+  const value169 = window.getSelection?.(),
+    enabled36 = triggerRange || (value169 && value169.rangeCount ? value169.getRangeAt(0) : null);
+  if (!enabled36 || enabled36.startContainer.nodeType !== Node.TEXT_NODE) return false;
+  const el21 = enabled36.startContainer,
+    list14 = String(el21.textContent || ''),
+    value170 = enabled36.startOffset,
+    count7 = Number.isFinite(atIndex) && atIndex >= 0 ? atIndex : list14.lastIndexOf('@', value170 - 1);
+  if (count7 < 0) return false;
+  const el22 = el21.parentNode;
+  if (!el22) return false;
+  const value171 = document.createTextNode(list14.slice(0, count7)),
+    value172 = document.createTextNode(list14.slice(value170));
+  (el22.replaceChild(value172, el21), el22.insertBefore(value171, value172));
+  const value173 = document.createRange();
   return (
-    _0x2aecbd.setStartAfter(_0x392c4d),
-    _0x2aecbd.collapse(true),
-    _0x7512f?.removeAllRanges?.(),
-    _0x7512f?.addRange?.(_0x2aecbd),
+    value173.setStartAfter(value171),
+    value173.collapse(true),
+    value169?.removeAllRanges?.(),
+    value169?.addRange?.(value173),
     true
   );
 }
 function _insertPromptAssetInputRef(
-  _0x150c5a,
-  _0x43f1a1,
+  value174,
+  value175,
   { triggerRange: triggerRange = null, atIndex: atIndex = -1, pillToEdit: pillToEdit = null } = {},
 ) {
-  const _0x4bb176 = _appendPromptAssetInputRefRecords(_0x150c5a, [_0x43f1a1]);
-  if (pillToEdit) return (pillToEdit.remove?.(), _commitPromptAndAssetInputRefs(_0x150c5a, _0x4bb176));
+  const _appendPromptAssetInputRefRecords2 = _appendPromptAssetInputRefRecords(value174, [value175]);
+  if (pillToEdit)
+    return (
+      pillToEdit.remove?.(),
+      _commitPromptAndAssetInputRefs(value174, _appendPromptAssetInputRefRecords2)
+    );
   if (!_consumeMentionTriggerText({ triggerRange: triggerRange, atIndex: atIndex })) return false;
-  return _commitPromptAndAssetInputRefs(_0x150c5a, _0x4bb176);
+  return _commitPromptAndAssetInputRefs(value174, _appendPromptAssetInputRefRecords2);
 }
-function _escapePromptPreviewHtml(_0xce6c55) {
-  return String(_0xce6c55 ?? '')
+function _escapePromptPreviewHtml(value176) {
+  return String(value176 ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/\r\n?/g, '\n')
     .replace(/\n/g, '<br>');
 }
-function _moveCaretToPromptEnd(_0x137831) {
-  if (!_0x137831) return;
+function _moveCaretToPromptEnd(enabled37) {
+  if (!enabled37) return;
   if (
     typeof window === 'undefined' ||
     typeof document === 'undefined' ||
@@ -1326,19 +1341,19 @@ function _moveCaretToPromptEnd(_0x137831) {
   )
     return;
   try {
-    const _0x178dae = window.getSelection?.();
-    if (!_0x178dae) return;
-    const _0x2f3bc3 = document.createRange();
-    (_0x2f3bc3.selectNodeContents(_0x137831),
-      _0x2f3bc3.collapse(false),
-      _0x178dae.removeAllRanges(),
-      _0x178dae.addRange(_0x2f3bc3));
+    const enabled38 = window.getSelection?.();
+    if (!enabled38) return;
+    const value177 = document.createRange();
+    (value177.selectNodeContents(enabled37),
+      value177.collapse(false),
+      enabled38.removeAllRanges(),
+      enabled38.addRange(value177));
   } catch {}
 }
-export function shouldUsePromptPreviewForPreset(_0x138037 = null, _0x233c58 = {}) {
+export function shouldUsePromptPreviewForPreset(value178 = null, value179 = {}) {
   return (
-    (_0x233c58?.insertPrompt === true || globalThis.window?.DEV_MODE === true) &&
-    hasPromptPresetTemplateContent(_0x138037)
+    (value179?.insertPrompt === true || globalThis.window?.DEV_MODE === true) &&
+    hasPromptPresetTemplateContent(value178)
   );
 }
 export function previewPresetPromptInEditor({
@@ -1349,27 +1364,27 @@ export function previewPresetPromptInEditor({
   toastText: toastText = '',
   toastType: toastType = 'warn',
 } = {}) {
-  const _0x4479f2 = String(promptText ?? ''),
-    _0xe8c199 = sanitizePromptHtml(_escapePromptPreviewHtml(_0x4479f2)),
-    _0x174de4 = typeof Element !== 'undefined' && promptEl instanceof Element;
-  promptEl && (promptEl.innerHTML = _0xe8c199);
-  !_0x174de4 &&
+  const textContent = String(promptText ?? ''),
+    prompt4 = sanitizePromptHtml(_escapePromptPreviewHtml(textContent)),
+    enabled39 = typeof Element !== 'undefined' && promptEl instanceof Element;
+  promptEl && (promptEl.innerHTML = prompt4);
+  !enabled39 &&
     promptEl &&
     (('textContent' in promptEl || typeof promptEl.textContent !== 'undefined') &&
-      (promptEl.textContent = _0x4479f2),
+      (promptEl.textContent = textContent),
     ('innerText' in promptEl || typeof promptEl.innerText !== 'undefined') &&
-      (promptEl.innerText = _0x4479f2),
+      (promptEl.innerText = textContent),
     Array.isArray(promptEl.childNodes) &&
-      (promptEl.childNodes = [{ nodeType: globalThis.Node?.TEXT_NODE ?? 3, textContent: _0x4479f2 }]));
+      (promptEl.childNodes = [{ nodeType: globalThis.Node?.TEXT_NODE ?? 3, textContent: textContent }]));
   if (typeof promptEl?.focus === 'function')
     try {
       promptEl.focus();
     } catch {}
   return (
-    _0x174de4 && _moveCaretToPromptEnd(promptEl),
-    storeApi?.updateNodeData && nodeId && storeApi.updateNodeData(nodeId, { prompt: _0xe8c199 }),
+    enabled39 && _moveCaretToPromptEnd(promptEl),
+    storeApi?.updateNodeData && nodeId && storeApi.updateNodeData(nodeId, { prompt: prompt4 }),
     toastText && globalThis.window?.showToast?.(toastText, toastType),
-    _0xe8c199
+    prompt4
   );
 }
 export function insertPresetPromptIntoEditor({
@@ -1383,7 +1398,7 @@ export function insertPresetPromptIntoEditor({
   toastText: toastText = '',
   toastType: toastType = 'success',
 } = {}) {
-  const _0xc7764 = _resolveInsertedPresetPromptText({
+  const promptText2 = _resolveInsertedPresetPromptText({
     template: template,
     promptEl: promptEl,
     inEdges: inEdges,
@@ -1394,7 +1409,7 @@ export function insertPresetPromptIntoEditor({
     storeApi: storeApi,
     nodeId: nodeId,
     promptEl: promptEl,
-    promptText: _0xc7764,
+    promptText: promptText2,
     toastText: toastText,
     toastType: toastType,
   });
@@ -1405,11 +1420,11 @@ let _mentionMenuEl = null,
   _mentionOutsideDocClick = null,
   _mentionOutsideDocClickTimer = 0,
   _mentionMenuPositionState = null;
-function _isMentionNodeConnected(_0x1d5e4c) {
-  if (!_0x1d5e4c) return false;
-  if (_0x1d5e4c.isConnected === true) return true;
+function _isMentionNodeConnected(el23) {
+  if (!el23) return false;
+  if (el23.isConnected === true) return true;
   if (typeof document === 'undefined') return true;
-  return typeof document.body?.contains === 'function' ? document.body.contains(_0x1d5e4c) : true;
+  return typeof document.body?.contains === 'function' ? document.body.contains(el23) : true;
 }
 function _clearMentionOutsideDocClick() {
   (_mentionOutsideDocClickTimer &&
@@ -1424,59 +1439,57 @@ function _cleanupMentionMenuLifecycle() {
     _mentionViewportUnsubscribe && (_mentionViewportUnsubscribe(), (_mentionViewportUnsubscribe = null)),
     (_mentionMenuPositionState = null));
 }
-function _resolveMentionMenuPoint(_0x53d9bd) {
-  if (!_0x53d9bd) return null;
-  const _0x380983 = 5;
-  if (_0x53d9bd.triggerRange?.getBoundingClientRect)
+function _resolveMentionMenuPoint(left) {
+  if (!left) return null;
+  const value180 = 5;
+  if (left.triggerRange?.getBoundingClientRect)
     try {
-      const _0x59a7bd = _0x53d9bd.triggerRange.getBoundingClientRect();
-      if (_0x59a7bd) return { left: _0x59a7bd.left, top: _0x59a7bd.bottom + _0x380983 };
+      const left2 = left.triggerRange.getBoundingClientRect();
+      if (left2) return { left: left2.left, top: left2.bottom + value180 };
     } catch {}
-  if (_0x53d9bd.pillToEdit?.getBoundingClientRect && _isMentionNodeConnected(_0x53d9bd.pillToEdit)) {
-    const _0x242e07 = _0x53d9bd.pillToEdit.getBoundingClientRect();
-    return { left: _0x242e07.left, top: _0x242e07.bottom + _0x380983 };
+  if (left.pillToEdit?.getBoundingClientRect && _isMentionNodeConnected(left.pillToEdit)) {
+    const left3 = left.pillToEdit.getBoundingClientRect();
+    return { left: left3.left, top: left3.bottom + value180 };
   }
-  if (Number.isFinite(_0x53d9bd.fallbackX) && Number.isFinite(_0x53d9bd.fallbackY))
-    return { left: _0x53d9bd.fallbackX, top: _0x53d9bd.fallbackY };
+  if (Number.isFinite(left.fallbackX) && Number.isFinite(left.fallbackY))
+    return { left: left.fallbackX, top: left.fallbackY };
   return null;
 }
 function _syncOpenMentionSubmenus() {
-  const _0x4f1d97 = _mentionMenuPositionState?.menu || _mentionMenuEl;
-  if (!_0x4f1d97?.querySelectorAll) return;
-  _0x4f1d97.querySelectorAll('.at-mention-submenu-open').forEach((_0x1f15ac) => {
-    const _0x5660e7 = Array.from(_0x1f15ac.children || []).find((_0x74a877) =>
-      _0x74a877.classList?.contains('at-mention-submenu'),
+  const el24 = _mentionMenuPositionState?.menu || _mentionMenuEl;
+  if (!el24?.querySelectorAll) return;
+  el24.querySelectorAll('.at-mention-submenu-open').forEach((el25) => {
+    const value181 = Array.from(el25.children || []).find((el26) =>
+      el26.classList?.contains('at-mention-submenu'),
     );
-    if (_0x5660e7) _positionMentionSubmenu(_0x1f15ac, _0x5660e7);
+    if (value181) _positionMentionSubmenu(el25, value181);
   });
 }
 function _positionMentionMenu() {
-  const _0x15f6f6 = _mentionMenuPositionState,
-    _0x2361ad = _0x15f6f6?.menu;
-  if (!_0x15f6f6 || !_0x2361ad || _0x2361ad.style.display !== 'flex') return;
-  const _0x58ac55 = _resolveMentionMenuPoint(_0x15f6f6);
-  if (!_0x58ac55) {
+  const enabled40 = _mentionMenuPositionState,
+    el27 = enabled40?.menu;
+  if (!enabled40 || !el27 || el27.style.display !== 'flex') return;
+  const box = _resolveMentionMenuPoint(enabled40);
+  if (!box) {
     _closeMentionMenu();
     return;
   }
-  const _0x1bc4c2 = Number(globalThis.window?.innerHeight || 0),
-    _0x3ed80f = _0x1bc4c2 > 0 && _0x58ac55.top + 180 > _0x1bc4c2 ? _0x58ac55.top - 185 : _0x58ac55.top;
-  ((_0x2361ad.style.left = _0x58ac55.left + 'px'),
-    (_0x2361ad.style.top = _0x3ed80f + 'px'),
-    _syncOpenMentionSubmenus());
+  const count8 = Number(globalThis.window?.innerHeight || 0),
+    value182 = count8 > 0 && box.top + 180 > count8 ? box.top - 185 : box.top;
+  ((el27.style.left = box.left + 'px'), (el27.style.top = value182 + 'px'), _syncOpenMentionSubmenus());
 }
 function _watchMentionViewport() {
   if (typeof appStore.subscribeSelector !== 'function') return;
   if (_mentionViewportUnsubscribe) _mentionViewportUnsubscribe();
   _mentionViewportUnsubscribe = appStore.subscribeSelector(
-    (_0x36b4c8) => _0x36b4c8.viewport,
+    (value183) => value183.viewport,
     () => _positionMentionMenu(),
   );
 }
-function _bindMentionOutsideDocClick(_0x5acd16) {
+function _bindMentionOutsideDocClick(enabled41) {
   (_clearMentionOutsideDocClick(),
-    (_mentionOutsideDocClick = (_0x342c1d) => {
-      !_0x5acd16.contains(_0x342c1d.target) && _closeMentionMenu();
+    (_mentionOutsideDocClick = (event3) => {
+      !enabled41.contains(event3.target) && _closeMentionMenu();
     }),
     (_mentionOutsideDocClickTimer = setTimeout(() => {
       ((_mentionOutsideDocClickTimer = 0),
@@ -1495,11 +1508,11 @@ export function _getMentionMenu() {
       !_mentionMenuEl.classList.contains('at-mention-menu') &&
         _mentionMenuEl.classList.add('at-mention-menu');
   }
-  const _0x51b36d = document.getElementById?.('v2-mention-menu') || null;
-  if (_0x51b36d && _0x51b36d !== _mentionMenuEl) _mentionMenuEl = _0x51b36d;
+  const enabled42 = document.getElementById?.('v2-mention-menu') || null;
+  if (enabled42 && enabled42 !== _mentionMenuEl) _mentionMenuEl = enabled42;
   else
     _mentionMenuEl &&
-      !_0x51b36d &&
+      !enabled42 &&
       typeof document.body?.appendChild === 'function' &&
       document.body.appendChild(_mentionMenuEl);
   return (
@@ -1511,443 +1524,461 @@ export function _getMentionMenu() {
 }
 export function _closeMentionMenu() {
   _cleanupMentionMenuLifecycle();
-  const _0x5b2ef8 = _getMentionMenu();
-  ((_0x5b2ef8.style.display = 'none'), (_0x5b2ef8.innerHTML = ''), (_mentionMenuState.activeMenu = null));
+  const el28 = _getMentionMenu();
+  ((el28.style.display = 'none'), (el28.innerHTML = ''), (_mentionMenuState.activeMenu = null));
 }
-export function _buildMentionCandidates(_0x30abf8, _0x184c56 = '', _0x4aa7d1 = {}) {
-  const _0x105326 = _0x30abf8?.nodeId,
-    _0x4402ed = appStore.getState(),
-    _0x35aea6 = _0x4402ed.nodes || {},
-    _0x4412db = _0x35aea6?.[_0x105326] || _0x30abf8?._data || {},
-    _0x5539ba = getTargetInputPolicy(_0x4412db),
-    _0x230ad5 = appStore.getIncomingEdges(_0x105326),
-    _0x119556 = _normalizeQuery(_0x184c56),
-    _0x2f014b = { text: 0, image: 0, video: 0, audio: 0 },
-    _0x22d51e = _getPromptInputCountState(_0x30abf8?.promptEl, _0x4aa7d1?.excludePill || null, {
-      nodeData: _0x4412db,
-    }),
-    _0x289f63 = _cloneInputCountState(_0x22d51e),
-    _0x57e118 = [];
-  _0x230ad5.forEach((_0x2b22cb) => {
-    const _0x37c45d = _0x35aea6[_0x2b22cb.sourceId];
-    if (!_0x37c45d) return;
-    const _0x4e8a8c = resolveEffectiveInputKind(_0x37c45d, _0x2b22cb);
-    if (!_0x4e8a8c) return;
-    if (!isInputKindAllowed(_0x5539ba, _0x4e8a8c)) return;
-    (_addInputCount(_0x289f63, _0x4e8a8c, _getNodeInputCountKey(_0x2b22cb.sourceId, _0x4e8a8c)),
-      (_0x2f014b[_0x4e8a8c] += 1));
-    const _0x48b0a2 = AT_TYPE_MAP[_0x4e8a8c] || _0x4e8a8c,
-      _0x133c9b = '' + _0x48b0a2 + _0x2f014b[_0x4e8a8c],
-      _0x4f68ff = _0x133c9b;
-    if (_0x119556 && !_0x133c9b.includes(_0x119556) && !_0x48b0a2.includes(_0x119556)) return;
-    _0x57e118.push({
+export function _buildMentionCandidates(value184, value185 = '', value186 = {}) {
+  const value187 = value184?.nodeId,
+    value188 = appStore.getState(),
+    value189 = value188.nodes || {},
+    nodeData2 = value189?.[value187] || value184?._data || {},
+    targetInputPolicy2 = getTargetInputPolicy(nodeData2),
+    list15 = appStore.getIncomingEdges(value187),
+    _normalizeQuery3 = _normalizeQuery(value185),
+    value190 = { text: 0, image: 0, video: 0, audio: 0 },
+    _getPromptInputCountState2 = _getPromptInputCountState(
+      value184?.promptEl,
+      value186?.excludePill || null,
+      {
+        nodeData: nodeData2,
+      },
+    ),
+    _cloneInputCountState2 = _cloneInputCountState(_getPromptInputCountState2),
+    list16 = [];
+  list15.forEach((edgeId) => {
+    const enabled43 = value189[edgeId.sourceId];
+    if (!enabled43) return;
+    const type8 = resolveEffectiveInputKind(enabled43, edgeId);
+    if (!type8) return;
+    if (!isInputKindAllowed(targetInputPolicy2, type8)) return;
+    (_addInputCount(_cloneInputCountState2, type8, _getNodeInputCountKey(edgeId.sourceId, type8)),
+      (value190[type8] += 1));
+    const list17 = AT_TYPE_MAP[type8] || type8,
+      list18 = '' + list17 + value190[type8],
+      label2 = list18;
+    if (_normalizeQuery3 && !list18.includes(_normalizeQuery3) && !list17.includes(_normalizeQuery3)) return;
+    list16.push({
       origin: 'node',
-      edgeId: _0x2b22cb.id,
-      nodeId: _0x2b22cb.sourceId,
-      type: _0x4e8a8c,
-      label: _0x4f68ff,
-      ..._getMentionVisual(_0x30abf8, { origin: 'node', nodeId: _0x2b22cb.sourceId, type: _0x4e8a8c }),
+      edgeId: edgeId.id,
+      nodeId: edgeId.sourceId,
+      type: type8,
+      label: label2,
+      ..._getMentionVisual(value184, { origin: 'node', nodeId: edgeId.sourceId, type: type8 }),
       limitReason: '',
     });
   });
-  const _0x236b73 = MENTION_TYPE_ORDER.filter((_0x347c7b) => isInputKindAllowed(_0x5539ba, _0x347c7b));
+  const allowedTypes2 = MENTION_TYPE_ORDER.filter((item23) => isInputKindAllowed(targetInputPolicy2, item23));
   return (
-    getAssetMentionCandidates({ query: '', allowedTypes: _0x236b73 }).forEach((_0x1e0211) => {
-      const _0x44d68b = _getMentionType(_0x1e0211.type);
-      if (!_0x44d68b) return;
-      if (!_candidateMatchesQuery(_0x1e0211, _0x184c56)) return;
-      _0x57e118.push({
+    getAssetMentionCandidates({ query: '', allowedTypes: allowedTypes2 }).forEach((assetId9) => {
+      const type9 = _getMentionType(assetId9.type);
+      if (!type9) return;
+      if (!_candidateMatchesQuery(assetId9, value185)) return;
+      list16.push({
         origin: 'asset',
-        assetId: _0x1e0211.assetId,
-        assetIndex: _0x1e0211.itemIndex,
-        type: _0x44d68b,
-        label: _stripMentionDisplayMarker(_0x1e0211.insertLabel || _0x1e0211.label || _0x1e0211.name),
-        assetName: _0x1e0211.assetName,
-        thumbUrl: _getRenderableMentionThumbUrl(_0x1e0211.thumbUrl || '', _0x44d68b),
-        iconType: _0x44d68b,
+        assetId: assetId9.assetId,
+        assetIndex: assetId9.itemIndex,
+        type: type9,
+        label: _stripMentionDisplayMarker(assetId9.insertLabel || assetId9.label || assetId9.name),
+        assetName: assetId9.assetName,
+        thumbUrl: _getRenderableMentionThumbUrl(assetId9.thumbUrl || '', type9),
+        iconType: type9,
         limitReason:
           _getAdvancedVoiceCloneAudioLimitReason(
-            _0x30abf8,
-            { origin: 'asset', assetId: _0x1e0211.assetId, assetIndex: _0x1e0211.itemIndex, type: _0x44d68b },
-            _0x4412db,
-            _0x4402ed,
+            value184,
+            { origin: 'asset', assetId: assetId9.assetId, assetIndex: assetId9.itemIndex, type: type9 },
+            nodeData2,
+            value188,
           ) ??
-          (_canReuseAlreadyCountedInputForLimit(_0x44d68b) &&
-          _isMentionAlreadyCounted(_0x289f63, {
+          (_canReuseAlreadyCountedInputForLimit(type9) &&
+          _isMentionAlreadyCounted(_cloneInputCountState2, {
             origin: 'asset',
-            assetId: _0x1e0211.assetId,
-            assetIndex: _0x1e0211.itemIndex,
-            type: _0x44d68b,
+            assetId: assetId9.assetId,
+            assetIndex: assetId9.itemIndex,
+            type: type9,
           })
             ? ''
-            : getInputLimitReason(_0x5539ba, _0x44d68b, _0x289f63.counts)),
+            : getInputLimitReason(targetInputPolicy2, type9, _cloneInputCountState2.counts)),
       });
     }),
-    _0x57e118
+    list16
   );
 }
-export function _buildMentionMenuTree(_0x5eda93 = []) {
-  const _0x1a8ef9 = [],
-    _0x355c62 = new Map();
-  (Array.isArray(_0x5eda93) ? _0x5eda93 : []).forEach((_0xb2c00a) => {
-    if (!_0xb2c00a || typeof _0xb2c00a !== 'object') return;
-    if (_0xb2c00a.origin !== 'asset') {
-      _0x1a8ef9.push(_0xb2c00a);
+export function _buildMentionMenuTree(list19 = []) {
+  const nodeItems = [],
+    map5 = new Map();
+  (Array.isArray(list19) ? list19 : []).forEach((assetId10) => {
+    if (!assetId10 || typeof assetId10 !== 'object') return;
+    if (assetId10.origin !== 'asset') {
+      nodeItems.push(assetId10);
       return;
     }
-    const _0x1068a5 = _getMentionType(_0xb2c00a.type);
-    if (!_0x1068a5) return;
-    const _0x1ebf10 = String(_0xb2c00a.assetId || _0xb2c00a.assetName || 'asset');
-    !_0x355c62.has(_0x1ebf10) &&
-      _0x355c62.set(_0x1ebf10, {
-        assetId: _0xb2c00a.assetId || '',
-        label: _0xb2c00a.assetName || nodePromptSharedText('assetFallback'),
+    const type10 = _getMentionType(assetId10.type);
+    if (!type10) return;
+    const value191 = String(assetId10.assetId || assetId10.assetName || 'asset');
+    !map5.has(value191) &&
+      map5.set(value191, {
+        assetId: assetId10.assetId || '',
+        label: assetId10.assetName || nodePromptSharedText('assetFallback'),
         typeMap: new Map(),
         items: [],
       });
-    const _0x5c133e = _0x355c62.get(_0x1ebf10);
-    (_0x5c133e.items.push(_0xb2c00a),
-      !_0x5c133e.typeMap.has(_0x1068a5) &&
-        _0x5c133e.typeMap.set(_0x1068a5, {
-          type: _0x1068a5,
-          label: _getAssetTypeMenuLabel(_0x1068a5),
+    const enabled44 = map5.get(value191);
+    (enabled44.items.push(assetId10),
+      !enabled44.typeMap.has(type10) &&
+        enabled44.typeMap.set(type10, {
+          type: type10,
+          label: _getAssetTypeMenuLabel(type10),
           items: [],
         }),
-      _0x5c133e.typeMap.get(_0x1068a5).items.push(_0xb2c00a));
+      enabled44.typeMap.get(type10).items.push(assetId10));
   });
-  const _0x4aee34 = Array.from(_0x355c62.values())
-    .map((_0x49c4d4) => ({
-      assetId: _0x49c4d4.assetId,
-      label: _0x49c4d4.label,
-      items: _0x49c4d4.items,
-      typeItems: MENTION_TYPE_ORDER.map((_0xa0ce93) => _0x49c4d4.typeMap.get(_0xa0ce93)).filter(
-        (_0x1bee74) => _0x1bee74?.items?.length > 0,
+  const assetItems = Array.from(map5.values())
+    .map((assetId11) => ({
+      assetId: assetId11.assetId,
+      label: assetId11.label,
+      items: assetId11.items,
+      typeItems: MENTION_TYPE_ORDER.map((item24) => assetId11.typeMap.get(item24)).filter(
+        (item25) => item25?.items?.length > 0,
       ),
     }))
-    .filter((_0x25ed42) => _0x25ed42.items.length > 0);
-  return { nodeItems: _0x1a8ef9, assetItems: _0x4aee34 };
+    .filter((item26) => item26.items.length > 0);
+  return { nodeItems: nodeItems, assetItems: assetItems };
 }
-function _getPromptInputPillLabel(_0x35c601) {
-  return _stripMentionDisplayMarker(
-    _getDatasetValue(_0x35c601, 'label', 'data-label') || _0x35c601?.textContent || '',
-  );
+function _getPromptInputPillLabel(el29) {
+  return _stripMentionDisplayMarker(_getDatasetValue(el29, 'label', 'data-label') || el29?.textContent || '');
 }
-function _buildInputMentionCandidateIndex(_0x2989ef) {
-  const _0x9d4c97 = _buildMentionCandidates(_0x2989ef, '').filter(
-      (_0x47bfec) => _0x47bfec?.origin === 'node',
-    ),
-    _0x10973e = new Map(),
-    _0x28331a = new Map(),
-    _0x4639b8 = new Map();
+function _buildInputMentionCandidateIndex(value192) {
+  const list20 = _buildMentionCandidates(value192, '').filter((item27) => item27?.origin === 'node'),
+    bySourceId = new Map(),
+    byLabel = new Map(),
+    byLabelAndType = new Map();
   return (
-    _0x9d4c97.forEach((_0x322e5f) => {
-      const _0x375aa2 = String(_0x322e5f?.nodeId || '').trim(),
-        _0x361150 = _normalizeMentionLabelKey(_0x322e5f?.label || ''),
-        _0x138529 = _getMentionType(_0x322e5f?.type);
-      if (_0x375aa2) _0x10973e.set(_0x375aa2, _0x322e5f);
-      if (_0x361150 && !_0x28331a.has(_0x361150)) _0x28331a.set(_0x361150, _0x322e5f);
-      if (_0x361150 && _0x138529) {
-        const _0x4b8dd6 = _0x138529 + ':' + _0x361150;
-        if (!_0x4639b8.has(_0x4b8dd6)) _0x4639b8.set(_0x4b8dd6, _0x322e5f);
+    list20.forEach((item28) => {
+      const value193 = String(item28?.nodeId || '').trim(),
+        _normalizeMentionLabelKey3 = _normalizeMentionLabelKey(item28?.label || ''),
+        _getMentionType18 = _getMentionType(item28?.type);
+      if (value193) bySourceId.set(value193, item28);
+      if (_normalizeMentionLabelKey3 && !byLabel.has(_normalizeMentionLabelKey3))
+        byLabel.set(_normalizeMentionLabelKey3, item28);
+      if (_normalizeMentionLabelKey3 && _getMentionType18) {
+        const value194 = _getMentionType18 + ':' + _normalizeMentionLabelKey3;
+        if (!byLabelAndType.has(value194)) byLabelAndType.set(value194, item28);
       }
     }),
-    { bySourceId: _0x10973e, byLabel: _0x28331a, byLabelAndType: _0x4639b8 }
+    { bySourceId: bySourceId, byLabel: byLabel, byLabelAndType: byLabelAndType }
   );
 }
-function _applyInputMentionCandidateToPill(_0x2c9053, _0x57c71d, _0x2a49de) {
-  if (!_isRefPillNode(_0x57c71d) || !_0x2a49de) return false;
-  const _0x142c2b = _stripMentionDisplayMarker(_0x2a49de.label || _0x57c71d.dataset?.label || ''),
-    _0x52fe53 = _getMentionType(_0x2a49de.type);
-  ((_0x57c71d.dataset.refOrigin = 'node'),
-    (_0x57c71d.dataset.label = _0x142c2b),
-    (_0x57c71d.dataset.nodeId = String(_0x2a49de.nodeId || '')));
-  if (_0x52fe53) _0x57c71d.dataset.refType = _0x52fe53;
+function _applyInputMentionCandidateToPill(value195, el30, enabled45) {
+  if (!_isRefPillNode(el30) || !enabled45) return false;
+  const _stripMentionDisplayMarker5 = _stripMentionDisplayMarker(
+      enabled45.label || el30.dataset?.label || '',
+    ),
+    _getMentionType19 = _getMentionType(enabled45.type);
+  ((el30.dataset.refOrigin = 'node'),
+    (el30.dataset.label = _stripMentionDisplayMarker5),
+    (el30.dataset.nodeId = String(enabled45.nodeId || '')));
+  if (_getMentionType19) el30.dataset.refType = _getMentionType19;
   return (
-    delete _0x57c71d.dataset.assetId,
-    delete _0x57c71d.dataset.assetIndex,
-    _0x57c71d.removeAttribute?.('data-asset-id'),
-    _0x57c71d.removeAttribute?.('data-asset-index'),
-    _clearInputMentionPillUnresolved(_0x57c71d),
-    _renderMentionPillContent(_0x57c71d, _0x142c2b, _getMentionVisual(_0x2c9053, _0x2a49de, _0x57c71d)),
+    delete el30.dataset.assetId,
+    delete el30.dataset.assetIndex,
+    el30.removeAttribute?.('data-asset-id'),
+    el30.removeAttribute?.('data-asset-index'),
+    _clearInputMentionPillUnresolved(el30),
+    _renderMentionPillContent(
+      el30,
+      _stripMentionDisplayMarker5,
+      _getMentionVisual(value195, enabled45, el30),
+    ),
     true
   );
 }
-export function resolvePromptInputPillsForTarget(_0x15067d) {
-  if (!_0x15067d?.promptEl || typeof _0x15067d.promptEl.querySelectorAll !== 'function')
+export function resolvePromptInputPillsForTarget(enabled46) {
+  if (!enabled46?.promptEl || typeof enabled46.promptEl.querySelectorAll !== 'function')
     return { resolved: 0, unresolved: 0 };
-  const _0x1699a6 = _buildInputMentionCandidateIndex(_0x15067d);
-  let _0x8b86f4 = 0,
-    _0x588906 = 0;
+  const _buildInputMentionCandidateIndex2 = _buildInputMentionCandidateIndex(enabled46);
+  let resolved = 0,
+    unresolved = 0;
   return (
-    _0x15067d.promptEl.querySelectorAll('.ref-pill').forEach((_0x2a2f64) => {
-      if (_isAssetMentionPill(_0x2a2f64)) return;
-      const _0x5b06f7 = _getPromptInputPillLabel(_0x2a2f64),
-        _0x2ef91e = _normalizeMentionLabelKey(_0x5b06f7),
-        _0x505671 = _getPillMentionType(_0x2a2f64),
-        _0x129fd6 = _getDatasetValue(_0x2a2f64, 'nodeId', 'data-node-id');
-      let _0x3b90c7 = _0x129fd6 ? _0x1699a6.bySourceId.get(_0x129fd6) : null;
-      !_0x3b90c7 &&
-        _0x2ef91e &&
-        _0x505671 &&
-        (_0x3b90c7 = _0x1699a6.byLabelAndType.get(_0x505671 + ':' + _0x2ef91e) || null);
-      !_0x3b90c7 && _0x2ef91e && (_0x3b90c7 = _0x1699a6.byLabel.get(_0x2ef91e) || null);
-      if (_0x3b90c7 && (!_0x505671 || _getMentionType(_0x3b90c7.type) === _0x505671)) {
-        if (_applyInputMentionCandidateToPill(_0x15067d, _0x2a2f64, _0x3b90c7)) _0x8b86f4 += 1;
+    enabled46.promptEl.querySelectorAll('.ref-pill').forEach((item29) => {
+      if (_isAssetMentionPill(item29)) return;
+      const label3 = _getPromptInputPillLabel(item29),
+        _normalizeMentionLabelKey4 = _normalizeMentionLabelKey(label3),
+        type11 = _getPillMentionType(item29),
+        _getDatasetValue6 = _getDatasetValue(item29, 'nodeId', 'data-node-id');
+      let enabled47 = _getDatasetValue6
+        ? _buildInputMentionCandidateIndex2.bySourceId.get(_getDatasetValue6)
+        : null;
+      !enabled47 &&
+        _normalizeMentionLabelKey4 &&
+        type11 &&
+        (enabled47 =
+          _buildInputMentionCandidateIndex2.byLabelAndType.get(type11 + ':' + _normalizeMentionLabelKey4) ||
+          null);
+      !enabled47 &&
+        _normalizeMentionLabelKey4 &&
+        (enabled47 = _buildInputMentionCandidateIndex2.byLabel.get(_normalizeMentionLabelKey4) || null);
+      if (enabled47 && (!type11 || _getMentionType(enabled47.type) === type11)) {
+        if (_applyInputMentionCandidateToPill(enabled46, item29, enabled47)) resolved += 1;
         return;
       }
-      if (_setInputMentionPillUnresolved(_0x2a2f64, { label: _0x5b06f7, type: _0x505671 })) _0x588906 += 1;
+      if (_setInputMentionPillUnresolved(item29, { label: label3, type: type11 })) unresolved += 1;
     }),
-    { resolved: _0x8b86f4, unresolved: _0x588906 }
+    { resolved: resolved, unresolved: unresolved }
   );
 }
-function _getClipboardData(_0xa90758, _0x3b93e7) {
-  const _0x39c564 = _0xa90758?.clipboardData || globalThis.window?.clipboardData;
-  if (typeof _0x39c564?.getData !== 'function') return '';
-  return String(_0x39c564.getData(_0x3b93e7) || '');
+function _getClipboardData(value196, value197) {
+  const value198 = value196?.clipboardData || globalThis.window?.clipboardData;
+  if (typeof value198?.getData !== 'function') return '';
+  return String(value198.getData(value197) || '');
 }
-function _insertPromptHtmlAtSelection(_0x39fa2f) {
+function _insertPromptHtmlAtSelection(value199) {
   if (typeof document !== 'undefined' && typeof document.execCommand === 'function')
     try {
-      if (document.execCommand('insertHTML', false, _0x39fa2f)) return true;
+      if (document.execCommand('insertHTML', false, value199)) return true;
     } catch {}
   return false;
 }
-function _insertPromptTextAtSelection(_0xb52ff) {
+function _insertPromptTextAtSelection(value200) {
   if (typeof document !== 'undefined' && typeof document.execCommand === 'function')
     try {
-      if (document.execCommand('insertText', false, _0xb52ff)) return true;
+      if (document.execCommand('insertText', false, value200)) return true;
     } catch {}
   return false;
 }
-export function handlePromptPaste(_0x3b1034, _0x3cc020) {
-  if (!_0x3b1034?.promptEl) return false;
-  _0x3cc020?.preventDefault?.();
-  const _0x54cffd = _getClipboardData(_0x3cc020, 'text/html'),
-    _0x392a68 = _getClipboardData(_0x3cc020, 'text/plain'),
-    _0x125ae5 = sanitizePromptHtml(_0x54cffd),
-    _0x3f4b2c = !!_0x125ae5 && /class="ref-pill"/i.test(_0x125ae5);
-  if (!_0x3f4b2c) {
-    const _0x24d1d2 = _insertPromptTextAtSelection(_0x392a68);
-    if (_0x24d1d2) return (_updatePromptHtml(_0x3b1034), true);
+export function handlePromptPaste(enabled48, event4) {
+  if (!enabled48?.promptEl) return false;
+  event4?.preventDefault?.();
+  const _getClipboardData2 = _getClipboardData(event4, 'text/html'),
+    _getClipboardData3 = _getClipboardData(event4, 'text/plain'),
+    sanitizePromptHtml4 = sanitizePromptHtml(_getClipboardData2),
+    enabled49 = !!sanitizePromptHtml4 && /class="ref-pill"/i.test(sanitizePromptHtml4);
+  if (!enabled49) {
+    const _insertPromptTextAtSelection2 = _insertPromptTextAtSelection(_getClipboardData3);
+    if (_insertPromptTextAtSelection2) return (_updatePromptHtml(enabled48), true);
     return false;
   }
-  const _0x36d300 = _insertPromptHtmlAtSelection(_0x125ae5);
-  if (!_0x36d300) {
-    const _0x4b7789 = _insertPromptTextAtSelection(_0x392a68);
-    if (_0x4b7789) _updatePromptHtml(_0x3b1034);
-    return _0x4b7789;
+  const _insertPromptHtmlAtSelection2 = _insertPromptHtmlAtSelection(sanitizePromptHtml4);
+  if (!_insertPromptHtmlAtSelection2) {
+    const _insertPromptTextAtSelection3 = _insertPromptTextAtSelection(_getClipboardData3);
+    if (_insertPromptTextAtSelection3) _updatePromptHtml(enabled48);
+    return _insertPromptTextAtSelection3;
   }
-  const _0x13dc74 = resolvePromptInputPillsForTarget(_0x3b1034);
+  const promptInputPillsForTarget = resolvePromptInputPillsForTarget(enabled48);
   return (
-    _rehydratePromptPills(_0x3b1034),
-    _syncEdgesOrderFromPills(_0x3b1034),
-    _updatePromptHtml(_0x3b1034),
-    _0x13dc74.unresolved > 0 &&
+    _rehydratePromptPills(enabled48),
+    _syncEdgesOrderFromPills(enabled48),
+    _updatePromptHtml(enabled48),
+    promptInputPillsForTarget.unresolved > 0 &&
       globalThis.window?.showToast?.('Some @ input refs are not bound in this node.', 'warn'),
     true
   );
 }
-export function handlePromptSelectAll(_0x319375, _0x12423a) {
-  if (!_0x319375?.promptEl) return false;
-  const _0x4d7c70 = String(_0x12423a?.key || '').toLowerCase(),
-    _0x4345f2 = String(_0x12423a?.code || ''),
-    _0x8c2d92 =
-      (_0x12423a?.ctrlKey || _0x12423a?.metaKey) &&
-      !_0x12423a?.altKey &&
-      (_0x4d7c70 === 'a' || _0x4345f2 === 'KeyA');
-  if (!_0x8c2d92) return false;
-  const _0xdcb6b1 = globalThis.window?.getSelection?.(),
-    _0x4cdc26 =
+export function handlePromptSelectAll(enabled50, event5) {
+  if (!enabled50?.promptEl) return false;
+  const value201 = String(event5?.key || '').toLowerCase(),
+    value202 = String(event5?.code || ''),
+    enabled51 =
+      (event5?.ctrlKey || event5?.metaKey) && !event5?.altKey && (value201 === 'a' || value202 === 'KeyA');
+  if (!enabled51) return false;
+  const enabled52 = globalThis.window?.getSelection?.(),
+    enabled53 =
       typeof document !== 'undefined' && typeof document.createRange === 'function'
         ? document.createRange()
         : null;
-  if (!_0xdcb6b1 || !_0x4cdc26) return false;
+  if (!enabled52 || !enabled53) return false;
   return (
-    _0x12423a.preventDefault?.(),
-    _0x12423a.stopPropagation?.(),
-    _0x4cdc26.selectNodeContents(_0x319375.promptEl),
-    _0xdcb6b1.removeAllRanges?.(),
-    _0xdcb6b1.addRange?.(_0x4cdc26),
+    event5.preventDefault?.(),
+    event5.stopPropagation?.(),
+    enabled53.selectNodeContents(enabled50.promptEl),
+    enabled52.removeAllRanges?.(),
+    enabled52.addRange?.(enabled53),
     true
   );
 }
 export function _insertMentionPill(
-  _0x195565,
+  enabled54,
   {
-    label: _0x27647a,
-    nodeId: _0x3b8704,
+    label: label4,
+    nodeId: nodeId2,
     triggerRange: triggerRange = null,
     atIndex: atIndex = -1,
     pillToEdit: pillToEdit = null,
     candidate: candidate = null,
   } = {},
 ) {
-  if (!_0x195565?.promptEl) return false;
-  const _0x507157 = candidate || { origin: 'node', label: _0x27647a, nodeId: _0x3b8704, type: '' },
-    _0x1343b5 = _getMentionType(_0x507157.type);
-  if (_0x1343b5) {
-    const _0xc5dac5 = appStore.getState(),
-      _0x1c6038 = _0xc5dac5.nodes?.[_0x195565.nodeId] || _0x195565?._data || {},
-      _0x40cb2b = getTargetInputPolicy(_0x1c6038),
-      _0x2cb549 = _getPromptInputCountState(_0x195565.promptEl, pillToEdit || null, { nodeData: _0x1c6038 });
-    if (_0x507157.origin === 'asset') {
-      const _0x46427d = _0xc5dac5.nodes || {};
-      appStore.getIncomingEdges(_0x195565.nodeId).forEach((_0x7cd6dd) => {
-        const _0x194058 = resolveEffectiveInputKind(_0x46427d?.[_0x7cd6dd?.sourceId], _0x7cd6dd);
-        _addInputCount(_0x2cb549, _0x194058, _getNodeInputCountKey(_0x7cd6dd?.sourceId, _0x194058));
+  if (!enabled54?.promptEl) return false;
+  const value203 = candidate || { origin: 'node', label: label4, nodeId: nodeId2, type: '' },
+    _getMentionType20 = _getMentionType(value203.type);
+  if (_getMentionType20) {
+    const value204 = appStore.getState(),
+      nodeData3 = value204.nodes?.[enabled54.nodeId] || enabled54?._data || {},
+      targetInputPolicy3 = getTargetInputPolicy(nodeData3),
+      _getPromptInputCountState3 = _getPromptInputCountState(enabled54.promptEl, pillToEdit || null, {
+        nodeData: nodeData3,
+      });
+    if (value203.origin === 'asset') {
+      const value205 = value204.nodes || {};
+      appStore.getIncomingEdges(enabled54.nodeId).forEach((item30) => {
+        const effectiveInputKind2 = resolveEffectiveInputKind(value205?.[item30?.sourceId], item30);
+        _addInputCount(
+          _getPromptInputCountState3,
+          effectiveInputKind2,
+          _getNodeInputCountKey(item30?.sourceId, effectiveInputKind2),
+        );
       });
     }
-    const _0x3d0283 =
-      _getAdvancedVoiceCloneAudioLimitReason(_0x195565, _0x507157, _0x1c6038, _0xc5dac5) ??
-      (_canReuseAlreadyCountedInputForLimit(_0x1343b5) &&
-      _isMentionAlreadyCounted(_0x2cb549, _0x507157, _0x1343b5)
+    const _getAdvancedVoiceCloneAudioLimitReason2 =
+      _getAdvancedVoiceCloneAudioLimitReason(enabled54, value203, nodeData3, value204) ??
+      (_canReuseAlreadyCountedInputForLimit(_getMentionType20) &&
+      _isMentionAlreadyCounted(_getPromptInputCountState3, value203, _getMentionType20)
         ? ''
-        : getInputLimitReason(_0x40cb2b, _0x1343b5, _0x2cb549.counts));
-    if (_0x3d0283) return (globalThis.window?.showToast?.(_0x3d0283, 'warn'), false);
+        : getInputLimitReason(targetInputPolicy3, _getMentionType20, _getPromptInputCountState3.counts));
+    if (_getAdvancedVoiceCloneAudioLimitReason2)
+      return (globalThis.window?.showToast?.(_getAdvancedVoiceCloneAudioLimitReason2, 'warn'), false);
   }
-  if (_shouldStoreMentionAsPromptAssetInput(_0x195565, _0x507157))
-    return _insertPromptAssetInputRef(_0x195565, _0x507157, {
+  if (_shouldStoreMentionAsPromptAssetInput(enabled54, value203))
+    return _insertPromptAssetInputRef(enabled54, value203, {
       triggerRange: triggerRange,
       atIndex: atIndex,
       pillToEdit: pillToEdit,
     });
-  const _0x58600e = (_0x5efc65) => {
-    const _0x34f9da = _stripMentionDisplayMarker(_0x507157.label || _0x27647a || '');
-    ((_0x5efc65.dataset.label = _0x34f9da),
-      _0x507157.origin === 'asset'
-        ? ((_0x5efc65.dataset.refOrigin = 'asset'),
-          (_0x5efc65.dataset.assetId = String(_0x507157.assetId || '')),
-          (_0x5efc65.dataset.assetIndex = String(_0x507157.assetIndex ?? '')),
-          (_0x5efc65.dataset.refType = String(_0x1343b5 || _0x507157.type || '')),
-          _clearInputMentionPillUnresolved(_0x5efc65),
-          delete _0x5efc65.dataset.nodeId,
-          _0x5efc65.removeAttribute?.('data-node-id'),
-          _renderMentionPillContent(_0x5efc65, _0x34f9da, _getMentionVisual(_0x195565, _0x507157, _0x5efc65)))
-        : ((_0x5efc65.dataset.refOrigin = 'node'),
-          (_0x5efc65.dataset.nodeId = String(_0x507157.nodeId || _0x3b8704 || '')),
-          (_0x1343b5 || _0x507157.type) &&
-            (_0x5efc65.dataset.refType = String(_0x1343b5 || _0x507157.type || '')),
-          _clearInputMentionPillUnresolved(_0x5efc65),
-          delete _0x5efc65.dataset.assetId,
-          delete _0x5efc65.dataset.assetIndex,
-          _0x5efc65.removeAttribute?.('data-asset-id'),
-          _0x5efc65.removeAttribute?.('data-asset-index'),
+  const run2 = (el31) => {
+    const _stripMentionDisplayMarker6 = _stripMentionDisplayMarker(value203.label || label4 || '');
+    ((el31.dataset.label = _stripMentionDisplayMarker6),
+      value203.origin === 'asset'
+        ? ((el31.dataset.refOrigin = 'asset'),
+          (el31.dataset.assetId = String(value203.assetId || '')),
+          (el31.dataset.assetIndex = String(value203.assetIndex ?? '')),
+          (el31.dataset.refType = String(_getMentionType20 || value203.type || '')),
+          _clearInputMentionPillUnresolved(el31),
+          delete el31.dataset.nodeId,
+          el31.removeAttribute?.('data-node-id'),
           _renderMentionPillContent(
-            _0x5efc65,
-            _0x34f9da,
-            _getMentionVisual(_0x195565, _0x507157, _0x5efc65),
+            el31,
+            _stripMentionDisplayMarker6,
+            _getMentionVisual(enabled54, value203, el31),
+          ))
+        : ((el31.dataset.refOrigin = 'node'),
+          (el31.dataset.nodeId = String(value203.nodeId || nodeId2 || '')),
+          (_getMentionType20 || value203.type) &&
+            (el31.dataset.refType = String(_getMentionType20 || value203.type || '')),
+          _clearInputMentionPillUnresolved(el31),
+          delete el31.dataset.assetId,
+          delete el31.dataset.assetIndex,
+          el31.removeAttribute?.('data-asset-id'),
+          el31.removeAttribute?.('data-asset-index'),
+          _renderMentionPillContent(
+            el31,
+            _stripMentionDisplayMarker6,
+            _getMentionVisual(enabled54, value203, el31),
           )));
   };
-  if (pillToEdit) return (_0x58600e(pillToEdit), _updatePromptHtml(_0x195565), true);
-  const _0x11cf45 = window.getSelection(),
-    _0x2325bc = triggerRange || (_0x11cf45 && _0x11cf45.rangeCount ? _0x11cf45.getRangeAt(0) : null);
-  if (!_0x2325bc || _0x2325bc.startContainer.nodeType !== Node.TEXT_NODE) return false;
-  const _0x28cc96 = _0x2325bc.startContainer,
-    _0x5460a5 = String(_0x28cc96.textContent || ''),
-    _0x1a5967 = _0x2325bc.startOffset,
-    _0x4e5e35 =
-      Number.isFinite(atIndex) && atIndex >= 0 ? atIndex : _0x5460a5.lastIndexOf('@', _0x1a5967 - 1);
-  if (_0x4e5e35 < 0) return false;
-  const _0x50d612 = _0x5460a5.slice(0, _0x4e5e35),
-    _0x198638 = _0x5460a5.slice(_0x1a5967),
-    _0x1d1d02 = document.createTextNode(_0x50d612),
-    _0x419cb7 = document.createTextNode(_0x198638),
-    _0x4d4b99 = document.createElement('span');
-  ((_0x4d4b99.className = 'ref-pill'),
-    (_0x4d4b99.contentEditable = 'false'),
-    _0x58600e(_0x4d4b99),
-    _bindPromptPill(_0x195565, _0x4d4b99),
-    _0x28cc96.parentNode.replaceChild(_0x419cb7, _0x28cc96),
-    _0x419cb7.parentNode.insertBefore(_0x4d4b99, _0x419cb7),
-    _0x419cb7.parentNode.insertBefore(_0x1d1d02, _0x4d4b99));
-  const _0x5588da = document.createRange();
+  if (pillToEdit) return (run2(pillToEdit), _updatePromptHtml(enabled54), true);
+  const value206 = window.getSelection(),
+    enabled55 = triggerRange || (value206 && value206.rangeCount ? value206.getRangeAt(0) : null);
+  if (!enabled55 || enabled55.startContainer.nodeType !== Node.TEXT_NODE) return false;
+  const el32 = enabled55.startContainer,
+    list21 = String(el32.textContent || ''),
+    value207 = enabled55.startOffset,
+    count9 = Number.isFinite(atIndex) && atIndex >= 0 ? atIndex : list21.lastIndexOf('@', value207 - 1);
+  if (count9 < 0) return false;
+  const value208 = list21.slice(0, count9),
+    value209 = list21.slice(value207),
+    value210 = document.createTextNode(value208),
+    el33 = document.createTextNode(value209),
+    value211 = document.createElement('span');
+  ((value211.className = 'ref-pill'),
+    (value211.contentEditable = 'false'),
+    run2(value211),
+    _bindPromptPill(enabled54, value211),
+    el32.parentNode.replaceChild(el33, el32),
+    el33.parentNode.insertBefore(value211, el33),
+    el33.parentNode.insertBefore(value210, value211));
+  const value212 = document.createRange();
   return (
-    _0x5588da.setStartAfter(_0x4d4b99),
-    _0x5588da.collapse(true),
-    _0x11cf45.removeAllRanges(),
-    _0x11cf45.addRange(_0x5588da),
-    _updatePromptHtml(_0x195565),
+    value212.setStartAfter(value211),
+    value212.collapse(true),
+    value206.removeAllRanges(),
+    value206.addRange(value212),
+    _updatePromptHtml(enabled54),
     true
   );
 }
-function _getDirectMentionItems(_0x44ef1c) {
-  return Array.from(_0x44ef1c?.children || []).filter((_0x291f0f) =>
-    _0x291f0f.classList?.contains('at-mention-item'),
-  );
+function _getDirectMentionItems(el34) {
+  return Array.from(el34?.children || []).filter((el35) => el35.classList?.contains('at-mention-item'));
 }
-function _clearActiveItems(_0x53a58b) {
-  _getDirectMentionItems(_0x53a58b).forEach((_0x27d170) => _0x27d170.classList.remove('active'));
+function _clearActiveItems(value213) {
+  _getDirectMentionItems(value213).forEach((el36) => el36.classList.remove('active'));
 }
-function _setActiveMentionItem(_0x20f4bf, { focusSubmenu: focusSubmenu = false } = {}) {
-  if (!_0x20f4bf) return;
-  const _0x1e80d0 = _0x20f4bf.parentElement;
-  if (!_0x1e80d0) return;
-  (_clearActiveItems(_0x1e80d0),
-    _0x20f4bf.classList.add('active'),
-    (_mentionMenuState.activeMenu = _0x1e80d0),
-    _0x20f4bf.classList.contains('at-mention-has-submenu')
-      ? _openMentionSubmenu(_0x20f4bf, { focusSubmenu: focusSubmenu })
-      : _closeSiblingMentionSubmenus(_0x20f4bf));
+function _setActiveMentionItem(el37, { focusSubmenu: focusSubmenu = false } = {}) {
+  if (!el37) return;
+  const enabled56 = el37.parentElement;
+  if (!enabled56) return;
+  (_clearActiveItems(enabled56),
+    el37.classList.add('active'),
+    (_mentionMenuState.activeMenu = enabled56),
+    el37.classList.contains('at-mention-has-submenu')
+      ? _openMentionSubmenu(el37, { focusSubmenu: focusSubmenu })
+      : _closeSiblingMentionSubmenus(el37));
 }
-function _setInitialMentionActiveItem(_0x369241) {
-  const _0x1a069e =
-    _getDirectMentionItems(_0x369241).find(
-      (_0x999b9a) => !_0x999b9a.classList.contains('at-mention-disabled'),
-    ) || _getDirectMentionItems(_0x369241)[0];
-  if (_0x1a069e) _setActiveMentionItem(_0x1a069e);
+function _setInitialMentionActiveItem(value214) {
+  const _getDirectMentionItems2 =
+    _getDirectMentionItems(value214).find((el38) => !el38.classList.contains('at-mention-disabled')) ||
+    _getDirectMentionItems(value214)[0];
+  if (_getDirectMentionItems2) _setActiveMentionItem(_getDirectMentionItems2);
 }
-function _closeSiblingMentionSubmenus(_0x457387) {
-  const _0x10383b = _0x457387?.parentElement;
-  if (!_0x10383b) return;
-  _getDirectMentionItems(_0x10383b).forEach((_0x381f3b) => {
-    if (_0x381f3b === _0x457387) return;
-    (_0x381f3b.classList.remove('at-mention-submenu-open'),
-      _0x381f3b
+function _closeSiblingMentionSubmenus(value215) {
+  const enabled57 = value215?.parentElement;
+  if (!enabled57) return;
+  _getDirectMentionItems(enabled57).forEach((el39) => {
+    if (el39 === value215) return;
+    (el39.classList.remove('at-mention-submenu-open'),
+      el39
         .querySelectorAll('.at-mention-submenu-open')
-        .forEach((_0x891bf) => _0x891bf.classList.remove('at-mention-submenu-open')));
+        .forEach((el40) => el40.classList.remove('at-mention-submenu-open')));
   });
 }
-function _positionMentionSubmenu(_0x4006ae, _0x28247d) {
-  if (!_0x4006ae || !_0x28247d || typeof _0x4006ae.getBoundingClientRect !== 'function') return;
-  const _0x67d34c = _0x4006ae.getBoundingClientRect(),
-    _0x4a9699 = Number(globalThis.window?.innerWidth || 0),
-    _0x27048c = Number(globalThis.window?.innerHeight || 0),
-    _0x49d70f = 6,
-    _0x221963 = 12,
-    _0x199f3a = _0x28247d.offsetWidth || 220,
-    _0x145d60 = _0x28247d.offsetHeight || 0x140;
-  let _0xc6589d = _0x67d34c.right + _0x49d70f;
-  _0x4a9699 > 0 &&
-    _0xc6589d + _0x199f3a + _0x221963 > _0x4a9699 &&
-    (_0xc6589d = Math.max(_0x221963, _0x67d34c.left - _0x199f3a - _0x49d70f));
-  let _0x571854 = _0x67d34c.top;
-  (_0x27048c > 0 &&
-    _0x571854 + _0x145d60 + _0x221963 > _0x27048c &&
-    (_0x571854 = Math.max(_0x221963, _0x27048c - _0x145d60 - _0x221963)),
-    (_0x28247d.style.left = Math.round(_0xc6589d) + 'px'),
-    (_0x28247d.style.top = Math.round(_0x571854) + 'px'),
-    _0x27048c > 0 && (_0x28247d.style.maxHeight = Math.max(160, _0x27048c - _0x221963 * 2) + 'px'));
+function _positionMentionSubmenu(el41, el42) {
+  if (!el41 || !el42 || typeof el41.getBoundingClientRect !== 'function') return;
+  const box2 = el41.getBoundingClientRect(),
+    count10 = Number(globalThis.window?.innerWidth || 0),
+    count11 = Number(globalThis.window?.innerHeight || 0),
+    value216 = 6,
+    value217 = 12,
+    value218 = el42.offsetWidth || 220,
+    value219 = el42.offsetHeight || 0x140;
+  let value220 = box2.right + value216;
+  count10 > 0 &&
+    value220 + value218 + value217 > count10 &&
+    (value220 = Math.max(value217, box2.left - value218 - value216));
+  let value221 = box2.top;
+  (count11 > 0 &&
+    value221 + value219 + value217 > count11 &&
+    (value221 = Math.max(value217, count11 - value219 - value217)),
+    (el42.style.left = Math.round(value220) + 'px'),
+    (el42.style.top = Math.round(value221) + 'px'),
+    count11 > 0 && (el42.style.maxHeight = Math.max(160, count11 - value217 * 2) + 'px'));
 }
-function _openMentionSubmenu(_0x18cff3, { focusSubmenu: focusSubmenu = false } = {}) {
-  const _0xd68387 = Array.from(_0x18cff3?.children || []).find((_0x4df56a) =>
-    _0x4df56a.classList?.contains('at-mention-submenu'),
+function _openMentionSubmenu(el43, { focusSubmenu: focusSubmenu = false } = {}) {
+  const enabled58 = Array.from(el43?.children || []).find((el44) =>
+    el44.classList?.contains('at-mention-submenu'),
   );
-  if (!_0xd68387) return false;
+  if (!enabled58) return false;
   return (
-    _closeSiblingMentionSubmenus(_0x18cff3),
-    _0x18cff3.classList.add('at-mention-submenu-open'),
-    _positionMentionSubmenu(_0x18cff3, _0xd68387),
+    _closeSiblingMentionSubmenus(el43),
+    el43.classList.add('at-mention-submenu-open'),
+    _positionMentionSubmenu(el43, enabled58),
     focusSubmenu
-      ? ((_mentionMenuState.activeMenu = _0xd68387), _setInitialMentionActiveItem(_0xd68387))
-      : (_mentionMenuState.activeMenu = _0x18cff3.parentElement || _0xd68387),
+      ? ((_mentionMenuState.activeMenu = enabled58), _setInitialMentionActiveItem(enabled58))
+      : (_mentionMenuState.activeMenu = el43.parentElement || enabled58),
     true
   );
 }
-function _activateMentionMenuItem(_0x11fbe9) {
-  if (!_0x11fbe9) return false;
-  if (_0x11fbe9.classList.contains('at-mention-has-submenu'))
-    return _openMentionSubmenu(_0x11fbe9, { focusSubmenu: true });
-  if (typeof _0x11fbe9._mentionSelect === 'function') return (_0x11fbe9._mentionSelect(), true);
+function _activateMentionMenuItem(el45) {
+  if (!el45) return false;
+  if (el45.classList.contains('at-mention-has-submenu'))
+    return _openMentionSubmenu(el45, { focusSubmenu: true });
+  if (typeof el45._mentionSelect === 'function') return (el45._mentionSelect(), true);
   return false;
 }
 function _createMentionMenuItem({
@@ -1961,83 +1992,79 @@ function _createMentionMenuItem({
   badges: badges = null,
   onSelect: onSelect = null,
 } = {}) {
-  const _0x345f15 = document.createElement('div');
-  ((_0x345f15.className =
+  const el46 = document.createElement('div');
+  ((el46.className =
     'at-mention-item' +
     (disabled ? ' at-mention-disabled disabled' : '') +
     (hasSubmenu ? ' at-mention-has-submenu' : '')),
-    (_0x345f15.title = title || ''));
-  const _0x2fbc2d = _getMentionType(iconType);
-  if (thumbUrl || thumbNode || _0x2fbc2d === 'text' || _0x2fbc2d === 'audio') {
-    const _0x13d95b = document.createElement('span');
-    _0x13d95b.className = 'at-mention-visual';
+    (el46.title = title || ''));
+  const _getMentionType21 = _getMentionType(iconType);
+  if (thumbUrl || thumbNode || _getMentionType21 === 'text' || _getMentionType21 === 'audio') {
+    const el47 = document.createElement('span');
+    el47.className = 'at-mention-visual';
     if (thumbUrl) {
-      const _0x496688 = document.createElement('img');
-      ((_0x496688.className = 'at-mention-thumb'),
-        (_0x496688.src = thumbUrl),
-        (_0x496688.alt = ''),
-        (_0x496688.draggable = false),
-        _0x13d95b.appendChild(_0x496688));
+      const value222 = document.createElement('img');
+      ((value222.className = 'at-mention-thumb'),
+        (value222.src = thumbUrl),
+        (value222.alt = ''),
+        (value222.draggable = false),
+        el47.appendChild(value222));
     } else {
-      const _0x404f53 = _cloneMentionThumbNode(thumbNode, 'at-mention-thumb', iconType);
-      if (_0x404f53) _0x13d95b.appendChild(_0x404f53);
+      const _cloneMentionThumbNode3 = _cloneMentionThumbNode(thumbNode, 'at-mention-thumb', iconType);
+      if (_cloneMentionThumbNode3) el47.appendChild(_cloneMentionThumbNode3);
     }
-    if (_0x13d95b.childNodes.length) _0x345f15.appendChild(_0x13d95b);
+    if (el47.childNodes.length) el46.appendChild(el47);
   }
-  const _0x470eb8 = document.createElement('span');
-  ((_0x470eb8.className = 'at-mention-label'),
-    (_0x470eb8.textContent = label),
-    _0x345f15.appendChild(_0x470eb8));
+  const el48 = document.createElement('span');
+  ((el48.className = 'at-mention-label'), (el48.textContent = label), el46.appendChild(el48));
   if (Array.isArray(badges) && badges.length > 0) {
-    const _0x2a7651 = document.createElement('span');
-    ((_0x2a7651.className = 'at-mention-badges'),
-      badges.slice(0, 4).forEach((_0x4671cc) => {
-        const _0x5717f1 = document.createElement('span');
-        ((_0x5717f1.className = 'at-mention-badge'),
-          (_0x5717f1.textContent = String(_0x4671cc || '')),
-          _0x2a7651.appendChild(_0x5717f1));
+    const el49 = document.createElement('span');
+    ((el49.className = 'at-mention-badges'),
+      badges.slice(0, 4).forEach((item31) => {
+        const el50 = document.createElement('span');
+        ((el50.className = 'at-mention-badge'),
+          (el50.textContent = String(item31 || '')),
+          el49.appendChild(el50));
       }),
-      _0x345f15.appendChild(_0x2a7651));
+      el46.appendChild(el49));
   }
   if (hasSubmenu) {
-    const _0x4fab7b = document.createElement('span');
-    ((_0x4fab7b.className = 'at-mention-arrow'),
-      (_0x4fab7b.textContent = '>'),
-      _0x345f15.appendChild(_0x4fab7b));
+    const el51 = document.createElement('span');
+    ((el51.className = 'at-mention-arrow'), (el51.textContent = '>'), el46.appendChild(el51));
   }
   return (
-    (_0x345f15._mentionSelect = onSelect),
-    _0x345f15.addEventListener('mouseenter', () => {
-      _setActiveMentionItem(_0x345f15);
+    (el46._mentionSelect = onSelect),
+    el46.addEventListener('mouseenter', () => {
+      _setActiveMentionItem(el46);
     }),
-    _0x345f15.addEventListener('mousedown', (_0x4985bd) => {
-      (_0x4985bd.preventDefault(), _0x4985bd.stopPropagation(), _activateMentionMenuItem(_0x345f15));
+    el46.addEventListener('mousedown', (event6) => {
+      (event6.preventDefault(), event6.stopPropagation(), _activateMentionMenuItem(el46));
     }),
-    _0x345f15
+    el46
   );
 }
 function _appendMentionCandidateItem(
-  _0x2148fe,
-  _0x119d4c,
-  _0xc9b12e,
+  el52,
+  value223,
+  label5,
   { triggerRange: triggerRange = null, atIndex: atIndex = -1, pillToEdit: pillToEdit = null } = {},
 ) {
-  const _0x5be440 = _createMentionMenuItem({
-    label: _0xc9b12e.label,
-    title: _0xc9b12e.limitReason || '',
-    disabled: !!_0xc9b12e.limitReason,
-    thumbUrl: _0xc9b12e.thumbUrl || '',
-    thumbNode: _0xc9b12e.thumbNode || null,
-    iconType: _0xc9b12e.iconType || _0xc9b12e.type || '',
+  const _createMentionMenuItem2 = _createMentionMenuItem({
+    label: label5.label,
+    title: label5.limitReason || '',
+    disabled: !!label5.limitReason,
+    thumbUrl: label5.thumbUrl || '',
+    thumbNode: label5.thumbNode || null,
+    iconType: label5.iconType || label5.type || '',
     onSelect: () => {
-      if (_0xc9b12e.limitReason) {
-        globalThis.window?.showToast?.(_0xc9b12e.limitReason, 'warn');
+      if (label5.limitReason) {
+        globalThis.window?.showToast?.(label5.limitReason, 'warn');
         return;
       }
-      (_insertMentionPill(_0x119d4c, {
-        label: _0xc9b12e.label,
-        nodeId: _0xc9b12e.nodeId,
-        candidate: _0xc9b12e,
+      (_insertMentionPill(value223, {
+        label: label5.label,
+        nodeId: label5.nodeId,
+        candidate: label5,
         triggerRange: triggerRange,
         atIndex: atIndex,
         pillToEdit: pillToEdit,
@@ -2046,194 +2073,209 @@ function _appendMentionCandidateItem(
     },
   });
   return (
-    _0xc9b12e.assetName &&
-      !_0xc9b12e.limitReason &&
-      (_0x5be440.title = _0xc9b12e.assetName + ' · ' + _getAssetTypeMenuLabel(_0xc9b12e.type)),
-    _0x2148fe.appendChild(_0x5be440),
-    _0x5be440
+    label5.assetName &&
+      !label5.limitReason &&
+      (_createMentionMenuItem2.title = label5.assetName + ' · ' + _getAssetTypeMenuLabel(label5.type)),
+    el52.appendChild(_createMentionMenuItem2),
+    _createMentionMenuItem2
   );
 }
-function _getBulkAssetLimitReason(_0x59d71e, _0x33b87e = [], _0x48a673 = null) {
-  const _0x41099f = (Array.isArray(_0x33b87e) ? _0x33b87e : []).filter(
-    (_0x16c1e7) => _0x16c1e7?.origin === 'asset',
-  );
-  if (!_0x41099f.length) return nodePromptSharedText('assetUnavailable');
-  const _0x3868ce = appStore.getState(),
-    _0x56e01a = _0x3868ce.nodes?.[_0x59d71e?.nodeId] || _0x59d71e?._data || {},
-    _0x5d0719 = getTargetInputPolicy(_0x56e01a);
-  if (_isAdvancedVoiceCloneTarget(_0x56e01a)) {
-    const _0x4711aa = _getActualAudioInputKeysForTarget(_0x59d71e?.nodeId, _0x56e01a, _0x3868ce),
-      _0x3930b2 = Number(_0x5d0719?.maxByKind?.audio);
-    for (const _0x801a62 of _0x41099f) {
-      const _0x6f4dfd = _getMentionType(_0x801a62.type);
-      if (!_0x6f4dfd) continue;
-      if (_0x6f4dfd !== 'audio') {
-        const _0x26dc2d = getInputLimitReason(_0x5d0719, _0x6f4dfd, {});
-        if (_0x26dc2d) return _0x26dc2d;
+function _getBulkAssetLimitReason(value224, value225 = [], value226 = null) {
+  const list22 = (Array.isArray(value225) ? value225 : []).filter((item32) => item32?.origin === 'asset');
+  if (!list22.length) return nodePromptSharedText('assetUnavailable');
+  const value227 = appStore.getState(),
+    nodeData4 = value227.nodes?.[value224?.nodeId] || value224?._data || {},
+    targetInputPolicy4 = getTargetInputPolicy(nodeData4);
+  if (_isAdvancedVoiceCloneTarget(nodeData4)) {
+    const audio2 = _getActualAudioInputKeysForTarget(value224?.nodeId, nodeData4, value227),
+      value228 = Number(targetInputPolicy4?.maxByKind?.audio);
+    for (const value229 of list22) {
+      const _getMentionType22 = _getMentionType(value229.type);
+      if (!_getMentionType22) continue;
+      if (_getMentionType22 !== 'audio') {
+        const inputLimitReason = getInputLimitReason(targetInputPolicy4, _getMentionType22, {});
+        if (inputLimitReason) return inputLimitReason;
         continue;
       }
-      const _0x181dd3 = _getMentionAudioInputKey(_0x801a62);
-      if (_0x181dd3 && _0x4711aa.has(_0x181dd3)) continue;
-      if (Number.isFinite(_0x3930b2) && _0x4711aa.size >= _0x3930b2)
-        return getInputLimitReason(_0x5d0719, 'audio', { audio: _0x4711aa.size });
-      if (_0x181dd3) _0x4711aa.add(_0x181dd3);
+      const _getMentionAudioInputKey3 = _getMentionAudioInputKey(value229);
+      if (_getMentionAudioInputKey3 && audio2.has(_getMentionAudioInputKey3)) continue;
+      if (Number.isFinite(value228) && audio2.size >= value228)
+        return getInputLimitReason(targetInputPolicy4, 'audio', { audio: audio2.size });
+      if (_getMentionAudioInputKey3) audio2.add(_getMentionAudioInputKey3);
     }
     return '';
   }
-  const _0x198852 = _getPromptInputCountState(_0x59d71e?.promptEl, _0x48a673 || null, {
-      nodeData: _0x56e01a,
+  const _getPromptInputCountState4 = _getPromptInputCountState(value224?.promptEl, value226 || null, {
+      nodeData: nodeData4,
     }),
-    _0x25e233 = _0x3868ce.nodes || {};
-  appStore.getIncomingEdges(_0x59d71e?.nodeId).forEach((_0xa970cb) => {
-    const _0xee409b = resolveEffectiveInputKind(_0x25e233?.[_0xa970cb?.sourceId], _0xa970cb);
-    _addInputCount(_0x198852, _0xee409b, _getNodeInputCountKey(_0xa970cb?.sourceId, _0xee409b));
+    value230 = value227.nodes || {};
+  appStore.getIncomingEdges(value224?.nodeId).forEach((item33) => {
+    const effectiveInputKind3 = resolveEffectiveInputKind(value230?.[item33?.sourceId], item33);
+    _addInputCount(
+      _getPromptInputCountState4,
+      effectiveInputKind3,
+      _getNodeInputCountKey(item33?.sourceId, effectiveInputKind3),
+    );
   });
-  for (const _0x220a7f of _0x41099f) {
-    const _0x3ea8af = _getMentionType(_0x220a7f.type);
-    if (!_0x3ea8af) continue;
+  for (const value231 of list22) {
+    const _getMentionType23 = _getMentionType(value231.type);
+    if (!_getMentionType23) continue;
     if (
-      _canReuseAlreadyCountedInputForLimit(_0x3ea8af) &&
-      _isMentionAlreadyCounted(_0x198852, _0x220a7f, _0x3ea8af)
+      _canReuseAlreadyCountedInputForLimit(_getMentionType23) &&
+      _isMentionAlreadyCounted(_getPromptInputCountState4, value231, _getMentionType23)
     )
       continue;
-    const _0x3ae335 = getInputLimitReason(_0x5d0719, _0x3ea8af, _0x198852.counts);
-    if (_0x3ae335) return _0x3ae335;
-    _addInputCount(_0x198852, _0x3ea8af, _getMentionInputCountKey(_0x220a7f, _0x3ea8af));
+    const inputLimitReason2 = getInputLimitReason(
+      targetInputPolicy4,
+      _getMentionType23,
+      _getPromptInputCountState4.counts,
+    );
+    if (inputLimitReason2) return inputLimitReason2;
+    _addInputCount(
+      _getPromptInputCountState4,
+      _getMentionType23,
+      _getMentionInputCountKey(value231, _getMentionType23),
+    );
   }
   return '';
 }
-function _createMentionPillForCandidate(_0x2fc370, _0x7090df = null) {
-  const _0x43f8f9 = document.createElement('span');
-  ((_0x43f8f9.className = 'ref-pill'), (_0x43f8f9.contentEditable = 'false'));
-  const _0x31eb77 = _getMentionType(_0x2fc370?.type),
-    _0x2afc7f = _stripMentionDisplayMarker(_0x2fc370?.label || '');
-  _0x43f8f9.dataset.label = _0x2afc7f;
-  if (_0x2fc370?.origin === 'asset')
+function _createMentionPillForCandidate(value232, value233 = null) {
+  const el53 = document.createElement('span');
+  ((el53.className = 'ref-pill'), (el53.contentEditable = 'false'));
+  const _getMentionType24 = _getMentionType(value232?.type),
+    _stripMentionDisplayMarker7 = _stripMentionDisplayMarker(value232?.label || '');
+  el53.dataset.label = _stripMentionDisplayMarker7;
+  if (value232?.origin === 'asset')
     return (
-      (_0x43f8f9.dataset.refOrigin = 'asset'),
-      (_0x43f8f9.dataset.assetId = String(_0x2fc370.assetId || '')),
-      (_0x43f8f9.dataset.assetIndex = String(_0x2fc370.assetIndex ?? '')),
-      (_0x43f8f9.dataset.refType = String(_0x31eb77 || _0x2fc370.type || '')),
-      _renderMentionPillContent(_0x43f8f9, _0x2afc7f, _getMentionVisual(_0x7090df, _0x2fc370, _0x43f8f9)),
-      _0x43f8f9
+      (el53.dataset.refOrigin = 'asset'),
+      (el53.dataset.assetId = String(value232.assetId || '')),
+      (el53.dataset.assetIndex = String(value232.assetIndex ?? '')),
+      (el53.dataset.refType = String(_getMentionType24 || value232.type || '')),
+      _renderMentionPillContent(
+        el53,
+        _stripMentionDisplayMarker7,
+        _getMentionVisual(value233, value232, el53),
+      ),
+      el53
     );
   return (
-    (_0x43f8f9.dataset.refOrigin = 'node'),
-    (_0x43f8f9.dataset.nodeId = String(_0x2fc370?.nodeId || '')),
-    (_0x31eb77 || _0x2fc370?.type) && (_0x43f8f9.dataset.refType = String(_0x31eb77 || _0x2fc370.type || '')),
-    _renderMentionPillContent(_0x43f8f9, _0x2afc7f, _getMentionVisual(_0x7090df, _0x2fc370, _0x43f8f9)),
-    _0x43f8f9
+    (el53.dataset.refOrigin = 'node'),
+    (el53.dataset.nodeId = String(value232?.nodeId || '')),
+    (_getMentionType24 || value232?.type) &&
+      (el53.dataset.refType = String(_getMentionType24 || value232.type || '')),
+    _renderMentionPillContent(el53, _stripMentionDisplayMarker7, _getMentionVisual(value233, value232, el53)),
+    el53
   );
 }
 function _insertMentionPills(
-  _0x1c04ae,
-  _0x5969bf = [],
+  enabled59,
+  value234 = [],
   { triggerRange: triggerRange = null, atIndex: atIndex = -1, pillToEdit: pillToEdit = null } = {},
 ) {
-  if (!_0x1c04ae?.promptEl) return false;
-  const _0x5c9d94 = (Array.isArray(_0x5969bf) ? _0x5969bf : []).filter(Boolean);
-  if (!_0x5c9d94.length) return false;
-  if (pillToEdit) return _insertMentionPill(_0x1c04ae, { candidate: _0x5c9d94[0], pillToEdit: pillToEdit });
-  const _0x4888bd = _0x5c9d94.filter((_0x44ba32) =>
-      _shouldStoreMentionAsPromptAssetInput(_0x1c04ae, _0x44ba32),
-    ),
-    _0x19a158 = _0x5c9d94.filter((_0x3c23f9) => !_shouldStoreMentionAsPromptAssetInput(_0x1c04ae, _0x3c23f9));
-  if (!_0x19a158.length) {
-    const _0x2c9d85 = _appendPromptAssetInputRefRecords(_0x1c04ae, _0x4888bd);
+  if (!enabled59?.promptEl) return false;
+  const candidate2 = (Array.isArray(value234) ? value234 : []).filter(Boolean);
+  if (!candidate2.length) return false;
+  if (pillToEdit) return _insertMentionPill(enabled59, { candidate: candidate2[0], pillToEdit: pillToEdit });
+  const list23 = candidate2.filter((item34) => _shouldStoreMentionAsPromptAssetInput(enabled59, item34)),
+    list24 = candidate2.filter((item35) => !_shouldStoreMentionAsPromptAssetInput(enabled59, item35));
+  if (!list24.length) {
+    const _appendPromptAssetInputRefRecords3 = _appendPromptAssetInputRefRecords(enabled59, list23);
     if (!_consumeMentionTriggerText({ triggerRange: triggerRange, atIndex: atIndex })) return false;
-    return _commitPromptAndAssetInputRefs(_0x1c04ae, _0x2c9d85);
+    return _commitPromptAndAssetInputRefs(enabled59, _appendPromptAssetInputRefRecords3);
   }
-  const _0x406ebc = window.getSelection(),
-    _0x1f6b70 = triggerRange || (_0x406ebc && _0x406ebc.rangeCount ? _0x406ebc.getRangeAt(0) : null);
-  if (!_0x1f6b70 || _0x1f6b70.startContainer.nodeType !== Node.TEXT_NODE) return false;
-  const _0x5007c6 = _0x1f6b70.startContainer,
-    _0x309411 = String(_0x5007c6.textContent || ''),
-    _0xf01dc = _0x1f6b70.startOffset,
-    _0x316eae = Number.isFinite(atIndex) && atIndex >= 0 ? atIndex : _0x309411.lastIndexOf('@', _0xf01dc - 1);
-  if (_0x316eae < 0) return false;
-  const _0x2c00ca = document.createTextNode(_0x309411.slice(0, _0x316eae)),
-    _0x509479 = document.createTextNode(_0x309411.slice(_0xf01dc)),
-    _0x26ce87 = _0x5007c6.parentNode;
-  if (!_0x26ce87) return false;
-  _0x26ce87.replaceChild(_0x509479, _0x5007c6);
-  const _0x7b5230 = [];
-  (_0x19a158.forEach((_0x597dca, _0xec96c0) => {
-    _0xec96c0 > 0 && _0x26ce87.insertBefore(document.createTextNode('\xa0'), _0x509479);
-    const _0x248db1 = _createMentionPillForCandidate(_0x597dca, _0x1c04ae);
-    (_bindPromptPill(_0x1c04ae, _0x248db1),
-      _0x7b5230.push(_0x248db1),
-      _0x26ce87.insertBefore(_0x248db1, _0x509479));
+  const value235 = window.getSelection(),
+    enabled60 = triggerRange || (value235 && value235.rangeCount ? value235.getRangeAt(0) : null);
+  if (!enabled60 || enabled60.startContainer.nodeType !== Node.TEXT_NODE) return false;
+  const el54 = enabled60.startContainer,
+    list25 = String(el54.textContent || ''),
+    value236 = enabled60.startOffset,
+    count12 = Number.isFinite(atIndex) && atIndex >= 0 ? atIndex : list25.lastIndexOf('@', value236 - 1);
+  if (count12 < 0) return false;
+  const value237 = document.createTextNode(list25.slice(0, count12)),
+    value238 = document.createTextNode(list25.slice(value236)),
+    el55 = el54.parentNode;
+  if (!el55) return false;
+  el55.replaceChild(value238, el54);
+  const list26 = [];
+  (list24.forEach((item36, count13) => {
+    count13 > 0 && el55.insertBefore(document.createTextNode('\xa0'), value238);
+    const _createMentionPillForCandidate3 = _createMentionPillForCandidate(item36, enabled59);
+    (_bindPromptPill(enabled59, _createMentionPillForCandidate3),
+      list26.push(_createMentionPillForCandidate3),
+      el55.insertBefore(_createMentionPillForCandidate3, value238));
   }),
-    _0x26ce87.insertBefore(_0x2c00ca, _0x7b5230[0] || _0x509479));
-  const _0x1c7081 = document.createRange(),
-    _0x50f4bc = _0x7b5230[_0x7b5230.length - 1];
+    el55.insertBefore(value237, list26[0] || value238));
+  const value239 = document.createRange(),
+    value240 = list26[list26.length - 1];
   return (
-    _0x1c7081.setStartAfter(_0x50f4bc),
-    _0x1c7081.collapse(true),
-    _0x406ebc.removeAllRanges(),
-    _0x406ebc.addRange(_0x1c7081),
-    _0x4888bd.length
-      ? _commitPromptAndAssetInputRefs(_0x1c04ae, _appendPromptAssetInputRefRecords(_0x1c04ae, _0x4888bd))
-      : _updatePromptHtml(_0x1c04ae),
+    value239.setStartAfter(value240),
+    value239.collapse(true),
+    value235.removeAllRanges(),
+    value235.addRange(value239),
+    list23.length
+      ? _commitPromptAndAssetInputRefs(enabled59, _appendPromptAssetInputRefRecords(enabled59, list23))
+      : _updatePromptHtml(enabled59),
     true
   );
 }
-function _appendMentionDivider(_0x1b9afc) {
-  const _0x2a2e15 = document.createElement('div');
-  return ((_0x2a2e15.className = 'at-mention-divider'), _0x1b9afc.appendChild(_0x2a2e15), _0x2a2e15);
+function _appendMentionDivider(el56) {
+  const value241 = document.createElement('div');
+  return ((value241.className = 'at-mention-divider'), el56.appendChild(value241), value241);
 }
 function _createMentionSubmenu({ leaf: leaf = false } = {}) {
-  const _0x453cdf = document.createElement('div');
+  const el57 = document.createElement('div');
   return (
-    (_0x453cdf.className =
+    (el57.className =
       'at-mention-menu at-mention-submenu' +
       (leaf ? ' at-mention-leaf-submenu' : ' at-mention-branch-submenu')),
-    _0x453cdf.addEventListener('mouseenter', () => {
-      _mentionMenuState.activeMenu = _0x453cdf;
+    el57.addEventListener('mouseenter', () => {
+      _mentionMenuState.activeMenu = el57;
     }),
-    _0x453cdf
+    el57
   );
 }
 export function _populateMentionMenu(
-  _0x45b73d,
+  value242,
   {
-    x: _0x456577,
-    y: _0x28d05b,
+    x: x,
+    y: y,
     triggerRange: triggerRange = null,
     query: query = '',
     atIndex: atIndex = -1,
     pillToEdit: pillToEdit = null,
   } = {},
 ) {
-  const _0x3224b = _getMentionMenu();
+  const menu = _getMentionMenu();
   _cleanupMentionMenuLifecycle();
-  const _0x3c7dda = _buildMentionCandidates(_0x45b73d, query, { excludePill: pillToEdit || null }),
-    _0x41a8d0 = _buildMentionMenuTree(_0x3c7dda);
-  _0x3224b.innerHTML = '';
-  if (!_0x3c7dda.length) return (_closeMentionMenu(), false);
+  const list27 = _buildMentionCandidates(value242, query, { excludePill: pillToEdit || null }),
+    _buildMentionMenuTree2 = _buildMentionMenuTree(list27);
+  menu.innerHTML = '';
+  if (!list27.length) return (_closeMentionMenu(), false);
   return (
-    _0x41a8d0.nodeItems.forEach((_0x205d61) => {
-      _appendMentionCandidateItem(_0x3224b, _0x45b73d, _0x205d61, {
+    _buildMentionMenuTree2.nodeItems.forEach((item37) => {
+      _appendMentionCandidateItem(menu, value242, item37, {
         triggerRange: triggerRange,
         atIndex: atIndex,
         pillToEdit: pillToEdit,
       });
     }),
-    _0x41a8d0.nodeItems.length && _0x41a8d0.assetItems.length && _appendMentionDivider(_0x3224b),
-    _0x41a8d0.assetItems.forEach((_0x5bd0a0) => {
-      const _0x460511 = _createMentionMenuItem({ label: _0x5bd0a0.label, hasSubmenu: true }),
-        _0x7397ef = _createMentionSubmenu(),
-        _0x211d11 = _getBulkAssetLimitReason(_0x45b73d, _0x5bd0a0.items, pillToEdit),
-        _0x2dd753 = _createMentionMenuItem({
+    _buildMentionMenuTree2.nodeItems.length &&
+      _buildMentionMenuTree2.assetItems.length &&
+      _appendMentionDivider(menu),
+    _buildMentionMenuTree2.assetItems.forEach((label6) => {
+      const el58 = _createMentionMenuItem({ label: label6.label, hasSubmenu: true }),
+        el59 = _createMentionSubmenu(),
+        title2 = _getBulkAssetLimitReason(value242, label6.items, pillToEdit),
+        _createMentionMenuItem3 = _createMentionMenuItem({
           label: nodePromptSharedText('useEntireAsset'),
-          title: _0x211d11,
-          disabled: !!_0x211d11,
+          title: title2,
+          disabled: !!title2,
           onSelect: () => {
-            if (_0x211d11) {
-              globalThis.window?.showToast?.(_0x211d11, 'warn');
+            if (title2) {
+              globalThis.window?.showToast?.(title2, 'warn');
               return;
             }
-            (_insertMentionPills(_0x45b73d, _0x5bd0a0.items, {
+            (_insertMentionPills(value242, label6.items, {
               triggerRange: triggerRange,
               atIndex: atIndex,
               pillToEdit: pillToEdit,
@@ -2241,311 +2283,648 @@ export function _populateMentionMenu(
               _closeMentionMenu());
           },
         });
-      (_0x7397ef.appendChild(_0x2dd753),
-        _appendMentionDivider(_0x7397ef),
-        _0x5bd0a0.items.forEach((_0x5a4d48) => {
-          _appendMentionCandidateItem(_0x7397ef, _0x45b73d, _0x5a4d48, {
+      (el59.appendChild(_createMentionMenuItem3),
+        _appendMentionDivider(el59),
+        label6.items.forEach((item38) => {
+          _appendMentionCandidateItem(el59, value242, item38, {
             triggerRange: triggerRange,
             atIndex: atIndex,
             pillToEdit: pillToEdit,
           });
         }),
-        _0x460511.appendChild(_0x7397ef),
-        _0x3224b.appendChild(_0x460511));
+        el58.appendChild(el59),
+        menu.appendChild(el58));
     }),
-    (_0x3224b.style.display = 'flex'),
-    (_0x3224b.style.pointerEvents = 'auto'),
-    (_0x3224b.style.bottom = ''),
-    (_0x3224b.style.marginTop = ''),
-    (_0x3224b.style.marginBottom = ''),
-    (_0x3224b.style.transformOrigin = ''),
+    (menu.style.display = 'flex'),
+    (menu.style.pointerEvents = 'auto'),
+    (menu.style.bottom = ''),
+    (menu.style.marginTop = ''),
+    (menu.style.marginBottom = ''),
+    (menu.style.transformOrigin = ''),
     (_mentionMenuPositionState = {
-      menu: _0x3224b,
+      menu: menu,
       triggerRange: triggerRange,
       pillToEdit: pillToEdit,
-      fallbackX: Number(_0x456577),
-      fallbackY: Number(_0x28d05b),
+      fallbackX: Number(x),
+      fallbackY: Number(y),
     }),
     _positionMentionMenu(),
-    (_mentionMenuState.activeMenu = _0x3224b),
-    _setInitialMentionActiveItem(_0x3224b),
+    (_mentionMenuState.activeMenu = menu),
+    _setInitialMentionActiveItem(menu),
     _watchMentionViewport(),
-    _bindMentionOutsideDocClick(_0x3224b),
+    _bindMentionOutsideDocClick(menu),
     true
   );
 }
-export function _checkAtTrigger(_0x10a11e, _0x231f66) {
-  if (_0x231f66?.inputType === 'insertCompositionText') return false;
-  const _0x538f17 = window.getSelection();
-  if (!_0x538f17.rangeCount) return false;
-  const _0x4c7ebb = _0x538f17.getRangeAt(0).cloneRange();
-  if (_0x4c7ebb.startContainer.nodeType !== Node.TEXT_NODE) return (_closeMentionMenu(), false);
-  const _0x3810b3 = String(_0x4c7ebb.startContainer.textContent || '').slice(0, _0x4c7ebb.startOffset),
-    _0x141071 = _0x3810b3.lastIndexOf('@');
-  if (_0x141071 === -1) return (_closeMentionMenu(), false);
-  const _0x1e5257 = _0x3810b3.slice(_0x141071 + 1);
-  if (_0x1e5257.length > 20) return (_closeMentionMenu(), false);
-  const _0x34f3ed = _0x4c7ebb.getBoundingClientRect();
-  return _populateMentionMenu(_0x10a11e, {
-    x: _0x34f3ed.left,
-    y: _0x34f3ed.bottom + 5,
-    triggerRange: _0x4c7ebb,
-    query: _0x1e5257,
-    atIndex: _0x141071,
+export function _checkAtTrigger(value243, value244) {
+  if (value244?.inputType === 'insertCompositionText') return false;
+  const enabled61 = window.getSelection();
+  if (!enabled61.rangeCount) return false;
+  const triggerRange2 = enabled61.getRangeAt(0).cloneRange();
+  if (triggerRange2.startContainer.nodeType !== Node.TEXT_NODE) return (_closeMentionMenu(), false);
+  const list28 = String(triggerRange2.startContainer.textContent || '').slice(0, triggerRange2.startOffset),
+    atIndex2 = list28.lastIndexOf('@');
+  if (atIndex2 === -1) return (_closeMentionMenu(), false);
+  const query2 = list28.slice(atIndex2 + 1);
+  if (query2.length > 20) return (_closeMentionMenu(), false);
+  const x2 = triggerRange2.getBoundingClientRect();
+  return _populateMentionMenu(value243, {
+    x: x2.left,
+    y: x2.bottom + 5,
+    triggerRange: triggerRange2,
+    query: query2,
+    atIndex: atIndex2,
   });
 }
-export function _handleMentionMenuKeyboard(_0x547e) {
-  const _0x41c9fd = _getMentionMenu();
-  if (_0x41c9fd.style.display !== 'flex') return false;
-  const _0x4a2e5c = _mentionMenuState.activeMenu || _0x41c9fd,
-    _0x440734 = _getDirectMentionItems(_0x4a2e5c);
-  if (!_0x440734.length) {
-    if (_0x547e.key === 'Escape') return (_0x547e.preventDefault(), _closeMentionMenu(), true);
+export function _handleMentionMenuKeyboard(event7) {
+  const el60 = _getMentionMenu();
+  if (el60.style.display !== 'flex') return false;
+  const value245 = _mentionMenuState.activeMenu || el60,
+    list29 = _getDirectMentionItems(value245);
+  if (!list29.length) {
+    if (event7.key === 'Escape') return (event7.preventDefault(), _closeMentionMenu(), true);
     return false;
   }
-  let _0x463a07 = _0x440734.findIndex((_0x19d2a3) => _0x19d2a3.classList.contains('active'));
-  if (_0x463a07 < 0) _0x463a07 = 0;
-  if (_0x547e.key === 'ArrowDown')
+  let count14 = list29.findIndex((el61) => el61.classList.contains('active'));
+  if (count14 < 0) count14 = 0;
+  if (event7.key === 'ArrowDown')
     return (
-      _0x547e.preventDefault(),
-      (_0x463a07 = _0x463a07 < _0x440734.length - 1 ? _0x463a07 + 1 : 0),
-      _setActiveMentionItem(_0x440734[_0x463a07]),
-      _0x440734[_0x463a07]?.scrollIntoView({ block: 'nearest' }),
+      event7.preventDefault(),
+      (count14 = count14 < list29.length - 1 ? count14 + 1 : 0),
+      _setActiveMentionItem(list29[count14]),
+      list29[count14]?.scrollIntoView({ block: 'nearest' }),
       true
     );
-  if (_0x547e.key === 'ArrowUp')
+  if (event7.key === 'ArrowUp')
     return (
-      _0x547e.preventDefault(),
-      (_0x463a07 = _0x463a07 > 0 ? _0x463a07 - 1 : _0x440734.length - 1),
-      _setActiveMentionItem(_0x440734[_0x463a07]),
-      _0x440734[_0x463a07]?.scrollIntoView({ block: 'nearest' }),
+      event7.preventDefault(),
+      (count14 = count14 > 0 ? count14 - 1 : list29.length - 1),
+      _setActiveMentionItem(list29[count14]),
+      list29[count14]?.scrollIntoView({ block: 'nearest' }),
       true
     );
-  if (_0x547e.key === 'ArrowRight') {
-    _0x547e.preventDefault();
-    if (_0x463a07 >= 0) _openMentionSubmenu(_0x440734[_0x463a07], { focusSubmenu: true });
+  if (event7.key === 'ArrowRight') {
+    event7.preventDefault();
+    if (count14 >= 0) _openMentionSubmenu(list29[count14], { focusSubmenu: true });
     return true;
   }
-  if (_0x547e.key === 'ArrowLeft') {
-    _0x547e.preventDefault();
-    if (_0x4a2e5c !== _0x41c9fd && _0x4a2e5c.parentElement) {
-      const _0x229dae = _0x4a2e5c.parentElement,
-        _0x11cff9 = _0x229dae.parentElement || _0x41c9fd;
-      (_0x229dae.classList.remove('at-mention-submenu-open'),
-        _clearActiveItems(_0x11cff9),
-        _0x229dae.classList.add('active'),
-        (_mentionMenuState.activeMenu = _0x11cff9));
+  if (event7.key === 'ArrowLeft') {
+    event7.preventDefault();
+    if (value245 !== el60 && value245.parentElement) {
+      const el62 = value245.parentElement,
+        value246 = el62.parentElement || el60;
+      (el62.classList.remove('at-mention-submenu-open'),
+        _clearActiveItems(value246),
+        el62.classList.add('active'),
+        (_mentionMenuState.activeMenu = value246));
     }
     return true;
   }
-  if (_0x547e.key === 'Enter') {
-    _0x547e.preventDefault();
-    if (_0x463a07 >= 0) _activateMentionMenuItem(_0x440734[_0x463a07]);
+  if (event7.key === 'Enter') {
+    event7.preventDefault();
+    if (count14 >= 0) _activateMentionMenuItem(list29[count14]);
     return true;
   }
-  if (_0x547e.key === 'Escape') return (_0x547e.preventDefault(), _closeMentionMenu(), true);
+  if (event7.key === 'Escape') return (event7.preventDefault(), _closeMentionMenu(), true);
   return false;
 }
-export function _bindPromptPill(_0x565f80, _0x120d8a) {
-  if (!_0x120d8a) return;
-  _0x120d8a.querySelectorAll('.pill-del').forEach((_0x58e7a9) => _0x58e7a9.remove());
-  const _0x1f75ee = _stripMentionDisplayMarker(
-    String(_0x120d8a.dataset.label || _0x120d8a.textContent || '').replace(/[×✕✖]/g, ''),
+export function _bindPromptPill(value247, pillToEdit2) {
+  if (!pillToEdit2) return;
+  pillToEdit2.querySelectorAll('.pill-del').forEach((el63) => el63.remove());
+  const _stripMentionDisplayMarker8 = _stripMentionDisplayMarker(
+    String(pillToEdit2.dataset.label || pillToEdit2.textContent || '').replace(/[×✕✖]/g, ''),
   );
-  ((_0x120d8a.dataset.label = _0x1f75ee),
-    _renderMentionPillContent(_0x120d8a, _0x1f75ee, _getMentionVisual(_0x565f80, null, _0x120d8a)),
-    _isUnresolvedInputMentionPill(_0x120d8a) &&
-      (_0x120d8a.classList?.add?.('ref-pill--unresolved'),
-      (_0x120d8a.title = 'Input reference is not bound in this node.')),
-    (_0x120d8a.onmousedown = (_0x1a4b04) => {
-      (_0x1a4b04.preventDefault(), _0x1a4b04.stopPropagation());
-      const _0x49f123 = _0x120d8a.getBoundingClientRect();
-      _populateMentionMenu(_0x565f80, {
-        x: _0x49f123.left,
-        y: _0x49f123.bottom + 5,
-        pillToEdit: _0x120d8a,
+  ((pillToEdit2.dataset.label = _stripMentionDisplayMarker8),
+    _renderMentionPillContent(
+      pillToEdit2,
+      _stripMentionDisplayMarker8,
+      _getMentionVisual(value247, null, pillToEdit2),
+    ),
+    _isUnresolvedInputMentionPill(pillToEdit2) &&
+      (pillToEdit2.classList?.add?.('ref-pill--unresolved'),
+      (pillToEdit2.title = 'Input reference is not bound in this node.')),
+    (pillToEdit2.onmousedown = (event8) => {
+      (event8.preventDefault(), event8.stopPropagation());
+      const x3 = pillToEdit2.getBoundingClientRect();
+      _populateMentionMenu(value247, {
+        x: x3.left,
+        y: x3.bottom + 5,
+        pillToEdit: pillToEdit2,
         query: '',
         atIndex: -1,
         triggerRange: null,
       });
     }));
 }
-export function _rehydratePromptPills(_0x5e59ab) {
-  if (!_0x5e59ab?.promptEl) return;
-  _0x5e59ab.promptEl.querySelectorAll('.ref-pill').forEach((_0x3ffd02) => {
-    _bindPromptPill(_0x5e59ab, _0x3ffd02);
+export function _rehydratePromptPills(enabled62) {
+  if (!enabled62?.promptEl) return;
+  enabled62.promptEl.querySelectorAll('.ref-pill').forEach((item39) => {
+    _bindPromptPill(enabled62, item39);
   });
 }
 const CARET_SPACER_TEXT_RE = /^[\u00A0\u200B\u200C\u200D\uFEFF]*$/;
-function _isCaretSpacerTextNode(_0x415e83) {
+function _isCaretSpacerTextNode(el64) {
   return !!(
-    _0x415e83 &&
-    _0x415e83.nodeType === Node.TEXT_NODE &&
-    CARET_SPACER_TEXT_RE.test(String(_0x415e83.textContent || ''))
+    el64 &&
+    el64.nodeType === Node.TEXT_NODE &&
+    CARET_SPACER_TEXT_RE.test(String(el64.textContent || ''))
   );
 }
-function _findRefPillNearNode(_0x24e8bd, _0x5d049e) {
-  let _0x3c2e3f = _0x24e8bd || null;
-  while (_0x3c2e3f) {
-    if (_isRefPillNode(_0x3c2e3f)) return _0x3c2e3f;
-    if (!_isCaretSpacerTextNode(_0x3c2e3f)) return null;
-    _0x3c2e3f = _0x5d049e === 'previous' ? _0x3c2e3f.previousSibling : _0x3c2e3f.nextSibling;
+function _findRefPillNearNode(value248, value249) {
+  let value250 = value248 || null;
+  while (value250) {
+    if (_isRefPillNode(value250)) return value250;
+    if (!_isCaretSpacerTextNode(value250)) return null;
+    value250 = value249 === 'previous' ? value250.previousSibling : value250.nextSibling;
   }
   return null;
 }
-function _getSelectedRefPill(_0x427fb3) {
-  const _0x562a97 = _0x427fb3?.startContainer,
-    _0x5bd7e0 = _0x427fb3?.endContainer;
-  if (!_0x562a97 || _0x562a97 !== _0x5bd7e0 || _0x562a97.nodeType !== Node.ELEMENT_NODE) return null;
-  if (_0x427fb3.endOffset - _0x427fb3.startOffset !== 1) return null;
-  return _isRefPillNode(_0x562a97.childNodes?.[_0x427fb3.startOffset])
-    ? _0x562a97.childNodes[_0x427fb3.startOffset]
+function _getSelectedRefPill(value251) {
+  const enabled63 = value251?.startContainer,
+    value252 = value251?.endContainer;
+  if (!enabled63 || enabled63 !== value252 || enabled63.nodeType !== Node.ELEMENT_NODE) return null;
+  if (value251.endOffset - value251.startOffset !== 1) return null;
+  return _isRefPillNode(enabled63.childNodes?.[value251.startOffset])
+    ? enabled63.childNodes[value251.startOffset]
     : null;
 }
-export function _handlePillKeyboard(_0x2d78ac, _0x4cec3a) {
-  if (!_0x2d78ac?.promptEl) return false;
-  if (_0x4cec3a.key !== 'Backspace' && _0x4cec3a.key !== 'Delete') return false;
-  const _0x270333 = window.getSelection();
-  if (!_0x270333.rangeCount) return false;
-  const _0x50a6f8 = _0x270333.getRangeAt(0);
-  if (!_0x50a6f8.collapsed) {
-    const _0x4f554a = _getSelectedRefPill(_0x50a6f8);
-    if (!_0x4f554a) return false;
-    return (_0x4cec3a.preventDefault(), _0x4f554a.remove(), _updatePromptHtml(_0x2d78ac), true);
+export function _handlePillKeyboard(enabled64, event9) {
+  if (!enabled64?.promptEl) return false;
+  if (event9.key !== 'Backspace' && event9.key !== 'Delete') return false;
+  const enabled65 = window.getSelection();
+  if (!enabled65.rangeCount) return false;
+  const enabled66 = enabled65.getRangeAt(0);
+  if (!enabled66.collapsed) {
+    const el65 = _getSelectedRefPill(enabled66);
+    if (!el65) return false;
+    return (event9.preventDefault(), el65.remove(), _updatePromptHtml(enabled64), true);
   }
-  const _0x105412 = _0x50a6f8.startContainer,
-    _0x11d52a = _0x50a6f8.startOffset;
-  let _0x32a1ad = null;
-  if (_0x105412.nodeType === Node.TEXT_NODE) {
-    const _0x1114de = String(_0x105412.textContent || '');
+  const el66 = enabled66.startContainer,
+    count15 = enabled66.startOffset;
+  let el67 = null;
+  if (el66.nodeType === Node.TEXT_NODE) {
+    const list30 = String(el66.textContent || '');
     if (
-      _0x4cec3a.key === 'Backspace' &&
-      (_0x11d52a === 0 || CARET_SPACER_TEXT_RE.test(_0x1114de.slice(0, _0x11d52a)))
+      event9.key === 'Backspace' &&
+      (count15 === 0 || CARET_SPACER_TEXT_RE.test(list30.slice(0, count15)))
     ) {
-      _0x32a1ad = _findRefPillNearNode(_0x105412.previousSibling, 'previous');
-      if (_0x32a1ad && _0x11d52a > 0) _0x105412.textContent = _0x1114de.slice(_0x11d52a);
+      el67 = _findRefPillNearNode(el66.previousSibling, 'previous');
+      if (el67 && count15 > 0) el66.textContent = list30.slice(count15);
     } else {
       if (
-        _0x4cec3a.key === 'Delete' &&
-        (_0x11d52a === _0x1114de.length || CARET_SPACER_TEXT_RE.test(_0x1114de.slice(_0x11d52a)))
+        event9.key === 'Delete' &&
+        (count15 === list30.length || CARET_SPACER_TEXT_RE.test(list30.slice(count15)))
       ) {
-        _0x32a1ad = _findRefPillNearNode(_0x105412.nextSibling, 'next');
-        if (_0x32a1ad && _0x11d52a < _0x1114de.length) _0x105412.textContent = _0x1114de.slice(0, _0x11d52a);
+        el67 = _findRefPillNearNode(el66.nextSibling, 'next');
+        if (el67 && count15 < list30.length) el66.textContent = list30.slice(0, count15);
       }
     }
   } else {
-    if (_0x105412.nodeType === Node.ELEMENT_NODE) {
-      if (_0x4cec3a.key === 'Backspace' && _0x11d52a > 0)
-        _0x32a1ad = _findRefPillNearNode(_0x105412.childNodes[_0x11d52a - 1], 'previous');
+    if (el66.nodeType === Node.ELEMENT_NODE) {
+      if (event9.key === 'Backspace' && count15 > 0)
+        el67 = _findRefPillNearNode(el66.childNodes[count15 - 1], 'previous');
       else
-        _0x4cec3a.key === 'Delete' &&
-          _0x11d52a < _0x105412.childNodes.length &&
-          (_0x32a1ad = _findRefPillNearNode(_0x105412.childNodes[_0x11d52a], 'next'));
+        event9.key === 'Delete' &&
+          count15 < el66.childNodes.length &&
+          (el67 = _findRefPillNearNode(el66.childNodes[count15], 'next'));
     }
   }
-  if (_isRefPillNode(_0x32a1ad))
-    return (_0x4cec3a.preventDefault(), _0x32a1ad.remove(), _updatePromptHtml(_0x2d78ac), true);
+  if (_isRefPillNode(el67))
+    return (event9.preventDefault(), el67.remove(), _updatePromptHtml(enabled64), true);
   return false;
 }
-export function _handlePillHover(_0x5a9dea, _0x5eb139) {
-  const _0x27e4cd = _0x5a9dea.target.closest('.ref-pill');
-  if (!_0x27e4cd || !_0x5eb139.refBarEl) return;
-  const _0x20288c = _0x27e4cd.dataset.nodeId;
-  if (!_0x20288c) return;
-  const _0xff6235 = _0x5eb139.refBarEl.querySelector('.ref-thumb-wrap[data-source-id="' + _0x20288c + '"]');
-  _0xff6235 &&
-    (_0xff6235.classList.add('highlight'),
-    _0xff6235.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }));
+export function _handlePillHover(event10, enabled67) {
+  const el68 = event10.target.closest('.ref-pill');
+  if (!el68 || !enabled67.refBarEl) return;
+  const enabled68 = el68.dataset.nodeId;
+  if (!enabled68) return;
+  const el69 = enabled67.refBarEl.querySelector('.ref-thumb-wrap[data-source-id="' + enabled68 + '"]');
+  el69 &&
+    (el69.classList.add('highlight'),
+    el69.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }));
 }
-export function _handlePillOut(_0x9d01e6, _0x5e6e51) {
-  const _0x177214 = _0x9d01e6.target.closest('.ref-pill');
-  if (!_0x177214 || !_0x5e6e51.refBarEl) return;
-  const _0x516d9f = _0x177214.dataset.nodeId;
-  if (!_0x516d9f) return;
-  const _0x581e84 = _0x5e6e51.refBarEl.querySelector('.ref-thumb-wrap[data-source-id="' + _0x516d9f + '"]');
-  _0x581e84 && _0x581e84.classList.remove('highlight');
+export function _handlePillOut(event11, enabled69) {
+  const el70 = event11.target.closest('.ref-pill');
+  if (!el70 || !enabled69.refBarEl) return;
+  const enabled70 = el70.dataset.nodeId;
+  if (!enabled70) return;
+  const el71 = enabled69.refBarEl.querySelector('.ref-thumb-wrap[data-source-id="' + enabled70 + '"]');
+  el71 && el71.classList.remove('highlight');
 }
-export function _syncEdgesOrderFromPills(_0xdfa0f0, { allowReorder: allowReorder = false } = {}) {
+export function _syncEdgesOrderFromPills(enabled71, { allowReorder: allowReorder = false } = {}) {
   if (!allowReorder) return false;
-  if (!_0xdfa0f0?.promptEl || typeof _0xdfa0f0.promptEl.querySelectorAll !== 'function') return false;
-  const _0x974cd = Array.from(_0xdfa0f0.promptEl.querySelectorAll('.ref-pill'));
-  if (_0x974cd.length === 0) return false;
-  const _0xb74c66 = appStore
-    .getIncomingEdges(_0xdfa0f0.nodeId)
-    .filter((_0x4fcb01) => !_0x4fcb01?.isGroupShared && _0x4fcb01?.targetId === _0xdfa0f0.nodeId);
-  if (_0xb74c66.length <= 1) return false;
-  const _0x5162b3 = _0x974cd.map((_0x23b813) => _0x23b813.dataset.nodeId).filter(Boolean);
-  if (_0x5162b3.length === 0) return false;
-  const _0x35ad39 = _0xb74c66.map((_0x32c9c6) => _0x32c9c6.id),
-    _0x38d14f = {};
-  _0xb74c66.forEach((_0x281157) => {
-    if (!_0x38d14f[_0x281157.sourceId]) _0x38d14f[_0x281157.sourceId] = [];
-    _0x38d14f[_0x281157.sourceId].push(_0x281157);
+  if (!enabled71?.promptEl || typeof enabled71.promptEl.querySelectorAll !== 'function') return false;
+  const list31 = Array.from(enabled71.promptEl.querySelectorAll('.ref-pill'));
+  if (list31.length === 0) return false;
+  const list32 = appStore
+    .getIncomingEdges(enabled71.nodeId)
+    .filter((enabled72) => !enabled72?.isGroupShared && enabled72?.targetId === enabled71.nodeId);
+  if (list32.length <= 1) return false;
+  const list33 = list31.map((el72) => el72.dataset.nodeId).filter(Boolean);
+  if (list33.length === 0) return false;
+  const value253 = list32.map((item40) => item40.id),
+    enabled73 = {};
+  list32.forEach((item41) => {
+    if (!enabled73[item41.sourceId]) enabled73[item41.sourceId] = [];
+    enabled73[item41.sourceId].push(item41);
   });
-  const _0x20acd6 = [];
-  (_0x5162b3.forEach((_0x56405e) => {
-    _0x38d14f[_0x56405e]?.length > 0 && _0x20acd6.push(_0x38d14f[_0x56405e].shift());
+  const list34 = [];
+  (list33.forEach((item42) => {
+    enabled73[item42]?.length > 0 && list34.push(enabled73[item42].shift());
   }),
-    Object.values(_0x38d14f).forEach((_0x32f5ca) => _0x20acd6.push(..._0x32f5ca)));
-  const _0x3b7c55 = _0x20acd6.map((_0x5adfc4) => _0x5adfc4.id);
-  if (JSON.stringify(_0x35ad39) !== JSON.stringify(_0x3b7c55))
-    return ((_0xdfa0f0._isDraggingSorting = false), appStore.updateEdgesBatch(_0x35ad39, _0x20acd6), true);
+    Object.values(enabled73).forEach((args) => list34.push(...args)));
+  const value254 = list34.map((item43) => item43.id);
+  if (JSON.stringify(value253) !== JSON.stringify(value254))
+    return ((enabled71._isDraggingSorting = false), appStore.updateEdgesBatch(value253, list34), true);
   return false;
 }
-export function _syncPillLabels(_0x1940e6, _0x3fa739) {
-  if (!_0x1940e6.promptEl) return;
-  const _0x5af196 = _0x1940e6.promptEl.querySelectorAll('.ref-pill');
-  if (!_0x5af196.length) return;
-  let _0x53054e = false;
-  (_0x5af196.forEach((_0x4e3ae9) => {
-    if (_isAssetMentionPill(_0x4e3ae9)) return;
-    const _0x118f07 = _0x4e3ae9.dataset.nodeId;
-    if (!_0x118f07) return;
-    if (_0x3fa739[_0x118f07]) {
-      const _0x1e9994 = _stripMentionDisplayMarker(_0x3fa739[_0x118f07]),
-        _0xf42c1a = _0x4e3ae9.querySelector?.('.ref-pill-label'),
-        _0x176edd = String(
-          _0x4e3ae9.dataset.label || _0xf42c1a?.textContent || _0x4e3ae9.textContent || '',
-        ).trim(),
-        _0x21fb0d = _getMentionVisual(_0x1940e6, null, _0x4e3ae9),
-        _0x342fe0 =
-          _0x176edd !== _0x1e9994 ||
-          !_0x4e3ae9.querySelector?.('.ref-pill-label') ||
-          !_isPillVisualCurrent(_0x4e3ae9, _0x21fb0d) ||
-          !!_0x4e3ae9.querySelector?.('.pill-del');
-      _0x342fe0 &&
-        ((_0x4e3ae9.dataset.label = _0x1e9994),
-        _renderMentionPillContent(_0x4e3ae9, _0x1e9994, _0x21fb0d),
-        (_0x53054e = true));
-    } else (_0x4e3ae9.remove(), (_0x53054e = true));
+export function _syncPillLabels(enabled74, value255) {
+  if (!enabled74.promptEl) return;
+  const list35 = enabled74.promptEl.querySelectorAll('.ref-pill');
+  if (!list35.length) return;
+  let value256 = false;
+  (list35.forEach((el73) => {
+    if (_isAssetMentionPill(el73)) return;
+    const enabled75 = el73.dataset.nodeId;
+    if (!enabled75) return;
+    if (value255[enabled75]) {
+      const _stripMentionDisplayMarker9 = _stripMentionDisplayMarker(value255[enabled75]),
+        el74 = el73.querySelector?.('.ref-pill-label'),
+        value257 = String(el73.dataset.label || el74?.textContent || el73.textContent || '').trim(),
+        _getMentionVisual2 = _getMentionVisual(enabled74, null, el73),
+        value258 =
+          value257 !== _stripMentionDisplayMarker9 ||
+          !el73.querySelector?.('.ref-pill-label') ||
+          !_isPillVisualCurrent(el73, _getMentionVisual2) ||
+          !!el73.querySelector?.('.pill-del');
+      value258 &&
+        ((el73.dataset.label = _stripMentionDisplayMarker9),
+        _renderMentionPillContent(el73, _stripMentionDisplayMarker9, _getMentionVisual2),
+        (value256 = true));
+    } else (el73.remove(), (value256 = true));
   }),
-    _0x53054e && _updatePromptHtml(_0x1940e6, { renderRefBar: false }));
+    value256 && _updatePromptHtml(enabled74, { renderRefBar: false }));
 }
 
-function _findLastMentionTriggerIndex(_0x4b38b7,_0x54dbdb){const _0x164049=Number["isFinite"](_0x54dbdb)?_0x54dbdb-0x1:undefined;return Math['max'](String(_0x4b38b7||'')["lastIndexOf"]('@',_0x164049),String(_0x4b38b7||'')["lastIndexOf"]('＠',_0x164049));}
+function _findLastMentionTriggerIndex(value259, value260) {
+  const value261 = Number['isFinite'](value260) ? value260 - 0x1 : undefined;
+  return Math['max'](
+    String(value259 || '')['lastIndexOf']('@', value261),
+    String(value259 || '')['lastIndexOf']('＠', value261),
+  );
+}
 
-function _getNodeMentionDisplayLabel(_0x18d6cc={},_0x467a03=''){const _0x446ce3=[_0x18d6cc?.["name"],_0x18d6cc?.["title"],_0x18d6cc?.["label"],_0x18d6cc?.["displayName"]]["map"](_0x535c06=>_stripMentionDisplayMarker(_0x535c06))["find"](Boolean);return _0x446ce3||_stripMentionDisplayMarker(_0x467a03);}
+function _getNodeMentionDisplayLabel(options12 = {}, value262 = '') {
+  const value263 = [
+    options12?.['name'],
+    options12?.['title'],
+    options12?.['label'],
+    options12?.['displayName'],
+  ]
+    ['map']((value264) => _stripMentionDisplayMarker(value264))
+    ['find'](Boolean);
+  return value263 || _stripMentionDisplayMarker(value262);
+}
 
-export function resolveTextReferenceContent(_0x1b77c7){const _0x274200=String(_0x1b77c7?.["type"]||'')["trim"]()["toLowerCase"]();if(_0x274200==="source-text"||_0x274200==="text"){const _0x9fd16c=typeof _0x1b77c7?.["content"]==="string"?_0x1b77c7['content']:_0x1b77c7?.["text"]||_0x1b77c7?.["outputText"]||_0x1b77c7?.["prompt"]||_0x1b77c7?.['label']||'';return String(_0x9fd16c)["trim"]();}return String(_0x1b77c7?.["outputText"]||_0x1b77c7?.["text"]||_0x1b77c7?.["content"]||_0x1b77c7?.['prompt']||_0x1b77c7?.["label"]||'')["trim"]();}
+export function resolveTextReferenceContent(value265) {
+  const value266 = String(value265?.['type'] || '')
+    ['trim']()
+    ['toLowerCase']();
+  if (value266 === 'source-text' || value266 === 'text') {
+    const value267 =
+      typeof value265?.['content'] === 'string'
+        ? value265['content']
+        : value265?.['text'] || value265?.['outputText'] || value265?.['prompt'] || value265?.['label'] || '';
+    return String(value267)['trim']();
+  }
+  return String(
+    value265?.['outputText'] ||
+      value265?.['text'] ||
+      value265?.['content'] ||
+      value265?.['prompt'] ||
+      value265?.['label'] ||
+      '',
+  )['trim']();
+}
 
-function _decorateMentionPill(_0x2a53fb,_0x10e2d9,_0x462b2a=null){if(typeof _0x2a53fb?.["decorateMentionPill"]!=='function')return;_0x2a53fb['decorateMentionPill']({'pill':_0x10e2d9,'mention':_0x462b2a});}
+function _decorateMentionPill(value268, value269, value270 = null) {
+  if (typeof value268?.['decorateMentionPill'] !== 'function') return;
+  value268['decorateMentionPill']({ pill: value269, mention: value270 });
+}
 
-export function createPromptMediaReferenceState(_0x2be96e=[]){const _0x2d0164={'image':0x0,'video':0x0,'audio':0x0},_0x76a9b6=new Map();for(const _0x47fe09 of _0x2be96e){const _0x37b3cc=normalizePromptMentionType(_0x47fe09["type"]),_0x5ac7a3=String(_0x47fe09['url']||'')['trim']();if(!(_0x37b3cc in _0x2d0164)||!_0x5ac7a3||_0x76a9b6["has"](_0x37b3cc+':'+_0x5ac7a3))continue;_0x2d0164[_0x37b3cc]+=0x1,_0x76a9b6["set"](_0x37b3cc+':'+_0x5ac7a3,getMentionPlaceholderLabel(_0x37b3cc,_0x2d0164[_0x37b3cc]));}return{'mediaCounts':_0x2d0164,'dedupeState':_0x76a9b6};}
+export function createPromptMediaReferenceState(list36 = []) {
+  const value271 = { image: 0x0, video: 0x0, audio: 0x0 },
+    value272 = new Map();
+  for (const response7 of list36) {
+    const promptMentionType = normalizePromptMentionType(response7['type']),
+      enabled76 = String(response7['url'] || '')['trim']();
+    if (
+      !(promptMentionType in value271) ||
+      !enabled76 ||
+      value272['has'](promptMentionType + ':' + enabled76)
+    )
+      continue;
+    ((value271[promptMentionType] += 0x1),
+      value272['set'](
+        promptMentionType + ':' + enabled76,
+        getMentionPlaceholderLabel(promptMentionType, value271[promptMentionType]),
+      ));
+  }
+  return { mediaCounts: value271, dedupeState: value272 };
+}
 
-function _readPromptHtmlForCommit(_0x5897db){const _0x4db631=serializeVirtualizedPromptHtml(_0x5897db?.['promptEl']),_0x7778bc=_0x4db631===null?sanitizePromptHtml(_0x5897db?.["promptEl"]?.["innerHTML"]||''):_0x4db631,_0x24398f=_isEmptyPromptHtml(_0x7778bc)?'':_0x7778bc;return rememberVirtualizedPromptCommit(_0x5897db,_0x24398f),_0x24398f;}
+function _readPromptHtmlForCommit(value273) {
+  const serializeVirtualizedPromptHtml2 = serializeVirtualizedPromptHtml(value273?.['promptEl']),
+    value274 =
+      serializeVirtualizedPromptHtml2 === null
+        ? sanitizePromptHtml(value273?.['promptEl']?.['innerHTML'] || '')
+        : serializeVirtualizedPromptHtml2,
+    _isEmptyPromptHtml2 = _isEmptyPromptHtml(value274) ? '' : value274;
+  return (rememberVirtualizedPromptCommit(value273, _isEmptyPromptHtml2), _isEmptyPromptHtml2);
+}
 
-export function bindPromptMentionHost(_0x529e94,{enablePaste:enablePaste=!![],enableSelectAll:enableSelectAll=!![],ignoreInlineEditor:ignoreInlineEditor=!![],inlineEditorSelector:inlineEditorSelector="[data-prompt-pill-inline-editor=\"true\"]",rehydrate:rehydrate=!![],commitHydratedPrompt:commitHydratedPrompt=!![],closeMenuOnDestroy:closeMenuOnDestroy=!![]}={}){const _0x38d655=_0x529e94?.["promptEl"];if(!_0x38d655?.['addEventListener'])return null;const _0xadb0d1=_0x23d20d=>ignoreInlineEditor&&Boolean(_0x23d20d?.["target"]?.["closest"]?.(inlineEditorSelector)),_0x34232c=_0x1720c8=>{if(_0xadb0d1(_0x1720c8))return;schedulePromptHtmlCommit(_0x529e94),_checkAtTrigger(_0x529e94,_0x1720c8);},_0xeb8a74=()=>{flushPromptHtmlCommit(_0x529e94);},_0x272fda=_0x425c1b=>{if(_0xadb0d1(_0x425c1b))return;if(_handleMentionMenuKeyboard(_0x425c1b))return;if(enableSelectAll&&handlePromptSelectAll(_0x529e94,_0x425c1b))return;_handlePillKeyboard(_0x529e94,_0x425c1b);},_0x5e2d4b=_0x46ab8b=>{if(_0xadb0d1(_0x46ab8b))return;handlePromptPaste(_0x529e94,_0x46ab8b);};_0x38d655["addEventListener"]("input",_0x34232c),_0x38d655["addEventListener"]("blur",_0xeb8a74),_0x38d655['addEventListener']('keydown',_0x272fda);if(enablePaste)_0x38d655["addEventListener"]("paste",_0x5e2d4b);if(rehydrate)_rehydratePromptPills(_0x529e94);if(commitHydratedPrompt&&typeof _0x529e94['getPromptHtml']==="function"&&typeof _0x529e94["commitPromptHtml"]==="function"){const _0x252927=_readPromptHtmlForCommit(_0x529e94);_0x252927!==_0x529e94["getPromptHtml"]()&&_0x529e94["commitPromptHtml"](_0x252927);}let _0x211083=![];return{'destroy'(){if(_0x211083)return;_0x211083=!![];if(closeMenuOnDestroy)_closeMentionMenu();flushPromptHtmlCommit(_0x529e94),_0x38d655["removeEventListener"]?.("input",_0x34232c),_0x38d655["removeEventListener"]?.("blur",_0xeb8a74),_0x38d655["removeEventListener"]?.('keydown',_0x272fda);if(enablePaste)_0x38d655['removeEventListener']?.("paste",_0x5e2d4b);}};}
+export function bindPromptMentionHost(
+  value275,
+  {
+    enablePaste: enablePaste = !![],
+    enableSelectAll: enableSelectAll = !![],
+    ignoreInlineEditor: ignoreInlineEditor = !![],
+    inlineEditorSelector: inlineEditorSelector = '[data-prompt-pill-inline-editor="true"]',
+    rehydrate: rehydrate = !![],
+    commitHydratedPrompt: commitHydratedPrompt = !![],
+    closeMenuOnDestroy: closeMenuOnDestroy = !![],
+  } = {},
+) {
+  const el75 = value275?.['promptEl'];
+  if (!el75?.['addEventListener']) return null;
+  const run3 = (value276) =>
+      ignoreInlineEditor && Boolean(value276?.['target']?.['closest']?.(inlineEditorSelector)),
+    value277 = (value278) => {
+      if (run3(value278)) return;
+      (schedulePromptHtmlCommit(value275), _checkAtTrigger(value275, value278));
+    },
+    value279 = () => {
+      flushPromptHtmlCommit(value275);
+    },
+    value280 = (value281) => {
+      if (run3(value281)) return;
+      if (_handleMentionMenuKeyboard(value281)) return;
+      if (enableSelectAll && handlePromptSelectAll(value275, value281)) return;
+      _handlePillKeyboard(value275, value281);
+    },
+    value282 = (value283) => {
+      if (run3(value283)) return;
+      handlePromptPaste(value275, value283);
+    };
+  (el75['addEventListener']('input', value277),
+    el75['addEventListener']('blur', value279),
+    el75['addEventListener']('keydown', value280));
+  if (enablePaste) el75['addEventListener']('paste', value282);
+  if (rehydrate) _rehydratePromptPills(value275);
+  if (
+    commitHydratedPrompt &&
+    typeof value275['getPromptHtml'] === 'function' &&
+    typeof value275['commitPromptHtml'] === 'function'
+  ) {
+    const _readPromptHtmlForCommit2 = _readPromptHtmlForCommit(value275);
+    _readPromptHtmlForCommit2 !== value275['getPromptHtml']() &&
+      value275['commitPromptHtml'](_readPromptHtmlForCommit2);
+  }
+  let value284 = ![];
+  return {
+    destroy() {
+      if (value284) return;
+      value284 = !![];
+      if (closeMenuOnDestroy) _closeMentionMenu();
+      (flushPromptHtmlCommit(value275),
+        el75['removeEventListener']?.('input', value277),
+        el75['removeEventListener']?.('blur', value279),
+        el75['removeEventListener']?.('keydown', value280));
+      if (enablePaste) el75['removeEventListener']?.('paste', value282);
+    },
+  };
+}
 
-function _appendMentionSectionLabel(_0x18e38d,_0x496bbb){const _0x4a9323=document["createElement"]("div");return _0x4a9323["className"]="at-mention-section-label",_0x4a9323["textContent"]=String(_0x496bbb||''),_0x18e38d["appendChild"](_0x4a9323),_0x4a9323;}
+function _appendMentionSectionLabel(value285, value286) {
+  const value287 = document['createElement']('div');
+  return (
+    (value287['className'] = 'at-mention-section-label'),
+    (value287['textContent'] = String(value286 || '')),
+    value285['appendChild'](value287),
+    value287
+  );
+}
 
-function _appendMentionGroupLabel(_0x4a2bf1,_0x440d05){const _0x57da0c=document["createElement"]('div');return _0x57da0c["className"]="at-mention-group-label",_0x57da0c["textContent"]=String(_0x440d05||''),_0x4a2bf1['appendChild'](_0x57da0c),_0x57da0c;}
+function _appendMentionGroupLabel(el76, value288) {
+  const value289 = document['createElement']('div');
+  return (
+    (value289['className'] = 'at-mention-group-label'),
+    (value289['textContent'] = String(value288 || '')),
+    el76['appendChild'](value289),
+    value289
+  );
+}
 
-function _applyMentionPillPresentation(_0xe04b1d,_0x2ba3b9={}){if(!_0xe04b1d)return;const _0x5c0c62=String(_0x2ba3b9?.['pillKind']||'')["trim"]();if(_0x5c0c62)_0xe04b1d["dataset"]["promptPillKind"]=_0x5c0c62;else delete _0xe04b1d["dataset"]["promptPillKind"];_0xe04b1d['classList']?.["toggle"]?.("story-time-pill",_0x5c0c62==="time");const _0x2fc685=_0x2ba3b9?.['missingAsset']===!![];_0xe04b1d["classList"]?.["toggle"]?.('ref-pill--unresolved',_0x2fc685);if(_0x2fc685)_0xe04b1d["dataset"]['refUnresolved']="true",_0xe04b1d["title"]="缺少图片素材";else{_0xe04b1d['dataset']?.["refUnresolved"]==="true"&&_0x2ba3b9?.["origin"]==="asset"&&delete _0xe04b1d['dataset']['refUnresolved'];if(_0xe04b1d["title"]==="缺少图片素材")_0xe04b1d["removeAttribute"]?.('title');}}
+function _applyMentionPillPresentation(el77, value290 = {}) {
+  if (!el77) return;
+  const value291 = String(value290?.['pillKind'] || '')['trim']();
+  if (value291) el77['dataset']['promptPillKind'] = value291;
+  else delete el77['dataset']['promptPillKind'];
+  el77['classList']?.['toggle']?.('story-time-pill', value291 === 'time');
+  const value292 = value290?.['missingAsset'] === !![];
+  el77['classList']?.['toggle']?.('ref-pill--unresolved', value292);
+  if (value292) ((el77['dataset']['refUnresolved'] = 'true'), (el77['title'] = '缺少图片素材'));
+  else {
+    el77['dataset']?.['refUnresolved'] === 'true' &&
+      value290?.['origin'] === 'asset' &&
+      delete el77['dataset']['refUnresolved'];
+    if (el77['title'] === '缺少图片素材') el77['removeAttribute']?.('title');
+  }
+}
 
-function _populateMentionMenuTree(_0x46ca79,_0x421ade,_0x5bbad6,{triggerRange:triggerRange=null,atIndex:atIndex=-0x1,pillToEdit:pillToEdit=null}={}){let _0x5cbd74='',_0x3f7689='',_0x546041=0x0;_0x5bbad6["nodeItems"]['forEach'](_0x3e7822=>{const _0x118a3e=String(_0x3e7822["menuGroup"]||'')["trim"](),_0x5cbb45=String(_0x3e7822["menuSection"]||'')["trim"]();if(_0x118a3e&&_0x118a3e!==_0x5cbd74){if(_0x546041>0x0)_appendMentionDivider(_0x46ca79);_appendMentionGroupLabel(_0x46ca79,_0x118a3e),_0x3f7689='';}_0x5cbd74=_0x118a3e,_0x5cbb45&&_0x5cbb45!==_0x3f7689&&_appendMentionSectionLabel(_0x46ca79,_0x5cbb45),_0x3f7689=_0x5cbb45,_appendMentionCandidateItem(_0x46ca79,_0x421ade,_0x3e7822,{'triggerRange':triggerRange,'atIndex':atIndex,'pillToEdit':pillToEdit}),_0x546041+=0x1;}),_0x5bbad6["nodeItems"]["length"]&&_0x5bbad6["assetItems"]["length"]&&_appendMentionDivider(_0x46ca79),_0x5bbad6["assetItems"]["forEach"](_0x3f99bc=>{const _0x114b7b=_createMentionMenuItem({'label':_0x3f99bc["label"],'subtitle':_0x3f99bc["subtitle"],'hasSubmenu':!![]}),_0x158915=_createMentionSubmenu();if(!_0x3f99bc["suppressBulkMention"]){const _0x2b5755=_getBulkAssetLimitReason(_0x421ade,_0x3f99bc["items"],pillToEdit),_0x402ff9=_createMentionMenuItem({'label':nodePromptSharedText('useEntireAsset'),'title':_0x2b5755,'disabled':!!_0x2b5755,'onSelect':()=>{if(_0x2b5755){globalThis["window"]?.["showToast"]?.(_0x2b5755,"warn");return;}_insertMentionPills(_0x421ade,_0x3f99bc["items"],{'triggerRange':triggerRange,'atIndex':atIndex,'pillToEdit':pillToEdit}),_closeMentionMenu();}});_0x158915["appendChild"](_0x402ff9),_appendMentionDivider(_0x158915);}_0x3f99bc["items"]["forEach"](_0x31482d=>{_appendMentionCandidateItem(_0x158915,_0x421ade,_0x31482d,{'triggerRange':triggerRange,'atIndex':atIndex,'pillToEdit':pillToEdit});}),_0x114b7b["appendChild"](_0x158915),_0x46ca79["appendChild"](_0x114b7b);});}
+function _populateMentionMenuTree(
+  value293,
+  value294,
+  value295,
+  { triggerRange: triggerRange = null, atIndex: atIndex = -0x1, pillToEdit: pillToEdit = null } = {},
+) {
+  let value296 = '',
+    value297 = '',
+    count16 = 0x0;
+  (value295['nodeItems']['forEach']((value298) => {
+    const value299 = String(value298['menuGroup'] || '')['trim'](),
+      value300 = String(value298['menuSection'] || '')['trim']();
+    if (value299 && value299 !== value296) {
+      if (count16 > 0x0) _appendMentionDivider(value293);
+      (_appendMentionGroupLabel(value293, value299), (value297 = ''));
+    }
+    ((value296 = value299),
+      value300 && value300 !== value297 && _appendMentionSectionLabel(value293, value300),
+      (value297 = value300),
+      _appendMentionCandidateItem(value293, value294, value298, {
+        triggerRange: triggerRange,
+        atIndex: atIndex,
+        pillToEdit: pillToEdit,
+      }),
+      (count16 += 0x1));
+  }),
+    value295['nodeItems']['length'] && value295['assetItems']['length'] && _appendMentionDivider(value293),
+    value295['assetItems']['forEach']((enabled77) => {
+      const _createMentionMenuItem4 = _createMentionMenuItem({
+          label: enabled77['label'],
+          subtitle: enabled77['subtitle'],
+          hasSubmenu: !![],
+        }),
+        _createMentionSubmenu2 = _createMentionSubmenu();
+      if (!enabled77['suppressBulkMention']) {
+        const _getBulkAssetLimitReason2 = _getBulkAssetLimitReason(value294, enabled77['items'], pillToEdit),
+          _createMentionMenuItem5 = _createMentionMenuItem({
+            label: nodePromptSharedText('useEntireAsset'),
+            title: _getBulkAssetLimitReason2,
+            disabled: !!_getBulkAssetLimitReason2,
+            onSelect: () => {
+              if (_getBulkAssetLimitReason2) {
+                globalThis['window']?.['showToast']?.(_getBulkAssetLimitReason2, 'warn');
+                return;
+              }
+              (_insertMentionPills(value294, enabled77['items'], {
+                triggerRange: triggerRange,
+                atIndex: atIndex,
+                pillToEdit: pillToEdit,
+              }),
+                _closeMentionMenu());
+            },
+          });
+        (_createMentionSubmenu2['appendChild'](_createMentionMenuItem5),
+          _appendMentionDivider(_createMentionSubmenu2));
+      }
+      (enabled77['items']['forEach']((value301) => {
+        _appendMentionCandidateItem(_createMentionSubmenu2, value294, value301, {
+          triggerRange: triggerRange,
+          atIndex: atIndex,
+          pillToEdit: pillToEdit,
+        });
+      }),
+        _createMentionMenuItem4['appendChild'](_createMentionSubmenu2),
+        value293['appendChild'](_createMentionMenuItem4));
+    }));
+}
 
-function _getMentionMenuPages(_0x3eb0ce,_0xb7b368=[]){const _0x82e70a=typeof _0x3eb0ce?.["getMentionMenuPages"]==='function'?_0x3eb0ce["getMentionMenuPages"]({'candidates':_0xb7b368}):[];if(!Array['isArray'](_0x82e70a)||_0x82e70a['length']<0x2)return[];const _0x1daefe=new Set();return _0x82e70a['map'](_0x5013d3=>({'id':String(_0x5013d3?.['id']||'')["trim"](),'label':String(_0x5013d3?.["label"]||'')["trim"](),'icon':["assets","tools"]["includes"](String(_0x5013d3?.["icon"]||'')["trim"]())?String(_0x5013d3["icon"])["trim"]():''}))["filter"](_0x4a601c=>{if(!_0x4a601c['id']||!_0x4a601c["label"]||_0x1daefe["has"](_0x4a601c['id']))return![];return _0x1daefe["add"](_0x4a601c['id']),!![];});}
+function _getMentionMenuPages(value302, value303 = []) {
+  const list37 =
+    typeof value302?.['getMentionMenuPages'] === 'function'
+      ? value302['getMentionMenuPages']({ candidates: value303 })
+      : [];
+  if (!Array['isArray'](list37) || list37['length'] < 0x2) return [];
+  const value304 = new Set();
+  return list37['map']((value305) => ({
+    id: String(value305?.['id'] || '')['trim'](),
+    label: String(value305?.['label'] || '')['trim'](),
+    icon: ['assets', 'tools']['includes'](String(value305?.['icon'] || '')['trim']())
+      ? String(value305['icon'])['trim']()
+      : '',
+  }))['filter']((enabled78) => {
+    if (!enabled78['id'] || !enabled78['label'] || value304['has'](enabled78['id'])) return ![];
+    return (value304['add'](enabled78['id']), !![]);
+  });
+}
 
-function _createMentionMenuPageIcon(_0x3c9701){const _0x557064=String(_0x3c9701||'')["trim"]();if(!_0x557064)return null;const _0x42b7e5=document['createElement']("span");return _0x42b7e5["className"]="at-mention-tab-icon",_0x42b7e5["dataset"]["icon"]=_0x557064,_0x42b7e5["setAttribute"]("aria-hidden","true"),_0x42b7e5["innerHTML"]=_0x557064==="tools"?"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M14.7 6.3a4 4 0 0 0-5-5L12 3.6 9.6 6 7.3 3.7a4 4 0 0 0 5 5l-7.7 7.7a2 2 0 1 0 2.8 2.8z\"/><path d=\"m16 15 4.5 4.5\"/></svg>":'<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22><path\x20d=\x22M4\x206.5h6l1.7\x202H20v9.5a2\x202\x200\x200\x201-2\x202H6a2\x202\x200\x200\x201-2-2z\x22/><path\x20d=\x22M4\x209h16\x22/></svg>',_0x42b7e5;}
+function _createMentionMenuPageIcon(value306) {
+  const enabled79 = String(value306 || '')['trim']();
+  if (!enabled79) return null;
+  const value307 = document['createElement']('span');
+  return (
+    (value307['className'] = 'at-mention-tab-icon'),
+    (value307['dataset']['icon'] = enabled79),
+    value307['setAttribute']('aria-hidden', 'true'),
+    (value307['innerHTML'] =
+      enabled79 === 'tools'
+        ? '<svg viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 0 0-5-5L12 3.6 9.6 6 7.3 3.7a4 4 0 0 0 5 5l-7.7 7.7a2 2 0 1 0 2.8 2.8z"/><path d="m16 15 4.5 4.5"/></svg>'
+        : '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22><path\x20d=\x22M4\x206.5h6l1.7\x202H20v9.5a2\x202\x200\x200\x201-2\x202H6a2\x202\x200\x200\x201-2-2z\x22/><path\x20d=\x22M4\x209h16\x22/></svg>'),
+    value307
+  );
+}
 
-function _appendMentionMenuPages(_0x4ad620,_0x4cb8c9,_0x398323,_0x5081c5){const _0x410cf3=_getMentionMenuPages(_0x4cb8c9,_0x398323);if(_0x410cf3["length"]<0x2)return null;const _0x177fa2=document["createElement"]("div");_0x177fa2["className"]="at-mention-tabs",_0x177fa2["setAttribute"]('role',"tablist"),_0x177fa2["setAttribute"]("aria-label","@ 功能分类"),_0x4ad620["appendChild"](_0x177fa2);const _0x42cb45=document['createElement']("div");_0x42cb45["className"]='at-mention-pages';const _0x200756=document['createElement']("div");_0x200756["className"]="at-mention-pages-track",_0x200756["style"]['width']=_0x410cf3["length"]*0x64+'%',_0x200756["style"]["gridTemplateColumns"]="repeat("+_0x410cf3["length"]+", minmax(0, 1fr))",_0x42cb45["appendChild"](_0x200756),_0x4ad620["appendChild"](_0x42cb45);const _0xe329bb=String(_0x4cb8c9?.["getMentionMenuDefaultPage"]?.({'candidates':_0x398323})||_0x410cf3[0x0]['id'])["trim"](),_0x29d811=_0x410cf3["map"](_0x4c4d81=>{const _0xeb7e37=_0x398323["filter"](_0x32fbba=>String(_0x32fbba?.['menuPage']||_0x410cf3[0x0]['id'])["trim"]()===_0x4c4d81['id']),_0x44476c=document["createElement"]("button");_0x44476c['type']="button",_0x44476c["className"]="at-mention-tab";const _0x10ed9c=_createMentionMenuPageIcon(_0x4c4d81["icon"]);if(_0x10ed9c)_0x44476c['appendChild'](_0x10ed9c);const _0x17cafb=document['createElement']('span');_0x17cafb['className']="at-mention-tab-label",_0x17cafb["textContent"]=_0x4c4d81["label"],_0x44476c['appendChild'](_0x17cafb),_0x44476c["dataset"]["mentionPage"]=_0x4c4d81['id'],_0x44476c["setAttribute"]("role","tab");const _0x172fee=document['createElement']('div');_0x172fee["className"]="at-mention-page",_0x172fee["dataset"]["mentionPagePanel"]=_0x4c4d81['id'],_0x172fee['setAttribute']("role",'tabpanel');if(_0xeb7e37['length'])_populateMentionMenuTree(_0x172fee,_0x4cb8c9,_buildMentionMenuTree(_0xeb7e37),_0x5081c5);else{const _0x43ac94=document["createElement"]("div");_0x43ac94["className"]='at-mention-empty',_0x43ac94["textContent"]='没有匹配的内容',_0x172fee['appendChild'](_0x43ac94);}return _0x177fa2["appendChild"](_0x44476c),_0x200756["appendChild"](_0x172fee),{..._0x4c4d81,'button':_0x44476c,'panel':_0x172fee,'hasCandidates':_0xeb7e37["length"]>0x0};}),_0x3266b0=_0x29d811["find"](_0x420209=>_0x420209['id']===_0xe329bb);let _0x54d57b=_0x3266b0?.["hasCandidates"]?_0x3266b0:null;if(!_0x54d57b)_0x54d57b=_0x29d811["find"](_0x2670f7=>_0x2670f7["hasCandidates"]);if(!_0x54d57b)_0x54d57b=_0x3266b0||_0x29d811[0x0];const _0x29d1f9=(_0x399cf3,{keyboard:keyboard=![]}={})=>{if(!_0x399cf3)return;const _0x5988cc=_0x29d811["indexOf"](_0x399cf3);_0x29d811["forEach"](_0x35da96=>{const _0x303953=_0x35da96===_0x399cf3;_0x35da96['button']['classList']["toggle"]("is-active",_0x303953),_0x35da96["button"]['setAttribute']("aria-selected",String(_0x303953)),_0x35da96['button']["tabIndex"]=_0x303953?0x0:-0x1,_0x35da96['panel']["classList"]["toggle"]("is-active",_0x303953),_0x35da96["panel"]["setAttribute"]("aria-hidden",String(!_0x303953)),_0x35da96['panel']["inert"]=!_0x303953;}),_0x200756["style"]["transform"]="translateX("+-_0x5988cc*(0x64/_0x29d811["length"])+'%)',_mentionMenuState["activeMenu"]=_0x399cf3['panel'],_setInitialMentionActiveItem(_0x399cf3['panel'],{'keyboard':keyboard}),_positionMentionMenu();};return _0x29d811["forEach"](_0x1e4b35=>{_0x1e4b35["button"]["addEventListener"]("mousedown",_0x1e8c08=>{_0x1e8c08["preventDefault"](),_0x1e8c08['stopPropagation'](),_0x29d1f9(_0x1e4b35);});}),_0x29d1f9(_0x54d57b),_0x54d57b?.["panel"]||null;}
+function _appendMentionMenuPages(value308, value309, value310, value311) {
+  const _getMentionMenuPages2 = _getMentionMenuPages(value309, value310);
+  if (_getMentionMenuPages2['length'] < 0x2) return null;
+  const value312 = document['createElement']('div');
+  ((value312['className'] = 'at-mention-tabs'),
+    value312['setAttribute']('role', 'tablist'),
+    value312['setAttribute']('aria-label', '@ 功能分类'),
+    value308['appendChild'](value312));
+  const value313 = document['createElement']('div');
+  value313['className'] = 'at-mention-pages';
+  const value314 = document['createElement']('div');
+  ((value314['className'] = 'at-mention-pages-track'),
+    (value314['style']['width'] = _getMentionMenuPages2['length'] * 0x64 + '%'),
+    (value314['style']['gridTemplateColumns'] =
+      'repeat(' + _getMentionMenuPages2['length'] + ', minmax(0, 1fr))'),
+    value313['appendChild'](value314),
+    value308['appendChild'](value313));
+  const value315 = String(
+      value309?.['getMentionMenuDefaultPage']?.({ candidates: value310 }) || _getMentionMenuPages2[0x0]['id'],
+    )['trim'](),
+    value316 = _getMentionMenuPages2['map']((args2) => {
+      const list38 = value310['filter'](
+          (value317) =>
+            String(value317?.['menuPage'] || _getMentionMenuPages2[0x0]['id'])['trim']() === args2['id'],
+        ),
+        el78 = document['createElement']('button');
+      ((el78['type'] = 'button'), (el78['className'] = 'at-mention-tab'));
+      const _createMentionMenuPageIcon2 = _createMentionMenuPageIcon(args2['icon']);
+      if (_createMentionMenuPageIcon2) el78['appendChild'](_createMentionMenuPageIcon2);
+      const value318 = document['createElement']('span');
+      ((value318['className'] = 'at-mention-tab-label'),
+        (value318['textContent'] = args2['label']),
+        el78['appendChild'](value318),
+        (el78['dataset']['mentionPage'] = args2['id']),
+        el78['setAttribute']('role', 'tab'));
+      const el79 = document['createElement']('div');
+      ((el79['className'] = 'at-mention-page'),
+        (el79['dataset']['mentionPagePanel'] = args2['id']),
+        el79['setAttribute']('role', 'tabpanel'));
+      if (list38['length']) _populateMentionMenuTree(el79, value309, _buildMentionMenuTree(list38), value311);
+      else {
+        const value319 = document['createElement']('div');
+        ((value319['className'] = 'at-mention-empty'),
+          (value319['textContent'] = '没有匹配的内容'),
+          el79['appendChild'](value319));
+      }
+      return (
+        value312['appendChild'](el78),
+        value314['appendChild'](el79),
+        { ...args2, button: el78, panel: el79, hasCandidates: list38['length'] > 0x0 }
+      );
+    }),
+    value320 = value316['find']((value321) => value321['id'] === value315);
+  let enabled80 = value320?.['hasCandidates'] ? value320 : null;
+  if (!enabled80) enabled80 = value316['find']((value322) => value322['hasCandidates']);
+  if (!enabled80) enabled80 = value320 || value316[0x0];
+  const run4 = (enabled81, { keyboard: keyboard = ![] } = {}) => {
+    if (!enabled81) return;
+    const value323 = value316['indexOf'](enabled81);
+    (value316['forEach']((event12) => {
+      const enabled82 = event12 === enabled81;
+      (event12['button']['classList']['toggle']('is-active', enabled82),
+        event12['button']['setAttribute']('aria-selected', String(enabled82)),
+        (event12['button']['tabIndex'] = enabled82 ? 0x0 : -0x1),
+        event12['panel']['classList']['toggle']('is-active', enabled82),
+        event12['panel']['setAttribute']('aria-hidden', String(!enabled82)),
+        (event12['panel']['inert'] = !enabled82));
+    }),
+      (value314['style']['transform'] = 'translateX(' + -value323 * (0x64 / value316['length']) + '%)'),
+      (_mentionMenuState['activeMenu'] = enabled81['panel']),
+      _setInitialMentionActiveItem(enabled81['panel'], { keyboard: keyboard }),
+      _positionMentionMenu());
+  };
+  return (
+    value316['forEach']((value324) => {
+      value324['button']['addEventListener']('mousedown', (event13) => {
+        (event13['preventDefault'](), event13['stopPropagation'](), run4(value324));
+      });
+    }),
+    run4(enabled80),
+    enabled80?.['panel'] || null
+  );
+}

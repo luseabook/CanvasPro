@@ -8,8 +8,8 @@ import {
   clampSceneOrbitPitch,
 } from '../../core/panoramaSceneMath.js';
 import { t } from '../../i18n/index.js';
-function panoramaSceneText(_0x53153e, _0x2485c6 = {}) {
-  return t('panoramaSceneNode.' + _0x53153e, _0x2485c6);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
 const PANORAMA_SCENE_NODE_TYPE = 'panorama-scene',
   PANORAMA_SCENE_NODE_ALIASES = ['panorama_scene'],
@@ -55,214 +55,199 @@ const PANORAMA_SCENE_COLOR_TOKENS = Object.freeze({
     gender: 'male',
     colorKey: 'blue',
   });
-function toFiniteNumber(_0x5c141d, _0x504a84) {
-  const _0x55e2ea = Number(_0x5c141d);
-  return Number.isFinite(_0x55e2ea) ? _0x55e2ea : _0x504a84;
+function toFiniteNumber(key, index) {
+  const result = Number(key);
+  return Number.isFinite(result) ? result : index;
 }
-function normalizeVector3(_0x5afb92, _0x489cf7) {
+function normalizeVector3(box, box2) {
   return {
-    x: toFiniteNumber(_0x5afb92?.x, _0x489cf7.x),
-    y: toFiniteNumber(_0x5afb92?.y, _0x489cf7.y),
-    z: toFiniteNumber(_0x5afb92?.z, _0x489cf7.z),
+    x: toFiniteNumber(box?.x, box2.x),
+    y: toFiniteNumber(box?.y, box2.y),
+    z: toFiniteNumber(box?.z, box2.z),
   };
 }
-function normalizeEuler(_0x362318, _0x593493) {
+function normalizeEuler(box3, box4) {
   return {
-    x: toFiniteNumber(_0x362318?.x, _0x593493.x),
-    y: toFiniteNumber(_0x362318?.y, _0x593493.y),
-    z: toFiniteNumber(_0x362318?.z, _0x593493.z),
+    x: toFiniteNumber(box3?.x, box4.x),
+    y: toFiniteNumber(box3?.y, box4.y),
+    z: toFiniteNumber(box3?.z, box4.z),
   };
 }
-function normalizeScaleValue(_0x418be8, _0x4ed1db = 1) {
-  if (Number.isFinite(_0x418be8)) return Math.max(0.01, Number(_0x418be8) || 1);
-  if (
-    _0x418be8 &&
-    Number.isFinite(_0x418be8.x) &&
-    Number.isFinite(_0x418be8.y) &&
-    Number.isFinite(_0x418be8.z)
-  )
+function normalizeScaleValue(box5, box6 = 1) {
+  if (Number.isFinite(box5)) return Math.max(0.01, Number(box5) || 1);
+  if (box5 && Number.isFinite(box5.x) && Number.isFinite(box5.y) && Number.isFinite(box5.z))
     return {
-      x: Math.max(0.01, Number(_0x418be8.x) || 1),
-      y: Math.max(0.01, Number(_0x418be8.y) || 1),
-      z: Math.max(0.01, Number(_0x418be8.z) || 1),
+      x: Math.max(0.01, Number(box5.x) || 1),
+      y: Math.max(0.01, Number(box5.y) || 1),
+      z: Math.max(0.01, Number(box5.z) || 1),
     };
-  if (
-    _0x4ed1db &&
-    Number.isFinite(_0x4ed1db.x) &&
-    Number.isFinite(_0x4ed1db.y) &&
-    Number.isFinite(_0x4ed1db.z)
-  )
+  if (box6 && Number.isFinite(box6.x) && Number.isFinite(box6.y) && Number.isFinite(box6.z))
     return {
-      x: Math.max(0.01, Number(_0x4ed1db.x) || 1),
-      y: Math.max(0.01, Number(_0x4ed1db.y) || 1),
-      z: Math.max(0.01, Number(_0x4ed1db.z) || 1),
+      x: Math.max(0.01, Number(box6.x) || 1),
+      y: Math.max(0.01, Number(box6.y) || 1),
+      z: Math.max(0.01, Number(box6.z) || 1),
     };
-  return Math.max(0.01, Number(_0x4ed1db) || 1);
+  return Math.max(0.01, Number(box6) || 1);
 }
-function clamp(_0x411233, _0x43e49e, _0x49107d) {
-  return Math.min(_0x49107d, Math.max(_0x43e49e, _0x411233));
+function clamp(data, options, target) {
+  return Math.min(target, Math.max(options, data));
 }
-function normalizeQuaternion(_0x5d8848, _0xf8aefa = { x: 0, y: 0, z: 0, w: 1 }) {
-  const _0x7c2e46 = Number(_0x5d8848?.x),
-    _0x4f791e = Number(_0x5d8848?.y),
-    _0x4c7f52 = Number(_0x5d8848?.z),
-    _0x4a949d = Number(_0x5d8848?.w);
-  if (
-    !Number.isFinite(_0x7c2e46) ||
-    !Number.isFinite(_0x4f791e) ||
-    !Number.isFinite(_0x4c7f52) ||
-    !Number.isFinite(_0x4a949d)
-  )
-    return { ..._0xf8aefa };
-  const _0x42145e = Math.hypot(_0x7c2e46, _0x4f791e, _0x4c7f52, _0x4a949d);
-  if (_0x42145e < 0.000001) return { ..._0xf8aefa };
+function normalizeQuaternion(box7, args = { x: 0, y: 0, z: 0, w: 1 }) {
+  const x2 = Number(box7?.x),
+    y2 = Number(box7?.y),
+    z = Number(box7?.z),
+    w = Number(box7?.w);
+  if (!Number.isFinite(x2) || !Number.isFinite(y2) || !Number.isFinite(z) || !Number.isFinite(w))
+    return { ...args };
+  const count = Math.hypot(x2, y2, z, w);
+  if (count < 0.000001) return { ...args };
   return {
-    x: _0x7c2e46 / _0x42145e,
-    y: _0x4f791e / _0x42145e,
-    z: _0x4c7f52 / _0x42145e,
-    w: _0x4a949d / _0x42145e,
+    x: x2 / count,
+    y: y2 / count,
+    z: z / count,
+    w: w / count,
   };
 }
-function quaternionFromEulerYXZ(_0x593e78) {
-  const _0xbfc9d7 = Number(_0x593e78?.x) || 0,
-    _0x132dbf = Number(_0x593e78?.y) || 0,
-    _0x303946 = Number(_0x593e78?.z) || 0,
-    _0x1ca260 = Math.cos(_0xbfc9d7 / 2),
-    _0x59a50e = Math.cos(_0x132dbf / 2),
-    _0x557379 = Math.cos(_0x303946 / 2),
-    _0x424a0d = Math.sin(_0xbfc9d7 / 2),
-    _0x20d499 = Math.sin(_0x132dbf / 2),
-    _0x8d10de = Math.sin(_0x303946 / 2);
+function quaternionFromEulerYXZ(box8) {
+  const source = Number(box8?.x) || 0,
+    next = Number(box8?.y) || 0,
+    current = Number(box8?.z) || 0,
+    y3 = Math.cos(source / 2),
+    entry = Math.cos(next / 2),
+    record = Math.cos(current / 2),
+    x3 = Math.sin(source / 2),
+    payload = Math.sin(next / 2),
+    handle = Math.sin(current / 2);
   return normalizeQuaternion({
-    x: _0x424a0d * _0x59a50e * _0x557379 + _0x1ca260 * _0x20d499 * _0x8d10de,
-    y: _0x1ca260 * _0x20d499 * _0x557379 - _0x424a0d * _0x59a50e * _0x8d10de,
-    z: _0x1ca260 * _0x59a50e * _0x8d10de - _0x424a0d * _0x20d499 * _0x557379,
-    w: _0x1ca260 * _0x59a50e * _0x557379 + _0x424a0d * _0x20d499 * _0x8d10de,
+    x: x3 * entry * record + y3 * payload * handle,
+    y: y3 * payload * record - x3 * entry * handle,
+    z: y3 * entry * handle - x3 * payload * record,
+    w: y3 * entry * record + x3 * payload * handle,
   });
 }
-function eulerFromQuaternionYXZ(_0x57374c) {
-  const _0x51569a = normalizeQuaternion(_0x57374c),
-    _0x29537d = _0x51569a.x * _0x51569a.x,
-    _0x17ef95 = _0x51569a.y * _0x51569a.y,
-    _0x1feae2 = _0x51569a.z * _0x51569a.z,
-    _0x550014 = _0x51569a.x * _0x51569a.y,
-    _0x4e754b = _0x51569a.x * _0x51569a.z,
-    _0x3e4904 = _0x51569a.y * _0x51569a.z,
-    _0x5bab59 = _0x51569a.x * _0x51569a.w,
-    _0x17b91e = _0x51569a.y * _0x51569a.w,
-    _0x587ecb = _0x51569a.z * _0x51569a.w,
-    _0x2ca036 = 1 - 2 * (_0x17ef95 + _0x1feae2),
-    _0x1ea30b = 2 * (_0x4e754b + _0x17b91e),
-    _0x55f08a = 2 * (_0x550014 + _0x587ecb),
-    _0x4e6249 = 1 - 2 * (_0x29537d + _0x1feae2),
-    _0x274fbf = 2 * (_0x3e4904 - _0x5bab59),
-    _0xf11481 = 2 * (_0x4e754b - _0x17b91e),
-    _0x506c95 = 1 - 2 * (_0x29537d + _0x17ef95),
-    _0xce4dea = Math.asin(-clamp(_0x274fbf, -1, 1));
-  if (Math.abs(_0x274fbf) < 0.9999999)
-    return { x: _0xce4dea, y: Math.atan2(_0x1ea30b, _0x506c95), z: Math.atan2(_0x55f08a, _0x4e6249) };
-  return { x: _0xce4dea, y: Math.atan2(-_0xf11481, _0x2ca036), z: 0 };
+function eulerFromQuaternionYXZ(state) {
+  const box9 = normalizeQuaternion(state),
+    config = box9.x * box9.x,
+    scope = box9.y * box9.y,
+    input = box9.z * box9.z,
+    output = box9.x * box9.y,
+    value2 = box9.x * box9.z,
+    value3 = box9.y * box9.z,
+    value4 = box9.x * box9.w,
+    value5 = box9.y * box9.w,
+    value6 = box9.z * box9.w,
+    value7 = 1 - 2 * (scope + input),
+    value8 = 2 * (value2 + value5),
+    value9 = 2 * (output + value6),
+    value10 = 1 - 2 * (config + input),
+    value11 = 2 * (value3 - value4),
+    value12 = 2 * (value2 - value5),
+    value13 = 1 - 2 * (config + scope),
+    x4 = Math.asin(-clamp(value11, -1, 1));
+  if (Math.abs(value11) < 0.9999999)
+    return { x: x4, y: Math.atan2(value8, value13), z: Math.atan2(value9, value10) };
+  return { x: x4, y: Math.atan2(-value12, value7), z: 0 };
 }
-function quaternionFromEulerXYZ(_0xffa72e) {
-  const _0x5c6b1a = Number(_0xffa72e?.x) || 0,
-    _0x28b5e5 = Number(_0xffa72e?.y) || 0,
-    _0x168a03 = Number(_0xffa72e?.z) || 0,
-    _0xe92295 = Math.cos(_0x5c6b1a / 2),
-    _0x4bff9d = Math.cos(_0x28b5e5 / 2),
-    _0x2d1564 = Math.cos(_0x168a03 / 2),
-    _0x6f612f = Math.sin(_0x5c6b1a / 2),
-    _0x46d40a = Math.sin(_0x28b5e5 / 2),
-    _0x52ef5a = Math.sin(_0x168a03 / 2);
+function quaternionFromEulerXYZ(box10) {
+  const value14 = Number(box10?.x) || 0,
+    value15 = Number(box10?.y) || 0,
+    value16 = Number(box10?.z) || 0,
+    y4 = Math.cos(value14 / 2),
+    value17 = Math.cos(value15 / 2),
+    value18 = Math.cos(value16 / 2),
+    x5 = Math.sin(value14 / 2),
+    value19 = Math.sin(value15 / 2),
+    value20 = Math.sin(value16 / 2);
   return normalizeQuaternion({
-    x: _0x6f612f * _0x4bff9d * _0x2d1564 + _0xe92295 * _0x46d40a * _0x52ef5a,
-    y: _0xe92295 * _0x46d40a * _0x2d1564 - _0x6f612f * _0x4bff9d * _0x52ef5a,
-    z: _0xe92295 * _0x4bff9d * _0x52ef5a + _0x6f612f * _0x46d40a * _0x2d1564,
-    w: _0xe92295 * _0x4bff9d * _0x2d1564 - _0x6f612f * _0x46d40a * _0x52ef5a,
+    x: x5 * value17 * value18 + y4 * value19 * value20,
+    y: y4 * value19 * value18 - x5 * value17 * value20,
+    z: y4 * value17 * value20 + x5 * value19 * value18,
+    w: y4 * value17 * value18 - x5 * value19 * value20,
   });
 }
-function eulerFromQuaternionXYZ(_0x1ec0a5) {
-  const _0x30b6d6 = normalizeQuaternion(_0x1ec0a5),
-    _0x3599c6 = _0x30b6d6.x * _0x30b6d6.x,
-    _0x3f4118 = _0x30b6d6.y * _0x30b6d6.y,
-    _0x478d7f = _0x30b6d6.z * _0x30b6d6.z,
-    _0x22226b = _0x30b6d6.x * _0x30b6d6.y,
-    _0x23e027 = _0x30b6d6.x * _0x30b6d6.z,
-    _0x3076c3 = _0x30b6d6.y * _0x30b6d6.z,
-    _0x240e09 = _0x30b6d6.x * _0x30b6d6.w,
-    _0x53c8fd = _0x30b6d6.y * _0x30b6d6.w,
-    _0x3b8cee = _0x30b6d6.z * _0x30b6d6.w,
-    _0x652c3b = 1 - 2 * (_0x3f4118 + _0x478d7f),
-    _0x142b39 = 2 * (_0x22226b - _0x3b8cee),
-    _0x1fcc57 = 2 * (_0x23e027 + _0x53c8fd),
-    _0x39bc7b = 2 * (_0x3076c3 - _0x240e09),
-    _0xe64e70 = 1 - 2 * (_0x3599c6 + _0x3f4118),
-    _0x4e2e5d = 2 * (_0x3076c3 + _0x240e09),
-    _0x2901a6 = 1 - 2 * (_0x3599c6 + _0x478d7f),
-    _0x283453 = Math.asin(clamp(_0x1fcc57, -1, 1));
-  if (Math.abs(_0x1fcc57) < 0.9999999)
-    return { x: Math.atan2(-_0x39bc7b, _0xe64e70), y: _0x283453, z: Math.atan2(-_0x142b39, _0x652c3b) };
-  return { x: Math.atan2(_0x4e2e5d, _0x2901a6), y: _0x283453, z: 0 };
+function eulerFromQuaternionXYZ(value21) {
+  const box11 = normalizeQuaternion(value21),
+    value22 = box11.x * box11.x,
+    value23 = box11.y * box11.y,
+    value24 = box11.z * box11.z,
+    value25 = box11.x * box11.y,
+    value26 = box11.x * box11.z,
+    value27 = box11.y * box11.z,
+    value28 = box11.x * box11.w,
+    value29 = box11.y * box11.w,
+    value30 = box11.z * box11.w,
+    value31 = 1 - 2 * (value23 + value24),
+    value32 = 2 * (value25 - value30),
+    value33 = 2 * (value26 + value29),
+    value34 = 2 * (value27 - value28),
+    value35 = 1 - 2 * (value22 + value23),
+    value36 = 2 * (value27 + value28),
+    value37 = 1 - 2 * (value22 + value24),
+    y5 = Math.asin(clamp(value33, -1, 1));
+  if (Math.abs(value33) < 0.9999999)
+    return { x: Math.atan2(-value34, value35), y: y5, z: Math.atan2(-value32, value31) };
+  return { x: Math.atan2(value36, value37), y: y5, z: 0 };
 }
-function normalizeMode(_0x41a328) {
-  return _0x41a328 === 'panorama' ? 'panorama' : 'scene';
+function normalizeMode(value38) {
+  return value38 === 'panorama' ? 'panorama' : 'scene';
 }
-function normalizeNodeTypeValue(_0x116f0a) {
-  return String(_0x116f0a || '').trim();
+function normalizeNodeTypeValue(value39) {
+  return String(value39 || '').trim();
 }
-export function isPanoramaSceneNodeType(_0x6e94a3) {
-  const _0x5b8bb5 = normalizeNodeTypeValue(_0x6e94a3);
-  return _0x5b8bb5 === PANORAMA_SCENE_NODE_TYPE || PANORAMA_SCENE_NODE_ALIASES.includes(_0x5b8bb5);
+export function isPanoramaSceneNodeType(value40) {
+  const nodeTypeValue = normalizeNodeTypeValue(value40);
+  return nodeTypeValue === PANORAMA_SCENE_NODE_TYPE || PANORAMA_SCENE_NODE_ALIASES.includes(nodeTypeValue);
 }
-export function isPanorama360NodeType(_0x5655dd) {
-  const _0x20645e = normalizeNodeTypeValue(_0x5655dd);
-  return _0x20645e === PANORAMA_360_NODE_TYPE || PANORAMA_360_NODE_ALIASES.includes(_0x20645e);
+export function isPanorama360NodeType(value41) {
+  const nodeTypeValue2 = normalizeNodeTypeValue(value41);
+  return nodeTypeValue2 === PANORAMA_360_NODE_TYPE || PANORAMA_360_NODE_ALIASES.includes(nodeTypeValue2);
 }
-export function isPanoramaGraphNodeType(_0x4c7450) {
-  return isPanoramaSceneNodeType(_0x4c7450) || isPanorama360NodeType(_0x4c7450);
+export function isPanoramaGraphNodeType(value42) {
+  return isPanoramaSceneNodeType(value42) || isPanorama360NodeType(value42);
 }
-export function getPanoramaStateFieldByNodeType(_0xa9d591) {
-  if (isPanorama360NodeType(_0xa9d591)) return 'panorama360Node';
-  if (isPanoramaSceneNodeType(_0xa9d591)) return 'sceneNode';
+export function getPanoramaStateFieldByNodeType(value43) {
+  if (isPanorama360NodeType(value43)) return 'panorama360Node';
+  if (isPanoramaSceneNodeType(value43)) return 'sceneNode';
   return '';
 }
-function normalizeEnvironmentMode(_0x4779a6) {
-  return _0x4779a6 === 'night' ? 'night' : 'day';
+function normalizeEnvironmentMode(value44) {
+  return value44 === 'night' ? 'night' : 'day';
 }
-function normalizeActiveView(_0x1bf446) {
-  return _0x1bf446 === 'camera' ? 'camera' : 'default';
+function normalizeActiveView(value45) {
+  return value45 === 'camera' ? 'camera' : 'default';
 }
-function normalizeSelectionType(_0x2966ec) {
-  return _0x2966ec === 'mannequin' || _0x2966ec === 'cube' ? _0x2966ec : null;
+function normalizeSelectionType(value46) {
+  return value46 === 'mannequin' || value46 === 'cube' ? value46 : null;
 }
-function normalizeGender(_0xaa0f2) {
-  return _0xaa0f2 === 'female' ? 'female' : 'male';
+function normalizeGender(value47) {
+  return value47 === 'female' ? 'female' : 'male';
 }
-function normalizeColorKey(_0x49042a) {
-  return PANORAMA_SCENE_COLOR_TOKENS[_0x49042a] ? _0x49042a : 'blue';
+function normalizeColorKey(value48) {
+  return PANORAMA_SCENE_COLOR_TOKENS[value48] ? value48 : 'blue';
 }
-function normalizeLegacyTool(_0x48829b) {
-  return _0x48829b === 'move' || _0x48829b === 'rotate' || _0x48829b === 'scale' || _0x48829b === 'box-select'
-    ? _0x48829b
+function normalizeLegacyTool(value49) {
+  return value49 === 'move' || value49 === 'rotate' || value49 === 'scale' || value49 === 'box-select'
+    ? value49
     : 'navigate';
 }
-function normalizeMouseTool(_0x51336a) {
-  return _0x51336a === 'box-select' ? 'box-select' : 'navigate';
+function normalizeMouseTool(value50) {
+  return value50 === 'box-select' ? 'box-select' : 'navigate';
 }
-function normalizeTransformTool(_0x30e276) {
-  return _0x30e276 === 'move' || _0x30e276 === 'rotate' || _0x30e276 === 'scale' ? _0x30e276 : 'move';
+function normalizeTransformTool(value51) {
+  return value51 === 'move' || value51 === 'rotate' || value51 === 'scale' ? value51 : 'move';
 }
-function normalizeTransformSpace(_0x28408c) {
+function normalizeTransformSpace(value52) {
   return 'local';
 }
-function normalizePivotMode(_0x2146da) {
+function normalizePivotMode(value53) {
   return 'active';
 }
-function normalizeNavigationPreset(_0x5c497e) {
-  return _0x5c497e === 'dcc' ? 'dcc' : 'dcc';
+function normalizeNavigationPreset(value54) {
+  return value54 === 'dcc' ? 'dcc' : 'dcc';
 }
-function normalizeCaptureMode(_0xc258f6) {
-  const _0x291082 = String(_0xc258f6 || '').trim();
-  if (_0x291082 === '9:16' || _0x291082 === '2.35:1') return _0x291082;
+function normalizeCaptureMode(value55) {
+  const value56 = String(value55 || '').trim();
+  if (value56 === '9:16' || value56 === '2.35:1') return value56;
   return 'adaptive';
 }
 export function createDefaultSceneView() {
@@ -324,460 +309,446 @@ export function createDefaultPanoramaSceneState() {
   };
 }
 export function createDefaultPanorama360State() {
-  const _0x5c0b22 = createDefaultPanoramaSceneState();
+  const defaultPanoramaSceneState = createDefaultPanoramaSceneState();
   return (
-    (_0x5c0b22.mode = 'panorama'),
-    (_0x5c0b22.viewport.activeView = 'default'),
-    (_0x5c0b22.viewport.activeCameraId = null),
-    (_0x5c0b22.cubes = []),
-    (_0x5c0b22.cameras = []),
-    (_0x5c0b22.ui.showCameraList = false),
-    _0x5c0b22
+    (defaultPanoramaSceneState.mode = 'panorama'),
+    (defaultPanoramaSceneState.viewport.activeView = 'default'),
+    (defaultPanoramaSceneState.viewport.activeCameraId = null),
+    (defaultPanoramaSceneState.cubes = []),
+    (defaultPanoramaSceneState.cameras = []),
+    (defaultPanoramaSceneState.ui.showCameraList = false),
+    defaultPanoramaSceneState
   );
 }
-export function normalizePanoramaSceneState(_0x406057) {
-  const _0x1f088e = createDefaultPanoramaSceneState(),
-    _0x391358 = { ..._0x1f088e.viewport.sceneView, ...(_0x406057?.viewport?.sceneView || {}) };
-  (delete _0x391358.fov,
-    (_0x391358.target = normalizeVector3(
-      _0x406057?.viewport?.sceneView?.target,
-      _0x1f088e.viewport.sceneView.target,
+export function normalizePanoramaSceneState(localPath) {
+  const args2 = createDefaultPanoramaSceneState(),
+    sceneView = { ...args2.viewport.sceneView, ...(localPath?.viewport?.sceneView || {}) };
+  (delete sceneView.fov,
+    (sceneView.target = normalizeVector3(
+      localPath?.viewport?.sceneView?.target,
+      args2.viewport.sceneView.target,
     )),
-    (_0x391358.orbitYaw = toFiniteNumber(
-      _0x406057?.viewport?.sceneView?.orbitYaw,
-      _0x1f088e.viewport.sceneView.orbitYaw,
+    (sceneView.orbitYaw = toFiniteNumber(
+      localPath?.viewport?.sceneView?.orbitYaw,
+      args2.viewport.sceneView.orbitYaw,
     )),
-    (_0x391358.orbitPitch = clampSceneOrbitPitch(
-      toFiniteNumber(_0x406057?.viewport?.sceneView?.orbitPitch, _0x1f088e.viewport.sceneView.orbitPitch),
+    (sceneView.orbitPitch = clampSceneOrbitPitch(
+      toFiniteNumber(localPath?.viewport?.sceneView?.orbitPitch, args2.viewport.sceneView.orbitPitch),
     )),
-    (_0x391358.orbitDistance = clamp(
-      toFiniteNumber(
-        _0x406057?.viewport?.sceneView?.orbitDistance,
-        _0x1f088e.viewport.sceneView.orbitDistance,
-      ),
+    (sceneView.orbitDistance = clamp(
+      toFiniteNumber(localPath?.viewport?.sceneView?.orbitDistance, args2.viewport.sceneView.orbitDistance),
       SCENE_ORBIT_DISTANCE_MIN,
       SCENE_ORBIT_DISTANCE_MAX,
     )));
-  const _0x533633 = { ..._0x1f088e.viewport.panoramaView, ...(_0x406057?.viewport?.panoramaView || {}) };
-  ((_0x533633.yaw = toFiniteNumber(
-    _0x406057?.viewport?.panoramaView?.yaw,
-    _0x1f088e.viewport.panoramaView.yaw,
+  const panoramaView = { ...args2.viewport.panoramaView, ...(localPath?.viewport?.panoramaView || {}) };
+  ((panoramaView.yaw = toFiniteNumber(
+    localPath?.viewport?.panoramaView?.yaw,
+    args2.viewport.panoramaView.yaw,
   )),
-    (_0x533633.pitch = clampPanoramaPitch(
-      toFiniteNumber(_0x406057?.viewport?.panoramaView?.pitch, _0x1f088e.viewport.panoramaView.pitch),
+    (panoramaView.pitch = clampPanoramaPitch(
+      toFiniteNumber(localPath?.viewport?.panoramaView?.pitch, args2.viewport.panoramaView.pitch),
     )),
-    (_0x533633.fov = Math.max(
+    (panoramaView.fov = Math.max(
       PANORAMA_SCENE_CAMERA_CONSTRAINTS.panorama.fov.min,
       Math.min(
         PANORAMA_SCENE_CAMERA_CONSTRAINTS.panorama.fov.max,
-        toFiniteNumber(_0x406057?.viewport?.panoramaView?.fov, _0x1f088e.viewport.panoramaView.fov),
+        toFiniteNumber(localPath?.viewport?.panoramaView?.fov, args2.viewport.panoramaView.fov),
       ),
     )));
-  const _0x438a58 = Array.isArray(_0x406057?.mannequins)
-      ? _0x406057.mannequins
-          .filter((_0x39c1d9) => _0x39c1d9 && _0x39c1d9.id)
-          .map((_0x62d4d) => {
-            const _0x4877f7 = normalizeEuler(_0x62d4d.rotation, { x: 0, y: 0, z: 0 }),
-              _0x4eb848 =
-                Number.isFinite(Number(_0x62d4d?.quaternion?.x)) &&
-                Number.isFinite(Number(_0x62d4d?.quaternion?.y)) &&
-                Number.isFinite(Number(_0x62d4d?.quaternion?.z)) &&
-                Number.isFinite(Number(_0x62d4d?.quaternion?.w)),
-              _0x34822b = _0x4eb848
-                ? normalizeQuaternion(_0x62d4d.quaternion, quaternionFromEulerXYZ(_0x4877f7))
-                : quaternionFromEulerXYZ(_0x4877f7),
-              _0x3a07f1 = _0x4eb848 ? eulerFromQuaternionXYZ(_0x34822b) : _0x4877f7;
+  const mannequins = Array.isArray(localPath?.mannequins)
+      ? localPath.mannequins
+          .filter((item2) => item2 && item2.id)
+          .map((id) => {
+            const euler = normalizeEuler(id.rotation, { x: 0, y: 0, z: 0 }),
+              value57 =
+                Number.isFinite(Number(id?.quaternion?.x)) &&
+                Number.isFinite(Number(id?.quaternion?.y)) &&
+                Number.isFinite(Number(id?.quaternion?.z)) &&
+                Number.isFinite(Number(id?.quaternion?.w)),
+              quaternion = value57
+                ? normalizeQuaternion(id.quaternion, quaternionFromEulerXYZ(euler))
+                : quaternionFromEulerXYZ(euler),
+              rotation = value57 ? eulerFromQuaternionXYZ(quaternion) : euler;
             return {
-              id: _0x62d4d.id,
-              gender: normalizeGender(_0x62d4d.gender),
-              colorKey: normalizeColorKey(_0x62d4d.colorKey || _0x62d4d.color),
-              position: normalizeVector3(_0x62d4d.position, { x: 0, y: 0, z: 0 }),
-              rotation: _0x3a07f1,
-              quaternion: _0x34822b,
-              scale: normalizeScaleValue(_0x62d4d.scale, 1),
+              id: id.id,
+              gender: normalizeGender(id.gender),
+              colorKey: normalizeColorKey(id.colorKey || id.color),
+              position: normalizeVector3(id.position, { x: 0, y: 0, z: 0 }),
+              rotation: rotation,
+              quaternion: quaternion,
+              scale: normalizeScaleValue(id.scale, 1),
             };
           })
       : [],
-    _0x389293 = Array.isArray(_0x406057?.cubes)
-      ? _0x406057.cubes
-          .filter((_0x414cf7) => _0x414cf7 && _0x414cf7.id)
-          .map((_0x2b6b24) => {
-            const _0x2712db = normalizeEuler(_0x2b6b24.rotation, { x: 0, y: 0, z: 0 }),
-              _0x32368d =
-                Number.isFinite(Number(_0x2b6b24?.quaternion?.x)) &&
-                Number.isFinite(Number(_0x2b6b24?.quaternion?.y)) &&
-                Number.isFinite(Number(_0x2b6b24?.quaternion?.z)) &&
-                Number.isFinite(Number(_0x2b6b24?.quaternion?.w)),
-              _0x3f895f = _0x32368d
-                ? normalizeQuaternion(_0x2b6b24.quaternion, quaternionFromEulerXYZ(_0x2712db))
-                : quaternionFromEulerXYZ(_0x2712db),
-              _0x4650a5 = _0x32368d ? eulerFromQuaternionXYZ(_0x3f895f) : _0x2712db;
+    cubes = Array.isArray(localPath?.cubes)
+      ? localPath.cubes
+          .filter((item3) => item3 && item3.id)
+          .map((id2) => {
+            const euler2 = normalizeEuler(id2.rotation, { x: 0, y: 0, z: 0 }),
+              value58 =
+                Number.isFinite(Number(id2?.quaternion?.x)) &&
+                Number.isFinite(Number(id2?.quaternion?.y)) &&
+                Number.isFinite(Number(id2?.quaternion?.z)) &&
+                Number.isFinite(Number(id2?.quaternion?.w)),
+              quaternion2 = value58
+                ? normalizeQuaternion(id2.quaternion, quaternionFromEulerXYZ(euler2))
+                : quaternionFromEulerXYZ(euler2),
+              rotation2 = value58 ? eulerFromQuaternionXYZ(quaternion2) : euler2;
             return {
-              id: _0x2b6b24.id,
-              colorKey: normalizeColorKey(_0x2b6b24.colorKey || _0x2b6b24.color),
-              position: normalizeVector3(_0x2b6b24.position, { x: 0, y: 0, z: 0 }),
-              rotation: _0x4650a5,
-              quaternion: _0x3f895f,
-              scale: normalizeScaleValue(_0x2b6b24.scale, 1),
+              id: id2.id,
+              colorKey: normalizeColorKey(id2.colorKey || id2.color),
+              position: normalizeVector3(id2.position, { x: 0, y: 0, z: 0 }),
+              rotation: rotation2,
+              quaternion: quaternion2,
+              scale: normalizeScaleValue(id2.scale, 1),
             };
           })
       : [],
-    _0x551bc6 = Array.isArray(_0x406057?.cameras)
-      ? _0x406057.cameras
-          .filter((_0x20778e) => _0x20778e && _0x20778e.id)
+    cameras = Array.isArray(localPath?.cameras)
+      ? localPath.cameras
+          .filter((item4) => item4 && item4.id)
           .slice(0, PANORAMA_SCENE_CAMERA_LIMIT)
-          .map((_0xbfac70, _0x5ccdb3) => {
-            const _0x13ea38 = normalizeEuler(_0xbfac70.rotation, { x: 0, y: 0, z: 0 }),
-              _0x48e007 =
-                Number.isFinite(Number(_0xbfac70?.quaternion?.x)) &&
-                Number.isFinite(Number(_0xbfac70?.quaternion?.y)) &&
-                Number.isFinite(Number(_0xbfac70?.quaternion?.z)) &&
-                Number.isFinite(Number(_0xbfac70?.quaternion?.w)),
-              _0x56671e = _0x48e007
-                ? normalizeQuaternion(_0xbfac70.quaternion, quaternionFromEulerYXZ(_0x13ea38))
-                : quaternionFromEulerYXZ(_0x13ea38),
-              _0x2fc7a3 = _0x48e007 ? eulerFromQuaternionYXZ(_0x56671e) : _0x13ea38;
+          .map((id3, slot) => {
+            const euler3 = normalizeEuler(id3.rotation, { x: 0, y: 0, z: 0 }),
+              value59 =
+                Number.isFinite(Number(id3?.quaternion?.x)) &&
+                Number.isFinite(Number(id3?.quaternion?.y)) &&
+                Number.isFinite(Number(id3?.quaternion?.z)) &&
+                Number.isFinite(Number(id3?.quaternion?.w)),
+              quaternion3 = value59
+                ? normalizeQuaternion(id3.quaternion, quaternionFromEulerYXZ(euler3))
+                : quaternionFromEulerYXZ(euler3),
+              rotation3 = value59 ? eulerFromQuaternionYXZ(quaternion3) : euler3;
             return {
-              id: _0xbfac70.id,
-              slot: Number.isInteger(Number(_0xbfac70.slot))
-                ? Math.max(1, Math.min(PANORAMA_SCENE_CAMERA_LIMIT, Number(_0xbfac70.slot)))
+              id: id3.id,
+              slot: Number.isInteger(Number(id3.slot))
+                ? Math.max(1, Math.min(PANORAMA_SCENE_CAMERA_LIMIT, Number(id3.slot)))
                 : null,
               name:
-                String(
-                  _0xbfac70.name || panoramaSceneText('camera.defaultName', { slot: _0x5ccdb3 + 1 }),
-                ).trim() || panoramaSceneText('camera.defaultName', { slot: _0x5ccdb3 + 1 }),
-              position: normalizeVector3(_0xbfac70.position, { x: 0, y: 1.6, z: 4 }),
-              quaternion: _0x56671e,
-              rotation: _0x2fc7a3,
+                String(id3.name || panoramaSceneText('camera.defaultName', { slot: slot + 1 })).trim() ||
+                panoramaSceneText('camera.defaultName', { slot: slot + 1 }),
+              position: normalizeVector3(id3.position, { x: 0, y: 1.6, z: 4 }),
+              quaternion: quaternion3,
+              rotation: rotation3,
               focalLength: clampSceneFocalLength(
-                Object.prototype.hasOwnProperty.call(_0xbfac70 || {}, 'focalLength')
-                  ? toFiniteNumber(_0xbfac70.focalLength, SCENE_DEFAULT_FOCAL_LENGTH_MM)
+                Object.prototype.hasOwnProperty.call(id3 || {}, 'focalLength')
+                  ? toFiniteNumber(id3.focalLength, SCENE_DEFAULT_FOCAL_LENGTH_MM)
                   : SCENE_DEFAULT_FOCAL_LENGTH_MM,
               ),
             };
           })
       : [],
-    _0x31f867 = new Set(_0x438a58.map((_0x1bb4e7) => _0x1bb4e7.id)),
-    _0x275d36 = new Set(_0x389293.map((_0x1d3b3f) => _0x1d3b3f.id)),
-    _0x4425f6 = Array.isArray(_0x406057?.groups)
-      ? _0x406057.groups
-          .filter((_0x44d5ca) => _0x44d5ca && _0x44d5ca.id)
-          .map((_0x1f832b) => {
-            const _0x374b18 = Array.isArray(_0x1f832b.memberIds)
-                ? [
-                    ...new Set(
-                      _0x1f832b.memberIds.map((_0x3ef718) => String(_0x3ef718 || '').trim()).filter(Boolean),
-                    ),
-                  ]
+    map = new Set(mannequins.map((item5) => item5.id)),
+    map2 = new Set(cubes.map((item6) => item6.id)),
+    groups = Array.isArray(localPath?.groups)
+      ? localPath.groups
+          .filter((item7) => item7 && item7.id)
+          .map((type) => {
+            const list = Array.isArray(type.memberIds)
+                ? [...new Set(type.memberIds.map((item8) => String(item8 || '').trim()).filter(Boolean))]
                 : [],
-              _0x371b52 = _0x374b18.filter((_0x2a8de8) => _0x31f867.has(_0x2a8de8));
+              memberIds = list.filter((item9) => map.has(item9));
             return {
-              id: String(_0x1f832b.id),
-              type: _0x1f832b.type === 'mannequin-grid' ? 'mannequin-grid' : 'mannequin-grid',
-              memberObjectType: _0x1f832b.memberObjectType === 'mannequin' ? 'mannequin' : 'mannequin',
-              memberIds: _0x371b52,
+              id: String(type.id),
+              type: type.type === 'mannequin-grid' ? 'mannequin-grid' : 'mannequin-grid',
+              memberObjectType: type.memberObjectType === 'mannequin' ? 'mannequin' : 'mannequin',
+              memberIds: memberIds,
             };
           })
-          .filter((_0x109af3) => _0x109af3.memberIds.length > 0)
+          .filter((item10) => item10.memberIds.length > 0)
       : [],
-    _0x20370b = String(_0x406057?.viewport?.activeCameraId || '').trim() || null,
-    _0x2bb3f4 = _0x20370b ? _0x551bc6.some((_0x3b486e) => _0x3b486e.id === _0x20370b) : false,
-    _0x5d6ff1 = normalizeSelectionType(_0x406057?.selection?.selectedObjectType),
-    _0x4286b0 = _0x406057?.selection?.selectedObjectId ? String(_0x406057.selection.selectedObjectId) : null,
-    _0x245dda = Array.isArray(_0x406057?.selection?.selectedObjectIds)
+    value60 = String(localPath?.viewport?.activeCameraId || '').trim() || null,
+    activeCameraId = value60 ? cameras.some((item11) => item11.id === value60) : false,
+    selectionType = normalizeSelectionType(localPath?.selection?.selectedObjectType),
+    value61 = localPath?.selection?.selectedObjectId ? String(localPath.selection.selectedObjectId) : null,
+    list2 = Array.isArray(localPath?.selection?.selectedObjectIds)
       ? [
           ...new Set(
-            _0x406057.selection.selectedObjectIds
-              .map((_0x3c75cc) => String(_0x3c75cc || '').trim())
+            localPath.selection.selectedObjectIds
+              .map((item12) => String(item12 || '').trim())
               .filter(Boolean),
           ),
         ]
-      : _0x4286b0
-        ? [_0x4286b0]
+      : value61
+        ? [value61]
         : [],
-    _0xded51 = _0x406057?.selection?.selectedGroupId
-      ? String(_0x406057.selection.selectedGroupId).trim()
+    value62 = localPath?.selection?.selectedGroupId
+      ? String(localPath.selection.selectedGroupId).trim()
       : null,
-    _0x2a27d4 = _0xded51 ? _0x4425f6.find((_0x53f045) => _0x53f045.id === _0xded51) || null : null,
-    _0x3e26b4 = new Set(_0x551bc6.map((_0x583e69) => _0x583e69.id)),
-    _0x3775af = Array.isArray(_0x406057?.selection?.selectedObjects)
-      ? _0x406057.selection.selectedObjects
-      : [],
-    _0x41885a = [],
-    _0x23a789 = new Set();
-  _0x3775af.forEach((_0x4cf923) => {
-    const _0x169325 = normalizeSelectionType(_0x4cf923?.objectType),
-      _0xc40c22 = String(_0x4cf923?.objectId || '').trim();
-    if (!_0x169325 || !_0xc40c22) return;
-    const _0x513b26 = _0x169325 === 'cube' ? _0x275d36.has(_0xc40c22) : _0x31f867.has(_0xc40c22);
-    if (!_0x513b26) return;
-    const _0xb3ecb5 = _0x169325 + ':' + _0xc40c22;
-    if (_0x23a789.has(_0xb3ecb5)) return;
-    (_0x23a789.add(_0xb3ecb5), _0x41885a.push({ objectType: _0x169325, objectId: _0xc40c22 }));
+    args3 = value62 ? groups.find((item13) => item13.id === value62) || null : null,
+    map3 = new Set(cameras.map((item14) => item14.id)),
+    list3 = Array.isArray(localPath?.selection?.selectedObjects) ? localPath.selection.selectedObjects : [],
+    list4 = [],
+    map4 = new Set();
+  list3.forEach((item15) => {
+    const objectType = normalizeSelectionType(item15?.objectType),
+      objectId = String(item15?.objectId || '').trim();
+    if (!objectType || !objectId) return;
+    const enabled = objectType === 'cube' ? map2.has(objectId) : map.has(objectId);
+    if (!enabled) return;
+    const value63 = objectType + ':' + objectId;
+    if (map4.has(value63)) return;
+    (map4.add(value63), list4.push({ objectType: objectType, objectId: objectId }));
   });
-  const _0x3a0264 = _0x5d6ff1,
-    _0x51fcb2 =
-      _0x3a0264 === 'camera'
-        ? _0x4286b0 && _0x3e26b4.has(_0x4286b0)
-          ? _0x4286b0
+  const value64 = selectionType,
+    value65 =
+      value64 === 'camera'
+        ? value61 && map3.has(value61)
+          ? value61
           : null
-        : _0x3a0264 === 'cube'
-          ? _0x4286b0 && _0x275d36.has(_0x4286b0)
-            ? _0x4286b0
+        : value64 === 'cube'
+          ? value61 && map2.has(value61)
+            ? value61
             : null
-          : _0x4286b0 && _0x31f867.has(_0x4286b0)
-            ? _0x4286b0
+          : value61 && map.has(value61)
+            ? value61
             : null;
-  let _0x565a6e = _0x245dda.filter((_0x22e1a9) =>
-      _0x3a0264 === 'camera'
-        ? _0x3e26b4.has(_0x22e1a9)
-        : _0x3a0264 === 'cube'
-          ? _0x275d36.has(_0x22e1a9)
-          : _0x31f867.has(_0x22e1a9),
+  let list5 = list2.filter((item16) =>
+      value64 === 'camera' ? map3.has(item16) : value64 === 'cube' ? map2.has(item16) : map.has(item16),
     ),
-    _0x30a28b = _0x3a0264,
-    _0x1dc82e = _0x51fcb2,
-    _0x4e33fc = _0x2a27d4 ? _0x2a27d4.id : null;
-  if (!_0x30a28b && _0x565a6e.length > 0) {
-    const _0x14f27b = _0x565a6e[0];
-    _0x275d36.has(_0x14f27b)
-      ? ((_0x30a28b = 'cube'), (_0x565a6e = _0x565a6e.filter((_0x1c10cf) => _0x275d36.has(_0x1c10cf))))
-      : ((_0x30a28b = 'mannequin'), (_0x565a6e = _0x565a6e.filter((_0x2e6ce8) => _0x31f867.has(_0x2e6ce8))));
+    objectType2 = value64,
+    value66 = value65,
+    selectedGroupId = args3 ? args3.id : null;
+  if (!objectType2 && list5.length > 0) {
+    const value67 = list5[0];
+    map2.has(value67)
+      ? ((objectType2 = 'cube'), (list5 = list5.filter((item17) => map2.has(item17))))
+      : ((objectType2 = 'mannequin'), (list5 = list5.filter((item18) => map.has(item18))));
   }
-  if (_0x2a27d4)
-    ((_0x30a28b = 'mannequin'),
-      (_0x565a6e = [..._0x2a27d4.memberIds]),
-      (_0x1dc82e = _0x2a27d4.memberIds[0] || null));
+  if (args3)
+    ((objectType2 = 'mannequin'), (list5 = [...args3.memberIds]), (value66 = args3.memberIds[0] || null));
   else {
-    if (_0x565a6e.length > 0)
-      ((_0x1dc82e = _0x565a6e.includes(_0x1dc82e) && _0x1dc82e ? _0x1dc82e : _0x565a6e[0]),
-        _0x30a28b !== 'mannequin' && (_0x4e33fc = null));
-    else _0x1dc82e ? (_0x565a6e = [_0x1dc82e]) : ((_0x1dc82e = null), (_0x30a28b = null), (_0x4e33fc = null));
+    if (list5.length > 0)
+      ((value66 = list5.includes(value66) && value66 ? value66 : list5[0]),
+        objectType2 !== 'mannequin' && (selectedGroupId = null));
+    else value66 ? (list5 = [value66]) : ((value66 = null), (objectType2 = null), (selectedGroupId = null));
   }
-  let _0x376fca = _0x41885a;
-  if (_0x376fca.length === 0) {
-    if (_0x2a27d4)
-      _0x376fca = _0x2a27d4.memberIds.map((_0xafdf31) => ({ objectType: 'mannequin', objectId: _0xafdf31 }));
+  let selectedObjects = list4;
+  if (selectedObjects.length === 0) {
+    if (args3)
+      selectedObjects = args3.memberIds.map((objectId2) => ({
+        objectType: 'mannequin',
+        objectId: objectId2,
+      }));
     else {
-      if (_0x30a28b === 'cube' || _0x30a28b === 'mannequin') {
-        const _0x85136d = _0x565a6e.length > 0 ? _0x565a6e : _0x1dc82e ? [_0x1dc82e] : [];
-        _0x376fca = _0x85136d.map((_0x2b1870) => ({ objectType: _0x30a28b, objectId: _0x2b1870 }));
+      if (objectType2 === 'cube' || objectType2 === 'mannequin') {
+        const list6 = list5.length > 0 ? list5 : value66 ? [value66] : [];
+        selectedObjects = list6.map((objectId3) => ({ objectType: objectType2, objectId: objectId3 }));
       }
     }
   }
-  let _0x33f213 = null,
-    _0x1f86ae = null,
-    _0x3de384 = [];
-  if (_0x376fca.length > 0) {
-    const _0x9d7417 = _0x30a28b === 'cube' || _0x30a28b === 'mannequin' ? _0x30a28b : null,
-      _0xdeec9d = _0x9d7417 ? _0x376fca.some((_0x30f47a) => _0x30f47a.objectType === _0x9d7417) : false;
-    ((_0x33f213 = _0xdeec9d ? _0x9d7417 : _0x376fca[0].objectType),
-      (_0x3de384 = _0x376fca
-        .filter((_0x330746) => _0x330746.objectType === _0x33f213)
-        .map((_0x31933a) => _0x31933a.objectId)));
-    const _0xb81345 =
-      _0x1dc82e &&
-      _0x376fca.some((_0x17ed3d) => _0x17ed3d.objectType === _0x33f213 && _0x17ed3d.objectId === _0x1dc82e);
-    _0x1f86ae = _0xb81345 ? _0x1dc82e : _0x3de384[0] || null;
-  } else _0x4e33fc = null;
-  if (_0x4e33fc) {
-    const _0x136673 = _0x4425f6.find((_0x41e064) => _0x41e064.id === _0x4e33fc) || null;
-    if (!_0x136673) _0x4e33fc = null;
+  let selectedObjectType = null,
+    selectedObjectId = null,
+    selectedObjectIds = [];
+  if (selectedObjects.length > 0) {
+    const value68 = objectType2 === 'cube' || objectType2 === 'mannequin' ? objectType2 : null,
+      value69 = value68 ? selectedObjects.some((item19) => item19.objectType === value68) : false;
+    ((selectedObjectType = value69 ? value68 : selectedObjects[0].objectType),
+      (selectedObjectIds = selectedObjects
+        .filter((item20) => item20.objectType === selectedObjectType)
+        .map((item21) => item21.objectId)));
+    const value70 =
+      value66 &&
+      selectedObjects.some(
+        (item22) => item22.objectType === selectedObjectType && item22.objectId === value66,
+      );
+    selectedObjectId = value70 ? value66 : selectedObjectIds[0] || null;
+  } else selectedGroupId = null;
+  if (selectedGroupId) {
+    const args4 = groups.find((item23) => item23.id === selectedGroupId) || null;
+    if (!args4) selectedGroupId = null;
     else {
-      const _0x264f2b = new Set(
-          _0x376fca
-            .filter((_0x5d0927) => _0x5d0927.objectType === 'mannequin')
-            .map((_0x35d008) => _0x35d008.objectId),
+      const map5 = new Set(
+          selectedObjects
+            .filter((item24) => item24.objectType === 'mannequin')
+            .map((item25) => item25.objectId),
         ),
-        _0x5da8bc =
-          _0x376fca.every((_0x412a7e) => _0x412a7e.objectType === 'mannequin') &&
-          _0x136673.memberIds.length > 0 &&
-          _0x136673.memberIds.every((_0x1c242c) => _0x264f2b.has(_0x1c242c)) &&
-          _0x136673.memberIds.length === _0x376fca.length;
-      !_0x5da8bc
-        ? (_0x4e33fc = null)
-        : ((_0x33f213 = 'mannequin'),
-          (_0x3de384 = [..._0x136673.memberIds]),
-          (_0x1f86ae = _0x136673.memberIds[0] || null),
-          (_0x376fca = _0x136673.memberIds.map((_0x515d73) => ({
+        enabled2 =
+          selectedObjects.every((item26) => item26.objectType === 'mannequin') &&
+          args4.memberIds.length > 0 &&
+          args4.memberIds.every((item27) => map5.has(item27)) &&
+          args4.memberIds.length === selectedObjects.length;
+      !enabled2
+        ? (selectedGroupId = null)
+        : ((selectedObjectType = 'mannequin'),
+          (selectedObjectIds = [...args4.memberIds]),
+          (selectedObjectId = args4.memberIds[0] || null),
+          (selectedObjects = args4.memberIds.map((objectId4) => ({
             objectType: 'mannequin',
-            objectId: _0x515d73,
+            objectId: objectId4,
           }))));
     }
   }
-  const _0x41a1a5 = normalizeLegacyTool(_0x406057?.ui?.activeTool),
-    _0x5bba0f = normalizeMouseTool(
-      _0x406057?.ui?.mouseTool != null
-        ? _0x406057.ui.mouseTool
-        : _0x41a1a5 === 'box-select'
+  const activeTool = normalizeLegacyTool(localPath?.ui?.activeTool),
+    mouseTool = normalizeMouseTool(
+      localPath?.ui?.mouseTool != null
+        ? localPath.ui.mouseTool
+        : activeTool === 'box-select'
           ? 'box-select'
           : 'navigate',
     ),
-    _0x268269 = normalizeTransformTool(
-      _0x406057?.ui?.transformTool != null
-        ? _0x406057.ui.transformTool
-        : _0x41a1a5 === 'move' || _0x41a1a5 === 'rotate' || _0x41a1a5 === 'scale'
-          ? _0x41a1a5
+    transformTool = normalizeTransformTool(
+      localPath?.ui?.transformTool != null
+        ? localPath.ui.transformTool
+        : activeTool === 'move' || activeTool === 'rotate' || activeTool === 'scale'
+          ? activeTool
           : 'move',
     );
   return {
     version: 1,
-    mode: normalizeMode(_0x406057?.mode),
-    environmentMode: normalizeEnvironmentMode(_0x406057?.environmentMode),
+    mode: normalizeMode(localPath?.mode),
+    environmentMode: normalizeEnvironmentMode(localPath?.environmentMode),
     viewport: {
       activeView:
-        normalizeActiveView(_0x406057?.viewport?.activeView) === 'camera' && _0x2bb3f4 ? 'camera' : 'default',
-      activeCameraId: _0x2bb3f4 ? _0x20370b : null,
-      sceneView: _0x391358,
-      panoramaView: _0x533633,
+        normalizeActiveView(localPath?.viewport?.activeView) === 'camera' && activeCameraId
+          ? 'camera'
+          : 'default',
+      activeCameraId: activeCameraId ? value60 : null,
+      sceneView: sceneView,
+      panoramaView: panoramaView,
     },
     panorama: {
-      localPath: _0x406057?.panorama?.localPath ? String(_0x406057.panorama.localPath).trim() : null,
-      imageUrl: _0x406057?.panorama?.imageUrl ? String(_0x406057.panorama.imageUrl).trim() : null,
-      fileName: _0x406057?.panorama?.fileName ? String(_0x406057.panorama.fileName).trim() : null,
-      sourceSignature: _0x406057?.panorama?.sourceSignature
-        ? String(_0x406057.panorama.sourceSignature).trim()
+      localPath: localPath?.panorama?.localPath ? String(localPath.panorama.localPath).trim() : null,
+      imageUrl: localPath?.panorama?.imageUrl ? String(localPath.panorama.imageUrl).trim() : null,
+      fileName: localPath?.panorama?.fileName ? String(localPath.panorama.fileName).trim() : null,
+      sourceSignature: localPath?.panorama?.sourceSignature
+        ? String(localPath.panorama.sourceSignature).trim()
         : null,
-      isLoaded: _0x406057?.panorama?.isLoaded === true,
-      error: _0x406057?.panorama?.error ? String(_0x406057.panorama.error) : null,
+      isLoaded: localPath?.panorama?.isLoaded === true,
+      error: localPath?.panorama?.error ? String(localPath.panorama.error) : null,
     },
-    mannequins: _0x438a58,
-    cubes: _0x389293,
-    cameras: _0x551bc6,
+    mannequins: mannequins,
+    cubes: cubes,
+    cameras: cameras,
     selection: {
-      selectedObjectType: _0x33f213,
-      selectedObjectId: _0x1f86ae,
-      selectedObjectIds: _0x3de384,
-      selectedObjects: _0x376fca,
-      selectedGroupId: _0x4e33fc,
+      selectedObjectType: selectedObjectType,
+      selectedObjectId: selectedObjectId,
+      selectedObjectIds: selectedObjectIds,
+      selectedObjects: selectedObjects,
+      selectedGroupId: selectedGroupId,
     },
-    groups: _0x4425f6,
+    groups: groups,
     gridPlacement: {
       rows: Math.max(
         1,
-        Math.min(
-          12,
-          Math.round(toFiniteNumber(_0x406057?.gridPlacement?.rows, _0x1f088e.gridPlacement.rows)),
-        ),
+        Math.min(12, Math.round(toFiniteNumber(localPath?.gridPlacement?.rows, args2.gridPlacement.rows))),
       ),
       cols: Math.max(
         1,
-        Math.min(
-          12,
-          Math.round(toFiniteNumber(_0x406057?.gridPlacement?.cols, _0x1f088e.gridPlacement.cols)),
-        ),
+        Math.min(12, Math.round(toFiniteNumber(localPath?.gridPlacement?.cols, args2.gridPlacement.cols))),
       ),
       spacingX: Math.max(
         0.5,
-        Math.min(8, toFiniteNumber(_0x406057?.gridPlacement?.spacingX, _0x1f088e.gridPlacement.spacingX)),
+        Math.min(8, toFiniteNumber(localPath?.gridPlacement?.spacingX, args2.gridPlacement.spacingX)),
       ),
       spacingZ: Math.max(
         0.5,
-        Math.min(8, toFiniteNumber(_0x406057?.gridPlacement?.spacingZ, _0x1f088e.gridPlacement.spacingZ)),
+        Math.min(8, toFiniteNumber(localPath?.gridPlacement?.spacingZ, args2.gridPlacement.spacingZ)),
       ),
-      gender: normalizeGender(_0x406057?.gridPlacement?.gender),
-      colorKey: normalizeColorKey(_0x406057?.gridPlacement?.colorKey || _0x406057?.gridPlacement?.color),
+      gender: normalizeGender(localPath?.gridPlacement?.gender),
+      colorKey: normalizeColorKey(localPath?.gridPlacement?.colorKey || localPath?.gridPlacement?.color),
     },
     capture: {
-      pending: _0x406057?.capture?.pending === true,
+      pending: localPath?.capture?.pending === true,
       lastCaptureAt:
-        _0x406057?.capture?.lastCaptureAt == null
+        localPath?.capture?.lastCaptureAt == null
           ? null
-          : toFiniteNumber(_0x406057.capture.lastCaptureAt, null),
-      error: _0x406057?.capture?.error ? String(_0x406057.capture.error) : null,
-      mode: normalizeCaptureMode(_0x406057?.capture?.mode),
-      showSafeFrame: _0x406057?.capture?.showSafeFrame === true,
+          : toFiniteNumber(localPath.capture.lastCaptureAt, null),
+      error: localPath?.capture?.error ? String(localPath.capture.error) : null,
+      mode: normalizeCaptureMode(localPath?.capture?.mode),
+      showSafeFrame: localPath?.capture?.showSafeFrame === true,
     },
     ui: {
-      mouseTool: _0x5bba0f,
-      transformTool: _0x268269,
-      activeTool: _0x41a1a5,
-      transformSpace: normalizeTransformSpace(_0x406057?.ui?.transformSpace),
-      pivotMode: normalizePivotMode(_0x406057?.ui?.pivotMode),
-      navigationPreset: normalizeNavigationPreset(_0x406057?.ui?.navigationPreset),
-      showCameraList: _0x406057?.ui?.showCameraList === true,
-      isEditing: _0x406057?.ui?.isEditing === true,
+      mouseTool: mouseTool,
+      transformTool: transformTool,
+      activeTool: activeTool,
+      transformSpace: normalizeTransformSpace(localPath?.ui?.transformSpace),
+      pivotMode: normalizePivotMode(localPath?.ui?.pivotMode),
+      navigationPreset: normalizeNavigationPreset(localPath?.ui?.navigationPreset),
+      showCameraList: localPath?.ui?.showCameraList === true,
+      isEditing: localPath?.ui?.isEditing === true,
     },
   };
 }
-export function normalizeSceneOnlyPanoramaSceneState(_0x2a32ee) {
-  const _0x1f552a = normalizePanoramaSceneState(_0x2a32ee),
-    _0x10daeb = String(_0x1f552a?.viewport?.activeCameraId || '').trim() || null,
-    _0x2f5341 = _0x10daeb
-      ? Array.isArray(_0x1f552a.cameras) && _0x1f552a.cameras.some((_0x4029a7) => _0x4029a7.id === _0x10daeb)
+export function normalizeSceneOnlyPanoramaSceneState(value71) {
+  const activeView = normalizePanoramaSceneState(value71),
+    value72 = String(activeView?.viewport?.activeCameraId || '').trim() || null,
+    activeCameraId2 = value72
+      ? Array.isArray(activeView.cameras) && activeView.cameras.some((item28) => item28.id === value72)
       : false;
   return {
-    ..._0x1f552a,
+    ...activeView,
     mode: 'scene',
     viewport: {
-      ..._0x1f552a.viewport,
-      activeView: _0x1f552a.viewport?.activeView === 'camera' && _0x2f5341 ? 'camera' : 'default',
-      activeCameraId: _0x2f5341 ? _0x10daeb : null,
+      ...activeView.viewport,
+      activeView: activeView.viewport?.activeView === 'camera' && activeCameraId2 ? 'camera' : 'default',
+      activeCameraId: activeCameraId2 ? value72 : null,
     },
   };
 }
-export function normalizePanorama360State(_0x20475f) {
-  const _0x452f18 = normalizePanoramaSceneState(_0x20475f),
-    _0x1cc0dc = new Set(
-      (Array.isArray(_0x452f18.mannequins) ? _0x452f18.mannequins : [])
-        .map((_0xa557ba) => String(_0xa557ba?.id || '').trim())
+export function normalizePanorama360State(value73) {
+  const args5 = normalizePanoramaSceneState(value73),
+    map6 = new Set(
+      (Array.isArray(args5.mannequins) ? args5.mannequins : [])
+        .map((item29) => String(item29?.id || '').trim())
         .filter(Boolean),
     ),
-    _0x2eb624 = Array.isArray(_0x452f18.groups) ? _0x452f18.groups : [];
-  let _0x431005 = (
-    Array.isArray(_0x452f18.selection?.selectedObjects) ? _0x452f18.selection.selectedObjects : []
+    list7 = Array.isArray(args5.groups) ? args5.groups : [];
+  let selectedObjects2 = (
+    Array.isArray(args5.selection?.selectedObjects) ? args5.selection.selectedObjects : []
   )
-    .map((_0x267aaa) => ({
-      objectType: String(_0x267aaa?.objectType || '').trim(),
-      objectId: String(_0x267aaa?.objectId || '').trim(),
+    .map((item30) => ({
+      objectType: String(item30?.objectType || '').trim(),
+      objectId: String(item30?.objectId || '').trim(),
     }))
-    .filter((_0xd98960) => _0xd98960.objectType === 'mannequin' && _0x1cc0dc.has(_0xd98960.objectId));
-  const _0x2febf9 = String(_0x452f18.selection?.selectedGroupId || '').trim(),
-    _0x4e0ee6 =
-      _0x2febf9 && _0x2eb624.length > 0
-        ? _0x2eb624.find((_0x1aebb1) => String(_0x1aebb1?.id || '').trim() === _0x2febf9) || null
+    .filter((item31) => item31.objectType === 'mannequin' && map6.has(item31.objectId));
+  const value74 = String(args5.selection?.selectedGroupId || '').trim(),
+    value75 =
+      value74 && list7.length > 0
+        ? list7.find((item32) => String(item32?.id || '').trim() === value74) || null
         : null;
-  let _0x1b013a = null;
-  _0x4e0ee6 &&
-    ((_0x1b013a = _0x4e0ee6.id),
-    (_0x431005 = _0x4e0ee6.memberIds
-      .map((_0x5376a9) => String(_0x5376a9 || '').trim())
-      .filter((_0x2e15a3) => _0x1cc0dc.has(_0x2e15a3))
-      .map((_0x14e28f) => ({ objectType: 'mannequin', objectId: _0x14e28f }))));
-  if (_0x431005.length === 0) {
-    const _0x5a4edf = String(_0x452f18.selection?.selectedObjectId || '').trim();
-    String(_0x452f18.selection?.selectedObjectType || '').trim() === 'mannequin' &&
-      _0x5a4edf &&
-      _0x1cc0dc.has(_0x5a4edf) &&
-      (_0x431005 = [{ objectType: 'mannequin', objectId: _0x5a4edf }]);
+  let selectedGroupId2 = null;
+  value75 &&
+    ((selectedGroupId2 = value75.id),
+    (selectedObjects2 = value75.memberIds
+      .map((item33) => String(item33 || '').trim())
+      .filter((item34) => map6.has(item34))
+      .map((objectId5) => ({ objectType: 'mannequin', objectId: objectId5 }))));
+  if (selectedObjects2.length === 0) {
+    const objectId6 = String(args5.selection?.selectedObjectId || '').trim();
+    String(args5.selection?.selectedObjectType || '').trim() === 'mannequin' &&
+      objectId6 &&
+      map6.has(objectId6) &&
+      (selectedObjects2 = [{ objectType: 'mannequin', objectId: objectId6 }]);
   }
-  const _0x54c62c = new Set();
-  _0x431005 = _0x431005.filter((_0x1e2885) => {
-    const _0x5ed143 = _0x1e2885.objectType + ':' + _0x1e2885.objectId;
-    if (_0x54c62c.has(_0x5ed143)) return false;
-    return (_0x54c62c.add(_0x5ed143), true);
+  const map7 = new Set();
+  selectedObjects2 = selectedObjects2.filter((item35) => {
+    const value76 = item35.objectType + ':' + item35.objectId;
+    if (map7.has(value76)) return false;
+    return (map7.add(value76), true);
   });
-  const _0x1f1960 = _0x431005.map((_0x3674a5) => _0x3674a5.objectId),
-    _0x5e5ae8 = String(_0x452f18.selection?.selectedObjectId || '').trim(),
-    _0x143c19 = _0x5e5ae8 && _0x1f1960.includes(_0x5e5ae8) ? _0x5e5ae8 : _0x1f1960[0] || null;
+  const selectedObjectIds2 = selectedObjects2.map((item36) => item36.objectId),
+    value77 = String(args5.selection?.selectedObjectId || '').trim(),
+    selectedObjectType2 =
+      value77 && selectedObjectIds2.includes(value77) ? value77 : selectedObjectIds2[0] || null;
   return {
-    ..._0x452f18,
+    ...args5,
     mode: 'panorama',
     cubes: [],
     cameras: [],
-    viewport: { ..._0x452f18.viewport, activeView: 'default', activeCameraId: null },
+    viewport: { ...args5.viewport, activeView: 'default', activeCameraId: null },
     selection: {
-      selectedObjectType: _0x143c19 ? 'mannequin' : null,
-      selectedObjectId: _0x143c19,
-      selectedObjectIds: _0x1f1960,
-      selectedObjects: _0x431005,
-      selectedGroupId: _0x1b013a && _0x431005.length > 0 ? _0x1b013a : null,
+      selectedObjectType: selectedObjectType2 ? 'mannequin' : null,
+      selectedObjectId: selectedObjectType2,
+      selectedObjectIds: selectedObjectIds2,
+      selectedObjects: selectedObjects2,
+      selectedGroupId: selectedGroupId2 && selectedObjects2.length > 0 ? selectedGroupId2 : null,
     },
-    ui: { ..._0x452f18.ui, showCameraList: false },
+    ui: { ...args5.ui, showCameraList: false },
   };
 }
 export function createPanoramaSceneNodeData({
-  id: _0x5af505,
+  id: id4,
   x: x = 0,
   y: y = 0,
   width: width = PANORAMA_SCENE_DEFAULT_SIZE.width,
@@ -785,7 +756,7 @@ export function createPanoramaSceneNodeData({
   name: name = getPanoramaSceneDefaultName(),
 } = {}) {
   return {
-    id: _0x5af505,
+    id: id4,
     type: PANORAMA_SCENE_NODE_TYPE,
     x: x,
     y: y,
@@ -796,7 +767,7 @@ export function createPanoramaSceneNodeData({
   };
 }
 export function createPanorama360NodeData({
-  id: _0x533dd4,
+  id: id5,
   x: x = 0,
   y: y = 0,
   width: width = PANORAMA_SCENE_DEFAULT_SIZE.width,
@@ -804,7 +775,7 @@ export function createPanorama360NodeData({
   name: name = getPanorama360DefaultName(),
 } = {}) {
   return {
-    id: _0x533dd4,
+    id: id5,
     type: PANORAMA_360_NODE_TYPE,
     x: x,
     y: y,

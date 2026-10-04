@@ -32,81 +32,78 @@ const DEFAULT_ASSET_CATEGORIES = ['人物', '场景', '物品'],
     出图历史: 'history',
     自定义: 'custom',
   });
-function assetManagerText(_0x98cfea, _0x10bf1c = {}) {
-  return t('assetManager.' + _0x98cfea, _0x10bf1c);
+function assetManagerText(value, item = {}) {
+  return t('assetManager.' + value, item);
 }
-function _formatAssetCategoryLabel(_0x33357e) {
-  const _0x4b40a3 = String(_0x33357e || '').trim(),
-    _0x3e3cf0 = ASSET_CATEGORY_I18N_KEYS[_0x4b40a3];
-  return _0x3e3cf0 ? assetManagerText('categories.' + _0x3e3cf0) : _0x4b40a3;
+function _formatAssetCategoryLabel(key) {
+  const index = String(key || '').trim(),
+    result = ASSET_CATEGORY_I18N_KEYS[index];
+  return result ? assetManagerText('categories.' + result) : index;
 }
-function _escapeHtml(_0x2606d3) {
-  return String(_0x2606d3 ?? '')
+function _escapeHtml(data) {
+  return String(data ?? '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 }
-function _clonePlain(_0x4cfd8c, _0x31a68a) {
-  if (_0x4cfd8c == null) return _0x31a68a;
+function _clonePlain(options, target) {
+  if (options == null) return target;
   try {
-    return JSON.parse(JSON.stringify(_0x4cfd8c));
-  } catch (_0x1e5809) {
-    return _0x31a68a;
+    return JSON.parse(JSON.stringify(options));
+  } catch (source) {
+    return target;
   }
 }
-function _normalizeAssetType(_0x45aff0) {
-  const _0x51b3cd = String(_0x45aff0 || '');
-  if (_0x51b3cd === 'text' || _0x51b3cd === 'source-text' || _0x51b3cd === 'ai-text') return 'text';
-  if (_0x51b3cd === 'audio' || _0x51b3cd === 'source-audio' || _0x51b3cd === 'ai-audio') return 'audio';
-  if (_0x51b3cd === 'video' || _0x51b3cd === 'source-video' || _0x51b3cd === 'ai-video') return 'video';
-  if (_0x51b3cd === 'image' || _0x51b3cd === 'source-image' || _0x51b3cd === 'ai-image') return 'image';
+function _normalizeAssetType(next) {
+  const current = String(next || '');
+  if (current === 'text' || current === 'source-text' || current === 'ai-text') return 'text';
+  if (current === 'audio' || current === 'source-audio' || current === 'ai-audio') return 'audio';
+  if (current === 'video' || current === 'source-video' || current === 'ai-video') return 'video';
+  if (current === 'image' || current === 'source-image' || current === 'ai-image') return 'image';
   return 'other';
 }
-function _formatAssetTypeLabel(_0x2a6df4) {
-  const _0x97aa06 = _normalizeAssetType(_0x2a6df4);
-  return assetManagerText('types.' + _0x97aa06);
+function _formatAssetTypeLabel(entry) {
+  const _normalizeAssetType2 = _normalizeAssetType(entry);
+  return assetManagerText('types.' + _normalizeAssetType2);
 }
-function _resolveNodeStableThumbSrc(_0x21d99c) {
-  if (!_0x21d99c) return '';
-  const _0x2fcc4b =
-    _0x21d99c.thumbLocalPath ||
-    _0x21d99c.displayLocalPath ||
-    _0x21d99c.localPath ||
-    _0x21d99c.originalLocalPath;
-  if (_0x2fcc4b)
+function _resolveNodeStableThumbSrc(enabled) {
+  if (!enabled) return '';
+  const record =
+    enabled.thumbLocalPath || enabled.displayLocalPath || enabled.localPath || enabled.originalLocalPath;
+  if (record)
     return (
-      localPathToUrl(_0x2fcc4b) ||
-      (String(_0x2fcc4b).startsWith('/') ? String(_0x2fcc4b) : '/' + String(_0x2fcc4b).replace(/^\/+/, ''))
+      localPathToUrl(record) ||
+      (String(record).startsWith('/') ? String(record) : '/' + String(record).replace(/^\/+/, ''))
     );
-  if (_0x21d99c.thumbUrl && typeof _0x21d99c.thumbUrl === 'string') return _0x21d99c.thumbUrl;
-  return String(_0x21d99c.src || _0x21d99c.imageUrl || '');
+  if (enabled.thumbUrl && typeof enabled.thumbUrl === 'string') return enabled.thumbUrl;
+  return String(enabled.src || enabled.imageUrl || '');
 }
-function _renderAssetIcon(_0x4fea63) {
-  const _0x24905d = _normalizeAssetType(_0x4fea63);
-  if (_0x24905d === 'text') return createReferenceFallbackThumbHtml('text', 'v2-asset-icon');
-  if (_0x24905d === 'audio') return createReferenceFallbackThumbHtml('audio', 'v2-asset-icon');
-  if (_0x24905d === 'video')
+function _renderAssetIcon(payload) {
+  const _normalizeAssetType3 = _normalizeAssetType(payload);
+  if (_normalizeAssetType3 === 'text') return createReferenceFallbackThumbHtml('text', 'v2-asset-icon');
+  if (_normalizeAssetType3 === 'audio') return createReferenceFallbackThumbHtml('audio', 'v2-asset-icon');
+  if (_normalizeAssetType3 === 'video')
     return '<div class="v2-asset-icon v2-asset-icon--video" aria-hidden="true">\n      <svg class="v2-asset-icon-svg" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">\n        <polygon points="5 3 19 12 5 21 5 3" />\n      </svg>\n    </div>';
   return '<div class="v2-asset-icon v2-asset-icon--other" aria-hidden="true">\n    <svg class="v2-asset-icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5">\n      <rect x="3" y="3" width="18" height="18" rx="2" />\n    </svg>\n  </div>';
 }
-function _buildAssetItem(_0xf3bc34) {
-  const _0x24c8d4 = _0xf3bc34?.type || 'other',
-    _0x1eae17 = _resolveNodeStableThumbSrc(_0xf3bc34);
-  return { type: _0x24c8d4, name: _0xf3bc34?.name || '', thumbSrc: _0x1eae17 || '', nodeData: _0xf3bc34 };
+function _buildAssetItem(name) {
+  const type = name?.type || 'other',
+    thumbSrc = _resolveNodeStableThumbSrc(name);
+  return { type: type, name: name?.name || '', thumbSrc: thumbSrc || '', nodeData: name };
 }
-function _sortAssetsByUpdatedTime(_0x5808f2) {
-  return [...(Array.isArray(_0x5808f2) ? _0x5808f2 : [])].sort((_0x4393c2, _0x4115e6) => {
-    const _0x1b0b29 = Number(_0x4393c2?.updatedAt || _0x4393c2?.createdAt || 0),
-      _0x411c1f = Number(_0x4115e6?.updatedAt || _0x4115e6?.createdAt || 0);
-    return _0x411c1f - _0x1b0b29;
+function _sortAssetsByUpdatedTime(handle) {
+  return [...(Array.isArray(handle) ? handle : [])].sort((item2, state) => {
+    const config = Number(item2?.updatedAt || item2?.createdAt || 0),
+      scope = Number(state?.updatedAt || state?.createdAt || 0);
+    return scope - config;
   });
 }
-function _formatAssetDateTime(_0x5ed43b) {
-  const _0x25aff8 = Number(_0x5ed43b);
-  if (!Number.isFinite(_0x25aff8) || _0x25aff8 <= 0) return assetManagerText('unknownTime');
-  return new Date(_0x25aff8).toLocaleString(getLocale(), {
+function _formatAssetDateTime(input) {
+  const count = Number(input);
+  if (!Number.isFinite(count) || count <= 0) return assetManagerText('unknownTime');
+  return new Date(count).toLocaleString(getLocale(), {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -143,72 +140,70 @@ class AssetManager {
       this.loadAssetsFromServer());
   }
   ['_getSortedAssets']() {
-    return _sortAssetsByUpdatedTime(
-      (this.assets || []).filter((_0x344b38) => this._isManagedAsset(_0x344b38)),
-    );
+    return _sortAssetsByUpdatedTime((this.assets || []).filter((item3) => this._isManagedAsset(item3)));
   }
-  ['_normalizeCategoryName'](_0x482a13) {
-    return String(_0x482a13 || '').trim();
+  ['_normalizeCategoryName'](output) {
+    return String(output || '').trim();
   }
-  ['_categoryKey'](_0x349693) {
-    return this._normalizeCategoryName(_0x349693).toLocaleLowerCase();
+  ['_categoryKey'](value2) {
+    return this._normalizeCategoryName(value2).toLocaleLowerCase();
   }
-  ['_isDefaultCategory'](_0x393f4f) {
-    return !!this._findCategoryByName(_0x393f4f, DEFAULT_ASSET_CATEGORIES);
+  ['_isDefaultCategory'](value3) {
+    return !!this._findCategoryByName(value3, DEFAULT_ASSET_CATEGORIES);
   }
-  ['_isHiddenAssetCategory'](_0x137728) {
-    return !!this._findCategoryByName(_0x137728, HIDDEN_ASSET_CATEGORIES);
+  ['_isHiddenAssetCategory'](value4) {
+    return !!this._findCategoryByName(value4, HIDDEN_ASSET_CATEGORIES);
   }
-  ['_isManagedAsset'](_0x21212b) {
-    if (!_0x21212b || typeof _0x21212b !== 'object') return false;
+  ['_isManagedAsset'](enabled2) {
+    if (!enabled2 || typeof enabled2 !== 'object') return false;
     if (
       HIDDEN_ASSET_KINDS.includes(
-        String(_0x21212b?.kind || '')
+        String(enabled2?.kind || '')
           .trim()
           .toLowerCase(),
       )
     )
       return false;
-    return !this._isHiddenAssetCategory(_0x21212b?.category);
+    return !this._isHiddenAssetCategory(enabled2?.category);
   }
-  ['_findCategoryByName'](_0x4bb53d, _0x2e3fb9 = this.tabs) {
-    const _0x33670d = this._categoryKey(_0x4bb53d);
-    if (!_0x33670d) return '';
-    return (_0x2e3fb9 || []).find((_0x51aecc) => this._categoryKey(_0x51aecc) === _0x33670d) || '';
+  ['_findCategoryByName'](value5, value6 = this.tabs) {
+    const enabled3 = this._categoryKey(value5);
+    if (!enabled3) return '';
+    return (value6 || []).find((item4) => this._categoryKey(item4) === enabled3) || '';
   }
-  ['_normalizeUserCategories'](_0x309796 = []) {
-    const _0x2fae04 = [],
-      _0x2f9432 = (_0x97ea14) => {
-        const _0x44cf53 = this._normalizeCategoryName(_0x97ea14);
-        if (!_0x44cf53) return;
-        if (this._isDefaultCategory(_0x44cf53) || this._isHiddenAssetCategory(_0x44cf53)) return;
-        if (this._findCategoryByName(_0x44cf53, _0x2fae04)) return;
-        if (DEFAULT_ASSET_CATEGORIES.length + _0x2fae04.length >= ASSET_CATEGORY_LIMIT) return;
-        _0x2fae04.push(_0x44cf53);
+  ['_normalizeUserCategories'](list = []) {
+    const list2 = [],
+      item5 = (value7) => {
+        const enabled4 = this._normalizeCategoryName(value7);
+        if (!enabled4) return;
+        if (this._isDefaultCategory(enabled4) || this._isHiddenAssetCategory(enabled4)) return;
+        if (this._findCategoryByName(enabled4, list2)) return;
+        if (DEFAULT_ASSET_CATEGORIES.length + list2.length >= ASSET_CATEGORY_LIMIT) return;
+        list2.push(enabled4);
       };
-    return ((Array.isArray(_0x309796) ? _0x309796 : []).forEach(_0x2f9432), _0x2fae04);
+    return ((Array.isArray(list) ? list : []).forEach(item5), list2);
   }
-  ['_isUserCategory'](_0x1a2a4c) {
-    return !!this._findCategoryByName(_0x1a2a4c, this.userCategories);
+  ['_isUserCategory'](value8) {
+    return !!this._findCategoryByName(value8, this.userCategories);
   }
-  ['_getAssetCategories'](_0x25147c = '') {
-    const _0x46948d = [],
-      _0x54ed94 = (_0x34e983) => {
-        const _0x3b65a4 = this._normalizeCategoryName(_0x34e983);
-        if (!_0x3b65a4) return;
-        if (this._isHiddenAssetCategory(_0x3b65a4)) return;
-        if (this._findCategoryByName(_0x3b65a4, _0x46948d)) return;
-        if (_0x46948d.length >= ASSET_CATEGORY_LIMIT) return;
-        _0x46948d.push(_0x3b65a4);
+  ['_getAssetCategories'](value9 = '') {
+    const list3 = [],
+      handler = (value10) => {
+        const enabled5 = this._normalizeCategoryName(value10);
+        if (!enabled5) return;
+        if (this._isHiddenAssetCategory(enabled5)) return;
+        if (this._findCategoryByName(enabled5, list3)) return;
+        if (list3.length >= ASSET_CATEGORY_LIMIT) return;
+        list3.push(enabled5);
       };
-    DEFAULT_ASSET_CATEGORIES.forEach(_0x54ed94);
-    for (const _0x1bfd1f of this.userCategories || []) {
-      _0x54ed94(_0x1bfd1f);
+    DEFAULT_ASSET_CATEGORIES.forEach(handler);
+    for (const value11 of this.userCategories || []) {
+      handler(value11);
     }
-    for (const _0x57f8e1 of this._getSortedAssets()) {
-      _0x54ed94(_0x57f8e1?.category);
+    for (const value12 of this._getSortedAssets()) {
+      handler(value12?.category);
     }
-    return (_0x54ed94(_0x25147c), _0x46948d);
+    return (handler(value9), list3);
   }
   ['_syncTabsFromAssets']() {
     ((this.tabs = this._getAssetCategories()),
@@ -217,16 +212,16 @@ class AssetManager {
   }
   ['_renderSidebarTabsHtml']() {
     return (this.tabs || [])
-      .map((_0x2e5f34) => {
-        const _0x21f89a = this._categoryKey(_0x2e5f34) === this._categoryKey(this.activeTab) ? ' active' : '',
-          _0x3b0ded = _escapeHtml(_0x2e5f34),
-          _0x17e8af = _escapeHtml(_formatAssetCategoryLabel(_0x2e5f34)),
-          _0x6b48bb = this._isUserCategory(_0x2e5f34)
+      .map((item6) => {
+        const value13 = this._categoryKey(item6) === this._categoryKey(this.activeTab) ? ' active' : '',
+          _escapeHtml2 = _escapeHtml(item6),
+          _escapeHtml3 = _escapeHtml(_formatAssetCategoryLabel(item6)),
+          value14 = this._isUserCategory(item6)
             ? '<button\n              type="button"\n              class="v2-asset-category-delete"\n              data-ui-action="asset-category-delete"\n              data-cat="' +
-              _0x3b0ded +
+              _escapeHtml2 +
               '"\n              aria-label="' +
               _escapeHtml(
-                assetManagerText('deleteCategoryAria', { category: _formatAssetCategoryLabel(_0x2e5f34) }),
+                assetManagerText('deleteCategoryAria', { category: _formatAssetCategoryLabel(item6) }),
               ) +
               '"\n              title="' +
               _escapeHtml(assetManagerText('deleteCategory')) +
@@ -234,22 +229,22 @@ class AssetManager {
             : '';
         return (
           '\n          <div class="v2-asset-sidebar-tab' +
-          _0x21f89a +
+          value13 +
           '" data-cat="' +
-          _0x3b0ded +
+          _escapeHtml2 +
           '">\n            <span class="v2-asset-sidebar-tab-text">' +
-          _0x17e8af +
+          _escapeHtml3 +
           '</span>\n            ' +
-          _0x6b48bb +
+          value14 +
           '\n          </div>\n        '
         );
       })
       .join('');
   }
   ['_renderSidebarTabs']() {
-    const _0x34feab = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
-    if (!_0x34feab) return;
-    ((_0x34feab.innerHTML = this._renderSidebarTabsHtml()), this._queueSidebarTabsLayoutSync());
+    const el = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
+    if (!el) return;
+    ((el.innerHTML = this._renderSidebarTabsHtml()), this._queueSidebarTabsLayoutSync());
   }
   ['_queueSidebarTabsLayoutSync']() {
     if (!this.sidebarPanel) return;
@@ -259,242 +254,240 @@ class AssetManager {
       })));
   }
   ['_syncSidebarTabsViewport']() {
-    const _0x5407ef = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
-    if (!_0x5407ef) return;
-    const _0x564864 = _0x5407ef.querySelector('.v2-asset-sidebar-tab.active');
-    if (_0x564864 && _0x5407ef.clientWidth > 0) {
-      if (this._isDefaultCategory(this.activeTab)) _0x5407ef.scrollLeft = 0;
+    const el2 = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
+    if (!el2) return;
+    const el3 = el2.querySelector('.v2-asset-sidebar-tab.active');
+    if (el3 && el2.clientWidth > 0) {
+      if (this._isDefaultCategory(this.activeTab)) el2.scrollLeft = 0;
       else {
-        const _0x16ea4b = _0x564864.offsetLeft,
-          _0x152f92 = _0x16ea4b + _0x564864.offsetWidth,
-          _0x13ec00 = _0x5407ef.scrollLeft,
-          _0x5a562e = _0x13ec00 + _0x5407ef.clientWidth;
-        if (_0x16ea4b < _0x13ec00) _0x5407ef.scrollLeft = _0x16ea4b;
-        else _0x152f92 > _0x5a562e && (_0x5407ef.scrollLeft = _0x152f92 - _0x5407ef.clientWidth);
+        const value15 = el3.offsetLeft,
+          value16 = value15 + el3.offsetWidth,
+          value17 = el2.scrollLeft,
+          value18 = value17 + el2.clientWidth;
+        if (value15 < value17) el2.scrollLeft = value15;
+        else value16 > value18 && (el2.scrollLeft = value16 - el2.clientWidth);
       }
     }
     this._updateSidebarTabsOverflowHint();
   }
   ['_updateSidebarTabsOverflowHint']() {
-    const _0x4d2f6e = this.sidebarPanel?.querySelector('#asset-sidebar-tabs-shell'),
-      _0x4d83f6 = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
-    if (!_0x4d2f6e || !_0x4d83f6) return;
-    const _0x1b5fa7 = Math.max(0, _0x4d83f6.scrollWidth - _0x4d83f6.clientWidth),
-      _0x134890 = _0x1b5fa7 > 2,
-      _0x4c12e3 = !_0x134890 || _0x4d83f6.scrollLeft <= 2,
-      _0xa96830 = !_0x134890 || _0x4d83f6.scrollLeft >= _0x1b5fa7 - 2;
-    (_0x4d2f6e.classList.toggle('has-overflow', _0x134890),
-      _0x4d2f6e.classList.toggle('is-at-start', _0x4c12e3),
-      _0x4d2f6e.classList.toggle('is-at-end', _0xa96830));
-    const _0x120680 = _0x4d2f6e.querySelector('.v2-asset-sidebar-tabs-nav--prev'),
-      _0x392da5 = _0x4d2f6e.querySelector('.v2-asset-sidebar-tabs-nav--next');
-    if (_0x120680) _0x120680.hidden = !_0x134890 || _0x4c12e3;
-    if (_0x392da5) _0x392da5.hidden = !_0x134890 || _0xa96830;
+    const el4 = this.sidebarPanel?.querySelector('#asset-sidebar-tabs-shell'),
+      el5 = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
+    if (!el4 || !el5) return;
+    const count2 = Math.max(0, el5.scrollWidth - el5.clientWidth),
+      enabled6 = count2 > 2,
+      value19 = !enabled6 || el5.scrollLeft <= 2,
+      value20 = !enabled6 || el5.scrollLeft >= count2 - 2;
+    (el4.classList.toggle('has-overflow', enabled6),
+      el4.classList.toggle('is-at-start', value19),
+      el4.classList.toggle('is-at-end', value20));
+    const el6 = el4.querySelector('.v2-asset-sidebar-tabs-nav--prev'),
+      el7 = el4.querySelector('.v2-asset-sidebar-tabs-nav--next');
+    if (el6) el6.hidden = !enabled6 || value19;
+    if (el7) el7.hidden = !enabled6 || value20;
   }
-  ['_scrollSidebarTabs'](_0x13355c = 1) {
-    const _0x515da1 = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
-    if (!_0x515da1) return;
-    const _0x190a27 = Math.max(1, Math.floor(_0x515da1.clientWidth * 0.75)),
-      _0x3c723e = _0x515da1.scrollLeft + _0x190a27 * (_0x13355c < 0 ? -1 : 1);
-    (typeof _0x515da1.scrollTo === 'function'
-      ? _0x515da1.scrollTo({ left: _0x3c723e, behavior: 'smooth' })
-      : (_0x515da1.scrollLeft = _0x3c723e),
+  ['_scrollSidebarTabs'](count3 = 1) {
+    const el8 = this.sidebarPanel?.querySelector('#asset-sidebar-tabs');
+    if (!el8) return;
+    const value21 = Math.max(1, Math.floor(el8.clientWidth * 0.75)),
+      left = el8.scrollLeft + value21 * (count3 < 0 ? -1 : 1);
+    (typeof el8.scrollTo === 'function'
+      ? el8.scrollTo({ left: left, behavior: 'smooth' })
+      : (el8.scrollLeft = left),
       window.setTimeout(() => this._updateSidebarTabsOverflowHint(), 220));
   }
   ['_getCreatePanelCategories']() {
-    const _0x199e2d = this._getAssetCategories(),
-      _0x29434f = (_0x424c12) => {
-        const _0x5a581c = this._normalizeCategoryName(_0x424c12);
-        if (!_0x5a581c) return;
-        if (this._findCategoryByName(_0x5a581c, _0x199e2d)) return;
-        _0x199e2d.push(_0x5a581c);
+    const list4 = this._getAssetCategories(),
+      handler2 = (value22) => {
+        const enabled7 = this._normalizeCategoryName(value22);
+        if (!enabled7) return;
+        if (this._findCategoryByName(enabled7, list4)) return;
+        list4.push(enabled7);
       };
-    for (const _0x550833 of this._createPanelState?.customCategories || []) {
-      _0x29434f(_0x550833);
+    for (const value23 of this._createPanelState?.customCategories || []) {
+      handler2(value23);
     }
-    return (_0x29434f(this._createPanelState?.draft?.category || this.activeTab), _0x199e2d);
+    return (handler2(this._createPanelState?.draft?.category || this.activeTab), list4);
   }
   ['_canAddCustomCategory']() {
     return this._getCreatePanelCategories().length < ASSET_CATEGORY_LIMIT;
   }
   async ['loadAssetCategoriesFromServer']() {
     try {
-      const _0x2ac2fe = await fetchAssetCategoriesFromServer();
-      ((this.userCategories = this._normalizeUserCategories(_0x2ac2fe)),
+      const fetchAssetCategoriesFromServer2 = await fetchAssetCategoriesFromServer();
+      ((this.userCategories = this._normalizeUserCategories(fetchAssetCategoriesFromServer2)),
         this._syncTabsFromAssets(),
         this._renderSidebarTabs(),
         this.sidebarPanel?.classList.contains('show') && this.renderSidebarContent());
-    } catch (_0x376d20) {
-      console.error('加载资产分类失败', _0x376d20);
+    } catch (value24) {
+      console.error('加载资产分类失败', value24);
     }
   }
   async ['_saveUserCategories']() {
-    const _0x4a06ce = this._normalizeUserCategories(this.userCategories);
-    ((this.userCategories = _0x4a06ce), await saveAssetCategoriesToServer(_0x4a06ce));
+    const value25 = this._normalizeUserCategories(this.userCategories);
+    ((this.userCategories = value25), await saveAssetCategoriesToServer(value25));
   }
-  ['_addUserCategory'](_0x2c9848) {
-    const _0x487b4b = this._normalizeCategoryName(_0x2c9848);
-    if (!_0x487b4b || this._isDefaultCategory(_0x487b4b) || this._isHiddenAssetCategory(_0x487b4b)) return '';
-    const _0x5e8ca8 = this._findCategoryByName(_0x487b4b, this.userCategories);
-    if (_0x5e8ca8) return _0x5e8ca8;
+  ['_addUserCategory'](value26) {
+    const enabled8 = this._normalizeCategoryName(value26);
+    if (!enabled8 || this._isDefaultCategory(enabled8) || this._isHiddenAssetCategory(enabled8)) return '';
+    const value27 = this._findCategoryByName(enabled8, this.userCategories);
+    if (value27) return value27;
     if (this._getAssetCategories().length >= ASSET_CATEGORY_LIMIT)
       return (
         window.showToast?.(assetManagerText('categoryLimit', { limit: ASSET_CATEGORY_LIMIT }), 'warn'),
         ''
       );
     return (
-      (this.userCategories = this._normalizeUserCategories([...this.userCategories, _0x487b4b])),
+      (this.userCategories = this._normalizeUserCategories([...this.userCategories, enabled8])),
       this._syncTabsFromAssets(),
       this._renderSidebarTabs(),
-      void this._saveUserCategories().catch((_0x499895) => {
-        (console.error('保存资产分类失败', _0x499895),
+      void this._saveUserCategories().catch((value28) => {
+        (console.error('保存资产分类失败', value28),
           window.showToast?.(assetManagerText('categorySaveFailed'), 'error'));
       }),
-      _0x487b4b
+      enabled8
     );
   }
   ['_getMentionEligibleAssets']() {
-    return this._getSortedAssets().filter((_0x56c3d3) =>
-      this._findCategoryByName(_0x56c3d3?.category, this.tabs),
-    );
+    return this._getSortedAssets().filter((item7) => this._findCategoryByName(item7?.category, this.tabs));
   }
-  ['_normalizeAssetEntity'](_0x31b72b) {
-    if (!_0x31b72b || typeof _0x31b72b !== 'object') return null;
-    const _0xe74003 = { ..._0x31b72b },
-      _0x1d9fa1 = Number(_0xe74003.createdAt || 0),
-      _0x4a80cf = Number(_0xe74003.updatedAt || _0x1d9fa1 || 0);
-    _0x1d9fa1 > 0 ? (_0xe74003.createdAt = _0x1d9fa1) : delete _0xe74003.createdAt;
-    if (_0x4a80cf > 0) _0xe74003.updatedAt = _0x4a80cf;
-    else _0x1d9fa1 > 0 && (_0xe74003.updatedAt = _0x1d9fa1);
+  ['_normalizeAssetEntity'](args) {
+    if (!args || typeof args !== 'object') return null;
+    const enabled9 = { ...args },
+      count4 = Number(enabled9.createdAt || 0),
+      count5 = Number(enabled9.updatedAt || count4 || 0);
+    count4 > 0 ? (enabled9.createdAt = count4) : delete enabled9.createdAt;
+    if (count5 > 0) enabled9.updatedAt = count5;
+    else count4 > 0 && (enabled9.updatedAt = count4);
     return (
-      !_0xe74003.coverUrl &&
-        Array.isArray(_0xe74003.nodes) &&
-        _0xe74003.nodes[0] &&
-        (_0xe74003.coverUrl = _resolveNodeStableThumbSrc(_0xe74003.nodes[0])),
-      !Array.isArray(_0xe74003.items) &&
-        Array.isArray(_0xe74003.nodes) &&
-        (_0xe74003.items = _0xe74003.nodes.map((_0x6ff292) => _buildAssetItem(_0x6ff292))),
-      _0xe74003
+      !enabled9.coverUrl &&
+        Array.isArray(enabled9.nodes) &&
+        enabled9.nodes[0] &&
+        (enabled9.coverUrl = _resolveNodeStableThumbSrc(enabled9.nodes[0])),
+      !Array.isArray(enabled9.items) &&
+        Array.isArray(enabled9.nodes) &&
+        (enabled9.items = enabled9.nodes.map((item8) => _buildAssetItem(item8))),
+      enabled9
     );
   }
-  ['_upsertLocalAsset'](_0x5aa009) {
-    const _0x24f2b3 = this._normalizeAssetEntity(_0x5aa009);
-    if (!_0x24f2b3?.id) return;
-    const _0x58f8e6 = Array.isArray(this.assets) ? this.assets : [],
-      _0x4f5cde = _0x58f8e6.filter((_0x874125) => String(_0x874125?.id || '') !== String(_0x24f2b3.id));
-    ((this.assets = _sortAssetsByUpdatedTime([_0x24f2b3, ..._0x4f5cde])),
+  ['_upsertLocalAsset'](value29) {
+    const enabled10 = this._normalizeAssetEntity(value29);
+    if (!enabled10?.id) return;
+    const list5 = Array.isArray(this.assets) ? this.assets : [],
+      args2 = list5.filter((item9) => String(item9?.id || '') !== String(enabled10.id));
+    ((this.assets = _sortAssetsByUpdatedTime([enabled10, ...args2])),
       this._syncTabsFromAssets(),
       this._renderSidebarTabs(),
-      this._findCategoryByName(_0x24f2b3.category, this.tabs)
-        ? upsertAssetMentionAsset(_0x24f2b3)
-        : removeAssetMentionAsset(_0x24f2b3.id));
+      this._findCategoryByName(enabled10.category, this.tabs)
+        ? upsertAssetMentionAsset(enabled10)
+        : removeAssetMentionAsset(enabled10.id));
   }
-  ['_getSelectedAssetNodes'](_0x52dbbf) {
-    const _0x48010c = Array.isArray(_0x52dbbf) ? _0x52dbbf : [],
-      _0x2ae02e = appStore.getState();
-    return _0x48010c.map((_0x30fc2b) => _0x2ae02e.nodes[_0x30fc2b]).filter(Boolean);
+  ['_getSelectedAssetNodes'](value30) {
+    const list6 = Array.isArray(value30) ? value30 : [],
+      value31 = appStore.getState();
+    return list6.map((item10) => value31.nodes[item10]).filter(Boolean);
   }
-  ['_getSelectedAssetEdges'](_0x5a1154) {
-    const _0x3ded93 = Array.isArray(_0x5a1154) ? _0x5a1154 : [],
-      _0x37cb83 = new Set(_0x3ded93),
-      _0x1e537c = appStore.getState();
-    return Object.values(_0x1e537c.edges || {}).filter(
-      (_0x7f9c4c) => _0x37cb83.has(_0x7f9c4c?.sourceId) && _0x37cb83.has(_0x7f9c4c?.targetId),
+  ['_getSelectedAssetEdges'](value32) {
+    const value33 = Array.isArray(value32) ? value32 : [],
+      map = new Set(value33),
+      value34 = appStore.getState();
+    return Object.values(value34.edges || {}).filter(
+      (item11) => map.has(item11?.sourceId) && map.has(item11?.targetId),
     );
   }
-  async ['_resolveCreatePanelCover'](_0x1dd6de) {
-    let _0x3a9c82 = '';
-    const _0x590a1d = _0x1dd6de?.type || 'other';
-    if (_0x1dd6de?.thumbId) {
-      const _0x2726bf = await getImage(_0x1dd6de.thumbId);
-      _0x2726bf &&
-        ((this._createPanelCoverObjectUrl = URL.createObjectURL(_0x2726bf)),
-        (_0x3a9c82 = this._createPanelCoverObjectUrl));
+  async ['_resolveCreatePanelCover'](value35) {
+    let coverUrl2 = '';
+    const coverType2 = value35?.type || 'other';
+    if (value35?.thumbId) {
+      const image = await getImage(value35.thumbId);
+      image &&
+        ((this._createPanelCoverObjectUrl = URL.createObjectURL(image)),
+        (coverUrl2 = this._createPanelCoverObjectUrl));
     }
     return (
-      !_0x3a9c82 && (_0x3a9c82 = _resolveNodeStableThumbSrc(_0x1dd6de)),
+      !coverUrl2 && (coverUrl2 = _resolveNodeStableThumbSrc(value35)),
       {
-        coverUrl: _0x3a9c82,
-        coverType: _0x590a1d,
-        coverHtml: _0x3a9c82
+        coverUrl: coverUrl2,
+        coverType: coverType2,
+        coverHtml: coverUrl2
           ? '<img src="' +
-            _0x3a9c82 +
+            coverUrl2 +
             '" alt="' +
             _escapeHtml(assetManagerText('coverAlt')) +
             '" id="asset-create-cover-img" draggable="false" />'
-          : _renderAssetIcon(_0x590a1d),
+          : _renderAssetIcon(coverType2),
       }
     );
   }
-  ['_buildAssetPayloadFromSelection'](_0x2010aa, _0x38ffe5 = {}) {
-    const _0x59dc24 = this._getSelectedAssetNodes(_0x2010aa),
-      _0x20d3e3 = _0x59dc24[0] || null,
-      _0x43fc96 = Date.now(),
-      _0x391739 = String(_0x38ffe5.name || '').trim() || assetManagerText('unnamedAsset'),
-      _0x339456 = String(_0x38ffe5.category || '').trim() || this.activeTab,
-      _0x4ccd2b = _0x20d3e3?.type || 'other',
-      _0x200809 = _resolveNodeStableThumbSrc(_0x20d3e3),
-      _0x2c0639 = String(_0x38ffe5.id || '').trim(),
-      _0x4cbad9 = Number(_0x38ffe5.createdAt || _0x43fc96) || _0x43fc96,
-      _0x136834 = Number(_0x38ffe5.updatedAt || _0x43fc96) || _0x43fc96;
+  ['_buildAssetPayloadFromSelection'](value36, error = {}) {
+    const items = this._getSelectedAssetNodes(value36),
+      value37 = items[0] || null,
+      value38 = Date.now(),
+      name2 = String(error.name || '').trim() || assetManagerText('unnamedAsset'),
+      category = String(error.category || '').trim() || this.activeTab,
+      coverType3 = value37?.type || 'other',
+      coverUrl3 = _resolveNodeStableThumbSrc(value37),
+      id = String(error.id || '').trim(),
+      createdAt = Number(error.createdAt || value38) || value38,
+      updatedAt = Number(error.updatedAt || value38) || value38;
     return {
-      id: _0x2c0639 || generateId('asset'),
-      name: _0x391739,
-      category: _0x339456,
-      coverUrl: _0x200809,
-      coverType: _0x4ccd2b,
-      items: _0x59dc24.map((_0x49b88a) => _buildAssetItem(_0x49b88a)),
-      nodes: _0x59dc24,
-      edges: this._getSelectedAssetEdges(_0x2010aa),
-      createdAt: _0x4cbad9,
-      updatedAt: _0x136834,
+      id: id || generateId('asset'),
+      name: name2,
+      category: category,
+      coverUrl: coverUrl3,
+      coverType: coverType3,
+      items: items.map((item12) => _buildAssetItem(item12)),
+      nodes: items,
+      edges: this._getSelectedAssetEdges(value36),
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     };
   }
-  ['_buildAssetAppendPayload'](_0x480639, _0x85a5a5, _0x573264 = {}) {
-    const _0xd3187e = this._getSelectedAssetNodes(_0x85a5a5),
-      _0x3b5cec = this._getSelectedAssetEdges(_0x85a5a5),
-      _0x2c8c9e = Date.now(),
-      _0x1eca6a = {},
-      _0x1491dc = _0xd3187e.map((_0xe1a177) => {
-        const _0x41bfbe = _clonePlain(_0xe1a177, { ..._0xe1a177 }),
-          _0x2ef80f = String(_0x41bfbe.id || ''),
-          _0x4e891c = generateId(_0x41bfbe.type);
-        if (_0x2ef80f) _0x1eca6a[_0x2ef80f] = _0x4e891c;
-        return ((_0x41bfbe.id = _0x4e891c), _0x41bfbe);
+  ['_buildAssetAppendPayload'](id2, value39, error2 = {}) {
+    const list7 = this._getSelectedAssetNodes(value39),
+      list8 = this._getSelectedAssetEdges(value39),
+      value40 = Date.now(),
+      value41 = {},
+      list9 = list7.map((args3) => {
+        const _clonePlain2 = _clonePlain(args3, { ...args3 }),
+          value42 = String(_clonePlain2.id || ''),
+          generateId2 = generateId(_clonePlain2.type);
+        if (value42) value41[value42] = generateId2;
+        return ((_clonePlain2.id = generateId2), _clonePlain2);
       }),
-      _0x3f3cd8 = _0x3b5cec.map((_0x1e8274) => {
-        const _0x2651e0 = _clonePlain(_0x1e8274, { ..._0x1e8274 });
-        _0x2651e0.id = generateId('edge');
-        if (_0x1eca6a[_0x2651e0.sourceId]) _0x2651e0.sourceId = _0x1eca6a[_0x2651e0.sourceId];
-        if (_0x1eca6a[_0x2651e0.targetId]) _0x2651e0.targetId = _0x1eca6a[_0x2651e0.targetId];
-        return _0x2651e0;
+      args4 = list8.map((args5) => {
+        const _clonePlain3 = _clonePlain(args5, { ...args5 });
+        _clonePlain3.id = generateId('edge');
+        if (value41[_clonePlain3.sourceId]) _clonePlain3.sourceId = value41[_clonePlain3.sourceId];
+        if (value41[_clonePlain3.targetId]) _clonePlain3.targetId = value41[_clonePlain3.targetId];
+        return _clonePlain3;
       }),
-      _0xf983b = Array.isArray(_0x480639?.nodes) ? _clonePlain(_0x480639.nodes, []) : [],
-      _0x535c65 = Array.isArray(_0x480639?.items)
-        ? _clonePlain(_0x480639.items, [])
-        : _0xf983b.map((_0x41f17f) => _buildAssetItem(_0x41f17f)),
-      _0x538207 = Array.isArray(_0x480639?.edges) ? _clonePlain(_0x480639.edges, []) : [],
-      _0x11bbfd = _0x1491dc[0] || null,
-      _0x4cfd2a = _0x11bbfd ? _resolveNodeStableThumbSrc(_0x11bbfd) : '',
-      _0x2458ad = _0x480639?.coverUrl || _0x4cfd2a,
-      _0x231cb4 = _0x480639?.coverType || _0x11bbfd?.type || 'other';
+      list10 = Array.isArray(id2?.nodes) ? _clonePlain(id2.nodes, []) : [],
+      args6 = Array.isArray(id2?.items)
+        ? _clonePlain(id2.items, [])
+        : list10.map((item13) => _buildAssetItem(item13)),
+      args7 = Array.isArray(id2?.edges) ? _clonePlain(id2.edges, []) : [],
+      value43 = list9[0] || null,
+      value44 = value43 ? _resolveNodeStableThumbSrc(value43) : '',
+      coverUrl4 = id2?.coverUrl || value44,
+      coverType4 = id2?.coverType || value43?.type || 'other';
     return {
-      ...(_0x480639 || {}),
-      id: _0x480639?.id,
-      name: String(_0x573264.name || '').trim() || assetManagerText('unnamedAsset'),
-      category: String(_0x573264.category || '').trim() || this.activeTab,
-      coverUrl: _0x2458ad,
-      coverType: _0x231cb4,
-      items: [..._0x535c65, ..._0x1491dc.map((_0x4412aa) => _buildAssetItem(_0x4412aa))],
-      nodes: [..._0xf983b, ..._0x1491dc],
-      edges: [..._0x538207, ..._0x3f3cd8],
-      createdAt: Number(_0x480639?.createdAt || _0x480639?.updatedAt || _0x2c8c9e) || _0x2c8c9e,
-      updatedAt: Number(_0x573264.updatedAt || _0x2c8c9e) || _0x2c8c9e,
+      ...(id2 || {}),
+      id: id2?.id,
+      name: String(error2.name || '').trim() || assetManagerText('unnamedAsset'),
+      category: String(error2.category || '').trim() || this.activeTab,
+      coverUrl: coverUrl4,
+      coverType: coverType4,
+      items: [...args6, ...list9.map((item14) => _buildAssetItem(item14))],
+      nodes: [...list10, ...list9],
+      edges: [...args7, ...args4],
+      createdAt: Number(id2?.createdAt || id2?.updatedAt || value40) || value40,
+      updatedAt: Number(error2.updatedAt || value40) || value40,
     };
   }
-  ['_createDefaultPanelState'](_0x45e9ff, _0x4618c3) {
+  ['_createDefaultPanelState'](args8, coverInfo) {
     return {
-      selectedIds: [..._0x45e9ff],
+      selectedIds: [...args8],
       mode: 'create',
       selectedAssetId: '',
       updateSearchKeyword: '',
@@ -506,261 +499,256 @@ class AssetManager {
       saving: false,
       savingAction: '',
       draft: { name: assetManagerText('newAsset'), category: this.activeTab },
-      coverInfo: _0x4618c3 || { coverUrl: '', coverType: 'other', coverHtml: _renderAssetIcon('other') },
+      coverInfo: coverInfo || { coverUrl: '', coverType: 'other', coverHtml: _renderAssetIcon('other') },
     };
   }
-  ['_setCreatePanelState'](_0x9f6d08 = {}) {
+  ['_setCreatePanelState'](args9 = {}) {
     if (!this._createPanelState) return;
-    const _0x530ce4 = this._createPanelState,
-      _0x2694bc = _0x9f6d08.draft ? { ...(_0x530ce4.draft || {}), ..._0x9f6d08.draft } : _0x530ce4.draft;
-    this._createPanelState = { ..._0x530ce4, ..._0x9f6d08, draft: _0x2694bc };
+    const args10 = this._createPanelState,
+      draft = args9.draft ? { ...(args10.draft || {}), ...args9.draft } : args10.draft;
+    this._createPanelState = { ...args10, ...args9, draft: draft };
   }
   ['_getUpdateListCategory']() {
-    const _0x38fecd = this._normalizeCategoryName(this._createPanelState?.draft?.category);
-    if (this._createPanelState?.mode === 'update' && _0x38fecd) return _0x38fecd;
+    const value45 = this._normalizeCategoryName(this._createPanelState?.draft?.category);
+    if (this._createPanelState?.mode === 'update' && value45) return value45;
     return this._findCategoryByName(this.activeTab, this.tabs) || this.activeTab;
   }
-  ['_getFilteredUpdateAssets'](_0x2a0ccf = '') {
-    const _0x4fba2a = String(_0x2a0ccf || '')
+  ['_getFilteredUpdateAssets'](value46 = '') {
+    const enabled11 = String(value46 || '')
         .trim()
         .toLowerCase(),
-      _0xb61890 = this._categoryKey(this._getUpdateListCategory()),
-      _0x3009cf = this._getSortedAssets().filter(
-        (_0x1e8a94) => this._categoryKey(_0x1e8a94?.category) === _0xb61890,
-      );
-    if (!_0x4fba2a) return _0x3009cf;
-    return _0x3009cf.filter((_0x348a53) =>
-      String(_0x348a53?.name || '')
+      value47 = this._categoryKey(this._getUpdateListCategory()),
+      list11 = this._getSortedAssets().filter((item15) => this._categoryKey(item15?.category) === value47);
+    if (!enabled11) return list11;
+    return list11.filter((error3) =>
+      String(error3?.name || '')
         .toLowerCase()
-        .includes(_0x4fba2a),
+        .includes(enabled11),
     );
   }
-  ['_syncCreatePanelDraftFromTarget'](_0x33357f) {
+  ['_syncCreatePanelDraftFromTarget'](error4) {
     this._setCreatePanelState({
       draft: {
-        name: String(_0x33357f?.name || '').trim() || assetManagerText('unnamedAsset'),
-        category: String(_0x33357f?.category || '').trim() || this.activeTab,
+        name: String(error4?.name || '').trim() || assetManagerText('unnamedAsset'),
+        category: String(error4?.category || '').trim() || this.activeTab,
       },
-      selectedAssetId: String(_0x33357f?.id || ''),
+      selectedAssetId: String(error4?.id || ''),
       updateConfirmOpen: false,
       customCategoryEditing: false,
       customCategoryDraft: '',
       error: '',
     });
   }
-  ['_syncUpdateSelectionForCategory'](_0x4495df) {
+  ['_syncUpdateSelectionForCategory'](value48) {
     if (this._createPanelState?.mode !== 'update') return;
-    const _0x456df1 = this._normalizeCategoryName(_0x4495df) || this.activeTab;
+    const category2 = this._normalizeCategoryName(value48) || this.activeTab;
     this._setCreatePanelState({
-      draft: { category: _0x456df1 },
+      draft: { category: category2 },
       selectedAssetId: '',
       updateSearchKeyword: '',
       updateConfirmOpen: false,
       error: '',
     });
-    const _0x189541 = this._getFilteredUpdateAssets()[0] || null;
-    if (!_0x189541) return;
+    const error5 = this._getFilteredUpdateAssets()[0] || null;
+    if (!error5) return;
     this._setCreatePanelState({
       draft: {
-        name: String(_0x189541?.name || '').trim() || assetManagerText('unnamedAsset'),
-        category: String(_0x189541?.category || '').trim() || _0x456df1,
+        name: String(error5?.name || '').trim() || assetManagerText('unnamedAsset'),
+        category: String(error5?.category || '').trim() || category2,
       },
-      selectedAssetId: String(_0x189541?.id || ''),
+      selectedAssetId: String(error5?.id || ''),
     });
   }
   ['_renderCreatePanelContent']() {
-    const _0x439522 = this.createPanel,
-      _0x59add5 = this._createPanelState;
-    if (!_0x439522 || !_0x59add5) return;
-    const _0x397d2e =
-        _0x59add5.coverInfo?.coverHtml || _renderAssetIcon(_0x59add5.coverInfo?.coverType || 'other'),
-      _0x5deff9 =
-        _0x59add5.mode === 'update'
+    const el9 = this.createPanel,
+      enabled12 = this._createPanelState;
+    if (!el9 || !enabled12) return;
+    const value49 =
+        enabled12.coverInfo?.coverHtml || _renderAssetIcon(enabled12.coverInfo?.coverType || 'other'),
+      value50 =
+        enabled12.mode === 'update'
           ? assetManagerText('createPanel.updateTitle')
           : assetManagerText('createPanel.createTitle'),
-      _0x2d94d0 = Array.isArray(_0x59add5.selectedIds) ? _0x59add5.selectedIds.length : 0,
-      _0x2f0aa4 = _0x59add5.saving
-        ? _0x59add5.mode === 'update' && _0x59add5.savingAction === 'join'
+      count6 = Array.isArray(enabled12.selectedIds) ? enabled12.selectedIds.length : 0,
+      value51 = enabled12.saving
+        ? enabled12.mode === 'update' && enabled12.savingAction === 'join'
           ? assetManagerText('createPanel.overwrite')
-          : _0x59add5.mode === 'update'
+          : enabled12.mode === 'update'
             ? assetManagerText('createPanel.saving')
             : assetManagerText('createPanel.creating')
-        : _0x59add5.mode === 'update'
-          ? _0x59add5.updateConfirmOpen
+        : enabled12.mode === 'update'
+          ? enabled12.updateConfirmOpen
             ? assetManagerText('createPanel.confirmOverwrite')
             : assetManagerText('createPanel.overwrite')
           : assetManagerText('createPanel.create'),
-      _0x5bdd4f =
-        _0x59add5.saving && _0x59add5.savingAction === 'join'
+      value52 =
+        enabled12.saving && enabled12.savingAction === 'join'
           ? assetManagerText('createPanel.joining')
           : assetManagerText('createPanel.join'),
-      _0xec53f0 = this._getFilteredUpdateAssets(_0x59add5.updateSearchKeyword),
-      _0x540d50 =
-        _0xec53f0.find((_0x25b048) => String(_0x25b048?.id || '') === _0x59add5.selectedAssetId) || null,
-      _0x444a96 = this._getUpdateListCategory(),
-      _0x46a2a9 = _0x59add5.error
-        ? '<div class="v2-asset-create-error" role="alert">' + _escapeHtml(_0x59add5.error) + '</div>'
+      list12 = this._getFilteredUpdateAssets(enabled12.updateSearchKeyword),
+      name3 = list12.find((item16) => String(item16?.id || '') === enabled12.selectedAssetId) || null,
+      value53 = this._getUpdateListCategory(),
+      value54 = enabled12.error
+        ? '<div class="v2-asset-create-error" role="alert">' + _escapeHtml(enabled12.error) + '</div>'
         : '',
-      _0x3d6c8e =
-        _0x59add5.mode === 'update' && _0x59add5.updateConfirmOpen && _0x540d50
+      value55 =
+        enabled12.mode === 'update' && enabled12.updateConfirmOpen && name3
           ? '<div class="v2-asset-create-confirm">' +
             _escapeHtml(
               assetManagerText('createPanel.confirmOverwriteAsset', {
-                name: _0x540d50.name || assetManagerText('unnamedAsset'),
+                name: name3.name || assetManagerText('unnamedAsset'),
               }),
             ) +
             '</div>'
           : '',
-      _0x28bcea =
-        _0x59add5.mode === 'update'
+      value56 =
+        enabled12.mode === 'update'
           ? '\n          <div class="v2-asset-update-layout">\n            <div class="v2-asset-update-picker">\n              <input\n                type="search"\n                class="v2-asset-update-search"\n                id="asset-update-search"\n                placeholder="' +
             _escapeHtml(
               assetManagerText('createPanel.searchAssets', {
-                category: _formatAssetCategoryLabel(_0x444a96),
+                category: _formatAssetCategoryLabel(value53),
               }),
             ) +
             '"\n                value="' +
-            _escapeHtml(_0x59add5.updateSearchKeyword || '') +
+            _escapeHtml(enabled12.updateSearchKeyword || '') +
             '"\n              />\n              <div class="v2-asset-update-list">\n                ' +
-            (_0xec53f0.length === 0
+            (list12.length === 0
               ? '<div class="v2-asset-update-empty">' +
-                (String(_0x59add5.updateSearchKeyword || '').trim()
+                (String(enabled12.updateSearchKeyword || '').trim()
                   ? _escapeHtml(assetManagerText('createPanel.noMatchedAssets'))
                   : _escapeHtml(
                       assetManagerText('createPanel.noCategoryAssets', {
-                        category: _formatAssetCategoryLabel(_0x444a96),
+                        category: _formatAssetCategoryLabel(value53),
                       }),
                     )) +
                 '</div>'
-              : _0xec53f0
-                  .map((_0x3ea43b) => {
-                    const _0x4035c6 =
-                        String(_0x3ea43b?.id || '') === _0x59add5.selectedAssetId ? ' active' : '',
-                      _0x40166d = _0x3ea43b?.coverUrl
+              : list12
+                  .map((error6) => {
+                    const value57 = String(error6?.id || '') === enabled12.selectedAssetId ? ' active' : '',
+                      value58 = error6?.coverUrl
                         ? '<img src="' +
-                          _escapeHtml(_0x3ea43b.coverUrl) +
+                          _escapeHtml(error6.coverUrl) +
                           '" alt="' +
-                          _escapeHtml(_0x3ea43b?.name || assetManagerText('assetAlt')) +
+                          _escapeHtml(error6?.name || assetManagerText('assetAlt')) +
                           '" draggable="false" />'
-                        : _renderAssetIcon(_0x3ea43b?.coverType || 'other');
+                        : _renderAssetIcon(error6?.coverType || 'other');
                     return (
                       '\n                            <button\n                              type="button"\n                              class="v2-asset-update-item' +
-                      _0x4035c6 +
+                      value57 +
                       '"\n                              data-asset-id="' +
-                      _escapeHtml(_0x3ea43b.id) +
+                      _escapeHtml(error6.id) +
                       '"\n                            >\n                              <div class="v2-asset-update-thumb">' +
-                      _0x40166d +
+                      value58 +
                       '</div>\n                              <div class="v2-asset-update-info">\n                                <span>' +
-                      _escapeHtml(_0x3ea43b.name || assetManagerText('unnamedAsset')) +
+                      _escapeHtml(error6.name || assetManagerText('unnamedAsset')) +
                       '</span>\n                                <small>' +
-                      _formatAssetDateTime(_0x3ea43b.updatedAt || _0x3ea43b.createdAt) +
+                      _formatAssetDateTime(error6.updatedAt || error6.createdAt) +
                       '</small>\n                              </div>\n                            </button>\n                          '
                     );
                   })
                   .join('')) +
             '\n              </div>\n            </div>\n            <div class="v2-asset-update-editor">\n        '
           : '',
-      _0x3fe105 = _0x59add5.mode === 'update' ? '</div></div>' : '',
-      _0x5611bb = _0x59add5.mode === 'update',
-      _0x68aa61 = _0x5611bb ? 'v2-asset-create-body v2-asset-create-body--update' : 'v2-asset-create-body',
-      _0x276e58 = _0x5611bb
+      value59 = enabled12.mode === 'update' ? '</div></div>' : '',
+      value60 = enabled12.mode === 'update',
+      value61 = value60 ? 'v2-asset-create-body v2-asset-create-body--update' : 'v2-asset-create-body',
+      value62 = value60
         ? ''
         : '\n        <div class="v2-asset-create-source-panel">\n          <div class="v2-asset-create-source-header">\n            <div class="v2-asset-create-source-title">' +
           assetManagerText('createPanel.currentSelection') +
           '</div>\n            <div class="v2-asset-create-source-scope">' +
-          assetManagerText('createPanel.selectedNodes', { count: _0x2d94d0 }) +
+          assetManagerText('createPanel.selectedNodes', { count: count6 }) +
           '</div>\n          </div>\n          <div class="v2-asset-create-cover">\n            ' +
-          _0x397d2e +
+          value49 +
           '\n          </div>\n        </div>\n      ';
-    ((_0x439522.innerHTML =
+    ((el9.innerHTML =
       '\n      <div class="v2-asset-create-header">\n        <div class="v2-asset-create-title">\n          <span class="v2-asset-create-header-text">' +
-      _0x5deff9 +
+      value50 +
       '</span>\n        </div>\n        <button type="button" class="v2-asset-create-close" data-ui-action="asset-create-close" aria-label="' +
       _escapeHtml(assetManagerText('close')) +
       '">×</button>\n      </div>\n      <div class="v2-asset-create-tabs">\n        <button\n          type="button"\n          class="v2-asset-create-tab' +
-      (_0x59add5.mode === 'create' ? ' active' : '') +
+      (enabled12.mode === 'create' ? ' active' : '') +
       '"\n          data-mode="create"\n        >' +
       assetManagerText('createPanel.createTab') +
       '</button>\n        <button\n          type="button"\n          class="v2-asset-create-tab' +
-      (_0x59add5.mode === 'update' ? ' active' : '') +
+      (enabled12.mode === 'update' ? ' active' : '') +
       '"\n          data-mode="update"\n        >' +
       assetManagerText('createPanel.updateTab') +
       '</button>\n      </div>\n      <div class="v2-asset-create-modal-body">\n        ' +
-      _0x28bcea +
+      value56 +
       '\n        <div class="' +
-      _0x68aa61 +
+      value61 +
       '">\n          ' +
-      _0x276e58 +
+      value62 +
       '\n          <div class="v2-asset-create-right">\n            <div class="v2-asset-create-field">\n              <div class="v2-asset-create-label">' +
       assetManagerText('createPanel.assetName') +
       '</div>\n              <input\n                type="text"\n                id="asset-create-name"\n                placeholder="' +
       _escapeHtml(assetManagerText('createPanel.assetNamePlaceholder')) +
       '"\n                value="' +
-      _escapeHtml(_0x59add5.draft?.name || '') +
+      _escapeHtml(enabled12.draft?.name || '') +
       '"\n              />\n            </div>\n            <div class="v2-asset-create-field">\n              <div class="v2-asset-create-label">' +
       assetManagerText('createPanel.category') +
       '</div>\n              <button type="button" class="v2-asset-create-select-trigger" id="asset-create-category-trigger">\n                <span id="asset-create-category-val">' +
-      _escapeHtml(_formatAssetCategoryLabel(_0x59add5.draft?.category || this.activeTab)) +
+      _escapeHtml(_formatAssetCategoryLabel(enabled12.draft?.category || this.activeTab)) +
       '</span>\n                <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">\n                  <path d="M1 1.5L6 6.5L11 1.5" stroke="var(--white-40)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n                </svg>\n              </button>\n            </div>\n            ' +
-      _0x46a2a9 +
+      value54 +
       '\n            ' +
-      _0x3d6c8e +
+      value55 +
       '\n          </div>\n        </div>\n        ' +
-      _0x3fe105 +
+      value59 +
       '\n      </div>\n      <div class="v2-asset-create-footer' +
-      (_0x5611bb ? ' v2-asset-create-footer--update' : '') +
+      (value60 ? ' v2-asset-create-footer--update' : '') +
       '">\n        <button\n          type="button"\n          class="v2-asset-create-btn"\n          id="asset-create-submit"\n          ' +
-      (_0x59add5.saving ? 'disabled' : '') +
+      (enabled12.saving ? 'disabled' : '') +
       '\n        >' +
-      _0x2f0aa4 +
+      value51 +
       '</button>\n        ' +
-      (_0x5611bb
+      (value60
         ? '<button\n                type="button"\n                class="v2-asset-create-btn v2-asset-create-btn--secondary"\n                id="asset-join-submit"\n                ' +
-          (_0x59add5.saving ? 'disabled' : '') +
+          (enabled12.saving ? 'disabled' : '') +
           '\n              >' +
-          _0x5bdd4f +
+          value52 +
           '</button>'
         : '') +
       '\n      </div>\n    '),
       this._bindCreatePanelEvents());
   }
   ['_bindCreatePanelEvents']() {
-    const _0x35b712 = this.createPanel,
-      _0x12128b = this._createPanelState;
-    if (!_0x35b712 || !_0x12128b) return;
-    _0x35b712.querySelector("[data-ui-action='asset-create-close']")?.addEventListener('click', () => {
+    const el10 = this.createPanel,
+      enabled13 = this._createPanelState;
+    if (!el10 || !enabled13) return;
+    el10.querySelector("[data-ui-action='asset-create-close']")?.addEventListener('click', () => {
       this.closeCreatePanel();
     });
-    const _0x48c446 = _0x35b712.querySelector('#asset-create-category-trigger'),
-      _0x4ecd10 = _0x35b712.querySelector('#asset-create-category-val');
+    const el11 = el10.querySelector('#asset-create-category-trigger'),
+      el12 = el10.querySelector('#asset-create-category-val');
     this._createPanelDropdownOutsideHandler &&
       (document.removeEventListener('pointerdown', this._createPanelDropdownOutsideHandler),
       (this._createPanelDropdownOutsideHandler = null));
     this._createPanelDropdownEl &&
       (this._createPanelDropdownEl.remove(), (this._createPanelDropdownEl = null));
-    if (_0x48c446 && _0x4ecd10) {
-      const _0x56be99 = document.createElement('div');
-      _0x56be99.className = 'v2-asset-select-dropdown';
-      const _0x5e9a48 = () => {
-          const _0x1ffe72 = this._createPanelState?.draft?.category || this.activeTab,
-            _0x263efa = this._getCreatePanelCategories()
-              .map((_0x225f05) => {
-                const _0x1806b1 =
-                    this._categoryKey(_0x225f05) === this._categoryKey(_0x1ffe72) ? ' selected' : '',
-                  _0x1cf72e = _escapeHtml(_0x225f05),
-                  _0x16191b = _escapeHtml(_formatAssetCategoryLabel(_0x225f05));
+    if (el11 && el12) {
+      const el13 = document.createElement('div');
+      el13.className = 'v2-asset-select-dropdown';
+      const run = () => {
+          const value63 = this._createPanelState?.draft?.category || this.activeTab,
+            value64 = this._getCreatePanelCategories()
+              .map((item17) => {
+                const value65 = this._categoryKey(item17) === this._categoryKey(value63) ? ' selected' : '',
+                  _escapeHtml4 = _escapeHtml(item17),
+                  _escapeHtml5 = _escapeHtml(_formatAssetCategoryLabel(item17));
                 return (
                   '<div class="v2-asset-select-item' +
-                  _0x1806b1 +
+                  value65 +
                   '" data-val="' +
-                  _0x1cf72e +
+                  _escapeHtml4 +
                   '">' +
-                  _0x16191b +
+                  _escapeHtml5 +
                   '</div>'
                 );
               })
               .join(''),
-            _0x2334aa = this._canAddCustomCategory()
+            value66 = this._canAddCustomCategory()
               ? this._createPanelState?.customCategoryEditing
                 ? '<div class="v2-asset-select-custom-row">\n                <input\n                  type="text"\n                  class="v2-asset-select-custom-input"\n                  id="asset-category-custom-input"\n                  placeholder="' +
                   _escapeHtml(assetManagerText('createPanel.categoryNamePlaceholder')) +
@@ -771,464 +759,463 @@ class AssetManager {
                   assetManagerText('categories.custom') +
                   '</div>'
               : '';
-          _0x56be99.innerHTML = _0x263efa + _0x2334aa;
+          el13.innerHTML = value64 + value66;
         },
-        _0x138a38 = () => {
-          const _0x181092 = _0x56be99.querySelector('#asset-category-custom-input'),
-            _0x29332c = _0x181092?.value ?? this._createPanelState?.customCategoryDraft ?? '',
-            _0xc269a2 = this._normalizeCategoryName(_0x29332c);
-          if (!_0xc269a2) {
-            (this._setCreatePanelState({ customCategoryEditing: false, customCategoryDraft: '' }),
-              _0x5e9a48());
+        handler3 = () => {
+          const el14 = el13.querySelector('#asset-category-custom-input'),
+            value67 = el14?.value ?? this._createPanelState?.customCategoryDraft ?? '',
+            enabled14 = this._normalizeCategoryName(value67);
+          if (!enabled14) {
+            (this._setCreatePanelState({ customCategoryEditing: false, customCategoryDraft: '' }), run());
             return;
           }
-          const _0x972e73 = this._getCreatePanelCategories(),
-            _0x2ad351 = this._findCategoryByName(_0xc269a2, _0x972e73);
-          if (!_0x2ad351 && _0x972e73.length >= ASSET_CATEGORY_LIMIT) {
+          const list13 = this._getCreatePanelCategories(),
+            enabled15 = this._findCategoryByName(enabled14, list13);
+          if (!enabled15 && list13.length >= ASSET_CATEGORY_LIMIT) {
             window.showToast?.(assetManagerText('categoryLimit', { limit: ASSET_CATEGORY_LIMIT }), 'warn');
             return;
           }
-          const _0x3a54dc = _0x2ad351 || this._addUserCategory(_0xc269a2);
-          if (!_0x3a54dc) return;
-          const _0xe5b3 = [...(this._createPanelState?.customCategories || [])];
-          !_0x2ad351 && !this._findCategoryByName(_0x3a54dc, _0xe5b3) && _0xe5b3.push(_0x3a54dc);
+          const category3 = enabled15 || this._addUserCategory(enabled14);
+          if (!category3) return;
+          const customCategories = [...(this._createPanelState?.customCategories || [])];
+          !enabled15 &&
+            !this._findCategoryByName(category3, customCategories) &&
+            customCategories.push(category3);
           this._setCreatePanelState({
-            draft: { category: _0x3a54dc },
+            draft: { category: category3 },
             customCategoryEditing: false,
             customCategoryDraft: '',
-            customCategories: _0xe5b3,
+            customCategories: customCategories,
             updateConfirmOpen: false,
             error: '',
           });
-          this._createPanelState?.mode === 'update' && this._syncUpdateSelectionForCategory(_0x3a54dc);
-          _0x4ecd10.textContent = _formatAssetCategoryLabel(_0x3a54dc);
+          this._createPanelState?.mode === 'update' && this._syncUpdateSelectionForCategory(category3);
+          el12.textContent = _formatAssetCategoryLabel(category3);
           if (this._createPanelState?.mode === 'update') {
-            (_0x216f59(), this._renderCreatePanelContent());
+            (run2(), this._renderCreatePanelContent());
             return;
           }
-          _0x5e9a48();
+          run();
         };
-      (_0x5e9a48(), document.body.appendChild(_0x56be99), (this._createPanelDropdownEl = _0x56be99));
-      const _0x216f59 = () => {
-        (_0x56be99.classList.remove('show'), _0x48c446.classList.remove('active'));
+      (run(), document.body.appendChild(el13), (this._createPanelDropdownEl = el13));
+      const run2 = () => {
+        (el13.classList.remove('show'), el11.classList.remove('active'));
       };
-      (_0x48c446.addEventListener('click', (_0x16c0fd) => {
-        _0x16c0fd.stopPropagation();
-        if (_0x56be99.classList.contains('show')) {
-          _0x216f59();
+      (el11.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (el13.classList.contains('show')) {
+          run2();
           return;
         }
-        const _0x5c8370 = _0x48c446.getBoundingClientRect();
-        ((_0x56be99.style.left = _0x5c8370.left + 'px'),
-          (_0x56be99.style.top = _0x5c8370.bottom + 4 + 'px'),
-          (_0x56be99.style.width = _0x5c8370.width + 'px'),
-          _0x56be99.classList.add('show'),
-          _0x48c446.classList.add('active'));
+        const box = el11.getBoundingClientRect();
+        ((el13.style.left = box.left + 'px'),
+          (el13.style.top = box.bottom + 4 + 'px'),
+          (el13.style.width = box.width + 'px'),
+          el13.classList.add('show'),
+          el11.classList.add('active'));
       }),
-        _0x56be99.addEventListener('click', (_0xad59e9) => {
-          const _0x2f9bce = _0xad59e9.target.closest("[data-custom-category='1']");
-          if (_0x2f9bce) {
+        el13.addEventListener('click', (event2) => {
+          const value68 = event2.target.closest("[data-custom-category='1']");
+          if (value68) {
             (this._setCreatePanelState({ customCategoryEditing: true, customCategoryDraft: '', error: '' }),
-              _0x5e9a48(),
+              run(),
               window.requestAnimationFrame(() => {
-                _0x56be99.querySelector('#asset-category-custom-input')?.focus();
+                el13.querySelector('#asset-category-custom-input')?.focus();
               }));
             return;
           }
-          const _0x23c1c2 = _0xad59e9.target.closest('.v2-asset-select-item[data-val]');
-          if (!_0x23c1c2) return;
-          const _0x296bd4 = this._normalizeCategoryName(_0x23c1c2.dataset.val) || this.activeTab;
+          const el15 = event2.target.closest('.v2-asset-select-item[data-val]');
+          if (!el15) return;
+          const category4 = this._normalizeCategoryName(el15.dataset.val) || this.activeTab;
           (this._createPanelState?.mode === 'update'
             ? (this._setCreatePanelState({ customCategoryEditing: false, customCategoryDraft: '' }),
-              this._syncUpdateSelectionForCategory(_0x296bd4))
+              this._syncUpdateSelectionForCategory(category4))
             : this._setCreatePanelState({
-                draft: { category: _0x296bd4 },
+                draft: { category: category4 },
                 customCategoryEditing: false,
                 customCategoryDraft: '',
                 updateConfirmOpen: false,
                 error: '',
               }),
-            _0x216f59(),
+            run2(),
             this._renderCreatePanelContent());
         }),
-        _0x56be99.addEventListener('input', (_0x5d2d95) => {
-          if (!_0x5d2d95.target.matches('#asset-category-custom-input')) return;
-          this._setCreatePanelState({ customCategoryDraft: _0x5d2d95.target.value || '' });
+        el13.addEventListener('input', (customCategoryDraft) => {
+          if (!customCategoryDraft.target.matches('#asset-category-custom-input')) return;
+          this._setCreatePanelState({ customCategoryDraft: customCategoryDraft.target.value || '' });
         }),
-        _0x56be99.addEventListener('keydown', (_0x14d486) => {
-          if (!_0x14d486.target.matches('#asset-category-custom-input')) return;
-          if (_0x14d486.key === 'Enter') {
-            (_0x14d486.preventDefault(), _0x138a38());
+        el13.addEventListener('keydown', (event3) => {
+          if (!event3.target.matches('#asset-category-custom-input')) return;
+          if (event3.key === 'Enter') {
+            (event3.preventDefault(), handler3());
             return;
           }
-          _0x14d486.key === 'Escape' &&
-            (_0x14d486.preventDefault(),
+          event3.key === 'Escape' &&
+            (event3.preventDefault(),
             this._setCreatePanelState({ customCategoryEditing: false, customCategoryDraft: '' }),
-            _0x5e9a48());
+            run());
         }),
-        _0x56be99.addEventListener('focusout', (_0x3b5137) => {
-          if (!_0x3b5137.target.matches('#asset-category-custom-input')) return;
-          _0x138a38();
+        el13.addEventListener('focusout', (event4) => {
+          if (!event4.target.matches('#asset-category-custom-input')) return;
+          handler3();
         }));
-      const _0x54b56f = (_0x44d569) => {
-        !_0x56be99.contains(_0x44d569.target) && !_0x48c446.contains(_0x44d569.target) && _0x216f59();
+      const value69 = (event5) => {
+        !el13.contains(event5.target) && !el11.contains(event5.target) && run2();
       };
-      ((this._createPanelDropdownOutsideHandler = _0x54b56f),
-        document.addEventListener('pointerdown', _0x54b56f));
+      ((this._createPanelDropdownOutsideHandler = value69),
+        document.addEventListener('pointerdown', value69));
     }
-    _0x35b712.querySelectorAll('.v2-asset-create-tab').forEach((_0x1fdf7e) => {
-      _0x1fdf7e.addEventListener('click', () => {
-        const _0x4c46af = _0x1fdf7e.dataset.mode === 'update' ? 'update' : 'create';
-        if (_0x4c46af === this._createPanelState?.mode) return;
+    el10.querySelectorAll('.v2-asset-create-tab').forEach((el16) => {
+      el16.addEventListener('click', () => {
+        const mode = el16.dataset.mode === 'update' ? 'update' : 'create';
+        if (mode === this._createPanelState?.mode) return;
         this._setCreatePanelState({
-          mode: _0x4c46af,
+          mode: mode,
           updateConfirmOpen: false,
           customCategoryEditing: false,
           customCategoryDraft: '',
           error: '',
         });
-        if (_0x4c46af === 'update' && !this._createPanelState?.selectedAssetId) {
-          const _0x21b7b3 = this._getFilteredUpdateAssets()[0] || null;
-          _0x21b7b3 && this._syncCreatePanelDraftFromTarget(_0x21b7b3);
+        if (mode === 'update' && !this._createPanelState?.selectedAssetId) {
+          const value70 = this._getFilteredUpdateAssets()[0] || null;
+          value70 && this._syncCreatePanelDraftFromTarget(value70);
         }
         this._renderCreatePanelContent();
       });
     });
-    const _0x2dde57 = _0x35b712.querySelector('#asset-create-name');
-    _0x2dde57 &&
-      _0x2dde57.addEventListener('input', (_0x4d6238) => {
+    const el17 = el10.querySelector('#asset-create-name');
+    el17 &&
+      el17.addEventListener('input', (name4) => {
         this._setCreatePanelState({
-          draft: { name: _0x4d6238.target.value || '' },
+          draft: { name: name4.target.value || '' },
           updateConfirmOpen: false,
           error: '',
         });
       });
-    const _0x5b4246 = _0x35b712.querySelector('#asset-update-search');
-    _0x5b4246 &&
-      _0x5b4246.addEventListener('input', (_0x1aaf70) => {
+    const el18 = el10.querySelector('#asset-update-search');
+    el18 &&
+      el18.addEventListener('input', (updateSearchKeyword) => {
         (this._setCreatePanelState({
-          updateSearchKeyword: _0x1aaf70.target.value || '',
+          updateSearchKeyword: updateSearchKeyword.target.value || '',
           updateConfirmOpen: false,
           error: '',
         }),
           this._renderCreatePanelContent());
       });
-    _0x35b712.querySelectorAll('.v2-asset-update-item').forEach((_0x3d8be1) => {
-      _0x3d8be1.addEventListener('click', () => {
-        const _0x5e6e91 = String(_0x3d8be1.dataset.assetId || ''),
-          _0x272171 = this._getSortedAssets().find((_0x1d31e7) => String(_0x1d31e7?.id || '') === _0x5e6e91);
-        if (!_0x272171) return;
-        (this._syncCreatePanelDraftFromTarget(_0x272171), this._renderCreatePanelContent());
+    el10.querySelectorAll('.v2-asset-update-item').forEach((el19) => {
+      el19.addEventListener('click', () => {
+        const value71 = String(el19.dataset.assetId || ''),
+          enabled16 = this._getSortedAssets().find((item18) => String(item18?.id || '') === value71);
+        if (!enabled16) return;
+        (this._syncCreatePanelDraftFromTarget(enabled16), this._renderCreatePanelContent());
       });
     });
-    const _0x382b0e = _0x35b712.querySelector('#asset-create-submit');
-    _0x382b0e &&
-      _0x382b0e.addEventListener('click', () => {
+    const el20 = el10.querySelector('#asset-create-submit');
+    el20 &&
+      el20.addEventListener('click', () => {
         this._submitCreatePanel();
       });
-    const _0xecf11d = _0x35b712.querySelector('#asset-join-submit');
-    _0xecf11d &&
-      _0xecf11d.addEventListener('click', () => {
+    const el21 = el10.querySelector('#asset-join-submit');
+    el21 &&
+      el21.addEventListener('click', () => {
         this._joinCreatePanelToAsset();
       });
   }
   async ['_submitCreatePanel']() {
-    const _0x587e02 = this._createPanelState,
-      _0xef7db9 = this.createPanel;
-    if (!_0x587e02 || !_0xef7db9 || _0x587e02.saving) return;
-    const _0xa2a58b = Array.isArray(_0x587e02.selectedIds) ? _0x587e02.selectedIds : [],
-      _0x393ef4 = this._getSelectedAssetNodes(_0xa2a58b);
-    if (!_0x393ef4.length) {
+    const enabled17 = this._createPanelState,
+      enabled18 = this.createPanel;
+    if (!enabled17 || !enabled18 || enabled17.saving) return;
+    const value72 = Array.isArray(enabled17.selectedIds) ? enabled17.selectedIds : [],
+      list14 = this._getSelectedAssetNodes(value72);
+    if (!list14.length) {
       (this._setCreatePanelState({ error: assetManagerText('errors.noSavableNodes') }),
         this._renderCreatePanelContent());
       return;
     }
-    const _0x183f39 =
+    const name5 =
         String(this._createPanelState?.draft?.name || '').trim() || assetManagerText('unnamedAsset'),
-      _0x3d4782 = String(this._createPanelState?.draft?.category || '').trim() || this.activeTab;
-    if (_0x587e02.mode === 'update') {
-      const _0x1b5f7a = this._getFilteredUpdateAssets().find(
-        (_0x1e799a) => String(_0x1e799a?.id || '') === String(_0x587e02.selectedAssetId || ''),
+      category5 = String(this._createPanelState?.draft?.category || '').trim() || this.activeTab;
+    if (enabled17.mode === 'update') {
+      const id3 = this._getFilteredUpdateAssets().find(
+        (item19) => String(item19?.id || '') === String(enabled17.selectedAssetId || ''),
       );
-      if (!_0x1b5f7a) {
+      if (!id3) {
         (this._setCreatePanelState({ error: assetManagerText('errors.selectAssetToUpdate') }),
           this._renderCreatePanelContent());
         return;
       }
-      if (!_0x587e02.updateConfirmOpen) {
+      if (!enabled17.updateConfirmOpen) {
         (this._setCreatePanelState({ updateConfirmOpen: true, error: '' }), this._renderCreatePanelContent());
         return;
       }
-      const _0x4ecf8c = this._buildAssetPayloadFromSelection(_0xa2a58b, {
-        id: _0x1b5f7a.id,
-        name: _0x183f39,
-        category: _0x3d4782,
-        createdAt: _0x1b5f7a.createdAt || _0x1b5f7a.updatedAt || Date.now(),
+      const value73 = this._buildAssetPayloadFromSelection(value72, {
+        id: id3.id,
+        name: name5,
+        category: category5,
+        createdAt: id3.createdAt || id3.updatedAt || Date.now(),
         updatedAt: Date.now(),
       });
       (this._setCreatePanelState({ saving: true, savingAction: 'overwrite', error: '' }),
         this._renderCreatePanelContent());
       try {
-        (await saveAssetToServer(_0x4ecf8c),
-          this._upsertLocalAsset(_0x4ecf8c),
+        (await saveAssetToServer(value73),
+          this._upsertLocalAsset(value73),
           this._scheduleVideoThumbJobs(),
           (this._openAssetId =
-            String(_0x4ecf8c.id || '') === this._openAssetId ? _0x4ecf8c.id : this._openAssetId),
+            String(value73.id || '') === this._openAssetId ? value73.id : this._openAssetId),
           window.showToast?.(assetManagerText('toasts.assetUpdated'), 'success'),
           this.closeCreatePanel(),
           this.sidebarPanel?.classList.contains('show') && this.renderSidebarContent());
-      } catch (_0x23a32e) {
+      } catch (value74) {
         (this._setCreatePanelState({
           saving: false,
           savingAction: '',
           error: assetManagerText('errors.assetUpdateFailed'),
         }),
           this._renderCreatePanelContent(),
-          console.error(_0x23a32e),
+          console.error(value74),
           window.showToast?.(assetManagerText('errors.assetUpdateFailed'), 'error'));
       }
       return;
     }
-    const _0x1c81e5 = this._buildAssetPayloadFromSelection(_0xa2a58b, {
-      name: _0x183f39,
-      category: _0x3d4782,
+    const value75 = this._buildAssetPayloadFromSelection(value72, {
+      name: name5,
+      category: category5,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
     (this._setCreatePanelState({ saving: true, savingAction: 'create', error: '' }),
       this._renderCreatePanelContent());
     try {
-      (await saveAssetToServer(_0x1c81e5),
-        this._upsertLocalAsset(_0x1c81e5),
+      (await saveAssetToServer(value75),
+        this._upsertLocalAsset(value75),
         this._scheduleVideoThumbJobs(),
         window.showToast?.(assetManagerText('toasts.assetCreated'), 'success'),
-        this._playCreateAssetFly(_0xef7db9),
+        this._playCreateAssetFly(enabled18),
         this.closeCreatePanel(),
         this.sidebarPanel?.classList.contains('show') &&
-          ((this._newAssetPulseId = String(_0x1c81e5.id || '')), this.renderSidebarContent()));
-    } catch (_0x155824) {
+          ((this._newAssetPulseId = String(value75.id || '')), this.renderSidebarContent()));
+    } catch (value76) {
       (this._setCreatePanelState({
         saving: false,
         savingAction: '',
         error: assetManagerText('errors.assetCreateFailed'),
       }),
         this._renderCreatePanelContent(),
-        console.error(_0x155824),
+        console.error(value76),
         window.showToast?.(assetManagerText('errors.assetCreateFailed'), 'error'));
     }
   }
   async ['_joinCreatePanelToAsset']() {
-    const _0xd752d8 = this._createPanelState,
-      _0x3e17ce = this.createPanel;
-    if (!_0xd752d8 || !_0x3e17ce || _0xd752d8.saving) return;
-    const _0xe38283 = Array.isArray(_0xd752d8.selectedIds) ? _0xd752d8.selectedIds : [],
-      _0x1e3b91 = this._getSelectedAssetNodes(_0xe38283);
-    if (!_0x1e3b91.length) {
+    const enabled19 = this._createPanelState,
+      enabled20 = this.createPanel;
+    if (!enabled19 || !enabled20 || enabled19.saving) return;
+    const value77 = Array.isArray(enabled19.selectedIds) ? enabled19.selectedIds : [],
+      list15 = this._getSelectedAssetNodes(value77);
+    if (!list15.length) {
       (this._setCreatePanelState({ error: assetManagerText('errors.noJoinableNodes') }),
         this._renderCreatePanelContent());
       return;
     }
-    const _0x1e52c6 = this._getFilteredUpdateAssets().find(
-      (_0x1e781a) => String(_0x1e781a?.id || '') === String(_0xd752d8.selectedAssetId || ''),
+    const enabled21 = this._getFilteredUpdateAssets().find(
+      (item20) => String(item20?.id || '') === String(enabled19.selectedAssetId || ''),
     );
-    if (!_0x1e52c6) {
+    if (!enabled21) {
       (this._setCreatePanelState({ error: assetManagerText('errors.selectAssetToJoin') }),
         this._renderCreatePanelContent());
       return;
     }
-    const _0xb598e9 =
+    const name6 =
         String(this._createPanelState?.draft?.name || '').trim() || assetManagerText('unnamedAsset'),
-      _0x5b208b = String(this._createPanelState?.draft?.category || '').trim() || this.activeTab,
-      _0x4b4996 = this._buildAssetAppendPayload(_0x1e52c6, _0xe38283, {
-        name: _0xb598e9,
-        category: _0x5b208b,
+      category6 = String(this._createPanelState?.draft?.category || '').trim() || this.activeTab,
+      value78 = this._buildAssetAppendPayload(enabled21, value77, {
+        name: name6,
+        category: category6,
         updatedAt: Date.now(),
       });
     (this._setCreatePanelState({ saving: true, savingAction: 'join', updateConfirmOpen: false, error: '' }),
       this._renderCreatePanelContent());
     try {
-      (await saveAssetToServer(_0x4b4996),
-        this._upsertLocalAsset(_0x4b4996),
+      (await saveAssetToServer(value78),
+        this._upsertLocalAsset(value78),
         this._scheduleVideoThumbJobs(),
-        (this._openAssetId =
-          String(_0x4b4996.id || '') === this._openAssetId ? _0x4b4996.id : this._openAssetId),
+        (this._openAssetId = String(value78.id || '') === this._openAssetId ? value78.id : this._openAssetId),
         window.showToast?.(assetManagerText('toasts.assetJoined'), 'success'),
         this.closeCreatePanel(),
         this.sidebarPanel?.classList.contains('show') && this.renderSidebarContent());
-    } catch (_0x313be5) {
+    } catch (value79) {
       (this._setCreatePanelState({
         saving: false,
         savingAction: '',
         error: assetManagerText('errors.assetJoinFailed'),
       }),
         this._renderCreatePanelContent(),
-        console.error(_0x313be5),
+        console.error(value79),
         window.showToast?.(assetManagerText('errors.assetJoinFailed'), 'error'));
     }
   }
   ['_getCanvasCenterWorld']() {
-    const { viewport: _0x4c05ac } = appStore.getState(),
-      _0x5a0ed6 = window.innerWidth / 2,
-      _0xf09185 = window.innerHeight / 2,
-      _0x4f1c5a = document.documentElement?.clientWidth || window.innerWidth || 0,
-      _0x8207d5 = document.documentElement?.clientHeight || window.innerHeight || 0;
-    if (!_0x4f1c5a || !_0x8207d5) return screenToWorld(_0x5a0ed6, _0xf09185, _0x4c05ac);
-    let _0x29d7d8 = 0,
-      _0x22e4cf = 0,
-      _0x46d1f4 = _0x4f1c5a,
-      _0x593c6e = _0x8207d5;
-    const _0x4aeaee = [],
-      _0x21c8f4 = document.querySelector('header');
-    if (_0x21c8f4) _0x4aeaee.push(_0x21c8f4);
-    const _0x1a0399 = document.querySelector('.sidebar-floating');
-    if (_0x1a0399) _0x4aeaee.push(_0x1a0399);
-    if (this.sidebarPanel?.classList?.contains('show')) _0x4aeaee.push(this.sidebarPanel);
-    const _0x3c4157 = 8;
-    for (const _0x1708f4 of _0x4aeaee) {
-      if (!_0x1708f4?.isConnected) continue;
-      const _0x586765 = _0x1708f4.getBoundingClientRect(),
-        _0x1f8aad = Math.max(_0x29d7d8, _0x586765.left),
-        _0x568195 = Math.max(_0x22e4cf, _0x586765.top),
-        _0x48f894 = Math.min(_0x46d1f4, _0x586765.right),
-        _0x497890 = Math.min(_0x593c6e, _0x586765.bottom);
-      if (_0x48f894 <= _0x1f8aad || _0x497890 <= _0x568195) continue;
-      if (_0x586765.left <= _0x29d7d8 + _0x3c4157 && _0x586765.right > _0x29d7d8 + _0x3c4157) {
-        _0x29d7d8 = Math.max(_0x29d7d8, _0x586765.right);
+    const { viewport: viewport } = appStore.getState(),
+      value80 = window.innerWidth / 2,
+      value81 = window.innerHeight / 2,
+      enabled22 = document.documentElement?.clientWidth || window.innerWidth || 0,
+      enabled23 = document.documentElement?.clientHeight || window.innerHeight || 0;
+    if (!enabled22 || !enabled23) return screenToWorld(value80, value81, viewport);
+    let value82 = 0,
+      value83 = 0,
+      value84 = enabled22,
+      value85 = enabled23;
+    const list16 = [],
+      value86 = document.querySelector('header');
+    if (value86) list16.push(value86);
+    const value87 = document.querySelector('.sidebar-floating');
+    if (value87) list16.push(value87);
+    if (this.sidebarPanel?.classList?.contains('show')) list16.push(this.sidebarPanel);
+    const value88 = 8;
+    for (const el22 of list16) {
+      if (!el22?.isConnected) continue;
+      const box2 = el22.getBoundingClientRect(),
+        value89 = Math.max(value82, box2.left),
+        value90 = Math.max(value83, box2.top),
+        value91 = Math.min(value84, box2.right),
+        value92 = Math.min(value85, box2.bottom);
+      if (value91 <= value89 || value92 <= value90) continue;
+      if (box2.left <= value82 + value88 && box2.right > value82 + value88) {
+        value82 = Math.max(value82, box2.right);
         continue;
       }
-      if (_0x586765.right >= _0x46d1f4 - _0x3c4157 && _0x586765.left < _0x46d1f4 - _0x3c4157) {
-        _0x46d1f4 = Math.min(_0x46d1f4, _0x586765.left);
+      if (box2.right >= value84 - value88 && box2.left < value84 - value88) {
+        value84 = Math.min(value84, box2.left);
         continue;
       }
-      if (_0x586765.top <= _0x22e4cf + _0x3c4157 && _0x586765.bottom > _0x22e4cf + _0x3c4157) {
-        _0x22e4cf = Math.max(_0x22e4cf, _0x586765.bottom);
+      if (box2.top <= value83 + value88 && box2.bottom > value83 + value88) {
+        value83 = Math.max(value83, box2.bottom);
         continue;
       }
-      if (_0x586765.bottom >= _0x593c6e - _0x3c4157 && _0x586765.top < _0x593c6e - _0x3c4157) {
-        _0x593c6e = Math.min(_0x593c6e, _0x586765.top);
+      if (box2.bottom >= value85 - value88 && box2.top < value85 - value88) {
+        value85 = Math.min(value85, box2.top);
         continue;
       }
     }
-    const _0x5ac355 = _0x46d1f4 - _0x29d7d8,
-      _0x45083d = _0x593c6e - _0x22e4cf,
-      _0x2ab7a3 = _0x5ac355 > 40 ? _0x29d7d8 + _0x5ac355 / 2 : _0x5a0ed6,
-      _0x3e65ff = _0x45083d > 40 ? _0x22e4cf + _0x45083d / 2 : _0xf09185;
-    return screenToWorld(_0x2ab7a3, _0x3e65ff, _0x4c05ac);
+    const count7 = value84 - value82,
+      count8 = value85 - value83,
+      value93 = count7 > 40 ? value82 + count7 / 2 : value80,
+      value94 = count8 > 40 ? value83 + count8 / 2 : value81;
+    return screenToWorld(value93, value94, viewport);
   }
-  ['_calcNodesBBox'](_0x244830) {
-    let _0x9ed139 = Infinity,
-      _0x1c13a6 = Infinity,
-      _0x1abb96 = -Infinity,
-      _0x3fdb1b = -Infinity;
-    for (const _0x470a1d of _0x244830 || []) {
-      if (!_0x470a1d) continue;
-      const _0x20bca8 = Number(_0x470a1d.x) || 0,
-        _0x3b6c14 = Number(_0x470a1d.y) || 0,
-        _0x4a86b7 = Number(_0x470a1d.width ?? _0x470a1d.w) || 100,
-        _0x400f1e = Number(_0x470a1d.height ?? _0x470a1d.h) || 100;
-      ((_0x9ed139 = Math.min(_0x9ed139, _0x20bca8)),
-        (_0x1c13a6 = Math.min(_0x1c13a6, _0x3b6c14)),
-        (_0x1abb96 = Math.max(_0x1abb96, _0x20bca8 + _0x4a86b7)),
-        (_0x3fdb1b = Math.max(_0x3fdb1b, _0x3b6c14 + _0x400f1e)));
+  ['_calcNodesBBox'](value95) {
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+    for (const box3 of value95 || []) {
+      if (!box3) continue;
+      const value96 = Number(box3.x) || 0,
+        value97 = Number(box3.y) || 0,
+        value98 = Number(box3.width ?? box3.w) || 100,
+        value99 = Number(box3.height ?? box3.h) || 100;
+      ((minX = Math.min(minX, value96)),
+        (minY = Math.min(minY, value97)),
+        (maxX = Math.max(maxX, value96 + value98)),
+        (maxY = Math.max(maxY, value97 + value99)));
     }
-    if (!Number.isFinite(_0x9ed139) || !Number.isFinite(_0x1c13a6))
+    if (!Number.isFinite(minX) || !Number.isFinite(minY))
       return { minX: 0, minY: 0, maxX: 0, maxY: 0, w: 0, h: 0, cx: 0, cy: 0 };
-    const _0x490479 = Math.max(0, _0x1abb96 - _0x9ed139),
-      _0x1dc7f5 = Math.max(0, _0x3fdb1b - _0x1c13a6);
+    const w = Math.max(0, maxX - minX),
+      h = Math.max(0, maxY - minY);
     return {
-      minX: _0x9ed139,
-      minY: _0x1c13a6,
-      maxX: _0x1abb96,
-      maxY: _0x3fdb1b,
-      w: _0x490479,
-      h: _0x1dc7f5,
-      cx: _0x9ed139 + _0x490479 / 2,
-      cy: _0x1c13a6 + _0x1dc7f5 / 2,
+      minX: minX,
+      minY: minY,
+      maxX: maxX,
+      maxY: maxY,
+      w: w,
+      h: h,
+      cx: minX + w / 2,
+      cy: minY + h / 2,
     };
   }
-  ['_preloadThumb'](_0x5aed0d) {
-    const _0x1386b7 = String(_0x5aed0d || '');
-    if (!_0x1386b7) return;
-    if (_0x1386b7.startsWith('data:')) return;
-    if (this._thumbPreloadSet.has(_0x1386b7)) return;
-    (this._thumbPreloadSet.add(_0x1386b7), this._ensureThumbDecoded(_0x1386b7));
+  ['_preloadThumb'](value100) {
+    const enabled24 = String(value100 || '');
+    if (!enabled24) return;
+    if (enabled24.startsWith('data:')) return;
+    if (this._thumbPreloadSet.has(enabled24)) return;
+    (this._thumbPreloadSet.add(enabled24), this._ensureThumbDecoded(enabled24));
   }
-  ['_ensureThumbDecoded'](_0x3c2fa1) {
-    const _0x31a1f6 = String(_0x3c2fa1 || '');
-    if (!_0x31a1f6) return Promise.resolve(false);
-    if (_0x31a1f6.startsWith('data:')) return Promise.resolve(true);
-    const _0x238e40 = this._thumbDecodePromiseMap.get(_0x31a1f6);
-    if (_0x238e40) return _0x238e40;
-    const _0x2676b9 = preloadCanvasImage(_0x31a1f6, { priority: 20, fetchPriority: 'auto' }).then(
+  ['_ensureThumbDecoded'](value101) {
+    const enabled25 = String(value101 || '');
+    if (!enabled25) return Promise.resolve(false);
+    if (enabled25.startsWith('data:')) return Promise.resolve(true);
+    const value102 = this._thumbDecodePromiseMap.get(enabled25);
+    if (value102) return value102;
+    const preloadCanvasImage2 = preloadCanvasImage(enabled25, { priority: 20, fetchPriority: 'auto' }).then(
       () => true,
       () => false,
     );
-    return (this._thumbDecodePromiseMap.set(_0x31a1f6, _0x2676b9), _0x2676b9);
+    return (this._thumbDecodePromiseMap.set(enabled25, preloadCanvasImage2), preloadCanvasImage2);
   }
-  ['_isVideoMediaSrc'](_0x460364) {
-    const _0x248f70 = String(_0x460364 || '').toLowerCase();
+  ['_isVideoMediaSrc'](value103) {
+    const value104 = String(value103 || '').toLowerCase();
     return (
-      _0x248f70.endsWith('.mp4') ||
-      _0x248f70.endsWith('.webm') ||
-      _0x248f70.endsWith('.mov') ||
-      _0x248f70.endsWith('.mkv') ||
-      _0x248f70.endsWith('.m4v')
+      value104.endsWith('.mp4') ||
+      value104.endsWith('.webm') ||
+      value104.endsWith('.mov') ||
+      value104.endsWith('.mkv') ||
+      value104.endsWith('.m4v')
     );
   }
-  async ['_captureVideoFirstFrameDataUrl'](_0x481384) {
-    const _0x5e2a82 = String(_0x481384 || '');
-    if (!_0x5e2a82) return '';
-    return await new Promise((_0x485fae) => {
-      const _0x63a578 = document.createElement('video');
-      ((_0x63a578.preload = 'auto'),
-        (_0x63a578.muted = true),
-        (_0x63a578.playsInline = true),
-        (_0x63a578.crossOrigin = 'anonymous'));
-      const _0x255fc1 = () => {
-          (_0x63a578.removeAttribute('src'), _0x63a578.load());
+  async ['_captureVideoFirstFrameDataUrl'](value105) {
+    const enabled26 = String(value105 || '');
+    if (!enabled26) return '';
+    return await new Promise((handler4) => {
+      const el23 = document.createElement('video');
+      ((el23.preload = 'auto'),
+        (el23.muted = true),
+        (el23.playsInline = true),
+        (el23.crossOrigin = 'anonymous'));
+      const run3 = () => {
+          (el23.removeAttribute('src'), el23.load());
         },
-        _0x132110 = () => {
-          (_0x255fc1(), _0x485fae(''));
+        handler5 = () => {
+          (run3(), handler4(''));
         },
-        _0x3cad86 = async () => {
+        async2 = async () => {
           try {
-            const _0x1cf013 = Number.isFinite(_0x63a578.duration) ? _0x63a578.duration : 0,
-              _0x3d2134 = _0x1cf013 > 0 ? Math.min(0.08, Math.max(0, _0x1cf013 - 0.08)) : 0,
-              _0x454740 = () => {
+            const count9 = Number.isFinite(el23.duration) ? el23.duration : 0,
+              value106 = count9 > 0 ? Math.min(0.08, Math.max(0, count9 - 0.08)) : 0,
+              value107 = () => {
                 try {
-                  const _0x58f5ac = _0x63a578.videoWidth || 0,
-                    _0x13d33a = _0x63a578.videoHeight || 0;
-                  if (!_0x58f5ac || !_0x13d33a) return _0x132110();
-                  const _0x1ed68d = 0x140,
-                    _0x9bd9f2 = 0x140,
-                    _0x5d975e = Math.min(1, _0x1ed68d / _0x58f5ac, _0x9bd9f2 / _0x13d33a),
-                    _0x157b43 = Math.max(1, Math.round(_0x58f5ac * _0x5d975e)),
-                    _0x5d35a2 = Math.max(1, Math.round(_0x13d33a * _0x5d975e)),
-                    _0x3ccef5 = document.createElement('canvas');
-                  ((_0x3ccef5.width = _0x157b43), (_0x3ccef5.height = _0x5d35a2));
-                  const _0x2d81c9 = _0x3ccef5.getContext('2d');
-                  _0x2d81c9.drawImage(_0x63a578, 0, 0, _0x157b43, _0x5d35a2);
-                  const _0x462e82 = _0x3ccef5.toDataURL('image/jpeg', 0.82);
-                  (_0x255fc1(), _0x485fae(_0x462e82));
-                } catch (_0x307f58) {
-                  _0x132110();
+                  const enabled27 = el23.videoWidth || 0,
+                    enabled28 = el23.videoHeight || 0;
+                  if (!enabled27 || !enabled28) return handler5();
+                  const value108 = 0x140,
+                    value109 = 0x140,
+                    value110 = Math.min(1, value108 / enabled27, value109 / enabled28),
+                    value111 = Math.max(1, Math.round(enabled27 * value110)),
+                    value112 = Math.max(1, Math.round(enabled28 * value110)),
+                    box4 = document.createElement('canvas');
+                  ((box4.width = value111), (box4.height = value112));
+                  const ctx = box4.getContext('2d');
+                  ctx.drawImage(el23, 0, 0, value111, value112);
+                  const value113 = box4.toDataURL('image/jpeg', 0.82);
+                  (run3(), handler4(value113));
+                } catch (value114) {
+                  handler5();
                 } finally {
-                  _0x63a578.removeEventListener('seeked', _0x454740);
+                  el23.removeEventListener('seeked', value107);
                 }
               };
-            (_0x63a578.addEventListener('seeked', _0x454740, { once: true }),
-              (_0x63a578.currentTime = _0x3d2134));
-          } catch (_0x3de478) {
-            _0x132110();
+            (el23.addEventListener('seeked', value107, { once: true }), (el23.currentTime = value106));
+          } catch (value115) {
+            handler5();
           }
         };
-      (_0x63a578.addEventListener('error', _0x132110, { once: true }),
-        _0x63a578.addEventListener('loadeddata', _0x3cad86, { once: true }),
-        attachMediaElementPlaybackSource(_0x63a578, _0x5e2a82, { preload: 'auto' }).catch(() => {
-          if (!String(_0x63a578.getAttribute('src') || _0x63a578.src || '').trim()) {
-            _0x63a578.src = _0x5e2a82;
+      (el23.addEventListener('error', handler5, { once: true }),
+        el23.addEventListener('loadeddata', async2, { once: true }),
+        attachMediaElementPlaybackSource(el23, enabled26, { preload: 'auto' }).catch(() => {
+          if (!String(el23.getAttribute('src') || el23.src || '').trim()) {
+            el23.src = enabled26;
             try {
-              _0x63a578.load?.();
+              el23.load?.();
             } catch {}
           }
         }));
@@ -1251,206 +1238,206 @@ class AssetManager {
       this.renderSidebarContent();
     });
   }
-  ['_beginRenameAsset'](_0x144035) {
-    const _0xf7efdf = String(_0x144035 || '');
-    if (!_0xf7efdf) return;
+  ['_beginRenameAsset'](value116) {
+    const enabled29 = String(value116 || '');
+    if (!enabled29) return;
     if (this._pendingDeleteAssetId) this._pendingDeleteAssetId = '';
-    ((this._renamingAssetId = _0xf7efdf), this.renderSidebarContent());
+    ((this._renamingAssetId = enabled29), this.renderSidebarContent());
   }
   ['_cancelRenameAsset']() {
     if (!this._renamingAssetId) return;
     ((this._renamingAssetId = ''), this.renderSidebarContent());
   }
-  async ['_commitRenameAsset'](_0x251222, _0x33f8a0) {
-    const _0x214c6e = String(_0x251222 || ''),
-      _0x7b1f92 = String(_0x33f8a0 || '').trim();
-    if (!_0x214c6e) return;
-    if (!_0x7b1f92) {
+  async ['_commitRenameAsset'](value117, value118) {
+    const enabled30 = String(value117 || ''),
+      enabled31 = String(value118 || '').trim();
+    if (!enabled30) return;
+    if (!enabled31) {
       window.showToast?.(assetManagerText('errors.nameRequired'), 'error');
       return;
     }
-    const _0x48ca3d = (this.assets || []).find((_0x433456) => String(_0x433456?.id || '') === _0x214c6e);
-    if (!_0x48ca3d) return;
-    const _0x49ee62 = String(_0x48ca3d?.name || ''),
-      _0x36fd81 = _0x48ca3d?.updatedAt;
-    if (_0x49ee62 === _0x7b1f92) {
+    const error7 = (this.assets || []).find((item21) => String(item21?.id || '') === enabled30);
+    if (!error7) return;
+    const value119 = String(error7?.name || ''),
+      value120 = error7?.updatedAt;
+    if (value119 === enabled31) {
       ((this._renamingAssetId = ''), this.renderSidebarContent());
       return;
     }
-    ((_0x48ca3d.name = _0x7b1f92), (_0x48ca3d.updatedAt = Date.now()));
+    ((error7.name = enabled31), (error7.updatedAt = Date.now()));
     try {
-      (await saveAssetToServer(_0x48ca3d),
-        this._upsertLocalAsset(_0x48ca3d),
+      (await saveAssetToServer(error7),
+        this._upsertLocalAsset(error7),
         window.showToast?.(assetManagerText('toasts.renamed'), 'success'));
-    } catch (_0x5a62c9) {
-      ((_0x48ca3d.name = _0x49ee62),
-        (_0x48ca3d.updatedAt = _0x36fd81),
+    } catch (value121) {
+      ((error7.name = value119),
+        (error7.updatedAt = value120),
         window.showToast?.(assetManagerText('errors.renameFailed'), 'error'));
     } finally {
       ((this._renamingAssetId = ''), this.renderSidebarContent());
     }
   }
   async ['_runVideoThumbJobs']() {
-    let _0x4503f0 = 2;
-    for (const _0x3edacb of this.assets || []) {
-      if (_0x4503f0 <= 0) break;
-      const _0x48722b = String(_0x3edacb?.id || '').trim();
-      if (!_0x48722b) continue;
-      const _0x1fd73b = Array.isArray(_0x3edacb?.items) ? _0x3edacb.items : [];
-      for (let _0x566220 = 0; _0x566220 < _0x1fd73b.length; _0x566220++) {
-        if (_0x4503f0 <= 0) break;
-        const _0x3fcaec = _0x1fd73b[_0x566220],
-          _0x4d4ba7 = _normalizeAssetType(_0x3fcaec?.type);
-        if (_0x4d4ba7 !== 'video') continue;
-        const _0xcb40b1 = String(_0x3fcaec?.thumbSrc || '');
-        if (_0xcb40b1 && !this._isVideoMediaSrc(_0xcb40b1)) continue;
-        const _0x31190a = _0x48722b + ':' + _0x566220;
-        if (this._videoThumbInFlight.has(_0x31190a)) continue;
-        (this._videoThumbInFlight.add(_0x31190a), (_0x4503f0 -= 1));
-        const _0x1c0487 = _0xcb40b1 || _resolveNodeStableThumbSrc(_0x3fcaec?.nodeData);
-        this._captureVideoFirstFrameDataUrl(_0x1c0487)
-          .then(async (_0x4ef4ad) => {
-            if (!String(_0x4ef4ad || '').startsWith('data:image/')) return;
-            const _0x3b941e = await saveAssetThumbToServer({
-                assetId: _0x48722b,
-                key: String(_0x566220),
-                dataUrl: _0x4ef4ad,
+    let count10 = 2;
+    for (const enabled32 of this.assets || []) {
+      if (count10 <= 0) break;
+      const assetId = String(enabled32?.id || '').trim();
+      if (!assetId) continue;
+      const list17 = Array.isArray(enabled32?.items) ? enabled32.items : [];
+      for (let count11 = 0; count11 < list17.length; count11++) {
+        if (count10 <= 0) break;
+        const value122 = list17[count11],
+          _normalizeAssetType4 = _normalizeAssetType(value122?.type);
+        if (_normalizeAssetType4 !== 'video') continue;
+        const value123 = String(value122?.thumbSrc || '');
+        if (value123 && !this._isVideoMediaSrc(value123)) continue;
+        const value124 = assetId + ':' + count11;
+        if (this._videoThumbInFlight.has(value124)) continue;
+        (this._videoThumbInFlight.add(value124), (count10 -= 1));
+        const value125 = value123 || _resolveNodeStableThumbSrc(value122?.nodeData);
+        this._captureVideoFirstFrameDataUrl(value125)
+          .then(async (dataUrl) => {
+            if (!String(dataUrl || '').startsWith('data:image/')) return;
+            const response = await saveAssetThumbToServer({
+                assetId: assetId,
+                key: String(count11),
+                dataUrl: dataUrl,
               }),
-              _0x68fb8b = String(_0x3b941e?.url || '');
-            if (!_0x68fb8b) return;
-            _0x3fcaec.thumbSrc = _0x68fb8b;
-            if (!_0x3edacb.coverUrl && _0x566220 === 0) _0x3edacb.coverUrl = _0x68fb8b;
-            (await saveAssetToServer(_0x3edacb),
-              upsertAssetMentionAsset(_0x3edacb),
+              enabled33 = String(response?.url || '');
+            if (!enabled33) return;
+            value122.thumbSrc = enabled33;
+            if (!enabled32.coverUrl && count11 === 0) enabled32.coverUrl = enabled33;
+            (await saveAssetToServer(enabled32),
+              upsertAssetMentionAsset(enabled32),
               this.sidebarPanel?.classList.contains('show') && this._scheduleSidebarRender());
           })
           .catch(() => {})
           .finally(() => {
-            this._videoThumbInFlight.delete(_0x31190a);
+            this._videoThumbInFlight.delete(value124);
           });
       }
     }
   }
   async ['loadAssetsFromServer']() {
     try {
-      const _0x464b70 = await fetchAssetsFromServer();
+      const fetchAssetsFromServer2 = await fetchAssetsFromServer();
       ((this.assets = _sortAssetsByUpdatedTime(
-        (Array.isArray(_0x464b70) ? _0x464b70 : [])
-          .map((_0x26d5c2) => this._normalizeAssetEntity(_0x26d5c2))
+        (Array.isArray(fetchAssetsFromServer2) ? fetchAssetsFromServer2 : [])
+          .map((item22) => this._normalizeAssetEntity(item22))
           .filter(Boolean),
       )),
         this._syncTabsFromAssets(),
         this._renderSidebarTabs(),
-        this.assets.forEach((_0x45a1b8) => {
-          !_0x45a1b8.coverUrl &&
-            _0x45a1b8.nodes &&
-            _0x45a1b8.nodes[0] &&
-            (_0x45a1b8.coverUrl = _resolveNodeStableThumbSrc(_0x45a1b8.nodes[0]));
-          if (Array.isArray(_0x45a1b8.items))
-            _0x45a1b8.items.forEach((_0x5408e3) => {
-              !_0x5408e3.thumbSrc &&
-                _0x5408e3.nodeData &&
-                (_0x5408e3.thumbSrc = _resolveNodeStableThumbSrc(_0x5408e3.nodeData));
+        this.assets.forEach((enabled34) => {
+          !enabled34.coverUrl &&
+            enabled34.nodes &&
+            enabled34.nodes[0] &&
+            (enabled34.coverUrl = _resolveNodeStableThumbSrc(enabled34.nodes[0]));
+          if (Array.isArray(enabled34.items))
+            enabled34.items.forEach((enabled35) => {
+              !enabled35.thumbSrc &&
+                enabled35.nodeData &&
+                (enabled35.thumbSrc = _resolveNodeStableThumbSrc(enabled35.nodeData));
             });
           else
-            Array.isArray(_0x45a1b8.nodes) &&
-              (_0x45a1b8.items = _0x45a1b8.nodes.map((_0x3c6ddd) => _buildAssetItem(_0x3c6ddd)));
+            Array.isArray(enabled34.nodes) &&
+              (enabled34.items = enabled34.nodes.map((item23) => _buildAssetItem(item23)));
         }),
         setAssetMentionAssets(this._getMentionEligibleAssets()));
-      let _0x49140b = 0;
-      for (const _0x111f53 of this.assets) {
-        if (_0x49140b >= 32) break;
-        _0x111f53?.coverUrl && (this._preloadThumb(_0x111f53.coverUrl), (_0x49140b += 1));
-        const _0x32d106 = Array.isArray(_0x111f53?.items) ? _0x111f53.items : [];
-        for (const _0x266b58 of _0x32d106) {
-          if (_0x49140b >= 32) break;
-          _0x266b58?.thumbSrc && (this._preloadThumb(_0x266b58.thumbSrc), (_0x49140b += 1));
+      let count12 = 0;
+      for (const value126 of this.assets) {
+        if (count12 >= 32) break;
+        value126?.coverUrl && (this._preloadThumb(value126.coverUrl), (count12 += 1));
+        const value127 = Array.isArray(value126?.items) ? value126.items : [];
+        for (const value128 of value127) {
+          if (count12 >= 32) break;
+          value128?.thumbSrc && (this._preloadThumb(value128.thumbSrc), (count12 += 1));
         }
       }
       (this._scheduleVideoThumbJobs(),
         this.sidebarPanel && this.sidebarPanel.classList.contains('show') && this.renderSidebarContent());
-    } catch (_0x35d395) {
-      console.error('加载全局资产失败', _0x35d395);
+    } catch (value129) {
+      console.error('加载全局资产失败', value129);
     }
   }
-  async ['showCreatePanel'](_0x342ca2, _0x1ae58f, _0x1235c2 = {}) {
-    if (!_0x342ca2 || _0x342ca2.length === 0) return;
-    (void _0x1ae58f, void _0x1235c2, this.closeCreatePanel());
-    const _0x126549 = document.createElement('div');
-    _0x126549.className = 'v2-asset-create-backdrop show';
-    const _0x378271 = document.createElement('div');
-    ((_0x378271.className = 'v2-asset-create-panel'),
-      _0x378271.setAttribute('role', 'dialog'),
-      _0x378271.setAttribute('aria-modal', 'true'),
-      _0x378271.setAttribute('aria-label', assetManagerText('title')));
-    const _0x1e32e4 = appStore.getState(),
-      _0x29f5bc = _0x1e32e4.nodes[_0x342ca2[0]];
-    (_0x126549.appendChild(_0x378271),
-      document.body.appendChild(_0x126549),
-      (this.createPanelBackdrop = _0x126549),
-      (this.createPanel = _0x378271));
-    const _0x20a37f = await this._resolveCreatePanelCover(_0x29f5bc);
-    if (!this.createPanel || this.createPanel !== _0x378271) {
+  async ['showCreatePanel'](list18, value130, value131 = {}) {
+    if (!list18 || list18.length === 0) return;
+    (void value130, void value131, this.closeCreatePanel());
+    const el24 = document.createElement('div');
+    el24.className = 'v2-asset-create-backdrop show';
+    const el25 = document.createElement('div');
+    ((el25.className = 'v2-asset-create-panel'),
+      el25.setAttribute('role', 'dialog'),
+      el25.setAttribute('aria-modal', 'true'),
+      el25.setAttribute('aria-label', assetManagerText('title')));
+    const value132 = appStore.getState(),
+      value133 = value132.nodes[list18[0]];
+    (el24.appendChild(el25),
+      document.body.appendChild(el24),
+      (this.createPanelBackdrop = el24),
+      (this.createPanel = el25));
+    const value134 = await this._resolveCreatePanelCover(value133);
+    if (!this.createPanel || this.createPanel !== el25) {
       String(this._createPanelCoverObjectUrl || '').startsWith('blob:') &&
         URL.revokeObjectURL(this._createPanelCoverObjectUrl);
       this._createPanelCoverObjectUrl = '';
       return;
     }
-    ((this._createPanelState = this._createDefaultPanelState(_0x342ca2, _0x20a37f)),
+    ((this._createPanelState = this._createDefaultPanelState(list18, value134)),
       this._renderCreatePanelContent(),
-      _0x126549.addEventListener('pointerdown', (_0x1818b6) => {
-        if (_0x1818b6.target === _0x126549) this.closeCreatePanel();
+      el24.addEventListener('pointerdown', (event6) => {
+        if (event6.target === el24) this.closeCreatePanel();
       }),
-      (this._createPanelKeydownHandler = (_0x5e3a36) => {
-        if (_0x5e3a36.key !== 'Escape') return;
-        if (this._createPanelDropdownEl?.contains(_0x5e3a36.target)) return;
+      (this._createPanelKeydownHandler = (event7) => {
+        if (event7.key !== 'Escape') return;
+        if (this._createPanelDropdownEl?.contains(event7.target)) return;
         this.closeCreatePanel();
       }),
       document.addEventListener('keydown', this._createPanelKeydownHandler));
   }
-  ['_playCreateAssetFly'](_0x146c8b) {
-    const _0x33f3d4 = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-    if (_0x33f3d4) return;
-    const _0x8fd558 = _0x146c8b && _0x146c8b.isConnected ? _0x146c8b : this.createPanel;
-    if (!_0x8fd558?.isConnected) return;
-    const _0x4c60c6 = _0x8fd558.querySelector('.v2-asset-create-cover'),
-      _0x3602b6 = _0x4c60c6?.firstElementChild;
-    if (!_0x3602b6) return;
-    const _0x24247e = _0x3602b6.getBoundingClientRect();
-    if (!_0x24247e.width || !_0x24247e.height) return;
-    const _0x7d6506 = document.getElementById('btnAssets'),
-      _0x215bc0 = _0x7d6506?.getBoundingClientRect?.();
-    if (!_0x215bc0) return;
-    const _0x2c7f6f = document.createElement('div');
-    ((_0x2c7f6f.className = 'v2-asset-create-fly'),
-      (_0x2c7f6f.style.left = _0x24247e.left + 'px'),
-      (_0x2c7f6f.style.top = _0x24247e.top + 'px'),
-      (_0x2c7f6f.style.width = _0x24247e.width + 'px'),
-      (_0x2c7f6f.style.height = _0x24247e.height + 'px'));
-    const _0x40d5d0 = _0x3602b6.cloneNode(true);
-    if (_0x40d5d0?.id) _0x40d5d0.removeAttribute('id');
-    (_0x2c7f6f.appendChild(_0x40d5d0), document.body.appendChild(_0x2c7f6f));
-    const _0x3e1a40 = _0x24247e.left + _0x24247e.width / 2,
-      _0x41e94f = _0x24247e.top + _0x24247e.height / 2,
-      _0xccf294 = _0x215bc0.left + _0x215bc0.width / 2,
-      _0x19d253 = _0x215bc0.top + _0x215bc0.height / 2,
-      _0x21b414 = _0xccf294 - _0x3e1a40,
-      _0x32e45e = _0x19d253 - _0x41e94f,
-      _0x179875 = 0.12,
-      _0x599e86 = _0x2c7f6f.animate(
+  ['_playCreateAssetFly'](el26) {
+    const value135 = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    if (value135) return;
+    const el27 = el26 && el26.isConnected ? el26 : this.createPanel;
+    if (!el27?.isConnected) return;
+    const value136 = el27.querySelector('.v2-asset-create-cover'),
+      el28 = value136?.firstElementChild;
+    if (!el28) return;
+    const box5 = el28.getBoundingClientRect();
+    if (!box5.width || !box5.height) return;
+    const el29 = document.getElementById('btnAssets'),
+      box6 = el29?.getBoundingClientRect?.();
+    if (!box6) return;
+    const el30 = document.createElement('div');
+    ((el30.className = 'v2-asset-create-fly'),
+      (el30.style.left = box5.left + 'px'),
+      (el30.style.top = box5.top + 'px'),
+      (el30.style.width = box5.width + 'px'),
+      (el30.style.height = box5.height + 'px'));
+    const value137 = el28.cloneNode(true);
+    if (value137?.id) value137.removeAttribute('id');
+    (el30.appendChild(value137), document.body.appendChild(el30));
+    const value138 = box5.left + box5.width / 2,
+      value139 = box5.top + box5.height / 2,
+      value140 = box6.left + box6.width / 2,
+      value141 = box6.top + box6.height / 2,
+      value142 = value140 - value138,
+      value143 = value141 - value139,
+      value144 = 0.12,
+      value145 = el30.animate(
         [
           { transform: 'translate(0,0) scale(1)', opacity: 1 },
           {
-            transform: 'translate(' + _0x21b414 + 'px,' + _0x32e45e + 'px) scale(' + _0x179875 + ')',
+            transform: 'translate(' + value142 + 'px,' + value143 + 'px) scale(' + value144 + ')',
             opacity: 0.2,
           },
         ],
         { duration: 0x208, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
       );
-    _0x599e86.onfinish = () => {
-      (_0x2c7f6f.remove(),
-        _0x7d6506?.animate &&
-          _0x7d6506.animate(
+    value145.onfinish = () => {
+      (el30.remove(),
+        el29?.animate &&
+          el29.animate(
             [
               { transform: 'scale(1)', filter: 'brightness(1)' },
               { transform: 'scale(1.08)', filter: 'brightness(1.2)' },
@@ -1492,109 +1479,107 @@ class AssetManager {
         '\n        </div>\n        <button\n          type="button"\n          class="v2-asset-sidebar-tabs-nav v2-asset-sidebar-tabs-nav--next"\n          data-ui-action="asset-tabs-scroll-next"\n          aria-label="' +
         _escapeHtml(assetManagerText('tabsNextAria')) +
         '"\n          hidden\n        >›</button>\n      </div>\n      <div class="v2-asset-sidebar-content" id="asset-sidebar-content"></div>\n    '));
-    const _0x1acabe = document.querySelector('.sidebar-floating');
-    _0x1acabe ? _0x1acabe.appendChild(this.sidebarPanel) : document.body.appendChild(this.sidebarPanel);
-    const _0x183fc2 = this.sidebarPanel.querySelector('#asset-sidebar-tabs');
-    (_0x183fc2.addEventListener('click', (_0x3f3d3a) => {
-      if (_0x3f3d3a.target.closest("[data-ui-action='asset-category-delete']")) return;
-      const _0x3e278c = _0x3f3d3a.target.closest('.v2-asset-sidebar-tab');
-      _0x3e278c &&
+    const el31 = document.querySelector('.sidebar-floating');
+    el31 ? el31.appendChild(this.sidebarPanel) : document.body.appendChild(this.sidebarPanel);
+    const el32 = this.sidebarPanel.querySelector('#asset-sidebar-tabs');
+    (el32.addEventListener('click', (event8) => {
+      if (event8.target.closest("[data-ui-action='asset-category-delete']")) return;
+      const el33 = event8.target.closest('.v2-asset-sidebar-tab');
+      el33 &&
         ((this._renamingAssetId = ''),
         (this._pendingDeleteAssetId = ''),
-        (this.activeTab = _0x3e278c.dataset.cat),
+        (this.activeTab = el33.dataset.cat),
         (this._openAssetId = null),
-        _0x183fc2
-          .querySelectorAll('.v2-asset-sidebar-tab')
-          .forEach((_0x26bcb3) => _0x26bcb3.classList.remove('active')),
-        _0x3e278c.classList.add('active'),
+        el32.querySelectorAll('.v2-asset-sidebar-tab').forEach((el34) => el34.classList.remove('active')),
+        el33.classList.add('active'),
         this.renderSidebarContent());
     }),
-      _0x183fc2.addEventListener('scroll', () => this._updateSidebarTabsOverflowHint(), { passive: true }),
-      this.sidebarPanel.addEventListener('click', (_0x2919a5) => {
-        const _0x837586 = _0x2919a5.target.closest('[data-ui-action]'),
-          _0x5b6083 = _0x837586?.dataset?.uiAction || '';
-        if (_0x5b6083 === 'asset-tabs-scroll-prev') {
-          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation(), this._scrollSidebarTabs(-1));
+      el32.addEventListener('scroll', () => this._updateSidebarTabsOverflowHint(), { passive: true }),
+      this.sidebarPanel.addEventListener('click', (event9) => {
+        const el35 = event9.target.closest('[data-ui-action]'),
+          value146 = el35?.dataset?.uiAction || '';
+        if (value146 === 'asset-tabs-scroll-prev') {
+          (event9.preventDefault(), event9.stopPropagation(), this._scrollSidebarTabs(-1));
           return;
         }
-        if (_0x5b6083 === 'asset-tabs-scroll-next') {
-          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation(), this._scrollSidebarTabs(1));
+        if (value146 === 'asset-tabs-scroll-next') {
+          (event9.preventDefault(), event9.stopPropagation(), this._scrollSidebarTabs(1));
           return;
         }
-        if (_0x5b6083 === 'asset-category-delete') {
-          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation());
-          const _0x52d561 = _0x837586?.dataset?.cat;
-          if (_0x52d561) void this._deleteUserCategory(_0x52d561);
+        if (value146 === 'asset-category-delete') {
+          (event9.preventDefault(), event9.stopPropagation());
+          const value147 = el35?.dataset?.cat;
+          if (value147) void this._deleteUserCategory(value147);
           return;
         }
-        if (_0x5b6083 === 'asset-back') {
+        if (value146 === 'asset-back') {
           ((this._renamingAssetId = ''),
             (this._pendingDeleteAssetId = ''),
             (this._openAssetId = null),
             this.renderSidebarContent());
           return;
         }
-        if (_0x5b6083 === 'asset-delete-open') {
-          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation(), (this._renamingAssetId = ''));
-          const _0x50b551 = _0x837586?.dataset?.assetId;
-          if (!_0x50b551) return;
-          ((this._pendingDeleteAssetId = _0x50b551), this.renderSidebarContent());
+        if (value146 === 'asset-delete-open') {
+          (event9.preventDefault(), event9.stopPropagation(), (this._renamingAssetId = ''));
+          const enabled36 = el35?.dataset?.assetId;
+          if (!enabled36) return;
+          ((this._pendingDeleteAssetId = enabled36), this.renderSidebarContent());
           return;
         }
-        if (_0x5b6083 === 'asset-delete-cancel') {
-          (_0x2919a5.preventDefault(),
-            _0x2919a5.stopPropagation(),
+        if (value146 === 'asset-delete-cancel') {
+          (event9.preventDefault(),
+            event9.stopPropagation(),
             (this._pendingDeleteAssetId = ''),
             this.renderSidebarContent());
           return;
         }
-        if (_0x5b6083 === 'asset-delete-confirm') {
-          (_0x2919a5.preventDefault(), _0x2919a5.stopPropagation());
-          const _0x26834b = _0x837586?.dataset?.assetId;
-          if (!_0x26834b) return;
-          ((this._pendingDeleteAssetId = ''), this._deleteAsset(_0x26834b));
+        if (value146 === 'asset-delete-confirm') {
+          (event9.preventDefault(), event9.stopPropagation());
+          const enabled37 = el35?.dataset?.assetId;
+          if (!enabled37) return;
+          ((this._pendingDeleteAssetId = ''), this._deleteAsset(enabled37));
           return;
         }
-        if (_0x5b6083 === 'asset-add-all') {
-          (_0x2919a5.preventDefault(),
-            _0x2919a5.stopPropagation(),
+        if (value146 === 'asset-add-all') {
+          (event9.preventDefault(),
+            event9.stopPropagation(),
             (this._renamingAssetId = ''),
             (this._pendingDeleteAssetId = ''));
-          const _0x4a105b = _0x837586?.dataset?.assetId;
-          if (_0x4a105b) this.restoreAssetToCanvas(_0x4a105b);
+          const value148 = el35?.dataset?.assetId;
+          if (value148) this.restoreAssetToCanvas(value148);
           return;
         }
-        const _0x46c996 = _0x2919a5.target.closest('.v2-asset-subitem');
-        if (_0x46c996) {
-          const _0x55d74d = _0x46c996.dataset.assetId,
-            _0x812042 = Number(_0x46c996.dataset.idx);
-          if (_0x55d74d && Number.isFinite(_0x812042)) this._restoreAssetSubItem(_0x55d74d, _0x812042);
+        const el36 = event9.target.closest('.v2-asset-subitem');
+        if (el36) {
+          const value149 = el36.dataset.assetId,
+            value150 = Number(el36.dataset.idx);
+          if (value149 && Number.isFinite(value150)) this._restoreAssetSubItem(value149, value150);
           return;
         }
-        const _0x273d5a = _0x2919a5.target.closest('.v2-asset-item');
-        _0x273d5a &&
-          _0x273d5a.dataset?.id &&
+        const el37 = event9.target.closest('.v2-asset-item');
+        el37 &&
+          el37.dataset?.id &&
           ((this._renamingAssetId = ''),
           (this._pendingDeleteAssetId = ''),
-          (this._openAssetId = _0x273d5a.dataset.id),
+          (this._openAssetId = el37.dataset.id),
           this.renderSidebarContent());
       }));
-    const _0x1cd4b8 = document.getElementById('btnAssets');
-    if (_0x1cd4b8) {
-      let _0x3cb123 = false;
-      const _0x2b9ddb = () => {
+    const button = document.getElementById('btnAssets');
+    if (button) {
+      let enabled38 = false;
+      const open = () => {
         (!this.sidebarPanel.classList.contains('show') && this.showSidebarPanel(),
-          !_0x3cb123 &&
-            ((_0x3cb123 = true),
+          !enabled38 &&
+            ((enabled38 = true),
             this.loadAssetsFromServer().finally(() => {
-              _0x3cb123 = false;
+              enabled38 = false;
             })));
       };
       registerSidebarSubmenu({
         key: 'assets',
-        button: _0x1cd4b8,
+        button: button,
         panel: this.sidebarPanel,
-        open: _0x2b9ddb,
+        open: open,
         close: () => this.hideSidebarPanel(),
         isOpen: () => this.sidebarPanel.classList.contains('show'),
       });
@@ -1608,583 +1593,578 @@ class AssetManager {
       document.getElementById('btnAssets')?.classList.remove('active'));
   }
   ['_getVisibleAssetCardsInList']() {
-    const _0x312254 = this.sidebarPanel?.querySelector('#asset-sidebar-content > .v2-asset-view-list');
-    if (!_0x312254) return { listView: null, cards: [] };
-    const _0x8eff01 = Array.from(_0x312254.querySelectorAll(':scope > .v2-asset-item')).filter(
-      (_0x18a75c) => _0x18a75c.style.display !== 'none',
+    const listView = this.sidebarPanel?.querySelector('#asset-sidebar-content > .v2-asset-view-list');
+    if (!listView) return { listView: null, cards: [] };
+    const cards = Array.from(listView.querySelectorAll(':scope > .v2-asset-item')).filter(
+      (el38) => el38.style.display !== 'none',
     );
-    return { listView: _0x312254, cards: _0x8eff01 };
+    return { listView: listView, cards: cards };
   }
-  ['_captureRectsById'](_0x38a036) {
-    const _0x52b523 = new Map();
-    for (const _0x411d63 of _0x38a036) {
-      const _0x21c490 = String(_0x411d63.dataset?.id || '');
-      if (!_0x21c490) continue;
-      _0x52b523.set(_0x21c490, _0x411d63.getBoundingClientRect());
+  ['_captureRectsById'](value151) {
+    const map2 = new Map();
+    for (const el39 of value151) {
+      const enabled39 = String(el39.dataset?.id || '');
+      if (!enabled39) continue;
+      map2.set(enabled39, el39.getBoundingClientRect());
     }
-    return _0x52b523;
+    return map2;
   }
-  ['_playFlip'](_0x498563, _0x2d524d) {
-    if (!_0x498563 || !_0x2d524d?.size) return;
-    const _0x26e1da = Array.from(_0x498563.querySelectorAll(':scope > .v2-asset-item')).filter(
-        (_0x2b1a95) => _0x2b1a95.style.display !== 'none',
+  ['_playFlip'](el40, map3) {
+    if (!el40 || !map3?.size) return;
+    const value152 = Array.from(el40.querySelectorAll(':scope > .v2-asset-item')).filter(
+        (el41) => el41.style.display !== 'none',
       ),
-      _0x5b0c96 = new Map();
-    for (const _0x12a82f of _0x26e1da) {
-      const _0x1c8809 = String(_0x12a82f.dataset?.id || '');
-      if (!_0x1c8809) continue;
-      _0x5b0c96.set(_0x1c8809, _0x12a82f.getBoundingClientRect());
+      map4 = new Map();
+    for (const el42 of value152) {
+      const enabled40 = String(el42.dataset?.id || '');
+      if (!enabled40) continue;
+      map4.set(enabled40, el42.getBoundingClientRect());
     }
-    for (const _0x1f0547 of _0x26e1da) {
-      const _0x5d6803 = String(_0x1f0547.dataset?.id || '');
-      if (!_0x5d6803) continue;
-      const _0x1dd597 = _0x2d524d.get(_0x5d6803),
-        _0x29ae7d = _0x5b0c96.get(_0x5d6803);
-      if (!_0x1dd597 || !_0x29ae7d) continue;
-      const _0x2221f9 = _0x1dd597.left - _0x29ae7d.left,
-        _0x4d15c5 = _0x1dd597.top - _0x29ae7d.top;
-      if (!_0x2221f9 && !_0x4d15c5) continue;
-      _0x1f0547.animate(
+    for (const el43 of value152) {
+      const enabled41 = String(el43.dataset?.id || '');
+      if (!enabled41) continue;
+      const box7 = map3.get(enabled41),
+        box8 = map4.get(enabled41);
+      if (!box7 || !box8) continue;
+      const enabled42 = box7.left - box8.left,
+        enabled43 = box7.top - box8.top;
+      if (!enabled42 && !enabled43) continue;
+      el43.animate(
         [
-          { transform: 'translate(' + _0x2221f9 + 'px, ' + _0x4d15c5 + 'px)' },
+          { transform: 'translate(' + enabled42 + 'px, ' + enabled43 + 'px)' },
           { transform: 'translate(0, 0)' },
         ],
         { duration: 220, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
       );
     }
   }
-  ['_playDeleteShake'](_0x4b5e94) {
-    if (!_0x4b5e94) return;
-    (_0x4b5e94.classList.remove('is-delete-shaking'),
-      void _0x4b5e94.offsetWidth,
-      _0x4b5e94.classList.add('is-delete-shaking'),
+  ['_playDeleteShake'](el44) {
+    if (!el44) return;
+    (el44.classList.remove('is-delete-shaking'),
+      void el44.offsetWidth,
+      el44.classList.add('is-delete-shaking'),
       window.setTimeout(() => {
-        if (_0x4b5e94.isConnected) _0x4b5e94.classList.remove('is-delete-shaking');
+        if (el44.isConnected) el44.classList.remove('is-delete-shaking');
       }, 240));
   }
-  async ['_deleteAsset'](_0x1d8d6e) {
-    const _0xba435d = String(_0x1d8d6e || '');
-    if (!_0xba435d) return;
-    const { listView: _0x58e672, cards: _0x42f908 } = this._getVisibleAssetCardsInList(),
-      _0x2806c1 = this._captureRectsById(_0x42f908);
+  async ['_deleteAsset'](value153) {
+    const enabled44 = String(value153 || '');
+    if (!enabled44) return;
+    const { listView: listView2, cards: cards2 } = this._getVisibleAssetCardsInList(),
+      value154 = this._captureRectsById(cards2);
     try {
-      await deleteAssetFromServer(_0xba435d);
-    } catch (_0x126e76) {
+      await deleteAssetFromServer(enabled44);
+    } catch (value155) {
       window.showToast?.(assetManagerText('deleteFailed'), 'error');
       return;
     }
-    ((this.assets = (this.assets || []).filter((_0x4a86be) => String(_0x4a86be?.id || '') !== _0xba435d)),
+    ((this.assets = (this.assets || []).filter((item24) => String(item24?.id || '') !== enabled44)),
       this._syncTabsFromAssets(),
       this._renderSidebarTabs(),
-      removeAssetMentionAsset(_0xba435d));
-    if (this._openAssetId === _0xba435d) this._openAssetId = null;
-    const _0x1320bf = this._assetCardPool?.get?.(_0xba435d);
-    if (_0x1320bf?.isConnected) _0x1320bf.remove();
-    (this._assetCardPool?.delete?.(_0xba435d),
+      removeAssetMentionAsset(enabled44));
+    if (this._openAssetId === enabled44) this._openAssetId = null;
+    const el45 = this._assetCardPool?.get?.(enabled44);
+    if (el45?.isConnected) el45.remove();
+    (this._assetCardPool?.delete?.(enabled44),
       this.renderSidebarContent(),
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
-          const { listView: _0x3c0177 } = this._getVisibleAssetCardsInList();
-          this._playFlip(_0x3c0177, _0x2806c1);
+          const { listView: listView3 } = this._getVisibleAssetCardsInList();
+          this._playFlip(listView3, value154);
         });
       }));
   }
-  async ['_deleteUserCategory'](_0x3339ae) {
-    const _0x2bed5d = this._normalizeCategoryName(_0x3339ae);
-    if (!_0x2bed5d || !this._isUserCategory(_0x2bed5d)) return;
-    const _0x2aeaca = this._getSortedAssets().some(
-      (_0xd1d955) => this._categoryKey(_0xd1d955?.category) === this._categoryKey(_0x2bed5d),
+  async ['_deleteUserCategory'](value156) {
+    const enabled45 = this._normalizeCategoryName(value156);
+    if (!enabled45 || !this._isUserCategory(enabled45)) return;
+    const value157 = this._getSortedAssets().some(
+      (item25) => this._categoryKey(item25?.category) === this._categoryKey(enabled45),
     );
-    if (_0x2aeaca) {
+    if (value157) {
       window.showToast?.(assetManagerText('categoryHasAssets'), 'warn');
       return;
     }
-    const _0x214ec4 = [...this.userCategories];
-    this.userCategories = _0x214ec4.filter(
-      (_0x2aa5c2) => this._categoryKey(_0x2aa5c2) !== this._categoryKey(_0x2bed5d),
+    const list19 = [...this.userCategories];
+    this.userCategories = list19.filter(
+      (item26) => this._categoryKey(item26) !== this._categoryKey(enabled45),
     );
-    this._categoryKey(this.activeTab) === this._categoryKey(_0x2bed5d) &&
+    this._categoryKey(this.activeTab) === this._categoryKey(enabled45) &&
       ((this.activeTab = DEFAULT_ASSET_CATEGORIES[0]), (this._openAssetId = null));
     (this._syncTabsFromAssets(), this._renderSidebarTabs(), this.renderSidebarContent());
     try {
       (await this._saveUserCategories(), window.showToast?.(assetManagerText('categoryDeleted'), 'success'));
-    } catch (_0x3a1d37) {
-      ((this.userCategories = _0x214ec4),
+    } catch (value158) {
+      ((this.userCategories = list19),
         this._syncTabsFromAssets(),
         this._renderSidebarTabs(),
         this.renderSidebarContent(),
-        console.error(_0x3a1d37),
+        console.error(value158),
         window.showToast?.(assetManagerText('categoryDeleteFailed'), 'error'));
     }
   }
-  ['_setThumbContent'](_0x797c42, _0x862772, _0x78f2c) {
-    if (!_0x797c42) return;
-    const _0x4a83f3 = String(_0x862772 || ''),
-      _0x4ba1d3 = _normalizeAssetType(_0x78f2c);
-    if (_0x4a83f3 && !(_0x4ba1d3 === 'video' && this._isVideoMediaSrc(_0x4a83f3))) {
-      const _0x4c1b8d = _0x797c42.dataset.thumbSrc || '';
-      if (_0x797c42.dataset.thumbKind === 'img' && _0x4c1b8d === _0x4a83f3) return;
-      if (_0x797c42.dataset.pendingSrc === _0x4a83f3) return;
-      _0x797c42.childElementCount === 0 &&
-        _0x797c42.dataset.thumbKind !== 'img' &&
-        ((_0x797c42.dataset.thumbKind = 'icon'),
-        (_0x797c42.dataset.thumbType = String(_0x78f2c || 'other')),
-        (_0x797c42.dataset.thumbSrc = ''),
-        (_0x797c42.innerHTML = _renderAssetIcon(_0x78f2c)));
-      ((_0x797c42.dataset.pendingSrc = _0x4a83f3),
-        this._ensureThumbDecoded(_0x4a83f3).then((_0x31748c) => {
-          if (!_0x31748c) {
-            if (_0x797c42.dataset.pendingSrc === _0x4a83f3) _0x797c42.dataset.pendingSrc = '';
+  ['_setThumbContent'](el46, value159, value160) {
+    if (!el46) return;
+    const value161 = String(value159 || ''),
+      _normalizeAssetType5 = _normalizeAssetType(value160);
+    if (value161 && !(_normalizeAssetType5 === 'video' && this._isVideoMediaSrc(value161))) {
+      const value162 = el46.dataset.thumbSrc || '';
+      if (el46.dataset.thumbKind === 'img' && value162 === value161) return;
+      if (el46.dataset.pendingSrc === value161) return;
+      el46.childElementCount === 0 &&
+        el46.dataset.thumbKind !== 'img' &&
+        ((el46.dataset.thumbKind = 'icon'),
+        (el46.dataset.thumbType = String(value160 || 'other')),
+        (el46.dataset.thumbSrc = ''),
+        (el46.innerHTML = _renderAssetIcon(value160)));
+      ((el46.dataset.pendingSrc = value161),
+        this._ensureThumbDecoded(value161).then((enabled46) => {
+          if (!enabled46) {
+            if (el46.dataset.pendingSrc === value161) el46.dataset.pendingSrc = '';
             return;
           }
-          if (!_0x797c42.isConnected) return;
-          if (_0x797c42.dataset.pendingSrc !== _0x4a83f3) return;
-          _0x797c42.dataset.pendingSrc = '';
-          let _0x47e7e8 = _0x797c42.querySelector(':scope > img');
-          !_0x47e7e8
-            ? ((_0x47e7e8 = document.createElement('img')),
-              (_0x47e7e8.alt = assetManagerText('thumbnailAlt')),
-              (_0x47e7e8.draggable = false),
-              (_0x47e7e8.decoding = 'async'),
-              (_0x47e7e8.loading = 'eager'),
-              (_0x47e7e8.className = 'v2-asset-thumb-img'))
-            : _0x47e7e8.classList.add('v2-asset-thumb-img');
-          if (_0x47e7e8.getAttribute('src') !== _0x4a83f3) _0x47e7e8.setAttribute('src', _0x4a83f3);
-          ((_0x797c42.dataset.thumbKind = 'img'),
-            (_0x797c42.dataset.thumbSrc = _0x4a83f3),
-            (_0x797c42.firstElementChild !== _0x47e7e8 || _0x797c42.childElementCount !== 1) &&
-              _0x797c42.replaceChildren(_0x47e7e8));
+          if (!el46.isConnected) return;
+          if (el46.dataset.pendingSrc !== value161) return;
+          el46.dataset.pendingSrc = '';
+          let el47 = el46.querySelector(':scope > img');
+          !el47
+            ? ((el47 = document.createElement('img')),
+              (el47.alt = assetManagerText('thumbnailAlt')),
+              (el47.draggable = false),
+              (el47.decoding = 'async'),
+              (el47.loading = 'eager'),
+              (el47.className = 'v2-asset-thumb-img'))
+            : el47.classList.add('v2-asset-thumb-img');
+          if (el47.getAttribute('src') !== value161) el47.setAttribute('src', value161);
+          ((el46.dataset.thumbKind = 'img'),
+            (el46.dataset.thumbSrc = value161),
+            (el46.firstElementChild !== el47 || el46.childElementCount !== 1) && el46.replaceChildren(el47));
         }));
       return;
     }
-    const _0x34c42a = String(_0x78f2c || 'other');
-    if (_0x797c42.dataset.thumbKind === 'icon' && _0x797c42.dataset.thumbType === _0x34c42a) return;
-    ((_0x797c42.dataset.thumbKind = 'icon'),
-      (_0x797c42.dataset.thumbType = _0x34c42a),
-      (_0x797c42.dataset.thumbSrc = ''),
-      (_0x797c42.dataset.pendingSrc = ''),
-      (_0x797c42.innerHTML = _renderAssetIcon(_0x34c42a)));
+    const value163 = String(value160 || 'other');
+    if (el46.dataset.thumbKind === 'icon' && el46.dataset.thumbType === value163) return;
+    ((el46.dataset.thumbKind = 'icon'),
+      (el46.dataset.thumbType = value163),
+      (el46.dataset.thumbSrc = ''),
+      (el46.dataset.pendingSrc = ''),
+      (el46.innerHTML = _renderAssetIcon(value163)));
   }
   ['renderSidebarContent']() {
-    const _0x31ce06 = this.sidebarPanel?.querySelector('#asset-sidebar-content');
-    if (!_0x31ce06) return;
-    const _0x44e62c = this.sidebarPanel.querySelector('#asset-sidebar-title-text'),
-      _0x26d245 = this.sidebarPanel.querySelector('.v2-asset-back');
+    const el48 = this.sidebarPanel?.querySelector('#asset-sidebar-content');
+    if (!el48) return;
+    const el49 = this.sidebarPanel.querySelector('#asset-sidebar-title-text'),
+      el50 = this.sidebarPanel.querySelector('.v2-asset-back');
     this._renderSidebarTabs();
-    const _0x520aa9 = () => {
-        let _0x5448d6 = _0x31ce06.querySelector(':scope > .v2-asset-view-list');
-        !_0x5448d6 &&
-          ((_0x5448d6 = document.createElement('div')),
-          (_0x5448d6.className = 'v2-asset-view-list'),
-          _0x31ce06.appendChild(_0x5448d6));
-        let _0x37d17e = _0x31ce06.querySelector(':scope > .v2-asset-view-detail');
+    const run4 = () => {
+        let listView4 = el48.querySelector(':scope > .v2-asset-view-list');
+        !listView4 &&
+          ((listView4 = document.createElement('div')),
+          (listView4.className = 'v2-asset-view-list'),
+          el48.appendChild(listView4));
+        let detailView = el48.querySelector(':scope > .v2-asset-view-detail');
         return (
-          !_0x37d17e &&
-            ((_0x37d17e = document.createElement('div')),
-            (_0x37d17e.className = 'v2-asset-view-detail'),
-            _0x31ce06.appendChild(_0x37d17e)),
-          _0x31ce06
+          !detailView &&
+            ((detailView = document.createElement('div')),
+            (detailView.className = 'v2-asset-view-detail'),
+            el48.appendChild(detailView)),
+          el48
             .querySelectorAll(':scope > .v2-asset-item, :scope > .v2-asset-empty')
-            .forEach((_0x812138) => _0x5448d6.appendChild(_0x812138)),
-          _0x31ce06
+            .forEach((item27) => listView4.appendChild(item27)),
+          el48
             .querySelectorAll(':scope > .v2-asset-detail-actions, :scope > .v2-asset-subgrid')
-            .forEach((_0x4b967d) => _0x37d17e.appendChild(_0x4b967d)),
-          { listView: _0x5448d6, detailView: _0x37d17e }
+            .forEach((item28) => detailView.appendChild(item28)),
+          { listView: listView4, detailView: detailView }
         );
       },
-      { listView: _0x58c425, detailView: _0x5a5ec9 } = _0x520aa9(),
-      _0x438d98 = (_0x2efd17, _0x270fc3, _0x5e55f4) => this._setThumbContent(_0x2efd17, _0x270fc3, _0x5e55f4),
-      _0x53b169 = (_0x3b192e) => {
-        let _0x94ea55 = _0x3b192e.querySelector(':scope > .v2-asset-cover-grid');
-        if (!_0x94ea55) {
-          ((_0x94ea55 = document.createElement('div')), (_0x94ea55.className = 'v2-asset-cover-grid'));
-          for (let _0x3a3b27 = 0; _0x3a3b27 < 4; _0x3a3b27++) {
-            const _0x9883c0 = document.createElement('div');
-            ((_0x9883c0.className = 'v2-asset-cover-cell'), _0x94ea55.appendChild(_0x9883c0));
+      { listView: listView5, detailView: detailView2 } = run4(),
+      handler6 = (value164, value165, value166) => this._setThumbContent(value164, value165, value166),
+      handler7 = (el51) => {
+        let el52 = el51.querySelector(':scope > .v2-asset-cover-grid');
+        if (!el52) {
+          ((el52 = document.createElement('div')), (el52.className = 'v2-asset-cover-grid'));
+          for (let count13 = 0; count13 < 4; count13++) {
+            const value167 = document.createElement('div');
+            ((value167.className = 'v2-asset-cover-cell'), el52.appendChild(value167));
           }
-          _0x3b192e.replaceChildren(_0x94ea55);
+          el51.replaceChildren(el52);
         } else {
-          const _0x2c30cf = _0x94ea55.querySelectorAll(':scope > .v2-asset-cover-cell');
-          for (let _0x5a7ca5 = _0x2c30cf.length; _0x5a7ca5 < 4; _0x5a7ca5++) {
-            const _0x14f48b = document.createElement('div');
-            ((_0x14f48b.className = 'v2-asset-cover-cell'), _0x94ea55.appendChild(_0x14f48b));
+          const list20 = el52.querySelectorAll(':scope > .v2-asset-cover-cell');
+          for (let count14 = list20.length; count14 < 4; count14++) {
+            const value168 = document.createElement('div');
+            ((value168.className = 'v2-asset-cover-cell'), el52.appendChild(value168));
           }
         }
-        return _0x94ea55;
+        return el52;
       },
-      _0x117776 = (_0x238478, _0x2ce531) => {
-        let _0x155cb7 = _0x238478.querySelector(':scope > .v2-asset-item-load'),
-          _0x4fc64d = _0x238478.querySelector(':scope > .v2-asset-item-delete'),
-          _0x28bde7 = _0x238478.querySelector(':scope > .v2-asset-item-delete-confirm'),
-          _0x373710 = _0x238478.querySelector(':scope > .v2-asset-item-cover'),
-          _0x558e15 = _0x238478.querySelector(':scope > .v2-asset-item-name');
-        !_0x155cb7 &&
-          ((_0x155cb7 = document.createElement('button')),
-          (_0x155cb7.type = 'button'),
-          (_0x155cb7.className = 'v2-asset-item-load'),
-          (_0x155cb7.dataset.uiAction = 'asset-add-all'),
-          (_0x155cb7.title = assetManagerText('loadToCanvas')),
-          _0x155cb7.setAttribute('aria-label', assetManagerText('loadToCanvas')),
-          (_0x155cb7.innerHTML =
+      handler8 = (el53, error8) => {
+        let el54 = el53.querySelector(':scope > .v2-asset-item-load'),
+          el55 = el53.querySelector(':scope > .v2-asset-item-delete'),
+          el56 = el53.querySelector(':scope > .v2-asset-item-delete-confirm'),
+          enabled47 = el53.querySelector(':scope > .v2-asset-item-cover'),
+          el57 = el53.querySelector(':scope > .v2-asset-item-name');
+        !el54 &&
+          ((el54 = document.createElement('button')),
+          (el54.type = 'button'),
+          (el54.className = 'v2-asset-item-load'),
+          (el54.dataset.uiAction = 'asset-add-all'),
+          (el54.title = assetManagerText('loadToCanvas')),
+          el54.setAttribute('aria-label', assetManagerText('loadToCanvas')),
+          (el54.innerHTML =
             '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 5.5a7.5 7.5 0 1 0-1 13.5"/><path d="M12 14h6v6"/><path d="m18 14-6 6"/></svg>'),
-          _0x238478.appendChild(_0x155cb7));
-        !_0x4fc64d &&
-          ((_0x4fc64d = document.createElement('button')),
-          (_0x4fc64d.type = 'button'),
-          (_0x4fc64d.className = 'v2-asset-item-delete'),
-          (_0x4fc64d.dataset.uiAction = 'asset-delete-open'),
-          _0x4fc64d.setAttribute('aria-label', assetManagerText('deleteAsset')),
-          (_0x4fc64d.innerHTML =
+          el53.appendChild(el54));
+        !el55 &&
+          ((el55 = document.createElement('button')),
+          (el55.type = 'button'),
+          (el55.className = 'v2-asset-item-delete'),
+          (el55.dataset.uiAction = 'asset-delete-open'),
+          el55.setAttribute('aria-label', assetManagerText('deleteAsset')),
+          (el55.innerHTML =
             '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 3h6l1 2h5v2H3V5h5l1-2zm1 6h2v10h-2V9zm4 0h2v10h-2V9zM7 9h2v10H7V9z"/></svg>'),
-          _0x238478.appendChild(_0x4fc64d));
-        if (!_0x28bde7) {
-          ((_0x28bde7 = document.createElement('div')),
-            (_0x28bde7.className = 'v2-asset-item-delete-confirm'),
-            (_0x28bde7.hidden = true),
-            _0x28bde7.addEventListener('click', (_0x41553b) => {
-              if (_0x41553b.target !== _0x28bde7) return;
-              (_0x41553b.stopPropagation(), (this._pendingDeleteAssetId = ''), this.renderSidebarContent());
+          el53.appendChild(el55));
+        if (!el56) {
+          ((el56 = document.createElement('div')),
+            (el56.className = 'v2-asset-item-delete-confirm'),
+            (el56.hidden = true),
+            el56.addEventListener('click', (event10) => {
+              if (event10.target !== el56) return;
+              (event10.stopPropagation(), (this._pendingDeleteAssetId = ''), this.renderSidebarContent());
             }));
-          const _0xf072b7 = document.createElement('button');
-          ((_0xf072b7.type = 'button'),
-            (_0xf072b7.className =
-              'v2-asset-item-delete-confirm-btn v2-asset-item-delete-confirm-btn--danger'),
-            (_0xf072b7.dataset.uiAction = 'asset-delete-confirm'),
-            (_0xf072b7.textContent = '✔'),
-            _0xf072b7.setAttribute('aria-label', assetManagerText('confirm')));
-          const _0x560fe6 = document.createElement('button');
-          ((_0x560fe6.type = 'button'),
-            (_0x560fe6.className =
-              'v2-asset-item-delete-confirm-btn v2-asset-item-delete-confirm-btn--neutral'),
-            (_0x560fe6.dataset.uiAction = 'asset-delete-cancel'),
-            (_0x560fe6.textContent = '×'),
-            _0x560fe6.setAttribute('aria-label', assetManagerText('cancel')),
-            _0x28bde7.appendChild(_0xf072b7),
-            _0x28bde7.appendChild(_0x560fe6),
-            _0x238478.appendChild(_0x28bde7));
+          const el58 = document.createElement('button');
+          ((el58.type = 'button'),
+            (el58.className = 'v2-asset-item-delete-confirm-btn v2-asset-item-delete-confirm-btn--danger'),
+            (el58.dataset.uiAction = 'asset-delete-confirm'),
+            (el58.textContent = '✔'),
+            el58.setAttribute('aria-label', assetManagerText('confirm')));
+          const el59 = document.createElement('button');
+          ((el59.type = 'button'),
+            (el59.className = 'v2-asset-item-delete-confirm-btn v2-asset-item-delete-confirm-btn--neutral'),
+            (el59.dataset.uiAction = 'asset-delete-cancel'),
+            (el59.textContent = '×'),
+            el59.setAttribute('aria-label', assetManagerText('cancel')),
+            el56.appendChild(el58),
+            el56.appendChild(el59),
+            el53.appendChild(el56));
         }
-        const _0x31351f = String(_0x2ce531?.id || '');
-        ((_0x155cb7.dataset.assetId = _0x31351f),
-          (_0x155cb7.disabled = !Array.isArray(_0x2ce531?.nodes) || _0x2ce531.nodes.length === 0),
-          (_0x4fc64d.dataset.assetId = _0x31351f),
-          _0x28bde7.querySelectorAll(':scope > button').forEach((_0x374cf5) => {
-            _0x374cf5.dataset.assetId = _0x31351f;
+        const value169 = String(error8?.id || '');
+        ((el54.dataset.assetId = value169),
+          (el54.disabled = !Array.isArray(error8?.nodes) || error8.nodes.length === 0),
+          (el55.dataset.assetId = value169),
+          el56.querySelectorAll(':scope > button').forEach((el60) => {
+            el60.dataset.assetId = value169;
           }));
-        const _0x3ac0d6 = this._pendingDeleteAssetId === _0x31351f;
-        ((_0x4fc64d.hidden = _0x3ac0d6), (_0x28bde7.hidden = !_0x3ac0d6));
-        !_0x373710 &&
-          ((_0x373710 = document.createElement('div')),
-          (_0x373710.className = 'v2-asset-item-cover'),
-          _0x238478.appendChild(_0x373710));
-        !_0x558e15 &&
-          ((_0x558e15 = document.createElement('div')),
-          (_0x558e15.className = 'v2-asset-item-name'),
-          _0x558e15.addEventListener('click', (_0x2fcc3b) => {
-            _0x2fcc3b.stopPropagation();
-            const _0x5480e5 = _0x2fcc3b.currentTarget?.closest?.('.v2-asset-item'),
-              _0x144238 = _0x5480e5?.dataset?.id || '';
-            this._beginRenameAsset(_0x144238);
+        const enabled48 = this._pendingDeleteAssetId === value169;
+        ((el55.hidden = enabled48), (el56.hidden = !enabled48));
+        !enabled47 &&
+          ((enabled47 = document.createElement('div')),
+          (enabled47.className = 'v2-asset-item-cover'),
+          el53.appendChild(enabled47));
+        !el57 &&
+          ((el57 = document.createElement('div')),
+          (el57.className = 'v2-asset-item-name'),
+          el57.addEventListener('click', (event11) => {
+            event11.stopPropagation();
+            const el61 = event11.currentTarget?.closest?.('.v2-asset-item'),
+              value170 = el61?.dataset?.id || '';
+            this._beginRenameAsset(value170);
           }),
-          _0x238478.appendChild(_0x558e15));
-        const _0x4c935d = String(_0x2ce531?.name || '');
-        if (this._renamingAssetId === _0x31351f) {
-          _0x558e15.classList.add('is-editing');
-          let _0x30f35e = _0x558e15.querySelector(':scope > input.v2-asset-item-name-input');
-          !_0x30f35e &&
-            ((_0x30f35e = document.createElement('input')),
-            (_0x30f35e.type = 'text'),
-            (_0x30f35e.className = 'v2-asset-item-name-input'),
-            _0x30f35e.addEventListener('click', (_0x3d39ce) => _0x3d39ce.stopPropagation()),
-            _0x30f35e.addEventListener('keydown', (_0x17724c) => {
-              if (_0x17724c.key === 'Enter') {
-                (_0x17724c.preventDefault(),
-                  _0x17724c.stopPropagation(),
-                  (_0x30f35e.dataset.submitted = '1'),
-                  this._commitRenameAsset(_0x31351f, _0x30f35e.value));
+          el53.appendChild(el57));
+        const value171 = String(error8?.name || '');
+        if (this._renamingAssetId === value169) {
+          el57.classList.add('is-editing');
+          let el62 = el57.querySelector(':scope > input.v2-asset-item-name-input');
+          !el62 &&
+            ((el62 = document.createElement('input')),
+            (el62.type = 'text'),
+            (el62.className = 'v2-asset-item-name-input'),
+            el62.addEventListener('click', (event12) => event12.stopPropagation()),
+            el62.addEventListener('keydown', (event13) => {
+              if (event13.key === 'Enter') {
+                (event13.preventDefault(),
+                  event13.stopPropagation(),
+                  (el62.dataset.submitted = '1'),
+                  this._commitRenameAsset(value169, el62.value));
                 return;
               }
-              _0x17724c.key === 'Escape' &&
-                (_0x17724c.preventDefault(), _0x17724c.stopPropagation(), this._cancelRenameAsset());
+              event13.key === 'Escape' &&
+                (event13.preventDefault(), event13.stopPropagation(), this._cancelRenameAsset());
             }),
-            _0x30f35e.addEventListener('blur', () => {
-              if (_0x30f35e.dataset.submitted === '1') return;
-              this._commitRenameAsset(_0x31351f, _0x30f35e.value);
+            el62.addEventListener('blur', () => {
+              if (el62.dataset.submitted === '1') return;
+              this._commitRenameAsset(value169, el62.value);
             }),
-            _0x558e15.replaceChildren(_0x30f35e));
-          if (_0x30f35e.value !== _0x4c935d) _0x30f35e.value = _0x4c935d;
-          if (_0x30f35e.getAttribute('aria-label') !== assetManagerText('createPanel.assetName'))
-            _0x30f35e.setAttribute('aria-label', assetManagerText('createPanel.assetName'));
+            el57.replaceChildren(el62));
+          if (el62.value !== value171) el62.value = value171;
+          if (el62.getAttribute('aria-label') !== assetManagerText('createPanel.assetName'))
+            el62.setAttribute('aria-label', assetManagerText('createPanel.assetName'));
           window.requestAnimationFrame(() => {
-            if (!_0x30f35e.isConnected) return;
+            if (!el62.isConnected) return;
             try {
-              (_0x30f35e.focus(), _0x30f35e.select?.());
-            } catch (_0x5a7682) {}
+              (el62.focus(), el62.select?.());
+            } catch (value172) {}
           });
         } else {
-          if (_0x558e15.classList.contains('is-editing')) _0x558e15.classList.remove('is-editing');
-          const _0x1fda48 = _0x558e15.querySelector(':scope > input.v2-asset-item-name-input');
-          if (_0x1fda48) _0x558e15.replaceChildren();
-          if (_0x558e15.textContent !== _0x4c935d) _0x558e15.textContent = _0x4c935d;
-          if (_0x558e15.getAttribute('title') !== _0x4c935d) _0x558e15.setAttribute('title', _0x4c935d);
+          if (el57.classList.contains('is-editing')) el57.classList.remove('is-editing');
+          const value173 = el57.querySelector(':scope > input.v2-asset-item-name-input');
+          if (value173) el57.replaceChildren();
+          if (el57.textContent !== value171) el57.textContent = value171;
+          if (el57.getAttribute('title') !== value171) el57.setAttribute('title', value171);
         }
-        const _0x14f876 = Array.isArray(_0x2ce531?.items)
-          ? _0x2ce531.items
-          : Array.isArray(_0x2ce531?.nodes)
-            ? _0x2ce531.nodes.map((_0x831417) => _buildAssetItem(_0x831417))
+        const list21 = Array.isArray(error8?.items)
+          ? error8.items
+          : Array.isArray(error8?.nodes)
+            ? error8.nodes.map((item29) => _buildAssetItem(item29))
             : [];
-        if (_0x14f876.length > 0) {
-          const _0x57769c = _0x53b169(_0x373710),
-            _0x261887 = _0x57769c.querySelectorAll(':scope > .v2-asset-cover-cell');
-          for (let _0x3ae982 = 0; _0x3ae982 < 4; _0x3ae982++) {
-            const _0x35e985 = _0x14f876[_0x3ae982];
-            if (!_0x35e985) {
-              const _0x5ef89d = _0x261887[_0x3ae982];
-              _0x5ef89d &&
-                ((_0x5ef89d.dataset.thumbKind = 'empty'),
-                (_0x5ef89d.dataset.thumbType = ''),
-                (_0x5ef89d.dataset.thumbSrc = ''),
-                (_0x5ef89d.dataset.pendingSrc = ''),
-                _0x5ef89d.replaceChildren());
+        if (list21.length > 0) {
+          const el63 = handler7(enabled47),
+            value174 = el63.querySelectorAll(':scope > .v2-asset-cover-cell');
+          for (let count15 = 0; count15 < 4; count15++) {
+            const enabled49 = list21[count15];
+            if (!enabled49) {
+              const el64 = value174[count15];
+              el64 &&
+                ((el64.dataset.thumbKind = 'empty'),
+                (el64.dataset.thumbType = ''),
+                (el64.dataset.thumbSrc = ''),
+                (el64.dataset.pendingSrc = ''),
+                el64.replaceChildren());
               continue;
             }
-            _0x438d98(_0x261887[_0x3ae982], _0x35e985.thumbSrc, _0x35e985.type);
+            handler6(value174[count15], enabled49.thumbSrc, enabled49.type);
           }
           return;
         }
-        _0x2ce531?.coverUrl
-          ? _0x438d98(_0x373710, _0x2ce531.coverUrl, _0x2ce531.coverType)
-          : _0x438d98(_0x373710, '', _0x2ce531?.coverType || 'other');
+        error8?.coverUrl
+          ? handler6(enabled47, error8.coverUrl, error8.coverType)
+          : handler6(enabled47, '', error8?.coverType || 'other');
       },
-      _0x57590b = this._getSortedAssets().filter(
-        (_0x5b3a4d) => this._categoryKey(_0x5b3a4d?.category) === this._categoryKey(this.activeTab),
+      list22 = this._getSortedAssets().filter(
+        (item30) => this._categoryKey(item30?.category) === this._categoryKey(this.activeTab),
       );
     if (this._openAssetId) {
-      const _0x3bdfdc = _0x57590b.find((_0x3a209) => _0x3a209.id === this._openAssetId);
-      if (!_0x3bdfdc) {
+      const category7 = list22.find((item31) => item31.id === this._openAssetId);
+      if (!category7) {
         ((this._openAssetId = null), this.renderSidebarContent());
         return;
       }
-      if (_0x44e62c) _0x44e62c.textContent = _0x3bdfdc.name || assetManagerText('title');
-      if (_0x26d245) _0x26d245.classList.add('show');
+      if (el49) el49.textContent = category7.name || assetManagerText('title');
+      if (el50) el50.classList.add('show');
       (this.sidebarPanel.classList.add('is-detail-view'),
-        (_0x58c425.style.display = 'none'),
-        (_0x5a5ec9.style.display = ''));
-      const _0x23e35b = Array.isArray(_0x3bdfdc?.items)
-        ? _0x3bdfdc.items
-        : Array.isArray(_0x3bdfdc?.nodes)
-          ? _0x3bdfdc.nodes.map((_0x486d01) => _buildAssetItem(_0x486d01))
+        (listView5.style.display = 'none'),
+        (detailView2.style.display = ''));
+      const list23 = Array.isArray(category7?.items)
+        ? category7.items
+        : Array.isArray(category7?.nodes)
+          ? category7.nodes.map((item32) => _buildAssetItem(item32))
           : [];
-      _0x5a5ec9.replaceChildren();
-      const _0xcd7008 = document.createElement('div');
-      _0xcd7008.className = 'v2-asset-detail';
-      const _0x25140a = document.createElement('div');
-      ((_0x25140a.className = 'v2-asset-detail-cover'), _0xcd7008.appendChild(_0x25140a));
-      if (_0x23e35b.length > 0) {
-        const _0x111a76 = _0x53b169(_0x25140a),
-          _0x42881d = _0x111a76.querySelectorAll(':scope > .v2-asset-cover-cell');
-        for (let _0x1d3dec = 0; _0x1d3dec < 4; _0x1d3dec++) {
-          const _0x330428 = _0x23e35b[_0x1d3dec];
-          if (_0x330428) _0x438d98(_0x42881d[_0x1d3dec], _0x330428.thumbSrc, _0x330428.type);
-          else _0x42881d[_0x1d3dec] && _0x42881d[_0x1d3dec].replaceChildren();
+      detailView2.replaceChildren();
+      const el65 = document.createElement('div');
+      el65.className = 'v2-asset-detail';
+      const value175 = document.createElement('div');
+      ((value175.className = 'v2-asset-detail-cover'), el65.appendChild(value175));
+      if (list23.length > 0) {
+        const el66 = handler7(value175),
+          value176 = el66.querySelectorAll(':scope > .v2-asset-cover-cell');
+        for (let count16 = 0; count16 < 4; count16++) {
+          const value177 = list23[count16];
+          if (value177) handler6(value176[count16], value177.thumbSrc, value177.type);
+          else value176[count16] && value176[count16].replaceChildren();
         }
-      } else _0x438d98(_0x25140a, _0x3bdfdc?.coverUrl, _0x3bdfdc?.coverType || 'other');
-      const _0x51b12d = document.createElement('div');
-      ((_0x51b12d.className = 'v2-asset-detail-title'),
-        (_0x51b12d.textContent = _0x3bdfdc.name || assetManagerText('unnamedAsset')),
-        _0xcd7008.appendChild(_0x51b12d));
-      const _0x4e76bf = document.createElement('div');
-      _0x4e76bf.className = 'v2-asset-detail-meta';
-      const _0x267f85 = Array.isArray(_0x3bdfdc?.nodes) ? _0x3bdfdc.nodes.length : _0x23e35b.length;
-      ((_0x4e76bf.textContent = assetManagerText('detail.meta', {
-        category: _0x3bdfdc.category
-          ? _formatAssetCategoryLabel(_0x3bdfdc.category)
+      } else handler6(value175, category7?.coverUrl, category7?.coverType || 'other');
+      const el67 = document.createElement('div');
+      ((el67.className = 'v2-asset-detail-title'),
+        (el67.textContent = category7.name || assetManagerText('unnamedAsset')),
+        el65.appendChild(el67));
+      const el68 = document.createElement('div');
+      el68.className = 'v2-asset-detail-meta';
+      const count17 = Array.isArray(category7?.nodes) ? category7.nodes.length : list23.length;
+      ((el68.textContent = assetManagerText('detail.meta', {
+        category: category7.category
+          ? _formatAssetCategoryLabel(category7.category)
           : assetManagerText('uncategorized'),
-        count: _0x267f85,
-        time: _formatAssetDateTime(_0x3bdfdc.updatedAt || _0x3bdfdc.createdAt),
+        count: count17,
+        time: _formatAssetDateTime(category7.updatedAt || category7.createdAt),
       })),
-        _0xcd7008.appendChild(_0x4e76bf));
-      const _0x5bc227 = document.createElement('section');
-      _0x5bc227.className = 'v2-asset-detail-section';
-      const _0x25d6b9 = document.createElement('div');
-      ((_0x25d6b9.className = 'v2-asset-detail-section-title'),
-        (_0x25d6b9.textContent = assetManagerText('detail.content')),
-        _0x5bc227.appendChild(_0x25d6b9));
-      const _0x1c109f = document.createElement('div');
-      _0x1c109f.className = 'v2-asset-subgrid';
-      if (_0x23e35b.length === 0) {
-        const _0x3e1b3d = document.createElement('div');
-        ((_0x3e1b3d.className = 'v2-asset-empty'),
-          (_0x3e1b3d.textContent = assetManagerText('detail.empty')),
-          _0x1c109f.appendChild(_0x3e1b3d));
+        el65.appendChild(el68));
+      const el69 = document.createElement('section');
+      el69.className = 'v2-asset-detail-section';
+      const el70 = document.createElement('div');
+      ((el70.className = 'v2-asset-detail-section-title'),
+        (el70.textContent = assetManagerText('detail.content')),
+        el69.appendChild(el70));
+      const el71 = document.createElement('div');
+      el71.className = 'v2-asset-subgrid';
+      if (list23.length === 0) {
+        const el72 = document.createElement('div');
+        ((el72.className = 'v2-asset-empty'),
+          (el72.textContent = assetManagerText('detail.empty')),
+          el71.appendChild(el72));
       } else
-        for (let _0x2a19f3 = 0; _0x2a19f3 < _0x23e35b.length; _0x2a19f3++) {
-          const _0x1fcd78 = _0x23e35b[_0x2a19f3],
-            _0x3cc406 = document.createElement('button');
-          ((_0x3cc406.type = 'button'),
-            (_0x3cc406.className = 'v2-asset-subitem'),
-            (_0x3cc406.dataset.assetId = _0x3bdfdc.id),
-            (_0x3cc406.dataset.idx = String(_0x2a19f3)));
-          const _0x635957 = document.createElement('div');
-          ((_0x635957.className = 'v2-asset-subitem-thumb'),
-            _0x438d98(_0x635957, _0x1fcd78?.thumbSrc, _0x1fcd78?.type));
-          const _0x32baa6 = document.createElement('div');
-          _0x32baa6.className = 'v2-asset-subitem-info';
-          const _0x28da0a = document.createElement('span');
-          ((_0x28da0a.className = 'v2-asset-subitem-type'),
-            (_0x28da0a.textContent = _formatAssetTypeLabel(_0x1fcd78?.type)));
-          const _0x32d3bb = document.createElement('div');
-          _0x32d3bb.className = 'v2-asset-subitem-name';
-          const _0x58c091 = String(
-            _0x1fcd78?.name ||
-              _0x1fcd78?.type ||
-              assetManagerText('detail.childAssetName', { index: _0x2a19f3 + 1 }),
+        for (let index2 = 0; index2 < list23.length; index2++) {
+          const error9 = list23[index2],
+            el73 = document.createElement('button');
+          ((el73.type = 'button'),
+            (el73.className = 'v2-asset-subitem'),
+            (el73.dataset.assetId = category7.id),
+            (el73.dataset.idx = String(index2)));
+          const value178 = document.createElement('div');
+          ((value178.className = 'v2-asset-subitem-thumb'),
+            handler6(value178, error9?.thumbSrc, error9?.type));
+          const value179 = document.createElement('div');
+          value179.className = 'v2-asset-subitem-info';
+          const el74 = document.createElement('span');
+          ((el74.className = 'v2-asset-subitem-type'),
+            (el74.textContent = _formatAssetTypeLabel(error9?.type)));
+          const el75 = document.createElement('div');
+          el75.className = 'v2-asset-subitem-name';
+          const value180 = String(
+            error9?.name || error9?.type || assetManagerText('detail.childAssetName', { index: index2 + 1 }),
           );
-          ((_0x32d3bb.textContent = _0x58c091), (_0x32d3bb.title = _0x58c091));
-          const _0x3782b8 = document.createElement('div');
-          ((_0x3782b8.className = 'v2-asset-subitem-summary'),
-            (_0x3782b8.textContent = assetManagerText('detail.clickToAdd')),
-            _0x32baa6.append(_0x28da0a, _0x32d3bb, _0x3782b8),
-            _0x3cc406.append(_0x635957, _0x32baa6),
-            _0x1c109f.appendChild(_0x3cc406));
+          ((el75.textContent = value180), (el75.title = value180));
+          const el76 = document.createElement('div');
+          ((el76.className = 'v2-asset-subitem-summary'),
+            (el76.textContent = assetManagerText('detail.clickToAdd')),
+            value179.append(el74, el75, el76),
+            el73.append(value178, value179),
+            el71.appendChild(el73));
         }
-      (_0x5bc227.appendChild(_0x1c109f), _0xcd7008.appendChild(_0x5bc227));
-      const _0x263fe9 = document.createElement('div');
-      _0x263fe9.className = 'v2-asset-detail-actions';
-      const _0x194b60 = document.createElement('button');
-      ((_0x194b60.type = 'button'),
-        (_0x194b60.className = 'v2-asset-detail-btn'),
-        (_0x194b60.dataset.uiAction = 'asset-add-all'),
-        (_0x194b60.dataset.assetId = _0x3bdfdc.id),
-        (_0x194b60.textContent = assetManagerText('loadToCanvas')),
-        _0x263fe9.appendChild(_0x194b60),
-        _0xcd7008.appendChild(_0x263fe9),
-        _0x5a5ec9.appendChild(_0xcd7008));
+      (el69.appendChild(el71), el65.appendChild(el69));
+      const el77 = document.createElement('div');
+      el77.className = 'v2-asset-detail-actions';
+      const el78 = document.createElement('button');
+      ((el78.type = 'button'),
+        (el78.className = 'v2-asset-detail-btn'),
+        (el78.dataset.uiAction = 'asset-add-all'),
+        (el78.dataset.assetId = category7.id),
+        (el78.textContent = assetManagerText('loadToCanvas')),
+        el77.appendChild(el78),
+        el65.appendChild(el77),
+        detailView2.appendChild(el65));
       return;
     }
-    if (_0x44e62c) _0x44e62c.textContent = assetManagerText('title');
-    if (_0x26d245) _0x26d245.classList.remove('show');
+    if (el49) el49.textContent = assetManagerText('title');
+    if (el50) el50.classList.remove('show');
     (this.sidebarPanel.classList.remove('is-detail-view'),
-      (_0x58c425.style.display = ''),
-      (_0x5a5ec9.style.display = 'none'),
-      _0x5a5ec9.replaceChildren());
-    let _0xd1c7cd = _0x58c425.querySelector(':scope > .v2-asset-empty');
-    !_0xd1c7cd &&
-      ((_0xd1c7cd = document.createElement('div')),
-      (_0xd1c7cd.className = 'v2-asset-empty'),
-      _0x58c425.appendChild(_0xd1c7cd));
-    const _0x6dce59 = this._getSortedAssets();
-    let _0x22558a = 0,
-      _0x2f2a3e = 0;
-    for (const _0x1a51b4 of _0x6dce59) {
-      const _0x43b454 = String(_0x1a51b4?.id || '');
-      if (!_0x43b454) continue;
-      let _0x4b492b = this._assetCardPool?.get?.(_0x43b454);
-      if (!_0x4b492b) {
-        ((_0x4b492b = document.createElement('div')),
-          (_0x4b492b.className = 'v2-asset-item'),
-          (_0x4b492b.dataset.id = _0x43b454));
+      (listView5.style.display = ''),
+      (detailView2.style.display = 'none'),
+      detailView2.replaceChildren());
+    let el79 = listView5.querySelector(':scope > .v2-asset-empty');
+    !el79 &&
+      ((el79 = document.createElement('div')),
+      (el79.className = 'v2-asset-empty'),
+      listView5.appendChild(el79));
+    const value181 = this._getSortedAssets();
+    let count18 = 0,
+      value182 = 0;
+    for (const value183 of value181) {
+      const enabled50 = String(value183?.id || '');
+      if (!enabled50) continue;
+      let el80 = this._assetCardPool?.get?.(enabled50);
+      if (!el80) {
+        ((el80 = document.createElement('div')),
+          (el80.className = 'v2-asset-item'),
+          (el80.dataset.id = enabled50));
         if (!this._assetCardPool) this._assetCardPool = new Map();
-        this._assetCardPool.set(_0x43b454, _0x4b492b);
+        this._assetCardPool.set(enabled50, el80);
       }
-      if (_0x4b492b.parentElement !== _0x58c425) _0x58c425.appendChild(_0x4b492b);
-      const _0x5b6d9c = this._categoryKey(_0x1a51b4?.category) === this._categoryKey(this.activeTab);
-      ((_0x4b492b.style.display = _0x5b6d9c ? '' : 'none'),
-        _0x5b6d9c &&
-          ((_0x4b492b.style.order = String(_0x2f2a3e++)),
-          _0x117776(_0x4b492b, _0x1a51b4),
+      if (el80.parentElement !== listView5) listView5.appendChild(el80);
+      const value184 = this._categoryKey(value183?.category) === this._categoryKey(this.activeTab);
+      ((el80.style.display = value184 ? '' : 'none'),
+        value184 &&
+          ((el80.style.order = String(value182++)),
+          handler8(el80, value183),
           this._newAssetPulseId &&
-            this._newAssetPulseId === _0x43b454 &&
+            this._newAssetPulseId === enabled50 &&
             ((this._newAssetPulseId = ''),
             window.requestAnimationFrame(() => {
-              if (!_0x4b492b.isConnected) return;
-              _0x4b492b.classList.add('is-new');
-              const _0x5872cd = window.setTimeout(() => {
-                if (_0x4b492b.isConnected) _0x4b492b.classList.remove('is-new');
+              if (!el80.isConnected) return;
+              el80.classList.add('is-new');
+              const value185 = window.setTimeout(() => {
+                if (el80.isConnected) el80.classList.remove('is-new');
               }, 0x28a);
-              _0x4b492b.dataset._pulseTimer = String(_0x5872cd);
+              el80.dataset._pulseTimer = String(value185);
             })),
-          (_0x22558a += 1)));
+          (count18 += 1)));
     }
-    ((_0xd1c7cd.style.display = _0x22558a === 0 ? '' : 'none'),
-      _0x22558a === 0 &&
-        ((_0xd1c7cd.textContent = assetManagerText('emptyCategory', {
+    ((el79.style.display = count18 === 0 ? '' : 'none'),
+      count18 === 0 &&
+        ((el79.textContent = assetManagerText('emptyCategory', {
           category: _formatAssetCategoryLabel(this.activeTab),
         })),
-        (_0xd1c7cd.style.order = '0')));
+        (el79.style.order = '0')));
   }
-  ['_restoreAssetSubItem'](_0x40fb7c, _0x26d6ef) {
-    const _0x984169 = (this.assets || []).find((_0x33215d) => _0x33215d.id === _0x40fb7c);
-    if (!_0x984169 || !Array.isArray(_0x984169.nodes)) return;
-    const _0x4385cf = _0x984169.nodes[_0x26d6ef];
-    if (!_0x4385cf) return;
-    const _0x3c8683 = this._getCanvasCenterWorld(),
-      _0x4e2325 = Number(_0x4385cf.width ?? _0x4385cf.w) || 240,
-      _0x9a6659 = Number(_0x4385cf.height ?? _0x4385cf.h) || 240,
-      _0x5a4431 = _0x3c8683.x - _0x4e2325 / 2,
-      _0x2daac8 = _0x3c8683.y - _0x9a6659 / 2,
-      _0x4f1325 = findAvailablePosition(
+  ['_restoreAssetSubItem'](value186, value187) {
+    const enabled51 = (this.assets || []).find((item33) => item33.id === value186);
+    if (!enabled51 || !Array.isArray(enabled51.nodes)) return;
+    const box9 = enabled51.nodes[value187];
+    if (!box9) return;
+    const box10 = this._getCanvasCenterWorld(),
+      value188 = Number(box9.width ?? box9.w) || 240,
+      value189 = Number(box9.height ?? box9.h) || 240,
+      value190 = box10.x - value188 / 2,
+      value191 = box10.y - value189 / 2,
+      box11 = findAvailablePosition(
         appStore.getState().nodes,
-        _0x5a4431,
-        _0x2daac8,
-        _0x4e2325,
-        _0x9a6659,
+        value190,
+        value191,
+        value188,
+        value189,
         24,
         'right',
       );
     (appStore.batch(() => {
-      const _0x499696 = JSON.parse(JSON.stringify(_0x4385cf));
-      ((_0x499696.id = generateId(_0x499696.type)),
-        (_0x499696.x = _0x4f1325.x),
-        (_0x499696.y = _0x4f1325.y),
-        appStore.addNode(_0x499696),
-        appStore.setSelectedNodes([_0x499696.id]));
+      const box12 = JSON.parse(JSON.stringify(box9));
+      ((box12.id = generateId(box12.type)),
+        (box12.x = box11.x),
+        (box12.y = box11.y),
+        appStore.addNode(box12),
+        appStore.setSelectedNodes([box12.id]));
     }),
       window.showToast?.(assetManagerText('toasts.subAssetAdded'), 'success'));
   }
-  ['restoreAssetToCanvas'](_0x22ccdb) {
-    const _0x1dc858 = (this.assets || []).find((_0x561d49) => _0x561d49.id === _0x22ccdb);
-    if (!_0x1dc858 || !_0x1dc858.nodes) return;
-    const _0x284920 = shouldTopAlignRestoredAsset(_0x1dc858.nodes, _0x1dc858.edges)
-        ? createTopAlignedAssetNodes(_0x1dc858.nodes, 24)
-        : _0x1dc858.nodes,
-      _0x11f110 = this._getCanvasCenterWorld(),
-      _0x5c2764 = this._calcNodesBBox(_0x284920),
-      _0x7d8e81 = _0x11f110.x - _0x5c2764.cx,
-      _0xdb03ff = _0x11f110.y - _0x5c2764.cy,
-      _0x5f09a1 = _0x5c2764.minX + _0x7d8e81,
-      _0x2a0429 = _0x5c2764.minY + _0xdb03ff,
-      _0x5dcc8f = findAvailablePosition(
+  ['restoreAssetToCanvas'](value192) {
+    const enabled52 = (this.assets || []).find((item34) => item34.id === value192);
+    if (!enabled52 || !enabled52.nodes) return;
+    const list24 = shouldTopAlignRestoredAsset(enabled52.nodes, enabled52.edges)
+        ? createTopAlignedAssetNodes(enabled52.nodes, 24)
+        : enabled52.nodes,
+      box13 = this._getCanvasCenterWorld(),
+      value193 = this._calcNodesBBox(list24),
+      value194 = box13.x - value193.cx,
+      value195 = box13.y - value193.cy,
+      value196 = value193.minX + value194,
+      value197 = value193.minY + value195,
+      box14 = findAvailablePosition(
         appStore.getState().nodes,
-        _0x5f09a1,
-        _0x2a0429,
-        Math.max(1, _0x5c2764.w),
-        Math.max(1, _0x5c2764.h),
+        value196,
+        value197,
+        Math.max(1, value193.w),
+        Math.max(1, value193.h),
         24,
         'right',
       ),
-      _0xfcd317 = _0x7d8e81 + (_0x5dcc8f.x - _0x5f09a1),
-      _0x56c946 = _0xdb03ff + (_0x5dcc8f.y - _0x2a0429);
+      value198 = value194 + (box14.x - value196),
+      value199 = value195 + (box14.y - value197);
     (appStore.batch(() => {
-      const _0x238c09 = {};
-      (_0x284920.forEach((_0x9228dc) => {
-        const _0x5e1612 = JSON.parse(JSON.stringify(_0x9228dc)),
-          _0x40a906 = _0x5e1612.id,
-          _0x26a465 = generateId(_0x5e1612.type);
-        ((_0x238c09[_0x40a906] = _0x26a465),
-          (_0x5e1612.id = _0x26a465),
-          (_0x5e1612.x = (Number(_0x5e1612.x) || 0) + _0xfcd317),
-          (_0x5e1612.y = (Number(_0x5e1612.y) || 0) + _0x56c946),
-          appStore.addNode(_0x5e1612));
+      const value200 = {};
+      (list24.forEach((item35) => {
+        const box15 = JSON.parse(JSON.stringify(item35)),
+          value201 = box15.id,
+          generateId3 = generateId(box15.type);
+        ((value200[value201] = generateId3),
+          (box15.id = generateId3),
+          (box15.x = (Number(box15.x) || 0) + value198),
+          (box15.y = (Number(box15.y) || 0) + value199),
+          appStore.addNode(box15));
       }),
-        _0x1dc858.edges &&
-          _0x1dc858.edges.forEach((_0x1bd6d8) => {
-            const _0x439ff7 = JSON.parse(JSON.stringify(_0x1bd6d8));
-            _0x439ff7.id = generateId('edge');
-            if (_0x238c09[_0x439ff7.sourceId]) _0x439ff7.sourceId = _0x238c09[_0x439ff7.sourceId];
-            if (_0x238c09[_0x439ff7.targetId]) _0x439ff7.targetId = _0x238c09[_0x439ff7.targetId];
-            appStore.addEdge(_0x439ff7);
+        enabled52.edges &&
+          enabled52.edges.forEach((item36) => {
+            const value202 = JSON.parse(JSON.stringify(item36));
+            value202.id = generateId('edge');
+            if (value200[value202.sourceId]) value202.sourceId = value200[value202.sourceId];
+            if (value200[value202.targetId]) value202.targetId = value200[value202.targetId];
+            appStore.addEdge(value202);
           }),
-        appStore.setSelectedNodes(Object.values(_0x238c09)));
+        appStore.setSelectedNodes(Object.values(value200)));
     }),
       window.showToast?.(assetManagerText('toasts.assetAdded'), 'success'));
   }

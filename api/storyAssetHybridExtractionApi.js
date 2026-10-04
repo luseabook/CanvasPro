@@ -51,147 +51,149 @@ const STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION = 0x1,
   STORY_ASSET_QUALITY_RECOVERY_PAID_RERUN = 'paid-rerun-required',
   STORY_ASSET_PARALLEL_DRAFT_STRATEGY = 'kind-detailed-parallel-v1',
   STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY = 'evidence-batched-api-v2';
-function cloneValue(_0x2e4d3d) {
-  if (!_0x2e4d3d || typeof _0x2e4d3d !== 'object') return _0x2e4d3d;
-  return JSON['parse'](JSON['stringify'](_0x2e4d3d));
+function cloneValue(enabled) {
+  if (!enabled || typeof enabled !== 'object') return enabled;
+  return JSON['parse'](JSON['stringify'](enabled));
 }
-function hasSameStoryAssetAuthoritativeContent(_0x2bc3ba, _0xb3267f) {
-  if (!Array['isArray'](_0x2bc3ba) || !Array['isArray'](_0xb3267f)) return ![];
-  if (_0x2bc3ba['length'] !== _0xb3267f['length']) return ![];
-  const _0x33cba4 = ['ref', 'episodeRef', 'source', 'heading', 'body'];
-  return _0x2bc3ba['every']((_0x17a7b8, _0x205af2) => {
-    const _0x233ea8 = _0xb3267f[_0x205af2];
-    return _0x33cba4['every'](
-      (_0x5b5af8) => String(_0x17a7b8?.[_0x5b5af8] ?? '') === String(_0x233ea8?.[_0x5b5af8] ?? ''),
-    );
+function hasSameStoryAssetAuthoritativeContent(list, list2) {
+  if (!Array['isArray'](list) || !Array['isArray'](list2)) return ![];
+  if (list['length'] !== list2['length']) return ![];
+  const list3 = ['ref', 'episodeRef', 'source', 'heading', 'body'];
+  return list['every']((value, item) => {
+    const key = list2[item];
+    return list3['every']((index) => String(value?.[index] ?? '') === String(key?.[index] ?? ''));
   });
 }
 function createStoryAssetFocusedContractSnapshot(
-  _0x5d110e,
+  kind,
   {
-    requiredAssetNamesByKind: _0x4c8ae8,
-    requiredAssetsByKind: _0x3889d5,
-    candidateAssetsByKind: _0x467f2e,
-    responseModeByKind: _0xbaa802,
+    requiredAssetNamesByKind: requiredAssetNamesByKind,
+    requiredAssetsByKind: requiredAssetsByKind,
+    candidateAssetsByKind: candidateAssetsByKind,
+    responseModeByKind: responseModeByKind,
   },
 ) {
-  const _0x1ac5c8 = _0xbaa802?.[_0x5d110e] === 'compact' ? 'compact' : 'verbose',
-    _0x32b639 = createStoryAssetPromptContracts([_0x5d110e], _0x4c8ae8, _0x467f2e, _0x3889d5, {
-      includeClientKeys: _0x1ac5c8 === 'compact',
-    })['payload'];
+  const includeClientKeys = responseModeByKind?.[kind] === 'compact' ? 'compact' : 'verbose',
+    storyAssetPromptContracts = createStoryAssetPromptContracts(
+      [kind],
+      requiredAssetNamesByKind,
+      candidateAssetsByKind,
+      requiredAssetsByKind,
+      {
+        includeClientKeys: includeClientKeys === 'compact',
+      },
+    )['payload'];
   return {
-    kind: _0x5d110e,
-    responseMode: _0x1ac5c8,
-    responseSchemaVersion: _0x1ac5c8 === 'compact' ? STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION : 0x1,
-    requiredAssets: cloneValue(_0x32b639['requiredAssets'] || []),
-    candidateAssets: cloneValue(_0x32b639['candidateAssets'] || []),
+    kind: kind,
+    responseMode: includeClientKeys,
+    responseSchemaVersion:
+      includeClientKeys === 'compact' ? STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION : 0x1,
+    requiredAssets: cloneValue(storyAssetPromptContracts['requiredAssets'] || []),
+    candidateAssets: cloneValue(storyAssetPromptContracts['candidateAssets'] || []),
   };
 }
-function compareStoryAssetSceneHeadingContractRows(_0x26728c, _0x38e611) {
-  if (!Array['isArray'](_0x26728c) || !Array['isArray'](_0x38e611)) return { compatible: ![], changed: ![] };
-  if (_0x26728c['length'] !== _0x38e611['length']) return { compatible: ![], changed: ![] };
-  let _0x571bbb = ![];
-  for (let _0x34bd84 = 0x0; _0x34bd84 < _0x26728c['length']; _0x34bd84 += 0x1) {
-    const _0x27a834 = _0x26728c[_0x34bd84],
-      _0x3456b0 = _0x38e611[_0x34bd84];
-    if (JSON['stringify'](_0x27a834) === JSON['stringify'](_0x3456b0)) continue;
-    const _0xbcf035 = String(_0x27a834?.['name'] || '')['trim'](),
-      _0x124804 = String(_0x3456b0?.['name'] || '')['trim']();
+function compareStoryAssetSceneHeadingContractRows(list4, list5) {
+  if (!Array['isArray'](list4) || !Array['isArray'](list5)) return { compatible: ![], changed: ![] };
+  if (list4['length'] !== list5['length']) return { compatible: ![], changed: ![] };
+  let changed = ![];
+  for (let result = 0x0; result < list4['length']; result += 0x1) {
+    const error = list4[result],
+      error2 = list5[result];
+    if (JSON['stringify'](error) === JSON['stringify'](error2)) continue;
+    const enabled2 = String(error?.['name'] || '')['trim'](),
+      enabled3 = String(error2?.['name'] || '')['trim']();
     if (
-      !_0xbcf035 ||
-      !_0x124804 ||
-      _0xbcf035 === _0x124804 ||
-      normalizeStorySceneHeadingIdentity(_0xbcf035) !== _0x124804
+      !enabled2 ||
+      !enabled3 ||
+      enabled2 === enabled3 ||
+      normalizeStorySceneHeadingIdentity(enabled2) !== enabled3
     )
       return { compatible: ![], changed: ![] };
-    const _0x19759d = cloneValue(_0x27a834),
-      _0x3ffe01 = cloneValue(_0x3456b0);
-    (delete _0x19759d['name'],
-      delete _0x19759d['clientKey'],
-      delete _0x3ffe01['name'],
-      delete _0x3ffe01['clientKey']);
-    if (JSON['stringify'](_0x19759d) !== JSON['stringify'](_0x3ffe01))
-      return { compatible: ![], changed: ![] };
-    _0x571bbb = !![];
+    const error3 = cloneValue(error),
+      error4 = cloneValue(error2);
+    (delete error3['name'], delete error3['clientKey'], delete error4['name'], delete error4['clientKey']);
+    if (JSON['stringify'](error3) !== JSON['stringify'](error4)) return { compatible: ![], changed: ![] };
+    changed = !![];
   }
-  return { compatible: !![], changed: _0x571bbb };
+  return { compatible: !![], changed: changed };
 }
-function areStoryAssetSceneHeadingContractSnapshotsCompatible(_0x5775cf, _0x3205fa) {
-  const _0x1c79fc = cloneValue(_0x5775cf),
-    _0x4d72a3 = cloneValue(_0x3205fa);
-  (delete _0x1c79fc['requiredAssets'],
-    delete _0x1c79fc['candidateAssets'],
-    delete _0x4d72a3['requiredAssets'],
-    delete _0x4d72a3['candidateAssets']);
-  if (JSON['stringify'](_0x1c79fc) !== JSON['stringify'](_0x4d72a3)) return ![];
-  const _0x81889d = compareStoryAssetSceneHeadingContractRows(
-    _0x5775cf?.['requiredAssets'],
-    _0x3205fa?.['requiredAssets'],
+function areStoryAssetSceneHeadingContractSnapshotsCompatible(data, options) {
+  const cloneValue2 = cloneValue(data),
+    cloneValue3 = cloneValue(options);
+  (delete cloneValue2['requiredAssets'],
+    delete cloneValue2['candidateAssets'],
+    delete cloneValue3['requiredAssets'],
+    delete cloneValue3['candidateAssets']);
+  if (JSON['stringify'](cloneValue2) !== JSON['stringify'](cloneValue3)) return ![];
+  const compareStoryAssetSceneHeadingContractRows2 = compareStoryAssetSceneHeadingContractRows(
+    data?.['requiredAssets'],
+    options?.['requiredAssets'],
   );
-  if (!_0x81889d['compatible']) return ![];
-  const _0x3bdd8c = compareStoryAssetSceneHeadingContractRows(
-    _0x5775cf?.['candidateAssets'],
-    _0x3205fa?.['candidateAssets'],
+  if (!compareStoryAssetSceneHeadingContractRows2['compatible']) return ![];
+  const compareStoryAssetSceneHeadingContractRows3 = compareStoryAssetSceneHeadingContractRows(
+    data?.['candidateAssets'],
+    options?.['candidateAssets'],
   );
-  return _0x3bdd8c['compatible'] && (_0x81889d['changed'] || _0x3bdd8c['changed']);
+  return (
+    compareStoryAssetSceneHeadingContractRows3['compatible'] &&
+    (compareStoryAssetSceneHeadingContractRows2['changed'] ||
+      compareStoryAssetSceneHeadingContractRows3['changed'])
+  );
 }
-function getSavedStoryAssetRequiredNamesByKind(_0x1ba4b0) {
-  const _0x4c6e1e = _0x1ba4b0?.['rawResponseContractSnapshotsByKind'] || {};
+function getSavedStoryAssetRequiredNamesByKind(target) {
+  const source = target?.['rawResponseContractSnapshotsByKind'] || {};
   return Object['fromEntries'](
-    ['character', 'scene', 'prop']['map']((_0x1075f7) => [
-      _0x1075f7,
-      (Array['isArray'](_0x4c6e1e?.[_0x1075f7]?.['requiredAssets'])
-        ? _0x4c6e1e[_0x1075f7]['requiredAssets']
-        : [])
-        ['map']((_0x3e6863) => String(_0x3e6863?.['name'] || '')['trim']())
+    ['character', 'scene', 'prop']['map']((next) => [
+      next,
+      (Array['isArray'](source?.[next]?.['requiredAssets']) ? source[next]['requiredAssets'] : [])
+        ['map']((error5) => String(error5?.['name'] || '')['trim']())
         ['filter'](Boolean),
     ]),
   );
 }
 function isStoryAssetSceneHeadingContractMigration({
-  resumeDraft: _0x12bb92,
-  requiredAssetNamesByKind: _0x3e44f7,
-  requiredAssetsByKind: _0x224735,
-  candidateAssetsByKind: _0x43651d,
-  responseModeByKind: _0x357cfe,
+  resumeDraft: resumeDraft2,
+  requiredAssetNamesByKind: requiredAssetNamesByKind2,
+  requiredAssetsByKind: requiredAssetsByKind2,
+  candidateAssetsByKind: candidateAssetsByKind2,
+  responseModeByKind: responseModeByKind2,
 } = {}) {
   if (
-    Number(_0x12bb92?.['hybridQualityPolicyVersion']) !== 0x6 ||
-    _0x12bb92?.['strategy'] !== STORY_ASSET_PARALLEL_DRAFT_STRATEGY ||
-    _0x12bb92?.['status'] !== 'completed' ||
-    _0x12bb92?.['qualityReview']
+    Number(resumeDraft2?.['hybridQualityPolicyVersion']) !== 0x6 ||
+    resumeDraft2?.['strategy'] !== STORY_ASSET_PARALLEL_DRAFT_STRATEGY ||
+    resumeDraft2?.['status'] !== 'completed' ||
+    resumeDraft2?.['qualityReview']
   )
     return ![];
-  const _0x658418 = _0x12bb92?.['rawResponseContractSnapshotsByKind'];
-  if (!_0x658418 || typeof _0x658418 !== 'object') return ![];
-  const _0x239abd = Object['fromEntries'](
-    ['character', 'scene', 'prop']['map']((_0xeee750) => [
-      _0xeee750,
-      createStoryAssetFocusedContractSnapshot(_0xeee750, {
-        requiredAssetNamesByKind: _0x3e44f7,
-        requiredAssetsByKind: _0x224735,
-        candidateAssetsByKind: _0x43651d,
-        responseModeByKind: _0x357cfe,
+  const enabled4 = resumeDraft2?.['rawResponseContractSnapshotsByKind'];
+  if (!enabled4 || typeof enabled4 !== 'object') return ![];
+  const current = Object['fromEntries'](
+    ['character', 'scene', 'prop']['map']((entry) => [
+      entry,
+      createStoryAssetFocusedContractSnapshot(entry, {
+        requiredAssetNamesByKind: requiredAssetNamesByKind2,
+        requiredAssetsByKind: requiredAssetsByKind2,
+        candidateAssetsByKind: candidateAssetsByKind2,
+        responseModeByKind: responseModeByKind2,
       }),
     ]),
   );
   if (
-    JSON['stringify'](_0x658418['character']) !== JSON['stringify'](_0x239abd['character']) ||
-    JSON['stringify'](_0x658418['prop']) !== JSON['stringify'](_0x239abd['prop'])
+    JSON['stringify'](enabled4['character']) !== JSON['stringify'](current['character']) ||
+    JSON['stringify'](enabled4['prop']) !== JSON['stringify'](current['prop'])
   )
     return ![];
-  if (JSON['stringify'](_0x658418['scene']) === JSON['stringify'](_0x239abd['scene'])) return ![];
-  return areStoryAssetSceneHeadingContractSnapshotsCompatible(_0x658418['scene'], _0x239abd['scene']);
+  if (JSON['stringify'](enabled4['scene']) === JSON['stringify'](current['scene'])) return ![];
+  return areStoryAssetSceneHeadingContractSnapshotsCompatible(enabled4['scene'], current['scene']);
 }
-function getStoryAssetPaidDraftKinds(_0x8193fe) {
-  return ['character', 'scene', 'prop']['filter']((_0x45c986) => {
-    const _0x34ebd1 = _0x8193fe?.['kindStates']?.[_0x45c986];
+function getStoryAssetPaidDraftKinds(record) {
+  return ['character', 'scene', 'prop']['filter']((payload) => {
+    const response = record?.['kindStates']?.[payload];
     return Boolean(
-      _0x8193fe?.['paidResponseReceivedByKind']?.[_0x45c986] ||
-      Object['hasOwn'](_0x8193fe?.['rawResponsesByKind'] || {}, _0x45c986) ||
-      (Array['isArray'](_0x8193fe?.['assetsByKind']?.[_0x45c986]) &&
-        _0x8193fe['assetsByKind'][_0x45c986]['length']) ||
-      Math['max'](0x0, Math['trunc'](Number(_0x34ebd1?.['requestCount']) || 0x0)) > 0x0 ||
+      record?.['paidResponseReceivedByKind']?.[payload] ||
+      Object['hasOwn'](record?.['rawResponsesByKind'] || {}, payload) ||
+      (Array['isArray'](record?.['assetsByKind']?.[payload]) && record['assetsByKind'][payload]['length']) ||
+      Math['max'](0x0, Math['trunc'](Number(response?.['requestCount']) || 0x0)) > 0x0 ||
       [
         'running',
         'succeeded',
@@ -199,28 +201,28 @@ function getStoryAssetPaidDraftKinds(_0x8193fe) {
         'blocked-quality-rerun',
         'blocked-ambiguous-submission',
         'blocked-incompatible',
-      ]['includes'](String(_0x34ebd1?.['status'] || '')),
+      ]['includes'](String(response?.['status'] || '')),
     );
   });
 }
-function isStoryAssetPaidLaneRerunAuthorized(_0x3751f1, _0x23eea1) {
+function isStoryAssetPaidLaneRerunAuthorized(handle, state) {
   return Boolean(
-    _0x3751f1?.['confirmed'] === !![] &&
-    Array['isArray'](_0x3751f1?.['authorizedKinds']) &&
-    _0x3751f1['authorizedKinds']['includes'](_0x23eea1),
+    handle?.['confirmed'] === !![] &&
+    Array['isArray'](handle?.['authorizedKinds']) &&
+    handle['authorizedKinds']['includes'](state),
   );
 }
-function getStoryAssetProtectedPaidBatchKeys(_0x5bd97c) {
-  const _0x50e8cf =
-    _0x5bd97c?.['batchSubmissionRecords'] && typeof _0x5bd97c['batchSubmissionRecords'] === 'object'
-      ? _0x5bd97c['batchSubmissionRecords']
+function getStoryAssetProtectedPaidBatchKeys(config) {
+  const scope =
+    config?.['batchSubmissionRecords'] && typeof config['batchSubmissionRecords'] === 'object'
+      ? config['batchSubmissionRecords']
       : {};
-  return Object['entries'](_0x50e8cf)['flatMap'](([_0x48bc16, _0x79d782]) => {
-    const _0x71d8e2 = String(_0x79d782?.['status'] || '')['trim'](),
-      _0x1e1073 =
-        _0x71d8e2 !== 'rejected-confirmed' &&
-        (Math['max'](0x0, Math['trunc'](Number(_0x79d782?.['requestCount']) || 0x0)) > 0x0 ||
-          Object['hasOwn'](_0x79d782 || {}, 'rawResponse') ||
+  return Object['entries'](scope)['flatMap'](([input, response2]) => {
+    const output = String(response2?.['status'] || '')['trim'](),
+      value2 =
+        output !== 'rejected-confirmed' &&
+        (Math['max'](0x0, Math['trunc'](Number(response2?.['requestCount']) || 0x0)) > 0x0 ||
+          Object['hasOwn'](response2 || {}, 'rawResponse') ||
           [
             'submitted',
             'ambiguous',
@@ -230,36 +232,41 @@ function getStoryAssetProtectedPaidBatchKeys(_0x5bd97c) {
             'blocked-quality-rerun',
             'blocked-incompatible',
             'validated',
-          ]['includes'](_0x71d8e2));
-    return _0x1e1073 ? [_0x48bc16] : [];
+          ]['includes'](output));
+    return value2 ? [input] : [];
   });
 }
-function isStoryAssetPaidBatchRerunAuthorized(_0x59a132, _0x2ece90) {
+function isStoryAssetPaidBatchRerunAuthorized(value3, value4) {
   return Boolean(
-    _0x59a132?.['confirmed'] === !![] &&
-    Array['isArray'](_0x59a132?.['authorizedBatchIds']) &&
-    _0x59a132['authorizedBatchIds']['includes'](_0x2ece90),
+    value3?.['confirmed'] === !![] &&
+    Array['isArray'](value3?.['authorizedBatchIds']) &&
+    value3['authorizedBatchIds']['includes'](value4),
   );
 }
-function createStoryAssetSourceChangePaidHistoryEntry(_0x71ce9, _0x5d1aa9, _0x14d750, _0x15abb2) {
+function createStoryAssetSourceChangePaidHistoryEntry(
+  responseMode,
+  list6,
+  previousSourceFingerprint,
+  nextSourceFingerprint,
+) {
   return {
     archivedAt: Date['now'](),
     reason: 'authorized-authoritative-source-change-rerun',
-    previousSourceFingerprint: _0x14d750,
-    nextSourceFingerprint: _0x15abb2,
+    previousSourceFingerprint: previousSourceFingerprint,
+    nextSourceFingerprint: nextSourceFingerprint,
     lanes: Object['fromEntries'](
-      _0x5d1aa9['map']((_0x21da69) => [
-        _0x21da69,
+      list6['map']((value5) => [
+        value5,
         {
-          rawResponse: Object['hasOwn'](_0x71ce9?.['rawResponsesByKind'] || {}, _0x21da69)
-            ? _0x71ce9['rawResponsesByKind'][_0x21da69]
+          rawResponse: Object['hasOwn'](responseMode?.['rawResponsesByKind'] || {}, value5)
+            ? responseMode['rawResponsesByKind'][value5]
             : '',
-          responseMode: _0x71ce9?.['rawResponseModesByKind']?.[_0x21da69] || '',
-          contractSnapshot: cloneValue(_0x71ce9?.['rawResponseContractSnapshotsByKind']?.[_0x21da69]),
-          decisions: cloneValue(_0x71ce9?.['decisionsByKind']?.[_0x21da69]),
-          assets: cloneValue(_0x71ce9?.['assetsByKind']?.[_0x21da69] || []),
-          submissionState: cloneValue(_0x71ce9?.['submissionStatesByKind']?.[_0x21da69]),
-          kindState: cloneValue(_0x71ce9?.['kindStates']?.[_0x21da69]),
+          responseMode: responseMode?.['rawResponseModesByKind']?.[value5] || '',
+          contractSnapshot: cloneValue(responseMode?.['rawResponseContractSnapshotsByKind']?.[value5]),
+          decisions: cloneValue(responseMode?.['decisionsByKind']?.[value5]),
+          assets: cloneValue(responseMode?.['assetsByKind']?.[value5] || []),
+          submissionState: cloneValue(responseMode?.['submissionStatesByKind']?.[value5]),
+          kindState: cloneValue(responseMode?.['kindStates']?.[value5]),
         },
       ]),
     ),
@@ -268,341 +275,319 @@ function createStoryAssetSourceChangePaidHistoryEntry(_0x71ce9, _0x5d1aa9, _0x14
 function createEmptyStoryAssetCandidatesByKind() {
   return { character: [], scene: [], prop: [] };
 }
-function mergeStoryAssetContractCandidates(_0x4861ca = [], _0x3661cf = []) {
-  const _0x754123 = new Map();
+function mergeStoryAssetContractCandidates(args = [], args2 = []) {
+  const map = new Map();
   return (
-    [..._0x4861ca, ..._0x3661cf]['forEach']((_0x4c541f) => {
-      const _0x140e06 = String(_0x4c541f?.['name'] || '')['trim'](),
-        _0x272420 = normalizeStoryAssetQualityName(_0x140e06);
-      if (!_0x272420) return;
-      const _0x5502bf = _0x754123['get'](_0x272420);
-      if (!_0x5502bf) {
-        _0x754123['set'](_0x272420, cloneValue(_0x4c541f));
+    [...args, ...args2]['forEach']((error6) => {
+      const value6 = String(error6?.['name'] || '')['trim'](),
+        storyAssetQualityName = normalizeStoryAssetQualityName(value6);
+      if (!storyAssetQualityName) return;
+      const args3 = map['get'](storyAssetQualityName);
+      if (!args3) {
+        map['set'](storyAssetQualityName, cloneValue(error6));
         return;
       }
-      _0x754123['set'](_0x272420, {
-        ..._0x5502bf,
+      map['set'](storyAssetQualityName, {
+        ...args3,
         sourceSceneRefs: [
           ...new Set(
             [
-              ...(Array['isArray'](_0x5502bf?.['sourceSceneRefs']) ? _0x5502bf['sourceSceneRefs'] : []),
-              ...(Array['isArray'](_0x4c541f?.['sourceSceneRefs']) ? _0x4c541f['sourceSceneRefs'] : []),
+              ...(Array['isArray'](args3?.['sourceSceneRefs']) ? args3['sourceSceneRefs'] : []),
+              ...(Array['isArray'](error6?.['sourceSceneRefs']) ? error6['sourceSceneRefs'] : []),
             ]
-              ['map']((_0x383e61) => String(_0x383e61 || '')['trim']())
+              ['map']((value7) => String(value7 || '')['trim']())
               ['filter'](Boolean),
           ),
         ],
         sourceChapterIds: [
           ...new Set(
             [
-              ...(Array['isArray'](_0x5502bf?.['sourceChapterIds']) ? _0x5502bf['sourceChapterIds'] : []),
-              ...(Array['isArray'](_0x4c541f?.['sourceChapterIds']) ? _0x4c541f['sourceChapterIds'] : []),
+              ...(Array['isArray'](args3?.['sourceChapterIds']) ? args3['sourceChapterIds'] : []),
+              ...(Array['isArray'](error6?.['sourceChapterIds']) ? error6['sourceChapterIds'] : []),
             ]
-              ['map']((_0x29be64) => String(_0x29be64 || '')['trim']())
+              ['map']((value8) => String(value8 || '')['trim']())
               ['filter'](Boolean),
           ),
         ],
-        evidence: String(_0x5502bf?.['evidence'] || _0x4c541f?.['evidence'] || '')['trim'](),
+        evidence: String(args3?.['evidence'] || error6?.['evidence'] || '')['trim'](),
       });
     }),
-    [..._0x754123['values']()]
+    [...map['values']()]
   );
 }
-function mergeStoryAssetActionPropCandidates(
-  _0x16addb = createEmptyStoryAssetCandidatesByKind(),
-  _0x4b60ee = [],
-) {
+function mergeStoryAssetActionPropCandidates(args4 = createEmptyStoryAssetCandidatesByKind(), value9 = []) {
   return {
-    ..._0x16addb,
-    prop: mergeStoryAssetContractCandidates(
-      _0x16addb?.['prop'],
-      createStoryAssetActionPropCandidates(_0x4b60ee),
-    ),
+    ...args4,
+    prop: mergeStoryAssetContractCandidates(args4?.['prop'], createStoryAssetActionPropCandidates(value9)),
   };
 }
 function createStoryAssetCandidateInventory({
-  status: _0x16cdd8,
+  status: status,
   evidenceScenes: evidenceScenes = [],
   localRuntime: localRuntime = null,
-  sourceFingerprint: _0x54042a,
+  sourceFingerprint: sourceFingerprint,
 } = {}) {
   return {
     schemaVersion: STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION,
-    status: _0x16cdd8,
+    status: status,
     evidenceScenes: cloneValue(Array['isArray'](evidenceScenes) ? evidenceScenes : []),
     localRuntime: localRuntime ? cloneValue(localRuntime) : null,
-    sourceFingerprint: String(_0x54042a || ''),
+    sourceFingerprint: String(sourceFingerprint || ''),
   };
 }
-function getReusableStoryAssetCandidateInventory(_0x3903bd, _0x571436, _0x54d4dc = []) {
-  const _0x1c37a8 = _0x3903bd?.['hybridCandidateInventory'],
-    _0x3e2729 = new Set([
-      String(_0x571436 || ''),
-      ...(Array['isArray'](_0x54d4dc) ? _0x54d4dc['map']((_0x229439) => String(_0x229439 || '')) : []),
+function getReusableStoryAssetCandidateInventory(value10, value11, list7 = []) {
+  const response3 = value10?.['hybridCandidateInventory'],
+    map2 = new Set([
+      String(value11 || ''),
+      ...(Array['isArray'](list7) ? list7['map']((value12) => String(value12 || '')) : []),
     ]);
   if (
-    Number(_0x1c37a8?.['schemaVersion']) !== STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION ||
-    !['ready', 'unavailable', 'disabled']['includes'](_0x1c37a8?.['status']) ||
-    !Array['isArray'](_0x1c37a8?.['evidenceScenes']) ||
-    !_0x3e2729['has'](String(_0x1c37a8?.['sourceFingerprint'] || ''))
+    Number(response3?.['schemaVersion']) !== STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION ||
+    !['ready', 'unavailable', 'disabled']['includes'](response3?.['status']) ||
+    !Array['isArray'](response3?.['evidenceScenes']) ||
+    !map2['has'](String(response3?.['sourceFingerprint'] || ''))
   )
     return null;
-  return { ...cloneValue(_0x1c37a8), sourceFingerprint: String(_0x571436 || '') };
+  return { ...cloneValue(response3), sourceFingerprint: String(value11 || '') };
 }
-function reportDiagnostics(_0x374ae3, _0x4253be, _0x1b2f87 = {}) {
+function reportDiagnostics(value13, value14, level = {}) {
   try {
-    const _0x1b0f30 =
-      typeof _0x374ae3?.['info'] === 'function'
-        ? _0x374ae3['info'](_0x4253be, _0x1b2f87)
-        : _0x374ae3?.['logEvent']?.({
+    const promise =
+      typeof value13?.['info'] === 'function'
+        ? value13['info'](value14, level)
+        : value13?.['logEvent']?.({
             type:
               'story_asset.' +
-              String(_0x4253be || 'hybrid')
+              String(value14 || 'hybrid')
                 ['replace'](/^story-asset-?/iu, '')
                 ['replace'](/[^a-z0-9]+/giu, '_'),
-            level: _0x1b2f87?.['status'] === 'fallback' ? 'warn' : 'info',
+            level: level?.['status'] === 'fallback' ? 'warn' : 'info',
             source: 'renderer',
-            message: String(_0x4253be || 'Story asset hybrid extraction event'),
-            context: _0x1b2f87,
+            message: String(value14 || 'Story asset hybrid extraction event'),
+            context: level,
           });
-    _0x1b0f30 &&
-      typeof _0x1b0f30['then'] === 'function' &&
-      void Promise['resolve'](_0x1b0f30)['catch'](() => undefined);
+    promise &&
+      typeof promise['then'] === 'function' &&
+      void Promise['resolve'](promise)['catch'](() => undefined);
   } catch {}
 }
-function getStoryProjectChapterCharacters(_0xc8c8ff = {}) {
-  return (Array['isArray'](_0xc8c8ff?.['chapters']) ? _0xc8c8ff['chapters'] : [])['reduce'](
-    (_0x772f23, _0x3e4c23) => _0x772f23 + String(_0x3e4c23?.['content'] || '')['length'],
+function getStoryProjectChapterCharacters(options2 = {}) {
+  return (Array['isArray'](options2?.['chapters']) ? options2['chapters'] : [])['reduce'](
+    (value15, value16) => value15 + String(value16?.['content'] || '')['length'],
     0x0,
   );
 }
-function shouldUseDirectStoryAssetApi(_0xc9451 = {}, _0x541f49 = []) {
-  const _0x344745 = _0x541f49['filter']((_0x40255c) => _0x40255c?.['source'] === 'upload-fallback');
-  if (_0x344745['length']) {
-    const _0x40e56e = _0x344745['flatMap']((_0x523d48) =>
-      Array['isArray'](_0x523d48?.['characters']) ? _0x523d48['characters'] : [],
+function shouldUseDirectStoryAssetApi(options3 = {}, list8 = []) {
+  const list9 = list8['filter']((value17) => value17?.['source'] === 'upload-fallback');
+  if (list9['length']) {
+    const list10 = list9['flatMap']((value18) =>
+      Array['isArray'](value18?.['characters']) ? value18['characters'] : [],
     );
-    if (!_0x40e56e['some']((_0x50591c) => !isNarrativeStoryCharacterFragment(_0x50591c))) return ![];
+    if (!list10['some']((value19) => !isNarrativeStoryCharacterFragment(value19))) return ![];
   }
-  const _0x56aeab = _0x541f49['reduce'](
-    (_0x5cded6, _0x2e3620) => _0x5cded6 + String(_0x2e3620?.['body'] || '')['length'],
-    0x0,
-  );
-  return _0x56aeab > 0x0 && _0x56aeab <= STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS;
+  const count = list8['reduce']((value20, dom) => value20 + String(dom?.['body'] || '')['length'], 0x0);
+  return count > 0x0 && count <= STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS;
 }
-function hasCompleteStructuredStorySceneEvidence(_0x3126cf = [], _0xe802de = {}) {
-  const _0x33afe4 = Array['isArray'](_0x3126cf) ? _0x3126cf : [];
-  if (!_0x33afe4['length']) return ![];
-  const _0x3a3a8b = new Set(getHardRequiredStorySceneRefs(_0xe802de));
-  return _0x33afe4['every'](
-    (_0x3b3172) =>
-      _0x3b3172?.['source'] !== 'upload-fallback' &&
-      _0x3a3a8b['has'](String(_0x3b3172?.['ref'] || '')['trim']()),
+function hasCompleteStructuredStorySceneEvidence(list11 = [], value21 = {}) {
+  const list12 = Array['isArray'](list11) ? list11 : [];
+  if (!list12['length']) return ![];
+  const map3 = new Set(getHardRequiredStorySceneRefs(value21));
+  return list12['every'](
+    (value22) =>
+      value22?.['source'] !== 'upload-fallback' && map3['has'](String(value22?.['ref'] || '')['trim']()),
   );
 }
-function createMissingLocalStoryAssetEvidenceError(_0x438847 = null) {
+function createMissingLocalStoryAssetEvidenceError(cause = null) {
   return Object['assign'](
     new Error(
       '本地实体检索没有得到可验证证据，已在调用远程 API 前安全停止；请检查或重新下载 PP-UIE 组件后再试。',
     ),
-    { type: 'LOCAL_ASSET_EVIDENCE_REQUIRED', cause: _0x438847 || undefined },
+    { type: 'LOCAL_ASSET_EVIDENCE_REQUIRED', cause: cause || undefined },
   );
 }
-function compactStoryAssetQualityText(_0x97d18d = '') {
-  return String(_0x97d18d || '')['replace'](/\s+/gu, '');
+function compactStoryAssetQualityText(value23 = '') {
+  return String(value23 || '')['replace'](/\s+/gu, '');
 }
-function normalizeStoryAssetQualityName(_0x1373c4 = '') {
-  return String(_0x1373c4 || '')
+function normalizeStoryAssetQualityName(value24 = '') {
+  return String(value24 || '')
     ['normalize']('NFKC')
     ['replace'](/[（(][^（）()]{0,30}[）)]/gu, '')
     ['replace'](/[^\p{L}\p{N}]+/gu, '')
     ['toLowerCase']();
 }
-function createStoryCharacterQualityAliases(_0x74b1be = '') {
-  const _0x47bcf5 = normalizeStoryAssetQualityName(_0x74b1be);
-  if (!_0x47bcf5) return [];
-  const _0x17b7c3 = _0x47bcf5['replace'](
+function createStoryCharacterQualityAliases(value25 = '') {
+  const storyAssetQualityName2 = normalizeStoryAssetQualityName(value25);
+  if (!storyAssetQualityName2) return [];
+  const value26 = storyAssetQualityName2['replace'](
     /^(?:房东|编辑|医生|护士|警察|老师|老板|经理|店员|保安|司机|队长|主任|主管)/u,
     '',
   );
-  return [...new Set([_0x47bcf5, _0x17b7c3]['filter'](Boolean))];
+  return [...new Set([storyAssetQualityName2, value26]['filter'](Boolean))];
 }
-function storyCharacterQualityNamesMatch(_0x4d8201 = '', _0x258421 = '') {
-  const _0x24169e = createStoryCharacterQualityAliases(_0x4d8201),
-    _0x1ec9a8 = createStoryCharacterQualityAliases(_0x258421);
-  return _0x24169e['some']((_0x300b53) => _0x1ec9a8['includes'](_0x300b53));
+function storyCharacterQualityNamesMatch(value27 = '', value28 = '') {
+  const list13 = createStoryCharacterQualityAliases(value27),
+    list14 = createStoryCharacterQualityAliases(value28);
+  return list13['some']((value29) => list14['includes'](value29));
 }
-function collectLegacyRequiredStoryCharacterNames(_0x5bd1a9 = []) {
-  const _0x4624ea = [];
+function collectLegacyRequiredStoryCharacterNames(list15 = []) {
+  const list16 = [];
   return (
-    (Array['isArray'](_0x5bd1a9) ? _0x5bd1a9 : [])['forEach']((_0xd6b74d) => {
-      (Array['isArray'](_0xd6b74d?.['characters']) ? _0xd6b74d['characters'] : [])['forEach']((_0x158ced) => {
-        !_0x4624ea['some']((_0x15f487) => storyCharacterQualityNamesMatch(_0x15f487, _0x158ced)) &&
-          _0x4624ea['push'](String(_0x158ced || '')['trim']());
+    (Array['isArray'](list15) ? list15 : [])['forEach']((value30) => {
+      (Array['isArray'](value30?.['characters']) ? value30['characters'] : [])['forEach']((value31) => {
+        !list16['some']((value32) => storyCharacterQualityNamesMatch(value32, value31)) &&
+          list16['push'](String(value31 || '')['trim']());
       });
     }),
-    _0x4624ea['filter'](Boolean)
+    list16['filter'](Boolean)
   );
 }
-function collectStorySceneNamesFromHeadings(_0x1d3e39 = []) {
-  const _0x141b82 = [];
+function collectStorySceneNamesFromHeadings(list17 = []) {
+  const list18 = [];
   return (
-    (Array['isArray'](_0x1d3e39) ? _0x1d3e39 : [])['forEach']((_0xf62cbb) => {
-      splitDeterministicStorySceneAssetNames(_0xf62cbb)
+    (Array['isArray'](list17) ? list17 : [])['forEach']((value33) => {
+      splitDeterministicStorySceneAssetNames(value33)
         ['filter'](
-          (_0x378a03) =>
-            _0x378a03 && !/^(?:(?:两个|多个|若干)?房间|室内|室外|同地|原地)$/u['test'](_0x378a03),
+          (value34) => value34 && !/^(?:(?:两个|多个|若干)?房间|室内|室外|同地|原地)$/u['test'](value34),
         )
-        ['forEach']((_0x4a84e4) => {
-          const _0x1cb382 = getStorySceneIdentityKey(_0x4a84e4);
-          _0x1cb382 &&
-            !_0x141b82['some']((_0x48a250) => getStorySceneIdentityKey(_0x48a250) === _0x1cb382) &&
-            _0x141b82['push'](_0x4a84e4);
+        ['forEach']((value35) => {
+          const storySceneIdentityKey = getStorySceneIdentityKey(value35);
+          storySceneIdentityKey &&
+            !list18['some']((value36) => getStorySceneIdentityKey(value36) === storySceneIdentityKey) &&
+            list18['push'](value35);
         });
     }),
-    _0x141b82
+    list18
   );
 }
-function collectRequiredStorySceneNames(_0x5a7468 = {}) {
-  return collectStorySceneNamesFromHeadings(getHardRequiredStoryAssetNames(_0x5a7468, 'scene'));
+function collectRequiredStorySceneNames(options4 = {}) {
+  return collectStorySceneNamesFromHeadings(getHardRequiredStoryAssetNames(options4, 'scene'));
 }
-function collectLegacyRequiredStorySceneNames(_0x6062d = []) {
+function collectLegacyRequiredStorySceneNames(list19 = []) {
   return collectStorySceneNamesFromHeadings(
-    (Array['isArray'](_0x6062d) ? _0x6062d : [])['map'](
-      (_0x3231a6) => _0x3231a6?.['assetHeading'] || _0x3231a6?.['heading'],
+    (Array['isArray'](list19) ? list19 : [])['map'](
+      (value37) => value37?.['assetHeading'] || value37?.['heading'],
     ),
   );
 }
-function storySceneQualityNamesMatch(_0x54d334 = '', _0x112dfe = '') {
-  const _0xe69907 = getStorySceneIdentityKey(_0x54d334),
-    _0x4e5b0e = getStorySceneIdentityKey(_0x112dfe);
+function storySceneQualityNamesMatch(value38 = '', value39 = '') {
+  const list20 = getStorySceneIdentityKey(value38),
+    list21 = getStorySceneIdentityKey(value39);
   return Boolean(
-    _0xe69907 &&
-    _0x4e5b0e &&
-    (_0xe69907 === _0x4e5b0e || _0xe69907['includes'](_0x4e5b0e) || _0x4e5b0e['includes'](_0xe69907)),
+    list20 && list21 && (list20 === list21 || list20['includes'](list21) || list21['includes'](list20)),
   );
 }
-function getStorySceneQualitySourceRefs(_0x47626f = '', _0x41d280 = []) {
+function getStorySceneQualitySourceRefs(value40 = '', value41 = []) {
   return new Set(
-    (Array['isArray'](_0x41d280) ? _0x41d280 : [])
-      ['filter']((_0x453b0e) =>
-        splitDeterministicStorySceneAssetNames(_0x453b0e?.['assetHeading'] || _0x453b0e?.['heading'])['some'](
-          (_0x576084) => storySceneQualityNamesMatch(_0x576084, _0x47626f),
+    (Array['isArray'](value41) ? value41 : [])
+      ['filter']((value42) =>
+        splitDeterministicStorySceneAssetNames(value42?.['assetHeading'] || value42?.['heading'])['some'](
+          (value43) => storySceneQualityNamesMatch(value43, value40),
         ),
       )
-      ['map']((_0x3b41e3) => String(_0x3b41e3?.['ref'] || '')['trim']())
+      ['map']((value44) => String(value44?.['ref'] || '')['trim']())
       ['filter'](Boolean),
   );
 }
-function storyPropQualityRequirementMatches(_0x1521f9 = {}, _0x51d3dd = '') {
-  const _0x298941 = normalizeStoryAssetQualityName(_0x51d3dd);
-  if (!_0x298941) return ![];
-  if (normalizeStoryAssetQualityName(_0x1521f9?.['name']) === _0x298941) return !![];
-  if ([..._0x298941]['length'] < 0x3) return ![];
-  const _0x1979e3 = normalizeStoryAssetQualityName(
+function storyPropQualityRequirementMatches(error7 = {}, value45 = '') {
+  const args5 = normalizeStoryAssetQualityName(value45);
+  if (!args5) return ![];
+  if (normalizeStoryAssetQualityName(error7?.['name']) === args5) return !![];
+  if ([...args5]['length'] < 0x3) return ![];
+  const list22 = normalizeStoryAssetQualityName(
     [
-      _0x1521f9?.['scriptFacts'],
-      _0x1521f9?.['description'],
-      ...(Array['isArray'](_0x1521f9?.['appearances'])
-        ? _0x1521f9['appearances']['flatMap']((_0x1c309c) => [
-            _0x1c309c?.['scriptFacts'],
-            _0x1c309c?.['description'],
-          ])
+      error7?.['scriptFacts'],
+      error7?.['description'],
+      ...(Array['isArray'](error7?.['appearances'])
+        ? error7['appearances']['flatMap']((value46) => [value46?.['scriptFacts'], value46?.['description']])
         : []),
     ]
       ['filter'](Boolean)
       ['join']('\x20'),
   );
-  return _0x1979e3['includes'](_0x298941);
+  return list22['includes'](args5);
 }
-function mergeStoryAssetCoverageText(_0x3d98af = []) {
+function mergeStoryAssetCoverageText(list23 = []) {
   return [
     ...new Set(
-      _0x3d98af['flatMap']((_0x33c956) => String(_0x33c956 || '')['split'](/[、,，；;]+/u))
-        ['map']((_0x1847d4) => _0x1847d4['trim']())
+      list23['flatMap']((value47) => String(value47 || '')['split'](/[、,，；;]+/u))
+        ['map']((value48) => value48['trim']())
         ['filter'](Boolean),
     ),
   ]['join']('、');
 }
-function getStoryAssetVisualCompletenessScore(_0x649081 = {}) {
-  const _0x1e963e = Array['isArray'](_0x649081?.['appearances']) ? _0x649081['appearances'] : [];
-  return _0x1e963e['reduce'](
-    (_0x52a70c, _0x50db3e) =>
-      _0x52a70c +
-      String(_0x50db3e?.['prompt'] || '')['trim']()['length'] +
-      String(_0x50db3e?.['description'] || '')['trim']()['length'],
-    String(_0x649081?.['description'] || '')['trim']()['length'],
+function getStoryAssetVisualCompletenessScore(options5 = {}) {
+  const list24 = Array['isArray'](options5?.['appearances']) ? options5['appearances'] : [];
+  return list24['reduce'](
+    (value49, value50) =>
+      value49 +
+      String(value50?.['prompt'] || '')['trim']()['length'] +
+      String(value50?.['description'] || '')['trim']()['length'],
+    String(options5?.['description'] || '')['trim']()['length'],
   );
 }
-export function consolidateDirectStorySceneAssets(_0x2a74df = {}, _0x557288 = []) {
-  const _0x70696d = Array['isArray'](_0x2a74df?.['assets']) ? _0x2a74df['assets'] : [],
-    _0x5b4c99 = new Map(),
-    _0x5046db = [];
-  _0x70696d['forEach']((_0x1d4ac8) => {
-    if (_0x1d4ac8?.['kind'] !== 'scene') {
-      _0x5046db['push']({ type: 'asset', asset: _0x1d4ac8 });
+export function consolidateDirectStorySceneAssets(args6 = {}, list25 = []) {
+  const list26 = Array['isArray'](args6?.['assets']) ? args6['assets'] : [],
+    map4 = new Map(),
+    list27 = [];
+  list26['forEach']((asset) => {
+    if (asset?.['kind'] !== 'scene') {
+      list27['push']({ type: 'asset', asset: asset });
       return;
     }
-    const _0x45172c = _0x557288['filter']((_0x49aa2c) =>
-        storySceneQualityNamesMatch(_0x1d4ac8?.['name'], _0x49aa2c),
+    const list28 = list25['filter']((value51) => storySceneQualityNamesMatch(asset?.['name'], value51)),
+      value52 = list28['find'](
+        (value53) => getStorySceneIdentityKey(value53) === getStorySceneIdentityKey(asset?.['name']),
       ),
-      _0x30bbb1 = _0x45172c['find'](
-        (_0x52589e) => getStorySceneIdentityKey(_0x52589e) === getStorySceneIdentityKey(_0x1d4ac8?.['name']),
-      ),
-      _0x4c5c0d =
-        _0x30bbb1 ||
-        (_0x45172c['length'] === 0x1 ? _0x45172c[0x0] : String(_0x1d4ac8?.['name'] || '')['trim']()),
-      _0x1c685a = getStorySceneIdentityKey(_0x4c5c0d);
-    (!_0x5b4c99['has'](_0x1c685a) &&
-      (_0x5b4c99['set'](_0x1c685a, []), _0x5046db['push']({ type: 'scene', key: _0x1c685a })),
-      _0x5b4c99['get'](_0x1c685a)['push']({ asset: _0x1d4ac8, canonicalName: _0x4c5c0d }));
+      canonicalName =
+        value52 || (list28['length'] === 0x1 ? list28[0x0] : String(asset?.['name'] || '')['trim']()),
+      key2 = getStorySceneIdentityKey(canonicalName);
+    (!map4['has'](key2) && (map4['set'](key2, []), list27['push']({ type: 'scene', key: key2 })),
+      map4['get'](key2)['push']({ asset: asset, canonicalName: canonicalName }));
   });
-  const _0x4524b3 = _0x5046db['flatMap']((_0x7992ea) => {
-    if (_0x7992ea['type'] === 'asset') return [_0x7992ea['asset']];
-    const _0x5954e8 = _0x5b4c99['get'](_0x7992ea['key']) || [],
-      _0x52eebf = [..._0x5954e8]['sort'](
-        (_0x4f7efa, _0x17a972) =>
-          getStoryAssetVisualCompletenessScore(_0x17a972['asset']) -
-          getStoryAssetVisualCompletenessScore(_0x4f7efa['asset']),
+  const assets = list27['flatMap']((event) => {
+    if (event['type'] === 'asset') return [event['asset']];
+    const list29 = map4['get'](event['key']) || [],
+      name = [...list29]['sort'](
+        (value54, value55) =>
+          getStoryAssetVisualCompletenessScore(value55['asset']) -
+          getStoryAssetVisualCompletenessScore(value54['asset']),
       )[0x0];
-    if (!_0x52eebf) return [];
-    const _0x52d75a = [
+    if (!name) return [];
+    const sourceChapterIds = [
         ...new Set(
-          _0x5954e8['flatMap'](({ asset: _0x5bee23 }) =>
-            Array['isArray'](_0x5bee23?.['sourceChapterIds']) ? _0x5bee23['sourceChapterIds'] : [],
+          list29['flatMap'](({ asset: asset2 }) =>
+            Array['isArray'](asset2?.['sourceChapterIds']) ? asset2['sourceChapterIds'] : [],
           ),
         ),
       ],
-      _0xa9cb99 = new Map(),
-      _0x53d6b4 = [];
-    _0x5954e8['forEach'](({ asset: _0x41b347 }) => {
-      (Array['isArray'](_0x41b347?.['appearances']) ? _0x41b347['appearances'] : [])['forEach'](
-        (_0x3c8568) => {
-          const _0x2b9d35 = String(_0x3c8568?.['name'] || '')
-              ['trim']()
-              ['toLowerCase'](),
-            _0x23d2f4 = _0x2b9d35 || 'appearance-' + (_0x53d6b4['length'] + 0x1);
-          (!_0xa9cb99['has'](_0x23d2f4) && (_0xa9cb99['set'](_0x23d2f4, []), _0x53d6b4['push'](_0x23d2f4)),
-            _0xa9cb99['get'](_0x23d2f4)['push'](_0x3c8568));
-        },
-      );
+      map5 = new Map(),
+      list30 = [];
+    list29['forEach'](({ asset: asset3 }) => {
+      (Array['isArray'](asset3?.['appearances']) ? asset3['appearances'] : [])['forEach']((error8) => {
+        const value56 = String(error8?.['name'] || '')
+            ['trim']()
+            ['toLowerCase'](),
+          value57 = value56 || 'appearance-' + (list30['length'] + 0x1);
+        (!map5['has'](value57) && (map5['set'](value57, []), list30['push'](value57)),
+          map5['get'](value57)['push'](error8));
+      });
     });
-    const _0x12fafe = _0x53d6b4['map']((_0x18908f) => {
-      const _0x457ac4 = _0xa9cb99['get'](_0x18908f) || [],
-        _0x2b8dcd = [..._0x457ac4]['sort'](
-          (_0x1fd32b, _0x4cda3a) =>
-            String(_0x4cda3a?.['prompt'] || '')['trim']()['length'] +
-            String(_0x4cda3a?.['description'] || '')['trim']()['length'] -
-            String(_0x1fd32b?.['prompt'] || '')['trim']()['length'] -
-            String(_0x1fd32b?.['description'] || '')['trim']()['length'],
+    const appearances = list30['map']((value58) => {
+      const list31 = map5['get'](value58) || [],
+        args7 = [...list31]['sort'](
+          (value59, value60) =>
+            String(value60?.['prompt'] || '')['trim']()['length'] +
+            String(value60?.['description'] || '')['trim']()['length'] -
+            String(value59?.['prompt'] || '')['trim']()['length'] -
+            String(value59?.['description'] || '')['trim']()['length'],
         )[0x0];
       return {
-        ..._0x2b8dcd,
-        occurrences: mergeStoryAssetCoverageText(_0x457ac4['map']((_0x355f55) => _0x355f55?.['occurrences'])),
+        ...args7,
+        occurrences: mergeStoryAssetCoverageText(list31['map']((value61) => value61?.['occurrences'])),
         sourceChapterIds: [
           ...new Set(
-            _0x457ac4['flatMap']((_0xb2adfc) =>
-              Array['isArray'](_0xb2adfc?.['sourceChapterIds']) ? _0xb2adfc['sourceChapterIds'] : [],
+            list31['flatMap']((value62) =>
+              Array['isArray'](value62?.['sourceChapterIds']) ? value62['sourceChapterIds'] : [],
             ),
           ),
         ],
@@ -610,442 +595,424 @@ export function consolidateDirectStorySceneAssets(_0x2a74df = {}, _0x557288 = []
     });
     return [
       {
-        ..._0x52eebf['asset'],
-        name: _0x52eebf['canonicalName'],
+        ...name['asset'],
+        name: name['canonicalName'],
         occurrences: mergeStoryAssetCoverageText(
-          _0x5954e8['map'](({ asset: _0x508574 }) => _0x508574?.['occurrences']),
+          list29['map'](({ asset: asset4 }) => asset4?.['occurrences']),
         ),
-        sourceChapterIds: _0x52d75a,
-        appearances: _0x12fafe,
+        sourceChapterIds: sourceChapterIds,
+        appearances: appearances,
       },
     ];
   });
-  return { ..._0x2a74df, assets: _0x4524b3 };
+  return { ...args6, assets: assets };
 }
 function collectLegacyQuotedStoryProps(
-  _0x5e2c2c = [],
+  list32 = [],
   { includeEpisodeTitles: includeEpisodeTitles = ![] } = {},
 ) {
-  const _0x776fbf = [];
+  const list33 = [];
   return (
-    (Array['isArray'](_0x5e2c2c) ? _0x5e2c2c : [])['forEach']((_0x514dd0) => {
-      const _0x58faf6 = String(_0x514dd0?.['body'] || '');
-      for (const _0x5927d5 of _0x58faf6['matchAll'](/《([^》\r\n]{1,24})》/gu)) {
-        const _0x3cc679 = _0x58faf6['slice'](
-          Math['max'](0x0, (_0x5927d5['index'] || 0x0) - 0x28),
-          _0x5927d5['index'] || 0x0,
+    (Array['isArray'](list32) ? list32 : [])['forEach']((dom2) => {
+      const list34 = String(dom2?.['body'] || '');
+      for (const value63 of list34['matchAll'](/《([^》\r\n]{1,24})》/gu)) {
+        const value64 = list34['slice'](
+          Math['max'](0x0, (value63['index'] || 0x0) - 0x28),
+          value63['index'] || 0x0,
         );
         if (
           !includeEpisodeTitles &&
           /(?:第\s*(?:\d+|[零〇一二三四五六七八九十百千万两廿卅]+)\s*集|(?:episode|ep)\s*\d+)\s*[：:—\-·丨|】\]）)]*\s*$/iu[
             'test'
-          ](_0x3cc679)
+          ](value64)
         )
           continue;
-        const _0x19800d = String(_0x5927d5[0x1] || '')['trim']();
-        if (_0x19800d && !_0x776fbf['includes'](_0x19800d)) _0x776fbf['push'](_0x19800d);
+        const value65 = String(value63[0x1] || '')['trim']();
+        if (value65 && !list33['includes'](value65)) list33['push'](value65);
       }
     }),
-    _0x776fbf
+    list33
   );
 }
-function createStoryAssetQualityResumeRequirementAliases(_0x3749f0, _0x7fb8c7, _0x104e2d) {
-  if (!_0x3749f0) return [];
-  const _0x234c62 = Number(_0x3749f0['hybridQualityPolicyVersion']) || 0x0;
-  if (_0x234c62 >= STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION) return [];
-  const _0x2f1baa = collectLegacyRequiredStoryCharacterNames(_0x104e2d),
-    _0xda879b = { ..._0x7fb8c7, character: _0x2f1baa },
-    _0x29ca5b = {
-      ..._0xda879b,
-      scene: collectLegacyRequiredStorySceneNames(_0x104e2d),
-      prop: collectLegacyQuotedStoryProps(_0x104e2d),
+function createStoryAssetQualityResumeRequirementAliases(enabled5, args8, value66) {
+  if (!enabled5) return [];
+  const count2 = Number(enabled5['hybridQualityPolicyVersion']) || 0x0;
+  if (count2 >= STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION) return [];
+  const character = collectLegacyRequiredStoryCharacterNames(value66),
+    args9 = { ...args8, character: character },
+    args10 = {
+      ...args9,
+      scene: collectLegacyRequiredStorySceneNames(value66),
+      prop: collectLegacyQuotedStoryProps(value66),
     },
-    _0x1b7355 = {
-      ..._0x29ca5b,
-      prop: collectLegacyQuotedStoryProps(_0x104e2d, { includeEpisodeTitles: !![] }),
+    value67 = {
+      ...args10,
+      prop: collectLegacyQuotedStoryProps(value66, { includeEpisodeTitles: !![] }),
     },
-    _0x137623 = JSON['stringify'](_0x7fb8c7),
-    _0x3a1739 = new Map();
+    value68 = JSON['stringify'](args8),
+    map6 = new Map();
   return (
-    (_0x234c62 >= 0x3 ? [_0xda879b] : _0x234c62 >= 0x2 ? [_0x29ca5b] : [_0x29ca5b, _0x1b7355])['forEach'](
-      (_0x4aecfe) => {
-        const _0x431a23 = JSON['stringify'](_0x4aecfe);
-        if (_0x431a23 !== _0x137623 && !_0x3a1739['has'](_0x431a23)) _0x3a1739['set'](_0x431a23, _0x4aecfe);
-      },
-    ),
-    [..._0x3a1739['values']()]
+    (count2 >= 0x3 ? [args9] : count2 >= 0x2 ? [args10] : [args10, value67])['forEach']((value69) => {
+      const value70 = JSON['stringify'](value69);
+      if (value70 !== value68 && !map6['has'](value70)) map6['set'](value70, value69);
+    }),
+    [...map6['values']()]
   );
 }
-function promptCopiesStorySource(_0x10ffeb = '', _0x261eb0 = []) {
-  const _0x7b951e = compactStoryAssetQualityText(_0x10ffeb);
-  if (_0x7b951e['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return ![];
-  return _0x261eb0['some']((_0x404a98) => {
-    const _0x4fe12e = compactStoryAssetQualityText(_0x404a98?.['body']);
-    if (_0x4fe12e['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return ![];
+function promptCopiesStorySource(value71 = '', list35 = []) {
+  const list36 = compactStoryAssetQualityText(value71);
+  if (list36['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return ![];
+  return list35['some']((dom3) => {
+    const list37 = compactStoryAssetQualityText(dom3?.['body']);
+    if (list37['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return ![];
     for (
-      let _0x2b5a19 = 0x0;
-      _0x2b5a19 <= _0x4fe12e['length'] - STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS;
-      _0x2b5a19 += Math['floor'](STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS / 0x2)
+      let value72 = 0x0;
+      value72 <= list37['length'] - STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS;
+      value72 += Math['floor'](STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS / 0x2)
     ) {
-      const _0x430583 = _0x4fe12e['slice'](_0x2b5a19, _0x2b5a19 + STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS);
-      if (_0x7b951e['includes'](_0x430583)) return !![];
+      const value73 = list37['slice'](value72, value72 + STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS);
+      if (list36['includes'](value73)) return !![];
     }
     return ![];
   });
 }
 function removeNarrativeUploadFallbackCharacterAssets(
-  _0x5e57a2 = {},
-  _0x107d2b = {},
-  _0x4c1d08 = [],
-  _0x17846c = _0x4c1d08,
+  args11 = {},
+  value74 = {},
+  value75 = [],
+  value76 = value75,
   { requireVerifiedFallbackCharacters: requireVerifiedFallbackCharacters = ![] } = {},
 ) {
-  const _0x283759 = [
-      ...(Array['isArray'](_0x107d2b?.['hardRequired']) ? _0x107d2b['hardRequired'] : []),
-      ...(Array['isArray'](_0x107d2b?.['optionalCandidates']) ? _0x107d2b['optionalCandidates'] : []),
+  const list38 = [
+      ...(Array['isArray'](value74?.['hardRequired']) ? value74['hardRequired'] : []),
+      ...(Array['isArray'](value74?.['optionalCandidates']) ? value74['optionalCandidates'] : []),
     ]['filter'](
-      (_0x3e7268) =>
-        _0x3e7268?.['kind'] === 'character' &&
-        _0x3e7268?.['reasonCodes']?.['includes']('upload-fallback-imported-character'),
+      (value77) =>
+        value77?.['kind'] === 'character' &&
+        value77?.['reasonCodes']?.['includes']('upload-fallback-imported-character'),
     ),
-    _0x2351bc = requireVerifiedFallbackCharacters
-      ? getUntrustedUploadFallbackStoryCharacterNames(_0x107d2b, _0x4c1d08, _0x17846c)
-      : _0x283759['filter']((_0x5648a5) => isNarrativeStoryCharacterFragment(_0x5648a5?.['name']))['map'](
-          (_0x314b7b) => _0x314b7b?.['name'],
+    list39 = requireVerifiedFallbackCharacters
+      ? getUntrustedUploadFallbackStoryCharacterNames(value74, value75, value76)
+      : list38['filter']((error9) => isNarrativeStoryCharacterFragment(error9?.['name']))['map'](
+          (error10) => error10?.['name'],
         ),
-    _0x333242 = new Set(_0x2351bc['map'](normalizeStoryAssetQualityName)['filter'](Boolean));
-  if (!_0x333242['size']) return _0x5e57a2;
+    map7 = new Set(list39['map'](normalizeStoryAssetQualityName)['filter'](Boolean));
+  if (!map7['size']) return args11;
   return {
-    ..._0x5e57a2,
-    assets: (Array['isArray'](_0x5e57a2?.['assets']) ? _0x5e57a2['assets'] : [])['filter'](
-      (_0xf0d9f1) =>
-        _0xf0d9f1?.['kind'] !== 'character' ||
-        !_0x333242['has'](normalizeStoryAssetQualityName(_0xf0d9f1?.['name'])),
+    ...args11,
+    assets: (Array['isArray'](args11?.['assets']) ? args11['assets'] : [])['filter'](
+      (error11) =>
+        error11?.['kind'] !== 'character' || !map7['has'](normalizeStoryAssetQualityName(error11?.['name'])),
     ),
   };
 }
-function createHardAuthoritativeSourceScenes(_0x233a29 = [], _0x3bcaec = {}) {
-  return (Array['isArray'](_0x233a29) ? _0x233a29 : [])['map']((_0x54e403) => ({
-    ..._0x54e403,
-    characters: getHardRequiredStoryAssetNamesForScene(_0x3bcaec, 'character', _0x54e403?.['ref']),
+function createHardAuthoritativeSourceScenes(list40 = [], value78 = {}) {
+  return (Array['isArray'](list40) ? list40 : [])['map']((args12) => ({
+    ...args12,
+    characters: getHardRequiredStoryAssetNamesForScene(value78, 'character', args12?.['ref']),
   }));
 }
-export function assertStoryAssetPublicResultQuality(_0x248e10 = {}, _0x1611ee = [], _0x2656e0 = {}) {
-  const _0x166bb0 = Array['isArray'](_0x248e10?.['assets']) ? _0x248e10['assets'] : [];
-  if (!_0x166bb0['length'])
+export function assertStoryAssetPublicResultQuality(options6 = {}, value79 = [], value80 = {}) {
+  const list41 = Array['isArray'](options6?.['assets']) ? options6['assets'] : [];
+  if (!list41['length'])
     throw Object['assign'](new Error('API 没有返回可用资产；旧资产已保留，未进入下一步。'), {
       type: 'ASSET_VISUAL_RESULT_INCOMPLETE',
       validationDetails: { problems: ['API 没有返回可用资产'], kinds: ['character', 'scene', 'prop'] },
     });
-  const _0x1dcf8f = [],
-    _0x2f44da = new Set(),
-    _0x41a8ea = (_0x656862, _0x3eda5e) => {
-      _0x1dcf8f['push'](_0x3eda5e);
-      if (_0x656862) _0x2f44da['add'](_0x656862);
+  const problems = [],
+    args13 = new Set(),
+    handler = (value81, value82) => {
+      problems['push'](value82);
+      if (value81) args13['add'](value81);
     },
-    _0x25a18f = _0x166bb0['filter']((_0x12f4ed) => _0x12f4ed?.['kind'] === 'character'),
-    _0x3629bd = _0x166bb0['filter']((_0x2a36ff) => _0x2a36ff?.['kind'] === 'scene'),
-    _0x41dd50 = _0x166bb0['filter']((_0x38de28) => _0x38de28?.['kind'] === 'prop'),
-    _0x28d1f2 =
+    list42 = list41['filter']((value83) => value83?.['kind'] === 'character'),
+    list43 = list41['filter']((value84) => value84?.['kind'] === 'scene'),
+    list44 = list41['filter']((value85) => value85?.['kind'] === 'prop'),
+    value86 =
       /客户端|PP-UIE|证据原文|模型细化|统一添加|candidateAssets|本地候选|候选资产|召回候选|召回线索/iu,
-    _0x2745e8 =
+    value87 =
       /^(?:(?:时间|时长|地点|目的地|状态|场景|镜头|画面|动作|音效|音乐|字幕|备注|人物|角色|台词|环境|转场)|(?:然后|随后|接着|紧接着|这时|此时)(?:他|她|它)?.*|.*(?:若干|数人|多人|等人))$/u,
-    _0x3fe4f8 = new Set();
-  _0x25a18f['forEach']((_0x4adf4f) => {
-    const _0x56c1b7 = String(_0x4adf4f?.['name'] || '')['trim'](),
-      _0x449f6e = normalizeStoryAssetQualityName(_0x56c1b7);
-    _0x449f6e &&
-      _0x3fe4f8['has'](_0x449f6e) &&
-      _0x41a8ea('character', '重复角色“' + (_0x56c1b7 || '未命名角色') + '”');
-    if (_0x449f6e) _0x3fe4f8['add'](_0x449f6e);
-    (isNarrativeStoryCharacterFragment(_0x56c1b7) || _0x2745e8['test'](_0x56c1b7)) &&
-      _0x41a8ea('character', '明显非人物角色“' + (_0x56c1b7 || '未命名角色') + '”');
+    map8 = new Set();
+  list42['forEach']((error12) => {
+    const value88 = String(error12?.['name'] || '')['trim'](),
+      storyAssetQualityName3 = normalizeStoryAssetQualityName(value88);
+    storyAssetQualityName3 &&
+      map8['has'](storyAssetQualityName3) &&
+      handler('character', '重复角色“' + (value88 || '未命名角色') + '”');
+    if (storyAssetQualityName3) map8['add'](storyAssetQualityName3);
+    (isNarrativeStoryCharacterFragment(value88) || value87['test'](value88)) &&
+      handler('character', '明显非人物角色“' + (value88 || '未命名角色') + '”');
   });
-  const _0x2ec264 = new Set();
-  _0x41dd50['forEach']((_0x5f2f3e) => {
-    const _0x12deb1 = String(_0x5f2f3e?.['name'] || '')['trim'](),
-      _0x4f193d = normalizeStoryAssetQualityName(_0x12deb1);
-    _0x4f193d &&
-      _0x2ec264['has'](_0x4f193d) &&
-      _0x41a8ea('prop', '重复道具“' + (_0x12deb1 || '未命名道具') + '”');
-    if (_0x4f193d) _0x2ec264['add'](_0x4f193d);
+  const map9 = new Set();
+  list44['forEach']((error13) => {
+    const value89 = String(error13?.['name'] || '')['trim'](),
+      storyAssetQualityName4 = normalizeStoryAssetQualityName(value89);
+    storyAssetQualityName4 &&
+      map9['has'](storyAssetQualityName4) &&
+      handler('prop', '重复道具“' + (value89 || '未命名道具') + '”');
+    if (storyAssetQualityName4) map9['add'](storyAssetQualityName4);
   });
-  const _0x2cc764 = new Set();
-  (_0x3629bd['forEach']((_0x1ed93b) => {
-    const _0x64afda = getStorySceneIdentityKey(_0x1ed93b?.['name']);
-    _0x64afda &&
-      _0x2cc764['has'](_0x64afda) &&
-      _0x41a8ea('scene', '重复场景“' + (_0x1ed93b?.['name'] || '未命名场景') + '”');
-    if (_0x64afda) _0x2cc764['add'](_0x64afda);
+  const map10 = new Set();
+  (list43['forEach']((error14) => {
+    const storySceneIdentityKey2 = getStorySceneIdentityKey(error14?.['name']);
+    storySceneIdentityKey2 &&
+      map10['has'](storySceneIdentityKey2) &&
+      handler('scene', '重复场景“' + (error14?.['name'] || '未命名场景') + '”');
+    if (storySceneIdentityKey2) map10['add'](storySceneIdentityKey2);
   }),
-    (_0x2656e0?.['character'] || [])['forEach']((_0x46bac6) => {
-      !_0x25a18f['some']((_0x107403) => storyCharacterQualityNamesMatch(_0x107403?.['name'], _0x46bac6)) &&
-        _0x41a8ea('character', '缺少原文角色“' + _0x46bac6 + '”');
+    (value80?.['character'] || [])['forEach']((value90) => {
+      !list42['some']((error15) => storyCharacterQualityNamesMatch(error15?.['name'], value90)) &&
+        handler('character', '缺少原文角色“' + value90 + '”');
     }));
-  const _0x221e93 = new Map(),
-    _0x5a86d5 = _0x2656e0?.['scene'] || [],
-    _0x56afbf = (_0x1ae31a, _0xf246a2) => {
-      const _0x2acea4 = _0x5a86d5[_0x1ae31a],
-        _0x5bc28a = getStorySceneQualitySourceRefs(_0x2acea4, _0x1611ee),
-        _0x48c9c9 = _0x3629bd['map']((_0x2eaf96, _0x5f1ddd) => ({ asset: _0x2eaf96, assetIndex: _0x5f1ddd }))
+  const map11 = new Map(),
+    list45 = value80?.['scene'] || [],
+    handler2 = (value91, map12) => {
+      const value92 = list45[value91],
+        map13 = getStorySceneQualitySourceRefs(value92, value79),
+        value93 = list43['map']((asset5, assetIndex) => ({ asset: asset5, assetIndex: assetIndex }))
           ['filter'](
-            ({ asset: _0x108618 }) =>
-              storySceneQualityNamesMatch(_0x108618?.['name'], _0x2acea4) ||
-              (Array['isArray'](_0x108618?.['sourceSceneRefs']) &&
-                _0x108618['sourceSceneRefs']['some']((_0x595691) => _0x5bc28a['has'](_0x595691))),
+            ({ asset: asset6 }) =>
+              storySceneQualityNamesMatch(asset6?.['name'], value92) ||
+              (Array['isArray'](asset6?.['sourceSceneRefs']) &&
+                asset6['sourceSceneRefs']['some']((value94) => map13['has'](value94))),
           )
-          ['sort']((_0x550da0, _0x41135c) => {
-            const _0x5e54df =
-                getStorySceneIdentityKey(_0x550da0['asset']?.['name']) ===
-                getStorySceneIdentityKey(_0x2acea4),
-              _0x594c49 =
-                getStorySceneIdentityKey(_0x41135c['asset']?.['name']) ===
-                getStorySceneIdentityKey(_0x2acea4);
-            return Number(_0x594c49) - Number(_0x5e54df);
+          ['sort']((value95, value96) => {
+            const storySceneIdentityKey3 =
+                getStorySceneIdentityKey(value95['asset']?.['name']) === getStorySceneIdentityKey(value92),
+              storySceneIdentityKey4 =
+                getStorySceneIdentityKey(value96['asset']?.['name']) === getStorySceneIdentityKey(value92);
+            return Number(storySceneIdentityKey4) - Number(storySceneIdentityKey3);
           })
-          ['map'](({ assetIndex: _0x34dbae }) => _0x34dbae);
-      for (const _0xec4ebb of _0x48c9c9) {
-        if (_0xf246a2['has'](_0xec4ebb)) continue;
-        _0xf246a2['add'](_0xec4ebb);
-        const _0x2266af = _0x221e93['get'](_0xec4ebb);
-        if (_0x2266af === undefined || _0x56afbf(_0x2266af, _0xf246a2))
-          return (_0x221e93['set'](_0xec4ebb, _0x1ae31a), !![]);
+          ['map'](({ assetIndex: assetIndex2 }) => assetIndex2);
+      for (const value97 of value93) {
+        if (map12['has'](value97)) continue;
+        map12['add'](value97);
+        const value98 = map11['get'](value97);
+        if (value98 === undefined || handler2(value98, map12)) return (map11['set'](value97, value91), !![]);
       }
       return ![];
     };
-  (_0x5a86d5['forEach']((_0x1fdc99, _0x37e235) => {
-    !_0x56afbf(_0x37e235, new Set()) && _0x41a8ea('scene', '缺少原子场景“' + _0x1fdc99 + '”');
+  (list45['forEach']((value99, value100) => {
+    !handler2(value100, new Set()) && handler('scene', '缺少原子场景“' + value99 + '”');
   }),
-    (_0x2656e0?.['prop'] || [])['forEach']((_0x6451ef) => {
-      !_0x41dd50['some']((_0x102b66) => storyPropQualityRequirementMatches(_0x102b66, _0x6451ef)) &&
-        _0x41a8ea('prop', '缺少原文关键道具“' + _0x6451ef + '”');
+    (value80?.['prop'] || [])['forEach']((value101) => {
+      !list44['some']((value102) => storyPropQualityRequirementMatches(value102, value101)) &&
+        handler('prop', '缺少原文关键道具“' + value101 + '”');
     }),
-    _0x166bb0['forEach']((_0x1e851f) => {
-      [
-        _0x1e851f?.['name'],
-        _0x1e851f?.['description'],
-        _0x1e851f?.['voiceDescription'],
-        _0x1e851f?.['occurrences'],
-      ]['forEach']((_0x18b6f2) => {
-        _0x28d1f2['test'](String(_0x18b6f2 || '')) &&
-          _0x41a8ea(_0x1e851f?.['kind'], (_0x1e851f?.['name'] || '未命名资产') + '描述泄露了内部处理规则');
+    list41['forEach']((error16) => {
+      [error16?.['name'], error16?.['description'], error16?.['voiceDescription'], error16?.['occurrences']][
+        'forEach'
+      ]((value103) => {
+        value86['test'](String(value103 || '')) &&
+          handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '描述泄露了内部处理规则');
       });
-      _0x1e851f?.['designStatus'] === 'baseline' &&
-        _0x41a8ea(_0x1e851f?.['kind'], (_0x1e851f?.['name'] || '未命名资产') + '缺少\x20API\x20视觉反推');
-      _0x1e851f?.['kind'] === 'scene' &&
-        /[/／|｜]/u['test'](String(_0x1e851f?.['name'] || '')) &&
-        _0x41a8ea('scene', _0x1e851f['name'] + '仍是复合场景名');
-      const _0x594723 = Array['isArray'](_0x1e851f?.['appearances']) ? _0x1e851f['appearances'] : [];
-      (!_0x594723['length'] &&
-        _0x41a8ea(_0x1e851f?.['kind'], (_0x1e851f?.['name'] || '未命名资产') + '缺少形象'),
-        _0x594723['forEach']((_0x339072) => {
-          [_0x339072?.['name'], _0x339072?.['description'], _0x339072?.['occurrences']]['forEach'](
-            (_0x57df0c) => {
-              _0x28d1f2['test'](String(_0x57df0c || '')) &&
-                _0x41a8ea(
-                  _0x1e851f?.['kind'],
-                  (_0x1e851f?.['name'] || '未命名资产') + '形象描述泄露了内部处理规则',
-                );
-            },
-          );
-          const _0x2b12b2 = String(_0x339072?.['prompt'] || '')['trim']();
-          if (!_0x2b12b2)
-            _0x41a8ea(_0x1e851f?.['kind'], (_0x1e851f?.['name'] || '未命名资产') + '缺少图片提示词');
+      error16?.['designStatus'] === 'baseline' &&
+        handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '缺少\x20API\x20视觉反推');
+      error16?.['kind'] === 'scene' &&
+        /[/／|｜]/u['test'](String(error16?.['name'] || '')) &&
+        handler('scene', error16['name'] + '仍是复合场景名');
+      const list46 = Array['isArray'](error16?.['appearances']) ? error16['appearances'] : [];
+      (!list46['length'] && handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '缺少形象'),
+        list46['forEach']((error17) => {
+          [error17?.['name'], error17?.['description'], error17?.['occurrences']]['forEach']((value104) => {
+            value86['test'](String(value104 || '')) &&
+              handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '形象描述泄露了内部处理规则');
+          });
+          const list47 = String(error17?.['prompt'] || '')['trim']();
+          if (!list47) handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '缺少图片提示词');
           else {
-            if (_0x2b12b2['length'] > STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS)
-              _0x41a8ea(_0x1e851f?.['kind'], (_0x1e851f?.['name'] || '未命名资产') + '提示词异常过长');
+            if (list47['length'] > STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS)
+              handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '提示词异常过长');
             else {
-              if (promptCopiesStorySource(_0x2b12b2, _0x1611ee))
-                _0x41a8ea(
-                  _0x1e851f?.['kind'],
-                  (_0x1e851f?.['name'] || '未命名资产') + '提示词复制了大段剧情原文',
-                );
+              if (promptCopiesStorySource(list47, value79))
+                handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '提示词复制了大段剧情原文');
               else
-                _0x28d1f2['test'](_0x2b12b2) &&
-                  _0x41a8ea(
-                    _0x1e851f?.['kind'],
-                    (_0x1e851f?.['name'] || '未命名资产') + '提示词泄露了内部处理规则',
+                value86['test'](list47) &&
+                  handler(
+                    error16?.['kind'],
+                    (error16?.['name'] || '未命名资产') + '提示词泄露了内部处理规则',
                   );
             }
           }
         }));
     }));
-  if (!_0x1dcf8f['length']) return;
-  const _0x2af936 = new Error(
+  if (!problems['length']) return;
+  const error18 = new Error(
     'API 视觉反推质量校验未通过：' +
-      _0x1dcf8f['slice'](0x0, 0x3)['join']('；') +
+      problems['slice'](0x0, 0x3)['join']('；') +
       '。旧资产已保留，未进入下一步。',
   );
-  ((_0x2af936['type'] = 'ASSET_VISUAL_QUALITY'),
-    (_0x2af936['validationDetails'] = { problems: _0x1dcf8f, kinds: [..._0x2f44da] }));
-  throw _0x2af936;
+  ((error18['type'] = 'ASSET_VISUAL_QUALITY'),
+    (error18['validationDetails'] = { problems: problems, kinds: [...args13] }));
+  throw error18;
 }
-async function checkpointStoryAssetQualityFailure(_0x477f13, _0x2284f1, _0x2c6dc5) {
-  if (!_0x2284f1 || typeof _0x2284f1 !== 'object') return;
-  const _0xaed5ac = cloneValue(_0x2284f1);
-  _0xaed5ac['hybridQualityPolicyVersion'] = STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION;
-  const _0x155742 = Array['isArray'](_0x477f13?.['validationDetails']?.['kinds'])
-      ? _0x477f13['validationDetails']['kinds']
+async function checkpointStoryAssetQualityFailure(error19, enabled6, value105) {
+  if (!enabled6 || typeof enabled6 !== 'object') return;
+  const response4 = cloneValue(enabled6);
+  response4['hybridQualityPolicyVersion'] = STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION;
+  const list48 = Array['isArray'](error19?.['validationDetails']?.['kinds'])
+      ? error19['validationDetails']['kinds']
       : [],
-    _0x3aaf5f = _0x155742['length'] ? _0x155742 : ['character', 'scene', 'prop'],
-    _0x29df6d =
-      _0xaed5ac['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
-        ? getStoryAssetProtectedPaidBatchKeys(_0xaed5ac)
+    kinds = list48['length'] ? list48 : ['character', 'scene', 'prop'],
+    batchIds =
+      response4['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+        ? getStoryAssetProtectedPaidBatchKeys(response4)
         : [];
-  ((_0xaed5ac['qualityReview'] = {
+  ((response4['qualityReview'] = {
     schemaVersion: STORY_ASSET_QUALITY_REVIEW_SCHEMA_VERSION,
     status: 'blocked',
     policyVersion: STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION,
     recoveryMode: STORY_ASSET_QUALITY_RECOVERY_PAID_RERUN,
-    kinds: _0x3aaf5f,
-    ...(_0x29df6d['length'] ? { batchIds: _0x29df6d } : {}),
-    problems: Array['isArray'](_0x477f13?.['validationDetails']?.['problems'])
-      ? [..._0x477f13['validationDetails']['problems']]
+    kinds: kinds,
+    ...(batchIds['length'] ? { batchIds: batchIds } : {}),
+    problems: Array['isArray'](error19?.['validationDetails']?.['problems'])
+      ? [...error19['validationDetails']['problems']]
       : [],
-    message: String(_0x477f13?.['message'] || '结果校验失败'),
+    message: String(error19?.['message'] || '结果校验失败'),
     reviewedAt: Date['now'](),
   }),
-    (_0xaed5ac['status'] = 'blocked'),
-    (_0xaed5ac['kindStates'] =
-      _0xaed5ac['kindStates'] && typeof _0xaed5ac['kindStates'] === 'object' ? _0xaed5ac['kindStates'] : {}),
-    _0x3aaf5f['forEach']((_0x340b26) => {
-      _0xaed5ac['kindStates'][_0x340b26] = {
-        ...(_0xaed5ac['kindStates'][_0x340b26] || {}),
-        kind: _0x340b26,
+    (response4['status'] = 'blocked'),
+    (response4['kindStates'] =
+      response4['kindStates'] && typeof response4['kindStates'] === 'object' ? response4['kindStates'] : {}),
+    kinds['forEach']((kind2) => {
+      response4['kindStates'][kind2] = {
+        ...(response4['kindStates'][kind2] || {}),
+        kind: kind2,
         status: 'blocked-quality-rerun',
         errorType: 'quality-rerun-required',
         errorMessage: '已付费结果未通过当前视觉质量合同；需要用户明确授权后重新请求该通道。',
         finishedAt: Date['now'](),
       };
     }),
-    _0x29df6d['forEach']((_0x1ebaf9) => {
-      const _0x13c5ef = _0xaed5ac['batchSubmissionRecords']?.[_0x1ebaf9];
-      if (!_0x13c5ef) return;
-      ((_0x13c5ef['qualityPreviousStatus'] = _0x13c5ef['status']),
-        (_0x13c5ef['status'] = 'blocked-quality-rerun'),
-        (_0x13c5ef['errorType'] = 'quality-rerun-required'),
-        (_0x13c5ef['errorMessage'] = '已付费结果未通过当前视觉质量合同；需要用户逐批明确授权后重新请求。'),
-        (_0x13c5ef['blockedAt'] = Date['now']()));
+    batchIds['forEach']((value106) => {
+      const response5 = response4['batchSubmissionRecords']?.[value106];
+      if (!response5) return;
+      ((response5['qualityPreviousStatus'] = response5['status']),
+        (response5['status'] = 'blocked-quality-rerun'),
+        (response5['errorType'] = 'quality-rerun-required'),
+        (response5['errorMessage'] = '已付费结果未通过当前视觉质量合同；需要用户逐批明确授权后重新请求。'),
+        (response5['blockedAt'] = Date['now']()));
     }),
-    (_0xaed5ac['completedKinds'] = ['character', 'scene', 'prop']['filter'](
-      (_0x916c1c) => _0xaed5ac['kindStates']?.[_0x916c1c]?.['status'] === 'succeeded',
+    (response4['completedKinds'] = ['character', 'scene', 'prop']['filter'](
+      (value107) => response4['kindStates']?.[value107]?.['status'] === 'succeeded',
     )),
-    (_0xaed5ac['failures'] = _0x3aaf5f['map']((_0x11040f) => ({
+    (response4['failures'] = kinds['map']((kind3) => ({
       stage: 'quality',
-      kind: _0x11040f,
+      kind: kind3,
       errorType: 'quality-rerun-required',
       errorMessage: '已付费结果未通过当前视觉质量合同；需要用户明确授权后重新请求。',
     }))),
-    (_0xaed5ac['updatedAt'] = Date['now']()),
-    (_0x477f13['assetExtractionDraft'] = cloneValue(_0xaed5ac)),
-    await _0x2c6dc5?.(_0xaed5ac));
+    (response4['updatedAt'] = Date['now']()),
+    (error19['assetExtractionDraft'] = cloneValue(response4)),
+    await value105?.(response4));
 }
-function prepareLegacyStoryAssetQualityRevalidationDraft(_0x346742) {
-  const _0x41d737 = cloneValue(_0x346742);
-  if (!_0x41d737) return _0x346742;
-  let _0x4fd4df = ![];
-  _0x41d737['qualityReview'] && (delete _0x41d737['qualityReview'], (_0x4fd4df = !![]));
-  let _0xe17550 = 0x0;
-  ['character', 'scene', 'prop']['forEach']((_0x6d8687) => {
-    const _0x1a36e4 = _0x41d737?.['kindStates']?.[_0x6d8687],
-      _0x1b7804 = _0x41d737?.['assetsByKind']?.[_0x6d8687],
-      _0x54c838 = Array['isArray'](_0x41d737?.['completedAssets'])
-        ? _0x41d737['completedAssets']['filter']((_0x1b8ad4) => _0x1b8ad4?.['kind'] === _0x6d8687)
+function prepareLegacyStoryAssetQualityRevalidationDraft(value108) {
+  const response6 = cloneValue(value108);
+  if (!response6) return value108;
+  let enabled7 = ![];
+  response6['qualityReview'] && (delete response6['qualityReview'], (enabled7 = !![]));
+  let enabled8 = 0x0;
+  ['character', 'scene', 'prop']['forEach']((value109) => {
+    const response7 = response6?.['kindStates']?.[value109],
+      assetCount = response6?.['assetsByKind']?.[value109],
+      assetCount2 = Array['isArray'](response6?.['completedAssets'])
+        ? response6['completedAssets']['filter']((value110) => value110?.['kind'] === value109)
         : [];
     if (
-      _0x41d737?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
-      _0x1a36e4?.['status'] === 'blocked-quality-rerun' &&
-      _0x54c838['length']
+      response6?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
+      response7?.['status'] === 'blocked-quality-rerun' &&
+      assetCount2['length']
     ) {
-      ((_0x41d737['kindStates'][_0x6d8687] = {
-        ..._0x1a36e4,
+      ((response6['kindStates'][value109] = {
+        ...response7,
         status: 'succeeded',
-        assetCount: _0x54c838['length'],
-        totalAssetCount: _0x54c838['length'],
+        assetCount: assetCount2['length'],
+        totalAssetCount: assetCount2['length'],
         errorType: '',
         errorMessage: '',
       }),
-        (_0xe17550 += 0x1));
+        (enabled8 += 0x1));
       return;
     }
     if (
-      _0x1a36e4?.['status'] !== 'failed' ||
-      _0x1a36e4?.['errorType'] !== 'validation' ||
-      !Array['isArray'](_0x1b7804)
+      response7?.['status'] !== 'failed' ||
+      response7?.['errorType'] !== 'validation' ||
+      !Array['isArray'](assetCount)
     )
       return;
-    ((_0x41d737['kindStates'][_0x6d8687] = {
-      ..._0x1a36e4,
+    ((response6['kindStates'][value109] = {
+      ...response7,
       status: 'succeeded',
-      assetCount: _0x1b7804['length'],
+      assetCount: assetCount['length'],
       errorType: '',
       errorMessage: '',
     }),
-      (_0xe17550 += 0x1));
+      (enabled8 += 0x1));
   });
-  if (!_0xe17550 && !_0x4fd4df) return _0x346742;
+  if (!enabled8 && !enabled7) return value108;
   return (
-    (_0x41d737['hybridQualityPolicyVersion'] = STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION),
-    (_0x41d737['completedKinds'] = ['character', 'scene', 'prop']['filter'](
-      (_0x1801bb) => _0x41d737['kindStates']?.[_0x1801bb]?.['status'] === 'succeeded',
+    (response6['hybridQualityPolicyVersion'] = STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION),
+    (response6['completedKinds'] = ['character', 'scene', 'prop']['filter'](
+      (value111) => response6['kindStates']?.[value111]?.['status'] === 'succeeded',
     )),
-    _0x41d737?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
-      ? Object['values'](_0x41d737['batchSubmissionRecords'] || {})['forEach']((_0x432245) => {
-          _0x432245?.['status'] === 'blocked-quality-rerun' &&
-            String(_0x432245?.['qualityPreviousStatus'] || '')['trim']() &&
-            ((_0x432245['status'] = _0x432245['qualityPreviousStatus']),
-            delete _0x432245['qualityPreviousStatus'],
-            delete _0x432245['errorType'],
-            delete _0x432245['errorMessage'],
-            delete _0x432245['blockedAt']);
+    response6?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+      ? Object['values'](response6['batchSubmissionRecords'] || {})['forEach']((response8) => {
+          response8?.['status'] === 'blocked-quality-rerun' &&
+            String(response8?.['qualityPreviousStatus'] || '')['trim']() &&
+            ((response8['status'] = response8['qualityPreviousStatus']),
+            delete response8['qualityPreviousStatus'],
+            delete response8['errorType'],
+            delete response8['errorMessage'],
+            delete response8['blockedAt']);
         })
-      : (_0x41d737['completedAssets'] = ['character', 'scene', 'prop']['flatMap'](
-          (_0x23aea3) => _0x41d737['assetsByKind']?.[_0x23aea3] || [],
+      : (response6['completedAssets'] = ['character', 'scene', 'prop']['flatMap'](
+          (value112) => response6['assetsByKind']?.[value112] || [],
         )),
-    (_0x41d737['failures'] = []),
-    (_0x41d737['status'] = _0x41d737['completedKinds']['length'] === 0x3 ? 'completed' : 'partial'),
-    _0x41d737
+    (response6['failures'] = []),
+    (response6['status'] = response6['completedKinds']['length'] === 0x3 ? 'completed' : 'partial'),
+    response6
   );
 }
-function isCurrentStoryAssetPaidQualityReview(_0x1a758e) {
+function isCurrentStoryAssetPaidQualityReview(value113) {
   return Boolean(
-    Number(_0x1a758e?.['qualityReview']?.['schemaVersion']) >= STORY_ASSET_QUALITY_REVIEW_SCHEMA_VERSION &&
-    Number(_0x1a758e?.['qualityReview']?.['policyVersion']) === STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION &&
-    _0x1a758e?.['qualityReview']?.['recoveryMode'] === STORY_ASSET_QUALITY_RECOVERY_PAID_RERUN,
+    Number(value113?.['qualityReview']?.['schemaVersion']) >= STORY_ASSET_QUALITY_REVIEW_SCHEMA_VERSION &&
+    Number(value113?.['qualityReview']?.['policyVersion']) === STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION &&
+    value113?.['qualityReview']?.['recoveryMode'] === STORY_ASSET_QUALITY_RECOVERY_PAID_RERUN,
   );
 }
-function archiveAndResetStoryAssetQualityLane(_0x3d1518, _0x49079e) {
-  _0x3d1518['paidResponseHistoryByKind'] =
-    _0x3d1518['paidResponseHistoryByKind'] && typeof _0x3d1518['paidResponseHistoryByKind'] === 'object'
-      ? _0x3d1518['paidResponseHistoryByKind']
+function archiveAndResetStoryAssetQualityLane(responseMode2, kind4) {
+  responseMode2['paidResponseHistoryByKind'] =
+    responseMode2['paidResponseHistoryByKind'] &&
+    typeof responseMode2['paidResponseHistoryByKind'] === 'object'
+      ? responseMode2['paidResponseHistoryByKind']
       : {};
-  const _0x56b684 = Array['isArray'](_0x3d1518['paidResponseHistoryByKind'][_0x49079e])
-    ? _0x3d1518['paidResponseHistoryByKind'][_0x49079e]
+  const list49 = Array['isArray'](responseMode2['paidResponseHistoryByKind'][kind4])
+    ? responseMode2['paidResponseHistoryByKind'][kind4]
     : [];
-  (_0x56b684['push']({
+  (list49['push']({
     archivedAt: Date['now'](),
     reason: 'authorized-quality-rerun',
-    rawResponse: Object['hasOwn'](_0x3d1518?.['rawResponsesByKind'] || {}, _0x49079e)
-      ? _0x3d1518['rawResponsesByKind'][_0x49079e]
+    rawResponse: Object['hasOwn'](responseMode2?.['rawResponsesByKind'] || {}, kind4)
+      ? responseMode2['rawResponsesByKind'][kind4]
       : '',
-    responseMode: _0x3d1518?.['rawResponseModesByKind']?.[_0x49079e] || '',
-    contractSnapshot: cloneValue(_0x3d1518?.['rawResponseContractSnapshotsByKind']?.[_0x49079e]),
-    decisions: cloneValue(_0x3d1518?.['decisionsByKind']?.[_0x49079e]),
-    assets: cloneValue(_0x3d1518?.['assetsByKind']?.[_0x49079e] || []),
-    submissionState: cloneValue(_0x3d1518?.['submissionStatesByKind']?.[_0x49079e]),
-    kindState: cloneValue(_0x3d1518?.['kindStates']?.[_0x49079e]),
+    responseMode: responseMode2?.['rawResponseModesByKind']?.[kind4] || '',
+    contractSnapshot: cloneValue(responseMode2?.['rawResponseContractSnapshotsByKind']?.[kind4]),
+    decisions: cloneValue(responseMode2?.['decisionsByKind']?.[kind4]),
+    assets: cloneValue(responseMode2?.['assetsByKind']?.[kind4] || []),
+    submissionState: cloneValue(responseMode2?.['submissionStatesByKind']?.[kind4]),
+    kindState: cloneValue(responseMode2?.['kindStates']?.[kind4]),
   }),
-    (_0x3d1518['paidResponseHistoryByKind'][_0x49079e] = _0x56b684),
-    (_0x3d1518['assetsByKind'][_0x49079e] = []),
-    delete _0x3d1518['rawResponsesByKind'][_0x49079e],
-    delete _0x3d1518['rawResponseModesByKind'][_0x49079e],
-    delete _0x3d1518['rawResponseContractSnapshotsByKind'][_0x49079e],
-    delete _0x3d1518['paidResponseReceivedByKind'][_0x49079e],
-    delete _0x3d1518['decisionsByKind'][_0x49079e],
-    delete _0x3d1518['submissionStatesByKind'][_0x49079e],
-    (_0x3d1518['kindStates'][_0x49079e] = {
-      ...(_0x3d1518['kindStates'][_0x49079e] || {}),
-      kind: _0x49079e,
+    (responseMode2['paidResponseHistoryByKind'][kind4] = list49),
+    (responseMode2['assetsByKind'][kind4] = []),
+    delete responseMode2['rawResponsesByKind'][kind4],
+    delete responseMode2['rawResponseModesByKind'][kind4],
+    delete responseMode2['rawResponseContractSnapshotsByKind'][kind4],
+    delete responseMode2['paidResponseReceivedByKind'][kind4],
+    delete responseMode2['decisionsByKind'][kind4],
+    delete responseMode2['submissionStatesByKind'][kind4],
+    (responseMode2['kindStates'][kind4] = {
+      ...(responseMode2['kindStates'][kind4] || {}),
+      kind: kind4,
       status: 'pending',
       assetCount: 0x0,
       errorType: '',
@@ -1053,96 +1020,97 @@ function archiveAndResetStoryAssetQualityLane(_0x3d1518, _0x49079e) {
       finishedAt: 0x0,
     }));
 }
-function archiveAndResetStoryAssetQualityBatches(_0x33e995, _0x588966) {
-  ((_0x33e995['paidBatchHistory'] =
-    _0x33e995['paidBatchHistory'] && typeof _0x33e995['paidBatchHistory'] === 'object'
-      ? _0x33e995['paidBatchHistory']
+function archiveAndResetStoryAssetQualityBatches(response9, list50) {
+  ((response9['paidBatchHistory'] =
+    response9['paidBatchHistory'] && typeof response9['paidBatchHistory'] === 'object'
+      ? response9['paidBatchHistory']
       : {}),
-    _0x588966['forEach']((_0x1205bc) => {
-      const _0x391e66 = _0x33e995['batchSubmissionRecords']?.[_0x1205bc];
-      if (!_0x391e66) return;
-      const _0x23acd4 = Array['isArray'](_0x33e995['paidBatchHistory'][_0x1205bc])
-        ? _0x33e995['paidBatchHistory'][_0x1205bc]
+    list50['forEach']((value114) => {
+      const enabled9 = response9['batchSubmissionRecords']?.[value114];
+      if (!enabled9) return;
+      const list51 = Array['isArray'](response9['paidBatchHistory'][value114])
+        ? response9['paidBatchHistory'][value114]
         : [];
-      (_0x23acd4['push']({
-        ...cloneValue(_0x391e66),
+      (list51['push']({
+        ...cloneValue(enabled9),
         archivedAt: Date['now'](),
         archiveReason: 'authorized-quality-rerun',
       }),
-        (_0x33e995['paidBatchHistory'][_0x1205bc] = _0x23acd4));
+        (response9['paidBatchHistory'][value114] = list51));
     }),
-    (_0x33e995['status'] = 'pending'),
-    (_0x33e995['phase'] = 'inventory'),
-    (_0x33e995['inventoryBatches'] = []),
-    (_0x33e995['inventory'] = null),
-    (_0x33e995['completedAssets'] = []),
-    (_0x33e995['detailBatches'] = []),
-    (_0x33e995['batchSubmissionRecords'] = {}),
-    (_0x33e995['failures'] = []),
-    (_0x33e995['runRequestCount'] = 0x0),
-    delete _0x33e995['kindStates'],
-    delete _0x33e995['progress']);
+    (response9['status'] = 'pending'),
+    (response9['phase'] = 'inventory'),
+    (response9['inventoryBatches'] = []),
+    (response9['inventory'] = null),
+    (response9['completedAssets'] = []),
+    (response9['detailBatches'] = []),
+    (response9['batchSubmissionRecords'] = {}),
+    (response9['failures'] = []),
+    (response9['runRequestCount'] = 0x0),
+    delete response9['kindStates'],
+    delete response9['progress']);
 }
-function createStoryAssetQualityRerunRequiredError(_0x4382ac, _0x58b298, _0x1e5ed7) {
-  const _0x37767d = new Error('已付费结果未通过视觉质量合同；未获得精确授权，未自动重新请求。');
+function createStoryAssetQualityRerunRequiredError(value115, args14, args15) {
+  const error20 = new Error('已付费结果未通过视觉质量合同；未获得精确授权，未自动重新请求。');
   return (
-    (_0x37767d['type'] = 'ASSET_VISUAL_QUALITY_RERUN_REQUIRED'),
-    (_0x37767d['blockedKinds'] = [..._0x58b298]),
-    (_0x37767d['blockedBatchIds'] = [..._0x1e5ed7]),
-    (_0x37767d['assetExtractionDraft'] = cloneValue(_0x4382ac)),
-    _0x37767d
+    (error20['type'] = 'ASSET_VISUAL_QUALITY_RERUN_REQUIRED'),
+    (error20['blockedKinds'] = [...args14]),
+    (error20['blockedBatchIds'] = [...args15]),
+    (error20['assetExtractionDraft'] = cloneValue(value115)),
+    error20
   );
 }
-async function prepareStoryAssetQualityRecoveryDraft(_0x4fa73e, _0x19f63e, _0x4a14cf) {
-  if (!_0x4fa73e?.['qualityReview']) return _0x4fa73e;
-  if (!isCurrentStoryAssetPaidQualityReview(_0x4fa73e))
-    return prepareLegacyStoryAssetQualityRevalidationDraft(_0x4fa73e);
-  const _0x5a9fe3 = cloneValue(_0x4fa73e),
-    _0x4e6436 =
-      Array['isArray'](_0x5a9fe3['qualityReview']?.['kinds']) && _0x5a9fe3['qualityReview']['kinds']['length']
-        ? _0x5a9fe3['qualityReview']['kinds']
+async function prepareStoryAssetQualityRecoveryDraft(enabled10, value116, value117) {
+  if (!enabled10?.['qualityReview']) return enabled10;
+  if (!isCurrentStoryAssetPaidQualityReview(enabled10))
+    return prepareLegacyStoryAssetQualityRevalidationDraft(enabled10);
+  const cloneValue4 = cloneValue(enabled10),
+    list52 =
+      Array['isArray'](cloneValue4['qualityReview']?.['kinds']) &&
+      cloneValue4['qualityReview']['kinds']['length']
+        ? cloneValue4['qualityReview']['kinds']
         : ['character', 'scene', 'prop'],
-    _0x4c8102 =
-      _0x5a9fe3['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
-        ? Array['isArray'](_0x5a9fe3['qualityReview']?.['batchIds'])
-          ? _0x5a9fe3['qualityReview']['batchIds']
-          : getStoryAssetProtectedPaidBatchKeys(_0x5a9fe3)
+    list53 =
+      cloneValue4['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+        ? Array['isArray'](cloneValue4['qualityReview']?.['batchIds'])
+          ? cloneValue4['qualityReview']['batchIds']
+          : getStoryAssetProtectedPaidBatchKeys(cloneValue4)
         : [],
-    _0x5d610d =
-      _0x5a9fe3['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY
-        ? _0x4e6436['filter']((_0x1317fc) => !isStoryAssetPaidLaneRerunAuthorized(_0x19f63e, _0x1317fc))
+    list54 =
+      cloneValue4['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY
+        ? list52['filter']((value118) => !isStoryAssetPaidLaneRerunAuthorized(value116, value118))
         : [],
-    _0x205be7 =
-      _0x5a9fe3['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
-        ? _0x4c8102['filter']((_0x2d80ef) => !isStoryAssetPaidBatchRerunAuthorized(_0x19f63e, _0x2d80ef))
+    list55 =
+      cloneValue4['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+        ? list53['filter']((value119) => !isStoryAssetPaidBatchRerunAuthorized(value116, value119))
         : [];
-  if (_0x5d610d['length'] || _0x205be7['length'])
+  if (list54['length'] || list55['length'])
     throw createStoryAssetQualityRerunRequiredError(
-      _0x5a9fe3,
-      _0x5d610d['length'] ? _0x5d610d : _0x4e6436,
-      _0x205be7['length'] ? _0x205be7 : _0x4c8102,
+      cloneValue4,
+      list54['length'] ? list54 : list52,
+      list55['length'] ? list55 : list53,
     );
-  if (_0x5a9fe3['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY)
-    _0x4e6436['forEach']((_0x58f030) => {
-      archiveAndResetStoryAssetQualityLane(_0x5a9fe3, _0x58f030);
+  if (cloneValue4['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY)
+    list52['forEach']((value120) => {
+      archiveAndResetStoryAssetQualityLane(cloneValue4, value120);
     });
   else
-    _0x5a9fe3['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
-      archiveAndResetStoryAssetQualityBatches(_0x5a9fe3, _0x4c8102);
-  const _0x1c78cd = Array['isArray'](_0x5a9fe3['qualityReviewHistory'])
-    ? _0x5a9fe3['qualityReviewHistory']
+    cloneValue4['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
+      archiveAndResetStoryAssetQualityBatches(cloneValue4, list53);
+  const list56 = Array['isArray'](cloneValue4['qualityReviewHistory'])
+    ? cloneValue4['qualityReviewHistory']
     : [];
   return (
-    _0x1c78cd['push']({
-      ...cloneValue(_0x5a9fe3['qualityReview']),
+    list56['push']({
+      ...cloneValue(cloneValue4['qualityReview']),
       recoveredAt: Date['now'](),
       recoveryReason: 'authorized-quality-rerun',
     }),
-    (_0x5a9fe3['qualityReviewHistory'] = _0x1c78cd),
-    delete _0x5a9fe3['qualityReview'],
-    (_0x5a9fe3['updatedAt'] = Date['now']()),
-    await _0x4a14cf?.(cloneValue(_0x5a9fe3)),
-    _0x5a9fe3
+    (cloneValue4['qualityReviewHistory'] = list56),
+    delete cloneValue4['qualityReview'],
+    (cloneValue4['updatedAt'] = Date['now']()),
+    await value117?.(cloneValue(cloneValue4)),
+    cloneValue4
   );
 }
 export async function extractStoryAssetsHybridExperimental({
@@ -1154,557 +1122,589 @@ export async function extractStoryAssetsHybridExperimental({
   onCheckpoint: onCheckpoint = null,
   resumeDraft: resumeDraft = null,
   diagnostics: diagnostics = null,
-  ..._0x411d9b
+  ...args16
 } = {}) {
-  const _0xf94a0f = normalizeStoryAssetExtractionSources(episodes),
-    _0x772aa1 = createStoryAssetRequirementEvidencePlan(_0xf94a0f),
-    _0x3ad0fe = {
-      character: getHardRequiredStoryAssetNames(_0x772aa1, 'character'),
-      scene: collectRequiredStorySceneNames(_0x772aa1),
-      prop: getHardRequiredStoryAssetNames(_0x772aa1, 'prop'),
+  const sourceScenes = normalizeStoryAssetExtractionSources(episodes),
+    requirementEvidence = createStoryAssetRequirementEvidencePlan(sourceScenes),
+    requiredAssetNamesByKind3 = {
+      character: getHardRequiredStoryAssetNames(requirementEvidence, 'character'),
+      scene: collectRequiredStorySceneNames(requirementEvidence),
+      prop: getHardRequiredStoryAssetNames(requirementEvidence, 'prop'),
     },
-    _0x3d8029 = createStoryAssetRequiredContractsByKind({
+    requiredAssetsByKind3 = createStoryAssetRequiredContractsByKind({
       project: project,
-      requirementEvidence: _0x772aa1,
-      sourceScenes: _0xf94a0f,
-      requiredAssetNamesByKind: _0x3ad0fe,
+      requirementEvidence: requirementEvidence,
+      sourceScenes: sourceScenes,
+      requiredAssetNamesByKind: requiredAssetNamesByKind3,
     }),
-    _0x3895a1 = createStoryAssetAuthoritativeSourceFingerprint(_0xf94a0f),
-    _0x4be53d = String(resumeDraft?.['hybridAuthoritativeSourceFingerprint'] || '')['trim'](),
-    _0x381936 = Boolean(_0x4be53d && _0x4be53d !== _0x3895a1),
-    _0x6eed6b = Boolean(
-      _0x381936 &&
+    nextSourceFingerprint2 = createStoryAssetAuthoritativeSourceFingerprint(sourceScenes),
+    previousSourceFingerprint2 = String(resumeDraft?.['hybridAuthoritativeSourceFingerprint'] || '')[
+      'trim'
+    ](),
+    value121 = Boolean(previousSourceFingerprint2 && previousSourceFingerprint2 !== nextSourceFingerprint2),
+    enabled11 = Boolean(
+      value121 &&
       Number(resumeDraft?.['hybridQualityPolicyVersion']) >= 0x5 &&
       Number(resumeDraft?.['hybridQualityPolicyVersion']) <= STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION &&
-      hasSameStoryAssetAuthoritativeContent(resumeDraft?.['hybridEvidenceScenes'], _0xf94a0f),
+      hasSameStoryAssetAuthoritativeContent(resumeDraft?.['hybridEvidenceScenes'], sourceScenes),
     ),
-    _0x24e84c = Boolean(_0x381936 && !_0x6eed6b);
-  _0x6eed6b &&
+    value122 = Boolean(value121 && !enabled11);
+  enabled11 &&
     reportDiagnostics(diagnostics, 'story-asset-hybrid-resume', {
       status: 'compatibility-migration',
       reason: 'derived-character-normalization-drift',
     });
-  const _0x53af38 = _0x411d9b?.['paidRerunAuthorization'],
-    _0x48027b =
-      _0x24e84c && resumeDraft?.['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY
+  const value123 = args16?.['paidRerunAuthorization'],
+    paidKinds =
+      value122 && resumeDraft?.['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY
         ? getStoryAssetPaidDraftKinds(resumeDraft)
         : [],
-    _0x5e88aa =
-      _0x24e84c && resumeDraft?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+    paidBatchKeys =
+      value122 && resumeDraft?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
         ? getStoryAssetProtectedPaidBatchKeys(resumeDraft)
         : [],
-    _0xdd81b7 = _0x48027b['filter'](
-      (_0x4099c7) => !isStoryAssetPaidLaneRerunAuthorized(_0x53af38, _0x4099c7),
+    unauthorizedKinds = paidKinds['filter'](
+      (value124) => !isStoryAssetPaidLaneRerunAuthorized(value123, value124),
     ),
-    _0x37626e = _0x5e88aa['filter'](
-      (_0x53afe3) => !isStoryAssetPaidBatchRerunAuthorized(_0x53af38, _0x53afe3),
+    unauthorizedBatchKeys = paidBatchKeys['filter'](
+      (value125) => !isStoryAssetPaidBatchRerunAuthorized(value123, value125),
     );
-  if (_0xdd81b7['length'] || _0x37626e['length']) {
-    const _0x19bac5 = cloneValue(resumeDraft);
-    ((_0x19bac5['status'] = 'blocked'),
-      (_0x19bac5['hybridSourceChangeReview'] = {
+  if (unauthorizedKinds['length'] || unauthorizedBatchKeys['length']) {
+    const response10 = cloneValue(resumeDraft);
+    ((response10['status'] = 'blocked'),
+      (response10['hybridSourceChangeReview'] = {
         status: 'blocked',
         reason: 'authoritative-source-changed',
-        previousSourceFingerprint: _0x4be53d,
-        nextSourceFingerprint: _0x3895a1,
-        paidKinds: _0x48027b,
-        unauthorizedKinds: _0xdd81b7,
-        paidBatchKeys: _0x5e88aa,
-        unauthorizedBatchKeys: _0x37626e,
+        previousSourceFingerprint: previousSourceFingerprint2,
+        nextSourceFingerprint: nextSourceFingerprint2,
+        paidKinds: paidKinds,
+        unauthorizedKinds: unauthorizedKinds,
+        paidBatchKeys: paidBatchKeys,
+        unauthorizedBatchKeys: unauthorizedBatchKeys,
       }),
-      (_0x19bac5['kindStates'] =
-        _0x19bac5['kindStates'] && typeof _0x19bac5['kindStates'] === 'object'
-          ? _0x19bac5['kindStates']
+      (response10['kindStates'] =
+        response10['kindStates'] && typeof response10['kindStates'] === 'object'
+          ? response10['kindStates']
           : {}),
-      _0xdd81b7['forEach']((_0x360b52) => {
-        _0x19bac5['kindStates'][_0x360b52] = {
-          ...(_0x19bac5['kindStates'][_0x360b52] || {}),
-          kind: _0x360b52,
+      unauthorizedKinds['forEach']((kind5) => {
+        response10['kindStates'][kind5] = {
+          ...(response10['kindStates'][kind5] || {}),
+          kind: kind5,
           status: 'blocked-source-changed',
           errorType: 'authoritative-source-changed',
           errorMessage: '剧本权威正文已变化；需要用户明确授权后才能重新提交该付费通道。',
         };
       }),
-      (_0x19bac5['batchSubmissionRecords'] =
-        _0x19bac5['batchSubmissionRecords'] && typeof _0x19bac5['batchSubmissionRecords'] === 'object'
-          ? _0x19bac5['batchSubmissionRecords']
+      (response10['batchSubmissionRecords'] =
+        response10['batchSubmissionRecords'] && typeof response10['batchSubmissionRecords'] === 'object'
+          ? response10['batchSubmissionRecords']
           : {}),
-      _0x37626e['forEach']((_0x474610) => {
-        const _0x28fb29 = _0x19bac5['batchSubmissionRecords'][_0x474610];
-        if (!_0x28fb29) return;
-        (_0x28fb29['status'] !== 'blocked-incompatible' &&
-          (_0x28fb29['incompatiblePreviousStatus'] = _0x28fb29['status']),
-          (_0x28fb29['status'] = 'blocked-incompatible'),
-          (_0x28fb29['errorType'] = 'authoritative-source-changed'),
-          (_0x28fb29['errorMessage'] = '剧本权威正文已变化；需要逐批明确授权后才能重新提交该付费批次。'),
-          (_0x28fb29['blockedAt'] = Date['now']()));
+      unauthorizedBatchKeys['forEach']((value126) => {
+        const response11 = response10['batchSubmissionRecords'][value126];
+        if (!response11) return;
+        (response11['status'] !== 'blocked-incompatible' &&
+          (response11['incompatiblePreviousStatus'] = response11['status']),
+          (response11['status'] = 'blocked-incompatible'),
+          (response11['errorType'] = 'authoritative-source-changed'),
+          (response11['errorMessage'] = '剧本权威正文已变化；需要逐批明确授权后才能重新提交该付费批次。'),
+          (response11['blockedAt'] = Date['now']()));
       }),
-      (_0x19bac5['failures'] = _0xdd81b7['map']((_0xce539b) => ({
+      (response10['failures'] = unauthorizedKinds['map']((kind6) => ({
         stage: 'kind',
-        kind: _0xce539b,
+        kind: kind6,
         errorType: 'authoritative-source-changed',
         errorMessage: '剧本权威正文已变化；需要用户明确授权后才能重新提交该付费通道。',
       }))),
-      (_0x19bac5['updatedAt'] = Date['now']()),
-      await onCheckpoint?.(_0x19bac5));
-    const _0x2a175c = new Error('剧本权威正文已变化；已有付费提交未获得精确授权，未自动重新请求。');
-    ((_0x2a175c['type'] = 'ASSET_AUTHORITATIVE_SOURCE_CHANGED'),
-      (_0x2a175c['blockedKinds'] = _0xdd81b7),
-      (_0x2a175c['blockedBatchIds'] = _0x37626e),
-      (_0x2a175c['assetExtractionDraft'] = cloneValue(_0x19bac5)));
-    throw _0x2a175c;
+      (response10['updatedAt'] = Date['now']()),
+      await onCheckpoint?.(response10));
+    const error21 = new Error('剧本权威正文已变化；已有付费提交未获得精确授权，未自动重新请求。');
+    ((error21['type'] = 'ASSET_AUTHORITATIVE_SOURCE_CHANGED'),
+      (error21['blockedKinds'] = unauthorizedKinds),
+      (error21['blockedBatchIds'] = unauthorizedBatchKeys),
+      (error21['assetExtractionDraft'] = cloneValue(response10)));
+    throw error21;
   }
-  if (_0x24e84c && _0x48027b['length']) {
-    const _0x213dcb = Array['isArray'](resumeDraft?.['hybridPaidSourceHistory'])
+  if (value122 && paidKinds['length']) {
+    const args17 = Array['isArray'](resumeDraft?.['hybridPaidSourceHistory'])
         ? cloneValue(resumeDraft['hybridPaidSourceHistory'])
         : [],
-      _0x186916 = [
-        ..._0x213dcb,
-        createStoryAssetSourceChangePaidHistoryEntry(resumeDraft, _0x48027b, _0x4be53d, _0x3895a1),
+      value127 = [
+        ...args17,
+        createStoryAssetSourceChangePaidHistoryEntry(
+          resumeDraft,
+          paidKinds,
+          previousSourceFingerprint2,
+          nextSourceFingerprint2,
+        ),
       ],
-      _0x1f6c2e = onCheckpoint;
-    onCheckpoint = async (_0x1ad9ca) => {
-      await _0x1f6c2e?.({ ..._0x1ad9ca, hybridPaidSourceHistory: cloneValue(_0x186916) });
+      value128 = onCheckpoint;
+    onCheckpoint = async (args18) => {
+      await value128?.({ ...args18, hybridPaidSourceHistory: cloneValue(value127) });
     };
   }
-  if (_0x24e84c && _0x5e88aa['length']) {
-    const _0x5b3a2d = cloneValue(resumeDraft?.['paidBatchHistory'] || {});
-    _0x5e88aa['forEach']((_0x122830) => {
-      const _0x136763 = Array['isArray'](_0x5b3a2d[_0x122830]) ? _0x5b3a2d[_0x122830] : [];
-      (_0x136763['push']({
-        ...cloneValue(resumeDraft?.['batchSubmissionRecords']?.[_0x122830]),
+  if (value122 && paidBatchKeys['length']) {
+    const cloneValue5 = cloneValue(resumeDraft?.['paidBatchHistory'] || {});
+    paidBatchKeys['forEach']((value129) => {
+      const list57 = Array['isArray'](cloneValue5[value129]) ? cloneValue5[value129] : [];
+      (list57['push']({
+        ...cloneValue(resumeDraft?.['batchSubmissionRecords']?.[value129]),
         archivedAt: Date['now'](),
         archiveReason: 'authorized-authoritative-source-change-rerun',
-        previousSourceFingerprint: _0x4be53d,
-        nextSourceFingerprint: _0x3895a1,
+        previousSourceFingerprint: previousSourceFingerprint2,
+        nextSourceFingerprint: nextSourceFingerprint2,
       }),
-        (_0x5b3a2d[_0x122830] = _0x136763));
+        (cloneValue5[value129] = list57));
     });
-    const _0x73db7f = onCheckpoint;
-    onCheckpoint = async (_0x48403e) => {
-      const _0x19bc99 =
-          _0x48403e?.['paidBatchHistory'] && typeof _0x48403e['paidBatchHistory'] === 'object'
-            ? _0x48403e['paidBatchHistory']
+    const value130 = onCheckpoint;
+    onCheckpoint = async (args19) => {
+      const value131 =
+          args19?.['paidBatchHistory'] && typeof args19['paidBatchHistory'] === 'object'
+            ? args19['paidBatchHistory']
             : {},
-        _0xacf54d = cloneValue(_0x5b3a2d);
-      (Object['entries'](_0x19bc99)['forEach'](([_0x3187c6, _0x591e72]) => {
-        _0xacf54d[_0x3187c6] = [
-          ...(Array['isArray'](_0xacf54d[_0x3187c6]) ? _0xacf54d[_0x3187c6] : []),
-          ...(Array['isArray'](_0x591e72) ? cloneValue(_0x591e72) : []),
+        paidBatchHistory = cloneValue(cloneValue5);
+      (Object['entries'](value131)['forEach'](([value132, value133]) => {
+        paidBatchHistory[value132] = [
+          ...(Array['isArray'](paidBatchHistory[value132]) ? paidBatchHistory[value132] : []),
+          ...(Array['isArray'](value133) ? cloneValue(value133) : []),
         ];
       }),
-        await _0x73db7f?.({ ..._0x48403e, paidBatchHistory: _0xacf54d }));
+        await value130?.({ ...args19, paidBatchHistory: paidBatchHistory }));
     };
   }
-  let _0x21be0b = _0x24e84c ? null : resumeDraft;
-  _0x21be0b = await prepareStoryAssetQualityRecoveryDraft(_0x21be0b, _0x53af38, onCheckpoint);
-  _0x24e84c &&
+  let resumeDraft3 = value122 ? null : resumeDraft;
+  resumeDraft3 = await prepareStoryAssetQualityRecoveryDraft(resumeDraft3, value123, onCheckpoint);
+  value122 &&
     reportDiagnostics(diagnostics, 'story-asset-hybrid-resume', {
       status: 'invalidated',
       reason: 'authoritative-source-changed',
     });
-  const _0x156c2b = async ({
-      extractionMode: _0x402d5d,
+  const run = async ({
+      extractionMode: extractionMode,
       localRuntime: localRuntime = null,
       candidateInventory: candidateInventory = null,
-      capacityError: _0x426bb1,
+      capacityError: capacityError,
     }) => {
-      const _0x246399 =
-          _0x21be0b?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
-          Array['isArray'](_0x21be0b?.['hybridEvidenceScenes']) &&
-          _0x21be0b['hybridEvidenceScenes']['length']
-            ? cloneValue(_0x21be0b['hybridEvidenceScenes'])
-            : _0xf94a0f,
-        _0x135213 = Boolean(_0x21be0b?.['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY),
-        _0x3c609a = _0x135213 ? getStoryAssetPaidDraftKinds(_0x21be0b) : [],
-        _0x5ef4a3 = _0x3c609a['filter'](
-          (_0x3f33e1) => !isStoryAssetPaidLaneRerunAuthorized(_0x53af38, _0x3f33e1),
+      const sourceScenes2 =
+          resumeDraft3?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
+          Array['isArray'](resumeDraft3?.['hybridEvidenceScenes']) &&
+          resumeDraft3['hybridEvidenceScenes']['length']
+            ? cloneValue(resumeDraft3['hybridEvidenceScenes'])
+            : sourceScenes,
+        resumeDraft4 = Boolean(resumeDraft3?.['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY),
+        paidKinds2 = resumeDraft4 ? getStoryAssetPaidDraftKinds(resumeDraft3) : [],
+        unauthorizedKinds2 = paidKinds2['filter'](
+          (value134) => !isStoryAssetPaidLaneRerunAuthorized(value123, value134),
         );
-      if (_0x5ef4a3['length']) {
-        const _0x42ce79 = cloneValue(_0x21be0b);
-        ((_0x42ce79['status'] = 'blocked'),
-          (_0x42ce79['hybridCapacityReview'] = {
+      if (unauthorizedKinds2['length']) {
+        const response12 = cloneValue(resumeDraft3);
+        ((response12['status'] = 'blocked'),
+          (response12['hybridCapacityReview'] = {
             status: 'blocked',
             reason: 'parallel-contract-over-capacity',
-            paidKinds: _0x3c609a,
-            unauthorizedKinds: _0x5ef4a3,
-            capacityDetails: cloneValue(_0x426bb1?.['capacityDetails']),
+            paidKinds: paidKinds2,
+            unauthorizedKinds: unauthorizedKinds2,
+            capacityDetails: cloneValue(capacityError?.['capacityDetails']),
           }),
-          (_0x42ce79['kindStates'] =
-            _0x42ce79['kindStates'] && typeof _0x42ce79['kindStates'] === 'object'
-              ? _0x42ce79['kindStates']
+          (response12['kindStates'] =
+            response12['kindStates'] && typeof response12['kindStates'] === 'object'
+              ? response12['kindStates']
               : {}),
-          _0x5ef4a3['forEach']((_0x45d9f5) => {
-            _0x42ce79['kindStates'][_0x45d9f5] = {
-              ...(_0x42ce79['kindStates']?.[_0x45d9f5] || {}),
-              kind: _0x45d9f5,
+          unauthorizedKinds2['forEach']((kind7) => {
+            response12['kindStates'][kind7] = {
+              ...(response12['kindStates']?.[kind7] || {}),
+              kind: kind7,
               status: 'blocked-incompatible',
               errorType: 'capacity-strategy-incompatible',
               errorMessage:
                 '当前完整输出合同需要切换到证据分批链；需要用户明确授权后才能重新提交该付费通道。',
             };
           }),
-          (_0x42ce79['updatedAt'] = Date['now']()),
-          await onCheckpoint?.(_0x42ce79));
-        const _0x5ab490 = new Error(
-          '完整输出合同超过单路安全容量；' + _0x5ef4a3['join']('、') + '已有付费结果，未自动切换并重新请求。',
+          (response12['updatedAt'] = Date['now']()),
+          await onCheckpoint?.(response12));
+        const error22 = new Error(
+          '完整输出合同超过单路安全容量；' +
+            unauthorizedKinds2['join']('、') +
+            '已有付费结果，未自动切换并重新请求。',
         );
-        ((_0x5ab490['type'] = 'ASSET_CONTRACT_INCOMPATIBLE'),
-          (_0x5ab490['blockedKinds'] = _0x5ef4a3),
-          (_0x5ab490['assetExtractionDraft'] = cloneValue(_0x42ce79)));
-        throw _0x5ab490;
+        ((error22['type'] = 'ASSET_CONTRACT_INCOMPATIBLE'),
+          (error22['blockedKinds'] = unauthorizedKinds2),
+          (error22['assetExtractionDraft'] = cloneValue(response12)));
+        throw error22;
       }
       reportDiagnostics(diagnostics, 'story-asset-hybrid-capacity-route', {
         status: 'started',
-        extractionMode: _0x402d5d,
-        ...(_0x426bb1?.['capacityDetails'] || {}),
+        extractionMode: extractionMode,
+        ...(capacityError?.['capacityDetails'] || {}),
         requestLimit: 0x3,
       });
-      const _0x3e51d9 =
-        _0x135213 && _0x3c609a['length']
+      const value135 =
+        resumeDraft4 && paidKinds2['length']
           ? [
-              ...(Array['isArray'](_0x21be0b?.['hybridPaidStrategyHistory'])
-                ? cloneValue(_0x21be0b['hybridPaidStrategyHistory'])
+              ...(Array['isArray'](resumeDraft3?.['hybridPaidStrategyHistory'])
+                ? cloneValue(resumeDraft3['hybridPaidStrategyHistory'])
                 : []),
               {
                 ...createStoryAssetSourceChangePaidHistoryEntry(
-                  _0x21be0b,
-                  _0x3c609a,
-                  _0x21be0b?.['hybridAuthoritativeSourceFingerprint'] || '',
-                  _0x3895a1,
+                  resumeDraft3,
+                  paidKinds2,
+                  resumeDraft3?.['hybridAuthoritativeSourceFingerprint'] || '',
+                  nextSourceFingerprint2,
                 ),
                 reason: 'authorized-capacity-strategy-rerun',
-                capacityDetails: cloneValue(_0x426bb1?.['capacityDetails']),
+                capacityDetails: cloneValue(capacityError?.['capacityDetails']),
               },
             ]
           : null;
-      let _0x5a7228 = null;
-      const _0x4adc72 = async (_0x2d8708) => {
-        const _0x1759ab = {
-          ..._0x2d8708,
+      let hybridQualityPolicyVersion = null;
+      const onCheckpoint2 = async (args20) => {
+        const value136 = {
+          ...args20,
           hybridQualityPolicyVersion: STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION,
-          hybridExtractionMode: _0x402d5d,
+          hybridExtractionMode: extractionMode,
           hybridCapacityFallback: {
             strategy: 'evidence-batched-api',
             requestLimit: 0x3,
-            capacityDetails: cloneValue(_0x426bb1?.['capacityDetails']),
+            capacityDetails: cloneValue(capacityError?.['capacityDetails']),
           },
-          hybridEvidenceScenes: cloneValue(_0x246399),
-          hybridLocalRuntime: localRuntime || _0x2d8708?.['hybridLocalRuntime'] || null,
+          hybridEvidenceScenes: cloneValue(sourceScenes2),
+          hybridLocalRuntime: localRuntime || args20?.['hybridLocalRuntime'] || null,
           ...(candidateInventory ? { hybridCandidateInventory: cloneValue(candidateInventory) } : {}),
-          ...(_0x3e51d9 ? { hybridPaidStrategyHistory: cloneValue(_0x3e51d9) } : {}),
-          hybridAuthoritativeSourceFingerprint: _0x3895a1,
+          ...(value135 ? { hybridPaidStrategyHistory: cloneValue(value135) } : {}),
+          hybridAuthoritativeSourceFingerprint: nextSourceFingerprint2,
         };
-        ((_0x5a7228 = cloneValue(_0x1759ab)), await onCheckpoint?.(_0x1759ab));
+        ((hybridQualityPolicyVersion = cloneValue(value136)), await onCheckpoint?.(value136));
       };
-      let _0xbfeddd = null;
+      let extractStoryAssetsEvidenceBatched2 = null;
       try {
-        _0xbfeddd = await extractStoryAssetsEvidenceBatched({
-          ..._0x411d9b,
+        extractStoryAssetsEvidenceBatched2 = await extractStoryAssetsEvidenceBatched({
+          ...args16,
           project: project,
           episodes: episodes,
-          sourceScenes: _0x246399,
-          authoritativeSourceScenes: createHardAuthoritativeSourceScenes(_0xf94a0f, _0x772aa1),
+          sourceScenes: sourceScenes2,
+          authoritativeSourceScenes: createHardAuthoritativeSourceScenes(sourceScenes, requirementEvidence),
           diagnostics: diagnostics,
           onProgress: onProgress,
-          resumeDraft: _0x135213 ? null : _0x21be0b,
+          resumeDraft: resumeDraft4 ? null : resumeDraft3,
           allowLocalBaselineFallback: ![],
           requestLimit: 0x3,
-          onCheckpoint: _0x4adc72,
+          onCheckpoint: onCheckpoint2,
         });
-      } catch (_0x3882ab) {
-        _0x5a7228 &&
+      } catch (value137) {
+        hybridQualityPolicyVersion &&
           [
             'ASSET_EXTRACTION_CONTINUE_REQUIRED',
             'ASSET_SUBMISSION_AMBIGUOUS',
             'ASSET_PAID_RESULT_BLOCKED',
             'ASSET_CONTRACT_INCOMPATIBLE',
-          ]['includes'](_0x3882ab?.['type']) &&
-          (_0x3882ab['assetExtractionDraft'] = {
-            ...cloneValue(_0x5a7228),
-            ...cloneValue(_0x3882ab['assetExtractionDraft'] || {}),
-            hybridQualityPolicyVersion: _0x5a7228['hybridQualityPolicyVersion'],
-            hybridExtractionMode: _0x5a7228['hybridExtractionMode'],
-            hybridCapacityFallback: cloneValue(_0x5a7228['hybridCapacityFallback']),
-            hybridEvidenceScenes: cloneValue(_0x5a7228['hybridEvidenceScenes']),
-            hybridLocalRuntime: cloneValue(_0x5a7228['hybridLocalRuntime']),
-            hybridCandidateInventory: cloneValue(_0x5a7228['hybridCandidateInventory']),
-            hybridAuthoritativeSourceFingerprint: _0x5a7228['hybridAuthoritativeSourceFingerprint'],
+          ]['includes'](value137?.['type']) &&
+          (value137['assetExtractionDraft'] = {
+            ...cloneValue(hybridQualityPolicyVersion),
+            ...cloneValue(value137['assetExtractionDraft'] || {}),
+            hybridQualityPolicyVersion: hybridQualityPolicyVersion['hybridQualityPolicyVersion'],
+            hybridExtractionMode: hybridQualityPolicyVersion['hybridExtractionMode'],
+            hybridCapacityFallback: cloneValue(hybridQualityPolicyVersion['hybridCapacityFallback']),
+            hybridEvidenceScenes: cloneValue(hybridQualityPolicyVersion['hybridEvidenceScenes']),
+            hybridLocalRuntime: cloneValue(hybridQualityPolicyVersion['hybridLocalRuntime']),
+            hybridCandidateInventory: cloneValue(hybridQualityPolicyVersion['hybridCandidateInventory']),
+            hybridAuthoritativeSourceFingerprint:
+              hybridQualityPolicyVersion['hybridAuthoritativeSourceFingerprint'],
           });
-        throw _0x3882ab;
+        throw value137;
       }
-      const _0x3d7117 = removeNarrativeUploadFallbackCharacterAssets(
-        _0xbfeddd,
-        _0x772aa1,
-        _0xf94a0f,
-        _0xf94a0f,
+      const extractionStrategy = removeNarrativeUploadFallbackCharacterAssets(
+        extractStoryAssetsEvidenceBatched2,
+        requirementEvidence,
+        sourceScenes,
+        sourceScenes,
       );
       try {
-        assertStoryAssetPublicResultQuality(_0x3d7117, _0xf94a0f, _0x3ad0fe);
-      } catch (_0x3f1211) {
-        await checkpointStoryAssetQualityFailure(_0x3f1211, _0x5a7228, _0x4adc72);
-        throw _0x3f1211;
+        assertStoryAssetPublicResultQuality(extractionStrategy, sourceScenes, requiredAssetNamesByKind3);
+      } catch (value138) {
+        await checkpointStoryAssetQualityFailure(value138, hybridQualityPolicyVersion, onCheckpoint2);
+        throw value138;
       }
       return {
-        ..._0x3d7117,
-        extractionStrategy: _0x3d7117['extractionStrategy'],
-        extractionMode: _0x402d5d,
+        ...extractionStrategy,
+        extractionStrategy: extractionStrategy['extractionStrategy'],
+        extractionMode: extractionMode,
         localRuntime: localRuntime,
       };
     },
-    _0x41c225 = hasCompleteStructuredStorySceneEvidence(_0xf94a0f, _0x772aa1);
-  if (shouldUseDirectStoryAssetApi(project, _0xf94a0f)) {
-    const _0x11f69d = getStoryProjectChapterCharacters(project),
-      _0x4ea5f0 = getReusableStoryAssetCandidateInventory(
-        _0x21be0b,
-        _0x3895a1,
-        _0x6eed6b ? [_0x21be0b?.['hybridAuthoritativeSourceFingerprint']] : [],
+    hasCompleteStructuredStorySceneEvidence2 = hasCompleteStructuredStorySceneEvidence(
+      sourceScenes,
+      requirementEvidence,
+    );
+  if (shouldUseDirectStoryAssetApi(project, sourceScenes)) {
+    const chapterCharacters = getStoryProjectChapterCharacters(project),
+      reusableStoryAssetCandidateInventory = getReusableStoryAssetCandidateInventory(
+        resumeDraft3,
+        nextSourceFingerprint2,
+        enabled11 ? [resumeDraft3?.['hybridAuthoritativeSourceFingerprint']] : [],
       ),
-      _0x2f43c7 = Boolean(_0x21be0b && !_0x4ea5f0);
-    let _0x38707f = _0x4ea5f0;
-    if (!_0x38707f && _0x2f43c7)
-      _0x38707f = createStoryAssetCandidateInventory({ status: 'disabled', sourceFingerprint: _0x3895a1 });
+      value139 = Boolean(resumeDraft3 && !reusableStoryAssetCandidateInventory);
+    let localRuntime2 = reusableStoryAssetCandidateInventory;
+    if (!localRuntime2 && value139)
+      localRuntime2 = createStoryAssetCandidateInventory({
+        status: 'disabled',
+        sourceFingerprint: nextSourceFingerprint2,
+      });
     else {
-      if (!_0x38707f && !preferLocal)
-        _0x38707f = createStoryAssetCandidateInventory({ status: 'disabled', sourceFingerprint: _0x3895a1 });
+      if (!localRuntime2 && !preferLocal)
+        localRuntime2 = createStoryAssetCandidateInventory({
+          status: 'disabled',
+          sourceFingerprint: nextSourceFingerprint2,
+        });
       else {
-        if (!_0x38707f)
+        if (!localRuntime2)
           try {
-            const _0x240cc5 = await extractStoryAssetMentionsLocal({
-                sourceScenes: _0xf94a0f,
+            const model = await extractStoryAssetMentionsLocal({
+                sourceScenes: sourceScenes,
                 ...(typeof localExtract === 'function' ? { localExtract: localExtract } : {}),
                 onProgress: onProgress,
               }),
-              _0x3a8c56 = _0x240cc5['mentions']['length']
-                ? createStoryAssetLocalEvidenceScenes(_0xf94a0f, _0x240cc5['mentions'])
+              evidenceCharacters = model['mentions']['length']
+                ? createStoryAssetLocalEvidenceScenes(sourceScenes, model['mentions'])
                 : [],
-              _0x457390 = {
-                model: _0x240cc5['model'],
-                device: _0x240cc5['device'],
-                precision: _0x240cc5['precision'],
-                mentionCount: _0x240cc5['mentions']['length'],
-                originalCharacters: _0xf94a0f['reduce'](
-                  (_0x52c703, _0x45eb2a) => _0x52c703 + _0x45eb2a['body']['length'],
+              localRuntime3 = {
+                model: model['model'],
+                device: model['device'],
+                precision: model['precision'],
+                mentionCount: model['mentions']['length'],
+                originalCharacters: sourceScenes['reduce'](
+                  (value140, dom4) => value140 + dom4['body']['length'],
                   0x0,
                 ),
-                evidenceCharacters: _0x3a8c56['reduce'](
-                  (_0x439087, _0x10c071) => _0x439087 + _0x10c071['body']['length'],
+                evidenceCharacters: evidenceCharacters['reduce'](
+                  (value141, dom5) => value141 + dom5['body']['length'],
                   0x0,
                 ),
               };
-            ((_0x38707f = createStoryAssetCandidateInventory({
+            ((localRuntime2 = createStoryAssetCandidateInventory({
               status: 'ready',
-              evidenceScenes: _0x3a8c56,
-              localRuntime: _0x457390,
-              sourceFingerprint: _0x3895a1,
+              evidenceScenes: evidenceCharacters,
+              localRuntime: localRuntime3,
+              sourceFingerprint: nextSourceFingerprint2,
             })),
               reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
                 status: 'succeeded',
-                ..._0x457390,
+                ...localRuntime3,
                 purpose: 'optional-candidate-inventory',
               }));
-          } catch (_0x4a71bb) {
-            ((_0x38707f = createStoryAssetCandidateInventory({
+          } catch (error23) {
+            ((localRuntime2 = createStoryAssetCandidateInventory({
               status: 'unavailable',
-              sourceFingerprint: _0x3895a1,
+              sourceFingerprint: nextSourceFingerprint2,
             })),
               reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
                 status: 'fallback',
                 purpose: 'optional-candidate-inventory',
-                errorMessage: String(_0x4a71bb?.['message'] || _0x4a71bb || ''),
+                errorMessage: String(error23?.['message'] || error23 || ''),
               }));
           }
       }
     }
-    const _0x223c09 = createBudgetedStoryAssetEvidenceProject(project, _0xf94a0f, {
-        requirementEvidence: _0x772aa1,
+    const project2 = createBudgetedStoryAssetEvidenceProject(project, sourceScenes, {
+        requirementEvidence: requirementEvidence,
         includeAllSceneHeadings: !![],
         includeAllSceneCharacters: !![],
         bodyCharacterBudget: STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS,
       }),
-      _0x4aea88 =
-        _0x38707f['status'] === 'ready' && _0x38707f['evidenceScenes']['length']
-          ? createStoryAssetOptionalCandidatesByKind(_0x38707f['evidenceScenes'], _0xf94a0f, {
+      value142 =
+        localRuntime2['status'] === 'ready' && localRuntime2['evidenceScenes']['length']
+          ? createStoryAssetOptionalCandidatesByKind(localRuntime2['evidenceScenes'], sourceScenes, {
               maxItemsPerKind: STORY_ASSET_CANDIDATE_MAX_ITEMS_PER_KIND,
               maxCharactersPerKind: STORY_ASSET_CANDIDATE_MAX_CHARACTERS_PER_KIND,
-              hardRequiredAssetNamesByKind: _0x3ad0fe,
+              hardRequiredAssetNamesByKind: requiredAssetNamesByKind3,
             })
           : createEmptyStoryAssetCandidatesByKind(),
-      _0xf89390 = mergeStoryAssetActionPropCandidates(_0x4aea88, _0xf94a0f);
-    let _0x5623f6 = null;
+      candidateAssetsByKind3 = mergeStoryAssetActionPropCandidates(value142, sourceScenes);
+    let responseModeByKind3 = null;
     try {
-      _0x5623f6 = resolveStoryAssetFocusedOutputMode({
-        requiredAssetNamesByKind: _0x3ad0fe,
-        candidateAssetsByKind: _0xf89390,
+      responseModeByKind3 = resolveStoryAssetFocusedOutputMode({
+        requiredAssetNamesByKind: requiredAssetNamesByKind3,
+        candidateAssetsByKind: candidateAssetsByKind3,
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
       });
-    } catch (_0x480961) {
-      if (_0x480961?.['type'] !== 'ASSET_OUTPUT_CAPACITY') throw _0x480961;
-      return _0x156c2b({
+    } catch (capacityError2) {
+      if (capacityError2?.['type'] !== 'ASSET_OUTPUT_CAPACITY') throw capacityError2;
+      return run({
         extractionMode: 'parallel-api-capacity-batched',
-        localRuntime: _0x38707f['localRuntime'] || null,
-        candidateInventory: _0x38707f,
-        capacityError: _0x480961,
+        localRuntime: localRuntime2['localRuntime'] || null,
+        candidateInventory: localRuntime2,
+        capacityError: capacityError2,
       });
     }
-    const _0x1aea23 = _0x5623f6['candidateAssetsByKind'];
+    const candidateAssetsByKind4 = responseModeByKind3['candidateAssetsByKind'];
     (reportDiagnostics(diagnostics, 'story-asset-hybrid-parallel-api', {
       status: 'started',
-      chapterCharacters: _0x11f69d,
-      sourceSceneCount: _0xf94a0f['length'],
+      chapterCharacters: chapterCharacters,
+      sourceSceneCount: sourceScenes['length'],
     }),
       onProgress?.({
         stage: 'parallel-api-asset-extraction',
         current: 0x0,
         total: 0x3,
-        message: '完整剧本共 ' + _0x11f69d + ' 字，正在分别提取角色、场景与道具；三类各调用一次且不自动重试',
+        message:
+          '完整剧本共 ' + chapterCharacters + ' 字，正在分别提取角色、场景与道具；三类各调用一次且不自动重试',
       }));
-    const _0x4472a3 = _0x21be0b,
-      _0x534587 = createStoryAssetQualityResumeRequirementAliases(_0x21be0b, _0x3ad0fe, _0xf94a0f),
-      _0x5bd31f =
-        _0x21be0b && Number(_0x21be0b?.['hybridQualityPolicyVersion'] || 0x0) < 0x5
-          ? [{ project: project, requiredAssetNamesByKind: _0x3ad0fe }]
+    const resumeDraft5 = resumeDraft3,
+      resumeRequiredAssetNamesByKindAliases = createStoryAssetQualityResumeRequirementAliases(
+        resumeDraft3,
+        requiredAssetNamesByKind3,
+        sourceScenes,
+      ),
+      resumeSourceAliases =
+        resumeDraft3 && Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0x0) < 0x5
+          ? [{ project: project, requiredAssetNamesByKind: requiredAssetNamesByKind3 }]
           : [],
-      _0x51bd07 = isStoryAssetSceneHeadingContractMigration({
-        resumeDraft: _0x4472a3,
-        requiredAssetNamesByKind: _0x3ad0fe,
-        requiredAssetsByKind: _0x3d8029,
-        candidateAssetsByKind: _0x1aea23,
-        responseModeByKind: _0x5623f6['modeByKind'],
+      isStoryAssetSceneHeadingContractMigration2 = isStoryAssetSceneHeadingContractMigration({
+        resumeDraft: resumeDraft5,
+        requiredAssetNamesByKind: requiredAssetNamesByKind3,
+        requiredAssetsByKind: requiredAssetsByKind3,
+        candidateAssetsByKind: candidateAssetsByKind4,
+        responseModeByKind: responseModeByKind3['modeByKind'],
       }),
-      _0x43d641 = _0x51bd07;
-    _0x51bd07 &&
-      (_0x5bd31f['push']({
-        project: _0x223c09,
-        requiredAssetNamesByKind: getSavedStoryAssetRequiredNamesByKind(_0x4472a3),
+      allowSavedPaidResultContractRevalidation = isStoryAssetSceneHeadingContractMigration2;
+    isStoryAssetSceneHeadingContractMigration2 &&
+      (resumeSourceAliases['push']({
+        project: project2,
+        requiredAssetNamesByKind: getSavedStoryAssetRequiredNamesByKind(resumeDraft5),
       }),
       reportDiagnostics(diagnostics, 'story-asset-hybrid-resume', {
         status: 'compatibility-migration',
         reason: 'scene-heading-label-normalization',
       }));
-    let _0x1b3f9e = null;
-    const _0x5ad707 = await extractStoryAssetsParallel({
-        ..._0x411d9b,
-        project: _0x223c09,
-        requiredAssetNamesByKind: _0x3ad0fe,
-        requiredAssetsByKind: _0x3d8029,
-        candidateAssetsByKind: _0x1aea23,
-        compactOutputByKind: _0x5623f6['modeByKind'],
-        resumeRequiredAssetNamesByKindAliases: _0x534587,
-        resumeSourceAliases: _0x5bd31f,
+    let cloneValue6 = null;
+    const extractStoryAssetsParallel2 = await extractStoryAssetsParallel({
+        ...args16,
+        project: project2,
+        requiredAssetNamesByKind: requiredAssetNamesByKind3,
+        requiredAssetsByKind: requiredAssetsByKind3,
+        candidateAssetsByKind: candidateAssetsByKind4,
+        compactOutputByKind: responseModeByKind3['modeByKind'],
+        resumeRequiredAssetNamesByKindAliases: resumeRequiredAssetNamesByKindAliases,
+        resumeSourceAliases: resumeSourceAliases,
         resumeSourceFingerprintAliases: [],
-        allowSavedPaidResultContractRevalidation: _0x43d641,
+        allowSavedPaidResultContractRevalidation: allowSavedPaidResultContractRevalidation,
         allowOversizedPrompt: !![],
         automaticRecovery: ![],
         structuredOutputFallback: 'none',
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
-        onCheckpoint: async (_0x556913) => {
-          const _0x11bdd8 = {
-            ..._0x556913,
+        onCheckpoint: async (args21) => {
+          const value143 = {
+            ...args21,
             hybridQualityPolicyVersion: STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION,
             hybridExtractionMode: 'parallel-api',
-            hybridEvidenceScenes: cloneValue(_0xf94a0f),
-            hybridCandidateInventory: cloneValue(_0x38707f),
-            hybridAuthoritativeSourceFingerprint: _0x3895a1,
+            hybridEvidenceScenes: cloneValue(sourceScenes),
+            hybridCandidateInventory: cloneValue(localRuntime2),
+            hybridAuthoritativeSourceFingerprint: nextSourceFingerprint2,
           };
-          ((_0x1b3f9e = cloneValue(_0x11bdd8)), await onCheckpoint?.(_0x11bdd8));
+          ((cloneValue6 = cloneValue(value143)), await onCheckpoint?.(value143));
         },
-        resumeDraft: _0x4472a3,
-        resumeCompatibilityPolicyVersion: Number(_0x21be0b?.['hybridQualityPolicyVersion'] || 0x0),
+        resumeDraft: resumeDraft5,
+        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0x0),
         onProgress: onProgress,
       }),
-      _0xecce38 = removeNarrativeUploadFallbackCharacterAssets(
+      assetCount3 = removeNarrativeUploadFallbackCharacterAssets(
         consolidateDirectStorySceneAssets(
-          lockStoryAssetRequiredSourceChapterIds(_0x5ad707, _0x3d8029, _0x1aea23),
-          _0x3ad0fe['scene'],
+          lockStoryAssetRequiredSourceChapterIds(
+            extractStoryAssetsParallel2,
+            requiredAssetsByKind3,
+            candidateAssetsByKind4,
+          ),
+          requiredAssetNamesByKind3['scene'],
         ),
-        _0x772aa1,
-        _0xf94a0f,
-        _0xf94a0f,
+        requirementEvidence,
+        sourceScenes,
+        sourceScenes,
       );
     try {
-      assertStoryAssetPublicResultQuality(_0xecce38, _0xf94a0f, _0x3ad0fe);
-    } catch (_0x4c0a43) {
-      await checkpointStoryAssetQualityFailure(_0x4c0a43, _0x1b3f9e, onCheckpoint);
-      throw _0x4c0a43;
+      assertStoryAssetPublicResultQuality(assetCount3, sourceScenes, requiredAssetNamesByKind3);
+    } catch (value144) {
+      await checkpointStoryAssetQualityFailure(value144, cloneValue6, onCheckpoint);
+      throw value144;
     }
     return (
       reportDiagnostics(diagnostics, 'story-asset-hybrid-parallel-api', {
         status: 'succeeded',
-        chapterCharacters: _0x11f69d,
-        assetCount: _0xecce38['assets']['length'],
+        chapterCharacters: chapterCharacters,
+        assetCount: assetCount3['assets']['length'],
       }),
-      { ..._0xecce38, extractionMode: 'parallel-api', localRuntime: _0x38707f['localRuntime'] || null }
+      { ...assetCount3, extractionMode: 'parallel-api', localRuntime: localRuntime2['localRuntime'] || null }
     );
   }
-  let _0x101330 = 'api-fallback',
-    _0xc472cf = null,
-    _0x23bf9b = ![];
-  const _0x3d5f1a =
-      _0x21be0b?.['qualityReview']?.['status'] === 'blocked'
-        ? String(_0x21be0b?.['hybridExtractionMode'] || '')['trim']()
+  let extractionMode2 = 'api-fallback',
+    localRuntime4 = null,
+    value145 = ![];
+  const value146 =
+      resumeDraft3?.['qualityReview']?.['status'] === 'blocked'
+        ? String(resumeDraft3?.['hybridExtractionMode'] || '')['trim']()
         : '',
-    _0x41106b = Boolean(
-      Array['isArray'](_0x21be0b?.['hybridEvidenceScenes']) &&
-      (_0x21be0b?.['hybridExtractionMode'] === 'local-pp-uie' ||
-        _0x21be0b?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY),
+    value147 = Boolean(
+      Array['isArray'](resumeDraft3?.['hybridEvidenceScenes']) &&
+      (resumeDraft3?.['hybridExtractionMode'] === 'local-pp-uie' ||
+        resumeDraft3?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY),
     );
-  let _0x28fa3e = _0x41106b ? cloneValue(_0x21be0b['hybridEvidenceScenes']) : null;
-  if (_0x3d5f1a === 'api-fallback')
-    ((_0x23bf9b =
-      _0x21be0b?.['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY &&
-      Array['isArray'](_0x21be0b?.['hybridEvidenceScenes'])),
-      (_0x28fa3e = _0x23bf9b ? cloneValue(_0x21be0b['hybridEvidenceScenes']) : _0xf94a0f));
+  let evidenceCharacters2 = value147 ? cloneValue(resumeDraft3['hybridEvidenceScenes']) : null;
+  if (value146 === 'api-fallback')
+    ((value145 =
+      resumeDraft3?.['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY &&
+      Array['isArray'](resumeDraft3?.['hybridEvidenceScenes'])),
+      (evidenceCharacters2 = value145 ? cloneValue(resumeDraft3['hybridEvidenceScenes']) : sourceScenes));
   else {
-    if (preferLocal && !_0x28fa3e)
+    if (preferLocal && !evidenceCharacters2)
       try {
-        const _0x1eb96a = await extractStoryAssetMentionsLocal({
-          sourceScenes: _0xf94a0f,
+        const model2 = await extractStoryAssetMentionsLocal({
+          sourceScenes: sourceScenes,
           ...(typeof localExtract === 'function' ? { localExtract: localExtract } : {}),
           onProgress: onProgress,
         });
-        if (!_0x1eb96a['mentions']['length'] && !_0x41c225) throw createMissingLocalStoryAssetEvidenceError();
-        ((_0x28fa3e = createStoryAssetLocalEvidenceScenes(_0xf94a0f, _0x1eb96a['mentions'])),
-          (_0x101330 = 'local-pp-uie'),
-          (_0xc472cf = {
-            model: _0x1eb96a['model'],
-            device: _0x1eb96a['device'],
-            precision: _0x1eb96a['precision'],
-            mentionCount: _0x1eb96a['mentions']['length'],
-            originalCharacters: _0xf94a0f['reduce'](
-              (_0x1f4c6e, _0x7371ad) => _0x1f4c6e + _0x7371ad['body']['length'],
+        if (!model2['mentions']['length'] && !hasCompleteStructuredStorySceneEvidence2)
+          throw createMissingLocalStoryAssetEvidenceError();
+        ((evidenceCharacters2 = createStoryAssetLocalEvidenceScenes(sourceScenes, model2['mentions'])),
+          (extractionMode2 = 'local-pp-uie'),
+          (localRuntime4 = {
+            model: model2['model'],
+            device: model2['device'],
+            precision: model2['precision'],
+            mentionCount: model2['mentions']['length'],
+            originalCharacters: sourceScenes['reduce'](
+              (value148, dom6) => value148 + dom6['body']['length'],
               0x0,
             ),
-            evidenceCharacters: _0x28fa3e['reduce'](
-              (_0x50d070, _0x206177) => _0x50d070 + _0x206177['body']['length'],
+            evidenceCharacters: evidenceCharacters2['reduce'](
+              (value149, dom7) => value149 + dom7['body']['length'],
               0x0,
             ),
           }),
-          reportDiagnostics(diagnostics, 'story-asset-hybrid-local', { status: 'succeeded', ..._0xc472cf }),
+          reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
+            status: 'succeeded',
+            ...localRuntime4,
+          }),
           onProgress?.({
             stage: 'local-evidence-ready',
             current: 0x1,
             total: 0x1,
             message:
               'PP-UIE 已把正文压缩为 ' +
-              _0xc472cf['evidenceCharacters'] +
+              localRuntime4['evidenceCharacters'] +
               ' 字证据，正在按资产建立档案并调用 API 核验事实、补全视觉',
           }));
-      } catch (_0x382429) {
-        if (!_0x41c225) {
+      } catch (error24) {
+        if (!hasCompleteStructuredStorySceneEvidence2) {
           reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
             status: 'stopped',
-            errorMessage: String(_0x382429?.['message'] || _0x382429 || ''),
+            errorMessage: String(error24?.['message'] || error24 || ''),
             apiRequestCount: 0x0,
           });
-          throw createMissingLocalStoryAssetEvidenceError(_0x382429);
+          throw createMissingLocalStoryAssetEvidenceError(error24);
         }
-        ((_0x101330 = 'api-fallback'),
-          (_0x28fa3e = createStoryAssetLocalEvidenceScenes(_0xf94a0f, [])),
-          (_0x23bf9b = !![]),
+        ((extractionMode2 = 'api-fallback'),
+          (evidenceCharacters2 = createStoryAssetLocalEvidenceScenes(sourceScenes, [])),
+          (value145 = !![]),
           reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
             status: 'fallback',
-            errorMessage: String(_0x382429?.['message'] || _0x382429 || ''),
+            errorMessage: String(error24?.['message'] || error24 || ''),
           }),
           onProgress?.({
             stage: 'local-evidence-fallback',
@@ -1714,77 +1714,81 @@ export async function extractStoryAssetsHybridExperimental({
           }));
       }
     else
-      _0x28fa3e
-        ? ((_0x101330 = 'local-pp-uie'),
-          (_0xc472cf = _0x21be0b?.['hybridLocalRuntime']
-            ? cloneValue(_0x21be0b['hybridLocalRuntime'])
+      evidenceCharacters2
+        ? ((extractionMode2 = 'local-pp-uie'),
+          (localRuntime4 = resumeDraft3?.['hybridLocalRuntime']
+            ? cloneValue(resumeDraft3['hybridLocalRuntime'])
             : null))
-        : ((_0x28fa3e = createStoryAssetLocalEvidenceScenes(_0xf94a0f, [])), (_0x23bf9b = !![]));
+        : ((evidenceCharacters2 = createStoryAssetLocalEvidenceScenes(sourceScenes, [])), (value145 = !![]));
   }
-  if (_0x101330 === 'local-pp-uie' || _0x23bf9b) {
-    const _0x164293 = _0x21be0b,
-      _0x32ee1f = createStoryAssetQualityResumeRequirementAliases(_0x21be0b, _0x3ad0fe, _0xf94a0f),
-      _0x2c7cc3 = createBudgetedStoryAssetEvidenceProject(project, _0x28fa3e, {
-        requirementEvidence: _0x772aa1,
+  if (extractionMode2 === 'local-pp-uie' || value145) {
+    const resumeDraft6 = resumeDraft3,
+      resumeRequiredAssetNamesByKindAliases2 = createStoryAssetQualityResumeRequirementAliases(
+        resumeDraft3,
+        requiredAssetNamesByKind3,
+        sourceScenes,
+      ),
+      project3 = createBudgetedStoryAssetEvidenceProject(project, evidenceCharacters2, {
+        requirementEvidence: requirementEvidence,
       }),
-      _0x136edf = Number(_0x21be0b?.['hybridQualityPolicyVersion']) || 0x0,
-      _0x2ed0d7 = _0x32ee1f['map']((_0x5c7101) => ({
+      includeAllSceneHeadings = Number(resumeDraft3?.['hybridQualityPolicyVersion']) || 0x0,
+      resumeSourceAliases2 = resumeRequiredAssetNamesByKindAliases2['map']((requiredAssetNamesByKind4) => ({
         project: createBudgetedStoryAssetEvidenceProject(
           project,
-          _0x28fa3e,
-          _0x136edf >= 0x3
-            ? { requirementEvidence: _0x772aa1, includeAllSceneCharacters: !![] }
+          evidenceCharacters2,
+          includeAllSceneHeadings >= 0x3
+            ? { requirementEvidence: requirementEvidence, includeAllSceneCharacters: !![] }
             : { includeAllSceneHeadings: !![], includeAllSceneCharacters: !![] },
         ),
-        requiredAssetNamesByKind: _0x5c7101,
+        requiredAssetNamesByKind: requiredAssetNamesByKind4,
       }));
-    _0x21be0b &&
-      _0x136edf < 0x5 &&
-      _0x2ed0d7['push']({
-        project: createBudgetedStoryAssetEvidenceProject(project, _0x28fa3e, {
-          requirementEvidence: _0x772aa1,
-          includeAllSceneHeadings: _0x136edf < 0x3,
+    resumeDraft3 &&
+      includeAllSceneHeadings < 0x5 &&
+      resumeSourceAliases2['push']({
+        project: createBudgetedStoryAssetEvidenceProject(project, evidenceCharacters2, {
+          requirementEvidence: requirementEvidence,
+          includeAllSceneHeadings: includeAllSceneHeadings < 0x3,
           includeAllSceneCharacters: !![],
           bodyCharacterBudget: Number['MAX_SAFE_INTEGER'],
         }),
-        requiredAssetNamesByKind: _0x3ad0fe,
+        requiredAssetNamesByKind: requiredAssetNamesByKind3,
       });
-    const _0x525b9f = mergeStoryAssetActionPropCandidates(
-      createStoryAssetOptionalCandidatesByKind(_0x28fa3e, _0xf94a0f, {
+    const candidateAssetsByKind5 = mergeStoryAssetActionPropCandidates(
+      createStoryAssetOptionalCandidatesByKind(evidenceCharacters2, sourceScenes, {
         maxItemsPerKind: STORY_ASSET_CANDIDATE_MAX_ITEMS_PER_KIND,
         maxCharactersPerKind: STORY_ASSET_CANDIDATE_MAX_CHARACTERS_PER_KIND,
-        hardRequiredAssetNamesByKind: _0x3ad0fe,
+        hardRequiredAssetNamesByKind: requiredAssetNamesByKind3,
       }),
-      _0xf94a0f,
+      sourceScenes,
     );
-    let _0xff7118 = null;
+    let responseModeByKind4 = null;
     try {
-      _0xff7118 = resolveStoryAssetFocusedOutputMode({
-        requiredAssetNamesByKind: _0x3ad0fe,
-        candidateAssetsByKind: _0x525b9f,
+      responseModeByKind4 = resolveStoryAssetFocusedOutputMode({
+        requiredAssetNamesByKind: requiredAssetNamesByKind3,
+        candidateAssetsByKind: candidateAssetsByKind5,
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
       });
-    } catch (_0x39e542) {
-      if (_0x39e542?.['type'] !== 'ASSET_OUTPUT_CAPACITY') throw _0x39e542;
-      return _0x156c2b({
-        extractionMode: _0x101330 + '-capacity-batched',
-        localRuntime: _0xc472cf,
-        capacityError: _0x39e542,
+    } catch (capacityError3) {
+      if (capacityError3?.['type'] !== 'ASSET_OUTPUT_CAPACITY') throw capacityError3;
+      return run({
+        extractionMode: extractionMode2 + '-capacity-batched',
+        localRuntime: localRuntime4,
+        capacityError: capacityError3,
       });
     }
-    const _0x1a8609 = _0xff7118['candidateAssetsByKind'],
-      _0x3b8233 = isStoryAssetSceneHeadingContractMigration({
-        resumeDraft: _0x164293,
-        requiredAssetNamesByKind: _0x3ad0fe,
-        requiredAssetsByKind: _0x3d8029,
-        candidateAssetsByKind: _0x1a8609,
-        responseModeByKind: _0xff7118['modeByKind'],
+    const candidateAssetsByKind6 = responseModeByKind4['candidateAssetsByKind'],
+      isStoryAssetSceneHeadingContractMigration3 = isStoryAssetSceneHeadingContractMigration({
+        resumeDraft: resumeDraft6,
+        requiredAssetNamesByKind: requiredAssetNamesByKind3,
+        requiredAssetsByKind: requiredAssetsByKind3,
+        candidateAssetsByKind: candidateAssetsByKind6,
+        responseModeByKind: responseModeByKind4['modeByKind'],
       }),
-      _0x5b8ce1 = _0x3b8233;
-    _0x3b8233 &&
-      (_0x2ed0d7['push']({
-        project: _0x2c7cc3,
-        requiredAssetNamesByKind: getSavedStoryAssetRequiredNamesByKind(_0x164293),
+      allowSavedPaidResultContractRevalidation2 = isStoryAssetSceneHeadingContractMigration3;
+    isStoryAssetSceneHeadingContractMigration3 &&
+      (resumeSourceAliases2['push']({
+        project: project3,
+        requiredAssetNamesByKind: getSavedStoryAssetRequiredNamesByKind(resumeDraft6),
       }),
       reportDiagnostics(diagnostics, 'story-asset-hybrid-resume', {
         status: 'compatibility-migration',
@@ -1795,102 +1799,113 @@ export async function extractStoryAssetsHybridExperimental({
       current: 0x0,
       total: 0x3,
       message:
-        _0x101330 === 'local-pp-uie'
+        extractionMode2 === 'local-pp-uie'
           ? '本地证据已准备，正在并行反推角色、场景与道具；三类各调用一次且不自动重试'
           : '结构化证据已准备，正在并行反推角色、场景与道具；三类各调用一次且不自动重试',
     });
-    let _0x188c09 = null;
-    const _0x305a49 = async (_0x204748) => {
-        const _0x535e7a = {
-          ..._0x204748,
+    let cloneValue7 = null;
+    const onCheckpoint3 = async (args22) => {
+        const value150 = {
+          ...args22,
           hybridQualityPolicyVersion: STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION,
-          hybridExtractionMode: _0x101330,
-          hybridEvidenceScenes: cloneValue(_0x28fa3e),
-          hybridLocalRuntime: _0xc472cf || _0x204748?.['hybridLocalRuntime'] || null,
-          hybridAuthoritativeSourceFingerprint: _0x3895a1,
+          hybridExtractionMode: extractionMode2,
+          hybridEvidenceScenes: cloneValue(evidenceCharacters2),
+          hybridLocalRuntime: localRuntime4 || args22?.['hybridLocalRuntime'] || null,
+          hybridAuthoritativeSourceFingerprint: nextSourceFingerprint2,
         };
-        ((_0x188c09 = cloneValue(_0x535e7a)), await onCheckpoint?.(_0x535e7a));
+        ((cloneValue7 = cloneValue(value150)), await onCheckpoint?.(value150));
       },
-      _0x28de0a = await extractStoryAssetsParallel({
-        ..._0x411d9b,
-        project: _0x2c7cc3,
-        requiredAssetNamesByKind: _0x3ad0fe,
-        requiredAssetsByKind: _0x3d8029,
-        candidateAssetsByKind: _0x1a8609,
-        compactOutputByKind: _0xff7118['modeByKind'],
-        resumeRequiredAssetNamesByKindAliases: _0x32ee1f,
-        resumeSourceAliases: _0x2ed0d7,
+      extractStoryAssetsParallel3 = await extractStoryAssetsParallel({
+        ...args16,
+        project: project3,
+        requiredAssetNamesByKind: requiredAssetNamesByKind3,
+        requiredAssetsByKind: requiredAssetsByKind3,
+        candidateAssetsByKind: candidateAssetsByKind6,
+        compactOutputByKind: responseModeByKind4['modeByKind'],
+        resumeRequiredAssetNamesByKindAliases: resumeRequiredAssetNamesByKindAliases2,
+        resumeSourceAliases: resumeSourceAliases2,
         resumeSourceFingerprintAliases: [],
-        allowSavedPaidResultContractRevalidation: _0x5b8ce1,
+        allowSavedPaidResultContractRevalidation: allowSavedPaidResultContractRevalidation2,
         allowOversizedPrompt: !![],
         automaticRecovery: ![],
         structuredOutputFallback: 'none',
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
-        resumeDraft: _0x164293,
-        resumeCompatibilityPolicyVersion: Number(_0x21be0b?.['hybridQualityPolicyVersion'] || 0x0),
+        resumeDraft: resumeDraft6,
+        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0x0),
         onProgress: onProgress,
-        onCheckpoint: _0x305a49,
+        onCheckpoint: onCheckpoint3,
       }),
-      _0x5271a2 = removeNarrativeUploadFallbackCharacterAssets(
+      args23 = removeNarrativeUploadFallbackCharacterAssets(
         consolidateDirectStorySceneAssets(
-          lockStoryAssetRequiredSourceChapterIds(_0x28de0a, _0x3d8029, _0x1a8609),
-          _0x3ad0fe['scene'],
+          lockStoryAssetRequiredSourceChapterIds(
+            extractStoryAssetsParallel3,
+            requiredAssetsByKind3,
+            candidateAssetsByKind6,
+          ),
+          requiredAssetNamesByKind3['scene'],
         ),
-        _0x772aa1,
-        _0x28fa3e,
-        _0xf94a0f,
+        requirementEvidence,
+        evidenceCharacters2,
+        sourceScenes,
         { requireVerifiedFallbackCharacters: !![] },
       );
     try {
-      assertStoryAssetPublicResultQuality(_0x5271a2, _0xf94a0f, _0x3ad0fe);
-    } catch (_0x4b58df) {
-      await checkpointStoryAssetQualityFailure(_0x4b58df, _0x188c09, _0x305a49);
-      throw _0x4b58df;
+      assertStoryAssetPublicResultQuality(args23, sourceScenes, requiredAssetNamesByKind3);
+    } catch (value151) {
+      await checkpointStoryAssetQualityFailure(value151, cloneValue7, onCheckpoint3);
+      throw value151;
     }
     return {
-      ..._0x5271a2,
+      ...args23,
       extractionStrategy:
-        _0x101330 === 'local-pp-uie' ? 'local-pp-uie-plus-parallel-api' : 'bounded-parallel-api-fallback',
-      extractionMode: _0x101330,
-      localRuntime: _0xc472cf,
+        extractionMode2 === 'local-pp-uie'
+          ? 'local-pp-uie-plus-parallel-api'
+          : 'bounded-parallel-api-fallback',
+      extractionMode: extractionMode2,
+      localRuntime: localRuntime4,
     };
   }
-  let _0x3c8953 = null;
-  const _0x4d131b = async (_0x2ebda0) => {
-      const _0x41f0d5 = {
-        ..._0x2ebda0,
+  let cloneValue8 = null;
+  const onCheckpoint4 = async (args24) => {
+      const value152 = {
+        ...args24,
         hybridQualityPolicyVersion: STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION,
-        hybridExtractionMode: _0x101330,
-        hybridEvidenceScenes: _0x101330 === 'local-pp-uie' ? cloneValue(_0x28fa3e) : null,
-        hybridLocalRuntime: _0xc472cf || _0x2ebda0?.['hybridLocalRuntime'] || null,
-        hybridAuthoritativeSourceFingerprint: _0x3895a1,
+        hybridExtractionMode: extractionMode2,
+        hybridEvidenceScenes: extractionMode2 === 'local-pp-uie' ? cloneValue(evidenceCharacters2) : null,
+        hybridLocalRuntime: localRuntime4 || args24?.['hybridLocalRuntime'] || null,
+        hybridAuthoritativeSourceFingerprint: nextSourceFingerprint2,
       };
-      ((_0x3c8953 = cloneValue(_0x41f0d5)), await onCheckpoint?.(_0x41f0d5));
+      ((cloneValue8 = cloneValue(value152)), await onCheckpoint?.(value152));
     },
-    _0x425912 = await extractStoryAssetsEvidenceBatched({
-      ..._0x411d9b,
+    extractStoryAssetsEvidenceBatched3 = await extractStoryAssetsEvidenceBatched({
+      ...args16,
       project: project,
       episodes: episodes,
-      sourceScenes: _0x28fa3e,
-      authoritativeSourceScenes: createHardAuthoritativeSourceScenes(_0xf94a0f, _0x772aa1),
+      sourceScenes: evidenceCharacters2,
+      authoritativeSourceScenes: createHardAuthoritativeSourceScenes(sourceScenes, requirementEvidence),
       diagnostics: diagnostics,
       onProgress: onProgress,
-      resumeDraft: _0x21be0b,
+      resumeDraft: resumeDraft3,
       allowLocalBaselineFallback: ![],
       requestLimit: 0x3,
-      onCheckpoint: _0x4d131b,
+      onCheckpoint: onCheckpoint4,
     }),
-    _0x52f24f = removeNarrativeUploadFallbackCharacterAssets(_0x425912, _0x772aa1, _0x28fa3e, _0xf94a0f);
+    extractionStrategy2 = removeNarrativeUploadFallbackCharacterAssets(
+      extractStoryAssetsEvidenceBatched3,
+      requirementEvidence,
+      evidenceCharacters2,
+      sourceScenes,
+    );
   try {
-    assertStoryAssetPublicResultQuality(_0x52f24f, _0xf94a0f, _0x3ad0fe);
-  } catch (_0x564bfe) {
-    await checkpointStoryAssetQualityFailure(_0x564bfe, _0x3c8953, _0x4d131b);
-    throw _0x564bfe;
+    assertStoryAssetPublicResultQuality(extractionStrategy2, sourceScenes, requiredAssetNamesByKind3);
+  } catch (value153) {
+    await checkpointStoryAssetQualityFailure(value153, cloneValue8, onCheckpoint4);
+    throw value153;
   }
   return {
-    ..._0x52f24f,
-    extractionStrategy: _0x52f24f['extractionStrategy'],
-    extractionMode: _0x101330,
-    localRuntime: _0xc472cf,
+    ...extractionStrategy2,
+    extractionStrategy: extractionStrategy2['extractionStrategy'],
+    extractionMode: extractionMode2,
+    localRuntime: localRuntime4,
   };
 }

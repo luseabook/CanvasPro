@@ -15,202 +15,200 @@ const APIMART_MIDJOURNEY_MODEL_ID = 'apimart/midjourney',
     Object['freeze']({ mode: 'weak', labelKey: 'variationWeakAction' }),
     Object['freeze']({ mode: 'strong', labelKey: 'variationStrongAction' }),
   ]);
-function midjourneyText(_0x261954, _0x251435 = {}) {
-  return t('nodeToolbar.midjourney.' + _0x261954, _0x251435);
+function midjourneyText(value, item = {}) {
+  return t('nodeToolbar.midjourney.' + value, item);
 }
-function clampMainImageIndex(_0x445c41 = {}) {
-  const _0x210e8c = Array['isArray'](_0x445c41?.['images']) ? _0x445c41['images'] : [];
-  if (_0x210e8c['length'] === 0x0) return 0x0;
-  const _0x2b7873 = Number['parseInt'](_0x445c41?.['mainImageIndex'], 0xa);
-  if (!Number['isFinite'](_0x2b7873)) return 0x0;
-  return Math['max'](0x0, Math['min'](_0x210e8c['length'] - 0x1, _0x2b7873));
+function clampMainImageIndex(options = {}) {
+  const list = Array['isArray'](options?.['images']) ? options['images'] : [];
+  if (list['length'] === 0x0) return 0x0;
+  const key = Number['parseInt'](options?.['mainImageIndex'], 0xa);
+  if (!Number['isFinite'](key)) return 0x0;
+  return Math['max'](0x0, Math['min'](list['length'] - 0x1, key));
 }
-function normalizeMjIndex(_0x1b533f, _0x4aef87 = 0x0) {
-  const _0x4707e0 = Number['parseInt'](_0x1b533f, 0xa);
-  if (Number['isFinite'](_0x4707e0) && _0x4707e0 >= 0x1 && _0x4707e0 <= 0x4) return _0x4707e0;
-  return _0x4aef87 >= 0x1 && _0x4aef87 <= 0x4 ? _0x4aef87 : 0x0;
+function normalizeMjIndex(result, count = 0x0) {
+  const count2 = Number['parseInt'](result, 0xa);
+  if (Number['isFinite'](count2) && count2 >= 0x1 && count2 <= 0x4) return count2;
+  return count >= 0x1 && count <= 0x4 ? count : 0x0;
 }
-function normalizeMjModelVersion(_0x298314) {
-  return String(_0x298314 || '')
+function normalizeMjModelVersion(data) {
+  return String(data || '')
     ['trim']()
     ['toLowerCase']()
     ['replace'](/^v/, '');
 }
-function normalizeMjSpeed(_0x474d0, _0xbca6f1 = 'relax') {
-  const _0xd15b1f = String(_0x474d0 || '')
+function normalizeMjSpeed(target, source = 'relax') {
+  const next = String(target || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0xd15b1f === 'relax' || _0xd15b1f === 'fast' || _0xd15b1f === 'turbo') return _0xd15b1f;
-  return _0xbca6f1;
+  if (next === 'relax' || next === 'fast' || next === 'turbo') return next;
+  return source;
 }
-function normalizeBooleanFlag(_0x8ff3c3) {
-  if (_0x8ff3c3 === !![] || _0x8ff3c3 === ![]) return _0x8ff3c3;
-  const _0x3751db = String(_0x8ff3c3 ?? '')
+function normalizeBooleanFlag(current) {
+  if (current === !![] || current === ![]) return current;
+  const enabled = String(current ?? '')
     ['trim']()
     ['toLowerCase']();
-  if (!_0x3751db) return ![];
-  return _0x3751db === 'true' || _0x3751db === '1' || _0x3751db === 'yes';
+  if (!enabled) return ![];
+  return enabled === 'true' || enabled === '1' || enabled === 'yes';
 }
-export function isApimartMidjourneyHdSupported(_0x3d87d6 = '') {
-  const _0x29d5ab = normalizeMjModelVersion(_0x3d87d6);
-  return _0x29d5ab !== '8.2' && _0x29d5ab !== '8.1';
+export function isApimartMidjourneyHdSupported(entry = '') {
+  const mjModelVersion = normalizeMjModelVersion(entry);
+  return mjModelVersion !== '8.2' && mjModelVersion !== '8.1';
 }
-function isApimartMidjourneyRemixModel(_0x3dbf30 = '') {
-  const _0x4d129e = normalizeMjModelVersion(_0x3dbf30);
-  return _0x4d129e === '8.2' || _0x4d129e === '8.1';
+function isApimartMidjourneyRemixModel(record = '') {
+  const mjModelVersion2 = normalizeMjModelVersion(record);
+  return mjModelVersion2 === '8.2' || mjModelVersion2 === '8.1';
 }
-export function getApimartMidjourneyVariationOptions(_0x3c980b = '') {
-  return isApimartMidjourneyRemixModel(_0x3c980b) ? MJ_REMIX_VARIATION_OPTIONS : MJ_VARIATION_OPTIONS;
+export function getApimartMidjourneyVariationOptions(payload = '') {
+  return isApimartMidjourneyRemixModel(payload) ? MJ_REMIX_VARIATION_OPTIONS : MJ_VARIATION_OPTIONS;
 }
-function normalizeButtons(_0x16a9ca) {
-  if (!Array['isArray'](_0x16a9ca)) return [];
-  return _0x16a9ca['map']((_0x13bf06) => {
-    if (!_0x13bf06 || typeof _0x13bf06 !== 'object') return null;
-    const _0x145031 = String(_0x13bf06['customId'] || _0x13bf06['custom_id'] || '')['trim'](),
-      _0x3b7514 = String(_0x13bf06['label'] || _0x13bf06['name'] || _0x13bf06['text'] || '')['trim']();
-    if (!_0x145031 && !_0x3b7514) return null;
-    return { ...(_0x145031 ? { customId: _0x145031 } : {}), ...(_0x3b7514 ? { label: _0x3b7514 } : {}) };
+function normalizeButtons(list2) {
+  if (!Array['isArray'](list2)) return [];
+  return list2['map']((error) => {
+    if (!error || typeof error !== 'object') return null;
+    const customId2 = String(error['customId'] || error['custom_id'] || '')['trim'](),
+      label = String(error['label'] || error['name'] || error['text'] || '')['trim']();
+    if (!customId2 && !label) return null;
+    return { ...(customId2 ? { customId: customId2 } : {}), ...(label ? { label: label } : {}) };
   })['filter'](Boolean);
 }
-function getCurrentImage(_0x496c67 = {}) {
-  const _0x585ec4 = Array['isArray'](_0x496c67?.['images']) ? _0x496c67['images'] : [];
-  if (_0x585ec4['length'] === 0x0) return _0x496c67 || {};
-  return _0x585ec4[clampMainImageIndex(_0x496c67)] || {};
+function getCurrentImage(options2 = {}) {
+  const list3 = Array['isArray'](options2?.['images']) ? options2['images'] : [];
+  if (list3['length'] === 0x0) return options2 || {};
+  return list3[clampMainImageIndex(options2)] || {};
 }
-function getCurrentImageUrl(_0x49a8fd = {}, _0x23cf02 = null) {
-  const _0x997a73 = getCurrentImage(_0x49a8fd),
-    _0xe07ca1 = String(_0x997a73?.['localPath'] || _0x49a8fd?.['localPath'] || '')['trim'](),
-    _0x36d7e2 = typeof _0x23cf02 === 'function' ? _0x23cf02(_0xe07ca1) : '';
+function getCurrentImageUrl(options3 = {}, handler = null) {
+  const currentImage = getCurrentImage(options3),
+    handle = String(currentImage?.['localPath'] || options3?.['localPath'] || '')['trim'](),
+    state = typeof handler === 'function' ? handler(handle) : '';
   return String(
-    _0x36d7e2 ||
-      _0x997a73?.['thumbUrl'] ||
-      _0x997a73?.['imageUrl'] ||
-      _0x997a73?.['sourceUrl'] ||
-      _0x997a73?.['src'] ||
-      _0x49a8fd?.['thumbUrl'] ||
-      _0x49a8fd?.['imageUrl'] ||
-      _0x49a8fd?.['sourceUrl'] ||
-      _0x49a8fd?.['src'] ||
+    state ||
+      currentImage?.['thumbUrl'] ||
+      currentImage?.['imageUrl'] ||
+      currentImage?.['sourceUrl'] ||
+      currentImage?.['src'] ||
+      options3?.['thumbUrl'] ||
+      options3?.['imageUrl'] ||
+      options3?.['sourceUrl'] ||
+      options3?.['src'] ||
       '',
   )['trim']();
 }
-function isApimartMidjourneyNode(_0x5f06f9 = {}, _0x1da695 = {}) {
-  const _0x5cf3f4 = String(
-      _0x1da695?.['metadata']?.['provider'] ||
-        _0x1da695?.['provider'] ||
-        _0x5f06f9?.['provider'] ||
-        _0x5f06f9?.['taskProvider'] ||
+function isApimartMidjourneyNode(options4 = {}, config = {}) {
+  const enabled2 = String(
+      config?.['metadata']?.['provider'] ||
+        config?.['provider'] ||
+        options4?.['provider'] ||
+        options4?.['taskProvider'] ||
         '',
     )
       ['trim']()
       ['toLowerCase'](),
-    _0xe073be = [
-      _0x1da695?.['metadata']?.['model'],
-      _0x1da695?.['model'],
-      _0x5f06f9?.['model'],
-      _0x5f06f9?.['modelId'],
-      _0x5f06f9?.['taskModelId'],
-      _0x5f06f9?.['executionId'],
-      _0x5f06f9?.['taskExecutionId'],
+    list4 = [
+      config?.['metadata']?.['model'],
+      config?.['model'],
+      options4?.['model'],
+      options4?.['modelId'],
+      options4?.['taskModelId'],
+      options4?.['executionId'],
+      options4?.['taskExecutionId'],
     ],
-    _0x2eff55 = _0xe073be['some']((_0x2f68a1) => {
-      const _0x129526 = String(_0x2f68a1 || '')
+    scope = list4['some']((input) => {
+      const list5 = String(input || '')
         ['trim']()
         ['toLowerCase']();
-      return _0x129526 === APIMART_MIDJOURNEY_MODEL_ID || _0x129526['includes']('midjourney');
+      return list5 === APIMART_MIDJOURNEY_MODEL_ID || list5['includes']('midjourney');
     });
-  return _0x2eff55 && (!_0x5cf3f4 || _0x5cf3f4 === 'apimart');
+  return scope && (!enabled2 || enabled2 === 'apimart');
 }
-export function resolveApimartMidjourneyToolbarContext(_0x66fe8e = {}) {
-  const _0xe57326 = getCurrentImage(_0x66fe8e),
-    _0x5c7f95 =
-      _0xe57326?.['metadata']?.['apimartMidjourney'] ||
-      _0xe57326?.['apimartMidjourney'] ||
-      _0x66fe8e?.['metadata']?.['apimartMidjourney'] ||
+export function resolveApimartMidjourneyToolbarContext(options5 = {}) {
+  const image = getCurrentImage(options5),
+    output =
+      image?.['metadata']?.['apimartMidjourney'] ||
+      image?.['apimartMidjourney'] ||
+      options5?.['metadata']?.['apimartMidjourney'] ||
       null;
-  if (!isApimartMidjourneyNode(_0x66fe8e, _0xe57326)) return { enabled: ![] };
-  const _0x32e08a = _0x5c7f95 && typeof _0x5c7f95 === 'object' ? _0x5c7f95 : {},
-    _0x5e0025 = Array['isArray'](_0x66fe8e?.['images']) ? _0x66fe8e['images'] : [],
-    _0x4fff70 = clampMainImageIndex(_0x66fe8e),
-    _0x46d407 = normalizeMjIndex(_0x32e08a['index'], _0x4fff70 + 0x1),
-    _0x177390 = String(_0x32e08a['taskId'] || _0x66fe8e?.['asyncTaskId'] || _0x66fe8e?.['taskId'] || '')[
-      'trim'
-    ](),
-    _0x317aca = normalizeButtons(_0x32e08a['buttons']),
-    _0x8aaa1b = String(_0x32e08a['action'] || '')
+  if (!isApimartMidjourneyNode(options5, image)) return { enabled: ![] };
+  const value2 = output && typeof output === 'object' ? output : {},
+    list6 = Array['isArray'](options5?.['images']) ? options5['images'] : [],
+    clampMainImageIndex2 = clampMainImageIndex(options5),
+    index2 = normalizeMjIndex(value2['index'], clampMainImageIndex2 + 0x1),
+    taskId = String(value2['taskId'] || options5?.['asyncTaskId'] || options5?.['taskId'] || '')['trim'](),
+    buttons = normalizeButtons(value2['buttons']),
+    list7 = String(value2['action'] || '')
       ['trim']()
       ['toUpperCase']();
-  if (_0x8aaa1b['includes']('UPSCALE')) return { enabled: ![] };
-  const _0x36442e =
-    _0x317aca['length'] > 0x0 ||
-    String(_0x32e08a['gridImageUrl'] || '')['trim']() ||
-    _0x8aaa1b['includes']('IMAGINE') ||
-    _0x5e0025['length'] >= 0x4;
-  if (!_0x177390 || !_0x46d407 || !_0x36442e) return { enabled: ![] };
-  const _0xc6c55c = String(
-      _0x32e08a['mjModel'] ||
-        _0xe57326?.['metadata']?.['mjModel'] ||
-        _0x66fe8e?.['generationParams']?.['mjModel'] ||
-        _0x66fe8e?.['mjModel'] ||
+  if (list7['includes']('UPSCALE')) return { enabled: ![] };
+  const enabled3 =
+    buttons['length'] > 0x0 ||
+    String(value2['gridImageUrl'] || '')['trim']() ||
+    list7['includes']('IMAGINE') ||
+    list6['length'] >= 0x4;
+  if (!taskId || !index2 || !enabled3) return { enabled: ![] };
+  const mjModel = String(
+      value2['mjModel'] ||
+        image?.['metadata']?.['mjModel'] ||
+        options5?.['generationParams']?.['mjModel'] ||
+        options5?.['mjModel'] ||
         '',
     )['trim'](),
-    _0x45a609 = normalizeMjSpeed(
-      _0x32e08a['speed'] ||
-        _0xe57326?.['metadata']?.['speed'] ||
-        _0x66fe8e?.['generationParams']?.['speed'] ||
-        _0x66fe8e?.['speed'] ||
+    speed = normalizeMjSpeed(
+      value2['speed'] ||
+        image?.['metadata']?.['speed'] ||
+        options5?.['generationParams']?.['speed'] ||
+        options5?.['speed'] ||
         '',
     ),
-    _0x5a452f = String(
-      _0x32e08a['prompt'] ||
-        _0xe57326?.['metadata']?.['prompt'] ||
-        _0x66fe8e?.['prompt'] ||
-        _0x66fe8e?.['generationParams']?.['prompt'] ||
+    prompt = String(
+      value2['prompt'] ||
+        image?.['metadata']?.['prompt'] ||
+        options5?.['prompt'] ||
+        options5?.['generationParams']?.['prompt'] ||
         '',
     )['trim'](),
-    _0x21a9ee = normalizeBooleanFlag(
-      _0x32e08a['hd'] ??
-        _0xe57326?.['metadata']?.['hd'] ??
-        _0x66fe8e?.['generationParams']?.['hd'] ??
-        _0x66fe8e?.['hd'],
+    hd = normalizeBooleanFlag(
+      value2['hd'] ??
+        image?.['metadata']?.['hd'] ??
+        options5?.['generationParams']?.['hd'] ??
+        options5?.['hd'],
     ),
-    _0x217a74 = isApimartMidjourneyHdSupported(_0xc6c55c) && _0x21a9ee !== !![];
+    supportsHd = isApimartMidjourneyHdSupported(mjModel) && hd !== !![];
   return {
     enabled: !![],
-    taskId: _0x177390,
-    index: _0x46d407,
-    buttons: _0x317aca,
-    image: _0xe57326,
-    supportsHd: _0x217a74,
-    mjModel: _0xc6c55c,
-    speed: _0x45a609,
-    prompt: _0x5a452f,
-    hd: _0x21a9ee,
+    taskId: taskId,
+    index: index2,
+    buttons: buttons,
+    image: image,
+    supportsHd: supportsHd,
+    mjModel: mjModel,
+    speed: speed,
+    prompt: prompt,
+    hd: hd,
   };
 }
-function resolveHdCommand(_0x2b7eca = '') {
-  const _0x42f6fe = String(_0x2b7eca || '')
+function resolveHdCommand(value3 = '') {
+  const list8 = String(value3 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x42f6fe['includes']('5.')) return 'upsample_v5_2x';
-  if (_0x42f6fe['includes']('6')) return 'upsample_v6_2x_subtle';
+  if (list8['includes']('5.')) return 'upsample_v5_2x';
+  if (list8['includes']('6')) return 'upsample_v6_2x_subtle';
   return 'upsample_v7_2x_subtle';
 }
-export function buildApimartMidjourneyHdCustomId(_0x1ff09d = [], _0x20682a = 0x0, _0x819028 = '') {
-  const _0x3259fa = normalizeMjIndex(_0x20682a);
-  if (!_0x3259fa) return '';
-  if (!isApimartMidjourneyHdSupported(_0x819028)) return '';
-  const _0x6bb53d = resolveHdCommand(_0x819028);
-  for (const _0x2ce7e3 of normalizeButtons(_0x1ff09d)) {
-    const _0x443fae = String(_0x2ce7e3?.['customId'] || '')['trim']();
-    if (!_0x443fae) continue;
-    const _0x5b6956 = _0x443fae['split']('::');
-    if (_0x5b6956['length'] < 0x5) continue;
-    if (String(_0x5b6956[0x0])['toUpperCase']() !== 'MJ') continue;
-    if (String(_0x5b6956[0x1])['toUpperCase']() !== 'JOB') continue;
-    if (!String(_0x5b6956[0x2] || '')['startsWith']('upsample')) continue;
-    if (Number['parseInt'](_0x5b6956[0x3], 0xa) !== _0x3259fa) continue;
-    return ((_0x5b6956[0x2] = _0x6bb53d), _0x5b6956['join']('::'));
+export function buildApimartMidjourneyHdCustomId(list9 = [], value4 = 0x0, value5 = '') {
+  const mjIndex = normalizeMjIndex(value4);
+  if (!mjIndex) return '';
+  if (!isApimartMidjourneyHdSupported(value5)) return '';
+  const hdCommand = resolveHdCommand(value5);
+  for (const value6 of normalizeButtons(list9)) {
+    const enabled4 = String(value6?.['customId'] || '')['trim']();
+    if (!enabled4) continue;
+    const list10 = enabled4['split']('::');
+    if (list10['length'] < 0x5) continue;
+    if (String(list10[0x0])['toUpperCase']() !== 'MJ') continue;
+    if (String(list10[0x1])['toUpperCase']() !== 'JOB') continue;
+    if (!String(list10[0x2] || '')['startsWith']('upsample')) continue;
+    if (Number['parseInt'](list10[0x3], 0xa) !== mjIndex) continue;
+    return ((list10[0x2] = hdCommand), list10['join']('::'));
   }
   return '';
 }
@@ -221,8 +219,8 @@ function midjourneyOutputText({ actionLabel: actionLabel = '', index: index = 0x
     index: index,
   });
 }
-function getPlainObject(_0x34ee5f) {
-  return _0x34ee5f && typeof _0x34ee5f === 'object' && !Array['isArray'](_0x34ee5f) ? _0x34ee5f : {};
+function getPlainObject(value7) {
+  return value7 && typeof value7 === 'object' && !Array['isArray'](value7) ? value7 : {};
 }
 export function buildApimartMidjourneyTargetNodePayload({
   id: id = '',
@@ -264,11 +262,11 @@ export function buildApimartMidjourneyTargetNodePayload({
     generationStartTime: startedAt,
   };
 }
-function normalizeVariationMode(_0x585b67) {
-  const _0x1d7cb5 = String(_0x585b67 || '')
+function normalizeVariationMode(value8) {
+  const value9 = String(value8 || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x1d7cb5 === 'weak' || _0x1d7cb5 === 'strong') return _0x1d7cb5;
+  if (value9 === 'weak' || value9 === 'strong') return value9;
   return 'medium';
 }
 export function buildApimartMidjourneyActionPayload({
@@ -278,7 +276,7 @@ export function buildApimartMidjourneyActionPayload({
   variationMode: variationMode = '',
   outputText: outputText = '',
 } = {}) {
-  const _0x5bde53 = String(kind || '') === 'variation';
+  const value10 = String(kind || '') === 'variation';
   return {
     parentTaskId: String(actionContext?.['taskId'] || '')['trim'](),
     index: actionContext?.['index'],
@@ -287,12 +285,12 @@ export function buildApimartMidjourneyActionPayload({
     prompt: String(actionContext?.['prompt'] || '')['trim'](),
     actionKind: kind,
     mjModel: String(actionContext?.['mjModel'] || '')['trim'](),
-    ...(_0x5bde53 ? { variationMode: normalizeVariationMode(variationMode) } : {}),
+    ...(value10 ? { variationMode: normalizeVariationMode(variationMode) } : {}),
     outputText: outputText,
   };
 }
-function getVariationActionLabel(_0x4e584e) {
-  switch (normalizeVariationMode(_0x4e584e)) {
+function getVariationActionLabel(value11) {
+  switch (normalizeVariationMode(value11)) {
     case 'weak':
       return midjourneyText('variationWeakAction');
     case 'strong':
@@ -301,479 +299,483 @@ function getVariationActionLabel(_0x4e584e) {
       return midjourneyText('variationMediumAction');
   }
 }
-function normalizeResumedImages(_0x532c3b) {
-  if (_0x532c3b?.['isBatch'] && Array['isArray'](_0x532c3b['images'])) return _0x532c3b['images'];
-  return _0x532c3b ? [_0x532c3b] : [];
+function normalizeResumedImages(value12) {
+  if (value12?.['isBatch'] && Array['isArray'](value12['images'])) return value12['images'];
+  return value12 ? [value12] : [];
 }
-function getResultUrlFromImage(_0x2ee785 = {}) {
+function getResultUrlFromImage(response = {}) {
   return String(
-    _0x2ee785?.['sourceUrl'] ||
-      _0x2ee785?.['imageUrl'] ||
-      _0x2ee785?.['thumbUrl'] ||
-      _0x2ee785?.['src'] ||
-      _0x2ee785?.['url'] ||
+    response?.['sourceUrl'] ||
+      response?.['imageUrl'] ||
+      response?.['thumbUrl'] ||
+      response?.['src'] ||
+      response?.['url'] ||
       '',
   )['trim']();
 }
-function setButtonVisible(_0x18b59a, _0x36eddf) {
-  if (!_0x18b59a) return;
-  ((_0x18b59a['hidden'] = !_0x36eddf),
-    _0x18b59a['classList']['toggle']('is-hidden', !_0x36eddf),
-    _0x18b59a['setAttribute']('aria-hidden', _0x36eddf ? 'false' : 'true'));
+function setButtonVisible(el, enabled5) {
+  if (!el) return;
+  ((el['hidden'] = !enabled5),
+    el['classList']['toggle']('is-hidden', !enabled5),
+    el['setAttribute']('aria-hidden', enabled5 ? 'false' : 'true'));
 }
-function setBusy(_0x3c590d, _0x3c311e) {
-  if (!_0x3c590d) return;
-  _0x3c590d['classList']['toggle']('is-task-running', _0x3c311e);
-  const _0x484144 = _0x3c590d['querySelector']('svg');
-  if (!_0x484144) return;
-  if (_0x3c311e) _0x484144['classList']['add']('v2-spinning');
-  else _0x484144['classList']['remove']('v2-spinning');
+function setBusy(el2, value13) {
+  if (!el2) return;
+  el2['classList']['toggle']('is-task-running', value13);
+  const el3 = el2['querySelector']('svg');
+  if (!el3) return;
+  if (value13) el3['classList']['add']('v2-spinning');
+  else el3['classList']['remove']('v2-spinning');
 }
-function openVariationSubmenu(_0x33524b, _0x1d28e9, _0x80b824 = MJ_VARIATION_OPTIONS) {
-  const _0x20581f = document['querySelector']('.v2-mj-variation-submenu');
-  if (_0x20581f) {
-    const _0x81e323 =
-        _0x20581f['__v2MjVariationAnchorBtn'] && _0x20581f['__v2MjVariationAnchorBtn'] === _0x33524b,
-      _0x420ad8 =
-        typeof _0x20581f['__v2MjVariationClose'] === 'function'
-          ? _0x20581f['__v2MjVariationClose']
-          : () => _0x20581f['remove']();
-    _0x420ad8();
-    if (_0x81e323) return () => {};
+function openVariationSubmenu(el4, value14, list11 = MJ_VARIATION_OPTIONS) {
+  const el5 = document['querySelector']('.v2-mj-variation-submenu');
+  if (el5) {
+    const value15 = el5['__v2MjVariationAnchorBtn'] && el5['__v2MjVariationAnchorBtn'] === el4,
+      handler2 =
+        typeof el5['__v2MjVariationClose'] === 'function'
+          ? el5['__v2MjVariationClose']
+          : () => el5['remove']();
+    handler2();
+    if (value15) return () => {};
   }
-  const _0x4bbdf9 = document['createElement']('div');
-  ((_0x4bbdf9['className'] = 'v2-mj-variation-submenu node-toolbar-action-submenu'),
-    (_0x4bbdf9['__v2MjVariationAnchorBtn'] = _0x33524b),
-    _0x4bbdf9['setAttribute']('role', 'menu'));
-  const _0x27cc08 = document['createElement']('div');
-  ((_0x27cc08['className'] = 'node-toolbar-action-menu-title'),
-    (_0x27cc08['textContent'] = midjourneyText('chooseVariation')),
-    _0x4bbdf9['appendChild'](_0x27cc08));
-  const _0x581441 =
-    Array['isArray'](_0x80b824) && _0x80b824['length'] > 0x0 ? _0x80b824 : MJ_VARIATION_OPTIONS;
-  for (const _0x55190b of _0x581441) {
-    const _0x4b5ac4 = document['createElement']('div');
-    ((_0x4b5ac4['className'] = 'node-toolbar-action-menu-item\x20node-toolbar-action-submenu-item'),
-      _0x4b5ac4['setAttribute']('role', 'menuitem'),
-      (_0x4b5ac4['tabIndex'] = 0x0),
-      (_0x4b5ac4['textContent'] = midjourneyText(_0x55190b['labelKey'])));
-    const _0x561be9 = (_0x1ecc2e) => {
-      (_0x1ecc2e['stopPropagation'](),
-        _0x1ecc2e['preventDefault'](),
-        _0x28bed5(),
-        _0x1d28e9?.(_0x55190b['mode']));
+  const el6 = document['createElement']('div');
+  ((el6['className'] = 'v2-mj-variation-submenu node-toolbar-action-submenu'),
+    (el6['__v2MjVariationAnchorBtn'] = el4),
+    el6['setAttribute']('role', 'menu'));
+  const el7 = document['createElement']('div');
+  ((el7['className'] = 'node-toolbar-action-menu-title'),
+    (el7['textContent'] = midjourneyText('chooseVariation')),
+    el6['appendChild'](el7));
+  const value16 = Array['isArray'](list11) && list11['length'] > 0x0 ? list11 : MJ_VARIATION_OPTIONS;
+  for (const value17 of value16) {
+    const el8 = document['createElement']('div');
+    ((el8['className'] = 'node-toolbar-action-menu-item\x20node-toolbar-action-submenu-item'),
+      el8['setAttribute']('role', 'menuitem'),
+      (el8['tabIndex'] = 0x0),
+      (el8['textContent'] = midjourneyText(value17['labelKey'])));
+    const run = (event) => {
+      (event['stopPropagation'](), event['preventDefault'](), handler3(), value14?.(value17['mode']));
     };
-    (_0x4b5ac4['addEventListener']('click', _0x561be9),
-      _0x4b5ac4['addEventListener']('keydown', (_0x888580) => {
-        if (_0x888580['key'] !== 'Enter' && _0x888580['key'] !== '\x20') return;
-        _0x561be9(_0x888580);
+    (el8['addEventListener']('click', run),
+      el8['addEventListener']('keydown', (event2) => {
+        if (event2['key'] !== 'Enter' && event2['key'] !== '\x20') return;
+        run(event2);
       }),
-      _0x4bbdf9['appendChild'](_0x4b5ac4));
+      el6['appendChild'](el8));
   }
-  const _0x465886 = createToolbarActionPopupAnchorPositionGetter(_0x33524b, { gap: 0xa }),
-    _0x208a72 = () => {
-      const _0x128154 = _0x465886();
-      positionToolbarActionSubmenuAbove(_0x128154, _0x4bbdf9);
+  const run2 = createToolbarActionPopupAnchorPositionGetter(el4, { gap: 0xa }),
+    handler4 = () => {
+      const value18 = run2();
+      positionToolbarActionSubmenuAbove(value18, el6);
     };
-  (_0x208a72(), Object['assign'](_0x4bbdf9['style'], { opacity: '0', pointerEvents: 'none' }));
-  const _0x3389a5 = (_0x74fd00) => {
-      const _0x321f1a = _0x74fd00['target'];
-      if (_0x4bbdf9['contains'](_0x321f1a) || _0x33524b['contains'](_0x321f1a)) return;
-      _0x28bed5();
+  (handler4(), Object['assign'](el6['style'], { opacity: '0', pointerEvents: 'none' }));
+  const value19 = (event3) => {
+      const value20 = event3['target'];
+      if (el6['contains'](value20) || el4['contains'](value20)) return;
+      handler3();
     },
-    _0x3f6466 = (_0x53978a) => {
-      if (_0x53978a['key'] === 'Escape') _0x28bed5();
+    value21 = (event4) => {
+      if (event4['key'] === 'Escape') handler3();
     },
-    _0x3ac4d8 = () => _0x208a72(),
-    _0x28bed5 = () => {
-      (document['removeEventListener']('pointerdown', _0x3389a5, !![]),
-        document['removeEventListener']('keydown', _0x3f6466, !![]),
-        window['removeEventListener']('resize', _0x3ac4d8, !![]),
-        window['removeEventListener']('scroll', _0x3ac4d8, !![]),
-        _0x33524b['classList']['remove']('is-active'));
-      if (document['body']['contains'](_0x4bbdf9)) _0x4bbdf9['remove']();
+    value22 = () => handler4(),
+    handler3 = () => {
+      (document['removeEventListener']('pointerdown', value19, !![]),
+        document['removeEventListener']('keydown', value21, !![]),
+        window['removeEventListener']('resize', value22, !![]),
+        window['removeEventListener']('scroll', value22, !![]),
+        el4['classList']['remove']('is-active'));
+      if (document['body']['contains'](el6)) el6['remove']();
     };
-  ((_0x4bbdf9['__v2MjVariationClose'] = _0x28bed5),
-    document['body']['appendChild'](_0x4bbdf9),
-    _0x33524b['classList']['add']('is-active'));
-  const _0x4b9222 =
+  ((el6['__v2MjVariationClose'] = handler3),
+    document['body']['appendChild'](el6),
+    el4['classList']['add']('is-active'));
+  const run3 =
     typeof requestAnimationFrame === 'function'
       ? requestAnimationFrame
-      : (_0x21bb90) => setTimeout(_0x21bb90, 0x0);
+      : (value23) => setTimeout(value23, 0x0);
   return (
-    _0x4b9222(() => {
-      (_0x208a72(), (_0x4bbdf9['style']['opacity'] = '1'), (_0x4bbdf9['style']['pointerEvents'] = 'auto'));
+    run3(() => {
+      (handler4(), (el6['style']['opacity'] = '1'), (el6['style']['pointerEvents'] = 'auto'));
     }),
-    document['addEventListener']('pointerdown', _0x3389a5, !![]),
-    document['addEventListener']('keydown', _0x3f6466, !![]),
-    window['addEventListener']('resize', _0x3ac4d8, !![]),
-    window['addEventListener']('scroll', _0x3ac4d8, !![]),
-    _0x28bed5
+    document['addEventListener']('pointerdown', value19, !![]),
+    document['addEventListener']('keydown', value21, !![]),
+    window['addEventListener']('resize', value22, !![]),
+    window['addEventListener']('scroll', value22, !![]),
+    handler3
   );
 }
-export function bindApimartMidjourneyActions(_0x10b385) {
+export function bindApimartMidjourneyActions(value24) {
   const {
-      toolbarEl: _0x3730ba,
-      nodeId: _0x1721ca,
-      getNodeData: _0x551d39,
-      store: _0x3ca49c,
-      submitTask: _0x4bfdfb,
-      buildImageGenerationFailurePatch: _0x4b9ff6,
-      buildImageGenerationResultPatch: _0x41cb36,
-      calcDisplaySizeByMedia: _0x55fada,
-      calcSafeSpawnPosNearNode: _0x51f8de,
-      localPathToUrl: _0x20f643,
-      resolveApiInputRatioBasis: _0x3cb14a,
-      resolveFinalResultDisplaySize: _0x4253b2,
-      saveOutputImageResult: _0xd8274f,
-      buildToolbarImageFields: _0x576f0d,
-      submitApimartMidjourneyUpscaleRequest: _0xfc83c4,
-      submitApimartMidjourneyVariationRequest: _0x5400c9,
-      resumeApimartMidjourneyUpscaleTask: _0x3a2113,
-      createLocalSaveFailureError: _0x570898,
-      isLocalSaveFailure: _0x5d4b5b,
-      buildClearedImageMediaFields: _0x26ffd0,
-      IMAGE_LOCAL_SAVE_FAILURE_MESSAGE: _0x22dd94,
-      selectToolbarTaskNode: _0x3889c8,
-      notifyImageToolbarTaskChange: _0x23c85a,
-    } = _0x10b385,
-    _0x2771d7 = _0x3730ba['querySelector']('.act-mj-variation'),
-    _0x1fc75c = _0x3730ba['querySelector']('.act-mj-hd');
-  if (!_0x2771d7 && !_0x1fc75c) return;
-  let _0x4c2e4f = () => {};
-  const _0xa7bc83 = () => {
-    const _0x254137 = resolveApimartMidjourneyToolbarContext(_0x551d39());
-    (setButtonVisible(_0x2771d7, _0x254137['enabled']),
-      setButtonVisible(_0x1fc75c, _0x254137['enabled'] && _0x254137['supportsHd'] !== ![]),
-      !_0x254137['enabled'] && (_0x4c2e4f(), (_0x4c2e4f = () => {})));
+      toolbarEl: toolbarEl,
+      nodeId: nodeId,
+      getNodeData: getNodeData,
+      store: store,
+      submitTask: submitTask,
+      buildImageGenerationFailurePatch: buildImageGenerationFailurePatch,
+      buildImageGenerationResultPatch: buildImageGenerationResultPatch,
+      calcDisplaySizeByMedia: calcDisplaySizeByMedia,
+      calcSafeSpawnPosNearNode: calcSafeSpawnPosNearNode,
+      localPathToUrl: localPathToUrl,
+      resolveApiInputRatioBasis: resolveApiInputRatioBasis,
+      resolveFinalResultDisplaySize: resolveFinalResultDisplaySize,
+      saveOutputImageResult: saveOutputImageResult,
+      buildToolbarImageFields: buildToolbarImageFields,
+      submitApimartMidjourneyUpscaleRequest: submitApimartMidjourneyUpscaleRequest,
+      submitApimartMidjourneyVariationRequest: submitApimartMidjourneyVariationRequest,
+      resumeApimartMidjourneyUpscaleTask: resumeApimartMidjourneyUpscaleTask,
+      createLocalSaveFailureError: createLocalSaveFailureError,
+      isLocalSaveFailure: isLocalSaveFailure,
+      buildClearedImageMediaFields: buildClearedImageMediaFields,
+      IMAGE_LOCAL_SAVE_FAILURE_MESSAGE: IMAGE_LOCAL_SAVE_FAILURE_MESSAGE,
+      selectToolbarTaskNode: selectToolbarTaskNode,
+      notifyImageToolbarTaskChange: notifyImageToolbarTaskChange,
+    } = value24,
+    el9 = toolbarEl['querySelector']('.act-mj-variation'),
+    el10 = toolbarEl['querySelector']('.act-mj-hd');
+  if (!el9 && !el10) return;
+  let run4 = () => {};
+  const run5 = () => {
+    const apimartMidjourneyToolbarContext = resolveApimartMidjourneyToolbarContext(getNodeData());
+    (setButtonVisible(el9, apimartMidjourneyToolbarContext['enabled']),
+      setButtonVisible(
+        el10,
+        apimartMidjourneyToolbarContext['enabled'] && apimartMidjourneyToolbarContext['supportsHd'] !== ![],
+      ),
+      !apimartMidjourneyToolbarContext['enabled'] && (run4(), (run4 = () => {})));
   };
-  _0xa7bc83();
-  let _0x2f0b2e = '';
-  const _0x2898d9 = (_0x16f041, _0x4b741c, _0x447755 = {}) => {
-    if (_0x2f0b2e) {
+  run5();
+  let value25 = '';
+  const run6 = (kind2, value26, value27 = {}) => {
+    if (value25) {
       window['showToast']?.(midjourneyText('busy'), 'info');
       return;
     }
     void (async () => {
-      let _0x1fc610 = null,
-        _0x2a440e = null,
-        _0x2d50f7 = '',
-        _0x5cf60f = '',
-        _0x48a5a7 = '',
-        _0x474f47 = null;
-      const _0x42ed95 = _0x16f041 === 'hd',
-        _0x268c96 = _0x16f041 === 'variation',
-        _0x336a81 = normalizeVariationMode(_0x447755?.['variationMode']),
-        _0x2918a1 = _0x42ed95 ? midjourneyText('hdAction') : getVariationActionLabel(_0x336a81);
+      let box = null,
+        width2 = null,
+        sourceUrl = '',
+        imageUrl = '',
+        localPath = '',
+        fileName2 = null;
+      const name2 = kind2 === 'hd',
+        executionId = kind2 === 'variation',
+        variationMode2 = normalizeVariationMode(value27?.['variationMode']),
+        actionLabel2 = name2 ? midjourneyText('hdAction') : getVariationActionLabel(variationMode2);
       try {
-        ((_0x2f0b2e = _0x16f041), setBusy(_0x4b741c, !![]));
-        const _0x3d00d8 = _0x551d39() || {},
-          _0x243556 = resolveApimartMidjourneyToolbarContext(_0x3d00d8);
-        if (!_0x243556['enabled']) {
+        ((value25 = kind2), setBusy(value26, !![]));
+        const value28 = getNodeData() || {},
+          index3 = resolveApimartMidjourneyToolbarContext(value28);
+        if (!index3['enabled']) {
           window['showToast']?.(midjourneyText('missingContext'), 'error');
           return;
         }
-        if (_0x42ed95 && _0x243556['supportsHd'] === ![]) {
+        if (name2 && index3['supportsHd'] === ![]) {
           window['showToast']?.(midjourneyText('hdUnsupported'), 'info');
           return;
         }
-        const _0x12d4d4 = _0x42ed95
-          ? buildApimartMidjourneyHdCustomId(_0x243556['buttons'], _0x243556['index'], _0x243556['mjModel'])
+        const customId3 = name2
+          ? buildApimartMidjourneyHdCustomId(index3['buttons'], index3['index'], index3['mjModel'])
           : '';
-        if (_0x42ed95 && !_0x12d4d4) {
+        if (name2 && !customId3) {
           window['showToast']?.(midjourneyText('hdCustomIdMissing'), 'error');
           return;
         }
-        const _0x154588 = _0x3ca49c['getState']()['nodes'][_0x1721ca] || _0x3d00d8;
-        if (!_0x154588) {
+        const sourceNodeId = store['getState']()['nodes'][nodeId] || value28;
+        if (!sourceNodeId) {
           window['showToast']?.(midjourneyText('sourceNodeMissing'), 'error');
           return;
         }
-        const _0x4682be = getCurrentImageUrl(_0x3d00d8, _0x20f643);
-        _0x1fc610 = await _0x3cb14a(_0x154588, _0x4682be);
-        const { width: _0x2355ab, height: _0x54370d } = _0x55fada(_0x1fc610['width'], _0x1fc610['height']),
-          { x: _0x112c70, y: _0x2033a0 } = _0x51f8de(
-            _0x3ca49c['getState']()['nodes'],
-            _0x154588,
-            _0x2355ab,
-            _0x54370d,
+        const currentImageUrl = getCurrentImageUrl(value28, localPathToUrl);
+        box = await resolveApiInputRatioBasis(sourceNodeId, currentImageUrl);
+        const { width: width3, height: height2 } = calcDisplaySizeByMedia(box['width'], box['height']),
+          { x: x2, y: y2 } = calcSafeSpawnPosNearNode(
+            store['getState']()['nodes'],
+            sourceNodeId,
+            width3,
+            height2,
           ),
-          _0x4a62b =
+          id2 =
             'ai-image-apimart-mj-' +
-            _0x16f041 +
+            kind2 +
             '-' +
             Date['now']() +
             '-' +
             Math['random']()['toString'](0x24)['slice'](0x2, 0x6),
-          _0x3cc804 = midjourneyOutputText({ actionLabel: _0x2918a1, index: _0x243556['index'] }),
-          _0x5ecb6f = {
-            ...getPlainObject(_0x3d00d8?.['generationParams']),
-            ...(_0x243556['mjModel'] ? { mjModel: _0x243556['mjModel'] } : {}),
-            ...(_0x243556['speed'] ? { speed: _0x243556['speed'] } : {}),
+          outputText2 = midjourneyOutputText({ actionLabel: actionLabel2, index: index3['index'] }),
+          generationParams2 = {
+            ...getPlainObject(value28?.['generationParams']),
+            ...(index3['mjModel'] ? { mjModel: index3['mjModel'] } : {}),
+            ...(index3['speed'] ? { speed: index3['speed'] } : {}),
           },
-          _0x146fb4 = buildApimartMidjourneyActionPayload({
-            kind: _0x16f041,
-            actionContext: _0x243556,
-            customId: _0x12d4d4,
-            variationMode: _0x336a81,
-            outputText: _0x3cc804,
+          payload2 = buildApimartMidjourneyActionPayload({
+            kind: kind2,
+            actionContext: index3,
+            customId: customId3,
+            variationMode: variationMode2,
+            outputText: outputText2,
           }),
-          _0x227321 = await _0x4bfdfb({
-            sourceNodeId: _0x154588['id'],
+          response2 = await submitTask({
+            sourceNodeId: sourceNodeId['id'],
             trigger: 'toolbar',
-            taskType: 'apimart-midjourney-' + _0x16f041,
+            taskType: 'apimart-midjourney-' + kind2,
             provider: 'apimart',
             adapterType: 'modelApi',
             async: !![],
             modelId: APIMART_MIDJOURNEY_MODEL_ID,
-            executionId: _0x268c96
+            executionId: executionId
               ? 'apimart.model-api.midjourney.variation'
               : 'apimart.model-api.midjourney.upscale',
-            payload: _0x146fb4,
+            payload: payload2,
             cancellable: !![],
             resumable: !![],
-            onTaskChange: _0x23c85a,
-            createTargetNode: ({ startedAt: _0x29cd25, startPatch: _0x2fbc40, protocolPatch: _0x316873 }) =>
+            onTaskChange: notifyImageToolbarTaskChange,
+            createTargetNode: ({
+              startedAt: startedAt2,
+              startPatch: startPatch2,
+              protocolPatch: protocolPatch2,
+            }) =>
               buildApimartMidjourneyTargetNodePayload({
-                id: _0x4a62b,
-                x: _0x112c70,
-                y: _0x2033a0,
-                width: _0x2355ab,
-                height: _0x54370d,
+                id: id2,
+                x: x2,
+                y: y2,
+                width: width3,
+                height: height2,
                 needsAutoResize: ![],
-                name: _0x42ed95
-                  ? midjourneyText('hdProcessingName')
-                  : midjourneyText('variationProcessingName'),
-                outputText: _0x3cc804,
-                fileName: 'apimart_midjourney_' + _0x16f041 + '_' + Date['now']() + '.png',
-                generationParams: _0x5ecb6f,
-                startedAt: _0x29cd25,
-                startPatch: _0x2fbc40,
-                protocolPatch: _0x316873,
+                name: name2 ? midjourneyText('hdProcessingName') : midjourneyText('variationProcessingName'),
+                outputText: outputText2,
+                fileName: 'apimart_midjourney_' + kind2 + '_' + Date['now']() + '.png',
+                generationParams: generationParams2,
+                startedAt: startedAt2,
+                startPatch: startPatch2,
+                protocolPatch: protocolPatch2,
               }),
-            submit: async (_0x2475bd, _0x4d0afb) => {
-              _0x3889c8(_0x4d0afb['targetNodeId']);
-              const _0x5a3825 = _0x268c96 ? _0x5400c9 : _0xfc83c4,
-                _0x33cbb0 = await _0x5a3825({
-                  taskId: _0x2475bd['parentTaskId'],
-                  index: _0x2475bd['index'],
-                  customId: _0x2475bd['customId'],
-                  speed: _0x2475bd['speed'],
-                  prompt: _0x2475bd['prompt'],
-                  mjModel: _0x2475bd['mjModel'],
-                  variationMode: _0x2475bd['variationMode'],
-                  signal: _0x4d0afb['signal'],
+            submit: async (taskId2, signal) => {
+              selectToolbarTaskNode(signal['targetNodeId']);
+              const run7 = executionId
+                  ? submitApimartMidjourneyVariationRequest
+                  : submitApimartMidjourneyUpscaleRequest,
+                taskId3 = await run7({
+                  taskId: taskId2['parentTaskId'],
+                  index: taskId2['index'],
+                  customId: taskId2['customId'],
+                  speed: taskId2['speed'],
+                  prompt: taskId2['prompt'],
+                  mjModel: taskId2['mjModel'],
+                  variationMode: taskId2['variationMode'],
+                  signal: signal['signal'],
                 });
-              if (_0x33cbb0?.['taskId']) _0x4d0afb['onTaskId'](_0x33cbb0['taskId']);
-              return { taskId: _0x33cbb0?.['taskId'] || '' };
+              if (taskId3?.['taskId']) signal['onTaskId'](taskId3['taskId']);
+              return { taskId: taskId3?.['taskId'] || '' };
             },
-            poll: async ({ taskId: _0x4da84e, signal: _0x3cc16e }) => {
-              const _0x57a7e3 = await _0x3a2113(
-                _0x4da84e,
+            poll: async ({ taskId: taskId4, signal: signal2 }) => {
+              const value29 = await resumeApimartMidjourneyUpscaleTask(
+                taskId4,
                 { provider: 'apimart', model: APIMART_MIDJOURNEY_MODEL_ID },
                 {
                   ...MJ_SECONDARY_ACTION_POLL_OPTIONS,
                   apimartMidjourneySource: {
-                    action: _0x268c96 ? 'VARIATION' : 'UPSCALE',
-                    ...(_0x146fb4['mjModel'] ? { mjModel: _0x146fb4['mjModel'] } : {}),
-                    ...(_0x146fb4['speed'] ? { speed: _0x146fb4['speed'] } : {}),
-                    ...(_0x146fb4['prompt'] ? { prompt: _0x146fb4['prompt'] } : {}),
-                    ...(_0x42ed95 ? { hd: !![] } : {}),
+                    action: executionId ? 'VARIATION' : 'UPSCALE',
+                    ...(payload2['mjModel'] ? { mjModel: payload2['mjModel'] } : {}),
+                    ...(payload2['speed'] ? { speed: payload2['speed'] } : {}),
+                    ...(payload2['prompt'] ? { prompt: payload2['prompt'] } : {}),
+                    ...(name2 ? { hd: !![] } : {}),
                   },
-                  signal: _0x3cc16e,
+                  signal: signal2,
                 },
               );
-              if (_0x57a7e3?.['pending']) return _0x57a7e3;
-              const _0x990fd3 = normalizeResumedImages(_0x57a7e3)['filter'](
-                  (_0x16e49e) => _0x16e49e && !_0x16e49e['error'] && getResultUrlFromImage(_0x16e49e),
+              if (value29?.['pending']) return value29;
+              const resultImages = normalizeResumedImages(value29)['filter'](
+                  (enabled6) => enabled6 && !enabled6['error'] && getResultUrlFromImage(enabled6),
                 ),
-                _0x269adc = _0x990fd3[0x0] || null;
-              if (!_0x269adc || _0x269adc['error'])
-                throw new Error(String(_0x269adc?.['error'] || midjourneyText('missingResultImage')));
-              const _0x3315ae = getResultUrlFromImage(_0x269adc);
-              if (!_0x3315ae) throw new Error(midjourneyText('missingResultImage'));
-              return { resultUrl: _0x3315ae, resumedImage: _0x269adc, resultImages: _0x990fd3 };
+                resumedImage = resultImages[0x0] || null;
+              if (!resumedImage || resumedImage['error'])
+                throw new Error(String(resumedImage?.['error'] || midjourneyText('missingResultImage')));
+              const resultUrl = getResultUrlFromImage(resumedImage);
+              if (!resultUrl) throw new Error(midjourneyText('missingResultImage'));
+              return { resultUrl: resultUrl, resumedImage: resumedImage, resultImages: resultImages };
             },
-            resultBuilder: async (_0xaacd6b, _0x41fe49) => {
-              const _0x1b15b2 = String(_0xaacd6b?.['resultUrl'] || '')['trim']();
-              if (!_0x1b15b2) throw new Error(midjourneyText('missingResultImage'));
-              ((_0x2d50f7 = _0x1b15b2), (_0x474f47 = _0xaacd6b?.['resumedImage'] || null));
-              const _0x1b1e2a = Array['isArray'](_0xaacd6b?.['resultImages'])
-                ? _0xaacd6b['resultImages']
-                : [];
-              if (_0x268c96 && _0x1b1e2a['length'] > 0x1) {
-                ((_0x5cf60f = _0x474f47?.['thumbUrl'] || _0x474f47?.['imageUrl'] || _0x1b15b2),
-                  (_0x48a5a7 = _0x474f47?.['localPath'] || ''),
-                  (_0x2a440e = await _0x4253b2(_0x1fc610, {
-                    localPath: _0x48a5a7,
-                    imageUrl: _0x5cf60f,
-                    sourceUrl: _0x1b15b2,
-                    thumbUrl: _0x5cf60f,
-                    src: _0x5cf60f,
+            resultBuilder: async (value30, startedAt3) => {
+              const sourceUrl2 = String(value30?.['resultUrl'] || '')['trim']();
+              if (!sourceUrl2) throw new Error(midjourneyText('missingResultImage'));
+              ((sourceUrl = sourceUrl2), (fileName2 = value30?.['resumedImage'] || null));
+              const images = Array['isArray'](value30?.['resultImages']) ? value30['resultImages'] : [];
+              if (executionId && images['length'] > 0x1) {
+                ((imageUrl = fileName2?.['thumbUrl'] || fileName2?.['imageUrl'] || sourceUrl2),
+                  (localPath = fileName2?.['localPath'] || ''),
+                  (width2 = await resolveFinalResultDisplaySize(box, {
+                    localPath: localPath,
+                    imageUrl: imageUrl,
+                    sourceUrl: sourceUrl2,
+                    thumbUrl: imageUrl,
+                    src: imageUrl,
                   })));
-                if (!_0x48a5a7) throw _0x570898();
+                if (!localPath) throw createLocalSaveFailureError();
                 return {
                   name: midjourneyText('variationResultName'),
-                  ..._0x41cb36({ isBatch: !![], images: _0x1b1e2a }, { startedAt: _0x41fe49['startedAt'] }),
+                  ...buildImageGenerationResultPatch(
+                    { isBatch: !![], images: images },
+                    { startedAt: startedAt3['startedAt'] },
+                  ),
                   fileName:
-                    _0x474f47?.['fileName'] ||
-                    'apimart_midjourney_' + _0x16f041 + '_' + Date['now']() + '.png',
-                  width: _0x2a440e['width'],
-                  height: _0x2a440e['height'],
-                  outputText: _0x3cc804,
+                    fileName2?.['fileName'] || 'apimart_midjourney_' + kind2 + '_' + Date['now']() + '.png',
+                  width: width2['width'],
+                  height: width2['height'],
+                  outputText: outputText2,
                 };
               }
-              let _0xcdac18;
+              let value31;
               try {
-                _0xcdac18 = await _0xd8274f(_0x1b15b2, {
-                  resumedImage: _0x474f47,
+                value31 = await saveOutputImageResult(sourceUrl2, {
+                  resumedImage: fileName2,
                   ext: 'png',
                   includeSrc: !![],
-                  taskKey: _0x41fe49['taskId'] ? 'apimart:image:' + _0x41fe49['taskId'] : '',
+                  taskKey: startedAt3['taskId'] ? 'apimart:image:' + startedAt3['taskId'] : '',
                 });
-              } catch (_0x5d96dc) {
-                (console['warn']('[ApimartMJ] saveOutputFromUrlToServer failed:', _0x5d96dc),
-                  (_0xcdac18 = {
+              } catch (value32) {
+                (console['warn']('[ApimartMJ] saveOutputFromUrlToServer failed:', value32),
+                  (value31 = {
                     localPath: '',
-                    thumbUrl: _0x1b15b2,
-                    fields: _0x576f0d({
+                    thumbUrl: sourceUrl2,
+                    fields: buildToolbarImageFields({
                       localPath: '',
-                      resultUrl: _0x1b15b2,
-                      thumbUrl: _0x1b15b2,
+                      resultUrl: sourceUrl2,
+                      thumbUrl: sourceUrl2,
                       includeSrc: !![],
                     }),
                   }));
               }
-              ((_0x5cf60f = _0xcdac18['thumbUrl'] || _0x1b15b2), (_0x48a5a7 = _0xcdac18['localPath'] || ''));
-              const _0x2c1a56 = _0xcdac18['fields'];
-              _0x2a440e = await _0x4253b2(_0x1fc610, {
-                localPath: _0x48a5a7,
-                imageUrl: _0x5cf60f || _0x1b15b2,
-                sourceUrl: _0x1b15b2,
-                thumbUrl: _0x5cf60f,
-                src: _0x5cf60f || _0x1b15b2,
+              ((imageUrl = value31['thumbUrl'] || sourceUrl2), (localPath = value31['localPath'] || ''));
+              const args = value31['fields'];
+              width2 = await resolveFinalResultDisplaySize(box, {
+                localPath: localPath,
+                imageUrl: imageUrl || sourceUrl2,
+                sourceUrl: sourceUrl2,
+                thumbUrl: imageUrl,
+                src: imageUrl || sourceUrl2,
               });
-              if (!_0x48a5a7) throw _0x570898();
+              if (!localPath) throw createLocalSaveFailureError();
               return {
-                name: _0x42ed95 ? midjourneyText('hdResultName') : midjourneyText('variationResultName'),
-                ..._0x41cb36(_0x2c1a56, { startedAt: _0x41fe49['startedAt'] }),
-                ..._0x2c1a56,
-                sourceUrl: _0x1b15b2 || _0x2c1a56['sourceUrl'] || '',
+                name: name2 ? midjourneyText('hdResultName') : midjourneyText('variationResultName'),
+                ...buildImageGenerationResultPatch(args, { startedAt: startedAt3['startedAt'] }),
+                ...args,
+                sourceUrl: sourceUrl2 || args['sourceUrl'] || '',
                 fileName:
-                  _0x474f47?.['fileName'] ||
-                  _0x2c1a56['fileName'] ||
-                  'apimart_midjourney_' + _0x16f041 + '_' + Date['now']() + '.png',
-                width: _0x2a440e['width'],
-                height: _0x2a440e['height'],
-                outputText: _0x3cc804,
+                  fileName2?.['fileName'] ||
+                  args['fileName'] ||
+                  'apimart_midjourney_' + kind2 + '_' + Date['now']() + '.png',
+                width: width2['width'],
+                height: width2['height'],
+                outputText: outputText2,
               };
             },
-            failureBuilder: async (_0x252b14, _0x12d129) => {
-              const _0x1cd79b =
-                _0x252b14 instanceof Error
-                  ? _0x252b14['message']
-                  : String(_0x252b14 || midjourneyText('unknownError'));
-              if (_0x5d4b5b(_0x252b14))
+            failureBuilder: async (error2, startedAt4) => {
+              const error3 =
+                error2 instanceof Error
+                  ? error2['message']
+                  : String(error2 || midjourneyText('unknownError'));
+              if (isLocalSaveFailure(error2))
                 return (
-                  (_0x2a440e ||= await _0x4253b2(_0x1fc610, {
-                    localPath: _0x48a5a7,
-                    imageUrl: _0x5cf60f || _0x2d50f7,
-                    sourceUrl: _0x2d50f7,
-                    thumbUrl: _0x5cf60f,
-                    src: _0x5cf60f || _0x2d50f7,
+                  (width2 ||= await resolveFinalResultDisplaySize(box, {
+                    localPath: localPath,
+                    imageUrl: imageUrl || sourceUrl,
+                    sourceUrl: sourceUrl,
+                    thumbUrl: imageUrl,
+                    src: imageUrl || sourceUrl,
                   })),
                   {
-                    name: _0x42ed95 ? midjourneyText('hdResultName') : midjourneyText('variationResultName'),
-                    ..._0x26ffd0(),
-                    fileName: 'apimart_midjourney_' + _0x16f041 + '_' + Date['now']() + '.png',
-                    width: _0x2a440e['width'],
-                    height: _0x2a440e['height'],
-                    outputText: _0x3cc804,
-                    ..._0x4b9ff6({ error: _0x22dd94, startedAt: _0x12d129['startedAt'] }),
-                    rhStatusMessage: _0x22dd94,
+                    name: name2 ? midjourneyText('hdResultName') : midjourneyText('variationResultName'),
+                    ...buildClearedImageMediaFields(),
+                    fileName: 'apimart_midjourney_' + kind2 + '_' + Date['now']() + '.png',
+                    width: width2['width'],
+                    height: width2['height'],
+                    outputText: outputText2,
+                    ...buildImageGenerationFailurePatch({
+                      error: IMAGE_LOCAL_SAVE_FAILURE_MESSAGE,
+                      startedAt: startedAt4['startedAt'],
+                    }),
+                    rhStatusMessage: IMAGE_LOCAL_SAVE_FAILURE_MESSAGE,
                   }
                 );
               return {
                 name: midjourneyText('failedName'),
-                ..._0x4b9ff6({ error: _0x1cd79b, startedAt: _0x12d129['startedAt'] }),
+                ...buildImageGenerationFailurePatch({ error: error3, startedAt: startedAt4['startedAt'] }),
                 outputText: midjourneyText('outputTextWithError', {
-                  outputText: _0x3cc804,
-                  error: _0x1cd79b,
+                  outputText: outputText2,
+                  error: error3,
                 }),
               };
             },
             cancelledBuilder: () => ({
               name: midjourneyText('cancelledName'),
               outputText: midjourneyText('outputTextWithStatus', {
-                outputText: _0x3cc804,
+                outputText: outputText2,
                 status: midjourneyText('status.cancelled'),
               }),
             }),
           });
-        if (_0x227321['status'] === 'success')
+        if (response2['status'] === 'success')
           window['showToast']?.(midjourneyText('successToast'), 'success');
         else {
-          if (_0x227321['status'] === 'failed') {
-            if (_0x5d4b5b(_0x227321['error'])) window['showToast']?.('⚠️ ' + _0x22dd94, 'warn');
+          if (response2['status'] === 'failed') {
+            if (isLocalSaveFailure(response2['error']))
+              window['showToast']?.('⚠️ ' + IMAGE_LOCAL_SAVE_FAILURE_MESSAGE, 'warn');
             else {
-              const _0x32579c =
-                  _0x227321['error'] instanceof Error
-                    ? _0x227321['error']['message']
-                    : String(_0x227321['error'] || midjourneyText('unknownError')),
-                _0x3d6625 = showProviderApiKeyMissingToastForError(_0x227321['error'], {
-                  providerId: 'apimart',
-                  model: APIMART_MIDJOURNEY_MODEL_ID,
-                  type: 'error',
-                  message: midjourneyText('failedWithError', { error: _0x32579c }),
-                });
-              !_0x3d6625 &&
-                window['showToast']?.(midjourneyText('failedWithError', { error: _0x32579c }), 'error');
+              const error4 =
+                  response2['error'] instanceof Error
+                    ? response2['error']['message']
+                    : String(response2['error'] || midjourneyText('unknownError')),
+                showProviderApiKeyMissingToastForError2 = showProviderApiKeyMissingToastForError(
+                  response2['error'],
+                  {
+                    providerId: 'apimart',
+                    model: APIMART_MIDJOURNEY_MODEL_ID,
+                    type: 'error',
+                    message: midjourneyText('failedWithError', { error: error4 }),
+                  },
+                );
+              !showProviderApiKeyMissingToastForError2 &&
+                window['showToast']?.(midjourneyText('failedWithError', { error: error4 }), 'error');
             }
           } else {
-            if (_0x227321['status'] === 'cancelled')
+            if (response2['status'] === 'cancelled')
               window['showToast']?.(midjourneyText('cancelledToast'), 'info');
             else
-              _0x227321['status'] === 'pending' &&
+              response2['status'] === 'pending' &&
                 window['showToast']?.(midjourneyText('pendingToast'), 'info');
           }
         }
-      } catch (_0x1ec41d) {
-        const _0x4dec81 =
-            _0x1ec41d instanceof Error
-              ? _0x1ec41d['message']
-              : String(_0x1ec41d || midjourneyText('unknownError')),
-          _0x3c0f54 = showProviderApiKeyMissingToastForError(_0x1ec41d, {
+      } catch (error5) {
+        const error6 =
+            error5 instanceof Error ? error5['message'] : String(error5 || midjourneyText('unknownError')),
+          showProviderApiKeyMissingToastForError3 = showProviderApiKeyMissingToastForError(error5, {
             providerId: 'apimart',
             model: APIMART_MIDJOURNEY_MODEL_ID,
             type: 'error',
-            message: midjourneyText('failedWithError', { error: _0x4dec81 }),
+            message: midjourneyText('failedWithError', { error: error6 }),
           });
-        !_0x3c0f54 && window['showToast']?.(midjourneyText('failedWithError', { error: _0x4dec81 }), 'error');
+        !showProviderApiKeyMissingToastForError3 &&
+          window['showToast']?.(midjourneyText('failedWithError', { error: error6 }), 'error');
       } finally {
-        ((_0x2f0b2e = ''), setBusy(_0x4b741c, ![]), _0xa7bc83());
+        ((value25 = ''), setBusy(value26, ![]), run5());
       }
     })();
   };
-  (_0x2771d7?.['addEventListener']('click', (_0x5ef3c1) => {
-    (_0x5ef3c1['stopPropagation'](), _0x5ef3c1['preventDefault']());
-    if (_0x2f0b2e) {
+  (el9?.['addEventListener']('click', (event5) => {
+    (event5['stopPropagation'](), event5['preventDefault']());
+    if (value25) {
       window['showToast']?.(midjourneyText('busy'), 'info');
       return;
     }
-    const _0x4a43fa = resolveApimartMidjourneyToolbarContext(_0x551d39());
-    _0x4c2e4f = openVariationSubmenu(
-      _0x2771d7,
-      (_0x2f67e6) => {
-        _0x2898d9('variation', _0x2771d7, { variationMode: _0x2f67e6 });
+    const apimartMidjourneyToolbarContext2 = resolveApimartMidjourneyToolbarContext(getNodeData());
+    run4 = openVariationSubmenu(
+      el9,
+      (variationMode3) => {
+        run6('variation', el9, { variationMode: variationMode3 });
       },
-      getApimartMidjourneyVariationOptions(_0x4a43fa['mjModel']),
+      getApimartMidjourneyVariationOptions(apimartMidjourneyToolbarContext2['mjModel']),
     );
   }),
-    _0x1fc75c?.['addEventListener']('click', (_0x2b2ef0) => {
-      (_0x2b2ef0['stopPropagation'](),
-        _0x2b2ef0['preventDefault'](),
-        _0x4c2e4f(),
-        (_0x4c2e4f = () => {}),
-        _0x2898d9('hd', _0x1fc75c));
+    el10?.['addEventListener']('click', (event6) => {
+      (event6['stopPropagation'](), event6['preventDefault'](), run4(), (run4 = () => {}), run6('hd', el10));
     }));
 }

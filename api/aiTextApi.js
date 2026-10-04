@@ -33,106 +33,103 @@ const GENERATION_TIMEOUT = 5 * 60 * 0x3e8,
     badgeBackground: 'midnightblue',
     badgeText: 'white',
   });
-function normalizeInputUrls(_0x56aa50) {
-  return Array.isArray(_0x56aa50)
-    ? _0x56aa50.map((_0x471784) => String(_0x471784 || '').trim()).filter(Boolean)
-    : [];
+function normalizeInputUrls(list) {
+  return Array.isArray(list) ? list.map((item) => String(item || '').trim()).filter(Boolean) : [];
 }
-function hasUnsupportedGptTextMediaUrl(_0x19ca66) {
-  return normalizeInputUrls(_0x19ca66).some((_0x5baace) => GPT_TEXT_UNSUPPORTED_MEDIA_RE.test(_0x5baace));
+function hasUnsupportedGptTextMediaUrl(value) {
+  return normalizeInputUrls(value).some((item2) => GPT_TEXT_UNSUPPORTED_MEDIA_RE.test(item2));
 }
-function isLikelyVideoUrl(_0x4ef1bd) {
-  return GPT_TEXT_VIDEO_MEDIA_RE.test(String(_0x4ef1bd || '').trim());
+function isLikelyVideoUrl(key) {
+  return GPT_TEXT_VIDEO_MEDIA_RE.test(String(key || '').trim());
 }
-function isLikelyAudioUrl(_0x46af1a) {
-  return GPT_TEXT_AUDIO_MEDIA_RE.test(String(_0x46af1a || '').trim());
+function isLikelyAudioUrl(index) {
+  return GPT_TEXT_AUDIO_MEDIA_RE.test(String(index || '').trim());
 }
-function hasUnsupportedGptTextAudioUrl(_0x4df4a8) {
-  return normalizeInputUrls(_0x4df4a8).some((_0x1ecc1d) => isLikelyAudioUrl(_0x1ecc1d));
+function hasUnsupportedGptTextAudioUrl(result) {
+  return normalizeInputUrls(result).some((item3) => isLikelyAudioUrl(item3));
 }
-function splitChatCompletionInputUrls(_0x2d6bcf) {
-  const _0x42fc0b = [],
-    _0x45784a = [],
-    _0x5d6a7f = [];
-  for (const _0x824210 of normalizeInputUrls(_0x2d6bcf)) {
-    if (isLikelyVideoUrl(_0x824210)) _0x45784a.push(_0x824210);
-    else isLikelyAudioUrl(_0x824210) ? _0x5d6a7f.push(_0x824210) : _0x42fc0b.push(_0x824210);
+function splitChatCompletionInputUrls(data) {
+  const imageUrls = [],
+    videoUrls = [],
+    audioUrls = [];
+  for (const options of normalizeInputUrls(data)) {
+    if (isLikelyVideoUrl(options)) videoUrls.push(options);
+    else isLikelyAudioUrl(options) ? audioUrls.push(options) : imageUrls.push(options);
   }
-  return { imageUrls: _0x42fc0b, videoUrls: _0x45784a, audioUrls: _0x5d6a7f };
+  return { imageUrls: imageUrls, videoUrls: videoUrls, audioUrls: audioUrls };
 }
 function resolveChatCompletionInputUrls({
   providerId: providerId = '',
   mediaPolicy: mediaPolicy = '',
-  inputUrls: _0x87ee14,
-  inputImageUrls: _0x28b103,
-  inputVideoUrls: _0x313de3,
+  inputUrls: inputUrls,
+  inputImageUrls: inputImageUrls,
+  inputVideoUrls: inputVideoUrls,
 }) {
-  const _0x18f7a0 = String(mediaPolicy || '')
+  const mediaPolicy2 = String(mediaPolicy || '')
       .trim()
       .toLowerCase(),
-    _0x1f0221 = normalizeInputUrls(_0x87ee14),
-    _0x5efb56 = normalizeInputUrls(_0x28b103),
-    _0x48ca04 = normalizeInputUrls(_0x313de3),
-    _0x4d6fdd = splitChatCompletionInputUrls(_0x1f0221);
-  if (_0x18f7a0 === 'text-only') {
-    if (_0x1f0221.length > 0 || _0x5efb56.length > 0 || _0x48ca04.length > 0) {
-      const _0x242e85 = formatTextProviderLabel(providerId);
-      throw new Error(_0x242e85 + ' 文本模型暂不支持图片、视频或音频参考，请仅输入文本');
+    inputUrls2 = normalizeInputUrls(inputUrls),
+    inputImageUrls2 = normalizeInputUrls(inputImageUrls),
+    inputVideoUrls2 = normalizeInputUrls(inputVideoUrls),
+    splitChatCompletionInputUrls2 = splitChatCompletionInputUrls(inputUrls2);
+  if (mediaPolicy2 === 'text-only') {
+    if (inputUrls2.length > 0 || inputImageUrls2.length > 0 || inputVideoUrls2.length > 0) {
+      const formatTextProviderLabel2 = formatTextProviderLabel(providerId);
+      throw new Error(formatTextProviderLabel2 + ' 文本模型暂不支持图片、视频或音频参考，请仅输入文本');
     }
     return [];
   }
-  if (_0x18f7a0 === 'image-video') {
+  if (mediaPolicy2 === 'image-video') {
     if (
-      _0x4d6fdd.audioUrls.length > 0 ||
-      hasUnsupportedGptTextAudioUrl(_0x5efb56) ||
-      hasUnsupportedGptTextAudioUrl(_0x48ca04)
+      splitChatCompletionInputUrls2.audioUrls.length > 0 ||
+      hasUnsupportedGptTextAudioUrl(inputImageUrls2) ||
+      hasUnsupportedGptTextAudioUrl(inputVideoUrls2)
     ) {
-      const _0x52aeae = formatTextProviderLabel(providerId);
-      throw new Error(_0x52aeae + ' 文本模型暂不支持音频参考，请改用图片或视频参考');
+      const formatTextProviderLabel3 = formatTextProviderLabel(providerId);
+      throw new Error(formatTextProviderLabel3 + ' 文本模型暂不支持音频参考，请改用图片或视频参考');
     }
     return {
-      inputUrls: _0x1f0221,
-      inputImageUrls: _0x5efb56.length > 0 ? _0x5efb56 : _0x4d6fdd.imageUrls,
-      inputVideoUrls: _0x48ca04.length > 0 ? _0x48ca04 : _0x4d6fdd.videoUrls,
+      inputUrls: inputUrls2,
+      inputImageUrls: inputImageUrls2.length > 0 ? inputImageUrls2 : splitChatCompletionInputUrls2.imageUrls,
+      inputVideoUrls: inputVideoUrls2.length > 0 ? inputVideoUrls2 : splitChatCompletionInputUrls2.videoUrls,
       allowVideo: true,
-      mediaPolicy: _0x18f7a0,
+      mediaPolicy: mediaPolicy2,
     };
   }
-  if (_0x18f7a0 !== 'image-only') return _0x1f0221;
+  if (mediaPolicy2 !== 'image-only') return inputUrls2;
   if (
-    _0x48ca04.length > 0 ||
-    hasUnsupportedGptTextMediaUrl(_0x1f0221) ||
-    hasUnsupportedGptTextMediaUrl(_0x5efb56)
+    inputVideoUrls2.length > 0 ||
+    hasUnsupportedGptTextMediaUrl(inputUrls2) ||
+    hasUnsupportedGptTextMediaUrl(inputImageUrls2)
   ) {
-    const _0x417ff9 = formatTextProviderLabel(providerId);
-    throw new Error(_0x417ff9 + ' 文本模型已统一使用 GPT 图文格式，暂不支持视频或音频参考，请改用图片参考');
+    const formatTextProviderLabel4 = formatTextProviderLabel(providerId);
+    throw new Error(
+      formatTextProviderLabel4 + ' 文本模型已统一使用 GPT 图文格式，暂不支持视频或音频参考，请改用图片参考',
+    );
   }
-  return _0x5efb56.length > 0 ? _0x5efb56 : _0x1f0221;
+  return inputImageUrls2.length > 0 ? inputImageUrls2 : inputUrls2;
 }
 const RUNNINGHUB_POLL_INTERVAL_MS = 0xbb8;
-function sleep(_0x386dfa) {
-  return new Promise((_0x586abf) => setTimeout(_0x586abf, _0x386dfa));
+function sleep(target) {
+  return new Promise((source) => setTimeout(source, target));
 }
-function resolveCssColorValue(_0x2e3cc4, _0x14289c = new Set()) {
-  const _0x4018d9 = String(_0x2e3cc4 || '').trim();
-  if (!_0x4018d9) return '';
-  const _0x1dad00 = /^var\(\s*(--[A-Za-z0-9_-]+)\s*(?:,\s*([^)]+?)\s*)?\)$/.exec(_0x4018d9);
-  if (!_0x1dad00) return _0x4018d9;
-  const _0x1c49e6 = _0x1dad00[1],
-    _0x1f22ed = (_0x1dad00[2] || '').trim();
-  if (_0x14289c.has(_0x1c49e6)) return resolveCssColorValue(_0x1f22ed, _0x14289c);
-  return (
-    _0x14289c.add(_0x1c49e6),
-    readDocumentCssColorToken(_0x1c49e6, _0x14289c) || resolveCssColorValue(_0x1f22ed, _0x14289c)
-  );
+function resolveCssColorValue(next, map = new Set()) {
+  const enabled = String(next || '').trim();
+  if (!enabled) return '';
+  const enabled2 = /^var\(\s*(--[A-Za-z0-9_-]+)\s*(?:,\s*([^)]+?)\s*)?\)$/.exec(enabled);
+  if (!enabled2) return enabled;
+  const current = enabled2[1],
+    entry = (enabled2[2] || '').trim();
+  if (map.has(current)) return resolveCssColorValue(entry, map);
+  return (map.add(current), readDocumentCssColorToken(current, map) || resolveCssColorValue(entry, map));
 }
-function readDocumentCssColorToken(_0x3da86b, _0x31a221 = new Set()) {
-  const _0x335b0b = globalThis?.document?.documentElement,
-    _0x3cf67d = globalThis?.getComputedStyle || globalThis?.window?.getComputedStyle;
-  if (!_0x335b0b || typeof _0x3cf67d !== 'function') return '';
-  const _0x2bb12a = _0x3cf67d(_0x335b0b).getPropertyValue(_0x3da86b).trim();
-  if (!_0x2bb12a) return '';
-  return resolveCssColorValue(_0x2bb12a, _0x31a221);
+function readDocumentCssColorToken(record, payload = new Set()) {
+  const enabled3 = globalThis?.document?.documentElement,
+    handler = globalThis?.getComputedStyle || globalThis?.window?.getComputedStyle;
+  if (!enabled3 || typeof handler !== 'function') return '';
+  const enabled4 = handler(enabled3).getPropertyValue(record).trim();
+  if (!enabled4) return '';
+  return resolveCssColorValue(enabled4, payload);
 }
 function getRunningHubContactSheetPalette() {
   return {
@@ -153,639 +150,635 @@ function getRunningHubContactSheetPalette() {
       RUNNINGHUB_CONTACT_SHEET_COLOR_FALLBACKS.badgeText,
   };
 }
-function pickFirstNonEmptyString(_0x10227d) {
-  for (const _0x443803 of _0x10227d) {
-    if (typeof _0x443803 === 'string' && _0x443803.trim()) return _0x443803.trim();
+function pickFirstNonEmptyString(handle) {
+  for (const state of handle) {
+    if (typeof state === 'string' && state.trim()) return state.trim();
   }
   return '';
 }
-function isRunningHubTextModel(_0x144cc7, _0x174333) {
-  return _0x144cc7 === 'runninghub' && isModelApiModel(_0x174333, 'runninghub');
+function isRunningHubTextModel(config, scope) {
+  return config === 'runninghub' && isModelApiModel(scope, 'runninghub');
 }
 const MANIFEST_REQUIRED_TEXT_PROVIDERS = Object.freeze(
   new Set(['agnes', 'apimart', 'grsai', 'ppio', 'runninghub', 'volcengine']),
 );
-function formatTextProviderLabel(_0x30a825) {
-  const _0xaddf0 = normalizeProviderId(_0x30a825);
-  if (_0xaddf0 === 'agnes') return 'Agnes AI';
-  if (_0xaddf0 === 'apimart') return 'APIMart';
-  if (_0xaddf0 === 'grsai') return 'GRSAI';
-  if (_0xaddf0 === 'ppio') return 'PPIO';
-  if (_0xaddf0 === 'runninghub') return 'RunningHub';
-  if (_0xaddf0 === 'volcengine') return 'Volcengine';
-  return _0xaddf0 || 'Text';
+function formatTextProviderLabel(input) {
+  const providerId2 = normalizeProviderId(input);
+  if (providerId2 === 'agnes') return 'Agnes AI';
+  if (providerId2 === 'apimart') return 'APIMart';
+  if (providerId2 === 'grsai') return 'GRSAI';
+  if (providerId2 === 'ppio') return 'PPIO';
+  if (providerId2 === 'runninghub') return 'RunningHub';
+  if (providerId2 === 'volcengine') return 'Volcengine';
+  return providerId2 || 'Text';
 }
-function resolveTextExecution(_0x56a447 = {}, _0x47f0bf = '') {
-  const _0x34a3fd = normalizeProviderId(_0x56a447?.provider);
-  if (_0x34a3fd === 'custom' || _0x34a3fd === 'openai') return null;
-  return resolveModelExecution(_0x47f0bf || _0x56a447?.model, { providerHint: _0x34a3fd });
+function resolveTextExecution(options2 = {}, output = '') {
+  const providerHint = normalizeProviderId(options2?.provider);
+  if (providerHint === 'custom' || providerHint === 'openai') return null;
+  return resolveModelExecution(output || options2?.model, { providerHint: providerHint });
 }
-function resolveTextProviderId(_0x37a590 = {}, _0x136d59 = '', _0x35c88f = null) {
-  if (_0x37a590.provider === 'custom') return 'openai';
-  return normalizeProviderId(_0x35c88f?.modelManifest?.provider || _0x37a590.provider);
+function resolveTextProviderId(options3 = {}, value2 = '', value3 = null) {
+  if (options3.provider === 'custom') return 'openai';
+  return normalizeProviderId(value3?.modelManifest?.provider || options3.provider);
 }
-function isManifestBackedTextExecution(_0xb832f2) {
+function isManifestBackedTextExecution(value4) {
   return (
-    _0xb832f2?.modelManifest?.kind === 'text' &&
-    _0xb832f2?.executionManifest?.kind === 'text' &&
-    _0xb832f2?.modelManifest?.adapterType === 'modelApi' &&
-    _0xb832f2?.executionManifest?.adapterType === 'modelApi'
+    value4?.modelManifest?.kind === 'text' &&
+    value4?.executionManifest?.kind === 'text' &&
+    value4?.modelManifest?.adapterType === 'modelApi' &&
+    value4?.executionManifest?.adapterType === 'modelApi'
   );
 }
-function getTextManifestMissingError(_0x3985da, _0x2bf500 = '') {
-  const _0x344bce = formatTextProviderLabel(_0x2bf500);
-  if (_0x2bf500) return new Error(_0x344bce + ' text model API manifest missing: ' + _0x3985da);
-  return new Error('Text model API manifest missing: ' + _0x3985da);
+function getTextManifestMissingError(value5, value6 = '') {
+  const formatTextProviderLabel5 = formatTextProviderLabel(value6);
+  if (value6) return new Error(formatTextProviderLabel5 + ' text model API manifest missing: ' + value5);
+  return new Error('Text model API manifest missing: ' + value5);
 }
-function assertTextManifestResolution(_0x362de8, _0x4e3bc2, _0x3cfdbc) {
-  if (isManifestBackedTextExecution(_0x3cfdbc)) return;
-  if (!_0x4e3bc2 || MANIFEST_REQUIRED_TEXT_PROVIDERS.has(normalizeProviderId(_0x4e3bc2)))
-    throw getTextManifestMissingError(_0x362de8, _0x4e3bc2);
+function assertTextManifestResolution(value7, enabled5, value8) {
+  if (isManifestBackedTextExecution(value8)) return;
+  if (!enabled5 || MANIFEST_REQUIRED_TEXT_PROVIDERS.has(normalizeProviderId(enabled5)))
+    throw getTextManifestMissingError(value7, enabled5);
 }
-function parseRunningHubResponseData(_0x2f1fe4) {
-  if (!_0x2f1fe4) return {};
-  if (typeof _0x2f1fe4 === 'object') return _0x2f1fe4;
-  const _0x804a6b = String(_0x2f1fe4 || '').trim();
-  if (!_0x804a6b) return {};
+function parseRunningHubResponseData(enabled6) {
+  if (!enabled6) return {};
+  if (typeof enabled6 === 'object') return enabled6;
+  const enabled7 = String(enabled6 || '').trim();
+  if (!enabled7) return {};
   try {
-    return JSON.parse(_0x804a6b);
+    return JSON.parse(enabled7);
   } catch {}
-  const _0x42dd14 = extractSseJsonSnapshots(_0x804a6b);
-  if (_0x42dd14.length > 0) {
-    const _0x488b9e = normalizeChatCompletionSnapshots(_0x42dd14);
-    if (_0x488b9e) return _0x488b9e;
-    for (const _0x4497b4 of _0x42dd14) {
-      if (getRunningHubTaskId(_0x4497b4)) return _0x4497b4;
+  const list2 = extractSseJsonSnapshots(enabled7);
+  if (list2.length > 0) {
+    const chatCompletionSnapshots = normalizeChatCompletionSnapshots(list2);
+    if (chatCompletionSnapshots) return chatCompletionSnapshots;
+    for (const value9 of list2) {
+      if (getRunningHubTaskId(value9)) return value9;
     }
-    return _0x42dd14[_0x42dd14.length - 1];
+    return list2[list2.length - 1];
   }
   throw new Error('无法解析 RunningHUB 文本接口响应');
 }
-function extractSseJsonSnapshots(_0x1c2cc5) {
-  const _0x1111ee = String(_0x1c2cc5 || '')
+function extractSseJsonSnapshots(value10) {
+  const list3 = String(value10 || '')
     .split('\n')
-    .filter((_0x44ee64) => _0x44ee64.trim().startsWith('data:'));
-  if (_0x1111ee.length === 0) return [];
-  const _0x146b7f = [];
-  for (const _0xb4b102 of _0x1111ee) {
-    const _0x565fc1 = String(_0xb4b102 || '')
+    .filter((item4) => item4.trim().startsWith('data:'));
+  if (list3.length === 0) return [];
+  const list4 = [];
+  for (const value11 of list3) {
+    const enabled8 = String(value11 || '')
       .trim()
       .replace(/^data:\s*/, '')
       .trim();
-    if (!_0x565fc1 || _0x565fc1 === '[DONE]') continue;
+    if (!enabled8 || enabled8 === '[DONE]') continue;
     try {
-      _0x146b7f.push(JSON.parse(_0x565fc1));
+      list4.push(JSON.parse(enabled8));
     } catch {}
   }
-  return _0x146b7f;
+  return list4;
 }
-function normalizeChatCompletionSnapshots(_0x1f50c8) {
-  const _0x97bc16 = [];
-  let _0x4aaa79 = null,
-    _0x500bac = '',
-    _0x2a7f45 = 'assistant';
-  for (const _0xb9c26a of _0x1f50c8 || []) {
-    if (!_0xb9c26a || typeof _0xb9c26a !== 'object') continue;
-    const _0x5af0f7 = _0xb9c26a.choices || _0xb9c26a.data?.choices || [];
-    if (!Array.isArray(_0x5af0f7) || _0x5af0f7.length === 0) continue;
-    _0x4aaa79 = _0xb9c26a;
-    for (const _0x1330f9 of _0x5af0f7) {
-      if (!_0x1330f9 || typeof _0x1330f9 !== 'object') continue;
-      if (_0x1330f9.finish_reason) _0x500bac = _0x1330f9.finish_reason;
-      if (typeof _0x1330f9.delta?.role === 'string') _0x2a7f45 = _0x1330f9.delta.role || _0x2a7f45;
-      if (typeof _0x1330f9.message?.role === 'string') _0x2a7f45 = _0x1330f9.message.role || _0x2a7f45;
-      if (typeof _0x1330f9.delta?.content === 'string') _0x97bc16.push(_0x1330f9.delta.content);
-      if (typeof _0x1330f9.message?.content === 'string') _0x97bc16.push(_0x1330f9.message.content);
-      if (typeof _0x1330f9.text === 'string') _0x97bc16.push(_0x1330f9.text);
+function normalizeChatCompletionSnapshots(value12) {
+  const list5 = [];
+  let id = null,
+    finish_reason = '',
+    role = 'assistant';
+  for (const enabled9 of value12 || []) {
+    if (!enabled9 || typeof enabled9 !== 'object') continue;
+    const list6 = enabled9.choices || enabled9.data?.choices || [];
+    if (!Array.isArray(list6) || list6.length === 0) continue;
+    id = enabled9;
+    for (const error of list6) {
+      if (!error || typeof error !== 'object') continue;
+      if (error.finish_reason) finish_reason = error.finish_reason;
+      if (typeof error.delta?.role === 'string') role = error.delta.role || role;
+      if (typeof error.message?.role === 'string') role = error.message.role || role;
+      if (typeof error.delta?.content === 'string') list5.push(error.delta.content);
+      if (typeof error.message?.content === 'string') list5.push(error.message.content);
+      if (typeof error.text === 'string') list5.push(error.text);
     }
   }
-  const _0x25a64a = _0x97bc16.join('');
-  if (!_0x25a64a) return null;
+  const content = list5.join('');
+  if (!content) return null;
   return {
-    id: _0x4aaa79?.id || '',
+    id: id?.id || '',
     object: 'chat.completion',
     choices: [
-      { index: 0, message: { role: _0x2a7f45, content: _0x25a64a }, finish_reason: _0x500bac || 'stop' },
+      { index: 0, message: { role: role, content: content }, finish_reason: finish_reason || 'stop' },
     ],
   };
 }
-function getRunningHubTaskId(_0x5eb749) {
+function getRunningHubTaskId(value13) {
   return String(
-    _0x5eb749?.taskId ||
-      _0x5eb749?.task_id ||
-      _0x5eb749?.data?.taskId ||
-      _0x5eb749?.data?.task_id ||
-      _0x5eb749?.data?.id ||
-      _0x5eb749?.id ||
+    value13?.taskId ||
+      value13?.task_id ||
+      value13?.data?.taskId ||
+      value13?.data?.task_id ||
+      value13?.data?.id ||
+      value13?.id ||
       '',
   ).trim();
 }
-function isChatCompletionResponse(_0x423311) {
-  const _0xd66d41 = _0x423311?.choices || _0x423311?.data?.choices;
-  if (Array.isArray(_0xd66d41)) return true;
-  const _0x1edb54 = String(_0x423311?.object || _0x423311?.data?.object || '');
-  return _0x1edb54.startsWith('chat.completion');
+function isChatCompletionResponse(value14) {
+  const value15 = value14?.choices || value14?.data?.choices;
+  if (Array.isArray(value15)) return true;
+  const value16 = String(value14?.object || value14?.data?.object || '');
+  return value16.startsWith('chat.completion');
 }
-function stringifyRunningHubReason(_0x473b6d) {
-  if (_0x473b6d == null) return '';
-  if (typeof _0x473b6d === 'string') return _0x473b6d.trim();
-  if (typeof _0x473b6d === 'object') {
-    const _0x3d27cb = pickFirstNonEmptyString([
-      _0x473b6d.message,
-      _0x473b6d.errorMessage,
-      _0x473b6d.error,
-      _0x473b6d.msg,
-      _0x473b6d.reason,
-      _0x473b6d.detail,
+function stringifyRunningHubReason(error2) {
+  if (error2 == null) return '';
+  if (typeof error2 === 'string') return error2.trim();
+  if (typeof error2 === 'object') {
+    const firstNonEmptyString = pickFirstNonEmptyString([
+      error2.message,
+      error2.errorMessage,
+      error2.error,
+      error2.msg,
+      error2.reason,
+      error2.detail,
     ]);
-    if (_0x3d27cb) return _0x3d27cb;
+    if (firstNonEmptyString) return firstNonEmptyString;
     try {
-      return JSON.stringify(_0x473b6d);
+      return JSON.stringify(error2);
     } catch {}
   }
-  return String(_0x473b6d || '').trim();
+  return String(error2 || '').trim();
 }
-function getRunningHubTextErrorMessage(_0x27159e, _0x5378db = '文本生成失败') {
+function getRunningHubTextErrorMessage(error3, value17 = '文本生成失败') {
   return (
     pickFirstNonEmptyString([
-      _0x27159e?.errorMessage,
-      _0x27159e?.message,
-      _0x27159e?.error,
-      _0x27159e?.msg,
-      stringifyRunningHubReason(_0x27159e?.failedReason),
-      stringifyRunningHubReason(_0x27159e?.reason),
-    ]) || _0x5378db
+      error3?.errorMessage,
+      error3?.message,
+      error3?.error,
+      error3?.msg,
+      stringifyRunningHubReason(error3?.failedReason),
+      stringifyRunningHubReason(error3?.reason),
+    ]) || value17
   );
 }
-function sanitizeGeneratedText(_0x4b10fc) {
-  return String(_0x4b10fc || '')
+function sanitizeGeneratedText(value18) {
+  return String(value18 || '')
     .replace(/<think>[\s\S]*?<\/think>\n?/g, '')
     .trim();
 }
-function hasImageMentions(_0x146539) {
-  return /@图片\d+/.test(String(_0x146539 || ''));
+function hasImageMentions(value19) {
+  return /@图片\d+/.test(String(value19 || ''));
 }
-function hasVideoMentions(_0x429199) {
-  return /@视频\d+/.test(String(_0x429199 || ''));
+function hasVideoMentions(value20) {
+  return /@视频\d+/.test(String(value20 || ''));
 }
-function resolveInputFetchUrl(_0x2ffe8b) {
-  const _0x4caa9e = String(_0x2ffe8b || '').trim();
-  if (!_0x4caa9e) return '';
-  if (/^(?:https?:|data:|blob:)/i.test(_0x4caa9e)) return _0x4caa9e;
-  if (_0x4caa9e.startsWith('/')) return buildApiUrl(_0x4caa9e);
-  return _0x4caa9e;
+function resolveInputFetchUrl(value21) {
+  const enabled10 = String(value21 || '').trim();
+  if (!enabled10) return '';
+  if (/^(?:https?:|data:|blob:)/i.test(enabled10)) return enabled10;
+  if (enabled10.startsWith('/')) return buildApiUrl(enabled10);
+  return enabled10;
 }
-function loadCanvasImageFromObjectUrl(_0x4457ef) {
-  return new Promise((_0x56e820, _0xa77088) => {
-    const _0x19f3ed = globalThis?.Image;
-    if (typeof _0x19f3ed !== 'function') {
-      _0xa77088(new Error('当前环境不支持图片加载'));
+function loadCanvasImageFromObjectUrl(value22) {
+  return new Promise((handler2, handler3) => {
+    const run = globalThis?.Image;
+    if (typeof run !== 'function') {
+      handler3(new Error('当前环境不支持图片加载'));
       return;
     }
-    const _0x119f0b = new _0x19f3ed();
-    ('crossOrigin' in _0x119f0b && (_0x119f0b.crossOrigin = 'anonymous'),
-      (_0x119f0b.onload = () => _0x56e820(_0x119f0b)),
-      (_0x119f0b.onerror = () => _0xa77088(new Error('图片加载失败'))),
-      (_0x119f0b.src = _0x4457ef));
+    const value23 = new run();
+    ('crossOrigin' in value23 && (value23.crossOrigin = 'anonymous'),
+      (value23.onload = () => handler2(value23)),
+      (value23.onerror = () => handler3(new Error('图片加载失败'))),
+      (value23.src = value22));
   });
 }
-async function loadCanvasImageSource(_0x4a47be) {
-  const _0x7d8527 = globalThis?.createImageBitmap;
-  if (typeof _0x7d8527 === 'function') {
-    const _0xd29ca7 = await _0x7d8527(_0x4a47be),
-      _0x53d73e = Number(_0xd29ca7?.width || 0),
-      _0x317777 = Number(_0xd29ca7?.height || 0);
-    if (_0x53d73e > 0 && _0x317777 > 0)
-      return { handle: _0xd29ca7, width: _0x53d73e, height: _0x317777, dispose: () => _0xd29ca7?.close?.() };
-    _0xd29ca7?.close?.();
+async function loadCanvasImageSource(value24) {
+  const run2 = globalThis?.createImageBitmap;
+  if (typeof run2 === 'function') {
+    const handle2 = await run2(value24),
+      width = Number(handle2?.width || 0),
+      height = Number(handle2?.height || 0);
+    if (width > 0 && height > 0)
+      return { handle: handle2, width: width, height: height, dispose: () => handle2?.close?.() };
+    handle2?.close?.();
   }
-  const _0x205809 = globalThis?.URL;
-  if (typeof _0x205809?.createObjectURL !== 'function') throw new Error('当前环境不支持多图合成');
-  const _0x47dca9 = _0x205809.createObjectURL(_0x4a47be);
+  const value25 = globalThis?.URL;
+  if (typeof value25?.createObjectURL !== 'function') throw new Error('当前环境不支持多图合成');
+  const value26 = value25.createObjectURL(value24);
   try {
-    const _0x2f2be1 = await loadCanvasImageFromObjectUrl(_0x47dca9),
-      _0x2520a0 = Number(_0x2f2be1?.naturalWidth || _0x2f2be1?.width || 0),
-      _0x112b25 = Number(_0x2f2be1?.naturalHeight || _0x2f2be1?.height || 0);
-    if (!(_0x2520a0 > 0 && _0x112b25 > 0)) throw new Error('图片尺寸无效');
+    const handle3 = await loadCanvasImageFromObjectUrl(value26),
+      width2 = Number(handle3?.naturalWidth || handle3?.width || 0),
+      height2 = Number(handle3?.naturalHeight || handle3?.height || 0);
+    if (!(width2 > 0 && height2 > 0)) throw new Error('图片尺寸无效');
     return {
-      handle: _0x2f2be1,
-      width: _0x2520a0,
-      height: _0x112b25,
-      dispose: () => _0x205809.revokeObjectURL?.(_0x47dca9),
+      handle: handle3,
+      width: width2,
+      height: height2,
+      dispose: () => value25.revokeObjectURL?.(value26),
     };
-  } catch (_0x4cc160) {
-    _0x205809.revokeObjectURL?.(_0x47dca9);
-    throw _0x4cc160;
+  } catch (value27) {
+    value25.revokeObjectURL?.(value26);
+    throw value27;
   }
 }
-function createCanvasTarget(_0x36a994, _0x46b3c6) {
-  const _0xc6cfb5 = globalThis?.OffscreenCanvas;
-  if (typeof _0xc6cfb5 === 'function') {
-    const _0x4d92aa = new _0xc6cfb5(_0x36a994, _0x46b3c6);
+function createCanvasTarget(value28, value29) {
+  const run3 = globalThis?.OffscreenCanvas;
+  if (typeof run3 === 'function') {
+    const canvas = new run3(value28, value29);
     return {
-      canvas: _0x4d92aa,
+      canvas: canvas,
       toBlob: async () => {
-        if (typeof _0x4d92aa.convertToBlob === 'function')
-          return await _0x4d92aa.convertToBlob({ type: 'image/png' });
+        if (typeof canvas.convertToBlob === 'function')
+          return await canvas.convertToBlob({ type: 'image/png' });
         return null;
       },
     };
   }
   if (typeof document !== 'undefined' && typeof document.createElement === 'function') {
-    const _0x435a9c = document.createElement('canvas');
+    const canvas2 = document.createElement('canvas');
     return (
-      (_0x435a9c.width = _0x36a994),
-      (_0x435a9c.height = _0x46b3c6),
+      (canvas2.width = value28),
+      (canvas2.height = value29),
       {
-        canvas: _0x435a9c,
+        canvas: canvas2,
         toBlob: async () =>
-          await new Promise((_0x689d91) => {
-            if (typeof _0x435a9c.toBlob !== 'function') {
-              _0x689d91(null);
+          await new Promise((handler4) => {
+            if (typeof canvas2.toBlob !== 'function') {
+              handler4(null);
               return;
             }
-            _0x435a9c.toBlob((_0x2b4caf) => _0x689d91(_0x2b4caf), 'image/png');
+            canvas2.toBlob((value30) => handler4(value30), 'image/png');
           }),
       }
     );
   }
   throw new Error('当前环境不支持多图合成');
 }
-function resolveRunningHubContactSheetGrid(_0x3b33f6) {
-  const _0x115198 = Math.max(1, Math.trunc(Number(_0x3b33f6) || 1)),
-    _0x2d0ffe = _0x115198 === 2 ? 2 : Math.ceil(Math.sqrt(_0x115198)),
-    _0x1b7d23 = Math.ceil(_0x115198 / _0x2d0ffe);
-  return { cols: _0x2d0ffe, rows: _0x1b7d23 };
+function resolveRunningHubContactSheetGrid(value31) {
+  const count = Math.max(1, Math.trunc(Number(value31) || 1)),
+    cols = count === 2 ? 2 : Math.ceil(Math.sqrt(count)),
+    rows = Math.ceil(count / cols);
+  return { cols: cols, rows: rows };
 }
-function resolveRunningHubContactSheetCellSize(_0x2b5153, _0x2740e1) {
-  const _0x4ba7de = RUNNINGHUB_CONTACT_SHEET_MAX_SIDE_PX,
-    _0x10bbce = RUNNINGHUB_CONTACT_SHEET_GAP_PX,
-    _0x325804 = Math.floor((_0x4ba7de - _0x10bbce * (_0x2b5153 + 1)) / _0x2b5153),
-    _0x188f9e = Math.floor((_0x4ba7de - _0x10bbce * (_0x2740e1 + 1)) / _0x2740e1);
-  return Math.max(RUNNINGHUB_CONTACT_SHEET_MIN_CELL_PX, Math.min(_0x325804, _0x188f9e));
+function resolveRunningHubContactSheetCellSize(value32, value33) {
+  const value34 = RUNNINGHUB_CONTACT_SHEET_MAX_SIDE_PX,
+    value35 = RUNNINGHUB_CONTACT_SHEET_GAP_PX,
+    value36 = Math.floor((value34 - value35 * (value32 + 1)) / value32),
+    value37 = Math.floor((value34 - value35 * (value33 + 1)) / value33);
+  return Math.max(RUNNINGHUB_CONTACT_SHEET_MIN_CELL_PX, Math.min(value36, value37));
 }
-async function composeRunningHubMultiImageBlob(_0x5b9d6b) {
-  const _0x513457 = normalizeInputUrls(_0x5b9d6b),
-    _0xf87d0d = [];
-  for (const _0x31afc9 of _0x513457) {
+async function composeRunningHubMultiImageBlob(value38) {
+  const inputUrls3 = normalizeInputUrls(value38),
+    list7 = [];
+  for (const value39 of inputUrls3) {
     try {
-      const _0x1967b8 = await get(resolveInputFetchUrl(_0x31afc9), {
+      const blob = await get(resolveInputFetchUrl(value39), {
           provider: 'remote',
           buildUrl: false,
           responseType: 'blob',
         }),
-        _0x3502af = await loadCanvasImageSource(_0x1967b8);
-      _0xf87d0d.push({ blob: _0x1967b8, source: _0x3502af });
+        source2 = await loadCanvasImageSource(blob);
+      list7.push({ blob: blob, source: source2 });
     } catch {}
   }
-  if (_0xf87d0d.length === 0) throw new Error('参考图片处理失败，无法合成多图输入');
-  if (_0xf87d0d.length === 1) {
-    const _0x3bb13c = _0xf87d0d[0].blob;
-    return (_0xf87d0d[0].source?.dispose?.(), _0x3bb13c);
+  if (list7.length === 0) throw new Error('参考图片处理失败，无法合成多图输入');
+  if (list7.length === 1) {
+    const value40 = list7[0].blob;
+    return (list7[0].source?.dispose?.(), value40);
   }
   try {
-    const { cols: _0x336e46, rows: _0x31f50b } = resolveRunningHubContactSheetGrid(_0xf87d0d.length),
-      _0x171ab7 = RUNNINGHUB_CONTACT_SHEET_GAP_PX,
-      _0x42d4e2 = resolveRunningHubContactSheetCellSize(_0x336e46, _0x31f50b),
-      _0x5cfa53 = getRunningHubContactSheetPalette(),
-      _0x39dc0c = _0x336e46 * _0x42d4e2 + _0x171ab7 * (_0x336e46 + 1),
-      _0x1db532 = _0x31f50b * _0x42d4e2 + _0x171ab7 * (_0x31f50b + 1),
-      { canvas: _0x666e3, toBlob: _0x4cdb5b } = createCanvasTarget(_0x39dc0c, _0x1db532),
-      _0x145b23 = _0x666e3?.getContext?.('2d');
-    if (!_0x145b23 || typeof _0x145b23.drawImage !== 'function') throw new Error('当前环境不支持多图合成');
-    ((_0x145b23.fillStyle = _0x5cfa53.background), _0x145b23.fillRect?.(0, 0, _0x39dc0c, _0x1db532));
-    const _0x437e04 = Math.max(30, Math.round(_0x42d4e2 * 0.14)),
-      _0x57330c = Math.max(16, Math.round(_0x437e04 * 0.48));
-    _0xf87d0d.forEach((_0x3a251c, _0x4713f4) => {
-      const _0x382b5a = Math.floor(_0x4713f4 / _0x336e46),
-        _0x268d2c = _0x4713f4 % _0x336e46,
-        _0x104617 = _0x171ab7 + _0x268d2c * (_0x42d4e2 + _0x171ab7),
-        _0x32d7cb = _0x171ab7 + _0x382b5a * (_0x42d4e2 + _0x171ab7);
-      ((_0x145b23.fillStyle = _0x5cfa53.cellBackground),
-        _0x145b23.fillRect?.(_0x104617, _0x32d7cb, _0x42d4e2, _0x42d4e2));
-      const _0x26b959 = Math.max(1, Number(_0x3a251c.source.width || 1)),
-        _0x23ffe3 = Math.max(1, Number(_0x3a251c.source.height || 1)),
-        _0x22b9d3 = Math.min(_0x42d4e2 / _0x26b959, _0x42d4e2 / _0x23ffe3),
-        _0x3354f4 = Math.max(1, Math.round(_0x26b959 * _0x22b9d3)),
-        _0x722afe = Math.max(1, Math.round(_0x23ffe3 * _0x22b9d3)),
-        _0xd7b903 = _0x104617 + Math.round((_0x42d4e2 - _0x3354f4) / 2),
-        _0x128b53 = _0x32d7cb + Math.round((_0x42d4e2 - _0x722afe) / 2);
-      (_0x145b23.drawImage(_0x3a251c.source.handle, _0xd7b903, _0x128b53, _0x3354f4, _0x722afe),
-        (_0x145b23.strokeStyle = _0x5cfa53.cellStroke),
-        (_0x145b23.lineWidth = 2),
-        _0x145b23.strokeRect?.(_0x104617 + 1, _0x32d7cb + 1, _0x42d4e2 - 2, _0x42d4e2 - 2),
-        (_0x145b23.fillStyle = _0x5cfa53.badgeBackground),
-        _0x145b23.fillRect?.(_0x104617 + 12, _0x32d7cb + 12, _0x437e04, _0x437e04),
-        (_0x145b23.fillStyle = _0x5cfa53.badgeText),
-        (_0x145b23.font = '600 ' + _0x57330c + 'px sans-serif'),
-        (_0x145b23.textAlign = 'center'),
-        (_0x145b23.textBaseline = 'middle'),
-        _0x145b23.fillText?.(
-          String(_0x4713f4 + 1),
-          _0x104617 + 12 + _0x437e04 / 2,
-          _0x32d7cb + 12 + _0x437e04 / 2,
-        ));
+    const { cols: cols2, rows: rows2 } = resolveRunningHubContactSheetGrid(list7.length),
+      value41 = RUNNINGHUB_CONTACT_SHEET_GAP_PX,
+      runningHubContactSheetCellSize = resolveRunningHubContactSheetCellSize(cols2, rows2),
+      runningHubContactSheetPalette = getRunningHubContactSheetPalette(),
+      value42 = cols2 * runningHubContactSheetCellSize + value41 * (cols2 + 1),
+      value43 = rows2 * runningHubContactSheetCellSize + value41 * (rows2 + 1),
+      { canvas: canvas3, toBlob: toBlob } = createCanvasTarget(value42, value43),
+      ctx = canvas3?.getContext?.('2d');
+    if (!ctx || typeof ctx.drawImage !== 'function') throw new Error('当前环境不支持多图合成');
+    ((ctx.fillStyle = runningHubContactSheetPalette.background), ctx.fillRect?.(0, 0, value42, value43));
+    const value44 = Math.max(30, Math.round(runningHubContactSheetCellSize * 0.14)),
+      value45 = Math.max(16, Math.round(value44 * 0.48));
+    list7.forEach((item5, value46) => {
+      const value47 = Math.floor(value46 / cols2),
+        value48 = value46 % cols2,
+        value49 = value41 + value48 * (runningHubContactSheetCellSize + value41),
+        value50 = value41 + value47 * (runningHubContactSheetCellSize + value41);
+      ((ctx.fillStyle = runningHubContactSheetPalette.cellBackground),
+        ctx.fillRect?.(value49, value50, runningHubContactSheetCellSize, runningHubContactSheetCellSize));
+      const value51 = Math.max(1, Number(item5.source.width || 1)),
+        value52 = Math.max(1, Number(item5.source.height || 1)),
+        value53 = Math.min(
+          runningHubContactSheetCellSize / value51,
+          runningHubContactSheetCellSize / value52,
+        ),
+        value54 = Math.max(1, Math.round(value51 * value53)),
+        value55 = Math.max(1, Math.round(value52 * value53)),
+        value56 = value49 + Math.round((runningHubContactSheetCellSize - value54) / 2),
+        value57 = value50 + Math.round((runningHubContactSheetCellSize - value55) / 2);
+      (ctx.drawImage(item5.source.handle, value56, value57, value54, value55),
+        (ctx.strokeStyle = runningHubContactSheetPalette.cellStroke),
+        (ctx.lineWidth = 2),
+        ctx.strokeRect?.(
+          value49 + 1,
+          value50 + 1,
+          runningHubContactSheetCellSize - 2,
+          runningHubContactSheetCellSize - 2,
+        ),
+        (ctx.fillStyle = runningHubContactSheetPalette.badgeBackground),
+        ctx.fillRect?.(value49 + 12, value50 + 12, value44, value44),
+        (ctx.fillStyle = runningHubContactSheetPalette.badgeText),
+        (ctx.font = '600 ' + value45 + 'px sans-serif'),
+        (ctx.textAlign = 'center'),
+        (ctx.textBaseline = 'middle'),
+        ctx.fillText?.(String(value46 + 1), value49 + 12 + value44 / 2, value50 + 12 + value44 / 2));
     });
-    const _0x125dd1 = await _0x4cdb5b();
-    if (!_0x125dd1) throw new Error('多图合成失败');
-    return _0x125dd1;
+    const enabled11 = await toBlob();
+    if (!enabled11) throw new Error('多图合成失败');
+    return enabled11;
   } finally {
-    _0xf87d0d.forEach((_0x57e8ae) => {
-      _0x57e8ae.source?.dispose?.();
+    list7.forEach((item6) => {
+      item6.source?.dispose?.();
     });
   }
 }
-async function buildRunningHubTextImageUrl(_0xa7b8d, _0x507f92) {
-  const _0x161e06 = normalizeInputUrls(_0xa7b8d);
-  if (_0x161e06.length === 0) return '';
-  if (_0x161e06.length === 1) {
-    const _0x5cfa25 = await processInputImages(_0x161e06, _0x507f92, {
+async function buildRunningHubTextImageUrl(value58, value59) {
+  const list8 = normalizeInputUrls(value58);
+  if (list8.length === 0) return '';
+  if (list8.length === 1) {
+    const processInputImages2 = await processInputImages(list8, value59, {
       applyInputQualityProfile: true,
       provider: 'runninghub',
       preferFree: false,
       strictUpload: true,
     });
-    return String(_0x5cfa25[0] || '').trim();
+    return String(processInputImages2[0] || '').trim();
   }
-  const _0x17b676 = await composeRunningHubMultiImageBlob(_0x161e06);
-  return String(await uploadToRunningHub(_0x17b676, _0x507f92)).trim();
+  const composeRunningHubMultiImageBlob2 = await composeRunningHubMultiImageBlob(list8);
+  return String(await uploadToRunningHub(composeRunningHubMultiImageBlob2, value59)).trim();
 }
-function mergeAdjacentTextParts(_0x85b3e5, { createTextPart: _0x149623, isTextPart: _0xacd19b }) {
-  const _0x27a6b1 = [];
-  let _0x1da830 = '';
-  const _0x2c66e6 = () => {
-    if (!_0x1da830) return;
-    (_0x27a6b1.push(_0x149623(_0x1da830)), (_0x1da830 = ''));
+function mergeAdjacentTextParts(value60, { createTextPart: createTextPart, isTextPart: isTextPart }) {
+  const list9 = [];
+  let enabled12 = '';
+  const run4 = () => {
+    if (!enabled12) return;
+    (list9.push(createTextPart(enabled12)), (enabled12 = ''));
   };
-  for (const _0x4d992a of _0x85b3e5) {
-    if (!_0x4d992a) continue;
-    if (_0xacd19b(_0x4d992a)) {
-      _0x1da830 += String(_0x4d992a.text || '');
+  for (const response of value60) {
+    if (!response) continue;
+    if (isTextPart(response)) {
+      enabled12 += String(response.text || '');
       continue;
     }
-    (_0x2c66e6(), _0x27a6b1.push(_0x4d992a));
+    (run4(), list9.push(response));
   }
-  return (_0x2c66e6(), _0x27a6b1);
+  return (run4(), list9);
 }
 function buildPromptMediaParts(
-  _0x1ba759,
-  _0x2dd911,
-  { createTextPart: _0x4b8b03, isTextPart: _0x142fd0 },
-  _0x283340 = {},
+  value61,
+  value62,
+  { createTextPart: createTextPart2, isTextPart: isTextPart2 },
+  value63 = {},
 ) {
-  const _0x21e25e = String(_0x1ba759 || ''),
-    _0x1de7d5 = normalizePromptMediaGroups(_0x2dd911, _0x283340),
-    _0x202a6e = _0x1de7d5.some((_0x2557dd) => _0x2557dd.parts.length > 0);
-  if (!_0x202a6e) return _0x21e25e ? [_0x4b8b03(_0x21e25e)] : [];
-  const _0x2e138b = [],
-    _0x5bff19 = new Set(),
-    _0x2d9b8e = [];
-  for (const _0x2a3333 of _0x1de7d5) {
-    _0x2a3333.mentionRe.lastIndex = 0;
-    let _0x5614f2;
-    while ((_0x5614f2 = _0x2a3333.mentionRe.exec(_0x21e25e))) {
-      const _0xef93cd = Number.parseInt(_0x5614f2[0].replace(/\D+/g, ''), 10),
-        _0x3c623c = Number.isFinite(_0xef93cd) ? Math.max(0, _0xef93cd - 1) : -1;
-      _0x2d9b8e.push({
-        index: _0x5614f2.index,
-        endIndex: _0x5614f2.index + _0x5614f2[0].length,
-        text: _0x5614f2[0],
-        group: _0x2a3333,
-        mediaIndex: _0x3c623c,
+  const list10 = String(value61 || ''),
+    list11 = normalizePromptMediaGroups(value62, value63),
+    enabled13 = list11.some((item7) => item7.parts.length > 0);
+  if (!enabled13) return list10 ? [createTextPart2(list10)] : [];
+  const list12 = [],
+    map2 = new Set(),
+    list13 = [];
+  for (const group of list11) {
+    group.mentionRe.lastIndex = 0;
+    let index2;
+    while ((index2 = group.mentionRe.exec(list10))) {
+      const value64 = Number.parseInt(index2[0].replace(/\D+/g, ''), 10),
+        mediaIndex = Number.isFinite(value64) ? Math.max(0, value64 - 1) : -1;
+      list13.push({
+        index: index2.index,
+        endIndex: index2.index + index2[0].length,
+        text: index2[0],
+        group: group,
+        mediaIndex: mediaIndex,
       });
     }
   }
-  _0x2d9b8e.sort(
-    (_0xd27ea3, _0x5472ab) => _0xd27ea3.index - _0x5472ab.index || _0xd27ea3.endIndex - _0x5472ab.endIndex,
-  );
-  let _0x11fc44 = 0;
-  for (const _0x59831c of _0x2d9b8e) {
-    if (_0x59831c.index < _0x11fc44) continue;
-    const _0x185897 = _0x21e25e.slice(_0x11fc44, _0x59831c.index);
-    _0x185897 && _0x2e138b.push(_0x4b8b03(_0x185897));
-    const _0x2ad25b = _0x59831c.group.parts[_0x59831c.mediaIndex];
-    (_0x2ad25b
-      ? (_0x2e138b.push(_0x2ad25b), _0x5bff19.add(_0x59831c.group.kind + ':' + _0x59831c.mediaIndex))
-      : _0x2e138b.push(_0x4b8b03(_0x59831c.text)),
-      (_0x11fc44 = _0x59831c.endIndex));
+  list13.sort((item8, value65) => item8.index - value65.index || item8.endIndex - value65.endIndex);
+  let value66 = 0;
+  for (const response2 of list13) {
+    if (response2.index < value66) continue;
+    const value67 = list10.slice(value66, response2.index);
+    value67 && list12.push(createTextPart2(value67));
+    const value68 = response2.group.parts[response2.mediaIndex];
+    (value68
+      ? (list12.push(value68), map2.add(response2.group.kind + ':' + response2.mediaIndex))
+      : list12.push(createTextPart2(response2.text)),
+      (value66 = response2.endIndex));
   }
-  const _0x299b4a = _0x21e25e.slice(_0x11fc44);
-  _0x299b4a && _0x2e138b.push(_0x4b8b03(_0x299b4a));
-  _0x1de7d5.forEach((_0x36b726) => {
-    _0x36b726.parts.forEach((_0x395aa6, _0x3d142a) => {
-      _0x395aa6 && !_0x5bff19.has(_0x36b726.kind + ':' + _0x3d142a) && _0x2e138b.push(_0x395aa6);
+  const value69 = list10.slice(value66);
+  value69 && list12.push(createTextPart2(value69));
+  list11.forEach((item9) => {
+    item9.parts.forEach((item10, value70) => {
+      item10 && !map2.has(item9.kind + ':' + value70) && list12.push(item10);
     });
   });
-  if (_0x2e138b.length === 0) return _0x1de7d5.flatMap((_0x58a424) => _0x58a424.parts.filter(Boolean));
-  return mergeAdjacentTextParts(_0x2e138b, { createTextPart: _0x4b8b03, isTextPart: _0x142fd0 });
+  if (list12.length === 0) return list11.flatMap((item11) => item11.parts.filter(Boolean));
+  return mergeAdjacentTextParts(list12, { createTextPart: createTextPart2, isTextPart: isTextPart2 });
 }
-function normalizePromptMediaGroups(_0x11902a, _0x2208d0 = {}) {
-  const _0x43a767 =
-    Array.isArray(_0x11902a) && _0x11902a.some((_0x432d0c) => _0x432d0c && Array.isArray(_0x432d0c.parts))
-      ? _0x11902a
+function normalizePromptMediaGroups(parts, preserveSlots = {}) {
+  const list14 =
+    Array.isArray(parts) && parts.some((item12) => item12 && Array.isArray(item12.parts))
+      ? parts
       : [
           {
             kind: 'image',
             mentionRe: IMAGE_MENTION_RE,
-            parts: _0x11902a,
-            preserveSlots: _0x2208d0?.preserveSlots === true,
+            parts: parts,
+            preserveSlots: preserveSlots?.preserveSlots === true,
           },
         ];
-  return _0x43a767.map((_0x4e9f58, _0x95ac75) => {
-    const _0x2ba9f1 = _0x4e9f58?.preserveSlots === true || _0x2208d0?.preserveSlots === true,
-      _0x37b5c6 = Array.isArray(_0x4e9f58?.parts)
-        ? _0x2ba9f1
-          ? _0x4e9f58.parts.slice()
-          : _0x4e9f58.parts.filter(Boolean)
+  return list14.map((mentionRe, value71) => {
+    const value72 = mentionRe?.preserveSlots === true || preserveSlots?.preserveSlots === true,
+      parts2 = Array.isArray(mentionRe?.parts)
+        ? value72
+          ? mentionRe.parts.slice()
+          : mentionRe.parts.filter(Boolean)
         : [];
     return {
-      kind: String(_0x4e9f58?.kind || 'media' + _0x95ac75),
-      mentionRe: _0x4e9f58?.mentionRe || IMAGE_MENTION_RE,
-      parts: _0x37b5c6,
+      kind: String(mentionRe?.kind || 'media' + value71),
+      mentionRe: mentionRe?.mentionRe || IMAGE_MENTION_RE,
+      parts: parts2,
     };
   });
 }
-function normalizeChatCompletionMediaInput(_0x365399, _0x1549e3 = {}) {
-  const _0x7dfcaf = _0x365399 && typeof _0x365399 === 'object' && !Array.isArray(_0x365399) ? _0x365399 : {},
-    _0x61d5a3 = normalizeInputUrls(_0x7dfcaf.inputUrls !== undefined ? _0x7dfcaf.inputUrls : _0x365399),
-    _0x24d366 = String(_0x1549e3.mediaPolicy || _0x7dfcaf.mediaPolicy || '')
+function normalizeChatCompletionMediaInput(value73, value74 = {}) {
+  const value75 = value73 && typeof value73 === 'object' && !Array.isArray(value73) ? value73 : {},
+    inputUrls4 = normalizeInputUrls(value75.inputUrls !== undefined ? value75.inputUrls : value73),
+    value76 = String(value74.mediaPolicy || value75.mediaPolicy || '')
       .trim()
       .toLowerCase(),
-    _0x200e38 = _0x1549e3.allowVideo === true || _0x7dfcaf.allowVideo === true || _0x24d366 === 'image-video',
-    _0x4be5aa = normalizeInputUrls(_0x1549e3.inputImageUrls),
-    _0x514a1d = normalizeInputUrls(_0x7dfcaf.inputImageUrls),
-    _0x23fbe6 = normalizeInputUrls(_0x1549e3.inputVideoUrls),
-    _0x29a58b = normalizeInputUrls(_0x7dfcaf.inputVideoUrls),
-    _0x301b6d = splitChatCompletionInputUrls(_0x61d5a3);
+    inputVideoUrls3 = value74.allowVideo === true || value75.allowVideo === true || value76 === 'image-video',
+    inputImageUrls3 = normalizeInputUrls(value74.inputImageUrls),
+    list15 = normalizeInputUrls(value75.inputImageUrls),
+    list16 = normalizeInputUrls(value74.inputVideoUrls),
+    list17 = normalizeInputUrls(value75.inputVideoUrls),
+    splitChatCompletionInputUrls3 = splitChatCompletionInputUrls(inputUrls4);
   return {
     inputImageUrls:
-      _0x4be5aa.length > 0
-        ? _0x4be5aa
-        : _0x514a1d.length > 0
-          ? _0x514a1d
-          : _0x200e38
-            ? _0x301b6d.imageUrls
-            : _0x61d5a3,
-    inputVideoUrls: _0x200e38
-      ? _0x23fbe6.length > 0
-        ? _0x23fbe6
-        : _0x29a58b.length > 0
-          ? _0x29a58b
-          : _0x301b6d.videoUrls
+      inputImageUrls3.length > 0
+        ? inputImageUrls3
+        : list15.length > 0
+          ? list15
+          : inputVideoUrls3
+            ? splitChatCompletionInputUrls3.imageUrls
+            : inputUrls4,
+    inputVideoUrls: inputVideoUrls3
+      ? list16.length > 0
+        ? list16
+        : list17.length > 0
+          ? list17
+          : splitChatCompletionInputUrls3.videoUrls
       : [],
   };
 }
-function resolveChatCompletionVideoUrl(_0x5d8f80, _0x506cb0) {
-  const _0xb7b2b4 = String(_0x5d8f80 || '').trim();
-  if (!_0xb7b2b4) return '';
-  if (normalizeProviderId(_0x506cb0) === 'volcengine') {
-    if (/^https?:\/\//i.test(_0xb7b2b4)) return _0xb7b2b4;
+function resolveChatCompletionVideoUrl(value77, value78) {
+  const enabled14 = String(value77 || '').trim();
+  if (!enabled14) return '';
+  if (normalizeProviderId(value78) === 'volcengine') {
+    if (/^https?:\/\//i.test(enabled14)) return enabled14;
     throw new Error('火山方舟视频输入需要公网可访问的视频 URL，当前本地视频无法直接发送');
   }
-  return resolveInputFetchUrl(_0xb7b2b4);
+  return resolveInputFetchUrl(enabled14);
 }
-async function buildVolcengineResponsesUserContent(
-  _0x2a4efc,
-  _0x75d40a,
-  _0x2f2ec5,
-  _0x150746,
-  _0x2860ce = {},
-) {
-  const _0x112735 = normalizeChatCompletionMediaInput(_0x75d40a, {
-      ..._0x2860ce,
+async function buildVolcengineResponsesUserContent(value79, value80, value81, value82, baseUrl = {}) {
+  const chatCompletionMediaInput = normalizeChatCompletionMediaInput(value80, {
+      ...baseUrl,
       allowVideo: true,
       mediaPolicy: 'image-video',
     }),
-    _0x1a28cf = String(_0x2860ce.model || '').trim(),
-    _0xbbb488 =
-      _0x112735.inputImageUrls.length > 0
-        ? await uploadInputsToVolcengineFiles(_0x112735.inputImageUrls, _0x2f2ec5, {
-            baseUrl: _0x2860ce.baseUrl,
+    model = String(baseUrl.model || '').trim(),
+    list18 =
+      chatCompletionMediaInput.inputImageUrls.length > 0
+        ? await uploadInputsToVolcengineFiles(chatCompletionMediaInput.inputImageUrls, value81, {
+            baseUrl: baseUrl.baseUrl,
             kind: 'image',
-            model: _0x1a28cf,
+            model: model,
           })
         : [],
-    _0xcfc17d =
-      _0x112735.inputVideoUrls.length > 0
-        ? await uploadInputsToVolcengineFiles(_0x112735.inputVideoUrls, _0x2f2ec5, {
-            baseUrl: _0x2860ce.baseUrl,
+    list19 =
+      chatCompletionMediaInput.inputVideoUrls.length > 0
+        ? await uploadInputsToVolcengineFiles(chatCompletionMediaInput.inputVideoUrls, value81, {
+            baseUrl: baseUrl.baseUrl,
             kind: 'video',
-            model: _0x1a28cf,
-            videoFps: _0x2860ce.videoFps ?? 0.3,
+            model: model,
+            videoFps: baseUrl.videoFps ?? 0.3,
           })
         : [],
-    _0x406586 = _0xbbb488.map((_0x5d45bf) =>
-      String(_0x5d45bf || '').trim() ? { type: 'input_image', file_id: _0x5d45bf } : null,
+    parts3 = list18.map((file_id) =>
+      String(file_id || '').trim() ? { type: 'input_image', file_id: file_id } : null,
     ),
-    _0x20f29d = _0xcfc17d.map((_0x1f07e7) =>
-      String(_0x1f07e7 || '').trim() ? { type: 'input_video', file_id: _0x1f07e7 } : null,
+    parts4 = list19.map((file_id2) =>
+      String(file_id2 || '').trim() ? { type: 'input_video', file_id: file_id2 } : null,
     );
   if (
-    hasImageMentions(_0x2a4efc) &&
-    _0x112735.inputImageUrls.length > 0 &&
-    _0x406586.filter(Boolean).length === 0
+    hasImageMentions(value79) &&
+    chatCompletionMediaInput.inputImageUrls.length > 0 &&
+    parts3.filter(Boolean).length === 0
   )
     throw new Error('参考图片处理失败，无法映射 @图片 引用');
   if (
-    hasVideoMentions(_0x2a4efc) &&
-    _0x112735.inputVideoUrls.length > 0 &&
-    _0x20f29d.filter(Boolean).length === 0
+    hasVideoMentions(value79) &&
+    chatCompletionMediaInput.inputVideoUrls.length > 0 &&
+    parts4.filter(Boolean).length === 0
   )
     throw new Error('参考视频处理失败，无法映射 @视频 引用');
   return buildPromptMediaParts(
-    _0x2a4efc,
+    value79,
     [
-      { kind: 'image', mentionRe: IMAGE_MENTION_RE, parts: _0x406586, preserveSlots: true },
-      { kind: 'video', mentionRe: VIDEO_MENTION_RE, parts: _0x20f29d, preserveSlots: true },
+      { kind: 'image', mentionRe: IMAGE_MENTION_RE, parts: parts3, preserveSlots: true },
+      { kind: 'video', mentionRe: VIDEO_MENTION_RE, parts: parts4, preserveSlots: true },
     ],
     {
-      createTextPart: (_0x47bbc7) => ({ type: 'input_text', text: _0x47bbc7 }),
-      isTextPart: (_0x3b24ca) => !!_0x3b24ca && _0x3b24ca.type === 'input_text',
+      createTextPart: (text) => ({ type: 'input_text', text: text }),
+      isTextPart: (enabled15) => !!enabled15 && enabled15.type === 'input_text',
     },
   );
 }
-async function buildChatCompletionUserContent(_0x1bab08, _0x1ec058, _0xeb413e, _0x30ed34, _0x36f2c0 = {}) {
-  const _0x5259af = normalizeChatCompletionMediaInput(_0x1ec058, _0x36f2c0),
-    _0x3ae70a = _0x5259af.inputImageUrls,
-    _0x326a44 = _0x5259af.inputVideoUrls,
-    _0x2913ac = normalizeProviderId(_0x30ed34),
-    _0x2cc906 = _0x2913ac === 'agnes' ? 'freeImageHost' : _0x30ed34,
-    _0x486521 = _0x2913ac === 'agnes' ? '' : _0xeb413e,
-    _0x1af266 = _0x2913ac !== 'grsai' && _0x2913ac !== 'agnes',
-    _0x4b51db =
-      _0x3ae70a.length > 0
-        ? await processInputImagesPreserveOrder(_0x3ae70a, _0x486521, {
+async function buildChatCompletionUserContent(value83, value84, value85, value86, value87 = {}) {
+  const chatCompletionMediaInput2 = normalizeChatCompletionMediaInput(value84, value87),
+    list20 = chatCompletionMediaInput2.inputImageUrls,
+    list21 = chatCompletionMediaInput2.inputVideoUrls,
+    strictUpload = normalizeProviderId(value86),
+    provider = strictUpload === 'agnes' ? 'freeImageHost' : value86,
+    value88 = strictUpload === 'agnes' ? '' : value85,
+    preferFree = strictUpload !== 'grsai' && strictUpload !== 'agnes',
+    list22 =
+      list20.length > 0
+        ? await processInputImagesPreserveOrder(list20, value88, {
             applyInputQualityProfile: true,
-            provider: _0x2cc906,
-            preferFree: _0x1af266,
-            strictUpload: _0x2913ac === 'agnes',
+            provider: provider,
+            preferFree: preferFree,
+            strictUpload: strictUpload === 'agnes',
           })
         : [],
-    _0x17cd55 = _0x4b51db.map((_0x342c11) =>
-      String(_0x342c11 || '').trim() ? { type: 'image_url', image_url: { url: _0x342c11 } } : null,
+    parts5 = list22.map((url) =>
+      String(url || '').trim() ? { type: 'image_url', image_url: { url: url } } : null,
     ),
-    _0x2ad56a = _0x17cd55.filter(Boolean);
-  if (hasImageMentions(_0x1bab08) && _0x3ae70a.length > 0 && _0x2ad56a.length === 0)
+    list23 = parts5.filter(Boolean);
+  if (hasImageMentions(value83) && list20.length > 0 && list23.length === 0)
     throw new Error('参考图片处理失败，无法映射 @图片 引用');
-  const _0x5f28ae = _0x326a44.map((_0x2f65c8) => {
-      const _0x364c55 = resolveChatCompletionVideoUrl(_0x2f65c8, _0x30ed34);
-      return _0x364c55 ? { type: 'video_url', video_url: { url: _0x364c55 } } : null;
+  const parts6 = list21.map((item13) => {
+      const url2 = resolveChatCompletionVideoUrl(item13, value86);
+      return url2 ? { type: 'video_url', video_url: { url: url2 } } : null;
     }),
-    _0x5a867d = _0x5f28ae.filter(Boolean);
-  if (hasVideoMentions(_0x1bab08) && _0x326a44.length > 0 && _0x5a867d.length === 0)
+    list24 = parts6.filter(Boolean);
+  if (hasVideoMentions(value83) && list21.length > 0 && list24.length === 0)
     throw new Error('参考视频处理失败，无法映射 @视频 引用');
-  const _0x16901a = buildPromptMediaParts(
-    _0x1bab08,
+  const list25 = buildPromptMediaParts(
+    value83,
     [
-      { kind: 'image', mentionRe: IMAGE_MENTION_RE, parts: _0x17cd55, preserveSlots: true },
-      { kind: 'video', mentionRe: VIDEO_MENTION_RE, parts: _0x5f28ae, preserveSlots: true },
+      { kind: 'image', mentionRe: IMAGE_MENTION_RE, parts: parts5, preserveSlots: true },
+      { kind: 'video', mentionRe: VIDEO_MENTION_RE, parts: parts6, preserveSlots: true },
     ],
     {
-      createTextPart: (_0x5936de) => ({ type: 'text', text: _0x5936de }),
-      isTextPart: (_0x322b26) => !!_0x322b26 && _0x322b26.type === 'text',
+      createTextPart: (text2) => ({ type: 'text', text: text2 }),
+      isTextPart: (enabled16) => !!enabled16 && enabled16.type === 'text',
     },
   );
-  if (_0x16901a.length === 1 && _0x16901a[0]?.type === 'text') return _0x16901a[0].text;
-  return _0x16901a.length > 0 ? _0x16901a : String(_0x1bab08 || '');
+  if (list25.length === 1 && list25[0]?.type === 'text') return list25[0].text;
+  return list25.length > 0 ? list25 : String(value83 || '');
 }
-export async function buildGenerateTextRequest(_0x470190) {
+export async function buildGenerateTextRequest(content2) {
   await ensureConfig();
-  const _0x10d678 = applyCameraAngleToPrompt(_0x470190.prompt, _0x470190.cameraAngle),
-    _0x4cb39e = _0x10d678.length;
-  if (_0x4cb39e > 0xc350)
+  const list26 = applyCameraAngleToPrompt(content2.prompt, content2.cameraAngle),
+    count2 = list26.length;
+  if (count2 > 0xc350)
     throw new Error(
       '提示词过长（' +
-        _0x4cb39e +
+        count2 +
         ' 字符）。为避免接口/代理返回异常，请分段生成：先让模型输出大纲，再按章节逐段生成。',
     );
-  const _0x30e23b = _0x470190.model || 'gemini-3.1-pro',
-    _0x56eaf3 = resolveTextExecution(_0x470190, _0x30e23b),
-    _0x1b6ed0 = resolveTextProviderId(_0x470190, _0x30e23b, _0x56eaf3);
-  assertTextManifestResolution(_0x30e23b, _0x1b6ed0, _0x56eaf3);
-  const _0x2c0ce2 = getProviderConfig(_0x1b6ed0),
-    _0x415db3 = _0x2c0ce2.apiUrl.replace(/\/v1\/?$/, ''),
-    _0x191608 = isRunningHubTextModel(_0x1b6ed0, _0x30e23b)
-      ? _0x2c0ce2.modelApiKey || _0x470190.apiKey
-      : _0x470190.apiKey || _0x2c0ce2.apiKey;
-  if (!_0x191608)
+  const model2 = content2.model || 'gemini-3.1-pro',
+    textExecution = resolveTextExecution(content2, model2),
+    expectedProvider = resolveTextProviderId(content2, model2, textExecution);
+  assertTextManifestResolution(model2, expectedProvider, textExecution);
+  const providerConfig = getProviderConfig(expectedProvider),
+    list27 = providerConfig.apiUrl.replace(/\/v1\/?$/, ''),
+    apiKey = isRunningHubTextModel(expectedProvider, model2)
+      ? providerConfig.modelApiKey || content2.apiKey
+      : content2.apiKey || providerConfig.apiKey;
+  if (!apiKey)
     throw ApiError.authError(
-      _0x1b6ed0,
+      expectedProvider,
       null,
-      'API Key 未配置（厂商：' + _0x1b6ed0 + '），无法发起文本生成请求',
+      'API Key 未配置（厂商：' + expectedProvider + '），无法发起文本生成请求',
     );
-  const _0x1e78e5 = normalizeInputUrls(_0x470190.inputUrls),
-    _0x429bbe = normalizeInputUrls(_0x470190.inputImageUrls),
-    _0x5b3354 = normalizeInputUrls(_0x470190.inputVideoUrls);
-  if (isManifestBackedTextExecution(_0x56eaf3)) {
-    const _0x100b3b = await buildTextRequestFromManifest(
+  const inputUrls5 = normalizeInputUrls(content2.inputUrls),
+    inputImageUrls4 = normalizeInputUrls(content2.inputImageUrls),
+    inputVideoUrls4 = normalizeInputUrls(content2.inputVideoUrls);
+  if (isManifestBackedTextExecution(textExecution)) {
+    const textRequestFromManifest = await buildTextRequestFromManifest(
       {
-        ..._0x470190,
-        model: _0x30e23b,
-        inputUrls: _0x1e78e5,
-        inputImageUrls: _0x429bbe,
-        inputVideoUrls: _0x5b3354,
+        ...content2,
+        model: model2,
+        inputUrls: inputUrls5,
+        inputImageUrls: inputImageUrls4,
+        inputVideoUrls: inputVideoUrls4,
       },
-      _0x10d678,
+      list26,
       {
         getProviderConfig: getProviderConfig,
         buildRunningHubTextImageUrl: buildRunningHubTextImageUrl,
@@ -793,114 +786,117 @@ export async function buildGenerateTextRequest(_0x470190) {
         buildChatCompletionUserContent: buildChatCompletionUserContent,
         buildVolcengineResponsesUserContent: buildVolcengineResponsesUserContent,
       },
-      { expectedProvider: _0x1b6ed0 },
+      { expectedProvider: expectedProvider },
     );
-    if (_0x100b3b) return _0x100b3b;
-    throw getTextManifestMissingError(_0x30e23b, _0x1b6ed0);
+    if (textRequestFromManifest) return textRequestFromManifest;
+    throw getTextManifestMissingError(model2, expectedProvider);
   }
-  const _0x1d7aab = resolveChatCompletionInputUrls({
-      providerId: _0x1b6ed0,
-      inputUrls: _0x1e78e5,
-      inputImageUrls: _0x429bbe,
-      inputVideoUrls: _0x5b3354,
+  const chatCompletionInputUrls = resolveChatCompletionInputUrls({
+      providerId: expectedProvider,
+      inputUrls: inputUrls5,
+      inputImageUrls: inputImageUrls4,
+      inputVideoUrls: inputVideoUrls4,
     }),
-    _0x587522 = await buildChatCompletionUserContent(_0x10d678, _0x1d7aab, _0x191608, _0x1b6ed0),
-    _0x4449ab = {
-      model: _0x30e23b,
+    content3 = await buildChatCompletionUserContent(
+      list26,
+      chatCompletionInputUrls,
+      apiKey,
+      expectedProvider,
+    ),
+    body = {
+      model: model2,
       stream: false,
       messages: [
-        { role: 'system', content: _0x470190.systemPrompt || 'You are a helpful assistant.' },
-        { role: 'user', content: _0x587522 },
+        { role: 'system', content: content2.systemPrompt || 'You are a helpful assistant.' },
+        { role: 'user', content: content3 },
       ],
     };
-  if (_0x1b6ed0 === 'ppio' || _0x1b6ed0 === 'openai' || _0x1b6ed0 === 'grsai') {
-    let _0x11629b;
-    if (_0x1b6ed0 === 'ppio') _0x11629b = PpioAdapter.getTextProxyApiUrl(_0x415db3);
+  if (expectedProvider === 'ppio' || expectedProvider === 'openai' || expectedProvider === 'grsai') {
+    let apiUrl;
+    if (expectedProvider === 'ppio') apiUrl = PpioAdapter.getTextProxyApiUrl(list27);
     else {
       if (
-        _0x415db3.includes(':generateContent') ||
-        _0x415db3.includes('/v1beta/models') ||
-        _0x415db3.endsWith('/chat/completions') ||
-        (_0x415db3.includes('/api/') && _0x415db3.split('/api/').length > 1)
+        list27.includes(':generateContent') ||
+        list27.includes('/v1beta/models') ||
+        list27.endsWith('/chat/completions') ||
+        (list27.includes('/api/') && list27.split('/api/').length > 1)
       )
-        _0x11629b = _0x415db3;
+        apiUrl = list27;
       else {
-        if (_0x415db3.endsWith('/api')) _0x11629b = _0x415db3;
-        else _0x415db3.endsWith('/v1') ? (_0x11629b = _0x415db3) : (_0x11629b = _0x415db3 + '/v1');
+        if (list27.endsWith('/api')) apiUrl = list27;
+        else list27.endsWith('/v1') ? (apiUrl = list27) : (apiUrl = list27 + '/v1');
       }
     }
     return {
       url: '/api/v2/proxy/completions',
       headers: { 'Content-Type': 'application/json' },
-      body: { apiUrl: _0x11629b, apiKey: _0x191608, ..._0x4449ab },
+      body: { apiUrl: apiUrl, apiKey: apiKey, ...body },
       isProxy: true,
     };
   }
-  let _0x111811;
+  let url3;
   if (
-    _0x415db3.includes(':generateContent') ||
-    _0x415db3.includes('/v1beta/models') ||
-    _0x415db3.endsWith('/chat/completions') ||
-    (_0x415db3.includes('/api/') && _0x415db3.split('/api/').length > 1)
+    list27.includes(':generateContent') ||
+    list27.includes('/v1beta/models') ||
+    list27.endsWith('/chat/completions') ||
+    (list27.includes('/api/') && list27.split('/api/').length > 1)
   )
-    _0x111811 = _0x415db3;
+    url3 = list27;
   else {
-    if (_0x415db3.endsWith('/api')) _0x111811 = _0x415db3 + '/v1/chat/completions';
+    if (list27.endsWith('/api')) url3 = list27 + '/v1/chat/completions';
     else
-      _0x415db3.endsWith('/v1')
-        ? (_0x111811 = _0x415db3 + '/chat/completions')
-        : (_0x111811 = _0x415db3 + '/v1/chat/completions');
+      list27.endsWith('/v1')
+        ? (url3 = list27 + '/chat/completions')
+        : (url3 = list27 + '/v1/chat/completions');
   }
   return {
-    url: _0x111811,
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + _0x191608 },
-    body: _0x4449ab,
+    url: url3,
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
+    body: body,
     isProxy: false,
   };
 }
-function parseTextResponse(_0x45268f, _0x177193) {
-  const _0x2d4bf3 = '',
-    _0x4cb795 = _0x45268f.length,
-    _0x3e535a = _0x45268f.slice(0, 0x190),
-    _0x41c81b = _0x45268f.slice(Math.max(0, _0x4cb795 - 0x190)),
-    _0x275e9a = /<!doctype\s+html|<html[\s>]/i.test(_0x3e535a),
-    _0x27a1ff = _0x45268f.replace(/^\uFEFF/, '').trim();
-  let _0x17e28b;
+function parseTextResponse(list28, status) {
+  const value89 = '',
+    value90 = list28.length,
+    value91 = list28.slice(0, 0x190),
+    value92 = list28.slice(Math.max(0, value90 - 0x190)),
+    value93 = /<!doctype\s+html|<html[\s>]/i.test(value91),
+    list29 = list28.replace(/^\uFEFF/, '').trim();
+  let enabled17;
   try {
-    _0x17e28b = JSON.parse(_0x27a1ff);
-  } catch (_0xe1f491) {
-    const _0x159da1 = _0x27a1ff.indexOf('{'),
-      _0x5a213a = _0x27a1ff.lastIndexOf('}');
-    if (_0x159da1 !== -1 && _0x5a213a > _0x159da1)
+    enabled17 = JSON.parse(list29);
+  } catch (value94) {
+    const value95 = list29.indexOf('{'),
+      value96 = list29.lastIndexOf('}');
+    if (value95 !== -1 && value96 > value95)
       try {
-        _0x17e28b = JSON.parse(_0x27a1ff.slice(_0x159da1, _0x5a213a + 1));
+        enabled17 = JSON.parse(list29.slice(value95, value96 + 1));
       } catch {}
-    if (!_0x17e28b) {
-      const _0x3ac539 = _0x27a1ff.split('\n').filter((_0x310078) => _0x310078.trim().startsWith('data:'));
-      if (_0x3ac539.length > 0) {
-        const _0x52ab27 = _0x3ac539[_0x3ac539.length - 1].replace(/^data:\s*/, '').trim();
-        if (_0x52ab27 === '[DONE]') {
-          const _0x108c2a = _0x3ac539.filter(
-            (_0x4d26d9) => _0x4d26d9.replace(/^data:\s*/, '').trim() !== '[DONE]',
-          );
-          if (_0x108c2a.length > 0) {
-            const _0x3ac4ee = _0x108c2a[_0x108c2a.length - 1].replace(/^data:\s*/, '').trim();
-            _0x17e28b = JSON.parse(_0x3ac4ee);
+    if (!enabled17) {
+      const list30 = list29.split('\n').filter((item14) => item14.trim().startsWith('data:'));
+      if (list30.length > 0) {
+        const value97 = list30[list30.length - 1].replace(/^data:\s*/, '').trim();
+        if (value97 === '[DONE]') {
+          const list31 = list30.filter((item15) => item15.replace(/^data:\s*/, '').trim() !== '[DONE]');
+          if (list31.length > 0) {
+            const value98 = list31[list31.length - 1].replace(/^data:\s*/, '').trim();
+            enabled17 = JSON.parse(value98);
           } else
             throw new ApiError({
               type: 'PARSE_ERROR',
               message: '服务端返回了空响应',
-              status: _0x177193,
+              status: status,
               retryable: false,
             });
         } else
           try {
-            _0x17e28b = JSON.parse(_0x52ab27);
-          } catch (_0x5e7c9f) {
+            enabled17 = JSON.parse(value97);
+          } catch (error4) {
             throw new ApiError({
               type: 'PARSE_ERROR',
-              message: '无法解析服务端响应: ' + _0x5e7c9f.message,
-              status: _0x177193,
+              message: '无法解析服务端响应: ' + error4.message,
+              status: status,
               retryable: false,
             });
           }
@@ -909,183 +905,185 @@ function parseTextResponse(_0x45268f, _0x177193) {
           type: 'PARSE_ERROR',
           message:
             '服务端返回的不是可解析的 JSON。HTTP ' +
-            _0x177193 +
-            (_0x2d4bf3 ? ' (' + _0x2d4bf3 + ')' : '') +
+            status +
+            (value89 ? ' (' + value89 + ')' : '') +
             '，长度 ' +
-            _0x4cb795 +
+            value90 +
             '。\n' +
-            (_0x275e9a
+            (value93
               ? '响应看起来像 HTML（常见原因：网关/防火墙拦截、API 地址错误、上游返回了错误页）。\n'
               : '') +
             '响应片段(截断)：\n[开头]\n' +
-            _0x3e535a +
+            value91 +
             '\n[结尾]\n' +
-            _0x41c81b,
-          status: _0x177193,
+            value92,
+          status: status,
           retryable: false,
         });
     }
   }
-  return _0x17e28b;
+  return enabled17;
 }
-function extractTextContent(_0x113eb2, _0x2a296c = null) {
-  const _0x3f7b6f = resolveMappedResponseValue(
-    _0x113eb2,
-    _0x2a296c?.resultPaths || _0x2a296c?.textFields || [],
+function extractTextContent(response3, value99 = null) {
+  const mappedResponseValue = resolveMappedResponseValue(
+    response3,
+    value99?.resultPaths || value99?.textFields || [],
   );
-  if (_0x3f7b6f) return _0x3f7b6f;
-  const _0x4bcd7f = _0x113eb2?.choices || _0x113eb2?.data?.choices;
-  let _0x490570 = _0x4bcd7f?.[0]?.message?.content;
-  !_0x490570 && (_0x490570 = _0x4bcd7f?.[0]?.delta?.content);
-  !_0x490570 &&
-    _0x113eb2?.data?.candidates?.[0]?.content?.parts?.[0]?.text &&
-    (_0x490570 = _0x113eb2.data.candidates[0].content.parts[0].text);
-  !_0x490570 &&
-    _0x113eb2?.candidates?.[0]?.content?.parts?.[0]?.text &&
-    (_0x490570 = _0x113eb2.candidates[0].content.parts[0].text);
-  if (!_0x490570) {
-    const _0x19485a = Array.isArray(_0x113eb2?.output)
-        ? _0x113eb2.output
-        : Array.isArray(_0x113eb2?.data?.output)
-          ? _0x113eb2.data.output
+  if (mappedResponseValue) return mappedResponseValue;
+  const value100 = response3?.choices || response3?.data?.choices;
+  let firstNonEmptyString2 = value100?.[0]?.message?.content;
+  !firstNonEmptyString2 && (firstNonEmptyString2 = value100?.[0]?.delta?.content);
+  !firstNonEmptyString2 &&
+    response3?.data?.candidates?.[0]?.content?.parts?.[0]?.text &&
+    (firstNonEmptyString2 = response3.data.candidates[0].content.parts[0].text);
+  !firstNonEmptyString2 &&
+    response3?.candidates?.[0]?.content?.parts?.[0]?.text &&
+    (firstNonEmptyString2 = response3.candidates[0].content.parts[0].text);
+  if (!firstNonEmptyString2) {
+    const list32 = Array.isArray(response3?.output)
+        ? response3.output
+        : Array.isArray(response3?.data?.output)
+          ? response3.data.output
           : [],
-      _0x369795 = _0x19485a.flatMap((_0x3cb72d) =>
-        Array.isArray(_0x3cb72d?.content) ? _0x3cb72d.content : [],
-      );
-    _0x490570 =
-      pickFirstNonEmptyString(_0x369795.map((_0x16aa42) => _0x16aa42?.text)) ||
-      pickFirstNonEmptyString(_0x369795.map((_0x5adb5) => _0x5adb5?.content)) ||
-      pickFirstNonEmptyString([_0x113eb2?.output_text, _0x113eb2?.data?.output_text]);
+      list33 = list32.flatMap((item16) => (Array.isArray(item16?.content) ? item16.content : []));
+    firstNonEmptyString2 =
+      pickFirstNonEmptyString(list33.map((response4) => response4?.text)) ||
+      pickFirstNonEmptyString(list33.map((item17) => item17?.content)) ||
+      pickFirstNonEmptyString([response3?.output_text, response3?.data?.output_text]);
   }
-  if (!_0x490570) {
-    const _0x57e164 = Array.isArray(_0x113eb2?.results)
-      ? _0x113eb2.results
-      : Array.isArray(_0x113eb2?.data?.results)
-        ? _0x113eb2.data.results
+  if (!firstNonEmptyString2) {
+    const list34 = Array.isArray(response3?.results)
+      ? response3.results
+      : Array.isArray(response3?.data?.results)
+        ? response3.data.results
         : [];
-    _0x490570 =
-      pickFirstNonEmptyString(_0x57e164.map((_0x56f451) => _0x56f451?.text)) ||
+    firstNonEmptyString2 =
+      pickFirstNonEmptyString(list34.map((response5) => response5?.text)) ||
       pickFirstNonEmptyString([
-        _0x113eb2?.text,
-        _0x113eb2?.output,
-        typeof _0x113eb2?.content === 'string' ? _0x113eb2.content : '',
-        _0x113eb2?.markdown,
-        _0x113eb2?.caption,
-        _0x113eb2?.data?.text,
-        _0x113eb2?.data?.output,
-        typeof _0x113eb2?.data?.content === 'string' ? _0x113eb2.data.content : '',
+        response3?.text,
+        response3?.output,
+        typeof response3?.content === 'string' ? response3.content : '',
+        response3?.markdown,
+        response3?.caption,
+        response3?.data?.text,
+        response3?.data?.output,
+        typeof response3?.data?.content === 'string' ? response3.data.content : '',
       ]);
   }
-  return _0x490570;
+  return firstNonEmptyString2;
 }
-async function pollRunningHubTextTask(_0x2f1dac, _0x2a10a0, _0x4cb8cf) {
-  const _0x250e5e = Date.now();
-  while (Date.now() - _0x250e5e < GENERATION_TIMEOUT) {
+async function pollRunningHubTextTask(taskId, apiKey2, value101) {
+  const value102 = Date.now();
+  while (Date.now() - value102 < GENERATION_TIMEOUT) {
     await sleep(RUNNINGHUB_POLL_INTERVAL_MS);
-    const _0x306c89 = await fetchWithTimeout(
+    const response6 = await fetchWithTimeout(
       buildApiUrl('/api/v2/proxy/image'),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           apiUrl: 'https://www.runninghub.cn/openapi/v2/query',
-          apiKey: _0x2a10a0,
-          taskId: _0x2f1dac,
+          apiKey: apiKey2,
+          taskId: taskId,
         }),
       },
       0x7530,
     );
-    if (!_0x306c89.ok) {
-      const _0x16bc17 = await _0x306c89.text().catch(() => '');
-      let _0x127961;
+    if (!response6.ok) {
+      const error5 = await response6.text().catch(() => '');
+      let value103;
       try {
-        _0x127961 = JSON.parse(_0x16bc17);
+        value103 = JSON.parse(error5);
       } catch {
-        _0x127961 = { error: _0x16bc17 };
+        value103 = { error: error5 };
       }
-      throw parseError(_0x4cb8cf, _0x127961, _0x306c89.status);
+      throw parseError(value101, value103, response6.status);
     }
-    const _0x1bb13a = parseRunningHubResponseData(await _0x306c89.text()),
-      _0x2b79b9 = Number(_0x1bb13a?.code);
-    if (Number.isFinite(_0x2b79b9)) {
-      if (_0x2b79b9 === 0x324 || _0x2b79b9 === 0x32d) continue;
-      if (_0x2b79b9 !== 0) throw new Error(getRunningHubTextErrorMessage(_0x1bb13a, '文本任务轮询失败'));
+    const runningHubResponseData = parseRunningHubResponseData(await response6.text()),
+      count3 = Number(runningHubResponseData?.code);
+    if (Number.isFinite(count3)) {
+      if (count3 === 0x324 || count3 === 0x32d) continue;
+      if (count3 !== 0)
+        throw new Error(getRunningHubTextErrorMessage(runningHubResponseData, '文本任务轮询失败'));
     }
-    const _0x2294dd = _0x1bb13a?.data && typeof _0x1bb13a.data === 'object' ? _0x1bb13a.data : _0x1bb13a,
-      _0x1f9c15 = String(_0x2294dd?.status || '').toUpperCase();
-    if (['SUCCESS', 'SUCCEEDED', 'COMPLETED'].includes(_0x1f9c15)) return _0x2294dd;
-    if (['FAILED', 'FAIL', 'ERROR', 'CANCELLED', 'CANCELED'].includes(_0x1f9c15))
-      throw new Error(getRunningHubTextErrorMessage(_0x2294dd, '文本任务执行失败'));
+    const response7 =
+        runningHubResponseData?.data && typeof runningHubResponseData.data === 'object'
+          ? runningHubResponseData.data
+          : runningHubResponseData,
+      value104 = String(response7?.status || '').toUpperCase();
+    if (['SUCCESS', 'SUCCEEDED', 'COMPLETED'].includes(value104)) return response7;
+    if (['FAILED', 'FAIL', 'ERROR', 'CANCELLED', 'CANCELED'].includes(value104))
+      throw new Error(getRunningHubTextErrorMessage(response7, '文本任务执行失败'));
   }
   throw new Error('文本任务超时，请稍后重试');
 }
-export async function generateText(_0x1ad4c0) {
-  const _0x1011df = await buildGenerateTextRequest(_0x1ad4c0),
-    _0x1e13a7 = _0x1ad4c0?.model || 'gemini-3.1-pro',
-    _0x31af19 = resolveTextExecution(_0x1ad4c0, _0x1e13a7),
-    _0x59aa2c = resolveTextProviderId(_0x1ad4c0, _0x1e13a7, _0x31af19);
-  let _0x57991f;
+export async function generateText(value105) {
+  const headers = await buildGenerateTextRequest(value105),
+    value106 = value105?.model || 'gemini-3.1-pro',
+    textExecution2 = resolveTextExecution(value105, value106),
+    provider2 = resolveTextProviderId(value105, value106, textExecution2);
+  let response8;
   try {
-    const _0x523a55 = _0x1011df.isProxy ? buildApiUrl(_0x1011df.url) : _0x1011df.url;
-    _0x57991f = await fetchWithTimeout(
-      _0x523a55,
-      { method: 'POST', headers: _0x1011df.headers, body: JSON.stringify(_0x1011df.body) },
+    const value107 = headers.isProxy ? buildApiUrl(headers.url) : headers.url;
+    response8 = await fetchWithTimeout(
+      value107,
+      { method: 'POST', headers: headers.headers, body: JSON.stringify(headers.body) },
       GENERATION_TIMEOUT,
     );
-  } catch (_0xe1c088) {
-    throw parseNetworkError(_0x59aa2c, _0xe1c088, GENERATION_TIMEOUT);
+  } catch (value108) {
+    throw parseNetworkError(provider2, value108, GENERATION_TIMEOUT);
   }
-  if (!_0x57991f.ok) {
-    const _0x24c71e = await _0x57991f.text().catch(() => '');
-    let _0x22ac76;
+  if (!response8.ok) {
+    const error6 = await response8.text().catch(() => '');
+    let value109;
     try {
-      _0x22ac76 = JSON.parse(_0x24c71e);
+      value109 = JSON.parse(error6);
     } catch {
-      _0x22ac76 = { error: _0x24c71e };
+      value109 = { error: error6 };
     }
-    throw parseError(_0x59aa2c, _0x22ac76, _0x57991f.status);
+    throw parseError(provider2, value109, response8.status);
   }
-  const _0x54fa07 = await _0x57991f.text();
-  if (isRunningHubTextModel(_0x59aa2c, _0x1ad4c0.model)) {
-    const _0x576077 = parseRunningHubResponseData(_0x54fa07),
-      _0x30c764 = Number(_0x576077?.code);
-    if (Number.isFinite(_0x30c764) && _0x30c764 !== 0)
-      throw new Error(getRunningHubTextErrorMessage(_0x576077, '文本任务创建失败'));
-    const _0x3e1f01 = extractTextContent(_0x576077, _0x1011df.responseMapping);
-    if (_0x3e1f01) return { text: sanitizeGeneratedText(_0x3e1f01) };
-    let _0xd17dd4 = _0x576077;
-    const _0x5c4bf5 = String(_0x576077?.status || _0x576077?.data?.status || '').toUpperCase(),
-      _0x1aef22 = isChatCompletionResponse(_0x576077) ? '' : getRunningHubTaskId(_0x576077);
+  const value110 = await response8.text();
+  if (isRunningHubTextModel(provider2, value105.model)) {
+    const response9 = parseRunningHubResponseData(value110),
+      count4 = Number(response9?.code);
+    if (Number.isFinite(count4) && count4 !== 0)
+      throw new Error(getRunningHubTextErrorMessage(response9, '文本任务创建失败'));
+    const extractTextContent2 = extractTextContent(response9, headers.responseMapping);
+    if (extractTextContent2) return { text: sanitizeGeneratedText(extractTextContent2) };
+    let raw = response9;
+    const value111 = String(response9?.status || response9?.data?.status || '').toUpperCase(),
+      isChatCompletionResponse2 = isChatCompletionResponse(response9) ? '' : getRunningHubTaskId(response9);
     if (
-      ['RUNNING', 'PENDING', 'QUEUED', 'SUBMITTED'].includes(_0x5c4bf5) ||
-      (_0x1aef22 && !['SUCCESS', 'SUCCEEDED', 'COMPLETED'].includes(_0x5c4bf5))
+      ['RUNNING', 'PENDING', 'QUEUED', 'SUBMITTED'].includes(value111) ||
+      (isChatCompletionResponse2 && !['SUCCESS', 'SUCCEEDED', 'COMPLETED'].includes(value111))
     ) {
-      if (!_0x1aef22) throw new Error('RunningHUB 文本任务创建成功但未返回 taskId');
-      _0xd17dd4 = await pollRunningHubTextTask(_0x1aef22, _0x1011df.body.apiKey, _0x59aa2c);
+      if (!isChatCompletionResponse2) throw new Error('RunningHUB 文本任务创建成功但未返回 taskId');
+      raw = await pollRunningHubTextTask(isChatCompletionResponse2, headers.body.apiKey, provider2);
     } else {
-      if (['FAILED', 'FAIL', 'ERROR', 'CANCELLED', 'CANCELED'].includes(_0x5c4bf5))
-        throw new Error(getRunningHubTextErrorMessage(_0x576077, '文本任务创建失败'));
+      if (['FAILED', 'FAIL', 'ERROR', 'CANCELLED', 'CANCELED'].includes(value111))
+        throw new Error(getRunningHubTextErrorMessage(response9, '文本任务创建失败'));
     }
-    const _0x4690be = extractTextContent(_0xd17dd4, _0x1011df.responseMapping);
-    if (!_0x4690be)
+    const extractTextContent3 = extractTextContent(raw, headers.responseMapping);
+    if (!extractTextContent3)
       throw new ApiError({
         type: 'PARSE_ERROR',
-        provider: _0x59aa2c,
+        provider: provider2,
         message: 'RunningHUB 未返回文本内容',
-        raw: _0xd17dd4,
+        raw: raw,
         retryable: false,
       });
-    return { text: sanitizeGeneratedText(_0x4690be) };
+    return { text: sanitizeGeneratedText(extractTextContent3) };
   }
-  const _0x5700c8 = parseTextResponse(_0x54fa07, _0x57991f.status),
-    _0x19b11a = extractTextContent(_0x5700c8, _0x1011df.responseMapping);
-  if (!_0x19b11a)
+  const raw2 = parseTextResponse(value110, response8.status),
+    extractTextContent4 = extractTextContent(raw2, headers.responseMapping);
+  if (!extractTextContent4)
     throw new ApiError({
       type: 'PARSE_ERROR',
-      provider: _0x59aa2c,
+      provider: provider2,
       message: '服务端未返回文本内容',
-      raw: _0x5700c8,
+      raw: raw2,
       retryable: false,
     });
-  return { text: sanitizeGeneratedText(_0x19b11a) };
+  return { text: sanitizeGeneratedText(extractTextContent4) };
 }

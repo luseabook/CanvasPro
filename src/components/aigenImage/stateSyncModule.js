@@ -43,180 +43,179 @@ import {
   syncImageRefBarButtonIcon,
 } from './refBarUiHelpers.js';
 export { resolveRefImageCandidateUrls, resolveRefImageRenderSources } from './referenceImageSources.js';
-export function createAIGenerateNodeStateSyncModule(_0x5edd92) {
+export function createAIGenerateNodeStateSyncModule(value) {
   const {
-    store: _0xc4985d,
-    api: _0x235dbd,
-    getDisplayModelName: _0x481c2f,
-    _handlePillHover: _0x423441,
-    _handlePillOut: _0x5bbcc9,
-    _syncEdgesOrderFromPills: _0x540a25,
-    _syncPillLabels: _0x20f72a,
-    _checkAtTrigger: _0xa2ee4a,
-    _populateMentionMenu: _0x360f7c,
-    _insertMentionPill: _0x1c6dcf,
-    _handlePillKeyboard: _0x257665,
-    _rehydratePromptPills: _0x48ce81,
-    _handleMentionMenuKeyboard: _0x224bcc,
-    TEXT_TOOLBAR_HTML: _0x574ab2,
-    bindTextToolbarEvents: _0x56e0d5,
-    IMAGE_TOOLBAR_HTML: _0x52ad68,
-    bindImageToolbarEvents: _0x5c025f,
-    showDevToast: _0x4eb1e6,
-    getImage: _0x9434a6,
-    openNodeImagePreview: _0x3862db,
-    getPromptPresets: _0x49961c,
-    openCustomPresetsManager: _0x5090f0,
-    startLoading: _0x81d446,
-    stopLoading: _0x1d22ce,
-    bindRefThumbHoverPreview: _0x382645,
-    ensureThumbDecoded: _0x8dcb84,
-    revealRefThumbMedia: _0xf5be36,
-    getRefKindByNodeType: _0xdac694,
-    uploadFile: _0x22e8b1,
-    ensureConfig: _0x318e8a,
-    getProviderConfig: _0x280b89,
-    generateId: _0x9e9ee,
-    checkSlashTrigger: _0x2ec880,
-    handleSlashKeyboardNavigation: _0x504e22,
-    closeSlashMenu: _0x2c4601,
-    activateMenuKeyboard: _0x9d86bb,
-    ImageFreeAngleController: _0x76018,
-  } = _0x5edd92;
-  class _0x4bdcfc {
+    store: store,
+    api: api,
+    getDisplayModelName: getDisplayModelName,
+    _handlePillHover: _handlePillHover,
+    _handlePillOut: _handlePillOut,
+    _syncEdgesOrderFromPills: _syncEdgesOrderFromPills,
+    _syncPillLabels: _syncPillLabels,
+    _checkAtTrigger: _checkAtTrigger,
+    _populateMentionMenu: _populateMentionMenu,
+    _insertMentionPill: _insertMentionPill,
+    _handlePillKeyboard: _handlePillKeyboard,
+    _rehydratePromptPills: _rehydratePromptPills,
+    _handleMentionMenuKeyboard: _handleMentionMenuKeyboard,
+    TEXT_TOOLBAR_HTML: TEXT_TOOLBAR_HTML,
+    bindTextToolbarEvents: bindTextToolbarEvents,
+    IMAGE_TOOLBAR_HTML: IMAGE_TOOLBAR_HTML,
+    bindImageToolbarEvents: bindImageToolbarEvents,
+    showDevToast: showDevToast,
+    getImage: getImage,
+    openNodeImagePreview: openNodeImagePreview,
+    getPromptPresets: getPromptPresets,
+    openCustomPresetsManager: openCustomPresetsManager,
+    startLoading: startLoading,
+    stopLoading: stopLoading,
+    bindRefThumbHoverPreview: bindRefThumbHoverPreview,
+    ensureThumbDecoded: ensureThumbDecoded,
+    revealRefThumbMedia: revealRefThumbMedia,
+    getRefKindByNodeType: getRefKindByNodeType,
+    uploadFile: uploadFile,
+    ensureConfig: ensureConfig,
+    getProviderConfig: getProviderConfig,
+    generateId: generateId,
+    checkSlashTrigger: checkSlashTrigger,
+    handleSlashKeyboardNavigation: handleSlashKeyboardNavigation,
+    closeSlashMenu: closeSlashMenu,
+    activateMenuKeyboard: activateMenuKeyboard,
+    ImageFreeAngleController: ImageFreeAngleController,
+  } = value;
+  class item {
     ['_getStoreStateForRead']() {
-      return typeof _0xc4985d.getStateRaw === 'function' ? _0xc4985d.getStateRaw() : _0xc4985d.getState();
+      return typeof store.getStateRaw === 'function' ? store.getStateRaw() : store.getState();
     }
-    async ['_resolveRefThumbObjectUrl'](_0x568a5e) {
-      const _0x1aa3d1 = String(_0x568a5e || '').trim();
-      if (!_0x1aa3d1) return '';
-      if (this._refThumbObjectUrls.has(_0x1aa3d1)) return this._refThumbObjectUrls.get(_0x1aa3d1) || '';
-      const _0x4f4814 = await _0x9434a6(_0x1aa3d1);
-      if (!_0x4f4814) return '';
-      const _0x5bcbfa = URL.createObjectURL(_0x4f4814);
-      return (this._refThumbObjectUrls.set(_0x1aa3d1, _0x5bcbfa), _0x5bcbfa);
+    async ['_resolveRefThumbObjectUrl'](key) {
+      const enabled = String(key || '').trim();
+      if (!enabled) return '';
+      if (this._refThumbObjectUrls.has(enabled)) return this._refThumbObjectUrls.get(enabled) || '';
+      const enabled2 = await getImage(enabled);
+      if (!enabled2) return '';
+      const index = URL.createObjectURL(enabled2);
+      return (this._refThumbObjectUrls.set(enabled, index), index);
     }
-    ['_shouldRenderRefBarNow'](_0xd9fe38, _0x4b95fa) {
-      const _0x38e285 = Array.isArray(_0xd9fe38?.selectedNodeIds) ? _0xd9fe38.selectedNodeIds : [];
-      if (_0x38e285.includes(this.nodeId)) return true;
-      if (_0x4b95fa?.active && _0x4b95fa?.sourceNodeId === this.nodeId) return true;
+    ['_shouldRenderRefBarNow'](result, data) {
+      const list = Array.isArray(result?.selectedNodeIds) ? result.selectedNodeIds : [];
+      if (list.includes(this.nodeId)) return true;
+      if (data?.active && data?.sourceNodeId === this.nodeId) return true;
       return shouldAlwaysShowImageRefBar(this._data?.model);
     }
-    ['update'](_0x36fe81) {
-      const _0x196581 = this._normalizeDreaminaNodeData(_0x36fe81),
-        _0xf3a7 = this._data?.model,
-        _0x328e5e = this._data?.rhAnimeRealRefUrl;
-      ((_0x36fe81 = _0x196581), (this._data = _0x36fe81));
-      const _0x2221bf = _0xf3a7 !== _0x36fe81?.model,
-        _0x338f5e = _0x328e5e !== _0x36fe81?.rhAnimeRealRefUrl,
-        _0x56f274 = shouldShowGenerationBusyUi(_0x36fe81),
-        _0x500927 = isTerminalGenerationUiState(_0x36fe81),
-        _0x2d2464 = isFailureGenerationUiState(_0x36fe81);
-      if (_0x56f274)
+    ['update'](options) {
+      const target = this._normalizeDreaminaNodeData(options),
+        source = this._data?.model,
+        next = this._data?.rhAnimeRealRefUrl;
+      ((options = target), (this._data = options));
+      const current = source !== options?.model,
+        entry = next !== options?.rhAnimeRealRefUrl,
+        shouldShowGenerationBusyUi2 = shouldShowGenerationBusyUi(options),
+        isTerminalGenerationUiState2 = isTerminalGenerationUiState(options),
+        isFailureGenerationUiState2 = isFailureGenerationUiState(options);
+      if (shouldShowGenerationBusyUi2)
         ((this._isGenerating = true),
-          this.previewEl && typeof _0x81d446 === 'function' && _0x81d446(this.previewEl));
+          this.previewEl && typeof startLoading === 'function' && startLoading(this.previewEl));
       else {
-        if (_0x500927) {
+        if (isTerminalGenerationUiState2) {
           this._isGenerating = false;
-          isDreaminaTerminalGenerationState(_0x36fe81) &&
+          isDreaminaTerminalGenerationState(options) &&
             ((this._dreaminaActiveSubmitId = ''), this._stopDreaminaRecovery?.(false));
           stopPreviewNodeLoading(this.nodeId);
-          if (this.previewEl) _0x1d22ce(this.previewEl);
+          if (this.previewEl) stopLoading(this.previewEl);
           resetGenerateButtonIdleUi(this.btnEl);
         }
       }
       this._rendererMediaDeferred !== true &&
-        (this._loadAndDisplayImage(),
-        this._applyMaskPreview(_0x36fe81.maskPreviewUrl || _0x36fe81.maskPreview));
-      const _0x3f8fa4 = this._getStoreStateForRead(),
-        _0x4033f5 = _0x3f8fa4.pickConnectMode || {};
+        (this._loadAndDisplayImage(), this._applyMaskPreview(options.maskPreviewUrl || options.maskPreview));
+      const record = this._getStoreStateForRead(),
+        payload = record.pickConnectMode || {};
       if (this._placeholderEl) {
-        const _0x4f7368 = this._placeholderEl.querySelector('.placeholder-icon-svg');
-        _0x4f7368 &&
-          (_0x4033f5.active && _0x4033f5.sourceNodeId === this.nodeId
-            ? _0x4f7368.classList.add('is-pick-connecting')
-            : _0x4f7368.classList.remove('is-pick-connecting'));
+        const el = this._placeholderEl.querySelector('.placeholder-icon-svg');
+        el &&
+          (payload.active && payload.sourceNodeId === this.nodeId
+            ? el.classList.add('is-pick-connecting')
+            : el.classList.remove('is-pick-connecting'));
       }
-      const _0x3d8df1 = this._attachBtnIcon;
-      if (_0x3d8df1) {
-        const _0x37ede6 = _0x4033f5.active && _0x4033f5.sourceNodeId === this.nodeId;
-        ((_0x3d8df1.style.transition = 'opacity 0.2s ease, transform 0.2s ease'),
-          (_0x3d8df1.style.opacity = _0x37ede6 ? '0' : ''),
-          (_0x3d8df1.style.transform = _0x37ede6 ? 'scale(0.4)' : ''),
-          (_0x3d8df1.style.pointerEvents = _0x37ede6 ? 'none' : ''));
+      const el2 = this._attachBtnIcon;
+      if (el2) {
+        const handle = payload.active && payload.sourceNodeId === this.nodeId;
+        ((el2.style.transition = 'opacity 0.2s ease, transform 0.2s ease'),
+          (el2.style.opacity = handle ? '0' : ''),
+          (el2.style.transform = handle ? 'scale(0.4)' : ''),
+          (el2.style.pointerEvents = handle ? 'none' : ''));
       }
-      if (document.activeElement !== this.promptEl && _0x36fe81.prompt !== undefined) {
-        const _0x3c3159 = sanitizePromptHtml(_0x36fe81.prompt || '');
-        this.promptEl.innerHTML !== _0x3c3159 && ((this.promptEl.innerHTML = _0x3c3159), _0x48ce81(this));
+      if (document.activeElement !== this.promptEl && options.prompt !== undefined) {
+        const sanitizePromptHtml2 = sanitizePromptHtml(options.prompt || '');
+        this.promptEl.innerHTML !== sanitizePromptHtml2 &&
+          ((this.promptEl.innerHTML = sanitizePromptHtml2), _rehydratePromptPills(this));
       }
-      (this._syncPromptPlaceholder?.(_0x36fe81),
-        this._syncPromptBoxSizeFromData?.(_0x36fe81),
+      (this._syncPromptPlaceholder?.(options),
+        this._syncPromptBoxSizeFromData?.(options),
         this._generationNodeHelpTip?.sync());
-      const _0xe2c84f = this.modelWrap?.querySelector('.img-model-label');
-      if (_0xe2c84f && _0x36fe81.model) _0xe2c84f.textContent = _0x481c2f(_0x36fe81.model);
-      this._applyModelParamVisibility(_0x36fe81);
-      const _0x53f971 = getImageNodeRootClass(_0x36fe81.model),
-        _0x5cb6d0 = isRhPersonReplaceWorkflowModel(_0x36fe81.model);
+      const el3 = this.modelWrap?.querySelector('.img-model-label');
+      if (el3 && options.model) el3.textContent = getDisplayModelName(options.model);
+      this._applyModelParamVisibility(options);
+      const imageNodeRootClass = getImageNodeRootClass(options.model),
+        isRhPersonReplaceWorkflowModel2 = isRhPersonReplaceWorkflowModel(options.model);
       this._root &&
-        (this._root.classList.toggle('rh-anime-real-node', _0x53f971 === 'rh-anime-real-node'),
-        _0x53f971 && _0x53f971 !== 'rh-anime-real-node' && this._root.classList.add(_0x53f971),
-        _0x5cb6d0
+        (this._root.classList.toggle('rh-anime-real-node', imageNodeRootClass === 'rh-anime-real-node'),
+        imageNodeRootClass &&
+          imageNodeRootClass !== 'rh-anime-real-node' &&
+          this._root.classList.add(imageNodeRootClass),
+        isRhPersonReplaceWorkflowModel2
           ? this._root.classList.add('rh-person-replace-v3-node')
           : this._root.classList.remove('rh-person-replace-v3-node'));
-      const _0x54cabd = this._shouldRenderRefBarNow(_0x3f8fa4, _0x4033f5),
-        _0x36e005 = _0xc4985d.getIncomingEdges(this.nodeId),
-        _0x5f8d0c = _0x3f8fa4.nodes || {};
+      const enabled3 = this._shouldRenderRefBarNow(record, payload),
+        inEdges = store.getIncomingEdges(this.nodeId),
+        nodes = record.nodes || {};
       syncAdaptiveImageInputRatio(this, {
-        store: _0xc4985d,
+        store: store,
         nodeId: this.nodeId,
-        inEdges: _0x36e005,
-        nodes: _0x5f8d0c,
-        targetNodeData: _0x5f8d0c?.[this.nodeId] || _0x36fe81 || {},
+        inEdges: inEdges,
+        nodes: nodes,
+        targetNodeData: nodes?.[this.nodeId] || options || {},
       });
-      if (this._rendererMediaDeferred === true || !_0x54cabd) this._renderRefBarPendingWhenVisible = true;
+      if (this._rendererMediaDeferred === true || !enabled3) this._renderRefBarPendingWhenVisible = true;
       else {
-        const _0x3b3ea7 = [..._0x36e005],
-          _0x516367 = _0x3b3ea7
-            .map((_0x5e6654) => {
-              const _0x19333a = _0x5f8d0c[_0x5e6654.sourceId] || null,
-                _0x3dccc6 =
-                  _0x19333a &&
-                  (typeof _0x19333a._bizRev === 'number' || typeof _0x19333a._bizRev === 'string')
-                    ? String(_0x19333a._bizRev)
+        const list2 = [...inEdges],
+          state = list2
+            .map((item2) => {
+              const config = nodes[item2.sourceId] || null,
+                scope =
+                  config && (typeof config._bizRev === 'number' || typeof config._bizRev === 'string')
+                    ? String(config._bizRev)
                     : '',
-                _0x7d1412 = _0x19333a?.thumbId ? String(_0x19333a.thumbId) : '',
-                _0x194689 = String(_0x19333a?.mask || '').trim() ? 'm1' : 'm0',
-                _0x502a44 = String(_0x5e6654?.refSlot || ''),
-                _0x3dfc93 = String(_0x5e6654?.sourceMediaKey || '');
+                input = config?.thumbId ? String(config.thumbId) : '',
+                output = String(config?.mask || '').trim() ? 'm1' : 'm0',
+                value2 = String(item2?.refSlot || ''),
+                value3 = String(item2?.sourceMediaKey || '');
               return (
-                _0x5e6654.id +
+                item2.id +
                 ':' +
-                _0x5e6654.sourceId +
+                item2.sourceId +
                 ':' +
-                _0x502a44 +
+                value2 +
                 ':' +
-                _0x3dfc93 +
+                value3 +
                 ':' +
-                _0x3dccc6 +
+                scope +
                 ':' +
-                _0x7d1412 +
+                input +
                 ':' +
-                _0x194689
+                output
               );
             })
             .join('|');
-        (_0x2221bf || _0x338f5e || this._renderRefBarPendingWhenVisible || _0x516367 !== this._lastEdgeSig) &&
-          ((this._renderRefBarPendingWhenVisible = false),
-          (this._lastEdgeSig = _0x516367),
-          this._renderRefBar());
+        (current || entry || this._renderRefBarPendingWhenVisible || state !== this._lastEdgeSig) &&
+          ((this._renderRefBarPendingWhenVisible = false), (this._lastEdgeSig = state), this._renderRefBar());
       }
-      (!_0x2d2464 &&
+      (!isFailureGenerationUiState2 &&
         typeof this._maybeResumeRunningHubTaskImpl === 'function' &&
         this._maybeResumeRunningHubTaskImpl(),
-        !_0x2d2464 &&
+        !isFailureGenerationUiState2 &&
           typeof this._maybeResumeDreaminaTaskImpl === 'function' &&
           this._maybeResumeDreaminaTaskImpl(),
-        !_0x2d2464 &&
+        !isFailureGenerationUiState2 &&
           typeof this._maybeResumeAsyncTaskImpl === 'function' &&
           this._maybeResumeAsyncTaskImpl(),
         this._updateSubmitButtonState());
@@ -224,9 +223,9 @@ export function createAIGenerateNodeStateSyncModule(_0x5edd92) {
     async ['_renderRefBar']() {
       if (!this.refBarEl) return;
       if (this._rendererMediaDeferred === true) return void (this._renderRefBarPendingWhenVisible = true);
-      const _0x329146 = this._getStoreStateForRead(),
-        _0x4fbb7d = _0x329146?.pickConnectMode || {};
-      if (!this._shouldRenderRefBarNow(_0x329146, _0x4fbb7d)) {
+      const value4 = this._getStoreStateForRead(),
+        value5 = value4?.pickConnectMode || {};
+      if (!this._shouldRenderRefBarNow(value4, value5)) {
         this._renderRefBarPendingWhenVisible = true;
         return;
       }
@@ -244,494 +243,493 @@ export function createAIGenerateNodeStateSyncModule(_0x5edd92) {
     }
     async ['_renderRefBarImpl']() {
       if (!this.refBarEl) return;
-      const _0x2a460b = this._getStoreStateForRead(),
-        _0x142ce1 = Object.values(_0x2a460b.edges || {}),
-        _0x2fc849 = _0x2a460b.nodes || {},
-        _0x397d40 = _0xc4985d.getIncomingEdges(this.nodeId),
-        _0x4393f8 = new Set();
-      for (const _0x2c0098 of _0x397d40) {
-        const _0x42fce0 = _0x2fc849[_0x2c0098.sourceId];
-        for (const _0x3c1b56 of collectRefThumbIds(_0x42fce0)) {
-          _0x4393f8.add(_0x3c1b56);
+      const value6 = this._getStoreStateForRead(),
+        value7 = Object.values(value6.edges || {}),
+        nodes2 = value6.nodes || {},
+        inEdges2 = store.getIncomingEdges(this.nodeId),
+        map = new Set();
+      for (const value8 of inEdges2) {
+        const value9 = nodes2[value8.sourceId];
+        for (const value10 of collectRefThumbIds(value9)) {
+          map.add(value10);
         }
       }
-      for (const [_0x5d7611, _0x1dc656] of this._refThumbObjectUrls.entries()) {
-        !_0x4393f8.has(_0x5d7611) &&
-          (_0x1dc656 && String(_0x1dc656).startsWith('blob:') && URL.revokeObjectURL(_0x1dc656),
-          this._refThumbObjectUrls.delete(_0x5d7611));
+      for (const [value11, value12] of this._refThumbObjectUrls.entries()) {
+        !map.has(value11) &&
+          (value12 && String(value12).startsWith('blob:') && URL.revokeObjectURL(value12),
+          this._refThumbObjectUrls.delete(value11));
       }
-      const _0x560828 = getImageNodeInputGate(this._data?.model),
-        _0x2911e8 = String(_0x560828.kind || '').trim(),
-        _0x46c5e2 = Number(_0x560828.max),
-        _0x86d620 = isRhPersonReplaceWorkflowModel(this._data?.model),
-        _0x4fb9a8 = getImageInputGateUploadedUrl(this._data, _0x560828),
-        _0x4f33d0 = _0x2fc849?.[this.nodeId] || this._data || {},
-        _0x18f9c4 = getTargetInputPolicy(_0x4f33d0),
-        _0x40a9e1 = getFixedInputSlotConfigFromManifest(_0x4f33d0);
+      const imageNodeInputGate = getImageNodeInputGate(this._data?.model),
+        value13 = String(imageNodeInputGate.kind || '').trim(),
+        value14 = Number(imageNodeInputGate.max),
+        isRhPersonReplaceWorkflowModel3 = isRhPersonReplaceWorkflowModel(this._data?.model),
+        imageInputGateUploadedUrl = getImageInputGateUploadedUrl(this._data, imageNodeInputGate),
+        targetNodeData = nodes2?.[this.nodeId] || this._data || {},
+        targetInputPolicy = getTargetInputPolicy(targetNodeData),
+        fixedInputConfig = getFixedInputSlotConfigFromManifest(targetNodeData);
       syncAdaptiveImageInputRatio(this, {
-        store: _0xc4985d,
+        store: store,
         nodeId: this.nodeId,
-        inEdges: _0x397d40,
-        nodes: _0x2fc849,
-        targetNodeData: _0x4f33d0,
+        inEdges: inEdges2,
+        nodes: nodes2,
+        targetNodeData: targetNodeData,
       });
-      const _0x5c7e36 = createPromptAttachmentButtonHTML({ stroke: 'var(--white-80)' }),
-        _0x34797b = () => {
-          let _0x24849b = this.refBarEl.querySelector('.prompt-attachment-btn'),
-            _0x2b88fd = this.refBarEl.querySelector('.ref-thumb-container');
+      const attachBtnHTML = createPromptAttachmentButtonHTML({ stroke: 'var(--white-80)' }),
+        handler = () => {
+          let attachBtn = this.refBarEl.querySelector('.prompt-attachment-btn'),
+            thumbContainer = this.refBarEl.querySelector('.ref-thumb-container');
           return (
-            (!_0x24849b || !_0x2b88fd) &&
-              ((this.refBarEl.innerHTML = _0x5c7e36 + ' <div class="ref-thumb-container"></div>'),
-              (_0x24849b = this.refBarEl.querySelector('.prompt-attachment-btn')),
-              (_0x2b88fd = this.refBarEl.querySelector('.ref-thumb-container')),
-              (this._attachBtnIcon = _0x24849b ? _0x24849b.querySelector('.btn-icon') : null)),
-            { attachBtn: _0x24849b, thumbContainer: _0x2b88fd }
+            (!attachBtn || !thumbContainer) &&
+              ((this.refBarEl.innerHTML = attachBtnHTML + ' <div class="ref-thumb-container"></div>'),
+              (attachBtn = this.refBarEl.querySelector('.prompt-attachment-btn')),
+              (thumbContainer = this.refBarEl.querySelector('.ref-thumb-container')),
+              (this._attachBtnIcon = attachBtn ? attachBtn.querySelector('.btn-icon') : null)),
+            { attachBtn: attachBtn, thumbContainer: thumbContainer }
           );
         };
-      let _0x79c9be = [];
-      const _0x42bcd7 = { text: 0, image: 0, video: 0, audio: 0 },
-        _0x4ac0a6 = {};
-      for (const _0x3e33e2 of _0x397d40) {
-        const _0x98976a = _0x2fc849[_0x3e33e2.sourceId];
-        if (!_0x98976a) continue;
-        const _0x1c38ec = resolveEffectiveInputKind(_0x98976a, _0x3e33e2);
-        if (!_0x1c38ec) continue;
-        if (!isInputKindAllowed(_0x18f9c4, _0x1c38ec)) continue;
-        if (_0x2911e8 && _0x1c38ec !== _0x2911e8) continue;
-        if (_0x2911e8 && Number.isFinite(_0x46c5e2) && _0x42bcd7[_0x2911e8] >= _0x46c5e2) continue;
-        if (_0x86d620 && _0x1c38ec !== 'image') continue;
-        if (_0x86d620 && _0x42bcd7.image >= 2) continue;
-        _0x42bcd7[_0x1c38ec]++;
-        const _0x3186a4 = {
+      let items = [];
+      const value15 = { text: 0, image: 0, video: 0, audio: 0 },
+        sourceIdToLabel = {};
+      for (const edgeId of inEdges2) {
+        const enabled4 = nodes2[edgeId.sourceId];
+        if (!enabled4) continue;
+        const type = resolveEffectiveInputKind(enabled4, edgeId);
+        if (!type) continue;
+        if (!isInputKindAllowed(targetInputPolicy, type)) continue;
+        if (value13 && type !== value13) continue;
+        if (value13 && Number.isFinite(value14) && value15[value13] >= value14) continue;
+        if (isRhPersonReplaceWorkflowModel3 && type !== 'image') continue;
+        if (isRhPersonReplaceWorkflowModel3 && value15.image >= 2) continue;
+        value15[type]++;
+        const value16 = {
             text: t('aigenImage.refs.types.text'),
             image: t('aigenImage.refs.types.image'),
             video: t('aigenImage.refs.types.video'),
             audio: t('aigenImage.refs.types.audio'),
           },
-          _0xc8fd68 = '@' + _0x3186a4[_0x1c38ec] + _0x42bcd7[_0x1c38ec];
-        _0x4ac0a6[_0x3e33e2.sourceId] = _0xc8fd68;
-        let _0x57bf30 = '',
-          _0x2bee4b = '',
-          _0x4ac241 = '';
-        if (_0x1c38ec === 'image') {
-          let _0x1289c6 = '';
-          for (const _0x18da54 of collectRefThumbIds(_0x98976a)) {
-            _0x1289c6 = await this._resolveRefThumbObjectUrl(_0x18da54);
-            if (_0x1289c6) break;
+          label = '@' + value16[type] + value15[type];
+        sourceIdToLabel[edgeId.sourceId] = label;
+        let thumbHTML = '',
+          thumbSrc = '',
+          previewSrc = '';
+        if (type === 'image') {
+          let thumbBlobUrl = '';
+          for (const value17 of collectRefThumbIds(enabled4)) {
+            thumbBlobUrl = await this._resolveRefThumbObjectUrl(value17);
+            if (thumbBlobUrl) break;
           }
-          ({ thumbSrc: _0x2bee4b, previewSrc: _0x4ac241 } = resolveRefImageRenderSources(_0x98976a, {
-            thumbBlobUrl: _0x1289c6,
+          ({ thumbSrc: thumbSrc, previewSrc: previewSrc } = resolveRefImageRenderSources(enabled4, {
+            thumbBlobUrl: thumbBlobUrl,
           }));
         }
-        let _0x147503 = resolveCanvasImageDisplayUrl(_0x98976a);
-        if (!_0x147503 && _0x98976a.thumbId) {
-          if (this._refThumbObjectUrls.has(_0x98976a.thumbId))
-            _0x147503 = this._refThumbObjectUrls.get(_0x98976a.thumbId);
+        let canvasImageDisplayUrl = resolveCanvasImageDisplayUrl(enabled4);
+        if (!canvasImageDisplayUrl && enabled4.thumbId) {
+          if (this._refThumbObjectUrls.has(enabled4.thumbId))
+            canvasImageDisplayUrl = this._refThumbObjectUrls.get(enabled4.thumbId);
           else {
-            const _0xb00104 = await _0x9434a6(_0x98976a.thumbId);
-            if (_0xb00104) {
-              const _0x278e57 = URL.createObjectURL(_0xb00104);
-              (this._refThumbObjectUrls.set(_0x98976a.thumbId, _0x278e57), (_0x147503 = _0x278e57));
+            const value18 = await getImage(enabled4.thumbId);
+            if (value18) {
+              const value19 = URL.createObjectURL(value18);
+              (this._refThumbObjectUrls.set(enabled4.thumbId, value19), (canvasImageDisplayUrl = value19));
             }
           }
         }
-        if (!_0x147503) {
-          const _0x269683 = resolveRefImageCandidateUrls(_0x98976a);
-          _0x147503 = _0x269683[0] || '';
+        if (!canvasImageDisplayUrl) {
+          const refImageCandidateUrls = resolveRefImageCandidateUrls(enabled4);
+          canvasImageDisplayUrl = refImageCandidateUrls[0] || '';
         }
-        _0x1c38ec === 'image' && (_0x147503 = _0x2bee4b || _0x147503);
-        if (_0x1c38ec === 'image' && _0x147503) {
-          _0x8dcb84(_0x147503);
-          _0x4ac241 && _0x4ac241 !== _0x147503 && _0x8dcb84(_0x4ac241);
-          const _0x290673 = !!String(_0x98976a.mask || '').trim();
-          _0x57bf30 =
+        type === 'image' && (canvasImageDisplayUrl = thumbSrc || canvasImageDisplayUrl);
+        if (type === 'image' && canvasImageDisplayUrl) {
+          ensureThumbDecoded(canvasImageDisplayUrl);
+          previewSrc && previewSrc !== canvasImageDisplayUrl && ensureThumbDecoded(previewSrc);
+          const value20 = !!String(enabled4.mask || '').trim();
+          thumbHTML =
             '<img src="' +
-            _0x147503 +
+            canvasImageDisplayUrl +
             '" class="ref-thumb-media is-pending" draggable="false">' +
-            (_0x290673
+            (value20
               ? '<span class="ref-thumb-mask-badge">' + t('aigenImage.refs.maskBadge') + '</span>'
               : '');
         } else {
-          if (_0x1c38ec === 'text') {
-            const _0x650316 = _0x98976a.type === 'ai-text';
-            if (_0x650316 && !_0x98976a.outputText) continue;
-            _0x57bf30 = createReferenceFallbackThumbHtml('text');
+          if (type === 'text') {
+            const value21 = enabled4.type === 'ai-text';
+            if (value21 && !enabled4.outputText) continue;
+            thumbHTML = createReferenceFallbackThumbHtml('text');
           } else {
-            if (_0x1c38ec === 'video')
-              _0x57bf30 =
+            if (type === 'video')
+              thumbHTML =
                 '<div class="ref-thumb-media" style="background:var(--bg);display:flex;align-items:center;justify-content:center;">\n    <svg width="20" height="20" viewBox="0 0 24 24" fill="white" opacity="0.5"><polygon points="5 3 19 12 5 21 5 3" /></svg>\n                </div>';
-            else _0x1c38ec === 'audio' && (_0x57bf30 = createReferenceFallbackThumbHtml('audio'));
+            else type === 'audio' && (thumbHTML = createReferenceFallbackThumbHtml('audio'));
           }
         }
-        if (_0x57bf30) {
-          const _0x4a6a5f = String(_0x98976a.mask || '').trim() ? 'm1' : 'm0',
-            _0x144abe =
-              _0x1c38ec +
+        if (thumbHTML) {
+          const value22 = String(enabled4.mask || '').trim() ? 'm1' : 'm0',
+            sig =
+              type +
               '|' +
-              _0x3e33e2.id +
+              edgeId.id +
               '|' +
-              _0x3e33e2.sourceId +
+              edgeId.sourceId +
               '|' +
-              (_0x147503 || '') +
+              (canvasImageDisplayUrl || '') +
               '|' +
-              _0x4a6a5f;
-          _0x79c9be.push({
-            key: 'edge:' + _0x3e33e2.id,
-            edgeId: _0x3e33e2.id,
-            sourceId: _0x3e33e2.sourceId,
-            refSlot: _0x3e33e2.refSlot || '',
-            type: _0x1c38ec,
-            label: _0xc8fd68,
-            sig: _0x144abe,
-            thumbHTML: _0x57bf30,
-            thumbSrc: _0x2bee4b || _0x147503 || '',
-            previewSrc: _0x4ac241 || _0x147503 || '',
+              value22;
+          items.push({
+            key: 'edge:' + edgeId.id,
+            edgeId: edgeId.id,
+            sourceId: edgeId.sourceId,
+            refSlot: edgeId.refSlot || '',
+            type: type,
+            label: label,
+            sig: sig,
+            thumbHTML: thumbHTML,
+            thumbSrc: thumbSrc || canvasImageDisplayUrl || '',
+            previewSrc: previewSrc || canvasImageDisplayUrl || '',
           });
         }
       }
-      (isRunningHubWorkflowNode(_0x4f33d0) || _0x40a9e1) &&
+      (isRunningHubWorkflowNode(targetNodeData) || fixedInputConfig) &&
         getAssetInputRefsFromPromptAndNode(this.promptEl, {
-          nodeData: _0x4f33d0,
+          nodeData: targetNodeData,
           allowedTypes: ['image'],
-        }).forEach((_0x33b6e5, _0x5d7de1) => {
-          const _0x1766ac = resolveEffectiveInputKind(_0x33b6e5);
-          if (_0x1766ac !== 'image' || !isInputKindAllowed(_0x18f9c4, _0x1766ac)) return;
-          const _0x164294 = String(_0x33b6e5.thumbUrl || _0x33b6e5.url || '').trim();
-          if (!_0x164294) return;
-          _0x8dcb84(_0x164294);
-          const _0x3fd260 = String(_0x33b6e5.assetId || ''),
-            _0x5500cc = String(_0x33b6e5.itemIndex ?? ''),
-            _0x55abd4 = String(_0x33b6e5.assetMentionOccurrence ?? ''),
-            _0x2dece6 = String(_0x33b6e5.assetRefSource || 'prompt'),
-            _0x55f50e = 'asset:' + _0x3fd260 + ':' + _0x5500cc,
-            _0x23cb87 = 'asset:' + _0x2dece6 + ':' + _0x3fd260 + ':' + _0x5500cc + ':image:' + _0x5d7de1;
-          _0x79c9be.push({
-            key: _0x23cb87,
+        }).forEach((label2, value23) => {
+          const effectiveInputKind = resolveEffectiveInputKind(label2);
+          if (effectiveInputKind !== 'image' || !isInputKindAllowed(targetInputPolicy, effectiveInputKind))
+            return;
+          const thumbSrc2 = String(label2.thumbUrl || label2.url || '').trim();
+          if (!thumbSrc2) return;
+          ensureThumbDecoded(thumbSrc2);
+          const assetId = String(label2.assetId || ''),
+            assetIndex = String(label2.itemIndex ?? ''),
+            assetOccurrence = String(label2.assetMentionOccurrence ?? ''),
+            assetRefSource = String(label2.assetRefSource || 'prompt'),
+            sourceId = 'asset:' + assetId + ':' + assetIndex,
+            key2 = 'asset:' + assetRefSource + ':' + assetId + ':' + assetIndex + ':image:' + value23;
+          items.push({
+            key: key2,
             edgeId: '',
-            sourceId: _0x55f50e,
+            sourceId: sourceId,
             refSlot: '',
             type: 'image',
-            label: _0x33b6e5.label || _0x33b6e5.name || t('aigenImage.refs.referenceImage'),
-            sig: _0x23cb87 + '|' + String(_0x33b6e5.url || '') + '|' + _0x164294,
-            thumbHTML: '<img src="' + _0x164294 + '" class="ref-thumb-media is-pending" draggable="false">',
-            thumbSrc: _0x164294,
-            previewSrc: String(_0x33b6e5.url || _0x164294),
+            label: label2.label || label2.name || t('aigenImage.refs.referenceImage'),
+            sig: key2 + '|' + String(label2.url || '') + '|' + thumbSrc2,
+            thumbHTML: '<img src="' + thumbSrc2 + '" class="ref-thumb-media is-pending" draggable="false">',
+            thumbSrc: thumbSrc2,
+            previewSrc: String(label2.url || thumbSrc2),
             virtual: true,
-            assetId: _0x3fd260,
-            assetIndex: _0x5500cc,
-            assetOccurrence: _0x55abd4,
-            assetRefSource: _0x2dece6,
+            assetId: assetId,
+            assetIndex: assetIndex,
+            assetOccurrence: assetOccurrence,
+            assetRefSource: assetRefSource,
             refType: 'image',
           });
         });
-      if (_0x86d620) {
-        const _0x22e1d1 = ['replaceTarget', 'replacedImage'],
-          _0x4b2810 = () => {
-            const _0x2fe4c2 = !!this.refBarEl.querySelector('[data-ref-slot="replaceTarget"]'),
-              _0x10baf4 = !!this.refBarEl.querySelector('[data-ref-slot="replacedImage"]');
-            let _0x22d031 = this.refBarEl.querySelector('.prompt-attachment-btn'),
-              _0x25a4b3 = this.refBarEl.querySelector('.ref-thumb-container');
-            if (!_0x22d031 || !_0x25a4b3 || !_0x2fe4c2 || !_0x10baf4) {
-              const _0x3dce54 = t('aigenImage.refs.replaceTarget'),
-                _0x563b0b = t('aigenImage.refs.replacedImage');
+      if (isRhPersonReplaceWorkflowModel3) {
+        const key3 = ['replaceTarget', 'replacedImage'],
+          handler2 = () => {
+            const enabled5 = !!this.refBarEl.querySelector('[data-ref-slot="replaceTarget"]'),
+              enabled6 = !!this.refBarEl.querySelector('[data-ref-slot="replacedImage"]');
+            let el4 = this.refBarEl.querySelector('.prompt-attachment-btn'),
+              container = this.refBarEl.querySelector('.ref-thumb-container');
+            if (!el4 || !container || !enabled5 || !enabled6) {
+              const t2 = t('aigenImage.refs.replaceTarget'),
+                t3 = t('aigenImage.refs.replacedImage');
               ((this.refBarEl.innerHTML =
-                _0x5c7e36 +
+                attachBtnHTML +
                 ' <div class="ref-thumb-container"><div class="ref-thumb-wrap ref-upload-slot" data-ref-slot="replaceTarget" data-slot="replaceTarget" data-kind="image" draggable="false" title="' +
-                escapeRefBarHtml(_0x3dce54) +
+                escapeRefBarHtml(t2) +
                 '"><span class="ref-upload-label">' +
-                formatRefUploadLabel(_0x3dce54) +
+                formatRefUploadLabel(t2) +
                 '</span></div><div class="ref-thumb-wrap ref-upload-slot" data-ref-slot="replacedImage" data-slot="replacedImage" data-kind="image" draggable="false" title="' +
-                escapeRefBarHtml(_0x563b0b) +
+                escapeRefBarHtml(t3) +
                 '"><span class="ref-upload-label">' +
-                formatRefUploadLabel(_0x563b0b) +
+                formatRefUploadLabel(t3) +
                 '</span></div></div>'),
-                (_0x22d031 = this.refBarEl.querySelector('.prompt-attachment-btn')),
-                (_0x25a4b3 = this.refBarEl.querySelector('.ref-thumb-container')),
-                (this._attachBtnIcon = _0x22d031 ? _0x22d031.querySelector('.btn-icon') : null));
+                (el4 = this.refBarEl.querySelector('.prompt-attachment-btn')),
+                (container = this.refBarEl.querySelector('.ref-thumb-container')),
+                (this._attachBtnIcon = el4 ? el4.querySelector('.btn-icon') : null));
             }
-            const _0x29cad8 = this.refBarEl.querySelector('[data-ref-slot="replaceTarget"]'),
-              _0x53e41f = this.refBarEl.querySelector('[data-ref-slot="replacedImage"]');
-            return { targetEl: _0x29cad8, sourceEl: _0x53e41f, container: _0x25a4b3 };
+            const targetEl = this.refBarEl.querySelector('[data-ref-slot="replaceTarget"]'),
+              sourceEl = this.refBarEl.querySelector('[data-ref-slot="replacedImage"]');
+            return { targetEl: targetEl, sourceEl: sourceEl, container: container };
           },
-          { targetEl: _0xc51452, sourceEl: _0x25a0e7, container: _0x2d2e46 } = _0x4b2810();
+          { targetEl: targetEl2, sourceEl: sourceEl2, container: container2 } = handler2();
         ((this._lastRefHTML = '__rh-person-replace-v3__'), this.refBarEl.classList.add('active'));
-        const _0x1fdc51 = (_0x1e30d9) => String(_0x1e30d9?.key || _0x1e30d9?.edgeId || ''),
-          _0x559b1d = new Set(),
-          _0x54f970 = new Map(),
-          _0x9072ff = [
+        const run = (event) => String(event?.key || event?.edgeId || ''),
+          map2 = new Set(),
+          map3 = new Map(),
+          value24 = [
             {
-              key: _0x22e1d1[0],
-              el: _0xc51452,
+              key: key3[0],
+              el: targetEl2,
               title: t('aigenImage.refs.replaceTarget'),
               emptyHtml: formatRefUploadLabel(t('aigenImage.refs.replaceTarget')),
             },
             {
-              key: _0x22e1d1[1],
-              el: _0x25a0e7,
+              key: key3[1],
+              el: sourceEl2,
               title: t('aigenImage.refs.replacedImage'),
               emptyHtml: formatRefUploadLabel(t('aigenImage.refs.replacedImage')),
             },
           ];
-        for (const _0xd541c8 of _0x79c9be) {
-          const _0x4e0d2d = _0x1fdc51(_0xd541c8);
-          if (!_0x4e0d2d || _0x559b1d.has(_0x4e0d2d)) continue;
-          const _0x187053 = String(_0xd541c8.refSlot || '');
-          if (!_0x22e1d1.includes(_0x187053)) continue;
-          if (_0x54f970.has(_0x187053)) continue;
-          (_0x54f970.set(_0x187053, _0xd541c8), _0x559b1d.add(_0x4e0d2d));
+        for (const value25 of items) {
+          const enabled7 = run(value25);
+          if (!enabled7 || map2.has(enabled7)) continue;
+          const value26 = String(value25.refSlot || '');
+          if (!key3.includes(value26)) continue;
+          if (map3.has(value26)) continue;
+          (map3.set(value26, value25), map2.add(enabled7));
         }
-        for (const _0x505a44 of _0x79c9be) {
-          const _0x1aee47 = _0x1fdc51(_0x505a44);
-          if (!_0x1aee47 || _0x559b1d.has(_0x1aee47)) continue;
-          for (const _0x488467 of _0x22e1d1) {
-            if (!_0x54f970.has(_0x488467)) {
-              (_0x54f970.set(_0x488467, _0x505a44), _0x559b1d.add(_0x1aee47));
+        for (const value27 of items) {
+          const enabled8 = run(value27);
+          if (!enabled8 || map2.has(enabled8)) continue;
+          for (const value28 of key3) {
+            if (!map3.has(value28)) {
+              (map3.set(value28, value27), map2.add(enabled8));
               break;
             }
           }
         }
-        const _0x13d3ed = (_0x21f9fd, _0x41c935, _0xe040ee) => {
-            const _0x38ff71 = document.createElement('div');
+        const run2 = (value29, value30, value31) => {
+            const el5 = document.createElement('div');
             return (
-              (_0x38ff71.className = 'ref-thumb-wrap ref-upload-slot'),
-              (_0x38ff71.dataset.refSlot = _0x21f9fd),
-              (_0x38ff71.dataset.slot = _0x21f9fd),
-              (_0x38ff71.dataset.kind = 'image'),
-              (_0x38ff71.title = _0x41c935),
-              _0x38ff71.setAttribute('draggable', 'false'),
-              (_0x38ff71.innerHTML = '<span class="ref-upload-label">' + _0xe040ee + '</span>'),
-              _0x38ff71
+              (el5.className = 'ref-thumb-wrap ref-upload-slot'),
+              (el5.dataset.refSlot = value29),
+              (el5.dataset.slot = value29),
+              (el5.dataset.kind = 'image'),
+              (el5.title = value30),
+              el5.setAttribute('draggable', 'false'),
+              (el5.innerHTML = '<span class="ref-upload-label">' + value31 + '</span>'),
+              el5
             );
           },
-          _0x367a26 = (_0x29fc9a, _0x2f0e0e, _0x10461a) => {
-            const _0xaffd28 = document.createElement('div');
+          handler3 = (value32, value33, value34) => {
+            const el6 = document.createElement('div');
             return (
-              (_0xaffd28.className = 'ref-thumb-wrap' + (_0x10461a.virtual ? ' ref-thumb-wrap--asset' : '')),
-              (_0xaffd28.dataset.refSlot = _0x29fc9a),
-              (_0xaffd28.dataset.slot = _0x29fc9a),
-              (_0xaffd28.dataset.kind = 'image'),
-              (_0xaffd28.title = _0x2f0e0e),
-              _0xaffd28.setAttribute('draggable', _0x10461a.virtual ? 'false' : 'true'),
-              _0xaffd28
+              (el6.className = 'ref-thumb-wrap' + (value34.virtual ? ' ref-thumb-wrap--asset' : '')),
+              (el6.dataset.refSlot = value32),
+              (el6.dataset.slot = value32),
+              (el6.dataset.kind = 'image'),
+              (el6.title = value33),
+              el6.setAttribute('draggable', value34.virtual ? 'false' : 'true'),
+              el6
             );
           };
-        for (const _0x2887e9 of _0x9072ff) {
-          const _0x399155 = _0x54f970.get(_0x2887e9.key) || null;
-          let _0x42aeba = _0x2887e9.el;
-          if (!_0x42aeba) continue;
-          if (_0x399155 && _0x42aeba.classList?.contains?.('ref-upload-slot')) {
-            const _0x148aca = _0x367a26(_0x2887e9.key, _0x2887e9.title, _0x399155);
-            (_0x42aeba.replaceWith(_0x148aca), (_0x42aeba = _0x148aca), (_0x2887e9.el = _0x148aca));
+        for (const event2 of value24) {
+          const enabled9 = map3.get(event2.key) || null;
+          let el7 = event2.el;
+          if (!el7) continue;
+          if (enabled9 && el7.classList?.contains?.('ref-upload-slot')) {
+            const value35 = handler3(event2.key, event2.title, enabled9);
+            (el7.replaceWith(value35), (el7 = value35), (event2.el = value35));
           } else {
-            if (!_0x399155 && !_0x42aeba.classList?.contains?.('ref-upload-slot')) {
-              const _0x1fd081 = _0x13d3ed(_0x2887e9.key, _0x2887e9.title, _0x2887e9.emptyHtml);
-              (_0x42aeba.replaceWith(_0x1fd081), (_0x42aeba = _0x1fd081), (_0x2887e9.el = _0x1fd081));
+            if (!enabled9 && !el7.classList?.contains?.('ref-upload-slot')) {
+              const value36 = run2(event2.key, event2.title, event2.emptyHtml);
+              (el7.replaceWith(value36), (el7 = value36), (event2.el = value36));
             }
           }
-          ((_0x42aeba.dataset.refSlot = _0x2887e9.key),
-            (_0x42aeba.dataset.slot = _0x2887e9.key),
-            (_0x42aeba.dataset.kind = 'image'),
-            (_0x42aeba.title = _0x2887e9.title));
-          if (_0x399155) {
-            ((_0x42aeba.className = 'ref-thumb-wrap' + (_0x399155.virtual ? ' ref-thumb-wrap--asset' : '')),
-              _0x42aeba.classList?.remove?.('ref-upload-slot'),
-              _0x42aeba.setAttribute('draggable', _0x399155.virtual ? 'false' : 'true'),
-              (_0x42aeba.dataset.refKey = _0x1fdc51(_0x399155)),
-              (_0x42aeba.dataset.edgeId = _0x399155.edgeId || ''),
-              (_0x42aeba.dataset.sourceId = _0x399155.sourceId || ''),
-              (_0x42aeba.dataset.refOrigin = _0x399155.virtual ? 'asset' : 'node'));
-            _0x399155.virtual
-              ? ((_0x42aeba.dataset.assetId = _0x399155.assetId || ''),
-                (_0x42aeba.dataset.assetIndex = _0x399155.assetIndex || ''),
-                (_0x42aeba.dataset.assetOccurrence = _0x399155.assetOccurrence || ''),
-                (_0x42aeba.dataset.assetRefSource = _0x399155.assetRefSource || 'prompt'),
-                (_0x42aeba.dataset.refType = _0x399155.refType || _0x399155.type || ''))
-              : (delete _0x42aeba.dataset.assetId,
-                delete _0x42aeba.dataset.assetIndex,
-                delete _0x42aeba.dataset.assetOccurrence,
-                delete _0x42aeba.dataset.assetRefSource,
-                delete _0x42aeba.dataset.refType);
-            _0x42aeba.dataset.sig !== _0x399155.sig &&
-              ((_0x42aeba.innerHTML =
-                _0x399155.thumbHTML +
+          ((el7.dataset.refSlot = event2.key),
+            (el7.dataset.slot = event2.key),
+            (el7.dataset.kind = 'image'),
+            (el7.title = event2.title));
+          if (enabled9) {
+            ((el7.className = 'ref-thumb-wrap' + (enabled9.virtual ? ' ref-thumb-wrap--asset' : '')),
+              el7.classList?.remove?.('ref-upload-slot'),
+              el7.setAttribute('draggable', enabled9.virtual ? 'false' : 'true'),
+              (el7.dataset.refKey = run(enabled9)),
+              (el7.dataset.edgeId = enabled9.edgeId || ''),
+              (el7.dataset.sourceId = enabled9.sourceId || ''),
+              (el7.dataset.refOrigin = enabled9.virtual ? 'asset' : 'node'));
+            enabled9.virtual
+              ? ((el7.dataset.assetId = enabled9.assetId || ''),
+                (el7.dataset.assetIndex = enabled9.assetIndex || ''),
+                (el7.dataset.assetOccurrence = enabled9.assetOccurrence || ''),
+                (el7.dataset.assetRefSource = enabled9.assetRefSource || 'prompt'),
+                (el7.dataset.refType = enabled9.refType || enabled9.type || ''))
+              : (delete el7.dataset.assetId,
+                delete el7.dataset.assetIndex,
+                delete el7.dataset.assetOccurrence,
+                delete el7.dataset.assetRefSource,
+                delete el7.dataset.refType);
+            el7.dataset.sig !== enabled9.sig &&
+              ((el7.innerHTML =
+                enabled9.thumbHTML +
                 '<button type="button" class="ref-thumb-delete" title="' +
                 t('aigenImage.refs.removeReference') +
                 '">&times;</button>'),
-              (_0x42aeba.dataset.sig = _0x399155.sig),
-              _0xf5be36(_0x42aeba, _0x399155.sig));
-            if (_0x399155.thumbSrc) _0x42aeba.dataset.thumbSrc = _0x399155.thumbSrc;
-            else delete _0x42aeba.dataset.thumbSrc;
-            if (_0x399155.previewSrc) _0x42aeba.dataset.previewSrc = _0x399155.previewSrc;
-            else delete _0x42aeba.dataset.previewSrc;
+              (el7.dataset.sig = enabled9.sig),
+              revealRefThumbMedia(el7, enabled9.sig));
+            if (enabled9.thumbSrc) el7.dataset.thumbSrc = enabled9.thumbSrc;
+            else delete el7.dataset.thumbSrc;
+            if (enabled9.previewSrc) el7.dataset.previewSrc = enabled9.previewSrc;
+            else delete el7.dataset.previewSrc;
           } else {
-            ((_0x42aeba.className = 'ref-thumb-wrap ref-upload-slot'),
-              _0x42aeba.setAttribute('draggable', 'false'));
-            if (_0x42aeba.dataset.refKey) delete _0x42aeba.dataset.refKey;
-            if (_0x42aeba.dataset.edgeId) delete _0x42aeba.dataset.edgeId;
-            if (_0x42aeba.dataset.sourceId) delete _0x42aeba.dataset.sourceId;
-            if (_0x42aeba.dataset.refOrigin) delete _0x42aeba.dataset.refOrigin;
-            if (_0x42aeba.dataset.assetId) delete _0x42aeba.dataset.assetId;
-            if (_0x42aeba.dataset.assetIndex) delete _0x42aeba.dataset.assetIndex;
-            if (_0x42aeba.dataset.assetOccurrence) delete _0x42aeba.dataset.assetOccurrence;
-            if (_0x42aeba.dataset.assetRefSource) delete _0x42aeba.dataset.assetRefSource;
-            if (_0x42aeba.dataset.refType) delete _0x42aeba.dataset.refType;
-            if (_0x42aeba.dataset.sig) delete _0x42aeba.dataset.sig;
-            if (_0x42aeba.dataset.thumbSrc) delete _0x42aeba.dataset.thumbSrc;
-            if (_0x42aeba.dataset.previewSrc) delete _0x42aeba.dataset.previewSrc;
-            const _0x580900 = '<span class="ref-upload-label">' + _0x2887e9.emptyHtml + '</span>';
-            if (_0x42aeba.innerHTML !== _0x580900) _0x42aeba.innerHTML = _0x580900;
+            ((el7.className = 'ref-thumb-wrap ref-upload-slot'), el7.setAttribute('draggable', 'false'));
+            if (el7.dataset.refKey) delete el7.dataset.refKey;
+            if (el7.dataset.edgeId) delete el7.dataset.edgeId;
+            if (el7.dataset.sourceId) delete el7.dataset.sourceId;
+            if (el7.dataset.refOrigin) delete el7.dataset.refOrigin;
+            if (el7.dataset.assetId) delete el7.dataset.assetId;
+            if (el7.dataset.assetIndex) delete el7.dataset.assetIndex;
+            if (el7.dataset.assetOccurrence) delete el7.dataset.assetOccurrence;
+            if (el7.dataset.assetRefSource) delete el7.dataset.assetRefSource;
+            if (el7.dataset.refType) delete el7.dataset.refType;
+            if (el7.dataset.sig) delete el7.dataset.sig;
+            if (el7.dataset.thumbSrc) delete el7.dataset.thumbSrc;
+            if (el7.dataset.previewSrc) delete el7.dataset.previewSrc;
+            const value37 = '<span class="ref-upload-label">' + event2.emptyHtml + '</span>';
+            if (el7.innerHTML !== value37) el7.innerHTML = value37;
           }
         }
         (bindRefThumbFixedSlotDrag({
           owner: this,
-          container: _0x2d2e46,
-          store: _0xc4985d,
+          container: container2,
+          store: store,
           nodeId: this.nodeId,
           acceptMap: { replaceTarget: 'image', replacedImage: 'image' },
         }),
           this._syncBtnIconState(),
-          _0x20f72a(this, {}));
+          _syncPillLabels(this, {}));
         return;
       }
       if (
-        _0x40a9e1 &&
+        fixedInputConfig &&
         renderManifestFixedImageRefBar({
           owner: this,
           refBarEl: this.refBarEl,
           promptEl: this.promptEl,
-          attachBtnHTML: _0x5c7e36,
-          fixedInputConfig: _0x40a9e1,
-          items: _0x79c9be,
-          targetNodeData: _0x4f33d0,
-          sourceIdToLabel: _0x4ac0a6,
-          store: _0xc4985d,
+          attachBtnHTML: attachBtnHTML,
+          fixedInputConfig: fixedInputConfig,
+          items: items,
+          targetNodeData: targetNodeData,
+          sourceIdToLabel: sourceIdToLabel,
+          store: store,
           nodeId: this.nodeId,
-          ensureThumbDecoded: _0x8dcb84,
-          revealRefThumbMedia: _0xf5be36,
-          syncPillLabels: _0x20f72a,
+          ensureThumbDecoded: ensureThumbDecoded,
+          revealRefThumbMedia: revealRefThumbMedia,
+          syncPillLabels: _syncPillLabels,
         })
       )
         return;
       if (this._isDraggingSorting) {
-        (this._syncBtnIconState(), _0x20f72a(this, _0x4ac0a6));
+        (this._syncBtnIconState(), _syncPillLabels(this, sourceIdToLabel));
         return;
       }
-      if (_0x79c9be.length > 0) {
+      if (items.length > 0) {
         (this.refBarEl.classList.add('active'), this.refBarEl.classList.remove('rh-v5-refbar'));
-        const _0x270c89 = this._lastRefHTML;
+        const value38 = this._lastRefHTML;
         this._lastRefHTML = '__has-items__';
-        const { thumbContainer: _0x35b596 } = _0x34797b();
-        String(_0x270c89 || '').startsWith('__rh-') &&
-          _0x35b596.querySelectorAll('.ref-thumb-wrap').forEach((_0x330392) => _0x330392.remove());
-        (_0x35b596.querySelectorAll('.ref-upload-slot').forEach((_0xf576ac) => _0xf576ac.remove()),
-          _0x35b596.querySelectorAll('.ref-thumb-wrap').forEach((_0x717c4) => {
-            const _0x40c42e =
-              String(_0x717c4?.dataset?.refKey || '').trim() ||
-              (String(_0x717c4?.dataset?.edgeId || '').trim()
-                ? 'edge:' + String(_0x717c4.dataset.edgeId).trim()
+        const { thumbContainer: thumbContainer2 } = handler();
+        String(value38 || '').startsWith('__rh-') &&
+          thumbContainer2.querySelectorAll('.ref-thumb-wrap').forEach((el8) => el8.remove());
+        (thumbContainer2.querySelectorAll('.ref-upload-slot').forEach((el9) => el9.remove()),
+          thumbContainer2.querySelectorAll('.ref-thumb-wrap').forEach((el10) => {
+            const enabled10 =
+              String(el10?.dataset?.refKey || '').trim() ||
+              (String(el10?.dataset?.edgeId || '').trim()
+                ? 'edge:' + String(el10.dataset.edgeId).trim()
                 : '');
-            if (!_0x40c42e) _0x717c4.remove();
+            if (!enabled10) el10.remove();
           }));
-        const _0x199480 = new Map();
-        _0x35b596.querySelectorAll('.ref-thumb-wrap').forEach((_0xce9b1a) => {
-          const _0xb4ec7e = String(_0xce9b1a?.dataset?.edgeId || '').trim(),
-            _0x5d1f2b =
-              String(_0xce9b1a?.dataset?.refKey || '').trim() || (_0xb4ec7e ? 'edge:' + _0xb4ec7e : '');
-          if (!_0x5d1f2b) return;
-          _0x199480.set(_0x5d1f2b, _0xce9b1a);
+        const map4 = new Map();
+        thumbContainer2.querySelectorAll('.ref-thumb-wrap').forEach((el11) => {
+          const value39 = String(el11?.dataset?.edgeId || '').trim(),
+            enabled11 = String(el11?.dataset?.refKey || '').trim() || (value39 ? 'edge:' + value39 : '');
+          if (!enabled11) return;
+          map4.set(enabled11, el11);
         });
-        const _0x4f52a8 = new Set();
-        for (let _0x5ea01c = 0; _0x5ea01c < _0x79c9be.length; _0x5ea01c++) {
-          const _0xad4d86 = _0x79c9be[_0x5ea01c],
-            _0x2d8b1f = String(_0xad4d86.key || _0xad4d86.edgeId || '');
-          if (!_0x2d8b1f) continue;
-          let _0x4b5394 = _0x199480.get(_0x2d8b1f);
-          !_0x4b5394 &&
-            ((_0x4b5394 = document.createElement('div')),
-            (_0x4b5394.className = 'ref-thumb-wrap' + (_0xad4d86.virtual ? ' ref-thumb-wrap--asset' : '')));
-          _0x4b5394.setAttribute('draggable', _0xad4d86.virtual ? 'false' : 'true');
-          _0x4b5394.dataset.sig !== _0xad4d86.sig &&
-            ((_0x4b5394.innerHTML =
-              _0xad4d86.thumbHTML +
+        const map5 = new Set();
+        for (let value40 = 0; value40 < items.length; value40++) {
+          const event3 = items[value40],
+            enabled12 = String(event3.key || event3.edgeId || '');
+          if (!enabled12) continue;
+          let el12 = map4.get(enabled12);
+          !el12 &&
+            ((el12 = document.createElement('div')),
+            (el12.className = 'ref-thumb-wrap' + (event3.virtual ? ' ref-thumb-wrap--asset' : '')));
+          el12.setAttribute('draggable', event3.virtual ? 'false' : 'true');
+          el12.dataset.sig !== event3.sig &&
+            ((el12.innerHTML =
+              event3.thumbHTML +
               '<button type="button" class="ref-thumb-delete" title="' +
               t('aigenImage.refs.removeReference') +
               '">&times;</button>'),
-            (_0x4b5394.dataset.sig = _0xad4d86.sig),
-            _0xf5be36(_0x4b5394, _0xad4d86.sig));
-          ((_0x4b5394.dataset.refKey = _0x2d8b1f),
-            (_0x4b5394.dataset.edgeId = _0xad4d86.edgeId || ''),
-            (_0x4b5394.dataset.sourceId = _0xad4d86.sourceId),
-            (_0x4b5394.dataset.refOrigin = _0xad4d86.virtual ? 'asset' : 'node'));
-          _0xad4d86.virtual
-            ? ((_0x4b5394.dataset.assetId = _0xad4d86.assetId || ''),
-              (_0x4b5394.dataset.assetIndex = _0xad4d86.assetIndex || ''),
-              (_0x4b5394.dataset.assetOccurrence = _0xad4d86.assetOccurrence || ''),
-              (_0x4b5394.dataset.assetRefSource = _0xad4d86.assetRefSource || 'prompt'),
-              (_0x4b5394.dataset.refType = _0xad4d86.refType || _0xad4d86.type || ''))
-            : (delete _0x4b5394.dataset.assetId,
-              delete _0x4b5394.dataset.assetIndex,
-              delete _0x4b5394.dataset.assetOccurrence,
-              delete _0x4b5394.dataset.assetRefSource,
-              delete _0x4b5394.dataset.refType);
-          ((_0x4b5394.dataset.type = _0xad4d86.type),
-            (_0x4b5394.dataset.label = _0xad4d86.label),
-            (_0x4b5394.dataset.index = String(_0x5ea01c)));
-          if (_0xad4d86.thumbSrc) _0x4b5394.dataset.thumbSrc = _0xad4d86.thumbSrc;
-          else delete _0x4b5394.dataset.thumbSrc;
-          if (_0xad4d86.previewSrc) _0x4b5394.dataset.previewSrc = _0xad4d86.previewSrc;
-          else delete _0x4b5394.dataset.previewSrc;
-          (_0x35b596.appendChild(_0x4b5394), _0x4f52a8.add(_0x2d8b1f));
+            (el12.dataset.sig = event3.sig),
+            revealRefThumbMedia(el12, event3.sig));
+          ((el12.dataset.refKey = enabled12),
+            (el12.dataset.edgeId = event3.edgeId || ''),
+            (el12.dataset.sourceId = event3.sourceId),
+            (el12.dataset.refOrigin = event3.virtual ? 'asset' : 'node'));
+          event3.virtual
+            ? ((el12.dataset.assetId = event3.assetId || ''),
+              (el12.dataset.assetIndex = event3.assetIndex || ''),
+              (el12.dataset.assetOccurrence = event3.assetOccurrence || ''),
+              (el12.dataset.assetRefSource = event3.assetRefSource || 'prompt'),
+              (el12.dataset.refType = event3.refType || event3.type || ''))
+            : (delete el12.dataset.assetId,
+              delete el12.dataset.assetIndex,
+              delete el12.dataset.assetOccurrence,
+              delete el12.dataset.assetRefSource,
+              delete el12.dataset.refType);
+          ((el12.dataset.type = event3.type),
+            (el12.dataset.label = event3.label),
+            (el12.dataset.index = String(value40)));
+          if (event3.thumbSrc) el12.dataset.thumbSrc = event3.thumbSrc;
+          else delete el12.dataset.thumbSrc;
+          if (event3.previewSrc) el12.dataset.previewSrc = event3.previewSrc;
+          else delete el12.dataset.previewSrc;
+          (thumbContainer2.appendChild(el12), map5.add(enabled12));
         }
-        for (const [_0x297901, _0xc15073] of _0x199480.entries()) {
-          if (!_0x4f52a8.has(_0x297901)) _0xc15073.remove();
+        for (const [value41, el13] of map4.entries()) {
+          if (!map5.has(value41)) el13.remove();
         }
         this._bindDragSort(this.refBarEl);
       } else {
-        if (_0x2911e8 === 'image') {
+        if (value13 === 'image') {
           this.refBarEl.classList.remove('rh-v5-refbar');
-          const _0x5cf002 = t('aigenImage.refs.uploadReference'),
-            _0x5ae8d8 =
-              _0x5c7e36 +
+          const t4 = t('aigenImage.refs.uploadReference'),
+            value42 =
+              attachBtnHTML +
               ' <div class="ref-thumb-container">' +
-              (_0x4fb9a8
+              (imageInputGateUploadedUrl
                 ? '<div class="ref-thumb-wrap ref-upload-slot" data-ref-src="upload"><img src="' +
-                  _0x4fb9a8 +
+                  imageInputGateUploadedUrl +
                   '" class="ref-thumb-media" draggable="false"><button type="button" class="ref-upload-delete" title="' +
                   t('aigenImage.refs.removeReference') +
                   '">&times;</button></div>'
                 : '<button type="button" class="ref-thumb-wrap ref-upload-slot" title="' +
-                  escapeRefBarHtml(_0x5cf002) +
+                  escapeRefBarHtml(t4) +
                   '"><span class="ref-upload-label">' +
-                  formatRefUploadLabel(_0x5cf002) +
+                  formatRefUploadLabel(t4) +
                   '</span></button>') +
               '</div>';
-          if (this._lastRefHTML !== _0x5ae8d8) {
-            ((this._lastRefHTML = _0x5ae8d8),
+          if (this._lastRefHTML !== value42) {
+            ((this._lastRefHTML = value42),
               this.refBarEl.classList.add('active'),
-              (this.refBarEl.innerHTML = _0x5ae8d8));
-            const _0x343766 = this.refBarEl.querySelector('.prompt-attachment-btn');
-            this._attachBtnIcon = _0x343766 ? _0x343766.querySelector('.btn-icon') : null;
+              (this.refBarEl.innerHTML = value42));
+            const el14 = this.refBarEl.querySelector('.prompt-attachment-btn');
+            this._attachBtnIcon = el14 ? el14.querySelector('.btn-icon') : null;
           }
         } else {
           (this.refBarEl.classList.remove('active'),
             this.refBarEl.classList.remove('rh-v5-refbar'),
             (this._lastRefHTML = '__empty__'));
-          const { thumbContainer: _0x1a4ae0 } = _0x34797b();
-          _0x1a4ae0.querySelectorAll('.ref-thumb-wrap').forEach((_0x1fcc58) => _0x1fcc58.remove());
+          const { thumbContainer: thumbContainer3 } = handler();
+          thumbContainer3.querySelectorAll('.ref-thumb-wrap').forEach((el15) => el15.remove());
         }
       }
-      (this._syncBtnIconState(), _0x20f72a(this, _0x4ac0a6));
+      (this._syncBtnIconState(), _syncPillLabels(this, sourceIdToLabel));
     }
     ['_syncBtnIconState']() {
       syncImageRefBarButtonIcon({
         refBarEl: this.refBarEl,
-        pickMode: _0xc4985d.getState().pickConnectMode,
+        pickMode: store.getState().pickConnectMode,
         nodeId: this.nodeId,
       });
     }
-    ['_bindDragSort'](_0x575655) {
-      bindImageRefThumbOrderDrag({ owner: this, refBar: _0x575655, store: _0xc4985d, nodeId: this.nodeId });
+    ['_bindDragSort'](refBar) {
+      bindImageRefThumbOrderDrag({ owner: this, refBar: refBar, store: store, nodeId: this.nodeId });
     }
   }
-  return _0x4bdcfc.prototype;
+  return item.prototype;
 }

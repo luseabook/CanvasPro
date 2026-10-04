@@ -8,11 +8,11 @@ import { canUseElectronMediaTask, enqueueElectronMediaTask } from '../../api/loc
 import { getAudioDurationFromUrl, getWaveformBarsPathFromUrl } from '../utils/audioWaveform.js';
 import { attachDesktopMediaPlaybackSource } from '../services/desktopMediaBlobSource.js';
 import { localPathToUrl, pickResultLocalPath } from '../utils/localMediaPath.js';
-export function normalizeAudioCutResultLocalPath(_0x2f2739) {
-  return pickResultLocalPath(_0x2f2739);
+export function normalizeAudioCutResultLocalPath(value) {
+  return pickResultLocalPath(value);
 }
-function audioClipText(_0x5a77c5, _0x27793e = {}) {
-  return t('audioClip.' + _0x5a77c5, _0x27793e);
+function audioClipText(item, key = {}) {
+  return t('audioClip.' + item, key);
 }
 const AudioClipController = {
   active: false,
@@ -50,79 +50,78 @@ const AudioClipController = {
   _waveToken: 0,
   _sourceToken: 0,
   _unsubscribeLocale: null,
-  init(_0x44f604) {
-    if (!_0x44f604) return;
+  init(enabled) {
+    if (!enabled) return;
     if (this.active) this.exit({ silent: true });
     this.audioEl = null;
-    const _0x1ed6cb = appStore.getState().nodes[_0x44f604];
-    if (!_0x1ed6cb) return;
-    const _0x1fc2dc = this._resolveAudioSrcFromNode(_0x1ed6cb);
-    if (!_0x1fc2dc) {
+    const enabled2 = appStore.getState().nodes[enabled];
+    if (!enabled2) return;
+    const enabled3 = this._resolveAudioSrcFromNode(enabled2);
+    if (!enabled3) {
       window.showToast?.(audioClipText('toasts.uploadFirst'), 'warn');
       return;
     }
     ((this.active = true),
-      (this.nodeId = _0x44f604),
-      (this.anchorNodeId = _0x44f604),
+      (this.nodeId = enabled),
+      (this.anchorNodeId = enabled),
       (this._retryCount = 0),
       this._mountWhenReady());
   },
-  _applyDimMode(_0x48dc02) {
-    const _0x5c5cec = document.getElementById('v2-wrap');
-    if (_0x5c5cec) {
-      if (_0x48dc02) _0x5c5cec.classList.add('is-audio-clip-mode');
-      else _0x5c5cec.classList.remove('is-audio-clip-mode');
+  _applyDimMode(index) {
+    const el = document.getElementById('v2-wrap');
+    if (el) {
+      if (index) el.classList.add('is-audio-clip-mode');
+      else el.classList.remove('is-audio-clip-mode');
     }
     if (this.wrapperEl) {
-      if (_0x48dc02) this.wrapperEl.classList.add('is-audio-clip-target');
+      if (index) this.wrapperEl.classList.add('is-audio-clip-target');
       else this.wrapperEl.classList.remove('is-audio-clip-target');
     }
   },
-  _applyFrozenUI(_0x176cd2) {
+  _applyFrozenUI(result) {
     if (!this.wrapperEl) return;
-    const _0x36c9ed = 'is-audio-clipping';
-    if (_0x176cd2) this.wrapperEl.classList.add(_0x36c9ed);
-    else this.wrapperEl.classList.remove(_0x36c9ed);
-    this._applyFrozenOverlaysHidden(_0x176cd2);
+    const data = 'is-audio-clipping';
+    if (result) this.wrapperEl.classList.add(data);
+    else this.wrapperEl.classList.remove(data);
+    this._applyFrozenOverlaysHidden(result);
   },
-  _applyFrozenOverlaysHidden(_0x3383bb) {
+  _applyFrozenOverlaysHidden(options) {
     if (!this.wrapperEl) return;
-    if (_0x3383bb) {
+    if (options) {
       if (Array.isArray(this._hiddenEls) && this._hiddenEls.length) return;
-      const _0x3ec3ca = ['.audio-controls', '.node-upload-hint'],
-        _0x336774 = [];
-      (_0x3ec3ca.forEach((_0xa6fe97) => {
-        this.wrapperEl.querySelectorAll(_0xa6fe97).forEach((_0x1c9a1d) => {
-          (_0x336774.push({ el: _0x1c9a1d, prevDisplay: _0x1c9a1d.style.display }),
-            (_0x1c9a1d.style.display = 'none'));
+      const list = ['.audio-controls', '.node-upload-hint'],
+        list2 = [];
+      (list.forEach((item2) => {
+        this.wrapperEl.querySelectorAll(item2).forEach((el2) => {
+          (list2.push({ el: el2, prevDisplay: el2.style.display }), (el2.style.display = 'none'));
         });
       }),
-        (this._hiddenEls = _0x336774));
+        (this._hiddenEls = list2));
       return;
     }
-    const _0x40a952 = Array.isArray(this._hiddenEls) ? this._hiddenEls : [];
+    const list3 = Array.isArray(this._hiddenEls) ? this._hiddenEls : [];
     ((this._hiddenEls = null),
-      _0x40a952.forEach(({ el: _0x57af7f, prevDisplay: _0x3e5d90 }) => {
-        if (!_0x57af7f || !_0x57af7f.isConnected) return;
-        _0x57af7f.style.display = _0x3e5d90 || '';
+      list3.forEach(({ el: el3, prevDisplay: prevDisplay }) => {
+        if (!el3 || !el3.isConnected) return;
+        el3.style.display = prevDisplay || '';
       }));
   },
   _mountWhenReady() {
-    const _0x1a2d34 = this.nodeId,
-      _0x3ac940 = () => {
-        if (!this.active || this.nodeId !== _0x1a2d34) return;
-        const _0x597a95 = document.getElementById(_0x1a2d34);
-        if (!_0x597a95) {
+    const target = this.nodeId,
+      source = () => {
+        if (!this.active || this.nodeId !== target) return;
+        const enabled4 = document.getElementById(target);
+        if (!enabled4) {
           this._retryCount++;
           if (this._retryCount > 10) {
             this.exit({ silent: true });
             return;
           }
-          this._retryRaf = requestAnimationFrame(_0x3ac940);
+          this._retryRaf = requestAnimationFrame(source);
           return;
         }
-        ((this.wrapperEl = _0x597a95),
-          window.v2FocusOnNodes?.([_0x1a2d34]),
+        ((this.wrapperEl = enabled4),
+          window.v2FocusOnNodes?.([target]),
           this._applyFrozenUI(true),
           this._applyDimMode(true),
           this._createUI(),
@@ -130,151 +129,145 @@ const AudioClipController = {
           this._syncDurationAndDefaults(),
           this._render());
       };
-    this._retryRaf = requestAnimationFrame(_0x3ac940);
+    this._retryRaf = requestAnimationFrame(source);
   },
   _createUI() {
     if (!this.wrapperEl) return;
-    this.wrapperEl.querySelectorAll('.v2-video-clipbar').forEach((_0xda1f6a) => _0xda1f6a.remove());
-    const _0x46f031 = document.createElement('div');
-    ((_0x46f031.className = 'v2-video-clipbar'),
-      _0x46f031.addEventListener('pointerdown', (_0x9b45f8) => _0x9b45f8.stopPropagation()),
-      _0x46f031.addEventListener('click', (_0x16a78c) => _0x16a78c.stopPropagation()),
-      _0x46f031.addEventListener('dblclick', (_0x5084d3) => {
-        (_0x5084d3.preventDefault(), _0x5084d3.stopPropagation());
+    this.wrapperEl.querySelectorAll('.v2-video-clipbar').forEach((el4) => el4.remove());
+    const el5 = document.createElement('div');
+    ((el5.className = 'v2-video-clipbar'),
+      el5.addEventListener('pointerdown', (event) => event.stopPropagation()),
+      el5.addEventListener('click', (event2) => event2.stopPropagation()),
+      el5.addEventListener('dblclick', (event3) => {
+        (event3.preventDefault(), event3.stopPropagation());
       }));
-    const _0x32cf7b = document.createElement('button');
-    ((_0x32cf7b.type = 'button'),
-      (_0x32cf7b.className = 'v2-video-clipbtn cancel'),
-      (_0x32cf7b.title = audioClipText('controls.cancel')));
+    const el6 = document.createElement('button');
+    ((el6.type = 'button'),
+      (el6.className = 'v2-video-clipbtn cancel'),
+      (el6.title = audioClipText('controls.cancel')));
     {
-      const _0x4a41c8 = 'http://www.w3.org/2000/svg',
-        _0x5510a6 = document.createElementNS(_0x4a41c8, 'svg');
-      (_0x5510a6.setAttribute('width', '20'),
-        _0x5510a6.setAttribute('height', '20'),
-        _0x5510a6.setAttribute('viewBox', '0 0 24 24'),
-        _0x5510a6.setAttribute('fill', 'none'),
-        _0x5510a6.setAttribute('stroke', 'currentColor'),
-        _0x5510a6.setAttribute('stroke-width', '2'));
-      const _0x1a4889 = document.createElementNS(_0x4a41c8, 'path');
-      _0x1a4889.setAttribute('d', 'M18 6L6 18');
-      const _0x34039f = document.createElementNS(_0x4a41c8, 'path');
-      (_0x34039f.setAttribute('d', 'M6 6l12 12'),
-        _0x5510a6.appendChild(_0x1a4889),
-        _0x5510a6.appendChild(_0x34039f),
-        _0x32cf7b.appendChild(_0x5510a6));
+      const next = 'http://www.w3.org/2000/svg',
+        el7 = document.createElementNS(next, 'svg');
+      (el7.setAttribute('width', '20'),
+        el7.setAttribute('height', '20'),
+        el7.setAttribute('viewBox', '0 0 24 24'),
+        el7.setAttribute('fill', 'none'),
+        el7.setAttribute('stroke', 'currentColor'),
+        el7.setAttribute('stroke-width', '2'));
+      const el8 = document.createElementNS(next, 'path');
+      el8.setAttribute('d', 'M18 6L6 18');
+      const el9 = document.createElementNS(next, 'path');
+      (el9.setAttribute('d', 'M6 6l12 12'), el7.appendChild(el8), el7.appendChild(el9), el6.appendChild(el7));
     }
-    const _0x31cb71 = document.createElement('button');
-    ((_0x31cb71.type = 'button'),
-      (_0x31cb71.className = 'v2-video-clipbtn confirm'),
-      (_0x31cb71.title = audioClipText('controls.done')));
+    const el10 = document.createElement('button');
+    ((el10.type = 'button'),
+      (el10.className = 'v2-video-clipbtn confirm'),
+      (el10.title = audioClipText('controls.done')));
     {
-      const _0xc5b2af = 'http://www.w3.org/2000/svg',
-        _0x81a0b8 = document.createElementNS(_0xc5b2af, 'svg');
-      (_0x81a0b8.setAttribute('width', '24'),
-        _0x81a0b8.setAttribute('height', '24'),
-        _0x81a0b8.setAttribute('viewBox', '0 0 24 24'),
-        _0x81a0b8.setAttribute('fill', 'none'),
-        _0x81a0b8.setAttribute('stroke', 'currentColor'),
-        _0x81a0b8.setAttribute('stroke-width', '2.5'));
-      const _0x3cab95 = document.createElementNS(_0xc5b2af, 'polyline');
-      (_0x3cab95.setAttribute('points', '20 6 9 17 4 12'),
-        _0x81a0b8.appendChild(_0x3cab95),
-        _0x31cb71.appendChild(_0x81a0b8));
+      const current = 'http://www.w3.org/2000/svg',
+        el11 = document.createElementNS(current, 'svg');
+      (el11.setAttribute('width', '24'),
+        el11.setAttribute('height', '24'),
+        el11.setAttribute('viewBox', '0 0 24 24'),
+        el11.setAttribute('fill', 'none'),
+        el11.setAttribute('stroke', 'currentColor'),
+        el11.setAttribute('stroke-width', '2.5'));
+      const el12 = document.createElementNS(current, 'polyline');
+      (el12.setAttribute('points', '20 6 9 17 4 12'), el11.appendChild(el12), el10.appendChild(el11));
     }
-    const _0xbd3787 = document.createElement('div');
-    _0xbd3787.className = 'v2-video-cliprow';
-    const _0x1f400d = document.createElement('div');
-    _0x1f400d.className = 'v2-video-cliptrack';
-    const _0x15bc61 = document.createElement('div');
-    _0x15bc61.className = 'v2-audio-clipwave';
+    const el13 = document.createElement('div');
+    el13.className = 'v2-video-cliprow';
+    const el14 = document.createElement('div');
+    el14.className = 'v2-video-cliptrack';
+    const el15 = document.createElement('div');
+    el15.className = 'v2-audio-clipwave';
     {
-      const _0xacdef = 'http://www.w3.org/2000/svg',
-        _0xad826e = document.createElementNS(_0xacdef, 'svg');
-      (_0xad826e.setAttribute('viewBox', '0 0 200 44'),
-        _0xad826e.setAttribute('preserveAspectRatio', 'none'));
-      const _0xa1182 = document.createElementNS(_0xacdef, 'path');
-      (_0xa1182.setAttribute('fill', 'none'),
-        _0xa1182.setAttribute('d', ''),
-        _0xa1182.classList.add('v2-audio-clipwave-path'));
-      const _0x43ca8f = document.createElementNS(_0xacdef, 'path');
-      (_0x43ca8f.setAttribute('fill', 'none'),
-        _0x43ca8f.setAttribute('d', 'M0,22 L200,22'),
-        _0x43ca8f.classList.add('v2-audio-clipwave-mid'),
-        _0xad826e.appendChild(_0xa1182),
-        _0xad826e.appendChild(_0x43ca8f),
-        _0x15bc61.appendChild(_0xad826e),
-        (this._wavePathEl = _0xa1182));
+      const entry = 'http://www.w3.org/2000/svg',
+        el16 = document.createElementNS(entry, 'svg');
+      (el16.setAttribute('viewBox', '0 0 200 44'), el16.setAttribute('preserveAspectRatio', 'none'));
+      const el17 = document.createElementNS(entry, 'path');
+      (el17.setAttribute('fill', 'none'),
+        el17.setAttribute('d', ''),
+        el17.classList.add('v2-audio-clipwave-path'));
+      const el18 = document.createElementNS(entry, 'path');
+      (el18.setAttribute('fill', 'none'),
+        el18.setAttribute('d', 'M0,22 L200,22'),
+        el18.classList.add('v2-audio-clipwave-mid'),
+        el16.appendChild(el17),
+        el16.appendChild(el18),
+        el15.appendChild(el16),
+        (this._wavePathEl = el17));
     }
-    const _0x6a0ba8 = document.createElement('div');
-    _0x6a0ba8.className = 'v2-video-clipticks';
-    const _0x584a7d = document.createElement('div');
-    _0x584a7d.className = 'v2-video-cliprange';
-    const _0x1efb5a = document.createElement('div');
-    _0x1efb5a.className = 'v2-video-clipselection';
-    const _0x591a9d = document.createElement('div');
-    _0x591a9d.className = 'v2-video-clipplayhead';
-    const _0x4ef970 = document.createElement('div');
-    ((_0x4ef970.className = 'v2-video-cliphandle left'), (_0x4ef970.dataset.handle = 'left'));
-    const _0x4b4791 = document.createElement('div');
-    ((_0x4b4791.className = 'v2-video-cliphandle right'), (_0x4b4791.dataset.handle = 'right'));
-    const _0x1f6665 = document.createElement('div');
-    ((_0x1f6665.className = 'v2-video-cliplabel'),
-      (_0x1f6665.textContent = '0.00s'),
-      _0x584a7d.appendChild(_0x1efb5a),
-      _0x584a7d.appendChild(_0x4ef970),
-      _0x584a7d.appendChild(_0x4b4791),
-      _0x1f400d.appendChild(_0x15bc61),
-      _0x1f400d.appendChild(_0x584a7d),
-      _0x1f400d.appendChild(_0x591a9d),
-      _0x1f400d.appendChild(_0x6a0ba8),
-      _0x1f400d.appendChild(_0x1f6665),
-      _0xbd3787.appendChild(_0x32cf7b),
-      _0xbd3787.appendChild(_0x1f400d),
-      _0xbd3787.appendChild(_0x31cb71),
-      _0x46f031.appendChild(_0xbd3787));
-    const _0x27a2ad = document.createElement('div');
-    _0x27a2ad.className = 'v2-video-cliphelper-row';
-    const _0x2805be = document.createElement('div');
-    _0x2805be.className = 'v2-video-cliphelper-left';
-    const _0x22c273 = this._buildHelperMessages();
-    this._msgEls = _0x22c273.map((_0x14c15b, _0x5efffc) => {
-      const _0x11d55d = document.createElement('div');
-      _0x11d55d.className = 'v2-video-cliphelper-msg';
-      if (_0x5efffc !== 0) _0x11d55d.classList.add('hide-down');
-      return ((_0x11d55d.innerHTML = _0x14c15b.html), _0x2805be.appendChild(_0x11d55d), _0x11d55d);
+    const record = document.createElement('div');
+    record.className = 'v2-video-clipticks';
+    const el19 = document.createElement('div');
+    el19.className = 'v2-video-cliprange';
+    const payload = document.createElement('div');
+    payload.className = 'v2-video-clipselection';
+    const handle = document.createElement('div');
+    handle.className = 'v2-video-clipplayhead';
+    const el20 = document.createElement('div');
+    ((el20.className = 'v2-video-cliphandle left'), (el20.dataset.handle = 'left'));
+    const el21 = document.createElement('div');
+    ((el21.className = 'v2-video-cliphandle right'), (el21.dataset.handle = 'right'));
+    const el22 = document.createElement('div');
+    ((el22.className = 'v2-video-cliplabel'),
+      (el22.textContent = '0.00s'),
+      el19.appendChild(payload),
+      el19.appendChild(el20),
+      el19.appendChild(el21),
+      el14.appendChild(el15),
+      el14.appendChild(el19),
+      el14.appendChild(handle),
+      el14.appendChild(record),
+      el14.appendChild(el22),
+      el13.appendChild(el6),
+      el13.appendChild(el14),
+      el13.appendChild(el10),
+      el5.appendChild(el13));
+    const el23 = document.createElement('div');
+    el23.className = 'v2-video-cliphelper-row';
+    const el24 = document.createElement('div');
+    el24.className = 'v2-video-cliphelper-left';
+    const list4 = this._buildHelperMessages();
+    this._msgEls = list4.map((item3, count) => {
+      const el25 = document.createElement('div');
+      el25.className = 'v2-video-cliphelper-msg';
+      if (count !== 0) el25.classList.add('hide-down');
+      return ((el25.innerHTML = item3.html), el24.appendChild(el25), el25);
     });
     if (this._msgInterval) window.clearInterval(this._msgInterval);
-    let _0x13a09b = 0;
+    let state = 0;
     this._msgInterval = window.setInterval(() => {
       if (!this.active || !this._msgEls) return;
-      const _0x4dacb3 = this._msgEls[_0x13a09b];
-      _0x13a09b = (_0x13a09b + 1) % this._msgEls.length;
-      const _0x3bfd2c = this._msgEls[_0x13a09b];
-      (_0x4dacb3.classList.remove('hide-down'),
-        _0x4dacb3.classList.add('hide-up'),
-        _0x3bfd2c.classList.remove('hide-up'),
-        _0x3bfd2c.classList.remove('hide-down'),
+      const el26 = this._msgEls[state];
+      state = (state + 1) % this._msgEls.length;
+      const el27 = this._msgEls[state];
+      (el26.classList.remove('hide-down'),
+        el26.classList.add('hide-up'),
+        el27.classList.remove('hide-up'),
+        el27.classList.remove('hide-down'),
         window.setTimeout(() => {
-          _0x4dacb3 &&
-            _0x4dacb3.classList.contains('hide-up') &&
-            (_0x4dacb3.classList.remove('hide-up'), _0x4dacb3.classList.add('hide-down'));
+          el26 &&
+            el26.classList.contains('hide-up') &&
+            (el26.classList.remove('hide-up'), el26.classList.add('hide-down'));
         }, 0x12c));
     }, 0xfa0);
-    const _0x4d4fa3 = document.createElement('div');
-    ((_0x4d4fa3.className = 'v2-video-clip-smartwrap'),
-      _0x27a2ad.appendChild(_0x2805be),
-      _0x27a2ad.appendChild(_0x4d4fa3),
-      _0x46f031.appendChild(_0x27a2ad),
-      this.wrapperEl.appendChild(_0x46f031),
-      (this.barEl = _0x46f031),
-      (this.cancelBtnEl = _0x32cf7b),
-      (this.confirmBtnEl = _0x31cb71),
-      (this.trackEl = _0x1f400d),
-      (this.selectionEl = _0x1efb5a),
-      (this.leftHandleEl = _0x4ef970),
-      (this.rightHandleEl = _0x4b4791),
-      (this.playheadEl = _0x591a9d),
-      (this.labelEl = _0x1f6665),
+    const config = document.createElement('div');
+    ((config.className = 'v2-video-clip-smartwrap'),
+      el23.appendChild(el24),
+      el23.appendChild(config),
+      el5.appendChild(el23),
+      this.wrapperEl.appendChild(el5),
+      (this.barEl = el5),
+      (this.cancelBtnEl = el6),
+      (this.confirmBtnEl = el10),
+      (this.trackEl = el14),
+      (this.selectionEl = payload),
+      (this.leftHandleEl = el20),
+      (this.rightHandleEl = el21),
+      (this.playheadEl = handle),
+      (this.labelEl = el22),
       this._subscribeLocaleChanges(),
       this._syncLocaleTexts());
   },
@@ -348,170 +341,169 @@ const AudioClipController = {
     if (this.cancelBtnEl) this.cancelBtnEl.title = audioClipText('controls.cancel');
     if (this.confirmBtnEl) this.confirmBtnEl.title = audioClipText('controls.done');
     if (Array.isArray(this._msgEls)) {
-      const _0x4d488b = this._buildHelperMessages();
-      this._msgEls.forEach((_0x5f3ddb, _0x267bd4) => {
-        if (_0x4d488b[_0x267bd4]) _0x5f3ddb.innerHTML = _0x4d488b[_0x267bd4].html;
+      const scope = this._buildHelperMessages();
+      this._msgEls.forEach((el28, input) => {
+        if (scope[input]) el28.innerHTML = scope[input].html;
       });
     }
   },
-  _resolveAudioSrcFromNode(_0x2a9ab4) {
-    if (!_0x2a9ab4) return '';
-    const _0x237428 = localPathToUrl(_0x2a9ab4.localPath);
-    return _0x237428 || _0x2a9ab4.src || _0x2a9ab4.audioUrl || _0x2a9ab4.resultUrl || '';
+  _resolveAudioSrcFromNode(enabled5) {
+    if (!enabled5) return '';
+    const url = localPathToUrl(enabled5.localPath);
+    return url || enabled5.src || enabled5.audioUrl || enabled5.resultUrl || '';
   },
   _getAudioEl() {
     if (!this.wrapperEl) return null;
     if (this.audioEl && this.audioEl.isConnected && this.wrapperEl.contains?.(this.audioEl))
       return this.audioEl;
-    const _0x4a294a = this.wrapperEl.querySelector('audio.audio-player');
-    return ((this.audioEl = _0x4a294a || null), _0x4a294a);
+    const output = this.wrapperEl.querySelector('audio.audio-player');
+    return ((this.audioEl = output || null), output);
   },
-  _getAudioElementSource(_0x10e300) {
-    return String(_0x10e300?.getAttribute?.('src') || _0x10e300?.currentSrc || _0x10e300?.src || '').trim();
+  _getAudioElementSource(value2) {
+    return String(value2?.getAttribute?.('src') || value2?.currentSrc || value2?.src || '').trim();
   },
-  _setClipMediaKeepAlive(_0x206809, _0x5d6dc7) {
-    if (!_0x206809?.dataset) return;
-    if (_0x5d6dc7) {
-      _0x206809.dataset.desktopMediaKeepAlive = 'audio-clip';
+  _setClipMediaKeepAlive(el29, value3) {
+    if (!el29?.dataset) return;
+    if (value3) {
+      el29.dataset.desktopMediaKeepAlive = 'audio-clip';
       return;
     }
-    _0x206809.dataset.desktopMediaKeepAlive === 'audio-clip' &&
-      delete _0x206809.dataset.desktopMediaKeepAlive;
+    el29.dataset.desktopMediaKeepAlive === 'audio-clip' && delete el29.dataset.desktopMediaKeepAlive;
   },
-  _readDurationSec(_0x47def6) {
-    const _0x468c34 = Number(_0x47def6?.duration);
-    if (!Number.isFinite(_0x468c34) || _0x468c34 <= 0) return 0;
-    return _0x468c34;
+  _readDurationSec(value4) {
+    const count2 = Number(value4?.duration);
+    if (!Number.isFinite(count2) || count2 <= 0) return 0;
+    return count2;
   },
-  _applyDurationSec(_0x28d54b) {
-    const _0x29a0cb = Number(_0x28d54b);
-    if (!Number.isFinite(_0x29a0cb) || _0x29a0cb <= 0) return false;
-    this.durationSec = _0x29a0cb;
+  _applyDurationSec(value5) {
+    const count3 = Number(value5);
+    if (!Number.isFinite(count3) || count3 <= 0) return false;
+    this.durationSec = count3;
     if (!(this.endSec > this.startSec)) {
-      const _0xae382c = Math.min(3, _0x29a0cb),
-        _0x28369c = Math.max(0, (_0x29a0cb - _0xae382c) / 2);
-      return ((this.startSec = _0x28369c), (this.endSec = _0x28369c + _0xae382c), true);
+      const value6 = Math.min(3, count3),
+        value7 = Math.max(0, (count3 - value6) / 2);
+      return ((this.startSec = value7), (this.endSec = value7 + value6), true);
     }
-    ((this.startSec = Math.max(0, Math.min(this.startSec, _0x29a0cb))),
-      (this.endSec = Math.max(0, Math.min(this.endSec, _0x29a0cb))));
+    ((this.startSec = Math.max(0, Math.min(this.startSec, count3))),
+      (this.endSec = Math.max(0, Math.min(this.endSec, count3))));
     if (this.endSec <= this.startSec) {
-      const _0xb09fa8 = Math.min(3, _0x29a0cb);
-      ((this.startSec = 0), (this.endSec = _0xb09fa8));
+      const value8 = Math.min(3, count3);
+      ((this.startSec = 0), (this.endSec = value8));
     }
     return true;
   },
   async _syncDurationAndDefaults() {
-    const _0x171082 = appStore.getState().nodes[this.nodeId];
-    if (!_0x171082) return;
-    const _0x102bca = this._resolveAudioSrcFromNode(_0x171082);
-    if (!_0x102bca) {
+    const enabled6 = appStore.getState().nodes[this.nodeId];
+    if (!enabled6) return;
+    const enabled7 = this._resolveAudioSrcFromNode(enabled6);
+    if (!enabled7) {
       this.exit({ silent: true });
       return;
     }
-    const _0x5b717a = this._getAudioEl();
-    if (!_0x5b717a) {
+    const el30 = this._getAudioEl();
+    if (!el30) {
       (window.showToast?.(audioClipText('toasts.playerMissing'), 'error'), this.exit({ silent: true }));
       return;
     }
-    const _0x141551 = ++this._sourceToken;
-    this._setClipMediaKeepAlive(_0x5b717a, true);
+    const value9 = ++this._sourceToken;
+    this._setClipMediaKeepAlive(el30, true);
     try {
-      _0x5b717a.pause();
-    } catch (_0x10f4d9) {}
+      el30.pause();
+    } catch (value10) {}
     try {
-      _0x5b717a.loop = false;
-    } catch (_0x4041c9) {}
+      el30.loop = false;
+    } catch (value11) {}
     !this._onLoadedMeta &&
       ((this._onLoadedMeta = () => {
         if (!this.active) return;
-        const _0x46b0d7 = this._readDurationSec(_0x5b717a);
-        (this._applyDurationSec(_0x46b0d7, _0x5b717a), this._render());
+        const value12 = this._readDurationSec(el30);
+        (this._applyDurationSec(value12, el30), this._render());
       }),
       (this._onDurationChange = () => {
         if (!this.active) return;
-        const _0x39940b = this._readDurationSec(_0x5b717a);
-        (this._applyDurationSec(_0x39940b, _0x5b717a), this._render());
+        const value13 = this._readDurationSec(el30);
+        (this._applyDurationSec(value13, el30), this._render());
       }),
-      _0x5b717a.addEventListener('loadedmetadata', this._onLoadedMeta, { once: true }),
-      _0x5b717a.addEventListener('durationchange', this._onDurationChange));
-    (this._ensureWaveform(_0x102bca), await attachDesktopMediaPlaybackSource(_0x5b717a, _0x102bca));
-    if (!this.active || _0x141551 !== this._sourceToken) return;
-    if (!this._getAudioElementSource(_0x5b717a)) {
-      ((_0x5b717a.preload = 'auto'), (_0x5b717a.src = _0x102bca));
+      el30.addEventListener('loadedmetadata', this._onLoadedMeta, { once: true }),
+      el30.addEventListener('durationchange', this._onDurationChange));
+    (this._ensureWaveform(enabled7), await attachDesktopMediaPlaybackSource(el30, enabled7));
+    if (!this.active || value9 !== this._sourceToken) return;
+    if (!this._getAudioElementSource(el30)) {
+      ((el30.preload = 'auto'), (el30.src = enabled7));
       try {
-        _0x5b717a.load();
-      } catch (_0x420a42) {}
+        el30.load();
+      } catch (value14) {}
     }
-    const _0x4b2327 = this._readDurationSec(_0x5b717a);
-    if (this._applyDurationSec(_0x4b2327, _0x5b717a)) {
+    const value15 = this._readDurationSec(el30);
+    if (this._applyDurationSec(value15, el30)) {
       (this._render(), this._startPlayheadLoop());
       return;
     }
     this._startPlayheadLoop();
   },
-  async _ensureWaveform(_0x4b2f8e) {
-    const _0x239068 = String(_0x4b2f8e || '').trim();
-    if (!_0x239068) return;
+  async _ensureWaveform(value16) {
+    const enabled8 = String(value16 || '').trim();
+    if (!enabled8) return;
     if (!this._wavePathEl) return;
-    const _0x55148e = ++this._waveToken,
-      [_0x7f0374, _0x3a1673] = await Promise.all([
-        getWaveformBarsPathFromUrl(_0x239068, { width: 200, height: 44, samples: 200 }),
-        getAudioDurationFromUrl(_0x239068),
+    const value17 = ++this._waveToken,
+      [enabled9, value18] = await Promise.all([
+        getWaveformBarsPathFromUrl(enabled8, { width: 200, height: 44, samples: 200 }),
+        getAudioDurationFromUrl(enabled8),
       ]);
     if (!this.active) return;
-    if (_0x55148e !== this._waveToken) return;
-    this._applyDurationSec(_0x3a1673) && (this._render(), this._startPlayheadLoop());
-    if (!this._wavePathEl || !_0x7f0374) return;
-    this._wavePathEl.setAttribute('d', _0x7f0374);
+    if (value17 !== this._waveToken) return;
+    this._applyDurationSec(value18) && (this._render(), this._startPlayheadLoop());
+    if (!this._wavePathEl || !enabled9) return;
+    this._wavePathEl.setAttribute('d', enabled9);
   },
   _startPlayheadLoop() {
     if (this._playheadRaf) cancelAnimationFrame(this._playheadRaf);
-    const _0x216d06 = () => {
+    const value19 = () => {
       if (!this.active) return;
-      (this._renderPlayhead(), (this._playheadRaf = requestAnimationFrame(_0x216d06)));
+      (this._renderPlayhead(), (this._playheadRaf = requestAnimationFrame(value19)));
     };
-    this._playheadRaf = requestAnimationFrame(_0x216d06);
+    this._playheadRaf = requestAnimationFrame(value19);
   },
   _renderPlayhead() {
     if (!this.playheadEl || !this.trackEl) return;
-    const _0x1d510c = this.durationSec;
-    if (!Number.isFinite(_0x1d510c) || _0x1d510c <= 0) {
+    const count4 = this.durationSec;
+    if (!Number.isFinite(count4) || count4 <= 0) {
       this.playheadEl.style.display = 'none';
       return;
     }
-    const _0x54e75a = this._getAudioEl();
-    if (!_0x54e75a) {
+    const enabled10 = this._getAudioEl();
+    if (!enabled10) {
       this.playheadEl.style.display = 'none';
       return;
     }
-    let _0x2e60f7 = Number(_0x54e75a.currentTime) || 0;
-    (_0x2e60f7 < this.startSec || _0x2e60f7 > this.endSec) &&
-      !_0x54e75a.paused &&
-      ((_0x54e75a.currentTime = this.startSec), (_0x2e60f7 = this.startSec));
-    const _0x272379 = Math.max(0, Math.min(1, _0x2e60f7 / _0x1d510c));
-    ((this.playheadEl.style.display = 'block'), (this.playheadEl.style.left = _0x272379 * 100 + '%'));
+    let value20 = Number(enabled10.currentTime) || 0;
+    (value20 < this.startSec || value20 > this.endSec) &&
+      !enabled10.paused &&
+      ((enabled10.currentTime = this.startSec), (value20 = this.startSec));
+    const value21 = Math.max(0, Math.min(1, value20 / count4));
+    ((this.playheadEl.style.display = 'block'), (this.playheadEl.style.left = value21 * 100 + '%'));
   },
   _bindEvents() {
     if (!this.barEl) return;
-    (this.cancelBtnEl?.addEventListener('click', (_0x17e7af) => {
-      (_0x17e7af.stopPropagation(), this.exit());
+    (this.cancelBtnEl?.addEventListener('click', (event4) => {
+      (event4.stopPropagation(), this.exit());
     }),
-      this.confirmBtnEl?.addEventListener('click', (_0x13adeb) => {
-        (_0x13adeb.stopPropagation(), this._confirm());
+      this.confirmBtnEl?.addEventListener('click', (event5) => {
+        (event5.stopPropagation(), this._confirm());
       }));
-    const _0x49d748 = (_0x481e4d) => {
+    const value22 = (event6) => {
       if (!this.trackEl || !this.active || this._dragMode) return;
-      const _0x485b24 = _0x481e4d.clientX,
-        _0x564254 = this.selectionEl.getBoundingClientRect(),
-        _0x44c4f4 = 20,
-        _0x41845e = Math.abs(_0x485b24 - _0x564254.left) < _0x44c4f4,
-        _0x126524 = Math.abs(_0x485b24 - _0x564254.right) < _0x44c4f4;
-      if (_0x41845e)
+      const value23 = event6.clientX,
+        box = this.selectionEl.getBoundingClientRect(),
+        value24 = 20,
+        value25 = Math.abs(value23 - box.left) < value24,
+        value26 = Math.abs(value23 - box.right) < value24;
+      if (value25)
         (this.leftHandleEl.classList.add('hover-active'),
           this.rightHandleEl.classList.remove('hover-active'),
           (this.selectionEl.style.cursor = 'var(--resize-ew-cursor)'));
       else
-        _0x126524
+        value26
           ? (this.rightHandleEl.classList.add('hover-active'),
             this.leftHandleEl.classList.remove('hover-active'),
             (this.selectionEl.style.cursor = 'var(--resize-ew-cursor)'))
@@ -519,164 +511,164 @@ const AudioClipController = {
             this.rightHandleEl.classList.remove('hover-active'),
             (this.selectionEl.style.cursor = 'var(--grab-cursor)'));
     };
-    this.trackEl?.addEventListener('pointermove', _0x49d748);
-    const _0x17f47b = 30,
-      _0x1db384 = (_0x5bf2b6) => (Number(_0x5bf2b6 || 1) / _0x17f47b) * 1,
-      _0x26c858 = () => {
-        const _0x518cd9 = this.durationSec;
-        if (!Number.isFinite(_0x518cd9) || _0x518cd9 <= 0) return 0.1;
-        return Math.min(0.1, _0x518cd9);
+    this.trackEl?.addEventListener('pointermove', value22);
+    const value27 = 30,
+      handler = (value28) => (Number(value28 || 1) / value27) * 1,
+      handler2 = () => {
+        const count5 = this.durationSec;
+        if (!Number.isFinite(count5) || count5 <= 0) return 0.1;
+        return Math.min(0.1, count5);
       },
-      _0x3cfdbf = (_0xf606bb, _0x63d10a, _0x55165b) => Math.max(_0x63d10a, Math.min(_0x55165b, _0xf606bb)),
-      _0x1e4181 = (_0x53e2ed) => {
+      handler3 = (value29, value30, value31) => Math.max(value30, Math.min(value31, value29)),
+      handler4 = (value32) => {
         if (!this.trackEl || !this.active) return;
-        const _0x3b0eae = this.durationSec;
-        if (!Number.isFinite(_0x3b0eae) || _0x3b0eae <= 0) return;
-        const _0x2cd0d1 = this._getAudioEl();
-        if (!_0x2cd0d1) return;
-        const _0x11cf3 = this.trackEl.getBoundingClientRect();
-        if (!_0x11cf3.width) return;
-        const _0x2e5f2b = _0x53e2ed - _0x11cf3.left,
-          _0x369802 = _0x3cfdbf(_0x2e5f2b / _0x11cf3.width, 0, 1),
-          _0x49a491 = _0x369802 * _0x3b0eae,
-          _0x5dfaeb = Math.max(0, _0x3b0eae - 0.001);
+        const count6 = this.durationSec;
+        if (!Number.isFinite(count6) || count6 <= 0) return;
+        const enabled11 = this._getAudioEl();
+        if (!enabled11) return;
+        const box2 = this.trackEl.getBoundingClientRect();
+        if (!box2.width) return;
+        const value33 = value32 - box2.left,
+          value34 = handler3(value33 / box2.width, 0, 1),
+          value35 = value34 * count6,
+          value36 = Math.max(0, count6 - 0.001);
         try {
-          _0x2cd0d1.currentTime = _0x3cfdbf(_0x49a491, 0, _0x5dfaeb);
-        } catch (_0x4e7ec6) {}
+          enabled11.currentTime = handler3(value35, 0, value36);
+        } catch (value37) {}
         this._renderPlayhead();
       },
-      _0x5963bd = () => {
-        const _0x11cbb9 = this._getAudioEl();
-        if (!_0x11cbb9) return;
-        if (!_0x11cbb9.paused) return;
-        const _0x2f343c = Number(_0x11cbb9.currentTime) || 0;
-        if (_0x2f343c >= this.startSec && _0x2f343c <= this.endSec) return;
+      handler5 = () => {
+        const enabled12 = this._getAudioEl();
+        if (!enabled12) return;
+        if (!enabled12.paused) return;
+        const value38 = Number(enabled12.currentTime) || 0;
+        if (value38 >= this.startSec && value38 <= this.endSec) return;
         try {
-          _0x11cbb9.currentTime = this.startSec;
-        } catch (_0x30d8c4) {}
+          enabled12.currentTime = this.startSec;
+        } catch (value39) {}
       },
-      _0x16226f = (_0x246c2d, _0x893b3a) => {
-        const _0x1731b0 = this.durationSec;
-        if (!Number.isFinite(_0x1731b0) || _0x1731b0 <= 0) return;
-        const _0x34b25a = _0x1db384(_0x893b3a) * (_0x246c2d >= 0 ? 1 : -1),
-          _0x2cf606 = _0x26c858(),
-          _0x5071b7 = Math.max(_0x2cf606, this.endSec - this.startSec);
-        let _0x343649 = this.startSec + _0x34b25a,
-          _0x2977dd = this.endSec + _0x34b25a;
-        _0x343649 < 0 && ((_0x343649 = 0), (_0x2977dd = _0x5071b7));
-        _0x2977dd > _0x1731b0 && ((_0x2977dd = _0x1731b0), (_0x343649 = Math.max(0, _0x1731b0 - _0x5071b7)));
-        ((this.startSec = _0x343649), (this.endSec = _0x2977dd));
-        const _0x5091a2 = this._getAudioEl();
-        if (_0x5091a2) {
+      handler6 = (count7, value40) => {
+        const count8 = this.durationSec;
+        if (!Number.isFinite(count8) || count8 <= 0) return;
+        const value41 = handler(value40) * (count7 >= 0 ? 1 : -1),
+          value42 = handler2(),
+          value43 = Math.max(value42, this.endSec - this.startSec);
+        let count9 = this.startSec + value41,
+          value44 = this.endSec + value41;
+        count9 < 0 && ((count9 = 0), (value44 = value43));
+        value44 > count8 && ((value44 = count8), (count9 = Math.max(0, count8 - value43)));
+        ((this.startSec = count9), (this.endSec = value44));
+        const enabled13 = this._getAudioEl();
+        if (enabled13) {
           try {
-            if (!_0x5091a2.paused) _0x5091a2.pause();
-          } catch (_0x2d70e9) {}
+            if (!enabled13.paused) enabled13.pause();
+          } catch (value45) {}
           try {
-            _0x5091a2.currentTime = _0x343649;
-          } catch (_0x5e528e) {}
-        } else _0x5963bd();
+            enabled13.currentTime = count9;
+          } catch (value46) {}
+        } else handler5();
         this._render();
       },
-      _0x5af5b8 = (_0x9b6ccb) => {
-        const _0x19e7cf = this.durationSec;
-        if (!Number.isFinite(_0x19e7cf) || _0x19e7cf <= 0) return;
-        const _0x423748 = _0x1db384(1) * (_0x9b6ccb >= 0 ? 1 : -1),
-          _0x15d70e = _0x26c858(),
-          _0x4a2f2c = Math.max(0, this.endSec - _0x15d70e);
-        this.startSec = _0x3cfdbf(this.startSec + _0x423748, 0, _0x4a2f2c);
-        const _0x2f794e = this._getAudioEl();
-        if (_0x2f794e) {
+      handler7 = (count10) => {
+        const count11 = this.durationSec;
+        if (!Number.isFinite(count11) || count11 <= 0) return;
+        const value47 = handler(1) * (count10 >= 0 ? 1 : -1),
+          value48 = handler2(),
+          value49 = Math.max(0, this.endSec - value48);
+        this.startSec = handler3(this.startSec + value47, 0, value49);
+        const enabled14 = this._getAudioEl();
+        if (enabled14) {
           try {
-            if (!_0x2f794e.paused) _0x2f794e.pause();
-          } catch (_0x5b981d) {}
+            if (!enabled14.paused) enabled14.pause();
+          } catch (value50) {}
           try {
-            _0x2f794e.currentTime = this.startSec;
-          } catch (_0x28040b) {}
+            enabled14.currentTime = this.startSec;
+          } catch (value51) {}
         }
         this._render();
       },
-      _0x35c286 = (_0x5ad90f) => {
-        const _0x43b8f2 = this.durationSec;
-        if (!Number.isFinite(_0x43b8f2) || _0x43b8f2 <= 0) return;
-        const _0x33cf1a = _0x1db384(1) * (_0x5ad90f >= 0 ? 1 : -1),
-          _0x373600 = _0x26c858(),
-          _0x55354f = Math.min(_0x43b8f2, this.startSec + _0x373600);
-        this.endSec = _0x3cfdbf(this.endSec + _0x33cf1a, _0x55354f, _0x43b8f2);
-        const _0x491dce = this._getAudioEl();
-        if (_0x491dce) {
+      handler8 = (count12) => {
+        const count13 = this.durationSec;
+        if (!Number.isFinite(count13) || count13 <= 0) return;
+        const value52 = handler(1) * (count12 >= 0 ? 1 : -1),
+          value53 = handler2(),
+          value54 = Math.min(count13, this.startSec + value53);
+        this.endSec = handler3(this.endSec + value52, value54, count13);
+        const enabled15 = this._getAudioEl();
+        if (enabled15) {
           try {
-            if (!_0x491dce.paused) _0x491dce.pause();
-          } catch (_0x1c1429) {}
+            if (!enabled15.paused) enabled15.pause();
+          } catch (value55) {}
           try {
-            _0x491dce.currentTime = this.endSec;
-          } catch (_0x5b62b0) {}
+            enabled15.currentTime = this.endSec;
+          } catch (value56) {}
         }
         this._render();
       },
-      _0x3d0d1f = (_0x8f2ae3) => {
-        const _0x29c6b3 = this.durationSec;
-        if (!Number.isFinite(_0x29c6b3) || _0x29c6b3 <= 0) return;
-        const _0x3a2f63 = this._getAudioEl();
-        if (!_0x3a2f63) return;
-        let _0x515cbc = Number(_0x3a2f63.currentTime) || 0;
-        _0x515cbc = _0x3cfdbf(_0x515cbc, 0, _0x29c6b3);
-        const _0x356dcd = _0x26c858();
-        if (_0x8f2ae3 === 'in') {
-          const _0x254d03 = Math.max(0, this.endSec - _0x356dcd);
-          this.startSec = _0x3cfdbf(_0x515cbc, 0, _0x254d03);
+      handler9 = (value57) => {
+        const count14 = this.durationSec;
+        if (!Number.isFinite(count14) || count14 <= 0) return;
+        const enabled16 = this._getAudioEl();
+        if (!enabled16) return;
+        let value58 = Number(enabled16.currentTime) || 0;
+        value58 = handler3(value58, 0, count14);
+        const value59 = handler2();
+        if (value57 === 'in') {
+          const value60 = Math.max(0, this.endSec - value59);
+          this.startSec = handler3(value58, 0, value60);
         } else {
-          const _0x1cdb1a = Math.min(_0x29c6b3, this.startSec + _0x356dcd);
-          this.endSec = _0x3cfdbf(_0x515cbc, _0x1cdb1a, _0x29c6b3);
+          const value61 = Math.min(count14, this.startSec + value59);
+          this.endSec = handler3(value58, value61, count14);
         }
         this._render();
       },
-      _0x131c51 = (_0x5674cf) => {
+      value62 = (event7) => {
         if (!this.trackEl || !this.active) return;
-        const _0x409481 = _0x5674cf.target.closest('.v2-video-cliphandle'),
-          _0x3f462f = !!_0x5674cf.target.closest('.v2-video-clipselection'),
-          _0x4e3b75 = this.trackEl.getBoundingClientRect();
-        if (!_0x4e3b75.width) return;
-        const _0x9994bc = _0x5674cf.clientX,
-          _0x3cdaf8 = this.selectionEl.getBoundingClientRect(),
-          _0x59da17 = 20,
-          _0x45489c = Math.abs(_0x9994bc - _0x3cdaf8.left) < _0x59da17,
-          _0x8bfa2 = Math.abs(_0x9994bc - _0x3cdaf8.right) < _0x59da17;
-        if (_0x45489c || (_0x409481 && _0x409481.dataset.handle === 'left'))
+        const el31 = event7.target.closest('.v2-video-cliphandle'),
+          value63 = !!event7.target.closest('.v2-video-clipselection'),
+          box3 = this.trackEl.getBoundingClientRect();
+        if (!box3.width) return;
+        const value64 = event7.clientX,
+          box4 = this.selectionEl.getBoundingClientRect(),
+          value65 = 20,
+          value66 = Math.abs(value64 - box4.left) < value65,
+          value67 = Math.abs(value64 - box4.right) < value65;
+        if (value66 || (el31 && el31.dataset.handle === 'left'))
           ((this._dragMode = 'left'), this.leftHandleEl.classList.add('hover-active'));
         else {
-          if (_0x8bfa2 || (_0x409481 && _0x409481.dataset.handle === 'right'))
+          if (value67 || (el31 && el31.dataset.handle === 'right'))
             ((this._dragMode = 'right'), this.rightHandleEl.classList.add('hover-active'));
           else {
-            if (_0x3f462f) this._dragMode = 'move';
+            if (value63) this._dragMode = 'move';
             else {
               this._dragMode = 'scrub';
-              const _0x1e6ec5 = this._getAudioEl();
-              if (_0x1e6ec5)
+              const enabled17 = this._getAudioEl();
+              if (enabled17)
                 try {
-                  if (!_0x1e6ec5.paused) _0x1e6ec5.pause();
-                } catch (_0x382b24) {}
+                  if (!enabled17.paused) enabled17.pause();
+                } catch (value68) {}
             }
           }
         }
         if (this._dragMode === 'move') {
-          const _0x275ee4 = this.selectionEl.getBoundingClientRect();
-          this._dragOffsetPx = _0x5674cf.clientX - _0x275ee4.left;
+          const box5 = this.selectionEl.getBoundingClientRect();
+          this._dragOffsetPx = event7.clientX - box5.left;
         } else this._dragOffsetPx = 0;
-        (_0x5674cf.preventDefault(), _0x5674cf.stopPropagation());
-        if (this._dragMode === 'scrub') _0x1e4181(_0x5674cf.clientX);
-        else this._handleDragAtClientX(_0x5674cf.clientX);
+        (event7.preventDefault(), event7.stopPropagation());
+        if (this._dragMode === 'scrub') handler4(event7.clientX);
+        else this._handleDragAtClientX(event7.clientX);
         if (this._onPointerMove) window.removeEventListener('pointermove', this._onPointerMove, true);
         if (this._onPointerUp) window.removeEventListener('pointerup', this._onPointerUp, true);
-        ((this._onPointerMove = (_0x3dca34) => {
+        ((this._onPointerMove = (event8) => {
           if (!this.active || !this.trackEl) return;
-          (_0x3dca34.preventDefault(), _0x3dca34.stopPropagation());
-          if (this._dragMode === 'scrub') _0x1e4181(_0x3dca34.clientX);
-          else this._handleDragAtClientX(_0x3dca34.clientX);
+          (event8.preventDefault(), event8.stopPropagation());
+          if (this._dragMode === 'scrub') handler4(event8.clientX);
+          else this._handleDragAtClientX(event8.clientX);
         }),
-          (this._onPointerUp = (_0x4c1b46) => {
+          (this._onPointerUp = (event9) => {
             if (!this.active) return;
-            (_0x4c1b46.preventDefault(),
-              _0x4c1b46.stopPropagation(),
+            (event9.preventDefault(),
+              event9.stopPropagation(),
               (this._dragMode = null),
               (this._dragOffsetPx = 0),
               this.leftHandleEl?.classList.remove('hover-active'),
@@ -688,155 +680,155 @@ const AudioClipController = {
           window.addEventListener('pointermove', this._onPointerMove, true),
           window.addEventListener('pointerup', this._onPointerUp, true));
       };
-    (this.trackEl?.addEventListener('pointerdown', _0x131c51),
+    (this.trackEl?.addEventListener('pointerdown', value62),
       this.trackEl?.addEventListener(
         'wheel',
-        (_0x5089cd) => {
+        (event10) => {
           if (!this.active) return;
-          (_0x5089cd.preventDefault(), _0x5089cd.stopPropagation());
-          const _0x265d21 = Number(_0x5089cd.deltaX) || 0,
-            _0x4819ac = Number(_0x5089cd.deltaY) || 0,
-            _0x30ba83 = Math.abs(_0x265d21) > Math.abs(_0x4819ac) ? _0x265d21 : _0x4819ac;
-          if (!_0x30ba83) return;
-          const _0x3fb2bf = _0x30ba83 > 0 ? 1 : -1;
-          if (_0x5089cd.ctrlKey || _0x5089cd.metaKey) _0x5af5b8(_0x3fb2bf);
+          (event10.preventDefault(), event10.stopPropagation());
+          const value69 = Number(event10.deltaX) || 0,
+            value70 = Number(event10.deltaY) || 0,
+            enabled18 = Math.abs(value69) > Math.abs(value70) ? value69 : value70;
+          if (!enabled18) return;
+          const value71 = enabled18 > 0 ? 1 : -1;
+          if (event10.ctrlKey || event10.metaKey) handler7(value71);
           else {
-            if (_0x5089cd.altKey) _0x35c286(_0x3fb2bf);
+            if (event10.altKey) handler8(value71);
             else {
-              const _0x3c4c55 = _0x5089cd.shiftKey ? 10 : 1;
-              _0x16226f(_0x3fb2bf, _0x3c4c55);
+              const value72 = event10.shiftKey ? 10 : 1;
+              handler6(value71, value72);
             }
           }
         },
         { passive: false },
       ),
-      this.selectionEl?.addEventListener('dblclick', (_0x232568) => {
+      this.selectionEl?.addEventListener('dblclick', (event11) => {
         if (!this.active) return;
-        (_0x232568.preventDefault(), _0x232568.stopPropagation());
-        const _0x3d31c2 = this.durationSec;
-        if (!_0x3d31c2 || !Number.isFinite(_0x3d31c2) || _0x3d31c2 <= 0) return;
-        const _0x1ff059 = this.selectionEl.getBoundingClientRect(),
-          _0x4894b7 = _0x232568.clientX,
-          _0x5fdaec = 24;
-        if (_0x4894b7 - _0x1ff059.left < _0x5fdaec || _0x1ff059.right - _0x4894b7 < _0x5fdaec) return;
-        const _0x28f6ec = Math.min(3, _0x3d31c2),
-          _0x5b7ddf = (this.startSec + this.endSec) / 2,
-          _0x1ab972 = Math.max(0, Math.min(_0x3d31c2 - _0x28f6ec, _0x5b7ddf - _0x28f6ec / 2));
-        ((this.startSec = _0x1ab972), (this.endSec = _0x1ab972 + _0x28f6ec));
-        const _0x264130 = this._getAudioEl();
-        if (_0x264130 && _0x264130.paused) _0x264130.currentTime = this.startSec;
+        (event11.preventDefault(), event11.stopPropagation());
+        const enabled19 = this.durationSec;
+        if (!enabled19 || !Number.isFinite(enabled19) || enabled19 <= 0) return;
+        const box6 = this.selectionEl.getBoundingClientRect(),
+          value73 = event11.clientX,
+          value74 = 24;
+        if (value73 - box6.left < value74 || box6.right - value73 < value74) return;
+        const value75 = Math.min(3, enabled19),
+          value76 = (this.startSec + this.endSec) / 2,
+          value77 = Math.max(0, Math.min(enabled19 - value75, value76 - value75 / 2));
+        ((this.startSec = value77), (this.endSec = value77 + value75));
+        const value78 = this._getAudioEl();
+        if (value78 && value78.paused) value78.currentTime = this.startSec;
         this._render();
       }),
       this._onKeyDown &&
         (window.removeEventListener('keydown', this._onKeyDown, true), (this._onKeyDown = null)),
-      (this._onKeyDown = (_0x3075c) => {
+      (this._onKeyDown = (event12) => {
         if (!this.active) return;
-        if (_0x3075c.key === 'Escape') {
-          (_0x3075c.preventDefault(), this.exit());
+        if (event12.key === 'Escape') {
+          (event12.preventDefault(), this.exit());
           return;
         }
-        if (_0x3075c.key === ' ' || _0x3075c.code === 'Space') {
-          _0x3075c.preventDefault();
-          const _0x41a639 = this._getAudioEl();
-          _0x41a639 &&
-            (_0x41a639.paused
-              ? ((_0x41a639.currentTime < this.startSec || _0x41a639.currentTime >= this.endSec) &&
-                  (_0x41a639.currentTime = this.startSec),
-                _0x41a639.play())
-              : _0x41a639.pause());
+        if (event12.key === ' ' || event12.code === 'Space') {
+          event12.preventDefault();
+          const value79 = this._getAudioEl();
+          value79 &&
+            (value79.paused
+              ? ((value79.currentTime < this.startSec || value79.currentTime >= this.endSec) &&
+                  (value79.currentTime = this.startSec),
+                value79.play())
+              : value79.pause());
           return;
         }
-        if (_0x3075c.key === 'i' || _0x3075c.key === 'I') {
-          (_0x3075c.preventDefault(), _0x3d0d1f('in'));
+        if (event12.key === 'i' || event12.key === 'I') {
+          (event12.preventDefault(), handler9('in'));
           return;
         }
-        if (_0x3075c.key === 'o' || _0x3075c.key === 'O') {
-          (_0x3075c.preventDefault(), _0x3d0d1f('out'));
+        if (event12.key === 'o' || event12.key === 'O') {
+          (event12.preventDefault(), handler9('out'));
           return;
         }
-        if (_0x3075c.key === 'ArrowLeft' || _0x3075c.key === 'ArrowRight') {
-          _0x3075c.preventDefault();
-          const _0x5c5c50 = _0x3075c.key === 'ArrowRight' ? 1 : -1;
-          if (_0x3075c.ctrlKey || _0x3075c.metaKey) {
-            _0x5af5b8(_0x5c5c50);
+        if (event12.key === 'ArrowLeft' || event12.key === 'ArrowRight') {
+          event12.preventDefault();
+          const value80 = event12.key === 'ArrowRight' ? 1 : -1;
+          if (event12.ctrlKey || event12.metaKey) {
+            handler7(value80);
             return;
           }
-          if (_0x3075c.altKey) {
-            _0x35c286(_0x5c5c50);
+          if (event12.altKey) {
+            handler8(value80);
             return;
           }
-          const _0x2365f2 = _0x3075c.shiftKey ? 10 : 1;
-          _0x16226f(_0x5c5c50, _0x2365f2);
+          const value81 = event12.shiftKey ? 10 : 1;
+          handler6(value80, value81);
         }
       }),
       window.addEventListener('keydown', this._onKeyDown, true),
       this._onDocClick &&
         (document.removeEventListener('pointerdown', this._onDocClick, true), (this._onDocClick = null)),
-      (this._onDocClick = (_0x335694) => {
+      (this._onDocClick = (event13) => {
         if (!this.active || !this.barEl) return;
-        if (this.barEl.contains(_0x335694.target)) return;
+        if (this.barEl.contains(event13.target)) return;
         this.exit({ silent: true });
       }),
       document.addEventListener('pointerdown', this._onDocClick, true));
   },
   _togglePlayRange() {
-    const _0x1acaf5 = this._getAudioEl(),
-      _0xad29b2 = this.durationSec;
-    if (!_0x1acaf5 || !Number.isFinite(_0xad29b2) || _0xad29b2 <= 0) return;
+    const enabled20 = this._getAudioEl(),
+      count15 = this.durationSec;
+    if (!enabled20 || !Number.isFinite(count15) || count15 <= 0) return;
     try {
-      if (!_0x1acaf5.paused) {
-        _0x1acaf5.pause();
+      if (!enabled20.paused) {
+        enabled20.pause();
         return;
       }
-    } catch (_0x150144) {}
-    let _0x55efdc = Number(_0x1acaf5.currentTime) || 0;
-    if (_0x55efdc < this.startSec || _0x55efdc >= this.endSec)
+    } catch (value82) {}
+    let value83 = Number(enabled20.currentTime) || 0;
+    if (value83 < this.startSec || value83 >= this.endSec)
       try {
-        _0x1acaf5.currentTime = this.startSec;
-      } catch (_0x2bf2d0) {}
+        enabled20.currentTime = this.startSec;
+      } catch (value84) {}
     try {
-      _0x1acaf5.play();
-    } catch (_0x3a6cdf) {}
+      enabled20.play();
+    } catch (value85) {}
   },
-  _handleDragAtClientX(_0x30a5e6) {
+  _handleDragAtClientX(value86) {
     if (!this.trackEl || !this.active) return;
-    const _0x1c48ed = this.durationSec;
-    if (!_0x1c48ed || !Number.isFinite(_0x1c48ed) || _0x1c48ed <= 0) {
+    const enabled21 = this.durationSec;
+    if (!enabled21 || !Number.isFinite(enabled21) || enabled21 <= 0) {
       this._render();
       return;
     }
-    const _0x15d6f4 = this.trackEl.getBoundingClientRect();
-    if (!_0x15d6f4.width) return;
-    const _0x13b72a = _0x30a5e6 - _0x15d6f4.left,
-      _0x79e27 = Math.max(0, Math.min(1, _0x13b72a / _0x15d6f4.width)),
-      _0x5bbc08 = _0x79e27 * _0x1c48ed,
-      _0x3e0648 = Math.min(0.1, _0x1c48ed),
-      _0x53aecc = Math.max(_0x3e0648, this.endSec - this.startSec);
+    const box7 = this.trackEl.getBoundingClientRect();
+    if (!box7.width) return;
+    const value87 = value86 - box7.left,
+      value88 = Math.max(0, Math.min(1, value87 / box7.width)),
+      value89 = value88 * enabled21,
+      value90 = Math.min(0.1, enabled21),
+      value91 = Math.max(value90, this.endSec - this.startSec);
     if (this._dragMode === 'left') {
-      const _0x23e315 = Math.max(0, Math.min(_0x5bbc08, this.endSec - _0x3e0648));
-      this.startSec = _0x23e315;
-      const _0x2ae015 = this._getAudioEl();
-      if (_0x2ae015)
+      const value92 = Math.max(0, Math.min(value89, this.endSec - value90));
+      this.startSec = value92;
+      const value93 = this._getAudioEl();
+      if (value93)
         try {
-          _0x2ae015.currentTime = _0x23e315;
-        } catch (_0x48cbef) {}
+          value93.currentTime = value92;
+        } catch (value94) {}
     } else {
       if (this._dragMode === 'right') {
-        const _0x19be50 = Math.max(this.startSec + _0x3e0648, Math.min(_0x1c48ed, _0x5bbc08));
-        this.endSec = _0x19be50;
+        const value95 = Math.max(this.startSec + value90, Math.min(enabled21, value89));
+        this.endSec = value95;
       } else {
         if (this._dragMode === 'move') {
-          const _0x389621 = this.selectionEl.getBoundingClientRect().left - _0x15d6f4.left,
-            _0x1f2837 = _0x30a5e6 - _0x15d6f4.left - this._dragOffsetPx,
-            _0x545655 = _0x1f2837 - _0x389621,
-            _0x4ce560 = (_0x545655 / _0x15d6f4.width) * _0x1c48ed,
-            _0x3bc4af = Math.max(0, Math.min(_0x1c48ed - _0x53aecc, this.startSec + _0x4ce560));
-          ((this.startSec = _0x3bc4af), (this.endSec = _0x3bc4af + _0x53aecc));
-          const _0x30e1e0 = this._getAudioEl();
-          if (_0x30e1e0)
+          const value96 = this.selectionEl.getBoundingClientRect().left - box7.left,
+            value97 = value86 - box7.left - this._dragOffsetPx,
+            value98 = value97 - value96,
+            value99 = (value98 / box7.width) * enabled21,
+            value100 = Math.max(0, Math.min(enabled21 - value91, this.startSec + value99));
+          ((this.startSec = value100), (this.endSec = value100 + value91));
+          const value101 = this._getAudioEl();
+          if (value101)
             try {
-              _0x30e1e0.currentTime = _0x3bc4af;
-            } catch (_0x2a30e9) {}
+              value101.currentTime = value100;
+            } catch (value102) {}
         }
       }
     }
@@ -845,21 +837,21 @@ const AudioClipController = {
   _render() {
     if (!this.active || !this.trackEl || !this.selectionEl || !this.leftHandleEl || !this.rightHandleEl)
       return;
-    const _0x30298d = this.durationSec,
-      _0x4f4df6 = Number.isFinite(_0x30298d) && _0x30298d > 0,
-      _0x233011 = _0x4f4df6 ? Math.max(0, Math.min(this.startSec, _0x30298d)) : 0,
-      _0x586a4d = _0x4f4df6 ? Math.max(0, Math.min(this.endSec, _0x30298d)) : 0,
-      _0x4563e8 = Math.max(0, _0x586a4d - _0x233011);
-    if (_0x4f4df6) {
-      const _0x24b973 = (_0x233011 / _0x30298d) * 100,
-        _0x424a46 = (_0x4563e8 / _0x30298d) * 100;
-      ((this.selectionEl.style.left = _0x24b973 + '%'),
-        (this.selectionEl.style.width = _0x424a46 + '%'),
-        (this.leftHandleEl.style.left = _0x24b973 + '%'),
-        (this.rightHandleEl.style.left = _0x24b973 + _0x424a46 + '%'),
+    const count16 = this.durationSec,
+      value103 = Number.isFinite(count16) && count16 > 0,
+      value104 = value103 ? Math.max(0, Math.min(this.startSec, count16)) : 0,
+      value105 = value103 ? Math.max(0, Math.min(this.endSec, count16)) : 0,
+      count17 = Math.max(0, value105 - value104);
+    if (value103) {
+      const value106 = (value104 / count16) * 100,
+        value107 = (count17 / count16) * 100;
+      ((this.selectionEl.style.left = value106 + '%'),
+        (this.selectionEl.style.width = value107 + '%'),
+        (this.leftHandleEl.style.left = value106 + '%'),
+        (this.rightHandleEl.style.left = value106 + value107 + '%'),
         this.labelEl &&
-          ((this.labelEl.textContent = _0x4563e8.toFixed(2) + 's'),
-          (this.labelEl.style.left = _0x24b973 + _0x424a46 / 2 + '%')));
+          ((this.labelEl.textContent = count17.toFixed(2) + 's'),
+          (this.labelEl.style.left = value106 + value107 / 2 + '%')));
     } else
       ((this.selectionEl.style.left = '0%'),
         (this.selectionEl.style.width = '0%'),
@@ -869,9 +861,9 @@ const AudioClipController = {
           ((this.labelEl.textContent = audioClipText('status.loading')), (this.labelEl.style.left = '50%')));
     this._renderPlayhead();
     if (this.confirmBtnEl) {
-      const _0x562cc7 = _0x4f4df6 && _0x4563e8 >= 0.1;
-      ((this.confirmBtnEl.disabled = !_0x562cc7),
-        (this.confirmBtnEl.dataset.disabled = _0x562cc7 ? 'false' : 'true'),
+      const enabled22 = value103 && count17 >= 0.1;
+      ((this.confirmBtnEl.disabled = !enabled22),
+        (this.confirmBtnEl.dataset.disabled = enabled22 ? 'false' : 'true'),
         this.confirmBtnEl.dataset.loading !== 'true' &&
           (this.confirmBtnEl.innerHTML =
             '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>'));
@@ -879,99 +871,95 @@ const AudioClipController = {
   },
   async _confirm() {
     if (!this.confirmBtnEl) return;
-    const _0x1b9afb = this.confirmBtnEl;
-    if (_0x1b9afb.dataset.disabled === 'true') return;
-    const _0x9611d8 = appStore.getState().nodes,
-      _0x1a61e0 = _0x9611d8[this.anchorNodeId];
-    if (!_0x1a61e0) {
+    const el32 = this.confirmBtnEl;
+    if (el32.dataset.disabled === 'true') return;
+    const value108 = appStore.getState().nodes,
+      name = value108[this.anchorNodeId];
+    if (!name) {
       this.exit({ silent: true });
       return;
     }
-    const _0x54b432 = this.durationSec;
-    if (!_0x54b432 || !Number.isFinite(_0x54b432) || _0x54b432 <= 0) return;
-    const _0x8c3451 = Math.max(0, Math.min(this.startSec, _0x54b432)),
-      _0x32879c = Math.max(0, Math.min(this.endSec, _0x54b432));
-    if (!(_0x32879c > _0x8c3451)) return;
-    const _0x405270 =
-      localPathToUrl(_0x1a61e0.localPath) || _0x1a61e0.src || _0x1a61e0.audioUrl || _0x1a61e0.resultUrl || '';
-    if (!_0x405270) return;
-    ((_0x1b9afb.dataset.disabled = 'true'),
-      (_0x1b9afb.dataset.loading = 'true'),
-      (_0x1b9afb.innerHTML =
+    const enabled23 = this.durationSec;
+    if (!enabled23 || !Number.isFinite(enabled23) || enabled23 <= 0) return;
+    const start = Math.max(0, Math.min(this.startSec, enabled23)),
+      end = Math.max(0, Math.min(this.endSec, enabled23));
+    if (!(end > start)) return;
+    const src = localPathToUrl(name.localPath) || name.src || name.audioUrl || name.resultUrl || '';
+    if (!src) return;
+    ((el32.dataset.disabled = 'true'),
+      (el32.dataset.loading = 'true'),
+      (el32.innerHTML =
         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><g style="animation:spin 1s linear infinite;transform-origin:50% 50%;transform-box:fill-box;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></g></svg>'),
       window.showToast?.(audioClipText('toasts.cutting'), 'info'));
     try {
-      let _0x3969a5 = null;
+      let error = null;
       if (canUseElectronMediaTask())
-        _0x3969a5 = await enqueueElectronMediaTask(
+        error = await enqueueElectronMediaTask(
           {
             kind: 'audioCut',
             nodeId: this.anchorNodeId,
-            src: _0x405270,
-            args: { start: _0x8c3451, end: _0x32879c },
+            src: src,
+            args: { start: start, end: end },
           },
           { wait: true, timeout: 0x493e0 },
         );
       else {
-        const _0x2f4d24 = await requester({
+        const response = await requester({
           url: '/api/v2/audio/cut',
           method: 'POST',
           provider: 'local',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ src: _0x405270, start: _0x8c3451, end: _0x32879c }),
+          body: JSON.stringify({ src: src, start: start, end: end }),
           allow404Null: true,
           returnMeta: true,
         });
-        if (_0x2f4d24?.status === 0x194 || _0x2f4d24?.data == null)
+        if (response?.status === 0x194 || response?.data == null)
           throw new Error(audioClipText('errors.cutApiMissing'));
-        _0x3969a5 = _0x2f4d24.data || {};
+        error = response.data || {};
       }
-      const _0x433fb9 =
-          _0x3969a5?.result && typeof _0x3969a5.result === 'object' ? _0x3969a5.result : _0x3969a5,
-        _0x289a69 = normalizeAudioCutResultLocalPath(_0x3969a5);
-      if (!_0x289a69 || _0x3969a5?.success === false || _0x433fb9?.success === false)
+      const fileName = error?.result && typeof error.result === 'object' ? error.result : error,
+        localPath = normalizeAudioCutResultLocalPath(error);
+      if (!localPath || error?.success === false || fileName?.success === false)
         throw new Error(
-          _0x433fb9?.error || _0x3969a5?.error || _0x3969a5?.message || audioClipText('errors.cutFailed'),
+          fileName?.error || error?.error || error?.message || audioClipText('errors.cutFailed'),
         );
-      const _0x4e1070 = _0x1a61e0.width || 0x168,
-        _0x1eaada = _0x1a61e0.height || 150,
-        _0x6c0d2e = calcSafeSpawnPosNearNode(appStore.getState().nodes, _0x1a61e0, _0x4e1070, _0x1eaada),
-        _0x2d1d2c = generateId('source-audio-cut');
+      const width = name.width || 0x168,
+        height = name.height || 150,
+        x = calcSafeSpawnPosNearNode(appStore.getState().nodes, name, width, height),
+        id = generateId('source-audio-cut');
       (appStore.addNode({
-        id: _0x2d1d2c,
+        id: id,
         type: 'source-audio',
-        x: _0x6c0d2e.x,
-        y: _0x6c0d2e.y,
-        width: _0x4e1070,
-        height: _0x1eaada,
+        x: x.x,
+        y: x.y,
+        width: width,
+        height: height,
         name: audioClipText('output.nodeName', {
-          name: _0x1a61e0.name || audioClipText('output.audioFallback'),
+          name: name.name || audioClipText('output.audioFallback'),
         }),
-        src: '/' + _0x289a69,
-        localPath: _0x289a69,
-        audioDuration: Math.max(0, _0x32879c - _0x8c3451),
-        fileName: _0x433fb9?.filename || _0x3969a5?.filename || '',
-        waveformLocalPath: _0x433fb9?.waveformLocalPath || _0x3969a5?.waveformLocalPath || '',
+        src: '/' + localPath,
+        localPath: localPath,
+        audioDuration: Math.max(0, end - start),
+        fileName: fileName?.filename || error?.filename || '',
+        waveformLocalPath: fileName?.waveformLocalPath || error?.waveformLocalPath || '',
         needsAutoResize: false,
         fixedSize: true,
       }),
-        appStore.setSelectedNodes([_0x2d1d2c]),
+        appStore.setSelectedNodes([id]),
         commit(),
-        window.v2FocusOnNodes?.([this.anchorNodeId, _0x2d1d2c]),
+        window.v2FocusOnNodes?.([this.anchorNodeId, id]),
         window._triggerLocalCacheSave?.(),
         window.showToast?.(audioClipText('toasts.success'), 'success'),
         this.exit({ silent: true }));
-    } catch (_0x1d0c90) {
-      const _0x440f5f =
-        _0x1d0c90 instanceof Error
-          ? _0x1d0c90.message
-          : String(_0x1d0c90 || audioClipText('errors.cutFailed'));
-      (window.showToast?.(audioClipText('toasts.failed', { error: _0x440f5f }), 'error'),
-        (_0x1b9afb.dataset.loading = 'false'),
+    } catch (error2) {
+      const error3 =
+        error2 instanceof Error ? error2.message : String(error2 || audioClipText('errors.cutFailed'));
+      (window.showToast?.(audioClipText('toasts.failed', { error: error3 }), 'error'),
+        (el32.dataset.loading = 'false'),
         this._render(),
-        (_0x1b9afb.dataset.loading = 'false'));
+        (el32.dataset.loading = 'false'));
     }
-    _0x1b9afb.dataset.loading = 'false';
+    el32.dataset.loading = 'false';
   },
   exit({ silent: silent = false } = {}) {
     if (!this.active) return;
@@ -980,11 +968,11 @@ const AudioClipController = {
     this._playheadRaf = 0;
     if (this._retryRaf) cancelAnimationFrame(this._retryRaf);
     this._retryRaf = 0;
-    const _0x30e303 = this._getAudioEl();
-    if (_0x30e303) {
-      this._setClipMediaKeepAlive(_0x30e303, false);
-      if (this._onLoadedMeta) _0x30e303.removeEventListener('loadedmetadata', this._onLoadedMeta);
-      if (this._onDurationChange) _0x30e303.removeEventListener('durationchange', this._onDurationChange);
+    const el33 = this._getAudioEl();
+    if (el33) {
+      this._setClipMediaKeepAlive(el33, false);
+      if (this._onLoadedMeta) el33.removeEventListener('loadedmetadata', this._onLoadedMeta);
+      if (this._onDurationChange) el33.removeEventListener('durationchange', this._onDurationChange);
     }
     this._onKeyDown &&
       (window.removeEventListener('keydown', this._onKeyDown, true), (this._onKeyDown = null));

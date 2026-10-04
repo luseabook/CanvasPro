@@ -6,142 +6,113 @@ export {
   applyRelativeCameraPose,
 } from './spatialProjectionMath.js';
 
-export function generateId(_0x295c27 = 'id') {
-  return _0x295c27 + '-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+export function generateId(value = 'id') {
+  return value + '-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 }
-export function screenToWorld(_0x27bbce, _0x367a29, _0x3e6c66) {
-  const { x: _0x3f56cd, y: _0x3315bc, zoom: _0x5f3616 } = _0x3e6c66;
-  return { x: (_0x27bbce - _0x3f56cd) / _0x5f3616, y: (_0x367a29 - _0x3315bc) / _0x5f3616 };
+export function screenToWorld(item, key, index) {
+  const { x: x, y: y, zoom: zoom } = index;
+  return { x: (item - x) / zoom, y: (key - y) / zoom };
 }
-export function worldToScreen(_0xd3bcde, _0x2745c2, _0x4f6604) {
-  const { x: _0x122500, y: _0x2dbd0d, zoom: _0x1121a0 } = _0x4f6604;
-  return { x: _0xd3bcde * _0x1121a0 + _0x122500, y: _0x2745c2 * _0x1121a0 + _0x2dbd0d };
+export function worldToScreen(x2, y2, result) {
+  const { x: x3, y: y3, zoom: zoom2 } = result;
+  return { x: x2 * zoom2 + x3, y: y2 * zoom2 + y3 };
 }
-export function getViewportScreenOrigin(_0x20c3fd = {}) {
+export function getViewportScreenOrigin(options = {}) {
   return {
-    x: Number.isFinite(Number(_0x20c3fd?._screenOriginX)) ? Number(_0x20c3fd._screenOriginX) : 0,
-    y: Number.isFinite(Number(_0x20c3fd?._screenOriginY)) ? Number(_0x20c3fd._screenOriginY) : 0,
+    x: Number.isFinite(Number(options?._screenOriginX)) ? Number(options._screenOriginX) : 0,
+    y: Number.isFinite(Number(options?._screenOriginY)) ? Number(options._screenOriginY) : 0,
   };
 }
-export function screenToViewportPoint(_0x119154, _0x19ba1d, _0x1b3b93 = {}) {
-  const _0x1dfea0 = getViewportScreenOrigin(_0x1b3b93);
-  return { x: Number(_0x119154) - _0x1dfea0.x, y: Number(_0x19ba1d) - _0x1dfea0.y };
+export function screenToViewportPoint(data, target, source = {}) {
+  const box = getViewportScreenOrigin(source);
+  return { x: Number(data) - box.x, y: Number(target) - box.y };
 }
 export const CANVAS_GRID_SIZE = 20;
-export function snapToCanvasGrid(_0x3634b3, _0x15bd4d = CANVAS_GRID_SIZE) {
-  const _0xf991bd =
-      Number.isFinite(Number(_0x15bd4d)) && Number(_0x15bd4d) > 0 ? Number(_0x15bd4d) : CANVAS_GRID_SIZE,
-    _0x1f34a9 = Number(_0x3634b3);
-  if (!Number.isFinite(_0x1f34a9)) return 0;
-  return Math.round(_0x1f34a9 / _0xf991bd) * _0xf991bd;
+export function snapToCanvasGrid(next, current = CANVAS_GRID_SIZE) {
+  const entry = Number.isFinite(Number(current)) && Number(current) > 0 ? Number(current) : CANVAS_GRID_SIZE,
+    record = Number(next);
+  if (!Number.isFinite(record)) return 0;
+  return Math.round(record / entry) * entry;
 }
-export function isPointInRect(_0x420f3f, _0x38768a, _0x4ec975, _0x20600d, _0x4f7df0, _0x3e11d4) {
-  return (
-    _0x420f3f >= _0x4ec975 &&
-    _0x420f3f <= _0x4ec975 + _0x4f7df0 &&
-    _0x38768a >= _0x20600d &&
-    _0x38768a <= _0x20600d + _0x3e11d4
-  );
+export function isPointInRect(payload, handle, state, config, scope, input) {
+  return payload >= state && payload <= state + scope && handle >= config && handle <= config + input;
 }
-export function isRectIntersect(
-  _0x2607c1,
-  _0x45a637,
-  _0x2db3f0,
-  _0x1d5a5f,
-  _0x289f20,
-  _0x19105c,
-  _0x5a281e,
-  _0x2e235f,
-) {
+export function isRectIntersect(output, value2, value3, value4, value5, value6, value7, value8) {
   return !(
-    _0x289f20 >= _0x2607c1 + _0x2db3f0 ||
-    _0x289f20 + _0x5a281e <= _0x2607c1 ||
-    _0x19105c >= _0x45a637 + _0x1d5a5f ||
-    _0x19105c + _0x2e235f <= _0x45a637
+    value5 >= output + value3 ||
+    value5 + value7 <= output ||
+    value6 >= value2 + value4 ||
+    value6 + value8 <= value2
   );
 }
 export function clampRectGroupTranslation(
-  _0x3fdd27 = [],
-  _0x1cf6ea = 0,
-  _0xd8bc88 = 0,
-  _0x30ce0c = { x: 0, y: 0, width: 1, height: 1 },
+  list = [],
+  value9 = 0,
+  value10 = 0,
+  box2 = { x: 0, y: 0, width: 1, height: 1 },
 ) {
-  const _0x1adf99 = (Array.isArray(_0x3fdd27) ? _0x3fdd27 : [])
-    .map((_0x2c3bf7) => ({
-      x: Number(_0x2c3bf7?.x),
-      y: Number(_0x2c3bf7?.y),
-      width: Number(_0x2c3bf7?.width),
-      height: Number(_0x2c3bf7?.height),
+  const list2 = (Array.isArray(list) ? list : [])
+    .map((box3) => ({
+      x: Number(box3?.x),
+      y: Number(box3?.y),
+      width: Number(box3?.width),
+      height: Number(box3?.height),
     }))
     .filter(
-      (_0xadb5ec) =>
-        Number.isFinite(_0xadb5ec.x) &&
-        Number.isFinite(_0xadb5ec.y) &&
-        Number.isFinite(_0xadb5ec.width) &&
-        _0xadb5ec.width >= 0 &&
-        Number.isFinite(_0xadb5ec.height) &&
-        _0xadb5ec.height >= 0,
+      (box4) =>
+        Number.isFinite(box4.x) &&
+        Number.isFinite(box4.y) &&
+        Number.isFinite(box4.width) &&
+        box4.width >= 0 &&
+        Number.isFinite(box4.height) &&
+        box4.height >= 0,
     );
-  if (!_0x1adf99.length) return { x: 0, y: 0 };
-  const _0xaa8bec = Number.isFinite(Number(_0x30ce0c?.x)) ? Number(_0x30ce0c.x) : 0,
-    _0x5b207c = Number.isFinite(Number(_0x30ce0c?.y)) ? Number(_0x30ce0c.y) : 0,
-    _0x182c2b = Math.max(0, Number(_0x30ce0c?.width) || 0),
-    _0x202e87 = Math.max(0, Number(_0x30ce0c?.height) || 0),
-    _0x95927a = Math.min(..._0x1adf99.map((_0x349b80) => _0x349b80.x)),
-    _0x206f8a = Math.min(..._0x1adf99.map((_0x623056) => _0x623056.y)),
-    _0xd6543c = Math.max(..._0x1adf99.map((_0x1dae59) => _0x1dae59.x + _0x1dae59.width)),
-    _0x35aac9 = Math.max(..._0x1adf99.map((_0x17ea82) => _0x17ea82.y + _0x17ea82.height)),
-    _0x4a7a1f = Number(_0x1cf6ea) || 0,
-    _0x5ee2a9 = Number(_0xd8bc88) || 0;
+  if (!list2.length) return { x: 0, y: 0 };
+  const value11 = Number.isFinite(Number(box2?.x)) ? Number(box2.x) : 0,
+    value12 = Number.isFinite(Number(box2?.y)) ? Number(box2.y) : 0,
+    value13 = Math.max(0, Number(box2?.width) || 0),
+    value14 = Math.max(0, Number(box2?.height) || 0),
+    value15 = Math.min(...list2.map((box5) => box5.x)),
+    value16 = Math.min(...list2.map((box6) => box6.y)),
+    value17 = Math.max(...list2.map((box7) => box7.x + box7.width)),
+    value18 = Math.max(...list2.map((box8) => box8.y + box8.height)),
+    value19 = Number(value9) || 0,
+    value20 = Number(value10) || 0;
   return {
-    x: Math.max(_0xaa8bec - _0x95927a, Math.min(_0xaa8bec + _0x182c2b - _0xd6543c, _0x4a7a1f)),
-    y: Math.max(_0x5b207c - _0x206f8a, Math.min(_0x5b207c + _0x202e87 - _0x35aac9, _0x5ee2a9)),
+    x: Math.max(value11 - value15, Math.min(value11 + value13 - value17, value19)),
+    y: Math.max(value12 - value16, Math.min(value12 + value14 - value18, value20)),
   };
 }
 export function findAvailablePosition(
-  _0xc92ddd,
-  _0x1c78fc,
-  _0x3b8d8b,
-  _0x29b130,
-  _0x57cc56,
-  _0x30712c = 20,
-  _0x57ba92 = 'right',
+  value21,
+  value22,
+  value23,
+  value24,
+  value25,
+  value26 = 20,
+  value27 = 'right',
 ) {
-  let _0x3c1fe7 = _0x1c78fc,
-    _0x406f72 = _0x3b8d8b;
-  const _0x34a751 = Object.values(_0xc92ddd);
-  if (_0x34a751.length === 0) return { x: _0x3c1fe7, y: _0x406f72 };
-  let _0x10db3a = true;
-  while (_0x10db3a) {
-    _0x10db3a = false;
-    for (const _0x2876ae of _0x34a751) {
-      const _0x2cbc3c = _0x2876ae.x,
-        _0x4a23d1 = _0x2876ae.y,
-        _0x5e5dd5 = _0x2876ae.width || 100,
-        _0x1795cd = _0x2876ae.height || 100;
-      if (
-        isRectIntersect(
-          _0x3c1fe7,
-          _0x406f72,
-          _0x29b130,
-          _0x57cc56,
-          _0x2cbc3c,
-          _0x4a23d1,
-          _0x5e5dd5,
-          _0x1795cd,
-        )
-      ) {
-        if (_0x57ba92 === 'down') _0x406f72 = _0x4a23d1 + _0x1795cd + _0x30712c;
-        else
-          _0x57ba92 === 'left'
-            ? (_0x3c1fe7 = _0x2cbc3c - _0x30712c - _0x29b130)
-            : (_0x3c1fe7 = _0x2cbc3c + _0x5e5dd5 + _0x30712c);
-        _0x10db3a = true;
+  let x4 = value22,
+    y4 = value23;
+  const list3 = Object.values(value21);
+  if (list3.length === 0) return { x: x4, y: y4 };
+  let value28 = true;
+  while (value28) {
+    value28 = false;
+    for (const box9 of list3) {
+      const value29 = box9.x,
+        value30 = box9.y,
+        value31 = box9.width || 100,
+        value32 = box9.height || 100;
+      if (isRectIntersect(x4, y4, value24, value25, value29, value30, value31, value32)) {
+        if (value27 === 'down') y4 = value30 + value32 + value26;
+        else value27 === 'left' ? (x4 = value29 - value26 - value24) : (x4 = value29 + value31 + value26);
+        value28 = true;
         break;
       }
     }
   }
-  return { x: _0x3c1fe7, y: _0x406f72 };
+  return { x: x4, y: y4 };
 }
 const ALIGN_SKIP_KEYS = [
   'isLocked',
@@ -155,1262 +126,1261 @@ const ALIGN_SKIP_KEYS = [
   'isDeleted',
   'deleted',
 ];
-function _toFiniteNumber(_0x5564e2, _0x1a2827 = 0) {
-  const _0x378624 = Number(_0x5564e2);
-  return Number.isFinite(_0x378624) ? _0x378624 : _0x1a2827;
+function _toFiniteNumber(value33, value34 = 0) {
+  const value35 = Number(value33);
+  return Number.isFinite(value35) ? value35 : value34;
 }
-function _toAlignRatio(_0x1f1a64, _0x51ae92 = 0.5) {
-  return Math.max(0, Math.min(1, _toFiniteNumber(_0x1f1a64, _0x51ae92)));
+function _toAlignRatio(value36, value37 = 0.5) {
+  return Math.max(0, Math.min(1, _toFiniteNumber(value36, value37)));
 }
-function _isAlignableNode(_0x3a52a1) {
-  if (!_0x3a52a1 || typeof _0x3a52a1 !== 'object') return false;
-  for (const _0x2d3c59 of ALIGN_SKIP_KEYS) {
-    if (_0x3a52a1[_0x2d3c59]) return false;
+function _isAlignableNode(enabled) {
+  if (!enabled || typeof enabled !== 'object') return false;
+  for (const value38 of ALIGN_SKIP_KEYS) {
+    if (enabled[value38]) return false;
   }
   return true;
 }
-export function getAlignableSelectionNodes(_0x40288c, _0x10ab4e) {
-  if (!_0x40288c || typeof _0x40288c !== 'object') return [];
-  if (!Array.isArray(_0x10ab4e) || _0x10ab4e.length === 0) return [];
-  const _0x3d381d = [];
-  for (const _0x3f4152 of _0x10ab4e) {
-    const _0x45cda3 = _0x40288c[_0x3f4152];
-    if (!_isAlignableNode(_0x45cda3)) continue;
-    const _0x19e95d = _toFiniteNumber(_0x45cda3.x, 0),
-      _0x4df0b9 = _toFiniteNumber(_0x45cda3.y, 0),
-      _0x2cdef1 = Math.max(0, _toFiniteNumber(_0x45cda3.width, 0)),
-      _0x125c6f = Math.max(0, _toFiniteNumber(_0x45cda3.height, 0)),
-      _0x5c82d7 = _0x19e95d,
-      _0x3b55e7 = _0x19e95d + _0x2cdef1,
-      _0x2252a3 = _0x4df0b9,
-      _0x1861a9 = _0x4df0b9 + _0x125c6f;
-    _0x3d381d.push({
-      id: _0x3f4152,
-      node: _0x45cda3,
-      x: _0x19e95d,
-      y: _0x4df0b9,
-      width: _0x2cdef1,
-      height: _0x125c6f,
-      left: _0x5c82d7,
-      right: _0x3b55e7,
-      top: _0x2252a3,
-      bottom: _0x1861a9,
-      cx: _0x5c82d7 + _0x2cdef1 / 2,
-      cy: _0x2252a3 + _0x125c6f / 2,
+export function getAlignableSelectionNodes(enabled2, list4) {
+  if (!enabled2 || typeof enabled2 !== 'object') return [];
+  if (!Array.isArray(list4) || list4.length === 0) return [];
+  const list5 = [];
+  for (const id of list4) {
+    const node = enabled2[id];
+    if (!_isAlignableNode(node)) continue;
+    const x5 = _toFiniteNumber(node.x, 0),
+      y5 = _toFiniteNumber(node.y, 0),
+      width = Math.max(0, _toFiniteNumber(node.width, 0)),
+      height = Math.max(0, _toFiniteNumber(node.height, 0)),
+      left = x5,
+      right = x5 + width,
+      top = y5,
+      bottom = y5 + height;
+    list5.push({
+      id: id,
+      node: node,
+      x: x5,
+      y: y5,
+      width: width,
+      height: height,
+      left: left,
+      right: right,
+      top: top,
+      bottom: bottom,
+      cx: left + width / 2,
+      cy: top + height / 2,
     });
   }
-  return _0x3d381d;
+  return list5;
 }
-export function computeSelectionBounds(_0x116c25) {
-  if (!Array.isArray(_0x116c25) || _0x116c25.length === 0) return null;
-  let _0x364f7a = Infinity,
-    _0xdb482f = Infinity,
-    _0x39aec5 = -Infinity,
-    _0x5a7a51 = -Infinity;
-  for (const _0x20ad29 of _0x116c25) {
-    ((_0x364f7a = Math.min(_0x364f7a, _0x20ad29.left)),
-      (_0xdb482f = Math.min(_0xdb482f, _0x20ad29.top)),
-      (_0x39aec5 = Math.max(_0x39aec5, _0x20ad29.right)),
-      (_0x5a7a51 = Math.max(_0x5a7a51, _0x20ad29.bottom)));
+export function computeSelectionBounds(list6) {
+  if (!Array.isArray(list6) || list6.length === 0) return null;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
+  for (const box10 of list6) {
+    ((minX = Math.min(minX, box10.left)),
+      (minY = Math.min(minY, box10.top)),
+      (maxX = Math.max(maxX, box10.right)),
+      (maxY = Math.max(maxY, box10.bottom)));
   }
-  if (!Number.isFinite(_0x364f7a) || !Number.isFinite(_0xdb482f)) return null;
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) return null;
   return {
-    minX: _0x364f7a,
-    maxX: _0x39aec5,
-    minY: _0xdb482f,
-    maxY: _0x5a7a51,
-    width: _0x39aec5 - _0x364f7a,
-    height: _0x5a7a51 - _0xdb482f,
-    centerX: (_0x364f7a + _0x39aec5) / 2,
-    centerY: (_0xdb482f + _0x5a7a51) / 2,
+    minX: minX,
+    maxX: maxX,
+    minY: minY,
+    maxY: maxY,
+    width: maxX - minX,
+    height: maxY - minY,
+    centerX: (minX + maxX) / 2,
+    centerY: (minY + maxY) / 2,
   };
 }
-export function computeNodesWorldBounds(_0x68fab1, _0x2c6997 = null) {
-  const _0x372a57 = [];
-  if (Array.isArray(_0x68fab1)) _0x372a57.push(..._0x68fab1.filter(Boolean));
+export function computeNodesWorldBounds(list7, list8 = null) {
+  const list9 = [];
+  if (Array.isArray(list7)) list9.push(...list7.filter(Boolean));
   else {
-    if (Array.isArray(_0x2c6997) && _0x2c6997.length > 0)
-      for (const _0x11a160 of _0x2c6997) {
-        const _0x3275f9 = _0x68fab1?.[_0x11a160];
-        if (_0x3275f9) _0x372a57.push(_0x3275f9);
+    if (Array.isArray(list8) && list8.length > 0)
+      for (const value39 of list8) {
+        const value40 = list7?.[value39];
+        if (value40) list9.push(value40);
       }
-    else _0x68fab1 && typeof _0x68fab1 === 'object' && _0x372a57.push(...Object.values(_0x68fab1));
+    else list7 && typeof list7 === 'object' && list9.push(...Object.values(list7));
   }
-  if (_0x372a57.length === 0) return null;
-  let _0x506c94 = Infinity,
-    _0x4d9e47 = Infinity,
-    _0x448edc = -Infinity,
-    _0x288d5e = -Infinity;
-  for (const _0x152ef0 of _0x372a57) {
-    if (!_0x152ef0 || typeof _0x152ef0 !== 'object') continue;
-    const _0x10d20d = _toFiniteNumber(_0x152ef0.x, 0),
-      _0x395897 = _toFiniteNumber(_0x152ef0.y, 0),
-      _0x389674 = Math.max(0, _toFiniteNumber(_0x152ef0.width, 0)),
-      _0x574e22 = Math.max(0, _toFiniteNumber(_0x152ef0.height, 0));
-    ((_0x506c94 = Math.min(_0x506c94, _0x10d20d)),
-      (_0x4d9e47 = Math.min(_0x4d9e47, _0x395897)),
-      (_0x448edc = Math.max(_0x448edc, _0x10d20d + _0x389674)),
-      (_0x288d5e = Math.max(_0x288d5e, _0x395897 + _0x574e22)));
+  if (list9.length === 0) return null;
+  let minX2 = Infinity,
+    minY2 = Infinity,
+    maxX2 = -Infinity,
+    maxY2 = -Infinity;
+  for (const box11 of list9) {
+    if (!box11 || typeof box11 !== 'object') continue;
+    const _toFiniteNumber2 = _toFiniteNumber(box11.x, 0),
+      _toFiniteNumber3 = _toFiniteNumber(box11.y, 0),
+      value41 = Math.max(0, _toFiniteNumber(box11.width, 0)),
+      value42 = Math.max(0, _toFiniteNumber(box11.height, 0));
+    ((minX2 = Math.min(minX2, _toFiniteNumber2)),
+      (minY2 = Math.min(minY2, _toFiniteNumber3)),
+      (maxX2 = Math.max(maxX2, _toFiniteNumber2 + value41)),
+      (maxY2 = Math.max(maxY2, _toFiniteNumber3 + value42)));
   }
   if (
-    !Number.isFinite(_0x506c94) ||
-    !Number.isFinite(_0x4d9e47) ||
-    !Number.isFinite(_0x448edc) ||
-    !Number.isFinite(_0x288d5e)
+    !Number.isFinite(minX2) ||
+    !Number.isFinite(minY2) ||
+    !Number.isFinite(maxX2) ||
+    !Number.isFinite(maxY2)
   )
     return null;
   return {
-    minX: _0x506c94,
-    minY: _0x4d9e47,
-    maxX: _0x448edc,
-    maxY: _0x288d5e,
-    width: Math.max(0, _0x448edc - _0x506c94),
-    height: Math.max(0, _0x288d5e - _0x4d9e47),
-    centerX: (_0x506c94 + _0x448edc) / 2,
-    centerY: (_0x4d9e47 + _0x288d5e) / 2,
+    minX: minX2,
+    minY: minY2,
+    maxX: maxX2,
+    maxY: maxY2,
+    width: Math.max(0, maxX2 - minX2),
+    height: Math.max(0, maxY2 - minY2),
+    centerX: (minX2 + maxX2) / 2,
+    centerY: (minY2 + maxY2) / 2,
   };
 }
-export function computeViewportForWorldBounds(_0x588aac, _0x322872, _0x4fcf44 = {}) {
-  if (!_0x588aac || !_0x322872) return null;
-  const _0x451606 = _toFiniteNumber(_0x322872.width, 0),
-    _0x5d6770 = _toFiniteNumber(_0x322872.height, 0);
-  if (!(_0x451606 > 0 && _0x5d6770 > 0)) return null;
-  const _0x3d28a6 = Math.max(1, _toFiniteNumber(_0x588aac.width, 0)),
-    _0x1b38d4 = Math.max(1, _toFiniteNumber(_0x588aac.height, 0)),
-    _0x5af60e = _toFiniteNumber(_0x588aac.centerX, 0),
-    _0x5b06c5 = _toFiniteNumber(_0x588aac.centerY, 0),
-    _0x4642a5 = Math.max(0, _toFiniteNumber(_0x4fcf44.padding, 0)),
-    _0x2997e2 = Math.max(0.0001, _toFiniteNumber(_0x4fcf44.minZoom, 0.2)),
-    _0x592f3f = Math.max(_0x2997e2, _toFiniteNumber(_0x4fcf44.maxZoom, 2)),
-    _0x41b775 = Number(_0x4fcf44.fixedZoom),
-    _0x13d446 = _toAlignRatio(_0x4fcf44.alignX, 0.5),
-    _0x53def5 = _toAlignRatio(_0x4fcf44.alignY, 0.5),
-    _0x1325e5 = _toAlignRatio(_0x4fcf44.worldAlignX, _0x13d446),
-    _0x4b1919 = _toAlignRatio(_0x4fcf44.worldAlignY, _0x53def5),
-    _0x5be6d0 = _toAlignRatio(_0x4fcf44.viewportAlignX, _0x13d446),
-    _0xa9ae55 = _toAlignRatio(_0x4fcf44.viewportAlignY, _0x53def5),
-    _0x163d77 = Math.max(1, _0x451606 - _0x4642a5 * 2),
-    _0x5f15dc = Math.max(1, _0x5d6770 - _0x4642a5 * 2),
-    _0xdc66a3 = Number.isFinite(_0x41b775)
-      ? Math.max(_0x2997e2, Math.min(_0x41b775, _0x592f3f))
-      : Math.max(_0x2997e2, Math.min(_0x163d77 / _0x3d28a6, _0x5f15dc / _0x1b38d4, _0x592f3f)),
-    _0x48489c = _toFiniteNumber(_0x322872.left, 0) + _0x451606 * _0x5be6d0,
-    _0x445124 = _toFiniteNumber(_0x322872.top, 0) + _0x5d6770 * _0xa9ae55,
-    _0x31fde2 = _toFiniteNumber(_0x588aac.minX, 0) + _0x3d28a6 * _0x1325e5,
-    _0x3b8438 = _toFiniteNumber(_0x588aac.minY, 0) + _0x1b38d4 * _0x4b1919;
-  return { x: _0x48489c - _0x31fde2 * _0xdc66a3, y: _0x445124 - _0x3b8438 * _0xdc66a3, zoom: _0xdc66a3 };
+export function computeViewportForWorldBounds(box12, box13, value43 = {}) {
+  if (!box12 || !box13) return null;
+  const _toFiniteNumber4 = _toFiniteNumber(box13.width, 0),
+    _toFiniteNumber5 = _toFiniteNumber(box13.height, 0);
+  if (!(_toFiniteNumber4 > 0 && _toFiniteNumber5 > 0)) return null;
+  const value44 = Math.max(1, _toFiniteNumber(box12.width, 0)),
+    value45 = Math.max(1, _toFiniteNumber(box12.height, 0)),
+    _toFiniteNumber6 = _toFiniteNumber(box12.centerX, 0),
+    _toFiniteNumber7 = _toFiniteNumber(box12.centerY, 0),
+    value46 = Math.max(0, _toFiniteNumber(value43.padding, 0)),
+    value47 = Math.max(0.0001, _toFiniteNumber(value43.minZoom, 0.2)),
+    value48 = Math.max(value47, _toFiniteNumber(value43.maxZoom, 2)),
+    value49 = Number(value43.fixedZoom),
+    _toAlignRatio2 = _toAlignRatio(value43.alignX, 0.5),
+    _toAlignRatio3 = _toAlignRatio(value43.alignY, 0.5),
+    _toAlignRatio4 = _toAlignRatio(value43.worldAlignX, _toAlignRatio2),
+    _toAlignRatio5 = _toAlignRatio(value43.worldAlignY, _toAlignRatio3),
+    _toAlignRatio6 = _toAlignRatio(value43.viewportAlignX, _toAlignRatio2),
+    _toAlignRatio7 = _toAlignRatio(value43.viewportAlignY, _toAlignRatio3),
+    value50 = Math.max(1, _toFiniteNumber4 - value46 * 2),
+    value51 = Math.max(1, _toFiniteNumber5 - value46 * 2),
+    zoom3 = Number.isFinite(value49)
+      ? Math.max(value47, Math.min(value49, value48))
+      : Math.max(value47, Math.min(value50 / value44, value51 / value45, value48)),
+    x6 = _toFiniteNumber(box13.left, 0) + _toFiniteNumber4 * _toAlignRatio6,
+    y6 = _toFiniteNumber(box13.top, 0) + _toFiniteNumber5 * _toAlignRatio7,
+    _toFiniteNumber8 = _toFiniteNumber(box12.minX, 0) + value44 * _toAlignRatio4,
+    _toFiniteNumber9 = _toFiniteNumber(box12.minY, 0) + value45 * _toAlignRatio5;
+  return { x: x6 - _toFiniteNumber8 * zoom3, y: y6 - _toFiniteNumber9 * zoom3, zoom: zoom3 };
 }
-export function computeAlignTargets(_0x2a49b2, _0xc02b00, _0x281ef4) {
-  if (!Array.isArray(_0x2a49b2) || _0x2a49b2.length === 0 || !_0x281ef4) return {};
-  const _0x54b064 = {};
-  for (const _0x3d0b2f of _0x2a49b2) {
-    let _0x1d4293 = _0x3d0b2f.x,
-      _0x4d88fd = _0x3d0b2f.y;
-    if (_0xc02b00 === 'left') _0x1d4293 = _0x281ef4.minX;
+export function computeAlignTargets(list10, value52, enabled3) {
+  if (!Array.isArray(list10) || list10.length === 0 || !enabled3) return {};
+  const value53 = {};
+  for (const box14 of list10) {
+    let x7 = box14.x,
+      y7 = box14.y;
+    if (value52 === 'left') x7 = enabled3.minX;
     else {
-      if (_0xc02b00 === 'h-center') _0x1d4293 = _0x281ef4.centerX - _0x3d0b2f.width / 2;
+      if (value52 === 'h-center') x7 = enabled3.centerX - box14.width / 2;
       else {
-        if (_0xc02b00 === 'right') _0x1d4293 = _0x281ef4.maxX - _0x3d0b2f.width;
+        if (value52 === 'right') x7 = enabled3.maxX - box14.width;
         else {
-          if (_0xc02b00 === 'top') _0x4d88fd = _0x281ef4.minY;
+          if (value52 === 'top') y7 = enabled3.minY;
           else {
-            if (_0xc02b00 === 'v-center') _0x4d88fd = _0x281ef4.centerY - _0x3d0b2f.height / 2;
+            if (value52 === 'v-center') y7 = enabled3.centerY - box14.height / 2;
             else {
-              if (_0xc02b00 === 'bottom') _0x4d88fd = _0x281ef4.maxY - _0x3d0b2f.height;
+              if (value52 === 'bottom') y7 = enabled3.maxY - box14.height;
             }
           }
         }
       }
     }
-    _0x54b064[_0x3d0b2f.id] = { x: _0x1d4293, y: _0x4d88fd };
+    value53[box14.id] = { x: x7, y: y7 };
   }
-  return _0x54b064;
+  return value53;
 }
-export function computeDistributeTargets(_0x9a1727, _0x10c212, _0xb85e1d = undefined) {
-  if (!Array.isArray(_0x9a1727) || _0x9a1727.length < 2) return {};
-  const _0x4aa4b1 = _0x10c212 === 'horizontal',
-    _0x2a7e48 = [..._0x9a1727].sort((_0x4bfabf, _0x49b787) => {
-      const _0x13313d = _0x4aa4b1 ? _0x4bfabf.left : _0x4bfabf.top,
-        _0x524a44 = _0x4aa4b1 ? _0x49b787.left : _0x49b787.top;
-      if (_0x13313d !== _0x524a44) return _0x13313d - _0x524a44;
-      return String(_0x4bfabf.id).localeCompare(String(_0x49b787.id));
+export function computeDistributeTargets(list11, value54, value55 = undefined) {
+  if (!Array.isArray(list11) || list11.length < 2) return {};
+  const value56 = value54 === 'horizontal',
+    list12 = [...list11].sort((box15, box16) => {
+      const value57 = value56 ? box15.left : box15.top,
+        value58 = value56 ? box16.left : box16.top;
+      if (value57 !== value58) return value57 - value58;
+      return String(box15.id).localeCompare(String(box16.id));
     }),
-    _0x4170fb = {};
-  for (const _0x1563b6 of _0x2a7e48) {
-    _0x4170fb[_0x1563b6.id] = { x: _0x1563b6.x, y: _0x1563b6.y };
+    value59 = {};
+  for (const x8 of list12) {
+    value59[x8.id] = { x: x8.x, y: x8.y };
   }
-  if (_0x2a7e48.length <= 1) return _0x4170fb;
-  const _0x2caae4 = Number(_0xb85e1d);
-  if (Number.isFinite(_0x2caae4) && _0x2caae4 >= 0) {
-    let _0x3b8f5b = _0x4aa4b1 ? _0x2a7e48[0].left : _0x2a7e48[0].top;
-    for (let _0x18b9ad = 0; _0x18b9ad < _0x2a7e48.length; _0x18b9ad += 1) {
-      const _0x4e8be3 = _0x2a7e48[_0x18b9ad];
-      if (_0x18b9ad === 0) {
-        _0x3b8f5b += (_0x4aa4b1 ? _0x4e8be3.width : _0x4e8be3.height) + _0x2caae4;
+  if (list12.length <= 1) return value59;
+  const count = Number(value55);
+  if (Number.isFinite(count) && count >= 0) {
+    let x9 = value56 ? list12[0].left : list12[0].top;
+    for (let count2 = 0; count2 < list12.length; count2 += 1) {
+      const y8 = list12[count2];
+      if (count2 === 0) {
+        x9 += (value56 ? y8.width : y8.height) + count;
         continue;
       }
-      _0x4aa4b1
-        ? ((_0x4170fb[_0x4e8be3.id] = { x: _0x3b8f5b, y: _0x4e8be3.y }),
-          (_0x3b8f5b += _0x4e8be3.width + _0x2caae4))
-        : ((_0x4170fb[_0x4e8be3.id] = { x: _0x4e8be3.x, y: _0x3b8f5b }),
-          (_0x3b8f5b += _0x4e8be3.height + _0x2caae4));
+      value56
+        ? ((value59[y8.id] = { x: x9, y: y8.y }), (x9 += y8.width + count))
+        : ((value59[y8.id] = { x: y8.x, y: x9 }), (x9 += y8.height + count));
     }
-    return _0x4170fb;
+    return value59;
   }
-  if (_0x2a7e48.length <= 2) return _0x4170fb;
-  const _0x1d4f57 = _0x2a7e48[0],
-    _0x4f7f99 = _0x2a7e48[_0x2a7e48.length - 1],
-    _0x54ea40 = _0x2a7e48.reduce(
-      (_0x34a1eb, _0x3a154d) => _0x34a1eb + (_0x4aa4b1 ? _0x3a154d.width : _0x3a154d.height),
-      0,
-    ),
-    _0x2fea1b = _0x4aa4b1
-      ? Math.max(0, _0x4f7f99.right - _0x1d4f57.left)
-      : Math.max(0, _0x4f7f99.bottom - _0x1d4f57.top),
-    _0x42e808 = (_0x2fea1b - _0x54ea40) / (_0x2a7e48.length - 1);
-  let _0x290f2e = _0x4aa4b1 ? _0x1d4f57.left : _0x1d4f57.top;
-  for (let _0x2c78ab = 0; _0x2c78ab < _0x2a7e48.length; _0x2c78ab += 1) {
-    const _0xa0188e = _0x2a7e48[_0x2c78ab];
-    if (_0x2c78ab === 0 || _0x2c78ab === _0x2a7e48.length - 1) {
-      _0x290f2e += (_0x4aa4b1 ? _0xa0188e.width : _0xa0188e.height) + _0x42e808;
+  if (list12.length <= 2) return value59;
+  const box17 = list12[0],
+    box18 = list12[list12.length - 1],
+    value60 = list12.reduce((item2, box19) => item2 + (value56 ? box19.width : box19.height), 0),
+    value61 = value56 ? Math.max(0, box18.right - box17.left) : Math.max(0, box18.bottom - box17.top),
+    value62 = (value61 - value60) / (list12.length - 1);
+  let x10 = value56 ? box17.left : box17.top;
+  for (let count3 = 0; count3 < list12.length; count3 += 1) {
+    const y9 = list12[count3];
+    if (count3 === 0 || count3 === list12.length - 1) {
+      x10 += (value56 ? y9.width : y9.height) + value62;
       continue;
     }
-    _0x4aa4b1
-      ? ((_0x4170fb[_0xa0188e.id] = { x: _0x290f2e, y: _0xa0188e.y }),
-        (_0x290f2e += _0xa0188e.width + _0x42e808))
-      : ((_0x4170fb[_0xa0188e.id] = { x: _0xa0188e.x, y: _0x290f2e }),
-        (_0x290f2e += _0xa0188e.height + _0x42e808));
+    value56
+      ? ((value59[y9.id] = { x: x10, y: y9.y }), (x10 += y9.width + value62))
+      : ((value59[y9.id] = { x: y9.x, y: x10 }), (x10 += y9.height + value62));
   }
-  return _0x4170fb;
+  return value59;
 }
-function _sortLayoutItems(_0x34dd8d) {
-  return [...(Array.isArray(_0x34dd8d) ? _0x34dd8d : [])].sort((_0x3ab16b, _0x15a5fa) => {
-    const _0x50c8be = _toFiniteNumber(_0x3ab16b?.top ?? _0x3ab16b?.y, 0),
-      _0x230be6 = _toFiniteNumber(_0x15a5fa?.top ?? _0x15a5fa?.y, 0);
-    if (_0x50c8be !== _0x230be6) return _0x50c8be - _0x230be6;
-    const _0x541371 = _toFiniteNumber(_0x3ab16b?.left ?? _0x3ab16b?.x, 0),
-      _0x47f0b6 = _toFiniteNumber(_0x15a5fa?.left ?? _0x15a5fa?.x, 0);
-    if (_0x541371 !== _0x47f0b6) return _0x541371 - _0x47f0b6;
-    return String(_0x3ab16b?.id || '').localeCompare(String(_0x15a5fa?.id || ''));
+function _sortLayoutItems(value63) {
+  return [...(Array.isArray(value63) ? value63 : [])].sort((box20, box21) => {
+    const _toFiniteNumber10 = _toFiniteNumber(box20?.top ?? box20?.y, 0),
+      _toFiniteNumber11 = _toFiniteNumber(box21?.top ?? box21?.y, 0);
+    if (_toFiniteNumber10 !== _toFiniteNumber11) return _toFiniteNumber10 - _toFiniteNumber11;
+    const _toFiniteNumber12 = _toFiniteNumber(box20?.left ?? box20?.x, 0),
+      _toFiniteNumber13 = _toFiniteNumber(box21?.left ?? box21?.x, 0);
+    if (_toFiniteNumber12 !== _toFiniteNumber13) return _toFiniteNumber12 - _toFiniteNumber13;
+    return String(box20?.id || '').localeCompare(String(box21?.id || ''));
   });
 }
-export function computeArrangeRowTargets(_0x2ded29, _0x1aeb5d = {}) {
-  const _0x57093e = _sortLayoutItems(_0x2ded29);
-  if (_0x57093e.length === 0) return {};
-  const _0x4d0eb8 = computeSelectionBounds(_0x57093e);
-  if (!_0x4d0eb8) return {};
-  const _0x58dc = Math.max(0, _toFiniteNumber(_0x1aeb5d.gap, 40)),
-    _0x27b13a = String(_0x1aeb5d.align || 'top');
-  let _0x3a9b40 = _0x4d0eb8.minX;
-  const _0x3f35d8 = {};
-  for (const _0x1dab6a of _0x57093e) {
-    let _0x5881d7 = _0x4d0eb8.minY;
-    if (_0x27b13a === 'center' || _0x27b13a === 'middle')
-      _0x5881d7 = _0x4d0eb8.centerY - _0x1dab6a.height / 2;
-    else _0x27b13a === 'bottom' && (_0x5881d7 = _0x4d0eb8.maxY - _0x1dab6a.height);
-    ((_0x3f35d8[_0x1dab6a.id] = { x: _0x3a9b40, y: _0x5881d7 }), (_0x3a9b40 += _0x1dab6a.width + _0x58dc));
+export function computeArrangeRowTargets(value64, value65 = {}) {
+  const list13 = _sortLayoutItems(value64);
+  if (list13.length === 0) return {};
+  const selectionBounds = computeSelectionBounds(list13);
+  if (!selectionBounds) return {};
+  const value66 = Math.max(0, _toFiniteNumber(value65.gap, 40)),
+    value67 = String(value65.align || 'top');
+  let x11 = selectionBounds.minX;
+  const value68 = {};
+  for (const box22 of list13) {
+    let y10 = selectionBounds.minY;
+    if (value67 === 'center' || value67 === 'middle') y10 = selectionBounds.centerY - box22.height / 2;
+    else value67 === 'bottom' && (y10 = selectionBounds.maxY - box22.height);
+    ((value68[box22.id] = { x: x11, y: y10 }), (x11 += box22.width + value66));
   }
-  return _0x3f35d8;
+  return value68;
 }
-export function computeArrangeColumnTargets(_0x131562, _0x1a6491 = {}) {
-  const _0x4e04c9 = _sortLayoutItems(_0x131562);
-  if (_0x4e04c9.length === 0) return {};
-  const _0x3fc0c7 = computeSelectionBounds(_0x4e04c9);
-  if (!_0x3fc0c7) return {};
-  const _0x13bf53 = Math.max(0, _toFiniteNumber(_0x1a6491.gap, 40)),
-    _0x587c82 = String(_0x1a6491.align || 'left');
-  let _0x353347 = _0x3fc0c7.minY;
-  const _0x3c0b3c = {};
-  for (const _0x3471f5 of _0x4e04c9) {
-    let _0x1b8eb4 = _0x3fc0c7.minX;
-    if (_0x587c82 === 'center' || _0x587c82 === 'middle') _0x1b8eb4 = _0x3fc0c7.centerX - _0x3471f5.width / 2;
-    else _0x587c82 === 'right' && (_0x1b8eb4 = _0x3fc0c7.maxX - _0x3471f5.width);
-    ((_0x3c0b3c[_0x3471f5.id] = { x: _0x1b8eb4, y: _0x353347 }), (_0x353347 += _0x3471f5.height + _0x13bf53));
+export function computeArrangeColumnTargets(value69, value70 = {}) {
+  const list14 = _sortLayoutItems(value69);
+  if (list14.length === 0) return {};
+  const selectionBounds2 = computeSelectionBounds(list14);
+  if (!selectionBounds2) return {};
+  const value71 = Math.max(0, _toFiniteNumber(value70.gap, 40)),
+    value72 = String(value70.align || 'left');
+  let y11 = selectionBounds2.minY;
+  const value73 = {};
+  for (const box23 of list14) {
+    let x12 = selectionBounds2.minX;
+    if (value72 === 'center' || value72 === 'middle') x12 = selectionBounds2.centerX - box23.width / 2;
+    else value72 === 'right' && (x12 = selectionBounds2.maxX - box23.width);
+    ((value73[box23.id] = { x: x12, y: y11 }), (y11 += box23.height + value71));
   }
-  return _0x3c0b3c;
+  return value73;
 }
-export function computeArrangeGridTargets(_0x2106a6, _0x399b4b = {}) {
-  const _0x400793 = _sortLayoutItems(_0x2106a6);
-  if (_0x400793.length === 0) return {};
-  const _0x2d4bc0 = computeSelectionBounds(_0x400793);
-  if (!_0x2d4bc0) return {};
-  const _0x138531 = Number(_0x399b4b.columns),
-    _0x22208a =
-      Number.isFinite(_0x138531) && _0x138531 > 0
-        ? Math.max(1, Math.trunc(_0x138531))
-        : Math.ceil(Math.sqrt(_0x400793.length)),
-    _0x31fd5b = Math.max(0, _toFiniteNumber(_0x399b4b.gapX ?? _0x399b4b.gap, 40)),
-    _0x3cd42c = Math.max(0, _toFiniteNumber(_0x399b4b.gapY ?? _0x399b4b.gap, 40)),
-    _0x36d87b = _0x400793.reduce((_0x5d482d, _0x81d5b8) => Math.max(_0x5d482d, _0x81d5b8.width), 0),
-    _0x10fa81 = _0x400793.reduce((_0x265eb4, _0x3911a5) => Math.max(_0x265eb4, _0x3911a5.height), 0),
-    _0x53639b = {};
+export function computeArrangeGridTargets(value74, value75 = {}) {
+  const list15 = _sortLayoutItems(value74);
+  if (list15.length === 0) return {};
+  const x13 = computeSelectionBounds(list15);
+  if (!x13) return {};
+  const count4 = Number(value75.columns),
+    value76 =
+      Number.isFinite(count4) && count4 > 0
+        ? Math.max(1, Math.trunc(count4))
+        : Math.ceil(Math.sqrt(list15.length)),
+    value77 = Math.max(0, _toFiniteNumber(value75.gapX ?? value75.gap, 40)),
+    value78 = Math.max(0, _toFiniteNumber(value75.gapY ?? value75.gap, 40)),
+    value79 = list15.reduce((item3, box24) => Math.max(item3, box24.width), 0),
+    value80 = list15.reduce((item4, box25) => Math.max(item4, box25.height), 0),
+    value81 = {};
   return (
-    _0x400793.forEach((_0x19885d, _0x8dded9) => {
-      const _0x42d5fb = _0x8dded9 % _0x22208a,
-        _0x1a88a4 = Math.floor(_0x8dded9 / _0x22208a);
-      _0x53639b[_0x19885d.id] = {
-        x: _0x2d4bc0.minX + _0x42d5fb * (_0x36d87b + _0x31fd5b),
-        y: _0x2d4bc0.minY + _0x1a88a4 * (_0x10fa81 + _0x3cd42c),
+    list15.forEach((item5, value82) => {
+      const value83 = value82 % value76,
+        value84 = Math.floor(value82 / value76);
+      value81[item5.id] = {
+        x: x13.minX + value83 * (value79 + value77),
+        y: x13.minY + value84 * (value80 + value78),
       };
     }),
-    _0x53639b
+    value81
   );
 }
-export function computeMoveNearNodeTargets(_0x3adab4, _0x253527, _0x2e6e66 = {}) {
-  const _0x22077e = Array.isArray(_0x3adab4) ? _0x3adab4.filter(Boolean) : [];
-  if (_0x22077e.length === 0 || !_0x253527) return {};
-  const _0x161b0a = computeSelectionBounds(_0x22077e);
-  if (!_0x161b0a) return {};
-  const _0x3f62c6 = Math.max(0, _toFiniteNumber(_0x2e6e66.gap, 40)),
-    _0x3a3d17 = String(_0x2e6e66.placement || 'right');
-  let _0x14be2d = _0x161b0a.minX,
-    _0x16e87e = _0x161b0a.minY;
-  if (_0x3a3d17 === 'left')
-    ((_0x14be2d = _0x253527.left - _0x3f62c6 - _0x161b0a.width),
-      (_0x16e87e = _0x253527.cy - _0x161b0a.height / 2));
+export function computeMoveNearNodeTargets(list16, box26, value85 = {}) {
+  const list17 = Array.isArray(list16) ? list16.filter(Boolean) : [];
+  if (list17.length === 0 || !box26) return {};
+  const box27 = computeSelectionBounds(list17);
+  if (!box27) return {};
+  const value86 = Math.max(0, _toFiniteNumber(value85.gap, 40)),
+    value87 = String(value85.placement || 'right');
+  let value88 = box27.minX,
+    value89 = box27.minY;
+  if (value87 === 'left')
+    ((value88 = box26.left - value86 - box27.width), (value89 = box26.cy - box27.height / 2));
   else {
-    if (_0x3a3d17 === 'top')
-      ((_0x14be2d = _0x253527.cx - _0x161b0a.width / 2),
-        (_0x16e87e = _0x253527.top - _0x3f62c6 - _0x161b0a.height));
+    if (value87 === 'top')
+      ((value88 = box26.cx - box27.width / 2), (value89 = box26.top - value86 - box27.height));
     else
-      _0x3a3d17 === 'bottom'
-        ? ((_0x14be2d = _0x253527.cx - _0x161b0a.width / 2), (_0x16e87e = _0x253527.bottom + _0x3f62c6))
-        : ((_0x14be2d = _0x253527.right + _0x3f62c6), (_0x16e87e = _0x253527.cy - _0x161b0a.height / 2));
+      value87 === 'bottom'
+        ? ((value88 = box26.cx - box27.width / 2), (value89 = box26.bottom + value86))
+        : ((value88 = box26.right + value86), (value89 = box26.cy - box27.height / 2));
   }
-  const _0xab1716 = _0x14be2d - _0x161b0a.minX,
-    _0x3acb66 = _0x16e87e - _0x161b0a.minY,
-    _0x32fac8 = {};
-  for (const _0x201045 of _0x22077e) {
-    _0x32fac8[_0x201045.id] = { x: _0x201045.x + _0xab1716, y: _0x201045.y + _0x3acb66 };
+  const value90 = value88 - box27.minX,
+    value91 = value89 - box27.minY,
+    value92 = {};
+  for (const x14 of list17) {
+    value92[x14.id] = { x: x14.x + value90, y: x14.y + value91 };
   }
-  return _0x32fac8;
+  return value92;
 }
-export function buildNodeOffsetPlan(_0x8795fb, _0x122daa) {
-  if (!_0x8795fb || typeof _0x8795fb !== 'object') return {};
-  if (!_0x122daa || typeof _0x122daa !== 'object') return {};
-  const _0x5f4fa7 = {};
-  for (const [_0x2840b6, _0xf0dd34] of Object.entries(_0x122daa)) {
-    const _0x5535a2 = _0x8795fb[_0x2840b6];
-    if (!_0x5535a2 || !_0xf0dd34) continue;
-    const _0x5b8a0b = _toFiniteNumber(_0x5535a2.x, 0),
-      _0x4f31ba = _toFiniteNumber(_0x5535a2.y, 0),
-      _0x175661 = _toFiniteNumber(_0xf0dd34.x, _0x5b8a0b),
-      _0x2e8bc1 = _toFiniteNumber(_0xf0dd34.y, _0x4f31ba),
-      _0x3e0be2 = _0x175661 - _0x5b8a0b,
-      _0x26a908 = _0x2e8bc1 - _0x4f31ba;
-    if (Math.abs(_0x3e0be2) < 0.000001 && Math.abs(_0x26a908) < 0.000001) continue;
-    _0x5f4fa7[_0x2840b6] = { dx: _0x3e0be2, dy: _0x26a908 };
+export function buildNodeOffsetPlan(enabled4, enabled5) {
+  if (!enabled4 || typeof enabled4 !== 'object') return {};
+  if (!enabled5 || typeof enabled5 !== 'object') return {};
+  const value93 = {};
+  for (const [value94, box28] of Object.entries(enabled5)) {
+    const box29 = enabled4[value94];
+    if (!box29 || !box28) continue;
+    const _toFiniteNumber14 = _toFiniteNumber(box29.x, 0),
+      _toFiniteNumber15 = _toFiniteNumber(box29.y, 0),
+      _toFiniteNumber16 = _toFiniteNumber(box28.x, _toFiniteNumber14),
+      _toFiniteNumber17 = _toFiniteNumber(box28.y, _toFiniteNumber15),
+      dx = _toFiniteNumber16 - _toFiniteNumber14,
+      dy = _toFiniteNumber17 - _toFiniteNumber15;
+    if (Math.abs(dx) < 0.000001 && Math.abs(dy) < 0.000001) continue;
+    value93[value94] = { dx: dx, dy: dy };
   }
-  return _0x5f4fa7;
+  return value93;
 }
-export function resolveSnapThresholdInWorld(_0x2bedc4, _0x552ed2 = 8) {
-  const _0x1799f5 = Number.isFinite(_0x2bedc4) && _0x2bedc4 > 0 ? _0x2bedc4 : 1,
-    _0x3db144 = Number.isFinite(_0x552ed2) ? _0x552ed2 : 8;
-  return _0x3db144 / _0x1799f5;
+export function resolveSnapThresholdInWorld(count5, value95 = 8) {
+  const value96 = Number.isFinite(count5) && count5 > 0 ? count5 : 1,
+    value97 = Number.isFinite(value95) ? value95 : 8;
+  return value97 / value96;
 }
-export function computeSingleNodeSnapGuides(_0x563977) {
+export function computeSingleNodeSnapGuides(value98) {
   const {
-      nodesById: _0x13916a,
-      dragNodeId: _0x2d4e10,
-      proposedX: _0x58a6d9,
-      proposedY: _0x2e0fa7,
-      width: _0x1c7a99,
-      height: _0x518588,
-      viewport: _0x436eb3,
+      nodesById: nodesById,
+      dragNodeId: dragNodeId,
+      proposedX: proposedX,
+      proposedY: proposedY,
+      width: width2,
+      height: height2,
+      viewport: viewport,
       thresholdPx: thresholdPx = 8,
       spatialIndex: spatialIndex = null,
-    } = _0x563977 || {},
-    _0x3147b7 = _toFiniteNumber(_0x58a6d9, 0),
-    _0x2d6e60 = _toFiniteNumber(_0x2e0fa7, 0),
-    _0x39a8e2 = _toFiniteNumber(_0x436eb3?.x, 0),
-    _0x35d4e3 = _toFiniteNumber(_0x436eb3?.y, 0),
-    _0x5685d1 = _toFiniteNumber(_0x436eb3?.zoom, 1) || 1,
-    _0x389083 = Math.max(0, _toFiniteNumber(_0x1c7a99, 200)),
-    _0x3a5aaa = Math.max(0, _toFiniteNumber(_0x518588, 200)),
-    _0x472555 = { snappedX: _0x3147b7, snappedY: _0x2d6e60, guideLines: [] };
-  if (!_0x13916a || typeof _0x13916a !== 'object' || !_0x2d4e10 || !_0x13916a[_0x2d4e10]) return _0x472555;
-  const _0x29f0c2 = resolveSnapThresholdInWorld(_0x5685d1, thresholdPx),
-    _0x3d7af1 = _0x3147b7,
-    _0x2bb4b2 = _0x3147b7 + _0x389083,
-    _0x50b505 = _0x2d6e60,
-    _0x1da1f8 = _0x2d6e60 + _0x3a5aaa;
-  let _0x2df5f1 = null,
-    _0x4246d2 = null,
-    _0x227657 = null,
-    _0x58d3e4 = null;
-  const _0x19434d = spatialIndex
+    } = value98 || {},
+    snappedX = _toFiniteNumber(proposedX, 0),
+    snappedY = _toFiniteNumber(proposedY, 0),
+    _toFiniteNumber18 = _toFiniteNumber(viewport?.x, 0),
+    _toFiniteNumber19 = _toFiniteNumber(viewport?.y, 0),
+    _toFiniteNumber20 = _toFiniteNumber(viewport?.zoom, 1) || 1,
+    width3 = Math.max(0, _toFiniteNumber(width2, 200)),
+    height3 = Math.max(0, _toFiniteNumber(height2, 200)),
+    value99 = { snappedX: snappedX, snappedY: snappedY, guideLines: [] };
+  if (!nodesById || typeof nodesById !== 'object' || !dragNodeId || !nodesById[dragNodeId]) return value99;
+  const snapThresholdInWorld = resolveSnapThresholdInWorld(_toFiniteNumber20, thresholdPx),
+    value100 = snappedX,
+    value101 = snappedX + width3,
+    value102 = snappedY,
+    value103 = snappedY + height3;
+  let value104 = null,
+    value105 = null,
+    pos = null,
+    pos2 = null;
+  const value106 = spatialIndex
     ? getNodeSpatialQueryNodes(
-        _0x13916a,
+        nodesById,
         collectSnapSearchCandidateIds(
           spatialIndex,
-          { x: _0x3147b7, y: _0x2d6e60, width: _0x389083, height: _0x3a5aaa },
-          _0x29f0c2,
+          { x: snappedX, y: snappedY, width: width3, height: height3 },
+          snapThresholdInWorld,
         ),
       )
-    : Object.values(_0x13916a);
-  for (const _0xf80f4e of _0x19434d) {
-    if (!_0xf80f4e || _0xf80f4e.id === _0x2d4e10) continue;
-    const _0x33c7e4 = _toFiniteNumber(_0xf80f4e.x, 0),
-      _0x2ed3ff = _0x33c7e4 + Math.max(0, _toFiniteNumber(_0xf80f4e.width, 200)),
-      _0x809658 = _toFiniteNumber(_0xf80f4e.y, 0),
-      _0x5b7a20 = _0x809658 + Math.max(0, _toFiniteNumber(_0xf80f4e.height, 200));
-    if (_0x2df5f1 === null) {
-      if (Math.abs(_0x3d7af1 - _0x33c7e4) < _0x29f0c2) ((_0x2df5f1 = _0x33c7e4), (_0x227657 = _0x33c7e4));
+    : Object.values(nodesById);
+  for (const box30 of value106) {
+    if (!box30 || box30.id === dragNodeId) continue;
+    const _toFiniteNumber21 = _toFiniteNumber(box30.x, 0),
+      value107 = _toFiniteNumber21 + Math.max(0, _toFiniteNumber(box30.width, 200)),
+      _toFiniteNumber22 = _toFiniteNumber(box30.y, 0),
+      value108 = _toFiniteNumber22 + Math.max(0, _toFiniteNumber(box30.height, 200));
+    if (value104 === null) {
+      if (Math.abs(value100 - _toFiniteNumber21) < snapThresholdInWorld)
+        ((value104 = _toFiniteNumber21), (pos = _toFiniteNumber21));
       else {
-        if (Math.abs(_0x3d7af1 - _0x2ed3ff) < _0x29f0c2) ((_0x2df5f1 = _0x2ed3ff), (_0x227657 = _0x2ed3ff));
+        if (Math.abs(value100 - value107) < snapThresholdInWorld) ((value104 = value107), (pos = value107));
         else {
-          if (Math.abs(_0x2bb4b2 - _0x33c7e4) < _0x29f0c2)
-            ((_0x2df5f1 = _0x33c7e4 - _0x389083), (_0x227657 = _0x33c7e4));
+          if (Math.abs(value101 - _toFiniteNumber21) < snapThresholdInWorld)
+            ((value104 = _toFiniteNumber21 - width3), (pos = _toFiniteNumber21));
           else
-            Math.abs(_0x2bb4b2 - _0x2ed3ff) < _0x29f0c2 &&
-              ((_0x2df5f1 = _0x2ed3ff - _0x389083), (_0x227657 = _0x2ed3ff));
+            Math.abs(value101 - value107) < snapThresholdInWorld &&
+              ((value104 = value107 - width3), (pos = value107));
         }
       }
     }
-    if (_0x4246d2 === null) {
-      if (Math.abs(_0x50b505 - _0x809658) < _0x29f0c2) ((_0x4246d2 = _0x809658), (_0x58d3e4 = _0x809658));
+    if (value105 === null) {
+      if (Math.abs(value102 - _toFiniteNumber22) < snapThresholdInWorld)
+        ((value105 = _toFiniteNumber22), (pos2 = _toFiniteNumber22));
       else {
-        if (Math.abs(_0x50b505 - _0x5b7a20) < _0x29f0c2) ((_0x4246d2 = _0x5b7a20), (_0x58d3e4 = _0x5b7a20));
+        if (Math.abs(value102 - value108) < snapThresholdInWorld) ((value105 = value108), (pos2 = value108));
         else {
-          if (Math.abs(_0x1da1f8 - _0x809658) < _0x29f0c2)
-            ((_0x4246d2 = _0x809658 - _0x3a5aaa), (_0x58d3e4 = _0x809658));
+          if (Math.abs(value103 - _toFiniteNumber22) < snapThresholdInWorld)
+            ((value105 = _toFiniteNumber22 - height3), (pos2 = _toFiniteNumber22));
           else
-            Math.abs(_0x1da1f8 - _0x5b7a20) < _0x29f0c2 &&
-              ((_0x4246d2 = _0x5b7a20 - _0x3a5aaa), (_0x58d3e4 = _0x5b7a20));
+            Math.abs(value103 - value108) < snapThresholdInWorld &&
+              ((value105 = value108 - height3), (pos2 = value108));
         }
       }
     }
-    if (_0x2df5f1 !== null && _0x4246d2 !== null) break;
+    if (value104 !== null && value105 !== null) break;
   }
-  const _0x773b43 = [],
-    _0x4b8f81 = [];
-  if (_0x2df5f1 !== null) {
-    const _0x5eee31 = collectSnapMatchNodes(_0x13916a, _0x19434d, spatialIndex, 'x', _0x227657);
-    for (const _0x3d59ed of _0x5eee31) {
-      if (!_0x3d59ed || _0x3d59ed.id === _0x2d4e10) continue;
-      const _0x47d33a = _toFiniteNumber(_0x3d59ed.x, 0),
-        _0x3b63a1 = _0x47d33a + Math.max(0, _toFiniteNumber(_0x3d59ed.width, 200));
-      (Math.abs(_0x47d33a - _0x227657) < SNAP_MATCH_EPSILON ||
-        Math.abs(_0x3b63a1 - _0x227657) < SNAP_MATCH_EPSILON) &&
-        _0x773b43.push(_0x3d59ed);
+  const list18 = [],
+    list19 = [];
+  if (value104 !== null) {
+    const snapMatchNodes = collectSnapMatchNodes(nodesById, value106, spatialIndex, 'x', pos);
+    for (const box31 of snapMatchNodes) {
+      if (!box31 || box31.id === dragNodeId) continue;
+      const _toFiniteNumber23 = _toFiniteNumber(box31.x, 0),
+        value109 = _toFiniteNumber23 + Math.max(0, _toFiniteNumber(box31.width, 200));
+      (Math.abs(_toFiniteNumber23 - pos) < SNAP_MATCH_EPSILON ||
+        Math.abs(value109 - pos) < SNAP_MATCH_EPSILON) &&
+        list18.push(box31);
     }
   }
-  if (_0x4246d2 !== null) {
-    const _0x2f70c8 = collectSnapMatchNodes(_0x13916a, _0x19434d, spatialIndex, 'y', _0x58d3e4);
-    for (const _0xebcbd6 of _0x2f70c8) {
-      if (!_0xebcbd6 || _0xebcbd6.id === _0x2d4e10) continue;
-      const _0x2618c6 = _toFiniteNumber(_0xebcbd6.y, 0),
-        _0x325e5c = _0x2618c6 + Math.max(0, _toFiniteNumber(_0xebcbd6.height, 200));
-      (Math.abs(_0x2618c6 - _0x58d3e4) < SNAP_MATCH_EPSILON ||
-        Math.abs(_0x325e5c - _0x58d3e4) < SNAP_MATCH_EPSILON) &&
-        _0x4b8f81.push(_0xebcbd6);
+  if (value105 !== null) {
+    const snapMatchNodes2 = collectSnapMatchNodes(nodesById, value106, spatialIndex, 'y', pos2);
+    for (const box32 of snapMatchNodes2) {
+      if (!box32 || box32.id === dragNodeId) continue;
+      const _toFiniteNumber24 = _toFiniteNumber(box32.y, 0),
+        value110 = _toFiniteNumber24 + Math.max(0, _toFiniteNumber(box32.height, 200));
+      (Math.abs(_toFiniteNumber24 - pos2) < SNAP_MATCH_EPSILON ||
+        Math.abs(value110 - pos2) < SNAP_MATCH_EPSILON) &&
+        list19.push(box32);
     }
   }
-  if (_0x2df5f1 !== null) {
-    _0x472555.snappedX = _0x2df5f1;
-    const _0x20777a = _0x2d6e60 + (_0x4246d2 !== null ? _0x4246d2 - _0x2d6e60 : 0),
-      _0x262080 = _0x20777a + _0x3a5aaa;
-    let _0x4937d6 = _0x20777a,
-      _0x225e12 = _0x262080;
-    (_0x773b43.forEach((_0x2aa540) => {
-      const _0x31ba29 = _toFiniteNumber(_0x2aa540.y, 0),
-        _0x485ccb = Math.max(0, _toFiniteNumber(_0x2aa540.height, 200));
-      ((_0x4937d6 = Math.min(_0x4937d6, _0x31ba29)),
-        (_0x225e12 = Math.max(_0x225e12, _0x31ba29 + _0x485ccb)));
+  if (value104 !== null) {
+    value99.snappedX = value104;
+    const value111 = snappedY + (value105 !== null ? value105 - snappedY : 0),
+      value112 = value111 + height3;
+    let start = value111,
+      end = value112;
+    (list18.forEach((box33) => {
+      const _toFiniteNumber25 = _toFiniteNumber(box33.y, 0),
+        value113 = Math.max(0, _toFiniteNumber(box33.height, 200));
+      ((start = Math.min(start, _toFiniteNumber25)), (end = Math.max(end, _toFiniteNumber25 + value113)));
     }),
-      _0x472555.guideLines.push({
+      value99.guideLines.push({
         type: 'v',
-        pos: _0x227657 * _0x5685d1 + _0x39a8e2,
-        start: _0x4937d6 * _0x5685d1 + _0x35d4e3,
-        end: _0x225e12 * _0x5685d1 + _0x35d4e3,
+        pos: pos * _toFiniteNumber20 + _toFiniteNumber18,
+        start: start * _toFiniteNumber20 + _toFiniteNumber19,
+        end: end * _toFiniteNumber20 + _toFiniteNumber19,
       }));
   }
-  if (_0x4246d2 !== null) {
-    _0x472555.snappedY = _0x4246d2;
-    const _0x46293a = _0x3147b7 + (_0x2df5f1 !== null ? _0x2df5f1 - _0x3147b7 : 0),
-      _0x15f1e2 = _0x46293a + _0x389083;
-    let _0x4af0a3 = _0x46293a,
-      _0x2206c8 = _0x15f1e2;
-    (_0x4b8f81.forEach((_0x1adf5d) => {
-      const _0x3ec7df = _toFiniteNumber(_0x1adf5d.x, 0),
-        _0x3ab874 = Math.max(0, _toFiniteNumber(_0x1adf5d.width, 200));
-      ((_0x4af0a3 = Math.min(_0x4af0a3, _0x3ec7df)),
-        (_0x2206c8 = Math.max(_0x2206c8, _0x3ec7df + _0x3ab874)));
+  if (value105 !== null) {
+    value99.snappedY = value105;
+    const value114 = snappedX + (value104 !== null ? value104 - snappedX : 0),
+      value115 = value114 + width3;
+    let start2 = value114,
+      end2 = value115;
+    (list19.forEach((box34) => {
+      const _toFiniteNumber26 = _toFiniteNumber(box34.x, 0),
+        value116 = Math.max(0, _toFiniteNumber(box34.width, 200));
+      ((start2 = Math.min(start2, _toFiniteNumber26)), (end2 = Math.max(end2, _toFiniteNumber26 + value116)));
     }),
-      _0x472555.guideLines.push({
+      value99.guideLines.push({
         type: 'h',
-        pos: _0x58d3e4 * _0x5685d1 + _0x35d4e3,
-        start: _0x4af0a3 * _0x5685d1 + _0x39a8e2,
-        end: _0x2206c8 * _0x5685d1 + _0x39a8e2,
+        pos: pos2 * _toFiniteNumber20 + _toFiniteNumber19,
+        start: start2 * _toFiniteNumber20 + _toFiniteNumber18,
+        end: end2 * _toFiniteNumber20 + _toFiniteNumber18,
       }));
   }
-  return _0x472555;
+  return value99;
 }
-export function computeMultiNodeSnapGuides(_0xf0e0b4) {
+export function computeMultiNodeSnapGuides(value117) {
   const {
-      nodesById: _0xc3feea,
-      movingNodeIds: _0x18f069,
-      proposedBounds: _0xfe7a3e,
-      viewport: _0x3422e2,
+      nodesById: nodesById2,
+      movingNodeIds: movingNodeIds,
+      proposedBounds: proposedBounds,
+      viewport: viewport2,
       thresholdPx: thresholdPx = 8,
       spatialIndex: spatialIndex = null,
-    } = _0xf0e0b4 || {},
-    _0x40025f = _toFiniteNumber(_0xfe7a3e?.minX, 0),
-    _0x4ac6b1 = _toFiniteNumber(_0xfe7a3e?.minY, 0),
-    _0x235e91 = Math.max(0, _toFiniteNumber(_0xfe7a3e?.width, 0)),
-    _0x56af87 = Math.max(0, _toFiniteNumber(_0xfe7a3e?.height, 0)),
-    _0x2402f7 = _toFiniteNumber(_0x3422e2?.x, 0),
-    _0x255af2 = _toFiniteNumber(_0x3422e2?.y, 0),
-    _0x27a1ef = _toFiniteNumber(_0x3422e2?.zoom, 1) || 1,
-    _0x570e17 = { snappedX: _0x40025f, snappedY: _0x4ac6b1, guideLines: [] };
-  if (!_0xc3feea || typeof _0xc3feea !== 'object') return _0x570e17;
-  const _0x37d4e2 = new Set(Array.isArray(_0x18f069) ? _0x18f069.filter(Boolean) : []);
-  if (_0x37d4e2.size === 0) return _0x570e17;
-  const _0x7cbf09 = resolveSnapThresholdInWorld(_0x27a1ef, thresholdPx),
-    _0x1fbab2 = _0x40025f,
-    _0x1d2ce1 = _0x40025f + _0x235e91,
-    _0x57e9dd = _0x4ac6b1,
-    _0x409834 = _0x4ac6b1 + _0x56af87;
-  let _0x2649ac = null,
-    _0x149771 = null,
-    _0x1ebe5e = null,
-    _0x3d4821 = null;
-  const _0x4f9f61 = spatialIndex
+    } = value117 || {},
+    snappedX2 = _toFiniteNumber(proposedBounds?.minX, 0),
+    snappedY2 = _toFiniteNumber(proposedBounds?.minY, 0),
+    width4 = Math.max(0, _toFiniteNumber(proposedBounds?.width, 0)),
+    height4 = Math.max(0, _toFiniteNumber(proposedBounds?.height, 0)),
+    _toFiniteNumber27 = _toFiniteNumber(viewport2?.x, 0),
+    _toFiniteNumber28 = _toFiniteNumber(viewport2?.y, 0),
+    _toFiniteNumber29 = _toFiniteNumber(viewport2?.zoom, 1) || 1,
+    value118 = { snappedX: snappedX2, snappedY: snappedY2, guideLines: [] };
+  if (!nodesById2 || typeof nodesById2 !== 'object') return value118;
+  const map = new Set(Array.isArray(movingNodeIds) ? movingNodeIds.filter(Boolean) : []);
+  if (map.size === 0) return value118;
+  const snapThresholdInWorld2 = resolveSnapThresholdInWorld(_toFiniteNumber29, thresholdPx),
+    value119 = snappedX2,
+    value120 = snappedX2 + width4,
+    value121 = snappedY2,
+    value122 = snappedY2 + height4;
+  let value123 = null,
+    value124 = null,
+    pos3 = null,
+    pos4 = null;
+  const value125 = spatialIndex
     ? getNodeSpatialQueryNodes(
-        _0xc3feea,
+        nodesById2,
         collectSnapSearchCandidateIds(
           spatialIndex,
-          { x: _0x40025f, y: _0x4ac6b1, width: _0x235e91, height: _0x56af87 },
-          _0x7cbf09,
+          { x: snappedX2, y: snappedY2, width: width4, height: height4 },
+          snapThresholdInWorld2,
         ),
       )
-    : Object.values(_0xc3feea);
-  for (const _0x50af63 of _0x4f9f61) {
-    if (!_0x50af63 || _0x37d4e2.has(_0x50af63.id)) continue;
-    const _0x1c4284 = _toFiniteNumber(_0x50af63.x, 0),
-      _0x1d8855 = _0x1c4284 + Math.max(0, _toFiniteNumber(_0x50af63.width, 200)),
-      _0x29ffa8 = _toFiniteNumber(_0x50af63.y, 0),
-      _0x5a404b = _0x29ffa8 + Math.max(0, _toFiniteNumber(_0x50af63.height, 200));
-    if (_0x2649ac === null) {
-      if (Math.abs(_0x1fbab2 - _0x1c4284) < _0x7cbf09) ((_0x2649ac = _0x1c4284), (_0x1ebe5e = _0x1c4284));
+    : Object.values(nodesById2);
+  for (const box35 of value125) {
+    if (!box35 || map.has(box35.id)) continue;
+    const _toFiniteNumber30 = _toFiniteNumber(box35.x, 0),
+      value126 = _toFiniteNumber30 + Math.max(0, _toFiniteNumber(box35.width, 200)),
+      _toFiniteNumber31 = _toFiniteNumber(box35.y, 0),
+      value127 = _toFiniteNumber31 + Math.max(0, _toFiniteNumber(box35.height, 200));
+    if (value123 === null) {
+      if (Math.abs(value119 - _toFiniteNumber30) < snapThresholdInWorld2)
+        ((value123 = _toFiniteNumber30), (pos3 = _toFiniteNumber30));
       else {
-        if (Math.abs(_0x1fbab2 - _0x1d8855) < _0x7cbf09) ((_0x2649ac = _0x1d8855), (_0x1ebe5e = _0x1d8855));
+        if (Math.abs(value119 - value126) < snapThresholdInWorld2) ((value123 = value126), (pos3 = value126));
         else {
-          if (Math.abs(_0x1d2ce1 - _0x1c4284) < _0x7cbf09)
-            ((_0x2649ac = _0x1c4284 - _0x235e91), (_0x1ebe5e = _0x1c4284));
+          if (Math.abs(value120 - _toFiniteNumber30) < snapThresholdInWorld2)
+            ((value123 = _toFiniteNumber30 - width4), (pos3 = _toFiniteNumber30));
           else
-            Math.abs(_0x1d2ce1 - _0x1d8855) < _0x7cbf09 &&
-              ((_0x2649ac = _0x1d8855 - _0x235e91), (_0x1ebe5e = _0x1d8855));
+            Math.abs(value120 - value126) < snapThresholdInWorld2 &&
+              ((value123 = value126 - width4), (pos3 = value126));
         }
       }
     }
-    if (_0x149771 === null) {
-      if (Math.abs(_0x57e9dd - _0x29ffa8) < _0x7cbf09) ((_0x149771 = _0x29ffa8), (_0x3d4821 = _0x29ffa8));
+    if (value124 === null) {
+      if (Math.abs(value121 - _toFiniteNumber31) < snapThresholdInWorld2)
+        ((value124 = _toFiniteNumber31), (pos4 = _toFiniteNumber31));
       else {
-        if (Math.abs(_0x57e9dd - _0x5a404b) < _0x7cbf09) ((_0x149771 = _0x5a404b), (_0x3d4821 = _0x5a404b));
+        if (Math.abs(value121 - value127) < snapThresholdInWorld2) ((value124 = value127), (pos4 = value127));
         else {
-          if (Math.abs(_0x409834 - _0x29ffa8) < _0x7cbf09)
-            ((_0x149771 = _0x29ffa8 - _0x56af87), (_0x3d4821 = _0x29ffa8));
+          if (Math.abs(value122 - _toFiniteNumber31) < snapThresholdInWorld2)
+            ((value124 = _toFiniteNumber31 - height4), (pos4 = _toFiniteNumber31));
           else
-            Math.abs(_0x409834 - _0x5a404b) < _0x7cbf09 &&
-              ((_0x149771 = _0x5a404b - _0x56af87), (_0x3d4821 = _0x5a404b));
+            Math.abs(value122 - value127) < snapThresholdInWorld2 &&
+              ((value124 = value127 - height4), (pos4 = value127));
         }
       }
     }
-    if (_0x2649ac !== null && _0x149771 !== null) break;
+    if (value123 !== null && value124 !== null) break;
   }
-  const _0x3832aa = [],
-    _0xd68f06 = [];
-  if (_0x2649ac !== null) {
-    const _0x536521 = collectSnapMatchNodes(_0xc3feea, _0x4f9f61, spatialIndex, 'x', _0x1ebe5e);
-    for (const _0x32720a of _0x536521) {
-      if (!_0x32720a || _0x37d4e2.has(_0x32720a.id)) continue;
-      const _0xeb76a3 = _toFiniteNumber(_0x32720a.x, 0),
-        _0x3e0e02 = _0xeb76a3 + Math.max(0, _toFiniteNumber(_0x32720a.width, 200));
-      (Math.abs(_0xeb76a3 - _0x1ebe5e) < SNAP_MATCH_EPSILON ||
-        Math.abs(_0x3e0e02 - _0x1ebe5e) < SNAP_MATCH_EPSILON) &&
-        _0x3832aa.push(_0x32720a);
+  const list20 = [],
+    list21 = [];
+  if (value123 !== null) {
+    const snapMatchNodes3 = collectSnapMatchNodes(nodesById2, value125, spatialIndex, 'x', pos3);
+    for (const box36 of snapMatchNodes3) {
+      if (!box36 || map.has(box36.id)) continue;
+      const _toFiniteNumber32 = _toFiniteNumber(box36.x, 0),
+        value128 = _toFiniteNumber32 + Math.max(0, _toFiniteNumber(box36.width, 200));
+      (Math.abs(_toFiniteNumber32 - pos3) < SNAP_MATCH_EPSILON ||
+        Math.abs(value128 - pos3) < SNAP_MATCH_EPSILON) &&
+        list20.push(box36);
     }
   }
-  if (_0x149771 !== null) {
-    const _0x5cadfe = collectSnapMatchNodes(_0xc3feea, _0x4f9f61, spatialIndex, 'y', _0x3d4821);
-    for (const _0x44f0f0 of _0x5cadfe) {
-      if (!_0x44f0f0 || _0x37d4e2.has(_0x44f0f0.id)) continue;
-      const _0x2f84e1 = _toFiniteNumber(_0x44f0f0.y, 0),
-        _0x12e035 = _0x2f84e1 + Math.max(0, _toFiniteNumber(_0x44f0f0.height, 200));
-      (Math.abs(_0x2f84e1 - _0x3d4821) < SNAP_MATCH_EPSILON ||
-        Math.abs(_0x12e035 - _0x3d4821) < SNAP_MATCH_EPSILON) &&
-        _0xd68f06.push(_0x44f0f0);
+  if (value124 !== null) {
+    const snapMatchNodes4 = collectSnapMatchNodes(nodesById2, value125, spatialIndex, 'y', pos4);
+    for (const box37 of snapMatchNodes4) {
+      if (!box37 || map.has(box37.id)) continue;
+      const _toFiniteNumber33 = _toFiniteNumber(box37.y, 0),
+        value129 = _toFiniteNumber33 + Math.max(0, _toFiniteNumber(box37.height, 200));
+      (Math.abs(_toFiniteNumber33 - pos4) < SNAP_MATCH_EPSILON ||
+        Math.abs(value129 - pos4) < SNAP_MATCH_EPSILON) &&
+        list21.push(box37);
     }
   }
-  if (_0x2649ac !== null) {
-    _0x570e17.snappedX = _0x2649ac;
-    const _0x3f1ec8 = _0x4ac6b1 + (_0x149771 !== null ? _0x149771 - _0x4ac6b1 : 0),
-      _0x2b3a28 = _0x3f1ec8 + _0x56af87;
-    let _0x921fe3 = _0x3f1ec8,
-      _0x5ea505 = _0x2b3a28;
-    (_0x3832aa.forEach((_0x36f634) => {
-      const _0x385121 = _toFiniteNumber(_0x36f634.y, 0),
-        _0x2b3d15 = Math.max(0, _toFiniteNumber(_0x36f634.height, 200));
-      ((_0x921fe3 = Math.min(_0x921fe3, _0x385121)),
-        (_0x5ea505 = Math.max(_0x5ea505, _0x385121 + _0x2b3d15)));
+  if (value123 !== null) {
+    value118.snappedX = value123;
+    const value130 = snappedY2 + (value124 !== null ? value124 - snappedY2 : 0),
+      value131 = value130 + height4;
+    let start3 = value130,
+      end3 = value131;
+    (list20.forEach((box38) => {
+      const _toFiniteNumber34 = _toFiniteNumber(box38.y, 0),
+        value132 = Math.max(0, _toFiniteNumber(box38.height, 200));
+      ((start3 = Math.min(start3, _toFiniteNumber34)), (end3 = Math.max(end3, _toFiniteNumber34 + value132)));
     }),
-      _0x570e17.guideLines.push({
+      value118.guideLines.push({
         type: 'v',
-        pos: _0x1ebe5e * _0x27a1ef + _0x2402f7,
-        start: _0x921fe3 * _0x27a1ef + _0x255af2,
-        end: _0x5ea505 * _0x27a1ef + _0x255af2,
+        pos: pos3 * _toFiniteNumber29 + _toFiniteNumber27,
+        start: start3 * _toFiniteNumber29 + _toFiniteNumber28,
+        end: end3 * _toFiniteNumber29 + _toFiniteNumber28,
       }));
   }
-  if (_0x149771 !== null) {
-    _0x570e17.snappedY = _0x149771;
-    const _0x3966ee = _0x40025f + (_0x2649ac !== null ? _0x2649ac - _0x40025f : 0),
-      _0x5b4051 = _0x3966ee + _0x235e91;
-    let _0x24537a = _0x3966ee,
-      _0x2ed34f = _0x5b4051;
-    (_0xd68f06.forEach((_0x1bc501) => {
-      const _0x30ebff = _toFiniteNumber(_0x1bc501.x, 0),
-        _0x39a959 = Math.max(0, _toFiniteNumber(_0x1bc501.width, 200));
-      ((_0x24537a = Math.min(_0x24537a, _0x30ebff)),
-        (_0x2ed34f = Math.max(_0x2ed34f, _0x30ebff + _0x39a959)));
+  if (value124 !== null) {
+    value118.snappedY = value124;
+    const value133 = snappedX2 + (value123 !== null ? value123 - snappedX2 : 0),
+      value134 = value133 + width4;
+    let start4 = value133,
+      end4 = value134;
+    (list21.forEach((box39) => {
+      const _toFiniteNumber35 = _toFiniteNumber(box39.x, 0),
+        value135 = Math.max(0, _toFiniteNumber(box39.width, 200));
+      ((start4 = Math.min(start4, _toFiniteNumber35)), (end4 = Math.max(end4, _toFiniteNumber35 + value135)));
     }),
-      _0x570e17.guideLines.push({
+      value118.guideLines.push({
         type: 'h',
-        pos: _0x3d4821 * _0x27a1ef + _0x255af2,
-        start: _0x24537a * _0x27a1ef + _0x2402f7,
-        end: _0x2ed34f * _0x27a1ef + _0x2402f7,
+        pos: pos4 * _toFiniteNumber29 + _toFiniteNumber28,
+        start: start4 * _toFiniteNumber29 + _toFiniteNumber27,
+        end: end4 * _toFiniteNumber29 + _toFiniteNumber27,
       }));
   }
-  return _0x570e17;
+  return value118;
 }
-export function calcWorldBounds(_0x314019, _0x280218 = null) {
-  const _0x2f408c = computeNodesWorldBounds(_0x314019);
-  if (!_0x2f408c) {
-    if (_0x280218) {
-      const _0x1170e4 = 0x780,
-        _0x55de59 = 0x438,
-        _0x2b525b = -_0x280218.x / _0x280218.zoom,
-        _0x1a74b8 = -_0x280218.y / _0x280218.zoom,
-        _0x3248a3 = _0x1170e4 / _0x280218.zoom,
-        _0x1964c4 = _0x55de59 / _0x280218.zoom,
-        _0x109aa0 = 0x258;
+export function calcWorldBounds(value136, box40 = null) {
+  const nodesWorldBounds = computeNodesWorldBounds(value136);
+  if (!nodesWorldBounds) {
+    if (box40) {
+      const value137 = 0x780,
+        value138 = 0x438,
+        minX3 = -box40.x / box40.zoom,
+        minY3 = -box40.y / box40.zoom,
+        width5 = value137 / box40.zoom,
+        height5 = value138 / box40.zoom,
+        value139 = 0x258;
       return {
-        minX: _0x2b525b - _0x109aa0,
-        minY: _0x1a74b8 - _0x109aa0,
-        maxX: _0x2b525b + _0x3248a3 + _0x109aa0,
-        maxY: _0x1a74b8 + _0x1964c4 + _0x109aa0,
-        width: _0x3248a3 + _0x109aa0 * 2,
-        height: _0x1964c4 + _0x109aa0 * 2,
+        minX: minX3 - value139,
+        minY: minY3 - value139,
+        maxX: minX3 + width5 + value139,
+        maxY: minY3 + height5 + value139,
+        width: width5 + value139 * 2,
+        height: height5 + value139 * 2,
       };
     }
     return { minX: 0, minY: 0, maxX: 0x7d0, maxY: 0x7d0, width: 0x7d0, height: 0x7d0 };
   }
-  const _0x38af0e = 0x258,
-    _0x5d2c0f = _0x2f408c.minX - _0x38af0e,
-    _0x52b69b = _0x2f408c.minY - _0x38af0e,
-    _0x2f3038 = _0x2f408c.maxX + _0x38af0e,
-    _0x8c6fa7 = _0x2f408c.maxY + _0x38af0e;
+  const value140 = 0x258,
+    minX4 = nodesWorldBounds.minX - value140,
+    minY4 = nodesWorldBounds.minY - value140,
+    maxX3 = nodesWorldBounds.maxX + value140,
+    maxY3 = nodesWorldBounds.maxY + value140;
   return {
-    minX: _0x5d2c0f,
-    minY: _0x52b69b,
-    maxX: _0x2f3038,
-    maxY: _0x8c6fa7,
-    width: _0x2f3038 - _0x5d2c0f,
-    height: _0x8c6fa7 - _0x52b69b,
+    minX: minX4,
+    minY: minY4,
+    maxX: maxX3,
+    maxY: maxY3,
+    width: maxX3 - minX4,
+    height: maxY3 - minY4,
   };
 }
-export function worldToMinimap(_0x314925, _0x5bcab4, _0x1aa136, _0x177641) {
-  const _0x47035b = Math.max(_0x1aa136.width, _0x1aa136.height, 1),
-    _0x82f1b6 = _0x177641 / _0x47035b,
-    _0x1da819 = (_0x314925 - _0x1aa136.minX) * _0x82f1b6,
-    _0x4ff78a = (_0x5bcab4 - _0x1aa136.minY) * _0x82f1b6;
-  return { x: _0x1da819, y: _0x4ff78a, scale: _0x82f1b6 };
+export function worldToMinimap(value141, value142, box41, value143) {
+  const value144 = Math.max(box41.width, box41.height, 1),
+    scale = value143 / value144,
+    x15 = (value141 - box41.minX) * scale,
+    y12 = (value142 - box41.minY) * scale;
+  return { x: x15, y: y12, scale: scale };
 }
 const DEFAULT_NODE_SPATIAL_INDEX_CELL_SIZE = 240,
   EMPTY_NODE_SPATIAL_QUERY_RESULT = Object.freeze([]),
   SNAP_MATCH_EPSILON = 0.1;
-function getNodeSpatialCellCoord(_0x3afed7, _0x5e86f2) {
-  return Math.floor(_0x3afed7 / _0x5e86f2);
+function getNodeSpatialCellCoord(value145, value146) {
+  return Math.floor(value145 / value146);
 }
-function getNodeSpatialCellKey(_0x2d1ec7, _0x64adc1) {
-  return _0x2d1ec7 + ',' + _0x64adc1;
+function getNodeSpatialCellKey(value147, value148) {
+  return value147 + ',' + value148;
 }
-function normalizeNodeSpatialCellBounds(_0x1daa24) {
-  if (!_0x1daa24) return null;
-  const _0x523e17 = Number(_0x1daa24.minX),
-    _0x698f41 = Number(_0x1daa24.maxX),
-    _0x4ac706 = Number(_0x1daa24.minY),
-    _0x251b4f = Number(_0x1daa24.maxY);
+function normalizeNodeSpatialCellBounds(enabled6) {
+  if (!enabled6) return null;
+  const minX5 = Number(enabled6.minX),
+    maxX4 = Number(enabled6.maxX),
+    minY5 = Number(enabled6.minY),
+    maxY4 = Number(enabled6.maxY);
   if (
-    !Number.isFinite(_0x523e17) ||
-    !Number.isFinite(_0x698f41) ||
-    !Number.isFinite(_0x4ac706) ||
-    !Number.isFinite(_0x251b4f)
+    !Number.isFinite(minX5) ||
+    !Number.isFinite(maxX4) ||
+    !Number.isFinite(minY5) ||
+    !Number.isFinite(maxY4)
   )
     return null;
-  return { minX: _0x523e17, maxX: _0x698f41, minY: _0x4ac706, maxY: _0x251b4f };
+  return { minX: minX5, maxX: maxX4, minY: minY5, maxY: maxY4 };
 }
-function pushNodeIdToSpatialCell(_0x1d31a0, _0x1641b1, _0x542f21, _0x1716ee) {
-  const _0x4c1cac = getNodeSpatialCellKey(_0x1641b1, _0x542f21),
-    _0x11243d = _0x1d31a0.get(_0x4c1cac);
-  if (_0x11243d) {
-    _0x11243d.push(_0x1716ee);
+function pushNodeIdToSpatialCell(map2, value149, value150, value151) {
+  const nodeSpatialCellKey = getNodeSpatialCellKey(value149, value150),
+    list22 = map2.get(nodeSpatialCellKey);
+  if (list22) {
+    list22.push(value151);
     return;
   }
-  _0x1d31a0.set(_0x4c1cac, [_0x1716ee]);
+  map2.set(nodeSpatialCellKey, [value151]);
 }
-function normalizeNodeQueryRect(_0x3f0f55) {
-  if (!_0x3f0f55 || typeof _0x3f0f55 !== 'object') return null;
-  const _0x51285c = Number(_0x3f0f55.x),
-    _0x30a449 = Number(_0x3f0f55.y),
-    _0x1eec1b = Math.max(0, Number(_0x3f0f55.width) || 0),
-    _0x294b3a = Math.max(0, Number(_0x3f0f55.height) || 0);
-  if (!Number.isFinite(_0x51285c) || !Number.isFinite(_0x30a449)) return null;
-  return { x: _0x51285c, y: _0x30a449, width: _0x1eec1b, height: _0x294b3a };
+function normalizeNodeQueryRect(box42) {
+  if (!box42 || typeof box42 !== 'object') return null;
+  const x16 = Number(box42.x),
+    y13 = Number(box42.y),
+    width6 = Math.max(0, Number(box42.width) || 0),
+    height6 = Math.max(0, Number(box42.height) || 0);
+  if (!Number.isFinite(x16) || !Number.isFinite(y13)) return null;
+  return { x: x16, y: y13, width: width6, height: height6 };
 }
-function finalizeNodeQueryRect(_0x429803, _0x2fcf37 = {}) {
-  const _0x2e7701 = normalizeNodeQueryRect(_0x429803);
-  if (!_0x2e7701) return null;
+function finalizeNodeQueryRect(value152, args = {}) {
+  const right2 = normalizeNodeQueryRect(value152);
+  if (!right2) return null;
   return {
-    ..._0x2e7701,
-    right: _0x2e7701.x + _0x2e7701.width,
-    bottom: _0x2e7701.y + _0x2e7701.height,
-    cx: _0x2e7701.x + _0x2e7701.width / 2,
-    cy: _0x2e7701.y + _0x2e7701.height / 2,
-    ..._0x2fcf37,
+    ...right2,
+    right: right2.x + right2.width,
+    bottom: right2.y + right2.height,
+    cx: right2.x + right2.width / 2,
+    cy: right2.y + right2.height / 2,
+    ...args,
   };
 }
-function defaultNodeQueryRectResolver(_0x508c35) {
-  if (!_0x508c35 || typeof _0x508c35 !== 'object') return null;
-  return { x: _0x508c35.x, y: _0x508c35.y, width: _0x508c35.width || 0, height: _0x508c35.height || 0 };
+function defaultNodeQueryRectResolver(x17) {
+  if (!x17 || typeof x17 !== 'object') return null;
+  return { x: x17.x, y: x17.y, width: x17.width || 0, height: x17.height || 0 };
 }
-function normalizeNodeQueryOptions(_0x14b8a2 = false, _0x30d446 = undefined) {
-  const _0x2dfadb =
-    _0x14b8a2 && typeof _0x14b8a2 === 'object' ? { ..._0x14b8a2 } : { ignoreGroup: _0x14b8a2 === true };
+function normalizeNodeQueryOptions(ignoreGroup = false, value153 = undefined) {
+  const value154 =
+    ignoreGroup && typeof ignoreGroup === 'object'
+      ? { ...ignoreGroup }
+      : { ignoreGroup: ignoreGroup === true };
   return (
-    _0x30d446 && typeof _0x30d446 === 'object' && Object.assign(_0x2dfadb, _0x30d446),
-    (_0x2dfadb.ignoreGroup = _0x2dfadb.ignoreGroup === true),
-    (_0x2dfadb.resolveRect =
-      typeof _0x2dfadb.resolveRect === 'function' ? _0x2dfadb.resolveRect : defaultNodeQueryRectResolver),
-    (_0x2dfadb.candidateFilter =
-      typeof _0x2dfadb.candidateFilter === 'function' ? _0x2dfadb.candidateFilter : null),
-    (_0x2dfadb.spatialIndex = _0x2dfadb.spatialIndex || null),
-    _0x2dfadb
+    value153 && typeof value153 === 'object' && Object.assign(value154, value153),
+    (value154.ignoreGroup = value154.ignoreGroup === true),
+    (value154.resolveRect =
+      typeof value154.resolveRect === 'function' ? value154.resolveRect : defaultNodeQueryRectResolver),
+    (value154.candidateFilter =
+      typeof value154.candidateFilter === 'function' ? value154.candidateFilter : null),
+    (value154.spatialIndex = value154.spatialIndex || null),
+    value154
   );
 }
-function resolveNodeQueryRect(_0x315708, _0x52ff1f, _0x4813bc, _0x3f1266 = null) {
-  const _0x84ad60 = String(_0x315708?.id || _0x52ff1f || '').trim();
-  if (!_0x84ad60) return null;
-  const _0x42cbb2 = _0x3f1266?.nodeRects instanceof Map ? _0x3f1266.nodeRects.get(_0x84ad60) : null;
-  if (_0x42cbb2) return _0x42cbb2;
-  return finalizeNodeQueryRect(_0x4813bc(_0x315708, _0x84ad60));
+function resolveNodeQueryRect(value155, value156, handler, value157 = null) {
+  const enabled7 = String(value155?.id || value156 || '').trim();
+  if (!enabled7) return null;
+  const value158 = value157?.nodeRects instanceof Map ? value157.nodeRects.get(enabled7) : null;
+  if (value158) return value158;
+  return finalizeNodeQueryRect(handler(value155, enabled7));
 }
-function iterateNodeSpatialRing(_0xaeafec, _0x5e476a, _0x28c5f3, _0x16cda4) {
-  if (_0x28c5f3 === 0) {
-    _0x16cda4(_0xaeafec, _0x5e476a);
+function iterateNodeSpatialRing(value159, value160, count6, handler2) {
+  if (count6 === 0) {
+    handler2(value159, value160);
     return;
   }
-  const _0x469944 = _0xaeafec - _0x28c5f3,
-    _0x5b0972 = _0xaeafec + _0x28c5f3,
-    _0x4c7760 = _0x5e476a - _0x28c5f3,
-    _0x605fce = _0x5e476a + _0x28c5f3;
-  for (let _0x18c3fd = _0x469944; _0x18c3fd <= _0x5b0972; _0x18c3fd += 1) {
-    (_0x16cda4(_0x18c3fd, _0x4c7760), _0x16cda4(_0x18c3fd, _0x605fce));
+  const value161 = value159 - count6,
+    value162 = value159 + count6,
+    value163 = value160 - count6,
+    value164 = value160 + count6;
+  for (let value165 = value161; value165 <= value162; value165 += 1) {
+    (handler2(value165, value163), handler2(value165, value164));
   }
-  for (let _0x1e3877 = _0x4c7760 + 1; _0x1e3877 < _0x605fce; _0x1e3877 += 1) {
-    (_0x16cda4(_0x469944, _0x1e3877), _0x16cda4(_0x5b0972, _0x1e3877));
+  for (let value166 = value163 + 1; value166 < value164; value166 += 1) {
+    (handler2(value161, value166), handler2(value162, value166));
   }
 }
-function getPointToCellRectDistSq(_0x310655, _0x480762, _0xb4bf54, _0x484af9, _0x323763) {
-  const _0x359489 = _0xb4bf54 * _0x323763,
-    _0x2a0fd8 = _0x484af9 * _0x323763,
-    _0x20e56c = _0x359489 + _0x323763,
-    _0x3e0ffb = _0x2a0fd8 + _0x323763,
-    _0x160a2a =
-      _0x310655 < _0x359489 ? _0x359489 - _0x310655 : _0x310655 > _0x20e56c ? _0x310655 - _0x20e56c : 0,
-    _0x4c4903 =
-      _0x480762 < _0x2a0fd8 ? _0x2a0fd8 - _0x480762 : _0x480762 > _0x3e0ffb ? _0x480762 - _0x3e0ffb : 0;
-  return _0x160a2a * _0x160a2a + _0x4c4903 * _0x4c4903;
+function getPointToCellRectDistSq(value167, value168, value169, value170, value171) {
+  const value172 = value169 * value171,
+    value173 = value170 * value171,
+    value174 = value172 + value171,
+    value175 = value173 + value171,
+    value176 = value167 < value172 ? value172 - value167 : value167 > value174 ? value167 - value174 : 0,
+    value177 = value168 < value173 ? value173 - value168 : value168 > value175 ? value168 - value175 : 0;
+  return value176 * value176 + value177 * value177;
 }
-function getNodeSpatialWorldBounds(_0x51a055) {
-  const _0xe13d4e = normalizeNodeSpatialCellBounds(_0x51a055?.boundsCellBounds);
-  if (!_0xe13d4e) return null;
-  const _0x42ea77 = Number(_0x51a055?.cellSize);
-  if (!Number.isFinite(_0x42ea77) || _0x42ea77 <= 0) return null;
+function getNodeSpatialWorldBounds(value178) {
+  const x18 = normalizeNodeSpatialCellBounds(value178?.boundsCellBounds);
+  if (!x18) return null;
+  const count7 = Number(value178?.cellSize);
+  if (!Number.isFinite(count7) || count7 <= 0) return null;
   return {
-    x: _0xe13d4e.minX * _0x42ea77,
-    y: _0xe13d4e.minY * _0x42ea77,
-    width: (_0xe13d4e.maxX - _0xe13d4e.minX + 1) * _0x42ea77,
-    height: (_0xe13d4e.maxY - _0xe13d4e.minY + 1) * _0x42ea77,
+    x: x18.minX * count7,
+    y: x18.minY * count7,
+    width: (x18.maxX - x18.minX + 1) * count7,
+    height: (x18.maxY - x18.minY + 1) * count7,
   };
 }
-function getNodeSpatialStripeRect(_0x492ff, _0x4e4470, _0x2575df, _0x11a19, _0x666f26 = 0) {
-  const _0x57d536 = getNodeSpatialWorldBounds(_0x492ff);
-  if (!_0x57d536) return null;
-  const _0x139d8b = Math.min(_toFiniteNumber(_0x2575df, 0), _toFiniteNumber(_0x11a19, 0)),
-    _0x354198 = Math.max(_toFiniteNumber(_0x2575df, 0), _toFiniteNumber(_0x11a19, 0)),
-    _0xd2cc71 = Math.max(0, _toFiniteNumber(_0x666f26, 0));
-  if (_0x4e4470 === 'x')
+function getNodeSpatialStripeRect(value179, value180, value181, value182, value183 = 0) {
+  const y14 = getNodeSpatialWorldBounds(value179);
+  if (!y14) return null;
+  const x19 = Math.min(_toFiniteNumber(value181, 0), _toFiniteNumber(value182, 0)),
+    value184 = Math.max(_toFiniteNumber(value181, 0), _toFiniteNumber(value182, 0)),
+    value185 = Math.max(0, _toFiniteNumber(value183, 0));
+  if (value180 === 'x')
     return {
-      x: _0x139d8b - _0xd2cc71,
-      y: _0x57d536.y,
-      width: Math.max(0, _0x354198 - _0x139d8b) + _0xd2cc71 * 2,
-      height: _0x57d536.height,
+      x: x19 - value185,
+      y: y14.y,
+      width: Math.max(0, value184 - x19) + value185 * 2,
+      height: y14.height,
     };
-  if (_0x4e4470 === 'y')
+  if (value180 === 'y')
     return {
-      x: _0x57d536.x,
-      y: _0x139d8b - _0xd2cc71,
-      width: _0x57d536.width,
-      height: Math.max(0, _0x354198 - _0x139d8b) + _0xd2cc71 * 2,
+      x: y14.x,
+      y: x19 - value185,
+      width: y14.width,
+      height: Math.max(0, value184 - x19) + value185 * 2,
     };
   return null;
 }
-function getNodeSpatialQueryNodes(_0x1a649d, _0x324d39) {
-  if (!Array.isArray(_0x324d39) || _0x324d39.length === 0) return [];
-  const _0x491a07 = [];
-  for (const _0x4ab67a of _0x324d39) {
-    const _0x5a4799 = _0x1a649d?.[_0x4ab67a];
-    if (_0x5a4799) _0x491a07.push(_0x5a4799);
+function getNodeSpatialQueryNodes(value186, list23) {
+  if (!Array.isArray(list23) || list23.length === 0) return [];
+  const list24 = [];
+  for (const value187 of list23) {
+    const value188 = value186?.[value187];
+    if (value188) list24.push(value188);
   }
-  return _0x491a07;
+  return list24;
 }
-function collectSnapSearchCandidateIds(_0x40c411, _0x5bc179, _0x272eab) {
-  if (!_0x40c411 || !_0x5bc179) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
-  const _0x4b56cd = getNodeSpatialStripeRect(
-      _0x40c411,
+function collectSnapSearchCandidateIds(enabled8, box43, value189) {
+  if (!enabled8 || !box43) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
+  const nodeSpatialStripeRect = getNodeSpatialStripeRect(
+      enabled8,
       'x',
-      _0x5bc179.x,
-      _0x5bc179.x + _0x5bc179.width,
-      _0x272eab,
+      box43.x,
+      box43.x + box43.width,
+      value189,
     ),
-    _0x3e4b59 = getNodeSpatialStripeRect(
-      _0x40c411,
+    nodeSpatialStripeRect2 = getNodeSpatialStripeRect(
+      enabled8,
       'y',
-      _0x5bc179.y,
-      _0x5bc179.y + _0x5bc179.height,
-      _0x272eab,
+      box43.y,
+      box43.y + box43.height,
+      value189,
     );
-  if (!_0x4b56cd && !_0x3e4b59) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
-  const _0x20361f = new Set();
-  if (_0x4b56cd)
-    for (const _0x3973d6 of queryNodeSpatialIndexInRect(_0x40c411, _0x4b56cd)) {
-      _0x20361f.add(_0x3973d6);
+  if (!nodeSpatialStripeRect && !nodeSpatialStripeRect2) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
+  const value190 = new Set();
+  if (nodeSpatialStripeRect)
+    for (const value191 of queryNodeSpatialIndexInRect(enabled8, nodeSpatialStripeRect)) {
+      value190.add(value191);
     }
-  if (_0x3e4b59)
-    for (const _0x2e9a3d of queryNodeSpatialIndexInRect(_0x40c411, _0x3e4b59)) {
-      _0x20361f.add(_0x2e9a3d);
+  if (nodeSpatialStripeRect2)
+    for (const value192 of queryNodeSpatialIndexInRect(enabled8, nodeSpatialStripeRect2)) {
+      value190.add(value192);
     }
-  return _0x20361f.size > 0 ? Array.from(_0x20361f) : EMPTY_NODE_SPATIAL_QUERY_RESULT;
+  return value190.size > 0 ? Array.from(value190) : EMPTY_NODE_SPATIAL_QUERY_RESULT;
 }
-function collectSnapMatchNodes(_0x78b64a, _0x2edacc, _0x38bcf4, _0x300e23, _0x34729b) {
-  if (!Number.isFinite(_0x34729b)) return [];
-  if (!_0x38bcf4) return _0x2edacc;
-  const _0xa8c3e5 = getNodeSpatialStripeRect(_0x38bcf4, _0x300e23, _0x34729b, _0x34729b, SNAP_MATCH_EPSILON);
-  if (!_0xa8c3e5) return _0x2edacc;
-  return getNodeSpatialQueryNodes(_0x78b64a, queryNodeSpatialIndexInRect(_0x38bcf4, _0xa8c3e5));
+function collectSnapMatchNodes(value193, value194, enabled9, value195, value196) {
+  if (!Number.isFinite(value196)) return [];
+  if (!enabled9) return value194;
+  const nodeSpatialStripeRect3 = getNodeSpatialStripeRect(
+    enabled9,
+    value195,
+    value196,
+    value196,
+    SNAP_MATCH_EPSILON,
+  );
+  if (!nodeSpatialStripeRect3) return value194;
+  return getNodeSpatialQueryNodes(value193, queryNodeSpatialIndexInRect(enabled9, nodeSpatialStripeRect3));
 }
-function getMinRingToCenterCellBounds(_0x3122b6, _0x2e1963, _0x5c5030) {
-  if (!_0x5c5030) return 0;
-  const _0x488973 =
-      _0x3122b6 < _0x5c5030.minX
-        ? _0x5c5030.minX - _0x3122b6
-        : _0x3122b6 > _0x5c5030.maxX
-          ? _0x3122b6 - _0x5c5030.maxX
+function getMinRingToCenterCellBounds(value197, value198, enabled10) {
+  if (!enabled10) return 0;
+  const value199 =
+      value197 < enabled10.minX
+        ? enabled10.minX - value197
+        : value197 > enabled10.maxX
+          ? value197 - enabled10.maxX
           : 0,
-    _0x3e7c51 =
-      _0x2e1963 < _0x5c5030.minY
-        ? _0x5c5030.minY - _0x2e1963
-        : _0x2e1963 > _0x5c5030.maxY
-          ? _0x2e1963 - _0x5c5030.maxY
+    value200 =
+      value198 < enabled10.minY
+        ? enabled10.minY - value198
+        : value198 > enabled10.maxY
+          ? value198 - enabled10.maxY
           : 0;
-  return Math.max(_0x488973, _0x3e7c51);
+  return Math.max(value199, value200);
 }
-function doesRingCoverCenterCellBounds(_0x3b9c9b, _0x3909c6, _0x3e394b, _0x18f2d8) {
-  if (!_0x18f2d8) return true;
+function doesRingCoverCenterCellBounds(value201, value202, value203, enabled11) {
+  if (!enabled11) return true;
   return (
-    _0x3b9c9b - _0x3e394b <= _0x18f2d8.minX &&
-    _0x3b9c9b + _0x3e394b >= _0x18f2d8.maxX &&
-    _0x3909c6 - _0x3e394b <= _0x18f2d8.minY &&
-    _0x3909c6 + _0x3e394b >= _0x18f2d8.maxY
+    value201 - value203 <= enabled11.minX &&
+    value201 + value203 >= enabled11.maxX &&
+    value202 - value203 <= enabled11.minY &&
+    value202 + value203 >= enabled11.maxY
   );
 }
-function getNextRingMinCenterDistSq(_0x1753d6, _0x2b9fa4, _0x581ccf, _0x1c95d2, _0x54b97b, _0x208597) {
-  if (!_0x1753d6?.centerCellBounds) return Infinity;
-  let _0x38d92d = Infinity;
+function getNextRingMinCenterDistSq(enabled12, value204, value205, value206, value207, value208) {
+  if (!enabled12?.centerCellBounds) return Infinity;
+  let value209 = Infinity;
   return (
-    iterateNodeSpatialRing(_0x1c95d2, _0x54b97b, _0x208597, (_0x3dec13, _0xdb791a) => {
+    iterateNodeSpatialRing(value206, value207, value208, (value210, value211) => {
       if (
-        _0x3dec13 < _0x1753d6.centerCellBounds.minX ||
-        _0x3dec13 > _0x1753d6.centerCellBounds.maxX ||
-        _0xdb791a < _0x1753d6.centerCellBounds.minY ||
-        _0xdb791a > _0x1753d6.centerCellBounds.maxY
+        value210 < enabled12.centerCellBounds.minX ||
+        value210 > enabled12.centerCellBounds.maxX ||
+        value211 < enabled12.centerCellBounds.minY ||
+        value211 > enabled12.centerCellBounds.maxY
       )
         return;
-      const _0x139e1c = getPointToCellRectDistSq(
-        _0x2b9fa4,
-        _0x581ccf,
-        _0x3dec13,
-        _0xdb791a,
-        _0x1753d6.cellSize,
+      const cellRectDistSq = getPointToCellRectDistSq(
+        value204,
+        value205,
+        value210,
+        value211,
+        enabled12.cellSize,
       );
-      if (_0x139e1c < _0x38d92d) _0x38d92d = _0x139e1c;
+      if (cellRectDistSq < value209) value209 = cellRectDistSq;
     }),
-    _0x38d92d
+    value209
   );
 }
-function findNearestNodeRectInSpatialIndex(_0x3e747a, _0x1bf74c, _0x31d555, _0xb4bea6, _0x34c156 = {}) {
+function findNearestNodeRectInSpatialIndex(enabled13, value212, value213, value214, value215 = {}) {
   if (
-    !_0x3e747a ||
-    !(_0x3e747a.centerCells instanceof Map) ||
-    !(_0x3e747a.nodeRects instanceof Map) ||
-    !_0x3e747a.centerCellBounds
+    !enabled13 ||
+    !(enabled13.centerCells instanceof Map) ||
+    !(enabled13.nodeRects instanceof Map) ||
+    !enabled13.centerCellBounds
   )
     return null;
-  const _0x3740e8 = getNodeSpatialCellCoord(_0x31d555, _0x3e747a.cellSize),
-    _0x5b42e9 = getNodeSpatialCellCoord(_0xb4bea6, _0x3e747a.cellSize),
-    _0x2fc899 = getMinRingToCenterCellBounds(_0x3740e8, _0x5b42e9, _0x3e747a.centerCellBounds),
-    _0x4d6f2e = _0x34c156.ignoreGroup === true,
-    _0x3d5d20 = typeof _0x34c156.candidateFilter === 'function' ? _0x34c156.candidateFilter : null;
-  let _0x2a7e86 = null,
-    _0x8dcc48 = null,
-    _0x2f170e = Infinity,
-    _0x233680 = Infinity;
-  for (let _0xa300c2 = _0x2fc899; ; _0xa300c2 += 1) {
-    iterateNodeSpatialRing(_0x3740e8, _0x5b42e9, _0xa300c2, (_0xf9dc54, _0x4e6597) => {
-      const _0x9108b1 = _0x3e747a.centerCells.get(getNodeSpatialCellKey(_0xf9dc54, _0x4e6597));
-      if (!_0x9108b1 || _0x9108b1.length === 0) return;
-      for (const _0x4ff459 of _0x9108b1) {
-        const _0x1809da = _0x1bf74c?.[_0x4ff459];
-        if (!_0x1809da) continue;
-        if (_0x4d6f2e && _0x1809da?.type === 'group') continue;
-        if (_0x3d5d20 && _0x3d5d20(_0x1809da, _0x4ff459) === false) continue;
-        const _0xa4ada7 = _0x3e747a.nodeRects.get(_0x4ff459);
-        if (!_0xa4ada7) continue;
-        const _0x3fe735 = _0x31d555 - _0xa4ada7.cx,
-          _0x2cd8aa = _0xb4bea6 - _0xa4ada7.cy,
-          _0x17ee98 = _0x3fe735 * _0x3fe735 + _0x2cd8aa * _0x2cd8aa;
-        (_0x17ee98 < _0x2f170e || (_0x17ee98 === _0x2f170e && _0xa4ada7.order < _0x233680)) &&
-          ((_0x2a7e86 = _0x4ff459),
-          (_0x8dcc48 = _0xa4ada7),
-          (_0x2f170e = _0x17ee98),
-          (_0x233680 = _0xa4ada7.order));
+  const nodeSpatialCellCoord = getNodeSpatialCellCoord(value213, enabled13.cellSize),
+    nodeSpatialCellCoord2 = getNodeSpatialCellCoord(value214, enabled13.cellSize),
+    centerCellBounds = getMinRingToCenterCellBounds(
+      nodeSpatialCellCoord,
+      nodeSpatialCellCoord2,
+      enabled13.centerCellBounds,
+    ),
+    value216 = value215.ignoreGroup === true,
+    handler3 = typeof value215.candidateFilter === 'function' ? value215.candidateFilter : null;
+  let nodeId = null,
+    rect = null,
+    value217 = Infinity,
+    value218 = Infinity;
+  for (let value219 = centerCellBounds; ; value219 += 1) {
+    iterateNodeSpatialRing(nodeSpatialCellCoord, nodeSpatialCellCoord2, value219, (value220, value221) => {
+      const list25 = enabled13.centerCells.get(getNodeSpatialCellKey(value220, value221));
+      if (!list25 || list25.length === 0) return;
+      for (const value222 of list25) {
+        const enabled14 = value212?.[value222];
+        if (!enabled14) continue;
+        if (value216 && enabled14?.type === 'group') continue;
+        if (handler3 && handler3(enabled14, value222) === false) continue;
+        const enabled15 = enabled13.nodeRects.get(value222);
+        if (!enabled15) continue;
+        const value223 = value213 - enabled15.cx,
+          value224 = value214 - enabled15.cy,
+          value225 = value223 * value223 + value224 * value224;
+        (value225 < value217 || (value225 === value217 && enabled15.order < value218)) &&
+          ((nodeId = value222), (rect = enabled15), (value217 = value225), (value218 = enabled15.order));
       }
     });
-    if (doesRingCoverCenterCellBounds(_0x3740e8, _0x5b42e9, _0xa300c2, _0x3e747a.centerCellBounds)) break;
-    if (_0x8dcc48) {
-      const _0x35e871 = getNextRingMinCenterDistSq(
-        _0x3e747a,
-        _0x31d555,
-        _0xb4bea6,
-        _0x3740e8,
-        _0x5b42e9,
-        _0xa300c2 + 1,
+    if (
+      doesRingCoverCenterCellBounds(
+        nodeSpatialCellCoord,
+        nodeSpatialCellCoord2,
+        value219,
+        enabled13.centerCellBounds,
+      )
+    )
+      break;
+    if (rect) {
+      const nextRingMinCenterDistSq = getNextRingMinCenterDistSq(
+        enabled13,
+        value213,
+        value214,
+        nodeSpatialCellCoord,
+        nodeSpatialCellCoord2,
+        value219 + 1,
       );
-      if (_0x2f170e <= _0x35e871) break;
+      if (value217 <= nextRingMinCenterDistSq) break;
     }
   }
-  return _0x2a7e86 && _0x8dcc48 ? { nodeId: _0x2a7e86, rect: _0x8dcc48 } : null;
+  return nodeId && rect ? { nodeId: nodeId, rect: rect } : null;
 }
-export function createNodeSpatialIndex(_0x8f51e5, _0xcdc6d3 = {}) {
-  const _0x323004 = Number(_0xcdc6d3?.cellSize),
-    _0x198b14 =
-      Number.isFinite(_0x323004) && _0x323004 > 0 ? _0x323004 : DEFAULT_NODE_SPATIAL_INDEX_CELL_SIZE,
-    _0x9d69bb =
-      typeof _0xcdc6d3?.resolveRect === 'function' ? _0xcdc6d3.resolveRect : defaultNodeQueryRectResolver,
-    _0x14f01b = new Map(),
-    _0x31fd3b = new Map(),
-    _0x179e6d = new Map();
-  let _0x5aae6b = Infinity,
-    _0x3db034 = -Infinity,
-    _0x416880 = Infinity,
-    _0x3cf253 = -Infinity,
-    _0x399fc5 = Infinity,
-    _0x53e5ac = -Infinity,
-    _0x4c618a = Infinity,
-    _0x2bb71e = -Infinity,
-    _0xd413fc = 0;
-  for (const [_0x395ba0, _0x53d56d] of Object.entries(_0x8f51e5 || {})) {
-    const _0x5ce62 = String(_0x53d56d?.id || _0x395ba0 || '').trim();
-    if (!_0x5ce62) continue;
-    const _0x10890c = finalizeNodeQueryRect(_0x9d69bb(_0x53d56d, _0x5ce62), { order: _0xd413fc });
-    if (!_0x10890c) continue;
-    const _0x1b0e27 = { nodeId: _0x5ce62, ..._0x10890c };
-    (_0x179e6d.set(_0x5ce62, _0x1b0e27), (_0xd413fc += 1));
-    const _0xdb6cb9 = getNodeSpatialCellCoord(_0x1b0e27.x, _0x198b14),
-      _0x1b23a6 = getNodeSpatialCellCoord(_0x1b0e27.right, _0x198b14),
-      _0x2e7f57 = getNodeSpatialCellCoord(_0x1b0e27.y, _0x198b14),
-      _0x513398 = getNodeSpatialCellCoord(_0x1b0e27.bottom, _0x198b14);
-    if (_0xdb6cb9 < _0x5aae6b) _0x5aae6b = _0xdb6cb9;
-    if (_0x1b23a6 > _0x3db034) _0x3db034 = _0x1b23a6;
-    if (_0x2e7f57 < _0x416880) _0x416880 = _0x2e7f57;
-    if (_0x513398 > _0x3cf253) _0x3cf253 = _0x513398;
-    for (let _0x24f3cb = _0xdb6cb9; _0x24f3cb <= _0x1b23a6; _0x24f3cb += 1) {
-      for (let _0x21970d = _0x2e7f57; _0x21970d <= _0x513398; _0x21970d += 1) {
-        pushNodeIdToSpatialCell(_0x14f01b, _0x24f3cb, _0x21970d, _0x5ce62);
+export function createNodeSpatialIndex(value226, value227 = {}) {
+  const count8 = Number(value227?.cellSize),
+    cellSize = Number.isFinite(count8) && count8 > 0 ? count8 : DEFAULT_NODE_SPATIAL_INDEX_CELL_SIZE,
+    handler4 =
+      typeof value227?.resolveRect === 'function' ? value227.resolveRect : defaultNodeQueryRectResolver,
+    boundsCells = new Map(),
+    centerCells = new Map(),
+    nodeRects = new Map();
+  let minX6 = Infinity,
+    maxX5 = -Infinity,
+    minY6 = Infinity,
+    maxY5 = -Infinity,
+    minX7 = Infinity,
+    maxX6 = -Infinity,
+    minY7 = Infinity,
+    maxY6 = -Infinity,
+    order = 0;
+  for (const [value228, value229] of Object.entries(value226 || {})) {
+    const nodeId2 = String(value229?.id || value228 || '').trim();
+    if (!nodeId2) continue;
+    const args2 = finalizeNodeQueryRect(handler4(value229, nodeId2), { order: order });
+    if (!args2) continue;
+    const box44 = { nodeId: nodeId2, ...args2 };
+    (nodeRects.set(nodeId2, box44), (order += 1));
+    const nodeSpatialCellCoord3 = getNodeSpatialCellCoord(box44.x, cellSize),
+      nodeSpatialCellCoord4 = getNodeSpatialCellCoord(box44.right, cellSize),
+      nodeSpatialCellCoord5 = getNodeSpatialCellCoord(box44.y, cellSize),
+      nodeSpatialCellCoord6 = getNodeSpatialCellCoord(box44.bottom, cellSize);
+    if (nodeSpatialCellCoord3 < minX6) minX6 = nodeSpatialCellCoord3;
+    if (nodeSpatialCellCoord4 > maxX5) maxX5 = nodeSpatialCellCoord4;
+    if (nodeSpatialCellCoord5 < minY6) minY6 = nodeSpatialCellCoord5;
+    if (nodeSpatialCellCoord6 > maxY5) maxY5 = nodeSpatialCellCoord6;
+    for (let value230 = nodeSpatialCellCoord3; value230 <= nodeSpatialCellCoord4; value230 += 1) {
+      for (let value231 = nodeSpatialCellCoord5; value231 <= nodeSpatialCellCoord6; value231 += 1) {
+        pushNodeIdToSpatialCell(boundsCells, value230, value231, nodeId2);
       }
     }
-    const _0x7ccead = getNodeSpatialCellCoord(_0x1b0e27.cx, _0x198b14),
-      _0xd4760a = getNodeSpatialCellCoord(_0x1b0e27.cy, _0x198b14);
-    pushNodeIdToSpatialCell(_0x31fd3b, _0x7ccead, _0xd4760a, _0x5ce62);
-    if (_0x7ccead < _0x399fc5) _0x399fc5 = _0x7ccead;
-    if (_0x7ccead > _0x53e5ac) _0x53e5ac = _0x7ccead;
-    if (_0xd4760a < _0x4c618a) _0x4c618a = _0xd4760a;
-    if (_0xd4760a > _0x2bb71e) _0x2bb71e = _0xd4760a;
+    const nodeSpatialCellCoord7 = getNodeSpatialCellCoord(box44.cx, cellSize),
+      nodeSpatialCellCoord8 = getNodeSpatialCellCoord(box44.cy, cellSize);
+    pushNodeIdToSpatialCell(centerCells, nodeSpatialCellCoord7, nodeSpatialCellCoord8, nodeId2);
+    if (nodeSpatialCellCoord7 < minX7) minX7 = nodeSpatialCellCoord7;
+    if (nodeSpatialCellCoord7 > maxX6) maxX6 = nodeSpatialCellCoord7;
+    if (nodeSpatialCellCoord8 < minY7) minY7 = nodeSpatialCellCoord8;
+    if (nodeSpatialCellCoord8 > maxY6) maxY6 = nodeSpatialCellCoord8;
   }
-  const _0x15d825 =
-      _0x399fc5 === Infinity ? null : { minX: _0x399fc5, maxX: _0x53e5ac, minY: _0x4c618a, maxY: _0x2bb71e },
-    _0x57fbbf =
-      _0x5aae6b === Infinity ? null : { minX: _0x5aae6b, maxX: _0x3db034, minY: _0x416880, maxY: _0x3cf253 };
+  const centerCellBounds2 =
+      minX7 === Infinity ? null : { minX: minX7, maxX: maxX6, minY: minY7, maxY: maxY6 },
+    boundsCellBounds = minX6 === Infinity ? null : { minX: minX6, maxX: maxX5, minY: minY6, maxY: maxY5 };
   return {
-    cellSize: _0x198b14,
-    boundsCells: _0x14f01b,
-    centerCells: _0x31fd3b,
-    nodeRects: _0x179e6d,
-    boundsCellBounds: _0x57fbbf,
-    centerCellBounds: _0x15d825,
-    nodeCount: _0x179e6d.size,
+    cellSize: cellSize,
+    boundsCells: boundsCells,
+    centerCells: centerCells,
+    nodeRects: nodeRects,
+    boundsCellBounds: boundsCellBounds,
+    centerCellBounds: centerCellBounds2,
+    nodeCount: nodeRects.size,
   };
 }
-export function queryNodeSpatialIndexAtWorldPoint(_0x285836, _0x2d7567, _0x42dba7) {
+export function queryNodeSpatialIndexAtWorldPoint(enabled16, value232, value233) {
   if (
-    !_0x285836 ||
-    !(_0x285836.boundsCells instanceof Map) ||
-    !Number.isFinite(_0x2d7567) ||
-    !Number.isFinite(_0x42dba7) ||
-    !Number.isFinite(_0x285836.cellSize) ||
-    _0x285836.cellSize <= 0
+    !enabled16 ||
+    !(enabled16.boundsCells instanceof Map) ||
+    !Number.isFinite(value232) ||
+    !Number.isFinite(value233) ||
+    !Number.isFinite(enabled16.cellSize) ||
+    enabled16.cellSize <= 0
   )
     return EMPTY_NODE_SPATIAL_QUERY_RESULT;
-  const _0x4f6bf7 = getNodeSpatialCellCoord(_0x2d7567, _0x285836.cellSize),
-    _0x55ddfb = getNodeSpatialCellCoord(_0x42dba7, _0x285836.cellSize);
+  const nodeSpatialCellCoord9 = getNodeSpatialCellCoord(value232, enabled16.cellSize),
+    nodeSpatialCellCoord10 = getNodeSpatialCellCoord(value233, enabled16.cellSize);
   return (
-    _0x285836.boundsCells.get(getNodeSpatialCellKey(_0x4f6bf7, _0x55ddfb)) || EMPTY_NODE_SPATIAL_QUERY_RESULT
+    enabled16.boundsCells.get(getNodeSpatialCellKey(nodeSpatialCellCoord9, nodeSpatialCellCoord10)) ||
+    EMPTY_NODE_SPATIAL_QUERY_RESULT
   );
 }
-export function queryNodeSpatialIndexInRect(_0x56a03d, _0x20a16d) {
-  const _0x82a88 = normalizeNodeQueryRect(_0x20a16d);
+export function queryNodeSpatialIndexInRect(enabled17, value234) {
+  const box45 = normalizeNodeQueryRect(value234);
   if (
-    !_0x82a88 ||
-    !_0x56a03d ||
-    !(_0x56a03d.boundsCells instanceof Map) ||
-    !(_0x56a03d.nodeRects instanceof Map) ||
-    !Number.isFinite(_0x56a03d.cellSize) ||
-    _0x56a03d.cellSize <= 0
+    !box45 ||
+    !enabled17 ||
+    !(enabled17.boundsCells instanceof Map) ||
+    !(enabled17.nodeRects instanceof Map) ||
+    !Number.isFinite(enabled17.cellSize) ||
+    enabled17.cellSize <= 0
   )
     return EMPTY_NODE_SPATIAL_QUERY_RESULT;
-  const _0x33f1f3 = getNodeSpatialCellCoord(_0x82a88.x, _0x56a03d.cellSize),
-    _0x3f9dc6 = getNodeSpatialCellCoord(_0x82a88.x + _0x82a88.width, _0x56a03d.cellSize),
-    _0x535d05 = getNodeSpatialCellCoord(_0x82a88.y, _0x56a03d.cellSize),
-    _0x3d4133 = getNodeSpatialCellCoord(_0x82a88.y + _0x82a88.height, _0x56a03d.cellSize),
-    _0x56ea87 = new Set();
-  for (let _0x2b7ccb = _0x33f1f3; _0x2b7ccb <= _0x3f9dc6; _0x2b7ccb += 1) {
-    for (let _0x3984e1 = _0x535d05; _0x3984e1 <= _0x3d4133; _0x3984e1 += 1) {
-      const _0x177c8d = _0x56a03d.boundsCells.get(getNodeSpatialCellKey(_0x2b7ccb, _0x3984e1));
-      if (!_0x177c8d || _0x177c8d.length === 0) continue;
-      for (const _0x3df105 of _0x177c8d) _0x56ea87.add(_0x3df105);
+  const nodeSpatialCellCoord11 = getNodeSpatialCellCoord(box45.x, enabled17.cellSize),
+    nodeSpatialCellCoord12 = getNodeSpatialCellCoord(box45.x + box45.width, enabled17.cellSize),
+    nodeSpatialCellCoord13 = getNodeSpatialCellCoord(box45.y, enabled17.cellSize),
+    nodeSpatialCellCoord14 = getNodeSpatialCellCoord(box45.y + box45.height, enabled17.cellSize),
+    value235 = new Set();
+  for (let value236 = nodeSpatialCellCoord11; value236 <= nodeSpatialCellCoord12; value236 += 1) {
+    for (let value237 = nodeSpatialCellCoord13; value237 <= nodeSpatialCellCoord14; value237 += 1) {
+      const list26 = enabled17.boundsCells.get(getNodeSpatialCellKey(value236, value237));
+      if (!list26 || list26.length === 0) continue;
+      for (const value238 of list26) value235.add(value238);
     }
   }
-  if (_0x56ea87.size === 0) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
-  return Array.from(_0x56ea87).sort((_0x5b8e25, _0x3b1119) => {
-    const _0x5ecefd = _0x56a03d.nodeRects.get(_0x5b8e25)?.order ?? Infinity,
-      _0x1eeae8 = _0x56a03d.nodeRects.get(_0x3b1119)?.order ?? Infinity;
-    return _0x5ecefd - _0x1eeae8;
+  if (value235.size === 0) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
+  return Array.from(value235).sort((item6, value239) => {
+    const value240 = enabled17.nodeRects.get(item6)?.order ?? Infinity,
+      value241 = enabled17.nodeRects.get(value239)?.order ?? Infinity;
+    return value240 - value241;
   });
 }
-export function getNodeScreenRect(_0x30933e, _0xbc1029) {
-  const { x: _0x4dacc0, y: _0x512adf, zoom: _0x143f3c } = _0xbc1029,
-    _0x4a3a16 = _0x30933e.x * _0x143f3c + _0x4dacc0,
-    _0x5ab118 = _0x30933e.y * _0x143f3c + _0x512adf,
-    _0xf5e466 = (_0x30933e.width || 0) * _0x143f3c,
-    _0x2ed86e = (_0x30933e.height || 0) * _0x143f3c;
+export function getNodeScreenRect(box46, value242) {
+  const { x: x20, y: y15, zoom: zoom4 } = value242,
+    left2 = box46.x * zoom4 + x20,
+    top2 = box46.y * zoom4 + y15,
+    width7 = (box46.width || 0) * zoom4,
+    height7 = (box46.height || 0) * zoom4;
   return {
-    left: _0x4a3a16,
-    top: _0x5ab118,
-    right: _0x4a3a16 + _0xf5e466,
-    bottom: _0x5ab118 + _0x2ed86e,
-    cx: _0x4a3a16 + _0xf5e466 / 2,
-    cy: _0x5ab118 + _0x2ed86e / 2,
-    width: _0xf5e466,
-    height: _0x2ed86e,
+    left: left2,
+    top: top2,
+    right: left2 + width7,
+    bottom: top2 + height7,
+    cx: left2 + width7 / 2,
+    cy: top2 + height7 / 2,
+    width: width7,
+    height: height7,
   };
 }
 export function findClosestNode(
-  _0x59dcbb,
-  _0x17767c,
-  _0x465ff8,
-  _0x26ade0,
-  _0x2e6f68 = false,
-  _0x5b6c5f = undefined,
+  value243,
+  value244,
+  value245,
+  value246,
+  value247 = false,
+  value248 = undefined,
 ) {
-  const { x: _0x443a9e, y: _0x2d4c17 } = screenToWorld(_0x59dcbb, _0x17767c, _0x26ade0),
-    _0x5f49ee = normalizeNodeQueryOptions(_0x2e6f68, _0x5b6c5f),
-    _0x587a45 = _0x5f49ee.spatialIndex
-      ? queryNodeSpatialIndexAtWorldPoint(_0x5f49ee.spatialIndex, _0x443a9e, _0x2d4c17)
+  const { x: x21, y: y16 } = screenToWorld(value243, value244, value246),
+    nodeQueryOptions = normalizeNodeQueryOptions(value247, value248),
+    value249 = nodeQueryOptions.spatialIndex
+      ? queryNodeSpatialIndexAtWorldPoint(nodeQueryOptions.spatialIndex, x21, y16)
       : null;
-  if (_0x587a45) {
-    for (const _0xe94302 of _0x587a45) {
-      const _0x28d3e7 = _0x465ff8?.[_0xe94302];
-      if (!_0x28d3e7) continue;
-      if (_0x5f49ee.ignoreGroup && _0x28d3e7?.type === 'group') continue;
-      if (_0x5f49ee.candidateFilter && _0x5f49ee.candidateFilter(_0x28d3e7, _0xe94302) === false) continue;
-      const _0x1e75a2 = resolveNodeQueryRect(
-        _0x28d3e7,
-        _0xe94302,
-        _0x5f49ee.resolveRect,
-        _0x5f49ee.spatialIndex,
-      );
-      if (!_0x1e75a2) continue;
-      if (!isPointInRect(_0x443a9e, _0x2d4c17, _0x1e75a2.x, _0x1e75a2.y, _0x1e75a2.width, _0x1e75a2.height))
+  if (value249) {
+    for (const nodeId3 of value249) {
+      const enabled18 = value245?.[nodeId3];
+      if (!enabled18) continue;
+      if (nodeQueryOptions.ignoreGroup && enabled18?.type === 'group') continue;
+      if (nodeQueryOptions.candidateFilter && nodeQueryOptions.candidateFilter(enabled18, nodeId3) === false)
         continue;
-      return { nodeId: _0xe94302, screenRect: getNodeScreenRect(_0x1e75a2, _0x26ade0), isInside: true };
+      const box47 = resolveNodeQueryRect(
+        enabled18,
+        nodeId3,
+        nodeQueryOptions.resolveRect,
+        nodeQueryOptions.spatialIndex,
+      );
+      if (!box47) continue;
+      if (!isPointInRect(x21, y16, box47.x, box47.y, box47.width, box47.height)) continue;
+      return { nodeId: nodeId3, screenRect: getNodeScreenRect(box47, value246), isInside: true };
     }
-    const _0x14f213 = findNearestNodeRectInSpatialIndex(
-      _0x5f49ee.spatialIndex,
-      _0x465ff8,
-      _0x443a9e,
-      _0x2d4c17,
-      _0x5f49ee,
+    const nodeId4 = findNearestNodeRectInSpatialIndex(
+      nodeQueryOptions.spatialIndex,
+      value245,
+      x21,
+      y16,
+      nodeQueryOptions,
     );
-    return _0x14f213
+    return nodeId4
       ? {
-          nodeId: _0x14f213.nodeId,
-          screenRect: getNodeScreenRect(_0x14f213.rect, _0x26ade0),
+          nodeId: nodeId4.nodeId,
+          screenRect: getNodeScreenRect(nodeId4.rect, value246),
           isInside: false,
         }
       : null;
   }
-  let _0x4f5a4d = null,
-    _0x45ca17 = null,
-    _0x5ee9c1 = Infinity;
-  for (const [_0x15acfb, _0x580358] of Object.entries(_0x465ff8 || {})) {
-    const _0x5e0236 = String(_0x580358?.id || _0x15acfb || '').trim();
-    if (!_0x5e0236) continue;
-    if (_0x5f49ee.ignoreGroup && _0x580358?.type === 'group') continue;
-    if (_0x5f49ee.candidateFilter && _0x5f49ee.candidateFilter(_0x580358, _0x5e0236) === false) continue;
-    const _0x59fae0 = resolveNodeQueryRect(
-      _0x580358,
-      _0x5e0236,
-      _0x5f49ee.resolveRect,
-      _0x5f49ee.spatialIndex,
+  let nodeId5 = null,
+    value250 = null,
+    value251 = Infinity;
+  for (const [value252, value253] of Object.entries(value245 || {})) {
+    const nodeId6 = String(value253?.id || value252 || '').trim();
+    if (!nodeId6) continue;
+    if (nodeQueryOptions.ignoreGroup && value253?.type === 'group') continue;
+    if (nodeQueryOptions.candidateFilter && nodeQueryOptions.candidateFilter(value253, nodeId6) === false)
+      continue;
+    const box48 = resolveNodeQueryRect(
+      value253,
+      nodeId6,
+      nodeQueryOptions.resolveRect,
+      nodeQueryOptions.spatialIndex,
     );
-    if (!_0x59fae0) continue;
-    const _0x584d57 = isPointInRect(
-      _0x443a9e,
-      _0x2d4c17,
-      _0x59fae0.x,
-      _0x59fae0.y,
-      _0x59fae0.width,
-      _0x59fae0.height,
-    );
-    if (_0x584d57)
-      return { nodeId: _0x5e0236, screenRect: getNodeScreenRect(_0x59fae0, _0x26ade0), isInside: true };
-    const _0x57ec8d = _0x443a9e - _0x59fae0.cx,
-      _0x383eae = _0x2d4c17 - _0x59fae0.cy,
-      _0x1c7575 = _0x57ec8d * _0x57ec8d + _0x383eae * _0x383eae;
-    _0x1c7575 < _0x5ee9c1 && ((_0x5ee9c1 = _0x1c7575), (_0x4f5a4d = _0x5e0236), (_0x45ca17 = _0x59fae0));
+    if (!box48) continue;
+    const isPointInRect2 = isPointInRect(x21, y16, box48.x, box48.y, box48.width, box48.height);
+    if (isPointInRect2)
+      return { nodeId: nodeId6, screenRect: getNodeScreenRect(box48, value246), isInside: true };
+    const value254 = x21 - box48.cx,
+      value255 = y16 - box48.cy,
+      value256 = value254 * value254 + value255 * value255;
+    value256 < value251 && ((value251 = value256), (nodeId5 = nodeId6), (value250 = box48));
   }
-  return _0x4f5a4d
-    ? { nodeId: _0x4f5a4d, screenRect: getNodeScreenRect(_0x45ca17, _0x26ade0), isInside: false }
+  return nodeId5
+    ? { nodeId: nodeId5, screenRect: getNodeScreenRect(value250, value246), isInside: false }
     : null;
 }
 export function hitTestNode(
-  _0x50ab62,
-  _0x456731,
-  _0x1abadc,
-  _0x52b6a9,
-  _0x100b15,
-  _0x126373 = false,
-  _0x3c5dc3 = undefined,
+  value257,
+  value258,
+  value259,
+  value260,
+  value261,
+  value262 = false,
+  value263 = undefined,
 ) {
-  const { x: _0x7b165, y: _0x146c61 } = screenToWorld(_0x50ab62, _0x456731, _0x52b6a9),
-    _0x1f8d5b = normalizeNodeQueryOptions(_0x126373, _0x3c5dc3),
-    _0x42e5c0 = new Set(),
-    _0x4fd573 = String(_0x100b15 || '').trim();
-  if (_0x4fd573) _0x42e5c0.add(_0x4fd573);
+  const { x: x22, y: y17 } = screenToWorld(value257, value258, value260),
+    nodeQueryOptions2 = normalizeNodeQueryOptions(value262, value263),
+    map3 = new Set(),
+    value264 = String(value261 || '').trim();
+  if (value264) map3.add(value264);
   if (
-    _0x1f8d5b.excludeIds &&
-    typeof _0x1f8d5b.excludeIds !== 'string' &&
-    typeof _0x1f8d5b.excludeIds[Symbol.iterator] === 'function'
+    nodeQueryOptions2.excludeIds &&
+    typeof nodeQueryOptions2.excludeIds !== 'string' &&
+    typeof nodeQueryOptions2.excludeIds[Symbol.iterator] === 'function'
   )
-    for (const _0x584329 of _0x1f8d5b.excludeIds) {
-      const _0xa7ea34 = String(_0x584329 || '').trim();
-      if (_0xa7ea34) _0x42e5c0.add(_0xa7ea34);
+    for (const value265 of nodeQueryOptions2.excludeIds) {
+      const value266 = String(value265 || '').trim();
+      if (value266) map3.add(value266);
     }
-  let _0x51b4f2 = null,
-    _0x180de7 = null;
-  const _0x271e7f = _0x1f8d5b.spatialIndex
-      ? queryNodeSpatialIndexAtWorldPoint(_0x1f8d5b.spatialIndex, _0x7b165, _0x146c61)
+  let value267 = null,
+    value268 = null;
+  const value269 = nodeQueryOptions2.spatialIndex
+      ? queryNodeSpatialIndexAtWorldPoint(nodeQueryOptions2.spatialIndex, x22, y17)
       : null,
-    _0x1db86d = (_0x28e2c1, _0x10e089) => {
-      if (_0x42e5c0.has(_0x28e2c1)) return;
-      if (_0x1f8d5b.ignoreGroup && _0x10e089?.type === 'group') return;
-      if (_0x1f8d5b.candidateFilter && _0x1f8d5b.candidateFilter(_0x10e089, _0x28e2c1) === false) return;
-      const _0x5e17cb = resolveNodeQueryRect(
-        _0x10e089,
-        _0x28e2c1,
-        _0x1f8d5b.resolveRect,
-        _0x1f8d5b.spatialIndex,
-      );
-      if (!_0x5e17cb) return;
-      if (!isPointInRect(_0x7b165, _0x146c61, _0x5e17cb.x, _0x5e17cb.y, _0x5e17cb.width, _0x5e17cb.height))
+    handler5 = (value270, value271) => {
+      if (map3.has(value270)) return;
+      if (nodeQueryOptions2.ignoreGroup && value271?.type === 'group') return;
+      if (
+        nodeQueryOptions2.candidateFilter &&
+        nodeQueryOptions2.candidateFilter(value271, value270) === false
+      )
         return;
-      _0x10e089?.type === 'group' ? (_0x51b4f2 = _0x28e2c1) : (_0x180de7 = _0x28e2c1);
+      const box49 = resolveNodeQueryRect(
+        value271,
+        value270,
+        nodeQueryOptions2.resolveRect,
+        nodeQueryOptions2.spatialIndex,
+      );
+      if (!box49) return;
+      if (!isPointInRect(x22, y17, box49.x, box49.y, box49.width, box49.height)) return;
+      value271?.type === 'group' ? (value267 = value270) : (value268 = value270);
     };
-  if (_0x271e7f) {
-    for (const _0x17b3aa of _0x271e7f) {
-      const _0x175fd8 = _0x1abadc?.[_0x17b3aa];
-      if (!_0x175fd8) continue;
-      _0x1db86d(_0x17b3aa, _0x175fd8);
+  if (value269) {
+    for (const value272 of value269) {
+      const enabled19 = value259?.[value272];
+      if (!enabled19) continue;
+      handler5(value272, enabled19);
     }
-    return _0x180de7 || _0x51b4f2 || null;
+    return value268 || value267 || null;
   }
-  for (const [_0x37ab8b, _0x4fe0f9] of Object.entries(_0x1abadc || {})) {
-    const _0x2e85fc = String(_0x4fe0f9?.id || _0x37ab8b || '').trim();
-    if (!_0x2e85fc) continue;
-    _0x1db86d(_0x2e85fc, _0x4fe0f9);
+  for (const [value273, value274] of Object.entries(value259 || {})) {
+    const enabled20 = String(value274?.id || value273 || '').trim();
+    if (!enabled20) continue;
+    handler5(enabled20, value274);
   }
-  return _0x180de7 || _0x51b4f2 || null;
+  return value268 || value267 || null;
 }
 export function checkLineIntersection(
-  _0x313b86,
-  _0x2dce3e,
-  _0x5f2ef1,
-  _0x2dd876,
-  _0x247567,
-  _0x3c9043,
-  _0x489ef0,
-  _0x311adb,
+  value275,
+  value276,
+  value277,
+  value278,
+  value279,
+  value280,
+  value281,
+  value282,
 ) {
-  let _0x2e2d11 = _0x5f2ef1 - _0x313b86,
-    _0x40c784 = _0x2dd876 - _0x2dce3e,
-    _0x16e71f = _0x489ef0 - _0x247567,
-    _0x54c01f = _0x311adb - _0x3c9043,
-    _0x575c6a = -_0x16e71f * _0x40c784 + _0x2e2d11 * _0x54c01f;
-  if (_0x575c6a === 0) return false;
-  let _0x50bf4f = (-_0x40c784 * (_0x313b86 - _0x247567) + _0x2e2d11 * (_0x2dce3e - _0x3c9043)) / _0x575c6a,
-    _0x63d44a = (_0x16e71f * (_0x2dce3e - _0x3c9043) - _0x54c01f * (_0x313b86 - _0x247567)) / _0x575c6a;
-  return _0x50bf4f >= 0 && _0x50bf4f <= 1 && _0x63d44a >= 0 && _0x63d44a <= 1;
+  let value283 = value277 - value275,
+    value284 = value278 - value276,
+    value285 = value281 - value279,
+    value286 = value282 - value280,
+    count9 = -value285 * value284 + value283 * value286;
+  if (count9 === 0) return false;
+  let count10 = (-value284 * (value275 - value279) + value283 * (value276 - value280)) / count9,
+    count11 = (value285 * (value276 - value280) - value286 * (value275 - value279)) / count9;
+  return count10 >= 0 && count10 <= 1 && count11 >= 0 && count11 <= 1;
 }
 export function checkBBoxIntersection(
-  _0x2f8cd9,
-  _0xb760bd,
-  _0x2bb0de,
-  _0x4805cd,
-  _0x2275fb,
-  _0x18e1ff,
-  _0x2394dc,
-  _0x4f3022,
+  value287,
+  value288,
+  value289,
+  value290,
+  value291,
+  value292,
+  value293,
+  value294,
 ) {
-  const _0x37e9b1 = Math.min(_0x2f8cd9, _0x2bb0de),
-    _0x223e6d = Math.max(_0x2f8cd9, _0x2bb0de),
-    _0x16faaf = Math.min(_0xb760bd, _0x4805cd),
-    _0x2a6133 = Math.max(_0xb760bd, _0x4805cd),
-    _0x1960bc = Math.min(_0x2275fb, _0x2394dc),
-    _0xe33baa = Math.max(_0x2275fb, _0x2394dc),
-    _0x1854f7 = Math.min(_0x18e1ff, _0x4f3022),
-    _0x2fac5f = Math.max(_0x18e1ff, _0x4f3022);
-  return !(_0x223e6d < _0x1960bc || _0xe33baa < _0x37e9b1 || _0x2a6133 < _0x1854f7 || _0x2fac5f < _0x16faaf);
+  const value295 = Math.min(value287, value289),
+    value296 = Math.max(value287, value289),
+    value297 = Math.min(value288, value290),
+    value298 = Math.max(value288, value290),
+    value299 = Math.min(value291, value293),
+    value300 = Math.max(value291, value293),
+    value301 = Math.min(value292, value294),
+    value302 = Math.max(value292, value294);
+  return !(value296 < value299 || value300 < value295 || value298 < value301 || value302 < value297);
 }
 export * from './panoramaSceneMath.js';
 export { resolveNormalizedMediaCrop, normalizedMediaDragRect } from './mediaSelectionMath.js';
@@ -1421,22 +1391,421 @@ export {
 } from './rotationMath.js';
 export { projectPointToViewportEdge, spreadViewportBoundaryPoint } from './viewportBoundaryMath.js';
 
-export function getViewportScreenBounds(_0x2b3c6e={},_0xc59435=0x0,_0x32e08e=0x0){const _0x5e064b=getViewportScreenOrigin(_0x2b3c6e),_0x457158=Number["isFinite"](Number(_0xc59435))?Number(_0xc59435):0x0,_0x42a93b=Number['isFinite'](Number(_0x32e08e))?Number(_0x32e08e):0x0,_0x22cc0c=Math["max"](0x0,_0x457158-_0x5e064b['x']),_0x1b15ba=Math['max'](0x0,_0x42a93b-_0x5e064b['y']);return{'left':_0x5e064b['x'],'top':_0x5e064b['y'],'right':_0x5e064b['x']+_0x22cc0c,'bottom':_0x5e064b['y']+_0x1b15ba,'width':_0x22cc0c,'height':_0x1b15ba,'centerX':_0x5e064b['x']+_0x22cc0c/0x2,'centerY':_0x5e064b['y']+_0x1b15ba/0x2};}
+export function getViewportScreenBounds(options2 = {}, value303 = 0x0, value304 = 0x0) {
+  const box50 = getViewportScreenOrigin(options2),
+    value305 = Number['isFinite'](Number(value303)) ? Number(value303) : 0x0,
+    value306 = Number['isFinite'](Number(value304)) ? Number(value304) : 0x0,
+    value307 = Math['max'](0x0, value305 - box50['x']),
+    value308 = Math['max'](0x0, value306 - box50['y']);
+  return {
+    left: box50['x'],
+    top: box50['y'],
+    right: box50['x'] + value307,
+    bottom: box50['y'] + value308,
+    width: value307,
+    height: value308,
+    centerX: box50['x'] + value307 / 0x2,
+    centerY: box50['y'] + value308 / 0x2,
+  };
+}
 
-export function getViewportScreenCenter(_0x488f8f={},_0x1d7c0d=0x0,_0x1e53bc=0x0){const _0x30c9eb=getViewportScreenBounds(_0x488f8f,_0x1d7c0d,_0x1e53bc);return{'x':_0x30c9eb['centerX'],'y':_0x30c9eb["centerY"]};}
+export function getViewportScreenCenter(options3 = {}, value309 = 0x0, value310 = 0x0) {
+  const viewportScreenBounds = getViewportScreenBounds(options3, value309, value310);
+  return { x: viewportScreenBounds['centerX'], y: viewportScreenBounds['centerY'] };
+}
 
-function _medianLayoutMetric(_0xed3dd0,_0x3b1c47,_0x268356=0x1){const _0xe08c4a=(Array["isArray"](_0xed3dd0)?_0xed3dd0:[])["map"](_0xe6765e=>Math["max"](0x0,_toFiniteNumber(_0xe6765e?.[_0x3b1c47],0x0)))['filter'](_0x36b80e=>_0x36b80e>0x0)["sort"]((_0x518d22,_0x387849)=>_0x518d22-_0x387849);if(_0xe08c4a["length"]===0x0)return _0x268356;const _0x3c9045=Math["floor"](_0xe08c4a["length"]/0x2);if(_0xe08c4a['length']%0x2===0x1)return _0xe08c4a[_0x3c9045];return(_0xe08c4a[_0x3c9045-0x1]+_0xe08c4a[_0x3c9045])/0x2;}
+function _medianLayoutMetric(value311, value312, value313 = 0x1) {
+  const list27 = (Array['isArray'](value311) ? value311 : [])
+    ['map']((value314) => Math['max'](0x0, _toFiniteNumber(value314?.[value312], 0x0)))
+    ['filter']((count12) => count12 > 0x0)
+    ['sort']((value315, value316) => value315 - value316);
+  if (list27['length'] === 0x0) return value313;
+  const value317 = Math['floor'](list27['length'] / 0x2);
+  if (list27['length'] % 0x2 === 0x1) return list27[value317];
+  return (list27[value317 - 0x1] + list27[value317]) / 0x2;
+}
 
-function _sortGridLayoutItems(_0x563577){const _0x19bd2e=_sortLayoutItems(_0x563577);if(_0x19bd2e["length"]<=0x1)return _0x19bd2e;const _0x3d6065=Math["max"](0x8,_medianLayoutMetric(_0x19bd2e,"height",0x28)*0.35),_0x26963c=[];for(const _0xd27c84 of _0x19bd2e){const _0xbddbb3=_toFiniteNumber(_0xd27c84?.['top']??_0xd27c84?.['y'],0x0),_0x92331b=Math["max"](0x0,_toFiniteNumber(_0xd27c84?.["height"],0x0)),_0x2e52d7=_toFiniteNumber(_0xd27c84?.["bottom"],_0xbddbb3+_0x92331b),_0x43052e=_toFiniteNumber(_0xd27c84?.['cy'],_0xbddbb3+_0x92331b/0x2);let _0x5c9dfe=null,_0x1b744e=Infinity;for(const _0x1edeae of _0x26963c){const _0x1a3c8d=Math["min"](_0x1edeae["bottom"],_0x2e52d7)-Math["max"](_0x1edeae['top'],_0xbddbb3),_0x4c3d69=Math['max'](0x1,Math['min'](_0x1edeae["bottom"]-_0x1edeae['top'],_0x92331b||0x1)),_0x5b1b57=Math["abs"](_0x43052e-_0x1edeae['centerY']),_0x1c6337=_0x1a3c8d>=_0x4c3d69*0.25||_0x5b1b57<=_0x3d6065;_0x1c6337&&_0x5b1b57<_0x1b744e&&(_0x5c9dfe=_0x1edeae,_0x1b744e=_0x5b1b57);}if(!_0x5c9dfe){_0x26963c["push"]({'top':_0xbddbb3,'bottom':_0x2e52d7,'centerY':_0x43052e,'centerSum':_0x43052e,'items':[_0xd27c84]});continue;}_0x5c9dfe['items']["push"](_0xd27c84),_0x5c9dfe["top"]=Math["min"](_0x5c9dfe["top"],_0xbddbb3),_0x5c9dfe["bottom"]=Math["max"](_0x5c9dfe['bottom'],_0x2e52d7),_0x5c9dfe["centerSum"]+=_0x43052e,_0x5c9dfe['centerY']=_0x5c9dfe['centerSum']/_0x5c9dfe["items"]['length'];}return _0x26963c["sort"]((_0x51fd40,_0x2bc768)=>_0x51fd40["top"]-_0x2bc768['top']),_0x26963c["flatMap"](_0x4012ce=>_0x4012ce["items"]["sort"]((_0x2eadaf,_0x4236d9)=>{const _0xafbcd7=_toFiniteNumber(_0x2eadaf?.["left"]??_0x2eadaf?.['x'],0x0),_0x2cfa8d=_toFiniteNumber(_0x4236d9?.['left']??_0x4236d9?.['x'],0x0);if(_0xafbcd7!==_0x2cfa8d)return _0xafbcd7-_0x2cfa8d;return String(_0x2eadaf?.['id']||'')["localeCompare"](String(_0x4236d9?.['id']||''));}));}
+function _sortGridLayoutItems(value318) {
+  const _sortLayoutItems2 = _sortLayoutItems(value318);
+  if (_sortLayoutItems2['length'] <= 0x1) return _sortLayoutItems2;
+  const value319 = Math['max'](0x8, _medianLayoutMetric(_sortLayoutItems2, 'height', 0x28) * 0.35),
+    value320 = [];
+  for (const box51 of _sortLayoutItems2) {
+    const _toFiniteNumber36 = _toFiniteNumber(box51?.['top'] ?? box51?.['y'], 0x0),
+      value321 = Math['max'](0x0, _toFiniteNumber(box51?.['height'], 0x0)),
+      _toFiniteNumber37 = _toFiniteNumber(box51?.['bottom'], _toFiniteNumber36 + value321),
+      _toFiniteNumber38 = _toFiniteNumber(box51?.['cy'], _toFiniteNumber36 + value321 / 0x2);
+    let box52 = null,
+      value322 = Infinity;
+    for (const box53 of value320) {
+      const value323 =
+          Math['min'](box53['bottom'], _toFiniteNumber37) - Math['max'](box53['top'], _toFiniteNumber36),
+        value324 = Math['max'](0x1, Math['min'](box53['bottom'] - box53['top'], value321 || 0x1)),
+        value325 = Math['abs'](_toFiniteNumber38 - box53['centerY']),
+        value326 = value323 >= value324 * 0.25 || value325 <= value319;
+      value326 && value325 < value322 && ((box52 = box53), (value322 = value325));
+    }
+    if (!box52) {
+      value320['push']({
+        top: _toFiniteNumber36,
+        bottom: _toFiniteNumber37,
+        centerY: _toFiniteNumber38,
+        centerSum: _toFiniteNumber38,
+        items: [box51],
+      });
+      continue;
+    }
+    (box52['items']['push'](box51),
+      (box52['top'] = Math['min'](box52['top'], _toFiniteNumber36)),
+      (box52['bottom'] = Math['max'](box52['bottom'], _toFiniteNumber37)),
+      (box52['centerSum'] += _toFiniteNumber38),
+      (box52['centerY'] = box52['centerSum'] / box52['items']['length']));
+  }
+  return (
+    value320['sort']((value327, box54) => value327['top'] - box54['top']),
+    value320['flatMap']((value328) =>
+      value328['items']['sort']((box55, box56) => {
+        const _toFiniteNumber39 = _toFiniteNumber(box55?.['left'] ?? box55?.['x'], 0x0),
+          _toFiniteNumber40 = _toFiniteNumber(box56?.['left'] ?? box56?.['x'], 0x0);
+        if (_toFiniteNumber39 !== _toFiniteNumber40) return _toFiniteNumber39 - _toFiniteNumber40;
+        return String(box55?.['id'] || '')['localeCompare'](String(box56?.['id'] || ''));
+      }),
+    )
+  );
+}
 
-function _resolveGridRelationLayout(_0x719039,_0x7a8ee9){const _0x118eb3=_sortGridLayoutItems(_0x719039),_0x16f65e=new Set(_0x118eb3["map"](_0x319207=>String(_0x319207?.['id']||'')['trim']())['filter'](Boolean)),_0x1ec530=[],_0x3599b9=new Set();for(const _0x3174d0 of Array["isArray"](_0x7a8ee9)?_0x7a8ee9:[]){const _0x49d5c5=String(_0x3174d0?.["sourceId"]||'')["trim"](),_0x50ce6e=String(_0x3174d0?.['targetId']||'')["trim"]();if(!_0x49d5c5||!_0x50ce6e||_0x49d5c5===_0x50ce6e||!_0x16f65e["has"](_0x49d5c5)||!_0x16f65e["has"](_0x50ce6e))continue;const _0x2e5af9=_0x49d5c5+'\x00'+_0x50ce6e;if(_0x3599b9["has"](_0x2e5af9))continue;_0x3599b9["add"](_0x2e5af9),_0x1ec530["push"]({'sourceId':_0x49d5c5,'targetId':_0x50ce6e});}if(_0x1ec530["length"]===0x0)return null;const _0x11305f=new Map(_0x118eb3["map"]((_0x4daabe,_0x5d74c4)=>[String(_0x4daabe['id']),_0x5d74c4])),_0x5b4e99=new Set(),_0x2183f3=new Map(),_0x3a4a44=new Map(),_0x1c12f1=new Map();for(const {sourceId:_0x58add2,targetId:_0x57a6eb}of _0x1ec530){_0x5b4e99["add"](_0x58add2),_0x5b4e99["add"](_0x57a6eb);if(!_0x2183f3["has"](_0x58add2))_0x2183f3["set"](_0x58add2,[]);_0x2183f3["get"](_0x58add2)['push'](_0x57a6eb),_0x3a4a44["set"](_0x57a6eb,(_0x3a4a44["get"](_0x57a6eb)||0x0)+0x1);if(!_0x3a4a44['has'](_0x58add2))_0x3a4a44["set"](_0x58add2,0x0);if(!_0x1c12f1["has"](_0x58add2))_0x1c12f1['set'](_0x58add2,0x0);if(!_0x1c12f1["has"](_0x57a6eb))_0x1c12f1['set'](_0x57a6eb,0x0);}const _0x13898b=(_0x56ca80,_0x4a5a59)=>(_0x11305f['get'](_0x56ca80)??Number["MAX_SAFE_INTEGER"])-(_0x11305f["get"](_0x4a5a59)??Number['MAX_SAFE_INTEGER'])||_0x56ca80['localeCompare'](_0x4a5a59);let _0x1805df=[..._0x5b4e99]["filter"](_0x16cf20=>(_0x3a4a44["get"](_0x16cf20)||0x0)===0x0)["sort"](_0x13898b);const _0x25c4e8=new Set();while(_0x1805df["length"]>0x0){const _0x412828=_0x1805df;_0x1805df=[];for(const _0x3acd96 of _0x412828){_0x25c4e8['add'](_0x3acd96);const _0x32aa55=_0x1c12f1['get'](_0x3acd96)||0x0;for(const _0x52fb9c of _0x2183f3["get"](_0x3acd96)||[]){_0x1c12f1["set"](_0x52fb9c,Math["max"](_0x1c12f1['get'](_0x52fb9c)||0x0,_0x32aa55+0x1));const _0xc0570c=(_0x3a4a44["get"](_0x52fb9c)||0x0)-0x1;_0x3a4a44["set"](_0x52fb9c,_0xc0570c);if(_0xc0570c===0x0)_0x1805df["push"](_0x52fb9c);}}_0x1805df["sort"](_0x13898b);}const _0xddf841=[..._0x5b4e99]['filter'](_0x31bb9d=>!_0x25c4e8["has"](_0x31bb9d));if(_0xddf841["length"]>0x0){const _0x3f0c59=_0xddf841["reduce"]((_0x1def06,_0xb8bd69)=>Math["max"](_0x1def06,_0x1c12f1["get"](_0xb8bd69)||0x0),0x0);for(const _0x263e1d of _0xddf841)_0x1c12f1["set"](_0x263e1d,_0x3f0c59);}const _0x4ada4a=[..._0x5b4e99]["reduce"]((_0x313386,_0x34c048)=>Math['max'](_0x313386,(_0x1c12f1["get"](_0x34c048)||0x0)+0x1),0x1);return{'connectedIds':_0x5b4e99,'layerById':_0x1c12f1,'layerCount':_0x4ada4a,'relations':_0x1ec530};}
+function _resolveGridRelationLayout(value329, value330) {
+  const _sortGridLayoutItems2 = _sortGridLayoutItems(value329),
+    enabled21 = new Set(
+      _sortGridLayoutItems2['map']((value331) => String(value331?.['id'] || '')['trim']())['filter'](Boolean),
+    ),
+    value332 = [],
+    value333 = new Set();
+  for (const value334 of Array['isArray'](value330) ? value330 : []) {
+    const enabled22 = String(value334?.['sourceId'] || '')['trim'](),
+      enabled23 = String(value334?.['targetId'] || '')['trim']();
+    if (
+      !enabled22 ||
+      !enabled23 ||
+      enabled22 === enabled23 ||
+      !enabled21['has'](enabled22) ||
+      !enabled21['has'](enabled23)
+    )
+      continue;
+    const value335 = enabled22 + '\x00' + enabled23;
+    if (value333['has'](value335)) continue;
+    (value333['add'](value335), value332['push']({ sourceId: enabled22, targetId: enabled23 }));
+  }
+  if (value332['length'] === 0x0) return null;
+  const map4 = new Map(
+      _sortGridLayoutItems2['map']((value336, value337) => [String(value336['id']), value337]),
+    ),
+    args3 = new Set(),
+    enabled24 = new Map(),
+    map5 = new Map(),
+    map6 = new Map();
+  for (const { sourceId: sourceId, targetId: targetId } of value332) {
+    (args3['add'](sourceId), args3['add'](targetId));
+    if (!enabled24['has'](sourceId)) enabled24['set'](sourceId, []);
+    (enabled24['get'](sourceId)['push'](targetId),
+      map5['set'](targetId, (map5['get'](targetId) || 0x0) + 0x1));
+    if (!map5['has'](sourceId)) map5['set'](sourceId, 0x0);
+    if (!map6['has'](sourceId)) map6['set'](sourceId, 0x0);
+    if (!map6['has'](targetId)) map6['set'](targetId, 0x0);
+  }
+  const value338 = (value339, value340) =>
+    (map4['get'](value339) ?? Number['MAX_SAFE_INTEGER']) -
+      (map4['get'](value340) ?? Number['MAX_SAFE_INTEGER']) || value339['localeCompare'](value340);
+  let value341 = [...args3]['filter']((value342) => (map5['get'](value342) || 0x0) === 0x0)['sort'](value338);
+  const enabled25 = new Set();
+  while (value341['length'] > 0x0) {
+    const value343 = value341;
+    value341 = [];
+    for (const value344 of value343) {
+      enabled25['add'](value344);
+      const value345 = map6['get'](value344) || 0x0;
+      for (const value346 of enabled24['get'](value344) || []) {
+        map6['set'](value346, Math['max'](map6['get'](value346) || 0x0, value345 + 0x1));
+        const count13 = (map5['get'](value346) || 0x0) - 0x1;
+        map5['set'](value346, count13);
+        if (count13 === 0x0) value341['push'](value346);
+      }
+    }
+    value341['sort'](value338);
+  }
+  const value347 = [...args3]['filter']((value348) => !enabled25['has'](value348));
+  if (value347['length'] > 0x0) {
+    const value349 = value347['reduce'](
+      (value350, value351) => Math['max'](value350, map6['get'](value351) || 0x0),
+      0x0,
+    );
+    for (const value352 of value347) map6['set'](value352, value349);
+  }
+  const value353 = [...args3]['reduce'](
+    (value354, value355) => Math['max'](value354, (map6['get'](value355) || 0x0) + 0x1),
+    0x1,
+  );
+  return { connectedIds: args3, layerById: map6, layerCount: value353, relations: value332 };
+}
 
-function _buildGraphAwareGridPlacements(_0x133883,_0x378cdf,_0x44fd4a){const _0x1d1b09=Array['from']({'length':_0x378cdf},()=>[]),_0x21ac1b=new Map();_0x133883["forEach"]((_0x3519da,_0x3d9ed5)=>{const _0x3000a0=String(_0x3519da['id']);let _0x5061eb=_0x44fd4a["connectedIds"]["has"](_0x3000a0)?Math["min"](_0x378cdf-0x1,_0x44fd4a["layerById"]['get'](_0x3000a0)||0x0):_0x3d9ed5%_0x378cdf;if(!_0x44fd4a["connectedIds"]['has'](_0x3000a0)){const _0x527836=Math["min"](..._0x1d1b09["map"](_0x3f645e=>_0x3f645e['length']));for(let _0x34b0a6=0x0;_0x34b0a6<_0x378cdf;_0x34b0a6+=0x1){const _0x396c4d=(_0x5061eb+_0x34b0a6)%_0x378cdf;if(_0x1d1b09[_0x396c4d]["length"]===_0x527836){_0x5061eb=_0x396c4d;break;}}}_0x1d1b09[_0x5061eb]["push"](_0x3519da),_0x21ac1b["set"](_0x3000a0,_0x5061eb);});const _0x4e4661=new Map(_0x133883["map"](_0x901e2b=>[String(_0x901e2b['id']),_0x901e2b])),_0xd0d92c=new Map(_0x133883['map']((_0x39cf73,_0x3756a3)=>[String(_0x39cf73['id']),_0x3756a3])),_0x43a177=new Map();for(const {sourceId:_0x5aabde,targetId:_0x227184}of _0x44fd4a['relations']){if(_0x21ac1b["get"](_0x5aabde)===_0x21ac1b["get"](_0x227184))continue;!_0x43a177["has"](_0x5aabde)&&_0x43a177["set"](_0x5aabde,[]),!_0x43a177['has'](_0x227184)&&_0x43a177["set"](_0x227184,[]),_0x43a177["get"](_0x5aabde)['push'](_0x227184),_0x43a177["get"](_0x227184)['push'](_0x5aabde);}const _0x281178=new Map(),_0x1331fe=_0x2b1274=>{_0x1d1b09[_0x2b1274]["forEach"]((_0x37fb44,_0x5b53b6)=>{_0x281178["set"](String(_0x37fb44['id']),_0x5b53b6);});};_0x1d1b09['forEach']((_0x2bd394,_0x3b34a0)=>_0x1331fe(_0x3b34a0));const _0x38a634=(_0x58879a,_0x4b82c9,_0x2a182d)=>{const _0x283666=(_0x43a177["get"](_0x58879a)||[])["filter"](_0x57df5b=>{const _0x44a4bb=_0x21ac1b["get"](_0x57df5b);return _0x2a182d>0x0?_0x44a4bb<_0x4b82c9:_0x44a4bb>_0x4b82c9;})['map'](_0x2364f7=>_0x281178['get'](_0x2364f7))["filter"](Number["isFinite"])['sort']((_0x5a49a9,_0x568d5b)=>_0x5a49a9-_0x568d5b);if(_0x283666["length"]===0x0)return null;const _0x191504=Math['floor'](_0x283666["length"]/0x2);return _0x283666['length']%0x2===0x1?_0x283666[_0x191504]:(_0x283666[_0x191504-0x1]+_0x283666[_0x191504])/0x2;},_0x236eef=_0xee37b6=>{const _0x38249f=_0xee37b6>0x0?0x1:_0x378cdf-0x2,_0x517722=_0xee37b6>0x0?_0x378cdf:-0x1;for(let _0x212e61=_0x38249f;_0x212e61!==_0x517722;_0x212e61+=_0xee37b6){const _0x40a00d=new Map(_0x1d1b09[_0x212e61]["map"]((_0x5a13cc,_0x5aaec5)=>[String(_0x5a13cc['id']),_0x5aaec5])),_0x1257bc=new Map(_0x1d1b09[_0x212e61]["map"](_0x1c70de=>{const _0x42b22a=String(_0x1c70de['id']);return[_0x42b22a,_0x38a634(_0x42b22a,_0x212e61,_0xee37b6)];}));_0x1d1b09[_0x212e61]["sort"]((_0xcdc58f,_0x269e9f)=>{const _0x4282ad=String(_0xcdc58f['id']),_0x2ca6b9=String(_0x269e9f['id']),_0x3efa99=_0x1257bc["get"](_0x4282ad),_0x48a33f=_0x1257bc["get"](_0x2ca6b9),_0x794882=_0x3efa99??_0x40a00d['get'](_0x4282ad)??0x0,_0x560a8a=_0x48a33f??_0x40a00d["get"](_0x2ca6b9)??0x0;if(_0x794882!==_0x560a8a)return _0x794882-_0x560a8a;return(_0x40a00d['get'](_0x4282ad)??0x0)-(_0x40a00d["get"](_0x2ca6b9)??0x0)||(_0xd0d92c["get"](_0x4282ad)??Number["MAX_SAFE_INTEGER"])-(_0xd0d92c["get"](_0x2ca6b9)??Number['MAX_SAFE_INTEGER'])||_0x4282ad["localeCompare"](_0x2ca6b9);}),_0x1331fe(_0x212e61);}};for(let _0x19b215=0x0;_0x19b215<0x2;_0x19b215+=0x1){_0x236eef(0x1),_0x236eef(-0x1);}const _0x1200a3=_0x44fd4a["relations"]["filter"](({sourceId:_0x4da14c,targetId:_0xd26c37})=>_0x21ac1b["get"](_0x4da14c)!==_0x21ac1b["get"](_0xd26c37)),_0x456254=new Map(),_0x1d5721=new Map();for(const {sourceId:_0x570fdc,targetId:_0x2b1a42}of _0x1200a3){_0x456254["set"](_0x570fdc,(_0x456254["get"](_0x570fdc)||0x0)+0x1),_0x1d5721["set"](_0x2b1a42,(_0x1d5721["get"](_0x2b1a42)||0x0)+0x1);}const _0x4fcb3f=new Map(_0x133883["map"](_0x301d44=>[String(_0x301d44['id']),String(_0x301d44['id'])])),_0x45126b=new Map(_0x133883["map"](_0x59a583=>{const _0x224b28=String(_0x59a583['id']);return[_0x224b28,new Set([_0x21ac1b['get'](_0x224b28)])];})),_0x13261f=_0x7835a2=>{let _0x2bca1b=_0x7835a2;while(_0x4fcb3f['get'](_0x2bca1b)!==_0x2bca1b)_0x2bca1b=_0x4fcb3f["get"](_0x2bca1b);let _0xa10c3e=_0x7835a2;while(_0x4fcb3f["get"](_0xa10c3e)!==_0x2bca1b){const _0x171d5a=_0x4fcb3f["get"](_0xa10c3e);_0x4fcb3f["set"](_0xa10c3e,_0x2bca1b),_0xa10c3e=_0x171d5a;}return _0x2bca1b;},_0x4455cb=(_0x35ce03,_0x5a7861)=>{const _0xed8896=_0x13261f(_0x35ce03),_0x1b34c6=_0x13261f(_0x5a7861);if(_0xed8896===_0x1b34c6)return!![];const _0x136dd0=_0x45126b["get"](_0xed8896)||new Set(),_0x3bd326=_0x45126b["get"](_0x1b34c6)||new Set();if([..._0x136dd0]['some'](_0x146b55=>_0x3bd326['has'](_0x146b55)))return![];const _0x10c32c=(_0xd0d92c["get"](_0xed8896)??Number["MAX_SAFE_INTEGER"])<=(_0xd0d92c["get"](_0x1b34c6)??Number['MAX_SAFE_INTEGER']),_0x147323=_0x10c32c?_0xed8896:_0x1b34c6,_0x31c8a1=_0x10c32c?_0x1b34c6:_0xed8896;return _0x4fcb3f["set"](_0x31c8a1,_0x147323),_0x45126b['set'](_0x147323,new Set([..._0x136dd0,..._0x3bd326])),_0x45126b["delete"](_0x31c8a1),!![];};_0x1200a3["sort"]((_0x28845f,_0x30ee04)=>{const _0x38dbf0=_0x456254['get'](_0x28845f["sourceId"])===0x1&&_0x1d5721["get"](_0x28845f["targetId"])===0x1,_0x174d7b=_0x456254['get'](_0x30ee04["sourceId"])===0x1&&_0x1d5721["get"](_0x30ee04["targetId"])===0x1;if(_0x38dbf0!==_0x174d7b)return _0x38dbf0?-0x1:0x1;const _0x3a58d4=_0x456254["get"](_0x28845f["sourceId"])===0x1||_0x1d5721["get"](_0x28845f['targetId'])===0x1,_0x3c6914=_0x456254["get"](_0x30ee04["sourceId"])===0x1||_0x1d5721["get"](_0x30ee04["targetId"])===0x1;if(_0x3a58d4!==_0x3c6914)return _0x3a58d4?-0x1:0x1;const _0x46c4d3=Math["abs"](_0x21ac1b["get"](_0x28845f["sourceId"])-_0x21ac1b["get"](_0x28845f["targetId"])),_0x174ae6=Math["abs"](_0x21ac1b['get'](_0x30ee04['sourceId'])-_0x21ac1b["get"](_0x30ee04["targetId"]));if(_0x46c4d3!==_0x174ae6)return _0x46c4d3-_0x174ae6;const _0x2ceae7=Math["abs"]((_0x281178["get"](_0x28845f["sourceId"])||0x0)-(_0x281178["get"](_0x28845f["targetId"])||0x0)),_0x3760aa=Math["abs"]((_0x281178["get"](_0x30ee04['sourceId'])||0x0)-(_0x281178['get'](_0x30ee04['targetId'])||0x0));if(_0x2ceae7!==_0x3760aa)return _0x2ceae7-_0x3760aa;const _0x3c9725=_0x4e4661["get"](_0x28845f["sourceId"]),_0x534ca4=_0x4e4661['get'](_0x28845f["targetId"]),_0x1431b4=_0x4e4661["get"](_0x30ee04["sourceId"]),_0x475ff6=_0x4e4661['get'](_0x30ee04["targetId"]),_0xc32256=Math["abs"]((_0x3c9725?.['cy']||0x0)-(_0x534ca4?.['cy']||0x0)),_0x5b4d5e=Math["abs"]((_0x1431b4?.['cy']||0x0)-(_0x475ff6?.['cy']||0x0));if(_0xc32256!==_0x5b4d5e)return _0xc32256-_0x5b4d5e;const _0x4643e7=(_0xd0d92c["get"](_0x28845f["sourceId"])||0x0)-(_0xd0d92c["get"](_0x30ee04["sourceId"])||0x0);if(_0x4643e7!==0x0)return _0x4643e7;return(_0xd0d92c['get'](_0x28845f["targetId"])||0x0)-(_0xd0d92c["get"](_0x30ee04['targetId'])||0x0);})["forEach"](({sourceId:_0x4e204f,targetId:_0x3e1d89})=>_0x4455cb(_0x4e204f,_0x3e1d89));const _0x10eacb=new Map();_0x133883["forEach"]((_0x2874a7,_0x220925)=>{const _0x323640=String(_0x2874a7['id']),_0x151e47=_0x13261f(_0x323640);!_0x10eacb["has"](_0x151e47)&&_0x10eacb["set"](_0x151e47,{'firstIndex':_0x220925,'items':[]});const _0x2151e5=_0x10eacb["get"](_0x151e47);_0x2151e5["firstIndex"]=Math["min"](_0x2151e5["firstIndex"],_0x220925),_0x2151e5["items"]["push"](_0x2874a7);});const _0x1e5c1e=[..._0x10eacb["values"]()]["sort"]((_0x764e52,_0xb8eeea)=>_0x764e52["firstIndex"]-_0xb8eeea["firstIndex"]);return{'placements':_0x1e5c1e["flatMap"]((_0x372cbc,_0x5ebff5)=>_0x372cbc['items']["map"](_0x378179=>({'item':_0x378179,'col':_0x21ac1b["get"](String(_0x378179['id'])),'row':_0x5ebff5}))),'rowCount':_0x1e5c1e["length"]};}
+function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
+  const list29 = Array['from']({ length: value356 }, () => []),
+    map7 = new Map();
+  list28['forEach']((value357, value358) => {
+    const value359 = String(value357['id']);
+    let value360 = enabled26['connectedIds']['has'](value359)
+      ? Math['min'](value356 - 0x1, enabled26['layerById']['get'](value359) || 0x0)
+      : value358 % value356;
+    if (!enabled26['connectedIds']['has'](value359)) {
+      const value361 = Math['min'](...list29['map']((list30) => list30['length']));
+      for (let value362 = 0x0; value362 < value356; value362 += 0x1) {
+        const value363 = (value360 + value362) % value356;
+        if (list29[value363]['length'] === value361) {
+          value360 = value363;
+          break;
+        }
+      }
+    }
+    (list29[value360]['push'](value357), map7['set'](value359, value360));
+  });
+  const map8 = new Map(list28['map']((value364) => [String(value364['id']), value364])),
+    map9 = new Map(list28['map']((value365, value366) => [String(value365['id']), value366])),
+    map10 = new Map();
+  for (const { sourceId: sourceId2, targetId: targetId2 } of enabled26['relations']) {
+    if (map7['get'](sourceId2) === map7['get'](targetId2)) continue;
+    (!map10['has'](sourceId2) && map10['set'](sourceId2, []),
+      !map10['has'](targetId2) && map10['set'](targetId2, []),
+      map10['get'](sourceId2)['push'](targetId2),
+      map10['get'](targetId2)['push'](sourceId2));
+  }
+  const map11 = new Map(),
+    handler6 = (value367) => {
+      list29[value367]['forEach']((value368, value369) => {
+        map11['set'](String(value368['id']), value369);
+      });
+    };
+  list29['forEach']((value370, value371) => handler6(value371));
+  const run = (value372, value373, count14) => {
+      const list31 = (map10['get'](value372) || [])
+        ['filter']((value374) => {
+          const value375 = map7['get'](value374);
+          return count14 > 0x0 ? value375 < value373 : value375 > value373;
+        })
+        ['map']((value376) => map11['get'](value376))
+        ['filter'](Number['isFinite'])
+        ['sort']((value377, value378) => value377 - value378);
+      if (list31['length'] === 0x0) return null;
+      const value379 = Math['floor'](list31['length'] / 0x2);
+      return list31['length'] % 0x2 === 0x1
+        ? list31[value379]
+        : (list31[value379 - 0x1] + list31[value379]) / 0x2;
+    },
+    handler7 = (count15) => {
+      const value380 = count15 > 0x0 ? 0x1 : value356 - 0x2,
+        value381 = count15 > 0x0 ? value356 : -0x1;
+      for (let value382 = value380; value382 !== value381; value382 += count15) {
+        const map12 = new Map(
+            list29[value382]['map']((value383, value384) => [String(value383['id']), value384]),
+          ),
+          value385 = new Map(
+            list29[value382]['map']((value386) => {
+              const value387 = String(value386['id']);
+              return [value387, run(value387, value382, count15)];
+            }),
+          );
+        (list29[value382]['sort']((value388, value389) => {
+          const value390 = String(value388['id']),
+            value391 = String(value389['id']),
+            value392 = value385['get'](value390),
+            value393 = value385['get'](value391),
+            value394 = value392 ?? map12['get'](value390) ?? 0x0,
+            value395 = value393 ?? map12['get'](value391) ?? 0x0;
+          if (value394 !== value395) return value394 - value395;
+          return (
+            (map12['get'](value390) ?? 0x0) - (map12['get'](value391) ?? 0x0) ||
+            (map9['get'](value390) ?? Number['MAX_SAFE_INTEGER']) -
+              (map9['get'](value391) ?? Number['MAX_SAFE_INTEGER']) ||
+            value390['localeCompare'](value391)
+          );
+        }),
+          handler6(value382));
+      }
+    };
+  for (let count16 = 0x0; count16 < 0x2; count16 += 0x1) {
+    (handler7(0x1), handler7(-0x1));
+  }
+  const value396 = enabled26['relations']['filter'](
+      ({ sourceId: sourceId3, targetId: targetId3 }) => map7['get'](sourceId3) !== map7['get'](targetId3),
+    ),
+    map13 = new Map(),
+    value397 = new Map();
+  for (const { sourceId: sourceId4, targetId: targetId4 } of value396) {
+    (map13['set'](sourceId4, (map13['get'](sourceId4) || 0x0) + 0x1),
+      value397['set'](targetId4, (value397['get'](targetId4) || 0x0) + 0x1));
+  }
+  const map14 = new Map(list28['map']((value398) => [String(value398['id']), String(value398['id'])])),
+    map15 = new Map(
+      list28['map']((value399) => {
+        const value400 = String(value399['id']);
+        return [value400, new Set([map7['get'](value400)])];
+      }),
+    ),
+    handler8 = (value401) => {
+      let value402 = value401;
+      while (map14['get'](value402) !== value402) value402 = map14['get'](value402);
+      let value403 = value401;
+      while (map14['get'](value403) !== value402) {
+        const value404 = map14['get'](value403);
+        (map14['set'](value403, value402), (value403 = value404));
+      }
+      return value402;
+    },
+    handler9 = (value405, value406) => {
+      const value407 = handler8(value405),
+        value408 = handler8(value406);
+      if (value407 === value408) return !![];
+      const args4 = map15['get'](value407) || new Set(),
+        map16 = map15['get'](value408) || new Set();
+      if ([...args4]['some']((value409) => map16['has'](value409))) return ![];
+      const value410 =
+          (map9['get'](value407) ?? Number['MAX_SAFE_INTEGER']) <=
+          (map9['get'](value408) ?? Number['MAX_SAFE_INTEGER']),
+        value411 = value410 ? value407 : value408,
+        value412 = value410 ? value408 : value407;
+      return (
+        map14['set'](value412, value411),
+        map15['set'](value411, new Set([...args4, ...map16])),
+        map15['delete'](value412),
+        !![]
+      );
+    };
+  value396['sort']((value413, value414) => {
+    const value415 =
+        map13['get'](value413['sourceId']) === 0x1 && value397['get'](value413['targetId']) === 0x1,
+      value416 = map13['get'](value414['sourceId']) === 0x1 && value397['get'](value414['targetId']) === 0x1;
+    if (value415 !== value416) return value415 ? -0x1 : 0x1;
+    const value417 =
+        map13['get'](value413['sourceId']) === 0x1 || value397['get'](value413['targetId']) === 0x1,
+      value418 = map13['get'](value414['sourceId']) === 0x1 || value397['get'](value414['targetId']) === 0x1;
+    if (value417 !== value418) return value417 ? -0x1 : 0x1;
+    const value419 = Math['abs'](map7['get'](value413['sourceId']) - map7['get'](value413['targetId'])),
+      value420 = Math['abs'](map7['get'](value414['sourceId']) - map7['get'](value414['targetId']));
+    if (value419 !== value420) return value419 - value420;
+    const value421 = Math['abs'](
+        (map11['get'](value413['sourceId']) || 0x0) - (map11['get'](value413['targetId']) || 0x0),
+      ),
+      value422 = Math['abs'](
+        (map11['get'](value414['sourceId']) || 0x0) - (map11['get'](value414['targetId']) || 0x0),
+      );
+    if (value421 !== value422) return value421 - value422;
+    const value423 = map8['get'](value413['sourceId']),
+      value424 = map8['get'](value413['targetId']),
+      value425 = map8['get'](value414['sourceId']),
+      value426 = map8['get'](value414['targetId']),
+      value427 = Math['abs']((value423?.['cy'] || 0x0) - (value424?.['cy'] || 0x0)),
+      value428 = Math['abs']((value425?.['cy'] || 0x0) - (value426?.['cy'] || 0x0));
+    if (value427 !== value428) return value427 - value428;
+    const count17 = (map9['get'](value413['sourceId']) || 0x0) - (map9['get'](value414['sourceId']) || 0x0);
+    if (count17 !== 0x0) return count17;
+    return (map9['get'](value413['targetId']) || 0x0) - (map9['get'](value414['targetId']) || 0x0);
+  })['forEach'](({ sourceId: sourceId5, targetId: targetId5 }) => handler9(sourceId5, targetId5));
+  const args5 = new Map();
+  list28['forEach']((value429, value430) => {
+    const value431 = String(value429['id']),
+      value432 = handler8(value431);
+    !args5['has'](value432) && args5['set'](value432, { firstIndex: value430, items: [] });
+    const value433 = args5['get'](value432);
+    ((value433['firstIndex'] = Math['min'](value433['firstIndex'], value430)),
+      value433['items']['push'](value429));
+  });
+  const value434 = [...args5['values']()]['sort'](
+    (value435, value436) => value435['firstIndex'] - value436['firstIndex'],
+  );
+  return {
+    placements: value434['flatMap']((value437, value438) =>
+      value437['items']['map']((value439) => ({
+        item: value439,
+        col: map7['get'](String(value439['id'])),
+        row: value438,
+      })),
+    ),
+    rowCount: value434['length'],
+  };
+}
 
-export function resolveArrangeGridColumns(_0x523afb,_0x3fb6da={}){const _0x47d9b6=Array['isArray'](_0x523afb)?_0x523afb['filter'](Boolean):[];if(_0x47d9b6['length']<=0x1)return Math['max'](0x1,_0x47d9b6["length"]);const _0x3e02c7=Number(_0x3fb6da["columns"]);if(Number["isFinite"](_0x3e02c7)&&_0x3e02c7>0x0)return Math["max"](0x1,Math["trunc"](_0x3e02c7));const _0x380f5d=computeSelectionBounds(_0x47d9b6),_0xf8c289=Math['max'](0x0,_toFiniteNumber(_0x3fb6da['gapX']??_0x3fb6da['gap'],0x28)),_0x54e0b4=Math["max"](0x0,_toFiniteNumber(_0x3fb6da["gapY"]??_0x3fb6da['gap'],0x28)),_0x4937b9=_medianLayoutMetric(_0x47d9b6,"width",0x1),_0x186f39=_medianLayoutMetric(_0x47d9b6,"height",0x1),_0x17f92b=Number(_0x3fb6da['targetAspect']),_0x44c621=_0x380f5d&&_0x380f5d["height"]>0x0?_0x380f5d["width"]/_0x380f5d["height"]:0x1,_0x5ebfde=Math["max"](0.75,Math["min"](0x10/0x9,Number["isFinite"](_0x17f92b)&&_0x17f92b>0x0?_0x17f92b:_0x44c621)),_0x4bf5f5=Number(_0x3fb6da["maxColumns"]),_0x574c66=Math["min"](_0x47d9b6["length"],Number["isFinite"](_0x4bf5f5)&&_0x4bf5f5>0x0?Math['max'](0x2,Math["trunc"](_0x4bf5f5)):0x6);let _0x201c24=0x2,_0x44f1e8=Infinity;for(let _0x160d0b=0x2;_0x160d0b<=_0x574c66;_0x160d0b+=0x1){const _0x4ceb64=Math["ceil"](_0x47d9b6["length"]/_0x160d0b),_0x40ea08=_0x160d0b*_0x4937b9+(_0x160d0b-0x1)*_0xf8c289,_0x5687ce=_0x4ceb64*_0x186f39+(_0x4ceb64-0x1)*_0x54e0b4,_0x142720=_0x40ea08/Math["max"](0x1,_0x5687ce),_0xabfc80=Math["abs"](Math["log"](_0x142720/_0x5ebfde)),_0x1af18b=(_0x160d0b*_0x4ceb64-_0x47d9b6['length'])/_0x47d9b6["length"],_0x294df3=_0xabfc80+_0x1af18b*0.9;_0x294df3<_0x44f1e8-1e-9&&(_0x44f1e8=_0x294df3,_0x201c24=_0x160d0b);}const _0x11516d=_resolveGridRelationLayout(_0x47d9b6,_0x3fb6da["relations"]);return _0x11516d&&(_0x201c24=Math['max'](_0x201c24,Math['min'](_0x574c66,_0x11516d["layerCount"]))),_0x201c24;}
+export function resolveArrangeGridColumns(list32, value440 = {}) {
+  const list33 = Array['isArray'](list32) ? list32['filter'](Boolean) : [];
+  if (list33['length'] <= 0x1) return Math['max'](0x1, list33['length']);
+  const count18 = Number(value440['columns']);
+  if (Number['isFinite'](count18) && count18 > 0x0) return Math['max'](0x1, Math['trunc'](count18));
+  const selectionBounds3 = computeSelectionBounds(list33),
+    value441 = Math['max'](0x0, _toFiniteNumber(value440['gapX'] ?? value440['gap'], 0x28)),
+    value442 = Math['max'](0x0, _toFiniteNumber(value440['gapY'] ?? value440['gap'], 0x28)),
+    _medianLayoutMetric2 = _medianLayoutMetric(list33, 'width', 0x1),
+    _medianLayoutMetric3 = _medianLayoutMetric(list33, 'height', 0x1),
+    count19 = Number(value440['targetAspect']),
+    value443 =
+      selectionBounds3 && selectionBounds3['height'] > 0x0
+        ? selectionBounds3['width'] / selectionBounds3['height']
+        : 0x1,
+    value444 = Math['max'](
+      0.75,
+      Math['min'](0x10 / 0x9, Number['isFinite'](count19) && count19 > 0x0 ? count19 : value443),
+    ),
+    count20 = Number(value440['maxColumns']),
+    value445 = Math['min'](
+      list33['length'],
+      Number['isFinite'](count20) && count20 > 0x0 ? Math['max'](0x2, Math['trunc'](count20)) : 0x6,
+    );
+  let value446 = 0x2,
+    value447 = Infinity;
+  for (let value448 = 0x2; value448 <= value445; value448 += 0x1) {
+    const value449 = Math['ceil'](list33['length'] / value448),
+      value450 = value448 * _medianLayoutMetric2 + (value448 - 0x1) * value441,
+      value451 = value449 * _medianLayoutMetric3 + (value449 - 0x1) * value442,
+      value452 = value450 / Math['max'](0x1, value451),
+      value453 = Math['abs'](Math['log'](value452 / value444)),
+      value454 = (value448 * value449 - list33['length']) / list33['length'],
+      value455 = value453 + value454 * 0.9;
+    value455 < value447 - 1e-9 && ((value447 = value455), (value446 = value448));
+  }
+  const _resolveGridRelationLayout2 = _resolveGridRelationLayout(list33, value440['relations']);
+  return (
+    _resolveGridRelationLayout2 &&
+      (value446 = Math['max'](value446, Math['min'](value445, _resolveGridRelationLayout2['layerCount']))),
+    value446
+  );
+}
 
-function queryNodeSpatialCells(_0x15275a,_0x5e9e16,_0x526711,_0xc95c26,_0x1d60bc){const _0x3e55cc=new Set(),_0x3967d7=(_0x526711-_0x5e9e16+0x1)*(_0x1d60bc-_0xc95c26+0x1)>Math['max'](0x40,_0x15275a['nodeCount']),_0x491591=_0x3967d7?_0x15275a["nodeRects"]["keys"]():_0x15275a["spanningIds"]||[];for(const _0x1aeaf5 of _0x491591){const _0xbd7fb0=_0x15275a['nodeRects']["get"](_0x1aeaf5),_0x277b4c=_0x15275a["cellSize"];if(Math["floor"](_0xbd7fb0['x']/_0x277b4c)<=_0x526711&&Math["floor"](_0xbd7fb0["right"]/_0x277b4c)>=_0x5e9e16&&Math["floor"](_0xbd7fb0['y']/_0x277b4c)<=_0x1d60bc&&Math["floor"](_0xbd7fb0["bottom"]/_0x277b4c)>=_0xc95c26)_0x3e55cc["add"](_0x1aeaf5);}if(!_0x3967d7)for(let _0x955261=_0x5e9e16;_0x955261<=_0x526711;_0x955261+=0x1){for(let _0x460d27=_0xc95c26;_0x460d27<=_0x1d60bc;_0x460d27+=0x1){const _0xc7a15a=_0x15275a["boundsCells"]['get'](getNodeSpatialCellKey(_0x955261,_0x460d27));if(!_0xc7a15a||_0xc7a15a['length']===0x0)continue;for(const _0x3dc66d of _0xc7a15a)_0x3e55cc["add"](_0x3dc66d);}}if(_0x3e55cc["size"]===0x0)return EMPTY_NODE_SPATIAL_QUERY_RESULT;return Array["from"](_0x3e55cc)["sort"]((_0x5738cf,_0xc95cc2)=>{const _0x5e52d4=_0x15275a["nodeRects"]["get"](_0x5738cf)?.["order"]??Infinity,_0x2ed73f=_0x15275a["nodeRects"]["get"](_0xc95cc2)?.["order"]??Infinity;return _0x5e52d4-_0x2ed73f;});}
-export {
-  getRotatedSize,
-  rotatePointAroundCenter,
-} from './rotationMath.js';
+function queryNodeSpatialCells(value456, value457, value458, value459, value460) {
+  const value461 = new Set(),
+    enabled27 =
+      (value458 - value457 + 0x1) * (value460 - value459 + 0x1) > Math['max'](0x40, value456['nodeCount']),
+    value462 = enabled27 ? value456['nodeRects']['keys']() : value456['spanningIds'] || [];
+  for (const value463 of value462) {
+    const box57 = value456['nodeRects']['get'](value463),
+      value464 = value456['cellSize'];
+    if (
+      Math['floor'](box57['x'] / value464) <= value458 &&
+      Math['floor'](box57['right'] / value464) >= value457 &&
+      Math['floor'](box57['y'] / value464) <= value460 &&
+      Math['floor'](box57['bottom'] / value464) >= value459
+    )
+      value461['add'](value463);
+  }
+  if (!enabled27)
+    for (let value465 = value457; value465 <= value458; value465 += 0x1) {
+      for (let value466 = value459; value466 <= value460; value466 += 0x1) {
+        const list34 = value456['boundsCells']['get'](getNodeSpatialCellKey(value465, value466));
+        if (!list34 || list34['length'] === 0x0) continue;
+        for (const value467 of list34) value461['add'](value467);
+      }
+    }
+  if (value461['size'] === 0x0) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
+  return Array['from'](value461)['sort']((value468, value469) => {
+    const value470 = value456['nodeRects']['get'](value468)?.['order'] ?? Infinity,
+      value471 = value456['nodeRects']['get'](value469)?.['order'] ?? Infinity;
+    return value470 - value471;
+  });
+}
+export { getRotatedSize, rotatePointAroundCenter } from './rotationMath.js';

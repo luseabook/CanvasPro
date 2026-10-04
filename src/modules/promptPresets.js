@@ -14,13 +14,13 @@ import appStore from '../core/stores/appStore.js';
 import { t } from '../i18n/index.js';
 import { isSubscriptionActive } from './subscriptionAccess.js';
 import { openSettingsPanel } from './settings/panelSettings.js';
-function promptPresetsText(_0x29c539, _0x43b6fe = {}) {
-  return t('promptPresets.' + _0x29c539, _0x43b6fe);
+function promptPresetsText(value, item = {}) {
+  return t('promptPresets.' + value, item);
 }
-function optionalPromptPresetsText(_0x5b61ef, _0x47273e = {}) {
-  const _0xc82f10 = 'promptPresets.' + _0x5b61ef,
-    _0x20fb4c = t(_0xc82f10, _0x47273e);
-  return _0x20fb4c === _0xc82f10 ? '' : _0x20fb4c;
+function optionalPromptPresetsText(key, index = {}) {
+  const result = 'promptPresets.' + key,
+    t2 = t(result, index);
+  return t2 === result ? '' : t2;
 }
 export const PROMPT_PRESET_TRIGGER_MODE_DIRECT = 'direct';
 export const PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT = 'insertPrompt';
@@ -117,58 +117,54 @@ const TEMPLATES = {
     { templateKey: 'xianxiaGuomanStoryboard', title: '修仙国漫故事板', desc: '修仙国漫剧情故事板模板' },
   ],
   IMAGE_PRESET_EMPTY_INPUT_MESSAGE = '请输入提示词或添加参考图片',
-  staticPromptTemplate = (_0xfe9c46) => ({
+  staticPromptTemplate = (text) => ({
     type: PROMPT_PRESET_TEMPLATE_TYPE_STATIC,
-    text: _0xfe9c46,
+    text: text,
     requireInput: true,
     emptyInputMessage: IMAGE_PRESET_EMPTY_INPUT_MESSAGE,
   }),
-  storyboardInsertPromptPreset = ({ templateKey: _0x1e6e15, title: _0x38304f, desc: _0x117a6d }) => ({
+  storyboardInsertPromptPreset = ({ templateKey: templateKey, title: title, desc: desc }) => ({
     icon: '🎬',
-    title: _0x38304f,
-    desc: _0x117a6d,
+    title: title,
+    desc: desc,
     triggerMode: PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT,
-    template: staticPromptTemplate(STORYBOARD_PROMPT_TEMPLATES[_0x1e6e15]),
+    template: staticPromptTemplate(STORYBOARD_PROMPT_TEMPLATES[templateKey]),
   });
-function localizePromptPresetTemplate(_0x4faec8, _0x154a5c = '') {
-  const _0x48bcfe = _0x154a5c ? optionalPromptPresetsText('presets.' + _0x154a5c + '.template') : '';
-  if (typeof _0x4faec8 === 'string') return _0x48bcfe || _0x4faec8;
-  if (!_0x4faec8 || typeof _0x4faec8 !== 'object') return _0x4faec8;
-  const _0x6515bb = { ..._0x4faec8 };
-  _0x48bcfe && _0x6515bb.type === PROMPT_PRESET_TEMPLATE_TYPE_STATIC && (_0x6515bb.text = _0x48bcfe);
-  if (_0x6515bb.type === PROMPT_PRESET_TEMPLATE_TYPE_CONDITIONAL_BY_IMAGE_INPUT) {
-    const _0x17704f = _0x154a5c
-        ? optionalPromptPresetsText('presets.' + _0x154a5c + '.imageInputTemplate')
-        : '',
-      _0x9d8b97 = _0x154a5c ? optionalPromptPresetsText('presets.' + _0x154a5c + '.textInputTemplate') : '';
-    (_0x17704f && (_0x6515bb.imageInputTemplate = _0x17704f),
-      _0x9d8b97 && (_0x6515bb.textInputTemplate = _0x9d8b97));
+function localizePromptPresetTemplate(args, data = '') {
+  const options = data ? optionalPromptPresetsText('presets.' + data + '.template') : '';
+  if (typeof args === 'string') return options || args;
+  if (!args || typeof args !== 'object') return args;
+  const response = { ...args };
+  options && response.type === PROMPT_PRESET_TEMPLATE_TYPE_STATIC && (response.text = options);
+  if (response.type === PROMPT_PRESET_TEMPLATE_TYPE_CONDITIONAL_BY_IMAGE_INPUT) {
+    const target = data ? optionalPromptPresetsText('presets.' + data + '.imageInputTemplate') : '',
+      source = data ? optionalPromptPresetsText('presets.' + data + '.textInputTemplate') : '';
+    (target && (response.imageInputTemplate = target), source && (response.textInputTemplate = source));
   }
-  const _0x2a5454 = String(_0x6515bb.emptyInputMessage || '');
-  if (_0x2a5454 === IMAGE_PRESET_EMPTY_INPUT_MESSAGE)
-    _0x6515bb.emptyInputMessage = promptPresetsText('emptyInput.image');
+  const next = String(response.emptyInputMessage || '');
+  if (next === IMAGE_PRESET_EMPTY_INPUT_MESSAGE)
+    response.emptyInputMessage = promptPresetsText('emptyInput.image');
   else
-    _0x2a5454 === TEMPLATES.Panorama360Seamless.emptyInputMessage &&
-      (_0x6515bb.emptyInputMessage = promptPresetsText('emptyInput.panorama'));
-  return _0x6515bb;
+    next === TEMPLATES.Panorama360Seamless.emptyInputMessage &&
+      (response.emptyInputMessage = promptPresetsText('emptyInput.panorama'));
+  return response;
 }
-function localizePromptPresetItem(_0x40f9a0 = {}) {
-  const _0x5a149a = String(_0x40f9a0?.title || ''),
-    _0x362fbe = PROMPT_PRESET_TITLE_I18N_KEYS[_0x5a149a] || '',
-    _0xac2d3b = { ..._0x40f9a0 };
-  if (_0x5a149a) _0xac2d3b.title = getLocalizedPresetTitle(_0x5a149a);
+function localizePromptPresetItem(args2 = {}) {
+  const current = String(args2?.title || ''),
+    entry = PROMPT_PRESET_TITLE_I18N_KEYS[current] || '',
+    record = { ...args2 };
+  if (current) record.title = getLocalizedPresetTitle(current);
   return (
-    Object.prototype.hasOwnProperty.call(_0x40f9a0, 'desc') &&
-      (_0xac2d3b.desc = getLocalizedPresetDesc(_0x5a149a, _0x40f9a0.desc)),
-    Array.isArray(_0x40f9a0.subItems) &&
-      (_0xac2d3b.subItems = _0x40f9a0.subItems.map(localizePromptPresetItem)),
-    Object.prototype.hasOwnProperty.call(_0x40f9a0, 'template') &&
-      (_0xac2d3b.template = localizePromptPresetTemplate(_0x40f9a0.template, _0x362fbe)),
-    _0xac2d3b
+    Object.prototype.hasOwnProperty.call(args2, 'desc') &&
+      (record.desc = getLocalizedPresetDesc(current, args2.desc)),
+    Array.isArray(args2.subItems) && (record.subItems = args2.subItems.map(localizePromptPresetItem)),
+    Object.prototype.hasOwnProperty.call(args2, 'template') &&
+      (record.template = localizePromptPresetTemplate(args2.template, entry)),
+    record
   );
 }
-function localizePromptPresetItems(_0x5a273b = []) {
-  return (Array.isArray(_0x5a273b) ? _0x5a273b : []).map(localizePromptPresetItem);
+function localizePromptPresetItems(list = []) {
+  return (Array.isArray(list) ? list : []).map(localizePromptPresetItem);
 }
 export const PROMPT_PRESETS = {
   'ai-image': [
@@ -389,19 +385,19 @@ const FREE_CUSTOM_PRESET_LIMIT = 2,
     '影视级叙事分镜脚本-秒级': 'storyboardScriptTimed',
     'Seedance2.0视频格式': 'seedance2VideoFormat',
   });
-function getPresetNodeTypeLabel(_0x4e365f) {
-  const _0x154308 = NODE_TYPE_I18N_KEYS[_0x4e365f];
-  return _0x154308 ? promptPresetsText('nodeTypes.' + _0x154308) : promptPresetsText('nodeTypes.node');
+function getPresetNodeTypeLabel(payload) {
+  const handle = NODE_TYPE_I18N_KEYS[payload];
+  return handle ? promptPresetsText('nodeTypes.' + handle) : promptPresetsText('nodeTypes.node');
 }
-export function getPromptPresetCollectionLabel(_0x64bb1b) {
-  const _0x154308 = NODE_TYPE_I18N_KEYS[_0x64bb1b];
-  return _0x154308 ? promptPresetsText('tabs.' + _0x154308 + '.label') : '';
+export function getPromptPresetCollectionLabel(state) {
+  const handle = NODE_TYPE_I18N_KEYS[state];
+  return handle ? promptPresetsText('tabs.' + handle + '.label') : '';
 }
-function getPresetManagerTabLabel(_0x33e558) {
-  return getPromptPresetCollectionLabel(_0x33e558?.nodeType) || String(_0x33e558?.label || '');
+function getPresetManagerTabLabel(config) {
+  return getPromptPresetCollectionLabel(config?.nodeType) || String(config?.label || '');
 }
-function getPresetManagerDesc(_0x1d0362) {
-  return promptPresetsText('manager.desc', { nodeType: getPresetNodeTypeLabel(_0x1d0362) });
+function getPresetManagerDesc(scope) {
+  return promptPresetsText('manager.desc', { nodeType: getPresetNodeTypeLabel(scope) });
 }
 function getUserInputPillHtml() {
   return (
@@ -416,878 +412,912 @@ function getPresetTemplatePlaceholderText() {
 function getCustomPresetFallbackTitle() {
   return promptPresetsText('customPresetFallback');
 }
-function getLocalizedPresetTitle(_0x2411a3) {
-  const _0x4b90b9 = PROMPT_PRESET_TITLE_I18N_KEYS[_0x2411a3];
-  return _0x4b90b9 ? promptPresetsText('presets.' + _0x4b90b9 + '.title') : _0x2411a3;
+function getLocalizedPresetTitle(input) {
+  const output = PROMPT_PRESET_TITLE_I18N_KEYS[input];
+  return output ? promptPresetsText('presets.' + output + '.title') : input;
 }
-function getLocalizedPresetDesc(_0x3feeef, _0xe03684) {
-  const _0x18213b = PROMPT_PRESET_TITLE_I18N_KEYS[_0x3feeef];
-  return _0x18213b ? promptPresetsText('presets.' + _0x18213b + '.desc') : _0xe03684;
+function getLocalizedPresetDesc(value2, value3) {
+  const value4 = PROMPT_PRESET_TITLE_I18N_KEYS[value2];
+  return value4 ? promptPresetsText('presets.' + value4 + '.desc') : value3;
 }
-export function normalizePromptPresetTriggerMode(_0x12d5c6) {
-  const _0x5a308e = String(_0x12d5c6 || '').trim();
-  return PROMPT_PRESET_TRIGGER_MODES.has(_0x5a308e) ? _0x5a308e : PROMPT_PRESET_TRIGGER_MODE_DIRECT;
+export function normalizePromptPresetTriggerMode(value5) {
+  const value6 = String(value5 || '').trim();
+  return PROMPT_PRESET_TRIGGER_MODES.has(value6) ? value6 : PROMPT_PRESET_TRIGGER_MODE_DIRECT;
 }
-export function shouldInsertPromptForPreset(_0x185096 = {}) {
-  return (
-    normalizePromptPresetTriggerMode(_0x185096?.triggerMode) === PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT
-  );
+export function shouldInsertPromptForPreset(options2 = {}) {
+  return normalizePromptPresetTriggerMode(options2?.triggerMode) === PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT;
 }
-export function isPromptPresetNodeTypeSupported(_0x212b41) {
-  return SUPPORTED_PRESET_NODE_TYPES.has(String(_0x212b41 || '').trim());
+export function isPromptPresetNodeTypeSupported(value7) {
+  return SUPPORTED_PRESET_NODE_TYPES.has(String(value7 || '').trim());
 }
-function getPromptPresetTriggerModeLabel(_0x5e10f8 = {}) {
-  return shouldInsertPromptForPreset(_0x5e10f8)
+function getPromptPresetTriggerModeLabel(options3 = {}) {
+  return shouldInsertPromptForPreset(options3)
     ? promptPresetsText('triggerModes.insertPrompt')
     : promptPresetsText('triggerModes.direct');
 }
 export async function loadCustomPresets() {
   try {
-    const [_0x2e5b0e] = await Promise.all([fetchPromptPresetsFromServer(), loadPromptPresetSettings()]);
-    customPresets = _0x2e5b0e;
-  } catch (_0x3eb349) {
-    console.warn('[promptPresets] No custom presets found or load failed.', _0x3eb349);
+    const [value8] = await Promise.all([fetchPromptPresetsFromServer(), loadPromptPresetSettings()]);
+    customPresets = value8;
+  } catch (value9) {
+    console.warn('[promptPresets] No custom presets found or load failed.', value9);
   }
 }
-export function getPromptPresets(_0x1c9616) {
-  const _0x5d23f1 = PROMPT_PRESETS[_0x1c9616] || [],
-    _0x2f5717 = customPresets[_0x1c9616] || [];
-  return [...localizePromptPresetItems(_0x5d23f1), ..._0x2f5717];
+export function getPromptPresets(value10) {
+  const value11 = PROMPT_PRESETS[value10] || [],
+    args3 = customPresets[value10] || [];
+  return [...localizePromptPresetItems(value11), ...args3];
 }
-function normalizePresetNodeType(_0x1c816e) {
-  const _0x312cb4 = String(_0x1c816e || '').trim();
-  return SUPPORTED_PRESET_NODE_TYPES.has(_0x312cb4) ? _0x312cb4 : 'ai-image';
+function normalizePresetNodeType(value12) {
+  const value13 = String(value12 || '').trim();
+  return SUPPORTED_PRESET_NODE_TYPES.has(value13) ? value13 : 'ai-image';
 }
-function normalizePresetManagerNodeType(_0x302940) {
-  const _0x1f97a1 = String(_0x302940 || '').trim();
-  return PRESET_MANAGER_TABS.some((_0x1415aa) => _0x1415aa.nodeType === _0x1f97a1) ? _0x1f97a1 : 'ai-text';
+function normalizePresetManagerNodeType(value14) {
+  const value15 = String(value14 || '').trim();
+  return PRESET_MANAGER_TABS.some((item2) => item2.nodeType === value15) ? value15 : 'ai-text';
 }
-function normalizePromptPresetSettings(_0x5e0a4d = {}) {
-  const _0x2b8c17 = String(_0x5e0a4d?.defaultQuickCaptureNodeType || '').trim();
+function normalizePromptPresetSettings(options4 = {}) {
+  const value16 = String(options4?.defaultQuickCaptureNodeType || '').trim();
   return {
-    defaultQuickCaptureNodeType: PRESET_MANAGER_TABS.some((_0x4f0d92) => _0x4f0d92.nodeType === _0x2b8c17)
-      ? _0x2b8c17
+    defaultQuickCaptureNodeType: PRESET_MANAGER_TABS.some((item3) => item3.nodeType === value16)
+      ? value16
       : '',
   };
 }
 export async function loadPromptPresetSettings({ force: force = false } = {}) {
   if (promptPresetSettingsLoaded && !force) return { ...promptPresetSettings };
   if (promptPresetSettingsLoadPromise && !force) return promptPresetSettingsLoadPromise;
-  const _0x4c1e60 = (async () => {
-    const _0x3ad7f1 = await fetchPromptPresetSettingsFromServer();
+  const value17 = (async () => {
+    const fetchPromptPresetSettingsFromServer2 = await fetchPromptPresetSettingsFromServer();
     return (
-      (promptPresetSettings = normalizePromptPresetSettings(_0x3ad7f1)),
+      (promptPresetSettings = normalizePromptPresetSettings(fetchPromptPresetSettingsFromServer2)),
       (promptPresetSettingsLoaded = true),
       { ...promptPresetSettings }
     );
-  })().catch((_0x1b9d4e) => {
+  })().catch((value18) => {
     return (
-      console.warn('[promptPresets] Failed to load preset settings.', _0x1b9d4e),
+      console.warn('[promptPresets] Failed to load preset settings.', value18),
       (promptPresetSettingsLoaded = true),
       { ...promptPresetSettings }
     );
   });
-  promptPresetSettingsLoadPromise = _0x4c1e60;
+  promptPresetSettingsLoadPromise = value17;
   try {
-    return await _0x4c1e60;
+    return await value17;
   } finally {
-    promptPresetSettingsLoadPromise === _0x4c1e60 && (promptPresetSettingsLoadPromise = null);
+    promptPresetSettingsLoadPromise === value17 && (promptPresetSettingsLoadPromise = null);
   }
 }
 export function getDefaultQuickCapturePresetNodeType() {
   return promptPresetSettings.defaultQuickCaptureNodeType || '';
 }
-export async function setDefaultQuickCapturePresetNodeType(_0x4c4b6c) {
-  const _0x49452f = String(_0x4c4b6c || '').trim();
-  if (!PRESET_MANAGER_TABS.some((_0x371e2a) => _0x371e2a.nodeType === _0x49452f))
+export async function setDefaultQuickCapturePresetNodeType(value19) {
+  const defaultQuickCaptureNodeType = String(value19 || '').trim();
+  if (!PRESET_MANAGER_TABS.some((item4) => item4.nodeType === defaultQuickCaptureNodeType))
     throw new Error('Invalid quick capture preset node type');
   return (
-    await savePromptPresetSettingsToServer({ defaultQuickCaptureNodeType: _0x49452f }),
-    (promptPresetSettings = { ...promptPresetSettings, defaultQuickCaptureNodeType: _0x49452f }),
+    await savePromptPresetSettingsToServer({ defaultQuickCaptureNodeType: defaultQuickCaptureNodeType }),
+    (promptPresetSettings = {
+      ...promptPresetSettings,
+      defaultQuickCaptureNodeType: defaultQuickCaptureNodeType,
+    }),
     (promptPresetSettingsLoaded = true),
     { ...promptPresetSettings }
   );
 }
-export function __setPromptPresetSettingsForTest(_0x30f0a7 = {}) {
-  ((promptPresetSettings = normalizePromptPresetSettings(_0x30f0a7)),
+export function __setPromptPresetSettingsForTest(options5 = {}) {
+  ((promptPresetSettings = normalizePromptPresetSettings(options5)),
     (promptPresetSettingsLoaded = true),
     (promptPresetSettingsLoadPromise = null));
 }
-export function getCustomPromptPresets(_0x4a2c20) {
-  const _0x312496 = normalizePresetNodeType(_0x4a2c20);
-  return Array.isArray(customPresets[_0x312496]) ? [...customPresets[_0x312496]] : [];
+export function getCustomPromptPresets(value20) {
+  const presetNodeType = normalizePresetNodeType(value20);
+  return Array.isArray(customPresets[presetNodeType]) ? [...customPresets[presetNodeType]] : [];
 }
-export function getSlashPromptPresetEntries(_0x4830ee) {
-  const _0x1f4ba4 = PROMPT_PRESETS[_0x4830ee] || [],
-    _0xea66d6 = getCustomPromptPresets(_0x4830ee),
-    _0xbb32f3 = localizePromptPresetItems(_0x1f4ba4);
-  if (_0xea66d6.length === 0) return _0xbb32f3;
+export function getSlashPromptPresetEntries(value21) {
+  const value22 = PROMPT_PRESETS[value21] || [],
+    subItems = getCustomPromptPresets(value21),
+    args4 = localizePromptPresetItems(value22);
+  if (subItems.length === 0) return args4;
   return [
-    ..._0xbb32f3,
+    ...args4,
     {
       title: promptPresetsText('customGroupTitle'),
       desc: promptPresetsText('customGroupDesc'),
-      subItems: _0xea66d6,
+      subItems: subItems,
     },
   ];
 }
-export function canCreateCustomPromptPreset(_0x5c8874, _0x4c4940) {
-  if (isSubscriptionActive(_0x4c4940 || {})) return true;
-  return getCustomPromptPresets(_0x5c8874).length < FREE_CUSTOM_PRESET_LIMIT;
+export function canCreateCustomPromptPreset(value23, value24) {
+  if (isSubscriptionActive(value24 || {})) return true;
+  return getCustomPromptPresets(value23).length < FREE_CUSTOM_PRESET_LIMIT;
 }
-export function __setCustomPromptPresetsForTest(_0x1e78a5 = {}) {
-  customPresets = _0x1e78a5 && typeof _0x1e78a5 === 'object' ? { ..._0x1e78a5 } : {};
+export function __setCustomPromptPresetsForTest(args5 = {}) {
+  customPresets = args5 && typeof args5 === 'object' ? { ...args5 } : {};
 }
-function escapePresetTemplateHtml(_0x174853) {
-  return String(_0x174853 ?? '')
+function escapePresetTemplateHtml(value25) {
+  return String(value25 ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
-export function renderPresetTemplateEditorHtml(_0x10cd78 = '') {
-  return String(_0x10cd78 ?? '')
+export function renderPresetTemplateEditorHtml(value26 = '') {
+  return String(value26 ?? '')
     .split(USER_INPUT_PLACEHOLDER)
-    .map((_0x57b172) => escapePresetTemplateHtml(_0x57b172).replace(/\r?\n/g, '<br>'))
+    .map((item5) => escapePresetTemplateHtml(item5).replace(/\r?\n/g, '<br>'))
     .join(getUserInputPillHtml());
 }
-export function serializePresetTemplateEditorHtml(_0x1e83c3 = '') {
-  const _0x4f4f04 = '__AIC_USER_INPUT_PLACEHOLDER__',
-    _0x1817ec = String(_0x1e83c3 ?? '')
-      .replace(/<span\b[^>]*\bdata-preset-placeholder=["']user-input["'][^>]*>[\s\S]*?<\/span>/gi, _0x4f4f04)
+export function serializePresetTemplateEditorHtml(value27 = '') {
+  const value28 = '__AIC_USER_INPUT_PLACEHOLDER__',
+    value29 = String(value27 ?? '')
+      .replace(/<span\b[^>]*\bdata-preset-placeholder=["']user-input["'][^>]*>[\s\S]*?<\/span>/gi, value28)
       .replace(/<br\b[^>]*\/?>/gi, '\n')
       .replace(/<\/(div|p)>/gi, '\n')
       .replace(/<[^>]+>/g, '');
   if (typeof document === 'undefined' || typeof document.createElement !== 'function')
-    return _0x1817ec
+    return value29
       .replace(/&nbsp;/g, ' ')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'")
       .replace(/&amp;/g, '&')
-      .replace(new RegExp(_0x4f4f04, 'g'), USER_INPUT_PLACEHOLDER)
+      .replace(new RegExp(value28, 'g'), USER_INPUT_PLACEHOLDER)
       .replace(/\n{3,}/g, '\n\n')
       .trim();
-  const _0x351d32 = document.createElement('textarea');
+  const el = document.createElement('textarea');
   return (
-    (_0x351d32.innerHTML = _0x1817ec),
-    _0x351d32.value
-      .replace(new RegExp(_0x4f4f04, 'g'), USER_INPUT_PLACEHOLDER)
+    (el.innerHTML = value29),
+    el.value
+      .replace(new RegExp(value28, 'g'), USER_INPUT_PLACEHOLDER)
       .replace(/\u00a0/g, ' ')
       .replace(/\n{3,}/g, '\n\n')
       .trim()
   );
 }
-function editorHasUserInputPill(_0x11d8c3) {
-  return !!_0x11d8c3?.querySelector?.('[data-preset-placeholder="user-input"]');
+function editorHasUserInputPill(el2) {
+  return !!el2?.querySelector?.('[data-preset-placeholder="user-input"]');
 }
-function moveCaretAfterNode(_0x14fcfd) {
-  const _0x159ffb = window.getSelection?.();
-  if (!_0x159ffb) return;
-  const _0x2a4a6e = document.createRange();
-  (_0x2a4a6e.setStartAfter(_0x14fcfd),
-    _0x2a4a6e.collapse(true),
-    _0x159ffb.removeAllRanges(),
-    _0x159ffb.addRange(_0x2a4a6e));
+function moveCaretAfterNode(value30) {
+  const enabled = window.getSelection?.();
+  if (!enabled) return;
+  const value31 = document.createRange();
+  (value31.setStartAfter(value30),
+    value31.collapse(true),
+    enabled.removeAllRanges(),
+    enabled.addRange(value31));
 }
-function insertUserInputPill(_0x189416) {
-  if (editorHasUserInputPill(_0x189416))
+function insertUserInputPill(el3) {
+  if (editorHasUserInputPill(el3))
     return (showPresetManagerToast(promptPresetsText('editor.duplicateUserInput'), 'warn'), false);
-  const _0x26576f = document.createElement('span');
-  _0x26576f.innerHTML = getUserInputPillHtml();
-  const _0x4cfcef = _0x26576f.firstElementChild,
-    _0x3e799a = document.createTextNode(' '),
-    _0x1fd002 = window.getSelection?.(),
-    _0x46997d =
-      _0x1fd002?.rangeCount && _0x189416.contains(_0x1fd002.getRangeAt(0).commonAncestorContainer)
-        ? _0x1fd002.getRangeAt(0)
+  const el4 = document.createElement('span');
+  el4.innerHTML = getUserInputPillHtml();
+  const value32 = el4.firstElementChild,
+    value33 = document.createTextNode(' '),
+    value34 = window.getSelection?.(),
+    value35 =
+      value34?.rangeCount && el3.contains(value34.getRangeAt(0).commonAncestorContainer)
+        ? value34.getRangeAt(0)
         : null;
   return (
-    _0x46997d
-      ? (_0x46997d.deleteContents(), _0x46997d.insertNode(_0x3e799a), _0x46997d.insertNode(_0x4cfcef))
-      : (_0x189416.appendChild(_0x4cfcef), _0x189416.appendChild(_0x3e799a)),
-    moveCaretAfterNode(_0x3e799a),
-    _0x189416.focus(),
+    value35
+      ? (value35.deleteContents(), value35.insertNode(value33), value35.insertNode(value32))
+      : (el3.appendChild(value32), el3.appendChild(value33)),
+    moveCaretAfterNode(value33),
+    el3.focus(),
     true
   );
 }
-function buildPresetModalButton(_0x20721f, _0x19490b) {
-  const _0x332dff = document.createElement('button');
-  return (
-    (_0x332dff.type = 'button'),
-    (_0x332dff.className = _0x19490b),
-    (_0x332dff.textContent = _0x20721f),
-    _0x332dff
-  );
+function buildPresetModalButton(value36, value37) {
+  const el5 = document.createElement('button');
+  return ((el5.type = 'button'), (el5.className = value37), (el5.textContent = value36), el5);
 }
-function buildPresetTriggerModeControl(_0x54ad45) {
-  let _0x5510b0 = normalizePromptPresetTriggerMode(_0x54ad45);
-  const _0x1510da = document.createElement('div');
-  ((_0x1510da.className = 'preset-manager-trigger-modes'),
-    _0x1510da.setAttribute('role', 'group'),
-    _0x1510da.setAttribute('aria-label', promptPresetsText('triggerModes.aria')));
-  const _0x36bd99 = document.createElement('span');
-  ((_0x36bd99.className = 'preset-manager-trigger-mode-label'),
-    (_0x36bd99.textContent = promptPresetsText('triggerModes.label')),
-    _0x1510da.appendChild(_0x36bd99));
-  const _0x358d2e = (_0x25260c, _0x467873) => {
-      const _0x5daff8 = buildPresetModalButton(_0x467873, 'preset-manager-trigger-mode');
+function buildPresetTriggerModeControl(value38) {
+  let promptPresetTriggerMode = normalizePromptPresetTriggerMode(value38);
+  const element = document.createElement('div');
+  ((element.className = 'preset-manager-trigger-modes'),
+    element.setAttribute('role', 'group'),
+    element.setAttribute('aria-label', promptPresetsText('triggerModes.aria')));
+  const el6 = document.createElement('span');
+  ((el6.className = 'preset-manager-trigger-mode-label'),
+    (el6.textContent = promptPresetsText('triggerModes.label')),
+    element.appendChild(el6));
+  const run = (value39, value40) => {
+      const el7 = buildPresetModalButton(value40, 'preset-manager-trigger-mode');
       return (
-        (_0x5daff8.dataset.triggerMode = _0x25260c),
-        _0x5daff8.setAttribute('aria-pressed', 'false'),
-        _0x5daff8.addEventListener('click', () => {
-          ((_0x5510b0 = _0x25260c), _0x5803a8());
+        (el7.dataset.triggerMode = value39),
+        el7.setAttribute('aria-pressed', 'false'),
+        el7.addEventListener('click', () => {
+          ((promptPresetTriggerMode = value39), run2());
         }),
-        _0x1510da.appendChild(_0x5daff8),
-        _0x5daff8
+        element.appendChild(el7),
+        el7
       );
     },
-    _0x29cb7a = _0x358d2e(PROMPT_PRESET_TRIGGER_MODE_DIRECT, promptPresetsText('triggerModes.direct')),
-    _0x4a049c = _0x358d2e(
-      PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT,
-      promptPresetsText('triggerModes.insertPrompt'),
-    );
-  function _0x5803a8() {
-    [_0x29cb7a, _0x4a049c].forEach((_0x1bd019) => {
-      const _0x5ef6a0 = _0x1bd019.dataset.triggerMode === _0x5510b0;
-      (_0x1bd019.classList.toggle('is-active', _0x5ef6a0),
-        _0x1bd019.setAttribute('aria-pressed', _0x5ef6a0 ? 'true' : 'false'));
+    value41 = run(PROMPT_PRESET_TRIGGER_MODE_DIRECT, promptPresetsText('triggerModes.direct')),
+    value42 = run(PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT, promptPresetsText('triggerModes.insertPrompt'));
+  function run2() {
+    [value41, value42].forEach((el8) => {
+      const value43 = el8.dataset.triggerMode === promptPresetTriggerMode;
+      (el8.classList.toggle('is-active', value43),
+        el8.setAttribute('aria-pressed', value43 ? 'true' : 'false'));
     });
   }
-  return (_0x5803a8(), { element: _0x1510da, getValue: () => _0x5510b0 });
+  return (run2(), { element: element, getValue: () => promptPresetTriggerMode });
 }
-function buildPresetManagerIcon(_0x17370a) {
-  const _0x3d27c6 = document.createElement('span');
+function buildPresetManagerIcon(value44) {
+  const el9 = document.createElement('span');
   return (
-    (_0x3d27c6.className = 'preset-manager-list-icon preset-manager-list-icon--' + _0x17370a),
-    _0x3d27c6.setAttribute('aria-hidden', 'true'),
-    _0x3d27c6
+    (el9.className = 'preset-manager-list-icon preset-manager-list-icon--' + value44),
+    el9.setAttribute('aria-hidden', 'true'),
+    el9
   );
 }
-function getPresetThumbSrc(_0x45f56a) {
-  const _0x5be771 = String(_0x45f56a?.thumbnailDataUrl || '').trim();
-  if (_0x5be771) return _0x5be771;
-  const _0x947863 = String(_0x45f56a?.thumbUrl || '').trim();
-  if (_0x947863) return _0x947863;
-  const _0x386862 = String(_0x45f56a?.thumbLocalPath || '').trim();
-  return _0x386862 ? '/' + _0x386862.replace(/^\/+/, '') : '';
+function getPresetThumbSrc(value45) {
+  const value46 = String(value45?.thumbnailDataUrl || '').trim();
+  if (value46) return value46;
+  const value47 = String(value45?.thumbUrl || '').trim();
+  if (value47) return value47;
+  const value48 = String(value45?.thumbLocalPath || '').trim();
+  return value48 ? '/' + value48.replace(/^\/+/, '') : '';
 }
-function readPresetThumbnailFile(_0x125f8c) {
-  return new Promise((_0x5b99cb, _0xa27276) => {
-    if (!_0x125f8c || !String(_0x125f8c.type || '').startsWith('image/')) {
-      _0xa27276(new Error(promptPresetsText('thumbnail.chooseImage')));
+function readPresetThumbnailFile(enabled2) {
+  return new Promise((handler, handler2) => {
+    if (!enabled2 || !String(enabled2.type || '').startsWith('image/')) {
+      handler2(new Error(promptPresetsText('thumbnail.chooseImage')));
       return;
     }
-    const _0x37acdc = new FileReader();
-    ((_0x37acdc.onload = () => _0x5b99cb(String(_0x37acdc.result || ''))),
-      (_0x37acdc.onerror = () => _0xa27276(new Error(promptPresetsText('thumbnail.readFailed')))),
-      _0x37acdc.readAsDataURL(_0x125f8c));
+    const fileReader = new FileReader();
+    ((fileReader.onload = () => handler(String(fileReader.result || ''))),
+      (fileReader.onerror = () => handler2(new Error(promptPresetsText('thumbnail.readFailed')))),
+      fileReader.readAsDataURL(enabled2));
   });
 }
-function buildPresetThumbnailControl({ preset: _0xe4f742, onUpload: _0xd6d577 }) {
-  const _0x30e44d = document.createElement('label');
-  ((_0x30e44d.className = 'preset-manager-list-thumb'),
-    (_0x30e44d.title = promptPresetsText('thumbnail.upload')),
-    _0x30e44d.addEventListener('click', (_0x585dcf) => _0x585dcf.stopPropagation()));
-  const _0x47abc3 = getPresetThumbSrc(_0xe4f742);
-  if (_0x47abc3) {
-    const _0x35ad63 = document.createElement('img');
-    ((_0x35ad63.className = 'preset-manager-list-thumb-img'),
-      (_0x35ad63.src = _0x47abc3),
-      (_0x35ad63.alt = ''),
-      _0x30e44d.appendChild(_0x35ad63));
+function buildPresetThumbnailControl({ preset: preset2, onUpload: onUpload }) {
+  const el10 = document.createElement('label');
+  ((el10.className = 'preset-manager-list-thumb'),
+    (el10.title = promptPresetsText('thumbnail.upload')),
+    el10.addEventListener('click', (event) => event.stopPropagation()));
+  const presetThumbSrc = getPresetThumbSrc(preset2);
+  if (presetThumbSrc) {
+    const value49 = document.createElement('img');
+    ((value49.className = 'preset-manager-list-thumb-img'),
+      (value49.src = presetThumbSrc),
+      (value49.alt = ''),
+      el10.appendChild(value49));
   } else {
-    const _0x18fcec = document.createElement('span');
-    ((_0x18fcec.className = 'preset-manager-list-thumb-plus'),
-      (_0x18fcec.textContent = '+'),
-      _0x30e44d.appendChild(_0x18fcec));
+    const el11 = document.createElement('span');
+    ((el11.className = 'preset-manager-list-thumb-plus'), (el11.textContent = '+'), el10.appendChild(el11));
   }
-  const _0x46b653 = document.createElement('input');
+  const el12 = document.createElement('input');
   return (
-    (_0x46b653.className = 'preset-manager-thumb-input'),
-    (_0x46b653.type = 'file'),
-    (_0x46b653.accept = 'image/*'),
-    _0x46b653.addEventListener('click', (_0x3b7586) => _0x3b7586.stopPropagation()),
-    _0x46b653.addEventListener('change', async () => {
-      const _0x48bdec = _0x46b653.files?.[0];
-      if (!_0x48bdec) return;
+    (el12.className = 'preset-manager-thumb-input'),
+    (el12.type = 'file'),
+    (el12.accept = 'image/*'),
+    el12.addEventListener('click', (event2) => event2.stopPropagation()),
+    el12.addEventListener('change', async () => {
+      const enabled3 = el12.files?.[0];
+      if (!enabled3) return;
       try {
-        const _0x21bf29 = await readPresetThumbnailFile(_0x48bdec);
-        _0xd6d577?.(_0x21bf29);
-      } catch (_0x1099da) {
-        showPresetManagerToast(_0x1099da?.message || promptPresetsText('thumbnail.uploadFailed'), 'error');
+        const presetThumbnailFile = await readPresetThumbnailFile(enabled3);
+        onUpload?.(presetThumbnailFile);
+      } catch (error) {
+        showPresetManagerToast(error?.message || promptPresetsText('thumbnail.uploadFailed'), 'error');
       } finally {
-        _0x46b653.value = '';
+        el12.value = '';
       }
     }),
-    _0x30e44d.appendChild(_0x46b653),
-    _0x30e44d
+    el10.appendChild(el12),
+    el10
   );
 }
 function buildPresetEditorPlaceholder() {
-  const _0x332876 = document.createElement('div');
-  ((_0x332876.className = 'preset-manager-editor-placeholder'),
-    _0x332876.setAttribute('aria-hidden', 'true'),
-    _0x332876.appendChild(document.createTextNode(getPresetTemplatePlaceholderText() + ' ')));
-  const _0x488082 = document.createElement('span');
-  return (
-    (_0x488082.innerHTML = getUserInputPillHtml()),
-    _0x332876.appendChild(_0x488082.firstElementChild),
-    _0x332876
-  );
+  const el13 = document.createElement('div');
+  ((el13.className = 'preset-manager-editor-placeholder'),
+    el13.setAttribute('aria-hidden', 'true'),
+    el13.appendChild(document.createTextNode(getPresetTemplatePlaceholderText() + ' ')));
+  const el14 = document.createElement('span');
+  return ((el14.innerHTML = getUserInputPillHtml()), el13.appendChild(el14.firstElementChild), el13);
 }
-function isPresetTemplateEditorEmpty(_0x19d75a) {
-  return !serializePresetTemplateEditorHtml(_0x19d75a?.innerHTML || '');
+function isPresetTemplateEditorEmpty(el15) {
+  return !serializePresetTemplateEditorHtml(el15?.innerHTML || '');
 }
-function syncPresetEditorPlaceholder(_0x287c7b, _0x2f5bb0) {
-  _0x2f5bb0.hidden = !isPresetTemplateEditorEmpty(_0x287c7b);
+function syncPresetEditorPlaceholder(value50, el16) {
+  el16.hidden = !isPresetTemplateEditorEmpty(value50);
 }
-function buildPresetManagerTabIcon(_0x531bd4) {
-  const _0x2dced5 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  (_0x2dced5.setAttribute('class', 'preset-manager-tab-icon'),
-    _0x2dced5.setAttribute('width', '16'),
-    _0x2dced5.setAttribute('height', '16'),
-    _0x2dced5.setAttribute('viewBox', '0 0 24 24'),
-    _0x2dced5.setAttribute('fill', 'none'),
-    _0x2dced5.setAttribute('stroke', 'currentColor'),
-    _0x2dced5.setAttribute('stroke-width', '2'),
-    _0x2dced5.setAttribute('aria-hidden', 'true'));
-  const _0x23b053 = (_0x15387a, _0x210e4a) => {
-    const _0x4e5fed = document.createElementNS('http://www.w3.org/2000/svg', _0x15387a);
-    (Object.entries(_0x210e4a).forEach(([_0x211a87, _0x48e2ed]) =>
-      _0x4e5fed.setAttribute(_0x211a87, _0x48e2ed),
-    ),
-      _0x2dced5.appendChild(_0x4e5fed));
+function buildPresetManagerTabIcon(value51) {
+  const el17 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  (el17.setAttribute('class', 'preset-manager-tab-icon'),
+    el17.setAttribute('width', '16'),
+    el17.setAttribute('height', '16'),
+    el17.setAttribute('viewBox', '0 0 24 24'),
+    el17.setAttribute('fill', 'none'),
+    el17.setAttribute('stroke', 'currentColor'),
+    el17.setAttribute('stroke-width', '2'),
+    el17.setAttribute('aria-hidden', 'true'));
+  const run3 = (value52, value53) => {
+    const el18 = document.createElementNS('http://www.w3.org/2000/svg', value52);
+    (Object.entries(value53).forEach(([value54, value55]) => el18.setAttribute(value54, value55)),
+      el17.appendChild(el18));
   };
-  if (_0x531bd4 === 'text')
+  if (value51 === 'text')
     return (
-      _0x23b053('polyline', { points: '4 7 4 4 20 4 20 7' }),
-      _0x23b053('line', { x1: '9', y1: '20', x2: '15', y2: '20' }),
-      _0x23b053('line', { x1: '12', y1: '4', x2: '12', y2: '20' }),
-      _0x2dced5
+      run3('polyline', { points: '4 7 4 4 20 4 20 7' }),
+      run3('line', { x1: '9', y1: '20', x2: '15', y2: '20' }),
+      run3('line', { x1: '12', y1: '4', x2: '12', y2: '20' }),
+      el17
     );
-  if (_0x531bd4 === 'image')
+  if (value51 === 'image')
     return (
-      _0x23b053('rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }),
-      _0x23b053('circle', { cx: '8.5', cy: '8.5', r: '1.5' }),
-      _0x23b053('polyline', { points: '21 15 16 10 5 21' }),
-      _0x2dced5
+      run3('rect', { x: '3', y: '3', width: '18', height: '18', rx: '2' }),
+      run3('circle', { cx: '8.5', cy: '8.5', r: '1.5' }),
+      run3('polyline', { points: '21 15 16 10 5 21' }),
+      el17
     );
-  if (_0x531bd4 === 'video')
+  if (value51 === 'video')
     return (
-      _0x23b053('polygon', { points: '23 7 16 12 23 17 23 7' }),
-      _0x23b053('rect', { x: '1', y: '5', width: '15', height: '14', rx: '2' }),
-      _0x2dced5
+      run3('polygon', { points: '23 7 16 12 23 17 23 7' }),
+      run3('rect', { x: '1', y: '5', width: '15', height: '14', rx: '2' }),
+      el17
     );
-  if (_0x531bd4 === 'audio')
+  if (value51 === 'audio')
     return (
-      _0x23b053('path', { d: 'M9 18V5l12-2v13' }),
-      _0x23b053('circle', { cx: '6', cy: '18', r: '3' }),
-      _0x23b053('circle', { cx: '18', cy: '16', r: '3' }),
-      _0x2dced5
+      run3('path', { d: 'M9 18V5l12-2v13' }),
+      run3('circle', { cx: '6', cy: '18', r: '3' }),
+      run3('circle', { cx: '18', cy: '16', r: '3' }),
+      el17
     );
-  return _0x2dced5;
+  return el17;
 }
-function getUniqueDraftTitle(_0x599d25) {
-  const _0x7ac10c = new Set((_0x599d25 || []).map((_0xc5712f) => String(_0xc5712f?.title || '').trim()));
-  let _0x3774e2 = 1,
-    _0x5e895c = getCustomPresetFallbackTitle();
-  while (_0x7ac10c.has(_0x5e895c)) {
-    ((_0x3774e2 += 1),
-      (_0x5e895c = promptPresetsText('customPresetFallbackWithIndex', { index: _0x3774e2 })));
+function getUniqueDraftTitle(value56) {
+  const map = new Set((value56 || []).map((item6) => String(item6?.title || '').trim()));
+  let index2 = 1,
+    customPresetFallbackTitle = getCustomPresetFallbackTitle();
+  while (map.has(customPresetFallbackTitle)) {
+    ((index2 += 1),
+      (customPresetFallbackTitle = promptPresetsText('customPresetFallbackWithIndex', { index: index2 })));
   }
-  return _0x5e895c;
+  return customPresetFallbackTitle;
 }
-function showPresetManagerToast(_0x492615, _0x3cdbb8 = 'info') {
-  window.showToast?.(_0x492615, _0x3cdbb8);
+function showPresetManagerToast(value57, value58 = 'info') {
+  window.showToast?.(value57, value58);
 }
-function requestSubscriptionFromPresetManager(_0x38a766, { onSuccess: _0x54783b } = {}) {
-  _0x38a766?.remove();
+function requestSubscriptionFromPresetManager(el19, { onSuccess: onSuccess } = {}) {
+  el19?.remove();
   if (typeof window.openSubscriptionDialog === 'function') {
-    window.openSubscriptionDialog({ onSuccess: _0x54783b });
+    window.openSubscriptionDialog({ onSuccess: onSuccess });
     return;
   }
   (openSettingsPanel(), showPresetManagerToast(promptPresetsText('manager.subscriptionRequired'), 'warn'));
 }
 function createPresetEditor({
-  nodeType: _0x130dd6,
+  nodeType: nodeType,
   preset: preset = null,
   isDraft: isDraft = false,
-  onSaved: _0x497641,
+  onSaved: onSaved,
 }) {
-  const _0x3b17e2 = document.createElement('div');
-  _0x3b17e2.className = 'preset-manager-detail';
-  const _0x3eac9b = isDraft ? '' : String(preset?.title || '').trim(),
-    _0x46a214 = String(preset?.title || '').trim(),
-    _0x5f16a3 = document.createElement('label');
-  _0x5f16a3.className = 'preset-manager-field';
-  const _0x2fe6ca = document.createElement('span');
-  ((_0x2fe6ca.className = 'preset-manager-label'),
-    (_0x2fe6ca.textContent = promptPresetsText('editor.name')));
-  const _0x3fc429 = document.createElement('input');
-  ((_0x3fc429.className = 'preset-manager-input'),
-    (_0x3fc429.type = 'text'),
-    (_0x3fc429.placeholder = promptPresetsText('editor.namePlaceholder')),
-    (_0x3fc429.value = _0x46a214),
-    _0x5f16a3.appendChild(_0x2fe6ca),
-    _0x5f16a3.appendChild(_0x3fc429));
-  const _0x2c0696 = document.createElement('label');
-  _0x2c0696.className = 'preset-manager-field';
-  const _0x46a03b = document.createElement('span');
-  ((_0x46a03b.className = 'preset-manager-label'),
-    (_0x46a03b.textContent = promptPresetsText('editor.desc')));
-  const _0xe23a33 = document.createElement('input');
-  ((_0xe23a33.className = 'preset-manager-input'),
-    (_0xe23a33.type = 'text'),
-    (_0xe23a33.placeholder = promptPresetsText('editor.descPlaceholder')),
-    (_0xe23a33.value = String(preset?.desc || '').trim()),
-    _0x2c0696.appendChild(_0x46a03b),
-    _0x2c0696.appendChild(_0xe23a33));
-  const _0x76b337 = document.createElement('div');
-  _0x76b337.className = 'preset-manager-template-tools';
-  const _0x3a47d6 = document.createElement('span');
-  ((_0x3a47d6.className = 'preset-manager-label'),
-    (_0x3a47d6.textContent = promptPresetsText('editor.template')));
-  const _0x4bdff6 = buildPresetModalButton(
+  const element2 = document.createElement('div');
+  element2.className = 'preset-manager-detail';
+  const originalTitle = isDraft ? '' : String(preset?.title || '').trim(),
+    value59 = String(preset?.title || '').trim(),
+    el20 = document.createElement('label');
+  el20.className = 'preset-manager-field';
+  const el21 = document.createElement('span');
+  ((el21.className = 'preset-manager-label'), (el21.textContent = promptPresetsText('editor.name')));
+  const el22 = document.createElement('input');
+  ((el22.className = 'preset-manager-input'),
+    (el22.type = 'text'),
+    (el22.placeholder = promptPresetsText('editor.namePlaceholder')),
+    (el22.value = value59),
+    el20.appendChild(el21),
+    el20.appendChild(el22));
+  const el23 = document.createElement('label');
+  el23.className = 'preset-manager-field';
+  const el24 = document.createElement('span');
+  ((el24.className = 'preset-manager-label'), (el24.textContent = promptPresetsText('editor.desc')));
+  const desc2 = document.createElement('input');
+  ((desc2.className = 'preset-manager-input'),
+    (desc2.type = 'text'),
+    (desc2.placeholder = promptPresetsText('editor.descPlaceholder')),
+    (desc2.value = String(preset?.desc || '').trim()),
+    el23.appendChild(el24),
+    el23.appendChild(desc2));
+  const el25 = document.createElement('div');
+  el25.className = 'preset-manager-template-tools';
+  const el26 = document.createElement('span');
+  ((el26.className = 'preset-manager-label'), (el26.textContent = promptPresetsText('editor.template')));
+  const el27 = buildPresetModalButton(
     promptPresetsText('editor.insertPrompt'),
     'preset-modal-btn-secondary preset-manager-insert-btn',
   );
-  (_0x76b337.appendChild(_0x3a47d6), _0x76b337.appendChild(_0x4bdff6));
-  const _0x5a5a56 = document.createElement('div');
-  _0x5a5a56.className = 'preset-manager-editor-wrap';
-  const _0x310c2b = document.createElement('div');
-  ((_0x310c2b.className = 'preset-manager-textarea preset-manager-editor'),
-    (_0x310c2b.contentEditable = 'true'),
-    (_0x310c2b.spellcheck = false),
-    (_0x310c2b.innerHTML = renderPresetTemplateEditorHtml(preset?.template || '')),
-    _0x4bdff6.addEventListener('click', () => insertUserInputPill(_0x310c2b)));
-  const _0xbf9f9d = buildPresetEditorPlaceholder();
-  (_0x310c2b.addEventListener('input', () => syncPresetEditorPlaceholder(_0x310c2b, _0xbf9f9d)),
-    _0x310c2b.addEventListener('blur', () => syncPresetEditorPlaceholder(_0x310c2b, _0xbf9f9d)),
-    _0x5a5a56.addEventListener('click', () => {
-      _0x310c2b.focus();
+  (el25.appendChild(el26), el25.appendChild(el27));
+  const el28 = document.createElement('div');
+  el28.className = 'preset-manager-editor-wrap';
+  const el29 = document.createElement('div');
+  ((el29.className = 'preset-manager-textarea preset-manager-editor'),
+    (el29.contentEditable = 'true'),
+    (el29.spellcheck = false),
+    (el29.innerHTML = renderPresetTemplateEditorHtml(preset?.template || '')),
+    el27.addEventListener('click', () => insertUserInputPill(el29)));
+  const presetEditorPlaceholder = buildPresetEditorPlaceholder();
+  (el29.addEventListener('input', () => syncPresetEditorPlaceholder(el29, presetEditorPlaceholder)),
+    el29.addEventListener('blur', () => syncPresetEditorPlaceholder(el29, presetEditorPlaceholder)),
+    el28.addEventListener('click', () => {
+      el29.focus();
     }),
-    _0x5a5a56.appendChild(_0x310c2b),
-    _0x5a5a56.appendChild(_0xbf9f9d),
-    syncPresetEditorPlaceholder(_0x310c2b, _0xbf9f9d));
-  const _0x4d4f3d = buildPresetTriggerModeControl(preset?.triggerMode),
-    _0x434a1d = buildPresetModalButton(promptPresetsText('editor.save'), 'preset-modal-btn-primary');
+    el28.appendChild(el29),
+    el28.appendChild(presetEditorPlaceholder),
+    syncPresetEditorPlaceholder(el29, presetEditorPlaceholder));
+  const triggerMode = buildPresetTriggerModeControl(preset?.triggerMode),
+    saveButton = buildPresetModalButton(promptPresetsText('editor.save'), 'preset-modal-btn-primary');
   return (
-    _0x434a1d.addEventListener('click', async () => {
-      const _0xecebe3 = _0x3fc429.value.trim(),
-        _0x3bd4cf = serializePresetTemplateEditorHtml(_0x310c2b.innerHTML);
-      if (!_0xecebe3) {
-        (showPresetManagerToast(promptPresetsText('editor.titleRequired'), 'warn'), _0x3fc429.focus());
+    saveButton.addEventListener('click', async () => {
+      const title2 = el22.value.trim(),
+        template = serializePresetTemplateEditorHtml(el29.innerHTML);
+      if (!title2) {
+        (showPresetManagerToast(promptPresetsText('editor.titleRequired'), 'warn'), el22.focus());
         return;
       }
-      if (!_0x3bd4cf) {
-        (showPresetManagerToast(promptPresetsText('editor.templateRequired'), 'warn'), _0x310c2b.focus());
+      if (!template) {
+        (showPresetManagerToast(promptPresetsText('editor.templateRequired'), 'warn'), el29.focus());
         return;
       }
-      ((_0x434a1d.disabled = true), (_0x434a1d.textContent = promptPresetsText('editor.saving')));
+      ((saveButton.disabled = true), (saveButton.textContent = promptPresetsText('editor.saving')));
       try {
         (await savePromptPresetToServer({
-          nodeType: _0x130dd6,
-          title: _0xecebe3,
-          desc: _0xe23a33.value.trim(),
-          template: _0x3bd4cf,
-          triggerMode: _0x4d4f3d.getValue(),
+          nodeType: nodeType,
+          title: title2,
+          desc: desc2.value.trim(),
+          template: template,
+          triggerMode: triggerMode.getValue(),
           thumbnailDataUrl: String(preset?.thumbnailDataUrl || '').trim(),
           thumbLocalPath: String(preset?.thumbLocalPath || '').trim(),
-          originalTitle: _0x3eac9b,
+          originalTitle: originalTitle,
           installId: String(window.__aicInstallId || globalThis.__aicInstallId || '').trim(),
         }),
           await loadCustomPresets(),
           showPresetManagerToast(promptPresetsText('editor.saved'), 'success'),
-          _0x497641?.({ title: _0xecebe3 }));
-      } catch (_0x110d2b) {
-        showPresetManagerToast(_0x110d2b?.message || promptPresetsText('editor.saveFailed'), 'error');
+          onSaved?.({ title: title2 }));
+      } catch (error2) {
+        showPresetManagerToast(error2?.message || promptPresetsText('editor.saveFailed'), 'error');
       } finally {
-        ((_0x434a1d.disabled = false), (_0x434a1d.textContent = promptPresetsText('editor.save')));
+        ((saveButton.disabled = false), (saveButton.textContent = promptPresetsText('editor.save')));
       }
     }),
-    _0x3b17e2.appendChild(_0x5f16a3),
-    _0x3b17e2.appendChild(_0x2c0696),
-    _0x3b17e2.appendChild(_0x76b337),
-    _0x3b17e2.appendChild(_0x5a5a56),
-    { element: _0x3b17e2, triggerModeControl: _0x4d4f3d.element, saveButton: _0x434a1d }
+    element2.appendChild(el20),
+    element2.appendChild(el23),
+    element2.appendChild(el25),
+    element2.appendChild(el28),
+    { element: element2, triggerModeControl: triggerMode.element, saveButton: saveButton }
   );
 }
 export function openCustomPresetsManager({
-  nodeType: _0x3b61cf,
+  nodeType: nodeType2,
   initialDraftTemplate: initialDraftTemplate = '',
 } = {}) {
-  const _0x2f8e15 = String(initialDraftTemplate || '').trim();
-  let _0x15d6d4 = normalizePresetManagerNodeType(_0x3b61cf || getDefaultQuickCapturePresetNodeType());
+  const template2 = String(initialDraftTemplate || '').trim();
+  let nodeType3 = normalizePresetManagerNodeType(nodeType2 || getDefaultQuickCapturePresetNodeType());
   closeActivePresetManager?.();
-  const _0x3446a8 = document.createElement('div');
-  _0x3446a8.className = 'preset-modal-overlay';
-  const _0x1763c1 = () => {
-    (_0x3446a8.remove(),
-      activePresetManagerOverlay === _0x3446a8 &&
+  const el30 = document.createElement('div');
+  el30.className = 'preset-modal-overlay';
+  const run4 = () => {
+    (el30.remove(),
+      activePresetManagerOverlay === el30 &&
         ((activePresetManagerOverlay = null), (closeActivePresetManager = null)));
   };
-  const _0x431cfe = document.createElement('div');
-  ((_0x431cfe.className = 'preset-modal preset-modal--manager'),
-    _0x431cfe.addEventListener('click', (_0x1c3832) => _0x1c3832.stopPropagation()));
-  const _0x15fddf = document.createElement('div');
-  _0x15fddf.className = 'preset-manager-title-row';
-  const _0x29214d = document.createElement('div');
-  _0x29214d.className = 'preset-manager-title-group';
-  const _0x3e573f = document.createElement('div');
-  ((_0x3e573f.textContent = promptPresetsText('manager.title')),
-    (_0x3e573f.className = 'preset-modal-title'));
-  const _0x3f48ef = document.createElement('div');
-  ((_0x3f48ef.className = 'preset-modal-desc'),
-    (_0x3f48ef.textContent = getPresetManagerDesc(_0x15d6d4)),
-    _0x29214d.appendChild(_0x3e573f),
-    _0x29214d.appendChild(_0x3f48ef));
-  const _0x51ec90 = buildPresetModalButton('×', 'preset-manager-close-btn');
-  (_0x51ec90.setAttribute('aria-label', promptPresetsText('manager.close')),
-    _0x51ec90.addEventListener('click', () => _0x1763c1()),
-    _0x15fddf.appendChild(_0x29214d),
-    _0x15fddf.appendChild(_0x51ec90));
-  const _0xdb2f87 = document.createElement('div');
-  ((_0xdb2f87.className = 'preset-manager-tabs'), _0xdb2f87.setAttribute('role', 'tablist'));
-  const _0x474ba5 = new Map();
-  let _0x3ee4c4 = false;
-  PRESET_MANAGER_TABS.forEach((_0xd63ffe) => {
-    const _0x3d71d0 = buildPresetModalButton('', 'preset-manager-tab');
-    (_0x3d71d0.setAttribute('role', 'tab'),
-      (_0x3d71d0.dataset.nodeType = _0xd63ffe.nodeType),
-      _0x3d71d0.appendChild(buildPresetManagerTabIcon(_0xd63ffe.icon)));
-    const _0x2eb9eb = document.createElement('span');
-    ((_0x2eb9eb.textContent = getPresetManagerTabLabel(_0xd63ffe)), _0x3d71d0.appendChild(_0x2eb9eb));
-    const _0x5f3a90 = document.createElement('span');
-    ((_0x5f3a90.className = 'preset-manager-tab-star'),
-      (_0x5f3a90.textContent = '★'),
-      _0x5f3a90.setAttribute('aria-hidden', 'true'),
-      _0x3d71d0.appendChild(_0x5f3a90),
-      _0x3d71d0.addEventListener('click', () => {
-        if (_0x15d6d4 === _0xd63ffe.nodeType) return;
-        ((_0x15d6d4 = _0xd63ffe.nodeType), _0x5e7679());
+  const el31 = document.createElement('div');
+  ((el31.className = 'preset-modal preset-modal--manager'),
+    el31.addEventListener('click', (event3) => event3.stopPropagation()));
+  const el32 = document.createElement('div');
+  el32.className = 'preset-manager-title-row';
+  const el33 = document.createElement('div');
+  el33.className = 'preset-manager-title-group';
+  const el34 = document.createElement('div');
+  ((el34.textContent = promptPresetsText('manager.title')), (el34.className = 'preset-modal-title'));
+  const el35 = document.createElement('div');
+  ((el35.className = 'preset-modal-desc'),
+    (el35.textContent = getPresetManagerDesc(nodeType3)),
+    el33.appendChild(el34),
+    el33.appendChild(el35));
+  const el36 = buildPresetModalButton('×', 'preset-manager-close-btn');
+  (el36.setAttribute('aria-label', promptPresetsText('manager.close')),
+    el36.addEventListener('click', () => run4()),
+    el32.appendChild(el33),
+    el32.appendChild(el36));
+  const el37 = document.createElement('div');
+  ((el37.className = 'preset-manager-tabs'), el37.setAttribute('role', 'tablist'));
+  const list2 = new Map();
+  let value60 = false;
+  PRESET_MANAGER_TABS.forEach((defaultQuickCaptureNodeType2) => {
+    const button = buildPresetModalButton('', 'preset-manager-tab');
+    (button.setAttribute('role', 'tab'),
+      (button.dataset.nodeType = defaultQuickCaptureNodeType2.nodeType),
+      button.appendChild(buildPresetManagerTabIcon(defaultQuickCaptureNodeType2.icon)));
+    const el38 = document.createElement('span');
+    ((el38.textContent = getPresetManagerTabLabel(defaultQuickCaptureNodeType2)), button.appendChild(el38));
+    const star = document.createElement('span');
+    ((star.className = 'preset-manager-tab-star'),
+      (star.textContent = '★'),
+      star.setAttribute('aria-hidden', 'true'),
+      button.appendChild(star),
+      button.addEventListener('click', () => {
+        if (nodeType3 === defaultQuickCaptureNodeType2.nodeType) return;
+        ((nodeType3 = defaultQuickCaptureNodeType2.nodeType), handler3());
       }),
-      _0x3d71d0.addEventListener('contextmenu', async (_0x457218) => {
-        (_0x457218.preventDefault(), _0x457218.stopPropagation());
-        if (_0x3ee4c4) return;
-        const _0x3a7e2b = getDefaultQuickCapturePresetNodeType();
-        if (_0x3a7e2b === _0xd63ffe.nodeType) return;
-        ((_0x3ee4c4 = true),
+      button.addEventListener('contextmenu', async (event4) => {
+        (event4.preventDefault(), event4.stopPropagation());
+        if (value60) return;
+        const defaultQuickCaptureNodeType3 = getDefaultQuickCapturePresetNodeType();
+        if (defaultQuickCaptureNodeType3 === defaultQuickCaptureNodeType2.nodeType) return;
+        ((value60 = true),
           (promptPresetSettings = {
             ...promptPresetSettings,
-            defaultQuickCaptureNodeType: _0xd63ffe.nodeType,
+            defaultQuickCaptureNodeType: defaultQuickCaptureNodeType2.nodeType,
           }),
-          _0x5e7679());
+          handler3());
         try {
-          (await setDefaultQuickCapturePresetNodeType(_0xd63ffe.nodeType),
+          (await setDefaultQuickCapturePresetNodeType(defaultQuickCaptureNodeType2.nodeType),
             showPresetManagerToast(
               promptPresetsText('manager.quickCaptureDefaultSet', {
-                preset: getPresetManagerTabLabel(_0xd63ffe),
+                preset: getPresetManagerTabLabel(defaultQuickCaptureNodeType2),
               }),
               'success',
             ));
-        } catch (_0x46fd67) {
-          ((promptPresetSettings = { ...promptPresetSettings, defaultQuickCaptureNodeType: _0x3a7e2b }),
-            _0x5e7679(),
+        } catch (error3) {
+          ((promptPresetSettings = {
+            ...promptPresetSettings,
+            defaultQuickCaptureNodeType: defaultQuickCaptureNodeType3,
+          }),
+            handler3(),
             showPresetManagerToast(
-              _0x46fd67?.message || promptPresetsText('manager.quickCaptureDefaultFailed'),
+              error3?.message || promptPresetsText('manager.quickCaptureDefaultFailed'),
               'error',
             ));
         } finally {
-          _0x3ee4c4 = false;
+          value60 = false;
         }
       }),
-      _0x474ba5.set(_0xd63ffe.nodeType, { button: _0x3d71d0, star: _0x5f3a90 }),
-      _0xdb2f87.appendChild(_0x3d71d0));
+      list2.set(defaultQuickCaptureNodeType2.nodeType, { button: button, star: star }),
+      el37.appendChild(button));
   });
-  const _0x23e661 = document.createElement('div');
-  _0x23e661.className = 'preset-manager-shell';
-  const _0x48d877 = document.createElement('div');
-  _0x48d877.className = 'preset-manager-sidebar';
-  const _0x5a65ee = buildPresetModalButton(promptPresetsText('manager.new'), 'preset-manager-new-btn'),
-    _0x5e5377 = document.createElement('div');
-  ((_0x5e5377.className = 'preset-manager-list'),
-    _0x48d877.appendChild(_0x5a65ee),
-    _0x48d877.appendChild(_0x5e5377));
-  const _0x4e44b4 = document.createElement('div');
-  ((_0x4e44b4.className = 'preset-manager-detail-pane'),
-    _0x23e661.appendChild(_0x48d877),
-    _0x23e661.appendChild(_0x4e44b4));
-  const _0x206d8c = document.createElement('div');
-  _0x206d8c.className = 'preset-modal-actions';
-  const _0x347663 = new Map(
-      PRESET_MANAGER_TABS.map((_0xa82af0) => [
-        _0xa82af0.nodeType,
+  const el39 = document.createElement('div');
+  el39.className = 'preset-manager-shell';
+  const el40 = document.createElement('div');
+  el40.className = 'preset-manager-sidebar';
+  const el41 = buildPresetModalButton(promptPresetsText('manager.new'), 'preset-manager-new-btn'),
+    el42 = document.createElement('div');
+  ((el42.className = 'preset-manager-list'), el40.appendChild(el41), el40.appendChild(el42));
+  const el43 = document.createElement('div');
+  ((el43.className = 'preset-manager-detail-pane'), el39.appendChild(el40), el39.appendChild(el43));
+  const el44 = document.createElement('div');
+  el44.className = 'preset-modal-actions';
+  const map2 = new Map(
+      PRESET_MANAGER_TABS.map((item7) => [
+        item7.nodeType,
         { selectedKey: '', draftPreset: null, draftCounter: 0 },
       ]),
     ),
-    _0x2dd8f0 = (_0x3782eb) =>
-      _0x347663.get(_0x3782eb) || { selectedKey: '', draftPreset: null, draftCounter: 0 },
-    _0x38255e = (_0x5271ec) => 'saved:' + String(_0x5271ec?.title || ''),
-    _0x3080b7 = (_0x27490c) => (_0x27490c ? 'draft:' + _0x27490c.id : ''),
-    _0x5e7679 = () => {
-      (_0x5e5377.replaceChildren(),
-        _0x4e44b4.replaceChildren(),
-        _0x206d8c.replaceChildren(),
-        (_0x3f48ef.textContent = getPresetManagerDesc(_0x15d6d4)),
-        _0x474ba5.forEach(({ button: _0x2b8395, star: _0x2981b7 }, _0x1a3f6c) => {
-          const _0x215b2b = _0x1a3f6c === _0x15d6d4,
-            _0x4c0c5f = _0x1a3f6c === getDefaultQuickCapturePresetNodeType(),
-            _0x2d7f2a = PRESET_MANAGER_TABS.find((_0x5c2cbe) => _0x5c2cbe.nodeType === _0x1a3f6c),
-            _0x4e7ab6 = _0x4c0c5f
+    handler4 = (value61) => map2.get(value61) || { selectedKey: '', draftPreset: null, draftCounter: 0 },
+    key2 = (value62) => 'saved:' + String(value62?.title || ''),
+    key3 = (value63) => (value63 ? 'draft:' + value63.id : ''),
+    handler3 = () => {
+      (el42.replaceChildren(),
+        el43.replaceChildren(),
+        el44.replaceChildren(),
+        (el35.textContent = getPresetManagerDesc(nodeType3)),
+        list2.forEach(({ button: button2, star: star2 }, value64) => {
+          const value65 = value64 === nodeType3,
+            enabled4 = value64 === getDefaultQuickCapturePresetNodeType(),
+            value66 = PRESET_MANAGER_TABS.find((item8) => item8.nodeType === value64),
+            value67 = enabled4
               ? promptPresetsText('manager.quickCaptureDefaultAria', {
-                  preset: getPresetManagerTabLabel(_0x2d7f2a),
+                  preset: getPresetManagerTabLabel(value66),
                 })
               : promptPresetsText('manager.quickCaptureSetAria', {
-                  preset: getPresetManagerTabLabel(_0x2d7f2a),
+                  preset: getPresetManagerTabLabel(value66),
                 });
-          (_0x2b8395.classList.toggle('is-active', _0x215b2b),
-            _0x2b8395.classList.toggle('is-quick-capture-default', _0x4c0c5f),
-            _0x2b8395.setAttribute('aria-selected', _0x215b2b ? 'true' : 'false'),
-            _0x2b8395.setAttribute('aria-label', _0x4e7ab6),
-            (_0x2b8395.title = _0x4e7ab6),
-            (_0x2981b7.hidden = !_0x4c0c5f));
+          (button2.classList.toggle('is-active', value65),
+            button2.classList.toggle('is-quick-capture-default', enabled4),
+            button2.setAttribute('aria-selected', value65 ? 'true' : 'false'),
+            button2.setAttribute('aria-label', value67),
+            (button2.title = value67),
+            (star2.hidden = !enabled4));
         }));
-      const _0x149432 = _0x2dd8f0(_0x15d6d4),
-        _0x4c86c9 = appStore.getStateRaw().subscription || {},
-        _0x933d6a = isSubscriptionActive(_0x4c86c9),
-        _0x256c91 = getCustomPromptPresets(_0x15d6d4),
-        _0x43da20 = canCreateCustomPromptPreset(_0x15d6d4, _0x4c86c9),
-        _0x2ce26b = [];
-      _0x149432.draftPreset &&
-        _0x2ce26b.push({
-          key: _0x3080b7(_0x149432.draftPreset),
-          preset: _0x149432.draftPreset,
+      const preset3 = handler4(nodeType3),
+        value68 = appStore.getStateRaw().subscription || {},
+        isSubscriptionActive2 = isSubscriptionActive(value68),
+        list3 = getCustomPromptPresets(nodeType3),
+        canCreateCustomPromptPreset2 = canCreateCustomPromptPreset(nodeType3, value68),
+        list4 = [];
+      preset3.draftPreset &&
+        list4.push({
+          key: key3(preset3.draftPreset),
+          preset: preset3.draftPreset,
           isDraft: true,
         });
-      _0x256c91.forEach((_0x47d551) => {
-        _0x2ce26b.push({ key: _0x38255e(_0x47d551), preset: _0x47d551, isDraft: false });
+      list3.forEach((preset4) => {
+        list4.push({ key: key2(preset4), preset: preset4, isDraft: false });
       });
-      !_0x149432.selectedKey && _0x2ce26b.length > 0 && (_0x149432.selectedKey = _0x2ce26b[0].key);
-      _0x149432.selectedKey &&
-        _0x2ce26b.length > 0 &&
-        !_0x2ce26b.some((_0x536522) => _0x536522.key === _0x149432.selectedKey) &&
-        (_0x149432.selectedKey = _0x2ce26b[0].key);
-      if (_0x2ce26b.length === 0) {
-        const _0x665944 = document.createElement('div');
-        ((_0x665944.className = 'preset-manager-empty'),
-          (_0x665944.textContent = promptPresetsText('manager.emptyList')),
-          _0x5e5377.appendChild(_0x665944));
+      !preset3.selectedKey && list4.length > 0 && (preset3.selectedKey = list4[0].key);
+      preset3.selectedKey &&
+        list4.length > 0 &&
+        !list4.some((event5) => event5.key === preset3.selectedKey) &&
+        (preset3.selectedKey = list4[0].key);
+      if (list4.length === 0) {
+        const el45 = document.createElement('div');
+        ((el45.className = 'preset-manager-empty'),
+          (el45.textContent = promptPresetsText('manager.emptyList')),
+          el42.appendChild(el45));
       }
-      _0x2ce26b.forEach(({ key: _0x380f8f, preset: _0x57a364, isDraft: _0x4e0df8 }) => {
-        const _0x2e076b = document.createElement('div');
-        (_0x2e076b.setAttribute('role', 'button'),
-          (_0x2e076b.tabIndex = 0),
-          (_0x2e076b.className = 'preset-manager-list-item'),
-          _0x2e076b.classList.toggle('is-active', _0x380f8f === _0x149432.selectedKey),
-          _0x2e076b.classList.toggle('has-trigger-badge', !_0x4e0df8),
-          _0x2e076b.appendChild(
+      list4.forEach(({ key: key4, preset: preset5, isDraft: isDraft2 }) => {
+        const el46 = document.createElement('div');
+        (el46.setAttribute('role', 'button'),
+          (el46.tabIndex = 0),
+          (el46.className = 'preset-manager-list-item'),
+          el46.classList.toggle('is-active', key4 === preset3.selectedKey),
+          el46.classList.toggle('has-trigger-badge', !isDraft2),
+          el46.appendChild(
             buildPresetThumbnailControl({
-              preset: _0x57a364,
-              onUpload: (_0x32e4a9) => {
-                ((_0x57a364.thumbnailDataUrl = _0x32e4a9),
-                  (_0x57a364.thumbLocalPath = ''),
-                  (_0x57a364.thumbUrl = ''),
-                  (_0x149432.selectedKey = _0x380f8f),
+              preset: preset5,
+              onUpload: (value69) => {
+                ((preset5.thumbnailDataUrl = value69),
+                  (preset5.thumbLocalPath = ''),
+                  (preset5.thumbUrl = ''),
+                  (preset3.selectedKey = key4),
                   showPresetManagerToast(promptPresetsText('thumbnail.updated'), 'success'),
-                  _0x5e7679());
+                  handler3());
               },
             }),
           ));
-        const _0x4cdf1d = document.createElement('span');
-        _0x4cdf1d.className = 'preset-manager-list-text';
-        const _0x313bd2 = document.createElement('span');
-        ((_0x313bd2.className = 'preset-manager-list-title'),
-          (_0x313bd2.textContent = _0x57a364?.title || getCustomPresetFallbackTitle()));
-        const _0x1289c0 = document.createElement('span');
-        ((_0x1289c0.className = 'preset-manager-list-desc'),
-          (_0x1289c0.textContent =
-            _0x57a364?.desc || _0x57a364?.template || promptPresetsText('presetDescFallback')),
-          _0x4cdf1d.appendChild(_0x313bd2),
-          _0x4cdf1d.appendChild(_0x1289c0),
-          _0x2e076b.appendChild(_0x4cdf1d));
-        if (!_0x4e0df8) {
-          const _0x4b1407 = document.createElement('span');
-          ((_0x4b1407.className = 'preset-manager-list-trigger-badge'),
-            (_0x4b1407.textContent = getPromptPresetTriggerModeLabel(_0x57a364)),
-            _0x2e076b.appendChild(_0x4b1407));
+        const el47 = document.createElement('span');
+        el47.className = 'preset-manager-list-text';
+        const el48 = document.createElement('span');
+        ((el48.className = 'preset-manager-list-title'),
+          (el48.textContent = preset5?.title || getCustomPresetFallbackTitle()));
+        const el49 = document.createElement('span');
+        ((el49.className = 'preset-manager-list-desc'),
+          (el49.textContent = preset5?.desc || preset5?.template || promptPresetsText('presetDescFallback')),
+          el47.appendChild(el48),
+          el47.appendChild(el49),
+          el46.appendChild(el47));
+        if (!isDraft2) {
+          const el50 = document.createElement('span');
+          ((el50.className = 'preset-manager-list-trigger-badge'),
+            (el50.textContent = getPromptPresetTriggerModeLabel(preset5)),
+            el46.appendChild(el50));
         }
-        (_0x2e076b.addEventListener('click', () => {
-          ((_0x149432.selectedKey = _0x380f8f), _0x5e7679());
+        (el46.addEventListener('click', () => {
+          ((preset3.selectedKey = key4), handler3());
         }),
-          _0x2e076b.addEventListener('keydown', (_0x44ce62) => {
-            if (_0x44ce62.key !== 'Enter' && _0x44ce62.key !== ' ') return;
-            (_0x44ce62.preventDefault(), (_0x149432.selectedKey = _0x380f8f), _0x5e7679());
+          el46.addEventListener('keydown', (event6) => {
+            if (event6.key !== 'Enter' && event6.key !== ' ') return;
+            (event6.preventDefault(), (preset3.selectedKey = key4), handler3());
           }));
-        const _0x4651ee = buildPresetModalButton('×', 'preset-manager-list-delete');
-        (_0x4651ee.setAttribute(
+        const el51 = buildPresetModalButton('×', 'preset-manager-list-delete');
+        (el51.setAttribute(
           'aria-label',
           promptPresetsText('manager.deleteAria', {
-            title: _0x57a364?.title || getCustomPresetFallbackTitle(),
+            title: preset5?.title || getCustomPresetFallbackTitle(),
           }),
         ),
-          _0x4651ee.addEventListener('click', async (_0x5e2e0a) => {
-            (_0x5e2e0a.preventDefault(), _0x5e2e0a.stopPropagation(), (_0x4651ee.disabled = true));
-            if (_0x4e0df8) {
-              _0x149432.draftPreset = null;
-              _0x149432.selectedKey === _0x380f8f && (_0x149432.selectedKey = '');
-              _0x5e7679();
+          el51.addEventListener('click', async (event7) => {
+            (event7.preventDefault(), event7.stopPropagation(), (el51.disabled = true));
+            if (isDraft2) {
+              preset3.draftPreset = null;
+              preset3.selectedKey === key4 && (preset3.selectedKey = '');
+              handler3();
               return;
             }
             try {
               (await deletePromptPresetFromServer({
-                nodeType: _0x15d6d4,
-                title: String(_0x57a364?.title || ''),
+                nodeType: nodeType3,
+                title: String(preset5?.title || ''),
               }),
                 await loadCustomPresets(),
                 showPresetManagerToast(promptPresetsText('delete.deleted'), 'success'),
-                _0x149432.selectedKey === _0x380f8f && (_0x149432.selectedKey = ''),
-                _0x5e7679());
-            } catch (_0x32b3de) {
-              (showPresetManagerToast(_0x32b3de?.message || promptPresetsText('delete.failed'), 'error'),
-                (_0x4651ee.disabled = false));
+                preset3.selectedKey === key4 && (preset3.selectedKey = ''),
+                handler3());
+            } catch (error4) {
+              (showPresetManagerToast(error4?.message || promptPresetsText('delete.failed'), 'error'),
+                (el51.disabled = false));
             }
           }),
-          _0x2e076b.appendChild(_0x4651ee),
-          _0x5e5377.appendChild(_0x2e076b));
+          el46.appendChild(el51),
+          el42.appendChild(el46));
       });
-      if (_0x933d6a) {
-        const _0x116fe8 = document.createElement('div');
-        ((_0x116fe8.className = 'preset-manager-status'),
-          (_0x116fe8.textContent = promptPresetsText('manager.authorized')),
-          _0x206d8c.appendChild(_0x116fe8));
+      if (isSubscriptionActive2) {
+        const el52 = document.createElement('div');
+        ((el52.className = 'preset-manager-status'),
+          (el52.textContent = promptPresetsText('manager.authorized')),
+          el44.appendChild(el52));
       }
-      const _0x1ea44f = _0x2ce26b.find((_0x129c41) => _0x129c41.key === _0x149432.selectedKey);
-      if (_0x1ea44f) {
-        const _0x586902 = createPresetEditor({
-          nodeType: _0x15d6d4,
-          preset: _0x1ea44f.preset,
-          isDraft: _0x1ea44f.isDraft,
-          onSaved: ({ title: _0x54b2ac } = {}) => {
-            ((_0x149432.draftPreset = null),
-              (_0x149432.selectedKey = 'saved:' + String(_0x54b2ac || '').trim()),
-              _0x5e7679());
+      const preset6 = list4.find((event8) => event8.key === preset3.selectedKey);
+      if (preset6) {
+        const presetEditor = createPresetEditor({
+          nodeType: nodeType3,
+          preset: preset6.preset,
+          isDraft: preset6.isDraft,
+          onSaved: ({ title: title3 } = {}) => {
+            ((preset3.draftPreset = null),
+              (preset3.selectedKey = 'saved:' + String(title3 || '').trim()),
+              handler3());
           },
         });
-        (_0x4e44b4.appendChild(_0x586902.element),
-          _0x206d8c.appendChild(_0x586902.triggerModeControl),
-          _0x206d8c.appendChild(_0x586902.saveButton));
+        (el43.appendChild(presetEditor.element),
+          el44.appendChild(presetEditor.triggerModeControl),
+          el44.appendChild(presetEditor.saveButton));
       } else {
-        const _0x4b3368 = document.createElement('div');
-        ((_0x4b3368.className = 'preset-manager-detail-empty'),
-          (_0x4b3368.textContent = promptPresetsText('manager.emptyDetail')),
-          _0x4e44b4.appendChild(_0x4b3368));
+        const el53 = document.createElement('div');
+        ((el53.className = 'preset-manager-detail-empty'),
+          (el53.textContent = promptPresetsText('manager.emptyDetail')),
+          el43.appendChild(el53));
       }
-      _0x5a65ee.disabled = !_0x43da20;
-      if (!_0x43da20) {
-        const _0x3d0372 = document.createElement('div');
-        ((_0x3d0372.className = 'preset-manager-limit'),
-          (_0x3d0372.textContent = promptPresetsText('manager.freeLimit', {
+      el41.disabled = !canCreateCustomPromptPreset2;
+      if (!canCreateCustomPromptPreset2) {
+        const el54 = document.createElement('div');
+        ((el54.className = 'preset-manager-limit'),
+          (el54.textContent = promptPresetsText('manager.freeLimit', {
             limit: FREE_CUSTOM_PRESET_LIMIT,
           })));
-        const _0x5da392 = buildPresetModalButton(
+        const el55 = buildPresetModalButton(
           promptPresetsText('manager.activate'),
           'preset-modal-btn-secondary',
         );
-        (_0x5da392.addEventListener('click', () => requestSubscriptionFromPresetManager(_0x3446a8)),
-          _0x3d0372.appendChild(_0x5da392),
-          _0x4e44b4.appendChild(_0x3d0372));
+        (el55.addEventListener('click', () => requestSubscriptionFromPresetManager(el30)),
+          el54.appendChild(el55),
+          el43.appendChild(el54));
       }
     };
-  if (_0x2f8e15) {
-    const _0x2a6a1f = _0x347663.get(_0x15d6d4);
-    ((_0x2a6a1f.draftCounter = 1),
-      (_0x2a6a1f.draftPreset = {
-        id: _0x2a6a1f.draftCounter,
-        title: getUniqueDraftTitle(getCustomPromptPresets(_0x15d6d4)),
+  if (template2) {
+    const id = map2.get(nodeType3);
+    ((id.draftCounter = 1),
+      (id.draftPreset = {
+        id: id.draftCounter,
+        title: getUniqueDraftTitle(getCustomPromptPresets(nodeType3)),
         desc: '',
-        template: _0x2f8e15,
+        template: template2,
         triggerMode: PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT,
       }),
-      (_0x2a6a1f.selectedKey = 'draft:' + _0x2a6a1f.draftPreset.id));
+      (id.selectedKey = 'draft:' + id.draftPreset.id));
   }
   return (
-    _0x5a65ee.addEventListener('click', () => {
-      const _0x4862fe = _0x2dd8f0(_0x15d6d4),
-        _0x1d9a2b = appStore.getStateRaw().subscription || {};
-      if (!canCreateCustomPromptPreset(_0x15d6d4, _0x1d9a2b)) {
+    el41.addEventListener('click', () => {
+      const id2 = handler4(nodeType3),
+        value70 = appStore.getStateRaw().subscription || {};
+      if (!canCreateCustomPromptPreset(nodeType3, value70)) {
         (showPresetManagerToast(
           promptPresetsText('manager.freeLimitToast', { limit: FREE_CUSTOM_PRESET_LIMIT }),
           'warn',
         ),
-          requestSubscriptionFromPresetManager(_0x3446a8));
+          requestSubscriptionFromPresetManager(el30));
         return;
       }
-      ((_0x4862fe.draftCounter += 1),
-        (_0x4862fe.draftPreset = {
-          id: _0x4862fe.draftCounter,
-          title: getUniqueDraftTitle(getCustomPromptPresets(_0x15d6d4)),
+      ((id2.draftCounter += 1),
+        (id2.draftPreset = {
+          id: id2.draftCounter,
+          title: getUniqueDraftTitle(getCustomPromptPresets(nodeType3)),
           desc: '',
           template: '',
           triggerMode: PROMPT_PRESET_TRIGGER_MODE_DIRECT,
         }),
-        (_0x4862fe.selectedKey = 'draft:' + _0x4862fe.draftPreset.id),
-        _0x5e7679());
+        (id2.selectedKey = 'draft:' + id2.draftPreset.id),
+        handler3());
     }),
-    _0x431cfe.appendChild(_0x15fddf),
-    _0x431cfe.appendChild(_0xdb2f87),
-    _0x431cfe.appendChild(_0x23e661),
-    _0x431cfe.appendChild(_0x206d8c),
-    _0x3446a8.appendChild(_0x431cfe),
-    _0x5e7679(),
-    _0x3446a8.addEventListener('mousedown', (_0x455733) => {
-      _0x455733.target === _0x3446a8 && _0x1763c1();
+    el31.appendChild(el32),
+    el31.appendChild(el37),
+    el31.appendChild(el39),
+    el31.appendChild(el44),
+    el30.appendChild(el31),
+    handler3(),
+    el30.addEventListener('mousedown', (event9) => {
+      event9.target === el30 && run4();
     }),
-    document.body.appendChild(_0x3446a8),
-    (activePresetManagerOverlay = _0x3446a8),
-    (closeActivePresetManager = _0x1763c1),
-    _0x3446a8
+    document.body.appendChild(el30),
+    (activePresetManagerOverlay = el30),
+    (closeActivePresetManager = run4),
+    el30
   );
 }
-export async function openQuickCapturePromptPresetDraft(_0x4b7f2a) {
+export async function openQuickCapturePromptPresetDraft(initialDraftTemplate2) {
   await loadPromptPresetSettings();
-  const _0x32af41 = getDefaultQuickCapturePresetNodeType(),
-    _0x1b0a3e = _0x32af41 || 'ai-text',
-    _0x4a5e8c = openCustomPresetsManager({
-      nodeType: _0x1b0a3e,
-      initialDraftTemplate: _0x4b7f2a,
+  const defaultQuickCapturePresetNodeType = getDefaultQuickCapturePresetNodeType(),
+    nodeType4 = defaultQuickCapturePresetNodeType || 'ai-text',
+    overlay = openCustomPresetsManager({
+      nodeType: nodeType4,
+      initialDraftTemplate: initialDraftTemplate2,
     });
-  return { overlay: _0x4a5e8c, nodeType: _0x1b0a3e, hasConfiguredDefault: Boolean(_0x32af41) };
+  return {
+    overlay: overlay,
+    nodeType: nodeType4,
+    hasConfiguredDefault: Boolean(defaultQuickCapturePresetNodeType),
+  };
 }
 
-function applyPromptPresetLeafTriggerMode(_0x13e604,_0x3b2666){return(Array["isArray"](_0x13e604)?_0x13e604:[])["map"](_0x2c3a2c=>{const _0x5b1a80={..._0x2c3a2c};return Array["isArray"](_0x2c3a2c?.["subItems"])?_0x5b1a80['subItems']=applyPromptPresetLeafTriggerMode(_0x2c3a2c["subItems"],_0x3b2666):_0x5b1a80["triggerMode"]=_0x3b2666,_0x5b1a80;});}
+function applyPromptPresetLeafTriggerMode(value71, value72) {
+  return (Array['isArray'](value71) ? value71 : [])['map']((args6) => {
+    const value73 = { ...args6 };
+    return (
+      Array['isArray'](args6?.['subItems'])
+        ? (value73['subItems'] = applyPromptPresetLeafTriggerMode(args6['subItems'], value72))
+        : (value73['triggerMode'] = value72),
+      value73
+    );
+  });
+}
 
-export const MINIMAX_H3_FULL_CHARACTER_REPLACEMENT_PROMPT="将 <Video 1> 中的主要人物完整替换为 <Picture 1> 中的人物，包括人物身份、面部、发型、身体特征、服装和配饰。\n\n新人物完整采用 <Picture 1> 的外貌与穿搭，但严格继承 <Video 1> 中原人物的动作、姿势、表演、走位、视线、表情、口型和动作时间。\n\n语音沿用 <Video 1> 原始音轨，不重新生成或修改。新人物的表情和口型逐帧匹配原人物并与原语音同步；不说话时自然闭口。\n\n完整保留原视频的镜头运动、构图、背景、场景、道具、环境光线、阴影、遮挡关系和剪辑节奏。服装在快速动作、转身和遮挡时保持结构稳定，人物面部在所有角度保持一致。\n\n忽略 <Picture 1> 的背景、姿势、光线和相机角度，不要将参考图背景带入视频。";
+export const MINIMAX_H3_FULL_CHARACTER_REPLACEMENT_PROMPT =
+  '将 <Video 1> 中的主要人物完整替换为 <Picture 1> 中的人物，包括人物身份、面部、发型、身体特征、服装和配饰。\n\n新人物完整采用 <Picture 1> 的外貌与穿搭，但严格继承 <Video 1> 中原人物的动作、姿势、表演、走位、视线、表情、口型和动作时间。\n\n语音沿用 <Video 1> 原始音轨，不重新生成或修改。新人物的表情和口型逐帧匹配原人物并与原语音同步；不说话时自然闭口。\n\n完整保留原视频的镜头运动、构图、背景、场景、道具、环境光线、阴影、遮挡关系和剪辑节奏。服装在快速动作、转身和遮挡时保持结构稳定，人物面部在所有角度保持一致。\n\n忽略 <Picture 1> 的背景、姿势、光线和相机角度，不要将参考图背景带入视频。';
 
-export const MINIMAX_H3_GENERAL_CHARACTER_REPLACEMENT_PROMPT="以 <Video 1> 为基础进行人物替换。\n\n将视频中的主要人物完整替换为 <Picture 1> 中的人物。准确保留 <Picture 1> 中人物的面部身份、五官比例、脸型、发型、发色、肤色、年龄特征和身体比例。\n\n严格继承 <Video 1> 中原人物的全部动作、姿势、走位、头部转动、视线、表情变化、口型变化和动作节奏。保持原视频的镜头角度、景别、运镜、构图、场景、背景、光线、阴影、道具、遮挡关系和时间节奏不变。\n\n语音沿用 <Video 1> 原始音轨，不重新生成或修改。新人物的表情和口型逐帧匹配原人物并与原语音同步；不说话时自然闭口。\n\n替换后的人物自然融入原场景，身体与环境光线一致，面部在正脸、侧脸和快速运动中保持稳定。不要改变背景，不要增加人物，不要删除其他人物，不要改变原视频镜头，不要出现原人物面孔残留、双脸、五官漂移、身体变形或服装闪烁。";
+export const MINIMAX_H3_GENERAL_CHARACTER_REPLACEMENT_PROMPT =
+  '以 <Video 1> 为基础进行人物替换。\n\n将视频中的主要人物完整替换为 <Picture 1> 中的人物。准确保留 <Picture 1> 中人物的面部身份、五官比例、脸型、发型、发色、肤色、年龄特征和身体比例。\n\n严格继承 <Video 1> 中原人物的全部动作、姿势、走位、头部转动、视线、表情变化、口型变化和动作节奏。保持原视频的镜头角度、景别、运镜、构图、场景、背景、光线、阴影、道具、遮挡关系和时间节奏不变。\n\n语音沿用 <Video 1> 原始音轨，不重新生成或修改。新人物的表情和口型逐帧匹配原人物并与原语音同步；不说话时自然闭口。\n\n替换后的人物自然融入原场景，身体与环境光线一致，面部在正脸、侧脸和快速运动中保持稳定。不要改变背景，不要增加人物，不要删除其他人物，不要改变原视频镜头，不要出现原人物面孔残留、双脸、五官漂移、身体变形或服装闪烁。';
 
-export const MINIMAX_H3_CHARACTER_AND_BACKGROUND_REPLACEMENT_PROMPT="将 <Video 1> 中的主要人物完整替换为 <Picture 1> 中的人物，包括人物身份、面部、发型、身体特征、服装和配饰。\n\n新人物完整采用 <Picture 1> 的外貌与穿搭，但严格继承 <Video 1> 中原人物的动作、姿势、表演、走位、视线、表情、口型和动作时间。\n\n同时，将 <Video 1> 的原背景和场景完整替换为 <Picture 1> 中的背景与场景，包括空间环境、家具、道具、材质、光线、色彩和整体视觉风格。人物始终在 <Picture 1> 的场景中完成原视频表演。\n\n语音沿用 <Video 1> 原始音轨，不重新生成或修改。新人物的表情和口型逐帧匹配原人物，并与原语音同步；不说话时自然闭口。\n\n完整保留 <Video 1> 的镜头运动、构图、景别、剪辑节奏和动作时间，但不要保留原视频的背景和场景。根据原视频的镜头变化，自然重建 <Picture 1> 背景的视角、透视、遮挡、环境光线和阴影，保持背景风格和空间结构连续稳定。\n\n服装在快速动作、转身和遮挡时保持结构稳定，人物面部在所有角度保持一致。人物与新背景自然融合，保持正确的空间关系、接触阴影和环境光照。\n\n忽略 <Picture 1> 中人物原本的姿势，只参考其中的人物形象、服装、背景和场景。不要带入 <Video 1> 的原人物外貌、服装、背景和场景。";
+export const MINIMAX_H3_CHARACTER_AND_BACKGROUND_REPLACEMENT_PROMPT =
+  '将 <Video 1> 中的主要人物完整替换为 <Picture 1> 中的人物，包括人物身份、面部、发型、身体特征、服装和配饰。\n\n新人物完整采用 <Picture 1> 的外貌与穿搭，但严格继承 <Video 1> 中原人物的动作、姿势、表演、走位、视线、表情、口型和动作时间。\n\n同时，将 <Video 1> 的原背景和场景完整替换为 <Picture 1> 中的背景与场景，包括空间环境、家具、道具、材质、光线、色彩和整体视觉风格。人物始终在 <Picture 1> 的场景中完成原视频表演。\n\n语音沿用 <Video 1> 原始音轨，不重新生成或修改。新人物的表情和口型逐帧匹配原人物，并与原语音同步；不说话时自然闭口。\n\n完整保留 <Video 1> 的镜头运动、构图、景别、剪辑节奏和动作时间，但不要保留原视频的背景和场景。根据原视频的镜头变化，自然重建 <Picture 1> 背景的视角、透视、遮挡、环境光线和阴影，保持背景风格和空间结构连续稳定。\n\n服装在快速动作、转身和遮挡时保持结构稳定，人物面部在所有角度保持一致。人物与新背景自然融合，保持正确的空间关系、接触阴影和环境光照。\n\n忽略 <Picture 1> 中人物原本的姿势，只参考其中的人物形象、服装、背景和场景。不要带入 <Video 1> 的原人物外貌、服装、背景和场景。';
 
-export const MINIMAX_H3_UNIVERSAL_OBJECT_REPLACEMENT_PROMPT="以 <Video 1> 为基础进行局部物体替换。\n\n将视频中的【原物体及其位置特征】完整替换为 <Picture 1> 中的【新物体】。准确保留新物体的形状、结构、比例、材质、颜色、纹理、图案、标识和细节。\n\n新物体严格继承原物体在 <Video 1> 中的位置、尺寸、朝向、透视、运动轨迹、速度、旋转、形变状态以及与人物和环境的互动关系。\n\n完整保留原视频中的人物、场景、背景、镜头、构图、运镜、光线、阴影、反射、遮挡、景深、动作节奏和音频。根据原场景的光照和透视自然重建新物体的阴影、反射和接触关系。\n\n只替换指定物体。不要改变人物身份、面部、服装、动作和身体；不要改变其他物体；不要带入 <Picture 1> 的背景、手部、人物、姿势或光线；不要出现原物体残留、物体融合、尺寸漂移、纹理闪烁、穿模、悬浮、复制或额外物体。";
+export const MINIMAX_H3_UNIVERSAL_OBJECT_REPLACEMENT_PROMPT =
+  '以 <Video 1> 为基础进行局部物体替换。\n\n将视频中的【原物体及其位置特征】完整替换为 <Picture 1> 中的【新物体】。准确保留新物体的形状、结构、比例、材质、颜色、纹理、图案、标识和细节。\n\n新物体严格继承原物体在 <Video 1> 中的位置、尺寸、朝向、透视、运动轨迹、速度、旋转、形变状态以及与人物和环境的互动关系。\n\n完整保留原视频中的人物、场景、背景、镜头、构图、运镜、光线、阴影、反射、遮挡、景深、动作节奏和音频。根据原场景的光照和透视自然重建新物体的阴影、反射和接触关系。\n\n只替换指定物体。不要改变人物身份、面部、服装、动作和身体；不要改变其他物体；不要带入 <Picture 1> 的背景、手部、人物、姿势或光线；不要出现原物体残留、物体融合、尺寸漂移、纹理闪烁、穿模、悬浮、复制或额外物体。';
 
-export const MINIMAX_H3_HANDHELD_ITEM_REPLACEMENT_PROMPT='将\x20<Video\x201>\x20中人物右手握着的黑色手机，完整替换为\x20<Picture\x201>\x20中的红色饮料罐。\x0a\x0a准确保留饮料罐的圆柱结构、尺寸比例、红色金属材质、标签、拉环和表面高光。饮料罐严格继承原手机的位置、移动轨迹、速度和朝向，同时根据新物体形状自然调整人物右手的握持方式。\x0a\x0a保持手掌、手腕、手指数量和关节结构正确。手指自然环绕饮料罐，拇指位于罐体一侧，其他手指产生正确遮挡和接触阴影。物体不得穿过手掌，不得悬浮，不得粘连或复制。\x0a\x0a完整保留人物身份、面部、发型、服装、身体动作、背景、镜头、光线和音频。只替换手中的物体，不要改变人物，不要带入参考图中的手、人物和背景，不要出现多余手指、原物体残留或标签闪烁。';
+export const MINIMAX_H3_HANDHELD_ITEM_REPLACEMENT_PROMPT =
+  '将\x20<Video\x201>\x20中人物右手握着的黑色手机，完整替换为\x20<Picture\x201>\x20中的红色饮料罐。\x0a\x0a准确保留饮料罐的圆柱结构、尺寸比例、红色金属材质、标签、拉环和表面高光。饮料罐严格继承原手机的位置、移动轨迹、速度和朝向，同时根据新物体形状自然调整人物右手的握持方式。\x0a\x0a保持手掌、手腕、手指数量和关节结构正确。手指自然环绕饮料罐，拇指位于罐体一侧，其他手指产生正确遮挡和接触阴影。物体不得穿过手掌，不得悬浮，不得粘连或复制。\x0a\x0a完整保留人物身份、面部、发型、服装、身体动作、背景、镜头、光线和音频。只替换手中的物体，不要改变人物，不要带入参考图中的手、人物和背景，不要出现多余手指、原物体残留或标签闪烁。';
 
-export const MINIMAX_H3_VEHICLE_REPLACEMENT_PROMPT="将 <Video 1> 中正在道路上行驶的白色轿车，完整替换为 <Picture 1> 中的黑色越野车。\n\n准确保留新车辆的车身结构、车型比例、前脸、车灯、轮毂、车漆、车窗、标识和材质细节。新车辆继承原车辆的行驶路线、速度、转向、刹车、车身起伏和镜头中的空间位置。\n\n车轮与道路正确接触并按照行驶速度自然旋转，车辆运动符合真实物理规律。根据原场景重新生成车漆反射、玻璃反射、车身阴影、轮胎阴影和运动模糊。\n\n保持道路、驾驶员、其他车辆、行人、建筑、天气、镜头运动、构图和音频不变。只替换指定车辆，不要改变道路和其他车辆，不要出现车轮滑动、车身漂移、尺寸突变、车牌乱码或原车辆残留。";
+export const MINIMAX_H3_VEHICLE_REPLACEMENT_PROMPT =
+  '将 <Video 1> 中正在道路上行驶的白色轿车，完整替换为 <Picture 1> 中的黑色越野车。\n\n准确保留新车辆的车身结构、车型比例、前脸、车灯、轮毂、车漆、车窗、标识和材质细节。新车辆继承原车辆的行驶路线、速度、转向、刹车、车身起伏和镜头中的空间位置。\n\n车轮与道路正确接触并按照行驶速度自然旋转，车辆运动符合真实物理规律。根据原场景重新生成车漆反射、玻璃反射、车身阴影、轮胎阴影和运动模糊。\n\n保持道路、驾驶员、其他车辆、行人、建筑、天气、镜头运动、构图和音频不变。只替换指定车辆，不要改变道路和其他车辆，不要出现车轮滑动、车身漂移、尺寸突变、车牌乱码或原车辆残留。';
 
-export const MINIMAX_H3_MULTI_PERSON_REPLACEMENT_PROMPT="以 <Video 1> 为基础进行双人物同步替换。<Picture 1> 只用于定义两个替换角色的外观，忽略参考图中的背景、墙面、阴影、姿势、动作、构图和光线。\n\n角色定义：\n<Subject 1> 是 <Picture 1> 左侧的银色头部、红蓝银配色角色，保留其头部造型、面部结构、胸前发光装置、服装配色、身体比例和全部外观细节。\n\n<Subject 2> 是 <Picture 1> 右侧的黑银色装甲角色，保留其尖锐头部轮廓、黑银装甲结构、胸前红色装置、身体比例、材质和全部外观细节。\n\n人物对应关系：\n将 <Video 1> 中位于前景中央、穿米色毛衣的男子完整替换为 <Subject 1>。\n\n将 <Video 1> 中位于画面右后方、靠近墙壁、穿黑色衣服的男子完整替换为 <Subject 2>。\n\n两名替换角色分别严格继承各自对应原人物的空间位置、身体动作、姿势、手势、头部转动、视线方向、表情节奏、口型变化、走位、运动轨迹和遮挡关系。\n\n语音沿用 <Video 1> 原始音轨，不重新生成或修改。<Subject 1> 和 <Subject 2> 的表情和口型分别逐帧匹配对应原人物及对白时间，禁止串用；不说话时自然闭口。\n\n保持两个人物的对应关系从视频开始到结束始终不变：\n前景人物始终是 <Subject 1>；\n右后方人物始终是 <Subject 2>。\n禁止两名角色身份交换、外观融合、服装互换或在不同帧中互相变成对方。\n\n完整保留 <Video 1> 的场景、墙壁、光线、窗户投影、背景、镜头角度、构图、运镜、景深、剪辑节奏和原始音频。根据原视频光线自然生成两名角色的高光、阴影、墙面投影和环境反射，使其自然融入现场。\n\n只替换这两名指定人物。不要增加第三个人物，不要保留原人物的脸、头发或服装，不要带入 <Picture 1> 的背景。不要出现双脸、原人物残留、角色复制、身份串位、装甲融合、肢体变形、材质闪烁、穿模或人物位置改变。";
+export const MINIMAX_H3_MULTI_PERSON_REPLACEMENT_PROMPT =
+  '以 <Video 1> 为基础进行双人物同步替换。<Picture 1> 只用于定义两个替换角色的外观，忽略参考图中的背景、墙面、阴影、姿势、动作、构图和光线。\n\n角色定义：\n<Subject 1> 是 <Picture 1> 左侧的银色头部、红蓝银配色角色，保留其头部造型、面部结构、胸前发光装置、服装配色、身体比例和全部外观细节。\n\n<Subject 2> 是 <Picture 1> 右侧的黑银色装甲角色，保留其尖锐头部轮廓、黑银装甲结构、胸前红色装置、身体比例、材质和全部外观细节。\n\n人物对应关系：\n将 <Video 1> 中位于前景中央、穿米色毛衣的男子完整替换为 <Subject 1>。\n\n将 <Video 1> 中位于画面右后方、靠近墙壁、穿黑色衣服的男子完整替换为 <Subject 2>。\n\n两名替换角色分别严格继承各自对应原人物的空间位置、身体动作、姿势、手势、头部转动、视线方向、表情节奏、口型变化、走位、运动轨迹和遮挡关系。\n\n语音沿用 <Video 1> 原始音轨，不重新生成或修改。<Subject 1> 和 <Subject 2> 的表情和口型分别逐帧匹配对应原人物及对白时间，禁止串用；不说话时自然闭口。\n\n保持两个人物的对应关系从视频开始到结束始终不变：\n前景人物始终是 <Subject 1>；\n右后方人物始终是 <Subject 2>。\n禁止两名角色身份交换、外观融合、服装互换或在不同帧中互相变成对方。\n\n完整保留 <Video 1> 的场景、墙壁、光线、窗户投影、背景、镜头角度、构图、运镜、景深、剪辑节奏和原始音频。根据原视频光线自然生成两名角色的高光、阴影、墙面投影和环境反射，使其自然融入现场。\n\n只替换这两名指定人物。不要增加第三个人物，不要保留原人物的脸、头发或服装，不要带入 <Picture 1> 的背景。不要出现双脸、原人物残留、角色复制、身份串位、装甲融合、肢体变形、材质闪烁、穿模或人物位置改变。';
 
-export const MINIMAX_H3_CLOTHING_ONLY_REPLACEMENT_PROMPT="以 <Video 1> 为基础进行人物换装。\n\n仅将 <Picture 1> 中的衣服穿到 <Video 1> 的主要人物身上。准确保留衣服的款式、版型、颜色、材质、纹理、图案、领口、袖口、纽扣、装饰和标识。\n\n完整保留 <Video 1> 中人物原本的身份、面部、五官、发型、肤色、年龄、体型和身体比例，不得替换人物，不得参考 <Picture 1> 中的模特、人体、姿势、背景、光线和构图。\n\n完整保留原视频的动作、表情、走位、镜头、构图、场景、背景、道具、光线、阴影、剪辑节奏和音频。\n\n只替换人物原来的衣服，其他内容全部保持不变。不要改变人物面孔和身体，不要带入参考图中的模特或背景，不要出现原衣服残留、双层衣服、衣服穿模、身体变形、纹理闪烁、图案漂移或多余肢体。";
+export const MINIMAX_H3_CLOTHING_ONLY_REPLACEMENT_PROMPT =
+  '以 <Video 1> 为基础进行人物换装。\n\n仅将 <Picture 1> 中的衣服穿到 <Video 1> 的主要人物身上。准确保留衣服的款式、版型、颜色、材质、纹理、图案、领口、袖口、纽扣、装饰和标识。\n\n完整保留 <Video 1> 中人物原本的身份、面部、五官、发型、肤色、年龄、体型和身体比例，不得替换人物，不得参考 <Picture 1> 中的模特、人体、姿势、背景、光线和构图。\n\n完整保留原视频的动作、表情、走位、镜头、构图、场景、背景、道具、光线、阴影、剪辑节奏和音频。\n\n只替换人物原来的衣服，其他内容全部保持不变。不要改变人物面孔和身体，不要带入参考图中的模特或背景，不要出现原衣服残留、双层衣服、衣服穿模、身体变形、纹理闪烁、图案漂移或多余肢体。';
 
-export const MINIMAX_H3_CLOTHING_AND_HAIRSTYLE_REPLACEMENT_PROMPT='以\x20<Video\x201>\x20为基础，仅替换主要人物的衣服和发型。\x0a\x0a人物穿着\x20<Picture\x201>\x20中的完整服装，并采用其中的发型、发色、头发长度和造型。衣服自然贴合身体并随动作产生合理的褶皱和摆动；发型适配人物头型，在运动中保持稳定。\x0a\x0a严格保留原视频人物的身份、面孔、五官、脸型、肤色、体型、表情、动作和走位。仅参考\x20<Picture\x201>\x20的服装与发型，忽略其中的人脸、身体、姿势、背景和光线。\x0a\x0a保持原视频的镜头、场景、构图、道具、光影、节奏和音频不变。不要改变人物长相，不要出现身份融合、原服装残留、双层衣服、穿模或纹理闪烁。';
+export const MINIMAX_H3_CLOTHING_AND_HAIRSTYLE_REPLACEMENT_PROMPT =
+  '以\x20<Video\x201>\x20为基础，仅替换主要人物的衣服和发型。\x0a\x0a人物穿着\x20<Picture\x201>\x20中的完整服装，并采用其中的发型、发色、头发长度和造型。衣服自然贴合身体并随动作产生合理的褶皱和摆动；发型适配人物头型，在运动中保持稳定。\x0a\x0a严格保留原视频人物的身份、面孔、五官、脸型、肤色、体型、表情、动作和走位。仅参考\x20<Picture\x201>\x20的服装与发型，忽略其中的人脸、身体、姿势、背景和光线。\x0a\x0a保持原视频的镜头、场景、构图、道具、光影、节奏和音频不变。不要改变人物长相，不要出现身份融合、原服装残留、双层衣服、穿模或纹理闪烁。';
 
-export const MINIMAX_H3_REPLACE_ONE_OF_TWO_PEOPLE_PROMPT='将\x20<Video\x201>\x20中位于画面左侧、穿黑色上衣的人物替换为\x20<Picture\x201>\x20中的人物。\x0a\x0a画面右侧人物必须完整保留，身份、面部、服装、动作和位置均不得改变。新人物严格继承左侧原人物的动作、表情、视线、口型、走位及与右侧人物的互动。\x0a\x0a语音沿用\x20<Video\x201>\x20原始音轨，不重新生成或修改。左侧新人物的表情和口型逐帧匹配左侧原人物及对白时间；右侧人物的口型和语音保持不变，不说话时自然闭口。\x0a\x0a保持原视频的镜头、背景、灯光、道具、遮挡、空间关系、对白时间和音频不变。只替换指定的左侧人物，不要交换两个人的身份，不要让两张脸融合。';
+export const MINIMAX_H3_REPLACE_ONE_OF_TWO_PEOPLE_PROMPT =
+  '将\x20<Video\x201>\x20中位于画面左侧、穿黑色上衣的人物替换为\x20<Picture\x201>\x20中的人物。\x0a\x0a画面右侧人物必须完整保留，身份、面部、服装、动作和位置均不得改变。新人物严格继承左侧原人物的动作、表情、视线、口型、走位及与右侧人物的互动。\x0a\x0a语音沿用\x20<Video\x201>\x20原始音轨，不重新生成或修改。左侧新人物的表情和口型逐帧匹配左侧原人物及对白时间；右侧人物的口型和语音保持不变，不说话时自然闭口。\x0a\x0a保持原视频的镜头、背景、灯光、道具、遮挡、空间关系、对白时间和音频不变。只替换指定的左侧人物，不要交换两个人的身份，不要让两张脸融合。';
 
-export const HAILUO_H3_STANDARD_PROMPT="subject_definitions:\n<Subject 1> 是 <Picture 1> 中的林夏，25岁中国女性，肩长黑发，面色苍白，穿湿润的米色风衣。完整保留她的面部身份、发型、年龄特征、服装颜色和身材比例。\n<Subject 2> 是 <Picture 2> 中的周沉，28岁中国男性，短黑发，轮廓消瘦，穿黑色旧外套。完整保留他的面部身份、发型、冷淡表情、服装和身材比例。\n<Subject 3> 是 <Picture 3> 中的废弃医院走廊，保留剥落的墙皮、闪烁灯管、绿色墙裙、积水地面、废弃病床和走廊尽头的全身镜。\n\nsummary:\n[reference generation] 目标视频是一段15秒双人悬疑短剧。<Subject 1> 在 <Subject 3> 中遇见本应已经死亡的 <Subject 2>。两人经过四句简短对话后，<Subject 2> 揭示真正死亡的人是 <Subject 1>，并通过镜中没有她的倒影完成剧情反转。\n\nretention_analysis:\n<Subject 1> (出现在 [Shot 1]、[Shot 2]、[Shot 3]): fully_preserved - 始终保留林夏的面部身份、黑色肩长发、米色风衣和年轻女性外形，情绪从震惊逐渐转为恐惧。\n<Subject 2> (出现在 [Shot 1]、[Shot 2]、[Shot 3]): fully_preserved - 始终保留周沉的面部身份、短黑发、黑色旧外套和冷淡克制的神态。\n<Subject 3> (出现在 [Shot 1]、[Shot 2]、[Shot 3]): fully_preserved - 保留医院走廊的空间结构、绿色墙裙、积水、闪烁灯管和尽头的全身镜。\n\ndetailed_description:\n目标视频采用真人电影质感、冷色悬疑风格和低照度照明，竖屏构图，浅景深，人物动作自然克制。\n\n[Shot 1] 中景镜头建立 <Subject 3>。闪烁的灯光映在积水地面上，<Subject 1> 林夏站在画面前景，湿润的米色风衣紧贴肩膀。<Subject 2> 周沉从走廊尽头的阴影中缓慢走出。镜头以较小幅度缓慢推向林夏。林夏（S1）盯着周沉，声音颤抖地问：<d>[Chinese] 你不是三年前就死了吗？</d>\n\n[Shot 2] At 00:04.500，镜头切至 <Subject 2> 的面部近景。周沉停在一盏闪烁的灯管下，半张脸藏在阴影中。他（S2）平静回答：<d>[Chinese] 你认错尸体了。</d> 镜头迅速切回林夏。她握紧手电筒，向前迈出半步，追问：<d>[Chinese] 那棺材里的人是谁？</d>\n\n[Shot 3] At 00:09.500，镜头切至周沉的正面特写。他没有立刻回答，而是把目光缓慢移向林夏身后的全身镜。周沉（S2）低声说：<d>[Chinese] 棺材里的人，是你。</d> 镜头以较小幅度缓慢环绕林夏，最终对准走廊尽头的镜子。镜中清晰映出周沉、灯光和废弃病床，却没有林夏的倒影。林夏低头看见自己手腕上的白色停尸标签，瞳孔骤然放大。灯光完全熄灭，画面立即切黑。\n\noverall_soundscape:\n暴雨敲打破损的窗户，老旧灯管持续发出电流噪声。空旷走廊中回荡着脚步、积水踩踏声、衣料摩擦声和林夏逐渐急促的呼吸。最后一句对白结束后，所有环境声突然停止。\n\nnon_diegetic_music:\n缓慢、稀疏的钢琴单音贯穿前两个镜头，低沉的大提琴长音逐渐增强。镜中显露真相时加入一次短促的低频冲击，画面切黑后音乐立即停止。";
+export const HAILUO_H3_STANDARD_PROMPT =
+  'subject_definitions:\n<Subject 1> 是 <Picture 1> 中的林夏，25岁中国女性，肩长黑发，面色苍白，穿湿润的米色风衣。完整保留她的面部身份、发型、年龄特征、服装颜色和身材比例。\n<Subject 2> 是 <Picture 2> 中的周沉，28岁中国男性，短黑发，轮廓消瘦，穿黑色旧外套。完整保留他的面部身份、发型、冷淡表情、服装和身材比例。\n<Subject 3> 是 <Picture 3> 中的废弃医院走廊，保留剥落的墙皮、闪烁灯管、绿色墙裙、积水地面、废弃病床和走廊尽头的全身镜。\n\nsummary:\n[reference generation] 目标视频是一段15秒双人悬疑短剧。<Subject 1> 在 <Subject 3> 中遇见本应已经死亡的 <Subject 2>。两人经过四句简短对话后，<Subject 2> 揭示真正死亡的人是 <Subject 1>，并通过镜中没有她的倒影完成剧情反转。\n\nretention_analysis:\n<Subject 1> (出现在 [Shot 1]、[Shot 2]、[Shot 3]): fully_preserved - 始终保留林夏的面部身份、黑色肩长发、米色风衣和年轻女性外形，情绪从震惊逐渐转为恐惧。\n<Subject 2> (出现在 [Shot 1]、[Shot 2]、[Shot 3]): fully_preserved - 始终保留周沉的面部身份、短黑发、黑色旧外套和冷淡克制的神态。\n<Subject 3> (出现在 [Shot 1]、[Shot 2]、[Shot 3]): fully_preserved - 保留医院走廊的空间结构、绿色墙裙、积水、闪烁灯管和尽头的全身镜。\n\ndetailed_description:\n目标视频采用真人电影质感、冷色悬疑风格和低照度照明，竖屏构图，浅景深，人物动作自然克制。\n\n[Shot 1] 中景镜头建立 <Subject 3>。闪烁的灯光映在积水地面上，<Subject 1> 林夏站在画面前景，湿润的米色风衣紧贴肩膀。<Subject 2> 周沉从走廊尽头的阴影中缓慢走出。镜头以较小幅度缓慢推向林夏。林夏（S1）盯着周沉，声音颤抖地问：<d>[Chinese] 你不是三年前就死了吗？</d>\n\n[Shot 2] At 00:04.500，镜头切至 <Subject 2> 的面部近景。周沉停在一盏闪烁的灯管下，半张脸藏在阴影中。他（S2）平静回答：<d>[Chinese] 你认错尸体了。</d> 镜头迅速切回林夏。她握紧手电筒，向前迈出半步，追问：<d>[Chinese] 那棺材里的人是谁？</d>\n\n[Shot 3] At 00:09.500，镜头切至周沉的正面特写。他没有立刻回答，而是把目光缓慢移向林夏身后的全身镜。周沉（S2）低声说：<d>[Chinese] 棺材里的人，是你。</d> 镜头以较小幅度缓慢环绕林夏，最终对准走廊尽头的镜子。镜中清晰映出周沉、灯光和废弃病床，却没有林夏的倒影。林夏低头看见自己手腕上的白色停尸标签，瞳孔骤然放大。灯光完全熄灭，画面立即切黑。\n\noverall_soundscape:\n暴雨敲打破损的窗户，老旧灯管持续发出电流噪声。空旷走廊中回荡着脚步、积水踩踏声、衣料摩擦声和林夏逐渐急促的呼吸。最后一句对白结束后，所有环境声突然停止。\n\nnon_diegetic_music:\n缓慢、稀疏的钢琴单音贯穿前两个镜头，低沉的大提琴长音逐渐增强。镜中显露真相时加入一次短促的低频冲击，画面切黑后音乐立即停止。';
 
-export const HAILUO_H3_AUDIO_PROMPT_VIDEO_PROMPT="根据提示词【视频内容】生成视频，并以 <Audio 1> 作为原始语音。画面内容、人物表演和镜头节奏跟随语音推进。";
+export const HAILUO_H3_AUDIO_PROMPT_VIDEO_PROMPT =
+  '根据提示词【视频内容】生成视频，并以 <Audio 1> 作为原始语音。画面内容、人物表演和镜头节奏跟随语音推进。';
 
-export const HAILUO_H3_AUDIO_IMAGE_LIP_SYNC_PROMPT="让 <Picture 1> 中的【指定人物】按照提示词【动作和运镜】进行表演，并跟随 <Audio 1> 说话，口型、表情和节奏与语音准确同步。";
+export const HAILUO_H3_AUDIO_IMAGE_LIP_SYNC_PROMPT =
+  '让 <Picture 1> 中的【指定人物】按照提示词【动作和运镜】进行表演，并跟随 <Audio 1> 说话，口型、表情和节奏与语音准确同步。';
 
-export const HAILUO_H3_AUDIO_VIDEO_LIP_SYNC_PROMPT="让 <Video 1> 中的【指定人物】跟随 <Audio 1> 说话，口型、表情和说话节奏与语音准确同步；停顿时自然闭口。直接使用 <Audio 1> 的原始语音，不改变台词、音色、语速和情绪。";
+export const HAILUO_H3_AUDIO_VIDEO_LIP_SYNC_PROMPT =
+  '让 <Video 1> 中的【指定人物】跟随 <Audio 1> 说话，口型、表情和说话节奏与语音准确同步；停顿时自然闭口。直接使用 <Audio 1> 的原始语音，不改变台词、音色、语速和情绪。';
 
-export const HAILUO_H3_AUDIO_IMAGE_VIDEO_MOTION_TRANSFER_PROMPT="以 <Picture 1> 提供人物、背景和整体画面，将 <Video 1> 中的人物动作和运镜迁移到参考图，并让人物跟随 <Audio 1> 说话，口型、表情和节奏与语音准确同步。";
+export const HAILUO_H3_AUDIO_IMAGE_VIDEO_MOTION_TRANSFER_PROMPT =
+  '以 <Picture 1> 提供人物、背景和整体画面，将 <Video 1> 中的人物动作和运镜迁移到参考图，并让人物跟随 <Audio 1> 说话，口型、表情和节奏与语音准确同步。';
 
-export function getPromptPresetThumbSrc(_0x1ed5fe){const _0xec3d43=String(_0x1ed5fe?.["thumbnailDataUrl"]||'')["trim"]();if(_0xec3d43)return _0xec3d43;const _0x11886c=String(_0x1ed5fe?.["thumbUrl"]||_0x1ed5fe?.["thumbnailUrl"]||_0x1ed5fe?.["posterUrl"]||_0x1ed5fe?.["coverUrl"]||'')["trim"]();if(_0x11886c)return _0x11886c;const _0x26c42c=String(_0x1ed5fe?.['thumbLocalPath']||_0x1ed5fe?.['thumbnailLocalPath']||_0x1ed5fe?.["posterLocalPath"]||_0x1ed5fe?.["coverLocalPath"]||'')["trim"]();return _0x26c42c?'/'+_0x26c42c["replace"](/^\/+/,''):'';}
+export function getPromptPresetThumbSrc(value74) {
+  const value75 = String(value74?.['thumbnailDataUrl'] || '')['trim']();
+  if (value75) return value75;
+  const value76 = String(
+    value74?.['thumbUrl'] ||
+      value74?.['thumbnailUrl'] ||
+      value74?.['posterUrl'] ||
+      value74?.['coverUrl'] ||
+      '',
+  )['trim']();
+  if (value76) return value76;
+  const value77 = String(
+    value74?.['thumbLocalPath'] ||
+      value74?.['thumbnailLocalPath'] ||
+      value74?.['posterLocalPath'] ||
+      value74?.['coverLocalPath'] ||
+      '',
+  )['trim']();
+  return value77 ? '/' + value77['replace'](/^\/+/, '') : '';
+}
 
-function showPresetButtonPending(_0x447fb5,_0x5c9162){_0x447fb5["disabled"]=!![],_0x447fb5["setAttribute"]('aria-busy',"true"),_0x447fb5["textContent"]=_0x5c9162;const _0xe1b66e=document["createElement"]("span");_0xe1b66e["className"]='project-package-loading-spinner\x20preset-manager-action-spinner',_0xe1b66e["setAttribute"]("aria-hidden",'true'),_0x447fb5["appendChild"](_0xe1b66e);}
+function showPresetButtonPending(value78, value79) {
+  ((value78['disabled'] = !![]),
+    value78['setAttribute']('aria-busy', 'true'),
+    (value78['textContent'] = value79));
+  const value80 = document['createElement']('span');
+  ((value80['className'] = 'project-package-loading-spinner\x20preset-manager-action-spinner'),
+    value80['setAttribute']('aria-hidden', 'true'),
+    value78['appendChild'](value80));
+}

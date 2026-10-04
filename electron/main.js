@@ -117,12 +117,12 @@ import {
 import { registerIpcHandlers } from './ipc/registerIpcHandlers.js';
 let APP_DISPLAY_NAME = 'Canvas';
 const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
-  ? // Production keeps its historical folder, so an existing install keeps its projects and
-    // settings. Note the packaged name is 'canvas' from package.json, not the product name.
-    'AI CanvasPro'
-  : // A side-by-side test build carries its own productName in package.json (see
-    // electron-builder.win.dev.cjs), so it gets its own folder instead of sharing data.
-    app.getName() || 'AI CanvasPro',
+    ? // Production keeps its historical folder, so an existing install keeps its projects and
+      // settings. Note the packaged name is 'canvas' from package.json, not the product name.
+      'AI CanvasPro'
+    : // A side-by-side test build carries its own productName in package.json (see
+      // electron-builder.win.dev.cjs), so it gets its own folder instead of sharing data.
+      app.getName() || 'AI CanvasPro',
   APP_USER_DATA_ROOT = process.env.AIC_USER_DATA_ROOT
     ? path.resolve(process.env.AIC_USER_DATA_ROOT)
     : path.join(app.getPath('appData'), APP_DATA_DIRECTORY_NAME),
@@ -144,7 +144,8 @@ const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
   PACKAGED_INSTALL_DATA_ROOT = STORAGE_ROOTS.installDataRoot,
   PACKAGED_FILES_ROOT = STORAGE_ROOTS.storageRoot,
   LEGACY_PACKAGED_FILES_ROOTS = STORAGE_ROOTS.legacyFilesRoots,
-  LEGACY_PACKAGED_FILES_ROOT = LEGACY_PACKAGED_FILES_ROOTS[0] || (process.env.AIC_STORAGE_ROOT ? PACKAGED_FILES_ROOT : APP_ROOT),
+  LEGACY_PACKAGED_FILES_ROOT =
+    LEGACY_PACKAGED_FILES_ROOTS[0] || (process.env.AIC_STORAGE_ROOT ? PACKAGED_FILES_ROOT : APP_ROOT),
   HOST = '127.0.0.1',
   PORT = Number.parseInt(process.env.AICANVAS_PORT || '8777', 10) || 0x2249,
   APP_ORIGIN = 'http://' + HOST + ':' + PORT,
@@ -182,31 +183,43 @@ let mainWindow = null,
   secureSettingsStore = null,
   updateInstallPreparation = null;
 const desktopStartupLifecycle = createDesktopStartupLifecycle({
-  app, getSpawnedServer: () => spawnedServer, probeServer: () => probeServer(),
-  clearPortBeforeStart: () => clearPortBeforeStart(), ensureServerRunning: () => ensureServerRunning(),
+  app,
+  getSpawnedServer: () => spawnedServer,
+  probeServer: () => probeServer(),
+  clearPortBeforeStart: () => clearPortBeforeStart(),
+  ensureServerRunning: () => ensureServerRunning(),
 });
 const desktopQuitCoordinator = createDesktopQuitCoordinator({
-  app, getMainWindow: () => mainWindow,
+  app,
+  getMainWindow: () => mainWindow,
   shouldBypassClose: () => isQuittingForUpdate,
   beginShutdown: () => desktopStartupLifecycle.beginQuit(),
-  onError: error => logDiagnosticEvent({ type: 'app.shutdown_cleanup_failed', level: 'warn', source: 'main', error }),
-  cleanup: () => runCleanupSteps([
-    () => localRuntimeKeepAlive.stop(),
-    () => backgroundCompletionNotifier.dispose(),
-    () => screenshotOverlayController.uninstallGlobalScreenshotShortcut(),
-    () => screenshotOverlayController.destroyScreenshotOverlayWindow(),
-    () => globalShortcut.unregisterAll(),
-    () => globalCaptureWindowController.destroy(),
-    () => stopSpawnedServer(),
-    () => stopAllPowerSaveBlockers(),
-  ], { onError: error => logDiagnosticEvent({ type: 'app.shutdown_cleanup_failed', level: 'warn', source: 'main', error }) }),
+  onError: (error) =>
+    logDiagnosticEvent({ type: 'app.shutdown_cleanup_failed', level: 'warn', source: 'main', error }),
+  cleanup: () =>
+    runCleanupSteps(
+      [
+        () => localRuntimeKeepAlive.stop(),
+        () => backgroundCompletionNotifier.dispose(),
+        () => screenshotOverlayController.uninstallGlobalScreenshotShortcut(),
+        () => screenshotOverlayController.destroyScreenshotOverlayWindow(),
+        () => globalShortcut.unregisterAll(),
+        () => globalCaptureWindowController.destroy(),
+        () => stopSpawnedServer(),
+        () => stopAllPowerSaveBlockers(),
+      ],
+      {
+        onError: (error) =>
+          logDiagnosticEvent({ type: 'app.shutdown_cleanup_failed', level: 'warn', source: 'main', error }),
+      },
+    ),
 });
 function isDragImportProfilingEnabled() {
   return /^(1|true|yes|on)$/i.test(String(process.env.AIC_DRAG_IMPORT_PROFILING || '').trim());
 }
-function logDragImportProfile(_0x360efc, _0x31e2f1 = {}) {
+function logDragImportProfile(value, item = {}) {
   if (!isDragImportProfilingEnabled()) return;
-  console.log('[drag-import-prof] ' + _0x360efc, _0x31e2f1);
+  console.log('[drag-import-prof] ' + value, item);
 }
 function isAssetImportLoggingEnabled() {
   return /^(1|true|yes|on)$/i.test(String(process.env.AIC_ASSET_IMPORT_LOG || '').trim());
@@ -283,8 +296,8 @@ const { globalCaptureWindowController, globalTextPresetShortcutController } = cr
   logDiagnosticEvent: logDiagnosticEvent,
 });
 diagnostics.ensureInitialFiles();
-function logDiagnosticEvent(_0x5dc451 = {}) {
-  return diagnostics.logEvent(_0x5dc451);
+function logDiagnosticEvent(options2 = {}) {
+  return diagnostics.logEvent(options2);
 }
 const localRuntimeKeepAlive = createLocalRuntimeKeepAliveController({
   getWindow: () => mainWindow,
@@ -292,130 +305,124 @@ const localRuntimeKeepAlive = createLocalRuntimeKeepAliveController({
   setPowerSaveBlocker: setPowerSaveBlocker,
   logDiagnosticEvent: logDiagnosticEvent,
 });
-function normalizeTaskbarProgress(_0x12dd54) {
-  const _0x320f3a = Number(_0x12dd54);
-  if (!Number.isFinite(_0x320f3a) || _0x320f3a < 0) return null;
-  return Math.max(0, Math.min(1, _0x320f3a));
+function normalizeTaskbarProgress(key) {
+  const count = Number(key);
+  if (!Number.isFinite(count) || count < 0) return null;
+  return Math.max(0, Math.min(1, count));
 }
 function refreshTaskbarProgress() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  const _0x5c55aa = taskbarProgressSources.get('updater') ?? taskbarProgressSources.get('media') ?? null;
-  mainWindow.setProgressBar(_0x5c55aa == null ? -1 : _0x5c55aa);
+  const index = taskbarProgressSources.get('updater') ?? taskbarProgressSources.get('media') ?? null;
+  mainWindow.setProgressBar(index == null ? -1 : index);
 }
-function setTaskbarProgressSource(_0x1ace5a, _0x1e326e) {
-  const _0x3b8d56 = String(_0x1ace5a || '').trim();
-  if (!_0x3b8d56) return;
-  const _0x4055bf = normalizeTaskbarProgress(_0x1e326e);
-  (_0x4055bf == null
-    ? taskbarProgressSources.delete(_0x3b8d56)
-    : taskbarProgressSources.set(_0x3b8d56, _0x4055bf),
+function setTaskbarProgressSource(data, next) {
+  const enabled = String(data || '').trim();
+  if (!enabled) return;
+  const taskbarProgress = normalizeTaskbarProgress(next);
+  (taskbarProgress == null
+    ? taskbarProgressSources.delete(enabled)
+    : taskbarProgressSources.set(enabled, taskbarProgress),
     refreshTaskbarProgress());
 }
-function setPowerSaveBlocker(_0x189f5f, _0x3f65a8, _0x38a89c = 'prevent-display-sleep') {
-  const _0x27e6c7 = String(_0x189f5f || '').trim();
-  if (!_0x27e6c7) return;
-  const _0x3b3ccf =
-    _0x38a89c === 'prevent-app-suspension' ? 'prevent-app-suspension' : 'prevent-display-sleep';
-  if (_0x3f65a8) {
-    if (powerSaveBlockerReasons.has(_0x27e6c7)) return;
-    const _0x152e9a = powerSaveBlocker.start(_0x3b3ccf);
-    (powerSaveBlockerReasons.set(_0x27e6c7, _0x152e9a),
+function setPowerSaveBlocker(current, entry, record = 'prevent-display-sleep') {
+  const reason = String(current || '').trim();
+  if (!reason) return;
+  const type = record === 'prevent-app-suspension' ? 'prevent-app-suspension' : 'prevent-display-sleep';
+  if (entry) {
+    if (powerSaveBlockerReasons.has(reason)) return;
+    const blockerId = powerSaveBlocker.start(type);
+    (powerSaveBlockerReasons.set(reason, blockerId),
       logDiagnosticEvent({
         type: 'power_save_blocker.started',
         level: 'info',
         source: 'main',
         message: 'Power save blocker started',
-        context: { reason: _0x27e6c7, blockerId: _0x152e9a, type: _0x3b3ccf },
+        context: { reason: reason, blockerId: blockerId, type: type },
       }));
     return;
   }
-  const _0x45f1cf = powerSaveBlockerReasons.get(_0x27e6c7);
-  if (_0x45f1cf == null) return;
-  powerSaveBlockerReasons.delete(_0x27e6c7);
+  const blockerId2 = powerSaveBlockerReasons.get(reason);
+  if (blockerId2 == null) return;
+  powerSaveBlockerReasons.delete(reason);
   try {
-    powerSaveBlocker.isStarted(_0x45f1cf) && powerSaveBlocker.stop(_0x45f1cf);
-  } catch (_0x4c4cc9) {
-    console.warn('[electron] failed to stop power save blocker:', _0x4c4cc9);
+    powerSaveBlocker.isStarted(blockerId2) && powerSaveBlocker.stop(blockerId2);
+  } catch (handle) {
+    console.warn('[electron] failed to stop power save blocker:', handle);
   }
   logDiagnosticEvent({
     type: 'power_save_blocker.stopped',
     level: 'info',
     source: 'main',
     message: 'Power save blocker stopped',
-    context: { reason: _0x27e6c7, blockerId: _0x45f1cf },
+    context: { reason: reason, blockerId: blockerId2 },
   });
 }
 function stopAllPowerSaveBlockers() {
-  for (const _0xbf5f5 of [...powerSaveBlockerReasons.keys()]) {
-    setPowerSaveBlocker(_0xbf5f5, false);
+  for (const state of [...powerSaveBlockerReasons.keys()]) {
+    setPowerSaveBlocker(state, false);
   }
 }
-function normalizeWindowState(_0x108899) {
-  const _0x1c2365 = _0x108899 && typeof _0x108899 === 'object' ? _0x108899 : {},
-    _0x331df0 = _0x1c2365.bounds && typeof _0x1c2365.bounds === 'object' ? _0x1c2365.bounds : _0x1c2365,
-    _0x295587 = Number.parseInt(_0x331df0.width, 10),
-    _0x521588 = Number.parseInt(_0x331df0.height, 10),
-    _0x202349 = Number.parseInt(_0x331df0.x, 10),
-    _0x23fe8c = Number.parseInt(_0x331df0.y, 10),
-    _0x3825a6 = {
-      width: Number.isFinite(_0x295587) && _0x295587 >= 0x400 ? _0x295587 : DEFAULT_WINDOW_STATE.width,
-      height: Number.isFinite(_0x521588) && _0x521588 >= 0x2d0 ? _0x521588 : DEFAULT_WINDOW_STATE.height,
-      isMaximized: _0x1c2365.isMaximized === true,
+function normalizeWindowState(scope) {
+  const isMaximized = scope && typeof scope === 'object' ? scope : {},
+    box = isMaximized.bounds && typeof isMaximized.bounds === 'object' ? isMaximized.bounds : isMaximized,
+    count2 = Number.parseInt(box.width, 10),
+    count3 = Number.parseInt(box.height, 10),
+    input = Number.parseInt(box.x, 10),
+    output = Number.parseInt(box.y, 10),
+    box2 = {
+      width: Number.isFinite(count2) && count2 >= 0x400 ? count2 : DEFAULT_WINDOW_STATE.width,
+      height: Number.isFinite(count3) && count3 >= 0x2d0 ? count3 : DEFAULT_WINDOW_STATE.height,
+      isMaximized: isMaximized.isMaximized === true,
     };
-  return (
-    Number.isFinite(_0x202349) &&
-      Number.isFinite(_0x23fe8c) &&
-      ((_0x3825a6.x = _0x202349), (_0x3825a6.y = _0x23fe8c)),
-    _0x3825a6
-  );
+  return (Number.isFinite(input) && Number.isFinite(output) && ((box2.x = input), (box2.y = output)), box2);
 }
-function isWindowStateOnDisplay(_0x3bf012) {
-  if (!Number.isFinite(_0x3bf012?.x) || !Number.isFinite(_0x3bf012?.y)) return true;
-  const _0x2a1ed1 = { x: _0x3bf012.x, y: _0x3bf012.y, width: _0x3bf012.width, height: _0x3bf012.height };
-  return screen.getAllDisplays().some(({ workArea: _0x4b15f }) => {
+function isWindowStateOnDisplay(x) {
+  if (!Number.isFinite(x?.x) || !Number.isFinite(x?.y)) return true;
+  const box3 = { x: x.x, y: x.y, width: x.width, height: x.height };
+  return screen.getAllDisplays().some(({ workArea: workArea }) => {
     return (
-      _0x2a1ed1.x < _0x4b15f.x + _0x4b15f.width &&
-      _0x2a1ed1.x + _0x2a1ed1.width > _0x4b15f.x &&
-      _0x2a1ed1.y < _0x4b15f.y + _0x4b15f.height &&
-      _0x2a1ed1.y + _0x2a1ed1.height > _0x4b15f.y
+      box3.x < workArea.x + workArea.width &&
+      box3.x + box3.width > workArea.x &&
+      box3.y < workArea.y + workArea.height &&
+      box3.y + box3.height > workArea.y
     );
   });
 }
 function readWindowState() {
   try {
-    const _0x121fb6 = normalizeWindowState(JSON.parse(readFileSync(WINDOW_STATE_PATH, 'utf8')));
-    return (!isWindowStateOnDisplay(_0x121fb6) && (delete _0x121fb6.x, delete _0x121fb6.y), _0x121fb6);
+    const box4 = normalizeWindowState(JSON.parse(readFileSync(WINDOW_STATE_PATH, 'utf8')));
+    return (!isWindowStateOnDisplay(box4) && (delete box4.x, delete box4.y), box4);
   } catch {
     return { ...DEFAULT_WINDOW_STATE };
   }
 }
-function writeWindowState(_0x36b286) {
-  if (!_0x36b286 || _0x36b286.isDestroyed()) return;
-  const _0x41daad = _0x36b286.getBounds(),
-    _0x429ea2 = normalizeWindowState({ ..._0x41daad, isMaximized: _0x36b286.isMaximized() }),
-    _0x31dd01 = WINDOW_STATE_PATH + '.' + process.pid + '.' + Date.now() + '.tmp';
+function writeWindowState(isMaximized2) {
+  if (!isMaximized2 || isMaximized2.isDestroyed()) return;
+  const args = isMaximized2.getBounds(),
+    windowState = normalizeWindowState({ ...args, isMaximized: isMaximized2.isMaximized() }),
+    value2 = WINDOW_STATE_PATH + '.' + process.pid + '.' + Date.now() + '.tmp';
   try {
     (mkdirSync(path.dirname(WINDOW_STATE_PATH), { recursive: true }),
-      writeFileSync(_0x31dd01, JSON.stringify(_0x429ea2, null, 2) + '\n', 'utf8'),
-      renameSync(_0x31dd01, WINDOW_STATE_PATH));
-  } catch (_0x19d5c9) {
-    console.warn('[electron] failed to save window state:', _0x19d5c9);
+      writeFileSync(value2, JSON.stringify(windowState, null, 2) + '\n', 'utf8'),
+      renameSync(value2, WINDOW_STATE_PATH));
+  } catch (value3) {
+    console.warn('[electron] failed to save window state:', value3);
   }
 }
-function installWindowStatePersistence(_0x1bfc6b) {
-  let _0x501a6e = null;
-  const _0x17bed2 = () => {
-    if (_0x501a6e) clearTimeout(_0x501a6e);
-    _0x501a6e = setTimeout(() => {
-      ((_0x501a6e = null), writeWindowState(_0x1bfc6b));
+function installWindowStatePersistence(value4) {
+  let setTimeout2 = null;
+  const value5 = () => {
+    if (setTimeout2) clearTimeout(setTimeout2);
+    setTimeout2 = setTimeout(() => {
+      ((setTimeout2 = null), writeWindowState(value4));
     }, 0x190);
   };
-  (_0x1bfc6b.on('move', _0x17bed2),
-    _0x1bfc6b.on('resize', _0x17bed2),
-    _0x1bfc6b.on('maximize', _0x17bed2),
-    _0x1bfc6b.on('unmaximize', _0x17bed2),
-    _0x1bfc6b.on('close', () => {
-      (_0x501a6e && (clearTimeout(_0x501a6e), (_0x501a6e = null)), writeWindowState(_0x1bfc6b));
+  (value4.on('move', value5),
+    value4.on('resize', value5),
+    value4.on('maximize', value5),
+    value4.on('unmaximize', value5),
+    value4.on('close', () => {
+      (setTimeout2 && (clearTimeout(setTimeout2), (setTimeout2 = null)), writeWindowState(value4));
     }));
 }
 const { delay, loadStartupStatus, isLocalAppUrl, openExternalUrl } = createStartupHelpers({
@@ -427,53 +434,57 @@ const { delay, loadStartupStatus, isLocalAppUrl, openExternalUrl } = createStart
   normalizeExternalUrl: normalizeExternalUrl,
   formatExternalUrlForLog: formatExternalUrlForLog,
 });
-function probeServer(_0x1837ce = 0x4b0) {
-  return new Promise((_0x5164e0) => {
-    const _0x35c039 = http.get(APP_ORIGIN + '/api/v2/runtime/info', { timeout: _0x1837ce, headers: { 'X-AIC-Local-Token': LOCAL_ACCESS_TOKEN } }, (_0x2aa121) => {
-      const _0xc711b1 = String(_0x2aa121.headers[SERVER_ID_HEADER] || '');
-      (_0x2aa121.resume(), _0x5164e0(_0x2aa121.statusCode === 200 && _0xc711b1 === SERVER_ID_VALUE));
-    });
-    (_0x35c039.on('timeout', () => {
-      (_0x35c039.destroy(), _0x5164e0(false));
+function probeServer(timeout = 0x4b0) {
+  return new Promise((handler) => {
+    const value6 = http.get(
+      APP_ORIGIN + '/api/v2/runtime/info',
+      { timeout: timeout, headers: { 'X-AIC-Local-Token': LOCAL_ACCESS_TOKEN } },
+      (response2) => {
+        const value7 = String(response2.headers[SERVER_ID_HEADER] || '');
+        (response2.resume(), handler(response2.statusCode === 200 && value7 === SERVER_ID_VALUE));
+      },
+    );
+    (value6.on('timeout', () => {
+      (value6.destroy(), handler(false));
     }),
-      _0x35c039.on('error', () => {
-        _0x5164e0(false);
+      value6.on('error', () => {
+        handler(false);
       }));
   });
 }
-function requestLocalJson(_0x52adc2, _0x3c3cdb = 0x640) {
-  return new Promise((_0x3219d9, _0x19bd8c) => {
-    const _0x2869fe = http.request(
+function requestLocalJson(path2, timeout2 = 0x640) {
+  return new Promise((handler2, handler3) => {
+    const value8 = http.request(
       {
         hostname: HOST,
         port: PORT,
-        path: _0x52adc2,
+        path: path2,
         method: 'GET',
-        timeout: _0x3c3cdb,
+        timeout: timeout2,
         headers: { 'X-AIC-Local-Token': LOCAL_ACCESS_TOKEN },
       },
-      (_0x4d8f32) => {
-        const _0x439deb = [];
-        (_0x4d8f32.on('data', (_0x5bfeb0) => _0x439deb.push(Buffer.from(_0x5bfeb0))),
-          _0x4d8f32.on('end', () => {
-            const _0x528203 = Buffer.concat(_0x439deb).toString('utf8');
-            if (_0x4d8f32.statusCode < 200 || _0x4d8f32.statusCode >= 0x12c) {
-              _0x19bd8c(new Error(_0x528203 || 'HTTP ' + _0x4d8f32.statusCode));
+      (value9) => {
+        const list = [];
+        (value9.on('data', (value10) => list.push(Buffer.from(value10))),
+          value9.on('end', () => {
+            const value11 = Buffer.concat(list).toString('utf8');
+            if (value9.statusCode < 200 || value9.statusCode >= 0x12c) {
+              handler3(new Error(value11 || 'HTTP ' + value9.statusCode));
               return;
             }
             try {
-              _0x3219d9(_0x528203 ? JSON.parse(_0x528203) : {});
-            } catch (_0x4d8814) {
-              _0x19bd8c(_0x4d8814);
+              handler2(value11 ? JSON.parse(value11) : {});
+            } catch (value12) {
+              handler3(value12);
             }
           }));
       },
     );
-    (_0x2869fe.on('timeout', () => {
-      _0x2869fe.destroy(new Error('Local service request timed out'));
+    (value8.on('timeout', () => {
+      value8.destroy(new Error('Local service request timed out'));
     }),
-      _0x2869fe.on('error', _0x19bd8c),
-      _0x2869fe.end());
+      value8.on('error', handler3),
+      value8.end());
   });
 }
 async function refreshProductDisplayName() {
@@ -491,59 +502,62 @@ async function refreshProductDisplayName() {
       updateMainWindowUnsavedState(mainWindow);
       const payload = JSON.stringify({ displayName: APP_DISPLAY_NAME });
       void mainWindow.webContents
-        .executeJavaScript(`window.dispatchEvent(new CustomEvent('canvas:product-display-name', { detail: ${payload} }));`)
+        .executeJavaScript(
+          `window.dispatchEvent(new CustomEvent('canvas:product-display-name', { detail: ${payload} }));`,
+        )
         .catch(() => {});
     }
   } catch {}
 }
-async function clearPortBeforeStart(_0x2f1d77 = null) {
+async function clearPortBeforeStart(value13 = null) {
   if (process.env.AIC_DISABLE_PORT_RECLAIM === '1') {
-    if (!await probeTcpPortAvailable({ host: HOST, port: PORT })) throw new Error('Independent test port is occupied; no existing process was stopped');
+    if (!(await probeTcpPortAvailable({ host: HOST, port: PORT })))
+      throw new Error('Independent test port is occupied; no existing process was stopped');
     return;
   }
-  const _0x1a93c4 = resolveBackendLaunch();
+  const backendCommand = resolveBackendLaunch();
   return reclaimStartupPort({
     port: PORT,
     env: process['env'],
     collectListeningPortPids: collectListeningPortPids,
     probePortAvailable: () => probeTcpPortAvailable({ host: HOST, port: PORT }),
-    confirmRuntimeIdentity: async ({ pids: _0x41c8de }) => {
+    confirmRuntimeIdentity: async ({ pids: pids }) => {
       if (!(await probeServer())) return [];
       return findVerifiedBackendProcessPids({
-        pids: _0x41c8de,
+        pids: pids,
         appIsPackaged: app['isPackaged'],
         appRoot: APP_ROOT,
-        backendCommand: _0x1a93c4['command'],
+        backendCommand: backendCommand['command'],
         host: HOST,
         port: PORT,
         platform: process['platform'],
         env: process['env'],
       });
     },
-    terminateProcess: (_0x4b7f0e) => {
+    terminateProcess: (value14) => {
       if (process['platform'] === 'win32') {
-        const _0x5c1a92 = resolveWindowsSystemToolPath('taskkill', { env: process['env'] });
-        execFileSync(_0x5c1a92, ['/PID', String(_0x4b7f0e), '/F', '/T'], {
+        const windowsSystemToolPath = resolveWindowsSystemToolPath('taskkill', { env: process['env'] });
+        execFileSync(windowsSystemToolPath, ['/PID', String(value14), '/F', '/T'], {
           stdio: 'ignore',
           windowsHide: !![],
         });
-      } else process['kill'](_0x4b7f0e, 'SIGTERM');
+      } else process['kill'](value14, 'SIGTERM');
     },
     delayFn: delay,
     onReclaim: () =>
-      _0x2f1d77?.({
+      value13?.({
         kind: 'loading',
         title: APP_DISPLAY_NAME + '\x20正在启动',
         detail: '正在恢复上次未关闭的运行环境。',
         hint: '启动完成后会自动进入画布。',
       }),
-    onEnumerationUnavailable: ({ error: _0x3e0b91 }) => {
+    onEnumerationUnavailable: ({ error: error2 }) => {
       logDiagnosticEvent({
         type: 'startup_port.enumeration_unavailable',
         level: 'warn',
         source: 'main',
         message: 'Startup port listener enumeration failed; the port is free, continuing startup',
-        context: { port: PORT, resolution: 'port-free-continue', ...(_0x3e0b91?.['details'] || {}) },
+        context: { port: PORT, resolution: 'port-free-continue', ...(error2?.['details'] || {}) },
       });
     },
   });
@@ -551,7 +565,7 @@ async function clearPortBeforeStart(_0x2f1d77 = null) {
 function resolvePythonCommand() {
   if (!app.isPackaged && process.env.AIC_TEST_PYTHON) return process.env.AIC_TEST_PYTHON;
   if (app.isPackaged) {
-    const _0x495dd7 =
+    const list2 =
       process.platform === 'win32'
         ? [
             path.join(RUNTIME_ROOT, 'python', 'python.exe'),
@@ -561,9 +575,9 @@ function resolvePythonCommand() {
             path.join(RUNTIME_ROOT, 'python', 'bin', 'python3'),
             path.join(RUNTIME_ROOT, 'python', 'bin', 'python'),
           ];
-    return _0x495dd7.find((_0x181c85) => existsSync(_0x181c85)) || _0x495dd7[0];
+    return list2.find((item2) => existsSync(item2)) || list2[0];
   }
-  const _0x464336 =
+  const list3 =
     process.platform === 'win32'
       ? [
           path.join(APP_ROOT, 'venv', 'python.exe'),
@@ -576,8 +590,8 @@ function resolvePythonCommand() {
           'python3',
           'python',
         ];
-  return _0x464336.find((_0x4e4abd) => {
-    return path.isAbsolute(_0x4e4abd) ? existsSync(_0x4e4abd) : true;
+  return list3.find((item3) => {
+    return path.isAbsolute(item3) ? existsSync(item3) : true;
   });
 }
 function resolveBackendLaunch() {
@@ -590,26 +604,25 @@ function resolveBackendLaunch() {
     pythonCommand: resolvePythonCommand(),
   });
 }
-function resolveRuntimeTool(_0x361b25) {
-  const _0x1771b =
-      process.platform === 'win32' && !_0x361b25.endsWith('.exe') ? _0x361b25 + '.exe' : _0x361b25,
-    _0x2777c8 = path.join(RUNTIME_ROOT, 'ffmpeg', 'bin', _0x1771b);
-  return existsSync(_0x2777c8) ? _0x2777c8 : '';
+function resolveRuntimeTool(enabled2) {
+  const value15 = process.platform === 'win32' && !enabled2.endsWith('.exe') ? enabled2 + '.exe' : enabled2,
+    value16 = path.join(RUNTIME_ROOT, 'ffmpeg', 'bin', value15);
+  return existsSync(value16) ? value16 : '';
 }
 function buildPackagedServerEnv() {
-  const _0x438439 = app.getPath('userData'),
-    _0x20ca3d = getStorageRoot();
+  const value17 = app.getPath('userData'),
+    storageRoot = getStorageRoot();
   return {
-    AIC_CLIENT_CONFIG_PATH: path.join(_0x438439, 'client-config.json'),
-    AIC_CLIENT_CONFIG_OVERRIDE_PATH: path.join(_0x438439, 'client-config.local.json'),
-    AIC_SUBSCRIPTION_STATUS_PATH: path.join(_0x438439, 'subscription-status.json'),
-    AIC_USER_DIR: path.join(_0x438439, 'user'),
-    AIC_CANVAS_DIR: path.join(_0x20ca3d, 'projects'),
-    AIC_DATA_DIR: path.join(_0x20ca3d, 'data'),
-    AIC_OUTPUT_DIR: path.join(_0x20ca3d, 'output'),
-    AIC_UPLOADS_DIR: path.join(_0x20ca3d, 'data', 'uploads'),
-    AIC_ASSETS_DIR: path.join(_0x20ca3d, 'data', 'assets'),
-    AIC_WORKFLOWS_DIR: path.join(_0x20ca3d, 'data', 'workflows'),
+    AIC_CLIENT_CONFIG_PATH: path.join(value17, 'client-config.json'),
+    AIC_CLIENT_CONFIG_OVERRIDE_PATH: path.join(value17, 'client-config.local.json'),
+    AIC_SUBSCRIPTION_STATUS_PATH: path.join(value17, 'subscription-status.json'),
+    AIC_USER_DIR: path.join(value17, 'user'),
+    AIC_CANVAS_DIR: path.join(storageRoot, 'projects'),
+    AIC_DATA_DIR: path.join(storageRoot, 'data'),
+    AIC_OUTPUT_DIR: path.join(storageRoot, 'output'),
+    AIC_UPLOADS_DIR: path.join(storageRoot, 'data', 'uploads'),
+    AIC_ASSETS_DIR: path.join(storageRoot, 'data', 'assets'),
+    AIC_WORKFLOWS_DIR: path.join(storageRoot, 'data', 'workflows'),
     ...buildLegacyFileSavePathEnv(LEGACY_PACKAGED_FILES_ROOTS),
     AIC_FFMPEG_EXE: resolveRuntimeTool('ffmpeg'),
     AIC_FFPROBE_EXE: resolveRuntimeTool('ffprobe'),
@@ -633,12 +646,12 @@ const { getStableDeviceId } = createDeviceIdentityManager({
     BrowserWindow: BrowserWindow,
     getMainWindow: () => mainWindow,
     openExternalUrl: openExternalUrl,
-    createContextMenu: (_0x22307f) => Menu.buildFromTemplate(_0x22307f),
+    createContextMenu: (value18) => Menu.buildFromTemplate(value18),
     logDiagnosticEvent: logDiagnosticEvent,
   }),
   importRemoteAssetToLibrary = createRemoteAssetImporter({
     importAssetToLibrary: importAssetToLibrary,
-    getWebPreviewEntry: (_0x4ef2b5, _0x449443) => webPreviewViewManager._getEntry(_0x4ef2b5, _0x449443),
+    getWebPreviewEntry: (value19, value20) => webPreviewViewManager._getEntry(value19, value20),
     tempRoot: app.getPath('temp'),
   }),
   projectPackageController = createProjectPackageController({
@@ -659,7 +672,7 @@ const { getStableDeviceId } = createDeviceIdentityManager({
   }),
   systemNotificationSoundFiles = createSystemNotificationSoundFileService({
     appRoot: APP_ROOT,
-    openPath: (_0x2dfed3) => shell.openPath(_0x2dfed3),
+    openPath: (value21) => shell.openPath(value21),
     beep: () => shell.beep(),
     logEvent: logDiagnosticEvent,
   }),
@@ -779,30 +792,33 @@ const { getStableDeviceId } = createDeviceIdentityManager({
     },
   });
 function readConfiguredUserSettingsSync() {
-  if (process.env.AIC_USER_DATA_ROOT) return readUserSettingsFromFilesSync([path.join(getUserRoot(), 'settings.json')]);
-  const _0x313bd1 = process.env.LOCALAPPDATA || app.getPath('userData');
+  if (process.env.AIC_USER_DATA_ROOT)
+    return readUserSettingsFromFilesSync([path.join(getUserRoot(), 'settings.json')]);
+  const value22 = process.env.LOCALAPPDATA || app.getPath('userData');
   return readUserSettingsFromFilesSync([
     path.join(getUserRoot(), 'settings.json'),
     path.join(APP_ROOT, 'user', 'settings.json'),
-    path.join(_0x313bd1, 'AI-CanvasPro', 'settings.json'),
+    path.join(value22, 'AI-CanvasPro', 'settings.json'),
   ]);
 }
 function readConfiguredFileSavePathsSync() {
-  const _0x1752c3 = readConfiguredUserSettingsSync()?.fileSavePaths;
-  return _0x1752c3 && typeof _0x1752c3 === 'object' ? _0x1752c3 : {};
+  const configuredUserSettingsSync = readConfiguredUserSettingsSync()?.fileSavePaths;
+  return configuredUserSettingsSync && typeof configuredUserSettingsSync === 'object'
+    ? configuredUserSettingsSync
+    : {};
 }
-function getConfiguredPath(_0x5a9030, _0x344d0e) {
-  const _0x2396ed = String(readConfiguredFileSavePathsSync()?.[_0x5a9030] || '').trim();
-  return _0x2396ed ? path.resolve(_0x2396ed) : _0x344d0e;
+function getConfiguredPath(value23, value24) {
+  const value25 = String(readConfiguredFileSavePathsSync()?.[value23] || '').trim();
+  return value25 ? path.resolve(value25) : value24;
 }
 function getDataDir() {
-  const _0x5e50f6 = readConfiguredFileSavePathsSync(),
-    _0x11472 = String(_0x5e50f6?.dataDir || '').trim();
-  if (_0x11472) return path.resolve(_0x11472);
-  const _0x3f05c1 = String(_0x5e50f6?.tempDir || '').trim();
-  if (_0x3f05c1) {
-    const _0x2d25ab = path.resolve(_0x3f05c1);
-    return path.basename(_0x2d25ab).toLowerCase() === 'uploads' ? path.dirname(_0x2d25ab) : _0x2d25ab;
+  const configuredFileSavePathsSync = readConfiguredFileSavePathsSync(),
+    value26 = String(configuredFileSavePathsSync?.dataDir || '').trim();
+  if (value26) return path.resolve(value26);
+  const value27 = String(configuredFileSavePathsSync?.tempDir || '').trim();
+  if (value27) {
+    const value28 = path.resolve(value27);
+    return path.basename(value28).toLowerCase() === 'uploads' ? path.dirname(value28) : value28;
   }
   return path.join(getStorageRoot(), 'data');
 }
@@ -819,9 +835,12 @@ function getRecoverySnapshotPath() {
   return path.join(app.getPath('userData'), RECOVERY_SNAPSHOT_FILENAME);
 }
 function getUploadsDir() {
-  const _0x2f3eb3 = readConfiguredFileSavePathsSync();
-  if (!String(_0x2f3eb3?.dataDir || '').trim() && String(_0x2f3eb3?.tempDir || '').trim())
-    return path.resolve(_0x2f3eb3.tempDir);
+  const configuredFileSavePathsSync2 = readConfiguredFileSavePathsSync();
+  if (
+    !String(configuredFileSavePathsSync2?.dataDir || '').trim() &&
+    String(configuredFileSavePathsSync2?.tempDir || '').trim()
+  )
+    return path.resolve(configuredFileSavePathsSync2.tempDir);
   return path.join(getDataDir(), 'uploads');
 }
 function getOutputDir() {
@@ -839,24 +858,24 @@ function getFunasrModelRootDir() {
 function getNodeExportRoots() {
   return { 'data/assets/': getAssetsDir(), 'data/uploads/': getUploadsDir(), 'output/': getOutputDir() };
 }
-function sanitizeUploadFilename(_0x37401a) {
-  const _0x56794b = path.basename(String(_0x37401a || 'upload'));
-  return _0x56794b.replace(/[\\/:*?"<>|]/g, '_').trim() || 'upload';
+function sanitizeUploadFilename(value29) {
+  const value30 = path.basename(String(value29 || 'upload'));
+  return value30.replace(/[\\/:*?"<>|]/g, '_').trim() || 'upload';
 }
-function allocateUniqueUploadPath(_0x90d177, _0x1b3578) {
-  const _0xfc28b4 = sanitizeUploadFilename(_0x1b3578),
-    _0x118a3b = path.parse(_0xfc28b4),
-    _0x268c9b = _0x118a3b.name || 'upload',
-    _0x1ebf0c = _0x118a3b.ext || '',
-    _0x49aa7d = Date.now();
-  for (let _0x12814b = 0; _0x12814b < 0x3e8; _0x12814b += 1) {
-    const _0x3d8a3b =
-        _0x12814b === 0
-          ? _0xfc28b4
-          : _0x268c9b + '_' + _0x49aa7d + '_' + String(_0x12814b).padStart(3, '0') + _0x1ebf0c,
-      _0x3cc922 = path.join(_0x90d177, _0x3d8a3b);
-    if (!existsSync(_0x3cc922))
-      return { safeFilename: _0xfc28b4, storedFilename: _0x3d8a3b, targetPath: _0x3cc922 };
+function allocateUniqueUploadPath(value31, value32) {
+  const safeFilename = sanitizeUploadFilename(value32),
+    error3 = path.parse(safeFilename),
+    value33 = error3.name || 'upload',
+    value34 = error3.ext || '',
+    value35 = Date.now();
+  for (let count4 = 0; count4 < 0x3e8; count4 += 1) {
+    const storedFilename =
+        count4 === 0
+          ? safeFilename
+          : value33 + '_' + value35 + '_' + String(count4).padStart(3, '0') + value34,
+      targetPath = path.join(value31, storedFilename);
+    if (!existsSync(targetPath))
+      return { safeFilename: safeFilename, storedFilename: storedFilename, targetPath: targetPath };
   }
   throw new Error('Unable to allocate unique upload filename');
 }
@@ -867,12 +886,12 @@ function getAssetCapabilityOperations() {
     (assetCapabilityOperations = createAssetCapabilityOperations({
       getAssetsDir: getAssetsDir,
       getMediaTaskQueue: getMediaTaskQueue,
-      createImageFromPath: (_0x77de3b) => nativeImage.createFromPath(_0x77de3b),
+      createImageFromPath: (value36) => nativeImage.createFromPath(value36),
       createImageDerivatives: createImageDerivativeWorker({ BrowserWindow: BrowserWindow }),
       probeVideoPlaybackInfo: mediaTaskRuntime['probeVideoPlaybackInfoForImport'],
-      publishAssetUpdate: (_0x32e876) => {
-        assetUpdateEvents.push(_0x32e876);
-        mainWindow?.webContents?.send('asset:updated', _0x32e876);
+      publishAssetUpdate: (value37) => {
+        assetUpdateEvents.push(value37);
+        mainWindow?.webContents?.send('asset:updated', value37);
       },
       shouldBufferAssetUpdates: () => false,
       isImportLoggingEnabled: isAssetImportLoggingEnabled,
@@ -880,22 +899,22 @@ function getAssetCapabilityOperations() {
     assetCapabilityOperations
   );
 }
-function toAssetLocalPath(..._0x2b272) {
-  return getAssetCapabilityOperations().toAssetLocalPath(..._0x2b272);
+function toAssetLocalPath(...args2) {
+  return getAssetCapabilityOperations().toAssetLocalPath(...args2);
 }
-function updateAssetRecord(_0x641c55, _0x3cc888, _0x1b6d0a = {}) {
-  return getAssetCapabilityOperations().updateAssetRecord(_0x641c55, _0x3cc888, _0x1b6d0a);
+function updateAssetRecord(value38, value39, value40 = {}) {
+  return getAssetCapabilityOperations().updateAssetRecord(value38, value39, value40);
 }
-function sendAssetUpdated(_0x25fef6) {
-  return getAssetCapabilityOperations().sendAssetUpdated(_0x25fef6);
+function sendAssetUpdated(value41) {
+  return getAssetCapabilityOperations().sendAssetUpdated(value41);
 }
-function importAssetToLibrary(_0xefcc02 = {}) {
-  return getAssetCapabilityOperations().importAssetToLibrary(_0xefcc02);
+function importAssetToLibrary(options3 = {}) {
+  return getAssetCapabilityOperations().importAssetToLibrary(options3);
 }
-function isImageImportPayload(_0x58c09b = {}, _0x538515 = '') {
-  const _0x2072c3 = String(_0x58c09b?.type || '').toLowerCase();
-  if (_0x2072c3.startsWith('image/')) return true;
-  return /\.(?:png|jpe?g|webp|gif|bmp|avif)$/i.test(String(_0x538515 || ''));
+function isImageImportPayload(options4 = {}, value42 = '') {
+  const value43 = String(options4?.type || '').toLowerCase();
+  if (value43.startsWith('image/')) return true;
+  return /\.(?:png|jpe?g|webp|gif|bmp|avif)$/i.test(String(value42 || ''));
 }
 const localPreviewProtocolRuntime = createLocalPreviewProtocolRuntime({
   protocol: protocol,
@@ -904,60 +923,60 @@ const localPreviewProtocolRuntime = createLocalPreviewProtocolRuntime({
   ttlMs: LOCAL_PREVIEW_TTL_MS,
   resolveLocalVirtualPath: resolveLocalVirtualPath,
 });
-function createLocalPreviewUrl(_0x5199a4 = {}) {
-  return localPreviewProtocolRuntime['createUrl'](_0x5199a4);
+function createLocalPreviewUrl(options5 = {}) {
+  return localPreviewProtocolRuntime['createUrl'](options5);
 }
 function installLocalPreviewProtocol() {
   localPreviewProtocolRuntime['install']();
 }
-function resizeImageToMaxEdge(_0x23ae91, _0x1aa5ab) {
-  const _0x175281 = _0x23ae91.getSize(),
-    _0x4dad55 = Number(_0x175281.width) || 0,
-    _0x36012f = Number(_0x175281.height) || 0;
-  if (_0x4dad55 <= 0 || _0x36012f <= 0) return null;
-  const _0x4ac961 = Math.max(_0x4dad55, _0x36012f);
-  if (_0x4ac961 <= _0x1aa5ab) return _0x23ae91;
-  const _0xa8ff64 = _0x1aa5ab / _0x4ac961;
-  return _0x23ae91.resize({
-    width: Math.max(1, Math.round(_0x4dad55 * _0xa8ff64)),
-    height: Math.max(1, Math.round(_0x36012f * _0xa8ff64)),
+function resizeImageToMaxEdge(value44, value45) {
+  const box5 = value44.getSize(),
+    count5 = Number(box5.width) || 0,
+    count6 = Number(box5.height) || 0;
+  if (count5 <= 0 || count6 <= 0) return null;
+  const value46 = Math.max(count5, count6);
+  if (value46 <= value45) return value44;
+  const value47 = value45 / value46;
+  return value44.resize({
+    width: Math.max(1, Math.round(count5 * value47)),
+    height: Math.max(1, Math.round(count6 * value47)),
     quality: 'best',
   });
 }
-function writeLocalImageDerivatives(_0x94f1cb, _0x5c57d8, _0xf725ba) {
-  const _0x59f3aa = nativeImage.createFromPath(_0xf725ba),
-    _0x45d2b8 = _0x59f3aa.getSize(),
-    _0x5b48fa = Number(_0x45d2b8.width) || 0,
-    _0x277a8d = Number(_0x45d2b8.height) || 0;
-  if (_0x59f3aa.isEmpty() || _0x5b48fa <= 0 || _0x277a8d <= 0) return {};
-  const _0x1f5817 = path.parse(_0x5c57d8).name || 'image',
-    _0x4b5a6b = path.join('_derived', 'display', _0x1f5817 + '.display.png'),
-    _0x4a6d9e = path.join('_derived', 'thumb', _0x1f5817 + '.thumb.png'),
-    _0x1f2ef3 = path.join(_0x94f1cb, _0x4b5a6b),
-    _0x1bad9e = path.join(_0x94f1cb, _0x4a6d9e);
-  (mkdirSync(path.dirname(_0x1f2ef3), { recursive: true }),
-    mkdirSync(path.dirname(_0x1bad9e), { recursive: true }));
-  const _0x5d70ff = resizeImageToMaxEdge(_0x59f3aa, 0x500),
-    _0x39b01e = resizeImageToMaxEdge(_0x59f3aa, 0x140);
-  if (!_0x5d70ff || !_0x39b01e) return {};
-  (writeFileSync(_0x1f2ef3, _0x5d70ff.toPNG()), writeFileSync(_0x1bad9e, _0x39b01e.toPNG()));
-  const _0x46da48 = 'data/uploads/' + _0x5c57d8,
-    _0x23a605 = 'data/uploads/' + _0x4b5a6b.replace(/\\/g, '/'),
-    _0x45da1a = 'data/uploads/' + _0x4a6d9e.replace(/\\/g, '/');
+function writeLocalImageDerivatives(value48, value49, value50) {
+  const value51 = nativeImage.createFromPath(value50),
+    box6 = value51.getSize(),
+    originalWidth = Number(box6.width) || 0,
+    originalHeight = Number(box6.height) || 0;
+  if (value51.isEmpty() || originalWidth <= 0 || originalHeight <= 0) return {};
+  const value52 = path.parse(value49).name || 'image',
+    value53 = path.join('_derived', 'display', value52 + '.display.png'),
+    value54 = path.join('_derived', 'thumb', value52 + '.thumb.png'),
+    value55 = path.join(value48, value53),
+    value56 = path.join(value48, value54);
+  (mkdirSync(path.dirname(value55), { recursive: true }),
+    mkdirSync(path.dirname(value56), { recursive: true }));
+  const maxEdge = resizeImageToMaxEdge(value51, 0x500),
+    maxEdge2 = resizeImageToMaxEdge(value51, 0x140);
+  if (!maxEdge || !maxEdge2) return {};
+  (writeFileSync(value55, maxEdge.toPNG()), writeFileSync(value56, maxEdge2.toPNG()));
+  const localPath = 'data/uploads/' + value49,
+    displayLocalPath = 'data/uploads/' + value53.replace(/\\/g, '/'),
+    thumbLocalPath = 'data/uploads/' + value54.replace(/\\/g, '/');
   return {
-    localPath: _0x46da48,
-    originalLocalPath: _0x46da48,
-    displayLocalPath: _0x23a605,
-    thumbLocalPath: _0x45da1a,
-    originalWidth: _0x5b48fa,
-    originalHeight: _0x277a8d,
-    originalUrl: '/' + _0x46da48,
-    displayUrl: '/' + _0x23a605,
-    thumbUrl: '/' + _0x45da1a,
+    localPath: localPath,
+    originalLocalPath: localPath,
+    displayLocalPath: displayLocalPath,
+    thumbLocalPath: thumbLocalPath,
+    originalWidth: originalWidth,
+    originalHeight: originalHeight,
+    originalUrl: '/' + localPath,
+    displayUrl: '/' + displayLocalPath,
+    thumbUrl: '/' + thumbLocalPath,
   };
 }
-function getRuntimeToolOrFallback(_0x3f1481) {
-  return resolveRuntimeTool(_0x3f1481) || _0x3f1481;
+function getRuntimeToolOrFallback(value57) {
+  return resolveRuntimeTool(value57) || value57;
 }
 function getMediaTaskHistory() {
   if (!mediaTaskHistory)
@@ -986,7 +1005,7 @@ const mediaTaskRuntime = createMediaTaskRuntime({
   setPowerSaveBlocker: setPowerSaveBlocker,
   NotificationCtor: Notification,
   focusMainWindow: focusMainWindow,
-  publishTaskUpdate: (_0x4f9c1d) => mainWindow?.webContents?.send('mediaTask:update', _0x4f9c1d),
+  publishTaskUpdate: (value58) => mainWindow?.webContents?.send('mediaTask:update', value58),
   getDoubaoAsrConfig: () => resolveDoubaoAsrConfig(),
   getBailianAsrConfig: () => resolveBailianAsrConfig(),
   getPythonCertificateEnv: getRuntimePythonCertificateEnv,
@@ -1024,126 +1043,126 @@ function resolveMediaTaskPythonCommand() {
     platform: process.platform,
   });
 }
-async function generateAssetVideoPoster(_0x1f7495) {
-  const _0x3eaf68 = resolveLocalVirtualPath(_0x1f7495.originalLocalPath);
-  if (!_0x3eaf68) throw new Error('Invalid video asset path');
-  const _0x45ce2d = path.join(getAssetsDir(), 'derived', 'video');
-  mkdirSync(_0x45ce2d, { recursive: true });
-  const _0x5424ea = path.join(_0x45ce2d, _0x1f7495.assetId + '.poster.jpg');
+async function generateAssetVideoPoster(value59) {
+  const localVirtualPath = resolveLocalVirtualPath(value59.originalLocalPath);
+  if (!localVirtualPath) throw new Error('Invalid video asset path');
+  const value60 = path.join(getAssetsDir(), 'derived', 'video');
+  mkdirSync(value60, { recursive: true });
+  const value61 = path.join(value60, value59.assetId + '.poster.jpg');
   return (
-    !existsSync(_0x5424ea) &&
+    !existsSync(value61) &&
       (await runToolCapture(
         getRuntimeToolOrFallback('ffmpeg'),
-        ['-y', '-ss', '0.1', '-i', _0x3eaf68, '-frames:v', '1', '-vf', 'scale=640:-2', _0x5424ea],
+        ['-y', '-ss', '0.1', '-i', localVirtualPath, '-frames:v', '1', '-vf', 'scale=640:-2', value61],
         { cwd: APP_ROOT },
       )),
-    { posterLocalPath: toAssetLocalPath('derived', 'video', _0x1f7495.assetId + '.poster.jpg') }
+    { posterLocalPath: toAssetLocalPath('derived', 'video', value59.assetId + '.poster.jpg') }
   );
 }
-function buildWaveformJsonFromFloat32(_0x1715d6, _0x521205 = 190) {
-  const _0x323812 = _0x1715d6.buffer.slice(_0x1715d6.byteOffset, _0x1715d6.byteOffset + _0x1715d6.byteLength),
-    _0x48f1e6 = new Float32Array(_0x323812, 0, Math.floor(_0x1715d6.byteLength / 4)),
-    _0x119c77 = _0x48f1e6.length,
-    _0x51b86c = Math.max(40, Math.min(0x190, Number(_0x521205) || 190)),
-    _0x243f58 = Math.max(1, Math.floor(_0x119c77 / _0x51b86c)),
-    _0x1e3c2e = [];
-  for (let _0x559b9a = 0; _0x559b9a < _0x51b86c; _0x559b9a += 1) {
-    const _0x1ef408 = _0x559b9a * _0x243f58,
-      _0x284800 = Math.min(_0x119c77, _0x1ef408 + _0x243f58);
-    let _0x5d2800 = 0;
-    for (let _0x3c6f38 = _0x1ef408; _0x3c6f38 < _0x284800; _0x3c6f38 += 1) {
-      const _0x49814f = Math.abs(Number(_0x48f1e6[_0x3c6f38]) || 0);
-      if (_0x49814f > _0x5d2800) _0x5d2800 = _0x49814f;
+function buildWaveformJsonFromFloat32(value62, value63 = 190) {
+  const value64 = value62.buffer.slice(value62.byteOffset, value62.byteOffset + value62.byteLength),
+    list4 = new Float32Array(value64, 0, Math.floor(value62.byteLength / 4)),
+    value65 = list4.length,
+    samples = Math.max(40, Math.min(0x190, Number(value63) || 190)),
+    value66 = Math.max(1, Math.floor(value65 / samples)),
+    peaks = [];
+  for (let value67 = 0; value67 < samples; value67 += 1) {
+    const value68 = value67 * value66,
+      value69 = Math.min(value65, value68 + value66);
+    let value70 = 0;
+    for (let value71 = value68; value71 < value69; value71 += 1) {
+      const value72 = Math.abs(Number(list4[value71]) || 0);
+      if (value72 > value70) value70 = value72;
     }
-    _0x1e3c2e.push(Number(Math.min(1, _0x5d2800).toFixed(4)));
+    peaks.push(Number(Math.min(1, value70).toFixed(4)));
   }
-  return { version: 1, samples: _0x51b86c, peaks: _0x1e3c2e };
+  return { version: 1, samples: samples, peaks: peaks };
 }
-async function generateAssetAudioWaveform(_0x55fe24) {
-  const _0x4ee89b = resolveLocalVirtualPath(_0x55fe24.originalLocalPath);
-  if (!_0x4ee89b) throw new Error('Invalid audio asset path');
-  const _0x4a4b1b = path.join(getAssetsDir(), 'derived', 'audio');
-  mkdirSync(_0x4a4b1b, { recursive: true });
-  const _0x28fac6 = path.join(_0x4a4b1b, _0x55fe24.assetId + '.waveform.json');
-  if (!existsSync(_0x28fac6)) {
-    const _0x181b3b = await runToolCapture(
+async function generateAssetAudioWaveform(value73) {
+  const localVirtualPath2 = resolveLocalVirtualPath(value73.originalLocalPath);
+  if (!localVirtualPath2) throw new Error('Invalid audio asset path');
+  const value74 = path.join(getAssetsDir(), 'derived', 'audio');
+  mkdirSync(value74, { recursive: true });
+  const value75 = path.join(value74, value73.assetId + '.waveform.json');
+  if (!existsSync(value75)) {
+    const runToolCapture2 = await runToolCapture(
       getRuntimeToolOrFallback('ffmpeg'),
-      ['-v', 'error', '-i', _0x4ee89b, '-ac', '1', '-ar', '8000', '-f', 'f32le', 'pipe:1'],
+      ['-v', 'error', '-i', localVirtualPath2, '-ac', '1', '-ar', '8000', '-f', 'f32le', 'pipe:1'],
       { cwd: APP_ROOT },
     );
-    writeFileSync(_0x28fac6, JSON.stringify(buildWaveformJsonFromFloat32(_0x181b3b)) + '\n', 'utf8');
+    writeFileSync(value75, JSON.stringify(buildWaveformJsonFromFloat32(runToolCapture2)) + '\n', 'utf8');
   }
-  return { waveformLocalPath: toAssetLocalPath('derived', 'audio', _0x55fe24.assetId + '.waveform.json') };
+  return { waveformLocalPath: toAssetLocalPath('derived', 'audio', value73.assetId + '.waveform.json') };
 }
-function importLocalFileToUploads(_0x20e1cd = {}) {
-  const _0x41da73 = Date.now(),
-    _0x1c58b9 = String(_0x20e1cd?.path || '').trim();
+function importLocalFileToUploads(name = {}) {
+  const t = Date.now(),
+    sourcePath = String(name?.path || '').trim();
   logDragImportProfile('main:import:start', {
-    t: _0x41da73,
-    name: _0x20e1cd?.name || '',
-    type: _0x20e1cd?.type || '',
-    sourcePath: _0x1c58b9,
+    t: t,
+    name: name?.name || '',
+    type: name?.type || '',
+    sourcePath: sourcePath,
   });
-  if (!_0x1c58b9) throw new Error('缺少文件路径');
-  if (!path.isAbsolute(_0x1c58b9)) throw new Error('文件路径必须是绝对路径');
-  const _0x3ead90 = realpathSync(_0x1c58b9),
-    _0x7b5fbb = statSync(_0x3ead90);
-  if (!_0x7b5fbb.isFile()) throw new Error('只支持导入文件');
-  const _0x397223 = getUploadsDir();
-  mkdirSync(_0x397223, { recursive: true });
+  if (!sourcePath) throw new Error('缺少文件路径');
+  if (!path.isAbsolute(sourcePath)) throw new Error('文件路径必须是绝对路径');
+  const sourceRealPath = realpathSync(sourcePath),
+    size = statSync(sourceRealPath);
+  if (!size.isFile()) throw new Error('只支持导入文件');
+  const uploadsDir = getUploadsDir();
+  mkdirSync(uploadsDir, { recursive: true });
   const {
-      safeFilename: _0x2de28a,
-      storedFilename: _0x3df3c5,
-      targetPath: _0x4e3975,
-    } = allocateUniqueUploadPath(_0x397223, _0x20e1cd?.name || path.basename(_0x3ead90)),
-    _0x2bed01 = Date.now();
+      safeFilename: safeFilename2,
+      storedFilename: storedFilename2,
+      targetPath: targetPath2,
+    } = allocateUniqueUploadPath(uploadsDir, name?.name || path.basename(sourceRealPath)),
+    t2 = Date.now();
   (logDragImportProfile('main:copy:start', {
-    t: _0x2bed01,
-    sourceRealPath: _0x3ead90,
-    targetPath: _0x4e3975,
-    size: _0x7b5fbb.size,
+    t: t2,
+    sourceRealPath: sourceRealPath,
+    targetPath: targetPath2,
+    size: size.size,
   }),
-    copyFileSync(_0x3ead90, _0x4e3975),
+    copyFileSync(sourceRealPath, targetPath2),
     logDragImportProfile('main:copy:done', {
       t: Date.now(),
-      elapsedMs: Date.now() - _0x2bed01,
-      targetPath: _0x4e3975,
+      elapsedMs: Date.now() - t2,
+      targetPath: targetPath2,
     }));
-  const _0x326ca4 = 'data/uploads/' + _0x3df3c5,
-    _0x5ccbeb = Date.now();
-  isImageImportPayload(_0x20e1cd, _0x3ead90) &&
-    logDragImportProfile('main:derivative:start', { t: _0x5ccbeb, targetPath: _0x4e3975 });
-  const _0x303f59 = isImageImportPayload(_0x20e1cd, _0x3ead90)
-    ? writeLocalImageDerivatives(_0x397223, _0x3df3c5, _0x4e3975)
+  const localPath2 = 'data/uploads/' + storedFilename2,
+    t3 = Date.now();
+  isImageImportPayload(name, sourceRealPath) &&
+    logDragImportProfile('main:derivative:start', { t: t3, targetPath: targetPath2 });
+  const displayLocalPath2 = isImageImportPayload(name, sourceRealPath)
+    ? writeLocalImageDerivatives(uploadsDir, storedFilename2, targetPath2)
     : {};
-  isImageImportPayload(_0x20e1cd, _0x3ead90) &&
+  isImageImportPayload(name, sourceRealPath) &&
     logDragImportProfile('main:derivative:done', {
       t: Date.now(),
-      elapsedMs: Date.now() - _0x5ccbeb,
-      displayLocalPath: _0x303f59.displayLocalPath || '',
-      thumbLocalPath: _0x303f59.thumbLocalPath || '',
-      originalWidth: _0x303f59.originalWidth || 0,
-      originalHeight: _0x303f59.originalHeight || 0,
+      elapsedMs: Date.now() - t3,
+      displayLocalPath: displayLocalPath2.displayLocalPath || '',
+      thumbLocalPath: displayLocalPath2.thumbLocalPath || '',
+      originalWidth: displayLocalPath2.originalWidth || 0,
+      originalHeight: displayLocalPath2.originalHeight || 0,
     });
-  const _0x19a3d8 = {
+  const localPath3 = {
     success: true,
-    url: '/' + _0x326ca4,
-    localPath: _0x326ca4,
-    ..._0x303f59,
-    filename: _0x2de28a,
-    storedFilename: _0x3df3c5,
-    size: _0x7b5fbb.size,
-    type: String(_0x20e1cd?.type || ''),
+    url: '/' + localPath2,
+    localPath: localPath2,
+    ...displayLocalPath2,
+    filename: safeFilename2,
+    storedFilename: storedFilename2,
+    size: size.size,
+    type: String(name?.type || ''),
   };
   return (
     logDragImportProfile('main:import:done', {
       t: Date.now(),
-      elapsedMs: Date.now() - _0x41da73,
-      localPath: _0x19a3d8.localPath,
-      displayLocalPath: _0x19a3d8.displayLocalPath || '',
-      thumbLocalPath: _0x19a3d8.thumbLocalPath || '',
+      elapsedMs: Date.now() - t,
+      localPath: localPath3.localPath,
+      displayLocalPath: localPath3.displayLocalPath || '',
+      thumbLocalPath: localPath3.thumbLocalPath || '',
     }),
-    _0x19a3d8
+    localPath3
   );
 }
 function installLocalApiTokenHeader() {
@@ -1151,26 +1170,29 @@ function installLocalApiTokenHeader() {
   ((localApiTokenHeaderInstalled = true),
     session.defaultSession.webRequest.onBeforeSendHeaders(
       { urls: [APP_ORIGIN + '/*', 'http://localhost:' + PORT + '/*'] },
-      (_0x329894, _0x8bf78f) => {
-        _0x8bf78f({
-          requestHeaders: { ..._0x329894.requestHeaders, 'X-AIC-Local-Token': LOCAL_ACCESS_TOKEN },
+      (args3, handler4) => {
+        handler4({
+          requestHeaders: { ...args3.requestHeaders, 'X-AIC-Local-Token': LOCAL_ACCESS_TOKEN },
         });
       },
     ));
 }
-async function waitForServerReady(_0x1ca88f = null) {
-  const _0x15991e = Date.now();
-  while (Date.now() - _0x15991e < SERVER_READY_TIMEOUT_MS) {
+async function waitForServerReady(value76 = null) {
+  const value77 = Date.now();
+  while (Date.now() - value77 < SERVER_READY_TIMEOUT_MS) {
     desktopStartupLifecycle.assertStarting();
-    if (await probeServer()) { desktopStartupLifecycle.assertStarting(); return true; }
-    const _0x53bc8d = Date.now() - _0x15991e;
-    (_0x1ca88f?.({
+    if (await probeServer()) {
+      desktopStartupLifecycle.assertStarting();
+      return true;
+    }
+    const value78 = Date.now() - value77;
+    (value76?.({
       kind: 'loading',
       title: APP_DISPLAY_NAME + ' 正在启动',
       detail: '正在准备画布环境。',
       hint:
         '已等待 ' +
-        Math.ceil(_0x53bc8d / 0x3e8) +
+        Math.ceil(value78 / 0x3e8) +
         ' 秒，预计最多需要 ' +
         Math.ceil(SERVER_READY_TIMEOUT_MS / 0x3e8) +
         ' 秒。',
@@ -1195,7 +1217,10 @@ function scheduleServerRestart() {
     return;
   }
   const attempt = serverRestartAttempts + 0x1,
-    delayMs = Math['min'](SERVER_RESTART_BASE_DELAY_MS * Math['pow'](0x2, serverRestartAttempts), SERVER_RESTART_MAX_DELAY_MS);
+    delayMs = Math['min'](
+      SERVER_RESTART_BASE_DELAY_MS * Math['pow'](0x2, serverRestartAttempts),
+      SERVER_RESTART_MAX_DELAY_MS,
+    );
   serverRestartAttempts = attempt;
   logDiagnosticEvent({
     type: 'backend.restart_scheduled',
@@ -1218,13 +1243,13 @@ function scheduleServerRestart() {
           context: { attempt: attempt, port: PORT },
         });
       })
-      .catch((_0x5c2f18) => {
+      .catch((error4) => {
         logDiagnosticEvent({
           type: 'backend.restart_failed',
           level: 'error',
           source: 'main',
           message: 'Local Python service restart failed',
-          error: _0x5c2f18,
+          error: error4,
           context: { attempt: attempt, port: PORT },
         });
         scheduleServerRestart();
@@ -1232,9 +1257,9 @@ function scheduleServerRestart() {
   }, delayMs);
   if (typeof serverRestartTimer['unref'] === 'function') serverRestartTimer['unref']();
 }
-async function ensureServerRunning(_0x4c8dab = null) {
+async function ensureServerRunning(value79 = null) {
   desktopStartupLifecycle.assertStarting();
-  _0x4c8dab?.({
+  value79?.({
     kind: 'loading',
     title: APP_DISPLAY_NAME + ' 正在启动',
     detail: '正在准备画布环境。',
@@ -1242,7 +1267,7 @@ async function ensureServerRunning(_0x4c8dab = null) {
   });
   if (await probeServer())
     return (
-      _0x4c8dab?.({
+      value79?.({
         kind: 'loading',
         title: APP_DISPLAY_NAME + ' 正在启动',
         detail: '正在打开画布。',
@@ -1251,57 +1276,58 @@ async function ensureServerRunning(_0x4c8dab = null) {
       'reused'
     );
   desktopStartupLifecycle.assertStarting();
-  const _0x247828 = resolvePythonCommand();
-  _0x4c8dab?.({
+  const command = resolvePythonCommand();
+  value79?.({
     kind: 'loading',
     title: APP_DISPLAY_NAME + ' 正在启动',
     detail: '正在加载本地工作环境。',
     hint: '启动完成后会自动进入画布。',
   });
-  const _0x4ca931 = createWriteStream(SERVER_LOG_PATH, { flags: 'a' });
-  _0x4ca931.write(
+  const writeStream = createWriteStream(SERVER_LOG_PATH, { flags: 'a' });
+  writeStream.write(
     '\n[' +
       new Date().toISOString() +
       '] starting ' +
-      _0x247828 +
+      command +
       ' server.py --host=' +
       HOST +
       ' --port=' +
       PORT +
       '\n',
   );
-  let _0x52dc35 = null;
+  let error5 = null;
   let launchedServer = null;
-  ((launchedServer = spawnedServer = spawn(_0x247828, ['server.py', '--host=' + HOST, '--port=' + PORT], {
-    cwd: APP_ROOT,
-    env: {
-      ...process.env,
-      AICANVAS_PORT: String(PORT),
-      AIC_LOCAL_TOKEN: LOCAL_ACCESS_TOKEN,
-      ...buildPackagedServerEnv(),
-      ...(app.isPackaged
-        ? {
-            AIC_SUBSCRIPTION_API_BASE: '',
-            AIC_ALLOW_SUBSCRIPTION_API_OVERRIDE: '',
-            AIC_DEV_MODE: '',
-          }
-        : {}),
-    },
-    stdio: ['ignore', 'pipe', 'pipe'],
-    windowsHide: true,
-  })),
-    launchedServer.stdout?.pipe(_0x4ca931, { end: false }),
-    launchedServer.stderr?.pipe(_0x4ca931, { end: false }),
+  ((launchedServer = spawnedServer =
+    spawn(command, ['server.py', '--host=' + HOST, '--port=' + PORT], {
+      cwd: APP_ROOT,
+      env: {
+        ...process.env,
+        AICANVAS_PORT: String(PORT),
+        AIC_LOCAL_TOKEN: LOCAL_ACCESS_TOKEN,
+        ...buildPackagedServerEnv(),
+        ...(app.isPackaged
+          ? {
+              AIC_SUBSCRIPTION_API_BASE: '',
+              AIC_ALLOW_SUBSCRIPTION_API_OVERRIDE: '',
+              AIC_DEV_MODE: '',
+            }
+          : {}),
+      },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+    })),
+    launchedServer.stdout?.pipe(writeStream, { end: false }),
+    launchedServer.stderr?.pipe(writeStream, { end: false }),
     launchedServer.once('spawn', () => {
       if (desktopQuitCoordinator.isQuitting()) stopSpawnedServerProcess(launchedServer);
     }),
-    launchedServer.once('error', (_0x4f5417) => {
-      ((_0x52dc35 = _0x4f5417),
-        _0x4ca931.write(
+    launchedServer.once('error', (error6) => {
+      ((error5 = error6),
+        writeStream.write(
           '[' +
             new Date().toISOString() +
             '] spawn error: ' +
-            (_0x4f5417?.stack || _0x4f5417?.message || _0x4f5417) +
+            (error6?.stack || error6?.message || error6) +
             '\n',
         ),
         logDiagnosticEvent({
@@ -1309,40 +1335,34 @@ async function ensureServerRunning(_0x4c8dab = null) {
           level: 'error',
           source: 'main',
           message: 'Failed to spawn local Python service',
-          error: _0x4f5417,
-          context: { command: _0x247828, port: PORT },
+          error: error6,
+          context: { command: command, port: PORT },
         }),
-        _0x4c8dab?.({
+        value79?.({
           kind: 'error',
           title: APP_DISPLAY_NAME + ' 启动失败',
           detail: '启动本地工作环境失败。',
           hint: '请重启应用，若仍失败请导出诊断日志。',
         }));
     }),
-    launchedServer.once('close', (_0x4daa93, _0x2ae6fd) => {
-      (_0x4ca931.write(
-        '[' +
-          new Date().toISOString() +
-          '] exited code=' +
-          (_0x4daa93 ?? '') +
-          ' signal=' +
-          (_0x2ae6fd ?? '') +
-          '\n',
+    launchedServer.once('close', (code, signal) => {
+      (writeStream.write(
+        '[' + new Date().toISOString() + '] exited code=' + (code ?? '') + ' signal=' + (signal ?? '') + '\n',
       ),
-        _0x4ca931.end(),
-        (_0x4daa93 !== 0 || _0x2ae6fd) &&
+        writeStream.end(),
+        (code !== 0 || signal) &&
           logDiagnosticEvent({
             type: 'backend.exited',
             level: 'warn',
             source: 'main',
             message: 'Local Python service exited',
-            context: { code: _0x4daa93, signal: _0x2ae6fd, port: PORT },
+            context: { code: code, signal: signal, port: PORT },
           }),
-        (spawnedServer === launchedServer && (spawnedServer = null)),
+        spawnedServer === launchedServer && (spawnedServer = null),
         serverShutdownRequested || scheduleServerRestart());
     }));
-  const _0x69f021 = await waitForServerReady(_0x4c8dab);
-  if (!_0x69f021) {
+  const waitForServerReady2 = await waitForServerReady(value79);
+  if (!waitForServerReady2) {
     (stopSpawnedServer(),
       logDiagnosticEvent({
         type: 'backend.ready_timeout',
@@ -1351,14 +1371,14 @@ async function ensureServerRunning(_0x4c8dab = null) {
         message: 'Local Python service did not become ready',
         context: { appUrl: APP_URL, timeoutMs: SERVER_READY_TIMEOUT_MS },
       }));
-    if (_0x52dc35)
-      throw new Error('Failed to start ' + APP_DISPLAY_NAME + ' server: ' + (_0x52dc35.message || _0x52dc35));
+    if (error5)
+      throw new Error('Failed to start ' + APP_DISPLAY_NAME + ' server: ' + (error5.message || error5));
     throw new Error(APP_DISPLAY_NAME + ' server did not become ready at ' + APP_URL);
   }
   return (
     // A ready backend clears the backoff so a later crash gets a full retry budget again.
     (serverRestartAttempts = 0),
-    _0x4c8dab?.({
+    value79?.({
       kind: 'loading',
       title: APP_DISPLAY_NAME + ' 正在启动',
       detail: '正在打开画布。',
@@ -1384,53 +1404,48 @@ function stopSpawnedServer() {
 function focusMainWindow() {
   return activateMainWindow({ app: app, window: mainWindow });
 }
-function normalizeVirtualLocalPath(_0x3d0848) {
-  const _0x48a40e = String(_0x3d0848 || '').trim();
-  if (!_0x48a40e) return '';
-  if (/^(?:file|javascript|data|blob):/i.test(_0x48a40e)) return '';
-  if (/^https?:/i.test(_0x48a40e))
+function normalizeVirtualLocalPath(value80) {
+  const enabled3 = String(value80 || '').trim();
+  if (!enabled3) return '';
+  if (/^(?:file|javascript|data|blob):/i.test(enabled3)) return '';
+  if (/^https?:/i.test(enabled3))
     try {
-      const _0x54e018 = new URL(_0x48a40e),
-        _0x1e95a0 = String(_0x54e018.hostname || '').toLowerCase();
-      if (
-        _0x1e95a0 !== 'localhost' &&
-        _0x1e95a0 !== '127.0.0.1' &&
-        _0x1e95a0 !== '::1' &&
-        _0x1e95a0 !== '[::1]'
-      )
+      const uRL = new URL(enabled3),
+        value81 = String(uRL.hostname || '').toLowerCase();
+      if (value81 !== 'localhost' && value81 !== '127.0.0.1' && value81 !== '::1' && value81 !== '[::1]')
         return '';
-      return normalizeVirtualLocalPath(_0x54e018.pathname);
+      return normalizeVirtualLocalPath(uRL.pathname);
     } catch {
       return '';
     }
-  const _0x1e271c = _0x48a40e.replace(/\\/g, '/');
-  if (/^[a-z][a-z0-9+.-]*:/i.test(_0x1e271c)) return '';
-  if (/^[a-zA-Z]:\//.test(_0x1e271c) || _0x1e271c.startsWith('//')) return '';
-  let _0x4c6153 = _0x1e271c.split(/[?#]/, 1)[0];
+  const value82 = enabled3.replace(/\\/g, '/');
+  if (/^[a-z][a-z0-9+.-]*:/i.test(value82)) return '';
+  if (/^[a-zA-Z]:\//.test(value82) || value82.startsWith('//')) return '';
+  let decodeURIComponent2 = value82.split(/[?#]/, 1)[0];
   try {
-    _0x4c6153 = decodeURIComponent(_0x4c6153);
+    decodeURIComponent2 = decodeURIComponent(decodeURIComponent2);
   } catch {}
-  const _0x46ae0c = path.posix.normalize(_0x4c6153.replace(/^\/+/, ''));
-  if (!_0x46ae0c || _0x46ae0c === '.' || _0x46ae0c === '..' || _0x46ae0c.startsWith('../')) return '';
+  const enabled4 = path.posix.normalize(decodeURIComponent2.replace(/^\/+/, ''));
+  if (!enabled4 || enabled4 === '.' || enabled4 === '..' || enabled4.startsWith('../')) return '';
   if (
-    !_0x46ae0c.startsWith('data/assets/') &&
-    !_0x46ae0c.startsWith('data/uploads/') &&
-    !_0x46ae0c.startsWith('output/')
+    !enabled4.startsWith('data/assets/') &&
+    !enabled4.startsWith('data/uploads/') &&
+    !enabled4.startsWith('output/')
   )
     return '';
-  return _0x46ae0c;
+  return enabled4;
 }
-function resolveLocalVirtualPath(_0x58ee55) {
-  const _0x3805dd = normalizeVirtualLocalPath(_0x58ee55);
-  if (!_0x3805dd) return '';
-  const _0x3d6711 = [
+function resolveLocalVirtualPath(value83) {
+  const list5 = normalizeVirtualLocalPath(value83);
+  if (!list5) return '';
+  const value84 = [
     ['data/assets/', getAssetsDir()],
     ['data/uploads/', getUploadsDir()],
     ['output/', getOutputDir()],
   ];
-  for (const [_0x102d98, _0x563725] of _0x3d6711) {
-    if (!_0x3805dd.startsWith(_0x102d98)) continue;
-    return resolveExistingPathWithinRoot(_0x563725, _0x3805dd.slice(_0x102d98.length));
+  for (const [list6, value85] of value84) {
+    if (!list5.startsWith(list6)) continue;
+    return resolveExistingPathWithinRoot(value85, list5.slice(list6.length));
   }
   return '';
 }
@@ -1454,67 +1469,68 @@ const resolveDoubaoAsrConfig = createDoubaoAsrConfigResolver({
     getSecureSettingsStore: getSecureSettingsStore,
     getUserRoot: getUserRoot,
   });
-function normalizeSecureSettingsKeys(_0x1dd1d4 = {}) {
-  const _0x1ce6f4 = Array.isArray(_0x1dd1d4?.keys) ? _0x1dd1d4.keys : [_0x1dd1d4?.key];
-  return _0x1ce6f4.map((_0x2f6168) => String(_0x2f6168 || '').trim()).filter(isAllowedSecureSettingKey);
+function normalizeSecureSettingsKeys(event2 = {}) {
+  const list7 = Array.isArray(event2?.keys) ? event2.keys : [event2?.key];
+  return list7.map((item4) => String(item4 || '').trim()).filter(isAllowedSecureSettingKey);
 }
 function syncSystemRecentDocumentsBestEffort() {
-  if (process.env.AIC_USER_DATA_ROOT) return { ok: true, count: 0, paths: [], skipped: 'independent-profile' };
+  if (process.env.AIC_USER_DATA_ROOT)
+    return { ok: true, count: 0, paths: [], skipped: 'independent-profile' };
   try {
     return syncRecentProjectsToSystemRecentDocuments({
       app: app,
       recentStorePath: getRecentProjectsStorePath(),
     });
-  } catch (_0x243ee6) {
+  } catch (error7) {
     return (
-      console.warn('[electron] sync recent documents failed:', _0x243ee6),
-      { ok: false, error: String(_0x243ee6?.message || _0x243ee6), count: 0, paths: [] }
+      console.warn('[electron] sync recent documents failed:', error7),
+      { ok: false, error: String(error7?.message || error7), count: 0, paths: [] }
     );
   }
 }
-function resolveClipboardAbsoluteFilePath(_0x16c93b) {
-  let _0x504e40 = String(_0x16c93b || '').trim();
-  if (!_0x504e40) return '';
-  _0x504e40 = _0x504e40.replace(/^"|"$/g, '');
-  if (/^file:\/\//i.test(_0x504e40))
+function resolveClipboardAbsoluteFilePath(value86) {
+  let enabled5 = String(value86 || '').trim();
+  if (!enabled5) return '';
+  enabled5 = enabled5.replace(/^"|"$/g, '');
+  if (/^file:\/\//i.test(enabled5))
     try {
-      _0x504e40 = fileURLToPath(_0x504e40);
+      enabled5 = fileURLToPath(enabled5);
     } catch {
       return '';
     }
-  if (!path.isAbsolute(_0x504e40)) return '';
+  if (!path.isAbsolute(enabled5)) return '';
   try {
-    const _0x301a62 = realpathSync(_0x504e40),
-      _0x17fd3e = statSync(_0x301a62);
-    return _0x17fd3e.isFile() ? _0x301a62 : '';
+    const realpathSync2 = realpathSync(enabled5),
+      statSync2 = statSync(realpathSync2);
+    return statSync2.isFile() ? realpathSync2 : '';
   } catch {
     return '';
   }
 }
-function resolveClipboardImagePath(_0x3fb8c9 = {}) {
-  const _0x130e5f = resolveClipboardAbsoluteFilePath(_0x3fb8c9?.absolutePath);
-  if (_0x130e5f) return _0x130e5f;
-  const _0x18e1f9 = String(_0x3fb8c9?.localPath || '').trim();
-  if (!_0x18e1f9) return '';
-  const _0x9ecb23 = resolveLocalVirtualPath(_0x18e1f9);
-  if (!_0x9ecb23) return '';
+function resolveClipboardImagePath(options6 = {}) {
+  const clipboardAbsoluteFilePath = resolveClipboardAbsoluteFilePath(options6?.absolutePath);
+  if (clipboardAbsoluteFilePath) return clipboardAbsoluteFilePath;
+  const enabled6 = String(options6?.localPath || '').trim();
+  if (!enabled6) return '';
+  const localVirtualPath3 = resolveLocalVirtualPath(enabled6);
+  if (!localVirtualPath3) return '';
   try {
-    const _0x219dfd = statSync(_0x9ecb23);
-    return _0x219dfd.isFile() ? _0x9ecb23 : '';
+    const statSync3 = statSync(localVirtualPath3);
+    return statSync3.isFile() ? localVirtualPath3 : '';
   } catch {
     return '';
   }
 }
-function createClipboardNativeImage(_0x5d120a = {}) {
-  const _0x1d8570 = String(_0x5d120a?.pngBase64 || '').trim();
-  if (_0x1d8570) return nativeImage.createFromBuffer(Buffer.from(_0x1d8570, 'base64'));
-  const _0x23bfd7 = resolveClipboardImagePath(_0x5d120a);
-  if (!_0x23bfd7) return nativeImage.createEmpty();
-  return nativeImage.createFromPath(_0x23bfd7);
+function createClipboardNativeImage(options7 = {}) {
+  const value87 = String(options7?.pngBase64 || '').trim();
+  if (value87) return nativeImage.createFromBuffer(Buffer.from(value87, 'base64'));
+  const clipboardImagePath = resolveClipboardImagePath(options7);
+  if (!clipboardImagePath) return nativeImage.createEmpty();
+  return nativeImage.createFromPath(clipboardImagePath);
 }
-function getMimeTypeForClipboardFile(_0x5b06f7) {
-  const _0x356e62 = path.extname(String(_0x5b06f7 || '')).toLowerCase(),
-    _0x4d376b = {
+function getMimeTypeForClipboardFile(value88) {
+  const value89 = path.extname(String(value88 || '')).toLowerCase(),
+    value90 = {
       '.png': 'image/png',
       '.jpg': 'image/jpeg',
       '.jpeg': 'image/jpeg',
@@ -1534,52 +1550,54 @@ function getMimeTypeForClipboardFile(_0x5b06f7) {
       '.flac': 'audio/flac',
       '.txt': 'text/plain',
     };
-  return _0x4d376b[_0x356e62] || 'application/octet-stream';
+  return value90[value89] || 'application/octet-stream';
 }
-function buildClipboardFileMeta(_0x4d6d5f) {
-  const _0x936a2e = statSync(_0x4d6d5f);
+function buildClipboardFileMeta(path3) {
+  const statSync4 = statSync(path3);
   return {
-    path: _0x4d6d5f,
-    name: path.basename(_0x4d6d5f),
-    type: getMimeTypeForClipboardFile(_0x4d6d5f),
-    size: Number(_0x936a2e.size || 0) || 0,
+    path: path3,
+    name: path.basename(path3),
+    type: getMimeTypeForClipboardFile(path3),
+    size: Number(statSync4.size || 0) || 0,
   };
 }
-function normalizeClipboardFileReferences(_0x53fbaf = []) {
-  const _0x1ec3cd = new Set(),
-    _0x49d00d = [];
+function normalizeClipboardFileReferences(list8 = []) {
+  const map = new Set(),
+    list9 = [];
   return (
-    (Array.isArray(_0x53fbaf) ? _0x53fbaf : [_0x53fbaf]).forEach((_0x99f40d) => {
-      const _0x4eaa71 = _0x99f40d && typeof _0x99f40d === 'object' ? _0x99f40d.path : _0x99f40d,
-        _0xdd83a6 = resolveClipboardAbsoluteFilePath(_0x4eaa71);
-      if (!_0xdd83a6) return;
-      const _0x501bc0 =
-        process.platform === 'win32' || process.platform === 'darwin' ? _0xdd83a6.toLowerCase() : _0xdd83a6;
-      if (_0x1ec3cd.has(_0x501bc0)) return;
-      (_0x1ec3cd.add(_0x501bc0), _0x49d00d.push(buildClipboardFileMeta(_0xdd83a6)));
+    (Array.isArray(list8) ? list8 : [list8]).forEach((item5) => {
+      const value91 = item5 && typeof item5 === 'object' ? item5.path : item5,
+        clipboardAbsoluteFilePath2 = resolveClipboardAbsoluteFilePath(value91);
+      if (!clipboardAbsoluteFilePath2) return;
+      const value92 =
+        process.platform === 'win32' || process.platform === 'darwin'
+          ? clipboardAbsoluteFilePath2.toLowerCase()
+          : clipboardAbsoluteFilePath2;
+      if (map.has(value92)) return;
+      (map.add(value92), list9.push(buildClipboardFileMeta(clipboardAbsoluteFilePath2)));
     }),
-    _0x49d00d
+    list9
   );
 }
-function parseClipboardFileReferencesFromText(_0x447eec) {
-  const _0x2e6960 = String(_0x447eec || '')
+function parseClipboardFileReferencesFromText(value93) {
+  const value94 = String(value93 || '')
     .split(/\r?\n/)
-    .map((_0x21a8ae) => _0x21a8ae.trim())
+    .map((item6) => item6.trim())
     .filter(Boolean);
-  return normalizeClipboardFileReferences(_0x2e6960);
+  return normalizeClipboardFileReferences(value94);
 }
-function resolveKnownFolder(_0x127dee) {
-  const _0x1f6b8d = String(_0x127dee || '').trim();
-  if (_0x1f6b8d === 'assets') return getAssetsDir();
-  if (_0x1f6b8d === 'output') return getOutputDir();
-  if (_0x1f6b8d === 'project') return getCanvasProjectDir();
+function resolveKnownFolder(value95) {
+  const value96 = String(value95 || '').trim();
+  if (value96 === 'assets') return getAssetsDir();
+  if (value96 === 'output') return getOutputDir();
+  if (value96 === 'project') return getCanvasProjectDir();
   return '';
 }
 function getLocalAssetCleanupManager() {
   if (localAssetCleanupManager) return localAssetCleanupManager;
   return (
     (localAssetCleanupManager = createLocalAssetCleanupManager({
-      trashItem: (_0x1713d9) => shell.trashItem(_0x1713d9),
+      trashItem: (value97) => shell.trashItem(value97),
       getRoots: createLocalAssetCleanupRootsResolver({
         appIsPackaged: app.isPackaged,
         legacyFilesRoot: LEGACY_PACKAGED_FILES_ROOT,
@@ -1609,264 +1627,270 @@ function getProjectDialogFilters() {
   return [
     {
       name: 'Canvas Project',
-      extensions: SUPPORTED_PROJECT_FILE_EXTENSIONS.map((_0x51baab) => _0x51baab.replace(/^\./, '')),
+      extensions: SUPPORTED_PROJECT_FILE_EXTENSIONS.map((item7) => item7.replace(/^\./, '')),
     },
   ];
 }
-function normalizePositiveTimestamp(_0x1f86c6) {
-  const _0x489db1 = Number(_0x1f86c6);
-  return Number.isFinite(_0x489db1) && _0x489db1 > 0 ? Math.round(_0x489db1) : 0;
+function normalizePositiveTimestamp(value98) {
+  const count7 = Number(value98);
+  return Number.isFinite(count7) && count7 > 0 ? Math.round(count7) : 0;
 }
-function getFileLastModified(_0x17a399) {
-  const _0x33ea5a = String(_0x17a399 || '').trim();
-  if (!_0x33ea5a || !path.isAbsolute(_0x33ea5a)) return 0;
+function getFileLastModified(value99) {
+  const enabled7 = String(value99 || '').trim();
+  if (!enabled7 || !path.isAbsolute(enabled7)) return 0;
   try {
-    const _0x77d132 = statSync(_0x33ea5a);
-    return _0x77d132.isFile() ? Math.round(_0x77d132.mtimeMs) : 0;
+    const statSync5 = statSync(enabled7);
+    return statSync5.isFile() ? Math.round(statSync5.mtimeMs) : 0;
   } catch {
     return 0;
   }
 }
-function resolveCurrentProjectLastModified(_0x33d2ee = {}, _0x5e1dd4 = {}) {
-  const _0x284254 = [
-      normalizePositiveTimestamp(_0x33d2ee?.lastKnownProjectLastModified ?? _0x33d2ee?.lastModified),
+function resolveCurrentProjectLastModified(options8 = {}, value100 = {}) {
+  const list10 = [
+      normalizePositiveTimestamp(options8?.lastKnownProjectLastModified ?? options8?.lastModified),
     ],
-    _0x30b028 = String(_0x33d2ee?.recentId || _0x5e1dd4?.recentId || '').trim();
-  if (_0x30b028) {
-    const _0x493e20 = findRecentProject(getRecentProjectsStorePath(), _0x30b028);
-    (_0x284254.push(normalizePositiveTimestamp(_0x493e20?.lastModified)),
-      _0x284254.push(getFileLastModified(_0x493e20?.path)));
+    value101 = String(options8?.recentId || value100?.recentId || '').trim();
+  if (value101) {
+    const recentProject = findRecentProject(getRecentProjectsStorePath(), value101);
+    (list10.push(normalizePositiveTimestamp(recentProject?.lastModified)),
+      list10.push(getFileLastModified(recentProject?.path)));
   }
   return (
-    _0x284254.push(getFileLastModified(_0x33d2ee?.displayPath)),
-    _0x284254.push(getFileLastModified(_0x5e1dd4?.displayPath)),
-    Math.max(0, ..._0x284254)
+    list10.push(getFileLastModified(options8?.displayPath)),
+    list10.push(getFileLastModified(value100?.displayPath)),
+    Math.max(0, ...list10)
   );
 }
-function getDesktopRecoverySnapshotInfo(_0x319d75 = {}) {
-  const _0x40903c = getRecoverySnapshotPath(),
-    _0x13ab4b = readRecoverySnapshot(_0x40903c),
-    _0x28530e = resolveCurrentProjectLastModified(_0x319d75, _0x13ab4b || {});
-  return getRecoverySnapshotInfo(_0x40903c, { currentLastModified: _0x28530e });
+function getDesktopRecoverySnapshotInfo(options9 = {}) {
+  const recoverySnapshotPath = getRecoverySnapshotPath(),
+    recoverySnapshot = readRecoverySnapshot(recoverySnapshotPath),
+    currentLastModified = resolveCurrentProjectLastModified(options9, recoverySnapshot || {});
+  return getRecoverySnapshotInfo(recoverySnapshotPath, { currentLastModified: currentLastModified });
 }
-function writeDesktopRecoverySnapshot(_0x43cb2f = {}) {
-  const _0x1da14c = writeRecoverySnapshot(getRecoverySnapshotPath(), _0x43cb2f);
+function writeDesktopRecoverySnapshot(options10 = {}) {
+  const savedAt = writeRecoverySnapshot(getRecoverySnapshotPath(), options10);
   return {
     success: true,
-    savedAt: _0x1da14c.savedAt,
-    projectId: _0x1da14c.projectId,
-    projectName: _0x1da14c.projectName,
+    savedAt: savedAt.savedAt,
+    projectId: savedAt.projectId,
+    projectName: savedAt.projectName,
   };
 }
 function readDesktopRecoverySnapshot() {
-  const _0x2c0a6c = readRecoverySnapshot(getRecoverySnapshotPath());
-  if (!_0x2c0a6c) return { success: false, exists: false, canceled: false };
+  const projectId = readRecoverySnapshot(getRecoverySnapshotPath());
+  if (!projectId) return { success: false, exists: false, canceled: false };
   return {
     success: true,
     exists: true,
     canceled: false,
     recovery: true,
-    projectId: _0x2c0a6c.projectId,
-    projectName: _0x2c0a6c.projectName,
-    filename: _0x2c0a6c.filename,
-    recentId: _0x2c0a6c.recentId,
-    displayPath: _0x2c0a6c.displayPath,
-    lastModified: _0x2c0a6c.lastKnownProjectLastModified,
-    recoverySavedAt: _0x2c0a6c.savedAt,
-    data: _0x2c0a6c.data,
+    projectId: projectId.projectId,
+    projectName: projectId.projectName,
+    filename: projectId.filename,
+    recentId: projectId.recentId,
+    displayPath: projectId.displayPath,
+    lastModified: projectId.lastKnownProjectLastModified,
+    recoverySavedAt: projectId.savedAt,
+    data: projectId.data,
   };
 }
 function clearDesktopRecoverySnapshot(expected = {}) {
   return clearRecoverySnapshotIfMatches(getRecoverySnapshotPath(), expected);
 }
-function normalizeWindowProjectName(_0x105cee) {
-  return String(_0x105cee || '')
+function normalizeWindowProjectName(value102) {
+  return String(value102 || '')
     .replace(/\s+/g, ' ')
     .trim();
 }
-function updateMainWindowUnsavedState(_0x1caf6a = mainWindow) {
-  if (!_0x1caf6a || _0x1caf6a.isDestroyed()) return;
-  const _0x142fbb = rendererProjectState.hasUnsavedChanges === true,
-    _0x2b3c89 = normalizeWindowProjectName(rendererProjectState.projectName),
-    _0x59b0dc = _0x2b3c89 ? _0x2b3c89 + ' - ' + APP_DISPLAY_NAME : APP_DISPLAY_NAME;
-  _0x1caf6a.setTitle('' + _0x59b0dc + (_0x142fbb ? ' *' : ''));
+function updateMainWindowUnsavedState(enabled8 = mainWindow) {
+  if (!enabled8 || enabled8.isDestroyed()) return;
+  const value103 = rendererProjectState.hasUnsavedChanges === true,
+    windowProjectName = normalizeWindowProjectName(rendererProjectState.projectName),
+    value104 = windowProjectName ? windowProjectName + ' - ' + APP_DISPLAY_NAME : APP_DISPLAY_NAME;
+  enabled8.setTitle('' + value104 + (value103 ? ' *' : ''));
   try {
-    _0x1caf6a.setDocumentEdited(_0x142fbb);
+    enabled8.setDocumentEdited(value103);
   } catch {}
 }
-function handleRendererUnsavedState(_0x4da546 = {}) {
+function handleRendererUnsavedState(hasUnsavedChanges = {}) {
   ((rendererProjectState = {
-    hasUnsavedChanges: _0x4da546?.hasUnsavedChanges === true || _0x4da546?.dirty === true,
-    projectName: normalizeWindowProjectName(_0x4da546?.projectName),
+    hasUnsavedChanges: hasUnsavedChanges?.hasUnsavedChanges === true || hasUnsavedChanges?.dirty === true,
+    projectName: normalizeWindowProjectName(hasUnsavedChanges?.projectName),
   }),
     updateMainWindowUnsavedState());
 }
-function buildProjectOpenResponse(_0x4924ea, _0xd347d2, _0x520db5) {
-  const _0x32ced4 = _0x520db5?.filename || path.basename(_0x4924ea),
-    _0x535a94 = _0x520db5?.name || stripProjectFileExtension(_0x32ced4);
+function buildProjectOpenResponse(value105, data2, recentId) {
+  const filename = recentId?.filename || path.basename(value105),
+    projectName = recentId?.name || stripProjectFileExtension(filename);
   return {
     success: true,
     canceled: false,
-    projectId: stripProjectFileExtension(_0x32ced4),
-    projectName: _0x535a94,
-    filename: _0x32ced4,
-    recentId: _0x520db5?.recentId || '',
-    displayPath: _0x520db5?.displayPath || _0x4924ea,
-    lastModified: Number(_0x520db5?.lastModified || 0) || 0,
-    data: _0xd347d2,
+    projectId: stripProjectFileExtension(filename),
+    projectName: projectName,
+    filename: filename,
+    recentId: recentId?.recentId || '',
+    displayPath: recentId?.displayPath || value105,
+    lastModified: Number(recentId?.lastModified || 0) || 0,
+    data: data2,
   };
 }
-function openProjectFileByPath(_0x5ca01c, { source: source = 'dialog' } = {}) {
-  const _0x336931 = path.resolve(String(_0x5ca01c || '')),
-    _0x1470f3 = readProjectJson(_0x336931),
-    _0x108db2 = upsertRecentProject(getRecentProjectsStorePath(), _0x336931, {
-      name: stripProjectFileExtension(path.basename(_0x336931)),
+function openProjectFileByPath(value106, { source: source = 'dialog' } = {}) {
+  const value107 = path.resolve(String(value106 || '')),
+    projectJson = readProjectJson(value107),
+    upsertRecentProject2 = upsertRecentProject(getRecentProjectsStorePath(), value107, {
+      name: stripProjectFileExtension(path.basename(value107)),
     });
   return (
     syncSystemRecentDocumentsBestEffort(),
-    { ...buildProjectOpenResponse(_0x336931, _0x1470f3, _0x108db2), source: source }
+    { ...buildProjectOpenResponse(value107, projectJson, upsertRecentProject2), source: source }
   );
 }
-function enqueueExternalProjectOpenRequest(_0x5117a6) {
-  if (!_0x5117a6 || typeof _0x5117a6 !== 'object') return;
-  (pendingExternalProjectOpenRequests.push({ ..._0x5117a6, queuedAt: Date.now() }),
+function enqueueExternalProjectOpenRequest(args4) {
+  if (!args4 || typeof args4 !== 'object') return;
+  (pendingExternalProjectOpenRequests.push({ ...args4, queuedAt: Date.now() }),
     mainWindow?.webContents?.send('project:externalOpenAvailable'));
 }
-function findFirstSupportedProjectPackagePathFromArgs(_0x313dc0) {
-  const _0x24be12 = Array.isArray(_0x313dc0) ? _0x313dc0 : [];
-  for (const _0x175433 of _0x24be12) {
-    const _0x996145 = String(_0x175433 || '')
+function findFirstSupportedProjectPackagePathFromArgs(value108) {
+  const value109 = Array.isArray(value108) ? value108 : [];
+  for (const value110 of value109) {
+    const enabled9 = String(value110 || '')
       .trim()
       .replace(/^"|"$/g, '');
-    if (!_0x996145 || !path.isAbsolute(_0x996145) || path.extname(_0x996145).toLowerCase() !== '.aicpkg')
+    if (!enabled9 || !path.isAbsolute(enabled9) || path.extname(enabled9).toLowerCase() !== '.aicpkg')
       continue;
     try {
-      if (statSync(_0x996145).isFile()) return path.resolve(_0x996145);
+      if (statSync(enabled9).isFile()) return path.resolve(enabled9);
     } catch {}
   }
   return '';
 }
-function queueExternalProjectOpenPath(_0x21dd9b, _0x45bd5a) {
-  const _0x3005a4 = findFirstSupportedProjectPackagePathFromArgs([_0x21dd9b]),
-    _0x1c0d2b = _0x3005a4 || findFirstSupportedProjectPathFromArgs([_0x21dd9b], { mustExist: true });
-  if (!_0x1c0d2b) return false;
+function queueExternalProjectOpenPath(value111, source2) {
+  const firstSupportedProjectPackagePathFromArgs = findFirstSupportedProjectPackagePathFromArgs([value111]),
+    filePath =
+      firstSupportedProjectPackagePathFromArgs ||
+      findFirstSupportedProjectPathFromArgs([value111], { mustExist: true });
+  if (!filePath) return false;
   try {
     (enqueueExternalProjectOpenRequest(
-      _0x3005a4
-        ? externalPackageTickets.issueRequest(_0x1c0d2b, _0x45bd5a)
-        : openProjectFileByPath(_0x1c0d2b, { source: _0x45bd5a }),
+      firstSupportedProjectPackagePathFromArgs
+        ? externalPackageTickets.issueRequest(filePath, source2)
+        : openProjectFileByPath(filePath, { source: source2 }),
     ),
       logDiagnosticEvent({
         type: 'project.external_open_queued',
         level: 'info',
         source: 'main',
         message: 'External project open queued',
-        context: { source: _0x45bd5a, filePath: _0x1c0d2b },
+        context: { source: source2, filePath: filePath },
       }));
-  } catch (_0x5a3bc6) {
+  } catch (error8) {
     (logDiagnosticEvent({
       type: 'project.external_open_failed',
       level: 'error',
       source: 'main',
       message: 'External project open failed',
-      error: _0x5a3bc6,
-      context: { source: _0x45bd5a, filePath: _0x1c0d2b },
+      error: error8,
+      context: { source: source2, filePath: filePath },
     }),
       enqueueExternalProjectOpenRequest({
         success: false,
         canceled: false,
-        source: _0x45bd5a,
-        ...(_0x3005a4 ? {} : { filePath: _0x1c0d2b }),
-        filename: path.basename(_0x1c0d2b),
-        error: String(_0x5a3bc6?.message || _0x5a3bc6),
+        source: source2,
+        ...(firstSupportedProjectPackagePathFromArgs ? {} : { filePath: filePath }),
+        filename: path.basename(filePath),
+        error: String(error8?.message || error8),
       }));
   }
   return true;
 }
-function queueExternalProjectOpenFromArgs(_0x41c42f, _0x89aa78) {
-  const _0x353451 =
-    findFirstSupportedProjectPackagePathFromArgs(_0x41c42f) ||
-    findFirstSupportedProjectPathFromArgs(_0x41c42f, { mustExist: true });
-  return _0x353451 ? queueExternalProjectOpenPath(_0x353451, _0x89aa78) : false;
+function queueExternalProjectOpenFromArgs(value112, value113) {
+  const firstSupportedProjectPackagePathFromArgs2 =
+    findFirstSupportedProjectPackagePathFromArgs(value112) ||
+    findFirstSupportedProjectPathFromArgs(value112, { mustExist: true });
+  return firstSupportedProjectPackagePathFromArgs2
+    ? queueExternalProjectOpenPath(firstSupportedProjectPackagePathFromArgs2, value113)
+    : false;
 }
-async function openDesktopProject(_0xc1f192 = {}) {
-  const _0x4b7162 = getRecentProjectsStorePath(),
-    _0x24c047 = String(_0xc1f192?.recentId || '').trim();
-  let _0x180de5 = '';
-  if (_0x24c047) {
-    const _0x3a70b5 = findRecentProject(_0x4b7162, _0x24c047);
-    if (!_0x3a70b5) throw new Error('最近项目不存在');
-    if (!_0x3a70b5.exists) throw new Error('最近项目文件不存在');
-    _0x180de5 = _0x3a70b5.path;
+async function openDesktopProject(options11 = {}) {
+  const recentProjectsStorePath = getRecentProjectsStorePath(),
+    source3 = String(options11?.recentId || '').trim();
+  let value114 = '';
+  if (source3) {
+    const recentProject2 = findRecentProject(recentProjectsStorePath, source3);
+    if (!recentProject2) throw new Error('最近项目不存在');
+    if (!recentProject2.exists) throw new Error('最近项目文件不存在');
+    value114 = recentProject2.path;
   } else {
     mkdirSync(getCanvasProjectDir(), { recursive: true });
-    const _0x1c11ba = await foregroundDialogs['showOpenDialog']({
+    const enabled10 = await foregroundDialogs['showOpenDialog']({
       title: '打开项目',
       defaultPath: getCanvasProjectDir(),
       properties: ['openFile'],
       filters: getProjectDialogFilters(),
     });
-    if (_0x1c11ba.canceled || !_0x1c11ba.filePaths?.[0]) return { success: false, canceled: true };
-    _0x180de5 = _0x1c11ba.filePaths[0];
+    if (enabled10.canceled || !enabled10.filePaths?.[0]) return { success: false, canceled: true };
+    value114 = enabled10.filePaths[0];
   }
-  return openProjectFileByPath(_0x180de5, { source: _0x24c047 ? 'recent' : 'dialog' });
+  return openProjectFileByPath(value114, { source: source3 ? 'recent' : 'dialog' });
 }
-function normalizeDialogOptionText(_0x1ba3f4, _0x2861fa = '', _0x1f48d4 = 180) {
-  const _0x36c1f0 = String(_0x1ba3f4 || '')
+function normalizeDialogOptionText(value115, value116 = '', value117 = 180) {
+  const list11 = String(value115 || '')
     .replace(/\0/g, '')
     .trim();
-  if (!_0x36c1f0) return _0x2861fa;
-  return _0x36c1f0.slice(0, _0x1f48d4);
+  if (!list11) return value116;
+  return list11.slice(0, value117);
 }
-async function selectDirectory(_0x29dc3e = {}) {
-  const _0xb57192 = normalizeDialogOptionText(_0x29dc3e?.title, '选择保存目录', 80),
-    _0x393ca2 = normalizeDialogOptionText(_0x29dc3e?.defaultPath, '', 0x400),
-    _0x1d2d94 = { title: _0xb57192, properties: ['openDirectory', 'createDirectory'] };
-  if (_0x393ca2) _0x1d2d94.defaultPath = _0x393ca2;
-  const _0x517886 = await foregroundDialogs['showOpenDialog'](_0x1d2d94);
-  if (_0x517886.canceled || !_0x517886.filePaths?.[0]) return { success: false, canceled: true };
-  return { success: true, canceled: false, path: _0x517886.filePaths[0] };
+async function selectDirectory(options12 = {}) {
+  const title = normalizeDialogOptionText(options12?.title, '选择保存目录', 80),
+    dialogOptionText = normalizeDialogOptionText(options12?.defaultPath, '', 0x400),
+    value118 = { title: title, properties: ['openDirectory', 'createDirectory'] };
+  if (dialogOptionText) value118.defaultPath = dialogOptionText;
+  const path4 = await foregroundDialogs['showOpenDialog'](value118);
+  if (path4.canceled || !path4.filePaths?.[0]) return { success: false, canceled: true };
+  return { success: true, canceled: false, path: path4.filePaths[0] };
 }
-async function saveDesktopProject(_0x443ccd = {}) {
-  const _0x3ce1b3 = getRecentProjectsStorePath(),
-    _0x59bc62 = String(_0x443ccd?.mode || 'save').trim() === 'saveAs' ? 'saveAs' : 'save',
-    _0x19b19f = sanitizeProjectName(_0x443ccd?.projectName || _0x443ccd?.projectId || '未命名画布');
-  let _0xb557a0 = '';
-  if (_0x59bc62 === 'save') {
-    const _0xae3c5b = String(_0x443ccd?.recentId || '').trim(),
-      _0x54ef11 = _0xae3c5b ? findRecentProject(_0x3ce1b3, _0xae3c5b) : null;
-    _0xb557a0 = _0x54ef11?.path || buildDefaultProjectPath(getCanvasProjectDir(), _0x19b19f);
+async function saveDesktopProject(options13 = {}) {
+  const recentProjectsStorePath2 = getRecentProjectsStorePath(),
+    value119 = String(options13?.mode || 'save').trim() === 'saveAs' ? 'saveAs' : 'save',
+    name2 = sanitizeProjectName(options13?.projectName || options13?.projectId || '未命名画布');
+  let withJsonProjectExtension2 = '';
+  if (value119 === 'save') {
+    const value120 = String(options13?.recentId || '').trim(),
+      value121 = value120 ? findRecentProject(recentProjectsStorePath2, value120) : null;
+    withJsonProjectExtension2 = value121?.path || buildDefaultProjectPath(getCanvasProjectDir(), name2);
   } else {
     mkdirSync(getCanvasProjectDir(), { recursive: true });
-    const _0x25f61c = await foregroundDialogs['showSaveDialog']({
+    const enabled11 = await foregroundDialogs['showSaveDialog']({
       title: '另存为项目',
-      defaultPath: buildDefaultProjectPath(getCanvasProjectDir(), _0x19b19f),
+      defaultPath: buildDefaultProjectPath(getCanvasProjectDir(), name2),
       filters: getProjectDialogFilters(),
     });
-    if (_0x25f61c.canceled || !_0x25f61c.filePath) return { success: false, canceled: true };
-    _0xb557a0 = withJsonProjectExtension(_0x25f61c.filePath);
+    if (enabled11.canceled || !enabled11.filePath) return { success: false, canceled: true };
+    withJsonProjectExtension2 = withJsonProjectExtension(enabled11.filePath);
   }
-  writeProjectJson(_0xb557a0, _0x443ccd?.multiData || {});
-  const _0xd0c779 = upsertRecentProject(_0x3ce1b3, _0xb557a0, { name: _0x19b19f });
+  writeProjectJson(withJsonProjectExtension2, options13?.multiData || {});
+  const projectName2 = upsertRecentProject(recentProjectsStorePath2, withJsonProjectExtension2, {
+    name: name2,
+  });
   return (
     syncSystemRecentDocumentsBestEffort(),
     {
       success: true,
       canceled: false,
-      projectId: stripProjectFileExtension(_0xd0c779.filename || ''),
-      projectName: _0xd0c779.name,
-      filename: _0xd0c779.filename,
-      recentId: _0xd0c779.recentId,
-      displayPath: _0xd0c779.displayPath,
-      lastModified: _0xd0c779.lastModified,
+      projectId: stripProjectFileExtension(projectName2.filename || ''),
+      projectName: projectName2.name,
+      filename: projectName2.filename,
+      recentId: projectName2.recentId,
+      displayPath: projectName2.displayPath,
+      lastModified: projectName2.lastModified,
     }
   );
 }
 function readAppVersionFromIndexHtml() {
   try {
-    const _0x3c8db2 = readFileSync(path.join(APP_ROOT, 'index.html'), 'utf8'),
-      _0x3ec2e3 = _0x3c8db2.match(/<meta\s+name=["']app-version["']\s+content=["']([^"']+)["']/i);
-    return String(_0x3ec2e3?.[1] || '').trim();
+    const fileSync = readFileSync(path.join(APP_ROOT, 'index.html'), 'utf8'),
+      value122 = fileSync.match(/<meta\s+name=["']app-version["']\s+content=["']([^"']+)["']/i);
+    return String(value122?.[1] || '').trim();
   } catch {
     return '';
   }
@@ -1874,20 +1898,20 @@ function readAppVersionFromIndexHtml() {
 function getAutoUpdater() {
   return (!autoUpdaterInstance && (autoUpdaterInstance = electron_updater.autoUpdater), autoUpdaterInstance);
 }
-function handleUpdaterEvent(_0x7ba7c2 = {}) {
-  const _0x4477d4 = String(_0x7ba7c2.type || '');
-  if (_0x4477d4 === 'download-started' || _0x4477d4 === 'download-retry') {
+function handleUpdaterEvent(options14 = {}) {
+  const value123 = String(options14.type || '');
+  if (value123 === 'download-started' || value123 === 'download-retry') {
     (setTaskbarProgressSource('updater', 0), setPowerSaveBlocker('updater', true));
     return;
   }
-  if (_0x4477d4 === 'download-progress') {
+  if (value123 === 'download-progress') {
     setPowerSaveBlocker('updater', true);
     return;
   }
-  (_0x4477d4 === 'downloaded' ||
-    _0x4477d4 === 'download-failed' ||
-    _0x4477d4 === 'error' ||
-    _0x4477d4 === 'not-available') &&
+  (value123 === 'downloaded' ||
+    value123 === 'download-failed' ||
+    value123 === 'error' ||
+    value123 === 'not-available') &&
     (setTaskbarProgressSource('updater', -1), setPowerSaveBlocker('updater', false));
 }
 function markQuittingForUpdate() {
@@ -1898,8 +1922,8 @@ function getUpdateInstallPreparation() {
     !updateInstallPreparation &&
       (updateInstallPreparation = createUpdateInstallPreparation({
         getSpawnedServer: () => spawnedServer,
-        clearSpawnedServer: (_0x589f48) => {
-          if (spawnedServer === _0x589f48) spawnedServer = null;
+        clearSpawnedServer: (value124) => {
+          if (spawnedServer === value124) spawnedServer = null;
         },
         markQuittingForUpdate: markQuittingForUpdate,
         getMainWindow: () => mainWindow,
@@ -1921,15 +1945,15 @@ function getUpdaterController() {
         normalizeInfo: normalizeUpdaterInfo,
         logEvent: logDiagnosticEvent,
         prepareBeforeInstall: () => getUpdateInstallPreparation().prepareForUpdateInstall(),
-        setProgressBar: (_0xc21bb2) => {
-          setTaskbarProgressSource('updater', _0xc21bb2);
+        setProgressBar: (value125) => {
+          setTaskbarProgressSource('updater', value125);
         },
-        sendEvent: (_0x1855a7) => {
-          latestUpdaterEvent = _0x1855a7;
-          if (_0x1855a7?.info) latestUpdaterInfo = _0x1855a7.info;
-          handleUpdaterEvent(_0x1855a7);
+        sendEvent: (value126) => {
+          latestUpdaterEvent = value126;
+          if (value126?.info) latestUpdaterInfo = value126.info;
+          handleUpdaterEvent(value126);
           if (!mainWindow || mainWindow.isDestroyed()) return;
-          mainWindow.webContents.send('appUpdater:event', _0x1855a7);
+          mainWindow.webContents.send('appUpdater:event', value126);
         },
       })),
     updaterController
@@ -1937,24 +1961,24 @@ function getUpdaterController() {
 }
 function readLocalPreviewVideoUrl() {
   try {
-    const _0x386813 = readFileSync(path.join(APP_ROOT, 'release_notes.txt'), 'utf8'),
-      _0x805a7c = extractPreviewVideoUrlFromNotes(_0x386813);
-    if (_0x805a7c) return _0x805a7c;
+    const fileSync2 = readFileSync(path.join(APP_ROOT, 'release_notes.txt'), 'utf8'),
+      extractPreviewVideoUrlFromNotes2 = extractPreviewVideoUrlFromNotes(fileSync2);
+    if (extractPreviewVideoUrlFromNotes2) return extractPreviewVideoUrlFromNotes2;
   } catch {}
   try {
-    const _0x32a5ab = readFileSync(path.join(APP_ROOT, 'release_video_url.txt'), 'utf8');
+    const fileSync3 = readFileSync(path.join(APP_ROOT, 'release_video_url.txt'), 'utf8');
     return (
-      _0x32a5ab
+      fileSync3
         .split(/\r?\n/)
-        .map((_0x4e8615) => _0x4e8615.trim())
-        .find((_0x239cd0) => _0x239cd0 && !_0x239cd0.startsWith('#')) || ''
+        .map((item8) => item8.trim())
+        .find((enabled12) => enabled12 && !enabled12.startsWith('#')) || ''
     );
   } catch {
     return '';
   }
 }
-function normalizeUpdaterInfo(_0x494f8a) {
-  return normalizeUpdaterInfoPayload(_0x494f8a, { readLocalPreviewVideoUrl: readLocalPreviewVideoUrl });
+function normalizeUpdaterInfo(value127) {
+  return normalizeUpdaterInfoPayload(value127, { readLocalPreviewVideoUrl: readLocalPreviewVideoUrl });
 }
 function installUpdaterHandlers() {
   if (updaterHandlersInstalled) return;
@@ -1966,23 +1990,27 @@ function scheduleUpdateCheck() {
     installUpdaterHandlers(),
     getUpdaterController()
       .checkForUpdates()
-      .catch((_0x4fde7b) => {
-        console.warn('[electron][updater] check failed:', _0x4fde7b);
+      .catch((value128) => {
+        console.warn('[electron][updater] check failed:', value128);
       }));
 }
-function loadCanvasWindow(_0x386651 = mainWindow) {
-  if (!_0x386651 || _0x386651.isDestroyed()) return;
-  void _0x386651.loadURL(APP_URL);
+function loadCanvasWindow(enabled13 = mainWindow) {
+  if (!enabled13 || enabled13.isDestroyed()) return;
+  void enabled13.loadURL(APP_URL);
 }
 const rendererNavigationGuard = createRendererNavigationGuard({
   getMainWindow: () => mainWindow,
   requestSnapshot: requestRendererRecoverySnapshot,
-  shouldPrepare: window => window.webContents.getURL().startsWith(APP_ORIGIN),
+  shouldPrepare: (window) => window.webContents.getURL().startsWith(APP_ORIGIN),
   onFailure: async () => {
     if (!mainWindow || mainWindow.isDestroyed()) return;
     await dialog.showMessageBox(mainWindow, {
-      type: 'warning', buttons: ['返回并保存'], defaultId: 0, cancelId: 0,
-      message: '保存未完成，已取消重载。', detail: '后台服务和当前窗口保持运行。请保存后重试。',
+      type: 'warning',
+      buttons: ['返回并保存'],
+      defaultId: 0,
+      cancelId: 0,
+      message: '保存未完成，已取消重载。',
+      detail: '后台服务和当前窗口保持运行。请保存后重试。',
     });
   },
 });
@@ -2004,14 +2032,14 @@ async function restartBackendAndReload() {
         void refreshProductDisplayName(),
         void localRuntimeKeepAlive.start('backend-restart'),
         loadCanvasWindow());
-    } catch (_0x19ab58) {
-      (console.error('[electron] backend restart failed:', _0x19ab58),
+    } catch (error9) {
+      (console.error('[electron] backend restart failed:', error9),
         logDiagnosticEvent({
           type: 'backend.restart_failed',
           level: 'error',
           source: 'main',
           message: 'Backend restart failed',
-          error: _0x19ab58,
+          error: error9,
         }),
         loadStartupStatus({
           kind: 'error',
@@ -2032,17 +2060,18 @@ function createMainWindow() {
     getMainWindow: () => mainWindow,
     logDir: LOG_DIR,
     restartBackendAndReload: restartBackendAndReload,
-    reloadCanvas: ignoreCache => rendererNavigationGuard.run('renderer-reload', window => {
-      if (ignoreCache) window.webContents.reloadIgnoringCache();
-      else window.webContents.reload();
-    }),
+    reloadCanvas: (ignoreCache) =>
+      rendererNavigationGuard.run('renderer-reload', (window) => {
+        if (ignoreCache) window.webContents.reloadIgnoringCache();
+        else window.webContents.reload();
+      }),
     relaunchElectron: () => desktopQuitCoordinator.requestRelaunch(),
   }),
     installLocalApiTokenHeader());
-  const { isMaximized: _0x5cd38b, ..._0x7e79c } = readWindowState();
+  const { isMaximized: isMaximized3, ...args5 } = readWindowState();
   ((rendererProjectState = { hasUnsavedChanges: false, projectName: '' }),
     (mainWindow = new BrowserWindow({
-      ..._0x7e79c,
+      ...args5,
       minWidth: 0x400,
       minHeight: 0x2d0,
       title: APP_DISPLAY_NAME,
@@ -2090,7 +2119,7 @@ function createMainWindow() {
     }),
     refreshTaskbarProgress(),
     mainWindow.once('ready-to-show', () => {
-      (_0x5cd38b && mainWindow?.maximize(),
+      (isMaximized3 && mainWindow?.maximize(),
         mainWindow?.show(),
         scheduleUpdateCheck(),
         void localRuntimeKeepAlive.start('ready-to-show'));
@@ -2103,30 +2132,30 @@ function createMainWindow() {
         globalTextPresetShortcutController?.sendShortcutStatus?.(),
         void localRuntimeKeepAlive.start('did-finish-load'));
     }),
-    mainWindow.webContents.on('did-fail-load', (_0x1ab568, _0x41801f, _0x1dd0e3, _0x2b0724) => {
+    mainWindow.webContents.on('did-fail-load', (value129, errorCode, errorDescription, url) => {
       logDiagnosticEvent({
         type: 'renderer.load_failed',
         level: 'error',
         source: 'main',
         message: 'Renderer failed to load',
-        context: { errorCode: _0x41801f, errorDescription: _0x1dd0e3, url: _0x2b0724 },
+        context: { errorCode: errorCode, errorDescription: errorDescription, url: url },
       });
     }),
-    mainWindow.webContents.on('render-process-gone', (_0x138fd6, _0x5ba87c = {}) => {
+    mainWindow.webContents.on('render-process-gone', (value130, context = {}) => {
       logDiagnosticEvent({
         type: 'renderer.process_gone',
         level: 'error',
         source: 'main',
         message: 'Renderer process exited unexpectedly',
-        context: _0x5ba87c,
+        context: context,
       });
     }),
-    mainWindow.webContents.setWindowOpenHandler(({ url: _0x214ced }) => {
-      return (openExternalUrl(_0x214ced), { action: 'deny' });
+    mainWindow.webContents.setWindowOpenHandler(({ url: url2 }) => {
+      return (openExternalUrl(url2), { action: 'deny' });
     }),
-    mainWindow.webContents.on('will-navigate', (_0x4724c6, _0x378e1f) => {
-      if (isLocalAppUrl(_0x378e1f)) return;
-      (_0x4724c6.preventDefault(), openExternalUrl(_0x378e1f));
+    mainWindow.webContents.on('will-navigate', (event3, value131) => {
+      if (isLocalAppUrl(value131)) return;
+      (event3.preventDefault(), openExternalUrl(value131));
     }),
     mainWindow.on('focus', () => void localRuntimeKeepAlive.start('focus')),
     mainWindow.on('show', () => void localRuntimeKeepAlive.start('show')),
@@ -2136,11 +2165,17 @@ function createMainWindow() {
     mainWindow.webContents.on('will-prevent-unload', () => desktopQuitCoordinator.cancelQuit()),
     mainWindow.on('closed', () => {
       mainWindow = null;
-      runCleanupSteps([
-        () => webPreviewViewManager.disposeViews(),
-        () => localRuntimeKeepAlive.stop(),
-        () => desktopQuitCoordinator.mainWindowClosed(),
-      ], { onError: error => logDiagnosticEvent({ type: 'app.window_cleanup_failed', level: 'warn', source: 'main', error }) });
+      runCleanupSteps(
+        [
+          () => webPreviewViewManager.disposeViews(),
+          () => localRuntimeKeepAlive.stop(),
+          () => desktopQuitCoordinator.mainWindowClosed(),
+        ],
+        {
+          onError: (error) =>
+            logDiagnosticEvent({ type: 'app.window_cleanup_failed', level: 'warn', source: 'main', error }),
+        },
+      );
     }),
     mainWindow.on('unresponsive', () => {
       logDiagnosticEvent({
@@ -2157,8 +2192,10 @@ async function startApp() {
     installIpcHandlers(),
     process.env.AIC_DISABLE_GLOBAL_CAPTURE !== '1' && void globalCaptureWindowController.prewarm(),
     createMainWindow(),
-    process.env.AIC_DISABLE_GLOBAL_CAPTURE !== '1' && screenshotOverlayController.installGlobalScreenshotShortcut(),
-    process.env.AIC_DISABLE_GLOBAL_CAPTURE !== '1' && globalTextPresetShortcutController.installGlobalShortcut(),
+    process.env.AIC_DISABLE_GLOBAL_CAPTURE !== '1' &&
+      screenshotOverlayController.installGlobalScreenshotShortcut(),
+    process.env.AIC_DISABLE_GLOBAL_CAPTURE !== '1' &&
+      globalTextPresetShortcutController.installGlobalShortcut(),
     queueExternalProjectOpenFromArgs(process.argv, 'startup'),
     await desktopStartupLifecycle.prepareBackend(),
     desktopStartupLifecycle.assertStarting(),
@@ -2166,15 +2203,15 @@ async function startApp() {
     void localRuntimeKeepAlive.start('server-ready'),
     loadCanvasWindow());
 }
-function handleStartupFailure(_0xf40367) {
-  if (_0xf40367?.code === 'AIC_DESKTOP_STARTUP_CANCELLED') return;
-  (console.error('[electron] startup failed:', _0xf40367),
+function handleStartupFailure(error10) {
+  if (error10?.code === 'AIC_DESKTOP_STARTUP_CANCELLED') return;
+  (console.error('[electron] startup failed:', error10),
     logDiagnosticEvent({
       type: 'app.startup_failed',
       level: 'error',
       source: 'main',
       message: 'Application startup failed',
-      error: _0xf40367,
+      error: error10,
     }),
     loadStartupStatus({
       kind: 'error',
@@ -2185,53 +2222,53 @@ function handleStartupFailure(_0xf40367) {
 }
 function installAppLifecycleHandlers() {
   (autoUpdater.on('before-quit-for-update', markQuittingForUpdate),
-    app.on('open-file', (_0x3089e5, _0x3d356c) => {
-      (_0x3089e5.preventDefault(), queueExternalProjectOpenPath(_0x3d356c, 'open-file'), focusMainWindow());
+    app.on('open-file', (event4, value132) => {
+      (event4.preventDefault(), queueExternalProjectOpenPath(value132, 'open-file'), focusMainWindow());
     }),
     app.whenReady().then(() => {
       void startApp().catch(handleStartupFailure);
     }),
-    app.on('second-instance', (_0xd446bc, _0x34cc3e) => {
-      (focusMainWindow(), queueExternalProjectOpenFromArgs(_0x34cc3e, 'second-instance'));
+    app.on('second-instance', (value133, value134) => {
+      (focusMainWindow(), queueExternalProjectOpenFromArgs(value134, 'second-instance'));
     }),
     app.on('activate', () => {
       (!mainWindow || mainWindow.isDestroyed()) &&
-        void startApp().catch((_0x109634) => {
-          (console.error('[electron] activate failed:', _0x109634),
+        void startApp().catch((error11) => {
+          (console.error('[electron] activate failed:', error11),
             logDiagnosticEvent({
               type: 'app.activate_failed',
               level: 'error',
               source: 'main',
               message: 'Application activate failed',
-              error: _0x109634,
+              error: error11,
             }));
         });
     }),
     app.on('window-all-closed', () => {
       process.platform !== 'darwin' && app.quit();
     }),
-    app.on('before-quit', event => desktopQuitCoordinator.beforeQuit(event)),
+    app.on('before-quit', (event) => desktopQuitCoordinator.beforeQuit(event)),
     app.on('will-quit', () => desktopQuitCoordinator.willQuit()));
 }
 GOT_SINGLE_INSTANCE_LOCK && installAppLifecycleHandlers();
-(process.on('uncaughtException', (_0x48adb1) => {
+(process.on('uncaughtException', (error12) => {
   (logDiagnosticEvent({
     type: 'main.uncaught_exception',
     level: 'error',
     source: 'main',
     message: 'Uncaught exception in Electron main process',
-    error: _0x48adb1,
+    error: error12,
   }),
-    console.error('[electron] uncaught exception:', _0x48adb1));
+    console.error('[electron] uncaught exception:', error12));
 }),
-  process.on('unhandledRejection', (_0x285137) => {
+  process.on('unhandledRejection', (error13) => {
     (logDiagnosticEvent({
       type: 'main.unhandled_rejection',
       level: 'error',
       source: 'main',
       message: 'Unhandled rejection in Electron main process',
-      error: _0x285137 instanceof Error ? _0x285137 : null,
-      context: _0x285137 instanceof Error ? {} : { reason: String(_0x285137) },
+      error: error13 instanceof Error ? error13 : null,
+      context: error13 instanceof Error ? {} : { reason: String(error13) },
     }),
-      console.error('[electron] unhandled rejection:', _0x285137));
+      console.error('[electron] unhandled rejection:', error13));
   }));

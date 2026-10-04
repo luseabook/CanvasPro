@@ -101,110 +101,110 @@ const RUNTIME_TEXT = Object.freeze({
     /生成|创建|新建|添加|插入|画图|画(?:一|个|张|幅)|制作|做(?:一个|一张|一段|一版|成|出)|出图|出视频/,
     /修改|改成|调整|重排|排列|对齐|连接|删除|复制|选中|选择|运行|开始|继续|执行/,
   ]);
-function normalizeRuntimeLocale(_0x50a185 = getLocale()) {
-  return String(_0x50a185 || '')
+function normalizeRuntimeLocale(locale = getLocale()) {
+  return String(locale || '')
     .toLowerCase()
     .startsWith('en')
     ? 'en-US'
     : 'zh-CN';
 }
-function runtimeText(_0x2fd09a, _0x46deb0 = getLocale()) {
-  const _0x4e0398 = normalizeRuntimeLocale(_0x46deb0);
-  return RUNTIME_TEXT[_0x4e0398]?.[_0x2fd09a] || RUNTIME_TEXT['zh-CN'][_0x2fd09a] || _0x2fd09a;
+function runtimeText(value, locale2 = getLocale()) {
+  const runtimeLocale = normalizeRuntimeLocale(locale2);
+  return RUNTIME_TEXT[runtimeLocale]?.[value] || RUNTIME_TEXT['zh-CN'][value] || value;
 }
-function createFailedReply(_0x142768, _0x2ff5e9 = {}) {
-  return { ok: false, status: 'failed', reply: _0x142768, message: _0x142768, ..._0x2ff5e9 };
+function createFailedReply(reply, args = {}) {
+  return { ok: false, status: 'failed', reply: reply, message: reply, ...args };
 }
-function summarizeExecution(_0x4beff5, _0x34a745 = getLocale()) {
-  if (_0x4beff5.ok) return runtimeText('done', _0x34a745);
-  return _0x4beff5.message || runtimeText('actionExecutionFailed', _0x34a745);
+function summarizeExecution(error, locale3 = getLocale()) {
+  if (error.ok) return runtimeText('done', locale3);
+  return error.message || runtimeText('actionExecutionFailed', locale3);
 }
-function isSafeAction(_0x125128 = {}) {
-  return String(_0x125128.riskLevel || 'safe') === 'safe';
+function isSafeAction(options = {}) {
+  return String(options.riskLevel || 'safe') === 'safe';
 }
-function createChatReply(_0x2bda9c, _0x386de1 = {}) {
-  const _0x36933e = String(_0x2bda9c || '');
-  return { ok: true, status: 'chat', reply: _0x36933e, message: _0x36933e, ..._0x386de1 };
+function createChatReply(item, args2 = {}) {
+  const reply2 = String(item || '');
+  return { ok: true, status: 'chat', reply: reply2, message: reply2, ...args2 };
 }
-function hasExplicitCanvasActionIntent(_0x57a437 = '', _0x17fa14 = {}) {
-  if (_0x17fa14?.clarificationAnswer || _0x17fa14?.pendingPlan) return true;
-  if (_0x17fa14?.intent?.canvasAction === true || _0x17fa14?.intent?.mutatesCanvas === true) return true;
-  const _0x27ad7f = String(_0x57a437 || '').trim();
-  if (!_0x27ad7f) return false;
-  return EXPLICIT_CANVAS_ACTION_PATTERNS.some((_0x13ff5a) => _0x13ff5a.test(_0x27ad7f));
+function hasExplicitCanvasActionIntent(key = '', index = {}) {
+  if (index?.clarificationAnswer || index?.pendingPlan) return true;
+  if (index?.intent?.canvasAction === true || index?.intent?.mutatesCanvas === true) return true;
+  const enabled = String(key || '').trim();
+  if (!enabled) return false;
+  return EXPLICIT_CANVAS_ACTION_PATTERNS.some((item2) => item2.test(enabled));
 }
-function shouldHoldCanvasActionsForChat(_0x36daa0 = {}, _0x75bae1 = '', _0x453454 = {}) {
-  if (_0x36daa0.status !== 'ready' && _0x36daa0.status !== 'need_confirmation') return false;
-  if (!Array.isArray(_0x36daa0.plan?.actions) || _0x36daa0.plan.actions.length === 0) return false;
-  return !hasExplicitCanvasActionIntent(_0x75bae1, _0x453454);
+function shouldHoldCanvasActionsForChat(response = {}, result = '', data = {}) {
+  if (response.status !== 'ready' && response.status !== 'need_confirmation') return false;
+  if (!Array.isArray(response.plan?.actions) || response.plan.actions.length === 0) return false;
+  return !hasExplicitCanvasActionIntent(result, data);
 }
-function getState({ store: _0x5a2c0f, commandContext: _0x8e22d2 } = {}) {
+function getState({ store: store, commandContext: commandContext } = {}) {
   return (
-    _0x5a2c0f?.getStateRaw?.() ||
-    _0x5a2c0f?.getState?.() ||
-    _0x8e22d2?.store?.getStateRaw?.() ||
-    _0x8e22d2?.store?.getState?.() ||
+    store?.getStateRaw?.() ||
+    store?.getState?.() ||
+    commandContext?.store?.getStateRaw?.() ||
+    commandContext?.store?.getState?.() ||
     {}
   );
 }
-function stripMarkup(_0x1feafd) {
-  return String(_0x1feafd || '')
+function stripMarkup(target) {
+  return String(target || '')
     .replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
-function truncateText(_0x19910b, _0x5d08c8 = 80) {
-  const _0x5573f5 = stripMarkup(_0x19910b);
-  return _0x5573f5.length <= _0x5d08c8 ? _0x5573f5 : _0x5573f5.slice(0, Math.max(0, _0x5d08c8 - 3)) + '...';
+function truncateText(source, next = 80) {
+  const list = stripMarkup(source);
+  return list.length <= next ? list : list.slice(0, Math.max(0, next - 3)) + '...';
 }
-function getProjectId(_0x55a1df = {}) {
+function getProjectId(options2 = {}) {
   return String(
-    _0x55a1df.commandContext?.windowObject?.currentProjectId ||
+    options2.commandContext?.windowObject?.currentProjectId ||
       globalThis.window?.currentProjectId ||
       'default_v2_project',
   );
 }
-function getCollectionSize(_0xa207ce) {
-  if (Array.isArray(_0xa207ce)) return _0xa207ce.length;
-  if (_0xa207ce && typeof _0xa207ce === 'object') return Object.keys(_0xa207ce).length;
+function getCollectionSize(list2) {
+  if (Array.isArray(list2)) return list2.length;
+  if (list2 && typeof list2 === 'object') return Object.keys(list2).length;
   return 0;
 }
-function buildCanvasSnapshotDigest(_0x5395ce = {}) {
-  const _0x518f1c = getState(_0x5395ce);
+function buildCanvasSnapshotDigest(options3 = {}) {
+  const state = getState(options3);
   return {
-    projectId: getProjectId(_0x5395ce),
-    nodeCount: getCollectionSize(_0x518f1c.nodes),
-    edgeCount: getCollectionSize(_0x518f1c.edges),
-    selectedNodeIds: Array.isArray(_0x518f1c.selectedNodeIds)
-      ? _0x518f1c.selectedNodeIds.map((_0x32333f) => String(_0x32333f || '')).filter(Boolean)
+    projectId: getProjectId(options3),
+    nodeCount: getCollectionSize(state.nodes),
+    edgeCount: getCollectionSize(state.edges),
+    selectedNodeIds: Array.isArray(state.selectedNodeIds)
+      ? state.selectedNodeIds.map((item3) => String(item3 || '')).filter(Boolean)
       : [],
   };
 }
-function buildPlanSummary(_0xc3b269 = {}) {
-  const _0x405c6f = _0xc3b269.confirmationSummary || {},
-    _0x150707 = Array.isArray(_0x405c6f.pendingActions) ? _0x405c6f.pendingActions : [],
-    _0x4c38d6 = Array.isArray(_0x405c6f.completedActions) ? _0x405c6f.completedActions : [],
-    _0x30023d = _0x150707
-      .map((_0x3420ff) => _0x3420ff?.label || _0x3420ff?.type || '')
+function buildPlanSummary(options4 = {}) {
+  const current = options4.confirmationSummary || {},
+    list3 = Array.isArray(current.pendingActions) ? current.pendingActions : [],
+    list4 = Array.isArray(current.completedActions) ? current.completedActions : [],
+    list5 = list3
+      .map((item4) => item4?.label || item4?.type || '')
       .filter(Boolean)
       .slice(0, 3),
-    _0x21c033 = [];
-  if (_0x4c38d6.length) _0x21c033.push('已准备 ' + _0x4c38d6.length + ' 步');
-  if (_0x30023d.length) _0x21c033.push('待确认：' + _0x30023d.join('，'));
-  if (_0x405c6f.generation?.modelLabel) _0x21c033.push('模型：' + _0x405c6f.generation.modelLabel);
+    list6 = [];
+  if (list4.length) list6.push('已准备 ' + list4.length + ' 步');
+  if (list5.length) list6.push('待确认：' + list5.join('，'));
+  if (current.generation?.modelLabel) list6.push('模型：' + current.generation.modelLabel);
   return (
-    _0x405c6f.generation?.promptSummary && _0x21c033.push('Prompt：' + _0x405c6f.generation.promptSummary),
-    truncateText(_0x21c033.join('；') || _0xc3b269.reply || '', 240)
+    current.generation?.promptSummary && list6.push('Prompt：' + current.generation.promptSummary),
+    truncateText(list6.join('；') || options4.reply || '', 240)
   );
 }
-function buildRecoverySummary(_0x550ca6 = {}) {
-  const _0x5db386 = _0x550ca6.failedAction || {},
-    _0x3abce8 = _0x5db386.label || _0x5db386.type || '';
-  return truncateText(_0x3abce8 ? '失败动作：' + _0x3abce8 : '上次生成失败，可重新规划。', 240);
+function buildRecoverySummary(options5 = {}) {
+  const entry = options5.failedAction || {},
+    record = entry.label || entry.type || '';
+  return truncateText(record ? '失败动作：' + record : '上次生成失败，可重新规划。', 240);
 }
-function formatTraceReason(_0x353949 = '') {
-  const _0x382b3e = String(_0x353949 || ''),
-    _0x572ef8 = {
+function formatTraceReason(payload = '') {
+  const handle = String(payload || ''),
+    config = {
       'selected image has compatible image-to-video model': '已根据选中图片选择兼容的图生视频模型',
       'requested model was available in context': '已使用上下文中的请求模型',
       'target model uiSchema does not declare removed params': '已移除目标模型不支持的参数',
@@ -220,214 +220,210 @@ function formatTraceReason(_0x353949 = '') {
       'action risk requires confirmation': '动作风险要求确认',
       'command risk requires confirmation': '命令风险要求确认',
     };
-  return _0x572ef8[_0x382b3e] || _0x382b3e || '需要确认';
+  return config[handle] || handle || '需要确认';
 }
-function summarizeDebugTraceForConfirmation(_0x47eea6 = []) {
-  if (!Array.isArray(_0x47eea6) || _0x47eea6.length === 0) return [];
-  const _0x178fc4 = [];
-  for (const _0x104c9c of _0x47eea6) {
-    if (_0x104c9c?.type === 'contextual_default_applied' && _0x104c9c.field === 'model') {
-      const _0x384141 = String(_0x104c9c.modelId || '').trim();
-      _0x178fc4.push(
-        _0x384141
-          ? '模型选择：' + _0x384141 + '。' + formatTraceReason(_0x104c9c.reason) + '。'
-          : '模型选择：' + formatTraceReason(_0x104c9c.reason) + '。',
+function summarizeDebugTraceForConfirmation(list7 = []) {
+  if (!Array.isArray(list7) || list7.length === 0) return [];
+  const list8 = [];
+  for (const scope of list7) {
+    if (scope?.type === 'contextual_default_applied' && scope.field === 'model') {
+      const input = String(scope.modelId || '').trim();
+      list8.push(
+        input
+          ? '模型选择：' + input + '。' + formatTraceReason(scope.reason) + '。'
+          : '模型选择：' + formatTraceReason(scope.reason) + '。',
       );
     }
-    if (_0x104c9c?.type === 'params_filtered') {
-      const _0x3c1e1e = Array.isArray(_0x104c9c.removedParamIds) ? _0x104c9c.removedParamIds.join('，') : '',
-        _0x49f839 = Array.isArray(_0x104c9c.keptParamIds) ? _0x104c9c.keptParamIds.join('，') : '';
-      _0x178fc4.push(
+    if (scope?.type === 'params_filtered') {
+      const output = Array.isArray(scope.removedParamIds) ? scope.removedParamIds.join('，') : '',
+        value2 = Array.isArray(scope.keptParamIds) ? scope.keptParamIds.join('，') : '';
+      list8.push(
         '参数过滤：移除' +
-          (_0x3c1e1e || '无') +
+          (output || '无') +
           '；保留' +
-          (_0x49f839 || '无') +
+          (value2 || '无') +
           '。' +
-          formatTraceReason(_0x104c9c.reason) +
+          formatTraceReason(scope.reason) +
           '。',
       );
     }
-    _0x104c9c?.type === 'confirmation_required' &&
-      _0x178fc4.push('确认原因：' + formatTraceReason(_0x104c9c.reason) + '。');
+    scope?.type === 'confirmation_required' &&
+      list8.push('确认原因：' + formatTraceReason(scope.reason) + '。');
   }
-  return _0x178fc4.slice(0, 6);
+  return list8.slice(0, 6);
 }
-function getPlainObject(_0x273c8c) {
-  return _0x273c8c && typeof _0x273c8c === 'object' && !Array.isArray(_0x273c8c) ? _0x273c8c : {};
+function getPlainObject(value3) {
+  return value3 && typeof value3 === 'object' && !Array.isArray(value3) ? value3 : {};
 }
-function readPathSegment(_0x536cbd, _0x20c206) {
-  if (_0x536cbd == null) return undefined;
-  if (Array.isArray(_0x536cbd) && /^\d+$/.test(_0x20c206)) return _0x536cbd[Number(_0x20c206)];
-  return _0x536cbd?.[_0x20c206];
+function readPathSegment(value4, value5) {
+  if (value4 == null) return undefined;
+  if (Array.isArray(value4) && /^\d+$/.test(value5)) return value4[Number(value5)];
+  return value4?.[value5];
 }
-function resolveScopedExpression(_0x50853f, _0x57fd9c = {}) {
-  const _0x5c71df = String(_0x50853f || '')
+function resolveScopedExpression(value6, value7 = {}) {
+  const value8 = String(value6 || '')
       .trim()
       .split('.')
-      .map((_0x482409) => _0x482409.trim())
+      .map((item5) => item5.trim())
       .filter(Boolean),
-    _0xa723d = _0x5c71df.shift();
-  if (!_0xa723d || !Object.prototype.hasOwnProperty.call(_0x57fd9c, _0xa723d)) return { ok: false };
-  let _0x2d55bc = _0x57fd9c[_0xa723d];
-  for (const _0x1f1a53 of _0x5c71df) {
-    _0x2d55bc = readPathSegment(_0x2d55bc, _0x1f1a53);
-    if (_0x2d55bc === undefined) return { ok: false };
+    enabled2 = value8.shift();
+  if (!enabled2 || !Object.prototype.hasOwnProperty.call(value7, enabled2)) return { ok: false };
+  let value9 = value7[enabled2];
+  for (const value10 of value8) {
+    value9 = readPathSegment(value9, value10);
+    if (value9 === undefined) return { ok: false };
   }
-  return { ok: true, value: _0x2d55bc };
+  return { ok: true, value: value9 };
 }
-function resolveScopedValue(_0x3deec0, _0x525e93 = {}) {
-  if (typeof _0x3deec0 === 'string') {
-    const _0x32353c = /^\$([A-Za-z_][A-Za-z0-9_]*(?:\.(?:[A-Za-z_][A-Za-z0-9_]*|\d+))*)$/.exec(
-      _0x3deec0.trim(),
-    );
-    if (!_0x32353c) return _0x3deec0;
-    const _0x5fc438 = resolveScopedExpression(_0x32353c[1], _0x525e93);
-    return _0x5fc438.ok ? _0x5fc438.value : _0x3deec0;
+function resolveScopedValue(list9, value11 = {}) {
+  if (typeof list9 === 'string') {
+    const enabled3 = /^\$([A-Za-z_][A-Za-z0-9_]*(?:\.(?:[A-Za-z_][A-Za-z0-9_]*|\d+))*)$/.exec(list9.trim());
+    if (!enabled3) return list9;
+    const el = resolveScopedExpression(enabled3[1], value11);
+    return el.ok ? el.value : list9;
   }
-  if (Array.isArray(_0x3deec0)) return _0x3deec0.map((_0x303c80) => resolveScopedValue(_0x303c80, _0x525e93));
-  if (_0x3deec0 && typeof _0x3deec0 === 'object') {
-    const _0x282c4b = {};
-    for (const [_0x88d92c, _0x1de3c9] of Object.entries(_0x3deec0)) {
-      _0x282c4b[_0x88d92c] = resolveScopedValue(_0x1de3c9, _0x525e93);
+  if (Array.isArray(list9)) return list9.map((item6) => resolveScopedValue(item6, value11));
+  if (list9 && typeof list9 === 'object') {
+    const value12 = {};
+    for (const [value13, value14] of Object.entries(list9)) {
+      value12[value13] = resolveScopedValue(value14, value11);
     }
-    return _0x282c4b;
+    return value12;
   }
-  return _0x3deec0;
+  return list9;
 }
-function resolveActionArgs(_0x3d534a = {}, _0x46fc92 = {}) {
-  return resolveScopedValue(_0x3d534a.args || {}, _0x46fc92);
+function resolveActionArgs(options6 = {}, value15 = {}) {
+  return resolveScopedValue(options6.args || {}, value15);
 }
-function getCreateActionLabel(_0x1c4c1f, _0x4ed5c3) {
-  const _0x4e24c3 = String(_0x1c4c1f || '');
-  if (_0x4e24c3 === 'ai-image') return runtimeText('nodeCreateImage', _0x4ed5c3);
-  if (_0x4e24c3 === 'ai-video') return runtimeText('nodeCreateVideo', _0x4ed5c3);
-  if (_0x4e24c3 === 'ai-audio') return runtimeText('nodeCreateAudio', _0x4ed5c3);
-  if (_0x4e24c3 === 'ai-text' || _0x4e24c3 === 'source-text') return runtimeText('nodeCreateText', _0x4ed5c3);
-  return runtimeText('nodeCreate', _0x4ed5c3);
+function getCreateActionLabel(value16, value17) {
+  const value18 = String(value16 || '');
+  if (value18 === 'ai-image') return runtimeText('nodeCreateImage', value17);
+  if (value18 === 'ai-video') return runtimeText('nodeCreateVideo', value17);
+  if (value18 === 'ai-audio') return runtimeText('nodeCreateAudio', value17);
+  if (value18 === 'ai-text' || value18 === 'source-text') return runtimeText('nodeCreateText', value17);
+  return runtimeText('nodeCreate', value17);
 }
-function getActionLabel(_0x5cb9cc, _0x2000eb = {}, _0x3634f5) {
-  const _0x4c6171 = String(_0x5cb9cc || '');
-  if (_0x4c6171 === 'node.create') return getCreateActionLabel(_0x2000eb.type, _0x3634f5);
-  if (_0x4c6171 === 'node.setPrompt' || _0x4c6171 === 'node.appendPrompt')
-    return runtimeText('nodeSetPrompt', _0x3634f5);
-  if (_0x4c6171 === 'node.setParams') return runtimeText('nodeSetParams', _0x3634f5);
-  if (_0x4c6171 === 'graph.connect') return runtimeText('graphConnect', _0x3634f5);
-  if (_0x4c6171 === 'layout.align') return runtimeText('layoutAlign', _0x3634f5);
-  if (_0x4c6171 === 'layout.arrangeRow') return runtimeText('layoutArrangeRow', _0x3634f5);
-  if (_0x4c6171 === 'layout.arrangeColumn') return runtimeText('layoutArrangeColumn', _0x3634f5);
-  if (_0x4c6171 === 'layout.arrangeGrid') return runtimeText('layoutArrangeGrid', _0x3634f5);
-  if (_0x4c6171 === 'generation.run') return runtimeText('generationRun', _0x3634f5);
-  if (_0x4c6171 === 'node.delete') return runtimeText('nodeDelete', _0x3634f5);
-  return _0x4c6171;
+function getActionLabel(value19, value20 = {}, value21) {
+  const value22 = String(value19 || '');
+  if (value22 === 'node.create') return getCreateActionLabel(value20.type, value21);
+  if (value22 === 'node.setPrompt' || value22 === 'node.appendPrompt')
+    return runtimeText('nodeSetPrompt', value21);
+  if (value22 === 'node.setParams') return runtimeText('nodeSetParams', value21);
+  if (value22 === 'graph.connect') return runtimeText('graphConnect', value21);
+  if (value22 === 'layout.align') return runtimeText('layoutAlign', value21);
+  if (value22 === 'layout.arrangeRow') return runtimeText('layoutArrangeRow', value21);
+  if (value22 === 'layout.arrangeColumn') return runtimeText('layoutArrangeColumn', value21);
+  if (value22 === 'layout.arrangeGrid') return runtimeText('layoutArrangeGrid', value21);
+  if (value22 === 'generation.run') return runtimeText('generationRun', value21);
+  if (value22 === 'node.delete') return runtimeText('nodeDelete', value21);
+  return value22;
 }
-function summarizeAction(_0xbf1ffc = {}, _0x56eeb1 = {}, _0xacb5c7 = getLocale()) {
-  const _0x3f7a11 = resolveActionArgs(_0xbf1ffc, _0x56eeb1);
+function summarizeAction(options7 = {}, value23 = {}, locale4 = getLocale()) {
+  const args3 = resolveActionArgs(options7, value23);
   return {
-    type: String(_0xbf1ffc.type || ''),
-    label: getActionLabel(_0xbf1ffc.type, _0x3f7a11, _0xacb5c7),
-    args: _0x3f7a11,
-    promptSummary: truncateText(_0x3f7a11.prompt || _0x3f7a11.text || '', 60),
+    type: String(options7.type || ''),
+    label: getActionLabel(options7.type, args3, locale4),
+    args: args3,
+    promptSummary: truncateText(args3.prompt || args3.text || '', 60),
   };
 }
-function getNode(_0x25c262 = {}, _0x4b655f = '') {
-  const _0x2f0d40 = String(_0x4b655f || '').trim();
-  return _0x2f0d40 ? _0x25c262.nodes?.[_0x2f0d40] || null : null;
+function getNode(options8 = {}, value24 = '') {
+  const value25 = String(value24 || '').trim();
+  return value25 ? options8.nodes?.[value25] || null : null;
 }
-function isImageNodeType(_0x5199cd = '') {
-  return String(_0x5199cd || '') === 'ai-image' || String(_0x5199cd || '') === 'source-image';
+function isImageNodeType(value26 = '') {
+  return String(value26 || '') === 'ai-image' || String(value26 || '') === 'source-image';
 }
-function summarizeInputSource(_0x138ddb = {}, _0x2a5241 = '', _0x472995 = getLocale()) {
-  const _0xf47ec2 = Object.values(_0x138ddb.edges || {}).filter(
-      (_0x3822a5) => String(_0x3822a5?.targetId || '') === String(_0x2a5241 || ''),
+function summarizeInputSource(options9 = {}, value27 = '', locale5 = getLocale()) {
+  const list10 = Object.values(options9.edges || {}).filter(
+      (item7) => String(item7?.targetId || '') === String(value27 || ''),
     ),
-    _0x3ce293 = new Set((_0x138ddb.selectedNodeIds || []).map((_0xcf839d) => String(_0xcf839d || ''))),
-    _0x4498bd = _0xf47ec2
-      .map((_0x1fe2e7) => {
-        const _0x40b914 = getNode(_0x138ddb, _0x1fe2e7.sourceId);
-        if (!_0x40b914) return '';
-        const _0xb3193 = String(_0x40b914.name || _0x40b914.id || _0x1fe2e7.sourceId),
-          _0x7cd7ae =
-            _0x3ce293.has(String(_0x40b914.id || '')) && isImageNodeType(_0x40b914.type)
-              ? runtimeText('selectedImageInput', _0x472995)
-              : runtimeText('inputNode', _0x472995);
-        return _0x7cd7ae + '：' + _0xb3193;
+    map = new Set((options9.selectedNodeIds || []).map((item8) => String(item8 || ''))),
+    list11 = list10
+      .map((item9) => {
+        const error2 = getNode(options9, item9.sourceId);
+        if (!error2) return '';
+        const value28 = String(error2.name || error2.id || item9.sourceId),
+          value29 =
+            map.has(String(error2.id || '')) && isImageNodeType(error2.type)
+              ? runtimeText('selectedImageInput', locale5)
+              : runtimeText('inputNode', locale5);
+        return value29 + '：' + value28;
       })
       .filter(Boolean);
-  return _0x4498bd.join('，') || runtimeText('noInputSource', _0x472995);
+  return list11.join('，') || runtimeText('noInputSource', locale5);
 }
-function summarizeGeneration(_0x2c72a4 = {}, _0x295f7d = {}) {
-  const _0x1a1754 = _0x295f7d.locale || getLocale(),
-    _0x5a301c = _0x2c72a4.scope || {},
-    _0x329b02 = (_0x2c72a4.actions || []).find((_0x2b3cae) => _0x2b3cae?.type === 'generation.run');
-  if (!_0x329b02) return null;
-  const _0x2c0d0e = resolveActionArgs(_0x329b02, _0x5a301c),
-    _0x57d406 = String(_0x2c0d0e.nodeId || '').trim(),
-    _0x2b99fe = getState(_0x295f7d),
-    _0x4cdfd7 = getNode(_0x2b99fe, _0x57d406) || {},
-    _0x515471 = resolveModelExecution(_0x4cdfd7.model, { providerHint: _0x4cdfd7.provider }),
-    _0x4303ce =
-      _0x515471?.modelManifest?.displayName ||
-      _0x515471?.modelManifest?.title ||
-      _0x4cdfd7.model ||
-      runtimeText('defaultModel', _0x1a1754),
-    _0x274441 = {
-      ...getPlainObject(_0x4cdfd7.generationParams),
-      ...getPlainObject(_0x2c0d0e.options?.params),
+function summarizeGeneration(options10 = {}, value30 = {}) {
+  const value31 = value30.locale || getLocale(),
+    value32 = options10.scope || {},
+    enabled4 = (options10.actions || []).find((item10) => item10?.type === 'generation.run');
+  if (!enabled4) return null;
+  const actionArgs = resolveActionArgs(enabled4, value32),
+    nodeId = String(actionArgs.nodeId || '').trim(),
+    state2 = getState(value30),
+    providerHint = getNode(state2, nodeId) || {},
+    modelExecution = resolveModelExecution(providerHint.model, { providerHint: providerHint.provider }),
+    modelLabel =
+      modelExecution?.modelManifest?.displayName ||
+      modelExecution?.modelManifest?.title ||
+      providerHint.model ||
+      runtimeText('defaultModel', value31),
+    params = {
+      ...getPlainObject(providerHint.generationParams),
+      ...getPlainObject(actionArgs.options?.params),
     };
   return {
-    nodeId: _0x57d406,
-    model: String(_0x4cdfd7.model || ''),
-    modelLabel: _0x4303ce,
-    provider: String(_0x4cdfd7.provider || _0x515471?.modelManifest?.provider || ''),
-    promptSummary: truncateText(_0x4cdfd7.prompt || _0x4cdfd7.storyboardScript?.prompt || '', 120),
-    params: _0x274441,
-    inputSource: summarizeInputSource(_0x2b99fe, _0x57d406, _0x1a1754),
+    nodeId: nodeId,
+    model: String(providerHint.model || ''),
+    modelLabel: modelLabel,
+    provider: String(providerHint.provider || modelExecution?.modelManifest?.provider || ''),
+    promptSummary: truncateText(providerHint.prompt || providerHint.storyboardScript?.prompt || '', 120),
+    params: params,
+    inputSource: summarizeInputSource(state2, nodeId, value31),
   };
 }
-function buildConfirmationSummary(_0x281a19 = {}, _0x1ff33a = {}) {
-  const _0xd6bbdb = _0x1ff33a.locale || getLocale(),
-    _0x4878ae = _0x281a19.scope || {};
+function buildConfirmationSummary(options11 = {}, value33 = {}) {
+  const value34 = value33.locale || getLocale(),
+    value35 = options11.scope || {};
   return {
-    completedActions: (_0x281a19.preExecutedActions || []).map((_0xf81ae3) =>
-      summarizeAction(_0xf81ae3, _0x4878ae, _0xd6bbdb),
+    completedActions: (options11.preExecutedActions || []).map((item11) =>
+      summarizeAction(item11, value35, value34),
     ),
-    pendingActions: (_0x281a19.actions || []).map((_0x1d8666) =>
-      summarizeAction(_0x1d8666, _0x4878ae, _0xd6bbdb),
-    ),
-    generation: summarizeGeneration(_0x281a19, _0x1ff33a),
-    debugTraceSummary: summarizeDebugTraceForConfirmation(_0x1ff33a.debugTrace),
-    cancelNotice: runtimeText('cancelNotice', _0xd6bbdb),
+    pendingActions: (options11.actions || []).map((item12) => summarizeAction(item12, value35, value34)),
+    generation: summarizeGeneration(options11, value33),
+    debugTraceSummary: summarizeDebugTraceForConfirmation(value33.debugTrace),
+    cancelNotice: runtimeText('cancelNotice', value34),
   };
 }
-function buildRecoveryOptions(_0x1a375c = getLocale()) {
+function buildRecoveryOptions(locale6 = getLocale()) {
   return [
-    { id: 'retry', label: runtimeText('retry', _0x1a375c) },
-    { id: 'editPrompt', label: runtimeText('editPrompt', _0x1a375c) },
-    { id: 'changeModel', label: runtimeText('changeModel', _0x1a375c) },
-    { id: 'keepPrepared', label: runtimeText('keepPrepared', _0x1a375c) },
+    { id: 'retry', label: runtimeText('retry', locale6) },
+    { id: 'editPrompt', label: runtimeText('editPrompt', locale6) },
+    { id: 'changeModel', label: runtimeText('changeModel', locale6) },
+    { id: 'keepPrepared', label: runtimeText('keepPrepared', locale6) },
   ];
 }
-function buildRecovery(_0x357eb0 = {}, _0x27eb81 = {}, _0x2232c6 = getLocale()) {
-  const _0x3f47ac = Number(_0x357eb0.raw?.result?.failedIndex),
-    _0x166b3c =
-      Number.isFinite(_0x3f47ac) && _0x3f47ac >= 0
-        ? _0x27eb81.actions?.[_0x3f47ac] || null
-        : _0x27eb81.actions?.find((_0x3d1d93) => _0x3d1d93?.type === 'generation.run') || null;
-  if (!_0x166b3c) return null;
+function buildRecovery(errorCode = {}, value36 = {}, locale7 = getLocale()) {
+  const count = Number(errorCode.raw?.result?.failedIndex),
+    enabled5 =
+      Number.isFinite(count) && count >= 0
+        ? value36.actions?.[count] || null
+        : value36.actions?.find((item13) => item13?.type === 'generation.run') || null;
+  if (!enabled5) return null;
   return {
-    errorCode: _0x357eb0.errorCode || _0x357eb0.raw?.errorCode || '',
-    failedAction: summarizeAction(_0x166b3c, _0x27eb81.scope || {}, _0x2232c6),
-    options: buildRecoveryOptions(_0x2232c6),
+    errorCode: errorCode.errorCode || errorCode.raw?.errorCode || '',
+    failedAction: summarizeAction(enabled5, value36.scope || {}, locale7),
+    options: buildRecoveryOptions(locale7),
   };
 }
-function splitSafePrefix(_0x5b81bc = []) {
-  const _0x402e7b = _0x5b81bc.findIndex((_0x31a737) => !isSafeAction(_0x31a737));
-  if (_0x402e7b <= 0) return { prefix: [], pending: _0x5b81bc };
-  return { prefix: _0x5b81bc.slice(0, _0x402e7b), pending: _0x5b81bc.slice(_0x402e7b) };
+function splitSafePrefix(pending = []) {
+  const count2 = pending.findIndex((item14) => !isSafeAction(item14));
+  if (count2 <= 0) return { prefix: [], pending: pending };
+  return { prefix: pending.slice(0, count2), pending: pending.slice(count2) };
 }
 export function createAgentRuntime({
-  store: _0x35560c,
-  commandContext: _0x52bb15,
+  store: store2,
+  commandContext: commandContext2,
   commandRegistry: commandRegistry = canvasCommandRegistry,
   sessionStore: sessionStore = createAgentSessionStore(),
   planner: planner = null,
@@ -436,299 +432,296 @@ export function createAgentRuntime({
   executeActions: executeActions = executeAgentActions,
   localeProvider: localeProvider = getLocale,
 } = {}) {
-  let _0x390a64 = 0,
-    _0x4108bd = null;
-  function _0x3be814() {
+  let value37 = 0,
+    value38 = null;
+  function locale8() {
     return normalizeRuntimeLocale(localeProvider?.() || getLocale());
   }
-  function _0x298ae2(_0x4324b1) {
+  function run(lastPlanSummary) {
     sessionStore.markUnfinishedOperation?.({
-      lastPlanSummary: _0x4324b1,
-      lastCanvasSnapshotDigest: buildCanvasSnapshotDigest({ store: _0x35560c, commandContext: _0x52bb15 }),
+      lastPlanSummary: lastPlanSummary,
+      lastCanvasSnapshotDigest: buildCanvasSnapshotDigest({ store: store2, commandContext: commandContext2 }),
     });
   }
-  function _0x272d23() {
+  function run2() {
     sessionStore.clearUnfinishedOperation?.();
   }
-  async function _0x19d5db(_0x22fe02, _0x185a0c = {}) {
-    if (typeof planner !== 'function') return createFailedReply(runtimeText('plannerMissing', _0x3be814()));
-    const _0x13794d = buildContext({
-      store: _0x35560c || _0x52bb15?.store,
+  async function run3(userMessage2, intent = {}) {
+    if (typeof planner !== 'function') return createFailedReply(runtimeText('plannerMissing', locale8()));
+    const context = buildContext({
+      store: store2 || commandContext2?.store,
       commandRegistry: commandRegistry,
       sessionStore: sessionStore,
-      userMessage: _0x22fe02,
-      intent: _0x185a0c.intent,
-      targetKind: _0x185a0c.targetKind,
-      inputRefs: _0x185a0c.inputRefs,
-      contextBudgetChars: _0x185a0c.contextBudgetChars,
+      userMessage: userMessage2,
+      intent: intent.intent,
+      targetKind: intent.targetKind,
+      inputRefs: intent.inputRefs,
+      contextBudgetChars: intent.contextBudgetChars,
     });
     return (
-      (_0x4108bd = _0x13794d),
+      (value38 = context),
       planner({
-        message: _0x22fe02,
-        context: _0x13794d,
+        message: userMessage2,
+        context: context,
         history: sessionStore.getHistory?.() || [],
         pendingClarification: sessionStore.getPendingClarification?.(),
-        onTrace: (_0x21da81) => sessionStore.recordTrace?.(_0x21da81),
-        ..._0x185a0c,
+        onTrace: (value39) => sessionStore.recordTrace?.(value39),
+        ...intent,
       })
     );
   }
-  async function _0xf6ccb9(_0x4a14d0) {
-    const _0x54cc1d = await executeActions(_0x4a14d0.plan.actions, {
-        commandContext: _0x52bb15,
-        initialScope: _0x4a14d0.plan.scope || _0x4a14d0.plan.aliases || {},
+  async function run4(initialScope) {
+    const status = await executeActions(initialScope.plan.actions, {
+        commandContext: commandContext2,
+        initialScope: initialScope.plan.scope || initialScope.plan.aliases || {},
       }),
-      _0xfe843d =
-        _0x4a14d0.plan.preExecutedActions?.length > 0
-          ? summarizeExecution(_0x54cc1d, _0x3be814())
-          : _0x4a14d0.plan.reply || summarizeExecution(_0x54cc1d, _0x3be814()),
-      _0x591b13 = _0x54cc1d.ok ? null : buildRecovery(_0x54cc1d, _0x4a14d0.plan, _0x3be814());
-    if (_0x54cc1d.ok) (sessionStore.clearPendingPlan?.(), sessionStore.clearPendingRecovery?.(), _0x272d23());
+      content =
+        initialScope.plan.preExecutedActions?.length > 0
+          ? summarizeExecution(status, locale8())
+          : initialScope.plan.reply || summarizeExecution(status, locale8()),
+      recovery = status.ok ? null : buildRecovery(status, initialScope.plan, locale8());
+    if (status.ok) (sessionStore.clearPendingPlan?.(), sessionStore.clearPendingRecovery?.(), run2());
     else
-      _0x591b13
+      recovery
         ? (sessionStore.clearPendingPlan?.(),
-          sessionStore.setPendingRecovery?.({ plan: _0x4a14d0.plan, recovery: _0x591b13 }),
-          _0x298ae2(buildRecoverySummary(_0x591b13)))
-        : (sessionStore.clearPendingPlan?.(), sessionStore.clearPendingRecovery?.(), _0x272d23());
+          sessionStore.setPendingRecovery?.({ plan: initialScope.plan, recovery: recovery }),
+          run(buildRecoverySummary(recovery)))
+        : (sessionStore.clearPendingPlan?.(), sessionStore.clearPendingRecovery?.(), run2());
     return (
       sessionStore.pushHistory?.({
         role: 'assistant',
-        status: _0x54cc1d.ok ? 'success' : 'failed',
-        content: _0xfe843d,
-        execution: _0x54cc1d,
-        recovery: _0x591b13,
+        status: status.ok ? 'success' : 'failed',
+        content: content,
+        execution: status,
+        recovery: recovery,
       }),
       {
-        ok: _0x54cc1d.ok,
-        status: _0x54cc1d.status,
-        reply: _0xfe843d,
-        plan: _0x4a14d0.plan,
-        execution: _0x54cc1d,
-        ...(_0x591b13 ? { recovery: _0x591b13 } : {}),
+        ok: status.ok,
+        status: status.status,
+        reply: content,
+        plan: initialScope.plan,
+        execution: status,
+        ...(recovery ? { recovery: recovery } : {}),
       }
     );
   }
-  async function _0x495f8a(_0x54d1ba) {
-    const { prefix: _0xc81b3e, pending: _0x966d70 } = splitSafePrefix(_0x54d1ba.plan.actions);
-    if (_0xc81b3e.length === 0) return { ok: true, plan: _0x54d1ba.plan, preExecution: null };
-    const _0x50aa40 = await executeActions(_0xc81b3e, { commandContext: _0x52bb15 });
-    if (!_0x50aa40.ok)
+  async function run5(plan) {
+    const { prefix: prefix, pending: pending2 } = splitSafePrefix(plan.plan.actions);
+    if (prefix.length === 0) return { ok: true, plan: plan.plan, preExecution: null };
+    const content2 = await executeActions(prefix, { commandContext: commandContext2 });
+    if (!content2.ok)
       return (
         sessionStore.pushHistory?.({
           role: 'assistant',
           status: 'failed',
-          content: _0x50aa40.message || runtimeText('preActionsFailed', _0x3be814()),
-          execution: _0x50aa40,
+          content: content2.message || runtimeText('preActionsFailed', locale8()),
+          execution: content2,
         }),
         {
           ok: false,
           status: 'failed',
-          reply: _0x50aa40.message || runtimeText('preActionsFailed', _0x3be814()),
-          message: _0x50aa40.message || runtimeText('preActionsFailed', _0x3be814()),
-          execution: _0x50aa40,
+          reply: content2.message || runtimeText('preActionsFailed', locale8()),
+          message: content2.message || runtimeText('preActionsFailed', locale8()),
+          execution: content2,
         }
       );
     return {
       ok: true,
-      preExecution: _0x50aa40,
+      preExecution: content2,
       plan: {
-        ..._0x54d1ba.plan,
-        actions: _0x966d70,
-        preExecutedActions: _0xc81b3e,
-        scope: _0x50aa40.raw?.result?.aliases || {},
+        ...plan.plan,
+        actions: pending2,
+        preExecutedActions: prefix,
+        scope: content2.raw?.result?.aliases || {},
       },
     };
   }
-  async function _0x4c6cae(
-    _0x3c7eba,
+  async function run6(
+    value40,
     {
-      agentContext: agentContext = _0x4108bd,
+      agentContext: agentContext = value38,
       userMessage: userMessage = '',
       plannerExtra: plannerExtra = {},
     } = {},
   ) {
-    const _0x58b208 = [],
-      _0x52e95d = validatePlan(_0x3c7eba, {
+    const debugTrace = [],
+      content3 = validatePlan(value40, {
         commandRegistry: commandRegistry,
-        commandContext: _0x52bb15,
+        commandContext: commandContext2,
         agentContext: agentContext,
-        traceRecorder: (_0x244100) => {
-          (_0x58b208.push(_0x244100), sessionStore.recordTrace?.(_0x244100));
+        traceRecorder: (value41) => {
+          (debugTrace.push(value41), sessionStore.recordTrace?.(value41));
         },
       });
-    if (!_0x52e95d.ok)
+    if (!content3.ok)
       return (
-        sessionStore.pushHistory?.({ role: 'assistant', status: 'failed', content: _0x52e95d.message }),
-        createFailedReply(_0x52e95d.message, { validation: _0x52e95d })
+        sessionStore.pushHistory?.({ role: 'assistant', status: 'failed', content: content3.message }),
+        createFailedReply(content3.message, { validation: content3 })
       );
-    if (_0x52e95d.status === 'chat') {
-      const _0x3b06b0 = _0x52e95d.plan.reply || runtimeText('chatFallback', _0x3be814());
+    if (content3.status === 'chat') {
+      const content4 = content3.plan.reply || runtimeText('chatFallback', locale8());
       return (
-        sessionStore.pushHistory?.({ role: 'assistant', status: 'chat', content: _0x3b06b0 }),
-        createChatReply(_0x3b06b0, { plan: _0x52e95d.plan })
+        sessionStore.pushHistory?.({ role: 'assistant', status: 'chat', content: content4 }),
+        createChatReply(content4, { plan: content3.plan })
       );
     }
-    if (shouldHoldCanvasActionsForChat(_0x52e95d, userMessage, plannerExtra)) {
-      const _0x4fb537 = _0x52e95d.plan.reply || runtimeText('chatIntentRequired', _0x3be814());
+    if (shouldHoldCanvasActionsForChat(content3, userMessage, plannerExtra)) {
+      const content5 = content3.plan.reply || runtimeText('chatIntentRequired', locale8());
       return (
         sessionStore.recordTrace?.({
           type: 'canvas_action_held_for_chat',
-          actionTypes: (_0x52e95d.plan.actions || []).map((_0x3a6038) => _0x3a6038.type),
+          actionTypes: (content3.plan.actions || []).map((item15) => item15.type),
           reason: 'missing explicit canvas action intent',
         }),
-        sessionStore.pushHistory?.({ role: 'assistant', status: 'chat', content: _0x4fb537 }),
-        createChatReply(_0x4fb537, {
-          plan: { ..._0x52e95d.plan, status: 'chat', actions: [], requiresConfirmation: false },
-          heldActions: _0x52e95d.plan.actions,
+        sessionStore.pushHistory?.({ role: 'assistant', status: 'chat', content: content5 }),
+        createChatReply(content5, {
+          plan: { ...content3.plan, status: 'chat', actions: [], requiresConfirmation: false },
+          heldActions: content3.plan.actions,
         })
       );
     }
-    if (_0x52e95d.status === 'need_clarification')
+    if (content3.status === 'need_clarification')
       return (
-        sessionStore.setPendingClarification?.(_0x52e95d.plan),
+        sessionStore.setPendingClarification?.(content3.plan),
         sessionStore.pushHistory?.({
           role: 'assistant',
           status: 'need_clarification',
-          content: _0x52e95d.plan.question,
+          content: content3.plan.question,
         }),
         {
           ok: true,
           status: 'need_clarification',
-          reply: _0x52e95d.plan.reply || _0x52e95d.plan.question,
-          question: _0x52e95d.plan.question,
-          options: _0x52e95d.plan.options,
-          plan: _0x52e95d.plan,
+          reply: content3.plan.reply || content3.plan.question,
+          question: content3.plan.question,
+          options: content3.plan.options,
+          plan: content3.plan,
         }
       );
-    if (_0x52e95d.status === 'need_confirmation') {
-      const _0x4d55d9 = await _0x495f8a(_0x52e95d);
-      if (!_0x4d55d9.ok) return _0x4d55d9;
+    if (content3.status === 'need_confirmation') {
+      const content6 = await run5(content3);
+      if (!content6.ok) return content6;
       return (
-        sessionStore.setPendingPlan?.(_0x4d55d9.plan),
-        (_0x4d55d9.plan.confirmationSummary = buildConfirmationSummary(_0x4d55d9.plan, {
-          store: _0x35560c,
-          commandContext: _0x52bb15,
-          locale: _0x3be814(),
-          debugTrace: _0x58b208,
+        sessionStore.setPendingPlan?.(content6.plan),
+        (content6.plan.confirmationSummary = buildConfirmationSummary(content6.plan, {
+          store: store2,
+          commandContext: commandContext2,
+          locale: locale8(),
+          debugTrace: debugTrace,
         })),
-        _0x298ae2(buildPlanSummary(_0x4d55d9.plan)),
+        run(buildPlanSummary(content6.plan)),
         sessionStore.pushHistory?.({
           role: 'assistant',
           status: 'need_confirmation',
-          content: _0x4d55d9.plan.reply,
+          content: content6.plan.reply,
         }),
         {
           ok: true,
           status: 'need_confirmation',
-          reply: _0x4d55d9.plan.reply || runtimeText('confirmFallback', _0x3be814()),
-          riskLevel: _0x52e95d.riskLevel,
-          plan: _0x4d55d9.plan,
-          preExecution: _0x4d55d9.preExecution,
+          reply: content6.plan.reply || runtimeText('confirmFallback', locale8()),
+          riskLevel: content3.riskLevel,
+          plan: content6.plan,
+          preExecution: content6.preExecution,
         }
       );
     }
-    return _0xf6ccb9(_0x52e95d);
+    return run4(content3);
   }
-  async function _0xb46f69(_0x5b0225, _0x34d5ec = {}) {
-    const _0x3d4e25 = String(_0x5b0225 || '').trim();
-    if (!_0x3d4e25) return createFailedReply(runtimeText('emptyMessage', _0x3be814()));
-    const _0xdffcc = 'agent-run-' + ++_0x390a64;
+  async function handleUserMessage(value42, plannerExtra2 = {}) {
+    const content7 = String(value42 || '').trim();
+    if (!content7) return createFailedReply(runtimeText('emptyMessage', locale8()));
+    const id = 'agent-run-' + ++value37;
     (sessionStore.clearPendingPlan?.(),
       sessionStore.clearPendingRecovery?.(),
       sessionStore.clearPendingClarification?.(),
-      _0x272d23(),
-      sessionStore.setCurrentRun?.({ id: _0xdffcc, status: 'planning', stopped: false }),
-      sessionStore.pushHistory?.({ role: 'user', content: _0x3d4e25 }));
-    let _0x268bfa;
+      run2(),
+      sessionStore.setCurrentRun?.({ id: id, status: 'planning', stopped: false }),
+      sessionStore.pushHistory?.({ role: 'user', content: content7 }));
+    let value43;
     try {
-      _0x268bfa = await _0x19d5db(_0x3d4e25, _0x34d5ec);
-    } catch (_0x106932) {
-      const _0x34353c = _0x106932?.message || runtimeText('plannerFailed', _0x3be814());
+      value43 = await run3(content7, plannerExtra2);
+    } catch (error3) {
+      const content8 = error3?.message || runtimeText('plannerFailed', locale8());
       return (
-        sessionStore.pushHistory?.({ role: 'assistant', status: 'failed', content: _0x34353c }),
-        sessionStore.setCurrentRun?.({ id: _0xdffcc, status: 'failed', stopped: false }),
-        createFailedReply(_0x34353c)
+        sessionStore.pushHistory?.({ role: 'assistant', status: 'failed', content: content8 }),
+        sessionStore.setCurrentRun?.({ id: id, status: 'failed', stopped: false }),
+        createFailedReply(content8)
       );
     }
-    const _0x5f8bfe = sessionStore.getCurrentRun?.();
-    if (_0x5f8bfe?.id === _0xdffcc && _0x5f8bfe.stopped)
-      return createFailedReply(runtimeText('runStopped', _0x3be814()), { status: 'stopped' });
-    const _0x178442 = await _0x4c6cae(_0x268bfa, { userMessage: _0x3d4e25, plannerExtra: _0x34d5ec });
-    return (
-      sessionStore.setCurrentRun?.({ id: _0xdffcc, status: _0x178442.status, stopped: false }),
-      _0x178442
-    );
+    const value44 = sessionStore.getCurrentRun?.();
+    if (value44?.id === id && value44.stopped)
+      return createFailedReply(runtimeText('runStopped', locale8()), { status: 'stopped' });
+    const status2 = await run6(value43, { userMessage: content7, plannerExtra: plannerExtra2 });
+    return (sessionStore.setCurrentRun?.({ id: id, status: status2.status, stopped: false }), status2);
   }
-  async function _0x343c1a(_0x385f76, _0x380915 = {}) {
-    const _0x545615 = sessionStore.getPendingClarification?.();
-    if (!_0x545615) return createFailedReply(runtimeText('noPendingClarification', _0x3be814()));
+  async function answerClarification(clarificationAnswer, args4 = {}) {
+    const pendingPlan = sessionStore.getPendingClarification?.();
+    if (!pendingPlan) return createFailedReply(runtimeText('noPendingClarification', locale8()));
     sessionStore.clearPendingClarification?.();
-    const _0x3452e9 = String(_0x380915.displayAnswer || _0x385f76 || '').trim(),
-      _0x19a02b = { ..._0x380915, clarificationAnswer: _0x385f76, pendingPlan: _0x545615 };
-    return (delete _0x19a02b.displayAnswer, _0xb46f69(_0x3452e9, _0x19a02b));
+    const value45 = String(args4.displayAnswer || clarificationAnswer || '').trim(),
+      value46 = { ...args4, clarificationAnswer: clarificationAnswer, pendingPlan: pendingPlan };
+    return (delete value46.displayAnswer, handleUserMessage(value45, value46));
   }
   return {
     sessionStore: sessionStore,
-    handleUserMessage: _0xb46f69,
-    answerClarification: _0x343c1a,
-    async confirmPendingPlan(_0x24263e = {}) {
-      const _0x4eb032 = sessionStore.getPendingPlan?.();
-      if (!_0x4eb032) return createFailedReply(runtimeText('noPendingPlan', _0x3be814()));
-      const _0x278f8a = String(_0x24263e.displayAnswer || '').trim();
+    handleUserMessage: handleUserMessage,
+    answerClarification: answerClarification,
+    async confirmPendingPlan(options12 = {}) {
+      const args5 = sessionStore.getPendingPlan?.();
+      if (!args5) return createFailedReply(runtimeText('noPendingPlan', locale8()));
+      const content9 = String(options12.displayAnswer || '').trim();
       return (
-        _0x278f8a && sessionStore.pushHistory?.({ role: 'user', content: _0x278f8a }),
-        _0xf6ccb9({
+        content9 && sessionStore.pushHistory?.({ role: 'user', content: content9 }),
+        run4({
           ok: true,
           status: 'ready',
-          plan: { ..._0x4eb032, status: 'ready', requiresConfirmation: false },
+          plan: { ...args5, status: 'ready', requiresConfirmation: false },
         })
       );
     },
     async retryFailedPlan() {
-      const _0x5558cd = sessionStore.getPendingRecovery?.();
-      if (!_0x5558cd?.plan) return createFailedReply(runtimeText('noPendingRecovery', _0x3be814()));
-      return _0xf6ccb9({
+      const args6 = sessionStore.getPendingRecovery?.();
+      if (!args6?.plan) return createFailedReply(runtimeText('noPendingRecovery', locale8()));
+      return run4({
         ok: true,
         status: 'ready',
-        plan: { ..._0x5558cd.plan, status: 'ready', requiresConfirmation: false },
+        plan: { ...args6.plan, status: 'ready', requiresConfirmation: false },
       });
     },
     keepPreparedPlan() {
-      (sessionStore.clearPendingRecovery?.(), sessionStore.clearPendingPlan?.(), _0x272d23());
-      const _0x5cab0b = runtimeText('recoveryKept', _0x3be814());
+      (sessionStore.clearPendingRecovery?.(), sessionStore.clearPendingPlan?.(), run2());
+      const content10 = runtimeText('recoveryKept', locale8());
       return (
-        sessionStore.pushHistory?.({ role: 'assistant', status: 'recovery_kept', content: _0x5cab0b }),
-        { ok: true, status: 'recovery_kept', reply: _0x5cab0b }
+        sessionStore.pushHistory?.({ role: 'assistant', status: 'recovery_kept', content: content10 }),
+        { ok: true, status: 'recovery_kept', reply: content10 }
       );
     },
     cancelPendingPlan() {
-      (sessionStore.clearPendingPlan?.(), _0x272d23());
-      const _0x1ed0c1 = runtimeText('planCancelled', _0x3be814());
+      (sessionStore.clearPendingPlan?.(), run2());
+      const content11 = runtimeText('planCancelled', locale8());
       return (
-        sessionStore.pushHistory?.({ role: 'assistant', status: 'cancelled', content: _0x1ed0c1 }),
-        { ok: true, status: 'cancelled', reply: _0x1ed0c1 }
+        sessionStore.pushHistory?.({ role: 'assistant', status: 'cancelled', content: content11 }),
+        { ok: true, status: 'cancelled', reply: content11 }
       );
     },
     stop() {
-      const _0x5c313b = sessionStore.stopCurrentRun?.();
-      return { ok: true, status: 'stopped', reply: runtimeText('runStopped', _0x3be814()), run: _0x5c313b };
+      const run7 = sessionStore.stopCurrentRun?.();
+      return { ok: true, status: 'stopped', reply: runtimeText('runStopped', locale8()), run: run7 };
     },
     resetSession() {
       return (
         sessionStore.reset?.(),
-        _0x272d23(),
-        { ok: true, status: 'reset', reply: runtimeText('reset', _0x3be814()) }
+        run2(),
+        { ok: true, status: 'reset', reply: runtimeText('reset', locale8()) }
       );
     },
     startNewConversation() {
       return sessionStore.startNewConversation?.() || null;
     },
-    switchConversation(_0x45a544) {
-      return sessionStore.switchConversation?.(_0x45a544) || null;
+    switchConversation(value47) {
+      return sessionStore.switchConversation?.(value47) || null;
     },
-    deleteConversation(_0x3833c6) {
-      return sessionStore.deleteConversation?.(_0x3833c6) || null;
+    deleteConversation(value48) {
+      return sessionStore.deleteConversation?.(value48) || null;
     },
     listConversations() {
       return sessionStore.listConversations?.() || [];

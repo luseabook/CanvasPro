@@ -697,18 +697,18 @@ export const HAPPYHORSE_AUDIO_SETTING_FIELD = Object['freeze']({
 });
 export const HAPPYHORSE_WATERMARK_FIELD = Object['freeze']({ ...VIDEO_WATERMARK_FIELD, label: '添加水印' });
 export function createHappyHorseFixedSlot({
-  id: _0xa1115d,
-  kind: _0x1aafb2,
-  label: _0x5764ba,
-  mode: _0xab465d,
-  description: _0x419034,
+  id: id,
+  kind: kind,
+  label: label2,
+  mode: mode,
+  description: description2,
 }) {
   return Object['freeze']({
-    id: _0xa1115d,
-    kind: _0x1aafb2,
-    label: _0x5764ba,
-    description: _0x419034,
-    showWhen: Object['freeze']({ field: 'happyhorse_mode', value: _0xab465d }),
+    id: id,
+    kind: kind,
+    label: label2,
+    description: description2,
+    showWhen: Object['freeze']({ field: 'happyhorse_mode', value: mode }),
   });
 }
 export const HAPPYHORSE_FIXED_INPUT_SLOTS = Object['freeze']([
@@ -843,13 +843,13 @@ export function createVolcengineSeedance2ResolutionField({
   include1080p: include1080p = !![],
   include4k: include4k = ![],
 } = {}) {
-  const _0x4a1c62 = [
+  const list = [
     Object['freeze']({ value: '480p', label: '480p' }),
     Object['freeze']({ value: '720p', label: '720p' }),
   ];
   return (
-    include1080p && _0x4a1c62['push'](Object['freeze']({ value: '1080p', label: '1080p' })),
-    include4k && _0x4a1c62['push'](Object['freeze']({ value: '4k', label: '4k' })),
+    include1080p && list['push'](Object['freeze']({ value: '1080p', label: '1080p' })),
+    include4k && list['push'](Object['freeze']({ value: '4k', label: '4k' })),
     Object['freeze']({
       id: 'resolution',
       displayRole: 'resolution',
@@ -859,7 +859,7 @@ export function createVolcengineSeedance2ResolutionField({
       qualityRatioLabelOrder: 'fieldFirst',
       label: '分辨率',
       defaultValue: '720p',
-      options: Object['freeze'](_0x4a1c62),
+      options: Object['freeze'](list),
     })
   );
 }
@@ -905,30 +905,30 @@ export const VOLCENGINE_SEEDANCE_2_PRIORITY_FIELD = Object['freeze']({
   step: 0x1,
 });
 export function createRunningHubSeedance2FixedSlot({
-  id: _0x4c0f99,
-  kind: _0x5bbe27,
-  label: _0x516102,
-  mode: _0x524713,
-  modes: _0x1cfc30,
-  description: _0x345e0e,
-  displayOrder: _0x312c82,
+  id: id2,
+  kind: kind2,
+  label: label3,
+  mode: mode2,
+  modes: modes,
+  description: description3,
+  displayOrder: displayOrder,
 }) {
-  const _0x1cb00e = Object['freeze'](
-      (Array['isArray'](_0x1cfc30) ? _0x1cfc30 : [_0x524713])
-        ['map']((_0x2e3065) => String(_0x2e3065 || '')['trim']())
+  const values = Object['freeze'](
+      (Array['isArray'](modes) ? modes : [mode2])
+        ['map']((value) => String(value || '')['trim']())
         ['filter'](Boolean),
     ),
-    _0x128a74 =
-      _0x1cb00e['length'] > 0x1
-        ? Object['freeze']({ field: 'rh_seedance_2_mode', values: _0x1cb00e })
-        : Object['freeze']({ field: 'rh_seedance_2_mode', value: _0x1cb00e[0x0] || '' });
+    showWhen =
+      values['length'] > 0x1
+        ? Object['freeze']({ field: 'rh_seedance_2_mode', values: values })
+        : Object['freeze']({ field: 'rh_seedance_2_mode', value: values[0x0] || '' });
   return Object['freeze']({
-    id: _0x4c0f99,
-    kind: _0x5bbe27,
-    label: _0x516102,
-    description: _0x345e0e,
-    displayOrder: _0x312c82,
-    showWhen: _0x128a74,
+    id: id2,
+    kind: kind2,
+    label: label3,
+    description: description3,
+    displayOrder: displayOrder,
+    showWhen: showWhen,
   });
 }
 export const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS = Object['freeze']([
@@ -1095,20 +1095,20 @@ export const KLING_V3_OMNI_MODE_FIELD = Object['freeze']({
   ]),
 });
 export function createKlingV3OmniFixedSlot({
-  id: _0x21190d,
-  kind: _0x2f9781,
-  label: _0x26bd28,
-  mode: _0x3e9da1,
-  description: _0x71a00e,
-  displayOrder: _0x30314f,
+  id: id3,
+  kind: kind3,
+  label: label4,
+  mode: mode3,
+  description: description4,
+  displayOrder: displayOrder2,
 }) {
   return Object['freeze']({
-    id: _0x21190d,
-    kind: _0x2f9781,
-    label: _0x26bd28,
-    description: _0x71a00e,
-    displayOrder: _0x30314f,
-    showWhen: Object['freeze']({ field: 'kling_v3_omni_mode', value: _0x3e9da1 }),
+    id: id3,
+    kind: kind3,
+    label: label4,
+    description: description4,
+    displayOrder: displayOrder2,
+    showWhen: Object['freeze']({ field: 'kling_v3_omni_mode', value: mode3 }),
   });
 }
 export const KLING_V3_OMNI_FIXED_INPUT_SLOTS = Object['freeze']([
@@ -1250,16 +1250,16 @@ export const RUNNINGHUB_KLING_O1_REFERENCE_PROMPT_PLACEHOLDER =
 export const RUNNINGHUB_KLING_O1_EDIT_PROMPT_PLACEHOLDER =
   '描述要对原视频做的编辑。例如：移除背景路人，将晴天改为电影感雨夜，并保持人物动作连贯。';
 export function createRunningHubKlingO1FixedSlot({
-  id: _0x715d98,
-  kind: _0x548dc3,
-  label: _0x533624,
-  mode: _0x4c948d,
-  description: _0x1afb8e,
-  displayOrder: _0x58c413,
+  id: id4,
+  kind: kind4,
+  label: label5,
+  mode: mode4,
+  description: description5,
+  displayOrder: displayOrder3,
 }) {
-  const _0x178682 =
-    _0x4c948d === 'reference' || _0x4c948d === 'edit'
-      ? { showWhen: Object['freeze']({ field: 'rh_kling_o1_generation_mode', value: _0x4c948d }) }
+  const args =
+    mode4 === 'reference' || mode4 === 'edit'
+      ? { showWhen: Object['freeze']({ field: 'rh_kling_o1_generation_mode', value: mode4 }) }
       : {
           hideWhen: Object['freeze']({
             field: 'rh_kling_o1_generation_mode',
@@ -1267,12 +1267,12 @@ export function createRunningHubKlingO1FixedSlot({
           }),
         };
   return Object['freeze']({
-    id: _0x715d98,
-    kind: _0x548dc3,
-    label: _0x533624,
-    description: _0x1afb8e,
-    displayOrder: _0x58c413,
-    ..._0x178682,
+    id: id4,
+    kind: kind4,
+    label: label5,
+    description: description5,
+    displayOrder: displayOrder3,
+    ...args,
   });
 }
 export const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS = Object['freeze']([
@@ -1389,21 +1389,21 @@ export const RUNNINGHUB_KLING_O3_REFERENCE_PROMPT_PLACEHOLDER =
 export const RUNNINGHUB_KLING_O3_EDIT_PROMPT_PLACEHOLDER =
   '描述要对原视频做什么编辑，可接参考图补充风格。例如：将原视频改成夜晚赛博朋克街道风格，保留人物动作和镜头节奏。';
 export function createRunningHubKlingO3FixedSlot({
-  id: _0x5df5ec,
-  kind: _0x5a339b,
-  label: _0x3f8179,
-  mode: _0x37c7fc,
-  description: _0x32c532,
-  displayOrder: _0x2415a3,
+  id: id5,
+  kind: kind5,
+  label: label6,
+  mode: mode5,
+  description: description6,
+  displayOrder: displayOrder4,
   hideWhen: hideWhen = null,
 }) {
   return Object['freeze']({
-    id: _0x5df5ec,
-    kind: _0x5a339b,
-    label: _0x3f8179,
-    description: _0x32c532,
-    displayOrder: _0x2415a3,
-    showWhen: Object['freeze']({ field: 'kling_v3_omni_mode', value: _0x37c7fc }),
+    id: id5,
+    kind: kind5,
+    label: label6,
+    description: description6,
+    displayOrder: displayOrder4,
+    showWhen: Object['freeze']({ field: 'kling_v3_omni_mode', value: mode5 }),
     ...(hideWhen ? { hideWhen: Object['freeze'](hideWhen) } : {}),
   });
 }
@@ -1545,33 +1545,32 @@ export const VIDU_Q3_VIDEO_PROMPT_PLACEHOLDER =
 export const VIDU_Q3_REFERENCE_PROMPT_PLACEHOLDER =
   '描述参考图的动作和镜头，外观由参考图决定。可用 @图片1、@图片2 指代素材。例如：@图片1 和 @图片2 中的角色在湖边相拥，镜头缓慢环绕。';
 export function createWan27FixedSlot({
-  id: _0x40824e,
-  kind: _0x1d724a,
-  label: _0x5e4c20,
-  mode: _0x492d38,
-  description: _0x474cf8,
-  displayOrder: _0x1b2b85,
-  showWhen: _0x25729b,
+  id: id6,
+  kind: kind6,
+  label: label7,
+  mode: mode6,
+  description: description7,
+  displayOrder: displayOrder5,
+  showWhen: showWhen2,
 }) {
-  const _0x33a471 = Array['isArray'](_0x492d38)
-      ? _0x492d38['map']((_0x378975) => String(_0x378975 || '')['trim']())['filter'](Boolean)
-      : [String(_0x492d38 || '')['trim']()]['filter'](Boolean),
-    _0x30a98c = [];
-  _0x30a98c['push'](
-    _0x33a471['length'] > 0x1
-      ? Object['freeze']({ field: 'wan27_mode', values: Object['freeze'](_0x33a471) })
-      : Object['freeze']({ field: 'wan27_mode', value: _0x33a471[0x0] || '' }),
+  const value2 = Array['isArray'](mode6)
+      ? mode6['map']((item) => String(item || '')['trim']())['filter'](Boolean)
+      : [String(mode6 || '')['trim']()]['filter'](Boolean),
+    list2 = [];
+  list2['push'](
+    value2['length'] > 0x1
+      ? Object['freeze']({ field: 'wan27_mode', values: Object['freeze'](value2) })
+      : Object['freeze']({ field: 'wan27_mode', value: value2[0x0] || '' }),
   );
-  const _0x33f768 =
-    _0x25729b ||
-    (_0x30a98c['length'] > 0x1 ? Object['freeze']({ all: Object['freeze'](_0x30a98c) }) : _0x30a98c[0x0]);
+  const showWhen3 =
+    showWhen2 || (list2['length'] > 0x1 ? Object['freeze']({ all: Object['freeze'](list2) }) : list2[0x0]);
   return Object['freeze']({
-    id: _0x40824e,
-    kind: _0x1d724a,
-    label: _0x5e4c20,
-    description: _0x474cf8,
-    displayOrder: _0x1b2b85,
-    showWhen: _0x33f768,
+    id: id6,
+    kind: kind6,
+    label: label7,
+    description: description7,
+    displayOrder: displayOrder5,
+    showWhen: showWhen3,
   });
 }
 export const WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
@@ -1706,44 +1705,42 @@ export const RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     description: '视频编辑可选参考图，最多 3 张',
   }),
 ]);
-export function freezeOption(_0x53f88e) {
-  if (_0x53f88e && typeof _0x53f88e === 'object' && !Array['isArray'](_0x53f88e))
-    return Object['freeze']({ ..._0x53f88e });
-  return Object['freeze']({ value: _0x53f88e, label: String(_0x53f88e) });
+export function freezeOption(value3) {
+  if (value3 && typeof value3 === 'object' && !Array['isArray'](value3))
+    return Object['freeze']({ ...value3 });
+  return Object['freeze']({ value: value3, label: String(value3) });
 }
-export function isAdaptiveRatioOptionValue(_0x16bbcd) {
-  const _0x521e35 = String(_0x16bbcd ?? '')['trim'](),
-    _0x1f09fd = _0x521e35['toLowerCase']();
+export function isAdaptiveRatioOptionValue(key) {
+  const index = String(key ?? '')['trim'](),
+    result = index['toLowerCase']();
   return (
-    _0x521e35 === APIMART_VIDEO_ADAPTIVE_RATIO_VALUE ||
-    _0x1f09fd === 'auto' ||
-    _0x1f09fd === 'adaptive' ||
-    _0x1f09fd === 'default'
+    index === APIMART_VIDEO_ADAPTIVE_RATIO_VALUE ||
+    result === 'auto' ||
+    result === 'adaptive' ||
+    result === 'default'
   );
 }
-export function withAdaptiveRatioOption(_0x70ed6c = []) {
-  const _0x50f3cc = Array['isArray'](_0x70ed6c) ? _0x70ed6c : [],
-    _0x1307e2 = _0x50f3cc['some']((_0x38ba28) =>
-      isAdaptiveRatioOptionValue(_0x38ba28?.['value'] ?? _0x38ba28),
-    );
-  return _0x1307e2 ? _0x50f3cc : [APIMART_VIDEO_ADAPTIVE_RATIO_OPTION, ..._0x50f3cc];
+export function withAdaptiveRatioOption(list3 = []) {
+  const list4 = Array['isArray'](list3) ? list3 : [],
+    data = list4['some']((el) => isAdaptiveRatioOptionValue(el?.['value'] ?? el));
+  return data ? list4 : [APIMART_VIDEO_ADAPTIVE_RATIO_OPTION, ...list4];
 }
 export function createSegmentedField({
-  id: _0x26c55b,
-  label: _0x2d2044,
-  defaultValue: _0x3010b8,
-  options: _0x428c01,
+  id: id7,
+  label: label8,
+  defaultValue: defaultValue2,
+  options: options2,
   placement: placement = 'mode',
   variant: variant = 'pillMenu',
 }) {
   return Object['freeze']({
-    id: _0x26c55b,
+    id: id7,
     type: 'segmented',
     placement: placement,
     variant: variant,
-    label: _0x2d2044,
-    defaultValue: _0x3010b8,
-    options: Object['freeze'](_0x428c01['map'](freezeOption)),
+    label: label8,
+    defaultValue: defaultValue2,
+    options: Object['freeze'](options2['map'](freezeOption)),
   });
 }
 export function createDurationField({
@@ -1761,55 +1758,55 @@ export function createDurationField({
   });
 }
 export function createDurationSliderOptionsField({
-  values: _0x595fb9,
-  defaultValue: defaultValue = _0x595fb9?.[0x0],
+  values: values2,
+  defaultValue: defaultValue = values2?.[0x0],
   label: label = VIDEO_DURATION_FIELD['label'],
   optionOverridesByValue: optionOverridesByValue = null,
 } = {}) {
-  const _0xd4fe3f = (Array['isArray'](_0x595fb9) ? _0x595fb9 : [])
-      ['map']((_0x3e7066) => Number(_0x3e7066))
+  const list5 = (Array['isArray'](values2) ? values2 : [])
+      ['map']((target) => Number(target))
       ['filter'](Number['isFinite']),
-    _0x5a7704 = _0xd4fe3f[0x0] ?? Number(defaultValue) ?? 0x1,
-    _0x4c02b5 = _0xd4fe3f[_0xd4fe3f['length'] - 0x1] ?? _0x5a7704;
+    min2 = list5[0x0] ?? Number(defaultValue) ?? 0x1,
+    max2 = list5[list5['length'] - 0x1] ?? min2;
   return Object['freeze']({
     ...VIDEO_DURATION_FIELD,
     label: label,
     defaultValue: defaultValue,
-    min: _0x5a7704,
-    max: _0x4c02b5,
+    min: min2,
+    max: max2,
     step: 0x1,
     options: Object['freeze'](
-      _0xd4fe3f['map']((_0x3ad616) =>
+      list5['map']((value4) =>
         Object['freeze']({
-          value: _0x3ad616,
-          label: _0x3ad616 + 's',
-          displayLabel: _0x3ad616 + 'S',
-          ...(optionOverridesByValue?.[_0x3ad616] || {}),
+          value: value4,
+          label: value4 + 's',
+          displayLabel: value4 + 'S',
+          ...(optionOverridesByValue?.[value4] || {}),
         }),
       ),
     ),
   });
 }
-export function createDurationOptionsField(_0x1c34f9, _0xb0e0 = _0x1c34f9[0x0]) {
+export function createDurationOptionsField(options3, defaultValue3 = options3[0x0]) {
   return createSegmentedField({
     id: 'duration',
     label: VIDEO_DURATION_FIELD['label'],
-    defaultValue: _0xb0e0,
-    options: _0x1c34f9['map']((_0x43dabc) => ({
-      value: _0x43dabc,
-      label: _0x43dabc + 's',
-      displayLabel: _0x43dabc + 'S',
+    defaultValue: defaultValue3,
+    options: options3['map']((value5) => ({
+      value: value5,
+      label: value5 + 's',
+      displayLabel: value5 + 'S',
     })),
   });
 }
-export function withResolutionPlacement(_0x104477) {
-  return Object['freeze']({ ..._0x104477, placement: 'resolution' });
+export function withResolutionPlacement(args2) {
+  return Object['freeze']({ ...args2, placement: 'resolution' });
 }
-export function createFooterDurationField(_0x277ccc = {}) {
-  return withResolutionPlacement(createDurationField(_0x277ccc));
+export function createFooterDurationField(options4 = {}) {
+  return withResolutionPlacement(createDurationField(options4));
 }
-export function createFooterDurationSliderOptionsField(_0x5594b8 = {}) {
-  return withResolutionPlacement(createDurationSliderOptionsField(_0x5594b8));
+export function createFooterDurationSliderOptionsField(options5 = {}) {
+  return withResolutionPlacement(createDurationSliderOptionsField(options5));
 }
 export function createResolutionField({
   label: label = VIDEO_RESOLUTION_FIELD['label'],
@@ -1835,19 +1832,19 @@ export function createAspectRatioField({
     options: Object['freeze'](withAdaptiveRatioOption(options)['map'](freezeOption)),
   });
 }
-export function createVideoMenuExtension(_0x1663aa, _0x54de99 = '') {
+export function createVideoMenuExtension(order, subtitle = '') {
   return Object['freeze']({
-    videoMenu: Object['freeze']({ role: 'apimartModel', order: _0x1663aa, subtitle: _0x54de99 }),
+    videoMenu: Object['freeze']({ role: 'apimartModel', order: order, subtitle: subtitle }),
   });
 }
-function freezeVideoInputPolicyCondition(_0xabc501) {
-  if (Array['isArray'](_0xabc501)) return Object['freeze'](_0xabc501['map'](freezeVideoInputPolicyCondition));
-  if (!_0xabc501 || typeof _0xabc501 !== 'object') return _0xabc501;
+function freezeVideoInputPolicyCondition(list6) {
+  if (Array['isArray'](list6)) return Object['freeze'](list6['map'](freezeVideoInputPolicyCondition));
+  if (!list6 || typeof list6 !== 'object') return list6;
   return Object['freeze']({
-    ..._0xabc501,
-    ...(Array['isArray'](_0xabc501['any']) ? { any: freezeVideoInputPolicyCondition(_0xabc501['any']) } : {}),
-    ...(Array['isArray'](_0xabc501['all']) ? { all: freezeVideoInputPolicyCondition(_0xabc501['all']) } : {}),
-    ...(Array['isArray'](_0xabc501['values']) ? { values: Object['freeze']([..._0xabc501['values']]) } : {}),
+    ...list6,
+    ...(Array['isArray'](list6['any']) ? { any: freezeVideoInputPolicyCondition(list6['any']) } : {}),
+    ...(Array['isArray'](list6['all']) ? { all: freezeVideoInputPolicyCondition(list6['all']) } : {}),
+    ...(Array['isArray'](list6['values']) ? { values: Object['freeze']([...list6['values']]) } : {}),
   });
 }
 export function createVideoInputSlots({
@@ -1864,64 +1861,61 @@ export function createVideoInputSlots({
   mediaConstraintsByKind: mediaConstraintsByKind = null,
   policyVariants: policyVariants = null,
 } = {}) {
-  const _0x473537 = ['text'],
-    _0x21e3fc = {};
-  image > 0x0 && (_0x473537['push']('image'), (_0x21e3fc['image'] = image));
-  video > 0x0 && (_0x473537['push']('video'), (_0x21e3fc['video'] = video));
-  audio > 0x0 && (_0x473537['push']('audio'), (_0x21e3fc['audio'] = audio));
-  const _0x5abe28 = {
-    allowedKinds: Object['freeze'](_0x473537),
+  const list7 = ['text'],
+    source = {};
+  image > 0x0 && (list7['push']('image'), (source['image'] = image));
+  video > 0x0 && (list7['push']('video'), (source['video'] = video));
+  audio > 0x0 && (list7['push']('audio'), (source['audio'] = audio));
+  const next = {
+    allowedKinds: Object['freeze'](list7),
     minByKind: Object['freeze']({ text: 0x0, ...(minImage > 0x0 ? { image: minImage } : {}) }),
-    maxByKind: Object['freeze'](_0x21e3fc),
+    maxByKind: Object['freeze'](source),
   };
   Array['isArray'](fixedSlots) &&
     fixedSlots['length'] > 0x0 &&
-    (_0x5abe28['fixedSlots'] = Object['freeze'](
-      fixedSlots['map']((_0x4b906c) => Object['freeze']({ ..._0x4b906c })),
-    ));
+    (next['fixedSlots'] = Object['freeze'](fixedSlots['map']((args3) => Object['freeze']({ ...args3 }))));
   Array['isArray'](exclusiveGroups) &&
     exclusiveGroups['length'] > 0x0 &&
-    (_0x5abe28['exclusiveGroups'] = Object['freeze'](
-      exclusiveGroups['map']((_0x397eef) =>
+    (next['exclusiveGroups'] = Object['freeze'](
+      exclusiveGroups['map']((args4) =>
         Object['freeze']({
-          ..._0x397eef,
+          ...args4,
           slots: Object['freeze'](
-            (Array['isArray'](_0x397eef?.['slots']) ? _0x397eef['slots'] : [])
-              ['map']((_0x1fa3c2) => String(_0x1fa3c2 || '')['trim']())
+            (Array['isArray'](args4?.['slots']) ? args4['slots'] : [])
+              ['map']((current) => String(current || '')['trim']())
               ['filter'](Boolean),
           ),
         }),
       ),
     ));
-  cycleFixedInputWhenFull === !![] && (_0x5abe28['cycleFixedInputWhenFull'] = !![]);
+  cycleFixedInputWhenFull === !![] && (next['cycleFixedInputWhenFull'] = !![]);
   if (preserveHiddenInputsByKind === !![]) {
-    _0x5abe28['preserveHiddenInputsByKind'] = !![];
-    const _0x228b37 = Array['from'](
+    next['preserveHiddenInputsByKind'] = !![];
+    const list8 = Array['from'](
       new Set(
         (Array['isArray'](preserveHiddenInputsByKindFields) ? preserveHiddenInputsByKindFields : [])
-          ['map']((_0x5ef9ca) => String(_0x5ef9ca || '')['trim']())
+          ['map']((entry) => String(entry || '')['trim']())
           ['filter'](Boolean),
       ),
     );
-    _0x228b37['length'] > 0x0 &&
-      (_0x5abe28['preserveHiddenInputsByKindFields'] = Object['freeze'](_0x228b37));
+    list8['length'] > 0x0 && (next['preserveHiddenInputsByKindFields'] = Object['freeze'](list8));
   }
   return (
     maxTotalDurationSecondsByKind &&
       typeof maxTotalDurationSecondsByKind === 'object' &&
       !Array['isArray'](maxTotalDurationSecondsByKind) &&
-      (_0x5abe28['maxTotalDurationSecondsByKind'] = Object['freeze']({ ...maxTotalDurationSecondsByKind })),
+      (next['maxTotalDurationSecondsByKind'] = Object['freeze']({ ...maxTotalDurationSecondsByKind })),
     mediaConstraintsByKind &&
       typeof mediaConstraintsByKind === 'object' &&
       !Array['isArray'](mediaConstraintsByKind) &&
-      (_0x5abe28['mediaConstraintsByKind'] = Object['freeze'](
+      (next['mediaConstraintsByKind'] = Object['freeze'](
         Object['fromEntries'](
-          Object['entries'](mediaConstraintsByKind)['map'](([_0x39f666, _0x450432]) => [
-            _0x39f666,
+          Object['entries'](mediaConstraintsByKind)['map'](([record, args5]) => [
+            record,
             Object['freeze']({
-              ..._0x450432,
-              ...(Array['isArray'](_0x450432?.['allowedExtensions'])
-                ? { allowedExtensions: Object['freeze']([..._0x450432['allowedExtensions']]) }
+              ...args5,
+              ...(Array['isArray'](args5?.['allowedExtensions'])
+                ? { allowedExtensions: Object['freeze']([...args5['allowedExtensions']]) }
                 : {}),
             }),
           ]),
@@ -1929,17 +1923,17 @@ export function createVideoInputSlots({
       )),
     Array['isArray'](policyVariants) &&
       policyVariants['length'] > 0x0 &&
-      (_0x5abe28['policyVariants'] = Object['freeze'](
-        policyVariants['map']((_0x2d58f8) =>
+      (next['policyVariants'] = Object['freeze'](
+        policyVariants['map']((args6) =>
           Object['freeze']({
-            ..._0x2d58f8,
-            when: freezeVideoInputPolicyCondition(_0x2d58f8?.['when']),
-            allowedKinds: Object['freeze']([...(_0x2d58f8?.['allowedKinds'] || [])]),
-            maxByKind: Object['freeze']({ ...(_0x2d58f8?.['maxByKind'] || {}) }),
+            ...args6,
+            when: freezeVideoInputPolicyCondition(args6?.['when']),
+            allowedKinds: Object['freeze']([...(args6?.['allowedKinds'] || [])]),
+            maxByKind: Object['freeze']({ ...(args6?.['maxByKind'] || {}) }),
           }),
         ),
       )),
-    Object['freeze'](_0x5abe28)
+    Object['freeze'](next)
   );
 }
 export const VIDEO_SIZE_RATIO_POLICY = Object['freeze']({ capability: 'size' });
@@ -1951,12 +1945,12 @@ export const VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY = Object['freeze']({
   ...SEEDANCE_VIDEO_RATIO_POLICY,
   preserveAdaptive: !![],
 });
-export function freezeBodyMapping(_0x154725) {
+export function freezeBodyMapping(list9) {
   return Object['freeze'](
-    _0x154725['map']((_0x321606) =>
+    list9['map']((args7) =>
       Object['freeze']({
-        ..._0x321606,
-        ...(Array['isArray'](_0x321606['field']) ? { field: Object['freeze'](_0x321606['field']) } : {}),
+        ...args7,
+        ...(Array['isArray'](args7['field']) ? { field: Object['freeze'](args7['field']) } : {}),
       }),
     ),
   );
@@ -1965,8 +1959,8 @@ export const APIMART_VIDEO_BASE_BODY_MAPPING = Object['freeze']([
   Object['freeze']({ path: 'model', from: 'model' }),
   Object['freeze']({ path: 'prompt', from: 'prompt' }),
 ]);
-export function createApimartVideoBodyMapping(_0xd784a1 = []) {
-  return freezeBodyMapping([...APIMART_VIDEO_BASE_BODY_MAPPING, ..._0xd784a1]);
+export function createApimartVideoBodyMapping(args8 = []) {
+  return freezeBodyMapping([...APIMART_VIDEO_BASE_BODY_MAPPING, ...args8]);
 }
 export const APIMART_VIDEO_LEGACY_BODY_MAPPING = Object['freeze']([
   Object['freeze']({ path: 'model', from: 'model' }),
@@ -2911,18 +2905,18 @@ export const APIMART_SEEDANCE_1_0_QUALITY_VIDEO_POLICY = Object['freeze']({
   maxRoleImageCount: 0x2,
   maxImageCount: 0x1,
 });
-export function createSeedanceVideoExecutionExtensions(_0x2ff756) {
+export function createSeedanceVideoExecutionExtensions(seedanceVideo) {
   return Object['freeze']({
     ...APIMART_SEEDANCE_VIDEO_RESOLVERS,
     inputResolutionMode: 'resolverOwned',
-    seedanceVideo: _0x2ff756,
+    seedanceVideo: seedanceVideo,
   });
 }
-export function createVolcengineSeedanceVideoExecutionExtensions(_0x314098) {
+export function createVolcengineSeedanceVideoExecutionExtensions(seedanceVideo2) {
   return Object['freeze']({
     ...VOLCENGINE_SEEDANCE_VIDEO_RESOLVERS,
     videoFamily: 'seedance2',
-    seedanceVideo: _0x314098,
+    seedanceVideo: seedanceVideo2,
     imageInputUpload: VOLCENGINE_SEEDANCE_IMAGE_INPUT_UPLOAD_POLICY,
     videoInputUpload: VOLCENGINE_SEEDANCE_VIDEO_INPUT_UPLOAD_POLICY,
     audioInputUpload: VOLCENGINE_SEEDANCE_AUDIO_INPUT_UPLOAD_POLICY,
@@ -2993,13 +2987,13 @@ export const APIMART_SEEDANCE_2_0_FIELDS = Object['freeze']([
   APIMART_SEEDANCE_RATIO_FIELD,
   createFooterDurationField(),
 ]);
-export function freezeFields(_0x26cc30) {
-  return Object['freeze'](_0x26cc30['map']((_0x51990f) => Object['freeze'](_0x51990f)));
+export function freezeFields(list10) {
+  return Object['freeze'](list10['map']((payload) => Object['freeze'](payload)));
 }
 export function createVideoModelApiManifest({
-  modelId: _0x50695e,
-  executionId: _0x4cdf16,
-  displayName: _0x19beca,
+  modelId: modelId,
+  executionId: executionId,
+  displayName: displayName,
   provider: provider = 'apimart',
   vip: vip = ![],
   aliases: aliases = null,
@@ -3013,27 +3007,27 @@ export function createVideoModelApiManifest({
   help: help = null,
   footerPlacementOrder: footerPlacementOrder = APIMART_VIDEO_FOOTER_PLACEMENT_ORDER,
 }) {
-  const _0x2aa192 = Array['isArray'](footerPlacementOrder)
-      ? footerPlacementOrder['map']((_0x4271cb) => String(_0x4271cb || '')['trim']())['filter'](Boolean)
+  const list11 = Array['isArray'](footerPlacementOrder)
+      ? footerPlacementOrder['map']((handle) => String(handle || '')['trim']())['filter'](Boolean)
       : [],
-    _0x524aba = {
+    state = {
       schemaVersion: '1.0',
-      modelId: _0x50695e,
+      modelId: modelId,
       ...(Array['isArray'](aliases) ? { aliases: aliases } : {}),
       provider: provider,
       kind: 'video',
       adapterType: 'modelApi',
-      executionId: _0x4cdf16,
-      displayName: _0x19beca,
+      executionId: executionId,
+      displayName: displayName,
       ...(vip === !![] ? { vip: !![] } : {}),
       icon: icon,
       description:
         description ||
-        (provider === 'apimart' ? 'APIMart video model API' : _0x19beca + '\x20video\x20model\x20API'),
+        (provider === 'apimart' ? 'APIMart video model API' : displayName + '\x20video\x20model\x20API'),
       inputSlots: inputSlots,
       uiSchema: Object['freeze']({
         fields: freezeFields(fields),
-        ...(_0x2aa192['length'] ? { footerPlacementOrder: Object['freeze'](_0x2aa192) } : {}),
+        ...(list11['length'] ? { footerPlacementOrder: Object['freeze'](list11) } : {}),
       }),
       ...(prompt && typeof prompt === 'object' ? { prompt: Object['freeze'](prompt) } : {}),
       ...(help && typeof help === 'object' ? { help: Object['freeze'](help) } : {}),
@@ -3045,13 +3039,13 @@ export function createVideoModelApiManifest({
   return (
     extensions &&
       typeof extensions === 'object' &&
-      (_0x524aba['extensions'] = Object['freeze']({ ratioPolicy: ratioPolicy, ...extensions })),
-    Object['freeze'](_0x524aba)
+      (state['extensions'] = Object['freeze']({ ratioPolicy: ratioPolicy, ...extensions })),
+    Object['freeze'](state)
   );
 }
 export function createVideoExecutionManifest({
-  id: _0x331502,
-  model: _0x1d2256,
+  id: id8,
+  model: model,
   provider: provider = 'apimart',
   endpoint: endpoint = '/v1/videos/generations',
   endpointMode: endpointMode = 'video-generation',
@@ -3063,22 +3057,22 @@ export function createVideoExecutionManifest({
   resultTaskIdPath: resultTaskIdPath = 'task_id',
   resultUrlFields: resultUrlFields = Object['freeze'](['videoUrl', 'video_url', 'url']),
 }) {
-  const _0x16c03c = Object['freeze']({
+  const extensions2 = Object['freeze']({
     ...(taskPolling ? { taskPolling: taskPolling } : {}),
     ...(extensions && typeof extensions === 'object' ? extensions : {}),
   });
   return Object['freeze']({
     schemaVersion: '1.0',
-    id: _0x331502,
+    id: id8,
     provider: provider,
     kind: 'video',
     adapterType: 'modelApi',
     endpoint: endpoint,
     endpointMode: endpointMode,
     method: 'POST',
-    model: _0x1d2256,
+    model: model,
     ...(modeModels ? { modeModels: Object['freeze'](modeModels) } : {}),
-    extensions: _0x16c03c,
+    extensions: extensions2,
     headers: Object['freeze']({ 'Content-Type': 'application/json' }),
     bodyMapping: bodyMapping,
     responseMapping: responseMapping,

@@ -119,33 +119,33 @@ const DREAMINA_STALE_ACTIVE_RESUME_MS = 15 * 0x3e8,
     'succeeded',
   ]),
   ASYNC_IMAGE_MODEL_API_PROVIDERS = new Set(['apimart', 'grsai', 'ppio']);
-function normalizeTaskStatus(_0x345625) {
-  return String(_0x345625 || '')
+function normalizeTaskStatus(value) {
+  return String(value || '')
     .trim()
     .toLowerCase();
 }
-function isAsyncImageModelApiProvider(_0x5a9947) {
+function isAsyncImageModelApiProvider(item) {
   return ASYNC_IMAGE_MODEL_API_PROVIDERS.has(
-    String(_0x5a9947 || '')
+    String(item || '')
       .trim()
       .toLowerCase(),
   );
 }
-function getImageProviderApiKeyMissingMessage(_0x3d30d0 = {}) {
-  if (String(_0x3d30d0?.apiKey || '').trim()) return '';
-  const _0x14bd89 = String(_0x3d30d0?.provider || '')
+function getImageProviderApiKeyMissingMessage(options = {}) {
+  if (String(options?.apiKey || '').trim()) return '';
+  const enabled = String(options?.provider || '')
     .trim()
     .toLowerCase();
-  if (!_0x14bd89) return '';
-  if (_0x14bd89 === 'volcengine') return t('aigenImage.task.apiKeyMissing.volcengine');
-  if (_0x14bd89 === 'runninghub')
-    return isModelApiModel(_0x3d30d0?.model, 'runninghub')
+  if (!enabled) return '';
+  if (enabled === 'volcengine') return t('aigenImage.task.apiKeyMissing.volcengine');
+  if (enabled === 'runninghub')
+    return isModelApiModel(options?.model, 'runninghub')
       ? t('aigenImage.task.apiKeyMissing.runninghubModel')
       : t('aigenImage.task.apiKeyMissing.runninghub');
-  if (_0x14bd89 === 'runninghubwf') return t('aigenImage.task.apiKeyMissing.runninghub');
-  if (_0x14bd89 === 'apimart') return t('aigenImage.task.apiKeyMissing.apimart');
-  if (_0x14bd89 === 'ppio') return t('aigenImage.task.apiKeyMissing.ppio');
-  if (_0x14bd89 === 'grsai') return t('aigenImage.task.apiKeyMissing.grsai');
+  if (enabled === 'runninghubwf') return t('aigenImage.task.apiKeyMissing.runninghub');
+  if (enabled === 'apimart') return t('aigenImage.task.apiKeyMissing.apimart');
+  if (enabled === 'ppio') return t('aigenImage.task.apiKeyMissing.ppio');
+  if (enabled === 'grsai') return t('aigenImage.task.apiKeyMissing.grsai');
   return '';
 }
 const REFERENCE_LABEL_ALIASES = Object.freeze({
@@ -154,128 +154,134 @@ const REFERENCE_LABEL_ALIASES = Object.freeze({
   video: Object.freeze(['视频', 'Video']),
   audio: Object.freeze(['音频', 'Audio']),
 });
-function getReferenceTypeLabel(_0x445ea6) {
-  const _0x4b6d66 = {
+function getReferenceTypeLabel(key) {
+  const index = {
     text: t('aigenImage.refs.types.text'),
     image: t('aigenImage.refs.types.image'),
     video: t('aigenImage.refs.types.video'),
     audio: t('aigenImage.refs.types.audio'),
   };
-  return _0x4b6d66[_0x445ea6] || String(_0x445ea6 || '');
+  return index[key] || String(key || '');
 }
-function buildReferenceLabelAliases(_0x340714, _0xe1b449) {
-  const _0x1c1633 = [
-    '@' + getReferenceTypeLabel(_0x340714) + _0xe1b449,
-    ...(REFERENCE_LABEL_ALIASES[_0x340714] || []).map((_0xe7ec54) => '@' + _0xe7ec54 + _0xe1b449),
+function buildReferenceLabelAliases(result, data) {
+  const target = [
+    '@' + getReferenceTypeLabel(result) + data,
+    ...(REFERENCE_LABEL_ALIASES[result] || []).map((item2) => '@' + item2 + data),
   ];
-  return Array.from(new Set(_0x1c1633));
+  return Array.from(new Set(target));
 }
 function createSchemaParamAccess({
-  model: _0xc5900a,
-  data: _0x707741,
-  generationParams: _0x3a48bc,
-  manifestFields: _0x56bdab,
+  model: model,
+  data: data2,
+  generationParams: generationParams,
+  manifestFields: manifestFields,
 }) {
-  const _0x6281a1 = (_0x4f2618) =>
-      _0x56bdab.find((_0x2eae69) => String(_0x2eae69?.id || '') === _0x4f2618) || null,
-    _0x2d5826 = (_0x505de2) => {
-      const _0x2662ac = _0x6281a1(_0x505de2);
-      if (!_0x2662ac) return undefined;
-      if (_0x3a48bc[_0x505de2] !== undefined) return _0x3a48bc[_0x505de2];
-      return _0x2662ac.defaultValue;
+  const getManifestField = (source) =>
+      manifestFields.find((item3) => String(item3?.id || '') === source) || null,
+    readSchemaParam = (next) => {
+      const enabled2 = getManifestField(next);
+      if (!enabled2) return undefined;
+      if (generationParams[next] !== undefined) return generationParams[next];
+      return enabled2.defaultValue;
     },
-    _0x70acd1 = (_0x3699dc) => {
-      const _0x1e8db5 = _0x2d5826(_0x3699dc);
-      if (_0x1e8db5 === undefined || _0x1e8db5 === null || String(_0x1e8db5).trim() === '')
-        throw new Error('Manifest model ' + _0xc5900a + ' missing ' + _0x3699dc);
-      return _0x1e8db5;
+    requireSchemaParam = (current) => {
+      const entry = readSchemaParam(current);
+      if (entry === undefined || entry === null || String(entry).trim() === '')
+        throw new Error('Manifest model ' + model + ' missing ' + current);
+      return entry;
     };
-  return { getManifestField: _0x6281a1, readSchemaParam: _0x2d5826, requireSchemaParam: _0x70acd1 };
+  return {
+    getManifestField: getManifestField,
+    readSchemaParam: readSchemaParam,
+    requireSchemaParam: requireSchemaParam,
+  };
 }
-function isGrsaiGptImage2Model(_0x556b6c, _0x3f4891) {
-  const _0x3ed22c = resolveNanoBananaSelectionFromModel(_0x3f4891, '2K', _0x556b6c || 'grsai');
-  return _0x3ed22c?.provider === 'grsai' && _0x3ed22c.family === NANO_BANANA_FAMILIES.GPT_IMAGE_2;
-}
-function resolveGrsaiGptImage2ModelForSize({
-  provider: _0x381839,
-  model: _0x48c4ee,
-  imageSize: _0x501130,
-} = {}) {
-  if (!isGrsaiGptImage2Model(_0x381839, _0x48c4ee)) return _0x48c4ee;
-  const _0x44e1b3 = String(_0x501130 || '1K')
-      .trim()
-      .toUpperCase(),
-    _0x4030c3 =
-      resolveModelExecution(_0x48c4ee, { providerHint: 'grsai' }) ||
-      resolveModelExecution(resolveNanoBananaSelectionFromModel(_0x48c4ee, _0x44e1b3, 'grsai')?.model, {
-        providerHint: 'grsai',
-      }),
-    _0x204e1a = _0x4030c3?.executionManifest?.imageSizeModels;
-  if (!_0x204e1a || typeof _0x204e1a !== 'object') return _0x48c4ee;
-  return _0x204e1a[_0x44e1b3] || _0x204e1a.default || _0x4030c3?.modelManifest?.modelId || _0x48c4ee;
-}
-function resolveImageSizeForProviderModel({
-  provider: _0x57a79e,
-  model: _0x160fd3,
-  imageSize: _0x329b8a,
-} = {}) {
-  const _0x4b9988 = normalizeImageSizeForProviderModel({
-    provider: _0x57a79e,
-    model: _0x160fd3,
-    imageSize: _0x329b8a,
-  });
-  if (_0x4b9988) return _0x4b9988;
-  if (
-    !String(_0x329b8a || '').trim() &&
-    String(_0x57a79e || '')
-      .trim()
-      .toLowerCase() === 'runninghub' &&
-    String(_0x160fd3 || '').trim() === 'runninghub-model/rhart-image-g'
-  )
-    return '1K';
-  const _0x3df6fa = String(_0x329b8a || (isGrsaiGptImage2Model(_0x57a79e, _0x160fd3) ? '1K' : '2K'))
-    .trim()
-    .toUpperCase();
-  return _0x3df6fa || '2K';
-}
-function shouldUseGrsaiNanoBananaApiAuto({ provider: _0x2b34bb, model: _0x1d486e } = {}) {
-  const _0x371d60 = String(_0x2b34bb || '')
-    .trim()
-    .toLowerCase();
-  if (_0x371d60 !== 'grsai') return false;
-  const _0x2a5b82 = resolveNanoBananaSelectionFromModel(_0x1d486e, '2K', _0x2b34bb);
-  if (!_0x2a5b82) return false;
-  return _0x2a5b82.family !== NANO_BANANA_FAMILIES.GPT_IMAGE_2;
-}
-function shouldUseApimartSeedreamApiAuto({
-  provider: _0x34a849,
-  model: _0x5d1b0b,
-  hasInputImages: _0x13d1e4,
-} = {}) {
-  const _0x1e8c34 = String(_0x34a849 || '')
-    .trim()
-    .toLowerCase();
-  if (_0x1e8c34 !== 'apimart' || !_0x13d1e4) return false;
-  const _0x536d06 = resolveModelExecution(_0x5d1b0b, { providerHint: _0x1e8c34 });
-  return _0x536d06?.executionManifest?.extensions?.apimartSeedream?.preserveAdaptiveInputRatio === true;
-}
-function sanitizeTaskGenerationParams(_0x28032f, _0x3339f6 = {}) {
-  const _0x43276f = _0x3339f6 && typeof _0x3339f6 === 'object' && !Array.isArray(_0x3339f6) ? _0x3339f6 : {},
-    _0x649329 = sanitizeModelUiSchemaParams(_0x28032f, _0x43276f, { includeDefaults: false });
+function isGrsaiGptImage2Model(record, payload) {
+  const nanoBananaSelectionFromModel = resolveNanoBananaSelectionFromModel(payload, '2K', record || 'grsai');
   return (
-    Object.prototype.hasOwnProperty.call(_0x43276f, 'aspectRatio') &&
-      (_0x649329.aspectRatio = _0x43276f.aspectRatio),
-    { ..._0x43276f, ..._0x649329 }
+    nanoBananaSelectionFromModel?.provider === 'grsai' &&
+    nanoBananaSelectionFromModel.family === NANO_BANANA_FAMILIES.GPT_IMAGE_2
   );
 }
-function normalizeTaskBooleanParam(_0x4cb0db) {
-  if (_0x4cb0db === true || _0x4cb0db === false) return _0x4cb0db;
-  const _0x360388 = String(_0x4cb0db ?? '')
+function resolveGrsaiGptImage2ModelForSize({
+  provider: provider2,
+  model: model2,
+  imageSize: imageSize,
+} = {}) {
+  if (!isGrsaiGptImage2Model(provider2, model2)) return model2;
+  const handle = String(imageSize || '1K')
+      .trim()
+      .toUpperCase(),
+    modelExecution =
+      resolveModelExecution(model2, { providerHint: 'grsai' }) ||
+      resolveModelExecution(resolveNanoBananaSelectionFromModel(model2, handle, 'grsai')?.model, {
+        providerHint: 'grsai',
+      }),
+    enabled3 = modelExecution?.executionManifest?.imageSizeModels;
+  if (!enabled3 || typeof enabled3 !== 'object') return model2;
+  return enabled3[handle] || enabled3.default || modelExecution?.modelManifest?.modelId || model2;
+}
+function resolveImageSizeForProviderModel({
+  provider: provider3,
+  model: model3,
+  imageSize: imageSize2,
+} = {}) {
+  const imageSizeForProviderModel = normalizeImageSizeForProviderModel({
+    provider: provider3,
+    model: model3,
+    imageSize: imageSize2,
+  });
+  if (imageSizeForProviderModel) return imageSizeForProviderModel;
+  if (
+    !String(imageSize2 || '').trim() &&
+    String(provider3 || '')
+      .trim()
+      .toLowerCase() === 'runninghub' &&
+    String(model3 || '').trim() === 'runninghub-model/rhart-image-g'
+  )
+    return '1K';
+  const state = String(imageSize2 || (isGrsaiGptImage2Model(provider3, model3) ? '1K' : '2K'))
+    .trim()
+    .toUpperCase();
+  return state || '2K';
+}
+function shouldUseGrsaiNanoBananaApiAuto({ provider: provider4, model: model4 } = {}) {
+  const config = String(provider4 || '')
     .trim()
     .toLowerCase();
-  if (['true', '1', 'yes', 'on'].includes(_0x360388)) return true;
-  if (['false', '0', 'no', 'off', ''].includes(_0x360388)) return false;
-  return Boolean(_0x4cb0db);
+  if (config !== 'grsai') return false;
+  const nanoBananaSelectionFromModel2 = resolveNanoBananaSelectionFromModel(model4, '2K', provider4);
+  if (!nanoBananaSelectionFromModel2) return false;
+  return nanoBananaSelectionFromModel2.family !== NANO_BANANA_FAMILIES.GPT_IMAGE_2;
+}
+function shouldUseApimartSeedreamApiAuto({
+  provider: provider5,
+  model: model5,
+  hasInputImages: hasInputImages,
+} = {}) {
+  const providerHint = String(provider5 || '')
+    .trim()
+    .toLowerCase();
+  if (providerHint !== 'apimart' || !hasInputImages) return false;
+  const modelExecution2 = resolveModelExecution(model5, { providerHint: providerHint });
+  return modelExecution2?.executionManifest?.extensions?.apimartSeedream?.preserveAdaptiveInputRatio === true;
+}
+function sanitizeTaskGenerationParams(scope, input = {}) {
+  const args = input && typeof input === 'object' && !Array.isArray(input) ? input : {},
+    args2 = sanitizeModelUiSchemaParams(scope, args, { includeDefaults: false });
+  return (
+    Object.prototype.hasOwnProperty.call(args, 'aspectRatio') && (args2.aspectRatio = args.aspectRatio),
+    { ...args, ...args2 }
+  );
+}
+function normalizeTaskBooleanParam(output) {
+  if (output === true || output === false) return output;
+  const value2 = String(output ?? '')
+    .trim()
+    .toLowerCase();
+  if (['true', '1', 'yes', 'on'].includes(value2)) return true;
+  if (['false', '0', 'no', 'off', ''].includes(value2)) return false;
+  return Boolean(output);
 }
 const MODEL_API_PAYLOAD_SCHEMA_PARAM_EXCLUDES = Object.freeze(
   new Set([
@@ -289,35 +295,33 @@ const MODEL_API_PAYLOAD_SCHEMA_PARAM_EXCLUDES = Object.freeze(
   ]),
 );
 function buildModelApiSchemaPayloadParams({
-  isModelApiManifest: _0x11902c,
-  manifestFields: _0x1a9de6,
-  readSchemaParam: _0xba085a,
+  isModelApiManifest: isModelApiManifest,
+  manifestFields: manifestFields2,
+  readSchemaParam: readSchemaParam2,
 } = {}) {
-  if (!_0x11902c || !Array.isArray(_0x1a9de6)) return {};
-  return _0x1a9de6.reduce((_0x511c23, _0x3dbce0) => {
-    const _0x5bf9d = String(_0x3dbce0?.id || '').trim();
-    if (!_0x5bf9d || MODEL_API_PAYLOAD_SCHEMA_PARAM_EXCLUDES.has(_0x5bf9d)) return _0x511c23;
-    return ((_0x511c23[_0x5bf9d] = _0xba085a(_0x5bf9d)), _0x511c23);
+  if (!isModelApiManifest || !Array.isArray(manifestFields2)) return {};
+  return manifestFields2.reduce((item4, value3) => {
+    const enabled4 = String(value3?.id || '').trim();
+    if (!enabled4 || MODEL_API_PAYLOAD_SCHEMA_PARAM_EXCLUDES.has(enabled4)) return item4;
+    return ((item4[enabled4] = readSchemaParam2(enabled4)), item4);
   }, {});
 }
-function reorderImageInputUrlsByRefOrder(_0x54a423 = [], _0x969459 = []) {
-  const _0x3b4ee1 = (Array.isArray(_0x54a423) ? _0x54a423 : [])
-    .map((_0x19a082) => String(_0x19a082 || '').trim())
-    .filter(Boolean);
-  if (_0x3b4ee1.length <= 1) return _0x3b4ee1;
-  const _0x598411 = new Set(_0x3b4ee1),
-    _0x8b8e41 = [],
-    _0x2ac295 = (_0x11902b) => {
-      const _0x4c5993 = String(_0x11902b || '').trim();
-      if (!_0x4c5993 || !_0x598411.has(_0x4c5993)) return;
-      (_0x8b8e41.push(_0x4c5993), _0x598411.delete(_0x4c5993));
+function reorderImageInputUrlsByRefOrder(list = [], value4 = []) {
+  const list2 = (Array.isArray(list) ? list : []).map((item5) => String(item5 || '').trim()).filter(Boolean);
+  if (list2.length <= 1) return list2;
+  const map = new Set(list2),
+    list3 = [],
+    handler = (value5) => {
+      const enabled5 = String(value5 || '').trim();
+      if (!enabled5 || !map.has(enabled5)) return;
+      (list3.push(enabled5), map.delete(enabled5));
     };
   return (
-    (Array.isArray(_0x969459) ? _0x969459 : []).forEach((_0x5df2d9) => {
-      _0x2ac295(_0x5df2d9?.url);
+    (Array.isArray(value4) ? value4 : []).forEach((response) => {
+      handler(response?.url);
     }),
-    _0x3b4ee1.forEach(_0x2ac295),
-    _0x8b8e41
+    list2.forEach(handler),
+    list3
   );
 }
 function buildInputUrlsByFixedImageSlot({
@@ -325,85 +329,83 @@ function buildInputUrlsByFixedImageSlot({
   imageRefs: imageRefs = [],
   assetInputRefs: assetInputRefs = [],
 } = {}) {
-  const _0x65379d = (fixedInputConfig?.visibleSlots || [])
-    .map((_0x5f2516) => String(_0x5f2516 || '').trim())
-    .filter(
-      (_0xd6b718) => _0xd6b718 && String(fixedInputConfig?.slotKindById?.[_0xd6b718] || '') === 'image',
-    );
-  if (_0x65379d.length === 0) return {};
-  const _0xacf884 = {},
-    _0x41b02b = new Set(),
-    _0x379441 = (_0x646403, _0x27f66e) => {
-      const _0x3e7ba2 = String(_0x646403 || '').trim(),
-        _0x182165 = String(_0x27f66e || '').trim();
-      if (!_0x3e7ba2 || !_0x182165 || _0xacf884[_0x3e7ba2]) return false;
-      if (!_0x65379d.includes(_0x3e7ba2)) return false;
-      return ((_0xacf884[_0x3e7ba2] = _0x182165), _0x41b02b.add(_0x182165), true);
+  const list4 = (fixedInputConfig?.visibleSlots || [])
+    .map((item6) => String(item6 || '').trim())
+    .filter((item7) => item7 && String(fixedInputConfig?.slotKindById?.[item7] || '') === 'image');
+  if (list4.length === 0) return {};
+  const enabled6 = {},
+    map2 = new Set(),
+    handler2 = (value6, value7) => {
+      const enabled7 = String(value6 || '').trim(),
+        enabled8 = String(value7 || '').trim();
+      if (!enabled7 || !enabled8 || enabled6[enabled7]) return false;
+      if (!list4.includes(enabled7)) return false;
+      return ((enabled6[enabled7] = enabled8), map2.add(enabled8), true);
     },
-    _0x16839e = (_0x170a9b) => {
-      const _0x4be552 = String(_0x170a9b || '').trim();
-      if (!_0x4be552 || _0x41b02b.has(_0x4be552)) return false;
-      const _0x2ace23 = _0x65379d.find((_0xb74726) => !_0xacf884[_0xb74726]);
-      return _0x379441(_0x2ace23, _0x4be552);
+    handler3 = (value8) => {
+      const enabled9 = String(value8 || '').trim();
+      if (!enabled9 || map2.has(enabled9)) return false;
+      const value9 = list4.find((item8) => !enabled6[item8]);
+      return handler2(value9, enabled9);
     };
   return (
-    (Array.isArray(imageRefs) ? imageRefs : []).forEach((_0x244354) => {
-      _0x379441(_0x244354?.refSlot, _0x244354?.url);
+    (Array.isArray(imageRefs) ? imageRefs : []).forEach((response2) => {
+      handler2(response2?.refSlot, response2?.url);
     }),
-    (Array.isArray(assetInputRefs) ? assetInputRefs : []).forEach((_0x2fa72e) => {
-      _0x379441(_0x2fa72e?.refSlot, _0x2fa72e?.url);
+    (Array.isArray(assetInputRefs) ? assetInputRefs : []).forEach((response3) => {
+      handler2(response3?.refSlot, response3?.url);
     }),
-    (Array.isArray(imageRefs) ? imageRefs : []).forEach((_0x42aa88) => {
-      _0x16839e(_0x42aa88?.url);
+    (Array.isArray(imageRefs) ? imageRefs : []).forEach((response4) => {
+      handler3(response4?.url);
     }),
-    (Array.isArray(assetInputRefs) ? assetInputRefs : []).forEach((_0x257d41) => {
-      const _0x323eb0 = resolveEffectiveInputKind(_0x257d41) || _0x257d41?.type;
-      if (_0x323eb0 === 'image') _0x16839e(_0x257d41?.url);
+    (Array.isArray(assetInputRefs) ? assetInputRefs : []).forEach((response5) => {
+      const effectiveInputKind = resolveEffectiveInputKind(response5) || response5?.type;
+      if (effectiveInputKind === 'image') handler3(response5?.url);
     }),
-    _0xacf884
+    enabled6
   );
 }
-export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
+export function createAIGenerateNodeTaskOrchestrationModule(value10) {
   const {
-    store: _0xff470c,
-    api: _0xfcf4f2,
-    getDisplayModelName: _0x5169d7,
-    _handlePillHover: _0x2f0cf0,
-    _handlePillOut: _0x1d078c,
-    _syncEdgesOrderFromPills: _0x273dec,
-    _syncPillLabels: _0x49d284,
-    _checkAtTrigger: _0xbe7a6a,
-    _populateMentionMenu: _0x31ee8e,
-    _insertMentionPill: _0x5b866c,
-    _handlePillKeyboard: _0x3f48e1,
-    _rehydratePromptPills: _0x42519e,
-    _handleMentionMenuKeyboard: _0x44e821,
-    TEXT_TOOLBAR_HTML: _0x379af8,
-    bindTextToolbarEvents: _0xd20093,
-    IMAGE_TOOLBAR_HTML: _0x4d5cda,
-    bindImageToolbarEvents: _0x40c888,
-    showDevToast: _0x589542,
-    getImage: _0xeea044,
-    openNodeImagePreview: _0x520d7e,
-    getPromptPresets: _0xa614a,
-    openCustomPresetsManager: _0xc9231a,
-    startLoading: _0x27a9f5,
-    stopLoading: _0x32cd7a,
-    bindRefThumbHoverPreview: _0x26f8b7,
-    ensureThumbDecoded: _0x1da4be,
-    revealRefThumbMedia: _0x28b18c,
-    getRefKindByNodeType: _0x7bff2c,
-    uploadFile: _0x5dc018,
-    ensureConfig: _0x14e2fd,
-    getProviderConfig: _0x28ad2b,
-    generateId: _0x49a538,
-    checkSlashTrigger: _0x2f48a4,
-    handleSlashKeyboardNavigation: _0x3363e5,
-    closeSlashMenu: _0x1154e6,
-    activateMenuKeyboard: _0x4eaa76,
-    ImageFreeAngleController: _0x450fea,
-  } = _0x4481d1;
-  class _0x2b8f6c {
+    store: store,
+    api: api,
+    getDisplayModelName: getDisplayModelName,
+    _handlePillHover: _handlePillHover,
+    _handlePillOut: _handlePillOut,
+    _syncEdgesOrderFromPills: _syncEdgesOrderFromPills,
+    _syncPillLabels: _syncPillLabels,
+    _checkAtTrigger: _checkAtTrigger,
+    _populateMentionMenu: _populateMentionMenu,
+    _insertMentionPill: _insertMentionPill,
+    _handlePillKeyboard: _handlePillKeyboard,
+    _rehydratePromptPills: _rehydratePromptPills,
+    _handleMentionMenuKeyboard: _handleMentionMenuKeyboard,
+    TEXT_TOOLBAR_HTML: TEXT_TOOLBAR_HTML,
+    bindTextToolbarEvents: bindTextToolbarEvents,
+    IMAGE_TOOLBAR_HTML: IMAGE_TOOLBAR_HTML,
+    bindImageToolbarEvents: bindImageToolbarEvents,
+    showDevToast: showDevToast,
+    getImage: getImage,
+    openNodeImagePreview: openNodeImagePreview,
+    getPromptPresets: getPromptPresets,
+    openCustomPresetsManager: openCustomPresetsManager,
+    startLoading: startLoading,
+    stopLoading: stopLoading,
+    bindRefThumbHoverPreview: bindRefThumbHoverPreview,
+    ensureThumbDecoded: ensureThumbDecoded,
+    revealRefThumbMedia: revealRefThumbMedia,
+    getRefKindByNodeType: getRefKindByNodeType,
+    uploadFile: uploadFile,
+    ensureConfig: ensureConfig,
+    getProviderConfig: getProviderConfig,
+    generateId: generateId,
+    checkSlashTrigger: checkSlashTrigger,
+    handleSlashKeyboardNavigation: handleSlashKeyboardNavigation,
+    closeSlashMenu: closeSlashMenu,
+    activateMenuKeyboard: activateMenuKeyboard,
+    ImageFreeAngleController: ImageFreeAngleController,
+  } = value10;
+  class value11 {
     ['_persistRunningHubResumeCache']() {
       try {
         window._triggerLocalCacheSave?.();
@@ -415,140 +417,141 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
     ['_persistAsyncResumeCache']() {
       this._persistRunningHubResumeCache();
     }
-    ['_isDreaminaImageNode'](_0x246b53 = this._data) {
-      return resolveModelProvider(_0x246b53?.model, _0x246b53?.provider) === 'dreamina';
+    ['_isDreaminaImageNode'](value12 = this._data) {
+      return resolveModelProvider(value12?.model, value12?.provider) === 'dreamina';
     }
-    ['_inferProviderFromModel'](_0x1fb19f, _0x3fa144 = '') {
+    ['_inferProviderFromModel'](value13, value14 = '') {
       return (
-        resolveModelProvider(_0x1fb19f, '', { allowProviderHint: false }) ||
-        resolveModelProvider(_0x1fb19f, _0x3fa144) ||
-        resolveModelProvider(_0x1fb19f, 'grsai')
+        resolveModelProvider(value13, '', { allowProviderHint: false }) ||
+        resolveModelProvider(value13, value14) ||
+        resolveModelProvider(value13, 'grsai')
       );
     }
-    ['_isRunninghubTaskModel'](_0x50420a, _0x2dc6db) {
-      const _0x47a421 = resolveModelProvider(_0x50420a, _0x2dc6db, { allowProviderHint: false }),
-        _0x47b884 = String(_0x2dc6db || _0x47a421 || '')
+    ['_isRunninghubTaskModel'](value15, value16) {
+      const modelProvider = resolveModelProvider(value15, value16, { allowProviderHint: false }),
+        value17 = String(value16 || modelProvider || '')
           .trim()
           .toLowerCase();
       return (
-        ((_0x47b884 === 'runninghub' || _0x47a421 === 'runninghub') &&
-          isModelApiModel(_0x50420a, 'runninghub')) ||
-        this._isRunninghubWorkflowModel(_0x50420a, _0x2dc6db)
+        ((value17 === 'runninghub' || modelProvider === 'runninghub') &&
+          isModelApiModel(value15, 'runninghub')) ||
+        this._isRunninghubWorkflowModel(value15, value16)
       );
     }
-    ['_isRunningHubNanoBananaModel'](_0x48f144 = this._data?.model) {
-      const _0x29e33d = resolveNanoBananaSelectionFromModel(_0x48f144, '2K', 'runninghub');
-      return _0x29e33d?.provider === 'runninghub' && _0x29e33d.family === NANO_BANANA_FAMILIES.NANOBANANA;
+    ['_isRunningHubNanoBananaModel'](value18 = this._data?.model) {
+      const nanoBananaSelectionFromModel3 = resolveNanoBananaSelectionFromModel(value18, '2K', 'runninghub');
+      return (
+        nanoBananaSelectionFromModel3?.provider === 'runninghub' &&
+        nanoBananaSelectionFromModel3.family === NANO_BANANA_FAMILIES.NANOBANANA
+      );
     }
-    ['_isRunningHubRecoverableRunningTask'](_0x93c83c = this._data) {
-      if (!this._isRunninghubTaskModel(_0x93c83c?.model, _0x93c83c?.provider)) return false;
-      const _0x44a9d6 = String(_0x93c83c?.rhTaskId || '').trim();
-      if (!_0x44a9d6) return false;
-      const _0x362b03 = String(_0x93c83c?.rhTaskStatus || '')
+    ['_isRunningHubRecoverableRunningTask'](value19 = this._data) {
+      if (!this._isRunninghubTaskModel(value19?.model, value19?.provider)) return false;
+      const enabled10 = String(value19?.rhTaskId || '').trim();
+      if (!enabled10) return false;
+      const value20 = String(value19?.rhTaskStatus || '')
         .trim()
         .toLowerCase();
       if (
-        _0x362b03 === 'complete' ||
-        _0x362b03 === 'completed' ||
-        _0x362b03 === 'done' ||
-        _0x362b03 === 'error' ||
-        _0x362b03 === 'finish' ||
-        _0x362b03 === 'finished' ||
-        _0x362b03 === 'success' ||
-        _0x362b03 === 'succeeded' ||
-        _0x362b03 === 'failed' ||
-        _0x362b03 === 'fail' ||
-        _0x362b03 === 'idle' ||
-        _0x362b03 === 'cancelled' ||
-        _0x362b03 === 'canceled'
+        value20 === 'complete' ||
+        value20 === 'completed' ||
+        value20 === 'done' ||
+        value20 === 'error' ||
+        value20 === 'finish' ||
+        value20 === 'finished' ||
+        value20 === 'success' ||
+        value20 === 'succeeded' ||
+        value20 === 'failed' ||
+        value20 === 'fail' ||
+        value20 === 'idle' ||
+        value20 === 'cancelled' ||
+        value20 === 'canceled'
       )
         return false;
       return true;
     }
-    ['_isDreaminaRecoverableRunningTask'](_0x493b54 = this._data) {
-      if (!this._isDreaminaImageNode(_0x493b54)) return false;
-      const _0x14ea07 = String(_0x493b54?.dreaminaSubmitId || '').trim();
-      if (!_0x14ea07) return false;
-      const _0x74fda5 = normalizeTaskStatus(_0x493b54?.jobStatus),
-        _0x3c80ba = normalizeTaskStatus(_0x493b54?.dreaminaTaskPhase),
-        _0x44e2a3 = normalizeTaskStatus(_0x493b54?.dreaminaTaskStatus);
-      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(_0x74fda5)) return false;
-      if (DREAMINA_NON_RECOVERABLE_PHASES.has(_0x3c80ba)) return false;
-      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(_0x44e2a3)) return false;
+    ['_isDreaminaRecoverableRunningTask'](value21 = this._data) {
+      if (!this._isDreaminaImageNode(value21)) return false;
+      const enabled11 = String(value21?.dreaminaSubmitId || '').trim();
+      if (!enabled11) return false;
+      const taskStatus = normalizeTaskStatus(value21?.jobStatus),
+        taskStatus2 = normalizeTaskStatus(value21?.dreaminaTaskPhase),
+        taskStatus3 = normalizeTaskStatus(value21?.dreaminaTaskStatus);
+      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(taskStatus)) return false;
+      if (DREAMINA_NON_RECOVERABLE_PHASES.has(taskStatus2)) return false;
+      if (DREAMINA_NON_RECOVERABLE_STATUSES.has(taskStatus3)) return false;
       return true;
     }
-    ['_isStaleActiveDreaminaTask'](_0x1dfeda = this._data) {
+    ['_isStaleActiveDreaminaTask'](value22 = this._data) {
       if (!this._isGenerating) return false;
-      if (_0x1dfeda?.dreaminaTaskRecovering === true) return false;
+      if (value22?.dreaminaTaskRecovering === true) return false;
       if (this._dreaminaResumePromise) return false;
-      const _0x343c97 = Number(
-        _0x1dfeda?.dreaminaTaskLastCheckedAt ||
-          _0x1dfeda?.dreaminaTaskStartedAt ||
-          _0x1dfeda?.generationStartTime ||
+      const count = Number(
+        value22?.dreaminaTaskLastCheckedAt ||
+          value22?.dreaminaTaskStartedAt ||
+          value22?.generationStartTime ||
           0,
       );
-      if (!Number.isFinite(_0x343c97) || _0x343c97 <= 0) return false;
-      return Date.now() - _0x343c97 >= DREAMINA_STALE_ACTIVE_RESUME_MS;
+      if (!Number.isFinite(count) || count <= 0) return false;
+      return Date.now() - count >= DREAMINA_STALE_ACTIVE_RESUME_MS;
     }
-    ['_isAsyncRecoverableRunningTask'](_0x501e70 = this._data) {
-      const _0x9a74cd = String(_0x501e70?.asyncTaskId || '').trim();
-      if (!_0x9a74cd) return false;
-      const _0x4e79fa = this._inferProviderFromModel(
-        _0x501e70?.model,
-        _0x501e70?.asyncTaskProvider || _0x501e70?.provider || '',
+    ['_isAsyncRecoverableRunningTask'](value23 = this._data) {
+      const enabled12 = String(value23?.asyncTaskId || '').trim();
+      if (!enabled12) return false;
+      const enabled13 = this._inferProviderFromModel(
+        value23?.model,
+        value23?.asyncTaskProvider || value23?.provider || '',
       );
       if (
-        !_0x4e79fa ||
-        _0x4e79fa === 'runninghubwf' ||
-        _0x4e79fa === 'runninghub' ||
-        _0x4e79fa === 'dreamina'
+        !enabled13 ||
+        enabled13 === 'runninghubwf' ||
+        enabled13 === 'runninghub' ||
+        enabled13 === 'dreamina'
       )
         return false;
-      const _0x34fbac = String(_0x501e70?.asyncTaskKind || '')
+      const value24 = String(value23?.asyncTaskKind || '')
         .trim()
         .toLowerCase();
-      if (_0x34fbac && _0x34fbac !== 'image') return false;
-      const _0x36f7b8 = String(_0x501e70?.asyncTaskStatus || '')
+      if (value24 && value24 !== 'image') return false;
+      const value25 = String(value23?.asyncTaskStatus || '')
         .trim()
         .toLowerCase();
-      if (
-        _0x36f7b8 === 'success' ||
-        _0x36f7b8 === 'failed' ||
-        _0x36f7b8 === 'idle' ||
-        _0x36f7b8 === 'cancelled'
-      )
+      if (value25 === 'success' || value25 === 'failed' || value25 === 'idle' || value25 === 'cancelled')
         return false;
       return true;
     }
-    ['_hasImageGenerationResult'](_0x5adf85 = this._data) {
-      const _0x19dcdc = Array.isArray(_0x5adf85?.images) ? _0x5adf85.images : [],
-        _0x3c01f2 = _0x19dcdc.some((_0x3c50f7) => {
-          if (!_0x3c50f7 || typeof _0x3c50f7 !== 'object') return false;
-          if (String(_0x3c50f7?.error || '').trim()) return false;
+    ['_hasImageGenerationResult'](value26 = this._data) {
+      const list5 = Array.isArray(value26?.images) ? value26.images : [],
+        value27 = list5.some((enabled14) => {
+          if (!enabled14 || typeof enabled14 !== 'object') return false;
+          if (String(enabled14?.error || '').trim()) return false;
           return !!String(
-            _0x3c50f7?.localPath || _0x3c50f7?.imageUrl || _0x3c50f7?.sourceUrl || _0x3c50f7?.thumbUrl || '',
+            enabled14?.localPath || enabled14?.imageUrl || enabled14?.sourceUrl || enabled14?.thumbUrl || '',
           ).trim();
         });
-      if (_0x3c01f2) return true;
+      if (value27) return true;
       return !!String(
-        _0x5adf85?.localPath || _0x5adf85?.imageUrl || _0x5adf85?.sourceUrl || _0x5adf85?.thumbUrl || '',
+        value26?.localPath || value26?.imageUrl || value26?.sourceUrl || value26?.thumbUrl || '',
       ).trim();
     }
-    ['_shouldFallbackRegenerateAsyncTask'](_0x26fe5d = this._data) {
+    ['_shouldFallbackRegenerateAsyncTask'](value28 = this._data) {
       // Workroom batches require a new explicit decision, never fallback paid resubmission.
-      if (_0x26fe5d?.storyMediaBatch?.version === 1 ||
-          _0xff470c.getState?.()?.nodes?.[this.nodeId]?.storyMediaBatch?.version === 1) return false;
-      const _0x4efc83 = String(_0x26fe5d?.asyncTaskId || '').trim();
-      if (_0x4efc83) return false;
-      const _0x2f0a18 = this._inferProviderFromModel(
-        _0x26fe5d?.model,
-        _0x26fe5d?.asyncTaskProvider || _0x26fe5d?.provider || '',
+      if (
+        value28?.storyMediaBatch?.version === 1 ||
+        store.getState?.()?.nodes?.[this.nodeId]?.storyMediaBatch?.version === 1
+      )
+        return false;
+      const value29 = String(value28?.asyncTaskId || '').trim();
+      if (value29) return false;
+      const value30 = this._inferProviderFromModel(
+        value28?.model,
+        value28?.asyncTaskProvider || value28?.provider || '',
       );
-      if (!['ppio', 'apimart'].includes(_0x2f0a18)) return false;
-      const _0x16a1b3 = String(_0x26fe5d?.asyncTaskStatus || '')
+      if (!['ppio', 'apimart'].includes(value30)) return false;
+      const value31 = String(value28?.asyncTaskStatus || '')
           .trim()
           .toLowerCase(),
-        _0x389b9b = [
+        enabled15 = [
           'submitted',
           'pending',
           'queued',
@@ -557,33 +560,31 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
           'processing',
           'querying',
           'in_progress',
-        ].includes(_0x16a1b3);
-      if (!_0x389b9b) return false;
-      if (this._hasImageGenerationResult(_0x26fe5d)) return false;
-      if (_0x26fe5d?.generationDuration != null) return false;
+        ].includes(value31);
+      if (!enabled15) return false;
+      if (this._hasImageGenerationResult(value28)) return false;
+      if (value28?.generationDuration != null) return false;
       return true;
     }
-    async ['_maybeFallbackRegenerateAsyncTask'](_0x3c6d46 = this._data) {
-      if (!this._shouldFallbackRegenerateAsyncTask(_0x3c6d46)) return false;
+    async ['_maybeFallbackRegenerateAsyncTask'](value32 = this._data) {
+      if (!this._shouldFallbackRegenerateAsyncTask(value32)) return false;
       if (this._asyncFallbackRegeneratePromise) return true;
       if (this._isGenerating) return true;
-      const _0x294e49 = (async () => {
-        const _0x5c1e24 = _0xff470c.getState().nodes?.[this.nodeId] || _0x3c6d46 || {},
-          _0x41d5fe =
-            Number(_0x5c1e24?.generationStartTime || 0) > 0
-              ? Number(_0x5c1e24.generationStartTime)
-              : Date.now();
-        (_0xff470c.updateNodeData(
+      const promise = (async () => {
+        const value33 = store.getState().nodes?.[this.nodeId] || value32 || {},
+          startedAt2 =
+            Number(value33?.generationStartTime || 0) > 0 ? Number(value33.generationStartTime) : Date.now();
+        (store.updateNodeData(
           this.nodeId,
           this._buildAsyncTaskPatch({
             provider: this._inferProviderFromModel(
-              _0x5c1e24?.model,
-              _0x5c1e24?.asyncTaskProvider || _0x5c1e24?.provider || '',
+              value33?.model,
+              value33?.asyncTaskProvider || value33?.provider || '',
             ),
             kind: 'image',
             taskId: '',
             status: 'pending',
-            startedAt: _0x41d5fe,
+            startedAt: startedAt2,
             recovering: true,
           }),
         ),
@@ -591,7 +592,7 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
           await this._onGenerate());
       })();
       return (
-        (this._asyncFallbackRegeneratePromise = _0x294e49.finally(() => {
+        (this._asyncFallbackRegeneratePromise = promise.finally(() => {
           this._asyncFallbackRegeneratePromise = null;
         })),
         true
@@ -641,40 +642,40 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
       lastCheckedAt: lastCheckedAt = Date.now(),
       raw: raw = {},
     } = {}) {
-      const _0x57d2d8 = _0xff470c.getState().nodes?.[this.nodeId] || this._data || {},
-        _0xa256ec =
+      const value34 = store.getState().nodes?.[this.nodeId] || this._data || {},
+        error2 =
           String(error?.message || error || t('aigenImage.task.generationFailed')).trim() ||
           t('aigenImage.task.generationFailed'),
-        _0x1a1533 = String(submitId || '').trim() || String(_0x57d2d8?.dreaminaSubmitId || '').trim(),
-        _0x59b9fb =
+        submitId2 = String(submitId || '').trim() || String(value34?.dreaminaSubmitId || '').trim(),
+        startedAt3 =
           Number(startedAt) > 0
             ? Number(startedAt)
-            : Number(_0x57d2d8?.dreaminaTaskStartedAt || _0x57d2d8?.generationStartTime || Date.now());
+            : Number(value34?.dreaminaTaskStartedAt || value34?.generationStartTime || Date.now());
       return {
-        ...buildImageGenerationFailurePatch({ error: _0xa256ec, startedAt: _0x59b9fb }),
+        ...buildImageGenerationFailurePatch({ error: error2, startedAt: startedAt3 }),
         ...this._buildDreaminaTaskPatch({
-          submitId: _0x1a1533,
+          submitId: submitId2,
           status: 'failed',
           phase: 'failed',
-          label: _0xa256ec,
-          startedAt: _0x59b9fb,
+          label: error2,
+          startedAt: startedAt3,
           lastCheckedAt: Number(lastCheckedAt || Date.now()),
           recovering: false,
           raw: raw,
         }),
       };
     }
-    ['_finalizeDreaminaImageFailure'](_0x245bb5 = {}) {
-      const _0x348b80 = this._buildDreaminaFailurePatch(_0x245bb5);
+    ['_finalizeDreaminaImageFailure'](options2 = {}) {
+      const value35 = this._buildDreaminaFailurePatch(options2);
       return (
-        _0xff470c.updateNodeData(this.nodeId, _0x348b80),
+        store.updateNodeData(this.nodeId, value35),
         this._persistDreaminaResumeCache(),
         (this._isGenerating = false),
         (this._dreaminaActiveSubmitId = ''),
         this.btnEl && resetGenerateButtonIdleUi(this.btnEl),
-        _0x32cd7a(this.previewEl),
+        stopLoading(this.previewEl),
         this._updateSubmitButtonState?.(),
-        _0x348b80
+        value35
       );
     }
     ['_buildAsyncTaskPatch']({
@@ -685,396 +686,400 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
       startedAt: startedAt = 0,
       recovering: recovering = false,
     } = {}) {
-      const _0x1dae70 = String(status || 'pending').trim() || 'pending',
-        _0x143e5d = String(taskId || '').trim();
-      let _0xd31a2c = String(provider || '')
+      const asyncTaskStatus = String(status || 'pending').trim() || 'pending',
+        asyncTaskId = String(taskId || '').trim();
+      let asyncTaskProvider = String(provider || '')
         .trim()
         .toLowerCase();
       return (
-        !_0xd31a2c &&
-          (_0x143e5d || _0x1dae70 !== 'idle') &&
-          (_0xd31a2c = this._inferProviderFromModel(this._data?.model || '', '')),
+        !asyncTaskProvider &&
+          (asyncTaskId || asyncTaskStatus !== 'idle') &&
+          (asyncTaskProvider = this._inferProviderFromModel(this._data?.model || '', '')),
         {
-          asyncTaskProvider: _0xd31a2c,
+          asyncTaskProvider: asyncTaskProvider,
           asyncTaskKind: String(kind || 'image').trim() || 'image',
-          asyncTaskId: _0x143e5d,
-          asyncTaskStatus: _0x1dae70,
+          asyncTaskId: asyncTaskId,
+          asyncTaskStatus: asyncTaskStatus,
           asyncTaskStartedAt: Number(startedAt || 0),
           asyncTaskRecovering: recovering === true,
         }
       );
     }
     ['_syncLocalTaskNodeData']() {
-      const _0x4e6c61 = _0xff470c.getState().nodes?.[this.nodeId];
-      if (_0x4e6c61) this._data = _0x4e6c61;
+      const value36 = store.getState().nodes?.[this.nodeId];
+      if (value36) this._data = value36;
       return this._data || {};
     }
-    ['_applyDreaminaTaskPatch'](_0x19ebac = {}, _0x53336a = {}) {
-      const _0x35a440 = _0xff470c.getState().nodes?.[this.nodeId] || this._data || {},
-        _0x37c518 = {
+    ['_applyDreaminaTaskPatch'](options3 = {}, args3 = {}) {
+      const value37 = store.getState().nodes?.[this.nodeId] || this._data || {},
+        value38 = {
           generationStartTime:
-            Number(_0x35a440?.generationStartTime) > 0
-              ? Number(_0x35a440.generationStartTime)
-              : Number(_0x19ebac?.startedAt || Date.now()),
+            Number(value37?.generationStartTime) > 0
+              ? Number(value37.generationStartTime)
+              : Number(options3?.startedAt || Date.now()),
           generationDuration: null,
-          ...this._buildDreaminaTaskPatch(_0x19ebac),
-          ..._0x53336a,
+          ...this._buildDreaminaTaskPatch(options3),
+          ...args3,
         };
       return (
-        _0xff470c.updateNodeData(this.nodeId, _0x37c518),
+        store.updateNodeData(this.nodeId, value38),
         this._syncLocalTaskNodeData(),
         this._persistDreaminaResumeCache(),
-        _0x37c518
+        value38
       );
     }
-    ['_stopRunningHubRecovery'](_0x4cc125 = false) {
+    ['_stopRunningHubRecovery'](value39 = false) {
       this._rhResumeAbortController &&
         !this._rhResumeAbortController.signal.aborted &&
         this._rhResumeAbortController.abort();
       ((this._rhResumeAbortController = null), (this._rhResumeTaskId = ''), (this._rhResumePromise = null));
-      if (_0x4cc125) {
-        const _0x107a58 = _0xff470c.getState().nodes?.[this.nodeId];
-        _0x107a58?.rhTaskRecovering &&
-          (_0xff470c.updateNodeData(this.nodeId, { rhTaskRecovering: false }),
+      if (value39) {
+        const value40 = store.getState().nodes?.[this.nodeId];
+        value40?.rhTaskRecovering &&
+          (store.updateNodeData(this.nodeId, { rhTaskRecovering: false }),
           this._persistRunningHubResumeCache());
       }
     }
-    ['_stopDreaminaRecovery'](_0x1f5a40 = false) {
+    ['_stopDreaminaRecovery'](value41 = false) {
       this._dreaminaResumeAbortController &&
         !this._dreaminaResumeAbortController.signal.aborted &&
         this._dreaminaResumeAbortController.abort();
       ((this._dreaminaResumeAbortController = null),
         (this._dreaminaResumeSubmitId = ''),
         (this._dreaminaResumePromise = null));
-      if (_0x1f5a40) {
-        const _0x4ed217 = _0xff470c.getState().nodes?.[this.nodeId];
-        _0x4ed217?.dreaminaTaskRecovering &&
-          (_0xff470c.updateNodeData(this.nodeId, { dreaminaTaskRecovering: false }),
+      if (value41) {
+        const value42 = store.getState().nodes?.[this.nodeId];
+        value42?.dreaminaTaskRecovering &&
+          (store.updateNodeData(this.nodeId, { dreaminaTaskRecovering: false }),
           this._persistDreaminaResumeCache());
       }
     }
-    ['_stopAsyncRecovery'](_0x545cde = false) {
+    ['_stopAsyncRecovery'](value43 = false) {
       this._asyncResumeAbortController &&
         !this._asyncResumeAbortController.signal.aborted &&
         this._asyncResumeAbortController.abort();
       ((this._asyncResumeAbortController = null),
         (this._asyncResumeTaskId = ''),
         (this._asyncResumePromise = null));
-      if (_0x545cde) {
-        const _0x49c25d = _0xff470c.getState().nodes?.[this.nodeId];
-        _0x49c25d?.asyncTaskRecovering &&
-          (_0xff470c.updateNodeData(this.nodeId, { asyncTaskRecovering: false }),
+      if (value43) {
+        const value44 = store.getState().nodes?.[this.nodeId];
+        value44?.asyncTaskRecovering &&
+          (store.updateNodeData(this.nodeId, { asyncTaskRecovering: false }),
           this._persistAsyncResumeCache());
       }
     }
-    ['_applyImageGenerationResult'](_0xd35d71, _0x21a49a, { writeStore: writeStore = true } = {}) {
-      const _0x2daac7 = normalizeImageGenerationResult(_0xd35d71),
-        _0x1f23b5 = buildImageGenerationResultPatch(_0x2daac7, { startedAt: _0x21a49a });
-      if (!_0x1f23b5) return null;
+    ['_applyImageGenerationResult'](value45, startedAt4, { writeStore: writeStore = true } = {}) {
+      const normalizedResult = normalizeImageGenerationResult(value45),
+        patch = buildImageGenerationResultPatch(normalizedResult, { startedAt: startedAt4 });
+      if (!patch) return null;
       return (
-        writeStore && _0xff470c.updateNodeData(this.nodeId, _0x1f23b5),
-        this._dispatchGenerationHistoryAssets(getSuccessfulImageGenerationItems(_0x2daac7), _0x21a49a),
-        { patch: _0x1f23b5, normalizedResult: _0x2daac7, items: getSuccessfulImageGenerationItems(_0x2daac7) }
+        writeStore && store.updateNodeData(this.nodeId, patch),
+        this._dispatchGenerationHistoryAssets(
+          getSuccessfulImageGenerationItems(normalizedResult),
+          startedAt4,
+        ),
+        {
+          patch: patch,
+          normalizedResult: normalizedResult,
+          items: getSuccessfulImageGenerationItems(normalizedResult),
+        }
       );
     }
-    ['_dispatchGenerationHistoryAssets'](_0x54ffbc, _0x5b362e) {
+    ['_dispatchGenerationHistoryAssets'](list6, startedAt5) {
       if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return;
-      const _0x59eef5 = Array.isArray(_0x54ffbc)
-        ? _0x54ffbc.filter((_0x390b1a) => _0x390b1a && typeof _0x390b1a === 'object' && !_0x390b1a.error)
+      const images = Array.isArray(list6)
+        ? list6.filter((enabled16) => enabled16 && typeof enabled16 === 'object' && !enabled16.error)
         : [];
-      if (_0x59eef5.length === 0) return;
-      const _0x331694 = _0xff470c.getState().nodes?.[this.nodeId] || this._data || {};
+      if (images.length === 0) return;
+      const nodeData = store.getState().nodes?.[this.nodeId] || this._data || {};
       try {
         window.dispatchEvent(
           new CustomEvent(GENERATION_HISTORY_EVENT, {
             detail: {
               kind: 'image',
               sourceNodeId: this.nodeId,
-              nodeData: _0x331694,
-              images: _0x59eef5,
-              startedAt: _0x5b362e,
+              nodeData: nodeData,
+              images: images,
+              startedAt: startedAt5,
               createdAt: Date.now(),
             },
           }),
         );
       } catch {}
     }
-    ['_getImageGenerationResultError'](_0x223dda) {
-      return getImageGenerationResultError(_0x223dda);
+    ['_getImageGenerationResultError'](value46) {
+      return getImageGenerationResultError(value46);
     }
-    async ['_buildResumePayload'](_0x1e8858 = this._data, _0x743a0a = {}) {
-      const _0x22119e = _0x1e8858 || {};
-      let _0x2827a4 = String(
-        normalizeDreaminaImageModel(_0x22119e?.model, _0x22119e?.provider) || _0x22119e?.model || '',
+    async ['_buildResumePayload'](value47 = this._data, value48 = {}) {
+      const value49 = value47 || {};
+      let model6 = String(
+        normalizeDreaminaImageModel(value49?.model, value49?.provider) || value49?.model || '',
       ).trim();
-      const _0x40d321 =
-          _0x22119e.generationParams &&
-          typeof _0x22119e.generationParams === 'object' &&
-          !Array.isArray(_0x22119e.generationParams)
-            ? _0x22119e.generationParams
+      const value50 =
+          value49.generationParams &&
+          typeof value49.generationParams === 'object' &&
+          !Array.isArray(value49.generationParams)
+            ? value49.generationParams
             : {},
-        _0x63116a = getModelManifest(_0x2827a4);
-      if (!_0x63116a) throw new Error('Missing model manifest: ' + _0x2827a4);
-      const _0x56c658 = sanitizeTaskGenerationParams(_0x2827a4, _0x40d321),
-        _0x42f873 = _0x63116a.adapterType === 'modelApi',
-        _0x1363c9 = Array.isArray(_0x63116a?.uiSchema?.fields) ? _0x63116a.uiSchema.fields : [],
+        modelManifest = getModelManifest(model6);
+      if (!modelManifest) throw new Error('Missing model manifest: ' + model6);
+      const generationParams2 = sanitizeTaskGenerationParams(model6, value50),
+        enabled17 = modelManifest.adapterType === 'modelApi',
+        manifestFields3 = Array.isArray(modelManifest?.uiSchema?.fields) ? modelManifest.uiSchema.fields : [],
         {
-          getManifestField: _0x2d946b,
-          readSchemaParam: _0x456baf,
-          requireSchemaParam: _0x6e1d45,
+          getManifestField: getManifestField2,
+          readSchemaParam: readSchemaParam3,
+          requireSchemaParam: requireSchemaParam2,
         } = createSchemaParamAccess({
-          model: _0x2827a4,
+          model: model6,
           data: this._data,
-          generationParams: _0x56c658,
-          manifestFields: _0x1363c9,
+          generationParams: generationParams2,
+          manifestFields: manifestFields3,
         }),
-        _0x3ca544 = _0x2d946b('imageSize') ? _0x6e1d45('imageSize') : undefined,
-        _0x5d8b69 = _0x42f873 ? _0x456baf('mode') : undefined,
-        _0x272c4c = resolveNanoBananaSelectionFromModel(_0x2827a4, _0x3ca544 || '2K', _0x22119e?.provider);
-      if (_0x272c4c) {
-        if (!_0x42f873 && _0x5d8b69 !== undefined)
-          _0x2827a4 = resolveNanoBananaModelBySelection({
-            family: _0x272c4c.family,
-            mode: _0x5d8b69,
-            imageSize: _0x3ca544 || '2K',
-            provider: _0x272c4c.provider || _0x22119e?.provider,
+        imageSize3 = getManifestField2('imageSize') ? requireSchemaParam2('imageSize') : undefined,
+        mode = enabled17 ? readSchemaParam3('mode') : undefined,
+        family = resolveNanoBananaSelectionFromModel(model6, imageSize3 || '2K', value49?.provider);
+      if (family) {
+        if (!enabled17 && mode !== undefined)
+          model6 = resolveNanoBananaModelBySelection({
+            family: family.family,
+            mode: mode,
+            imageSize: imageSize3 || '2K',
+            provider: family.provider || value49?.provider,
           });
-        else !_0x42f873 && (_0x2827a4 = _0x272c4c.model);
+        else !enabled17 && (model6 = family.model);
       }
-      const _0x539194 = String(_0x743a0a?.providerHint || _0x22119e?.provider || '')
+      const value51 = String(value48?.providerHint || value49?.provider || '')
         .trim()
         .toLowerCase();
-      isDreaminaImageModel(_0x2827a4, _0x539194) &&
-        (_0x2827a4 =
-          normalizeDreaminaImageModel(_0x2827a4, _0x539194) || _0x2827a4 || getDefaultDreaminaImageModelId());
-      const _0xb0368c = this._inferProviderFromModel(_0x2827a4, _0x539194),
-        _0x3eb7c0 = resolveImageSizeForProviderModel({
-          provider: _0xb0368c,
-          model: _0x2827a4,
-          imageSize: _0x3ca544,
+      isDreaminaImageModel(model6, value51) &&
+        (model6 = normalizeDreaminaImageModel(model6, value51) || model6 || getDefaultDreaminaImageModelId());
+      const provider6 = this._inferProviderFromModel(model6, value51),
+        imageSize4 = resolveImageSizeForProviderModel({
+          provider: provider6,
+          model: model6,
+          imageSize: imageSize3,
         });
-      !getModelManifest(_0x2827a4) &&
-        (_0x2827a4 = resolveGrsaiGptImage2ModelForSize({
-          provider: _0xb0368c,
-          model: _0x2827a4,
-          imageSize: _0x3eb7c0,
+      !getModelManifest(model6) &&
+        (model6 = resolveGrsaiGptImage2ModelForSize({
+          provider: provider6,
+          model: model6,
+          imageSize: imageSize4,
         }));
-      await _0x14e2fd();
-      const _0x1a4108 = _0x28ad2b(_0xb0368c) || {};
-      let _0x44d879 = '';
-      if (_0xb0368c === 'runninghub')
-        _0x44d879 = isModelApiModel(_0x2827a4, _0xb0368c)
-          ? _0x1a4108.modelApiKey || ''
-          : _0x1a4108.apiKey || '';
+      await ensureConfig();
+      const value52 = getProviderConfig(provider6) || {};
+      let apiKey = '';
+      if (provider6 === 'runninghub')
+        apiKey = isModelApiModel(model6, provider6) ? value52.modelApiKey || '' : value52.apiKey || '';
       else
-        _0xb0368c === 'runninghubwf'
-          ? (_0x44d879 = _0x1a4108.apiKey || '')
-          : (_0x44d879 = _0x1a4108.apiKey || window._appApiKey || '');
-      return { nodeId: this.nodeId, model: _0x2827a4, provider: _0xb0368c, apiKey: _0x44d879 };
+        provider6 === 'runninghubwf'
+          ? (apiKey = value52.apiKey || '')
+          : (apiKey = value52.apiKey || window._appApiKey || '');
+      return { nodeId: this.nodeId, model: model6, provider: provider6, apiKey: apiKey };
     }
     async ['_maybeResumeRunningHubTaskImpl']() {
-      const _0x1792ae = _0xff470c.getState().nodes?.[this.nodeId] || this._data || {};
-      if (this._isGenerating && _0x1792ae?.rhTaskRecovering !== true) return;
-      if (!this._isRunninghubTaskModel(_0x1792ae?.model, _0x1792ae?.provider)) {
+      const value53 = store.getState().nodes?.[this.nodeId] || this._data || {};
+      if (this._isGenerating && value53?.rhTaskRecovering !== true) return;
+      if (!this._isRunninghubTaskModel(value53?.model, value53?.provider)) {
         this._stopRunningHubRecovery(false);
         return;
       }
-      if (!this._isRunningHubRecoverableRunningTask(_0x1792ae)) {
+      if (!this._isRunningHubRecoverableRunningTask(value53)) {
         this._stopRunningHubRecovery(false);
         return;
       }
-      const _0x241e78 = String(_0x1792ae?.rhTaskId || '').trim();
-      if (!_0x241e78) {
+      const taskId2 = String(value53?.rhTaskId || '').trim();
+      if (!taskId2) {
         this._stopRunningHubRecovery(false);
         return;
       }
-      if (this._rhResumeTaskId === _0x241e78 && this._rhResumePromise) return;
+      if (this._rhResumeTaskId === taskId2 && this._rhResumePromise) return;
       this._stopRunningHubRecovery(false);
-      const _0x510c4c = Number(_0x1792ae?.rhTaskStartedAt || _0x1792ae?.generationStartTime || Date.now()),
-        _0xa36fcc =
-          _0x1792ae?.rhTaskUseOpenapiQuery === true ||
-          isModelApiModel(_0x1792ae?.model, _0x1792ae?.provider || 'runninghub');
-      this._rhResumeTaskId = _0x241e78;
-      const _0x3ff114 = (async () => {
-        let _0x588327 = null;
-        const _0x2738bf = this._isRunninghubWorkflowModel(_0x1792ae?.model, _0x1792ae?.provider),
-          _0x49de3d = shouldUseImageWorkflowBusyButton(_0x1792ae?.model);
+      const startedAt6 = Number(value53?.rhTaskStartedAt || value53?.generationStartTime || Date.now()),
+        rhTaskUseOpenapiQuery =
+          value53?.rhTaskUseOpenapiQuery === true ||
+          isModelApiModel(value53?.model, value53?.provider || 'runninghub');
+      this._rhResumeTaskId = taskId2;
+      const value54 = (async () => {
+        let signal = null;
+        const cancellable = this._isRunninghubWorkflowModel(value53?.model, value53?.provider),
+          busy = shouldUseImageWorkflowBusyButton(value53?.model);
         try {
-          const _0x2d449f = await this._buildResumePayload(_0x1792ae);
-          if (!_0x2d449f) return;
-          ((_0x588327 = new AbortController()),
-            (this._rhResumeAbortController = _0x588327),
-            (this._rhTaskId = _0x241e78),
-            (this._rhApiKey = String(_0x2d449f?.apiKey || '').trim() || this._rhApiKey || null),
+          const provider7 = await this._buildResumePayload(value53);
+          if (!provider7) return;
+          ((signal = new AbortController()),
+            (this._rhResumeAbortController = signal),
+            (this._rhTaskId = taskId2),
+            (this._rhApiKey = String(provider7?.apiKey || '').trim() || this._rhApiKey || null),
             (this._rhCancelRequested = false),
             (this._isGenerating = true));
           this.btnEl &&
-            (_0x2738bf
-              ? setGenerateButtonCancellableUi(this.btnEl, { busy: _0x49de3d })
+            (cancellable
+              ? setGenerateButtonCancellableUi(this.btnEl, { busy: busy })
               : setGenerateButtonLoadingUi(this.btnEl));
-          _0x27a9f5(this.previewEl);
-          const _0x367978 = await resumeTask(
+          startLoading(this.previewEl);
+          const response6 = await resumeTask(
             {
               sourceNodeId: this.nodeId,
               targetNodeId: this.nodeId,
               trigger: 'node',
               taskType: 'image-generation',
-              provider: _0x2d449f.provider || _0x1792ae?.provider || 'runninghubwf',
+              provider: provider7.provider || value53?.provider || 'runninghubwf',
               adapterType: 'workflow',
-              modelId: _0x2d449f.model || _0x1792ae?.model || '',
-              executionId: 'runninghub.image.' + (_0x2d449f.model || _0x1792ae?.model || 'workflow'),
-              payload: _0x2d449f,
-              taskId: _0x241e78,
-              cancellable: _0x2738bf,
+              modelId: provider7.model || value53?.model || '',
+              executionId: 'runninghub.image.' + (provider7.model || value53?.model || 'workflow'),
+              payload: provider7,
+              taskId: taskId2,
+              cancellable: cancellable,
               resumable: true,
               pauseOnAbort: true,
               startBuilder: () => ({
                 rhStatusMessage: null,
                 rhStatusCode: null,
-                rhTaskUseOpenapiQuery: _0xa36fcc,
+                rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery,
               }),
               onTaskStart: () => {
                 this._persistRunningHubResumeCache();
               },
               poll: async () =>
-                _0xfcf4f2.resumeRunningHubImageTask(_0x241e78, _0x2d449f, {
-                  signal: _0x588327.signal,
-                  useOpenapiQuery: _0xa36fcc,
+                api.resumeRunningHubImageTask(taskId2, provider7, {
+                  signal: signal.signal,
+                  useOpenapiQuery: rhTaskUseOpenapiQuery,
                 }),
-              resultBuilder: async (_0x3f61b8, _0x1ce04e) => {
-                const _0x2e3516 = this._getImageGenerationResultError(_0x3f61b8);
-                if (_0x2e3516) throw new Error(_0x2e3516);
-                const _0x2ccb18 = this._applyImageGenerationResult(_0x3f61b8, _0x1ce04e.startedAt, {
+              resultBuilder: async (value55, startedAt7) => {
+                const value56 = this._getImageGenerationResultError(value55);
+                if (value56) throw new Error(value56);
+                const value57 = this._applyImageGenerationResult(value55, startedAt7.startedAt, {
                   writeStore: false,
                 });
                 return {
-                  ...(_0x2ccb18?.patch || {}),
+                  ...(value57?.patch || {}),
                   ...this._buildRunningHubTaskPatch({
-                    taskId: _0x241e78,
+                    taskId: taskId2,
                     status: 'success',
-                    startedAt: _0x1ce04e.startedAt,
+                    startedAt: startedAt7.startedAt,
                     recovering: false,
-                    useOpenapiQuery: _0xa36fcc,
+                    useOpenapiQuery: rhTaskUseOpenapiQuery,
                   }),
                 };
               },
-              failureBuilder: (_0x4d0965, _0x587e81) => ({
+              failureBuilder: (error3, startedAt8) => ({
                 ...buildImageGenerationFailurePatch({
-                  error: _0x4d0965?.message || t('aigenImage.task.generationFailed'),
-                  startedAt: _0x587e81.startedAt,
+                  error: error3?.message || t('aigenImage.task.generationFailed'),
+                  startedAt: startedAt8.startedAt,
                 }),
-                rhStatusMessage: _0x4d0965?.message || t('aigenImage.task.generationFailed'),
-                rhStatusCode: Number.isFinite(Number(_0x4d0965?.code)) ? Number(_0x4d0965.code) : null,
+                rhStatusMessage: error3?.message || t('aigenImage.task.generationFailed'),
+                rhStatusCode: Number.isFinite(Number(error3?.code)) ? Number(error3.code) : null,
                 ...this._buildRunningHubTaskPatch({
-                  taskId: _0x241e78,
+                  taskId: taskId2,
                   status: 'failed',
-                  startedAt: _0x587e81.startedAt,
+                  startedAt: startedAt8.startedAt,
                   recovering: false,
-                  useOpenapiQuery: _0xa36fcc,
+                  useOpenapiQuery: rhTaskUseOpenapiQuery,
                 }),
               }),
-              cancelledBuilder: (_0x277d2e) => {
-                const _0x3593bb = _0xff470c.getState().nodes?.[this.nodeId] || {},
-                  _0x460a48 =
-                    _0x3593bb.generationDuration == null
-                      ? Date.now() - _0x277d2e.startedAt
-                      : _0x3593bb.generationDuration;
+              cancelledBuilder: (value58) => {
+                const latest2 = store.getState().nodes?.[this.nodeId] || {},
+                  duration2 =
+                    latest2.generationDuration == null
+                      ? Date.now() - value58.startedAt
+                      : latest2.generationDuration;
                 return this._buildRunningHubCancelResultPatch({
-                  latest: _0x3593bb,
-                  message: _0x3593bb.rhStatusMessage || t('aigenImage.task.interrupted'),
-                  code: _0x3593bb.rhStatusCode,
-                  duration: _0x460a48,
-                  taskId: _0x241e78,
+                  latest: latest2,
+                  message: latest2.rhStatusMessage || t('aigenImage.task.interrupted'),
+                  code: latest2.rhStatusCode,
+                  duration: duration2,
+                  taskId: taskId2,
                 });
               },
-              parseError: (_0x6bca96) => _0x6bca96?.message || t('aigenImage.task.generationFailed'),
+              parseError: (error4) => error4?.message || t('aigenImage.task.generationFailed'),
             },
-            { store: _0xff470c, startedAt: _0x510c4c, abortController: _0x588327 },
+            { store: store, startedAt: startedAt6, abortController: signal },
           );
-          if (_0x367978.status === 'pending') {
+          if (response6.status === 'pending') {
             this._persistRunningHubResumeCache();
             return;
           }
           this._persistRunningHubResumeCache();
-        } catch (_0x5c347f) {
+        } catch (rhStatusMessage) {
           if (
-            _0x588327?.signal?.aborted ||
-            _0x5c347f?.message === 'CANCELLED' ||
-            _0x5c347f?.name === 'AbortError'
+            signal?.signal?.aborted ||
+            rhStatusMessage?.message === 'CANCELLED' ||
+            rhStatusMessage?.name === 'AbortError'
           )
             return;
-          (_0xff470c.updateNodeData(this.nodeId, {
-            generationDuration: Math.max(0, Date.now() - _0x510c4c),
-            rhStatusMessage: _0x5c347f?.message || t('aigenImage.task.generationFailed'),
-            rhStatusCode: Number.isFinite(Number(_0x5c347f?.code)) ? Number(_0x5c347f.code) : null,
+          (store.updateNodeData(this.nodeId, {
+            generationDuration: Math.max(0, Date.now() - startedAt6),
+            rhStatusMessage: rhStatusMessage?.message || t('aigenImage.task.generationFailed'),
+            rhStatusCode: Number.isFinite(Number(rhStatusMessage?.code))
+              ? Number(rhStatusMessage.code)
+              : null,
             ...this._buildRunningHubTaskPatch({
-              taskId: _0x241e78,
+              taskId: taskId2,
               status: 'failed',
-              startedAt: _0x510c4c,
+              startedAt: startedAt6,
               recovering: false,
-              useOpenapiQuery: _0xa36fcc,
+              useOpenapiQuery: rhTaskUseOpenapiQuery,
             }),
           }),
             this._persistRunningHubResumeCache());
         } finally {
-          _0x588327 && this._rhResumeAbortController === _0x588327 && (this._rhResumeAbortController = null);
-          this._rhResumeTaskId === _0x241e78 && (this._rhResumeTaskId = '');
+          signal && this._rhResumeAbortController === signal && (this._rhResumeAbortController = null);
+          this._rhResumeTaskId === taskId2 && (this._rhResumeTaskId = '');
           this._rhResumePromise = null;
-          const _0xed635e = this._syncLocalTaskNodeData(),
-            _0x4c74ce = shouldShowGenerationBusyUi(_0xed635e);
-          this._isGenerating = _0x4c74ce;
-          if (_0x4c74ce) this._rhTaskId = String(_0xed635e?.rhTaskId || _0x241e78 || '').trim();
+          const value59 = this._syncLocalTaskNodeData(),
+            shouldShowGenerationBusyUi2 = shouldShowGenerationBusyUi(value59);
+          this._isGenerating = shouldShowGenerationBusyUi2;
+          if (shouldShowGenerationBusyUi2) this._rhTaskId = String(value59?.rhTaskId || taskId2 || '').trim();
           else {
             this._rhTaskId = null;
             if (!this._rhCancelRequested) this._rhApiKey = null;
-            (this.btnEl && resetGenerateButtonIdleUi(this.btnEl), _0x32cd7a(this.previewEl));
+            (this.btnEl && resetGenerateButtonIdleUi(this.btnEl), stopLoading(this.previewEl));
           }
           this._updateSubmitButtonState();
         }
       })();
-      this._rhResumePromise = _0x3ff114;
+      this._rhResumePromise = value54;
     }
     async ['_maybeResumeDreaminaTaskImpl']() {
-      const _0x42cb24 = _0xff470c.getState().nodes?.[this.nodeId] || this._data || {},
-        _0x464266 = String(_0x42cb24?.dreaminaSubmitId || '').trim(),
-        _0xcc5f51 = String(this._dreaminaActiveSubmitId || '').trim();
+      const raw2 = store.getState().nodes?.[this.nodeId] || this._data || {},
+        taskId3 = String(raw2?.dreaminaSubmitId || '').trim(),
+        value60 = String(this._dreaminaActiveSubmitId || '').trim();
       if (
         this._isGenerating &&
-        _0x42cb24?.dreaminaTaskRecovering !== true &&
-        _0xcc5f51 &&
-        _0xcc5f51 === _0x464266 &&
-        !this._isStaleActiveDreaminaTask(_0x42cb24)
+        raw2?.dreaminaTaskRecovering !== true &&
+        value60 &&
+        value60 === taskId3 &&
+        !this._isStaleActiveDreaminaTask(raw2)
       )
         return;
-      if (!this._isDreaminaImageNode(_0x42cb24)) {
+      if (!this._isDreaminaImageNode(raw2)) {
         this._stopDreaminaRecovery(false);
         return;
       }
-      if (!this._isDreaminaRecoverableRunningTask(_0x42cb24)) {
+      if (!this._isDreaminaRecoverableRunningTask(raw2)) {
         this._stopDreaminaRecovery(false);
         return;
       }
-      if (!_0x464266) {
+      if (!taskId3) {
         this._stopDreaminaRecovery(false);
         return;
       }
-      if (this._dreaminaResumeSubmitId === _0x464266) return;
+      if (this._dreaminaResumeSubmitId === taskId3) return;
       this._stopDreaminaRecovery(false);
-      const _0x1a1e1e = Number(
-        _0x42cb24?.dreaminaTaskStartedAt || _0x42cb24?.generationStartTime || Date.now(),
-      );
-      this._dreaminaResumeSubmitId = _0x464266;
-      const _0x500c94 = (async () => {
-        let _0x252fdc = null;
+      const startedAt9 = Number(raw2?.dreaminaTaskStartedAt || raw2?.generationStartTime || Date.now());
+      this._dreaminaResumeSubmitId = taskId3;
+      const value61 = (async () => {
+        let signal2 = null;
         try {
-          const _0x2837d1 = await this._buildResumePayload(_0x42cb24);
-          if (!_0x2837d1) return;
-          ((_0x252fdc = new AbortController()),
-            (this._dreaminaResumeAbortController = _0x252fdc),
+          const modelId = await this._buildResumePayload(raw2);
+          if (!modelId) return;
+          ((signal2 = new AbortController()),
+            (this._dreaminaResumeAbortController = signal2),
             (this._isGenerating = true));
           this.btnEl && setGenerateButtonLoadingUi(this.btnEl);
-          _0x27a9f5(this.previewEl);
-          const _0x3f0bbd = await resumeTask(
+          startLoading(this.previewEl);
+          const response7 = await resumeTask(
             {
               sourceNodeId: this.nodeId,
               targetNodeId: this.nodeId,
@@ -1082,763 +1087,763 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
               taskType: 'image-generation',
               provider: 'dreamina',
               adapterType: 'localRuntime',
-              modelId: _0x2837d1.model || _0x42cb24?.model || '',
-              executionId: 'dreamina.image.' + (_0x2837d1.model || _0x42cb24?.model || 'cli'),
-              payload: _0x2837d1,
-              taskId: _0x464266,
+              modelId: modelId.model || raw2?.model || '',
+              executionId: 'dreamina.image.' + (modelId.model || raw2?.model || 'cli'),
+              payload: modelId,
+              taskId: taskId3,
               cancellable: false,
               resumable: true,
               pauseOnAbort: true,
               startBuilder: () =>
                 this._buildDreaminaTaskPatch({
-                  submitId: _0x464266,
+                  submitId: taskId3,
                   status: 'pending',
                   phase: 'generating',
-                  label: String(_0x42cb24?.dreaminaTaskLabel || '').trim() || t('aigenImage.task.generating'),
-                  startedAt: _0x1a1e1e,
+                  label: String(raw2?.dreaminaTaskLabel || '').trim() || t('aigenImage.task.generating'),
+                  startedAt: startedAt9,
                   lastCheckedAt: Date.now(),
                   recovering: true,
-                  raw: _0x42cb24?.dreaminaTaskLastRaw || {},
+                  raw: raw2?.dreaminaTaskLastRaw || {},
                 }),
               onTaskStart: () => {
                 this._persistDreaminaResumeCache();
               },
-              pauseBuilder: (_0x15940c) =>
+              pauseBuilder: (startedAt10) =>
                 this._buildDreaminaTaskPatch({
-                  submitId: _0x464266,
-                  status: String(_0x42cb24?.dreaminaTaskStatus || '').trim() || 'pending',
-                  phase: String(_0x42cb24?.dreaminaTaskPhase || '').trim() || 'generating',
-                  label: String(_0x42cb24?.dreaminaTaskLabel || '').trim() || t('aigenImage.task.generating'),
-                  startedAt: _0x15940c.startedAt,
+                  submitId: taskId3,
+                  status: String(raw2?.dreaminaTaskStatus || '').trim() || 'pending',
+                  phase: String(raw2?.dreaminaTaskPhase || '').trim() || 'generating',
+                  label: String(raw2?.dreaminaTaskLabel || '').trim() || t('aigenImage.task.generating'),
+                  startedAt: startedAt10.startedAt,
                   lastCheckedAt: Date.now(),
                   recovering: false,
-                  raw: _0x42cb24?.dreaminaTaskLastRaw || {},
+                  raw: raw2?.dreaminaTaskLastRaw || {},
                 }),
-              poll: async () =>
-                _0xfcf4f2.resumeDreaminaImageTask(_0x464266, _0x2837d1, { signal: _0x252fdc.signal }),
-              resultBuilder: async (_0x17839a, _0x4669d2) => {
-                const _0x4e2f98 = this._getImageGenerationResultError(_0x17839a);
-                if (_0x4e2f98) throw new Error(_0x4e2f98);
-                const _0x177748 = this._applyImageGenerationResult(_0x17839a, _0x4669d2.startedAt, {
+              poll: async () => api.resumeDreaminaImageTask(taskId3, modelId, { signal: signal2.signal }),
+              resultBuilder: async (value62, startedAt11) => {
+                const value63 = this._getImageGenerationResultError(value62);
+                if (value63) throw new Error(value63);
+                const value64 = this._applyImageGenerationResult(value62, startedAt11.startedAt, {
                   writeStore: false,
                 });
                 return {
-                  ...(_0x177748?.patch || {}),
+                  ...(value64?.patch || {}),
                   ...this._buildDreaminaTaskPatch({
-                    submitId: _0x464266,
+                    submitId: taskId3,
                     status: 'success',
                     phase: 'done',
                     label: t('aigenImage.task.completed'),
-                    startedAt: _0x4669d2.startedAt,
+                    startedAt: startedAt11.startedAt,
                     lastCheckedAt: Date.now(),
                     recovering: false,
                     raw: {},
                   }),
                 };
               },
-              failureBuilder: (_0x57f02c, _0x1b4a5e) =>
+              failureBuilder: (error5, startedAt12) =>
                 this._buildDreaminaFailurePatch({
-                  error: _0x57f02c,
-                  startedAt: _0x1b4a5e.startedAt,
-                  submitId: _0x464266,
+                  error: error5,
+                  startedAt: startedAt12.startedAt,
+                  submitId: taskId3,
                   lastCheckedAt: Date.now(),
                   raw: {},
                 }),
-              cancelledBuilder: (_0xc46972) => ({
-                generationDuration: Date.now() - _0xc46972.startedAt,
+              cancelledBuilder: (startedAt13) => ({
+                generationDuration: Date.now() - startedAt13.startedAt,
                 ...this._buildDreaminaTaskPatch({
-                  submitId: _0x464266,
+                  submitId: taskId3,
                   status: 'pending',
                   phase: 'generating',
-                  label: String(_0x42cb24?.dreaminaTaskLabel || '').trim() || t('aigenImage.task.generating'),
-                  startedAt: _0xc46972.startedAt,
+                  label: String(raw2?.dreaminaTaskLabel || '').trim() || t('aigenImage.task.generating'),
+                  startedAt: startedAt13.startedAt,
                   lastCheckedAt: Date.now(),
                   recovering: false,
-                  raw: _0x42cb24?.dreaminaTaskLastRaw || {},
+                  raw: raw2?.dreaminaTaskLastRaw || {},
                 }),
               }),
-              parseError: (_0x58fdc8) => _0x58fdc8?.message || t('aigenImage.task.generationFailed'),
+              parseError: (error6) => error6?.message || t('aigenImage.task.generationFailed'),
             },
-            { store: _0xff470c, startedAt: _0x1a1e1e, abortController: _0x252fdc },
+            { store: store, startedAt: startedAt9, abortController: signal2 },
           );
-          if (_0x3f0bbd.status === 'pending') {
+          if (response7.status === 'pending') {
             this._persistDreaminaResumeCache();
             return;
           }
-          (_0x3f0bbd.status === 'failed' && (this._dreaminaActiveSubmitId = ''),
+          (response7.status === 'failed' && (this._dreaminaActiveSubmitId = ''),
             this._persistDreaminaResumeCache());
-        } catch (_0x146213) {
-          if (
-            _0x252fdc?.signal?.aborted ||
-            _0x146213?.message === 'CANCELLED' ||
-            _0x146213?.name === 'AbortError'
-          )
+        } catch (error7) {
+          if (signal2?.signal?.aborted || error7?.message === 'CANCELLED' || error7?.name === 'AbortError')
             return;
           this._finalizeDreaminaImageFailure({
-            error: _0x146213,
-            startedAt: _0x1a1e1e,
-            submitId: _0x464266,
+            error: error7,
+            startedAt: startedAt9,
+            submitId: taskId3,
             lastCheckedAt: Date.now(),
             raw: {},
           });
         } finally {
-          _0x252fdc &&
-            this._dreaminaResumeAbortController === _0x252fdc &&
+          signal2 &&
+            this._dreaminaResumeAbortController === signal2 &&
             (this._dreaminaResumeAbortController = null);
-          this._dreaminaResumeSubmitId === _0x464266 && (this._dreaminaResumeSubmitId = '');
+          this._dreaminaResumeSubmitId === taskId3 && (this._dreaminaResumeSubmitId = '');
           this._dreaminaResumePromise = null;
-          const _0x2ede4c = this._syncLocalTaskNodeData(),
-            _0x508727 = shouldShowGenerationBusyUi(_0x2ede4c);
-          ((this._isGenerating = _0x508727),
-            !_0x508727 && (this.btnEl && resetGenerateButtonIdleUi(this.btnEl), _0x32cd7a(this.previewEl)),
+          const value65 = this._syncLocalTaskNodeData(),
+            shouldShowGenerationBusyUi3 = shouldShowGenerationBusyUi(value65);
+          ((this._isGenerating = shouldShowGenerationBusyUi3),
+            !shouldShowGenerationBusyUi3 &&
+              (this.btnEl && resetGenerateButtonIdleUi(this.btnEl), stopLoading(this.previewEl)),
             this._updateSubmitButtonState());
         }
       })();
-      this._dreaminaResumePromise = _0x500c94;
+      this._dreaminaResumePromise = value61;
     }
     async ['_maybeResumeAsyncTaskImpl']() {
-      const _0xe418fa = _0xff470c.getState().nodes?.[this.nodeId] || this._data || {};
-      if (this._isGenerating && _0xe418fa?.asyncTaskRecovering !== true) return;
-      if (!this._isAsyncRecoverableRunningTask(_0xe418fa)) {
-        const _0x48968b = await this._maybeFallbackRegenerateAsyncTask(_0xe418fa);
-        if (_0x48968b) return;
+      const value66 = store.getState().nodes?.[this.nodeId] || this._data || {};
+      if (this._isGenerating && value66?.asyncTaskRecovering !== true) return;
+      if (!this._isAsyncRecoverableRunningTask(value66)) {
+        const value67 = await this._maybeFallbackRegenerateAsyncTask(value66);
+        if (value67) return;
         this._stopAsyncRecovery(false);
         return;
       }
-      const _0xf09c0e = String(_0xe418fa?.asyncTaskId || '').trim();
-      if (!_0xf09c0e) {
-        const _0x2c275a = await this._maybeFallbackRegenerateAsyncTask(_0xe418fa);
-        if (_0x2c275a) return;
+      const taskId4 = String(value66?.asyncTaskId || '').trim();
+      if (!taskId4) {
+        const value68 = await this._maybeFallbackRegenerateAsyncTask(value66);
+        if (value68) return;
         this._stopAsyncRecovery(false);
         return;
       }
-      if (this._asyncResumeTaskId === _0xf09c0e && this._asyncResumePromise) return;
+      if (this._asyncResumeTaskId === taskId4 && this._asyncResumePromise) return;
       this._stopAsyncRecovery(false);
-      const _0x421deb = Number(_0xe418fa?.asyncTaskStartedAt || _0xe418fa?.generationStartTime || Date.now()),
-        _0x312923 = this._inferProviderFromModel(
-          _0xe418fa?.model,
-          _0xe418fa?.asyncTaskProvider || _0xe418fa?.provider || '',
+      const startedAt14 = Number(value66?.asyncTaskStartedAt || value66?.generationStartTime || Date.now()),
+        providerHint2 = this._inferProviderFromModel(
+          value66?.model,
+          value66?.asyncTaskProvider || value66?.provider || '',
         );
-      this._asyncResumeTaskId = _0xf09c0e;
-      const _0x2f48ec = (async () => {
-        let _0x262d16 = null;
+      this._asyncResumeTaskId = taskId4;
+      const value69 = (async () => {
+        let signal3 = null;
         try {
-          const _0x15c66d = await this._buildResumePayload(_0xe418fa, { providerHint: _0x312923 });
-          if (!_0x15c66d) return;
-          ((_0x262d16 = new AbortController()),
-            (this._asyncResumeAbortController = _0x262d16),
+          const modelId2 = await this._buildResumePayload(value66, { providerHint: providerHint2 });
+          if (!modelId2) return;
+          ((signal3 = new AbortController()),
+            (this._asyncResumeAbortController = signal3),
             (this._isGenerating = true));
           this.btnEl && setGenerateButtonLoadingUi(this.btnEl);
-          _0x27a9f5(this.previewEl);
-          const _0x1578c6 = await resumeTask(
+          startLoading(this.previewEl);
+          const response8 = await resumeTask(
             {
               sourceNodeId: this.nodeId,
               targetNodeId: this.nodeId,
               trigger: 'node',
               taskType: 'image-generation',
-              provider: _0x312923 || _0x15c66d.provider || _0xe418fa?.provider || '',
+              provider: providerHint2 || modelId2.provider || value66?.provider || '',
               adapterType: 'modelApi',
-              modelId: _0x15c66d.model || _0xe418fa?.model || '',
-              executionId: (_0x312923 || _0x15c66d.provider || 'model') + '.image.async',
-              payload: _0x15c66d,
-              taskId: _0xf09c0e,
+              modelId: modelId2.model || value66?.model || '',
+              executionId: (providerHint2 || modelId2.provider || 'model') + '.image.async',
+              payload: modelId2,
+              taskId: taskId4,
               async: true,
               cancellable: false,
               resumable: true,
               pauseOnAbort: true,
               startBuilder: () =>
                 this._buildAsyncTaskPatch({
-                  provider: _0x312923,
+                  provider: providerHint2,
                   kind: 'image',
-                  taskId: _0xf09c0e,
+                  taskId: taskId4,
                   status: 'running',
-                  startedAt: _0x421deb,
+                  startedAt: startedAt14,
                   recovering: true,
                 }),
               onTaskStart: () => {
                 this._persistAsyncResumeCache();
               },
-              poll: async () =>
-                _0xfcf4f2.resumeAsyncImageTask(_0xf09c0e, _0x15c66d, { signal: _0x262d16.signal }),
-              resultBuilder: async (_0x1362f8, _0x1a760d) => {
-                const _0x316b40 = this._getImageGenerationResultError(_0x1362f8);
-                if (_0x316b40) throw new Error(_0x316b40);
-                const _0x51937c = this._applyImageGenerationResult(_0x1362f8, _0x1a760d.startedAt, {
+              poll: async () => api.resumeAsyncImageTask(taskId4, modelId2, { signal: signal3.signal }),
+              resultBuilder: async (value70, startedAt15) => {
+                const value71 = this._getImageGenerationResultError(value70);
+                if (value71) throw new Error(value71);
+                const value72 = this._applyImageGenerationResult(value70, startedAt15.startedAt, {
                   writeStore: false,
                 });
                 return {
-                  ...(_0x51937c?.patch || {}),
+                  ...(value72?.patch || {}),
                   ...this._buildAsyncTaskPatch({
-                    provider: _0x312923,
+                    provider: providerHint2,
                     kind: 'image',
-                    taskId: _0xf09c0e,
+                    taskId: taskId4,
                     status: 'success',
-                    startedAt: _0x1a760d.startedAt,
+                    startedAt: startedAt15.startedAt,
                     recovering: false,
                   }),
                 };
               },
-              failureBuilder: (_0x4f1fa4, _0x162822) => ({
+              failureBuilder: (error8, startedAt16) => ({
                 ...buildImageGenerationFailurePatch({
-                  error: _0x4f1fa4?.message || t('aigenImage.task.generationFailed'),
-                  startedAt: _0x162822.startedAt,
+                  error: error8?.message || t('aigenImage.task.generationFailed'),
+                  startedAt: startedAt16.startedAt,
                 }),
                 ...this._buildAsyncTaskPatch({
-                  provider: _0x312923,
+                  provider: providerHint2,
                   kind: 'image',
-                  taskId: _0xf09c0e,
+                  taskId: taskId4,
                   status: 'failed',
-                  startedAt: _0x162822.startedAt,
+                  startedAt: startedAt16.startedAt,
                   recovering: false,
                 }),
               }),
-              cancelledBuilder: (_0x46b798) => ({
+              cancelledBuilder: (startedAt17) => ({
                 images: [],
                 imageUrl: '',
                 src: '',
                 localPath: '',
-                generationDuration: Date.now() - _0x46b798.startedAt,
+                generationDuration: Date.now() - startedAt17.startedAt,
                 ...this._buildAsyncTaskPatch({
-                  provider: _0x312923,
+                  provider: providerHint2,
                   kind: 'image',
-                  taskId: _0xf09c0e,
+                  taskId: taskId4,
                   status: 'cancelled',
-                  startedAt: _0x46b798.startedAt,
+                  startedAt: startedAt17.startedAt,
                   recovering: false,
                 }),
               }),
-              parseError: (_0x67126e) => _0x67126e?.message || t('aigenImage.task.generationFailed'),
+              parseError: (error9) => error9?.message || t('aigenImage.task.generationFailed'),
             },
-            { store: _0xff470c, startedAt: _0x421deb, abortController: _0x262d16 },
+            { store: store, startedAt: startedAt14, abortController: signal3 },
           );
-          if (_0x1578c6.status === 'pending') {
+          if (response8.status === 'pending') {
             this._persistAsyncResumeCache();
             return;
           }
           this._persistAsyncResumeCache();
-        } catch (_0x2c554e) {
-          if (
-            _0x262d16?.signal?.aborted ||
-            _0x2c554e?.message === 'CANCELLED' ||
-            _0x2c554e?.name === 'AbortError'
-          )
+        } catch (error10) {
+          if (signal3?.signal?.aborted || error10?.message === 'CANCELLED' || error10?.name === 'AbortError')
             return;
-          (_0xff470c.updateNodeData(this.nodeId, {
-            generationDuration: Math.max(0, Date.now() - _0x421deb),
+          (store.updateNodeData(this.nodeId, {
+            generationDuration: Math.max(0, Date.now() - startedAt14),
             ...this._buildAsyncTaskPatch({
-              provider: _0x312923,
+              provider: providerHint2,
               kind: 'image',
-              taskId: _0xf09c0e,
+              taskId: taskId4,
               status: 'failed',
-              startedAt: _0x421deb,
+              startedAt: startedAt14,
               recovering: false,
             }),
           }),
             this._persistAsyncResumeCache());
         } finally {
-          _0x262d16 &&
-            this._asyncResumeAbortController === _0x262d16 &&
+          signal3 &&
+            this._asyncResumeAbortController === signal3 &&
             (this._asyncResumeAbortController = null);
-          this._asyncResumeTaskId === _0xf09c0e && (this._asyncResumeTaskId = '');
+          this._asyncResumeTaskId === taskId4 && (this._asyncResumeTaskId = '');
           this._asyncResumePromise = null;
-          const _0x35d506 = this._syncLocalTaskNodeData(),
-            _0xacb146 = shouldShowGenerationBusyUi(_0x35d506);
-          ((this._isGenerating = _0xacb146),
-            !_0xacb146 && (this.btnEl && resetGenerateButtonIdleUi(this.btnEl), _0x32cd7a(this.previewEl)),
+          const value73 = this._syncLocalTaskNodeData(),
+            shouldShowGenerationBusyUi4 = shouldShowGenerationBusyUi(value73);
+          ((this._isGenerating = shouldShowGenerationBusyUi4),
+            !shouldShowGenerationBusyUi4 &&
+              (this.btnEl && resetGenerateButtonIdleUi(this.btnEl), stopLoading(this.previewEl)),
             this._updateSubmitButtonState());
         }
       })();
-      this._asyncResumePromise = _0x2f48ec;
+      this._asyncResumePromise = value69;
     }
-    async ['_buildPayload'](_0x2e526d = null) {
-      const _0x606f8e = _0xff470c.getState(),
-        _0x52c3bb = _0xff470c.getIncomingEdges(this.nodeId),
-        _0x373fbd = _0x606f8e.nodes || {},
-        _0x153dac = getTargetInputPolicy(_0x373fbd?.[this.nodeId] || this._data || {}),
-        _0x180729 = getFixedInputSlotConfigFromManifest(_0x373fbd?.[this.nodeId] || this._data || {}),
-        _0x4de6a6 = getImageNodeInputGate(this._data?.model),
-        _0x19bdf9 = String(_0x4de6a6.kind || '').trim(),
-        _0x5c5c05 = Number(_0x4de6a6.max),
-        _0x8313a7 = isRhPersonReplaceWorkflowModel(this._data?.model),
-        _0x14423c = isRhQwenImageEditModel(this._data?.model),
-        _0x14678c = getModelManifest(this._data?.model)?.inputSlots,
-        _0x2628f7 = Math.max(0, Number(_0x14678c?.maxByKind?.image) || 0),
-        _0x3f64a0 = _0x2628f7 || 3,
-        _0x47eda0 = getImageInputGateUploadedUrl(this._data, _0x4de6a6),
-        _0x182597 = { text: [], image: [], video: [], audio: [] },
-        _0x1db25a = { text: 0, image: 0, video: 0, audio: 0 },
-        _0x2d3a26 = new Map();
-      for (const _0x59c89e of _0x52c3bb) {
-        const _0xd62e2 = _0x373fbd[_0x59c89e.sourceId];
-        if (!_0xd62e2) continue;
-        const _0x107fa5 = resolveEffectiveInputKind(_0xd62e2, _0x59c89e);
-        if (!_0x107fa5) continue;
-        if (!isInputKindAllowed(_0x153dac, _0x107fa5)) continue;
-        if (_0x19bdf9 && _0x107fa5 !== _0x19bdf9) continue;
-        if (_0x19bdf9 && Number.isFinite(_0x5c5c05) && _0x1db25a[_0x19bdf9] >= _0x5c5c05) continue;
-        if (_0x8313a7 && _0x107fa5 !== 'image') continue;
-        if (_0x8313a7 && _0x1db25a.image >= 2) continue;
-        if (_0x14423c && _0x107fa5 !== 'image') continue;
-        if (_0x14423c && _0x1db25a.image >= _0x3f64a0) continue;
-        let _0x16f625 = '',
-          _0x493102 = '';
-        if (_0x107fa5 === 'text') {
-          _0x16f625 = (
-            _0xd62e2.outputText ||
-            _0xd62e2.text ||
-            _0xd62e2.content ||
-            _0xd62e2.prompt ||
-            _0xd62e2.label ||
+    async ['_buildPayload'](value74 = null) {
+      const value75 = store.getState(),
+        list7 = store.getIncomingEdges(this.nodeId),
+        nodeData2 = value75.nodes || {},
+        targetInputPolicy = getTargetInputPolicy(nodeData2?.[this.nodeId] || this._data || {}),
+        fixedInputConfig2 = getFixedInputSlotConfigFromManifest(nodeData2?.[this.nodeId] || this._data || {}),
+        imageNodeInputGate = getImageNodeInputGate(this._data?.model),
+        value76 = String(imageNodeInputGate.kind || '').trim(),
+        value77 = Number(imageNodeInputGate.max),
+        isRhPersonReplaceWorkflowModel2 = isRhPersonReplaceWorkflowModel(this._data?.model),
+        rhQwenEditMode = isRhQwenImageEditModel(this._data?.model),
+        modelManifest2 = getModelManifest(this._data?.model)?.inputSlots,
+        value78 = Math.max(0, Number(modelManifest2?.maxByKind?.image) || 0),
+        value79 = value78 || 3,
+        imageInputGateUploadedUrl = getImageInputGateUploadedUrl(this._data, imageNodeInputGate),
+        imageRefs2 = { text: [], image: [], video: [], audio: [] },
+        value80 = { text: 0, image: 0, video: 0, audio: 0 },
+        map3 = new Map();
+      for (const sourceId of list7) {
+        const response9 = nodeData2[sourceId.sourceId];
+        if (!response9) continue;
+        const effectiveInputKind2 = resolveEffectiveInputKind(response9, sourceId);
+        if (!effectiveInputKind2) continue;
+        if (!isInputKindAllowed(targetInputPolicy, effectiveInputKind2)) continue;
+        if (value76 && effectiveInputKind2 !== value76) continue;
+        if (value76 && Number.isFinite(value77) && value80[value76] >= value77) continue;
+        if (isRhPersonReplaceWorkflowModel2 && effectiveInputKind2 !== 'image') continue;
+        if (isRhPersonReplaceWorkflowModel2 && value80.image >= 2) continue;
+        if (rhQwenEditMode && effectiveInputKind2 !== 'image') continue;
+        if (rhQwenEditMode && value80.image >= value79) continue;
+        let content = '',
+          url = '';
+        if (effectiveInputKind2 === 'text') {
+          content = (
+            response9.outputText ||
+            response9.text ||
+            response9.content ||
+            response9.prompt ||
+            response9.label ||
             ''
           ).trim();
-          if (!_0x16f625) continue;
+          if (!content) continue;
         } else {
-          _0x107fa5 === 'image' && (_0x493102 = resolveGenerationInputImageUrl(_0xd62e2));
-          if (!_0x493102 && _0xd62e2.sourceId) {
-            const _0x5dee0e = await _0xeea044(_0xd62e2.sourceId);
-            if (_0x5dee0e) _0x493102 = URL.createObjectURL(_0x5dee0e);
+          effectiveInputKind2 === 'image' && (url = resolveGenerationInputImageUrl(response9));
+          if (!url && response9.sourceId) {
+            const value81 = await getImage(response9.sourceId);
+            if (value81) url = URL.createObjectURL(value81);
           }
-          if (!_0x493102) _0x493102 = _0xd62e2.src || _0xd62e2.imageUrl || _0xd62e2.thumbUrl || '';
-          if (!_0x493102) continue;
+          if (!url) url = response9.src || response9.imageUrl || response9.thumbUrl || '';
+          if (!url) continue;
         }
-        _0x1db25a[_0x107fa5]++;
-        const _0x2296fb = buildReferenceLabelAliases(_0x107fa5, _0x1db25a[_0x107fa5]),
-          _0x3a7712 = _0x2296fb[0],
-          _0x58683e = _0x107fa5 === 'image' ? String(_0xd62e2.mask || '') : '',
-          _0x523571 = _0x58683e.trim(),
-          _0x3d5254 =
-            _0x107fa5 === 'image' && _0x523571
-              ? _0x523571.startsWith('/')
-                ? _0x523571
-                : '/' + _0x523571.replace(/^\//, '')
+        value80[effectiveInputKind2]++;
+        const labels = buildReferenceLabelAliases(effectiveInputKind2, value80[effectiveInputKind2]),
+          label2 = labels[0],
+          value82 = effectiveInputKind2 === 'image' ? String(response9.mask || '') : '',
+          value83 = value82.trim(),
+          maskUrl =
+            effectiveInputKind2 === 'image' && value83
+              ? value83.startsWith('/')
+                ? value83
+                : '/' + value83.replace(/^\//, '')
               : '';
-        if (_0x107fa5 === 'image' && _0x3d5254) _0x2d3a26.set(_0x493102, _0x3d5254);
-        _0x182597[_0x107fa5].push({
-          label: _0x3a7712,
-          labels: _0x2296fb,
-          content: _0x16f625,
-          url: _0x493102,
-          maskUrl: _0x3d5254,
+        if (effectiveInputKind2 === 'image' && maskUrl) map3.set(url, maskUrl);
+        imageRefs2[effectiveInputKind2].push({
+          label: label2,
+          labels: labels,
+          content: content,
+          url: url,
+          maskUrl: maskUrl,
           used: false,
-          sourceId: _0x59c89e.sourceId,
-          refSlot: _0x59c89e.refSlot || '',
+          sourceId: sourceId.sourceId,
+          refSlot: sourceId.refSlot || '',
         });
       }
-      const _0x145a86 = [..._0x182597.text, ..._0x182597.image, ..._0x182597.video, ..._0x182597.audio],
-        _0x5ef042 = {};
-      _0x145a86.forEach((_0x32dbd0) => {
-        (_0x32dbd0.labels || [_0x32dbd0.label]).forEach((_0x547bb5) => {
-          _0x5ef042[_0x547bb5.replace(/\s+/g, '')] = _0x32dbd0;
+      const list8 = [...imageRefs2.text, ...imageRefs2.image, ...imageRefs2.video, ...imageRefs2.audio],
+        value84 = {};
+      list8.forEach((item9) => {
+        (item9.labels || [item9.label]).forEach((item10) => {
+          value84[item10.replace(/\s+/g, '')] = item9;
         });
       });
-      const _0x181389 = {};
-      _0x145a86.forEach((_0x2260c5) => {
-        if (_0x2260c5.sourceId) _0x181389[_0x2260c5.sourceId] = _0x2260c5;
+      const value85 = {};
+      list8.forEach((item11) => {
+        if (item11.sourceId) value85[item11.sourceId] = item11;
       });
-      let _0x944f57 = [];
-      const _0x50eae9 = [],
-        _0x2c426e = { image: 0, video: 0, audio: 0 },
-        _0x304c6b = _0x373fbd?.[this.nodeId] || this._data || {},
-        _0x50022f = getPromptAssetInputRefsFromNode(_0x304c6b, { allowedTypes: ['image'] }),
-        _0x295f13 = () =>
-          (_0x182597.image || []).some((_0x21a452) => !!_0x21a452.url) ||
-          _0x944f57.some(Boolean) ||
-          _0x50eae9.some((_0x588fc5) => _0x588fc5.type === 'image' && _0x588fc5.url) ||
-          _0x50022f.some((_0x10e1df) => {
-            const _0x55eff9 = resolveEffectiveInputKind(_0x10e1df) || _0x10e1df.type;
-            return _0x55eff9 === 'image' && !!_0x10e1df.url;
+      let hasInputImages2 = [];
+      const inputRefs = [],
+        mediaCounts = { image: 0, video: 0, audio: 0 },
+        value86 = nodeData2?.[this.nodeId] || this._data || {},
+        list9 = getPromptAssetInputRefsFromNode(value86, { allowedTypes: ['image'] }),
+        hasImageInput = () =>
+          (imageRefs2.image || []).some((response10) => !!response10.url) ||
+          hasInputImages2.some(Boolean) ||
+          inputRefs.some((response11) => response11.type === 'image' && response11.url) ||
+          list9.some((response12) => {
+            const effectiveInputKind3 = resolveEffectiveInputKind(response12) || response12.type;
+            return effectiveInputKind3 === 'image' && !!response12.url;
           }),
-        _0x113fc3 = (_0xa26ad5) => {
-          let _0x467f95 = '';
-          const _0x2e4ddf = (_0x24089c) => {
-            for (const _0x1f117b of _0x24089c.childNodes) {
-              if (_0x1f117b.nodeType === Node.TEXT_NODE) _0x467f95 += _0x1f117b.textContent;
+        handler4 = (value87) => {
+          let value88 = '';
+          const run = (value89) => {
+            for (const domNode of value89.childNodes) {
+              if (domNode.nodeType === Node.TEXT_NODE) value88 += domNode.textContent;
               else {
-                if (_0x1f117b.nodeType === Node.ELEMENT_NODE) {
-                  if (_0x1f117b.classList.contains('ref-pill')) {
-                    const _0x5970ec = _0x1f117b.dataset.nodeId || '',
-                      _0x106c52 = _0x1f117b.dataset.label || _0x1f117b.textContent.trim(),
-                      _0xab035 = [];
+                if (domNode.nodeType === Node.ELEMENT_NODE) {
+                  if (domNode.classList.contains('ref-pill')) {
+                    const value90 = domNode.dataset.nodeId || '',
+                      rawLabel = domNode.dataset.label || domNode.textContent.trim(),
+                      promptParts = [];
                     if (
                       appendAssetMentionToPrompt({
-                        domNode: _0x1f117b,
-                        rawLabel: _0x106c52,
-                        promptParts: _0xab035,
-                        inputRefs: _0x50eae9,
-                        mediaCounts: _0x2c426e,
+                        domNode: domNode,
+                        rawLabel: rawLabel,
+                        promptParts: promptParts,
+                        inputRefs: inputRefs,
+                        mediaCounts: mediaCounts,
                         allowedTypes: ['text', 'image'],
                       })
                     ) {
-                      ((_0x467f95 += _0xab035.join('')),
-                        _0x50eae9.forEach((_0x4746e3) => {
-                          _0x4746e3.type === 'image' &&
-                            _0x4746e3.url &&
-                            !_0x944f57.includes(_0x4746e3.url) &&
-                            _0x944f57.push(_0x4746e3.url);
+                      ((value88 += promptParts.join('')),
+                        inputRefs.forEach((response13) => {
+                          response13.type === 'image' &&
+                            response13.url &&
+                            !hasInputImages2.includes(response13.url) &&
+                            hasInputImages2.push(response13.url);
                         }));
                       continue;
                     }
-                    const _0x4ac093 = _0x106c52.replace(/\s+/g, ''),
-                      _0x11bbf9 = (_0x5970ec && _0x181389[_0x5970ec]) || _0x5ef042[_0x4ac093];
-                    if (_0x11bbf9) {
-                      _0x11bbf9.used = true;
-                      if (_0x11bbf9.content) _0x467f95 += ' ' + _0x11bbf9.content + ' ';
+                    const value91 = rawLabel.replace(/\s+/g, ''),
+                      response14 = (value90 && value85[value90]) || value84[value91];
+                    if (response14) {
+                      response14.used = true;
+                      if (response14.content) value88 += ' ' + response14.content + ' ';
                       else {
-                        if (_0x11bbf9.url) {
-                          _0x467f95 += ' ' + _0x106c52 + ' ';
-                          if (!_0x8313a7 && !_0x944f57.includes(_0x11bbf9.url)) _0x944f57.push(_0x11bbf9.url);
+                        if (response14.url) {
+                          value88 += ' ' + rawLabel + ' ';
+                          if (!isRhPersonReplaceWorkflowModel2 && !hasInputImages2.includes(response14.url))
+                            hasInputImages2.push(response14.url);
                         }
                       }
-                    } else _0x467f95 += ' ' + _0x106c52 + ' ';
-                  } else _0x1f117b.tagName === 'BR' ? (_0x467f95 += '\n') : _0x2e4ddf(_0x1f117b);
+                    } else value88 += ' ' + rawLabel + ' ';
+                  } else domNode.tagName === 'BR' ? (value88 += '\n') : run(domNode);
                 }
               }
             }
           };
-          _0x2e4ddf(_0xa26ad5);
-          let _0x459362 = _0x467f95.replace(/[\s\u00A0\u200B-\u200D\uFEFF]+/g, ' ').trim();
-          if (_0x2e526d) {
-            let _0x519e79 = _0x459362;
-            if (requiresPromptPresetInput(_0x2e526d)) {
-              const _0x41dd9a = [];
-              (_0x182597.text.forEach((_0x1a26f0) => {
-                const _0x3b9adc = (_0x1a26f0.labels || [_0x1a26f0.label]).map(
-                  (_0x5cb2b5) =>
+          run(value87);
+          let promptPresetTemplate = value88.replace(/[\s\u00A0\u200B-\u200D\uFEFF]+/g, ' ').trim();
+          if (value74) {
+            let value92 = promptPresetTemplate;
+            if (requiresPromptPresetInput(value74)) {
+              const list10 = [];
+              (imageRefs2.text.forEach((enabled18) => {
+                const list11 = (enabled18.labels || [enabled18.label]).map(
+                  (item12) =>
                     new RegExp(
-                      _0x5cb2b5.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '[\\s\\u00A0]*'),
+                      item12.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '[\\s\\u00A0]*'),
                       'g',
                     ),
                 );
-                !_0x1a26f0.used &&
-                  _0x1a26f0.content &&
-                  !_0x3b9adc.some((_0x370c3d) => _0x370c3d.test(_0x459362)) &&
-                  (_0x41dd9a.push(_0x1a26f0.content), (_0x1a26f0.used = true));
+                !enabled18.used &&
+                  enabled18.content &&
+                  !list11.some((item13) => item13.test(promptPresetTemplate)) &&
+                  (list10.push(enabled18.content), (enabled18.used = true));
               }),
-                (_0x519e79 = [..._0x41dd9a, _0x459362].filter(Boolean).join('\n').trim()));
+                (value92 = [...list10, promptPresetTemplate].filter(Boolean).join('\n').trim()));
             }
-            _0x459362 = resolvePromptPresetTemplate(_0x2e526d, _0x519e79, { hasImageInput: _0x295f13 });
-          } else _0x459362 = _0x459362 || '';
-          return _0x459362;
+            promptPresetTemplate = resolvePromptPresetTemplate(value74, value92, {
+              hasImageInput: hasImageInput,
+            });
+          } else promptPresetTemplate = promptPresetTemplate || '';
+          return promptPresetTemplate;
         };
-      let _0x2356c = _0x113fc3(this.promptEl);
-      const _0x461570 = _0x145a86
-        .flatMap((_0x1df5b2) =>
-          (_0x1df5b2.labels || [_0x1df5b2.label]).map((_0x464fc7) => ({ ref: _0x1df5b2, label: _0x464fc7 })),
-        )
-        .sort((_0xee402b, _0x25ed38) => _0x25ed38.label.length - _0xee402b.label.length);
-      _0x461570.forEach(({ ref: _0x3ed704, label: _0x26c79b }) => {
-        if (!_0x3ed704.used) {
-          const _0x3c8c24 = new RegExp(
-            _0x26c79b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '[\\s\\u00A0]*'),
+      let prompt = handler4(this.promptEl);
+      const list12 = list8
+        .flatMap((ref) => (ref.labels || [ref.label]).map((label3) => ({ ref: ref, label: label3 })))
+        .sort((item14, value93) => value93.label.length - item14.label.length);
+      list12.forEach(({ ref: ref2, label: label4 }) => {
+        if (!ref2.used) {
+          const regExp = new RegExp(
+            label4.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '[\\s\\u00A0]*'),
             'g',
           );
-          if (_0x3c8c24.test(_0x2356c)) {
-            _0x3ed704.used = true;
-            if (_0x3ed704.content) _0x2356c = _0x2356c.replace(_0x3c8c24, ' ' + _0x3ed704.content + ' ');
+          if (regExp.test(prompt)) {
+            ref2.used = true;
+            if (ref2.content) prompt = prompt.replace(regExp, ' ' + ref2.content + ' ');
             else {
-              if (_0x3ed704.url) {
-                _0x2356c = _0x2356c.replace(_0x3c8c24, ' ' + _0x26c79b.trim() + ' ');
-                if (!_0x8313a7 && !_0x944f57.includes(_0x3ed704.url)) _0x944f57.push(_0x3ed704.url);
+              if (ref2.url) {
+                prompt = prompt.replace(regExp, ' ' + label4.trim() + ' ');
+                if (!isRhPersonReplaceWorkflowModel2 && !hasInputImages2.includes(ref2.url))
+                  hasInputImages2.push(ref2.url);
               }
             }
           }
         }
       });
-      let _0x3326e9 = '';
-      _0x182597.text.forEach((_0x34adac) => {
-        !_0x34adac.used &&
-          _0x34adac.content &&
-          ((_0x3326e9 += _0x34adac.content + '\n'), (_0x34adac.used = true));
+      let value94 = '';
+      imageRefs2.text.forEach((enabled19) => {
+        !enabled19.used &&
+          enabled19.content &&
+          ((value94 += enabled19.content + '\n'), (enabled19.used = true));
       });
-      _0x3326e9 && (_0x2356c = _0x3326e9 + _0x2356c);
-      !_0x8313a7 &&
-        _0x145a86.forEach((_0x537a21) => {
-          !_0x537a21.used &&
-            _0x537a21.url &&
-            !_0x944f57.includes(_0x537a21.url) &&
-            _0x944f57.push(_0x537a21.url);
+      value94 && (prompt = value94 + prompt);
+      !isRhPersonReplaceWorkflowModel2 &&
+        list8.forEach((response15) => {
+          !response15.used &&
+            response15.url &&
+            !hasInputImages2.includes(response15.url) &&
+            hasInputImages2.push(response15.url);
         });
-      requiresPromptPresetInput(_0x2e526d) &&
-        _0x50022f.forEach((_0x3fe89a) => {
-          const _0x8df373 = resolveEffectiveInputKind(_0x3fe89a) || _0x3fe89a.type;
-          _0x8df373 === 'image' &&
-            _0x3fe89a.url &&
-            !_0x944f57.includes(_0x3fe89a.url) &&
-            _0x944f57.push(_0x3fe89a.url);
+      requiresPromptPresetInput(value74) &&
+        list9.forEach((response16) => {
+          const effectiveInputKind4 = resolveEffectiveInputKind(response16) || response16.type;
+          effectiveInputKind4 === 'image' &&
+            response16.url &&
+            !hasInputImages2.includes(response16.url) &&
+            hasInputImages2.push(response16.url);
         });
-      _0x944f57 = reorderImageInputUrlsByRefOrder(_0x944f57, _0x182597.image);
-      if (_0x19bdf9 === 'image') {
-        if (_0x47eda0) _0x944f57 = [_0x47eda0];
-        else Number.isFinite(_0x5c5c05) && (_0x944f57 = _0x944f57.slice(0, _0x5c5c05));
+      hasInputImages2 = reorderImageInputUrlsByRefOrder(hasInputImages2, imageRefs2.image);
+      if (value76 === 'image') {
+        if (imageInputGateUploadedUrl) hasInputImages2 = [imageInputGateUploadedUrl];
+        else Number.isFinite(value77) && (hasInputImages2 = hasInputImages2.slice(0, value77));
       }
-      if (_0x8313a7) {
-        const _0x4cf215 = ['replaceTarget', 'replacedImage'],
-          _0x192d9f = _0x182597.image || [],
-          _0x20aa74 = (_0x14269a) =>
-            String(_0x192d9f.find((_0x2c7ecd) => String(_0x2c7ecd.refSlot || '') === _0x14269a)?.url || ''),
-          _0x165ea6 = String(_0x192d9f[0]?.url || ''),
-          _0x4664f2 = String(
-            _0x192d9f.find((_0x375ef4) => String(_0x375ef4.url || '') !== _0x165ea6)?.url || '',
-          ),
-          _0x3c3a52 = _0x20aa74(_0x4cf215[0]) || _0x165ea6,
-          _0xc3f772 = _0x20aa74(_0x4cf215[1]) || _0x4664f2;
-        _0x944f57 = [_0x3c3a52, _0xc3f772].filter(Boolean);
+      if (isRhPersonReplaceWorkflowModel2) {
+        const value95 = ['replaceTarget', 'replacedImage'],
+          list13 = imageRefs2.image || [],
+          handler5 = (value96) =>
+            String(list13.find((item15) => String(item15.refSlot || '') === value96)?.url || ''),
+          value97 = String(list13[0]?.url || ''),
+          value98 = String(list13.find((response17) => String(response17.url || '') !== value97)?.url || ''),
+          value99 = handler5(value95[0]) || value97,
+          value100 = handler5(value95[1]) || value98;
+        hasInputImages2 = [value99, value100].filter(Boolean);
       }
-      _0x14423c && (_0x944f57 = _0x944f57.filter(Boolean).slice(0, _0x3f64a0));
-      const _0x1f8423 = _0x8313a7
+      rhQwenEditMode && (hasInputImages2 = hasInputImages2.filter(Boolean).slice(0, value79));
+      const inputUrlsBySlot = isRhPersonReplaceWorkflowModel2
           ? {}
           : buildInputUrlsByFixedImageSlot({
-              fixedInputConfig: _0x180729,
-              imageRefs: _0x182597.image,
-              assetInputRefs: _0x50eae9,
+              fixedInputConfig: fixedInputConfig2,
+              imageRefs: imageRefs2.image,
+              assetInputRefs: inputRefs,
             }),
-        _0x118d5b =
+        value101 =
           this._data.generationParams &&
           typeof this._data.generationParams === 'object' &&
           !Array.isArray(this._data.generationParams)
             ? this._data.generationParams
             : {},
-        _0x212f06 = normalizeDreaminaImageModel(this._data.model, this._data.provider) || this._data.model,
-        _0xd3231d = getModelManifest(_0x212f06);
-      if (!_0xd3231d) throw new Error('Missing model manifest: ' + this._data.model);
-      const _0x56622f = sanitizeTaskGenerationParams(_0x212f06, _0x118d5b),
-        _0x177fb9 = _0xd3231d.adapterType === 'modelApi',
-        _0xfca2aa = Array.isArray(_0xd3231d?.uiSchema?.fields) ? _0xd3231d.uiSchema.fields : [],
+        model7 = normalizeDreaminaImageModel(this._data.model, this._data.provider) || this._data.model,
+        modelManifest3 = getModelManifest(model7);
+      if (!modelManifest3) throw new Error('Missing model manifest: ' + this._data.model);
+      const generationParams3 = sanitizeTaskGenerationParams(model7, value101),
+        isModelApiManifest2 = modelManifest3.adapterType === 'modelApi',
+        manifestFields4 = Array.isArray(modelManifest3?.uiSchema?.fields)
+          ? modelManifest3.uiSchema.fields
+          : [],
         {
-          getManifestField: _0x1565e1,
-          readSchemaParam: _0x1ad9dd,
-          requireSchemaParam: _0x515506,
+          getManifestField: getManifestField3,
+          readSchemaParam: readSchemaParam4,
+          requireSchemaParam: requireSchemaParam3,
         } = createSchemaParamAccess({
-          model: _0x212f06,
+          model: model7,
           data: this._data,
-          generationParams: _0x56622f,
-          manifestFields: _0xfca2aa,
+          generationParams: generationParams3,
+          manifestFields: manifestFields4,
         }),
-        _0x117661 = _0x1565e1('imageSize') ? _0x515506('imageSize') : undefined,
-        _0x20587d = _0x1565e1('aspectRatio') ? _0x515506('aspectRatio') : '自适应',
-        _0x3c1c71 = _0x1565e1('batchSize') ? _0x515506('batchSize') : 1,
-        _0x21cd1c =
-          _0x177fb9 && _0x1565e1('google_image_search')
-            ? normalizeTaskBooleanParam(_0x1ad9dd('google_image_search'))
+        imageSize5 = getManifestField3('imageSize') ? requireSchemaParam3('imageSize') : undefined,
+        value102 = getManifestField3('aspectRatio') ? requireSchemaParam3('aspectRatio') : '自适应',
+        value103 = getManifestField3('batchSize') ? requireSchemaParam3('batchSize') : 1,
+        google_image_search =
+          isModelApiManifest2 && getManifestField3('google_image_search')
+            ? normalizeTaskBooleanParam(readSchemaParam4('google_image_search'))
             : undefined,
-        _0x12bbd4 =
-          _0x177fb9 && _0x1565e1('google_search')
-            ? normalizeTaskBooleanParam(_0x1ad9dd('google_search')) || _0x21cd1c === true
+        google_search =
+          isModelApiManifest2 && getManifestField3('google_search')
+            ? normalizeTaskBooleanParam(readSchemaParam4('google_search')) || google_image_search === true
             : undefined,
-        _0x274423 = buildModelApiSchemaPayloadParams({
-          isModelApiManifest: _0x177fb9,
-          manifestFields: _0xfca2aa,
-          readSchemaParam: _0x1ad9dd,
+        args4 = buildModelApiSchemaPayloadParams({
+          isModelApiManifest: isModelApiManifest2,
+          manifestFields: manifestFields4,
+          readSchemaParam: readSchemaParam4,
         });
-      let _0x85b36 = _0x212f06 || 'nano-banana-2';
-      const _0x221699 = _0x177fb9 ? _0x1ad9dd('mode') : undefined,
-        _0xc01929 = _0x1ad9dd('rhModelRoute'),
-        _0x2bc70a = resolveNanoBananaSelectionFromModel(_0x85b36, _0x117661 || '2K', this._data.provider);
-      if (_0x2bc70a) {
-        if (!_0x177fb9 && _0x221699 !== undefined)
-          _0x85b36 = resolveNanoBananaModelBySelection({
-            family: _0x2bc70a.family,
-            mode: _0x221699,
-            imageSize: _0x117661 || '2K',
-            provider: _0x2bc70a.provider || this._data.provider,
+      let model8 = model7 || 'nano-banana-2';
+      const mode2 = isModelApiManifest2 ? readSchemaParam4('mode') : undefined,
+        rhModelRoute = readSchemaParam4('rhModelRoute'),
+        family2 = resolveNanoBananaSelectionFromModel(model8, imageSize5 || '2K', this._data.provider);
+      if (family2) {
+        if (!isModelApiManifest2 && mode2 !== undefined)
+          model8 = resolveNanoBananaModelBySelection({
+            family: family2.family,
+            mode: mode2,
+            imageSize: imageSize5 || '2K',
+            provider: family2.provider || this._data.provider,
           });
-        else !_0x177fb9 && (_0x85b36 = _0x2bc70a.model);
+        else !isModelApiManifest2 && (model8 = family2.model);
       }
-      isDreaminaImageModel(_0x85b36, this._data.provider) &&
-        (_0x85b36 =
-          normalizeDreaminaImageModel(_0x85b36, this._data.provider) || getDefaultDreaminaImageModelId());
-      const _0x580db1 = this._inferProviderFromModel(_0x85b36, this._data.provider),
-        _0x42c122 = resolveImageSizeForProviderModel({
-          provider: _0x580db1,
-          model: _0x85b36,
-          imageSize: _0x117661,
+      isDreaminaImageModel(model8, this._data.provider) &&
+        (model8 =
+          normalizeDreaminaImageModel(model8, this._data.provider) || getDefaultDreaminaImageModelId());
+      const provider8 = this._inferProviderFromModel(model8, this._data.provider),
+        imageSize6 = resolveImageSizeForProviderModel({
+          provider: provider8,
+          model: model8,
+          imageSize: imageSize5,
         });
-      !getModelManifest(_0x85b36) &&
-        (_0x85b36 = resolveGrsaiGptImage2ModelForSize({
-          provider: _0x580db1,
-          model: _0x85b36,
-          imageSize: _0x42c122,
+      !getModelManifest(model8) &&
+        (model8 = resolveGrsaiGptImage2ModelForSize({
+          provider: provider8,
+          model: model8,
+          imageSize: imageSize6,
         }));
-      const _0x31a9c6 = isRunningHubWorkflowNode({ ...this._data, model: _0x85b36, provider: _0x580db1 });
-      if (_0x31a9c6) {
-        const _0x58c08c = _0x373fbd?.[this.nodeId] || this._data || {};
-        getPromptAssetInputRefsFromNode(_0x58c08c, { allowedTypes: ['image'] }).forEach((_0x2c3f61) => {
-          if (resolveEffectiveInputKind(_0x2c3f61) !== 'image') return;
-          if (_0x2c3f61.url && !_0x944f57.includes(_0x2c3f61.url)) _0x944f57.push(_0x2c3f61.url);
+      const isRunningHubWorkflowNode2 = isRunningHubWorkflowNode({
+        ...this._data,
+        model: model8,
+        provider: provider8,
+      });
+      if (isRunningHubWorkflowNode2) {
+        const value104 = nodeData2?.[this.nodeId] || this._data || {};
+        getPromptAssetInputRefsFromNode(value104, { allowedTypes: ['image'] }).forEach((response18) => {
+          if (resolveEffectiveInputKind(response18) !== 'image') return;
+          if (response18.url && !hasInputImages2.includes(response18.url))
+            hasInputImages2.push(response18.url);
         });
       }
-      if (_0x580db1 === 'dreamina') {
-        const _0x5409b3 = [],
-          _0x25c622 = (_0x22d520) => {
-            const _0xd87e01 = String(_0x22d520 || '').trim();
-            if (!_0xd87e01 || _0xd87e01.startsWith('blob:')) return;
-            if (!_0x5409b3.includes(_0xd87e01)) _0x5409b3.push(_0xd87e01);
+      if (provider8 === 'dreamina') {
+        const list14 = [],
+          handler6 = (value105) => {
+            const enabled20 = String(value105 || '').trim();
+            if (!enabled20 || enabled20.startsWith('blob:')) return;
+            if (!list14.includes(enabled20)) list14.push(enabled20);
           };
-        ((_0x182597.image || []).forEach((_0x1cc804) => {
-          const _0x297d5e = _0x373fbd?.[_0x1cc804?.sourceId] || null,
-            _0x5a2168 = _0x297d5e ? resolveGenerationInputImageUrl(_0x297d5e) : '';
-          (_0x25c622(_0x5a2168), _0x25c622(_0x1cc804?.url));
+        ((imageRefs2.image || []).forEach((response19) => {
+          const value106 = nodeData2?.[response19?.sourceId] || null,
+            value107 = value106 ? resolveGenerationInputImageUrl(value106) : '';
+          (handler6(value107), handler6(response19?.url));
         }),
-          (_0x944f57 = _0x5409b3.slice(0, 1)));
+          (hasInputImages2 = list14.slice(0, 1)));
       }
-      const _0x48441f = _0x944f57.map((_0x22a082) => String(_0x2d3a26.get(_0x22a082) || ''));
-      if (_0x19bdf9 === 'image' && _0x944f57.length === 0)
+      const inputMaskUrls = hasInputImages2.map((item16) => String(map3.get(item16) || ''));
+      if (value76 === 'image' && hasInputImages2.length === 0)
         return (
           window.showToast?.(
-            getImageInputGateMissingMessage(_0x4de6a6) || t('aigenImage.task.referenceImageRequired'),
+            getImageInputGateMissingMessage(imageNodeInputGate) ||
+              t('aigenImage.task.referenceImageRequired'),
             'warn',
           ),
           null
         );
-      if (_0x8313a7 && _0x944f57.length < 2)
+      if (isRhPersonReplaceWorkflowModel2 && hasInputImages2.length < 2)
         return (window.showToast?.(t('aigenImage.task.replacePairRequired'), 'warn'), null);
-      if (_0x14423c && _0x944f57.length < 1)
+      if (rhQwenEditMode && hasInputImages2.length < 1)
         return (window.showToast?.(t('aigenImage.task.referenceImageRequired'), 'warn'), null);
-      const _0x1b7c77 = getPromptPresetTemplateEmptyInputMessage(_0x2e526d);
-      if (_0x1b7c77 && !_0x2356c && _0x944f57.length === 0)
-        return (window.showToast?.(_0x1b7c77, 'warn'), null);
-      if (!_0x31a9c6 && !_0x2356c && _0x944f57.length === 0)
+      const promptPresetTemplateEmptyInputMessage = getPromptPresetTemplateEmptyInputMessage(value74);
+      if (promptPresetTemplateEmptyInputMessage && !prompt && hasInputImages2.length === 0)
+        return (window.showToast?.(promptPresetTemplateEmptyInputMessage, 'warn'), null);
+      if (!isRunningHubWorkflowNode2 && !prompt && hasInputImages2.length === 0)
         return (
           console.warn('[AIGenerateNode] prompt 为空，跳过生成'),
           window.showToast?.(t('aigenImage.task.promptOrReferenceRequired'), 'warn'),
           null
         );
-      await _0x14e2fd();
-      const _0x1d8cd4 = _0x28ad2b(_0x580db1);
-      let _0x48aac7 = '';
-      if (_0x580db1 === 'runninghub')
-        _0x48aac7 = isModelApiModel(_0x85b36, _0x580db1)
-          ? _0x1d8cd4.modelApiKey || ''
-          : _0x1d8cd4.apiKey || '';
+      await ensureConfig();
+      const value108 = getProviderConfig(provider8);
+      let apiKey2 = '';
+      if (provider8 === 'runninghub')
+        apiKey2 = isModelApiModel(model8, provider8) ? value108.modelApiKey || '' : value108.apiKey || '';
       else
-        _0x580db1 === 'runninghubwf'
-          ? (_0x48aac7 = _0x1d8cd4.apiKey || '')
-          : (_0x48aac7 = _0x1d8cd4.apiKey || window._appApiKey || '');
-      let _0x11b4de = String(window.__aicInstallId || '').trim();
+        provider8 === 'runninghubwf'
+          ? (apiKey2 = value108.apiKey || '')
+          : (apiKey2 = value108.apiKey || window._appApiKey || '');
+      let installId = String(window.__aicInstallId || '').trim();
       if (typeof window.ensureSubscriptionInstallId === 'function')
         try {
-          _0x11b4de = String(await window.ensureSubscriptionInstallId()).trim();
+          installId = String(await window.ensureSubscriptionInstallId()).trim();
         } catch {}
-      const _0x29e984 = String(_0x20587d || '自适应').trim(),
-        _0x3e20d2 = isAdaptiveRatioLabel(_0x29e984),
-        _0x6e4f7 = _0x52c3bb.filter((_0x17650b) => {
-          const _0x5b375b = String(_0x17650b?.refSlot || '').toLowerCase();
-          if (_0x5b375b.includes('mask')) return false;
-          const _0x1f6237 = _0x373fbd?.[_0x17650b?.sourceId];
-          return resolveEffectiveInputKind(_0x1f6237, _0x17650b) === 'image';
+      const value109 = String(value102 || '自适应').trim(),
+        isAdaptiveRatioLabel2 = isAdaptiveRatioLabel(value109),
+        value110 = list7.filter((item17) => {
+          const list15 = String(item17?.refSlot || '').toLowerCase();
+          if (list15.includes('mask')) return false;
+          const value111 = nodeData2?.[item17?.sourceId];
+          return resolveEffectiveInputKind(value111, item17) === 'image';
         }),
-        _0x3f61c9 = pickGenerationRatioSourceEdge(_0x6e4f7, _0x373fbd?.[this.nodeId] || this._data || {});
-      let _0x5dd3d1 = 0,
-        _0x35a3c7 = 0;
-      if (_0x3f61c9?.sourceId) {
-        const _0xe636dc = _0x3f61c9.sourceId,
-          _0x1fe8b7 = getGenerationRatioSizeWithDom({
-            nodeId: _0xe636dc,
-            nodeData: _0x373fbd[_0xe636dc],
-            edge: _0x3f61c9,
+        edge = pickGenerationRatioSourceEdge(value110, nodeData2?.[this.nodeId] || this._data || {});
+      let inputWidth = 0,
+        inputHeight = 0;
+      if (edge?.sourceId) {
+        const nodeId = edge.sourceId,
+          box = getGenerationRatioSizeWithDom({
+            nodeId: nodeId,
+            nodeData: nodeData2[nodeId],
+            edge: edge,
             includeNodeFrame: true,
           });
-        _0x1fe8b7 && ((_0x5dd3d1 = _0x1fe8b7.width), (_0x35a3c7 = _0x1fe8b7.height));
+        box && ((inputWidth = box.width), (inputHeight = box.height));
       }
-      const _0x1b2650 = _0x373fbd?.[this.nodeId] || {},
-        _0x3e0ea9 = resolveAdaptiveSourceSize({
-          displayWidth: Number(_0x1b2650?.width || this._data?.width || 0),
-          displayHeight: Number(_0x1b2650?.height || this._data?.height || 0),
-          inputWidth: _0x5dd3d1,
-          inputHeight: _0x35a3c7,
+      const box2 = nodeData2?.[this.nodeId] || {},
+        adaptiveSourceSize = resolveAdaptiveSourceSize({
+          displayWidth: Number(box2?.width || this._data?.width || 0),
+          displayHeight: Number(box2?.height || this._data?.height || 0),
+          inputWidth: inputWidth,
+          inputHeight: inputHeight,
         }),
-        _0xd32f2f =
-          _0x3e20d2 && _0x5dd3d1 > 0 && _0x35a3c7 > 0
-            ? { width: _0x5dd3d1, height: _0x35a3c7, source: 'input-media' }
-            : _0x3e0ea9,
-        _0x2102f3 = _0x580db1 === 'dreamina' ? normalizeDreaminaImageAspectRatio(_0x29e984) : _0x29e984,
-        _0x344719 = parseRatioLabel(_0x2102f3)?.label || '',
-        _0x1c38c7 = _0x42c122,
-        _0x3ccc53 =
-          _0x3e20d2 &&
-          (shouldUseGrsaiNanoBananaApiAuto({ provider: _0x580db1, model: _0x85b36 }) ||
+        width =
+          isAdaptiveRatioLabel2 && inputWidth > 0 && inputHeight > 0
+            ? { width: inputWidth, height: inputHeight, source: 'input-media' }
+            : adaptiveSourceSize,
+        value112 = provider8 === 'dreamina' ? normalizeDreaminaImageAspectRatio(value109) : value109,
+        ratioLabel = parseRatioLabel(value112)?.label || '',
+        imageSize7 = imageSize6,
+        value113 =
+          isAdaptiveRatioLabel2 &&
+          (shouldUseGrsaiNanoBananaApiAuto({ provider: provider8, model: model8 }) ||
             shouldUseApimartSeedreamApiAuto({
-              provider: _0x580db1,
-              model: _0x85b36,
-              hasInputImages: _0x944f57.length > 0,
+              provider: provider8,
+              model: model8,
+              hasInputImages: hasInputImages2.length > 0,
             })),
-        _0x4a86fb = _0x3e20d2
-          ? _0x3ccc53
+        ratioLabel2 = isAdaptiveRatioLabel2
+          ? value113
             ? 'auto'
             : pickClosestRatioForProviderModel({
-                provider: _0x580db1,
-                model: _0x85b36,
-                width: _0xd32f2f.width,
-                height: _0xd32f2f.height,
-                imageSize: _0x1c38c7,
+                provider: provider8,
+                model: model8,
+                width: width.width,
+                height: width.height,
+                imageSize: imageSize7,
               })
           : pickClosestRatioForProviderModel({
-              provider: _0x580db1,
-              model: _0x85b36,
-              ratioLabel: _0x344719 || _0x2102f3 || '1:1',
-              imageSize: _0x1c38c7,
+              provider: provider8,
+              model: model8,
+              ratioLabel: ratioLabel || value112 || '1:1',
+              imageSize: imageSize7,
             }),
-        _0x377398 = _0x3ccc53
+        aspectRatio = value113
           ? { resolvedRatioLabel: 'auto' }
           : resolveProviderRatioPayload({
-              provider: _0x580db1,
-              model: _0x85b36,
-              ratioLabel: _0x4a86fb,
-              imageSize: _0x1c38c7,
+              provider: provider8,
+              model: model8,
+              ratioLabel: ratioLabel2,
+              imageSize: imageSize7,
             }),
-        _0x1332fc = getRatioCapability(_0x580db1, _0x85b36),
-        _0x18b7fe = _0x1332fc === 'none',
-        _0x25f759 =
-          _0x580db1 === 'dreamina'
-            ? normalizeDreaminaImageSize(_0x117661 || '2K')
-            : _0x14423c && String(_0x42c122).toUpperCase() === '4K'
+        ratioCapability = getRatioCapability(provider8, model8),
+        value114 = ratioCapability === 'none',
+        imageSize8 =
+          provider8 === 'dreamina'
+            ? normalizeDreaminaImageSize(imageSize5 || '2K')
+            : rhQwenEditMode && String(imageSize6).toUpperCase() === '4K'
               ? '2K'
-              : _0x42c122,
-        _0x3a8c95 = _0x580db1 === 'dreamina' ? getDreaminaImageModelVersion(_0x85b36, _0x580db1) : '';
+              : imageSize6,
+        modelVersion = provider8 === 'dreamina' ? getDreaminaImageModelVersion(model8, provider8) : '';
       return {
-        prompt: _0x2356c,
-        model: _0x85b36,
-        aspectRatio: _0x377398.resolvedRatioLabel,
-        resolvedRatioLabel: _0x377398.resolvedRatioLabel,
-        adaptiveSource: _0xd32f2f.source,
-        ratioCapability: _0x1332fc,
-        imageSize: _0x25f759,
-        modelVersion: _0x3a8c95,
-        ..._0x274423,
-        ...(_0x221699 !== undefined ? { mode: _0x221699 } : {}),
-        ...(_0xc01929 !== undefined ? { rhModelRoute: _0xc01929 } : {}),
-        ...(_0x12bbd4 !== undefined ? { google_search: _0x12bbd4 } : {}),
-        ...(_0x21cd1c !== undefined ? { google_image_search: _0x21cd1c } : {}),
-        batchSize: parseInt(_0x3c1c71) || 1,
-        inputUrls: _0x944f57,
-        ...(Object.keys(_0x1f8423).length > 0 ? { inputUrlsBySlot: _0x1f8423 } : {}),
-        inputMaskUrls: _0x48441f,
-        apiKey: _0x48aac7,
-        installId: _0x11b4de,
-        rhResolution: _0x1ad9dd('rhResolution') ?? _0x1ad9dd('rhAnimeRealResolution'),
-        rhAnimeRealResolution: _0x1ad9dd('rhAnimeRealResolution'),
-        rhInstanceType: _0x1ad9dd('rhInstanceType'),
-        rhQwenEditMode: _0x14423c ? String(_0x1ad9dd('rhQwenEditMode') || '').trim() : undefined,
-        rhQwenFirstImageMode: _0x14423c ? String(_0x1ad9dd('rhQwenFirstImageMode') || '').trim() : undefined,
-        provider: _0x580db1,
+        prompt: prompt,
+        model: model8,
+        aspectRatio: aspectRatio.resolvedRatioLabel,
+        resolvedRatioLabel: aspectRatio.resolvedRatioLabel,
+        adaptiveSource: width.source,
+        ratioCapability: ratioCapability,
+        imageSize: imageSize8,
+        modelVersion: modelVersion,
+        ...args4,
+        ...(mode2 !== undefined ? { mode: mode2 } : {}),
+        ...(rhModelRoute !== undefined ? { rhModelRoute: rhModelRoute } : {}),
+        ...(google_search !== undefined ? { google_search: google_search } : {}),
+        ...(google_image_search !== undefined ? { google_image_search: google_image_search } : {}),
+        batchSize: parseInt(value103) || 1,
+        inputUrls: hasInputImages2,
+        ...(Object.keys(inputUrlsBySlot).length > 0 ? { inputUrlsBySlot: inputUrlsBySlot } : {}),
+        inputMaskUrls: inputMaskUrls,
+        apiKey: apiKey2,
+        installId: installId,
+        rhResolution: readSchemaParam4('rhResolution') ?? readSchemaParam4('rhAnimeRealResolution'),
+        rhAnimeRealResolution: readSchemaParam4('rhAnimeRealResolution'),
+        rhInstanceType: readSchemaParam4('rhInstanceType'),
+        rhQwenEditMode: rhQwenEditMode ? String(readSchemaParam4('rhQwenEditMode') || '').trim() : undefined,
+        rhQwenFirstImageMode: rhQwenEditMode
+          ? String(readSchemaParam4('rhQwenFirstImageMode') || '').trim()
+          : undefined,
+        provider: provider8,
         cameraAngle: this._data.cameraAngle || null,
-        ratioNotice: _0x377398.notice || '',
-        ...(_0x18b7fe ? { suppressAspectRatio: true } : {}),
+        ratioNotice: aspectRatio.notice || '',
+        ...(value114 ? { suppressAspectRatio: true } : {}),
       };
     }
-    async ['_handleGenerateOrCancel'](_0x48e5c4 = null) {
-      const _0x5a5d13 = _0xff470c.getState().nodes?.[this.nodeId] || this._data || {},
-        _0x13fac7 = this._isRunninghubWorkflowModel(_0x5a5d13?.model, _0x5a5d13?.provider);
+    async ['_handleGenerateOrCancel'](value115 = null) {
+      const value116 = store.getState().nodes?.[this.nodeId] || this._data || {},
+        cancellable2 = this._isRunninghubWorkflowModel(value116?.model, value116?.provider);
       if (
-        shouldAllowCancel(_0x5a5d13, {
-          cancellable: _0x13fac7,
+        shouldAllowCancel(value116, {
+          cancellable: cancellable2,
           cancelInFlight: this._rhCancelInFlight === true,
         })
       ) {
         await this._cancelRunningHubWorkflowTask();
         return;
       }
-      await this._onGenerate(_0x48e5c4);
+      await this._onGenerate(value115);
     }
     ['_buildRunningHubCancelResultPatch']({
       latest: latest = {},
@@ -1847,103 +1852,103 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
       duration: duration = null,
       taskId: taskId = '',
     } = {}) {
-      const _0x3a885a = Number(latest?.rhTaskStartedAt || latest?.generationStartTime || 0),
-        _0x48aff3 =
+      const startedAt18 = Number(latest?.rhTaskStartedAt || latest?.generationStartTime || 0),
+        rhStatusMessage2 =
           String(message || t('aigenImage.task.interrupted')).trim() || t('aigenImage.task.interrupted'),
-        _0x4a4e7d = code === null || code === undefined || code === '' ? null : Number(code);
+        value117 = code === null || code === undefined || code === '' ? null : Number(code);
       return {
-        rhStatusMessage: _0x48aff3,
-        rhStatusCode: Number.isFinite(_0x4a4e7d) ? _0x4a4e7d : null,
+        rhStatusMessage: rhStatusMessage2,
+        rhStatusCode: Number.isFinite(value117) ? value117 : null,
         images: [],
         imageUrl: '',
         thumbUrl: '',
         localPath: '',
-        ...buildGenerationCancelledPatch({ startedAt: _0x3a885a, duration: duration }),
+        ...buildGenerationCancelledPatch({ startedAt: startedAt18, duration: duration }),
         ...this._buildRunningHubTaskPatch({
           taskId: taskId,
           status: 'cancelled',
-          startedAt: _0x3a885a,
+          startedAt: startedAt18,
           recovering: false,
           useOpenapiQuery: latest?.rhTaskUseOpenapiQuery === true,
         }),
       };
     }
     async ['_cancelRunningHubWorkflowTask']() {
-      const _0x37d581 = _0xff470c.getState().nodes?.[this.nodeId] || this._data || {},
-        _0x465dc9 = this._rhApiKey || '',
-        _0xccf866 = String(this._rhTaskId || '').trim() || String(_0x37d581?.rhTaskId || '').trim(),
-        _0x54002a = Date.now(),
-        _0x1b9fc7 = Number(_0x37d581?.generationStartTime),
-        _0x3c77ef =
-          _0x37d581?.generationDuration != null
-            ? _0x37d581.generationDuration
-            : Number.isFinite(_0x1b9fc7) && _0x1b9fc7 > 0
-              ? Math.max(0, _0x54002a - _0x1b9fc7)
+      const latest3 = store.getState().nodes?.[this.nodeId] || this._data || {},
+        apiKey3 = this._rhApiKey || '',
+        taskId5 = String(this._rhTaskId || '').trim() || String(latest3?.rhTaskId || '').trim(),
+        value118 = Date.now(),
+        count2 = Number(latest3?.generationStartTime),
+        duration3 =
+          latest3?.generationDuration != null
+            ? latest3.generationDuration
+            : Number.isFinite(count2) && count2 > 0
+              ? Math.max(0, value118 - count2)
               : 0;
       this._rhCancelRequested = true;
       if (this._rhCancelInFlight) return;
       this._rhAbortController && !this._rhAbortController.signal.aborted && this._rhAbortController.abort();
-      const _0x3ba64c = !_0x465dc9,
-        _0x30957b = !_0xccf866;
+      const enabled21 = !apiKey3,
+        code2 = !taskId5;
       try {
         this._rhCancelInFlight = true;
-        const _0x4ae497 = ({ remoteResult: _0x5149bd, remoteError: _0x199162 }) => {
-          const _0x53e5c2 = Number(_0x5149bd?.code),
-            _0x54ccc8 = String(_0x5149bd?.msg || _0x5149bd?.message || '').trim(),
-            _0x4652d5 = _0x3ba64c
+        const cancelledBuilder = ({ remoteResult: remoteResult, remoteError: remoteError }) => {
+          const count3 = Number(remoteResult?.code),
+            value119 = String(remoteResult?.msg || remoteResult?.message || '').trim(),
+            value120 = enabled21
               ? t('aigenImage.task.cancelMissingApiKey')
-              : _0x30957b
+              : code2
                 ? t('aigenImage.task.interruptedMissingTaskId')
                 : '',
-            _0x51a157 =
-              _0x4652d5 ||
-              (_0x199162
-                ? _0x199162.message || t('aigenImage.task.cancelFailed')
-                : _0x53e5c2 === 0
-                  ? _0x54ccc8 || t('aigenImage.task.cancelSuccess')
-                  : _0x53e5c2 === 0x327
-                    ? _0x54ccc8 || t('aigenImage.task.taskNotFound')
-                    : _0x54ccc8 || t('aigenImage.task.cancelFailed'));
+            message2 =
+              value120 ||
+              (remoteError
+                ? remoteError.message || t('aigenImage.task.cancelFailed')
+                : count3 === 0
+                  ? value119 || t('aigenImage.task.cancelSuccess')
+                  : count3 === 0x327
+                    ? value119 || t('aigenImage.task.taskNotFound')
+                    : value119 || t('aigenImage.task.cancelFailed'));
           return this._buildRunningHubCancelResultPatch({
-            latest: _0x37d581,
-            message: _0x51a157,
-            code: _0x30957b ? 0x32d : _0x53e5c2,
-            duration: _0x3c77ef,
+            latest: latest3,
+            message: message2,
+            code: code2 ? 0x32d : count3,
+            duration: duration3,
           });
         };
         (await cancelTask(this.nodeId, {
-          store: _0xff470c,
-          taskId: _0xccf866,
+          store: store,
+          taskId: taskId5,
           cancellable: true,
-          cancel: ({ taskId: _0x97deb4 }) => {
-            if (!_0x465dc9) throw new Error(t('aigenImage.task.cancelMissingApiKey'));
-            return _0xfcf4f2.cancelRunningHubWorkflowTask({ apiKey: _0x465dc9, taskId: _0x97deb4 });
+          cancel: ({ taskId: taskId6 }) => {
+            if (!apiKey3) throw new Error(t('aigenImage.task.cancelMissingApiKey'));
+            return api.cancelRunningHubWorkflowTask({ apiKey: apiKey3, taskId: taskId6 });
           },
-          cancelledBuilder: _0x4ae497,
+          cancelledBuilder: cancelledBuilder,
           spec: {
             sourceNodeId: this.nodeId,
             targetNodeId: this.nodeId,
             trigger: 'node',
             taskType: 'image-generation',
-            provider: _0x37d581?.provider || 'runninghubwf',
+            provider: latest3?.provider || 'runninghubwf',
             adapterType: 'workflow',
-            modelId: _0x37d581?.model || '',
-            executionId: 'runninghub.image.' + (_0x37d581?.model || 'workflow'),
-            payload: _0x37d581,
+            modelId: latest3?.model || '',
+            executionId: 'runninghub.image.' + (latest3?.model || 'workflow'),
+            payload: latest3,
             cancellable: true,
             resumable: true,
             resultBuilder: () => ({}),
-            cancelledBuilder: _0x4ae497,
+            cancelledBuilder: cancelledBuilder,
           },
         }),
           this._persistRunningHubResumeCache());
-        const _0xf198cc = _0xff470c.getState().nodes?.[this.nodeId] || {},
-          _0x21e3e4 = Number(_0xf198cc?.rhStatusCode),
-          _0x4a5770 = String(_0xf198cc?.rhStatusMessage || '').trim();
-        if (!_0x3ba64c && !_0x30957b) {
-          if (_0x21e3e4 === 0) window.showToast?.(t('aigenImage.task.cancelledToast'), 'success');
+        const value121 = store.getState().nodes?.[this.nodeId] || {},
+          count4 = Number(value121?.rhStatusCode),
+          value122 = String(value121?.rhStatusMessage || '').trim();
+        if (!enabled21 && !code2) {
+          if (count4 === 0) window.showToast?.(t('aigenImage.task.cancelledToast'), 'success');
           else {
-            if (_0x4a5770) window.showToast?.(_0x4a5770, 'error');
+            if (value122) window.showToast?.(value122, 'error');
           }
         }
       } finally {
@@ -1953,60 +1958,58 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
           (this._rhTaskId = null),
           (this._rhApiKey = null),
           this.btnEl && (resetGenerateButtonIdleUi(this.btnEl), this._updateSubmitButtonState()),
-          _0x32cd7a(this.previewEl));
+          stopLoading(this.previewEl));
       }
     }
     ['_getPreviewGenerateButtonLoadingOptions']() {
       return createPreviewGenerateButtonCallbacks(this, t('aigenImage.controls.generate'));
     }
-    async ['runGeneration'](_0x51fa56 = {}) {
-      return this._onGenerate(null, _0x51fa56);
+    async ['runGeneration'](options4 = {}) {
+      return this._onGenerate(null, options4);
     }
     async ['cancelGeneration']() {
       return this._cancelRunningHubWorkflowTask();
     }
     ['getGenerationStatus']() {
-      const _0x4aeddb = _0xff470c.getState?.()?.nodes?.[this.nodeId] || this._data || {},
-        _0x6c4d67 = String(
-          _0x4aeddb.jobStatus ||
-            _0x4aeddb.asyncTaskStatus ||
-            _0x4aeddb.rhTaskStatus ||
+      const value123 = store.getState?.()?.nodes?.[this.nodeId] || this._data || {},
+        jobStatus = String(
+          value123.jobStatus ||
+            value123.asyncTaskStatus ||
+            value123.rhTaskStatus ||
             (this._isGenerating ? 'running' : 'idle'),
         );
       return {
         nodeId: this.nodeId,
-        jobStatus: _0x6c4d67,
-        isGenerating: this._isGenerating === true || _0x6c4d67 === 'running' || _0x6c4d67 === 'pending',
-        taskId: String(
-          this._rhTaskId || _0x4aeddb.rhTaskId || _0x4aeddb.asyncTaskId || _0x4aeddb.taskId || '',
-        ),
+        jobStatus: jobStatus,
+        isGenerating: this._isGenerating === true || jobStatus === 'running' || jobStatus === 'pending',
+        taskId: String(this._rhTaskId || value123.rhTaskId || value123.asyncTaskId || value123.taskId || ''),
         cancellable: true,
-        resumable: Boolean(_0x4aeddb.asyncTaskId || _0x4aeddb.rhTaskId),
+        resumable: Boolean(value123.asyncTaskId || value123.rhTaskId),
       };
     }
-    async ['_onGenerate'](_0x474df3 = null, _0x1bd6db = {}) {
+    async ['_onGenerate'](template = null, value124 = {}) {
       if (this._isGenerating) return;
-      if (_0x1bd6db?.insertPrompt === true) {
+      if (value124?.insertPrompt === true) {
         (insertPresetPromptIntoEditor({
-          storeApi: _0xff470c,
+          storeApi: store,
           nodeId: this.nodeId,
           promptEl: this.promptEl,
-          template: _0x474df3,
-          inEdges: _0xff470c.getIncomingEdges(this.nodeId),
-          nodes: _0xff470c.getState().nodes || {},
+          template: template,
+          inEdges: store.getIncomingEdges(this.nodeId),
+          nodes: store.getState().nodes || {},
           allowedAssetTypes: ['text', 'image'],
         }),
           this._updateSubmitButtonState?.());
         return;
       }
-      if (shouldUsePromptPreviewForPreset(_0x474df3)) {
-        const _0x37ff8c = await this._buildPayload(_0x474df3);
-        if (!_0x37ff8c) return;
+      if (shouldUsePromptPreviewForPreset(template)) {
+        const promptText = await this._buildPayload(template);
+        if (!promptText) return;
         previewPresetPromptInEditor({
-          storeApi: _0xff470c,
+          storeApi: store,
           nodeId: this.nodeId,
           promptEl: this.promptEl,
-          promptText: _0x37ff8c.prompt,
+          promptText: promptText.prompt,
         });
         return;
       }
@@ -2019,57 +2022,57 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
           );
         return;
       }
-      const _0x18be32 = await this._buildPayload(_0x474df3);
-      if (!_0x18be32) return;
-      const _0x2bd8b2 = getImageProviderApiKeyMissingMessage(_0x18be32);
-      if (_0x2bd8b2) {
-        window.showToast?.(_0x2bd8b2, 'warn');
+      const provider9 = await this._buildPayload(template);
+      if (!provider9) return;
+      const imageProviderApiKeyMissingMessage = getImageProviderApiKeyMissingMessage(provider9);
+      if (imageProviderApiKeyMissingMessage) {
+        window.showToast?.(imageProviderApiKeyMissingMessage, 'warn');
         return;
       }
-      const _0x21d97a = this._isRunninghubTaskModel(_0x18be32.model, _0x18be32.provider),
-        _0x125bb7 = this._isRunninghubWorkflowModel(_0x18be32.model, _0x18be32.provider),
-        _0x5d581c = this._isDreaminaImageNode(_0x18be32),
-        _0x236309 = this._inferProviderFromModel(
-          _0x18be32?.model,
-          _0x18be32?.provider || this._data?.provider || '',
+      const resumable = this._isRunninghubTaskModel(provider9.model, provider9.provider),
+        adapterType = this._isRunninghubWorkflowModel(provider9.model, provider9.provider),
+        onProgress = this._isDreaminaImageNode(provider9),
+        provider10 = this._inferProviderFromModel(
+          provider9?.model,
+          provider9?.provider || this._data?.provider || '',
         ),
-        _0x224e39 = !_0x21d97a && !_0x5d581c && isAsyncImageModelApiProvider(_0x236309),
-        _0x3a307d =
-          resolveModelProvider(_0x18be32?.model, _0x18be32?.provider, { allowProviderHint: false }) ===
-            'runninghub' && isModelApiModel(_0x18be32?.model, 'runninghub'),
-        _0x28d282 = shouldUseImageWorkflowBusyButton(_0x18be32.model);
-      _0x21d97a && this._stopRunningHubRecovery(true);
-      _0x5d581c && this._stopDreaminaRecovery(true);
-      _0x224e39 && this._stopAsyncRecovery(true);
+        async2 = !resumable && !onProgress && isAsyncImageModelApiProvider(provider10),
+        useOpenapiQuery2 =
+          resolveModelProvider(provider9?.model, provider9?.provider, { allowProviderHint: false }) ===
+            'runninghub' && isModelApiModel(provider9?.model, 'runninghub'),
+        busy2 = shouldUseImageWorkflowBusyButton(provider9.model);
+      resumable && this._stopRunningHubRecovery(true);
+      onProgress && this._stopDreaminaRecovery(true);
+      async2 && this._stopAsyncRecovery(true);
       this._rhCancelRequested = false;
-      const _0x280798 = _0x21d97a || _0x5d581c || _0x224e39;
-      ((this._rhApiKey = _0x21d97a ? _0x18be32.apiKey : null),
+      const pauseOnAbort = resumable || onProgress || async2;
+      ((this._rhApiKey = resumable ? provider9.apiKey : null),
         (this._rhTaskId = null),
-        (this._rhAbortController = _0x280798 ? new AbortController() : null),
+        (this._rhAbortController = pauseOnAbort ? new AbortController() : null),
         (this._isGenerating = true));
       this.btnEl &&
-        (_0x125bb7
-          ? setGenerateButtonCancellableUi(this.btnEl, { busy: _0x28d282 })
+        (adapterType
+          ? setGenerateButtonCancellableUi(this.btnEl, { busy: busy2 })
           : setGenerateButtonLoadingUi(this.btnEl));
-      _0x27a9f5(this.previewEl);
-      const _0x344dda = Date.now(),
-        _0x1fc31e = {
-          ...buildGenerationStartPatch({ startedAt: _0x344dda }),
+      startLoading(this.previewEl);
+      const startedAt19 = Date.now(),
+        value125 = {
+          ...buildGenerationStartPatch({ startedAt: startedAt19 }),
           rhStatusMessage: null,
           rhStatusCode: null,
         };
-      _0x21d97a &&
+      resumable &&
         (Object.assign(
-          _0x1fc31e,
+          value125,
           this._buildRunningHubTaskPatch({
             taskId: '',
             status: 'pending',
-            startedAt: _0x344dda,
+            startedAt: startedAt19,
             recovering: false,
-            useOpenapiQuery: _0x3a307d,
+            useOpenapiQuery: useOpenapiQuery2,
           }),
         ),
-        Object.assign(_0x1fc31e, {
+        Object.assign(value125, {
           ...this._buildDreaminaTaskPatch({
             submitId: '',
             status: 'idle',
@@ -2089,21 +2092,21 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
             recovering: false,
           }),
         }));
-      _0x5d581c &&
+      onProgress &&
         (Object.assign(
-          _0x1fc31e,
+          value125,
           this._buildDreaminaTaskPatch({
             submitId: '',
             status: 'pending',
             phase: 'generating',
             label: t('aigenImage.task.submitting'),
-            startedAt: _0x344dda,
+            startedAt: startedAt19,
             lastCheckedAt: 0,
             recovering: false,
             raw: {},
           }),
         ),
-        Object.assign(_0x1fc31e, {
+        Object.assign(value125, {
           ...this._buildRunningHubTaskPatch({
             taskId: '',
             status: 'idle',
@@ -2120,19 +2123,19 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
             recovering: false,
           }),
         }));
-      _0x224e39 &&
+      async2 &&
         (Object.assign(
-          _0x1fc31e,
+          value125,
           this._buildAsyncTaskPatch({
-            provider: _0x236309,
+            provider: provider10,
             kind: 'image',
             taskId: '',
             status: 'pending',
-            startedAt: _0x344dda,
+            startedAt: startedAt19,
             recovering: false,
           }),
         ),
-        Object.assign(_0x1fc31e, {
+        Object.assign(value125, {
           ...this._buildRunningHubTaskPatch({
             taskId: '',
             status: 'idle',
@@ -2151,10 +2154,10 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
             raw: {},
           }),
         }));
-      !_0x21d97a &&
-        !_0x5d581c &&
-        !_0x224e39 &&
-        Object.assign(_0x1fc31e, {
+      !resumable &&
+        !onProgress &&
+        !async2 &&
+        Object.assign(value125, {
           ...this._buildRunningHubTaskPatch({
             taskId: '',
             status: 'idle',
@@ -2181,194 +2184,199 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
             recovering: false,
           }),
         });
-      _0x1fc31e.ratioNotice = String(_0x18be32?.ratioNotice || '');
-      let _0x333763 = null;
+      value125.ratioNotice = String(provider9?.ratioNotice || '');
+      let response20 = null;
       try {
-        _0x333763 = await submitTask(
+        response20 = await submitTask(
           {
             sourceNodeId: this.nodeId,
             targetNodeId: this.nodeId,
             trigger: 'node',
             taskType: 'image-generation',
-            provider: _0x18be32.provider || _0x236309 || this._data?.provider || '',
-            adapterType: _0x125bb7 ? 'workflow' : 'modelApi',
-            modelId: _0x18be32.model || this._data?.model || '',
+            provider: provider9.provider || provider10 || this._data?.provider || '',
+            adapterType: adapterType ? 'workflow' : 'modelApi',
+            modelId: provider9.model || this._data?.model || '',
             executionId:
               'image.' +
-              (_0x18be32.provider || _0x236309 || 'modelApi') +
+              (provider9.provider || provider10 || 'modelApi') +
               '.' +
-              (_0x18be32.model || 'default'),
-            payload: _0x18be32,
-            cancellable: _0x125bb7,
-            resumable: _0x21d97a || _0x5d581c || _0x224e39,
-            async: _0x224e39,
-            pauseOnAbort: _0x280798,
-            startBuilder: () => _0x1fc31e,
-            pauseBuilder: (_0x5aa4cd) => {
-              const _0x1b9c3 = _0xff470c.getState().nodes?.[this.nodeId] || {};
-              if (_0x5d581c)
+              (provider9.model || 'default'),
+            payload: provider9,
+            cancellable: adapterType,
+            resumable: resumable || onProgress || async2,
+            async: async2,
+            pauseOnAbort: pauseOnAbort,
+            startBuilder: () => value125,
+            pauseBuilder: (startedAt20) => {
+              const raw3 = store.getState().nodes?.[this.nodeId] || {};
+              if (onProgress)
                 return this._buildDreaminaTaskPatch({
                   submitId:
                     String(this._dreaminaActiveSubmitId || '').trim() ||
-                    String(_0x1b9c3?.dreaminaSubmitId || '').trim(),
-                  status: String(_0x1b9c3?.dreaminaTaskStatus || '').trim() || 'pending',
-                  phase: String(_0x1b9c3?.dreaminaTaskPhase || '').trim() || 'generating',
-                  label: String(_0x1b9c3?.dreaminaTaskLabel || '').trim() || t('aigenImage.task.generating'),
-                  startedAt: _0x5aa4cd.startedAt,
+                    String(raw3?.dreaminaSubmitId || '').trim(),
+                  status: String(raw3?.dreaminaTaskStatus || '').trim() || 'pending',
+                  phase: String(raw3?.dreaminaTaskPhase || '').trim() || 'generating',
+                  label: String(raw3?.dreaminaTaskLabel || '').trim() || t('aigenImage.task.generating'),
+                  startedAt: startedAt20.startedAt,
                   lastCheckedAt: Date.now(),
                   recovering: false,
-                  raw: _0x1b9c3?.dreaminaTaskLastRaw || {},
+                  raw: raw3?.dreaminaTaskLastRaw || {},
                 });
-              if (_0x21d97a)
+              if (resumable)
                 return this._buildRunningHubTaskPatch({
                   taskId:
                     String(this._rhTaskId || '').trim() ||
-                    String(_0x1b9c3?.rhTaskId || '').trim() ||
-                    String(_0x5aa4cd?.taskId || '').trim(),
-                  status: String(_0x1b9c3?.rhTaskStatus || '').trim() || 'running',
-                  startedAt: _0x5aa4cd.startedAt,
+                    String(raw3?.rhTaskId || '').trim() ||
+                    String(startedAt20?.taskId || '').trim(),
+                  status: String(raw3?.rhTaskStatus || '').trim() || 'running',
+                  startedAt: startedAt20.startedAt,
                   recovering: false,
-                  useOpenapiQuery: _0x1b9c3?.rhTaskUseOpenapiQuery === true || _0x3a307d,
+                  useOpenapiQuery: raw3?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
                 });
               return {};
             },
             onTaskStart: () => {
               this._syncLocalTaskNodeData();
-              if (_0x21d97a) this._persistRunningHubResumeCache();
-              if (_0x5d581c) this._persistDreaminaResumeCache();
-              if (_0x224e39) this._persistAsyncResumeCache();
+              if (resumable) this._persistRunningHubResumeCache();
+              if (onProgress) this._persistDreaminaResumeCache();
+              if (async2) this._persistAsyncResumeCache();
             },
-            submit: async (_0xb9caf2, _0x2f87b5 = {}) =>
-              _0xfcf4f2.generateImage(_0x18be32, {
+            submit: async (value126, value127 = {}) =>
+              api.generateImage(provider9, {
                 ...(this._rhAbortController ? { signal: this._rhAbortController.signal } : {}),
-                onProgress: _0x5d581c
-                  ? (_0x452385 = {}) => {
-                      const _0x1ce838 = String(_0x452385?.status || 'pending').trim() || 'pending',
-                        _0x45a61e = String(_0x452385?.phase || 'generating').trim() || 'generating',
-                        _0x2387a9 = String(
-                          _0x452385?.failReason ||
-                            _0x452385?.failureReason ||
-                            _0x452385?.error ||
-                            _0x452385?.message ||
-                            _0x452385?.label ||
+                onProgress: onProgress
+                  ? (raw4 = {}) => {
+                      const status2 = String(raw4?.status || 'pending').trim() || 'pending',
+                        phase2 = String(raw4?.phase || 'generating').trim() || 'generating',
+                        error11 = String(
+                          raw4?.failReason ||
+                            raw4?.failureReason ||
+                            raw4?.error ||
+                            raw4?.message ||
+                            raw4?.label ||
                             '',
                         ).trim();
                       if (
-                        _0x1ce838.toLowerCase() === 'failed' ||
-                        _0x1ce838.toLowerCase() === 'fail' ||
-                        _0x1ce838.toLowerCase() === 'error' ||
-                        _0x45a61e.toLowerCase() === 'failed' ||
-                        _0x45a61e.toLowerCase() === 'fail' ||
-                        _0x45a61e.toLowerCase() === 'error'
+                        status2.toLowerCase() === 'failed' ||
+                        status2.toLowerCase() === 'fail' ||
+                        status2.toLowerCase() === 'error' ||
+                        phase2.toLowerCase() === 'failed' ||
+                        phase2.toLowerCase() === 'fail' ||
+                        phase2.toLowerCase() === 'error'
                       ) {
                         this._finalizeDreaminaImageFailure({
-                          error: _0x2387a9 || t('aigenImage.task.generationFailed'),
-                          startedAt: _0x344dda,
+                          error: error11 || t('aigenImage.task.generationFailed'),
+                          startedAt: startedAt19,
                           submitId:
-                            String(_0x452385?.submitId || '').trim() ||
-                            String(_0xff470c.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '').trim(),
-                          lastCheckedAt: Number(_0x452385?.lastCheckedAt || Date.now()),
-                          raw: _0x452385?.raw || {},
+                            String(raw4?.submitId || '').trim() ||
+                            String(store.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '').trim(),
+                          lastCheckedAt: Number(raw4?.lastCheckedAt || Date.now()),
+                          raw: raw4?.raw || {},
                         });
                         return;
                       }
                       this._applyDreaminaTaskPatch({
                         submitId:
-                          String(_0x452385?.submitId || '').trim() ||
-                          String(_0xff470c.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '').trim(),
-                        status: _0x1ce838,
-                        phase: _0x45a61e,
+                          String(raw4?.submitId || '').trim() ||
+                          String(store.getState().nodes?.[this.nodeId]?.dreaminaSubmitId || '').trim(),
+                        status: status2,
+                        phase: phase2,
                         label:
-                          String(_0x452385?.label || t('aigenImage.task.generating')).trim() ||
+                          String(raw4?.label || t('aigenImage.task.generating')).trim() ||
                           t('aigenImage.task.generating'),
-                        startedAt: _0x344dda,
-                        lastCheckedAt: Number(_0x452385?.lastCheckedAt || Date.now()),
+                        startedAt: startedAt19,
+                        lastCheckedAt: Number(raw4?.lastCheckedAt || Date.now()),
                         recovering: false,
-                        raw: _0x452385?.raw || {},
+                        raw: raw4?.raw || {},
                       });
                     }
                   : undefined,
-                onTaskMeta: ({ taskId: _0x4ba80c, useOpenapiQuery: _0x39a69e, provider: _0x4d3107 }) => {
-                  const _0x40f423 = String(_0x4ba80c || '').trim();
-                  if (!_0x40f423) return;
-                  if (_0x21d97a) {
-                    ((this._rhTaskId = _0x40f423),
-                      _0x2f87b5.onTaskId?.(_0x40f423),
-                      _0xff470c.updateNodeData(this.nodeId, {
+                onTaskMeta: ({
+                  taskId: taskId7,
+                  useOpenapiQuery: useOpenapiQuery3,
+                  provider: provider11,
+                }) => {
+                  const submitId3 = String(taskId7 || '').trim();
+                  if (!submitId3) return;
+                  if (resumable) {
+                    ((this._rhTaskId = submitId3),
+                      value127.onTaskId?.(submitId3),
+                      store.updateNodeData(this.nodeId, {
                         rhStatusMessage: null,
                         rhStatusCode: null,
-                        rhTaskUseOpenapiQuery: _0x39a69e === true,
+                        rhTaskUseOpenapiQuery: useOpenapiQuery3 === true,
                       }),
                       this._syncLocalTaskNodeData(),
                       this._persistRunningHubResumeCache());
-                    _0x125bb7 && this._rhCancelRequested && this._cancelRunningHubWorkflowTask();
+                    adapterType && this._rhCancelRequested && this._cancelRunningHubWorkflowTask();
                     return;
                   }
-                  if (_0x5d581c) {
-                    ((this._dreaminaActiveSubmitId = _0x40f423),
+                  if (onProgress) {
+                    ((this._dreaminaActiveSubmitId = submitId3),
                       this._applyDreaminaTaskPatch({
-                        submitId: _0x40f423,
+                        submitId: submitId3,
                         status: 'pending',
                         phase: 'generating',
                         label: t('aigenImage.task.generating'),
-                        startedAt: _0x344dda,
+                        startedAt: startedAt19,
                         lastCheckedAt: Date.now(),
                         recovering: false,
                         raw: {},
                       }),
-                      _0x2f87b5.onTaskId?.(_0x40f423));
+                      value127.onTaskId?.(submitId3));
                     return;
                   }
-                  _0x224e39 &&
-                    (_0x2f87b5.onTaskId?.(_0x40f423),
-                    _0xff470c.updateNodeData(this.nodeId, {
+                  async2 &&
+                    (value127.onTaskId?.(submitId3),
+                    store.updateNodeData(this.nodeId, {
                       asyncTaskProvider: this._inferProviderFromModel(
-                        _0x18be32?.model,
-                        _0x4d3107 || _0x236309 || this._data?.provider || '',
+                        provider9?.model,
+                        provider11 || provider10 || this._data?.provider || '',
                       ),
                       asyncTaskKind: 'image',
                     }),
                     this._syncLocalTaskNodeData(),
                     this._persistAsyncResumeCache());
                 },
-                onTaskId: (_0x35a0ac) => {
-                  const _0x3a5ceb = String(_0x35a0ac || '').trim();
-                  if (!_0x3a5ceb) return;
-                  if (_0x21d97a) {
-                    ((this._rhTaskId = _0x3a5ceb), _0x2f87b5.onTaskId?.(_0x3a5ceb));
-                    const _0x42f459 = _0xff470c.getState().nodes?.[this.nodeId] || {};
-                    (_0xff470c.updateNodeData(this.nodeId, {
+                onTaskId: (value128) => {
+                  const submitId4 = String(value128 || '').trim();
+                  if (!submitId4) return;
+                  if (resumable) {
+                    ((this._rhTaskId = submitId4), value127.onTaskId?.(submitId4));
+                    const rhTaskUseOpenapiQuery2 = store.getState().nodes?.[this.nodeId] || {};
+                    (store.updateNodeData(this.nodeId, {
                       rhStatusMessage: null,
                       rhStatusCode: null,
-                      rhTaskUseOpenapiQuery: _0x42f459?.rhTaskUseOpenapiQuery === true || _0x3a307d,
+                      rhTaskUseOpenapiQuery:
+                        rhTaskUseOpenapiQuery2?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
                     }),
                       this._syncLocalTaskNodeData(),
                       this._persistRunningHubResumeCache());
-                    _0x125bb7 && this._rhCancelRequested && this._cancelRunningHubWorkflowTask();
+                    adapterType && this._rhCancelRequested && this._cancelRunningHubWorkflowTask();
                     return;
                   }
-                  if (_0x5d581c) {
-                    ((this._dreaminaActiveSubmitId = _0x3a5ceb),
+                  if (onProgress) {
+                    ((this._dreaminaActiveSubmitId = submitId4),
                       this._applyDreaminaTaskPatch({
-                        submitId: _0x3a5ceb,
+                        submitId: submitId4,
                         status: 'pending',
                         phase: 'generating',
                         label: t('aigenImage.task.generating'),
-                        startedAt: _0x344dda,
+                        startedAt: startedAt19,
                         lastCheckedAt: Date.now(),
                         recovering: false,
                         raw: {},
                       }),
-                      _0x2f87b5.onTaskId?.(_0x3a5ceb));
+                      value127.onTaskId?.(submitId4));
                     return;
                   }
-                  if (_0x224e39) {
-                    const _0x4751ed = _0xff470c.getState().nodes?.[this.nodeId] || {};
-                    (_0x2f87b5.onTaskId?.(_0x3a5ceb),
-                      _0xff470c.updateNodeData(this.nodeId, {
+                  if (async2) {
+                    const value129 = store.getState().nodes?.[this.nodeId] || {};
+                    (value127.onTaskId?.(submitId4),
+                      store.updateNodeData(this.nodeId, {
                         asyncTaskProvider: this._inferProviderFromModel(
-                          _0x4751ed?.model || _0x18be32?.model,
-                          _0x4751ed?.asyncTaskProvider || _0x236309 || this._data?.provider || '',
+                          value129?.model || provider9?.model,
+                          value129?.asyncTaskProvider || provider10 || this._data?.provider || '',
                         ),
                         asyncTaskKind: 'image',
                       }),
@@ -2377,45 +2385,46 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
                   }
                 },
               }),
-            cancel: _0x125bb7
-              ? async ({ taskId: _0x11ada7 }) => {
-                  const _0x15a703 = this._rhApiKey || _0x18be32.apiKey || '',
-                    _0x59cdfb = String(_0x11ada7 || '').trim();
-                  if (!_0x15a703 || !_0x59cdfb) return null;
-                  return _0xfcf4f2.cancelRunningHubWorkflowTask({ apiKey: _0x15a703, taskId: _0x59cdfb });
+            cancel: adapterType
+              ? async ({ taskId: taskId8 }) => {
+                  const apiKey4 = this._rhApiKey || provider9.apiKey || '',
+                    taskId9 = String(taskId8 || '').trim();
+                  if (!apiKey4 || !taskId9) return null;
+                  return api.cancelRunningHubWorkflowTask({ apiKey: apiKey4, taskId: taskId9 });
                 }
               : undefined,
-            resultBuilder: async (_0x45cfe7, _0x1f9bad) => {
-              const _0xd1b60f = this._getImageGenerationResultError(_0x45cfe7);
-              if (_0xd1b60f) throw new Error(_0xd1b60f);
-              const _0x379354 = this._applyImageGenerationResult(_0x45cfe7, _0x1f9bad.startedAt, {
+            resultBuilder: async (value130, startedAt21) => {
+              const value131 = this._getImageGenerationResultError(value130);
+              if (value131) throw new Error(value131);
+              const value132 = this._applyImageGenerationResult(value130, startedAt21.startedAt, {
                   writeStore: false,
                 }),
-                _0x3462b4 = { ...(_0x379354?.patch || {}) };
-              if (_0x21d97a) {
-                const _0x1ede1b = _0xff470c.getState().nodes?.[this.nodeId] || {};
+                value133 = { ...(value132?.patch || {}) };
+              if (resumable) {
+                const useOpenapiQuery4 = store.getState().nodes?.[this.nodeId] || {};
                 (Object.assign(
-                  _0x3462b4,
+                  value133,
                   this._buildRunningHubTaskPatch({
-                    taskId: String(this._rhTaskId || '').trim() || String(_0x1ede1b?.rhTaskId || '').trim(),
+                    taskId:
+                      String(this._rhTaskId || '').trim() || String(useOpenapiQuery4?.rhTaskId || '').trim(),
                     status: 'success',
-                    startedAt: _0x1f9bad.startedAt,
+                    startedAt: startedAt21.startedAt,
                     recovering: false,
-                    useOpenapiQuery: _0x1ede1b?.rhTaskUseOpenapiQuery === true || _0x3a307d,
+                    useOpenapiQuery: useOpenapiQuery4?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
                   }),
                 ),
                   this._persistRunningHubResumeCache());
               } else {
-                if (_0x5d581c) {
-                  const _0x238d7e = _0xff470c.getState().nodes?.[this.nodeId] || {};
+                if (onProgress) {
+                  const value134 = store.getState().nodes?.[this.nodeId] || {};
                   (Object.assign(
-                    _0x3462b4,
+                    value133,
                     this._buildDreaminaTaskPatch({
-                      submitId: String(_0x238d7e?.dreaminaSubmitId || '').trim(),
+                      submitId: String(value134?.dreaminaSubmitId || '').trim(),
                       status: 'success',
                       phase: 'done',
                       label: t('aigenImage.task.completed'),
-                      startedAt: _0x1f9bad.startedAt,
+                      startedAt: startedAt21.startedAt,
                       lastCheckedAt: Date.now(),
                       recovering: false,
                       raw: {},
@@ -2423,21 +2432,21 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
                   ),
                     this._persistDreaminaResumeCache());
                 } else {
-                  if (_0x224e39) {
-                    const _0x5541d8 = _0xff470c.getState().nodes?.[this.nodeId] || {};
+                  if (async2) {
+                    const value135 = store.getState().nodes?.[this.nodeId] || {};
                     (Object.assign(
-                      _0x3462b4,
+                      value133,
                       this._buildAsyncTaskPatch({
                         provider: this._inferProviderFromModel(
-                          _0x5541d8?.model || _0x18be32?.model,
-                          _0x5541d8?.asyncTaskProvider || _0x236309 || '',
+                          value135?.model || provider9?.model,
+                          value135?.asyncTaskProvider || provider10 || '',
                         ),
                         kind: 'image',
                         taskId:
-                          String(_0x5541d8?.asyncTaskId || '').trim() ||
-                          String(_0x1f9bad?.taskId || '').trim(),
+                          String(value135?.asyncTaskId || '').trim() ||
+                          String(startedAt21?.taskId || '').trim(),
                         status: 'success',
-                        startedAt: _0x1f9bad.startedAt,
+                        startedAt: startedAt21.startedAt,
                         recovering: false,
                       }),
                     ),
@@ -2445,125 +2454,127 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
                   }
                 }
               }
-              return _0x3462b4;
+              return value133;
             },
-            failureBuilder: (_0x18e099, _0x2e93a4) => {
-              if (_0x5d581c) {
-                const _0xe91247 = _0xff470c.getState().nodes?.[this.nodeId] || {};
+            failureBuilder: (error12, startedAt22) => {
+              if (onProgress) {
+                const raw5 = store.getState().nodes?.[this.nodeId] || {};
                 return this._buildDreaminaFailurePatch({
-                  error: _0x18e099,
-                  startedAt: _0x2e93a4.startedAt,
+                  error: error12,
+                  startedAt: startedAt22.startedAt,
                   submitId:
                     String(this._dreaminaActiveSubmitId || '').trim() ||
-                    String(_0xe91247?.dreaminaSubmitId || '').trim(),
+                    String(raw5?.dreaminaSubmitId || '').trim(),
                   lastCheckedAt: Date.now(),
-                  raw: _0xe91247?.dreaminaTaskLastRaw || {},
+                  raw: raw5?.dreaminaTaskLastRaw || {},
                 });
               }
-              const _0x295ed3 = {
+              const value136 = {
                 ...buildImageGenerationFailurePatch({
-                  error: _0x18e099?.message || t('aigenImage.task.generationFailed'),
-                  startedAt: _0x2e93a4.startedAt,
+                  error: error12?.message || t('aigenImage.task.generationFailed'),
+                  startedAt: startedAt22.startedAt,
                 }),
               };
-              if (_0x21d97a) {
-                const _0x5c718d = _0xff470c.getState().nodes?.[this.nodeId] || {};
+              if (resumable) {
+                const useOpenapiQuery5 = store.getState().nodes?.[this.nodeId] || {};
                 Object.assign(
-                  _0x295ed3,
+                  value136,
                   {
-                    rhStatusMessage: _0x18e099?.message || t('aigenImage.task.generationFailed'),
-                    rhStatusCode: Number.isFinite(Number(_0x18e099?.code)) ? Number(_0x18e099.code) : null,
+                    rhStatusMessage: error12?.message || t('aigenImage.task.generationFailed'),
+                    rhStatusCode: Number.isFinite(Number(error12?.code)) ? Number(error12.code) : null,
                   },
                   this._buildRunningHubTaskPatch({
-                    taskId: String(this._rhTaskId || '').trim() || String(_0x5c718d?.rhTaskId || '').trim(),
+                    taskId:
+                      String(this._rhTaskId || '').trim() || String(useOpenapiQuery5?.rhTaskId || '').trim(),
                     status: 'failed',
-                    startedAt: _0x2e93a4.startedAt,
+                    startedAt: startedAt22.startedAt,
                     recovering: false,
-                    useOpenapiQuery: _0x5c718d?.rhTaskUseOpenapiQuery === true || _0x3a307d,
+                    useOpenapiQuery: useOpenapiQuery5?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
                   }),
                 );
               } else {
-                if (_0x224e39) {
-                  const _0x3b01f2 = _0xff470c.getState().nodes?.[this.nodeId] || {};
+                if (async2) {
+                  const value137 = store.getState().nodes?.[this.nodeId] || {};
                   Object.assign(
-                    _0x295ed3,
+                    value136,
                     this._buildAsyncTaskPatch({
                       provider: this._inferProviderFromModel(
-                        _0x3b01f2?.model || _0x18be32?.model,
-                        _0x3b01f2?.asyncTaskProvider || _0x236309 || '',
+                        value137?.model || provider9?.model,
+                        value137?.asyncTaskProvider || provider10 || '',
                       ),
                       kind: 'image',
                       taskId:
-                        String(_0x3b01f2?.asyncTaskId || '').trim() || String(_0x2e93a4?.taskId || '').trim(),
+                        String(value137?.asyncTaskId || '').trim() ||
+                        String(startedAt22?.taskId || '').trim(),
                       status: 'failed',
-                      startedAt: _0x2e93a4.startedAt,
+                      startedAt: startedAt22.startedAt,
                       recovering: false,
                     }),
                   );
                 }
               }
-              return _0x295ed3;
+              return value136;
             },
-            cancelledBuilder: (_0x275104) => {
-              const _0xb0a1f7 = _0xff470c.getState().nodes?.[this.nodeId] || {},
-                _0x16cf57 =
-                  _0xb0a1f7.generationDuration == null
-                    ? Date.now() - _0x275104.startedAt
-                    : _0xb0a1f7.generationDuration;
-              if (_0x125bb7)
+            cancelledBuilder: (value138) => {
+              const latest4 = store.getState().nodes?.[this.nodeId] || {},
+                duration4 =
+                  latest4.generationDuration == null
+                    ? Date.now() - value138.startedAt
+                    : latest4.generationDuration;
+              if (adapterType)
                 return this._buildRunningHubCancelResultPatch({
-                  latest: _0xb0a1f7,
-                  message: _0xb0a1f7.rhStatusMessage || t('aigenImage.task.interrupted'),
-                  code: _0xb0a1f7.rhStatusCode,
-                  duration: _0x16cf57,
-                  taskId: String(this._rhTaskId || '').trim() || String(_0xb0a1f7?.rhTaskId || '').trim(),
+                  latest: latest4,
+                  message: latest4.rhStatusMessage || t('aigenImage.task.interrupted'),
+                  code: latest4.rhStatusCode,
+                  duration: duration4,
+                  taskId: String(this._rhTaskId || '').trim() || String(latest4?.rhTaskId || '').trim(),
                 });
               return { images: [], imageUrl: '', thumbUrl: '', localPath: '' };
             },
-            parseError: (_0x193cc0) => _0x193cc0?.message || t('aigenImage.task.generationFailed'),
+            parseError: (error13) => error13?.message || t('aigenImage.task.generationFailed'),
           },
-          { store: _0xff470c, startedAt: _0x344dda, abortController: this._rhAbortController },
+          { store: store, startedAt: startedAt19, abortController: this._rhAbortController },
         );
-        if (_0x333763.status === 'failed') {
-          const _0x35bd96 = _0x333763.error;
-          (console.error('[AIGenerateNode] 生成失败:', _0x35bd96),
+        if (response20.status === 'failed') {
+          const message3 = response20.error;
+          (console.error('[AIGenerateNode] 生成失败:', message3),
             void logDiagnosticEvent({
               type: 'generation.image_failed',
               level: 'error',
               source: 'renderer',
-              message: _0x35bd96?.message || t('aigenImage.task.imageGenerationFailed'),
-              error: _0x35bd96,
+              message: message3?.message || t('aigenImage.task.imageGenerationFailed'),
+              error: message3,
               context: {
                 nodeId: this.nodeId,
-                provider: _0x18be32?.provider || '',
-                model: _0x18be32?.model || '',
-                isRhTaskModel: _0x21d97a,
-                isDreaminaTask: _0x5d581c,
-                isAsyncTaskModel: _0x224e39,
+                provider: provider9?.provider || '',
+                model: provider9?.model || '',
+                isRhTaskModel: resumable,
+                isDreaminaTask: onProgress,
+                isAsyncTaskModel: async2,
               },
             }));
         }
-        if (_0x21d97a) this._persistRunningHubResumeCache();
-        if (_0x5d581c) this._persistDreaminaResumeCache();
-        if (_0x224e39) this._persistAsyncResumeCache();
-        return _0x333763;
+        if (resumable) this._persistRunningHubResumeCache();
+        if (onProgress) this._persistDreaminaResumeCache();
+        if (async2) this._persistAsyncResumeCache();
+        return response20;
       } finally {
-        const _0x43f168 = this._syncLocalTaskNodeData(),
-          _0x2f376d = shouldShowGenerationBusyUi(_0x43f168);
-        ((this._isGenerating = _0x2f376d),
+        const value139 = this._syncLocalTaskNodeData(),
+          shouldShowGenerationBusyUi5 = shouldShowGenerationBusyUi(value139);
+        ((this._isGenerating = shouldShowGenerationBusyUi5),
           (this._dreaminaActiveSubmitId = ''),
           (this._rhAbortController = null));
-        if (_0x21d97a && _0x2f376d) {
-          const _0x4e5c91 = String(_0x43f168?.rhTaskId || '').trim();
-          if (_0x4e5c91) this._rhTaskId = _0x4e5c91;
+        if (resumable && shouldShowGenerationBusyUi5) {
+          const value140 = String(value139?.rhTaskId || '').trim();
+          if (value140) this._rhTaskId = value140;
         } else {
           this._rhTaskId = null;
           if (!this._rhCancelRequested) this._rhApiKey = null;
         }
         this.btnEl && this._updateSubmitButtonState?.();
-        if (!_0x2f376d) {
+        if (!shouldShowGenerationBusyUi5) {
           if (this.btnEl) resetGenerateButtonIdleUi(this.btnEl);
-          _0x32cd7a(this.previewEl);
+          stopLoading(this.previewEl);
         }
       }
     }
@@ -2590,5 +2601,5 @@ export function createAIGenerateNodeTaskOrchestrationModule(_0x4481d1) {
         setNodeMediaLodHoverPromoted(this._root, false));
     }
   }
-  return _0x2b8f6c.prototype;
+  return value11.prototype;
 }

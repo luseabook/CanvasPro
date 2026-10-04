@@ -42,62 +42,64 @@ import {
   buildPersonReplacementAnnotatedSource,
   applyPersonReplacementAnnotatedSource,
 } from './personReplacementAnnotatedSource.js';
-function normalizeText(_0x42096f) {
-  return String(_0x42096f ?? '')['trim']();
+function normalizeText(value) {
+  return String(value ?? '')['trim']();
 }
-function resolveGeneratedImages(_0x2df08f) {
-  const _0x47ddca = normalizeImageGenerationResult(_0x2df08f),
-    _0x184ecb = getSuccessfulImageGenerationItems(_0x47ddca)
-      ['map']((_0x580e26) => ({
-        ..._0x580e26,
+function resolveGeneratedImages(item) {
+  const imageGenerationResult = normalizeImageGenerationResult(item),
+    list = getSuccessfulImageGenerationItems(imageGenerationResult)
+      ['map']((response) => ({
+        ...response,
         localPath:
           [
-            _0x580e26['localPath'],
-            _0x580e26['originalLocalPath'],
-            _0x580e26['displayLocalPath'],
-            _0x580e26['imageUrl'],
-            _0x580e26['url'],
+            response['localPath'],
+            response['originalLocalPath'],
+            response['displayLocalPath'],
+            response['imageUrl'],
+            response['url'],
           ]
             ['map'](normalizeLocalPath)
             ['find'](Boolean) || '',
       }))
-      ['filter']((_0x1b7597) => _0x1b7597['localPath']);
-  if (!_0x184ecb['length'])
+      ['filter']((key) => key['localPath']);
+  if (!list['length'])
     throw new Error(
-      normalizeText(_0x47ddca['items'][0x0]?.['localSaveError'] || _0x47ddca?.['localSaveError']) ||
-        getImageGenerationResultError(_0x47ddca) ||
+      normalizeText(
+        imageGenerationResult['items'][0x0]?.['localSaveError'] || imageGenerationResult?.['localSaveError'],
+      ) ||
+        getImageGenerationResultError(imageGenerationResult) ||
         '图像生成结果缺少可用图片',
     );
-  return _0x184ecb;
+  return list;
 }
-function resolveDefaultPromptRequest({ shot: _0x49b284, promptPackage: _0xcff728 }) {
-  const _0x27f4f0 = normalizeText(_0x49b284?.['imagePrompt']);
+function resolveDefaultPromptRequest({ shot: shot, promptPackage: promptPackage2 }) {
+  const savedPrompt2 = normalizeText(shot?.['imagePrompt']);
   return {
-    savedPrompt: _0x27f4f0,
-    requestPrompt: composePersonReplacementImagePrompt(_0xcff728, _0x27f4f0),
+    savedPrompt: savedPrompt2,
+    requestPrompt: composePersonReplacementImagePrompt(promptPackage2, savedPrompt2),
     promptAssetRefs: [],
   };
 }
-async function resumePersonReplacementImageTask(_0x1f4d5e, _0x51b45a, _0x3175a0 = {}) {
-  const _0x98dece =
-      resolveModelExecution(_0x51b45a?.['model']) ||
-      resolveModelExecution(_0x51b45a?.['model'], { providerHint: _0x51b45a?.['provider'] }),
-    _0xb97ac = normalizeText(_0x98dece?.['modelManifest']?.['provider'] || _0x51b45a?.['provider']);
-  if (_0xb97ac === 'dreamina') return resumeDreaminaImageTask(_0x1f4d5e, _0x51b45a, _0x3175a0);
+async function resumePersonReplacementImageTask(index, providerHint, result = {}) {
+  const modelExecution =
+      resolveModelExecution(providerHint?.['model']) ||
+      resolveModelExecution(providerHint?.['model'], { providerHint: providerHint?.['provider'] }),
+    text = normalizeText(modelExecution?.['modelManifest']?.['provider'] || providerHint?.['provider']);
+  if (text === 'dreamina') return resumeDreaminaImageTask(index, providerHint, result);
   if (
-    _0xb97ac === 'runninghub' ||
-    _0xb97ac === 'runninghubwf' ||
-    _0x98dece?.['executionManifest']?.['adapterType'] === 'workflow'
+    text === 'runninghub' ||
+    text === 'runninghubwf' ||
+    modelExecution?.['executionManifest']?.['adapterType'] === 'workflow'
   )
-    return resumeRunningHubImageTask(_0x1f4d5e, _0x51b45a, _0x3175a0);
-  return resumeAsyncImageTask(_0x1f4d5e, _0x51b45a, _0x3175a0);
+    return resumeRunningHubImageTask(index, providerHint, result);
+  return resumeAsyncImageTask(index, providerHint, result);
 }
 export function createPersonReplacementImageTaskRuntime({
-  getProject: _0x397ed7,
+  getProject: getProject,
   getProjectById: getProjectById = null,
-  commitProject: _0x444fbf,
+  commitProject: commitProject,
   commitProjectById: commitProjectById = null,
-  generateImage: _0xeaf778,
+  generateImage: generateImage,
   enhancePrompt: enhancePrompt = null,
   createLocationGuide: createLocationGuide = buildPersonReplacementLocationGuide,
   createAnnotatedSource: createAnnotatedSource = buildPersonReplacementAnnotatedSource,
@@ -110,40 +112,43 @@ export function createPersonReplacementImageTaskRuntime({
   notifyCompletion: notifyCompletion = () => {},
   persistNow: persistNow = () => Promise['resolve'](null),
 } = {}) {
-  const _0x3805cf = new Map(),
-    _0x162f67 = new Map();
-  let _0x24ed12 = ![];
-  const _0x2f4d03 = (_0x2eaecf = '') => {
-      const _0x1a8a18 = normalizeText(_0x2eaecf);
-      return _0x1a8a18 && typeof getProjectById === 'function' ? getProjectById(_0x1a8a18) : _0x397ed7?.();
+  const map = new Map(),
+    map2 = new Map();
+  let data = ![];
+  const currentProject = (options = '') => {
+      const text2 = normalizeText(options);
+      return text2 && typeof getProjectById === 'function' ? getProjectById(text2) : getProject?.();
     },
-    _0x5c4dfc = (_0x10f5bc) =>
+    handler = (target) =>
       typeof commitProjectById === 'function'
-        ? commitProjectById(_0x10f5bc?.['id'], _0x10f5bc)
-        : _0x444fbf?.(_0x10f5bc),
-    _0x4a054e = ({
-      currentProject: _0x143871,
-      projectId: _0x2fe125,
-      shotId: _0x3981f8,
-      requestId: _0x5c6bcf,
+        ? commitProjectById(target?.['id'], target)
+        : commitProject?.(target),
+    handler2 = ({
+      currentProject: currentProject2,
+      projectId: projectId2,
+      shotId: shotId2,
+      requestId: requestId,
     }) => {
-      if (_0x24ed12 || _0x143871?.['id'] !== _0x2fe125) return null;
-      const _0x47d0b0 = resolvePersonReplacementImageGenerationState(_0x143871['workspace'], _0x3981f8);
-      if (_0x47d0b0['requestId'] !== _0x5c6bcf) return null;
-      const _0x4f71ee = _0x5c4dfc({
-        ..._0x143871,
-        workspace: updatePersonReplacementImageGenerationState(_0x143871['workspace'], {
+      if (data || currentProject2?.['id'] !== projectId2) return null;
+      const personReplacementImageGenerationState = resolvePersonReplacementImageGenerationState(
+        currentProject2['workspace'],
+        shotId2,
+      );
+      if (personReplacementImageGenerationState['requestId'] !== requestId) return null;
+      const project = handler({
+        ...currentProject2,
+        workspace: updatePersonReplacementImageGenerationState(currentProject2['workspace'], {
           status: 'idle',
-          shotId: _0x3981f8,
+          shotId: shotId2,
           error: '',
         }),
       });
       return (
         showToast('生成期间检测框或生成设置已变化，旧结果未应用，请重新生成。', 'warn'),
-        { project: _0x4f71ee, ok: ![], stale: !![], shotId: _0x3981f8 }
+        { project: project, ok: ![], stale: !![], shotId: shotId2 }
       );
     },
-    _0x36f5e9 = ({
+    acceptUploadedResult = ({
       shotId: shotId = '',
       imageRef: imageRef = '',
       fileName: fileName = '',
@@ -151,670 +156,688 @@ export function createPersonReplacementImageTaskRuntime({
       expectedProjectId: expectedProjectId = '',
       expectedShotRevision: expectedShotRevision = '',
     } = {}) => {
-      if (_0x24ed12) return null;
-      const _0x4176ab = _0x397ed7?.(),
-        _0x54858d = normalizeText(shotId),
-        _0x16a4f5 = normalizeText(imageRef),
-        _0x2a9d32 = normalizeText(expectedProjectId),
-        _0x305d61 = normalizeText(expectedShotRevision);
-      if (!_0x2a9d32 || _0x4176ab?.['id'] !== _0x2a9d32) return null;
-      const _0x1ffc35 = _0x4176ab?.['shots']?.['find']?.((_0x497b83) => _0x497b83['id'] === _0x54858d);
-      if (!_0x1ffc35 || !_0x16a4f5) return null;
+      if (data) return null;
+      const project2 = getProject?.(),
+        selectedShotId = normalizeText(shotId),
+        imageUrl = normalizeText(imageRef),
+        text3 = normalizeText(expectedProjectId),
+        text4 = normalizeText(expectedShotRevision);
+      if (!text3 || project2?.['id'] !== text3) return null;
+      const shot2 = project2?.['shots']?.['find']?.((source) => source['id'] === selectedShotId);
+      if (!shot2 || !imageUrl) return null;
       if (
-        !_0x305d61 ||
-        createPersonReplacementImageGenerationMappingRevision({ project: _0x4176ab, shot: _0x1ffc35 }) !==
-          _0x305d61
+        !text4 ||
+        createPersonReplacementImageGenerationMappingRevision({ project: project2, shot: shot2 }) !== text4
       )
         return null;
-      const _0x5819e5 = appendPersonReplacementImageResult(_0x1ffc35, {
-        imageUrl: _0x16a4f5,
+      const replacementImage = appendPersonReplacementImageResult(shot2, {
+        imageUrl: imageUrl,
         source: 'upload',
         fileName: normalizeText(fileName) || '上传替换图片',
-        userPrompt: normalizeText(_0x1ffc35['imagePrompt']),
+        userPrompt: normalizeText(shot2['imagePrompt']),
         createdAt: createdAt,
       });
-      return _0x444fbf?.({
-        ..._0x4176ab,
-        shots: _0x4176ab['shots']['map']((_0x46f378) =>
-          _0x46f378['id'] === _0x54858d
-            ? { ..._0x46f378, replacementImage: _0x5819e5, replacementImageRef: _0x16a4f5, error: '' }
-            : _0x46f378,
+      return commitProject?.({
+        ...project2,
+        shots: project2['shots']['map']((args) =>
+          args['id'] === selectedShotId
+            ? { ...args, replacementImage: replacementImage, replacementImageRef: imageUrl, error: '' }
+            : args,
         ),
-        workspace: { ..._0x4176ab['workspace'], selectedShotId: _0x54858d },
+        workspace: { ...project2['workspace'], selectedShotId: selectedShotId },
       });
     },
-    _0x3504d2 = ({
-      project: _0x59ef9c,
-      shot: _0x3a7d9e,
+    handler3 = ({
+      project: project3,
+      shot: shot3,
       promptPackage: promptPackage = buildPersonReplacementPromptPackage({
-        project: _0x59ef9c,
-        shot: _0x3a7d9e,
+        project: project3,
+        shot: shot3,
       }),
       promptEnhancement: promptEnhancement = null,
-      sourceImageSize: _0x4e23af,
+      sourceImageSize: sourceImageSize,
       taskIdentity: taskIdentity = {},
     }) => {
-      const _0x35ca26 = promptEnhancement
+      const promptPackage3 = promptEnhancement
           ? applyPersonReplacementPromptEnhancement(promptPackage, promptEnhancement)
           : promptPackage,
         {
           savedPrompt: savedPrompt = '',
-          requestPrompt: requestPrompt = _0x35ca26['prompt'],
+          requestPrompt: requestPrompt = promptPackage3['prompt'],
           promptAssetRefs: promptAssetRefs = [],
-        } = resolvePromptRequest({ project: _0x59ef9c, shot: _0x3a7d9e, promptPackage: _0x35ca26 }) || {},
-        _0x3cc450 =
+        } = resolvePromptRequest({ project: project3, shot: shot3, promptPackage: promptPackage3 }) || {},
+        modelId =
           normalizeText(taskIdentity['modelId']) ||
-          _0x59ef9c['settings']?.['replacementImageModelId'] ||
+          project3['settings']?.['replacementImageModelId'] ||
           PERSON_REPLACEMENT_DEFAULT_IMAGE_MODEL_ID,
-        _0x82b31d = resolvePersonReplacementImageGenerationParams({
-          modelId: _0x3cc450,
+        provider = resolvePersonReplacementImageGenerationParams({
+          modelId: modelId,
           provider:
-            normalizeText(taskIdentity['provider']) || _0x59ef9c['settings']?.['replacementImageProvider'],
-          generationParams: _0x59ef9c['settings']?.['replacementImageGenerationParams'],
-          sourceImageSize: _0x4e23af,
-          shot: _0x3a7d9e,
+            normalizeText(taskIdentity['provider']) || project3['settings']?.['replacementImageProvider'],
+          generationParams: project3['settings']?.['replacementImageGenerationParams'],
+          sourceImageSize: sourceImageSize,
+          shot: shot3,
         }),
-        _0x4fd50d = buildCharacterAssetImageGenerationPayload({
+        payload = buildCharacterAssetImageGenerationPayload({
           prompt: requestPrompt,
-          modelId: _0x3cc450,
-          provider: _0x82b31d['provider'],
+          modelId: modelId,
+          provider: provider['provider'],
           providerProfileId:
             normalizeText(taskIdentity['providerProfileId']) ||
-            _0x59ef9c['settings']?.['replacementImageProviderProfileId'],
-          generationParams: _0x82b31d['generationParams'],
+            project3['settings']?.['replacementImageProviderProfileId'],
+          generationParams: provider['generationParams'],
           referenceImageUrls: [
-            ..._0x35ca26['referenceImages']
-              ['filter'](
-                (_0x2065a6) => !_0x35ca26['annotatedSource'] || _0x2065a6['role'] !== 'source-keyframe',
-              )
-              ['map']((_0xef83aa) => _0xef83aa['ref']),
+            ...promptPackage3['referenceImages']
+              ['filter']((next) => !promptPackage3['annotatedSource'] || next['role'] !== 'source-keyframe')
+              ['map']((current) => current['ref']),
             ...(Array['isArray'](promptAssetRefs) ? promptAssetRefs : [])['map'](
-              (_0x156b2f) => _0x156b2f?.['url'],
+              (response2) => response2?.['url'],
             ),
           ],
         });
-      if (_0x35ca26['annotatedSource'])
-        _0x4fd50d['inputUrls']['unshift'](_0x35ca26['referenceImages'][0x0]['ref']);
+      if (promptPackage3['annotatedSource'])
+        payload['inputUrls']['unshift'](promptPackage3['referenceImages'][0x0]['ref']);
       return (
-        (_0x4fd50d['adaptiveSource'] = _0x82b31d['adaptiveSource']),
-        (_0x4fd50d['resolvedRatioLabel'] = _0x82b31d['resolvedAspectRatio']),
+        (payload['adaptiveSource'] = provider['adaptiveSource']),
+        (payload['resolvedRatioLabel'] = provider['resolvedAspectRatio']),
         {
-          modelId: _0x3cc450,
-          payload: _0x4fd50d,
-          promptPackage: _0x35ca26,
-          ratioResolution: _0x82b31d,
+          modelId: modelId,
+          payload: payload,
+          promptPackage: promptPackage3,
+          ratioResolution: provider,
           requestPrompt: requestPrompt,
           savedPrompt: savedPrompt,
         }
       );
     },
-    _0x4b38f4 = ({
-      currentProject: _0x128080,
-      currentShot: _0x50eba3,
-      requestRevision: _0x130270,
-      savedPrompt: _0x432518,
+    handler4 = ({
+      currentProject: currentProject3,
+      currentShot: currentShot,
+      requestRevision: requestRevision2,
+      savedPrompt: savedPrompt3,
       promptEnhancement: promptEnhancement = null,
-      sourceImageSize: _0xab4914,
+      sourceImageSize: sourceImageSize2,
       taskIdentity: taskIdentity = {},
     }) => {
       try {
-        const _0x40a8d1 = _0x3504d2({
-          project: _0x128080,
-          shot: { ..._0x50eba3, imagePrompt: _0x432518 },
-          sourceImageSize: _0xab4914,
+        const payload2 = handler3({
+          project: currentProject3,
+          shot: { ...currentShot, imagePrompt: savedPrompt3 },
+          sourceImageSize: sourceImageSize2,
           taskIdentity: taskIdentity,
           promptEnhancement: promptEnhancement,
         });
         return (
           createPersonReplacementImageGenerationRequestRevision({
-            project: _0x128080,
-            shot: _0x50eba3,
-            payload: _0x40a8d1['payload'],
-            sourceImageSize: _0xab4914,
-          }) === _0x130270
+            project: currentProject3,
+            shot: currentShot,
+            payload: payload2['payload'],
+            sourceImageSize: sourceImageSize2,
+          }) === requestRevision2
         );
       } catch {
         return ![];
       }
     },
-    _0x1a74cd = ({
-      projectId: _0x2eed03,
-      shotId: _0x112f9f,
-      requestId: _0x2be1e6,
+    handler5 = ({
+      projectId: projectId3,
+      shotId: shotId3,
+      requestId: requestId2,
       requestRevision: requestRevision = '',
       savedPrompt: savedPrompt = '',
       promptEnhancement: promptEnhancement = null,
-      sourceImageSize: _0x113155,
+      sourceImageSize: sourceImageSize3,
       taskIdentity: taskIdentity = {},
     } = {}) => {
-      if (_0x24ed12) return ![];
-      const _0x318722 = _0x2f4d03(_0x2eed03);
-      if (normalizeText(_0x318722?.['id']) !== normalizeText(_0x2eed03)) return ![];
-      const _0x4070fa = _0x318722?.['shots']?.['find']?.(
-        (_0x37aed9) => normalizeText(_0x37aed9?.['id']) === normalizeText(_0x112f9f),
+      if (data) return ![];
+      const currentProject4 = currentProject(projectId3);
+      if (normalizeText(currentProject4?.['id']) !== normalizeText(projectId3)) return ![];
+      const currentShot2 = currentProject4?.['shots']?.['find']?.(
+        (entry) => normalizeText(entry?.['id']) === normalizeText(shotId3),
       );
-      if (!_0x4070fa) return ![];
-      const _0x4d861b = resolvePersonReplacementImageGenerationState(_0x318722['workspace'], _0x112f9f);
-      if (normalizeText(_0x4d861b['requestId']) !== normalizeText(_0x2be1e6)) return ![];
+      if (!currentShot2) return ![];
+      const personReplacementImageGenerationState2 = resolvePersonReplacementImageGenerationState(
+        currentProject4['workspace'],
+        shotId3,
+      );
+      if (normalizeText(personReplacementImageGenerationState2['requestId']) !== normalizeText(requestId2))
+        return ![];
       return (
         !requestRevision ||
-        _0x4b38f4({
-          currentProject: _0x318722,
-          currentShot: _0x4070fa,
+        handler4({
+          currentProject: currentProject4,
+          currentShot: currentShot2,
           requestRevision: requestRevision,
           savedPrompt: savedPrompt,
           promptEnhancement: promptEnhancement,
-          sourceImageSize: _0x113155,
+          sourceImageSize: sourceImageSize3,
           taskIdentity: taskIdentity,
         })
       );
     },
-    _0x3f5caa = (_0x2adec5, _0x3dd709 = {}, { persistIdentity: persistIdentity = ![] } = {}) => {
-      if (!_0x1a74cd(_0x2adec5)) return ![];
-      const _0x1effbe = _0x2f4d03(_0x2adec5['projectId']),
-        _0x32c57f = resolvePersonReplacementImageGenerationState(_0x1effbe['workspace'], _0x2adec5['shotId']),
-        _0x3927ef = {
-          ..._0x32c57f,
-          ..._0x3dd709,
-          shotId: _0x2adec5['shotId'],
-          requestId: _0x2adec5['requestId'],
+    handler6 = (shotId4, args2 = {}, { persistIdentity: persistIdentity = ![] } = {}) => {
+      if (!handler5(shotId4)) return ![];
+      const args3 = currentProject(shotId4['projectId']),
+        args4 = resolvePersonReplacementImageGenerationState(args3['workspace'], shotId4['shotId']),
+        record = {
+          ...args4,
+          ...args2,
+          shotId: shotId4['shotId'],
+          requestId: shotId4['requestId'],
         },
-        _0x3a8ccf =
-          Object['keys'](_0x3927ef)['some'](
-            (_0x5e4674) => !Object['is'](_0x3927ef[_0x5e4674], _0x32c57f[_0x5e4674]),
-          ) || Object['keys'](_0x32c57f)['some']((_0x5a8a8d) => !Object['hasOwn'](_0x3927ef, _0x5a8a8d));
-      if (!_0x3a8ccf) return !![];
+        enabled =
+          Object['keys'](record)['some']((handle) => !Object['is'](record[handle], args4[handle])) ||
+          Object['keys'](args4)['some']((state) => !Object['hasOwn'](record, state));
+      if (!enabled) return !![];
       return (
-        _0x5c4dfc({
-          ..._0x1effbe,
-          workspace: updatePersonReplacementImageGenerationState(_0x1effbe['workspace'], _0x3927ef),
+        handler({
+          ...args3,
+          workspace: updatePersonReplacementImageGenerationState(args3['workspace'], record),
         }),
         persistIdentity &&
-          normalizeText(_0x3927ef['taskId']) &&
-          hasPersonReplacementGenerationTaskIdentityChanged(_0x32c57f, _0x3927ef) &&
+          normalizeText(record['taskId']) &&
+          hasPersonReplacementGenerationTaskIdentityChanged(args4, record) &&
           void Promise['resolve'](persistNow())['catch'](() => {}),
         !![]
       );
     },
-    _0x1d0a33 = async ({
-      projectId: _0x49a944 = '',
+    generate = async ({
+      projectId: projectId4 = '',
       shotId: shotId = '',
-      sourceImageSize: _0x3f2b86,
-      notifyCompletion: _0x14703e = !![],
+      sourceImageSize: sourceImageSize4,
+      notifyCompletion: notifyCompletion2 = !![],
       recoveryTask: recoveryTask = null,
     } = {}) => {
-      if (_0x24ed12) return null;
-      const _0x1ce6db = _0x2f4d03(_0x49a944),
-        _0xb5e29e = normalizeText(shotId),
-        _0x46f50b = _0x1ce6db?.['shots']?.['find']?.((_0x2d9f22) => _0x2d9f22['id'] === _0xb5e29e),
-        _0x48f05a = getRecoverablePersonReplacementImageTask(
-          _0x1ce6db?.['workspace']?.['imageGenerationsByShotId']?.[_0xb5e29e],
+      if (data) return null;
+      const project4 = currentProject(projectId4),
+        shotId5 = normalizeText(shotId),
+        shot4 = project4?.['shots']?.['find']?.((config) => config['id'] === shotId5),
+        args5 = getRecoverablePersonReplacementImageTask(
+          project4?.['workspace']?.['imageGenerationsByShotId']?.[shotId5],
         ),
-        _0x115a10 = recoveryTask ? { ..._0x48f05a, ...recoveryTask } : null;
-      if (!_0x115a10 && _0x48f05a) return null;
+        taskIdentity2 = recoveryTask ? { ...args5, ...recoveryTask } : null;
+      if (!taskIdentity2 && args5) return null;
       if (
-        !_0x1ce6db?.['id'] ||
-        !_0x46f50b ||
-        (_0x115a10 ? typeof resumeImageTask !== 'function' : typeof _0xeaf778 !== 'function')
+        !project4?.['id'] ||
+        !shot4 ||
+        (taskIdentity2 ? typeof resumeImageTask !== 'function' : typeof generateImage !== 'function')
       )
         return null;
-      let _0x62da6e = buildPersonReplacementPromptPackage({ project: _0x1ce6db, shot: _0x46f50b });
-      const _0x156585 = buildPersonReplacementImageGate({
-        project: _0x1ce6db,
-        shot: _0x46f50b,
-        promptPackage: _0x62da6e,
-        recovering: Boolean(_0x115a10),
+      let promptPackage4 = buildPersonReplacementPromptPackage({ project: project4, shot: shot4 });
+      const error = buildPersonReplacementImageGate({
+        project: project4,
+        shot: shot4,
+        promptPackage: promptPackage4,
+        recovering: Boolean(taskIdentity2),
       });
-      if (!_0x156585['eligible']) return (showToast(_0x156585['message'], 'warn'), null);
-      if (!_0x115a10 && _0x156585['enforceImageLimit'])
+      if (!error['eligible']) return (showToast(error['message'], 'warn'), null);
+      if (!taskIdentity2 && error['enforceImageLimit'])
         try {
-          const _0x1e2cae = _0x3504d2({
-              project: _0x1ce6db,
-              shot: _0x46f50b,
-              promptPackage: _0x62da6e,
-              sourceImageSize: _0x3f2b86,
+          const inputUrls = handler3({
+              project: project4,
+              shot: shot4,
+              promptPackage: promptPackage4,
+              sourceImageSize: sourceImageSize4,
             }),
-            _0x570a3d = buildPersonReplacementImageGate({
-              project: _0x1ce6db,
-              shot: _0x46f50b,
-              promptPackage: _0x62da6e,
-              inputUrls: _0x1e2cae['payload']['inputUrls'],
-              modelId: _0x1e2cae['modelId'],
+            error2 = buildPersonReplacementImageGate({
+              project: project4,
+              shot: shot4,
+              promptPackage: promptPackage4,
+              inputUrls: inputUrls['payload']['inputUrls'],
+              modelId: inputUrls['modelId'],
             });
-          if (!_0x570a3d['eligible']) return (showToast(_0x570a3d['message'], 'warn'), null);
-        } catch (_0x2e10b1) {
-          return (showToast(_0x2e10b1?.['message'] || '无法校验生成输入', 'warn'), null);
+          if (!error2['eligible']) return (showToast(error2['message'], 'warn'), null);
+        } catch (error3) {
+          return (showToast(error3?.['message'] || '无法校验生成输入', 'warn'), null);
         }
-      const _0x3178e7 = _0x1ce6db['id'] + ':image:' + _0xb5e29e;
-      if (_0x3805cf['has'](_0x3178e7)) return null;
-      const _0x72b92d = _0x1ce6db['id'],
-        _0x37bb96 = normalizeText(_0x115a10?.['requestId']) || normalizeText(createRequestId()),
-        _0x2628c1 = new AbortController(),
-        _0x526a5e = {
-          projectId: _0x72b92d,
-          requestId: _0x37bb96,
-          shotId: _0xb5e29e,
-          abortController: _0x2628c1,
-          taskId: normalizeText(_0x115a10?.['taskId']),
-          taskIdentity: _0x115a10 || {},
+      const scope = project4['id'] + ':image:' + shotId5;
+      if (map['has'](scope)) return null;
+      const projectId5 = project4['id'],
+        requestId3 = normalizeText(taskIdentity2?.['requestId']) || normalizeText(createRequestId()),
+        abortController = new AbortController(),
+        promptEnhancement2 = {
+          projectId: projectId5,
+          requestId: requestId3,
+          shotId: shotId5,
+          abortController: abortController,
+          taskId: normalizeText(taskIdentity2?.['taskId']),
+          taskIdentity: taskIdentity2 || {},
           promptEnhancement: null,
         };
-      _0x3805cf['set'](_0x3178e7, _0x526a5e);
-      const _0x2b7326 = createPersonReplacementImageGenerationMappingRevision({
-        project: _0x1ce6db,
-        shot: _0x46f50b,
-      });
-      let _0x1d8738 = '',
-        _0x49edac = '';
-      _0x5c4dfc({
-        ..._0x1ce6db,
-        workspace: updatePersonReplacementImageGenerationState(_0x1ce6db['workspace'], {
+      map['set'](scope, promptEnhancement2);
+      const personReplacementImageGenerationMappingRevision =
+        createPersonReplacementImageGenerationMappingRevision({
+          project: project4,
+          shot: shot4,
+        });
+      let requestRevision3 = '',
+        savedPrompt4 = '';
+      handler({
+        ...project4,
+        workspace: updatePersonReplacementImageGenerationState(project4['workspace'], {
           status: 'running',
-          shotId: _0xb5e29e,
-          requestId: _0x37bb96,
-          ...(_0x115a10 || {}),
+          shotId: shotId5,
+          requestId: requestId3,
+          ...(taskIdentity2 || {}),
           error: '',
         }),
       });
       try {
-        if (_0x62da6e['annotatedSource'] && !_0x115a10) {
-          const _0x341857 = await createAnnotatedSource({
-            ..._0x62da6e['annotatedSource'],
-            signal: _0x2628c1['signal'],
+        if (promptPackage4['annotatedSource'] && !taskIdentity2) {
+          const annotatedSource = await createAnnotatedSource({
+            ...promptPackage4['annotatedSource'],
+            signal: abortController['signal'],
           });
-          _0x62da6e = applyPersonReplacementAnnotatedSource(_0x62da6e, _0x341857);
-          if (_0x2628c1['signal']['aborted'] || _0x24ed12) return null;
+          promptPackage4 = applyPersonReplacementAnnotatedSource(promptPackage4, annotatedSource);
+          if (abortController['signal']['aborted'] || data) return null;
         }
-        if (_0x62da6e['locationGuide'] && !_0x115a10) {
-          const _0x56eb5b = await createLocationGuide({
-            ..._0x62da6e['locationGuide'],
-            signal: _0x2628c1['signal'],
+        if (promptPackage4['locationGuide'] && !taskIdentity2) {
+          const locationGuide = await createLocationGuide({
+            ...promptPackage4['locationGuide'],
+            signal: abortController['signal'],
           });
-          _0x62da6e = applyPersonReplacementLocationGuide(_0x62da6e, _0x56eb5b);
-          if (_0x2628c1['signal']['aborted'] || _0x24ed12) return null;
+          promptPackage4 = applyPersonReplacementLocationGuide(promptPackage4, locationGuide);
+          if (abortController['signal']['aborted'] || data) return null;
         }
-        let _0x8ee2e9 = _0x156585['manual'] ? null : _0x115a10?.['promptEnhancement'] || null;
+        let promptEnhancement3 = error['manual'] ? null : taskIdentity2?.['promptEnhancement'] || null;
         if (
-          !_0x156585['manual'] &&
-          !_0x8ee2e9 &&
-          _0x1ce6db['settings']?.['replacementPromptEnhancementEnabled'] === !![]
+          !error['manual'] &&
+          !promptEnhancement3 &&
+          project4['settings']?.['replacementPromptEnhancementEnabled'] === !![]
         ) {
           if (typeof enhancePrompt !== 'function') throw new Error('AI 提示词增强服务尚未初始化');
-          const _0x1ff54b = getPromptEnhancementModel?.() || {},
-            _0x2b1223 = JSON['stringify']({
-              mappingRevision: usesSourceDescriptions(_0x62da6e)
-                ? sourceDescriptionIdentity(_0x62da6e)
-                : _0x2b7326,
-              modelId: normalizeText(_0x1ff54b['modelId']),
-              provider: normalizeText(_0x1ff54b['provider']),
-              providerProfileId: normalizeText(_0x1ff54b['providerProfileId']),
+          const input = getPromptEnhancementModel?.() || {},
+            output = JSON['stringify']({
+              mappingRevision: usesSourceDescriptions(promptPackage4)
+                ? sourceDescriptionIdentity(promptPackage4)
+                : personReplacementImageGenerationMappingRevision,
+              modelId: normalizeText(input['modelId']),
+              provider: normalizeText(input['provider']),
+              providerProfileId: normalizeText(input['providerProfileId']),
             });
-          _0x8ee2e9 = _0x162f67['get'](_0x2b1223);
-          if (!_0x8ee2e9) {
-            const _0x59d6d5 = await enhancePrompt({
-              project: _0x1ce6db,
-              promptPackage: _0x62da6e,
-              shot: _0x46f50b,
-              signal: _0x2628c1['signal'],
+          promptEnhancement3 = map2['get'](output);
+          if (!promptEnhancement3) {
+            const args6 = await enhancePrompt({
+              project: project4,
+              promptPackage: promptPackage4,
+              shot: shot4,
+              signal: abortController['signal'],
             });
-            _0x8ee2e9 = { ..._0x59d6d5, createdAt: normalizeText(_0x59d6d5?.['createdAt']) || now() };
-            if (!normalizeText(_0x8ee2e9['prompt'])) throw new Error('AI 提示词增强未返回可用提示词');
-            _0x162f67['set'](_0x2b1223, _0x8ee2e9);
+            promptEnhancement3 = { ...args6, createdAt: normalizeText(args6?.['createdAt']) || now() };
+            if (!normalizeText(promptEnhancement3['prompt']))
+              throw new Error('AI 提示词增强未返回可用提示词');
+            map2['set'](output, promptEnhancement3);
           }
-          (usesSourceDescriptions(_0x62da6e) &&
-            _0x8ee2e9['analysis']?.['kind'] === 'source-descriptions-v1' &&
-            (_0x8ee2e9 = {
-              ..._0x8ee2e9,
-              prompt: compileSourceDescriptions(_0x62da6e, _0x8ee2e9['analysis']),
+          (usesSourceDescriptions(promptPackage4) &&
+            promptEnhancement3['analysis']?.['kind'] === 'source-descriptions-v1' &&
+            (promptEnhancement3 = {
+              ...promptEnhancement3,
+              prompt: compileSourceDescriptions(promptPackage4, promptEnhancement3['analysis']),
             }),
-            (_0x526a5e['promptEnhancement'] = _0x8ee2e9),
-            _0x3f5caa(_0x526a5e, { status: 'running', promptEnhancement: _0x8ee2e9, error: '' }));
+            (promptEnhancement2['promptEnhancement'] = promptEnhancement3),
+            handler6(promptEnhancement2, {
+              status: 'running',
+              promptEnhancement: promptEnhancement3,
+              error: '',
+            }));
         }
         const {
-          modelId: _0x474795,
-          payload: _0x5521d5,
-          ratioResolution: _0x1e584f,
-          requestPrompt: _0x5e37c9,
-          savedPrompt: _0x4b7aaf,
-        } = _0x3504d2({
-          project: _0x1ce6db,
-          shot: _0x46f50b,
-          promptPackage: _0x62da6e,
-          promptEnhancement: _0x8ee2e9,
-          sourceImageSize: _0x3f2b86,
-          taskIdentity: _0x115a10 || {},
+          modelId: modelId2,
+          payload: payload3,
+          ratioResolution: ratioResolution,
+          requestPrompt: requestPrompt2,
+          savedPrompt: savedPrompt5,
+        } = handler3({
+          project: project4,
+          shot: shot4,
+          promptPackage: promptPackage4,
+          promptEnhancement: promptEnhancement3,
+          sourceImageSize: sourceImageSize4,
+          taskIdentity: taskIdentity2 || {},
         });
-        if (_0x156585['manual'] && !normalizeText(_0x5e37c9)) throw new Error('手动模式请先填写提示词。');
-        ((_0x49edac = _0x4b7aaf),
-          (_0x1d8738 = createPersonReplacementImageGenerationRequestRevision({
-            project: _0x1ce6db,
-            shot: _0x46f50b,
-            payload: _0x5521d5,
-            sourceImageSize: _0x3f2b86,
+        if (error['manual'] && !normalizeText(requestPrompt2)) throw new Error('手动模式请先填写提示词。');
+        ((savedPrompt4 = savedPrompt5),
+          (requestRevision3 = createPersonReplacementImageGenerationRequestRevision({
+            project: project4,
+            shot: shot4,
+            payload: payload3,
+            sourceImageSize: sourceImageSize4,
           })),
-          Object['assign'](_0x526a5e, {
-            requestRevision: _0x1d8738,
-            savedPrompt: _0x4b7aaf,
-            promptEnhancement: _0x8ee2e9,
-            sourceImageSize: _0x3f2b86,
+          Object['assign'](promptEnhancement2, {
+            requestRevision: requestRevision3,
+            savedPrompt: savedPrompt5,
+            promptEnhancement: promptEnhancement3,
+            sourceImageSize: sourceImageSize4,
           }));
-        const _0x51d374 =
-            resolveModelExecution(_0x474795) ||
-            resolveModelExecution(_0x474795, { providerHint: _0x1e584f['provider'] }),
-          _0x6d157c = Number(_0x115a10?.['startedAt']) || Date['now'](),
-          _0x3101ef = {
-            taskId: normalizeText(_0x115a10?.['taskId']),
-            modelId: _0x474795,
-            provider: _0x1e584f['provider'],
-            providerProfileId: _0x5521d5['providerProfileId'],
+        const modelExecution2 =
+            resolveModelExecution(modelId2) ||
+            resolveModelExecution(modelId2, { providerHint: ratioResolution['provider'] }),
+          startedAt = Number(taskIdentity2?.['startedAt']) || Date['now'](),
+          args7 = {
+            taskId: normalizeText(taskIdentity2?.['taskId']),
+            modelId: modelId2,
+            provider: ratioResolution['provider'],
+            providerProfileId: payload3['providerProfileId'],
             executionId:
-              normalizeText(_0x115a10?.['executionId']) ||
-              normalizeText(_0x51d374?.['executionManifest']?.['id']),
-            startedAt: _0x6d157c,
-            useOpenapiQuery: _0x115a10?.['useOpenapiQuery'] === !![],
+              normalizeText(taskIdentity2?.['executionId']) ||
+              normalizeText(modelExecution2?.['executionManifest']?.['id']),
+            startedAt: startedAt,
+            useOpenapiQuery: taskIdentity2?.['useOpenapiQuery'] === !![],
           },
-          _0xbbac7d = (_0x570a49, _0x2a1bf0 = {}) => {
-            const _0x597c0 = resolvePersonReplacementImageGenerationState(
-                _0x2f4d03(_0x72b92d)?.['workspace'],
-                _0xb5e29e,
+          handler7 = (taskId, meta = {}) => {
+            const args8 = resolvePersonReplacementImageGenerationState(
+                currentProject(projectId5)?.['workspace'],
+                shotId5,
               ),
-              _0x33c2d9 = projectPersonReplacementGenerationTaskIdentity({
-                taskId: _0x570a49,
-                meta: _0x2a1bf0,
-                defaults: { ..._0x3101ef, ..._0x597c0 },
+              args9 = projectPersonReplacementGenerationTaskIdentity({
+                taskId: taskId,
+                meta: meta,
+                defaults: { ...args7, ...args8 },
               });
-            if (!_0x33c2d9['taskId']) return;
-            ((_0x526a5e['taskId'] = _0x33c2d9['taskId']),
-              _0x3f5caa(
-                _0x526a5e,
-                { status: 'running', ..._0x33c2d9, error: '' },
+            if (!args9['taskId']) return;
+            ((promptEnhancement2['taskId'] = args9['taskId']),
+              handler6(
+                promptEnhancement2,
+                { status: 'running', ...args9, error: '' },
                 { persistIdentity: !![] },
               ));
           },
-          _0x10e229 = {
-            signal: _0x2628c1['signal'],
-            useOpenapiQuery: _0x115a10?.['useOpenapiQuery'] === !![],
-            onTaskId: (_0x448fe4) => _0xbbac7d(_0x448fe4),
-            onTaskMeta: (_0x4ccc47 = {}) => _0xbbac7d(_0x4ccc47['taskId'], _0x4ccc47),
-            onRunningHubWorkflowQueueChange: (_0x201ee5 = {}) => {
-              const _0x43fa20 =
-                normalizeText(_0x201ee5['status'])['toLowerCase']() === 'queued' ? 'queued' : 'running';
-              _0x3f5caa(_0x526a5e, { status: _0x43fa20, error: '' });
+          value2 = {
+            signal: abortController['signal'],
+            useOpenapiQuery: taskIdentity2?.['useOpenapiQuery'] === !![],
+            onTaskId: (value3) => handler7(value3),
+            onTaskMeta: (options2 = {}) => handler7(options2['taskId'], options2),
+            onRunningHubWorkflowQueueChange: (response3 = {}) => {
+              const status =
+                normalizeText(response3['status'])['toLowerCase']() === 'queued' ? 'queued' : 'running';
+              handler6(promptEnhancement2, { status: status, error: '' });
             },
           },
-          _0x2b5a57 = _0x2f4d03(_0x72b92d),
-          _0xf1cecc = _0x2b5a57?.['shots']?.['find']((_0x52e439) => _0x52e439['id'] === _0xb5e29e);
+          project5 = currentProject(projectId5),
+          shot5 = project5?.['shots']?.['find']((value4) => value4['id'] === shotId5);
         if (
-          _0x2628c1['signal']['aborted'] ||
-          createPersonReplacementImageGenerationMappingRevision({ project: _0x2b5a57, shot: _0xf1cecc }) !==
-            _0x2b7326 ||
-          !_0x1a74cd({
-            projectId: _0x72b92d,
-            shotId: _0xb5e29e,
-            requestId: _0x37bb96,
-            requestRevision: _0x1d8738,
-            savedPrompt: _0x4b7aaf,
-            promptEnhancement: _0x8ee2e9,
-            sourceImageSize: _0x3f2b86,
-            taskIdentity: _0x115a10 || {},
+          abortController['signal']['aborted'] ||
+          createPersonReplacementImageGenerationMappingRevision({ project: project5, shot: shot5 }) !==
+            personReplacementImageGenerationMappingRevision ||
+          !handler5({
+            projectId: projectId5,
+            shotId: shotId5,
+            requestId: requestId3,
+            requestRevision: requestRevision3,
+            savedPrompt: savedPrompt5,
+            promptEnhancement: promptEnhancement3,
+            sourceImageSize: sourceImageSize4,
+            taskIdentity: taskIdentity2 || {},
           })
         )
-          return _0x4a054e({
-            currentProject: _0x2f4d03(_0x72b92d),
-            projectId: _0x72b92d,
-            shotId: _0xb5e29e,
-            requestId: _0x37bb96,
+          return handler2({
+            currentProject: currentProject(projectId5),
+            projectId: projectId5,
+            shotId: shotId5,
+            requestId: requestId3,
           });
-        const _0xe7d8e0 = _0x115a10
-          ? await resumeImageTask(_0x115a10['taskId'], _0x5521d5, _0x10e229)
-          : await _0xeaf778(_0x5521d5, _0x10e229);
-        if (_0x24ed12) return null;
-        const _0x181d47 = resolveGeneratedImages(_0xe7d8e0),
-          _0x4bce57 = _0x181d47[0x0]['localPath'],
-          _0x400ec7 = _0x2f4d03(_0x72b92d);
-        if (_0x400ec7?.['id'] !== _0x72b92d) return null;
-        const _0x1311d0 = _0x400ec7['shots']?.['find']?.((_0x469971) => _0x469971['id'] === _0xb5e29e);
-        if (!_0x1311d0) return null;
-        const _0x4be3a6 = resolvePersonReplacementImageGenerationState(_0x400ec7['workspace'], _0xb5e29e);
-        if (_0x4be3a6['requestId'] !== _0x37bb96) return null;
+        const value5 = taskIdentity2
+          ? await resumeImageTask(taskIdentity2['taskId'], payload3, value2)
+          : await generateImage(payload3, value2);
+        if (data) return null;
+        const map3 = resolveGeneratedImages(value5),
+          replacementImageRef = map3[0x0]['localPath'],
+          currentProject5 = currentProject(projectId5);
+        if (currentProject5?.['id'] !== projectId5) return null;
+        const currentShot3 = currentProject5['shots']?.['find']?.((value6) => value6['id'] === shotId5);
+        if (!currentShot3) return null;
+        const personReplacementImageGenerationState3 = resolvePersonReplacementImageGenerationState(
+          currentProject5['workspace'],
+          shotId5,
+        );
+        if (personReplacementImageGenerationState3['requestId'] !== requestId3) return null;
         if (
-          !_0x4b38f4({
-            currentProject: _0x400ec7,
-            currentShot: _0x1311d0,
-            requestRevision: _0x1d8738,
-            savedPrompt: _0x4b7aaf,
-            promptEnhancement: _0x8ee2e9,
-            sourceImageSize: _0x3f2b86,
-            taskIdentity: _0x115a10 || {},
+          !handler4({
+            currentProject: currentProject5,
+            currentShot: currentShot3,
+            requestRevision: requestRevision3,
+            savedPrompt: savedPrompt5,
+            promptEnhancement: promptEnhancement3,
+            sourceImageSize: sourceImageSize4,
+            taskIdentity: taskIdentity2 || {},
           })
         )
-          return _0x4a054e({
-            currentProject: _0x400ec7,
-            projectId: _0x72b92d,
-            shotId: _0xb5e29e,
-            requestId: _0x37bb96,
+          return handler2({
+            currentProject: currentProject5,
+            projectId: projectId5,
+            shotId: shotId5,
+            requestId: requestId3,
           });
-        let _0x2b581b = _0x1311d0['replacementImage'];
-        const _0x33114e = now();
-        let _0x3b11de = 0x0;
-        for (const [_0x1c5cb7, _0x4683a7] of _0x181d47['entries']()) {
-          _0x2b581b = appendPersonReplacementImageResult(
-            { replacementImage: _0x2b581b },
+        let replacementImage2 = currentShot3['replacementImage'];
+        const createdAt2 = now();
+        let value7 = 0x0;
+        for (const [count, imageUrl2] of map3['entries']()) {
+          replacementImage2 = appendPersonReplacementImageResult(
+            { replacementImage: replacementImage2 },
             {
-              ..._0x4683a7,
-              imageUrl: _0x4683a7['localPath'],
-              prompt: _0x5e37c9,
-              userPrompt: _0x4b7aaf,
-              modelId: _0x474795,
-              provider: _0x1e584f['provider'],
-              ...(_0x8ee2e9 ? { promptEnhancement: _0x8ee2e9 } : {}),
-              createdAt: _0x33114e,
+              ...imageUrl2,
+              imageUrl: imageUrl2['localPath'],
+              prompt: requestPrompt2,
+              userPrompt: savedPrompt5,
+              modelId: modelId2,
+              provider: ratioResolution['provider'],
+              ...(promptEnhancement3 ? { promptEnhancement: promptEnhancement3 } : {}),
+              createdAt: createdAt2,
             },
           );
-          if (_0x1c5cb7 === 0x0) _0x3b11de = _0x2b581b['activeIndex'];
+          if (count === 0x0) value7 = replacementImage2['activeIndex'];
         }
-        _0x2b581b['activeIndex'] = _0x3b11de;
-        const _0x20ac21 = normalizeText(_0x1311d0['imagePrompt']) !== normalizeText(_0x4b7aaf),
-          _0x25cfec = _0x5c4dfc({
-            ..._0x400ec7,
-            shots: _0x400ec7['shots']['map']((_0x193737) =>
-              _0x193737['id'] === _0xb5e29e
+        replacementImage2['activeIndex'] = value7;
+        const imagePrompt = normalizeText(currentShot3['imagePrompt']) !== normalizeText(savedPrompt5),
+          value8 = handler({
+            ...currentProject5,
+            shots: currentProject5['shots']['map']((args10) =>
+              args10['id'] === shotId5
                 ? {
-                    ..._0x193737,
-                    replacementImage: _0x2b581b,
-                    replacementImageRef: _0x4bce57,
+                    ...args10,
+                    replacementImage: replacementImage2,
+                    replacementImageRef: replacementImageRef,
                     error: '',
-                    imagePrompt: _0x20ac21 ? _0x1311d0['imagePrompt'] : _0x4b7aaf,
+                    imagePrompt: imagePrompt ? currentShot3['imagePrompt'] : savedPrompt5,
                   }
-                : _0x193737,
+                : args10,
             ),
-            workspace: updatePersonReplacementImageGenerationState(_0x400ec7['workspace'], {
+            workspace: updatePersonReplacementImageGenerationState(currentProject5['workspace'], {
               status: 'succeeded',
-              shotId: _0xb5e29e,
-              requestId: _0x37bb96,
+              shotId: shotId5,
+              requestId: requestId3,
               error: '',
             }),
           });
-        let _0x44527d = !![];
+        let enabled2 = !![];
         try {
           await persistNow();
         } catch {
-          _0x44527d = ![];
+          enabled2 = ![];
         }
-        if (_0x24ed12) return null;
-        const _0x3d537d = _0x2f4d03(_0x72b92d);
-        if (_0x3d537d?.['id'] !== _0x72b92d) return null;
-        const _0x27288a = _0x3d537d['shots']?.['find']?.((_0x22a7e8) => _0x22a7e8['id'] === _0xb5e29e);
-        if (!_0x27288a) return null;
-        const _0x217718 = resolvePersonReplacementImageGenerationState(_0x3d537d['workspace'], _0xb5e29e);
-        if (_0x217718['requestId'] !== _0x37bb96) return null;
-        return (
-          (!_0x44527d || _0x14703e === ![]) &&
-            showToast(
-              _0x44527d ? '替换首帧已生成。' : '替换首帧已生成，项目数据正在重试保存，请暂时不要刷新。',
-              _0x44527d ? 'success' : 'warn',
-            ),
-          _0x14703e !== ![] && notifyCompletion({ kind: 'image', mediaRef: _0x4bce57, projectId: _0x72b92d }),
-          { project: _0x3d537d || _0x25cfec, ok: !![], shotId: _0xb5e29e }
+        if (data) return null;
+        const project6 = currentProject(projectId5);
+        if (project6?.['id'] !== projectId5) return null;
+        const enabled3 = project6['shots']?.['find']?.((value9) => value9['id'] === shotId5);
+        if (!enabled3) return null;
+        const personReplacementImageGenerationState4 = resolvePersonReplacementImageGenerationState(
+          project6['workspace'],
+          shotId5,
         );
-      } catch (_0x254891) {
-        if (_0x24ed12) return null;
-        const _0x4a35bb = _0x2f4d03(_0x72b92d);
-        if (_0x4a35bb?.['id'] !== _0x72b92d) return null;
-        const _0x37cf13 = _0x4a35bb['shots']?.['find']?.((_0x1bac4d) => _0x1bac4d['id'] === _0xb5e29e);
-        if (!_0x37cf13) return null;
-        const _0x40ba4e = resolvePersonReplacementImageGenerationState(_0x4a35bb['workspace'], _0xb5e29e);
-        if (_0x40ba4e['requestId'] !== _0x37bb96) return null;
-        const _0xebd3e9 = _0x1d8738
-          ? !_0x4b38f4({
-              currentProject: _0x4a35bb,
-              currentShot: _0x37cf13,
-              requestRevision: _0x1d8738,
-              savedPrompt: _0x49edac,
-              promptEnhancement: _0x526a5e['promptEnhancement'],
-              sourceImageSize: _0x3f2b86,
-              taskIdentity: _0x115a10 || {},
+        if (personReplacementImageGenerationState4['requestId'] !== requestId3) return null;
+        return (
+          (!enabled2 || notifyCompletion2 === ![]) &&
+            showToast(
+              enabled2 ? '替换首帧已生成。' : '替换首帧已生成，项目数据正在重试保存，请暂时不要刷新。',
+              enabled2 ? 'success' : 'warn',
+            ),
+          notifyCompletion2 !== ![] &&
+            notifyCompletion({ kind: 'image', mediaRef: replacementImageRef, projectId: projectId5 }),
+          { project: project6 || value8, ok: !![], shotId: shotId5 }
+        );
+      } catch (error4) {
+        if (data) return null;
+        const currentProject6 = currentProject(projectId5);
+        if (currentProject6?.['id'] !== projectId5) return null;
+        const currentShot4 = currentProject6['shots']?.['find']?.((value10) => value10['id'] === shotId5);
+        if (!currentShot4) return null;
+        const personReplacementImageGenerationState5 = resolvePersonReplacementImageGenerationState(
+          currentProject6['workspace'],
+          shotId5,
+        );
+        if (personReplacementImageGenerationState5['requestId'] !== requestId3) return null;
+        const value11 = requestRevision3
+          ? !handler4({
+              currentProject: currentProject6,
+              currentShot: currentShot4,
+              requestRevision: requestRevision3,
+              savedPrompt: savedPrompt4,
+              promptEnhancement: promptEnhancement2['promptEnhancement'],
+              sourceImageSize: sourceImageSize4,
+              taskIdentity: taskIdentity2 || {},
             })
-          : createPersonReplacementImageGenerationMappingRevision({ project: _0x4a35bb, shot: _0x37cf13 }) !==
-            _0x2b7326;
-        if (_0xebd3e9)
-          return _0x4a054e({
-            currentProject: _0x4a35bb,
-            projectId: _0x72b92d,
-            shotId: _0xb5e29e,
-            requestId: _0x37bb96,
+          : createPersonReplacementImageGenerationMappingRevision({
+              project: currentProject6,
+              shot: currentShot4,
+            }) !== personReplacementImageGenerationMappingRevision;
+        if (value11)
+          return handler2({
+            currentProject: currentProject6,
+            projectId: projectId5,
+            shotId: shotId5,
+            requestId: requestId3,
           });
-        const _0x2fef5f = _0x254891?.['getUserMessage']?.() || _0x254891?.['message'] || '替换首帧生成失败',
-          _0x563ef7 = _0x5c4dfc({
-            ..._0x4a35bb,
-            workspace: updatePersonReplacementImageGenerationState(_0x4a35bb['workspace'], {
+        const error5 = error4?.['getUserMessage']?.() || error4?.['message'] || '替换首帧生成失败',
+          project7 = handler({
+            ...currentProject6,
+            workspace: updatePersonReplacementImageGenerationState(currentProject6['workspace'], {
               status: 'failed',
-              shotId: _0xb5e29e,
-              requestId: _0x37bb96,
-              error: _0x2fef5f,
+              shotId: shotId5,
+              requestId: requestId3,
+              error: error5,
             }),
           });
-        return { project: _0x563ef7, ok: ![], shotId: _0xb5e29e, error: _0x2fef5f };
+        return { project: project7, ok: ![], shotId: shotId5, error: error5 };
       } finally {
-        _0x3805cf['delete'](_0x3178e7);
+        map['delete'](scope);
       }
     },
-    _0x2e19ca = async ({
-      projectId: _0x57e8f9 = '',
+    resume = async ({
+      projectId: projectId6 = '',
       shotId: shotId = '',
       notifyCompletion: notifyCompletion = !![],
     } = {}) => {
-      const _0x187b25 = normalizeText(shotId),
-        _0x18f4a0 = _0x2f4d03(_0x57e8f9),
-        _0x5c2785 = getRecoverablePersonReplacementImageTask(
-          _0x18f4a0?.['workspace']?.['imageGenerationsByShotId']?.[_0x187b25],
+      const shotId6 = normalizeText(shotId),
+        projectId7 = currentProject(projectId6),
+        recoveryTask2 = getRecoverablePersonReplacementImageTask(
+          projectId7?.['workspace']?.['imageGenerationsByShotId']?.[shotId6],
         );
-      if (!_0x5c2785 || _0x24ed12) return null;
-      return _0x1d0a33({
-        projectId: _0x18f4a0?.['id'],
-        shotId: _0x187b25,
+      if (!recoveryTask2 || data) return null;
+      return generate({
+        projectId: projectId7?.['id'],
+        shotId: shotId6,
         notifyCompletion: notifyCompletion,
-        recoveryTask: _0x5c2785,
+        recoveryTask: recoveryTask2,
       });
     },
-    _0x469966 = ({ projectId: _0x41d319 = '', shotId: _0x55eac4 } = {}) => {
-      const _0x8f6430 = normalizeText(_0x55eac4),
-        _0x2c2887 = _0x2f4d03(_0x41d319),
-        _0x1bf83e = normalizeText(_0x2c2887?.['id']),
-        _0xb246a2 = _0x1bf83e + ':image:' + _0x8f6430,
-        _0x291afb = _0x3805cf['get'](_0xb246a2);
-      if (!_0x291afb || _0x24ed12) return null;
-      (_0x3805cf['delete'](_0xb246a2), _0x291afb['abortController']?.['abort']?.());
-      const _0x4bb49c = resolvePersonReplacementImageGenerationState(_0x2c2887?.['workspace'], _0x8f6430);
-      if (normalizeText(_0x4bb49c['requestId']) !== normalizeText(_0x291afb['requestId']))
-        return { ok: !![], shotId: _0x8f6430 };
-      const _0xbe4af2 = _0x5c4dfc({
-        ..._0x2c2887,
-        workspace: updatePersonReplacementImageGenerationState(_0x2c2887['workspace'], {
+    cancel = ({ projectId: projectId8 = '', shotId: shotId7 } = {}) => {
+      const shotId8 = normalizeText(shotId7),
+        args11 = currentProject(projectId8),
+        text5 = normalizeText(args11?.['id']),
+        value12 = text5 + ':image:' + shotId8,
+        enabled4 = map['get'](value12);
+      if (!enabled4 || data) return null;
+      (map['delete'](value12), enabled4['abortController']?.['abort']?.());
+      const personReplacementImageGenerationState6 = resolvePersonReplacementImageGenerationState(
+        args11?.['workspace'],
+        shotId8,
+      );
+      if (
+        normalizeText(personReplacementImageGenerationState6['requestId']) !==
+        normalizeText(enabled4['requestId'])
+      )
+        return { ok: !![], shotId: shotId8 };
+      const project8 = handler({
+        ...args11,
+        workspace: updatePersonReplacementImageGenerationState(args11['workspace'], {
           status: 'idle',
-          shotId: _0x8f6430,
+          shotId: shotId8,
           error: '',
         }),
       });
-      return { ok: !![], shotId: _0x8f6430, project: _0xbe4af2 };
+      return { ok: !![], shotId: shotId8, project: project8 };
     },
-    _0x2fa94c = async () => {
-      if (_0x24ed12) return [];
-      const _0x481f7d = _0x397ed7?.(),
-        _0x5b31c0 = normalizeText(_0x481f7d?.['id']),
-        _0x1198ae = Object['entries'](_0x481f7d?.['workspace']?.['imageGenerationsByShotId'] || {})[
-          'flatMap'
-        ](([_0x5d0523, _0x37f992]) =>
-          getRecoverablePersonReplacementImageTask(_0x37f992) ? [normalizeText(_0x5d0523)] : [],
+    resumeRecoverable = async () => {
+      if (data) return [];
+      const value13 = getProject?.(),
+        text6 = normalizeText(value13?.['id']),
+        list2 = Object['entries'](value13?.['workspace']?.['imageGenerationsByShotId'] || {})['flatMap'](
+          ([value14, value15]) =>
+            getRecoverablePersonReplacementImageTask(value15) ? [normalizeText(value14)] : [],
         ),
-        _0xd46809 = await Promise['allSettled'](
-          _0x1198ae['map']((_0x3540e5) => _0x2e19ca({ shotId: _0x3540e5 })),
-        );
-      if (_0x24ed12 || !_0x2f4d03(_0x5b31c0)) return [];
-      return _0xd46809;
+        value16 = await Promise['allSettled'](list2['map']((shotId9) => resume({ shotId: shotId9 })));
+      if (data || !currentProject(text6)) return [];
+      return value16;
     },
-    _0x8473e3 = () => {
-      if (_0x24ed12) return null;
-      _0x24ed12 = !![];
-      const _0x4770fc = _0x397ed7?.();
-      let _0x277685 = _0x4770fc?.['workspace'],
-        _0x500acf = ![];
-      _0x4770fc?.['id'] &&
-        _0x3805cf['forEach']((_0x2d45c1) => {
-          if (_0x2d45c1['projectId'] !== _0x4770fc['id']) return;
-          const _0x4091d8 = resolvePersonReplacementImageGenerationState(_0x277685, _0x2d45c1['shotId']);
-          if (_0x4091d8['requestId'] !== _0x2d45c1['requestId']) return;
-          _0x2d45c1['abortController']?.['abort']?.();
-          if (getRecoverablePersonReplacementImageTask(_0x4091d8)) return;
-          if (_0x4091d8['status'] !== 'running') return;
-          ((_0x277685 = updatePersonReplacementImageGenerationState(_0x277685, {
+    destroy = () => {
+      if (data) return null;
+      data = !![];
+      const args12 = getProject?.();
+      let workspace = args12?.['workspace'],
+        enabled5 = ![];
+      args12?.['id'] &&
+        map['forEach']((shotId10) => {
+          if (shotId10['projectId'] !== args12['id']) return;
+          const response4 = resolvePersonReplacementImageGenerationState(workspace, shotId10['shotId']);
+          if (response4['requestId'] !== shotId10['requestId']) return;
+          shotId10['abortController']?.['abort']?.();
+          if (getRecoverablePersonReplacementImageTask(response4)) return;
+          if (response4['status'] !== 'running') return;
+          ((workspace = updatePersonReplacementImageGenerationState(workspace, {
             status: 'idle',
-            shotId: _0x2d45c1['shotId'],
+            shotId: shotId10['shotId'],
             error: '',
           })),
-            (_0x500acf = !![]));
+            (enabled5 = !![]));
         });
-      (_0x3805cf['clear'](), _0x162f67['clear']());
-      if (!_0x500acf) return null;
-      return _0x444fbf?.({ ..._0x4770fc, workspace: _0x277685 });
+      (map['clear'](), map2['clear']());
+      if (!enabled5) return null;
+      return commitProject?.({ ...args12, workspace: workspace });
     };
   return Object['freeze']({
-    preview: ({ projectId: projectId = '', shotId: _0x525985, sourceImageSize: _0xb122b0 } = {}) => {
-      const _0x26b5c0 = _0x2f4d03(projectId),
-        _0x5c8fa4 = _0x26b5c0?.['shots']?.['find']((_0x125c9f) => _0x125c9f['id'] === _0x525985);
-      if (!_0x5c8fa4) throw new Error('请先选择镜头');
-      const _0x5d676c = buildPersonReplacementPromptPackage({ project: _0x26b5c0, shot: _0x5c8fa4 });
-      if (_0x5d676c['annotatedSource']) {
-        const _0x4ee0ad = buildPersonReplacementImageGate({
-          project: _0x26b5c0,
-          shot: _0x5c8fa4,
-          promptPackage: _0x5d676c,
+    preview: ({ projectId: projectId = '', shotId: shotId11, sourceImageSize: sourceImageSize5 } = {}) => {
+      const project9 = currentProject(projectId),
+        shot6 = project9?.['shots']?.['find']((value17) => value17['id'] === shotId11);
+      if (!shot6) throw new Error('请先选择镜头');
+      const promptPackage5 = buildPersonReplacementPromptPackage({ project: project9, shot: shot6 });
+      if (promptPackage5['annotatedSource']) {
+        const error6 = buildPersonReplacementImageGate({
+          project: project9,
+          shot: shot6,
+          promptPackage: promptPackage5,
         });
-        if (!_0x4ee0ad['eligible']) throw new Error(_0x4ee0ad['message']);
-        return createAnnotatedSource(_0x5d676c['annotatedSource'])['then']((_0x8da74e) =>
-          _0x3504d2({
-            project: _0x26b5c0,
-            shot: _0x5c8fa4,
-            sourceImageSize: _0xb122b0,
-            promptPackage: applyPersonReplacementAnnotatedSource(_0x5d676c, _0x8da74e),
+        if (!error6['eligible']) throw new Error(error6['message']);
+        return createAnnotatedSource(promptPackage5['annotatedSource'])['then']((value18) =>
+          handler3({
+            project: project9,
+            shot: shot6,
+            sourceImageSize: sourceImageSize5,
+            promptPackage: applyPersonReplacementAnnotatedSource(promptPackage5, value18),
           }),
         );
       }
-      return _0x3504d2({ project: _0x26b5c0, shot: _0x5c8fa4, sourceImageSize: _0xb122b0 });
+      return handler3({ project: project9, shot: shot6, sourceImageSize: sourceImageSize5 });
     },
-    acceptUploadedResult: _0x36f5e9,
-    cancel: _0x469966,
-    destroy: _0x8473e3,
-    generate: _0x1d0a33,
-    resume: _0x2e19ca,
-    resumeRecoverable: _0x2fa94c,
-    hasActiveTasks: () => _0x3805cf['size'] > 0x0,
-    hasActiveTasksForProject: (_0x554047) => {
-      const _0x3dc469 = normalizeText(_0x554047);
-      return (
-        Boolean(_0x3dc469) &&
-        [..._0x3805cf['values']()]['some']((_0x452367) => _0x452367['projectId'] === _0x3dc469)
-      );
+    acceptUploadedResult: acceptUploadedResult,
+    cancel: cancel,
+    destroy: destroy,
+    generate: generate,
+    resume: resume,
+    resumeRecoverable: resumeRecoverable,
+    hasActiveTasks: () => map['size'] > 0x0,
+    hasActiveTasksForProject: (value19) => {
+      const text7 = normalizeText(value19);
+      return Boolean(text7) && [...map['values']()]['some']((value20) => value20['projectId'] === text7);
     },
   });
 }

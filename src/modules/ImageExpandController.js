@@ -46,8 +46,8 @@ import {
 } from './imageTaskModelResolver.js';
 import { onLocaleChange, t } from '../i18n/index.js';
 const IMAGE_EXPAND_PROMPT = '移除绿区域，并在绿色区域内生成符合画面的场景';
-function imageExpandText(_0x1709a2, _0x420f7f = {}) {
-  return t('imageExpand.' + _0x1709a2, _0x420f7f);
+function imageExpandText(value, item = {}) {
+  return t('imageExpand.' + value, item);
 }
 const EXPAND_RATIO_OPTIONS = [
     { value: 'original', labelKey: 'ratio.original' },
@@ -64,21 +64,20 @@ const EXPAND_RATIO_OPTIONS = [
     { value: '4K', label: '4K' },
   ];
 function getExpandRatioOptions() {
-  return EXPAND_RATIO_OPTIONS.map((_0x55d48a) => ({
-    ..._0x55d48a,
-    label: _0x55d48a.labelKey ? imageExpandText(_0x55d48a.labelKey) : _0x55d48a.label,
-    selectedLabel:
-      _0x55d48a.value === 'original' ? imageExpandText('ratio.selectedOriginal') : _0x55d48a.label,
+  return EXPAND_RATIO_OPTIONS.map((label2) => ({
+    ...label2,
+    label: label2.labelKey ? imageExpandText(label2.labelKey) : label2.label,
+    selectedLabel: label2.value === 'original' ? imageExpandText('ratio.selectedOriginal') : label2.label,
   }));
 }
 function getExpandImageSizeOptions({ disabled: disabled = false } = {}) {
-  return EXPAND_IMAGE_SIZE_OPTIONS.map((_0x3e4a4a) => ({ ..._0x3e4a4a, disabled: disabled }));
+  return EXPAND_IMAGE_SIZE_OPTIONS.map((args) => ({ ...args, disabled: disabled }));
 }
-function isRunningHubTaskModel(_0x1e40a6, _0x571ce9) {
-  return isRunningHubImageTaskModel(_0x1e40a6, _0x571ce9);
+function isRunningHubTaskModel(key, index) {
+  return isRunningHubImageTaskModel(key, index);
 }
-function isDreaminaTaskModel(_0x388322, _0x3d5dc7) {
-  return isDreaminaImageTaskModel(_0x388322, _0x3d5dc7);
+function isDreaminaTaskModel(result, data) {
+  return isDreaminaImageTaskModel(result, data);
 }
 function buildRunningHubTaskPatch({
   taskId: taskId = '',
@@ -137,24 +136,24 @@ function persistRunningHubResumeCache() {
     window._triggerLocalCacheSave?.();
   } catch {}
 }
-function buildImageExpandOutputText(_0x3907e7, { error: error = '' } = {}) {
-  const _0x4b52bd = { model: _0x3907e7, prompt: imageExpandText('output.promptDisplay'), error: error };
-  return error ? imageExpandText('output.failed', _0x4b52bd) : imageExpandText('output.started', _0x4b52bd);
+function buildImageExpandOutputText(model, { error: error = '' } = {}) {
+  const options = { model: model, prompt: imageExpandText('output.promptDisplay'), error: error };
+  return error ? imageExpandText('output.failed', options) : imageExpandText('output.started', options);
 }
 function buildExpandModelCatalog() {
   return buildImageFunctionModelCatalog(IMAGE_MODELS);
 }
-function findProviderKeyByModel(_0x4f2c76, _0x5bc828) {
-  const _0x40701 = String(_0x5bc828 || '').trim();
-  if (!_0x40701) return null;
-  for (const [_0x517999, _0x5e33fa] of Object.entries(_0x4f2c76 || {})) {
-    const _0x287f83 = Array.isArray(_0x5e33fa?.models) ? _0x5e33fa.models : [];
-    if (_0x287f83.some((_0x29a9c8) => _0x29a9c8?.id === _0x40701)) return _0x517999;
+function findProviderKeyByModel(target, source) {
+  const enabled = String(source || '').trim();
+  if (!enabled) return null;
+  for (const [next, current] of Object.entries(target || {})) {
+    const list = Array.isArray(current?.models) ? current.models : [];
+    if (list.some((item2) => item2?.id === enabled)) return next;
   }
-  return findImageFunctionProviderByModel(_0x4f2c76, _0x40701);
+  return findImageFunctionProviderByModel(target, enabled);
 }
-function buildSeedreamMigrationPatch(_0x48a38c) {
-  return (void _0x48a38c, null);
+function buildSeedreamMigrationPatch(entry) {
+  return (void entry, null);
 }
 const ImageExpandController = {
   active: false,
@@ -179,55 +178,60 @@ const ImageExpandController = {
   _unbindToolbarUpMenus: null,
   _unsubscribeLocale: null,
   cleanup: null,
-  init(_0x25b4fb) {
+  init(record) {
     if (this.active) return;
-    const _0x742142 = appStore.getStateRaw(),
-      _0x58f444 = _0x742142.nodes?.[_0x25b4fb];
-    if (!_0x58f444) return;
-    ((this.active = true), (this.nodeId = _0x25b4fb), (this._expandModelCatalog = buildExpandModelCatalog()));
-    const _0x41549f = this._normalizeLegacySeedreamNode(_0x58f444);
-    ((this.nodeData = _0x41549f),
-      (this._view = { viewport: _0x742142.viewport, node: _0x41549f }),
+    const viewport = appStore.getStateRaw(),
+      enabled2 = viewport.nodes?.[record];
+    if (!enabled2) return;
+    ((this.active = true), (this.nodeId = record), (this._expandModelCatalog = buildExpandModelCatalog()));
+    const node = this._normalizeLegacySeedreamNode(enabled2);
+    ((this.nodeData = node),
+      (this._view = { viewport: viewport.viewport, node: node }),
       (this.ratioStr = 'original'),
       (this.imageSize = '1K'));
-    const _0x14efac = this._getExpandModelCatalog(),
-      _0x13fb5f = getDefaultImageFunctionModelState(_0x14efac),
-      _0x5be22a = String(_0x41549f?.model || '').trim(),
-      _0x42f7e6 = String(_0x41549f?.provider || '').trim(),
-      _0x451bce = findProviderKeyByModel(_0x14efac, _0x5be22a);
-    if (_0x451bce) ((this.model = _0x5be22a), (this.provider = _0x451bce));
+    const payload = this._getExpandModelCatalog(),
+      defaultImageFunctionModelState = getDefaultImageFunctionModelState(payload),
+      handle = String(node?.model || '').trim(),
+      state = String(node?.provider || '').trim(),
+      providerKeyByModel = findProviderKeyByModel(payload, handle);
+    if (providerKeyByModel) ((this.model = handle), (this.provider = providerKeyByModel));
     else
-      _0x13fb5f.model
-        ? ((this.model = _0x13fb5f.model), (this.provider = _0x13fb5f.provider))
-        : ((this.model = _0x5be22a || ''),
-          (this.provider = resolveImageTaskProvider(_0x5be22a, _0x42f7e6, _0x13fb5f.provider || '')));
+      defaultImageFunctionModelState.model
+        ? ((this.model = defaultImageFunctionModelState.model),
+          (this.provider = defaultImageFunctionModelState.provider))
+        : ((this.model = handle || ''),
+          (this.provider = resolveImageTaskProvider(
+            handle,
+            state,
+            defaultImageFunctionModelState.provider || '',
+          )));
     (this._createUI(),
       this._bindEvents(),
       (this._unsubscribeLocale = onLocaleChange(() => this._syncLocaleTexts())),
       (this._unsubscribe = appStore.subscribeSelector(
-        (_0x2053a7) => {
-          const _0x439d02 = _0x2053a7.nodes?.[_0x25b4fb],
-            _0x2203d5 = _0x2053a7.viewport || { x: 0, y: 0, zoom: 1 };
+        (config) => {
+          const nx = config.nodes?.[record],
+            vx = config.viewport || { x: 0, y: 0, zoom: 1 };
           return {
-            hasNode: !!_0x439d02,
-            vx: _0x2203d5.x,
-            vy: _0x2203d5.y,
-            vz: _0x2203d5.zoom || 1,
-            nx: _0x439d02 ? _0x439d02.x : 0,
-            ny: _0x439d02 ? _0x439d02.y : 0,
-            nw: _0x439d02 ? _0x439d02.width : 0,
-            nh: _0x439d02 ? _0x439d02.height : 0,
+            hasNode: !!nx,
+            vx: vx.x,
+            vy: vx.y,
+            vz: vx.zoom || 1,
+            nx: nx ? nx.x : 0,
+            ny: nx ? nx.y : 0,
+            nw: nx ? nx.width : 0,
+            nh: nx ? nx.height : 0,
           };
         },
-        (_0x1697cc) => {
-          if (!_0x1697cc?.hasNode) return;
-          const _0x46ac47 = appStore.getStateRaw().nodes?.[_0x25b4fb];
-          if (!_0x46ac47) return;
-          const _0x1f233b = this._normalizeLegacySeedreamNode(_0x46ac47);
-          ((this.nodeData = _0x1f233b),
+        (x2) => {
+          if (!x2?.hasNode) return;
+          const enabled3 = appStore.getStateRaw().nodes?.[record];
+          if (!enabled3) return;
+          const node2 = this._normalizeLegacySeedreamNode(enabled3);
+          ((this.nodeData = node2),
             (this._view = {
-              viewport: { x: _0x1697cc.vx, y: _0x1697cc.vy, zoom: _0x1697cc.vz },
-              node: _0x1f233b,
+              viewport: { x: x2.vx, y: x2.vy, zoom: x2.vz },
+              node: node2,
             }),
             this._updateView(this._view));
         },
@@ -235,15 +239,15 @@ const ImageExpandController = {
       this._waitForImageAndShow());
   },
   _waitForImageAndShow() {
-    const _0x10615b = () => {
+    const run = () => {
       this.imgEl && this.imgEl.complete && this.imgEl.naturalWidth > 0
         ? (this._updateView(this._view),
           requestAnimationFrame(() => {
             if (this.overlayEl) this.overlayEl.classList.add('visible');
           }))
-        : requestAnimationFrame(_0x10615b);
+        : requestAnimationFrame(run);
     };
-    _0x10615b();
+    run();
   },
   _getExpandModelCatalog() {
     return (
@@ -251,236 +255,229 @@ const ImageExpandController = {
       this._expandModelCatalog
     );
   },
-  _normalizeLegacySeedreamNode(_0x595f85) {
-    const _0x3b4ca5 = buildSeedreamMigrationPatch(_0x595f85);
-    if (!_0x3b4ca5) return _0x595f85;
-    const _0x301841 = { ...(_0x595f85 || {}), ..._0x3b4ca5 },
-      _0x3bbd6d = appStore.getStateRaw().nodes?.[this.nodeId];
-    return (_0x3bbd6d && appStore.updateNodeData(this.nodeId, _0x3b4ca5), _0x301841);
+  _normalizeLegacySeedreamNode(scope) {
+    const args2 = buildSeedreamMigrationPatch(scope);
+    if (!args2) return scope;
+    const input = { ...(scope || {}), ...args2 },
+      output = appStore.getStateRaw().nodes?.[this.nodeId];
+    return (output && appStore.updateNodeData(this.nodeId, args2), input);
   },
   _getImageUrl() {
-    const _0x36614c = this.nodeData || {};
-    return localPathToUrl(_0x36614c.localPath) || _0x36614c.src || _0x36614c.imageUrl || _0x36614c.sourceUrl;
+    const value2 = this.nodeData || {};
+    return localPathToUrl(value2.localPath) || value2.src || value2.imageUrl || value2.sourceUrl;
   },
-  _createExpandedImage(_0xce7d6b, _0x51a472) {
-    return new Promise((_0xeaf5ae, _0x39f681) => {
-      const _0x3653b9 = new Image();
-      ((_0x3653b9.crossOrigin = 'anonymous'),
-        (_0x3653b9.onload = async () => {
+  _createExpandedImage(value3, x3) {
+    return new Promise((handler, handler2) => {
+      const image = new Image();
+      ((image.crossOrigin = 'anonymous'),
+        (image.onload = async () => {
           try {
-            const _0x4edc9a = document.createElement('canvas'),
-              _0x1a1f98 = _0x4edc9a.getContext('2d'),
-              _0x16e465 = _0x3653b9.naturalWidth,
-              _0x528219 = _0x3653b9.naturalHeight,
-              _0x5a7a32 = _0xce7d6b,
-              _0x1d4078 = {
-                x: _0x51a472.x || 0,
-                y: _0x51a472.y || 0,
-                w: _0x51a472.width || 1,
-                h: _0x51a472.height || 1,
+            const box = document.createElement('canvas'),
+              ctx = box.getContext('2d'),
+              value4 = image.naturalWidth,
+              value5 = image.naturalHeight,
+              box2 = value3,
+              box3 = {
+                x: x3.x || 0,
+                y: x3.y || 0,
+                w: x3.width || 1,
+                h: x3.height || 1,
               },
-              _0x1062a5 = _0x16e465 / _0x1d4078.w,
-              _0x3f4090 = _0x528219 / _0x1d4078.h,
-              _0xb6799a = Math.round(_0x5a7a32.w * _0x1062a5),
-              _0x23f9fe = Math.round(_0x5a7a32.h * _0x3f4090);
-            ((_0x4edc9a.width = _0xb6799a),
-              (_0x4edc9a.height = _0x23f9fe),
-              (_0x1a1f98.fillStyle = '#00FF00'),
-              _0x1a1f98.fillRect(0, 0, _0xb6799a, _0x23f9fe));
-            const _0x35a120 = Math.round((_0x1d4078.x - _0x5a7a32.x) * _0x1062a5),
-              _0x327b62 = Math.round((_0x1d4078.y - _0x5a7a32.y) * _0x3f4090);
-            (_0x1a1f98.drawImage(_0x3653b9, _0x35a120, _0x327b62, _0x16e465, _0x528219),
-              _0x4edc9a.toBlob((_0x35d786) => {
-                if (_0x35d786) {
-                  const _0x57c6c4 = URL.createObjectURL(_0x35d786);
-                  _0xeaf5ae({ url: _0x57c6c4, width: _0xb6799a, height: _0x23f9fe });
-                } else _0x39f681(new Error(imageExpandText('errors.createExpandedImageFailed')));
+              value6 = value4 / box3.w,
+              value7 = value5 / box3.h,
+              width = Math.round(box2.w * value6),
+              height = Math.round(box2.h * value7);
+            ((box.width = width),
+              (box.height = height),
+              (ctx.fillStyle = '#00FF00'),
+              ctx.fillRect(0, 0, width, height));
+            const value8 = Math.round((box3.x - box2.x) * value6),
+              value9 = Math.round((box3.y - box2.y) * value7);
+            (ctx.drawImage(image, value8, value9, value4, value5),
+              box.toBlob((value10) => {
+                if (value10) {
+                  const url = URL.createObjectURL(value10);
+                  handler({ url: url, width: width, height: height });
+                } else handler2(new Error(imageExpandText('errors.createExpandedImageFailed')));
               }, 'image/png'));
-          } catch (_0x527c2c) {
-            _0x39f681(_0x527c2c);
+          } catch (value11) {
+            handler2(value11);
           }
         }),
-        (_0x3653b9.onerror = () => {
-          _0x39f681(new Error(imageExpandText('errors.sourceImageLoadFailed')));
+        (image.onerror = () => {
+          handler2(new Error(imageExpandText('errors.sourceImageLoadFailed')));
         }));
-      const _0x301ec1 =
-        localPathToUrl(_0x51a472.localPath) || _0x51a472.src || _0x51a472.imageUrl || _0x51a472.sourceUrl;
-      _0x3653b9.src = _0x301ec1;
+      const url2 = localPathToUrl(x3.localPath) || x3.src || x3.imageUrl || x3.sourceUrl;
+      image.src = url2;
     });
   },
-  _buildGenerationPayload(_0x543cd0, _0xca83e8, _0x31bbde) {
-    const _0x6dbb48 = this.ratioStr === 'original';
+  _buildGenerationPayload(model2, provider2, value12) {
+    const value13 = this.ratioStr === 'original';
     return {
       prompt: IMAGE_EXPAND_PROMPT,
-      model: _0x543cd0,
-      provider: _0xca83e8,
-      ...(_0x6dbb48 ? { suppressAspectRatio: true } : { aspectRatio: this.ratioStr }),
+      model: model2,
+      provider: provider2,
+      ...(value13 ? { suppressAspectRatio: true } : { aspectRatio: this.ratioStr }),
       imageSize: this.imageSize,
-      inputUrls: [_0x31bbde],
+      inputUrls: [value12],
       batchSize: 1,
     };
   },
-  _formatDebugRequest(_0x4c21f5) {
-    return formatFinalApiDebugRequest(_0x4c21f5);
+  _formatDebugRequest(value14) {
+    return formatFinalApiDebugRequest(value14);
   },
-  _upsertDebugNode(_0x4a4d4f, _0x5a60e1) {
-    const _0xfc034f = appStore.getStateRaw(),
-      _0x34b6a0 = _0x5a60e1 || _0xfc034f.nodes?.[this.nodeId] || this.nodeData || {},
-      { x: _0x21a882, y: _0x151fab } = calcSafeSpawnPosNearNode(_0xfc034f.nodes, _0x34b6a0, 0x17c, 0x12c),
-      _0x4241f1 = Object.values(_0xfc034f.nodes).find((_0x54b599) => _0x54b599.type === 'debug');
-    !_0x4241f1
+  _upsertDebugNode(outputText, value15) {
+    const value16 = appStore.getStateRaw(),
+      value17 = value15 || value16.nodes?.[this.nodeId] || this.nodeData || {},
+      { x: x4, y: y2 } = calcSafeSpawnPosNearNode(value16.nodes, value17, 0x17c, 0x12c),
+      enabled4 = Object.values(value16.nodes).find((item3) => item3.type === 'debug');
+    !enabled4
       ? appStore.addNode({
           id: 'debug-' + Date.now(),
           type: 'debug',
-          x: _0x21a882,
-          y: _0x151fab,
+          x: x4,
+          y: y2,
           width: 0x17c,
           height: 0x12c,
           name: imageExpandText('debug.nodeName'),
-          outputText: _0x4a4d4f,
+          outputText: outputText,
         })
-      : appStore.updateNodeData(_0x4241f1.id, { outputText: _0x4a4d4f, x: _0x21a882, y: _0x151fab });
+      : appStore.updateNodeData(enabled4.id, { outputText: outputText, x: x4, y: y2 });
   },
   async _handleDebug() {
-    let _0x5df054 = null;
+    let response = null;
     try {
-      const _0x15f0e5 = appStore.getStateRaw(),
-        _0x22110b = _0x15f0e5.nodes?.[this.nodeId];
-      if (!_0x22110b) {
+      const value18 = appStore.getStateRaw(),
+        args3 = value18.nodes?.[this.nodeId];
+      if (!args3) {
         window.showToast?.(imageExpandText('toasts.sourceNodeMissing'), 'warn');
         return;
       }
       if (!this.frameRect) this.frameRect = this._calcFrameWorldRect();
-      const _0x5e8b89 = String(this.model || '').trim(),
-        _0x293ee3 = resolveImageTaskProvider(_0x5e8b89, this.provider, '');
-      _0x5df054 = await this._createExpandedImage({ ...this.frameRect }, { ..._0x22110b });
-      const _0x176c90 = this._buildGenerationPayload(_0x5e8b89, _0x293ee3, _0x5df054.url),
-        _0x47b75f = await buildGenerateImageRequest(_0x176c90);
-      (this._upsertDebugNode(this._formatDebugRequest(_0x47b75f), _0x22110b),
+      const value19 = String(this.model || '').trim(),
+        imageTaskProvider = resolveImageTaskProvider(value19, this.provider, '');
+      response = await this._createExpandedImage({ ...this.frameRect }, { ...args3 });
+      const value20 = this._buildGenerationPayload(value19, imageTaskProvider, response.url),
+        generateImageRequest = await buildGenerateImageRequest(value20);
+      (this._upsertDebugNode(this._formatDebugRequest(generateImageRequest), args3),
         window.showToast?.(imageExpandText('toasts.debugShown'), 'warn'));
-    } catch (_0x50c7d4) {
-      (console.error('[ImageExpandController] 调试请求构建失败:', _0x50c7d4),
+    } catch (error2) {
+      (console.error('[ImageExpandController] 调试请求构建失败:', error2),
         window.showToast?.(
           imageExpandText('toasts.debugBuildFailed', {
-            error: _0x50c7d4?.message || imageExpandText('errors.unknown'),
+            error: error2?.message || imageExpandText('errors.unknown'),
           }),
           'error',
         ));
     } finally {
-      _0x5df054?.url && URL.revokeObjectURL(_0x5df054.url);
+      response?.url && URL.revokeObjectURL(response.url);
     }
   },
   _parseRatio() {
     if (this.ratioStr === 'original') return (this.nodeData.width || 1) / (this.nodeData.height || 1);
-    const _0x363033 = this.ratioStr.split(':').map((_0x327ab8) => Number(_0x327ab8));
-    if (_0x363033.length !== 2 || !_0x363033[0] || !_0x363033[1])
+    const list2 = this.ratioStr.split(':').map((item4) => Number(item4));
+    if (list2.length !== 2 || !list2[0] || !list2[1])
       return (this.nodeData.width || 1) / (this.nodeData.height || 1);
-    return _0x363033[0] / _0x363033[1];
+    return list2[0] / list2[1];
   },
   _calcFrameWorldRect() {
-    const _0x150305 = this.nodeData,
-      _0x1df56f = _0x150305.width || 1,
-      _0x22811a = _0x150305.height || 1,
-      _0x5ac1a7 = _0x150305.x + _0x1df56f / 2,
-      _0x400f5d = _0x150305.y + _0x22811a / 2,
-      _0xbd4da7 = _0x1df56f / _0x22811a,
-      _0x4a6b77 = this._parseRatio();
-    let _0x352b7a, _0x2f592e;
-    _0x4a6b77 >= _0xbd4da7
-      ? ((_0x2f592e = _0x22811a), (_0x352b7a = _0x22811a * _0x4a6b77))
-      : ((_0x352b7a = _0x1df56f), (_0x2f592e = _0x1df56f / _0x4a6b77));
-    const _0x5f2bbd = 1.35,
-      _0x430dc9 = Math.max(_0x1df56f, _0x352b7a) * _0x5f2bbd,
-      _0x290368 = Math.max(_0x22811a, _0x2f592e) * _0x5f2bbd;
-    return { x: _0x5ac1a7 - _0x430dc9 / 2, y: _0x400f5d - _0x290368 / 2, w: _0x430dc9, h: _0x290368 };
+    const box4 = this.nodeData,
+      value21 = box4.width || 1,
+      value22 = box4.height || 1,
+      x5 = box4.x + value21 / 2,
+      y3 = box4.y + value22 / 2,
+      value23 = value21 / value22,
+      value24 = this._parseRatio();
+    let value25, value26;
+    value24 >= value23
+      ? ((value26 = value22), (value25 = value22 * value24))
+      : ((value25 = value21), (value26 = value21 / value24));
+    const value27 = 1.35,
+      w = Math.max(value21, value25) * value27,
+      h = Math.max(value22, value26) * value27;
+    return { x: x5 - w / 2, y: y3 - h / 2, w: w, h: h };
   },
   _getNodeWorldRect() {
-    const _0x1979d0 = this.nodeData || {},
-      _0x357587 = _0x1979d0.width || 1,
-      _0x543f00 = _0x1979d0.height || 1;
-    return { x: _0x1979d0.x || 0, y: _0x1979d0.y || 0, w: _0x357587, h: _0x543f00 };
+    const x6 = this.nodeData || {},
+      w2 = x6.width || 1,
+      h2 = x6.height || 1;
+    return { x: x6.x || 0, y: x6.y || 0, w: w2, h: h2 };
   },
-  _clampFrameRect(_0x290e2a) {
-    const _0x2e3bf4 = this._getNodeWorldRect(),
-      _0x32d5a8 = (_0x5ed5e8, _0x2eb6c4, _0x4d82e6) => Math.min(_0x4d82e6, Math.max(_0x2eb6c4, _0x5ed5e8)),
-      _0x40f0bb = {
-        x: Number(_0x290e2a?.x) || 0,
-        y: Number(_0x290e2a?.y) || 0,
-        w: Number(_0x290e2a?.w) || 1,
-        h: Number(_0x290e2a?.h) || 1,
+  _clampFrameRect(box5) {
+    const box6 = this._getNodeWorldRect(),
+      handler3 = (value28, value29, value30) => Math.min(value30, Math.max(value29, value28)),
+      box7 = {
+        x: Number(box5?.x) || 0,
+        y: Number(box5?.y) || 0,
+        w: Number(box5?.w) || 1,
+        h: Number(box5?.h) || 1,
       },
-      _0x2a4223 = Math.max(_0x2e3bf4.w, 24),
-      _0x1d009f = Math.max(_0x2e3bf4.h, 24);
-    ((_0x40f0bb.w = Math.max(_0x40f0bb.w, _0x2a4223)), (_0x40f0bb.h = Math.max(_0x40f0bb.h, _0x1d009f)));
+      value31 = Math.max(box6.w, 24),
+      value32 = Math.max(box6.h, 24);
+    ((box7.w = Math.max(box7.w, value31)), (box7.h = Math.max(box7.h, value32)));
     if (this.ratioStr !== 'original') {
-      const _0x374542 = this._parseRatio(),
-        _0x4ae592 = _0x40f0bb.x + _0x40f0bb.w / 2,
-        _0x19b1c9 = _0x40f0bb.y + _0x40f0bb.h / 2;
-      let _0x45812b = _0x40f0bb.w,
-        _0x1940f2 = _0x40f0bb.h;
-      (_0x45812b / _0x1940f2 > _0x374542
-        ? (_0x1940f2 = _0x45812b / _0x374542)
-        : (_0x45812b = _0x1940f2 * _0x374542),
-        _0x45812b < _0x2a4223 && ((_0x45812b = _0x2a4223), (_0x1940f2 = _0x45812b / _0x374542)),
-        _0x1940f2 < _0x1d009f && ((_0x1940f2 = _0x1d009f), (_0x45812b = _0x1940f2 * _0x374542)),
-        (_0x40f0bb.w = _0x45812b),
-        (_0x40f0bb.h = _0x1940f2),
-        (_0x40f0bb.x = _0x4ae592 - _0x40f0bb.w / 2),
-        (_0x40f0bb.y = _0x19b1c9 - _0x40f0bb.h / 2));
+      const value33 = this._parseRatio(),
+        value34 = box7.x + box7.w / 2,
+        value35 = box7.y + box7.h / 2;
+      let value36 = box7.w,
+        value37 = box7.h;
+      (value36 / value37 > value33 ? (value37 = value36 / value33) : (value36 = value37 * value33),
+        value36 < value31 && ((value36 = value31), (value37 = value36 / value33)),
+        value37 < value32 && ((value37 = value32), (value36 = value37 * value33)),
+        (box7.w = value36),
+        (box7.h = value37),
+        (box7.x = value34 - box7.w / 2),
+        (box7.y = value35 - box7.h / 2));
     }
-    const _0x4a57d9 = _0x2e3bf4.x + _0x2e3bf4.w - _0x40f0bb.w,
-      _0x9fb0cc = _0x2e3bf4.x,
-      _0x748288 = _0x2e3bf4.y + _0x2e3bf4.h - _0x40f0bb.h,
-      _0xc29de2 = _0x2e3bf4.y;
+    const value38 = box6.x + box6.w - box7.w,
+      value39 = box6.x,
+      value40 = box6.y + box6.h - box7.h,
+      value41 = box6.y;
     return (
-      (_0x40f0bb.x = _0x32d5a8(_0x40f0bb.x, _0x4a57d9, _0x9fb0cc)),
-      (_0x40f0bb.y = _0x32d5a8(_0x40f0bb.y, _0x748288, _0xc29de2)),
-      _0x40f0bb
+      (box7.x = handler3(box7.x, value38, value39)),
+      (box7.y = handler3(box7.y, value40, value41)),
+      box7
     );
   },
-  _closeToolbarUpMenus(_0x1dbff1 = null) {
-    this.toolbarEl?.querySelectorAll('[data-toolbar-up-menu-menu]').forEach((_0xc65319) => {
-      if (_0xc65319 === _0x1dbff1) return;
-      const _0x363760 = String(_0xc65319?.dataset?.toolbarUpMenuOpenClass || 'open').trim() || 'open';
-      (_0xc65319.classList.remove(_0x363760),
-        _0xc65319.classList.remove('open'),
-        _0xc65319.classList.remove('show'));
+  _closeToolbarUpMenus(value42 = null) {
+    this.toolbarEl?.querySelectorAll('[data-toolbar-up-menu-menu]').forEach((el) => {
+      if (el === value42) return;
+      const value43 = String(el?.dataset?.toolbarUpMenuOpenClass || 'open').trim() || 'open';
+      (el.classList.remove(value43), el.classList.remove('open'), el.classList.remove('show'));
     });
   },
   _createUI() {
-    const _0x3412d0 = document.createElement('div');
-    _0x3412d0.className = 'v2-expand-overlay';
-    const _0x5e0068 = document.createElement('div');
-    ((_0x5e0068.className = 'v2-expand-frame'),
-      ['tl', 'tr', 'bl', 'br', 'tm', 'bm', 'lm', 'rm'].forEach((_0x463788) => {
-        const _0x5b779a = document.createElement('div');
-        ((_0x5b779a.className = 'v2-expand-handle ' + _0x463788),
-          (_0x5b779a.dataset.handle = _0x463788),
-          _0x5e0068.appendChild(_0x5b779a));
+    const el2 = document.createElement('div');
+    el2.className = 'v2-expand-overlay';
+    const el3 = document.createElement('div');
+    ((el3.className = 'v2-expand-frame'),
+      ['tl', 'tr', 'bl', 'br', 'tm', 'bm', 'lm', 'rm'].forEach((item5) => {
+        const el4 = document.createElement('div');
+        ((el4.className = 'v2-expand-handle ' + item5), (el4.dataset.handle = item5), el3.appendChild(el4));
       }));
-    const _0x1a7128 = document.createElement('img');
-    ((_0x1a7128.className = 'v2-expand-img'),
-      (_0x1a7128.draggable = false),
-      (_0x1a7128.src = this._getImageUrl()),
-      _0x3412d0.appendChild(_0x5e0068),
-      _0x3412d0.appendChild(_0x1a7128),
-      document.body.appendChild(_0x3412d0),
-      (this.overlayEl = _0x3412d0),
-      (this.frameEl = _0x5e0068),
-      (this.imgEl = _0x1a7128),
+    const value44 = document.createElement('img');
+    ((value44.className = 'v2-expand-img'),
+      (value44.draggable = false),
+      (value44.src = this._getImageUrl()),
+      el2.appendChild(el3),
+      el2.appendChild(value44),
+      document.body.appendChild(el2),
+      (this.overlayEl = el2),
+      (this.frameEl = el3),
+      (this.imgEl = value44),
       (this.frameRect = this._calcFrameWorldRect()));
-    const _0x5089bc = document.createElement('div');
-    _0x5089bc.className = 'v2-expand-toolbar';
-    const _0x4b05e1 = this._getExpandModelCatalog(),
-      _0x146ce3 = getImageFunctionModelDisplayName(this.model, _0x4b05e1),
-      _0x1a1bed = getImageFunctionModelTriggerIconHTML(this.model, this.provider),
-      _0x13587c = shouldDisableImageSizeControl(this.model, this.provider),
-      _0x207249 = buildImageFunctionModelMenuHTML({
+    const el5 = document.createElement('div');
+    el5.className = 'v2-expand-toolbar';
+    const modelCatalog = this._getExpandModelCatalog(),
+      imageFunctionModelDisplayName = getImageFunctionModelDisplayName(this.model, modelCatalog),
+      imageFunctionModelTriggerIconHTML = getImageFunctionModelTriggerIconHTML(this.model, this.provider),
+      disabled2 = shouldDisableImageSizeControl(this.model, this.provider),
+      imageFunctionModelMenuHTML = buildImageFunctionModelMenuHTML({
         activeModel: this.model,
         activeProvider: this.provider,
-        modelCatalog: _0x4b05e1,
+        modelCatalog: modelCatalog,
       });
-    ((_0x5089bc.innerHTML =
+    ((el5.innerHTML =
       '\n      <button class="v2-expand-toolbar-btn exit" title="' +
       imageExpandText('actions.exit') +
       '">\n        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>\n      </button>\n      <div class="v2-expand-divider"></div>\n      ' +
@@ -497,19 +494,19 @@ const ImageExpandController = {
       renderToolbarUpMenu({
         fieldId: 'size',
         value: this.imageSize,
-        options: getExpandImageSizeOptions({ disabled: _0x13587c }),
+        options: getExpandImageSizeOptions({ disabled: disabled2 }),
         triggerClass: 'size-toggle',
         labelClass: 'size-text',
         menuClass: 'v2-expand-menu size-menu',
         itemClass: 'v2-expand-menu-item',
-        disabled: _0x13587c,
+        disabled: disabled2,
       }) +
       '\n      <div class="v2-expand-wrap">\n        <button class="v2-expand-toolbar-btn model-toggle">\n          <span class="image-function-model-trigger-icon-slot">' +
-      _0x1a1bed +
+      imageFunctionModelTriggerIconHTML +
       '</span>\n          <span class="model-text">' +
-      _0x146ce3 +
+      imageFunctionModelDisplayName +
       '</span>\n          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5;margin-left:2px;"><polyline points="6 9 12 15 18 9"></polyline></svg>\n        </button>\n        <div class="floating-menu img-model-menu model-menu">\n          ' +
-      _0x207249 +
+      imageFunctionModelMenuHTML +
       '\n        </div>\n      </div>\n      ' +
       buildImageFunctionModeControlHTML({
         model: this.model,
@@ -527,798 +524,782 @@ const ImageExpandController = {
       '\n      </button>\n      <button class="v2-expand-toolbar-btn go img-gen-btn" title="' +
       imageExpandText('actions.generate') +
       '">\n        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>\n      </button>\n    '),
-      document.body.appendChild(_0x5089bc),
-      (this.toolbarEl = _0x5089bc),
-      (this.ratioMenuEl = _0x5089bc.querySelector('.ratio-menu')),
-      (this.sizeMenuEl = _0x5089bc.querySelector('.size-menu')),
-      (this.modelMenuEl = _0x5089bc.querySelector('.model-menu')),
+      document.body.appendChild(el5),
+      (this.toolbarEl = el5),
+      (this.ratioMenuEl = el5.querySelector('.ratio-menu')),
+      (this.sizeMenuEl = el5.querySelector('.size-menu')),
+      (this.modelMenuEl = el5.querySelector('.model-menu')),
       this._updateView(this._view),
       this._syncLocaleTexts());
   },
   _syncLocaleTexts() {
     if (!this.toolbarEl) return;
-    const _0x5c3389 = this.toolbarEl.querySelector('.exit');
-    if (_0x5c3389) _0x5c3389.title = imageExpandText('actions.exit');
-    const _0x57e515 = this.toolbarEl.querySelector('.debug-wrench-btn');
-    if (_0x57e515) {
-      const _0xbb12cb = imageExpandText('actions.debugApiParams');
-      ((_0x57e515.title = _0xbb12cb), _0x57e515.setAttribute('aria-label', _0xbb12cb));
+    const value45 = this.toolbarEl.querySelector('.exit');
+    if (value45) value45.title = imageExpandText('actions.exit');
+    const el6 = this.toolbarEl.querySelector('.debug-wrench-btn');
+    if (el6) {
+      const imageExpandText2 = imageExpandText('actions.debugApiParams');
+      ((el6.title = imageExpandText2), el6.setAttribute('aria-label', imageExpandText2));
     }
-    const _0x33a819 = this.toolbarEl.querySelector('.go');
-    if (_0x33a819) _0x33a819.title = imageExpandText('actions.generate');
-    const _0x19d573 = (_0x5f0648, _0x5cebff, _0x54de18) => {
-      const _0x13b85e = new Map(_0x5cebff.map((_0x577b4b) => [String(_0x577b4b.value || ''), _0x577b4b])),
-        _0x38eb3f = this.toolbarEl.querySelector('[data-toolbar-up-menu="' + _0x5f0648 + '"]'),
-        _0x17eb56 = _0x13b85e.get(String(_0x54de18 || '')) || _0x5cebff[0],
-        _0x251184 = _0x38eb3f?.querySelector('[data-toolbar-up-menu-label]');
-      (_0x251184 &&
-        _0x17eb56 &&
-        (_0x251184.textContent = _0x17eb56.selectedLabel || _0x17eb56.label || _0x54de18),
-        _0x38eb3f?.querySelectorAll('[data-toolbar-up-menu-item]')?.forEach((_0x47cd20) => {
-          const _0x2052b2 = _0x13b85e.get(String(_0x47cd20.dataset.toolbarUpMenuValue || ''));
-          if (!_0x2052b2) return;
-          _0x47cd20.dataset.toolbarUpMenuLabel = _0x2052b2.selectedLabel || _0x2052b2.label;
-          const _0x29bade = _0x47cd20.querySelector('.floating-menu-label');
-          if (_0x29bade) _0x29bade.textContent = _0x2052b2.label;
+    const value46 = this.toolbarEl.querySelector('.go');
+    if (value46) value46.title = imageExpandText('actions.generate');
+    const run2 = (value47, list3, value48) => {
+      const map = new Map(list3.map((el7) => [String(el7.value || ''), el7])),
+        el8 = this.toolbarEl.querySelector('[data-toolbar-up-menu="' + value47 + '"]'),
+        value49 = map.get(String(value48 || '')) || list3[0],
+        el9 = el8?.querySelector('[data-toolbar-up-menu-label]');
+      (el9 && value49 && (el9.textContent = value49.selectedLabel || value49.label || value48),
+        el8?.querySelectorAll('[data-toolbar-up-menu-item]')?.forEach((el10) => {
+          const enabled5 = map.get(String(el10.dataset.toolbarUpMenuValue || ''));
+          if (!enabled5) return;
+          el10.dataset.toolbarUpMenuLabel = enabled5.selectedLabel || enabled5.label;
+          const el11 = el10.querySelector('.floating-menu-label');
+          if (el11) el11.textContent = enabled5.label;
         }));
     };
-    (_0x19d573('ratio', getExpandRatioOptions(), this.ratioStr),
-      _0x19d573(
+    (run2('ratio', getExpandRatioOptions(), this.ratioStr),
+      run2(
         'size',
         getExpandImageSizeOptions({ disabled: shouldDisableImageSizeControl(this.model, this.provider) }),
         this.imageSize,
       ));
   },
-  _updateView(_0x24d713 = this._view) {
+  _updateView(value50 = this._view) {
     if (!this.active) return;
-    const _0x43bd4c = _0x24d713?.node,
-      _0x38f18c = _0x24d713?.viewport;
-    if (!_0x43bd4c) return;
-    this.nodeData = _0x43bd4c;
+    const box8 = value50?.node,
+      box9 = value50?.viewport;
+    if (!box8) return;
+    this.nodeData = box8;
     if (!this.frameRect) this.frameRect = this._calcFrameWorldRect();
     this.frameRect = this._clampFrameRect(this.frameRect);
-    const _0x6d7a83 = this.frameRect,
-      _0x321c3f = worldToScreen(_0x6d7a83.x, _0x6d7a83.y, _0x38f18c),
-      _0x136e2b = Math.round(_0x6d7a83.w * _0x38f18c.zoom),
-      _0x2305f7 = Math.round(_0x6d7a83.h * _0x38f18c.zoom);
-    ((this.frameEl.style.left = Math.round(_0x321c3f.x) + 'px'),
-      (this.frameEl.style.top = Math.round(_0x321c3f.y) + 'px'),
-      (this.frameEl.style.width = _0x136e2b + 'px'),
-      (this.frameEl.style.height = _0x2305f7 + 'px'));
-    const _0x51f962 = worldToScreen(_0x43bd4c.x, _0x43bd4c.y, _0x38f18c),
-      _0x13f71c = Math.round(_0x43bd4c.width * _0x38f18c.zoom),
-      _0x2e8172 = Math.round(_0x43bd4c.height * _0x38f18c.zoom);
-    ((this.imgEl.style.left = Math.round(_0x51f962.x) + 'px'),
-      (this.imgEl.style.top = Math.round(_0x51f962.y) + 'px'),
-      (this.imgEl.style.width = _0x13f71c + 'px'),
-      (this.imgEl.style.height = _0x2e8172 + 'px'));
+    const box10 = this.frameRect,
+      box11 = worldToScreen(box10.x, box10.y, box9),
+      value51 = Math.round(box10.w * box9.zoom),
+      value52 = Math.round(box10.h * box9.zoom);
+    ((this.frameEl.style.left = Math.round(box11.x) + 'px'),
+      (this.frameEl.style.top = Math.round(box11.y) + 'px'),
+      (this.frameEl.style.width = value51 + 'px'),
+      (this.frameEl.style.height = value52 + 'px'));
+    const box12 = worldToScreen(box8.x, box8.y, box9),
+      value53 = Math.round(box8.width * box9.zoom),
+      value54 = Math.round(box8.height * box9.zoom);
+    ((this.imgEl.style.left = Math.round(box12.x) + 'px'),
+      (this.imgEl.style.top = Math.round(box12.y) + 'px'),
+      (this.imgEl.style.width = value53 + 'px'),
+      (this.imgEl.style.height = value54 + 'px'));
     if (this.toolbarEl) {
-      const _0x10fdea = _0x51f962.y + _0x2e8172 + 14;
-      ((this.toolbarEl.style.top = _0x10fdea + 'px'),
-        (this.toolbarEl.style.left = _0x51f962.x + _0x13f71c / 2 + 'px'),
+      const value55 = box12.y + value54 + 14;
+      ((this.toolbarEl.style.top = value55 + 'px'),
+        (this.toolbarEl.style.left = box12.x + value53 / 2 + 'px'),
         (this.toolbarEl.style.transform = 'translateX(-50%)'),
         (this.toolbarEl.style.bottom = 'auto'));
     }
   },
   _bindEvents() {
-    const _0x5a5664 = () => this._updateView(this._view);
-    window.addEventListener('resize', _0x5a5664);
-    const _0x419135 = (_0x14bbb2) => {
-      if (_0x14bbb2.key === 'Escape') this.exit();
+    const value56 = () => this._updateView(this._view);
+    window.addEventListener('resize', value56);
+    const value57 = (event) => {
+      if (event.key === 'Escape') this.exit();
     };
-    window.addEventListener('keydown', _0x419135);
-    const _0x402d98 = (_0x164786) => _0x164786.stopPropagation();
-    this.overlayEl.addEventListener('wheel', _0x402d98, { passive: false });
-    const _0x429196 = this.modelMenuEl,
-      _0x1ef15c = this.toolbarEl.querySelector('.model-text'),
-      _0x49e0b7 = this.toolbarEl.querySelector('.image-function-model-trigger-icon-slot'),
-      _0x4586a6 = this.toolbarEl.querySelector('.model-toggle'),
-      _0x517de2 = this.toolbarEl.querySelector('.image-function-mode-toggle'),
-      _0x3451d5 = this.toolbarEl.querySelector('.image-function-mode-menu'),
-      _0x4526d2 = this._getExpandModelCatalog(),
-      _0x3c02e3 = () => {
-        const _0x1f88b3 = shouldDisableImageSizeControl(this.model, this.provider),
-          _0xb51798 = this.toolbarEl.querySelector('.size-toggle');
-        (_0xb51798 &&
-          ((_0xb51798.disabled = _0x1f88b3),
-          _0xb51798.classList.toggle('is-disabled', _0x1f88b3),
-          _0xb51798.setAttribute('aria-disabled', _0x1f88b3 ? 'true' : 'false')),
-          this.sizeMenuEl?.querySelectorAll('[data-toolbar-up-menu-field="size"]').forEach((_0x358436) => {
-            (_0x358436.classList.toggle('disabled', _0x1f88b3),
-              (_0x358436.dataset.disabled = _0x1f88b3 ? 'true' : 'false'));
+    window.addEventListener('keydown', value57);
+    const value58 = (event2) => event2.stopPropagation();
+    this.overlayEl.addEventListener('wheel', value58, { passive: false });
+    const modelMenu = this.modelMenuEl,
+      el12 = this.toolbarEl.querySelector('.model-text'),
+      el13 = this.toolbarEl.querySelector('.image-function-model-trigger-icon-slot'),
+      el14 = this.toolbarEl.querySelector('.model-toggle'),
+      el15 = this.toolbarEl.querySelector('.image-function-mode-toggle'),
+      modeMenu = this.toolbarEl.querySelector('.image-function-mode-menu'),
+      value59 = this._getExpandModelCatalog(),
+      handler4 = () => {
+        const shouldDisableImageSizeControl2 = shouldDisableImageSizeControl(this.model, this.provider),
+          el16 = this.toolbarEl.querySelector('.size-toggle');
+        (el16 &&
+          ((el16.disabled = shouldDisableImageSizeControl2),
+          el16.classList.toggle('is-disabled', shouldDisableImageSizeControl2),
+          el16.setAttribute('aria-disabled', shouldDisableImageSizeControl2 ? 'true' : 'false')),
+          this.sizeMenuEl?.querySelectorAll('[data-toolbar-up-menu-field="size"]').forEach((el17) => {
+            (el17.classList.toggle('disabled', shouldDisableImageSizeControl2),
+              (el17.dataset.disabled = shouldDisableImageSizeControl2 ? 'true' : 'false'));
           }),
-          _0x1f88b3 && this.sizeMenuEl?.classList.remove('open'));
+          shouldDisableImageSizeControl2 && this.sizeMenuEl?.classList.remove('open'));
       },
-      _0x298bfb = () =>
+      handler5 = () =>
         syncImageFunctionModeControl({
           root: this.toolbarEl,
           model: this.model,
           provider: this.provider,
           imageSize: this.imageSize,
         }),
-      _0x219608 = (_0x146476, _0x4cb61f, { syncStore: syncStore = true } = {}) => {
-        const _0x4edddc = String(_0x146476 || '').trim(),
-          _0x5d0a64 = String(resolveImageTaskProvider(_0x4edddc, _0x4cb61f, '')).trim();
-        if (!_0x4edddc || !_0x5d0a64) return;
-        const _0x1574ff = this.model !== _0x4edddc || this.provider !== _0x5d0a64;
-        ((this.model = _0x4edddc),
-          (this.provider = _0x5d0a64),
-          _0x1ef15c && (_0x1ef15c.textContent = getImageFunctionModelDisplayName(_0x4edddc, _0x4526d2)),
-          _0x49e0b7 && (_0x49e0b7.innerHTML = getImageFunctionModelTriggerIconHTML(_0x4edddc, _0x5d0a64)),
-          syncImageFunctionModelMenuActive({ modelMenu: _0x429196, model: _0x4edddc, provider: _0x5d0a64 }),
-          _0x298bfb(),
-          _0x3c02e3(),
+      handler6 = (value60, value61, { syncStore: syncStore = true } = {}) => {
+        const model3 = String(value60 || '').trim(),
+          provider3 = String(resolveImageTaskProvider(model3, value61, '')).trim();
+        if (!model3 || !provider3) return;
+        const value62 = this.model !== model3 || this.provider !== provider3;
+        ((this.model = model3),
+          (this.provider = provider3),
+          el12 && (el12.textContent = getImageFunctionModelDisplayName(model3, value59)),
+          el13 && (el13.innerHTML = getImageFunctionModelTriggerIconHTML(model3, provider3)),
+          syncImageFunctionModelMenuActive({ modelMenu: modelMenu, model: model3, provider: provider3 }),
+          handler5(),
+          handler4(),
           syncStore &&
-            _0x1574ff &&
-            appStore.updateNodeData(this.nodeId, { model: _0x4edddc, provider: _0x5d0a64 }));
+            value62 &&
+            appStore.updateNodeData(this.nodeId, { model: model3, provider: provider3 }));
       },
-      _0x1d756d = () => {
+      handler7 = () => {
         (this._closeToolbarUpMenus(),
           this.modelMenuEl?.classList.remove('show'),
-          _0x3451d5?.classList.remove('show'),
+          modeMenu?.classList.remove('show'),
           closeImageFunctionModelSubmenus(this.modelMenuEl));
       };
     ((this.toolbarEl.querySelector('.exit').onclick = () => this.exit()),
       (this._unbindToolbarUpMenus = bindToolbarUpMenus(this.toolbarEl, {
         onBeforeOpen: () => {
           (this.modelMenuEl?.classList.remove('show'),
-            _0x3451d5?.classList.remove('show'),
+            modeMenu?.classList.remove('show'),
             closeImageFunctionModelSubmenus(this.modelMenuEl));
         },
-        onSelect: ({ fieldId: _0x3b46ab, value: _0x5bf7ee }) => {
-          if (_0x3b46ab === 'ratio') {
-            ((this.ratioStr = String(_0x5bf7ee || 'original').trim() || 'original'),
+        onSelect: ({ fieldId: fieldId, value: value63 }) => {
+          if (fieldId === 'ratio') {
+            ((this.ratioStr = String(value63 || 'original').trim() || 'original'),
               (this.frameRect = this._calcFrameWorldRect()),
               this._updateView(this._view));
             return;
           }
-          if (_0x3b46ab === 'size') {
+          if (fieldId === 'size') {
             if (shouldDisableImageSizeControl(this.model, this.provider)) return;
-            this.imageSize = String(_0x5bf7ee || '1K').trim() || '1K';
-            const _0x3e30b9 = getImageFunctionNanoSelection(this.model, this.provider, this.imageSize);
-            if (_0x3e30b9) {
-              const _0x20d8a6 = resolveImageFunctionModelByMode({
+            this.imageSize = String(value63 || '1K').trim() || '1K';
+            const mode = getImageFunctionNanoSelection(this.model, this.provider, this.imageSize);
+            if (mode) {
+              const imageFunctionModelByMode = resolveImageFunctionModelByMode({
                 model: this.model,
                 provider: this.provider,
                 imageSize: this.imageSize,
-                mode: _0x3e30b9.mode,
+                mode: mode.mode,
               });
-              _0x20d8a6?.model && _0x219608(_0x20d8a6.model, _0x20d8a6.provider);
+              imageFunctionModelByMode?.model &&
+                handler6(imageFunctionModelByMode.model, imageFunctionModelByMode.provider);
             }
-            (_0x298bfb(), _0x3c02e3());
+            (handler5(), handler4());
           }
         },
       })));
-    if (_0x4586a6 && _0x429196 && _0x1ef15c) {
-      _0x4586a6.addEventListener('click', (_0x45c852) => {
-        (_0x45c852.stopPropagation(),
-          _0x429196.classList.toggle('show'),
+    if (el14 && modelMenu && el12) {
+      el14.addEventListener('click', (event3) => {
+        (event3.stopPropagation(),
+          modelMenu.classList.toggle('show'),
           this._closeToolbarUpMenus(),
-          _0x3451d5?.classList.remove('show'));
+          modeMenu?.classList.remove('show'));
       });
-      const _0x4ad73d = bindImageFunctionModelMenu({
-          modelMenu: _0x429196,
-          onSelect: ({ model: _0xefe065, provider: _0x41df23 }) => {
-            _0x219608(_0xefe065, _0x41df23);
+      const bindImageFunctionModelMenu2 = bindImageFunctionModelMenu({
+          modelMenu: modelMenu,
+          onSelect: ({ model: model4, provider: provider4 }) => {
+            handler6(model4, provider4);
           },
           closeMenu: () => {
-            _0x429196.classList.remove('show');
+            modelMenu.classList.remove('show');
           },
         }),
-        _0x512ae0 = bindImageFunctionModeMenu({
-          modeMenu: _0x3451d5,
-          onSelect: ({ mode: _0x69c950 }) => {
-            const _0x22f3eb = resolveImageFunctionModelByMode({
+        bindImageFunctionModeMenu2 = bindImageFunctionModeMenu({
+          modeMenu: modeMenu,
+          onSelect: ({ mode: mode2 }) => {
+            const imageFunctionModelByMode2 = resolveImageFunctionModelByMode({
               model: this.model,
               provider: this.provider,
               imageSize: this.imageSize,
-              mode: _0x69c950,
+              mode: mode2,
             });
-            if (!_0x22f3eb?.model) return;
-            (_0x219608(_0x22f3eb.model, _0x22f3eb.provider), _0x3451d5?.classList.remove('show'));
+            if (!imageFunctionModelByMode2?.model) return;
+            (handler6(imageFunctionModelByMode2.model, imageFunctionModelByMode2.provider),
+              modeMenu?.classList.remove('show'));
           },
         });
-      (_0x517de2 &&
-        _0x3451d5 &&
-        _0x517de2.addEventListener('click', (_0x710ebb) => {
-          _0x710ebb.stopPropagation();
-          if (_0x517de2.closest('.image-function-mode-wrap')?.classList.contains('is-hidden')) return;
-          (_0x3451d5.classList.toggle('show'),
-            this._closeToolbarUpMenus(_0x3451d5),
-            _0x429196.classList.remove('show'),
-            closeImageFunctionModelSubmenus(_0x429196));
+      (el15 &&
+        modeMenu &&
+        el15.addEventListener('click', (event4) => {
+          event4.stopPropagation();
+          if (el15.closest('.image-function-mode-wrap')?.classList.contains('is-hidden')) return;
+          (modeMenu.classList.toggle('show'),
+            this._closeToolbarUpMenus(modeMenu),
+            modelMenu.classList.remove('show'),
+            closeImageFunctionModelSubmenus(modelMenu));
         }),
         (this._unbindImageFunctionMenus = () => {
-          (_0x4ad73d?.(), _0x512ae0?.());
+          (bindImageFunctionModelMenu2?.(), bindImageFunctionModeMenu2?.());
         }));
     }
-    (_0x298bfb(), _0x3c02e3());
-    const _0x12520c = this.toolbarEl.querySelector('.debug-wrench-btn');
-    ((_0x12520c.onclick = (_0x50c4c6) => {
-      (_0x50c4c6.stopPropagation(), _0x50c4c6.preventDefault(), _0x1d756d(), void this._handleDebug());
+    (handler5(), handler4());
+    const value64 = this.toolbarEl.querySelector('.debug-wrench-btn');
+    ((value64.onclick = (event5) => {
+      (event5.stopPropagation(), event5.preventDefault(), handler7(), void this._handleDebug());
     }),
       (this.toolbarEl.querySelector('.go').onclick = async () => {
-        let _0x51925a = null,
-          _0x1087f9 = null,
-          _0x220482 = resolveInputRatioBasis();
-        const _0x4da4cf = String(this.model || '').trim(),
-          _0xb6fb53 = resolveImageTaskProvider(_0x4da4cf, this.provider, ''),
-          _0x1b6c14 = isRunningHubTaskModel(_0x4da4cf, _0xb6fb53),
-          _0x3dfe81 = isDreaminaTaskModel(_0x4da4cf, _0xb6fb53),
-          _0x5a5c20 = !_0x1b6c14 && !_0x3dfe81,
-          _0xe85d0c = String(_0xb6fb53 || '')
+        let id = null,
+          width2 = null,
+          box13 = resolveInputRatioBasis();
+        const model5 = String(this.model || '').trim(),
+          provider5 = resolveImageTaskProvider(model5, this.provider, ''),
+          isRunningHubTaskModel2 = isRunningHubTaskModel(model5, provider5),
+          isDreaminaTaskModel2 = isDreaminaTaskModel(model5, provider5),
+          value65 = !isRunningHubTaskModel2 && !isDreaminaTaskModel2,
+          provider6 = String(provider5 || '')
             .trim()
             .toLowerCase(),
-          _0x3bc73f = shouldUseRunningHubOpenapiQuery(_0x4da4cf, _0xb6fb53),
-          _0x5a576a = Date.now();
+          useOpenapiQuery2 = shouldUseRunningHubOpenapiQuery(model5, provider5),
+          startedAt2 = Date.now();
         try {
           window.showToast?.(imageExpandText('toasts.generating'), 'loading');
-          const _0x2733a4 = appStore.getStateRaw(),
-            _0x35d55d = _0x2733a4.nodes?.[this.nodeId];
-          if (!_0x35d55d) return;
-          const _0x2441b8 = { ...this.frameRect },
-            _0x13a1b7 = { ..._0x35d55d };
-          ((_0x1087f9 = await this._createExpandedImage(_0x2441b8, _0x13a1b7)),
-            (_0x220482 = resolveInputRatioBasis(
-              { width: _0x1087f9?.width, height: _0x1087f9?.height },
-              { width: _0x35d55d.width, height: _0x35d55d.height },
+          const value66 = appStore.getStateRaw(),
+            width3 = value66.nodes?.[this.nodeId];
+          if (!width3) return;
+          const value67 = { ...this.frameRect },
+            value68 = { ...width3 };
+          ((width2 = await this._createExpandedImage(value67, value68)),
+            (box13 = resolveInputRatioBasis(
+              { width: width2?.width, height: width2?.height },
+              { width: width3.width, height: width3.height },
             )));
-          const { width: _0x18918e, height: _0x103dbe } = calcDisplaySizeByMedia(
-              _0x220482.width,
-              _0x220482.height,
-            ),
-            { x: _0x19f31f, y: _0x1a3bfe } = calcSafeSpawnPosNearNode(
-              _0x2733a4.nodes,
-              _0x35d55d,
-              _0x18918e,
-              _0x103dbe,
-            );
-          _0x51925a = generateId('source-image-expand');
-          const _0x310815 = () => {
-            return isTaskCancelled(appStore.getState().nodes?.[_0x51925a]);
+          const { width: width4, height: height2 } = calcDisplaySizeByMedia(box13.width, box13.height),
+            { x: x7, y: y4 } = calcSafeSpawnPosNearNode(value66.nodes, width3, width4, height2);
+          id = generateId('source-image-expand');
+          const run3 = () => {
+            return isTaskCancelled(appStore.getState().nodes?.[id]);
           };
           appStore.addNode(
             buildSourceMediaNodePayload({
-              id: _0x51925a,
+              id: id,
               type: 'source-image',
-              x: _0x19f31f,
-              y: _0x1a3bfe,
-              width: _0x18918e,
-              height: _0x103dbe,
+              x: x7,
+              y: y4,
+              width: width4,
+              height: height2,
               needsAutoResize: false,
               name: imageExpandText('output.generatingName'),
               src: '',
-              ...buildGenerationStartPatch({ startedAt: _0x5a576a }),
-              ...(_0x1b6c14 || _0x3dfe81 || _0x5a5c20 ? { provider: _0xb6fb53, model: _0x4da4cf } : {}),
-              ...(_0x1b6c14 ? { rhSourceNodeId: _0x35d55d.id, rhToolbarTaskType: 'image-expand' } : {}),
-              ...(_0x1b6c14
+              ...buildGenerationStartPatch({ startedAt: startedAt2 }),
+              ...(isRunningHubTaskModel2 || isDreaminaTaskModel2 || value65
+                ? { provider: provider5, model: model5 }
+                : {}),
+              ...(isRunningHubTaskModel2
+                ? { rhSourceNodeId: width3.id, rhToolbarTaskType: 'image-expand' }
+                : {}),
+              ...(isRunningHubTaskModel2
                 ? buildRunningHubTaskPatch({
                     taskId: '',
                     status: 'pending',
-                    startedAt: _0x5a576a,
+                    startedAt: startedAt2,
                     recovering: false,
-                    useOpenapiQuery: _0x3bc73f,
+                    useOpenapiQuery: useOpenapiQuery2,
                   })
                 : {}),
-              ...(_0x3dfe81
+              ...(isDreaminaTaskModel2
                 ? buildDreaminaTaskPatch({
                     submitId: '',
                     status: 'pending',
                     phase: 'generating',
                     label: imageExpandText('task.submitting'),
-                    startedAt: _0x5a576a,
+                    startedAt: startedAt2,
                     recovering: false,
                   })
                 : {}),
-              ...(_0x5a5c20
+              ...(value65
                 ? buildAsyncTaskPatch({
-                    provider: _0xe85d0c,
+                    provider: provider6,
                     kind: 'image',
                     taskId: '',
                     status: 'pending',
-                    startedAt: _0x5a576a,
+                    startedAt: startedAt2,
                     recovering: false,
                   })
                 : {}),
               outputText: buildImageExpandOutputText(getDisplayModelName(this.model)),
             }),
           );
-          (_0x1b6c14 || _0x3dfe81 || _0x5a5c20) && persistRunningHubResumeCache();
-          appStore.setSelectedNodes([_0x51925a]);
+          (isRunningHubTaskModel2 || isDreaminaTaskModel2 || value65) && persistRunningHubResumeCache();
+          appStore.setSelectedNodes([id]);
           typeof window.v2FocusOnNodes === 'function'
-            ? window.v2FocusOnNodes([_0x35d55d.id, _0x51925a])
-            : window.v2FocusOnNode?.(_0x51925a);
+            ? window.v2FocusOnNodes([width3.id, id])
+            : window.v2FocusOnNode?.(id);
           this.exit();
-          const _0x308755 = this._buildGenerationPayload(_0x4da4cf, _0xb6fb53, _0x1087f9.url),
-            _0x282224 = await generateImage(_0x308755, {
-              onTaskMeta: ({ taskId: _0x302296, useOpenapiQuery: _0x3ba33f, provider: _0x344f0c }) => {
-                const _0x306b43 = String(_0x302296 || '').trim();
-                if (!_0x306b43) return;
-                const _0x29a5e1 = appStore.getState().nodes?.[_0x51925a];
-                if (!_0x29a5e1) return;
-                if (_0x310815()) return;
-                if (_0x1b6c14) {
-                  (appStore.updateNodeData(_0x51925a, {
+          const value69 = this._buildGenerationPayload(model5, provider5, width2.url),
+            error3 = await generateImage(value69, {
+              onTaskMeta: ({ taskId: taskId2, useOpenapiQuery: useOpenapiQuery3, provider: provider7 }) => {
+                const taskId3 = String(taskId2 || '').trim();
+                if (!taskId3) return;
+                const enabled6 = appStore.getState().nodes?.[id];
+                if (!enabled6) return;
+                if (run3()) return;
+                if (isRunningHubTaskModel2) {
+                  (appStore.updateNodeData(id, {
                     ...buildRunningHubTaskPatch({
-                      taskId: _0x306b43,
+                      taskId: taskId3,
                       status: 'running',
-                      startedAt: _0x5a576a,
+                      startedAt: startedAt2,
                       recovering: false,
-                      useOpenapiQuery: _0x3ba33f === true,
+                      useOpenapiQuery: useOpenapiQuery3 === true,
                     }),
                   }),
                     persistRunningHubResumeCache());
                   return;
                 }
-                if (_0x3dfe81) {
-                  (appStore.updateNodeData(_0x51925a, {
+                if (isDreaminaTaskModel2) {
+                  (appStore.updateNodeData(id, {
                     ...buildDreaminaTaskPatch({
-                      submitId: _0x306b43,
+                      submitId: taskId3,
                       status: 'pending',
                       phase: 'generating',
                       label: imageExpandText('task.generating'),
-                      startedAt: _0x5a576a,
+                      startedAt: startedAt2,
                       recovering: false,
                     }),
                   }),
                     persistRunningHubResumeCache());
                   return;
                 }
-                _0x5a5c20 &&
-                  (appStore.updateNodeData(_0x51925a, {
+                value65 &&
+                  (appStore.updateNodeData(id, {
                     ...buildAsyncTaskPatch({
-                      provider: String(_0x344f0c || _0x29a5e1?.asyncTaskProvider || _0xe85d0c).trim(),
+                      provider: String(provider7 || enabled6?.asyncTaskProvider || provider6).trim(),
                       kind: 'image',
-                      taskId: _0x306b43,
+                      taskId: taskId3,
                       status: 'running',
-                      startedAt: _0x5a576a,
+                      startedAt: startedAt2,
                       recovering: false,
                     }),
                   }),
                   persistRunningHubResumeCache());
               },
-              onTaskId: (_0x16182e) => {
-                const _0x290ac7 = String(_0x16182e || '').trim();
-                if (!_0x290ac7) return;
-                const _0x150404 = appStore.getState().nodes?.[_0x51925a];
-                if (!_0x150404) return;
-                if (_0x310815()) return;
-                if (_0x1b6c14) {
-                  (appStore.updateNodeData(_0x51925a, {
+              onTaskId: (value70) => {
+                const taskId4 = String(value70 || '').trim();
+                if (!taskId4) return;
+                const useOpenapiQuery4 = appStore.getState().nodes?.[id];
+                if (!useOpenapiQuery4) return;
+                if (run3()) return;
+                if (isRunningHubTaskModel2) {
+                  (appStore.updateNodeData(id, {
                     ...buildRunningHubTaskPatch({
-                      taskId: _0x290ac7,
+                      taskId: taskId4,
                       status: 'running',
-                      startedAt: _0x5a576a,
+                      startedAt: startedAt2,
                       recovering: false,
-                      useOpenapiQuery: _0x150404?.rhTaskUseOpenapiQuery === true || _0x3bc73f,
+                      useOpenapiQuery: useOpenapiQuery4?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
                     }),
                   }),
                     persistRunningHubResumeCache());
                   return;
                 }
-                if (_0x3dfe81) {
-                  (appStore.updateNodeData(_0x51925a, {
+                if (isDreaminaTaskModel2) {
+                  (appStore.updateNodeData(id, {
                     ...buildDreaminaTaskPatch({
-                      submitId: _0x290ac7,
+                      submitId: taskId4,
                       status: 'pending',
                       phase: 'generating',
                       label: imageExpandText('task.generating'),
-                      startedAt: _0x5a576a,
+                      startedAt: startedAt2,
                       recovering: false,
                     }),
                   }),
                     persistRunningHubResumeCache());
                   return;
                 }
-                _0x5a5c20 &&
-                  (appStore.updateNodeData(_0x51925a, {
+                value65 &&
+                  (appStore.updateNodeData(id, {
                     ...buildAsyncTaskPatch({
-                      provider: String(_0x150404?.asyncTaskProvider || _0xe85d0c).trim(),
+                      provider: String(useOpenapiQuery4?.asyncTaskProvider || provider6).trim(),
                       kind: 'image',
-                      taskId: _0x290ac7,
+                      taskId: taskId4,
                       status: 'running',
-                      startedAt: _0x5a576a,
+                      startedAt: startedAt2,
                       recovering: false,
                     }),
                   }),
                   persistRunningHubResumeCache());
               },
             });
-          if (_0x310815()) return;
-          if (_0x282224.error) {
-            const _0x104d8d = appStore.getState().nodes?.[_0x51925a],
-              _0x575d59 = _0x104d8d?.generationStartTime ? Date.now() - _0x104d8d.generationStartTime : 0;
-            appStore.updateNodeData(_0x51925a, {
+          if (run3()) return;
+          if (error3.error) {
+            const taskId5 = appStore.getState().nodes?.[id],
+              duration = taskId5?.generationStartTime ? Date.now() - taskId5.generationStartTime : 0;
+            appStore.updateNodeData(id, {
               ...buildImageGenerationFailurePatch({
-                error: _0x282224.error,
-                startedAt: _0x5a576a,
-                duration: _0x575d59,
+                error: error3.error,
+                startedAt: startedAt2,
+                duration: duration,
               }),
               name: imageExpandText('output.failedName'),
-              ...(_0x1b6c14
+              ...(isRunningHubTaskModel2
                 ? buildRunningHubTaskPatch({
-                    taskId: _0x104d8d?.rhTaskId || '',
+                    taskId: taskId5?.rhTaskId || '',
                     status: 'failed',
-                    startedAt: _0x5a576a,
+                    startedAt: startedAt2,
                     recovering: false,
-                    useOpenapiQuery: _0x104d8d?.rhTaskUseOpenapiQuery === true || _0x3bc73f,
+                    useOpenapiQuery: taskId5?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
                   })
                 : {}),
-              ...(_0x3dfe81
+              ...(isDreaminaTaskModel2
                 ? buildDreaminaTaskPatch({
-                    submitId: _0x104d8d?.dreaminaSubmitId || '',
+                    submitId: taskId5?.dreaminaSubmitId || '',
                     status: 'failed',
                     phase: 'failed',
-                    label: _0x282224.error || imageExpandText('task.failed'),
-                    startedAt: _0x5a576a,
+                    label: error3.error || imageExpandText('task.failed'),
+                    startedAt: startedAt2,
                     recovering: false,
                   })
                 : {}),
-              ...(_0x5a5c20
+              ...(value65
                 ? buildAsyncTaskPatch({
-                    provider: _0x104d8d?.asyncTaskProvider || _0xe85d0c,
+                    provider: taskId5?.asyncTaskProvider || provider6,
                     kind: 'image',
-                    taskId: _0x104d8d?.asyncTaskId || '',
+                    taskId: taskId5?.asyncTaskId || '',
                     status: 'failed',
-                    startedAt: _0x5a576a,
+                    startedAt: startedAt2,
                     recovering: false,
                   })
                 : {}),
               outputText: buildImageExpandOutputText(getDisplayModelName(this.model), {
-                error: _0x282224.error,
+                error: error3.error,
               }),
             });
-            (_0x1b6c14 || _0x3dfe81 || _0x5a5c20) && persistRunningHubResumeCache();
+            (isRunningHubTaskModel2 || isDreaminaTaskModel2 || value65) && persistRunningHubResumeCache();
             return;
           }
-          const _0x4f7498 = appStore.getState().nodes?.[_0x51925a],
-            _0x49f19b = _0x4f7498?.generationStartTime ? Date.now() - _0x4f7498.generationStartTime : 0,
-            _0x1e0502 = await resolveOutputMediaSize({
-              localPath: _0x282224.localPath,
-              imageUrl: _0x282224.imageUrl,
-              sourceUrl: _0x282224.sourceUrl,
-              thumbUrl: _0x282224.thumbUrl,
-              src: _0x282224.imageUrl || _0x282224.sourceUrl || _0x282224.thumbUrl || '',
+          const taskId6 = appStore.getState().nodes?.[id],
+            duration2 = taskId6?.generationStartTime ? Date.now() - taskId6.generationStartTime : 0,
+            box14 = await resolveOutputMediaSize({
+              localPath: error3.localPath,
+              imageUrl: error3.imageUrl,
+              sourceUrl: error3.sourceUrl,
+              thumbUrl: error3.thumbUrl,
+              src: error3.imageUrl || error3.sourceUrl || error3.thumbUrl || '',
             }),
-            _0x5ed64d =
-              _0x1e0502 &&
+            width5 =
+              box14 &&
               shouldSwitchToOutputRatio(
-                _0x220482.width,
-                _0x220482.height,
-                _0x1e0502.width,
-                _0x1e0502.height,
+                box13.width,
+                box13.height,
+                box14.width,
+                box14.height,
                 OUTPUT_RATIO_SWITCH_THRESHOLD,
               )
-                ? calcDisplaySizeByMedia(_0x1e0502.width, _0x1e0502.height)
-                : calcDisplaySizeByMedia(_0x220482.width, _0x220482.height);
-          (appStore.updateNodeData(_0x51925a, {
-            ...buildImageGenerationResultPatch(_0x282224, { startedAt: _0x5a576a, duration: _0x49f19b }),
+                ? calcDisplaySizeByMedia(box14.width, box14.height)
+                : calcDisplaySizeByMedia(box13.width, box13.height);
+          (appStore.updateNodeData(id, {
+            ...buildImageGenerationResultPatch(error3, { startedAt: startedAt2, duration: duration2 }),
             name: imageExpandText('output.resultName'),
-            width: _0x5ed64d.width,
-            height: _0x5ed64d.height,
-            ...(_0x1b6c14
+            width: width5.width,
+            height: width5.height,
+            ...(isRunningHubTaskModel2
               ? buildRunningHubTaskPatch({
-                  taskId: _0x4f7498?.rhTaskId || '',
+                  taskId: taskId6?.rhTaskId || '',
                   status: 'success',
-                  startedAt: _0x5a576a,
+                  startedAt: startedAt2,
                   recovering: false,
-                  useOpenapiQuery: _0x4f7498?.rhTaskUseOpenapiQuery === true || _0x3bc73f,
+                  useOpenapiQuery: taskId6?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
                 })
               : {}),
-            ...(_0x3dfe81
+            ...(isDreaminaTaskModel2
               ? buildDreaminaTaskPatch({
-                  submitId: _0x4f7498?.dreaminaSubmitId || '',
+                  submitId: taskId6?.dreaminaSubmitId || '',
                   status: 'success',
                   phase: 'done',
                   label: imageExpandText('task.completed'),
-                  startedAt: _0x5a576a,
+                  startedAt: startedAt2,
                   recovering: false,
                 })
               : {}),
-            ...(_0x5a5c20
+            ...(value65
               ? buildAsyncTaskPatch({
-                  provider: _0x4f7498?.asyncTaskProvider || _0xe85d0c,
+                  provider: taskId6?.asyncTaskProvider || provider6,
                   kind: 'image',
-                  taskId: _0x4f7498?.asyncTaskId || '',
+                  taskId: taskId6?.asyncTaskId || '',
                   status: 'success',
-                  startedAt: _0x5a576a,
+                  startedAt: startedAt2,
                   recovering: false,
                 })
               : {}),
             outputText: buildImageExpandOutputText(getDisplayModelName(this.model)),
           }),
-            (_0x1b6c14 || _0x3dfe81 || _0x5a5c20) && persistRunningHubResumeCache(),
+            (isRunningHubTaskModel2 || isDreaminaTaskModel2 || value65) && persistRunningHubResumeCache(),
             window.showToast?.(imageExpandText('toasts.success'), 'success'));
-        } catch (_0x23228f) {
-          console.error('扩图生成失败:', _0x23228f);
-          if (_0x51925a) {
-            const _0x301e93 = appStore.getState().nodes?.[_0x51925a];
-            if (isTaskCancelled(_0x301e93)) return;
-            const _0x212102 = _0x301e93?.generationStartTime ? Date.now() - _0x301e93.generationStartTime : 0,
-              _0x39fd79 = _0x23228f.message || imageExpandText('errors.unknown');
-            (appStore.updateNodeData(_0x51925a, {
+        } catch (error4) {
+          console.error('扩图生成失败:', error4);
+          if (id) {
+            const taskId7 = appStore.getState().nodes?.[id];
+            if (isTaskCancelled(taskId7)) return;
+            const duration3 = taskId7?.generationStartTime ? Date.now() - taskId7.generationStartTime : 0,
+              error5 = error4.message || imageExpandText('errors.unknown');
+            (appStore.updateNodeData(id, {
               ...buildImageGenerationFailurePatch({
-                error: _0x39fd79,
-                startedAt: _0x5a576a,
-                duration: _0x212102,
+                error: error5,
+                startedAt: startedAt2,
+                duration: duration3,
               }),
               name: imageExpandText('output.failedName'),
-              ...(_0x1b6c14
+              ...(isRunningHubTaskModel2
                 ? buildRunningHubTaskPatch({
-                    taskId: _0x301e93?.rhTaskId || '',
+                    taskId: taskId7?.rhTaskId || '',
                     status: 'failed',
-                    startedAt: _0x5a576a,
+                    startedAt: startedAt2,
                     recovering: false,
-                    useOpenapiQuery: _0x301e93?.rhTaskUseOpenapiQuery === true || _0x3bc73f,
+                    useOpenapiQuery: taskId7?.rhTaskUseOpenapiQuery === true || useOpenapiQuery2,
                   })
                 : {}),
-              ...(_0x3dfe81
+              ...(isDreaminaTaskModel2
                 ? buildDreaminaTaskPatch({
-                    submitId: _0x301e93?.dreaminaSubmitId || '',
+                    submitId: taskId7?.dreaminaSubmitId || '',
                     status: 'failed',
                     phase: 'failed',
-                    label: _0x39fd79 || imageExpandText('task.failed'),
-                    startedAt: _0x5a576a,
+                    label: error5 || imageExpandText('task.failed'),
+                    startedAt: startedAt2,
                     recovering: false,
                   })
                 : {}),
-              ...(_0x5a5c20
+              ...(value65
                 ? buildAsyncTaskPatch({
-                    provider: _0x301e93?.asyncTaskProvider || _0xe85d0c,
+                    provider: taskId7?.asyncTaskProvider || provider6,
                     kind: 'image',
-                    taskId: _0x301e93?.asyncTaskId || '',
+                    taskId: taskId7?.asyncTaskId || '',
                     status: 'failed',
-                    startedAt: _0x5a576a,
+                    startedAt: startedAt2,
                     recovering: false,
                   })
                 : {}),
-              outputText: buildImageExpandOutputText(getDisplayModelName(this.model), { error: _0x39fd79 }),
+              outputText: buildImageExpandOutputText(getDisplayModelName(this.model), { error: error5 }),
             }),
-              (_0x1b6c14 || _0x3dfe81 || _0x5a5c20) && persistRunningHubResumeCache());
+              (isRunningHubTaskModel2 || isDreaminaTaskModel2 || value65) && persistRunningHubResumeCache());
           } else
             window.showToast?.(
               imageExpandText('toasts.failed', {
-                error: _0x23228f.message || imageExpandText('errors.unknown'),
+                error: error4.message || imageExpandText('errors.unknown'),
               }),
               'error',
             );
         } finally {
-          _0x1087f9?.url && URL.revokeObjectURL(_0x1087f9.url);
+          width2?.url && URL.revokeObjectURL(width2.url);
         }
       }));
-    const _0x1cbad8 = (_0x2ad22e) => {
-      if (!this.toolbarEl.contains(_0x2ad22e.target)) _0x1d756d();
+    const value71 = (event6) => {
+      if (!this.toolbarEl.contains(event6.target)) handler7();
     };
-    document.addEventListener('pointerdown', _0x1cbad8, true);
-    const _0x4fb161 = () => {
+    document.addEventListener('pointerdown', value71, true);
+    const run4 = () => {
         if (!this._pointerState) return;
-        (window.removeEventListener('pointermove', _0x335263, true),
-          window.removeEventListener('pointerup', _0x178062, true),
-          window.removeEventListener('pointercancel', _0x178062, true),
+        (window.removeEventListener('pointermove', value72, true),
+          window.removeEventListener('pointerup', value73, true),
+          window.removeEventListener('pointercancel', value73, true),
           (this._pointerState = null));
       },
-      _0x39e69c = () => this.ratioStr !== 'original',
-      _0x335263 = (_0x1a4cc8) => {
-        const _0x54e600 = this._pointerState;
-        if (!_0x54e600 || _0x1a4cc8.pointerId !== _0x54e600.pointerId) return;
-        _0x1a4cc8.preventDefault();
-        const _0x55d6b2 = _0x54e600.zoom || this._view?.viewport?.zoom || 1,
-          _0xd6fe6f = (_0x1a4cc8.clientX - _0x54e600.startX) / _0x55d6b2,
-          _0x461972 = (_0x1a4cc8.clientY - _0x54e600.startY) / _0x55d6b2,
-          _0x55f56b = this._getNodeWorldRect(),
-          _0x1bd510 = (_0x34dfc0, _0x4dff88, _0x3a552d) =>
-            Math.min(_0x3a552d, Math.max(_0x4dff88, _0x34dfc0));
-        if (_0x54e600.mode === 'drag') {
-          const _0x45c816 = _0x54e600.startRect.w,
-            _0x221d82 = _0x54e600.startRect.h;
-          let _0x4d925a = _0x54e600.startRect.x + _0xd6fe6f,
-            _0x1cf6a6 = _0x54e600.startRect.y + _0x461972;
-          ((_0x4d925a = _0x1bd510(_0x4d925a, _0x55f56b.x + _0x55f56b.w - _0x45c816, _0x55f56b.x)),
-            (_0x1cf6a6 = _0x1bd510(_0x1cf6a6, _0x55f56b.y + _0x55f56b.h - _0x221d82, _0x55f56b.y)),
-            (this.frameRect = { x: _0x4d925a, y: _0x1cf6a6, w: _0x45c816, h: _0x221d82 }),
+      handler8 = () => this.ratioStr !== 'original',
+      value72 = (event7) => {
+        const event8 = this._pointerState;
+        if (!event8 || event7.pointerId !== event8.pointerId) return;
+        event7.preventDefault();
+        const value74 = event8.zoom || this._view?.viewport?.zoom || 1,
+          value75 = (event7.clientX - event8.startX) / value74,
+          value76 = (event7.clientY - event8.startY) / value74,
+          box15 = this._getNodeWorldRect(),
+          handler9 = (value77, value78, value79) => Math.min(value79, Math.max(value78, value77));
+        if (event8.mode === 'drag') {
+          const w3 = event8.startRect.w,
+            h3 = event8.startRect.h;
+          let x8 = event8.startRect.x + value75,
+            y5 = event8.startRect.y + value76;
+          ((x8 = handler9(x8, box15.x + box15.w - w3, box15.x)),
+            (y5 = handler9(y5, box15.y + box15.h - h3, box15.y)),
+            (this.frameRect = { x: x8, y: y5, w: w3, h: h3 }),
             this._updateView(this._view));
           return;
         }
-        const _0x36fab0 = _0x54e600.handle,
-          _0x294841 = Math.max(_0x55f56b.w, 24),
-          _0x42a40f = Math.max(_0x55f56b.h, 24),
-          _0x1be15b = (_0x36f9eb) => {
-            const _0x5ddf96 = { ..._0x36f9eb },
-              _0x5416e0 = _0x55f56b.x + _0x55f56b.w - _0x5ddf96.w,
-              _0x41f356 = _0x55f56b.x,
-              _0x2b1715 = _0x55f56b.y + _0x55f56b.h - _0x5ddf96.h,
-              _0x1a5dd3 = _0x55f56b.y;
+        const value80 = event8.handle,
+          value81 = Math.max(box15.w, 24),
+          value82 = Math.max(box15.h, 24),
+          handler10 = (args4) => {
+            const box16 = { ...args4 },
+              value83 = box15.x + box15.w - box16.w,
+              value84 = box15.x,
+              value85 = box15.y + box15.h - box16.h,
+              value86 = box15.y;
             return (
-              (_0x5ddf96.x = _0x1bd510(_0x5ddf96.x, _0x5416e0, _0x41f356)),
-              (_0x5ddf96.y = _0x1bd510(_0x5ddf96.y, _0x2b1715, _0x1a5dd3)),
-              _0x5ddf96
+              (box16.x = handler9(box16.x, value83, value84)),
+              (box16.y = handler9(box16.y, value85, value86)),
+              box16
             );
           },
-          _0x5727b8 = (_0x60d305, _0x2363ee) => {
-            const _0x410b6b = { ..._0x60d305 };
-            if (_0x410b6b.w < _0x294841) _0x410b6b.w = _0x294841;
-            if (_0x410b6b.h < _0x42a40f) _0x410b6b.h = _0x42a40f;
-            if (_0x2363ee === 'tl')
-              ((_0x410b6b.x = _0x54e600.startRect.x + _0x54e600.startRect.w - _0x410b6b.w),
-                (_0x410b6b.y = _0x54e600.startRect.y + _0x54e600.startRect.h - _0x410b6b.h));
+          handler11 = (args5, value87) => {
+            const box17 = { ...args5 };
+            if (box17.w < value81) box17.w = value81;
+            if (box17.h < value82) box17.h = value82;
+            if (value87 === 'tl')
+              ((box17.x = event8.startRect.x + event8.startRect.w - box17.w),
+                (box17.y = event8.startRect.y + event8.startRect.h - box17.h));
             else {
-              if (_0x2363ee === 'tr')
-                ((_0x410b6b.x = _0x54e600.startRect.x),
-                  (_0x410b6b.y = _0x54e600.startRect.y + _0x54e600.startRect.h - _0x410b6b.h));
+              if (value87 === 'tr')
+                ((box17.x = event8.startRect.x),
+                  (box17.y = event8.startRect.y + event8.startRect.h - box17.h));
               else {
-                if (_0x2363ee === 'bl')
-                  ((_0x410b6b.x = _0x54e600.startRect.x + _0x54e600.startRect.w - _0x410b6b.w),
-                    (_0x410b6b.y = _0x54e600.startRect.y));
+                if (value87 === 'bl')
+                  ((box17.x = event8.startRect.x + event8.startRect.w - box17.w),
+                    (box17.y = event8.startRect.y));
                 else {
-                  if (_0x2363ee === 'br')
-                    ((_0x410b6b.x = _0x54e600.startRect.x), (_0x410b6b.y = _0x54e600.startRect.y));
+                  if (value87 === 'br') ((box17.x = event8.startRect.x), (box17.y = event8.startRect.y));
                   else {
-                    if (_0x2363ee === 'lm')
-                      ((_0x410b6b.x = _0x54e600.startRect.x + _0x54e600.startRect.w - _0x410b6b.w),
-                        (_0x410b6b.y = _0x54e600.startRect.y));
+                    if (value87 === 'lm')
+                      ((box17.x = event8.startRect.x + event8.startRect.w - box17.w),
+                        (box17.y = event8.startRect.y));
                     else {
-                      if (_0x2363ee === 'rm')
-                        ((_0x410b6b.x = _0x54e600.startRect.x), (_0x410b6b.y = _0x54e600.startRect.y));
+                      if (value87 === 'rm') ((box17.x = event8.startRect.x), (box17.y = event8.startRect.y));
                       else {
-                        if (_0x2363ee === 'tm')
-                          ((_0x410b6b.x = _0x54e600.startRect.x),
-                            (_0x410b6b.y = _0x54e600.startRect.y + _0x54e600.startRect.h - _0x410b6b.h));
+                        if (value87 === 'tm')
+                          ((box17.x = event8.startRect.x),
+                            (box17.y = event8.startRect.y + event8.startRect.h - box17.h));
                         else
-                          _0x2363ee === 'bm' &&
-                            ((_0x410b6b.x = _0x54e600.startRect.x), (_0x410b6b.y = _0x54e600.startRect.y));
+                          value87 === 'bm' &&
+                            ((box17.x = event8.startRect.x), (box17.y = event8.startRect.y));
                       }
                     }
                   }
                 }
               }
             }
-            return _0x410b6b;
+            return box17;
           };
-        if (!_0x39e69c()) {
-          let _0x2822c1 = { ..._0x54e600.startRect };
-          if (_0x36fab0 === 'tl')
-            ((_0x2822c1.x = _0x54e600.startRect.x + _0xd6fe6f),
-              (_0x2822c1.y = _0x54e600.startRect.y + _0x461972),
-              (_0x2822c1.w = _0x54e600.startRect.w - _0xd6fe6f),
-              (_0x2822c1.h = _0x54e600.startRect.h - _0x461972),
-              (_0x2822c1 = _0x5727b8(_0x2822c1, 'tl')));
+        if (!handler8()) {
+          let box18 = { ...event8.startRect };
+          if (value80 === 'tl')
+            ((box18.x = event8.startRect.x + value75),
+              (box18.y = event8.startRect.y + value76),
+              (box18.w = event8.startRect.w - value75),
+              (box18.h = event8.startRect.h - value76),
+              (box18 = handler11(box18, 'tl')));
           else {
-            if (_0x36fab0 === 'tr')
-              ((_0x2822c1.y = _0x54e600.startRect.y + _0x461972),
-                (_0x2822c1.w = _0x54e600.startRect.w + _0xd6fe6f),
-                (_0x2822c1.h = _0x54e600.startRect.h - _0x461972),
-                (_0x2822c1 = _0x5727b8(_0x2822c1, 'tr')));
+            if (value80 === 'tr')
+              ((box18.y = event8.startRect.y + value76),
+                (box18.w = event8.startRect.w + value75),
+                (box18.h = event8.startRect.h - value76),
+                (box18 = handler11(box18, 'tr')));
             else {
-              if (_0x36fab0 === 'bl')
-                ((_0x2822c1.x = _0x54e600.startRect.x + _0xd6fe6f),
-                  (_0x2822c1.w = _0x54e600.startRect.w - _0xd6fe6f),
-                  (_0x2822c1.h = _0x54e600.startRect.h + _0x461972),
-                  (_0x2822c1 = _0x5727b8(_0x2822c1, 'bl')));
+              if (value80 === 'bl')
+                ((box18.x = event8.startRect.x + value75),
+                  (box18.w = event8.startRect.w - value75),
+                  (box18.h = event8.startRect.h + value76),
+                  (box18 = handler11(box18, 'bl')));
               else {
-                if (_0x36fab0 === 'br')
-                  ((_0x2822c1.w = _0x54e600.startRect.w + _0xd6fe6f),
-                    (_0x2822c1.h = _0x54e600.startRect.h + _0x461972),
-                    (_0x2822c1 = _0x5727b8(_0x2822c1, 'br')));
+                if (value80 === 'br')
+                  ((box18.w = event8.startRect.w + value75),
+                    (box18.h = event8.startRect.h + value76),
+                    (box18 = handler11(box18, 'br')));
                 else {
-                  if (_0x36fab0 === 'tm')
-                    ((_0x2822c1.y = _0x54e600.startRect.y + _0x461972),
-                      (_0x2822c1.h = _0x54e600.startRect.h - _0x461972),
-                      (_0x2822c1 = _0x5727b8(_0x2822c1, 'tm')));
+                  if (value80 === 'tm')
+                    ((box18.y = event8.startRect.y + value76),
+                      (box18.h = event8.startRect.h - value76),
+                      (box18 = handler11(box18, 'tm')));
                   else {
-                    if (_0x36fab0 === 'bm')
-                      ((_0x2822c1.h = _0x54e600.startRect.h + _0x461972),
-                        (_0x2822c1 = _0x5727b8(_0x2822c1, 'bm')));
+                    if (value80 === 'bm')
+                      ((box18.h = event8.startRect.h + value76), (box18 = handler11(box18, 'bm')));
                     else {
-                      if (_0x36fab0 === 'lm')
-                        ((_0x2822c1.x = _0x54e600.startRect.x + _0xd6fe6f),
-                          (_0x2822c1.w = _0x54e600.startRect.w - _0xd6fe6f),
-                          (_0x2822c1 = _0x5727b8(_0x2822c1, 'lm')));
+                      if (value80 === 'lm')
+                        ((box18.x = event8.startRect.x + value75),
+                          (box18.w = event8.startRect.w - value75),
+                          (box18 = handler11(box18, 'lm')));
                       else
-                        _0x36fab0 === 'rm' &&
-                          ((_0x2822c1.w = _0x54e600.startRect.w + _0xd6fe6f),
-                          (_0x2822c1 = _0x5727b8(_0x2822c1, 'rm')));
+                        value80 === 'rm' &&
+                          ((box18.w = event8.startRect.w + value75), (box18 = handler11(box18, 'rm')));
                     }
                   }
                 }
               }
             }
           }
-          ((this.frameRect = _0x1be15b(_0x2822c1)), this._updateView(this._view));
+          ((this.frameRect = handler10(box18)), this._updateView(this._view));
           return;
         }
-        const _0x5d92b3 = this._parseRatio(),
-          _0x3d4583 = _0x54e600.startRect.x + _0x54e600.startRect.w / 2,
-          _0x1451b5 = _0x54e600.startRect.y + _0x54e600.startRect.h / 2;
-        let _0x2cbdd1 = { ..._0x54e600.startRect };
-        if (_0x36fab0 === 'lm' || _0x36fab0 === 'rm') {
-          let _0x598cbe = _0x54e600.startRect.w + (_0x36fab0 === 'rm' ? _0xd6fe6f : -_0xd6fe6f);
-          _0x598cbe = Math.max(_0x598cbe, _0x294841);
-          let _0x5b6fe5 = _0x598cbe / _0x5d92b3;
-          (_0x5b6fe5 < _0x42a40f && ((_0x5b6fe5 = _0x42a40f), (_0x598cbe = _0x5b6fe5 * _0x5d92b3)),
-            (_0x2cbdd1.w = _0x598cbe),
-            (_0x2cbdd1.h = _0x5b6fe5),
-            (_0x2cbdd1.x =
-              _0x36fab0 === 'rm'
-                ? _0x54e600.startRect.x
-                : _0x54e600.startRect.x + _0x54e600.startRect.w - _0x2cbdd1.w),
-            (_0x2cbdd1.y = _0x1451b5 - _0x2cbdd1.h / 2));
+        const value88 = this._parseRatio(),
+          value89 = event8.startRect.x + event8.startRect.w / 2,
+          value90 = event8.startRect.y + event8.startRect.h / 2;
+        let box19 = { ...event8.startRect };
+        if (value80 === 'lm' || value80 === 'rm') {
+          let value91 = event8.startRect.w + (value80 === 'rm' ? value75 : -value75);
+          value91 = Math.max(value91, value81);
+          let value92 = value91 / value88;
+          (value92 < value82 && ((value92 = value82), (value91 = value92 * value88)),
+            (box19.w = value91),
+            (box19.h = value92),
+            (box19.x =
+              value80 === 'rm' ? event8.startRect.x : event8.startRect.x + event8.startRect.w - box19.w),
+            (box19.y = value90 - box19.h / 2));
         } else {
-          if (_0x36fab0 === 'tm' || _0x36fab0 === 'bm') {
-            let _0x146d1c = _0x54e600.startRect.h + (_0x36fab0 === 'bm' ? _0x461972 : -_0x461972);
-            _0x146d1c = Math.max(_0x146d1c, _0x42a40f);
-            let _0x36d54b = _0x146d1c * _0x5d92b3;
-            (_0x36d54b < _0x294841 && ((_0x36d54b = _0x294841), (_0x146d1c = _0x36d54b / _0x5d92b3)),
-              (_0x2cbdd1.w = _0x36d54b),
-              (_0x2cbdd1.h = _0x146d1c),
-              (_0x2cbdd1.y =
-                _0x36fab0 === 'bm'
-                  ? _0x54e600.startRect.y
-                  : _0x54e600.startRect.y + _0x54e600.startRect.h - _0x2cbdd1.h),
-              (_0x2cbdd1.x = _0x3d4583 - _0x2cbdd1.w / 2));
+          if (value80 === 'tm' || value80 === 'bm') {
+            let value93 = event8.startRect.h + (value80 === 'bm' ? value76 : -value76);
+            value93 = Math.max(value93, value82);
+            let value94 = value93 * value88;
+            (value94 < value81 && ((value94 = value81), (value93 = value94 / value88)),
+              (box19.w = value94),
+              (box19.h = value93),
+              (box19.y =
+                value80 === 'bm' ? event8.startRect.y : event8.startRect.y + event8.startRect.h - box19.h),
+              (box19.x = value89 - box19.w / 2));
           } else {
-            const _0x2ef8bb = _0x36fab0 === 'tr' || _0x36fab0 === 'br' ? 1 : -1,
-              _0xc43a6a = _0x36fab0 === 'bl' || _0x36fab0 === 'br' ? 1 : -1;
-            let _0x2090a4 = _0x54e600.startRect.w + _0xd6fe6f * _0x2ef8bb,
-              _0x476a6d = _0x54e600.startRect.h + _0x461972 * _0xc43a6a;
-            ((_0x2090a4 = Math.max(_0x2090a4, 1)), (_0x476a6d = Math.max(_0x476a6d, 1)));
-            _0x2090a4 / _0x476a6d > _0x5d92b3
-              ? (_0x476a6d = _0x2090a4 / _0x5d92b3)
-              : (_0x2090a4 = _0x476a6d * _0x5d92b3);
-            _0x2090a4 < _0x294841 && ((_0x2090a4 = _0x294841), (_0x476a6d = _0x2090a4 / _0x5d92b3));
-            _0x476a6d < _0x42a40f && ((_0x476a6d = _0x42a40f), (_0x2090a4 = _0x476a6d * _0x5d92b3));
-            ((_0x2cbdd1.w = _0x2090a4), (_0x2cbdd1.h = _0x476a6d));
-            if (_0x36fab0 === 'br')
-              ((_0x2cbdd1.x = _0x54e600.startRect.x), (_0x2cbdd1.y = _0x54e600.startRect.y));
+            const value95 = value80 === 'tr' || value80 === 'br' ? 1 : -1,
+              value96 = value80 === 'bl' || value80 === 'br' ? 1 : -1;
+            let value97 = event8.startRect.w + value75 * value95,
+              value98 = event8.startRect.h + value76 * value96;
+            ((value97 = Math.max(value97, 1)), (value98 = Math.max(value98, 1)));
+            value97 / value98 > value88 ? (value98 = value97 / value88) : (value97 = value98 * value88);
+            value97 < value81 && ((value97 = value81), (value98 = value97 / value88));
+            value98 < value82 && ((value98 = value82), (value97 = value98 * value88));
+            ((box19.w = value97), (box19.h = value98));
+            if (value80 === 'br') ((box19.x = event8.startRect.x), (box19.y = event8.startRect.y));
             else {
-              if (_0x36fab0 === 'bl')
-                ((_0x2cbdd1.x = _0x54e600.startRect.x + _0x54e600.startRect.w - _0x2cbdd1.w),
-                  (_0x2cbdd1.y = _0x54e600.startRect.y));
+              if (value80 === 'bl')
+                ((box19.x = event8.startRect.x + event8.startRect.w - box19.w),
+                  (box19.y = event8.startRect.y));
               else
-                _0x36fab0 === 'tr'
-                  ? ((_0x2cbdd1.x = _0x54e600.startRect.x),
-                    (_0x2cbdd1.y = _0x54e600.startRect.y + _0x54e600.startRect.h - _0x2cbdd1.h))
-                  : ((_0x2cbdd1.x = _0x54e600.startRect.x + _0x54e600.startRect.w - _0x2cbdd1.w),
-                    (_0x2cbdd1.y = _0x54e600.startRect.y + _0x54e600.startRect.h - _0x2cbdd1.h));
+                value80 === 'tr'
+                  ? ((box19.x = event8.startRect.x),
+                    (box19.y = event8.startRect.y + event8.startRect.h - box19.h))
+                  : ((box19.x = event8.startRect.x + event8.startRect.w - box19.w),
+                    (box19.y = event8.startRect.y + event8.startRect.h - box19.h));
             }
           }
         }
-        ((this.frameRect = _0x1be15b(_0x2cbdd1)), this._updateView(this._view));
+        ((this.frameRect = handler10(box19)), this._updateView(this._view));
       },
-      _0x178062 = (_0x1cbf18) => {
-        const _0x37233b = this._pointerState;
-        if (!_0x37233b || _0x1cbf18.pointerId !== _0x37233b.pointerId) return;
-        (_0x1cbf18.preventDefault(), _0x4fb161());
+      value73 = (event9) => {
+        const event10 = this._pointerState;
+        if (!event10 || event9.pointerId !== event10.pointerId) return;
+        (event9.preventDefault(), run4());
       },
-      _0x371fb6 = (_0x49277d) => {
-        if (_0x49277d.button !== 0) return;
-        (_0x49277d.stopPropagation(), _0x49277d.preventDefault());
+      value99 = (pointerId) => {
+        if (pointerId.button !== 0) return;
+        (pointerId.stopPropagation(), pointerId.preventDefault());
         if (!this.frameRect) this.frameRect = this._calcFrameWorldRect();
         this.frameRect = this._clampFrameRect(this.frameRect);
-        const _0x1c758f = _0x49277d.target.closest('.v2-expand-handle'),
-          _0x107469 = _0x1c758f?.dataset?.handle || null,
-          _0x53d3fc = _0x107469 ? 'resize' : 'drag';
+        const el18 = pointerId.target.closest('.v2-expand-handle'),
+          handle2 = el18?.dataset?.handle || null,
+          mode3 = handle2 ? 'resize' : 'drag';
         ((this._pointerState = {
-          pointerId: _0x49277d.pointerId,
-          mode: _0x53d3fc,
-          handle: _0x107469,
-          startX: _0x49277d.clientX,
-          startY: _0x49277d.clientY,
+          pointerId: pointerId.pointerId,
+          mode: mode3,
+          handle: handle2,
+          startX: pointerId.clientX,
+          startY: pointerId.clientY,
           startRect: { ...this.frameRect },
           zoom: this._view?.viewport?.zoom || 1,
         }),
-          this.frameEl.setPointerCapture?.(_0x49277d.pointerId),
-          window.addEventListener('pointermove', _0x335263, true),
-          window.addEventListener('pointerup', _0x178062, true),
-          window.addEventListener('pointercancel', _0x178062, true));
+          this.frameEl.setPointerCapture?.(pointerId.pointerId),
+          window.addEventListener('pointermove', value72, true),
+          window.addEventListener('pointerup', value73, true),
+          window.addEventListener('pointercancel', value73, true));
       };
-    (this.frameEl.addEventListener('pointerdown', _0x371fb6),
+    (this.frameEl.addEventListener('pointerdown', value99),
       (this.cleanup = () => {
-        (_0x4fb161(),
-          window.removeEventListener('resize', _0x5a5664),
-          window.removeEventListener('keydown', _0x419135),
-          document.removeEventListener('pointerdown', _0x1cbad8, true),
-          this.overlayEl?.removeEventListener('wheel', _0x402d98),
-          this.frameEl?.removeEventListener('pointerdown', _0x371fb6),
+        (run4(),
+          window.removeEventListener('resize', value56),
+          window.removeEventListener('keydown', value57),
+          document.removeEventListener('pointerdown', value71, true),
+          this.overlayEl?.removeEventListener('wheel', value58),
+          this.frameEl?.removeEventListener('pointerdown', value99),
           this._unbindToolbarUpMenus?.(),
           (this._unbindToolbarUpMenus = null),
           this._unbindImageFunctionMenus?.(),

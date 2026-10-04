@@ -41,36 +41,36 @@ import {
   normalizeStoryMinimaxH3OfficialTags,
   normalizeStoryPromptMode,
 } from './storyPromptModes.js';
-function escapeHtml(_0x4eea5f) {
-  return String(_0x4eea5f ?? '')
+function escapeHtml(value) {
+  return String(value ?? '')
     ['replace'](/&/g, '&amp;')
     ['replace'](/</g, '&lt;')
     ['replace'](/>/g, '&gt;')
     ['replace'](/"/g, '&quot;')
     ['replace'](/'/g, '&#39;');
 }
-function normalizeText(_0x133ae7) {
-  return String(_0x133ae7 || '')['trim']();
+function normalizeText(item) {
+  return String(item || '')['trim']();
 }
-function formatPromptHistorySavedAt(_0x55d5a9) {
-  const _0x58e4ec = new Date(Number(_0x55d5a9));
-  if (!Number['isFinite'](_0x58e4ec['getTime']()) || Number(_0x55d5a9) <= 0x0) return '时间未记录';
-  const _0x33d652 = (_0xb6a482) => String(_0xb6a482)['padStart'](0x2, '0');
+function formatPromptHistorySavedAt(key) {
+  const index = new Date(Number(key));
+  if (!Number['isFinite'](index['getTime']()) || Number(key) <= 0x0) return '时间未记录';
+  const run = (result) => String(result)['padStart'](0x2, '0');
   return (
-    _0x58e4ec['getFullYear']() +
+    index['getFullYear']() +
     '-' +
-    _0x33d652(_0x58e4ec['getMonth']() + 0x1) +
+    run(index['getMonth']() + 0x1) +
     '-' +
-    _0x33d652(_0x58e4ec['getDate']()) +
+    run(index['getDate']()) +
     '\x20' +
-    _0x33d652(_0x58e4ec['getHours']()) +
+    run(index['getHours']()) +
     ':' +
-    _0x33d652(_0x58e4ec['getMinutes']())
+    run(index['getMinutes']())
   );
 }
-function getPromptHistoryPreview(_0x1a1f5b) {
+function getPromptHistoryPreview(data) {
   return normalizeText(
-    String(_0x1a1f5b || '')
+    String(data || '')
       ['replace'](/<br\s*\/?\s*>/gi, '\x20')
       ['replace'](/<[^>]+>/g, '\x20')
       ['replace'](/&nbsp;/gi, '\x20')
@@ -82,143 +82,139 @@ function getPromptHistoryPreview(_0x1a1f5b) {
       ['replace'](/\s+/g, '\x20'),
   )['slice'](0x0, 0x60);
 }
-function getVideoResults(_0xa1bae = {}) {
-  return Array['isArray'](_0xa1bae?.['video']?.['results'])
-    ? _0xa1bae['video']['results']['filter']((_0x494755) => _0x494755 && typeof _0x494755 === 'object')
+function getVideoResults(options = {}) {
+  return Array['isArray'](options?.['video']?.['results'])
+    ? options['video']['results']['filter']((target) => target && typeof target === 'object')
     : [];
 }
-function getActiveVideoResultIndex(_0x2c899f = {}, _0x266745 = getVideoResults(_0x2c899f)) {
-  if (!_0x266745['length']) return 0x0;
-  const _0x33cb1 = Math['trunc'](Number(_0x2c899f?.['video']?.['activeIndex']) || 0x0);
-  return Math['max'](0x0, Math['min'](_0x266745['length'] - 0x1, _0x33cb1));
+function getActiveVideoResultIndex(options2 = {}, list = getVideoResults(options2)) {
+  if (!list['length']) return 0x0;
+  const source = Math['trunc'](Number(options2?.['video']?.['activeIndex']) || 0x0);
+  return Math['max'](0x0, Math['min'](list['length'] - 0x1, source));
 }
-function removeVideoResult(_0x14b71b = {}, _0x129de4) {
-  const _0x2fb9a7 = getVideoResults(_0x14b71b),
-    _0x40b238 = Number(_0x129de4),
-    _0x389ac3 = getActiveVideoResultIndex(_0x14b71b, _0x2fb9a7);
-  if (
-    _0x2fb9a7['length'] < 0x2 ||
-    !Number['isInteger'](_0x40b238) ||
-    _0x40b238 < 0x0 ||
-    _0x40b238 >= _0x2fb9a7['length']
-  )
+function removeVideoResult(clip = {}, next) {
+  const results = getVideoResults(clip),
+    count = Number(next),
+    activeIndex = getActiveVideoResultIndex(clip, results);
+  if (results['length'] < 0x2 || !Number['isInteger'](count) || count < 0x0 || count >= results['length'])
     return {
       changed: ![],
-      clip: _0x14b71b,
-      results: _0x2fb9a7,
-      activeIndex: _0x389ac3,
+      clip: clip,
+      results: results,
+      activeIndex: activeIndex,
       activeResultChanged: ![],
       direction: '',
     };
-  const _0x3258f0 = _0x2fb9a7[_0x389ac3],
-    _0x390755 = _0x2fb9a7['filter']((_0x2181b1, _0x58bbe5) => _0x58bbe5 !== _0x40b238),
-    _0x3e9f10 =
-      _0x40b238 < _0x389ac3
-        ? _0x389ac3 - 0x1
-        : _0x40b238 === _0x389ac3
-          ? Math['min'](_0x40b238, _0x390755['length'] - 0x1)
-          : _0x389ac3,
-    _0xd2661 = _0x390755[_0x3e9f10] !== _0x3258f0;
+  const current = results[activeIndex],
+    results2 = results['filter']((entry, record) => record !== count),
+    activeIndex2 =
+      count < activeIndex
+        ? activeIndex - 0x1
+        : count === activeIndex
+          ? Math['min'](count, results2['length'] - 0x1)
+          : activeIndex,
+    activeResultChanged = results2[activeIndex2] !== current;
   return {
     changed: !![],
     clip: {
-      ..._0x14b71b,
-      video: { ...(_0x14b71b?.['video'] || {}), results: _0x390755, activeIndex: _0x3e9f10 },
+      ...clip,
+      video: { ...(clip?.['video'] || {}), results: results2, activeIndex: activeIndex2 },
     },
-    results: _0x390755,
-    activeIndex: _0x3e9f10,
-    activeResultChanged: _0xd2661,
-    direction: _0xd2661 && _0x40b238 >= _0x390755['length'] ? 'previous' : _0xd2661 ? 'next' : '',
+    results: results2,
+    activeIndex: activeIndex2,
+    activeResultChanged: activeResultChanged,
+    direction:
+      activeResultChanged && count >= results2['length'] ? 'previous' : activeResultChanged ? 'next' : '',
   };
 }
-function resolveVideoResultUrl(_0x44e626 = {}) {
+function resolveVideoResultUrl(response = {}) {
   return (
     [
-      localPathToUrl(_0x44e626['displayLocalPath']),
-      localPathToUrl(_0x44e626['localPath']),
-      _0x44e626['videoUrl'],
-      _0x44e626['url'],
-      _0x44e626['displayUrl'],
+      localPathToUrl(response['displayLocalPath']),
+      localPathToUrl(response['localPath']),
+      response['videoUrl'],
+      response['url'],
+      response['displayUrl'],
     ]
-      ['map']((_0x4a625b) => normalizeText(_0x4a625b))
+      ['map']((payload) => normalizeText(payload))
       ['find'](Boolean) || ''
   );
 }
-function resolveVideoResultPosterUrl(_0x250744 = {}) {
+function resolveVideoResultPosterUrl(options3 = {}) {
   return (
     [
-      _0x250744['posterUrl'],
-      _0x250744['thumbUrl'],
-      _0x250744['thumbnailUrl'],
-      _0x250744['coverUrl'],
-      localPathToUrl(_0x250744['posterLocalPath']),
-      localPathToUrl(_0x250744['thumbLocalPath']),
-      localPathToUrl(_0x250744['thumbnailLocalPath']),
+      options3['posterUrl'],
+      options3['thumbUrl'],
+      options3['thumbnailUrl'],
+      options3['coverUrl'],
+      localPathToUrl(options3['posterLocalPath']),
+      localPathToUrl(options3['thumbLocalPath']),
+      localPathToUrl(options3['thumbnailLocalPath']),
     ]
-      ['map']((_0x595804) => normalizeText(_0x595804))
+      ['map']((handle) => normalizeText(handle))
       ['find'](Boolean) || ''
   );
 }
-function renderVideoThumbnail(_0x4c31bb, { className: className = '', label: label = '视频缩略图' } = {}) {
-  const _0x5e398f = resolveVideoResultPosterUrl(_0x4c31bb);
-  if (_0x5e398f)
+function renderVideoThumbnail(state, { className: className = '', label: label = '视频缩略图' } = {}) {
+  const videoResultPosterUrl = resolveVideoResultPosterUrl(state);
+  if (videoResultPosterUrl)
     return (
       '<img class="' +
       escapeHtml(className) +
       '" src="' +
-      escapeHtml(_0x5e398f) +
+      escapeHtml(videoResultPosterUrl) +
       '\x22\x20alt=\x22' +
       escapeHtml(label) +
       '" loading="lazy" draggable="false">'
     );
-  const _0x562007 = resolveVideoResultUrl(_0x4c31bb);
-  if (_0x562007)
+  const videoResultUrl = resolveVideoResultUrl(state);
+  if (videoResultUrl)
     return (
       '<video class="' +
       escapeHtml(className) +
       '\x22\x20src=\x22' +
-      escapeHtml(_0x562007) +
+      escapeHtml(videoResultUrl) +
       '\x22\x20aria-label=\x22' +
       escapeHtml(label) +
       '" muted playsinline preload="metadata"></video>'
     );
   return '';
 }
-function getAdjacentVideoResultIndex(_0x2b36b9 = {}, _0x5301cf = 0x1) {
-  const _0x40d238 = getVideoResults(_0x2b36b9);
-  if (_0x40d238['length'] < 0x2) return getActiveVideoResultIndex(_0x2b36b9, _0x40d238);
-  const _0x3efe9a = getActiveVideoResultIndex(_0x2b36b9, _0x40d238),
-    _0x27e836 = Number(_0x5301cf) < 0x0 ? -0x1 : 0x1;
-  return (_0x3efe9a + _0x27e836 + _0x40d238['length']) % _0x40d238['length'];
+function getAdjacentVideoResultIndex(options4 = {}, config = 0x1) {
+  const list2 = getVideoResults(options4);
+  if (list2['length'] < 0x2) return getActiveVideoResultIndex(options4, list2);
+  const activeVideoResultIndex2 = getActiveVideoResultIndex(options4, list2),
+    scope = Number(config) < 0x0 ? -0x1 : 0x1;
+  return (activeVideoResultIndex2 + scope + list2['length']) % list2['length'];
 }
-function renderVideoHistoryMenu(_0x389b49 = {}) {
-  const _0xfb4219 = getVideoResults(_0x389b49),
-    _0x4c146c = getActiveVideoResultIndex(_0x389b49, _0xfb4219);
+function renderVideoHistoryMenu(title = {}) {
+  const results3 = getVideoResults(title),
+    activeIndex3 = getActiveVideoResultIndex(title, results3);
   return renderStoryMediaHistoryMenu({
-    title: _0x389b49?.['title'] || '片段视频',
-    results: _0xfb4219,
-    activeIndex: _0x4c146c,
-    menuLabel: (_0x389b49?.['title'] || '片段') + '历史视频',
-    getItemStatus: (_0x40022f, _0x104c90) => (_0x104c90 === _0x4c146c ? '当前播放' : '点击切换'),
-    renderMedia: (_0x2723d4, _0x5bae80) =>
-      renderVideoThumbnail(_0x2723d4, {
+    title: title?.['title'] || '片段视频',
+    results: results3,
+    activeIndex: activeIndex3,
+    menuLabel: (title?.['title'] || '片段') + '历史视频',
+    getItemStatus: (input, output) => (output === activeIndex3 ? '当前播放' : '点击切换'),
+    renderMedia: (value2, value3) =>
+      renderVideoThumbnail(value2, {
         className: 'story-media-history-thumbnail story-clip-video-history-thumbnail',
-        label: (_0x389b49?.['title'] || '片段') + ' · 版本 ' + (_0x5bae80 + 0x1),
+        label: (title?.['title'] || '片段') + ' · 版本 ' + (value3 + 0x1),
       }),
-    getItemAttributes: (_0x17e802, _0xc3f106) =>
+    getItemAttributes: (value4, value5) =>
       'data-story-action="select-video-result" data-story-clip-id="' +
-      escapeHtml(_0x389b49?.['id']) +
+      escapeHtml(title?.['id']) +
       '" data-story-video-result-index="' +
-      _0xc3f106 +
+      value5 +
       '\x22',
-    renderItemAction: (_0x4c360c, _0x5bafad) =>
+    renderItemAction: (value6, value7) =>
       renderWorkspaceCardDeleteControl({
         className: 'story-media-history-delete',
-        ariaLabel: '删除版本\x20' + (_0x5bafad + 0x1),
+        ariaLabel: '删除版本\x20' + (value7 + 0x1),
         actionAttributes: {
           'data-story-action': 'delete-video-result',
-          'data-story-clip-id': _0x389b49?.['id'],
-          'data-story-video-result-index': _0x5bafad,
+          'data-story-clip-id': title?.['id'],
+          'data-story-video-result-index': value7,
         },
       }),
   });
@@ -226,245 +222,236 @@ function renderVideoHistoryMenu(_0x389b49 = {}) {
 function renderGenerationSpinner() {
   return renderStoryGenerationSpinner();
 }
-function renderTimelineVideoThumbnail(_0x2a8925 = {}) {
-  const _0x4e11de = getVideoResults(_0x2a8925),
-    _0x492797 = _0x4e11de[getActiveVideoResultIndex(_0x2a8925, _0x4e11de)] || null;
-  return _0x492797
-    ? renderVideoThumbnail(_0x492797, {
+function renderTimelineVideoThumbnail(options5 = {}) {
+  const videoResults2 = getVideoResults(options5),
+    value8 = videoResults2[getActiveVideoResultIndex(options5, videoResults2)] || null;
+  return value8
+    ? renderVideoThumbnail(value8, {
         className: 'story-clip-card-thumbnail',
-        label: '片段 ' + _0x2a8925['number'] + ' 视频缩略图',
+        label: '片段 ' + options5['number'] + ' 视频缩略图',
       })
     : '';
 }
-function getSelectedEpisode(_0x7fc0df) {
-  const _0x182f19 = Array['isArray'](_0x7fc0df?.['data']?.['episodes']) ? _0x7fc0df['data']['episodes'] : [];
-  return (
-    _0x182f19['find']((_0xb9c24c) => _0xb9c24c['id'] === _0x7fc0df?.['selectedEpisodeId']) ||
-    _0x182f19[0x0] ||
-    null
+function getSelectedEpisode(value9) {
+  const list3 = Array['isArray'](value9?.['data']?.['episodes']) ? value9['data']['episodes'] : [];
+  return list3['find']((value10) => value10['id'] === value9?.['selectedEpisodeId']) || list3[0x0] || null;
+}
+function getSelectedClip(value11, value12) {
+  const list4 = Array['isArray'](value12?.['clips']) ? value12['clips'] : [];
+  return list4['find']((value13) => value13['id'] === value11?.['selectedClipId']) || list4[0x0] || null;
+}
+function getAdjacentClipId(list5 = [], value14 = '', value15 = 0x1) {
+  const list6 = (Array['isArray'](list5) ? list5 : [])['filter']((value16) => normalizeText(value16?.['id']));
+  if (!list6['length']) return '';
+  const count2 = list6['findIndex']((value17) => value17['id'] === value14),
+    value18 = count2 >= 0x0 ? count2 : 0x0,
+    value19 = Number(value15) < 0x0 ? -0x1 : 0x1,
+    value20 = (value18 + value19 + list6['length']) % list6['length'];
+  return list6[value20]['id'];
+}
+function selectBatchTargets(list7 = [], value21 = []) {
+  const map = new Set(
+    (Array['isArray'](value21) ? value21 : [])['map']((value22) => normalizeText(value22))['filter'](Boolean),
+  );
+  return (Array['isArray'](list7) ? list7 : [])['filter']((value23) =>
+    map['has'](normalizeText(value23?.['id'])),
   );
 }
-function getSelectedClip(_0x1e7f00, _0xb94b7d) {
-  const _0x362b25 = Array['isArray'](_0xb94b7d?.['clips']) ? _0xb94b7d['clips'] : [];
-  return (
-    _0x362b25['find']((_0x448b64) => _0x448b64['id'] === _0x1e7f00?.['selectedClipId']) ||
-    _0x362b25[0x0] ||
-    null
-  );
-}
-function getAdjacentClipId(_0xcd8a83 = [], _0x211538 = '', _0x5e87ee = 0x1) {
-  const _0x1f9616 = (Array['isArray'](_0xcd8a83) ? _0xcd8a83 : [])['filter']((_0x34b54b) =>
-    normalizeText(_0x34b54b?.['id']),
-  );
-  if (!_0x1f9616['length']) return '';
-  const _0xbe59e = _0x1f9616['findIndex']((_0x3de2d3) => _0x3de2d3['id'] === _0x211538),
-    _0x5c90cc = _0xbe59e >= 0x0 ? _0xbe59e : 0x0,
-    _0x2ba7ed = Number(_0x5e87ee) < 0x0 ? -0x1 : 0x1,
-    _0x45c618 = (_0x5c90cc + _0x2ba7ed + _0x1f9616['length']) % _0x1f9616['length'];
-  return _0x1f9616[_0x45c618]['id'];
-}
-function selectBatchTargets(_0x1c81f6 = [], _0x1b3b25 = []) {
-  const _0x5f1235 = new Set(
-    (Array['isArray'](_0x1b3b25) ? _0x1b3b25 : [])
-      ['map']((_0x4dc186) => normalizeText(_0x4dc186))
-      ['filter'](Boolean),
-  );
-  return (Array['isArray'](_0x1c81f6) ? _0x1c81f6 : [])['filter']((_0x3a46e5) =>
-    _0x5f1235['has'](normalizeText(_0x3a46e5?.['id'])),
-  );
-}
-async function runBatch(_0x10bc98 = [], _0x463362 = null, { onProgress: onProgress = null } = {}) {
-  if (typeof _0x463362 !== 'function') return [];
-  const _0x152df0 = Array['isArray'](_0x10bc98) ? _0x10bc98 : [];
-  let _0x6560b1 = 0x0;
+async function runBatch(list8 = [], handler = null, { onProgress: onProgress = null } = {}) {
+  if (typeof handler !== 'function') return [];
+  const total2 = Array['isArray'](list8) ? list8 : [];
+  let completed2 = 0x0;
   return Promise['all'](
-    _0x152df0['map'](async (_0x599aa8, _0x381d06) => {
-      let _0x1bcd2f;
+    total2['map'](async (target2, index2) => {
+      let result2;
       try {
-        _0x1bcd2f = await _0x463362(_0x599aa8, { index: _0x381d06, total: _0x152df0['length'] });
-      } catch (_0x1b7337) {
-        _0x1bcd2f = { ok: ![], error: _0x1b7337 };
+        result2 = await handler(target2, { index: index2, total: total2['length'] });
+      } catch (error) {
+        result2 = { ok: ![], error: error };
       }
       return (
-        (_0x6560b1 += 0x1),
+        (completed2 += 0x1),
         onProgress?.({
-          completed: _0x6560b1,
-          total: _0x152df0['length'],
-          index: _0x381d06,
-          target: _0x599aa8,
-          result: _0x1bcd2f,
+          completed: completed2,
+          total: total2['length'],
+          index: index2,
+          target: target2,
+          result: result2,
         }),
-        _0x1bcd2f
+        result2
       );
     }),
   );
 }
-function getGeneratingClipIds(_0x493329 = {}, _0x363f23 = null) {
-  const _0x1d16a7 = new Set(
-      (Array['isArray'](_0x493329?.['generatingClipIds']) ? _0x493329['generatingClipIds'] : [])
-        ['map']((_0x14f9cb) => normalizeText(_0x14f9cb))
+function getGeneratingClipIds(options6 = {}, enabled = null) {
+  const args = new Set(
+      (Array['isArray'](options6?.['generatingClipIds']) ? options6['generatingClipIds'] : [])
+        ['map']((value24) => normalizeText(value24))
         ['filter'](Boolean),
     ),
-    _0x30a96a = normalizeText(_0x493329?.['generatingClipId']);
-  if (_0x30a96a) _0x1d16a7['add'](_0x30a96a);
-  const _0x6a1343 = [..._0x1d16a7];
-  if (!_0x363f23) return _0x6a1343;
-  const _0x2e7bef = new Set(
-    (Array['isArray'](_0x363f23?.['clips']) ? _0x363f23['clips'] : [])
-      ['map']((_0x37aae5) => normalizeText(_0x37aae5?.['id']))
+    text = normalizeText(options6?.['generatingClipId']);
+  if (text) args['add'](text);
+  const list9 = [...args];
+  if (!enabled) return list9;
+  const map2 = new Set(
+    (Array['isArray'](enabled?.['clips']) ? enabled['clips'] : [])
+      ['map']((value25) => normalizeText(value25?.['id']))
       ['filter'](Boolean),
   );
-  return _0x6a1343['filter']((_0x213e1d) => _0x2e7bef['has'](_0x213e1d));
+  return list9['filter']((value26) => map2['has'](value26));
 }
-function setClipGenerationRunning(_0x4dd8c9, _0x1445ec, _0x354c7d = !![]) {
-  if (!_0x4dd8c9 || typeof _0x4dd8c9 !== 'object') return [];
-  const _0x173efe = normalizeText(_0x1445ec),
-    _0x476b34 = new Set(getGeneratingClipIds(_0x4dd8c9));
-  if (_0x173efe) {
-    if (_0x354c7d) _0x476b34['add'](_0x173efe);
-    else _0x476b34['delete'](_0x173efe);
+function setClipGenerationRunning(args2, value27, value28 = !![]) {
+  if (!args2 || typeof args2 !== 'object') return [];
+  const text2 = normalizeText(value27),
+    map3 = new Set(getGeneratingClipIds(args2));
+  if (text2) {
+    if (value28) map3['add'](text2);
+    else map3['delete'](text2);
   }
   return (
-    (_0x4dd8c9['generatingClipIds'] = [..._0x476b34]),
-    (_0x4dd8c9['generatingClipId'] = _0x4dd8c9['generatingClipIds'][0x0] || ''),
-    [..._0x4dd8c9['generatingClipIds']]
+    (args2['generatingClipIds'] = [...map3]),
+    (args2['generatingClipId'] = args2['generatingClipIds'][0x0] || ''),
+    [...args2['generatingClipIds']]
   );
 }
-function getGenerationState(_0x143038 = {}, _0x2fe6 = null) {
-  const _0x237815 = normalizeText(_0x2fe6?.['id']),
-    _0x1a6e2e = _0x143038?.['clipBatchGenerationByEpisode'],
-    _0x58c3c3 = Boolean(
-      _0x237815 &&
-      _0x1a6e2e &&
-      typeof _0x1a6e2e === 'object' &&
-      !Array['isArray'](_0x1a6e2e) &&
-      Object['hasOwn'](_0x1a6e2e, _0x237815),
+function getGenerationState(options7 = {}, value29 = null) {
+  const text3 = normalizeText(value29?.['id']),
+    value30 = options7?.['clipBatchGenerationByEpisode'],
+    isBatchGenerating = Boolean(
+      text3 &&
+      value30 &&
+      typeof value30 === 'object' &&
+      !Array['isArray'](value30) &&
+      Object['hasOwn'](value30, text3),
     ),
-    _0x2340e5 = _0x58c3c3 ? _0x1a6e2e[_0x237815] : null,
-    _0x36d487 = getGeneratingClipIds(_0x143038, _0x2fe6);
+    batchCancelRequested = isBatchGenerating ? value30[text3] : null,
+    generatingClipIds2 = getGeneratingClipIds(options7, value29);
   return {
-    generatingClipIds: _0x36d487,
-    isBatchGenerating: _0x58c3c3,
-    batchLabel: normalizeText(_0x2340e5?.['label']),
-    batchCancelRequested: _0x2340e5?.['cancelRequested'] === !![],
-    busy: _0x58c3c3 || _0x36d487['length'] > 0x0,
+    generatingClipIds: generatingClipIds2,
+    isBatchGenerating: isBatchGenerating,
+    batchLabel: normalizeText(batchCancelRequested?.['label']),
+    batchCancelRequested: batchCancelRequested?.['cancelRequested'] === !![],
+    busy: isBatchGenerating || generatingClipIds2['length'] > 0x0,
   };
 }
-function setEpisodeBatchRunning(_0x36ca89, _0x113de2, _0x343bc6 = !![], _0x34792e = '', _0x3995fe = {}) {
-  if (!_0x36ca89 || typeof _0x36ca89 !== 'object') return null;
-  const _0x39ff51 = normalizeText(_0x113de2);
-  if (!_0x39ff51) return null;
-  const _0x22a772 = _0x36ca89['clipBatchGenerationByEpisode'],
-    _0x5bf1b6 = {
-      ...(_0x22a772 && typeof _0x22a772 === 'object' && !Array['isArray'](_0x22a772) ? _0x22a772 : {}),
+function setEpisodeBatchRunning(enabled2, value31, value32 = !![], value33 = '', value34 = {}) {
+  if (!enabled2 || typeof enabled2 !== 'object') return null;
+  const text4 = normalizeText(value31);
+  if (!text4) return null;
+  const value35 = enabled2['clipBatchGenerationByEpisode'],
+    value36 = {
+      ...(value35 && typeof value35 === 'object' && !Array['isArray'](value35) ? value35 : {}),
     };
-  if (_0x343bc6)
-    _0x5bf1b6[_0x39ff51] = {
-      ...(_0x5bf1b6[_0x39ff51] || {}),
-      ...(_0x3995fe && typeof _0x3995fe === 'object' ? _0x3995fe : {}),
-      label: normalizeText(_0x34792e),
+  if (value32)
+    value36[text4] = {
+      ...(value36[text4] || {}),
+      ...(value34 && typeof value34 === 'object' ? value34 : {}),
+      label: normalizeText(value33),
     };
-  else delete _0x5bf1b6[_0x39ff51];
-  return ((_0x36ca89['clipBatchGenerationByEpisode'] = _0x5bf1b6), _0x5bf1b6[_0x39ff51] || null);
+  else delete value36[text4];
+  return ((enabled2['clipBatchGenerationByEpisode'] = value36), value36[text4] || null);
 }
-function getClipInputSurface(_0x29f463, _0x4935da, _0x2ddee7) {
-  if (!_0x2ddee7) return '';
-  const _0x4b0911 = resolveModelExecution(_0x29f463['models']['video'], {
-      providerHint: _0x29f463['videoProvider'],
+function getClipInputSurface(providerHint, episode2, inputs) {
+  if (!inputs) return '';
+  const manifest = resolveModelExecution(providerHint['models']['video'], {
+      providerHint: providerHint['videoProvider'],
     }),
-    _0x575eeb = buildStoryClipInputSlotViewModel({
-      modelId: _0x29f463['models']['video'],
-      provider: _0x29f463['videoProvider'],
-      inputs: _0x2ddee7['inputs'],
+    storyClipInputSlotViewModel = buildStoryClipInputSlotViewModel({
+      modelId: providerHint['models']['video'],
+      provider: providerHint['videoProvider'],
+      inputs: inputs['inputs'],
     }),
-    _0x5bc9db = {
-      model: _0x29f463['models']['video'],
-      provider: _0x29f463['videoProvider'],
-      generationParams: _0x29f463['videoGenerationParams'],
+    value37 = {
+      model: providerHint['models']['video'],
+      provider: providerHint['videoProvider'],
+      generationParams: providerHint['videoGenerationParams'],
     },
-    _0x18017b = getFixedInputSlotConfigFromManifest(_0x5bc9db, {
-      manifest: _0x4b0911?.['modelManifest'] || null,
+    fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(value37, {
+      manifest: manifest?.['modelManifest'] || null,
     }),
-    _0x1c1864 = shouldHideFixedInputSlots(_0x18017b) ? null : _0x18017b,
-    _0x101f46 = _0x575eeb['slots']['filter']((_0x55ae97) => _0x55ae97['input']?.['url']),
-    _0x3abdee = Object['fromEntries'](
-      _0x101f46['map']((_0x112385) => [_0x112385['id'], { ..._0x112385['input'], kind: _0x112385['kind'] }]),
+    slotOrderByType = shouldHideFixedInputSlots(fixedInputSlotConfigFromManifest)
+      ? null
+      : fixedInputSlotConfigFromManifest,
+    occupiedSlots = storyClipInputSlotViewModel['slots']['filter']((value38) => value38['input']?.['url']),
+    inputsBySlot = Object['fromEntries'](
+      occupiedSlots['map']((kind) => [kind['id'], { ...kind['input'], kind: kind['kind'] }]),
     ),
-    _0x35ab8a = new Set(
-      _0x101f46['map'](
-        (_0x4023a7) => normalizeText(_0x4023a7['kind']) + ':' + normalizeText(_0x4023a7['input']?.['url']),
+    map4 = new Set(
+      occupiedSlots['map'](
+        (value39) => normalizeText(value39['kind']) + ':' + normalizeText(value39['input']?.['url']),
       )['filter'](Boolean),
     ),
-    _0x136592 = resolveStoryVideoReplicationClipVoiceAssetIds(_0x29f463?.['data'], _0x2ddee7),
-    _0x1261cd = resolveStoryClipPromptAssetRefs(_0x2ddee7?.['prompt'] || '', {
-      assets: Array['isArray'](_0x29f463?.['data']?.['assets']) ? _0x29f463['data']['assets'] : [],
-      episode: _0x4935da,
-      clipFrames: Array['isArray'](_0x29f463?.['data']?.['clipFrames'])
-        ? _0x29f463['data']['clipFrames']
+    voiceAssetIds2 = resolveStoryVideoReplicationClipVoiceAssetIds(providerHint?.['data'], inputs),
+    list10 = resolveStoryClipPromptAssetRefs(inputs?.['prompt'] || '', {
+      assets: Array['isArray'](providerHint?.['data']?.['assets']) ? providerHint['data']['assets'] : [],
+      episode: episode2,
+      clipFrames: Array['isArray'](providerHint?.['data']?.['clipFrames'])
+        ? providerHint['data']['clipFrames']
         : [],
       resolveExternalAssetRef: resolveAssetMentionRef,
-      voiceAssetIds: _0x136592,
+      voiceAssetIds: voiceAssetIds2,
     })
-      ['map']((_0x187baa, _0x3cfe7b) => ({
-        ..._0x187baa,
-        type: normalizeText(_0x187baa?.['type'] || _0x187baa?.['kind']),
-        kind: normalizeText(_0x187baa?.['type'] || _0x187baa?.['kind']),
-        url: normalizeText(_0x187baa?.['url']),
-        thumbUrl: normalizeText(_0x187baa?.['thumbUrl'] || _0x187baa?.['url']),
-        name: normalizeText(_0x187baa?.['name'] || _0x187baa?.['label']) || '素材 ' + (_0x3cfe7b + 0x1),
-        refSlot: normalizeText(_0x187baa?.['refSlot'] || _0x187baa?.['slotId']),
+      ['map']((error2, value40) => ({
+        ...error2,
+        type: normalizeText(error2?.['type'] || error2?.['kind']),
+        kind: normalizeText(error2?.['type'] || error2?.['kind']),
+        url: normalizeText(error2?.['url']),
+        thumbUrl: normalizeText(error2?.['thumbUrl'] || error2?.['url']),
+        name: normalizeText(error2?.['name'] || error2?.['label']) || '素材 ' + (value40 + 0x1),
+        refSlot: normalizeText(error2?.['refSlot'] || error2?.['slotId']),
       }))
       ['filter'](
-        (_0x6b92a7) =>
-          _0x6b92a7['kind'] &&
-          _0x6b92a7['url'] &&
-          !_0x35ab8a['has'](_0x6b92a7['kind'] + ':' + _0x6b92a7['url']),
+        (response2) =>
+          response2['kind'] && response2['url'] && !map4['has'](response2['kind'] + ':' + response2['url']),
       );
-  let _0x393eb1 = _0x1261cd['filter']((_0x368be2) => _0x368be2['kind'] === 'image');
-  const _0x317ebc = [];
-  if (_0x4b0911?.['modelManifest']?.['extensions']?.['rhAiApp'] && _0x1c1864) {
-    const _0x50b19f = buildFixedInputAssetSlotMapFromRefs(_0x1261cd, {
-        slotOrderByType: _0x1c1864['slotOrderByType'],
-        visibleSlots: _0x1c1864['visibleSlots'],
-        occupiedSlots: _0x101f46['map']((_0x2c94cb) => _0x2c94cb['id']),
-        exclusiveGroups: _0x1c1864['exclusiveGroups'],
-        slotById: _0x1c1864['slotById'],
+  let readOnlyInputs = list10['filter']((value41) => value41['kind'] === 'image');
+  const readOnlyFixedInputSlots = [];
+  if (manifest?.['modelManifest']?.['extensions']?.['rhAiApp'] && slotOrderByType) {
+    const fixedInputAssetSlotMapFromRefs = buildFixedInputAssetSlotMapFromRefs(list10, {
+        slotOrderByType: slotOrderByType['slotOrderByType'],
+        visibleSlots: slotOrderByType['visibleSlots'],
+        occupiedSlots: occupiedSlots['map']((value42) => value42['id']),
+        exclusiveGroups: slotOrderByType['exclusiveGroups'],
+        slotById: slotOrderByType['slotById'],
       }),
-      _0x14e261 = new Set();
-    (Object['entries'](_0x50b19f)['forEach'](([_0x528a8b, _0x314722]) => {
-      if (!_0x314722?.['url']) return;
-      const _0x36f591 = normalizeText(_0x314722['type'] || _0x314722['kind']);
-      ((_0x3abdee[_0x528a8b] = { ..._0x314722, kind: _0x36f591, slotId: _0x528a8b }),
-        _0x317ebc['push'](_0x528a8b),
-        _0x14e261['add'](_0x36f591 + ':' + normalizeText(_0x314722['url'])));
+      map5 = new Set();
+    (Object['entries'](fixedInputAssetSlotMapFromRefs)['forEach'](([slotId, response3]) => {
+      if (!response3?.['url']) return;
+      const kind2 = normalizeText(response3['type'] || response3['kind']);
+      ((inputsBySlot[slotId] = { ...response3, kind: kind2, slotId: slotId }),
+        readOnlyFixedInputSlots['push'](slotId),
+        map5['add'](kind2 + ':' + normalizeText(response3['url'])));
     }),
-      (_0x393eb1 = _0x393eb1['filter'](
-        (_0x2c1669) => !_0x14e261['has'](_0x2c1669['kind'] + ':' + _0x2c1669['url']),
+      (readOnlyInputs = readOnlyInputs['filter'](
+        (response4) => !map5['has'](response4['kind'] + ':' + response4['url']),
       )));
   }
   return {
-    fixedInputConfig: _0x1c1864,
-    inputsBySlot: _0x3abdee,
-    inputs: _0x101f46['map']((_0x1dee3b) => ({
-      ..._0x1dee3b['input'],
-      kind: _0x1dee3b['kind'],
-      slotId: _0x1dee3b['id'],
+    fixedInputConfig: slotOrderByType,
+    inputsBySlot: inputsBySlot,
+    inputs: occupiedSlots['map']((kind3) => ({
+      ...kind3['input'],
+      kind: kind3['kind'],
+      slotId: kind3['id'],
     })),
-    readOnlyInputs: _0x393eb1,
-    readOnlyFixedInputSlots: _0x317ebc,
+    readOnlyInputs: readOnlyInputs,
+    readOnlyFixedInputSlots: readOnlyFixedInputSlots,
   };
 }
-function getInputReferenceCounts(_0x2c7247) {
-  const _0xe79c50 =
-      _0x2c7247?.['inputs'] && typeof _0x2c7247['inputs'] === 'object' ? _0x2c7247['inputs'] : {},
-    _0x39f562 = (_0x88fdc0) =>
-      (Array['isArray'](_0xe79c50[_0x88fdc0]) ? _0xe79c50[_0x88fdc0] : [])['filter']((_0x36c6ee) =>
-        normalizeText(_0x36c6ee?.['url']),
+function getInputReferenceCounts(value43) {
+  const value44 = value43?.['inputs'] && typeof value43['inputs'] === 'object' ? value43['inputs'] : {},
+    imageCount = (value45) =>
+      (Array['isArray'](value44[value45]) ? value44[value45] : [])['filter']((response5) =>
+        normalizeText(response5?.['url']),
       )['length'];
-  return { imageCount: _0x39f562('image'), videoCount: _0x39f562('video'), audioCount: _0x39f562('audio') };
+  return {
+    imageCount: imageCount('image'),
+    videoCount: imageCount('video'),
+    audioCount: imageCount('audio'),
+  };
 }
 function getUsedReferenceCounts(
-  _0x171430,
+  value46,
   {
     assets: assets = [],
     episode: episode = null,
@@ -472,35 +459,35 @@ function getUsedReferenceCounts(
     voiceAssetIds: voiceAssetIds = null,
   } = {},
 ) {
-  const _0x221722 = { imageCount: 0x0, audioCount: 0x0, videoCount: 0x0 },
-    _0x240eb5 = new Set(),
-    _0x1e7d5d = (_0x3f43fc, _0x34f40f = '') => {
-      const _0x5ca257 = normalizeText(_0x3f43fc?.['type'] || _0x3f43fc?.['kind'] || _0x34f40f),
-        _0x477cce = normalizeText(_0x3f43fc?.['url']);
-      if (!Object['hasOwn'](_0x221722, _0x5ca257 + 'Count') || !_0x477cce) return;
-      const _0x1c2330 = _0x5ca257 + ':' + _0x477cce;
-      if (_0x240eb5['has'](_0x1c2330)) return;
-      (_0x240eb5['add'](_0x1c2330), (_0x221722[_0x5ca257 + 'Count'] += 0x1));
+  const value47 = { imageCount: 0x0, audioCount: 0x0, videoCount: 0x0 },
+    map6 = new Set(),
+    handler2 = (response6, value48 = '') => {
+      const text5 = normalizeText(response6?.['type'] || response6?.['kind'] || value48),
+        text6 = normalizeText(response6?.['url']);
+      if (!Object['hasOwn'](value47, text5 + 'Count') || !text6) return;
+      const value49 = text5 + ':' + text6;
+      if (map6['has'](value49)) return;
+      (map6['add'](value49), (value47[text5 + 'Count'] += 0x1));
     },
-    _0x7b81a3 = _0x171430?.['inputs'] && typeof _0x171430['inputs'] === 'object' ? _0x171430['inputs'] : {};
+    value50 = value46?.['inputs'] && typeof value46['inputs'] === 'object' ? value46['inputs'] : {};
   return (
-    ['image', 'audio', 'video']['forEach']((_0x5e0e08) => {
-      (Array['isArray'](_0x7b81a3[_0x5e0e08]) ? _0x7b81a3[_0x5e0e08] : [])['forEach']((_0x2f392d) =>
-        _0x1e7d5d(_0x2f392d, _0x5e0e08),
+    ['image', 'audio', 'video']['forEach']((value51) => {
+      (Array['isArray'](value50[value51]) ? value50[value51] : [])['forEach']((value52) =>
+        handler2(value52, value51),
       );
     }),
-    resolveStoryClipPromptAssetRefs(_0x171430?.['prompt'] || '', {
+    resolveStoryClipPromptAssetRefs(value46?.['prompt'] || '', {
       assets: assets,
       episode: episode,
       clipFrames: clipFrames,
       resolveExternalAssetRef: resolveAssetMentionRef,
       voiceAssetIds: voiceAssetIds,
-    })['forEach']((_0xe13c72) => _0x1e7d5d(_0xe13c72)),
-    _0x221722
+    })['forEach']((value53) => handler2(value53)),
+    value47
   );
 }
 function renderReferenceSummary(
-  _0x4185c7,
+  value54,
   {
     assets: assets = [],
     episode: episode = null,
@@ -508,366 +495,363 @@ function renderReferenceSummary(
     voiceAssetIds: voiceAssetIds = null,
   } = {},
 ) {
-  const _0x198788 = getUsedReferenceCounts(_0x4185c7, {
+  const usedReferenceCounts = getUsedReferenceCounts(value54, {
       assets: assets,
       episode: episode,
       clipFrames: clipFrames,
       voiceAssetIds: voiceAssetIds,
     }),
-    _0xc0c73f =
+    value55 =
       '参考素材，图片 ' +
-      _0x198788['imageCount'] +
+      usedReferenceCounts['imageCount'] +
       '，音频\x20' +
-      _0x198788['audioCount'] +
+      usedReferenceCounts['audioCount'] +
       '，视频\x20' +
-      _0x198788['videoCount'];
+      usedReferenceCounts['videoCount'];
   return (
     '<div class="story-clip-reference-summary" data-story-clip-reference-summary role="status" aria-live="polite" aria-label="' +
-    _0xc0c73f +
+    value55 +
     '">\n    <span>图片：<strong data-story-reference-count="image">' +
-    _0x198788['imageCount'] +
+    usedReferenceCounts['imageCount'] +
     '</strong></span>\n    <span>音频：<strong data-story-reference-count="audio">' +
-    _0x198788['audioCount'] +
+    usedReferenceCounts['audioCount'] +
     '</strong></span>\x0a\x20\x20\x20\x20<span>视频：<strong\x20data-story-reference-count=\x22video\x22>' +
-    _0x198788['videoCount'] +
+    usedReferenceCounts['videoCount'] +
     '</strong></span>\n  </div>'
   );
 }
-function renderSelectionControls(_0x50bc25, _0x42eafa, _0x9079cd = null) {
-  const _0x313314 = Array['isArray'](_0x42eafa?.['clips']) ? _0x42eafa['clips'] : [],
-    _0x161d63 = Array['isArray'](_0x50bc25?.['selectedClipGenerationIds'])
-      ? _0x50bc25['selectedClipGenerationIds']
+function renderSelectionControls(enabled3, value56, value57 = null) {
+  const list11 = Array['isArray'](value56?.['clips']) ? value56['clips'] : [],
+    value58 = Array['isArray'](enabled3?.['selectedClipGenerationIds'])
+      ? enabled3['selectedClipGenerationIds']
       : [],
-    _0x13af32 = selectBatchTargets(_0x313314, _0x161d63),
-    _0x2db1b9 = _0x13af32['length'],
-    _0x2529fd = getGenerationState(_0x50bc25, _0x42eafa),
-    { generatingClipIds: _0x59cab5 } = _0x2529fd,
-    _0x4db553 = _0x9079cd || getSelectedClip(_0x50bc25, _0x42eafa),
-    _0x1ee49a = _0x50bc25?.['clipSelectionMode'] ? _0x13af32[0x0] : _0x4db553,
-    _0x5db47e = _0x50bc25?.['clipSelectionMode'] && _0x2db1b9 > 0x1,
-    _0x41aef6 = !_0x50bc25?.['clipSelectionMode'] || _0x2db1b9 === 0x1,
-    _0xafa0dc =
-      _0x41aef6 &&
+    list12 = selectBatchTargets(list11, value58),
+    count3 = list12['length'],
+    generationState = getGenerationState(enabled3, value56),
+    { generatingClipIds: generatingClipIds3 } = generationState,
+    enabled4 = value57 || getSelectedClip(enabled3, value56),
+    value59 = enabled3?.['clipSelectionMode'] ? list12[0x0] : enabled4,
+    value60 = enabled3?.['clipSelectionMode'] && count3 > 0x1,
+    value61 = !enabled3?.['clipSelectionMode'] || count3 === 0x1,
+    value62 =
+      value61 &&
       Boolean(
-        _0x1ee49a &&
-        (_0x59cab5['includes'](normalizeText(_0x1ee49a['id'])) ||
-          getRecoverableStoryClipVideoTask(_0x1ee49a)),
+        value59 &&
+        (generatingClipIds3['includes'](normalizeText(value59['id'])) ||
+          getRecoverableStoryClipVideoTask(value59)),
       ),
-    _0x31b9ed = _0x50bc25?.['clipSelectionMode']
-      ? _0x2db1b9 === 0x0 ||
-        _0x2529fd['isBatchGenerating'] ||
-        (_0x5db47e ? _0x59cab5['length'] > 0x0 : _0xafa0dc)
-      : !_0x4db553 || _0x2529fd['isBatchGenerating'] || _0xafa0dc,
-    _0x1380ba = normalizeText(_0x1ee49a?.['generation']?.['status'])['toLowerCase']() === 'queued',
-    _0x3d17e5 = '批量生成视频' + (_0x2db1b9 ? '\x20(' + _0x2db1b9 + ')' : ''),
-    _0x588348 = _0x2529fd['isBatchGenerating']
-      ? _0x3d17e5
-      : _0xafa0dc
-        ? _0x1380ba
+    value63 = enabled3?.['clipSelectionMode']
+      ? count3 === 0x0 ||
+        generationState['isBatchGenerating'] ||
+        (value60 ? generatingClipIds3['length'] > 0x0 : value62)
+      : !enabled4 || generationState['isBatchGenerating'] || value62,
+    text7 = normalizeText(value59?.['generation']?.['status'])['toLowerCase']() === 'queued',
+    value64 = '批量生成视频' + (count3 ? '\x20(' + count3 + ')' : ''),
+    value65 = generationState['isBatchGenerating']
+      ? value64
+      : value62
+        ? text7
           ? '排队中'
           : '生成中'
-        : _0x50bc25?.['clipSelectionMode'] && _0x2db1b9 > 0x1
-          ? _0x3d17e5
+        : enabled3?.['clipSelectionMode'] && count3 > 0x1
+          ? value64
           : '生成本片段',
-    _0x4224e8 = Boolean(_0x2529fd['isBatchGenerating'] || _0xafa0dc),
-    _0x4b9bab =
+    value66 = Boolean(generationState['isBatchGenerating'] || value62),
+    renderRequestDebugButton2 =
       renderRequestDebugButton('data-story-action="debug-clip-video"') +
       '<button type="button" class="story-workbench-action-button story-main-action-button" data-story-action="generate-clip-video" aria-busy="' +
-      _0x4224e8 +
+      value66 +
       '\x22\x20' +
-      (_0x31b9ed ? 'disabled' : '') +
+      (value63 ? 'disabled' : '') +
       '>' +
-      (_0x4224e8 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
-      _0x588348 +
+      (value66 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+      value65 +
       '</button>',
-    _0x165dbb = _0x2529fd['isBatchGenerating']
+    value67 = generationState['isBatchGenerating']
       ? '<button type="button" class="story-secondary-button" data-story-action="cancel-clip-batch-generation" ' +
-        (_0x2529fd['batchCancelRequested'] ? 'disabled' : '') +
+        (generationState['batchCancelRequested'] ? 'disabled' : '') +
         '>' +
-        (_0x2529fd['batchCancelRequested'] ? '正在停止' : '停止批量生成') +
+        (generationState['batchCancelRequested'] ? '正在停止' : '停止批量生成') +
         '</button>'
       : '',
-    _0x185833 =
+    value68 =
       '<div\x20class=\x22story-clip-selection-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x22\x20data-story-action=\x22select-all-clips\x22\x20aria-pressed=\x22' +
-      (_0x2db1b9 > 0x0 && _0x2db1b9 === _0x313314['length']) +
+      (count3 > 0x0 && count3 === list11['length']) +
       '\x22\x20' +
-      (!_0x313314['length'] ? 'disabled' : '') +
+      (!list11['length'] ? 'disabled' : '') +
       '>' +
-      (_0x2db1b9 > 0x0 && _0x2db1b9 === _0x313314['length'] ? '取消全选' : '全选') +
+      (count3 > 0x0 && count3 === list11['length'] ? '取消全选' : '全选') +
       '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
-      _0x165dbb +
+      value67 +
       '\n        ' +
-      _0x4b9bab +
+      renderRequestDebugButton2 +
       '\n      </div>';
-  return '<div class="story-clip-selection-controls">' + _0x185833 + '</div>';
+  return '<div class="story-clip-selection-controls">' + value68 + '</div>';
 }
-function renderAdjustmentBar(_0x4cdd70, _0x1e0737, _0x59ed92 = null) {
-  if (_0x4cdd70?.['clipAdjustmentOpen'] !== !![]) return '';
-  const _0x5ad066 = isStoryClipAdjustmentGenerating(_0x4cdd70, _0x59ed92, _0x1e0737),
-    _0x145534 = normalizeStoryPromptMode(
-      _0x1e0737?.['promptMode'] ||
-        _0x59ed92?.['promptMode'] ||
-        _0x4cdd70?.['data']?.['project']?.['planning']?.['promptMode'],
+function renderAdjustmentBar(value69, value70, value71 = null) {
+  if (value69?.['clipAdjustmentOpen'] !== !![]) return '';
+  const isStoryClipAdjustmentGenerating2 = isStoryClipAdjustmentGenerating(value69, value71, value70),
+    storyPromptMode = normalizeStoryPromptMode(
+      value70?.['promptMode'] ||
+        value71?.['promptMode'] ||
+        value69?.['data']?.['project']?.['planning']?.['promptMode'],
       { allowDeveloperModes: !![] },
     ),
-    _0x26cb23 = normalizeStoryPromptMode(_0x4cdd70?.['clipAdjustmentPromptMode'] || _0x145534, {
+    storyPromptMode2 = normalizeStoryPromptMode(value69?.['clipAdjustmentPromptMode'] || storyPromptMode, {
       allowDeveloperModes: !![],
     }),
-    _0x2b23ad = canGenerateStoryClipAdjustment(_0x4cdd70, _0x59ed92, _0x1e0737);
+    canGenerateStoryClipAdjustment2 = canGenerateStoryClipAdjustment(value69, value71, value70);
   return (
     '<div class="story-clip-adjustment-bar" data-story-clip-adjustment-bar>\n    <div class="story-clip-adjustment-selectors">\n    <div class="story-clip-adjustment-mode" data-story-clip-adjustment-mode data-story-adjustment-kind="mode">\n      <button type="button" class="story-clip-adjustment-mode-trigger" data-story-action="toggle-clip-adjustment-mode" aria-haspopup="listbox" aria-expanded="' +
-    (_0x4cdd70?.['clipAdjustmentPromptModeOpen'] === !![]) +
+    (value69?.['clipAdjustmentPromptModeOpen'] === !![]) +
     '\x22\x20' +
-    (_0x5ad066 ? 'disabled' : '') +
+    (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<strong\x20data-story-clip-adjustment-mode-label>' +
-    escapeHtml(getStoryPromptModeLabel(_0x26cb23)) +
+    escapeHtml(getStoryPromptModeLabel(storyPromptMode2)) +
     '</strong>\n      </button>\n      <div class="story-clip-adjustment-mode-menu" role="listbox" aria-label="提示词模式" ' +
-    (_0x4cdd70?.['clipAdjustmentPromptModeOpen'] === !![] ? '' : 'hidden') +
+    (value69?.['clipAdjustmentPromptModeOpen'] === !![] ? '' : 'hidden') +
     '>\n        ' +
     STORY_PROMPT_MODE_OPTIONS['map'](
-      (_0x1b549a) =>
+      (el) =>
         '<button type="button" class="' +
-        (_0x1b549a['value'] === _0x26cb23 ? 'is-selected' : '') +
+        (el['value'] === storyPromptMode2 ? 'is-selected' : '') +
         '" data-story-action="select-clip-adjustment-mode" data-story-clip-adjustment-mode-option="' +
-        escapeHtml(_0x1b549a['value']) +
+        escapeHtml(el['value']) +
         '" role="option" aria-selected="' +
-        (_0x1b549a['value'] === _0x26cb23) +
+        (el['value'] === storyPromptMode2) +
         '\x22>' +
-        escapeHtml(_0x1b549a['label']) +
+        escapeHtml(el['label']) +
         '</button>',
     )['join']('') +
     '\n      </div>\n    </div>\n    <div class="story-clip-adjustment-mode" data-story-clip-adjustment-mode data-story-adjustment-kind="language">\n      <button type="button" class="story-clip-adjustment-mode-trigger" data-story-action="toggle-clip-adjustment-mode" aria-label="语言转换" aria-haspopup="listbox" aria-expanded="' +
-    (_0x4cdd70?.['clipAdjustmentLanguageOpen'] === !![]) +
+    (value69?.['clipAdjustmentLanguageOpen'] === !![]) +
     '\x22\x20' +
-    (_0x5ad066 ? 'disabled' : '') +
+    (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\n        <strong data-story-clip-adjustment-mode-label>' +
     escapeHtml(
-      STORY_PROMPT_LANGUAGES['find'](
-        (_0x3a6ba7) => _0x3a6ba7['value'] === _0x4cdd70?.['clipAdjustmentLanguage'],
-      )?.['label'] || '语言转换',
+      STORY_PROMPT_LANGUAGES['find']((el2) => el2['value'] === value69?.['clipAdjustmentLanguage'])?.[
+        'label'
+      ] || '语言转换',
     ) +
     '</strong>\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-clip-adjustment-mode-menu\x22\x20role=\x22listbox\x22\x20aria-label=\x22语言转换\x22\x20' +
-    (_0x4cdd70?.['clipAdjustmentLanguageOpen'] ? '' : 'hidden') +
+    (value69?.['clipAdjustmentLanguageOpen'] ? '' : 'hidden') +
     '>\n        ' +
     [{ value: '', label: '保持当前语言' }, ...STORY_PROMPT_LANGUAGES]
       ['map'](
-        (_0x68f2ad) =>
+        (el3) =>
           '<button type="button" class="' +
-          (_0x68f2ad['value'] === (_0x4cdd70?.['clipAdjustmentLanguage'] || '') ? 'is-selected' : '') +
+          (el3['value'] === (value69?.['clipAdjustmentLanguage'] || '') ? 'is-selected' : '') +
           '" data-story-action="select-clip-adjustment-mode" data-story-clip-adjustment-mode-option="' +
-          _0x68f2ad['value'] +
+          el3['value'] +
           '" role="option" aria-selected="' +
-          (_0x68f2ad['value'] === (_0x4cdd70?.['clipAdjustmentLanguage'] || '')) +
+          (el3['value'] === (value69?.['clipAdjustmentLanguage'] || '')) +
           '\x22>' +
-          _0x68f2ad['label'] +
+          el3['label'] +
           '</button>',
       )
       ['join']('') +
     '\n      </div>\n    </div></div>\n    <div class="story-clip-adjustment-compose">\n      <input type="text" data-story-clip-adjustment-instruction maxlength="600" value="' +
-    escapeHtml(_0x4cdd70?.['clipAdjustmentInstruction'] || '') +
+    escapeHtml(value69?.['clipAdjustmentInstruction'] || '') +
     '" placeholder="可选：补充这一段还要怎么调整" aria-label="AI 调整说明" ' +
-    (_0x5ad066 ? 'disabled' : '') +
+    (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\n      <button type="button" class="story-workbench-action-button" data-story-action="generate-clip-adjustment" ' +
-    (_0x5ad066 || !_0x2b23ad ? 'disabled' : '') +
+    (isStoryClipAdjustmentGenerating2 || !canGenerateStoryClipAdjustment2 ? 'disabled' : '') +
     '\x20aria-busy=\x22' +
-    _0x5ad066 +
+    isStoryClipAdjustmentGenerating2 +
     '\x22>' +
-    (_0x5ad066 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
-    (_0x5ad066 ? '生成中' : '生成') +
+    (isStoryClipAdjustmentGenerating2 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+    (isStoryClipAdjustmentGenerating2 ? '生成中' : '生成') +
     '</button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>'
   );
 }
-function shouldCloseAdjustmentOnOutsideClick(_0x5f3327, _0x5ac880) {
+function shouldCloseAdjustmentOnOutsideClick(value72, el4) {
+  return value72?.['clipAdjustmentOpen'] === !![] && !el4?.['closest']?.('.story-clip-adjustment-control');
+}
+function shouldClosePromptHistoryOnOutsideClick(value73, el5) {
   return (
-    _0x5f3327?.['clipAdjustmentOpen'] === !![] && !_0x5ac880?.['closest']?.('.story-clip-adjustment-control')
+    value73?.['clipPromptHistoryOpen'] === !![] && !el5?.['closest']?.('[data-story-clip-prompt-history]')
   );
 }
-function shouldClosePromptHistoryOnOutsideClick(_0x323952, _0xdae028) {
-  return (
-    _0x323952?.['clipPromptHistoryOpen'] === !![] &&
-    !_0xdae028?.['closest']?.('[data-story-clip-prompt-history]')
-  );
-}
-function renderPromptHistoryControl(_0x4f1a01, _0x320dc3) {
-  const _0xf5dfa2 = normalizeStoryClipPromptHistory(_0x320dc3?.['promptHistory']);
-  if (!_0xf5dfa2['length']) return '';
-  const _0x5bc8fb = _0x4f1a01?.['clipPromptHistoryOpen'] === !![];
+function renderPromptHistoryControl(value74, value75) {
+  const list13 = normalizeStoryClipPromptHistory(value75?.['promptHistory']);
+  if (!list13['length']) return '';
+  const value76 = value74?.['clipPromptHistoryOpen'] === !![];
   return (
     '<div class="story-clip-prompt-history" data-story-clip-prompt-history>\n    <button type="button" class="story-clip-prompt-history-trigger" data-story-action="toggle-clip-prompt-history" aria-label="提示词历史" aria-haspopup="dialog" aria-expanded="' +
-    _0x5bc8fb +
+    value76 +
     '">\n      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.8 12a8.2 8.2 0 1 0 2.4-5.8L4 8.4M4 4.8v3.6h3.6M12 7.8v4.7l3.1 1.8"/></svg>\n    </button>\n    <section class="story-clip-prompt-history-panel" data-story-clip-prompt-history-panel role="dialog" aria-label="提示词历史" ' +
-    (_0x5bc8fb ? '' : 'hidden') +
+    (value76 ? '' : 'hidden') +
     '>\n      <header><strong>提示词历史</strong><span>最近 ' +
-    _0xf5dfa2['length'] +
+    list13['length'] +
     ' 个已确认版本</span></header>\n      <div class="story-clip-prompt-history-list">\n        ' +
-    _0xf5dfa2['map']((_0x5daed6) => {
-      const _0x93c63f =
-          _0x5daed6['durationSec'] > 0x0 ? _0x5daed6['durationSec']['toFixed'](0x1) + 's' : '时长未记录',
-        _0x370d9e = getPromptHistoryPreview(_0x5daed6['promptHtml']) || '空提示词';
+    list13['map']((value77) => {
+      const value78 =
+          value77['durationSec'] > 0x0 ? value77['durationSec']['toFixed'](0x1) + 's' : '时长未记录',
+        promptHistoryPreview = getPromptHistoryPreview(value77['promptHtml']) || '空提示词';
       return (
         '<button type="button" class="story-clip-prompt-history-item" data-story-action="restore-clip-prompt-history" data-story-clip-prompt-history-id="' +
-        escapeHtml(_0x5daed6['id']) +
+        escapeHtml(value77['id']) +
         '" aria-label="恢复 ' +
-        escapeHtml(getStoryPromptModeLabel(_0x5daed6['promptMode'])) +
+        escapeHtml(getStoryPromptModeLabel(value77['promptMode'])) +
         ' 历史提示词">\n            <span class="story-clip-prompt-history-item-meta"><strong>' +
-        escapeHtml(getStoryPromptModeLabel(_0x5daed6['promptMode'])) +
+        escapeHtml(getStoryPromptModeLabel(value77['promptMode'])) +
         '\x20·\x20' +
-        _0x93c63f +
+        value78 +
         '</strong><small>' +
-        escapeHtml(formatPromptHistorySavedAt(_0x5daed6['savedAt'])) +
+        escapeHtml(formatPromptHistorySavedAt(value77['savedAt'])) +
         '</small></span>\n            <span class="story-clip-prompt-history-item-preview">' +
-        escapeHtml(_0x370d9e) +
+        escapeHtml(promptHistoryPreview) +
         '</span>\n            <span class="story-clip-prompt-history-item-action">恢复</span>\n          </button>'
       );
     })['join']('') +
     '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</section>\x0a\x20\x20</div>'
   );
 }
-function renderAdjustmentControl(_0xf67464, _0x2172ef, _0x11cdb2 = null) {
-  if (_0x2172ef?.['promptAdjustment']?.['candidate']) return '';
-  const _0x1a134f = isStoryClipAdjustmentGenerating(_0xf67464, _0x11cdb2, _0x2172ef),
-    _0x354eb5 =
+function renderAdjustmentControl(value79, value80, value81 = null) {
+  if (value80?.['promptAdjustment']?.['candidate']) return '';
+  const isStoryClipAdjustmentGenerating3 = isStoryClipAdjustmentGenerating(value79, value81, value80),
+    value82 =
       '<div class="story-clip-adjustment-header">\n    ' +
-      renderPromptHistoryControl(_0xf67464, _0x2172ef) +
+      renderPromptHistoryControl(value79, value80) +
       '\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-clip-adjustment-trigger\x22\x20data-story-action=\x22toggle-clip-adjustment\x22\x20aria-expanded=\x22' +
-      (_0xf67464?.['clipAdjustmentOpen'] === !![]) +
+      (value79?.['clipAdjustmentOpen'] === !![]) +
       '\x22\x20' +
-      (_0x1a134f ? 'disabled' : '') +
+      (isStoryClipAdjustmentGenerating3 ? 'disabled' : '') +
       '><span\x20aria-hidden=\x22true\x22>✦</span>AI\x20调整</button>\x0a\x20\x20</div>';
   return (
     '<div class="story-clip-adjustment-control">\n    ' +
-    _0x354eb5 +
+    value82 +
     '\n    ' +
-    renderAdjustmentBar(_0xf67464, _0x2172ef, _0x11cdb2) +
+    renderAdjustmentBar(value79, value80, value81) +
     '\x0a\x20\x20</div>'
   );
 }
-function renderPromptComparison(_0x41b6bd) {
-  const _0xb98d09 = _0x41b6bd?.['promptAdjustment']?.['candidate'];
-  if (!_0xb98d09) return '';
-  const _0x16cf50 = normalizeDurationSeconds(
-      _0xb98d09['sourceDurationSeconds'] || _0x41b6bd?.['durationSec'] || _0x41b6bd?.['duration'],
+function renderPromptComparison(value83) {
+  const enabled5 = value83?.['promptAdjustment']?.['candidate'];
+  if (!enabled5) return '';
+  const durationSeconds = normalizeDurationSeconds(
+      enabled5['sourceDurationSeconds'] || value83?.['durationSec'] || value83?.['duration'],
     ),
-    _0x2e0738 = normalizeDurationSeconds(_0xb98d09['candidateDurationSeconds'] || _0x16cf50),
-    _0x415d97 = normalizeStoryPromptMode(_0xb98d09['sourcePromptMode'] || _0x41b6bd?.['promptMode'], {
+    durationSeconds2 = normalizeDurationSeconds(enabled5['candidateDurationSeconds'] || durationSeconds),
+    storyPromptMode3 = normalizeStoryPromptMode(enabled5['sourcePromptMode'] || value83?.['promptMode'], {
       allowDeveloperModes: !![],
     }),
-    _0x32b90b = normalizeStoryPromptMode(_0xb98d09['targetPromptMode'] || _0x415d97, {
+    storyPromptMode4 = normalizeStoryPromptMode(enabled5['targetPromptMode'] || storyPromptMode3, {
       allowDeveloperModes: !![],
     }),
-    _0x4ac920 = (_0x216ab8) => (_0x216ab8 > 0x0 ? _0x216ab8['toFixed'](0x1) + 's' : '--');
+    handler3 = (count4) => (count4 > 0x0 ? count4['toFixed'](0x1) + 's' : '--');
   return (
     '<div\x20class=\x22story-clip-prompt-comparison\x22\x20data-story-clip-prompt-comparison>\x0a\x20\x20\x20\x20<header>\x0a\x20\x20\x20\x20\x20\x20<span>AI\x20调整完成</span>\x0a\x20\x20\x20\x20\x20\x20<strong>选择这个片段要使用的提示词版本</strong>\x0a\x20\x20\x20\x20</header>\x0a\x20\x20\x20\x20<div\x20class=\x22story-clip-prompt-comparison-grid\x22>\x0a\x20\x20\x20\x20\x20\x20<article>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-clip-prompt-version-title\x22><strong>原版本\x20·\x20' +
-    escapeHtml(getStoryPromptModeLabel(_0x415d97)) +
+    escapeHtml(getStoryPromptModeLabel(storyPromptMode3)) +
     '</strong><span>总时长 ' +
-    _0x4ac920(_0x16cf50) +
+    handler3(durationSeconds) +
     '</span></div>\n        <div class="story-clip-prompt-version-content">' +
-    sanitizePromptHtmlForCommit(_0xb98d09['sourcePromptHtml']) +
+    sanitizePromptHtmlForCommit(enabled5['sourcePromptHtml']) +
     '</div>\n        <button type="button" data-story-action="keep-current-clip-prompt">保留原版本</button>\n      </article>\n      <article class="is-ai-version">\n        <div class="story-clip-prompt-version-title"><strong>AI 调整后 · ' +
-    escapeHtml(getStoryPromptModeLabel(_0x32b90b)) +
+    escapeHtml(getStoryPromptModeLabel(storyPromptMode4)) +
     '</strong><span>总时长 ' +
-    _0x4ac920(_0x2e0738) +
+    handler3(durationSeconds2) +
     '</span></div>\n        <div class="story-clip-prompt-version-content">' +
-    sanitizePromptHtmlForCommit(_0xb98d09['promptHtml']) +
+    sanitizePromptHtmlForCommit(enabled5['promptHtml']) +
     '</div>\n        <div class="story-clip-prompt-version-actions">\n          <button type="button" class="story-regenerate-button" data-story-action="regenerate-clip-adjustment">重新生成</button>\n          <button type="button" class="story-workbench-action-button" data-story-action="use-ai-clip-prompt">使用 AI 版本</button>\n        </div>\n      </article>\n    </div>\n  </div>'
   );
 }
-function renderPromptSurface(_0x2c4078, _0x1998b3, _0x154652) {
+function renderPromptSurface(modelId2, episode3, value84) {
   try {
-    const _0x55515c = getClipInputSurface(_0x2c4078, _0x1998b3, _0x154652),
-      _0x5b625f = resolveStoryClipVideoGenerationParams(
-        _0x154652,
-        _0x2c4078['models']['video'],
-        _0x2c4078['videoGenerationParams'],
+    const args3 = getClipInputSurface(modelId2, episode3, value84),
+      generationParams2 = resolveStoryClipVideoGenerationParams(
+        value84,
+        modelId2['models']['video'],
+        modelId2['videoGenerationParams'],
       ),
-      _0x2fce90 = {
-        ...(_0x2c4078['videoGenerationParamsByModel'] || {}),
-        [_0x2c4078['models']['video']]: { ..._0x5b625f },
+      generationParamsByModel = {
+        ...(modelId2['videoGenerationParamsByModel'] || {}),
+        [modelId2['models']['video']]: { ...generationParams2 },
       },
-      _0x58df2c = normalizeStoryPromptMode(
-        _0x154652?.['promptMode'] ||
-          _0x1998b3?.['promptMode'] ||
-          _0x2c4078?.['data']?.['project']?.['planning']?.['promptMode'],
+      storyPromptMode5 = normalizeStoryPromptMode(
+        value84?.['promptMode'] ||
+          episode3?.['promptMode'] ||
+          modelId2?.['data']?.['project']?.['planning']?.['promptMode'],
         { allowDeveloperModes: !![] },
       ),
-      _0x2619df = isStoryMinimaxH3PromptMode(_0x58df2c)
-        ? normalizeStoryMinimaxH3OfficialTags(_0x154652?.['prompt'] || '')
-        : _0x154652?.['prompt'] || '',
-      _0x3c5920 = renderStoryClipPromptMentions(_0x2619df, {
-        assets: Array['isArray'](_0x2c4078?.['data']?.['assets']) ? _0x2c4078['data']['assets'] : [],
-        episode: _0x1998b3,
-        clipFrames: Array['isArray'](_0x2c4078?.['data']?.['clipFrames'])
-          ? _0x2c4078['data']['clipFrames']
+      isStoryMinimaxH3PromptMode2 = isStoryMinimaxH3PromptMode(storyPromptMode5)
+        ? normalizeStoryMinimaxH3OfficialTags(value84?.['prompt'] || '')
+        : value84?.['prompt'] || '',
+      promptHtml = renderStoryClipPromptMentions(isStoryMinimaxH3PromptMode2, {
+        assets: Array['isArray'](modelId2?.['data']?.['assets']) ? modelId2['data']['assets'] : [],
+        episode: episode3,
+        clipFrames: Array['isArray'](modelId2?.['data']?.['clipFrames'])
+          ? modelId2['data']['clipFrames']
           : [],
       }),
-      _0x299e3b = isStoryClipAdjustmentGenerating(_0x2c4078, _0x1998b3, _0x154652),
-      _0x20982a = Boolean(_0x154652?.['promptAdjustment']?.['candidate']);
+      isStoryClipAdjustmentGenerating4 = isStoryClipAdjustmentGenerating(modelId2, episode3, value84),
+      value85 = Boolean(value84?.['promptAdjustment']?.['candidate']);
     return (
       '<div class="story-video-node-prompt text-prompt-panel" data-story-clip-prompt-surface>\n      ' +
-      renderStoryClipQualityNotes(_0x1998b3, _0x154652, escapeHtml) +
+      renderStoryClipQualityNotes(episode3, value84, escapeHtml) +
       '\n      <div class="story-clip-prompt-toolbar">\n        ' +
-      renderVideoReferenceBarMarkup({ ..._0x55515c, attachmentButtonHtml: '' }) +
+      renderVideoReferenceBarMarkup({ ...args3, attachmentButtonHtml: '' }) +
       '\n        ' +
-      renderAdjustmentControl(_0x2c4078, _0x154652, _0x1998b3) +
+      renderAdjustmentControl(modelId2, value84, episode3) +
       '\n      </div>\n      ' +
-      (_0x299e3b
+      (isStoryClipAdjustmentGenerating4
         ? '<div class="story-clip-prompt-adjustment-loading" role="status" aria-live="polite" aria-busy="true">\n            ' +
           renderGenerationSpinner() +
           '\n            <strong>正在调整当前片段提示词</strong>\n            <span>其他片段不受影响</span>\n          </div>'
-        : _0x20982a
-          ? renderPromptComparison(_0x154652)
+        : value85
+          ? renderPromptComparison(value84)
           : renderVideoPromptEditorMarkup({
-              promptHtml: _0x3c5920,
+              promptHtml: promptHtml,
               placeholder: t('aigenVideoNode.prompt.placeholder'),
               attributes: 'data-story-clip-prompt',
             })) +
       '\n      <div class="story-clip-model-bar prompt-panel-footer">\n        ' +
       renderAIGenVideoModelSelectorMarkup({
-        modelId: _0x2c4078['models']['video'],
-        provider: _0x2c4078['videoProvider'],
-        generationParams: _0x5b625f,
-        generationParamsByModel: _0x2fce90,
-        providerProfileId: _0x2c4078['videoProviderProfileId'],
-        providerProfileIdByModel: _0x2c4078['videoProviderProfileIdByModel'],
-        referenceCounts: getInputReferenceCounts(_0x154652),
+        modelId: modelId2['models']['video'],
+        provider: modelId2['videoProvider'],
+        generationParams: generationParams2,
+        generationParamsByModel: generationParamsByModel,
+        providerProfileId: modelId2['videoProviderProfileId'],
+        providerProfileIdByModel: modelId2['videoProviderProfileIdByModel'],
+        referenceCounts: getInputReferenceCounts(value84),
         showSchemaControls: !![],
         className: 'story-clip-video-model-selector',
         runningHubWorkflowAllowedModelIds: STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_IDS,
       }) +
       '\n        <span class="story-clip-provider-profile-control" data-story-video-provider-profile></span>\n        <div class="story-clip-generation-actions">\n          ' +
-      renderSelectionControls(_0x2c4078, _0x1998b3, _0x154652) +
+      renderSelectionControls(modelId2, episode3, value84) +
       '\n        </div>\n      </div>\n    </div>'
     );
-  } catch (_0x3655ed) {
+  } catch (error3) {
     return (
       '<div\x20class=\x22story-inline-error\x22>' +
-      escapeHtml(_0x3655ed?.['message'] || '当前模型输入槽不可用') +
+      escapeHtml(error3?.['message'] || '当前模型输入槽不可用') +
       '</div>'
     );
   }
 }
-function renderVideoResultSwitchButton(_0x5cddad, _0x4ba09c) {
-  const _0x571ba2 = _0x5cddad === 'previous',
-    _0x4261ab = _0x571ba2 ? 'previous-video-result' : 'next-video-result',
-    _0x1be958 = _0x571ba2 ? '切换到上一个历史视频' : '切换到下一个历史视频',
-    _0x4fd2ae = _0x571ba2 ? 'story-video-result-switch--previous' : 'story-video-result-switch--next',
-    _0x324ad4 = _0x571ba2 ? 'm6.5 14.5 5.5-5.5 5.5 5.5' : 'm6.5 9.5 5.5 5.5 5.5-5.5';
+function renderVideoResultSwitchButton(value86, value87) {
+  const value88 = value86 === 'previous',
+    value89 = value88 ? 'previous-video-result' : 'next-video-result',
+    value90 = value88 ? '切换到上一个历史视频' : '切换到下一个历史视频',
+    value91 = value88 ? 'story-video-result-switch--previous' : 'story-video-result-switch--next',
+    value92 = value88 ? 'm6.5 14.5 5.5-5.5 5.5 5.5' : 'm6.5 9.5 5.5 5.5 5.5-5.5';
   return (
     '<button type="button" class="story-appearance-arrow story-video-result-switch ' +
-    _0x4fd2ae +
+    value91 +
     '" data-story-action="' +
-    _0x4261ab +
+    value89 +
     '" data-story-clip-id="' +
-    escapeHtml(_0x4ba09c?.['id']) +
+    escapeHtml(value87?.['id']) +
     '\x22\x20aria-label=\x22' +
-    _0x1be958 +
+    value90 +
     '"><svg class="story-appearance-arrow-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="' +
-    _0x324ad4 +
+    value92 +
     '"/></svg></button>'
   );
 }
-function renderVideoPlaybackControls(_0x25635d, _0x135d4d) {
-  const _0x3034db = escapeHtml(_0x25635d?.['id']);
+function renderVideoPlaybackControls(value93, value94) {
+  const escapeHtml2 = escapeHtml(value93?.['id']);
   return renderWorkspaceVideoPlaybackControls({
     label: '视频',
     playLabel: '播放视频',
@@ -883,68 +867,67 @@ function renderVideoPlaybackControls(_0x25635d, _0x135d4d) {
     slots: {
       beforeVolume:
         '<button type="button" class="video-snap-btn story-video-snap-btn" data-story-action="capture-video-frame" data-story-clip-id="' +
-        _0x3034db +
+        escapeHtml2 +
         '\x22\x20data-story-video-result-index=\x22' +
-        _0x135d4d +
+        value94 +
         '" aria-label="获取当前帧" title="获取当前帧">\n        ' +
         renderStoryKeyframeIcon() +
         '\n      </button>\n      <button type="button" class="video-snap-btn story-video-snap-btn story-video-clip-btn" data-story-action="trim-video" data-story-clip-id="' +
-        _0x3034db +
+        escapeHtml2 +
         '" data-story-video-result-index="' +
-        _0x135d4d +
+        value94 +
         '" aria-label="裁剪视频" title="裁剪视频">\n        ' +
         VIDEO_CLIP_ICON_SVG +
         '\x0a\x20\x20\x20\x20\x20\x20</button>',
     },
   });
 }
-function renderVideoPreview(_0x205c55, { isGenerating: isGenerating = ![] } = {}) {
-  const _0x22315f = getVideoResults(_0x205c55),
-    _0x13b945 = getActiveVideoResultIndex(_0x205c55, _0x22315f),
-    _0x5cbae7 = _0x22315f[_0x13b945] || {},
-    _0x2cb885 = resolveVideoResultUrl(_0x5cbae7),
-    _0x21e216 = normalizeText(_0x205c55?.['generation']?.['status'])['toLowerCase'](),
-    _0xdb5b30 =
-      isGenerating || ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](_0x21e216);
-  if (_0xdb5b30)
+function renderVideoPreview(value95, { isGenerating: isGenerating = ![] } = {}) {
+  const list14 = getVideoResults(value95),
+    activeVideoResultIndex3 = getActiveVideoResultIndex(value95, list14),
+    value96 = list14[activeVideoResultIndex3] || {},
+    videoResultUrl2 = resolveVideoResultUrl(value96),
+    text8 = normalizeText(value95?.['generation']?.['status'])['toLowerCase'](),
+    value97 = isGenerating || ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](text8);
+  if (value97)
     return (
       '<div class="story-video-empty story-video-loading" role="status" aria-live="polite" aria-busy="true">\n      ' +
       renderGenerationSpinner() +
       '\x0a\x20\x20\x20\x20\x20\x20<strong>视频生成中</strong>\x0a\x20\x20\x20\x20\x20\x20<p>正在等待生成结果，完成后会自动显示。</p>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-script-loading-bar\x22\x20aria-hidden=\x22true\x22><div\x20class=\x22storyboard-script-loading-bar-fill\x22></div></div>\x0a\x20\x20\x20\x20</div>'
     );
-  if (_0x2cb885) {
-    const _0xce6081 = _0x22315f['length'] > 0x1;
+  if (videoResultUrl2) {
+    const value98 = list14['length'] > 0x1;
     return (
       '<div class="story-video-result" data-story-video-result-index="' +
-      _0x13b945 +
+      activeVideoResultIndex3 +
       '">\n      <div class="story-video-stage">\n        ' +
-      (_0xce6081 ? renderVideoResultSwitchButton('previous', _0x205c55) : '') +
+      (value98 ? renderVideoResultSwitchButton('previous', value95) : '') +
       '\n        <video data-story-video-player data-story-video-url="' +
-      escapeHtml(_0x2cb885) +
+      escapeHtml(videoResultUrl2) +
       '" playsinline preload="auto"></video>\n        ' +
-      (_0xce6081 ? renderVideoResultSwitchButton('next', _0x205c55) : '') +
+      (value98 ? renderVideoResultSwitchButton('next', value95) : '') +
       '\n        ' +
-      renderVideoPlaybackControls(_0x205c55, _0x13b945) +
+      renderVideoPlaybackControls(value95, activeVideoResultIndex3) +
       '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-video-result-meta\x22><strong>视频结果</strong><span>' +
-      (_0x13b945 + 0x1) +
+      (activeVideoResultIndex3 + 0x1) +
       '/' +
-      _0x22315f['length'] +
+      list14['length'] +
       '</span></div>\n    </div>'
     );
   }
-  const _0x58a6a5 = _0x205c55?.['generation']?.['error'] || '',
-    _0x196d1b = _0x58a6a5 ? 'story-video-empty story-video-error' : 'story-video-empty';
+  const value99 = value95?.['generation']?.['error'] || '',
+    value100 = value99 ? 'story-video-empty story-video-error' : 'story-video-empty';
   return (
     '<div class="' +
-    _0x196d1b +
+    value100 +
     '">\n    <strong>视频结果</strong>\n    <p>' +
-    escapeHtml(_0x58a6a5 || '生成完成后将在这里预览本片段视频。') +
+    escapeHtml(value99 || '生成完成后将在这里预览本片段视频。') +
     '</p>\n  </div>'
   );
 }
 function renderTimeline(
-  _0x5e1389,
-  _0x4dd088,
+  value101,
+  value102,
   {
     selectionMode: selectionMode = ![],
     selectedClipIds: selectedClipIds = [],
@@ -955,358 +938,359 @@ function renderTimeline(
     generationParams: generationParams = {},
   } = {},
 ) {
-  const _0x33837a = Array['isArray'](_0x5e1389?.['clips']) ? _0x5e1389['clips'] : [],
-    _0x35393e = new Set(
-      (Array['isArray'](selectedClipIds) ? selectedClipIds : [])['map']((_0x2c2c2e) =>
-        normalizeText(_0x2c2c2e),
+  const list15 = Array['isArray'](value101?.['clips']) ? value101['clips'] : [],
+    map7 = new Set(
+      (Array['isArray'](selectedClipIds) ? selectedClipIds : [])['map']((value103) =>
+        normalizeText(value103),
       ),
     ),
-    _0x3aa761 = new Set(
+    map8 = new Set(
       (Array['isArray'](generatingClipIds) ? generatingClipIds : [])
-        ['map']((_0x5c2cba) => normalizeText(_0x5c2cba))
+        ['map']((value104) => normalizeText(value104))
         ['filter'](Boolean),
     );
   return (
     '<div\x20class=\x22story-clip-timeline\x20' +
     (selectionMode ? 'is-selection-mode' : '') +
     '">\n    <div class="story-clip-timeline-header">\n      <span>' +
-    escapeHtml(_0x5e1389?.['duration'] || '--:--') +
+    escapeHtml(value101?.['duration'] || '--:--') +
     '</span>\n      <small>' +
     (selectionMode ? '点击片段选择需要生成的视频' : '点击片段切换提示词和视频结果') +
     '</small>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<div\x20class=\x22story-clip-strip\x22\x20data-story-marquee-surface=\x22clips\x22>\x0a\x20\x20\x20\x20\x20\x20' +
-    _0x33837a['map']((_0x203895, _0x4fb7e4) => {
-      const _0xc1b4e9 = normalizeText(_0x203895['id']),
-        _0x1b2ff9 = adjustingClipIds['includes'](_0xc1b4e9),
-        _0x363113 = getVideoResults(_0x203895),
-        _0x30393e = renderTimelineVideoThumbnail(_0x203895),
-        _0x11b7fa = normalizeText(_0x203895?.['generation']?.['status'])['toLowerCase'](),
-        _0x44b762 =
-          _0x3aa761['has'](_0xc1b4e9) ||
-          ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](_0x11b7fa),
-        _0x75b10e = _0x35393e['has'](_0xc1b4e9),
-        _0x476f23 = !_0x44b762 && normalizeText(pendingDeleteClipId) === _0xc1b4e9,
-        _0xa58a6c =
+    list15['map']((value105, value106) => {
+      const text9 = normalizeText(value105['id']),
+        value107 = adjustingClipIds['includes'](text9),
+        list16 = getVideoResults(value105),
+        renderTimelineVideoThumbnail2 = renderTimelineVideoThumbnail(value105),
+        text10 = normalizeText(value105?.['generation']?.['status'])['toLowerCase'](),
+        enabled6 =
+          map8['has'](text9) ||
+          ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](text10),
+        value108 = map7['has'](text9),
+        hidden = !enabled6 && normalizeText(pendingDeleteClipId) === text9,
+        value109 =
           '<div\x20class=\x22story-clip-card-shell' +
-          (_0x44b762 ? ' is-generating' : '') +
-          (_0x476f23 ? ' is-delete-confirming' : '') +
+          (enabled6 ? ' is-generating' : '') +
+          (hidden ? ' is-delete-confirming' : '') +
           '\x22\x20data-story-video-history=\x22' +
-          (_0x363113['length'] > 0x1) +
+          (list16['length'] > 0x1) +
           '" data-story-clip-id="' +
-          escapeHtml(_0x203895['id']) +
+          escapeHtml(value105['id']) +
           '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-clip-card\x20' +
-          (_0x203895['id'] === _0x4dd088 ? 'is-selected' : '') +
+          (value105['id'] === value102 ? 'is-selected' : '') +
           '\x20' +
           (selectionMode ? 'is-selection-mode' : '') +
           '\x20' +
-          (_0x75b10e ? 'is-checked' : '') +
-          (_0x30393e ? '\x20has-video-thumbnail' : '') +
+          (value108 ? 'is-checked' : '') +
+          (renderTimelineVideoThumbnail2 ? '\x20has-video-thumbnail' : '') +
           '" data-story-clip-id="' +
-          escapeHtml(_0x203895['id']) +
+          escapeHtml(value105['id']) +
           '\x22\x20data-story-marquee-item\x20data-story-marquee-id=\x22' +
-          escapeHtml(_0x203895['id']) +
+          escapeHtml(value105['id']) +
           '" aria-pressed="' +
-          (selectionMode ? String(_0x75b10e) : 'false') +
+          (selectionMode ? String(value108) : 'false') +
           '\x22\x20aria-busy=\x22' +
-          _0x44b762 +
+          enabled6 +
           '">\n            ' +
-          (_0x30393e
-            ? '<span class="story-clip-card-media" aria-hidden="true">' + _0x30393e + '</span>'
+          (renderTimelineVideoThumbnail2
+            ? '<span class="story-clip-card-media" aria-hidden="true">' +
+              renderTimelineVideoThumbnail2 +
+              '</span>'
             : '') +
           '\n            <span class="story-clip-card-copy"><strong>片段' +
-          escapeHtml(String(_0x203895['number'] || _0x4fb7e4 + 0x1)['padStart'](0x2, '0')) +
+          escapeHtml(String(value105['number'] || value106 + 0x1)['padStart'](0x2, '0')) +
           '</strong><small\x20data-story-clip-duration=\x22' +
-          escapeHtml(_0x203895['id']) +
+          escapeHtml(value105['id']) +
           '\x22>' +
-          escapeHtml(formatStoryClipVideoGenerationDuration(_0x203895, modelId, generationParams)) +
+          escapeHtml(formatStoryClipVideoGenerationDuration(value105, modelId, generationParams)) +
           '</small></span>\n          </button>\n          ' +
-          (_0x1b2ff9 && !_0x44b762
+          (value107 && !enabled6
             ? '<span class="story-clip-card-adjusting generation-loading-surface" role="status" aria-busy="true" aria-label="正在调整提示词"><span class="generation-loading-shimmer" aria-hidden="true"></span><span class="generation-loading-label">正在调整提示词</span></span>'
             : '') +
           '\n          ' +
-          (_0x44b762
+          (enabled6
             ? '<span\x20class=\x22story-clip-card-loading\x20generation-loading-surface\x22\x20role=\x22status\x22\x20aria-busy=\x22true\x22\x20aria-label=\x22片段\x20' +
-              escapeHtml(_0x203895['number']) +
+              escapeHtml(value105['number']) +
               ' 视频生成中">' +
               renderGenerationSpinner() +
               '</span>'
-            : selectionMode || _0x1b2ff9
+            : selectionMode || value107
               ? ''
               : renderWorkspaceCardDeleteControl({
                   className: 'story-clip-delete-trigger',
-                  ariaLabel: '删除片段 ' + _0x203895['number'] + '：' + (_0x203895['title'] || '未命名片段'),
+                  ariaLabel: '删除片段 ' + value105['number'] + '：' + (value105['title'] || '未命名片段'),
                   actionAttributes: {
                     'data-story-action': 'request-delete-clip',
-                    'data-story-clip-delete-id': _0x203895['id'],
-                    hidden: _0x476f23,
+                    'data-story-clip-delete-id': value105['id'],
+                    hidden: hidden,
                   },
                 }) +
                 '\n          <div class="story-project-delete-confirm story-clip-delete-confirm" ' +
-                (_0x476f23 ? '' : 'hidden') +
+                (hidden ? '' : 'hidden') +
                 ' aria-label="确认删除片段 ' +
-                escapeHtml(_0x203895['number']) +
+                escapeHtml(value105['number']) +
                 '">\n            <button type="button" class="confirm-btn confirm-cancel" data-story-action="cancel-delete-clip" data-story-clip-delete-id="' +
-                escapeHtml(_0x203895['id']) +
+                escapeHtml(value105['id']) +
                 '">取消</button>\n            <button type="button" class="confirm-btn confirm-ok" data-story-action="confirm-delete-clip" data-story-clip-delete-id="' +
-                escapeHtml(_0x203895['id']) +
+                escapeHtml(value105['id']) +
                 '">删除</button>\n          </div>') +
           '\n        </div>';
-      if (_0x4fb7e4 >= _0x33837a['length'] - 0x1) return _0xa58a6c;
-      const _0x9b36a9 = _0x33837a[_0x4fb7e4 + 0x1];
+      if (value106 >= list15['length'] - 0x1) return value109;
+      const value110 = list15[value106 + 0x1];
       return (
-        _0xa58a6c +
+        value109 +
         '<button type="button" class="story-clip-insert-button" data-story-insert-after-clip-id="' +
-        escapeHtml(_0x203895['id']) +
+        escapeHtml(value105['id']) +
         '" aria-label="在片段 ' +
-        escapeHtml(_0x203895['number']) +
+        escapeHtml(value105['number']) +
         ' 和片段 ' +
-        escapeHtml(_0x9b36a9?.['number']) +
+        escapeHtml(value110?.['number']) +
         ' 之间新增片段"><span aria-hidden="true">+</span></button>'
       );
     })['join']('') +
     '\n    </div>\n  </div>'
   );
 }
-function renderEpisode(_0x470fb9 = {}, _0x1c1ff5 = null, _0x3284cd = null) {
-  const _0x144dfb = _0x1c1ff5 || getSelectedEpisode(_0x470fb9),
-    _0x2eb013 = _0x3284cd || getSelectedClip(_0x470fb9, _0x144dfb),
-    _0x5432a8 = Array['isArray'](_0x470fb9?.['data']?.['assets']) ? _0x470fb9['data']['assets'] : [],
-    _0x3a6eb4 = Array['isArray'](_0x470fb9?.['data']?.['clipFrames']) ? _0x470fb9['data']['clipFrames'] : [],
-    _0x22ebb4 = resolveStoryVideoReplicationClipVoiceAssetIds(_0x470fb9?.['data'], _0x2eb013);
+function renderEpisode(selectionMode2 = {}, value111 = null, value112 = null) {
+  const episode4 = value111 || getSelectedEpisode(selectionMode2),
+    value113 = value112 || getSelectedClip(selectionMode2, episode4),
+    assets2 = Array['isArray'](selectionMode2?.['data']?.['assets']) ? selectionMode2['data']['assets'] : [],
+    clipFrames2 = Array['isArray'](selectionMode2?.['data']?.['clipFrames'])
+      ? selectionMode2['data']['clipFrames']
+      : [],
+    voiceAssetIds3 = resolveStoryVideoReplicationClipVoiceAssetIds(selectionMode2?.['data'], value113);
   return {
     get referenceCounts() {
-      return getUsedReferenceCounts(_0x2eb013, {
-        assets: _0x5432a8,
-        episode: _0x144dfb,
-        clipFrames: _0x3a6eb4,
-        voiceAssetIds: _0x22ebb4,
+      return getUsedReferenceCounts(value113, {
+        assets: assets2,
+        episode: episode4,
+        clipFrames: clipFrames2,
+        voiceAssetIds: voiceAssetIds3,
       });
     },
     get referenceSummary() {
-      return renderReferenceSummary(_0x2eb013, {
-        assets: _0x5432a8,
-        episode: _0x144dfb,
-        clipFrames: _0x3a6eb4,
-        voiceAssetIds: _0x22ebb4,
+      return renderReferenceSummary(value113, {
+        assets: assets2,
+        episode: episode4,
+        clipFrames: clipFrames2,
+        voiceAssetIds: voiceAssetIds3,
       });
     },
     get referenceBar() {
       return renderVideoReferenceBarMarkup({
-        ...getClipInputSurface(_0x470fb9, _0x144dfb, _0x2eb013),
+        ...getClipInputSurface(selectionMode2, episode4, value113),
         attachmentButtonHtml: '',
       });
     },
     get selectionControls() {
-      return renderSelectionControls(_0x470fb9, _0x144dfb, _0x2eb013);
+      return renderSelectionControls(selectionMode2, episode4, value113);
     },
     get adjustmentBar() {
-      return renderAdjustmentBar(_0x470fb9, _0x2eb013, _0x144dfb);
+      return renderAdjustmentBar(selectionMode2, value113, episode4);
     },
     get adjustmentControl() {
-      return renderAdjustmentControl(_0x470fb9, _0x2eb013, _0x144dfb);
+      return renderAdjustmentControl(selectionMode2, value113, episode4);
     },
     get promptSurface() {
-      return renderPromptSurface(_0x470fb9, _0x144dfb, _0x2eb013);
+      return renderPromptSurface(selectionMode2, episode4, value113);
     },
     get videoPreview() {
-      const _0x24404d = getGenerationState(_0x470fb9, _0x144dfb);
-      return renderVideoPreview(_0x2eb013, {
-        isGenerating: _0x24404d['generatingClipIds']['includes'](normalizeText(_0x2eb013?.['id'])),
+      const isGenerating2 = getGenerationState(selectionMode2, episode4);
+      return renderVideoPreview(value113, {
+        isGenerating: isGenerating2['generatingClipIds']['includes'](normalizeText(value113?.['id'])),
       });
     },
     get videoResults() {
-      return getVideoResults(_0x2eb013);
+      return getVideoResults(value113);
     },
     get activeVideoResultIndex() {
-      return getActiveVideoResultIndex(_0x2eb013);
+      return getActiveVideoResultIndex(value113);
     },
     get videoHistoryMenu() {
-      return renderVideoHistoryMenu(_0x2eb013);
+      return renderVideoHistoryMenu(value113);
     },
-    getAdjacentVideoResultIndex(_0x5c24c0) {
-      return getAdjacentVideoResultIndex(_0x2eb013, _0x5c24c0);
+    getAdjacentVideoResultIndex(value114) {
+      return getAdjacentVideoResultIndex(value113, value114);
     },
     get timeline() {
-      const _0x37ea3c = getGenerationState(_0x470fb9, _0x144dfb);
-      return renderTimeline(_0x144dfb, _0x2eb013?.['id'], {
-        selectionMode: _0x470fb9?.['clipSelectionMode'],
-        selectedClipIds: _0x470fb9?.['selectedClipGenerationIds'],
-        pendingDeleteClipId: _0x470fb9?.['pendingDeleteClipId'],
-        generatingClipIds: _0x37ea3c['generatingClipIds'],
-        adjustingClipIds: (_0x144dfb?.['clips'] || [])
-          ['filter']((_0x399682) => isStoryClipAdjustmentGenerating(_0x470fb9, _0x144dfb, _0x399682))
-          ['map']((_0x23c8b1) => _0x23c8b1['id']),
-        modelId: _0x470fb9?.['models']?.['video'],
-        generationParams: _0x470fb9?.['videoGenerationParams'],
+      const generatingClipIds4 = getGenerationState(selectionMode2, episode4);
+      return renderTimeline(episode4, value113?.['id'], {
+        selectionMode: selectionMode2?.['clipSelectionMode'],
+        selectedClipIds: selectionMode2?.['selectedClipGenerationIds'],
+        pendingDeleteClipId: selectionMode2?.['pendingDeleteClipId'],
+        generatingClipIds: generatingClipIds4['generatingClipIds'],
+        adjustingClipIds: (episode4?.['clips'] || [])
+          ['filter']((value115) => isStoryClipAdjustmentGenerating(selectionMode2, episode4, value115))
+          ['map']((value116) => value116['id']),
+        modelId: selectionMode2?.['models']?.['video'],
+        generationParams: selectionMode2?.['videoGenerationParams'],
       });
     },
   };
 }
 function createRuntime({
-  state: _0x3acf1b,
+  state: state2,
   projectAdapter: projectAdapter = {},
   generationAdapter: generationAdapter = {},
   projectionAdapter: projectionAdapter = {},
 } = {}) {
-  if (!_0x3acf1b || typeof _0x3acf1b !== 'object') throw new Error('[storyClipProduction] state is required');
+  if (!state2 || typeof state2 !== 'object') throw new Error('[storyClipProduction] state is required');
   if (typeof projectAdapter['createToken'] !== 'function')
     throw new Error('[storyClipProduction] projectAdapter.createToken is required');
   if (typeof generationAdapter['createController'] !== 'function')
     throw new Error('[storyClipProduction] generationAdapter.createController is required');
-  const _0x5b8ca9 =
-      generationAdapter['controllers'] instanceof Map ? generationAdapter['controllers'] : new Map(),
-    _0x2edb7a = new Map(),
-    _0x117d0e = (_0x309f91) => projectAdapter['isLive']?.(_0x309f91) !== ![],
-    _0x1e6038 = (_0x32161b) => projectAdapter['isCurrent']?.(_0x32161b) !== ![],
-    _0x25fd9b = (_0x24f2e4, _0x36481f, _0x52a02b) =>
-      [_0x24f2e4?.['projectId'], _0x36481f?.['id'], _0x52a02b?.['id']]['map'](normalizeText)['join'](':'),
-    _0x57be89 = (_0x49ea3e, _0x5222a2) =>
-      [_0x49ea3e?.['projectId'], _0x5222a2?.['id']]['map'](normalizeText)['join'](':'),
-    _0x4649d3 = () => {
+  const map9 = generationAdapter['controllers'] instanceof Map ? generationAdapter['controllers'] : new Map(),
+    map10 = new Map(),
+    handler4 = (value117) => projectAdapter['isLive']?.(value117) !== ![],
+    handler5 = (value118) => projectAdapter['isCurrent']?.(value118) !== ![],
+    handler6 = (value119, value120, value121) =>
+      [value119?.['projectId'], value120?.['id'], value121?.['id']]['map'](normalizeText)['join'](':'),
+    handler7 = (value122, value123) =>
+      [value122?.['projectId'], value123?.['id']]['map'](normalizeText)['join'](':'),
+    handler8 = () => {
       if (projectionAdapter['refreshGeneration']?.() === !![]) return !![];
       return (projectionAdapter['render']?.(), ![]);
     };
-  function _0x1aedd6({ episode: _0x2f98cb, clip: _0x2963e7, projectToken: _0x1ac192 }) {
+  function run2({ episode: episode5, clip: clip2, projectToken: projectToken }) {
     return {
       ok: ![],
       cancelled: !![],
       reason: 'batch-cancelled',
-      projectToken: _0x1ac192,
-      episodeId: _0x2f98cb?.['id'] || '',
-      clipId: _0x2963e7?.['id'] || '',
+      projectToken: projectToken,
+      episodeId: episode5?.['id'] || '',
+      clipId: clip2?.['id'] || '',
     };
   }
-  function _0x50f8bf({
-    episode: _0x1dd41c,
-    clip: _0x495265,
-    displayedClip: _0x479eff,
-    projectToken: _0x4ddee8,
+  function run3({
+    episode: episode6,
+    clip: clip3,
+    displayedClip: displayedClip,
+    projectToken: projectToken2,
   }) {
-    const _0xbcb426 =
+    const prompt =
         generationAdapter['resolvePrompt']?.({
-          state: _0x3acf1b,
-          episode: _0x1dd41c,
-          clip: _0x495265,
-          displayedClip: _0x479eff,
-          projectToken: _0x4ddee8,
+          state: state2,
+          episode: episode6,
+          clip: clip3,
+          displayedClip: displayedClip,
+          projectToken: projectToken2,
         }) || {},
-      _0x3c6d63 =
+      modelId3 =
         generationAdapter['resolveSettings']?.({
-          state: _0x3acf1b,
-          episode: _0x1dd41c,
-          clip: _0x495265,
-          projectToken: _0x4ddee8,
+          state: state2,
+          episode: episode6,
+          clip: clip3,
+          projectToken: projectToken2,
         }) || {};
     return {
-      projectId: _0x4ddee8['projectId'],
-      episodeId: _0x1dd41c['id'],
-      modelId: _0x3c6d63['modelId'],
-      provider: _0x3c6d63['provider'],
-      providerProfileId: _0x3c6d63['providerProfileId'],
-      prompt: _0xbcb426['prompt'],
-      generationParams: _0x3c6d63['generationParams'],
-      inputs: _0x495265['inputs'],
-      assetInputRefs: _0xbcb426['assetInputRefs'],
+      projectId: projectToken2['projectId'],
+      episodeId: episode6['id'],
+      modelId: modelId3['modelId'],
+      provider: modelId3['provider'],
+      providerProfileId: modelId3['providerProfileId'],
+      prompt: prompt['prompt'],
+      generationParams: modelId3['generationParams'],
+      inputs: clip3['inputs'],
+      assetInputRefs: prompt['assetInputRefs'],
     };
   }
-  function _0x3a1236() {
-    const _0x260a76 = getSelectedEpisode(_0x3acf1b),
-      _0x46c17c = getSelectedClip(_0x3acf1b, _0x260a76),
-      _0x5838b0 = _0x3acf1b['clipSelectionMode']
-        ? selectBatchTargets(_0x260a76?.['clips'], _0x3acf1b['selectedClipGenerationIds'])
-        : [_0x46c17c];
-    if (!_0x260a76 || !_0x5838b0[0x0]) throw new Error('请先选择片段');
-    const _0x569177 = _0x50f8bf({
-      episode: _0x260a76,
-      clip: _0x5838b0[0x0],
-      displayedClip: _0x46c17c,
+  function previewSelection() {
+    const episode7 = getSelectedEpisode(state2),
+      displayedClip2 = getSelectedClip(state2, episode7),
+      clip4 = state2['clipSelectionMode']
+        ? selectBatchTargets(episode7?.['clips'], state2['selectedClipGenerationIds'])
+        : [displayedClip2];
+    if (!episode7 || !clip4[0x0]) throw new Error('请先选择片段');
+    const value124 = run3({
+      episode: episode7,
+      clip: clip4[0x0],
+      displayedClip: displayedClip2,
       projectToken: projectAdapter['createToken'](),
     });
-    return buildStoryClipVideoPayload(_0x569177);
+    return buildStoryClipVideoPayload(value124);
   }
-  async function _0x269835({
-    episode: _0x2f28d6,
-    clip: _0x4cb371,
-    displayedClip: _0x58ff08,
-    projectToken: _0x18ab6f,
+  async function run4({
+    episode: episode8,
+    clip: clip5,
+    displayedClip: displayedClip3,
+    projectToken: projectToken3,
     batch: batch = null,
     batchRun: batchRun = null,
   }) {
     if (batchRun?.['cancelRequested'])
-      return _0x1aedd6({ episode: _0x2f28d6, clip: _0x4cb371, projectToken: _0x18ab6f });
-    const _0x43ec4b = _0x25fd9b(_0x18ab6f, _0x2f28d6, _0x4cb371);
+      return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
+    const value125 = handler6(projectToken3, episode8, clip5);
     if (
-      !_0x2f28d6 ||
-      !_0x4cb371 ||
-      getGenerationState(_0x3acf1b, _0x2f28d6)['generatingClipIds']['includes'](
-        normalizeText(_0x4cb371['id']),
-      ) ||
-      getRecoverableStoryClipVideoTask(_0x4cb371) ||
-      _0x5b8ca9['has'](_0x43ec4b)
+      !episode8 ||
+      !clip5 ||
+      getGenerationState(state2, episode8)['generatingClipIds']['includes'](normalizeText(clip5['id'])) ||
+      getRecoverableStoryClipVideoTask(clip5) ||
+      map9['has'](value125)
     )
       return { ok: ![], reason: 'unavailable' };
-    let _0x29e81e = null,
-      _0x1a4f5e = '',
-      _0x59a494 = '';
+    let enabled7 = null,
+      modelId4 = '',
+      provider = '';
     try {
-      const _0x236eaf = _0x50f8bf({
-        episode: _0x2f28d6,
-        clip: _0x4cb371,
-        displayedClip: _0x58ff08,
-        projectToken: _0x18ab6f,
+      const args4 = run3({
+        episode: episode8,
+        clip: clip5,
+        displayedClip: displayedClip3,
+        projectToken: projectToken3,
       });
-      if (!normalizeText(_0x236eaf['prompt'])) return { ok: ![], reason: 'empty-prompt' };
-      const _0x387578 = _0x236eaf;
-      ((_0x1a4f5e = normalizeText(_0x387578['modelId'])), (_0x59a494 = normalizeText(_0x387578['provider'])));
-      const _0x108d46 = normalizeText(
+      if (!normalizeText(args4['prompt'])) return { ok: ![], reason: 'empty-prompt' };
+      const value126 = args4;
+      ((modelId4 = normalizeText(value126['modelId'])), (provider = normalizeText(value126['provider'])));
+      const installId = normalizeText(
         await generationAdapter['resolveInstallId']?.({
-          state: _0x3acf1b,
-          episode: _0x2f28d6,
-          clip: _0x4cb371,
-          projectToken: _0x18ab6f,
-          modelId: _0x1a4f5e,
-          provider: _0x59a494,
+          state: state2,
+          episode: episode8,
+          clip: clip5,
+          projectToken: projectToken3,
+          modelId: modelId4,
+          provider: provider,
         }),
       );
       if (batchRun?.['cancelRequested'])
-        return _0x1aedd6({ episode: _0x2f28d6, clip: _0x4cb371, projectToken: _0x18ab6f });
-      _0x29e81e = generationAdapter['createController']({
-        state: _0x3acf1b,
-        episode: _0x2f28d6,
-        clip: _0x4cb371,
-        projectToken: _0x18ab6f,
+        return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
+      enabled7 = generationAdapter['createController']({
+        state: state2,
+        episode: episode8,
+        clip: clip5,
+        projectToken: projectToken3,
         batch: batch,
       });
-      if (!_0x29e81e || typeof _0x29e81e['generate'] !== 'function')
+      if (!enabled7 || typeof enabled7['generate'] !== 'function')
         throw new Error('story clip generation controller is unavailable');
-      (_0x5b8ca9['set'](_0x43ec4b, _0x29e81e), batchRun?.['controllers']['add'](_0x29e81e));
+      (map9['set'](value125, enabled7), batchRun?.['controllers']['add'](enabled7));
       if (batchRun?.['cancelRequested'])
-        return _0x1aedd6({ episode: _0x2f28d6, clip: _0x4cb371, projectToken: _0x18ab6f });
-      projectAdapter['register']?.(_0x18ab6f);
-      _0x1e6038(_0x18ab6f) && (setClipGenerationRunning(_0x3acf1b, _0x4cb371['id'], !![]), _0x4649d3());
-      const _0x483c88 = await _0x29e81e['generate']({ ..._0x236eaf, installId: _0x108d46 });
-      if (!_0x117d0e(_0x18ab6f))
-        return { ok: ![], reason: 'stale-project', modelId: _0x1a4f5e, provider: _0x59a494 };
-      const _0x1ebbfc = normalizeText(_0x483c88?.['status'])['toLowerCase']();
+        return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
+      projectAdapter['register']?.(projectToken3);
+      handler5(projectToken3) && (setClipGenerationRunning(state2, clip5['id'], !![]), handler8());
+      const result3 = await enabled7['generate']({ ...args4, installId: installId });
+      if (!handler4(projectToken3))
+        return { ok: ![], reason: 'stale-project', modelId: modelId4, provider: provider };
+      const text11 = normalizeText(result3?.['status'])['toLowerCase']();
       if (
         batchRun?.['cancelRequested'] &&
-        (_0x483c88?.['ok'] === ![] || ['cancelled', 'canceled', 'paused']['includes'](_0x1ebbfc))
+        (result3?.['ok'] === ![] || ['cancelled', 'canceled', 'paused']['includes'](text11))
       )
-        return _0x1aedd6({ episode: _0x2f28d6, clip: _0x4cb371, projectToken: _0x18ab6f });
-      if (_0x483c88?.['ok'] === ![] || ['cancelled', 'canceled', 'error', 'failed']['includes'](_0x1ebbfc)) {
-        const _0x45e3af = _0x483c88?.['error'],
-          _0x103080 =
-            _0x45e3af instanceof Error
-              ? _0x45e3af
-              : new Error(normalizeText(_0x45e3af?.['message'] || _0x45e3af) || '片段视频生成失败');
+        return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
+      if (result3?.['ok'] === ![] || ['cancelled', 'canceled', 'error', 'failed']['includes'](text11)) {
+        const error4 = result3?.['error'],
+          error5 =
+            error4 instanceof Error
+              ? error4
+              : new Error(normalizeText(error4?.['message'] || error4) || '片段视频生成失败');
         return {
           ok: ![],
           type: 'single-failed',
-          error: _0x103080,
-          projectToken: _0x18ab6f,
-          episodeId: _0x2f28d6['id'],
-          clipId: _0x4cb371['id'],
-          modelId: _0x1a4f5e,
-          provider: _0x59a494,
+          error: error5,
+          projectToken: projectToken3,
+          episodeId: episode8['id'],
+          clipId: clip5['id'],
+          modelId: modelId4,
+          provider: provider,
         };
       }
       return (
@@ -1314,229 +1298,227 @@ function createRuntime({
         {
           ok: !![],
           type: 'single-complete',
-          result: _0x483c88,
-          projectToken: _0x18ab6f,
-          episodeId: _0x2f28d6['id'],
-          clipId: _0x4cb371['id'],
-          modelId: _0x1a4f5e,
-          provider: _0x59a494,
+          result: result3,
+          projectToken: projectToken3,
+          episodeId: episode8['id'],
+          clipId: clip5['id'],
+          modelId: modelId4,
+          provider: provider,
         }
       );
-    } catch (_0x51eb59) {
-      if (!_0x117d0e(_0x18ab6f))
-        return { ok: ![], reason: 'stale-project', modelId: _0x1a4f5e, provider: _0x59a494 };
+    } catch (error6) {
+      if (!handler4(projectToken3))
+        return { ok: ![], reason: 'stale-project', modelId: modelId4, provider: provider };
       if (batchRun?.['cancelRequested'])
-        return _0x1aedd6({ episode: _0x2f28d6, clip: _0x4cb371, projectToken: _0x18ab6f });
+        return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
       return {
         ok: ![],
         type: 'single-failed',
-        error: _0x51eb59,
-        projectToken: _0x18ab6f,
-        episodeId: _0x2f28d6?.['id'] || '',
-        clipId: _0x4cb371?.['id'] || '',
-        modelId: _0x1a4f5e,
-        provider: _0x59a494,
+        error: error6,
+        projectToken: projectToken3,
+        episodeId: episode8?.['id'] || '',
+        clipId: clip5?.['id'] || '',
+        modelId: modelId4,
+        provider: provider,
       };
     } finally {
-      _0x29e81e && _0x5b8ca9['get'](_0x43ec4b) === _0x29e81e && _0x5b8ca9['delete'](_0x43ec4b);
-      if (_0x29e81e) batchRun?.['controllers']['delete'](_0x29e81e);
-      _0x29e81e &&
-        _0x1e6038(_0x18ab6f) &&
-        (setClipGenerationRunning(_0x3acf1b, _0x4cb371?.['id'], ![]), _0x4649d3());
+      enabled7 && map9['get'](value125) === enabled7 && map9['delete'](value125);
+      if (enabled7) batchRun?.['controllers']['delete'](enabled7);
+      enabled7 &&
+        handler5(projectToken3) &&
+        (setClipGenerationRunning(state2, clip5?.['id'], ![]), handler8());
     }
   }
-  async function _0x5be15b({ episode: _0x4175aa, targets: _0x1a5a74, projectToken: _0x1161dc }) {
-    const _0x27a2df = new Set(
-        _0x1a5a74['map']((_0x380aaf) => normalizeText(_0x380aaf?.['id']))['filter'](Boolean),
-      ),
-      _0x14cfd1 = projectAdapter['createBatch']?.('clip-videos', {
-        episodeId: _0x4175aa['id'],
-        total: _0x1a5a74['length'],
+  async function run5({ episode: episode9, targets: targets, projectToken: projectToken4 }) {
+    const map11 = new Set(targets['map']((value127) => normalizeText(value127?.['id']))['filter'](Boolean)),
+      batch2 = projectAdapter['createBatch']?.('clip-videos', {
+        episodeId: episode9['id'],
+        total: targets['length'],
         completed: 0x0,
-        targetClipIds: [..._0x27a2df],
-        pendingClipIds: [..._0x27a2df],
-        label: '批量生成\x200/' + _0x1a5a74['length'],
+        targetClipIds: [...map11],
+        pendingClipIds: [...map11],
+        label: '批量生成\x200/' + targets['length'],
       }) || {
-        id: 'clip-videos:' + normalizeText(_0x1161dc?.['projectId']) + ':' + Date['now'](),
+        id: 'clip-videos:' + normalizeText(projectToken4?.['projectId']) + ':' + Date['now'](),
         type: 'clip-videos',
-        episodeId: _0x4175aa['id'],
-        total: _0x1a5a74['length'],
+        episodeId: episode9['id'],
+        total: targets['length'],
         completed: 0x0,
       },
-      _0x43ee43 = {
-        batch: _0x14cfd1,
-        projectToken: _0x1161dc,
-        episodeId: normalizeText(_0x4175aa['id']),
+      batchRun2 = {
+        batch: batch2,
+        projectToken: projectToken4,
+        episodeId: normalizeText(episode9['id']),
         controllers: new Set(),
         cancelRequested: ![],
       },
-      _0x59c6b5 = _0x57be89(_0x1161dc, _0x4175aa);
-    (_0x2edb7a['set'](_0x59c6b5, _0x43ee43),
-      setEpisodeBatchRunning(_0x3acf1b, _0x4175aa['id'], !![], '批量生成\x200/' + _0x1a5a74['length'], {
-        batchId: _0x14cfd1['id'],
+      value128 = handler7(projectToken4, episode9);
+    (map10['set'](value128, batchRun2),
+      setEpisodeBatchRunning(state2, episode9['id'], !![], '批量生成\x200/' + targets['length'], {
+        batchId: batch2['id'],
         cancelRequested: ![],
       }));
-    let _0x149097 = 0x0,
-      _0x273563 = 0x0,
-      _0x2d8af8 = 0x0,
-      _0x141097 = null,
-      _0x42c6d7 = ![];
-    _0x4649d3();
+    let succeeded = 0x0,
+      failed = 0x0,
+      cancelled = 0x0,
+      firstFailure = null,
+      suppressToast = ![];
+    handler8();
     try {
       await runBatch(
-        _0x1a5a74,
-        (_0x2ed748) =>
-          _0x269835({
-            episode: _0x4175aa,
-            clip: _0x2ed748,
+        targets,
+        (clip6) =>
+          run4({
+            episode: episode9,
+            clip: clip6,
             displayedClip: null,
-            projectToken: _0x1161dc,
-            batch: _0x14cfd1,
-            batchRun: _0x43ee43,
+            projectToken: projectToken4,
+            batch: batch2,
+            batchRun: batchRun2,
           }),
         {
-          onProgress: ({ completed: _0x44d302, total: _0x261b0b, target: _0x557935, result: _0x154b20 }) => {
-            if (!_0x117d0e(_0x1161dc)) return;
-            _0x27a2df['delete'](normalizeText(_0x557935?.['id']));
-            const _0x4e9c0 = _0x43ee43['cancelRequested']
-              ? '正在停止批量生成 · 已结束 ' + _0x44d302 + '/' + _0x261b0b
-              : '批量生成 ' + _0x44d302 + '/' + _0x261b0b;
-            projectAdapter['syncBatch']?.(_0x1161dc, _0x14cfd1, {
-              completed: _0x44d302,
-              pendingClipIds: [..._0x27a2df],
-              cancelRequested: _0x43ee43['cancelRequested'],
-              label: _0x4e9c0,
+          onProgress: ({ completed: completed3, total: total3, target: target3, result: result4 }) => {
+            if (!handler4(projectToken4)) return;
+            map11['delete'](normalizeText(target3?.['id']));
+            const label2 = batchRun2['cancelRequested']
+              ? '正在停止批量生成 · 已结束 ' + completed3 + '/' + total3
+              : '批量生成 ' + completed3 + '/' + total3;
+            projectAdapter['syncBatch']?.(projectToken4, batch2, {
+              completed: completed3,
+              pendingClipIds: [...map11],
+              cancelRequested: batchRun2['cancelRequested'],
+              label: label2,
             });
-            if (_0x154b20?.['ok']) _0x149097 += 0x1;
+            if (result4?.['ok']) succeeded += 0x1;
             else
-              _0x154b20?.['cancelled'] || _0x154b20?.['reason'] === 'batch-cancelled'
-                ? (_0x2d8af8 += 0x1)
-                : ((_0x273563 += 0x1),
-                  (_0x141097 ||= _0x154b20),
-                  !_0x42c6d7 &&
-                    _0x154b20?.['error'] &&
-                    (_0x42c6d7 =
+              result4?.['cancelled'] || result4?.['reason'] === 'batch-cancelled'
+                ? (cancelled += 0x1)
+                : ((failed += 0x1),
+                  (firstFailure ||= result4),
+                  !suppressToast &&
+                    result4?.['error'] &&
+                    (suppressToast =
                       projectionAdapter['present']?.({
                         type: 'provider-error',
-                        error: _0x154b20['error'],
-                        modelId: _0x154b20['modelId'],
-                        provider: _0x154b20['provider'],
+                        error: result4['error'],
+                        modelId: result4['modelId'],
+                        provider: result4['provider'],
                       }) === !![]));
-            _0x1e6038(_0x1161dc) &&
-              (setEpisodeBatchRunning(_0x3acf1b, _0x4175aa['id'], !![], _0x4e9c0, {
-                batchId: _0x14cfd1['id'],
-                cancelRequested: _0x43ee43['cancelRequested'],
+            handler5(projectToken4) &&
+              (setEpisodeBatchRunning(state2, episode9['id'], !![], label2, {
+                batchId: batch2['id'],
+                cancelRequested: batchRun2['cancelRequested'],
               }),
-              _0x4649d3());
+              handler8());
           },
         },
       );
     } finally {
-      (_0x2edb7a['get'](_0x59c6b5) === _0x43ee43 && _0x2edb7a['delete'](_0x59c6b5),
-        _0x1e6038(_0x1161dc) &&
-          (setEpisodeBatchRunning(_0x3acf1b, _0x4175aa['id'], ![]),
+      (map10['get'](value128) === batchRun2 && map10['delete'](value128),
+        handler5(projectToken4) &&
+          (setEpisodeBatchRunning(state2, episode9['id'], ![]),
           await projectionAdapter['persist']?.({ immediate: !![] }),
-          _0x4649d3()));
+          handler8()));
     }
-    if (!_0x117d0e(_0x1161dc)) return ![];
+    if (!handler4(projectToken4)) return ![];
     return (
       projectionAdapter['present']?.({
         type: 'batch-complete',
-        projectToken: _0x1161dc,
-        episodeId: _0x4175aa['id'],
-        clipId: _0x1a5a74[0x0]?.['id'] || '',
-        succeeded: _0x149097,
-        failed: _0x273563,
-        cancelled: _0x2d8af8,
-        cancelRequested: _0x43ee43['cancelRequested'],
-        firstFailure: _0x141097,
-        suppressToast: _0x42c6d7,
+        projectToken: projectToken4,
+        episodeId: episode9['id'],
+        clipId: targets[0x0]?.['id'] || '',
+        succeeded: succeeded,
+        failed: failed,
+        cancelled: cancelled,
+        cancelRequested: batchRun2['cancelRequested'],
+        firstFailure: firstFailure,
+        suppressToast: suppressToast,
       }),
-      _0x149097 > 0x0
+      succeeded > 0x0
     );
   }
-  async function _0xc6afb7() {
-    const _0x34b7e1 = getSelectedEpisode(_0x3acf1b),
-      _0x33c40b = normalizeText(_0x34b7e1?.['id']),
-      _0x54cd36 = projectAdapter['createToken'](),
-      _0x841bf2 = _0x57be89(_0x54cd36, _0x34b7e1);
-    let _0x575756 = _0x2edb7a['get'](_0x841bf2);
-    if (!_0x575756) {
-      const _0x129122 = _0x3acf1b['clipBatchGenerationByEpisode']?.[_0x33c40b],
-        _0x3e52b3 = _0x841bf2 + ':',
-        _0x9fe1fc = new Set(
-          [..._0x5b8ca9['entries']()]
-            ['filter'](([_0x3a0639]) => normalizeText(_0x3a0639)['startsWith'](_0x3e52b3))
-            ['map'](([, _0x210d8a]) => _0x210d8a),
+  async function cancelBatch() {
+    const selectedEpisode = getSelectedEpisode(state2),
+      episodeId2 = normalizeText(selectedEpisode?.['id']),
+      projectToken5 = projectAdapter['createToken'](),
+      value129 = handler7(projectToken5, selectedEpisode);
+    let batchId = map10['get'](value129);
+    if (!batchId) {
+      const id2 = state2['clipBatchGenerationByEpisode']?.[episodeId2],
+        value130 = value129 + ':',
+        controllers = new Set(
+          [...map9['entries']()]
+            ['filter'](([value131]) => normalizeText(value131)['startsWith'](value130))
+            ['map'](([, value132]) => value132),
         );
-      if (!_0x129122?.['batchId'] || !_0x9fe1fc['size']) return ![];
-      _0x575756 = {
-        batch: { id: _0x129122['batchId'], type: 'clip-videos', episodeId: _0x33c40b },
-        projectToken: _0x54cd36,
-        episodeId: _0x33c40b,
-        controllers: _0x9fe1fc,
-        cancelRequested: _0x129122['cancelRequested'] === !![],
+      if (!id2?.['batchId'] || !controllers['size']) return ![];
+      batchId = {
+        batch: { id: id2['batchId'], type: 'clip-videos', episodeId: episodeId2 },
+        projectToken: projectToken5,
+        episodeId: episodeId2,
+        controllers: controllers,
+        cancelRequested: id2['cancelRequested'] === !![],
       };
     }
-    if (!_0x575756 || _0x575756['cancelRequested']) return ![];
-    _0x575756['cancelRequested'] = !![];
-    const _0xccf3d7 = '正在停止批量生成';
+    if (!batchId || batchId['cancelRequested']) return ![];
+    batchId['cancelRequested'] = !![];
+    const label3 = '正在停止批量生成';
     return (
-      projectAdapter['syncBatch']?.(_0x575756['projectToken'], _0x575756['batch'], {
+      projectAdapter['syncBatch']?.(batchId['projectToken'], batchId['batch'], {
         type: 'clip-videos-stopped',
         cancelRequested: !![],
         pendingClipIds: [],
-        label: _0xccf3d7,
+        label: label3,
       }),
-      _0x1e6038(_0x575756['projectToken']) &&
-        (setEpisodeBatchRunning(_0x3acf1b, _0x33c40b, !![], _0xccf3d7, {
-          batchId: _0x575756['batch']['id'],
+      handler5(batchId['projectToken']) &&
+        (setEpisodeBatchRunning(state2, episodeId2, !![], label3, {
+          batchId: batchId['batch']['id'],
           cancelRequested: !![],
         }),
-        _0x4649d3()),
+        handler8()),
       await Promise['allSettled'](
-        [..._0x575756['controllers']]['map']((_0xff02ef) => {
-          if (typeof _0xff02ef?.['cancel'] === 'function') return _0xff02ef['cancel']();
-          return _0xff02ef?.['pause']?.();
+        [...batchId['controllers']]['map']((value133) => {
+          if (typeof value133?.['cancel'] === 'function') return value133['cancel']();
+          return value133?.['pause']?.();
         }),
       ),
       !![]
     );
   }
-  async function _0x2ef6a7() {
-    const _0x51718b = getSelectedEpisode(_0x3acf1b),
-      _0x35cd0f = getGenerationState(_0x3acf1b, _0x51718b);
-    if (_0x35cd0f['isBatchGenerating']) return ![];
-    const _0x16c143 = getSelectedClip(_0x3acf1b, _0x51718b),
-      _0x166c0c = _0x3acf1b['clipSelectionMode']
-        ? selectBatchTargets(_0x51718b?.['clips'], _0x3acf1b['selectedClipGenerationIds'])
+  async function generateSelection() {
+    const episode10 = getSelectedEpisode(state2),
+      generationState2 = getGenerationState(state2, episode10);
+    if (generationState2['isBatchGenerating']) return ![];
+    const displayedClip4 = getSelectedClip(state2, episode10),
+      targets2 = state2['clipSelectionMode']
+        ? selectBatchTargets(episode10?.['clips'], state2['selectedClipGenerationIds'])
         : [];
-    if (_0x3acf1b['clipSelectionMode'] && _0x166c0c['length'] > 0x1) {
-      if (_0x35cd0f['busy']) return ![];
-      return _0x5be15b({
-        episode: _0x51718b,
-        targets: _0x166c0c,
+    if (state2['clipSelectionMode'] && targets2['length'] > 0x1) {
+      if (generationState2['busy']) return ![];
+      return run5({
+        episode: episode10,
+        targets: targets2,
         projectToken: projectAdapter['createToken'](),
       });
     }
-    const _0x113eb3 = _0x3acf1b['clipSelectionMode'] ? _0x166c0c[0x0] : _0x16c143;
-    if (!_0x113eb3) return (projectionAdapter['present']?.({ type: 'selection-missing' }), ![]);
-    const _0x10bbe6 = projectAdapter['createToken'](),
-      _0x2005a2 = await _0x269835({
-        episode: _0x51718b,
-        clip: _0x113eb3,
-        displayedClip: _0x16c143,
-        projectToken: _0x10bbe6,
+    const clip7 = state2['clipSelectionMode'] ? targets2[0x0] : displayedClip4;
+    if (!clip7) return (projectionAdapter['present']?.({ type: 'selection-missing' }), ![]);
+    const projectToken6 = projectAdapter['createToken'](),
+      response7 = await run4({
+        episode: episode10,
+        clip: clip7,
+        displayedClip: displayedClip4,
+        projectToken: projectToken6,
       });
-    if (_0x2005a2['reason'] === 'empty-prompt')
-      return (projectionAdapter['present']?.({ ..._0x2005a2, type: 'empty-prompt' }), ![]);
-    if (_0x2005a2['type']) projectionAdapter['present']?.(_0x2005a2);
-    return _0x2005a2['ok'] === !![];
+    if (response7['reason'] === 'empty-prompt')
+      return (projectionAdapter['present']?.({ ...response7, type: 'empty-prompt' }), ![]);
+    if (response7['type']) projectionAdapter['present']?.(response7);
+    return response7['ok'] === !![];
   }
   return Object['freeze']({
-    generateSelection: _0x2ef6a7,
-    previewSelection: _0x3a1236,
-    cancelBatch: _0xc6afb7,
+    generateSelection: generateSelection,
+    previewSelection: previewSelection,
+    cancelBatch: cancelBatch,
   });
 }
 export const storyClipProduction = Object['freeze']({

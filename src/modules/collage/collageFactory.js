@@ -33,12 +33,12 @@ const COLLAGE_ASPECT_RATIO_LABELS = Object.freeze([
     '4:5',
     '21:9',
   ]),
-  imageRatioOptionsByLabel = new Map(IMAGE_RATIO_OPTIONS.map((_0x3ea7ae) => [_0x3ea7ae.label, _0x3ea7ae]));
-function createCollageAspectRatioOption(_0x407b74) {
-  const _0x14174c = imageRatioOptionsByLabel.get(_0x407b74),
-    _0x5b1552 = parseRatioLabel(_0x14174c?.label || _0x407b74);
-  if (!_0x5b1552) return null;
-  return Object.freeze({ label: _0x5b1552.label, value: _0x5b1552.label, w: _0x5b1552.w, h: _0x5b1552.h });
+  imageRatioOptionsByLabel = new Map(IMAGE_RATIO_OPTIONS.map((item) => [item.label, item]));
+function createCollageAspectRatioOption(value) {
+  const key = imageRatioOptionsByLabel.get(value),
+    label = parseRatioLabel(key?.label || value);
+  if (!label) return null;
+  return Object.freeze({ label: label.label, value: label.label, w: label.w, h: label.h });
 }
 export const COLLAGE_ASPECT_RATIO_OPTIONS = Object.freeze(
   COLLAGE_ASPECT_RATIO_LABELS.map(createCollageAspectRatioOption).filter(Boolean),
@@ -65,11 +65,11 @@ export const COLLAGE_IMAGE_SCALE_MAX = 4;
 const COLLAGE_DIVIDER_MIN_SIZE = 4,
   COLLAGE_DIVIDER_MAX_MIN_SIZE = 24,
   COLLAGE_DIVIDER_MIN_SIZE_RATIO = 0.02,
-  slot = (_0x24c07d, _0x3c37cb, _0x40516c, _0x5990a3) => ({
-    x: _0x24c07d,
-    y: _0x3c37cb,
-    width: _0x40516c,
-    height: _0x5990a3,
+  slot = (x2, y2, width2, height2) => ({
+    x: x2,
+    y: y2,
+    width: width2,
+    height: height2,
   });
 export const COLLAGE_LAYOUT_PRESETS = Object.freeze([
   { id: 'freeform', label: '自由', slotCount: 0 },
@@ -272,205 +272,204 @@ export const COLLAGE_LAYOUT_PRESETS = Object.freeze([
   },
 ]);
 export const COLLAGE_TEMPLATE_GROUPS = Object.freeze(
-  [2, 3, 4].map((_0xfb2ea5) => ({
-    slotCount: _0xfb2ea5,
-    label: String(_0xfb2ea5),
-    presets: COLLAGE_LAYOUT_PRESETS.filter((_0xdfb36d) => _0xdfb36d.slotCount === _0xfb2ea5),
+  [2, 3, 4].map((slotCount) => ({
+    slotCount: slotCount,
+    label: String(slotCount),
+    presets: COLLAGE_LAYOUT_PRESETS.filter((item2) => item2.slotCount === slotCount),
   })),
 );
-function trimString(_0x58add9) {
-  return typeof _0x58add9 === 'string' ? _0x58add9.trim() : '';
+function trimString(index) {
+  return typeof index === 'string' ? index.trim() : '';
 }
-function toPositiveNumber(_0x5b9419, _0x2f0b66 = 0) {
-  const _0x44a022 = Number(_0x5b9419);
-  return Number.isFinite(_0x44a022) && _0x44a022 > 0 ? _0x44a022 : _0x2f0b66;
+function toPositiveNumber(result, data = 0) {
+  const count = Number(result);
+  return Number.isFinite(count) && count > 0 ? count : data;
 }
-function roundDimension(_0x334177, _0x291b4d = 1) {
-  return Math.max(1, Math.round(toPositiveNumber(_0x334177, _0x291b4d)));
+function roundDimension(options, target = 1) {
+  return Math.max(1, Math.round(toPositiveNumber(options, target)));
 }
 export function resolveCollageSizeByShortSide({
-  width: _0x2d746c,
-  height: _0x30e207,
+  width: width3,
+  height: height3,
   shortSide: shortSide = COLLAGE_EXPANDED_SHORT_SIDE,
 } = {}) {
-  const _0x291a38 = roundDimension(shortSide, COLLAGE_EXPANDED_SHORT_SIDE),
-    _0x51b92b = toPositiveNumber(_0x2d746c, 0),
-    _0x3f9930 = toPositiveNumber(_0x30e207, 0);
-  if (!(_0x51b92b > 0 && _0x3f9930 > 0)) return { width: _0x291a38, height: _0x291a38 };
-  const _0x3657fc = _0x51b92b / _0x3f9930;
-  if (!Number.isFinite(_0x3657fc) || _0x3657fc <= 0) return { width: _0x291a38, height: _0x291a38 };
-  if (_0x3657fc >= 1) return { width: roundDimension(_0x291a38 * _0x3657fc, _0x291a38), height: _0x291a38 };
-  return { width: _0x291a38, height: roundDimension(_0x291a38 / _0x3657fc, _0x291a38) };
+  const width4 = roundDimension(shortSide, COLLAGE_EXPANDED_SHORT_SIDE),
+    toPositiveNumber2 = toPositiveNumber(width3, 0),
+    toPositiveNumber3 = toPositiveNumber(height3, 0);
+  if (!(toPositiveNumber2 > 0 && toPositiveNumber3 > 0)) return { width: width4, height: width4 };
+  const count2 = toPositiveNumber2 / toPositiveNumber3;
+  if (!Number.isFinite(count2) || count2 <= 0) return { width: width4, height: width4 };
+  if (count2 >= 1) return { width: roundDimension(width4 * count2, width4), height: width4 };
+  return { width: width4, height: roundDimension(width4 / count2, width4) };
 }
 export function resolveCollagePresetSizeBySlotShortSide(
-  _0x19440e,
+  source,
   { aspectRatio: aspectRatio = '', slotShortSide: slotShortSide = COLLAGE_SLOT_SHORT_SIDE } = {},
 ) {
-  const _0x3255d3 = _0x19440e && typeof _0x19440e === 'object' ? _0x19440e : {},
-    _0x3b8747 = toPositiveNumber(_0x3255d3.width, COLLAGE_DEFAULT_SIZE.width),
-    _0x4aa0bf = toPositiveNumber(_0x3255d3.height, COLLAGE_DEFAULT_SIZE.height),
-    _0x2c0f5c = getCollageAspectRatioOption(aspectRatio),
-    _0x3d35c4 = _0x2c0f5c?.w || _0x3b8747,
-    _0x185963 = _0x2c0f5c?.h || _0x4aa0bf,
-    _0x4399b7 = _0x185963 / _0x3d35c4,
-    _0x25287e = roundDimension(slotShortSide, COLLAGE_SLOT_SHORT_SIDE),
-    _0x4af39c = Array.isArray(_0x3255d3.slots) ? _0x3255d3.slots : [];
-  let _0x5bca3c = Infinity;
-  for (const _0x4aea47 of _0x4af39c) {
-    const _0xdf8e12 = toPositiveNumber(_0x4aea47?.width, 0) / _0x3b8747,
-      _0xc7e7b2 = (toPositiveNumber(_0x4aea47?.height, 0) / _0x4aa0bf) * _0x4399b7,
-      _0x18aa88 = Math.min(_0xdf8e12, _0xc7e7b2);
-    Number.isFinite(_0x18aa88) && _0x18aa88 > 0 && (_0x5bca3c = Math.min(_0x5bca3c, _0x18aa88));
+  const box = source && typeof source === 'object' ? source : {},
+    toPositiveNumber4 = toPositiveNumber(box.width, COLLAGE_DEFAULT_SIZE.width),
+    toPositiveNumber5 = toPositiveNumber(box.height, COLLAGE_DEFAULT_SIZE.height),
+    collageAspectRatioOption = getCollageAspectRatioOption(aspectRatio),
+    next = collageAspectRatioOption?.w || toPositiveNumber4,
+    current = collageAspectRatioOption?.h || toPositiveNumber5,
+    entry = current / next,
+    roundDimension2 = roundDimension(slotShortSide, COLLAGE_SLOT_SHORT_SIDE),
+    record = Array.isArray(box.slots) ? box.slots : [];
+  let count3 = Infinity;
+  for (const box2 of record) {
+    const toPositiveNumber6 = toPositiveNumber(box2?.width, 0) / toPositiveNumber4,
+      payload = (toPositiveNumber(box2?.height, 0) / toPositiveNumber5) * entry,
+      count4 = Math.min(toPositiveNumber6, payload);
+    Number.isFinite(count4) && count4 > 0 && (count3 = Math.min(count3, count4));
   }
-  (!Number.isFinite(_0x5bca3c) || _0x5bca3c <= 0) && (_0x5bca3c = Math.min(1, _0x4399b7));
-  const _0x5881ce = _0x25287e / _0x5bca3c,
-    _0x114077 = _0x5881ce * _0x4399b7;
+  (!Number.isFinite(count3) || count3 <= 0) && (count3 = Math.min(1, entry));
+  const handle = roundDimension2 / count3,
+    state = handle * entry;
   return {
-    width: roundDimension(_0x5881ce, COLLAGE_DEFAULT_SIZE.width),
-    height: roundDimension(_0x114077, COLLAGE_DEFAULT_SIZE.height),
+    width: roundDimension(handle, COLLAGE_DEFAULT_SIZE.width),
+    height: roundDimension(state, COLLAGE_DEFAULT_SIZE.height),
   };
 }
-function normalizeMediaUrl(_0x4867a8) {
-  const _0x413816 = trimString(_0x4867a8);
-  if (!_0x413816) return '';
-  if (/^(https?:|blob:|data:)/i.test(_0x413816)) return _0x413816;
-  const _0x38c42a = localPathToUrl(_0x413816);
-  return _0x38c42a || '';
+function normalizeMediaUrl(config) {
+  const trimString2 = trimString(config);
+  if (!trimString2) return '';
+  if (/^(https?:|blob:|data:)/i.test(trimString2)) return trimString2;
+  const url = localPathToUrl(trimString2);
+  return url || '';
 }
-function pickMediaUrl(..._0x69fa8d) {
-  for (const _0x91968e of _0x69fa8d) {
-    const _0x139764 = normalizeMediaUrl(_0x91968e);
-    if (_0x139764) return _0x139764;
+function pickMediaUrl(...args) {
+  for (const scope of args) {
+    const mediaUrl = normalizeMediaUrl(scope);
+    if (mediaUrl) return mediaUrl;
   }
   return '';
 }
-function pickLocalPath(..._0x3073f6) {
-  for (const _0x38ea49 of _0x3073f6) {
-    const _0x2e9032 = normalizeLocalPath(_0x38ea49);
-    if (_0x2e9032) return _0x2e9032;
+function pickLocalPath(...args2) {
+  for (const input of args2) {
+    const localPath = normalizeLocalPath(input);
+    if (localPath) return localPath;
   }
   return '';
 }
-export function resolveCollageItemPreviewUrl(_0x3cca7e) {
+export function resolveCollageItemPreviewUrl(response) {
   return pickMediaUrl(
-    _0x3cca7e?.url,
-    _0x3cca7e?.localPath,
-    _0x3cca7e?.thumbLocalPath,
-    _0x3cca7e?.sourceUrl,
-    _0x3cca7e?.sourceLocalPath,
+    response?.url,
+    response?.localPath,
+    response?.thumbLocalPath,
+    response?.sourceUrl,
+    response?.sourceLocalPath,
   );
 }
-export function resolveCollageItemSourceImage(_0x1f2622) {
-  const _0x59cb5b = pickLocalPath(_0x1f2622?.sourceLocalPath),
-    _0x5bdf42 = normalizeMediaUrl(_0x1f2622?.sourceUrl),
-    _0x2b2de5 = toPositiveNumber(_0x1f2622?.sourceWidth, 0),
-    _0x1abd92 = toPositiveNumber(_0x1f2622?.sourceHeight, 0),
-    _0x404910 = toPositiveNumber(_0x1f2622?.imageWidth, 0),
-    _0x51c41e = toPositiveNumber(_0x1f2622?.imageHeight, 0),
-    _0x3e51b0 = _0x2b2de5 || _0x404910,
-    _0x11b7e7 = _0x1abd92 || _0x51c41e,
-    _0x2d3422 = _0x3e51b0 > 0 && _0x11b7e7 > 0,
-    _0xdac0c4 = !!(_0x59cb5b || _0x5bdf42);
-  if (_0xdac0c4)
+export function resolveCollageItemSourceImage(box3) {
+  const localPath2 = pickLocalPath(box3?.sourceLocalPath),
+    src = normalizeMediaUrl(box3?.sourceUrl),
+    toPositiveNumber7 = toPositiveNumber(box3?.sourceWidth, 0),
+    toPositiveNumber8 = toPositiveNumber(box3?.sourceHeight, 0),
+    width5 = toPositiveNumber(box3?.imageWidth, 0),
+    height4 = toPositiveNumber(box3?.imageHeight, 0),
+    width6 = toPositiveNumber7 || width5,
+    height5 = toPositiveNumber8 || height4,
+    hasIntrinsicSize = width6 > 0 && height5 > 0,
+    output = !!(localPath2 || src);
+  if (output)
     return {
-      src: _0x5bdf42 || normalizeMediaUrl(_0x59cb5b),
-      localPath: _0x59cb5b || pickLocalPath(_0x5bdf42),
-      width: _0x3e51b0 || toPositiveNumber(_0x1f2622?.width, 0),
-      height: _0x11b7e7 || toPositiveNumber(_0x1f2622?.height, 0),
-      hasIntrinsicSize: _0x2d3422,
+      src: src || normalizeMediaUrl(localPath2),
+      localPath: localPath2 || pickLocalPath(src),
+      width: width6 || toPositiveNumber(box3?.width, 0),
+      height: height5 || toPositiveNumber(box3?.height, 0),
+      hasIntrinsicSize: hasIntrinsicSize,
       isOriginalSource: true,
     };
-  const _0x1ee396 = pickLocalPath(_0x1f2622?.localPath, _0x1f2622?.url, _0x1f2622?.thumbLocalPath);
+  const localPath3 = pickLocalPath(box3?.localPath, box3?.url, box3?.thumbLocalPath);
   return {
-    src: pickMediaUrl(_0x1f2622?.url, _0x1f2622?.localPath, _0x1f2622?.thumbLocalPath),
-    localPath: _0x1ee396,
-    width: _0x404910 || toPositiveNumber(_0x1f2622?.width, 0),
-    height: _0x51c41e || toPositiveNumber(_0x1f2622?.height, 0),
-    hasIntrinsicSize: _0x404910 > 0 && _0x51c41e > 0,
+    src: pickMediaUrl(box3?.url, box3?.localPath, box3?.thumbLocalPath),
+    localPath: localPath3,
+    width: width5 || toPositiveNumber(box3?.width, 0),
+    height: height4 || toPositiveNumber(box3?.height, 0),
+    hasIntrinsicSize: width5 > 0 && height4 > 0,
     isOriginalSource: false,
   };
 }
-function pickMainImageItem(_0x27a15, _0x19aead) {
-  if (!Array.isArray(_0x27a15) || _0x27a15.length === 0) return null;
-  const _0x5431b3 = Number(_0x19aead),
-    _0x42fa88 = Number.isFinite(_0x5431b3) ? Math.max(0, Math.trunc(_0x5431b3)) : 0;
-  return _0x27a15[_0x42fa88] || _0x27a15[0] || null;
+function pickMainImageItem(list, value2) {
+  if (!Array.isArray(list) || list.length === 0) return null;
+  const value3 = Number(value2),
+    value4 = Number.isFinite(value3) ? Math.max(0, Math.trunc(value3)) : 0;
+  return list[value4] || list[0] || null;
 }
-export function getCollageLayoutPreset(_0x45d2ab) {
-  const _0x513fef = trimString(_0x45d2ab) || 'freeform';
-  return COLLAGE_LAYOUT_PRESETS.find((_0x445b7c) => _0x445b7c.id === _0x513fef) || COLLAGE_LAYOUT_PRESETS[0];
+export function getCollageLayoutPreset(value5) {
+  const trimString3 = trimString(value5) || 'freeform';
+  return COLLAGE_LAYOUT_PRESETS.find((item3) => item3.id === trimString3) || COLLAGE_LAYOUT_PRESETS[0];
 }
-export function getCollageExportResolution(_0xe1683b) {
-  const _0x775e87 = roundDimension(_0xe1683b, 0x800);
+export function getCollageExportResolution(value6) {
+  const roundDimension3 = roundDimension(value6, 0x800);
   return (
-    COLLAGE_EXPORT_RESOLUTIONS.find((_0x220fbd) => _0x220fbd.longSide === _0x775e87) ||
+    COLLAGE_EXPORT_RESOLUTIONS.find((item4) => item4.longSide === roundDimension3) ||
     COLLAGE_EXPORT_RESOLUTIONS[1]
   );
 }
-export function getCollageAspectRatioOption(_0x5e1f55) {
-  const _0x413ca7 = parseRatioLabel(_0x5e1f55);
-  if (!_0x413ca7) return null;
-  return COLLAGE_ASPECT_RATIO_OPTIONS.find((_0x553e7b) => _0x553e7b.label === _0x413ca7.label) || null;
+export function getCollageAspectRatioOption(value7) {
+  const ratioLabel = parseRatioLabel(value7);
+  if (!ratioLabel) return null;
+  return COLLAGE_ASPECT_RATIO_OPTIONS.find((item5) => item5.label === ratioLabel.label) || null;
 }
-export function getCollageBackgroundOption(_0x15ca4f) {
-  const _0x3ef256 = trimString(_0x15ca4f),
-    _0x2ae42b = _0x3ef256 || COLLAGE_BACKGROUND_DEFAULT;
+export function getCollageBackgroundOption(value8) {
+  const trimString4 = trimString(value8),
+    value9 = trimString4 || COLLAGE_BACKGROUND_DEFAULT;
   return (
-    COLLAGE_BACKGROUND_OPTIONS.find(
-      (_0x3592c8) => _0x3592c8.id === _0x2ae42b || _0x3592c8.value === _0x2ae42b,
-    ) || COLLAGE_BACKGROUND_OPTIONS.find((_0x55eb14) => _0x55eb14.value === COLLAGE_BACKGROUND_DEFAULT)
+    COLLAGE_BACKGROUND_OPTIONS.find((el) => el.id === value9 || el.value === value9) ||
+    COLLAGE_BACKGROUND_OPTIONS.find((el2) => el2.value === COLLAGE_BACKGROUND_DEFAULT)
   );
 }
-export function normalizeCollageBackgroundColor(_0x11ab16) {
-  return getCollageBackgroundOption(_0x11ab16).value;
+export function normalizeCollageBackgroundColor(value10) {
+  return getCollageBackgroundOption(value10).value;
 }
-export function isCollageBackgroundTransparent(_0x144238) {
-  return getCollageBackgroundOption(_0x144238).id === 'transparent';
+export function isCollageBackgroundTransparent(value11) {
+  return getCollageBackgroundOption(value11).id === 'transparent';
 }
-export function normalizeCollageStyleValue(_0x2a3dc1, _0x185540 = 0) {
-  const _0x5f29e0 = Number(_0x2a3dc1);
-  if (!Number.isFinite(_0x5f29e0)) return _0x185540;
-  return Math.min(100, Math.max(0, Math.round(_0x5f29e0)));
+export function normalizeCollageStyleValue(value12, value13 = 0) {
+  const value14 = Number(value12);
+  if (!Number.isFinite(value14)) return value13;
+  return Math.min(100, Math.max(0, Math.round(value14)));
 }
-export function normalizeCollageImageScale(_0x54e708, _0x5cd942 = COLLAGE_IMAGE_SCALE_DEFAULT) {
-  const _0x317f41 = Number(_0x54e708),
-    _0x22d34d = Number.isFinite(Number(_0x5cd942)) ? Number(_0x5cd942) : COLLAGE_IMAGE_SCALE_DEFAULT,
-    _0x41959d = Number.isFinite(_0x317f41) ? _0x317f41 : _0x22d34d,
-    _0x5a0899 = Math.min(COLLAGE_IMAGE_SCALE_MAX, Math.max(COLLAGE_IMAGE_SCALE_MIN, _0x41959d));
-  return Math.round(_0x5a0899 * 100) / 100;
+export function normalizeCollageImageScale(value15, value16 = COLLAGE_IMAGE_SCALE_DEFAULT) {
+  const value17 = Number(value15),
+    value18 = Number.isFinite(Number(value16)) ? Number(value16) : COLLAGE_IMAGE_SCALE_DEFAULT,
+    value19 = Number.isFinite(value17) ? value17 : value18,
+    value20 = Math.min(COLLAGE_IMAGE_SCALE_MAX, Math.max(COLLAGE_IMAGE_SCALE_MIN, value19));
+  return Math.round(value20 * 100) / 100;
 }
-export function getCollageLayoutStyle(_0x1b8449) {
+export function getCollageLayoutStyle(value21) {
   return {
     outerPadding: normalizeCollageStyleValue(
-      _0x1b8449?.outerPadding,
+      value21?.outerPadding,
       COLLAGE_LAYOUT_STYLE_DEFAULTS.outerPadding,
     ),
-    gap: normalizeCollageStyleValue(_0x1b8449?.gap, COLLAGE_LAYOUT_STYLE_DEFAULTS.gap),
+    gap: normalizeCollageStyleValue(value21?.gap, COLLAGE_LAYOUT_STYLE_DEFAULTS.gap),
     cornerRadius: normalizeCollageStyleValue(
-      _0x1b8449?.cornerRadius,
+      value21?.cornerRadius,
       COLLAGE_LAYOUT_STYLE_DEFAULTS.cornerRadius,
     ),
   };
 }
-export function isCollageItemEmpty(_0x3a5c9b) {
+export function isCollageItemEmpty(response2) {
   return !(
-    trimString(_0x3a5c9b?.url) ||
-    trimString(_0x3a5c9b?.localPath) ||
-    trimString(_0x3a5c9b?.thumbLocalPath) ||
-    trimString(_0x3a5c9b?.sourceUrl) ||
-    trimString(_0x3a5c9b?.sourceLocalPath)
+    trimString(response2?.url) ||
+    trimString(response2?.localPath) ||
+    trimString(response2?.thumbLocalPath) ||
+    trimString(response2?.sourceUrl) ||
+    trimString(response2?.sourceLocalPath)
   );
 }
-export function normalizeEmptyCollageItem(_0x542df0 = {}, _0x41808f = 0) {
+export function normalizeEmptyCollageItem(box4 = {}, value22 = 0) {
   return {
-    id: trimString(_0x542df0?.id) || 'collage-slot-' + _0x41808f,
-    slotIndex: Number.isFinite(Number(_0x542df0?.slotIndex)) ? Number(_0x542df0.slotIndex) : _0x41808f,
+    id: trimString(box4?.id) || 'collage-slot-' + value22,
+    slotIndex: Number.isFinite(Number(box4?.slotIndex)) ? Number(box4.slotIndex) : value22,
     isEmpty: true,
-    x: Number(_0x542df0?.x) || 0,
-    y: Number(_0x542df0?.y) || 0,
-    width: toPositiveNumber(_0x542df0?.width, 1),
-    height: toPositiveNumber(_0x542df0?.height, 1),
-    fit: trimString(_0x542df0?.fit) || 'cover',
+    x: Number(box4?.x) || 0,
+    y: Number(box4?.y) || 0,
+    width: toPositiveNumber(box4?.width, 1),
+    height: toPositiveNumber(box4?.height, 1),
+    fit: trimString(box4?.fit) || 'cover',
     focusX: 0.5,
     focusY: 0.5,
     imageScale: COLLAGE_IMAGE_SCALE_DEFAULT,
@@ -485,560 +484,565 @@ export function normalizeEmptyCollageItem(_0x542df0 = {}, _0x41808f = 0) {
     label: '',
   };
 }
-function resolveSlotInset(_0x26bdb6, _0x46c5d3) {
-  const _0x58447d = Math.min(
-    normalizeCollageStyleValue(_0x46c5d3, 0),
-    Math.max(0, _0x26bdb6.width * 0.45),
-    Math.max(0, _0x26bdb6.height * 0.45),
+function resolveSlotInset(box5, value23) {
+  const value24 = Math.min(
+    normalizeCollageStyleValue(value23, 0),
+    Math.max(0, box5.width * 0.45),
+    Math.max(0, box5.height * 0.45),
   );
-  return _0x58447d / 2;
+  return value24 / 2;
 }
-export function resolveCollageItemFrames(_0x18e2ec) {
-  const _0x116801 = toPositiveNumber(_0x18e2ec?.width, COLLAGE_DEFAULT_SIZE.width),
-    _0x5275fc = toPositiveNumber(_0x18e2ec?.height, COLLAGE_DEFAULT_SIZE.height),
-    { outerPadding: _0x53ca1e, gap: _0x2e5699, cornerRadius: _0x3dadd7 } = getCollageLayoutStyle(_0x18e2ec),
-    _0x4b9d34 = Math.min(_0x53ca1e, Math.max(0, _0x116801 * 0.45), Math.max(0, _0x5275fc * 0.45)),
-    _0x7929d2 = Math.max(1, _0x116801 - _0x4b9d34 * 2),
-    _0x3ce9ae = Math.max(1, _0x5275fc - _0x4b9d34 * 2),
-    _0x127e18 = _0x7929d2 / _0x116801,
-    _0x854b2b = _0x3ce9ae / _0x5275fc,
-    _0x56cc4b = Array.isArray(_0x18e2ec?.items) ? _0x18e2ec.items : [];
-  return _0x56cc4b.map((_0x436fd3, _0x19304e) => {
-    const _0x64959d = {
-        x: _0x4b9d34 + (Number(_0x436fd3?.x) || 0) * _0x127e18,
-        y: _0x4b9d34 + (Number(_0x436fd3?.y) || 0) * _0x854b2b,
-        width: toPositiveNumber(_0x436fd3?.width, 1) * _0x127e18,
-        height: toPositiveNumber(_0x436fd3?.height, 1) * _0x854b2b,
+export function resolveCollageItemFrames(box6) {
+  const toPositiveNumber9 = toPositiveNumber(box6?.width, COLLAGE_DEFAULT_SIZE.width),
+    toPositiveNumber10 = toPositiveNumber(box6?.height, COLLAGE_DEFAULT_SIZE.height),
+    { outerPadding: outerPadding, gap: gap, cornerRadius: cornerRadius } = getCollageLayoutStyle(box6),
+    x3 = Math.min(
+      outerPadding,
+      Math.max(0, toPositiveNumber9 * 0.45),
+      Math.max(0, toPositiveNumber10 * 0.45),
+    ),
+    value25 = Math.max(1, toPositiveNumber9 - x3 * 2),
+    value26 = Math.max(1, toPositiveNumber10 - x3 * 2),
+    value27 = value25 / toPositiveNumber9,
+    value28 = value26 / toPositiveNumber10,
+    list2 = Array.isArray(box6?.items) ? box6.items : [];
+  return list2.map((item6, index2) => {
+    const x4 = {
+        x: x3 + (Number(item6?.x) || 0) * value27,
+        y: x3 + (Number(item6?.y) || 0) * value28,
+        width: toPositiveNumber(item6?.width, 1) * value27,
+        height: toPositiveNumber(item6?.height, 1) * value28,
       },
-      _0x2b22d7 = resolveSlotInset(_0x64959d, _0x2e5699),
-      _0x5f44f4 = {
-        x: _0x64959d.x + _0x2b22d7,
-        y: _0x64959d.y + _0x2b22d7,
-        width: Math.max(1, _0x64959d.width - _0x2b22d7 * 2),
-        height: Math.max(1, _0x64959d.height - _0x2b22d7 * 2),
+      slotInset = resolveSlotInset(x4, gap),
+      frame = {
+        x: x4.x + slotInset,
+        y: x4.y + slotInset,
+        width: Math.max(1, x4.width - slotInset * 2),
+        height: Math.max(1, x4.height - slotInset * 2),
       };
     return {
-      item: _0x436fd3,
-      index: _0x19304e,
-      frame: _0x5f44f4,
-      style: { outerPadding: _0x4b9d34, gap: _0x2e5699, cornerRadius: _0x3dadd7 },
-      isEmpty: isCollageItemEmpty(_0x436fd3),
+      item: item6,
+      index: index2,
+      frame: frame,
+      style: { outerPadding: x3, gap: gap, cornerRadius: cornerRadius },
+      isEmpty: isCollageItemEmpty(item6),
     };
   });
 }
-export function getCollageItemIndexAtWorldPoint(_0x92ef74, _0x302e87, _0x534f95) {
-  if (!_0x92ef74 || _0x92ef74.type !== COLLAGE_NODE_TYPE) return -1;
-  const _0x511188 = Number(_0x302e87) - (Number(_0x92ef74.x) || 0),
-    _0x1c0932 = Number(_0x534f95) - (Number(_0x92ef74.y) || 0);
-  if (!Number.isFinite(_0x511188) || !Number.isFinite(_0x1c0932)) return -1;
-  const _0x4c6472 = resolveCollageItemFrames(_0x92ef74);
-  for (let _0x103ccf = _0x4c6472.length - 1; _0x103ccf >= 0; _0x103ccf -= 1) {
-    const { frame: _0x4b2f55 } = _0x4c6472[_0x103ccf];
+export function getCollageItemIndexAtWorldPoint(box7, value29, value30) {
+  if (!box7 || box7.type !== COLLAGE_NODE_TYPE) return -1;
+  const value31 = Number(value29) - (Number(box7.x) || 0),
+    value32 = Number(value30) - (Number(box7.y) || 0);
+  if (!Number.isFinite(value31) || !Number.isFinite(value32)) return -1;
+  const list3 = resolveCollageItemFrames(box7);
+  for (let count5 = list3.length - 1; count5 >= 0; count5 -= 1) {
+    const { frame: frame2 } = list3[count5];
     if (
-      _0x511188 >= _0x4b2f55.x &&
-      _0x511188 <= _0x4b2f55.x + _0x4b2f55.width &&
-      _0x1c0932 >= _0x4b2f55.y &&
-      _0x1c0932 <= _0x4b2f55.y + _0x4b2f55.height
+      value31 >= frame2.x &&
+      value31 <= frame2.x + frame2.width &&
+      value32 >= frame2.y &&
+      value32 <= frame2.y + frame2.height
     )
-      return _0x4c6472[_0x103ccf].index;
+      return list3[count5].index;
   }
   return -1;
 }
-function getCollageSlotGeometry(_0x51fd6e, _0x510801) {
-  const _0x573e01 = getRawCollageItemFrame(_0x51fd6e);
+function getCollageSlotGeometry(value33, slotIndex) {
+  const x5 = getRawCollageItemFrame(value33);
   return {
-    slotIndex: _0x510801,
-    x: _0x573e01.x,
-    y: _0x573e01.y,
-    width: _0x573e01.width,
-    height: _0x573e01.height,
-    freeformX: Number.isFinite(Number(_0x51fd6e?.freeformX)) ? Number(_0x51fd6e.freeformX) : _0x573e01.x,
-    freeformY: Number.isFinite(Number(_0x51fd6e?.freeformY)) ? Number(_0x51fd6e.freeformY) : _0x573e01.y,
-    freeformWidth: toPositiveNumber(_0x51fd6e?.freeformWidth, _0x573e01.width),
-    freeformHeight: toPositiveNumber(_0x51fd6e?.freeformHeight, _0x573e01.height),
+    slotIndex: slotIndex,
+    x: x5.x,
+    y: x5.y,
+    width: x5.width,
+    height: x5.height,
+    freeformX: Number.isFinite(Number(value33?.freeformX)) ? Number(value33.freeformX) : x5.x,
+    freeformY: Number.isFinite(Number(value33?.freeformY)) ? Number(value33.freeformY) : x5.y,
+    freeformWidth: toPositiveNumber(value33?.freeformWidth, x5.width),
+    freeformHeight: toPositiveNumber(value33?.freeformHeight, x5.height),
   };
 }
-function createEmptyCollageSlotFromGeometry(_0x286c28, _0x2ecd58) {
+function createEmptyCollageSlotFromGeometry(freeformX, value34) {
   return {
-    ...normalizeEmptyCollageItem({ ..._0x286c28, id: 'collage-slot-' + _0x2ecd58 }, _0x2ecd58),
-    freeformX: _0x286c28.freeformX,
-    freeformY: _0x286c28.freeformY,
-    freeformWidth: _0x286c28.freeformWidth,
-    freeformHeight: _0x286c28.freeformHeight,
+    ...normalizeEmptyCollageItem({ ...freeformX, id: 'collage-slot-' + value34 }, value34),
+    freeformX: freeformX.freeformX,
+    freeformY: freeformX.freeformY,
+    freeformWidth: freeformX.freeformWidth,
+    freeformHeight: freeformX.freeformHeight,
   };
 }
-function placeCollageItemIntoSlot(_0x370129, _0x34a33e, _0x1c8636) {
+function placeCollageItemIntoSlot(args3, x6, slotIndex2) {
   return {
-    ..._0x370129,
-    slotIndex: _0x1c8636,
+    ...args3,
+    slotIndex: slotIndex2,
     isEmpty: false,
-    x: _0x34a33e.x,
-    y: _0x34a33e.y,
-    width: _0x34a33e.width,
-    height: _0x34a33e.height,
-    freeformX: _0x34a33e.freeformX,
-    freeformY: _0x34a33e.freeformY,
-    freeformWidth: _0x34a33e.freeformWidth,
-    freeformHeight: _0x34a33e.freeformHeight,
+    x: x6.x,
+    y: x6.y,
+    width: x6.width,
+    height: x6.height,
+    freeformX: x6.freeformX,
+    freeformY: x6.freeformY,
+    freeformWidth: x6.freeformWidth,
+    freeformHeight: x6.freeformHeight,
   };
 }
-export function buildCollageItemSwapPatch(_0x39dcc7, _0x4bd30d, _0x1a8fa4) {
-  const _0x2a6bc8 = (Array.isArray(_0x39dcc7?.items) ? _0x39dcc7.items : []).map((_0x20745c) => ({
-      ..._0x20745c,
+export function buildCollageItemSwapPatch(value35, value36, value37) {
+  const items = (Array.isArray(value35?.items) ? value35.items : []).map((args4) => ({
+      ...args4,
     })),
-    _0x250238 = _0x2a6bc8[_0x4bd30d],
-    _0x4bc1df = _0x2a6bc8[_0x1a8fa4];
-  if (!_0x250238 || !_0x4bc1df || _0x4bd30d === _0x1a8fa4 || isCollageItemEmpty(_0x250238)) return null;
-  const _0x3b4f00 = getCollageSlotGeometry(_0x250238, _0x4bd30d),
-    _0x311054 = getCollageSlotGeometry(_0x4bc1df, _0x1a8fa4);
+    enabled = items[value36],
+    enabled2 = items[value37];
+  if (!enabled || !enabled2 || value36 === value37 || isCollageItemEmpty(enabled)) return null;
+  const collageSlotGeometry = getCollageSlotGeometry(enabled, value36),
+    collageSlotGeometry2 = getCollageSlotGeometry(enabled2, value37);
   return (
-    (_0x2a6bc8[_0x1a8fa4] = placeCollageItemIntoSlot(_0x250238, _0x311054, _0x1a8fa4)),
-    (_0x2a6bc8[_0x4bd30d] = isCollageItemEmpty(_0x4bc1df)
-      ? createEmptyCollageSlotFromGeometry(_0x3b4f00, _0x4bd30d)
-      : placeCollageItemIntoSlot(_0x4bc1df, _0x3b4f00, _0x4bd30d)),
-    { items: _0x2a6bc8 }
+    (items[value37] = placeCollageItemIntoSlot(enabled, collageSlotGeometry2, value37)),
+    (items[value36] = isCollageItemEmpty(enabled2)
+      ? createEmptyCollageSlotFromGeometry(collageSlotGeometry, value36)
+      : placeCollageItemIntoSlot(enabled2, collageSlotGeometry, value36)),
+    { items: items }
   );
 }
-function roundCollageGeometryValue(_0x1d5229) {
-  return Math.round((Number(_0x1d5229) || 0) * 100) / 100;
+function roundCollageGeometryValue(value38) {
+  return Math.round((Number(value38) || 0) * 100) / 100;
 }
-function getRawCollageItemFrame(_0x551b39) {
+function getRawCollageItemFrame(box8) {
   return {
-    x: Number(_0x551b39?.x) || 0,
-    y: Number(_0x551b39?.y) || 0,
-    width: toPositiveNumber(_0x551b39?.width, 1),
-    height: toPositiveNumber(_0x551b39?.height, 1),
+    x: Number(box8?.x) || 0,
+    y: Number(box8?.y) || 0,
+    width: toPositiveNumber(box8?.width, 1),
+    height: toPositiveNumber(box8?.height, 1),
   };
 }
-function getCollageDividerMinSize(_0x30def3) {
-  const _0x38e461 = toPositiveNumber(_0x30def3, 1);
+function getCollageDividerMinSize(value39) {
+  const toPositiveNumber11 = toPositiveNumber(value39, 1);
   return Math.min(
     COLLAGE_DIVIDER_MAX_MIN_SIZE,
-    Math.max(COLLAGE_DIVIDER_MIN_SIZE, _0x38e461 * COLLAGE_DIVIDER_MIN_SIZE_RATIO),
-    _0x38e461 * 0.45,
+    Math.max(COLLAGE_DIVIDER_MIN_SIZE, toPositiveNumber11 * COLLAGE_DIVIDER_MIN_SIZE_RATIO),
+    toPositiveNumber11 * 0.45,
   );
 }
-function collectCollageDividerBoundary(_0x40aa8b, _0x16a354, _0x4ed1f7, _0x2d9dac) {
-  const _0x2155d4 = 0.5,
-    _0x45ed2a = [],
-    _0x5b7514 = [],
-    _0x280d1b = [],
-    _0x5841e3 = _0x16a354 === 'x',
-    _0x251ab4 = _0x5841e3 ? 'y' : 'x',
-    _0x1c4ffa = _0x5841e3 ? 'height' : 'width',
-    _0xb93c84 = _0x5841e3 ? 'x' : 'y',
-    _0x2beee1 = _0x5841e3 ? 'width' : 'height';
-  if (_0x4ed1f7 <= _0x2155d4 || _0x4ed1f7 >= _0x2d9dac - _0x2155d4) return null;
-  _0x40aa8b.forEach((_0x5d04c7, _0x31c1e3) => {
-    const _0x53bd88 = getRawCollageItemFrame(_0x5d04c7),
-      _0x5a9919 = _0x53bd88[_0xb93c84],
-      _0x4dfc3d = _0x5a9919 + _0x53bd88[_0x2beee1];
-    if (Math.abs(_0x4dfc3d - _0x4ed1f7) <= _0x2155d4) _0x45ed2a.push(_0x31c1e3);
-    if (Math.abs(_0x5a9919 - _0x4ed1f7) <= _0x2155d4) _0x5b7514.push(_0x31c1e3);
+function collectCollageDividerBoundary(list4, id2, value40, value41) {
+  const value42 = 0.5,
+    list5 = [],
+    list6 = [],
+    list7 = [],
+    value43 = id2 === 'x',
+    value44 = value43 ? 'y' : 'x',
+    value45 = value43 ? 'height' : 'width',
+    value46 = value43 ? 'x' : 'y',
+    value47 = value43 ? 'width' : 'height';
+  if (value40 <= value42 || value40 >= value41 - value42) return null;
+  list4.forEach((item7, value48) => {
+    const rawCollageItemFrame = getRawCollageItemFrame(item7),
+      value49 = rawCollageItemFrame[value46],
+      value50 = value49 + rawCollageItemFrame[value47];
+    if (Math.abs(value50 - value40) <= value42) list5.push(value48);
+    if (Math.abs(value49 - value40) <= value42) list6.push(value48);
   });
-  if (_0x45ed2a.length === 0 || _0x5b7514.length === 0) return null;
-  for (const _0x4f7140 of _0x45ed2a) {
-    const _0x163c1c = getRawCollageItemFrame(_0x40aa8b[_0x4f7140]);
-    for (const _0x1aa501 of _0x5b7514) {
-      const _0x477528 = getRawCollageItemFrame(_0x40aa8b[_0x1aa501]),
-        _0x3e7a62 = Math.max(_0x163c1c[_0x251ab4], _0x477528[_0x251ab4]),
-        _0x2ba57a = Math.min(
-          _0x163c1c[_0x251ab4] + _0x163c1c[_0x1c4ffa],
-          _0x477528[_0x251ab4] + _0x477528[_0x1c4ffa],
+  if (list5.length === 0 || list6.length === 0) return null;
+  for (const value51 of list5) {
+    const rawCollageItemFrame2 = getRawCollageItemFrame(list4[value51]);
+    for (const value52 of list6) {
+      const rawCollageItemFrame3 = getRawCollageItemFrame(list4[value52]),
+        start = Math.max(rawCollageItemFrame2[value44], rawCollageItemFrame3[value44]),
+        end = Math.min(
+          rawCollageItemFrame2[value44] + rawCollageItemFrame2[value45],
+          rawCollageItemFrame3[value44] + rawCollageItemFrame3[value45],
         );
-      _0x2ba57a - _0x3e7a62 > 1 && _0x280d1b.push({ start: _0x3e7a62, end: _0x2ba57a });
+      end - start > 1 && list7.push({ start: start, end: end });
     }
   }
-  if (_0x280d1b.length === 0) return null;
-  const _0x5e07bb = Math.min(..._0x280d1b.map((_0x4c81ac) => _0x4c81ac.start)),
-    _0x13c87d = Math.max(..._0x280d1b.map((_0x4bd670) => _0x4bd670.end)),
-    _0x3ebd6d = roundCollageGeometryValue(_0x4ed1f7);
+  if (list7.length === 0) return null;
+  const value53 = Math.min(...list7.map((item8) => item8.start)),
+    value54 = Math.max(...list7.map((item9) => item9.end)),
+    position2 = roundCollageGeometryValue(value40);
   return {
-    id: _0x16a354 + '-' + _0x3ebd6d,
-    axis: _0x16a354,
-    position: _0x3ebd6d,
-    spanStart: roundCollageGeometryValue(_0x5e07bb),
-    spanEnd: roundCollageGeometryValue(_0x13c87d),
-    beforeIndexes: Array.from(new Set(_0x45ed2a)),
-    afterIndexes: Array.from(new Set(_0x5b7514)),
+    id: id2 + '-' + position2,
+    axis: id2,
+    position: position2,
+    spanStart: roundCollageGeometryValue(value53),
+    spanEnd: roundCollageGeometryValue(value54),
+    beforeIndexes: Array.from(new Set(list5)),
+    afterIndexes: Array.from(new Set(list6)),
   };
 }
-function rawFrameRangesOverlap(_0x2bdb70, _0x1d4b47, _0x3fe10f, _0xf7f9a6) {
-  const _0x2153b2 = Math.max(_0x2bdb70[_0x3fe10f], _0x1d4b47[_0x3fe10f]),
-    _0x1b2a35 = Math.min(
-      _0x2bdb70[_0x3fe10f] + _0x2bdb70[_0xf7f9a6],
-      _0x1d4b47[_0x3fe10f] + _0x1d4b47[_0xf7f9a6],
-    );
-  return _0x1b2a35 - _0x2153b2 > 1;
+function rawFrameRangesOverlap(value55, value56, value57, value58) {
+  const count6 = Math.max(value55[value57], value56[value57]),
+    value59 = Math.min(value55[value57] + value55[value58], value56[value57] + value56[value58]);
+  return value59 - count6 > 1;
 }
-function collectCollageAxisDividers(_0x430976, _0x26efb5, _0x44dfac) {
-  const _0xd8825b = 0.5,
-    _0x13168b = _0x26efb5 === 'x',
-    _0x57b237 = _0x13168b ? 'x' : 'y',
-    _0x2b9132 = _0x13168b ? 'width' : 'height',
-    _0x5816bc = _0x13168b ? 'y' : 'x',
-    _0x2ee314 = _0x13168b ? 'height' : 'width',
-    _0x575ffd = new Map();
+function collectCollageAxisDividers(list8, axis2, value60) {
+  const value61 = 0.5,
+    value62 = axis2 === 'x',
+    value63 = value62 ? 'x' : 'y',
+    value64 = value62 ? 'width' : 'height',
+    value65 = value62 ? 'y' : 'x',
+    value66 = value62 ? 'height' : 'width',
+    map = new Map();
   return (
-    _0x430976.forEach((_0x2c0bd2, _0x120e71) => {
-      const _0x39a257 = getRawCollageItemFrame(_0x2c0bd2),
-        _0x3eeaa0 = _0x39a257[_0x57b237];
-      if (_0x3eeaa0 <= _0xd8825b || _0x3eeaa0 >= _0x44dfac - _0xd8825b) return;
-      let _0x4c621e = -Infinity,
-        _0x5d8d72 = [];
-      _0x430976.forEach((_0x1ac7de, _0x1155d4) => {
-        if (_0x1155d4 === _0x120e71) return;
-        const _0x4c6947 = getRawCollageItemFrame(_0x1ac7de),
-          _0x131ba5 = _0x4c6947[_0x57b237] + _0x4c6947[_0x2b9132];
-        if (_0x131ba5 > _0x3eeaa0 + _0xd8825b) return;
-        if (!rawFrameRangesOverlap(_0x4c6947, _0x39a257, _0x5816bc, _0x2ee314)) return;
-        if (_0x131ba5 > _0x4c621e + _0xd8825b) ((_0x4c621e = _0x131ba5), (_0x5d8d72 = [_0x1155d4]));
-        else Math.abs(_0x131ba5 - _0x4c621e) <= _0xd8825b && _0x5d8d72.push(_0x1155d4);
+    list8.forEach((item10, value67) => {
+      const rawCollageItemFrame4 = getRawCollageItemFrame(item10),
+        value68 = rawCollageItemFrame4[value63];
+      if (value68 <= value61 || value68 >= value60 - value61) return;
+      let value69 = -Infinity,
+        list9 = [];
+      list8.forEach((item11, value70) => {
+        if (value70 === value67) return;
+        const rawCollageItemFrame5 = getRawCollageItemFrame(item11),
+          value71 = rawCollageItemFrame5[value63] + rawCollageItemFrame5[value64];
+        if (value71 > value68 + value61) return;
+        if (!rawFrameRangesOverlap(rawCollageItemFrame5, rawCollageItemFrame4, value65, value66)) return;
+        if (value71 > value69 + value61) ((value69 = value71), (list9 = [value70]));
+        else Math.abs(value71 - value69) <= value61 && list9.push(value70);
       });
-      if (_0x5d8d72.length === 0) return;
-      const _0x290982 = _0x26efb5 + '-' + roundCollageGeometryValue(_0x3eeaa0),
-        _0x549c27 = _0x575ffd.get(_0x290982) || {
-          id: _0x290982,
-          axis: _0x26efb5,
-          position: roundCollageGeometryValue(_0x3eeaa0),
+      if (list9.length === 0) return;
+      const id3 = axis2 + '-' + roundCollageGeometryValue(value68),
+        value72 = map.get(id3) || {
+          id: id3,
+          axis: axis2,
+          position: roundCollageGeometryValue(value68),
           spanStart: Infinity,
           spanEnd: -Infinity,
           beforeIndexes: new Set(),
           afterIndexes: new Set(),
         };
-      _0x549c27.afterIndexes.add(_0x120e71);
-      for (const _0x1a3c59 of _0x5d8d72) {
-        _0x549c27.beforeIndexes.add(_0x1a3c59);
-        const _0x3df598 = getRawCollageItemFrame(_0x430976[_0x1a3c59]);
-        ((_0x549c27.spanStart = Math.min(
-          _0x549c27.spanStart,
-          Math.max(_0x3df598[_0x5816bc], _0x39a257[_0x5816bc]),
+      value72.afterIndexes.add(value67);
+      for (const value73 of list9) {
+        value72.beforeIndexes.add(value73);
+        const rawCollageItemFrame6 = getRawCollageItemFrame(list8[value73]);
+        ((value72.spanStart = Math.min(
+          value72.spanStart,
+          Math.max(rawCollageItemFrame6[value65], rawCollageItemFrame4[value65]),
         )),
-          (_0x549c27.spanEnd = Math.max(
-            _0x549c27.spanEnd,
+          (value72.spanEnd = Math.max(
+            value72.spanEnd,
             Math.min(
-              _0x3df598[_0x5816bc] + _0x3df598[_0x2ee314],
-              _0x39a257[_0x5816bc] + _0x39a257[_0x2ee314],
+              rawCollageItemFrame6[value65] + rawCollageItemFrame6[value66],
+              rawCollageItemFrame4[value65] + rawCollageItemFrame4[value66],
             ),
           )));
       }
-      _0x575ffd.set(_0x290982, _0x549c27);
+      map.set(id3, value72);
     }),
-    Array.from(_0x575ffd.values())
-      .filter((_0x154c1d) => _0x154c1d.spanEnd - _0x154c1d.spanStart > 1)
-      .map((_0x535108) => ({
-        ..._0x535108,
-        spanStart: roundCollageGeometryValue(_0x535108.spanStart),
-        spanEnd: roundCollageGeometryValue(_0x535108.spanEnd),
-        beforeIndexes: Array.from(_0x535108.beforeIndexes),
-        afterIndexes: Array.from(_0x535108.afterIndexes),
+    Array.from(map.values())
+      .filter((item12) => item12.spanEnd - item12.spanStart > 1)
+      .map((args5) => ({
+        ...args5,
+        spanStart: roundCollageGeometryValue(args5.spanStart),
+        spanEnd: roundCollageGeometryValue(args5.spanEnd),
+        beforeIndexes: Array.from(args5.beforeIndexes),
+        afterIndexes: Array.from(args5.afterIndexes),
       }))
   );
 }
-export function resolveCollageEditableDividers(_0x293ab8) {
-  const _0x1ad81e = toPositiveNumber(_0x293ab8?.width, COLLAGE_DEFAULT_SIZE.width),
-    _0x226bcb = toPositiveNumber(_0x293ab8?.height, COLLAGE_DEFAULT_SIZE.height),
-    _0x47b7e7 = Array.isArray(_0x293ab8?.items) ? _0x293ab8.items : [],
-    _0x49b833 = [
-      ...collectCollageAxisDividers(_0x47b7e7, 'x', _0x1ad81e),
-      ...collectCollageAxisDividers(_0x47b7e7, 'y', _0x226bcb),
+export function resolveCollageEditableDividers(box9) {
+  const toPositiveNumber12 = toPositiveNumber(box9?.width, COLLAGE_DEFAULT_SIZE.width),
+    toPositiveNumber13 = toPositiveNumber(box9?.height, COLLAGE_DEFAULT_SIZE.height),
+    value74 = Array.isArray(box9?.items) ? box9.items : [],
+    list10 = [
+      ...collectCollageAxisDividers(value74, 'x', toPositiveNumber12),
+      ...collectCollageAxisDividers(value74, 'y', toPositiveNumber13),
     ];
-  return _0x49b833.sort((_0xd47545, _0x52ee38) =>
-    _0xd47545.axis === _0x52ee38.axis
-      ? _0xd47545.position - _0x52ee38.position
-      : _0xd47545.axis.localeCompare(_0x52ee38.axis),
+  return list10.sort((item13, value75) =>
+    item13.axis === value75.axis
+      ? item13.position - value75.position
+      : item13.axis.localeCompare(value75.axis),
   );
 }
-export function buildCollageDividerDragPatch(_0x48bdc1, _0xaae403, _0x441cfe) {
-  const _0x4be7f8 = _0xaae403?.axis === 'y' ? 'y' : 'x',
-    _0x4a1c22 = _0x4be7f8 === 'x' ? 'width' : 'height',
-    _0x516273 = _0x4be7f8 === 'x' ? 'x' : 'y',
-    _0x3cab75 = toPositiveNumber(
-      _0x4be7f8 === 'x' ? _0x48bdc1?.width : _0x48bdc1?.height,
-      _0x4be7f8 === 'x' ? COLLAGE_DEFAULT_SIZE.width : COLLAGE_DEFAULT_SIZE.height,
+export function buildCollageDividerDragPatch(box10, value76, value77) {
+  const value78 = value76?.axis === 'y' ? 'y' : 'x',
+    value79 = value78 === 'x' ? 'width' : 'height',
+    value80 = value78 === 'x' ? 'x' : 'y',
+    toPositiveNumber14 = toPositiveNumber(
+      value78 === 'x' ? box10?.width : box10?.height,
+      value78 === 'x' ? COLLAGE_DEFAULT_SIZE.width : COLLAGE_DEFAULT_SIZE.height,
     ),
-    _0x2e4eef = (Array.isArray(_0x48bdc1?.items) ? _0x48bdc1.items : []).map((_0x5909a2) => ({
-      ..._0x5909a2,
+    items2 = (Array.isArray(box10?.items) ? box10.items : []).map((args6) => ({
+      ...args6,
     })),
-    _0x4b359f = Array.isArray(_0xaae403?.beforeIndexes) ? _0xaae403.beforeIndexes : [],
-    _0x45625f = Array.isArray(_0xaae403?.afterIndexes) ? _0xaae403.afterIndexes : [];
-  if (_0x4b359f.length === 0 || _0x45625f.length === 0) return { items: _0x2e4eef, delta: 0 };
-  const _0x1bb788 = new Set(_0x4b359f),
-    _0x543338 = new Set(_0x45625f),
-    _0x3688d9 = new Set([..._0x1bb788, ..._0x543338]),
-    _0x3f7a14 = Number(_0xaae403?.position) || 0,
-    _0x2e1498 = getCollageDividerMinSize(_0x3cab75);
-  let _0x45343a = -Infinity,
-    _0x145b7b = Infinity;
-  for (const _0x5586cd of _0x1bb788) {
-    const _0x32cc4e = _0x2e4eef[_0x5586cd];
-    if (!_0x32cc4e) continue;
-    const _0x453b89 = getRawCollageItemFrame(_0x32cc4e);
-    ((_0x45343a = Math.max(_0x45343a, _0x2e1498 - _0x453b89[_0x4a1c22])),
-      (_0x145b7b = Math.min(_0x145b7b, _0x3cab75 - (_0x453b89[_0x516273] + _0x453b89[_0x4a1c22]))));
+    list11 = Array.isArray(value76?.beforeIndexes) ? value76.beforeIndexes : [],
+    list12 = Array.isArray(value76?.afterIndexes) ? value76.afterIndexes : [];
+  if (list11.length === 0 || list12.length === 0) return { items: items2, delta: 0 };
+  const args7 = new Set(list11),
+    args8 = new Set(list12),
+    value81 = new Set([...args7, ...args8]),
+    value82 = Number(value76?.position) || 0,
+    collageDividerMinSize = getCollageDividerMinSize(toPositiveNumber14);
+  let value83 = -Infinity,
+    value84 = Infinity;
+  for (const value85 of args7) {
+    const enabled3 = items2[value85];
+    if (!enabled3) continue;
+    const rawCollageItemFrame7 = getRawCollageItemFrame(enabled3);
+    ((value83 = Math.max(value83, collageDividerMinSize - rawCollageItemFrame7[value79])),
+      (value84 = Math.min(
+        value84,
+        toPositiveNumber14 - (rawCollageItemFrame7[value80] + rawCollageItemFrame7[value79]),
+      )));
   }
-  for (const _0x4b316b of _0x543338) {
-    const _0x906747 = _0x2e4eef[_0x4b316b];
-    if (!_0x906747) continue;
-    const _0x4aa432 = getRawCollageItemFrame(_0x906747);
-    ((_0x45343a = Math.max(_0x45343a, -_0x4aa432[_0x516273])),
-      (_0x145b7b = Math.min(_0x145b7b, _0x4aa432[_0x4a1c22] - _0x2e1498)));
+  for (const value86 of args8) {
+    const enabled4 = items2[value86];
+    if (!enabled4) continue;
+    const rawCollageItemFrame8 = getRawCollageItemFrame(enabled4);
+    ((value83 = Math.max(value83, -rawCollageItemFrame8[value80])),
+      (value84 = Math.min(value84, rawCollageItemFrame8[value79] - collageDividerMinSize)));
   }
-  const _0x31fc7d = Math.min(_0x145b7b, Math.max(_0x45343a, Number(_0x441cfe) || 0));
-  for (const _0x34e17b of _0x1bb788) {
-    const _0x2f7b4a = _0x2e4eef[_0x34e17b];
-    if (!_0x2f7b4a) continue;
-    const _0x141f65 = getRawCollageItemFrame(_0x2f7b4a);
-    _0x2e4eef[_0x34e17b] = {
-      ..._0x2f7b4a,
-      [_0x4a1c22]: roundCollageGeometryValue(_0x141f65[_0x4a1c22] + _0x31fc7d),
+  const value87 = Math.min(value84, Math.max(value83, Number(value77) || 0));
+  for (const value88 of args7) {
+    const args9 = items2[value88];
+    if (!args9) continue;
+    const rawCollageItemFrame9 = getRawCollageItemFrame(args9);
+    items2[value88] = {
+      ...args9,
+      [value79]: roundCollageGeometryValue(rawCollageItemFrame9[value79] + value87),
     };
   }
-  for (const _0x253824 of _0x543338) {
-    const _0x3b5880 = _0x2e4eef[_0x253824];
-    if (!_0x3b5880) continue;
-    const _0x561f2f = getRawCollageItemFrame(_0x3b5880);
-    _0x2e4eef[_0x253824] = {
-      ..._0x3b5880,
-      [_0x516273]: roundCollageGeometryValue(_0x561f2f[_0x516273] + _0x31fc7d),
-      [_0x4a1c22]: roundCollageGeometryValue(_0x561f2f[_0x4a1c22] - _0x31fc7d),
+  for (const value89 of args8) {
+    const args10 = items2[value89];
+    if (!args10) continue;
+    const rawCollageItemFrame10 = getRawCollageItemFrame(args10);
+    items2[value89] = {
+      ...args10,
+      [value80]: roundCollageGeometryValue(rawCollageItemFrame10[value80] + value87),
+      [value79]: roundCollageGeometryValue(rawCollageItemFrame10[value79] - value87),
     };
   }
   return {
-    items: _0x2e4eef,
-    delta: roundCollageGeometryValue(_0x31fc7d),
-    moveIndexes: Array.from(_0x3688d9),
+    items: items2,
+    delta: roundCollageGeometryValue(value87),
+    moveIndexes: Array.from(value81),
   };
 }
-export function resolveCollageNodeImage(_0x374195) {
-  if (!_0x374195 || typeof _0x374195 !== 'object') return { url: '', localPath: '', label: '' };
-  const _0x36a1f4 = trimString(_0x374195.type);
-  let _0x5c6441 = '',
-    _0x474536 = '',
-    _0x2502d1 = '',
-    _0x31ac22 = '',
-    _0x3ccb28 = '',
-    _0x39a977 = 0,
-    _0x167951 = 0,
-    _0x46783f = 0,
-    _0x467d97 = 0;
-  if (_0x36a1f4 === 'source-image')
-    ((_0x5c6441 = pickMediaUrl(
-      _0x374195.displayLocalPath,
-      _0x374195.localPath,
-      _0x374195.originalLocalPath,
-      _0x374195.src,
-      _0x374195.sourceUrl,
-      _0x374195.imageUrl,
-      _0x374195.thumbLocalPath,
-      _0x374195.thumbUrl,
+export function resolveCollageNodeImage(box11) {
+  if (!box11 || typeof box11 !== 'object') return { url: '', localPath: '', label: '' };
+  const trimString5 = trimString(box11.type);
+  let url2 = '',
+    localPath4 = '',
+    thumbLocalPath = '',
+    sourceLocalPath = '',
+    sourceUrl = '',
+    sourceWidth = 0,
+    sourceHeight = 0,
+    imageWidth = 0,
+    imageHeight = 0;
+  if (trimString5 === 'source-image')
+    ((url2 = pickMediaUrl(
+      box11.displayLocalPath,
+      box11.localPath,
+      box11.originalLocalPath,
+      box11.src,
+      box11.sourceUrl,
+      box11.imageUrl,
+      box11.thumbLocalPath,
+      box11.thumbUrl,
     )),
-      (_0x474536 = pickLocalPath(
-        _0x374195.displayLocalPath,
-        _0x374195.localPath,
-        _0x374195.originalLocalPath,
-        _0x374195.src,
-        _0x374195.sourceUrl,
-        _0x374195.imageUrl,
-        _0x374195.thumbLocalPath,
-        _0x374195.thumbUrl,
+      (localPath4 = pickLocalPath(
+        box11.displayLocalPath,
+        box11.localPath,
+        box11.originalLocalPath,
+        box11.src,
+        box11.sourceUrl,
+        box11.imageUrl,
+        box11.thumbLocalPath,
+        box11.thumbUrl,
       )),
-      (_0x2502d1 = pickLocalPath(_0x374195.thumbLocalPath, _0x374195.thumbUrl)),
-      (_0x31ac22 = pickLocalPath(_0x374195.sourceLocalPath)),
-      (_0x3ccb28 = normalizeMediaUrl(_0x374195.sourceUrl)),
-      (_0x39a977 = toPositiveNumber(_0x374195.sourceWidth, 0)),
-      (_0x167951 = toPositiveNumber(_0x374195.sourceHeight, 0)),
-      (_0x46783f = toPositiveNumber(_0x374195.imageWidth, 0)),
-      (_0x467d97 = toPositiveNumber(_0x374195.imageHeight, 0)));
+      (thumbLocalPath = pickLocalPath(box11.thumbLocalPath, box11.thumbUrl)),
+      (sourceLocalPath = pickLocalPath(box11.sourceLocalPath)),
+      (sourceUrl = normalizeMediaUrl(box11.sourceUrl)),
+      (sourceWidth = toPositiveNumber(box11.sourceWidth, 0)),
+      (sourceHeight = toPositiveNumber(box11.sourceHeight, 0)),
+      (imageWidth = toPositiveNumber(box11.imageWidth, 0)),
+      (imageHeight = toPositiveNumber(box11.imageHeight, 0)));
   else {
-    if (_0x36a1f4 === 'ai-image') {
-      const _0x48f717 = pickMainImageItem(_0x374195.images, _0x374195.mainImageIndex);
-      ((_0x5c6441 = pickMediaUrl(
-        _0x48f717?.displayLocalPath,
-        _0x48f717?.localPath,
-        _0x48f717?.originalLocalPath,
-        _0x48f717?.sourceUrl,
-        _0x48f717?.imageUrl,
-        _0x48f717?.url,
-        _0x48f717?.thumbLocalPath,
-        _0x48f717?.thumbUrl,
-        _0x374195.displayLocalPath,
-        _0x374195.localPath,
-        _0x374195.originalLocalPath,
-        _0x374195.sourceUrl,
-        _0x374195.imageUrl,
-        _0x374195.src,
-        _0x374195.thumbLocalPath,
-        _0x374195.thumbUrl,
+    if (trimString5 === 'ai-image') {
+      const box12 = pickMainImageItem(box11.images, box11.mainImageIndex);
+      ((url2 = pickMediaUrl(
+        box12?.displayLocalPath,
+        box12?.localPath,
+        box12?.originalLocalPath,
+        box12?.sourceUrl,
+        box12?.imageUrl,
+        box12?.url,
+        box12?.thumbLocalPath,
+        box12?.thumbUrl,
+        box11.displayLocalPath,
+        box11.localPath,
+        box11.originalLocalPath,
+        box11.sourceUrl,
+        box11.imageUrl,
+        box11.src,
+        box11.thumbLocalPath,
+        box11.thumbUrl,
       )),
-        (_0x474536 = pickLocalPath(
-          _0x48f717?.displayLocalPath,
-          _0x48f717?.localPath,
-          _0x48f717?.originalLocalPath,
-          _0x48f717?.sourceUrl,
-          _0x48f717?.imageUrl,
-          _0x48f717?.url,
-          _0x48f717?.thumbLocalPath,
-          _0x48f717?.thumbUrl,
-          _0x374195.displayLocalPath,
-          _0x374195.localPath,
-          _0x374195.originalLocalPath,
-          _0x374195.sourceUrl,
-          _0x374195.imageUrl,
-          _0x374195.src,
-          _0x374195.thumbLocalPath,
-          _0x374195.thumbUrl,
+        (localPath4 = pickLocalPath(
+          box12?.displayLocalPath,
+          box12?.localPath,
+          box12?.originalLocalPath,
+          box12?.sourceUrl,
+          box12?.imageUrl,
+          box12?.url,
+          box12?.thumbLocalPath,
+          box12?.thumbUrl,
+          box11.displayLocalPath,
+          box11.localPath,
+          box11.originalLocalPath,
+          box11.sourceUrl,
+          box11.imageUrl,
+          box11.src,
+          box11.thumbLocalPath,
+          box11.thumbUrl,
         )),
-        (_0x2502d1 = pickLocalPath(
-          _0x48f717?.thumbLocalPath,
-          _0x48f717?.thumbUrl,
-          _0x374195.thumbLocalPath,
-          _0x374195.thumbUrl,
+        (thumbLocalPath = pickLocalPath(
+          box12?.thumbLocalPath,
+          box12?.thumbUrl,
+          box11.thumbLocalPath,
+          box11.thumbUrl,
         )),
-        (_0x31ac22 = pickLocalPath(_0x48f717?.sourceLocalPath, _0x374195.sourceLocalPath)),
-        (_0x3ccb28 = normalizeMediaUrl(_0x48f717?.sourceUrl || _0x374195.sourceUrl)),
-        (_0x39a977 =
-          toPositiveNumber(_0x48f717?.sourceWidth, 0) || toPositiveNumber(_0x374195.sourceWidth, 0)),
-        (_0x167951 =
-          toPositiveNumber(_0x48f717?.sourceHeight, 0) || toPositiveNumber(_0x374195.sourceHeight, 0)),
-        (_0x46783f =
-          toPositiveNumber(_0x48f717?.imageWidth || _0x48f717?.width, 0) ||
-          toPositiveNumber(_0x374195.imageWidth || _0x374195.width, 0)),
-        (_0x467d97 =
-          toPositiveNumber(_0x48f717?.imageHeight || _0x48f717?.height, 0) ||
-          toPositiveNumber(_0x374195.imageHeight || _0x374195.height, 0)));
+        (sourceLocalPath = pickLocalPath(box12?.sourceLocalPath, box11.sourceLocalPath)),
+        (sourceUrl = normalizeMediaUrl(box12?.sourceUrl || box11.sourceUrl)),
+        (sourceWidth = toPositiveNumber(box12?.sourceWidth, 0) || toPositiveNumber(box11.sourceWidth, 0)),
+        (sourceHeight = toPositiveNumber(box12?.sourceHeight, 0) || toPositiveNumber(box11.sourceHeight, 0)),
+        (imageWidth =
+          toPositiveNumber(box12?.imageWidth || box12?.width, 0) ||
+          toPositiveNumber(box11.imageWidth || box11.width, 0)),
+        (imageHeight =
+          toPositiveNumber(box12?.imageHeight || box12?.height, 0) ||
+          toPositiveNumber(box11.imageHeight || box11.height, 0)));
     } else {
-      if (_0x36a1f4 === 'storyboard') {
-        const _0x469174 = Array.isArray(_0x374195.cells) ? _0x374195.cells : [],
-          _0x3be98f = _0x469174.find(
-            (_0x404fcf) =>
-              resolveStoryboardCellAssetSrc(_0x404fcf) || resolveStoryboardCellPreviewSrc(_0x404fcf),
+      if (trimString5 === 'storyboard') {
+        const list13 = Array.isArray(box11.cells) ? box11.cells : [],
+          value90 = list13.find(
+            (item14) => resolveStoryboardCellAssetSrc(item14) || resolveStoryboardCellPreviewSrc(item14),
           ),
-          _0x3f0e99 = resolveStoryboardCellAssetSrc(_0x3be98f) || resolveStoryboardCellPreviewSrc(_0x3be98f);
-        ((_0x5c6441 = pickMediaUrl(
-          _0x3f0e99,
-          _0x374195.localPath,
-          _0x374195.sourceUrl,
-          _0x374195.imageUrl,
-          _0x374195.src,
+          storyboardCellAssetSrc =
+            resolveStoryboardCellAssetSrc(value90) || resolveStoryboardCellPreviewSrc(value90);
+        ((url2 = pickMediaUrl(
+          storyboardCellAssetSrc,
+          box11.localPath,
+          box11.sourceUrl,
+          box11.imageUrl,
+          box11.src,
         )),
-          (_0x474536 = pickLocalPath(
-            _0x3be98f?.localPath,
-            _0x3be98f?.displayLocalPath,
-            _0x3be98f?.originalLocalPath,
-            _0x3f0e99,
-            _0x374195.localPath,
-            _0x374195.sourceUrl,
-            _0x374195.imageUrl,
-            _0x374195.src,
+          (localPath4 = pickLocalPath(
+            value90?.localPath,
+            value90?.displayLocalPath,
+            value90?.originalLocalPath,
+            storyboardCellAssetSrc,
+            box11.localPath,
+            box11.sourceUrl,
+            box11.imageUrl,
+            box11.src,
           )),
-          (_0x2502d1 = pickLocalPath(_0x3be98f?.thumbLocalPath, _0x374195.thumbLocalPath)),
-          (_0x31ac22 = pickLocalPath(_0x3be98f?.sourceLocalPath, _0x374195.sourceLocalPath)),
-          (_0x3ccb28 = normalizeMediaUrl(_0x3be98f?.sourceUrl || _0x374195.sourceUrl)),
-          (_0x39a977 =
-            toPositiveNumber(_0x3be98f?.sourceWidth, 0) || toPositiveNumber(_0x374195.sourceWidth, 0)),
-          (_0x167951 =
-            toPositiveNumber(_0x3be98f?.sourceHeight, 0) || toPositiveNumber(_0x374195.sourceHeight, 0)),
-          (_0x46783f =
-            toPositiveNumber(_0x3be98f?.imageWidth, 0) || toPositiveNumber(_0x374195.imageWidth, 0)),
-          (_0x467d97 =
-            toPositiveNumber(_0x3be98f?.imageHeight, 0) || toPositiveNumber(_0x374195.imageHeight, 0)));
+          (thumbLocalPath = pickLocalPath(value90?.thumbLocalPath, box11.thumbLocalPath)),
+          (sourceLocalPath = pickLocalPath(value90?.sourceLocalPath, box11.sourceLocalPath)),
+          (sourceUrl = normalizeMediaUrl(value90?.sourceUrl || box11.sourceUrl)),
+          (sourceWidth = toPositiveNumber(value90?.sourceWidth, 0) || toPositiveNumber(box11.sourceWidth, 0)),
+          (sourceHeight =
+            toPositiveNumber(value90?.sourceHeight, 0) || toPositiveNumber(box11.sourceHeight, 0)),
+          (imageWidth = toPositiveNumber(value90?.imageWidth, 0) || toPositiveNumber(box11.imageWidth, 0)),
+          (imageHeight =
+            toPositiveNumber(value90?.imageHeight, 0) || toPositiveNumber(box11.imageHeight, 0)));
       }
     }
   }
   return {
-    url: _0x5c6441,
-    localPath: _0x474536,
-    thumbLocalPath: _0x2502d1,
-    sourceLocalPath: _0x31ac22,
-    sourceUrl: _0x3ccb28,
-    sourceWidth: _0x39a977,
-    sourceHeight: _0x167951,
-    imageWidth: _0x46783f,
-    imageHeight: _0x467d97,
-    label: trimString(_0x374195.name) || trimString(_0x374195.fileName) || '',
+    url: url2,
+    localPath: localPath4,
+    thumbLocalPath: thumbLocalPath,
+    sourceLocalPath: sourceLocalPath,
+    sourceUrl: sourceUrl,
+    sourceWidth: sourceWidth,
+    sourceHeight: sourceHeight,
+    imageWidth: imageWidth,
+    imageHeight: imageHeight,
+    label: trimString(box11.name) || trimString(box11.fileName) || '',
   };
 }
-export function isCollageImageNode(_0x65d50) {
-  return !!resolveCollageNodeImage(_0x65d50).url;
+export function isCollageImageNode(value91) {
+  return !!resolveCollageNodeImage(value91).url;
 }
-export function computeCollageBounds(_0x327370) {
-  if (!Array.isArray(_0x327370) || _0x327370.length === 0) return null;
-  let _0x4a8b1a = Infinity,
-    _0x309376 = Infinity,
-    _0x8adca1 = -Infinity,
-    _0x99fc1d = -Infinity;
-  for (const _0x3542d3 of _0x327370) {
-    if (!_0x3542d3 || typeof _0x3542d3 !== 'object') continue;
-    const _0xba097e = Number(_0x3542d3.x),
-      _0x418f67 = Number(_0x3542d3.y),
-      _0x518876 = toPositiveNumber(_0x3542d3.width, 0),
-      _0x35b420 = toPositiveNumber(_0x3542d3.height, 0);
-    if (!Number.isFinite(_0xba097e) || !Number.isFinite(_0x418f67) || _0x518876 <= 0 || _0x35b420 <= 0)
+export function computeCollageBounds(list14) {
+  if (!Array.isArray(list14) || list14.length === 0) return null;
+  let x7 = Infinity,
+    y3 = Infinity,
+    value92 = -Infinity,
+    value93 = -Infinity;
+  for (const box13 of list14) {
+    if (!box13 || typeof box13 !== 'object') continue;
+    const value94 = Number(box13.x),
+      value95 = Number(box13.y),
+      toPositiveNumber15 = toPositiveNumber(box13.width, 0),
+      toPositiveNumber16 = toPositiveNumber(box13.height, 0);
+    if (
+      !Number.isFinite(value94) ||
+      !Number.isFinite(value95) ||
+      toPositiveNumber15 <= 0 ||
+      toPositiveNumber16 <= 0
+    )
       continue;
-    ((_0x4a8b1a = Math.min(_0x4a8b1a, _0xba097e)),
-      (_0x309376 = Math.min(_0x309376, _0x418f67)),
-      (_0x8adca1 = Math.max(_0x8adca1, _0xba097e + _0x518876)),
-      (_0x99fc1d = Math.max(_0x99fc1d, _0x418f67 + _0x35b420)));
+    ((x7 = Math.min(x7, value94)),
+      (y3 = Math.min(y3, value95)),
+      (value92 = Math.max(value92, value94 + toPositiveNumber15)),
+      (value93 = Math.max(value93, value95 + toPositiveNumber16)));
   }
-  if (!Number.isFinite(_0x4a8b1a) || !Number.isFinite(_0x309376)) return null;
+  if (!Number.isFinite(x7) || !Number.isFinite(y3)) return null;
   return {
-    x: _0x4a8b1a,
-    y: _0x309376,
-    width: Math.max(1, _0x8adca1 - _0x4a8b1a),
-    height: Math.max(1, _0x99fc1d - _0x309376),
+    x: x7,
+    y: y3,
+    width: Math.max(1, value92 - x7),
+    height: Math.max(1, value93 - y3),
   };
 }
-export function buildCollageItemsFromNodes(_0x258208, _0xb7b3b1, _0x47448c = null) {
-  const _0x186d57 = _0xb7b3b1 || computeCollageBounds(_0x258208);
-  if (!_0x186d57) return [];
-  const _0x2c1337 = toPositiveNumber(_0x47448c?.width, _0x186d57.width),
-    _0x1c373a = toPositiveNumber(_0x47448c?.height, _0x186d57.height),
-    _0x4ec6a4 = _0x2c1337 / _0x186d57.width,
-    _0x1652c8 = _0x1c373a / _0x186d57.height;
-  return (Array.isArray(_0x258208) ? _0x258208 : [])
-    .map((_0x1c70dd, _0x2d5347) => {
-      const _0x4e7e08 = resolveCollageNodeImage(_0x1c70dd);
-      if (!_0x4e7e08.url) return null;
-      const _0x4df60f = Number(_0x1c70dd.x) || 0,
-        _0xfd8195 = Number(_0x1c70dd.y) || 0,
-        _0x437534 = toPositiveNumber(_0x1c70dd.width, 1),
-        _0x340cfe = toPositiveNumber(_0x1c70dd.height, 1),
-        _0x11e5fb = {
-          id: 'item-' + (trimString(_0x1c70dd.id) || _0x2d5347),
-          sourceNodeId: trimString(_0x1c70dd.id),
-          url: _0x4e7e08.url,
-          localPath: _0x4e7e08.localPath,
-          thumbLocalPath: _0x4e7e08.thumbLocalPath,
-          sourceLocalPath: _0x4e7e08.sourceLocalPath,
-          sourceUrl: _0x4e7e08.sourceUrl,
-          sourceWidth: _0x4e7e08.sourceWidth || null,
-          sourceHeight: _0x4e7e08.sourceHeight || null,
-          imageWidth: _0x4e7e08.imageWidth || null,
-          imageHeight: _0x4e7e08.imageHeight || null,
-          sourceDisplayWidth: _0x437534,
-          sourceDisplayHeight: _0x340cfe,
-          label: _0x4e7e08.label,
-          x: roundCollageGeometryValue((_0x4df60f - _0x186d57.x) * _0x4ec6a4),
-          y: roundCollageGeometryValue((_0xfd8195 - _0x186d57.y) * _0x1652c8),
-          width: roundCollageGeometryValue(_0x437534 * _0x4ec6a4),
-          height: roundCollageGeometryValue(_0x340cfe * _0x1652c8),
+export function buildCollageItemsFromNodes(value96, value97, box14 = null) {
+  const box15 = value97 || computeCollageBounds(value96);
+  if (!box15) return [];
+  const toPositiveNumber17 = toPositiveNumber(box14?.width, box15.width),
+    toPositiveNumber18 = toPositiveNumber(box14?.height, box15.height),
+    value98 = toPositiveNumber17 / box15.width,
+    value99 = toPositiveNumber18 / box15.height;
+  return (Array.isArray(value96) ? value96 : [])
+    .map((box16, value100) => {
+      const url3 = resolveCollageNodeImage(box16);
+      if (!url3.url) return null;
+      const value101 = Number(box16.x) || 0,
+        value102 = Number(box16.y) || 0,
+        sourceDisplayWidth = toPositiveNumber(box16.width, 1),
+        sourceDisplayHeight = toPositiveNumber(box16.height, 1),
+        freeformX2 = {
+          id: 'item-' + (trimString(box16.id) || value100),
+          sourceNodeId: trimString(box16.id),
+          url: url3.url,
+          localPath: url3.localPath,
+          thumbLocalPath: url3.thumbLocalPath,
+          sourceLocalPath: url3.sourceLocalPath,
+          sourceUrl: url3.sourceUrl,
+          sourceWidth: url3.sourceWidth || null,
+          sourceHeight: url3.sourceHeight || null,
+          imageWidth: url3.imageWidth || null,
+          imageHeight: url3.imageHeight || null,
+          sourceDisplayWidth: sourceDisplayWidth,
+          sourceDisplayHeight: sourceDisplayHeight,
+          label: url3.label,
+          x: roundCollageGeometryValue((value101 - box15.x) * value98),
+          y: roundCollageGeometryValue((value102 - box15.y) * value99),
+          width: roundCollageGeometryValue(sourceDisplayWidth * value98),
+          height: roundCollageGeometryValue(sourceDisplayHeight * value99),
           fit: 'cover',
           focusX: 0.5,
           focusY: 0.5,
         };
       return {
-        ..._0x11e5fb,
-        freeformX: _0x11e5fb.x,
-        freeformY: _0x11e5fb.y,
-        freeformWidth: _0x11e5fb.width,
-        freeformHeight: _0x11e5fb.height,
+        ...freeformX2,
+        freeformX: freeformX2.x,
+        freeformY: freeformX2.y,
+        freeformWidth: freeformX2.width,
+        freeformHeight: freeformX2.height,
       };
     })
     .filter(Boolean);
 }
 function createCollageBaseNodeData({
-  id: _0x245b4a,
+  id: id4,
   x: x = 0,
   y: y = 0,
   width: width = COLLAGE_DEFAULT_SIZE.width,
@@ -1046,7 +1050,7 @@ function createCollageBaseNodeData({
   name: name = '拼图',
 } = {}) {
   return {
-    id: _0x245b4a,
+    id: id4,
     type: COLLAGE_NODE_TYPE,
     schemaVersion: COLLAGE_SCHEMA_VERSION,
     name: name,
@@ -1064,239 +1068,228 @@ function createCollageBaseNodeData({
     items: [],
   };
 }
-export function createEmptyCollageNodeData(_0x131279 = {}) {
-  const _0x2057ac = {
-    ...createCollageBaseNodeData(_0x131279),
+export function createEmptyCollageNodeData(options2 = {}) {
+  const args11 = {
+    ...createCollageBaseNodeData(options2),
     aspectRatio: COLLAGE_INITIAL_ASPECT_RATIO,
     layoutPresetId: COLLAGE_INITIAL_LAYOUT_PRESET_ID,
   };
-  return { ..._0x2057ac, ...buildCollageLayoutPatch(_0x2057ac, COLLAGE_INITIAL_LAYOUT_PRESET_ID) };
+  return { ...args11, ...buildCollageLayoutPatch(args11, COLLAGE_INITIAL_LAYOUT_PRESET_ID) };
 }
-export function buildCollageNodeDataFromSelection({
-  id: _0x24fd18,
-  nodes: _0x461aab,
-  name: name = '拼图',
-} = {}) {
-  const _0x149611 = (Array.isArray(_0x461aab) ? _0x461aab : []).filter(isCollageImageNode),
-    _0x4f65df = computeCollageBounds(_0x149611);
-  if (!_0x4f65df) return null;
+export function buildCollageNodeDataFromSelection({ id: id5, nodes: nodes, name: name = '拼图' } = {}) {
+  const value103 = (Array.isArray(nodes) ? nodes : []).filter(isCollageImageNode),
+    x8 = computeCollageBounds(value103);
+  if (!x8) return null;
   return {
     ...createCollageBaseNodeData({
-      id: _0x24fd18,
+      id: id5,
       name: name,
-      x: _0x4f65df.x,
-      y: _0x4f65df.y,
-      width: _0x4f65df.width,
-      height: _0x4f65df.height,
+      x: x8.x,
+      y: x8.y,
+      width: x8.width,
+      height: x8.height,
     }),
     aspectRatio: '',
     layoutPresetId: 'freeform',
-    sourceBounds: { width: _0x4f65df.width, height: _0x4f65df.height },
-    items: buildCollageItemsFromNodes(_0x149611, _0x4f65df),
+    sourceBounds: { width: x8.width, height: x8.height },
+    items: buildCollageItemsFromNodes(value103, x8),
   };
 }
-function cloneFreeformItem(_0x543020) {
-  const _0x22a2fd = Number.isFinite(Number(_0x543020.freeformX))
-      ? Number(_0x543020.freeformX)
-      : Number(_0x543020.x) || 0,
-    _0x5afb90 = Number.isFinite(Number(_0x543020.freeformY))
-      ? Number(_0x543020.freeformY)
-      : Number(_0x543020.y) || 0,
-    _0x308136 = toPositiveNumber(_0x543020.freeformWidth, _0x543020.width || 1),
-    _0x3cbe57 = toPositiveNumber(_0x543020.freeformHeight, _0x543020.height || 1);
+function cloneFreeformItem(box17) {
+  const x9 = Number.isFinite(Number(box17.freeformX)) ? Number(box17.freeformX) : Number(box17.x) || 0,
+    y4 = Number.isFinite(Number(box17.freeformY)) ? Number(box17.freeformY) : Number(box17.y) || 0,
+    width7 = toPositiveNumber(box17.freeformWidth, box17.width || 1),
+    height6 = toPositiveNumber(box17.freeformHeight, box17.height || 1);
   return {
-    ..._0x543020,
-    x: _0x22a2fd,
-    y: _0x5afb90,
-    width: _0x308136,
-    height: _0x3cbe57,
-    freeformX: _0x22a2fd,
-    freeformY: _0x5afb90,
-    freeformWidth: _0x308136,
-    freeformHeight: _0x3cbe57,
+    ...box17,
+    x: x9,
+    y: y4,
+    width: width7,
+    height: height6,
+    freeformX: x9,
+    freeformY: y4,
+    freeformWidth: width7,
+    freeformHeight: height6,
   };
 }
-function getFreeformSize(_0x3531a6) {
-  const _0x4cfbfe = toPositiveNumber(_0x3531a6?.sourceBounds?.width, 0),
-    _0x4daf77 = toPositiveNumber(_0x3531a6?.sourceBounds?.height, 0);
+function getFreeformSize(box18) {
+  const toPositiveNumber19 = toPositiveNumber(box18?.sourceBounds?.width, 0),
+    toPositiveNumber20 = toPositiveNumber(box18?.sourceBounds?.height, 0);
   return {
-    width: roundDimension(_0x4cfbfe || _0x3531a6?.width, COLLAGE_DEFAULT_SIZE.width),
-    height: roundDimension(_0x4daf77 || _0x3531a6?.height, COLLAGE_DEFAULT_SIZE.height),
+    width: roundDimension(toPositiveNumber19 || box18?.width, COLLAGE_DEFAULT_SIZE.width),
+    height: roundDimension(toPositiveNumber20 || box18?.height, COLLAGE_DEFAULT_SIZE.height),
   };
 }
 function buildLayoutSlotItem({
-  item: _0x3dcc07,
-  preset: _0x16183f,
-  slotIndex: _0x3bb3e7,
-  slotBounds: _0x5b8eb9,
-  scaleX: _0x5e7004,
-  scaleY: _0x1253d2,
+  item: item15,
+  preset: preset,
+  slotIndex: slotIndex3,
+  slotBounds: slotBounds,
+  scaleX: scaleX,
+  scaleY: scaleY,
 }) {
-  const _0x29722f = _0x3dcc07 && !isCollageItemEmpty(_0x3dcc07);
+  const enabled5 = item15 && !isCollageItemEmpty(item15);
   return {
-    ...(_0x29722f ? _0x3dcc07 : {}),
-    id: trimString(_0x3dcc07?.id) || _0x16183f.id + '-slot-' + _0x3bb3e7,
-    sourceNodeId: trimString(_0x3dcc07?.sourceNodeId),
-    url: trimString(_0x3dcc07?.url),
-    localPath: trimString(_0x3dcc07?.localPath),
-    label: trimString(_0x3dcc07?.label),
-    fit: trimString(_0x3dcc07?.fit) || 'cover',
-    focusX: Number.isFinite(Number(_0x3dcc07?.focusX)) ? Number(_0x3dcc07.focusX) : 0.5,
-    focusY: Number.isFinite(Number(_0x3dcc07?.focusY)) ? Number(_0x3dcc07.focusY) : 0.5,
-    imageScale: normalizeCollageImageScale(_0x3dcc07?.imageScale),
-    slotIndex: _0x3bb3e7,
-    isEmpty: !_0x29722f,
-    x: _0x5b8eb9.x * _0x5e7004,
-    y: _0x5b8eb9.y * _0x1253d2,
-    width: _0x5b8eb9.width * _0x5e7004,
-    height: _0x5b8eb9.height * _0x1253d2,
+    ...(enabled5 ? item15 : {}),
+    id: trimString(item15?.id) || preset.id + '-slot-' + slotIndex3,
+    sourceNodeId: trimString(item15?.sourceNodeId),
+    url: trimString(item15?.url),
+    localPath: trimString(item15?.localPath),
+    label: trimString(item15?.label),
+    fit: trimString(item15?.fit) || 'cover',
+    focusX: Number.isFinite(Number(item15?.focusX)) ? Number(item15.focusX) : 0.5,
+    focusY: Number.isFinite(Number(item15?.focusY)) ? Number(item15.focusY) : 0.5,
+    imageScale: normalizeCollageImageScale(item15?.imageScale),
+    slotIndex: slotIndex3,
+    isEmpty: !enabled5,
+    x: slotBounds.x * scaleX,
+    y: slotBounds.y * scaleY,
+    width: slotBounds.width * scaleX,
+    height: slotBounds.height * scaleY,
   };
 }
-function scaleCollageItemGeometry(_0x4d69fa, _0x4eacdd, _0x101f8d, _0x368891) {
-  const _0xee65ea = {
-    ..._0x4d69fa,
-    x: (Number(_0x4d69fa?.x) || 0) * _0x4eacdd,
-    y: (Number(_0x4d69fa?.y) || 0) * _0x101f8d,
-    width: toPositiveNumber(_0x4d69fa?.width, 1) * _0x4eacdd,
-    height: toPositiveNumber(_0x4d69fa?.height, 1) * _0x101f8d,
+function scaleCollageItemGeometry(box19, value104, value105, enabled6) {
+  const args12 = {
+    ...box19,
+    x: (Number(box19?.x) || 0) * value104,
+    y: (Number(box19?.y) || 0) * value105,
+    width: toPositiveNumber(box19?.width, 1) * value104,
+    height: toPositiveNumber(box19?.height, 1) * value105,
   };
-  if (!_0x368891) return _0xee65ea;
+  if (!enabled6) return args12;
   return {
-    ..._0xee65ea,
-    freeformX: (Number(_0x4d69fa?.freeformX) || 0) * _0x4eacdd,
-    freeformY: (Number(_0x4d69fa?.freeformY) || 0) * _0x101f8d,
-    freeformWidth: toPositiveNumber(_0x4d69fa?.freeformWidth, _0x4d69fa?.width || 1) * _0x4eacdd,
-    freeformHeight: toPositiveNumber(_0x4d69fa?.freeformHeight, _0x4d69fa?.height || 1) * _0x101f8d,
+    ...args12,
+    freeformX: (Number(box19?.freeformX) || 0) * value104,
+    freeformY: (Number(box19?.freeformY) || 0) * value105,
+    freeformWidth: toPositiveNumber(box19?.freeformWidth, box19?.width || 1) * value104,
+    freeformHeight: toPositiveNumber(box19?.freeformHeight, box19?.height || 1) * value105,
   };
 }
-function getCollageCurrentSize(_0x1bb814) {
+function getCollageCurrentSize(box20) {
   return {
-    width: roundDimension(_0x1bb814?.width, COLLAGE_DEFAULT_SIZE.width),
-    height: roundDimension(_0x1bb814?.height, COLLAGE_DEFAULT_SIZE.height),
+    width: roundDimension(box20?.width, COLLAGE_DEFAULT_SIZE.width),
+    height: roundDimension(box20?.height, COLLAGE_DEFAULT_SIZE.height),
   };
 }
-function getCollageCurrentShortSide(_0x27c94b) {
-  const _0x54c3d0 = getCollageCurrentSize(_0x27c94b);
-  return Math.max(1, Math.min(_0x54c3d0.width, _0x54c3d0.height));
+function getCollageCurrentShortSide(value106) {
+  const box21 = getCollageCurrentSize(value106);
+  return Math.max(1, Math.min(box21.width, box21.height));
 }
-function buildCollageResizePatch(_0x4a0224, _0x225bd6, { includeFreeform: includeFreeform = false } = {}) {
-  const _0x3e9e09 = getCollageCurrentSize(_0x4a0224),
-    _0x5684c6 = {
-      width: roundDimension(_0x225bd6?.width, _0x3e9e09.width),
-      height: roundDimension(_0x225bd6?.height, _0x3e9e09.height),
+function buildCollageResizePatch(value107, box22, { includeFreeform: includeFreeform = false } = {}) {
+  const box23 = getCollageCurrentSize(value107),
+    width8 = {
+      width: roundDimension(box22?.width, box23.width),
+      height: roundDimension(box22?.height, box23.height),
     },
-    _0x3c2afd = _0x5684c6.width / _0x3e9e09.width,
-    _0xdac7ca = _0x5684c6.height / _0x3e9e09.height,
-    _0x4a9ffe = Array.isArray(_0x4a0224?.items) ? _0x4a0224.items : [];
+    value108 = width8.width / box23.width,
+    value109 = width8.height / box23.height,
+    items3 = Array.isArray(value107?.items) ? value107.items : [];
   return {
-    width: _0x5684c6.width,
-    height: _0x5684c6.height,
-    items: _0x4a9ffe.map((_0x3ba51e) =>
-      scaleCollageItemGeometry(_0x3ba51e, _0x3c2afd, _0xdac7ca, includeFreeform),
-    ),
+    width: width8.width,
+    height: width8.height,
+    items: items3.map((item16) => scaleCollageItemGeometry(item16, value108, value109, includeFreeform)),
   };
 }
-export function buildCollageCollapsePatch(_0x39c9ac, _0x160c8d) {
-  const _0xf92a8e = !!_0x160c8d,
-    _0x42ea0b = getCollageCurrentSize(_0x39c9ac),
-    _0x18a57d = getCollageLayoutPreset(_0x39c9ac?.layoutPresetId),
-    _0x54dc32 = _0x18a57d.id === 'freeform';
-  if (_0xf92a8e) {
-    const _0x3e2274 = resolveCollageSizeByShortSide({
-      width: _0x42ea0b.width,
-      height: _0x42ea0b.height,
+export function buildCollageCollapsePatch(value110, enabled7) {
+  const value111 = !!enabled7,
+    width9 = getCollageCurrentSize(value110),
+    collageLayoutPreset = getCollageLayoutPreset(value110?.layoutPresetId),
+    includeFreeform2 = collageLayoutPreset.id === 'freeform';
+  if (value111) {
+    const collageSizeByShortSide = resolveCollageSizeByShortSide({
+      width: width9.width,
+      height: width9.height,
       shortSide: COLLAGE_COLLAPSED_SHORT_SIDE,
     });
     return {
-      ...buildCollageResizePatch(_0x39c9ac, _0x3e2274, { includeFreeform: _0x54dc32 }),
+      ...buildCollageResizePatch(value110, collageSizeByShortSide, { includeFreeform: includeFreeform2 }),
       isCollapsed: true,
       isEditing: false,
-      _originalWidth: _0x42ea0b.width,
-      _originalHeight: _0x42ea0b.height,
+      _originalWidth: width9.width,
+      _originalHeight: width9.height,
     };
   }
-  const _0x41631e =
-      toPositiveNumber(_0x39c9ac?._originalWidth, 0) > 0 &&
-      toPositiveNumber(_0x39c9ac?._originalHeight, 0) > 0,
-    _0x45ef45 = {
-      ...(_0x41631e
+  const toPositiveNumber21 =
+      toPositiveNumber(value110?._originalWidth, 0) > 0 && toPositiveNumber(value110?._originalHeight, 0) > 0,
+    value112 = {
+      ...(toPositiveNumber21
         ? {
-            width: roundDimension(_0x39c9ac?._originalWidth, _0x42ea0b.width),
-            height: roundDimension(_0x39c9ac?._originalHeight, _0x42ea0b.height),
+            width: roundDimension(value110?._originalWidth, width9.width),
+            height: roundDimension(value110?._originalHeight, width9.height),
           }
         : resolveCollageSizeByShortSide({
-            width: _0x42ea0b.width,
-            height: _0x42ea0b.height,
+            width: width9.width,
+            height: width9.height,
             shortSide: COLLAGE_EXPANDED_SHORT_SIDE,
           })),
     };
   return {
-    ...buildCollageResizePatch(_0x39c9ac, _0x45ef45, { includeFreeform: _0x54dc32 }),
+    ...buildCollageResizePatch(value110, value112, { includeFreeform: includeFreeform2 }),
     isCollapsed: false,
   };
 }
-export function buildCollageAspectRatioPatch(_0x259a8d, _0xf17e29) {
-  const _0x3eda45 = getCollageAspectRatioOption(_0xf17e29) || COLLAGE_ASPECT_RATIO_OPTIONS[0],
-    _0x4f14cd = getCollageLayoutPreset(_0x259a8d?.layoutPresetId),
-    _0x22dcc3 =
-      _0x4f14cd.id === 'freeform' || !Array.isArray(_0x4f14cd.slots)
+export function buildCollageAspectRatioPatch(value113, value114) {
+  const width10 = getCollageAspectRatioOption(value114) || COLLAGE_ASPECT_RATIO_OPTIONS[0],
+    includeFreeform3 = getCollageLayoutPreset(value113?.layoutPresetId),
+    value115 =
+      includeFreeform3.id === 'freeform' || !Array.isArray(includeFreeform3.slots)
         ? resolveCollageSizeByShortSide({
-            width: _0x3eda45.w,
-            height: _0x3eda45.h,
-            shortSide: getCollageCurrentShortSide(_0x259a8d),
+            width: width10.w,
+            height: width10.h,
+            shortSide: getCollageCurrentShortSide(value113),
           })
-        : resolveCollagePresetSizeBySlotShortSide(_0x4f14cd, { aspectRatio: _0x3eda45.label });
+        : resolveCollagePresetSizeBySlotShortSide(includeFreeform3, { aspectRatio: width10.label });
   return {
-    ...buildCollageResizePatch(_0x259a8d, _0x22dcc3, { includeFreeform: _0x4f14cd.id === 'freeform' }),
-    aspectRatio: _0x3eda45.label,
+    ...buildCollageResizePatch(value113, value115, { includeFreeform: includeFreeform3.id === 'freeform' }),
+    aspectRatio: width10.label,
   };
 }
-export function buildCollageLayoutPatch(_0x1fb4c9, _0xf2d19c) {
-  const _0x4a946a = getCollageLayoutPreset(_0xf2d19c),
-    _0x3837fc = Array.isArray(_0x1fb4c9?.items) ? _0x1fb4c9.items : [];
-  if (_0x4a946a.id === 'freeform' || !Array.isArray(_0x4a946a.slots)) {
-    const _0x1c766f = getFreeformSize(_0x1fb4c9);
+export function buildCollageLayoutPatch(value116, value117) {
+  const preset2 = getCollageLayoutPreset(value117),
+    items4 = Array.isArray(value116?.items) ? value116.items : [];
+  if (preset2.id === 'freeform' || !Array.isArray(preset2.slots)) {
+    const width11 = getFreeformSize(value116);
     return {
       layoutPresetId: 'freeform',
       aspectRatio: '',
-      width: _0x1c766f.width,
-      height: _0x1c766f.height,
-      items: _0x3837fc.map(cloneFreeformItem),
+      width: width11.width,
+      height: width11.height,
+      items: items4.map(cloneFreeformItem),
     };
   }
-  const _0x26c9ed = toPositiveNumber(_0x4a946a.width, COLLAGE_DEFAULT_SIZE.width),
-    _0x46bd45 = toPositiveNumber(_0x4a946a.height, COLLAGE_DEFAULT_SIZE.height),
-    _0x18ce71 = getCollageAspectRatioOption(_0x1fb4c9?.aspectRatio),
-    _0xedab07 = resolveCollagePresetSizeBySlotShortSide(_0x4a946a, { aspectRatio: _0x18ce71?.label || '' }),
-    _0x59570d = _0xedab07.width,
-    _0x2389f3 = _0xedab07.height,
-    _0x5d2cc1 = _0x59570d / _0x26c9ed,
-    _0x1831e0 = _0x2389f3 / _0x46bd45,
-    _0x51c95a = _0x3837fc.filter((_0x101d74) => !isCollageItemEmpty(_0x101d74)),
-    _0x21ae7e = _0x4a946a.slots.map((_0x5b43c1, _0x3afc4e) =>
+  const toPositiveNumber22 = toPositiveNumber(preset2.width, COLLAGE_DEFAULT_SIZE.width),
+    toPositiveNumber23 = toPositiveNumber(preset2.height, COLLAGE_DEFAULT_SIZE.height),
+    aspectRatio2 = getCollageAspectRatioOption(value116?.aspectRatio),
+    box24 = resolveCollagePresetSizeBySlotShortSide(preset2, { aspectRatio: aspectRatio2?.label || '' }),
+    width12 = box24.width,
+    height7 = box24.height,
+    scaleX2 = width12 / toPositiveNumber22,
+    scaleY2 = height7 / toPositiveNumber23,
+    item17 = items4.filter((item18) => !isCollageItemEmpty(item18)),
+    items5 = preset2.slots.map((slotBounds2, slotIndex4) =>
       buildLayoutSlotItem({
-        item: _0x51c95a[_0x3afc4e],
-        preset: _0x4a946a,
-        slotIndex: _0x3afc4e,
-        slotBounds: _0x5b43c1,
-        scaleX: _0x5d2cc1,
-        scaleY: _0x1831e0,
+        item: item17[slotIndex4],
+        preset: preset2,
+        slotIndex: slotIndex4,
+        slotBounds: slotBounds2,
+        scaleX: scaleX2,
+        scaleY: scaleY2,
       }),
     );
   return {
-    layoutPresetId: _0x4a946a.id,
-    aspectRatio: _0x18ce71?.label || '',
-    width: _0x59570d,
-    height: _0x2389f3,
-    items: _0x21ae7e,
+    layoutPresetId: preset2.id,
+    aspectRatio: aspectRatio2?.label || '',
+    width: width12,
+    height: height7,
+    items: items5,
   };
 }
-export function resolveCollageExportSize(_0x59a305, _0x7a6631) {
-  const _0x4ea140 = toPositiveNumber(_0x59a305?.width, COLLAGE_DEFAULT_SIZE.width),
-    _0x3f1884 = toPositiveNumber(_0x59a305?.height, COLLAGE_DEFAULT_SIZE.height),
-    _0x1c6ca3 = getCollageExportResolution(_0x7a6631).longSide,
-    _0x1b5fe3 = _0x4ea140 / _0x3f1884;
-  if (!Number.isFinite(_0x1b5fe3) || _0x1b5fe3 <= 0) return { width: _0x1c6ca3, height: _0x1c6ca3 };
-  if (_0x1b5fe3 >= 1) return { width: _0x1c6ca3, height: roundDimension(_0x1c6ca3 / _0x1b5fe3, _0x1c6ca3) };
-  return { width: roundDimension(_0x1c6ca3 * _0x1b5fe3, _0x1c6ca3), height: _0x1c6ca3 };
+export function resolveCollageExportSize(box25, value118) {
+  const toPositiveNumber24 = toPositiveNumber(box25?.width, COLLAGE_DEFAULT_SIZE.width),
+    toPositiveNumber25 = toPositiveNumber(box25?.height, COLLAGE_DEFAULT_SIZE.height),
+    width13 = getCollageExportResolution(value118).longSide,
+    count7 = toPositiveNumber24 / toPositiveNumber25;
+  if (!Number.isFinite(count7) || count7 <= 0) return { width: width13, height: width13 };
+  if (count7 >= 1) return { width: width13, height: roundDimension(width13 / count7, width13) };
+  return { width: roundDimension(width13 * count7, width13), height: width13 };
 }

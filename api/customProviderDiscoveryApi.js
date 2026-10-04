@@ -14,93 +14,91 @@ const CUSTOM_PROVIDERS_API_BASE = '/api/v2/custom-providers',
     'Only include endpoints, parameters, enums, defaults, required fields, and response paths explicitly supported by the documentation.',
     'Do\x20not\x20invent\x20model\x20capabilities\x20or\x20executable\x20code.',
   ]['join']('\x20');
-function unwrapApiResult(_0x496a58, _0x139d44) {
-  if (!_0x496a58?.['success']) throw new Error(_0x496a58?.['error'] || _0x139d44);
-  return _0x496a58['data'] || {};
+function unwrapApiResult(response, value) {
+  if (!response?.['success']) throw new Error(response?.['error'] || value);
+  return response['data'] || {};
 }
-export async function discoverCustomProvider(_0x3a479c) {
-  const _0xb01d2 = await post(
+export async function discoverCustomProvider(item) {
+  const post2 = await post(
     CUSTOM_PROVIDERS_API_BASE + '/discover',
-    _0x3a479c,
+    item,
     CUSTOM_PROVIDER_DISCOVERY_TIMEOUT_MS,
   );
-  return unwrapApiResult(_0xb01d2, '自定义中转站模型发现失败');
+  return unwrapApiResult(post2, '自定义中转站模型发现失败');
 }
-export async function buildCustomProviderManifestDraft(_0x6447b2) {
-  const _0x335c5f = await post(CUSTOM_PROVIDERS_API_BASE + '/build-manifest-draft', _0x6447b2);
-  return unwrapApiResult(_0x335c5f, '生成自定义模型清单草稿失败');
+export async function buildCustomProviderManifestDraft(key) {
+  const post3 = await post(CUSTOM_PROVIDERS_API_BASE + '/build-manifest-draft', key);
+  return unwrapApiResult(post3, '生成自定义模型清单草稿失败');
 }
-function sanitizeDocumentationAnalysisPayload(_0x590cbb = {}) {
-  const _0x35cdbd =
-      _0x590cbb?.['provider'] && typeof _0x590cbb['provider'] === 'object' ? _0x590cbb['provider'] : {},
-    _0x2d472e = Array['isArray'](_0x590cbb?.['models'])
-      ? _0x590cbb['models']
-          ['map']((_0x3a1ffd) => ({
-            upstreamModelId: String(_0x3a1ffd?.['upstreamModelId'] || '')['trim'](),
-            kind: String(_0x3a1ffd?.['kind'] || '')
+function sanitizeDocumentationAnalysisPayload(options = {}) {
+  const error = options?.['provider'] && typeof options['provider'] === 'object' ? options['provider'] : {},
+    models = Array['isArray'](options?.['models'])
+      ? options['models']
+          ['map']((index) => ({
+            upstreamModelId: String(index?.['upstreamModelId'] || '')['trim'](),
+            kind: String(index?.['kind'] || '')
               ['trim']()
               ['toLowerCase'](),
           }))
-          ['filter']((_0xef331b) => _0xef331b['upstreamModelId'] && _0xef331b['kind'])
+          ['filter']((result) => result['upstreamModelId'] && result['kind'])
       : [],
-    _0x3b73a1 = _0x590cbb?.['documentationDocument'],
-    _0x5b3667 =
-      _0x3b73a1 && typeof _0x3b73a1 === 'object'
+    error2 = options?.['documentationDocument'],
+    documentationDocument =
+      error2 && typeof error2 === 'object'
         ? {
-            name: String(_0x3b73a1['name'] || '')
+            name: String(error2['name'] || '')
               ['trim']()
               ['slice'](0x0, 0xff),
-            contentType: String(_0x3b73a1['contentType'] || '')
+            contentType: String(error2['contentType'] || '')
               ['trim']()
               ['slice'](0x0, 0xa0),
-            text: String(_0x3b73a1['text'] || ''),
+            text: String(error2['text'] || ''),
           }
         : null;
   if (
-    _0x5b3667 &&
-    new TextEncoder()['encode'](_0x5b3667['text'])['byteLength'] > MAX_CUSTOM_PROVIDER_DOCUMENT_BYTES
+    documentationDocument &&
+    new TextEncoder()['encode'](documentationDocument['text'])['byteLength'] >
+      MAX_CUSTOM_PROVIDER_DOCUMENT_BYTES
   )
     throw new Error('Local API documentation is too large');
   return {
-    ...(_0x590cbb['apiKey'] ? { apiKey: String(_0x590cbb['apiKey'])['trim']() } : {}),
+    ...(options['apiKey'] ? { apiKey: String(options['apiKey'])['trim']() } : {}),
     provider: {
-      providerId: String(_0x35cdbd['providerId'] || '')['trim'](),
-      name: String(_0x35cdbd['name'] || '')['trim'](),
-      baseUrl: String(_0x35cdbd['baseUrl'] || _0x35cdbd['apiUrl'] || '')['trim'](),
-      documentationUrl: String(_0x590cbb?.['documentationUrl'] || _0x35cdbd['documentationUrl'] || '')[
-        'trim'
-      ](),
+      providerId: String(error['providerId'] || '')['trim'](),
+      name: String(error['name'] || '')['trim'](),
+      baseUrl: String(error['baseUrl'] || error['apiUrl'] || '')['trim'](),
+      documentationUrl: String(options?.['documentationUrl'] || error['documentationUrl'] || '')['trim'](),
     },
-    models: _0x2d472e,
-    documentationUrl: String(_0x590cbb?.['documentationUrl'] || _0x35cdbd['documentationUrl'] || '')[
-      'trim'
-    ](),
-    ...(_0x5b3667?.['name'] && _0x5b3667['text'] ? { documentationDocument: _0x5b3667 } : {}),
+    models: models,
+    documentationUrl: String(options?.['documentationUrl'] || error['documentationUrl'] || '')['trim'](),
+    ...(documentationDocument?.['name'] && documentationDocument['text']
+      ? { documentationDocument: documentationDocument }
+      : {}),
   };
 }
-function sanitizePreparedDocumentation(_0x45f0b9) {
-  if (!_0x45f0b9 || typeof _0x45f0b9 !== 'object') return null;
-  const _0x3cd4f0 = String(_0x45f0b9['text'] || '');
-  if (new TextEncoder()['encode'](_0x3cd4f0)['byteLength'] > MAX_CUSTOM_PROVIDER_DOCUMENT_BYTES)
+function sanitizePreparedDocumentation(response2) {
+  if (!response2 || typeof response2 !== 'object') return null;
+  const text = String(response2['text'] || '');
+  if (new TextEncoder()['encode'](text)['byteLength'] > MAX_CUSTOM_PROVIDER_DOCUMENT_BYTES)
     throw new Error('Prepared API documentation is too large');
-  const _0x5d540d = String(_0x45f0b9['url'] || '')['trim'](),
-    _0x589ff3 = String(_0x45f0b9['fingerprint'] || '')['trim']();
-  if (!_0x5d540d || !_0x589ff3) return null;
-  const _0x5a561a = String(_0x45f0b9['source'] || '')['trim']();
+  const url = String(response2['url'] || '')['trim'](),
+    fingerprint = String(response2['fingerprint'] || '')['trim']();
+  if (!url || !fingerprint) return null;
+  const source = String(response2['source'] || '')['trim']();
   return {
-    url: _0x5d540d,
-    fingerprint: _0x589ff3,
-    contentType: String(_0x45f0b9['contentType'] || '')
+    url: url,
+    fingerprint: fingerprint,
+    contentType: String(response2['contentType'] || '')
       ['trim']()
       ['slice'](0x0, 0xa0),
-    text: _0x3cd4f0,
-    ...(_0x5a561a ? { source: _0x5a561a } : {}),
+    text: text,
+    ...(source ? { source: source } : {}),
   };
 }
-function extractDocumentationAgentText(_0x7d177e) {
-  return typeof _0x7d177e === 'string'
-    ? _0x7d177e
-    : _0x7d177e?.['text'] || _0x7d177e?.['outputText'] || _0x7d177e?.['content'] || '';
+function extractDocumentationAgentText(response3) {
+  return typeof response3 === 'string'
+    ? response3
+    : response3?.['text'] || response3?.['outputText'] || response3?.['content'] || '';
 }
 function createDocumentationAgentStructuredOutput() {
   return {
@@ -115,7 +113,7 @@ function createDocumentationAgentStructuredOutput() {
     },
   };
 }
-function buildDocumentationAgentRepairPrompt(_0x38f675) {
+function buildDocumentationAgentRepairPrompt(previousResponse) {
   return JSON['stringify']({
     task: 'repair_custom_provider_documentation_json',
     instructions: [
@@ -126,34 +124,34 @@ function buildDocumentationAgentRepairPrompt(_0x38f675) {
     requiredResponseEnvelope: {
       analysisJson: JSON['stringify']({ modelResults: [], profiles: [], warnings: [] }),
     },
-    previousResponse: _0x38f675,
+    previousResponse: previousResponse,
   });
 }
-function findDocumentationJsonObjects(_0x47d13c) {
-  const _0x151061 = [];
-  for (let _0x1911f7 = 0x0; _0x1911f7 < _0x47d13c['length']; _0x1911f7 += 0x1) {
-    if (_0x47d13c[_0x1911f7] !== '{') continue;
-    let _0x3563e7 = 0x0,
-      _0x2523e3 = ![],
-      _0x13d6a0 = ![];
-    for (let _0x1d7460 = _0x1911f7; _0x1d7460 < _0x47d13c['length']; _0x1d7460 += 0x1) {
-      const _0x36eca0 = _0x47d13c[_0x1d7460];
-      if (_0x2523e3) {
-        if (_0x13d6a0) _0x13d6a0 = ![];
+function findDocumentationJsonObjects(list) {
+  const list2 = [];
+  for (let data = 0x0; data < list['length']; data += 0x1) {
+    if (list[data] !== '{') continue;
+    let count = 0x0,
+      enabled = ![],
+      target = ![];
+    for (let next = data; next < list['length']; next += 0x1) {
+      const current = list[next];
+      if (enabled) {
+        if (target) target = ![];
         else {
-          if (_0x36eca0 === '\x5c') _0x13d6a0 = !![];
-          else _0x36eca0 === '\x22' && (_0x2523e3 = ![]);
+          if (current === '\x5c') target = !![];
+          else current === '\x22' && (enabled = ![]);
         }
         continue;
       }
-      if (_0x36eca0 === '\x22') _0x2523e3 = !![];
+      if (current === '\x22') enabled = !![];
       else {
-        if (_0x36eca0 === '{') _0x3563e7 += 0x1;
+        if (current === '{') count += 0x1;
         else {
-          if (_0x36eca0 === '}') {
-            _0x3563e7 -= 0x1;
-            if (_0x3563e7 === 0x0) {
-              (_0x151061['push'](_0x47d13c['slice'](_0x1911f7, _0x1d7460 + 0x1)), (_0x1911f7 = _0x1d7460));
+          if (current === '}') {
+            count -= 0x1;
+            if (count === 0x0) {
+              (list2['push'](list['slice'](data, next + 0x1)), (data = next));
               break;
             }
           }
@@ -161,66 +159,66 @@ function findDocumentationJsonObjects(_0x47d13c) {
       }
     }
   }
-  return _0x151061;
+  return list2;
 }
-function isDocumentationAgentContract(_0x538beb) {
+function isDocumentationAgentContract(entry) {
   return (
-    _0x538beb &&
-    typeof _0x538beb === 'object' &&
-    Array['isArray'](_0x538beb['modelResults']) &&
-    Array['isArray'](_0x538beb['profiles'])
+    entry &&
+    typeof entry === 'object' &&
+    Array['isArray'](entry['modelResults']) &&
+    Array['isArray'](entry['profiles'])
   );
 }
-function parseDocumentationAgentJson(_0x8f3e39) {
-  const _0x2da742 = String(extractDocumentationAgentText(_0x8f3e39) || '')['trim']();
-  if (!_0x2da742) throw new Error('API documentation Agent returned empty text');
-  const _0x3675d = [..._0x2da742['matchAll'](/```(?:json)?\s*([\s\S]*?)```/gi)]
-      ['map']((_0x2c5cf5) => String(_0x2c5cf5[0x1] || '')['trim']())
+function parseDocumentationAgentJson(record) {
+  const args = String(extractDocumentationAgentText(record) || '')['trim']();
+  if (!args) throw new Error('API documentation Agent returned empty text');
+  const args2 = [...args['matchAll'](/```(?:json)?\s*([\s\S]*?)```/gi)]
+      ['map']((payload) => String(payload[0x1] || '')['trim']())
       ['filter'](Boolean),
-    _0x337b3e = [_0x2da742, ..._0x3675d, ...findDocumentationJsonObjects(_0x2da742)];
-  let _0x4041f1 = ![];
-  for (const _0x3606ca of [...new Set(_0x337b3e)]) {
+    handle = [args, ...args2, ...findDocumentationJsonObjects(args)];
+  let state = ![];
+  for (const config of [...new Set(handle)]) {
     try {
-      const _0x3f59fa = JSON['parse'](_0x3606ca);
-      if (isDocumentationAgentContract(_0x3f59fa)) return _0x3f59fa;
-      const _0x6600c0 =
-        _0x3f59fa && typeof _0x3f59fa === 'object' && !Array['isArray'](_0x3f59fa)
-          ? String(_0x3f59fa['analysisJson'] || '')['trim']()
+      const scope = JSON['parse'](config);
+      if (isDocumentationAgentContract(scope)) return scope;
+      const input =
+        scope && typeof scope === 'object' && !Array['isArray'](scope)
+          ? String(scope['analysisJson'] || '')['trim']()
           : '';
-      if (_0x6600c0) {
-        const _0x376bd6 = JSON['parse'](_0x6600c0);
-        if (isDocumentationAgentContract(_0x376bd6)) return _0x376bd6;
+      if (input) {
+        const output = JSON['parse'](input);
+        if (isDocumentationAgentContract(output)) return output;
       }
-      _0x4041f1 = !![];
+      state = !![];
     } catch {}
   }
-  if (_0x4041f1) throw new Error('API documentation Agent returned an invalid contract');
+  if (state) throw new Error('API documentation Agent returned an invalid contract');
   throw new Error('API documentation Agent returned invalid JSON');
 }
-function buildDocumentationModelTargets(_0x5cbe3d = []) {
-  return _0x5cbe3d['map']((_0x439cdf) => {
-    const _0x5b6786 = String(_0x439cdf?.['upstreamModelId'] || '')['trim'](),
-      _0x57a85f = _0x5b6786['replace'](/([A-Za-z])(?=\d)/g, '$1 ')
+function buildDocumentationModelTargets(list3 = []) {
+  return list3['map']((value2) => {
+    const upstreamModelId = String(value2?.['upstreamModelId'] || '')['trim'](),
+      value3 = upstreamModelId['replace'](/([A-Za-z])(?=\d)/g, '$1 ')
         ['replace'](/[_-]+/g, '\x20')
         ['replace'](/\s+/g, '\x20')
         ['trim'](),
-      _0x1b2623 = _0x57a85f['replace'](/\s+/g, '-');
+      value4 = value3['replace'](/\s+/g, '-');
     return {
-      upstreamModelId: _0x5b6786,
-      kind: String(_0x439cdf?.['kind'] || '')
+      upstreamModelId: upstreamModelId,
+      kind: String(value2?.['kind'] || '')
         ['trim']()
         ['toLowerCase'](),
-      searchTerms: [...new Set([_0x5b6786, _0x57a85f, _0x1b2623]['filter'](Boolean))],
+      searchTerms: [...new Set([upstreamModelId, value3, value4]['filter'](Boolean))],
     };
   });
 }
-function buildDocumentationAgentPrompt({ document: _0xa6548c, models: _0xa4313 }) {
-  const _0x220e82 = buildDocumentationModelTargets(_0xa4313);
+function buildDocumentationAgentPrompt({ document: document, models: models2 }) {
+  const selectedModels = buildDocumentationModelTargets(models2);
   return JSON['stringify'](
     {
       task: 'extract_custom_provider_api_profiles',
       objective: 'Your only targets are the selected models. Do not return unrelated model profiles.',
-      selectedModels: _0x220e82,
+      selectedModels: selectedModels,
       requiredProcess: [
         'When untrustedDocumentation.source is local_document, analyze the supplied text directly and do not require a website URL.',
         "When untrustedDocumentation.source is apifox_site_index, inspect selectedModelMatches and matchedPages first. Those pages were resolved from the documentation site's full navigation tree for the selected models; do not require the user to provide one URL per model.",
@@ -379,33 +377,33 @@ function buildDocumentationAgentPrompt({ document: _0xa6548c, models: _0xa4313 }
         'Omit\x20uncertain\x20parameters\x20instead\x20of\x20guessing.',
       ],
       untrustedDocumentation: {
-        source: String(_0xa6548c?.['source'] || ''),
-        url: String(_0xa6548c?.['url'] || ''),
-        fingerprint: String(_0xa6548c?.['fingerprint'] || ''),
-        text: String(_0xa6548c?.['text'] || ''),
+        source: String(document?.['source'] || ''),
+        url: String(document?.['url'] || ''),
+        fingerprint: String(document?.['fingerprint'] || ''),
+        text: String(document?.['text'] || ''),
       },
     },
     null,
     0x2,
   );
 }
-function getDocumentationAgentReviewIssues(_0x4817e3) {
-  const _0x59cb1c = _0x4817e3?.['analysis']?.['agentReview'];
-  if (_0x59cb1c?.['needsRepair'] !== !![]) return [];
-  const _0x3f19c2 = Array['isArray'](_0x59cb1c['issues'])
-    ? _0x59cb1c['issues']
-        ['filter']((_0x5dd339) => _0x5dd339 && typeof _0x5dd339 === 'object')
+function getDocumentationAgentReviewIssues(value5) {
+  const value6 = value5?.['analysis']?.['agentReview'];
+  if (value6?.['needsRepair'] !== !![]) return [];
+  const list4 = Array['isArray'](value6['issues'])
+    ? value6['issues']
+        ['filter']((value7) => value7 && typeof value7 === 'object')
         ['slice'](0x0, 0x14)
-        ['map']((_0x1de2d7) => ({
-          code: String(_0x1de2d7['code'] || 'semantic_review_failed')['slice'](0x0, 0x78),
-          modelId: String(_0x1de2d7['modelId'] || '')['slice'](0x0, 0xff),
-          kind: String(_0x1de2d7['kind'] || '')['slice'](0x0, 0x28),
-          endpoint: String(_0x1de2d7['endpoint'] || '')['slice'](0x0, 0x1f4),
-          message: String(_0x1de2d7['message'] || '')['slice'](0x0, 0x3e8),
+        ['map']((error3) => ({
+          code: String(error3['code'] || 'semantic_review_failed')['slice'](0x0, 0x78),
+          modelId: String(error3['modelId'] || '')['slice'](0x0, 0xff),
+          kind: String(error3['kind'] || '')['slice'](0x0, 0x28),
+          endpoint: String(error3['endpoint'] || '')['slice'](0x0, 0x1f4),
+          message: String(error3['message'] || '')['slice'](0x0, 0x3e8),
         }))
     : [];
-  return _0x3f19c2['length']
-    ? _0x3f19c2
+  return list4['length']
+    ? list4
     : [
         {
           code: 'semantic_review_failed',
@@ -417,15 +415,15 @@ function getDocumentationAgentReviewIssues(_0x4817e3) {
       ];
 }
 function buildDocumentationAgentSemanticRepairPrompt({
-  document: _0x3369cb,
-  models: _0x152b5e,
-  previousAnalysis: _0x30ef99,
-  issues: _0x2a34e0,
+  document: document2,
+  models: models3,
+  previousAnalysis: previousAnalysis,
+  issues: issues,
 }) {
-  const _0x2a1403 = JSON['parse'](buildDocumentationAgentPrompt({ document: _0x3369cb, models: _0x152b5e }));
+  const args3 = JSON['parse'](buildDocumentationAgentPrompt({ document: document2, models: models3 }));
   return JSON['stringify'](
     {
-      ..._0x2a1403,
+      ...args3,
       task: 'repair_custom_provider_documentation_analysis',
       objective:
         'Return a complete replacement analysis that corrects every programmatically verified review issue.',
@@ -436,141 +434,143 @@ function buildDocumentationAgentSemanticRepairPrompt({
         'Preserve verified facts from the previous analysis and do not invent unsupported endpoints, fields, enum values, defaults, or response paths.',
         'Before returning, audit the replacement against selectedModels, reviewIssues, outputContract, and rules.',
       ],
-      reviewIssues: _0x2a34e0,
-      previousAnalysis: _0x30ef99,
+      reviewIssues: issues,
+      previousAnalysis: previousAnalysis,
     },
     null,
     0x2,
   );
 }
-function formatDocumentationAgentReviewError(_0x32f9fe) {
-  const _0x38ba27 = _0x32f9fe['slice'](0x0, 0x3)
-    ['map']((_0x497b3e) =>
-      [_0x497b3e['modelId'], _0x497b3e['code'], _0x497b3e['endpoint']]['filter'](Boolean)['join'](' / '),
+function formatDocumentationAgentReviewError(list5) {
+  const value8 = list5['slice'](0x0, 0x3)
+    ['map']((value9) =>
+      [value9['modelId'], value9['code'], value9['endpoint']]['filter'](Boolean)['join'](' / '),
     )
     ['filter'](Boolean)
     ['join']('；');
-  return 'API 文档 Agent 自动纠错后仍有未解决项：' + (_0x38ba27 || '语义审计未通过');
+  return 'API 文档 Agent 自动纠错后仍有未解决项：' + (value8 || '语义审计未通过');
 }
 export async function analyzeCustomProviderDocumentation(
-  _0x3009e8,
+  value10,
   { settings: settings = {}, request: request = generateText } = {},
 ) {
-  const _0x3dd097 = sanitizeDocumentationAnalysisPayload(_0x3009e8),
-    _0x50df88 = await post(
+  const models4 = sanitizeDocumentationAnalysisPayload(value10),
+    post4 = await post(
       CUSTOM_PROVIDERS_API_BASE + '/analyze-documentation',
-      _0x3dd097,
+      models4,
       CUSTOM_PROVIDER_DOCUMENTATION_TIMEOUT_MS,
     ),
-    _0x367715 = unwrapApiResult(_0x50df88, '读取自定义中转站 API 文档失败');
-  if (_0x367715?.['bundle'] || !_0x367715?.['needsAgent']) return _0x367715;
-  const _0x1e01c6 = String(settings?.['provider'] || '')['trim'](),
-    _0x26e851 = String(settings?.['model'] || '')['trim'](),
-    _0x45dd87 = String(settings?.['providerProfileId'] || '')['trim']();
-  if (!_0x1e01c6 || !_0x26e851) return { ..._0x367715, agentUnavailable: !![] };
-  const _0xd58c54 = buildDocumentationAgentPrompt({
-      document: _0x367715['document'],
-      models: _0x3dd097['models'],
+    document3 = unwrapApiResult(post4, '读取自定义中转站 API 文档失败');
+  if (document3?.['bundle'] || !document3?.['needsAgent']) return document3;
+  const provider = String(settings?.['provider'] || '')['trim'](),
+    model = String(settings?.['model'] || '')['trim'](),
+    providerProfileId = String(settings?.['providerProfileId'] || '')['trim']();
+  if (!provider || !model) return { ...document3, agentUnavailable: !![] };
+  const prompt = buildDocumentationAgentPrompt({
+      document: document3['document'],
+      models: models4['models'],
     }),
-    _0x52628d = !_0x3dd097['documentationDocument']
-      ? String(_0x367715?.['analysis']?.['documentationUrl'] || _0x367715?.['document']?.['url'] || '')[
+    documentationUrl = !models4['documentationDocument']
+      ? String(document3?.['analysis']?.['documentationUrl'] || document3?.['document']?.['url'] || '')[
           'trim'
         ]()
       : '',
-    _0x4f1ae8 = /^https?:\/\//i['test'](_0x52628d)
+    args4 = /^https?:\/\//i['test'](documentationUrl)
       ? {
-          ..._0x3dd097,
-          provider: { ..._0x3dd097['provider'], documentationUrl: _0x52628d },
-          documentationUrl: _0x52628d,
+          ...models4,
+          provider: { ...models4['provider'], documentationUrl: documentationUrl },
+          documentationUrl: documentationUrl,
         }
-      : _0x3dd097,
-    _0x37ef43 = !_0x3dd097['documentationDocument']
-      ? sanitizePreparedDocumentation(_0x367715?.['document'])
+      : models4,
+    preparedDocument = !models4['documentationDocument']
+      ? sanitizePreparedDocumentation(document3?.['document'])
       : null,
-    _0x140adb = {
-      provider: _0x1e01c6,
-      model: _0x26e851,
+    args5 = {
+      provider: provider,
+      model: model,
       ...buildAgentModelRequestParams(settings),
-      ...(_0x45dd87 ? { providerProfileId: _0x45dd87 } : {}),
-      prompt: _0xd58c54,
+      ...(providerProfileId ? { providerProfileId: providerProfileId } : {}),
+      prompt: prompt,
       systemPrompt: CUSTOM_PROVIDER_DOCUMENTATION_SYSTEM_PROMPT,
       structuredOutput: createDocumentationAgentStructuredOutput(),
       temperature: 0x0,
-      webSearch: !['apifox_site_index', 'local_document']['includes'](_0x367715?.['document']?.['source']),
+      webSearch: !['apifox_site_index', 'local_document']['includes'](document3?.['document']?.['source']),
     };
-  let _0xde730c;
-  const _0x13a3ac = await request(_0x140adb);
+  let previousAnalysis2;
+  const request2 = await request(args5);
   try {
-    _0xde730c = parseDocumentationAgentJson(_0x13a3ac);
-  } catch (_0x4a1f22) {
-    const _0x4a6917 = String(extractDocumentationAgentText(_0x13a3ac) || '')
+    previousAnalysis2 = parseDocumentationAgentJson(request2);
+  } catch (error4) {
+    const list6 = String(extractDocumentationAgentText(request2) || '')
         ['trim']()
         ['slice'](0x0, 0xea60),
-      _0x12e98 = _0x4a6917['includes']('{'),
-      _0x14d79c = _0x12e98
-        ? buildDocumentationAgentRepairPrompt(_0x4a6917)
-        : _0xd58c54 +
+      webSearch = list6['includes']('{'),
+      prompt2 = webSearch
+        ? buildDocumentationAgentRepairPrompt(list6)
+        : prompt +
           '\n\nYour previous response was invalid: ' +
-          String(_0x4a1f22?.['message'] || 'invalid\x20JSON') +
+          String(error4?.['message'] || 'invalid\x20JSON') +
           '. Return only the strict JSON contract without introductory text.';
-    _0xde730c = parseDocumentationAgentJson(
-      await request({ ..._0x140adb, prompt: _0x14d79c, webSearch: _0x12e98 ? ![] : _0x140adb['webSearch'] }),
+    previousAnalysis2 = parseDocumentationAgentJson(
+      await request({ ...args5, prompt: prompt2, webSearch: webSearch ? ![] : args5['webSearch'] }),
     );
   }
-  const _0x24c4f9 = async (_0x1f3d8a) => {
-    const _0x5255d5 = await post(
+  const run = async (agentAnalysis) => {
+    const post5 = await post(
       CUSTOM_PROVIDERS_API_BASE + '/analyze-documentation',
-      { ..._0x4f1ae8, agentAnalysis: _0x1f3d8a, ...(_0x37ef43 ? { preparedDocument: _0x37ef43 } : {}) },
+      {
+        ...args4,
+        agentAnalysis: agentAnalysis,
+        ...(preparedDocument ? { preparedDocument: preparedDocument } : {}),
+      },
       CUSTOM_PROVIDER_DOCUMENTATION_TIMEOUT_MS,
     );
-    return unwrapApiResult(_0x5255d5, '编译 API 文档 Agent 结果失败');
+    return unwrapApiResult(post5, '编译 API 文档 Agent 结果失败');
   };
-  let _0x41ed8e = await _0x24c4f9(_0xde730c);
-  const _0x1c1281 = getDocumentationAgentReviewIssues(_0x41ed8e);
-  if (!_0x1c1281['length']) return _0x41ed8e;
-  let _0x21f4cc;
+  let args6 = await run(previousAnalysis2);
+  const issues2 = getDocumentationAgentReviewIssues(args6);
+  if (!issues2['length']) return args6;
+  let documentationAgentJson;
   try {
-    _0x21f4cc = parseDocumentationAgentJson(
+    documentationAgentJson = parseDocumentationAgentJson(
       await request({
-        ..._0x140adb,
+        ...args5,
         prompt: buildDocumentationAgentSemanticRepairPrompt({
-          document: _0x367715['document'],
-          models: _0x3dd097['models'],
-          previousAnalysis: _0xde730c,
-          issues: _0x1c1281,
+          document: document3['document'],
+          models: models4['models'],
+          previousAnalysis: previousAnalysis2,
+          issues: issues2,
         }),
       }),
     );
-  } catch (_0x4fa88e) {
-    throw new Error(
-      'API 文档 Agent 自动纠错失败：' + String(_0x4fa88e?.['message'] || _0x4fa88e || '未知错误'),
-    );
+  } catch (error5) {
+    throw new Error('API 文档 Agent 自动纠错失败：' + String(error5?.['message'] || error5 || '未知错误'));
   }
-  _0x41ed8e = await _0x24c4f9(_0x21f4cc);
-  const _0x1872d6 = getDocumentationAgentReviewIssues(_0x41ed8e);
-  if (_0x1872d6['length']) throw new Error(formatDocumentationAgentReviewError(_0x1872d6));
+  args6 = await run(documentationAgentJson);
+  const list7 = getDocumentationAgentReviewIssues(args6);
+  if (list7['length']) throw new Error(formatDocumentationAgentReviewError(list7));
   return {
-    ..._0x41ed8e,
+    ...args6,
     analysis: {
-      ...(_0x41ed8e?.['analysis'] && typeof _0x41ed8e['analysis'] === 'object' ? _0x41ed8e['analysis'] : {}),
+      ...(args6?.['analysis'] && typeof args6['analysis'] === 'object' ? args6['analysis'] : {}),
       agentRepairAttempts: 0x1,
     },
   };
 }
-export async function validateCustomProviderManifestDraft(_0x1af21f) {
-  const _0x3e3635 = await post(CUSTOM_PROVIDERS_API_BASE + '/validate-manifest-draft', _0x1af21f);
-  return unwrapApiResult(_0x3e3635, '校验自定义模型清单草稿失败');
+export async function validateCustomProviderManifestDraft(value11) {
+  const post6 = await post(CUSTOM_PROVIDERS_API_BASE + '/validate-manifest-draft', value11);
+  return unwrapApiResult(post6, '校验自定义模型清单草稿失败');
 }
-export async function saveCustomProviderManifestBundle(_0x506157) {
-  const _0x4814d8 = await post(CUSTOM_PROVIDERS_API_BASE + '/save-manifest-bundle', _0x506157);
-  return unwrapApiResult(_0x4814d8, '保存自定义模型清单失败');
+export async function saveCustomProviderManifestBundle(value12) {
+  const post7 = await post(CUSTOM_PROVIDERS_API_BASE + '/save-manifest-bundle', value12);
+  return unwrapApiResult(post7, '保存自定义模型清单失败');
 }
 export async function listCustomProviderManifestBundles() {
-  const _0x2f5540 = await get(CUSTOM_PROVIDERS_API_BASE + '/manifest-bundles');
-  return unwrapApiResult(_0x2f5540, '读取自定义模型清单失败');
+  const get2 = await get(CUSTOM_PROVIDERS_API_BASE + '/manifest-bundles');
+  return unwrapApiResult(get2, '读取自定义模型清单失败');
 }
-export async function deleteCustomProviderManifestBundle(_0x1ff849) {
-  const _0x544650 = encodeURIComponent(String(_0x1ff849 || '')['trim']()),
-    _0x14c556 = await del(CUSTOM_PROVIDERS_API_BASE + '/manifest-bundles/' + _0x544650);
-  return unwrapApiResult(_0x14c556, '删除自定义模型清单失败');
+export async function deleteCustomProviderManifestBundle(value13) {
+  const encodeURIComponent2 = encodeURIComponent(String(value13 || '')['trim']()),
+    del2 = await del(CUSTOM_PROVIDERS_API_BASE + '/manifest-bundles/' + encodeURIComponent2);
+  return unwrapApiResult(del2, '删除自定义模型清单失败');
 }

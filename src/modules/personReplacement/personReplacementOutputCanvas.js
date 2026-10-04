@@ -41,39 +41,37 @@ export const PERSON_REPLACEMENT_CANVAS_NODE_SIZES = Object['freeze']({
   'source-audio': Object['freeze']({ width: 0x1a4, height: 0xb4 }),
   'ai-audio': Object['freeze']({ width: 0x1a4, height: 0xb4 }),
 });
-function asObject(_0x8907fd) {
-  return _0x8907fd && typeof _0x8907fd === 'object' && !Array['isArray'](_0x8907fd) ? _0x8907fd : {};
+function asObject(value) {
+  return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
 }
-function normalizeText(_0xa3818e) {
-  return String(_0xa3818e || '')['trim']();
+function normalizeText(item) {
+  return String(item || '')['trim']();
 }
 export const personReplacementCanvasMaterializationBindingPolicy = Object['freeze']({
-  getProjectId(_0x1c3298) {
-    return normalizeText(_0x1c3298?.['personReplacementBinding']?.['projectId']);
+  getProjectId(key) {
+    return normalizeText(key?.['personReplacementBinding']?.['projectId']);
   },
-  findProjectAnchor({ nodes: nodes = [], projectId: _0x2cbbd9 } = {}) {
-    const _0x36f884 = normalizeText(_0x2cbbd9);
-    if (!_0x36f884) return null;
-    const _0x2dfbe3 = (Array['isArray'](nodes) ? nodes : [])['filter'](
-      (_0x30f557) => normalizeText(_0x30f557?.['personReplacementBinding']?.['projectId']) === _0x36f884,
+  findProjectAnchor({ nodes: nodes = [], projectId: projectId } = {}) {
+    const text = normalizeText(projectId);
+    if (!text) return null;
+    const list = (Array['isArray'](nodes) ? nodes : [])['filter'](
+      (index) => normalizeText(index?.['personReplacementBinding']?.['projectId']) === text,
     );
     return (
-      _0x2dfbe3['find'](
-        (_0x5c27ba) =>
-          _0x5c27ba?.['personReplacementBinding']?.['kind'] === 'stage-group' &&
-          _0x5c27ba?.['personReplacementBinding']?.['stage'] === 'assets',
+      list['find'](
+        (result) =>
+          result?.['personReplacementBinding']?.['kind'] === 'stage-group' &&
+          result?.['personReplacementBinding']?.['stage'] === 'assets',
       ) ||
-      _0x2dfbe3['find']((_0x5dc672) => _0x5dc672?.['personReplacementBinding']?.['kind'] === 'stage-group') ||
-      _0x2dfbe3['find'](
-        (_0x1a4380) => _0x1a4380?.['personReplacementBinding']?.['kind'] === 'project-overview',
-      ) ||
-      _0x2dfbe3[0x0] ||
+      list['find']((data) => data?.['personReplacementBinding']?.['kind'] === 'stage-group') ||
+      list['find']((options) => options?.['personReplacementBinding']?.['kind'] === 'project-overview') ||
+      list[0x0] ||
       null
     );
   },
 });
-function normalizePromptDisplayText(_0x3648a3) {
-  return String(_0x3648a3 || '')
+function normalizePromptDisplayText(target) {
+  return String(target || '')
     ['replace'](/<br\b[^>]*\/?>/gi, '\x0a')
     ['replace'](/<\/(?:div|p|section|article|blockquote|li)>/gi, '\x0a')
     ['replace'](/<li\b[^>]*>/gi, '-\x20')
@@ -87,190 +85,191 @@ function normalizePromptDisplayText(_0x3648a3) {
     ['replace'](/\n{3,}/g, '\x0a\x0a')
     ['trim']();
 }
-function normalizeList(_0x189b3a) {
-  return Array['isArray'](_0x189b3a) ? _0x189b3a['filter'](Boolean) : [];
+function normalizeList(list2) {
+  return Array['isArray'](list2) ? list2['filter'](Boolean) : [];
 }
-function normalizeScope(_0x2b0898) {
-  return _0x2b0898 === PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT']
+function normalizeScope(next) {
+  return next === PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT']
     ? PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT']
     : PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'];
 }
-function normalizeWorkspaceStep(_0x5868c6 = {}) {
-  const _0x2fc272 = Math['trunc'](
-    Number(_0x5868c6['workspace']?.['step']) || Number(_0x5868c6['step']) || 0x1,
-  );
-  return Math['max'](0x1, Math['min'](0x5, _0x2fc272));
+function normalizeWorkspaceStep(options2 = {}) {
+  const current = Math['trunc'](Number(options2['workspace']?.['step']) || Number(options2['step']) || 0x1);
+  return Math['max'](0x1, Math['min'](0x5, current));
 }
-function getWorkspaceStepName(_0x452731) {
+function getWorkspaceStepName(entry) {
   return ['', '素材设定', '图像替换', '视频替换', '声音克隆', '合成视频'][
-    Math['max'](0x1, Math['min'](0x5, Math['trunc'](Number(_0x452731) || 0x1)))
+    Math['max'](0x1, Math['min'](0x5, Math['trunc'](Number(entry) || 0x1)))
   ];
 }
-function formatSequence(_0x14a5e1) {
-  return String(_0x14a5e1 + 0x1)['padStart'](0x2, '0');
+function formatSequence(record) {
+  return String(record + 0x1)['padStart'](0x2, '0');
 }
 function createPlanEntry(
-  _0x4cf0c9,
-  _0x2fa9e1,
-  _0x37eea6,
+  key2,
+  data2,
+  box,
   { width: width = 0x0, height: height = 0x0, parentKey: parentKey = '', inputKeys: inputKeys = [] } = {},
 ) {
-  const _0x355233 = normalizeText(_0x2fa9e1?.['type']),
-    _0x567f20 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES[_0x355233],
-    _0x47fb4f = Number(width) || _0x567f20?.['width'],
-    _0x54b8bb = Number(height) || _0x567f20?.['height'];
-  if (!_0x355233 || !_0x47fb4f || !_0x54b8bb)
-    throw new Error('不支持的人物替换画布节点类型：' + (_0x355233 || 'unknown'));
+  const type2 = normalizeText(data2?.['type']),
+    box2 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES[type2],
+    width2 = Number(width) || box2?.['width'],
+    height2 = Number(height) || box2?.['height'];
+  if (!type2 || !width2 || !height2) throw new Error('不支持的人物替换画布节点类型：' + (type2 || 'unknown'));
   return {
-    key: _0x4cf0c9,
-    type: _0x355233,
-    data: _0x2fa9e1,
-    width: _0x47fb4f,
-    height: _0x54b8bb,
-    position: { x: Number(_0x37eea6?.['x']) || 0x0, y: Number(_0x37eea6?.['y']) || 0x0 },
+    key: key2,
+    type: type2,
+    data: data2,
+    width: width2,
+    height: height2,
+    position: { x: Number(box?.['x']) || 0x0, y: Number(box?.['y']) || 0x0 },
     ...(normalizeText(parentKey) ? { parentKey: normalizeText(parentKey) } : {}),
     ...(normalizeList(inputKeys)['length']
       ? { inputKeys: normalizeList(inputKeys)['map'](normalizeText)['filter'](Boolean) }
       : {}),
   };
 }
-function buildMediaLocation(_0x4e3463) {
-  const _0x3131e3 = normalizeText(_0x4e3463),
-    _0x1a7a94 = normalizeLocalPath(_0x3131e3);
-  return { localPath: _0x1a7a94, url: localPathToUrl(_0x1a7a94) };
+function buildMediaLocation(payload) {
+  const text2 = normalizeText(payload),
+    localPath = normalizeLocalPath(text2);
+  return { localPath: localPath, url: localPathToUrl(localPath) };
 }
-function normalizeInlineLocationGuideRef(_0x415afd, _0x42abc6 = ![]) {
-  const _0x1d9d2c = normalizeText(_0x415afd);
-  return _0x42abc6 && /^data:image\/svg\+xml(?:;|,)/i['test'](_0x1d9d2c) ? _0x1d9d2c : '';
+function normalizeInlineLocationGuideRef(handle, state = ![]) {
+  const text3 = normalizeText(handle);
+  return state && /^data:image\/svg\+xml(?:;|,)/i['test'](text3) ? text3 : '';
 }
-function buildBinding(_0x5cd3f1, _0x496ec1 = {}) {
-  return { projectId: normalizeText(_0x5cd3f1?.['id']), ...asObject(_0x496ec1) };
+function buildBinding(config, input = {}) {
+  return { projectId: normalizeText(config?.['id']), ...asObject(input) };
 }
 const PERSON_REPLACEMENT_LOCATION_GUIDE_SUBDIR = 'person-replacement-guides';
-function buildInlineSvgSignature(_0x14b3d9) {
-  const _0x5f37f1 = normalizeText(_0x14b3d9);
-  let _0x3e7249 = 0x811c9dc5;
-  for (let _0x338b2d = 0x0; _0x338b2d < _0x5f37f1['length']; _0x338b2d += 0x1) {
-    ((_0x3e7249 ^= _0x5f37f1['charCodeAt'](_0x338b2d)), (_0x3e7249 = Math['imul'](_0x3e7249, 0x1000193)));
+function buildInlineSvgSignature(output) {
+  const list3 = normalizeText(output);
+  let value2 = 0x811c9dc5;
+  for (let value3 = 0x0; value3 < list3['length']; value3 += 0x1) {
+    ((value2 ^= list3['charCodeAt'](value3)), (value2 = Math['imul'](value2, 0x1000193)));
   }
-  return 'svg-' + (_0x3e7249 >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
+  return 'svg-' + (value2 >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
 }
-function buildInlineSvgBlob(_0x41f412) {
-  const _0x38c61f = normalizeText(_0x41f412),
-    _0x187cd1 = _0x38c61f['indexOf'](','),
-    _0x115047 = _0x187cd1 >= 0x0 ? _0x38c61f['slice'](0x0, _0x187cd1) : '',
-    _0x4e9b43 = _0x187cd1 >= 0x0 ? _0x38c61f['slice'](_0x187cd1 + 0x1) : '';
-  if (!/^data:image\/svg\+xml(?:;|$)/i['test'](_0x115047) || !_0x4e9b43)
+function buildInlineSvgBlob(value4) {
+  const list4 = normalizeText(value4),
+    count = list4['indexOf'](','),
+    value5 = count >= 0x0 ? list4['slice'](0x0, count) : '',
+    enabled = count >= 0x0 ? list4['slice'](count + 0x1) : '';
+  if (!/^data:image\/svg\+xml(?:;|$)/i['test'](value5) || !enabled)
     throw new Error('人物定位图不是有效的 SVG 数据');
-  const _0x4f028f = globalThis['Blob'];
-  if (typeof _0x4f028f !== 'function') throw new Error('当前环境无法保存人物定位图');
-  if (/;base64(?:;|$)/i['test'](_0x115047)) {
-    const _0x50ae33 = globalThis['atob'];
-    if (typeof _0x50ae33 !== 'function') throw new Error('当前环境无法解码人物定位图');
-    const _0x4fa579 = _0x50ae33(_0x4e9b43),
-      _0x5019f4 = new Uint8Array(_0x4fa579['length']);
-    for (let _0x121b67 = 0x0; _0x121b67 < _0x4fa579['length']; _0x121b67 += 0x1) {
-      _0x5019f4[_0x121b67] = _0x4fa579['charCodeAt'](_0x121b67);
+  const run = globalThis['Blob'];
+  if (typeof run !== 'function') throw new Error('当前环境无法保存人物定位图');
+  if (/;base64(?:;|$)/i['test'](value5)) {
+    const run2 = globalThis['atob'];
+    if (typeof run2 !== 'function') throw new Error('当前环境无法解码人物定位图');
+    const list5 = run2(enabled),
+      uint8Array = new Uint8Array(list5['length']);
+    for (let value6 = 0x0; value6 < list5['length']; value6 += 0x1) {
+      uint8Array[value6] = list5['charCodeAt'](value6);
     }
-    return new _0x4f028f([_0x5019f4], { type: 'image/svg+xml' });
+    return new run([uint8Array], { type: 'image/svg+xml' });
   }
   try {
-    return new _0x4f028f([decodeURIComponent(_0x4e9b43)], { type: 'image/svg+xml' });
+    return new run([decodeURIComponent(enabled)], { type: 'image/svg+xml' });
   } catch {
     throw new Error('人物定位图 SVG 数据无法解码');
   }
 }
-function normalizeSavedLocationGuideRef(_0x1ce1f3 = {}) {
+function normalizeSavedLocationGuideRef(response = {}) {
   return normalizeLocalPath(
-    _0x1ce1f3?.['originalLocalPath'] ||
-      _0x1ce1f3?.['localPath'] ||
-      _0x1ce1f3?.['path'] ||
-      _0x1ce1f3?.['url'] ||
+    response?.['originalLocalPath'] ||
+      response?.['localPath'] ||
+      response?.['path'] ||
+      response?.['url'] ||
       '',
   );
 }
-function applyPersistedLocationGuide(_0x937f7a, _0xf92c1e, _0x457e19, _0x37ecdc, _0x555ead) {
-  const _0x187e73 = asObject(_0x937f7a?.['data']),
-    _0x414820 = { ...asObject(_0x187e73['personReplacementBinding']), locationGuideSignature: _0x37ecdc };
-  _0x937f7a['data'] = {
-    ..._0x187e73,
+function applyPersistedLocationGuide(value7, project2, imageRef2, locationGuideSignature, args) {
+  const name2 = asObject(value7?.['data']),
+    binding2 = {
+      ...asObject(name2['personReplacementBinding']),
+      locationGuideSignature: locationGuideSignature,
+    };
+  value7['data'] = {
+    ...name2,
     ...buildPersonReplacementImageCanvasNodeData({
-      project: _0xf92c1e,
-      imageRef: _0x457e19,
-      results: [{ ..._0x555ead, localPath: _0x457e19 }],
-      name: _0x187e73['name'],
-      type: _0x187e73['type'] || _0x937f7a['type'],
-      prompt: _0x187e73['prompt'],
-      binding: _0x414820,
+      project: project2,
+      imageRef: imageRef2,
+      results: [{ ...args, localPath: imageRef2 }],
+      name: name2['name'],
+      type: name2['type'] || value7['type'],
+      prompt: name2['prompt'],
+      binding: binding2,
     }),
-    imageWidth: _0x187e73['imageWidth'],
-    imageHeight: _0x187e73['imageHeight'],
+    imageWidth: name2['imageWidth'],
+    imageHeight: name2['imageHeight'],
   };
 }
 async function materializePersonReplacementLocationGuides({
   plan: plan = [],
   project: project = {},
-  adapter: _0x34947a,
+  adapter: adapter,
   canReuseCanvas: canReuseCanvas = ![],
   previousNodes: previousNodes = {},
   canvasId: canvasId = '',
   saveOutputBlob: saveOutputBlob = null,
-  createLocationGuide: _0x35cfe5,
+  createLocationGuide: createLocationGuide,
 } = {}) {
-  for (const _0x23aa0d of normalizeList(plan)) {
-    const _0x12860f = asObject(_0x23aa0d?.['data']?.['personReplacementBinding']);
-    if (_0x12860f['locationGuide'] || _0x12860f['annotatedSource']) {
+  for (const entry2 of normalizeList(plan)) {
+    const asObject2 = asObject(entry2?.['data']?.['personReplacementBinding']);
+    if (asObject2['locationGuide'] || asObject2['annotatedSource']) {
       await materializePersonReplacementGuide({
-        entry: _0x23aa0d,
+        entry: entry2,
         project: project,
-        adapter: _0x34947a,
+        adapter: adapter,
         canReuseCanvas: canReuseCanvas,
         previousNodes: previousNodes,
         canvasId: canvasId,
         saveOutputBlob: saveOutputBlob,
         buildNodeData: buildPersonReplacementImageCanvasNodeData,
-        createLocationGuide: _0x35cfe5,
+        createLocationGuide: createLocationGuide,
       });
       continue;
     }
-    if (_0x12860f['kind'] !== 'person-location-guide') continue;
-    const _0x2aaafb = normalizeText(
-      _0x23aa0d?.['data']?.['imageUrl'] || _0x23aa0d?.['data']?.['images']?.[0x0]?.['imageUrl'],
+    if (asObject2['kind'] !== 'person-location-guide') continue;
+    const text4 = normalizeText(
+      entry2?.['data']?.['imageUrl'] || entry2?.['data']?.['images']?.[0x0]?.['imageUrl'],
     );
-    if (!/^data:image\/svg\+xml(?:;|,)/i['test'](_0x2aaafb)) continue;
-    const _0x563848 = buildInlineSvgSignature(_0x2aaafb);
-    let _0x4725cd = '',
-      _0x9d4815 = {};
-    const _0x2bde54 = normalizeText(previousNodes[_0x23aa0d['key']]);
+    if (!/^data:image\/svg\+xml(?:;|,)/i['test'](text4)) continue;
+    const inlineSvgSignature = buildInlineSvgSignature(text4);
+    let localPath2 = '',
+      value8 = {};
+    const text5 = normalizeText(previousNodes[entry2['key']]);
     if (
       canReuseCanvas &&
-      _0x2bde54 &&
-      typeof _0x34947a?.['getNode'] === 'function' &&
-      (await _0x34947a['nodeExists'](_0x2bde54, canvasId))
+      text5 &&
+      typeof adapter?.['getNode'] === 'function' &&
+      (await adapter['nodeExists'](text5, canvasId))
     ) {
-      const _0x409e4a = await _0x34947a['getNode'](_0x2bde54, canvasId);
-      ((_0x9d4815 = _0x409e4a?.['images']?.[0x0] || _0x409e4a || {}),
-        normalizeText(_0x409e4a?.['personReplacementBinding']?.['locationGuideSignature']) === _0x563848 &&
-          (_0x4725cd = normalizeLocalPath(
-            _0x409e4a?.['originalLocalPath'] ||
-              _0x409e4a?.['localPath'] ||
-              _0x409e4a?.['displayLocalPath'] ||
-              _0x409e4a?.['images']?.[0x0]?.['originalLocalPath'] ||
-              _0x409e4a?.['images']?.[0x0]?.['localPath'] ||
+      const value9 = await adapter['getNode'](text5, canvasId);
+      ((value8 = value9?.['images']?.[0x0] || value9 || {}),
+        normalizeText(value9?.['personReplacementBinding']?.['locationGuideSignature']) ===
+          inlineSvgSignature &&
+          (localPath2 = normalizeLocalPath(
+            value9?.['originalLocalPath'] ||
+              value9?.['localPath'] ||
+              value9?.['displayLocalPath'] ||
+              value9?.['images']?.[0x0]?.['originalLocalPath'] ||
+              value9?.['images']?.[0x0]?.['localPath'] ||
               '',
           )));
     }
-    if (!_0x4725cd) {
+    if (!localPath2) {
       if (typeof saveOutputBlob !== 'function') throw new Error('人物定位图本地保存服务不可用');
-      const _0x8a7fd4 = await saveOutputBlob(buildInlineSvgBlob(_0x2aaafb), {
+      const saveOutputBlob2 = await saveOutputBlob(buildInlineSvgBlob(text4), {
         ext: 'svg',
         subDir: PERSON_REPLACEMENT_LOCATION_GUIDE_SUBDIR,
         kind: 'image',
       });
-      ((_0x4725cd = normalizeSavedLocationGuideRef(_0x8a7fd4)), (_0x9d4815 = _0x8a7fd4));
-      if (!_0x4725cd) throw new Error('人物定位图保存后未返回本地路径');
+      ((localPath2 = normalizeSavedLocationGuideRef(saveOutputBlob2)), (value8 = saveOutputBlob2));
+      if (!localPath2) throw new Error('人物定位图保存后未返回本地路径');
     }
-    applyPersistedLocationGuide(_0x23aa0d, project, _0x4725cd, _0x563848, _0x9d4815);
+    applyPersistedLocationGuide(entry2, project, localPath2, inlineSvgSignature, value8);
   }
 }
 function buildPersonReplacementVideoCanvasNodeData({
@@ -289,33 +288,33 @@ function buildPersonReplacementVideoCanvasNodeData({
   generationParams: generationParams = {},
   allowEmpty: allowEmpty = ![],
 } = {}) {
-  const _0x58033f = buildMediaLocation(videoRef),
-    { items: _0x5c84bb, activeIndex: _0x39fbc0 } = resolveGenerationResultSelection(
+  const localPath3 = buildMediaLocation(videoRef),
+    { items: items, activeIndex: activeIndex2 } = resolveGenerationResultSelection(
       normalizeVideoGenerationResult({
         videos: results['length']
           ? results
-          : _0x58033f['url']
-            ? [{ localPath: _0x58033f['localPath'], videoUrl: _0x58033f['url'] }]
+          : localPath3['url']
+            ? [{ localPath: localPath3['localPath'], videoUrl: localPath3['url'] }]
             : [],
       })['items'],
       activeIndex,
     ),
-    _0x3d74bf = _0x5c84bb[_0x39fbc0];
-  if (!_0x3d74bf?.['videoUrl'] && !allowEmpty)
+    enabled2 = items[activeIndex2];
+  if (!enabled2?.['videoUrl'] && !allowEmpty)
     throw new Error((normalizeText(name) || '视频') + '缺少可加入画布的媒体地址');
   return {
     type: type,
     name: normalizeText(name) || '人物替换视频',
     prompt: normalizeText(prompt),
-    videos: _0x5c84bb,
-    mainVideoIndex: _0x39fbc0,
+    videos: items,
+    mainVideoIndex: activeIndex2,
     isVideosExpanded: ![],
-    videoUrl: normalizeText(_0x3d74bf?.['videoUrl']),
-    localPath: normalizeText(_0x3d74bf?.['localPath']),
-    displayLocalPath: normalizeText(_0x3d74bf?.['displayLocalPath']),
-    posterLocalPath: normalizeText(_0x3d74bf?.['posterLocalPath']),
-    thumbId: normalizeText(_0x3d74bf?.['thumbId']),
-    thumbUrl: normalizeText(_0x3d74bf?.['thumbUrl']),
+    videoUrl: normalizeText(enabled2?.['videoUrl']),
+    localPath: normalizeText(enabled2?.['localPath']),
+    displayLocalPath: normalizeText(enabled2?.['displayLocalPath']),
+    posterLocalPath: normalizeText(enabled2?.['posterLocalPath']),
+    thumbId: normalizeText(enabled2?.['thumbId']),
+    thumbUrl: normalizeText(enabled2?.['thumbUrl']),
     ...(normalizeText(model) ? { model: normalizeText(model) } : {}),
     ...(normalizeText(provider) ? { provider: normalizeText(provider) } : {}),
     ...(normalizeText(providerProfileId) ? { providerProfileId: normalizeText(providerProfileId) } : {}),
@@ -345,44 +344,44 @@ function buildPersonReplacementImageCanvasNodeData({
   allowEmpty: allowEmpty = ![],
   allowInlineSvg: allowInlineSvg = ![],
 } = {}) {
-  const _0x1e1020 = buildMediaLocation(imageRef),
-    _0x7165ac = normalizeInlineLocationGuideRef(imageRef, allowInlineSvg),
-    _0x42e25d = _0x1e1020['url']
+  const localPath4 = buildMediaLocation(imageRef),
+    imageUrl = normalizeInlineLocationGuideRef(imageRef, allowInlineSvg),
+    value10 = localPath4['url']
       ? normalizeImageGenerationResult({
           images: [
-            { localPath: _0x1e1020['localPath'], imageUrl: _0x1e1020['url'], sourceUrl: _0x1e1020['url'] },
+            { localPath: localPath4['localPath'], imageUrl: localPath4['url'], sourceUrl: localPath4['url'] },
           ],
         })['items'][0x0]
-      : _0x7165ac
-        ? { imageUrl: _0x7165ac, sourceUrl: _0x7165ac, localPath: '' }
+      : imageUrl
+        ? { imageUrl: imageUrl, sourceUrl: imageUrl, localPath: '' }
         : null,
-    { items: _0x44e964, activeIndex: _0x27bab3 } = resolveGenerationResultSelection(
+    { items: items2, activeIndex: activeIndex3 } = resolveGenerationResultSelection(
       results['length']
         ? normalizeImageGenerationResult({ images: results })['items']
-        : _0x42e25d
-          ? [_0x42e25d]
+        : value10
+          ? [value10]
           : [],
       activeIndex,
     ),
-    _0x4e76f7 = _0x44e964[_0x27bab3];
-  if (!_0x4e76f7?.['imageUrl'] && !allowEmpty)
+    enabled3 = items2[activeIndex3];
+  if (!enabled3?.['imageUrl'] && !allowEmpty)
     throw new Error((normalizeText(name) || '图片') + '缺少可加入画布的媒体地址');
   return {
     type: type,
     name: normalizeText(name) || '人物替换图片',
     prompt: normalizeText(prompt),
-    images: _0x44e964,
-    mainImageIndex: _0x27bab3,
+    images: items2,
+    mainImageIndex: activeIndex3,
     isImagesExpanded: ![],
-    imageUrl: normalizeText(_0x4e76f7?.['imageUrl']),
-    sourceUrl: normalizeText(_0x4e76f7?.['sourceUrl']),
-    thumbUrl: normalizeText(_0x4e76f7?.['thumbUrl']),
-    localPath: normalizeText(_0x4e76f7?.['localPath']),
-    originalLocalPath: normalizeText(_0x4e76f7?.['originalLocalPath']),
-    displayLocalPath: normalizeText(_0x4e76f7?.['displayLocalPath']),
-    thumbLocalPath: normalizeText(_0x4e76f7?.['thumbLocalPath']),
-    sourceId: normalizeText(_0x4e76f7?.['sourceId']),
-    thumbId: normalizeText(_0x4e76f7?.['thumbId']),
+    imageUrl: normalizeText(enabled3?.['imageUrl']),
+    sourceUrl: normalizeText(enabled3?.['sourceUrl']),
+    thumbUrl: normalizeText(enabled3?.['thumbUrl']),
+    localPath: normalizeText(enabled3?.['localPath']),
+    originalLocalPath: normalizeText(enabled3?.['originalLocalPath']),
+    displayLocalPath: normalizeText(enabled3?.['displayLocalPath']),
+    thumbLocalPath: normalizeText(enabled3?.['thumbLocalPath']),
+    sourceId: normalizeText(enabled3?.['sourceId']),
+    thumbId: normalizeText(enabled3?.['thumbId']),
     ...(normalizeText(model) ? { model: normalizeText(model) } : {}),
     ...(normalizeText(provider) ? { provider: normalizeText(provider) } : {}),
     ...(normalizeText(providerProfileId) ? { providerProfileId: normalizeText(providerProfileId) } : {}),
@@ -395,157 +394,160 @@ function buildPersonReplacementImageCanvasNodeData({
     personReplacementBinding: buildBinding(project, binding),
   };
 }
-function resolveShotImageCanvasGeometry(_0x6066eb = {}) {
-  const _0x3b9d20 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-image'],
-    _0x3f1827 = Math['max'](0x0, Number(_0x6066eb?.['frame']?.['width']) || 0x0),
-    _0x3502ec = Math['max'](0x0, Number(_0x6066eb?.['frame']?.['height']) || 0x0);
-  if (!(_0x3f1827 > 0x0 && _0x3502ec > 0x0))
-    return { width: _0x3b9d20['width'], height: _0x3b9d20['height'], imageWidth: 0x0, imageHeight: 0x0 };
+function resolveShotImageCanvasGeometry(options3 = {}) {
+  const width3 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-image'],
+    imageWidth = Math['max'](0x0, Number(options3?.['frame']?.['width']) || 0x0),
+    imageHeight = Math['max'](0x0, Number(options3?.['frame']?.['height']) || 0x0);
+  if (!(imageWidth > 0x0 && imageHeight > 0x0))
+    return { width: width3['width'], height: width3['height'], imageWidth: 0x0, imageHeight: 0x0 };
   return {
-    ...getAutoMediaSizeByShortSide(_0x3f1827, _0x3502ec),
-    imageWidth: _0x3f1827,
-    imageHeight: _0x3502ec,
+    ...getAutoMediaSizeByShortSide(imageWidth, imageHeight),
+    imageWidth: imageWidth,
+    imageHeight: imageHeight,
   };
 }
-function applyImageCanvasGeometry(_0x16e393, _0x29630f, { source: source = ![] } = {}) {
-  const _0x200097 = Math['max'](0x0, Number(_0x29630f?.['imageWidth']) || 0x0),
-    _0x2063be = Math['max'](0x0, Number(_0x29630f?.['imageHeight']) || 0x0);
+function applyImageCanvasGeometry(args2, box3, { source: source = ![] } = {}) {
+  const imageWidth2 = Math['max'](0x0, Number(box3?.['imageWidth']) || 0x0),
+    imageHeight2 = Math['max'](0x0, Number(box3?.['imageHeight']) || 0x0);
   return {
-    ..._0x16e393,
-    width: Math['max'](0x1, Number(_0x29630f?.['width']) || 0x1),
-    height: Math['max'](0x1, Number(_0x29630f?.['height']) || 0x1),
-    ...(_0x200097 > 0x0 && _0x2063be > 0x0 ? { imageWidth: _0x200097, imageHeight: _0x2063be } : {}),
+    ...args2,
+    width: Math['max'](0x1, Number(box3?.['width']) || 0x1),
+    height: Math['max'](0x1, Number(box3?.['height']) || 0x1),
+    ...(imageWidth2 > 0x0 && imageHeight2 > 0x0
+      ? { imageWidth: imageWidth2, imageHeight: imageHeight2 }
+      : {}),
     ...(source ? { needsAutoResize: ![] } : {}),
   };
 }
-function resolveShotVideoCanvasGeometry(_0x4e176c = {}) {
-  const _0x5bf7f3 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-video'],
-    _0x1785f0 = Math['max'](0x0, Number(_0x4e176c?.['frame']?.['width']) || 0x0),
-    _0x524019 = Math['max'](0x0, Number(_0x4e176c?.['frame']?.['height']) || 0x0);
-  if (!(_0x1785f0 > 0x0 && _0x524019 > 0x0))
-    return { width: _0x5bf7f3['width'], height: _0x5bf7f3['height'], videoWidth: 0x0, videoHeight: 0x0 };
+function resolveShotVideoCanvasGeometry(options4 = {}) {
+  const width4 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-video'],
+    videoWidth = Math['max'](0x0, Number(options4?.['frame']?.['width']) || 0x0),
+    videoHeight = Math['max'](0x0, Number(options4?.['frame']?.['height']) || 0x0);
+  if (!(videoWidth > 0x0 && videoHeight > 0x0))
+    return { width: width4['width'], height: width4['height'], videoWidth: 0x0, videoHeight: 0x0 };
   return {
-    ...getAutoMediaSizeByShortSide(_0x1785f0, _0x524019),
-    videoWidth: _0x1785f0,
-    videoHeight: _0x524019,
+    ...getAutoMediaSizeByShortSide(videoWidth, videoHeight),
+    videoWidth: videoWidth,
+    videoHeight: videoHeight,
   };
 }
-function applyVideoCanvasGeometry(_0x27d260, _0xc579d5) {
-  const _0x3a0992 = Math['max'](0x0, Number(_0xc579d5?.['videoWidth']) || 0x0),
-    _0x54232c = Math['max'](0x0, Number(_0xc579d5?.['videoHeight']) || 0x0),
-    _0x5af5f0 = Math['max'](0x1, Number(_0xc579d5?.['width']) || 0x1),
-    _0x5437d8 = Math['max'](0x1, Number(_0xc579d5?.['height']) || 0x1),
-    _0x12c9e8 = _0x3a0992 > 0x0 && _0x54232c > 0x0;
+function applyVideoCanvasGeometry(args3, box4) {
+  const naturalWidth = Math['max'](0x0, Number(box4?.['videoWidth']) || 0x0),
+    naturalHeight = Math['max'](0x0, Number(box4?.['videoHeight']) || 0x0),
+    width5 = Math['max'](0x1, Number(box4?.['width']) || 0x1),
+    height3 = Math['max'](0x1, Number(box4?.['height']) || 0x1),
+    value11 = naturalWidth > 0x0 && naturalHeight > 0x0;
   return {
-    ..._0x27d260,
-    width: _0x5af5f0,
-    height: _0x5437d8,
-    ...(_0x12c9e8
+    ...args3,
+    width: width5,
+    height: height3,
+    ...(value11
       ? {
-          naturalWidth: _0x3a0992,
-          naturalHeight: _0x54232c,
-          videoWidth: _0x3a0992,
-          videoHeight: _0x54232c,
-          selectedVideoWidth: _0x3a0992,
-          selectedVideoHeight: _0x54232c,
+          naturalWidth: naturalWidth,
+          naturalHeight: naturalHeight,
+          videoWidth: naturalWidth,
+          videoHeight: naturalHeight,
+          selectedVideoWidth: naturalWidth,
+          selectedVideoHeight: naturalHeight,
           needsAutoResize: ![],
-          videos: normalizeList(_0x27d260?.['videos'])['map']((_0x4f421c) => ({
-            ..._0x4f421c,
-            videoWidth: _0x3a0992,
-            videoHeight: _0x54232c,
+          videos: normalizeList(args3?.['videos'])['map']((args4) => ({
+            ...args4,
+            videoWidth: naturalWidth,
+            videoHeight: naturalHeight,
           })),
         }
       : {}),
   };
 }
-function resolveAppearanceImageCanvasGeometry(_0x4f8b77 = {}) {
-  const _0x16029b = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-image'],
-    _0x38ee09 = Math['max'](
+function resolveAppearanceImageCanvasGeometry(box5 = {}) {
+  const width6 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-image'],
+    imageWidth3 = Math['max'](
       0x0,
-      Number(
-        _0x4f8b77?.['imageWidth'] ||
-          _0x4f8b77?.['naturalWidth'] ||
-          _0x4f8b77?.['originalWidth'] ||
-          _0x4f8b77?.['width'],
-      ) || 0x0,
+      Number(box5?.['imageWidth'] || box5?.['naturalWidth'] || box5?.['originalWidth'] || box5?.['width']) ||
+        0x0,
     ),
-    _0x416507 = Math['max'](
+    imageHeight3 = Math['max'](
       0x0,
       Number(
-        _0x4f8b77?.['imageHeight'] ||
-          _0x4f8b77?.['naturalHeight'] ||
-          _0x4f8b77?.['originalHeight'] ||
-          _0x4f8b77?.['height'],
+        box5?.['imageHeight'] || box5?.['naturalHeight'] || box5?.['originalHeight'] || box5?.['height'],
       ) || 0x0,
     );
-  if (!(_0x38ee09 > 0x0 && _0x416507 > 0x0))
-    return { width: _0x16029b['width'], height: _0x16029b['height'], imageWidth: 0x0, imageHeight: 0x0 };
+  if (!(imageWidth3 > 0x0 && imageHeight3 > 0x0))
+    return { width: width6['width'], height: width6['height'], imageWidth: 0x0, imageHeight: 0x0 };
   return {
-    ...getAutoMediaSizeByShortSide(_0x38ee09, _0x416507),
-    imageWidth: _0x38ee09,
-    imageHeight: _0x416507,
+    ...getAutoMediaSizeByShortSide(imageWidth3, imageHeight3),
+    imageWidth: imageWidth3,
+    imageHeight: imageHeight3,
   };
 }
-async function resolveProjectAppearanceImageSizes(_0x103673 = {}) {
-  const _0x38d53b = await Promise['all'](
-    normalizeList(_0x103673['characters'])['map'](async (_0x160936) => {
-      const _0x2e55e7 = await Promise['all'](
-        normalizeList(_0x160936?.['appearances'])['map'](async (_0x564b48) => {
-          const _0x874a7 = resolveAppearanceImageCanvasGeometry(_0x564b48);
-          if (_0x874a7['imageWidth'] > 0x0 && _0x874a7['imageHeight'] > 0x0) return _0x564b48;
-          const _0x1a141d = normalizeText(
-            _0x564b48?.['imageUrl'] || _0x564b48?.['imageRef'] || _0x564b48?.['url'],
+async function resolveProjectAppearanceImageSizes(args5 = {}) {
+  const characters = await Promise['all'](
+    normalizeList(args5['characters'])['map'](async (args6) => {
+      const appearances = await Promise['all'](
+        normalizeList(args6?.['appearances'])['map'](async (response2) => {
+          const appearanceImageCanvasGeometry = resolveAppearanceImageCanvasGeometry(response2);
+          if (
+            appearanceImageCanvasGeometry['imageWidth'] > 0x0 &&
+            appearanceImageCanvasGeometry['imageHeight'] > 0x0
+          )
+            return response2;
+          const text6 = normalizeText(
+            response2?.['imageUrl'] || response2?.['imageRef'] || response2?.['url'],
           );
-          if (!_0x1a141d) return _0x564b48;
-          const _0x207033 = buildMediaLocation(_0x1a141d),
-            _0x45f6d1 = await resolveOutputMediaSize({
-              localPath: _0x207033['localPath'],
-              imageUrl: _0x207033['url'],
+          if (!text6) return response2;
+          const localPath5 = buildMediaLocation(text6),
+            imageWidth4 = await resolveOutputMediaSize({
+              localPath: localPath5['localPath'],
+              imageUrl: localPath5['url'],
             });
-          return _0x45f6d1
-            ? { ..._0x564b48, imageWidth: _0x45f6d1['width'], imageHeight: _0x45f6d1['height'] }
-            : _0x564b48;
+          return imageWidth4
+            ? { ...response2, imageWidth: imageWidth4['width'], imageHeight: imageWidth4['height'] }
+            : response2;
         }),
       );
-      return { ..._0x160936, appearances: _0x2e55e7 };
+      return { ...args6, appearances: appearances };
     }),
   );
-  return { ..._0x103673, characters: _0x38d53b };
+  return { ...args5, characters: characters };
 }
-async function resolveProjectShotImageSizes(_0x12a268 = {}) {
-  const _0x2a0972 = await Promise['all'](
-    normalizeList(_0x12a268['shots'])['map'](async (_0x38fbbb) => {
-      const _0xd81e69 = resolveShotImageCanvasGeometry(_0x38fbbb);
-      if (_0xd81e69['imageWidth'] > 0x0 && _0xd81e69['imageHeight'] > 0x0) return _0x38fbbb;
-      const _0x402538 = [
+async function resolveProjectShotImageSizes(args7 = {}) {
+  const shots = await Promise['all'](
+    normalizeList(args7['shots'])['map'](async (args8) => {
+      const shotImageCanvasGeometry = resolveShotImageCanvasGeometry(args8);
+      if (shotImageCanvasGeometry['imageWidth'] > 0x0 && shotImageCanvasGeometry['imageHeight'] > 0x0)
+        return args8;
+      const list6 = [
         ...new Set(
-          [normalizeText(_0x38fbbb?.['keyframeRef']), normalizeText(_0x38fbbb?.['replacementImageRef'])][
-            'filter'
-          ](Boolean),
+          [normalizeText(args8?.['keyframeRef']), normalizeText(args8?.['replacementImageRef'])]['filter'](
+            Boolean,
+          ),
         ),
       ];
-      if (!_0x402538['length']) return _0x38fbbb;
-      const _0x2420b0 = (
+      if (!list6['length']) return args8;
+      const width7 = (
         await Promise['all'](
-          _0x402538['map'](async (_0x2a79ab) => {
-            const _0x1ad49d = buildMediaLocation(_0x2a79ab);
-            return resolveOutputMediaSize({ localPath: _0x1ad49d['localPath'], imageUrl: _0x1ad49d['url'] });
+          list6['map'](async (value12) => {
+            const localPath6 = buildMediaLocation(value12);
+            return resolveOutputMediaSize({
+              localPath: localPath6['localPath'],
+              imageUrl: localPath6['url'],
+            });
           }),
         )
       )['find'](Boolean);
-      return _0x2420b0
+      return width7
         ? {
-            ..._0x38fbbb,
+            ...args8,
             frame: {
-              ...asObject(_0x38fbbb?.['frame']),
-              width: _0x2420b0['width'],
-              height: _0x2420b0['height'],
+              ...asObject(args8?.['frame']),
+              width: width7['width'],
+              height: width7['height'],
             },
           }
-        : _0x38fbbb;
+        : args8;
     }),
   );
-  return { ..._0x12a268, shots: _0x2a0972 };
+  return { ...args7, shots: shots };
 }
 function buildPersonReplacementSourceAudioNodeData({
   project: project = {},
@@ -553,14 +555,14 @@ function buildPersonReplacementSourceAudioNodeData({
   name: name = '',
   binding: binding = {},
 } = {}) {
-  const _0x2b8863 = buildMediaLocation(audioRef);
-  if (!_0x2b8863['url']) throw new Error((normalizeText(name) || '音频') + '缺少可加入画布的媒体地址');
+  const audioUrl = buildMediaLocation(audioRef);
+  if (!audioUrl['url']) throw new Error((normalizeText(name) || '音频') + '缺少可加入画布的媒体地址');
   return {
     type: 'source-audio',
     name: normalizeText(name) || '原音频片段',
     fileName: normalizeText(name) || '原音频片段',
-    audioUrl: _0x2b8863['url'],
-    localPath: _0x2b8863['localPath'],
+    audioUrl: audioUrl['url'],
+    localPath: audioUrl['localPath'],
     personReplacementBinding: buildBinding(project, binding),
   };
 }
@@ -573,20 +575,20 @@ function buildPersonReplacementAudioCanvasNodeData({
   binding: binding = {},
   allowEmpty: allowEmpty = ![],
 } = {}) {
-  const _0x145e8d = buildMediaLocation(audioRef);
-  if (!_0x145e8d['url'] && !allowEmpty)
+  const audioUrl2 = buildMediaLocation(audioRef);
+  if (!audioUrl2['url'] && !allowEmpty)
     throw new Error((normalizeText(name) || '音频') + '缺少可加入画布的媒体地址');
-  const _0x57f033 = _0x145e8d['url']
-    ? [{ audioUrl: _0x145e8d['url'], src: _0x145e8d['url'], localPath: _0x145e8d['localPath'] }]
+  const audios = audioUrl2['url']
+    ? [{ audioUrl: audioUrl2['url'], src: audioUrl2['url'], localPath: audioUrl2['localPath'] }]
     : [];
   return {
     type: 'ai-audio',
     name: normalizeText(name) || '替换音频',
     prompt: normalizeText(prompt),
-    audios: _0x57f033,
+    audios: audios,
     mainAudioIndex: 0x0,
-    audioUrl: _0x145e8d['url'],
-    localPath: _0x145e8d['localPath'],
+    audioUrl: audioUrl2['url'],
+    localPath: audioUrl2['localPath'],
     ...(normalizeText(model) ? { model: normalizeText(model), audioWorkflowKey: normalizeText(model) } : {}),
     personReplacementBinding: buildBinding(project, binding),
   };
@@ -598,7 +600,7 @@ function buildStageAnnotationNodeData({
   content: content = '',
   isProjectAnchor: isProjectAnchor = ![],
 } = {}) {
-  const _0x48dde7 = PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'];
+  const canvasScope2 = PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'];
   return {
     type: 'comment-note',
     name: normalizeText(title),
@@ -607,604 +609,602 @@ function buildStageAnnotationNodeData({
     personReplacementBinding: buildBinding(project, {
       kind: isProjectAnchor ? 'project-overview' : 'stage-annotation',
       stage: normalizeText(stage),
-      canvasScope: _0x48dde7,
+      canvasScope: canvasScope2,
     }),
   };
 }
-function getCharacterAppearanceRecords(_0x2c9ba5 = {}) {
-  const _0xf9459a = [];
+function getCharacterAppearanceRecords(options5 = {}) {
+  const list7 = [];
   return (
-    normalizeList(_0x2c9ba5['characters'])['forEach']((_0x29d7c6, _0x22d42f) => {
-      const _0x4306b4 = normalizeText(_0x29d7c6?.['id']) || 'character-' + (_0x22d42f + 0x1),
-        _0x45fbaa = normalizeList(_0x29d7c6?.['appearances']),
-        _0x89911c = normalizeList(_0x29d7c6?.['imageRefs'])['map']((_0x16de3d, _0x12122f) => ({
-          id: 'image-' + (_0x12122f + 0x1),
-          name: _0x12122f === 0x0 ? '基础形象' : '形象 ' + (_0x12122f + 0x1),
-          imageUrl: _0x16de3d,
-          prompt: _0x29d7c6?.['description'],
+    normalizeList(options5['characters'])['forEach']((prompt2, value13) => {
+      const characterId = normalizeText(prompt2?.['id']) || 'character-' + (value13 + 0x1),
+        list8 = normalizeList(prompt2?.['appearances']),
+        list9 = normalizeList(prompt2?.['imageRefs'])['map']((imageUrl2, name3) => ({
+          id: 'image-' + (name3 + 0x1),
+          name: name3 === 0x0 ? '基础形象' : '形象 ' + (name3 + 0x1),
+          imageUrl: imageUrl2,
+          prompt: prompt2?.['description'],
         })),
-        _0x46cc64 = _0x45fbaa['length']
-          ? _0x45fbaa
-          : _0x89911c['length']
-            ? _0x89911c
-            : [{ id: 'base', name: '基础形象', imageUrl: '', prompt: _0x29d7c6?.['description'] }];
-      _0x46cc64['forEach']((_0x11687b, _0x205d4b) => {
-        const _0x5e318e = normalizeText(_0x11687b?.['id']) || 'appearance-' + (_0x205d4b + 0x1);
-        _0xf9459a['push']({
-          key: 'asset:' + _0x4306b4 + ':' + _0x5e318e,
-          characterId: _0x4306b4,
-          appearanceId: _0x5e318e,
-          characterName: normalizeText(_0x29d7c6?.['name']) || '目标人物' + (_0x22d42f + 0x1),
-          appearanceName: normalizeText(_0x11687b?.['name']),
-          imageRef: normalizeText(_0x11687b?.['imageUrl'] || _0x11687b?.['imageRef'] || _0x11687b?.['url']),
-          prompt: normalizeText(_0x11687b?.['prompt'] || _0x29d7c6?.['description']),
+        list10 = list8['length']
+          ? list8
+          : list9['length']
+            ? list9
+            : [{ id: 'base', name: '基础形象', imageUrl: '', prompt: prompt2?.['description'] }];
+      list10['forEach']((box6, value14) => {
+        const appearanceId = normalizeText(box6?.['id']) || 'appearance-' + (value14 + 0x1);
+        list7['push']({
+          key: 'asset:' + characterId + ':' + appearanceId,
+          characterId: characterId,
+          appearanceId: appearanceId,
+          characterName: normalizeText(prompt2?.['name']) || '目标人物' + (value13 + 0x1),
+          appearanceName: normalizeText(box6?.['name']),
+          imageRef: normalizeText(box6?.['imageUrl'] || box6?.['imageRef'] || box6?.['url']),
+          prompt: normalizeText(box6?.['prompt'] || prompt2?.['description']),
           imageWidth: Math['max'](
             0x0,
             Number(
-              _0x11687b?.['imageWidth'] ||
-                _0x11687b?.['naturalWidth'] ||
-                _0x11687b?.['originalWidth'] ||
-                _0x11687b?.['width'],
+              box6?.['imageWidth'] || box6?.['naturalWidth'] || box6?.['originalWidth'] || box6?.['width'],
             ) || 0x0,
           ),
           imageHeight: Math['max'](
             0x0,
             Number(
-              _0x11687b?.['imageHeight'] ||
-                _0x11687b?.['naturalHeight'] ||
-                _0x11687b?.['originalHeight'] ||
-                _0x11687b?.['height'],
+              box6?.['imageHeight'] ||
+                box6?.['naturalHeight'] ||
+                box6?.['originalHeight'] ||
+                box6?.['height'],
             ) || 0x0,
           ),
         });
       });
     }),
-    _0xf9459a
+    list7
   );
 }
-function appendAssetStage(_0x30e411, _0x55139f, _0x51167b, _0x58072a) {
-  const _0x2ca9e1 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'],
-    _0x277a80 = [];
-  for (let _0x567b11 = 0x0; _0x567b11 < _0x58072a['length']; _0x567b11 += ASSET_COLUMNS) {
-    const _0xb2944f = _0x58072a['slice'](_0x567b11, _0x567b11 + ASSET_COLUMNS),
-      _0x393a96 = _0xb2944f['map']((_0x436736) => ({
-        appearance: _0x436736,
-        geometry: resolveAppearanceImageCanvasGeometry(_0x436736),
+function appendAssetStage(list11, project3, y, list12) {
+  const box7 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'],
+    list13 = [];
+  for (let value15 = 0x0; value15 < list12['length']; value15 += ASSET_COLUMNS) {
+    const list14 = list12['slice'](value15, value15 + ASSET_COLUMNS),
+      items3 = list14['map']((appearance) => ({
+        appearance: appearance,
+        geometry: resolveAppearanceImageCanvasGeometry(appearance),
       }));
-    _0x277a80['push']({
-      items: _0x393a96,
-      width: _0x393a96['reduce'](
-        (_0x4a48ac, _0x5e6271, _0x16c276) =>
-          _0x4a48ac + _0x5e6271['geometry']['width'] + (_0x16c276 > 0x0 ? NODE_GAP : 0x0),
+    list13['push']({
+      items: items3,
+      width: items3['reduce'](
+        (value16, value17, count2) =>
+          value16 + value17['geometry']['width'] + (count2 > 0x0 ? NODE_GAP : 0x0),
         0x0,
       ),
-      height: Math['max'](..._0x393a96['map']((_0x5bc0ad) => _0x5bc0ad['geometry']['height'])),
+      height: Math['max'](...items3['map']((value18) => value18['geometry']['height'])),
     });
   }
-  _0x30e411['push'](
+  list11['push'](
     createPlanEntry(
       'stage:assets:annotation',
       buildStageAnnotationNodeData({
-        project: _0x55139f,
+        project: project3,
         stage: 'assets',
         title: '阶段 1 · 人物素材',
         content: '人物素材及形象参考图。',
         isProjectAnchor: !![],
       }),
-      { x: 0x0, y: _0x51167b },
+      { x: 0x0, y: y },
     ),
   );
-  const _0x1f91ce = _0x51167b + _0x2ca9e1['height'] + NODE_GAP;
-  let _0x7f92e9 = 0x0;
+  const y2 = y + box7['height'] + NODE_GAP;
+  let value19 = 0x0;
   return (
-    _0x277a80['forEach']((_0x3ba2e9) => {
-      let _0x5ac1bd = 0x0;
-      (_0x3ba2e9['items']['forEach'](({ appearance: _0x151568, geometry: _0xa29097 }) => {
-        (_0x30e411['push'](
+    list13['forEach']((box8) => {
+      let x = 0x0;
+      (box8['items']['forEach'](({ appearance: appearance2, geometry: geometry }) => {
+        (list11['push'](
           createPlanEntry(
-            _0x151568['key'],
+            appearance2['key'],
             applyImageCanvasGeometry(
               buildPersonReplacementImageCanvasNodeData({
-                project: _0x55139f,
-                imageRef: _0x151568['imageRef'],
-                name: [_0x151568['characterName'], _0x151568['appearanceName']]
+                project: project3,
+                imageRef: appearance2['imageRef'],
+                name: [appearance2['characterName'], appearance2['appearanceName']]
                   ['filter'](Boolean)
                   ['join']('\x20·\x20'),
-                prompt: _0x151568['prompt'],
-                model: _0x55139f['settings']?.['characterImageModelId'],
-                provider: _0x55139f['settings']?.['characterImageProvider'],
-                providerProfileId: _0x55139f['settings']?.['characterImageProviderProfileId'],
-                providerProfileIdByModel: _0x55139f['settings']?.['characterImageProviderProfileIdByModel'],
-                generationParams: _0x55139f['settings']?.['characterImageGenerationParams'],
+                prompt: appearance2['prompt'],
+                model: project3['settings']?.['characterImageModelId'],
+                provider: project3['settings']?.['characterImageProvider'],
+                providerProfileId: project3['settings']?.['characterImageProviderProfileId'],
+                providerProfileIdByModel: project3['settings']?.['characterImageProviderProfileIdByModel'],
+                generationParams: project3['settings']?.['characterImageGenerationParams'],
                 allowEmpty: !![],
                 binding: {
-                  characterId: _0x151568['characterId'],
-                  appearanceId: _0x151568['appearanceId'],
+                  characterId: appearance2['characterId'],
+                  appearanceId: appearance2['appearanceId'],
                   kind: 'character-image',
                   canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
                 },
               }),
-              _0xa29097,
+              geometry,
             ),
-            { x: _0x5ac1bd, y: _0x1f91ce + _0x7f92e9 },
-            { width: _0xa29097['width'], height: _0xa29097['height'] },
+            { x: x, y: y2 + value19 },
+            { width: geometry['width'], height: geometry['height'] },
           ),
         ),
-          (_0x5ac1bd += _0xa29097['width'] + NODE_GAP));
+          (x += geometry['width'] + NODE_GAP));
       }),
-        (_0x7f92e9 += _0x3ba2e9['height'] + NODE_GAP));
+        (value19 += box8['height'] + NODE_GAP));
     }),
-    _0x277a80['length'] ? _0x1f91ce + _0x7f92e9 - NODE_GAP : _0x51167b + _0x2ca9e1['height']
+    list13['length'] ? y2 + value19 - NODE_GAP : y + box7['height']
   );
 }
-function buildShotPromptPackage(_0x5298fe, _0x3fd167) {
-  const _0x2d8ae2 = buildPersonReplacementPromptPackage({ project: _0x5298fe, shot: _0x3fd167 });
+function buildShotPromptPackage(project4, shot) {
+  const promptPackage = buildPersonReplacementPromptPackage({ project: project4, shot: shot });
   if (
-    _0x2d8ae2['promptMode'] === PERSON_REPLACEMENT_PROMPT_MODE_TEST &&
+    promptPackage['promptMode'] === PERSON_REPLACEMENT_PROMPT_MODE_TEST &&
     !isPersonReplacementTestModeAvailable()
   )
     throw new Error('测试模式仅限开发者，请切回其他替换模式后加入画布。');
-  const _0x4fc5f7 = globalThis['document']?.['createElement']
-      ? _0x3fd167
-      : { ..._0x3fd167, imagePrompt: normalizePromptDisplayText(_0x3fd167?.['imagePrompt']) },
-    _0x52d7e5 = createPersonReplacementImagePromptRequestResolver()({
-      project: _0x5298fe,
-      shot: _0x4fc5f7,
-      promptPackage: _0x2d8ae2,
+  const shot2 = globalThis['document']?.['createElement']
+      ? shot
+      : { ...shot, imagePrompt: normalizePromptDisplayText(shot?.['imagePrompt']) },
+    prompt3 = createPersonReplacementImagePromptRequestResolver()({
+      project: project4,
+      shot: shot2,
+      promptPackage: promptPackage,
     });
   return {
-    ..._0x2d8ae2,
-    prompt: _0x52d7e5['requestPrompt'],
+    ...promptPackage,
+    prompt: prompt3['requestPrompt'],
     referenceImages: [
-      ..._0x2d8ae2['referenceImages'],
-      ..._0x52d7e5['promptAssetRefs']['map']((_0xc94f95, _0x45c034) => ({
-        ref: _0xc94f95['url'],
+      ...promptPackage['referenceImages'],
+      ...prompt3['promptAssetRefs']['map']((ref, value20) => ({
+        ref: ref['url'],
         role: 'prompt-reference',
-        slot: _0x2d8ae2['referenceImages']['length'] + _0x45c034 + 0x1,
+        slot: promptPackage['referenceImages']['length'] + value20 + 0x1,
       })),
     ],
   };
 }
-function resolveAssetKeyForReference(_0x20f5c9, _0x3a961b) {
-  const _0x11f432 = normalizeText(_0x20f5c9?.['targetCharacterId']),
-    _0x377ce2 = normalizeText(_0x20f5c9?.['targetAppearanceId']),
-    _0x537b9d = _0x3a961b['find'](
-      (_0x391cc6) =>
-        _0x391cc6['characterId'] === _0x11f432 && (!_0x377ce2 || _0x391cc6['appearanceId'] === _0x377ce2),
+function resolveAssetKeyForReference(value21, list15) {
+  const text7 = normalizeText(value21?.['targetCharacterId']),
+    text8 = normalizeText(value21?.['targetAppearanceId']),
+    event = list15['find'](
+      (value22) => value22['characterId'] === text7 && (!text8 || value22['appearanceId'] === text8),
     );
-  if (_0x537b9d) return _0x537b9d['key'];
-  const _0x3c0814 = normalizeText(_0x20f5c9?.['ref']);
-  return _0x3a961b['find']((_0x1a31b4) => _0x1a31b4['imageRef'] === _0x3c0814)?.['key'] || '';
+  if (event) return event['key'];
+  const text9 = normalizeText(value21?.['ref']);
+  return list15['find']((value23) => value23['imageRef'] === text9)?.['key'] || '';
 }
-function appendImageReplacementStage(_0x4a37cb, _0x744769, _0x576845, _0x56fbff) {
-  const _0x46306d = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'],
-    _0x49f83e = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['source-text'];
-  _0x4a37cb['push'](
+function appendImageReplacementStage(list16, project5, y3, value24) {
+  const box9 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'],
+    box10 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['source-text'];
+  list16['push'](
     createPlanEntry(
       'stage:image:annotation',
       buildStageAnnotationNodeData({
-        project: _0x744769,
+        project: project5,
         stage: 'image',
         title: '阶段 2 · 图像替换',
         content: '关键帧、人物素材和提示词共同连到替换结果图。',
       }),
-      { x: 0x0, y: _0x576845 },
+      { x: 0x0, y: y3 },
     ),
   );
-  let _0x4092ca = _0x576845 + _0x46306d['height'] + NODE_GAP;
+  let y4 = y3 + box9['height'] + NODE_GAP;
   return (
-    normalizeList(_0x744769['shots'])['forEach']((_0x1555ee, _0x420f6e) => {
-      const _0x1404e4 = normalizeText(_0x1555ee?.['id']) || 'shot-' + (_0x420f6e + 0x1),
-        _0x5cabce = formatSequence(_0x420f6e),
-        _0x50266c = buildShotPromptPackage(_0x744769, _0x1555ee),
-        _0x1385eb = [];
-      let _0x563035 = 0x0;
-      const _0x4cddb2 = resolveShotImageCanvasGeometry(_0x1555ee),
-        _0x3ca7f4 = normalizeText(_0x50266c['referenceImages'][0x0]?.['ref'] || _0x1555ee?.['keyframeRef']);
-      if (_0x3ca7f4) {
-        const _0x2ee4b7 = 'shot:' + _0x1404e4 + ':keyframe';
-        (_0x4a37cb['push'](
+    normalizeList(project5['shots'])['forEach']((imageRef3, value25) => {
+      const shotId = normalizeText(imageRef3?.['id']) || 'shot-' + (value25 + 0x1),
+        formatSequence2 = formatSequence(value25),
+        annotatedSource = buildShotPromptPackage(project5, imageRef3),
+        inputKeys2 = [];
+      let x2 = 0x0;
+      const width8 = resolveShotImageCanvasGeometry(imageRef3),
+        imageRef4 = normalizeText(
+          annotatedSource['referenceImages'][0x0]?.['ref'] || imageRef3?.['keyframeRef'],
+        );
+      if (imageRef4) {
+        const value26 = 'shot:' + shotId + ':keyframe';
+        (list16['push'](
           createPlanEntry(
-            _0x2ee4b7,
+            value26,
             applyImageCanvasGeometry(
               buildPersonReplacementImageCanvasNodeData({
-                project: _0x744769,
-                imageRef: _0x3ca7f4,
-                name: '镜头片段' + _0x5cabce + ' · 关键帧',
+                project: project5,
+                imageRef: imageRef4,
+                name: '镜头片段' + formatSequence2 + ' · 关键帧',
                 type: 'source-image',
                 binding: {
-                  shotId: _0x1404e4,
+                  shotId: shotId,
                   kind: 'source-keyframe',
-                  ...(_0x50266c['annotatedSource'] ? { annotatedSource: _0x50266c['annotatedSource'] } : {}),
+                  ...(annotatedSource['annotatedSource']
+                    ? { annotatedSource: annotatedSource['annotatedSource'] }
+                    : {}),
                   canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
                 },
               }),
-              _0x4cddb2,
+              width8,
               { source: !![] },
             ),
-            { x: _0x563035, y: _0x4092ca },
-            { width: _0x4cddb2['width'], height: _0x4cddb2['height'] },
+            { x: x2, y: y4 },
+            { width: width8['width'], height: width8['height'] },
           ),
         ),
-          _0x1385eb['push'](_0x2ee4b7),
-          (_0x563035 += _0x4cddb2['width'] + NODE_GAP));
+          inputKeys2['push'](value26),
+          (x2 += width8['width'] + NODE_GAP));
       }
-      for (const _0x3652bf of normalizeList(_0x50266c['referenceImages'])['filter'](
-        (_0x4c15a0) => _0x4c15a0['role'] !== 'source-keyframe',
+      for (const imageRef5 of normalizeList(annotatedSource['referenceImages'])['filter'](
+        (value27) => value27['role'] !== 'source-keyframe',
       )) {
-        const _0x2e63ef = resolveAssetKeyForReference(_0x3652bf, _0x56fbff);
-        if (_0x2e63ef) {
-          if (!_0x1385eb['includes'](_0x2e63ef)) _0x1385eb['push'](_0x2e63ef);
+        const assetKeyForReference = resolveAssetKeyForReference(imageRef5, value24);
+        if (assetKeyForReference) {
+          if (!inputKeys2['includes'](assetKeyForReference)) inputKeys2['push'](assetKeyForReference);
           continue;
         }
-        const _0x284127 = _0x3652bf['role'] === 'person-location-guide',
-          _0x1aabbd = _0x284127
-            ? 'shot:' + _0x1404e4 + ':location-guide'
-            : 'shot:' + _0x1404e4 + ':reference:' + _0x3652bf['slot'];
-        (_0x4a37cb['push'](
+        const allowInlineSvg2 = imageRef5['role'] === 'person-location-guide',
+          value28 = allowInlineSvg2
+            ? 'shot:' + shotId + ':location-guide'
+            : 'shot:' + shotId + ':reference:' + imageRef5['slot'];
+        (list16['push'](
           createPlanEntry(
-            _0x1aabbd,
+            value28,
             applyImageCanvasGeometry(
               buildPersonReplacementImageCanvasNodeData({
-                project: _0x744769,
-                imageRef: _0x3652bf['ref'],
-                name: '镜头片段' + _0x5cabce + ' · 图' + _0x3652bf['slot'],
+                project: project5,
+                imageRef: imageRef5['ref'],
+                name: '镜头片段' + formatSequence2 + ' · 图' + imageRef5['slot'],
                 type: 'source-image',
-                allowInlineSvg: _0x284127,
+                allowInlineSvg: allowInlineSvg2,
                 binding: {
-                  shotId: _0x1404e4,
-                  kind: _0x3652bf['role'],
-                  ...(_0x284127 ? { locationGuide: _0x50266c['locationGuide'] } : {}),
+                  shotId: shotId,
+                  kind: imageRef5['role'],
+                  ...(allowInlineSvg2 ? { locationGuide: annotatedSource['locationGuide'] } : {}),
                   canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
                 },
               }),
-              _0x4cddb2,
+              width8,
               { source: !![] },
             ),
-            { x: _0x563035, y: _0x4092ca },
-            { width: _0x4cddb2['width'], height: _0x4cddb2['height'] },
+            { x: x2, y: y4 },
+            { width: width8['width'], height: width8['height'] },
           ),
         ),
-          _0x1385eb['push'](_0x1aabbd),
-          (_0x563035 += _0x4cddb2['width'] + NODE_GAP));
+          inputKeys2['push'](value28),
+          (x2 += width8['width'] + NODE_GAP));
       }
-      const _0x396796 = _0x50266c['prompt'],
-        _0x3c9210 = 'shot:' + _0x1404e4 + ':prompt';
-      (_0x4a37cb['push'](
+      const content2 = annotatedSource['prompt'],
+        value29 = 'shot:' + shotId + ':prompt';
+      (list16['push'](
         createPlanEntry(
-          _0x3c9210,
+          value29,
           {
             type: 'source-text',
-            name: '镜头片段' + _0x5cabce + '\x20·\x20图像替换提示词',
-            content: _0x396796,
-            personReplacementBinding: buildBinding(_0x744769, {
-              shotId: _0x1404e4,
+            name: '镜头片段' + formatSequence2 + '\x20·\x20图像替换提示词',
+            content: content2,
+            personReplacementBinding: buildBinding(project5, {
+              shotId: shotId,
               kind: 'image-prompt',
               canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
             }),
           },
-          { x: _0x563035, y: _0x4092ca },
+          { x: x2, y: y4 },
         ),
       ),
-        _0x1385eb['push'](_0x3c9210),
-        (_0x563035 += _0x49f83e['width'] + NODE_GAP),
-        _0x4a37cb['push'](
+        inputKeys2['push'](value29),
+        (x2 += box10['width'] + NODE_GAP),
+        list16['push'](
           createPlanEntry(
-            'shot:' + _0x1404e4 + ':replacement-image',
+            'shot:' + shotId + ':replacement-image',
             applyImageCanvasGeometry(
               buildPersonReplacementImageCanvasNodeData({
-                project: _0x744769,
-                imageRef: _0x1555ee?.['replacementImageRef'],
-                results: getPersonReplacementImageResults(_0x1555ee),
-                activeIndex: _0x1555ee?.['replacementImage']?.['activeIndex'],
-                name: '镜头片段' + _0x5cabce + ' · 替换结果图',
+                project: project5,
+                imageRef: imageRef3?.['replacementImageRef'],
+                results: getPersonReplacementImageResults(imageRef3),
+                activeIndex: imageRef3?.['replacementImage']?.['activeIndex'],
+                name: '镜头片段' + formatSequence2 + ' · 替换结果图',
                 prompt: '',
-                model: _0x744769['settings']?.['replacementImageModelId'],
-                provider: _0x744769['settings']?.['replacementImageProvider'],
-                providerProfileId: _0x744769['settings']?.['replacementImageProviderProfileId'],
-                providerProfileIdByModel: _0x744769['settings']?.['replacementImageProviderProfileIdByModel'],
-                generationParams: _0x744769['settings']?.['replacementImageGenerationParams'],
+                model: project5['settings']?.['replacementImageModelId'],
+                provider: project5['settings']?.['replacementImageProvider'],
+                providerProfileId: project5['settings']?.['replacementImageProviderProfileId'],
+                providerProfileIdByModel: project5['settings']?.['replacementImageProviderProfileIdByModel'],
+                generationParams: project5['settings']?.['replacementImageGenerationParams'],
                 allowEmpty: !![],
                 binding: {
-                  shotId: _0x1404e4,
+                  shotId: shotId,
                   kind: 'replacement-image',
                   canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
                 },
               }),
-              _0x4cddb2,
+              width8,
             ),
-            { x: _0x563035, y: _0x4092ca },
-            { width: _0x4cddb2['width'], height: _0x4cddb2['height'], inputKeys: _0x1385eb },
+            { x: x2, y: y4 },
+            { width: width8['width'], height: width8['height'], inputKeys: inputKeys2 },
           ),
         ),
-        (_0x4092ca += Math['max'](_0x4cddb2['height'], _0x49f83e['height']) + SECTION_GAP));
+        (y4 += Math['max'](width8['height'], box10['height']) + SECTION_GAP));
     }),
-    Math['max'](_0x576845 + _0x46306d['height'], _0x4092ca - SECTION_GAP)
+    Math['max'](y3 + box9['height'], y4 - SECTION_GAP)
   );
 }
-function appendVideoReplacementStage(_0x4efde6, _0x1571d4, _0x1d0dc4) {
-  const _0x3c1f33 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'];
-  _0x4efde6['push'](
+function appendVideoReplacementStage(list17, project6, y5) {
+  const box11 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'];
+  list17['push'](
     createPlanEntry(
       'stage:video:annotation',
       buildStageAnnotationNodeData({
-        project: _0x1571d4,
+        project: project6,
         stage: 'video',
         title: '阶段 3 · 视频替换',
         content: '原视频片段与替换结果图共同连到替换视频。',
       }),
-      { x: 0x0, y: _0x1d0dc4 },
+      { x: 0x0, y: y5 },
     ),
   );
-  let _0x10cbe9 = _0x1d0dc4 + _0x3c1f33['height'] + NODE_GAP;
+  let y6 = y5 + box11['height'] + NODE_GAP;
   return (
-    normalizeList(_0x1571d4['shots'])['forEach']((_0x1d41ed, _0x9f8007) => {
-      const _0x714755 = normalizeText(_0x1d41ed?.['id']) || 'shot-' + (_0x9f8007 + 0x1),
-        _0x4578a7 = formatSequence(_0x9f8007),
-        _0x305136 = [];
-      let _0xfd8231 = 0x0;
-      const _0x1f9290 = resolveShotVideoCanvasGeometry(_0x1d41ed),
-        _0x137e9e =
-          resolvePersonReplacementVideoSourceRef(_0x1d41ed) || normalizeText(_0x1d41ed?.['sourceVideoRef']);
-      if (_0x137e9e) {
-        const _0xd0aacf = 'shot:' + _0x714755 + ':original-video';
-        (_0x4efde6['push'](
+    normalizeList(project6['shots'])['forEach']((videoRef2, value30) => {
+      const shotId2 = normalizeText(videoRef2?.['id']) || 'shot-' + (value30 + 0x1),
+        formatSequence3 = formatSequence(value30),
+        inputKeys3 = [];
+      let x3 = 0x0;
+      const width9 = resolveShotVideoCanvasGeometry(videoRef2),
+        videoRef3 =
+          resolvePersonReplacementVideoSourceRef(videoRef2) || normalizeText(videoRef2?.['sourceVideoRef']);
+      if (videoRef3) {
+        const value31 = 'shot:' + shotId2 + ':original-video';
+        (list17['push'](
           createPlanEntry(
-            _0xd0aacf,
+            value31,
             applyVideoCanvasGeometry(
               buildPersonReplacementVideoCanvasNodeData({
-                project: _0x1571d4,
-                videoRef: _0x137e9e,
-                name: '镜头片段' + _0x4578a7 + ' · 原视频',
+                project: project6,
+                videoRef: videoRef3,
+                name: '镜头片段' + formatSequence3 + ' · 原视频',
                 type: 'source-video',
                 binding: {
-                  shotId: _0x714755,
+                  shotId: shotId2,
                   kind: 'original-video',
                   canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
                 },
               }),
-              _0x1f9290,
+              width9,
             ),
-            { x: _0xfd8231, y: _0x10cbe9 },
-            { width: _0x1f9290['width'], height: _0x1f9290['height'] },
+            { x: x3, y: y6 },
+            { width: width9['width'], height: width9['height'] },
           ),
         ),
-          _0x305136['push'](_0xd0aacf),
-          (_0xfd8231 += _0x1f9290['width'] + NODE_GAP));
+          inputKeys3['push'](value31),
+          (x3 += width9['width'] + NODE_GAP));
       }
-      const _0x45a8c2 = 'shot:' + _0x714755 + ':replacement-image';
-      (_0x305136['push'](_0x45a8c2),
-        _0x4efde6['push'](
+      const value32 = 'shot:' + shotId2 + ':replacement-image';
+      (inputKeys3['push'](value32),
+        list17['push'](
           createPlanEntry(
-            'shot:' + _0x714755 + ':replacement-video',
+            'shot:' + shotId2 + ':replacement-video',
             applyVideoCanvasGeometry(
               buildPersonReplacementVideoCanvasNodeData({
-                project: _0x1571d4,
-                videoRef: _0x1d41ed?.['resultVideoRef'],
-                results: getPersonReplacementVideoResults(_0x1d41ed),
-                activeIndex: _0x1d41ed?.['replacementVideo']?.['activeIndex'],
-                name: '镜头片段' + _0x4578a7 + ' · 替换视频',
-                prompt: _0x1d41ed?.['videoPrompt'],
-                model: _0x1571d4['settings']?.['replacementModelId'],
-                providerProfileId: _0x1571d4['settings']?.['replacementVideoProviderProfileId'],
-                providerProfileIdByModel: _0x1571d4['settings']?.['replacementVideoProviderProfileIdByModel'],
-                generationParams: _0x1571d4['settings']?.['replacementVideoGenerationParams'],
+                project: project6,
+                videoRef: videoRef2?.['resultVideoRef'],
+                results: getPersonReplacementVideoResults(videoRef2),
+                activeIndex: videoRef2?.['replacementVideo']?.['activeIndex'],
+                name: '镜头片段' + formatSequence3 + ' · 替换视频',
+                prompt: videoRef2?.['videoPrompt'],
+                model: project6['settings']?.['replacementModelId'],
+                providerProfileId: project6['settings']?.['replacementVideoProviderProfileId'],
+                providerProfileIdByModel: project6['settings']?.['replacementVideoProviderProfileIdByModel'],
+                generationParams: project6['settings']?.['replacementVideoGenerationParams'],
                 allowEmpty: !![],
                 binding: {
-                  shotId: _0x714755,
+                  shotId: shotId2,
                   kind: 'replacement-video',
                   canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
                 },
               }),
-              _0x1f9290,
+              width9,
             ),
-            { x: _0xfd8231, y: _0x10cbe9 },
-            { width: _0x1f9290['width'], height: _0x1f9290['height'], inputKeys: _0x305136 },
+            { x: x3, y: y6 },
+            { width: width9['width'], height: width9['height'], inputKeys: inputKeys3 },
           ),
         ),
-        (_0x10cbe9 += _0x1f9290['height'] + SECTION_GAP));
+        (y6 += width9['height'] + SECTION_GAP));
     }),
-    Math['max'](_0x1d0dc4 + _0x3c1f33['height'], _0x10cbe9 - SECTION_GAP)
+    Math['max'](y5 + box11['height'], y6 - SECTION_GAP)
   );
 }
-function getVoiceSegments(_0x1c4080 = {}) {
-  const _0x5019f0 = [];
+function getVoiceSegments(options6 = {}) {
+  const list18 = [];
   return (
-    Object['entries'](asObject(_0x1c4080['audio']?.['voiceStudioState']))['forEach'](
-      ([_0xba9e75, _0xa688c7]) => {
-        normalizeList(_0xa688c7?.['audioVoiceAnalysis']?.['segments'])['forEach']((_0x57d82d, _0x3ce12b) => {
-          _0x5019f0['push']({
-            ...asObject(_0x57d82d),
-            sourceId: normalizeText(_0xba9e75) || 'source',
-            segmentId: normalizeText(_0x57d82d?.['id']) || 'segment-' + (_0x3ce12b + 0x1),
-          });
+    Object['entries'](asObject(options6['audio']?.['voiceStudioState']))['forEach'](([value33, value34]) => {
+      normalizeList(value34?.['audioVoiceAnalysis']?.['segments'])['forEach']((value35, value36) => {
+        list18['push']({
+          ...asObject(value35),
+          sourceId: normalizeText(value33) || 'source',
+          segmentId: normalizeText(value35?.['id']) || 'segment-' + (value36 + 0x1),
         });
-      },
-    ),
-    _0x5019f0
+      });
+    }),
+    list18
   );
 }
-function appendVoiceReplacementStage(_0x309e4c, _0x48fb03, _0x2c760b) {
-  const _0x3ffaf5 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'],
-    _0x4110c0 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-audio'];
-  _0x309e4c['push'](
+function appendVoiceReplacementStage(list19, project7, y7) {
+  const box12 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'],
+    box13 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-audio'];
+  list19['push'](
     createPlanEntry(
       'stage:voice:annotation',
       buildStageAnnotationNodeData({
-        project: _0x48fb03,
+        project: project7,
         stage: 'voice',
         title: '阶段 4 · 声音克隆',
         content:
           '使用源音频时，源音频连到替换音频；使用参考音频时，原音频与参考音频共同连到替换音频。总合成音频独立展示。',
       }),
-      { x: 0x0, y: _0x2c760b },
+      { x: 0x0, y: y7 },
     ),
   );
-  const _0x27aa4f = _0x2c760b + _0x3ffaf5['height'] + NODE_GAP;
-  let _0x3cf89c = _0x27aa4f,
-    _0xd4ca75 = _0x2c760b + _0x3ffaf5['height'],
-    _0x10d003 = 0x0;
-  getVoiceSegments(_0x48fb03)['forEach']((_0x6510bc, _0x3c2594) => {
-    const _0x3df0a9 = normalizeText(_0x6510bc['sourceId']),
-      _0x130323 = normalizeText(_0x6510bc['segmentId']),
-      _0x5a90b5 = formatSequence(_0x3c2594),
-      _0x128c56 = [];
-    let _0x8d27da = 0x0;
-    const _0x1e9b4c = normalizeText(_0x6510bc['sourceAudioLocalPath'] || _0x6510bc['sourceAudioUrl']);
-    if (_0x1e9b4c) {
-      const _0x459941 = 'voice:' + _0x3df0a9 + ':' + _0x130323 + ':source-audio';
-      (_0x309e4c['push'](
+  const y8 = y7 + box12['height'] + NODE_GAP;
+  let y9 = y8,
+    value37 = y7 + box12['height'],
+    value38 = 0x0;
+  getVoiceSegments(project7)['forEach']((audioRef2, value39) => {
+    const sourceId = normalizeText(audioRef2['sourceId']),
+      segmentId = normalizeText(audioRef2['segmentId']),
+      formatSequence4 = formatSequence(value39),
+      inputKeys4 = [];
+    let x4 = 0x0;
+    const audioRef3 = normalizeText(audioRef2['sourceAudioLocalPath'] || audioRef2['sourceAudioUrl']);
+    if (audioRef3) {
+      const value40 = 'voice:' + sourceId + ':' + segmentId + ':source-audio';
+      (list19['push'](
         createPlanEntry(
-          _0x459941,
+          value40,
           buildPersonReplacementSourceAudioNodeData({
-            project: _0x48fb03,
-            audioRef: _0x1e9b4c,
-            name: '声音片段' + _0x5a90b5 + ' · 原音频片段',
+            project: project7,
+            audioRef: audioRef3,
+            name: '声音片段' + formatSequence4 + ' · 原音频片段',
             binding: {
-              sourceId: _0x3df0a9,
-              segmentId: _0x130323,
+              sourceId: sourceId,
+              segmentId: segmentId,
               kind: 'source-audio-segment',
               canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
             },
           }),
-          { x: _0x8d27da, y: _0x3cf89c },
+          { x: x4, y: y9 },
         ),
       ),
-        _0x128c56['push'](_0x459941),
-        (_0x8d27da += _0x4110c0['width'] + NODE_GAP));
+        inputKeys4['push'](value40),
+        (x4 += box13['width'] + NODE_GAP));
     }
-    const _0x556f6f = normalizeText(_0x6510bc['voiceRefAudioLocalPath'] || _0x6510bc['voiceRefAudioUrl']);
-    if (_0x556f6f) {
-      const _0x2bb85c = 'voice:' + _0x3df0a9 + ':' + _0x130323 + ':reference-audio';
-      (_0x309e4c['push'](
+    const audioRef4 = normalizeText(audioRef2['voiceRefAudioLocalPath'] || audioRef2['voiceRefAudioUrl']);
+    if (audioRef4) {
+      const value41 = 'voice:' + sourceId + ':' + segmentId + ':reference-audio';
+      (list19['push'](
         createPlanEntry(
-          _0x2bb85c,
+          value41,
           buildPersonReplacementSourceAudioNodeData({
-            project: _0x48fb03,
-            audioRef: _0x556f6f,
-            name: normalizeText(_0x6510bc['voiceRefName']) || '声音片段' + _0x5a90b5 + ' · 参考音频',
+            project: project7,
+            audioRef: audioRef4,
+            name: normalizeText(audioRef2['voiceRefName']) || '声音片段' + formatSequence4 + ' · 参考音频',
             binding: {
-              sourceId: _0x3df0a9,
-              segmentId: _0x130323,
+              sourceId: sourceId,
+              segmentId: segmentId,
               kind: 'reference-audio',
               canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
             },
           }),
-          { x: _0x8d27da, y: _0x3cf89c },
+          { x: x4, y: y9 },
         ),
       ),
-        _0x128c56['push'](_0x2bb85c),
-        (_0x8d27da += _0x4110c0['width'] + NODE_GAP));
+        inputKeys4['push'](value41),
+        (x4 += box13['width'] + NODE_GAP));
     }
-    const _0x432e65 = 'voice:' + _0x3df0a9 + ':' + _0x130323 + ':replacement-audio';
-    (_0x309e4c['push'](
+    const value42 = 'voice:' + sourceId + ':' + segmentId + ':replacement-audio';
+    (list19['push'](
       createPlanEntry(
-        _0x432e65,
+        value42,
         buildPersonReplacementAudioCanvasNodeData({
-          project: _0x48fb03,
-          audioRef: _0x6510bc['convertedAudioLocalPath'] || _0x6510bc['convertedAudioUrl'],
-          name: '声音片段' + _0x5a90b5 + ' · 替换音频',
-          prompt: _0x6510bc['targetText'] || _0x6510bc['sourceText'],
-          model: _0x6510bc['voiceModelId'],
+          project: project7,
+          audioRef: audioRef2['convertedAudioLocalPath'] || audioRef2['convertedAudioUrl'],
+          name: '声音片段' + formatSequence4 + ' · 替换音频',
+          prompt: audioRef2['targetText'] || audioRef2['sourceText'],
+          model: audioRef2['voiceModelId'],
           allowEmpty: !![],
           binding: {
-            sourceId: _0x3df0a9,
-            segmentId: _0x130323,
+            sourceId: sourceId,
+            segmentId: segmentId,
             kind: 'replacement-audio-segment',
             canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
           },
         }),
-        { x: _0x8d27da, y: _0x3cf89c },
-        { inputKeys: _0x128c56 },
+        { x: x4, y: y9 },
+        { inputKeys: inputKeys4 },
       ),
     ),
-      (_0x10d003 = Math['max'](_0x10d003, _0x8d27da + _0x4110c0['width'])),
-      (_0xd4ca75 = Math['max'](_0xd4ca75, _0x3cf89c + _0x4110c0['height'])),
-      (_0x3cf89c += _0x4110c0['height'] + SECTION_GAP));
+      (value38 = Math['max'](value38, x4 + box13['width'])),
+      (value37 = Math['max'](value37, y9 + box13['height'])),
+      (y9 += box13['height'] + SECTION_GAP));
   });
-  const _0x5f3c76 = normalizeText(_0x48fb03['audio']?.['replacementAudioRef']);
-  if (_0x5f3c76) {
-    const _0x5ad721 = _0x10d003 ? _0x10d003 + NODE_GAP : 0x0;
-    (_0x309e4c['push'](
+  const audioRef5 = normalizeText(project7['audio']?.['replacementAudioRef']);
+  if (audioRef5) {
+    const x5 = value38 ? value38 + NODE_GAP : 0x0;
+    (list19['push'](
       createPlanEntry(
         'voice:timeline',
         buildPersonReplacementSourceAudioNodeData({
-          project: _0x48fb03,
-          audioRef: _0x5f3c76,
+          project: project7,
+          audioRef: audioRef5,
           name: '替换音频 · 总合成音频',
           binding: {
             kind: 'replacement-audio-timeline',
             canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
           },
         }),
-        { x: _0x5ad721, y: _0x27aa4f },
+        { x: x5, y: y8 },
       ),
     ),
-      (_0xd4ca75 = Math['max'](_0xd4ca75, _0x27aa4f + _0x4110c0['height'])));
+      (value37 = Math['max'](value37, y8 + box13['height'])));
   }
-  return _0xd4ca75;
+  return value37;
 }
-function appendCompositeStage(_0x3dd4f1, _0x7cc246, _0x57498a) {
-  const _0x14f8f5 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'],
-    _0x2049b3 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['source-video'];
-  _0x3dd4f1['push'](
+function appendCompositeStage(list20, project8, y10) {
+  const box14 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'],
+    box15 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['source-video'];
+  list20['push'](
     createPlanEntry(
       'stage:composite:annotation',
       buildStageAnnotationNodeData({
-        project: _0x7cc246,
+        project: project8,
         stage: 'composite',
         title: '阶段\x205\x20·\x20最终合成对比',
         content: '原视频与最终替换视频用于效果对比。',
       }),
-      { x: 0x0, y: _0x57498a },
+      { x: 0x0, y: y10 },
     ),
   );
-  const _0xc9713c = _0x57498a + _0x14f8f5['height'] + NODE_GAP;
-  let _0x247386 = 0x0;
-  const _0x4cbdec = normalizeList(_0x7cc246['sources']),
-    _0x63d30b = _0x4cbdec['findIndex']((_0x167c39) => normalizeText(_0x167c39?.['videoRef']));
-  if (_0x63d30b >= 0x0) {
-    const _0xeb160b = _0x4cbdec[_0x63d30b],
-      _0x352a32 = normalizeText(_0xeb160b['videoRef']),
-      _0x12f86c = normalizeText(_0xeb160b?.['id']) || 'source-' + (_0x63d30b + 0x1);
-    (_0x3dd4f1['push'](
+  const y11 = y10 + box14['height'] + NODE_GAP;
+  let x6 = 0x0;
+  const list21 = normalizeList(project8['sources']),
+    count3 = list21['findIndex']((value43) => normalizeText(value43?.['videoRef']));
+  if (count3 >= 0x0) {
+    const value44 = list21[count3],
+      videoRef4 = normalizeText(value44['videoRef']),
+      sourceId2 = normalizeText(value44?.['id']) || 'source-' + (count3 + 0x1);
+    (list20['push'](
       createPlanEntry(
-        'project:source:' + _0x12f86c + ':comparison-video',
+        'project:source:' + sourceId2 + ':comparison-video',
         buildPersonReplacementVideoCanvasNodeData({
-          project: _0x7cc246,
-          videoRef: _0x352a32,
+          project: project8,
+          videoRef: videoRef4,
           name: '原视频 · 对比',
           type: 'source-video',
           binding: {
-            sourceId: _0x12f86c,
+            sourceId: sourceId2,
             kind: 'comparison-source-video',
             canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
           },
         }),
-        { x: _0x247386 * (_0x2049b3['width'] + NODE_GAP), y: _0xc9713c },
+        { x: x6 * (box15['width'] + NODE_GAP), y: y11 },
       ),
     ),
-      (_0x247386 += 0x1));
+      (x6 += 0x1));
   }
-  const _0x3b84c1 = normalizeText(
-    _0x7cc246['output']?.['finalVideoRef'] || _0x7cc246['output']?.['visualMasterRef'],
+  const videoRef5 = normalizeText(
+    project8['output']?.['finalVideoRef'] || project8['output']?.['visualMasterRef'],
   );
   return (
-    _0x3b84c1 &&
-      _0x3dd4f1['push'](
+    videoRef5 &&
+      list20['push'](
         createPlanEntry(
           'project:composite-output',
           buildPersonReplacementVideoCanvasNodeData({
-            project: _0x7cc246,
-            videoRef: _0x3b84c1,
-            name: (normalizeText(_0x7cc246['title']) || '人物替换项目') + ' · 最终替换视频',
+            project: project8,
+            videoRef: videoRef5,
+            name: (normalizeText(project8['title']) || '人物替换项目') + ' · 最终替换视频',
             type: 'source-video',
             binding: { kind: 'composite-output', canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'] },
           }),
-          { x: _0x247386 * (_0x2049b3['width'] + NODE_GAP), y: _0xc9713c },
+          { x: x6 * (box15['width'] + NODE_GAP), y: y11 },
         ),
       ),
-    _0xc9713c + _0x2049b3['height']
+    y11 + box15['height']
   );
 }
 export function buildPersonReplacementOutputCanvasNodeData({
@@ -1219,229 +1219,222 @@ export function buildPersonReplacementOutputCanvasNodeData({
     binding: { kind: 'composite-output', canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'] },
   });
 }
-function buildReplacementClipPlan(_0x451105, _0x74cca2) {
-  const _0xe9e051 = [];
-  let _0x159630 = 0x0;
+function buildReplacementClipPlan(project9, canvasScope3) {
+  const list22 = [];
+  let x7 = 0x0;
   return (
-    normalizeList(_0x451105['shots'])['forEach']((_0x1517ce, _0x43a1ca) => {
-      const _0x1e57b2 = normalizeText(_0x1517ce?.['resultVideoRef']);
-      if (!_0x1e57b2) return;
-      const _0x4c3914 = normalizeText(_0x1517ce?.['id']) || 'shot-' + (_0x43a1ca + 0x1),
-        _0x1af21c = resolveShotVideoCanvasGeometry(_0x1517ce);
-      (_0xe9e051['push'](
+    normalizeList(project9['shots'])['forEach']((activeIndex4, value45) => {
+      const videoRef6 = normalizeText(activeIndex4?.['resultVideoRef']);
+      if (!videoRef6) return;
+      const shotId3 = normalizeText(activeIndex4?.['id']) || 'shot-' + (value45 + 0x1),
+        width10 = resolveShotVideoCanvasGeometry(activeIndex4);
+      (list22['push'](
         createPlanEntry(
-          'shot:' + _0x4c3914 + ':replacement-video',
+          'shot:' + shotId3 + ':replacement-video',
           applyVideoCanvasGeometry(
             buildPersonReplacementVideoCanvasNodeData({
-              project: _0x451105,
-              videoRef: _0x1e57b2,
-              name: '镜头片段' + formatSequence(_0x43a1ca) + ' · 替换视频',
-              results: getPersonReplacementVideoResults(_0x1517ce),
-              activeIndex: _0x1517ce?.['replacementVideo']?.['activeIndex'],
-              binding: { shotId: _0x4c3914, kind: 'replacement-video', canvasScope: _0x74cca2 },
+              project: project9,
+              videoRef: videoRef6,
+              name: '镜头片段' + formatSequence(value45) + ' · 替换视频',
+              results: getPersonReplacementVideoResults(activeIndex4),
+              activeIndex: activeIndex4?.['replacementVideo']?.['activeIndex'],
+              binding: { shotId: shotId3, kind: 'replacement-video', canvasScope: canvasScope3 },
             }),
-            _0x1af21c,
+            width10,
           ),
-          { x: _0x159630, y: 0x0 },
-          { width: _0x1af21c['width'], height: _0x1af21c['height'] },
+          { x: x7, y: 0x0 },
+          { width: width10['width'], height: width10['height'] },
         ),
       ),
-        (_0x159630 += _0x1af21c['width'] + NODE_GAP));
+        (x7 += width10['width'] + NODE_GAP));
     }),
-    _0xe9e051
+    list22
   );
 }
-function getPlanBounds(_0x24d03c) {
-  const _0x38c294 = normalizeList(_0x24d03c);
-  if (!_0x38c294['length']) return { left: 0x0, top: 0x0, right: 0x0, bottom: 0x0, width: 0x0, height: 0x0 };
-  const _0x4e5610 = Math['min'](..._0x38c294['map']((_0x459a37) => _0x459a37['position']['x'])),
-    _0x48165f = Math['min'](..._0x38c294['map']((_0x2ab7e4) => _0x2ab7e4['position']['y'])),
-    _0x6cec0d = Math['max'](
-      ..._0x38c294['map']((_0x493955) => _0x493955['position']['x'] + _0x493955['width']),
-    ),
-    _0xe3ddde = Math['max'](
-      ..._0x38c294['map']((_0x1c9ef1) => _0x1c9ef1['position']['y'] + _0x1c9ef1['height']),
-    );
+function getPlanBounds(value46) {
+  const list23 = normalizeList(value46);
+  if (!list23['length']) return { left: 0x0, top: 0x0, right: 0x0, bottom: 0x0, width: 0x0, height: 0x0 };
+  const left = Math['min'](...list23['map']((value47) => value47['position']['x'])),
+    top = Math['min'](...list23['map']((value48) => value48['position']['y'])),
+    right = Math['max'](...list23['map']((box16) => box16['position']['x'] + box16['width'])),
+    bottom = Math['max'](...list23['map']((box17) => box17['position']['y'] + box17['height']));
   return {
-    left: _0x4e5610,
-    top: _0x48165f,
-    right: _0x6cec0d,
-    bottom: _0xe3ddde,
-    width: _0x6cec0d - _0x4e5610,
-    height: _0xe3ddde - _0x48165f,
+    left: left,
+    top: top,
+    right: right,
+    bottom: bottom,
+    width: right - left,
+    height: bottom - top,
   };
 }
 function wrapStageEntriesInGroup({
-  entries: _0xb16a0f,
-  project: _0x10e369,
-  stage: _0x54225f,
-  name: _0x2dd5b2,
+  entries: entries,
+  project: project10,
+  stage: stage2,
+  name: name4,
   canvasScope: canvasScope = PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'],
 } = {}) {
-  const _0x3decb6 = normalizeList(_0xb16a0f)['filter']((_0x4d866e) => _0x4d866e['type'] !== 'group');
-  if (!_0x3decb6['length']) return [];
-  const _0x116d2b = 'stage:' + normalizeText(_0x54225f) + ':group',
-    _0x308263 = calculateGroupNodeBounds(
-      _0x3decb6['map']((_0x3ef99d) => ({
-        x: _0x3ef99d['position']['x'],
-        y: _0x3ef99d['position']['y'],
-        width: _0x3ef99d['width'],
-        height: _0x3ef99d['height'],
+  const list24 = normalizeList(entries)['filter']((value49) => value49['type'] !== 'group');
+  if (!list24['length']) return [];
+  const parentKey2 = 'stage:' + normalizeText(stage2) + ':group',
+    width11 = calculateGroupNodeBounds(
+      list24['map']((x8) => ({
+        x: x8['position']['x'],
+        y: x8['position']['y'],
+        width: x8['width'],
+        height: x8['height'],
       })),
     ),
-    _0x127571 = createPlanEntry(
-      _0x116d2b,
+    planEntry = createPlanEntry(
+      parentKey2,
       {
         type: 'group',
-        name: normalizeText(_0x2dd5b2),
-        color: STAGE_GROUP_COLORS[normalizeText(_0x54225f)] || 'var(--indigo)',
-        width: _0x308263['width'],
-        height: _0x308263['height'],
-        personReplacementBinding: buildBinding(_0x10e369, {
+        name: normalizeText(name4),
+        color: STAGE_GROUP_COLORS[normalizeText(stage2)] || 'var(--indigo)',
+        width: width11['width'],
+        height: width11['height'],
+        personReplacementBinding: buildBinding(project10, {
           kind: 'stage-group',
-          stage: normalizeText(_0x54225f),
+          stage: normalizeText(stage2),
           canvasScope: canvasScope,
         }),
       },
-      { x: _0x308263['x'], y: _0x308263['y'] },
-      { width: _0x308263['width'], height: _0x308263['height'] },
+      { x: width11['x'], y: width11['y'] },
+      { width: width11['width'], height: width11['height'] },
     );
-  return [_0x127571, ..._0x3decb6['map']((_0x3c56e6) => ({ ..._0x3c56e6, parentKey: _0x116d2b }))];
+  return [planEntry, ...list24['map']((args9) => ({ ...args9, parentKey: parentKey2 }))];
 }
-function appendHorizontalStage(_0x33baf7, _0x325eba, _0x2498f2) {
-  const _0x90ef8b = getPlanBounds(_0x325eba),
-    _0x26ab6e = _0x2498f2 - _0x90ef8b['left'],
-    _0x1613bb = -_0x90ef8b['top'];
+function appendHorizontalStage(list25, list26, value50) {
+  const box18 = getPlanBounds(list26),
+    value51 = value50 - box18['left'],
+    value52 = -box18['top'];
   return (
-    _0x33baf7['push'](
-      ..._0x325eba['map']((_0x543db3) => ({
-        ..._0x543db3,
-        position: { x: _0x543db3['position']['x'] + _0x26ab6e, y: _0x543db3['position']['y'] + _0x1613bb },
+    list25['push'](
+      ...list26['map']((x9) => ({
+        ...x9,
+        position: { x: x9['position']['x'] + value51, y: x9['position']['y'] + value52 },
       })),
     ),
-    _0x2498f2 + _0x90ef8b['width'] + STAGE_GAP
+    value50 + box18['width'] + STAGE_GAP
   );
 }
-function buildProjectCanvasPlan(_0x2c778b) {
-  const _0x1e5233 = [],
-    _0x9a7f51 = getCharacterAppearanceRecords(_0x2c778b),
-    _0x2443b4 = normalizeWorkspaceStep(_0x2c778b);
-  let _0x45b669 = 0x0;
-  const _0x193402 = ({ stage: _0x2a2cc9, name: _0x587388, buildStage: _0x42d519 }) => {
-    const _0x18d017 = [];
-    _0x42d519(_0x18d017);
-    const _0x5c474b = wrapStageEntriesInGroup({
-      entries: _0x18d017,
-      project: _0x2c778b,
-      stage: _0x2a2cc9,
-      name: _0x587388,
+function buildProjectCanvasPlan(project11) {
+  const value53 = [],
+    characterAppearanceRecords = getCharacterAppearanceRecords(project11),
+    workspaceStep = normalizeWorkspaceStep(project11);
+  let appendHorizontalStage2 = 0x0;
+  const run3 = ({ stage: stage3, name: name5, buildStage: buildStage }) => {
+    const entries2 = [];
+    buildStage(entries2);
+    const wrapStageEntriesInGroup2 = wrapStageEntriesInGroup({
+      entries: entries2,
+      project: project11,
+      stage: stage3,
+      name: name5,
     });
-    _0x45b669 = appendHorizontalStage(_0x1e5233, _0x5c474b, _0x45b669);
+    appendHorizontalStage2 = appendHorizontalStage(value53, wrapStageEntriesInGroup2, appendHorizontalStage2);
   };
   return (
-    _0x193402({
+    run3({
       stage: 'assets',
       name: '阶段 1 · 素材设定',
-      buildStage: (_0x37384c) => {
-        appendAssetStage(_0x37384c, _0x2c778b, 0x0, _0x9a7f51);
+      buildStage: (value54) => {
+        appendAssetStage(value54, project11, 0x0, characterAppearanceRecords);
       },
     }),
-    _0x2443b4 >= 0x2 &&
-      _0x193402({
+    workspaceStep >= 0x2 &&
+      run3({
         stage: 'image',
         name: '阶段 2 · 图像替换',
-        buildStage: (_0x5eded6) => {
-          appendImageReplacementStage(_0x5eded6, _0x2c778b, 0x0, _0x9a7f51);
+        buildStage: (value55) => {
+          appendImageReplacementStage(value55, project11, 0x0, characterAppearanceRecords);
         },
       }),
-    _0x2443b4 >= 0x3 &&
-      _0x193402({
+    workspaceStep >= 0x3 &&
+      run3({
         stage: 'video',
         name: '阶段\x203\x20·\x20视频替换',
-        buildStage: (_0x3d8e9e) => {
-          appendVideoReplacementStage(_0x3d8e9e, _0x2c778b, 0x0);
+        buildStage: (value56) => {
+          appendVideoReplacementStage(value56, project11, 0x0);
         },
       }),
-    _0x2443b4 >= 0x4 &&
-      _0x193402({
+    workspaceStep >= 0x4 &&
+      run3({
         stage: 'voice',
         name: '阶段\x204\x20·\x20声音克隆',
-        buildStage: (_0x244290) => {
-          appendVoiceReplacementStage(_0x244290, _0x2c778b, 0x0);
+        buildStage: (value57) => {
+          appendVoiceReplacementStage(value57, project11, 0x0);
         },
       }),
-    _0x2443b4 >= 0x5 &&
-      _0x193402({
+    workspaceStep >= 0x5 &&
+      run3({
         stage: 'composite',
         name: '阶段 5 · 合成视频',
-        buildStage: (_0x4546c6) => {
-          appendCompositeStage(_0x4546c6, _0x2c778b, 0x0);
+        buildStage: (value58) => {
+          appendCompositeStage(value58, project11, 0x0);
         },
       }),
-    _0x1e5233
+    value53
   );
 }
-function clonePlanEntryForScope(_0x5c89ff, _0x3af52f, _0x37071b) {
-  const _0x27c3bc = asObject(_0x5c89ff['data']?.['personReplacementBinding']),
-    _0x36211b = normalizeList(_0x5c89ff['inputKeys'])
+function clonePlanEntryForScope(args10, canvasScope4, map) {
+  const args11 = asObject(args10['data']?.['personReplacementBinding']),
+    list27 = normalizeList(args10['inputKeys'])
       ['map'](normalizeText)
-      ['filter']((_0x573c62) => _0x37071b['has'](_0x573c62)),
-    _0x3a117f = normalizeText(_0x5c89ff['parentKey']),
-    _0x22bef8 = {
-      ..._0x5c89ff,
-      data: { ..._0x5c89ff['data'], personReplacementBinding: { ..._0x27c3bc, canvasScope: _0x3af52f } },
+      ['filter']((value59) => map['has'](value59)),
+    text10 = normalizeText(args10['parentKey']),
+    value60 = {
+      ...args10,
+      data: { ...args10['data'], personReplacementBinding: { ...args11, canvasScope: canvasScope4 } },
     };
-  (delete _0x22bef8['inputKeys'], delete _0x22bef8['parentKey']);
-  if (_0x36211b['length']) _0x22bef8['inputKeys'] = _0x36211b;
-  if (_0x3a117f && _0x37071b['has'](_0x3a117f)) _0x22bef8['parentKey'] = _0x3a117f;
-  return _0x22bef8;
+  (delete value60['inputKeys'], delete value60['parentKey']);
+  if (list27['length']) value60['inputKeys'] = list27;
+  if (text10 && map['has'](text10)) value60['parentKey'] = text10;
+  return value60;
 }
-function normalizePlanOrigin(_0x4bd3a8) {
-  const _0x428b43 = Math['min'](
-      ..._0x4bd3a8['map']((_0x3645b7) => Number(_0x3645b7['position']?.['x']) || 0x0),
-    ),
-    _0x239c72 = Math['min'](..._0x4bd3a8['map']((_0x349fcc) => Number(_0x349fcc['position']?.['y']) || 0x0));
-  return _0x4bd3a8['map']((_0x126e02) => ({
-    ..._0x126e02,
+function normalizePlanOrigin(list28) {
+  const value61 = Math['min'](...list28['map']((value62) => Number(value62['position']?.['x']) || 0x0)),
+    value63 = Math['min'](...list28['map']((value64) => Number(value64['position']?.['y']) || 0x0));
+  return list28['map']((args12) => ({
+    ...args12,
     position: {
-      x: (Number(_0x126e02['position']?.['x']) || 0x0) - _0x428b43,
-      y: (Number(_0x126e02['position']?.['y']) || 0x0) - _0x239c72,
+      x: (Number(args12['position']?.['x']) || 0x0) - value61,
+      y: (Number(args12['position']?.['y']) || 0x0) - value63,
     },
   }));
 }
-function reflowCurrentVideoPlan(_0x27b734, _0x1e04da) {
-  const _0x45e31d = _0x27b734['find']((_0x54fe82) => _0x54fe82['key'] === 'stage:video:annotation'),
-    _0x290aa7 = new Map(_0x27b734['map']((_0x5a72c3) => [_0x5a72c3['key'], _0x5a72c3]));
-  let _0x28016e = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note']['height'] + NODE_GAP;
-  const _0x9df79a = _0x45e31d ? [{ ..._0x45e31d, position: { x: 0x0, y: 0x0 }, parentKey: '' }] : [];
+function reflowCurrentVideoPlan(list29, project12) {
+  const args13 = list29['find']((event2) => event2['key'] === 'stage:video:annotation'),
+    map2 = new Map(list29['map']((event3) => [event3['key'], event3]));
+  let y12 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note']['height'] + NODE_GAP;
+  const entries3 = args13 ? [{ ...args13, position: { x: 0x0, y: 0x0 }, parentKey: '' }] : [];
   return (
-    normalizeList(_0x1e04da['shots'])['forEach']((_0x26fa90, _0x1894cc) => {
-      const _0x17dea7 = normalizeText(_0x26fa90?.['id']) || 'shot-' + (_0x1894cc + 0x1),
-        _0x3682f9 = _0x290aa7['get']('shot:' + _0x17dea7 + ':original-video'),
-        _0x110921 = _0x290aa7['get']('shot:' + _0x17dea7 + ':replacement-image'),
-        _0xdb4c73 = _0x290aa7['get']('shot:' + _0x17dea7 + ':replacement-video');
-      let _0x14f424 = 0x0,
-        _0x55ae4b = Math['max'](
-          Number(_0x110921?.['height']) || 0x0,
-          Number(_0x3682f9?.['height']) || 0x0,
-          Number(_0xdb4c73?.['height']) || 0x0,
+    normalizeList(project12['shots'])['forEach']((value65, value66) => {
+      const text11 = normalizeText(value65?.['id']) || 'shot-' + (value66 + 0x1),
+        box19 = map2['get']('shot:' + text11 + ':original-video'),
+        box20 = map2['get']('shot:' + text11 + ':replacement-image'),
+        box21 = map2['get']('shot:' + text11 + ':replacement-video');
+      let x10 = 0x0,
+        value67 = Math['max'](
+          Number(box20?.['height']) || 0x0,
+          Number(box19?.['height']) || 0x0,
+          Number(box21?.['height']) || 0x0,
           PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-video']['height'],
         );
-      (_0x110921 &&
-        (_0x9df79a['push']({ ..._0x110921, position: { x: _0x14f424, y: _0x28016e }, parentKey: '' }),
-        (_0x14f424 += _0x110921['width'] + NODE_GAP),
-        (_0x55ae4b = Math['max'](_0x55ae4b, _0x110921['height']))),
-        _0x3682f9 &&
-          (_0x9df79a['push']({ ..._0x3682f9, position: { x: _0x14f424, y: _0x28016e }, parentKey: '' }),
-          (_0x14f424 += _0x3682f9['width'] + NODE_GAP)),
-        _0xdb4c73 &&
-          _0x9df79a['push']({ ..._0xdb4c73, position: { x: _0x14f424, y: _0x28016e }, parentKey: '' }),
-        (_0x28016e += _0x55ae4b + SECTION_GAP));
+      (box20 &&
+        (entries3['push']({ ...box20, position: { x: x10, y: y12 }, parentKey: '' }),
+        (x10 += box20['width'] + NODE_GAP),
+        (value67 = Math['max'](value67, box20['height']))),
+        box19 &&
+          (entries3['push']({ ...box19, position: { x: x10, y: y12 }, parentKey: '' }),
+          (x10 += box19['width'] + NODE_GAP)),
+        box21 && entries3['push']({ ...box21, position: { x: x10, y: y12 }, parentKey: '' }),
+        (y12 += value67 + SECTION_GAP));
     }),
     normalizePlanOrigin(
       wrapStageEntriesInGroup({
-        entries: _0x9df79a,
-        project: _0x1e04da,
+        entries: entries3,
+        project: project12,
         stage: 'video',
         name: '阶段 3 · 视频替换',
         canvasScope: PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'],
@@ -1449,312 +1442,303 @@ function reflowCurrentVideoPlan(_0x27b734, _0x1e04da) {
     )
   );
 }
-function buildCurrentInterfacePlan(_0x471448) {
-  const _0x2f0c21 = normalizeWorkspaceStep(_0x471448),
-    _0x56e0f2 = buildProjectCanvasPlan(_0x471448),
-    _0x5e2c1f = (_0x5a587a) => {
-      if (_0x2f0c21 === 0x1)
-        return _0x5a587a['key']['startsWith']('stage:assets:') || _0x5a587a['key']['startsWith']('asset:');
-      if (_0x2f0c21 === 0x2)
+function buildCurrentInterfacePlan(value68) {
+  const workspaceStep2 = normalizeWorkspaceStep(value68),
+    list30 = buildProjectCanvasPlan(value68),
+    value69 = (event4) => {
+      if (workspaceStep2 === 0x1)
+        return event4['key']['startsWith']('stage:assets:') || event4['key']['startsWith']('asset:');
+      if (workspaceStep2 === 0x2)
         return (
-          _0x5a587a['key']['startsWith']('stage:assets:') ||
-          _0x5a587a['key']['startsWith']('asset:') ||
-          _0x5a587a['key']['startsWith']('stage:image:') ||
-          /^shot:[^:]+:(?:keyframe|location-guide|prompt|replacement-image)$/['test'](_0x5a587a['key'])
+          event4['key']['startsWith']('stage:assets:') ||
+          event4['key']['startsWith']('asset:') ||
+          event4['key']['startsWith']('stage:image:') ||
+          /^shot:[^:]+:(?:keyframe|location-guide|prompt|replacement-image)$/['test'](event4['key'])
         );
-      if (_0x2f0c21 === 0x3)
+      if (workspaceStep2 === 0x3)
         return (
-          _0x5a587a['key']['startsWith']('stage:video:') ||
-          /^shot:[^:]+:(?:replacement-image|original-video|replacement-video)$/['test'](_0x5a587a['key'])
+          event4['key']['startsWith']('stage:video:') ||
+          /^shot:[^:]+:(?:replacement-image|original-video|replacement-video)$/['test'](event4['key'])
         );
-      if (_0x2f0c21 === 0x4)
-        return _0x5a587a['key']['startsWith']('stage:voice:') || _0x5a587a['key']['startsWith']('voice:');
+      if (workspaceStep2 === 0x4)
+        return event4['key']['startsWith']('stage:voice:') || event4['key']['startsWith']('voice:');
       return ![];
     },
-    _0x3bca49 = _0x56e0f2['filter'](_0x5e2c1f),
-    _0x87412b = new Set(_0x3bca49['map']((_0x2a473d) => _0x2a473d['key'])),
-    _0x1b586a = _0x3bca49['map']((_0x3c5f90) =>
-      clonePlanEntryForScope(_0x3c5f90, PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'], _0x87412b),
+    list31 = list30['filter'](value69),
+    value70 = new Set(list31['map']((event5) => event5['key'])),
+    value71 = list31['map']((value72) =>
+      clonePlanEntryForScope(value72, PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'], value70),
     );
-  return _0x2f0c21 === 0x3 ? reflowCurrentVideoPlan(_0x1b586a, _0x471448) : normalizePlanOrigin(_0x1b586a);
+  return workspaceStep2 === 0x3 ? reflowCurrentVideoPlan(value71, value68) : normalizePlanOrigin(value71);
 }
 export function buildPersonReplacementCanvasPlan({
   project: project = {},
   scope: scope = PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'],
 } = {}) {
-  const _0x40bc42 = normalizeScope(scope);
-  if (_0x40bc42 === PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'])
+  const scope2 = normalizeScope(scope);
+  if (scope2 === PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'])
     return normalizeWorkspaceStep(project) < 0x5
       ? buildCurrentInterfacePlan(project)
-      : buildReplacementClipPlan(project, _0x40bc42);
+      : buildReplacementClipPlan(project, scope2);
   return buildProjectCanvasPlan(project);
 }
-function buildPlanLayout(_0x3319ba = []) {
+function buildPlanLayout(list32 = []) {
   return Object['fromEntries'](
-    normalizeList(_0x3319ba)['map']((_0x423db7) => [
-      _0x423db7['key'],
+    normalizeList(list32)['map']((box22) => [
+      box22['key'],
       {
-        x: Number(_0x423db7['position']?.['x']) || 0x0,
-        y: Number(_0x423db7['position']?.['y']) || 0x0,
-        width: Number(_0x423db7['width']) || 0x0,
-        height: Number(_0x423db7['height']) || 0x0,
+        x: Number(box22['position']?.['x']) || 0x0,
+        y: Number(box22['position']?.['y']) || 0x0,
+        width: Number(box22['width']) || 0x0,
+        height: Number(box22['height']) || 0x0,
       },
     ]),
   );
 }
-function hasSameGeometry(_0x6ddced = {}, _0x46c0b9 = {}) {
+function hasSameGeometry(box23 = {}, box24 = {}) {
   return (
-    Number(_0x6ddced['x']) === Number(_0x46c0b9['x']) &&
-    Number(_0x6ddced['y']) === Number(_0x46c0b9['y']) &&
-    Number(_0x6ddced['width']) === Number(_0x46c0b9['width']) &&
-    Number(_0x6ddced['height']) === Number(_0x46c0b9['height'])
+    Number(box23['x']) === Number(box24['x']) &&
+    Number(box23['y']) === Number(box24['y']) &&
+    Number(box23['width']) === Number(box24['width']) &&
+    Number(box23['height']) === Number(box24['height'])
   );
 }
 async function shouldReflowManagedNodes({
   plan: plan = [],
   planLayout: planLayout = {},
   previousBinding: previousBinding = {},
-  adapter: _0x111e3d,
+  adapter: adapter2,
   canvasId: canvasId = '',
 } = {}) {
-  const _0x389f4b = asObject(previousBinding['nodes']),
-    _0x340b3e = plan['map']((_0x2e2c56) => _0x2e2c56['key']),
-    _0x418c20 = Object['keys'](_0x389f4b);
+  const asObject3 = asObject(previousBinding['nodes']),
+    list33 = plan['map']((event6) => event6['key']),
+    list34 = Object['keys'](asObject3);
   if (
-    _0x340b3e['length'] !== _0x418c20['length'] ||
-    _0x340b3e['some']((_0x51de38) => !normalizeText(_0x389f4b[_0x51de38])) ||
-    _0x418c20['some']((_0xd95d21) => !(_0xd95d21 in planLayout))
+    list33['length'] !== list34['length'] ||
+    list33['some']((value73) => !normalizeText(asObject3[value73])) ||
+    list34['some']((value74) => !(value74 in planLayout))
   )
     return !![];
-  const _0x5388ac = asObject(previousBinding['layout']);
-  if (Object['keys'](_0x5388ac)['length'])
-    return _0x340b3e['some'](
-      (_0x3248cc) => !hasSameGeometry(asObject(_0x5388ac[_0x3248cc]), asObject(planLayout[_0x3248cc])),
+  const asObject4 = asObject(previousBinding['layout']);
+  if (Object['keys'](asObject4)['length'])
+    return list33['some'](
+      (value75) => !hasSameGeometry(asObject(asObject4[value75]), asObject(planLayout[value75])),
     );
-  if (typeof _0x111e3d?.['getNode'] !== 'function') return ![];
-  for (const _0xbd8759 of plan) {
-    const _0x5a2590 = normalizeText(_0x389f4b[_0xbd8759['key']]);
-    if (!_0x5a2590 || !(await _0x111e3d['nodeExists'](_0x5a2590, canvasId))) return !![];
-    const _0x41154c = await _0x111e3d['getNode'](_0x5a2590, canvasId);
+  if (typeof adapter2?.['getNode'] !== 'function') return ![];
+  for (const box25 of plan) {
+    const text12 = normalizeText(asObject3[box25['key']]);
+    if (!text12 || !(await adapter2['nodeExists'](text12, canvasId))) return !![];
+    const box26 = await adapter2['getNode'](text12, canvasId);
     if (
-      Number(_0x41154c?.['width']) !== Number(_0xbd8759['width']) ||
-      Number(_0x41154c?.['height']) !== Number(_0xbd8759['height'])
+      Number(box26?.['width']) !== Number(box25['width']) ||
+      Number(box26?.['height']) !== Number(box25['height'])
     )
       return !![];
   }
   return !![];
 }
 async function rollbackCanvasMutation({
-  adapter: _0x38f451,
+  adapter: adapter3,
   canvasId: canvasId = '',
   reused: reused = ![],
-  mutationSnapshot: _0x2c75fe,
+  mutationSnapshot: mutationSnapshot,
 } = {}) {
-  if (!reused && typeof _0x38f451?.['deleteCanvas'] === 'function')
+  if (!reused && typeof adapter3?.['deleteCanvas'] === 'function')
     try {
-      const _0x4509b6 = await _0x38f451['deleteCanvas'](canvasId, { skipDirtyConfirm: !![] });
-      if (_0x4509b6 !== ![]) return !![];
+      const value76 = await adapter3['deleteCanvas'](canvasId, { skipDirtyConfirm: !![] });
+      if (value76 !== ![]) return !![];
     } catch {}
-  if (typeof _0x38f451?.['restoreMutationSnapshot'] === 'function' && _0x2c75fe)
+  if (typeof adapter3?.['restoreMutationSnapshot'] === 'function' && mutationSnapshot)
     try {
-      return (await _0x38f451['restoreMutationSnapshot'](_0x2c75fe, { canvasId: canvasId })) !== ![];
+      return (await adapter3['restoreMutationSnapshot'](mutationSnapshot, { canvasId: canvasId })) !== ![];
     } catch {}
   return ![];
 }
 export async function syncPersonReplacementCanvas({
   project: project = {},
   scope: scope = PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'],
-  adapter: _0x557913,
+  adapter: adapter4,
   saveOutputBlob: saveOutputBlob = null,
-  createLocationGuide: _0x441452,
+  createLocationGuide: createLocationGuide2,
 } = {}) {
-  const _0x1928dd = [
-    'canvasExists',
-    'switchCanvas',
-    'createCanvas',
-    'nodeExists',
-    'createNode',
-    'updateNode',
-  ];
-  if (_0x1928dd['some']((_0xd66f73) => typeof _0x557913?.[_0xd66f73] !== 'function'))
+  const list35 = ['canvasExists', 'switchCanvas', 'createCanvas', 'nodeExists', 'createNode', 'updateNode'];
+  if (list35['some']((value77) => typeof adapter4?.[value77] !== 'function'))
     throw new Error('人物替换画布适配器不完整');
-  const _0x50ccb8 = normalizeScope(scope),
-    _0x3ce8f1 = normalizeWorkspaceStep(project),
-    _0x32458e = _0x50ccb8 === PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'] || _0x3ce8f1 <= 0x2,
-    _0x4f8ae5 =
-      _0x50ccb8 === PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'] || _0x3ce8f1 === 0x2 || _0x3ce8f1 === 0x3,
-    [_0x1221d8, _0x566379] = await Promise['all']([
-      _0x32458e ? resolveProjectAppearanceImageSizes(project) : project,
-      _0x4f8ae5 ? resolveProjectShotImageSizes(project) : project,
+  const scope3 = normalizeScope(scope),
+    workspaceStep3 = normalizeWorkspaceStep(project),
+    value78 = scope3 === PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'] || workspaceStep3 <= 0x2,
+    value79 =
+      scope3 === PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'] ||
+      workspaceStep3 === 0x2 ||
+      workspaceStep3 === 0x3,
+    [characters2, shots2] = await Promise['all']([
+      value78 ? resolveProjectAppearanceImageSizes(project) : project,
+      value79 ? resolveProjectShotImageSizes(project) : project,
     ]),
-    _0x42bd3c = { ...project, characters: _0x1221d8['characters'], shots: _0x566379['shots'] },
-    _0x41b388 = buildPersonReplacementCanvasPlan({ project: _0x42bd3c, scope: _0x50ccb8 });
-  if (!_0x41b388['length']) throw new Error('当前项目还没有可同步到画布的内容。');
-  if (
-    _0x41b388['some']((_0x5c6f93) => _0x5c6f93['parentKey']) &&
-    typeof _0x557913?.['setNodeParent'] !== 'function'
-  )
+    project13 = { ...project, characters: characters2['characters'], shots: shots2['shots'] },
+    plan2 = buildPersonReplacementCanvasPlan({ project: project13, scope: scope3 });
+  if (!plan2['length']) throw new Error('当前项目还没有可同步到画布的内容。');
+  if (plan2['some']((value80) => value80['parentKey']) && typeof adapter4?.['setNodeParent'] !== 'function')
     throw new Error('人物替换画布适配器缺少节点分组能力');
   if (
-    _0x41b388['some']((_0x243f10) => normalizeList(_0x243f10['inputKeys'])['length']) &&
-    typeof _0x557913?.['connectNodes'] !== 'function'
+    plan2['some']((value81) => normalizeList(value81['inputKeys'])['length']) &&
+    typeof adapter4?.['connectNodes'] !== 'function'
   )
     throw new Error('人物替换画布适配器缺少节点连线能力');
-  const _0x2cde96 = normalizeText(project['title']) || '人物替换项目',
-    _0x4219e1 =
-      _0x50ccb8 === PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'] && _0x3ce8f1 < 0x5
-        ? _0x2cde96 + ' · ' + getWorkspaceStepName(_0x3ce8f1)
-        : _0x2cde96,
-    _0xd0d13e = asObject(project['output']?.['canvasBinding']),
-    _0x130b46 = normalizeText(_0xd0d13e['canvasId']),
-    _0x569d28 = normalizeText(_0xd0d13e['scope']) === _0x50ccb8,
-    _0x3eaa92 =
-      _0x50ccb8 !== PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'] ||
-      Math['trunc'](Number(_0xd0d13e['workspaceStep']) || 0x0) === _0x3ce8f1,
-    _0x164fe9 =
-      Math['trunc'](Number(_0xd0d13e['layoutVersion']) || 0x0) === PERSON_REPLACEMENT_CANVAS_LAYOUT_VERSION,
-    _0x551849 = Boolean(
-      _0x130b46 && _0x569d28 && _0x3eaa92 && _0x164fe9 && (await _0x557913['canvasExists'](_0x130b46)),
+  const text13 = normalizeText(project['title']) || '人物替换项目',
+    canvasName =
+      scope3 === PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'] && workspaceStep3 < 0x5
+        ? text13 + ' · ' + getWorkspaceStepName(workspaceStep3)
+        : text13,
+    previousBinding2 = asObject(project['output']?.['canvasBinding']),
+    text14 = normalizeText(previousBinding2['canvasId']),
+    text15 = normalizeText(previousBinding2['scope']) === scope3,
+    value82 =
+      scope3 !== PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'] ||
+      Math['trunc'](Number(previousBinding2['workspaceStep']) || 0x0) === workspaceStep3,
+    value83 =
+      Math['trunc'](Number(previousBinding2['layoutVersion']) || 0x0) ===
+      PERSON_REPLACEMENT_CANVAS_LAYOUT_VERSION,
+    canReuseCanvas2 = Boolean(
+      text14 && text15 && value82 && value83 && (await adapter4['canvasExists'](text14)),
     );
-  let _0x7bd8a2 = '';
-  if (_0x551849) {
-    const _0x2d9b12 = await _0x557913['switchCanvas'](_0x130b46);
-    if (_0x2d9b12 === ![]) throw new Error('无法切换到已绑定的人物替换画布：' + _0x130b46);
-    _0x7bd8a2 = _0x130b46;
-  } else _0x7bd8a2 = normalizeText(await _0x557913['createCanvas'](_0x4219e1));
-  if (!_0x7bd8a2) throw new Error('新建人物替换画布后未获得活动画布 ID');
-  const _0x385155 = asObject(_0xd0d13e['nodes']),
-    _0x4213cd = buildPlanLayout(_0x41b388),
-    _0x11fa68 = _0x551849
+  let canvasId2 = '';
+  if (canReuseCanvas2) {
+    const value84 = await adapter4['switchCanvas'](text14);
+    if (value84 === ![]) throw new Error('无法切换到已绑定的人物替换画布：' + text14);
+    canvasId2 = text14;
+  } else canvasId2 = normalizeText(await adapter4['createCanvas'](canvasName));
+  if (!canvasId2) throw new Error('新建人物替换画布后未获得活动画布 ID');
+  const previousNodes2 = asObject(previousBinding2['nodes']),
+    planLayout2 = buildPlanLayout(plan2),
+    reflowed = canReuseCanvas2
       ? await shouldReflowManagedNodes({
-          plan: _0x41b388,
-          planLayout: _0x4213cd,
-          previousBinding: _0xd0d13e,
-          adapter: _0x557913,
-          canvasId: _0x7bd8a2,
+          plan: plan2,
+          planLayout: planLayout2,
+          previousBinding: previousBinding2,
+          adapter: adapter4,
+          canvasId: canvasId2,
         })
       : ![],
-    _0x3a3247 = {},
-    _0x4238d1 = [];
-  let _0x5640a2 = 0x0,
-    _0x1dab5a = 0x0,
-    _0x50601c = 0x0;
-  const _0x43cda5 = 'person-replacement:' + (normalizeText(project['id']) || _0x7bd8a2),
-    _0x27e207 = await _0x557913['createMutationSnapshot']?.({ canvasId: _0x7bd8a2 });
+    nodes2 = {},
+    nodes3 = [];
+  let createdCount = 0x0,
+    updatedCount = 0x0,
+    deletedCount = 0x0;
+  const sequenceKey = 'person-replacement:' + (normalizeText(project['id']) || canvasId2),
+    mutationSnapshot2 = await adapter4['createMutationSnapshot']?.({ canvasId: canvasId2 });
   try {
     await materializePersonReplacementLocationGuides({
-      plan: _0x41b388,
-      project: _0x42bd3c,
-      adapter: _0x557913,
-      canReuseCanvas: _0x551849,
-      previousNodes: _0x385155,
-      canvasId: _0x7bd8a2,
+      plan: plan2,
+      project: project13,
+      adapter: adapter4,
+      canReuseCanvas: canReuseCanvas2,
+      previousNodes: previousNodes2,
+      canvasId: canvasId2,
       saveOutputBlob: saveOutputBlob,
-      createLocationGuide: _0x441452,
+      createLocationGuide: createLocationGuide2,
     });
-    if (_0x551849) {
-      const _0xb2e4c1 = [];
-      for (const [_0x19998a, _0x28b27c] of Object['entries'](_0x385155)) {
-        if (_0x19998a in _0x4213cd) continue;
-        const _0x19867c = normalizeText(_0x28b27c);
-        _0x19867c && (await _0x557913['nodeExists'](_0x19867c, _0x7bd8a2)) && _0xb2e4c1['push'](_0x19867c);
+    if (canReuseCanvas2) {
+      const list36 = [];
+      for (const [value85, value86] of Object['entries'](previousNodes2)) {
+        if (value85 in planLayout2) continue;
+        const text16 = normalizeText(value86);
+        text16 && (await adapter4['nodeExists'](text16, canvasId2)) && list36['push'](text16);
       }
-      if (_0xb2e4c1['length']) {
-        if (typeof _0x557913['deleteNodes'] !== 'function')
+      if (list36['length']) {
+        if (typeof adapter4['deleteNodes'] !== 'function')
           throw new Error('人物替换画布适配器缺少托管节点清理能力');
-        const _0x230f1b = await _0x557913['deleteNodes']([...new Set(_0xb2e4c1)], { canvasId: _0x7bd8a2 });
-        if (_0x230f1b === ![]) throw new Error('清理已失效的人物替换画布节点失败');
-        _0x50601c = new Set(_0xb2e4c1)['size'];
+        const value87 = await adapter4['deleteNodes']([...new Set(list36)], { canvasId: canvasId2 });
+        if (value87 === ![]) throw new Error('清理已失效的人物替换画布节点失败');
+        deletedCount = new Set(list36)['size'];
       }
     }
-    for (const _0x575e56 of _0x41b388) {
-      const _0x37f4d5 = normalizeText(_0x385155[_0x575e56['key']]),
-        _0xa2b9e9 = Boolean(_0x551849 && _0x37f4d5 && (await _0x557913['nodeExists'](_0x37f4d5, _0x7bd8a2))),
-        _0x40e6eb = _0xa2b9e9
-          ? await _0x557913['updateNode'](_0x37f4d5, _0x575e56['data'], {
-              canvasId: _0x7bd8a2,
-              key: _0x575e56['key'],
-              type: _0x575e56['type'],
-              width: _0x575e56['width'],
-              height: _0x575e56['height'],
-              ...(_0x11fa68 ? { position: _0x575e56['position'] } : {}),
+    for (const key3 of plan2) {
+      const text17 = normalizeText(previousNodes2[key3['key']]),
+        value88 = Boolean(canReuseCanvas2 && text17 && (await adapter4['nodeExists'](text17, canvasId2))),
+        node = value88
+          ? await adapter4['updateNode'](text17, key3['data'], {
+              canvasId: canvasId2,
+              key: key3['key'],
+              type: key3['type'],
+              width: key3['width'],
+              height: key3['height'],
+              ...(reflowed ? { position: key3['position'] } : {}),
             })
-          : await _0x557913['createNode'](_0x575e56['data'], {
-              canvasId: _0x7bd8a2,
-              key: _0x575e56['key'],
-              type: _0x575e56['type'],
-              width: _0x575e56['width'],
-              height: _0x575e56['height'],
-              position: _0x575e56['position'],
-              sequenceKey: _0x43cda5,
-              parentNodeId: normalizeText(_0x3a3247[_0x575e56['parentKey']]),
+          : await adapter4['createNode'](key3['data'], {
+              canvasId: canvasId2,
+              key: key3['key'],
+              type: key3['type'],
+              width: key3['width'],
+              height: key3['height'],
+              position: key3['position'],
+              sequenceKey: sequenceKey,
+              parentNodeId: normalizeText(nodes2[key3['parentKey']]),
             });
-      if (_0xa2b9e9) _0x1dab5a += 0x1;
-      else _0x5640a2 += 0x1;
-      const _0x2eee62 = normalizeText(_0x40e6eb?.['id'] || (_0xa2b9e9 ? _0x37f4d5 : ''));
-      if (!_0x2eee62)
-        throw new Error('同步人物替换画布节点失败：' + (_0x575e56['data']['name'] || _0x575e56['key']));
-      ((_0x3a3247[_0x575e56['key']] = _0x2eee62),
-        _0x4238d1['push']({ ..._0x575e56, nodeId: _0x2eee62, node: _0x40e6eb }));
+      if (value88) updatedCount += 0x1;
+      else createdCount += 0x1;
+      const nodeId = normalizeText(node?.['id'] || (value88 ? text17 : ''));
+      if (!nodeId) throw new Error('同步人物替换画布节点失败：' + (key3['data']['name'] || key3['key']));
+      ((nodes2[key3['key']] = nodeId), nodes3['push']({ ...key3, nodeId: nodeId, node: node }));
     }
-    for (const _0x7a8a4c of _0x41b388) {
-      if (!_0x7a8a4c['parentKey']) continue;
-      const _0x586903 = normalizeText(_0x3a3247[_0x7a8a4c['key']]),
-        _0x5bf115 = normalizeText(_0x3a3247[_0x7a8a4c['parentKey']]);
-      if (!_0x586903 || !_0x5bf115) throw new Error('人物替换画布分组缺少节点：' + _0x7a8a4c['key']);
-      const _0x4da7b8 = await _0x557913['setNodeParent'](_0x586903, _0x5bf115, { canvasId: _0x7bd8a2 });
-      if (_0x4da7b8 === ![]) throw new Error('人物替换画布节点分组失败：' + _0x7a8a4c['key']);
+    for (const event7 of plan2) {
+      if (!event7['parentKey']) continue;
+      const text18 = normalizeText(nodes2[event7['key']]),
+        text19 = normalizeText(nodes2[event7['parentKey']]);
+      if (!text18 || !text19) throw new Error('人物替换画布分组缺少节点：' + event7['key']);
+      const value89 = await adapter4['setNodeParent'](text18, text19, { canvasId: canvasId2 });
+      if (value89 === ![]) throw new Error('人物替换画布节点分组失败：' + event7['key']);
     }
-    for (const _0x36b0ae of _0x41b388) {
-      const _0x4a8a0c = normalizeText(_0x3a3247[_0x36b0ae['key']]);
-      for (const _0xc4ab61 of normalizeList(_0x36b0ae['inputKeys'])) {
-        const _0x7bffd8 = normalizeText(_0x3a3247[_0xc4ab61]);
-        if (!_0x7bffd8 || !_0x4a8a0c)
-          throw new Error('人物替换画布连线缺少节点：' + _0xc4ab61 + ' → ' + _0x36b0ae['key']);
-        const _0x4dde1e = await _0x557913['connectNodes'](_0x7bffd8, _0x4a8a0c, {
-          canvasId: _0x7bd8a2,
-          sourceKey: _0xc4ab61,
-          targetKey: _0x36b0ae['key'],
+    for (const targetKey of plan2) {
+      const text20 = normalizeText(nodes2[targetKey['key']]);
+      for (const sourceKey of normalizeList(targetKey['inputKeys'])) {
+        const text21 = normalizeText(nodes2[sourceKey]);
+        if (!text21 || !text20)
+          throw new Error('人物替换画布连线缺少节点：' + sourceKey + ' → ' + targetKey['key']);
+        const value90 = await adapter4['connectNodes'](text21, text20, {
+          canvasId: canvasId2,
+          sourceKey: sourceKey,
+          targetKey: targetKey['key'],
         });
-        if (_0x4dde1e === ![])
-          throw new Error('人物替换画布节点连线失败：' + _0xc4ab61 + ' → ' + _0x36b0ae['key']);
+        if (value90 === ![])
+          throw new Error('人物替换画布节点连线失败：' + sourceKey + ' → ' + targetKey['key']);
       }
     }
-    (await _0x557913['renameCanvas']?.(_0x7bd8a2, _0x4219e1),
-      _0x557913['commit']?.(),
-      typeof _0x557913['focusNodes'] === 'function' &&
-        (await _0x557913['focusNodes'](
-          _0x4238d1['map']((_0x680864) => _0x680864['nodeId']),
+    (await adapter4['renameCanvas']?.(canvasId2, canvasName),
+      adapter4['commit']?.(),
+      typeof adapter4['focusNodes'] === 'function' &&
+        (await adapter4['focusNodes'](
+          nodes3['map']((value91) => value91['nodeId']),
           { padding: 0x50, durationMs: 0x0, maxZoom: 0.2 },
         )));
-  } catch (_0x19eeab) {
+  } catch (value92) {
     await rollbackCanvasMutation({
-      adapter: _0x557913,
-      canvasId: _0x7bd8a2,
-      reused: _0x551849,
-      mutationSnapshot: _0x27e207,
+      adapter: adapter4,
+      canvasId: canvasId2,
+      reused: canReuseCanvas2,
+      mutationSnapshot: mutationSnapshot2,
     });
-    throw _0x19eeab;
+    throw value92;
   }
-  const _0x228eaf = {
-    canvasId: _0x7bd8a2,
-    scope: _0x50ccb8,
-    workspaceStep: _0x3ce8f1,
+  const binding3 = {
+    canvasId: canvasId2,
+    scope: scope3,
+    workspaceStep: workspaceStep3,
     layoutVersion: PERSON_REPLACEMENT_CANVAS_LAYOUT_VERSION,
-    nodes: _0x3a3247,
-    layout: _0x4213cd,
+    nodes: nodes2,
+    layout: planLayout2,
   };
   return {
-    canvasId: _0x7bd8a2,
-    canvasName: _0x4219e1,
-    scope: _0x50ccb8,
-    nodes: _0x4238d1,
-    reused: _0x551849,
-    reflowed: _0x11fa68,
-    createdCount: _0x5640a2,
-    updatedCount: _0x1dab5a,
-    deletedCount: _0x50601c,
-    binding: _0x228eaf,
-    canvasBinding: _0x228eaf,
+    canvasId: canvasId2,
+    canvasName: canvasName,
+    scope: scope3,
+    nodes: nodes3,
+    reused: canReuseCanvas2,
+    reflowed: reflowed,
+    createdCount: createdCount,
+    updatedCount: updatedCount,
+    deletedCount: deletedCount,
+    binding: binding3,
+    canvasBinding: binding3,
   };
 }

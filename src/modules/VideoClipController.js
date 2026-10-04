@@ -19,8 +19,8 @@ import {
 } from '../components/videoFrameCapture.js';
 import { playVideoWithRecovery } from '../components/video-node/mediaPlaybackRecovery.js';
 import { saveOutputBlob } from './project.js';
-export function normalizeVideoCutResultLocalPath(_0x9835b7) {
-  return pickResultLocalPath(_0x9835b7);
+export function normalizeVideoCutResultLocalPath(value) {
+  return pickResultLocalPath(value);
 }
 const SMART_CLIP_MIN_SEGMENTS = 2,
   SMART_CLIP_MAX_SEGMENTS = 25,
@@ -40,512 +40,502 @@ export const SMART_CLIP_KEYFRAME_DEFAULT_OPTIONS = Object.freeze({
   fps: SMART_CLIP_DEFAULT_FPS,
   outputMode: SMART_CLIP_OUTPUT_MODE_KEYFRAMES,
 });
-function videoClipText(_0x1c56c1, _0x52dd5b = {}) {
-  return t('videoClip.' + _0x1c56c1, _0x52dd5b);
+function videoClipText(item, key = {}) {
+  return t('videoClip.' + item, key);
 }
-function escapeClipHelperHtml(_0x582382) {
-  return String(_0x582382 ?? '').replace(/[&<>"']/g, (_0x41526e) => {
-    if (_0x41526e === '&') return '&amp;';
-    if (_0x41526e === '<') return '&lt;';
-    if (_0x41526e === '>') return '&gt;';
-    if (_0x41526e === '"') return '&quot;';
+function escapeClipHelperHtml(index) {
+  return String(index ?? '').replace(/[&<>"']/g, (result) => {
+    if (result === '&') return '&amp;';
+    if (result === '<') return '&lt;';
+    if (result === '>') return '&gt;';
+    if (result === '"') return '&quot;';
     return '&#39;';
   });
 }
-function clipHelperLabel(_0x3279df, _0x3bf9e6 = {}) {
-  return escapeClipHelperHtml(videoClipText(_0x3279df, _0x3bf9e6));
+function clipHelperLabel(data, options = {}) {
+  return escapeClipHelperHtml(videoClipText(data, options));
 }
-export function normalizeSmartClipMaxSegments(_0x5628b5) {
-  const _0x5f5489 = Number(_0x5628b5),
-    _0xf52e4d = Number.isFinite(_0x5f5489) ? Math.round(_0x5f5489) : SMART_CLIP_DEFAULT_SEGMENTS;
-  return Math.max(SMART_CLIP_MIN_SEGMENTS, Math.min(SMART_CLIP_MAX_SEGMENTS, _0xf52e4d));
+export function normalizeSmartClipMaxSegments(target) {
+  const source = Number(target),
+    next = Number.isFinite(source) ? Math.round(source) : SMART_CLIP_DEFAULT_SEGMENTS;
+  return Math.max(SMART_CLIP_MIN_SEGMENTS, Math.min(SMART_CLIP_MAX_SEGMENTS, next));
 }
-export function normalizeSmartClipFps(_0x5f0e28) {
-  const _0x132905 = Number(_0x5f0e28),
-    _0x14f2ff = Number.isFinite(_0x132905) ? Math.round(_0x132905) : SMART_CLIP_DEFAULT_FPS;
-  return SMART_CLIP_FPS_OPTIONS.includes(_0x14f2ff) ? _0x14f2ff : SMART_CLIP_DEFAULT_FPS;
+export function normalizeSmartClipFps(current) {
+  const entry = Number(current),
+    record = Number.isFinite(entry) ? Math.round(entry) : SMART_CLIP_DEFAULT_FPS;
+  return SMART_CLIP_FPS_OPTIONS.includes(record) ? record : SMART_CLIP_DEFAULT_FPS;
 }
-export function normalizeSmartClipOutputMode(_0x24e83e) {
-  const _0x27b274 = String(_0x24e83e || '').trim();
-  return _0x27b274 === SMART_CLIP_OUTPUT_MODE_KEYFRAMES
+export function normalizeSmartClipOutputMode(payload) {
+  const handle = String(payload || '').trim();
+  return handle === SMART_CLIP_OUTPUT_MODE_KEYFRAMES
     ? SMART_CLIP_OUTPUT_MODE_KEYFRAMES
     : SMART_CLIP_DEFAULT_OUTPUT_MODE;
 }
-function normalizeSmartClipMode(_0x73d604) {
-  const _0x3bfd05 = String(_0x73d604 || '')
+function normalizeSmartClipMode(state) {
+  const config = String(state || '')
     .trim()
     .toLowerCase();
-  return SMART_CLIP_MODE_OPTIONS.includes(_0x3bfd05) ? _0x3bfd05 : 'stable';
+  return SMART_CLIP_MODE_OPTIONS.includes(config) ? config : 'stable';
 }
-function normalizeSmartClipRunOptions(_0x4942d1 = {}) {
-  const _0x58bcbe = _0x4942d1 && typeof _0x4942d1 === 'object' ? _0x4942d1 : {};
+function normalizeSmartClipRunOptions(options2 = {}) {
+  const scope = options2 && typeof options2 === 'object' ? options2 : {};
   return {
-    mode: normalizeSmartClipMode(_0x58bcbe.mode),
-    maxSegments: normalizeSmartClipMaxSegments(_0x58bcbe.maxSegments),
-    fps: normalizeSmartClipFps(_0x58bcbe.fps),
-    outputMode: normalizeSmartClipOutputMode(_0x58bcbe.outputMode),
+    mode: normalizeSmartClipMode(scope.mode),
+    maxSegments: normalizeSmartClipMaxSegments(scope.maxSegments),
+    fps: normalizeSmartClipFps(scope.fps),
+    outputMode: normalizeSmartClipOutputMode(scope.outputMode),
   };
 }
-export function isSmartClipImageResult(_0x3db377, _0xe884a5 = pickResultLocalPath(_0x3db377)) {
-  const _0x210ed2 = String(_0x3db377?.outputType || _0x3db377?.type || '')
+export function isSmartClipImageResult(response, resultLocalPath = pickResultLocalPath(response)) {
+  const input = String(response?.outputType || response?.type || '')
       .trim()
       .toLowerCase(),
-    _0x5514f5 = String(_0x3db377?.mimeType || _0x3db377?.contentType || '')
+    output = String(response?.mimeType || response?.contentType || '')
       .trim()
       .toLowerCase();
   return (
-    _0x210ed2 === 'image' ||
-    _0x5514f5.startsWith('image/') ||
-    SMART_CLIP_IMAGE_EXT_RE.test(String(_0xe884a5 || _0x3db377?.url || _0x3db377?.path || ''))
+    input === 'image' ||
+    output.startsWith('image/') ||
+    SMART_CLIP_IMAGE_EXT_RE.test(String(resultLocalPath || response?.url || response?.path || ''))
   );
 }
-function resolveSmartClipResultUrl(_0x33b4c0, _0x3a8a5a) {
+function resolveSmartClipResultUrl(response2, value2) {
   return (
-    localPathToUrl(_0x3a8a5a) || String(_0x33b4c0?.url || _0x33b4c0?.src || _0x33b4c0?.imageUrl || '').trim()
+    localPathToUrl(value2) || String(response2?.url || response2?.src || response2?.imageUrl || '').trim()
   );
 }
-function getWindowTimer(_0x579346) {
-  const _0x16ed48 = globalThis.window?.[_0x579346] || globalThis[_0x579346];
-  return typeof _0x16ed48 === 'function' ? _0x16ed48.bind(globalThis.window || globalThis) : null;
+function getWindowTimer(value3) {
+  const value4 = globalThis.window?.[value3] || globalThis[value3];
+  return typeof value4 === 'function' ? value4.bind(globalThis.window || globalThis) : null;
 }
-function waitForSmartClipVideoEvent(_0x85450, _0x2473e9, _0x26b236 = 0x2710) {
-  const _0x1b7db8 = getWindowTimer('setTimeout'),
-    _0x526dc9 = getWindowTimer('clearTimeout');
-  if (!_0x85450 || typeof _0x1b7db8 !== 'function') return Promise.resolve(false);
-  return new Promise((_0x45b387) => {
-    let _0x2fe4e4 = false,
-      _0x3c5366 = null;
-    const _0x4828b9 = () => {
-        for (const _0x30cb9d of _0x2473e9) {
-          _0x85450.removeEventListener?.(_0x30cb9d, _0x39a0d1);
+function waitForSmartClipVideoEvent(el, value5, value6 = 0x2710) {
+  const run = getWindowTimer('setTimeout'),
+    handler = getWindowTimer('clearTimeout');
+  if (!el || typeof run !== 'function') return Promise.resolve(false);
+  return new Promise((handler2) => {
+    let value7 = false,
+      value8 = null;
+    const run2 = () => {
+        for (const value9 of value5) {
+          el.removeEventListener?.(value9, value10);
         }
-        (_0x85450.removeEventListener?.('error', _0x1b2afb),
-          _0x85450.removeEventListener?.('abort', _0x1b2afb));
-        if (_0x3c5366 && typeof _0x526dc9 === 'function') _0x526dc9(_0x3c5366);
+        (el.removeEventListener?.('error', value11), el.removeEventListener?.('abort', value11));
+        if (value8 && typeof handler === 'function') handler(value8);
       },
-      _0x3a4deb = (_0x307c7d) => {
-        if (_0x2fe4e4) return;
-        ((_0x2fe4e4 = true), _0x4828b9(), _0x45b387(_0x307c7d === true));
+      handler3 = (value12) => {
+        if (value7) return;
+        ((value7 = true), run2(), handler2(value12 === true));
       },
-      _0x39a0d1 = () => _0x3a4deb(true),
-      _0x1b2afb = () => _0x3a4deb(false);
-    for (const _0xa7070b of _0x2473e9) {
-      _0x85450.addEventListener?.(_0xa7070b, _0x39a0d1, { once: true });
+      value10 = () => handler3(true),
+      value11 = () => handler3(false);
+    for (const value13 of value5) {
+      el.addEventListener?.(value13, value10, { once: true });
     }
-    (_0x85450.addEventListener?.('error', _0x1b2afb, { once: true }),
-      _0x85450.addEventListener?.('abort', _0x1b2afb, { once: true }),
-      (_0x3c5366 = _0x1b7db8(() => _0x3a4deb(false), _0x26b236)));
+    (el.addEventListener?.('error', value11, { once: true }),
+      el.addEventListener?.('abort', value11, { once: true }),
+      (value8 = run(() => handler3(false), value6)));
   });
 }
-async function captureSmartClipVideoFirstFrame(_0x348f6e, _0x550790) {
-  const _0x51c882 = globalThis.document;
-  if (!_0x51c882 || !_0x348f6e) throw new Error('missing video url');
-  const _0x5498ae = _0x51c882.createElement('video');
-  ((_0x5498ae.muted = true),
-    (_0x5498ae.playsInline = true),
-    (_0x5498ae.preload = 'auto'),
-    (_0x5498ae.crossOrigin = 'anonymous'),
-    (_0x5498ae.style.position = 'fixed'),
-    (_0x5498ae.style.left = '-10000px'),
-    (_0x5498ae.style.top = '-10000px'),
-    (_0x5498ae.style.width = '1px'),
-    (_0x5498ae.style.height = '1px'),
-    (_0x5498ae.style.opacity = '0'),
-    _0x51c882.body?.appendChild(_0x5498ae));
+async function captureSmartClipVideoFirstFrame(enabled, fileNamePrefix) {
+  const el2 = globalThis.document;
+  if (!el2 || !enabled) throw new Error('missing video url');
+  const el3 = el2.createElement('video');
+  ((el3.muted = true),
+    (el3.playsInline = true),
+    (el3.preload = 'auto'),
+    (el3.crossOrigin = 'anonymous'),
+    (el3.style.position = 'fixed'),
+    (el3.style.left = '-10000px'),
+    (el3.style.top = '-10000px'),
+    (el3.style.width = '1px'),
+    (el3.style.height = '1px'),
+    (el3.style.opacity = '0'),
+    el2.body?.appendChild(el3));
   try {
-    _0x5498ae.src = _0x348f6e;
+    el3.src = enabled;
     try {
-      _0x5498ae.load?.();
+      el3.load?.();
     } catch {}
-    const _0x58402 = await waitForVideoFrame(_0x5498ae, { timeoutMs: 0x2710 });
-    if (!_0x58402) throw new Error('video frame is not ready');
+    const waitForVideoFrame2 = await waitForVideoFrame(el3, { timeoutMs: 0x2710 });
+    if (!waitForVideoFrame2) throw new Error('video frame is not ready');
     return (
-      Number(_0x5498ae.currentTime || 0) > 0.001 &&
-        ((_0x5498ae.currentTime = 0),
-        await waitForSmartClipVideoEvent(_0x5498ae, ['seeked', 'timeupdate'], 0x1388)),
-      await captureVideoFrameSnapshot(_0x5498ae, { fileNamePrefix: _0x550790 })
+      Number(el3.currentTime || 0) > 0.001 &&
+        ((el3.currentTime = 0), await waitForSmartClipVideoEvent(el3, ['seeked', 'timeupdate'], 0x1388)),
+      await captureVideoFrameSnapshot(el3, { fileNamePrefix: fileNamePrefix })
     );
   } finally {
     try {
-      (_0x5498ae.pause?.(), _0x5498ae.removeAttribute?.('src'), _0x5498ae.load?.());
+      (el3.pause?.(), el3.removeAttribute?.('src'), el3.load?.());
     } catch {}
-    _0x5498ae.remove?.();
+    el3.remove?.();
   }
 }
-async function extractSmartClipVideoResultFirstFrame(_0x3bef22, _0x7612ef, _0x1d0936) {
-  const _0x3256fa = resolveSmartClipResultUrl(_0x3bef22, _0x7612ef);
-  if (!_0x3256fa) throw new Error('missing video segment url');
-  const _0x21a5bd = await captureSmartClipVideoFirstFrame(
-    _0x3256fa,
-    'smart_clip_keyframe_' + (_0x1d0936 + 1),
+async function extractSmartClipVideoResultFirstFrame(value14, value15, value16) {
+  const smartClipResultUrl = resolveSmartClipResultUrl(value14, value15);
+  if (!smartClipResultUrl) throw new Error('missing video segment url');
+  const captureSmartClipVideoFirstFrame2 = await captureSmartClipVideoFirstFrame(
+    smartClipResultUrl,
+    'smart_clip_keyframe_' + (value16 + 1),
   );
-  return saveVideoFrameSnapshot(_0x21a5bd, saveOutputBlob);
+  return saveVideoFrameSnapshot(captureSmartClipVideoFirstFrame2, saveOutputBlob);
 }
-function emitSmartClipProgress(_0xccdeb7, _0x21aabb) {
-  if (typeof _0xccdeb7 !== 'function') return;
+function emitSmartClipProgress(handler4, value17) {
+  if (typeof handler4 !== 'function') return;
   try {
-    _0xccdeb7(_0x21aabb);
+    handler4(value17);
   } catch {}
 }
-function getSmartClipStageText(_0x5a5b9a) {
-  if (_0x5a5b9a === 'detect') return videoClipText('smartClip.stages.detect');
-  if (_0x5a5b9a === 'cut') return videoClipText('smartClip.stages.cut');
-  if (_0x5a5b9a === 'frame') return videoClipText('smartClip.stages.frame');
+function getSmartClipStageText(value18) {
+  if (value18 === 'detect') return videoClipText('smartClip.stages.detect');
+  if (value18 === 'cut') return videoClipText('smartClip.stages.cut');
+  if (value18 === 'frame') return videoClipText('smartClip.stages.frame');
   return videoClipText('smartClip.stages.processing');
 }
-function buildSmartClipProgressPayload(_0x5d6639 = {}) {
-  const _0xde2b6f = Math.max(0, Math.min(1, Number(_0x5d6639.progress || 0))),
-    _0x6db1c7 = Math.round(_0xde2b6f * 100),
-    _0xd6c46e = Number(_0x5d6639.doneCount || 0),
-    _0x1825e6 = Number(_0x5d6639.total || 0),
-    _0x43fb5b = String(_0x5d6639.stage || ''),
-    _0xe96b00 = getSmartClipStageText(_0x43fb5b);
+function buildSmartClipProgressPayload(options3 = {}) {
+  const progress = Math.max(0, Math.min(1, Number(options3.progress || 0))),
+    pct = Math.round(progress * 100),
+    doneCount = Number(options3.doneCount || 0),
+    total = Number(options3.total || 0),
+    stage = String(options3.stage || ''),
+    stageText = getSmartClipStageText(stage);
   return {
-    stage: _0x43fb5b,
-    stageText: _0xe96b00,
-    progress: _0xde2b6f,
-    pct: _0x6db1c7,
-    doneCount: _0xd6c46e,
-    total: _0x1825e6,
+    stage: stage,
+    stageText: stageText,
+    progress: progress,
+    pct: pct,
+    doneCount: doneCount,
+    total: total,
     text:
-      _0x1825e6 > 0
+      total > 0
         ? videoClipText('smartClip.progressWithTotal', {
-            stage: _0xe96b00,
-            done: _0xd6c46e,
-            total: _0x1825e6,
-            pct: _0x6db1c7,
+            stage: stageText,
+            done: doneCount,
+            total: total,
+            pct: pct,
           })
-        : videoClipText('smartClip.progressPercent', { stage: _0xe96b00, pct: _0x6db1c7 }),
+        : videoClipText('smartClip.progressPercent', { stage: stageText, pct: pct }),
   };
 }
-function pickPositiveNumber(..._0x16dd95) {
-  for (const _0x23bbaf of _0x16dd95) {
-    const _0x54383a = Number(_0x23bbaf);
-    if (Number.isFinite(_0x54383a) && _0x54383a > 0) return _0x54383a;
+function pickPositiveNumber(...args) {
+  for (const value19 of args) {
+    const count = Number(value19);
+    if (Number.isFinite(count) && count > 0) return count;
   }
   return 0;
 }
-function pickSelectedVideoItem(_0x325456) {
-  const _0x423d69 = Array.isArray(_0x325456?.videos) ? _0x325456.videos : [];
-  if (!_0x423d69.length) return null;
-  const _0x54e80d = Number(_0x325456?.mainVideoIndex),
-    _0x51c123 = Number.isFinite(_0x54e80d) ? Math.max(0, Math.trunc(_0x54e80d)) : 0;
-  return _0x423d69[Math.min(_0x51c123, _0x423d69.length - 1)] || _0x423d69[0] || null;
+function pickSelectedVideoItem(value20) {
+  const list = Array.isArray(value20?.videos) ? value20.videos : [];
+  if (!list.length) return null;
+  const value21 = Number(value20?.mainVideoIndex),
+    value22 = Number.isFinite(value21) ? Math.max(0, Math.trunc(value21)) : 0;
+  return list[Math.min(value22, list.length - 1)] || list[0] || null;
 }
 const DIRECT_VIDEO_SOURCE_RE = /^(?:https?:|blob:|data:)/i,
   BLOCKED_VIDEO_SOURCE_RE = /^(?:file|javascript):/i;
-function normalizeDirectVideoSource(_0x41839a) {
-  const _0x2f22f8 = String(_0x41839a || '').trim();
-  if (!_0x2f22f8 || BLOCKED_VIDEO_SOURCE_RE.test(_0x2f22f8)) return '';
-  const _0x40251a = localPathToUrl(_0x2f22f8);
-  if (_0x40251a) return _0x40251a;
-  if (_0x2f22f8.startsWith('/') && !_0x2f22f8.startsWith('//')) return _0x2f22f8;
-  return DIRECT_VIDEO_SOURCE_RE.test(_0x2f22f8) ? _0x2f22f8 : '';
+function normalizeDirectVideoSource(value23) {
+  const enabled2 = String(value23 || '').trim();
+  if (!enabled2 || BLOCKED_VIDEO_SOURCE_RE.test(enabled2)) return '';
+  const url = localPathToUrl(enabled2);
+  if (url) return url;
+  if (enabled2.startsWith('/') && !enabled2.startsWith('//')) return enabled2;
+  return DIRECT_VIDEO_SOURCE_RE.test(enabled2) ? enabled2 : '';
 }
-export function resolveVideoClipSourceUrl(_0x13dbfb) {
-  if (!_0x13dbfb) return '';
-  const _0x4c0c30 = pickSelectedVideoItem(_0x13dbfb),
-    _0x2dceff = _0x4c0c30 ? [_0x4c0c30, _0x13dbfb] : [_0x13dbfb];
-  for (const _0x41ad30 of _0x2dceff) {
-    const _0xb3a2c6 = resolveCanvasVideoUrl(_0x41ad30);
-    if (_0xb3a2c6) return _0xb3a2c6;
-    for (const _0xb42647 of ['src', 'videoUrl', 'url', 'resultUrl', 'sourceUrl']) {
-      const _0x592df6 = normalizeDirectVideoSource(_0x41ad30?.[_0xb42647]);
-      if (_0x592df6) return _0x592df6;
+export function resolveVideoClipSourceUrl(enabled3) {
+  if (!enabled3) return '';
+  const selectedVideoItem = pickSelectedVideoItem(enabled3),
+    value24 = selectedVideoItem ? [selectedVideoItem, enabled3] : [enabled3];
+  for (const value25 of value24) {
+    const canvasVideoUrl = resolveCanvasVideoUrl(value25);
+    if (canvasVideoUrl) return canvasVideoUrl;
+    for (const value26 of ['src', 'videoUrl', 'url', 'resultUrl', 'sourceUrl']) {
+      const directVideoSource = normalizeDirectVideoSource(value25?.[value26]);
+      if (directVideoSource) return directVideoSource;
     }
   }
   return '';
 }
-export function buildVideoCutNodeMeta(_0x4426b8, _0x2dd3c0, _0x38b686, _0x415df5) {
-  const _0x4c23d2 = Number(_0x2dd3c0),
-    _0x26da9a = Number(_0x38b686),
-    _0x359fd9 =
-      Number.isFinite(_0x4c23d2) && Number.isFinite(_0x26da9a) && _0x26da9a > _0x4c23d2
-        ? _0x26da9a - _0x4c23d2
-        : 0,
-    _0x5c45f7 = pickSelectedVideoItem(_0x4426b8),
-    _0xdfbc38 = pickPositiveNumber(
-      _0x5c45f7?.videoDuration,
-      _0x5c45f7?.duration,
-      _0x4426b8?.videoDuration,
-      _0x4426b8?.duration,
+export function buildVideoCutNodeMeta(value27, value28, value29, value30) {
+  const value31 = Number(value28),
+    value32 = Number(value29),
+    count2 =
+      Number.isFinite(value31) && Number.isFinite(value32) && value32 > value31 ? value32 - value31 : 0,
+    box = pickSelectedVideoItem(value27),
+    positiveNumber = pickPositiveNumber(
+      box?.videoDuration,
+      box?.duration,
+      value27?.videoDuration,
+      value27?.duration,
     ),
-    _0x558f92 = pickPositiveNumber(
-      _0x5c45f7?.videoFrameCount,
-      _0x5c45f7?.frameCount,
-      _0x4426b8?.videoFrameCount,
-      _0x4426b8?.frameCount,
+    positiveNumber2 = pickPositiveNumber(
+      box?.videoFrameCount,
+      box?.frameCount,
+      value27?.videoFrameCount,
+      value27?.frameCount,
     ),
-    _0x307148 =
-      pickPositiveNumber(
-        _0x415df5,
-        _0x5c45f7?.videoFps,
-        _0x5c45f7?.fps,
-        _0x4426b8?.videoFps,
-        _0x4426b8?.fps,
-      ) || (_0x558f92 > 0 && _0xdfbc38 > 0 ? _0x558f92 / _0xdfbc38 : 0),
-    _0x3c63d1 = pickPositiveNumber(
-      _0x5c45f7?.videoWidth,
-      _0x5c45f7?.width,
-      _0x4426b8?.videoWidth,
-      _0x4426b8?.selectedVideoWidth,
+    positiveNumber3 =
+      pickPositiveNumber(value30, box?.videoFps, box?.fps, value27?.videoFps, value27?.fps) ||
+      (positiveNumber2 > 0 && positiveNumber > 0 ? positiveNumber2 / positiveNumber : 0),
+    positiveNumber4 = pickPositiveNumber(
+      box?.videoWidth,
+      box?.width,
+      value27?.videoWidth,
+      value27?.selectedVideoWidth,
     ),
-    _0x398edc = pickPositiveNumber(
-      _0x5c45f7?.videoHeight,
-      _0x5c45f7?.height,
-      _0x4426b8?.videoHeight,
-      _0x4426b8?.selectedVideoHeight,
+    positiveNumber5 = pickPositiveNumber(
+      box?.videoHeight,
+      box?.height,
+      value27?.videoHeight,
+      value27?.selectedVideoHeight,
     ),
-    _0x34690d = {};
-  if (_0x359fd9 > 0) _0x34690d.videoDuration = _0x359fd9;
-  if (_0x307148 > 0) _0x34690d.videoFps = _0x307148;
-  _0x359fd9 > 0 &&
-    _0x307148 > 0 &&
-    (_0x34690d.videoFrameCount = Math.max(1, Math.round(_0x359fd9 * _0x307148)));
-  if (_0x3c63d1 > 0) _0x34690d.videoWidth = Math.round(_0x3c63d1);
-  if (_0x398edc > 0) _0x34690d.videoHeight = Math.round(_0x398edc);
-  return _0x34690d;
+    value33 = {};
+  if (count2 > 0) value33.videoDuration = count2;
+  if (positiveNumber3 > 0) value33.videoFps = positiveNumber3;
+  count2 > 0 &&
+    positiveNumber3 > 0 &&
+    (value33.videoFrameCount = Math.max(1, Math.round(count2 * positiveNumber3)));
+  if (positiveNumber4 > 0) value33.videoWidth = Math.round(positiveNumber4);
+  if (positiveNumber5 > 0) value33.videoHeight = Math.round(positiveNumber5);
+  return value33;
 }
-export function buildVideoCutNodePlaybackFields(_0x17e853) {
-  const _0x2ee1b9 = pickResultLocalPath({ localPath: _0x17e853 }),
-    _0x52e648 = localPathToUrl(_0x2ee1b9);
+export function buildVideoCutNodePlaybackFields(localPath) {
+  const localPath2 = pickResultLocalPath({ localPath: localPath }),
+    src = localPathToUrl(localPath2);
   return {
-    src: _0x52e648,
-    videoUrl: _0x52e648,
-    localPath: _0x2ee1b9,
-    originalLocalPath: _0x2ee1b9,
-    videoThumbSrc: _0x52e648,
+    src: src,
+    videoUrl: src,
+    localPath: localPath2,
+    originalLocalPath: localPath2,
+    videoThumbSrc: src,
   };
 }
-function applyVideoCutThumbResultToNode(_0x6715e8, _0xcac0c5, _0x3c1f32 = {}) {
-  const _0x57b6f7 = String(_0x6715e8 || '').trim(),
-    _0x1d118d = String(_0xcac0c5 || '').trim();
-  if (!_0x57b6f7 || !_0x1d118d) return;
-  const _0x57abfb = String(_0x3c1f32.thumbUrl || _0x3c1f32.url || '').trim(),
-    _0x492656 = pickResultLocalPath(_0x3c1f32);
-  if (!_0x57abfb && !_0x492656) return;
-  const _0x14279d = appStore.getState().nodes?.[_0x57b6f7];
-  if (!_0x14279d) return;
-  const _0x47a27b = resolveCanvasVideoUrl(_0x14279d);
-  if (_0x47a27b && _0x47a27b !== _0x1d118d) return;
-  const _0xfcc8ef = { videoThumbSrc: _0x1d118d, videoThumbUnavailableSource: '' };
-  (_0x57abfb && !String(_0x14279d.thumbUrl || '').trim() && (_0xfcc8ef.thumbUrl = _0x57abfb),
-    _0x492656 && !String(_0x14279d.posterLocalPath || '').trim() && (_0xfcc8ef.posterLocalPath = _0x492656),
-    appStore.updateNodeData(_0x57b6f7, _0xfcc8ef));
+function applyVideoCutThumbResultToNode(value34, value35, response3 = {}) {
+  const enabled4 = String(value34 || '').trim(),
+    videoThumbSrc = String(value35 || '').trim();
+  if (!enabled4 || !videoThumbSrc) return;
+  const enabled5 = String(response3.thumbUrl || response3.url || '').trim(),
+    resultLocalPath2 = pickResultLocalPath(response3);
+  if (!enabled5 && !resultLocalPath2) return;
+  const enabled6 = appStore.getState().nodes?.[enabled4];
+  if (!enabled6) return;
+  const canvasVideoUrl2 = resolveCanvasVideoUrl(enabled6);
+  if (canvasVideoUrl2 && canvasVideoUrl2 !== videoThumbSrc) return;
+  const value36 = { videoThumbSrc: videoThumbSrc, videoThumbUnavailableSource: '' };
+  (enabled5 && !String(enabled6.thumbUrl || '').trim() && (value36.thumbUrl = enabled5),
+    resultLocalPath2 &&
+      !String(enabled6.posterLocalPath || '').trim() &&
+      (value36.posterLocalPath = resultLocalPath2),
+    appStore.updateNodeData(enabled4, value36));
 }
-function ensureVideoCutNodeThumb(_0x1b01d8, _0x28ed89) {
-  const _0x1a2e1d = localPathToUrl(_0x28ed89);
-  if (!_0x1a2e1d) return;
-  fetchVideoFirstFrameThumbFromServer(_0x1a2e1d)
-    .then((_0x3afc25) => applyVideoCutThumbResultToNode(_0x1b01d8, _0x1a2e1d, _0x3afc25))
+function ensureVideoCutNodeThumb(value37, value38) {
+  const url2 = localPathToUrl(value38);
+  if (!url2) return;
+  fetchVideoFirstFrameThumbFromServer(url2)
+    .then((value39) => applyVideoCutThumbResultToNode(value37, url2, value39))
     .catch(() => {});
 }
 export async function runSmartClipFromVideoNode({
-  nodeId: _0x129cd6,
-  options: _0x4c2d0c,
-  onProgress: _0x89acfa,
-  shouldContinue: _0x4325fc,
+  nodeId: nodeId,
+  options: options4,
+  onProgress: onProgress,
+  shouldContinue: shouldContinue,
 } = {}) {
-  const _0x169019 = normalizeSmartClipRunOptions(_0x4c2d0c),
-    _0x59be81 = String(_0x129cd6 || '').trim(),
-    _0x186819 = appStore.getState().nodes,
-    _0x1d60a6 = _0x186819[_0x59be81];
-  if (!_0x1d60a6) throw new Error(videoClipText('errors.videoNodeMissing'));
-  const _0x557246 =
-    localPathToUrl(_0x1d60a6.localPath) || _0x1d60a6.src || _0x1d60a6.videoUrl || _0x1d60a6.resultUrl || '';
-  if (!_0x557246) throw new Error(videoClipText('errors.invalidSource'));
-  emitSmartClipProgress(_0x89acfa, {
+  const outputMode = normalizeSmartClipRunOptions(options4),
+    value40 = String(nodeId || '').trim(),
+    value41 = appStore.getState().nodes,
+    enabled7 = value41[value40];
+  if (!enabled7) throw new Error(videoClipText('errors.videoNodeMissing'));
+  const src2 =
+    localPathToUrl(enabled7.localPath) || enabled7.src || enabled7.videoUrl || enabled7.resultUrl || '';
+  if (!src2) throw new Error(videoClipText('errors.invalidSource'));
+  emitSmartClipProgress(onProgress, {
     stage: 'prepare',
     stageText: videoClipText('smartClip.stages.prepare'),
     text: videoClipText('smartClip.preparing'),
-    outputMode: _0x169019.outputMode,
+    outputMode: outputMode.outputMode,
   });
-  const _0x339551 = await requester({
+  const response4 = await requester({
     url: '/api/v2/video/smart_clip',
     method: 'POST',
     provider: 'local',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ src: _0x557246, options: _0x169019 }),
+    body: JSON.stringify({ src: src2, options: outputMode }),
     allow404Null: true,
     returnMeta: true,
   });
-  if (_0x339551?.status === 0x194 || _0x339551?.data == null)
+  if (response4?.status === 0x194 || response4?.data == null)
     throw new Error(videoClipText('errors.smartClipEndpointMissing'));
-  if (!_0x339551?.data?.success)
-    throw new Error(_0x339551?.data?.error || videoClipText('errors.startFailed'));
-  const _0x5cf701 = _0x339551.data.jobId;
-  if (!_0x5cf701) throw new Error(videoClipText('errors.startMissingJobId'));
+  if (!response4?.data?.success)
+    throw new Error(response4?.data?.error || videoClipText('errors.startFailed'));
+  const enabled8 = response4.data.jobId;
+  if (!enabled8) throw new Error(videoClipText('errors.startMissingJobId'));
   for (;;) {
-    if (typeof _0x4325fc === 'function' && _0x4325fc() === false)
+    if (typeof shouldContinue === 'function' && shouldContinue() === false)
       throw new Error(videoClipText('errors.exitedClipMode'));
-    const _0x358980 = await requester({
-        url: '/api/v2/video/smart_clip/status?jobId=' + encodeURIComponent(_0x5cf701),
+    const requester2 = await requester({
+        url: '/api/v2/video/smart_clip/status?jobId=' + encodeURIComponent(enabled8),
         method: 'GET',
         provider: 'local',
         timeout: 0x4e20,
         returnMeta: true,
       }),
-      _0x3f07fe = _0x358980.data || {};
-    if (_0x3f07fe.status === 'error')
-      throw new Error(_0x3f07fe.error || videoClipText('errors.smartClipFailed'));
-    emitSmartClipProgress(_0x89acfa, {
-      ...buildSmartClipProgressPayload(_0x3f07fe),
-      outputMode: _0x169019.outputMode,
+      response5 = requester2.data || {};
+    if (response5.status === 'error')
+      throw new Error(response5.error || videoClipText('errors.smartClipFailed'));
+    emitSmartClipProgress(onProgress, {
+      ...buildSmartClipProgressPayload(response5),
+      outputMode: outputMode.outputMode,
     });
-    if (_0x3f07fe.status !== 'done') {
-      await new Promise((_0x284751) => setTimeout(_0x284751, 0x320));
+    if (response5.status !== 'done') {
+      await new Promise((value42) => setTimeout(value42, 0x320));
       continue;
     }
-    const _0x2c7a3c = Array.isArray(_0x3f07fe.segments) ? _0x3f07fe.segments : [];
-    if (!_0x2c7a3c.length)
-      return { ok: false, reason: 'no-segments', nodeIds: [], outputMode: _0x169019.outputMode };
-    const _0xb0bc3a = appStore.getState().nodes[_0x59be81];
-    if (!_0xb0bc3a) throw new Error(videoClipText('errors.sourceNodeMissing'));
-    const _0x4936d9 = normalizeSmartClipOutputMode(_0x3f07fe.outputMode || _0x169019.outputMode),
-      _0x5ed133 = _0x4936d9 === SMART_CLIP_OUTPUT_MODE_KEYFRAMES,
-      _0x403914 = getAutoMediaSizeByShortSide(_0xb0bc3a.width || 0x200, _0xb0bc3a.height || 0x120),
-      { spacing: _0x3e5d11, direction: _0x4ba01e, avoidOverlap: _0x594d02 } = getNodeSpawnPrefs(),
-      { startX: _0x5cc06f, startY: _0x5445cf } = calcSpawnStartFromAnchor(_0xb0bc3a, _0x3e5d11, _0x4ba01e),
-      _0x34e12a = [],
-      _0x529402 = { ...(appStore.getState().nodes || {}) };
-    for (let _0x14aeaf = 0; _0x14aeaf < _0x2c7a3c.length; _0x14aeaf++) {
-      const _0x568107 = _0x2c7a3c[_0x14aeaf] || {},
-        _0x520e05 = pickResultLocalPath(_0x568107);
-      if (!_0x520e05) continue;
-      let _0x428f75 = _0x568107,
-        _0x1af4c5 = _0x520e05;
-      if (_0x5ed133 && !isSmartClipImageResult(_0x568107, _0x520e05)) {
-        emitSmartClipProgress(_0x89acfa, {
+    const progress2 = Array.isArray(response5.segments) ? response5.segments : [];
+    if (!progress2.length)
+      return { ok: false, reason: 'no-segments', nodeIds: [], outputMode: outputMode.outputMode };
+    const box2 = appStore.getState().nodes[value40];
+    if (!box2) throw new Error(videoClipText('errors.sourceNodeMissing'));
+    const outputMode2 = normalizeSmartClipOutputMode(response5.outputMode || outputMode.outputMode),
+      reason = outputMode2 === SMART_CLIP_OUTPUT_MODE_KEYFRAMES,
+      autoMediaSizeByShortSide = getAutoMediaSizeByShortSide(box2.width || 0x200, box2.height || 0x120),
+      { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
+      { startX: startX, startY: startY } = calcSpawnStartFromAnchor(box2, spacing, direction),
+      nodeIds = [],
+      value43 = { ...(appStore.getState().nodes || {}) };
+    for (let doneCount2 = 0; doneCount2 < progress2.length; doneCount2++) {
+      const value44 = progress2[doneCount2] || {},
+        resultLocalPath3 = pickResultLocalPath(value44);
+      if (!resultLocalPath3) continue;
+      let originalLocalPath = value44,
+        localPath3 = resultLocalPath3;
+      if (reason && !isSmartClipImageResult(value44, resultLocalPath3)) {
+        emitSmartClipProgress(onProgress, {
           stage: 'frame',
           stageText: videoClipText('smartClip.stages.frame'),
-          progress: _0x2c7a3c.length > 0 ? _0x14aeaf / _0x2c7a3c.length : 0,
-          pct: _0x2c7a3c.length > 0 ? Math.round((_0x14aeaf / _0x2c7a3c.length) * 100) : 0,
-          doneCount: _0x14aeaf,
-          total: _0x2c7a3c.length,
+          progress: progress2.length > 0 ? doneCount2 / progress2.length : 0,
+          pct: progress2.length > 0 ? Math.round((doneCount2 / progress2.length) * 100) : 0,
+          doneCount: doneCount2,
+          total: progress2.length,
           text: videoClipText('smartClip.extractingFrame', {
-            current: _0x14aeaf + 1,
-            total: _0x2c7a3c.length,
+            current: doneCount2 + 1,
+            total: progress2.length,
           }),
-          outputMode: _0x4936d9,
+          outputMode: outputMode2,
         });
         try {
-          ((_0x428f75 = await extractSmartClipVideoResultFirstFrame(_0x568107, _0x520e05, _0x14aeaf)),
-            (_0x1af4c5 = pickResultLocalPath(_0x428f75)));
-        } catch (_0x3543c1) {
-          console.warn('[VideoClipController] smart clip keyframe fallback failed:', _0x3543c1);
+          ((originalLocalPath = await extractSmartClipVideoResultFirstFrame(
+            value44,
+            resultLocalPath3,
+            doneCount2,
+          )),
+            (localPath3 = pickResultLocalPath(originalLocalPath)));
+        } catch (value45) {
+          console.warn('[VideoClipController] smart clip keyframe fallback failed:', value45);
           continue;
         }
-        if (!_0x1af4c5) continue;
+        if (!localPath3) continue;
       }
-      const _0x2d3296 = normalizeSmartClipFps(_0x568107.fps || _0x169019.fps),
-        _0x55c9bc = Number(_0x568107.duration) > 0 ? Number(_0x568107.duration) : 0,
-        _0x2e12ec = pickPositiveNumber(
-          _0x428f75.width,
-          _0x428f75.imageWidth,
-          _0x428f75.originalWidth,
-          _0xb0bc3a.videoWidth,
-          _0xb0bc3a.selectedVideoWidth,
-          _0xb0bc3a.originalWidth,
-          _0xb0bc3a.width,
+      const videoFps = normalizeSmartClipFps(value44.fps || outputMode.fps),
+        videoDuration = Number(value44.duration) > 0 ? Number(value44.duration) : 0,
+        naturalWidth = pickPositiveNumber(
+          originalLocalPath.width,
+          originalLocalPath.imageWidth,
+          originalLocalPath.originalWidth,
+          box2.videoWidth,
+          box2.selectedVideoWidth,
+          box2.originalWidth,
+          box2.width,
           0x200,
         ),
-        _0x2ceaf0 = pickPositiveNumber(
-          _0x428f75.height,
-          _0x428f75.imageHeight,
-          _0x428f75.originalHeight,
-          _0xb0bc3a.videoHeight,
-          _0xb0bc3a.selectedVideoHeight,
-          _0xb0bc3a.originalHeight,
-          _0xb0bc3a.height,
+        naturalHeight = pickPositiveNumber(
+          originalLocalPath.height,
+          originalLocalPath.imageHeight,
+          originalLocalPath.originalHeight,
+          box2.videoHeight,
+          box2.selectedVideoHeight,
+          box2.originalHeight,
+          box2.height,
           0x120,
         ),
-        _0x595bf9 = _0x5ed133 ? getAutoMediaSizeByShortSide(_0x2e12ec, _0x2ceaf0) : _0x403914,
-        _0x373b34 = _0x594d02
-          ? findAvailablePosition(
-              _0x529402,
-              _0x5cc06f,
-              _0x5445cf,
-              _0x595bf9.width,
-              _0x595bf9.height,
-              _0x3e5d11,
-              _0x4ba01e,
-            )
-          : { x: _0x5cc06f, y: _0x5445cf },
-        _0x232937 = generateId(_0x5ed133 ? 'source-image-smart-frame' : 'source-video-scene'),
-        _0x321d8a = _0x5ed133 ? null : buildVideoCutNodePlaybackFields(_0x1af4c5),
-        _0x35749f = _0x5ed133
+        width = reason ? getAutoMediaSizeByShortSide(naturalWidth, naturalHeight) : autoMediaSizeByShortSide,
+        x = avoidOverlap
+          ? findAvailablePosition(value43, startX, startY, width.width, width.height, spacing, direction)
+          : { x: startX, y: startY },
+        id = generateId(reason ? 'source-image-smart-frame' : 'source-video-scene'),
+        args2 = reason ? null : buildVideoCutNodePlaybackFields(localPath3),
+        value46 = reason
           ? buildSourceMediaNodePayload({
-              id: _0x232937,
+              id: id,
               type: 'source-image',
-              x: _0x373b34.x,
-              y: _0x373b34.y,
-              width: _0x595bf9.width,
-              height: _0x595bf9.height,
-              name: videoClipText('smartClip.keyframeNodeName', { index: _0x14aeaf + 1 }),
-              src: localPathToUrl(_0x1af4c5),
-              localPath: _0x1af4c5,
-              originalLocalPath: _0x428f75.originalLocalPath || _0x1af4c5,
-              displayLocalPath: _0x428f75.displayLocalPath || '',
-              thumbLocalPath: _0x428f75.thumbLocalPath || '',
-              fileName: _0x428f75.fileName || _0x568107.fileName || '',
-              naturalWidth: _0x2e12ec,
-              naturalHeight: _0x2ceaf0,
-              originalWidth: _0x2e12ec,
-              originalHeight: _0x2ceaf0,
+              x: x.x,
+              y: x.y,
+              width: width.width,
+              height: width.height,
+              name: videoClipText('smartClip.keyframeNodeName', { index: doneCount2 + 1 }),
+              src: localPathToUrl(localPath3),
+              localPath: localPath3,
+              originalLocalPath: originalLocalPath.originalLocalPath || localPath3,
+              displayLocalPath: originalLocalPath.displayLocalPath || '',
+              thumbLocalPath: originalLocalPath.thumbLocalPath || '',
+              fileName: originalLocalPath.fileName || value44.fileName || '',
+              naturalWidth: naturalWidth,
+              naturalHeight: naturalHeight,
+              originalWidth: naturalWidth,
+              originalHeight: naturalHeight,
               needsAutoResize: false,
               fixedSize: true,
             })
           : buildSourceMediaNodePayload({
-              id: _0x232937,
+              id: id,
               type: 'source-video',
-              x: _0x373b34.x,
-              y: _0x373b34.y,
-              width: _0x595bf9.width,
-              height: _0x595bf9.height,
-              name: videoClipText('smartClip.segmentNodeName', { index: _0x14aeaf + 1 }),
-              ..._0x321d8a,
-              videoDuration: _0x55c9bc || undefined,
-              videoFps: _0x2d3296,
-              videoFrameCount: _0x55c9bc > 0 ? Math.max(1, Math.round(_0x55c9bc * _0x2d3296)) : undefined,
+              x: x.x,
+              y: x.y,
+              width: width.width,
+              height: width.height,
+              name: videoClipText('smartClip.segmentNodeName', { index: doneCount2 + 1 }),
+              ...args2,
+              videoDuration: videoDuration || undefined,
+              videoFps: videoFps,
+              videoFrameCount:
+                videoDuration > 0 ? Math.max(1, Math.round(videoDuration * videoFps)) : undefined,
               needsAutoResize: false,
               fixedSize: true,
             });
-      (appStore.addNode(_0x35749f),
-        (_0x529402[_0x232937] = _0x35749f),
-        _0x34e12a.push(_0x232937),
-        !_0x5ed133 && ensureVideoCutNodeThumb(_0x232937, _0x1af4c5));
+      (appStore.addNode(value46),
+        (value43[id] = value46),
+        nodeIds.push(id),
+        !reason && ensureVideoCutNodeThumb(id, localPath3));
     }
-    if (!_0x34e12a.length)
+    if (!nodeIds.length)
       return {
         ok: false,
-        reason: _0x5ed133 ? 'no-keyframes' : 'no-results',
+        reason: reason ? 'no-keyframes' : 'no-results',
         nodeIds: [],
-        outputMode: _0x4936d9,
+        outputMode: outputMode2,
       };
     return (
-      appStore.setSelectedNodes(_0x34e12a),
+      appStore.setSelectedNodes(nodeIds),
       commit(),
-      window.v2FocusOnNodes?.([_0x59be81, ..._0x34e12a]),
+      window.v2FocusOnNodes?.([value40, ...nodeIds]),
       window._triggerLocalCacheSave?.(),
-      { ok: true, nodeIds: _0x34e12a, outputMode: _0x4936d9 }
+      { ok: true, nodeIds: nodeIds, outputMode: outputMode2 }
     );
   }
 }
 export function runSmartClipKeyframeExtractionFromVideoNode({
-  nodeId: _0x4031da,
-  options: _0x5e459f,
-  onProgress: _0x2efe59,
-  shouldContinue: _0x3c2eff,
+  nodeId: nodeId2,
+  options: options5,
+  onProgress: onProgress2,
+  shouldContinue: shouldContinue2,
 } = {}) {
   return runSmartClipFromVideoNode({
-    nodeId: _0x4031da,
+    nodeId: nodeId2,
     options: {
       ...SMART_CLIP_KEYFRAME_DEFAULT_OPTIONS,
-      ...(_0x5e459f && typeof _0x5e459f === 'object' ? _0x5e459f : {}),
+      ...(options5 && typeof options5 === 'object' ? options5 : {}),
       outputMode: SMART_CLIP_OUTPUT_MODE_KEYFRAMES,
     },
-    onProgress: _0x2efe59,
-    shouldContinue: _0x3c2eff,
+    onProgress: onProgress2,
+    shouldContinue: shouldContinue2,
   });
 }
 const VideoClipController = {
@@ -588,43 +578,43 @@ const VideoClipController = {
   _rangeLoopSeekPending: false,
   _rangePlaybackSeq: 0,
   _hiddenEls: null,
-  init(_0x2e560e) {
-    if (!_0x2e560e) return;
+  init(nodeId3) {
+    if (!nodeId3) return;
     if (this.active) this.exit({ silent: true });
-    const _0x38a4fe = appStore.getState().nodes[_0x2e560e];
-    if (!_0x38a4fe) return;
+    const enabled9 = appStore.getState().nodes[nodeId3];
+    if (!enabled9) return;
     ((this.active = true),
-      (this.nodeId = _0x2e560e),
-      (this.anchorNodeId = _0x2e560e),
+      (this.nodeId = nodeId3),
+      (this.anchorNodeId = nodeId3),
       (this._rangeLoopSeekPending = false),
       (this._rangePlaybackSeq += 1),
-      appStore.setVideoClipState({ active: true, nodeId: _0x2e560e }),
+      appStore.setVideoClipState({ active: true, nodeId: nodeId3 }),
       (this._retryCount = 0),
       this._mountWhenReady());
   },
-  _applyDimMode(_0x27639b) {
-    const _0xce06eb = document.getElementById('v2-wrap');
-    if (_0xce06eb) {
-      if (_0x27639b) _0xce06eb.classList.add('is-video-clip-mode');
-      else _0xce06eb.classList.remove('is-video-clip-mode');
+  _applyDimMode(value47) {
+    const el4 = document.getElementById('v2-wrap');
+    if (el4) {
+      if (value47) el4.classList.add('is-video-clip-mode');
+      else el4.classList.remove('is-video-clip-mode');
     }
     if (this.wrapperEl) {
-      if (_0x27639b) this.wrapperEl.classList.add('is-video-clip-target');
+      if (value47) this.wrapperEl.classList.add('is-video-clip-target');
       else this.wrapperEl.classList.remove('is-video-clip-target');
     }
   },
-  _applyFrozenUI(_0x193656) {
+  _applyFrozenUI(value48) {
     if (!this.wrapperEl) return;
-    const _0x452ca8 = 'is-video-clipping';
-    if (_0x193656) this.wrapperEl.classList.add(_0x452ca8);
-    else this.wrapperEl.classList.remove(_0x452ca8);
-    this._applyFrozenOverlaysHidden(_0x193656);
+    const value49 = 'is-video-clipping';
+    if (value48) this.wrapperEl.classList.add(value49);
+    else this.wrapperEl.classList.remove(value49);
+    this._applyFrozenOverlaysHidden(value48);
   },
-  _applyFrozenOverlaysHidden(_0x224a37) {
+  _applyFrozenOverlaysHidden(value50) {
     if (!this.wrapperEl) return;
-    if (_0x224a37) {
+    if (value50) {
       if (Array.isArray(this._hiddenEls) && this._hiddenEls.length) return;
-      const _0xfb700b = [
+      const list2 = [
           '.video-controls',
           '.video-mute-btn',
           '.node-upload-hint',
@@ -632,38 +622,37 @@ const VideoClipController = {
           '.gen-video-center-indicator',
           '.multi-toggle-btn',
         ],
-        _0x486672 = [];
-      (_0xfb700b.forEach((_0x296386) => {
-        this.wrapperEl.querySelectorAll(_0x296386).forEach((_0x585e8c) => {
-          (_0x486672.push({ el: _0x585e8c, prevDisplay: _0x585e8c.style.display }),
-            (_0x585e8c.style.display = 'none'));
+        list3 = [];
+      (list2.forEach((item2) => {
+        this.wrapperEl.querySelectorAll(item2).forEach((el5) => {
+          (list3.push({ el: el5, prevDisplay: el5.style.display }), (el5.style.display = 'none'));
         });
       }),
-        (this._hiddenEls = _0x486672));
+        (this._hiddenEls = list3));
       return;
     }
-    const _0x3e8b88 = Array.isArray(this._hiddenEls) ? this._hiddenEls : [];
+    const list4 = Array.isArray(this._hiddenEls) ? this._hiddenEls : [];
     ((this._hiddenEls = null),
-      _0x3e8b88.forEach(({ el: _0x4bbfb2, prevDisplay: _0x58a6d4 }) => {
-        if (!_0x4bbfb2 || !_0x4bbfb2.isConnected) return;
-        _0x4bbfb2.style.display = _0x58a6d4 || '';
+      list4.forEach(({ el: el6, prevDisplay: prevDisplay }) => {
+        if (!el6 || !el6.isConnected) return;
+        el6.style.display = prevDisplay || '';
       }));
   },
   _mountWhenReady() {
-    const _0x306460 = this.nodeId,
-      _0x15b673 = () => {
-        if (!this.active || this.nodeId !== _0x306460) return;
-        const _0x33b834 = document.getElementById(_0x306460);
-        if (!_0x33b834) {
+    const value51 = this.nodeId,
+      value52 = () => {
+        if (!this.active || this.nodeId !== value51) return;
+        const enabled10 = document.getElementById(value51);
+        if (!enabled10) {
           this._retryCount++;
           if (this._retryCount > 10) {
             this.exit({ silent: true });
             return;
           }
-          this._retryRaf = requestAnimationFrame(_0x15b673);
+          this._retryRaf = requestAnimationFrame(value52);
           return;
         }
-        ((this.wrapperEl = _0x33b834),
+        ((this.wrapperEl = enabled10),
           this._applyFrozenUI(true),
           this._applyDimMode(true),
           this._createUI(),
@@ -671,89 +660,85 @@ const VideoClipController = {
           this._syncDurationAndDefaults(),
           this._render());
       };
-    this._retryRaf = requestAnimationFrame(_0x15b673);
+    this._retryRaf = requestAnimationFrame(value52);
   },
   _createUI() {
     if (!this.wrapperEl) return;
-    this.wrapperEl.querySelectorAll('.v2-video-clipbar').forEach((_0x4713ee) => _0x4713ee.remove());
-    const _0x5e4f92 = document.createElement('div');
-    ((_0x5e4f92.className = 'v2-video-clipbar'),
-      _0x5e4f92.addEventListener('pointerdown', (_0x1351e3) => _0x1351e3.stopPropagation()),
-      _0x5e4f92.addEventListener('click', (_0x18da54) => _0x18da54.stopPropagation()),
-      _0x5e4f92.addEventListener('dblclick', (_0x688371) => {
-        (_0x688371.preventDefault(), _0x688371.stopPropagation());
+    this.wrapperEl.querySelectorAll('.v2-video-clipbar').forEach((el7) => el7.remove());
+    const el8 = document.createElement('div');
+    ((el8.className = 'v2-video-clipbar'),
+      el8.addEventListener('pointerdown', (event) => event.stopPropagation()),
+      el8.addEventListener('click', (event2) => event2.stopPropagation()),
+      el8.addEventListener('dblclick', (event3) => {
+        (event3.preventDefault(), event3.stopPropagation());
       }));
-    const _0x1b72a6 = document.createElement('button');
-    ((_0x1b72a6.type = 'button'),
-      (_0x1b72a6.className = 'v2-video-clipbtn cancel'),
-      (_0x1b72a6.title = videoClipText('controls.cancel')));
+    const el9 = document.createElement('button');
+    ((el9.type = 'button'),
+      (el9.className = 'v2-video-clipbtn cancel'),
+      (el9.title = videoClipText('controls.cancel')));
     {
-      const _0x14362b = 'http://www.w3.org/2000/svg',
-        _0x5c7434 = document.createElementNS(_0x14362b, 'svg');
-      (_0x5c7434.setAttribute('width', '20'),
-        _0x5c7434.setAttribute('height', '20'),
-        _0x5c7434.setAttribute('viewBox', '0 0 24 24'),
-        _0x5c7434.setAttribute('fill', 'none'),
-        _0x5c7434.setAttribute('stroke', 'currentColor'),
-        _0x5c7434.setAttribute('stroke-width', '2'));
-      const _0x174586 = document.createElementNS(_0x14362b, 'path');
-      _0x174586.setAttribute('d', 'M18 6L6 18');
-      const _0x94b70b = document.createElementNS(_0x14362b, 'path');
-      (_0x94b70b.setAttribute('d', 'M6 6l12 12'),
-        _0x5c7434.appendChild(_0x174586),
-        _0x5c7434.appendChild(_0x94b70b),
-        _0x1b72a6.appendChild(_0x5c7434));
+      const value53 = 'http://www.w3.org/2000/svg',
+        el10 = document.createElementNS(value53, 'svg');
+      (el10.setAttribute('width', '20'),
+        el10.setAttribute('height', '20'),
+        el10.setAttribute('viewBox', '0 0 24 24'),
+        el10.setAttribute('fill', 'none'),
+        el10.setAttribute('stroke', 'currentColor'),
+        el10.setAttribute('stroke-width', '2'));
+      const el11 = document.createElementNS(value53, 'path');
+      el11.setAttribute('d', 'M18 6L6 18');
+      const el12 = document.createElementNS(value53, 'path');
+      (el12.setAttribute('d', 'M6 6l12 12'),
+        el10.appendChild(el11),
+        el10.appendChild(el12),
+        el9.appendChild(el10));
     }
-    const _0xd8c9ed = document.createElement('button');
-    ((_0xd8c9ed.type = 'button'),
-      (_0xd8c9ed.className = 'v2-video-clipbtn confirm'),
-      (_0xd8c9ed.title = videoClipText('controls.done')));
+    const el13 = document.createElement('button');
+    ((el13.type = 'button'),
+      (el13.className = 'v2-video-clipbtn confirm'),
+      (el13.title = videoClipText('controls.done')));
     {
-      const _0x5ef147 = 'http://www.w3.org/2000/svg',
-        _0x222fa0 = document.createElementNS(_0x5ef147, 'svg');
-      (_0x222fa0.setAttribute('width', '24'),
-        _0x222fa0.setAttribute('height', '24'),
-        _0x222fa0.setAttribute('viewBox', '0 0 24 24'),
-        _0x222fa0.setAttribute('fill', 'none'),
-        _0x222fa0.setAttribute('stroke', 'currentColor'),
-        _0x222fa0.setAttribute('stroke-width', '2.5'));
-      const _0x226fa7 = document.createElementNS(_0x5ef147, 'polyline');
-      (_0x226fa7.setAttribute('points', '20 6 9 17 4 12'),
-        _0x222fa0.appendChild(_0x226fa7),
-        _0xd8c9ed.appendChild(_0x222fa0));
+      const value54 = 'http://www.w3.org/2000/svg',
+        el14 = document.createElementNS(value54, 'svg');
+      (el14.setAttribute('width', '24'),
+        el14.setAttribute('height', '24'),
+        el14.setAttribute('viewBox', '0 0 24 24'),
+        el14.setAttribute('fill', 'none'),
+        el14.setAttribute('stroke', 'currentColor'),
+        el14.setAttribute('stroke-width', '2.5'));
+      const el15 = document.createElementNS(value54, 'polyline');
+      (el15.setAttribute('points', '20 6 9 17 4 12'), el14.appendChild(el15), el13.appendChild(el14));
     }
-    const _0x266f0c = document.createElement('div');
-    _0x266f0c.className = 'v2-video-cliprow';
-    const _0x13f4c5 = document.createElement('div');
-    _0x13f4c5.className = 'v2-video-cliptrack';
-    const _0x24fae7 = document.createElement('div');
-    _0x24fae7.className = 'v2-video-clipticks';
-    const _0x57bef5 = document.createElement('div');
-    _0x57bef5.className = 'v2-video-clipthumbs';
-    const _0x4ed579 = [];
-    for (let _0x50357c = 0; _0x50357c < 10; _0x50357c++) {
-      const _0x1e225e = document.createElement('div');
-      ((_0x1e225e.className = 'v2-video-clipthumb'),
-        _0x57bef5.appendChild(_0x1e225e),
-        _0x4ed579.push(_0x1e225e));
+    const el16 = document.createElement('div');
+    el16.className = 'v2-video-cliprow';
+    const el17 = document.createElement('div');
+    el17.className = 'v2-video-cliptrack';
+    const value55 = document.createElement('div');
+    value55.className = 'v2-video-clipticks';
+    const el18 = document.createElement('div');
+    el18.className = 'v2-video-clipthumbs';
+    const list5 = [];
+    for (let count3 = 0; count3 < 10; count3++) {
+      const value56 = document.createElement('div');
+      ((value56.className = 'v2-video-clipthumb'), el18.appendChild(value56), list5.push(value56));
     }
-    const _0x5a4086 = document.createElement('div');
-    _0x5a4086.className = 'v2-video-cliprange';
-    const _0x359137 = document.createElement('div');
-    _0x359137.className = 'v2-video-clipselection';
-    const _0x1d6625 = document.createElement('div');
-    _0x1d6625.className = 'v2-video-clipplayhead';
-    const _0x218b70 = document.createElement('div');
-    ((_0x218b70.className = 'v2-video-cliphandle left'), (_0x218b70.dataset.handle = 'left'));
-    const _0x20411f = document.createElement('div');
-    ((_0x20411f.className = 'v2-video-cliphandle right'), (_0x20411f.dataset.handle = 'right'));
-    const _0x2cbb58 = document.createElement('div');
-    ((_0x2cbb58.className = 'v2-video-cliplabel'), (_0x2cbb58.textContent = '0.00s'));
-    const _0x1e4ae9 = document.createElement('div');
-    _0x1e4ae9.className = 'v2-video-cliphelper-row';
-    const _0x3d4236 = document.createElement('div');
-    _0x3d4236.className = 'v2-video-cliphelper-left';
-    const _0x51662d = [
+    const el19 = document.createElement('div');
+    el19.className = 'v2-video-cliprange';
+    const value57 = document.createElement('div');
+    value57.className = 'v2-video-clipselection';
+    const value58 = document.createElement('div');
+    value58.className = 'v2-video-clipplayhead';
+    const el20 = document.createElement('div');
+    ((el20.className = 'v2-video-cliphandle left'), (el20.dataset.handle = 'left'));
+    const el21 = document.createElement('div');
+    ((el21.className = 'v2-video-cliphandle right'), (el21.dataset.handle = 'right'));
+    const el22 = document.createElement('div');
+    ((el22.className = 'v2-video-cliplabel'), (el22.textContent = '0.00s'));
+    const el23 = document.createElement('div');
+    el23.className = 'v2-video-cliphelper-row';
+    const el24 = document.createElement('div');
+    el24.className = 'v2-video-cliphelper-left';
+    const list6 = [
       {
         html:
           '<span class="v2-video-cliphelperkbd">Esc</span><span>' +
@@ -821,224 +806,223 @@ const VideoClipController = {
           '</span>',
       },
     ];
-    this._msgEls = _0x51662d.map((_0x37c907, _0x45510d) => {
-      const _0x2dbfaf = document.createElement('div');
-      _0x2dbfaf.className = 'v2-video-cliphelper-msg';
-      if (_0x45510d !== 0) _0x2dbfaf.classList.add('hide-down');
-      return ((_0x2dbfaf.innerHTML = _0x37c907.html), _0x3d4236.appendChild(_0x2dbfaf), _0x2dbfaf);
+    this._msgEls = list6.map((item3, count4) => {
+      const el25 = document.createElement('div');
+      el25.className = 'v2-video-cliphelper-msg';
+      if (count4 !== 0) el25.classList.add('hide-down');
+      return ((el25.innerHTML = item3.html), el24.appendChild(el25), el25);
     });
-    let _0x5134eb = 0;
+    let value59 = 0;
     ((this._msgInterval = setInterval(() => {
       if (!this.active || !this._msgEls) return;
-      const _0x30964a = this._msgEls[_0x5134eb];
-      _0x5134eb = (_0x5134eb + 1) % this._msgEls.length;
-      const _0x2ee7d7 = this._msgEls[_0x5134eb];
-      (_0x30964a.classList.remove('hide-down'),
-        _0x30964a.classList.add('hide-up'),
-        _0x2ee7d7.classList.remove('hide-up'),
-        _0x2ee7d7.classList.remove('hide-down'),
+      const el26 = this._msgEls[value59];
+      value59 = (value59 + 1) % this._msgEls.length;
+      const el27 = this._msgEls[value59];
+      (el26.classList.remove('hide-down'),
+        el26.classList.add('hide-up'),
+        el27.classList.remove('hide-up'),
+        el27.classList.remove('hide-down'),
         setTimeout(() => {
-          _0x30964a &&
-            _0x30964a.classList.contains('hide-up') &&
-            (_0x30964a.classList.remove('hide-up'), _0x30964a.classList.add('hide-down'));
+          el26 &&
+            el26.classList.contains('hide-up') &&
+            (el26.classList.remove('hide-up'), el26.classList.add('hide-down'));
         }, 0x12c));
     }, 0xfa0)),
       (this._smartClipMode = this._smartClipMode || 'stable'),
       (this._smartClipMaxSegments = normalizeSmartClipMaxSegments(this._smartClipMaxSegments)),
       (this._smartClipFps = normalizeSmartClipFps(this._smartClipFps)),
       (this._smartClipOutputMode = normalizeSmartClipOutputMode(this._smartClipOutputMode)));
-    const _0x1c5d2a = document.createElement('div');
-    _0x1c5d2a.className = 'v2-video-clip-actions';
-    const _0x50a197 = document.createElement('div');
-    _0x50a197.className = 'v2-video-clip-smartwrap';
-    const _0x198e16 = document.createElement('button');
-    _0x198e16.className = 'v2-video-clip-smartbtn';
-    const _0x42c4c0 =
+    const el28 = document.createElement('div');
+    el28.className = 'v2-video-clip-actions';
+    const el29 = document.createElement('div');
+    el29.className = 'v2-video-clip-smartwrap';
+    const el30 = document.createElement('button');
+    el30.className = 'v2-video-clip-smartbtn';
+    const value60 =
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>',
-      _0xb9e80d =
+      value61 =
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><g style="animation:spin 1s linear infinite;transform-origin:50% 50%;transform-box:fill-box;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></g></svg>',
-      _0x1da1ba = () => escapeClipHelperHtml(videoClipText('smartPanel.smartClipButton'));
-    _0x198e16.innerHTML = _0x42c4c0 + ' ' + _0x1da1ba();
-    const _0x29a0a9 = document.createElement('button');
-    ((_0x29a0a9.type = 'button'),
-      (_0x29a0a9.className = 'v2-video-clip-smartbtn v2-video-clip-framebtn'),
-      (_0x29a0a9.title = videoClipText('smartPanel.extractFrame')),
-      _0x29a0a9.setAttribute('aria-label', videoClipText('smartPanel.extractFrame')));
-    const _0x1471ca =
+      handler5 = () => escapeClipHelperHtml(videoClipText('smartPanel.smartClipButton'));
+    el30.innerHTML = value60 + ' ' + handler5();
+    const el31 = document.createElement('button');
+    ((el31.type = 'button'),
+      (el31.className = 'v2-video-clip-smartbtn v2-video-clip-framebtn'),
+      (el31.title = videoClipText('smartPanel.extractFrame')),
+      el31.setAttribute('aria-label', videoClipText('smartPanel.extractFrame')));
+    const value62 =
       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>';
-    _0x29a0a9.innerHTML = _0x1471ca;
-    const _0x4f56f1 = document.createElement('div');
-    _0x4f56f1.className = 'v2-video-clip-smartpanel';
-    const _0x1634da = document.createElement('div');
-    ((_0x1634da.className = 'v2-video-clip-smartpanel-title'),
-      (_0x1634da.textContent = videoClipText('smartPanel.title')));
-    const _0x319510 = document.createElement('div');
-    _0x319510.className = 'v2-video-clip-smartpanel-row';
-    const _0x2f0e7f = document.createElement('div');
-    ((_0x2f0e7f.className = 'v2-video-clip-smartpanel-label'),
-      (_0x2f0e7f.textContent = videoClipText('smartPanel.output')));
-    const _0x28a5c7 = document.createElement('span');
-    ((_0x28a5c7.className = 'rh-tip'),
-      _0x28a5c7.setAttribute('data-tooltip', videoClipText('smartPanel.outputTip')),
-      (_0x28a5c7.textContent = '!'),
-      _0x2f0e7f.appendChild(_0x28a5c7));
-    const _0x52a92a = document.createElement('div');
-    _0x52a92a.className = 'v2-video-clip-modegroup v2-video-clip-outputgroup';
-    const _0x10b220 = document.createElement('button');
-    ((_0x10b220.type = 'button'),
-      (_0x10b220.className = 'v2-video-clip-modebtn'),
-      (_0x10b220.dataset.outputMode = SMART_CLIP_OUTPUT_MODE_SEGMENTS),
-      (_0x10b220.textContent = videoClipText('smartPanel.outputSegments')));
-    const _0x4c50c3 = document.createElement('button');
-    ((_0x4c50c3.type = 'button'),
-      (_0x4c50c3.className = 'v2-video-clip-modebtn'),
-      (_0x4c50c3.dataset.outputMode = SMART_CLIP_OUTPUT_MODE_KEYFRAMES),
-      (_0x4c50c3.textContent = videoClipText('smartPanel.outputKeyframes')),
-      _0x52a92a.appendChild(_0x10b220),
-      _0x52a92a.appendChild(_0x4c50c3),
-      _0x319510.appendChild(_0x2f0e7f),
-      _0x319510.appendChild(_0x52a92a));
-    const _0x5b2f4c = document.createElement('div');
-    _0x5b2f4c.className = 'v2-video-clip-smartpanel-row';
-    const _0xcc0b08 = document.createElement('div');
-    ((_0xcc0b08.className = 'v2-video-clip-smartpanel-label'),
-      (_0xcc0b08.textContent = videoClipText('smartPanel.mode')));
-    const _0x4701f1 = document.createElement('span');
-    ((_0x4701f1.className = 'rh-tip'),
-      _0x4701f1.setAttribute('data-tooltip', videoClipText('smartPanel.modeTip')),
-      (_0x4701f1.textContent = '!'),
-      _0xcc0b08.appendChild(_0x4701f1));
-    const _0x2786dc = document.createElement('div');
-    _0x2786dc.className = 'v2-video-clip-modegroup';
-    const _0x3e3401 = document.createElement('button');
-    ((_0x3e3401.type = 'button'),
-      (_0x3e3401.className = 'v2-video-clip-modebtn'),
-      (_0x3e3401.dataset.mode = 'stable'),
-      (_0x3e3401.textContent = videoClipText('smartPanel.modeStable')));
-    const _0x5333fb = document.createElement('button');
-    ((_0x5333fb.type = 'button'),
-      (_0x5333fb.className = 'v2-video-clip-modebtn'),
-      (_0x5333fb.dataset.mode = 'balanced'),
-      (_0x5333fb.textContent = videoClipText('smartPanel.modeBalanced')));
-    const _0x118aed = document.createElement('button');
-    ((_0x118aed.type = 'button'),
-      (_0x118aed.className = 'v2-video-clip-modebtn'),
-      (_0x118aed.dataset.mode = 'sensitive'),
-      (_0x118aed.textContent = videoClipText('smartPanel.modeSensitive')),
-      _0x2786dc.appendChild(_0x3e3401),
-      _0x2786dc.appendChild(_0x5333fb),
-      _0x2786dc.appendChild(_0x118aed),
-      _0x5b2f4c.appendChild(_0xcc0b08),
-      _0x5b2f4c.appendChild(_0x2786dc));
-    const _0x18acdc = document.createElement('div');
-    _0x18acdc.className = 'v2-video-clip-smartpanel-row';
-    const _0x4c1ed9 = document.createElement('div');
-    ((_0x4c1ed9.className = 'v2-video-clip-smartpanel-label'),
-      (_0x4c1ed9.textContent = videoClipText('smartPanel.fps')));
-    const _0x33da81 = document.createElement('span');
-    ((_0x33da81.className = 'rh-tip'),
-      _0x33da81.setAttribute('data-tooltip', videoClipText('smartPanel.fpsTip')),
-      (_0x33da81.textContent = '!'),
-      _0x4c1ed9.appendChild(_0x33da81));
-    const _0x504774 = document.createElement('div');
-    _0x504774.className = 'v2-video-clip-modegroup v2-video-clip-fpsgroup';
-    const _0x362143 = SMART_CLIP_FPS_OPTIONS.map((_0x5792a5) => {
-      const _0x8ce4c8 = document.createElement('button');
+    el31.innerHTML = value62;
+    const el32 = document.createElement('div');
+    el32.className = 'v2-video-clip-smartpanel';
+    const el33 = document.createElement('div');
+    ((el33.className = 'v2-video-clip-smartpanel-title'),
+      (el33.textContent = videoClipText('smartPanel.title')));
+    const el34 = document.createElement('div');
+    el34.className = 'v2-video-clip-smartpanel-row';
+    const el35 = document.createElement('div');
+    ((el35.className = 'v2-video-clip-smartpanel-label'),
+      (el35.textContent = videoClipText('smartPanel.output')));
+    const el36 = document.createElement('span');
+    ((el36.className = 'rh-tip'),
+      el36.setAttribute('data-tooltip', videoClipText('smartPanel.outputTip')),
+      (el36.textContent = '!'),
+      el35.appendChild(el36));
+    const el37 = document.createElement('div');
+    el37.className = 'v2-video-clip-modegroup v2-video-clip-outputgroup';
+    const el38 = document.createElement('button');
+    ((el38.type = 'button'),
+      (el38.className = 'v2-video-clip-modebtn'),
+      (el38.dataset.outputMode = SMART_CLIP_OUTPUT_MODE_SEGMENTS),
+      (el38.textContent = videoClipText('smartPanel.outputSegments')));
+    const el39 = document.createElement('button');
+    ((el39.type = 'button'),
+      (el39.className = 'v2-video-clip-modebtn'),
+      (el39.dataset.outputMode = SMART_CLIP_OUTPUT_MODE_KEYFRAMES),
+      (el39.textContent = videoClipText('smartPanel.outputKeyframes')),
+      el37.appendChild(el38),
+      el37.appendChild(el39),
+      el34.appendChild(el35),
+      el34.appendChild(el37));
+    const el40 = document.createElement('div');
+    el40.className = 'v2-video-clip-smartpanel-row';
+    const el41 = document.createElement('div');
+    ((el41.className = 'v2-video-clip-smartpanel-label'),
+      (el41.textContent = videoClipText('smartPanel.mode')));
+    const el42 = document.createElement('span');
+    ((el42.className = 'rh-tip'),
+      el42.setAttribute('data-tooltip', videoClipText('smartPanel.modeTip')),
+      (el42.textContent = '!'),
+      el41.appendChild(el42));
+    const el43 = document.createElement('div');
+    el43.className = 'v2-video-clip-modegroup';
+    const el44 = document.createElement('button');
+    ((el44.type = 'button'),
+      (el44.className = 'v2-video-clip-modebtn'),
+      (el44.dataset.mode = 'stable'),
+      (el44.textContent = videoClipText('smartPanel.modeStable')));
+    const el45 = document.createElement('button');
+    ((el45.type = 'button'),
+      (el45.className = 'v2-video-clip-modebtn'),
+      (el45.dataset.mode = 'balanced'),
+      (el45.textContent = videoClipText('smartPanel.modeBalanced')));
+    const el46 = document.createElement('button');
+    ((el46.type = 'button'),
+      (el46.className = 'v2-video-clip-modebtn'),
+      (el46.dataset.mode = 'sensitive'),
+      (el46.textContent = videoClipText('smartPanel.modeSensitive')),
+      el43.appendChild(el44),
+      el43.appendChild(el45),
+      el43.appendChild(el46),
+      el40.appendChild(el41),
+      el40.appendChild(el43));
+    const el47 = document.createElement('div');
+    el47.className = 'v2-video-clip-smartpanel-row';
+    const el48 = document.createElement('div');
+    ((el48.className = 'v2-video-clip-smartpanel-label'),
+      (el48.textContent = videoClipText('smartPanel.fps')));
+    const el49 = document.createElement('span');
+    ((el49.className = 'rh-tip'),
+      el49.setAttribute('data-tooltip', videoClipText('smartPanel.fpsTip')),
+      (el49.textContent = '!'),
+      el48.appendChild(el49));
+    const el50 = document.createElement('div');
+    el50.className = 'v2-video-clip-modegroup v2-video-clip-fpsgroup';
+    const list7 = SMART_CLIP_FPS_OPTIONS.map((fps) => {
+      const el51 = document.createElement('button');
       return (
-        (_0x8ce4c8.type = 'button'),
-        (_0x8ce4c8.className = 'v2-video-clip-modebtn v2-video-clip-fpsbtn'),
-        (_0x8ce4c8.dataset.fps = String(_0x5792a5)),
-        (_0x8ce4c8.textContent = videoClipText('smartPanel.fpsValue', { fps: _0x5792a5 })),
-        _0x504774.appendChild(_0x8ce4c8),
-        _0x8ce4c8
+        (el51.type = 'button'),
+        (el51.className = 'v2-video-clip-modebtn v2-video-clip-fpsbtn'),
+        (el51.dataset.fps = String(fps)),
+        (el51.textContent = videoClipText('smartPanel.fpsValue', { fps: fps })),
+        el50.appendChild(el51),
+        el51
       );
     });
-    (_0x18acdc.appendChild(_0x4c1ed9), _0x18acdc.appendChild(_0x504774));
-    const _0x1f0d97 = document.createElement('div');
-    _0x1f0d97.className = 'v2-video-clip-smartpanel-row';
-    const _0xb9169 = document.createElement('div');
-    ((_0xb9169.className = 'v2-video-clip-smartpanel-label'),
-      (_0xb9169.textContent = videoClipText('smartPanel.maxSegments')));
-    const _0x4f93bd = document.createElement('span');
-    ((_0x4f93bd.className = 'rh-tip'),
-      _0x4f93bd.setAttribute(
+    (el47.appendChild(el48), el47.appendChild(el50));
+    const el52 = document.createElement('div');
+    el52.className = 'v2-video-clip-smartpanel-row';
+    const el53 = document.createElement('div');
+    ((el53.className = 'v2-video-clip-smartpanel-label'),
+      (el53.textContent = videoClipText('smartPanel.maxSegments')));
+    const el54 = document.createElement('span');
+    ((el54.className = 'rh-tip'),
+      el54.setAttribute(
         'data-tooltip',
         videoClipText('smartPanel.maxSegmentsTip', { max: SMART_CLIP_MAX_SEGMENTS }),
       ),
-      (_0x4f93bd.textContent = '!'),
-      _0xb9169.appendChild(_0x4f93bd));
-    const _0x875c9b = document.createElement('div');
-    _0x875c9b.className = 'v2-video-clip-maxsegwrap';
-    const _0x176c84 = document.createElement('div');
-    ((_0x176c84.className = 'rh-stepper-value v2-video-clip-maxseg'),
-      _0x176c84.setAttribute('role', 'spinbutton'),
-      _0x176c84.setAttribute('aria-label', videoClipText('smartPanel.maxSegmentsAria')),
-      _0x176c84.setAttribute('aria-valuemin', String(SMART_CLIP_MIN_SEGMENTS)),
-      _0x176c84.setAttribute('aria-valuemax', String(SMART_CLIP_MAX_SEGMENTS)),
-      (_0x176c84.tabIndex = 0));
-    const _0x38d445 = document.createElement('span');
-    ((_0x38d445.className = 'v2-video-clip-maxseg-suffix'),
-      (_0x38d445.textContent = videoClipText('smartPanel.segmentUnit')),
-      _0x875c9b.appendChild(_0x176c84),
-      _0x875c9b.appendChild(_0x38d445),
-      _0x1f0d97.appendChild(_0xb9169),
-      _0x1f0d97.appendChild(_0x875c9b));
-    const _0x233f9a = document.createElement('div');
-    ((_0x233f9a.className = 'v2-video-clip-smartpanel-hint'),
-      (_0x233f9a.textContent = videoClipText('smartPanel.hintDefault')));
-    const _0x371829 = document.createElement('div');
-    _0x371829.className = 'v2-video-clip-smartpanel-actions';
-    const _0x436f98 = document.createElement('button');
-    ((_0x436f98.type = 'button'),
-      (_0x436f98.className = 'v2-video-clip-panelbtn'),
-      (_0x436f98.textContent = videoClipText('controls.cancel')));
-    const _0x28ee11 = document.createElement('button');
-    ((_0x28ee11.type = 'button'),
-      (_0x28ee11.className = 'v2-video-clip-panelbtn primary'),
-      (_0x28ee11.textContent = videoClipText('controls.start')),
-      _0x371829.appendChild(_0x436f98),
-      _0x371829.appendChild(_0x28ee11),
-      _0x4f56f1.appendChild(_0x1634da),
-      _0x4f56f1.appendChild(_0x319510),
-      _0x4f56f1.appendChild(_0x5b2f4c),
-      _0x4f56f1.appendChild(_0x18acdc),
-      _0x4f56f1.appendChild(_0x1f0d97),
-      _0x4f56f1.appendChild(_0x233f9a),
-      _0x4f56f1.appendChild(_0x371829));
-    const _0x4c48d0 = [_0x10b220, _0x4c50c3],
-      _0x4a0e1e = () => {
-        const _0x44fa81 = normalizeSmartClipOutputMode(this._smartClipOutputMode);
-        ((this._smartClipOutputMode = _0x44fa81),
-          _0x4c48d0.forEach((_0x4dd3b2) => {
-            _0x4dd3b2.classList.toggle('is-active', _0x4dd3b2.dataset.outputMode === _0x44fa81);
+      (el54.textContent = '!'),
+      el53.appendChild(el54));
+    const el55 = document.createElement('div');
+    el55.className = 'v2-video-clip-maxsegwrap';
+    const el56 = document.createElement('div');
+    ((el56.className = 'rh-stepper-value v2-video-clip-maxseg'),
+      el56.setAttribute('role', 'spinbutton'),
+      el56.setAttribute('aria-label', videoClipText('smartPanel.maxSegmentsAria')),
+      el56.setAttribute('aria-valuemin', String(SMART_CLIP_MIN_SEGMENTS)),
+      el56.setAttribute('aria-valuemax', String(SMART_CLIP_MAX_SEGMENTS)),
+      (el56.tabIndex = 0));
+    const el57 = document.createElement('span');
+    ((el57.className = 'v2-video-clip-maxseg-suffix'),
+      (el57.textContent = videoClipText('smartPanel.segmentUnit')),
+      el55.appendChild(el56),
+      el55.appendChild(el57),
+      el52.appendChild(el53),
+      el52.appendChild(el55));
+    const el58 = document.createElement('div');
+    ((el58.className = 'v2-video-clip-smartpanel-hint'),
+      (el58.textContent = videoClipText('smartPanel.hintDefault')));
+    const el59 = document.createElement('div');
+    el59.className = 'v2-video-clip-smartpanel-actions';
+    const el60 = document.createElement('button');
+    ((el60.type = 'button'),
+      (el60.className = 'v2-video-clip-panelbtn'),
+      (el60.textContent = videoClipText('controls.cancel')));
+    const el61 = document.createElement('button');
+    ((el61.type = 'button'),
+      (el61.className = 'v2-video-clip-panelbtn primary'),
+      (el61.textContent = videoClipText('controls.start')),
+      el59.appendChild(el60),
+      el59.appendChild(el61),
+      el32.appendChild(el33),
+      el32.appendChild(el34),
+      el32.appendChild(el40),
+      el32.appendChild(el47),
+      el32.appendChild(el52),
+      el32.appendChild(el58),
+      el32.appendChild(el59));
+    const list8 = [el38, el39],
+      handler6 = () => {
+        const smartClipOutputMode = normalizeSmartClipOutputMode(this._smartClipOutputMode);
+        ((this._smartClipOutputMode = smartClipOutputMode),
+          list8.forEach((el62) => {
+            el62.classList.toggle('is-active', el62.dataset.outputMode === smartClipOutputMode);
           }));
-        const _0x28e818 = _0x44fa81 === SMART_CLIP_OUTPUT_MODE_KEYFRAMES;
-        (_0x18acdc.classList.toggle('is-disabled', _0x28e818),
-          _0x362143.forEach((_0x542ac2) => {
-            ((_0x542ac2.disabled = _0x28e818),
-              _0x542ac2.setAttribute('aria-disabled', _0x28e818 ? 'true' : 'false'));
+        const value63 = smartClipOutputMode === SMART_CLIP_OUTPUT_MODE_KEYFRAMES;
+        (el47.classList.toggle('is-disabled', value63),
+          list7.forEach((el63) => {
+            ((el63.disabled = value63), el63.setAttribute('aria-disabled', value63 ? 'true' : 'false'));
           }),
-          (_0x233f9a.textContent = _0x28e818
+          (el58.textContent = value63
             ? videoClipText('smartPanel.hintKeyframes')
             : videoClipText('smartPanel.hintDefault')));
-        const _0x59e025 = this._smartClipMode || 'stable';
-        [_0x3e3401, _0x5333fb, _0x118aed].forEach((_0x103103) => {
-          if (!_0x103103) return;
-          if (_0x103103.dataset.mode === _0x59e025) _0x103103.classList.add('is-active');
-          else _0x103103.classList.remove('is-active');
+        const value64 = this._smartClipMode || 'stable';
+        [el44, el45, el46].forEach((el64) => {
+          if (!el64) return;
+          if (el64.dataset.mode === value64) el64.classList.add('is-active');
+          else el64.classList.remove('is-active');
         });
-        const _0x4f480d = normalizeSmartClipFps(this._smartClipFps);
-        ((this._smartClipFps = _0x4f480d),
-          _0x362143.forEach((_0x42d882) => {
-            _0x42d882.classList.toggle('is-active', Number(_0x42d882.dataset.fps) === _0x4f480d);
+        const smartClipFps = normalizeSmartClipFps(this._smartClipFps);
+        ((this._smartClipFps = smartClipFps),
+          list7.forEach((el65) => {
+            el65.classList.toggle('is-active', Number(el65.dataset.fps) === smartClipFps);
           }));
-        const _0x40e606 = normalizeSmartClipMaxSegments(this._smartClipMaxSegments);
-        ((this._smartClipMaxSegments = _0x40e606),
-          (_0x176c84.textContent = String(_0x40e606)),
-          _0x176c84.setAttribute('aria-valuenow', String(_0x40e606)));
+        const smartClipMaxSegments = normalizeSmartClipMaxSegments(this._smartClipMaxSegments);
+        ((this._smartClipMaxSegments = smartClipMaxSegments),
+          (el56.textContent = String(smartClipMaxSegments)),
+          el56.setAttribute('aria-valuenow', String(smartClipMaxSegments)));
       };
-    _0x4a0e1e();
-    const _0xee7079 = () => {
+    handler6();
+    const run3 = () => {
         if (!this._smartClipMaxSegmentDrag) return;
         (this._smartClipMaxSegmentDrag.el?.classList?.remove('is-dragging'),
           this._smartClipMaxSegmentDrag.doc?.removeEventListener?.(
@@ -1051,289 +1035,276 @@ const VideoClipController = {
           ),
           (this._smartClipMaxSegmentDrag = null));
       },
-      _0x595ecb = (_0x426659) => {
-        ((this._smartClipMaxSegments = normalizeSmartClipMaxSegments(_0x426659)), _0x4a0e1e());
+      handler7 = (value65) => {
+        ((this._smartClipMaxSegments = normalizeSmartClipMaxSegments(value65)), handler6());
       },
-      _0x1fd6bd = () => {
-        if (!_0x176c84?.isConnected) return;
-        const _0x118833 = normalizeSmartClipMaxSegments(this._smartClipMaxSegments),
-          _0xd3d309 = document.createElement('input');
-        ((_0xd3d309.className = 'rh-stepper-input v2-video-clip-maxseg-input'),
-          (_0xd3d309.type = 'number'),
-          (_0xd3d309.min = String(SMART_CLIP_MIN_SEGMENTS)),
-          (_0xd3d309.max = String(SMART_CLIP_MAX_SEGMENTS)),
-          (_0xd3d309.step = '1'),
-          (_0xd3d309.value = String(_0x118833)));
-        let _0x1c5243 = false;
-        const _0x237ad4 = (_0x44b2e4) => {
-          if (_0x1c5243) return;
-          ((_0x1c5243 = true),
-            _0x595ecb(_0x44b2e4 ? _0xd3d309.value : _0x118833),
-            _0xd3d309.replaceWith(_0x176c84),
-            _0x4a0e1e());
+      handler8 = () => {
+        if (!el56?.isConnected) return;
+        const smartClipMaxSegments2 = normalizeSmartClipMaxSegments(this._smartClipMaxSegments),
+          el66 = document.createElement('input');
+        ((el66.className = 'rh-stepper-input v2-video-clip-maxseg-input'),
+          (el66.type = 'number'),
+          (el66.min = String(SMART_CLIP_MIN_SEGMENTS)),
+          (el66.max = String(SMART_CLIP_MAX_SEGMENTS)),
+          (el66.step = '1'),
+          (el66.value = String(smartClipMaxSegments2)));
+        let value66 = false;
+        const run4 = (value67) => {
+          if (value66) return;
+          ((value66 = true),
+            handler7(value67 ? el66.value : smartClipMaxSegments2),
+            el66.replaceWith(el56),
+            handler6());
         };
-        (_0xd3d309.addEventListener('click', (_0x31ff36) => _0x31ff36.stopPropagation()),
-          _0xd3d309.addEventListener('mousedown', (_0x127c0f) => _0x127c0f.stopPropagation()),
-          _0xd3d309.addEventListener('keydown', (_0x4613cc) => {
-            _0x4613cc.stopPropagation();
-            if (_0x4613cc.key === 'Enter') _0x237ad4(true);
-            if (_0x4613cc.key === 'Escape') _0x237ad4(false);
+        (el66.addEventListener('click', (event4) => event4.stopPropagation()),
+          el66.addEventListener('mousedown', (event5) => event5.stopPropagation()),
+          el66.addEventListener('keydown', (event6) => {
+            event6.stopPropagation();
+            if (event6.key === 'Enter') run4(true);
+            if (event6.key === 'Escape') run4(false);
           }),
-          _0xd3d309.addEventListener('blur', () => _0x237ad4(true)),
-          _0x176c84.replaceWith(_0xd3d309),
-          _0xd3d309.focus(),
-          _0xd3d309.select());
+          el66.addEventListener('blur', () => run4(true)),
+          el56.replaceWith(el66),
+          el66.focus(),
+          el66.select());
       };
-    ((this._onSmartClipMaxSegmentDragMove = (_0x201b3a) => {
-      const _0x387499 = this._smartClipMaxSegmentDrag;
-      if (!_0x387499) return;
-      const _0x1e8c81 = _0x201b3a.clientX - _0x387499.x,
-        _0x1150ef = Math.trunc(_0x1e8c81 / 6),
-        _0x5062bf = normalizeSmartClipMaxSegments(_0x387499.base + _0x1150ef);
-      _0x5062bf !== _0x387499.last &&
-        ((_0x387499.moved = true), (_0x387499.last = _0x5062bf), _0x595ecb(_0x5062bf));
+    ((this._onSmartClipMaxSegmentDragMove = (event7) => {
+      const box3 = this._smartClipMaxSegmentDrag;
+      if (!box3) return;
+      const value68 = event7.clientX - box3.x,
+        value69 = Math.trunc(value68 / 6),
+        smartClipMaxSegments3 = normalizeSmartClipMaxSegments(box3.base + value69);
+      smartClipMaxSegments3 !== box3.last &&
+        ((box3.moved = true), (box3.last = smartClipMaxSegments3), handler7(smartClipMaxSegments3));
     }),
       (this._onSmartClipMaxSegmentDragUp = () => {
-        const _0xf1ebf8 = this._smartClipMaxSegmentDrag;
-        if (!_0xf1ebf8) return;
-        (_0xee7079(),
-          _0xf1ebf8.moved && ((this._suppressSmartClipMaxSegmentClick = true), _0x595ecb(_0xf1ebf8.last)));
+        const enabled11 = this._smartClipMaxSegmentDrag;
+        if (!enabled11) return;
+        (run3(),
+          enabled11.moved && ((this._suppressSmartClipMaxSegmentClick = true), handler7(enabled11.last)));
       }));
-    const _0x1eb3cc = () => {
-        (_0x4f56f1.classList.remove('is-open'),
+    const run5 = () => {
+        (el32.classList.remove('is-open'),
           this._onSmartClipDocDown &&
             (document.removeEventListener('pointerdown', this._onSmartClipDocDown, true),
             (this._onSmartClipDocDown = null)));
       },
-      _0x295efd = () => {
-        if (_0x198e16.dataset.loading === 'true') return;
-        (_0x4a0e1e(),
-          _0x4f56f1.classList.add('is-open'),
+      handler9 = () => {
+        if (el30.dataset.loading === 'true') return;
+        (handler6(),
+          el32.classList.add('is-open'),
           !this._onSmartClipDocDown &&
-            ((this._onSmartClipDocDown = (_0xa1ffd3) => {
+            ((this._onSmartClipDocDown = (event8) => {
               if (!this.active) return;
-              const _0x1fd237 = _0xa1ffd3?.target;
-              if (!_0x1fd237) return;
-              if (_0x50a197.contains(_0x1fd237)) return;
-              _0x1eb3cc();
+              const enabled12 = event8?.target;
+              if (!enabled12) return;
+              if (el29.contains(enabled12)) return;
+              run5();
             }),
             document.addEventListener('pointerdown', this._onSmartClipDocDown, true)));
       },
-      _0x1f2a30 = () => {
-        if (_0x4f56f1.classList.contains('is-open')) _0x1eb3cc();
-        else _0x295efd();
+      handler10 = () => {
+        if (el32.classList.contains('is-open')) run5();
+        else handler9();
       },
-      _0x32dd56 = (_0x3b1572) => {
-        ((this._smartClipMode = _0x3b1572), _0x4a0e1e());
+      handler11 = (value70) => {
+        ((this._smartClipMode = value70), handler6());
       },
-      _0x162a34 = (_0x578546) => {
-        ((this._smartClipOutputMode = normalizeSmartClipOutputMode(_0x578546)), _0x4a0e1e());
+      handler12 = (value71) => {
+        ((this._smartClipOutputMode = normalizeSmartClipOutputMode(value71)), handler6());
       },
-      _0x210508 = (_0xaec7e7) => {
-        ((this._smartClipFps = normalizeSmartClipFps(_0xaec7e7)), _0x4a0e1e());
+      handler13 = (value72) => {
+        ((this._smartClipFps = normalizeSmartClipFps(value72)), handler6());
       };
-    (_0x4c48d0.forEach((_0x5be4d3) => {
-      _0x5be4d3.onclick = (_0x34c680) => {
-        (_0x34c680.stopPropagation(), _0x162a34(_0x5be4d3.dataset.outputMode));
+    (list8.forEach((el67) => {
+      el67.onclick = (event9) => {
+        (event9.stopPropagation(), handler12(el67.dataset.outputMode));
       };
     }),
-      [_0x3e3401, _0x5333fb, _0x118aed].forEach((_0x5e37e2) => {
-        _0x5e37e2.onclick = (_0x46f12f) => {
-          (_0x46f12f.stopPropagation(), _0x32dd56(_0x5e37e2.dataset.mode || 'stable'));
+      [el44, el45, el46].forEach((el68) => {
+        el68.onclick = (event10) => {
+          (event10.stopPropagation(), handler11(el68.dataset.mode || 'stable'));
         };
       }),
-      _0x362143.forEach((_0x26f6f1) => {
-        _0x26f6f1.onclick = (_0x2774ca) => {
-          (_0x2774ca.stopPropagation(), _0x210508(_0x26f6f1.dataset.fps));
+      list7.forEach((el69) => {
+        el69.onclick = (event11) => {
+          (event11.stopPropagation(), handler13(el69.dataset.fps));
         };
       }),
-      (_0x176c84.onmousedown = (_0xc0206e) => {
-        if (_0xc0206e.button !== 0) return;
-        (_0xc0206e.preventDefault(), _0xc0206e.stopPropagation());
-        const _0x46e344 = document,
-          _0x17d6db = normalizeSmartClipMaxSegments(this._smartClipMaxSegments);
-        (_0xee7079(),
+      (el56.onmousedown = (x2) => {
+        if (x2.button !== 0) return;
+        (x2.preventDefault(), x2.stopPropagation());
+        const doc = document,
+          base = normalizeSmartClipMaxSegments(this._smartClipMaxSegments);
+        (run3(),
           (this._smartClipMaxSegmentDrag = {
-            x: _0xc0206e.clientX,
-            base: _0x17d6db,
-            last: _0x17d6db,
+            x: x2.clientX,
+            base: base,
+            last: base,
             moved: false,
-            el: _0x176c84,
-            doc: _0x46e344,
+            el: el56,
+            doc: doc,
           }),
-          _0x176c84.classList.add('is-dragging'),
-          _0x46e344.addEventListener('mousemove', this._onSmartClipMaxSegmentDragMove),
-          _0x46e344.addEventListener('mouseup', this._onSmartClipMaxSegmentDragUp));
+          el56.classList.add('is-dragging'),
+          doc.addEventListener('mousemove', this._onSmartClipMaxSegmentDragMove),
+          doc.addEventListener('mouseup', this._onSmartClipMaxSegmentDragUp));
       }),
-      (_0x176c84.onclick = (_0x2e5d91) => {
-        _0x2e5d91.stopPropagation();
+      (el56.onclick = (event12) => {
+        event12.stopPropagation();
         if (this._suppressSmartClipMaxSegmentClick) {
           this._suppressSmartClipMaxSegmentClick = false;
           return;
         }
-        _0x1fd6bd();
+        handler8();
       }),
-      (_0x176c84.onkeydown = (_0x3572f5) => {
-        _0x3572f5.stopPropagation();
-        if (_0x3572f5.key === 'Enter' || _0x3572f5.key === ' ') {
-          (_0x3572f5.preventDefault(), _0x1fd6bd());
+      (el56.onkeydown = (event13) => {
+        event13.stopPropagation();
+        if (event13.key === 'Enter' || event13.key === ' ') {
+          (event13.preventDefault(), handler8());
           return;
         }
-        if (_0x3572f5.key === 'ArrowRight' || _0x3572f5.key === 'ArrowUp') {
-          (_0x3572f5.preventDefault(), _0x595ecb(Number(this._smartClipMaxSegments) + 1));
+        if (event13.key === 'ArrowRight' || event13.key === 'ArrowUp') {
+          (event13.preventDefault(), handler7(Number(this._smartClipMaxSegments) + 1));
           return;
         }
-        (_0x3572f5.key === 'ArrowLeft' || _0x3572f5.key === 'ArrowDown') &&
-          (_0x3572f5.preventDefault(), _0x595ecb(Number(this._smartClipMaxSegments) - 1));
+        (event13.key === 'ArrowLeft' || event13.key === 'ArrowDown') &&
+          (event13.preventDefault(), handler7(Number(this._smartClipMaxSegments) - 1));
       }),
-      (_0x436f98.onclick = (_0x4f168b) => {
-        (_0x4f168b.stopPropagation(), _0x1eb3cc());
+      (el60.onclick = (event14) => {
+        (event14.stopPropagation(), run5());
       }));
-    const _0x5822e4 = async ({
-      mode: _0x3c59d3,
-      maxSegments: _0x48dfa5,
-      fps: _0x262daf,
-      outputMode: _0x1db762,
-    }) => {
-      const _0x52eb6 = normalizeSmartClipOutputMode(_0x1db762),
-        _0x11d6c2 = _0x52eb6 === SMART_CLIP_OUTPUT_MODE_KEYFRAMES;
-      ((_0x198e16.dataset.loading = 'true'),
-        (_0x198e16.disabled = true),
-        (_0x198e16.innerHTML = _0xb9e80d + ' ' + escapeClipHelperHtml(videoClipText('smartClip.preparing'))),
+    const run6 = async ({ mode: mode, maxSegments: maxSegments, fps: fps2, outputMode: outputMode3 }) => {
+      const outputMode4 = normalizeSmartClipOutputMode(outputMode3),
+        value73 = outputMode4 === SMART_CLIP_OUTPUT_MODE_KEYFRAMES;
+      ((el30.dataset.loading = 'true'),
+        (el30.disabled = true),
+        (el30.innerHTML = value61 + ' ' + escapeClipHelperHtml(videoClipText('smartClip.preparing'))),
         window.showToast?.(
-          _0x11d6c2
-            ? videoClipText('smartClip.startedKeyframes')
-            : videoClipText('smartClip.startedSegments'),
+          value73 ? videoClipText('smartClip.startedKeyframes') : videoClipText('smartClip.startedSegments'),
           'info',
         ));
       try {
-        const _0x1c110c = await runSmartClipFromVideoNode({
+        const count5 = await runSmartClipFromVideoNode({
           nodeId: this.anchorNodeId,
-          options: { mode: _0x3c59d3, maxSegments: _0x48dfa5, fps: _0x262daf, outputMode: _0x52eb6 },
+          options: { mode: mode, maxSegments: maxSegments, fps: fps2, outputMode: outputMode4 },
           shouldContinue: () => this.active,
-          onProgress: (_0x210102) => {
-            if (!_0x198e16?.isConnected || !_0x210102?.text) return;
-            _0x198e16.innerHTML = _0xb9e80d + ' ' + _0x210102.text;
+          onProgress: (response6) => {
+            if (!el30?.isConnected || !response6?.text) return;
+            el30.innerHTML = value61 + ' ' + response6.text;
           },
         });
-        if (!_0x1c110c?.ok) {
+        if (!count5?.ok) {
           window.showToast?.(
-            _0x1c110c?.reason === 'no-segments'
+            count5?.reason === 'no-segments'
               ? videoClipText('smartClip.noSegments')
-              : _0x11d6c2
+              : value73
                 ? videoClipText('smartClip.noKeyframes')
                 : videoClipText('smartClip.noResults'),
-            _0x1c110c?.reason === 'no-segments' ? 'info' : 'error',
+            count5?.reason === 'no-segments' ? 'info' : 'error',
           );
           return;
         }
         (window.showToast?.(
-          _0x11d6c2
-            ? videoClipText('smartClip.completeKeyframes', { count: _0x1c110c.nodeIds.length })
-            : videoClipText('smartClip.completeSegments', { count: _0x1c110c.nodeIds.length }),
+          value73
+            ? videoClipText('smartClip.completeKeyframes', { count: count5.nodeIds.length })
+            : videoClipText('smartClip.completeSegments', { count: count5.nodeIds.length }),
           'success',
         ),
           this.exit({ silent: true }));
-      } catch (_0x1f457b) {
-        const _0x56d457 =
-          _0x1f457b instanceof Error
-            ? _0x1f457b.message
-            : String(_0x1f457b || videoClipText('errors.smartClipFailed'));
-        window.showToast?.(videoClipText('smartClip.failedWithError', { error: _0x56d457 }), 'error');
+      } catch (error) {
+        const error2 =
+          error instanceof Error ? error.message : String(error || videoClipText('errors.smartClipFailed'));
+        window.showToast?.(videoClipText('smartClip.failedWithError', { error: error2 }), 'error');
       } finally {
-        (_0x1eb3cc(),
-          _0x198e16 &&
-            _0x198e16.isConnected &&
-            ((_0x198e16.dataset.loading = 'false'),
-            (_0x198e16.disabled = false),
-            (_0x198e16.innerHTML = _0x42c4c0 + ' ' + _0x1da1ba())));
+        (run5(),
+          el30 &&
+            el30.isConnected &&
+            ((el30.dataset.loading = 'false'),
+            (el30.disabled = false),
+            (el30.innerHTML = value60 + ' ' + handler5())));
       }
     };
-    ((_0x28ee11.onclick = async (_0x56bfe6) => {
-      (_0x56bfe6.stopPropagation(), _0x1eb3cc());
-      const _0x32c4f8 = this._smartClipMode || 'stable',
-        _0x427188 = normalizeSmartClipMaxSegments(this._smartClipMaxSegments),
-        _0xe5ddcd = normalizeSmartClipFps(this._smartClipFps),
-        _0x50bb4f = normalizeSmartClipOutputMode(this._smartClipOutputMode);
-      await _0x5822e4({ mode: _0x32c4f8, maxSegments: _0x427188, fps: _0xe5ddcd, outputMode: _0x50bb4f });
+    ((el61.onclick = async (event15) => {
+      (event15.stopPropagation(), run5());
+      const mode2 = this._smartClipMode || 'stable',
+        maxSegments2 = normalizeSmartClipMaxSegments(this._smartClipMaxSegments),
+        fps3 = normalizeSmartClipFps(this._smartClipFps),
+        outputMode5 = normalizeSmartClipOutputMode(this._smartClipOutputMode);
+      await run6({ mode: mode2, maxSegments: maxSegments2, fps: fps3, outputMode: outputMode5 });
     }),
-      (_0x198e16.onclick = (_0x254bc7) => {
-        (_0x254bc7.stopPropagation(), _0x1f2a30());
+      (el30.onclick = (event16) => {
+        (event16.stopPropagation(), handler10());
       }),
-      (_0x29a0a9.onclick = async (_0x47b6f4) => {
-        (_0x47b6f4.stopPropagation(), _0x1eb3cc());
-        if (_0x29a0a9.dataset.loading === 'true') return;
-        ((_0x29a0a9.dataset.loading = 'true'),
-          (_0x29a0a9.disabled = true),
-          (_0x29a0a9.innerHTML = _0xb9e80d));
+      (el31.onclick = async (event17) => {
+        (event17.stopPropagation(), run5());
+        if (el31.dataset.loading === 'true') return;
+        ((el31.dataset.loading = 'true'), (el31.disabled = true), (el31.innerHTML = value61));
         try {
-          const _0x2604d4 = this.videoEl || this._getVideoEl();
+          const videoEl = this.videoEl || this._getVideoEl();
           await extractCurrentVideoFrameToImageNode({
-            videoEl: _0x2604d4,
+            videoEl: videoEl,
             anchorNodeId: this.anchorNodeId,
-            fallbackDurationSec: this._readDurationSec(_0x2604d4) || this.durationSec,
+            fallbackDurationSec: this._readDurationSec(videoEl) || this.durationSec,
             logPrefix: '[VideoClipController]',
           });
         } finally {
-          _0x29a0a9 &&
-            _0x29a0a9.isConnected &&
-            ((_0x29a0a9.dataset.loading = 'false'),
-            (_0x29a0a9.disabled = false),
-            (_0x29a0a9.innerHTML = _0x1471ca));
+          el31 &&
+            el31.isConnected &&
+            ((el31.dataset.loading = 'false'), (el31.disabled = false), (el31.innerHTML = value62));
         }
       }),
-      _0x50a197.appendChild(_0x198e16),
-      _0x50a197.appendChild(_0x4f56f1),
-      _0x1c5d2a.appendChild(_0x50a197),
-      _0x1c5d2a.appendChild(_0x29a0a9),
-      _0x1e4ae9.appendChild(_0x3d4236),
-      _0x1e4ae9.appendChild(_0x1c5d2a),
-      _0x5a4086.appendChild(_0x359137),
-      _0x5a4086.appendChild(_0x218b70),
-      _0x5a4086.appendChild(_0x20411f),
-      _0x13f4c5.appendChild(_0x57bef5),
-      _0x13f4c5.appendChild(_0x5a4086),
-      _0x13f4c5.appendChild(_0x1d6625),
-      _0x13f4c5.appendChild(_0x24fae7),
-      _0x13f4c5.appendChild(_0x2cbb58),
-      _0x266f0c.appendChild(_0x1b72a6),
-      _0x266f0c.appendChild(_0x13f4c5),
-      _0x266f0c.appendChild(_0xd8c9ed),
-      _0x5e4f92.appendChild(_0x266f0c),
-      _0x5e4f92.appendChild(_0x1e4ae9),
-      this.wrapperEl.appendChild(_0x5e4f92),
-      (this.barEl = _0x5e4f92),
-      (this.cancelBtnEl = _0x1b72a6),
-      (this.confirmBtnEl = _0xd8c9ed),
-      (this.trackEl = _0x13f4c5),
-      (this.selectionEl = _0x359137),
-      (this.leftHandleEl = _0x218b70),
-      (this.rightHandleEl = _0x20411f),
-      (this.playheadEl = _0x1d6625),
-      (this.labelEl = _0x2cbb58),
-      (this.thumbEls = _0x4ed579));
+      el29.appendChild(el30),
+      el29.appendChild(el32),
+      el28.appendChild(el29),
+      el28.appendChild(el31),
+      el23.appendChild(el24),
+      el23.appendChild(el28),
+      el19.appendChild(value57),
+      el19.appendChild(el20),
+      el19.appendChild(el21),
+      el17.appendChild(el18),
+      el17.appendChild(el19),
+      el17.appendChild(value58),
+      el17.appendChild(value55),
+      el17.appendChild(el22),
+      el16.appendChild(el9),
+      el16.appendChild(el17),
+      el16.appendChild(el13),
+      el8.appendChild(el16),
+      el8.appendChild(el23),
+      this.wrapperEl.appendChild(el8),
+      (this.barEl = el8),
+      (this.cancelBtnEl = el9),
+      (this.confirmBtnEl = el13),
+      (this.trackEl = el17),
+      (this.selectionEl = value57),
+      (this.leftHandleEl = el20),
+      (this.rightHandleEl = el21),
+      (this.playheadEl = value58),
+      (this.labelEl = el22),
+      (this.thumbEls = list5));
   },
   _bindEvents() {
     if (!this.barEl) return;
-    (this.cancelBtnEl?.addEventListener('click', (_0x3e51e4) => {
-      (_0x3e51e4.stopPropagation(), this.exit());
+    (this.cancelBtnEl?.addEventListener('click', (event18) => {
+      (event18.stopPropagation(), this.exit());
     }),
-      this.confirmBtnEl?.addEventListener('click', (_0x53020a) => {
-        (_0x53020a.stopPropagation(), this._confirm());
+      this.confirmBtnEl?.addEventListener('click', (event19) => {
+        (event19.stopPropagation(), this._confirm());
       }));
-    const _0x594cbf = (_0x456ef4) => {
+    const value74 = (event20) => {
       if (!this.trackEl || !this.active || this._dragMode) return;
-      const _0x261522 = _0x456ef4.clientX,
-        _0xb88501 = this.selectionEl.getBoundingClientRect(),
-        _0x22e2b8 = 20,
-        _0x185a4e = Math.abs(_0x261522 - _0xb88501.left) < _0x22e2b8,
-        _0x4d5971 = Math.abs(_0x261522 - _0xb88501.right) < _0x22e2b8;
-      if (_0x185a4e)
+      const value75 = event20.clientX,
+        box4 = this.selectionEl.getBoundingClientRect(),
+        value76 = 20,
+        value77 = Math.abs(value75 - box4.left) < value76,
+        value78 = Math.abs(value75 - box4.right) < value76;
+      if (value77)
         (this.leftHandleEl.classList.add('hover-active'),
           this.rightHandleEl.classList.remove('hover-active'),
           (this.selectionEl.style.cursor = 'var(--resize-ew-cursor)'));
       else
-        _0x4d5971
+        value78
           ? (this.rightHandleEl.classList.add('hover-active'),
             this.leftHandleEl.classList.remove('hover-active'),
             (this.selectionEl.style.cursor = 'var(--resize-ew-cursor)'))
@@ -1341,150 +1312,150 @@ const VideoClipController = {
             this.rightHandleEl.classList.remove('hover-active'),
             (this.selectionEl.style.cursor = 'var(--grab-cursor)'));
     };
-    this.trackEl?.addEventListener('pointermove', _0x594cbf);
-    const _0x3f4bf9 = 30,
-      _0x1f3109 = (_0x272d46) => (Number(_0x272d46 || 1) / _0x3f4bf9) * 1,
-      _0x1b9f2b = () => {
-        const _0x3c2c5e = this.durationSec;
-        if (!Number.isFinite(_0x3c2c5e) || _0x3c2c5e <= 0) return 0.1;
-        return Math.min(0.1, _0x3c2c5e);
+    this.trackEl?.addEventListener('pointermove', value74);
+    const value79 = 30,
+      handler14 = (value80) => (Number(value80 || 1) / value79) * 1,
+      handler15 = () => {
+        const count6 = this.durationSec;
+        if (!Number.isFinite(count6) || count6 <= 0) return 0.1;
+        return Math.min(0.1, count6);
       },
-      _0x409ea2 = (_0x1824fc, _0x24a51e, _0x4712c1) => Math.max(_0x24a51e, Math.min(_0x4712c1, _0x1824fc)),
-      _0x25a17d = (_0x455632) => {
+      handler16 = (value81, value82, value83) => Math.max(value82, Math.min(value83, value81)),
+      handler17 = (value84) => {
         if (!this.trackEl || !this.active) return;
-        const _0x123158 = this.durationSec;
-        if (!Number.isFinite(_0x123158) || _0x123158 <= 0) return;
-        const _0x2cbacc = this.videoEl || this._getVideoEl();
-        if (!_0x2cbacc) return;
-        const _0x49c662 = this.trackEl.getBoundingClientRect();
-        if (!_0x49c662.width) return;
-        const _0x558994 = _0x455632 - _0x49c662.left,
-          _0x193213 = _0x409ea2(_0x558994 / _0x49c662.width, 0, 1),
-          _0x460ecc = _0x193213 * _0x123158,
-          _0x56e518 = Math.max(0, _0x123158 - 0.001);
+        const count7 = this.durationSec;
+        if (!Number.isFinite(count7) || count7 <= 0) return;
+        const enabled13 = this.videoEl || this._getVideoEl();
+        if (!enabled13) return;
+        const box5 = this.trackEl.getBoundingClientRect();
+        if (!box5.width) return;
+        const value85 = value84 - box5.left,
+          value86 = handler16(value85 / box5.width, 0, 1),
+          value87 = value86 * count7,
+          value88 = Math.max(0, count7 - 0.001);
         try {
-          _0x2cbacc.currentTime = _0x409ea2(_0x460ecc, 0, _0x56e518);
-        } catch (_0x216f1d) {}
+          enabled13.currentTime = handler16(value87, 0, value88);
+        } catch (value89) {}
         this._renderPlayhead();
       },
-      _0x72c8d4 = () => {
-        const _0x558f78 = this.videoEl || this._getVideoEl();
-        if (!_0x558f78) return;
-        if (!_0x558f78.paused) return;
-        const _0x1e74b8 = Number(_0x558f78.currentTime) || 0;
-        if (_0x1e74b8 >= this.startSec && _0x1e74b8 <= this.endSec) return;
+      handler18 = () => {
+        const enabled14 = this.videoEl || this._getVideoEl();
+        if (!enabled14) return;
+        if (!enabled14.paused) return;
+        const value90 = Number(enabled14.currentTime) || 0;
+        if (value90 >= this.startSec && value90 <= this.endSec) return;
         try {
-          _0x558f78.currentTime = this.startSec;
-        } catch (_0x1f123b) {}
+          enabled14.currentTime = this.startSec;
+        } catch (value91) {}
       },
-      _0x3d603a = (_0x329d93, _0x3dda7c) => {
-        const _0x252694 = this.durationSec;
-        if (!Number.isFinite(_0x252694) || _0x252694 <= 0) return;
-        const _0x5f5dab = this._pauseRangePlaybackForRangeEdit(),
-          _0x399a11 = _0x1f3109(_0x3dda7c) * (_0x329d93 >= 0 ? 1 : -1),
-          _0x5284ff = _0x1b9f2b(),
-          _0x3dfd0a = Math.max(_0x5284ff, this.endSec - this.startSec);
-        let _0x412d8b = this.startSec + _0x399a11,
-          _0x4e53a8 = this.endSec + _0x399a11;
-        _0x412d8b < 0 && ((_0x412d8b = 0), (_0x4e53a8 = _0x3dfd0a));
-        _0x4e53a8 > _0x252694 && ((_0x4e53a8 = _0x252694), (_0x412d8b = Math.max(0, _0x252694 - _0x3dfd0a)));
-        ((this.startSec = _0x412d8b), (this.endSec = _0x4e53a8));
-        if (_0x5f5dab)
+      handler19 = (count8, value92) => {
+        const count9 = this.durationSec;
+        if (!Number.isFinite(count9) || count9 <= 0) return;
+        const value93 = this._pauseRangePlaybackForRangeEdit(),
+          value94 = handler14(value92) * (count8 >= 0 ? 1 : -1),
+          value95 = handler15(),
+          value96 = Math.max(value95, this.endSec - this.startSec);
+        let count10 = this.startSec + value94,
+          value97 = this.endSec + value94;
+        count10 < 0 && ((count10 = 0), (value97 = value96));
+        value97 > count9 && ((value97 = count9), (count10 = Math.max(0, count9 - value96)));
+        ((this.startSec = count10), (this.endSec = value97));
+        if (value93)
           try {
-            _0x5f5dab.currentTime = _0x412d8b;
-          } catch (_0x76e327) {}
-        else _0x72c8d4();
+            value93.currentTime = count10;
+          } catch (value98) {}
+        else handler18();
         this._render();
       },
-      _0x1e7d77 = (_0xc688e7) => {
-        const _0x1809c7 = this.durationSec;
-        if (!Number.isFinite(_0x1809c7) || _0x1809c7 <= 0) return;
-        const _0x131dd6 = this._pauseRangePlaybackForRangeEdit(),
-          _0xe6df2e = _0x1f3109(1) * (_0xc688e7 >= 0 ? 1 : -1),
-          _0x4bc57a = _0x1b9f2b(),
-          _0x5fd772 = Math.max(0, this.endSec - _0x4bc57a);
-        this.startSec = _0x409ea2(this.startSec + _0xe6df2e, 0, _0x5fd772);
-        if (_0x131dd6)
+      handler20 = (count11) => {
+        const count12 = this.durationSec;
+        if (!Number.isFinite(count12) || count12 <= 0) return;
+        const value99 = this._pauseRangePlaybackForRangeEdit(),
+          value100 = handler14(1) * (count11 >= 0 ? 1 : -1),
+          value101 = handler15(),
+          value102 = Math.max(0, this.endSec - value101);
+        this.startSec = handler16(this.startSec + value100, 0, value102);
+        if (value99)
           try {
-            _0x131dd6.currentTime = this.startSec;
-          } catch (_0xbf00d9) {}
+            value99.currentTime = this.startSec;
+          } catch (value103) {}
         this._render();
       },
-      _0x5cb3f8 = (_0x283bbb) => {
-        const _0x314e98 = this.durationSec;
-        if (!Number.isFinite(_0x314e98) || _0x314e98 <= 0) return;
-        const _0x46eed5 = this._pauseRangePlaybackForRangeEdit(),
-          _0x2bd4f9 = _0x1f3109(1) * (_0x283bbb >= 0 ? 1 : -1),
-          _0x525c1a = _0x1b9f2b(),
-          _0x3864cc = Math.min(_0x314e98, this.startSec + _0x525c1a);
-        this.endSec = _0x409ea2(this.endSec + _0x2bd4f9, _0x3864cc, _0x314e98);
-        if (_0x46eed5)
+      handler21 = (count13) => {
+        const count14 = this.durationSec;
+        if (!Number.isFinite(count14) || count14 <= 0) return;
+        const value104 = this._pauseRangePlaybackForRangeEdit(),
+          value105 = handler14(1) * (count13 >= 0 ? 1 : -1),
+          value106 = handler15(),
+          value107 = Math.min(count14, this.startSec + value106);
+        this.endSec = handler16(this.endSec + value105, value107, count14);
+        if (value104)
           try {
-            _0x46eed5.currentTime = this.endSec;
-          } catch (_0x52d384) {}
+            value104.currentTime = this.endSec;
+          } catch (value108) {}
         this._render();
       },
-      _0x3fa9de = (_0x4768b7) => {
-        const _0x27b31d = this.durationSec;
-        if (!Number.isFinite(_0x27b31d) || _0x27b31d <= 0) return;
-        const _0xfe661b = this.videoEl || this._getVideoEl();
-        if (!_0xfe661b) return;
-        this._pauseRangePlaybackForRangeEdit(_0xfe661b);
-        let _0x491ba6 = Number(_0xfe661b.currentTime) || 0;
-        _0x491ba6 = _0x409ea2(_0x491ba6, 0, _0x27b31d);
-        const _0x191a0d = _0x1b9f2b();
-        if (_0x4768b7 === 'in') {
-          const _0x4642c4 = Math.max(0, this.endSec - _0x191a0d);
-          this.startSec = _0x409ea2(_0x491ba6, 0, _0x4642c4);
+      handler22 = (value109) => {
+        const count15 = this.durationSec;
+        if (!Number.isFinite(count15) || count15 <= 0) return;
+        const enabled15 = this.videoEl || this._getVideoEl();
+        if (!enabled15) return;
+        this._pauseRangePlaybackForRangeEdit(enabled15);
+        let value110 = Number(enabled15.currentTime) || 0;
+        value110 = handler16(value110, 0, count15);
+        const value111 = handler15();
+        if (value109 === 'in') {
+          const value112 = Math.max(0, this.endSec - value111);
+          this.startSec = handler16(value110, 0, value112);
         } else {
-          const _0x40e658 = Math.min(_0x27b31d, this.startSec + _0x191a0d);
-          this.endSec = _0x409ea2(_0x491ba6, _0x40e658, _0x27b31d);
+          const value113 = Math.min(count15, this.startSec + value111);
+          this.endSec = handler16(value110, value113, count15);
         }
         this._render();
       },
-      _0x1dce06 = (_0x308d5f) => {
+      value114 = (event21) => {
         if (!this.trackEl || !this.active) return;
-        const _0x199335 = _0x308d5f.target.closest('.v2-video-cliphandle'),
-          _0xaf0e91 = !!_0x308d5f.target.closest('.v2-video-clipselection'),
-          _0x14a385 = this.trackEl.getBoundingClientRect();
-        if (!_0x14a385.width) return;
-        const _0x19b4f3 = _0x308d5f.clientX,
-          _0x4b304a = this.selectionEl.getBoundingClientRect(),
-          _0x4f832d = 20,
-          _0x4c791f = Math.abs(_0x19b4f3 - _0x4b304a.left) < _0x4f832d,
-          _0x53a108 = Math.abs(_0x19b4f3 - _0x4b304a.right) < _0x4f832d;
-        if (_0x4c791f || (_0x199335 && _0x199335.dataset.handle === 'left'))
+        const el70 = event21.target.closest('.v2-video-cliphandle'),
+          value115 = !!event21.target.closest('.v2-video-clipselection'),
+          box6 = this.trackEl.getBoundingClientRect();
+        if (!box6.width) return;
+        const value116 = event21.clientX,
+          box7 = this.selectionEl.getBoundingClientRect(),
+          value117 = 20,
+          value118 = Math.abs(value116 - box7.left) < value117,
+          value119 = Math.abs(value116 - box7.right) < value117;
+        if (value118 || (el70 && el70.dataset.handle === 'left'))
           ((this._dragMode = 'left'), this.leftHandleEl.classList.add('hover-active'));
         else {
-          if (_0x53a108 || (_0x199335 && _0x199335.dataset.handle === 'right'))
+          if (value119 || (el70 && el70.dataset.handle === 'right'))
             ((this._dragMode = 'right'), this.rightHandleEl.classList.add('hover-active'));
           else {
-            if (_0xaf0e91) this._dragMode = 'move';
+            if (value115) this._dragMode = 'move';
             else {
               this._dragMode = 'scrub';
-              const _0x41f752 = this.videoEl || this._getVideoEl();
-              if (_0x41f752)
+              const enabled16 = this.videoEl || this._getVideoEl();
+              if (enabled16)
                 try {
-                  if (!_0x41f752.paused) _0x41f752.pause();
-                } catch (_0x3e1f70) {}
+                  if (!enabled16.paused) enabled16.pause();
+                } catch (value120) {}
             }
           }
         }
         if (this._dragMode === 'move') {
-          const _0x250eaa = this.selectionEl.getBoundingClientRect();
-          this._dragOffsetPx = _0x308d5f.clientX - _0x250eaa.left;
+          const box8 = this.selectionEl.getBoundingClientRect();
+          this._dragOffsetPx = event21.clientX - box8.left;
         } else this._dragOffsetPx = 0;
-        (_0x308d5f.preventDefault(), _0x308d5f.stopPropagation());
-        if (this._dragMode === 'scrub') _0x25a17d(_0x308d5f.clientX);
-        else this._handleDragAtClientX(_0x308d5f.clientX);
-        ((this._onPointerMove = (_0x14dc3b) => {
-          (_0x14dc3b.preventDefault(), _0x14dc3b.stopPropagation());
-          if (this._dragMode === 'scrub') _0x25a17d(_0x14dc3b.clientX);
-          else this._handleDragAtClientX(_0x14dc3b.clientX);
+        (event21.preventDefault(), event21.stopPropagation());
+        if (this._dragMode === 'scrub') handler17(event21.clientX);
+        else this._handleDragAtClientX(event21.clientX);
+        ((this._onPointerMove = (event22) => {
+          (event22.preventDefault(), event22.stopPropagation());
+          if (this._dragMode === 'scrub') handler17(event22.clientX);
+          else this._handleDragAtClientX(event22.clientX);
         }),
-          (this._onPointerUp = (_0x1cfb18) => {
-            (_0x1cfb18.preventDefault(),
-              _0x1cfb18.stopPropagation(),
+          (this._onPointerUp = (event23) => {
+            (event23.preventDefault(),
+              event23.stopPropagation(),
               window.removeEventListener('pointermove', this._onPointerMove, true),
               window.removeEventListener('pointerup', this._onPointerUp, true),
               (this._dragMode = null),
@@ -1494,232 +1465,234 @@ const VideoClipController = {
           window.addEventListener('pointermove', this._onPointerMove, true),
           window.addEventListener('pointerup', this._onPointerUp, true));
       };
-    (this.trackEl?.addEventListener('pointerdown', _0x1dce06),
+    (this.trackEl?.addEventListener('pointerdown', value114),
       this.trackEl?.addEventListener(
         'wheel',
-        (_0x447c18) => {
+        (event24) => {
           if (!this.active) return;
-          (_0x447c18.preventDefault(), _0x447c18.stopPropagation());
-          const _0x2cb54a = Number(_0x447c18.deltaX) || 0,
-            _0x5292a7 = Number(_0x447c18.deltaY) || 0,
-            _0x1e2752 = Math.abs(_0x2cb54a) > Math.abs(_0x5292a7) ? _0x2cb54a : _0x5292a7;
-          if (!_0x1e2752) return;
-          const _0x44b134 = _0x1e2752 > 0 ? 1 : -1;
-          if (_0x447c18.ctrlKey || _0x447c18.metaKey) _0x1e7d77(_0x44b134);
+          (event24.preventDefault(), event24.stopPropagation());
+          const value121 = Number(event24.deltaX) || 0,
+            value122 = Number(event24.deltaY) || 0,
+            enabled17 = Math.abs(value121) > Math.abs(value122) ? value121 : value122;
+          if (!enabled17) return;
+          const value123 = enabled17 > 0 ? 1 : -1;
+          if (event24.ctrlKey || event24.metaKey) handler20(value123);
           else {
-            if (_0x447c18.altKey) _0x5cb3f8(_0x44b134);
+            if (event24.altKey) handler21(value123);
             else {
-              const _0x433367 = _0x447c18.shiftKey ? 10 : 1;
-              _0x3d603a(_0x44b134, _0x433367);
+              const value124 = event24.shiftKey ? 10 : 1;
+              handler19(value123, value124);
             }
           }
         },
         { passive: false },
       ),
-      this.selectionEl?.addEventListener('dblclick', (_0x308505) => {
+      this.selectionEl?.addEventListener('dblclick', (event25) => {
         if (!this.active) return;
-        (_0x308505.preventDefault(), _0x308505.stopPropagation());
-        const _0x4226a9 = this.durationSec;
-        if (!_0x4226a9 || !Number.isFinite(_0x4226a9) || _0x4226a9 <= 0) return;
-        const _0x477f7b = this.selectionEl.getBoundingClientRect(),
-          _0x20d9d5 = _0x308505.clientX,
-          _0x1e387e = 24;
-        if (_0x20d9d5 - _0x477f7b.left < _0x1e387e || _0x477f7b.right - _0x20d9d5 < _0x1e387e) return;
-        const _0x40c2d1 = Math.min(3, _0x4226a9),
-          _0x4d14b6 = (this.startSec + this.endSec) / 2,
-          _0x810af = Math.max(0, Math.min(_0x4226a9 - _0x40c2d1, _0x4d14b6 - _0x40c2d1 / 2)),
-          _0x126f60 = this._pauseRangePlaybackForRangeEdit();
-        ((this.startSec = _0x810af), (this.endSec = _0x810af + _0x40c2d1));
-        if (_0x126f60 && _0x126f60.paused) _0x126f60.currentTime = this.startSec;
+        (event25.preventDefault(), event25.stopPropagation());
+        const enabled18 = this.durationSec;
+        if (!enabled18 || !Number.isFinite(enabled18) || enabled18 <= 0) return;
+        const box9 = this.selectionEl.getBoundingClientRect(),
+          value125 = event25.clientX,
+          value126 = 24;
+        if (value125 - box9.left < value126 || box9.right - value125 < value126) return;
+        const value127 = Math.min(3, enabled18),
+          value128 = (this.startSec + this.endSec) / 2,
+          value129 = Math.max(0, Math.min(enabled18 - value127, value128 - value127 / 2)),
+          value130 = this._pauseRangePlaybackForRangeEdit();
+        ((this.startSec = value129), (this.endSec = value129 + value127));
+        if (value130 && value130.paused) value130.currentTime = this.startSec;
         this._render();
       }),
-      (this._onKeyDown = (_0x6ba148) => {
+      (this._onKeyDown = (event26) => {
         if (!this.active) return;
-        if (_0x6ba148.key === 'Escape') {
-          (_0x6ba148.preventDefault(), this.exit());
+        if (event26.key === 'Escape') {
+          (event26.preventDefault(), this.exit());
           return;
         }
-        if (_0x6ba148.key === ' ' || _0x6ba148.code === 'Space') {
-          this._handlePlaybackShortcutKey(_0x6ba148);
+        if (event26.key === ' ' || event26.code === 'Space') {
+          this._handlePlaybackShortcutKey(event26);
           return;
         }
-        if (_0x6ba148.key === 'i' || _0x6ba148.key === 'I') {
-          (_0x6ba148.preventDefault(), _0x3fa9de('in'));
+        if (event26.key === 'i' || event26.key === 'I') {
+          (event26.preventDefault(), handler22('in'));
           return;
         }
-        if (_0x6ba148.key === 'o' || _0x6ba148.key === 'O') {
-          (_0x6ba148.preventDefault(), _0x3fa9de('out'));
+        if (event26.key === 'o' || event26.key === 'O') {
+          (event26.preventDefault(), handler22('out'));
           return;
         }
-        if (_0x6ba148.key === 'ArrowLeft' || _0x6ba148.key === 'ArrowRight') {
-          _0x6ba148.preventDefault();
-          const _0x4ea91a = _0x6ba148.key === 'ArrowRight' ? 1 : -1;
-          if (_0x6ba148.ctrlKey || _0x6ba148.metaKey) {
-            _0x1e7d77(_0x4ea91a);
+        if (event26.key === 'ArrowLeft' || event26.key === 'ArrowRight') {
+          event26.preventDefault();
+          const value131 = event26.key === 'ArrowRight' ? 1 : -1;
+          if (event26.ctrlKey || event26.metaKey) {
+            handler20(value131);
             return;
           }
-          if (_0x6ba148.altKey) {
-            _0x5cb3f8(_0x4ea91a);
+          if (event26.altKey) {
+            handler21(value131);
             return;
           }
-          const _0x3da4db = _0x6ba148.shiftKey ? 10 : 1;
-          _0x3d603a(_0x4ea91a, _0x3da4db);
+          const value132 = event26.shiftKey ? 10 : 1;
+          handler19(value131, value132);
         }
       }),
       window.addEventListener('keydown', this._onKeyDown, true),
       this._onDocClick &&
         (document.removeEventListener('pointerdown', this._onDocClick, true), (this._onDocClick = null)),
-      (this._onDocClick = (_0x1369c2) => {
+      (this._onDocClick = (event27) => {
         if (!this.active || !this.barEl) return;
-        if (this.barEl.contains(_0x1369c2.target)) return;
+        if (this.barEl.contains(event27.target)) return;
         this.exit({ silent: true });
       }),
       document.addEventListener('pointerdown', this._onDocClick, true));
   },
   _getVideoEl() {
     if (!this.wrapperEl) return null;
-    const _0x5e13e1 = Array.from(this.wrapperEl.querySelectorAll('video'));
-    let _0x4b0045 = null,
-      _0x2a9971 = null;
-    for (const _0xc8f95c of _0x5e13e1) {
-      if (!_0xc8f95c) continue;
-      const _0x5a8cd7 = window.getComputedStyle(_0xc8f95c);
-      if (_0x5a8cd7.display === 'none' || _0x5a8cd7.visibility === 'hidden') continue;
-      const _0x127d7d = Number(_0x5a8cd7.opacity);
-      if (Number.isFinite(_0x127d7d) && _0x127d7d <= 0) continue;
-      const _0x3b6bfe = _0xc8f95c.getBoundingClientRect();
-      if (!_0x3b6bfe.width || !_0x3b6bfe.height) continue;
-      if (!_0x4b0045) _0x4b0045 = _0xc8f95c;
-      const _0x30df40 = String(_0xc8f95c.currentSrc || _0xc8f95c.getAttribute('src') || '').trim();
-      if (_0x30df40) {
-        _0x2a9971 = _0xc8f95c;
+    const value133 = Array.from(this.wrapperEl.querySelectorAll('video'));
+    let enabled19 = null,
+      value134 = null;
+    for (const el71 of value133) {
+      if (!el71) continue;
+      const value135 = window.getComputedStyle(el71);
+      if (value135.display === 'none' || value135.visibility === 'hidden') continue;
+      const count16 = Number(value135.opacity);
+      if (Number.isFinite(count16) && count16 <= 0) continue;
+      const box10 = el71.getBoundingClientRect();
+      if (!box10.width || !box10.height) continue;
+      if (!enabled19) enabled19 = el71;
+      const value136 = String(el71.currentSrc || el71.getAttribute('src') || '').trim();
+      if (value136) {
+        value134 = el71;
         break;
       }
     }
-    return ((this.videoEl = _0x2a9971 || _0x4b0045 || null), this.videoEl);
+    return ((this.videoEl = value134 || enabled19 || null), this.videoEl);
   },
-  _getVideoElementSource(_0x28fab9) {
-    return String(_0x28fab9?.getAttribute?.('src') || _0x28fab9?.currentSrc || _0x28fab9?.src || '').trim();
+  _getVideoElementSource(value137) {
+    return String(value137?.getAttribute?.('src') || value137?.currentSrc || value137?.src || '').trim();
   },
-  _setClipMediaKeepAlive(_0xe35b8b, _0x5eb777) {
-    if (!_0xe35b8b?.dataset) return;
-    if (_0x5eb777) {
-      _0xe35b8b.dataset.desktopMediaKeepAlive = 'video-clip';
+  _setClipMediaKeepAlive(el72, value138) {
+    if (!el72?.dataset) return;
+    if (value138) {
+      el72.dataset.desktopMediaKeepAlive = 'video-clip';
       return;
     }
-    _0xe35b8b.dataset.desktopMediaKeepAlive === 'video-clip' &&
-      delete _0xe35b8b.dataset.desktopMediaKeepAlive;
+    el72.dataset.desktopMediaKeepAlive === 'video-clip' && delete el72.dataset.desktopMediaKeepAlive;
   },
-  _readDurationSec(_0x45a952) {
-    if (!_0x45a952) return 0;
-    const _0x1fdd14 = Number(_0x45a952.duration);
-    if (Number.isFinite(_0x1fdd14) && _0x1fdd14 > 0) return _0x1fdd14;
-    const _0x255989 = _0x45a952.seekable;
-    if (_0x255989 && _0x255989.length) {
-      const _0x5ca9d6 = Number(_0x255989.end(_0x255989.length - 1));
-      if (Number.isFinite(_0x5ca9d6) && _0x5ca9d6 > 0) return _0x5ca9d6;
+  _readDurationSec(enabled20) {
+    if (!enabled20) return 0;
+    const count17 = Number(enabled20.duration);
+    if (Number.isFinite(count17) && count17 > 0) return count17;
+    const list9 = enabled20.seekable;
+    if (list9 && list9.length) {
+      const count18 = Number(list9.end(list9.length - 1));
+      if (Number.isFinite(count18) && count18 > 0) return count18;
     }
     return 0;
   },
-  _resolveKnownDurationSec(_0x556c3e) {
-    const _0x452d96 = pickSelectedVideoItem(_0x556c3e),
-      _0x52dacf = pickPositiveNumber(
-        _0x452d96?.videoDuration,
-        _0x452d96?.duration,
-        _0x556c3e?.videoDuration,
-        _0x556c3e?.duration,
+  _resolveKnownDurationSec(value139) {
+    const selectedVideoItem2 = pickSelectedVideoItem(value139),
+      positiveNumber6 = pickPositiveNumber(
+        selectedVideoItem2?.videoDuration,
+        selectedVideoItem2?.duration,
+        value139?.videoDuration,
+        value139?.duration,
       );
-    if (_0x52dacf > 0) return _0x52dacf;
-    const _0x40cbc8 = pickPositiveNumber(
-        _0x452d96?.videoFrameCount,
-        _0x452d96?.frameCount,
-        _0x556c3e?.videoFrameCount,
-        _0x556c3e?.frameCount,
+    if (positiveNumber6 > 0) return positiveNumber6;
+    const positiveNumber7 = pickPositiveNumber(
+        selectedVideoItem2?.videoFrameCount,
+        selectedVideoItem2?.frameCount,
+        value139?.videoFrameCount,
+        value139?.frameCount,
       ),
-      _0x447d0e = pickPositiveNumber(
-        _0x452d96?.videoFps,
-        _0x452d96?.fps,
-        _0x556c3e?.videoFps,
-        _0x556c3e?.fps,
+      positiveNumber8 = pickPositiveNumber(
+        selectedVideoItem2?.videoFps,
+        selectedVideoItem2?.fps,
+        value139?.videoFps,
+        value139?.fps,
       );
-    return _0x40cbc8 > 0 && _0x447d0e > 0 ? _0x40cbc8 / _0x447d0e : 0;
+    return positiveNumber7 > 0 && positiveNumber8 > 0 ? positiveNumber7 / positiveNumber8 : 0;
   },
-  _applyDurationSec(_0x4b1b3c) {
-    const _0x41ee23 = Number(_0x4b1b3c);
-    if (!Number.isFinite(_0x41ee23) || _0x41ee23 <= 0) return false;
-    this.durationSec = _0x41ee23;
+  _applyDurationSec(value140) {
+    const count19 = Number(value140);
+    if (!Number.isFinite(count19) || count19 <= 0) return false;
+    this.durationSec = count19;
     if (!(this.endSec > this.startSec)) {
-      const _0x1bb468 = Math.min(3, _0x41ee23),
-        _0x4ab9bb = Math.max(0, (_0x41ee23 - _0x1bb468) / 2);
-      return ((this.startSec = _0x4ab9bb), (this.endSec = _0x4ab9bb + _0x1bb468), true);
+      const value141 = Math.min(3, count19),
+        value142 = Math.max(0, (count19 - value141) / 2);
+      return ((this.startSec = value142), (this.endSec = value142 + value141), true);
     }
-    ((this.startSec = Math.max(0, Math.min(this.startSec, _0x41ee23))),
-      (this.endSec = Math.max(0, Math.min(this.endSec, _0x41ee23))));
+    ((this.startSec = Math.max(0, Math.min(this.startSec, count19))),
+      (this.endSec = Math.max(0, Math.min(this.endSec, count19))));
     if (this.endSec <= this.startSec) {
-      const _0x2e2797 = Math.min(3, _0x41ee23);
-      ((this.startSec = 0), (this.endSec = _0x2e2797));
+      const value143 = Math.min(3, count19);
+      ((this.startSec = 0), (this.endSec = value143));
     }
     return true;
   },
-  async _applyVideoMetaDurationFallback(_0x227ce1, _0x27c21b) {
-    const _0x3d0e7d = String(_0x227ce1 || '').trim();
-    if (!_0x3d0e7d) return;
+  async _applyVideoMetaDurationFallback(value144, value145) {
+    const enabled21 = String(value144 || '').trim();
+    if (!enabled21) return;
     try {
-      const _0xc3947c = await fetchVideoMetaFromServer(_0x3d0e7d);
-      if (!this.active || _0x27c21b !== this._sourceToken) return;
-      const _0xf9ad91 =
-          _0xc3947c && typeof _0xc3947c === 'object' && _0xc3947c.data ? _0xc3947c.data : _0xc3947c,
-        _0x32fcef = pickPositiveNumber(
-          _0xf9ad91?.duration,
-          _0xf9ad91?.videoDuration,
-          _0xf9ad91?.format?.duration,
-          _0xf9ad91?.stream?.duration,
+      const fetchVideoMetaFromServer2 = await fetchVideoMetaFromServer(enabled21);
+      if (!this.active || value145 !== this._sourceToken) return;
+      const value146 =
+          fetchVideoMetaFromServer2 &&
+          typeof fetchVideoMetaFromServer2 === 'object' &&
+          fetchVideoMetaFromServer2.data
+            ? fetchVideoMetaFromServer2.data
+            : fetchVideoMetaFromServer2,
+        positiveNumber9 = pickPositiveNumber(
+          value146?.duration,
+          value146?.videoDuration,
+          value146?.format?.duration,
+          value146?.stream?.duration,
         );
-      this._applyDurationSec(_0x32fcef) && (this._render(), this._startPlayheadLoop());
-    } catch (_0x45efe6) {}
+      this._applyDurationSec(positiveNumber9) && (this._render(), this._startPlayheadLoop());
+    } catch (value147) {}
   },
   async _syncDurationAndDefaults() {
-    const _0x4cf8b8 = appStore.getState().nodes?.[this.nodeId],
-      _0x2ba67a = this._resolveVideoSrcFromNode(_0x4cf8b8),
-      _0xa62c19 = String(_0x2ba67a || '').trim(),
-      _0x4b0244 = ++this._sourceToken;
+    const value148 = appStore.getState().nodes?.[this.nodeId],
+      value149 = this._resolveVideoSrcFromNode(value148),
+      value150 = String(value149 || '').trim(),
+      value151 = ++this._sourceToken;
     this.videoEl = this._getVideoEl();
-    this._applyDurationSec(this._resolveKnownDurationSec(_0x4cf8b8)) && this._render();
+    this._applyDurationSec(this._resolveKnownDurationSec(value148)) && this._render();
     if (this.videoEl) {
-      const _0x4717ce = String(this.videoEl.dataset?.videoClipSourceUrl || '').trim();
+      const value152 = String(this.videoEl.dataset?.videoClipSourceUrl || '').trim();
       this._setClipMediaKeepAlive(this.videoEl, true);
       try {
         this.videoEl.pause();
-      } catch (_0x203196) {}
+      } catch (value153) {}
       try {
         this.videoEl.loop = false;
-      } catch (_0x5f3001) {}
-      if (_0xa62c19 && _0x4717ce !== _0xa62c19) {
-        await attachDesktopMediaPlaybackSource(this.videoEl, _0xa62c19);
-        if (!this.active || _0x4b0244 !== this._sourceToken) return;
+      } catch (value154) {}
+      if (value150 && value152 !== value150) {
+        await attachDesktopMediaPlaybackSource(this.videoEl, value150);
+        if (!this.active || value151 !== this._sourceToken) return;
         if (!this._getVideoElementSource(this.videoEl)) {
-          ((this.videoEl.preload = 'metadata'), (this.videoEl.src = _0xa62c19));
+          ((this.videoEl.preload = 'metadata'), (this.videoEl.src = value150));
           try {
             this.videoEl.load?.();
-          } catch (_0x2ca1f7) {}
+          } catch (value155) {}
         }
-        this.videoEl.dataset && (this.videoEl.dataset.videoClipSourceUrl = _0xa62c19);
+        this.videoEl.dataset && (this.videoEl.dataset.videoClipSourceUrl = value150);
       }
     }
-    const _0x1a7e9c = this._readDurationSec(this.videoEl);
-    if (this._applyDurationSec(_0x1a7e9c)) this._render();
-    else
-      !(this.durationSec > 0) && _0xa62c19 && void this._applyVideoMetaDurationFallback(_0xa62c19, _0x4b0244);
+    const value156 = this._readDurationSec(this.videoEl);
+    if (this._applyDurationSec(value156)) this._render();
+    else !(this.durationSec > 0) && value150 && void this._applyVideoMetaDurationFallback(value150, value151);
     (this.videoEl &&
       ((this._onLoadedMeta = () => {
         if (!this.active) return;
-        const _0x582d12 = this._readDurationSec(this.videoEl);
-        (this._applyDurationSec(_0x582d12, this.videoEl), this._render());
+        const value157 = this._readDurationSec(this.videoEl);
+        (this._applyDurationSec(value157, this.videoEl), this._render());
       }),
       (this._onDurationChange = () => {
         if (!this.active) return;
-        const _0x22687e = this._readDurationSec(this.videoEl);
-        (this._applyDurationSec(_0x22687e, this.videoEl), this._render());
+        const value158 = this._readDurationSec(this.videoEl);
+        (this._applyDurationSec(value158, this.videoEl), this._render());
       }),
       this.videoEl.addEventListener('loadedmetadata', this._onLoadedMeta, { once: true }),
       this.videoEl.addEventListener('durationchange', this._onDurationChange)),
@@ -1728,285 +1701,282 @@ const VideoClipController = {
   },
   _startPlayheadLoop() {
     if (this._playheadRaf) cancelAnimationFrame(this._playheadRaf);
-    const _0x13ea6a = () => {
+    const value159 = () => {
       if (!this.active) return;
-      (this._renderPlayhead(), (this._playheadRaf = requestAnimationFrame(_0x13ea6a)));
+      (this._renderPlayhead(), (this._playheadRaf = requestAnimationFrame(value159)));
     };
-    this._playheadRaf = requestAnimationFrame(_0x13ea6a);
+    this._playheadRaf = requestAnimationFrame(value159);
   },
   _renderPlayhead() {
     if (!this.playheadEl || !this.trackEl) return;
-    const _0x265c3d = this.durationSec;
-    if (!Number.isFinite(_0x265c3d) || _0x265c3d <= 0) {
+    const count20 = this.durationSec;
+    if (!Number.isFinite(count20) || count20 <= 0) {
       this.playheadEl.style.display = 'none';
       return;
     }
-    const _0xf09a2b = this.videoEl || this._getVideoEl();
-    if (!_0xf09a2b) {
+    const enabled22 = this.videoEl || this._getVideoEl();
+    if (!enabled22) {
       this.playheadEl.style.display = 'none';
       return;
     }
-    let _0xc331ae = Number(_0xf09a2b.currentTime) || 0;
-    if (_0xc331ae < this.startSec || _0xc331ae > this.endSec) {
-      if (!_0xf09a2b.paused && !_0xf09a2b.seeking && this._rangeLoopSeekPending !== true) {
+    let value160 = Number(enabled22.currentTime) || 0;
+    if (value160 < this.startSec || value160 > this.endSec) {
+      if (!enabled22.paused && !enabled22.seeking && this._rangeLoopSeekPending !== true) {
         this._rangeLoopSeekPending = true;
         try {
-          _0xf09a2b.currentTime = this.startSec;
-        } catch (_0x475d68) {}
-        _0xc331ae = this.startSec;
+          enabled22.currentTime = this.startSec;
+        } catch (value161) {}
+        value160 = this.startSec;
       }
-    } else !_0xf09a2b.seeking && (this._rangeLoopSeekPending = false);
-    const _0x3bc06a = Math.max(0, Math.min(1, _0xc331ae / _0x265c3d));
-    ((this.playheadEl.style.display = 'block'), (this.playheadEl.style.left = _0x3bc06a * 100 + '%'));
+    } else !enabled22.seeking && (this._rangeLoopSeekPending = false);
+    const value162 = Math.max(0, Math.min(1, value160 / count20));
+    ((this.playheadEl.style.display = 'block'), (this.playheadEl.style.left = value162 * 100 + '%'));
   },
-  _handlePlaybackShortcutKey(_0x1e3c0e) {
+  _handlePlaybackShortcutKey(event28) {
     if (!this.active) return false;
-    if (!(_0x1e3c0e?.key === ' ' || _0x1e3c0e?.code === 'Space')) return false;
-    (_0x1e3c0e.preventDefault?.(), _0x1e3c0e.stopPropagation?.());
-    if (!_0x1e3c0e.repeat) void this._togglePlayRange();
+    if (!(event28?.key === ' ' || event28?.code === 'Space')) return false;
+    (event28.preventDefault?.(), event28.stopPropagation?.());
+    if (!event28.repeat) void this._togglePlayRange();
     return true;
   },
-  _pauseRangePlaybackForRangeEdit(_0x1b0a06 = this.videoEl || this._getVideoEl()) {
+  _pauseRangePlaybackForRangeEdit(enabled23 = this.videoEl || this._getVideoEl()) {
     ((this._rangePlaybackSeq += 1), (this._rangeLoopSeekPending = false));
-    if (!_0x1b0a06) return null;
+    if (!enabled23) return null;
     try {
-      if (!_0x1b0a06.paused) _0x1b0a06.pause();
-    } catch (_0x278547) {}
-    return _0x1b0a06;
+      if (!enabled23.paused) enabled23.pause();
+    } catch (value163) {}
+    return enabled23;
   },
   async _togglePlayRange() {
-    const _0x354ea8 = ++this._rangePlaybackSeq,
-      _0x360919 = this._getVideoEl();
-    if (!_0x360919) return false;
-    await this._ensureVideoPlaybackSource(_0x360919);
-    if (!this.active || _0x354ea8 !== this._rangePlaybackSeq) return false;
-    let _0x1988b5 = Number(this.durationSec);
-    if (!Number.isFinite(_0x1988b5) || _0x1988b5 <= 0) {
-      _0x1988b5 = this._readDurationSec(_0x360919);
-      if (!Number.isFinite(_0x1988b5) || _0x1988b5 <= 0) return false;
-      if (this._applyDurationSec(_0x1988b5)) this._render();
+    const value164 = ++this._rangePlaybackSeq,
+      enabled24 = this._getVideoEl();
+    if (!enabled24) return false;
+    await this._ensureVideoPlaybackSource(enabled24);
+    if (!this.active || value164 !== this._rangePlaybackSeq) return false;
+    let count21 = Number(this.durationSec);
+    if (!Number.isFinite(count21) || count21 <= 0) {
+      count21 = this._readDurationSec(enabled24);
+      if (!Number.isFinite(count21) || count21 <= 0) return false;
+      if (this._applyDurationSec(count21)) this._render();
     }
     try {
-      if (!_0x360919.paused) return (_0x360919.pause(), this._renderPlayhead(), true);
-    } catch (_0x563d72) {}
-    const _0x14bb47 = Math.max(0, Math.min(this.startSec, _0x1988b5)),
-      _0x475b16 = Math.max(_0x14bb47, Math.min(this.endSec, _0x1988b5));
-    if (!(_0x475b16 > _0x14bb47)) return false;
-    const _0x3d25f3 = Number(_0x360919.currentTime) || 0;
-    (_0x3d25f3 < _0x14bb47 || _0x3d25f3 >= _0x475b16) &&
-      (await this._seekVideoForRangePlayback(_0x360919, _0x14bb47));
-    if (!this.active || _0x354ea8 !== this._rangePlaybackSeq) return false;
-    const _0x41226c = await playVideoWithRecovery(_0x360919, {
+      if (!enabled24.paused) return (enabled24.pause(), this._renderPlayhead(), true);
+    } catch (value165) {}
+    const value166 = Math.max(0, Math.min(this.startSec, count21)),
+      value167 = Math.max(value166, Math.min(this.endSec, count21));
+    if (!(value167 > value166)) return false;
+    const value168 = Number(enabled24.currentTime) || 0;
+    (value168 < value166 || value168 >= value167) &&
+      (await this._seekVideoForRangePlayback(enabled24, value166));
+    if (!this.active || value164 !== this._rangePlaybackSeq) return false;
+    const playVideoWithRecovery2 = await playVideoWithRecovery(enabled24, {
       label: 'video-clip:' + (this.nodeId || 'unknown') + ':range',
-      ensureSrc: () => this._ensureVideoPlaybackSource(_0x360919),
+      ensureSrc: () => this._ensureVideoPlaybackSource(enabled24),
       minBufferAhead: 0.5,
       readyTimeoutMs: 0x1f4,
       recoveryDebounceMs: 150,
       recoveryCooldownMs: 0x1f4,
-      shouldRecover: (_0x3a49) =>
-        this.active === true &&
-        this.videoEl === _0x3a49 &&
-        _0x3a49?.isConnected !== false &&
-        !_0x3a49?.paused,
+      shouldRecover: (el73) =>
+        this.active === true && this.videoEl === el73 && el73?.isConnected !== false && !el73?.paused,
       shouldContinue: () =>
-        this.active === true && _0x354ea8 === this._rangePlaybackSeq && this.videoEl === _0x360919,
+        this.active === true && value164 === this._rangePlaybackSeq && this.videoEl === enabled24,
     });
-    return (_0x41226c && ((this._rangeLoopSeekPending = false), this._renderPlayhead()), _0x41226c);
+    return (
+      playVideoWithRecovery2 && ((this._rangeLoopSeekPending = false), this._renderPlayhead()),
+      playVideoWithRecovery2
+    );
   },
-  async _ensureVideoPlaybackSource(_0x534dcf = this.videoEl) {
-    if (!_0x534dcf) return false;
-    if (this._getVideoElementSource(_0x534dcf)) {
-      if (_0x534dcf.preload !== 'auto') _0x534dcf.preload = 'auto';
+  async _ensureVideoPlaybackSource(el74 = this.videoEl) {
+    if (!el74) return false;
+    if (this._getVideoElementSource(el74)) {
+      if (el74.preload !== 'auto') el74.preload = 'auto';
       return true;
     }
-    const _0x1e6d7a = appStore.getState().nodes?.[this.nodeId],
-      _0x2d5626 = String(this._resolveVideoSrcFromNode(_0x1e6d7a) || '').trim();
-    if (!_0x2d5626) return false;
-    await attachDesktopMediaPlaybackSource(_0x534dcf, _0x2d5626, { preload: 'auto' });
-    if (_0x534dcf.dataset) _0x534dcf.dataset.videoClipSourceUrl = _0x2d5626;
-    return !!this._getVideoElementSource(_0x534dcf);
+    const value169 = appStore.getState().nodes?.[this.nodeId],
+      enabled25 = String(this._resolveVideoSrcFromNode(value169) || '').trim();
+    if (!enabled25) return false;
+    await attachDesktopMediaPlaybackSource(el74, enabled25, { preload: 'auto' });
+    if (el74.dataset) el74.dataset.videoClipSourceUrl = enabled25;
+    return !!this._getVideoElementSource(el74);
   },
-  async _seekVideoForRangePlayback(_0x131bbd, _0x1108aa) {
-    if (!_0x131bbd) return false;
-    const _0xaac938 = Math.max(0, Number(_0x1108aa) || 0),
-      _0x4f37f4 = Number(_0x131bbd.currentTime || 0);
+  async _seekVideoForRangePlayback(enabled26, value170) {
+    if (!enabled26) return false;
+    const value171 = Math.max(0, Number(value170) || 0),
+      value172 = Number(enabled26.currentTime || 0);
     if (
-      Math.abs(_0x4f37f4 - _0xaac938) <= VIDEO_CLIP_SEEK_EPSILON_SEC &&
-      Number(_0x131bbd.readyState || 0) >= 2 &&
-      !_0x131bbd.seeking
+      Math.abs(value172 - value171) <= VIDEO_CLIP_SEEK_EPSILON_SEC &&
+      Number(enabled26.readyState || 0) >= 2 &&
+      !enabled26.seeking
     )
       return true;
     this._rangeLoopSeekPending = true;
     try {
-      _0x131bbd.currentTime = _0xaac938;
-    } catch (_0x22f155) {}
-    return (await this._waitForRangePlaybackSeek(_0x131bbd), (this._rangeLoopSeekPending = false), true);
+      enabled26.currentTime = value171;
+    } catch (value173) {}
+    return (await this._waitForRangePlaybackSeek(enabled26), (this._rangeLoopSeekPending = false), true);
   },
-  _waitForRangePlaybackSeek(_0x137e8e) {
-    if (!_0x137e8e || (Number(_0x137e8e.readyState || 0) >= 2 && !_0x137e8e.seeking))
-      return Promise.resolve(true);
-    return new Promise((_0x1c692c) => {
-      let _0x1d6939 = false;
-      const _0x15fde1 = ['seeked', 'canplay', 'canplaythrough', 'loadeddata', 'timeupdate'],
-        _0x2185d8 = () => {
-          if (_0x1d6939) return;
-          ((_0x1d6939 = true),
-            clearTimeout(_0x5da656),
-            _0x15fde1.forEach((_0x3a429a) => _0x137e8e.removeEventListener?.(_0x3a429a, _0x24890e)),
-            _0x137e8e.removeEventListener?.('error', _0x24890e),
-            _0x137e8e.removeEventListener?.('abort', _0x24890e),
-            _0x1c692c(true));
+  _waitForRangePlaybackSeek(el75) {
+    if (!el75 || (Number(el75.readyState || 0) >= 2 && !el75.seeking)) return Promise.resolve(true);
+    return new Promise((handler23) => {
+      let value174 = false;
+      const list10 = ['seeked', 'canplay', 'canplaythrough', 'loadeddata', 'timeupdate'],
+        handler24 = () => {
+          if (value174) return;
+          ((value174 = true),
+            clearTimeout(setTimeout2),
+            list10.forEach((item4) => el75.removeEventListener?.(item4, value175)),
+            el75.removeEventListener?.('error', value175),
+            el75.removeEventListener?.('abort', value175),
+            handler23(true));
         },
-        _0x24890e = () => {
-          if (Number(_0x137e8e.readyState || 0) >= 2 || !_0x137e8e.seeking) _0x2185d8();
+        value175 = () => {
+          if (Number(el75.readyState || 0) >= 2 || !el75.seeking) handler24();
         },
-        _0x5da656 = setTimeout(_0x2185d8, VIDEO_CLIP_PLAY_SEEK_TIMEOUT_MS);
-      (_0x15fde1.forEach((_0x3ad41d) => _0x137e8e.addEventListener?.(_0x3ad41d, _0x24890e)),
-        _0x137e8e.addEventListener?.('error', _0x24890e),
-        _0x137e8e.addEventListener?.('abort', _0x24890e));
+        setTimeout2 = setTimeout(handler24, VIDEO_CLIP_PLAY_SEEK_TIMEOUT_MS);
+      (list10.forEach((item5) => el75.addEventListener?.(item5, value175)),
+        el75.addEventListener?.('error', value175),
+        el75.addEventListener?.('abort', value175));
     });
   },
-  _resolveVideoSrcFromNode(_0x3feeca) {
-    return resolveVideoClipSourceUrl(_0x3feeca);
+  _resolveVideoSrcFromNode(value176) {
+    return resolveVideoClipSourceUrl(value176);
   },
   async _renderThumbs() {
-    const _0xa52178 = ++this._thumbToken,
-      _0x3335e8 = Array.isArray(this.thumbEls) ? this.thumbEls : [];
-    if (!_0x3335e8.length) return;
-    const _0x59bb7a = appStore.getState().nodes[this.nodeId],
-      _0x355cb0 = this._resolveVideoSrcFromNode(_0x59bb7a);
-    if (!_0x355cb0) return;
-    const _0xf73ba8 = _0x3335e8.length;
-    let _0x4a79f0, _0x56986a, _0x4570b7;
-    const _0xbdfd80 = (_0x13d800, _0x77db7b) =>
-      new Promise((_0x3f4592, _0x10c3f0) => {
-        let _0xf2abdd = false;
-        const _0x47d17f = () => {
-            (_0x13d800.removeEventListener('seeked', _0x186335),
-              _0x13d800.removeEventListener('error', _0x508699));
+    const value177 = ++this._thumbToken,
+      list11 = Array.isArray(this.thumbEls) ? this.thumbEls : [];
+    if (!list11.length) return;
+    const value178 = appStore.getState().nodes[this.nodeId],
+      enabled27 = this._resolveVideoSrcFromNode(value178);
+    if (!enabled27) return;
+    const value179 = list11.length;
+    let el76, box11, ctx;
+    const run7 = (el77, value180) =>
+      new Promise((handler25, handler26) => {
+        let value181 = false;
+        const run8 = () => {
+            (el77.removeEventListener('seeked', value182), el77.removeEventListener('error', handler27));
           },
-          _0x186335 = () => {
-            if (_0xf2abdd) return;
-            ((_0xf2abdd = true), _0x47d17f(), _0x3f4592());
+          value182 = () => {
+            if (value181) return;
+            ((value181 = true), run8(), handler25());
           },
-          _0x508699 = () => {
-            if (_0xf2abdd) return;
-            ((_0xf2abdd = true), _0x47d17f(), _0x10c3f0(new Error('video seek error')));
+          handler27 = () => {
+            if (value181) return;
+            ((value181 = true), run8(), handler26(new Error('video seek error')));
           };
-        (_0x13d800.addEventListener('seeked', _0x186335), _0x13d800.addEventListener('error', _0x508699));
-        const _0x3b9222 = Math.max(0, (Number(_0x13d800.duration) || 0) - 0.05),
-          _0x7adbe2 = Math.max(0, Math.min(_0x3b9222, _0x77db7b));
+        (el77.addEventListener('seeked', value182), el77.addEventListener('error', handler27));
+        const value183 = Math.max(0, (Number(el77.duration) || 0) - 0.05),
+          value184 = Math.max(0, Math.min(value183, value180));
         try {
-          _0x13d800.currentTime = _0x7adbe2;
-        } catch (_0x144382) {
-          _0x508699();
+          el77.currentTime = value184;
+        } catch (value185) {
+          handler27();
         }
         window.setTimeout(() => {
-          if (_0xf2abdd) return;
-          ((_0xf2abdd = true), _0x47d17f(), _0x3f4592());
+          if (value181) return;
+          ((value181 = true), run8(), handler25());
         }, 0x1c2);
       });
     try {
-      ((_0x4a79f0 = document.createElement('video')),
-        (_0x4a79f0.muted = true),
-        (_0x4a79f0.playsInline = true),
-        (_0x4a79f0.preload = 'auto'),
-        (_0x4a79f0.crossOrigin = 'anonymous'),
-        await attachDesktopMediaPlaybackSource(_0x4a79f0, _0x355cb0));
-      if (!this._getVideoElementSource(_0x4a79f0)) {
-        _0x4a79f0.src = _0x355cb0;
+      ((el76 = document.createElement('video')),
+        (el76.muted = true),
+        (el76.playsInline = true),
+        (el76.preload = 'auto'),
+        (el76.crossOrigin = 'anonymous'),
+        await attachDesktopMediaPlaybackSource(el76, enabled27));
+      if (!this._getVideoElementSource(el76)) {
+        el76.src = enabled27;
         try {
-          _0x4a79f0.load?.();
-        } catch (_0x440857) {}
+          el76.load?.();
+        } catch (value186) {}
       }
-      await new Promise((_0x2f66da, _0xd7e19f) => {
-        let _0x217424 = false,
-          _0x1ff587 = null;
-        const _0xc54af3 = () => {
-            (_0x4a79f0.removeEventListener('loadedmetadata', _0x36a82d),
-              _0x4a79f0.removeEventListener('error', _0x1a79af));
-            if (_0x1ff587) window.clearTimeout(_0x1ff587);
+      await new Promise((handler28, handler29) => {
+        let value187 = false,
+          value188 = null;
+        const run9 = () => {
+            (el76.removeEventListener('loadedmetadata', value189),
+              el76.removeEventListener('error', value190));
+            if (value188) window.clearTimeout(value188);
           },
-          _0x36a82d = () => {
-            if (_0x217424) return;
-            ((_0x217424 = true), _0xc54af3(), _0x2f66da());
+          value189 = () => {
+            if (value187) return;
+            ((value187 = true), run9(), handler28());
           },
-          _0x1a79af = () => {
-            if (_0x217424) return;
-            ((_0x217424 = true), _0xc54af3(), _0xd7e19f(new Error('video load error')));
+          value190 = () => {
+            if (value187) return;
+            ((value187 = true), run9(), handler29(new Error('video load error')));
           };
-        (_0x4a79f0.addEventListener('loadedmetadata', _0x36a82d, { once: true }),
-          _0x4a79f0.addEventListener('error', _0x1a79af),
-          (_0x1ff587 = window.setTimeout(() => {
-            if (_0x217424) return;
-            if (Number(_0x4a79f0.readyState || 0) >= 1 || this._readDurationSec(_0x4a79f0) > 0) {
-              ((_0x217424 = true), _0xc54af3(), _0x2f66da());
+        (el76.addEventListener('loadedmetadata', value189, { once: true }),
+          el76.addEventListener('error', value190),
+          (value188 = window.setTimeout(() => {
+            if (value187) return;
+            if (Number(el76.readyState || 0) >= 1 || this._readDurationSec(el76) > 0) {
+              ((value187 = true), run9(), handler28());
               return;
             }
-            ((_0x217424 = true), _0xc54af3(), _0xd7e19f(new Error('video metadata timeout')));
+            ((value187 = true), run9(), handler29(new Error('video metadata timeout')));
           }, 0x1f40)));
       });
-      const _0x1a1bac = await waitForVideoFrame(_0x4a79f0, { timeoutMs: 0xbb8 });
-      if (!_0x1a1bac) throw new Error('video frame timeout');
-      if (!this.active || this._thumbToken !== _0xa52178) return;
-      const _0x41af3c = this._readDurationSec(_0x4a79f0);
-      if (!_0x41af3c || !Number.isFinite(_0x41af3c)) return;
-      if (this._applyDurationSec(_0x41af3c, _0x4a79f0)) this._render();
-      const _0x437722 = _0x4a79f0.videoWidth || 1,
-        _0x42af06 = _0x4a79f0.videoHeight || 1,
-        _0x523bf1 = 44,
-        _0x3abf62 = Math.max(1, Math.round((_0x437722 / _0x42af06) * _0x523bf1));
-      ((_0x56986a = document.createElement('canvas')),
-        (_0x56986a.width = _0x3abf62),
-        (_0x56986a.height = _0x523bf1),
-        (_0x4570b7 = _0x56986a.getContext('2d')));
-      if (!_0x4570b7) return;
-      for (let _0x199bda = 0; _0x199bda < _0xf73ba8; _0x199bda++) {
-        if (!this.active || this._thumbToken !== _0xa52178) return;
-        const _0x3c1dbe = ((_0x199bda + 0.5) / _0xf73ba8) * _0x41af3c;
-        (await _0xbdfd80(_0x4a79f0, _0x3c1dbe), await waitForVideoFrame(_0x4a79f0, { timeoutMs: 0x4b0 }));
-        if (!this.active || this._thumbToken !== _0xa52178) return;
-        (_0x4570b7.clearRect(0, 0, _0x3abf62, _0x523bf1),
-          _0x4570b7.drawImage(_0x4a79f0, 0, 0, _0x3abf62, _0x523bf1));
-        let _0x253636;
+      const waitForVideoFrame3 = await waitForVideoFrame(el76, { timeoutMs: 0xbb8 });
+      if (!waitForVideoFrame3) throw new Error('video frame timeout');
+      if (!this.active || this._thumbToken !== value177) return;
+      const enabled28 = this._readDurationSec(el76);
+      if (!enabled28 || !Number.isFinite(enabled28)) return;
+      if (this._applyDurationSec(enabled28, el76)) this._render();
+      const value191 = el76.videoWidth || 1,
+        value192 = el76.videoHeight || 1,
+        value193 = 44,
+        value194 = Math.max(1, Math.round((value191 / value192) * value193));
+      ((box11 = document.createElement('canvas')),
+        (box11.width = value194),
+        (box11.height = value193),
+        (ctx = box11.getContext('2d')));
+      if (!ctx) return;
+      for (let value195 = 0; value195 < value179; value195++) {
+        if (!this.active || this._thumbToken !== value177) return;
+        const value196 = ((value195 + 0.5) / value179) * enabled28;
+        (await run7(el76, value196), await waitForVideoFrame(el76, { timeoutMs: 0x4b0 }));
+        if (!this.active || this._thumbToken !== value177) return;
+        (ctx.clearRect(0, 0, value194, value193), ctx.drawImage(el76, 0, 0, value194, value193));
+        let enabled29;
         try {
-          _0x253636 = _0x56986a.toDataURL('image/jpeg', 0.7);
-        } catch (_0xd231c3) {
+          enabled29 = box11.toDataURL('image/jpeg', 0.7);
+        } catch (value197) {
           return;
         }
-        if (!_0x253636) return;
-        _0x3335e8[_0x199bda].style.backgroundImage = 'url(' + _0x253636 + ')';
+        if (!enabled29) return;
+        list11[value195].style.backgroundImage = 'url(' + enabled29 + ')';
       }
-    } catch (_0x652da7) {
+    } catch (value198) {
       return;
     } finally {
-      if (_0x4a79f0) {
+      if (el76) {
         try {
-          _0x4a79f0.pause();
-        } catch (_0x41b1db) {}
-        _0x4a79f0.removeAttribute('src');
+          el76.pause();
+        } catch (value199) {}
+        el76.removeAttribute('src');
         try {
-          _0x4a79f0.load();
-        } catch (_0xeea4e5) {}
+          el76.load();
+        } catch (value200) {}
       }
-      ((_0x56986a = null), (_0x4570b7 = null));
+      ((box11 = null), (ctx = null));
     }
   },
-  _handleDragAtClientX(_0x1ddb7c) {
+  _handleDragAtClientX(value201) {
     if (!this.trackEl || !this.active) return;
-    const _0x25a652 = this.durationSec;
-    if (!_0x25a652 || !Number.isFinite(_0x25a652) || _0x25a652 <= 0) {
+    const enabled30 = this.durationSec;
+    if (!enabled30 || !Number.isFinite(enabled30) || enabled30 <= 0) {
       this._render();
       return;
     }
-    const _0x29af73 = this.trackEl.getBoundingClientRect();
-    if (!_0x29af73.width) return;
-    const _0x502f49 = _0x1ddb7c - _0x29af73.left,
-      _0x8f728 = Math.max(0, Math.min(1, _0x502f49 / _0x29af73.width)),
-      _0x417540 = _0x8f728 * _0x25a652,
-      _0x40e62e = Math.min(0.1, _0x25a652),
-      _0x2a76fd = Math.max(_0x40e62e, this.endSec - this.startSec),
-      _0x59aeae =
+    const box12 = this.trackEl.getBoundingClientRect();
+    if (!box12.width) return;
+    const value202 = value201 - box12.left,
+      value203 = Math.max(0, Math.min(1, value202 / box12.width)),
+      value204 = value203 * enabled30,
+      value205 = Math.min(0.1, enabled30),
+      value206 = Math.max(value205, this.endSec - this.startSec),
+      value207 =
         this._dragMode === 'left' ||
         this._dragMode === 'right' ||
         this._dragMode === 'move' ||
@@ -2014,33 +1984,33 @@ const VideoClipController = {
           ? this._pauseRangePlaybackForRangeEdit()
           : null;
     if (this._dragMode === 'left') {
-      const _0x8a8bd2 = Math.max(0, Math.min(_0x417540, this.endSec - _0x40e62e));
-      this.startSec = _0x8a8bd2;
-      if (_0x59aeae)
+      const value208 = Math.max(0, Math.min(value204, this.endSec - value205));
+      this.startSec = value208;
+      if (value207)
         try {
-          _0x59aeae.currentTime = _0x8a8bd2;
-        } catch (_0x394231) {}
+          value207.currentTime = value208;
+        } catch (value209) {}
     } else {
       if (this._dragMode === 'right') {
-        const _0x5f4226 = Math.max(this.startSec + _0x40e62e, Math.min(_0x25a652, _0x417540));
-        this.endSec = _0x5f4226;
+        const value210 = Math.max(this.startSec + value205, Math.min(enabled30, value204));
+        this.endSec = value210;
       } else {
         if (this._dragMode === 'move') {
-          const _0x4d31fa = this.selectionEl.getBoundingClientRect().left - _0x29af73.left,
-            _0x36d6ab = _0x1ddb7c - _0x29af73.left - this._dragOffsetPx,
-            _0x1dcb8b = _0x36d6ab - _0x4d31fa,
-            _0x439379 = (_0x1dcb8b / _0x29af73.width) * _0x25a652,
-            _0xa4ae05 = Math.max(0, Math.min(_0x25a652 - _0x2a76fd, this.startSec + _0x439379));
-          ((this.startSec = _0xa4ae05), (this.endSec = _0xa4ae05 + _0x2a76fd));
-          if (_0x59aeae)
+          const value211 = this.selectionEl.getBoundingClientRect().left - box12.left,
+            value212 = value201 - box12.left - this._dragOffsetPx,
+            value213 = value212 - value211,
+            value214 = (value213 / box12.width) * enabled30,
+            value215 = Math.max(0, Math.min(enabled30 - value206, this.startSec + value214));
+          ((this.startSec = value215), (this.endSec = value215 + value206));
+          if (value207)
             try {
-              _0x59aeae.currentTime = _0xa4ae05;
-            } catch (_0xff031a) {}
+              value207.currentTime = value215;
+            } catch (value216) {}
         } else {
           if (this._dragMode === 'set') {
-            const _0x134b77 = Math.min(3, _0x25a652),
-              _0x41675b = Math.max(0, Math.min(_0x25a652 - _0x134b77, _0x417540 - _0x134b77 / 2));
-            ((this.startSec = _0x41675b), (this.endSec = _0x41675b + _0x134b77));
+            const value217 = Math.min(3, enabled30),
+              value218 = Math.max(0, Math.min(enabled30 - value217, value204 - value217 / 2));
+            ((this.startSec = value218), (this.endSec = value218 + value217));
           }
         }
       }
@@ -2050,21 +2020,21 @@ const VideoClipController = {
   _render() {
     if (!this.active || !this.trackEl || !this.selectionEl || !this.leftHandleEl || !this.rightHandleEl)
       return;
-    const _0x302c34 = this.durationSec,
-      _0x2f2dbb = Number.isFinite(_0x302c34) && _0x302c34 > 0,
-      _0x6d5427 = _0x2f2dbb ? Math.max(0, Math.min(this.startSec, _0x302c34)) : 0,
-      _0x5e0a21 = _0x2f2dbb ? Math.max(0, Math.min(this.endSec, _0x302c34)) : 0,
-      _0x355ea5 = Math.max(0, _0x5e0a21 - _0x6d5427);
-    if (_0x2f2dbb) {
-      const _0x599fe9 = (_0x6d5427 / _0x302c34) * 100,
-        _0xcee6b9 = (_0x355ea5 / _0x302c34) * 100;
-      ((this.selectionEl.style.left = _0x599fe9 + '%'),
-        (this.selectionEl.style.width = _0xcee6b9 + '%'),
-        (this.leftHandleEl.style.left = _0x599fe9 + '%'),
-        (this.rightHandleEl.style.left = _0x599fe9 + _0xcee6b9 + '%'),
+    const count22 = this.durationSec,
+      value219 = Number.isFinite(count22) && count22 > 0,
+      value220 = value219 ? Math.max(0, Math.min(this.startSec, count22)) : 0,
+      value221 = value219 ? Math.max(0, Math.min(this.endSec, count22)) : 0,
+      count23 = Math.max(0, value221 - value220);
+    if (value219) {
+      const value222 = (value220 / count22) * 100,
+        value223 = (count23 / count22) * 100;
+      ((this.selectionEl.style.left = value222 + '%'),
+        (this.selectionEl.style.width = value223 + '%'),
+        (this.leftHandleEl.style.left = value222 + '%'),
+        (this.rightHandleEl.style.left = value222 + value223 + '%'),
         this.labelEl &&
-          ((this.labelEl.textContent = _0x355ea5.toFixed(2) + 's'),
-          (this.labelEl.style.left = _0x599fe9 + _0xcee6b9 / 2 + '%')));
+          ((this.labelEl.textContent = count23.toFixed(2) + 's'),
+          (this.labelEl.style.left = value222 + value223 / 2 + '%')));
     } else
       ((this.selectionEl.style.left = '0%'),
         (this.selectionEl.style.width = '0%'),
@@ -2075,9 +2045,9 @@ const VideoClipController = {
           (this.labelEl.style.left = '50%')));
     this._renderPlayhead();
     if (this.confirmBtnEl) {
-      const _0x4916d5 = _0x2f2dbb && _0x355ea5 >= 0.1;
-      ((this.confirmBtnEl.disabled = !_0x4916d5),
-        (this.confirmBtnEl.dataset.disabled = _0x4916d5 ? 'false' : 'true'),
+      const enabled31 = value219 && count23 >= 0.1;
+      ((this.confirmBtnEl.disabled = !enabled31),
+        (this.confirmBtnEl.dataset.disabled = enabled31 ? 'false' : 'true'),
         this.confirmBtnEl.dataset.loading !== 'true' &&
           (this.confirmBtnEl.innerHTML =
             '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>'));
@@ -2085,104 +2055,100 @@ const VideoClipController = {
   },
   async _confirm() {
     if (!this.confirmBtnEl) return;
-    const _0x36c9dc = this.confirmBtnEl;
-    if (_0x36c9dc.dataset.disabled === 'true') return;
-    const _0x13340d = appStore.getState().nodes,
-      _0x1ff025 = _0x13340d[this.anchorNodeId];
-    if (!_0x1ff025) {
+    const el78 = this.confirmBtnEl;
+    if (el78.dataset.disabled === 'true') return;
+    const value224 = appStore.getState().nodes,
+      name = value224[this.anchorNodeId];
+    if (!name) {
       this.exit({ silent: true });
       return;
     }
-    const _0x599a90 = this.durationSec;
-    if (!_0x599a90 || !Number.isFinite(_0x599a90) || _0x599a90 <= 0) return;
-    const _0xe5d6a9 = Math.max(0, Math.min(this.startSec, _0x599a90)),
-      _0xf69853 = Math.max(0, Math.min(this.endSec, _0x599a90));
-    if (!(_0xf69853 > _0xe5d6a9)) return;
-    const _0x2f5967 =
-      localPathToUrl(_0x1ff025.localPath) || _0x1ff025.src || _0x1ff025.videoUrl || _0x1ff025.resultUrl || '';
-    if (!_0x2f5967) return;
-    ((_0x36c9dc.dataset.disabled = 'true'),
-      (_0x36c9dc.dataset.loading = 'true'),
-      (_0x36c9dc.innerHTML =
+    const enabled32 = this.durationSec;
+    if (!enabled32 || !Number.isFinite(enabled32) || enabled32 <= 0) return;
+    const start = Math.max(0, Math.min(this.startSec, enabled32)),
+      end = Math.max(0, Math.min(this.endSec, enabled32));
+    if (!(end > start)) return;
+    const src3 = localPathToUrl(name.localPath) || name.src || name.videoUrl || name.resultUrl || '';
+    if (!src3) return;
+    ((el78.dataset.disabled = 'true'),
+      (el78.dataset.loading = 'true'),
+      (el78.innerHTML =
         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><g style="animation:spin 1s linear infinite;transform-origin:50% 50%;transform-box:fill-box;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></g></svg>'),
       window.showToast?.(videoClipText('cut.processing'), 'info'));
     try {
-      let _0x11f8be = null;
+      let error3 = null;
       if (canUseElectronMediaTask())
-        _0x11f8be = await enqueueElectronMediaTask(
+        error3 = await enqueueElectronMediaTask(
           {
             kind: 'videoCut',
             nodeId: this.anchorNodeId,
-            src: _0x2f5967,
-            args: { start: _0xe5d6a9, end: _0xf69853 },
+            src: src3,
+            args: { start: start, end: end },
           },
           { wait: true, timeout: 0x493e0 },
         );
       else {
-        const _0x354c56 = await requester({
+        const response7 = await requester({
           url: '/api/v2/video/cut',
           method: 'POST',
           provider: 'local',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ src: _0x2f5967, start: _0xe5d6a9, end: _0xf69853 }),
+          body: JSON.stringify({ src: src3, start: start, end: end }),
           allow404Null: true,
           returnMeta: true,
         });
-        if (_0x354c56?.status === 0x194 || _0x354c56?.data == null)
+        if (response7?.status === 0x194 || response7?.data == null)
           throw new Error(videoClipText('errors.cutEndpointMissing'));
-        _0x11f8be = _0x354c56.data || {};
+        error3 = response7.data || {};
       }
-      const _0x30b31f =
-          _0x11f8be?.result && typeof _0x11f8be.result === 'object' ? _0x11f8be.result : _0x11f8be,
-        _0x4979f4 = normalizeVideoCutResultLocalPath(_0x11f8be);
-      if (!_0x4979f4 || _0x11f8be?.success === false || _0x30b31f?.success === false)
+      const response8 = error3?.result && typeof error3.result === 'object' ? error3.result : error3,
+        videoCutResultLocalPath = normalizeVideoCutResultLocalPath(error3);
+      if (!videoCutResultLocalPath || error3?.success === false || response8?.success === false)
         throw new Error(
-          _0x30b31f?.error || _0x11f8be?.error || _0x11f8be?.message || videoClipText('errors.cutFailed'),
+          response8?.error || error3?.error || error3?.message || videoClipText('errors.cutFailed'),
         );
-      const { width: _0x33de00, height: _0x34cbf0 } = getAutoMediaSizeByShortSide(
-          _0x1ff025.width || 0x200,
-          _0x1ff025.height || 0x120,
+      const { width: width2, height: height } = getAutoMediaSizeByShortSide(
+          name.width || 0x200,
+          name.height || 0x120,
         ),
-        _0x5ad9c4 = calcSafeSpawnPosNearNode(appStore.getState().nodes, _0x1ff025, _0x33de00, _0x34cbf0),
-        _0x2a448d = generateId('source-video-cut'),
-        _0x56d7bb = pickPositiveNumber(_0x30b31f?.fps, _0x11f8be?.fps),
-        _0x278f12 = buildVideoCutNodeMeta(_0x1ff025, _0xe5d6a9, _0xf69853, _0x56d7bb),
-        _0x4cfd35 = buildVideoCutNodePlaybackFields(_0x4979f4);
+        x3 = calcSafeSpawnPosNearNode(appStore.getState().nodes, name, width2, height),
+        id2 = generateId('source-video-cut'),
+        positiveNumber10 = pickPositiveNumber(response8?.fps, error3?.fps),
+        args3 = buildVideoCutNodeMeta(name, start, end, positiveNumber10),
+        args4 = buildVideoCutNodePlaybackFields(videoCutResultLocalPath);
       (appStore.addNode(
         buildSourceMediaNodePayload({
-          id: _0x2a448d,
+          id: id2,
           type: 'source-video',
-          x: _0x5ad9c4.x,
-          y: _0x5ad9c4.y,
-          width: _0x33de00,
-          height: _0x34cbf0,
+          x: x3.x,
+          y: x3.y,
+          width: width2,
+          height: height,
           name: videoClipText('cut.newNodeName', {
-            name: _0x1ff025.name || videoClipText('cut.videoFallback'),
+            name: name.name || videoClipText('cut.videoFallback'),
           }),
-          ..._0x4cfd35,
-          ..._0x278f12,
+          ...args4,
+          ...args3,
           needsAutoResize: false,
           fixedSize: true,
         }),
       ),
-        appStore.setSelectedNodes([_0x2a448d]),
+        appStore.setSelectedNodes([id2]),
         commit(),
-        ensureVideoCutNodeThumb(_0x2a448d, _0x4979f4),
-        window.v2FocusOnNodes?.([this.anchorNodeId, _0x2a448d]),
+        ensureVideoCutNodeThumb(id2, videoCutResultLocalPath),
+        window.v2FocusOnNodes?.([this.anchorNodeId, id2]),
         window._triggerLocalCacheSave?.(),
         window.showToast?.(videoClipText('cut.success'), 'success'),
         this.exit({ silent: true }));
-    } catch (_0x15d986) {
-      const _0x31a270 =
-        _0x15d986 instanceof Error
-          ? _0x15d986.message
-          : String(_0x15d986 || videoClipText('errors.cutFailed'));
-      (window.showToast?.(videoClipText('cut.failedWithError', { error: _0x31a270 }), 'error'),
-        (_0x36c9dc.dataset.loading = 'false'),
+    } catch (error4) {
+      const error5 =
+        error4 instanceof Error ? error4.message : String(error4 || videoClipText('errors.cutFailed'));
+      (window.showToast?.(videoClipText('cut.failedWithError', { error: error5 }), 'error'),
+        (el78.dataset.loading = 'false'),
         this._render(),
-        (_0x36c9dc.dataset.loading = 'false'));
+        (el78.dataset.loading = 'false'));
     }
-    _0x36c9dc.dataset.loading = 'false';
+    el78.dataset.loading = 'false';
   },
   exit({ silent: silent = false } = {}) {
     if (!this.active) return;
@@ -2251,27 +2217,29 @@ const VideoClipController = {
 };
 const VIDEO_CLIP_CONTROLLER_METHOD_KEYS = new Set(
     Object.entries(VideoClipController)
-      .filter(([, _0x422a0a]) => typeof _0x422a0a === 'function')
-      .map(([_0x591c70]) => _0x591c70),
+      .filter(([, value225]) => typeof value225 === 'function')
+      .map(([value226]) => value226),
   ),
   VIDEO_CLIP_CONTROLLER_INITIAL_STATE = Object.freeze(
     Object.fromEntries(
-      Object.entries(VideoClipController).filter(([_0x359388]) => !VIDEO_CLIP_CONTROLLER_METHOD_KEYS.has(_0x359388)),
+      Object.entries(VideoClipController).filter(
+        ([value227]) => !VIDEO_CLIP_CONTROLLER_METHOD_KEYS.has(value227),
+      ),
     ),
   );
 export default VideoClipController;
 export function createVideoClipController() {
-  const _0x34f032 = Object.create(VideoClipController);
-  for (const _0x37bb9c of Object.keys(VideoClipController)) {
-    if (VIDEO_CLIP_CONTROLLER_METHOD_KEYS.has(_0x37bb9c)) continue;
-    const _0x13287f = Object.hasOwn(VIDEO_CLIP_CONTROLLER_INITIAL_STATE, _0x37bb9c)
-      ? VIDEO_CLIP_CONTROLLER_INITIAL_STATE[_0x37bb9c]
+  const value228 = Object.create(VideoClipController);
+  for (const value229 of Object.keys(VideoClipController)) {
+    if (VIDEO_CLIP_CONTROLLER_METHOD_KEYS.has(value229)) continue;
+    const args5 = Object.hasOwn(VIDEO_CLIP_CONTROLLER_INITIAL_STATE, value229)
+      ? VIDEO_CLIP_CONTROLLER_INITIAL_STATE[value229]
       : undefined;
-    _0x34f032[_0x37bb9c] = Array.isArray(_0x13287f)
-      ? [..._0x13287f]
-      : _0x13287f && typeof _0x13287f === 'object'
-        ? { ..._0x13287f }
-        : _0x13287f;
+    value228[value229] = Array.isArray(args5)
+      ? [...args5]
+      : args5 && typeof args5 === 'object'
+        ? { ...args5 }
+        : args5;
   }
-  return _0x34f032;
+  return value228;
 }

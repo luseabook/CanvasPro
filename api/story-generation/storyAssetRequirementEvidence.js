@@ -68,698 +68,659 @@ const STORY_ASSET_REQUIREMENT_TIERS = Object['freeze']({
     ]['join']('|'),
     'u',
   );
-function normalizeText(_0x4f671a) {
-  return typeof _0x4f671a === 'string' ? _0x4f671a['trim']() : '';
+function normalizeText(value) {
+  return typeof value === 'string' ? value['trim']() : '';
 }
-function normalizeNameKey(_0x13e954) {
-  return normalizeText(_0x13e954)['normalize']('NFKC')['replace'](/\s+/gu, '')['toLocaleLowerCase']();
+function normalizeNameKey(item) {
+  return normalizeText(item)['normalize']('NFKC')['replace'](/\s+/gu, '')['toLocaleLowerCase']();
 }
-function normalizeStringArray(_0x3b9dda = []) {
-  return [
-    ...new Set((Array['isArray'](_0x3b9dda) ? _0x3b9dda : [])['map'](normalizeText)['filter'](Boolean)),
-  ];
+function normalizeStringArray(list = []) {
+  return [...new Set((Array['isArray'](list) ? list : [])['map'](normalizeText)['filter'](Boolean))];
 }
-function getLocalCandidateConfidence(_0x27b409, _0xa610e6, _0x217fcf) {
-  const _0x42c940 = (
-    Array['isArray'](_0x27b409?.['localEntityEvidence']) ? _0x27b409['localEntityEvidence'] : []
-  )
-    ['filter'](
-      (_0x2d1480) => _0x2d1480?.['kind'] === _0xa610e6 && normalizeText(_0x2d1480?.['text']) === _0x217fcf,
-    )
-    ['map']((_0x3abbc9) => Number(_0x3abbc9?.['probability']))
+function getLocalCandidateConfidence(key, index, result) {
+  const list2 = (Array['isArray'](key?.['localEntityEvidence']) ? key['localEntityEvidence'] : [])
+    ['filter']((response) => response?.['kind'] === index && normalizeText(response?.['text']) === result)
+    ['map']((data) => Number(data?.['probability']))
     ['filter'](Number['isFinite']);
-  return _0x42c940['length'] ? Math['max'](..._0x42c940) : 0x0;
+  return list2['length'] ? Math['max'](...list2) : 0x0;
 }
-function stripLocalCandidateSummary(_0x5db535 = '') {
-  return normalizeText(_0x5db535)
+function stripLocalCandidateSummary(options = '') {
+  return normalizeText(options)
     ['replace'](/PP-UIE\s*本地候选：[^\r\n]*(?:\r?\n\s*证据原文：)?/giu, '')
     ['replace'](/证据原文：/gu, '')
     ['trim']();
 }
-function isUsableLocalCandidateName(_0x5ce8a3, _0x26c3ca) {
-  const _0x2a4028 = normalizeText(_0x26c3ca),
-    _0x1e0310 = [..._0x2a4028]['length'];
+function isUsableLocalCandidateName(target, source) {
+  const args = normalizeText(source),
+    count = [...args]['length'];
   if (
-    _0x1e0310 < 0x2 ||
-    _0x1e0310 > 0x30 ||
-    /[\r\n]/u['test'](_0x2a4028) ||
-    STORY_ASSET_LOCAL_CANDIDATE_PLACEHOLDER_PATTERN['test'](_0x2a4028)
+    count < 0x2 ||
+    count > 0x30 ||
+    /[\r\n]/u['test'](args) ||
+    STORY_ASSET_LOCAL_CANDIDATE_PLACEHOLDER_PATTERN['test'](args)
   )
     return ![];
-  if (_0x5ce8a3 === 'prop' && isNoisyStoryPropCandidateName(_0x2a4028)) return ![];
-  if (_0x5ce8a3 !== 'character') return !![];
+  if (target === 'prop' && isNoisyStoryPropCandidateName(args)) return ![];
+  if (target !== 'character') return !![];
   return (
-    _0x1e0310 <= 0x8 &&
-    /^[\p{Script=Han}A-Za-z0-9·•._-]+$/u['test'](_0x2a4028) &&
-    !STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN['test'](_0x2a4028)
+    count <= 0x8 &&
+    /^[\p{Script=Han}A-Za-z0-9·•._-]+$/u['test'](args) &&
+    !STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN['test'](args)
   );
 }
-function isNoisyStoryPropCandidateName(_0x202d5c = '') {
-  const _0x551a50 = normalizeText(_0x202d5c)['replace'](STORY_PROP_LEADING_MEASURE_PATTERN, '')['trim']();
+function isNoisyStoryPropCandidateName(next = '') {
+  const args2 = normalizeText(next)['replace'](STORY_PROP_LEADING_MEASURE_PATTERN, '')['trim']();
   if (
-    [..._0x551a50]['length'] < 0x2 ||
-    [..._0x551a50]['length'] > 0x18 ||
-    STORY_PROP_CANDIDATE_NOISE_PATTERN['test'](_0x551a50) ||
-    /(?:中段标记|场次标记|剧情标记|唯一标记|核对编号)$/u['test'](_0x551a50)
+    [...args2]['length'] < 0x2 ||
+    [...args2]['length'] > 0x18 ||
+    STORY_PROP_CANDIDATE_NOISE_PATTERN['test'](args2) ||
+    /(?:中段标记|场次标记|剧情标记|唯一标记|核对编号)$/u['test'](args2)
   )
     return !![];
-  return !/^[\p{L}\p{N}·•._-]+$/u['test'](_0x551a50);
+  return !/^[\p{L}\p{N}·•._-]+$/u['test'](args2);
 }
-function normalizeStoryPropActionCandidate(_0x344bf4 = '') {
-  let _0x43a1d9 = normalizeText(_0x344bf4)
+function normalizeStoryPropActionCandidate(current = '') {
+  let text = normalizeText(current)
     ['replace'](STORY_PROP_LEADING_MEASURE_PATTERN, '')
     ['replace'](/^(?:这|那|该)(?:个|只|把|张|本|册|枚|块|台|部|支|瓶|盒|箱|套|卷|件|份|根|条|沓)?/u, '')
     ['replace'](/^[《“”"'‘’]+|[》“”"'‘’]+$/gu, '')
     ['replace'](STORY_PROP_TRAILING_PREDICATE_PATTERN, '')
     ['trim']();
-  for (let _0x17efa8 = 0x0; _0x17efa8 < 0x3; _0x17efa8 += 0x1) {
-    const _0x56106b = _0x43a1d9;
-    _0x43a1d9 = _0x43a1d9['replace'](STORY_PROP_TRAILING_ACTION_FRAGMENT_PATTERN, '')
+  for (let count2 = 0x0; count2 < 0x3; count2 += 0x1) {
+    const entry = text;
+    text = text['replace'](STORY_PROP_TRAILING_ACTION_FRAGMENT_PATTERN, '')
       ['replace'](STORY_PROP_LEADING_STATE_PATTERN, '')
       ['trim']();
-    if (_0x43a1d9 === _0x56106b) break;
+    if (text === entry) break;
   }
-  const _0x5d04bd = normalizeText(
-    _0x43a1d9['match'](STORY_PROP_PACKAGING_DESCRIPTION_PATTERN)?.[0x1] || _0x43a1d9,
-  );
-  if (
-    !_0x5d04bd ||
-    /[和及、]/u['test'](_0x5d04bd) ||
-    STORY_PROP_NON_ASSET_FRAGMENT_PATTERN['test'](_0x5d04bd)
-  )
-    return '';
-  return isNoisyStoryPropCandidateName(_0x5d04bd) ? '' : _0x5d04bd;
+  const text2 = normalizeText(text['match'](STORY_PROP_PACKAGING_DESCRIPTION_PATTERN)?.[0x1] || text);
+  if (!text2 || /[和及、]/u['test'](text2) || STORY_PROP_NON_ASSET_FRAGMENT_PATTERN['test'](text2)) return '';
+  return isNoisyStoryPropCandidateName(text2) ? '' : text2;
 }
-function createStoryPropActionEvidence(_0x10c275, _0x3a6d68, _0x40b6f3) {
-  const _0x48117f = _0x10c275['indexOf'](_0x40b6f3, Math['max'](0x0, _0x3a6d68)),
-    _0x34a862 = _0x48117f >= 0x0 ? _0x48117f : Math['max'](0x0, _0x3a6d68),
-    _0x15a56b = Math['max'](0x0, _0x34a862 - 0x30);
-  return _0x10c275['slice'](
-    _0x15a56b,
-    Math['min'](_0x10c275['length'], _0x15a56b + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
+function createStoryPropActionEvidence(list3, record, payload) {
+  const count3 = list3['indexOf'](payload, Math['max'](0x0, record)),
+    handle = count3 >= 0x0 ? count3 : Math['max'](0x0, record),
+    state = Math['max'](0x0, handle - 0x30);
+  return list3['slice'](
+    state,
+    Math['min'](list3['length'], state + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
   )
     ['replace'](/\s+/gu, '\x20')
     ['trim']();
 }
-export function createStoryAssetActionPropCandidates(_0x4abdb9 = []) {
-  const _0x20fa8c = new Map();
+export function createStoryAssetActionPropCandidates(list4 = []) {
+  const map = new Map();
   return (
-    (Array['isArray'](_0x4abdb9) ? _0x4abdb9 : [])['forEach']((_0x35d7c0) => {
-      const _0x46e56b = normalizeText(_0x35d7c0?.['body']),
-        _0x1ed120 = normalizeText(_0x35d7c0?.['ref']),
-        _0x253986 = normalizeText(_0x35d7c0?.['episodeRef']);
-      if (!_0x46e56b || !_0x1ed120) return;
-      const _0x157400 = [
-        ..._0x46e56b['matchAll'](STORY_PROP_DIRECT_OBJECT_ACTION_PATTERN),
-        ..._0x46e56b['matchAll'](STORY_PROP_BA_ACTION_PATTERN),
-      ]['sort'](
-        (_0x1c2e7e, _0x5e2a59) => (Number(_0x1c2e7e['index']) || 0x0) - (Number(_0x5e2a59['index']) || 0x0),
-      );
-      _0x157400['forEach']((_0x1021a1) => {
-        const _0x2707e2 = normalizeStoryPropActionCandidate(_0x1021a1[0x1]);
-        if (!_0x2707e2) return;
-        const _0x1b7011 = normalizeNameKey(_0x2707e2),
-          _0x25c54c = _0x20fa8c['get'](_0x1b7011),
-          _0x1d2928 = normalizeStringArray([...(_0x25c54c?.['sourceSceneRefs'] || []), _0x1ed120]),
-          _0x1b8755 = normalizeStringArray([...(_0x25c54c?.['sourceChapterIds'] || []), _0x253986]);
-        _0x20fa8c['set'](_0x1b7011, {
-          name: _0x25c54c?.['name'] || _0x2707e2,
+    (Array['isArray'](list4) ? list4 : [])['forEach']((dom) => {
+      const args3 = normalizeText(dom?.['body']),
+        text3 = normalizeText(dom?.['ref']),
+        text4 = normalizeText(dom?.['episodeRef']);
+      if (!args3 || !text3) return;
+      const list5 = [
+        ...args3['matchAll'](STORY_PROP_DIRECT_OBJECT_ACTION_PATTERN),
+        ...args3['matchAll'](STORY_PROP_BA_ACTION_PATTERN),
+      ]['sort']((config, scope) => (Number(config['index']) || 0x0) - (Number(scope['index']) || 0x0));
+      list5['forEach']((input) => {
+        const storyPropActionCandidate = normalizeStoryPropActionCandidate(input[0x1]);
+        if (!storyPropActionCandidate) return;
+        const nameKey = normalizeNameKey(storyPropActionCandidate),
+          name = map['get'](nameKey),
+          sourceSceneRefs = normalizeStringArray([...(name?.['sourceSceneRefs'] || []), text3]),
+          sourceChapterIds = normalizeStringArray([...(name?.['sourceChapterIds'] || []), text4]);
+        map['set'](nameKey, {
+          name: name?.['name'] || storyPropActionCandidate,
           evidence:
-            _0x25c54c?.['evidence'] ||
-            createStoryPropActionEvidence(_0x46e56b, Number(_0x1021a1['index']) || 0x0, _0x2707e2),
-          sourceSceneRefs: _0x1d2928,
-          sourceChapterIds: _0x1b8755,
+            name?.['evidence'] ||
+            createStoryPropActionEvidence(args3, Number(input['index']) || 0x0, storyPropActionCandidate),
+          sourceSceneRefs: sourceSceneRefs,
+          sourceChapterIds: sourceChapterIds,
           confidence: 0x1,
         });
       });
     }),
-    [..._0x20fa8c['values']()]
+    [...map['values']()]
   );
 }
-function createLocalCandidateEvidence(_0x6b0ac8, _0x5acf16, _0xad4e73, _0x3db80e) {
-  const _0x5e736d = normalizeText(_0x5acf16?.['body']) || stripLocalCandidateSummary(_0x6b0ac8?.['body']),
-    _0xf296b5 = (
-      Array['isArray'](_0x6b0ac8?.['localEntityEvidence']) ? _0x6b0ac8['localEntityEvidence'] : []
-    )['find'](
-      (_0x2bfb85) => _0x2bfb85?.['kind'] === _0xad4e73 && normalizeText(_0x2bfb85?.['text']) === _0x3db80e,
+function createLocalCandidateEvidence(dom2, dom3, output, list6) {
+  const list7 = normalizeText(dom3?.['body']) || stripLocalCandidateSummary(dom2?.['body']),
+    value2 = (Array['isArray'](dom2?.['localEntityEvidence']) ? dom2['localEntityEvidence'] : [])['find'](
+      (response2) => response2?.['kind'] === output && normalizeText(response2?.['text']) === list6,
     ),
-    _0x519f53 = Math['max'](0x0, Math['trunc'](Number(_0xf296b5?.['start']) || 0x0)),
-    _0x312682 =
-      _0x5e736d['slice'](_0x519f53, _0x519f53 + _0x3db80e['length']) === _0x3db80e
-        ? _0x519f53
-        : _0x5e736d['indexOf'](_0x3db80e);
-  if (_0x312682 < 0x0) return '';
-  const _0x1c8529 = Math['max'](0x0, _0x312682 - 0x38);
-  return _0x5e736d['slice'](
-    _0x1c8529,
-    Math['min'](_0x5e736d['length'], _0x1c8529 + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
+    value3 = Math['max'](0x0, Math['trunc'](Number(value2?.['start']) || 0x0)),
+    count4 = list7['slice'](value3, value3 + list6['length']) === list6 ? value3 : list7['indexOf'](list6);
+  if (count4 < 0x0) return '';
+  const value4 = Math['max'](0x0, count4 - 0x38);
+  return list7['slice'](
+    value4,
+    Math['min'](list7['length'], value4 + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
   )
     ['replace'](/\s+/gu, '\x20')
     ['trim']();
 }
-function collectVerifiedLocalCandidates(_0x433372 = {}, _0x6e8e3b = null) {
-  return ['character', 'scene', 'prop']['flatMap']((_0x42e7b9) =>
-    normalizeStringArray(_0x433372?.['localEntityCandidates']?.[_0x42e7b9])
-      ['filter']((_0x3b5384) => isUsableLocalCandidateName(_0x42e7b9, _0x3b5384))
-      ['map']((_0x2e4c4b) => ({
-        kind: _0x42e7b9,
-        name: _0x2e4c4b,
-        confidence: getLocalCandidateConfidence(_0x433372, _0x42e7b9, _0x2e4c4b),
-        evidence: createLocalCandidateEvidence(_0x433372, _0x6e8e3b, _0x42e7b9, _0x2e4c4b),
+function collectVerifiedLocalCandidates(options2 = {}, value5 = null) {
+  return ['character', 'scene', 'prop']['flatMap']((kind) =>
+    normalizeStringArray(options2?.['localEntityCandidates']?.[kind])
+      ['filter']((value6) => isUsableLocalCandidateName(kind, value6))
+      ['map']((name2) => ({
+        kind: kind,
+        name: name2,
+        confidence: getLocalCandidateConfidence(options2, kind, name2),
+        evidence: createLocalCandidateEvidence(options2, value5, kind, name2),
       }))
-      ['filter']((_0x566e9c) => _0x566e9c['evidence']),
+      ['filter']((value7) => value7['evidence']),
   );
 }
-function resolveStoryAssetCandidateWinnerKindsByName(_0x8c874e = []) {
-  const _0x1da2b5 = new Map();
+function resolveStoryAssetCandidateWinnerKindsByName(list8 = []) {
+  const map2 = new Map();
   return (
-    _0x8c874e['forEach'](({ key: _0x33af60, kind: _0x16df94, confidence: _0x349785 }) => {
-      const _0x3939a6 = _0x1da2b5['get'](_0x33af60) || new Map();
-      (_0x3939a6['set'](
-        _0x16df94,
-        Math['max'](Number(_0x3939a6['get'](_0x16df94)) || 0x0, Number(_0x349785) || 0x0),
-      ),
-        _0x1da2b5['set'](_0x33af60, _0x3939a6));
+    list8['forEach'](({ key: key2, kind: kind2, confidence: confidence }) => {
+      const map3 = map2['get'](key2) || new Map();
+      (map3['set'](kind2, Math['max'](Number(map3['get'](kind2)) || 0x0, Number(confidence) || 0x0)),
+        map2['set'](key2, map3));
     }),
     new Map(
-      [..._0x1da2b5]['flatMap'](([_0x17c6ae, _0x4f1832]) => {
-        if (_0x4f1832['size'] === 0x1) return [[_0x17c6ae, [..._0x4f1832['keys']()][0x0]]];
-        const _0x5e9513 = [..._0x4f1832]
-            ['map'](([_0x34a491, _0x56ef81]) => ({ kind: _0x34a491, confidence: _0x56ef81 }))
-            ['sort']((_0x4840cc, _0x30b108) => _0x30b108['confidence'] - _0x4840cc['confidence']),
-          _0x1a274c = _0x5e9513[0x0],
-          _0x585925 = _0x5e9513[0x1];
+      [...map2]['flatMap'](([value8, map4]) => {
+        if (map4['size'] === 0x1) return [[value8, [...map4['keys']()][0x0]]];
+        const value9 = [...map4]
+            ['map'](([kind3, confidence2]) => ({ kind: kind3, confidence: confidence2 }))
+            ['sort']((value10, value11) => value11['confidence'] - value10['confidence']),
+          value12 = value9[0x0],
+          value13 = value9[0x1];
         if (
-          _0x1a274c['confidence'] >= STORY_ASSET_CROSS_KIND_WINNER_MIN_CONFIDENCE &&
-          _0x1a274c['confidence'] - _0x585925['confidence'] + Number['EPSILON'] >=
+          value12['confidence'] >= STORY_ASSET_CROSS_KIND_WINNER_MIN_CONFIDENCE &&
+          value12['confidence'] - value13['confidence'] + Number['EPSILON'] >=
             STORY_ASSET_CROSS_KIND_WINNER_MIN_MARGIN
         )
-          return [[_0x17c6ae, _0x1a274c['kind']]];
+          return [[value8, value12['kind']]];
         return [];
       }),
     )
   );
 }
-function createHardRequiredStoryAssetKindsByName(_0x43265f = [], _0x5c46d5 = null) {
-  const _0xbf33a0 = createStoryAssetRequirementEvidencePlan(_0x43265f),
-    _0x228ed4 = new Map();
+function createHardRequiredStoryAssetKindsByName(list9 = [], value14 = null) {
+  const storyAssetRequirementEvidencePlan = createStoryAssetRequirementEvidencePlan(list9),
+    map5 = new Map();
   return (
-    ['character', 'scene', 'prop']['forEach']((_0x34c2d9) => {
-      const _0x2b258e = normalizeStringArray([
-        ...getHardRequiredStoryAssetNames(_0xbf33a0, _0x34c2d9),
-        ...(Array['isArray'](_0x5c46d5?.[_0x34c2d9]) ? _0x5c46d5[_0x34c2d9] : []),
+    ['character', 'scene', 'prop']['forEach']((value15) => {
+      const list10 = normalizeStringArray([
+        ...getHardRequiredStoryAssetNames(storyAssetRequirementEvidencePlan, value15),
+        ...(Array['isArray'](value14?.[value15]) ? value14[value15] : []),
       ]);
-      _0x2b258e['forEach']((_0x3a9175) => {
-        const _0x566879 = normalizeNameKey(_0x3a9175),
-          _0x16cd44 = _0x228ed4['get'](_0x566879) || new Set();
-        (_0x16cd44['add'](_0x34c2d9), _0x228ed4['set'](_0x566879, _0x16cd44));
+      list10['forEach']((value16) => {
+        const nameKey2 = normalizeNameKey(value16),
+          value17 = map5['get'](nameKey2) || new Set();
+        (value17['add'](value15), map5['set'](nameKey2, value17));
       });
     }),
-    _0x228ed4
+    map5
   );
 }
-function filterCandidatesByHardRequiredKinds(_0x46434e = [], _0x4d8b16 = new Map()) {
-  return _0x46434e['filter']((_0x5972ee) => {
-    const _0x848242 = _0x4d8b16['get'](_0x5972ee['key']);
-    if (!_0x848242) return !![];
-    return _0x848242['size'] === 0x1 && _0x848242['has'](_0x5972ee['kind']);
+function filterCandidatesByHardRequiredKinds(list11 = [], map6 = new Map()) {
+  return list11['filter']((event) => {
+    const map7 = map6['get'](event['key']);
+    if (!map7) return !![];
+    return map7['size'] === 0x1 && map7['has'](event['kind']);
   });
 }
-function createAnchorFirstIndexOrder(_0x2cd5bd) {
-  const _0x4b82ba = Math['max'](0x0, Math['trunc'](Number(_0x2cd5bd) || 0x0));
-  if (!_0x4b82ba) return [];
-  const _0x5acd55 = [],
-    _0x557600 = new Set(),
-    _0x28bc9c = (_0x229853) => {
-      const _0x5e9ead = Math['max'](0x0, Math['min'](_0x4b82ba - 0x1, Math['trunc'](_0x229853)));
-      if (_0x557600['has'](_0x5e9ead)) return;
-      (_0x557600['add'](_0x5e9ead), _0x5acd55['push'](_0x5e9ead));
+function createAnchorFirstIndexOrder(value18) {
+  const enabled = Math['max'](0x0, Math['trunc'](Number(value18) || 0x0));
+  if (!enabled) return [];
+  const list12 = [],
+    map8 = new Set(),
+    handler = (value19) => {
+      const value20 = Math['max'](0x0, Math['min'](enabled - 0x1, Math['trunc'](value19)));
+      if (map8['has'](value20)) return;
+      (map8['add'](value20), list12['push'](value20));
     };
-  (_0x28bc9c(0x0), _0x28bc9c(Math['floor']((_0x4b82ba - 0x1) / 0x2)), _0x28bc9c(_0x4b82ba - 0x1));
-  while (_0x5acd55['length'] < _0x4b82ba) {
-    let _0x488a64 = -0x1,
-      _0x1caf31 = -0x1;
-    for (let _0x20abe8 = 0x0; _0x20abe8 < _0x4b82ba; _0x20abe8 += 0x1) {
-      if (_0x557600['has'](_0x20abe8)) continue;
-      const _0x56eb6e = Math['min'](..._0x5acd55['map']((_0x466841) => Math['abs'](_0x466841 - _0x20abe8)));
-      _0x56eb6e > _0x1caf31 && ((_0x488a64 = _0x20abe8), (_0x1caf31 = _0x56eb6e));
+  (handler(0x0), handler(Math['floor']((enabled - 0x1) / 0x2)), handler(enabled - 0x1));
+  while (list12['length'] < enabled) {
+    let value21 = -0x1,
+      value22 = -0x1;
+    for (let value23 = 0x0; value23 < enabled; value23 += 0x1) {
+      if (map8['has'](value23)) continue;
+      const value24 = Math['min'](...list12['map']((value25) => Math['abs'](value25 - value23)));
+      value24 > value22 && ((value21 = value23), (value22 = value24));
     }
-    _0x28bc9c(_0x488a64);
+    handler(value21);
   }
-  return _0x5acd55;
+  return list12;
 }
-function createFairSourceRefOrder(_0x4bc031 = [], _0x2138cf = []) {
-  const _0x13ac59 = new Set(_0x2138cf['flatMap']((_0x14964b) => _0x14964b['sourceSceneRefs'] || [])),
-    _0x1f1ba5 = normalizeStringArray(
-      (Array['isArray'](_0x4bc031) ? _0x4bc031 : [])
-        ['map']((_0x1a9e7f) => _0x1a9e7f?.['ref'])
-        ['filter']((_0x475dff) => _0x13ac59['has'](normalizeText(_0x475dff))),
+function createFairSourceRefOrder(list13 = [], list14 = []) {
+  const map9 = new Set(list14['flatMap']((value26) => value26['sourceSceneRefs'] || [])),
+    list15 = normalizeStringArray(
+      (Array['isArray'](list13) ? list13 : [])
+        ['map']((value27) => value27?.['ref'])
+        ['filter']((value28) => map9['has'](normalizeText(value28))),
     ),
-    _0x417f0e = new Set(_0x1f1ba5);
+    map10 = new Set(list15);
   return (
-    _0x2138cf['flatMap']((_0x5925fa) => _0x5925fa['sourceSceneRefs'] || [])['forEach']((_0x3d90c1) => {
-      const _0x36b2e2 = normalizeText(_0x3d90c1);
-      _0x36b2e2 &&
-        !_0x417f0e['has'](_0x36b2e2) &&
-        (_0x417f0e['add'](_0x36b2e2), _0x1f1ba5['push'](_0x36b2e2));
+    list14['flatMap']((value29) => value29['sourceSceneRefs'] || [])['forEach']((value30) => {
+      const text5 = normalizeText(value30);
+      text5 && !map10['has'](text5) && (map10['add'](text5), list15['push'](text5));
     }),
-    createAnchorFirstIndexOrder(_0x1f1ba5['length'])['map']((_0x273fa4) => _0x1f1ba5[_0x273fa4])
+    createAnchorFirstIndexOrder(list15['length'])['map']((value31) => list15[value31])
   );
 }
-function selectFairSourceRefs(_0x4da786 = [], _0x15fd89 = [], _0x1801af = 0x3) {
-  const _0x1911e4 = new Map(
-      (Array['isArray'](_0x15fd89) ? _0x15fd89 : [])['map']((_0x3a4f54, _0x5cd8b2) => [
-        normalizeText(_0x3a4f54?.['ref']),
-        _0x5cd8b2,
+function selectFairSourceRefs(list16 = [], value32 = [], value33 = 0x3) {
+  const map11 = new Map(
+      (Array['isArray'](value32) ? value32 : [])['map']((value34, value35) => [
+        normalizeText(value34?.['ref']),
+        value35,
       ]),
     ),
-    _0x2fd175 = normalizeStringArray(_0x4da786)['sort'](
-      (_0x260e41, _0x37315d) =>
-        (_0x1911e4['get'](_0x260e41) ?? Number['MAX_SAFE_INTEGER']) -
-        (_0x1911e4['get'](_0x37315d) ?? Number['MAX_SAFE_INTEGER']),
+    list17 = normalizeStringArray(list16)['sort'](
+      (value36, value37) =>
+        (map11['get'](value36) ?? Number['MAX_SAFE_INTEGER']) -
+        (map11['get'](value37) ?? Number['MAX_SAFE_INTEGER']),
     );
-  return createAnchorFirstIndexOrder(_0x2fd175['length'])
-    ['slice'](0x0, Math['max'](0x1, Math['trunc'](Number(_0x1801af) || 0x0)))
-    ['map']((_0x3763d8) => _0x2fd175[_0x3763d8]);
+  return createAnchorFirstIndexOrder(list17['length'])
+    ['slice'](0x0, Math['max'](0x1, Math['trunc'](Number(value33) || 0x0)))
+    ['map']((value38) => list17[value38]);
 }
-function mergeStoryAssetOptionalCandidates(_0x282514 = [], _0x55e239 = []) {
-  const _0xe47394 = new Map();
+function mergeStoryAssetOptionalCandidates(list18 = [], value39 = []) {
+  const map12 = new Map();
   return (
-    _0x282514['forEach']((_0x19966a) => {
-      const _0x4b723d = _0xe47394['get'](_0x19966a['key']);
-      if (!_0x4b723d) {
-        _0xe47394['set'](_0x19966a['key'], {
-          ..._0x19966a,
-          sourceSceneRefs: normalizeStringArray(_0x19966a['sourceSceneRefs']),
+    list18['forEach']((event2) => {
+      const args4 = map12['get'](event2['key']);
+      if (!args4) {
+        map12['set'](event2['key'], {
+          ...event2,
+          sourceSceneRefs: normalizeStringArray(event2['sourceSceneRefs']),
         });
         return;
       }
-      ((_0x4b723d['sourceSceneRefs'] = normalizeStringArray([
-        ..._0x4b723d['sourceSceneRefs'],
-        ...(_0x19966a['sourceSceneRefs'] || []),
+      ((args4['sourceSceneRefs'] = normalizeStringArray([
+        ...args4['sourceSceneRefs'],
+        ...(event2['sourceSceneRefs'] || []),
       ])),
-        (Number(_0x19966a['confidence']) > Number(_0x4b723d['confidence']) ||
-          (Number(_0x19966a['confidence']) === Number(_0x4b723d['confidence']) &&
-            String(_0x19966a['evidence'] || '')['length'] > String(_0x4b723d['evidence'] || '')['length'])) &&
-          ((_0x4b723d['evidence'] = _0x19966a['evidence']),
-          (_0x4b723d['confidence'] = _0x19966a['confidence'])));
+        (Number(event2['confidence']) > Number(args4['confidence']) ||
+          (Number(event2['confidence']) === Number(args4['confidence']) &&
+            String(event2['evidence'] || '')['length'] > String(args4['evidence'] || '')['length'])) &&
+          ((args4['evidence'] = event2['evidence']), (args4['confidence'] = event2['confidence'])));
     }),
-    [..._0xe47394['values']()]['map']((_0x536da2) => ({
-      ..._0x536da2,
-      sourceSceneRefs: selectFairSourceRefs(_0x536da2['sourceSceneRefs'], _0x55e239, 0x3),
+    [...map12['values']()]['map']((args5) => ({
+      ...args5,
+      sourceSceneRefs: selectFairSourceRefs(args5['sourceSceneRefs'], value39, 0x3),
     }))
   );
 }
 function selectBudgetedStoryAssetOptionalCandidates(
-  _0x393f35,
-  _0x378385 = [],
-  _0x16e2bf = [],
+  kind4,
+  list19 = [],
+  value40 = [],
   {
     maxItems: maxItems = Number['POSITIVE_INFINITY'],
     maxCharacters: maxCharacters = Number['POSITIVE_INFINITY'],
   } = {},
 ) {
-  const _0x1640f3 = Number['isFinite'](Number(maxItems))
+  const value41 = Number['isFinite'](Number(maxItems))
       ? Math['max'](0x0, Math['trunc'](Number(maxItems)))
       : Number['POSITIVE_INFINITY'],
-    _0x391637 = Number['isFinite'](Number(maxCharacters))
+    value42 = Number['isFinite'](Number(maxCharacters))
       ? Math['max'](0x0, Math['trunc'](Number(maxCharacters)))
       : Number['POSITIVE_INFINITY'];
-  if (!Number['isFinite'](_0x1640f3) && !Number['isFinite'](_0x391637)) return _0x378385;
-  const _0x4ce564 = new Map(
-      (Array['isArray'](_0x16e2bf) ? _0x16e2bf : [])['map']((_0x2bc55f) => [
-        normalizeText(_0x2bc55f?.['ref']),
-        normalizeText(_0x2bc55f?.['episodeRef']),
+  if (!Number['isFinite'](value41) && !Number['isFinite'](value42)) return list19;
+  const map13 = new Map(
+      (Array['isArray'](value40) ? value40 : [])['map']((value43) => [
+        normalizeText(value43?.['ref']),
+        normalizeText(value43?.['episodeRef']),
       ]),
     ),
-    _0x9e8d55 = new Map();
-  (_0x378385['forEach']((_0x165cc8) => {
-    const _0x14b27a = normalizeText(_0x165cc8['sourceSceneRefs']?.[0x0]),
-      _0x16a1c0 = _0x9e8d55['get'](_0x14b27a) || [];
-    (_0x16a1c0['push'](_0x165cc8), _0x9e8d55['set'](_0x14b27a, _0x16a1c0));
+    map14 = new Map();
+  (list19['forEach']((value44) => {
+    const text6 = normalizeText(value44['sourceSceneRefs']?.[0x0]),
+      list20 = map14['get'](text6) || [];
+    (list20['push'](value44), map14['set'](text6, list20));
   }),
-    _0x9e8d55['forEach']((_0x2d32fe) =>
-      _0x2d32fe['sort'](
-        (_0x4cb3d9, _0x50b98a) =>
-          Number(_0x50b98a['confidence'] || 0x0) - Number(_0x4cb3d9['confidence'] || 0x0) ||
-          String(_0x50b98a['evidence'] || '')['length'] - String(_0x4cb3d9['evidence'] || '')['length'] ||
-          String(_0x4cb3d9['name'] || '')['localeCompare'](String(_0x50b98a['name'] || ''), 'zh-CN'),
+    map14['forEach']((list21) =>
+      list21['sort'](
+        (error, error2) =>
+          Number(error2['confidence'] || 0x0) - Number(error['confidence'] || 0x0) ||
+          String(error2['evidence'] || '')['length'] - String(error['evidence'] || '')['length'] ||
+          String(error['name'] || '')['localeCompare'](String(error2['name'] || ''), 'zh-CN'),
       ),
     ));
-  const _0x4e02b6 = createFairSourceRefOrder(_0x16e2bf, _0x378385),
-    _0x51fb76 = [],
-    _0x4faa91 = new Set();
-  let _0x285f15 = 0x2,
-    _0x4057a9 = !![];
-  while (_0x4057a9 && _0x51fb76['length'] < _0x1640f3) {
-    _0x4057a9 = ![];
-    for (const _0xc38a18 of _0x4e02b6) {
-      const _0x1517d5 = _0x9e8d55['get'](_0xc38a18) || [],
-        _0x43e568 = _0x1517d5['shift']();
-      if (!_0x43e568 || _0x4faa91['has'](_0x43e568['key'])) continue;
-      _0x4057a9 = !![];
-      const _0x83526b = {
-          kind: _0x393f35,
-          name: _0x43e568['name'],
-          evidence: _0x43e568['evidence'],
-          sourceSceneRefs: _0x43e568['sourceSceneRefs'],
+  const fairSourceRefOrder = createFairSourceRefOrder(value40, list19),
+    list22 = [],
+    map15 = new Set();
+  let value45 = 0x2,
+    value46 = !![];
+  while (value46 && list22['length'] < value41) {
+    value46 = ![];
+    for (const value47 of fairSourceRefOrder) {
+      const value48 = map14['get'](value47) || [],
+        name3 = value48['shift']();
+      if (!name3 || map15['has'](name3['key'])) continue;
+      value46 = !![];
+      const value49 = {
+          kind: kind4,
+          name: name3['name'],
+          evidence: name3['evidence'],
+          sourceSceneRefs: name3['sourceSceneRefs'],
           sourceChapterIds: normalizeStringArray(
-            _0x43e568['sourceSceneRefs']['map']((_0x424735) => _0x4ce564['get'](_0x424735)),
+            name3['sourceSceneRefs']['map']((value50) => map13['get'](value50)),
           ),
         },
-        _0xf9097 = JSON['stringify'](_0x83526b)['length'] + (_0x51fb76['length'] ? 0x1 : 0x0);
-      if (_0x285f15 + _0xf9097 > _0x391637) continue;
-      (_0x4faa91['add'](_0x43e568['key']), _0x51fb76['push'](_0x43e568), (_0x285f15 += _0xf9097));
-      if (_0x51fb76['length'] >= _0x1640f3) break;
+        value51 = JSON['stringify'](value49)['length'] + (list22['length'] ? 0x1 : 0x0);
+      if (value45 + value51 > value42) continue;
+      (map15['add'](name3['key']), list22['push'](name3), (value45 += value51));
+      if (list22['length'] >= value41) break;
     }
   }
-  return _0x51fb76;
+  return list22;
 }
 function createEvidenceBuckets() {
   return { hardRequired: [], optionalCandidates: [], ignored: [] };
 }
-function getEvidenceBucketName(_0x13ab66) {
-  if (_0x13ab66 === STORY_ASSET_REQUIREMENT_TIERS['hard']) return 'hardRequired';
-  if (_0x13ab66 === STORY_ASSET_REQUIREMENT_TIERS['optional']) return 'optionalCandidates';
+function getEvidenceBucketName(value52) {
+  if (value52 === STORY_ASSET_REQUIREMENT_TIERS['hard']) return 'hardRequired';
+  if (value52 === STORY_ASSET_REQUIREMENT_TIERS['optional']) return 'optionalCandidates';
   return 'ignored';
 }
-function getBoundedClausePrefix(_0x338a37, _0x549620) {
-  const _0x226ad0 = _0x338a37['slice'](Math['max'](0x0, _0x549620 - 0x60), _0x549620);
-  let _0x2a3e33 = -0x1;
-  for (let _0x1a1190 = _0x226ad0['length'] - 0x1; _0x1a1190 >= 0x0; _0x1a1190 -= 0x1) {
-    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN['test'](_0x226ad0[_0x1a1190])) {
-      _0x2a3e33 = _0x1a1190;
+function getBoundedClausePrefix(list23, value53) {
+  const list24 = list23['slice'](Math['max'](0x0, value53 - 0x60), value53);
+  let value54 = -0x1;
+  for (let count5 = list24['length'] - 0x1; count5 >= 0x0; count5 -= 0x1) {
+    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN['test'](list24[count5])) {
+      value54 = count5;
       break;
     }
   }
-  return _0x226ad0['slice'](_0x2a3e33 + 0x1);
+  return list24['slice'](value54 + 0x1);
 }
-function getBoundedClauseSuffix(_0x4cfbc1, _0x2d9370) {
-  const _0x552a81 = _0x4cfbc1['slice'](_0x2d9370, Math['min'](_0x4cfbc1['length'], _0x2d9370 + 0x40));
-  for (let _0x250347 = 0x0; _0x250347 < _0x552a81['length']; _0x250347 += 0x1) {
-    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN['test'](_0x552a81[_0x250347]))
-      return _0x552a81['slice'](0x0, _0x250347);
+function getBoundedClauseSuffix(list25, value55) {
+  const list26 = list25['slice'](value55, Math['min'](list25['length'], value55 + 0x40));
+  for (let value56 = 0x0; value56 < list26['length']; value56 += 0x1) {
+    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN['test'](list26[value56])) return list26['slice'](0x0, value56);
   }
-  return _0x552a81;
+  return list26;
 }
-function getStoryTitleContext(_0x4c2cbf, _0x3fe1d4, _0x11a6f0) {
-  return _0x4c2cbf['slice'](
-    Math['max'](0x0, _0x3fe1d4 - 0x30),
-    Math['min'](_0x4c2cbf['length'], _0x11a6f0 + 0x40),
-  )['trim']();
+function getStoryTitleContext(list27, value57, value58) {
+  return list27['slice'](Math['max'](0x0, value57 - 0x30), Math['min'](list27['length'], value58 + 0x40))[
+    'trim'
+  ]();
 }
-function isStructuralStoryTitle(_0x17bc6e, _0x253092) {
-  const _0x3b9b2f = _0x17bc6e['slice'](Math['max'](0x0, _0x253092 - 0x40), _0x253092);
-  return STORY_STRUCTURAL_TITLE_PREFIX_PATTERN['test'](_0x3b9b2f);
+function isStructuralStoryTitle(list28, value59) {
+  const value60 = list28['slice'](Math['max'](0x0, value59 - 0x40), value59);
+  return STORY_STRUCTURAL_TITLE_PREFIX_PATTERN['test'](value60);
 }
-function hasHardStoryPropEvidence(_0x22cb18, _0x693350, _0x3205fe) {
-  const _0x2d84e6 = getBoundedClausePrefix(_0x22cb18, _0x693350),
-    _0x21b2f3 = getBoundedClauseSuffix(_0x22cb18, _0x3205fe)['replace'](/^[\s，,:：]+/u, '');
+function hasHardStoryPropEvidence(list29, value61, value62) {
+  const list30 = getBoundedClausePrefix(list29, value61),
+    list31 = getBoundedClauseSuffix(list29, value62)['replace'](/^[\s，,:：]+/u, '');
   return (
-    STORY_PROP_DECLARATION_PATTERN['test'](
-      _0x22cb18['slice'](Math['max'](0x0, _0x693350 - 0x78), _0x693350),
-    ) ||
-    STORY_PROP_PHYSICAL_ACTION_PATTERN['test'](_0x2d84e6) ||
-    STORY_PROP_PHYSICAL_ACTION_PATTERN['test'](_0x21b2f3['slice'](0x0, 0x20)) ||
-    STORY_PROP_MATERIAL_CUE_PATTERN['test'](_0x2d84e6['slice'](-0x18)) ||
-    STORY_PROP_MATERIAL_CUE_PATTERN['test'](_0x21b2f3['slice'](0x0, 0x18))
+    STORY_PROP_DECLARATION_PATTERN['test'](list29['slice'](Math['max'](0x0, value61 - 0x78), value61)) ||
+    STORY_PROP_PHYSICAL_ACTION_PATTERN['test'](list30) ||
+    STORY_PROP_PHYSICAL_ACTION_PATTERN['test'](list31['slice'](0x0, 0x20)) ||
+    STORY_PROP_MATERIAL_CUE_PATTERN['test'](list30['slice'](-0x18)) ||
+    STORY_PROP_MATERIAL_CUE_PATTERN['test'](list31['slice'](0x0, 0x18))
   );
 }
-function mergeEvidenceEntry(_0xf1ba03, _0x1b865c) {
-  const _0x4426b6 = normalizeText(_0x1b865c?.['kind']),
-    _0x5c62d0 = normalizeText(_0x1b865c?.['name']),
-    _0x132694 = normalizeText(_0x1b865c?.['tier']);
-  if (!_0x4426b6 || !_0x5c62d0 || !(_0x132694 in STORY_ASSET_REQUIREMENT_TIER_PRIORITY)) return;
-  const _0x485ae9 = _0x4426b6 + ':' + normalizeNameKey(_0x5c62d0),
-    _0x2b077d = _0xf1ba03['get'](_0x485ae9);
-  if (!_0x2b077d) {
-    _0xf1ba03['set'](_0x485ae9, {
-      kind: _0x4426b6,
-      name: _0x5c62d0,
-      tier: _0x132694,
-      sourceSceneRefs: normalizeStringArray(_0x1b865c?.['sourceSceneRefs']),
+function mergeEvidenceEntry(map16, error3) {
+  const kind5 = normalizeText(error3?.['kind']),
+    name4 = normalizeText(error3?.['name']),
+    tier = normalizeText(error3?.['tier']);
+  if (!kind5 || !name4 || !(tier in STORY_ASSET_REQUIREMENT_TIER_PRIORITY)) return;
+  const value63 = kind5 + ':' + normalizeNameKey(name4),
+    args6 = map16['get'](value63);
+  if (!args6) {
+    map16['set'](value63, {
+      kind: kind5,
+      name: name4,
+      tier: tier,
+      sourceSceneRefs: normalizeStringArray(error3?.['sourceSceneRefs']),
       hardSourceSceneRefs:
-        _0x132694 === STORY_ASSET_REQUIREMENT_TIERS['hard']
-          ? normalizeStringArray(_0x1b865c?.['sourceSceneRefs'])
+        tier === STORY_ASSET_REQUIREMENT_TIERS['hard']
+          ? normalizeStringArray(error3?.['sourceSceneRefs'])
           : [],
       optionalSourceSceneRefs:
-        _0x132694 === STORY_ASSET_REQUIREMENT_TIERS['optional']
-          ? normalizeStringArray(_0x1b865c?.['sourceSceneRefs'])
+        tier === STORY_ASSET_REQUIREMENT_TIERS['optional']
+          ? normalizeStringArray(error3?.['sourceSceneRefs'])
           : [],
-      reasonCodes: normalizeStringArray(_0x1b865c?.['reasonCodes']),
-      contexts: normalizeStringArray(_0x1b865c?.['contexts']),
+      reasonCodes: normalizeStringArray(error3?.['reasonCodes']),
+      contexts: normalizeStringArray(error3?.['contexts']),
     });
     return;
   }
-  STORY_ASSET_REQUIREMENT_TIER_PRIORITY[_0x132694] >
-    STORY_ASSET_REQUIREMENT_TIER_PRIORITY[_0x2b077d['tier']] && (_0x2b077d['tier'] = _0x132694);
-  _0x2b077d['sourceSceneRefs'] = normalizeStringArray([
-    ..._0x2b077d['sourceSceneRefs'],
-    ...(_0x1b865c?.['sourceSceneRefs'] || []),
+  STORY_ASSET_REQUIREMENT_TIER_PRIORITY[tier] > STORY_ASSET_REQUIREMENT_TIER_PRIORITY[args6['tier']] &&
+    (args6['tier'] = tier);
+  args6['sourceSceneRefs'] = normalizeStringArray([
+    ...args6['sourceSceneRefs'],
+    ...(error3?.['sourceSceneRefs'] || []),
   ]);
-  if (_0x132694 === STORY_ASSET_REQUIREMENT_TIERS['hard'])
-    _0x2b077d['hardSourceSceneRefs'] = normalizeStringArray([
-      ..._0x2b077d['hardSourceSceneRefs'],
-      ...(_0x1b865c?.['sourceSceneRefs'] || []),
+  if (tier === STORY_ASSET_REQUIREMENT_TIERS['hard'])
+    args6['hardSourceSceneRefs'] = normalizeStringArray([
+      ...args6['hardSourceSceneRefs'],
+      ...(error3?.['sourceSceneRefs'] || []),
     ]);
   else
-    _0x132694 === STORY_ASSET_REQUIREMENT_TIERS['optional'] &&
-      (_0x2b077d['optionalSourceSceneRefs'] = normalizeStringArray([
-        ..._0x2b077d['optionalSourceSceneRefs'],
-        ...(_0x1b865c?.['sourceSceneRefs'] || []),
+    tier === STORY_ASSET_REQUIREMENT_TIERS['optional'] &&
+      (args6['optionalSourceSceneRefs'] = normalizeStringArray([
+        ...args6['optionalSourceSceneRefs'],
+        ...(error3?.['sourceSceneRefs'] || []),
       ]));
-  ((_0x2b077d['reasonCodes'] = normalizeStringArray([
-    ..._0x2b077d['reasonCodes'],
-    ...(_0x1b865c?.['reasonCodes'] || []),
+  ((args6['reasonCodes'] = normalizeStringArray([
+    ...args6['reasonCodes'],
+    ...(error3?.['reasonCodes'] || []),
   ])),
-    (_0x2b077d['contexts'] = normalizeStringArray([
-      ..._0x2b077d['contexts'],
-      ...(_0x1b865c?.['contexts'] || []),
-    ])['slice'](0x0, 0x3)));
+    (args6['contexts'] = normalizeStringArray([...args6['contexts'], ...(error3?.['contexts'] || [])])[
+      'slice'
+    ](0x0, 0x3)));
 }
-export function createStoryAssetRequirementEvidencePlan(_0x3cd6e1 = []) {
-  const _0x1a6801 = new Map();
-  (Array['isArray'](_0x3cd6e1) ? _0x3cd6e1 : [])['forEach']((_0x16776c) => {
-    const _0x2de33c = normalizeText(_0x16776c?.['ref']),
-      _0x37e6db = normalizeText(_0x16776c?.['assetHeading'] || _0x16776c?.['heading']),
-      _0x4ed9eb = normalizeText(_0x16776c?.['source']);
-    _0x37e6db &&
-      mergeEvidenceEntry(_0x1a6801, {
+export function createStoryAssetRequirementEvidencePlan(list32 = []) {
+  const map17 = new Map();
+  (Array['isArray'](list32) ? list32 : [])['forEach']((dom4) => {
+    const text7 = normalizeText(dom4?.['ref']),
+      name5 = normalizeText(dom4?.['assetHeading'] || dom4?.['heading']),
+      tier2 = normalizeText(dom4?.['source']);
+    name5 &&
+      mergeEvidenceEntry(map17, {
         kind: 'scene',
-        name: _0x37e6db,
+        name: name5,
         tier:
-          _0x4ed9eb === 'upload-fallback'
+          tier2 === 'upload-fallback'
             ? STORY_ASSET_REQUIREMENT_TIERS['optional']
             : STORY_ASSET_REQUIREMENT_TIERS['hard'],
-        sourceSceneRefs: [_0x2de33c],
-        reasonCodes: [
-          _0x4ed9eb === 'upload-fallback' ? 'upload-fallback-heading' : 'structured-scene-heading',
-        ],
+        sourceSceneRefs: [text7],
+        reasonCodes: [tier2 === 'upload-fallback' ? 'upload-fallback-heading' : 'structured-scene-heading'],
       });
-    (normalizeStringArray(_0x16776c?.['characters'])['forEach']((_0x5743ed) => {
-      mergeEvidenceEntry(_0x1a6801, {
+    (normalizeStringArray(dom4?.['characters'])['forEach']((name6) => {
+      mergeEvidenceEntry(map17, {
         kind: 'character',
-        name: _0x5743ed,
+        name: name6,
         tier:
-          _0x4ed9eb === 'upload-fallback'
+          tier2 === 'upload-fallback'
             ? STORY_ASSET_REQUIREMENT_TIERS['optional']
             : STORY_ASSET_REQUIREMENT_TIERS['hard'],
-        sourceSceneRefs: [_0x2de33c],
+        sourceSceneRefs: [text7],
         reasonCodes: [
-          _0x4ed9eb === 'upload-fallback'
-            ? 'upload-fallback-imported-character'
-            : 'structured-scene-character',
+          tier2 === 'upload-fallback' ? 'upload-fallback-imported-character' : 'structured-scene-character',
         ],
       });
     }),
-      collectVerifiedLocalCandidates(_0x16776c)['forEach'](({ kind: _0x562502, name: _0x1d9a4e }) => {
-        mergeEvidenceEntry(_0x1a6801, {
-          kind: _0x562502,
-          name: _0x1d9a4e,
+      collectVerifiedLocalCandidates(dom4)['forEach'](({ kind: kind6, name: name7 }) => {
+        mergeEvidenceEntry(map17, {
+          kind: kind6,
+          name: name7,
           tier: STORY_ASSET_REQUIREMENT_TIERS['optional'],
-          sourceSceneRefs: [_0x2de33c],
+          sourceSceneRefs: [text7],
           reasonCodes: ['verified-local-entity-candidate'],
         });
       }));
-    const _0x34877d = normalizeText(_0x16776c?.['body']);
-    createStoryAssetActionPropCandidates([_0x16776c])['forEach']((_0x116b8f) => {
-      mergeEvidenceEntry(_0x1a6801, {
+    const text8 = normalizeText(dom4?.['body']);
+    createStoryAssetActionPropCandidates([dom4])['forEach']((name8) => {
+      mergeEvidenceEntry(map17, {
         kind: 'prop',
-        name: _0x116b8f['name'],
+        name: name8['name'],
         tier: STORY_ASSET_REQUIREMENT_TIERS['hard'],
-        sourceSceneRefs: _0x116b8f['sourceSceneRefs'],
+        sourceSceneRefs: name8['sourceSceneRefs'],
         reasonCodes: ['direct-object-physical-action'],
-        contexts: [_0x116b8f['evidence']],
+        contexts: [name8['evidence']],
       });
     });
-    for (const _0x26c36a of _0x34877d['matchAll'](/《([^》\r\n]{1,48})》/gu)) {
-      const _0x1f5dfb = normalizeText(_0x26c36a[0x1]);
-      if (!_0x1f5dfb) continue;
-      const _0x2aae09 = Number(_0x26c36a['index']) || 0x0,
-        _0x2cc8e3 = _0x2aae09 + String(_0x26c36a[0x0] || '')['length'],
-        _0x1f8d39 = isStructuralStoryTitle(_0x34877d, _0x2aae09),
-        _0x5061af = !_0x1f8d39 && hasHardStoryPropEvidence(_0x34877d, _0x2aae09, _0x2cc8e3);
-      mergeEvidenceEntry(_0x1a6801, {
+    for (const value64 of text8['matchAll'](/《([^》\r\n]{1,48})》/gu)) {
+      const name9 = normalizeText(value64[0x1]);
+      if (!name9) continue;
+      const value65 = Number(value64['index']) || 0x0,
+        value66 = value65 + String(value64[0x0] || '')['length'],
+        tier3 = isStructuralStoryTitle(text8, value65),
+        value67 = !tier3 && hasHardStoryPropEvidence(text8, value65, value66);
+      mergeEvidenceEntry(map17, {
         kind: 'prop',
-        name: _0x1f5dfb,
-        tier: _0x1f8d39
+        name: name9,
+        tier: tier3
           ? STORY_ASSET_REQUIREMENT_TIERS['ignored']
-          : _0x5061af
+          : value67
             ? STORY_ASSET_REQUIREMENT_TIERS['hard']
             : STORY_ASSET_REQUIREMENT_TIERS['optional'],
-        sourceSceneRefs: [_0x2de33c],
+        sourceSceneRefs: [text7],
         reasonCodes: [
-          _0x1f8d39
-            ? 'structural-story-title'
-            : _0x5061af
-              ? 'physical-prop-context'
-              : 'quoted-title-candidate',
+          tier3 ? 'structural-story-title' : value67 ? 'physical-prop-context' : 'quoted-title-candidate',
         ],
-        contexts: [getStoryTitleContext(_0x34877d, _0x2aae09, _0x2cc8e3)],
+        contexts: [getStoryTitleContext(text8, value65, value66)],
       });
     }
   });
-  const _0x7b2330 = createEvidenceBuckets();
+  const args7 = createEvidenceBuckets();
   return (
-    [..._0x1a6801['values']()]['forEach']((_0x17bd80) => {
-      _0x7b2330[getEvidenceBucketName(_0x17bd80['tier'])]['push'](_0x17bd80);
+    [...map17['values']()]['forEach']((value68) => {
+      args7[getEvidenceBucketName(value68['tier'])]['push'](value68);
     }),
-    { schemaVersion: STORY_ASSET_REQUIREMENT_EVIDENCE_SCHEMA_VERSION, ..._0x7b2330 }
+    { schemaVersion: STORY_ASSET_REQUIREMENT_EVIDENCE_SCHEMA_VERSION, ...args7 }
   );
 }
-export function getHardRequiredStoryAssetNames(_0x44ed57 = {}, _0x3b3f24 = '') {
+export function getHardRequiredStoryAssetNames(options3 = {}, value69 = '') {
   return normalizeStringArray(
-    (Array['isArray'](_0x44ed57?.['hardRequired']) ? _0x44ed57['hardRequired'] : [])
-      ['filter']((_0x36f4d3) => _0x36f4d3?.['kind'] === _0x3b3f24)
-      ['map']((_0x23f91b) => _0x23f91b?.['name']),
+    (Array['isArray'](options3?.['hardRequired']) ? options3['hardRequired'] : [])
+      ['filter']((value70) => value70?.['kind'] === value69)
+      ['map']((error4) => error4?.['name']),
   );
 }
-export function getHardRequiredStorySceneRefs(_0x5ced23 = {}) {
+export function getHardRequiredStorySceneRefs(options4 = {}) {
   return normalizeStringArray(
-    (Array['isArray'](_0x5ced23?.['hardRequired']) ? _0x5ced23['hardRequired'] : [])
-      ['filter']((_0x5a6091) => _0x5a6091?.['kind'] === 'scene')
-      ['flatMap']((_0x1ffd3b) =>
-        _0x1ffd3b?.['hardSourceSceneRefs']?.['length']
-          ? _0x1ffd3b['hardSourceSceneRefs']
-          : _0x1ffd3b?.['sourceSceneRefs'] || [],
+    (Array['isArray'](options4?.['hardRequired']) ? options4['hardRequired'] : [])
+      ['filter']((value71) => value71?.['kind'] === 'scene')
+      ['flatMap']((value72) =>
+        value72?.['hardSourceSceneRefs']?.['length']
+          ? value72['hardSourceSceneRefs']
+          : value72?.['sourceSceneRefs'] || [],
       ),
   );
 }
-export function getHardRequiredStoryAssetNamesForScene(_0x56036c = {}, _0xcee4b2 = '', _0x552eb4 = '') {
-  const _0x404a89 = normalizeText(_0x552eb4);
-  if (!_0x404a89) return [];
+export function getHardRequiredStoryAssetNamesForScene(options5 = {}, value73 = '', value74 = '') {
+  const text9 = normalizeText(value74);
+  if (!text9) return [];
   return normalizeStringArray(
-    (Array['isArray'](_0x56036c?.['hardRequired']) ? _0x56036c['hardRequired'] : [])
+    (Array['isArray'](options5?.['hardRequired']) ? options5['hardRequired'] : [])
       ['filter'](
-        (_0x446283) =>
-          _0x446283?.['kind'] === _0xcee4b2 &&
-          (_0x446283?.['hardSourceSceneRefs']?.['length']
-            ? _0x446283['hardSourceSceneRefs']['includes'](_0x404a89)
-            : _0x446283?.['sourceSceneRefs']?.['includes'](_0x404a89)),
+        (value75) =>
+          value75?.['kind'] === value73 &&
+          (value75?.['hardSourceSceneRefs']?.['length']
+            ? value75['hardSourceSceneRefs']['includes'](text9)
+            : value75?.['sourceSceneRefs']?.['includes'](text9)),
       )
-      ['map']((_0x3e4da3) => _0x3e4da3?.['name']),
+      ['map']((error5) => error5?.['name']),
   );
 }
 export function createStoryAssetOptionalCandidatesByKind(
-  _0x53a9bc = [],
-  _0xf4cc4b = _0x53a9bc,
+  list33 = [],
+  value76 = list33,
   {
     maxItemsPerKind: maxItemsPerKind = Number['POSITIVE_INFINITY'],
     maxCharactersPerKind: maxCharactersPerKind = Number['POSITIVE_INFINITY'],
     hardRequiredAssetNamesByKind: hardRequiredAssetNamesByKind = null,
   } = {},
 ) {
-  const _0x282b7c = new Map(
-      (Array['isArray'](_0xf4cc4b) ? _0xf4cc4b : [])['map']((_0x3ae8dd) => [
-        normalizeText(_0x3ae8dd?.['ref']),
-        _0x3ae8dd,
+  const map18 = new Map(
+      (Array['isArray'](value76) ? value76 : [])['map']((value77) => [
+        normalizeText(value77?.['ref']),
+        value77,
       ]),
     ),
-    _0xe3c38f = new Map(
-      (Array['isArray'](_0xf4cc4b) ? _0xf4cc4b : [])['map']((_0x3c6e16) => [
-        normalizeText(_0x3c6e16?.['ref']),
-        normalizeText(_0x3c6e16?.['episodeRef']),
+    map19 = new Map(
+      (Array['isArray'](value76) ? value76 : [])['map']((value78) => [
+        normalizeText(value78?.['ref']),
+        normalizeText(value78?.['episodeRef']),
       ]),
     ),
-    _0x3bb4bb = ['character', 'scene', 'prop']['flatMap']((_0x5a231a) =>
-      (Array['isArray'](_0x53a9bc) ? _0x53a9bc : [])['flatMap']((_0x1a0740) =>
-        collectVerifiedLocalCandidates(_0x1a0740, _0x282b7c['get'](normalizeText(_0x1a0740?.['ref'])))
-          ['filter']((_0x399389) => _0x399389['kind'] === _0x5a231a)
-          ['map']((_0x41ddc9) => ({
-            ..._0x41ddc9,
-            key: normalizeNameKey(_0x41ddc9['name']),
-            sourceSceneRefs: normalizeStringArray([_0x1a0740?.['ref']]),
+    value79 = ['character', 'scene', 'prop']['flatMap']((value80) =>
+      (Array['isArray'](list33) ? list33 : [])['flatMap']((value81) =>
+        collectVerifiedLocalCandidates(value81, map18['get'](normalizeText(value81?.['ref'])))
+          ['filter']((value82) => value82['kind'] === value80)
+          ['map']((error6) => ({
+            ...error6,
+            key: normalizeNameKey(error6['name']),
+            sourceSceneRefs: normalizeStringArray([value81?.['ref']]),
           })),
       ),
     ),
-    _0x22d285 = createHardRequiredStoryAssetKindsByName(_0xf4cc4b, hardRequiredAssetNamesByKind),
-    _0x528ef4 = filterCandidatesByHardRequiredKinds(_0x3bb4bb, _0x22d285),
-    _0x23b46c = resolveStoryAssetCandidateWinnerKindsByName(_0x528ef4);
+    hardRequiredStoryAssetKindsByName = createHardRequiredStoryAssetKindsByName(
+      value76,
+      hardRequiredAssetNamesByKind,
+    ),
+    list34 = filterCandidatesByHardRequiredKinds(value79, hardRequiredStoryAssetKindsByName),
+    map20 = resolveStoryAssetCandidateWinnerKindsByName(list34);
   return Object['fromEntries'](
-    ['character', 'scene', 'prop']['map']((_0x22218d) => {
-      const _0x2a25d7 = mergeStoryAssetOptionalCandidates(
-          _0x528ef4['filter'](
-            (_0x4ef10d) =>
-              _0x4ef10d['kind'] === _0x22218d && _0x23b46c['get'](_0x4ef10d['key']) === _0x22218d,
-          ),
-          _0x53a9bc,
+    ['character', 'scene', 'prop']['map']((value83) => {
+      const storyAssetOptionalCandidates = mergeStoryAssetOptionalCandidates(
+          list34['filter']((event3) => event3['kind'] === value83 && map20['get'](event3['key']) === value83),
+          list33,
         ),
-        _0x4b58d2 = selectBudgetedStoryAssetOptionalCandidates(_0x22218d, _0x2a25d7, _0x53a9bc, {
+        list35 = selectBudgetedStoryAssetOptionalCandidates(value83, storyAssetOptionalCandidates, list33, {
           maxItems: maxItemsPerKind,
           maxCharacters: maxCharactersPerKind,
         });
       return [
-        _0x22218d,
-        _0x4b58d2['map'](({ name: _0x24a47f, evidence: _0x3fa373, sourceSceneRefs: _0x5da2aa }) => ({
-          name: _0x24a47f,
-          evidence: _0x3fa373,
-          sourceSceneRefs: _0x5da2aa,
-          sourceChapterIds: normalizeStringArray(
-            _0x5da2aa['map']((_0x4e3961) => _0xe3c38f['get'](_0x4e3961)),
-          ),
+        value83,
+        list35['map'](({ name: name10, evidence: evidence, sourceSceneRefs: sourceSceneRefs2 }) => ({
+          name: name10,
+          evidence: evidence,
+          sourceSceneRefs: sourceSceneRefs2,
+          sourceChapterIds: normalizeStringArray(sourceSceneRefs2['map']((value84) => map19['get'](value84))),
         })),
       ];
     }),
   );
 }
-export function createStoryAssetOptionalCandidateNamesByKind(_0x14e213 = [], _0x42b45f = _0x14e213) {
-  const _0x17dafc = createStoryAssetOptionalCandidatesByKind(_0x14e213, _0x42b45f);
+export function createStoryAssetOptionalCandidateNamesByKind(list36 = [], value85 = list36) {
+  const storyAssetOptionalCandidatesByKind = createStoryAssetOptionalCandidatesByKind(list36, value85);
   return Object['fromEntries'](
-    ['character', 'scene', 'prop']['map']((_0x428273) => [
-      _0x428273,
-      normalizeStringArray((_0x17dafc[_0x428273] || [])['map']((_0x22f8e5) => _0x22f8e5['name'])),
+    ['character', 'scene', 'prop']['map']((value86) => [
+      value86,
+      normalizeStringArray(
+        (storyAssetOptionalCandidatesByKind[value86] || [])['map']((error7) => error7['name']),
+      ),
     ]),
   );
 }
 export function getUntrustedUploadFallbackStoryCharacterNames(
-  _0x43e07a = {},
-  _0x1fb9cd = [],
-  _0xeba98 = _0x1fb9cd,
+  options6 = {},
+  value87 = [],
+  value88 = value87,
 ) {
-  const _0x579fa6 = [
-      ...(Array['isArray'](_0x43e07a?.['hardRequired']) ? _0x43e07a['hardRequired'] : []),
-      ...(Array['isArray'](_0x43e07a?.['optionalCandidates']) ? _0x43e07a['optionalCandidates'] : []),
+  const list37 = [
+      ...(Array['isArray'](options6?.['hardRequired']) ? options6['hardRequired'] : []),
+      ...(Array['isArray'](options6?.['optionalCandidates']) ? options6['optionalCandidates'] : []),
     ],
-    _0x497802 = new Set(
-      createStoryAssetOptionalCandidateNamesByKind(_0x1fb9cd, _0xeba98)['character']['map'](normalizeNameKey),
+    map21 = new Set(
+      createStoryAssetOptionalCandidateNamesByKind(value87, value88)['character']['map'](normalizeNameKey),
     );
   return (
-    _0x579fa6['filter'](
-      (_0xe1fe6e) =>
-        _0xe1fe6e?.['kind'] === 'character' &&
-        _0xe1fe6e?.['reasonCodes']?.['includes']('structured-scene-character'),
-    )['forEach']((_0x56220a) => _0x497802['add'](normalizeNameKey(_0x56220a?.['name']))),
+    list37['filter'](
+      (value89) =>
+        value89?.['kind'] === 'character' &&
+        value89?.['reasonCodes']?.['includes']('structured-scene-character'),
+    )['forEach']((error8) => map21['add'](normalizeNameKey(error8?.['name']))),
     normalizeStringArray(
-      _0x579fa6['filter'](
-        (_0x5a6a67) =>
-          _0x5a6a67?.['kind'] === 'character' &&
-          _0x5a6a67?.['reasonCodes']?.['includes']('upload-fallback-imported-character') &&
-          !_0x497802['has'](normalizeNameKey(_0x5a6a67?.['name'])),
-      )['map']((_0x5781e8) => _0x5781e8?.['name']),
+      list37['filter'](
+        (error9) =>
+          error9?.['kind'] === 'character' &&
+          error9?.['reasonCodes']?.['includes']('upload-fallback-imported-character') &&
+          !map21['has'](normalizeNameKey(error9?.['name'])),
+      )['map']((error10) => error10?.['name']),
     )
   );
 }
-export function isNarrativeStoryCharacterFragment(_0x47131f = '') {
-  const _0x552fa3 = normalizeText(_0x47131f);
-  return [..._0x552fa3]['length'] > 0x8 || STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN['test'](_0x552fa3);
+export function isNarrativeStoryCharacterFragment(value90 = '') {
+  const args8 = normalizeText(value90);
+  return [...args8]['length'] > 0x8 || STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN['test'](args8);
 }

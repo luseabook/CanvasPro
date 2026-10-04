@@ -68,49 +68,49 @@ const RUNNINGHUB_SETTINGS_PROVIDER_IDS = ['runninghub', 'runninghub-internationa
     'settings-provider-status--configured',
     'settings-provider-status--unconfigured',
   ];
-function trTemplate(_0x516aac, _0x2f605a = {}) {
-  let _0x4d1594 = t(_0x516aac);
+function trTemplate(value, item = {}) {
+  let t2 = t(value);
   return (
-    Object['entries'](_0x2f605a || {})['forEach'](([_0x476e6c, _0x5d2a5e]) => {
-      _0x4d1594 = _0x4d1594['split']('{' + _0x476e6c + '}')['join'](String(_0x5d2a5e ?? ''));
+    Object['entries'](item || {})['forEach'](([key, index]) => {
+      t2 = t2['split']('{' + key + '}')['join'](String(index ?? ''));
     }),
-    _0x4d1594
+    t2
   );
 }
-function trApiInput(_0x5a35b4, _0x398bbd = {}) {
-  return trTemplate('settings.apiInput.' + _0x5a35b4, _0x398bbd);
+function trApiInput(result, data = {}) {
+  return trTemplate('settings.apiInput.' + result, data);
 }
-function markNonLoginTextInput(_0x39dac8) {
-  if (!_0x39dac8) return;
-  ((_0x39dac8['autocomplete'] = 'off'),
-    _0x39dac8['setAttribute']('autocomplete', 'off'),
-    _0x39dac8['setAttribute']('autocapitalize', 'off'),
-    _0x39dac8['setAttribute']('spellcheck', 'false'),
-    _0x39dac8['setAttribute']('data-form-type', 'other'));
+function markNonLoginTextInput(el) {
+  if (!el) return;
+  ((el['autocomplete'] = 'off'),
+    el['setAttribute']('autocomplete', 'off'),
+    el['setAttribute']('autocapitalize', 'off'),
+    el['setAttribute']('spellcheck', 'false'),
+    el['setAttribute']('data-form-type', 'other'));
 }
-function markApiSecretInput(_0xd82b71) {
-  if (!_0xd82b71) return;
-  ((_0xd82b71['autocomplete'] = 'new-password'),
-    _0xd82b71['setAttribute']('autocomplete', 'new-password'),
-    _0xd82b71['setAttribute']('autocapitalize', 'off'),
-    _0xd82b71['setAttribute']('spellcheck', 'false'),
-    _0xd82b71['setAttribute']('data-lpignore', 'true'),
-    _0xd82b71['setAttribute']('data-1p-ignore', 'true'),
-    _0xd82b71['setAttribute']('data-form-type', 'other'));
+function markApiSecretInput(el2) {
+  if (!el2) return;
+  ((el2['autocomplete'] = 'new-password'),
+    el2['setAttribute']('autocomplete', 'new-password'),
+    el2['setAttribute']('autocapitalize', 'off'),
+    el2['setAttribute']('spellcheck', 'false'),
+    el2['setAttribute']('data-lpignore', 'true'),
+    el2['setAttribute']('data-1p-ignore', 'true'),
+    el2['setAttribute']('data-form-type', 'other'));
 }
-function hardenApiCredentialInputs(_0x3f282b = globalThis['document']) {
-  (_0x3f282b?.['querySelectorAll']?.('input[type="password"], [data-custom-provider-api-key]')?.['forEach'](
+function hardenApiCredentialInputs(el3 = globalThis['document']) {
+  (el3?.['querySelectorAll']?.('input[type="password"], [data-custom-provider-api-key]')?.['forEach'](
     markApiSecretInput,
   ),
-    _0x3f282b?.['querySelectorAll']?.(
+    el3?.['querySelectorAll']?.(
       '#providerUrl-openai, #customProviderBaseUrl, [data-custom-provider-base-url]',
     )?.['forEach'](markNonLoginTextInput),
-    _0x3f282b?.['querySelectorAll']?.(
+    el3?.['querySelectorAll']?.(
       '#customProviderDocumentationUrl, [data-custom-provider-documentation-url]',
     )?.['forEach'](markNonLoginTextInput));
 }
 export function createProviderSettingsController({
-  store: _0x4549e7,
+  store: store,
   configPort: configPort = {},
   customProviderPort: customProviderPort = {},
   dreaminaPort: dreaminaPort = {},
@@ -118,96 +118,96 @@ export function createProviderSettingsController({
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis['window'],
 } = {}) {
-  const _0x50ad60 = documentObject,
-    _0xd96ce0 = windowObject,
+  const documentObject2 = documentObject,
+    el4 = windowObject,
     {
-      fetchConfig: _0xa6e333,
-      getConfigSnapshot: _0x1eaf0d,
-      saveConfig: _0x147283,
-      testConnections: _0x4d862d,
+      fetchConfig: fetchConfig,
+      getConfigSnapshot: getConfigSnapshot,
+      saveConfig: saveConfig,
+      testConnections: testConnections,
     } = configPort,
-    { refreshManifestModelNodeUis: _0x48dc00, showError: _0x3ba721 } = uiPort;
-  let _0x4fcbd4 = {},
-    _0x3acf88 = null,
-    _0x3ad40e = Promise['resolve'](),
-    _0x287e45 = null;
-  const _0x134865 = createProviderStatusTooltipController();
-  let _0x1bab9a = null;
+    { refreshManifestModelNodeUis: refreshManifestModelNodeUis, showError: showError } = uiPort;
+  let options = {},
+    apiConfigAutoSaveController = null,
+    target = Promise['resolve'](),
+    runningHubDefaultSiteSettings = null;
+  const providerStatusTooltipController = createProviderStatusTooltipController();
+  let customProviderOnboardingController = null;
   // ── 厂商模型清单：从接口拉取、勾选、动态登记 ─────────────────────────────
   // 内置清单只能覆盖已适配的模型；厂商新增模型时，用户在这里拉一次真实列表即可选用。
-  const _0x4a71c9 = createProviderModelCatalogBundleRegistry();
-  function _0x2f9d13(_0x11e0a5 = _0x4fcbd4) {
+  const providerModelCatalogBundleRegistry = createProviderModelCatalogBundleRegistry();
+  function run(source = options) {
     try {
-      return _0x4a71c9['sync'](collectEnabledVendorModels(_0x11e0a5));
-    } catch (_0x1c3d5e) {
-      console['warn']('[Provider Model Catalog] sync failed:', _0x1c3d5e);
+      return providerModelCatalogBundleRegistry['sync'](collectEnabledVendorModels(source));
+    } catch (next) {
+      console['warn']('[Provider Model Catalog] sync failed:', next);
       return { changed: false, registered: 0x0 };
     }
   }
-  function _0x5a7c9e(_0x2b1e0c, _0x3f5c1d = {}) {
-    const _0x3d0f2a = readProviderModelCatalog(_0x4fcbd4?.['providers']?.[_0x2b1e0c] || {}),
-      _0x1a2f7f = _0x3f5c1d['statusText'] ?? '';
+  function run2(providerId, message = {}) {
+    const catalog = readProviderModelCatalog(options?.['providers']?.[providerId] || {}),
+      statusText = message['statusText'] ?? '';
     return renderProviderModelCatalogPanel({
-      documentObject: _0x50ad60,
-      providerId: _0x2b1e0c,
-      catalog: _0x3d0f2a,
+      documentObject: documentObject2,
+      providerId: providerId,
+      catalog: catalog,
       statusText:
-        _0x1a2f7f ||
-        (_0x3d0f2a['models']['length']
-          ? trApiInput('models.count', { count: _0x3d0f2a['models']['length'] })
+        statusText ||
+        (catalog['models']['length']
+          ? trApiInput('models.count', { count: catalog['models']['length'] })
           : ''),
-      message: _0x3f5c1d['message'] || '',
-      messageKind: _0x3f5c1d['messageKind'] || 'info',
+      message: message['message'] || '',
+      messageKind: message['messageKind'] || 'info',
     });
   }
-  function _0x5c1f8b(_0x2f0e57) {
-    const _0x3c9a1b = readProviderModelCatalogSelection(_0x50ad60, _0x2f0e57);
-    if (_0x3c9a1b['length'] === 0) return false;
-    const _0x4f0d69 = String(_0x2f0e57 || '')['trim']();
-    _0x4fcbd4['providers'] = _0x4fcbd4['providers'] || {};
-    _0x4fcbd4['providers'][_0x4f0d69] = applyProviderModelCatalog(_0x4fcbd4['providers'][_0x4f0d69], {
+  function run3(current) {
+    const models = readProviderModelCatalogSelection(documentObject2, current);
+    if (models['length'] === 0) return false;
+    const entry = String(current || '')['trim']();
+    options['providers'] = options['providers'] || {};
+    options['providers'][entry] = applyProviderModelCatalog(options['providers'][entry], {
       fetchedAt: new Date()['toISOString'](),
-      models: _0x3c9a1b['map']((_0x4d2f1a) => ({
-        id: _0x4d2f1a['id'],
-        kind: _0x4d2f1a['kind'] || inferProviderModelKind(_0x4f0d69, _0x4d2f1a['id']),
-        enabled: _0x4d2f1a['enabled'],
+      models: models['map']((id) => ({
+        id: id['id'],
+        kind: id['kind'] || inferProviderModelKind(entry, id['id']),
+        enabled: id['enabled'],
       })),
     });
     return true;
   }
-  async function _0x1e5a76(_0x2f0e57, _0x5d3a91 = null) {
-    const _0x1a2cbe = String(_0x2f0e57 || '')['trim']();
-    if (!isProviderModelCatalogProvider(_0x1a2cbe)) return false;
-    const _0x3b1d0e = _0x50ad60['getElementById']('providerKey-' + _0x1a2cbe),
-      _0x2210af = String(_0x3b1d0e?.['value'] || '')
+  async function run4(current, el5 = null) {
+    const providerId2 = String(current || '')['trim']();
+    if (!isProviderModelCatalogProvider(providerId2)) return false;
+    const el6 = documentObject2['getElementById']('providerKey-' + providerId2),
+      apiKey = String(el6?.['value'] || '')
         ['trim']()
         ['replace'](/^Bearer\s+/i, '');
-    if (!_0x2210af) {
-      (_0xd96ce0['showToast']?.(trApiInput('models.needKey'), 'error'), _0x3b1d0e?.['focus']?.());
+    if (!apiKey) {
+      (el4['showToast']?.(trApiInput('models.needKey'), 'error'), el6?.['focus']?.());
       return false;
     }
-    if (_0x5d3a91) _0x5d3a91['disabled'] = true;
-    _0x5a7c9e(_0x1a2cbe, {
+    if (el5) el5['disabled'] = true;
+    run2(providerId2, {
       statusText: trApiInput('models.fetching'),
       message: trApiInput('models.fetching'),
     });
     try {
-      const _0x4f7a1c = _0x4fcbd4?.['providers']?.[_0x1a2cbe] || {},
-        _0x5fb8a5 = await fetchProviderModelList({
-          providerId: _0x1a2cbe,
-          apiUrl: _0x4f7a1c['apiUrl'],
-          apiKey: _0x2210af,
+      const apiUrl = options?.['providers']?.[providerId2] || {},
+        response = await fetchProviderModelList({
+          providerId: providerId2,
+          apiUrl: apiUrl['apiUrl'],
+          apiKey: apiKey,
         });
-      if (!_0x5fb8a5['success']) {
-        _0x5a7c9e(_0x1a2cbe, {
+      if (!response['success']) {
+        run2(providerId2, {
           statusText: '',
-          message: trApiInput('models.failed') + '：' + _0x5fb8a5['error'],
+          message: trApiInput('models.failed') + '：' + response['error'],
           messageKind: 'error',
         });
         return false;
       }
-      if (_0x5fb8a5['models']['length'] === 0) {
-        _0x5a7c9e(_0x1a2cbe, {
+      if (response['models']['length'] === 0) {
+        run2(providerId2, {
           statusText: '',
           message: trApiInput('models.empty'),
           messageKind: 'error',
@@ -215,705 +215,706 @@ export function createProviderSettingsController({
         return false;
       }
       // 拉取只刷新候选清单，不改动已勾选状态；写入配置由“保存选择”完成。
-      const _0x1f9d5f = mergeProviderModelCatalog(
-        _0x1a2cbe,
-        readProviderModelCatalog(_0x4f7a1c)['models'],
-        _0x5fb8a5['models'],
+      const models2 = mergeProviderModelCatalog(
+        providerId2,
+        readProviderModelCatalog(apiUrl)['models'],
+        response['models'],
       );
       renderProviderModelCatalogPanel({
-        documentObject: _0x50ad60,
-        providerId: _0x1a2cbe,
-        catalog: { fetchedAt: new Date()['toISOString'](), models: _0x1f9d5f },
-        statusText: trApiInput('models.count', { count: _0x1f9d5f['length'] }),
+        documentObject: documentObject2,
+        providerId: providerId2,
+        catalog: { fetchedAt: new Date()['toISOString'](), models: models2 },
+        statusText: trApiInput('models.count', { count: models2['length'] }),
       });
       return true;
     } finally {
-      if (_0x5d3a91) _0x5d3a91['disabled'] = false;
+      if (el5) el5['disabled'] = false;
     }
   }
-  async function _0x4b8e2c(_0x2f0e57) {
-    const _0x1a2cbe = String(_0x2f0e57 || '')['trim']();
-    if (!isProviderModelCatalogProvider(_0x1a2cbe)) return false;
-    if (!_0x5c1f8b(_0x1a2cbe)) return false;
-    await _0x3acf88?.['persist']();
-    const _0x2c1c9a = _0x2f9d13(_0x4fcbd4);
-    _0x48dc00?.();
-    const _0x3d0f2a = readProviderModelCatalog(_0x4fcbd4?.['providers']?.[_0x1a2cbe] || {}),
-      _0x5a3f1c = _0x2c1c9a?.['skipped']?.['length'] || 0;
-    _0x5a7c9e(_0x1a2cbe, {
-      statusText: trApiInput('models.count', { count: _0x3d0f2a['models']['length'] }),
+  async function run5(current) {
+    const providerId2 = String(current || '')['trim']();
+    if (!isProviderModelCatalogProvider(providerId2)) return false;
+    if (!run3(providerId2)) return false;
+    await apiConfigAutoSaveController?.['persist']();
+    const record = run(options);
+    refreshManifestModelNodeUis?.();
+    const catalog = readProviderModelCatalog(options?.['providers']?.[providerId2] || {}),
+      payload = record?.['skipped']?.['length'] || 0;
+    run2(providerId2, {
+      statusText: trApiInput('models.count', { count: catalog['models']['length'] }),
       message:
         trApiInput('models.saved') +
-        (_0x2c1c9a?.['registered'] ? '（新增 ' + _0x2c1c9a['registered'] + ' 个）' : '') +
-        (_0x5a3f1c ? '（' + _0x5a3f1c + ' 个需手动接入）' : ''),
+        (record?.['registered'] ? '（新增 ' + record['registered'] + ' 个）' : '') +
+        (payload ? '（' + payload + ' 个需手动接入）' : ''),
       messageKind: 'success',
     });
     return true;
   }
 
-  const _0x5ef025 = new Set();
-  function _0x4b4d05(_0x3a4849) {
-    const _0xa89355 = typeof _0x3a4849 === 'string' ? _0x3a4849 : _0x3a4849?.['id'];
-    if (_0xa89355) _0x5ef025['add'](_0xa89355);
+  const map = new Set();
+  function run6(handle) {
+    const state = typeof handle === 'string' ? handle : handle?.['id'];
+    if (state) map['add'](state);
   }
-  function _0x5ba888(_0x59fc36) {
-    return !!_0x59fc36 && !_0x5ef025['has'](_0x59fc36['id']);
+  function run7(enabled) {
+    return !!enabled && !map['has'](enabled['id']);
   }
-  function _0x2b288c(_0x4e7da8) {
-    ((_0x4fcbd4 = _0x4e7da8 || {}), _0x1bab9a?.['syncConfigSnapshot'](_0x4fcbd4));
+  function onConfigSnapshotChange(config) {
+    ((options = config || {}), customProviderOnboardingController?.['syncConfigSnapshot'](options));
   }
-  const _0x3fbc29 = createDreaminaLoginSessionController({
+  const dreaminaLoginSessionController = createDreaminaLoginSessionController({
     ...dreaminaPort,
     documentObject: documentObject,
     windowObject: windowObject,
   });
-  _0x1bab9a = createCustomProviderOnboardingController({
-    store: _0x4549e7,
+  customProviderOnboardingController = createCustomProviderOnboardingController({
+    store: store,
     ...customProviderPort,
-    saveApiConfigToServer: _0x147283,
-    refreshManifestModelNodeUis: _0x48dc00,
-    showError: _0x3ba721,
-    syncModelServiceReadinessSummary: _0x369069,
-    getConfigSnapshot: () => _0x4fcbd4,
-    onConfigSnapshotChange: _0x2b288c,
+    saveApiConfigToServer: saveConfig,
+    refreshManifestModelNodeUis: refreshManifestModelNodeUis,
+    showError: showError,
+    syncModelServiceReadinessSummary: syncModelServiceReadinessSummary,
+    getConfigSnapshot: () => options,
+    onConfigSnapshotChange: onConfigSnapshotChange,
     documentObject: documentObject,
     windowObject: windowObject,
   });
-  const _0x1b412d = new Map(
+  const map2 = new Map(
     Object['entries'](PROVIDERS_META)
-      ['filter'](([, _0x2c709b]) => _0x2c709b['apiRoutes'])
-      ['map'](([_0x249a99, _0xb1473e]) => [
-        _0x249a99,
+      ['filter'](([, scope]) => scope['apiRoutes'])
+      ['map'](([input, routes]) => [
+        input,
         createApiRouteSelection({
-          buttons: Array['from'](_0x50ad60['querySelectorAll']('[data-' + _0x249a99 + '-route]')),
-          urlElement: _0x50ad60['getElementById']('providerRouteUrl-' + _0x249a99),
-          routes: _0xb1473e['apiRoutes'],
-          resolveConfig: (_0x46798c) => resolveProviderApiRoute(_0x249a99, _0x46798c),
-          getButtonRouteId: (_0x52c299) => _0x52c299['getAttribute']('data-' + _0x249a99 + '-route'),
-          formatCustomUrl: (_0x1391bc) => trApiInput('route.custom', { value: _0x1391bc }),
+          buttons: Array['from'](documentObject2['querySelectorAll']('[data-' + input + '-route]')),
+          urlElement: documentObject2['getElementById']('providerRouteUrl-' + input),
+          routes: routes['apiRoutes'],
+          resolveConfig: (output) => resolveProviderApiRoute(input, output),
+          getButtonRouteId: (value2) => value2['getAttribute']('data-' + input + '-route'),
+          formatCustomUrl: (value3) => trApiInput('route.custom', { value: value3 }),
         }),
       ]),
   );
-  function _0x167079(_0x29ca4c = _0x4fcbd4) {
-    const _0x18d38b = (_0x2baac4) =>
-        String(_0x2baac4 || '')
+  function collectConfig(value4 = options) {
+    const run8 = (value5) =>
+        String(value5 || '')
           ['trim']()
           ['replace'](/^Bearer\s+/i, ''),
-      _0x31be17 = {};
-    (Object['entries'](_0x29ca4c?.['providers'] || {})['forEach'](([_0x11c963, _0x2a225d]) => {
-      const _0x22f54e = String(_0x11c963 || '')['trim']();
-      if (!_0x22f54e || API_PROVIDER_IDS['includes'](_0x22f54e)) return;
-      _0x31be17[_0x22f54e] = _0x2a225d && typeof _0x2a225d === 'object' ? { ..._0x2a225d } : _0x2a225d;
+      providers = {};
+    (Object['entries'](value4?.['providers'] || {})['forEach'](([value6, args]) => {
+      const enabled2 = String(value6 || '')['trim']();
+      if (!enabled2 || API_PROVIDER_IDS['includes'](enabled2)) return;
+      providers[enabled2] = args && typeof args === 'object' ? { ...args } : args;
     }),
-      API_PROVIDER_IDS['forEach']((_0xb91a2) => {
-        const _0x2c127c = _0x50ad60['getElementById']('providerUrl-' + _0xb91a2),
-          _0x587574 = _0x50ad60['getElementById']('providerKey-' + _0xb91a2),
-          _0x528191 = _0x29ca4c?.['providers']?.[_0xb91a2],
-          _0x42d60e = _0x528191 && typeof _0x528191 === 'object' ? { ..._0x528191 } : {};
-        if (_0x2c127c) _0x42d60e['apiUrl'] = _0x2c127c['value']['trim']();
-        if (_0x587574) _0x42d60e['apiKey'] = _0x18d38b(_0x587574['value']);
-        if (_0xb91a2 === 'comfyui') {
-          const _0xb0ce5b = _0x50ad60['getElementById']('providerUrl-comfyui-cloud');
-          ((_0x42d60e['apiUrl'] = normalizeComfyUiFormUrl(_0x42d60e['apiUrl'], COMFYUI_LOCAL_DEFAULT_URL)),
-            (_0x42d60e['cloudApiUrl'] = normalizeComfyUiFormUrl(_0xb0ce5b?.['value'] || '')));
+      API_PROVIDER_IDS['forEach']((value7) => {
+        const el7 = documentObject2['getElementById']('providerUrl-' + value7),
+          el8 = documentObject2['getElementById']('providerKey-' + value7),
+          args2 = value4?.['providers']?.[value7],
+          value8 = args2 && typeof args2 === 'object' ? { ...args2 } : {};
+        if (el7) value8['apiUrl'] = el7['value']['trim']();
+        if (el8) value8['apiKey'] = run8(el8['value']);
+        if (value7 === 'comfyui') {
+          const el9 = documentObject2['getElementById']('providerUrl-comfyui-cloud');
+          ((value8['apiUrl'] = normalizeComfyUiFormUrl(value8['apiUrl'], COMFYUI_LOCAL_DEFAULT_URL)),
+            (value8['cloudApiUrl'] = normalizeComfyUiFormUrl(el9?.['value'] || '')));
         }
-        (_0x1b412d['has'](_0xb91a2) &&
-          Object['assign'](_0x42d60e, _0x1b412d['get'](_0xb91a2)['collect'](_0x42d60e)),
-          (_0x31be17[_0xb91a2] = _0x42d60e));
+        (map2['has'](value7) && Object['assign'](value8, map2['get'](value7)['collect'](value8)),
+          (providers[value7] = value8));
       }),
-      RUNNINGHUB_SETTINGS_PROVIDER_IDS['forEach']((_0xb210e9) => {
-        const _0x2ad914 = _0x50ad60['getElementById']('providerKey-' + _0xb210e9 + '-model');
-        if (!_0x2ad914) return;
-        ((_0x31be17[_0xb210e9] = _0x31be17[_0xb210e9] || {}),
-          (_0x31be17[_0xb210e9]['modelApiKey'] = _0x18d38b(_0x2ad914['value'])));
+      RUNNINGHUB_SETTINGS_PROVIDER_IDS['forEach']((value9) => {
+        const el10 = documentObject2['getElementById']('providerKey-' + value9 + '-model');
+        if (!el10) return;
+        ((providers[value9] = providers[value9] || {}),
+          (providers[value9]['modelApiKey'] = run8(el10['value'])));
       }),
-      API_PROVIDER_IDS['forEach']((_0x14006c) => {
-        _0x31be17[_0x14006c] = reconcileProviderConnectionVerification(
-          _0x29ca4c?.['providers']?.[_0x14006c] || {},
-          _0x31be17[_0x14006c] || {},
-          _0x14006c,
+      API_PROVIDER_IDS['forEach']((value10) => {
+        providers[value10] = reconcileProviderConnectionVerification(
+          value4?.['providers']?.[value10] || {},
+          providers[value10] || {},
+          value10,
         );
       }));
-    const _0x31f2e1 = { ...(_0x29ca4c || {}), providers: _0x31be17 };
-    return _0x287e45?.['applyToConfig'](_0x31f2e1) || _0x31f2e1;
+    const value11 = { ...(value4 || {}), providers: providers };
+    return runningHubDefaultSiteSettings?.['applyToConfig'](value11) || value11;
   }
-  function _0x412cb9(_0x2ba5e4) {
-    const _0x3bc40f = _0x2ba5e4?.['providers'] || {};
-    return API_PROVIDER_IDS['filter']((_0x32a104) => {
-      const _0x1d91fd = _0x3bc40f[_0x32a104] || {};
-      if (_0x32a104 === 'comfyui')
-        return !!String(_0x1d91fd['apiUrl'] || _0x1d91fd['cloudApiUrl'] || '')['trim']();
-      return !!String(_0x1d91fd['apiKey'] || _0x1d91fd['modelApiKey'] || '')['trim']();
+  function run9(value12) {
+    const value13 = value12?.['providers'] || {};
+    return API_PROVIDER_IDS['filter']((value14) => {
+      const value15 = value13[value14] || {};
+      if (value14 === 'comfyui') return !!String(value15['apiUrl'] || value15['cloudApiUrl'] || '')['trim']();
+      return !!String(value15['apiKey'] || value15['modelApiKey'] || '')['trim']();
     });
   }
-  function _0x53788b(_0x56ba8c, _0x43e8da) {
-    const _0x351bd3 = _0x56ba8c?.['providers']?.[_0x43e8da] || {};
-    if (_0x43e8da === 'comfyui')
-      return Number(Boolean(String(_0x351bd3['apiUrl'] || _0x351bd3['cloudApiUrl'] || '')['trim']()));
-    if (RUNNINGHUB_SETTINGS_PROVIDER_IDS['includes'](_0x43e8da))
+  function run10(value16, value17) {
+    const value18 = value16?.['providers']?.[value17] || {};
+    if (value17 === 'comfyui')
+      return Number(Boolean(String(value18['apiUrl'] || value18['cloudApiUrl'] || '')['trim']()));
+    if (RUNNINGHUB_SETTINGS_PROVIDER_IDS['includes'](value17))
       return (
-        Number(Boolean(String(_0x351bd3['apiKey'] || '')['trim']())) +
-        Number(Boolean(String(_0x351bd3['modelApiKey'] || '')['trim']()))
+        Number(Boolean(String(value18['apiKey'] || '')['trim']())) +
+        Number(Boolean(String(value18['modelApiKey'] || '')['trim']()))
       );
-    return Number(Boolean(String(_0x351bd3['apiKey'] || '')['trim']()));
+    return Number(Boolean(String(value18['apiKey'] || '')['trim']()));
   }
-  function _0x1d917d(_0x23e827) {
-    const _0x1f2942 = _0x23e827?.['providers'] || {};
-    return Object['keys'](_0x1f2942)['filter']((_0x29a46c) => {
-      const _0x1f6e44 = _0x1f2942[_0x29a46c] || {};
-      if (_0x29a46c === 'comfyui')
-        return !!String(_0x1f6e44['apiUrl'] || _0x1f6e44['cloudApiUrl'] || '')['trim']();
-      return !!String(_0x1f6e44['apiKey'] || _0x1f6e44['modelApiKey'] || '')['trim']();
+  function run11(value19) {
+    const value20 = value19?.['providers'] || {};
+    return Object['keys'](value20)['filter']((value21) => {
+      const value22 = value20[value21] || {};
+      if (value21 === 'comfyui') return !!String(value22['apiUrl'] || value22['cloudApiUrl'] || '')['trim']();
+      return !!String(value22['apiKey'] || value22['modelApiKey'] || '')['trim']();
     });
   }
-  function _0x53cee2(_0x51cf73, _0x3c8d36) {
-    const _0xda7595 = _0x51cf73?.['providers']?.[_0x3c8d36] || {};
-    if (_0x3c8d36 === 'comfyui')
-      return !!String(_0xda7595['apiUrl'] || _0xda7595['cloudApiUrl'] || '')['trim']();
-    return !!String(_0xda7595['apiKey'] || _0xda7595['modelApiKey'] || '')['trim']();
+  function run12(value23, value24) {
+    const value25 = value23?.['providers']?.[value24] || {};
+    if (value24 === 'comfyui') return !!String(value25['apiUrl'] || value25['cloudApiUrl'] || '')['trim']();
+    return !!String(value25['apiKey'] || value25['modelApiKey'] || '')['trim']();
   }
-  function _0x46a080(_0x9845d3, _0x2b8b42 = '') {
-    const _0x4b5819 = normalizeComfyUiConnectionTarget(_0x2b8b42),
-      _0x59fc0e =
-        _0x9845d3 === 'comfyui' ? getComfyUiStatusElementId(_0x4b5819) : 'providerTestStatus-' + _0x9845d3,
-      _0x50782f = _0x50ad60['getElementById'](_0x59fc0e);
-    return (_0x134865['bind'](_0x50782f), _0x50782f);
+  function run13(value26, value27 = '') {
+    const comfyUiConnectionTarget = normalizeComfyUiConnectionTarget(value27),
+      value28 =
+        value26 === 'comfyui'
+          ? getComfyUiStatusElementId(comfyUiConnectionTarget)
+          : 'providerTestStatus-' + value26,
+      value29 = documentObject2['getElementById'](value28);
+    return (providerStatusTooltipController['bind'](value29), value29);
   }
-  function _0x96c62f(_0x190e90) {
-    const _0x37e06c = _0x50ad60['getElementById']('providerBalance-' + _0x190e90);
-    return (_0x134865['bind'](_0x37e06c), _0x37e06c);
+  function run14(value30) {
+    const value31 = documentObject2['getElementById']('providerBalance-' + value30);
+    return (providerStatusTooltipController['bind'](value31), value31);
   }
-  function _0xf29880(_0x17b5d0, _0x5cc358 = '') {
-    const _0x17bdda = normalizeComfyUiConnectionTarget(_0x5cc358);
-    if (_0x17b5d0 === 'comfyui' && !_0x17bdda) {
-      (_0xf29880(_0x17b5d0, 'local'), _0xf29880(_0x17b5d0, 'cloud'));
+  function run15(value32, value33 = '') {
+    const comfyUiConnectionTarget2 = normalizeComfyUiConnectionTarget(value33);
+    if (value32 === 'comfyui' && !comfyUiConnectionTarget2) {
+      (run15(value32, 'local'), run15(value32, 'cloud'));
       return;
     }
-    const _0x5292a9 = _0x46a080(_0x17b5d0, _0x17bdda);
-    (_0x5292a9 &&
-      (_0x134865['hide'](_0x5292a9),
-      (_0x5292a9['hidden'] = !![]),
-      (_0x5292a9['textContent'] = ''),
-      _0x5292a9['removeAttribute']('title'),
-      _0x5292a9['removeAttribute']('data-tooltip'),
-      _0x5292a9['removeAttribute']('data-tooltip-source'),
-      _0x5292a9['removeAttribute']('data-native-title'),
-      _0x5292a9['removeAttribute']('data-provider-test-tooltip'),
-      _0x5292a9['removeAttribute']('aria-label'),
-      _0x5292a9['removeAttribute']('tabindex'),
-      _0x5292a9['setAttribute']('aria-busy', 'false'),
-      _0x5292a9['classList']['remove'](...PROVIDER_TEST_STATUS_CLASSES)),
-      _0x401c30(_0x17b5d0));
+    const el11 = run13(value32, comfyUiConnectionTarget2);
+    (el11 &&
+      (providerStatusTooltipController['hide'](el11),
+      (el11['hidden'] = !![]),
+      (el11['textContent'] = ''),
+      el11['removeAttribute']('title'),
+      el11['removeAttribute']('data-tooltip'),
+      el11['removeAttribute']('data-tooltip-source'),
+      el11['removeAttribute']('data-native-title'),
+      el11['removeAttribute']('data-provider-test-tooltip'),
+      el11['removeAttribute']('aria-label'),
+      el11['removeAttribute']('tabindex'),
+      el11['setAttribute']('aria-busy', 'false'),
+      el11['classList']['remove'](...PROVIDER_TEST_STATUS_CLASSES)),
+      run16(value32));
   }
-  function _0x5110c3(_0x2fffb7, _0x386908, _0x127407, _0x29e386 = '', _0x1449ac = '') {
-    const _0xdce924 = normalizeComfyUiConnectionTarget(_0x1449ac);
-    if (_0x2fffb7 === 'comfyui' && !_0xdce924) {
-      (_0x5110c3(_0x2fffb7, _0x386908, _0x127407, _0x29e386, 'local'),
-        _0x5110c3(_0x2fffb7, _0x386908, _0x127407, _0x29e386, 'cloud'));
+  function run17(value34, value35, value36, value37 = '', value38 = '') {
+    const comfyUiConnectionTarget3 = normalizeComfyUiConnectionTarget(value38);
+    if (value34 === 'comfyui' && !comfyUiConnectionTarget3) {
+      (run17(value34, value35, value36, value37, 'local'),
+        run17(value34, value35, value36, value37, 'cloud'));
       return;
     }
-    const _0x1e8ac6 = _0x46a080(_0x2fffb7, _0xdce924);
-    if (!_0x1e8ac6) return;
-    const _0x5bf404 = String(_0x127407 || '')['trim'](),
-      _0x59a124 = String(_0x29e386 || '')['trim']();
-    ((_0x1e8ac6['hidden'] = ![]),
-      (_0x1e8ac6['textContent'] = _0x5bf404),
-      _0x1e8ac6['setAttribute']('aria-busy', String(_0x386908 === 'testing')),
-      _0x1e8ac6['removeAttribute']('title'),
-      _0x1e8ac6['removeAttribute']('data-tooltip'),
-      _0x1e8ac6['removeAttribute']('data-tooltip-source'),
-      _0x1e8ac6['removeAttribute']('data-native-title'));
-    _0x59a124 && _0x59a124 !== _0x5bf404
-      ? (_0x1e8ac6['setAttribute']('data-provider-test-tooltip', _0x59a124),
-        _0x1e8ac6['setAttribute']('aria-label', _0x59a124),
-        _0x1e8ac6['setAttribute']('tabindex', '0'))
-      : (_0x134865['hide'](_0x1e8ac6),
-        _0x1e8ac6['removeAttribute']('data-provider-test-tooltip'),
-        _0x1e8ac6['removeAttribute']('aria-label'),
-        _0x1e8ac6['removeAttribute']('tabindex'));
-    _0x1e8ac6['classList']['remove'](...PROVIDER_TEST_STATUS_CLASSES);
-    if (_0x386908 === 'success') _0x1e8ac6['classList']['add']('settings-provider-status--success');
+    const el12 = run13(value34, comfyUiConnectionTarget3);
+    if (!el12) return;
+    const value39 = String(value36 || '')['trim'](),
+      value40 = String(value37 || '')['trim']();
+    ((el12['hidden'] = ![]),
+      (el12['textContent'] = value39),
+      el12['setAttribute']('aria-busy', String(value35 === 'testing')),
+      el12['removeAttribute']('title'),
+      el12['removeAttribute']('data-tooltip'),
+      el12['removeAttribute']('data-tooltip-source'),
+      el12['removeAttribute']('data-native-title'));
+    value40 && value40 !== value39
+      ? (el12['setAttribute']('data-provider-test-tooltip', value40),
+        el12['setAttribute']('aria-label', value40),
+        el12['setAttribute']('tabindex', '0'))
+      : (providerStatusTooltipController['hide'](el12),
+        el12['removeAttribute']('data-provider-test-tooltip'),
+        el12['removeAttribute']('aria-label'),
+        el12['removeAttribute']('tabindex'));
+    el12['classList']['remove'](...PROVIDER_TEST_STATUS_CLASSES);
+    if (value35 === 'success') el12['classList']['add']('settings-provider-status--success');
     else {
-      if (_0x386908 === 'testing') _0x1e8ac6['classList']['add']('settings-provider-status--testing');
+      if (value35 === 'testing') el12['classList']['add']('settings-provider-status--testing');
       else {
-        if (_0x386908 === 'partial') _0x1e8ac6['classList']['add']('settings-provider-status--partial');
+        if (value35 === 'partial') el12['classList']['add']('settings-provider-status--partial');
         else {
-          if (_0x386908 === 'configured')
-            _0x1e8ac6['classList']['add']('settings-provider-status--configured');
+          if (value35 === 'configured') el12['classList']['add']('settings-provider-status--configured');
           else {
-            if (_0x386908 === 'unconfigured')
-              _0x1e8ac6['classList']['add']('settings-provider-status--unconfigured');
-            else _0x1e8ac6['classList']['add']('settings-provider-status--danger');
+            if (value35 === 'unconfigured')
+              el12['classList']['add']('settings-provider-status--unconfigured');
+            else el12['classList']['add']('settings-provider-status--danger');
           }
         }
       }
     }
   }
-  function _0x59a2fe(_0x65bc61, _0x338838) {
-    if (_0x338838 === 'comfyui') {
-      getComfyUiEndpointStatusEntries(_0x65bc61)['forEach'](
-        ({ target: _0x5d1492, tone: _0x65a4e5, textKey: _0x525837 }) => {
-          _0x5110c3('comfyui', _0x65a4e5, trApiInput(_0x525837), '', _0x5d1492);
+  function run18(value41, value42) {
+    if (value42 === 'comfyui') {
+      getComfyUiEndpointStatusEntries(value41)['forEach'](
+        ({ target: target2, tone: tone, textKey: textKey }) => {
+          run17('comfyui', tone, trApiInput(textKey), '', target2);
         },
       );
       return;
     }
-    const _0xeaf2ac = _0x53788b(_0x65bc61, _0x338838),
-      _0x2df2b2 = RUNNINGHUB_SETTINGS_PROVIDER_IDS['includes'](_0x338838) ? 0x2 : 0x1;
-    if (_0xeaf2ac > 0x0) {
-      if (isProviderConnectionVerified(_0x65bc61, _0x338838)) {
-        _0x5110c3(_0x338838, 'success', trApiInput('diagnostics.passed'));
+    const count = run10(value41, value42),
+      total = RUNNINGHUB_SETTINGS_PROVIDER_IDS['includes'](value42) ? 0x2 : 0x1;
+    if (count > 0x0) {
+      if (isProviderConnectionVerified(value41, value42)) {
+        run17(value42, 'success', trApiInput('diagnostics.passed'));
         return;
       }
-      if (_0x65bc61?.['providers']?.[_0x338838]?.['connectionVerification']?.['status'] === 'partial') {
-        _0x5110c3(_0x338838, 'partial', trApiInput('diagnostics.partialPassed'));
+      if (value41?.['providers']?.[value42]?.['connectionVerification']?.['status'] === 'partial') {
+        run17(value42, 'partial', trApiInput('diagnostics.partialPassed'));
         return;
       }
-      _0x5110c3(
-        _0x338838,
+      run17(
+        value42,
         'configured',
-        _0x2df2b2 > 0x1
-          ? trApiInput('statuses.configuredCount', { count: _0xeaf2ac, total: _0x2df2b2 })
+        total > 0x1
+          ? trApiInput('statuses.configuredCount', { count: count, total: total })
           : trApiInput('statuses.configured'),
       );
       return;
     }
-    _0x5110c3(_0x338838, 'unconfigured', trApiInput('statuses.unconfigured'));
+    run17(value42, 'unconfigured', trApiInput('statuses.unconfigured'));
   }
-  function _0xadece6(_0x4a3b6f) {
-    API_PROVIDER_IDS['forEach']((_0x5b230e) => {
-      _0x59a2fe(_0x4a3b6f, _0x5b230e);
+  function run19(value43) {
+    API_PROVIDER_IDS['forEach']((value44) => {
+      run18(value43, value44);
     });
   }
-  function _0x369069(_0x4c5b2d) {
-    const _0x153a8e = _0x50ad60['getElementById']('modelServiceReadinessSummary'),
-      _0xf944f6 = _0x50ad60['getElementById']('modelServiceReadinessDesc'),
-      _0x30785c = _0x50ad60['getElementById']('modelServiceReadinessStatus');
-    if (!_0x153a8e || !_0xf944f6 || !_0x30785c) return;
-    const _0x49b2fd = _0x1d917d(_0x4c5b2d)['length'];
-    ((_0x153a8e['dataset']['state'] = _0x49b2fd > 0x0 ? 'ready' : 'empty'),
-      (_0xf944f6['textContent'] = trApiInput(_0x49b2fd > 0x0 ? 'readiness.ready' : 'readiness.empty', {
-        count: _0x49b2fd,
+  function syncModelServiceReadinessSummary(value45) {
+    const el13 = documentObject2['getElementById']('modelServiceReadinessSummary'),
+      el14 = documentObject2['getElementById']('modelServiceReadinessDesc'),
+      el15 = documentObject2['getElementById']('modelServiceReadinessStatus');
+    if (!el13 || !el14 || !el15) return;
+    const count2 = run11(value45)['length'];
+    ((el13['dataset']['state'] = count2 > 0x0 ? 'ready' : 'empty'),
+      (el14['textContent'] = trApiInput(count2 > 0x0 ? 'readiness.ready' : 'readiness.empty', {
+        count: count2,
       })),
-      (_0x30785c['textContent'] = trApiInput(
-        _0x49b2fd > 0x0 ? 'readiness.readyShort' : 'readiness.emptyShort',
-        { count: _0x49b2fd },
-      )));
+      (el15['textContent'] = trApiInput(count2 > 0x0 ? 'readiness.readyShort' : 'readiness.emptyShort', {
+        count: count2,
+      })));
   }
-  function _0x401c30(_0x221d38) {
-    const _0xc8d128 = _0x96c62f(_0x221d38);
-    if (!_0xc8d128) return;
-    (_0x134865['hide'](_0xc8d128),
-      (_0xc8d128['hidden'] = !![]),
-      (_0xc8d128['textContent'] = ''),
-      _0xc8d128['removeAttribute']('aria-label'),
-      _0xc8d128['removeAttribute']('data-provider-test-tooltip'));
+  function run16(value46) {
+    const el16 = run14(value46);
+    if (!el16) return;
+    (providerStatusTooltipController['hide'](el16),
+      (el16['hidden'] = !![]),
+      (el16['textContent'] = ''),
+      el16['removeAttribute']('aria-label'),
+      el16['removeAttribute']('data-provider-test-tooltip'));
   }
-  function _0x181cf5(_0x3b2a61, _0x40e799 = null) {
-    const _0x118163 = _0x96c62f(_0x3b2a61);
-    if (!_0x118163) return;
-    const _0x194509 = String(_0x40e799?.['displayText'] || '')['trim']();
-    if (!_0x194509) {
-      _0x401c30(_0x3b2a61);
+  function run20(value47, value48 = null) {
+    const el17 = run14(value47);
+    if (!el17) return;
+    const enabled3 = String(value48?.['displayText'] || '')['trim']();
+    if (!enabled3) {
+      run16(value47);
       return;
     }
-    const _0x500f4f = String(_0x40e799?.['detailText'] || _0x194509)['trim']();
-    ((_0x118163['hidden'] = ![]),
-      (_0x118163['textContent'] = _0x194509),
-      _0x118163['setAttribute']('aria-label', _0x500f4f),
-      _0x118163['setAttribute']('data-provider-test-tooltip', _0x500f4f));
+    const value49 = String(value48?.['detailText'] || enabled3)['trim']();
+    ((el17['hidden'] = ![]),
+      (el17['textContent'] = enabled3),
+      el17['setAttribute']('aria-label', value49),
+      el17['setAttribute']('data-provider-test-tooltip', value49));
   }
-  function _0x3ef56c(_0x5a653d) {
-    const _0x23acef = Number(_0x5a653d);
-    if (!Number['isFinite'](_0x23acef) || _0x23acef <= 0x0) return null;
-    return Math['max'](0x1, Math['floor'](_0x23acef));
+  function run21(value50) {
+    const count3 = Number(value50);
+    if (!Number['isFinite'](count3) || count3 <= 0x0) return null;
+    return Math['max'](0x1, Math['floor'](count3));
   }
-  function _0x12efdb(_0x385f8d, _0x45166a = null) {
-    if (!_0x45166a || typeof _0x45166a !== 'object') return null;
-    const _0x19ecb7 = String(_0x385f8d || '')
+  function run22(value51, enabled4 = null) {
+    if (!enabled4 || typeof enabled4 !== 'object') return null;
+    const value52 = String(value51 || '')
       ['trim']()
       ['toLowerCase']();
-    if (RUNNINGHUB_SETTINGS_PROVIDER_IDS['includes'](_0x19ecb7)) {
-      const _0x3d31a0 = _0x3ef56c(_0x45166a['workflowConcurrentLimit']),
-        _0xb8e16b = _0x3ef56c(_0x45166a['modelConcurrentLimit']),
-        _0x292ebb = {};
+    if (RUNNINGHUB_SETTINGS_PROVIDER_IDS['includes'](value52)) {
+      const value53 = run21(enabled4['workflowConcurrentLimit']),
+        value54 = run21(enabled4['modelConcurrentLimit']),
+        value55 = {};
       return (
-        _0x3d31a0 !== null && (_0x292ebb['workflowConcurrentLimit'] = _0x3d31a0),
-        _0xb8e16b !== null && (_0x292ebb['modelConcurrentLimit'] = _0xb8e16b),
-        _0x45166a['workflowApiKeyType'] &&
-          (_0x292ebb['workflowApiKeyType'] = String(_0x45166a['workflowApiKeyType'] || '')['trim']()),
-        _0x45166a['modelApiKeyType'] &&
-          (_0x292ebb['modelApiKeyType'] = String(_0x45166a['modelApiKeyType'] || '')['trim']()),
-        Object['keys'](_0x292ebb)['length'] ? _0x292ebb : null
+        value53 !== null && (value55['workflowConcurrentLimit'] = value53),
+        value54 !== null && (value55['modelConcurrentLimit'] = value54),
+        enabled4['workflowApiKeyType'] &&
+          (value55['workflowApiKeyType'] = String(enabled4['workflowApiKeyType'] || '')['trim']()),
+        enabled4['modelApiKeyType'] &&
+          (value55['modelApiKeyType'] = String(enabled4['modelApiKeyType'] || '')['trim']()),
+        Object['keys'](value55)['length'] ? value55 : null
       );
     }
-    const _0x159aee = _0x3ef56c(_0x45166a['concurrentLimit']);
-    return _0x159aee === null ? null : { concurrentLimit: _0x159aee };
+    const concurrentLimit = run21(enabled4['concurrentLimit']);
+    return concurrentLimit === null ? null : { concurrentLimit: concurrentLimit };
   }
-  function _0x5baee7(_0x55bf1a = {}) {
-    return formatProviderDiagnosticDetail(_0x55bf1a, {
+  function run23(options2 = {}) {
+    return formatProviderDiagnosticDetail(options2, {
       skipped: trApiInput('diagnostics.skipped'),
       passed: trApiInput('diagnostics.passed'),
       failed: trApiInput('diagnostics.failed'),
       step: trApiInput('diagnostics.step'),
     });
   }
-  function _0x179df1(_0x39face = {}) {
-    if (_0x39face['partial']) return 'partial';
-    if (_0x39face['ok']) return 'success';
+  function run24(response2 = {}) {
+    if (response2['partial']) return 'partial';
+    if (response2['ok']) return 'success';
     return 'danger';
   }
-  function _0x1c4b51(_0x4833c2 = {}) {
-    if (_0x4833c2['partial']) return trApiInput('diagnostics.partialPassed');
-    if (_0x4833c2['ok']) return trApiInput('diagnostics.passed');
+  function run25(response3 = {}) {
+    if (response3['partial']) return trApiInput('diagnostics.partialPassed');
+    if (response3['ok']) return trApiInput('diagnostics.passed');
     return trApiInput('diagnostics.notPassed');
   }
-  function _0x3a4348() {
-    API_PROVIDER_IDS['forEach'](_0xf29880);
+  function run26() {
+    API_PROVIDER_IDS['forEach'](run15);
   }
-  function _0x1ba785() {
-    const _0x1e99d2 = (_0x44b4bd) => {
-        const _0x54ada3 = _0x167079();
-        (_0xf29880(_0x44b4bd),
-          _0x59a2fe(_0x54ada3, _0x44b4bd),
-          _0x369069(_0x54ada3),
-          _0x3acf88?.['schedule']());
+  function run27() {
+    const run28 = (value56) => {
+        const value57 = collectConfig();
+        (run15(value56),
+          run18(value57, value56),
+          syncModelServiceReadinessSummary(value57),
+          apiConfigAutoSaveController?.['schedule']());
       },
-      _0x405945 = (_0x37ae74, _0x4209d8) => {
-        (_0x37ae74?.['addEventListener']('input', () => {
-          (_0x4b4d05(_0x37ae74), _0x1e99d2(_0x4209d8));
+      handler = (el18, value58) => {
+        (el18?.['addEventListener']('input', () => {
+          (run6(el18), run28(value58));
         }),
-          _0x37ae74?.['addEventListener']('change', () => {
-            (_0x4b4d05(_0x37ae74), _0x3acf88?.['persist']()['catch'](() => {}));
+          el18?.['addEventListener']('change', () => {
+            (run6(el18), apiConfigAutoSaveController?.['persist']()['catch'](() => {}));
           }));
       };
-    (API_PROVIDER_IDS['forEach']((_0xa77f25) => {
-      const _0x10196c = _0x50ad60['getElementById']('providerUrl-' + _0xa77f25),
-        _0xdbc30f = _0x50ad60['getElementById']('providerKey-' + _0xa77f25);
-      (_0x405945(_0x10196c, _0xa77f25), _0x405945(_0xdbc30f, _0xa77f25));
+    (API_PROVIDER_IDS['forEach']((value59) => {
+      const value60 = documentObject2['getElementById']('providerUrl-' + value59),
+        value61 = documentObject2['getElementById']('providerKey-' + value59);
+      (handler(value60, value59), handler(value61, value59));
     }),
-      _0x405945(_0x50ad60['getElementById']('providerUrl-comfyui-cloud'), 'comfyui'),
-      _0x1b412d['forEach']((_0x5e7875, _0x385325) => {
-        _0x5e7875['bind'](() => {
-          (_0x4b4d05('providerRoute-' + _0x385325), _0x1e99d2(_0x385325));
+      handler(documentObject2['getElementById']('providerUrl-comfyui-cloud'), 'comfyui'),
+      map2['forEach']((value62, value63) => {
+        value62['bind'](() => {
+          (run6('providerRoute-' + value63), run28(value63));
         });
       }),
-      RUNNINGHUB_SETTINGS_PROVIDER_IDS['forEach']((_0xe5da99) => {
-        _0x405945(_0x50ad60['getElementById']('providerKey-' + _0xe5da99 + '-model'), _0xe5da99);
+      RUNNINGHUB_SETTINGS_PROVIDER_IDS['forEach']((value64) => {
+        handler(documentObject2['getElementById']('providerKey-' + value64 + '-model'), value64);
       }));
   }
-  async function _0xc31df5(_0x2eb8c8, _0x51ea29 = {}) {
-    if (typeof _0x4d862d !== 'function') {
-      _0xd96ce0['showToast']?.(trApiInput('diagnostics.testUnsupported'), 'error');
+  async function run29(el19, value65 = {}) {
+    if (typeof testConnections !== 'function') {
+      el4['showToast']?.(trApiInput('diagnostics.testUnsupported'), 'error');
       return;
     }
-    const _0x86405d = await _0x3acf88?.['persist']();
-    if (!_0x86405d) return;
-    const _0x380514 = String(_0x51ea29?.['providerId'] || '')
+    const enabled5 = await apiConfigAutoSaveController?.['persist']();
+    if (!enabled5) return;
+    const value66 = String(value65?.['providerId'] || '')
         ['trim']()
         ['toLowerCase'](),
-      _0x215882 =
-        _0x380514 === 'comfyui' ? normalizeComfyUiConnectionTarget(_0x51ea29?.['comfyUiTarget']) : '',
-      _0x3f7b3b = _0x380514 ? [_0x380514] : _0x412cb9(_0x86405d);
-    _0x380514 ? _0xf29880(_0x380514, _0x215882) : _0x3a4348();
-    const _0x2d2aa0 = _0x215882 ? isComfyUiEndpointConfigured(_0x86405d, _0x215882) : !![];
-    if (_0x380514 && (!_0x53cee2(_0x86405d, _0x380514) || !_0x2d2aa0)) {
-      (_0x59a2fe(_0x86405d, _0x380514),
-        _0xd96ce0['showToast']?.(
-          trApiInput(_0x380514 === 'comfyui' ? 'diagnostics.fillProviderUrl' : 'diagnostics.fillProviderKey'),
+      target3 = value66 === 'comfyui' ? normalizeComfyUiConnectionTarget(value65?.['comfyUiTarget']) : '',
+      list = value66 ? [value66] : run9(enabled5);
+    value66 ? run15(value66, target3) : run26();
+    const enabled6 = target3 ? isComfyUiEndpointConfigured(enabled5, target3) : !![];
+    if (value66 && (!run12(enabled5, value66) || !enabled6)) {
+      (run18(enabled5, value66),
+        el4['showToast']?.(
+          trApiInput(value66 === 'comfyui' ? 'diagnostics.fillProviderUrl' : 'diagnostics.fillProviderKey'),
           'warn',
         ));
       return;
     }
-    if (_0x3f7b3b['length'] === 0x0) {
-      (_0xadece6(_0x86405d),
-        _0x369069(_0x86405d),
-        _0xd96ce0['showToast']?.(trApiInput('diagnostics.fillOneProviderKey'), 'warn'));
+    if (list['length'] === 0x0) {
+      (run19(enabled5),
+        syncModelServiceReadinessSummary(enabled5),
+        el4['showToast']?.(trApiInput('diagnostics.fillOneProviderKey'), 'warn'));
       return;
     }
-    _0x3f7b3b['forEach']((_0x20ef71) =>
-      _0x5110c3(
-        _0x20ef71,
-        'testing',
-        trApiInput('diagnostics.testing'),
-        '',
-        _0x20ef71 === 'comfyui' ? _0x215882 : '',
-      ),
+    list['forEach']((value67) =>
+      run17(value67, 'testing', trApiInput('diagnostics.testing'), '', value67 === 'comfyui' ? target3 : ''),
     );
-    const _0x7dc6f4 = _0x2eb8c8?.['querySelector']?.('.settings-btn-label'),
-      _0x44503c = _0x7dc6f4?.['textContent'] || _0x2eb8c8?.['textContent'] || trApiInput('testConnection');
-    if (_0x2eb8c8) {
-      _0x2eb8c8['disabled'] = !![];
-      if (_0x7dc6f4) _0x7dc6f4['textContent'] = trApiInput('diagnostics.testingBusy');
-      else _0x2eb8c8['textContent'] = trApiInput('diagnostics.testingBusy');
+    const el20 = el19?.['querySelector']?.('.settings-btn-label'),
+      value68 = el20?.['textContent'] || el19?.['textContent'] || trApiInput('testConnection');
+    if (el19) {
+      el19['disabled'] = !![];
+      if (el20) el20['textContent'] = trApiInput('diagnostics.testingBusy');
+      else el19['textContent'] = trApiInput('diagnostics.testingBusy');
     }
-    const _0x20a3b8 = {},
-      _0x55fd20 = [],
-      _0x44daa6 = [];
-    let _0x52d464 = [];
-    const _0x43e1d8 = new Map();
+    const providerResults = {},
+      list2 = [],
+      list3 = [];
+    let list4 = [];
+    const map3 = new Map();
     try {
       await Promise['all'](
-        _0x3f7b3b['map'](async (_0x1fe536) => {
+        list['map'](async (label) => {
           try {
-            const _0x27fcfe = await _0x4d862d(
-              _0x86405d,
-              [_0x1fe536],
-              _0x1fe536 === 'comfyui' && _0x215882 ? { target: _0x215882 } : {},
+            const value69 = await testConnections(
+              enabled5,
+              [label],
+              label === 'comfyui' && target3 ? { target: target3 } : {},
             );
-            _0x20a3b8[_0x1fe536] = _0x27fcfe?.[_0x1fe536];
-          } catch (_0x354258) {
-            _0x20a3b8[_0x1fe536] = {
+            providerResults[label] = value69?.[label];
+          } catch (error) {
+            providerResults[label] = {
               ok: ![],
-              label: _0x1fe536,
-              error: _0x354258?.['message'] || trApiInput('diagnostics.testFailed'),
+              label: label,
+              error: error?.['message'] || trApiInput('diagnostics.testFailed'),
             };
           }
-          const _0x1315d5 = _0x20a3b8[_0x1fe536];
-          _0x181cf5(_0x1fe536, _0x1315d5?.['balance']);
-          const _0x1acb09 = _0x12efdb(_0x1fe536, _0x1315d5?.['balance']);
-          if (_0x1acb09) _0x43e1d8['set'](_0x1fe536, _0x1acb09);
-          (shouldPersistProviderConnectionResult(_0x1fe536, _0x1315d5) && _0x44daa6['push'](_0x1fe536),
-            !_0x1315d5?.['ok'] &&
-              _0x55fd20['push']({
-                id: _0x1fe536,
-                label: _0x1315d5?.['label'] || _0x1fe536,
+          const label2 = providerResults[label];
+          run20(label, label2?.['balance']);
+          const value70 = run22(label, label2?.['balance']);
+          if (value70) map3['set'](label, value70);
+          (shouldPersistProviderConnectionResult(label, label2) && list3['push'](label),
+            !label2?.['ok'] &&
+              list2['push']({
+                id: label,
+                label: label2?.['label'] || label,
                 error:
-                  _0x1315d5?.['suggestion'] ||
-                  _0x1315d5?.['summary'] ||
-                  _0x1315d5?.['error'] ||
+                  label2?.['suggestion'] ||
+                  label2?.['summary'] ||
+                  label2?.['error'] ||
                   trApiInput('diagnostics.testNotPassed'),
               }));
         }),
       );
-      if (_0x44daa6['length'] > 0x0) {
-        const _0x38834b = _0x167079(typeof _0x1eaf0d === 'function' ? _0x1eaf0d() : _0x4fcbd4),
-          _0x48b1db = mergeCurrentProviderConnectionResults(_0x38834b, _0x86405d, _0x44daa6, _0x43e1d8, {
-            connectionCapabilities: _0x215882 ? { comfyui: _0x215882 } : {},
-            providerResults: _0x20a3b8,
-          });
-        ((_0x52d464 = _0x48b1db['staleProviderIds']),
-          _0x52d464['forEach']((_0x22f097) => {
-            (_0x401c30(_0x22f097), _0x59a2fe(_0x48b1db['config'], _0x22f097));
+      if (list3['length'] > 0x0) {
+        const value71 = collectConfig(
+            typeof getConfigSnapshot === 'function' ? getConfigSnapshot() : options,
+          ),
+          currentProviderConnectionResults = mergeCurrentProviderConnectionResults(
+            value71,
+            enabled5,
+            list3,
+            map3,
+            {
+              connectionCapabilities: target3 ? { comfyui: target3 } : {},
+              providerResults: providerResults,
+            },
+          );
+        ((list4 = currentProviderConnectionResults['staleProviderIds']),
+          list4['forEach']((value72) => {
+            (run16(value72), run18(currentProviderConnectionResults['config'], value72));
           }));
         try {
-          _0x48b1db['appliedProviderIds']['length'] > 0x0 &&
-            (await _0x147283(_0x48b1db['config']),
-            _0x2b288c(_0x48b1db['config']),
-            _0x369069(_0x48b1db['config']),
-            _0x48dc00?.());
-        } catch (_0x5bc901) {
-          console['warn']('[API\x20Config]\x20provider\x20diagnostics\x20save\x20failed:', _0x5bc901);
-          const _0x58c7a0 = _0x167079(typeof _0x1eaf0d === 'function' ? _0x1eaf0d() : _0x4fcbd4);
-          (_0x3f7b3b['forEach']((_0x383e3d) => {
-            (_0x401c30(_0x383e3d), _0x59a2fe(_0x58c7a0, _0x383e3d));
+          currentProviderConnectionResults['appliedProviderIds']['length'] > 0x0 &&
+            (await saveConfig(currentProviderConnectionResults['config']),
+            onConfigSnapshotChange(currentProviderConnectionResults['config']),
+            syncModelServiceReadinessSummary(currentProviderConnectionResults['config']),
+            refreshManifestModelNodeUis?.());
+        } catch (error2) {
+          console['warn']('[API\x20Config]\x20provider\x20diagnostics\x20save\x20failed:', error2);
+          const value73 = collectConfig(
+            typeof getConfigSnapshot === 'function' ? getConfigSnapshot() : options,
+          );
+          (list['forEach']((value74) => {
+            (run16(value74), run18(value73, value74));
           }),
-            _0x369069(_0x58c7a0),
-            _0xd96ce0['showToast']?.(
+            syncModelServiceReadinessSummary(value73),
+            el4['showToast']?.(
               trApiInput('diagnostics.saveFailed', {
-                error: _0x5bc901?.['message'] || trApiInput('diagnostics.unknownError'),
+                error: error2?.['message'] || trApiInput('diagnostics.unknownError'),
               }),
               'error',
             ));
           return;
         }
       }
-      _0x3f7b3b['filter']((_0x86b782) => !_0x52d464['includes'](_0x86b782))['forEach']((_0x53962b) => {
-        const _0xef6ce5 = _0x20a3b8[_0x53962b];
-        _0x5110c3(
-          _0x53962b,
-          _0xef6ce5?.['ok'] ? 'success' : _0x179df1(_0xef6ce5),
-          _0xef6ce5?.['ok'] ? trApiInput('diagnostics.passed') : _0x1c4b51(_0xef6ce5),
-          _0x5baee7(_0xef6ce5) ||
-            (_0xef6ce5?.['ok']
+      list['filter']((value75) => !list4['includes'](value75))['forEach']((value76) => {
+        const response4 = providerResults[value76];
+        run17(
+          value76,
+          response4?.['ok'] ? 'success' : run24(response4),
+          response4?.['ok'] ? trApiInput('diagnostics.passed') : run25(response4),
+          run23(response4) ||
+            (response4?.['ok']
               ? trApiInput('diagnostics.testPassed')
-              : _0xef6ce5?.['error'] || trApiInput('diagnostics.testNotPassed')),
-          _0x53962b === 'comfyui' ? _0x215882 : '',
+              : response4?.['error'] || trApiInput('diagnostics.testNotPassed')),
+          value76 === 'comfyui' ? target3 : '',
         );
       });
-      const _0x547316 = _0x55fd20['filter'](({ id: _0x220d8f }) => !_0x52d464['includes'](_0x220d8f));
-      if (_0x547316['length'] === 0x0 && _0x52d464['length'] === 0x0) {
-        const _0x2112e9 = _0x20a3b8[_0x3f7b3b[0x0]],
-          _0x41ce0e = _0x380514
-            ? trApiInput('diagnostics.providerPassed', { label: _0x2112e9?.['label'] || _0x380514 })
+      const list5 = list2['filter'](({ id: id2 }) => !list4['includes'](id2));
+      if (list5['length'] === 0x0 && list4['length'] === 0x0) {
+        const label3 = providerResults[list[0x0]],
+          value77 = value66
+            ? trApiInput('diagnostics.providerPassed', { label: label3?.['label'] || value66 })
             : trApiInput('diagnostics.allPassed');
-        _0xd96ce0['showToast']?.(_0x41ce0e, 'success');
+        el4['showToast']?.(value77, 'success');
       } else {
-        if (_0x547316['length'] > 0x0) {
-          const _0x8d22cc = _0x547316[0x0];
-          _0xd96ce0['showToast']?.(
+        if (list5['length'] > 0x0) {
+          const label4 = list5[0x0];
+          el4['showToast']?.(
             trApiInput('diagnostics.providerFailed', {
-              label: _0x8d22cc['label'],
-              error: _0x8d22cc['error'],
+              label: label4['label'],
+              error: label4['error'],
             }),
             'error',
             0x2328,
           );
         }
       }
-    } catch (_0x3b9c07) {
-      (_0x3f7b3b['forEach']((_0x173204) =>
-        _0x5110c3(
-          _0x173204,
+    } catch (error3) {
+      (list['forEach']((value78) =>
+        run17(
+          value78,
           'danger',
           trApiInput('diagnostics.notPassed'),
-          _0x3b9c07?.['message'] || trApiInput('diagnostics.testFailed'),
-          _0x173204 === 'comfyui' ? _0x215882 : '',
+          error3?.['message'] || trApiInput('diagnostics.testFailed'),
+          value78 === 'comfyui' ? target3 : '',
         ),
       ),
-        _0xd96ce0['showToast']?.(
+        el4['showToast']?.(
           trApiInput('diagnostics.testFailedWithDetail', {
-            error: _0x3b9c07?.['message'] || trApiInput('diagnostics.unknownError'),
+            error: error3?.['message'] || trApiInput('diagnostics.unknownError'),
           }),
           'error',
         ));
     } finally {
-      if (_0x2eb8c8) {
-        _0x2eb8c8['disabled'] = ![];
-        if (_0x7dc6f4) _0x7dc6f4['textContent'] = _0x44503c;
-        else _0x2eb8c8['textContent'] = _0x44503c;
+      if (el19) {
+        el19['disabled'] = ![];
+        if (el20) el20['textContent'] = value68;
+        else el19['textContent'] = value68;
       }
     }
   }
-  function _0x4a60d8() {
-    const _0x17b388 = _0x50ad60['getElementById']('btnApiSave'),
-      _0x5e7ed7 = createApiConfigSavePresentation();
-    (_0x3fbc29['syncDevVisibility'](),
-      (_0x3acf88 = createApiConfigAutoSaveController({
-        beforePersist: () => _0x3ad40e,
-        collectConfig: _0x167079,
-        saveConfig: _0x147283,
-        onStateChange: _0x5e7ed7['update'],
-        onSaved: (_0x4707f7, { showSuccess: showSuccess = ![] } = {}) => {
-          (_0x2b288c(_0x4707f7), _0xadece6(_0x4707f7), _0x369069(_0x4707f7), _0x48dc00?.());
-          if (showSuccess) _0xd96ce0['showToast']?.(trApiInput('diagnostics.saveSuccess'));
+  function init() {
+    const el21 = documentObject2['getElementById']('btnApiSave'),
+      onStateChange = createApiConfigSavePresentation();
+    (dreaminaLoginSessionController['syncDevVisibility'](),
+      (apiConfigAutoSaveController = createApiConfigAutoSaveController({
+        beforePersist: () => target,
+        collectConfig: collectConfig,
+        saveConfig: saveConfig,
+        onStateChange: onStateChange['update'],
+        onSaved: (value79, { showSuccess: showSuccess = ![] } = {}) => {
+          (onConfigSnapshotChange(value79),
+            run19(value79),
+            syncModelServiceReadinessSummary(value79),
+            refreshManifestModelNodeUis?.());
+          if (showSuccess) el4['showToast']?.(trApiInput('diagnostics.saveSuccess'));
         },
-        onError: (_0x42194f) =>
-          _0xd96ce0['showToast']?.(
+        onError: (error4) =>
+          el4['showToast']?.(
             trApiInput('diagnostics.saveFailed', {
-              error: _0x42194f?.['message'] || trApiInput('diagnostics.unknownError'),
+              error: error4?.['message'] || trApiInput('diagnostics.unknownError'),
             }),
             'error',
           ),
       })),
-      hardenApiCredentialInputs(_0x50ad60),
-      _0x287e45?.['destroy']?.(),
-      (_0x287e45 = createRunningHubDefaultSiteSettings({
-        root: _0x50ad60,
+      hardenApiCredentialInputs(documentObject2),
+      runningHubDefaultSiteSettings?.['destroy']?.(),
+      (runningHubDefaultSiteSettings = createRunningHubDefaultSiteSettings({
+        root: documentObject2,
         onSelectionChange: () => {
-          (_0x4b4d05('runninghub-default-site'), _0x3acf88?.['persist']()['catch'](() => {}));
+          (run6('runninghub-default-site'), apiConfigAutoSaveController?.['persist']()['catch'](() => {}));
         },
       })),
-      _0x287e45['bind'](),
+      runningHubDefaultSiteSettings['bind'](),
       bindModelCatalogProviderCardVisibility({
-        store: _0x4549e7,
-        card: _0x50ad60['querySelector']('[data-subscription-provider-card=\x22binghuo\x22]'),
+        store: store,
+        card: documentObject2['querySelector']('[data-subscription-provider-card=\x22binghuo\x22]'),
         providerId: 'binghuo',
       }),
-      (_0x3ad40e = Promise['resolve']()
-        ['then'](() => _0xa6e333())
-        ['then']((_0x201a29) => {
-          if (!_0x201a29 || _0x201a29['error']) return;
-          (_0x2b288c(_0x201a29 || {}), _0x287e45?.['loadConfig'](_0x4fcbd4));
-          const _0x84ebce = _0x201a29['providers'] || {};
-          API_PROVIDER_IDS['forEach']((_0x3b07ee) => {
-            const _0x168856 = _0x50ad60['getElementById']('providerUrl-' + _0x3b07ee),
-              _0x5ba595 = _0x50ad60['getElementById']('providerKey-' + _0x3b07ee),
-              _0xb59fa3 = _0x84ebce[_0x3b07ee] || {};
-            if (_0x5ba888(_0x168856) && _0xb59fa3['apiUrl']) _0x168856['value'] = _0xb59fa3['apiUrl'];
-            _0x3b07ee === 'comfyui' &&
-              _0x5ba888(_0x168856) &&
-              !_0xb59fa3['apiUrl'] &&
-              (_0x168856['value'] = COMFYUI_LOCAL_DEFAULT_URL);
-            if (_0x5ba888(_0x5ba595) && _0xb59fa3['apiKey']) _0x5ba595['value'] = _0xb59fa3['apiKey'];
+      (target = Promise['resolve']()
+        ['then'](() => fetchConfig())
+        ['then']((enabled7) => {
+          if (!enabled7 || enabled7['error']) return;
+          (onConfigSnapshotChange(enabled7 || {}), runningHubDefaultSiteSettings?.['loadConfig'](options));
+          const enabled8 = enabled7['providers'] || {};
+          API_PROVIDER_IDS['forEach']((value80) => {
+            const el22 = documentObject2['getElementById']('providerUrl-' + value80),
+              el23 = documentObject2['getElementById']('providerKey-' + value80),
+              enabled9 = enabled8[value80] || {};
+            if (run7(el22) && enabled9['apiUrl']) el22['value'] = enabled9['apiUrl'];
+            value80 === 'comfyui' &&
+              run7(el22) &&
+              !enabled9['apiUrl'] &&
+              (el22['value'] = COMFYUI_LOCAL_DEFAULT_URL);
+            if (run7(el23) && enabled9['apiKey']) el23['value'] = enabled9['apiKey'];
           });
-          const _0x59b134 = _0x50ad60['getElementById']('providerUrl-comfyui-cloud');
-          _0x5ba888(_0x59b134) && (_0x59b134['value'] = _0x84ebce['comfyui']?.['cloudApiUrl'] || '');
-          (_0x1b412d['forEach']((_0xa85ba9, _0x1c81db) => {
-            !_0x5ef025['has']('providerRoute-' + _0x1c81db) &&
-              _0xa85ba9['hydrate'](_0x84ebce[_0x1c81db] || {});
+          const el24 = documentObject2['getElementById']('providerUrl-comfyui-cloud');
+          run7(el24) && (el24['value'] = enabled8['comfyui']?.['cloudApiUrl'] || '');
+          (map2['forEach']((value81, value82) => {
+            !map['has']('providerRoute-' + value82) && value81['hydrate'](enabled8[value82] || {});
           }),
-            RUNNINGHUB_SETTINGS_PROVIDER_IDS['forEach']((_0x158f5e) => {
-              const _0x540bc8 = _0x50ad60['getElementById']('providerKey-' + _0x158f5e + '-model');
-              _0x5ba888(_0x540bc8) &&
-                _0x84ebce[_0x158f5e]?.['modelApiKey'] &&
-                (_0x540bc8['value'] = _0x84ebce[_0x158f5e]['modelApiKey']);
+            RUNNINGHUB_SETTINGS_PROVIDER_IDS['forEach']((value83) => {
+              const el25 = documentObject2['getElementById']('providerKey-' + value83 + '-model');
+              run7(el25) &&
+                enabled8[value83]?.['modelApiKey'] &&
+                (el25['value'] = enabled8[value83]['modelApiKey']);
             }));
-          if (!_0x84ebce['grsai']?.['apiKey'] && _0x201a29['apiKey']) {
-            const _0x72255a = _0x50ad60['getElementById']('providerKey-grsai');
-            if (_0x5ba888(_0x72255a) && !_0x72255a['value']) _0x72255a['value'] = _0x201a29['apiKey'];
+          if (!enabled8['grsai']?.['apiKey'] && enabled7['apiKey']) {
+            const el26 = documentObject2['getElementById']('providerKey-grsai');
+            if (run7(el26) && !el26['value']) el26['value'] = enabled7['apiKey'];
           }
-          (_0x2f9d13(_0x4fcbd4),
-            PROVIDER_MODEL_CATALOG_PROVIDER_IDS['forEach']((_0x6f31a2) => _0x5a7c9e(_0x6f31a2)),
-            _0x1bab9a['syncEditorCredentials'](_0x84ebce),
-            _0x1bab9a['syncDefaults'](_0x84ebce),
-            _0x5ef025['size'] && _0x2b288c(_0x167079(_0x201a29)),
-            _0xadece6(_0x4fcbd4),
-            _0x369069(_0x4fcbd4),
-            _0x48dc00?.());
+          (run(options),
+            PROVIDER_MODEL_CATALOG_PROVIDER_IDS['forEach']((value84) => run2(value84)),
+            customProviderOnboardingController['syncEditorCredentials'](enabled8),
+            customProviderOnboardingController['syncDefaults'](enabled8),
+            map['size'] && onConfigSnapshotChange(collectConfig(enabled7)),
+            run19(options),
+            syncModelServiceReadinessSummary(options),
+            refreshManifestModelNodeUis?.());
         })
-        ['catch']((_0x310f22) => {
-          (console['error']('[API Config] 加载失败:', _0x310f22),
-            _0xadece6({}),
-            _0x369069({}),
-            _0x3ba721?.(
+        ['catch']((error5) => {
+          (console['error']('[API Config] 加载失败:', error5),
+            run19({}),
+            syncModelServiceReadinessSummary({}),
+            showError?.(
               trApiInput('diagnostics.loadFailed', {
-                error: _0x310f22['message'] || trApiInput('diagnostics.unknownError'),
+                error: error5['message'] || trApiInput('diagnostics.unknownError'),
               }),
             ));
         })
         ['finally'](() => {
-          _0x3fbc29['syncDevVisibility']() &&
-            _0x3fbc29['refreshStatus']({ force: !![], silent: !![] })['catch'](() => {});
+          dreaminaLoginSessionController['syncDevVisibility']() &&
+            dreaminaLoginSessionController['refreshStatus']({ force: !![], silent: !![] })['catch'](() => {});
         })),
-      _0x17b388 &&
-        _0x17b388['addEventListener']('click', () => {
-          _0x3acf88['persist']({ showSuccess: !![] })['then']((_0xf969d3) => {
-            if (!_0xf969d3) return;
-            _0x3fbc29['refreshStatus']({ force: !![], silent: !![] })['catch'](() => {});
+      el21 &&
+        el21['addEventListener']('click', () => {
+          apiConfigAutoSaveController['persist']({ showSuccess: !![] })['then']((enabled10) => {
+            if (!enabled10) return;
+            dreaminaLoginSessionController['refreshStatus']({ force: !![], silent: !![] })['catch'](() => {});
           });
         }),
-      _0xd96ce0['addEventListener']('settings-panel-closed', () => {
-        _0x3acf88?.['flush']()['catch'](() => {});
+      el4['addEventListener']('settings-panel-closed', () => {
+        apiConfigAutoSaveController?.['flush']()['catch'](() => {});
       }),
-      _0x50ad60['querySelectorAll']('[data-provider-test]')['forEach']((_0x37afc0) => {
-        const _0x2592a4 = String(_0x37afc0['dataset']['providerTest'] || '')['trim']();
-        if (!_0x2592a4) return;
-        _0x37afc0['addEventListener']('click', () => {
-          _0xc31df5(_0x37afc0, {
-            providerId: _0x2592a4,
-            comfyUiTarget: _0x37afc0['dataset']['comfyuiTestTarget'],
+      documentObject2['querySelectorAll']('[data-provider-test]')['forEach']((comfyUiTarget) => {
+        const providerId3 = String(comfyUiTarget['dataset']['providerTest'] || '')['trim']();
+        if (!providerId3) return;
+        comfyUiTarget['addEventListener']('click', () => {
+          run29(comfyUiTarget, {
+            providerId: providerId3,
+            comfyUiTarget: comfyUiTarget['dataset']['comfyuiTestTarget'],
           })['catch'](() => {});
         });
       }),
-      _0x50ad60['querySelectorAll']('[data-provider-models]')['forEach']((_0x3e1a2b) => {
-        const _0x1d6f0e = String(_0x3e1a2b['dataset']['providerModels'] || '')['trim']();
-        if (!_0x1d6f0e) return;
-        _0x3e1a2b['addEventListener']('click', () => {
-          _0x1e5a76(_0x1d6f0e, _0x3e1a2b)['catch'](() => {});
+      documentObject2['querySelectorAll']('[data-provider-models]')['forEach']((el27) => {
+        const enabled11 = String(el27['dataset']['providerModels'] || '')['trim']();
+        if (!enabled11) return;
+        el27['addEventListener']('click', () => {
+          run4(enabled11, el27)['catch'](() => {});
         });
       }),
-      (_0x50ad60['getElementById']('pane-api-input') || _0x50ad60)['addEventListener'](
+      (documentObject2['getElementById']('pane-api-input') || documentObject2)['addEventListener'](
         'click',
-        (_0x4bb3c2) => {
-          const _0x2ab1d2 = _0x4bb3c2?.['target']?.['closest']?.('[data-provider-model-save]');
-          if (!_0x2ab1d2) return;
-          _0x4bb3c2['preventDefault']?.();
-          _0x4b8e2c(String(_0x2ab1d2['dataset']['providerModelSave'] || '')['trim']())['catch'](() => {});
+        (event) => {
+          const el28 = event?.['target']?.['closest']?.('[data-provider-model-save]');
+          if (!el28) return;
+          event['preventDefault']?.();
+          run5(String(el28['dataset']['providerModelSave'] || '')['trim']())['catch'](() => {});
         },
       ),
-      _0x1ba785(),
-      bindProviderApiKeyGuideTriggers(_0x50ad60),
-      bindVolcengineSpeechApiKeyGuideTriggers(_0x50ad60),
-      bindRunningHubApiKeyGuideTriggers(_0x50ad60),
-      _0x1bab9a['init'](),
-      _0x3fbc29['init']());
+      run27(),
+      bindProviderApiKeyGuideTriggers(documentObject2),
+      bindVolcengineSpeechApiKeyGuideTriggers(documentObject2),
+      bindRunningHubApiKeyGuideTriggers(documentObject2),
+      customProviderOnboardingController['init'](),
+      dreaminaLoginSessionController['init']());
   }
   return {
     destroy() {
-      (_0x3fbc29['destroy'](), _0x287e45?.['destroy']?.());
+      (dreaminaLoginSessionController['destroy'](), runningHubDefaultSiteSettings?.['destroy']?.());
     },
-    init: _0x4a60d8,
-    syncModelServiceReadinessSummary: _0x369069,
+    init: init,
+    syncModelServiceReadinessSummary: syncModelServiceReadinessSummary,
   };
 }

@@ -39,12 +39,12 @@ const PERMANENT_ERRORS = new Set([
   'ROOM_STORAGE_FULL',
 ]);
 export function createCollaborationSession({
-  store: _0x1be6b2,
-  api: _0x4d7a9d,
-  room: _0x21fa45,
-  actorId: _0x4b82f3,
-  clientId: _0xe6810,
-  getCanvasId: _0x1851b3,
+  store: store,
+  api: api,
+  room: room,
+  actorId: actorId,
+  clientId: clientId,
+  getCanvasId: getCanvasId,
   hosting: hosting = ![],
   onChange: onChange = () => {},
   onPresence: onPresence = () => {},
@@ -55,984 +55,941 @@ export function createCollaborationSession({
   onComment: onComment = () => {},
   mediaOptions: mediaOptions = {},
   journal: journal = createCollaborationJournal({
-    roomId: _0x21fa45['roomId'],
-    actorId: _0x4b82f3,
-    clientId: _0xe6810,
+    roomId: room['roomId'],
+    actorId: actorId,
+    clientId: clientId,
   }),
 }) {
-  const _0x110093 = _0x1851b3(),
-    _0xd4433b = new AbortController(),
-    _0x1e251e = {
-      ..._0x21fa45,
-      actorId: _0x4b82f3,
-      clientId: _0xe6810,
+  const value = getCanvasId(),
+    signal = new AbortController(),
+    revision = {
+      ...room,
+      actorId: actorId,
+      clientId: clientId,
       status: 'connecting',
       message: '正在同步画布',
       pending: ![],
     };
-  let _0x82a4dc = cloneGraph(_0x21fa45['document']),
-    _0x3c6d8d = null,
-    _0xe7ef3b = null,
-    _0x55e51f = null,
-    _0x33cdc9 = null,
-    _0x2d37b7 = ![],
-    _0x40ebd4 = null,
-    _0x232bfb = ![];
-  const _0x77184 = new Set();
-  let _0x219031 = ![],
-    _0x2322b3 = ![],
-    _0x254d76 = -0x1,
-    _0x528df0 = null,
-    _0x5a0f09 = null,
-    _0x3520bd = null,
-    _0x35e5d1 = 0x0,
-    _0x42206c = 0x0,
-    _0x502216 = '',
-    _0xf72e2d = Promise['resolve']();
-  const _0x286e6e = new WeakSet();
-  let _0x5c948f = ![],
-    _0x572870 = _0x21fa45['attention']?.['id'],
-    _0x3923a4 = () => {},
-    _0x13f860 = () => {},
-    _0x540798 = { selected: [] };
-  const _0x2149a4 = [],
-    _0xf316ee = [],
-    _0x5cf612 = new Map(),
-    _0xd197a6 = new Set(),
-    _0x6b7c55 = createCollaborationConflicts(),
-    _0x17ec17 = () =>
-      _0xd197a6['size'] > 0x0 ||
-      [..._0x5cf612]['some'](([_0x44f1cc, _0x139c56]) => {
-        const _0x2fe860 = _0x1be6b2['getStateRaw']()['nodes'][_0x44f1cc];
-        return !_0x139c56['released'] || _0x2fe860?.['isGenerating'] || _0x2fe860?.['isLoading'];
+  let before2 = cloneGraph(room['document']),
+    base = null,
+    packet = null,
+    enabled = null,
+    setTimeout2 = null,
+    enabled2 = ![],
+    item = null,
+    enabled3 = ![];
+  const map = new Set();
+  let pending = ![],
+    enabled4 = ![],
+    key = -0x1,
+    value2 = null,
+    setTimeout3 = null,
+    setTimeout4 = null,
+    index = 0x0,
+    result = 0x0,
+    data = '',
+    options = Promise['resolve']();
+  const map2 = new WeakSet();
+  let enabled5 = ![],
+    target = room['attention']?.['id'],
+    handler = () => {},
+    handler2 = () => {},
+    presence = { selected: [] };
+  const undoCount = [],
+    redoCount = [],
+    executing = new Map(),
+    map3 = new Set(),
+    conflicts = createCollaborationConflicts(),
+    handler3 = () =>
+      map3['size'] > 0x0 ||
+      [...executing]['some'](([source, enabled6]) => {
+        const next = store['getStateRaw']()['nodes'][source];
+        return !enabled6['released'] || next?.['isGenerating'] || next?.['isLoading'];
       }),
-    _0xc83269 = () => {
-      ((_0x1e251e['conflicts'] = _0x6b7c55['list']()),
-        (_0x1e251e['mediaNodes'] = _0x337259['states'](_0x1be6b2['getStateRaw']())));
-      for (const _0x18d202 of _0x77184)
-        if (!_0x1e251e['mediaNodes']['some']((_0x20b0df) => _0x20b0df['id'] === _0x18d202))
-          _0x1e251e['mediaNodes']['push']({ id: _0x18d202, owned: !![] });
-      if (!_0x2d37b7)
+    handler4 = () => {
+      ((revision['conflicts'] = conflicts['list']()),
+        (revision['mediaNodes'] = media['states'](store['getStateRaw']())));
+      for (const id of map)
+        if (!revision['mediaNodes']['some']((current) => current['id'] === id))
+          revision['mediaNodes']['push']({ id: id, owned: !![] });
+      if (!enabled2)
         onChange({
-          ..._0x1e251e,
-          pending: _0x219031 || _0x232bfb || !!_0xe7ef3b || _0xd197a6['size'] > 0x0,
-          executing: _0x5cf612['size'] > 0x0 || _0xd197a6['size'] > 0x0,
+          ...revision,
+          pending: pending || enabled3 || !!packet || map3['size'] > 0x0,
+          executing: executing['size'] > 0x0 || map3['size'] > 0x0,
         });
     },
-    _0x3fbf5a = (_0x5deed7) =>
-      _0x4d7a9d['rpc'](
-        { ..._0x5deed7, roomId: _0x21fa45['roomId'], clientId: _0xe6810 },
-        _0xd4433b['signal'],
-      ),
-    _0x1ab936 = { roomId: _0x21fa45['roomId'], clientId: _0xe6810 },
-    _0x337259 = createCollaborationMediaQueue({
+    rpc = (args) => api['rpc']({ ...args, roomId: room['roomId'], clientId: clientId }, signal['signal']),
+    args2 = { roomId: room['roomId'], clientId: clientId },
+    media = createCollaborationMediaQueue({
       uploadMedia:
-        _0x4d7a9d['uploadMedia'] &&
-        ((_0x185cea, _0x5a54ec) =>
-          _0x4d7a9d['uploadMedia'](_0x185cea, _0x1ab936, _0xd4433b['signal'], _0x5a54ec)),
-      imagePreviews: _0x4d7a9d['imagePreviews'],
+        api['uploadMedia'] && ((entry, record) => api['uploadMedia'](entry, args2, signal['signal'], record)),
+      imagePreviews: api['imagePreviews'],
       registerMedia:
-        _0x4d7a9d['registerMedia'] &&
-        ((_0x43a7fd) => _0x4d7a9d['registerMedia'](_0x43a7fd, _0x1ab936, _0xd4433b['signal'])),
-      bindMedia:
-        _0x4d7a9d['bindMedia'] &&
-        ((_0x295db9) => _0x4d7a9d['bindMedia'](_0x295db9, _0x1ab936, _0xd4433b['signal'])),
+        api['registerMedia'] && ((payload) => api['registerMedia'](payload, args2, signal['signal'])),
+      bindMedia: api['bindMedia'] && ((handle) => api['bindMedia'](handle, args2, signal['signal'])),
       ...mediaOptions,
-      rpc: _0x3fbf5a,
-      signal: _0xd4433b['signal'],
-      readGraph: () => _0x1be6b2['getStateRaw'](),
+      rpc: rpc,
+      signal: signal['signal'],
+      readGraph: () => store['getStateRaw'](),
       onChange() {
-        if (_0x6def90()) {
-          (_0x42206c++, (_0x232bfb = !![]), _0x1908c7());
-          if (!_0x3520bd)
-            _0x3520bd = setTimeout(() => {
-              _0x3520bd = null;
-              if (_0x6def90()) _0x11bfa9();
+        if (current2()) {
+          (result++, (enabled3 = !![]), run());
+          if (!setTimeout4)
+            setTimeout4 = setTimeout(() => {
+              setTimeout4 = null;
+              if (current2()) run2();
             }, 0x64);
         }
       },
-      onPreview(_0x15b15d, _0x1ab72c, _0x192b0a) {
-        const _0x185321 = _0x1be6b2['getStateRaw']()['nodes'][_0x15b15d];
+      onPreview(state, config, scope) {
+        const enabled7 = store['getStateRaw']()['nodes'][state];
         if (
-          !_0x6def90() ||
-          !_0x185321 ||
-          ['src', 'localPath', 'originalLocalPath']['some'](
-            (_0x4c4640) => _0x185321[_0x4c4640] !== _0x1ab72c[_0x4c4640],
-          )
+          !current2() ||
+          !enabled7 ||
+          ['src', 'localPath', 'originalLocalPath']['some']((input) => enabled7[input] !== config[input])
         )
           return;
-        const _0x4214a6 = Object['fromEntries'](
-          Object['entries'](_0x192b0a)['filter'](
-            ([_0x488c78]) => _0x185321[_0x488c78] === _0x1ab72c[_0x488c78],
-          ),
+        const output = Object['fromEntries'](
+          Object['entries'](scope)['filter'](([value3]) => enabled7[value3] === config[value3]),
         );
-        if (Object['keys'](_0x4214a6)['length'])
-          _0x1be6b2['withGraphMutationBypass'](() => _0x1be6b2['updateNodeData'](_0x15b15d, _0x4214a6));
+        if (Object['keys'](output)['length'])
+          store['withGraphMutationBypass'](() => store['updateNodeData'](state, output));
       },
     }),
-    _0x6def90 = () => !_0x2d37b7 && _0x1851b3() === _0x110093,
-    _0x507fdb = () =>
-      _0x77184['size'] > 0x0 ||
-      _0x337259['states'](_0x1be6b2['getStateRaw']())['some']((_0x50b3f2) => hosting || _0x50b3f2['owned']),
-    _0x24cf08 = () => {
-      if (!_0x6def90()) throw new DOMException('Aborted', 'AbortError');
+    current2 = () => !enabled2 && getCanvasId() === value,
+    handler5 = () =>
+      map['size'] > 0x0 ||
+      media['states'](store['getStateRaw']())['some']((value4) => hosting || value4['owned']),
+    handler6 = () => {
+      if (!current2()) throw new DOMException('Aborted', 'AbortError');
     },
-    _0x885910 = createCollaborationReviewState({
-      rpc: _0x3fbf5a,
-      current: _0x6def90,
-      initialRevision: _0x21fa45['reviewRevision'],
+    review = createCollaborationReviewState({
+      rpc: rpc,
+      current: current2,
+      initialRevision: room['reviewRevision'],
       onComment: onComment,
-      onChange(_0x27f56c) {
-        ((_0x1e251e['review'] = _0x27f56c), _0xc83269());
+      onChange(value5) {
+        ((revision['review'] = value5), handler4());
       },
     }),
-    _0xb81c3 = () => _0x337259['project'](_0x1be6b2['getStateRaw']()),
-    _0xe0fbd6 = (_0x4aa9fd) =>
-      JSON['stringify'](_0x337259['resolveWire'](_0x4aa9fd['before'])) ===
-      JSON['stringify'](_0x4aa9fd['after']),
-    _0x15b0af = (_0x21baa3) => {
-      const _0x1c158b = _0x1e251e['locks']?.[_0x21baa3],
-        _0x4ab896 = _0x1e251e['jobs']?.['find'](
-          (_0x3872d1) => _0x3872d1['node'] === _0x21baa3 && _0x3872d1['status'] === 'running',
+    before3 = () => media['project'](store['getStateRaw']()),
+    handler7 = (value6) =>
+      JSON['stringify'](media['resolveWire'](value6['before'])) === JSON['stringify'](value6['after']),
+    handler8 = (value7) => {
+      const value8 = revision['locks']?.[value7],
+        value9 = revision['jobs']?.['find'](
+          (response) => response['node'] === value7 && response['status'] === 'running',
         );
       return (
-        (_0x1c158b &&
-          _0x1c158b['expiresAt'] * 0x3e8 > Date['now']() &&
-          (_0x1c158b['clientId'] !== _0xe6810 || _0x1c158b['actorId'] !== _0x4b82f3)) ||
-        (_0x4ab896 && (_0x4ab896['client'] !== _0xe6810 || _0x4ab896['actor'] !== _0x4b82f3))
+        (value8 &&
+          value8['expiresAt'] * 0x3e8 > Date['now']() &&
+          (value8['clientId'] !== clientId || value8['actorId'] !== actorId)) ||
+        (value9 && (value9['client'] !== clientId || value9['actor'] !== actorId))
       );
     },
-    _0x57ae78 = createCollaborationEditing({
-      rpc: _0x3fbf5a,
+    timer = createCollaborationEditing({
+      rpc: rpc,
       flush: async () => {
-        if (_0x55e51f) await _0x55e51f;
-        if (_0x219031 || _0x232bfb || _0xe7ef3b) await _0x1b1796();
+        if (enabled) await enabled;
+        if (pending || enabled3 || packet) await run3();
       },
-      current: _0x6def90,
-      canEdit: (_0x7949c2) =>
-        _0x1e251e['presenceStatus'] !== 'offline' &&
-        _0x307881({ name: 'interaction', args: [], nodeIds: _0x7949c2, removedNodeIds: [] }),
-      async update(_0x2b3f06) {
-        (Object['assign'](_0x1e251e, _0x2b3f06),
-          _0x57ae78['refresh'](_0x2b3f06['locks']),
-          onPresence(_0x2b3f06));
-        if (_0x2b3f06['documentRevision'] > _0x1e251e['revision']) await _0x1b1796();
+      current: current2,
+      canEdit: (nodeIds) =>
+        revision['presenceStatus'] !== 'offline' &&
+        run4({ name: 'interaction', args: [], nodeIds: nodeIds, removedNodeIds: [] }),
+      async update(value10) {
+        (Object['assign'](revision, value10), timer['refresh'](value10['locks']), onPresence(value10));
+        if (value10['documentRevision'] > revision['revision']) await run3();
       },
-      notify(_0x13a2e8) {
-        ((_0x1e251e['message'] = _0x13a2e8), onNotice(_0x13a2e8), _0xc83269());
+      notify(value11) {
+        ((revision['message'] = value11), onNotice(value11), handler4());
       },
       onChange() {
-        ((_0x1e251e['editingPending'] = _0x57ae78['pending']()),
-          (_0x540798['editing'] = _0x57ae78['presence']()),
-          _0xa0ec68?.['changed'](),
-          onPresence(_0x1e251e));
+        ((revision['editingPending'] = timer['pending']()),
+          (presence['editing'] = timer['presence']()),
+          value12?.['changed'](),
+          onPresence(revision));
       },
     });
-  function _0x56debe() {
-    (clearTimeout(_0x5a0f09), (_0x5a0f09 = null));
-    if (!_0x3c6d8d || !_0x5c948f || _0x528df0) return Promise['resolve']();
-    const _0x4eadf6 = JSON['stringify']([
-      _0x35e5d1,
-      _0x42206c,
-      _0x1e251e['revision'],
-      _0xe7ef3b?.['operationId'],
-      _0x232bfb,
-      _0x6b7c55['list'](),
+  function run5() {
+    (clearTimeout(setTimeout3), (setTimeout3 = null));
+    if (!base || !enabled5 || value2) return Promise['resolve']();
+    const value13 = JSON['stringify']([
+      index,
+      result,
+      revision['revision'],
+      packet?.['operationId'],
+      enabled3,
+      conflicts['list'](),
     ]);
-    if (_0x4eadf6 === _0x502216) return _0xf72e2d;
-    _0x502216 = _0x4eadf6;
-    if (!_0xe7ef3b && !_0x232bfb && !_0x6b7c55['list']()['length'] && !_0x337259['snapshot']()['length'])
-      return (_0xf72e2d = journal['clear']()['catch'](() => {
-        if (_0x502216 === _0x4eadf6) _0x502216 = '';
+    if (value13 === data) return options;
+    data = value13;
+    if (!packet && !enabled3 && !conflicts['list']()['length'] && !media['snapshot']()['length'])
+      return (options = journal['clear']()['catch'](() => {
+        if (data === value13) data = '';
       }));
-    const _0x589514 = _0xb81c3();
-    return (_0xf72e2d = journal['write']({
-      packet: _0xe7ef3b,
-      base: _0x3c6d8d,
-      draft: _0x589514,
-      media: _0x337259['snapshot'](),
-      conflicts: _0x6b7c55['list']()['map']((_0x57fc02) => ({
-        ..._0x57fc02,
-        before: _0x82a4dc[_0x57fc02['kind']][_0x57fc02['id']] ?? null,
-        after: _0x589514[_0x57fc02['kind']][_0x57fc02['id']] ?? null,
+    const draft = before3();
+    return (options = journal['write']({
+      packet: packet,
+      base: base,
+      draft: draft,
+      media: media['snapshot'](),
+      conflicts: conflicts['list']()['map']((args3) => ({
+        ...args3,
+        before: before2[args3['kind']][args3['id']] ?? null,
+        after: draft[args3['kind']][args3['id']] ?? null,
       })),
     })['catch'](() => {
-      if (_0x502216 === _0x4eadf6) _0x502216 = '';
-      ((_0x1e251e['recoveryError'] = '本机恢复记录写入失败，请保持画布开启直到同步完成'), _0xc83269());
+      if (data === value13) data = '';
+      ((revision['recoveryError'] = '本机恢复记录写入失败，请保持画布开启直到同步完成'), handler4());
     }));
   }
-  function _0x1908c7() {
-    if (!_0x5a0f09)
-      _0x5a0f09 = setTimeout(() => {
-        void _0x56debe();
+  function run() {
+    if (!setTimeout3)
+      setTimeout3 = setTimeout(() => {
+        void run5();
       }, 0x64);
   }
-  const _0xa0ec68 =
-      typeof _0x4d7a9d['presence'] === 'function'
+  const value12 =
+      typeof api['presence'] === 'function'
         ? createCollaborationPresenceChannel({
-            changeDriven: typeof _0x4d7a9d['events'] === 'function',
-            send: (_0x2dd68c) =>
-              _0x4d7a9d['presence']({ ..._0x1ab936, presence: _0x2dd68c }, _0xd4433b['signal']),
-            read: () => _0x540798,
-            signal: _0xd4433b['signal'],
-            onUpdate(_0x338821) {
-              _0x6def90() &&
-                (Object['assign'](_0x1e251e, _0x338821),
-                _0x57ae78['refresh'](_0x338821['locks']),
-                onPresence(_0x338821));
+            changeDriven: typeof api['events'] === 'function',
+            send: (presence2) => api['presence']({ ...args2, presence: presence2 }, signal['signal']),
+            read: () => presence,
+            signal: signal['signal'],
+            onUpdate(value14) {
+              current2() &&
+                (Object['assign'](revision, value14),
+                timer['refresh'](value14['locks']),
+                onPresence(value14));
             },
-            onError(_0xcec3f5) {
-              _0x6def90() &&
-                ((_0x1e251e['presenceStatus'] = 'offline'),
-                (_0x1e251e['latencyMs'] = null),
+            onError(value15) {
+              current2() &&
+                ((revision['presenceStatus'] = 'offline'),
+                (revision['latencyMs'] = null),
                 onPresence({ presenceStatus: 'offline', latencyMs: null }),
-                PERMANENT_ERRORS['has'](_0xcec3f5['code']) && (_0xa0ec68['stop'](), _0x46d3da(_0xcec3f5)));
+                PERMANENT_ERRORS['has'](value15['code']) && (value12['stop'](), run6(value15)));
             },
           })
         : null,
-    _0x2cf4d8 =
-      typeof _0x4d7a9d['events'] === 'function'
+    value16 =
+      typeof api['events'] === 'function'
         ? createCollaborationChangeFeed({
-            read: (_0x27c93d) =>
-              _0x4d7a9d['events']({ ..._0x1ab936, cursor: _0x27c93d }, _0xd4433b['signal']),
-            signal: _0xd4433b['signal'],
-            onChange(_0x236157, _0x1d8935) {
-              if (!_0x6def90()) return;
-              const _0x575194 = { presence: _0x236157['presence'], locks: _0x236157['locks'] };
-              if (Number['isInteger'](_0x236157['reviewRevision']))
-                void _0x885910['refresh'](_0x236157['reviewRevision']);
+            read: (cursor) => api['events']({ ...args2, cursor: cursor }, signal['signal']),
+            signal: signal['signal'],
+            onChange(presence3, value17) {
+              if (!current2()) return;
+              const value18 = { presence: presence3['presence'], locks: presence3['locks'] };
+              if (Number['isInteger'](presence3['reviewRevision']))
+                void review['refresh'](presence3['reviewRevision']);
               if (
-                _0x236157['attention']?.['id'] &&
-                _0x236157['attention']['id'] !== _0x572870 &&
-                _0x236157['attention']['actorId'] !== _0x4b82f3 &&
-                _0x236157['attention']['expiresAt'] * 0x3e8 > Date['now']()
+                presence3['attention']?.['id'] &&
+                presence3['attention']['id'] !== target &&
+                presence3['attention']['actorId'] !== actorId &&
+                presence3['attention']['expiresAt'] * 0x3e8 > Date['now']()
               ) {
-                _0x572870 = _0x236157['attention']['id'];
-                const _0x164efa = readHostAttention();
-                if (_0x164efa) _0x1e251e['locateView'] = _0x236157['attention']['view'];
-                onAttention(_0x164efa);
+                target = presence3['attention']['id'];
+                const hostAttention = readHostAttention();
+                if (hostAttention) revision['locateView'] = presence3['attention']['view'];
+                onAttention(hostAttention);
               }
-              (Object['assign'](_0x1e251e, _0x575194),
-                _0x57ae78['refresh'](_0x575194['locks']),
-                onPresence(_0x575194));
-              if (_0x1d8935) _0x11bfa9();
+              (Object['assign'](revision, value18), timer['refresh'](value18['locks']), onPresence(value18));
+              if (value17) run2();
             },
-            onError(_0x161d0e) {
-              PERMANENT_ERRORS['has'](_0x161d0e['code']) && (_0x2cf4d8['stop'](), _0x46d3da(_0x161d0e));
+            onError(value19) {
+              PERMANENT_ERRORS['has'](value19['code']) && (value16['stop'](), run6(value19));
             },
           })
         : null;
-  let _0xef6d7a = ![];
-  function _0x11bfa9() {
-    _0xef6d7a = !![];
-    if (!_0x55e51f)
+  let enabled8 = ![];
+  function run2() {
+    enabled8 = !![];
+    if (!enabled)
       queueMicrotask(() => {
-        _0x6def90() && _0xef6d7a && ((_0xef6d7a = ![]), void _0x563fc7());
+        current2() && enabled8 && ((enabled8 = ![]), void run7());
       });
   }
-  function _0x46d3da(_0x2c0397) {
-    if (!_0x6def90()) return;
-    ((_0x1e251e['status'] = PERMANENT_ERRORS['has'](_0x2c0397['code']) ? 'blocked' : 'offline'),
-      (_0x1e251e['message'] = _0x2c0397['message'] || '连接中断，正在重连；未同步修改保留在本机'),
-      (_0x1e251e['errorCode'] = _0x2c0397['code'] || 'NETWORK_ERROR'),
-      _0xc83269());
+  function run6(error) {
+    if (!current2()) return;
+    ((revision['status'] = PERMANENT_ERRORS['has'](error['code']) ? 'blocked' : 'offline'),
+      (revision['message'] = error['message'] || '连接中断，正在重连；未同步修改保留在本机'),
+      (revision['errorCode'] = error['code'] || 'NETWORK_ERROR'),
+      handler4());
   }
-  async function _0x29e620(_0x12e617, _0x3c2457 = graphChanges(_0x82a4dc, _0x12e617)) {
-    _0x3c2457 = _0x6b7c55['reconcile'](_0x3c2457, graphChanges(_0x3c6d8d, _0xb81c3()), _0xb81c3());
-    if (!_0x3c2457['length']) return;
-    const _0x56a965 = cloneGraph(_0x1be6b2['getStateRaw']()),
-      _0x23a3f6 = _0xb81c3(),
-      _0x46ed76 = new Set(
-        graphChanges(_0x3c6d8d, _0x23a3f6)['map']((_0xd4d206) => _0xd4d206['kind'] + ':' + _0xd4d206['id']),
+  async function run8(edges, list = graphChanges(before2, edges)) {
+    list = conflicts['reconcile'](list, graphChanges(base, before3()), before3());
+    if (!list['length']) return;
+    const cloneGraph2 = cloneGraph(store['getStateRaw']()),
+      value20 = before3(),
+      after2 = new Set(
+        graphChanges(base, value20)['map']((value21) => value21['kind'] + ':' + value21['id']),
       ),
-      _0x295565 = _0x3c2457['map']((_0x46af16) => ({
-        ..._0x46af16,
-        after: _0x46ed76['has'](_0x46af16['kind'] + ':' + _0x46af16['id'])
+      list2 = list['map']((args4) => ({
+        ...args4,
+        after: after2['has'](args4['kind'] + ':' + args4['id'])
           ? mergeCollaborationFields(
-              _0x46af16['before'],
-              _0x46af16['after'],
-              _0x23a3f6[_0x46af16['kind']][_0x46af16['id']] ?? null,
+              args4['before'],
+              args4['after'],
+              value20[args4['kind']][args4['id']] ?? null,
             )
-          : _0x46af16['after'],
+          : args4['after'],
       })),
-      _0x203399 = await _0x337259['materialize']({
+      state2 = await media['materialize']({
         nodes: Object['fromEntries'](
-          _0x295565['filter']((_0x49bea5) => _0x49bea5['kind'] === 'nodes' && _0x49bea5['after'])['map'](
-            (_0x517f27) => [_0x517f27['id'], _0x517f27['after']],
-          ),
+          list2['filter']((value22) => value22['kind'] === 'nodes' && value22['after'])['map']((value23) => [
+            value23['id'],
+            value23['after'],
+          ]),
         ),
-        edges: _0x12e617['edges'],
+        edges: edges['edges'],
       });
-    _0x24cf08();
-    const _0x63b7ba = graphChanges(_0x337259['project'](_0x56a965), _0xb81c3());
-    _0x3c2457 = _0x6b7c55['reconcile'](_0x3c2457, _0x63b7ba, _0xb81c3());
-    const _0xa0b7f5 = graphChanges(_0x3c6d8d, _0xb81c3()),
-      _0x1a030c = new Set(
-        _0x3c2457['filter']((_0xa50e25) => _0xa50e25['kind'] === 'nodes')['map'](
-          (_0x37d179) => _0x37d179['id'],
-        ),
+    handler6();
+    const graphChanges2 = graphChanges(media['project'](cloneGraph2), before3());
+    list = conflicts['reconcile'](list, graphChanges2, before3());
+    const list3 = graphChanges(base, before3()),
+      map4 = new Set(
+        list['filter']((value24) => value24['kind'] === 'nodes')['map']((value25) => value25['id']),
       );
-    _0x1be6b2['withGraphMutationBypass'](() =>
-      _0x1be6b2['batch'](() => {
-        const _0x14feff = _0x3c2457['filter'](
-          (_0x65eba4) => _0x65eba4['kind'] === 'nodes' && !_0x65eba4['after'],
-        )['map']((_0x5b1387) => _0x5b1387['id']);
-        if (_0x14feff['length']) _0x1be6b2['deleteNodes'](_0x14feff);
-        for (const [_0x30521a, _0x5cf2b8] of Object['entries'](_0x203399['nodes'])) {
-          if (!_0x1a030c['has'](_0x30521a)) continue;
-          const _0x41cf2c = _0x1be6b2['getStateRaw']()['nodes'][_0x30521a];
-          if (!_0x41cf2c) _0x1be6b2['addNode'](_0x5cf2b8);
-          const _0x5addac = sharedValue(_0x56a965['nodes'][_0x30521a] ?? null),
-            _0x5332a4 = mergeCollaborationFields(_0x5addac, _0x5cf2b8, sharedValue(_0x41cf2c ?? null)),
-            _0x346d04 = mergeSharedNode(_0x41cf2c, _0x5332a4);
-          delete _0x346d04['_collaborationPendingMedia'];
-          if (_0x5cf2b8['_collaborationPendingMedia'])
-            _0x346d04['_collaborationPendingMedia'] = _0x5cf2b8['_collaborationPendingMedia'];
-          _0x1be6b2['updateNodeData'](_0x30521a, _0x346d04, { replace: !![] });
+    store['withGraphMutationBypass'](() =>
+      store['batch'](() => {
+        const list4 = list['filter']((enabled9) => enabled9['kind'] === 'nodes' && !enabled9['after'])['map'](
+          (value26) => value26['id'],
+        );
+        if (list4['length']) store['deleteNodes'](list4);
+        for (const [value27, value28] of Object['entries'](state2['nodes'])) {
+          if (!map4['has'](value27)) continue;
+          const enabled10 = store['getStateRaw']()['nodes'][value27];
+          if (!enabled10) store['addNode'](value28);
+          const sharedValue2 = sharedValue(cloneGraph2['nodes'][value27] ?? null),
+            collaborationFields = mergeCollaborationFields(
+              sharedValue2,
+              value28,
+              sharedValue(enabled10 ?? null),
+            ),
+            sharedNode = mergeSharedNode(enabled10, collaborationFields);
+          delete sharedNode['_collaborationPendingMedia'];
+          if (value28['_collaborationPendingMedia'])
+            sharedNode['_collaborationPendingMedia'] = value28['_collaborationPendingMedia'];
+          store['updateNodeData'](value27, sharedNode, { replace: !![] });
         }
-        const _0x2a3ed4 = _0x3c2457['filter']((_0x385fb2) => _0x385fb2['kind'] === 'edges');
-        if (_0x2a3ed4['length'] || _0x14feff['length'])
-          _0x1be6b2['updateEdgesBatch'](
-            _0x2a3ed4['map']((_0x40cc5a) => _0x40cc5a['id']),
-            _0x2a3ed4['filter']((_0x4abe43) => _0x4abe43['after'])['map']((_0x28dc71) => _0x28dc71['after']),
+        const list5 = list['filter']((value29) => value29['kind'] === 'edges');
+        if (list5['length'] || list4['length'])
+          store['updateEdgesBatch'](
+            list5['map']((value30) => value30['id']),
+            list5['filter']((value31) => value31['after'])['map']((value32) => value32['after']),
           );
       }),
     );
-    const _0x62ecf4 = _0xb81c3();
-    for (const _0x27f1f4 of _0x3c2457) {
-      const _0x3656af = _0xa0b7f5['find'](
-          (_0x1b894f) => _0x1b894f['kind'] === _0x27f1f4['kind'] && _0x1b894f['id'] === _0x27f1f4['id'],
+    const value33 = before3();
+    for (const value34 of list) {
+      const value35 = list3['find'](
+          (value36) => value36['kind'] === value34['kind'] && value36['id'] === value34['id'],
         ),
-        _0x16cdc6 = _0x3656af
+        value37 = value35
           ? mergeCollaborationFields(
-              _0x3656af['after'],
-              _0x3656af['before'],
-              _0x62ecf4[_0x27f1f4['kind']][_0x27f1f4['id']] ?? null,
+              value35['after'],
+              value35['before'],
+              value33[value34['kind']][value34['id']] ?? null,
             )
-          : _0x62ecf4[_0x27f1f4['kind']][_0x27f1f4['id']];
-      if (_0x16cdc6) _0x3c6d8d[_0x27f1f4['kind']][_0x27f1f4['id']] = _0x16cdc6;
-      else delete _0x3c6d8d[_0x27f1f4['kind']][_0x27f1f4['id']];
+          : value33[value34['kind']][value34['id']];
+      if (value37) base[value34['kind']][value34['id']] = value37;
+      else delete base[value34['kind']][value34['id']];
     }
-    _0x337259['prepare'](_0x1be6b2['getStateRaw']());
+    media['prepare'](store['getStateRaw']());
   }
-  async function _0x2041dc() {
-    if (!_0x232bfb || _0xe7ef3b) return;
-    _0x232bfb = ![];
-    const _0x457f16 = _0x337259['prepare'](_0x1be6b2['getStateRaw']());
-    (_0x24cf08(), _0x77184['clear']());
-    const _0x347651 = graphChanges(_0x3c6d8d, _0x457f16)['filter']((_0x260d74) => {
-      if (_0x6b7c55['has'](_0x260d74)) return ![];
-      if (_0x260d74['kind'] === 'nodes' && _0xe0fbd6(_0x260d74) && _0x15b0af(_0x260d74['id']))
-        return (_0x77184['add'](_0x260d74['id']), ![]);
+  async function run9() {
+    if (!enabled3 || packet) return;
+    enabled3 = ![];
+    const value38 = media['prepare'](store['getStateRaw']());
+    (handler6(), map['clear']());
+    const changes = graphChanges(base, value38)['filter']((value39) => {
+      if (conflicts['has'](value39)) return ![];
+      if (value39['kind'] === 'nodes' && handler7(value39) && handler8(value39['id']))
+        return (map['add'](value39['id']), ![]);
       return !![];
     });
-    _0x347651['length'] &&
-      ((_0xe7ef3b = {
+    changes['length'] &&
+      ((packet = {
         operationId: crypto['randomUUID'](),
-        changes: _0x347651['map']((_0x2bfd6a) => ({
-          ..._0x2bfd6a,
-          before: _0x82a4dc[_0x2bfd6a['kind']][_0x2bfd6a['id']] ?? null,
+        changes: changes['map']((args5) => ({
+          ...args5,
+          before: before2[args5['kind']][args5['id']] ?? null,
         })),
       }),
-      (_0x3c6d8d = applyGraphChanges(_0x3c6d8d, _0x347651)));
+      (base = applyGraphChanges(base, changes)));
   }
-  async function _0x159a1c() {
-    if (!_0x6def90() || _0x1e251e['status'] === 'blocked') return;
+  async function run10() {
+    if (!current2() || revision['status'] === 'blocked') return;
     try {
-      if (_0x219031) {
-        if (_0x2322b3) _0x337259['prepare'](cloneGraph(_0x1be6b2['getStateRaw']()));
-        const _0xbd370b = graphChanges(_0x3c6d8d, _0x82a4dc),
-          _0x57243c = new Set(
-            _0xbd370b['filter']((_0x47241e) => _0x47241e['kind'] === 'nodes')['map'](
-              (_0x5ec638) => _0x5ec638['id'],
-            ),
+      if (pending) {
+        if (enabled4) media['prepare'](cloneGraph(store['getStateRaw']()));
+        const list6 = graphChanges(base, before2),
+          map5 = new Set(
+            list6['filter']((value40) => value40['kind'] === 'nodes')['map']((value41) => value41['id']),
           );
-        if (_0x2322b3 && !hosting)
-          for (const [_0x52da89, _0x3bad3e] of Object['entries'](_0x82a4dc['nodes'])) {
-            if (JSON['stringify'](_0x3bad3e)['includes']('aic-asset:') && !_0x57243c['has'](_0x52da89))
-              _0xbd370b['push']({ kind: 'nodes', id: _0x52da89, before: _0x3bad3e, after: _0x3bad3e });
+        if (enabled4 && !hosting)
+          for (const [id2, before4] of Object['entries'](before2['nodes'])) {
+            if (JSON['stringify'](before4)['includes']('aic-asset:') && !map5['has'](id2))
+              list6['push']({ kind: 'nodes', id: id2, before: before4, after: before4 });
           }
-        await _0x29e620(_0x82a4dc, _0xbd370b);
-        if (!_0x2322b3) _0x3c6d8d = _0xb81c3();
-        else _0x232bfb = !![];
-        ((_0x2322b3 = ![]), (_0x219031 = ![]));
+        await run8(before2, list6);
+        if (!enabled4) base = before3();
+        else enabled3 = !![];
+        ((enabled4 = ![]), (pending = ![]));
       }
-      if (_0x528df0) {
-        const _0x5db07f = _0x528df0,
-          _0x21fc14 = applyGraphChanges(
-            applyGraphChanges(_0x82a4dc, _0x5db07f['packet']?.['changes'] || []),
-            _0x5db07f['conflicts'] || [],
+      if (value2) {
+        const value42 = value2,
+          graphChanges3 = applyGraphChanges(
+            applyGraphChanges(before2, value42['packet']?.['changes'] || []),
+            value42['conflicts'] || [],
           );
-        await _0x29e620(_0x21fc14);
-        const _0x1f2d54 = _0xb81c3(),
-          _0x1a5fa4 = graphChanges(_0x5db07f['base'], _0x5db07f['draft']),
-          _0x4c42e8 = applyGraphChanges(_0x21fc14, _0x1a5fa4);
-        (await _0x29e620(_0x4c42e8, graphChanges(_0x21fc14, _0x4c42e8)),
-          (_0x3c6d8d = _0x1f2d54),
-          (_0xe7ef3b = _0x5db07f['packet'] || null),
-          (_0x232bfb = _0x1a5fa4['length'] > 0x0),
-          _0x6b7c55['hold'](_0x5db07f['conflicts'] || []),
-          (_0x528df0 = null));
+        await run8(graphChanges3);
+        const value43 = before3(),
+          list7 = graphChanges(value42['base'], value42['draft']),
+          graphChanges4 = applyGraphChanges(graphChanges3, list7);
+        (await run8(graphChanges4, graphChanges(graphChanges3, graphChanges4)),
+          (base = value43),
+          (packet = value42['packet'] || null),
+          (enabled3 = list7['length'] > 0x0),
+          conflicts['hold'](value42['conflicts'] || []),
+          (value2 = null));
       }
-      if (_0x77184['size']) _0x232bfb = !![];
-      (await _0x2041dc(), _0x24cf08());
-      if (_0xe7ef3b) {
-        const _0x4992b4 = _0xe7ef3b;
-        ((_0x1e251e['message'] = '正在同步修改'), _0xc83269());
-        let _0x40675d;
-        await _0x56debe();
+      if (map['size']) enabled3 = !![];
+      (await run9(), handler6());
+      if (packet) {
+        const operationId = packet;
+        ((revision['message'] = '正在同步修改'), handler4());
+        let value44;
+        await run5();
         try {
-          _0x40675d = await _0x3fbf5a({
+          value44 = await rpc({
             action: 'apply',
-            operationId: _0x4992b4['operationId'],
-            changes: _0x4992b4['changes'],
+            operationId: operationId['operationId'],
+            changes: operationId['changes'],
           });
-        } catch (_0xe768f0) {
-          if (!['EDIT_CONFLICT', 'NODE_BUSY', 'TASK_BUSY']['includes'](_0xe768f0['code'])) throw _0xe768f0;
-          const _0x48e018 = await _0x3fbf5a({ action: 'sync', revision: -0x1 }),
-            _0x504f9b =
-              _0x4992b4['historyMode'] || !_0x48e018['document']
-                ? { blocked: _0x4992b4['changes'], safe: [] }
-                : partitionCollaborationConflict(_0x4992b4['changes'], _0x48e018, _0x4b82f3, _0xe6810);
-          (['NODE_BUSY', 'TASK_BUSY']['includes'](_0xe768f0['code']) &&
-            !_0x4992b4['historyMode'] &&
-            (_0x504f9b['blocked'] = _0x504f9b['blocked']['filter']((_0x340e8a) => {
-              if (!_0xe0fbd6(_0x340e8a)) return !![];
+        } catch (value45) {
+          if (!['EDIT_CONFLICT', 'NODE_BUSY', 'TASK_BUSY']['includes'](value45['code'])) throw value45;
+          const dom = await rpc({ action: 'sync', revision: -0x1 }),
+            changes2 =
+              operationId['historyMode'] || !dom['document']
+                ? { blocked: operationId['changes'], safe: [] }
+                : partitionCollaborationConflict(operationId['changes'], dom, actorId, clientId);
+          (['NODE_BUSY', 'TASK_BUSY']['includes'](value45['code']) &&
+            !operationId['historyMode'] &&
+            (changes2['blocked'] = changes2['blocked']['filter']((value46) => {
+              if (!handler7(value46)) return !![];
               return (
-                _0x77184['add'](_0x340e8a['id']),
-                (_0x3c6d8d[_0x340e8a['kind']][_0x340e8a['id']] = _0x340e8a['before']),
+                map['add'](value46['id']),
+                (base[value46['kind']][value46['id']] = value46['before']),
                 ![]
               );
             })),
-            _0x6b7c55['hold'](_0x504f9b['blocked']),
-            (_0xe7ef3b = _0x504f9b['safe']['length']
-              ? { operationId: crypto['randomUUID'](), changes: _0x504f9b['safe'] }
+            conflicts['hold'](changes2['blocked']),
+            (packet = changes2['safe']['length']
+              ? { operationId: crypto['randomUUID'](), changes: changes2['safe'] }
               : null),
-            (_0x1e251e['message'] = '部分节点需要处理冲突，其他节点可继续协作'));
+            (revision['message'] = '部分节点需要处理冲突，其他节点可继续协作'));
         }
-        _0x24cf08();
-        if (_0x40675d) {
-          const _0x2eef95 = _0x40675d['changes'] || _0x4992b4['changes'];
-          if (!_0x2eef95['length'] && _0x4992b4['changes']['length']) _0x1e251e['revision'] = -0x1;
-          const _0x33df63 = applyGraphChanges(_0x82a4dc, _0x2eef95);
-          if (_0x4992b4['historyMode']) {
-            await _0x29e620(_0x33df63, _0x2eef95);
-            const _0x46c901 = _0x4992b4['historyMode'] === 'undo' ? _0x2149a4 : _0xf316ee;
-            (_0x46c901['pop'](),
-              (_0x4992b4['historyMode'] === 'undo' ? _0xf316ee : _0x2149a4)['push'](_0x4992b4['original']));
+        handler6();
+        if (value44) {
+          const list8 = value44['changes'] || operationId['changes'];
+          if (!list8['length'] && operationId['changes']['length']) revision['revision'] = -0x1;
+          const graphChanges5 = applyGraphChanges(before2, list8);
+          if (operationId['historyMode']) {
+            await run8(graphChanges5, list8);
+            const value47 = operationId['historyMode'] === 'undo' ? undoCount : redoCount;
+            (value47['pop'](),
+              (operationId['historyMode'] === 'undo' ? redoCount : undoCount)['push'](
+                operationId['original'],
+              ));
           } else {
-            const _0x4a88b4 = new Map(
-                _0x4992b4['changes']['map']((_0x592988) => [
-                  _0x592988['kind'] + ':' + _0x592988['id'],
-                  _0x592988,
-                ]),
+            const before5 = new Map(
+                operationId['changes']['map']((value48) => [value48['kind'] + ':' + value48['id'], value48]),
               ),
-              _0x360e4c = _0x2eef95['filter'](
-                (_0x197962) =>
-                  JSON['stringify'](_0x197962['after']) !==
-                  JSON['stringify'](_0x4a88b4['get'](_0x197962['kind'] + ':' + _0x197962['id'])?.['after']),
+              list9 = list8['filter'](
+                (value49) =>
+                  JSON['stringify'](value49['after']) !==
+                  JSON['stringify'](before5['get'](value49['kind'] + ':' + value49['id'])?.['after']),
               );
-            await _0x29e620(
-              _0x33df63,
-              _0x360e4c['map']((_0x58994c) => ({
-                ..._0x58994c,
-                before: _0x4a88b4['has'](_0x58994c['kind'] + ':' + _0x58994c['id'])
-                  ? _0x4a88b4['get'](_0x58994c['kind'] + ':' + _0x58994c['id'])['after']
-                  : _0x58994c['before'],
+            await run8(
+              graphChanges5,
+              list9['map']((args6) => ({
+                ...args6,
+                before: before5['has'](args6['kind'] + ':' + args6['id'])
+                  ? before5['get'](args6['kind'] + ':' + args6['id'])['after']
+                  : args6['before'],
               })),
             );
-            const _0x65b9d9 = _0x2eef95['filter']((_0x14a8a3) => !_0xe0fbd6(_0x14a8a3));
-            _0x65b9d9['length'] && (_0x2149a4['push'](_0x65b9d9), (_0xf316ee['length'] = 0x0));
-            if (_0x2149a4['length'] > 0x32) _0x2149a4['shift']();
+            const list10 = list8['filter']((value50) => !handler7(value50));
+            list10['length'] && (undoCount['push'](list10), (redoCount['length'] = 0x0));
+            if (undoCount['length'] > 0x32) undoCount['shift']();
           }
-          ((_0x82a4dc = _0x33df63), (_0xe7ef3b = null));
+          ((before2 = graphChanges5), (packet = null));
         }
       }
-      const _0x3ef2b4 = await _0x3fbf5a({
+      const dom2 = await rpc({
         action: 'sync',
-        revision: _0x1e251e['revision'],
-        ...(_0xa0ec68 ? {} : { presence: _0x540798 }),
+        revision: revision['revision'],
+        ...(value12 ? {} : { presence: presence }),
       });
-      _0x24cf08();
+      handler6();
       if (
-        _0x3ef2b4['roomId'] !== _0x21fa45['roomId'] ||
-        !Number['isInteger'](_0x3ef2b4['revision']) ||
-        !Array['isArray'](_0x3ef2b4['members'])
+        dom2['roomId'] !== room['roomId'] ||
+        !Number['isInteger'](dom2['revision']) ||
+        !Array['isArray'](dom2['members'])
       )
         throw new Error('协作服务响应无效');
-      const _0x593553 = (_0x3ef2b4['operations'] || [])['flatMap']((_0x488563) => _0x488563['changes']),
-        _0x5df14d = _0x593553['length']
-          ? applyGraphChanges(_0x3ef2b4['document'] || _0x82a4dc, _0x593553)
-          : _0x3ef2b4['document'] || _0x82a4dc,
-        _0x4f749c = _0x5df14d === _0x82a4dc ? [] : graphChanges(_0x82a4dc, _0x5df14d);
-      _0x4f749c['length'] && (await _0x29e620(_0x5df14d, _0x4f749c), (_0x82a4dc = cloneGraph(_0x5df14d)));
-      _0xa0ec68 &&
-        _0x1e251e['presenceStatus'] === 'online' &&
-        (delete _0x3ef2b4['presence'], delete _0x3ef2b4['locks']);
-      (Object['assign'](_0x1e251e, _0x3ef2b4, {
+      const list11 = (dom2['operations'] || [])['flatMap']((value51) => value51['changes']),
+        value52 = list11['length']
+          ? applyGraphChanges(dom2['document'] || before2, list11)
+          : dom2['document'] || before2,
+        list12 = value52 === before2 ? [] : graphChanges(before2, value52);
+      list12['length'] && (await run8(value52, list12), (before2 = cloneGraph(value52)));
+      value12 && revision['presenceStatus'] === 'online' && (delete dom2['presence'], delete dom2['locks']);
+      (Object['assign'](revision, dom2, {
         status: 'online',
-        message: _0x6b7c55['list']()['length']
+        message: conflicts['list']()['length']
           ? '部分节点有冲突，其他节点可继续协作'
           : '房主已接收修改 · 项目文件由房主保存',
         errorCode: '',
       }),
-        _0x57ae78['refresh'](_0x3ef2b4['locks']),
-        delete _0x1e251e['document'],
-        delete _0x1e251e['operations']);
-      if (Number['isInteger'](_0x3ef2b4['reviewRevision']))
-        void _0x885910['refresh'](_0x3ef2b4['reviewRevision']);
-      for (const [_0x3051d9, _0x2cfa52] of _0x5cf612) {
-        const _0x1d5a0f = _0x1be6b2['getStateRaw']()['nodes'][_0x3051d9];
+        timer['refresh'](dom2['locks']),
+        delete revision['document'],
+        delete revision['operations']);
+      if (Number['isInteger'](dom2['reviewRevision'])) void review['refresh'](dom2['reviewRevision']);
+      for (const [nodeId, taskId] of executing) {
+        const enabled11 = store['getStateRaw']()['nodes'][nodeId];
         if (
-          _0x2cfa52['released'] &&
-          !_0x1d5a0f?.['isGenerating'] &&
-          !_0x1d5a0f?.['isLoading'] &&
-          !_0x232bfb &&
-          !_0xe7ef3b &&
-          !_0x337259['states'](_0x1be6b2['getStateRaw']())['some'](
-            (_0x57df16) => _0x57df16['id'] === _0x3051d9,
-          )
+          taskId['released'] &&
+          !enabled11?.['isGenerating'] &&
+          !enabled11?.['isLoading'] &&
+          !enabled3 &&
+          !packet &&
+          !media['states'](store['getStateRaw']())['some']((value53) => value53['id'] === nodeId)
         ) {
           if (
-            !_0x2cfa52['uncertain'] ||
-            _0x1e251e['jobs']['some'](
-              (_0x46b9a0) =>
-                _0x46b9a0['node'] === _0x3051d9 &&
-                _0x46b9a0['id'] === _0x2cfa52['taskId'] &&
-                _0x46b9a0['actor'] === _0x4b82f3 &&
-                _0x46b9a0['client'] === _0xe6810 &&
-                _0x46b9a0['status'] === 'running',
+            !taskId['uncertain'] ||
+            revision['jobs']['some'](
+              (response2) =>
+                response2['node'] === nodeId &&
+                response2['id'] === taskId['taskId'] &&
+                response2['actor'] === actorId &&
+                response2['client'] === clientId &&
+                response2['status'] === 'running',
             )
           )
-            await _0x3fbf5a({ action: 'finishTask', nodeId: _0x3051d9, taskId: _0x2cfa52['taskId'] });
-          _0x5cf612['delete'](_0x3051d9);
+            await rpc({ action: 'finishTask', nodeId: nodeId, taskId: taskId['taskId'] });
+          executing['delete'](nodeId);
         }
       }
-      (_0xc83269(), await _0x56debe());
-      if (!_0x232bfb && !_0xe7ef3b && !_0x6b7c55['list']()['length'] && _0x254d76 !== _0x1e251e['revision'])
+      (handler4(), await run5());
+      if (!enabled3 && !packet && !conflicts['list']()['length'] && key !== revision['revision'])
         try {
-          (await onConfirmed(_0x82a4dc, _0x337259['snapshotBindings'](_0x1be6b2['getStateRaw']())),
-            (_0x254d76 = _0x1e251e['revision']));
+          (await onConfirmed(before2, media['snapshotBindings'](store['getStateRaw']())),
+            (key = revision['revision']));
         } catch {
-          ((_0x1e251e['recoveryError'] = '无法保存本机协作基线，请保持画布开启并重试'), _0xc83269());
+          ((revision['recoveryError'] = '无法保存本机协作基线，请保持画布开启并重试'), handler4());
         }
-    } catch (_0x193c11) {
-      _0x46d3da(_0x193c11);
+    } catch (value54) {
+      run6(value54);
     }
   }
-  function _0x563fc7() {
-    if (!_0x55e51f)
-      _0x55e51f = _0x159a1c()['finally'](() => {
-        _0x55e51f = null;
-        if (_0xef6d7a) _0x11bfa9();
+  function run7() {
+    if (!enabled)
+      enabled = run10()['finally'](() => {
+        enabled = null;
+        if (enabled8) run2();
       });
-    return _0x55e51f;
+    return enabled;
   }
-  async function _0x1b1796(_0x2ffa6c = () => !![]) {
-    await _0x563fc7();
-    while (_0x2ffa6c() && _0x6def90() && _0x1e251e['status'] === 'online' && (_0x232bfb || _0xe7ef3b))
-      await _0x563fc7();
+  async function run3(handler9 = () => !![]) {
+    await run7();
+    while (handler9() && current2() && revision['status'] === 'online' && (enabled3 || packet)) await run7();
   }
-  function _0x6e0fe2() {
-    if (_0x2d37b7) return;
-    _0x33cdc9 = setTimeout(
+  function run11() {
+    if (enabled2) return;
+    setTimeout2 = setTimeout(
       async () => {
-        (await _0x563fc7(), _0x6e0fe2());
+        (await run7(), run11());
       },
-      _0x1e251e['status'] === 'offline' ? 0xbb8 : _0x2cf4d8 ? 0x2710 : 0x1f4,
+      revision['status'] === 'offline' ? 0xbb8 : value16 ? 0x2710 : 0x1f4,
     );
   }
-  function _0xc91cc() {
-    (clearTimeout(_0x3520bd), (_0x3520bd = null));
-    if (_0x2d37b7) return _0x40ebd4;
+  function destroy() {
+    (clearTimeout(setTimeout4), (setTimeout4 = null));
+    if (enabled2) return item;
     return (
-      (_0x2d37b7 = !![]),
-      clearTimeout(_0x33cdc9),
-      _0xa0ec68?.['stop'](),
-      _0x2cf4d8?.['stop'](),
-      _0xd4433b['abort'](),
-      void _0x56debe()['finally'](() => journal['close']()),
-      _0x3923a4(),
-      _0x13f860(),
-      _0x337259['dispose'](),
-      _0x57ae78['dispose'](),
-      (_0x40ebd4 = (
-        hosting && _0x4d7a9d['disconnect']
-          ? _0x4d7a9d['disconnect']()
-          : _0x4d7a9d['rpc']({ action: 'disconnect', roomId: _0x21fa45['roomId'], clientId: _0xe6810 })
+      (enabled2 = !![]),
+      clearTimeout(setTimeout2),
+      value12?.['stop'](),
+      value16?.['stop'](),
+      signal['abort'](),
+      void run5()['finally'](() => journal['close']()),
+      handler(),
+      handler2(),
+      media['dispose'](),
+      timer['dispose'](),
+      (item = (
+        hosting && api['disconnect']
+          ? api['disconnect']()
+          : api['rpc']({ action: 'disconnect', roomId: room['roomId'], clientId: clientId })
       )['catch'](() => {})),
-      _0x40ebd4
+      item
     );
   }
-  function _0x307881({ name: _0x3ddc67, args: _0x1c1fd2, nodeIds: _0x431b7c, removedNodeIds: _0x4a3a80 }) {
-    if (!_0x6def90()) return ![];
+  function run4({ name: name, args: args7, nodeIds: nodeIds2, removedNodeIds: removedNodeIds }) {
+    if (!current2()) return ![];
     if (
-      _0x3ddc67 === 'updateNodeData' &&
-      _0x1c1fd2[0x2]?.['replace'] !== !![] &&
-      _0x1c1fd2[0x1] &&
-      Object['keys'](sharedValue(_0x1c1fd2[0x1]))['length'] === 0x0
+      name === 'updateNodeData' &&
+      args7[0x2]?.['replace'] !== !![] &&
+      args7[0x1] &&
+      Object['keys'](sharedValue(args7[0x1]))['length'] === 0x0
     )
       return !![];
-    if (_0xe7ef3b?.['historyMode']) return ![];
-    const _0x3aa365 = _0x3ddc67 === 'updateNodeData' && _0x5cf612['has'](_0x1c1fd2[0x0]);
-    if (_0x1e251e['status'] !== 'online' && !_0x3aa365) return ![];
-    if (_0x1e251e['role'] === 'viewer') return ![];
-    if (_0x6b7c55['blocks'](_0x431b7c, _0x1be6b2['getStateRaw']())) return ![];
-    return _0x431b7c['every']((_0x2eda8a) => {
-      if (_0xd197a6['has'](_0x2eda8a)) return ![];
-      const _0x18ffb8 = _0x1e251e['locks']?.[_0x2eda8a],
-        _0x2e5e5f = _0x1e251e['jobs']?.['find'](
-          (_0x7749b9) => _0x7749b9['node'] === _0x2eda8a && _0x7749b9['status'] === 'running',
+    if (packet?.['historyMode']) return ![];
+    const enabled12 = name === 'updateNodeData' && executing['has'](args7[0x0]);
+    if (revision['status'] !== 'online' && !enabled12) return ![];
+    if (revision['role'] === 'viewer') return ![];
+    if (conflicts['blocks'](nodeIds2, store['getStateRaw']())) return ![];
+    return nodeIds2['every']((value55) => {
+      if (map3['has'](value55)) return ![];
+      const enabled13 = revision['locks']?.[value55],
+        enabled14 = revision['jobs']?.['find'](
+          (response3) => response3['node'] === value55 && response3['status'] === 'running',
         );
-      if (_0x4a3a80['includes'](_0x2eda8a) && (_0x5cf612['has'](_0x2eda8a) || _0x2e5e5f)) return ![];
+      if (removedNodeIds['includes'](value55) && (executing['has'](value55) || enabled14)) return ![];
       return (
-        (!_0x18ffb8 ||
-          (_0x18ffb8['clientId'] === _0xe6810 && _0x18ffb8['actorId'] === _0x4b82f3) ||
-          _0x18ffb8['expiresAt'] * 0x3e8 <= Date['now']()) &&
-        (!_0x2e5e5f || (_0x2e5e5f['client'] === _0xe6810 && _0x2e5e5f['actor'] === _0x4b82f3))
+        (!enabled13 ||
+          (enabled13['clientId'] === clientId && enabled13['actorId'] === actorId) ||
+          enabled13['expiresAt'] * 0x3e8 <= Date['now']()) &&
+        (!enabled14 || (enabled14['client'] === clientId && enabled14['actor'] === actorId))
       );
     });
   }
-  async function _0x5a845f(_0x263359) {
-    await _0x563fc7();
-    if (_0x1e251e['status'] !== 'online' || _0x232bfb || _0xe7ef3b || _0x5cf612['size'] || _0xd197a6['size'])
-      return;
-    const _0x561e71 = _0x263359 === 'undo' ? _0x2149a4 : _0xf316ee,
-      _0x1b387b = _0x337259['resolveWire'](_0x561e71['at'](-0x1));
-    if (!_0x1b387b) return;
-    const _0x4ebe6b = _0x263359 === 'undo' ? invertChanges(_0x1b387b) : _0x1b387b;
+  async function run12(historyMode) {
+    await run7();
+    if (revision['status'] !== 'online' || enabled3 || packet || executing['size'] || map3['size']) return;
+    const value56 = historyMode === 'undo' ? undoCount : redoCount,
+      original = media['resolveWire'](value56['at'](-0x1));
+    if (!original) return;
+    const changes3 = historyMode === 'undo' ? invertChanges(original) : original;
     try {
-      for (const _0xf7127 of _0x4ebe6b)
+      for (const value57 of changes3)
         mergeCollaborationFields(
-          _0xf7127['before'],
-          _0xf7127['after'],
-          _0x82a4dc[_0xf7127['kind']][_0xf7127['id']] ?? null,
+          value57['before'],
+          value57['after'],
+          before2[value57['kind']][value57['id']] ?? null,
         );
     } catch {
-      ((_0x1e251e['message'] = '目标已被其他成员修改，不能撤销或重做这一步'), _0xc83269());
+      ((revision['message'] = '目标已被其他成员修改，不能撤销或重做这一步'), handler4());
       return;
     }
-    ((_0xe7ef3b = {
+    ((packet = {
       operationId: crypto['randomUUID'](),
-      changes: _0x4ebe6b,
-      historyMode: _0x263359,
-      original: _0x1b387b,
+      changes: changes3,
+      historyMode: historyMode,
+      original: original,
     }),
-      await _0x563fc7());
+      await run7());
   }
-  const _0x791b0a = {
-    state: _0x1e251e,
+  const enabled15 = {
+    state: revision,
     async start({
       publish: publish = ![],
       hostBase: hostBase = null,
       mediaBindings: mediaBindings = [],
     } = {}) {
       try {
-        const _0x15cabe = await journal['read']();
-        ((_0x5c948f = !![]), _0x337259['restore'](_0x15cabe?.['media']));
+        const value58 = await journal['read']();
+        ((enabled5 = !![]), media['restore'](value58?.['media']));
         if (
-          _0x15cabe?.['schema'] === 0x1 &&
-          _0x15cabe['base']?.['nodes'] &&
-          _0x15cabe['draft']?.['nodes'] &&
-          (_0x15cabe['packet'] ||
-            _0x15cabe['conflicts']?.['length'] ||
-            graphChanges(_0x15cabe['base'], _0x15cabe['draft'])['length'])
+          value58?.['schema'] === 0x1 &&
+          value58['base']?.['nodes'] &&
+          value58['draft']?.['nodes'] &&
+          (value58['packet'] ||
+            value58['conflicts']?.['length'] ||
+            graphChanges(value58['base'], value58['draft'])['length'])
         )
-          _0x528df0 = _0x15cabe;
+          value2 = value58;
       } catch {
-        _0x1e251e['recoveryError'] = '无法读取本机协作恢复记录';
+        revision['recoveryError'] = '无法读取本机协作恢复记录';
       }
-      (_0x337259['restoreBindings'](mediaBindings),
-        (_0x3c6d8d = _0x337259['project'](_0x1be6b2['getStateRaw']())),
-        (_0x3923a4 = _0x1be6b2['setGraphMutationPolicy']({
-          beginInteraction: (_0x4aa5c5) => _0x57ae78['begin'](_0x4aa5c5),
+      (media['restoreBindings'](mediaBindings),
+        (base = media['project'](store['getStateRaw']())),
+        (handler = store['setGraphMutationPolicy']({
+          beginInteraction: (value59) => timer['begin'](value59),
           async beforeWorkspaceTransition() {
-            await _0x563fc7();
-            if (!_0x791b0a['canDetach']())
-              return ((_0x1e251e['message'] = '请先完成同步和生成任务，再切换画布'), _0xc83269(), ![]);
-            return (await _0x791b0a['detach'](), !![]);
+            await run7();
+            if (!enabled15['canDetach']())
+              return ((revision['message'] = '请先完成同步和生成任务，再切换画布'), handler4(), ![]);
+            return (await enabled15['detach'](), !![]);
           },
-          before(_0x2bec91) {
-            if (!_0x307881(_0x2bec91)) return ![];
-            const { name: _0x338989, args: _0x1bb485 } = _0x2bec91,
-              _0x355edf =
-                _0x338989 === 'updateNodeData' && !_0x1bb485[0x2]?.['replace']
-                  ? { [_0x1bb485[0x0]]: _0x1bb485[0x1] }
-                  : _0x338989 === 'updateNodesData'
-                    ? _0x1bb485[0x0]
+          before(value60) {
+            if (!run4(value60)) return ![];
+            const { name: name2, args: args8 } = value60,
+              value61 =
+                name2 === 'updateNodeData' && !args8[0x2]?.['replace']
+                  ? { [args8[0x0]]: args8[0x1] }
+                  : name2 === 'updateNodesData'
+                    ? args8[0x0]
                     : null;
             if (
-              _0x355edf &&
-              Object['entries'](_0x355edf)['every'](
-                ([_0x23e8f3, _0x2d8830]) =>
-                  _0x2d8830 &&
-                  !_0x1be6b2['getStateRaw']()['nodes'][_0x23e8f3]?.['_collaborationPendingMedia']?.['some'](
-                    (_0x49e97a) => Object['hasOwn'](_0x2d8830, _0x49e97a['path'][0x0]),
+              value61 &&
+              Object['entries'](value61)['every'](
+                ([value62, value63]) =>
+                  value63 &&
+                  !store['getStateRaw']()['nodes'][value62]?.['_collaborationPendingMedia']?.['some'](
+                    (value64) => Object['hasOwn'](value63, value64['path'][0x0]),
                   ) &&
-                  Object['entries'](sharedValue(_0x2d8830))['every'](
-                    ([_0xd58832, _0x2bf9c1]) =>
-                      JSON['stringify'](_0x2bf9c1) ===
+                  Object['entries'](sharedValue(value63))['every'](
+                    ([value65, value66]) =>
+                      JSON['stringify'](value66) ===
                       JSON['stringify'](
-                        sharedValue(_0x1be6b2['getStateRaw']()['nodes'][_0x23e8f3]?.[_0xd58832], _0xd58832),
+                        sharedValue(store['getStateRaw']()['nodes'][value62]?.[value65], value65),
                       ),
                   ),
               )
             )
-              _0x286e6e['add'](_0x2bec91);
+              map2['add'](value60);
             return !![];
           },
-          after(_0x269ea6) {
-            if (_0x286e6e['delete'](_0x269ea6)) {
-              if (_0x269ea6['nodeIds']['some']((_0x24e482) => _0x5cf612['get'](_0x24e482)?.['released']))
-                _0x11bfa9();
+          after(value67) {
+            if (map2['delete'](value67)) {
+              if (value67['nodeIds']['some']((value68) => executing['get'](value68)?.['released'])) run2();
               return;
             }
-            (_0x35e5d1++,
-              _0x337259['afterEdit'](_0x269ea6, _0x1be6b2['getStateRaw'](), (_0x54b9b5, _0x325cbe) =>
-                _0x1be6b2['withGraphMutationBypass'](() =>
-                  _0x1be6b2['updateNodeData'](_0x54b9b5, { _collaborationPendingMedia: _0x325cbe }),
+            (index++,
+              media['afterEdit'](value67, store['getStateRaw'](), (value69, _collaborationPendingMedia) =>
+                store['withGraphMutationBypass'](() =>
+                  store['updateNodeData'](value69, {
+                    _collaborationPendingMedia: _collaborationPendingMedia,
+                  }),
                 ),
               ),
-              (_0x232bfb = !![]),
-              _0xc83269(),
-              _0x1908c7());
-            if (_0x2cf4d8) _0x11bfa9();
+              (enabled3 = !![]),
+              handler4(),
+              run());
+            if (value16) run2();
           },
           beforeReplace() {
-            if (!_0x791b0a['canDetach']()) return ![];
-            return (_0x791b0a['detach'](), !![]);
+            if (!enabled15['canDetach']()) return ![];
+            return (enabled15['detach'](), !![]);
           },
           history: {
             commit() {
-              return (
-                _0x35e5d1++,
-                (_0x232bfb = !![]),
-                _0xc83269(),
-                _0x1908c7(),
-                { id: 'collaboration-pending' }
-              );
+              return (index++, (enabled3 = !![]), handler4(), run(), { id: 'collaboration-pending' });
             },
             undo: () => {
-              void _0x5a845f('undo');
+              void run12('undo');
             },
             redo: () => {
-              void _0x5a845f('redo');
+              void run12('redo');
             },
-            getHistoryInfo: () => ({ undoCount: _0x2149a4['length'] + 0x1, redoCount: _0xf316ee['length'] }),
+            getHistoryInfo: () => ({ undoCount: undoCount['length'] + 0x1, redoCount: redoCount['length'] }),
           },
         })));
-      const _0x288cd5 = {
-          async acquire(_0x1beb57, _0x31e50f = {}) {
-            if (_0x1e251e['status'] !== 'online' || _0x1e251e['role'] === 'viewer')
+      const value70 = {
+          async acquire(value71, enabled16 = {}) {
+            if (revision['status'] !== 'online' || revision['role'] === 'viewer')
               throw new Error('当前协作画布不能发起生成');
-            const _0xc11c3 = _0x1beb57['targetNodeId'] || _0x1beb57['sourceNodeId'];
-            if (_0xd197a6['has'](_0xc11c3) || (_0x5cf612['has'](_0xc11c3) && !_0x31e50f['recovering']))
+            const nodeId2 = value71['targetNodeId'] || value71['sourceNodeId'];
+            if (map3['has'](nodeId2) || (executing['has'](nodeId2) && !enabled16['recovering']))
               throw new Error('该节点正在请求或执行生成，请等待结束');
-            (_0xd197a6['add'](_0xc11c3), _0xc83269());
-            let _0xf75119,
-              _0xef08b2 = ![];
+            (map3['add'](nodeId2), handler4());
+            let taskId2,
+              value72 = ![];
             try {
-              ((_0x232bfb = !![]), await _0x1b1796(), _0x24cf08());
-              if (_0x232bfb || _0xe7ef3b || _0x1e251e['status'] !== 'online')
-                throw new Error('请先完成画布同步');
-              const _0x1c8871 = new Set([_0xc11c3]);
-              for (let _0x361382 = -0x1; _0x361382 !== _0x1c8871['size'];) {
-                _0x361382 = _0x1c8871['size'];
-                for (const _0x41d7d6 of Object['values'](_0x1be6b2['getStateRaw']()['edges']))
-                  if (_0x1c8871['has'](_0x41d7d6['targetId'])) _0x1c8871['add'](_0x41d7d6['sourceId']);
+              ((enabled3 = !![]), await run3(), handler6());
+              if (enabled3 || packet || revision['status'] !== 'online') throw new Error('请先完成画布同步');
+              const map6 = new Set([nodeId2]);
+              for (let value73 = -0x1; value73 !== map6['size'];) {
+                value73 = map6['size'];
+                for (const value74 of Object['values'](store['getStateRaw']()['edges']))
+                  if (map6['has'](value74['targetId'])) map6['add'](value74['sourceId']);
               }
-              if (
-                _0x337259['states'](_0x1be6b2['getStateRaw']())['some']((_0x5d6f1f) =>
-                  _0x1c8871['has'](_0x5d6f1f['id']),
-                )
-              )
+              if (media['states'](store['getStateRaw']())['some']((value75) => map6['has'](value75['id'])))
                 throw new Error('此节点的素材尚未准备完成，请稍后重试');
-              if (_0x31e50f['recovering']) {
-                const _0x403486 = _0x1e251e['jobs']?.['find'](
-                  (_0x2e9db4) => _0x2e9db4['node'] === _0xc11c3 && _0x2e9db4['status'] === 'running',
+              if (enabled16['recovering']) {
+                const taskId3 = revision['jobs']?.['find'](
+                  (response4) => response4['node'] === nodeId2 && response4['status'] === 'running',
                 );
-                if (!_0x403486 || _0x403486['client'] !== _0xe6810 || _0x403486['actor'] !== _0x4b82f3)
+                if (!taskId3 || taskId3['client'] !== clientId || taskId3['actor'] !== actorId)
                   throw new Error('只能恢复当前客户端拥有的协作生成任务');
-                const _0x41ec8b = { taskId: _0x403486['id'], released: ![] };
+                const value76 = { taskId: taskId3['id'], released: ![] };
                 return (
-                  _0x5cf612['set'](_0xc11c3, _0x41ec8b),
+                  executing['set'](nodeId2, value76),
                   async () => {
-                    ((_0x41ec8b['released'] = !![]), (_0x232bfb = !![]), await _0x563fc7());
+                    ((value76['released'] = !![]), (enabled3 = !![]), await run7());
                   }
                 );
               }
-              ((_0xf75119 = crypto['randomUUID']()),
-                (_0xef08b2 = !![]),
-                await _0x3fbf5a({ action: 'claimTask', nodeId: _0xc11c3, taskId: _0xf75119 }),
-                _0x24cf08());
-              const _0x29a0bd = { taskId: _0xf75119, released: ![] };
+              ((taskId2 = crypto['randomUUID']()),
+                (value72 = !![]),
+                await rpc({ action: 'claimTask', nodeId: nodeId2, taskId: taskId2 }),
+                handler6());
+              const value77 = { taskId: taskId2, released: ![] };
               return (
-                _0x5cf612['set'](_0xc11c3, _0x29a0bd),
-                _0xc83269(),
+                executing['set'](nodeId2, value77),
+                handler4(),
                 async () => {
-                  ((_0x29a0bd['released'] = !![]), (_0x232bfb = !![]), await _0x563fc7());
+                  ((value77['released'] = !![]), (enabled3 = !![]), await run7());
                 }
               );
-            } catch (_0x2a6160) {
-              _0xef08b2 &&
-                _0x6def90() &&
-                !(_0x2a6160['status'] >= 0x190 && _0x2a6160['status'] < 0x1f4) &&
-                (_0x5cf612['set'](_0xc11c3, { taskId: _0xf75119, released: !![], uncertain: !![] }),
-                (_0x232bfb = !![]),
-                _0x46d3da(_0x2a6160));
-              throw _0x2a6160;
+            } catch (response5) {
+              value72 &&
+                current2() &&
+                !(response5['status'] >= 0x190 && response5['status'] < 0x1f4) &&
+                (executing['set'](nodeId2, { taskId: taskId2, released: !![], uncertain: !![] }),
+                (enabled3 = !![]),
+                run6(response5));
+              throw response5;
             } finally {
-              (_0xd197a6['delete'](_0xc11c3), _0xc83269());
+              (map3['delete'](nodeId2), handler4());
             }
           },
         },
-        _0x192705 = [setGenerationExecutionPolicy(_0x1be6b2, _0x288cd5)];
-      if (_0x1be6b2['graphStore'])
-        _0x192705['push'](setGenerationExecutionPolicy(_0x1be6b2['graphStore'], _0x288cd5));
+        list13 = [setGenerationExecutionPolicy(store, value70)];
+      if (store['graphStore']) list13['push'](setGenerationExecutionPolicy(store['graphStore'], value70));
       return (
-        (_0x13f860 = () => _0x192705['forEach']((_0x3afeef) => _0x3afeef())),
+        (handler2 = () => list13['forEach']((handler10) => handler10())),
         publish
-          ? ((_0x3c6d8d = cloneGraph(_0x82a4dc)), (_0x232bfb = !![]))
-          : (hostBase?.['nodes'] &&
-              hostBase?.['edges'] &&
-              ((_0x3c6d8d = cloneGraph(hostBase)), (_0x2322b3 = !![])),
-            (_0x219031 = !![])),
-        await _0x563fc7(),
-        _0x6e0fe2(),
-        _0xc83269(),
-        void _0xa0ec68?.['start'](),
-        void _0x2cf4d8?.['start'](),
-        _0x791b0a
+          ? ((base = cloneGraph(before2)), (enabled3 = !![]))
+          : (hostBase?.['nodes'] && hostBase?.['edges'] && ((base = cloneGraph(hostBase)), (enabled4 = !![])),
+            (pending = !![])),
+        await run7(),
+        run11(),
+        handler4(),
+        void value12?.['start'](),
+        void value16?.['start'](),
+        enabled15
       );
     },
-    setPresence(_0x489bf4) {
-      ((_0x540798 = { ..._0x540798, ..._0x489bf4 }), _0xa0ec68?.['changed']());
+    setPresence(args9) {
+      ((presence = { ...presence, ...args9 }), value12?.['changed']());
     },
-    beginEditing(_0x19723a) {
-      return _0x57ae78['begin'](_0x19723a);
+    beginEditing(value78) {
+      return timer['begin'](value78);
     },
-    follow(_0x1eceef) {
-      ((_0x1e251e['followActorId'] = _0x1eceef || ''), _0xc83269());
+    follow(value79) {
+      ((revision['followActorId'] = value79 || ''), handler4());
     },
-    locate(_0x54566a) {
-      ((_0x1e251e['locateActorId'] = _0x54566a || ''), (_0x1e251e['followActorId'] = ''), _0xc83269());
+    locate(value80) {
+      ((revision['locateActorId'] = value80 || ''), (revision['followActorId'] = ''), handler4());
     },
     summon() {
-      return _0x791b0a['command']('attention', { view: _0x540798['view'] });
+      return enabled15['command']('attention', { view: presence['view'] });
     },
-    retryMedia(_0x395003) {
-      _0x337259['retry'](_0x395003, _0x1be6b2['getStateRaw']());
+    retryMedia(value81) {
+      media['retry'](value81, store['getStateRaw']());
     },
-    async resolveConflicts(_0x29db5b) {
-      await _0x563fc7();
-      if (_0xe7ef3b || _0x232bfb || _0x1e251e['status'] !== 'online')
-        throw new Error('请先完成其他修改的同步');
-      const _0x13d36d = _0x6b7c55['list'](),
-        _0x2bfa9c = _0x13d36d['map']((_0x381492) => ({
-          ..._0x381492,
-          before: _0xb81c3()[_0x381492['kind']][_0x381492['id']] ?? null,
-          after: _0x82a4dc[_0x381492['kind']][_0x381492['id']] ?? null,
+    async resolveConflicts(value82) {
+      await run7();
+      if (packet || enabled3 || revision['status'] !== 'online') throw new Error('请先完成其他修改的同步');
+      const list14 = conflicts['list'](),
+        value83 = list14['map']((args10) => ({
+          ...args10,
+          before: before3()[args10['kind']][args10['id']] ?? null,
+          after: before2[args10['kind']][args10['id']] ?? null,
         }));
-      _0x6b7c55['clear']();
-      if (_0x29db5b) {
-        for (const _0x6dbf4d of _0x13d36d) {
-          if (_0x82a4dc[_0x6dbf4d['kind']][_0x6dbf4d['id']])
-            _0x3c6d8d[_0x6dbf4d['kind']][_0x6dbf4d['id']] = structuredClone(
-              _0x82a4dc[_0x6dbf4d['kind']][_0x6dbf4d['id']],
-            );
-          else delete _0x3c6d8d[_0x6dbf4d['kind']][_0x6dbf4d['id']];
+      conflicts['clear']();
+      if (value82) {
+        for (const value84 of list14) {
+          if (before2[value84['kind']][value84['id']])
+            base[value84['kind']][value84['id']] = structuredClone(before2[value84['kind']][value84['id']]);
+          else delete base[value84['kind']][value84['id']];
         }
-        _0x232bfb = !![];
-      } else await _0x29e620(_0x82a4dc, _0x2bfa9c);
-      (await _0x563fc7(), _0xc83269());
+        enabled3 = !![];
+      } else await run8(before2, value83);
+      (await run7(), handler4());
     },
     async flush() {
-      (await _0xa0ec68?.['flush'](), await _0x1b1796());
+      (await value12?.['flush'](), await run3());
     },
-    async prepareDetach({ signal: _0x1f97a7, timeoutMs: timeoutMs = 0x2710 } = {}) {
-      const _0x1637b6 = () => new DOMException('Aborted', 'AbortError');
-      if (_0x1f97a7?.['aborted']) throw _0x1637b6();
-      if (_0x17ec17()) throw new Error('请等待当前生成任务结束后退出协作');
-      if (_0x507fdb())
+    async prepareDetach({ signal: signal2, timeoutMs: timeoutMs = 0x2710 } = {}) {
+      const run13 = () => new DOMException('Aborted', 'AbortError');
+      if (signal2?.['aborted']) throw run13();
+      if (handler3()) throw new Error('请等待当前生成任务结束后退出协作');
+      if (handler5())
         throw new Error(
           '素材尚未同步完成，请等待完成；也可选择“结束本次联机 → 确定”，保留当前本机内容后退出',
         );
-      if (_0x6b7c55['list']()['length'])
+      if (conflicts['list']()['length'])
         throw new Error('存在未处理的冲突，请先处理；也可选择“结束本次联机 → 确定”，保留当前本机内容后退出');
-      if (_0x791b0a['canDetach']()) return;
-      let _0x942252 = !![],
-        _0x38c525,
-        _0x14e4c2;
-      const _0x3c5fdc = new Promise((_0x15b0d9, _0x35fd01) => {
-        ((_0x14e4c2 = () => {
-          ((_0x942252 = ![]), _0x35fd01(_0x1637b6()));
+      if (enabled15['canDetach']()) return;
+      let enabled17 = !![],
+        setTimeout5,
+        value85;
+      const value86 = new Promise((value87, handler11) => {
+        ((value85 = () => {
+          ((enabled17 = ![]), handler11(run13()));
         }),
-          _0x1f97a7?.['addEventListener']('abort', _0x14e4c2, { once: !![] }),
-          (_0x38c525 = setTimeout(() => {
-            ((_0x942252 = ![]),
-              _0x35fd01(
+          signal2?.['addEventListener']('abort', value85, { once: !![] }),
+          (setTimeout5 = setTimeout(() => {
+            ((enabled17 = ![]),
+              handler11(
                 new Error('同步等待超时，修改仍保留在当前画布；请重试，或选择“结束本次联机 → 确定”直接退出'),
               ));
           }, timeoutMs)));
       });
       try {
-        await Promise['race']([_0x1b1796(() => _0x942252), _0x3c5fdc]);
+        await Promise['race']([run3(() => enabled17), value86]);
       } finally {
-        ((_0x942252 = ![]), clearTimeout(_0x38c525), _0x1f97a7?.['removeEventListener']('abort', _0x14e4c2));
+        ((enabled17 = ![]), clearTimeout(setTimeout5), signal2?.['removeEventListener']('abort', value85));
       }
-      if (_0x1f97a7?.['aborted']) throw _0x1637b6();
-      _0x24cf08();
-      if (!_0x791b0a['canDetach']())
+      if (signal2?.['aborted']) throw run13();
+      handler6();
+      if (!enabled15['canDetach']())
         throw new Error('当前仍有未同步修改，请重试，或选择“结束本次联机 → 确定”保留当前本机内容后退出');
     },
-    review: _0x885910,
-    async command(_0x3a2a16, _0x3fc6e3 = {}) {
-      if (['invite', 'renameSelf']['includes'](_0x3a2a16)) {
-        _0x24cf08();
-        const _0x50e662 = await _0x3fbf5a({ action: _0x3a2a16, ..._0x3fc6e3 });
+    review: review,
+    async command(action, args11 = {}) {
+      if (['invite', 'renameSelf']['includes'](action)) {
+        handler6();
+        const name3 = await rpc({ action: action, ...args11 });
         return (
-          _0x24cf08(),
-          _0x3a2a16 === 'renameSelf' &&
-            ((_0x1e251e['members'] = _0x1e251e['members']['map']((_0x3ca7b7) =>
-              _0x3ca7b7['id'] === _0x4b82f3 ? { ..._0x3ca7b7, name: _0x50e662['displayName'] } : _0x3ca7b7,
+          handler6(),
+          action === 'renameSelf' &&
+            ((revision['members'] = revision['members']['map']((args12) =>
+              args12['id'] === actorId ? { ...args12, name: name3['displayName'] } : args12,
             )),
-            (_0x1e251e['presence'] = _0x1e251e['presence']['map']((_0x66812) =>
-              _0x66812['actorId'] === _0x4b82f3 ? { ..._0x66812, name: _0x50e662['displayName'] } : _0x66812,
+            (revision['presence'] = revision['presence']['map']((args13) =>
+              args13['actorId'] === actorId ? { ...args13, name: name3['displayName'] } : args13,
             )),
-            _0xc83269()),
-          _0x50e662
+            handler4()),
+          name3
         );
       }
-      await _0x563fc7();
-      if (_0xe7ef3b || _0x232bfb) throw new Error('请先完成同步，或保留画布草稿后退出');
-      if (['leave', 'close']['includes'](_0x3a2a16) && _0x17ec17()) throw new Error('请先结束当前生成任务');
-      if (['leave', 'close']['includes'](_0x3a2a16) && _0x507fdb())
+      await run7();
+      if (packet || enabled3) throw new Error('请先完成同步，或保留画布草稿后退出');
+      if (['leave', 'close']['includes'](action) && handler3()) throw new Error('请先结束当前生成任务');
+      if (['leave', 'close']['includes'](action) && handler5())
         throw new Error('当前素材尚未同步，请等待完成或保留画布草稿后退出');
-      const _0x573e52 = await _0x3fbf5a({ action: _0x3a2a16, ..._0x3fc6e3 });
-      if (['leave', 'close']['includes'](_0x3a2a16)) await _0x791b0a['detach']();
-      else await _0x563fc7();
-      return _0x573e52;
+      const value88 = await rpc({ action: action, ...args11 });
+      if (['leave', 'close']['includes'](action)) await enabled15['detach']();
+      else await run7();
+      return value88;
     },
     canDetach() {
       return (
-        !_0x219031 &&
-        !_0x507fdb() &&
-        !_0x232bfb &&
-        !_0xe7ef3b &&
-        !_0x5cf612['size'] &&
-        !_0xd197a6['size'] &&
-        !_0x6b7c55['list']()['length']
+        !pending &&
+        !handler5() &&
+        !enabled3 &&
+        !packet &&
+        !executing['size'] &&
+        !map3['size'] &&
+        !conflicts['list']()['length']
       );
     },
     detach({ force: force = ![] } = {}) {
-      if (_0x17ec17()) throw new Error('请等待当前生成任务结束后退出协作');
-      if (!force && (_0x507fdb() || _0xe7ef3b || _0x232bfb || _0x6b7c55['list']()['length']))
+      if (handler3()) throw new Error('请等待当前生成任务结束后退出协作');
+      if (!force && (handler5() || packet || enabled3 || conflicts['list']()['length']))
         throw new Error('当前有未同步素材、修改或冲突，请先保留画布草稿');
-      if (_0x2d37b7) return _0x40ebd4;
-      const _0x537a6d = _0xc91cc();
-      return (onDetach(), _0x537a6d);
+      if (enabled2) return item;
+      const value89 = destroy();
+      return (onDetach(), value89);
     },
-    destroy: _0xc91cc,
+    destroy: destroy,
   };
-  return _0x791b0a;
+  return enabled15;
 }

@@ -1,6 +1,13 @@
-import { buildDreaminaImageUpscaleSubmitPayload, runDreaminaImageUpscaleGeneration } from './dreaminaGenApi.js';
+import {
+  buildDreaminaImageUpscaleSubmitPayload,
+  runDreaminaImageUpscaleGeneration,
+} from './dreaminaGenApi.js';
 import { buildOpenAiCliImageSubmitRequest, runOpenAiCliImageGeneration } from './openAiCliImageGenApi.js';
-import { getRunningHubTaskProviderProfileId, normalizeRunningHubModelApiProfileId, resolveRunningHubModelApiProfileId } from '../src/modules/runningHubProviderProfiles.js';
+import {
+  getRunningHubTaskProviderProfileId,
+  normalizeRunningHubModelApiProfileId,
+  resolveRunningHubModelApiProfileId,
+} from '../src/modules/runningHubProviderProfiles.js';
 import { saveImage } from '../src/modules/storage.js';
 import { compressImage } from '../src/modules/imageUtils.js';
 import * as RunningHubAdapter from './adapters/RunningHubAdapter.js';
@@ -26,253 +33,248 @@ import { requester } from './requester.js';
 import { runTaskSingleFlight } from './taskSingleFlight.js';
 import { ApiError, ErrorType, parseError, parseTaskError, parseNetworkError } from './errors/index.js';
 const GENERATION_TIMEOUT = 10 * 60 * 0x3e8;
-export async function cancelRunningHubImageTask({ apiKey: _0x5b8ee6, taskId: _0x1bc403 } = {}) {
-  return cancelRunningHubTask({ apiKey: _0x5b8ee6, taskId: _0x1bc403 });
+export async function cancelRunningHubImageTask({ apiKey: apiKey, taskId: taskId } = {}) {
+  return cancelRunningHubTask({ apiKey: apiKey, taskId: taskId });
 }
 const GENERATION_RETRIES = 2,
   GENERATION_RETRY_DELAY = 0x3e8;
-function getProviderId(_0x1780be) {
-  return resolveModelProvider(_0x1780be?.model, _0x1780be?.provider);
+function getProviderId(value) {
+  return resolveModelProvider(value?.model, value?.provider);
 }
-function resolveModelApiExecutionForPayload(_0xdbbf19, _0x240a7e) {
-  const _0xa083fe = String(_0x240a7e || '')
+function resolveModelApiExecutionForPayload(item, key) {
+  const providerHint = String(key || '')
       .trim()
       .toLowerCase(),
-    _0x36331d = String(_0xdbbf19?.model || '').trim();
-  if (!_0x36331d) return null;
-  const _0x526dc9 = resolveModelExecution(_0x36331d, { providerHint: _0xa083fe }),
-    _0x21747d = _0x526dc9?.executionManifest;
-  if (!_0x21747d || _0x21747d.adapterType !== 'modelApi' || _0x21747d.kind !== 'image') return null;
-  return _0x21747d;
+    enabled = String(item?.model || '').trim();
+  if (!enabled) return null;
+  const modelExecution = resolveModelExecution(enabled, { providerHint: providerHint }),
+    enabled2 = modelExecution?.executionManifest;
+  if (!enabled2 || enabled2.adapterType !== 'modelApi' || enabled2.kind !== 'image') return null;
+  return enabled2;
 }
-function resolveImageTaskRuntimeOptions(_0x54cba4 = {}, _0x3df42b = '', _0x3d07a8 = {}) {
-  const _0x1e6f49 = String(_0x54cba4?.model || '').trim();
-  if (!_0x1e6f49) return _0x3d07a8 || {};
-  const _0x4fcbe2 = String(_0x3df42b || getProviderId(_0x54cba4) || '')
+function resolveImageTaskRuntimeOptions(options = {}, index = '', enabled3 = {}) {
+  const enabled4 = String(options?.model || '').trim();
+  if (!enabled4) return enabled3 || {};
+  const providerHint2 = String(index || getProviderId(options) || '')
       .trim()
       .toLowerCase(),
-    _0x3e36a6 = resolveModelExecution(_0x1e6f49, { providerHint: _0x4fcbe2 }),
-    _0x4fe281 = _0x3e36a6?.executionManifest;
-  if (!_0x4fe281 || _0x4fe281.adapterType !== 'modelApi' || _0x4fe281.kind !== 'image')
-    return _0x3d07a8 || {};
-  const _0x1b975e = String(_0x4fe281.provider || _0x4fcbe2)
+    modelManifest = resolveModelExecution(enabled4, { providerHint: providerHint2 }),
+    responseMapping = modelManifest?.executionManifest;
+  if (!responseMapping || responseMapping.adapterType !== 'modelApi' || responseMapping.kind !== 'image')
+    return enabled3 || {};
+  const result = String(responseMapping.provider || providerHint2)
       .trim()
       .toLowerCase(),
-    _0x4d1e9a = getProviderConfig(_0x1b975e),
-    _0x8fc2b3 = resolveManifestTaskPolling(_0x1b975e, _0x4d1e9a, _0x4fe281, {
-      modelManifest: _0x3e36a6?.modelManifest || null,
+    providerConfig = getProviderConfig(result),
+    taskPolling = resolveManifestTaskPolling(result, providerConfig, responseMapping, {
+      modelManifest: modelManifest?.modelManifest || null,
     });
   return {
-    ...(_0x3d07a8 || {}),
-    ...(!_0x3d07a8?.responseMapping && _0x4fe281.responseMapping
-      ? { responseMapping: _0x4fe281.responseMapping }
+    ...(enabled3 || {}),
+    ...(!enabled3?.responseMapping && responseMapping.responseMapping
+      ? { responseMapping: responseMapping.responseMapping }
       : {}),
-    ...(!_0x3d07a8?.taskPolling && _0x8fc2b3 ? { taskPolling: _0x8fc2b3 } : {}),
+    ...(!enabled3?.taskPolling && taskPolling ? { taskPolling: taskPolling } : {}),
   };
 }
-function shouldSubmitProviderBatchOnce(_0x4d847c, _0x39dee0, _0x4ba446) {
-  if (!(Number.parseInt(_0x4ba446, 10) > 1)) return false;
-  const _0x1e82a7 = resolveModelApiExecutionForPayload(_0x4d847c, _0x39dee0),
-    _0x2898ba = _0x1e82a7?.extensions?.batchSubmitMode;
-  if (_0x2898ba === 'providerN') return true;
-  if (!_0x2898ba || typeof _0x2898ba !== 'object' || Array.isArray(_0x2898ba)) return false;
-  if (String(_0x2898ba.type || '').trim() !== 'providerN') return false;
-  if (_0x2898ba.requiresInputImages === true) {
-    const _0xdf9c48 = [_0x4d847c?.inputUrls, _0x4d847c?.image_urls, _0x4d847c?.imageUrls, _0x4d847c?.images],
-      _0x132d12 = _0xdf9c48.some((_0x5dbcb2) =>
-        Array.isArray(_0x5dbcb2)
-          ? _0x5dbcb2.some((_0x37fd22) => String(_0x37fd22 || '').trim())
-          : String(_0x5dbcb2 || '').trim(),
+function shouldSubmitProviderBatchOnce(data, target, source) {
+  if (!(Number.parseInt(source, 10) > 1)) return false;
+  const modelApiExecutionForPayload = resolveModelApiExecutionForPayload(data, target),
+    el = modelApiExecutionForPayload?.extensions?.batchSubmitMode;
+  if (el === 'providerN') return true;
+  if (!el || typeof el !== 'object' || Array.isArray(el)) return false;
+  if (String(el.type || '').trim() !== 'providerN') return false;
+  if (el.requiresInputImages === true) {
+    const list = [data?.inputUrls, data?.image_urls, data?.imageUrls, data?.images],
+      enabled5 = list.some((list2) =>
+        Array.isArray(list2) ? list2.some((item2) => String(item2 || '').trim()) : String(list2 || '').trim(),
       );
-    if (!_0x132d12) return false;
+    if (!enabled5) return false;
   }
-  const _0x2274aa = String(_0x2898ba.field || '').trim();
-  if (!_0x2274aa) return true;
-  const _0x3c3b5d = Array.isArray(_0x2898ba.values) ? _0x2898ba.values : [_0x2898ba.value],
-    _0x1c7ce2 = _0x3c3b5d
-      .map((_0x468b04) =>
-        String(_0x468b04 ?? '')
+  const enabled6 = String(el.field || '').trim();
+  if (!enabled6) return true;
+  const list3 = Array.isArray(el.values) ? el.values : [el.value],
+    list4 = list3
+      .map((item3) =>
+        String(item3 ?? '')
           .trim()
           .toLowerCase(),
       )
       .filter(Boolean);
-  if (_0x1c7ce2.length === 0) return true;
-  const _0x5c6c47 = String(_0x4d847c?.[_0x2274aa] ?? '')
+  if (list4.length === 0) return true;
+  const next = String(data?.[enabled6] ?? '')
     .trim()
     .toLowerCase();
-  return _0x1c7ce2.includes(_0x5c6c47);
+  return list4.includes(next);
 }
-function resolveImageGenerationBatchSize(_0x325be1, _0x3b4763) {
-  const _0x110625 = parseInt(_0x325be1?.batchSize, 10) || 1,
-    _0x586b19 = resolveModelApiExecutionForPayload(_0x325be1, _0x3b4763),
-    _0x5ed065 = Number.parseInt(_0x586b19?.extensions?.fixedBatchSize, 10);
-  if (Number.isFinite(_0x5ed065) && _0x5ed065 >= 1) return _0x5ed065;
-  const _0x5219be = Number.parseInt(_0x586b19?.extensions?.maxBatchSize, 10);
-  if (Number.isFinite(_0x5219be) && _0x5219be >= 1) return Math.min(_0x110625, _0x5219be);
-  return _0x110625;
+function resolveImageGenerationBatchSize(current, entry) {
+  const record = parseInt(current?.batchSize, 10) || 1,
+    modelApiExecutionForPayload2 = resolveModelApiExecutionForPayload(current, entry),
+    count = Number.parseInt(modelApiExecutionForPayload2?.extensions?.fixedBatchSize, 10);
+  if (Number.isFinite(count) && count >= 1) return count;
+  const count2 = Number.parseInt(modelApiExecutionForPayload2?.extensions?.maxBatchSize, 10);
+  if (Number.isFinite(count2) && count2 >= 1) return Math.min(record, count2);
+  return record;
 }
-function isRunningHubOpenApiV2AiApp(_0x169fda) {
-  const _0x38bb4f = String(_0x169fda?.model || ''),
-    _0x292f8f = resolveModelExecution(_0x38bb4f)?.executionManifest;
+function isRunningHubOpenApiV2AiApp(payload) {
+  const handle = String(payload?.model || ''),
+    modelExecution2 = resolveModelExecution(handle)?.executionManifest;
   if (
-    _0x292f8f?.adapterType === 'workflow' &&
-    _0x292f8f?.submitMode === 'openapi-v2-ai-app' &&
-    _0x292f8f?.queryMode === 'openapi-v2-query'
+    modelExecution2?.adapterType === 'workflow' &&
+    modelExecution2?.submitMode === 'openapi-v2-ai-app' &&
+    modelExecution2?.queryMode === 'openapi-v2-query'
   )
     return true;
   return false;
 }
-function getDreaminaModelVersion(_0x24c3cf) {
-  const _0x2333a0 = String(_0x24c3cf?.modelVersion || '').trim();
-  if (_0x2333a0) return _0x2333a0;
-  const _0xa35214 = String(_0x24c3cf?.model || '').trim();
-  if (resolveModelProvider(_0xa35214, _0x24c3cf?.provider) !== 'dreamina') return '';
-  const _0x89fe63 = (_0xa35214.split('/')[1] || '').trim();
-  return /^(4\.0|4\.1|4\.5|5\.0)$/.test(_0x89fe63) ? _0x89fe63 : '';
+function getDreaminaModelVersion(state) {
+  const config = String(state?.modelVersion || '').trim();
+  if (config) return config;
+  const scope = String(state?.model || '').trim();
+  if (resolveModelProvider(scope, state?.provider) !== 'dreamina') return '';
+  const input = (scope.split('/')[1] || '').trim();
+  return /^(4\.0|4\.1|4\.5|5\.0)$/.test(input) ? input : '';
 }
-function getDreaminaAspectRatio(_0x40a3e6, _0x20a625) {
-  const _0x11f5e9 = String(_0x40a3e6?.resolvedRatioLabel || '').trim();
-  if (_0x11f5e9) return _0x11f5e9;
-  const _0x4aa1bb = String(_0x40a3e6?.aspectRatio || '').trim();
-  if (!_0x4aa1bb) return '';
-  if (_0x4aa1bb === '自适应' || _0x4aa1bb === 'auto') return _0x20a625 ? '' : '1:1';
-  return _0x4aa1bb;
+function getDreaminaAspectRatio(output, value2) {
+  const value3 = String(output?.resolvedRatioLabel || '').trim();
+  if (value3) return value3;
+  const enabled7 = String(output?.aspectRatio || '').trim();
+  if (!enabled7) return '';
+  if (enabled7 === '自适应' || enabled7 === 'auto') return value2 ? '' : '1:1';
+  return enabled7;
 }
-function buildDreaminaImageSubmitRequest(_0x1cd438, _0x3b52c8) {
-  const _0x25ae2e = Array.isArray(_0x1cd438.inputUrls) ? _0x1cd438.inputUrls.filter(Boolean) : [],
-    _0x3eeef8 = _0x25ae2e.length > 0,
-    _0x2400d8 = getDreaminaModelVersion(_0x1cd438),
-    _0x55bc91 = getDreaminaAspectRatio(_0x1cd438, _0x3eeef8),
-    _0x9255e4 = String(_0x1cd438.imageSize || '')
+function buildDreaminaImageSubmitRequest(value4, prompt) {
+  const images = Array.isArray(value4.inputUrls) ? value4.inputUrls.filter(Boolean) : [],
+    value5 = images.length > 0,
+    dreaminaModelVersion = getDreaminaModelVersion(value4),
+    dreaminaAspectRatio = getDreaminaAspectRatio(value4, value5),
+    value6 = String(value4.imageSize || '')
       .trim()
       .toLowerCase(),
-    _0x4ba18a = { prompt: _0x3b52c8 };
-  if (_0x55bc91) _0x4ba18a.ratio = _0x55bc91;
-  if (_0x9255e4) _0x4ba18a.resolutionType = _0x9255e4;
-  if (_0x2400d8) _0x4ba18a.modelVersion = _0x2400d8;
-  if (_0x25ae2e.length > 0)
+    body = { prompt: prompt };
+  if (dreaminaAspectRatio) body.ratio = dreaminaAspectRatio;
+  if (value6) body.resolutionType = value6;
+  if (dreaminaModelVersion) body.modelVersion = dreaminaModelVersion;
+  if (images.length > 0)
     return {
       url: '/api/v2/dreamina/image2image',
       headers: { 'Content-Type': 'application/json' },
-      body: { ..._0x4ba18a, images: _0x25ae2e },
+      body: { ...body, images: images },
     };
   return {
     url: '/api/v2/dreamina/text2image',
     headers: { 'Content-Type': 'application/json' },
-    body: _0x4ba18a,
+    body: body,
   };
 }
-function getImageExecution(_0x53659b, _0x5d1a9f) {
-  return resolveModelExecution(_0x53659b?.model, { providerHint: _0x5d1a9f });
+function getImageExecution(value7, providerHint3) {
+  return resolveModelExecution(value7?.model, { providerHint: providerHint3 });
 }
-function createMissingImageManifestError(_0x1b4a29, _0x49514f) {
-  const _0x1e402b = String(_0x1b4a29?.model || '').trim() || '(empty)',
-    _0x20839b = String(_0x49514f || '')
+function createMissingImageManifestError(value8, value9) {
+  const value10 = String(value8?.model || '').trim() || '(empty)',
+    value11 = String(value9 || '')
       .trim()
       .toLowerCase();
-  if (_0x20839b === 'runninghubwf')
+  if (value11 === 'runninghubwf')
     return new Error(
-      'RunningHub workflow manifest missing: ' + _0x1e402b + '; RunningHUB request requires a manifest',
+      'RunningHub workflow manifest missing: ' + value10 + '; RunningHUB request requires a manifest',
     );
-  if (_0x20839b === 'runninghub') return new Error('RunningHub model API manifest missing: ' + _0x1e402b);
-  const _0x4dcb3f = {
+  if (value11 === 'runninghub') return new Error('RunningHub model API manifest missing: ' + value10);
+  const value12 = {
       agnes: 'Agnes AI',
       apimart: 'APIMart',
       grsai: 'GRSAI',
       ppio: 'PPIO',
       volcengine: 'Volcengine',
     },
-    _0x36b656 = _0x4dcb3f[_0x20839b];
-  if (_0x36b656) return new Error(_0x36b656 + ' image model API manifest missing: ' + _0x1e402b);
-  return new Error('Image model API manifest missing: ' + _0x1e402b);
+    value13 = value12[value11];
+  if (value13) return new Error(value13 + ' image model API manifest missing: ' + value10);
+  return new Error('Image model API manifest missing: ' + value10);
 }
-function collectDeepMediaUrls(_0x2ff74f, _0x5cf6f8 = 0, _0x3aa199 = new WeakSet()) {
-  if (_0x2ff74f === undefined || _0x2ff74f === null || _0x5cf6f8 > 8) return [];
-  if (typeof _0x2ff74f === 'string') {
-    const _0x8df5ba = _0x2ff74f.trim();
-    return /^https?:\/\//i.test(_0x8df5ba) ? [_0x8df5ba] : [];
+function collectDeepMediaUrls(list5, count3 = 0, map = new WeakSet()) {
+  if (list5 === undefined || list5 === null || count3 > 8) return [];
+  if (typeof list5 === 'string') {
+    const value14 = list5.trim();
+    return /^https?:\/\//i.test(value14) ? [value14] : [];
   }
-  if (Array.isArray(_0x2ff74f))
-    return _0x2ff74f.flatMap((_0xedcf5a) => collectDeepMediaUrls(_0xedcf5a, _0x5cf6f8 + 1, _0x3aa199));
-  if (typeof _0x2ff74f !== 'object') return [];
-  if (_0x3aa199.has(_0x2ff74f)) return [];
-  _0x3aa199.add(_0x2ff74f);
-  const _0x24117e = ['url', 'imageUrl', 'image_url', 'fileUrl', 'file_url', 'downloadUrl', 'download_url'],
-    _0x54d6d2 = [];
-  for (const _0x121e3e of _0x24117e) {
-    _0x54d6d2.push(...collectDeepMediaUrls(_0x2ff74f[_0x121e3e], _0x5cf6f8 + 1, _0x3aa199));
+  if (Array.isArray(list5)) return list5.flatMap((item4) => collectDeepMediaUrls(item4, count3 + 1, map));
+  if (typeof list5 !== 'object') return [];
+  if (map.has(list5)) return [];
+  map.add(list5);
+  const value15 = ['url', 'imageUrl', 'image_url', 'fileUrl', 'file_url', 'downloadUrl', 'download_url'],
+    list6 = [];
+  for (const value16 of value15) {
+    list6.push(...collectDeepMediaUrls(list5[value16], count3 + 1, map));
   }
-  const _0x531d6e = ['results', 'result', 'images', 'image', 'outputs', 'output', 'data'];
-  for (const _0x586c57 of _0x531d6e) {
-    _0x54d6d2.push(...collectDeepMediaUrls(_0x2ff74f[_0x586c57], _0x5cf6f8 + 1, _0x3aa199));
+  const value17 = ['results', 'result', 'images', 'image', 'outputs', 'output', 'data'];
+  for (const value18 of value17) {
+    list6.push(...collectDeepMediaUrls(list5[value18], count3 + 1, map));
   }
-  return Array.from(new Set(_0x54d6d2.filter(Boolean)));
+  return Array.from(new Set(list6.filter(Boolean)));
 }
-function extractImageUrls(_0xf639e, _0x395500 = null) {
-  const _0x38a7fd = resolveMappedResponseValues(_0xf639e, _0x395500?.resultPaths);
-  if (_0x38a7fd.length > 0) return _0x38a7fd;
-  const _0x4ac1de = [];
-  if (_0xf639e.data?.result?.images && Array.isArray(_0xf639e.data.result.images))
-    _0x4ac1de.push(
-      ..._0xf639e.data.result.images.map((_0x454836) =>
-        Array.isArray(_0x454836.url) ? _0x454836.url[0] : _0x454836.url,
+function extractImageUrls(response, value19 = null) {
+  const list7 = resolveMappedResponseValues(response, value19?.resultPaths);
+  if (list7.length > 0) return list7;
+  const list8 = [];
+  if (response.data?.result?.images && Array.isArray(response.data.result.images))
+    list8.push(
+      ...response.data.result.images.map((response2) =>
+        Array.isArray(response2.url) ? response2.url[0] : response2.url,
       ),
     );
   else {
-    if (_0xf639e.result?.images && Array.isArray(_0xf639e.result.images))
-      _0x4ac1de.push(
-        ..._0xf639e.result.images.map((_0x2e584b) =>
-          Array.isArray(_0x2e584b.url) ? _0x2e584b.url[0] : _0x2e584b.url,
+    if (response.result?.images && Array.isArray(response.result.images))
+      list8.push(
+        ...response.result.images.map((response3) =>
+          Array.isArray(response3.url) ? response3.url[0] : response3.url,
         ),
       );
     else {
-      if (_0xf639e.status === 'succeeded' && _0xf639e.results)
-        _0x4ac1de.push(..._0xf639e.results.map((_0x18e19c) => _0x18e19c.url));
+      if (response.status === 'succeeded' && response.results)
+        list8.push(...response.results.map((response4) => response4.url));
       else {
-        if (_0xf639e.data?.[0]?.url) _0x4ac1de.push(..._0xf639e.data.map((_0x3bd38d) => _0x3bd38d.url));
+        if (response.data?.[0]?.url) list8.push(...response.data.map((response5) => response5.url));
         else {
-          if (_0xf639e.data?.[0]?.fileUrl)
-            _0x4ac1de.push(..._0xf639e.data.map((_0x15f776) => _0x15f776.fileUrl));
+          if (response.data?.[0]?.fileUrl) list8.push(...response.data.map((item5) => item5.fileUrl));
           else {
-            if (_0xf639e.data?.results)
-              _0x4ac1de.push(..._0xf639e.data.results.map((_0x32b2b8) => _0x32b2b8.url));
+            if (response.data?.results)
+              list8.push(...response.data.results.map((response6) => response6.url));
             else {
-              if (_0xf639e.data?.[0]?.image)
-                _0x4ac1de.push(..._0xf639e.data.map((_0x5403bd) => _0x5403bd.image));
+              if (response.data?.[0]?.image) list8.push(...response.data.map((item6) => item6.image));
               else {
-                if (Array.isArray(_0xf639e.images))
-                  _0x4ac1de.push(
-                    ..._0xf639e.images.map((_0x166b7d) =>
-                      typeof _0x166b7d === 'string' ? _0x166b7d : _0x166b7d.url || _0x166b7d.image_url,
+                if (Array.isArray(response.images))
+                  list8.push(
+                    ...response.images.map((response7) =>
+                      typeof response7 === 'string' ? response7 : response7.url || response7.image_url,
                     ),
                   );
                 else {
-                  if (Array.isArray(_0xf639e.image_urls))
-                    _0x4ac1de.push(
-                      ..._0xf639e.image_urls.map((_0x2dd0c2) =>
-                        typeof _0x2dd0c2 === 'string' ? _0x2dd0c2 : _0x2dd0c2.url,
+                  if (Array.isArray(response.image_urls))
+                    list8.push(
+                      ...response.image_urls.map((response8) =>
+                        typeof response8 === 'string' ? response8 : response8.url,
                       ),
                     );
                   else {
-                    if (Array.isArray(_0xf639e.results))
-                      _0x4ac1de.push(
-                        ..._0xf639e.results.map(
-                          (_0x3f530a) =>
-                            _0x3f530a.url || _0x3f530a.imageUrl || _0x3f530a.image_url || _0x3f530a.image,
+                    if (Array.isArray(response.results))
+                      list8.push(
+                        ...response.results.map(
+                          (response9) =>
+                            response9.url || response9.imageUrl || response9.image_url || response9.image,
                         ),
                       );
                     else
-                      (_0xf639e.url ||
-                        _0xf639e.image_url ||
-                        _0xf639e.fileUrl ||
-                        _0xf639e.file_url ||
-                        _0xf639e.image) &&
-                        _0x4ac1de.push(
-                          _0xf639e.url ||
-                            _0xf639e.image_url ||
-                            _0xf639e.fileUrl ||
-                            _0xf639e.file_url ||
-                            _0xf639e.image,
+                      (response.url ||
+                        response.image_url ||
+                        response.fileUrl ||
+                        response.file_url ||
+                        response.image) &&
+                        list8.push(
+                          response.url ||
+                            response.image_url ||
+                            response.fileUrl ||
+                            response.file_url ||
+                            response.image,
                         );
                   }
                 }
@@ -284,43 +286,43 @@ function extractImageUrls(_0xf639e, _0x395500 = null) {
     }
   }
   return (
-    _0x4ac1de.length === 0 && _0x4ac1de.push(...collectDeepMediaUrls(_0xf639e)),
-    Array.from(new Set(_0x4ac1de.filter(Boolean)))
+    list8.length === 0 && list8.push(...collectDeepMediaUrls(response)),
+    Array.from(new Set(list8.filter(Boolean)))
   );
 }
-function firstNonEmptyText(..._0x46eb4e) {
-  for (const _0x5e9a7d of _0x46eb4e) {
-    let _0x51951f = '';
-    _0x5e9a7d && typeof _0x5e9a7d === 'object'
-      ? (_0x51951f =
+function firstNonEmptyText(...args) {
+  for (const error of args) {
+    let nonEmptyText = '';
+    error && typeof error === 'object'
+      ? (nonEmptyText =
           firstNonEmptyText(
-            _0x5e9a7d.message,
-            _0x5e9a7d.errorMessage,
-            _0x5e9a7d.error_message,
-            _0x5e9a7d.reason,
-            _0x5e9a7d.detail,
-            _0x5e9a7d.details,
-            _0x5e9a7d.msg,
+            error.message,
+            error.errorMessage,
+            error.error_message,
+            error.reason,
+            error.detail,
+            error.details,
+            error.msg,
           ) ||
           (() => {
             try {
-              return JSON.stringify(_0x5e9a7d);
+              return JSON.stringify(error);
             } catch {
               return '';
             }
           })())
-      : (_0x51951f = String(_0x5e9a7d || '').trim());
-    if (_0x51951f) return _0x51951f;
+      : (nonEmptyText = String(error || '').trim());
+    if (nonEmptyText) return nonEmptyText;
   }
   return '';
 }
-function pickImageUrlFromResultItem(_0xef44ea) {
-  if (typeof _0xef44ea === 'string') {
-    const _0x468aa6 = _0xef44ea.trim();
-    return /^https?:\/\//i.test(_0x468aa6) ? _0x468aa6 : '';
+function pickImageUrlFromResultItem(enabled8) {
+  if (typeof enabled8 === 'string') {
+    const value20 = enabled8.trim();
+    return /^https?:\/\//i.test(value20) ? value20 : '';
   }
-  if (!_0xef44ea || typeof _0xef44ea !== 'object') return '';
-  for (const _0x5fef1 of [
+  if (!enabled8 || typeof enabled8 !== 'object') return '';
+  for (const value21 of [
     'url',
     'imageUrl',
     'image_url',
@@ -330,32 +332,30 @@ function pickImageUrlFromResultItem(_0xef44ea) {
     'download_url',
     'image',
   ]) {
-    const _0x357a20 = _0xef44ea[_0x5fef1],
-      _0x8934b4 = Array.isArray(_0x357a20) ? _0x357a20[0] : _0x357a20,
-      _0x4ce6de = String(_0x8934b4 || '').trim();
-    if (/^https?:\/\//i.test(_0x4ce6de)) return _0x4ce6de;
+    const value22 = enabled8[value21],
+      value23 = Array.isArray(value22) ? value22[0] : value22,
+      value24 = String(value23 || '').trim();
+    if (/^https?:\/\//i.test(value24)) return value24;
   }
-  return collectDeepMediaUrls(_0xef44ea)[0] || '';
+  return collectDeepMediaUrls(enabled8)[0] || '';
 }
-function pickImageResultError(_0x138faa) {
-  if (!_0x138faa || typeof _0x138faa !== 'object') return '';
-  const _0x296bbc = firstNonEmptyText(
-    _0x138faa.error,
-    _0x138faa.errorMessage,
-    _0x138faa.message,
-    _0x138faa.failure_reason,
-    _0x138faa.failReason,
-    _0x138faa.reason,
-    _0x138faa.statusReason,
-    _0x138faa?.data?.error,
-    _0x138faa?.data?.errorMessage,
-    _0x138faa?.data?.message,
-    _0x138faa?.data?.failure_reason,
+function pickImageResultError(error2) {
+  if (!error2 || typeof error2 !== 'object') return '';
+  const nonEmptyText2 = firstNonEmptyText(
+    error2.error,
+    error2.errorMessage,
+    error2.message,
+    error2.failure_reason,
+    error2.failReason,
+    error2.reason,
+    error2.statusReason,
+    error2?.data?.error,
+    error2?.data?.errorMessage,
+    error2?.data?.message,
+    error2?.data?.failure_reason,
   );
-  if (_0x296bbc) return _0x296bbc;
-  const _0x211b62 = String(
-    _0x138faa.status || _0x138faa.taskStatus || _0x138faa.task_status || _0x138faa.state || '',
-  )
+  if (nonEmptyText2) return nonEmptyText2;
+  const value25 = String(error2.status || error2.taskStatus || error2.task_status || error2.state || '')
     .trim()
     .toLowerCase();
   if (
@@ -370,28 +370,28 @@ function pickImageResultError(_0x138faa) {
       'content-filtered',
       'sensitive',
       'violation',
-    ].includes(_0x211b62)
+    ].includes(value25)
   )
     return '生成失败';
   return '';
 }
-function getArrayAtPath(_0x2f763b, _0x5d361c) {
-  const _0x586f09 = String(_0x5d361c || '')
+function getArrayAtPath(value26, value27) {
+  const value28 = String(value27 || '')
     .split('.')
     .filter(Boolean)
-    .reduce((_0xd62027, _0xb8cd60) => {
-      if (_0xd62027 === undefined || _0xd62027 === null) return undefined;
-      return _0xd62027[_0xb8cd60];
-    }, _0x2f763b);
-  return Array.isArray(_0x586f09) ? _0x586f09 : null;
+    .reduce((item7, value29) => {
+      if (item7 === undefined || item7 === null) return undefined;
+      return item7[value29];
+    }, value26);
+  return Array.isArray(value28) ? value28 : null;
 }
-function collectImageResultRecordArrays(_0x3ed400) {
-  const _0x109bbe = [],
-    _0x161018 = (_0x2582a0) => {
-      if (!Array.isArray(_0x2582a0) || _0x109bbe.includes(_0x2582a0)) return;
-      _0x109bbe.push(_0x2582a0);
+function collectImageResultRecordArrays(value30) {
+  const list9 = [],
+    handler = (value31) => {
+      if (!Array.isArray(value31) || list9.includes(value31)) return;
+      list9.push(value31);
     };
-  for (const _0x2b0267 of [
+  for (const value32 of [
     'data.result.images',
     'result.images',
     'results',
@@ -403,107 +403,105 @@ function collectImageResultRecordArrays(_0x3ed400) {
     'output.images',
     'output.results',
   ]) {
-    _0x161018(getArrayAtPath(_0x3ed400, _0x2b0267));
+    handler(getArrayAtPath(value30, value32));
   }
-  return _0x109bbe;
+  return list9;
 }
-function normalizeImageResultRecordItem(_0x147f8e) {
-  const _0x340c53 = pickImageUrlFromResultItem(_0x147f8e),
-    _0x1b1073 = _0x340c53 ? '' : pickImageResultError(_0x147f8e);
-  if (!_0x340c53 && !_0x1b1073) return null;
+function normalizeImageResultRecordItem(fullData) {
+  const sourceUrl = pickImageUrlFromResultItem(fullData),
+    error3 = sourceUrl ? '' : pickImageResultError(fullData);
+  if (!sourceUrl && !error3) return null;
   return {
-    sourceUrl: _0x340c53,
-    error: _0x1b1073,
-    fullData: _0x147f8e && typeof _0x147f8e === 'object' ? _0x147f8e : undefined,
+    sourceUrl: sourceUrl,
+    error: error3,
+    fullData: fullData && typeof fullData === 'object' ? fullData : undefined,
   };
 }
-function extractImageResultRecords(_0x16b4ea, _0x1073f1 = null) {
-  for (const _0x371610 of collectImageResultRecordArrays(_0x16b4ea)) {
-    const _0x3bbd66 = _0x371610.map((_0x9515a3) => normalizeImageResultRecordItem(_0x9515a3)).filter(Boolean);
-    if (_0x3bbd66.length > 0) return _0x3bbd66;
+function extractImageResultRecords(value33, value34 = null) {
+  for (const list10 of collectImageResultRecordArrays(value33)) {
+    const list11 = list10.map((item8) => normalizeImageResultRecordItem(item8)).filter(Boolean);
+    if (list11.length > 0) return list11;
   }
-  const _0x4f85b1 = resolveMappedResponseValues(_0x16b4ea, _0x1073f1?.resultPaths);
-  if (_0x4f85b1.length > 0) return _0x4f85b1.map((_0x2d33fe) => ({ sourceUrl: _0x2d33fe, error: '' }));
-  return extractImageUrls(_0x16b4ea, _0x1073f1).map((_0x1058dc) => ({ sourceUrl: _0x1058dc, error: '' }));
+  const list12 = resolveMappedResponseValues(value33, value34?.resultPaths);
+  if (list12.length > 0) return list12.map((sourceUrl2) => ({ sourceUrl: sourceUrl2, error: '' }));
+  return extractImageUrls(value33, value34).map((sourceUrl3) => ({ sourceUrl: sourceUrl3, error: '' }));
 }
-function hasImageResultOutput(_0x573b1f, _0x1b8686 = null) {
-  return extractImageResultRecords(_0x573b1f, _0x1b8686).some((_0x590ce9) =>
-    String(_0x590ce9?.sourceUrl || '').trim(),
-  );
+function hasImageResultOutput(value35, value36 = null) {
+  return extractImageResultRecords(value35, value36).some((item9) => String(item9?.sourceUrl || '').trim());
 }
-export async function buildGenerateImageRequest(_0x17aa8b) {
+export async function buildGenerateImageRequest(value37) {
   await ensureConfig();
-  const _0x397f12 = applyCameraAngleToPrompt(_0x17aa8b.prompt, _0x17aa8b.cameraAngle),
-    _0x440597 = getProviderId(_0x17aa8b || {}),
-    _0x38193d = getImageExecution(_0x17aa8b, _0x440597),
-    _0x3abd2d = _0x38193d?.executionManifest,
-    _0x1f239c = _0x38193d?.modelManifest;
-  if (_0x3abd2d?.adapterType === 'localRuntime' && _0x3abd2d?.runtime === 'dreaminaImage')
-    return buildDreaminaImageSubmitRequest(_0x17aa8b, _0x397f12);
-  const _0x154808 = {
+  const prompt2 = applyCameraAngleToPrompt(value37.prompt, value37.cameraAngle),
+    providerId = getProviderId(value37 || {}),
+    imageExecution = getImageExecution(value37, providerId),
+    value38 = imageExecution?.executionManifest,
+    expectedProvider = imageExecution?.modelManifest;
+  if (value38?.adapterType === 'localRuntime' && value38?.runtime === 'dreaminaImage')
+    return buildDreaminaImageSubmitRequest(value37, prompt2);
+  const value39 = {
     getProviderConfig: getProviderConfig,
     processInputImages: processInputImages,
     processInputImagesPreserveOrder: processInputImagesPreserveOrder,
     uploadInputsToVolcengineFiles: uploadInputsToVolcengineFiles,
   };
-  if (_0x3abd2d?.adapterType === 'modelApi') {
-    const _0x1c1214 = await buildImageRequestFromManifest(_0x17aa8b, _0x397f12, _0x154808, {
-      expectedProvider: _0x1f239c?.provider || _0x440597,
+  if (value38?.adapterType === 'modelApi') {
+    const imageRequestFromManifest = await buildImageRequestFromManifest(value37, prompt2, value39, {
+      expectedProvider: expectedProvider?.provider || providerId,
     });
-    if (_0x1c1214) return _0x1c1214;
+    if (imageRequestFromManifest) return imageRequestFromManifest;
     throw new Error(
-      (_0x1f239c?.provider || _0x440597) + ' image model API manifest missing: ' + _0x17aa8b.model,
+      (expectedProvider?.provider || providerId) + ' image model API manifest missing: ' + value37.model,
     );
   }
-  if (_0x3abd2d?.adapterType === 'workflow')
-    return RunningHubAdapter.buildImageRequest(_0x17aa8b, _0x397f12, _0x154808);
-  throw createMissingImageManifestError(_0x17aa8b, _0x440597);
+  if (value38?.adapterType === 'workflow')
+    return RunningHubAdapter.buildImageRequest(value37, prompt2, value39);
+  throw createMissingImageManifestError(value37, providerId);
 }
-function parseResponseData(_0x1a8ba) {
-  const _0x82c46c = _0x1a8ba.trim().replace(/^data:\s*/, '');
+function parseResponseData(value40) {
+  const value41 = value40.trim().replace(/^data:\s*/, '');
   try {
-    return JSON.parse(_0x82c46c);
+    return JSON.parse(value41);
   } catch {
-    const _0x596484 = extractSseJsonSnapshots(_0x1a8ba);
-    if (_0x596484.length > 0) {
-      for (const _0xe3162 of _0x596484) {
-        if (resolveAsyncImageTaskId(_0xe3162)) return _0xe3162;
+    const list13 = extractSseJsonSnapshots(value40);
+    if (list13.length > 0) {
+      for (const value42 of list13) {
+        if (resolveAsyncImageTaskId(value42)) return value42;
       }
-      return _0x596484[_0x596484.length - 1];
+      return list13[list13.length - 1];
     }
     throw new ApiError({ type: 'PARSE_ERROR', message: '无法解析服务端响应', retryable: false });
   }
 }
-function extractSseJsonSnapshots(_0x2b9eb4) {
-  const _0x398731 = String(_0x2b9eb4 || '')
+function extractSseJsonSnapshots(value43) {
+  const list14 = String(value43 || '')
     .split('\n')
-    .filter((_0x130bb6) => _0x130bb6.trim().startsWith('data:'));
-  if (_0x398731.length === 0) return [];
-  const _0x4a43b9 = [];
-  for (const _0x358416 of _0x398731) {
-    const _0x22f883 = String(_0x358416 || '')
+    .filter((item10) => item10.trim().startsWith('data:'));
+  if (list14.length === 0) return [];
+  const list15 = [];
+  for (const value44 of list14) {
+    const enabled9 = String(value44 || '')
       .trim()
       .replace(/^data:\s*/, '')
       .trim();
-    if (!_0x22f883 || _0x22f883 === '[DONE]') continue;
+    if (!enabled9 || enabled9 === '[DONE]') continue;
     try {
-      _0x4a43b9.push(JSON.parse(_0x22f883));
+      list15.push(JSON.parse(enabled9));
     } catch {}
   }
-  return _0x4a43b9;
+  return list15;
 }
-function resolveDirectOutputSnapshotFromRawText(_0x2607f2) {
-  const _0x13b956 = extractSseJsonSnapshots(_0x2607f2);
-  for (let _0x526ba0 = _0x13b956.length - 1; _0x526ba0 >= 0; _0x526ba0 -= 1) {
-    const _0x17a12f = _0x13b956[_0x526ba0];
-    if (hasImageResultOutput(_0x17a12f)) return _0x17a12f;
+function resolveDirectOutputSnapshotFromRawText(value45) {
+  const list16 = extractSseJsonSnapshots(value45);
+  for (let count4 = list16.length - 1; count4 >= 0; count4 -= 1) {
+    const value46 = list16[count4];
+    if (hasImageResultOutput(value46)) return value46;
   }
   return null;
 }
-function extractTaskIdFromRawText(_0xc692c0) {
-  const _0x571246 = String(_0xc692c0 || '');
-  if (!_0x571246) return '';
-  const _0x59a8c4 = [
+function extractTaskIdFromRawText(value47) {
+  const enabled10 = String(value47 || '');
+  if (!enabled10) return '';
+  const value48 = [
     /"task_id"\s*:\s*"?([a-zA-Z0-9._:-]+)"?/i,
     /"taskId"\s*:\s*"?([a-zA-Z0-9._:-]+)"?/i,
     /"taskid"\s*:\s*"?([a-zA-Z0-9._:-]+)"?/i,
@@ -525,35 +523,35 @@ function extractTaskIdFromRawText(_0xc692c0) {
     /(?:\?|&)(?:task_id|taskId|taskid|job_id|request_id)=([a-zA-Z0-9._:-]+)/i,
     /\bid\b\s*[:=]\s*["']?([a-zA-Z0-9._:-]{8,})["']?/i,
   ];
-  for (const _0xd4679a of _0x59a8c4) {
-    const _0x257c27 = _0x571246.match(_0xd4679a),
-      _0x766694 = String(_0x257c27?.[1] || '').trim();
-    if (_0x766694) return _0x766694;
+  for (const value49 of value48) {
+    const value50 = enabled10.match(value49),
+      value51 = String(value50?.[1] || '').trim();
+    if (value51) return value51;
   }
   return '';
 }
-function extractRunningHubTaskIdFromRawText(_0x13d090) {
-  const _0x4b62c6 = String(_0x13d090 || '');
-  if (!_0x4b62c6) return '';
-  const _0x3edbc0 = [
+function extractRunningHubTaskIdFromRawText(value52) {
+  const enabled11 = String(value52 || '');
+  if (!enabled11) return '';
+  const value53 = [
     /"task_id"\s*:\s*"?([a-zA-Z0-9._:-]+)"?/i,
     /"taskId"\s*:\s*"?([a-zA-Z0-9._:-]+)"?/i,
     /"taskid"\s*:\s*"?([a-zA-Z0-9._:-]+)"?/i,
     /\btask[_-]?id\b\s*[:=]\s*["']?([a-zA-Z0-9._:-]+)["']?/i,
     /(?:\?|&)(?:task_id|taskId|taskid)=([a-zA-Z0-9._:-]+)/i,
   ];
-  for (const _0xac9aa of _0x3edbc0) {
-    const _0x743bad = _0x4b62c6.match(_0xac9aa),
-      _0x107b34 = String(_0x743bad?.[1] || '')
+  for (const value54 of value53) {
+    const value55 = enabled11.match(value54),
+      value56 = String(value55?.[1] || '')
         .replace(/,/g, '')
         .trim();
-    if (_0x107b34) return _0x107b34;
+    if (value56) return value56;
   }
   return '';
 }
-function extractTaskIdFromResponseHeaders(_0x2142aa) {
-  if (!_0x2142aa || typeof _0x2142aa.get !== 'function') return '';
-  const _0x5c6582 = [
+function extractTaskIdFromResponseHeaders(list17) {
+  if (!list17 || typeof list17.get !== 'function') return '';
+  const value57 = [
     'x-task-id',
     'x-taskid',
     'x-request-id',
@@ -567,145 +565,143 @@ function extractTaskIdFromResponseHeaders(_0x2142aa) {
     'job-id',
     'jobid',
   ];
-  for (const _0x438841 of _0x5c6582) {
-    const _0x2b897a = String(_0x2142aa.get(_0x438841) || '').trim();
-    if (_0x2b897a) return _0x2b897a;
+  for (const value58 of value57) {
+    const value59 = String(list17.get(value58) || '').trim();
+    if (value59) return value59;
   }
-  if (typeof _0x2142aa.forEach === 'function') {
-    let _0x394846 = '';
-    _0x2142aa.forEach((_0x1b752e, _0x223cae) => {
-      if (_0x394846) return;
-      const _0x2d9bdf = String(_0x223cae || '')
+  if (typeof list17.forEach === 'function') {
+    let value60 = '';
+    list17.forEach((item11, value61) => {
+      if (value60) return;
+      const list18 = String(value61 || '')
           .trim()
           .toLowerCase(),
-        _0x4cd15d = String(_0x1b752e || '').trim();
-      if (!_0x4cd15d) return;
-      ((_0x2d9bdf.includes('task') && _0x2d9bdf.includes('id')) ||
-        (_0x2d9bdf.includes('job') && _0x2d9bdf.includes('id')) ||
-        (_0x2d9bdf.includes('request') && _0x2d9bdf.includes('id')) ||
-        (_0x2d9bdf.includes('submit') && _0x2d9bdf.includes('id'))) &&
-        (_0x394846 = _0x4cd15d);
+        enabled12 = String(item11 || '').trim();
+      if (!enabled12) return;
+      ((list18.includes('task') && list18.includes('id')) ||
+        (list18.includes('job') && list18.includes('id')) ||
+        (list18.includes('request') && list18.includes('id')) ||
+        (list18.includes('submit') && list18.includes('id'))) &&
+        (value60 = enabled12);
     });
-    if (_0x394846) return _0x394846;
+    if (value60) return value60;
   }
   return '';
 }
-function normalizeTaskIdValue(_0x33b583) {
-  return String(_0x33b583 ?? '')
+function normalizeTaskIdValue(value62) {
+  return String(value62 ?? '')
     .replace(/,/g, '')
     .trim();
 }
-function resolveRunningHubTaskId(_0x1707ef, _0x55eabf, _0x3bb4a9) {
-  const _0x453173 = extractRunningHubTaskIdFromRawText(_0x55eabf);
-  if (_0x453173) return _0x453173;
-  const _0x4dc34c = Array.isArray(_0x1707ef?.data)
-      ? _0x1707ef.data[0]
-      : _0x1707ef?.data && typeof _0x1707ef.data === 'object'
-        ? _0x1707ef.data
+function resolveRunningHubTaskId(value63, value64, value65) {
+  const extractRunningHubTaskIdFromRawText2 = extractRunningHubTaskIdFromRawText(value64);
+  if (extractRunningHubTaskIdFromRawText2) return extractRunningHubTaskIdFromRawText2;
+  const value66 = Array.isArray(value63?.data)
+      ? value63.data[0]
+      : value63?.data && typeof value63.data === 'object'
+        ? value63.data
         : null,
-    _0x489233 = Array.isArray(_0x1707ef?.results)
-      ? _0x1707ef.results[0]
-      : _0x1707ef?.results && typeof _0x1707ef.results === 'object'
-        ? _0x1707ef.results
+    value67 = Array.isArray(value63?.results)
+      ? value63.results[0]
+      : value63?.results && typeof value63.results === 'object'
+        ? value63.results
         : null,
-    _0x3907c2 = _0x1707ef?.result && typeof _0x1707ef.result === 'object' ? _0x1707ef.result : null,
-    _0x30f739 = _0x1707ef?.output && typeof _0x1707ef.output === 'object' ? _0x1707ef.output : null,
-    _0x91bf1 = _0x1707ef?.response && typeof _0x1707ef.response === 'object' ? _0x1707ef.response : null,
-    _0x26c99c = [
-      _0x1707ef?.taskId,
-      _0x1707ef?.task_id,
-      _0x1707ef?.data?.taskId,
-      _0x1707ef?.data?.task_id,
-      _0x4dc34c?.taskId,
-      _0x4dc34c?.task_id,
-      _0x3907c2?.taskId,
-      _0x3907c2?.task_id,
-      _0x30f739?.taskId,
-      _0x30f739?.task_id,
-      _0x91bf1?.taskId,
-      _0x91bf1?.task_id,
-      _0x489233?.taskId,
-      _0x489233?.task_id,
+    value68 = value63?.result && typeof value63.result === 'object' ? value63.result : null,
+    value69 = value63?.output && typeof value63.output === 'object' ? value63.output : null,
+    value70 = value63?.response && typeof value63.response === 'object' ? value63.response : null,
+    value71 = [
+      value63?.taskId,
+      value63?.task_id,
+      value63?.data?.taskId,
+      value63?.data?.task_id,
+      value66?.taskId,
+      value66?.task_id,
+      value68?.taskId,
+      value68?.task_id,
+      value69?.taskId,
+      value69?.task_id,
+      value70?.taskId,
+      value70?.task_id,
+      value67?.taskId,
+      value67?.task_id,
     ];
-  for (const _0x32b7b8 of _0x26c99c) {
-    const _0x45f7df = normalizeTaskIdValue(_0x32b7b8);
-    if (_0x45f7df) return _0x45f7df;
+  for (const value72 of value71) {
+    const taskIdValue = normalizeTaskIdValue(value72);
+    if (taskIdValue) return taskIdValue;
   }
-  return normalizeTaskIdValue(extractTaskIdFromResponseHeaders(_0x3bb4a9));
+  return normalizeTaskIdValue(extractTaskIdFromResponseHeaders(value65));
 }
-function looksLikeTaskToken(_0x320314) {
-  const _0x58fe51 = String(_0x320314 ?? '').trim();
-  if (!_0x58fe51) return false;
-  if (_0x58fe51.length < 8) return false;
-  const _0x54193b = _0x58fe51.toLowerCase();
+function looksLikeTaskToken(value73) {
+  const list19 = String(value73 ?? '').trim();
+  if (!list19) return false;
+  if (list19.length < 8) return false;
+  const value74 = list19.toLowerCase();
   if (
-    _0x54193b === 'pending' ||
-    _0x54193b === 'running' ||
-    _0x54193b === 'success' ||
-    _0x54193b === 'failed' ||
-    _0x54193b === 'queued' ||
-    _0x54193b === 'submitted'
+    value74 === 'pending' ||
+    value74 === 'running' ||
+    value74 === 'success' ||
+    value74 === 'failed' ||
+    value74 === 'queued' ||
+    value74 === 'submitted'
   )
     return false;
-  return /^[a-zA-Z0-9._:-]+$/.test(_0x58fe51);
+  return /^[a-zA-Z0-9._:-]+$/.test(list19);
 }
-function resolveAsyncImageTaskIdLoose(_0x5a46a7) {
-  if (!_0x5a46a7 || typeof _0x5a46a7 !== 'object') return '';
-  const _0x558acf = [
-    _0x5a46a7?.data,
-    _0x5a46a7?.task,
-    _0x5a46a7?.job,
-    _0x5a46a7?.request,
-    _0x5a46a7?.submit,
-    _0x5a46a7?.payload?.task,
-    _0x5a46a7?.payload?.task_id,
-    _0x5a46a7?.payload?.taskId,
+function resolveAsyncImageTaskIdLoose(enabled13) {
+  if (!enabled13 || typeof enabled13 !== 'object') return '';
+  const value75 = [
+    enabled13?.data,
+    enabled13?.task,
+    enabled13?.job,
+    enabled13?.request,
+    enabled13?.submit,
+    enabled13?.payload?.task,
+    enabled13?.payload?.task_id,
+    enabled13?.payload?.taskId,
   ];
-  for (const _0x1ad7c9 of _0x558acf) {
-    if (typeof _0x1ad7c9 === 'string' || typeof _0x1ad7c9 === 'number') {
-      const _0x27c883 = String(_0x1ad7c9).trim();
-      if (looksLikeTaskToken(_0x27c883)) return _0x27c883;
+  for (const value76 of value75) {
+    if (typeof value76 === 'string' || typeof value76 === 'number') {
+      const value77 = String(value76).trim();
+      if (looksLikeTaskToken(value77)) return value77;
     }
   }
-  const _0x5c9de5 = findFirstDeepValueByKeyPattern(
-    _0x5a46a7,
+  const firstDeepValueByKeyPattern = findFirstDeepValueByKeyPattern(
+    enabled13,
     /^(task|job|request|submit|task_?id|job_?id|request_?id|submit_?id)$/i,
   );
-  if (looksLikeTaskToken(_0x5c9de5)) return _0x5c9de5;
+  if (looksLikeTaskToken(firstDeepValueByKeyPattern)) return firstDeepValueByKeyPattern;
   return '';
 }
-function findFirstDeepValueByKeyPattern(_0x1cac83, _0x1c7d5c, _0x500b33 = 8) {
-  if (!_0x1cac83 || typeof _0x1cac83 !== 'object') return '';
-  const _0x437fa3 = new WeakSet(),
-    _0x4b748a = [{ value: _0x1cac83, depth: 0 }];
-  while (_0x4b748a.length > 0) {
-    const { value: _0xbfc91, depth: _0x3430ca } = _0x4b748a.shift();
-    if (!_0xbfc91 || typeof _0xbfc91 !== 'object') continue;
-    if (_0x437fa3.has(_0xbfc91)) continue;
-    _0x437fa3.add(_0xbfc91);
-    if (_0x3430ca > _0x500b33) continue;
-    const _0x3178c8 = Array.isArray(_0xbfc91)
-      ? _0xbfc91.map((_0x2aa687, _0x374c6a) => [String(_0x374c6a), _0x2aa687])
-      : Object.entries(_0xbfc91);
-    for (const [_0x8f276a, _0x4468c8] of _0x3178c8) {
-      const _0x227493 = String(_0x8f276a || '')
+function findFirstDeepValueByKeyPattern(value78, value79, value80 = 8) {
+  if (!value78 || typeof value78 !== 'object') return '';
+  const map2 = new WeakSet(),
+    list20 = [{ value: value78, depth: 0 }];
+  while (list20.length > 0) {
+    const { value: value81, depth: depth } = list20.shift();
+    if (!value81 || typeof value81 !== 'object') continue;
+    if (map2.has(value81)) continue;
+    map2.add(value81);
+    if (depth > value80) continue;
+    const value82 = Array.isArray(value81)
+      ? value81.map((item12, value83) => [String(value83), item12])
+      : Object.entries(value81);
+    for (const [value84, value85] of value82) {
+      const value86 = String(value84 || '')
         .trim()
         .toLowerCase();
-      if (_0x1c7d5c.test(_0x227493)) {
-        const _0x124e65 = String(_0x4468c8 ?? '').trim();
-        if (_0x124e65) return _0x124e65;
+      if (value79.test(value86)) {
+        const value87 = String(value85 ?? '').trim();
+        if (value87) return value87;
       }
-      _0x4468c8 &&
-        typeof _0x4468c8 === 'object' &&
-        _0x4b748a.push({ value: _0x4468c8, depth: _0x3430ca + 1 });
+      value85 && typeof value85 === 'object' && list20.push({ value: value85, depth: depth + 1 });
     }
   }
   return '';
 }
-function extractTaskStatusFromRawText(_0x59fe1e) {
-  const _0x4d9ee1 = String(_0x59fe1e || '');
-  if (!_0x4d9ee1) return '';
-  const _0x5b9536 = [
+function extractTaskStatusFromRawText(value88) {
+  const enabled14 = String(value88 || '');
+  if (!enabled14) return '';
+  const value89 = [
     /"status"\s*:\s*"([^"]+)"/i,
     /"taskStatus"\s*:\s*"([^"]+)"/i,
     /"task_status"\s*:\s*"([^"]+)"/i,
@@ -715,240 +711,242 @@ function extractTaskStatusFromRawText(_0x59fe1e) {
     /\bphase\b\s*[:=]\s*["']?([a-zA-Z_]+)["']?/i,
     /\bstate\b\s*[:=]\s*["']?([a-zA-Z_]+)["']?/i,
   ];
-  for (const _0x3b57fb of _0x5b9536) {
-    const _0x44a805 = _0x4d9ee1.match(_0x3b57fb),
-      _0x455a5b = String(_0x44a805?.[1] || '').trim();
-    if (_0x455a5b) return _0x455a5b.toLowerCase();
+  for (const value90 of value89) {
+    const value91 = enabled14.match(value90),
+      value92 = String(value91?.[1] || '').trim();
+    if (value92) return value92.toLowerCase();
   }
   return '';
 }
-function resolveAsyncImageTaskId(_0x476682, _0xbc31b7 = null) {
-  const _0x36486e = resolveMappedResponseValue(_0x476682, _0xbc31b7?.taskIdPath);
-  if (_0x36486e) return _0x36486e;
-  const _0x40d055 = Array.isArray(_0x476682?.data)
-      ? _0x476682.data[0]
-      : _0x476682?.data && typeof _0x476682.data === 'object'
-        ? _0x476682.data
+function resolveAsyncImageTaskId(value93, value94 = null) {
+  const mappedResponseValue = resolveMappedResponseValue(value93, value94?.taskIdPath);
+  if (mappedResponseValue) return mappedResponseValue;
+  const value95 = Array.isArray(value93?.data)
+      ? value93.data[0]
+      : value93?.data && typeof value93.data === 'object'
+        ? value93.data
         : null,
-    _0xe06530 = Array.isArray(_0x476682?.results)
-      ? _0x476682.results[0]
-      : _0x476682?.results && typeof _0x476682.results === 'object'
-        ? _0x476682.results
+    value96 = Array.isArray(value93?.results)
+      ? value93.results[0]
+      : value93?.results && typeof value93.results === 'object'
+        ? value93.results
         : null,
-    _0x325c34 = _0x476682?.result && typeof _0x476682.result === 'object' ? _0x476682.result : null,
-    _0x584eb5 = _0x476682?.output && typeof _0x476682.output === 'object' ? _0x476682.output : null,
-    _0x5f479b = _0x476682?.response && typeof _0x476682.response === 'object' ? _0x476682.response : null,
-    _0x31ab01 =
-      _0x40d055?.task_id ||
-      _0x40d055?.taskId ||
-      _0x40d055?.id ||
-      _0x325c34?.task_id ||
-      _0x325c34?.taskId ||
-      _0x325c34?.id ||
-      _0x584eb5?.task_id ||
-      _0x584eb5?.taskId ||
-      _0x584eb5?.id ||
-      _0x5f479b?.task_id ||
-      _0x5f479b?.taskId ||
-      _0x5f479b?.id ||
-      _0x476682?.task_id ||
-      _0x476682?.taskId ||
-      _0x476682?.data?.task_id ||
-      _0x476682?.data?.taskId ||
-      _0x476682?.data?.id ||
-      _0x476682?.id ||
-      _0xe06530?.task_id ||
-      _0xe06530?.taskId ||
-      _0xe06530?.id ||
-      findFirstDeepValueByKeyPattern(_0x476682, /^(task_?id|taskid|request_?id|requestid)$/i) ||
-      findFirstDeepValueByKeyPattern(_0x476682, /^id$/i) ||
+    value97 = value93?.result && typeof value93.result === 'object' ? value93.result : null,
+    value98 = value93?.output && typeof value93.output === 'object' ? value93.output : null,
+    value99 = value93?.response && typeof value93.response === 'object' ? value93.response : null,
+    value100 =
+      value95?.task_id ||
+      value95?.taskId ||
+      value95?.id ||
+      value97?.task_id ||
+      value97?.taskId ||
+      value97?.id ||
+      value98?.task_id ||
+      value98?.taskId ||
+      value98?.id ||
+      value99?.task_id ||
+      value99?.taskId ||
+      value99?.id ||
+      value93?.task_id ||
+      value93?.taskId ||
+      value93?.data?.task_id ||
+      value93?.data?.taskId ||
+      value93?.data?.id ||
+      value93?.id ||
+      value96?.task_id ||
+      value96?.taskId ||
+      value96?.id ||
+      findFirstDeepValueByKeyPattern(value93, /^(task_?id|taskid|request_?id|requestid)$/i) ||
+      findFirstDeepValueByKeyPattern(value93, /^id$/i) ||
       '';
-  return String(_0x31ab01 || '').trim();
+  return String(value100 || '').trim();
 }
-function resolveApimartTaskIdStrict(_0x484c29) {
-  const _0x53ab52 = Array.isArray(_0x484c29?.data)
-      ? _0x484c29.data[0]
-      : _0x484c29?.data && typeof _0x484c29.data === 'object'
-        ? _0x484c29.data
+function resolveApimartTaskIdStrict(value101) {
+  const value102 = Array.isArray(value101?.data)
+      ? value101.data[0]
+      : value101?.data && typeof value101.data === 'object'
+        ? value101.data
         : null,
-    _0x2977e6 = Array.isArray(_0x484c29?.results)
-      ? _0x484c29.results[0]
-      : _0x484c29?.results && typeof _0x484c29.results === 'object'
-        ? _0x484c29.results
+    value103 = Array.isArray(value101?.results)
+      ? value101.results[0]
+      : value101?.results && typeof value101.results === 'object'
+        ? value101.results
         : null,
-    _0x38fad9 = _0x484c29?.result && typeof _0x484c29.result === 'object' ? _0x484c29.result : null,
-    _0x70e3b2 = _0x484c29?.output && typeof _0x484c29.output === 'object' ? _0x484c29.output : null,
-    _0x423a01 = _0x484c29?.response && typeof _0x484c29.response === 'object' ? _0x484c29.response : null,
-    _0x1d9595 =
-      _0x53ab52?.task_id ||
-      _0x53ab52?.taskId ||
-      _0x38fad9?.task_id ||
-      _0x38fad9?.taskId ||
-      _0x70e3b2?.task_id ||
-      _0x70e3b2?.taskId ||
-      _0x423a01?.task_id ||
-      _0x423a01?.taskId ||
-      _0x484c29?.task_id ||
-      _0x484c29?.taskId ||
-      _0x484c29?.data?.task_id ||
-      _0x484c29?.data?.taskId ||
-      _0x2977e6?.task_id ||
-      _0x2977e6?.taskId ||
-      findFirstDeepValueByKeyPattern(_0x484c29, /^(task_?id|taskid)$/i) ||
+    value104 = value101?.result && typeof value101.result === 'object' ? value101.result : null,
+    value105 = value101?.output && typeof value101.output === 'object' ? value101.output : null,
+    value106 = value101?.response && typeof value101.response === 'object' ? value101.response : null,
+    value107 =
+      value102?.task_id ||
+      value102?.taskId ||
+      value104?.task_id ||
+      value104?.taskId ||
+      value105?.task_id ||
+      value105?.taskId ||
+      value106?.task_id ||
+      value106?.taskId ||
+      value101?.task_id ||
+      value101?.taskId ||
+      value101?.data?.task_id ||
+      value101?.data?.taskId ||
+      value103?.task_id ||
+      value103?.taskId ||
+      findFirstDeepValueByKeyPattern(value101, /^(task_?id|taskid)$/i) ||
       '';
-  return String(_0x1d9595 || '').trim();
+  return String(value107 || '').trim();
 }
-function collectApimartFallbackTaskIdCandidates(_0x2c1bfa) {
-  const _0x3f40ae = [],
-    _0x41e82f = (_0x2133f1) => {
-      const _0x2ec020 = String(_0x2133f1 || '').trim();
-      if (!_0x2ec020 || _0x3f40ae.includes(_0x2ec020)) return;
-      _0x3f40ae.push(_0x2ec020);
+function collectApimartFallbackTaskIdCandidates(value108) {
+  const list21 = [],
+    handler2 = (value109) => {
+      const enabled15 = String(value109 || '').trim();
+      if (!enabled15 || list21.includes(enabled15)) return;
+      list21.push(enabled15);
     },
-    _0x5cc2cf = Array.isArray(_0x2c1bfa?.data)
-      ? _0x2c1bfa.data[0]
-      : _0x2c1bfa?.data && typeof _0x2c1bfa.data === 'object'
-        ? _0x2c1bfa.data
+    value110 = Array.isArray(value108?.data)
+      ? value108.data[0]
+      : value108?.data && typeof value108.data === 'object'
+        ? value108.data
         : null,
-    _0x2a3689 = Array.isArray(_0x2c1bfa?.results)
-      ? _0x2c1bfa.results[0]
-      : _0x2c1bfa?.results && typeof _0x2c1bfa.results === 'object'
-        ? _0x2c1bfa.results
+    value111 = Array.isArray(value108?.results)
+      ? value108.results[0]
+      : value108?.results && typeof value108.results === 'object'
+        ? value108.results
         : null,
-    _0x569040 = _0x2c1bfa?.result && typeof _0x2c1bfa.result === 'object' ? _0x2c1bfa.result : null,
-    _0x2bbdf0 = _0x2c1bfa?.output && typeof _0x2c1bfa.output === 'object' ? _0x2c1bfa.output : null,
-    _0x409c6f = _0x2c1bfa?.response && typeof _0x2c1bfa.response === 'object' ? _0x2c1bfa.response : null;
+    value112 = value108?.result && typeof value108.result === 'object' ? value108.result : null,
+    value113 = value108?.output && typeof value108.output === 'object' ? value108.output : null,
+    value114 = value108?.response && typeof value108.response === 'object' ? value108.response : null;
   return (
-    _0x41e82f(_0x5cc2cf?.id),
-    _0x41e82f(_0x569040?.id),
-    _0x41e82f(_0x2bbdf0?.id),
-    _0x41e82f(_0x409c6f?.id),
-    _0x41e82f(_0x2a3689?.id),
-    _0x41e82f(_0x2c1bfa?.data?.id),
-    _0x41e82f(_0x2c1bfa?.id),
-    _0x3f40ae
+    handler2(value110?.id),
+    handler2(value112?.id),
+    handler2(value113?.id),
+    handler2(value114?.id),
+    handler2(value111?.id),
+    handler2(value108?.data?.id),
+    handler2(value108?.id),
+    list21
   );
 }
-function extractApimartTaskIdFromRawText(_0x27a06b) {
-  const _0xfc8711 = String(_0x27a06b || '');
-  if (!_0xfc8711) return '';
-  const _0xec4282 = [
+function extractApimartTaskIdFromRawText(value115) {
+  const enabled16 = String(value115 || '');
+  if (!enabled16) return '';
+  const value116 = [
     /"task_id"\s*:\s*"?([a-zA-Z0-9._:-]+)"?/i,
     /"taskId"\s*:\s*"?([a-zA-Z0-9._:-]+)"?/i,
     /"taskid"\s*:\s*"?([a-zA-Z0-9._:-]+)"?/i,
     /\btask[_-]?id\b\s*[:=]\s*["']?([a-zA-Z0-9._:-]+)["']?/i,
     /(?:\?|&)task_id=([a-zA-Z0-9._:-]+)/i,
   ];
-  for (const _0x5208ff of _0xec4282) {
-    const _0x5c19f6 = _0xfc8711.match(_0x5208ff),
-      _0x327d48 = String(_0x5c19f6?.[1] || '').trim();
-    if (_0x327d48) return _0x327d48;
+  for (const value117 of value116) {
+    const value118 = enabled16.match(value117),
+      value119 = String(value118?.[1] || '').trim();
+    if (value119) return value119;
   }
   return '';
 }
-function buildApimartTaskStatusUrl(_0x410d8f, _0x1eef4c = null, _0x53bf47 = '') {
-  const _0x3e79ba = String(_0x410d8f || '').trim(),
-    _0x315598 = buildManifestPollCandidate(_0x3e79ba, _0x1eef4c);
-  if (_0x315598?.url) return _0x315598.url;
-  const _0x56e465 = normalizeApimartBaseUrl(_0x53bf47);
-  return _0x56e465 + '/v1/tasks/' + encodeURIComponent(_0x3e79ba) + '?language=zh';
+function buildApimartTaskStatusUrl(value120, value121 = null, value122 = '') {
+  const value123 = String(value120 || '').trim(),
+    response10 = buildManifestPollCandidate(value123, value121);
+  if (response10?.url) return response10.url;
+  const apimartBaseUrl = normalizeApimartBaseUrl(value122);
+  return apimartBaseUrl + '/v1/tasks/' + encodeURIComponent(value123) + '?language=zh';
 }
-async function probeApimartTaskIdCandidate(_0x3da37c, _0x10081a, _0x1e60f1 = {}) {
-  const _0x27f5b7 = String(_0x3da37c || '').trim();
-  if (!_0x27f5b7) return '';
-  const _0x41c80c = getProviderConfig('apimart'),
-    _0x57d293 = String(_0x10081a?.apiKey || _0x41c80c?.apiKey || '').trim();
-  if (!_0x57d293) return '';
+async function probeApimartTaskIdCandidate(value124, value125, signal = {}) {
+  const enabled17 = String(value124 || '').trim();
+  if (!enabled17) return '';
+  const providerConfig2 = getProviderConfig('apimart'),
+    enabled18 = String(value125?.apiKey || providerConfig2?.apiKey || '').trim();
+  if (!enabled18) return '';
   try {
-    const _0x23a28b = await requester({
+    const requester2 = await requester({
         url:
           '/api/v2/proxy/task?apiUrl=' +
-          encodeURIComponent(buildApimartTaskStatusUrl(_0x27f5b7, _0x1e60f1?.taskPolling, _0x41c80c?.apiUrl)),
+          encodeURIComponent(
+            buildApimartTaskStatusUrl(enabled17, signal?.taskPolling, providerConfig2?.apiUrl),
+          ),
         method: 'GET',
-        headers: { Authorization: 'Bearer ' + _0x57d293 },
+        headers: { Authorization: 'Bearer ' + enabled18 },
         provider: 'apimart',
         timeout: 0x7530,
-        signal: _0x1e60f1?.signal,
+        signal: signal?.signal,
       }),
-      _0x5b4a64 = normalizeTaskSnapshotPayload(_0x23a28b),
-      _0x51bfe9 =
-        _0x5b4a64 &&
-        typeof _0x5b4a64 === 'object' &&
-        _0x5b4a64.data &&
-        typeof _0x5b4a64.data === 'object' &&
-        !Array.isArray(_0x5b4a64.data),
-      _0xb10d38 = _0x51bfe9
-        ? { ..._0x5b4a64, ..._0x5b4a64.data }
-        : normalizeTaskSnapshotPayload(_0x23a28b?.data || _0x23a28b),
-      _0x2f43a8 = parseTaskError('apimart', _0xb10d38);
-    if (_0x2f43a8) return '';
-    return _0x27f5b7;
+      args2 = normalizeTaskSnapshotPayload(requester2),
+      value126 =
+        args2 &&
+        typeof args2 === 'object' &&
+        args2.data &&
+        typeof args2.data === 'object' &&
+        !Array.isArray(args2.data),
+      value127 = value126
+        ? { ...args2, ...args2.data }
+        : normalizeTaskSnapshotPayload(requester2?.data || requester2),
+      taskError = parseTaskError('apimart', value127);
+    if (taskError) return '';
+    return enabled17;
   } catch {
     return '';
   }
 }
-async function resolveApimartTaskIdByProbe(_0x5f322c, _0x3c6e83, _0x8e4dfa = {}) {
-  const _0x1f11a6 = collectApimartFallbackTaskIdCandidates(_0x5f322c);
-  for (const _0x9b4b72 of _0x1f11a6) {
-    const _0x84e33f = await probeApimartTaskIdCandidate(_0x9b4b72, _0x3c6e83, _0x8e4dfa);
-    if (_0x84e33f) return _0x84e33f;
+async function resolveApimartTaskIdByProbe(value128, value129, value130 = {}) {
+  const apimartFallbackTaskIdCandidates = collectApimartFallbackTaskIdCandidates(value128);
+  for (const value131 of apimartFallbackTaskIdCandidates) {
+    const probeApimartTaskIdCandidate2 = await probeApimartTaskIdCandidate(value131, value129, value130);
+    if (probeApimartTaskIdCandidate2) return probeApimartTaskIdCandidate2;
   }
   return '';
 }
-function resolveAsyncImageTaskStatus(_0x458a34) {
-  const _0x58f96d = Array.isArray(_0x458a34?.data)
-      ? _0x458a34.data[0]
-      : _0x458a34?.data && typeof _0x458a34.data === 'object'
-        ? _0x458a34.data
+function resolveAsyncImageTaskStatus(response11) {
+  const response12 = Array.isArray(response11?.data)
+      ? response11.data[0]
+      : response11?.data && typeof response11.data === 'object'
+        ? response11.data
         : null,
-    _0x3d4892 = Array.isArray(_0x458a34?.results)
-      ? _0x458a34.results[0]
-      : _0x458a34?.results && typeof _0x458a34.results === 'object'
-        ? _0x458a34.results
+    response13 = Array.isArray(response11?.results)
+      ? response11.results[0]
+      : response11?.results && typeof response11.results === 'object'
+        ? response11.results
         : null,
-    _0x4b7b5c = _0x458a34?.result && typeof _0x458a34.result === 'object' ? _0x458a34.result : null,
-    _0x455fbd = _0x458a34?.output && typeof _0x458a34.output === 'object' ? _0x458a34.output : null,
-    _0x2f0f21 = _0x458a34?.response && typeof _0x458a34.response === 'object' ? _0x458a34.response : null;
+    response14 = response11?.result && typeof response11.result === 'object' ? response11.result : null,
+    response15 = response11?.output && typeof response11.output === 'object' ? response11.output : null,
+    response16 = response11?.response && typeof response11.response === 'object' ? response11.response : null;
   return String(
-    _0x58f96d?.status ||
-      _0x458a34?.status ||
-      _0x458a34?.taskStatus ||
-      _0x458a34?.task_status ||
-      _0x458a34?.data?.status ||
-      _0x4b7b5c?.status ||
-      _0x4b7b5c?.taskStatus ||
-      _0x4b7b5c?.task_status ||
-      _0x455fbd?.status ||
-      _0x455fbd?.taskStatus ||
-      _0x455fbd?.task_status ||
-      _0x2f0f21?.status ||
-      _0x2f0f21?.taskStatus ||
-      _0x2f0f21?.task_status ||
-      _0x3d4892?.status ||
-      _0x458a34?.state ||
-      _0x458a34?.phase ||
-      findFirstDeepValueByKeyPattern(_0x458a34, /^(task_?status|taskstatus|status|state|phase)$/i) ||
+    response12?.status ||
+      response11?.status ||
+      response11?.taskStatus ||
+      response11?.task_status ||
+      response11?.data?.status ||
+      response14?.status ||
+      response14?.taskStatus ||
+      response14?.task_status ||
+      response15?.status ||
+      response15?.taskStatus ||
+      response15?.task_status ||
+      response16?.status ||
+      response16?.taskStatus ||
+      response16?.task_status ||
+      response13?.status ||
+      response11?.state ||
+      response11?.phase ||
+      findFirstDeepValueByKeyPattern(response11, /^(task_?status|taskstatus|status|state|phase)$/i) ||
       '',
   )
     .trim()
     .toLowerCase();
 }
-function normalizeTaskSnapshotPayload(_0x3b56a7) {
-  if (_0x3b56a7 && typeof _0x3b56a7 === 'object') return _0x3b56a7;
-  const _0x57d92b = String(_0x3b56a7 || '').trim();
-  if (!_0x57d92b) return {};
+function normalizeTaskSnapshotPayload(value132) {
+  if (value132 && typeof value132 === 'object') return value132;
+  const rawText = String(value132 || '').trim();
+  if (!rawText) return {};
   try {
-    return parseResponseData(_0x57d92b);
+    return parseResponseData(rawText);
   } catch {
     try {
-      return JSON.parse(_0x57d92b);
+      return JSON.parse(rawText);
     } catch {
-      return { rawText: _0x57d92b };
+      return { rawText: rawText };
     }
   }
 }
-function isAsyncTaskTerminalStatus(_0x4df8dd) {
-  const _0x38b9d5 = String(_0x4df8dd || '')
+function isAsyncTaskTerminalStatus(value133) {
+  const value134 = String(value133 || '')
     .trim()
     .toLowerCase();
   return [
@@ -965,10 +963,10 @@ function isAsyncTaskTerminalStatus(_0x4df8dd) {
     'cancelled',
     'canceled',
     'idle',
-  ].includes(_0x38b9d5);
+  ].includes(value134);
 }
-function isAsyncTaskPendingStatus(_0x1d0a3b) {
-  const _0x4c7a90 = String(_0x1d0a3b || '')
+function isAsyncTaskPendingStatus(value135) {
+  const value136 = String(value135 || '')
     .trim()
     .toLowerCase();
   return [
@@ -980,569 +978,569 @@ function isAsyncTaskPendingStatus(_0x1d0a3b) {
     'processing',
     'querying',
     'in_progress',
-  ].includes(_0x4c7a90);
+  ].includes(value136);
 }
-function isAsyncTaskFailureStatus(_0x1a4454) {
-  const _0x529f23 = String(_0x1a4454 || '')
+function isAsyncTaskFailureStatus(value137) {
+  const value138 = String(value137 || '')
     .trim()
     .toLowerCase();
-  return ['failed', 'fail', 'error', 'cancelled', 'canceled', 'idle'].includes(_0x529f23);
+  return ['failed', 'fail', 'error', 'cancelled', 'canceled', 'idle'].includes(value138);
 }
-function supportsAsyncImageTaskPolling(_0x32b597, _0x538f69 = {}) {
-  const _0x85f5e = String(_0x32b597 || '')
+function supportsAsyncImageTaskPolling(value139, value140 = {}) {
+  const value141 = String(value139 || '')
     .trim()
     .toLowerCase();
-  if (['apimart', 'ppio', 'grsai'].includes(_0x85f5e)) return true;
-  const _0x116e7e = _0x538f69?.taskPolling;
-  return !!(_0x116e7e && typeof _0x116e7e === 'object' && String(_0x116e7e.urlTemplate || '').trim());
+  if (['apimart', 'ppio', 'grsai'].includes(value141)) return true;
+  const value142 = value140?.taskPolling;
+  return !!(value142 && typeof value142 === 'object' && String(value142.urlTemplate || '').trim());
 }
-function buildManifestPollCandidate(_0x558cc8, _0x44be81) {
-  if (!_0x44be81 || typeof _0x44be81 !== 'object') return null;
-  const _0x23ca86 = String(_0x44be81.urlTemplate || '').trim();
-  if (!_0x23ca86) return null;
+function buildManifestPollCandidate(value143, enabled19) {
+  if (!enabled19 || typeof enabled19 !== 'object') return null;
+  const url = String(enabled19.urlTemplate || '').trim();
+  if (!url) return null;
   return {
     method:
-      String(_0x44be81.method || 'GET')
+      String(enabled19.method || 'GET')
         .trim()
         .toUpperCase() || 'GET',
-    mode: String(_0x44be81.mode || 'task-proxy').trim() || 'task-proxy',
-    url: _0x23ca86.replace('{taskId}', encodeURIComponent(_0x558cc8)),
+    mode: String(enabled19.mode || 'task-proxy').trim() || 'task-proxy',
+    url: url.replace('{taskId}', encodeURIComponent(value143)),
   };
 }
-async function pollAsyncImageTask(_0x2e161d, _0x63291e, _0x56e93f, _0x45a1ee = {}) {
-  const _0x20873e = String(_0x2e161d || '').trim();
-  if (!_0x20873e) throw new Error('缺少异步图片任务 ID');
-  const _0x3ec75c = String(_0x56e93f || '')
+async function pollAsyncImageTask(value144, value145, value146, signal2 = {}) {
+  const enabled20 = String(value144 || '').trim();
+  if (!enabled20) throw new Error('缺少异步图片任务 ID');
+  const provider = String(value146 || '')
       .trim()
       .toLowerCase(),
-    _0x38311e = getProviderConfig(_0x3ec75c),
-    _0x36148e = String(_0x63291e?.apiKey || _0x38311e?.apiKey || '').trim();
-  if (!_0x36148e)
-    throw ApiError.authError(_0x3ec75c, null, 'API Key 未配置（厂商：' + _0x3ec75c + '），无法轮询任务');
-  for (let _0x1f36c9 = 0; _0x1f36c9 < 0x1c2; _0x1f36c9++) {
-    if (_0x45a1ee?.signal?.aborted) throw new Error('CANCELLED');
-    await new Promise((_0x52c8cb) => setTimeout(_0x52c8cb, 0x7d0));
-    if (_0x45a1ee?.signal?.aborted) throw new Error('CANCELLED');
-    const _0x73a685 = String(_0x38311e?.apiUrl || '').replace(/\/+$/, ''),
-      _0x3cbfb0 = buildManifestPollCandidate(_0x20873e, _0x45a1ee?.taskPolling),
-      _0x2bdeb7 =
-        _0x3ec75c === 'apimart'
+    providerConfig3 = getProviderConfig(provider),
+    apiKey2 = String(value145?.apiKey || providerConfig3?.apiKey || '').trim();
+  if (!apiKey2)
+    throw ApiError.authError(provider, null, 'API Key 未配置（厂商：' + provider + '），无法轮询任务');
+  for (let count5 = 0; count5 < 0x1c2; count5++) {
+    if (signal2?.signal?.aborted) throw new Error('CANCELLED');
+    await new Promise((value147) => setTimeout(value147, 0x7d0));
+    if (signal2?.signal?.aborted) throw new Error('CANCELLED');
+    const url2 = String(providerConfig3?.apiUrl || '').replace(/\/+$/, ''),
+      manifestPollCandidate = buildManifestPollCandidate(enabled20, signal2?.taskPolling),
+      value148 =
+        provider === 'apimart'
           ? [
               {
                 method: 'GET',
                 mode: 'task-proxy',
-                url: buildApimartTaskStatusUrl(_0x20873e, null, _0x38311e?.apiUrl),
+                url: buildApimartTaskStatusUrl(enabled20, null, providerConfig3?.apiUrl),
               },
             ]
-          : _0x3ec75c === 'ppio'
-            ? [{ method: 'GET', mode: 'task-proxy', url: _0x73a685 + '/v1/tasks/' + _0x20873e }]
+          : provider === 'ppio'
+            ? [{ method: 'GET', mode: 'task-proxy', url: url2 + '/v1/tasks/' + enabled20 }]
             : [],
-      _0x5461af = _0x3cbfb0 ? [_0x3cbfb0] : _0x2bdeb7;
-    if (_0x5461af.length === 0) throw new Error('异步图片任务查询配置缺失（厂商：' + _0x3ec75c + '）');
+      list22 = manifestPollCandidate ? [manifestPollCandidate] : value148;
+    if (list22.length === 0) throw new Error('异步图片任务查询配置缺失（厂商：' + provider + '）');
     try {
-      let _0x17745a = null,
-        _0x1c166b = null;
-      for (const _0xc22e59 of _0x5461af) {
+      let requester3 = null,
+        value149 = null;
+      for (const apiUrl of list22) {
         try {
-          _0xc22e59.mode === 'image-proxy'
-            ? (_0x17745a = await requester({
+          apiUrl.mode === 'image-proxy'
+            ? (requester3 = await requester({
                 url: '/api/v2/proxy/image',
                 method: 'POST',
-                provider: _0x3ec75c,
+                provider: provider,
                 timeout: 0x7530,
-                signal: _0x45a1ee?.signal,
+                signal: signal2?.signal,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ apiUrl: _0xc22e59.url, apiKey: _0x36148e, ...(_0xc22e59.body || {}) }),
+                body: JSON.stringify({ apiUrl: apiUrl.url, apiKey: apiKey2, ...(apiUrl.body || {}) }),
               }))
-            : (_0x17745a = await requester({
-                url: '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(_0xc22e59.url),
+            : (requester3 = await requester({
+                url: '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(apiUrl.url),
                 method: 'GET',
-                headers: { Authorization: 'Bearer ' + _0x36148e },
-                provider: _0x3ec75c,
+                headers: { Authorization: 'Bearer ' + apiKey2 },
+                provider: provider,
                 timeout: 0x7530,
-                signal: _0x45a1ee?.signal,
+                signal: signal2?.signal,
               }));
-          _0x1c166b = null;
+          value149 = null;
           break;
-        } catch (_0x4c7f42) {
-          _0x1c166b = _0x4c7f42;
-          if (_0x4c7f42 instanceof ApiError) {
+        } catch (value150) {
+          value149 = value150;
+          if (value150 instanceof ApiError) {
             if (
-              _0x4c7f42.type === ErrorType.AUTH_ERROR ||
-              _0x4c7f42.type === ErrorType.FORBIDDEN ||
-              _0x4c7f42.type === ErrorType.INSUFFICIENT_BALANCE ||
-              _0x4c7f42.type === ErrorType.MODEL_UNAVAILABLE
+              value150.type === ErrorType.AUTH_ERROR ||
+              value150.type === ErrorType.FORBIDDEN ||
+              value150.type === ErrorType.INSUFFICIENT_BALANCE ||
+              value150.type === ErrorType.MODEL_UNAVAILABLE
             )
-              throw _0x4c7f42;
-            if (_0x4c7f42.type === ErrorType.INVALID_PARAMS) throw _0x4c7f42;
+              throw value150;
+            if (value150.type === ErrorType.INVALID_PARAMS) throw value150;
           }
         }
       }
-      if (!_0x17745a) {
-        if (_0x1c166b instanceof ApiError) throw _0x1c166b;
+      if (!requester3) {
+        if (value149 instanceof ApiError) throw value149;
         continue;
       }
-      const _0x322dbd = normalizeTaskSnapshotPayload(_0x17745a),
-        _0x34c1c5 =
-          _0x322dbd &&
-          typeof _0x322dbd === 'object' &&
-          _0x322dbd.data &&
-          typeof _0x322dbd.data === 'object' &&
-          !Array.isArray(_0x322dbd.data),
-        _0x44e5e4 = _0x34c1c5
-          ? { ..._0x322dbd, ..._0x322dbd.data }
-          : normalizeTaskSnapshotPayload(_0x17745a.data || _0x17745a),
-        _0x10ddc3 = hasImageResultOutput(_0x44e5e4, _0x45a1ee?.responseMapping);
-      if (_0x10ddc3) return _0x44e5e4;
-      const _0x5b6967 = parseTaskError(_0x3ec75c, _0x44e5e4);
-      if (_0x5b6967) throw _0x5b6967;
-      const _0x5f4eaa = resolveAsyncImageTaskStatus(_0x44e5e4);
-      if (['completed', 'succeeded', 'success'].includes(_0x5f4eaa)) return _0x44e5e4;
-      if (isAsyncTaskPendingStatus(_0x5f4eaa)) continue;
-      if (isAsyncTaskTerminalStatus(_0x5f4eaa)) {
-        const _0x17ff53 = String(_0x44e5e4?.rawText || '');
+      const args3 = normalizeTaskSnapshotPayload(requester3),
+        value151 =
+          args3 &&
+          typeof args3 === 'object' &&
+          args3.data &&
+          typeof args3.data === 'object' &&
+          !Array.isArray(args3.data),
+        error4 = value151
+          ? { ...args3, ...args3.data }
+          : normalizeTaskSnapshotPayload(requester3.data || requester3),
+        hasImageResultOutput2 = hasImageResultOutput(error4, signal2?.responseMapping);
+      if (hasImageResultOutput2) return error4;
+      const taskError2 = parseTaskError(provider, error4);
+      if (taskError2) throw taskError2;
+      const asyncImageTaskStatus = resolveAsyncImageTaskStatus(error4);
+      if (['completed', 'succeeded', 'success'].includes(asyncImageTaskStatus)) return error4;
+      if (isAsyncTaskPendingStatus(asyncImageTaskStatus)) continue;
+      if (isAsyncTaskTerminalStatus(asyncImageTaskStatus)) {
+        const value152 = String(error4?.rawText || '');
         throw ApiError.taskFailed(
-          _0x3ec75c,
+          provider,
           String(
-            _0x44e5e4?.error ||
-              _0x44e5e4?.errorMessage ||
-              _0x44e5e4?.message ||
-              extractTaskStatusFromRawText(_0x17ff53) ||
+            error4?.error ||
+              error4?.errorMessage ||
+              error4?.message ||
+              extractTaskStatusFromRawText(value152) ||
               '任务状态异常',
           ),
         );
       }
-    } catch (_0xf6b5e5) {
-      if (_0xf6b5e5 instanceof ApiError) {
+    } catch (value153) {
+      if (value153 instanceof ApiError) {
         if (
-          _0xf6b5e5.type === ErrorType.TASK_FAILED ||
-          _0xf6b5e5.type === ErrorType.CONTENT_FILTERED ||
-          _0xf6b5e5.type === ErrorType.TASK_TIMEOUT ||
-          _0xf6b5e5.type === ErrorType.AUTH_ERROR ||
-          _0xf6b5e5.type === ErrorType.FORBIDDEN ||
-          _0xf6b5e5.type === ErrorType.INVALID_PARAMS ||
-          _0xf6b5e5.type === ErrorType.INSUFFICIENT_BALANCE
+          value153.type === ErrorType.TASK_FAILED ||
+          value153.type === ErrorType.CONTENT_FILTERED ||
+          value153.type === ErrorType.TASK_TIMEOUT ||
+          value153.type === ErrorType.AUTH_ERROR ||
+          value153.type === ErrorType.FORBIDDEN ||
+          value153.type === ErrorType.INVALID_PARAMS ||
+          value153.type === ErrorType.INSUFFICIENT_BALANCE
         )
-          throw _0xf6b5e5;
+          throw value153;
       }
     }
   }
-  throw ApiError.taskTimeout(_0x3ec75c);
+  throw ApiError.taskTimeout(provider);
 }
-async function pollRunningHubTask(_0x20b7dc, _0x490ec1, _0x1f0d5f, _0x238e11) {
-  const _0x5c793e = isModelApiModel(_0x490ec1.model, 'runninghub'),
-    _0x50c78b = _0x238e11?.useOpenapiQuery === true || _0x5c793e || isRunningHubOpenApiV2AiApp(_0x490ec1),
-    _0x42de28 =
-      _0x238e11?.pollIntervalMs === undefined ? 0x7d0 : Math.max(0, Number(_0x238e11.pollIntervalMs) || 0),
-    _0x247041 = Math.max(1, Number(_0x238e11?.maxPolls) || 0x1c2),
-    _0x3ed48d = _0x238e11?.softTimeout === true,
-    _0x3ce276 = getProviderConfig(_0x5c793e ? 'runninghub' : 'runninghubwf'),
-    _0x39aca9 = _0x5c793e ? _0x3ce276.modelApiKey || _0x490ec1.apiKey : _0x3ce276.apiKey || _0x490ec1.apiKey;
-  for (let _0x1f924b = 0; _0x1f924b < _0x247041; _0x1f924b++) {
-    if (_0x238e11?.signal?.aborted) throw new Error('CANCELLED');
-    _0x42de28 > 0 && (await new Promise((_0x167036) => setTimeout(_0x167036, _0x42de28)));
-    if (_0x238e11?.signal?.aborted) throw new Error('CANCELLED');
+async function pollRunningHubTask(taskId2, value154, provider2, value155) {
+  const isModelApiModel2 = isModelApiModel(value154.model, 'runninghub'),
+    url3 = value155?.useOpenapiQuery === true || isModelApiModel2 || isRunningHubOpenApiV2AiApp(value154),
+    count6 =
+      value155?.pollIntervalMs === undefined ? 0x7d0 : Math.max(0, Number(value155.pollIntervalMs) || 0),
+    value156 = Math.max(1, Number(value155?.maxPolls) || 0x1c2),
+    value157 = value155?.softTimeout === true,
+    providerConfig4 = getProviderConfig(isModelApiModel2 ? 'runninghub' : 'runninghubwf'),
+    apiKey3 = isModelApiModel2
+      ? providerConfig4.modelApiKey || value154.apiKey
+      : providerConfig4.apiKey || value154.apiKey;
+  for (let value158 = 0; value158 < value156; value158++) {
+    if (value155?.signal?.aborted) throw new Error('CANCELLED');
+    count6 > 0 && (await new Promise((value159) => setTimeout(value159, count6)));
+    if (value155?.signal?.aborted) throw new Error('CANCELLED');
     try {
-      const _0x10f347 = await requester({
-          url: _0x50c78b ? '/api/v2/proxy/image' : '/api/v2/runninghubwf/query',
+      const requester4 = await requester({
+          url: url3 ? '/api/v2/proxy/image' : '/api/v2/runninghubwf/query',
           method: 'POST',
-          provider: _0x1f0d5f,
+          provider: provider2,
           timeout: 0x7530,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(
-            _0x50c78b
-              ? { apiUrl: 'https://www.runninghub.cn/openapi/v2/query', apiKey: _0x39aca9, taskId: _0x20b7dc }
-              : { apiKey: _0x39aca9, taskId: _0x20b7dc },
+            url3
+              ? { apiUrl: 'https://www.runninghub.cn/openapi/v2/query', apiKey: apiKey3, taskId: taskId2 }
+              : { apiKey: apiKey3, taskId: taskId2 },
           ),
         }),
-        _0x3ed666 = typeof _0x10f347?.code === 'number' ? _0x10f347.code : null;
-      if (_0x3ed666 === 0x324 || _0x3ed666 === 0x32d) continue;
-      if (_0x3ed666 !== null && _0x3ed666 !== 0) throw parseError(_0x1f0d5f, _0x10f347, 200);
-      if (_0x50c78b && hasImageResultOutput(_0x10f347, _0x238e11?.responseMapping)) return _0x10f347;
-      if (_0x3ed666 === 0 && Array.isArray(_0x10f347.data)) {
-        const _0x29dc19 = _0x10f347.data.filter((_0x4fb80b) => _0x4fb80b && typeof _0x4fb80b === 'object');
-        if (_0x29dc19.length === 0) continue;
-        const _0x45454b = _0x29dc19.some((_0x1f8c3f) =>
-          hasImageResultOutput(_0x1f8c3f, _0x238e11?.responseMapping),
-        );
-        if (_0x45454b) return _0x10f347;
-        for (const _0x297e83 of _0x29dc19) {
-          const _0x35ec0b = parseTaskError(_0x1f0d5f, _0x297e83);
-          if (_0x35ec0b) throw _0x35ec0b;
+        count7 = typeof requester4?.code === 'number' ? requester4.code : null;
+      if (count7 === 0x324 || count7 === 0x32d) continue;
+      if (count7 !== null && count7 !== 0) throw parseError(provider2, requester4, 200);
+      if (url3 && hasImageResultOutput(requester4, value155?.responseMapping)) return requester4;
+      if (count7 === 0 && Array.isArray(requester4.data)) {
+        const list23 = requester4.data.filter((item13) => item13 && typeof item13 === 'object');
+        if (list23.length === 0) continue;
+        const value160 = list23.some((item14) => hasImageResultOutput(item14, value155?.responseMapping));
+        if (value160) return requester4;
+        for (const value161 of list23) {
+          const taskError3 = parseTaskError(provider2, value161);
+          if (taskError3) throw taskError3;
         }
-        const _0x5834ca = _0x29dc19
-            .map((_0x340ee6) =>
-              String(_0x340ee6?.status || _0x340ee6?.taskStatus || _0x340ee6?.task_status || '')
+        const list24 = list23
+            .map((response17) =>
+              String(response17?.status || response17?.taskStatus || response17?.task_status || '')
                 .trim()
                 .toUpperCase(),
             )
             .filter(Boolean),
-          _0x22b3a9 = _0x29dc19.find((_0x3f54d1) =>
+          error5 = list23.find((response18) =>
             ['FAILED', 'FAIL', 'ERROR', 'CANCELLED', 'CANCELED'].includes(
-              String(_0x3f54d1?.status || _0x3f54d1?.taskStatus || _0x3f54d1?.task_status || '')
+              String(response18?.status || response18?.taskStatus || response18?.task_status || '')
                 .trim()
                 .toUpperCase(),
             ),
           );
-        if (_0x22b3a9)
+        if (error5)
           throw ApiError.taskFailed(
-            _0x1f0d5f,
-            String(_0x22b3a9?.errorMessage || _0x22b3a9?.error || _0x22b3a9?.message || '任务执行失败'),
+            provider2,
+            String(error5?.errorMessage || error5?.error || error5?.message || '任务执行失败'),
           );
-        if (_0x5834ca.some((_0x36a9ff) => ['COMPLETED', 'SUCCEEDED', 'SUCCESS'].includes(_0x36a9ff)))
-          continue;
+        if (list24.some((item15) => ['COMPLETED', 'SUCCEEDED', 'SUCCESS'].includes(item15))) continue;
         if (
-          _0x5834ca.some((_0x14bbe8) =>
-            ['RUNNING', 'PENDING', 'QUEUED', 'SUBMITTED', 'PROCESSING'].includes(_0x14bbe8),
+          list24.some((item16) =>
+            ['RUNNING', 'PENDING', 'QUEUED', 'SUBMITTED', 'PROCESSING'].includes(item16),
           )
         )
           continue;
       }
-      const _0x29de42 = _0x10f347.data && Object.keys(_0x10f347.data).length > 0 ? _0x10f347.data : _0x10f347,
-        _0x3173a2 = hasImageResultOutput(_0x29de42, _0x238e11?.responseMapping);
-      if (_0x3173a2) return _0x29de42;
-      const _0x32fa6e = parseTaskError(_0x1f0d5f, _0x29de42);
-      if (_0x32fa6e) throw _0x32fa6e;
-      const _0x423461 = (_0x29de42.status || '').toUpperCase();
-      if (['FAILED', 'FAIL', 'ERROR', 'CANCELLED', 'CANCELED'].includes(_0x423461))
+      const error6 =
+          requester4.data && Object.keys(requester4.data).length > 0 ? requester4.data : requester4,
+        hasImageResultOutput3 = hasImageResultOutput(error6, value155?.responseMapping);
+      if (hasImageResultOutput3) return error6;
+      const taskError4 = parseTaskError(provider2, error6);
+      if (taskError4) throw taskError4;
+      const value162 = (error6.status || '').toUpperCase();
+      if (['FAILED', 'FAIL', 'ERROR', 'CANCELLED', 'CANCELED'].includes(value162))
         throw ApiError.taskFailed(
-          _0x1f0d5f,
-          String(_0x29de42?.errorMessage || _0x29de42?.error || _0x29de42?.message || '任务执行失败'),
+          provider2,
+          String(error6?.errorMessage || error6?.error || error6?.message || '任务执行失败'),
         );
-      if (['COMPLETED', 'SUCCEEDED', 'SUCCESS'].includes(_0x423461)) {
-        if (!hasImageResultOutput(_0x29de42, _0x238e11?.responseMapping)) continue;
-        return _0x29de42;
+      if (['COMPLETED', 'SUCCEEDED', 'SUCCESS'].includes(value162)) {
+        if (!hasImageResultOutput(error6, value155?.responseMapping)) continue;
+        return error6;
       }
-      if (['RUNNING', 'PENDING', 'QUEUED', 'SUBMITTED', 'PROCESSING'].includes(_0x423461)) continue;
-    } catch (_0x38324f) {
-      if (_0x38324f instanceof ApiError) {
-        if (_0x38324f.type === ErrorType.TIMEOUT) continue;
+      if (['RUNNING', 'PENDING', 'QUEUED', 'SUBMITTED', 'PROCESSING'].includes(value162)) continue;
+    } catch (value163) {
+      if (value163 instanceof ApiError) {
+        if (value163.type === ErrorType.TIMEOUT) continue;
         if (
-          _0x38324f.type === ErrorType.TASK_FAILED ||
-          _0x38324f.type === ErrorType.TASK_TIMEOUT ||
-          _0x38324f.type === ErrorType.AUTH_ERROR ||
-          _0x38324f.type === ErrorType.FORBIDDEN ||
-          _0x38324f.type === ErrorType.INVALID_PARAMS ||
-          _0x38324f.type === ErrorType.CONTENT_FILTERED ||
-          _0x38324f.type === ErrorType.INSUFFICIENT_BALANCE ||
-          (_0x38324f.provider === 'runninghub' && _0x38324f.code !== null && _0x38324f.code !== undefined)
+          value163.type === ErrorType.TASK_FAILED ||
+          value163.type === ErrorType.TASK_TIMEOUT ||
+          value163.type === ErrorType.AUTH_ERROR ||
+          value163.type === ErrorType.FORBIDDEN ||
+          value163.type === ErrorType.INVALID_PARAMS ||
+          value163.type === ErrorType.CONTENT_FILTERED ||
+          value163.type === ErrorType.INSUFFICIENT_BALANCE ||
+          (value163.provider === 'runninghub' && value163.code !== null && value163.code !== undefined)
         )
-          throw _0x38324f;
+          throw value163;
       }
     }
   }
-  if (_0x3ed48d)
+  if (value157)
     return {
       pending: true,
-      taskId: String(_0x20b7dc || '').trim(),
+      taskId: String(taskId2 || '').trim(),
       status: 'running',
       message: '任务仍在 RunningHub 生成中',
     };
-  throw ApiError.taskTimeout(_0x1f0d5f);
+  throw ApiError.taskTimeout(provider2);
 }
-async function doGenerateOnce(_0xf091a9, _0x180b1b, _0x369bda) {
-  const _0x57e0c4 = await buildGenerateImageRequest(_0xf091a9),
-    _0x43916f = _0x57e0c4?.responseMapping || null,
-    _0x243f83 = {
-      ...(_0x369bda || {}),
-      ...(_0x43916f ? { responseMapping: _0x43916f } : {}),
-      ...(_0x57e0c4?.taskPolling ? { taskPolling: _0x57e0c4.taskPolling } : {}),
+async function doGenerateOnce(value164, provider3, enabled21) {
+  const taskPolling2 = await buildGenerateImageRequest(value164),
+    responseMapping2 = taskPolling2?.responseMapping || null,
+    args4 = {
+      ...(enabled21 || {}),
+      ...(responseMapping2 ? { responseMapping: responseMapping2 } : {}),
+      ...(taskPolling2?.taskPolling ? { taskPolling: taskPolling2.taskPolling } : {}),
     },
-    _0x3b3847 = _0x180b1b === 'runninghubwf' || _0x180b1b === 'runninghub',
-    _0x4b445e = String(_0x57e0c4?.body?.apiUrl || ''),
-    _0x56408c =
-      _0x369bda?.useOpenapiQuery === true ||
-      _0x57e0c4?.useOpenapiQuery === true ||
-      (_0x180b1b === 'runninghubwf' &&
-        _0x57e0c4?.url === '/api/v2/proxy/image' &&
-        (typeof _0x57e0c4?.pollUrlBuilder === 'function' || _0x4b445e.includes('/openapi/v2/run/ai-app/'))) ||
-      isModelApiModel(_0xf091a9?.model, _0x180b1b) ||
-      isRunningHubOpenApiV2AiApp(_0xf091a9),
-    _0x3ce503 = !!_0x369bda?.signal && _0x180b1b !== 'runninghubwf',
-    _0x127e92 = String(
-      _0xf091a9?.installId || globalThis.window?.__aicInstallId || globalThis.__aicInstallId || '',
+    enabled22 = provider3 === 'runninghubwf' || provider3 === 'runninghub',
+    list25 = String(taskPolling2?.body?.apiUrl || ''),
+    useOpenapiQuery =
+      enabled21?.useOpenapiQuery === true ||
+      taskPolling2?.useOpenapiQuery === true ||
+      (provider3 === 'runninghubwf' &&
+        taskPolling2?.url === '/api/v2/proxy/image' &&
+        (typeof taskPolling2?.pollUrlBuilder === 'function' || list25.includes('/openapi/v2/run/ai-app/'))) ||
+      isModelApiModel(value164?.model, provider3) ||
+      isRunningHubOpenApiV2AiApp(value164),
+    signal3 = !!enabled21?.signal && provider3 !== 'runninghubwf',
+    value165 = String(
+      value164?.installId || globalThis.window?.__aicInstallId || globalThis.__aicInstallId || '',
     ).trim(),
-    _0x180970 = {
-      ...(_0x57e0c4.headers || { 'Content-Type': 'application/json' }),
-      ...(_0x127e92 ? { 'X-AIC-Install-Id': _0x127e92 } : {}),
+    headers = {
+      ...(taskPolling2.headers || { 'Content-Type': 'application/json' }),
+      ...(value165 ? { 'X-AIC-Install-Id': value165 } : {}),
     },
-    _0x24f874 = _0x57e0c4.body;
-  let _0x44efd6,
-    _0x3ece95 = null;
+    value166 = taskPolling2.body;
+  let value167,
+    list26 = null;
   try {
-    const _0x1cf936 = await requester({
-      url: _0x57e0c4.url,
+    const response19 = await requester({
+      url: taskPolling2.url,
       method: 'POST',
-      provider: _0x180b1b,
+      provider: provider3,
       timeout: GENERATION_TIMEOUT,
       retries: GENERATION_RETRIES,
       retryDelay: GENERATION_RETRY_DELAY,
-      signal: _0x3ce503 ? _0x369bda?.signal : undefined,
-      headers: _0x180970,
-      body: JSON.stringify(_0x24f874),
+      signal: signal3 ? enabled21?.signal : undefined,
+      headers: headers,
+      body: JSON.stringify(value166),
       responseType: 'text',
       returnMeta: true,
     });
-    ((_0x44efd6 = String(_0x1cf936?.data ?? '')), (_0x3ece95 = _0x1cf936?.headers || null));
-  } catch (_0xf260ea) {
-    if (_0xf260ea instanceof ApiError) throw _0xf260ea;
-    throw parseNetworkError(_0x180b1b, _0xf260ea, GENERATION_TIMEOUT);
+    ((value167 = String(response19?.data ?? '')), (list26 = response19?.headers || null));
+  } catch (value168) {
+    if (value168 instanceof ApiError) throw value168;
+    throw parseNetworkError(provider3, value168, GENERATION_TIMEOUT);
   }
-  let _0x21eb24 = {},
-    _0x2d8e86 = null;
+  let parsedKeys = {},
+    value169 = null;
   try {
-    _0x21eb24 = parseResponseData(_0x44efd6);
-  } catch (_0xea804d) {
-    ((_0x2d8e86 = _0xea804d), (_0x21eb24 = {}));
+    parsedKeys = parseResponseData(value167);
+  } catch (value170) {
+    ((value169 = value170), (parsedKeys = {}));
   }
-  if (_0x180b1b === 'runninghubwf') {
-    const _0x97812c = typeof _0x21eb24?.code === 'number' ? _0x21eb24.code : null;
-    if (_0x97812c !== null && _0x97812c !== 0) throw parseError(_0x180b1b, _0x21eb24, 200);
-    const _0x26f7ca = resolveRunningHubTaskId(_0x21eb24, _0x44efd6, _0x3ece95);
-    if (_0x26f7ca) {
-      const _0x37ab4a = _0x180b1b + ':image:' + _0x26f7ca;
-      (_0x369bda?.onTaskMeta?.({ taskId: _0x26f7ca, useOpenapiQuery: _0x56408c }),
-        _0x369bda?.onTaskId?.(_0x26f7ca));
-      const _0xfd23b7 = await pollRunningHubTask(_0x26f7ca, _0xf091a9, _0x180b1b, {
-        ..._0x243f83,
-        useOpenapiQuery: _0x56408c,
+  if (provider3 === 'runninghubwf') {
+    const count8 = typeof parsedKeys?.code === 'number' ? parsedKeys.code : null;
+    if (count8 !== null && count8 !== 0) throw parseError(provider3, parsedKeys, 200);
+    const taskId3 = resolveRunningHubTaskId(parsedKeys, value167, list26);
+    if (taskId3) {
+      const taskKey = provider3 + ':image:' + taskId3;
+      (enabled21?.onTaskMeta?.({ taskId: taskId3, useOpenapiQuery: useOpenapiQuery }),
+        enabled21?.onTaskId?.(taskId3));
+      const pollRunningHubTask2 = await pollRunningHubTask(taskId3, value164, provider3, {
+        ...args4,
+        useOpenapiQuery: useOpenapiQuery,
       });
-      return processTaskResult(_0xfd23b7, _0x180b1b, { ..._0x243f83, taskKey: _0x37ab4a });
+      return processTaskResult(pollRunningHubTask2, provider3, { ...args4, taskKey: taskKey });
     }
   }
-  let _0x4a630c =
-      _0x180b1b === 'apimart'
-        ? resolveApimartTaskIdStrict(_0x21eb24)
-        : resolveAsyncImageTaskId(_0x21eb24, _0x43916f),
-    _0x32a839 = resolveAsyncImageTaskStatus(_0x21eb24);
-  !_0x4a630c && _0x180b1b !== 'apimart' && (_0x4a630c = resolveAsyncImageTaskIdLoose(_0x21eb24));
-  !_0x4a630c &&
-    (_0x4a630c =
-      _0x180b1b === 'apimart'
-        ? extractApimartTaskIdFromRawText(_0x44efd6)
-        : extractTaskIdFromRawText(_0x44efd6));
-  if (_0x4a630c && _0x180b1b === 'apimart') {
-    const _0x5510a8 = await probeApimartTaskIdCandidate(_0x4a630c, _0xf091a9, _0x243f83);
-    if (!_0x5510a8) _0x4a630c = '';
+  let taskId4 =
+      provider3 === 'apimart'
+        ? resolveApimartTaskIdStrict(parsedKeys)
+        : resolveAsyncImageTaskId(parsedKeys, responseMapping2),
+    asyncTaskStatus = resolveAsyncImageTaskStatus(parsedKeys);
+  !taskId4 && provider3 !== 'apimart' && (taskId4 = resolveAsyncImageTaskIdLoose(parsedKeys));
+  !taskId4 &&
+    (taskId4 =
+      provider3 === 'apimart'
+        ? extractApimartTaskIdFromRawText(value167)
+        : extractTaskIdFromRawText(value167));
+  if (taskId4 && provider3 === 'apimart') {
+    const probeApimartTaskIdCandidate3 = await probeApimartTaskIdCandidate(taskId4, value164, args4);
+    if (!probeApimartTaskIdCandidate3) taskId4 = '';
   }
-  !_0x4a630c &&
-    _0x180b1b === 'apimart' &&
-    (_0x4a630c = await resolveApimartTaskIdByProbe(_0x21eb24, _0xf091a9, _0x243f83));
-  !_0x4a630c && _0x180b1b !== 'apimart' && (_0x4a630c = extractTaskIdFromResponseHeaders(_0x3ece95));
-  !_0x32a839 && (_0x32a839 = extractTaskStatusFromRawText(_0x44efd6));
-  const _0x873325 = extractImageUrls(_0x21eb24, _0x43916f).length > 0;
+  !taskId4 &&
+    provider3 === 'apimart' &&
+    (taskId4 = await resolveApimartTaskIdByProbe(parsedKeys, value164, args4));
+  !taskId4 && provider3 !== 'apimart' && (taskId4 = extractTaskIdFromResponseHeaders(list26));
+  !asyncTaskStatus && (asyncTaskStatus = extractTaskStatusFromRawText(value167));
+  const extractImageUrls2 = extractImageUrls(parsedKeys, responseMapping2).length > 0;
   if (
-    _0x873325 &&
-    (_0x180b1b === 'grsai' || _0x180b1b === 'volcengine') &&
-    !isAsyncTaskFailureStatus(_0x32a839)
+    extractImageUrls2 &&
+    (provider3 === 'grsai' || provider3 === 'volcengine') &&
+    !isAsyncTaskFailureStatus(asyncTaskStatus)
   )
-    return processTaskResult(_0x21eb24, _0x180b1b, _0x243f83);
-  if (!_0x873325 && _0x180b1b === 'grsai') {
-    const _0xad7a27 = resolveDirectOutputSnapshotFromRawText(_0x44efd6);
-    if (_0xad7a27) return processTaskResult(_0xad7a27, _0x180b1b, _0x243f83);
+    return processTaskResult(parsedKeys, provider3, args4);
+  if (!extractImageUrls2 && provider3 === 'grsai') {
+    const directOutputSnapshotFromRawText = resolveDirectOutputSnapshotFromRawText(value167);
+    if (directOutputSnapshotFromRawText)
+      return processTaskResult(directOutputSnapshotFromRawText, provider3, args4);
   }
-  _0x4a630c && !supportsAsyncImageTaskPolling(_0x180b1b, _0x243f83) && (_0x4a630c = '');
-  if (!_0x3b3847 && _0x4a630c && !isAsyncTaskFailureStatus(_0x32a839)) {
-    (_0x369bda?.onTaskMeta?.({ taskId: _0x4a630c, provider: _0x180b1b, kind: 'image' }),
-      _0x369bda?.onTaskId?.(_0x4a630c));
+  taskId4 && !supportsAsyncImageTaskPolling(provider3, args4) && (taskId4 = '');
+  if (!enabled22 && taskId4 && !isAsyncTaskFailureStatus(asyncTaskStatus)) {
+    (enabled21?.onTaskMeta?.({ taskId: taskId4, provider: provider3, kind: 'image' }),
+      enabled21?.onTaskId?.(taskId4));
     if (
-      _0x873325 &&
+      extractImageUrls2 &&
       ['success', 'succeeded', 'completed', 'complete', 'done'].includes(
-        String(_0x32a839 || '').toLowerCase(),
+        String(asyncTaskStatus || '').toLowerCase(),
       )
     )
-      return processTaskResult(_0x21eb24, _0x180b1b, _0x243f83);
-    const _0x11fc1c = await pollAsyncImageTask(_0x4a630c, _0xf091a9, _0x180b1b, _0x243f83);
-    return processTaskResult(_0x11fc1c, _0x180b1b, _0x243f83);
+      return processTaskResult(parsedKeys, provider3, args4);
+    const pollAsyncImageTask2 = await pollAsyncImageTask(taskId4, value164, provider3, args4);
+    return processTaskResult(pollAsyncImageTask2, provider3, args4);
   }
   if (
-    !_0x3b3847 &&
-    (_0x180b1b === 'ppio' || _0x180b1b === 'grsai') &&
-    (!_0x4a630c || isAsyncTaskPendingStatus(_0x32a839))
+    !enabled22 &&
+    (provider3 === 'ppio' || provider3 === 'grsai') &&
+    (!taskId4 || isAsyncTaskPendingStatus(asyncTaskStatus))
   ) {
-    const _0x5e10c6 = String(_0x44efd6 || '').slice(0, 0x190);
-    let _0x40c02d = {};
-    if (_0x3ece95 && typeof _0x3ece95.forEach === 'function') {
-      const _0x245cf3 = {};
-      (_0x3ece95.forEach((_0x5751ba, _0xaa35f3) => {
-        const _0x4366b3 = String(_0xaa35f3 || '').toLowerCase();
-        (_0x4366b3.includes('task') ||
-          _0x4366b3.includes('job') ||
-          _0x4366b3.includes('request') ||
-          _0x4366b3.includes('submit')) &&
-          (_0x245cf3[_0xaa35f3] = String(_0x5751ba || ''));
+    const previewText = String(value167 || '').slice(0, 0x190);
+    let headerSnapshot = {};
+    if (list26 && typeof list26.forEach === 'function') {
+      const value171 = {};
+      (list26.forEach((item17, value172) => {
+        const list27 = String(value172 || '').toLowerCase();
+        (list27.includes('task') ||
+          list27.includes('job') ||
+          list27.includes('request') ||
+          list27.includes('submit')) &&
+          (value171[value172] = String(item17 || ''));
       }),
-        (_0x40c02d = _0x245cf3));
+        (headerSnapshot = value171));
     }
     console.warn('[aiImageApi] async submit missing taskId', {
-      providerId: _0x180b1b,
-      asyncTaskStatus: _0x32a839,
-      previewText: _0x5e10c6,
-      headerSnapshot: _0x40c02d,
+      providerId: provider3,
+      asyncTaskStatus: asyncTaskStatus,
+      previewText: previewText,
+      headerSnapshot: headerSnapshot,
       parsedKeys:
-        _0x21eb24 && typeof _0x21eb24 === 'object' && !Array.isArray(_0x21eb24)
-          ? Object.keys(_0x21eb24).slice(0, 20)
+        parsedKeys && typeof parsedKeys === 'object' && !Array.isArray(parsedKeys)
+          ? Object.keys(parsedKeys).slice(0, 20)
           : [],
     });
   }
-  if (_0x2d8e86 && !_0x3b3847) throw _0x2d8e86;
-  const _0x41709f = String(_0x21eb24.status || _0x21eb24?.data?.status || '').toUpperCase(),
-    _0xa99493 = resolveRunningHubTaskId(_0x21eb24, _0x44efd6, _0x3ece95);
+  if (value169 && !enabled22) throw value169;
+  const enabled23 = String(parsedKeys.status || parsedKeys?.data?.status || '').toUpperCase(),
+    runningHubTaskId = resolveRunningHubTaskId(parsedKeys, value167, list26);
   if (
-    _0x3b3847 &&
-    _0xa99493 &&
-    (!_0x41709f || ['RUNNING', 'PENDING', 'QUEUED', 'SUBMITTED'].includes(_0x41709f))
+    enabled22 &&
+    runningHubTaskId &&
+    (!enabled23 || ['RUNNING', 'PENDING', 'QUEUED', 'SUBMITTED'].includes(enabled23))
   ) {
-    const _0x50c13c = _0xa99493,
-      _0xaacd9c = _0x180b1b + ':image:' + _0x50c13c;
-    (_0x369bda?.onTaskMeta?.({ taskId: _0x50c13c, useOpenapiQuery: _0x56408c }),
-      _0x369bda?.onTaskId?.(_0x50c13c));
-    const _0x59dc05 = await pollRunningHubTask(_0x50c13c, _0xf091a9, _0x180b1b, {
-      ..._0x243f83,
-      useOpenapiQuery: _0x56408c,
+    const taskId5 = runningHubTaskId,
+      taskKey2 = provider3 + ':image:' + taskId5;
+    (enabled21?.onTaskMeta?.({ taskId: taskId5, useOpenapiQuery: useOpenapiQuery }),
+      enabled21?.onTaskId?.(taskId5));
+    const pollRunningHubTask3 = await pollRunningHubTask(taskId5, value164, provider3, {
+      ...args4,
+      useOpenapiQuery: useOpenapiQuery,
     });
-    return processTaskResult(_0x59dc05, _0x180b1b, { ..._0x243f83, taskKey: _0xaacd9c });
+    return processTaskResult(pollRunningHubTask3, provider3, { ...args4, taskKey: taskKey2 });
   }
-  return processTaskResult(_0x21eb24, _0x180b1b, _0x243f83);
+  return processTaskResult(parsedKeys, provider3, args4);
 }
-export async function resumeDreaminaImageTask(_0x3208df, _0x1826dd = {}, _0x343d6c = {}) {
-  const _0x412682 = getProviderId(_0x1826dd || {});
-  if (_0x412682 !== 'dreamina') throw new Error('仅支持恢复 Dreamina 图片任务');
-  const _0x2a53ff = String(_0x3208df || '').trim();
-  if (!_0x2a53ff) throw new Error('缺少 Dreamina 提交ID，无法恢复');
-  const _0x35df41 = await pollDreaminaUntilDone(_0x2a53ff, { ..._0x343d6c, taskKind: 'image' }),
-    _0x45beb5 = normalizeDreaminaTaskSnapshot(_0x35df41, { submitId: _0x2a53ff });
-  if (_0x45beb5?.phase === 'failed') throw new Error(_0x45beb5.failReason || '即梦图片任务恢复失败');
-  const _0x234b7a = Array.isArray(_0x45beb5?.outputs) ? _0x45beb5.outputs : [];
-  if (_0x234b7a.length === 0) throw new Error('即梦图片任务恢复失败：无可用输出');
-  const _0x216db0 = _0x234b7a.map((_0x3ff5be) => {
-    const _0x31edba = _0x3ff5be.localUrl || _0x3ff5be.url;
+export async function resumeDreaminaImageTask(value173, value174 = {}, args5 = {}) {
+  const providerId2 = getProviderId(value174 || {});
+  if (providerId2 !== 'dreamina') throw new Error('仅支持恢复 Dreamina 图片任务');
+  const submitId = String(value173 || '').trim();
+  if (!submitId) throw new Error('缺少 Dreamina 提交ID，无法恢复');
+  const pollDreaminaUntilDone2 = await pollDreaminaUntilDone(submitId, { ...args5, taskKind: 'image' }),
+    dreaminaTaskSnapshot = normalizeDreaminaTaskSnapshot(pollDreaminaUntilDone2, { submitId: submitId });
+  if (dreaminaTaskSnapshot?.phase === 'failed')
+    throw new Error(dreaminaTaskSnapshot.failReason || '即梦图片任务恢复失败');
+  const list28 = Array.isArray(dreaminaTaskSnapshot?.outputs) ? dreaminaTaskSnapshot.outputs : [];
+  if (list28.length === 0) throw new Error('即梦图片任务恢复失败：无可用输出');
+  const images2 = list28.map((sourceUrl4) => {
+    const thumbUrl = sourceUrl4.localUrl || sourceUrl4.url;
     return {
       sourceId: null,
       thumbId: null,
-      sourceUrl: _0x3ff5be.url || _0x31edba,
-      thumbUrl: _0x31edba,
-      imageUrl: _0x31edba,
-      localPath: _0x3ff5be.localPath || '',
+      sourceUrl: sourceUrl4.url || thumbUrl,
+      thumbUrl: thumbUrl,
+      imageUrl: thumbUrl,
+      localPath: sourceUrl4.localPath || '',
     };
   });
-  return _0x216db0.length === 1 ? _0x216db0[0] : { isBatch: true, images: _0x216db0 };
+  return images2.length === 1 ? images2[0] : { isBatch: true, images: images2 };
 }
-export async function resumeAsyncImageTask(_0x344089, _0xc9fbf2 = {}, _0x18d686 = {}) {
+export async function resumeAsyncImageTask(value175, value176 = {}, value177 = {}) {
   await ensureConfig();
-  const _0x1c31c6 = getProviderId(_0xc9fbf2 || {});
-  if (_0x1c31c6 === 'runninghubwf' || _0x1c31c6 === 'runninghub' || _0x1c31c6 === 'dreamina')
+  const provider4 = getProviderId(value176 || {});
+  if (provider4 === 'runninghubwf' || provider4 === 'runninghub' || provider4 === 'dreamina')
     throw new Error('仅支持恢复 APIMart/PPIO/GRSAI 等异步图片任务');
-  const _0x2e1749 = String(_0x344089 || '').trim();
-  if (!_0x2e1749) throw new Error('缺少异步图片任务ID，无法恢复');
-  return runTaskSingleFlight({ provider: _0x1c31c6, kind: 'image', taskId: _0x2e1749 }, async () => {
-    const _0x5c3015 = resolveImageTaskRuntimeOptions(_0xc9fbf2 || {}, _0x1c31c6, _0x18d686),
-      _0x35553f = await pollAsyncImageTask(_0x2e1749, _0xc9fbf2 || {}, _0x1c31c6, _0x5c3015),
-      _0xd388a9 = await processTaskResult(_0x35553f, _0x1c31c6, {
-        taskKey: _0x1c31c6 + ':image:' + _0x2e1749,
-        ...(_0x5c3015?.responseMapping ? { responseMapping: _0x5c3015.responseMapping } : {}),
+  const taskId6 = String(value175 || '').trim();
+  if (!taskId6) throw new Error('缺少异步图片任务ID，无法恢复');
+  return runTaskSingleFlight({ provider: provider4, kind: 'image', taskId: taskId6 }, async () => {
+    const responseMapping3 = resolveImageTaskRuntimeOptions(value176 || {}, provider4, value177),
+      pollAsyncImageTask3 = await pollAsyncImageTask(taskId6, value176 || {}, provider4, responseMapping3),
+      images3 = await processTaskResult(pollAsyncImageTask3, provider4, {
+        taskKey: provider4 + ':image:' + taskId6,
+        ...(responseMapping3?.responseMapping ? { responseMapping: responseMapping3.responseMapping } : {}),
       });
-    if (_0xd388a9.length === 1 && _0xd388a9[0]?.error)
-      throw new Error(_0xd388a9[0].error || '图片任务恢复失败');
-    return _0xd388a9.length === 1 ? _0xd388a9[0] : { isBatch: true, images: _0xd388a9 };
+    if (images3.length === 1 && images3[0]?.error) throw new Error(images3[0].error || '图片任务恢复失败');
+    return images3.length === 1 ? images3[0] : { isBatch: true, images: images3 };
   });
 }
-export async function resumeRunningHubImageTask(_0x5c431f, _0x4a266e, _0x4c6ee5 = {}) {
-  const _0x598f9a = getProviderId(_0x4a266e || {});
-  if (_0x598f9a !== 'runninghubwf' && _0x598f9a !== 'runninghub')
+export async function resumeRunningHubImageTask(value178, value179, args6 = {}) {
+  const provider5 = getProviderId(value179 || {});
+  if (provider5 !== 'runninghubwf' && provider5 !== 'runninghub')
     throw new Error('仅支持恢复 RunningHub 图片任务');
-  const _0xd17812 = String(_0x5c431f || '').trim();
-  if (!_0xd17812) throw new Error('缺少 RunningHub 任务ID，无法恢复');
-  const _0x257a3f =
-    _0x4c6ee5?.useOpenapiQuery === true ||
-    isModelApiModel(_0x4a266e?.model, _0x598f9a) ||
-    isRunningHubOpenApiV2AiApp(_0x4a266e);
-  return runTaskSingleFlight({ provider: _0x598f9a, kind: 'image', taskId: _0xd17812 }, async () => {
-    const _0x494fc7 = await pollRunningHubTask(_0xd17812, _0x4a266e || {}, _0x598f9a, {
-      ..._0x4c6ee5,
-      useOpenapiQuery: _0x257a3f,
+  const taskId7 = String(value178 || '').trim();
+  if (!taskId7) throw new Error('缺少 RunningHub 任务ID，无法恢复');
+  const useOpenapiQuery2 =
+    args6?.useOpenapiQuery === true ||
+    isModelApiModel(value179?.model, provider5) ||
+    isRunningHubOpenApiV2AiApp(value179);
+  return runTaskSingleFlight({ provider: provider5, kind: 'image', taskId: taskId7 }, async () => {
+    const pollRunningHubTask4 = await pollRunningHubTask(taskId7, value179 || {}, provider5, {
+      ...args6,
+      useOpenapiQuery: useOpenapiQuery2,
     });
-    if (_0x494fc7?.pending) return _0x494fc7;
-    const _0x3cf615 = await processTaskResult(_0x494fc7, _0x598f9a, {
-      taskKey: _0x598f9a + ':image:' + _0xd17812,
+    if (pollRunningHubTask4?.pending) return pollRunningHubTask4;
+    const images4 = await processTaskResult(pollRunningHubTask4, provider5, {
+      taskKey: provider5 + ':image:' + taskId7,
     });
-    if (_0x3cf615.length === 1 && _0x3cf615[0]?.error)
-      throw new Error(_0x3cf615[0].error || '图片任务恢复失败');
-    return _0x3cf615.length === 1 ? _0x3cf615[0] : { isBatch: true, images: _0x3cf615 };
+    if (images4.length === 1 && images4[0]?.error) throw new Error(images4[0].error || '图片任务恢复失败');
+    return images4.length === 1 ? images4[0] : { isBatch: true, images: images4 };
   });
 }
-async function processTaskResult(_0x245695, _0x3beffc, _0x40463f = {}) {
-  const _0x40bed4 = extractImageResultRecords(_0x245695, _0x40463f?.responseMapping),
-    _0x4a0267 = _0x40bed4.some((_0x4df2e3) => String(_0x4df2e3?.sourceUrl || '').trim()),
-    _0x22b620 = _0x40bed4.some((_0x157d82) => String(_0x157d82?.error || '').trim());
-  if (!_0x4a0267) {
-    if (_0x22b620) return await processImageResultRecords(_0x40bed4, _0x40463f);
-    const _0x2f3168 = parseError(_0x3beffc, _0x245695, 200);
-    if (_0x2f3168) return [{ error: _0x2f3168.getUserMessage(), fullData: _0x245695 }];
-    const _0x6f741a = parseTaskError(_0x3beffc, _0x245695);
-    if (_0x6f741a) return [{ error: _0x6f741a.getUserMessage(), fullData: _0x245695 }];
-    const _0x365031 =
-      _0x245695.error || _0x245695.errorMessage || _0x245695.message || _0x245695.failure_reason;
-    if (_0x365031) return [{ error: _0x365031, fullData: _0x245695 }];
+async function processTaskResult(fullData2, provider6, value180 = {}) {
+  const list29 = extractImageResultRecords(fullData2, value180?.responseMapping),
+    enabled24 = list29.some((item18) => String(item18?.sourceUrl || '').trim()),
+    value181 = list29.some((item19) => String(item19?.error || '').trim());
+  if (!enabled24) {
+    if (value181) return await processImageResultRecords(list29, value180);
+    const error7 = parseError(provider6, fullData2, 200);
+    if (error7) return [{ error: error7.getUserMessage(), fullData: fullData2 }];
+    const error8 = parseTaskError(provider6, fullData2);
+    if (error8) return [{ error: error8.getUserMessage(), fullData: fullData2 }];
+    const error9 = fullData2.error || fullData2.errorMessage || fullData2.message || fullData2.failure_reason;
+    if (error9) return [{ error: error9, fullData: fullData2 }];
     throw new ApiError({
       type: 'PARSE_ERROR',
-      provider: _0x3beffc,
+      provider: provider6,
       message: '无法从服务器响应中提取图片地址',
-      raw: _0x245695,
+      raw: fullData2,
       retryable: false,
     });
   }
-  return await processImageResultRecords(_0x40bed4, _0x40463f);
+  return await processImageResultRecords(list29, value180);
 }
-async function processImages(_0x4068e6, _0x573855 = {}) {
+async function processImages(value182, value183 = {}) {
   return await processImageResultRecords(
-    (Array.isArray(_0x4068e6) ? _0x4068e6 : []).map((_0x2599ff) => ({ sourceUrl: _0x2599ff, error: '' })),
-    _0x573855,
+    (Array.isArray(value182) ? value182 : []).map((sourceUrl5) => ({ sourceUrl: sourceUrl5, error: '' })),
+    value183,
   );
 }
-async function processImageResultRecords(_0x4a8ca7, _0x567406 = {}) {
-  const _0x3c21fa = [],
-    _0x3ae1aa = window.currentProjectId || 'default_v2_project';
-  for (const _0x4c7e62 of Array.isArray(_0x4a8ca7) ? _0x4a8ca7 : []) {
-    const _0x252451 = String(_0x4c7e62?.sourceUrl || '').trim(),
-      _0x4051ab = String(_0x4c7e62?.error || '').trim();
-    if (!_0x252451) {
-      _0x4051ab &&
-        _0x3c21fa.push({
+async function processImageResultRecords(value184, taskKey3 = {}) {
+  const list30 = [],
+    value185 = window.currentProjectId || 'default_v2_project';
+  for (const fullData3 of Array.isArray(value184) ? value184 : []) {
+    const sourceUrl6 = String(fullData3?.sourceUrl || '').trim(),
+      error10 = String(fullData3?.error || '').trim();
+    if (!sourceUrl6) {
+      error10 &&
+        list30.push({
           sourceUrl: '',
           thumbUrl: '',
           imageUrl: '',
           localPath: '',
-          error: _0x4051ab,
-          ...(_0x4c7e62?.fullData !== undefined ? { fullData: _0x4c7e62.fullData } : {}),
+          error: error10,
+          ...(fullData3?.fullData !== undefined ? { fullData: fullData3.fullData } : {}),
         });
       continue;
     }
     try {
-      const { saveRemoteImageLocallyDetailed: _0x5e2dfd } = await import('../src/modules/project.js'),
-        _0x2b38a7 = await _0x5e2dfd(_0x252451, _0x3ae1aa, {
-          taskKey: _0x567406?.taskKey,
-          dedupeKey: _0x567406?.taskKey ? _0x567406.taskKey + ':' + _0x252451 : undefined,
+      const { saveRemoteImageLocallyDetailed: saveRemoteImageLocallyDetailed } =
+          await import('../src/modules/project.js'),
+        value186 = await saveRemoteImageLocallyDetailed(sourceUrl6, value185, {
+          taskKey: taskKey3?.taskKey,
+          dedupeKey: taskKey3?.taskKey ? taskKey3.taskKey + ':' + sourceUrl6 : undefined,
         }),
-        _0x2bbb5a = pickResultLocalPath(_0x2b38a7),
-        _0x2ab027 = String(_0x2b38a7?.localUrl || '').trim() || localPathToUrl(_0x2bbb5a);
-      _0x3c21fa.push({
+        localPath = pickResultLocalPath(value186),
+        value187 = String(value186?.localUrl || '').trim() || localPathToUrl(localPath);
+      list30.push({
         sourceId: null,
         thumbId: null,
-        sourceUrl: _0x252451,
+        sourceUrl: sourceUrl6,
         thumbUrl:
-          String(_0x2b38a7?.thumbUrl || '').trim() || String(_0x2b38a7?.displayUrl || '').trim() || _0x2ab027,
-        imageUrl: String(_0x2b38a7?.displayUrl || '').trim() || _0x2ab027,
-        localPath: _0x2bbb5a,
-        originalLocalPath: normalizeLocalPath(_0x2b38a7?.originalLocalPath || _0x2b38a7?.localPath),
-        displayLocalPath: normalizeLocalPath(_0x2b38a7?.displayLocalPath),
-        thumbLocalPath: normalizeLocalPath(_0x2b38a7?.thumbLocalPath),
-        originalWidth: Number(_0x2b38a7?.originalWidth || 0) || undefined,
-        originalHeight: Number(_0x2b38a7?.originalHeight || 0) || undefined,
+          String(value186?.thumbUrl || '').trim() || String(value186?.displayUrl || '').trim() || value187,
+        imageUrl: String(value186?.displayUrl || '').trim() || value187,
+        localPath: localPath,
+        originalLocalPath: normalizeLocalPath(value186?.originalLocalPath || value186?.localPath),
+        displayLocalPath: normalizeLocalPath(value186?.displayLocalPath),
+        thumbLocalPath: normalizeLocalPath(value186?.thumbLocalPath),
+        originalWidth: Number(value186?.originalWidth || 0) || undefined,
+        originalHeight: Number(value186?.originalHeight || 0) || undefined,
       });
-    } catch (_0x461b41) {
-      _0x3c21fa.push({
-        sourceUrl: _0x252451,
+    } catch (value188) {
+      list30.push({
+        sourceUrl: sourceUrl6,
         thumbUrl: '',
         imageUrl: '',
         localPath: '',
@@ -1550,129 +1548,674 @@ async function processImageResultRecords(_0x4a8ca7, _0x567406 = {}) {
       });
     }
   }
-  return _0x3c21fa;
+  return list30;
 }
-export async function generateImage(_0x14526f, _0x42ef9b) {
-  const _0x43f9f6 = getProviderId(_0x14526f),
-    _0x1601f5 = getImageExecution(_0x14526f, _0x43f9f6)?.executionManifest,
-    _0x21d9f2 = resolveImageGenerationBatchSize(_0x14526f, _0x43f9f6),
-    _0x37f3d0 = shouldSubmitProviderBatchOnce(_0x14526f, _0x43f9f6, _0x21d9f2);
-  if (_0x1601f5?.adapterType === 'localRuntime' && _0x1601f5?.runtime === 'dreaminaImage') {
-    if (_0x21d9f2 <= 1) {
-      const _0x49c469 = await runDreaminaImageGeneration(_0x14526f, _0x42ef9b);
-      return _0x49c469.length === 1 ? _0x49c469[0] : { isBatch: true, images: _0x49c469 };
+export async function generateImage(value189, value190) {
+  const providerId3 = getProviderId(value189),
+    imageExecution2 = getImageExecution(value189, providerId3)?.executionManifest,
+    imageGenerationBatchSize = resolveImageGenerationBatchSize(value189, providerId3),
+    shouldSubmitProviderBatchOnce2 = shouldSubmitProviderBatchOnce(
+      value189,
+      providerId3,
+      imageGenerationBatchSize,
+    );
+  if (imageExecution2?.adapterType === 'localRuntime' && imageExecution2?.runtime === 'dreaminaImage') {
+    if (imageGenerationBatchSize <= 1) {
+      const images5 = await runDreaminaImageGeneration(value189, value190);
+      return images5.length === 1 ? images5[0] : { isBatch: true, images: images5 };
     }
-    const _0x6691b7 = [];
-    for (let _0x5de78c = 0; _0x5de78c < _0x21d9f2; _0x5de78c++) {
+    const images6 = [];
+    for (let value191 = 0; value191 < imageGenerationBatchSize; value191++) {
       try {
-        const _0x188994 = await runDreaminaImageGeneration(_0x14526f, _0x42ef9b);
-        _0x6691b7.push(..._0x188994);
-      } catch (_0x91cd0b) {
-        _0x6691b7.push({
-          error: _0x91cd0b?.message || '即梦图片生成失败',
+        const args7 = await runDreaminaImageGeneration(value189, value190);
+        images6.push(...args7);
+      } catch (error11) {
+        images6.push({
+          error: error11?.message || '即梦图片生成失败',
           status: 'failed',
           retryable: false,
         });
       }
     }
-    if (_0x6691b7.length === 1) return _0x6691b7[0];
-    return { isBatch: true, images: _0x6691b7 };
+    if (images6.length === 1) return images6[0];
+    return { isBatch: true, images: images6 };
   }
-  if (_0x21d9f2 <= 1 || _0x37f3d0)
+  if (imageGenerationBatchSize <= 1 || shouldSubmitProviderBatchOnce2)
     try {
-      const _0x36f8e3 = await doGenerateOnce(_0x14526f, _0x43f9f6, _0x42ef9b),
-        _0x40b6f8 = Array.isArray(_0x36f8e3) ? _0x36f8e3 : [_0x36f8e3];
-      if (_0x40b6f8.length === 1 && _0x40b6f8[0].error) throw new Error(_0x40b6f8[0].error);
-      return _0x40b6f8.length === 1 ? _0x40b6f8[0] : { isBatch: true, images: _0x40b6f8 };
-    } catch (_0x20612c) {
-      if (_0x20612c instanceof ApiError) throw new Error(_0x20612c.getUserMessage());
-      throw _0x20612c;
+      const doGenerateOnce2 = await doGenerateOnce(value189, providerId3, value190),
+        images7 = Array.isArray(doGenerateOnce2) ? doGenerateOnce2 : [doGenerateOnce2];
+      if (images7.length === 1 && images7[0].error) throw new Error(images7[0].error);
+      return images7.length === 1 ? images7[0] : { isBatch: true, images: images7 };
+    } catch (value192) {
+      if (value192 instanceof ApiError) throw new Error(value192.getUserMessage());
+      throw value192;
     }
-  const _0x32d3af = [];
-  for (let _0x3e0f0b = 0; _0x3e0f0b < _0x21d9f2; _0x3e0f0b++) {
+  const images8 = [];
+  for (let value193 = 0; value193 < imageGenerationBatchSize; value193++) {
     try {
-      const _0x391d99 = await doGenerateOnce(_0x14526f, _0x43f9f6, _0x42ef9b);
-      _0x32d3af.push(..._0x391d99);
-    } catch (_0x12dcf8) {
-      _0x12dcf8 instanceof ApiError
-        ? _0x32d3af.push({
-            error: _0x12dcf8.getUserMessage(),
+      const args8 = await doGenerateOnce(value189, providerId3, value190);
+      images8.push(...args8);
+    } catch (error12) {
+      error12 instanceof ApiError
+        ? images8.push({
+            error: error12.getUserMessage(),
             status: 'failed',
-            retryable: _0x12dcf8.retryable,
+            retryable: error12.retryable,
           })
-        : _0x32d3af.push({ error: _0x12dcf8.message || '未知错误', status: 'failed', retryable: false });
+        : images8.push({ error: error12.message || '未知错误', status: 'failed', retryable: false });
     }
   }
-  if (_0x32d3af.length === 0) throw new Error('批量生成全部失败');
-  if (_0x32d3af.length === 1) return _0x32d3af[0];
-  return { isBatch: true, images: _0x32d3af };
+  if (images8.length === 0) throw new Error('批量生成全部失败');
+  if (images8.length === 1) return images8[0];
+  return { isBatch: true, images: images8 };
 }
 
-const MAX_MANIFEST_GENERATION_TIMEOUT = 0x3c*0x3c*0x3e8;
+const MAX_MANIFEST_GENERATION_TIMEOUT = 0x3c * 0x3c * 0x3e8;
 
-const APIMART_MIDJOURNEY_MODEL_ID = "apimart/midjourney";
-const APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING = Object["freeze"]({'taskIdPath':Object["freeze"](['data[].task_id',"task_id",'taskId']),'statusPath':"status",'errorPath':"error",'resultPaths':Object["freeze"](["image_urls[]","image_url","grid_image_url",'data.image_urls[]','data.image_url',"data.grid_image_url","data.result.images[].url","result.images[].url","data[].url","results[].url","results[].imageUrl","url"])});
+const APIMART_MIDJOURNEY_MODEL_ID = 'apimart/midjourney';
+const APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING = Object['freeze']({
+  taskIdPath: Object['freeze'](['data[].task_id', 'task_id', 'taskId']),
+  statusPath: 'status',
+  errorPath: 'error',
+  resultPaths: Object['freeze']([
+    'image_urls[]',
+    'image_url',
+    'grid_image_url',
+    'data.image_urls[]',
+    'data.image_url',
+    'data.grid_image_url',
+    'data.result.images[].url',
+    'result.images[].url',
+    'data[].url',
+    'results[].url',
+    'results[].imageUrl',
+    'url',
+  ]),
+});
 
-function resolveGenerationRequestTimeout(_0x128697){const _0x154310=Number(_0x128697?.["requestTimeoutMs"]);if(!Number["isFinite"](_0x154310)||_0x154310<=0x0)return GENERATION_TIMEOUT;return Math["min"](MAX_MANIFEST_GENERATION_TIMEOUT,Math["max"](0x7530,Math['trunc'](_0x154310)));}
+function resolveGenerationRequestTimeout(value194) {
+  const count9 = Number(value194?.['requestTimeoutMs']);
+  if (!Number['isFinite'](count9) || count9 <= 0x0) return GENERATION_TIMEOUT;
+  return Math['min'](MAX_MANIFEST_GENERATION_TIMEOUT, Math['max'](0x7530, Math['trunc'](count9)));
+}
 
-function buildApimartMidjourneyTaskPolling(_0x48ea0c=''){const _0x2d9788=normalizeApimartBaseUrl(_0x48ea0c);return{'mode':"task-proxy",'method':"GET",'urlTemplate':_0x2d9788+"/v1/midjourney/{taskId}",'headersMode':"bearer"};}
+function buildApimartMidjourneyTaskPolling(value195 = '') {
+  const apimartBaseUrl2 = normalizeApimartBaseUrl(value195);
+  return {
+    mode: 'task-proxy',
+    method: 'GET',
+    urlTemplate: apimartBaseUrl2 + '/v1/midjourney/{taskId}',
+    headersMode: 'bearer',
+  };
+}
 
-function createImageBatchAttemptContext(_0x13f08c){const _0x2c631b=Number["parseInt"](_0x13f08c,0xa);if(!Number["isFinite"](_0x2c631b)||_0x2c631b<=0x1)return null;return{'__aicBatchSize':_0x2c631b,'__aicBatchSeedNonce':Math["floor"](Math['random']()*0x3b9aca00)};}
+function createImageBatchAttemptContext(value196) {
+  const count10 = Number['parseInt'](value196, 0xa);
+  if (!Number['isFinite'](count10) || count10 <= 0x1) return null;
+  return { __aicBatchSize: count10, __aicBatchSeedNonce: Math['floor'](Math['random']() * 0x3b9aca00) };
+}
 
-function buildImageBatchAttemptPayload(_0x388ec9,_0x455b53,_0xce997){if(!_0x455b53)return _0x388ec9;return{..._0x388ec9,..._0x455b53,'__aicBatchIndex':_0xce997};}
+function buildImageBatchAttemptPayload(args9, args10, value197) {
+  if (!args10) return args9;
+  return { ...args9, ...args10, __aicBatchIndex: value197 };
+}
 
-function normalizeDreaminaImageGenerateNum(_0x471433={}){const _0x156cfb=_0x471433?.["generateNum"]??_0x471433?.['generate_num']??_0x471433?.["batchSize"]??0x1,_0x4d227f=Number['parseInt'](_0x156cfb,0xa);if(!Number["isFinite"](_0x4d227f))return 0x1;return Math["max"](0x1,Math["min"](0xa,_0x4d227f));}
+function normalizeDreaminaImageGenerateNum(options2 = {}) {
+  const value198 = options2?.['generateNum'] ?? options2?.['generate_num'] ?? options2?.['batchSize'] ?? 0x1,
+    value199 = Number['parseInt'](value198, 0xa);
+  if (!Number['isFinite'](value199)) return 0x1;
+  return Math['max'](0x1, Math['min'](0xa, value199));
+}
 
-function buildDreaminaImageUpscaleSubmitRequest(_0x27ee64){return{'url':'/api/v2/dreamina/image_upscale','headers':{'Content-Type':"application/json"},'body':buildDreaminaImageUpscaleSubmitPayload(_0x27ee64)};}
+function buildDreaminaImageUpscaleSubmitRequest(value200) {
+  return {
+    url: '/api/v2/dreamina/image_upscale',
+    headers: { 'Content-Type': 'application/json' },
+    body: buildDreaminaImageUpscaleSubmitPayload(value200),
+  };
+}
 
-const LOCAL_IMAGE_RUNTIME_HANDLERS=Object["freeze"]({'dreaminaImage':Object["freeze"]({'buildSubmitRequest':({payload:_0x131ff0,finalPrompt:_0x46ae91,executionManifest:_0x503519})=>buildDreaminaImageSubmitRequest(_0x131ff0,_0x46ae91,_0x503519),'run':({payload:_0x328574,options:_0x39c68b,batchSize:_0x53294b,executionManifest:_0x25b31e})=>{const _0x1d152e=normalizeDreaminaImageGenerateNum({..._0x328574,'batchSize':_0x53294b}),_0x438c70=getDreaminaModelVersion(_0x328574,_0x25b31e);return runDreaminaImageGeneration({..._0x328574,..._0x438c70?{'modelVersion':_0x438c70}:{},'generateNum':_0x1d152e},_0x39c68b);}}),'dreaminaImageUpscale':Object["freeze"]({'buildSubmitRequest':({payload:_0x103a70})=>buildDreaminaImageUpscaleSubmitRequest(_0x103a70),'run':({payload:_0x43e4cf,options:_0x40f711})=>runDreaminaImageUpscaleGeneration(_0x43e4cf,_0x40f711)}),'openAiCliImage':Object["freeze"]({'buildSubmitRequest':({payload:_0x2c9afa,finalPrompt:_0x82d7a2,executionManifest:_0x47a565})=>buildOpenAiCliImageSubmitRequest(_0x2c9afa,_0x82d7a2,_0x47a565),'run':({payload:_0x7b2aa1,executionManifest:_0x5abee1})=>runOpenAiCliImageGeneration(_0x7b2aa1,_0x5abee1)})});
+const LOCAL_IMAGE_RUNTIME_HANDLERS = Object['freeze']({
+  dreaminaImage: Object['freeze']({
+    buildSubmitRequest: ({
+      payload: payload2,
+      finalPrompt: finalPrompt,
+      executionManifest: executionManifest,
+    }) => buildDreaminaImageSubmitRequest(payload2, finalPrompt, executionManifest),
+    run: ({
+      payload: payload3,
+      options: options3,
+      batchSize: batchSize,
+      executionManifest: executionManifest2,
+    }) => {
+      const dreaminaImageGenerateNum = normalizeDreaminaImageGenerateNum({
+          ...payload3,
+          batchSize: batchSize,
+        }),
+        args11 = getDreaminaModelVersion(payload3, executionManifest2);
+      return runDreaminaImageGeneration(
+        { ...payload3, ...(args11 ? { modelVersion: args11 } : {}), generateNum: dreaminaImageGenerateNum },
+        options3,
+      );
+    },
+  }),
+  dreaminaImageUpscale: Object['freeze']({
+    buildSubmitRequest: ({ payload: payload4 }) => buildDreaminaImageUpscaleSubmitRequest(payload4),
+    run: ({ payload: payload5, options: options4 }) => runDreaminaImageUpscaleGeneration(payload5, options4),
+  }),
+  openAiCliImage: Object['freeze']({
+    buildSubmitRequest: ({
+      payload: payload6,
+      finalPrompt: finalPrompt2,
+      executionManifest: executionManifest3,
+    }) => buildOpenAiCliImageSubmitRequest(payload6, finalPrompt2, executionManifest3),
+    run: ({ payload: payload7, executionManifest: executionManifest4 }) =>
+      runOpenAiCliImageGeneration(payload7, executionManifest4),
+  }),
+});
 
-function getLocalImageRuntimeHandler(_0x44248b){if(_0x44248b?.['adapterType']!=="localRuntime")return null;const _0xb27633=String(_0x44248b?.["runtime"]||'')["trim"]();return LOCAL_IMAGE_RUNTIME_HANDLERS[_0xb27633]||null;}
+function getLocalImageRuntimeHandler(value201) {
+  if (value201?.['adapterType'] !== 'localRuntime') return null;
+  const value202 = String(value201?.['runtime'] || '')['trim']();
+  return LOCAL_IMAGE_RUNTIME_HANDLERS[value202] || null;
+}
 
-function cloneRecordMetadata(_0x2ec553){return _0x2ec553?.["metadata"]&&typeof _0x2ec553["metadata"]==='object'?{..._0x2ec553['metadata']}:{};}
+function cloneRecordMetadata(args12) {
+  return args12?.['metadata'] && typeof args12['metadata'] === 'object' ? { ...args12['metadata'] } : {};
+}
 
-function firstApimartMidjourneySourceValue(..._0x3f527a){for(const _0x33b6f2 of _0x3f527a){if(_0x33b6f2===!![]||_0x33b6f2===![])return _0x33b6f2;const _0x1bc613=String(_0x33b6f2??'')["trim"]();if(_0x1bc613)return _0x1bc613;}return'';}
+function firstApimartMidjourneySourceValue(...args13) {
+  for (const value203 of args13) {
+    if (value203 === !![] || value203 === ![]) return value203;
+    const value204 = String(value203 ?? '')['trim']();
+    if (value204) return value204;
+  }
+  return '';
+}
 
-function normalizeApimartMidjourneySourceBoolean(_0x371f97){if(_0x371f97===!![]||_0x371f97===![])return _0x371f97;const _0x7d96bf=String(_0x371f97??'')["trim"]()['toLowerCase']();if(!_0x7d96bf)return![];return _0x7d96bf==="true"||_0x7d96bf==='1'||_0x7d96bf==='yes';}
+function normalizeApimartMidjourneySourceBoolean(value205) {
+  if (value205 === !![] || value205 === ![]) return value205;
+  const enabled25 = String(value205 ?? '')
+    ['trim']()
+    ['toLowerCase']();
+  if (!enabled25) return ![];
+  return enabled25 === 'true' || enabled25 === '1' || enabled25 === 'yes';
+}
 
-function resolveApimartMidjourneySourceMetadata(_0x2c926f={}){const _0x1b3a13=_0x2c926f?.["generationParams"]&&typeof _0x2c926f['generationParams']==="object"&&!Array["isArray"](_0x2c926f["generationParams"])?_0x2c926f["generationParams"]:{},_0x9ef8a9=String(firstApimartMidjourneySourceValue(_0x2c926f?.["mjModel"],_0x2c926f?.["midjourneyModel"],_0x2c926f?.['version'],_0x1b3a13["mjModel"],_0x1b3a13['midjourneyModel'],_0x1b3a13["version"]))['trim'](),_0xde6368=String(firstApimartMidjourneySourceValue(_0x2c926f?.["speed"],_0x1b3a13["speed"]))["trim"]()['toLowerCase'](),_0x9cc132=String(firstApimartMidjourneySourceValue(_0x2c926f?.['prompt'],_0x1b3a13['prompt']))['trim'](),_0x2bc347=String(firstApimartMidjourneySourceValue(_0x2c926f?.["action"],_0x2c926f?.["mjAction"],_0x1b3a13["action"],_0x1b3a13["mjAction"]))["trim"]()["toUpperCase"](),_0x34f2b1=firstApimartMidjourneySourceValue(_0x2c926f?.['hd'],_0x2c926f?.["isHd"],_0x1b3a13['hd'],_0x1b3a13["isHd"]),_0x2e8180={..._0x9ef8a9?{'mjModel':_0x9ef8a9}:{},..._0xde6368==='relax'||_0xde6368==='fast'||_0xde6368==="turbo"?{'speed':_0xde6368}:{},..._0x9cc132?{'prompt':_0x9cc132}:{},..._0x2bc347?{'action':_0x2bc347}:{}};return _0x34f2b1!==''&&(_0x2e8180['hd']=normalizeApimartMidjourneySourceBoolean(_0x34f2b1)),_0x2e8180;}
+function resolveApimartMidjourneySourceMetadata(options5 = {}) {
+  const value206 =
+      options5?.['generationParams'] &&
+      typeof options5['generationParams'] === 'object' &&
+      !Array['isArray'](options5['generationParams'])
+        ? options5['generationParams']
+        : {},
+    args14 = String(
+      firstApimartMidjourneySourceValue(
+        options5?.['mjModel'],
+        options5?.['midjourneyModel'],
+        options5?.['version'],
+        value206['mjModel'],
+        value206['midjourneyModel'],
+        value206['version'],
+      ),
+    )['trim'](),
+    args15 = String(firstApimartMidjourneySourceValue(options5?.['speed'], value206['speed']))
+      ['trim']()
+      ['toLowerCase'](),
+    args16 = String(firstApimartMidjourneySourceValue(options5?.['prompt'], value206['prompt']))['trim'](),
+    args17 = String(
+      firstApimartMidjourneySourceValue(
+        options5?.['action'],
+        options5?.['mjAction'],
+        value206['action'],
+        value206['mjAction'],
+      ),
+    )
+      ['trim']()
+      ['toUpperCase'](),
+    apimartMidjourneySourceValue = firstApimartMidjourneySourceValue(
+      options5?.['hd'],
+      options5?.['isHd'],
+      value206['hd'],
+      value206['isHd'],
+    ),
+    value207 = {
+      ...(args14 ? { mjModel: args14 } : {}),
+      ...(args15 === 'relax' || args15 === 'fast' || args15 === 'turbo' ? { speed: args15 } : {}),
+      ...(args16 ? { prompt: args16 } : {}),
+      ...(args17 ? { action: args17 } : {}),
+    };
+  return (
+    apimartMidjourneySourceValue !== '' &&
+      (value207['hd'] = normalizeApimartMidjourneySourceBoolean(apimartMidjourneySourceValue)),
+    value207
+  );
+}
 
-function isApimartMidjourneyResponseMapping(_0x4f4cad=null){const _0x159d94=Array["isArray"](_0x4f4cad?.["resultPaths"])?_0x4f4cad["resultPaths"]:[];return _0x159d94["includes"]('image_urls[]')&&_0x159d94['includes']("grid_image_url");}
+function isApimartMidjourneyResponseMapping(value208 = null) {
+  const list31 = Array['isArray'](value208?.['resultPaths']) ? value208['resultPaths'] : [];
+  return list31['includes']('image_urls[]') && list31['includes']('grid_image_url');
+}
 
-function normalizeApimartMidjourneyButtons(_0xee5553){if(!Array['isArray'](_0xee5553))return[];return _0xee5553["map"](_0x3a6c26=>{if(!_0x3a6c26||typeof _0x3a6c26!=="object")return null;const _0x2556ce=String(_0x3a6c26["customId"]||_0x3a6c26["custom_id"]||_0x3a6c26["customID"]||_0x3a6c26['id']||'')['trim'](),_0x26b7a5=String(_0x3a6c26["label"]||_0x3a6c26["name"]||_0x3a6c26['text']||_0x3a6c26['emoji']||'')["trim"](),_0x2040a0={..._0x2556ce?{'customId':_0x2556ce}:{},..._0x26b7a5?{'label':_0x26b7a5}:{}};return Object['keys'](_0x2040a0)["length"]>0x0?_0x2040a0:null;})["filter"](Boolean);}
+function normalizeApimartMidjourneyButtons(value209) {
+  if (!Array['isArray'](value209)) return [];
+  return value209['map']((response20) => {
+    if (!response20 || typeof response20 !== 'object') return null;
+    const args18 = String(
+        response20['customId'] || response20['custom_id'] || response20['customID'] || response20['id'] || '',
+      )['trim'](),
+      args19 = String(
+        response20['label'] || response20['name'] || response20['text'] || response20['emoji'] || '',
+      )['trim'](),
+      value210 = { ...(args18 ? { customId: args18 } : {}), ...(args19 ? { label: args19 } : {}) };
+    return Object['keys'](value210)['length'] > 0x0 ? value210 : null;
+  })['filter'](Boolean);
+}
 
-function extractApimartMidjourneyImageRecords(_0x2b11ae,_0x103d39=null,_0x35ce06={}){if(!isApimartMidjourneyResponseMapping(_0x103d39))return[];const _0x461237=_0x2b11ae?.["data"]&&typeof _0x2b11ae["data"]==='object'&&!Array["isArray"](_0x2b11ae["data"])?{..._0x2b11ae,..._0x2b11ae["data"]}:_0x2b11ae,_0x547241=Array["isArray"](_0x461237?.["image_urls"])&&_0x461237["image_urls"]['length']>0x0?_0x461237["image_urls"]:String(_0x461237?.["image_url"]||'')["trim"]()?[_0x461237['image_url']]:[];if(_0x547241["length"]===0x0)return[];const _0x3418cc=String(resolveApimartTaskIdStrict(_0x461237)||resolveAsyncImageTaskId(_0x461237,_0x103d39)||_0x461237?.['id']||'')["trim"](),_0x5dde75=String(_0x461237?.["grid_image_url"]||'')["trim"](),_0x1a6f88=String(_0x461237?.['action']||'')["trim"](),_0x29efb4=normalizeApimartMidjourneyButtons(_0x461237?.['buttons']),_0x3a0db4=resolveApimartMidjourneySourceMetadata(_0x35ce06),_0x5897fb=_0x1a6f88||_0x3a0db4["action"]||'';return _0x547241['map']((_0x2ee75e,_0x1da196)=>{const _0x7a0536=String(_0x2ee75e||'')["trim"]();if(!_0x7a0536)return null;return{'sourceUrl':_0x7a0536,'error':'','metadata':{'provider':"apimart",'model':APIMART_MIDJOURNEY_MODEL_ID,'apimartMidjourney':{'taskId':_0x3418cc,'index':_0x1da196+0x1,..._0x3a0db4,..._0x5dde75?{'gridImageUrl':_0x5dde75}:{},..._0x5897fb?{'action':_0x5897fb}:{},..._0x29efb4["length"]>0x0?{'buttons':_0x29efb4}:{}}}};})["filter"](Boolean);}
+function extractApimartMidjourneyImageRecords(args20, value211 = null, value212 = {}) {
+  if (!isApimartMidjourneyResponseMapping(value211)) return [];
+  const value213 =
+      args20?.['data'] && typeof args20['data'] === 'object' && !Array['isArray'](args20['data'])
+        ? { ...args20, ...args20['data'] }
+        : args20,
+    list32 =
+      Array['isArray'](value213?.['image_urls']) && value213['image_urls']['length'] > 0x0
+        ? value213['image_urls']
+        : String(value213?.['image_url'] || '')['trim']()
+          ? [value213['image_url']]
+          : [];
+  if (list32['length'] === 0x0) return [];
+  const value214 = String(
+      resolveApimartTaskIdStrict(value213) ||
+        resolveAsyncImageTaskId(value213, value211) ||
+        value213?.['id'] ||
+        '',
+    )['trim'](),
+    args21 = String(value213?.['grid_image_url'] || '')['trim'](),
+    value215 = String(value213?.['action'] || '')['trim'](),
+    args22 = normalizeApimartMidjourneyButtons(value213?.['buttons']),
+    args23 = resolveApimartMidjourneySourceMetadata(value212),
+    args24 = value215 || args23['action'] || '';
+  return list32['map']((value216, value217) => {
+    const enabled26 = String(value216 || '')['trim']();
+    if (!enabled26) return null;
+    return {
+      sourceUrl: enabled26,
+      error: '',
+      metadata: {
+        provider: 'apimart',
+        model: APIMART_MIDJOURNEY_MODEL_ID,
+        apimartMidjourney: {
+          taskId: value214,
+          index: value217 + 0x1,
+          ...args23,
+          ...(args21 ? { gridImageUrl: args21 } : {}),
+          ...(args24 ? { action: args24 } : {}),
+          ...(args22['length'] > 0x0 ? { buttons: args22 } : {}),
+        },
+      },
+    };
+  })['filter'](Boolean);
+}
 
-function isComfyUiHistoryPolling(_0x3e0aa9={}){return String(_0x3e0aa9?.["mode"]||'')["trim"]()==="comfyui-history";}
+function isComfyUiHistoryPolling(options6 = {}) {
+  return String(options6?.['mode'] || '')['trim']() === 'comfyui-history';
+}
 
-async function pollComfyUiImageTask(_0x21e9c6,_0x2dd7af={}){const _0x164cab=String(_0x21e9c6||'')["trim"](),_0x5cc5f3=_0x2dd7af?.["taskPolling"]||{},_0xf493ff=String(_0x5cc5f3["baseUrl"]||'')["trim"]();for(let _0x58fc01=0x0;_0x58fc01<0x1c2;_0x58fc01++){if(_0x2dd7af?.["signal"]?.["aborted"])throw new Error("CANCELLED");await new Promise(_0x290c09=>setTimeout(_0x290c09,0x7d0));if(_0x2dd7af?.["signal"]?.["aborted"])throw new Error("CANCELLED");const _0xdaa1ea=new URLSearchParams({'promptId':_0x164cab,..._0xf493ff?{'baseUrl':_0xf493ff}:{},..._0x5cc5f3["allowCloudBaseUrl"]?{'allowCloudBaseUrl':'1'}:{}}),_0x40404d=await requester({'url':"/api/v2/comfyui/history?"+_0xdaa1ea["toString"](),'method':"GET",'provider':"comfyui",'timeout':0x7530,'signal':_0x2dd7af?.["signal"]}),_0x31c9d7=typeof _0x2dd7af?.["resultExtractor"]==="function"?_0x2dd7af['resultExtractor'](_0x40404d):_0x40404d,_0x20b52c=hasImageResultOutput(_0x31c9d7,_0x2dd7af?.['responseMapping']);if(_0x20b52c)return _0x31c9d7;const _0x3c8ba9=resolveAsyncImageTaskStatus(_0x31c9d7);if(isAsyncTaskFailureStatus(_0x3c8ba9))throw ApiError["taskFailed"]("comfyui",String(_0x31c9d7?.["error"]||_0x31c9d7?.["message"]||"ComfyUI 任务执行失败"));}throw ApiError['taskTimeout']("comfyui");}
+async function pollComfyUiImageTask(value218, value219 = {}) {
+  const value220 = String(value218 || '')['trim'](),
+    args25 = value219?.['taskPolling'] || {},
+    args26 = String(args25['baseUrl'] || '')['trim']();
+  for (let count11 = 0x0; count11 < 0x1c2; count11++) {
+    if (value219?.['signal']?.['aborted']) throw new Error('CANCELLED');
+    await new Promise((value221) => setTimeout(value221, 0x7d0));
+    if (value219?.['signal']?.['aborted']) throw new Error('CANCELLED');
+    const uRLSearchParams = new URLSearchParams({
+        promptId: value220,
+        ...(args26 ? { baseUrl: args26 } : {}),
+        ...(args25['allowCloudBaseUrl'] ? { allowCloudBaseUrl: '1' } : {}),
+      }),
+      requester5 = await requester({
+        url: '/api/v2/comfyui/history?' + uRLSearchParams['toString'](),
+        method: 'GET',
+        provider: 'comfyui',
+        timeout: 0x7530,
+        signal: value219?.['signal'],
+      }),
+      value222 =
+        typeof value219?.['resultExtractor'] === 'function'
+          ? value219['resultExtractor'](requester5)
+          : requester5,
+      hasImageResultOutput4 = hasImageResultOutput(value222, value219?.['responseMapping']);
+    if (hasImageResultOutput4) return value222;
+    const asyncImageTaskStatus2 = resolveAsyncImageTaskStatus(value222);
+    if (isAsyncTaskFailureStatus(asyncImageTaskStatus2))
+      throw ApiError['taskFailed'](
+        'comfyui',
+        String(value222?.['error'] || value222?.['message'] || 'ComfyUI 任务执行失败'),
+      );
+  }
+  throw ApiError['taskTimeout']('comfyui');
+}
 
-function resolveRunningHubImageTaskProviderKey(_0x2ad6c1,_0x4e07fb={}){if(_0x2ad6c1==='runninghubwf'){const _0x28b841=getRunningHubTaskProviderProfileId(_0x4e07fb);if(_0x28b841)return normalizeRunningHubModelApiProfileId(_0x28b841);}if(_0x2ad6c1==="runninghub"&&isModelApiModel(_0x4e07fb?.['model'],'runninghub'))return resolveRunningHubModelApiProfileId(resolveModelExecution(_0x4e07fb?.["model"],{'providerHint':"runninghub"})?.['modelManifest']?.["modelId"]||_0x4e07fb?.["model"],getRunningHubTaskProviderProfileId(_0x4e07fb));return _0x2ad6c1;}
+function resolveRunningHubImageTaskProviderKey(value223, value224 = {}) {
+  if (value223 === 'runninghubwf') {
+    const runningHubTaskProviderProfileId = getRunningHubTaskProviderProfileId(value224);
+    if (runningHubTaskProviderProfileId)
+      return normalizeRunningHubModelApiProfileId(runningHubTaskProviderProfileId);
+  }
+  if (value223 === 'runninghub' && isModelApiModel(value224?.['model'], 'runninghub'))
+    return resolveRunningHubModelApiProfileId(
+      resolveModelExecution(value224?.['model'], { providerHint: 'runninghub' })?.['modelManifest']?.[
+        'modelId'
+      ] || value224?.['model'],
+      getRunningHubTaskProviderProfileId(value224),
+    );
+  return value223;
+}
 
-function buildRunningHubImageTaskKey(_0x207620,_0x3f7f7f,_0x4f42fb){return resolveRunningHubImageTaskProviderKey(_0x207620,_0x3f7f7f)+":image:"+_0x4f42fb;}
+function buildRunningHubImageTaskKey(value225, value226, value227) {
+  return resolveRunningHubImageTaskProviderKey(value225, value226) + ':image:' + value227;
+}
 
-function normalizeApimartMidjourneyUpscaleSpeed(_0x530b7f){const _0x2f4a18=String(_0x530b7f||'')["trim"]()["toLowerCase"]();return["relax",'fast','turbo']["includes"](_0x2f4a18)?_0x2f4a18:"fast";}
+function normalizeApimartMidjourneyUpscaleSpeed(value228) {
+  const value229 = String(value228 || '')
+    ['trim']()
+    ['toLowerCase']();
+  return ['relax', 'fast', 'turbo']['includes'](value229) ? value229 : 'fast';
+}
 
-function normalizeApimartMidjourneyUpscaleIndex(_0x52fcb3){const _0x54dc11=Number["parseInt"](_0x52fcb3,0xa);if(!Number["isFinite"](_0x54dc11))return 0x0;return _0x54dc11>=0x1&&_0x54dc11<=0x4?_0x54dc11:0x0;}
+function normalizeApimartMidjourneyUpscaleIndex(value230) {
+  const count12 = Number['parseInt'](value230, 0xa);
+  if (!Number['isFinite'](count12)) return 0x0;
+  return count12 >= 0x1 && count12 <= 0x4 ? count12 : 0x0;
+}
 
-function normalizeApimartMidjourneyVariationMode(_0x5f26a0){const _0x1adefd=String(_0x5f26a0||'')['trim']()["toLowerCase"]();if(["weak","low","low-variation"]['includes'](_0x1adefd))return "weak";if(["strong","high","high-variation"]["includes"](_0x1adefd))return "strong";return "medium";}
+function normalizeApimartMidjourneyVariationMode(value231) {
+  const value232 = String(value231 || '')
+    ['trim']()
+    ['toLowerCase']();
+  if (['weak', 'low', 'low-variation']['includes'](value232)) return 'weak';
+  if (['strong', 'high', 'high-variation']['includes'](value232)) return 'strong';
+  return 'medium';
+}
 
-function normalizeApimartMidjourneyVersion(_0x219dc3){return String(_0x219dc3||'')['trim']()["toLowerCase"]()['replace'](/^v/,'');}
+function normalizeApimartMidjourneyVersion(value233) {
+  return String(value233 || '')
+    ['trim']()
+    ['toLowerCase']()
+    ['replace'](/^v/, '');
+}
 
-function isApimartMidjourneyRemixVersion(_0x3c350f){const _0x166473=normalizeApimartMidjourneyVersion(_0x3c350f);return _0x166473==="8.2"||_0x166473==="8.1";}
+function isApimartMidjourneyRemixVersion(value234) {
+  const apimartMidjourneyVersion = normalizeApimartMidjourneyVersion(value234);
+  return apimartMidjourneyVersion === '8.2' || apimartMidjourneyVersion === '8.1';
+}
 
-function getApimartMidjourneyVariationEndpoint(_0x4be807,_0x12f60d=''){if(isApimartMidjourneyRemixVersion(_0x12f60d))return normalizeApimartMidjourneyVariationMode(_0x4be807)==="strong"?'remix-strong':"remix-subtle";switch(normalizeApimartMidjourneyVariationMode(_0x4be807)){case "weak":return "low-variation";case "strong":return "high-variation";default:return "variation";}}
+function getApimartMidjourneyVariationEndpoint(value235, value236 = '') {
+  if (isApimartMidjourneyRemixVersion(value236))
+    return normalizeApimartMidjourneyVariationMode(value235) === 'strong' ? 'remix-strong' : 'remix-subtle';
+  switch (normalizeApimartMidjourneyVariationMode(value235)) {
+    case 'weak':
+      return 'low-variation';
+    case 'strong':
+      return 'high-variation';
+    default:
+      return 'variation';
+  }
+}
 
-export async function submitApimartMidjourneyUpscaleRequest(_0x2d346e={}){await ensureConfig();const _0x3dfa87=getProviderConfig("apimart"),_0x7aba1c=String(_0x2d346e?.["apiKey"]||_0x3dfa87?.['apiKey']||'')["trim"]();if(!_0x7aba1c)throw ApiError["authError"]("apimart",null,"APIMart API Key 未配置，无法发起 Midjourney 二次操作");const _0x35733c=String(_0x2d346e?.["taskId"]||_0x2d346e?.["parentTaskId"]||_0x2d346e?.["mjTaskId"]||'')["trim"]();if(!_0x35733c)throw new Error("缺少 APIMart Midjourney task_id");const _0x6d159d=String(_0x2d346e?.["customId"]||_0x2d346e?.["custom_id"]||'')["trim"](),_0x3862b2=normalizeApimartMidjourneyUpscaleIndex(_0x2d346e?.["index"]);if(!_0x6d159d&&!_0x3862b2)throw new Error("APIMart Midjourney upscale 需要 index 或 custom_id");const _0x592012=normalizeApimartBaseUrl(_0x3dfa87?.['apiUrl']),_0x413109={'apiUrl':_0x592012+"/v1/midjourney/generations/upscale",'apiKey':_0x7aba1c,'task_id':_0x35733c,..._0x6d159d?{'custom_id':_0x6d159d}:{'index':_0x3862b2},..._0x6d159d&&String(_0x2d346e?.["prompt"]||'')['trim']()?{'prompt':String(_0x2d346e["prompt"]||'')["trim"]()}:{},..._0x6d159d?{}:{'speed':normalizeApimartMidjourneyUpscaleSpeed(_0x2d346e?.["speed"])}},_0x5021=await requester({'url':"/api/v2/proxy/image",'method':"POST",'provider':"apimart",'timeout':GENERATION_TIMEOUT,'retries':GENERATION_RETRIES,'retryDelay':GENERATION_RETRY_DELAY,'signal':_0x2d346e?.['signal'],'headers':{'Content-Type':"application/json"},'body':JSON["stringify"](_0x413109),'responseType':"text"}),_0x4c06a9=typeof _0x5021==="string"?parseResponseData(_0x5021):_0x5021||{},_0xfcc6da=parseError("apimart",_0x4c06a9,0xc8);if(_0xfcc6da)throw _0xfcc6da;const _0x420777=String(resolveApimartTaskIdStrict(_0x4c06a9)||resolveAsyncImageTaskId(_0x4c06a9,APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING)||extractApimartTaskIdFromRawText(String(_0x5021||''))||'')["trim"]();if(!_0x420777)throw new Error("APIMart Midjourney upscale 未返回 task_id");return{'taskId':_0x420777,'parentTaskId':_0x35733c,..._0x6d159d?{'customId':_0x6d159d}:{'index':_0x3862b2}};}
+export async function submitApimartMidjourneyUpscaleRequest(options7 = {}) {
+  await ensureConfig();
+  const providerConfig5 = getProviderConfig('apimart'),
+    enabled27 = String(options7?.['apiKey'] || providerConfig5?.['apiKey'] || '')['trim']();
+  if (!enabled27)
+    throw ApiError['authError']('apimart', null, 'APIMart API Key 未配置，无法发起 Midjourney 二次操作');
+  const enabled28 = String(
+    options7?.['taskId'] || options7?.['parentTaskId'] || options7?.['mjTaskId'] || '',
+  )['trim']();
+  if (!enabled28) throw new Error('缺少 APIMart Midjourney task_id');
+  const args27 = String(options7?.['customId'] || options7?.['custom_id'] || '')['trim'](),
+    apimartMidjourneyUpscaleIndex = normalizeApimartMidjourneyUpscaleIndex(options7?.['index']);
+  if (!args27 && !apimartMidjourneyUpscaleIndex)
+    throw new Error('APIMart Midjourney upscale 需要 index 或 custom_id');
+  const apimartBaseUrl3 = normalizeApimartBaseUrl(providerConfig5?.['apiUrl']),
+    value237 = {
+      apiUrl: apimartBaseUrl3 + '/v1/midjourney/generations/upscale',
+      apiKey: enabled27,
+      task_id: enabled28,
+      ...(args27 ? { custom_id: args27 } : { index: apimartMidjourneyUpscaleIndex }),
+      ...(args27 && String(options7?.['prompt'] || '')['trim']()
+        ? { prompt: String(options7['prompt'] || '')['trim']() }
+        : {}),
+      ...(args27 ? {} : { speed: normalizeApimartMidjourneyUpscaleSpeed(options7?.['speed']) }),
+    },
+    requester6 = await requester({
+      url: '/api/v2/proxy/image',
+      method: 'POST',
+      provider: 'apimart',
+      timeout: GENERATION_TIMEOUT,
+      retries: GENERATION_RETRIES,
+      retryDelay: GENERATION_RETRY_DELAY,
+      signal: options7?.['signal'],
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON['stringify'](value237),
+      responseType: 'text',
+    }),
+    value238 = typeof requester6 === 'string' ? parseResponseData(requester6) : requester6 || {},
+    error13 = parseError('apimart', value238, 0xc8);
+  if (error13) throw error13;
+  const enabled29 = String(
+    resolveApimartTaskIdStrict(value238) ||
+      resolveAsyncImageTaskId(value238, APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING) ||
+      extractApimartTaskIdFromRawText(String(requester6 || '')) ||
+      '',
+  )['trim']();
+  if (!enabled29) throw new Error('APIMart Midjourney upscale 未返回 task_id');
+  return {
+    taskId: enabled29,
+    parentTaskId: enabled28,
+    ...(args27 ? { customId: args27 } : { index: apimartMidjourneyUpscaleIndex }),
+  };
+}
 
-export async function submitApimartMidjourneyVariationRequest(_0x408ad9={}){await ensureConfig();const _0xaa4335=getProviderConfig('apimart'),_0x26eceb=String(_0x408ad9?.["apiKey"]||_0xaa4335?.["apiKey"]||'')["trim"]();if(!_0x26eceb)throw ApiError['authError']("apimart",null,"APIMart API Key 未配置，无法发起 Midjourney 变体操作");const _0x5c5817=String(_0x408ad9?.["taskId"]||_0x408ad9?.["parentTaskId"]||_0x408ad9?.['mjTaskId']||'')['trim']();if(!_0x5c5817)throw new Error('缺少\x20APIMart\x20Midjourney\x20task_id');const _0x4a29f0=String(_0x408ad9?.["customId"]||_0x408ad9?.["custom_id"]||'')["trim"](),_0x7feac7=normalizeApimartMidjourneyUpscaleIndex(_0x408ad9?.["index"]);if(!_0x4a29f0&&!_0x7feac7)throw new Error('APIMart\x20Midjourney\x20variation\x20需要\x20index\x20或\x20custom_id');const _0x2c518c=normalizeApimartMidjourneyVariationMode(_0x408ad9?.["variationMode"]||_0x408ad9?.["mode"]||_0x408ad9?.["strength"]),_0x2dbaf0=String(_0x408ad9?.["mjModel"]||_0x408ad9?.["midjourneyModel"]||_0x408ad9?.["model"]||_0x408ad9?.["version"]||'')["trim"](),_0x299cec=isApimartMidjourneyRemixVersion(_0x2dbaf0);if(_0x299cec&&!_0x7feac7)throw new Error('APIMart\x20Midjourney\x20remix\x20需要\x20index');const _0x3bdba5=normalizeApimartBaseUrl(_0xaa4335?.["apiUrl"]),_0x2318e4={'apiUrl':_0x3bdba5+'/v1/midjourney/generations/'+getApimartMidjourneyVariationEndpoint(_0x2c518c,_0x2dbaf0),'apiKey':_0x26eceb,'task_id':_0x5c5817,'speed':normalizeApimartMidjourneyUpscaleSpeed(_0x408ad9?.['speed']),..._0x299cec?{'index':_0x7feac7}:_0x4a29f0?{'custom_id':_0x4a29f0}:{'index':_0x7feac7}},_0x4b7bb0=await requester({'url':"/api/v2/proxy/image",'method':"POST",'provider':"apimart",'timeout':GENERATION_TIMEOUT,'retries':GENERATION_RETRIES,'retryDelay':GENERATION_RETRY_DELAY,'signal':_0x408ad9?.['signal'],'headers':{'Content-Type':'application/json'},'body':JSON['stringify'](_0x2318e4),'responseType':'text'}),_0x632539=typeof _0x4b7bb0==="string"?parseResponseData(_0x4b7bb0):_0x4b7bb0||{},_0x452cdd=parseError('apimart',_0x632539,0xc8);if(_0x452cdd)throw _0x452cdd;const _0x266096=String(resolveApimartTaskIdStrict(_0x632539)||resolveAsyncImageTaskId(_0x632539,APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING)||extractApimartTaskIdFromRawText(String(_0x4b7bb0||''))||'')['trim']();if(!_0x266096)throw new Error("APIMart Midjourney variation 未返回 task_id");return{'taskId':_0x266096,'parentTaskId':_0x5c5817,'variationMode':_0x2c518c,..._0x2dbaf0?{'mjModel':_0x2dbaf0}:{},..._0x299cec?{'index':_0x7feac7}:_0x4a29f0?{'customId':_0x4a29f0}:{'index':_0x7feac7}};}
+export async function submitApimartMidjourneyVariationRequest(options8 = {}) {
+  await ensureConfig();
+  const providerConfig6 = getProviderConfig('apimart'),
+    enabled30 = String(options8?.['apiKey'] || providerConfig6?.['apiKey'] || '')['trim']();
+  if (!enabled30)
+    throw ApiError['authError']('apimart', null, 'APIMart API Key 未配置，无法发起 Midjourney 变体操作');
+  const enabled31 = String(
+    options8?.['taskId'] || options8?.['parentTaskId'] || options8?.['mjTaskId'] || '',
+  )['trim']();
+  if (!enabled31) throw new Error('缺少\x20APIMart\x20Midjourney\x20task_id');
+  const enabled32 = String(options8?.['customId'] || options8?.['custom_id'] || '')['trim'](),
+    apimartMidjourneyUpscaleIndex2 = normalizeApimartMidjourneyUpscaleIndex(options8?.['index']);
+  if (!enabled32 && !apimartMidjourneyUpscaleIndex2)
+    throw new Error('APIMart\x20Midjourney\x20variation\x20需要\x20index\x20或\x20custom_id');
+  const apimartMidjourneyVariationMode = normalizeApimartMidjourneyVariationMode(
+      options8?.['variationMode'] || options8?.['mode'] || options8?.['strength'],
+    ),
+    args28 = String(
+      options8?.['mjModel'] ||
+        options8?.['midjourneyModel'] ||
+        options8?.['model'] ||
+        options8?.['version'] ||
+        '',
+    )['trim'](),
+    args29 = isApimartMidjourneyRemixVersion(args28);
+  if (args29 && !apimartMidjourneyUpscaleIndex2)
+    throw new Error('APIMart\x20Midjourney\x20remix\x20需要\x20index');
+  const apimartBaseUrl4 = normalizeApimartBaseUrl(providerConfig6?.['apiUrl']),
+    value239 = {
+      apiUrl:
+        apimartBaseUrl4 +
+        '/v1/midjourney/generations/' +
+        getApimartMidjourneyVariationEndpoint(apimartMidjourneyVariationMode, args28),
+      apiKey: enabled30,
+      task_id: enabled31,
+      speed: normalizeApimartMidjourneyUpscaleSpeed(options8?.['speed']),
+      ...(args29
+        ? { index: apimartMidjourneyUpscaleIndex2 }
+        : enabled32
+          ? { custom_id: enabled32 }
+          : { index: apimartMidjourneyUpscaleIndex2 }),
+    },
+    requester7 = await requester({
+      url: '/api/v2/proxy/image',
+      method: 'POST',
+      provider: 'apimart',
+      timeout: GENERATION_TIMEOUT,
+      retries: GENERATION_RETRIES,
+      retryDelay: GENERATION_RETRY_DELAY,
+      signal: options8?.['signal'],
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON['stringify'](value239),
+      responseType: 'text',
+    }),
+    value240 = typeof requester7 === 'string' ? parseResponseData(requester7) : requester7 || {},
+    error14 = parseError('apimart', value240, 0xc8);
+  if (error14) throw error14;
+  const enabled33 = String(
+    resolveApimartTaskIdStrict(value240) ||
+      resolveAsyncImageTaskId(value240, APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING) ||
+      extractApimartTaskIdFromRawText(String(requester7 || '')) ||
+      '',
+  )['trim']();
+  if (!enabled33) throw new Error('APIMart Midjourney variation 未返回 task_id');
+  return {
+    taskId: enabled33,
+    parentTaskId: enabled31,
+    variationMode: apimartMidjourneyVariationMode,
+    ...(args28 ? { mjModel: args28 } : {}),
+    ...(args29
+      ? { index: apimartMidjourneyUpscaleIndex2 }
+      : enabled32
+        ? { customId: enabled32 }
+        : { index: apimartMidjourneyUpscaleIndex2 }),
+  };
+}
 
-export async function resumeApimartMidjourneyUpscaleTask(_0xb52a79,_0x4bdc9c={},_0x3dd1d9={}){await ensureConfig();const _0x37eac9=String(_0xb52a79||'')["trim"]();if(!_0x37eac9)throw new Error("缺少 APIMart Midjourney 任务ID，无法恢复");const _0x318687=getProviderConfig("apimart"),_0x3cd877={..._0x4bdc9c&&typeof _0x4bdc9c==="object"?_0x4bdc9c:{},'provider':"apimart",'model':APIMART_MIDJOURNEY_MODEL_ID},_0x35adc6={..._0x3dd1d9,'responseMapping':_0x3dd1d9?.["responseMapping"]||APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING,'taskPolling':_0x3dd1d9?.["taskPolling"]||buildApimartMidjourneyTaskPolling(_0x318687?.["apiUrl"])};return runTaskSingleFlight({'provider':"apimart",'kind':"image",'taskId':_0x37eac9},async()=>{const _0x4339fc=await pollAsyncImageTask(_0x37eac9,_0x3cd877,"apimart",_0x35adc6);if(_0x4339fc?.["pending"])return _0x4339fc;const _0x25608b=await processTaskResult(_0x4339fc,"apimart",{'taskKey':"apimart:image:"+_0x37eac9,'responseMapping':_0x35adc6["responseMapping"],..._0x35adc6["apimartMidjourneySource"]?{'apimartMidjourneySource':_0x35adc6["apimartMidjourneySource"]}:{}});if(_0x25608b["length"]===0x1&&_0x25608b[0x0]?.["error"])throw new Error(_0x25608b[0x0]["error"]||"Midjourney 二次操作恢复失败");return _0x25608b["length"]===0x1?_0x25608b[0x0]:{'isBatch':!![],'images':_0x25608b};});}
+export async function resumeApimartMidjourneyUpscaleTask(value241, args30 = {}, args31 = {}) {
+  await ensureConfig();
+  const enabled34 = String(value241 || '')['trim']();
+  if (!enabled34) throw new Error('缺少 APIMart Midjourney 任务ID，无法恢复');
+  const providerConfig7 = getProviderConfig('apimart'),
+    value242 = {
+      ...(args30 && typeof args30 === 'object' ? args30 : {}),
+      provider: 'apimart',
+      model: APIMART_MIDJOURNEY_MODEL_ID,
+    },
+    args32 = {
+      ...args31,
+      responseMapping: args31?.['responseMapping'] || APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING,
+      taskPolling: args31?.['taskPolling'] || buildApimartMidjourneyTaskPolling(providerConfig7?.['apiUrl']),
+    };
+  return runTaskSingleFlight({ provider: 'apimart', kind: 'image', taskId: enabled34 }, async () => {
+    const pollAsyncImageTask4 = await pollAsyncImageTask(enabled34, value242, 'apimart', args32);
+    if (pollAsyncImageTask4?.['pending']) return pollAsyncImageTask4;
+    const processTaskResult2 = await processTaskResult(pollAsyncImageTask4, 'apimart', {
+      taskKey: 'apimart:image:' + enabled34,
+      responseMapping: args32['responseMapping'],
+      ...(args32['apimartMidjourneySource']
+        ? { apimartMidjourneySource: args32['apimartMidjourneySource'] }
+        : {}),
+    });
+    if (processTaskResult2['length'] === 0x1 && processTaskResult2[0x0]?.['error'])
+      throw new Error(processTaskResult2[0x0]['error'] || 'Midjourney 二次操作恢复失败');
+    return processTaskResult2['length'] === 0x1
+      ? processTaskResult2[0x0]
+      : { isBatch: !![], images: processTaskResult2 };
+  });
+}
 
-const IMAGE_LOCAL_SAVE_FAILURE_MESSAGE='图片已返回，但保存到本地失败';
+const IMAGE_LOCAL_SAVE_FAILURE_MESSAGE = '图片已返回，但保存到本地失败';
 
-function getReadableErrorMessage(_0x57f765){if(!_0x57f765)return'';if(typeof _0x57f765["getUserMessage"]==="function")try{const _0x46fced=String(_0x57f765['getUserMessage']()||'')["trim"]();if(_0x46fced)return _0x46fced;}catch{}if(typeof _0x57f765==="string")return _0x57f765["trim"]();const _0x5aada3=_0x57f765?.["message"]||_0x57f765?.["errorMessage"]||_0x57f765?.["error_message"]||_0x57f765?.["reason"]||_0x57f765?.["detail"]||_0x57f765?.["details"]||_0x57f765?.["error"];if(_0x5aada3!==undefined&&_0x5aada3!==null&&_0x5aada3!==_0x57f765){const _0x38403a=getReadableErrorMessage(_0x5aada3);if(_0x38403a)return _0x38403a;}try{return JSON["stringify"](_0x57f765);}catch{return String(_0x57f765||'')["trim"]();}}
+function getReadableErrorMessage(enabled35) {
+  if (!enabled35) return '';
+  if (typeof enabled35['getUserMessage'] === 'function')
+    try {
+      const value243 = String(enabled35['getUserMessage']() || '')['trim']();
+      if (value243) return value243;
+    } catch {}
+  if (typeof enabled35 === 'string') return enabled35['trim']();
+  const value244 =
+    enabled35?.['message'] ||
+    enabled35?.['errorMessage'] ||
+    enabled35?.['error_message'] ||
+    enabled35?.['reason'] ||
+    enabled35?.['detail'] ||
+    enabled35?.['details'] ||
+    enabled35?.['error'];
+  if (value244 !== undefined && value244 !== null && value244 !== enabled35) {
+    const readableErrorMessage = getReadableErrorMessage(value244);
+    if (readableErrorMessage) return readableErrorMessage;
+  }
+  try {
+    return JSON['stringify'](enabled35);
+  } catch {
+    return String(enabled35 || '')['trim']();
+  }
+}
 
-function formatLocalSaveFailureMessage(_0x2906f8){const _0x4ff4cf=getReadableErrorMessage(_0x2906f8);if(!_0x4ff4cf)return IMAGE_LOCAL_SAVE_FAILURE_MESSAGE;if(_0x4ff4cf['includes']("保存到本地失败"))return _0x4ff4cf;return IMAGE_LOCAL_SAVE_FAILURE_MESSAGE+'：'+_0x4ff4cf;}
+function formatLocalSaveFailureMessage(value245) {
+  const list33 = getReadableErrorMessage(value245);
+  if (!list33) return IMAGE_LOCAL_SAVE_FAILURE_MESSAGE;
+  if (list33['includes']('保存到本地失败')) return list33;
+  return IMAGE_LOCAL_SAVE_FAILURE_MESSAGE + '：' + list33;
+}
 
-async function generateImageUnqueued(_0x39b116,_0x31b03f){const _0x1737db=getProviderId(_0x39b116),_0x203363=getImageExecution(_0x39b116,_0x1737db)?.["executionManifest"],_0xe157ba=resolveImageGenerationBatchSize(_0x39b116,_0x1737db),_0x390b8a=shouldSubmitProviderBatchOnce(_0x39b116,_0x1737db,_0xe157ba),_0x103eea=getLocalImageRuntimeHandler(_0x203363);if(_0x103eea){const _0x484397=await _0x103eea["run"]({'payload':_0x39b116,'options':_0x31b03f,'batchSize':_0xe157ba,'executionManifest':_0x203363});return _0x484397['length']===0x1?_0x484397[0x0]:{'isBatch':!![],'images':_0x484397};}if(_0xe157ba<=0x1||_0x390b8a)try{const _0x5751e3=await doGenerateOnce(_0x39b116,_0x1737db,_0x31b03f),_0x7ead48=Array["isArray"](_0x5751e3)?_0x5751e3:[_0x5751e3];if(_0x7ead48["length"]===0x1&&_0x7ead48[0x0]['error'])throw new Error(_0x7ead48[0x0]["error"],{'cause':_0x7ead48[0x0]["cause"]});return _0x7ead48["length"]===0x1?_0x7ead48[0x0]:{'isBatch':!![],'images':_0x7ead48};}catch(_0x47ddeb){if(_0x47ddeb instanceof ApiError)throw new Error(_0x47ddeb["getUserMessage"](),{'cause':_0x47ddeb});throw _0x47ddeb;}const _0x324418=[],_0x418558=createImageBatchAttemptContext(_0xe157ba);for(let _0x51fc08=0x0;_0x51fc08<_0xe157ba;_0x51fc08++){try{const _0x583f6b=await doGenerateOnce(buildImageBatchAttemptPayload(_0x39b116,_0x418558,_0x51fc08),_0x1737db,_0x31b03f);_0x324418["push"](..._0x583f6b);}catch(_0x161a7a){_0x161a7a instanceof ApiError?_0x324418["push"]({'error':_0x161a7a["getUserMessage"](),'status':"failed",'retryable':_0x161a7a["retryable"]}):_0x324418["push"]({'error':_0x161a7a["message"]||'未知错误','status':"failed",'retryable':![]});}}if(_0x324418["length"]===0x0)throw new Error("批量生成全部失败");if(_0x324418['length']===0x1)return _0x324418[0x0];return{'isBatch':!![],'images':_0x324418};}
+async function generateImageUnqueued(value246, value247) {
+  const providerId4 = getProviderId(value246),
+    imageExecution3 = getImageExecution(value246, providerId4)?.['executionManifest'],
+    imageGenerationBatchSize2 = resolveImageGenerationBatchSize(value246, providerId4),
+    shouldSubmitProviderBatchOnce3 = shouldSubmitProviderBatchOnce(
+      value246,
+      providerId4,
+      imageGenerationBatchSize2,
+    ),
+    localImageRuntimeHandler = getLocalImageRuntimeHandler(imageExecution3);
+  if (localImageRuntimeHandler) {
+    const list34 = await localImageRuntimeHandler['run']({
+      payload: value246,
+      options: value247,
+      batchSize: imageGenerationBatchSize2,
+      executionManifest: imageExecution3,
+    });
+    return list34['length'] === 0x1 ? list34[0x0] : { isBatch: !![], images: list34 };
+  }
+  if (imageGenerationBatchSize2 <= 0x1 || shouldSubmitProviderBatchOnce3)
+    try {
+      const doGenerateOnce3 = await doGenerateOnce(value246, providerId4, value247),
+        value248 = Array['isArray'](doGenerateOnce3) ? doGenerateOnce3 : [doGenerateOnce3];
+      if (value248['length'] === 0x1 && value248[0x0]['error'])
+        throw new Error(value248[0x0]['error'], { cause: value248[0x0]['cause'] });
+      return value248['length'] === 0x1 ? value248[0x0] : { isBatch: !![], images: value248 };
+    } catch (value249) {
+      if (value249 instanceof ApiError) throw new Error(value249['getUserMessage'](), { cause: value249 });
+      throw value249;
+    }
+  const list35 = [],
+    imageBatchAttemptContext = createImageBatchAttemptContext(imageGenerationBatchSize2);
+  for (let value250 = 0x0; value250 < imageGenerationBatchSize2; value250++) {
+    try {
+      const args33 = await doGenerateOnce(
+        buildImageBatchAttemptPayload(value246, imageBatchAttemptContext, value250),
+        providerId4,
+        value247,
+      );
+      list35['push'](...args33);
+    } catch (value251) {
+      value251 instanceof ApiError
+        ? list35['push']({
+            error: value251['getUserMessage'](),
+            status: 'failed',
+            retryable: value251['retryable'],
+          })
+        : list35['push']({ error: value251['message'] || '未知错误', status: 'failed', retryable: ![] });
+    }
+  }
+  if (list35['length'] === 0x0) throw new Error('批量生成全部失败');
+  if (list35['length'] === 0x1) return list35[0x0];
+  return { isBatch: !![], images: list35 };
+}

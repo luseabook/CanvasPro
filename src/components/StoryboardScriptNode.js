@@ -126,249 +126,242 @@ const CARD_FIELDS = Object.freeze([
   }),
   STORYBOARD_IMAGE_BATCH_PADDING = 30,
   STORYBOARD_IMAGE_BATCH_TITLE_HEIGHT = 20;
-function storyboardScriptText(_0x1a211e, _0x934595 = {}) {
-  return t('storyboardScript.' + _0x1a211e, _0x934595);
+function storyboardScriptText(value, item = {}) {
+  return t('storyboardScript.' + value, item);
 }
-function getStoryboardColumnLabel(_0x3a064e, _0x1e7192 = '') {
-  const _0x431b7a = STORYBOARD_COLUMN_I18N_KEYS[String(_0x3a064e || '')];
-  if (!_0x431b7a) return String(_0x1e7192 || _0x3a064e || '');
-  return storyboardScriptText('columns.' + _0x431b7a);
+function getStoryboardColumnLabel(key, index = '') {
+  const enabled = STORYBOARD_COLUMN_I18N_KEYS[String(key || '')];
+  if (!enabled) return String(index || key || '');
+  return storyboardScriptText('columns.' + enabled);
 }
 const getStateSnapshot = () =>
   typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
-function getSelectedRowIndexes(_0x1aa9a2) {
+function getSelectedRowIndexes(result) {
   return normalizeStoryboardScriptSelectedRowIndexes(
-    _0x1aa9a2?.selectedRowIndexes,
-    Array.isArray(_0x1aa9a2?.rows) ? _0x1aa9a2.rows.length : 0,
+    result?.selectedRowIndexes,
+    Array.isArray(result?.rows) ? result.rows.length : 0,
   );
 }
-function resolveStoryboardColumnDensity(_0x56e786) {
-  const _0x3d5620 = String(_0x56e786 || '');
-  if (NARROW_TABLE_COLUMNS.has(_0x3d5620)) return 'narrow';
-  if (COMPACT_TABLE_COLUMNS.has(_0x3d5620)) return 'compact';
-  if (WIDE_TABLE_COLUMNS.has(_0x3d5620)) return 'wide';
+function resolveStoryboardColumnDensity(data) {
+  const options = String(data || '');
+  if (NARROW_TABLE_COLUMNS.has(options)) return 'narrow';
+  if (COMPACT_TABLE_COLUMNS.has(options)) return 'compact';
+  if (WIDE_TABLE_COLUMNS.has(options)) return 'wide';
   return 'normal';
 }
-function getStoryboardColumnsForMediaMode(_0x129743, _0x53931a = []) {
-  return getStoryboardScriptDisplayColumns({ mediaMode: _0x129743, rows: _0x53931a });
+function getStoryboardColumnsForMediaMode(mediaMode, rows2 = []) {
+  return getStoryboardScriptDisplayColumns({ mediaMode: mediaMode, rows: rows2 });
 }
-function getStoryboardCardFieldsForMediaMode(_0x1d6d62, _0x3781c7 = []) {
-  return getStoryboardScriptDisplayColumns({ mediaMode: _0x1d6d62, rows: _0x3781c7 })
-    .map((_0x73f6dd) => _0x73f6dd.key)
-    .filter((_0x418f77) => CARD_FIELD_KEYS.has(_0x418f77));
+function getStoryboardCardFieldsForMediaMode(mediaMode2, rows3 = []) {
+  return getStoryboardScriptDisplayColumns({ mediaMode: mediaMode2, rows: rows3 })
+    .map((event) => event.key)
+    .filter((item2) => CARD_FIELD_KEYS.has(item2));
 }
-function formatCellValue(_0x373189) {
-  if (_0x373189 == null) return '';
-  if (typeof _0x373189 === 'string') return _0x373189;
-  if (typeof _0x373189 === 'number' || typeof _0x373189 === 'boolean') return String(_0x373189);
+function formatCellValue(target) {
+  if (target == null) return '';
+  if (typeof target === 'string') return target;
+  if (typeof target === 'number' || typeof target === 'boolean') return String(target);
   try {
-    return JSON.stringify(_0x373189);
+    return JSON.stringify(target);
   } catch {
-    return String(_0x373189);
+    return String(target);
   }
 }
 const STORYBOARD_IMAGE_PLACEHOLDER_PATTERN = /@图片\d+/g;
-function normalizeStoryboardImagePlaceholder(_0x4759cc) {
-  return String(_0x4759cc || '')
+function normalizeStoryboardImagePlaceholder(source) {
+  return String(source || '')
     .trim()
     .replace(/\s+/g, '');
 }
-function extractStoryboardImagePlaceholders(_0x2a5029) {
-  return String(_0x2a5029 || '').match(STORYBOARD_IMAGE_PLACEHOLDER_PATTERN) || [];
+function extractStoryboardImagePlaceholders(next) {
+  return String(next || '').match(STORYBOARD_IMAGE_PLACEHOLDER_PATTERN) || [];
 }
-function extractGeneratedText(_0x45a252) {
-  if (typeof _0x45a252 === 'string') return _0x45a252;
+function extractGeneratedText(error2) {
+  if (typeof error2 === 'string') return error2;
   return String(
-    _0x45a252?.text ||
-      _0x45a252?.outputText ||
-      _0x45a252?.output ||
-      _0x45a252?.content ||
-      _0x45a252?.message ||
-      '',
+    error2?.text || error2?.outputText || error2?.output || error2?.content || error2?.message || '',
   );
 }
-function getStoryboardImagePlaceholder(_0x3ea5a4) {
-  return '@图片' + Math.max(1, Math.trunc(Number(_0x3ea5a4) || 1));
+function getStoryboardImagePlaceholder(current) {
+  return '@图片' + Math.max(1, Math.trunc(Number(current) || 1));
 }
-function getStoryboardVideoPlaceholder(_0x33cc22) {
-  return '@视频' + Math.max(1, Math.trunc(Number(_0x33cc22) || 1));
+function getStoryboardVideoPlaceholder(entry) {
+  return '@视频' + Math.max(1, Math.trunc(Number(entry) || 1));
 }
-function buildStoryboardImageRefMap(_0x1e36b = []) {
-  const _0x52f843 = Array.isArray(_0x1e36b) ? _0x1e36b : [],
-    _0x20e35a = new Map();
+function buildStoryboardImageRefMap(list = []) {
+  const list2 = Array.isArray(list) ? list : [],
+    map = new Map();
   return (
-    _0x52f843.forEach((_0x503693, _0x4131fe) => {
-      const _0x1f0cf1 =
-          normalizeStoryboardImagePlaceholder(_0x503693?.label) ||
-          getStoryboardImagePlaceholder(_0x4131fe + 1),
-        _0x354cd0 = String(_0x503693?.url || '').trim();
-      if (!_0x1f0cf1 || !_0x354cd0) return;
-      _0x20e35a.set(_0x1f0cf1, { ..._0x503693, label: _0x1f0cf1, url: _0x354cd0 });
+    list2.forEach((response, record) => {
+      const label =
+          normalizeStoryboardImagePlaceholder(response?.label) || getStoryboardImagePlaceholder(record + 1),
+        url = String(response?.url || '').trim();
+      if (!label || !url) return;
+      map.set(label, { ...response, label: label, url: url });
     }),
-    _0x20e35a
+    map
   );
 }
-function mergeStoryboardImageRefs(..._0x1c8c6b) {
-  const _0x4e5cd3 = [],
-    _0x4e53c5 = new Set();
+function mergeStoryboardImageRefs(...args) {
+  const list3 = [],
+    map2 = new Set();
   return (
-    _0x1c8c6b.flat().forEach((_0x2cd760) => {
-      const _0x36803f = normalizeStoryboardImagePlaceholder(_0x2cd760?.label),
-        _0xf61c22 = String(_0x2cd760?.url || '').trim();
-      if (!_0x36803f || !_0xf61c22 || _0x4e53c5.has(_0x36803f)) return;
-      (_0x4e53c5.add(_0x36803f),
-        _0x4e5cd3.push({ ..._0x2cd760, label: _0x36803f, url: _0xf61c22, type: 'image' }));
+    args.flat().forEach((response2) => {
+      const label2 = normalizeStoryboardImagePlaceholder(response2?.label),
+        url2 = String(response2?.url || '').trim();
+      if (!label2 || !url2 || map2.has(label2)) return;
+      (map2.add(label2), list3.push({ ...response2, label: label2, url: url2, type: 'image' }));
     }),
-    _0x4e5cd3
+    list3
   );
 }
-function pickStoryboardIndexedItem(_0x51b1dc, _0x44c616) {
-  if (!Array.isArray(_0x51b1dc) || _0x51b1dc.length === 0) return null;
-  const _0x38471f = Number.isFinite(Number(_0x44c616)) ? Math.max(0, Math.trunc(Number(_0x44c616))) : 0;
-  return _0x51b1dc[Math.min(_0x38471f, _0x51b1dc.length - 1)] || null;
+function pickStoryboardIndexedItem(list4, payload) {
+  if (!Array.isArray(list4) || list4.length === 0) return null;
+  const handle = Number.isFinite(Number(payload)) ? Math.max(0, Math.trunc(Number(payload))) : 0;
+  return list4[Math.min(handle, list4.length - 1)] || null;
 }
-function toStoryboardUsableMediaUrl(_0x9c0e75) {
-  const _0x34d484 = String(_0x9c0e75 || '').trim();
-  if (!_0x34d484) return '';
-  if (/^(?:https?:|blob:|data:|\/)/i.test(_0x34d484)) return _0x34d484;
-  return localPathToUrl(_0x34d484) || '';
+function toStoryboardUsableMediaUrl(state) {
+  const enabled2 = String(state || '').trim();
+  if (!enabled2) return '';
+  if (/^(?:https?:|blob:|data:|\/)/i.test(enabled2)) return enabled2;
+  return localPathToUrl(enabled2) || '';
 }
-function resolveStoryboardVideoRefUrl(_0x5012cc = {}) {
-  const _0x5b3024 = pickStoryboardIndexedItem(_0x5012cc?.videos, _0x5012cc?.mainVideoIndex),
-    _0x4bf251 = [
-      resolveCanvasVideoUrl(_0x5b3024),
-      resolveCanvasVideoUrl(_0x5012cc),
-      _0x5b3024?.videoUrl,
-      _0x5b3024?.url,
-      _0x5b3024?.src,
-      _0x5b3024?.localPath,
-      _0x5012cc?.videoUrl,
-      _0x5012cc?.url,
-      _0x5012cc?.src,
-      _0x5012cc?.localPath,
+function resolveStoryboardVideoRefUrl(response3 = {}) {
+  const response4 = pickStoryboardIndexedItem(response3?.videos, response3?.mainVideoIndex),
+    list5 = [
+      resolveCanvasVideoUrl(response4),
+      resolveCanvasVideoUrl(response3),
+      response4?.videoUrl,
+      response4?.url,
+      response4?.src,
+      response4?.localPath,
+      response3?.videoUrl,
+      response3?.url,
+      response3?.src,
+      response3?.localPath,
     ];
-  return _0x4bf251.map((_0x5231ff) => toStoryboardUsableMediaUrl(_0x5231ff)).find(Boolean) || '';
+  return list5.map((item3) => toStoryboardUsableMediaUrl(item3)).find(Boolean) || '';
 }
-function createStoryboardRoleImagePreview(_0x4c4eec, _0x18ad7f = new Map()) {
-  const _0x56ba28 = extractStoryboardImagePlaceholders(_0x4c4eec),
-    _0x58473b = _0x56ba28
-      .map((_0x4a5066) => _0x18ad7f.get(normalizeStoryboardImagePlaceholder(_0x4a5066)))
-      .filter((_0x158c8e) => _0x158c8e?.url);
-  if (_0x58473b.length === 0) return null;
-  const _0x5bd41a = document.createElement('span');
-  ((_0x5bd41a.className = 'storyboard-script-role-images'),
-    _0x58473b.slice(0, 3).forEach((_0x4859cc) => {
-      const _0x451fc8 = document.createElement('img');
-      ((_0x451fc8.className = 'storyboard-script-role-image-thumb'),
-        (_0x451fc8.src = _0x4859cc.url),
-        (_0x451fc8.alt = _0x4859cc.label || getStoryboardColumnLabel('角色图')),
-        (_0x451fc8.loading = 'lazy'),
-        (_0x451fc8.draggable = false),
-        (_0x451fc8.title = _0x4859cc.label || ''),
-        _0x5bd41a.appendChild(_0x451fc8));
+function createStoryboardRoleImagePreview(config, map3 = new Map()) {
+  const list6 = extractStoryboardImagePlaceholders(config),
+    list7 = list6
+      .map((item4) => map3.get(normalizeStoryboardImagePlaceholder(item4)))
+      .filter((response5) => response5?.url);
+  if (list7.length === 0) return null;
+  const el = document.createElement('span');
+  ((el.className = 'storyboard-script-role-images'),
+    list7.slice(0, 3).forEach((response6) => {
+      const scope = document.createElement('img');
+      ((scope.className = 'storyboard-script-role-image-thumb'),
+        (scope.src = response6.url),
+        (scope.alt = response6.label || getStoryboardColumnLabel('角色图')),
+        (scope.loading = 'lazy'),
+        (scope.draggable = false),
+        (scope.title = response6.label || ''),
+        el.appendChild(scope));
     }));
-  if (_0x58473b.length > 3) {
-    const _0x2029b6 = document.createElement('span');
-    ((_0x2029b6.className = 'storyboard-script-role-image-more'),
-      (_0x2029b6.textContent = '+' + (_0x58473b.length - 3)),
-      _0x5bd41a.appendChild(_0x2029b6));
+  if (list7.length > 3) {
+    const el2 = document.createElement('span');
+    ((el2.className = 'storyboard-script-role-image-more'),
+      (el2.textContent = '+' + (list7.length - 3)),
+      el.appendChild(el2));
   }
-  return _0x5bd41a;
+  return el;
 }
-function appendStoryboardCellDisplay(_0x1357d6, _0x464d68, _0x41418c, _0x576c96 = new Map()) {
-  const _0x45fd55 = formatCellValue(_0x41418c);
-  ((_0x1357d6.dataset.storyboardRawValue = _0x45fd55),
-    _0x1357d6.replaceChildren(),
-    _0x1357d6.classList.remove('storyboard-script-image-cell'));
-  if (_0x464d68 === '角色图' || _0x464d68 === '参考') {
-    const _0x17b153 = createStoryboardRoleImagePreview(_0x45fd55, _0x576c96);
-    if (_0x17b153) {
-      (_0x1357d6.classList.add('storyboard-script-image-cell'), _0x1357d6.appendChild(_0x17b153));
+function appendStoryboardCellDisplay(el3, input, output, value2 = new Map()) {
+  const formatCellValue2 = formatCellValue(output);
+  ((el3.dataset.storyboardRawValue = formatCellValue2),
+    el3.replaceChildren(),
+    el3.classList.remove('storyboard-script-image-cell'));
+  if (input === '角色图' || input === '参考') {
+    const storyboardRoleImagePreview = createStoryboardRoleImagePreview(formatCellValue2, value2);
+    if (storyboardRoleImagePreview) {
+      (el3.classList.add('storyboard-script-image-cell'), el3.appendChild(storyboardRoleImagePreview));
       return;
     }
   }
-  _0x1357d6.textContent = _0x45fd55;
+  el3.textContent = formatCellValue2;
 }
-function buildStoryboardBodyRenderSignature(_0x3f28f6, _0x2af5f0 = []) {
-  const _0x321c54 = mergeStoryboardImageRefs(_0x2af5f0, _0x3f28f6?.referenceImageRefs).map((_0x11d801) => ({
-    label: normalizeStoryboardImagePlaceholder(_0x11d801?.label),
-    url: String(_0x11d801?.url || '').trim(),
+function buildStoryboardBodyRenderSignature(selectionMode, value3 = []) {
+  const refs = mergeStoryboardImageRefs(value3, selectionMode?.referenceImageRefs).map((response7) => ({
+    label: normalizeStoryboardImagePlaceholder(response7?.label),
+    url: String(response7?.url || '').trim(),
   }));
   try {
     return JSON.stringify({
-      viewMode: normalizeStoryboardScriptViewMode(_0x3f28f6?.viewMode),
-      mediaMode: normalizeStoryboardScriptMediaMode(_0x3f28f6?.mediaMode),
-      selectionMode: _0x3f28f6?.selectionMode === true,
-      rows: Array.isArray(_0x3f28f6?.rows) ? _0x3f28f6.rows : [],
-      refs: _0x321c54,
+      viewMode: normalizeStoryboardScriptViewMode(selectionMode?.viewMode),
+      mediaMode: normalizeStoryboardScriptMediaMode(selectionMode?.mediaMode),
+      selectionMode: selectionMode?.selectionMode === true,
+      rows: Array.isArray(selectionMode?.rows) ? selectionMode.rows : [],
+      refs: refs,
     });
   } catch {
     return '' + Date.now();
   }
 }
-function collectDirectStoryboardImageRefs(_0x3393aa = [], _0x5c70e8 = {}) {
-  const _0x45c938 = [];
-  for (const _0xca95c0 of Array.isArray(_0x3393aa) ? _0x3393aa : []) {
-    const _0x5de0ef = _0x5c70e8?.[_0xca95c0?.sourceId];
-    if (!_0x5de0ef) continue;
-    if (resolveEffectiveInputKind(_0x5de0ef, _0xca95c0) !== 'image') continue;
-    const _0x4166b6 = resolveGenerationInputImageUrl(_0x5de0ef);
-    if (!_0x4166b6) continue;
-    _0x45c938.push({
-      label: getStoryboardImagePlaceholder(_0x45c938.length + 1),
-      url: _0x4166b6,
+function collectDirectStoryboardImageRefs(list8 = [], value4 = {}) {
+  const list9 = [];
+  for (const value5 of Array.isArray(list8) ? list8 : []) {
+    const enabled3 = value4?.[value5?.sourceId];
+    if (!enabled3) continue;
+    if (resolveEffectiveInputKind(enabled3, value5) !== 'image') continue;
+    const url3 = resolveGenerationInputImageUrl(enabled3);
+    if (!url3) continue;
+    list9.push({
+      label: getStoryboardImagePlaceholder(list9.length + 1),
+      url: url3,
       type: 'image',
-      sourceId: String(_0xca95c0?.sourceId || ''),
+      sourceId: String(value5?.sourceId || ''),
       source: 'node',
     });
   }
-  return _0x45c938;
+  return list9;
 }
-function collectDirectStoryboardVideoRefs(_0x267c74 = [], _0x5511d2 = {}) {
-  const _0x315c12 = [];
-  for (const _0x3aea51 of Array.isArray(_0x267c74) ? _0x267c74 : []) {
-    const _0x5f0b5b = _0x5511d2?.[_0x3aea51?.sourceId];
-    if (!_0x5f0b5b) continue;
-    if (resolveEffectiveInputKind(_0x5f0b5b, _0x3aea51) !== 'video') continue;
-    const _0x5323b7 = resolveStoryboardVideoRefUrl(_0x5f0b5b);
-    if (!_0x5323b7) continue;
-    _0x315c12.push({
-      label: getStoryboardVideoPlaceholder(_0x315c12.length + 1),
-      url: _0x5323b7,
+function collectDirectStoryboardVideoRefs(list10 = [], value6 = {}) {
+  const list11 = [];
+  for (const value7 of Array.isArray(list10) ? list10 : []) {
+    const enabled4 = value6?.[value7?.sourceId];
+    if (!enabled4) continue;
+    if (resolveEffectiveInputKind(enabled4, value7) !== 'video') continue;
+    const url4 = resolveStoryboardVideoRefUrl(enabled4);
+    if (!url4) continue;
+    list11.push({
+      label: getStoryboardVideoPlaceholder(list11.length + 1),
+      url: url4,
       type: 'video',
-      sourceId: String(_0x3aea51?.sourceId || ''),
+      sourceId: String(value7?.sourceId || ''),
       source: 'node',
     });
   }
-  return _0x315c12;
+  return list11;
 }
 function normalizeStoryboardImageInputRefs({
   directImageRefs: directImageRefs = [],
   promptAssetRefs: promptAssetRefs = [],
   hiddenAssetRefs: hiddenAssetRefs = [],
 } = {}) {
-  const _0x3084a1 = [],
-    _0x36e12f = (_0x50e520, _0x241f3d = '') => {
-      const _0x59bda3 = String(_0x50e520?.url || '').trim();
-      if (!_0x59bda3) return;
-      const _0x573a43 =
-        String(_0x50e520?.placeholder || _0x50e520?.label || _0x241f3d || '').trim() ||
-        getStoryboardImagePlaceholder(_0x3084a1.length + 1);
-      _0x3084a1.push({ ..._0x50e520, label: _0x573a43, url: _0x59bda3, type: 'image' });
+  const list12 = [],
+    handler = (response8, value8 = '') => {
+      const url5 = String(response8?.url || '').trim();
+      if (!url5) return;
+      const label3 =
+        String(response8?.placeholder || response8?.label || value8 || '').trim() ||
+        getStoryboardImagePlaceholder(list12.length + 1);
+      list12.push({ ...response8, label: label3, url: url5, type: 'image' });
     };
   return (
-    directImageRefs.forEach((_0xa51162) => _0x36e12f(_0xa51162, _0xa51162?.label)),
+    directImageRefs.forEach((item5) => handler(item5, item5?.label)),
     promptAssetRefs
-      .filter((_0xf1093b) => _0xf1093b?.type === 'image')
-      .forEach((_0x13d747) => _0x36e12f({ ..._0x13d747, label: '' }, _0x13d747?.placeholder)),
+      .filter((item6) => item6?.type === 'image')
+      .forEach((args2) => handler({ ...args2, label: '' }, args2?.placeholder)),
     hiddenAssetRefs
-      .filter((_0x15b51b) => _0x15b51b?.type === 'image')
-      .forEach((_0xdfcfb3) => {
-        _0x36e12f({ ..._0xdfcfb3, label: '' }, getStoryboardImagePlaceholder(_0x3084a1.length + 1));
+      .filter((item7) => item7?.type === 'image')
+      .forEach((args3) => {
+        handler({ ...args3, label: '' }, getStoryboardImagePlaceholder(list12.length + 1));
       }),
-    _0x3084a1.map((_0xf1b048, _0x30bca1) => ({
-      ..._0xf1b048,
-      label: _0xf1b048.label || getStoryboardImagePlaceholder(_0x30bca1 + 1),
+    list12.map((label4, value9) => ({
+      ...label4,
+      label: label4.label || getStoryboardImagePlaceholder(value9 + 1),
     }))
   );
 }
@@ -377,28 +370,28 @@ function normalizeStoryboardVideoInputRefs({
   promptAssetRefs: promptAssetRefs = [],
   hiddenAssetRefs: hiddenAssetRefs = [],
 } = {}) {
-  const _0x13d6c9 = [],
-    _0x4adec6 = (_0x2d187a, _0x16bca0 = '') => {
-      const _0x501cfd = String(_0x2d187a?.url || '').trim();
-      if (!_0x501cfd) return;
-      const _0x759d52 =
-        String(_0x2d187a?.placeholder || _0x2d187a?.label || _0x16bca0 || '').trim() ||
-        getStoryboardVideoPlaceholder(_0x13d6c9.length + 1);
-      _0x13d6c9.push({ ..._0x2d187a, label: _0x759d52, url: _0x501cfd, type: 'video' });
+  const list13 = [],
+    handler2 = (response9, value10 = '') => {
+      const url6 = String(response9?.url || '').trim();
+      if (!url6) return;
+      const label5 =
+        String(response9?.placeholder || response9?.label || value10 || '').trim() ||
+        getStoryboardVideoPlaceholder(list13.length + 1);
+      list13.push({ ...response9, label: label5, url: url6, type: 'video' });
     };
   return (
-    directVideoRefs.forEach((_0x207f44) => _0x4adec6(_0x207f44, _0x207f44?.label)),
+    directVideoRefs.forEach((item8) => handler2(item8, item8?.label)),
     promptAssetRefs
-      .filter((_0x36f913) => _0x36f913?.type === 'video')
-      .forEach((_0x5bdefe) => _0x4adec6({ ..._0x5bdefe, label: '' }, _0x5bdefe?.placeholder)),
+      .filter((item9) => item9?.type === 'video')
+      .forEach((args4) => handler2({ ...args4, label: '' }, args4?.placeholder)),
     hiddenAssetRefs
-      .filter((_0x102969) => _0x102969?.type === 'video')
-      .forEach((_0x4d9247) => {
-        _0x4adec6({ ..._0x4d9247, label: '' }, getStoryboardVideoPlaceholder(_0x13d6c9.length + 1));
+      .filter((item10) => item10?.type === 'video')
+      .forEach((args5) => {
+        handler2({ ...args5, label: '' }, getStoryboardVideoPlaceholder(list13.length + 1));
       }),
-    _0x13d6c9.map((_0x327379, _0x1920f2) => ({
-      ..._0x327379,
-      label: _0x327379.label || getStoryboardVideoPlaceholder(_0x1920f2 + 1),
+    list13.map((label6, value11) => ({
+      ...label6,
+      label: label6.label || getStoryboardVideoPlaceholder(value11 + 1),
     }))
   );
 }
@@ -406,67 +399,67 @@ function buildStoryboardReferenceSummary({
   imageLabels: imageLabels = [],
   videoLabels: videoLabels = [],
 } = {}) {
-  const _0x152e6d = [];
+  const list14 = [];
   return (
     Array.isArray(imageLabels) &&
       imageLabels.length > 0 &&
-      _0x152e6d.push('参考图片：' + imageLabels.join('、')),
+      list14.push('参考图片：' + imageLabels.join('、')),
     Array.isArray(videoLabels) &&
       videoLabels.length > 0 &&
-      _0x152e6d.push('参考视频：' + videoLabels.join('、')),
-    _0x152e6d.join('\n')
+      list14.push('参考视频：' + videoLabels.join('、')),
+    list14.join('\n')
   );
 }
-function formatStoryboardVideoTime(_0x395fbc) {
-  const _0x15d127 = Math.max(0, Number(_0x395fbc) || 0),
-    _0x4ffa13 = Math.floor(_0x15d127),
-    _0x2e8e66 = Math.floor(_0x4ffa13 / 60),
-    _0x4db5fe = _0x4ffa13 % 60,
-    _0x1008dd = Math.round((_0x15d127 - _0x4ffa13) * 10);
-  return String(_0x2e8e66).padStart(2, '0') + ':' + String(_0x4db5fe).padStart(2, '0') + '.' + _0x1008dd;
+function formatStoryboardVideoTime(value12) {
+  const value13 = Math.max(0, Number(value12) || 0),
+    value14 = Math.floor(value13),
+    value15 = Math.floor(value14 / 60),
+    value16 = value14 % 60,
+    value17 = Math.round((value13 - value14) * 10);
+  return String(value15).padStart(2, '0') + ':' + String(value16).padStart(2, '0') + '.' + value17;
 }
-function formatStoryboardVideoTimeRange(_0x247050 = {}) {
-  const _0x55d799 = formatStoryboardVideoTime(_0x247050.start),
-    _0x3d3d37 = formatStoryboardVideoTime(
-      Number(_0x247050.end) > Number(_0x247050.start) ? _0x247050.end : _0x247050.captureTime,
+function formatStoryboardVideoTimeRange(options2 = {}) {
+  const formatStoryboardVideoTime2 = formatStoryboardVideoTime(options2.start),
+    formatStoryboardVideoTime3 = formatStoryboardVideoTime(
+      Number(options2.end) > Number(options2.start) ? options2.end : options2.captureTime,
     );
-  return _0x55d799 + '-' + _0x3d3d37;
+  return formatStoryboardVideoTime2 + '-' + formatStoryboardVideoTime3;
 }
-function buildStoryboardVideoFrameReferenceSummary(_0x4af746 = []) {
-  const _0x23e244 = Array.isArray(_0x4af746) ? _0x4af746 : [];
-  if (_0x23e244.length === 0) return '';
-  return _0x23e244
-    .map((_0x2e1900) => {
-      const _0x2d10e9 = normalizeStoryboardImagePlaceholder(_0x2e1900?.label),
-        _0x16ffad = String(_0x2e1900?.videoLabel || '@视频1').trim(),
-        _0x3b7075 = String(_0x2e1900?.timeRange || '').trim(),
-        _0x548085 = _0x2e1900?.sentAsImage === false ? '（仅提供时间码，画面请结合原视频判断）' : '';
-      return _0x2d10e9 + '：来自 ' + _0x16ffad + (_0x3b7075 ? ' ' + _0x3b7075 : '') + _0x548085;
+function buildStoryboardVideoFrameReferenceSummary(list15 = []) {
+  const list16 = Array.isArray(list15) ? list15 : [];
+  if (list16.length === 0) return '';
+  return list16
+    .map((item11) => {
+      const storyboardImagePlaceholder = normalizeStoryboardImagePlaceholder(item11?.label),
+        value18 = String(item11?.videoLabel || '@视频1').trim(),
+        value19 = String(item11?.timeRange || '').trim(),
+        value20 = item11?.sentAsImage === false ? '（仅提供时间码，画面请结合原视频判断）' : '';
+      return storyboardImagePlaceholder + '：来自 ' + value18 + (value19 ? ' ' + value19 : '') + value20;
     })
     .filter(Boolean)
     .join('\n');
 }
-function getStoryboardModelImageInputLimit(_0x1a3e2b, _0x1811d8) {
-  const _0x1ac91b = getModelManifest(_0x1a3e2b, _0x1811d8),
-    _0x1f71af = Number(_0x1ac91b?.inputSlots?.maxByKind?.image);
-  return Number.isFinite(_0x1f71af) && _0x1f71af > 0 ? Math.trunc(_0x1f71af) : STORYBOARD_VIDEO_FRAME_LIMIT;
+function getStoryboardModelImageInputLimit(value21, value22) {
+  const modelManifest = getModelManifest(value21, value22),
+    count = Number(modelManifest?.inputSlots?.maxByKind?.image);
+  return Number.isFinite(count) && count > 0 ? Math.trunc(count) : STORYBOARD_VIDEO_FRAME_LIMIT;
 }
-function chunkStoryboardFrameRefs(_0x351efd = [], _0x30a275 = STORYBOARD_VIDEO_FRAME_LIMIT) {
-  const _0x12ddda = Array.isArray(_0x351efd) ? _0x351efd : [],
-    _0x8b942b = Math.max(1, Math.trunc(Number(_0x30a275) || 1)),
-    _0x3f8a2b = [];
-  for (let _0x3ad4ec = 0; _0x3ad4ec < _0x12ddda.length; _0x3ad4ec += _0x8b942b) {
-    _0x3f8a2b.push(_0x12ddda.slice(_0x3ad4ec, _0x3ad4ec + _0x8b942b));
+function chunkStoryboardFrameRefs(list17 = [], value23 = STORYBOARD_VIDEO_FRAME_LIMIT) {
+  const list18 = Array.isArray(list17) ? list17 : [],
+    value24 = Math.max(1, Math.trunc(Number(value23) || 1)),
+    list19 = [];
+  for (let value25 = 0; value25 < list18.length; value25 += value24) {
+    list19.push(list18.slice(value25, value25 + value24));
   }
-  return _0x3f8a2b;
+  return list19;
 }
 function buildCombinedStoryboardBatchJson({
   rows: rows = [],
   title: title = getStoryboardScriptDefaultName(),
 } = {}) {
-  const _0xbc6ac8 = (Array.isArray(rows) ? rows : []).map((_0x4e799f, _0x416962) => ({
-    ..._0x4e799f,
-    镜号: String(_0x416962 + 1),
+  const shotCount = (Array.isArray(rows) ? rows : []).map((args6, value26) => ({
+    ...args6,
+    镜号: String(value26 + 1),
   }));
   return JSON.stringify(
     {
@@ -474,312 +467,304 @@ function buildCombinedStoryboardBatchJson({
       type: 'storyboard-script',
       sourceMode: 'video',
       title: String(title || getStoryboardScriptDefaultName()).trim() || getStoryboardScriptDefaultName(),
-      detectedIntent: { shotCount: _0xbc6ac8.length, language: 'zh-CN' },
-      rows: _0xbc6ac8,
+      detectedIntent: { shotCount: shotCount.length, language: 'zh-CN' },
+      rows: shotCount,
     },
     null,
     2,
   );
 }
-async function runStoryboardScriptGenerationPayload(_0x4a8c0a) {
-  const _0x417104 = Array.isArray(_0x4a8c0a?.videoFrameBatches)
-    ? _0x4a8c0a.videoFrameBatches.filter((_0x570487) => Array.isArray(_0x570487) && _0x570487.length > 0)
+async function runStoryboardScriptGenerationPayload(videoLabels2) {
+  const list20 = Array.isArray(videoLabels2?.videoFrameBatches)
+    ? videoLabels2.videoFrameBatches.filter((list21) => Array.isArray(list21) && list21.length > 0)
     : [];
-  if (_0x4a8c0a?.sourceMode !== 'video' || _0x417104.length <= 1) return generateText(_0x4a8c0a);
-  const _0xd94cd0 = [];
-  let _0x54f1d0 = '';
-  for (const _0x558e3f of _0x417104) {
-    const _0xc1aa8a = _0x558e3f.map((_0x17b6f3) => _0x17b6f3.url).filter(Boolean),
-      _0x113241 = buildStoryboardScriptVideoPrompt(_0x4a8c0a.rawPromptText || '', {
-        videoCount: Array.isArray(_0x4a8c0a.inputVideoUrls) ? _0x4a8c0a.inputVideoUrls.length : 0,
-        videoLabels: _0x4a8c0a.videoLabels,
+  if (videoLabels2?.sourceMode !== 'video' || list20.length <= 1) return generateText(videoLabels2);
+  const rows4 = [];
+  let title2 = '';
+  for (const list22 of list20) {
+    const inputImageUrls = list22.map((response10) => response10.url).filter(Boolean),
+      prompt = buildStoryboardScriptVideoPrompt(videoLabels2.rawPromptText || '', {
+        videoCount: Array.isArray(videoLabels2.inputVideoUrls) ? videoLabels2.inputVideoUrls.length : 0,
+        videoLabels: videoLabels2.videoLabels,
         videoFrameSummary: buildStoryboardVideoFrameReferenceSummary(
-          _0x558e3f.map((_0x939c55) => ({ ..._0x939c55, sentAsImage: true })),
+          list22.map((args7) => ({ ...args7, sentAsImage: true })),
         ),
       }),
-      _0x3ebfa8 = await generateText({
-        ..._0x4a8c0a,
-        prompt: _0x113241,
-        inputImageUrls: _0xc1aa8a,
-        inputUrls: [..._0xc1aa8a, ...(_0x4a8c0a.inputVideoUrls || [])],
+      generateText2 = await generateText({
+        ...videoLabels2,
+        prompt: prompt,
+        inputImageUrls: inputImageUrls,
+        inputUrls: [...inputImageUrls, ...(videoLabels2.inputVideoUrls || [])],
       }),
-      _0x42ba12 = normalizeStoryboardScriptGenerationResult(extractGeneratedText(_0x3ebfa8).trim(), {
+      response11 = normalizeStoryboardScriptGenerationResult(extractGeneratedText(generateText2).trim(), {
         requireMarker: true,
         sourceMode: 'video',
       });
-    if (!_0x42ba12.ok) throw new Error(storyboardScriptText('errors.invalidJsonTooManyFrames'));
-    if (!_0x54f1d0) _0x54f1d0 = _0x42ba12.title;
-    _0xd94cd0.push(..._0x42ba12.rows);
+    if (!response11.ok) throw new Error(storyboardScriptText('errors.invalidJsonTooManyFrames'));
+    if (!title2) title2 = response11.title;
+    rows4.push(...response11.rows);
   }
   return {
     text: buildCombinedStoryboardBatchJson({
-      rows: _0xd94cd0,
-      title: _0x54f1d0 || getStoryboardScriptDefaultName(),
+      rows: rows4,
+      title: title2 || getStoryboardScriptDefaultName(),
     }),
   };
 }
-function resolveStoryboardScriptTextModel(_0x362e9d = {}) {
-  const _0x12b8f3 = String(
-    _0x362e9d.storyboardScript?.model || _0x362e9d.model || STORYBOARD_SCRIPT_TEXT_MODEL,
+function resolveStoryboardScriptTextModel(options3 = {}) {
+  const value27 = String(
+    options3.storyboardScript?.model || options3.model || STORYBOARD_SCRIPT_TEXT_MODEL,
   ).trim();
-  return _0x12b8f3 || STORYBOARD_SCRIPT_TEXT_MODEL;
+  return value27 || STORYBOARD_SCRIPT_TEXT_MODEL;
 }
-function resolveStoryboardScriptTextProvider(_0x810093 = {}) {
-  const _0x5ed63e = String(
-    _0x810093.storyboardScript?.provider || _0x810093.provider || STORYBOARD_SCRIPT_TEXT_PROVIDER,
+function resolveStoryboardScriptTextProvider(options4 = {}) {
+  const value28 = String(
+    options4.storyboardScript?.provider || options4.provider || STORYBOARD_SCRIPT_TEXT_PROVIDER,
   ).trim();
-  return _0x5ed63e || STORYBOARD_SCRIPT_TEXT_PROVIDER;
+  return value28 || STORYBOARD_SCRIPT_TEXT_PROVIDER;
 }
 function buildStoryboardScriptStatePatch({
-  current: _0x32d7aa,
-  prompt: _0x2801a4,
-  model: _0x59d5b0,
-  provider: _0x1ea366,
+  current: current2,
+  prompt: prompt2,
+  model: model,
+  provider: provider,
   sourceMode: sourceMode = '',
-  status: _0x2dcc37,
+  status: status,
   normalized: normalized = null,
   error: error = '',
   referenceImageRefs: referenceImageRefs = null,
 }) {
-  const _0x2558b2 = normalized?.rows ?? _0x32d7aa.rows ?? [],
-    _0x180fc3 = buildCanonicalStoryboardScriptJson({ ..._0x32d7aa, ...(normalized || {}), rows: _0x2558b2 });
+  const rows5 = normalized?.rows ?? current2.rows ?? [],
+    title3 = buildCanonicalStoryboardScriptJson({ ...current2, ...(normalized || {}), rows: rows5 });
   return {
-    ..._0x32d7aa,
+    ...current2,
     version: 1,
-    viewMode: _0x32d7aa.viewMode || 'list',
-    prompt: _0x2801a4,
-    model: _0x59d5b0,
-    provider: _0x1ea366,
-    sourceMode: normalized?.sourceMode || sourceMode || _0x32d7aa.sourceMode || 'text',
-    isGenerating: _0x2dcc37 === 'running',
-    jobStatus: _0x2dcc37,
+    viewMode: current2.viewMode || 'list',
+    prompt: prompt2,
+    model: model,
+    provider: provider,
+    sourceMode: normalized?.sourceMode || sourceMode || current2.sourceMode || 'text',
+    isGenerating: status === 'running',
+    jobStatus: status,
     jobError: error,
-    rawJson: normalized?.rawJson ?? _0x32d7aa.rawJson ?? '',
-    canonicalJson: JSON.stringify(_0x180fc3, null, 2),
-    rows: _0x2558b2,
+    rawJson: normalized?.rawJson ?? current2.rawJson ?? '',
+    canonicalJson: JSON.stringify(title3, null, 2),
+    rows: rows5,
     selectedRowIndexes: normalized
       ? []
-      : normalizeStoryboardScriptSelectedRowIndexes(_0x32d7aa.selectedRowIndexes, _0x2558b2.length),
-    selectionMode: normalized ? false : _0x32d7aa.selectionMode === true,
-    title: _0x180fc3.title,
-    detectedIntent: _0x180fc3.detectedIntent,
+      : normalizeStoryboardScriptSelectedRowIndexes(current2.selectedRowIndexes, rows5.length),
+    selectionMode: normalized ? false : current2.selectionMode === true,
+    title: title3.title,
+    detectedIntent: title3.detectedIntent,
     referenceImageRefs: Array.isArray(referenceImageRefs)
       ? referenceImageRefs
-      : Array.isArray(_0x32d7aa.referenceImageRefs)
-        ? _0x32d7aa.referenceImageRefs
+      : Array.isArray(current2.referenceImageRefs)
+        ? current2.referenceImageRefs
         : [],
-    warnings: normalized?.warnings ?? _0x32d7aa.warnings ?? [],
+    warnings: normalized?.warnings ?? current2.warnings ?? [],
     updatedAt: Date.now(),
   };
 }
 function createToolbarButton({
-  action: _0x1cb258,
-  label: _0xdcfd01,
-  tooltip: _0x1cc501,
-  iconHtml: _0x24431a,
+  action: action,
+  label: label7,
+  tooltip: tooltip,
+  iconHtml: iconHtml,
   showLabel: showLabel = false,
 }) {
-  const _0x538e29 = document.createElement('button');
+  const el4 = document.createElement('button');
   return (
-    (_0x538e29.type = 'button'),
-    (_0x538e29.className = ['ftb-btn', showLabel ? '' : 'icon-only', 'act-' + _0x1cb258]
-      .filter(Boolean)
-      .join(' ')),
-    (_0x538e29.dataset.tooltip = _0x1cc501 || _0xdcfd01),
-    _0x538e29.setAttribute('aria-label', _0xdcfd01),
-    (_0x538e29.innerHTML = showLabel ? _0x24431a + '<span>' + _0xdcfd01 + '</span>' : _0x24431a),
-    _0x538e29
+    (el4.type = 'button'),
+    (el4.className = ['ftb-btn', showLabel ? '' : 'icon-only', 'act-' + action].filter(Boolean).join(' ')),
+    (el4.dataset.tooltip = tooltip || label7),
+    el4.setAttribute('aria-label', label7),
+    (el4.innerHTML = showLabel ? iconHtml + '<span>' + label7 + '</span>' : iconHtml),
+    el4
   );
 }
-function setToolbarButtonLabel(_0x306fa2, _0x5951bc) {
-  if (!_0x306fa2) return;
-  ((_0x306fa2.dataset.tooltip = _0x5951bc), _0x306fa2.setAttribute('aria-label', _0x5951bc));
-  const _0x34af5a = _0x306fa2.querySelector('span');
-  if (_0x34af5a) _0x34af5a.textContent = _0x5951bc;
+function setToolbarButtonLabel(el5, value29) {
+  if (!el5) return;
+  ((el5.dataset.tooltip = value29), el5.setAttribute('aria-label', value29));
+  const el6 = el5.querySelector('span');
+  if (el6) el6.textContent = value29;
 }
-function replaceModelTriggerIcon(_0x24e1c6, _0x592756) {
-  const _0x38d5eb = _0x24e1c6?.firstElementChild,
-    _0x1ec7ad = String(_0x592756 || '').trim();
-  if (!_0x38d5eb || !_0x1ec7ad) return;
-  const _0x4b377a = _0x24e1c6.dataset?.storyboardModelIconHtml || '';
-  if (_0x4b377a === _0x1ec7ad) return;
-  if (!_0x4b377a && String(_0x38d5eb.outerHTML || '').trim() === _0x1ec7ad) {
-    _0x24e1c6.dataset.storyboardModelIconHtml = _0x1ec7ad;
+function replaceModelTriggerIcon(el7, value30) {
+  const enabled5 = el7?.firstElementChild,
+    enabled6 = String(value30 || '').trim();
+  if (!enabled5 || !enabled6) return;
+  const enabled7 = el7.dataset?.storyboardModelIconHtml || '';
+  if (enabled7 === enabled6) return;
+  if (!enabled7 && String(enabled5.outerHTML || '').trim() === enabled6) {
+    el7.dataset.storyboardModelIconHtml = enabled6;
     return;
   }
-  const _0x5b59ec = document.createElement('template');
-  _0x5b59ec.innerHTML = _0x1ec7ad;
-  const _0x5bcff5 = _0x5b59ec.content.firstElementChild;
-  if (!_0x5bcff5) return;
-  ((_0x24e1c6.dataset.storyboardModelIconHtml = _0x1ec7ad), _0x38d5eb.replaceWith(_0x5bcff5));
+  const el8 = document.createElement('template');
+  el8.innerHTML = enabled6;
+  const enabled8 = el8.content.firstElementChild;
+  if (!enabled8) return;
+  ((el7.dataset.storyboardModelIconHtml = enabled6), enabled5.replaceWith(enabled8));
 }
-function escapePromptTextForHtml(_0x5db4d4) {
-  return String(_0x5db4d4 || '')
+function escapePromptTextForHtml(value31) {
+  return String(value31 || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
-function getStoryboardRowImagePrompt(_0x3651d2) {
-  if (!_0x3651d2 || typeof _0x3651d2 !== 'object') return '';
+function getStoryboardRowImagePrompt(enabled9) {
+  if (!enabled9 || typeof enabled9 !== 'object') return '';
   return formatCellValue(
-    _0x3651d2['图片提示词'] ??
-      _0x3651d2.imagePrompt ??
-      _0x3651d2.image_prompt ??
-      _0x3651d2.imagePromptText ??
-      '',
+    enabled9['图片提示词'] ?? enabled9.imagePrompt ?? enabled9.image_prompt ?? enabled9.imagePromptText ?? '',
   ).trim();
 }
-function getStoryboardRowShotNo(_0x5d6e50, _0x26c684) {
-  return formatCellValue(
-    _0x5d6e50?.['镜号'] ?? _0x5d6e50?.shotNo ?? _0x5d6e50?.shotNumber ?? _0x26c684 + 1,
-  ).trim();
+function getStoryboardRowShotNo(value32, value33) {
+  return formatCellValue(value32?.['镜号'] ?? value32?.shotNo ?? value32?.shotNumber ?? value33 + 1).trim();
 }
-function clonePlainObject(_0x5150ee) {
-  if (!_0x5150ee || typeof _0x5150ee !== 'object' || Array.isArray(_0x5150ee)) return null;
+function clonePlainObject(args8) {
+  if (!args8 || typeof args8 !== 'object' || Array.isArray(args8)) return null;
   try {
-    return JSON.parse(JSON.stringify(_0x5150ee));
+    return JSON.parse(JSON.stringify(args8));
   } catch {
-    return { ..._0x5150ee };
+    return { ...args8 };
   }
 }
-function getPlainObject(_0x33083a) {
-  return _0x33083a && typeof _0x33083a === 'object' && !Array.isArray(_0x33083a) ? { ..._0x33083a } : {};
+function getPlainObject(args9) {
+  return args9 && typeof args9 === 'object' && !Array.isArray(args9) ? { ...args9 } : {};
 }
-function getImageNodeSizeForAspectRatio(_0x9a793f) {
-  const _0xa640cb = getAIGenerationDefaultSizeByType('ai-image'),
-    _0x582f75 = buildImageDisplayRatioResizePatch({
-      nodeData: { x: 0, y: 0, width: _0xa640cb.width, height: _0xa640cb.height },
-      ratioValue: _0x9a793f,
-      minSide: Math.min(_0xa640cb.width, _0xa640cb.height),
+function getImageNodeSizeForAspectRatio(ratioValue) {
+  const width = getAIGenerationDefaultSizeByType('ai-image'),
+    box = buildImageDisplayRatioResizePatch({
+      nodeData: { x: 0, y: 0, width: width.width, height: width.height },
+      ratioValue: ratioValue,
+      minSide: Math.min(width.width, width.height),
     });
   return {
-    width: Number(_0x582f75.width) || _0xa640cb.width,
-    height: Number(_0x582f75.height) || _0xa640cb.height,
+    width: Number(box.width) || width.width,
+    height: Number(box.height) || width.height,
   };
 }
-function sanitizeExportFileName(_0x2eff9) {
-  const _0x37d912 = String(_0x2eff9 || '')
+function sanitizeExportFileName(value34) {
+  const value35 = String(value34 || '')
     .trim()
     .replace(/[\\/:*?"<>|]/g, '_')
     .replace(/\s+/g, '_')
     .slice(0, 80);
-  return _0x37d912 || getStoryboardScriptDefaultName();
+  return value35 || getStoryboardScriptDefaultName();
 }
-function formatExportTimestamp(_0x6725fa = new Date()) {
-  const _0x3364c4 = (_0x4b6e3b) => String(_0x4b6e3b).padStart(2, '0');
+function formatExportTimestamp(value36 = new Date()) {
+  const run = (value37) => String(value37).padStart(2, '0');
   return [
-    _0x6725fa.getFullYear(),
-    _0x3364c4(_0x6725fa.getMonth() + 1),
-    _0x3364c4(_0x6725fa.getDate()),
+    value36.getFullYear(),
+    run(value36.getMonth() + 1),
+    run(value36.getDate()),
     '-',
-    _0x3364c4(_0x6725fa.getHours()),
-    _0x3364c4(_0x6725fa.getMinutes()),
-    _0x3364c4(_0x6725fa.getSeconds()),
+    run(value36.getHours()),
+    run(value36.getMinutes()),
+    run(value36.getSeconds()),
   ].join('');
 }
-function downloadTextFile({ filename: _0x321949, content: _0x1288bd, mimeType: _0xf92d76 }) {
-  const _0x55d733 = new Blob([_0x1288bd], { type: _0xf92d76 }),
-    _0x59f026 = URL.createObjectURL(_0x55d733),
-    _0x4c5edf = document.createElement('a');
-  ((_0x4c5edf.href = _0x59f026),
-    (_0x4c5edf.download = _0x321949),
-    (_0x4c5edf.rel = 'noopener'),
-    document.body.appendChild(_0x4c5edf),
-    _0x4c5edf.click(),
-    _0x4c5edf.remove(),
-    window.setTimeout(() => URL.revokeObjectURL(_0x59f026), 0));
+function downloadTextFile({ filename: filename, content: content, mimeType: mimeType }) {
+  const blob = new Blob([content], { type: mimeType }),
+    value38 = URL.createObjectURL(blob),
+    el9 = document.createElement('a');
+  ((el9.href = value38),
+    (el9.download = filename),
+    (el9.rel = 'noopener'),
+    document.body.appendChild(el9),
+    el9.click(),
+    el9.remove(),
+    window.setTimeout(() => URL.revokeObjectURL(value38), 0));
 }
-function focusStoryboardImageBatch(_0x56cbe7, _0x2f993b) {
-  const _0x3c9abf = [_0x56cbe7, _0x2f993b].map((_0x344e37) => String(_0x344e37 || '').trim()).filter(Boolean);
-  if (_0x3c9abf.length === 0) return;
-  appStore.setSelectedNodes(_0x3c9abf);
-  const _0x1da7e0 = typeof window !== 'undefined' ? window : null;
+function focusStoryboardImageBatch(value39, value40) {
+  const list23 = [value39, value40].map((item12) => String(item12 || '').trim()).filter(Boolean);
+  if (list23.length === 0) return;
+  appStore.setSelectedNodes(list23);
+  const value41 = typeof window !== 'undefined' ? window : null;
   try {
-    if (typeof _0x1da7e0?.v2FocusOnNodes === 'function') _0x1da7e0.v2FocusOnNodes(_0x3c9abf, 80, 0x320);
+    if (typeof value41?.v2FocusOnNodes === 'function') value41.v2FocusOnNodes(list23, 80, 0x320);
     else
-      typeof _0x1da7e0?.v2FocusOnNode === 'function' &&
-        _0x1da7e0.v2FocusOnNode(_0x3c9abf[_0x3c9abf.length - 1], 80, 0x320);
-  } catch (_0x21822c) {
-    console.warn('[StoryboardScriptNode] focus created image batch failed', _0x21822c);
+      typeof value41?.v2FocusOnNode === 'function' &&
+        value41.v2FocusOnNode(list23[list23.length - 1], 80, 0x320);
+  } catch (value42) {
+    console.warn('[StoryboardScriptNode] focus created image batch failed', value42);
   }
 }
 function createStoryboardScriptLoadingOverlay() {
-  const _0x41814f = document.createElement('div');
-  ((_0x41814f.className = 'storyboard-script-loading-overlay'),
-    _0x41814f.setAttribute('role', 'status'),
-    _0x41814f.setAttribute('aria-live', 'polite'));
-  const _0x2d4b87 = document.createElement('div');
-  ((_0x2d4b87.className = 'storyboard-script-loading-spinner'), _0x41814f.appendChild(_0x2d4b87));
-  const _0x27a52a = document.createElement('div');
-  ((_0x27a52a.className = 'storyboard-script-loading-label'),
-    (_0x27a52a.textContent = storyboardScriptText('loading')),
-    _0x41814f.appendChild(_0x27a52a));
-  const _0x56396d = document.createElement('div');
-  _0x56396d.className = 'storyboard-script-loading-bar';
-  const _0x3907fe = document.createElement('div');
+  const el10 = document.createElement('div');
+  ((el10.className = 'storyboard-script-loading-overlay'),
+    el10.setAttribute('role', 'status'),
+    el10.setAttribute('aria-live', 'polite'));
+  const value43 = document.createElement('div');
+  ((value43.className = 'storyboard-script-loading-spinner'), el10.appendChild(value43));
+  const el11 = document.createElement('div');
+  ((el11.className = 'storyboard-script-loading-label'),
+    (el11.textContent = storyboardScriptText('loading')),
+    el10.appendChild(el11));
+  const el12 = document.createElement('div');
+  el12.className = 'storyboard-script-loading-bar';
+  const value44 = document.createElement('div');
   return (
-    (_0x3907fe.className = 'storyboard-script-loading-bar-fill'),
-    _0x56396d.appendChild(_0x3907fe),
-    _0x41814f.appendChild(_0x56396d),
-    _0x41814f
+    (value44.className = 'storyboard-script-loading-bar-fill'),
+    el12.appendChild(value44),
+    el10.appendChild(el12),
+    el10
   );
 }
 function waitForStoryboardLoadingPaint() {
-  const _0x467a93 = typeof window !== 'undefined' ? window : null;
-  if (!_0x467a93) return Promise.resolve();
-  return new Promise((_0x1958e4) => {
-    const _0x250c24 = () => _0x1958e4();
-    if (typeof _0x467a93.requestAnimationFrame === 'function') {
-      _0x467a93.requestAnimationFrame(() => {
-        typeof _0x467a93.setTimeout === 'function' ? _0x467a93.setTimeout(_0x250c24, 0) : _0x250c24();
+  const enabled10 = typeof window !== 'undefined' ? window : null;
+  if (!enabled10) return Promise.resolve();
+  return new Promise((handler3) => {
+    const run2 = () => handler3();
+    if (typeof enabled10.requestAnimationFrame === 'function') {
+      enabled10.requestAnimationFrame(() => {
+        typeof enabled10.setTimeout === 'function' ? enabled10.setTimeout(run2, 0) : run2();
       });
       return;
     }
-    if (typeof _0x467a93.setTimeout === 'function') {
-      _0x467a93.setTimeout(_0x250c24, 0);
+    if (typeof enabled10.setTimeout === 'function') {
+      enabled10.setTimeout(run2, 0);
       return;
     }
-    _0x250c24();
+    run2();
   });
 }
 function createSvgIcon() {
-  const _0x3e1572 = 'http://www.w3.org/2000/svg',
-    _0x189aa9 = document.createElementNS(_0x3e1572, 'svg');
-  (_0x189aa9.setAttribute('width', '16'),
-    _0x189aa9.setAttribute('height', '16'),
-    _0x189aa9.setAttribute('viewBox', '0 0 24 24'),
-    _0x189aa9.setAttribute('fill', 'none'),
-    _0x189aa9.setAttribute('stroke', 'currentColor'),
-    _0x189aa9.setAttribute('stroke-width', '2'));
-  const _0x144bbd = document.createElementNS(_0x3e1572, 'rect');
-  (_0x144bbd.setAttribute('x', '3'),
-    _0x144bbd.setAttribute('y', '4'),
-    _0x144bbd.setAttribute('width', '18'),
-    _0x144bbd.setAttribute('height', '16'),
-    _0x144bbd.setAttribute('rx', '2'),
-    _0x189aa9.appendChild(_0x144bbd),
-    ['9', '14'].forEach((_0x5ae38a) => {
-      const _0x26707d = document.createElementNS(_0x3e1572, 'line');
-      (_0x26707d.setAttribute('x1', '3'),
-        _0x26707d.setAttribute('y1', _0x5ae38a),
-        _0x26707d.setAttribute('x2', '21'),
-        _0x26707d.setAttribute('y2', _0x5ae38a),
-        _0x189aa9.appendChild(_0x26707d));
+  const value45 = 'http://www.w3.org/2000/svg',
+    el13 = document.createElementNS(value45, 'svg');
+  (el13.setAttribute('width', '16'),
+    el13.setAttribute('height', '16'),
+    el13.setAttribute('viewBox', '0 0 24 24'),
+    el13.setAttribute('fill', 'none'),
+    el13.setAttribute('stroke', 'currentColor'),
+    el13.setAttribute('stroke-width', '2'));
+  const el14 = document.createElementNS(value45, 'rect');
+  (el14.setAttribute('x', '3'),
+    el14.setAttribute('y', '4'),
+    el14.setAttribute('width', '18'),
+    el14.setAttribute('height', '16'),
+    el14.setAttribute('rx', '2'),
+    el13.appendChild(el14),
+    ['9', '14'].forEach((item13) => {
+      const el15 = document.createElementNS(value45, 'line');
+      (el15.setAttribute('x1', '3'),
+        el15.setAttribute('y1', item13),
+        el15.setAttribute('x2', '21'),
+        el15.setAttribute('y2', item13),
+        el13.appendChild(el15));
     }));
-  const _0x9a0ce2 = document.createElementNS(_0x3e1572, 'line');
+  const el16 = document.createElementNS(value45, 'line');
   return (
-    _0x9a0ce2.setAttribute('x1', '8'),
-    _0x9a0ce2.setAttribute('y1', '4'),
-    _0x9a0ce2.setAttribute('x2', '8'),
-    _0x9a0ce2.setAttribute('y2', '20'),
-    _0x189aa9.appendChild(_0x9a0ce2),
-    _0x189aa9
+    el16.setAttribute('x1', '8'),
+    el16.setAttribute('y1', '4'),
+    el16.setAttribute('x2', '8'),
+    el16.setAttribute('y2', '20'),
+    el13.appendChild(el16),
+    el13
   );
 }
 export class StoryboardScriptNode {
-  constructor(_0x2ff145) {
-    ((this._data = _0x2ff145 || {}),
+  constructor(value46) {
+    ((this._data = value46 || {}),
       (this.nodeId = this._data.id),
       (this.refBarEl = null),
       (this.promptEl = null),
@@ -817,39 +802,37 @@ export class StoryboardScriptNode {
   }
   ['mount']() {
     this.el.replaceChildren();
-    const _0x77868 = document.createElement('div');
-    _0x77868.className = 'storyboard-script-header';
-    const _0x4d17a4 = document.createElement('div');
-    ((_0x4d17a4.className = 'storyboard-script-title'), _0x4d17a4.appendChild(createSvgIcon()));
-    const _0x32354f = document.createElement('span');
-    ((_0x32354f.textContent = getStoryboardScriptDefaultName()), _0x4d17a4.appendChild(_0x32354f));
-    const _0x437b9a = document.createElement('span');
-    ((_0x437b9a.className = 'storyboard-script-beta'),
-      (_0x437b9a.textContent = 'BETA'),
-      _0x4d17a4.appendChild(_0x437b9a));
-    const _0x261c78 = document.createElement('div');
-    _0x261c78.className = 'storyboard-script-header-controls';
-    const _0x2d1bf2 = document.createElement('div');
-    ((_0x2d1bf2.className = 'storyboard-script-media-switch'),
-      _0x2d1bf2.setAttribute('role', 'group'),
-      _0x2d1bf2.setAttribute('aria-label', storyboardScriptText('mediaModeAria')),
+    const el17 = document.createElement('div');
+    el17.className = 'storyboard-script-header';
+    const el18 = document.createElement('div');
+    ((el18.className = 'storyboard-script-title'), el18.appendChild(createSvgIcon()));
+    const el19 = document.createElement('span');
+    ((el19.textContent = getStoryboardScriptDefaultName()), el18.appendChild(el19));
+    const el20 = document.createElement('span');
+    ((el20.className = 'storyboard-script-beta'), (el20.textContent = 'BETA'), el18.appendChild(el20));
+    const el21 = document.createElement('div');
+    el21.className = 'storyboard-script-header-controls';
+    const el22 = document.createElement('div');
+    ((el22.className = 'storyboard-script-media-switch'),
+      el22.setAttribute('role', 'group'),
+      el22.setAttribute('aria-label', storyboardScriptText('mediaModeAria')),
       (this._imageModeBtn = this._createMediaModeButton('image', storyboardScriptText('mediaMode.image'))),
       (this._videoModeBtn = this._createMediaModeButton('video', storyboardScriptText('mediaMode.video'))),
-      _0x2d1bf2.appendChild(this._imageModeBtn),
-      _0x2d1bf2.appendChild(this._videoModeBtn));
-    const _0x1f919b = document.createElement('div');
+      el22.appendChild(this._imageModeBtn),
+      el22.appendChild(this._videoModeBtn));
+    const el23 = document.createElement('div');
     return (
-      (_0x1f919b.className = 'storyboard-script-view-switch'),
-      _0x1f919b.setAttribute('role', 'group'),
-      _0x1f919b.setAttribute('aria-label', storyboardScriptText('viewModeAria')),
+      (el23.className = 'storyboard-script-view-switch'),
+      el23.setAttribute('role', 'group'),
+      el23.setAttribute('aria-label', storyboardScriptText('viewModeAria')),
       (this._listBtn = this._createModeButton('list', storyboardScriptText('viewMode.list'))),
       (this._cardBtn = this._createModeButton('card', storyboardScriptText('viewMode.card'))),
-      _0x1f919b.appendChild(this._listBtn),
-      _0x1f919b.appendChild(this._cardBtn),
-      _0x261c78.appendChild(_0x2d1bf2),
-      _0x261c78.appendChild(_0x1f919b),
-      _0x77868.appendChild(_0x4d17a4),
-      _0x77868.appendChild(_0x261c78),
+      el23.appendChild(this._listBtn),
+      el23.appendChild(this._cardBtn),
+      el21.appendChild(el22),
+      el21.appendChild(el23),
+      el17.appendChild(el18),
+      el17.appendChild(el21),
       (this._bodyEl = document.createElement('div')),
       (this._bodyEl.className = 'storyboard-script-body'),
       this._bindBodyInteractions(),
@@ -862,19 +845,19 @@ export class StoryboardScriptNode {
           allowCustomModels: false,
           defaultModel: STORYBOARD_SCRIPT_TEXT_MODEL,
           model: resolveStoryboardScriptTextModel(this._data),
-          onSelect: ({ modelId: _0x165724, provider: _0x51f210 }) => {
-            const _0x6d8065 = this._getScriptState(),
-              _0x4a8ca4 = { ..._0x6d8065, model: _0x165724, provider: _0x51f210, sourceMode: 'text' };
+          onSelect: ({ modelId: modelId, provider: provider2 }) => {
+            const args10 = this._getScriptState(),
+              storyboardScript = { ...args10, model: modelId, provider: provider2, sourceMode: 'text' };
             ((this._data = {
               ...this._data,
-              model: _0x165724,
-              provider: _0x51f210,
-              storyboardScript: _0x4a8ca4,
+              model: modelId,
+              provider: provider2,
+              storyboardScript: storyboardScript,
             }),
               appStore.updateNodeData(this.nodeId, {
-                model: _0x165724,
-                provider: _0x51f210,
-                storyboardScript: _0x4a8ca4,
+                model: modelId,
+                provider: provider2,
+                storyboardScript: storyboardScript,
               }));
           },
         },
@@ -884,7 +867,7 @@ export class StoryboardScriptNode {
       this._installStoryboardImagePromptSchemaControls(),
       this._installStoryboardQueueButton(),
       this._bindStoryboardImageModelTrigger(),
-      this.el.appendChild(_0x77868),
+      this.el.appendChild(el17),
       this.el.appendChild(this._bodyEl),
       (this._toolbarEl = this._createToolbar()),
       this.el.appendChild(this._toolbarEl),
@@ -904,14 +887,14 @@ export class StoryboardScriptNode {
     );
   }
   ['_createToolbar']() {
-    const _0x5c1c26 = document.createElement('div');
+    const el24 = document.createElement('div');
     return (
-      (_0x5c1c26.className = 'node-floating-toolbar v2-text-toolbar v2-storyboard-script-toolbar'),
-      _0x5c1c26.addEventListener('pointerdown', (_0x11ce37) => {
-        _0x11ce37.stopPropagation();
+      (el24.className = 'node-floating-toolbar v2-text-toolbar v2-storyboard-script-toolbar'),
+      el24.addEventListener('pointerdown', (event2) => {
+        event2.stopPropagation();
       }),
-      _0x5c1c26.addEventListener('dblclick', (_0x1fc4b6) => {
-        (_0x1fc4b6.preventDefault(), _0x1fc4b6.stopPropagation());
+      el24.addEventListener('dblclick', (event3) => {
+        (event3.preventDefault(), event3.stopPropagation());
       }),
       (this._toolbarGenerateBtn = createToolbarButton({
         action: 'generate-storyboard',
@@ -920,10 +903,10 @@ export class StoryboardScriptNode {
         iconHtml: STORYBOARD_TOOLBAR_GENERATE_ICON_HTML,
         showLabel: true,
       })),
-      this._toolbarGenerateBtn.addEventListener('click', (_0x33e777) => {
-        _0x33e777.stopPropagation();
-        const _0x57558f = this._getScriptState();
-        _0x57558f.selectionMode === true ? this._cancelSelectionMode() : this._enterSelectionMode();
+      this._toolbarGenerateBtn.addEventListener('click', (event4) => {
+        event4.stopPropagation();
+        const value47 = this._getScriptState();
+        value47.selectionMode === true ? this._cancelSelectionMode() : this._enterSelectionMode();
       }),
       (this._toolbarFullscreenBtn = createToolbarButton({
         action: 'fullscreen-script',
@@ -931,8 +914,8 @@ export class StoryboardScriptNode {
         tooltip: storyboardScriptText('toolbar.fullscreen'),
         iconHtml: STORYBOARD_TOOLBAR_FULLSCREEN_ICON_HTML,
       })),
-      this._toolbarFullscreenBtn.addEventListener('click', (_0x2577b3) => {
-        (_0x2577b3.stopPropagation(), this._openFullscreenScript());
+      this._toolbarFullscreenBtn.addEventListener('click', (event5) => {
+        (event5.stopPropagation(), this._openFullscreenScript());
       }),
       (this._toolbarDownloadBtn = createToolbarButton({
         action: 'download-table',
@@ -940,25 +923,25 @@ export class StoryboardScriptNode {
         tooltip: storyboardScriptText('toolbar.downloadTable'),
         iconHtml: STORYBOARD_TOOLBAR_DOWNLOAD_ICON_HTML,
       })),
-      this._toolbarDownloadBtn.addEventListener('click', (_0x44a687) => {
-        (_0x44a687.stopPropagation(), this._downloadScriptTable());
+      this._toolbarDownloadBtn.addEventListener('click', (event6) => {
+        (event6.stopPropagation(), this._downloadScriptTable());
       }),
-      _0x5c1c26.appendChild(this._toolbarGenerateBtn),
-      _0x5c1c26.appendChild(this._toolbarFullscreenBtn),
-      _0x5c1c26.appendChild(this._toolbarDownloadBtn),
-      _0x5c1c26
+      el24.appendChild(this._toolbarGenerateBtn),
+      el24.appendChild(this._toolbarFullscreenBtn),
+      el24.appendChild(this._toolbarDownloadBtn),
+      el24
     );
   }
   ['_bindOutsideSelectionCancel']() {
     (this._unbindOutsideSelectionCancel(),
-      (this._onDocumentPointerDown = (_0x57f156) => {
-        const _0x3fbb61 = this._getScriptState();
-        if (_0x3fbb61.selectionMode !== true) return;
-        const _0x1dc977 = _0x57f156.target;
-        if (!(_0x1dc977 instanceof Element)) return;
-        const _0x3a081e = document.getElementById(this.nodeId);
-        if (this._fullscreenOverlayEl?.contains(_0x1dc977)) return;
-        if (this.el.contains(_0x1dc977) || _0x3a081e?.contains(_0x1dc977)) return;
+      (this._onDocumentPointerDown = (event7) => {
+        const value48 = this._getScriptState();
+        if (value48.selectionMode !== true) return;
+        const value49 = event7.target;
+        if (!(value49 instanceof Element)) return;
+        const value50 = document.getElementById(this.nodeId);
+        if (this._fullscreenOverlayEl?.contains(value49)) return;
+        if (this.el.contains(value49) || value50?.contains(value49)) return;
         this._cancelSelectionMode();
       }),
       document.addEventListener('pointerdown', this._onDocumentPointerDown, true));
@@ -969,22 +952,22 @@ export class StoryboardScriptNode {
       (this._onDocumentPointerDown = null));
   }
   ['_bindStoryboardImageModelTrigger']() {
-    const _0x3752a8 = this._promptPanelEl?.querySelector('.img-model-btn-trigger');
-    if (!_0x3752a8) return;
-    ((this._onModelTriggerClickCapture = (_0x6f02cd) => {
-      const _0x42e2c9 = this._getScriptState();
-      if (_0x42e2c9.selectionMode !== true) return;
-      (_0x6f02cd.preventDefault(),
-        _0x6f02cd.stopPropagation(),
-        _0x6f02cd.stopImmediatePropagation?.(),
+    const el25 = this._promptPanelEl?.querySelector('.img-model-btn-trigger');
+    if (!el25) return;
+    ((this._onModelTriggerClickCapture = (event8) => {
+      const value51 = this._getScriptState();
+      if (value51.selectionMode !== true) return;
+      (event8.preventDefault(),
+        event8.stopPropagation(),
+        event8.stopImmediatePropagation?.(),
         this._toggleStoryboardImageModelMenu());
     }),
-      _0x3752a8.addEventListener('click', this._onModelTriggerClickCapture, { capture: true }));
+      el25.addEventListener('click', this._onModelTriggerClickCapture, { capture: true }));
   }
   ['_unbindStoryboardImageModelTrigger']() {
-    const _0x3d5242 = this._promptPanelEl?.querySelector('.img-model-btn-trigger');
-    if (!_0x3d5242 || !this._onModelTriggerClickCapture) return;
-    (_0x3d5242.removeEventListener('click', this._onModelTriggerClickCapture, { capture: true }),
+    const el26 = this._promptPanelEl?.querySelector('.img-model-btn-trigger');
+    if (!el26 || !this._onModelTriggerClickCapture) return;
+    (el26.removeEventListener('click', this._onModelTriggerClickCapture, { capture: true }),
       (this._onModelTriggerClickCapture = null));
   }
   ['_removeStoryboardImageModelMenu']() {
@@ -992,294 +975,294 @@ export class StoryboardScriptNode {
       (this._storyboardImageModelMenu = null),
       (this._storyboardImageModelMenuBound = false));
   }
-  ['_getStoryboardImagePromptNodeData'](_0x343b18 = this._data, _0x875c46 = null) {
-    const _0x267d6f = _0x875c46 || createDefaultStoryboardScriptState(_0x343b18?.storyboardScript || {}),
-      _0x8f9485 = normalizeDreaminaImageModel(
-        _0x267d6f.imageModel || DEFAULT_IMAGE_NODE_MODEL,
-        _0x267d6f.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
+  ['_getStoryboardImagePromptNodeData'](value52 = this._data, value53 = null) {
+    const provider3 = value53 || createDefaultStoryboardScriptState(value52?.storyboardScript || {}),
+      model2 = normalizeDreaminaImageModel(
+        provider3.imageModel || DEFAULT_IMAGE_NODE_MODEL,
+        provider3.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
       );
     return {
-      ...(_0x343b18 || {}),
+      ...(value52 || {}),
       type: 'ai-image',
-      model: _0x8f9485,
-      provider: _0x267d6f.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
-      generationParams: getPlainObject(_0x343b18?.generationParams),
-      generationParamsByModel: getPlainObject(_0x343b18?.generationParamsByModel),
+      model: model2,
+      provider: provider3.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
+      generationParams: getPlainObject(value52?.generationParams),
+      generationParamsByModel: getPlainObject(value52?.generationParamsByModel),
     };
   }
   ['_installStoryboardImagePromptSchemaControls']() {
-    const _0x55620a = this._promptPanelEl?.querySelector('.prompt-panel-footer'),
-      _0x29b7da = _0x55620a?.querySelector('.img-model-pills'),
-      _0x551522 = _0x29b7da?.querySelector('.img-model-wrap'),
-      _0x4d76ea = _0x55620a?.querySelector('.prompt-actions'),
-      _0x5d2a55 = _0x4d76ea?.querySelector('.debug-wrench-btn');
-    if (!_0x55620a || !_0x29b7da || !_0x551522 || !_0x4d76ea || !_0x5d2a55) return;
-    const _0x3a850f = (_0x5e589f) => {
-      const _0x5b7873 = document.createElement('div');
+    const el27 = this._promptPanelEl?.querySelector('.prompt-panel-footer'),
+      el28 = el27?.querySelector('.img-model-pills'),
+      enabled11 = el28?.querySelector('.img-model-wrap'),
+      el29 = el27?.querySelector('.prompt-actions'),
+      enabled12 = el29?.querySelector('.debug-wrench-btn');
+    if (!el27 || !el28 || !enabled11 || !el29 || !enabled12) return;
+    const run3 = (value54) => {
+      const el30 = document.createElement('div');
       return (
-        (_0x5b7873.className = 'ui-schema-placement ' + _0x5e589f + ' storyboard-image-schema-only'),
-        (_0x5b7873.hidden = true),
-        _0x5b7873
+        (el30.className = 'ui-schema-placement ' + value54 + ' storyboard-image-schema-only'),
+        (el30.hidden = true),
+        el30
       );
     };
-    ((this.uiSchemaModeSlot = _0x3a850f('ui-schema-mode-slot')),
-      (this.uiSchemaResolutionSlot = _0x3a850f('ui-schema-resolution-slot')),
-      (this.uiSchemaBatchSlot = _0x3a850f('ui-schema-batch-slot')),
-      (this.uiSchemaInstanceSlot = _0x3a850f('ui-schema-instance-slot')),
-      _0x551522.after(this.uiSchemaModeSlot, this.uiSchemaResolutionSlot),
+    ((this.uiSchemaModeSlot = run3('ui-schema-mode-slot')),
+      (this.uiSchemaResolutionSlot = run3('ui-schema-resolution-slot')),
+      (this.uiSchemaBatchSlot = run3('ui-schema-batch-slot')),
+      (this.uiSchemaInstanceSlot = run3('ui-schema-instance-slot')),
+      enabled11.after(this.uiSchemaModeSlot, this.uiSchemaResolutionSlot),
       (this.rhAdvWrap = document.createElement('div')),
       (this.rhAdvWrap.className = 'rh-adv-wrap storyboard-image-schema-only'),
       (this.rhAdvWrap.hidden = true));
-    const _0x3c4167 = document.createElement('button');
-    ((_0x3c4167.type = 'button'), (_0x3c4167.className = 'img-pill-btn rh-adv-btn'));
-    const _0x12246e = document.createElement('span');
-    ((_0x12246e.className = 'rh-adv-btn-label'),
-      (_0x12246e.textContent = storyboardScriptText('advancedSettings')),
-      _0x3c4167.replaceChildren(_0x12246e),
-      this.rhAdvWrap.appendChild(_0x3c4167),
-      _0x4d76ea.insertBefore(this.rhAdvWrap, _0x5d2a55),
-      _0x4d76ea.insertBefore(this.uiSchemaBatchSlot, _0x5d2a55),
-      _0x4d76ea.insertBefore(this.uiSchemaInstanceSlot, _0x5d2a55),
+    const el31 = document.createElement('button');
+    ((el31.type = 'button'), (el31.className = 'img-pill-btn rh-adv-btn'));
+    const el32 = document.createElement('span');
+    ((el32.className = 'rh-adv-btn-label'),
+      (el32.textContent = storyboardScriptText('advancedSettings')),
+      el31.replaceChildren(el32),
+      this.rhAdvWrap.appendChild(el31),
+      el29.insertBefore(this.rhAdvWrap, enabled12),
+      el29.insertBefore(this.uiSchemaBatchSlot, enabled12),
+      el29.insertBefore(this.uiSchemaInstanceSlot, enabled12),
       (this.rhAdvPanelEl = document.createElement('div')),
       (this.rhAdvPanelEl.className = 'rh-adv-panel storyboard-image-schema-only'),
-      _0x55620a.appendChild(this.rhAdvPanelEl),
-      _0x3c4167.addEventListener('click', (_0x429e7b) => {
-        _0x429e7b.stopPropagation();
+      el27.appendChild(this.rhAdvPanelEl),
+      el31.addEventListener('click', (event9) => {
+        event9.stopPropagation();
         if (this.rhAdvPanelEl?.hidden) return;
-        (closeNodeFooterMenus(_0x55620a, this.rhAdvPanelEl),
+        (closeNodeFooterMenus(el27, this.rhAdvPanelEl),
           this.rhAdvPanelEl?.classList.toggle('show'),
           this._storyboardImageModelMenu?.classList.remove('show'));
       }),
-      this.rhAdvPanelEl.addEventListener('click', (_0x295666) => {
-        _0x295666.stopPropagation();
+      this.rhAdvPanelEl.addEventListener('click', (event10) => {
+        event10.stopPropagation();
       }),
       this._storyboardImageSchemaCleanup?.(),
-      (this._storyboardImageSchemaCleanup = bindModelUiSchemaControls(_0x55620a, {
+      (this._storyboardImageSchemaCleanup = bindModelUiSchemaControls(el27, {
         nodeId: this.nodeId,
         nodeData: this._getStoryboardImagePromptNodeData(),
         store: appStore,
-        decorateNodeData: (_0x4292c3) =>
+        decorateNodeData: (value55) =>
           this._getStoryboardImagePromptNodeData(
-            _0x4292c3,
-            createDefaultStoryboardScriptState(_0x4292c3?.storyboardScript || {}),
+            value55,
+            createDefaultStoryboardScriptState(value55?.storyboardScript || {}),
           ),
-        buildPatch: (_0x4d2c31, _0x203925, _0x145ef4) => {
-          const _0x2ae0b9 = createDefaultStoryboardScriptState(_0x4d2c31?.storyboardScript || {}),
-            _0x230e79 = { ..._0x2ae0b9, updatedAt: Date.now() };
-          if (_0x203925 !== 'aspectRatio') return { storyboardScript: _0x230e79 };
-          return { aspectRatio: _0x145ef4, storyboardScript: _0x230e79 };
+        buildPatch: (value56, value57, aspectRatio) => {
+          const args11 = createDefaultStoryboardScriptState(value56?.storyboardScript || {}),
+            storyboardScript2 = { ...args11, updatedAt: Date.now() };
+          if (value57 !== 'aspectRatio') return { storyboardScript: storyboardScript2 };
+          return { aspectRatio: aspectRatio, storyboardScript: storyboardScript2 };
         },
-        afterCommit: (_0x52b803, _0x286fbc, _0x577e05, { patch: _0x4a6770 } = {}) => {
-          (_0x4a6770 && typeof _0x4a6770 === 'object' && (this._data = { ...this._data, ..._0x4a6770 }),
+        afterCommit: (value58, value59, value60, { patch: patch } = {}) => {
+          (patch && typeof patch === 'object' && (this._data = { ...this._data, ...patch }),
             this._syncStoryboardImageSchemaControls(this._getScriptState()));
         },
       })));
   }
-  ['_syncStoryboardImageSchemaControls'](_0x2dec39 = this._getScriptState()) {
-    const _0x1933c6 = this._promptPanelEl?.querySelector('.prompt-panel-footer');
-    if (!_0x1933c6 || !this.uiSchemaModeSlot || !this.uiSchemaResolutionSlot) return;
-    const _0x3a2b4c =
-        Array.isArray(_0x2dec39.rows) && _0x2dec39.rows.length > 0 && _0x2dec39.selectionMode === true,
-      _0x124b14 = normalizeDreaminaImageModel(
-        _0x2dec39.imageModel || DEFAULT_IMAGE_NODE_MODEL,
-        _0x2dec39.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
+  ['_syncStoryboardImageSchemaControls'](value61 = this._getScriptState()) {
+    const enabled13 = this._promptPanelEl?.querySelector('.prompt-panel-footer');
+    if (!enabled13 || !this.uiSchemaModeSlot || !this.uiSchemaResolutionSlot) return;
+    const enabled14 =
+        Array.isArray(value61.rows) && value61.rows.length > 0 && value61.selectionMode === true,
+      dreaminaImageModel = normalizeDreaminaImageModel(
+        value61.imageModel || DEFAULT_IMAGE_NODE_MODEL,
+        value61.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
       ),
-      _0x290bc3 = this._getStoryboardImagePromptNodeData(this._data, _0x2dec39),
-      _0x4493e0 =
-        this._storyboardImageSchemaModel !== _0x124b14 ||
-        this._storyboardImageSchemaSelectionMode !== _0x3a2b4c,
-      _0x5b4297 = (_0x509adc, _0x3529b5, _0x41595f) => {
-        if (!_0x509adc) return;
-        const _0x42ea61 = _0x3a2b4c
-          ? renderModelUiSchemaControls(_0x124b14, _0x290bc3, { placement: _0x3529b5, variant: _0x41595f })
+      value62 = this._getStoryboardImagePromptNodeData(this._data, value61),
+      value63 =
+        this._storyboardImageSchemaModel !== dreaminaImageModel ||
+        this._storyboardImageSchemaSelectionMode !== enabled14,
+      handler4 = (el33, placement, variant) => {
+        if (!el33) return;
+        const enabled15 = enabled14
+          ? renderModelUiSchemaControls(dreaminaImageModel, value62, {
+              placement: placement,
+              variant: variant,
+            })
           : '';
-        ((_0x509adc.innerHTML = _0x42ea61), (_0x509adc.hidden = !_0x3a2b4c || !_0x42ea61));
+        ((el33.innerHTML = enabled15), (el33.hidden = !enabled14 || !enabled15));
       };
-    _0x4493e0 &&
-      (_0x5b4297(this.uiSchemaModeSlot, 'mode', 'pillMenu'),
-      _0x5b4297(this.uiSchemaResolutionSlot, 'resolution', 'resolutionPill'),
-      _0x5b4297(this.uiSchemaBatchSlot, 'batch', 'pillMenu'),
-      _0x5b4297(this.uiSchemaInstanceSlot, 'instance', 'instanceToggle'),
+    value63 &&
+      (handler4(this.uiSchemaModeSlot, 'mode', 'pillMenu'),
+      handler4(this.uiSchemaResolutionSlot, 'resolution', 'resolutionPill'),
+      handler4(this.uiSchemaBatchSlot, 'batch', 'pillMenu'),
+      handler4(this.uiSchemaInstanceSlot, 'instance', 'instanceToggle'),
       this.rhAdvPanelEl &&
-        (this.rhAdvPanelEl.innerHTML = _0x3a2b4c
-          ? renderModelUiSchemaControls(_0x124b14, _0x290bc3, {
+        (this.rhAdvPanelEl.innerHTML = enabled14
+          ? renderModelUiSchemaControls(dreaminaImageModel, value62, {
               placement: 'advanced',
               variant: 'advancedRow',
             })
           : ''),
-      (this._storyboardImageSchemaModel = _0x124b14),
-      (this._storyboardImageSchemaSelectionMode = _0x3a2b4c));
-    syncModelUiSchemaControls(_0x1933c6, _0x290bc3);
-    const _0x274eb0 = _0x3a2b4c && hasModelUiSchema(_0x124b14, { placement: 'advanced' });
-    if (this.rhAdvWrap) this.rhAdvWrap.hidden = !_0x274eb0;
+      (this._storyboardImageSchemaModel = dreaminaImageModel),
+      (this._storyboardImageSchemaSelectionMode = enabled14));
+    syncModelUiSchemaControls(enabled13, value62);
+    const enabled16 = enabled14 && hasModelUiSchema(dreaminaImageModel, { placement: 'advanced' });
+    if (this.rhAdvWrap) this.rhAdvWrap.hidden = !enabled16;
     this.rhAdvPanelEl &&
-      ((this.rhAdvPanelEl.hidden = !_0x274eb0),
-      (!_0x274eb0 || !_0x3a2b4c) && this.rhAdvPanelEl.classList.remove('show'));
+      ((this.rhAdvPanelEl.hidden = !enabled16),
+      (!enabled16 || !enabled14) && this.rhAdvPanelEl.classList.remove('show'));
   }
-  ['_buildStoryboardImageModelPatch'](_0x2a5017, _0x4d1f05, _0x3abe30, _0x4766d8 = {}) {
-    const _0x41cf6a = createDefaultStoryboardScriptState(
-        _0x2a5017?.storyboardScript || this._getScriptState(),
-      ),
-      _0x35e14b = String(_0x2a5017?.model || '').trim(),
-      _0x10aabe = String(_0x4d1f05 || '').trim() || DEFAULT_IMAGE_NODE_MODEL,
-      _0x94582c = String(_0x3abe30 || '').trim() || DEFAULT_IMAGE_NODE_PROVIDER,
-      _0xd1a5bd = _0x4766d8 && typeof _0x4766d8 === 'object' ? { ..._0x4766d8 } : {};
-    delete _0xd1a5bd.storyboardScript;
-    const _0x3b69e4 = getPlainObject(_0x2a5017?.generationParamsByModel);
-    _0x35e14b && (_0x3b69e4[_0x35e14b] = getPlainObject(_0x2a5017?.generationParams));
-    const _0x5b9ff0 = getModelManifest(_0x10aabe),
-      _0x84c720 = new Set(
-        (_0x5b9ff0?.uiSchema?.fields || [])
-          .map((_0x3115cd) => String(_0x3115cd?.id || '').trim())
+  ['_buildStoryboardImageModelPatch'](value64, value65, value66, args12 = {}) {
+    const args13 = createDefaultStoryboardScriptState(value64?.storyboardScript || this._getScriptState()),
+      value67 = String(value64?.model || '').trim(),
+      imageModel = String(value65 || '').trim() || DEFAULT_IMAGE_NODE_MODEL,
+      imageProvider = String(value66 || '').trim() || DEFAULT_IMAGE_NODE_PROVIDER,
+      args14 = args12 && typeof args12 === 'object' ? { ...args12 } : {};
+    delete args14.storyboardScript;
+    const generationParamsByModel = getPlainObject(value64?.generationParamsByModel);
+    value67 && (generationParamsByModel[value67] = getPlainObject(value64?.generationParams));
+    const modelManifest2 = getModelManifest(imageModel),
+      list24 = new Set(
+        (modelManifest2?.uiSchema?.fields || [])
+          .map((item14) => String(item14?.id || '').trim())
           .filter(Boolean),
       ),
-      _0x33f221 = getPlainObject(_0xd1a5bd.generationParams),
-      _0x43a44f = getPlainObject(_0x3b69e4[_0x10aabe]),
-      _0x47b42e = buildModelUiSchemaDefaultParams(_0x10aabe),
-      _0x486839 = {};
-    (_0x84c720.forEach((_0x2682e7) => {
-      Object.prototype.hasOwnProperty.call(_0xd1a5bd, _0x2682e7) &&
-        ((_0x486839[_0x2682e7] = _0xd1a5bd[_0x2682e7]), delete _0xd1a5bd[_0x2682e7]);
+      args15 = getPlainObject(args14.generationParams),
+      args16 = getPlainObject(generationParamsByModel[imageModel]),
+      args17 = buildModelUiSchemaDefaultParams(imageModel),
+      args18 = {};
+    (list24.forEach((item15) => {
+      Object.prototype.hasOwnProperty.call(args14, item15) &&
+        ((args18[item15] = args14[item15]), delete args14[item15]);
     }),
-      delete _0xd1a5bd.generationParams,
-      delete _0xd1a5bd.generationParamsByModel);
-    const _0x151202 = sanitizeModelUiSchemaParams(
-      _0x10aabe,
-      { ..._0x47b42e, ..._0x43a44f, ..._0x33f221, ..._0x486839 },
+      delete args14.generationParams,
+      delete args14.generationParamsByModel);
+    const generationParams = sanitizeModelUiSchemaParams(
+      imageModel,
+      { ...args17, ...args16, ...args15, ...args18 },
       { includeDefaults: true },
     );
-    if (_0x10aabe) _0x3b69e4[_0x10aabe] = _0x151202;
-    const _0x4d8c9c = {
-        ..._0x41cf6a,
+    if (imageModel) generationParamsByModel[imageModel] = generationParams;
+    const storyboardScript3 = {
+        ...args13,
         selectionMode: true,
-        imageModel: _0x10aabe,
-        imageProvider: _0x94582c,
+        imageModel: imageModel,
+        imageProvider: imageProvider,
         updatedAt: Date.now(),
       },
-      _0x5afae8 = _0x151202.aspectRatio || _0xd1a5bd.aspectRatio || _0x2a5017?.aspectRatio;
+      aspectRatio2 = generationParams.aspectRatio || args14.aspectRatio || value64?.aspectRatio;
     return {
-      ..._0xd1a5bd,
-      model: _0x10aabe,
-      provider: _0x94582c,
-      ...(_0x5afae8 ? { aspectRatio: _0x5afae8 } : {}),
-      generationParams: _0x151202,
-      generationParamsByModel: _0x3b69e4,
-      storyboardScript: _0x4d8c9c,
+      ...args14,
+      model: imageModel,
+      provider: imageProvider,
+      ...(aspectRatio2 ? { aspectRatio: aspectRatio2 } : {}),
+      generationParams: generationParams,
+      generationParamsByModel: generationParamsByModel,
+      storyboardScript: storyboardScript3,
     };
   }
-  ['_bindStoryboardImageModelMenu'](_0x328fd7) {
-    if (!_0x328fd7 || this._storyboardImageModelMenuBound) return;
-    const _0x2b3e70 = this._promptPanelEl?.querySelector('.img-model-btn-trigger'),
-      _0x2e300d = this._promptPanelEl?.querySelector('.img-model-label'),
-      _0x20ec1a = {
-        modelMenu: _0x328fd7,
-        modelTrigger: _0x2b3e70,
-        modelLabel: _0x2e300d,
+  ['_bindStoryboardImageModelMenu'](modelMenu) {
+    if (!modelMenu || this._storyboardImageModelMenuBound) return;
+    const modelTrigger = this._promptPanelEl?.querySelector('.img-model-btn-trigger'),
+      modelLabel = this._promptPanelEl?.querySelector('.img-model-label'),
+      args19 = {
+        modelMenu: modelMenu,
+        modelTrigger: modelTrigger,
+        modelLabel: modelLabel,
         nodeId: this.nodeId,
         store: appStore,
         fallbackNodeData: this._data,
-        buildModelPatch: (..._0x21a8cf) => this._buildStoryboardImageModelPatch(..._0x21a8cf),
+        buildModelPatch: (...args20) => this._buildStoryboardImageModelPatch(...args20),
       };
     (bindImageModelMenuSubmenu({
-      ..._0x20ec1a,
+      ...args19,
       toggleSelector: '[data-grsai-toggle]',
       submenuSelector: '.grsai-submenu',
       defaultProvider: 'grsai',
       resolveSelection: resolveGrsaiImageMenuSelection,
-      afterSelect: ({ item: _0x44324b }) => setImageModelTriggerIcon(_0x2b3e70, 'grsai', _0x44324b),
+      afterSelect: ({ item: item16 }) => setImageModelTriggerIcon(modelTrigger, 'grsai', item16),
     }),
       bindImageModelMenuSubmenu({
-        ..._0x20ec1a,
+        ...args19,
         toggleSelector: '[data-ppio-toggle]',
         submenuSelector: '.ppio-submenu',
         defaultProvider: 'ppio',
-        afterSelect: ({ item: _0x55db0a }) => setImageModelTriggerIcon(_0x2b3e70, 'ppio', _0x55db0a),
+        afterSelect: ({ item: item17 }) => setImageModelTriggerIcon(modelTrigger, 'ppio', item17),
       }),
-      bindDreaminaImageMenu(_0x20ec1a),
+      bindDreaminaImageMenu(args19),
       bindImageModelMenuSubmenu({
-        ..._0x20ec1a,
+        ...args19,
         toggleSelector: '[data-apimart-toggle]',
         submenuSelector: '.apimart-submenu',
         defaultProvider: 'apimart',
         resolveSelection: resolveApimartImageMenuSelection,
-        afterSelect: ({ item: _0x183f88 }) => setImageModelTriggerIcon(_0x2b3e70, 'apimart', _0x183f88),
+        afterSelect: ({ item: item18 }) => setImageModelTriggerIcon(modelTrigger, 'apimart', item18),
       }),
       bindImageModelMenuSubmenu({
-        ..._0x20ec1a,
+        ...args19,
         toggleSelector: '[data-agnes-toggle]',
         submenuSelector: '.agnes-submenu',
         defaultProvider: 'agnes',
-        afterSelect: ({ item: _0x12fc09 }) => setImageModelTriggerIcon(_0x2b3e70, 'agnes', _0x12fc09),
+        afterSelect: ({ item: item19 }) => setImageModelTriggerIcon(modelTrigger, 'agnes', item19),
       }),
       bindImageModelMenuSubmenu({
-        ..._0x20ec1a,
+        ...args19,
         toggleSelector: '[data-volcengine-toggle]',
         submenuSelector: '.volcengine-submenu',
         defaultProvider: 'volcengine',
         resolveSelection: resolveVolcengineImageMenuSelection,
-        afterSelect: ({ item: _0x3e4fab }) => setImageModelTriggerIcon(_0x2b3e70, 'volcengine', _0x3e4fab),
+        afterSelect: ({ item: item20 }) => setImageModelTriggerIcon(modelTrigger, 'volcengine', item20),
       }),
       bindImageModelMenuSubmenu({
-        ..._0x20ec1a,
+        ...args19,
         toggleSelector: '[data-runninghubwf-toggle]',
         submenuSelector: '.runninghubwf-submenu',
         defaultProvider: 'runninghubwf',
         resolveSelection: resolveRunningHubWorkflowImageMenuSelection,
-        afterSelect: ({ item: _0x2758cc }) => setImageModelTriggerIcon(_0x2b3e70, 'runninghubwf', _0x2758cc),
+        afterSelect: ({ item: item21 }) => setImageModelTriggerIcon(modelTrigger, 'runninghubwf', item21),
       }),
       bindImageModelMenuSubmenu({
-        ..._0x20ec1a,
+        ...args19,
         toggleSelector: '[data-runninghub-toggle]',
         submenuSelector: '.runninghub-submenu',
         defaultProvider: 'runninghubwf',
         resolveSelection: resolveRunningHubModelImageMenuSelection,
-        afterSelect: ({ item: _0x525a54, provider: _0x5dcde7 }) =>
-          setImageModelTriggerIcon(_0x2b3e70, _0x5dcde7, _0x525a54),
+        afterSelect: ({ item: item22, provider: provider4 }) =>
+          setImageModelTriggerIcon(modelTrigger, provider4, item22),
       }),
       (this._storyboardImageModelMenuBound = true));
   }
   ['_ensureStoryboardImageModelMenu']() {
     if (this._storyboardImageModelMenu?.isConnected) return this._storyboardImageModelMenu;
-    const _0x33fa1f = this._promptPanelEl?.querySelector('.img-model-wrap');
-    if (!_0x33fa1f) return null;
-    const _0x33abc4 = this._getScriptState(),
-      _0x2a1d43 = normalizeDreaminaImageModel(
-        _0x33abc4.imageModel || DEFAULT_IMAGE_NODE_MODEL,
-        _0x33abc4.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
+    const el34 = this._promptPanelEl?.querySelector('.img-model-wrap');
+    if (!el34) return null;
+    const value68 = this._getScriptState(),
+      activeModel = normalizeDreaminaImageModel(
+        value68.imageModel || DEFAULT_IMAGE_NODE_MODEL,
+        value68.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
       ),
-      _0x3adf42 = document.createElement('template');
-    _0x3adf42.innerHTML = buildImageModelMenuHTML({
-      activeModel: _0x2a1d43,
+      el35 = document.createElement('template');
+    el35.innerHTML = buildImageModelMenuHTML({
+      activeModel: activeModel,
       nanoSelection: getNanoBananaSelectionFromModel(
-        _0x2a1d43,
-        _0x33abc4.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
+        activeModel,
+        value68.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
       ),
     }).trim();
-    const _0x4330ae = _0x3adf42.content.firstElementChild;
-    if (!_0x4330ae) return null;
+    const el36 = el35.content.firstElementChild;
+    if (!el36) return null;
     return (
-      _0x4330ae.classList.add('storyboard-image-model-menu'),
-      (_0x33fa1f.style.position = _0x33fa1f.style.position || 'relative'),
-      _0x33fa1f.appendChild(_0x4330ae),
-      (this._storyboardImageModelMenu = _0x4330ae),
+      el36.classList.add('storyboard-image-model-menu'),
+      (el34.style.position = el34.style.position || 'relative'),
+      el34.appendChild(el36),
+      (this._storyboardImageModelMenu = el36),
       (this._storyboardImageModelMenuBound = false),
-      this._bindStoryboardImageModelMenu(_0x4330ae),
-      _0x4330ae
+      this._bindStoryboardImageModelMenu(el36),
+      el36
     );
   }
   ['_toggleStoryboardImageModelMenu']() {
-    const _0x1d330c = this._promptPanelEl?.querySelector('.prompt-panel-footer'),
-      _0x2fe5f0 = this._ensureStoryboardImageModelMenu();
-    if (!_0x2fe5f0) return;
-    const _0x5d11a8 = !_0x2fe5f0.classList.contains('show');
-    (closeNodeFooterMenus(_0x1d330c || this._promptPanelEl, _0x2fe5f0),
-      _0x2fe5f0.classList.toggle('show', _0x5d11a8));
-    if (_0x5d11a8) activateMenuKeyboard(_0x2fe5f0);
+    const value69 = this._promptPanelEl?.querySelector('.prompt-panel-footer'),
+      el37 = this._ensureStoryboardImageModelMenu();
+    if (!el37) return;
+    const value70 = !el37.classList.contains('show');
+    (closeNodeFooterMenus(value69 || this._promptPanelEl, el37), el37.classList.toggle('show', value70));
+    if (value70) activateMenuKeyboard(el37);
   }
   ['_installSelectionCountIndicator']() {
-    const _0x14ed43 = this._promptPanelEl?.querySelector('.prompt-actions'),
-      _0x43e908 = _0x14ed43?.querySelector('.debug-wrench-btn');
-    if (!_0x14ed43 || !_0x43e908) return;
+    const el38 = this._promptPanelEl?.querySelector('.prompt-actions'),
+      enabled17 = el38?.querySelector('.debug-wrench-btn');
+    if (!el38 || !enabled17) return;
     ((this._selectionCountEl = document.createElement('div')),
       (this._selectionCountEl.className = 'storyboard-script-selection-count'),
       (this._selectionCountEl.textContent = '0/0'),
@@ -1287,253 +1270,263 @@ export class StoryboardScriptNode {
         'aria-label',
         storyboardScriptText('selectionCount', { selected: 0, total: 0 }),
       ),
-      _0x14ed43.insertBefore(this._selectionCountEl, _0x43e908));
+      el38.insertBefore(this._selectionCountEl, enabled17));
   }
   ['_installStoryboardQueueButton']() {
-    const _0x3ecbd0 = this._promptPanelEl?.querySelector('.prompt-actions');
-    if (!_0x3ecbd0 || !this.btnEl || this._queueBtn) return;
-    const _0x3a5f13 = document.createElement('button');
-    ((_0x3a5f13.type = 'button'),
-      (_0x3a5f13.className = 'prompt-submit storyboard-script-queue-btn'),
-      (_0x3a5f13.title = storyboardScriptText('toolbar.queue')),
-      _0x3a5f13.setAttribute('aria-label', storyboardScriptText('toolbar.queue')),
-      (_0x3a5f13.innerHTML = STORYBOARD_QUEUE_ICON_HTML),
-      (_0x3a5f13.hidden = true),
-      _0x3a5f13.addEventListener('click', (_0x6d8eb7) => {
-        (_0x6d8eb7.stopPropagation(),
+    const el39 = this._promptPanelEl?.querySelector('.prompt-actions');
+    if (!el39 || !this.btnEl || this._queueBtn) return;
+    const el40 = document.createElement('button');
+    ((el40.type = 'button'),
+      (el40.className = 'prompt-submit storyboard-script-queue-btn'),
+      (el40.title = storyboardScriptText('toolbar.queue')),
+      el40.setAttribute('aria-label', storyboardScriptText('toolbar.queue')),
+      (el40.innerHTML = STORYBOARD_QUEUE_ICON_HTML),
+      (el40.hidden = true),
+      el40.addEventListener('click', (event11) => {
+        (event11.stopPropagation(),
           this._flushPromptHtmlCommit?.(),
           this._createImageNodesFromSelectedStoryboards({ startGeneration: false }));
       }),
-      _0x3ecbd0.insertBefore(_0x3a5f13, this.btnEl),
-      (this._queueBtn = _0x3a5f13));
+      el39.insertBefore(el40, this.btnEl),
+      (this._queueBtn = el40));
   }
-  ['_createModeButton'](_0x43b401, _0x341fcf) {
-    const _0x4ff8cd = document.createElement('button');
+  ['_createModeButton'](value71, value72) {
+    const el41 = document.createElement('button');
     return (
-      (_0x4ff8cd.type = 'button'),
-      (_0x4ff8cd.className = 'storyboard-script-view-btn'),
-      (_0x4ff8cd.dataset.mode = _0x43b401),
-      (_0x4ff8cd.textContent = _0x341fcf),
-      _0x4ff8cd.addEventListener('pointerdown', (_0xf38ae5) => {
-        _0xf38ae5.stopPropagation();
+      (el41.type = 'button'),
+      (el41.className = 'storyboard-script-view-btn'),
+      (el41.dataset.mode = value71),
+      (el41.textContent = value72),
+      el41.addEventListener('pointerdown', (event12) => {
+        event12.stopPropagation();
       }),
-      _0x4ff8cd.addEventListener('dblclick', (_0x3d6212) => {
-        _0x3d6212.stopPropagation();
+      el41.addEventListener('dblclick', (event13) => {
+        event13.stopPropagation();
       }),
-      _0x4ff8cd.addEventListener('click', (_0x22730b) => {
-        (_0x22730b.stopPropagation(), this._setViewMode(_0x43b401));
+      el41.addEventListener('click', (event14) => {
+        (event14.stopPropagation(), this._setViewMode(value71));
       }),
-      _0x4ff8cd
+      el41
     );
   }
-  ['_createMediaModeButton'](_0x3cff13, _0x11dcb7) {
-    const _0x18fadf = document.createElement('button');
+  ['_createMediaModeButton'](value73, value74) {
+    const el42 = document.createElement('button');
     return (
-      (_0x18fadf.type = 'button'),
-      (_0x18fadf.className = 'storyboard-script-view-btn storyboard-script-media-btn'),
-      (_0x18fadf.dataset.mediaMode = _0x3cff13),
-      (_0x18fadf.textContent = _0x11dcb7),
-      _0x18fadf.addEventListener('pointerdown', (_0x200f2d) => {
-        _0x200f2d.stopPropagation();
+      (el42.type = 'button'),
+      (el42.className = 'storyboard-script-view-btn storyboard-script-media-btn'),
+      (el42.dataset.mediaMode = value73),
+      (el42.textContent = value74),
+      el42.addEventListener('pointerdown', (event15) => {
+        event15.stopPropagation();
       }),
-      _0x18fadf.addEventListener('dblclick', (_0x2749f8) => {
-        _0x2749f8.stopPropagation();
+      el42.addEventListener('dblclick', (event16) => {
+        event16.stopPropagation();
       }),
-      _0x18fadf.addEventListener('click', (_0x456684) => {
-        (_0x456684.stopPropagation(), this._setMediaMode(_0x3cff13));
+      el42.addEventListener('click', (event17) => {
+        (event17.stopPropagation(), this._setMediaMode(value73));
       }),
-      _0x18fadf
+      el42
     );
   }
   ['_getScriptState']() {
     return createDefaultStoryboardScriptState(this._data.storyboardScript || {});
   }
-  ['_syncSelectionModeUi'](_0x581e4f = this._getScriptState()) {
-    const _0x3fd7aa = Array.isArray(_0x581e4f.rows) ? _0x581e4f.rows.length : 0,
-      _0x4eb24f = getSelectedRowIndexes(_0x581e4f),
-      _0x42eb7e = _0x3fd7aa > 0 && _0x581e4f.selectionMode === true,
-      _0x57e631 = _0x42eb7e
+  ['_syncSelectionModeUi'](storyboardScript4 = this._getScriptState()) {
+    const total = Array.isArray(storyboardScript4.rows) ? storyboardScript4.rows.length : 0,
+      selected = getSelectedRowIndexes(storyboardScript4),
+      enabled18 = total > 0 && storyboardScript4.selectionMode === true,
+      value75 = enabled18
         ? storyboardScriptText('toolbar.exitEdit')
         : storyboardScriptText('toolbar.editMode'),
-      _0x432d4e = _0x42eb7e
-        ? _0x581e4f.imageModel || DEFAULT_IMAGE_NODE_MODEL
-        : resolveStoryboardScriptTextModel({ storyboardScript: _0x581e4f }),
-      _0x14d121 = _0x42eb7e
-        ? _0x581e4f.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER
-        : resolveStoryboardScriptTextProvider({ storyboardScript: _0x581e4f });
-    this._promptPanelEl?.classList.toggle('is-storyboard-image-mode', _0x42eb7e);
-    this._queueBtn && (this._queueBtn.hidden = !_0x42eb7e);
-    (this.el?.classList.toggle('has-storyboard-rows', _0x3fd7aa > 0),
-      this.el?.classList.toggle('is-storyboard-selection-mode', _0x42eb7e),
-      this._toolbarGenerateBtn?.classList.toggle('active', _0x42eb7e),
-      setToolbarButtonLabel(this._toolbarGenerateBtn, _0x57e631),
+      model3 = enabled18
+        ? storyboardScript4.imageModel || DEFAULT_IMAGE_NODE_MODEL
+        : resolveStoryboardScriptTextModel({ storyboardScript: storyboardScript4 }),
+      provider5 = enabled18
+        ? storyboardScript4.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER
+        : resolveStoryboardScriptTextProvider({ storyboardScript: storyboardScript4 });
+    this._promptPanelEl?.classList.toggle('is-storyboard-image-mode', enabled18);
+    this._queueBtn && (this._queueBtn.hidden = !enabled18);
+    (this.el?.classList.toggle('has-storyboard-rows', total > 0),
+      this.el?.classList.toggle('is-storyboard-selection-mode', enabled18),
+      this._toolbarGenerateBtn?.classList.toggle('active', enabled18),
+      setToolbarButtonLabel(this._toolbarGenerateBtn, value75),
       this._promptPanelEl
         ?.querySelector('.node-model-menu')
-        ?.classList.toggle('is-storyboard-text-menu-hidden', _0x42eb7e));
-    !_0x42eb7e && this._storyboardImageModelMenu?.classList.remove('show');
-    const _0x377ecc = this._promptPanelEl?.querySelector('.img-model-btn-trigger'),
-      _0x1b9e8d = this._promptPanelEl?.querySelector('.img-model-label'),
-      _0x4acb17 = getDisplayModelName(_0x432d4e);
-    (_0x1b9e8d && _0x1b9e8d.textContent !== _0x4acb17 && (_0x1b9e8d.textContent = _0x4acb17),
-      _0x42eb7e
+        ?.classList.toggle('is-storyboard-text-menu-hidden', enabled18));
+    !enabled18 && this._storyboardImageModelMenu?.classList.remove('show');
+    const value76 = this._promptPanelEl?.querySelector('.img-model-btn-trigger'),
+      el43 = this._promptPanelEl?.querySelector('.img-model-label'),
+      displayModelName = getDisplayModelName(model3);
+    (el43 && el43.textContent !== displayModelName && (el43.textContent = displayModelName),
+      enabled18
         ? replaceModelTriggerIcon(
-            _0x377ecc,
-            renderImageModelTriggerIconHTML({ model: _0x432d4e, provider: _0x14d121 }),
+            value76,
+            renderImageModelTriggerIconHTML({ model: model3, provider: provider5 }),
           )
         : replaceModelTriggerIcon(
-            _0x377ecc,
-            buildTextModelSmallIconHTML(_0x432d4e) ||
+            value76,
+            buildTextModelSmallIconHTML(model3) ||
               '<div class="text-model-icon-small text-model-icon-badge">AI</div>',
           ),
       this._selectionCountEl &&
-        ((this._selectionCountEl.textContent = _0x4eb24f.length + '/' + _0x3fd7aa),
+        ((this._selectionCountEl.textContent = selected.length + '/' + total),
         this._selectionCountEl.setAttribute(
           'aria-label',
-          storyboardScriptText('selectionCount', { selected: _0x4eb24f.length, total: _0x3fd7aa }),
+          storyboardScriptText('selectionCount', { selected: selected.length, total: total }),
         ),
-        (this._selectionCountEl.hidden = !_0x42eb7e)),
-      this._syncStoryboardImageSchemaControls(_0x581e4f));
+        (this._selectionCountEl.hidden = !enabled18)),
+      this._syncStoryboardImageSchemaControls(storyboardScript4));
   }
   ['_enterSelectionMode']() {
     this._finishCellEdit({ commit: true });
-    const _0x44b19c = this._getScriptState();
-    if (!Array.isArray(_0x44b19c.rows) || _0x44b19c.rows.length === 0) {
+    const value77 = this._getScriptState();
+    if (!Array.isArray(value77.rows) || value77.rows.length === 0) {
       window.showToast?.(storyboardScriptText('toasts.generateScriptFirst'), 'warn');
       return;
     }
-    const _0x3e5bc7 = _0x44b19c.imageModel || DEFAULT_IMAGE_NODE_MODEL,
-      _0x2ee2d4 = _0x44b19c.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
-      _0x1ad095 = appStore.getState?.().nodes?.[this.nodeId] || this._data,
-      _0x2ae412 = this._buildStoryboardImageModelPatch(_0x1ad095, _0x3e5bc7, _0x2ee2d4),
-      _0x10890f = {
-        ..._0x2ae412.storyboardScript,
+    const value78 = value77.imageModel || DEFAULT_IMAGE_NODE_MODEL,
+      value79 = value77.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
+      value80 = appStore.getState?.().nodes?.[this.nodeId] || this._data,
+      args21 = this._buildStoryboardImageModelPatch(value80, value78, value79),
+      storyboardScript5 = {
+        ...args21.storyboardScript,
         viewMode: 'list',
         selectionMode: true,
-        selectedRowIndexes: getSelectedRowIndexes(_0x44b19c),
+        selectedRowIndexes: getSelectedRowIndexes(value77),
         updatedAt: Date.now(),
       };
-    ((this._data = { ...this._data, ..._0x2ae412, storyboardScript: _0x10890f }),
-      appStore.updateNodeData(this.nodeId, { ..._0x2ae412, storyboardScript: _0x10890f }));
+    ((this._data = { ...this._data, ...args21, storyboardScript: storyboardScript5 }),
+      appStore.updateNodeData(this.nodeId, { ...args21, storyboardScript: storyboardScript5 }));
   }
   ['_cancelSelectionMode']() {
-    let _0x1a13a9 = this._getScriptState();
-    if (_0x1a13a9.selectionMode !== true) return;
-    (this._finishCellEdit({ commit: true }), (_0x1a13a9 = this._getScriptState()));
-    const _0x8a70be = resolveStoryboardScriptTextModel({ storyboardScript: _0x1a13a9 }),
-      _0x2b9109 = resolveStoryboardScriptTextProvider({ storyboardScript: _0x1a13a9 }),
-      _0xd7d096 = { ..._0x1a13a9, selectionMode: false, selectedRowIndexes: [], updatedAt: Date.now() };
-    ((this._data = { ...this._data, model: _0x8a70be, provider: _0x2b9109, storyboardScript: _0xd7d096 }),
-      appStore.updateNodeData(this.nodeId, {
-        model: _0x8a70be,
-        provider: _0x2b9109,
-        storyboardScript: _0xd7d096,
-      }));
-  }
-  ['_updateSelectedRowIndexes'](_0x573bdc) {
-    const _0x2455a0 = this._getScriptState(),
-      _0x1b03ea = normalizeStoryboardScriptSelectedRowIndexes(_0x573bdc, _0x2455a0.rows.length),
-      _0x30dc30 = { ..._0x2455a0, selectedRowIndexes: _0x1b03ea, updatedAt: Date.now() };
-    ((this._data = { ...this._data, storyboardScript: _0x30dc30 }),
-      this._syncListSelectionState(_0x30dc30),
-      appStore.updateNodeData(this.nodeId, { storyboardScript: _0x30dc30 }));
-  }
-  ['_toggleRowSelection'](_0xe47852, _0x2acc3c) {
-    const _0x24365b = this._getScriptState(),
-      _0x176e43 = new Set(getSelectedRowIndexes(_0x24365b));
-    if (_0x2acc3c) _0x176e43.add(_0xe47852);
-    else _0x176e43.delete(_0xe47852);
-    this._updateSelectedRowIndexes([..._0x176e43].sort((_0x619efb, _0x58ea42) => _0x619efb - _0x58ea42));
-  }
-  ['_setAllRowsSelected'](_0x32b494) {
-    const _0x1131da = this._getScriptState(),
-      _0xa340d = _0x32b494 ? _0x1131da.rows.map((_0x3218e6, _0x3bca31) => _0x3bca31) : [];
-    this._updateSelectedRowIndexes(_0xa340d);
-  }
-  ['_setViewMode'](_0x3c2863) {
-    this._finishCellEdit({ commit: true });
-    const _0x1317a9 = normalizeStoryboardScriptViewMode(_0x3c2863),
-      _0x3197c9 = this._getScriptState();
-    if (_0x3197c9.viewMode === _0x1317a9) return;
-    appStore.updateNodeData(this.nodeId, { storyboardScript: { ..._0x3197c9, viewMode: _0x1317a9 } });
-  }
-  ['_setMediaMode'](_0x44caa2) {
-    this._finishCellEdit({ commit: true });
-    const _0x336e2e = normalizeStoryboardScriptMediaMode(_0x44caa2),
-      _0x325841 = this._getScriptState();
-    if (_0x325841.mediaMode === _0x336e2e) return;
-    appStore.updateNodeData(this.nodeId, {
-      storyboardScript: { ..._0x325841, mediaMode: _0x336e2e, updatedAt: Date.now() },
-    });
-  }
-  ['_syncModeButtons'](_0x284d8d, _0x356bba) {
-    [this._listBtn, this._cardBtn].forEach((_0x2ce545) => {
-      if (!_0x2ce545) return;
-      const _0x5c672f = _0x2ce545.dataset.mode === _0x284d8d;
-      (_0x2ce545.classList.toggle('is-active', _0x5c672f),
-        _0x2ce545.setAttribute('aria-pressed', _0x5c672f ? 'true' : 'false'));
-    });
-    const _0x4bd2b9 = normalizeStoryboardScriptMediaMode(_0x356bba);
-    [this._imageModeBtn, this._videoModeBtn].forEach((_0x151eb6) => {
-      if (!_0x151eb6) return;
-      const _0x36fe46 = _0x151eb6.dataset.mediaMode === _0x4bd2b9;
-      (_0x151eb6.classList.toggle('is-active', _0x36fe46),
-        _0x151eb6.setAttribute('aria-pressed', _0x36fe46 ? 'true' : 'false'));
-    });
-  }
-  ['_isStoryboardScriptGenerating'](_0x4df7e6 = null) {
-    const _0x29c953 = appStore.getState?.().nodes?.[this.nodeId] || this._data || {},
-      _0x890e8b =
-        _0x4df7e6 ||
-        createDefaultStoryboardScriptState(_0x29c953.storyboardScript || this._data.storyboardScript || {});
-    return (
-      this._isGeneratingScript ||
-      _0x29c953.isGenerating === true ||
-      _0x890e8b.isGenerating === true ||
-      String(_0x890e8b.jobStatus || _0x29c953.jobStatus || '') === 'running'
-    );
-  }
-  ['_syncGeneratingOverlay'](_0x34ce66) {
-    if (!this._bodyEl) return;
-    const _0x26b32e = _0x34ce66 === true;
-    (this.el?.classList?.toggle('is-storyboard-script-generating', _0x26b32e),
-      this._bodyEl.classList.toggle('is-generating', _0x26b32e),
-      this._bodyEl.setAttribute('aria-busy', _0x26b32e ? 'true' : 'false'));
-    const _0x5c925f = this._bodyEl.querySelector('.storyboard-script-loading-overlay');
-    if (!_0x26b32e) {
-      _0x5c925f?.remove();
-      return;
-    }
-    if (_0x5c925f) return;
-    this._bodyEl.appendChild(createStoryboardScriptLoadingOverlay());
-  }
-  ['_setStoryboardGeneratingState'](_0x11088d, _0x4c3fc0 = {}) {
-    const _0x3802ff = this._getScriptState(),
-      _0x3aef8b = {
-        ..._0x3802ff,
-        ..._0x4c3fc0,
-        isGenerating: _0x11088d === true,
-        jobStatus: _0x11088d === true ? 'running' : _0x4c3fc0.jobStatus || '',
+    let storyboardScript6 = this._getScriptState();
+    if (storyboardScript6.selectionMode !== true) return;
+    (this._finishCellEdit({ commit: true }), (storyboardScript6 = this._getScriptState()));
+    const model4 = resolveStoryboardScriptTextModel({ storyboardScript: storyboardScript6 }),
+      provider6 = resolveStoryboardScriptTextProvider({ storyboardScript: storyboardScript6 }),
+      storyboardScript7 = {
+        ...storyboardScript6,
+        selectionMode: false,
+        selectedRowIndexes: [],
         updatedAt: Date.now(),
       };
-    ((this._data = { ...this._data, storyboardScript: _0x3aef8b }),
-      appStore.updateNodeData(this.nodeId, { storyboardScript: _0x3aef8b }));
+    ((this._data = {
+      ...this._data,
+      model: model4,
+      provider: provider6,
+      storyboardScript: storyboardScript7,
+    }),
+      appStore.updateNodeData(this.nodeId, {
+        model: model4,
+        provider: provider6,
+        storyboardScript: storyboardScript7,
+      }));
+  }
+  ['_updateSelectedRowIndexes'](value81) {
+    const args22 = this._getScriptState(),
+      selectedRowIndexes = normalizeStoryboardScriptSelectedRowIndexes(value81, args22.rows.length),
+      storyboardScript8 = { ...args22, selectedRowIndexes: selectedRowIndexes, updatedAt: Date.now() };
+    ((this._data = { ...this._data, storyboardScript: storyboardScript8 }),
+      this._syncListSelectionState(storyboardScript8),
+      appStore.updateNodeData(this.nodeId, { storyboardScript: storyboardScript8 }));
+  }
+  ['_toggleRowSelection'](value82, value83) {
+    const value84 = this._getScriptState(),
+      map4 = new Set(getSelectedRowIndexes(value84));
+    if (value83) map4.add(value82);
+    else map4.delete(value82);
+    this._updateSelectedRowIndexes([...map4].sort((item23, value85) => item23 - value85));
+  }
+  ['_setAllRowsSelected'](value86) {
+    const value87 = this._getScriptState(),
+      value88 = value86 ? value87.rows.map((item24, value89) => value89) : [];
+    this._updateSelectedRowIndexes(value88);
+  }
+  ['_setViewMode'](value90) {
+    this._finishCellEdit({ commit: true });
+    const viewMode = normalizeStoryboardScriptViewMode(value90),
+      args23 = this._getScriptState();
+    if (args23.viewMode === viewMode) return;
+    appStore.updateNodeData(this.nodeId, { storyboardScript: { ...args23, viewMode: viewMode } });
+  }
+  ['_setMediaMode'](value91) {
+    this._finishCellEdit({ commit: true });
+    const mediaMode3 = normalizeStoryboardScriptMediaMode(value91),
+      args24 = this._getScriptState();
+    if (args24.mediaMode === mediaMode3) return;
+    appStore.updateNodeData(this.nodeId, {
+      storyboardScript: { ...args24, mediaMode: mediaMode3, updatedAt: Date.now() },
+    });
+  }
+  ['_syncModeButtons'](value92, value93) {
+    [this._listBtn, this._cardBtn].forEach((el44) => {
+      if (!el44) return;
+      const value94 = el44.dataset.mode === value92;
+      (el44.classList.toggle('is-active', value94),
+        el44.setAttribute('aria-pressed', value94 ? 'true' : 'false'));
+    });
+    const storyboardScriptMediaMode = normalizeStoryboardScriptMediaMode(value93);
+    [this._imageModeBtn, this._videoModeBtn].forEach((el45) => {
+      if (!el45) return;
+      const value95 = el45.dataset.mediaMode === storyboardScriptMediaMode;
+      (el45.classList.toggle('is-active', value95),
+        el45.setAttribute('aria-pressed', value95 ? 'true' : 'false'));
+    });
+  }
+  ['_isStoryboardScriptGenerating'](value96 = null) {
+    const value97 = appStore.getState?.().nodes?.[this.nodeId] || this._data || {},
+      value98 =
+        value96 ||
+        createDefaultStoryboardScriptState(value97.storyboardScript || this._data.storyboardScript || {});
+    return (
+      this._isGeneratingScript ||
+      value97.isGenerating === true ||
+      value98.isGenerating === true ||
+      String(value98.jobStatus || value97.jobStatus || '') === 'running'
+    );
+  }
+  ['_syncGeneratingOverlay'](value99) {
+    if (!this._bodyEl) return;
+    const enabled19 = value99 === true;
+    (this.el?.classList?.toggle('is-storyboard-script-generating', enabled19),
+      this._bodyEl.classList.toggle('is-generating', enabled19),
+      this._bodyEl.setAttribute('aria-busy', enabled19 ? 'true' : 'false'));
+    const el46 = this._bodyEl.querySelector('.storyboard-script-loading-overlay');
+    if (!enabled19) {
+      el46?.remove();
+      return;
+    }
+    if (el46) return;
+    this._bodyEl.appendChild(createStoryboardScriptLoadingOverlay());
+  }
+  ['_setStoryboardGeneratingState'](isGenerating, args25 = {}) {
+    const args26 = this._getScriptState(),
+      storyboardScript9 = {
+        ...args26,
+        ...args25,
+        isGenerating: isGenerating === true,
+        jobStatus: isGenerating === true ? 'running' : args25.jobStatus || '',
+        updatedAt: Date.now(),
+      };
+    ((this._data = { ...this._data, storyboardScript: storyboardScript9 }),
+      appStore.updateNodeData(this.nodeId, { storyboardScript: storyboardScript9 }));
   }
   ['_showStoryboardLoadingOverlayImmediately']() {
     if (this._isGeneratingScript) return;
-    const _0x867fcc = this._getScriptState();
-    if (_0x867fcc.selectionMode === true) return;
+    const value100 = this._getScriptState();
+    if (value100.selectionMode === true) return;
     ((this._isGeneratingScript = true),
       (this._isPromptGenerateLoadingPrimed = true),
       this._setStoryboardGeneratingState(true),
       this._syncGeneratingOverlay(true));
   }
   ['_bindPromptGenerateImmediateLoading']() {
-    const _0x259525 = this.btnEl;
-    if (!(_0x259525 instanceof HTMLElement)) return;
-    _0x259525.addEventListener(
+    const el47 = this.btnEl;
+    if (!(el47 instanceof HTMLElement)) return;
+    el47.addEventListener(
       'click',
       () => {
-        if (_0x259525.disabled) return;
+        if (el47.disabled) return;
         this._showStoryboardLoadingOverlayImmediately();
       },
       { capture: true },
@@ -1543,197 +1536,197 @@ export class StoryboardScriptNode {
     return this._getStoryboardSubmitInput().promptText;
   }
   ['_getStoryboardSubmitInput']() {
-    const _0x14fe0e = appStore.getState(),
-      _0x5d0dab = _0x14fe0e.nodes || {},
-      _0x4207b5 = _0x5d0dab?.[this.nodeId] || this._data || {},
-      _0x50644f = appStore.getIncomingEdges(this.nodeId),
-      _0x1edfdd = collectDirectStoryboardImageRefs(_0x50644f, _0x5d0dab),
-      _0x231c3e = collectDirectStoryboardVideoRefs(_0x50644f, _0x5d0dab),
-      _0x54e41d = [],
-      _0x3bd474 = { image: _0x1edfdd.length, video: _0x231c3e.length, audio: 0 },
-      _0x3da0e8 = resolvePromptTextWithTextRefs({
+    const value101 = appStore.getState(),
+      nodes = value101.nodes || {},
+      value102 = nodes?.[this.nodeId] || this._data || {},
+      inEdges = appStore.getIncomingEdges(this.nodeId),
+      image = collectDirectStoryboardImageRefs(inEdges, nodes),
+      video = collectDirectStoryboardVideoRefs(inEdges, nodes),
+      assetInputRefs = [],
+      assetMediaCounts = { image: image.length, video: video.length, audio: 0 },
+      promptText = resolvePromptTextWithTextRefs({
         promptEl: this.promptEl,
-        inEdges: _0x50644f,
-        nodes: _0x5d0dab,
-        assetInputRefs: _0x54e41d,
-        assetMediaCounts: _0x3bd474,
+        inEdges: inEdges,
+        nodes: nodes,
+        assetInputRefs: assetInputRefs,
+        assetMediaCounts: assetMediaCounts,
         allowedAssetTypes: ['text', 'image', 'video'],
       }).trim(),
-      _0x40fa2c = getPromptAssetInputRefsFromNode(_0x4207b5, { allowedTypes: ['image', 'video'] }),
-      _0x26729d = normalizeStoryboardImageInputRefs({
-        directImageRefs: _0x1edfdd,
-        promptAssetRefs: _0x54e41d,
-        hiddenAssetRefs: _0x40fa2c,
+      hiddenAssetRefs2 = getPromptAssetInputRefsFromNode(value102, { allowedTypes: ['image', 'video'] }),
+      imageRefs = normalizeStoryboardImageInputRefs({
+        directImageRefs: image,
+        promptAssetRefs: assetInputRefs,
+        hiddenAssetRefs: hiddenAssetRefs2,
       }),
-      _0xc12de8 = normalizeStoryboardVideoInputRefs({
-        directVideoRefs: _0x231c3e,
-        promptAssetRefs: _0x54e41d,
-        hiddenAssetRefs: _0x40fa2c,
+      videoRefs = normalizeStoryboardVideoInputRefs({
+        directVideoRefs: video,
+        promptAssetRefs: assetInputRefs,
+        hiddenAssetRefs: hiddenAssetRefs2,
       }),
-      _0x12350c = _0x26729d.map((_0x4fc45f) => _0x4fc45f.url).filter(Boolean),
-      _0x1380a1 = _0xc12de8.map((_0xe87433) => _0xe87433.url).filter(Boolean),
-      _0xd0dbfb =
-        _0x12350c.length > 0 && _0x1380a1.length > 0
+      inputImageUrls2 = imageRefs.map((response12) => response12.url).filter(Boolean),
+      inputVideoUrls = videoRefs.map((response13) => response13.url).filter(Boolean),
+      sourceMode2 =
+        inputImageUrls2.length > 0 && inputVideoUrls.length > 0
           ? 'multimodal'
-          : _0x1380a1.length > 0
+          : inputVideoUrls.length > 0
             ? 'video'
-            : _0x12350c.length > 0
+            : inputImageUrls2.length > 0
               ? 'image'
               : 'text';
     return {
-      promptText: _0x3da0e8,
-      imageRefs: _0x26729d,
-      videoRefs: _0xc12de8,
-      imageLabels: _0x26729d.map((_0x44b1ac) => _0x44b1ac.label),
-      videoLabels: _0xc12de8.map((_0x464c70) => _0x464c70.label),
-      inputUrls: [..._0x12350c, ..._0x1380a1],
-      inputImageUrls: _0x12350c,
-      inputVideoUrls: _0x1380a1,
-      sourceMode: _0xd0dbfb,
+      promptText: promptText,
+      imageRefs: imageRefs,
+      videoRefs: videoRefs,
+      imageLabels: imageRefs.map((item25) => item25.label),
+      videoLabels: videoRefs.map((item26) => item26.label),
+      inputUrls: [...inputImageUrls2, ...inputVideoUrls],
+      inputImageUrls: inputImageUrls2,
+      inputVideoUrls: inputVideoUrls,
+      sourceMode: sourceMode2,
     };
   }
   ['_updateSubmitButtonState']() {
     if (!this.btnEl) return;
-    const _0x4d3c74 = appStore.getState?.().nodes?.[this.nodeId] || this._data || {},
-      _0x2035fa = createDefaultStoryboardScriptState(
-        _0x4d3c74.storyboardScript || this._data.storyboardScript || {},
+    const cancellable = appStore.getState?.().nodes?.[this.nodeId] || this._data || {},
+      jobStatus = createDefaultStoryboardScriptState(
+        cancellable.storyboardScript || this._data.storyboardScript || {},
       ),
-      _0x409fcd = resolveGenerationButtonMode(
+      disabled = resolveGenerationButtonMode(
         {
-          ..._0x4d3c74,
+          ...cancellable,
           isGenerating:
-            this._isGeneratingScript || _0x4d3c74.isGenerating === true || _0x2035fa.isGenerating === true,
-          jobStatus: _0x2035fa.jobStatus || _0x4d3c74.jobStatus || '',
+            this._isGeneratingScript || cancellable.isGenerating === true || jobStatus.isGenerating === true,
+          jobStatus: jobStatus.jobStatus || cancellable.jobStatus || '',
         },
-        { cancellable: _0x4d3c74.taskCancellable === true },
+        { cancellable: cancellable.taskCancellable === true },
       ),
-      _0x461bab = this._getStoryboardSubmitInput(),
-      _0x121f3b = _0x461bab.promptText,
-      _0x3fcae9 = _0x2035fa.rows.length > 0 && _0x2035fa.selectionMode === true,
-      _0x41213b = _0x3fcae9
+      value103 = this._getStoryboardSubmitInput(),
+      value104 = value103.promptText,
+      enabled20 = jobStatus.rows.length > 0 && jobStatus.selectionMode === true,
+      title4 = enabled20
         ? storyboardScriptText('toolbar.generateSelected')
         : storyboardScriptText('generate'),
-      _0x3abbb4 = getSelectedRowIndexes(_0x2035fa).length,
-      _0x92b1cd = _0x3fcae9
-        ? _0x3abbb4 > 0
-        : Boolean(_0x121f3b || _0x461bab.inputImageUrls.length > 0 || _0x461bab.inputVideoUrls.length > 0);
-    this._syncGeneratingOverlay(_0x409fcd.busy);
+      selectedRowIndexes2 = getSelectedRowIndexes(jobStatus).length,
+      enabled21 = enabled20
+        ? selectedRowIndexes2 > 0
+        : Boolean(value104 || value103.inputImageUrls.length > 0 || value103.inputVideoUrls.length > 0);
+    this._syncGeneratingOverlay(disabled.busy);
     this._queueBtn &&
-      ((this._queueBtn.hidden = !_0x3fcae9),
-      (this._queueBtn.disabled = !_0x3fcae9 || _0x3abbb4 === 0 || _0x409fcd.busy),
+      ((this._queueBtn.hidden = !enabled20),
+      (this._queueBtn.disabled = !enabled20 || selectedRowIndexes2 === 0 || disabled.busy),
       (this._queueBtn.style.cursor = this._queueBtn.disabled ? 'var(--unavailable-cursor)' : ''));
     this._syncToolbarButtonState({
-      canGenerate: _0x2035fa.rows.length > 0 && !_0x409fcd.busy && !_0x409fcd.disabled,
-      canDownload: Array.isArray(_0x2035fa.rows) && _0x2035fa.rows.length > 0,
+      canGenerate: jobStatus.rows.length > 0 && !disabled.busy && !disabled.disabled,
+      canDownload: Array.isArray(jobStatus.rows) && jobStatus.rows.length > 0,
     });
-    if (_0x409fcd.busy) {
+    if (disabled.busy) {
       (setGenerateButtonLoadingUi(this.btnEl, {
-        title: _0x41213b,
-        disabled: _0x409fcd.disabled,
-        ariaLabel: _0x41213b,
+        title: title4,
+        disabled: disabled.disabled,
+        ariaLabel: title4,
       }),
-        (this.btnEl.disabled = _0x409fcd.disabled),
-        (this.btnEl.style.cursor = _0x409fcd.cursor));
+        (this.btnEl.disabled = disabled.disabled),
+        (this.btnEl.style.cursor = disabled.cursor));
       return;
     }
-    (resetGenerateButtonIdleUi(this.btnEl, _0x41213b),
-      !_0x92b1cd
+    (resetGenerateButtonIdleUi(this.btnEl, title4),
+      !enabled21
         ? ((this.btnEl.disabled = true), (this.btnEl.style.cursor = 'var(--unavailable-cursor)'))
         : ((this.btnEl.disabled = false), (this.btnEl.style.cursor = '')));
   }
   ['_syncToolbarButtonState']({
-    canGenerate: _0x8abd24,
-    canDownload: _0x55d66f,
-    canFullscreen: _0x547312,
+    canGenerate: canGenerate,
+    canDownload: canDownload,
+    canFullscreen: canFullscreen,
   } = {}) {
     this._toolbarGenerateBtn &&
-      ((this._toolbarGenerateBtn.disabled = _0x8abd24 !== true),
-      (this._toolbarGenerateBtn.style.cursor = _0x8abd24 === true ? '' : 'var(--unavailable-cursor)'));
+      ((this._toolbarGenerateBtn.disabled = canGenerate !== true),
+      (this._toolbarGenerateBtn.style.cursor = canGenerate === true ? '' : 'var(--unavailable-cursor)'));
     if (this._toolbarFullscreenBtn) {
-      const _0x1b40c7 = (_0x547312 ?? _0x55d66f) === true;
-      ((this._toolbarFullscreenBtn.disabled = !_0x1b40c7),
-        (this._toolbarFullscreenBtn.style.cursor = _0x1b40c7 ? '' : 'var(--unavailable-cursor)'));
+      const enabled22 = (canFullscreen ?? canDownload) === true;
+      ((this._toolbarFullscreenBtn.disabled = !enabled22),
+        (this._toolbarFullscreenBtn.style.cursor = enabled22 ? '' : 'var(--unavailable-cursor)'));
     }
     this._toolbarDownloadBtn &&
-      ((this._toolbarDownloadBtn.disabled = _0x55d66f !== true),
-      (this._toolbarDownloadBtn.style.cursor = _0x55d66f === true ? '' : 'var(--unavailable-cursor)'));
+      ((this._toolbarDownloadBtn.disabled = canDownload !== true),
+      (this._toolbarDownloadBtn.style.cursor = canDownload === true ? '' : 'var(--unavailable-cursor)'));
   }
   ['_syncGenerateButtonState']() {
     this._updateSubmitButtonState();
   }
   ['_createFullscreenCloseButton']() {
-    const _0x5973e5 = document.createElement('button');
+    const el48 = document.createElement('button');
     return (
-      (_0x5973e5.type = 'button'),
-      (_0x5973e5.className = 'storyboard-script-fullscreen-close'),
-      _0x5973e5.setAttribute('aria-label', storyboardScriptText('fullscreen.close')),
-      (_0x5973e5.innerHTML =
+      (el48.type = 'button'),
+      (el48.className = 'storyboard-script-fullscreen-close'),
+      el48.setAttribute('aria-label', storyboardScriptText('fullscreen.close')),
+      (el48.innerHTML =
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'),
-      _0x5973e5.addEventListener('click', (_0x2bd014) => {
-        (_0x2bd014.stopPropagation(), this._closeFullscreenScript());
+      el48.addEventListener('click', (event18) => {
+        (event18.stopPropagation(), this._closeFullscreenScript());
       }),
-      _0x5973e5
+      el48
     );
   }
   ['_openFullscreenScript']() {
     this._finishCellEdit({ commit: true });
-    const _0x2b2256 = this._getScriptState();
-    if (!Array.isArray(_0x2b2256.rows) || _0x2b2256.rows.length === 0) {
+    const value105 = this._getScriptState();
+    if (!Array.isArray(value105.rows) || value105.rows.length === 0) {
       window.showToast?.(storyboardScriptText('toasts.noFullscreenData'), 'warn');
       return;
     }
     if (this._fullscreenOverlayEl) {
-      (this._renderFullscreenContent(_0x2b2256),
+      (this._renderFullscreenContent(value105),
         this._fullscreenOverlayEl
           .querySelector('.storyboard-script-fullscreen-close')
           ?.focus?.({ preventScroll: true }));
       return;
     }
-    const _0x24d860 = document.createElement('div');
-    ((_0x24d860.className = 'storyboard-script-fullscreen-overlay'),
-      _0x24d860.setAttribute('role', 'dialog'),
-      _0x24d860.setAttribute('aria-modal', 'true'),
-      _0x24d860.setAttribute('aria-label', storyboardScriptText('fullscreen.aria')));
-    const _0x2ced88 = document.createElement('section');
-    ((_0x2ced88.className = 'storyboard-script-fullscreen-panel'),
-      _0x2ced88.addEventListener('pointerdown', (_0x29e9fc) => {
-        _0x29e9fc.stopPropagation();
+    const el49 = document.createElement('div');
+    ((el49.className = 'storyboard-script-fullscreen-overlay'),
+      el49.setAttribute('role', 'dialog'),
+      el49.setAttribute('aria-modal', 'true'),
+      el49.setAttribute('aria-label', storyboardScriptText('fullscreen.aria')));
+    const el50 = document.createElement('section');
+    ((el50.className = 'storyboard-script-fullscreen-panel'),
+      el50.addEventListener('pointerdown', (event19) => {
+        event19.stopPropagation();
       }),
-      _0x2ced88.addEventListener('dblclick', (_0x1f29e0) => {
-        _0x1f29e0.stopPropagation();
+      el50.addEventListener('dblclick', (event20) => {
+        event20.stopPropagation();
       }));
-    const _0x280bbf = document.createElement('header');
-    _0x280bbf.className = 'storyboard-script-fullscreen-header';
-    const _0x2850ad = document.createElement('div');
-    _0x2850ad.className = 'storyboard-script-fullscreen-title-wrap';
-    const _0x405adc = document.createElement('div');
-    ((_0x405adc.className = 'storyboard-script-fullscreen-title'),
-      (_0x405adc.textContent = _0x2b2256.title || this._data.name || getStoryboardScriptDefaultName()));
-    const _0x785676 = document.createElement('div');
-    ((_0x785676.className = 'storyboard-script-fullscreen-meta'),
-      _0x2850ad.appendChild(_0x405adc),
-      _0x2850ad.appendChild(_0x785676),
-      _0x280bbf.appendChild(_0x2850ad),
-      _0x280bbf.appendChild(this._createFullscreenCloseButton()));
-    const _0x248520 = document.createElement('div');
-    ((_0x248520.className = 'storyboard-script-fullscreen-body'),
-      this._bindFullscreenBodyInteractions(_0x248520),
-      _0x2ced88.appendChild(_0x280bbf),
-      _0x2ced88.appendChild(_0x248520),
-      _0x24d860.appendChild(_0x2ced88),
-      _0x24d860.addEventListener('pointerdown', (_0x4f745e) => {
-        _0x4f745e.stopPropagation();
-        if (_0x4f745e.target === _0x24d860) this._closeFullscreenScript();
+    const el51 = document.createElement('header');
+    el51.className = 'storyboard-script-fullscreen-header';
+    const el52 = document.createElement('div');
+    el52.className = 'storyboard-script-fullscreen-title-wrap';
+    const el53 = document.createElement('div');
+    ((el53.className = 'storyboard-script-fullscreen-title'),
+      (el53.textContent = value105.title || this._data.name || getStoryboardScriptDefaultName()));
+    const value106 = document.createElement('div');
+    ((value106.className = 'storyboard-script-fullscreen-meta'),
+      el52.appendChild(el53),
+      el52.appendChild(value106),
+      el51.appendChild(el52),
+      el51.appendChild(this._createFullscreenCloseButton()));
+    const value107 = document.createElement('div');
+    ((value107.className = 'storyboard-script-fullscreen-body'),
+      this._bindFullscreenBodyInteractions(value107),
+      el50.appendChild(el51),
+      el50.appendChild(value107),
+      el49.appendChild(el50),
+      el49.addEventListener('pointerdown', (event21) => {
+        event21.stopPropagation();
+        if (event21.target === el49) this._closeFullscreenScript();
       }),
-      (this._onFullscreenKeydown = (_0x2260c9) => {
-        if (_0x2260c9.key !== 'Escape') return;
-        (_0x2260c9.preventDefault(), _0x2260c9.stopPropagation(), this._closeFullscreenScript());
+      (this._onFullscreenKeydown = (event22) => {
+        if (event22.key !== 'Escape') return;
+        (event22.preventDefault(), event22.stopPropagation(), this._closeFullscreenScript());
       }),
       document.addEventListener('keydown', this._onFullscreenKeydown, true),
-      document.body.appendChild(_0x24d860),
-      (this._fullscreenOverlayEl = _0x24d860),
-      this._renderFullscreenContent(_0x2b2256),
-      _0x24d860.querySelector('.storyboard-script-fullscreen-close')?.focus?.({ preventScroll: true }));
+      document.body.appendChild(el49),
+      (this._fullscreenOverlayEl = el49),
+      this._renderFullscreenContent(value105),
+      el49.querySelector('.storyboard-script-fullscreen-close')?.focus?.({ preventScroll: true }));
   }
   ['_closeFullscreenScript']() {
     (this._finishCellEdit({ commit: true }),
@@ -1743,96 +1736,92 @@ export class StoryboardScriptNode {
       this._fullscreenOverlayEl?.remove(),
       (this._fullscreenOverlayEl = null));
   }
-  ['_bindFullscreenBodyInteractions'](_0x159be8) {
-    if (!(_0x159be8 instanceof HTMLElement)) return;
-    (_0x159be8.addEventListener(
+  ['_bindFullscreenBodyInteractions'](el54) {
+    if (!(el54 instanceof HTMLElement)) return;
+    (el54.addEventListener(
       'wheel',
-      (_0x46fb91) => {
-        _0x46fb91.stopPropagation();
+      (event23) => {
+        event23.stopPropagation();
       },
       { passive: false },
     ),
-      _0x159be8.addEventListener(
+      el54.addEventListener(
         'pointerdown',
-        (_0x4874e1) => {
-          const _0x6d23aa =
-              _0x4874e1.target instanceof Element ? _0x4874e1.target : _0x4874e1.target?.parentElement,
-            _0x55a55c = _0x6d23aa?.closest?.('[data-storyboard-edit-key]');
-          if (!_0x55a55c || !_0x159be8.contains(_0x55a55c)) return;
-          this._beginCellEdit(_0x55a55c, { focus: false, selectAll: false });
+        (event24) => {
+          const el55 = event24.target instanceof Element ? event24.target : event24.target?.parentElement,
+            enabled23 = el55?.closest?.('[data-storyboard-edit-key]');
+          if (!enabled23 || !el54.contains(enabled23)) return;
+          this._beginCellEdit(enabled23, { focus: false, selectAll: false });
         },
         { capture: true },
       ),
-      _0x159be8.addEventListener('pointerdown', (_0x5109de) => {
-        _0x5109de.stopPropagation();
+      el54.addEventListener('pointerdown', (event25) => {
+        event25.stopPropagation();
       }),
-      _0x159be8.addEventListener('dblclick', (_0x2e5256) => {
-        const _0x558ac6 =
-            _0x2e5256.target instanceof Element ? _0x2e5256.target : _0x2e5256.target?.parentElement,
-          _0x42045b = _0x558ac6?.closest?.('[data-storyboard-edit-key]');
-        (_0x2e5256.preventDefault(), _0x2e5256.stopPropagation());
-        if (!_0x42045b || !_0x159be8.contains(_0x42045b)) return;
-        this._beginCellEdit(_0x42045b);
+      el54.addEventListener('dblclick', (event26) => {
+        const el56 = event26.target instanceof Element ? event26.target : event26.target?.parentElement,
+          enabled24 = el56?.closest?.('[data-storyboard-edit-key]');
+        (event26.preventDefault(), event26.stopPropagation());
+        if (!enabled24 || !el54.contains(enabled24)) return;
+        this._beginCellEdit(enabled24);
       }));
   }
-  ['_renderFullscreenContent'](_0x166b01 = this._getScriptState(), _0x28f926 = null) {
+  ['_renderFullscreenContent'](value108 = this._getScriptState(), value109 = null) {
     if (!this._fullscreenOverlayEl) return;
-    const _0x2d3024 = this._fullscreenOverlayEl.querySelector('.storyboard-script-fullscreen-body');
-    if (!(_0x2d3024 instanceof HTMLElement)) return;
-    const _0x936153 = Array.isArray(_0x166b01.rows) ? _0x166b01.rows : [],
-      _0x19a0e1 = _0x2d3024.querySelector('.storyboard-script-table-wrap, .storyboard-script-card-grid'),
-      _0x52296f = _0x19a0e1 ? { left: _0x19a0e1.scrollLeft || 0, top: _0x19a0e1.scrollTop || 0 } : null,
-      _0x3f48b2 =
-        _0x28f926 ||
-        mergeStoryboardImageRefs(this._getStoryboardSubmitInput().imageRefs, _0x166b01.referenceImageRefs),
-      _0x293a04 = this._fullscreenOverlayEl.querySelector('.storyboard-script-fullscreen-title');
-    _0x293a04 &&
-      (_0x293a04.textContent = _0x166b01.title || this._data.name || getStoryboardScriptDefaultName());
-    const _0x1b558c = this._fullscreenOverlayEl.querySelector('.storyboard-script-fullscreen-meta');
-    if (_0x1b558c) {
-      const _0x5cc04b =
-          normalizeStoryboardScriptViewMode(_0x166b01.viewMode) === 'card'
+    const el57 = this._fullscreenOverlayEl.querySelector('.storyboard-script-fullscreen-body');
+    if (!(el57 instanceof HTMLElement)) return;
+    const count2 = Array.isArray(value108.rows) ? value108.rows : [],
+      left = el57.querySelector('.storyboard-script-table-wrap, .storyboard-script-card-grid'),
+      box2 = left ? { left: left.scrollLeft || 0, top: left.scrollTop || 0 } : null,
+      value110 =
+        value109 ||
+        mergeStoryboardImageRefs(this._getStoryboardSubmitInput().imageRefs, value108.referenceImageRefs),
+      el58 = this._fullscreenOverlayEl.querySelector('.storyboard-script-fullscreen-title');
+    el58 && (el58.textContent = value108.title || this._data.name || getStoryboardScriptDefaultName());
+    const el59 = this._fullscreenOverlayEl.querySelector('.storyboard-script-fullscreen-meta');
+    if (el59) {
+      const view =
+          normalizeStoryboardScriptViewMode(value108.viewMode) === 'card'
             ? storyboardScriptText('viewMode.card')
             : storyboardScriptText('viewMode.list'),
-        _0x4f96cb =
-          normalizeStoryboardScriptMediaMode(_0x166b01.mediaMode) === 'video'
+        media =
+          normalizeStoryboardScriptMediaMode(value108.mediaMode) === 'video'
             ? storyboardScriptText('mediaMode.video')
             : storyboardScriptText('mediaMode.image');
-      _0x1b558c.textContent = storyboardScriptText('fullscreen.meta', {
-        count: _0x936153.length,
-        media: _0x4f96cb,
-        view: _0x5cc04b,
+      el59.textContent = storyboardScriptText('fullscreen.meta', {
+        count: count2.length,
+        media: media,
+        view: view,
       });
     }
-    _0x2d3024.replaceChildren();
-    if (_0x936153.length === 0) {
-      _0x2d3024.appendChild(this._createEmptyState());
+    el57.replaceChildren();
+    if (count2.length === 0) {
+      el57.appendChild(this._createEmptyState());
       return;
     }
-    const _0x295fce = buildStoryboardImageRefMap(_0x3f48b2),
-      _0x52ee36 =
-        normalizeStoryboardScriptViewMode(_0x166b01.viewMode) === 'card'
+    const storyboardImageRefMap = buildStoryboardImageRefMap(value110),
+      el60 =
+        normalizeStoryboardScriptViewMode(value108.viewMode) === 'card'
           ? this._createCardView(
-              _0x936153,
-              getStoryboardCardFieldsForMediaMode(_0x166b01.mediaMode, _0x936153),
-              _0x295fce,
+              count2,
+              getStoryboardCardFieldsForMediaMode(value108.mediaMode, count2),
+              storyboardImageRefMap,
             )
           : this._createListView(
-              _0x936153,
-              getStoryboardColumnsForMediaMode(_0x166b01.mediaMode, _0x936153),
-              _0x295fce,
+              count2,
+              getStoryboardColumnsForMediaMode(value108.mediaMode, count2),
+              storyboardImageRefMap,
               { selectionMode: false },
             );
-    (_0x52ee36.classList.add('storyboard-script-fullscreen-scroller'), _0x2d3024.appendChild(_0x52ee36));
-    if (_0x52296f) {
-      const _0x25c69e = () => {
-        ((_0x52ee36.scrollLeft = Math.max(0, _0x52296f.left)),
-          (_0x52ee36.scrollTop = Math.max(0, _0x52296f.top)));
+    (el60.classList.add('storyboard-script-fullscreen-scroller'), el57.appendChild(el60));
+    if (box2) {
+      const run4 = () => {
+        ((el60.scrollLeft = Math.max(0, box2.left)), (el60.scrollTop = Math.max(0, box2.top)));
       };
-      (_0x25c69e(),
+      (run4(),
         typeof window !== 'undefined' &&
           typeof window.requestAnimationFrame === 'function' &&
-          window.requestAnimationFrame(_0x25c69e));
+          window.requestAnimationFrame(run4));
     }
   }
   ['_renderRefBar']() {
@@ -1842,454 +1831,463 @@ export class StoryboardScriptNode {
     if (!this._bodyEl) return;
     (this._bodyEl.addEventListener(
       'wheel',
-      (_0x21ff13) => {
-        _0x21ff13.stopPropagation();
+      (event27) => {
+        event27.stopPropagation();
       },
       { passive: false },
     ),
       this._bodyEl.addEventListener(
         'pointerdown',
-        (_0x1513ba) => {
-          const _0x49b799 = this._getScriptState();
-          if (_0x49b799.selectionMode !== true) return;
-          const _0xcc9b4d =
-              _0x1513ba.target instanceof Element ? _0x1513ba.target : _0x1513ba.target?.parentElement,
-            _0x52eb00 = _0xcc9b4d?.closest?.('[data-storyboard-edit-key]');
-          if (!_0x52eb00 || !this._bodyEl.contains(_0x52eb00)) return;
-          this._beginCellEdit(_0x52eb00, { focus: false, selectAll: false });
+        (event28) => {
+          const value111 = this._getScriptState();
+          if (value111.selectionMode !== true) return;
+          const el61 = event28.target instanceof Element ? event28.target : event28.target?.parentElement,
+            enabled25 = el61?.closest?.('[data-storyboard-edit-key]');
+          if (!enabled25 || !this._bodyEl.contains(enabled25)) return;
+          this._beginCellEdit(enabled25, { focus: false, selectAll: false });
         },
         { capture: true },
       ),
-      this._bodyEl.addEventListener('pointerdown', (_0x34c4bf) => {
-        const _0x1f4db2 = this._getScriptState();
-        if (_0x1f4db2.selectionMode !== true) return;
-        _0x34c4bf.stopPropagation();
+      this._bodyEl.addEventListener('pointerdown', (event29) => {
+        const value112 = this._getScriptState();
+        if (value112.selectionMode !== true) return;
+        event29.stopPropagation();
       }),
-      this._bodyEl.addEventListener('dblclick', (_0x42fd88) => {
-        const _0x2b3c57 =
-            _0x42fd88.target instanceof Element ? _0x42fd88.target : _0x42fd88.target?.parentElement,
-          _0x434180 = _0x2b3c57?.closest?.('[data-storyboard-edit-key]');
-        (_0x42fd88.preventDefault(), _0x42fd88.stopPropagation());
-        const _0x4917a5 = this._getScriptState();
-        if (_0x4917a5.selectionMode !== true) {
+      this._bodyEl.addEventListener('dblclick', (event30) => {
+        const el62 = event30.target instanceof Element ? event30.target : event30.target?.parentElement,
+          enabled26 = el62?.closest?.('[data-storyboard-edit-key]');
+        (event30.preventDefault(), event30.stopPropagation());
+        const value113 = this._getScriptState();
+        if (value113.selectionMode !== true) {
           this._enterSelectionMode();
           return;
         }
-        if (!_0x434180 || !this._bodyEl.contains(_0x434180)) return;
-        this._beginCellEdit(_0x434180);
+        if (!enabled26 || !this._bodyEl.contains(enabled26)) return;
+        this._beginCellEdit(enabled26);
       }));
   }
-  ['_beginCellEdit'](_0xac877, { focus: focus = true, selectAll: selectAll = true } = {}) {
-    if (!(_0xac877 instanceof HTMLElement)) return;
-    if (this._activeCellEdit?.target === _0xac877) return;
+  ['_beginCellEdit'](target2, { focus: focus = true, selectAll: selectAll = true } = {}) {
+    if (!(target2 instanceof HTMLElement)) return;
+    if (this._activeCellEdit?.target === target2) return;
     this._finishCellEdit({ commit: true });
-    const _0x5ee7e9 = Number(_0xac877.dataset.storyboardRowIndex),
-      _0x4d48e0 = String(_0xac877.dataset.storyboardEditKey || '');
-    if (!Number.isInteger(_0x5ee7e9) || _0x5ee7e9 < 0 || !_0x4d48e0) return;
-    const _0x3d4f83 = _0xac877.dataset.storyboardRawValue ?? _0xac877.textContent ?? '',
-      _0x4763a2 = (_0x4a1694) => _0x4a1694.stopPropagation(),
-      _0x19c1c5 = (_0x3cbfda) => _0x3cbfda.stopPropagation(),
-      _0x14c495 = (_0x281446) => {
-        _0x281446.stopPropagation();
-        if (_0x281446.key === 'Enter' && !_0x281446.shiftKey)
-          (_0x281446.preventDefault(), this._finishCellEdit({ commit: true }));
-        else
-          _0x281446.key === 'Escape' && (_0x281446.preventDefault(), this._finishCellEdit({ commit: false }));
+    const rowIndex = Number(target2.dataset.storyboardRowIndex),
+      key2 = String(target2.dataset.storyboardEditKey || '');
+    if (!Number.isInteger(rowIndex) || rowIndex < 0 || !key2) return;
+    const originalText = target2.dataset.storyboardRawValue ?? target2.textContent ?? '',
+      value114 = (event31) => event31.stopPropagation(),
+      value115 = (event32) => event32.stopPropagation(),
+      value116 = (event33) => {
+        event33.stopPropagation();
+        if (event33.key === 'Enter' && !event33.shiftKey)
+          (event33.preventDefault(), this._finishCellEdit({ commit: true }));
+        else event33.key === 'Escape' && (event33.preventDefault(), this._finishCellEdit({ commit: false }));
       },
-      _0x28a687 = () => this._finishCellEdit({ commit: true }),
-      _0x1f4a8a = () => {
-        (_0xac877.removeEventListener('pointerdown', _0x4763a2),
-          _0xac877.removeEventListener('dblclick', _0x19c1c5),
-          _0xac877.removeEventListener('keydown', _0x14c495),
-          _0xac877.removeEventListener('blur', _0x28a687));
+      value117 = () => this._finishCellEdit({ commit: true }),
+      cleanup = () => {
+        (target2.removeEventListener('pointerdown', value114),
+          target2.removeEventListener('dblclick', value115),
+          target2.removeEventListener('keydown', value116),
+          target2.removeEventListener('blur', value117));
       };
     ((this._activeCellEdit = {
-      target: _0xac877,
-      rowIndex: _0x5ee7e9,
-      key: _0x4d48e0,
-      originalText: _0x3d4f83,
-      cleanup: _0x1f4a8a,
+      target: target2,
+      rowIndex: rowIndex,
+      key: key2,
+      originalText: originalText,
+      cleanup: cleanup,
     }),
-      (_0xac877.textContent = _0x3d4f83),
-      _0xac877.classList.remove('storyboard-script-image-cell'),
-      _0xac877.classList.add('is-editing'),
-      (_0xac877.contentEditable = 'true'),
-      (_0xac877.spellcheck = false),
-      _0xac877.addEventListener('pointerdown', _0x4763a2),
-      _0xac877.addEventListener('dblclick', _0x19c1c5),
-      _0xac877.addEventListener('keydown', _0x14c495),
-      _0xac877.addEventListener('blur', _0x28a687));
-    focus && _0xac877.focus({ preventScroll: true });
-    const _0x4f3159 = selectAll ? window.getSelection?.() : null;
-    if (_0x4f3159) {
-      const _0x7030da = document.createRange();
-      (_0x7030da.selectNodeContents(_0xac877), _0x4f3159.removeAllRanges(), _0x4f3159.addRange(_0x7030da));
+      (target2.textContent = originalText),
+      target2.classList.remove('storyboard-script-image-cell'),
+      target2.classList.add('is-editing'),
+      (target2.contentEditable = 'true'),
+      (target2.spellcheck = false),
+      target2.addEventListener('pointerdown', value114),
+      target2.addEventListener('dblclick', value115),
+      target2.addEventListener('keydown', value116),
+      target2.addEventListener('blur', value117));
+    focus && target2.focus({ preventScroll: true });
+    const value118 = selectAll ? window.getSelection?.() : null;
+    if (value118) {
+      const value119 = document.createRange();
+      (value119.selectNodeContents(target2), value118.removeAllRanges(), value118.addRange(value119));
     }
   }
-  ['_finishCellEdit']({ commit: _0x259ffd }) {
-    const _0x2fdeeb = this._activeCellEdit;
-    if (!_0x2fdeeb) return;
+  ['_finishCellEdit']({ commit: commit2 }) {
+    const event34 = this._activeCellEdit;
+    if (!event34) return;
     ((this._activeCellEdit = null),
-      _0x2fdeeb.cleanup?.(),
-      _0x2fdeeb.target.classList.remove('is-editing'),
-      _0x2fdeeb.target.removeAttribute('contenteditable'),
-      (_0x2fdeeb.target.spellcheck = false));
-    if (!_0x259ffd) {
-      this._restoreEditedCellDisplay(_0x2fdeeb.target, _0x2fdeeb.key, _0x2fdeeb.originalText);
+      event34.cleanup?.(),
+      event34.target.classList.remove('is-editing'),
+      event34.target.removeAttribute('contenteditable'),
+      (event34.target.spellcheck = false));
+    if (!commit2) {
+      this._restoreEditedCellDisplay(event34.target, event34.key, event34.originalText);
       return;
     }
-    const _0x424114 = String(_0x2fdeeb.target.textContent || '')
+    const value120 = String(event34.target.textContent || '')
       .replace(/\u00a0/g, ' ')
       .trim();
-    if (_0x424114 !== _0x2fdeeb.originalText)
-      (this._restoreEditedCellDisplay(_0x2fdeeb.target, _0x2fdeeb.key, _0x424114),
-        this._updateCellValue(_0x2fdeeb.rowIndex, _0x2fdeeb.key, _0x424114));
+    if (value120 !== event34.originalText)
+      (this._restoreEditedCellDisplay(event34.target, event34.key, value120),
+        this._updateCellValue(event34.rowIndex, event34.key, value120));
     else
-      (_0x2fdeeb.key === '角色图' || _0x2fdeeb.key === '参考') &&
-        this._restoreEditedCellDisplay(_0x2fdeeb.target, _0x2fdeeb.key, _0x2fdeeb.originalText);
+      (event34.key === '角色图' || event34.key === '参考') &&
+        this._restoreEditedCellDisplay(event34.target, event34.key, event34.originalText);
   }
-  ['_restoreEditedCellDisplay'](_0x23203e, _0x2f43dd, _0x163289) {
-    if (!(_0x23203e instanceof HTMLElement)) return;
-    const _0x460389 = this._getScriptState(),
-      _0x38ec23 = this._getStoryboardSubmitInput(),
-      _0x400aea = buildStoryboardImageRefMap(
-        mergeStoryboardImageRefs(_0x38ec23.imageRefs, _0x460389.referenceImageRefs),
+  ['_restoreEditedCellDisplay'](value121, value122, value123) {
+    if (!(value121 instanceof HTMLElement)) return;
+    const value124 = this._getScriptState(),
+      value125 = this._getStoryboardSubmitInput(),
+      storyboardImageRefMap2 = buildStoryboardImageRefMap(
+        mergeStoryboardImageRefs(value125.imageRefs, value124.referenceImageRefs),
       );
-    appendStoryboardCellDisplay(_0x23203e, _0x2f43dd, _0x163289, _0x400aea);
+    appendStoryboardCellDisplay(value121, value122, value123, storyboardImageRefMap2);
   }
-  ['_updateCellValue'](_0x346b73, _0x547b50, _0x448e22) {
-    const _0x32bc62 = this._getScriptState();
-    if (!Array.isArray(_0x32bc62.rows) || !_0x32bc62.rows[_0x346b73]) return;
-    const _0x31115c = _0x32bc62.rows.map((_0x961641, _0x8f0cc0) =>
-        _0x8f0cc0 === _0x346b73 ? { ..._0x961641, [_0x547b50]: _0x448e22 } : _0x961641,
+  ['_updateCellValue'](value126, value127, value128) {
+    const args27 = this._getScriptState();
+    if (!Array.isArray(args27.rows) || !args27.rows[value126]) return;
+    const rows6 = args27.rows.map((args28, value129) =>
+        value129 === value126 ? { ...args28, [value127]: value128 } : args28,
       ),
-      _0x2f05f3 = serializeCanonicalStoryboardScriptJson({ ..._0x32bc62, rows: _0x31115c }),
-      _0x1921d0 = JSON.parse(_0x2f05f3),
-      _0x223c7a = {
-        ..._0x32bc62,
-        rows: _0x31115c,
-        canonicalJson: _0x2f05f3,
-        title: _0x1921d0.title,
-        detectedIntent: _0x1921d0.detectedIntent,
+      canonicalJson = serializeCanonicalStoryboardScriptJson({ ...args27, rows: rows6 }),
+      title5 = JSON.parse(canonicalJson),
+      storyboardScript10 = {
+        ...args27,
+        rows: rows6,
+        canonicalJson: canonicalJson,
+        title: title5.title,
+        detectedIntent: title5.detectedIntent,
         updatedAt: Date.now(),
       };
-    ((this._data = { ...this._data, storyboardScript: _0x223c7a }),
+    ((this._data = { ...this._data, storyboardScript: storyboardScript10 }),
       (this._skipNextStoryboardBodyRender = true),
-      appStore.updateNodeData(this.nodeId, { storyboardScript: _0x223c7a }));
+      appStore.updateNodeData(this.nodeId, { storyboardScript: storyboardScript10 }));
   }
   async ['_prepareStoryboardVideoFrames']({
-    submitInput: _0x2f10dd,
-    promptText: _0x36e452,
-    model: _0x4e8a3e,
-    provider: _0x50b700,
+    submitInput: submitInput,
+    promptText: promptText2,
+    model: model5,
+    provider: provider7,
   }) {
-    const _0x49f387 = Array.isArray(_0x2f10dd?.videoRefs) ? _0x2f10dd.videoRefs : [];
-    if (_0x49f387.length === 0)
+    const list25 = Array.isArray(submitInput?.videoRefs) ? submitInput.videoRefs : [];
+    if (list25.length === 0)
       return { frameRefs: [], frameBatches: [], frameSummary: '', visibleFrameRefs: [] };
-    const _0x437aca = extractRequestedStoryboardShotCount(_0x36e452, { max: STORYBOARD_VIDEO_FRAME_LIMIT }),
-      _0x227f28 = _0x437aca || STORYBOARD_VIDEO_FRAME_LIMIT,
-      _0x4ca981 = Math.max(1, Math.ceil(_0x227f28 / _0x49f387.length)),
-      _0xb33696 = getStoryboardModelImageInputLimit(_0x4e8a3e, _0x50b700),
-      _0xb44b5c = [];
-    for (const _0x4a30a8 of _0x49f387) {
-      if (_0xb44b5c.length >= _0x227f28) break;
-      const _0x25dab7 = _0x227f28 - _0xb44b5c.length,
-        _0x5b9708 = Math.max(1, Math.min(_0x4ca981, _0x25dab7)),
-        _0x5f0b97 = await extractStoryboardVideoFramesFromServer(_0x4a30a8.url, {
-          maxFrames: _0x5b9708,
-          exactCount: _0x437aca > 0,
-        }),
-        _0x33d178 = Array.isArray(_0x5f0b97.frames) ? _0x5f0b97.frames : [];
-      for (const _0x34ceee of _0x33d178) {
-        if (_0xb44b5c.length >= _0x227f28) break;
-        const _0x14d218 = getStoryboardImagePlaceholder(_0xb44b5c.length + 1),
-          _0x47c5da = String(_0x34ceee.url || '').trim();
-        if (!_0x47c5da) continue;
-        const _0x1582b0 = {
-          ..._0x34ceee,
-          label: _0x14d218,
-          url: _0x47c5da,
+    const exactCount = extractRequestedStoryboardShotCount(promptText2, {
+        max: STORYBOARD_VIDEO_FRAME_LIMIT,
+      }),
+      value130 = exactCount || STORYBOARD_VIDEO_FRAME_LIMIT,
+      value131 = Math.max(1, Math.ceil(value130 / list25.length)),
+      storyboardModelImageInputLimit = getStoryboardModelImageInputLimit(model5, provider7),
+      list26 = [];
+    for (const videoLabel of list25) {
+      if (list26.length >= value130) break;
+      const value132 = value130 - list26.length,
+        maxFrames = Math.max(1, Math.min(value131, value132)),
+        extractStoryboardVideoFramesFromServer2 = await extractStoryboardVideoFramesFromServer(
+          videoLabel.url,
+          {
+            maxFrames: maxFrames,
+            exactCount: exactCount > 0,
+          },
+        ),
+        value133 = Array.isArray(extractStoryboardVideoFramesFromServer2.frames)
+          ? extractStoryboardVideoFramesFromServer2.frames
+          : [];
+      for (const response14 of value133) {
+        if (list26.length >= value130) break;
+        const label8 = getStoryboardImagePlaceholder(list26.length + 1),
+          url7 = String(response14.url || '').trim();
+        if (!url7) continue;
+        const value134 = {
+          ...response14,
+          label: label8,
+          url: url7,
           type: 'image',
           source: 'video-frame',
-          videoLabel: _0x4a30a8.label,
-          videoUrl: _0x4a30a8.url,
+          videoLabel: videoLabel.label,
+          videoUrl: videoLabel.url,
         };
-        ((_0x1582b0.timeRange = formatStoryboardVideoTimeRange(_0x1582b0)), _0xb44b5c.push(_0x1582b0));
+        ((value134.timeRange = formatStoryboardVideoTimeRange(value134)), list26.push(value134));
       }
     }
-    const _0x11042c = _0xb44b5c.map((_0x27cf03, _0x2b9d7b) => ({
-      ..._0x27cf03,
-      sentAsImage: _0x2b9d7b < _0xb33696,
+    const frameRefs = list26.map((args29, sentAsImage) => ({
+      ...args29,
+      sentAsImage: sentAsImage < storyboardModelImageInputLimit,
     }));
     return {
-      frameRefs: _0x11042c,
-      frameBatches: chunkStoryboardFrameRefs(_0x11042c, _0xb33696),
-      frameSummary: buildStoryboardVideoFrameReferenceSummary(_0x11042c),
-      visibleFrameRefs: _0x11042c,
+      frameRefs: frameRefs,
+      frameBatches: chunkStoryboardFrameRefs(frameRefs, storyboardModelImageInputLimit),
+      frameSummary: buildStoryboardVideoFrameReferenceSummary(frameRefs),
+      visibleFrameRefs: frameRefs,
     };
   }
   async ['_buildPayload']() {
-    const _0xde2360 = this._getStoryboardSubmitInput(),
-      _0x3275b7 = _0xde2360.promptText,
-      _0x1a1d70 = _0xde2360.inputImageUrls.length > 0,
-      _0x33dede = _0xde2360.inputVideoUrls.length > 0;
-    if (!_0x3275b7 && !_0x1a1d70 && !_0x33dede)
+    const submitInput2 = this._getStoryboardSubmitInput(),
+      promptText3 = submitInput2.promptText,
+      enabled27 = submitInput2.inputImageUrls.length > 0,
+      enabled28 = submitInput2.inputVideoUrls.length > 0;
+    if (!promptText3 && !enabled27 && !enabled28)
       return (window.showToast?.(storyboardScriptText('toasts.missingPromptOrReference'), 'warn'), null);
-    const _0x500116 = resolveStoryboardScriptTextModel(this._data),
-      _0x14c385 = resolveStoryboardScriptTextProvider(this._data),
-      _0x5e20ef = _0xde2360.sourceMode,
-      _0x4e0d74 =
-        _0x5e20ef === 'video'
+    const model6 = resolveStoryboardScriptTextModel(this._data),
+      provider8 = resolveStoryboardScriptTextProvider(this._data),
+      sourceMode3 = submitInput2.sourceMode,
+      videoFrameSummary =
+        sourceMode3 === 'video'
           ? await this._prepareStoryboardVideoFrames({
-              submitInput: _0xde2360,
-              promptText: _0x3275b7,
-              model: _0x500116,
-              provider: _0x14c385,
+              submitInput: submitInput2,
+              promptText: promptText3,
+              model: model6,
+              provider: provider8,
             })
           : { frameRefs: [], frameBatches: [], frameSummary: '', visibleFrameRefs: [] },
-      _0x15d4e0 =
-        _0x3275b7 ||
+      storyboardPrompt =
+        promptText3 ||
         buildStoryboardReferenceSummary({
-          imageLabels: _0xde2360.imageLabels,
-          videoLabels: _0xde2360.videoLabels,
+          imageLabels: submitInput2.imageLabels,
+          videoLabels: submitInput2.videoLabels,
         }),
-      _0x42b31e = buildStoryboardReferenceSummary({
-        imageLabels: _0xde2360.imageLabels,
-        videoLabels: _0xde2360.videoLabels,
+      summary = buildStoryboardReferenceSummary({
+        imageLabels: submitInput2.imageLabels,
+        videoLabels: submitInput2.videoLabels,
       });
-    let _0x3befbb = buildStoryboardScriptTextOnlyPrompt(_0x3275b7),
-      _0x292599 = buildStoryboardScriptTextOnlySystemPrompt();
-    if (_0x5e20ef === 'image')
-      ((_0x3befbb = buildStoryboardScriptImagePrompt(_0x3275b7, {
-        imageCount: _0xde2360.inputImageUrls.length,
-        imageLabels: _0xde2360.imageLabels,
+    let prompt3 = buildStoryboardScriptTextOnlyPrompt(promptText3),
+      systemPrompt = buildStoryboardScriptTextOnlySystemPrompt();
+    if (sourceMode3 === 'image')
+      ((prompt3 = buildStoryboardScriptImagePrompt(promptText3, {
+        imageCount: submitInput2.inputImageUrls.length,
+        imageLabels: submitInput2.imageLabels,
       })),
-        (_0x292599 = buildStoryboardScriptImageSystemPrompt()));
+        (systemPrompt = buildStoryboardScriptImageSystemPrompt()));
     else {
-      if (_0x5e20ef === 'video')
-        ((_0x3befbb = buildStoryboardScriptVideoPrompt(_0x3275b7, {
-          videoCount: _0xde2360.inputVideoUrls.length,
-          videoLabels: _0xde2360.videoLabels,
-          videoFrameSummary: _0x4e0d74.frameSummary,
+      if (sourceMode3 === 'video')
+        ((prompt3 = buildStoryboardScriptVideoPrompt(promptText3, {
+          videoCount: submitInput2.inputVideoUrls.length,
+          videoLabels: submitInput2.videoLabels,
+          videoFrameSummary: videoFrameSummary.frameSummary,
         })),
-          (_0x292599 = buildStoryboardScriptVideoSystemPrompt()));
+          (systemPrompt = buildStoryboardScriptVideoSystemPrompt()));
       else
-        _0x5e20ef === 'multimodal' &&
-          ((_0x3befbb = buildStoryboardScriptPrompt(_0x3275b7, {
-            summary: _0x42b31e,
-            imageCount: _0xde2360.inputImageUrls.length,
-            imageLabels: _0xde2360.imageLabels,
-            videoCount: _0xde2360.inputVideoUrls.length,
-            videoLabels: _0xde2360.videoLabels,
+        sourceMode3 === 'multimodal' &&
+          ((prompt3 = buildStoryboardScriptPrompt(promptText3, {
+            summary: summary,
+            imageCount: submitInput2.inputImageUrls.length,
+            imageLabels: submitInput2.imageLabels,
+            videoCount: submitInput2.inputVideoUrls.length,
+            videoLabels: submitInput2.videoLabels,
           })),
-          (_0x292599 = ''));
+          (systemPrompt = ''));
     }
     return {
-      prompt: _0x3befbb,
-      systemPrompt: _0x292599,
-      storyboardPrompt: _0x15d4e0,
-      sourceMode: _0x5e20ef,
+      prompt: prompt3,
+      systemPrompt: systemPrompt,
+      storyboardPrompt: storyboardPrompt,
+      sourceMode: sourceMode3,
       inputUrls:
-        _0x5e20ef === 'video'
+        sourceMode3 === 'video'
           ? [
-              ..._0x4e0d74.visibleFrameRefs
-                .filter((_0x41b762) => _0x41b762.sentAsImage !== false)
-                .map((_0x3feb3e) => _0x3feb3e.url)
+              ...videoFrameSummary.visibleFrameRefs
+                .filter((item27) => item27.sentAsImage !== false)
+                .map((response15) => response15.url)
                 .filter(Boolean),
-              ..._0xde2360.inputVideoUrls,
+              ...submitInput2.inputVideoUrls,
             ]
-          : _0xde2360.inputUrls,
+          : submitInput2.inputUrls,
       inputImageUrls:
-        _0x5e20ef === 'video'
-          ? _0x4e0d74.visibleFrameRefs
-              .filter((_0x241a9a) => _0x241a9a.sentAsImage !== false)
-              .map((_0x388d51) => _0x388d51.url)
+        sourceMode3 === 'video'
+          ? videoFrameSummary.visibleFrameRefs
+              .filter((item28) => item28.sentAsImage !== false)
+              .map((response16) => response16.url)
               .filter(Boolean)
-          : _0xde2360.inputImageUrls,
-      inputVideoUrls: _0xde2360.inputVideoUrls,
-      videoLabels: _0xde2360.videoLabels,
-      videoFrameRefs: _0x4e0d74.visibleFrameRefs,
-      videoFrameBatches: _0x4e0d74.frameBatches,
-      referenceImageRefs: _0x4e0d74.visibleFrameRefs,
-      rawPromptText: _0x3275b7,
-      model: _0x500116,
-      provider: _0x14c385,
+          : submitInput2.inputImageUrls,
+      inputVideoUrls: submitInput2.inputVideoUrls,
+      videoLabels: submitInput2.videoLabels,
+      videoFrameRefs: videoFrameSummary.visibleFrameRefs,
+      videoFrameBatches: videoFrameSummary.frameBatches,
+      referenceImageRefs: videoFrameSummary.visibleFrameRefs,
+      rawPromptText: promptText3,
+      model: model6,
+      provider: provider8,
       nodeId: this.nodeId,
     };
   }
   ['_createImageNodesFromSelectedStoryboards']({ startGeneration: startGeneration = false } = {}) {
     this._finishCellEdit({ commit: true });
-    const _0x10bc93 = appStore.getState?.().nodes?.[this.nodeId] || this._data || {},
-      _0x1a0696 = createDefaultStoryboardScriptState(
-        _0x10bc93.storyboardScript || this._data.storyboardScript || {},
+    const anchorNode = appStore.getState?.().nodes?.[this.nodeId] || this._data || {},
+      storyboardScript11 = createDefaultStoryboardScriptState(
+        anchorNode.storyboardScript || this._data.storyboardScript || {},
       ),
-      _0xd2f270 = serializeCanonicalStoryboardScriptJson(_0x1a0696),
-      _0x8be444 = JSON.parse(_0xd2f270),
-      _0x41c977 = getSelectedRowIndexes(_0x1a0696);
-    if (_0x1a0696.selectionMode !== true) return false;
-    if (_0x41c977.length === 0)
+      canonicalJson2 = serializeCanonicalStoryboardScriptJson(storyboardScript11),
+      title6 = JSON.parse(canonicalJson2),
+      list27 = getSelectedRowIndexes(storyboardScript11);
+    if (storyboardScript11.selectionMode !== true) return false;
+    if (list27.length === 0)
       return (window.showToast?.(storyboardScriptText('toasts.selectStoryboardsFirst'), 'warn'), true);
-    const _0x4f7199 = _0x41c977.map((_0x2a71dd) => {
-        const _0x4d4a2b = _0x1a0696.rows[_0x2a71dd] || {};
+    const itemCount = list27.map((rowIndex2) => {
+        const value135 = storyboardScript11.rows[rowIndex2] || {};
         return {
-          rowIndex: _0x2a71dd,
-          shotNo: getStoryboardRowShotNo(_0x4d4a2b, _0x2a71dd),
-          prompt: getStoryboardRowImagePrompt(_0x4d4a2b),
+          rowIndex: rowIndex2,
+          shotNo: getStoryboardRowShotNo(value135, rowIndex2),
+          prompt: getStoryboardRowImagePrompt(value135),
         };
       }),
-      _0x277dcc = _0x4f7199.filter((_0x1fe595) => !_0x1fe595.prompt);
-    if (_0x277dcc.length > 0)
+      list28 = itemCount.filter((enabled29) => !enabled29.prompt);
+    if (list28.length > 0)
       return (window.showToast?.(storyboardScriptText('toasts.missingImagePrompt'), 'warn'), true);
-    const _0x3a619d = _0x1a0696.imageModel || DEFAULT_IMAGE_NODE_MODEL,
-      _0x44ce15 = _0x1a0696.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
-      _0x273eb4 = resolveStoryboardScriptTextModel({ storyboardScript: _0x1a0696 }),
-      _0x2226d7 = resolveStoryboardScriptTextProvider({ storyboardScript: _0x1a0696 }),
-      _0x1c6486 = clonePlainObject(_0x10bc93.generationParams),
-      _0x193db7 = clonePlainObject(_0x10bc93.generationParamsByModel),
-      _0x35e44f = _0x1c6486?.aspectRatio || _0x10bc93.aspectRatio || '自适应',
-      _0x38cb5c = _0x1c6486?.imageSize || _0x10bc93.imageSize || '',
-      _0x130f83 = getImageNodeSizeForAspectRatio(_0x35e44f),
-      _0xb62fb8 = getStateSnapshot(),
-      _0x12c316 = createBatchSpawnLayoutNearNode({
-        nodes: _0xb62fb8.nodes || {},
-        anchorNode: _0x10bc93,
-        itemCount: _0x4f7199.length,
-        itemWidth: _0x130f83.width,
-        itemHeight: _0x130f83.height,
+    const model7 = storyboardScript11.imageModel || DEFAULT_IMAGE_NODE_MODEL,
+      provider9 = storyboardScript11.imageProvider || DEFAULT_IMAGE_NODE_PROVIDER,
+      model8 = resolveStoryboardScriptTextModel({ storyboardScript: storyboardScript11 }),
+      provider10 = resolveStoryboardScriptTextProvider({ storyboardScript: storyboardScript11 }),
+      clonePlainObject2 = clonePlainObject(anchorNode.generationParams),
+      clonePlainObject3 = clonePlainObject(anchorNode.generationParamsByModel),
+      aspectRatio3 = clonePlainObject2?.aspectRatio || anchorNode.aspectRatio || '自适应',
+      value136 = clonePlainObject2?.imageSize || anchorNode.imageSize || '',
+      itemWidth = getImageNodeSizeForAspectRatio(aspectRatio3),
+      nodes2 = getStateSnapshot(),
+      x = createBatchSpawnLayoutNearNode({
+        nodes: nodes2.nodes || {},
+        anchorNode: anchorNode,
+        itemCount: itemCount.length,
+        itemWidth: itemWidth.width,
+        itemHeight: itemWidth.height,
         maxPerLine: 5,
         padding: STORYBOARD_IMAGE_BATCH_PADDING,
         titleHeight: STORYBOARD_IMAGE_BATCH_TITLE_HEIGHT,
       }),
-      _0x3289bc = generateId('group');
+      id = generateId('group');
     appStore.addNode({
-      id: _0x3289bc,
+      id: id,
       type: 'group',
-      x: _0x12c316.groupX,
-      y: _0x12c316.groupY,
-      width: _0x12c316.groupWidth,
-      height: _0x12c316.groupHeight,
+      x: x.groupX,
+      y: x.groupY,
+      width: x.groupWidth,
+      height: x.groupHeight,
       name: storyboardScriptText('imageBatchGroupName'),
       label: storyboardScriptText('imageBatchGroupName'),
     });
-    const _0x463030 = [];
-    (_0x4f7199.forEach((_0xcdefaa, _0x536ff1) => {
-      const _0x52d104 = _0x12c316.getItemPosition(_0x536ff1),
-        _0x5b70fd = generateId('ai-image'),
-        _0x7874bb = {
-          id: _0x5b70fd,
+    const count3 = [];
+    (itemCount.forEach((shot, value137) => {
+      const x2 = x.getItemPosition(value137),
+        id2 = generateId('ai-image'),
+        value138 = {
+          id: id2,
           type: 'ai-image',
-          x: _0x52d104.x,
-          y: _0x52d104.y,
-          width: _0x130f83.width,
-          height: _0x130f83.height,
-          name: storyboardScriptText('imageNodeName', { shot: _0xcdefaa.shotNo || _0x536ff1 + 1 }),
-          prompt: escapePromptTextForHtml(_0xcdefaa.prompt),
-          model: _0x3a619d,
-          provider: _0x44ce15,
-          aspectRatio: _0x35e44f,
+          x: x2.x,
+          y: x2.y,
+          width: itemWidth.width,
+          height: itemWidth.height,
+          name: storyboardScriptText('imageNodeName', { shot: shot.shotNo || value137 + 1 }),
+          prompt: escapePromptTextForHtml(shot.prompt),
+          model: model7,
+          provider: provider9,
+          aspectRatio: aspectRatio3,
           needsAutoResize: true,
-          storyboardSource: { nodeId: this.nodeId, rowIndex: _0xcdefaa.rowIndex, shotNo: _0xcdefaa.shotNo },
+          storyboardSource: { nodeId: this.nodeId, rowIndex: shot.rowIndex, shotNo: shot.shotNo },
         };
-      _0x1c6486 && (_0x7874bb.generationParams = clonePlainObject(_0x1c6486));
-      _0x193db7 && (_0x7874bb.generationParamsByModel = clonePlainObject(_0x193db7));
-      if (_0x38cb5c) _0x7874bb.imageSize = _0x38cb5c;
-      (appStore.addNode(_0x7874bb), _0x463030.push(_0x5b70fd));
+      clonePlainObject2 && (value138.generationParams = clonePlainObject(clonePlainObject2));
+      clonePlainObject3 && (value138.generationParamsByModel = clonePlainObject(clonePlainObject3));
+      if (value136) value138.imageSize = value136;
+      (appStore.addNode(value138), count3.push(id2));
     }),
-      appStore.groupNodes(_0x463030, _0x3289bc));
-    const _0x28f395 = {
-      ..._0x1a0696,
-      canonicalJson: _0xd2f270,
-      title: _0x8be444.title,
-      detectedIntent: _0x8be444.detectedIntent,
+      appStore.groupNodes(count3, id));
+    const storyboardScript12 = {
+      ...storyboardScript11,
+      canonicalJson: canonicalJson2,
+      title: title6.title,
+      detectedIntent: title6.detectedIntent,
       selectionMode: false,
       selectedRowIndexes: [],
       updatedAt: Date.now(),
     };
     return (
-      (this._data = { ...this._data, model: _0x273eb4, provider: _0x2226d7, storyboardScript: _0x28f395 }),
+      (this._data = {
+        ...this._data,
+        model: model8,
+        provider: provider10,
+        storyboardScript: storyboardScript12,
+      }),
       appStore.updateNodeData(this.nodeId, {
-        model: _0x273eb4,
-        provider: _0x2226d7,
-        storyboardScript: _0x28f395,
+        model: model8,
+        provider: provider10,
+        storyboardScript: storyboardScript12,
       }),
       commit(),
       startGeneration
-        ? this._startGeneratedImageNodes(_0x463030, {
-            onStarted: () => focusStoryboardImageBatch(this.nodeId, _0x3289bc),
+        ? this._startGeneratedImageNodes(count3, {
+            onStarted: () => focusStoryboardImageBatch(this.nodeId, id),
           })
-        : focusStoryboardImageBatch(this.nodeId, _0x3289bc),
+        : focusStoryboardImageBatch(this.nodeId, id),
       window.showToast?.(
         startGeneration
-          ? storyboardScriptText('toasts.createdAndStartedImageNodes', { count: _0x463030.length })
-          : storyboardScriptText('toasts.createdImageNodes', { count: _0x463030.length }),
+          ? storyboardScriptText('toasts.createdAndStartedImageNodes', { count: count3.length })
+          : storyboardScriptText('toasts.createdImageNodes', { count: count3.length }),
         'success',
       ),
       true
     );
   }
-  ['_startGeneratedImageNodes'](_0x1bd4e3 = [], { onStarted: onStarted = null } = {}) {
-    const _0x14b734 = Array.isArray(_0x1bd4e3)
-      ? _0x1bd4e3.map((_0x5375f2) => String(_0x5375f2 || '').trim()).filter(Boolean)
+  ['_startGeneratedImageNodes'](list29 = [], { onStarted: onStarted = null } = {}) {
+    const list30 = Array.isArray(list29)
+      ? list29.map((item29) => String(item29 || '').trim()).filter(Boolean)
       : [];
-    if (_0x14b734.length === 0 || typeof window === 'undefined') return;
-    const _0x1bb43f = new Set(_0x14b734),
-      _0x413f98 = 'storyboard-script:' + this.nodeId + ':auto-generate',
-      _0x4ae1ac = () => window.v2Renderer || null,
-      _0x73f19e = (_0x34019d) => {
+    if (list30.length === 0 || typeof window === 'undefined') return;
+    const list31 = new Set(list30),
+      value139 = 'storyboard-script:' + this.nodeId + ':auto-generate',
+      handler5 = () => window.v2Renderer || null,
+      handler6 = (value140) => {
         typeof window.requestAnimationFrame === 'function'
-          ? window.requestAnimationFrame(_0x34019d)
-          : window.setTimeout(_0x34019d, 16);
+          ? window.requestAnimationFrame(value140)
+          : window.setTimeout(value140, 16);
       };
-    _0x4ae1ac()?.pinNode && _0x14b734.forEach((_0x460f0d) => _0x4ae1ac()?.pinNode?.(_0x460f0d, _0x413f98));
-    let _0x20e591 = 0;
-    const _0x20f57d = 30;
-    let _0x2e9cba = false;
-    const _0x379cb8 = () => {
-        if (_0x2e9cba) return;
-        _0x2e9cba = true;
+    handler5()?.pinNode && list30.forEach((item30) => handler5()?.pinNode?.(item30, value139));
+    let value141 = 0;
+    const value142 = 30;
+    let value143 = false;
+    const run5 = () => {
+        if (value143) return;
+        value143 = true;
         if (typeof onStarted !== 'function') return;
         try {
           onStarted();
-        } catch (_0x2a436d) {
-          console.warn('[StoryboardScriptNode] post-start callback failed', _0x2a436d);
+        } catch (value144) {
+          console.warn('[StoryboardScriptNode] post-start callback failed', value144);
         }
       },
-      _0x12de1f = () => {
-        _0x20e591 += 1;
-        const _0x2661ce = _0x4ae1ac();
-        _0x2661ce?.flushNodes?.([..._0x1bb43f]);
-        for (const _0xdfa1af of Array.from(_0x1bb43f)) {
-          const _0x21f0db = _0x2661ce?.nodeInstances?.get?.(_0xdfa1af);
-          if (!_0x21f0db || typeof _0x21f0db.runGeneration !== 'function') continue;
-          (_0x1bb43f.delete(_0xdfa1af),
+      value145 = () => {
+        value141 += 1;
+        const value146 = handler5();
+        value146?.flushNodes?.([...list31]);
+        for (const value147 of Array.from(list31)) {
+          const enabled30 = value146?.nodeInstances?.get?.(value147);
+          if (!enabled30 || typeof enabled30.runGeneration !== 'function') continue;
+          (list31.delete(value147),
             Promise.resolve()
-              .then(() => _0x21f0db.runGeneration())
-              .catch((_0x5cdf46) => {
-                console.error('[StoryboardScriptNode] auto image generation failed', _0x5cdf46);
+              .then(() => enabled30.runGeneration())
+              .catch((value148) => {
+                console.error('[StoryboardScriptNode] auto image generation failed', value148);
               })
               .finally(() => {
-                _0x4ae1ac()?.unpinNode?.(_0xdfa1af, _0x413f98);
+                handler5()?.unpinNode?.(value147, value139);
               }));
         }
-        if (_0x1bb43f.size === 0) {
-          _0x379cb8();
+        if (list31.size === 0) {
+          run5();
           return;
         }
-        if (_0x1bb43f.size > 0 && _0x20e591 < _0x20f57d) {
-          _0x73f19e(_0x12de1f);
+        if (list31.size > 0 && value141 < value142) {
+          handler6(value145);
           return;
         }
-        (_0x1bb43f.size > 0 &&
-          (_0x1bb43f.forEach((_0x391c36) => {
-            _0x4ae1ac()?.unpinNode?.(_0x391c36, _0x413f98);
+        (list31.size > 0 &&
+          (list31.forEach((item31) => {
+            handler5()?.unpinNode?.(item31, value139);
           }),
           window.showToast?.(storyboardScriptText('toasts.autoStartPartialFailed'), 'warn')),
-          _0x379cb8());
+          run5());
       };
-    _0x73f19e(_0x12de1f);
+    handler6(value145);
   }
-  ['runGeneration'](_0x301089 = {}) {
-    return this._onGenerate(_0x301089);
+  ['runGeneration'](options5 = {}) {
+    return this._onGenerate(options5);
   }
   ['cancelGeneration']() {
     return {
@@ -2299,129 +2297,126 @@ export class StoryboardScriptNode {
     };
   }
   ['getGenerationStatus']() {
-    const _0x43fe4c = appStore.getState?.().nodes?.[this.nodeId] || this._data || {},
-      _0x16c10b = createDefaultStoryboardScriptState(
-        _0x43fe4c.storyboardScript || this._data.storyboardScript || {},
+    const value149 = appStore.getState?.().nodes?.[this.nodeId] || this._data || {},
+      defaultStoryboardScriptState = createDefaultStoryboardScriptState(
+        value149.storyboardScript || this._data.storyboardScript || {},
       ),
-      _0x1b518c = this._isStoryboardScriptGenerating(_0x16c10b);
+      jobStatus2 = this._isStoryboardScriptGenerating(defaultStoryboardScriptState);
     return {
       nodeId: this.nodeId,
-      jobStatus: _0x1b518c ? 'running' : String(_0x16c10b.jobStatus || 'idle'),
-      isGenerating: _0x1b518c,
+      jobStatus: jobStatus2 ? 'running' : String(defaultStoryboardScriptState.jobStatus || 'idle'),
+      isGenerating: jobStatus2,
       cancellable: false,
       resumable: false,
     };
   }
-  async ['_onGenerate'](_0x178e3d = {}) {
-    const _0x1b914b = this._isPromptGenerateLoadingPrimed === true;
-    if (this._isGeneratingScript && !_0x1b914b) return;
+  async ['_onGenerate'](options6 = {}) {
+    const enabled31 = this._isPromptGenerateLoadingPrimed === true;
+    if (this._isGeneratingScript && !enabled31) return;
     this._isPromptGenerateLoadingPrimed = false;
-    const _0x11b81f = this._getScriptState();
-    if (_0x11b81f.selectionMode === true) {
+    const value150 = this._getScriptState();
+    if (value150.selectionMode === true) {
       ((this._isGeneratingScript = false),
         this._syncGeneratingOverlay(false),
         this._createImageNodesFromSelectedStoryboards({ startGeneration: true }));
       return;
     }
     this._isGeneratingScript = true;
-    !_0x1b914b && this._setStoryboardGeneratingState(true);
+    !enabled31 && this._setStoryboardGeneratingState(true);
     (this._syncGeneratingOverlay(true),
       await waitForStoryboardLoadingPaint(),
       this._updateSubmitButtonState());
-    let _0x1b4025 = null;
+    let provider11 = null;
     try {
-      _0x1b4025 = await this._buildPayload();
-    } catch (_0x44c2ca) {
+      provider11 = await this._buildPayload();
+    } catch (error3) {
       ((this._isGeneratingScript = false),
         this._setStoryboardGeneratingState(false),
         this._updateSubmitButtonState(),
-        window.showToast?.(
-          _0x44c2ca?.message || storyboardScriptText('errors.videoPreprocessFailed'),
-          'error',
-        ));
+        window.showToast?.(error3?.message || storyboardScriptText('errors.videoPreprocessFailed'), 'error'));
       return;
     }
-    if (!_0x1b4025) {
+    if (!provider11) {
       ((this._isGeneratingScript = false),
         this._setStoryboardGeneratingState(false),
         this._updateSubmitButtonState());
       return;
     }
-    const _0x1e2621 = Date.now(),
-      _0x4cdf11 = this._getScriptState(),
-      _0x444995 = resolveModelManifest(_0x1b4025.model, _0x1b4025.provider);
+    const startedAt = Date.now(),
+      current3 = this._getScriptState(),
+      executionId = resolveModelManifest(provider11.model, provider11.provider);
     try {
-      const _0x2697de = await submitTask(
+      const response17 = await submitTask(
         {
           sourceNodeId: this.nodeId,
           targetNodeId: this.nodeId,
           trigger: 'node',
           taskType: 'storyboard-script-generation',
-          provider: _0x1b4025.provider,
+          provider: provider11.provider,
           adapterType: 'modelApi',
-          modelId: _0x1b4025.model,
+          modelId: provider11.model,
           executionId:
-            _0x444995?.executionId || 'storyboard-script.' + _0x1b4025.provider + '.' + _0x1b4025.model,
-          payload: _0x1b4025,
+            executionId?.executionId || 'storyboard-script.' + provider11.provider + '.' + provider11.model,
+          payload: provider11,
           cancellable: false,
           resumable: false,
           async: false,
-          submit: () => runStoryboardScriptGenerationPayload(_0x1b4025),
+          submit: () => runStoryboardScriptGenerationPayload(provider11),
           startBuilder: () => ({
-            model: _0x1b4025.model,
-            provider: _0x1b4025.provider,
+            model: provider11.model,
+            provider: provider11.provider,
             storyboardScript: buildStoryboardScriptStatePatch({
-              current: _0x4cdf11,
-              prompt: _0x1b4025.storyboardPrompt,
-              model: _0x1b4025.model,
-              provider: _0x1b4025.provider,
-              sourceMode: _0x1b4025.sourceMode,
+              current: current3,
+              prompt: provider11.storyboardPrompt,
+              model: provider11.model,
+              provider: provider11.provider,
+              sourceMode: provider11.sourceMode,
               status: 'running',
-              referenceImageRefs: _0x1b4025.referenceImageRefs,
+              referenceImageRefs: provider11.referenceImageRefs,
             }),
           }),
-          resultBuilder: async (_0x445b78) => {
-            const _0x5bcc1e = extractGeneratedText(_0x445b78).trim(),
-              _0x2def86 = normalizeStoryboardScriptGenerationResult(_0x5bcc1e, {
+          resultBuilder: async (value151) => {
+            const extractGeneratedText2 = extractGeneratedText(value151).trim(),
+              name = normalizeStoryboardScriptGenerationResult(extractGeneratedText2, {
                 requireMarker: true,
-                sourceMode: _0x1b4025.sourceMode,
+                sourceMode: provider11.sourceMode,
               });
-            if (!_0x2def86.ok) throw new Error(storyboardScriptText('errors.invalidJsonSwitchModel'));
+            if (!name.ok) throw new Error(storyboardScriptText('errors.invalidJsonSwitchModel'));
             return {
-              name: _0x2def86.title || this._data.name || getStoryboardScriptDefaultName(),
-              model: _0x1b4025.model,
-              provider: _0x1b4025.provider,
+              name: name.title || this._data.name || getStoryboardScriptDefaultName(),
+              model: provider11.model,
+              provider: provider11.provider,
               storyboardScript: buildStoryboardScriptStatePatch({
-                current: _0x4cdf11,
-                prompt: _0x1b4025.storyboardPrompt,
-                model: _0x1b4025.model,
-                provider: _0x1b4025.provider,
-                sourceMode: _0x1b4025.sourceMode,
-                normalized: _0x2def86,
+                current: current3,
+                prompt: provider11.storyboardPrompt,
+                model: provider11.model,
+                provider: provider11.provider,
+                sourceMode: provider11.sourceMode,
+                normalized: name,
                 status: 'success',
-                referenceImageRefs: _0x1b4025.referenceImageRefs,
+                referenceImageRefs: provider11.referenceImageRefs,
               }),
             };
           },
-          failureBuilder: (_0x275847) => ({
+          failureBuilder: (error4) => ({
             storyboardScript: buildStoryboardScriptStatePatch({
-              current: _0x4cdf11,
-              prompt: _0x1b4025.storyboardPrompt,
-              model: _0x1b4025.model,
-              provider: _0x1b4025.provider,
-              sourceMode: _0x1b4025.sourceMode,
+              current: current3,
+              prompt: provider11.storyboardPrompt,
+              model: provider11.model,
+              provider: provider11.provider,
+              sourceMode: provider11.sourceMode,
               status: 'error',
-              error: _0x275847?.message || storyboardScriptText('errors.generationFailed'),
-              referenceImageRefs: _0x1b4025.referenceImageRefs,
+              error: error4?.message || storyboardScriptText('errors.generationFailed'),
+              referenceImageRefs: provider11.referenceImageRefs,
             }),
           }),
-          parseError: (_0x363c36) => _0x363c36?.message || storyboardScriptText('errors.generationFailed'),
+          parseError: (error5) => error5?.message || storyboardScriptText('errors.generationFailed'),
         },
-        { store: appStore, startedAt: _0x1e2621 },
+        { store: appStore, startedAt: startedAt },
       );
-      _0x2697de.status === 'failed' &&
+      response17.status === 'failed' &&
         window.showToast?.(
-          _0x2697de.error?.message || storyboardScriptText('errors.generationFailed'),
+          response17.error?.message || storyboardScriptText('errors.generationFailed'),
           'error',
         );
     } finally {
@@ -2430,318 +2425,314 @@ export class StoryboardScriptNode {
   }
   ['_downloadScriptTable']() {
     this._finishCellEdit({ commit: true });
-    const _0xdf86e8 = this._getScriptState();
-    if (!Array.isArray(_0xdf86e8.rows) || _0xdf86e8.rows.length === 0) {
+    const args30 = this._getScriptState();
+    if (!Array.isArray(args30.rows) || args30.rows.length === 0) {
       window.showToast?.(storyboardScriptText('toasts.noDownloadData'), 'warn');
       return;
     }
-    const _0xa1d01a = serializeCanonicalStoryboardScriptJson(_0xdf86e8),
-      _0x5eb584 = JSON.parse(_0xa1d01a),
-      _0x471aba = {
-        ..._0xdf86e8,
-        canonicalJson: _0xa1d01a,
-        title: _0x5eb584.title,
-        detectedIntent: _0x5eb584.detectedIntent,
+    const canonicalJson3 = serializeCanonicalStoryboardScriptJson(args30),
+      title7 = JSON.parse(canonicalJson3),
+      storyboardScript13 = {
+        ...args30,
+        canonicalJson: canonicalJson3,
+        title: title7.title,
+        detectedIntent: title7.detectedIntent,
         updatedAt: Date.now(),
       };
-    ((this._data = { ...this._data, storyboardScript: _0x471aba }),
-      appStore.updateNodeData(this.nodeId, { storyboardScript: _0x471aba }));
-    const _0x55ab32 = STORYBOARD_SCRIPT_COLUMNS.map((_0x2628d8) => ({
-        ..._0x2628d8,
-        label: getStoryboardColumnLabel(_0x2628d8.key, _0x2628d8.label),
+    ((this._data = { ...this._data, storyboardScript: storyboardScript13 }),
+      appStore.updateNodeData(this.nodeId, { storyboardScript: storyboardScript13 }));
+    const value152 = STORYBOARD_SCRIPT_COLUMNS.map((event35) => ({
+        ...event35,
+        label: getStoryboardColumnLabel(event35.key, event35.label),
       })),
-      _0x4a0938 = serializeStoryboardScriptRowsToCsv(_0x471aba.rows, _0x55ab32),
-      _0x41a467 = sanitizeExportFileName(
-        _0x471aba.title || this._data.name || getStoryboardScriptDefaultName(),
+      content2 = serializeStoryboardScriptRowsToCsv(storyboardScript13.rows, value152),
+      filename2 = sanitizeExportFileName(
+        storyboardScript13.title || this._data.name || getStoryboardScriptDefaultName(),
       );
     (downloadTextFile({
-      filename: _0x41a467 + '_' + formatExportTimestamp() + '.csv',
-      content: _0x4a0938,
+      filename: filename2 + '_' + formatExportTimestamp() + '.csv',
+      content: content2,
       mimeType: STORYBOARD_SCRIPT_TABLE_EXPORT_MIME,
     }),
       window.showToast?.(storyboardScriptText('toasts.downloadedTable'), 'success'));
   }
-  ['_getStoryboardViewScrollKey'](_0x500b73, _0x1e7890 = '') {
-    const _0x212e50 = normalizeStoryboardScriptMediaMode(_0x500b73?.mediaMode),
-      _0x3de44c = normalizeStoryboardScriptViewMode(_0x1e7890 || _0x500b73?.viewMode);
-    return _0x212e50 + ':' + _0x3de44c;
+  ['_getStoryboardViewScrollKey'](value153, value154 = '') {
+    const storyboardScriptMediaMode2 = normalizeStoryboardScriptMediaMode(value153?.mediaMode),
+      storyboardScriptViewMode = normalizeStoryboardScriptViewMode(value154 || value153?.viewMode);
+    return storyboardScriptMediaMode2 + ':' + storyboardScriptViewMode;
   }
   ['_getCurrentStoryboardScroller']() {
     return this._bodyEl?.querySelector?.('.storyboard-script-table-wrap, .storyboard-script-card-grid');
   }
-  ['_rememberStoryboardViewScroll'](_0x45dc01, _0x22ecce, _0x25baf3 = '') {
-    if (!(_0x45dc01 instanceof HTMLElement)) return;
-    const _0x1dc522 = this._getStoryboardViewScrollKey(_0x22ecce, _0x25baf3);
-    this._storyboardViewScrollByKey.set(_0x1dc522, { left: _0x45dc01.scrollLeft, top: _0x45dc01.scrollTop });
+  ['_rememberStoryboardViewScroll'](left2, value155, value156 = '') {
+    if (!(left2 instanceof HTMLElement)) return;
+    const value157 = this._getStoryboardViewScrollKey(value155, value156);
+    this._storyboardViewScrollByKey.set(value157, { left: left2.scrollLeft, top: left2.scrollTop });
   }
-  ['_captureStoryboardViewScroll'](_0xc59e16) {
-    const _0x5b1abc = this._getCurrentStoryboardScroller();
-    if (!(_0x5b1abc instanceof HTMLElement)) return;
-    const _0x437185 = _0x5b1abc.classList.contains('storyboard-script-card-grid') ? 'card' : 'list';
-    this._rememberStoryboardViewScroll(_0x5b1abc, _0xc59e16, _0x437185);
+  ['_captureStoryboardViewScroll'](value158) {
+    const el63 = this._getCurrentStoryboardScroller();
+    if (!(el63 instanceof HTMLElement)) return;
+    const value159 = el63.classList.contains('storyboard-script-card-grid') ? 'card' : 'list';
+    this._rememberStoryboardViewScroll(el63, value158, value159);
   }
-  ['_bindStoryboardViewScrollMemory'](_0x364290, _0x358e20) {
-    if (!(_0x364290 instanceof HTMLElement)) return;
-    if (_0x364290.dataset.storyboardScrollMemoryBound === 'true') return;
-    ((_0x364290.dataset.storyboardScrollMemoryBound = 'true'),
-      _0x364290.addEventListener('scroll', () => this._rememberStoryboardViewScroll(_0x364290, _0x358e20), {
+  ['_bindStoryboardViewScrollMemory'](el64, value160) {
+    if (!(el64 instanceof HTMLElement)) return;
+    if (el64.dataset.storyboardScrollMemoryBound === 'true') return;
+    ((el64.dataset.storyboardScrollMemoryBound = 'true'),
+      el64.addEventListener('scroll', () => this._rememberStoryboardViewScroll(el64, value160), {
         passive: true,
       }));
   }
-  ['_restoreStoryboardViewScroll'](_0x47500, _0x65c4b9) {
-    if (!(_0x47500 instanceof HTMLElement)) return;
-    const _0xf3c309 = this._getStoryboardViewScrollKey(_0x65c4b9),
-      _0x5dd3ab = this._storyboardViewScrollByKey.get(_0xf3c309);
-    if (!_0x5dd3ab) return;
-    const _0x45a64a = () => {
-      const _0x3ed383 = Math.max(0, _0x47500.scrollWidth - _0x47500.clientWidth),
-        _0x252e75 = Math.max(0, _0x47500.scrollHeight - _0x47500.clientHeight);
-      ((_0x47500.scrollLeft = Math.min(_0x3ed383, Math.max(0, _0x5dd3ab.left || 0))),
-        (_0x47500.scrollTop = Math.min(_0x252e75, Math.max(0, _0x5dd3ab.top || 0))));
+  ['_restoreStoryboardViewScroll'](el65, value161) {
+    if (!(el65 instanceof HTMLElement)) return;
+    const value162 = this._getStoryboardViewScrollKey(value161),
+      box3 = this._storyboardViewScrollByKey.get(value162);
+    if (!box3) return;
+    const run6 = () => {
+      const value163 = Math.max(0, el65.scrollWidth - el65.clientWidth),
+        value164 = Math.max(0, el65.scrollHeight - el65.clientHeight);
+      ((el65.scrollLeft = Math.min(value163, Math.max(0, box3.left || 0))),
+        (el65.scrollTop = Math.min(value164, Math.max(0, box3.top || 0))));
     };
-    (_0x45a64a(),
+    (run6(),
       typeof window !== 'undefined' &&
         typeof window.requestAnimationFrame === 'function' &&
-        window.requestAnimationFrame(_0x45a64a));
+        window.requestAnimationFrame(run6));
   }
   ['_render']() {
     if (!this._bodyEl) return;
-    const _0x55ea50 = this._getScriptState(),
-      _0x1dd744 = this._isStoryboardScriptGenerating(_0x55ea50);
-    (this._captureStoryboardViewScroll(_0x55ea50),
-      this._syncModeButtons(_0x55ea50.viewMode, _0x55ea50.mediaMode),
-      this._syncSelectionModeUi(_0x55ea50),
+    const value165 = this._getScriptState(),
+      value166 = this._isStoryboardScriptGenerating(value165);
+    (this._captureStoryboardViewScroll(value165),
+      this._syncModeButtons(value165.viewMode, value165.mediaMode),
+      this._syncSelectionModeUi(value165),
       this._updateSubmitButtonState());
-    const _0x429dca = this._getStoryboardSubmitInput(),
-      _0x37309d = mergeStoryboardImageRefs(_0x429dca.imageRefs, _0x55ea50.referenceImageRefs),
-      _0x28ea2f = buildStoryboardBodyRenderSignature(_0x55ea50, _0x37309d),
-      _0x3d51f7 = this._getCurrentStoryboardScroller(),
-      _0x2a3b8a =
-        _0x3d51f7 instanceof HTMLElement &&
-        (this._storyboardBodyRenderSignature === _0x28ea2f || this._skipNextStoryboardBodyRender === true);
-    if (_0x2a3b8a) {
-      ((this._storyboardBodyRenderSignature = _0x28ea2f),
+    const value167 = this._getStoryboardSubmitInput(),
+      storyboardImageRefs = mergeStoryboardImageRefs(value167.imageRefs, value165.referenceImageRefs),
+      storyboardBodyRenderSignature = buildStoryboardBodyRenderSignature(value165, storyboardImageRefs),
+      value168 = this._getCurrentStoryboardScroller(),
+      value169 =
+        value168 instanceof HTMLElement &&
+        (this._storyboardBodyRenderSignature === storyboardBodyRenderSignature ||
+          this._skipNextStoryboardBodyRender === true);
+    if (value169) {
+      ((this._storyboardBodyRenderSignature = storyboardBodyRenderSignature),
         (this._skipNextStoryboardBodyRender = false),
-        this._bindStoryboardViewScrollMemory(_0x3d51f7, _0x55ea50),
-        this._restoreStoryboardViewScroll(_0x3d51f7, _0x55ea50),
-        this._syncListSelectionState(_0x55ea50),
-        this._syncGeneratingOverlay(_0x1dd744),
-        this._renderFullscreenContent(_0x55ea50, _0x37309d));
+        this._bindStoryboardViewScrollMemory(value168, value165),
+        this._restoreStoryboardViewScroll(value168, value165),
+        this._syncListSelectionState(value165),
+        this._syncGeneratingOverlay(value166),
+        this._renderFullscreenContent(value165, storyboardImageRefs));
       return;
     }
     ((this._skipNextStoryboardBodyRender = false),
-      (this._storyboardBodyRenderSignature = _0x28ea2f),
+      (this._storyboardBodyRenderSignature = storyboardBodyRenderSignature),
       this._bodyEl.replaceChildren());
-    if (_0x55ea50.rows.length === 0) {
+    if (value165.rows.length === 0) {
       (this._bodyEl.appendChild(this._createEmptyState()),
-        this._syncGeneratingOverlay(_0x1dd744),
-        this._renderFullscreenContent(_0x55ea50, _0x37309d));
+        this._syncGeneratingOverlay(value166),
+        this._renderFullscreenContent(value165, storyboardImageRefs));
       return;
     }
-    const _0x47bc69 = buildStoryboardImageRefMap(_0x37309d);
-    let _0xc191fc = null;
-    (_0x55ea50.viewMode === 'card'
-      ? ((_0xc191fc = this._createCardView(
-          _0x55ea50.rows,
-          getStoryboardCardFieldsForMediaMode(_0x55ea50.mediaMode, _0x55ea50.rows),
-          _0x47bc69,
+    const storyboardImageRefMap3 = buildStoryboardImageRefMap(storyboardImageRefs);
+    let value170 = null;
+    (value165.viewMode === 'card'
+      ? ((value170 = this._createCardView(
+          value165.rows,
+          getStoryboardCardFieldsForMediaMode(value165.mediaMode, value165.rows),
+          storyboardImageRefMap3,
         )),
-        this._bodyEl.appendChild(_0xc191fc))
-      : ((_0xc191fc = this._createListView(
-          _0x55ea50.rows,
-          getStoryboardColumnsForMediaMode(_0x55ea50.mediaMode, _0x55ea50.rows),
-          _0x47bc69,
+        this._bodyEl.appendChild(value170))
+      : ((value170 = this._createListView(
+          value165.rows,
+          getStoryboardColumnsForMediaMode(value165.mediaMode, value165.rows),
+          storyboardImageRefMap3,
         )),
-        this._bodyEl.appendChild(_0xc191fc)),
-      this._bindStoryboardViewScrollMemory(_0xc191fc, _0x55ea50),
-      this._restoreStoryboardViewScroll(_0xc191fc, _0x55ea50),
-      this._syncListSelectionState(_0x55ea50),
-      this._syncGeneratingOverlay(_0x1dd744),
-      this._renderFullscreenContent(_0x55ea50, _0x37309d));
+        this._bodyEl.appendChild(value170)),
+      this._bindStoryboardViewScrollMemory(value170, value165),
+      this._restoreStoryboardViewScroll(value170, value165),
+      this._syncListSelectionState(value165),
+      this._syncGeneratingOverlay(value166),
+      this._renderFullscreenContent(value165, storyboardImageRefs));
   }
   ['_createEmptyState']() {
-    const _0x39bcbe = document.createElement('div');
-    _0x39bcbe.className = 'storyboard-script-empty';
-    const _0x2193b1 = document.createElement('div');
-    ((_0x2193b1.className = 'storyboard-script-empty-title'),
-      (_0x2193b1.textContent = storyboardScriptText('empty.title')));
-    const _0xe942f5 = document.createElement('div');
+    const el66 = document.createElement('div');
+    el66.className = 'storyboard-script-empty';
+    const el67 = document.createElement('div');
+    ((el67.className = 'storyboard-script-empty-title'),
+      (el67.textContent = storyboardScriptText('empty.title')));
+    const el68 = document.createElement('div');
     return (
-      (_0xe942f5.className = 'storyboard-script-empty-hint'),
-      (_0xe942f5.textContent = storyboardScriptText('empty.hint')),
-      _0x39bcbe.appendChild(_0x2193b1),
-      _0x39bcbe.appendChild(_0xe942f5),
-      _0x39bcbe
+      (el68.className = 'storyboard-script-empty-hint'),
+      (el68.textContent = storyboardScriptText('empty.hint')),
+      el66.appendChild(el67),
+      el66.appendChild(el68),
+      el66
     );
   }
   ['_createListView'](
-    _0x2689e2,
-    _0x4600eb = STORYBOARD_SCRIPT_COLUMNS,
-    _0x3b0c31 = new Map(),
-    { selectionMode: _0x5b2965 = null } = {},
+    list32,
+    list33 = STORYBOARD_SCRIPT_COLUMNS,
+    value171 = new Map(),
+    { selectionMode: selectionMode2 = null } = {},
   ) {
-    const _0xb55a = document.createElement('div');
-    _0xb55a.className = 'storyboard-script-table-wrap custom-scrollbar';
-    const _0x8a3e6e = this._getScriptState(),
-      _0x3aacff = _0x5b2965 == null ? _0x8a3e6e.selectionMode === true : _0x5b2965 === true,
-      _0x32d763 = _0x3aacff ? getSelectedRowIndexes(_0x8a3e6e) : [],
-      _0x968825 = new Set(_0x32d763),
-      _0x23faba = _0x2689e2.length > 0 && _0x32d763.length === _0x2689e2.length,
-      _0x33466c = document.createElement('table');
-    ((_0x33466c.className = 'storyboard-script-table'),
-      _0x33466c.classList.toggle('is-selection-mode', _0x3aacff));
-    const _0x129485 = document.createElement('thead'),
-      _0x98d468 = document.createElement('tr');
-    if (_0x3aacff) {
-      const _0xbceece = document.createElement('th');
-      ((_0xbceece.scope = 'col'),
-        (_0xbceece.className = 'storyboard-script-select-cell storyboard-script-select-cell--head'));
-      const _0x4b95cd = document.createElement('input');
-      ((_0x4b95cd.type = 'checkbox'),
-        (_0x4b95cd.className = 'storyboard-script-select-checkbox storyboard-script-select-all'),
-        (_0x4b95cd.checked = _0x23faba),
-        (_0x4b95cd.indeterminate = _0x32d763.length > 0 && !_0x23faba),
-        _0x4b95cd.setAttribute('aria-label', storyboardScriptText('selectAllAria')),
-        _0x4b95cd.addEventListener('pointerdown', (_0x268435) => {
-          _0x268435.stopPropagation();
+    const el69 = document.createElement('div');
+    el69.className = 'storyboard-script-table-wrap custom-scrollbar';
+    const value172 = this._getScriptState(),
+      value173 = selectionMode2 == null ? value172.selectionMode === true : selectionMode2 === true,
+      list34 = value173 ? getSelectedRowIndexes(value172) : [],
+      map5 = new Set(list34),
+      enabled32 = list32.length > 0 && list34.length === list32.length,
+      el70 = document.createElement('table');
+    ((el70.className = 'storyboard-script-table'), el70.classList.toggle('is-selection-mode', value173));
+    const el71 = document.createElement('thead'),
+      el72 = document.createElement('tr');
+    if (value173) {
+      const el73 = document.createElement('th');
+      ((el73.scope = 'col'),
+        (el73.className = 'storyboard-script-select-cell storyboard-script-select-cell--head'));
+      const el74 = document.createElement('input');
+      ((el74.type = 'checkbox'),
+        (el74.className = 'storyboard-script-select-checkbox storyboard-script-select-all'),
+        (el74.checked = enabled32),
+        (el74.indeterminate = list34.length > 0 && !enabled32),
+        el74.setAttribute('aria-label', storyboardScriptText('selectAllAria')),
+        el74.addEventListener('pointerdown', (event36) => {
+          event36.stopPropagation();
         }),
-        _0x4b95cd.addEventListener('click', (_0x43408b) => {
-          (_0x43408b.stopPropagation(), this._setAllRowsSelected(_0x4b95cd.checked));
+        el74.addEventListener('click', (event37) => {
+          (event37.stopPropagation(), this._setAllRowsSelected(el74.checked));
         }),
-        _0xbceece.appendChild(_0x4b95cd),
-        _0x98d468.appendChild(_0xbceece));
+        el73.appendChild(el74),
+        el72.appendChild(el73));
     }
-    (_0x4600eb.forEach((_0x1d0109) => {
-      const _0x2f1d44 = document.createElement('th');
-      ((_0x2f1d44.scope = 'col'),
-        (_0x2f1d44.dataset.storyboardColumnDensity = resolveStoryboardColumnDensity(_0x1d0109.key)),
-        (_0x2f1d44.textContent = getStoryboardColumnLabel(_0x1d0109.key, _0x1d0109.label)),
-        _0x98d468.appendChild(_0x2f1d44));
+    (list33.forEach((event38) => {
+      const el75 = document.createElement('th');
+      ((el75.scope = 'col'),
+        (el75.dataset.storyboardColumnDensity = resolveStoryboardColumnDensity(event38.key)),
+        (el75.textContent = getStoryboardColumnLabel(event38.key, event38.label)),
+        el72.appendChild(el75));
     }),
-      _0x129485.appendChild(_0x98d468));
-    const _0x356dbf = document.createElement('tbody');
+      el71.appendChild(el72));
+    const el76 = document.createElement('tbody');
     return (
-      _0x2689e2.forEach((_0x3c678e, _0x492db0) => {
-        const _0x64f35 = document.createElement('tr');
-        _0x64f35.dataset.storyboardRowIndex = String(_0x492db0);
-        if (_0x3aacff) {
-          const _0x19266c = document.createElement('td');
-          _0x19266c.className = 'storyboard-script-select-cell';
-          const _0x125a7e = document.createElement('input');
-          ((_0x125a7e.type = 'checkbox'),
-            (_0x125a7e.className = 'storyboard-script-select-checkbox'),
-            (_0x125a7e.checked = _0x968825.has(_0x492db0)),
-            _0x125a7e.setAttribute(
-              'aria-label',
-              storyboardScriptText('selectRowAria', { index: _0x492db0 + 1 }),
-            ),
-            _0x125a7e.addEventListener('pointerdown', (_0x1d3215) => {
-              _0x1d3215.stopPropagation();
+      list32.forEach((item32, index2) => {
+        const el77 = document.createElement('tr');
+        el77.dataset.storyboardRowIndex = String(index2);
+        if (value173) {
+          const el78 = document.createElement('td');
+          el78.className = 'storyboard-script-select-cell';
+          const el79 = document.createElement('input');
+          ((el79.type = 'checkbox'),
+            (el79.className = 'storyboard-script-select-checkbox'),
+            (el79.checked = map5.has(index2)),
+            el79.setAttribute('aria-label', storyboardScriptText('selectRowAria', { index: index2 + 1 })),
+            el79.addEventListener('pointerdown', (event39) => {
+              event39.stopPropagation();
             }),
-            _0x125a7e.addEventListener('click', (_0x51760a) => {
-              (_0x51760a.stopPropagation(), this._toggleRowSelection(_0x492db0, _0x125a7e.checked));
+            el79.addEventListener('click', (event40) => {
+              (event40.stopPropagation(), this._toggleRowSelection(index2, el79.checked));
             }),
-            _0x19266c.appendChild(_0x125a7e),
-            _0x64f35.appendChild(_0x19266c));
+            el78.appendChild(el79),
+            el77.appendChild(el78));
         }
-        (_0x4600eb.forEach((_0x46f14b) => {
-          const _0x2b4a3b = document.createElement('td');
-          ((_0x2b4a3b.className = 'storyboard-script-editable'),
-            (_0x2b4a3b.dataset.storyboardRowIndex = String(_0x492db0)),
-            (_0x2b4a3b.dataset.storyboardEditKey = _0x46f14b.key),
-            (_0x2b4a3b.dataset.storyboardColumnDensity = resolveStoryboardColumnDensity(_0x46f14b.key)),
-            appendStoryboardCellDisplay(_0x2b4a3b, _0x46f14b.key, _0x3c678e[_0x46f14b.key], _0x3b0c31),
-            _0x64f35.appendChild(_0x2b4a3b));
+        (list33.forEach((event41) => {
+          const el80 = document.createElement('td');
+          ((el80.className = 'storyboard-script-editable'),
+            (el80.dataset.storyboardRowIndex = String(index2)),
+            (el80.dataset.storyboardEditKey = event41.key),
+            (el80.dataset.storyboardColumnDensity = resolveStoryboardColumnDensity(event41.key)),
+            appendStoryboardCellDisplay(el80, event41.key, item32[event41.key], value171),
+            el77.appendChild(el80));
         }),
-          _0x356dbf.appendChild(_0x64f35));
+          el76.appendChild(el77));
       }),
-      _0x33466c.appendChild(_0x129485),
-      _0x33466c.appendChild(_0x356dbf),
-      _0xb55a.appendChild(_0x33466c),
-      _0xb55a
+      el70.appendChild(el71),
+      el70.appendChild(el76),
+      el69.appendChild(el70),
+      el69
     );
   }
-  ['_syncListSelectionState'](_0x465b15 = this._getScriptState()) {
-    const _0x1ec5e8 = _0x465b15.selectionMode === true,
-      _0x6e14e0 = _0x1ec5e8 ? getSelectedRowIndexes(_0x465b15) : [],
-      _0x52315b = new Set(_0x6e14e0),
-      _0x4ab000 = this._bodyEl?.querySelector?.('.storyboard-script-table');
-    if (!(_0x4ab000 instanceof HTMLElement)) return;
-    _0x4ab000.classList.toggle('is-selection-mode', _0x1ec5e8);
-    const _0x16aaf2 =
-        _0x1ec5e8 &&
-        Array.isArray(_0x465b15.rows) &&
-        _0x465b15.rows.length > 0 &&
-        _0x6e14e0.length === _0x465b15.rows.length,
-      _0x4f7fb5 = _0x4ab000.querySelector('.storyboard-script-select-all');
-    (_0x4f7fb5 instanceof HTMLInputElement &&
-      ((_0x4f7fb5.checked = _0x16aaf2),
-      (_0x4f7fb5.indeterminate = _0x1ec5e8 && _0x6e14e0.length > 0 && !_0x16aaf2)),
-      _0x4ab000.querySelectorAll('tbody tr').forEach((_0x3a43b7, _0x5594ea) => {
-        if (!(_0x3a43b7 instanceof HTMLElement)) return;
-        const _0xc8b7f = Number(_0x3a43b7.dataset.storyboardRowIndex || _0x5594ea),
-          _0x11cdf8 = _0x52315b.has(_0xc8b7f),
-          _0xba96e9 = _0x3a43b7.querySelector('.storyboard-script-select-checkbox');
-        _0xba96e9 instanceof HTMLInputElement && (_0xba96e9.checked = _0x11cdf8);
+  ['_syncListSelectionState'](value174 = this._getScriptState()) {
+    const value175 = value174.selectionMode === true,
+      list35 = value175 ? getSelectedRowIndexes(value174) : [],
+      map6 = new Set(list35),
+      el81 = this._bodyEl?.querySelector?.('.storyboard-script-table');
+    if (!(el81 instanceof HTMLElement)) return;
+    el81.classList.toggle('is-selection-mode', value175);
+    const enabled33 =
+        value175 &&
+        Array.isArray(value174.rows) &&
+        value174.rows.length > 0 &&
+        list35.length === value174.rows.length,
+      value176 = el81.querySelector('.storyboard-script-select-all');
+    (value176 instanceof HTMLInputElement &&
+      ((value176.checked = enabled33),
+      (value176.indeterminate = value175 && list35.length > 0 && !enabled33)),
+      el81.querySelectorAll('tbody tr').forEach((el82, value177) => {
+        if (!(el82 instanceof HTMLElement)) return;
+        const value178 = Number(el82.dataset.storyboardRowIndex || value177),
+          value179 = map6.has(value178),
+          value180 = el82.querySelector('.storyboard-script-select-checkbox');
+        value180 instanceof HTMLInputElement && (value180.checked = value179);
       }));
   }
-  ['_createCardView'](_0x3ab29f, _0xbe2768 = CARD_FIELDS, _0x3085ef = new Map()) {
-    const _0x170adc = document.createElement('div');
+  ['_createCardView'](list36, list37 = CARD_FIELDS, value181 = new Map()) {
+    const el83 = document.createElement('div');
     return (
-      (_0x170adc.className = 'storyboard-script-card-grid custom-scrollbar'),
-      _0x3ab29f.forEach((_0x20bd4d, _0x106d5a) => {
-        const _0x476e50 = document.createElement('article');
-        _0x476e50.className = 'storyboard-script-card';
-        const _0x4b893d = document.createElement('div');
-        _0x4b893d.className = 'storyboard-script-card-head';
-        const _0x4a58e4 = document.createElement('span');
-        ((_0x4a58e4.className = 'storyboard-script-shot storyboard-script-editable'),
-          (_0x4a58e4.dataset.storyboardRowIndex = String(_0x106d5a)),
-          (_0x4a58e4.dataset.storyboardEditKey = '镜号'),
-          (_0x4a58e4.textContent =
-            formatCellValue(_0x20bd4d['镜号']) ||
-            storyboardScriptText('shotFallback', { index: _0x106d5a + 1 })),
-          _0x4b893d.appendChild(_0x4a58e4));
-        const _0x4c79e6 = formatCellValue(_0x20bd4d['时长']);
-        if (_0x4c79e6) {
-          const _0x226b57 = document.createElement('span');
-          ((_0x226b57.className = 'storyboard-script-duration storyboard-script-editable'),
-            (_0x226b57.dataset.storyboardRowIndex = String(_0x106d5a)),
-            (_0x226b57.dataset.storyboardEditKey = '时长'),
-            (_0x226b57.textContent = _0x4c79e6),
-            _0x4b893d.appendChild(_0x226b57));
+      (el83.className = 'storyboard-script-card-grid custom-scrollbar'),
+      list36.forEach((item33, index3) => {
+        const el84 = document.createElement('article');
+        el84.className = 'storyboard-script-card';
+        const el85 = document.createElement('div');
+        el85.className = 'storyboard-script-card-head';
+        const el86 = document.createElement('span');
+        ((el86.className = 'storyboard-script-shot storyboard-script-editable'),
+          (el86.dataset.storyboardRowIndex = String(index3)),
+          (el86.dataset.storyboardEditKey = '镜号'),
+          (el86.textContent =
+            formatCellValue(item33['镜号']) || storyboardScriptText('shotFallback', { index: index3 + 1 })),
+          el85.appendChild(el86));
+        const formatCellValue3 = formatCellValue(item33['时长']);
+        if (formatCellValue3) {
+          const el87 = document.createElement('span');
+          ((el87.className = 'storyboard-script-duration storyboard-script-editable'),
+            (el87.dataset.storyboardRowIndex = String(index3)),
+            (el87.dataset.storyboardEditKey = '时长'),
+            (el87.textContent = formatCellValue3),
+            el85.appendChild(el87));
         }
-        (_0x476e50.appendChild(_0x4b893d),
-          _0xbe2768.forEach((_0xf51b89) => {
-            const _0x50051a = formatCellValue(_0x20bd4d[_0xf51b89]);
-            if (!_0x50051a) return;
-            const _0x19b4c8 = document.createElement('div');
-            _0x19b4c8.className = 'storyboard-script-card-field';
-            const _0x2999d9 = document.createElement('span');
-            ((_0x2999d9.className = 'storyboard-script-card-label'),
-              (_0x2999d9.textContent = getStoryboardColumnLabel(_0xf51b89, _0xf51b89)));
-            const _0xfcd86e = document.createElement('span');
-            ((_0xfcd86e.className = 'storyboard-script-card-value storyboard-script-editable'),
-              (_0xfcd86e.dataset.storyboardRowIndex = String(_0x106d5a)),
-              (_0xfcd86e.dataset.storyboardEditKey = _0xf51b89),
-              appendStoryboardCellDisplay(_0xfcd86e, _0xf51b89, _0x50051a, _0x3085ef),
-              _0x19b4c8.appendChild(_0x2999d9),
-              _0x19b4c8.appendChild(_0xfcd86e),
-              _0x476e50.appendChild(_0x19b4c8));
+        (el84.appendChild(el85),
+          list37.forEach((item34) => {
+            const formatCellValue4 = formatCellValue(item33[item34]);
+            if (!formatCellValue4) return;
+            const el88 = document.createElement('div');
+            el88.className = 'storyboard-script-card-field';
+            const el89 = document.createElement('span');
+            ((el89.className = 'storyboard-script-card-label'),
+              (el89.textContent = getStoryboardColumnLabel(item34, item34)));
+            const el90 = document.createElement('span');
+            ((el90.className = 'storyboard-script-card-value storyboard-script-editable'),
+              (el90.dataset.storyboardRowIndex = String(index3)),
+              (el90.dataset.storyboardEditKey = item34),
+              appendStoryboardCellDisplay(el90, item34, formatCellValue4, value181),
+              el88.appendChild(el89),
+              el88.appendChild(el90),
+              el84.appendChild(el88));
           }),
-          _0x170adc.appendChild(_0x476e50));
+          el83.appendChild(el84));
       }),
-      _0x170adc
+      el83
     );
   }
-  ['update'](_0x2f26b6) {
-    this._data = _0x2f26b6 || {};
-    if (document.activeElement !== this.promptEl && _0x2f26b6?.prompt !== undefined) {
-      const _0x546f3c = sanitizePromptHtml(_0x2f26b6.prompt || '');
-      this.promptEl?.innerHTML !== _0x546f3c &&
-        ((this.promptEl.innerHTML = _0x546f3c), _rehydratePromptPills(this));
+  ['update'](value182) {
+    this._data = value182 || {};
+    if (document.activeElement !== this.promptEl && value182?.prompt !== undefined) {
+      const sanitizePromptHtml2 = sanitizePromptHtml(value182.prompt || '');
+      this.promptEl?.innerHTML !== sanitizePromptHtml2 &&
+        ((this.promptEl.innerHTML = sanitizePromptHtml2), _rehydratePromptPills(this));
     }
-    (this._syncPromptBoxSizeFromData?.(_0x2f26b6), this._renderRefBar(), this._render());
+    (this._syncPromptBoxSizeFromData?.(value182), this._renderRefBar(), this._render());
   }
   ['unmount']() {
     (this._closeFullscreenScript(),

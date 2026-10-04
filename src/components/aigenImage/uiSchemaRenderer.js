@@ -33,374 +33,337 @@ const SUPPORTED_CONTROL_TYPES = new Set([
   ]),
   RANDOM_SEED_DEFAULT_MIN = 0,
   RANDOM_SEED_DEFAULT_MAX = 0x7fffffff;
-function manifestText(_0x4917c2) {
-  return translateManifestText(_0x4917c2);
+function manifestText(value) {
+  return translateManifestText(value);
 }
-function getDisplayLabelFromOption(_0x2b41fc, _0x44cfa6 = '') {
-  return manifestText(_0x2b41fc?.displayLabel ?? _0x2b41fc?.selectedLabel ?? _0x2b41fc?.label ?? _0x44cfa6);
+function getDisplayLabelFromOption(item, key = '') {
+  return manifestText(item?.displayLabel ?? item?.selectedLabel ?? item?.label ?? key);
 }
-function formatMetricLabel(_0x6be8c5, _0x5edcba) {
-  const _0x20b2a9 = manifestText(_0x6be8c5),
-    _0x9e6d24 = String(_0x5edcba ?? '');
-  return _0x20b2a9 === String(_0x6be8c5) ? '' + _0x20b2a9 + _0x9e6d24 : _0x20b2a9 + ' ' + _0x9e6d24;
+function formatMetricLabel(index, result) {
+  const manifestText2 = manifestText(index),
+    data = String(result ?? '');
+  return manifestText2 === String(index) ? '' + manifestText2 + data : manifestText2 + ' ' + data;
 }
-function joinMetricLabels(_0x59b165) {
-  return _0x59b165
-    .filter((_0x5a2122) => Array.isArray(_0x5a2122) && _0x5a2122.length >= 2 && _0x5a2122[1] !== '')
-    .map(([_0x2baf0d, _0x15e7fd]) => formatMetricLabel(_0x2baf0d, _0x15e7fd))
+function joinMetricLabels(list) {
+  return list
+    .filter((list2) => Array.isArray(list2) && list2.length >= 2 && list2[1] !== '')
+    .map(([options, target]) => formatMetricLabel(options, target))
     .join('·');
 }
-function escapeCssString(_0x84ef5f) {
-  return String(_0x84ef5f ?? '')
+function escapeCssString(source) {
+  return String(source ?? '')
     .replace(/\\/g, '\\\\')
     .replace(/"/g, '\\"');
 }
-function normalizePlacement(_0x250d97) {
-  const _0xa34e01 = String(_0x250d97 || '')
+function normalizePlacement(next) {
+  const current = String(next || '')
     .trim()
     .toLowerCase();
-  return ALLOWED_PLACEMENTS.has(_0xa34e01) ? _0xa34e01 : '';
+  return ALLOWED_PLACEMENTS.has(current) ? current : '';
 }
 function filterUiSchemaFields(
-  _0x92f100,
+  list3,
   {
-    placement: _0x467f24,
-    excludeFieldIds: _0x276af0,
+    placement: placement,
+    excludeFieldIds: excludeFieldIds,
     ignorePlacementFilter: ignorePlacementFilter = false,
   } = {},
 ) {
-  if (!Array.isArray(_0x92f100)) return [];
-  const _0x16b695 = String(_0x467f24 ?? '').trim() !== '',
-    _0x871db1 = normalizePlacement(_0x467f24),
-    _0x484dd8 = new Set(
-      (Array.isArray(_0x276af0) ? _0x276af0 : []).map((_0x5bb701) => String(_0x5bb701 || '').trim()),
+  if (!Array.isArray(list3)) return [];
+  const entry = String(placement ?? '').trim() !== '',
+    placement2 = normalizePlacement(placement),
+    map = new Set(
+      (Array.isArray(excludeFieldIds) ? excludeFieldIds : []).map((item2) => String(item2 || '').trim()),
     );
-  return _0x92f100.filter((_0x2cfb86) => {
-    const _0x40b61a = String(_0x2cfb86?.id || '').trim();
-    if (_0x484dd8.has(_0x40b61a)) return false;
-    if (_0x16b695 && !_0x871db1 && !ignorePlacementFilter) return false;
-    if (!_0x871db1 || ignorePlacementFilter) return true;
-    return normalizePlacement(_0x2cfb86?.placement) === _0x871db1;
+  return list3.filter((item3) => {
+    const record = String(item3?.id || '').trim();
+    if (map.has(record)) return false;
+    if (entry && !placement2 && !ignorePlacementFilter) return false;
+    if (!placement2 || ignorePlacementFilter) return true;
+    return normalizePlacement(item3?.placement) === placement2;
   });
 }
-function getUiSchemaFields(_0xaada73, { placement: _0x838f9b, excludeFieldIds: _0x442558 } = {}) {
-  const _0x1b49dc = getModelManifest(_0xaada73);
-  return filterUiSchemaFields(_0x1b49dc?.uiSchema?.fields, {
-    placement: _0x838f9b,
-    excludeFieldIds: _0x442558,
+function getUiSchemaFields(payload, { placement: placement3, excludeFieldIds: excludeFieldIds2 } = {}) {
+  const modelManifest = getModelManifest(payload);
+  return filterUiSchemaFields(modelManifest?.uiSchema?.fields, {
+    placement: placement3,
+    excludeFieldIds: excludeFieldIds2,
   });
 }
-function getUiSchemaModelIdForNode(_0x5ea9d7 = {}) {
-  const _0x389d9b = String(_0x5ea9d7?.model || '').trim();
-  if (!_0x389d9b) return '';
-  if (getModelManifest(_0x389d9b)) return _0x389d9b;
-  const _0x4af0cf =
-    resolveModelExecution(_0x389d9b, { providerHint: _0x5ea9d7?.provider }) ||
-    resolveModelExecution(_0x389d9b);
-  return String(_0x4af0cf?.canonicalModelId || _0x4af0cf?.modelManifest?.modelId || _0x389d9b).trim();
+function getUiSchemaModelIdForNode(providerHint = {}) {
+  const enabled = String(providerHint?.model || '').trim();
+  if (!enabled) return '';
+  if (getModelManifest(enabled)) return enabled;
+  const modelExecution =
+    resolveModelExecution(enabled, { providerHint: providerHint?.provider }) ||
+    resolveModelExecution(enabled);
+  return String(modelExecution?.canonicalModelId || modelExecution?.modelManifest?.modelId || enabled).trim();
 }
-function assertSupportedField(_0x3abf9d) {
-  const _0x2cdd4d = String(_0x3abf9d?.id || '').trim(),
-    _0xae207 = normalizeControlType(_0x3abf9d?.type);
-  if (!_0x2cdd4d) throw new Error('[uiSchema] field id is required');
-  if (!SUPPORTED_CONTROL_TYPES.has(_0xae207))
-    throw new Error('[uiSchema] unsupported control type for ' + _0x2cdd4d + ': ' + _0x3abf9d?.type);
-  if (_0x3abf9d?.defaultValue === undefined)
-    throw new Error('[uiSchema] defaultValue is required for ' + _0x2cdd4d);
+function assertSupportedField(handle) {
+  const enabled2 = String(handle?.id || '').trim(),
+    controlType = normalizeControlType(handle?.type);
+  if (!enabled2) throw new Error('[uiSchema] field id is required');
+  if (!SUPPORTED_CONTROL_TYPES.has(controlType))
+    throw new Error('[uiSchema] unsupported control type for ' + enabled2 + ': ' + handle?.type);
+  if (handle?.defaultValue === undefined)
+    throw new Error('[uiSchema] defaultValue is required for ' + enabled2);
   if (
-    (_0xae207 === 'segmented' || _0xae207 === 'select') &&
-    (!Array.isArray(_0x3abf9d?.options) || _0x3abf9d.options.length === 0)
+    (controlType === 'segmented' || controlType === 'select') &&
+    (!Array.isArray(handle?.options) || handle.options.length === 0)
   )
-    throw new Error('[uiSchema] options are required for ' + _0x2cdd4d);
+    throw new Error('[uiSchema] options are required for ' + enabled2);
 }
-function getFieldValue(_0x16c134, _0x21d136) {
-  const _0x5726d9 = String(_0x21d136?.id || '').trim();
-  if (!_0x5726d9) return _0x21d136?.defaultValue ?? '';
-  const _0x3d54d5 = getUiSchemaParamContext(_0x16c134),
-    _0x272753 = _0x16c134?.generationParams;
-  if (
-    _0x272753 &&
-    typeof _0x272753 === 'object' &&
-    !Array.isArray(_0x272753) &&
-    _0x272753[_0x5726d9] !== undefined
-  )
-    return normalizeUiSchemaFieldValue(_0x21d136, _0x272753[_0x5726d9], { params: _0x3d54d5 });
-  if (
-    _0x16c134 &&
-    typeof _0x16c134 === 'object' &&
-    !Array.isArray(_0x16c134) &&
-    _0x16c134[_0x5726d9] !== undefined
-  )
-    return normalizeUiSchemaFieldValue(_0x21d136, _0x16c134[_0x5726d9], { params: _0x3d54d5 });
-  return normalizeUiSchemaFieldValue(_0x21d136, _0x21d136?.defaultValue, { params: _0x3d54d5 });
+function getFieldValue(state, config) {
+  const enabled3 = String(config?.id || '').trim();
+  if (!enabled3) return config?.defaultValue ?? '';
+  const params = getUiSchemaParamContext(state),
+    scope = state?.generationParams;
+  if (scope && typeof scope === 'object' && !Array.isArray(scope) && scope[enabled3] !== undefined)
+    return normalizeUiSchemaFieldValue(config, scope[enabled3], { params: params });
+  if (state && typeof state === 'object' && !Array.isArray(state) && state[enabled3] !== undefined)
+    return normalizeUiSchemaFieldValue(config, state[enabled3], { params: params });
+  return normalizeUiSchemaFieldValue(config, config?.defaultValue, { params: params });
 }
-function getNodeFieldValue(_0x2aa9db, _0x3c2984, _0x3abb3e = '') {
-  const _0x38d997 = String(_0x3c2984 || '').trim();
-  if (!_0x38d997) return _0x3abb3e;
-  const _0x5ab246 = _0x2aa9db?.generationParams;
-  if (
-    _0x5ab246 &&
-    typeof _0x5ab246 === 'object' &&
-    !Array.isArray(_0x5ab246) &&
-    _0x5ab246[_0x38d997] !== undefined
-  )
-    return _0x5ab246[_0x38d997];
-  if (
-    _0x2aa9db &&
-    typeof _0x2aa9db === 'object' &&
-    !Array.isArray(_0x2aa9db) &&
-    _0x2aa9db[_0x38d997] !== undefined
-  )
-    return _0x2aa9db[_0x38d997];
-  return _0x3abb3e;
+function getNodeFieldValue(input, output, value2 = '') {
+  const enabled4 = String(output || '').trim();
+  if (!enabled4) return value2;
+  const value3 = input?.generationParams;
+  if (value3 && typeof value3 === 'object' && !Array.isArray(value3) && value3[enabled4] !== undefined)
+    return value3[enabled4];
+  if (input && typeof input === 'object' && !Array.isArray(input) && input[enabled4] !== undefined)
+    return input[enabled4];
+  return value2;
 }
-function getPlainGenerationParams(_0x70da3e) {
-  return _0x70da3e && typeof _0x70da3e === 'object' && !Array.isArray(_0x70da3e) ? { ..._0x70da3e } : {};
+function getPlainGenerationParams(args) {
+  return args && typeof args === 'object' && !Array.isArray(args) ? { ...args } : {};
 }
-function getUiSchemaParamContext(_0x24d7e5 = {}) {
-  const _0x2251d2 = getPlainGenerationParams(_0x24d7e5?.generationParams),
-    _0x28f00b = _0x24d7e5 && typeof _0x24d7e5 === 'object' && !Array.isArray(_0x24d7e5) ? _0x24d7e5 : {};
-  return { ..._0x28f00b, ..._0x2251d2 };
+function getUiSchemaParamContext(options2 = {}) {
+  const args2 = getPlainGenerationParams(options2?.generationParams),
+    args3 = options2 && typeof options2 === 'object' && !Array.isArray(options2) ? options2 : {};
+  return { ...args3, ...args2 };
 }
-function getGenerationParamsMemoryKey(_0x1daf7a) {
-  return String(_0x1daf7a?.model || '').trim();
+function getGenerationParamsMemoryKey(value4) {
+  return String(value4?.model || '').trim();
 }
-function normalizeControlType(_0x3d22fa) {
-  return String(_0x3d22fa || '')
+function normalizeControlType(value5) {
+  return String(value5 || '')
     .trim()
     .toLowerCase();
 }
-function getRenderableOptions(_0x154c89) {
-  const _0x15c5d4 = Array.isArray(_0x154c89?.options) ? _0x154c89.options : [],
-    _0x491dde =
-      Array.isArray(_0x154c89?.advancedOptions) && globalThis.window?.ADVANCED_MODE
-        ? _0x154c89.advancedOptions
+function getRenderableOptions(value6) {
+  const args4 = Array.isArray(value6?.options) ? value6.options : [],
+    args5 =
+      Array.isArray(value6?.advancedOptions) && globalThis.window?.ADVANCED_MODE
+        ? value6.advancedOptions
         : [];
-  return [..._0x15c5d4, ..._0x491dde];
+  return [...args4, ...args5];
 }
-function getOptionHideWhen(_0x3390ea) {
-  if (!_0x3390ea || typeof _0x3390ea !== 'object' || Array.isArray(_0x3390ea)) return null;
-  const _0x4912ca = _0x3390ea.hideWhen;
-  return _0x4912ca &&
-    (Array.isArray(_0x4912ca) || (typeof _0x4912ca === 'object' && !Array.isArray(_0x4912ca)))
-    ? _0x4912ca
+function getOptionHideWhen(enabled5) {
+  if (!enabled5 || typeof enabled5 !== 'object' || Array.isArray(enabled5)) return null;
+  const value7 = enabled5.hideWhen;
+  return value7 && (Array.isArray(value7) || (typeof value7 === 'object' && !Array.isArray(value7)))
+    ? value7
     : null;
 }
-function isOptionHidden(_0x136e1c, _0x3b915f = {}) {
-  if (_0x136e1c?.hidden === true) return true;
-  const _0x497659 = getOptionHideWhen(_0x136e1c);
-  return _0x497659 ? uiSchemaConditionMatches(_0x497659, _0x3b915f) : false;
+function isOptionHidden(el, value8 = {}) {
+  if (el?.hidden === true) return true;
+  const optionHideWhen = getOptionHideWhen(el);
+  return optionHideWhen ? uiSchemaConditionMatches(optionHideWhen, value8) : false;
 }
-function getVisibleOptions(_0x5bb78b, _0x47aa52 = {}) {
-  return getRenderableOptions(_0x5bb78b).filter((_0x41c7ba) => !isOptionHidden(_0x41c7ba, _0x47aa52));
+function getVisibleOptions(value9, value10 = {}) {
+  return getRenderableOptions(value9).filter((item4) => !isOptionHidden(item4, value10));
 }
-function renderOptions(_0xf0d251, _0x4be3cf, _0x146f45 = {}) {
-  const _0x3f830b = getVisibleOptions(_0xf0d251, _0x146f45);
-  return _0x3f830b
-    .map((_0x1e28b4) => {
-      const _0x3d5cad = _0x1e28b4 && typeof _0x1e28b4 === 'object' && !Array.isArray(_0x1e28b4),
-        _0x292fcb = String(_0x3d5cad ? (_0x1e28b4.value ?? '') : _0x1e28b4),
-        _0x5b79a2 = manifestText(_0x3d5cad ? (_0x1e28b4.label ?? _0x292fcb) : _0x292fcb),
-        _0x22b125 = manifestText(_0x3d5cad ? _0x1e28b4.tooltip || '' : '').trim(),
-        _0x52c023 = String(_0x4be3cf ?? '') === _0x292fcb,
-        _0x5cc70e = isOptionDisabled(_0xf0d251, _0x1e28b4, _0x146f45),
-        _0x1097a9 = _0x22b125
-          ? ' title="' + escapeHtmlAttr(_0x22b125) + '" data-tooltip="' + escapeHtmlAttr(_0x22b125) + '"'
+function renderOptions(value11, value12, nodeData2 = {}) {
+  const list4 = getVisibleOptions(value11, nodeData2);
+  return list4
+    .map((el2) => {
+      const value13 = el2 && typeof el2 === 'object' && !Array.isArray(el2),
+        value14 = String(value13 ? (el2.value ?? '') : el2),
+        manifestText3 = manifestText(value13 ? (el2.label ?? value14) : value14),
+        manifestText4 = manifestText(value13 ? el2.tooltip || '' : '').trim(),
+        value15 = String(value12 ?? '') === value14,
+        isOptionDisabled2 = isOptionDisabled(value11, el2, nodeData2),
+        value16 = manifestText4
+          ? ' title="' +
+            escapeHtmlAttr(manifestText4) +
+            '" data-tooltip="' +
+            escapeHtmlAttr(manifestText4) +
+            '"'
           : '';
       return (
         '<button type="button" class="img-rp-quality-item ui-schema-option ' +
-        (_0x52c023 ? 'active' : '') +
+        (value15 ? 'active' : '') +
         ' ' +
-        (_0x5cc70e ? 'disabled' : '') +
+        (isOptionDisabled2 ? 'disabled' : '') +
         '" data-ui-schema-value="' +
-        escapeHtmlAttr(_0x292fcb) +
+        escapeHtmlAttr(value14) +
         '"' +
-        _0x1097a9 +
-        getOptionDisabledAttrs(_0xf0d251, _0x1e28b4, { nodeData: _0x146f45 }) +
+        value16 +
+        getOptionDisabledAttrs(value11, el2, { nodeData: nodeData2 }) +
         '>' +
-        escapeHtmlAttr(_0x5b79a2) +
+        escapeHtmlAttr(manifestText3) +
         '</button>'
       );
     })
     .join('');
 }
-function renderControl(_0x400326, _0x57b8a5, _0x8f65ad, _0x317412 = {}) {
-  if (_0x8f65ad === 'segmented') {
-    if (_0x317412?.advanced)
-      return renderAdvancedSelectionControl(_0x400326, _0x57b8a5, _0x317412?.nodeData || {});
-    const _0x36d45e = _0x317412?.advanced ? ' rh-adv-seg rh-v5-fps-seg' : '';
+function renderControl(value17, value18, value19, value20 = {}) {
+  if (value19 === 'segmented') {
+    if (value20?.advanced) return renderAdvancedSelectionControl(value17, value18, value20?.nodeData || {});
+    const value21 = value20?.advanced ? ' rh-adv-seg rh-v5-fps-seg' : '';
     return (
       '<div class="img-rp-quality-segmented ui-schema-segmented' +
-      _0x36d45e +
+      value21 +
       '">' +
-      renderOptions(_0x400326, _0x57b8a5, _0x317412?.nodeData || {}) +
+      renderOptions(value17, value18, value20?.nodeData || {}) +
       '</div>'
     );
   }
-  if (_0x8f65ad === 'select') return renderSelect(_0x400326, _0x57b8a5, _0x317412?.nodeData || {});
-  if (_0x8f65ad === 'slider' || _0x8f65ad === 'stepper')
-    return renderRange(_0x400326, _0x57b8a5, _0x8f65ad, _0x317412?.nodeData || {});
-  if (_0x8f65ad === 'toggle')
-    return renderAdvancedSelectionControl(_0x400326, _0x57b8a5, _0x317412?.nodeData || {});
-  if (_0x8f65ad === 'text' || _0x8f65ad === 'textarea')
-    return renderTextInput(_0x400326, _0x57b8a5, _0x8f65ad);
-  return renderAssetInput(_0x400326, _0x8f65ad);
+  if (value19 === 'select') return renderSelect(value17, value18, value20?.nodeData || {});
+  if (value19 === 'slider' || value19 === 'stepper')
+    return renderRange(value17, value18, value19, value20?.nodeData || {});
+  if (value19 === 'toggle') return renderAdvancedSelectionControl(value17, value18, value20?.nodeData || {});
+  if (value19 === 'text' || value19 === 'textarea') return renderTextInput(value17, value18, value19);
+  return renderAssetInput(value17, value19);
 }
-function getOptionLabel(_0x10200a, _0xb34709) {
-  const _0x74f684 = getRenderableOptions(_0x10200a),
-    _0x37257a = String(_0xb34709 ?? ''),
-    _0x48f369 = _0x74f684.find((_0x5c99d0) => String(_0x5c99d0?.value ?? _0x5c99d0) === _0x37257a);
-  return getDisplayLabelFromOption(_0x48f369, _0x37257a);
+function getOptionLabel(value22, value23) {
+  const list5 = getRenderableOptions(value22),
+    value24 = String(value23 ?? ''),
+    value25 = list5.find((el3) => String(el3?.value ?? el3) === value24);
+  return getDisplayLabelFromOption(value25, value24);
 }
-function getFieldById(_0x44cd46, _0x292ad5) {
-  return (Array.isArray(_0x44cd46) ? _0x44cd46 : []).find(
-    (_0x1e87de) => String(_0x1e87de?.id || '').trim() === _0x292ad5,
+function getFieldById(value26, value27) {
+  return (Array.isArray(value26) ? value26 : []).find((item5) => String(item5?.id || '').trim() === value27);
+}
+function getFieldByDisplayRole(value28, value29) {
+  const enabled6 = String(value29 || '').trim();
+  if (!enabled6) return null;
+  return (Array.isArray(value28) ? value28 : []).find(
+    (item6) => String(item6?.displayRole || '').trim() === enabled6,
   );
 }
-function getFieldByDisplayRole(_0x1494be, _0x4ef8de) {
-  const _0x6b7e35 = String(_0x4ef8de || '').trim();
-  if (!_0x6b7e35) return null;
-  return (Array.isArray(_0x1494be) ? _0x1494be : []).find(
-    (_0x1907cf) => String(_0x1907cf?.displayRole || '').trim() === _0x6b7e35,
-  );
+function getOptionValue(el4) {
+  return String(el4?.value ?? el4);
 }
-function getOptionValue(_0x3120bc) {
-  return String(_0x3120bc?.value ?? _0x3120bc);
+function isFieldDisabled(el5) {
+  return el5?.disabled === true || el5?.readOnly === true;
 }
-function isFieldDisabled(_0x111d92) {
-  return _0x111d92?.disabled === true || _0x111d92?.readOnly === true;
-}
-function normalizeCompareValue(_0x176821) {
-  return String(_0x176821 ?? '')
+function normalizeCompareValue(value30) {
+  return String(value30 ?? '')
     .trim()
     .toLowerCase();
 }
-function getOptionDisableWhen(_0x4d8b2c) {
-  if (!_0x4d8b2c || typeof _0x4d8b2c !== 'object' || Array.isArray(_0x4d8b2c)) return null;
-  const _0x58f7c6 = _0x4d8b2c.disableWhen || _0x4d8b2c.disabledWhen;
-  return _0x58f7c6 &&
-    (Array.isArray(_0x58f7c6) || (typeof _0x58f7c6 === 'object' && !Array.isArray(_0x58f7c6)))
-    ? _0x58f7c6
+function getOptionDisableWhen(enabled7) {
+  if (!enabled7 || typeof enabled7 !== 'object' || Array.isArray(enabled7)) return null;
+  const value31 = enabled7.disableWhen || enabled7.disabledWhen;
+  return value31 && (Array.isArray(value31) || (typeof value31 === 'object' && !Array.isArray(value31)))
+    ? value31
     : null;
 }
-function optionDisableWhenMatches(_0x39b443, _0x48b9b0 = {}) {
-  if (Array.isArray(_0x39b443))
-    return _0x39b443.some((_0x17bcf1) => optionDisableWhenMatches(_0x17bcf1, _0x48b9b0));
-  if (!_0x39b443 || typeof _0x39b443 !== 'object') return false;
-  if (Array.isArray(_0x39b443.any))
-    return _0x39b443.any.some((_0x3b1188) => optionDisableWhenMatches(_0x3b1188, _0x48b9b0));
-  if (Array.isArray(_0x39b443.all))
-    return _0x39b443.all.every((_0x10ee49) => optionDisableWhenMatches(_0x10ee49, _0x48b9b0));
-  const _0x59ee14 = String(_0x39b443?.field || _0x39b443?.param || '').trim();
-  if (!_0x59ee14) return false;
-  const _0x4ace92 = _0x39b443.values !== undefined ? _0x39b443.values : _0x39b443.value,
-    _0x5c0a86 = Array.isArray(_0x4ace92) ? _0x4ace92 : [_0x4ace92],
-    _0x1ed8b3 = _0x5c0a86.map(normalizeCompareValue);
-  return _0x1ed8b3.includes(normalizeCompareValue(getNodeFieldValue(_0x48b9b0, _0x59ee14, '')));
+function optionDisableWhenMatches(el6, value32 = {}) {
+  if (Array.isArray(el6)) return el6.some((item7) => optionDisableWhenMatches(item7, value32));
+  if (!el6 || typeof el6 !== 'object') return false;
+  if (Array.isArray(el6.any)) return el6.any.some((item8) => optionDisableWhenMatches(item8, value32));
+  if (Array.isArray(el6.all)) return el6.all.every((item9) => optionDisableWhenMatches(item9, value32));
+  const enabled8 = String(el6?.field || el6?.param || '').trim();
+  if (!enabled8) return false;
+  const value33 = el6.values !== undefined ? el6.values : el6.value,
+    list6 = Array.isArray(value33) ? value33 : [value33],
+    list7 = list6.map(normalizeCompareValue);
+  return list7.includes(normalizeCompareValue(getNodeFieldValue(value32, enabled8, '')));
 }
-function uiSchemaConditionMatches(_0x5826de, _0x225638 = {}) {
-  if (Array.isArray(_0x5826de))
-    return _0x5826de.some((_0x21faeb) => uiSchemaConditionMatches(_0x21faeb, _0x225638));
-  if (!_0x5826de || typeof _0x5826de !== 'object') return false;
-  if (Array.isArray(_0x5826de.any))
-    return _0x5826de.any.some((_0x346922) => uiSchemaConditionMatches(_0x346922, _0x225638));
-  if (Array.isArray(_0x5826de.all))
-    return _0x5826de.all.every((_0xf19674) => uiSchemaConditionMatches(_0xf19674, _0x225638));
-  const _0x4cf6fe = String(_0x5826de?.field || _0x5826de?.param || '').trim();
-  if (!_0x4cf6fe) return false;
-  const _0x3125f3 = _0x5826de.values !== undefined ? _0x5826de.values : _0x5826de.value,
-    _0x2935f0 = Array.isArray(_0x3125f3) ? _0x3125f3 : [_0x3125f3],
-    _0x4910a0 = _0x2935f0.map(normalizeCompareValue);
-  return _0x4910a0.includes(normalizeCompareValue(getNodeFieldValue(_0x225638, _0x4cf6fe, '')));
+function uiSchemaConditionMatches(el7, value34 = {}) {
+  if (Array.isArray(el7)) return el7.some((item10) => uiSchemaConditionMatches(item10, value34));
+  if (!el7 || typeof el7 !== 'object') return false;
+  if (Array.isArray(el7.any)) return el7.any.some((item11) => uiSchemaConditionMatches(item11, value34));
+  if (Array.isArray(el7.all)) return el7.all.every((item12) => uiSchemaConditionMatches(item12, value34));
+  const enabled9 = String(el7?.field || el7?.param || '').trim();
+  if (!enabled9) return false;
+  const value35 = el7.values !== undefined ? el7.values : el7.value,
+    list8 = Array.isArray(value35) ? value35 : [value35],
+    list9 = list8.map(normalizeCompareValue);
+  return list9.includes(normalizeCompareValue(getNodeFieldValue(value34, enabled9, '')));
 }
-function filterVisibleUiSchemaFields(_0x22162c = [], _0x1caf33 = {}) {
-  return (Array.isArray(_0x22162c) ? _0x22162c : []).filter((_0xb7472) => {
-    if (_0xb7472?.showWhen && !uiSchemaConditionMatches(_0xb7472.showWhen, _0x1caf33)) return false;
-    if (_0xb7472?.hideWhen && uiSchemaConditionMatches(_0xb7472.hideWhen, _0x1caf33)) return false;
+function filterVisibleUiSchemaFields(list10 = [], value36 = {}) {
+  return (Array.isArray(list10) ? list10 : []).filter((item13) => {
+    if (item13?.showWhen && !uiSchemaConditionMatches(item13.showWhen, value36)) return false;
+    if (item13?.hideWhen && uiSchemaConditionMatches(item13.hideWhen, value36)) return false;
     return true;
   });
 }
-function getOptionDisableWhenAttrs(_0x37d17f) {
-  const _0x35d6ea = getOptionDisableWhen(_0x37d17f);
-  if (!_0x35d6ea) return '';
-  if (Array.isArray(_0x35d6ea) || Array.isArray(_0x35d6ea.any) || Array.isArray(_0x35d6ea.all))
-    return ' data-ui-schema-disable-when-json="' + escapeHtmlAttr(JSON.stringify(_0x35d6ea)) + '"';
-  const _0x4a9c33 = String(_0x35d6ea.field || _0x35d6ea.param || '').trim(),
-    _0x24dd60 = _0x35d6ea.values !== undefined ? _0x35d6ea.values : _0x35d6ea.value,
-    _0x5047c7 = Array.isArray(_0x24dd60) ? _0x24dd60 : [_0x24dd60];
-  if (!_0x4a9c33 || _0x5047c7.length === 0) return '';
+function getOptionDisableWhenAttrs(value37) {
+  const el8 = getOptionDisableWhen(value37);
+  if (!el8) return '';
+  if (Array.isArray(el8) || Array.isArray(el8.any) || Array.isArray(el8.all))
+    return ' data-ui-schema-disable-when-json="' + escapeHtmlAttr(JSON.stringify(el8)) + '"';
+  const enabled10 = String(el8.field || el8.param || '').trim(),
+    value38 = el8.values !== undefined ? el8.values : el8.value,
+    list11 = Array.isArray(value38) ? value38 : [value38];
+  if (!enabled10 || list11.length === 0) return '';
   return (
     ' data-ui-schema-disable-when-field="' +
-    escapeHtmlAttr(_0x4a9c33) +
+    escapeHtmlAttr(enabled10) +
     '" data-ui-schema-disable-when-values="' +
-    escapeHtmlAttr(_0x5047c7.join(',')) +
+    escapeHtmlAttr(list11.join(',')) +
     '"'
   );
 }
-function getFieldDefaultAliasAttrs(_0x3867f3) {
-  const _0x340e80 = (Array.isArray(_0x3867f3?.defaultValueAliases) ? _0x3867f3.defaultValueAliases : [])
-    .map((_0x3de4ff) => String(_0x3de4ff ?? '').trim())
+function getFieldDefaultAliasAttrs(value39) {
+  const list12 = (Array.isArray(value39?.defaultValueAliases) ? value39.defaultValueAliases : [])
+    .map((item14) => String(item14 ?? '').trim())
     .filter(Boolean);
-  return _0x340e80.length
-    ? ' data-ui-schema-default-aliases="' + escapeHtmlAttr(JSON.stringify(_0x340e80)) + '"'
+  return list12.length
+    ? ' data-ui-schema-default-aliases="' + escapeHtmlAttr(JSON.stringify(list12)) + '"'
     : '';
 }
-function isOptionDisabled(_0x29dda3, _0x298ff0, _0x362010 = {}) {
+function isOptionDisabled(value40, el9, value41 = {}) {
   return (
-    isFieldDisabled(_0x29dda3) ||
-    (_0x298ff0 &&
-      typeof _0x298ff0 === 'object' &&
-      !Array.isArray(_0x298ff0) &&
-      (_0x298ff0.disabled === true || optionDisableWhenMatches(getOptionDisableWhen(_0x298ff0), _0x362010)))
+    isFieldDisabled(value40) ||
+    (el9 &&
+      typeof el9 === 'object' &&
+      !Array.isArray(el9) &&
+      (el9.disabled === true || optionDisableWhenMatches(getOptionDisableWhen(el9), value41)))
   );
 }
-function getOptionDisabledAttrs(
-  _0x4e9a86,
-  _0x2daa1e,
-  { button: button = true, nodeData: nodeData = {} } = {},
-) {
-  const _0x172112 = getOptionDisableWhenAttrs(_0x2daa1e),
-    _0x4bb2e9 =
-      isFieldDisabled(_0x4e9a86) ||
-      (_0x2daa1e &&
-        typeof _0x2daa1e === 'object' &&
-        !Array.isArray(_0x2daa1e) &&
-        _0x2daa1e.disabled === true),
-    _0x2623b5 = isOptionDisabled(_0x4e9a86, _0x2daa1e, nodeData);
-  if (!_0x2623b5) return _0x172112;
-  const _0x1d5bb9 = _0x4bb2e9 ? ' data-ui-schema-static-disabled="true"' : '',
-    _0x3f5abe = button
+function getOptionDisabledAttrs(value42, el10, { button: button = true, nodeData: nodeData = {} } = {}) {
+  const optionDisableWhenAttrs = getOptionDisableWhenAttrs(el10),
+    isFieldDisabled2 =
+      isFieldDisabled(value42) ||
+      (el10 && typeof el10 === 'object' && !Array.isArray(el10) && el10.disabled === true),
+    isOptionDisabled3 = isOptionDisabled(value42, el10, nodeData);
+  if (!isOptionDisabled3) return optionDisableWhenAttrs;
+  const value43 = isFieldDisabled2 ? ' data-ui-schema-static-disabled="true"' : '',
+    value44 = button
       ? ' data-ui-schema-disabled="true" disabled aria-disabled="true"'
       : ' data-ui-schema-disabled="true" aria-disabled="true"';
-  return '' + _0x172112 + _0x1d5bb9 + _0x3f5abe;
+  return '' + optionDisableWhenAttrs + value43 + value44;
 }
-function isAdaptiveRatioOption(_0x436e64, _0x1abba4) {
-  const _0x34dbac = getOptionValue(_0x1abba4).trim(),
-    _0x25ac05 = String(_0x1abba4?.label ?? _0x34dbac).trim(),
-    _0x5ab9cb = _0x34dbac.toLowerCase(),
-    _0x521748 = _0x25ac05.toLowerCase();
+function isAdaptiveRatioOption(value45, value46) {
+  const optionValue = getOptionValue(value46).trim(),
+    value47 = String(value46?.label ?? optionValue).trim(),
+    value48 = optionValue.toLowerCase(),
+    value49 = value47.toLowerCase();
   return (
-    _0x5ab9cb === 'auto' ||
-    _0x5ab9cb === 'adaptive' ||
-    _0x5ab9cb === '自适应' ||
-    _0x521748 === 'auto' ||
-    _0x521748 === 'adaptive' ||
-    _0x521748 === '自适应' ||
-    (_0x34dbac === String(_0x436e64?.defaultValue ?? '') && _0x521748 === 'auto')
+    value48 === 'auto' ||
+    value48 === 'adaptive' ||
+    value48 === '自适应' ||
+    value49 === 'auto' ||
+    value49 === 'adaptive' ||
+    value49 === '自适应' ||
+    (optionValue === String(value45?.defaultValue ?? '') && value49 === 'auto')
   );
 }
-function getRatioOptionLabel(_0x3bf7a6, _0x481b91) {
-  const _0x29978a = getRenderableOptions(_0x3bf7a6),
-    _0x58ce4e = String(_0x481b91 ?? ''),
-    _0x43dd90 = _0x29978a.find((_0x3dc5c1) => getOptionValue(_0x3dc5c1) === _0x58ce4e);
-  if (_0x43dd90 && isAdaptiveRatioOption(_0x3bf7a6, _0x43dd90)) return t('videoNode.parameterPanel.adaptive');
-  if (!_0x43dd90 && isAdaptiveRatioOption(_0x3bf7a6, _0x58ce4e))
-    return t('videoNode.parameterPanel.adaptive');
-  return getDisplayLabelFromOption(_0x43dd90, _0x58ce4e);
+function getRatioOptionLabel(value50, value51) {
+  const list13 = getRenderableOptions(value50),
+    value52 = String(value51 ?? ''),
+    enabled11 = list13.find((item15) => getOptionValue(item15) === value52);
+  if (enabled11 && isAdaptiveRatioOption(value50, enabled11)) return t('videoNode.parameterPanel.adaptive');
+  if (!enabled11 && isAdaptiveRatioOption(value50, value52)) return t('videoNode.parameterPanel.adaptive');
+  return getDisplayLabelFromOption(enabled11, value52);
 }
-function getRatioIconClass(_0x249354) {
-  const _0x372aec = String(_0x249354 || '').trim(),
-    _0x24886d = {
+function getRatioIconClass(value53) {
+  const value54 = String(value53 || '').trim(),
+    value55 = {
       '1:1': 'img-rp-sq',
       '9:16': 'img-rp-tall',
       '16:9': 'img-rp-wide',
@@ -416,77 +379,76 @@ function getRatioIconClass(_0x249354) {
       '4:5': 'img-rp-p45',
       '21:9': 'img-rp-ultra',
     };
-  if (_0x24886d[_0x372aec]) return _0x24886d[_0x372aec];
-  const _0x18a88d = _0x372aec.match(/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/);
-  if (!_0x18a88d) return 'img-rp-sq';
-  const _0x53edf2 = Number(_0x18a88d[1]),
-    _0x4b9f15 = Number(_0x18a88d[2]);
-  if (!Number.isFinite(_0x53edf2) || !Number.isFinite(_0x4b9f15) || _0x53edf2 === _0x4b9f15)
-    return 'img-rp-sq';
-  return _0x53edf2 > _0x4b9f15 ? 'img-rp-wide' : 'img-rp-tall';
+  if (value55[value54]) return value55[value54];
+  const enabled12 = value54.match(/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/);
+  if (!enabled12) return 'img-rp-sq';
+  const value56 = Number(enabled12[1]),
+    value57 = Number(enabled12[2]);
+  if (!Number.isFinite(value56) || !Number.isFinite(value57) || value56 === value57) return 'img-rp-sq';
+  return value56 > value57 ? 'img-rp-wide' : 'img-rp-tall';
 }
-function renderQualityButtons(_0x32fb05, _0x3f777c, _0x404add = {}) {
-  assertSupportedField(_0x32fb05);
-  const _0x1a7fd6 = _0x32fb05?.displayRole
-      ? ' data-ui-schema-display-role="' + escapeHtmlAttr(_0x32fb05.displayRole) + '"'
+function renderQualityButtons(value58, value59, nodeData3 = {}) {
+  assertSupportedField(value58);
+  const value60 = value58?.displayRole
+      ? ' data-ui-schema-display-role="' + escapeHtmlAttr(value58.displayRole) + '"'
       : '',
-    _0x2d7811 =
-      String(_0x32fb05?.id || '').trim() === 'imageSize'
+    value61 =
+      String(value58?.id || '').trim() === 'imageSize'
         ? manifestText('画质')
-        : manifestText(_0x32fb05?.label || '画质'),
-    _0x37493f = manifestText(_0x32fb05?.description || _0x32fb05?.tooltip || '').trim(),
-    _0x22cb45 = String(_0x32fb05?.variant || '').trim() === 'sectionMenu' || _0x32fb05?.showInfoTip === true,
-    _0x4fb518 =
-      _0x37493f && _0x22cb45
-        ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' + escapeHtmlAttr(_0x37493f) + '">!</span>'
+        : manifestText(value58?.label || '画质'),
+    manifestText5 = manifestText(value58?.description || value58?.tooltip || '').trim(),
+    value62 = String(value58?.variant || '').trim() === 'sectionMenu' || value58?.showInfoTip === true,
+    value63 =
+      manifestText5 && value62
+        ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' +
+          escapeHtmlAttr(manifestText5) +
+          '">!</span>'
         : '',
-    _0x4d1928 = getVisibleOptions(_0x32fb05, _0x404add),
-    _0x143631 = _0x4d1928.some((_0x51f74b) =>
-      String(_0x51f74b?.groupLabel || _0x51f74b?.sectionLabel || '').trim(),
-    );
-  if (_0x143631) {
-    const _0x36e449 = [];
+    list14 = getVisibleOptions(value58, nodeData3),
+    value64 = list14.some((item16) => String(item16?.groupLabel || item16?.sectionLabel || '').trim());
+  if (value64) {
+    const list15 = [];
     return (
-      _0x4d1928.forEach((_0x2e724b) => {
-        const _0x2eaa02 = manifestText(_0x2e724b?.groupLabel || _0x2e724b?.sectionLabel || _0x2d7811).trim();
-        let _0x2ad636 = _0x36e449.find((_0x1e42d9) => _0x1e42d9.label === _0x2eaa02);
-        (!_0x2ad636 && ((_0x2ad636 = { label: _0x2eaa02, options: [] }), _0x36e449.push(_0x2ad636)),
-          _0x2ad636.options.push(_0x2e724b));
+      list14.forEach((item17) => {
+        const label = manifestText(item17?.groupLabel || item17?.sectionLabel || value61).trim();
+        let enabled13 = list15.find((item18) => item18.label === label);
+        (!enabled13 && ((enabled13 = { label: label, options: [] }), list15.push(enabled13)),
+          enabled13.options.push(item17));
       }),
       '<div class="img-rp-quality-area" data-ui-schema-field="' +
-        escapeHtmlAttr(_0x32fb05.id) +
+        escapeHtmlAttr(value58.id) +
         '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-        escapeHtmlAttr(_0x32fb05?.defaultValue ?? '') +
+        escapeHtmlAttr(value58?.defaultValue ?? '') +
         '"' +
-        _0x1a7fd6 +
+        value60 +
         '>\n      ' +
-        _0x36e449
+        list15
           .map(
-            (_0x5a5565) =>
+            (item19) =>
               '<div class="img-rp-section-label">' +
-              escapeHtmlAttr(_0x5a5565.label) +
-              (_0x5a5565.label === _0x2d7811 ? _0x4fb518 : '') +
+              escapeHtmlAttr(item19.label) +
+              (item19.label === value61 ? value63 : '') +
               '</div>\n            <div class="img-rp-quality-segmented">\n              ' +
-              _0x5a5565.options
-                .map((_0x2e9014) => {
-                  const _0x3750e6 = getOptionValue(_0x2e9014),
-                    _0x4fc8d6 = manifestText(_0x2e9014?.label ?? _0x3750e6),
-                    _0x151cca = getDisplayLabelFromOption(_0x2e9014, _0x4fc8d6),
-                    _0x47a8f2 = String(_0x3f777c ?? '') === _0x3750e6,
-                    _0x51e5d1 = isOptionDisabled(_0x32fb05, _0x2e9014, _0x404add);
+              item19.options
+                .map((item20) => {
+                  const optionValue2 = getOptionValue(item20),
+                    manifestText6 = manifestText(item20?.label ?? optionValue2),
+                    displayLabelFromOption = getDisplayLabelFromOption(item20, manifestText6),
+                    value65 = String(value59 ?? '') === optionValue2,
+                    isOptionDisabled4 = isOptionDisabled(value58, item20, nodeData3);
                   return (
                     '<button type="button" class="img-rp-quality-item ui-schema-option ' +
-                    (_0x47a8f2 ? 'active' : '') +
+                    (value65 ? 'active' : '') +
                     ' ' +
-                    (_0x51e5d1 ? 'disabled' : '') +
+                    (isOptionDisabled4 ? 'disabled' : '') +
                     '" data-ui-schema-value="' +
-                    escapeHtmlAttr(_0x3750e6) +
+                    escapeHtmlAttr(optionValue2) +
                     '" data-ui-schema-option-label="' +
-                    escapeHtmlAttr(_0x151cca) +
+                    escapeHtmlAttr(displayLabelFromOption) +
                     '"' +
-                    getOptionDisabledAttrs(_0x32fb05, _0x2e9014, { nodeData: _0x404add }) +
+                    getOptionDisabledAttrs(value58, item20, { nodeData: nodeData3 }) +
                     '>' +
-                    escapeHtmlAttr(_0x4fc8d6) +
+                    escapeHtmlAttr(manifestText6) +
                     '</button>'
                   );
                 })
@@ -499,35 +461,35 @@ function renderQualityButtons(_0x32fb05, _0x3f777c, _0x404add = {}) {
   }
   return (
     '<div class="img-rp-quality-area" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x32fb05.id) +
+    escapeHtmlAttr(value58.id) +
     '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x32fb05?.defaultValue ?? '') +
+    escapeHtmlAttr(value58?.defaultValue ?? '') +
     '"' +
-    _0x1a7fd6 +
+    value60 +
     '>\n    <div class="img-rp-section-label">' +
-    escapeHtmlAttr(_0x2d7811) +
-    _0x4fb518 +
+    escapeHtmlAttr(value61) +
+    value63 +
     '</div>\n    <div class="img-rp-quality-segmented">\n      ' +
-    _0x4d1928
-      .map((_0x39c9fd) => {
-        const _0x1a23ec = getOptionValue(_0x39c9fd),
-          _0x1eef71 = manifestText(_0x39c9fd?.label ?? _0x1a23ec),
-          _0x56dca6 = getDisplayLabelFromOption(_0x39c9fd, _0x1eef71),
-          _0x580ec8 = String(_0x3f777c ?? '') === _0x1a23ec,
-          _0x2d04ab = isOptionDisabled(_0x32fb05, _0x39c9fd, _0x404add);
+    list14
+      .map((item21) => {
+        const optionValue3 = getOptionValue(item21),
+          manifestText7 = manifestText(item21?.label ?? optionValue3),
+          displayLabelFromOption2 = getDisplayLabelFromOption(item21, manifestText7),
+          value66 = String(value59 ?? '') === optionValue3,
+          isOptionDisabled5 = isOptionDisabled(value58, item21, nodeData3);
         return (
           '<button type="button" class="img-rp-quality-item ui-schema-option ' +
-          (_0x580ec8 ? 'active' : '') +
+          (value66 ? 'active' : '') +
           ' ' +
-          (_0x2d04ab ? 'disabled' : '') +
+          (isOptionDisabled5 ? 'disabled' : '') +
           '" data-ui-schema-value="' +
-          escapeHtmlAttr(_0x1a23ec) +
+          escapeHtmlAttr(optionValue3) +
           '" data-ui-schema-option-label="' +
-          escapeHtmlAttr(_0x56dca6) +
+          escapeHtmlAttr(displayLabelFromOption2) +
           '"' +
-          getOptionDisabledAttrs(_0x32fb05, _0x39c9fd, { nodeData: _0x404add }) +
+          getOptionDisabledAttrs(value58, item21, { nodeData: nodeData3 }) +
           '>' +
-          escapeHtmlAttr(_0x1eef71) +
+          escapeHtmlAttr(manifestText7) +
           '</button>'
         );
       })
@@ -535,80 +497,80 @@ function renderQualityButtons(_0x32fb05, _0x3f777c, _0x404add = {}) {
     '\n    </div>\n  </div>'
   );
 }
-function renderSectionMenuField(_0x2b7530, _0x3d897c) {
-  const _0x4e9ce9 = String(_0x2b7530?.id || '').trim(),
-    _0x5cf421 = getFieldValue(_0x3d897c, _0x2b7530),
-    _0x157f9e = getOptionLabel(_0x2b7530, _0x5cf421);
+function renderSectionMenuField(value67, value68) {
+  const value69 = String(value67?.id || '').trim(),
+    fieldValue = getFieldValue(value68, value67),
+    optionLabel = getOptionLabel(value67, fieldValue);
   return (
     '<div class="ui-schema-field ui-schema-section-menu" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x4e9ce9) +
+    escapeHtmlAttr(value69) +
     '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x2b7530?.defaultValue ?? '') +
+    escapeHtmlAttr(value67?.defaultValue ?? '') +
     '">\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="' +
-    escapeHtmlAttr(_0x4e9ce9) +
+    escapeHtmlAttr(value69) +
     '">\n      <span class="ui-schema-pill-label">' +
-    escapeHtmlAttr(_0x157f9e) +
+    escapeHtmlAttr(optionLabel) +
     '</span>\n    </button>\n    <div class="img-ratio-popup ui-schema-popup ui-schema-section-menu-popup" style="display:none;">\n      ' +
-    renderQualityButtons(_0x2b7530, _0x5cf421, _0x3d897c) +
+    renderQualityButtons(value67, fieldValue, value68) +
     '\n    </div>\n  </div>'
   );
 }
-function renderRatioButtons(_0x3208a8, _0x595a48, _0x4c74dc = {}) {
-  assertSupportedField(_0x3208a8);
-  const _0x2aba42 = _0x3208a8?.displayRole
-      ? ' data-ui-schema-display-role="' + escapeHtmlAttr(_0x3208a8.displayRole) + '"'
+function renderRatioButtons(value70, value71, nodeData4 = {}) {
+  assertSupportedField(value70);
+  const value72 = value70?.displayRole
+      ? ' data-ui-schema-display-role="' + escapeHtmlAttr(value70.displayRole) + '"'
       : '',
-    _0xbee601 = getVisibleOptions(_0x3208a8, _0x4c74dc),
-    _0x42261e = _0xbee601.find((_0x366850) => isAdaptiveRatioOption(_0x3208a8, _0x366850)),
-    _0x2d26a3 = _0xbee601.filter((_0x5bf948) => !isAdaptiveRatioOption(_0x3208a8, _0x5bf948)),
-    _0x454612 = String(_0x595a48 ?? ''),
-    _0x39956e = _0x42261e ? getOptionValue(_0x42261e) : '',
-    _0x541c1e = _0x42261e && String(_0x454612) === String(_0x39956e),
-    _0x5c794e = _0x42261e
+    list16 = getVisibleOptions(value70, nodeData4),
+    value73 = list16.find((item22) => isAdaptiveRatioOption(value70, item22)),
+    list17 = list16.filter((item23) => !isAdaptiveRatioOption(value70, item23)),
+    value74 = String(value71 ?? ''),
+    value75 = value73 ? getOptionValue(value73) : '',
+    value76 = value73 && String(value74) === String(value75),
+    value77 = value73
       ? '<button type="button" class="img-rp-large-adaptive ui-schema-option ' +
-        (_0x541c1e ? 'active' : '') +
+        (value76 ? 'active' : '') +
         '" data-label="自适应" data-ui-schema-value="' +
-        escapeHtmlAttr(_0x39956e) +
+        escapeHtmlAttr(value75) +
         '">\n        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>\n        <span>' +
         escapeHtmlAttr(t('videoNode.parameterPanel.adaptive')) +
         '</span>\n      </button>'
       : '',
-    _0x3bf12e = _0x42261e ? 'img-rp-ratio-split has-adaptive' : 'img-rp-ratio-split';
+    value78 = value73 ? 'img-rp-ratio-split has-adaptive' : 'img-rp-ratio-split';
   return (
     '<div class="img-rp-ratio-area" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x3208a8.id) +
+    escapeHtmlAttr(value70.id) +
     '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x3208a8?.defaultValue ?? '') +
+    escapeHtmlAttr(value70?.defaultValue ?? '') +
     '"' +
-    _0x2aba42 +
+    value72 +
     '>\n    <div class="img-rp-section-label">' +
     escapeHtmlAttr(manifestText('比例')) +
     '</div>\n    <div class="' +
-    _0x3bf12e +
+    value78 +
     '">\n      ' +
-    (_0x42261e ? '<div class="img-rp-ratio-left">' + _0x5c794e + '</div>' : '') +
+    (value73 ? '<div class="img-rp-ratio-left">' + value77 + '</div>' : '') +
     '\n      <div class="img-rp-ratio-right">\n        ' +
-    _0x2d26a3
-      .map((_0xe13331) => {
-        const _0x257250 = getOptionValue(_0xe13331),
-          _0x4ed0eb = manifestText(_0xe13331?.label ?? _0x257250),
-          _0x2a4bb1 = _0x454612 === _0x257250,
-          _0x3e0c8c = isOptionDisabled(_0x3208a8, _0xe13331, _0x4c74dc);
+    list17
+      .map((item24) => {
+        const optionValue4 = getOptionValue(item24),
+          manifestText8 = manifestText(item24?.label ?? optionValue4),
+          value79 = value74 === optionValue4,
+          isOptionDisabled6 = isOptionDisabled(value70, item24, nodeData4);
         return (
           '<button type="button" class="img-rp-ratio-item ui-schema-option ' +
-          (_0x2a4bb1 ? 'active' : '') +
+          (value79 ? 'active' : '') +
           ' ' +
-          (_0x3e0c8c ? 'disabled' : '') +
+          (isOptionDisabled6 ? 'disabled' : '') +
           '" data-label="' +
-          escapeHtmlAttr(_0x257250) +
+          escapeHtmlAttr(optionValue4) +
           '" data-ui-schema-value="' +
-          escapeHtmlAttr(_0x257250) +
+          escapeHtmlAttr(optionValue4) +
           '"' +
-          getOptionDisabledAttrs(_0x3208a8, _0xe13331, { nodeData: _0x4c74dc }) +
+          getOptionDisabledAttrs(value70, item24, { nodeData: nodeData4 }) +
           '><span class="img-rp-icon ' +
-          getRatioIconClass(_0x257250) +
+          getRatioIconClass(optionValue4) +
           '"></span><span>' +
-          escapeHtmlAttr(_0x4ed0eb) +
+          escapeHtmlAttr(manifestText8) +
           '</span></button>'
         );
       })
@@ -616,303 +578,292 @@ function renderRatioButtons(_0x3208a8, _0x595a48, _0x4c74dc = {}) {
     '\n      </div>\n    </div>\n  </div>'
   );
 }
-function renderQualityRatioField(_0x4ddf93, _0x466a05, _0x471f86) {
-  const _0x4521e5 = (Array.isArray(_0x4ddf93) ? _0x4ddf93 : [_0x4ddf93]).filter(Boolean);
-  (_0x4521e5.forEach(assertSupportedField), assertSupportedField(_0x466a05));
-  const _0x432f32 = getFieldValue(_0x471f86, _0x466a05),
-    _0x1bda66 = _0x4521e5.map((_0x705281) => getOptionLabel(_0x705281, getFieldValue(_0x471f86, _0x705281))),
-    _0x18e440 = getRatioOptionLabel(_0x466a05, _0x432f32),
-    _0x4e459d = String(
-      _0x4521e5[0]?.qualityRatioLabelOrder || _0x4521e5[0]?.compositeLabelOrder || '',
-    ).trim(),
-    _0x26e8bf =
-      _0x1bda66.length > 1
-        ? [..._0x1bda66, _0x18e440].join(' · ')
-        : _0x4e459d === 'fieldFirst'
-          ? (_0x1bda66[0] || '') + ' · ' + _0x18e440
-          : _0x18e440 + ' · ' + (_0x1bda66[0] || ''),
-    _0x19dc68 = _0x4e459d ? ' data-ui-schema-label-order="' + escapeHtmlAttr(_0x4e459d) + '"' : '';
+function renderQualityRatioField(value80, value81, value82) {
+  const list18 = (Array.isArray(value80) ? value80 : [value80]).filter(Boolean);
+  (list18.forEach(assertSupportedField), assertSupportedField(value81));
+  const fieldValue2 = getFieldValue(value82, value81),
+    list19 = list18.map((item25) => getOptionLabel(item25, getFieldValue(value82, item25))),
+    ratioOptionLabel = getRatioOptionLabel(value81, fieldValue2),
+    value83 = String(list18[0]?.qualityRatioLabelOrder || list18[0]?.compositeLabelOrder || '').trim(),
+    value84 =
+      list19.length > 1
+        ? [...list19, ratioOptionLabel].join(' · ')
+        : value83 === 'fieldFirst'
+          ? (list19[0] || '') + ' · ' + ratioOptionLabel
+          : ratioOptionLabel + ' · ' + (list19[0] || ''),
+    value85 = value83 ? ' data-ui-schema-label-order="' + escapeHtmlAttr(value83) + '"' : '';
   return (
     '<div class="ui-schema-quality-ratio-pill" data-ui-schema-composite-field="qualityRatio"' +
-    _0x19dc68 +
+    value85 +
     '>\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="qualityRatio">\n      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>\n      <span class="ui-schema-pill-label ui-schema-quality-ratio-label">' +
-    escapeHtmlAttr(_0x26e8bf) +
+    escapeHtmlAttr(value84) +
     '</span>\n    </button>\n    <div class="img-ratio-popup ui-schema-popup ui-schema-quality-ratio-popup" style="display:none;">\n      ' +
-    _0x4521e5
-      .map((_0x22393f) => renderQualityButtons(_0x22393f, getFieldValue(_0x471f86, _0x22393f), _0x471f86))
-      .join('') +
+    list18.map((item26) => renderQualityButtons(item26, getFieldValue(value82, item26), value82)).join('') +
     '\n      ' +
-    renderRatioButtons(_0x466a05, _0x432f32, _0x471f86) +
+    renderRatioButtons(value81, fieldValue2, value82) +
     '\n    </div>\n  </div>'
   );
 }
-function renderAspectRatioPillField(_0x3c60b2, _0x560454) {
-  assertSupportedField(_0x3c60b2);
-  const _0x3eced3 = String(_0x3c60b2?.id || '').trim(),
-    _0x36243b = getFieldValue(_0x560454, _0x3c60b2),
-    _0x767372 = getRatioOptionLabel(_0x3c60b2, _0x36243b);
+function renderAspectRatioPillField(value86, value87) {
+  assertSupportedField(value86);
+  const value88 = String(value86?.id || '').trim(),
+    fieldValue3 = getFieldValue(value87, value86),
+    ratioOptionLabel2 = getRatioOptionLabel(value86, fieldValue3);
   return (
     '<div class="ui-schema-aspect-ratio-pill" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x3eced3) +
+    escapeHtmlAttr(value88) +
     '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x3c60b2?.defaultValue ?? '') +
+    escapeHtmlAttr(value86?.defaultValue ?? '') +
     '">\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="' +
-    escapeHtmlAttr(_0x3eced3) +
+    escapeHtmlAttr(value88) +
     '">\n      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>\n      <span class="ui-schema-pill-label ui-schema-aspect-ratio-label">' +
-    escapeHtmlAttr(_0x767372) +
+    escapeHtmlAttr(ratioOptionLabel2) +
     '</span>\n    </button>\n    <div class="img-ratio-popup ui-schema-popup ui-schema-aspect-ratio-popup" style="display:none;">\n      ' +
-    renderRatioButtons(_0x3c60b2, _0x36243b, _0x560454) +
+    renderRatioButtons(value86, fieldValue3, value87) +
     '\n    </div>\n  </div>'
   );
 }
-function renderSectionPairField(_0x29118f, _0x13807e) {
-  const _0x53da48 = (Array.isArray(_0x29118f) ? _0x29118f : []).filter(Boolean);
-  _0x53da48.forEach(assertSupportedField);
-  const _0x33fe3d = _0x53da48
-      .map((_0x4ef09c) => getOptionLabel(_0x4ef09c, getFieldValue(_0x13807e, _0x4ef09c)))
-      .join(' · '),
-    _0x75a91b = _0x53da48.map((_0x5062a2) => String(_0x5062a2?.id || '').trim()).filter(Boolean),
-    _0x36ddca = _0x75a91b[0] || '',
-    _0x28d895 = _0x75a91b[1] || '';
+function renderSectionPairField(value89, value90) {
+  const list20 = (Array.isArray(value89) ? value89 : []).filter(Boolean);
+  list20.forEach(assertSupportedField);
+  const value91 = list20.map((item27) => getOptionLabel(item27, getFieldValue(value90, item27))).join(' · '),
+    value92 = list20.map((item28) => String(item28?.id || '').trim()).filter(Boolean),
+    value93 = value92[0] || '',
+    value94 = value92[1] || '';
   return (
     '<div class="ui-schema-section-pair-pill" data-ui-schema-composite-field="sectionPair" data-ui-schema-primary-field="' +
-    escapeHtmlAttr(_0x36ddca) +
+    escapeHtmlAttr(value93) +
     '" data-ui-schema-secondary-field="' +
-    escapeHtmlAttr(_0x28d895) +
+    escapeHtmlAttr(value94) +
     '">\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="sectionPair">\n      <span class="ui-schema-pill-label ui-schema-section-pair-label">' +
-    escapeHtmlAttr(_0x33fe3d) +
+    escapeHtmlAttr(value91) +
     '</span>\n    </button>\n    <div class="img-ratio-popup ui-schema-popup ui-schema-section-pair-popup" style="display:none;">\n      ' +
-    _0x53da48
-      .map((_0x1d0957) => renderQualityButtons(_0x1d0957, getFieldValue(_0x13807e, _0x1d0957), _0x13807e))
-      .join('') +
+    list20.map((item29) => renderQualityButtons(item29, getFieldValue(value90, item29), value90)).join('') +
     '\n    </div>\n  </div>'
   );
 }
-function renderVideoResolutionField(_0x1f8977, _0x1f7200) {
-  const _0xed56f9 =
-    getFieldById(_0x1f8977, 'rhVideoResolution') || getFieldById(_0x1f8977, 'videoResolution');
-  if (!_0xed56f9) return '';
-  assertSupportedField(_0xed56f9);
-  const _0x1282af = getFieldById(_0x1f8977, 'rhVideoFps'),
-    _0xa9faf7 = getFieldById(_0x1f8977, 'rhVideoFrames');
-  if (_0x1282af) assertSupportedField(_0x1282af);
-  if (_0xa9faf7) assertSupportedField(_0xa9faf7);
-  const _0x4a81e7 = getFieldValue(_0x1f7200, _0xed56f9),
-    _0x2b3986 = _0x1282af ? getFieldValue(_0x1f7200, _0x1282af) : '',
-    _0x4de6d6 = _0xa9faf7 ? getFieldValue(_0x1f7200, _0xa9faf7) : '',
-    _0xcb60a8 = Number(_0x4de6d6) === 0 ? t('aigenImage.uiSchema.fullLength') : String(_0x4de6d6 || ''),
-    _0x2ea904 =
-      _0x1282af && _0xa9faf7
+function renderVideoResolutionField(value95, value96) {
+  const args6 = getFieldById(value95, 'rhVideoResolution') || getFieldById(value95, 'videoResolution');
+  if (!args6) return '';
+  assertSupportedField(args6);
+  const fieldById = getFieldById(value95, 'rhVideoFps'),
+    fieldById2 = getFieldById(value95, 'rhVideoFrames');
+  if (fieldById) assertSupportedField(fieldById);
+  if (fieldById2) assertSupportedField(fieldById2);
+  const fieldValue4 = getFieldValue(value96, args6),
+    value97 = fieldById ? getFieldValue(value96, fieldById) : '',
+    value98 = fieldById2 ? getFieldValue(value96, fieldById2) : '',
+    value99 = Number(value98) === 0 ? t('aigenImage.uiSchema.fullLength') : String(value98 || ''),
+    value100 =
+      fieldById && fieldById2
         ? joinMetricLabels([
-            ['帧数', _0xcb60a8],
-            ['帧率', _0x2b3986],
-            ['分辨率', _0x4a81e7],
+            ['帧数', value99],
+            ['帧率', value97],
+            ['分辨率', fieldValue4],
           ])
-        : formatMetricLabel('分辨率', _0x4a81e7);
+        : formatMetricLabel('分辨率', fieldValue4);
   return (
     '<div class="ui-schema-video-resolution-pill" data-ui-schema-composite-field="videoResolution">\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="videoResolution">\n      <span class="ui-schema-pill-label ui-schema-video-resolution-label">' +
-    escapeHtmlAttr(_0x2ea904) +
+    escapeHtmlAttr(value100) +
     '</span>\n    </button>\n    <div class="img-ratio-popup ui-schema-popup ui-schema-video-resolution-popup" style="display:none;">\n      ' +
-    renderQualityButtons({ ..._0xed56f9, label: '分辨率' }, _0x4a81e7, _0x1f7200) +
+    renderQualityButtons({ ...args6, label: '分辨率' }, fieldValue4, value96) +
     '\n      ' +
-    (_0x1282af
+    (fieldById
       ? '<div class="rh-v5-meta-panel"><div class="rh-vram-adv-row"><div class="rh-vram-adv-label"><span>' +
         escapeHtmlAttr(manifestText('帧率')) +
         '</span></div><div class="img-rp-quality-segmented rh-adv-seg rh-v5-fps-seg" data-ui-schema-field="' +
-        escapeHtmlAttr(_0x1282af.id) +
+        escapeHtmlAttr(fieldById.id) +
         '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-        escapeHtmlAttr(_0x1282af.defaultValue ?? '') +
+        escapeHtmlAttr(fieldById.defaultValue ?? '') +
         '">' +
-        renderOptions(_0x1282af, _0x2b3986, _0x1f7200) +
+        renderOptions(fieldById, value97, value96) +
         '</div></div></div>'
       : '') +
     '\n    </div>\n  </div>'
   );
 }
-function normalizeNumberValue(_0x2c8b11, _0x3c41cc, { min: min = -Infinity, max: max = Infinity } = {}) {
-  const _0x470aed = Number(_0x2c8b11),
-    _0xf570be = Number.isFinite(_0x470aed) ? Math.trunc(_0x470aed) : _0x3c41cc;
-  return Math.max(min, Math.min(max, _0xf570be));
+function normalizeNumberValue(value101, value102, { min: min = -Infinity, max: max = Infinity } = {}) {
+  const value103 = Number(value101),
+    value104 = Number.isFinite(value103) ? Math.trunc(value103) : value102;
+  return Math.max(min, Math.min(max, value104));
 }
-export function evaluateUiSchemaNumberExpression(_0x55fbed) {
-  if (typeof _0x55fbed === 'number') return Number.isFinite(_0x55fbed) ? _0x55fbed : NaN;
-  const _0x293e89 = String(_0x55fbed ?? '').trim();
-  if (!_0x293e89) return NaN;
-  let _0x4371dc = 0;
-  const _0x4da266 = () => {
-      while (/\s/.test(_0x293e89[_0x4371dc] || '')) _0x4371dc += 1;
+export function evaluateUiSchemaNumberExpression(value105) {
+  if (typeof value105 === 'number') return Number.isFinite(value105) ? value105 : NaN;
+  const list21 = String(value105 ?? '').trim();
+  if (!list21) return NaN;
+  let value106 = 0;
+  const run = () => {
+      while (/\s/.test(list21[value106] || '')) value106 += 1;
     },
-    _0x7f583f = () => {
-      _0x4da266();
-      const _0x3124cd = _0x4371dc;
-      let _0x253bf6 = false;
-      while (/\d/.test(_0x293e89[_0x4371dc] || '')) {
-        ((_0x253bf6 = true), (_0x4371dc += 1));
+    handler = () => {
+      run();
+      const value107 = value106;
+      let enabled14 = false;
+      while (/\d/.test(list21[value106] || '')) {
+        ((enabled14 = true), (value106 += 1));
       }
-      if (_0x293e89[_0x4371dc] === '.') {
-        _0x4371dc += 1;
-        while (/\d/.test(_0x293e89[_0x4371dc] || '')) {
-          ((_0x253bf6 = true), (_0x4371dc += 1));
+      if (list21[value106] === '.') {
+        value106 += 1;
+        while (/\d/.test(list21[value106] || '')) {
+          ((enabled14 = true), (value106 += 1));
         }
       }
-      if (!_0x253bf6) return NaN;
-      return Number(_0x293e89.slice(_0x3124cd, _0x4371dc));
+      if (!enabled14) return NaN;
+      return Number(list21.slice(value107, value106));
     },
-    _0x2c7010 = () => {
-      _0x4da266();
-      const _0x2498b6 = _0x293e89[_0x4371dc];
-      if (_0x2498b6 === '+' || _0x2498b6 === '-') {
-        _0x4371dc += 1;
-        const _0xed18a1 = _0x2c7010();
-        return _0x2498b6 === '-' ? -_0xed18a1 : _0xed18a1;
+    handler2 = () => {
+      run();
+      const value108 = list21[value106];
+      if (value108 === '+' || value108 === '-') {
+        value106 += 1;
+        const value109 = handler2();
+        return value108 === '-' ? -value109 : value109;
       }
-      if (_0x293e89[_0x4371dc] === '(') {
-        _0x4371dc += 1;
-        const _0x50c786 = _0x248d11();
-        _0x4da266();
-        if (_0x293e89[_0x4371dc] !== ')') return NaN;
-        return ((_0x4371dc += 1), _0x50c786);
+      if (list21[value106] === '(') {
+        value106 += 1;
+        const value110 = run2();
+        run();
+        if (list21[value106] !== ')') return NaN;
+        return ((value106 += 1), value110);
       }
-      return _0x7f583f();
+      return handler();
     },
-    _0x23bc69 = () => {
-      let _0x3f92fe = _0x2c7010();
+    handler3 = () => {
+      let value111 = handler2();
       while (true) {
-        _0x4da266();
-        const _0x4a7a84 = _0x293e89[_0x4371dc];
-        if (_0x4a7a84 !== '*' && _0x4a7a84 !== '/') return _0x3f92fe;
-        _0x4371dc += 1;
-        const _0x57a4dc = _0x2c7010();
-        if (!Number.isFinite(_0x3f92fe) || !Number.isFinite(_0x57a4dc)) return NaN;
-        if (_0x4a7a84 === '/' && _0x57a4dc === 0) return NaN;
-        _0x3f92fe = _0x4a7a84 === '*' ? _0x3f92fe * _0x57a4dc : _0x3f92fe / _0x57a4dc;
+        run();
+        const value112 = list21[value106];
+        if (value112 !== '*' && value112 !== '/') return value111;
+        value106 += 1;
+        const count = handler2();
+        if (!Number.isFinite(value111) || !Number.isFinite(count)) return NaN;
+        if (value112 === '/' && count === 0) return NaN;
+        value111 = value112 === '*' ? value111 * count : value111 / count;
       }
     };
-  function _0x248d11() {
-    let _0x378483 = _0x23bc69();
+  function run2() {
+    let value113 = handler3();
     while (true) {
-      _0x4da266();
-      const _0x2fe748 = _0x293e89[_0x4371dc];
-      if (_0x2fe748 !== '+' && _0x2fe748 !== '-') return _0x378483;
-      _0x4371dc += 1;
-      const _0xa1ca3d = _0x23bc69();
-      if (!Number.isFinite(_0x378483) || !Number.isFinite(_0xa1ca3d)) return NaN;
-      _0x378483 = _0x2fe748 === '+' ? _0x378483 + _0xa1ca3d : _0x378483 - _0xa1ca3d;
+      run();
+      const value114 = list21[value106];
+      if (value114 !== '+' && value114 !== '-') return value113;
+      value106 += 1;
+      const value115 = handler3();
+      if (!Number.isFinite(value113) || !Number.isFinite(value115)) return NaN;
+      value113 = value114 === '+' ? value113 + value115 : value113 - value115;
     }
   }
-  const _0x370498 = _0x248d11();
-  return (_0x4da266(), _0x4371dc === _0x293e89.length && Number.isFinite(_0x370498) ? _0x370498 : NaN);
+  const value116 = run2();
+  return (run(), value106 === list21.length && Number.isFinite(value116) ? value116 : NaN);
 }
 function renderRhVideoParamsIcon() {
   return '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M7 6V4"/><path d="M12 6V4"/><path d="M17 6V4"/><path d="M8 10h1"/><path d="M8 14h1"/><path d="M8 18h1"/><path d="M15 12l4 2-4 2z"/></svg>';
 }
-function getRhVideoParamsKind(_0x1c5389) {
-  if (getFieldById(_0x1c5389, 'rhVideoSeconds')) return 'seconds';
-  if (getFieldById(_0x1c5389, 'rhVideoFrames')) return 'frames';
+function getRhVideoParamsKind(value117) {
+  if (getFieldById(value117, 'rhVideoSeconds')) return 'seconds';
+  if (getFieldById(value117, 'rhVideoFrames')) return 'frames';
   return 'resolution';
 }
-function buildRhVideoParamsLabel(_0x497702, _0x110d01) {
-  const _0x344882 = getFieldById(_0x497702, 'rhVideoResolution'),
-    _0x73e8eb = getFieldById(_0x497702, 'rhVideoFps'),
-    _0xd9c9a1 = getFieldById(_0x497702, 'rhVideoFrames'),
-    _0xc38b54 = getFieldById(_0x497702, 'rhVideoSeconds'),
-    _0x939b91 = _0x344882
-      ? normalizeNumberValue(getFieldValue(_0x110d01, _0x344882), Number(_0x344882.defaultValue ?? 0x340), {
+function buildRhVideoParamsLabel(value118, value119) {
+  const fieldById3 = getFieldById(value118, 'rhVideoResolution'),
+    fieldById4 = getFieldById(value118, 'rhVideoFps'),
+    fieldById5 = getFieldById(value118, 'rhVideoFrames'),
+    fieldById6 = getFieldById(value118, 'rhVideoSeconds'),
+    value120 = fieldById3
+      ? normalizeNumberValue(getFieldValue(value119, fieldById3), Number(fieldById3.defaultValue ?? 0x340), {
           min: 0x340,
         })
       : 0x340;
-  if (_0xc38b54) {
-    const _0x3b8b77 = _0x73e8eb
-        ? normalizeNumberValue(getFieldValue(_0x110d01, _0x73e8eb), Number(_0x73e8eb.defaultValue ?? 24))
+  if (fieldById6) {
+    const value121 = fieldById4
+        ? normalizeNumberValue(getFieldValue(value119, fieldById4), Number(fieldById4.defaultValue ?? 24))
         : 24,
-      _0x22023e = normalizeNumberValue(
-        getFieldValue(_0x110d01, _0xc38b54),
-        Number(_0xc38b54.defaultValue ?? 5),
-        { min: Number(_0xc38b54.min ?? 1), max: Number(_0xc38b54.max ?? 0x258) },
+      numberValue = normalizeNumberValue(
+        getFieldValue(value119, fieldById6),
+        Number(fieldById6.defaultValue ?? 5),
+        { min: Number(fieldById6.min ?? 1), max: Number(fieldById6.max ?? 0x258) },
       );
     return joinMetricLabels([
-      ['秒数', _0x22023e],
-      ['帧率', _0x3b8b77],
-      ['分辨率', _0x939b91],
+      ['秒数', numberValue],
+      ['帧率', value121],
+      ['分辨率', value120],
     ]);
   }
-  if (_0xd9c9a1) {
-    const _0x5a75e6 = normalizeNumberValue(
-        getFieldValue(_0x110d01, _0xd9c9a1),
-        Number(_0xd9c9a1.defaultValue ?? 77),
-        { min: Number(_0xd9c9a1.min ?? 0), max: Number(_0xd9c9a1.max ?? 0xf423f) },
+  if (fieldById5) {
+    const numberValue2 = normalizeNumberValue(
+        getFieldValue(value119, fieldById5),
+        Number(fieldById5.defaultValue ?? 77),
+        { min: Number(fieldById5.min ?? 0), max: Number(fieldById5.max ?? 0xf423f) },
       ),
-      _0x16388e = _0x5a75e6 === 0 ? t('aigenImage.uiSchema.fullLength') : String(_0x5a75e6);
-    if (!_0x73e8eb)
+      value122 = numberValue2 === 0 ? t('aigenImage.uiSchema.fullLength') : String(numberValue2);
+    if (!fieldById4)
       return joinMetricLabels([
-        ['帧数', _0x16388e],
-        ['分辨率', _0x939b91],
+        ['帧数', value122],
+        ['分辨率', value120],
       ]);
-    const _0x4076aa = normalizeNumberValue(
-      getFieldValue(_0x110d01, _0x73e8eb),
-      Number(_0x73e8eb.defaultValue ?? 24),
+    const numberValue3 = normalizeNumberValue(
+      getFieldValue(value119, fieldById4),
+      Number(fieldById4.defaultValue ?? 24),
     );
     return joinMetricLabels([
-      ['帧数', _0x16388e],
-      ['帧率', _0x4076aa],
-      ['分辨率', _0x939b91],
+      ['帧数', value122],
+      ['帧率', numberValue3],
+      ['分辨率', value120],
     ]);
   }
-  return formatMetricLabel('分辨率', _0x939b91);
+  return formatMetricLabel('分辨率', value120);
 }
-function getRhVideoParamsAspectRatioField(_0xce5d03) {
+function getRhVideoParamsAspectRatioField(value123) {
   return (
-    getFieldById(_0xce5d03, 'rhBerniniAspectRatio') ||
-    getFieldById(_0xce5d03, 'aspectRatio') ||
-    getFieldByDisplayRole(_0xce5d03, 'aspectRatio')
+    getFieldById(value123, 'rhBerniniAspectRatio') ||
+    getFieldById(value123, 'aspectRatio') ||
+    getFieldByDisplayRole(value123, 'aspectRatio')
   );
 }
-function getRhVideoFpsOptions(_0xc23023, _0x51be7b = {}) {
-  if (Array.isArray(_0x51be7b?.rhVideoFpsOptions) && _0x51be7b.rhVideoFpsOptions.length)
-    return _0x51be7b.rhVideoFpsOptions
-      .map((_0x13773f) => Number(_0x13773f))
+function getRhVideoFpsOptions(value124, value125 = {}) {
+  if (Array.isArray(value125?.rhVideoFpsOptions) && value125.rhVideoFpsOptions.length)
+    return value125.rhVideoFpsOptions
+      .map((item30) => Number(item30))
       .filter(Number.isFinite)
-      .map((_0xbab6ff) => Object.freeze({ value: _0xbab6ff, label: _0xbab6ff + '帧' }));
-  return getRenderableOptions(_0xc23023);
+      .map((value126) => Object.freeze({ value: value126, label: value126 + '帧' }));
+  return getRenderableOptions(value124);
 }
-function renderRhVideoParamsResolutionField(_0x248d58, _0x450325, { buttonClass: _0x1649f0 }) {
-  assertSupportedField(_0x248d58);
-  const _0x26ebef = normalizeNumberValue(
-    getFieldValue(_0x450325, _0x248d58),
-    Number(_0x248d58.defaultValue ?? 0x340),
+function renderRhVideoParamsResolutionField(value127, value128, { buttonClass: buttonClass }) {
+  assertSupportedField(value127);
+  const numberValue4 = normalizeNumberValue(
+    getFieldValue(value128, value127),
+    Number(value127.defaultValue ?? 0x340),
     { min: 0x340 },
   );
   return (
     '<div class="img-rp-quality-area" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x248d58.id) +
+    escapeHtmlAttr(value127.id) +
     '" data-ui-schema-type="segmented" data-ui-schema-value-type="number" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x248d58?.defaultValue ?? '') +
+    escapeHtmlAttr(value127?.defaultValue ?? '') +
     '">\n                  <div class="img-rp-section-label">' +
     escapeHtmlAttr(manifestText('分辨率')) +
     '<span class="rh-tip" data-tooltip="' +
     escapeHtmlAttr(manifestText('分辨率越高细节越清晰、边缘更稳定。\n同时显存占用与生成耗时会明显增加。')) +
     '">!</span></div>\n                  <div class="img-rp-quality-segmented rh-video-resolution-seg">\n                    ' +
-    (Array.isArray(_0x248d58?.options) ? _0x248d58.options : [])
-      .map((_0x3ecf42) => {
-        const _0x1648ce = Number(getOptionValue(_0x3ecf42)),
-          _0x120168 = Number(_0x26ebef) === Number(_0x1648ce),
-          _0x14ef1a =
-            _0x248d58?.showHighResolutionOptions === true || Number(_0x1648ce) <= 0x5a0
-              ? ''
-              : ' dev-mode-only';
+    (Array.isArray(value127?.options) ? value127.options : [])
+      .map((item31) => {
+        const value129 = Number(getOptionValue(item31)),
+          value130 = Number(numberValue4) === Number(value129),
+          value131 =
+            value127?.showHighResolutionOptions === true || Number(value129) <= 0x5a0 ? '' : ' dev-mode-only';
         return (
           '<button type="button" class="img-rp-quality-item' +
-          _0x14ef1a +
+          value131 +
           ' ' +
-          (_0x120168 ? 'active' : '') +
+          (value130 ? 'active' : '') +
           ' ' +
-          _0x1649f0 +
+          buttonClass +
           ' ui-schema-option" data-value="' +
-          escapeHtmlAttr(_0x1648ce) +
+          escapeHtmlAttr(value129) +
           '" data-ui-schema-value="' +
-          escapeHtmlAttr(_0x1648ce) +
+          escapeHtmlAttr(value129) +
           '">' +
-          escapeHtmlAttr(_0x1648ce) +
+          escapeHtmlAttr(value129) +
           '</button>'
         );
       })
@@ -920,17 +871,17 @@ function renderRhVideoParamsResolutionField(_0x248d58, _0x450325, { buttonClass:
     '\n                  </div>\n                </div>'
   );
 }
-function renderRhVideoParamsFpsRow(_0x2ab827, _0x26fe7b, _0x252b12 = {}) {
-  assertSupportedField(_0x2ab827);
-  const _0x5d6384 = normalizeNumberValue(
-      getFieldValue(_0x26fe7b, _0x2ab827),
-      Number(_0x2ab827.defaultValue ?? 24),
+function renderRhVideoParamsFpsRow(value132, value133, el11 = {}) {
+  assertSupportedField(value132);
+  const numberValue5 = normalizeNumberValue(
+      getFieldValue(value133, value132),
+      Number(value132.defaultValue ?? 24),
     ),
-    _0x20eee6 = _0x252b12?.buttonClass || 'rh-v5-fps-btn',
-    _0x5cac27 = _0x252b12?.hidden ? ' hidden' : '';
+    value134 = el11?.buttonClass || 'rh-v5-fps-btn',
+    value135 = el11?.hidden ? ' hidden' : '';
   return (
     '<div class="rh-vram-adv-row"' +
-    _0x5cac27 +
+    value135 +
     '>\n                    <div class="rh-vram-adv-label">\n                      <span>' +
     escapeHtmlAttr(manifestText('帧率')) +
     '</span>\n                      <span class="rh-tip" data-tooltip="' +
@@ -940,25 +891,25 @@ function renderRhVideoParamsFpsRow(_0x2ab827, _0x26fe7b, _0x252b12 = {}) {
       ),
     ) +
     '">!</span>\n                    </div>\n                    <div class="img-rp-quality-segmented rh-adv-seg rh-v5-fps-seg" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x2ab827.id) +
+    escapeHtmlAttr(value132.id) +
     '" data-ui-schema-type="segmented" data-ui-schema-value-type="number" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x2ab827?.defaultValue ?? '') +
+    escapeHtmlAttr(value132?.defaultValue ?? '') +
     '">\n                      ' +
-    getRhVideoFpsOptions(_0x2ab827, _0x252b12)
-      .map((_0x2d318e) => {
-        const _0x181cc2 = Number(getOptionValue(_0x2d318e)),
-          _0x3e58b8 = manifestText(_0x2d318e?.label ?? _0x181cc2 + '帧');
+    getRhVideoFpsOptions(value132, el11)
+      .map((item32) => {
+        const value136 = Number(getOptionValue(item32)),
+          manifestText9 = manifestText(item32?.label ?? value136 + '帧');
         return (
           '<button type="button" class="img-rp-quality-item ' +
-          _0x20eee6 +
+          value134 +
           ' ' +
-          (Number(_0x5d6384) === Number(_0x181cc2) ? 'active' : '') +
+          (Number(numberValue5) === Number(value136) ? 'active' : '') +
           ' ui-schema-option" data-value="' +
-          escapeHtmlAttr(_0x181cc2) +
+          escapeHtmlAttr(value136) +
           '" data-ui-schema-value="' +
-          escapeHtmlAttr(_0x181cc2) +
+          escapeHtmlAttr(value136) +
           '">' +
-          escapeHtmlAttr(_0x3e58b8) +
+          escapeHtmlAttr(manifestText9) +
           '</button>'
         );
       })
@@ -966,92 +917,92 @@ function renderRhVideoParamsFpsRow(_0x2ab827, _0x26fe7b, _0x252b12 = {}) {
     '\n                    </div>\n                  </div>'
   );
 }
-function renderRhVideoParamsStepperRow(_0x16df03, _0x2430dd, _0x4c5de7 = {}) {
-  assertSupportedField(_0x16df03);
-  const _0x1a713f = String(_0x16df03?.id || '').trim(),
-    _0x13e046 = _0x1a713f === 'rhVideoFrames',
-    _0x225e8f = Number(_0x16df03?.min ?? (_0x13e046 ? 0 : 1)),
-    _0x39ed45 = Number(_0x16df03?.max ?? (_0x13e046 ? 0xf423f : 0x258)),
-    _0x36c35c = Number(_0x16df03?.defaultValue ?? (_0x13e046 ? 77 : 5)),
-    _0x289481 = normalizeNumberValue(getFieldValue(_0x2430dd, _0x16df03), _0x36c35c, {
-      min: _0x225e8f,
-      max: _0x39ed45,
+function renderRhVideoParamsStepperRow(value137, value138, value139 = {}) {
+  assertSupportedField(value137);
+  const value140 = String(value137?.id || '').trim(),
+    value141 = value140 === 'rhVideoFrames',
+    min2 = Number(value137?.min ?? (value141 ? 0 : 1)),
+    max2 = Number(value137?.max ?? (value141 ? 0xf423f : 0x258)),
+    value142 = Number(value137?.defaultValue ?? (value141 ? 77 : 5)),
+    numberValue6 = normalizeNumberValue(getFieldValue(value138, value137), value142, {
+      min: min2,
+      max: max2,
     }),
-    _0x212cfa = Number(_0x2430dd?.rhVideoSourceFrameCount || 0),
-    _0x5ec95c = _0x13e046 ? 'rh-v5-frames-stepper' : 'rh-ltx-seconds-stepper',
-    _0x3ddad2 = manifestText(_0x13e046 ? '生成时长（帧数）' : '生成秒数'),
-    _0x4fe969 = manifestText(
-      _0x13e046
+    value143 = Number(value138?.rhVideoSourceFrameCount || 0),
+    value144 = value141 ? 'rh-v5-frames-stepper' : 'rh-ltx-seconds-stepper',
+    manifestText10 = manifestText(value141 ? '生成时长（帧数）' : '生成秒数'),
+    manifestText11 = manifestText(
+      value141
         ? '帧数决定生成片段的长度：数值越大视频越长、耗时越高。\n填 0 表示按源视频全长处理（适合整段替换）。'
         : '秒数决定生成视频的时长：数值越大视频越长、耗时与成本越高。',
     ),
-    _0x4141c9 = _0x13e046 && _0x289481 === 0 ? t('aigenImage.uiSchema.fullLength') : String(_0x289481);
+    value145 = value141 && numberValue6 === 0 ? t('aigenImage.uiSchema.fullLength') : String(numberValue6);
   return (
     '<div class="rh-vram-adv-row ui-schema-rh-video-stepper" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x1a713f) +
+    escapeHtmlAttr(value140) +
     '" data-ui-schema-type="stepper" data-ui-schema-value-type="number" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x16df03?.defaultValue ?? '') +
+    escapeHtmlAttr(value137?.defaultValue ?? '') +
     '" data-ui-schema-min="' +
-    escapeHtmlAttr(_0x225e8f) +
+    escapeHtmlAttr(min2) +
     '" data-ui-schema-max="' +
-    escapeHtmlAttr(_0x39ed45) +
+    escapeHtmlAttr(max2) +
     '" data-ui-schema-step="' +
-    escapeHtmlAttr(_0x16df03?.step ?? 1) +
+    escapeHtmlAttr(value137?.step ?? 1) +
     '">\n                    <div class="rh-vram-adv-label">\n                      <span>' +
-    _0x3ddad2 +
+    manifestText10 +
     '</span>\n                      <span class="rh-tip" data-tooltip="' +
-    _0x4fe969 +
+    manifestText11 +
     '">!</span>\n                    </div>\n                    <div class="rh-stepper ' +
-    _0x5ec95c +
+    value144 +
     '">\n                      ' +
-    (_0x13e046
+    (value141
       ? '<div class="rh-v5-source-framecount" aria-label="' +
         escapeHtmlAttr(manifestText('源视频总帧数')) +
         '">' +
-        (_0x212cfa ? String(_0x212cfa) : '—') +
+        (value143 ? String(value143) : '—') +
         '</div>'
       : '') +
     '\n                      <div class="rh-stepper-value" role="spinbutton" aria-label="' +
-    escapeHtmlAttr(manifestText(_0x13e046 ? '生成帧数' : '生成秒数')) +
+    escapeHtmlAttr(manifestText(value141 ? '生成帧数' : '生成秒数')) +
     '" aria-valuenow="' +
-    escapeHtmlAttr(_0x289481) +
+    escapeHtmlAttr(numberValue6) +
     '" tabindex="0">' +
-    escapeHtmlAttr(_0x4141c9) +
+    escapeHtmlAttr(value145) +
     '</div>\n                    </div>\n                  </div>'
   );
 }
-function renderRhVideoParamsPlacementFields(_0x3c689c, _0x375aac, _0x12e8c6 = {}) {
-  const _0x7c5da0 = getFieldById(_0x3c689c, 'rhVideoResolution');
-  if (!_0x7c5da0) return _0x3c689c.map((_0x4f891b) => renderField(_0x4f891b, _0x375aac, _0x12e8c6)).join('');
-  const _0x7d1bef = getFieldById(_0x3c689c, 'rhVideoFps'),
-    _0x150b36 = getFieldById(_0x3c689c, 'rhVideoFrames'),
-    _0x162b61 = getFieldById(_0x3c689c, 'rhVideoSeconds'),
-    _0x499446 = getRhVideoParamsAspectRatioField(_0x3c689c),
-    _0x2ce743 = getRhVideoParamsKind(_0x3c689c),
-    _0x3c56b6 = _0x2ce743 === 'seconds',
-    _0x3ce786 = Boolean(_0x150b36 && !_0x7d1bef),
-    _0x3d21a7 = _0x3c56b6 ? 'rh-ltx-res-btn' : 'rh-v5-res-btn',
-    _0xc31cb0 = _0x3c56b6 ? 'rh-ltx-fps-btn' : 'rh-v5-fps-btn',
-    _0x159d27 = buildRhVideoParamsLabel(_0x3c689c, _0x375aac),
-    _0x3d516e = _0x3c56b6 ? 'rh-ltx-meta-panel' : 'rh-v5-meta-panel',
-    _0x441acf = _0x3c56b6
+function renderRhVideoParamsPlacementFields(list22, value146, args7 = {}) {
+  const fieldById7 = getFieldById(list22, 'rhVideoResolution');
+  if (!fieldById7) return list22.map((item33) => renderField(item33, value146, args7)).join('');
+  const fieldById8 = getFieldById(list22, 'rhVideoFps'),
+    fieldById9 = getFieldById(list22, 'rhVideoFrames'),
+    fieldById10 = getFieldById(list22, 'rhVideoSeconds'),
+    rhVideoParamsAspectRatioField = getRhVideoParamsAspectRatioField(list22),
+    rhVideoParamsKind = getRhVideoParamsKind(list22),
+    value147 = rhVideoParamsKind === 'seconds',
+    value148 = Boolean(fieldById9 && !fieldById8),
+    buttonClass2 = value147 ? 'rh-ltx-res-btn' : 'rh-v5-res-btn',
+    buttonClass3 = value147 ? 'rh-ltx-fps-btn' : 'rh-v5-fps-btn',
+    rhVideoParamsLabel = buildRhVideoParamsLabel(list22, value146),
+    value149 = value147 ? 'rh-ltx-meta-panel' : 'rh-v5-meta-panel',
+    value150 = value147
       ? '' +
-        (_0x7d1bef
-          ? renderRhVideoParamsFpsRow(_0x7d1bef, _0x375aac, { ..._0x12e8c6, buttonClass: _0xc31cb0 })
+        (fieldById8
+          ? renderRhVideoParamsFpsRow(fieldById8, value146, { ...args7, buttonClass: buttonClass3 })
           : '') +
-        (_0x162b61 ? renderRhVideoParamsStepperRow(_0x162b61, _0x375aac, _0x12e8c6) : '')
+        (fieldById10 ? renderRhVideoParamsStepperRow(fieldById10, value146, args7) : '')
       : '' +
-        (_0x7d1bef
-          ? renderRhVideoParamsFpsRow(_0x7d1bef, _0x375aac, { ..._0x12e8c6, buttonClass: _0xc31cb0 })
+        (fieldById8
+          ? renderRhVideoParamsFpsRow(fieldById8, value146, { ...args7, buttonClass: buttonClass3 })
           : '') +
-        (_0x3ce786 && _0x12e8c6?.preserveHiddenFpsRow ? '' : '') +
-        (_0x150b36 ? renderRhVideoParamsStepperRow(_0x150b36, _0x375aac, _0x12e8c6) : ''),
-    _0x33c40f = new Set(['rhVideoResolution', 'rhVideoFps', 'rhVideoFrames', 'rhVideoSeconds']),
-    _0x54d46d = String(_0x499446?.id || '').trim();
-  if (_0x54d46d) _0x33c40f.add(_0x54d46d);
-  const _0x19d71a = _0x3c689c.filter((_0x5806b3) => !_0x33c40f.has(String(_0x5806b3?.id || '').trim())),
-    _0x2bf992 =
-      _0x3ce786 && _0x12e8c6?.preserveHiddenFpsRow
+        (value148 && args7?.preserveHiddenFpsRow ? '' : '') +
+        (fieldById9 ? renderRhVideoParamsStepperRow(fieldById9, value146, args7) : ''),
+    map2 = new Set(['rhVideoResolution', 'rhVideoFps', 'rhVideoFrames', 'rhVideoSeconds']),
+    value151 = String(rhVideoParamsAspectRatioField?.id || '').trim();
+  if (value151) map2.add(value151);
+  const list23 = list22.filter((item34) => !map2.has(String(item34?.id || '').trim())),
+    value152 =
+      value148 && args7?.preserveHiddenFpsRow
         ? renderRhVideoParamsFpsRow(
             {
               id: 'rhVideoFps',
@@ -1064,321 +1015,334 @@ function renderRhVideoParamsPlacementFields(_0x3c689c, _0x375aac, _0x12e8c6 = {}
               ]),
             },
             { generationParams: { rhVideoFps: 24 } },
-            { ..._0x12e8c6, buttonClass: _0xc31cb0, hidden: true },
+            { ...args7, buttonClass: buttonClass3, hidden: true },
           )
         : '',
-    _0x5c8408 =
+    value153 =
       '<div class="img-ratio-wrap ui-schema-rh-video-params" style="position:relative;" data-ui-schema-composite-field="rhVideoParams">\n              <button type="button" class="img-pill-btn img-ratio-btn">\n                <span class="img-ratio-icon-slot">' +
       renderRhVideoParamsIcon() +
       '</span>\n                <span class="img-ratio-label">' +
-      escapeHtmlAttr(_0x159d27) +
+      escapeHtmlAttr(rhVideoParamsLabel) +
       '</span>\n              </button>\n              <div class="img-ratio-popup" style="display:none;">\n                ' +
-      renderRhVideoParamsResolutionField(_0x7c5da0, _0x375aac, { buttonClass: _0x3d21a7 }) +
+      renderRhVideoParamsResolutionField(fieldById7, value146, { buttonClass: buttonClass2 }) +
       '\n                <div class="' +
-      _0x3d516e +
+      value149 +
       '" style="display:flex;flex-direction:column;gap:10px;">\n                  ' +
-      _0x2bf992 +
-      _0x441acf +
+      value152 +
+      value150 +
       '\n                </div>\n                ' +
-      (_0x499446 ? renderRatioButtons(_0x499446, getFieldValue(_0x375aac, _0x499446), _0x375aac) : '') +
+      (rhVideoParamsAspectRatioField
+        ? renderRatioButtons(
+            rhVideoParamsAspectRatioField,
+            getFieldValue(value146, rhVideoParamsAspectRatioField),
+            value146,
+          )
+        : '') +
       '\n              </div>\n            </div>';
-  return [..._0x19d71a.map((_0x3f8672) => renderField(_0x3f8672, _0x375aac, _0x12e8c6)), _0x5c8408].join('');
+  return [...list23.map((item35) => renderField(item35, value146, args7)), value153].join('');
 }
-function renderFloatingMenuItems(_0x3bb464, _0x1fe866, _0x86245e = {}) {
-  const _0x2a7e24 = getVisibleOptions(_0x3bb464, _0x86245e);
-  return _0x2a7e24
-    .map((_0x306a15) => {
-      const _0x38fc44 = String(_0x306a15?.value ?? _0x306a15),
-        _0x2e3b47 = manifestText(_0x306a15?.label ?? _0x38fc44),
-        _0x48c3af = getDisplayLabelFromOption(_0x306a15, _0x2e3b47),
-        _0x1d6ab5 = manifestText(_0x306a15?.tooltip || '').trim(),
-        _0x4014f0 = String(_0x1fe866 ?? '') === _0x38fc44,
-        _0x4ddc80 = isOptionDisabled(_0x3bb464, _0x306a15, _0x86245e),
-        _0x2d2fc4 = _0x1d6ab5
-          ? ' title="' + escapeHtmlAttr(_0x1d6ab5) + '" data-tooltip="' + escapeHtmlAttr(_0x1d6ab5) + '"'
+function renderFloatingMenuItems(value154, value155, nodeData5 = {}) {
+  const list24 = getVisibleOptions(value154, nodeData5);
+  return list24
+    .map((el12) => {
+      const value156 = String(el12?.value ?? el12),
+        manifestText12 = manifestText(el12?.label ?? value156),
+        displayLabelFromOption3 = getDisplayLabelFromOption(el12, manifestText12),
+        manifestText13 = manifestText(el12?.tooltip || '').trim(),
+        value157 = String(value155 ?? '') === value156,
+        isOptionDisabled7 = isOptionDisabled(value154, el12, nodeData5),
+        value158 = manifestText13
+          ? ' title="' +
+            escapeHtmlAttr(manifestText13) +
+            '" data-tooltip="' +
+            escapeHtmlAttr(manifestText13) +
+            '"'
           : '',
-        _0x2f0e8d = _0x1d6ab5
+        value159 = manifestText13
           ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' +
-            escapeHtmlAttr(_0x1d6ab5) +
+            escapeHtmlAttr(manifestText13) +
             '">!</span>'
           : '';
       return (
         '<div class="floating-menu-item ' +
-        (_0x4014f0 ? 'active' : '') +
+        (value157 ? 'active' : '') +
         ' ' +
-        (_0x4ddc80 ? 'disabled' : '') +
+        (isOptionDisabled7 ? 'disabled' : '') +
         '" data-ui-schema-value="' +
-        escapeHtmlAttr(_0x38fc44) +
+        escapeHtmlAttr(value156) +
         '" data-ui-schema-option-label="' +
-        escapeHtmlAttr(_0x48c3af) +
+        escapeHtmlAttr(displayLabelFromOption3) +
         '"' +
-        _0x2d2fc4 +
-        getOptionDisabledAttrs(_0x3bb464, _0x306a15, { button: false, nodeData: _0x86245e }) +
+        value158 +
+        getOptionDisabledAttrs(value154, el12, { button: false, nodeData: nodeData5 }) +
         '><span class="floating-menu-label">' +
-        escapeHtmlAttr(_0x2e3b47) +
+        escapeHtmlAttr(manifestText12) +
         '</span>' +
-        _0x2f0e8d +
+        value159 +
         '</div>'
       );
     })
     .join('');
 }
-function renderPillMenuField(_0x1aeadb, _0x224b94) {
-  const _0x1cf508 = String(_0x1aeadb?.id || '').trim(),
-    _0x4ab894 = getFieldValue(_0x224b94, _0x1aeadb),
-    _0x37d2d9 = getOptionLabel(_0x1aeadb, _0x4ab894),
-    _0x3ad4dd = manifestText(_0x1aeadb?.menuTitle || '').trim(),
-    _0x3d0bca =
-      _0x3ad4dd || (_0x1aeadb?.showMenuTitle === true ? manifestText(_0x1aeadb?.label || '').trim() : ''),
-    _0x18c3ef = _0x1aeadb?.menuTooltipByValue,
-    _0x402ce3 = String(_0x1aeadb?.menuTooltipField || '').trim(),
-    _0x5cdb88 = _0x402ce3 ? String(getNodeFieldValue(_0x224b94, _0x402ce3, '') || '').trim() : '',
-    _0x43c093 =
-      _0x18c3ef && typeof _0x18c3ef === 'object' && !Array.isArray(_0x18c3ef) ? _0x18c3ef[_0x5cdb88] : '',
-    _0x16279f = manifestText(_0x43c093 || _0x1aeadb?.menuTooltip || _0x1aeadb?.tooltip || '').trim(),
-    _0x33aaaf = _0x16279f
-      ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' + escapeHtmlAttr(_0x16279f) + '">!</span>'
+function renderPillMenuField(value160, value161) {
+  const value162 = String(value160?.id || '').trim(),
+    fieldValue5 = getFieldValue(value161, value160),
+    optionLabel2 = getOptionLabel(value160, fieldValue5),
+    manifestText14 = manifestText(value160?.menuTitle || '').trim(),
+    value163 =
+      manifestText14 || (value160?.showMenuTitle === true ? manifestText(value160?.label || '').trim() : ''),
+    value164 = value160?.menuTooltipByValue,
+    value165 = String(value160?.menuTooltipField || '').trim(),
+    value166 = value165 ? String(getNodeFieldValue(value161, value165, '') || '').trim() : '',
+    value167 = value164 && typeof value164 === 'object' && !Array.isArray(value164) ? value164[value166] : '',
+    manifestText15 = manifestText(value167 || value160?.menuTooltip || value160?.tooltip || '').trim(),
+    value168 = manifestText15
+      ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' +
+        escapeHtmlAttr(manifestText15) +
+        '">!</span>'
       : '',
-    _0x5da4c9 = _0x3d0bca
+    value169 = value163
       ? '<div class="floating-menu-title ui-schema-floating-menu-title">' +
-        escapeHtmlAttr(_0x3d0bca) +
-        _0x33aaaf +
+        escapeHtmlAttr(value163) +
+        value168 +
         '</div>'
       : '',
-    _0x2ed913 = isFieldDisabled(_0x1aeadb)
+    isFieldDisabled3 = isFieldDisabled(value160)
       ? ' disabled aria-disabled="true" data-ui-schema-disabled="true"'
       : '';
   return (
     '<div class="ui-schema-field ui-schema-pill-menu" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x1cf508) +
+    escapeHtmlAttr(value162) +
     '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x1aeadb?.defaultValue ?? '') +
+    escapeHtmlAttr(value160?.defaultValue ?? '') +
     '">\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="' +
-    escapeHtmlAttr(_0x1cf508) +
+    escapeHtmlAttr(value162) +
     '"' +
-    _0x2ed913 +
+    isFieldDisabled3 +
     '>\n      <span class="ui-schema-pill-label">' +
-    escapeHtmlAttr(_0x37d2d9) +
+    escapeHtmlAttr(optionLabel2) +
     '</span>\n    </button>\n    <div class="floating-menu ui-schema-floating-menu">\n      ' +
-    _0x5da4c9 +
+    value169 +
     '\n      ' +
-    renderFloatingMenuItems(_0x1aeadb, _0x4ab894, _0x224b94) +
+    renderFloatingMenuItems(value160, fieldValue5, value161) +
     '\n    </div>\n  </div>'
   );
 }
-function renderResolutionPillField(_0x482cf6, _0x1d918d) {
-  const _0x4ee37e = String(_0x482cf6?.id || '').trim(),
-    _0x4eaeaf = getFieldValue(_0x1d918d, _0x482cf6),
-    _0x27bdfa = getVisibleOptions(_0x482cf6, _0x1d918d),
-    _0x979a96 = _0x27bdfa.map((_0x1f2124) => Number(_0x1f2124?.value ?? _0x1f2124)).filter(Number.isFinite),
-    _0x8e66b8 = Number.isFinite(Number(_0x4eaeaf))
-      ? Number(_0x4eaeaf)
-      : Number(_0x482cf6?.defaultValue ?? _0x979a96[0] ?? 0),
-    _0x1f0427 = Math.max(0, _0x979a96.indexOf(_0x8e66b8)),
-    _0x1584bd = Math.max(0, _0x979a96.length - 1),
-    _0x1f5003 = manifestText(_0x482cf6?.label || 'Resolution'),
-    _0x50620d = manifestText(_0x482cf6?.description || _0x482cf6?.tooltip || '').trim(),
-    _0x3c32e9 =
-      _0x50620d && _0x482cf6?.showInfoTip === true
-        ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' + escapeHtmlAttr(_0x50620d) + '">!</span>'
+function renderResolutionPillField(value170, value171) {
+  const value172 = String(value170?.id || '').trim(),
+    fieldValue6 = getFieldValue(value171, value170),
+    list25 = getVisibleOptions(value170, value171),
+    list26 = list25.map((el13) => Number(el13?.value ?? el13)).filter(Number.isFinite),
+    value173 = Number.isFinite(Number(fieldValue6))
+      ? Number(fieldValue6)
+      : Number(value170?.defaultValue ?? list26[0] ?? 0),
+    value174 = Math.max(0, list26.indexOf(value173)),
+    value175 = Math.max(0, list26.length - 1),
+    manifestText16 = manifestText(value170?.label || 'Resolution'),
+    manifestText17 = manifestText(value170?.description || value170?.tooltip || '').trim(),
+    value176 =
+      manifestText17 && value170?.showInfoTip === true
+        ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' +
+          escapeHtmlAttr(manifestText17) +
+          '">!</span>'
         : '';
   return (
     '<div class="ui-schema-field ui-schema-resolution-pill" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x4ee37e) +
+    escapeHtmlAttr(value172) +
     '" data-ui-schema-type="slider" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x482cf6?.defaultValue ?? '') +
+    escapeHtmlAttr(value170?.defaultValue ?? '') +
     '" data-ui-schema-range-values="' +
-    escapeHtmlAttr(_0x979a96.join(',')) +
+    escapeHtmlAttr(list26.join(',')) +
     '">\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="' +
-    escapeHtmlAttr(_0x4ee37e) +
+    escapeHtmlAttr(value172) +
     '">\n      <span class="ui-schema-pill-label ui-schema-resolution-label">\n        <span class="ui-schema-resolution-title">' +
-    escapeHtmlAttr(_0x1f5003) +
+    escapeHtmlAttr(manifestText16) +
     '</span>\n        <span class="ui-schema-resolution-value">' +
-    escapeHtmlAttr(_0x8e66b8) +
+    escapeHtmlAttr(value173) +
     '</span>\n      </span>\n    </button>\n    <div class="rh-res-popup ui-schema-popup" style="display:none;">\n      <div class="rh-res-title">' +
-    escapeHtmlAttr(_0x1f5003) +
-    _0x3c32e9 +
+    escapeHtmlAttr(manifestText16) +
+    value176 +
     '</div>\n      <input type="range" class="rh-res-slider ui-schema-range-index" data-ui-schema-input="' +
-    escapeHtmlAttr(_0x4ee37e) +
+    escapeHtmlAttr(value172) +
     '" min="0" max="' +
-    escapeHtmlAttr(_0x1584bd) +
+    escapeHtmlAttr(value175) +
     '" step="1" value="' +
-    escapeHtmlAttr(_0x1f0427) +
+    escapeHtmlAttr(value174) +
     '">\n      <div class="rh-res-ticks">' +
-    _0x979a96.map((_0x32076f) => '<span>' + escapeHtmlAttr(_0x32076f) + '</span>').join('') +
+    list26.map((item36) => '<span>' + escapeHtmlAttr(item36) + '</span>').join('') +
     '</div>\n    </div>\n  </div>'
   );
 }
-function findRangeValueIndex(_0x5f2930, _0x5d9799) {
-  const _0x37066a = Number(_0x5d9799);
-  if (!Number.isFinite(_0x37066a) || !Array.isArray(_0x5f2930)) return -1;
-  return _0x5f2930.findIndex((_0x49c5b3) => Math.abs(Number(_0x49c5b3) - _0x37066a) < 0.000001);
+function findRangeValueIndex(list27, value177) {
+  const value178 = Number(value177);
+  if (!Number.isFinite(value178) || !Array.isArray(list27)) return -1;
+  return list27.findIndex((item37) => Math.abs(Number(item37) - value178) < 0.000001);
 }
-function parseRangeValuesFromFieldEl(_0x42d99e) {
-  const _0x221ae7 = String(_0x42d99e?.dataset?.uiSchemaRangeValues || '').trim();
-  if (!_0x221ae7) return [];
-  return _0x221ae7
+function parseRangeValuesFromFieldEl(el14) {
+  const enabled15 = String(el14?.dataset?.uiSchemaRangeValues || '').trim();
+  if (!enabled15) return [];
+  return enabled15
     .split(',')
-    .map((_0x5c6d0d) => Number(_0x5c6d0d))
+    .map((item38) => Number(item38))
     .filter(Number.isFinite);
 }
-function parseRangeLabelsFromFieldEl(_0x4b49ab) {
-  const _0x39277a = String(_0x4b49ab?.dataset?.uiSchemaRangeLabels || '').trim();
-  if (!_0x39277a) return [];
+function parseRangeLabelsFromFieldEl(el15) {
+  const enabled16 = String(el15?.dataset?.uiSchemaRangeLabels || '').trim();
+  if (!enabled16) return [];
   try {
-    const _0x496801 = JSON.parse(_0x39277a);
-    return Array.isArray(_0x496801) ? _0x496801.map((_0x3fc104) => String(_0x3fc104)) : [];
+    const list28 = JSON.parse(enabled16);
+    return Array.isArray(list28) ? list28.map((item39) => String(item39)) : [];
   } catch {
     return [];
   }
 }
-function getRangeValueDisplayLabel(_0x230c16, _0x15619e, _0x483437 = '') {
-  const _0x1aab90 = parseRangeLabelsFromFieldEl(_0x230c16);
-  if (_0x1aab90.length === 0) return _0x483437 || String(_0x15619e ?? '');
-  const _0x12e2a0 = parseRangeValuesFromFieldEl(_0x230c16),
-    _0x174dd4 = findRangeValueIndex(_0x12e2a0, _0x15619e);
-  return _0x174dd4 >= 0 && _0x1aab90[_0x174dd4] ? _0x1aab90[_0x174dd4] : _0x483437 || String(_0x15619e ?? '');
+function getRangeValueDisplayLabel(value179, value180, value181 = '') {
+  const list29 = parseRangeLabelsFromFieldEl(value179);
+  if (list29.length === 0) return value181 || String(value180 ?? '');
+  const rangeValuesFromFieldEl = parseRangeValuesFromFieldEl(value179),
+    rangeValueIndex = findRangeValueIndex(rangeValuesFromFieldEl, value180);
+  return rangeValueIndex >= 0 && list29[rangeValueIndex]
+    ? list29[rangeValueIndex]
+    : value181 || String(value180 ?? '');
 }
-function getDurationOptionEntries(_0x114bd8, _0x989396 = {}) {
-  return getVisibleOptions(_0x114bd8, _0x989396)
-    .map((_0xa7758c) => {
-      const _0x270bc = _0xa7758c && typeof _0xa7758c === 'object' && !Array.isArray(_0xa7758c),
-        _0x53dfd3 = Number(_0x270bc ? _0xa7758c.value : _0xa7758c);
-      if (!Number.isFinite(_0x53dfd3)) return null;
-      const _0x290112 = String(
-        _0x270bc ? getDisplayLabelFromOption(_0xa7758c, _0x53dfd3 + 'S') : _0x53dfd3 + 'S',
-      );
-      return { value: _0x53dfd3, label: _0x290112 };
+function getDurationOptionEntries(value182, value183 = {}) {
+  return getVisibleOptions(value182, value183)
+    .map((el16) => {
+      const value184 = el16 && typeof el16 === 'object' && !Array.isArray(el16),
+        value185 = Number(value184 ? el16.value : el16);
+      if (!Number.isFinite(value185)) return null;
+      const label2 = String(value184 ? getDisplayLabelFromOption(el16, value185 + 'S') : value185 + 'S');
+      return { value: value185, label: label2 };
     })
     .filter(Boolean);
 }
-function renderDurationPillField(_0x64d767, _0x2bec89) {
-  const _0x4f9811 = String(_0x64d767?.id || '').trim(),
-    _0x596309 = getFieldValue(_0x2bec89, _0x64d767),
-    _0x4890c6 = getDurationOptionEntries(_0x64d767, _0x2bec89),
-    _0x624afb = _0x4890c6.map((_0x4304b9) => _0x4304b9.value),
-    _0x15c6f6 = _0x624afb.length > 0,
-    _0x1b4e4a = Number(_0x64d767?.min ?? 1),
-    _0x493fd5 = Number(_0x64d767?.max ?? 15),
-    _0x135d58 = Number(_0x64d767?.step ?? 1),
-    _0x2992ee = Number.isFinite(Number(_0x596309))
-      ? Number(_0x596309)
-      : Number(_0x64d767?.defaultValue ?? _0x1b4e4a),
-    _0x570480 = Math.max(0, findRangeValueIndex(_0x624afb, _0x2992ee)),
-    _0x3939f6 = _0x15c6f6 ? 0 : _0x1b4e4a,
-    _0x281bfc = _0x15c6f6 ? Math.max(0, _0x624afb.length - 1) : _0x493fd5,
-    _0x3cd0a0 = _0x15c6f6 ? 1 : _0x135d58,
-    _0x554f9d = _0x15c6f6 ? _0x570480 : _0x2992ee,
-    _0xd8010 = _0x15c6f6 && _0x4890c6[_0x570480]?.label ? _0x4890c6[_0x570480].label : _0x2992ee + 'S',
-    _0x1f1757 = _0x15c6f6 ? _0x4890c6[0]?.label : _0x1b4e4a + 'S',
-    _0x19e6d1 = _0x15c6f6 ? _0x4890c6[_0x4890c6.length - 1]?.label : _0x493fd5 + 'S',
-    _0x31c449 = _0x15c6f6 ? ' data-ui-schema-range-values="' + escapeHtmlAttr(_0x624afb.join(',')) + '"' : '',
-    _0x5d56f6 = _0x15c6f6
+function renderDurationPillField(value186, value187) {
+  const value188 = String(value186?.id || '').trim(),
+    fieldValue7 = getFieldValue(value187, value186),
+    list30 = getDurationOptionEntries(value186, value187),
+    list31 = list30.map((el17) => el17.value),
+    value189 = list31.length > 0,
+    value190 = Number(value186?.min ?? 1),
+    value191 = Number(value186?.max ?? 15),
+    value192 = Number(value186?.step ?? 1),
+    value193 = Number.isFinite(Number(fieldValue7))
+      ? Number(fieldValue7)
+      : Number(value186?.defaultValue ?? value190),
+    value194 = Math.max(0, findRangeValueIndex(list31, value193)),
+    value195 = value189 ? 0 : value190,
+    value196 = value189 ? Math.max(0, list31.length - 1) : value191,
+    value197 = value189 ? 1 : value192,
+    value198 = value189 ? value194 : value193,
+    value199 = value189 && list30[value194]?.label ? list30[value194].label : value193 + 'S',
+    value200 = value189 ? list30[0]?.label : value190 + 'S',
+    value201 = value189 ? list30[list30.length - 1]?.label : value191 + 'S',
+    value202 = value189 ? ' data-ui-schema-range-values="' + escapeHtmlAttr(list31.join(',')) + '"' : '',
+    value203 = value189
       ? ' data-ui-schema-range-labels="' +
-        escapeHtmlAttr(JSON.stringify(_0x4890c6.map((_0x2ffab9) => _0x2ffab9.label))) +
+        escapeHtmlAttr(JSON.stringify(list30.map((item40) => item40.label))) +
         '"'
       : '',
-    _0x330228 = isFieldDisabled(_0x64d767)
+    isFieldDisabled4 = isFieldDisabled(value186)
       ? ' disabled aria-disabled="true" data-ui-schema-disabled="true"'
       : '';
   return (
     '<div class="ui-schema-field ui-schema-duration-pill" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x4f9811) +
+    escapeHtmlAttr(value188) +
     '" data-ui-schema-type="slider" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x64d767?.defaultValue ?? '') +
+    escapeHtmlAttr(value186?.defaultValue ?? '') +
     '"' +
-    _0x31c449 +
-    _0x5d56f6 +
+    value202 +
+    value203 +
     '>\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="' +
-    escapeHtmlAttr(_0x4f9811) +
+    escapeHtmlAttr(value188) +
     '"' +
-    _0x330228 +
+    isFieldDisabled4 +
     '>\n      <span class="ui-schema-pill-label ui-schema-duration-label">' +
-    escapeHtmlAttr(_0xd8010) +
+    escapeHtmlAttr(value199) +
     '</span>\n    </button>\n    <div class="floating-menu ui-schema-popup ui-schema-duration-pop">\n      <div class="ui-schema-duration-title">' +
-    escapeHtmlAttr(manifestText(_0x64d767?.label || '视频时长')) +
+    escapeHtmlAttr(manifestText(value186?.label || '视频时长')) +
     '</div>\n      <input type="range" class="ui-schema-range ui-schema-duration-slider" data-ui-schema-input="' +
-    escapeHtmlAttr(_0x4f9811) +
+    escapeHtmlAttr(value188) +
     '" min="' +
-    escapeHtmlAttr(_0x3939f6) +
+    escapeHtmlAttr(value195) +
     '" max="' +
-    escapeHtmlAttr(_0x281bfc) +
+    escapeHtmlAttr(value196) +
     '" step="' +
-    escapeHtmlAttr(_0x3cd0a0) +
+    escapeHtmlAttr(value197) +
     '" value="' +
-    escapeHtmlAttr(_0x554f9d) +
+    escapeHtmlAttr(value198) +
     '">\n      <div class="ui-schema-duration-bounds">\n        <span>' +
-    escapeHtmlAttr(_0x1f1757) +
+    escapeHtmlAttr(value200) +
     '</span>\n        <span>' +
-    escapeHtmlAttr(_0x19e6d1) +
+    escapeHtmlAttr(value201) +
     '</span>\n      </div>\n    </div>\n  </div>'
   );
 }
-function renderInstanceToggleField(_0x28ec08, _0x1d7bab) {
-  const _0x2fb0ca = String(_0x28ec08?.id || '').trim(),
-    _0x92ce38 = String(getFieldValue(_0x1d7bab, _0x28ec08) || _0x28ec08?.defaultValue || ''),
-    _0x736e0e = getVisibleOptions(_0x28ec08, _0x1d7bab),
-    _0x3d194f = Math.max(
+function renderInstanceToggleField(value204, value205) {
+  const value206 = String(value204?.id || '').trim(),
+    value207 = String(getFieldValue(value205, value204) || value204?.defaultValue || ''),
+    list32 = getVisibleOptions(value204, value205),
+    value208 = Math.max(
       0,
-      _0x736e0e.findIndex((_0x4263c2) => String(_0x4263c2?.value ?? _0x4263c2) === _0x92ce38),
+      list32.findIndex((el18) => String(el18?.value ?? el18) === value207),
     ),
-    _0x3e5ca5 = _0x736e0e[_0x3d194f] || _0x736e0e[0] || {},
-    _0x234b84 = _0x736e0e[(_0x3d194f + 1) % Math.max(1, _0x736e0e.length)] || _0x3e5ca5;
+    el19 = list32[value208] || list32[0] || {},
+    el20 = list32[(value208 + 1) % Math.max(1, list32.length)] || el19;
   return (
     '<div class="ui-schema-field rh-vram-wrap ui-schema-instance-toggle" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x2fb0ca) +
+    escapeHtmlAttr(value206) +
     '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x28ec08?.defaultValue ?? '') +
+    escapeHtmlAttr(value204?.defaultValue ?? '') +
     '">\n    <button type="button" class="img-pill-btn rh-vram-btn" data-ui-schema-value="' +
-    escapeHtmlAttr(_0x234b84?.value ?? _0x234b84) +
+    escapeHtmlAttr(el20?.value ?? el20) +
     '">\n      <span class="rh-vram-label ui-schema-pill-label">' +
-    escapeHtmlAttr(_0x3e5ca5?.label ?? _0x3e5ca5?.value ?? _0x92ce38) +
+    escapeHtmlAttr(el19?.label ?? el19?.value ?? value207) +
     '</span>\n    </button>\n  </div>'
   );
 }
-function syncInstanceToggleField(_0x3b1f6a, _0x10f868) {
-  if (!_0x3b1f6a?.classList?.contains('ui-schema-instance-toggle')) return;
-  const _0x2eaf24 = String(_0x10f868) === 'plus',
-    _0x3f04c3 = _0x3b1f6a.querySelector('.ui-schema-pill-label');
-  if (_0x3f04c3) _0x3f04c3.textContent = _0x2eaf24 ? '48G' : '24G';
-  const _0x4f617f = _0x3b1f6a.querySelector('[data-ui-schema-value]');
-  if (_0x4f617f) _0x4f617f.dataset.uiSchemaValue = _0x2eaf24 ? 'default' : 'plus';
+function syncInstanceToggleField(el21, value209) {
+  if (!el21?.classList?.contains('ui-schema-instance-toggle')) return;
+  const value210 = String(value209) === 'plus',
+    el22 = el21.querySelector('.ui-schema-pill-label');
+  if (el22) el22.textContent = value210 ? '48G' : '24G';
+  const el23 = el21.querySelector('[data-ui-schema-value]');
+  if (el23) el23.dataset.uiSchemaValue = value210 ? 'default' : 'plus';
 }
-function syncStepperField(_0x28a415, _0x358496) {
-  if (!_0x28a415?.classList?.contains('ui-schema-rh-video-stepper')) return;
-  const _0x16f1e0 = Number(_0x28a415.dataset.uiSchemaDefault ?? 0),
-    _0x55bc1b = _0x28a415.dataset.uiSchemaMin,
-    _0x184f4a = _0x28a415.dataset.uiSchemaMax,
-    _0x347554 = normalizeNumberValue(_0x358496, Number.isFinite(_0x16f1e0) ? _0x16f1e0 : 0, {
-      min: _0x55bc1b === undefined ? -Infinity : Number(_0x55bc1b),
-      max: _0x184f4a === undefined ? Infinity : Number(_0x184f4a),
+function syncStepperField(el24, value211) {
+  if (!el24?.classList?.contains('ui-schema-rh-video-stepper')) return;
+  const value212 = Number(el24.dataset.uiSchemaDefault ?? 0),
+    min3 = el24.dataset.uiSchemaMin,
+    max3 = el24.dataset.uiSchemaMax,
+    numberValue7 = normalizeNumberValue(value211, Number.isFinite(value212) ? value212 : 0, {
+      min: min3 === undefined ? -Infinity : Number(min3),
+      max: max3 === undefined ? Infinity : Number(max3),
     }),
-    _0x2bb178 = _0x28a415.querySelector('.rh-stepper-value');
-  if (!_0x2bb178) return;
-  const _0x2cd496 = String(_0x28a415.dataset.uiSchemaField || '').trim();
-  ((_0x2bb178.textContent =
-    _0x2cd496 === 'rhVideoFrames' && _0x347554 === 0
+    el25 = el24.querySelector('.rh-stepper-value');
+  if (!el25) return;
+  const value213 = String(el24.dataset.uiSchemaField || '').trim();
+  ((el25.textContent =
+    value213 === 'rhVideoFrames' && numberValue7 === 0
       ? t('aigenImage.uiSchema.fullLength')
-      : String(_0x347554)),
-    _0x2bb178.setAttribute('aria-valuenow', String(_0x347554)));
+      : String(numberValue7)),
+    el25.setAttribute('aria-valuenow', String(numberValue7)));
 }
-function renderSelect(_0x3b2cc1, _0x5b69ff, _0x202dd3 = {}) {
-  const _0x1202e8 = getVisibleOptions(_0x3b2cc1, _0x202dd3);
+function renderSelect(value214, value215, value216 = {}) {
+  const list33 = getVisibleOptions(value214, value216);
   return (
     '<select class="ui-schema-select" data-ui-schema-input="' +
-    escapeHtmlAttr(_0x3b2cc1.id) +
+    escapeHtmlAttr(value214.id) +
     '">\n    ' +
-    _0x1202e8
-      .map((_0x4d32e4) => {
-        const _0x35e543 = String(_0x4d32e4?.value ?? ''),
-          _0x55d52a = String(_0x5b69ff ?? '') === _0x35e543 ? ' selected' : '';
+    list33
+      .map((el26) => {
+        const value217 = String(el26?.value ?? ''),
+          value218 = String(value215 ?? '') === value217 ? ' selected' : '';
         return (
           '<option value="' +
-          escapeHtmlAttr(_0x35e543) +
+          escapeHtmlAttr(value217) +
           '"' +
-          _0x55d52a +
+          value218 +
           '>' +
-          escapeHtmlAttr(_0x4d32e4?.label ?? _0x35e543) +
+          escapeHtmlAttr(el26?.label ?? value217) +
           '</option>'
         );
       })
@@ -1386,407 +1350,400 @@ function renderSelect(_0x3b2cc1, _0x5b69ff, _0x202dd3 = {}) {
     '\n  </select>'
   );
 }
-function renderRange(_0x5303f6, _0x18174b, _0x261763, _0x49a2f9 = {}) {
-  const _0x16d096 = getVisibleOptions(_0x5303f6, _0x49a2f9),
-    _0x47967d = _0x16d096.map((_0x42e5ec) => Number(_0x42e5ec?.value ?? _0x42e5ec)).filter(Number.isFinite),
-    _0x2f8308 = Number(_0x5303f6?.defaultValue ?? _0x47967d[0] ?? 0),
-    _0x58acb6 = Number.isFinite(Number(_0x18174b)) ? Number(_0x18174b) : _0x2f8308;
-  if (_0x261763 === 'stepper') {
-    const _0x40a96b = _0x5303f6?.ariaLabel
-      ? manifestText(_0x5303f6.ariaLabel)
-      : t('aigenImage.uiSchema.numericValueAria', { label: manifestText(_0x5303f6?.label || _0x5303f6.id) });
+function renderRange(value219, value220, value221, value222 = {}) {
+  const list34 = getVisibleOptions(value219, value222),
+    list35 = list34.map((el27) => Number(el27?.value ?? el27)).filter(Number.isFinite),
+    value223 = Number(value219?.defaultValue ?? list35[0] ?? 0),
+    value224 = Number.isFinite(Number(value220)) ? Number(value220) : value223;
+  if (value221 === 'stepper') {
+    const value225 = value219?.ariaLabel
+      ? manifestText(value219.ariaLabel)
+      : t('aigenImage.uiSchema.numericValueAria', { label: manifestText(value219?.label || value219.id) });
     return (
       '<div class="rh-stepper" data-key="' +
-      escapeHtmlAttr(_0x5303f6.id) +
+      escapeHtmlAttr(value219.id) +
       '">\n      <div class="rh-stepper-value" role="spinbutton" aria-label="' +
-      escapeHtmlAttr(_0x40a96b) +
+      escapeHtmlAttr(value225) +
       '" aria-valuenow="' +
-      escapeHtmlAttr(_0x58acb6) +
+      escapeHtmlAttr(value224) +
       '" tabindex="0">' +
-      escapeHtmlAttr(_0x58acb6) +
+      escapeHtmlAttr(value224) +
       '</div>\n    </div>'
     );
   }
-  const _0x5dea49 = Number(_0x5303f6?.min ?? _0x47967d[0] ?? 0),
-    _0x3bba4e = Number(_0x5303f6?.max ?? _0x47967d[_0x47967d.length - 1] ?? _0x5dea49),
-    _0x57867d = Number(_0x5303f6?.step ?? 1);
+  const value226 = Number(value219?.min ?? list35[0] ?? 0),
+    value227 = Number(value219?.max ?? list35[list35.length - 1] ?? value226),
+    value228 = Number(value219?.step ?? 1);
   return (
     '<div class="ui-schema-range-line">\n    <input class="ui-schema-range" data-ui-schema-input="' +
-    escapeHtmlAttr(_0x5303f6.id) +
+    escapeHtmlAttr(value219.id) +
     '" type="range" min="' +
-    escapeHtmlAttr(_0x5dea49) +
+    escapeHtmlAttr(value226) +
     '" max="' +
-    escapeHtmlAttr(_0x3bba4e) +
+    escapeHtmlAttr(value227) +
     '" step="' +
-    escapeHtmlAttr(_0x57867d) +
+    escapeHtmlAttr(value228) +
     '" value="' +
-    escapeHtmlAttr(_0x58acb6) +
+    escapeHtmlAttr(value224) +
     '">\n    <span class="ui-schema-value">' +
-    escapeHtmlAttr(_0x58acb6) +
+    escapeHtmlAttr(value224) +
     '</span>\n  </div>'
   );
 }
-function renderStepperAttrs(_0xbb12d3, _0x1b597a) {
-  if (_0x1b597a !== 'stepper') return '';
-  const _0xe7d3d5 = [];
+function renderStepperAttrs(value229, value230) {
+  if (value230 !== 'stepper') return '';
+  const list36 = [];
   return (
-    _0xbb12d3?.min !== undefined &&
-      _0xbb12d3?.min !== null &&
-      _0xe7d3d5.push(' data-ui-schema-min="' + escapeHtmlAttr(_0xbb12d3.min) + '"'),
-    _0xbb12d3?.max !== undefined &&
-      _0xbb12d3?.max !== null &&
-      _0xe7d3d5.push(' data-ui-schema-max="' + escapeHtmlAttr(_0xbb12d3.max) + '"'),
-    _0xe7d3d5.push(' data-ui-schema-step="' + escapeHtmlAttr(_0xbb12d3?.step ?? 1) + '"'),
-    _0xe7d3d5.join('')
+    value229?.min !== undefined &&
+      value229?.min !== null &&
+      list36.push(' data-ui-schema-min="' + escapeHtmlAttr(value229.min) + '"'),
+    value229?.max !== undefined &&
+      value229?.max !== null &&
+      list36.push(' data-ui-schema-max="' + escapeHtmlAttr(value229.max) + '"'),
+    list36.push(' data-ui-schema-step="' + escapeHtmlAttr(value229?.step ?? 1) + '"'),
+    list36.join('')
   );
 }
-function renderTextInput(_0x1db76e, _0x52ff69, _0x192ec0) {
-  if (_0x192ec0 === 'textarea')
+function renderTextInput(value231, value232, value233) {
+  if (value233 === 'textarea')
     return (
       '<textarea class="ui-schema-textarea" data-ui-schema-input="' +
-      escapeHtmlAttr(_0x1db76e.id) +
+      escapeHtmlAttr(value231.id) +
       '">' +
-      escapeHtmlAttr(_0x52ff69) +
+      escapeHtmlAttr(value232) +
       '</textarea>'
     );
   return (
     '<input class="ui-schema-text" data-ui-schema-input="' +
-    escapeHtmlAttr(_0x1db76e.id) +
+    escapeHtmlAttr(value231.id) +
     '" type="text" value="' +
-    escapeHtmlAttr(_0x52ff69) +
+    escapeHtmlAttr(value232) +
     '">'
   );
 }
-function renderAssetInput(_0x372464, _0x5196a7) {
-  const _0x47bb4b =
-    _0x5196a7 === 'video input'
+function renderAssetInput(value234, value235) {
+  const value236 =
+    value235 === 'video input'
       ? t('aigenImage.uiSchema.assetInput.video')
-      : _0x5196a7 === 'audio input'
+      : value235 === 'audio input'
         ? t('aigenImage.uiSchema.assetInput.audio')
         : t('aigenImage.uiSchema.assetInput.image');
   return (
     '<button type="button" class="img-rp-quality-item ui-schema-asset-input" data-ui-schema-input="' +
-    escapeHtmlAttr(_0x372464.id) +
+    escapeHtmlAttr(value234.id) +
     '" data-ui-schema-asset-kind="' +
-    escapeHtmlAttr(_0x5196a7.split(' ')[0]) +
+    escapeHtmlAttr(value235.split(' ')[0]) +
     '">' +
-    _0x47bb4b +
+    value236 +
     '</button>'
   );
 }
-function renderAdvancedRowField(_0x4b6414, _0x5a71c7) {
-  assertSupportedField(_0x4b6414);
-  const _0x18d483 = String(_0x4b6414?.id || '').trim(),
-    _0x2c4a61 = normalizeControlType(_0x4b6414?.type),
-    _0x5cd81d = getFieldValue(_0x5a71c7, _0x4b6414),
-    _0x1a686d = manifestText(_0x4b6414?.label || _0x18d483),
-    _0x59aceb = manifestText(_0x4b6414?.description || _0x4b6414?.tooltip || '').trim(),
-    _0x3f79b2 = _0x59aceb
-      ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' + escapeHtmlAttr(_0x59aceb) + '">!</span>'
+function renderAdvancedRowField(value237, nodeData6) {
+  assertSupportedField(value237);
+  const value238 = String(value237?.id || '').trim(),
+    controlType2 = normalizeControlType(value237?.type),
+    fieldValue8 = getFieldValue(nodeData6, value237),
+    manifestText18 = manifestText(value237?.label || value238),
+    manifestText19 = manifestText(value237?.description || value237?.tooltip || '').trim(),
+    value239 = manifestText19
+      ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' +
+        escapeHtmlAttr(manifestText19) +
+        '">!</span>'
       : '',
-    _0x28f114 =
-      typeof _0x4b6414?.defaultValue === 'boolean'
+    value240 =
+      typeof value237?.defaultValue === 'boolean'
         ? ' data-ui-schema-value-type="boolean"'
-        : _0x2c4a61 === 'stepper'
+        : controlType2 === 'stepper'
           ? ' data-ui-schema-value-type="number"'
           : '',
-    _0x37d9e4 = _0x2c4a61 === 'stepper' ? ' ui-schema-rh-video-stepper' : '';
+    value241 = controlType2 === 'stepper' ? ' ui-schema-rh-video-stepper' : '';
   return (
     '<div class="ui-schema-field rh-vram-adv-row' +
-    _0x37d9e4 +
+    value241 +
     '" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x18d483) +
+    escapeHtmlAttr(value238) +
     '" data-ui-schema-type="' +
-    escapeHtmlAttr(_0x2c4a61) +
+    escapeHtmlAttr(controlType2) +
     '" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x4b6414?.defaultValue ?? '') +
+    escapeHtmlAttr(value237?.defaultValue ?? '') +
     '"' +
-    getFieldDefaultAliasAttrs(_0x4b6414) +
-    _0x28f114 +
-    renderStepperAttrs(_0x4b6414, _0x2c4a61) +
+    getFieldDefaultAliasAttrs(value237) +
+    value240 +
+    renderStepperAttrs(value237, controlType2) +
     '>\n    <div class="rh-vram-adv-label">\n      <span class="rh-adv-title ui-schema-field-label">' +
-    escapeHtmlAttr(_0x1a686d) +
+    escapeHtmlAttr(manifestText18) +
     '</span>\n      ' +
-    _0x3f79b2 +
+    value239 +
     '\n    </div>\n    <div class="rh-adv-control-line">' +
-    renderControl(_0x4b6414, _0x5cd81d, _0x2c4a61, { advanced: true, nodeData: _0x5a71c7 }) +
+    renderControl(value237, fieldValue8, controlType2, { advanced: true, nodeData: nodeData6 }) +
     '</div>\n  </div>'
   );
 }
-function getRandomSeedAttrs(_0x4435e9) {
-  const _0x3135b7 = Number.isFinite(Number(_0x4435e9?.randomSeedMin))
-      ? Math.trunc(Number(_0x4435e9.randomSeedMin))
+function getRandomSeedAttrs(value242) {
+  const value243 = Number.isFinite(Number(value242?.randomSeedMin))
+      ? Math.trunc(Number(value242.randomSeedMin))
       : RANDOM_SEED_DEFAULT_MIN,
-    _0xd2dcc1 = Number.isFinite(Number(_0x4435e9?.randomSeedMax))
-      ? Math.trunc(Number(_0x4435e9.randomSeedMax))
+    value244 = Number.isFinite(Number(value242?.randomSeedMax))
+      ? Math.trunc(Number(value242.randomSeedMax))
       : RANDOM_SEED_DEFAULT_MAX,
-    _0x45b333 = Math.min(_0x3135b7, _0xd2dcc1),
-    _0x1583e6 = Math.max(_0x3135b7, _0xd2dcc1),
-    _0x59e806 = String(_0x4435e9?.randomSeedModeField || '').trim(),
-    _0x3e424e = String(_0x4435e9?.randomSeedDefaultMode || 'fixed').trim() || 'fixed',
-    _0x3b39fe = _0x59e806
+    value245 = Math.min(value243, value244),
+    value246 = Math.max(value243, value244),
+    value247 = String(value242?.randomSeedModeField || '').trim(),
+    value248 = String(value242?.randomSeedDefaultMode || 'fixed').trim() || 'fixed',
+    value249 = value247
       ? ' data-ui-schema-random-seed-mode-field="' +
-        escapeHtmlAttr(_0x59e806) +
+        escapeHtmlAttr(value247) +
         '" data-ui-schema-random-seed-mode-default="' +
-        escapeHtmlAttr(_0x3e424e) +
+        escapeHtmlAttr(value248) +
         '"'
       : '';
   return (
     ' data-ui-schema-random-seed-min="' +
-    escapeHtmlAttr(_0x45b333) +
+    escapeHtmlAttr(value245) +
     '" data-ui-schema-random-seed-max="' +
-    escapeHtmlAttr(_0x1583e6) +
+    escapeHtmlAttr(value246) +
     '"' +
-    _0x3b39fe
+    value249
   );
 }
-function normalizeRandomSeedMode(_0x235e5d, _0x24d12c = 'fixed') {
-  const _0x3fcc53 = String(_0x235e5d ?? _0x24d12c)
+function normalizeRandomSeedMode(value250, value251 = 'fixed') {
+  const value252 = String(value250 ?? value251)
     .trim()
     .toLowerCase();
-  return _0x3fcc53 === 'random' ? 'random' : 'fixed';
+  return value252 === 'random' ? 'random' : 'fixed';
 }
-function getRandomSeedModeFromNodeData(_0x361084, _0x1e5863) {
-  const _0x275d16 = String(_0x1e5863?.randomSeedModeField || '').trim();
+function getRandomSeedModeFromNodeData(value253, value254) {
+  const value255 = String(value254?.randomSeedModeField || '').trim();
   return normalizeRandomSeedMode(
-    _0x275d16
-      ? getNodeFieldValue(_0x361084, _0x275d16, _0x1e5863?.randomSeedDefaultMode || 'fixed')
-      : 'fixed',
-    _0x1e5863?.randomSeedDefaultMode || 'fixed',
+    value255 ? getNodeFieldValue(value253, value255, value254?.randomSeedDefaultMode || 'fixed') : 'fixed',
+    value254?.randomSeedDefaultMode || 'fixed',
   );
 }
-function renderRandomSeedModeButtons(_0x49965a, _0x50394c, _0x1db85a) {
-  const _0x559dcf = String(_0x49965a?.randomSeedModeField || '').trim(),
-    _0x29360a = t('aigenImage.uiSchema.random'),
-    _0x58be28 = t('aigenImage.uiSchema.fixed');
-  if (!_0x559dcf)
+function renderRandomSeedModeButtons(value256, value257, label3) {
+  const enabled17 = String(value256?.randomSeedModeField || '').trim(),
+    label4 = t('aigenImage.uiSchema.random'),
+    label5 = t('aigenImage.uiSchema.fixed');
+  if (!enabled17)
     return (
       '<button type="button" class="img-rp-quality-item ui-schema-random-seed-btn" data-ui-schema-random-seed="true" aria-label="' +
-      escapeHtmlAttr(t('aigenImage.uiSchema.randomAria', { label: _0x1db85a })) +
+      escapeHtmlAttr(t('aigenImage.uiSchema.randomAria', { label: label3 })) +
       '">' +
-      escapeHtmlAttr(_0x29360a) +
+      escapeHtmlAttr(label4) +
       '</button>'
     );
-  const _0x402b6a = [
-    { value: 'random', label: _0x29360a },
-    { value: 'fixed', label: _0x58be28 },
+  const list37 = [
+    { value: 'random', label: label4 },
+    { value: 'fixed', label: label5 },
   ];
-  return _0x402b6a
+  return list37
     .map(
-      (_0x185a66) =>
+      (el28) =>
         '<button type="button" class="img-rp-quality-item ui-schema-random-seed-mode-btn ' +
-        (_0x50394c === _0x185a66.value ? 'active' : '') +
+        (value257 === el28.value ? 'active' : '') +
         '" data-ui-schema-random-seed-mode="' +
-        escapeHtmlAttr(_0x185a66.value) +
+        escapeHtmlAttr(el28.value) +
         '" data-ui-schema-random-seed-mode-field="' +
-        escapeHtmlAttr(_0x559dcf) +
+        escapeHtmlAttr(enabled17) +
         '" aria-label="' +
-        escapeHtmlAttr('' + _0x1db85a + _0x185a66.label) +
+        escapeHtmlAttr('' + label3 + el28.label) +
         '">' +
-        escapeHtmlAttr(_0x185a66.label) +
+        escapeHtmlAttr(el28.label) +
         '</button>',
     )
     .join('');
 }
-function syncRandomSeedField(_0x129c29, _0x2e53e1 = {}) {
-  if (!_0x129c29?.classList?.contains?.('ui-schema-random-seed-row')) return;
-  const _0x4aba02 = String(_0x129c29.dataset.uiSchemaRandomSeedModeField || '').trim();
-  if (!_0x4aba02) return;
-  const _0x1102c2 = normalizeRandomSeedMode(
-    getNodeFieldValue(_0x2e53e1, _0x4aba02, _0x129c29.dataset.uiSchemaRandomSeedModeDefault || 'fixed'),
-    _0x129c29.dataset.uiSchemaRandomSeedModeDefault || 'fixed',
+function syncRandomSeedField(el29, value258 = {}) {
+  if (!el29?.classList?.contains?.('ui-schema-random-seed-row')) return;
+  const enabled18 = String(el29.dataset.uiSchemaRandomSeedModeField || '').trim();
+  if (!enabled18) return;
+  const randomSeedMode = normalizeRandomSeedMode(
+    getNodeFieldValue(value258, enabled18, el29.dataset.uiSchemaRandomSeedModeDefault || 'fixed'),
+    el29.dataset.uiSchemaRandomSeedModeDefault || 'fixed',
   );
-  _0x129c29.querySelectorAll('[data-ui-schema-random-seed-mode]').forEach((_0x3bbeed) => {
-    _0x3bbeed.classList.toggle(
-      'active',
-      String(_0x3bbeed.dataset.uiSchemaRandomSeedMode || '') === _0x1102c2,
-    );
+  el29.querySelectorAll('[data-ui-schema-random-seed-mode]').forEach((el30) => {
+    el30.classList.toggle('active', String(el30.dataset.uiSchemaRandomSeedMode || '') === randomSeedMode);
   });
 }
-function renderRandomSeedRowField(_0x1b1d47, _0xef6a99) {
-  assertSupportedField(_0x1b1d47);
-  const _0x1ebf59 = String(_0x1b1d47?.id || '').trim(),
-    _0x822c9d = normalizeControlType(_0x1b1d47?.type),
-    _0x43f432 = getFieldValue(_0xef6a99, _0x1b1d47),
-    _0x2af153 = getRandomSeedModeFromNodeData(_0xef6a99, _0x1b1d47),
-    _0x255a06 = manifestText(_0x1b1d47?.label || _0x1ebf59),
-    _0x4679ce = manifestText(_0x1b1d47?.description || _0x1b1d47?.tooltip || '').trim(),
-    _0x255ac9 = _0x4679ce
-      ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' + escapeHtmlAttr(_0x4679ce) + '">!</span>'
+function renderRandomSeedRowField(value259, nodeData7) {
+  assertSupportedField(value259);
+  const value260 = String(value259?.id || '').trim(),
+    controlType3 = normalizeControlType(value259?.type),
+    fieldValue9 = getFieldValue(nodeData7, value259),
+    randomSeedModeFromNodeData = getRandomSeedModeFromNodeData(nodeData7, value259),
+    manifestText20 = manifestText(value259?.label || value260),
+    manifestText21 = manifestText(value259?.description || value259?.tooltip || '').trim(),
+    value261 = manifestText21
+      ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' +
+        escapeHtmlAttr(manifestText21) +
+        '">!</span>'
       : '',
-    _0x5d1919 = _0x822c9d === 'stepper' ? ' data-ui-schema-value-type="number"' : '',
-    _0x33e6cf = _0x822c9d === 'stepper' ? ' ui-schema-rh-video-stepper' : '';
+    value262 = controlType3 === 'stepper' ? ' data-ui-schema-value-type="number"' : '',
+    value263 = controlType3 === 'stepper' ? ' ui-schema-rh-video-stepper' : '';
   return (
     '<div class="ui-schema-field rh-vram-adv-row ui-schema-random-seed-row' +
-    _0x33e6cf +
+    value263 +
     '" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x1ebf59) +
+    escapeHtmlAttr(value260) +
     '" data-ui-schema-type="' +
-    escapeHtmlAttr(_0x822c9d) +
+    escapeHtmlAttr(controlType3) +
     '" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x1b1d47?.defaultValue ?? '') +
+    escapeHtmlAttr(value259?.defaultValue ?? '') +
     '"' +
-    getFieldDefaultAliasAttrs(_0x1b1d47) +
-    _0x5d1919 +
-    renderStepperAttrs(_0x1b1d47, _0x822c9d) +
-    getRandomSeedAttrs(_0x1b1d47) +
+    getFieldDefaultAliasAttrs(value259) +
+    value262 +
+    renderStepperAttrs(value259, controlType3) +
+    getRandomSeedAttrs(value259) +
     '>\n    <div class="rh-vram-adv-label">\n      <span class="rh-adv-title ui-schema-field-label">' +
-    escapeHtmlAttr(_0x255a06) +
+    escapeHtmlAttr(manifestText20) +
     '</span>\n      ' +
-    _0x255ac9 +
+    value261 +
     '\n    </div>\n    <div class="rh-adv-control-line">\n      ' +
-    renderRandomSeedModeButtons(_0x1b1d47, _0x2af153, _0x255a06) +
+    renderRandomSeedModeButtons(value259, randomSeedModeFromNodeData, manifestText20) +
     '\n      ' +
-    renderControl(_0x1b1d47, _0x43f432, _0x822c9d, { advanced: true, nodeData: _0xef6a99 }) +
+    renderControl(value259, fieldValue9, controlType3, { advanced: true, nodeData: nodeData7 }) +
     '\n    </div>\n  </div>'
   );
 }
-function normalizeRhV54SinglePreset(_0x18ce6a, _0x9df433 = 'efficiency') {
-  const _0x5e5494 = String(_0x18ce6a ?? '').trim();
-  return _0x5e5494 === 'efficiency' || _0x5e5494 === 'stable' || _0x5e5494 === 'quality'
-    ? _0x5e5494
-    : _0x9df433;
+function normalizeRhV54SinglePreset(value264, value265 = 'efficiency') {
+  const value266 = String(value264 ?? '').trim();
+  return value266 === 'efficiency' || value266 === 'stable' || value266 === 'quality' ? value266 : value265;
 }
-function normalizeRhV54SpecialMode(_0x19ced5) {
-  const _0x4fee77 = String(_0x19ced5 ?? '').trim();
-  return _0x4fee77 === 'longVideoOverlay' || _0x4fee77 === 'cameraMove' ? _0x4fee77 : '';
+function normalizeRhV54SpecialMode(value267) {
+  const value268 = String(value267 ?? '').trim();
+  return value268 === 'longVideoOverlay' || value268 === 'cameraMove' ? value268 : '';
 }
-function normalizeRhV54MaskExpand(_0x31ad75, _0x1c3ab8 = 25) {
-  const _0xfa079f = Number(_0x31ad75);
-  return Number.isFinite(_0xfa079f) ? Math.max(-0x270f, Math.min(0x270f, Math.trunc(_0xfa079f))) : _0x1c3ab8;
+function normalizeRhV54MaskExpand(value269, value270 = 25) {
+  const value271 = Number(value269);
+  return Number.isFinite(value271) ? Math.max(-0x270f, Math.min(0x270f, Math.trunc(value271))) : value270;
 }
-function getStepPrecision(_0x10faad) {
-  const _0x43ae60 = String(_0x10faad ?? ''),
-    _0x3d5010 = _0x43ae60.includes('.') ? _0x43ae60.split('.')[1] : '';
-  return Math.min(Math.max(_0x3d5010.length, 0), 8);
+function getStepPrecision(value272) {
+  const list38 = String(value272 ?? ''),
+    list39 = list38.includes('.') ? list38.split('.')[1] : '';
+  return Math.min(Math.max(list39.length, 0), 8);
 }
 function normalizeRhV54BreastJiggle(
-  _0x4433dd,
+  value273,
   { min: min = 0, max: max = 1, step: step = 0.05, fallback: fallback = 0 } = {},
 ) {
-  const _0x13c669 = Number(_0x4433dd),
-    _0x336f73 = Number(fallback),
-    _0x1394fd = Number(min),
-    _0x31ff53 = Number(max),
-    _0x3fe7f4 = Number(step),
-    _0x4dce3b = Number.isFinite(_0x1394fd) ? _0x1394fd : 0,
-    _0x4f3d35 = Number.isFinite(_0x31ff53) ? _0x31ff53 : 1,
-    _0x2381a7 = Number.isFinite(_0x336f73) ? _0x336f73 : _0x4dce3b,
-    _0x452ec1 = Math.max(
-      Math.min(_0x4dce3b, _0x4f3d35),
-      Math.min(Math.max(_0x4dce3b, _0x4f3d35), Number.isFinite(_0x13c669) ? _0x13c669 : _0x2381a7),
+  const value274 = Number(value273),
+    value275 = Number(fallback),
+    value276 = Number(min),
+    value277 = Number(max),
+    count2 = Number(step),
+    value278 = Number.isFinite(value276) ? value276 : 0,
+    value279 = Number.isFinite(value277) ? value277 : 1,
+    value280 = Number.isFinite(value275) ? value275 : value278,
+    value281 = Math.max(
+      Math.min(value278, value279),
+      Math.min(Math.max(value278, value279), Number.isFinite(value274) ? value274 : value280),
     );
-  if (!Number.isFinite(_0x3fe7f4) || _0x3fe7f4 <= 0) return _0x452ec1;
-  const _0x1b6bd6 = _0x4dce3b + Math.round((_0x452ec1 - _0x4dce3b) / _0x3fe7f4) * _0x3fe7f4;
-  return Math.max(Math.min(_0x4dce3b, _0x4f3d35), Math.min(Math.max(_0x4dce3b, _0x4f3d35), _0x1b6bd6));
+  if (!Number.isFinite(count2) || count2 <= 0) return value281;
+  const value282 = value278 + Math.round((value281 - value278) / count2) * count2;
+  return Math.max(Math.min(value278, value279), Math.min(Math.max(value278, value279), value282));
 }
-function formatRhV54BreastJiggle(_0x12f748, _0x3a8106 = {}) {
-  const _0x51e789 = normalizeRhV54BreastJiggle(_0x12f748, _0x3a8106);
-  return String(Number(_0x51e789.toFixed(getStepPrecision(_0x3a8106.step ?? 0.05))));
+function formatRhV54BreastJiggle(value283, value284 = {}) {
+  const rhV54BreastJiggle = normalizeRhV54BreastJiggle(value283, value284);
+  return String(Number(rhV54BreastJiggle.toFixed(getStepPrecision(value284.step ?? 0.05))));
 }
-function getRhV54BreastJiggleRangeFromFieldEl(_0x4e44d5) {
-  const _0x1cb564 = Number(_0x4e44d5?.dataset?.uiSchemaMin ?? 0),
-    _0x1436c5 = Number(_0x4e44d5?.dataset?.uiSchemaMax ?? 1),
-    _0x1771f5 = Number(_0x4e44d5?.dataset?.uiSchemaStep ?? 0.05),
-    _0x459c33 = Number(_0x4e44d5?.dataset?.uiSchemaDefault ?? _0x1cb564);
-  return { min: _0x1cb564, max: _0x1436c5, step: _0x1771f5, fallback: _0x459c33 };
+function getRhV54BreastJiggleRangeFromFieldEl(el31) {
+  const min4 = Number(el31?.dataset?.uiSchemaMin ?? 0),
+    max4 = Number(el31?.dataset?.uiSchemaMax ?? 1),
+    step2 = Number(el31?.dataset?.uiSchemaStep ?? 0.05),
+    fallback2 = Number(el31?.dataset?.uiSchemaDefault ?? min4);
+  return { min: min4, max: max4, step: step2, fallback: fallback2 };
 }
-function renderRhV54FieldLabel(_0x34ebd6) {
-  const _0x1225d5 = String(_0x34ebd6?.id || '').trim(),
-    _0x792b52 = manifestText(_0x34ebd6?.label || _0x1225d5),
-    _0x2d0704 = manifestText(_0x34ebd6?.description || _0x34ebd6?.tooltip || '').trim(),
-    _0x4fc041 = _0x2d0704
-      ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' + escapeHtmlAttr(_0x2d0704) + '">!</span>'
+function renderRhV54FieldLabel(value285) {
+  const value286 = String(value285?.id || '').trim(),
+    manifestText22 = manifestText(value285?.label || value286),
+    manifestText23 = manifestText(value285?.description || value285?.tooltip || '').trim(),
+    value287 = manifestText23
+      ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' +
+        escapeHtmlAttr(manifestText23) +
+        '">!</span>'
       : '';
   return (
-    '<div class="rh-vram-adv-label"><span>' + escapeHtmlAttr(_0x792b52) + '</span>' + _0x4fc041 + '</div>'
+    '<div class="rh-vram-adv-label"><span>' + escapeHtmlAttr(manifestText22) + '</span>' + value287 + '</div>'
   );
 }
 function renderRhV54SegmentButton({
-  key: _0x28d76e,
-  value: _0x16df83,
-  label: _0x271375,
-  active: _0x526b28,
+  key: key2,
+  value: value288,
+  label: label6,
+  active: active,
   disabled: disabled = false,
   attrs: attrs = '',
 }) {
-  const _0x48a253 =
-      attrs || (disabled ? ' disabled aria-disabled="true" data-ui-schema-disabled="true"' : ''),
-    _0xaefb66 = [
-      'img-rp-quality-item',
-      'rh-adv-seg-btn',
-      _0x526b28 ? 'active' : '',
-      disabled ? 'disabled' : '',
-    ]
+  const value289 = attrs || (disabled ? ' disabled aria-disabled="true" data-ui-schema-disabled="true"' : ''),
+    value290 = ['img-rp-quality-item', 'rh-adv-seg-btn', active ? 'active' : '', disabled ? 'disabled' : '']
       .filter(Boolean)
       .join(' ');
   return (
     '<button type="button" class="' +
-    _0xaefb66 +
+    value290 +
     '" data-key="' +
-    escapeHtmlAttr(_0x28d76e) +
+    escapeHtmlAttr(key2) +
     '" data-value="' +
-    escapeHtmlAttr(_0x16df83) +
+    escapeHtmlAttr(value288) +
     '" data-ui-schema-value="' +
-    escapeHtmlAttr(_0x16df83) +
+    escapeHtmlAttr(value288) +
     '"' +
-    _0x48a253 +
+    value289 +
     '>' +
-    escapeHtmlAttr(_0x271375) +
+    escapeHtmlAttr(label6) +
     '</button>'
   );
 }
-function renderAdvancedSelectionControl(_0x3721a4, _0x4fc75b, _0x216acf = {}) {
-  const _0x5d4727 = String(_0x3721a4?.id || '').trim(),
-    _0x147ccd = normalizeControlType(_0x3721a4?.type),
-    _0x54660b = [
+function renderAdvancedSelectionControl(value291, value292, nodeData8 = {}) {
+  const key3 = String(value291?.id || '').trim(),
+    controlType4 = normalizeControlType(value291?.type),
+    value293 = [
       Object.freeze({ value: true, label: t('aigenImage.uiSchema.yes') }),
       Object.freeze({ value: false, label: t('aigenImage.uiSchema.no') }),
     ],
-    _0x4edf30 =
-      _0x147ccd === 'toggle' && !Array.isArray(_0x3721a4?.options)
-        ? _0x54660b
-        : getVisibleOptions(_0x3721a4, _0x216acf),
-    _0x3d3434 = _0x4edf30.length ? _0x4edf30 : _0x54660b;
+    list40 =
+      controlType4 === 'toggle' && !Array.isArray(value291?.options)
+        ? value293
+        : getVisibleOptions(value291, nodeData8),
+    list41 = list40.length ? list40 : value293;
   return (
     '<div class="img-rp-quality-segmented rh-adv-seg">\n      ' +
-    _0x3d3434
-      .map((_0x2e847a) => {
-        const _0x229f67 = getOptionValue(_0x2e847a),
-          _0x49c348 = manifestText(_0x2e847a?.label ?? _0x229f67),
-          _0x2ca18b = String(_0x4fc75b ?? '') === _0x229f67,
-          _0x108ed6 = isOptionDisabled(_0x3721a4, _0x2e847a, _0x216acf);
+    list41
+      .map((item41) => {
+        const value294 = getOptionValue(item41),
+          label7 = manifestText(item41?.label ?? value294),
+          active2 = String(value292 ?? '') === value294,
+          disabled2 = isOptionDisabled(value291, item41, nodeData8);
         return renderRhV54SegmentButton({
-          key: _0x5d4727,
-          value: _0x229f67,
-          label: _0x49c348,
-          active: _0x2ca18b,
-          disabled: _0x108ed6,
-          attrs: getOptionDisabledAttrs(_0x3721a4, _0x2e847a, { nodeData: _0x216acf }),
+          key: key3,
+          value: value294,
+          label: label7,
+          active: active2,
+          disabled: disabled2,
+          attrs: getOptionDisabledAttrs(value291, item41, { nodeData: nodeData8 }),
         });
       })
       .join('') +
     '\n    </div>'
   );
 }
-function renderRhV54ControlModeField(_0x24f8a1, _0x44bce8) {
-  assertSupportedField(_0x24f8a1);
-  const _0x4e4817 = String(_0x24f8a1?.id || '').trim(),
-    _0x10d38c = String(getNodeFieldValue(_0x44bce8, 'rhControlMode', 'single') || 'single'),
-    _0xd99159 = normalizeRhV54SinglePreset(
-      getNodeFieldValue(_0x44bce8, 'rhSingleControlPreset', _0x24f8a1?.defaultValue),
-      String(_0x24f8a1?.defaultValue || 'efficiency'),
+function renderRhV54ControlModeField(value295, value296) {
+  assertSupportedField(value295);
+  const value297 = String(value295?.id || '').trim(),
+    value298 = String(getNodeFieldValue(value296, 'rhControlMode', 'single') || 'single'),
+    rhV54SinglePreset = normalizeRhV54SinglePreset(
+      getNodeFieldValue(value296, 'rhSingleControlPreset', value295?.defaultValue),
+      String(value295?.defaultValue || 'efficiency'),
     ),
-    _0x88a435 = _0x10d38c === 'multi' ? 'multi' : _0xd99159;
+    active3 = value298 === 'multi' ? 'multi' : rhV54SinglePreset;
   return (
     '<div class="ui-schema-field rh-vram-adv-row ui-schema-rh-v54-control-mode" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x4e4817) +
+    escapeHtmlAttr(value297) +
     '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x24f8a1?.defaultValue ?? '') +
+    escapeHtmlAttr(value295?.defaultValue ?? '') +
     '">\n    ' +
-    renderRhV54FieldLabel(_0x24f8a1) +
+    renderRhV54FieldLabel(value295) +
     '\n    <div class="rh-adv-control-line">\n      <div class="rh-adv-single-group ' +
-    (_0x10d38c !== 'multi' ? 'active' : '') +
+    (value298 !== 'multi' ? 'active' : '') +
     '">\n        <span class="rh-adv-single-title">' +
     escapeHtmlAttr(t('aigenImage.uiSchema.singleControl')) +
     '</span>\n        <span class="rh-adv-single-colon" aria-hidden="true">' +
@@ -1796,1282 +1753,1726 @@ function renderRhV54ControlModeField(_0x24f8a1, _0x44bce8) {
       key: 'rhSingleControlPreset',
       value: 'efficiency',
       label: t('aigenImage.uiSchema.efficiency'),
-      active: _0x88a435 === 'efficiency',
+      active: active3 === 'efficiency',
     }) +
     '\n          ' +
     renderRhV54SegmentButton({
       key: 'rhSingleControlPreset',
       value: 'stable',
       label: t('aigenImage.uiSchema.stable'),
-      active: _0x88a435 === 'stable',
+      active: active3 === 'stable',
     }) +
     '\n        </div>\n      </div>\n      <span class="rh-adv-control-split" aria-hidden="true"></span>\n      <div class="rh-adv-multi-group ' +
-    (_0x10d38c === 'multi' ? 'active' : '') +
+    (value298 === 'multi' ? 'active' : '') +
     '">\n        ' +
     renderRhV54SegmentButton({
       key: 'rhControlMode',
       value: 'multi',
       label: t('aigenImage.uiSchema.multiControl'),
-      active: _0x88a435 === 'multi',
+      active: active3 === 'multi',
     }) +
     '\n      </div>\n    </div>\n  </div>'
   );
 }
-function renderRhV54BooleanRowField(_0x37f363, _0x17b68e) {
-  assertSupportedField(_0x37f363);
-  const _0x3b1346 = String(_0x37f363?.id || '').trim(),
-    _0x48428 =
-      _0x37f363?.disableWhenSpecialMode === 'cameraMove' &&
-      normalizeRhV54SpecialMode(getNodeFieldValue(_0x17b68e, 'rhSpecialMode', '')) === 'cameraMove',
-    _0x281162 = _0x3b1346 === 'rhSubtractSubject' && _0x17b68e?.rhV54HasMaskVideo === true,
-    _0x265f6d = _0x281162 ? false : getNodeFieldValue(_0x17b68e, _0x3b1346, _0x37f363?.defaultValue) === true;
+function renderRhV54BooleanRowField(value299, value300) {
+  assertSupportedField(value299);
+  const key4 = String(value299?.id || '').trim(),
+    value301 =
+      value299?.disableWhenSpecialMode === 'cameraMove' &&
+      normalizeRhV54SpecialMode(getNodeFieldValue(value300, 'rhSpecialMode', '')) === 'cameraMove',
+    value302 = key4 === 'rhSubtractSubject' && value300?.rhV54HasMaskVideo === true,
+    active4 = value302 ? false : getNodeFieldValue(value300, key4, value299?.defaultValue) === true;
   return (
     '<div class="ui-schema-field rh-vram-adv-row ui-schema-rh-v54-boolean-row ' +
-    (_0x48428 || _0x281162 ? 'is-rh-disabled' : '') +
+    (value301 || value302 ? 'is-rh-disabled' : '') +
     '" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x3b1346) +
+    escapeHtmlAttr(key4) +
     '" data-ui-schema-type="segmented" data-ui-schema-value-type="boolean" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x37f363?.defaultValue ?? '') +
+    escapeHtmlAttr(value299?.defaultValue ?? '') +
     '"' +
-    (_0x37f363?.disableWhenSpecialMode
-      ? ' data-rh-v54-disable-on-special="' + escapeHtmlAttr(_0x37f363.disableWhenSpecialMode) + '"'
+    (value299?.disableWhenSpecialMode
+      ? ' data-rh-v54-disable-on-special="' + escapeHtmlAttr(value299.disableWhenSpecialMode) + '"'
       : '') +
-    (_0x281162 ? ' data-rh-v54-disable-on-mask-video="true"' : '') +
+    (value302 ? ' data-rh-v54-disable-on-mask-video="true"' : '') +
     '>\n    ' +
-    renderRhV54FieldLabel(_0x37f363) +
+    renderRhV54FieldLabel(value299) +
     '\n    <div class="img-rp-quality-segmented rh-adv-seg">\n      ' +
     renderRhV54SegmentButton({
-      key: _0x3b1346,
+      key: key4,
       value: 'true',
       label: t('aigenImage.uiSchema.yes'),
-      active: _0x265f6d,
+      active: active4,
     }) +
     '\n      ' +
     renderRhV54SegmentButton({
-      key: _0x3b1346,
+      key: key4,
       value: 'false',
       label: t('aigenImage.uiSchema.no'),
-      active: !_0x265f6d,
+      active: !active4,
     }) +
     '\n    </div>\n  </div>'
   );
 }
-function renderRhV54MaskExpandField(_0x2ee7e1, _0x7eb77a) {
-  assertSupportedField(_0x2ee7e1);
-  const _0x259a57 = String(_0x2ee7e1?.id || '').trim(),
-    _0x361660 = getNodeFieldValue(_0x7eb77a, _0x259a57, _0x2ee7e1?.defaultValue ?? 25),
-    _0x2aafef = normalizeRhV54MaskExpand(_0x361660, Number(_0x2ee7e1?.defaultValue ?? 25)),
-    _0x46ba09 = _0x2ee7e1?.ariaLabel
-      ? manifestText(_0x2ee7e1.ariaLabel)
-      : t('aigenImage.uiSchema.numericValueAria', { label: manifestText(_0x2ee7e1?.label || _0x259a57) }),
-    _0x1aa44b =
-      _0x2ee7e1?.disableWhenSpecialMode === 'cameraMove' &&
-      normalizeRhV54SpecialMode(getNodeFieldValue(_0x7eb77a, 'rhSpecialMode', '')) === 'cameraMove';
+function renderRhV54MaskExpandField(value303, value304) {
+  assertSupportedField(value303);
+  const value305 = String(value303?.id || '').trim(),
+    nodeFieldValue = getNodeFieldValue(value304, value305, value303?.defaultValue ?? 25),
+    rhV54MaskExpand = normalizeRhV54MaskExpand(nodeFieldValue, Number(value303?.defaultValue ?? 25)),
+    value306 = value303?.ariaLabel
+      ? manifestText(value303.ariaLabel)
+      : t('aigenImage.uiSchema.numericValueAria', { label: manifestText(value303?.label || value305) }),
+    value307 =
+      value303?.disableWhenSpecialMode === 'cameraMove' &&
+      normalizeRhV54SpecialMode(getNodeFieldValue(value304, 'rhSpecialMode', '')) === 'cameraMove';
   return (
     '<div class="ui-schema-field rh-vram-adv-row ui-schema-rh-v54-mask-expand ' +
-    (_0x1aa44b ? 'is-rh-disabled' : '') +
+    (value307 ? 'is-rh-disabled' : '') +
     '" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x259a57) +
+    escapeHtmlAttr(value305) +
     '" data-ui-schema-type="stepper" data-ui-schema-value-type="number" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x2ee7e1?.defaultValue ?? '') +
+    escapeHtmlAttr(value303?.defaultValue ?? '') +
     '" data-ui-schema-min="' +
-    escapeHtmlAttr(_0x2ee7e1?.min ?? -0x270f) +
+    escapeHtmlAttr(value303?.min ?? -0x270f) +
     '" data-ui-schema-max="' +
-    escapeHtmlAttr(_0x2ee7e1?.max ?? 0x270f) +
+    escapeHtmlAttr(value303?.max ?? 0x270f) +
     '" data-ui-schema-step="' +
-    escapeHtmlAttr(_0x2ee7e1?.step ?? 1) +
+    escapeHtmlAttr(value303?.step ?? 1) +
     '"' +
-    (_0x2ee7e1?.disableWhenSpecialMode
-      ? ' data-rh-v54-disable-on-special="' + escapeHtmlAttr(_0x2ee7e1.disableWhenSpecialMode) + '"'
+    (value303?.disableWhenSpecialMode
+      ? ' data-rh-v54-disable-on-special="' + escapeHtmlAttr(value303.disableWhenSpecialMode) + '"'
       : '') +
     '>\n    ' +
-    renderRhV54FieldLabel(_0x2ee7e1) +
+    renderRhV54FieldLabel(value303) +
     '\n    <div class="rh-stepper" data-key="' +
-    escapeHtmlAttr(_0x259a57) +
+    escapeHtmlAttr(value305) +
     '">\n      <div class="rh-stepper-value" role="spinbutton" aria-label="' +
-    escapeHtmlAttr(_0x46ba09) +
+    escapeHtmlAttr(value306) +
     '" aria-valuenow="' +
-    escapeHtmlAttr(_0x2aafef) +
+    escapeHtmlAttr(rhV54MaskExpand) +
     '" tabindex="0">' +
-    escapeHtmlAttr(_0x2aafef) +
+    escapeHtmlAttr(rhV54MaskExpand) +
     '</div>\n    </div>\n  </div>'
   );
 }
-function renderRhV54SpecialModeField(_0x490ae1, _0x5cc14e) {
-  assertSupportedField(_0x490ae1);
-  const _0x52a3de = String(_0x490ae1?.id || '').trim(),
-    _0x4d60a8 = normalizeRhV54SpecialMode(getNodeFieldValue(_0x5cc14e, _0x52a3de, '')),
-    _0x29c38e = getRenderableOptions(_0x490ae1).filter((_0x4c3bf9) => _0x4c3bf9?.hidden !== true);
+function renderRhV54SpecialModeField(value308, value309) {
+  assertSupportedField(value308);
+  const key5 = String(value308?.id || '').trim(),
+    active5 = normalizeRhV54SpecialMode(getNodeFieldValue(value309, key5, '')),
+    list42 = getRenderableOptions(value308).filter((el32) => el32?.hidden !== true);
   return (
     '<div class="ui-schema-field rh-vram-adv-row ui-schema-rh-v54-special-mode" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x52a3de) +
+    escapeHtmlAttr(key5) +
     '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x490ae1?.defaultValue ?? '') +
+    escapeHtmlAttr(value308?.defaultValue ?? '') +
     '">\n    ' +
-    renderRhV54FieldLabel(_0x490ae1) +
+    renderRhV54FieldLabel(value308) +
     '\n    <div class="img-rp-quality-segmented rh-adv-seg">\n      ' +
-    _0x29c38e
-      .map((_0x206725) => {
-        const _0x44f1ec = getOptionValue(_0x206725);
+    list42
+      .map((item42) => {
+        const value310 = getOptionValue(item42);
         return renderRhV54SegmentButton({
-          key: _0x52a3de,
-          value: _0x44f1ec,
-          label: manifestText(_0x206725?.label ?? _0x44f1ec),
-          active: _0x4d60a8 === _0x44f1ec,
+          key: key5,
+          value: value310,
+          label: manifestText(item42?.label ?? value310),
+          active: active5 === value310,
         });
       })
       .join('') +
     '\n    </div>\n  </div>'
   );
 }
-function renderRhV54BreastJiggleField(_0x3ee4ad, _0x3ac17e) {
-  assertSupportedField(_0x3ee4ad);
-  const _0x3f873a = String(_0x3ee4ad?.id || '').trim(),
-    _0x540f00 = Number(_0x3ee4ad?.min ?? 0),
-    _0x34f5f1 = Number(_0x3ee4ad?.max ?? 1),
-    _0x47909b = Number(_0x3ee4ad?.step ?? 0.05),
-    _0x2eb4f7 = Number(_0x3ee4ad?.defaultValue ?? _0x540f00),
-    _0x2a5421 = formatRhV54BreastJiggle(
-      getNodeFieldValue(_0x3ac17e, _0x3f873a, _0x3ee4ad?.defaultValue ?? 0),
-      { min: _0x540f00, max: _0x34f5f1, step: _0x47909b, fallback: _0x2eb4f7 },
+function renderRhV54BreastJiggleField(value311, value312) {
+  assertSupportedField(value311);
+  const value313 = String(value311?.id || '').trim(),
+    min5 = Number(value311?.min ?? 0),
+    max5 = Number(value311?.max ?? 1),
+    step3 = Number(value311?.step ?? 0.05),
+    fallback3 = Number(value311?.defaultValue ?? min5),
+    formatRhV54BreastJiggle2 = formatRhV54BreastJiggle(
+      getNodeFieldValue(value312, value313, value311?.defaultValue ?? 0),
+      { min: min5, max: max5, step: step3, fallback: fallback3 },
     );
   return (
     '<div class="ui-schema-field rh-vram-adv-row rh-breast-jiggle-row ui-schema-rh-v54-breast-jiggle" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x3f873a) +
+    escapeHtmlAttr(value313) +
     '" data-ui-schema-type="slider" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x3ee4ad?.defaultValue ?? '') +
+    escapeHtmlAttr(value311?.defaultValue ?? '') +
     '" data-ui-schema-min="' +
-    escapeHtmlAttr(_0x540f00) +
+    escapeHtmlAttr(min5) +
     '" data-ui-schema-max="' +
-    escapeHtmlAttr(_0x34f5f1) +
+    escapeHtmlAttr(max5) +
     '" data-ui-schema-step="' +
-    escapeHtmlAttr(_0x47909b) +
+    escapeHtmlAttr(step3) +
     '">\n    ' +
-    renderRhV54FieldLabel(_0x3ee4ad) +
+    renderRhV54FieldLabel(value311) +
     '\n    <div class="rh-breast-jiggle-control">\n      <input type="range" class="rh-breast-jiggle-slider" data-ui-schema-input="' +
-    escapeHtmlAttr(_0x3f873a) +
+    escapeHtmlAttr(value313) +
     '" min="' +
-    escapeHtmlAttr(_0x540f00) +
+    escapeHtmlAttr(min5) +
     '" max="' +
-    escapeHtmlAttr(_0x34f5f1) +
+    escapeHtmlAttr(max5) +
     '" step="' +
-    escapeHtmlAttr(_0x47909b) +
+    escapeHtmlAttr(step3) +
     '" value="' +
-    escapeHtmlAttr(_0x2a5421) +
+    escapeHtmlAttr(formatRhV54BreastJiggle2) +
     '" aria-label="' +
-    escapeHtmlAttr(manifestText(_0x3ee4ad?.ariaLabel || _0x3ee4ad?.label || _0x3f873a)) +
+    escapeHtmlAttr(manifestText(value311?.ariaLabel || value311?.label || value313)) +
     '">\n      <span class="rh-breast-jiggle-value">' +
-    escapeHtmlAttr(_0x2a5421) +
+    escapeHtmlAttr(formatRhV54BreastJiggle2) +
     '</span>\n    </div>\n  </div>'
   );
 }
-function renderField(_0x5e5463, _0x496d15, _0x2036fb = {}) {
-  assertSupportedField(_0x5e5463);
-  const _0x3cfac7 = String(_0x5e5463?.id || '').trim(),
-    _0x31c219 = normalizeControlType(_0x5e5463?.type),
-    _0x2844af = _0x5e5463?.variant || _0x2036fb?.variant;
-  if (_0x2844af === 'rhV54ControlMode') return renderRhV54ControlModeField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'rhV54BooleanRow') return renderRhV54BooleanRowField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'rhV54MaskExpand') return renderRhV54MaskExpandField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'rhV54SpecialMode') return renderRhV54SpecialModeField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'rhV54BreastJiggle') return renderRhV54BreastJiggleField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'advancedRow') return renderAdvancedRowField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'randomSeedRow') return renderRandomSeedRowField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'pillMenu' && _0x31c219 === 'segmented') return renderPillMenuField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'ratioPill' && _0x31c219 === 'segmented')
-    return renderAspectRatioPillField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'sectionMenu' && _0x31c219 === 'segmented')
-    return renderSectionMenuField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'resolutionPill' && _0x31c219 === 'segmented')
-    return renderPillMenuField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'resolutionPill' && _0x31c219 === 'slider')
-    return renderResolutionPillField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'durationPill' && _0x31c219 === 'slider')
-    return renderDurationPillField(_0x5e5463, _0x496d15);
-  if (_0x2844af === 'instanceToggle' && _0x31c219 === 'segmented')
-    return renderInstanceToggleField(_0x5e5463, _0x496d15);
-  const _0x1c9549 = getFieldValue(_0x496d15, _0x5e5463),
-    _0x15ba05 = manifestText(_0x5e5463?.label || _0x3cfac7),
-    _0x386cc6 = _0x5e5463?.defaultValue ?? '',
-    _0x5796ae = renderControl(_0x5e5463, _0x1c9549, _0x31c219, { nodeData: _0x496d15 }),
-    _0x2b7cef = _0x31c219 === 'stepper' ? ' ui-schema-rh-video-stepper' : '',
-    _0x3bde9c = _0x31c219 === 'stepper' ? ' data-ui-schema-value-type="number"' : '';
+function renderField(value314, nodeData9, value315 = {}) {
+  assertSupportedField(value314);
+  const value316 = String(value314?.id || '').trim(),
+    controlType5 = normalizeControlType(value314?.type),
+    value317 = value314?.variant || value315?.variant;
+  if (value317 === 'rhV54ControlMode') return renderRhV54ControlModeField(value314, nodeData9);
+  if (value317 === 'rhV54BooleanRow') return renderRhV54BooleanRowField(value314, nodeData9);
+  if (value317 === 'rhV54MaskExpand') return renderRhV54MaskExpandField(value314, nodeData9);
+  if (value317 === 'rhV54SpecialMode') return renderRhV54SpecialModeField(value314, nodeData9);
+  if (value317 === 'rhV54BreastJiggle') return renderRhV54BreastJiggleField(value314, nodeData9);
+  if (value317 === 'advancedRow') return renderAdvancedRowField(value314, nodeData9);
+  if (value317 === 'randomSeedRow') return renderRandomSeedRowField(value314, nodeData9);
+  if (value317 === 'pillMenu' && controlType5 === 'segmented')
+    return renderPillMenuField(value314, nodeData9);
+  if (value317 === 'ratioPill' && controlType5 === 'segmented')
+    return renderAspectRatioPillField(value314, nodeData9);
+  if (value317 === 'sectionMenu' && controlType5 === 'segmented')
+    return renderSectionMenuField(value314, nodeData9);
+  if (value317 === 'resolutionPill' && controlType5 === 'segmented')
+    return renderPillMenuField(value314, nodeData9);
+  if (value317 === 'resolutionPill' && controlType5 === 'slider')
+    return renderResolutionPillField(value314, nodeData9);
+  if (value317 === 'durationPill' && controlType5 === 'slider')
+    return renderDurationPillField(value314, nodeData9);
+  if (value317 === 'instanceToggle' && controlType5 === 'segmented')
+    return renderInstanceToggleField(value314, nodeData9);
+  const fieldValue10 = getFieldValue(nodeData9, value314),
+    manifestText24 = manifestText(value314?.label || value316),
+    value318 = value314?.defaultValue ?? '',
+    renderControl2 = renderControl(value314, fieldValue10, controlType5, { nodeData: nodeData9 }),
+    value319 = controlType5 === 'stepper' ? ' ui-schema-rh-video-stepper' : '',
+    value320 = controlType5 === 'stepper' ? ' data-ui-schema-value-type="number"' : '';
   return (
     '<div class="ui-schema-field' +
-    _0x2b7cef +
+    value319 +
     '" data-ui-schema-field="' +
-    escapeHtmlAttr(_0x3cfac7) +
+    escapeHtmlAttr(value316) +
     '" data-ui-schema-type="' +
-    escapeHtmlAttr(_0x31c219) +
+    escapeHtmlAttr(controlType5) +
     '" data-ui-schema-default="' +
-    escapeHtmlAttr(_0x386cc6) +
+    escapeHtmlAttr(value318) +
     '"' +
-    _0x3bde9c +
-    renderStepperAttrs(_0x5e5463, _0x31c219) +
+    value320 +
+    renderStepperAttrs(value314, controlType5) +
     '>\n    <div class="rh-adv-title ui-schema-field-label">' +
-    escapeHtmlAttr(_0x15ba05) +
+    escapeHtmlAttr(manifestText24) +
     '</div>\n    <div class="ui-schema-field-control">' +
-    _0x5796ae +
+    renderControl2 +
     '</div>\n  </div>'
   );
 }
-function renderResolutionPlacementFields(_0x1f19e5, _0x298b3f, _0x294405 = {}) {
-  const _0xcd0a7a =
-    getFieldById(_0x1f19e5, 'rhVideoResolution') || getFieldById(_0x1f19e5, 'videoResolution');
-  if (_0xcd0a7a) {
-    const _0x1f0f6f = new Set(['rhVideoResolution', 'videoResolution', 'rhVideoFps', 'rhVideoFrames']),
-      _0x5b1e70 = _0x1f19e5.filter((_0x220b17) => !_0x1f0f6f.has(String(_0x220b17?.id || '').trim()));
+function renderResolutionPlacementFields(list43, value321, value322 = {}) {
+  const fieldById11 = getFieldById(list43, 'rhVideoResolution') || getFieldById(list43, 'videoResolution');
+  if (fieldById11) {
+    const map3 = new Set(['rhVideoResolution', 'videoResolution', 'rhVideoFps', 'rhVideoFrames']),
+      list44 = list43.filter((item43) => !map3.has(String(item43?.id || '').trim()));
     return [
-      renderVideoResolutionField(_0x1f19e5, _0x298b3f),
-      ..._0x5b1e70.map((_0x421745) => renderField(_0x421745, _0x298b3f, _0x294405)),
+      renderVideoResolutionField(list43, value321),
+      ...list44.map((item44) => renderField(item44, value321, value322)),
     ].join('');
   }
-  const _0x2d3342 = new Set(['imageSize', 'resolution', 'videoSize', 'quality']),
-    _0x46d4d0 = _0x1f19e5.filter((_0x4908a7) => {
-      const _0x50a128 = String(_0x4908a7?.id || '').trim(),
-        _0x5db6c3 = String(_0x4908a7?.displayRole || '').trim();
-      return _0x5db6c3 === 'resolution' || _0x2d3342.has(_0x50a128);
+  const map4 = new Set(['imageSize', 'resolution', 'videoSize', 'quality']),
+    list45 = list43.filter((item45) => {
+      const value323 = String(item45?.id || '').trim(),
+        value324 = String(item45?.displayRole || '').trim();
+      return value324 === 'resolution' || map4.has(value323);
     }),
-    _0x2706aa = _0x46d4d0[0] || null,
-    _0x442307 = getFieldById(_0x1f19e5, 'aspectRatio') || getFieldByDisplayRole(_0x1f19e5, 'aspectRatio');
-  if (_0x2706aa && _0x442307) {
-    const _0x521ae0 = _0x1f19e5.filter((_0x1855fc) => {
-      const _0x1686ab = String(_0x1855fc?.id || '').trim();
+    value325 = list45[0] || null,
+    fieldById12 = getFieldById(list43, 'aspectRatio') || getFieldByDisplayRole(list43, 'aspectRatio');
+  if (value325 && fieldById12) {
+    const list46 = list43.filter((item46) => {
+      const value326 = String(item46?.id || '').trim();
       return (
-        !_0x46d4d0.some((_0x397cf2) => String(_0x397cf2?.id || '').trim() === _0x1686ab) &&
-        _0x1686ab !== 'aspectRatio'
+        !list45.some((item47) => String(item47?.id || '').trim() === value326) && value326 !== 'aspectRatio'
       );
     });
     return [
-      renderQualityRatioField(_0x46d4d0, _0x442307, _0x298b3f),
-      ..._0x521ae0.map((_0x3c1e3b) => renderField(_0x3c1e3b, _0x298b3f, _0x294405)),
+      renderQualityRatioField(list45, fieldById12, value321),
+      ...list46.map((item48) => renderField(item48, value321, value322)),
     ].join('');
   }
-  return _0x1f19e5.map((_0x502287) => renderField(_0x502287, _0x298b3f, _0x294405)).join('');
+  return list43.map((item49) => renderField(item49, value321, value322)).join('');
 }
-function renderModePlacementFields(_0xf3964f, _0x181309, _0x351ea5 = {}) {
-  const _0x403299 = _0xf3964f.filter(
-    (_0x3ef6da) => String(_0x3ef6da?.variant || '').trim() === 'sectionMenu',
-  );
-  if (_0x403299.length >= 2) {
-    const _0x32e50a = new Set(_0x403299.map((_0x39741c) => String(_0x39741c?.id || '').trim())),
-      _0x1b35a2 = _0xf3964f.filter((_0x357d83) => !_0x32e50a.has(String(_0x357d83?.id || '').trim()));
+function renderModePlacementFields(list47, value327, value328 = {}) {
+  const list48 = list47.filter((item50) => String(item50?.variant || '').trim() === 'sectionMenu');
+  if (list48.length >= 2) {
+    const map5 = new Set(list48.map((item51) => String(item51?.id || '').trim())),
+      list49 = list47.filter((item52) => !map5.has(String(item52?.id || '').trim()));
     return [
-      renderSectionPairField(_0x403299, _0x181309),
-      ..._0x1b35a2.map((_0x285353) => renderField(_0x285353, _0x181309, _0x351ea5)),
+      renderSectionPairField(list48, value327),
+      ...list49.map((item53) => renderField(item53, value327, value328)),
     ].join('');
   }
-  return _0xf3964f.map((_0xf7bacf) => renderField(_0xf7bacf, _0x181309, _0x351ea5)).join('');
+  return list47.map((item54) => renderField(item54, value327, value328)).join('');
 }
-export function hasModelUiSchema(_0x51abeb, _0xf67792 = {}) {
-  const _0x53d9eb = getUiSchemaFields(_0x51abeb, _0xf67792);
-  return (_0x53d9eb.forEach(assertSupportedField), _0x53d9eb.length > 0);
+export function hasModelUiSchema(value329, value330 = {}) {
+  const list50 = getUiSchemaFields(value329, value330);
+  return (list50.forEach(assertSupportedField), list50.length > 0);
 }
-function renderUiSchemaControls(_0x4fa4b0, _0x24dff4 = {}, _0x4aa7c1 = {}) {
-  const _0x1618bc = filterVisibleUiSchemaFields(filterUiSchemaFields(_0x4fa4b0, _0x4aa7c1), _0x24dff4);
-  if (!_0x1618bc.length) return '';
-  const _0x310de5 = normalizePlacement(_0x4aa7c1?.placement),
-    _0x12adf2 =
-      _0x310de5 === 'resolution'
-        ? renderResolutionPlacementFields(_0x1618bc, _0x24dff4, _0x4aa7c1)
-        : _0x310de5 === 'mode'
-          ? renderModePlacementFields(_0x1618bc, _0x24dff4, _0x4aa7c1)
-          : _0x310de5 === 'videoparams'
-            ? renderRhVideoParamsPlacementFields(_0x1618bc, _0x24dff4, _0x4aa7c1)
-            : _0x1618bc.map((_0x3b5aea) => renderField(_0x3b5aea, _0x24dff4, _0x4aa7c1)).join('');
-  if (!_0x12adf2) return '';
-  if (_0x4aa7c1?.unwrap === true) return _0x12adf2;
-  const _0x970a92 = _0x310de5 ? ' data-ui-schema-placement="' + escapeHtmlAttr(_0x310de5) + '"' : '',
-    _0x5c6ff8 = _0x4aa7c1?.modelId ? ' data-ui-schema-model="' + escapeHtmlAttr(_0x4aa7c1.modelId) + '"' : '',
-    _0xca5dec = _0x4aa7c1?.sourceId
-      ? ' data-ui-schema-source="' + escapeHtmlAttr(_0x4aa7c1.sourceId) + '"'
-      : '';
-  return '<div class="ui-schema-renderer"' + _0x5c6ff8 + _0xca5dec + _0x970a92 + '>' + _0x12adf2 + '</div>';
+function renderUiSchemaControls(value331, value332 = {}, value333 = {}) {
+  const list51 = filterVisibleUiSchemaFields(filterUiSchemaFields(value331, value333), value332);
+  if (!list51.length) return '';
+  const placement4 = normalizePlacement(value333?.placement),
+    enabled19 =
+      placement4 === 'resolution'
+        ? renderResolutionPlacementFields(list51, value332, value333)
+        : placement4 === 'mode'
+          ? renderModePlacementFields(list51, value332, value333)
+          : placement4 === 'videoparams'
+            ? renderRhVideoParamsPlacementFields(list51, value332, value333)
+            : list51.map((item55) => renderField(item55, value332, value333)).join('');
+  if (!enabled19) return '';
+  if (value333?.unwrap === true) return enabled19;
+  const value334 = placement4 ? ' data-ui-schema-placement="' + escapeHtmlAttr(placement4) + '"' : '',
+    value335 = value333?.modelId ? ' data-ui-schema-model="' + escapeHtmlAttr(value333.modelId) + '"' : '',
+    value336 = value333?.sourceId ? ' data-ui-schema-source="' + escapeHtmlAttr(value333.sourceId) + '"' : '';
+  return '<div class="ui-schema-renderer"' + value335 + value336 + value334 + '>' + enabled19 + '</div>';
 }
-export function renderModelUiSchemaControls(_0x4a1940, _0x469379 = {}, _0x158659 = {}) {
-  const _0x2da752 = getUiSchemaFields(_0x4a1940, _0x158659);
-  return renderUiSchemaControls(_0x2da752, _0x469379, { ..._0x158659, modelId: _0x4a1940 });
+export function renderModelUiSchemaControls(modelId, value337 = {}, args8 = {}) {
+  const uiSchemaFields = getUiSchemaFields(modelId, args8);
+  return renderUiSchemaControls(uiSchemaFields, value337, { ...args8, modelId: modelId });
 }
-export function renderUiSchemaFields(_0x57c742, _0x2d86e9 = {}, _0x39b41e = {}) {
-  return renderUiSchemaControls(_0x57c742, _0x2d86e9, { ..._0x39b41e, ignorePlacementFilter: true });
+export function renderUiSchemaFields(value338, value339 = {}, args9 = {}) {
+  return renderUiSchemaControls(value338, value339, { ...args9, ignorePlacementFilter: true });
 }
-export function buildUiSchemaParamPatch(_0xe99fc7 = {}, _0x179641 = '', _0x20d67c = '') {
-  const _0x5938c2 = String(_0x179641 || '').trim();
-  if (!_0x5938c2) return {};
-  const _0x339b48 = getUiSchemaModelIdForNode(_0xe99fc7),
-    _0x24cdf = getModelManifest(_0x339b48),
-    _0x13de20 = Array.isArray(_0x24cdf?.uiSchema?.fields)
-      ? _0x24cdf.uiSchema.fields.find((_0x31d795) => String(_0x31d795?.id || '').trim() === _0x5938c2)
+export function buildUiSchemaParamPatch(options3 = {}, value340 = '', value341 = '') {
+  const enabled20 = String(value340 || '').trim();
+  if (!enabled20) return {};
+  const uiSchemaModelIdForNode = getUiSchemaModelIdForNode(options3),
+    modelManifest2 = getModelManifest(uiSchemaModelIdForNode),
+    value342 = Array.isArray(modelManifest2?.uiSchema?.fields)
+      ? modelManifest2.uiSchema.fields.find((item56) => String(item56?.id || '').trim() === enabled20)
       : null,
-    _0x39c2e5 = _0x13de20 ? normalizeUiSchemaFieldValue(_0x13de20, _0x20d67c) : _0x20d67c,
-    _0x5689fc = getPlainGenerationParams(_0xe99fc7.generationParams);
-  _0x5689fc[_0x5938c2] = _0x39c2e5;
-  const _0x53d62e = sanitizeModelUiSchemaParams(_0x339b48 || _0xe99fc7?.model, _0x5689fc, {
-      includeDefaults: false,
-    }),
-    _0x1248bf = { generationParams: _0x53d62e },
-    _0x58042f = getGenerationParamsMemoryKey(_0xe99fc7);
+    value343 = value342 ? normalizeUiSchemaFieldValue(value342, value341) : value341,
+    plainGenerationParams = getPlainGenerationParams(options3.generationParams);
+  plainGenerationParams[enabled20] = value343;
+  const generationParams = sanitizeModelUiSchemaParams(
+      uiSchemaModelIdForNode || options3?.model,
+      plainGenerationParams,
+      {
+        includeDefaults: false,
+      },
+    ),
+    value344 = { generationParams: generationParams },
+    generationParamsMemoryKey = getGenerationParamsMemoryKey(options3);
   return (
-    _0x58042f &&
-      (_0x1248bf.generationParamsByModel = {
-        ...getPlainGenerationParams(_0xe99fc7.generationParamsByModel),
-        [_0x58042f]: _0x53d62e,
+    generationParamsMemoryKey &&
+      (value344.generationParamsByModel = {
+        ...getPlainGenerationParams(options3.generationParamsByModel),
+        [generationParamsMemoryKey]: generationParams,
       }),
-    _0x1248bf
+    value344
   );
 }
-export function buildModelUiSchemaDefaultParams(_0x582a59) {
-  const _0x3ecd08 = getUiSchemaFields(_0x582a59);
-  return (_0x3ecd08.forEach(assertSupportedField), sanitizeModelUiSchemaParams(_0x582a59));
+export function buildModelUiSchemaDefaultParams(value345) {
+  const list52 = getUiSchemaFields(value345);
+  return (list52.forEach(assertSupportedField), sanitizeModelUiSchemaParams(value345));
 }
-function bindUiSchemaControls(_0x350eee, { getNodeData: _0x172699, commitFieldValue: _0x38a81e } = {}) {
-  if (!_0x350eee || typeof _0x38a81e !== 'function') return () => {};
-  const _0x28636b = (_0x24bde1, _0x1c37d0) => {
-    const _0x1187d3 = typeof _0x172699 === 'function' ? _0x172699() || {} : {},
-      _0x288e7c = _0x38a81e(_0x24bde1, _0x1c37d0, _0x1187d3),
-      _0x46a13e =
-        _0x288e7c && typeof _0x288e7c === 'object'
-          ? _0x288e7c
-          : typeof _0x172699 === 'function'
-            ? _0x172699() || _0x1187d3
-            : _0x1187d3;
-    syncModelUiSchemaControls(_0x350eee, { ..._0x1187d3, ..._0x46a13e });
+function bindUiSchemaControls(el33, { getNodeData: getNodeData, commitFieldValue: commitFieldValue } = {}) {
+  if (!el33 || typeof commitFieldValue !== 'function') return () => {};
+  const run3 = (value346, value347) => {
+    const args10 = typeof getNodeData === 'function' ? getNodeData() || {} : {},
+      value348 = commitFieldValue(value346, value347, args10),
+      args11 =
+        value348 && typeof value348 === 'object'
+          ? value348
+          : typeof getNodeData === 'function'
+            ? getNodeData() || args10
+            : args10;
+    syncModelUiSchemaControls(el33, { ...args10, ...args11 });
   };
-  let _0x6ae39e = null,
-    _0x57a345 = false,
-    _0x37d6f7 = null,
-    _0x2a6046 = false;
-  const _0x5cfcef = new Map(),
-    _0x3e37b4 = (_0x400f57) => {
-      const _0x59400d = _0x5cfcef.get(_0x400f57);
-      if (_0x59400d?.timer) clearTimeout(_0x59400d.timer);
-      _0x5cfcef.delete(_0x400f57);
+  let box = null,
+    value349 = false,
+    box2 = null,
+    value350 = false;
+  const map6 = new Map(),
+    handler4 = (value351) => {
+      const value352 = map6.get(value351);
+      if (value352?.timer) clearTimeout(value352.timer);
+      map6.delete(value351);
     },
-    _0x37cf3e = () => {
-      Array.from(_0x5cfcef.entries()).forEach(([_0x176e6f, _0x4a0c5a]) => {
-        if (_0x4a0c5a?.timer) clearTimeout(_0x4a0c5a.timer);
-        (_0x5cfcef.delete(_0x176e6f), _0x28636b(_0x176e6f, _0x4a0c5a?.value ?? ''));
+    handler5 = () => {
+      Array.from(map6.entries()).forEach(([value353, el34]) => {
+        if (el34?.timer) clearTimeout(el34.timer);
+        (map6.delete(value353), run3(value353, el34?.value ?? ''));
       });
     },
-    _0x1d5aca = (_0x33faff, _0x4d7fd5) => {
-      _0x3e37b4(_0x33faff);
-      const _0x599571 = setTimeout(() => {
-        (_0x5cfcef.delete(_0x33faff), _0x28636b(_0x33faff, _0x4d7fd5));
+    handler6 = (value354, value355) => {
+      handler4(value354);
+      const timer = setTimeout(() => {
+        (map6.delete(value354), run3(value354, value355));
       }, 180);
-      _0x5cfcef.set(_0x33faff, { timer: _0x599571, value: _0x4d7fd5 });
+      map6.set(value354, { timer: timer, value: value355 });
     },
-    _0x367496 = (_0x1c87e6) => {
-      const _0xe00967 = String(_0x1c87e6?.closest?.('[data-ui-schema-field]')?.dataset?.uiSchemaType || '')
+    handler7 = (el35) => {
+      const value356 = String(el35?.closest?.('[data-ui-schema-field]')?.dataset?.uiSchemaType || '')
           .trim()
           .toLowerCase(),
-        _0x277895 = String(_0x1c87e6?.tagName || '')
+        value357 = String(el35?.tagName || '')
           .trim()
           .toLowerCase(),
-        _0x30be96 = String(_0x1c87e6?.type || '')
+        value358 = String(el35?.type || '')
           .trim()
           .toLowerCase();
-      return (
-        _0xe00967 === 'text' || _0xe00967 === 'textarea' || _0x277895 === 'textarea' || _0x30be96 === 'text'
-      );
+      return value356 === 'text' || value356 === 'textarea' || value357 === 'textarea' || value358 === 'text';
     },
-    _0x2cc82c = (_0x22bafa) => {
-      if (!_0x22bafa?.addEventListener) return false;
-      let _0x1136e2 = null;
-      const _0x19b9df = () => {
-          (_0x22bafa.removeEventListener('click', _0x327a6a, true),
-            _0x1136e2 && (clearTimeout(_0x1136e2), (_0x1136e2 = null)));
+    handler8 = (el36) => {
+      if (!el36?.addEventListener) return false;
+      let setTimeout2 = null;
+      const run4 = () => {
+          (el36.removeEventListener('click', value359, true),
+            setTimeout2 && (clearTimeout(setTimeout2), (setTimeout2 = null)));
         },
-        _0x327a6a = (_0x489213) => {
-          (_0x489213.preventDefault?.(),
-            _0x489213.stopPropagation?.(),
-            _0x489213.stopImmediatePropagation?.(),
-            _0x19b9df());
+        value359 = (event) => {
+          (event.preventDefault?.(), event.stopPropagation?.(), event.stopImmediatePropagation?.(), run4());
         };
-      return (
-        _0x22bafa.addEventListener('click', _0x327a6a, true),
-        (_0x1136e2 = setTimeout(_0x19b9df, 0x15e)),
-        true
-      );
+      return (el36.addEventListener('click', value359, true), (setTimeout2 = setTimeout(run4, 0x15e)), true);
     },
-    _0x2f7e5e = (_0xc9cd5b, _0x5c83b4) => {
-      const _0x145678 = Number(_0xc9cd5b);
-      return Number.isFinite(_0x145678) ? _0x145678 : _0x5c83b4;
+    handler9 = (value360, value361) => {
+      const value362 = Number(value360);
+      return Number.isFinite(value362) ? value362 : value361;
     },
-    _0x5c20e8 = () => {
-      const _0xa2b6d1 = globalThis.crypto || globalThis.window?.crypto;
-      if (_0xa2b6d1?.getRandomValues) {
-        const _0x1cbbba = new Uint32Array(1);
-        return (_0xa2b6d1.getRandomValues(_0x1cbbba), _0x1cbbba[0] / 0x100000000);
+    handler10 = () => {
+      const value363 = globalThis.crypto || globalThis.window?.crypto;
+      if (value363?.getRandomValues) {
+        const uint32Array = new Uint32Array(1);
+        return (value363.getRandomValues(uint32Array), uint32Array[0] / 0x100000000);
       }
       return Math.random();
     },
-    _0x25f391 = (_0x576652) => {
-      const _0x5f1c55 = Math.trunc(
-          _0x2f7e5e(_0x576652?.dataset?.uiSchemaRandomSeedMin, RANDOM_SEED_DEFAULT_MIN),
-        ),
-        _0x451024 = Math.trunc(_0x2f7e5e(_0x576652?.dataset?.uiSchemaRandomSeedMax, RANDOM_SEED_DEFAULT_MAX)),
-        _0x1bb757 = Math.min(_0x5f1c55, _0x451024),
-        _0x213483 = Math.max(_0x5f1c55, _0x451024);
-      return String(_0x1bb757 + Math.floor(_0x5c20e8() * (_0x213483 - _0x1bb757 + 1)));
+    handler11 = (el37) => {
+      const value364 = Math.trunc(handler9(el37?.dataset?.uiSchemaRandomSeedMin, RANDOM_SEED_DEFAULT_MIN)),
+        value365 = Math.trunc(handler9(el37?.dataset?.uiSchemaRandomSeedMax, RANDOM_SEED_DEFAULT_MAX)),
+        value366 = Math.min(value364, value365),
+        value367 = Math.max(value364, value365);
+      return String(value366 + Math.floor(handler10() * (value367 - value366 + 1)));
     },
-    _0x37b30e = (_0x1bbf71, _0x24b89f) => {
-      const _0x1a189e = _0x2f7e5e(_0x1bbf71?.dataset?.uiSchemaDefault, 0),
-        _0x343342 = _0x2f7e5e(_0x1bbf71?.dataset?.uiSchemaMin, -Infinity),
-        _0x3bb9dd = _0x2f7e5e(_0x1bbf71?.dataset?.uiSchemaMax, Infinity),
-        _0x5edc16 = evaluateUiSchemaNumberExpression(_0x24b89f),
-        _0x2c63af = Number.isFinite(_0x5edc16) ? Math.trunc(_0x5edc16) : _0x1a189e;
-      return Math.max(_0x343342, Math.min(_0x3bb9dd, _0x2c63af));
+    handler12 = (el38, value368) => {
+      const value369 = handler9(el38?.dataset?.uiSchemaDefault, 0),
+        value370 = handler9(el38?.dataset?.uiSchemaMin, -Infinity),
+        value371 = handler9(el38?.dataset?.uiSchemaMax, Infinity),
+        evaluateUiSchemaNumberExpression2 = evaluateUiSchemaNumberExpression(value368),
+        value372 = Number.isFinite(evaluateUiSchemaNumberExpression2)
+          ? Math.trunc(evaluateUiSchemaNumberExpression2)
+          : value369;
+      return Math.max(value370, Math.min(value371, value372));
     },
-    _0x5d4a21 = (_0x34a1ab, _0x5b1cf9) => {
-      const _0x478606 = String(_0x34a1ab?.dataset?.uiSchemaField || '').trim();
-      return _0x478606 === 'rhVideoFrames' && Number(_0x5b1cf9) === 0
+    handler13 = (el39, value373) => {
+      const value374 = String(el39?.dataset?.uiSchemaField || '').trim();
+      return value374 === 'rhVideoFrames' && Number(value373) === 0
         ? t('aigenImage.uiSchema.fullLength')
-        : String(_0x5b1cf9);
+        : String(value373);
     },
-    _0xd3a3d7 = (_0x56bae3, _0x4f8cff) => {
-      const _0x240997 = _0x37b30e(_0x56bae3, _0x4f8cff),
-        _0x5a3bb3 = _0x56bae3?.querySelector?.('.rh-stepper-value');
+    handler14 = (el40, value375) => {
+      const value376 = handler12(el40, value375),
+        el41 = el40?.querySelector?.('.rh-stepper-value');
       return (
-        _0x5a3bb3 &&
-          ((_0x5a3bb3.textContent = _0x5d4a21(_0x56bae3, _0x240997)),
-          _0x5a3bb3.setAttribute('aria-valuenow', String(_0x240997))),
-        _0x240997
+        el41 &&
+          ((el41.textContent = handler13(el40, value376)),
+          el41.setAttribute('aria-valuenow', String(value376))),
+        value376
       );
     },
-    _0x4b5071 = (_0x468451) => {
-      const _0x1228a5 = String(_0x468451?.dataset?.uiSchemaField || '').trim(),
-        _0x176d45 = typeof _0x172699 === 'function' ? _0x172699() || {} : {};
-      return _0x37b30e(
-        _0x468451,
-        getNodeFieldValue(_0x176d45, _0x1228a5, _0x468451?.dataset?.uiSchemaDefault ?? 0),
-      );
+    handler15 = (el42) => {
+      const value377 = String(el42?.dataset?.uiSchemaField || '').trim(),
+        value378 = typeof getNodeData === 'function' ? getNodeData() || {} : {};
+      return handler12(el42, getNodeFieldValue(value378, value377, el42?.dataset?.uiSchemaDefault ?? 0));
     },
-    _0xf30d0a = (_0x5d39bb) => {
-      const _0xb799dc = _0x5d39bb?.closest?.('.ui-schema-rh-video-stepper'),
-        _0x1a3c4b = String(_0xb799dc?.dataset?.uiSchemaField || '').trim();
-      if (!_0xb799dc || !_0x1a3c4b) return;
-      const _0x27d1e5 = _0x4b5071(_0xb799dc),
-        _0x3317da = _0x350eee.ownerDocument?.createElement?.('input');
-      if (!_0x3317da) return;
-      ((_0x3317da.className = 'rh-stepper-input'),
-        (_0x3317da.type = 'text'),
-        (_0x3317da.autocomplete = 'off'),
-        (_0x3317da.step = String(_0xb799dc.dataset.uiSchemaStep || '1')),
-        (_0x3317da.min = String(_0xb799dc.dataset.uiSchemaMin || '0')),
-        (_0x3317da.max = String(_0xb799dc.dataset.uiSchemaMax || '')),
-        (_0x3317da.value = String(_0x27d1e5)));
-      let _0x4f9b36 = false;
-      const _0x637d28 = (_0x359d0d) => {
-        if (_0x4f9b36) return;
-        _0x4f9b36 = true;
-        const _0x39282b = _0x359d0d ? _0x37b30e(_0xb799dc, _0x3317da.value) : _0x27d1e5,
-          _0x11596e = _0x350eee.ownerDocument.createElement('div');
-        ((_0x11596e.className = 'rh-stepper-value'),
-          _0x11596e.setAttribute('role', 'spinbutton'),
-          _0x11596e.setAttribute('tabindex', '0'),
-          _0x11596e.setAttribute(
+    handler16 = (el43) => {
+      const el44 = el43?.closest?.('.ui-schema-rh-video-stepper'),
+        enabled21 = String(el44?.dataset?.uiSchemaField || '').trim();
+      if (!el44 || !enabled21) return;
+      const value379 = handler15(el44),
+        el45 = el33.ownerDocument?.createElement?.('input');
+      if (!el45) return;
+      ((el45.className = 'rh-stepper-input'),
+        (el45.type = 'text'),
+        (el45.autocomplete = 'off'),
+        (el45.step = String(el44.dataset.uiSchemaStep || '1')),
+        (el45.min = String(el44.dataset.uiSchemaMin || '0')),
+        (el45.max = String(el44.dataset.uiSchemaMax || '')),
+        (el45.value = String(value379)));
+      let value380 = false;
+      const run5 = (value381) => {
+        if (value380) return;
+        value380 = true;
+        const value382 = value381 ? handler12(el44, el45.value) : value379,
+          el46 = el33.ownerDocument.createElement('div');
+        ((el46.className = 'rh-stepper-value'),
+          el46.setAttribute('role', 'spinbutton'),
+          el46.setAttribute('tabindex', '0'),
+          el46.setAttribute(
             'aria-label',
-            _0x5d39bb.getAttribute('aria-label') ||
-              _0xb799dc.querySelector('.rh-vram-adv-label span')?.textContent ||
-              _0x1a3c4b,
+            el43.getAttribute('aria-label') ||
+              el44.querySelector('.rh-vram-adv-label span')?.textContent ||
+              enabled21,
           ),
-          (_0x11596e.textContent = _0x5d4a21(_0xb799dc, _0x39282b)),
-          _0x11596e.setAttribute('aria-valuenow', String(_0x39282b)),
-          _0x3317da.replaceWith(_0x11596e));
-        if (_0x359d0d) _0x28636b(_0x1a3c4b, _0x39282b);
+          (el46.textContent = handler13(el44, value382)),
+          el46.setAttribute('aria-valuenow', String(value382)),
+          el45.replaceWith(el46));
+        if (value381) run3(enabled21, value382);
       };
-      (_0x3317da.addEventListener('click', (_0x37d122) => _0x37d122.stopPropagation()),
-        _0x3317da.addEventListener('mousedown', (_0x3f09d4) => _0x3f09d4.stopPropagation()),
-        _0x3317da.addEventListener('keydown', (_0x2f0563) => {
-          if (_0x2f0563.key === 'Enter') _0x637d28(true);
-          if (_0x2f0563.key === 'Escape') _0x637d28(false);
+      (el45.addEventListener('click', (event2) => event2.stopPropagation()),
+        el45.addEventListener('mousedown', (event3) => event3.stopPropagation()),
+        el45.addEventListener('keydown', (event4) => {
+          if (event4.key === 'Enter') run5(true);
+          if (event4.key === 'Escape') run5(false);
         }),
-        _0x3317da.addEventListener('blur', () => _0x637d28(true)),
-        _0x5d39bb.replaceWith(_0x3317da),
-        _0x3317da.focus(),
-        _0x3317da.select());
+        el45.addEventListener('blur', () => run5(true)),
+        el43.replaceWith(el45),
+        el45.focus(),
+        el45.select());
     },
-    _0x16fc0b = () => {
-      if (!_0x37d6f7) return;
-      (_0x37d6f7.el?.classList?.remove('is-dragging'),
-        _0x37d6f7.doc?.removeEventListener?.('mousemove', _0x3300e0),
-        _0x37d6f7.doc?.removeEventListener?.('mouseup', _0x414379),
-        (_0x37d6f7 = null));
+    handler17 = () => {
+      if (!box2) return;
+      (box2.el?.classList?.remove('is-dragging'),
+        box2.doc?.removeEventListener?.('mousemove', value383),
+        box2.doc?.removeEventListener?.('mouseup', value384),
+        (box2 = null));
     },
-    _0x3300e0 = (_0x3253be) => {
-      if (!_0x37d6f7) return;
-      const _0x543e07 = _0x3253be.clientX - _0x37d6f7.x;
-      if (Math.abs(_0x543e07) >= 2) _0x37d6f7.dragged = true;
-      const _0x355358 = Math.trunc(_0x543e07 / 6),
-        _0x28b0fb = _0x37b30e(_0x37d6f7.fieldEl, _0x37d6f7.base + _0x355358);
-      _0x28b0fb !== _0x37d6f7.last &&
-        ((_0x37d6f7.moved = true), (_0x37d6f7.last = _0x28b0fb), _0xd3a3d7(_0x37d6f7.fieldEl, _0x28b0fb));
+    value383 = (event5) => {
+      if (!box2) return;
+      const value385 = event5.clientX - box2.x;
+      if (Math.abs(value385) >= 2) box2.dragged = true;
+      const value386 = Math.trunc(value385 / 6),
+        value387 = handler12(box2.fieldEl, box2.base + value386);
+      value387 !== box2.last &&
+        ((box2.moved = true), (box2.last = value387), handler14(box2.fieldEl, value387));
     },
-    _0x414379 = () => {
-      if (!_0x37d6f7) return;
-      const _0x382a2f = _0x37d6f7;
-      (_0x16fc0b(),
-        (_0x382a2f.dragged || _0x382a2f.moved) && (_0x2a6046 = !_0x2cc82c(_0x382a2f.doc)),
-        _0x382a2f.moved && _0x28636b(_0x382a2f.fieldId, _0x382a2f.last));
+    value384 = () => {
+      if (!box2) return;
+      const value388 = box2;
+      (handler17(),
+        (value388.dragged || value388.moved) && (value350 = !handler8(value388.doc)),
+        value388.moved && run3(value388.fieldId, value388.last));
     },
-    _0x694a0 = (_0x4017b4, _0x4c6c06) => {
-      const _0x5dfc13 = _0x2f7e5e(_0x4017b4?.dataset?.uiSchemaDefault, 25),
-        _0x161b17 = _0x2f7e5e(_0x4017b4?.dataset?.uiSchemaMin, -0x270f),
-        _0x5542b8 = _0x2f7e5e(_0x4017b4?.dataset?.uiSchemaMax, 0x270f),
-        _0xb16bd0 = normalizeRhV54MaskExpand(_0x4c6c06, _0x5dfc13);
-      return Math.max(_0x161b17, Math.min(_0x5542b8, _0xb16bd0));
+    handler18 = (el47, value389) => {
+      const value390 = handler9(el47?.dataset?.uiSchemaDefault, 25),
+        value391 = handler9(el47?.dataset?.uiSchemaMin, -0x270f),
+        value392 = handler9(el47?.dataset?.uiSchemaMax, 0x270f),
+        rhV54MaskExpand2 = normalizeRhV54MaskExpand(value389, value390);
+      return Math.max(value391, Math.min(value392, rhV54MaskExpand2));
     },
-    _0x2ac6ad = (_0x3ddbde, _0x24a7e8) => {
-      const _0x49d91f = _0x694a0(_0x3ddbde, _0x24a7e8),
-        _0x149770 = _0x3ddbde?.querySelector?.('.rh-stepper-value');
+    handler19 = (el48, value393) => {
+      const value394 = handler18(el48, value393),
+        el49 = el48?.querySelector?.('.rh-stepper-value');
       return (
-        _0x149770 &&
-          ((_0x149770.textContent = String(_0x49d91f)),
-          _0x149770.setAttribute('aria-valuenow', String(_0x49d91f))),
-        _0x49d91f
+        el49 && ((el49.textContent = String(value394)), el49.setAttribute('aria-valuenow', String(value394))),
+        value394
       );
     },
-    _0x11f8c9 = (_0x5bfe2f) => {
-      const _0x322544 = String(_0x5bfe2f?.dataset?.uiSchemaField || '').trim(),
-        _0x438462 = typeof _0x172699 === 'function' ? _0x172699() || {} : {};
-      return _0x694a0(
-        _0x5bfe2f,
-        getNodeFieldValue(_0x438462, _0x322544, _0x5bfe2f?.dataset?.uiSchemaDefault ?? 25),
-      );
+    handler20 = (el50) => {
+      const value395 = String(el50?.dataset?.uiSchemaField || '').trim(),
+        value396 = typeof getNodeData === 'function' ? getNodeData() || {} : {};
+      return handler18(el50, getNodeFieldValue(value396, value395, el50?.dataset?.uiSchemaDefault ?? 25));
     },
-    _0x8340ca = (_0x43ed0d) => {
-      const _0x33c82d = _0x43ed0d?.closest?.('.ui-schema-rh-v54-mask-expand'),
-        _0xe3f032 = String(_0x33c82d?.dataset?.uiSchemaField || '').trim();
-      if (!_0x33c82d || !_0xe3f032 || _0x33c82d.classList?.contains('is-rh-disabled')) return;
-      const _0x2ca71c = _0x11f8c9(_0x33c82d),
-        _0x34e875 = _0x350eee.ownerDocument?.createElement?.('input');
-      if (!_0x34e875) return;
-      ((_0x34e875.className = 'rh-stepper-input'),
-        (_0x34e875.type = 'number'),
-        (_0x34e875.step = String(_0x33c82d.dataset.uiSchemaStep || '1')),
-        (_0x34e875.min = String(_0x33c82d.dataset.uiSchemaMin || '-9999')),
-        (_0x34e875.max = String(_0x33c82d.dataset.uiSchemaMax || '9999')),
-        (_0x34e875.value = String(_0x2ca71c)));
-      let _0x5968ec = false;
-      const _0xf8bda = (_0xf2d8a9) => {
-        if (_0x5968ec) return;
-        _0x5968ec = true;
-        const _0x48d0af = _0xf2d8a9 ? _0x694a0(_0x33c82d, _0x34e875.value) : _0x2ca71c,
-          _0x237ef1 = _0x350eee.ownerDocument.createElement('div');
-        ((_0x237ef1.className = 'rh-stepper-value'),
-          _0x237ef1.setAttribute('role', 'spinbutton'),
-          _0x237ef1.setAttribute('tabindex', '0'),
-          _0x237ef1.setAttribute(
+    handler21 = (el51) => {
+      const el52 = el51?.closest?.('.ui-schema-rh-v54-mask-expand'),
+        enabled22 = String(el52?.dataset?.uiSchemaField || '').trim();
+      if (!el52 || !enabled22 || el52.classList?.contains('is-rh-disabled')) return;
+      const value397 = handler20(el52),
+        el53 = el33.ownerDocument?.createElement?.('input');
+      if (!el53) return;
+      ((el53.className = 'rh-stepper-input'),
+        (el53.type = 'number'),
+        (el53.step = String(el52.dataset.uiSchemaStep || '1')),
+        (el53.min = String(el52.dataset.uiSchemaMin || '-9999')),
+        (el53.max = String(el52.dataset.uiSchemaMax || '9999')),
+        (el53.value = String(value397)));
+      let value398 = false;
+      const run6 = (value399) => {
+        if (value398) return;
+        value398 = true;
+        const value400 = value399 ? handler18(el52, el53.value) : value397,
+          el54 = el33.ownerDocument.createElement('div');
+        ((el54.className = 'rh-stepper-value'),
+          el54.setAttribute('role', 'spinbutton'),
+          el54.setAttribute('tabindex', '0'),
+          el54.setAttribute(
             'aria-label',
-            _0x43ed0d.getAttribute('aria-label') || t('aigenImage.uiSchema.maskExpandValue'),
+            el51.getAttribute('aria-label') || t('aigenImage.uiSchema.maskExpandValue'),
           ),
-          (_0x237ef1.textContent = String(_0x48d0af)),
-          _0x237ef1.setAttribute('aria-valuenow', String(_0x48d0af)),
-          _0x34e875.replaceWith(_0x237ef1));
-        if (_0xf2d8a9) _0x28636b(_0xe3f032, _0x48d0af);
+          (el54.textContent = String(value400)),
+          el54.setAttribute('aria-valuenow', String(value400)),
+          el53.replaceWith(el54));
+        if (value399) run3(enabled22, value400);
       };
-      (_0x34e875.addEventListener('click', (_0xa6e7cb) => _0xa6e7cb.stopPropagation()),
-        _0x34e875.addEventListener('mousedown', (_0x372c1d) => _0x372c1d.stopPropagation()),
-        _0x34e875.addEventListener('keydown', (_0xc5fded) => {
-          if (_0xc5fded.key === 'Enter') _0xf8bda(true);
-          if (_0xc5fded.key === 'Escape') _0xf8bda(false);
+      (el53.addEventListener('click', (event6) => event6.stopPropagation()),
+        el53.addEventListener('mousedown', (event7) => event7.stopPropagation()),
+        el53.addEventListener('keydown', (event8) => {
+          if (event8.key === 'Enter') run6(true);
+          if (event8.key === 'Escape') run6(false);
         }),
-        _0x34e875.addEventListener('blur', () => _0xf8bda(true)),
-        _0x43ed0d.replaceWith(_0x34e875),
-        _0x34e875.focus(),
-        _0x34e875.select());
+        el53.addEventListener('blur', () => run6(true)),
+        el51.replaceWith(el53),
+        el53.focus(),
+        el53.select());
     },
-    _0x546795 = () => {
-      if (!_0x6ae39e) return;
-      (_0x6ae39e.el?.classList?.remove('is-dragging'),
-        _0x6ae39e.doc?.removeEventListener?.('mousemove', _0x38ce6b),
-        _0x6ae39e.doc?.removeEventListener?.('mouseup', _0x3e17ef),
-        (_0x6ae39e = null));
+    handler22 = () => {
+      if (!box) return;
+      (box.el?.classList?.remove('is-dragging'),
+        box.doc?.removeEventListener?.('mousemove', value401),
+        box.doc?.removeEventListener?.('mouseup', value402),
+        (box = null));
     },
-    _0x38ce6b = (_0x588314) => {
-      if (!_0x6ae39e) return;
-      const _0x5d74b0 = _0x588314.clientX - _0x6ae39e.x;
-      if (Math.abs(_0x5d74b0) >= 2) _0x6ae39e.dragged = true;
-      const _0x37e4b5 = Math.trunc(_0x5d74b0 / 6),
-        _0x2a3d6c = _0x694a0(_0x6ae39e.fieldEl, _0x6ae39e.base + _0x37e4b5);
-      _0x2a3d6c !== _0x6ae39e.last &&
-        ((_0x6ae39e.moved = true), (_0x6ae39e.last = _0x2a3d6c), _0x2ac6ad(_0x6ae39e.fieldEl, _0x2a3d6c));
+    value401 = (event9) => {
+      if (!box) return;
+      const value403 = event9.clientX - box.x;
+      if (Math.abs(value403) >= 2) box.dragged = true;
+      const value404 = Math.trunc(value403 / 6),
+        value405 = handler18(box.fieldEl, box.base + value404);
+      value405 !== box.last && ((box.moved = true), (box.last = value405), handler19(box.fieldEl, value405));
     },
-    _0x3e17ef = () => {
-      if (!_0x6ae39e) return;
-      const _0x4ac1aa = _0x6ae39e;
-      (_0x546795(),
-        (_0x4ac1aa.dragged || _0x4ac1aa.moved) && (_0x57a345 = !_0x2cc82c(_0x4ac1aa.doc)),
-        _0x4ac1aa.moved && _0x28636b(_0x4ac1aa.fieldId, _0x4ac1aa.last));
+    value402 = () => {
+      if (!box) return;
+      const value406 = box;
+      (handler22(),
+        (value406.dragged || value406.moved) && (value349 = !handler8(value406.doc)),
+        value406.moved && run3(value406.fieldId, value406.last));
     },
-    _0x2c6925 = (_0x2c3224) => {
-      const _0x3027c2 = _0x2c3224.target?.closest?.('.ui-schema-rh-video-stepper .rh-stepper-value');
-      if (_0x3027c2 && _0x2c3224.button === 0) {
-        const _0x2d8ac8 = _0x3027c2.closest('.ui-schema-rh-video-stepper'),
-          _0x802b59 = String(_0x2d8ac8?.dataset?.uiSchemaField || '').trim();
-        if (!_0x2d8ac8 || !_0x802b59) return;
-        const _0xbb6dc3 = _0x350eee.ownerDocument || globalThis.document;
-        if (!_0xbb6dc3) return;
-        (_0x2c3224.preventDefault(), _0x2c3224.stopPropagation());
-        const _0xa87224 = _0x4b5071(_0x2d8ac8);
-        (_0x16fc0b(),
-          (_0x37d6f7 = {
-            x: _0x2c3224.clientX,
-            base: _0xa87224,
-            last: _0xa87224,
+    value407 = (x) => {
+      const el55 = x.target?.closest?.('.ui-schema-rh-video-stepper .rh-stepper-value');
+      if (el55 && x.button === 0) {
+        const fieldEl = el55.closest('.ui-schema-rh-video-stepper'),
+          fieldId = String(fieldEl?.dataset?.uiSchemaField || '').trim();
+        if (!fieldEl || !fieldId) return;
+        const doc = el33.ownerDocument || globalThis.document;
+        if (!doc) return;
+        (x.preventDefault(), x.stopPropagation());
+        const base = handler15(fieldEl);
+        (handler17(),
+          (box2 = {
+            x: x.clientX,
+            base: base,
+            last: base,
             moved: false,
             dragged: false,
-            fieldEl: _0x2d8ac8,
-            fieldId: _0x802b59,
-            el: _0x3027c2,
-            doc: _0xbb6dc3,
+            fieldEl: fieldEl,
+            fieldId: fieldId,
+            el: el55,
+            doc: doc,
           }),
-          _0x3027c2.classList.add('is-dragging'),
-          _0xbb6dc3.addEventListener('mousemove', _0x3300e0),
-          _0xbb6dc3.addEventListener('mouseup', _0x414379));
+          el55.classList.add('is-dragging'),
+          doc.addEventListener('mousemove', value383),
+          doc.addEventListener('mouseup', value384));
         return;
       }
-      const _0x89ff73 = _0x2c3224.target?.closest?.('.ui-schema-rh-v54-mask-expand .rh-stepper-value');
-      if (!_0x89ff73 || _0x2c3224.button !== 0) return;
-      const _0x4193ab = _0x89ff73.closest('.ui-schema-rh-v54-mask-expand'),
-        _0x4848df = String(_0x4193ab?.dataset?.uiSchemaField || '').trim();
-      if (!_0x4193ab || !_0x4848df || _0x4193ab.classList?.contains('is-rh-disabled')) return;
-      const _0x246437 = _0x350eee.ownerDocument || globalThis.document;
-      if (!_0x246437) return;
-      (_0x2c3224.preventDefault(), _0x2c3224.stopPropagation());
-      const _0x50cacc = _0x11f8c9(_0x4193ab);
-      (_0x546795(),
-        (_0x6ae39e = {
-          x: _0x2c3224.clientX,
-          base: _0x50cacc,
-          last: _0x50cacc,
+      const el56 = x.target?.closest?.('.ui-schema-rh-v54-mask-expand .rh-stepper-value');
+      if (!el56 || x.button !== 0) return;
+      const fieldEl2 = el56.closest('.ui-schema-rh-v54-mask-expand'),
+        fieldId2 = String(fieldEl2?.dataset?.uiSchemaField || '').trim();
+      if (!fieldEl2 || !fieldId2 || fieldEl2.classList?.contains('is-rh-disabled')) return;
+      const doc2 = el33.ownerDocument || globalThis.document;
+      if (!doc2) return;
+      (x.preventDefault(), x.stopPropagation());
+      const base2 = handler20(fieldEl2);
+      (handler22(),
+        (box = {
+          x: x.clientX,
+          base: base2,
+          last: base2,
           moved: false,
           dragged: false,
-          fieldEl: _0x4193ab,
-          fieldId: _0x4848df,
-          el: _0x89ff73,
-          doc: _0x246437,
+          fieldEl: fieldEl2,
+          fieldId: fieldId2,
+          el: el56,
+          doc: doc2,
         }),
-        _0x89ff73.classList.add('is-dragging'),
-        _0x246437.addEventListener('mousemove', _0x38ce6b),
-        _0x246437.addEventListener('mouseup', _0x3e17ef));
+        el56.classList.add('is-dragging'),
+        doc2.addEventListener('mousemove', value401),
+        doc2.addEventListener('mouseup', value402));
     },
-    _0x9332e4 = (_0x40fde2) => {
-      const _0x515504 = _0x40fde2.target?.closest?.('[data-ui-schema-random-seed-mode]');
-      if (_0x515504) {
-        (_0x40fde2.preventDefault?.(), _0x40fde2.stopPropagation?.());
-        const _0x4723e6 = _0x515504.closest('[data-ui-schema-field]'),
-          _0x3b1cbe = String(
-            _0x515504.dataset.uiSchemaRandomSeedModeField ||
-              _0x4723e6?.dataset?.uiSchemaRandomSeedModeField ||
-              '',
+    value408 = (event10) => {
+      const el57 = event10.target?.closest?.('[data-ui-schema-random-seed-mode]');
+      if (el57) {
+        (event10.preventDefault?.(), event10.stopPropagation?.());
+        const el58 = el57.closest('[data-ui-schema-field]'),
+          enabled23 = String(
+            el57.dataset.uiSchemaRandomSeedModeField || el58?.dataset?.uiSchemaRandomSeedModeField || '',
           ).trim(),
-          _0x555586 = normalizeRandomSeedMode(_0x515504.dataset.uiSchemaRandomSeedMode, 'fixed');
-        if (!_0x3b1cbe) return;
-        _0x28636b(_0x3b1cbe, _0x555586);
-        if (_0x555586 === 'random' && _0x4723e6) {
-          const _0x5696f2 = String(_0x4723e6.dataset.uiSchemaField || '').trim(),
-            _0x450b62 = _0x25f391(_0x4723e6);
-          _0x4723e6.classList?.contains('ui-schema-rh-video-stepper') && _0xd3a3d7(_0x4723e6, _0x450b62);
-          const _0x4a41e4 = _0x4723e6.querySelector('[data-ui-schema-input]');
-          if (_0x4a41e4) _0x4a41e4.value = _0x450b62;
-          if (_0x5696f2) _0x28636b(_0x5696f2, _0x450b62);
+          randomSeedMode2 = normalizeRandomSeedMode(el57.dataset.uiSchemaRandomSeedMode, 'fixed');
+        if (!enabled23) return;
+        run3(enabled23, randomSeedMode2);
+        if (randomSeedMode2 === 'random' && el58) {
+          const value409 = String(el58.dataset.uiSchemaField || '').trim(),
+            value410 = handler11(el58);
+          el58.classList?.contains('ui-schema-rh-video-stepper') && handler14(el58, value410);
+          const el59 = el58.querySelector('[data-ui-schema-input]');
+          if (el59) el59.value = value410;
+          if (value409) run3(value409, value410);
         }
         return;
       }
-      const _0x2d8de8 = _0x40fde2.target?.closest?.('[data-ui-schema-random-seed]');
-      if (_0x2d8de8) {
-        (_0x40fde2.preventDefault?.(), _0x40fde2.stopPropagation?.());
-        const _0x5c1c63 = _0x2d8de8.closest('[data-ui-schema-field]'),
-          _0x1563fc = String(_0x5c1c63?.dataset?.uiSchemaField || '').trim();
-        if (!_0x1563fc) return;
-        const _0x4101b = _0x25f391(_0x5c1c63);
-        _0x5c1c63.classList?.contains('ui-schema-rh-video-stepper') && _0xd3a3d7(_0x5c1c63, _0x4101b);
-        const _0x55d7f6 = _0x5c1c63.querySelector('[data-ui-schema-input]');
-        if (_0x55d7f6) _0x55d7f6.value = _0x4101b;
-        _0x28636b(_0x1563fc, _0x4101b);
+      const el60 = event10.target?.closest?.('[data-ui-schema-random-seed]');
+      if (el60) {
+        (event10.preventDefault?.(), event10.stopPropagation?.());
+        const el61 = el60.closest('[data-ui-schema-field]'),
+          enabled24 = String(el61?.dataset?.uiSchemaField || '').trim();
+        if (!enabled24) return;
+        const value411 = handler11(el61);
+        el61.classList?.contains('ui-schema-rh-video-stepper') && handler14(el61, value411);
+        const el62 = el61.querySelector('[data-ui-schema-input]');
+        if (el62) el62.value = value411;
+        run3(enabled24, value411);
         return;
       }
-      const _0x4af916 = _0x40fde2.target?.closest?.('.ui-schema-rh-video-stepper .rh-stepper-value');
-      if (_0x4af916) {
-        _0x40fde2.stopPropagation();
-        if (_0x2a6046) {
-          _0x2a6046 = false;
+      const value412 = event10.target?.closest?.('.ui-schema-rh-video-stepper .rh-stepper-value');
+      if (value412) {
+        event10.stopPropagation();
+        if (value350) {
+          value350 = false;
           return;
         }
-        _0xf30d0a(_0x4af916);
+        handler16(value412);
         return;
       }
-      const _0x74d708 = _0x40fde2.target?.closest?.('.ui-schema-rh-v54-mask-expand .rh-stepper-value');
-      if (_0x74d708) {
-        _0x40fde2.stopPropagation();
-        if (_0x57a345) {
-          _0x57a345 = false;
+      const value413 = event10.target?.closest?.('.ui-schema-rh-v54-mask-expand .rh-stepper-value');
+      if (value413) {
+        event10.stopPropagation();
+        if (value349) {
+          value349 = false;
           return;
         }
-        _0x8340ca(_0x74d708);
+        handler21(value413);
         return;
       }
-      const _0x5c92b7 = _0x40fde2.target?.closest?.('[data-ui-schema-menu-trigger]');
-      if (_0x5c92b7) {
-        _0x40fde2.stopPropagation();
-        const _0x1aa58d = _0x5c92b7.closest('[data-ui-schema-field], [data-ui-schema-composite-field]'),
-          _0x28186f =
-            _0x1aa58d?.querySelector('.ui-schema-floating-menu') ||
-            _0x1aa58d?.querySelector('.ui-schema-popup'),
-          _0x49b2ea = _0x28186f?.classList?.contains('floating-menu')
-            ? !_0x28186f.classList.contains('show')
-            : _0x28186f
-              ? _0x28186f.style.display === 'none'
+      const el63 = event10.target?.closest?.('[data-ui-schema-menu-trigger]');
+      if (el63) {
+        event10.stopPropagation();
+        const fieldEl3 = el63.closest('[data-ui-schema-field], [data-ui-schema-composite-field]'),
+          popup =
+            fieldEl3?.querySelector('.ui-schema-floating-menu') ||
+            fieldEl3?.querySelector('.ui-schema-popup'),
+          shouldOpen = popup?.classList?.contains('floating-menu')
+            ? !popup.classList.contains('show')
+            : popup
+              ? popup.style.display === 'none'
               : false;
-        (_0x350eee.dispatchEvent(
+        (el33.dispatchEvent(
           new CustomEvent('ui-schema-menu-before-open', {
-            detail: { fieldEl: _0x1aa58d, popup: _0x28186f, shouldOpen: _0x49b2ea },
+            detail: { fieldEl: fieldEl3, popup: popup, shouldOpen: shouldOpen },
           }),
         ),
-          _0x350eee.querySelectorAll('.ui-schema-floating-menu').forEach((_0x241444) => {
-            if (_0x241444 !== _0x28186f) _0x241444.classList.remove('show');
+          el33.querySelectorAll('.ui-schema-floating-menu').forEach((el64) => {
+            if (el64 !== popup) el64.classList.remove('show');
           }),
-          _0x350eee.querySelectorAll('.ui-schema-popup').forEach((_0x562599) => {
-            if (_0x562599 === _0x28186f) return;
-            if (_0x562599.classList?.contains('floating-menu')) {
-              (_0x562599.classList.remove('show'), (_0x562599.style.display = ''));
+          el33.querySelectorAll('.ui-schema-popup').forEach((el65) => {
+            if (el65 === popup) return;
+            if (el65.classList?.contains('floating-menu')) {
+              (el65.classList.remove('show'), (el65.style.display = ''));
               return;
             }
-            _0x562599.style.display = 'none';
+            el65.style.display = 'none';
           }));
-        if (_0x28186f?.classList?.contains('floating-menu'))
-          ((_0x28186f.style.display = ''), _0x28186f.classList.toggle('show', _0x49b2ea));
+        if (popup?.classList?.contains('floating-menu'))
+          ((popup.style.display = ''), popup.classList.toggle('show', shouldOpen));
         else
-          _0x28186f &&
-            (_0x28186f.style.display = _0x49b2ea
-              ? _0x28186f.classList?.contains('ui-schema-duration-pop')
+          popup &&
+            (popup.style.display = shouldOpen
+              ? popup.classList?.contains('ui-schema-duration-pop')
                 ? 'flex'
                 : 'block'
               : 'none');
         return;
       }
-      _0x40fde2.target?.closest?.(
+      event10.target?.closest?.(
         '.ui-schema-popup, .ui-schema-floating-menu, .img-ratio-popup, .rh-res-popup',
-      ) && _0x40fde2.stopPropagation();
-      const _0x3652d2 = _0x40fde2.target?.closest?.('[data-ui-schema-field]');
-      if (!_0x3652d2) return;
-      const _0x11b4db = String(_0x3652d2.dataset.uiSchemaField || '').trim();
-      if (!_0x11b4db) return;
-      const _0x78c7ef = _0x40fde2.target.closest('[data-ui-schema-value]');
-      if (!_0x78c7ef) return;
-      if (_0x78c7ef.dataset.uiSchemaDisabled === 'true' || _0x78c7ef.disabled === true) return;
-      _0x40fde2.stopPropagation();
-      const _0x2d6aec = String(_0x3652d2.dataset.uiSchemaType || ''),
-        _0x56f881 = _0x78c7ef.dataset.uiSchemaValue,
-        _0x411f42 =
-          _0x3652d2.dataset.uiSchemaValueType === 'boolean'
-            ? _0x56f881 === 'true'
-            : _0x3652d2.dataset.uiSchemaValueType === 'number'
-              ? Number(_0x56f881)
-              : _0x2d6aec === 'toggle'
-                ? _0x56f881 === 'true'
-                : _0x56f881;
-      (_0x3652d2
-        .querySelectorAll('[data-ui-schema-value]')
-        .forEach((_0x2aa7d1) => _0x2aa7d1.classList.remove('active')),
-        _0x78c7ef.classList.add('active'));
-      const _0x5da76a = _0x3652d2.querySelector('.ui-schema-menu-trigger .ui-schema-pill-label');
-      if (_0x5da76a) {
-        const _0x32f40f =
-          _0x78c7ef.dataset.uiSchemaOptionLabel || _0x78c7ef.textContent?.trim?.() || String(_0x411f42);
-        _0x5da76a.textContent = _0x32f40f;
+      ) && event10.stopPropagation();
+      const el66 = event10.target?.closest?.('[data-ui-schema-field]');
+      if (!el66) return;
+      const enabled25 = String(el66.dataset.uiSchemaField || '').trim();
+      if (!enabled25) return;
+      const el67 = event10.target.closest('[data-ui-schema-value]');
+      if (!el67) return;
+      if (el67.dataset.uiSchemaDisabled === 'true' || el67.disabled === true) return;
+      event10.stopPropagation();
+      const value414 = String(el66.dataset.uiSchemaType || ''),
+        value415 = el67.dataset.uiSchemaValue,
+        value416 =
+          el66.dataset.uiSchemaValueType === 'boolean'
+            ? value415 === 'true'
+            : el66.dataset.uiSchemaValueType === 'number'
+              ? Number(value415)
+              : value414 === 'toggle'
+                ? value415 === 'true'
+                : value415;
+      (el66.querySelectorAll('[data-ui-schema-value]').forEach((el68) => el68.classList.remove('active')),
+        el67.classList.add('active'));
+      const el69 = el66.querySelector('.ui-schema-menu-trigger .ui-schema-pill-label');
+      if (el69) {
+        const value417 = el67.dataset.uiSchemaOptionLabel || el67.textContent?.trim?.() || String(value416);
+        el69.textContent = value417;
       }
-      (syncInstanceToggleField(_0x3652d2, _0x411f42),
-        _0x28636b(_0x11b4db, _0x411f42),
-        _0x78c7ef.closest('.floating-menu')?.classList.remove('show'));
+      (syncInstanceToggleField(el66, value416),
+        run3(enabled25, value416),
+        el67.closest('.floating-menu')?.classList.remove('show'));
     },
-    _0x1107c4 = (_0x463c84) => {
-      const _0x41e4d2 = _0x463c84.target?.closest?.('[data-ui-schema-input]');
-      if (!_0x41e4d2) return;
-      const _0x41327f = String(_0x41e4d2.dataset.uiSchemaInput || '').trim();
-      if (!_0x41327f) return;
-      const _0x199579 = _0x41e4d2.closest('[data-ui-schema-range-values]'),
-        _0x11931d = parseRangeValuesFromFieldEl(_0x199579),
-        _0x57cd21 =
-          _0x41e4d2.type === 'range' && _0x11931d?.length
-            ? _0x11931d[Math.max(0, Math.min(_0x11931d.length - 1, Number(_0x41e4d2.value)))]
-            : _0x41e4d2.type === 'range' || _0x41e4d2.type === 'number'
-              ? Number(_0x41e4d2.value)
-              : _0x41e4d2.value,
-        _0x273930 = _0x41e4d2.closest('.ui-schema-field')?.querySelector('.ui-schema-value');
-      if (_0x273930) _0x273930.textContent = String(_0x57cd21);
-      const _0xd23753 = _0x41e4d2.closest('.ui-schema-rh-v54-breast-jiggle'),
-        _0x6d33e5 = _0xd23753?.querySelector('.rh-breast-jiggle-value');
-      _0x6d33e5 &&
-        (_0x6d33e5.textContent = formatRhV54BreastJiggle(
-          _0x57cd21,
-          getRhV54BreastJiggleRangeFromFieldEl(_0xd23753),
-        ));
-      const _0x22a6b3 = _0x41e4d2
-        .closest('.ui-schema-duration-pill')
-        ?.querySelector('.ui-schema-duration-label');
-      _0x22a6b3 && (_0x22a6b3.textContent = getRangeValueDisplayLabel(_0x199579, _0x57cd21, _0x57cd21 + 'S'));
-      const _0x2315f2 = _0x41e4d2.closest('.ui-schema-field')?.querySelector('.ui-schema-pill-label'),
-        _0x232603 = _0x41e4d2.closest('.ui-schema-field')?.querySelector('.rh-res-title');
-      if (_0x2315f2 && _0x232603) {
-        const _0x59e242 = _0x2315f2.querySelector('.ui-schema-resolution-value');
-        _0x59e242
-          ? (_0x59e242.textContent = String(_0x57cd21))
-          : (_0x2315f2.textContent = (_0x232603.textContent || 'Resolution') + ' ' + _0x57cd21);
+    value418 = (event11) => {
+      const el70 = event11.target?.closest?.('[data-ui-schema-input]');
+      if (!el70) return;
+      const enabled26 = String(el70.dataset.uiSchemaInput || '').trim();
+      if (!enabled26) return;
+      const value419 = el70.closest('[data-ui-schema-range-values]'),
+        list53 = parseRangeValuesFromFieldEl(value419),
+        value420 =
+          el70.type === 'range' && list53?.length
+            ? list53[Math.max(0, Math.min(list53.length - 1, Number(el70.value)))]
+            : el70.type === 'range' || el70.type === 'number'
+              ? Number(el70.value)
+              : el70.value,
+        el71 = el70.closest('.ui-schema-field')?.querySelector('.ui-schema-value');
+      if (el71) el71.textContent = String(value420);
+      const el72 = el70.closest('.ui-schema-rh-v54-breast-jiggle'),
+        el73 = el72?.querySelector('.rh-breast-jiggle-value');
+      el73 &&
+        (el73.textContent = formatRhV54BreastJiggle(value420, getRhV54BreastJiggleRangeFromFieldEl(el72)));
+      const el74 = el70.closest('.ui-schema-duration-pill')?.querySelector('.ui-schema-duration-label');
+      el74 && (el74.textContent = getRangeValueDisplayLabel(value419, value420, value420 + 'S'));
+      const el75 = el70.closest('.ui-schema-field')?.querySelector('.ui-schema-pill-label'),
+        el76 = el70.closest('.ui-schema-field')?.querySelector('.rh-res-title');
+      if (el75 && el76) {
+        const el77 = el75.querySelector('.ui-schema-resolution-value');
+        el77
+          ? (el77.textContent = String(value420))
+          : (el75.textContent = (el76.textContent || 'Resolution') + ' ' + value420);
       }
-      if (_0x367496(_0x41e4d2)) {
-        _0x463c84.type === 'input'
-          ? _0x1d5aca(_0x41327f, _0x57cd21)
-          : (_0x3e37b4(_0x41327f), _0x28636b(_0x41327f, _0x57cd21));
+      if (handler7(el70)) {
+        event11.type === 'input'
+          ? handler6(enabled26, value420)
+          : (handler4(enabled26), run3(enabled26, value420));
         return;
       }
-      _0x28636b(_0x41327f, _0x57cd21);
+      run3(enabled26, value420);
     };
   return (
-    _0x350eee.addEventListener('click', _0x9332e4, true),
-    _0x350eee.addEventListener('mousedown', _0x2c6925, true),
-    _0x350eee.addEventListener('input', _0x1107c4),
-    _0x350eee.addEventListener('change', _0x1107c4),
+    el33.addEventListener('click', value408, true),
+    el33.addEventListener('mousedown', value407, true),
+    el33.addEventListener('input', value418),
+    el33.addEventListener('change', value418),
     () => {
-      (_0x37cf3e(),
-        _0x546795(),
-        _0x16fc0b(),
-        _0x350eee.removeEventListener('click', _0x9332e4, true),
-        _0x350eee.removeEventListener('mousedown', _0x2c6925, true),
-        _0x350eee.removeEventListener('input', _0x1107c4),
-        _0x350eee.removeEventListener('change', _0x1107c4));
+      (handler5(),
+        handler22(),
+        handler17(),
+        el33.removeEventListener('click', value408, true),
+        el33.removeEventListener('mousedown', value407, true),
+        el33.removeEventListener('input', value418),
+        el33.removeEventListener('change', value418));
     }
   );
 }
 export function bindModelUiSchemaControls(
-  _0x287c4d,
+  enabled27,
   {
-    nodeId: _0x4aca45,
-    nodeData: _0x16cc3e,
-    store: _0x1f91ba,
-    buildPatch: _0x4ed68d,
-    decorateNodeData: _0x2785f0,
-    afterCommit: _0x25f849,
+    nodeId: nodeId,
+    nodeData: nodeData10,
+    store: store,
+    buildPatch: buildPatch,
+    decorateNodeData: decorateNodeData,
+    afterCommit: afterCommit,
   } = {},
 ) {
-  if (!_0x287c4d || !_0x1f91ba || !_0x4aca45) return () => {};
-  const _0x554549 = () => {
-    const _0x46b4ca = _0x1f91ba.getState?.().nodes?.[_0x4aca45] || _0x16cc3e || {};
-    return typeof _0x2785f0 === 'function' ? _0x2785f0(_0x46b4ca) : _0x46b4ca;
+  if (!enabled27 || !store || !nodeId) return () => {};
+  const getNodeData2 = () => {
+    const value421 = store.getState?.().nodes?.[nodeId] || nodeData10 || {};
+    return typeof decorateNodeData === 'function' ? decorateNodeData(value421) : value421;
   };
-  return bindUiSchemaControls(_0x287c4d, {
-    getNodeData: _0x554549,
-    commitFieldValue: (_0x1fb9a7, _0xc82221, _0x6b21aa) => {
-      const _0x1c979f = buildUiSchemaParamPatch(_0x6b21aa, _0x1fb9a7, _0xc82221),
-        _0x28a69a =
-          typeof _0x4ed68d === 'function' ? _0x4ed68d(_0x6b21aa, _0x1fb9a7, _0xc82221, _0x1c979f) : {},
-        _0x5d5c5d = { ..._0x1c979f, ...(_0x28a69a && typeof _0x28a69a === 'object' ? _0x28a69a : {}) };
-      _0x1f91ba.updateNodeData(_0x4aca45, _0x5d5c5d);
-      const _0x1535d4 = { ..._0x6b21aa, ..._0x5d5c5d },
-        _0x3a92b2 = typeof _0x2785f0 === 'function' ? _0x2785f0(_0x1535d4) : _0x1535d4;
-      return (
-        _0x25f849?.(_0x1fb9a7, _0xc82221, _0x3a92b2, { latest: _0x6b21aa, patch: _0x5d5c5d }),
-        _0x3a92b2
-      );
+  return bindUiSchemaControls(enabled27, {
+    getNodeData: getNodeData2,
+    commitFieldValue: (value422, value423, latest) => {
+      const args12 = buildUiSchemaParamPatch(latest, value422, value423),
+        value424 = typeof buildPatch === 'function' ? buildPatch(latest, value422, value423, args12) : {},
+        patch = { ...args12, ...(value424 && typeof value424 === 'object' ? value424 : {}) };
+      store.updateNodeData(nodeId, patch);
+      const value425 = { ...latest, ...patch },
+        value426 = typeof decorateNodeData === 'function' ? decorateNodeData(value425) : value425;
+      return (afterCommit?.(value422, value423, value426, { latest: latest, patch: patch }), value426);
     },
   });
 }
 export function bindUiSchemaFieldControls(
-  _0x17bebc,
-  { getNodeData: _0x14b454, commitFieldValue: _0x490347 } = {},
+  value427,
+  { getNodeData: getNodeData3, commitFieldValue: commitFieldValue2 } = {},
 ) {
-  return bindUiSchemaControls(_0x17bebc, { getNodeData: _0x14b454, commitFieldValue: _0x490347 });
+  return bindUiSchemaControls(value427, { getNodeData: getNodeData3, commitFieldValue: commitFieldValue2 });
 }
-export function syncModelUiSchemaControls(_0x56d7b8, _0x39e1c6 = {}) {
-  if (!_0x56d7b8) return;
-  (syncDynamicOptionDisabled(_0x56d7b8, _0x39e1c6),
-    _0x56d7b8.querySelectorAll('[data-ui-schema-field]').forEach((_0x236f1b) => {
-      const _0x3ee4b0 = String(_0x236f1b.dataset.uiSchemaField || '').trim();
-      if (!_0x3ee4b0) return;
-      let _0x1fa72f = getNodeFieldValue(_0x39e1c6, _0x3ee4b0, _0x236f1b.dataset.uiSchemaDefault);
-      const _0x4a1b19 = String(_0x236f1b.dataset.uiSchemaDefaultAliases || '').trim();
-      if (_0x4a1b19)
+export function syncModelUiSchemaControls(el78, value428 = {}) {
+  if (!el78) return;
+  (syncDynamicOptionDisabled(el78, value428),
+    el78.querySelectorAll('[data-ui-schema-field]').forEach((el79) => {
+      const enabled28 = String(el79.dataset.uiSchemaField || '').trim();
+      if (!enabled28) return;
+      let nodeFieldValue2 = getNodeFieldValue(value428, enabled28, el79.dataset.uiSchemaDefault);
+      const value429 = String(el79.dataset.uiSchemaDefaultAliases || '').trim();
+      if (value429)
         try {
-          const _0x3f85a8 = JSON.parse(_0x4a1b19)
-            .map((_0x5c21f1) =>
-              String(_0x5c21f1 ?? '')
+          const list54 = JSON.parse(value429)
+            .map((item57) =>
+              String(item57 ?? '')
                 .trim()
                 .toLowerCase(),
             )
             .filter(Boolean);
-          _0x3f85a8.includes(
-            String(_0x1fa72f ?? '')
+          list54.includes(
+            String(nodeFieldValue2 ?? '')
               .trim()
               .toLowerCase(),
-          ) && (_0x1fa72f = _0x236f1b.dataset.uiSchemaDefault);
+          ) && (nodeFieldValue2 = el79.dataset.uiSchemaDefault);
         } catch {}
-      const _0x4c0449 = _0x236f1b.querySelector(
-        '[data-ui-schema-value="' + escapeCssString(_0x1fa72f) + '"]',
-      );
-      if (_0x4c0449?.dataset?.uiSchemaDisabled === 'true') {
-        const _0x5da249 = _0x236f1b.dataset.uiSchemaDefault,
-          _0x588058 = _0x236f1b.querySelector('[data-ui-schema-value="' + escapeCssString(_0x5da249) + '"]'),
-          _0x27160f =
-            _0x588058?.dataset?.uiSchemaDisabled === 'true'
-              ? _0x236f1b.querySelector('[data-ui-schema-value]:not([data-ui-schema-disabled="true"])')
-              : _0x588058;
-        _0x27160f?.dataset?.uiSchemaValue !== undefined && (_0x1fa72f = _0x27160f.dataset.uiSchemaValue);
+      const el80 = el79.querySelector('[data-ui-schema-value="' + escapeCssString(nodeFieldValue2) + '"]');
+      if (el80?.dataset?.uiSchemaDisabled === 'true') {
+        const value430 = el79.dataset.uiSchemaDefault,
+          el81 = el79.querySelector('[data-ui-schema-value="' + escapeCssString(value430) + '"]'),
+          el82 =
+            el81?.dataset?.uiSchemaDisabled === 'true'
+              ? el79.querySelector('[data-ui-schema-value]:not([data-ui-schema-disabled="true"])')
+              : el81;
+        el82?.dataset?.uiSchemaValue !== undefined && (nodeFieldValue2 = el82.dataset.uiSchemaValue);
       }
-      _0x236f1b.querySelectorAll('[data-ui-schema-value]').forEach((_0x261714) => {
-        _0x261714.classList.toggle('active', String(_0x261714.dataset.uiSchemaValue) === String(_0x1fa72f));
+      el79.querySelectorAll('[data-ui-schema-value]').forEach((el83) => {
+        el83.classList.toggle('active', String(el83.dataset.uiSchemaValue) === String(nodeFieldValue2));
       });
-      const _0x1ea501 = _0x236f1b.querySelector(
-          '[data-ui-schema-value="' + escapeCssString(_0x1fa72f) + '"]',
-        ),
-        _0xcda931 = _0x236f1b.querySelector('.ui-schema-pill-label');
-      _0xcda931 &&
-        _0x1ea501?.dataset?.uiSchemaOptionLabel &&
-        (_0xcda931.textContent = _0x1ea501.dataset.uiSchemaOptionLabel);
-      (syncInstanceToggleField(_0x236f1b, _0x1fa72f), syncStepperField(_0x236f1b, _0x1fa72f));
-      const _0x31961b = _0x236f1b.querySelector('[data-ui-schema-input]');
-      if (_0x31961b && _0x1fa72f !== undefined) {
-        const _0x525335 = parseRangeValuesFromFieldEl(_0x236f1b),
-          _0x4c084f = findRangeValueIndex(_0x525335, _0x1fa72f);
-        _0x31961b.value = _0x525335?.length ? String(Math.max(0, _0x4c084f)) : String(_0x1fa72f);
-        const _0x4be2da = _0x236f1b.querySelector('.ui-schema-value');
-        if (_0x4be2da) _0x4be2da.textContent = String(_0x1fa72f);
-        const _0x120a57 = _0x236f1b.querySelector('.ui-schema-duration-label');
-        _0x120a57 &&
-          (_0x120a57.textContent = getRangeValueDisplayLabel(_0x236f1b, _0x1fa72f, _0x1fa72f + 'S'));
-        const _0x2149f7 = _0x236f1b.querySelector('.ui-schema-pill-label'),
-          _0x5712d8 = _0x2149f7?.querySelector('.ui-schema-resolution-value');
-        if (_0x5712d8) _0x5712d8.textContent = String(_0x1fa72f);
+      const el84 = el79.querySelector('[data-ui-schema-value="' + escapeCssString(nodeFieldValue2) + '"]'),
+        el85 = el79.querySelector('.ui-schema-pill-label');
+      el85 && el84?.dataset?.uiSchemaOptionLabel && (el85.textContent = el84.dataset.uiSchemaOptionLabel);
+      (syncInstanceToggleField(el79, nodeFieldValue2), syncStepperField(el79, nodeFieldValue2));
+      const el86 = el79.querySelector('[data-ui-schema-input]');
+      if (el86 && nodeFieldValue2 !== undefined) {
+        const list55 = parseRangeValuesFromFieldEl(el79),
+          rangeValueIndex2 = findRangeValueIndex(list55, nodeFieldValue2);
+        el86.value = list55?.length ? String(Math.max(0, rangeValueIndex2)) : String(nodeFieldValue2);
+        const el87 = el79.querySelector('.ui-schema-value');
+        if (el87) el87.textContent = String(nodeFieldValue2);
+        const el88 = el79.querySelector('.ui-schema-duration-label');
+        el88 && (el88.textContent = getRangeValueDisplayLabel(el79, nodeFieldValue2, nodeFieldValue2 + 'S'));
+        const el89 = el79.querySelector('.ui-schema-pill-label'),
+          el90 = el89?.querySelector('.ui-schema-resolution-value');
+        if (el90) el90.textContent = String(nodeFieldValue2);
         else {
-          if (_0x236f1b.classList?.contains('ui-schema-resolution-pill')) {
-            const _0x4589ca = _0x236f1b.querySelector('.rh-res-title')?.textContent || 'Resolution';
-            if (_0x2149f7) _0x2149f7.textContent = _0x4589ca + ' ' + _0x1fa72f;
+          if (el79.classList?.contains('ui-schema-resolution-pill')) {
+            const value431 = el79.querySelector('.rh-res-title')?.textContent || 'Resolution';
+            if (el89) el89.textContent = value431 + ' ' + nodeFieldValue2;
           }
         }
       }
-      (syncRhV54CustomField(_0x236f1b, _0x39e1c6), syncRandomSeedField(_0x236f1b, _0x39e1c6));
+      (syncRhV54CustomField(el79, value428), syncRandomSeedField(el79, value428));
     }),
-    syncCompositeUiSchemaControls(_0x56d7b8, _0x39e1c6));
+    syncCompositeUiSchemaControls(el78, value428));
 }
-function syncDynamicOptionDisabled(_0xa85516, _0x1850dd = {}) {
-  _0xa85516
+function syncDynamicOptionDisabled(el91, value432 = {}) {
+  el91
     .querySelectorAll('[data-ui-schema-disable-when-field], [data-ui-schema-disable-when-json]')
-    .forEach((_0x47e99c) => {
-      const _0x5393a5 = String(_0x47e99c.dataset.uiSchemaDisableWhenField || '').trim(),
-        _0x46af1f = String(_0x47e99c.dataset.uiSchemaDisableWhenValues || '')
+    .forEach((el92) => {
+      const value433 = String(el92.dataset.uiSchemaDisableWhenField || '').trim(),
+        list56 = String(el92.dataset.uiSchemaDisableWhenValues || '')
           .split(',')
           .map(normalizeCompareValue)
           .filter(Boolean);
-      let _0x154c99 = false;
-      const _0x2fbc5e = String(_0x47e99c.dataset.uiSchemaDisableWhenJson || '').trim();
-      if (_0x2fbc5e)
+      let optionDisableWhenMatches2 = false;
+      const value434 = String(el92.dataset.uiSchemaDisableWhenJson || '').trim();
+      if (value434)
         try {
-          _0x154c99 = optionDisableWhenMatches(JSON.parse(_0x2fbc5e), _0x1850dd);
+          optionDisableWhenMatches2 = optionDisableWhenMatches(JSON.parse(value434), value432);
         } catch {
-          _0x154c99 = false;
+          optionDisableWhenMatches2 = false;
         }
       else
-        _0x154c99 =
-          _0x5393a5 && _0x46af1f.includes(normalizeCompareValue(getNodeFieldValue(_0x1850dd, _0x5393a5, '')));
-      const _0x1e103b =
-          _0x47e99c.dataset.uiSchemaStaticDisabled === 'true' ||
-          _0x47e99c.hasAttribute('data-ui-schema-static-disabled'),
-        _0x44dd66 = Boolean(_0x1e103b || _0x154c99);
-      _0x47e99c.classList?.toggle('disabled', _0x44dd66);
-      if (_0x44dd66) {
-        ((_0x47e99c.dataset.uiSchemaDisabled = 'true'), _0x47e99c.setAttribute('aria-disabled', 'true'));
-        if ('disabled' in _0x47e99c) _0x47e99c.disabled = true;
+        optionDisableWhenMatches2 =
+          value433 && list56.includes(normalizeCompareValue(getNodeFieldValue(value432, value433, '')));
+      const value435 =
+          el92.dataset.uiSchemaStaticDisabled === 'true' ||
+          el92.hasAttribute('data-ui-schema-static-disabled'),
+        value436 = Boolean(value435 || optionDisableWhenMatches2);
+      el92.classList?.toggle('disabled', value436);
+      if (value436) {
+        ((el92.dataset.uiSchemaDisabled = 'true'), el92.setAttribute('aria-disabled', 'true'));
+        if ('disabled' in el92) el92.disabled = true;
       } else {
-        (delete _0x47e99c.dataset.uiSchemaDisabled,
-          _0x47e99c.removeAttribute('data-ui-schema-disabled'),
-          _0x47e99c.removeAttribute('aria-disabled'));
-        if ('disabled' in _0x47e99c) _0x47e99c.disabled = false;
+        (delete el92.dataset.uiSchemaDisabled,
+          el92.removeAttribute('data-ui-schema-disabled'),
+          el92.removeAttribute('aria-disabled'));
+        if ('disabled' in el92) el92.disabled = false;
       }
     });
 }
-function syncRhV54CustomField(_0x476977, _0xa750f2 = {}) {
-  const _0x25e031 = String(_0x476977?.dataset?.uiSchemaField || '').trim(),
-    _0x459557 = String(_0x476977?.dataset?.rhV54DisableOnSpecial || '').trim(),
-    _0x4e1827 =
-      _0x459557 && normalizeRhV54SpecialMode(getNodeFieldValue(_0xa750f2, 'rhSpecialMode', '')) === _0x459557,
-    _0x21e128 = _0x25e031 === 'rhSubtractSubject' && _0xa750f2?.rhV54HasMaskVideo === true;
-  (_0x459557 || _0x21e128) && _0x476977.classList.toggle('is-rh-disabled', Boolean(_0x4e1827 || _0x21e128));
-  if (_0x476977.classList?.contains('ui-schema-rh-v54-control-mode')) {
-    const _0xc63b27 = String(getNodeFieldValue(_0xa750f2, 'rhControlMode', 'single') || 'single'),
-      _0x2925eb = normalizeRhV54SinglePreset(
-        getNodeFieldValue(_0xa750f2, 'rhSingleControlPreset', 'efficiency'),
+function syncRhV54CustomField(el93, value437 = {}) {
+  const value438 = String(el93?.dataset?.uiSchemaField || '').trim(),
+    value439 = String(el93?.dataset?.rhV54DisableOnSpecial || '').trim(),
+    value440 =
+      value439 && normalizeRhV54SpecialMode(getNodeFieldValue(value437, 'rhSpecialMode', '')) === value439,
+    value441 = value438 === 'rhSubtractSubject' && value437?.rhV54HasMaskVideo === true;
+  (value439 || value441) && el93.classList.toggle('is-rh-disabled', Boolean(value440 || value441));
+  if (el93.classList?.contains('ui-schema-rh-v54-control-mode')) {
+    const value442 = String(getNodeFieldValue(value437, 'rhControlMode', 'single') || 'single'),
+      rhV54SinglePreset2 = normalizeRhV54SinglePreset(
+        getNodeFieldValue(value437, 'rhSingleControlPreset', 'efficiency'),
       );
-    (_0x476977
+    (el93
       .querySelectorAll('[data-key="rhSingleControlPreset"]')
-      .forEach((_0x409b20) =>
-        _0x409b20.classList.toggle('active', _0xc63b27 !== 'multi' && _0x409b20.dataset.value === _0x2925eb),
+      .forEach((el94) =>
+        el94.classList.toggle('active', value442 !== 'multi' && el94.dataset.value === rhV54SinglePreset2),
       ),
-      _0x476977
+      el93
         .querySelectorAll('[data-key="rhControlMode"]')
-        .forEach((_0x4b9ae7) =>
-          _0x4b9ae7.classList.toggle('active', _0xc63b27 === 'multi' && _0x4b9ae7.dataset.value === 'multi'),
+        .forEach((el95) =>
+          el95.classList.toggle('active', value442 === 'multi' && el95.dataset.value === 'multi'),
         ),
-      _0x476977.querySelector('.rh-adv-single-group')?.classList.toggle('active', _0xc63b27 !== 'multi'),
-      _0x476977.querySelector('.rh-adv-multi-group')?.classList.toggle('active', _0xc63b27 === 'multi'));
+      el93.querySelector('.rh-adv-single-group')?.classList.toggle('active', value442 !== 'multi'),
+      el93.querySelector('.rh-adv-multi-group')?.classList.toggle('active', value442 === 'multi'));
   }
-  if (_0x476977.classList?.contains('ui-schema-rh-v54-mask-expand')) {
-    const _0x3885a1 = normalizeRhV54MaskExpand(
-        getNodeFieldValue(_0xa750f2, 'rhMaskExpand', _0x476977.dataset.uiSchemaDefault || 25),
-        Number(_0x476977.dataset.uiSchemaDefault || 25),
+  if (el93.classList?.contains('ui-schema-rh-v54-mask-expand')) {
+    const rhV54MaskExpand3 = normalizeRhV54MaskExpand(
+        getNodeFieldValue(value437, 'rhMaskExpand', el93.dataset.uiSchemaDefault || 25),
+        Number(el93.dataset.uiSchemaDefault || 25),
       ),
-      _0x401c23 = _0x476977.querySelector('.rh-stepper-value');
-    _0x401c23 &&
-      ((_0x401c23.textContent = String(_0x3885a1)),
-      _0x401c23.setAttribute('aria-valuenow', String(_0x3885a1)));
+      el96 = el93.querySelector('.rh-stepper-value');
+    el96 &&
+      ((el96.textContent = String(rhV54MaskExpand3)),
+      el96.setAttribute('aria-valuenow', String(rhV54MaskExpand3)));
   }
-  if (_0x476977.classList?.contains('ui-schema-rh-v54-breast-jiggle')) {
-    const _0x1cf052 = String(_0x476977.dataset.uiSchemaField || '').trim(),
-      _0x3e4bd4 = formatRhV54BreastJiggle(
-        getNodeFieldValue(_0xa750f2, _0x1cf052, _0x476977.dataset.uiSchemaDefault || 0),
-        getRhV54BreastJiggleRangeFromFieldEl(_0x476977),
+  if (el93.classList?.contains('ui-schema-rh-v54-breast-jiggle')) {
+    const value443 = String(el93.dataset.uiSchemaField || '').trim(),
+      formatRhV54BreastJiggle3 = formatRhV54BreastJiggle(
+        getNodeFieldValue(value437, value443, el93.dataset.uiSchemaDefault || 0),
+        getRhV54BreastJiggleRangeFromFieldEl(el93),
       ),
-      _0x4bdb43 = _0x476977.querySelector('.rh-breast-jiggle-slider');
-    if (_0x4bdb43) _0x4bdb43.value = _0x3e4bd4;
-    const _0x255d70 = _0x476977.querySelector('.rh-breast-jiggle-value');
-    if (_0x255d70) _0x255d70.textContent = _0x3e4bd4;
+      el97 = el93.querySelector('.rh-breast-jiggle-slider');
+    if (el97) el97.value = formatRhV54BreastJiggle3;
+    const el98 = el93.querySelector('.rh-breast-jiggle-value');
+    if (el98) el98.textContent = formatRhV54BreastJiggle3;
   }
 }
-function getSyncedFieldValue(_0x53b6aa, _0x2aebea = {}) {
-  const _0x304583 = String(_0x53b6aa?.dataset?.uiSchemaField || '').trim();
-  if (!_0x304583) return '';
-  const _0x2cd4e8 = getNodeFieldValue(_0x2aebea, _0x304583, _0x53b6aa?.dataset?.uiSchemaDefault ?? ''),
-    _0x306474 = _0x53b6aa?.querySelector?.('[data-ui-schema-value="' + escapeCssString(_0x2cd4e8) + '"]');
-  if (_0x306474?.dataset?.uiSchemaDisabled !== 'true') return _0x2cd4e8;
-  const _0x482fec = _0x53b6aa?.dataset?.uiSchemaDefault ?? '',
-    _0x52f0ba = _0x53b6aa?.querySelector?.('[data-ui-schema-value="' + escapeCssString(_0x482fec) + '"]');
-  if (_0x52f0ba?.dataset?.uiSchemaDisabled !== 'true') return _0x482fec;
-  const _0x3ced07 = _0x53b6aa?.querySelector?.(
-    '[data-ui-schema-value]:not([data-ui-schema-disabled="true"])',
-  );
-  return _0x3ced07?.dataset?.uiSchemaValue ?? _0x2cd4e8;
+function getSyncedFieldValue(el99, value444 = {}) {
+  const enabled29 = String(el99?.dataset?.uiSchemaField || '').trim();
+  if (!enabled29) return '';
+  const nodeFieldValue3 = getNodeFieldValue(value444, enabled29, el99?.dataset?.uiSchemaDefault ?? ''),
+    el100 = el99?.querySelector?.('[data-ui-schema-value="' + escapeCssString(nodeFieldValue3) + '"]');
+  if (el100?.dataset?.uiSchemaDisabled !== 'true') return nodeFieldValue3;
+  const value445 = el99?.dataset?.uiSchemaDefault ?? '',
+    el101 = el99?.querySelector?.('[data-ui-schema-value="' + escapeCssString(value445) + '"]');
+  if (el101?.dataset?.uiSchemaDisabled !== 'true') return value445;
+  const el102 = el99?.querySelector?.('[data-ui-schema-value]:not([data-ui-schema-disabled="true"])');
+  return el102?.dataset?.uiSchemaValue ?? nodeFieldValue3;
 }
-function getSyncedOptionLabel(_0x5647b9, _0xf0ca91, { adaptive: adaptive = false } = {}) {
-  const _0x2904f0 = _0x5647b9?.querySelector?.('[data-ui-schema-value="' + escapeCssString(_0xf0ca91) + '"]'),
-    _0x47592c = String(
-      _0x2904f0?.dataset?.uiSchemaOptionLabel || _0x2904f0?.textContent || _0xf0ca91 || '',
-    ).trim(),
-    _0x1e0d7e = _0x47592c.toLowerCase(),
-    _0x4980b8 = String(_0xf0ca91 || '')
+function getSyncedOptionLabel(el103, value446, { adaptive: adaptive = false } = {}) {
+  const el104 = el103?.querySelector?.('[data-ui-schema-value="' + escapeCssString(value446) + '"]'),
+    value447 = String(el104?.dataset?.uiSchemaOptionLabel || el104?.textContent || value446 || '').trim(),
+    value448 = value447.toLowerCase(),
+    value449 = String(value446 || '')
       .trim()
       .toLowerCase();
   if (
     adaptive &&
-    (_0x1e0d7e === 'auto' ||
-      _0x1e0d7e === 'adaptive' ||
-      _0x1e0d7e === '自适应' ||
-      _0x4980b8 === 'auto' ||
-      _0x4980b8 === 'adaptive' ||
-      _0x4980b8 === '自适应')
+    (value448 === 'auto' ||
+      value448 === 'adaptive' ||
+      value448 === '自适应' ||
+      value449 === 'auto' ||
+      value449 === 'adaptive' ||
+      value449 === '自适应')
   )
     return '自适应';
-  return _0x47592c;
+  return value447;
 }
-function syncQualityRatioComposite(_0x818fa2, _0xca50dc = {}) {
-  const _0x598bc4 =
-      _0x818fa2?.querySelector?.('[data-ui-schema-field="aspectRatio"]') ||
-      _0x818fa2?.querySelector?.('[data-ui-schema-display-role="aspectRatio"]'),
-    _0xb5ddc2 =
-      _0x818fa2?.querySelector?.('[data-ui-schema-field="imageSize"]') ||
-      _0x818fa2?.querySelector?.('[data-ui-schema-field="resolution"]') ||
-      _0x818fa2?.querySelector?.('[data-ui-schema-field="videoSize"]') ||
-      _0x818fa2?.querySelector?.('[data-ui-schema-field="quality"]') ||
-      _0x818fa2?.querySelector?.('[data-ui-schema-display-role="resolution"]'),
-    _0x2751b5 = Array.from(_0x818fa2?.querySelectorAll?.('[data-ui-schema-field]') || []).filter(
-      (_0x3a9f33) => _0x3a9f33 !== _0x598bc4,
+function syncQualityRatioComposite(el105, value450 = {}) {
+  const enabled30 =
+      el105?.querySelector?.('[data-ui-schema-field="aspectRatio"]') ||
+      el105?.querySelector?.('[data-ui-schema-display-role="aspectRatio"]'),
+    value451 =
+      el105?.querySelector?.('[data-ui-schema-field="imageSize"]') ||
+      el105?.querySelector?.('[data-ui-schema-field="resolution"]') ||
+      el105?.querySelector?.('[data-ui-schema-field="videoSize"]') ||
+      el105?.querySelector?.('[data-ui-schema-field="quality"]') ||
+      el105?.querySelector?.('[data-ui-schema-display-role="resolution"]'),
+    list57 = Array.from(el105?.querySelectorAll?.('[data-ui-schema-field]') || []).filter(
+      (item58) => item58 !== enabled30,
     );
-  _0x2751b5.length === 0 && _0xb5ddc2 && _0x2751b5.push(_0xb5ddc2);
-  const _0x1bd56b = _0x818fa2?.querySelector?.('.ui-schema-quality-ratio-label');
-  if (!_0x2751b5.length || !_0x598bc4 || !_0x1bd56b) return;
-  const _0x7f8563 = getSyncedFieldValue(_0x598bc4, _0xca50dc),
-    _0x14fa6f = _0x2751b5.map((_0x2cde56) =>
-      getSyncedOptionLabel(_0x2cde56, getSyncedFieldValue(_0x2cde56, _0xca50dc)),
-    ),
-    _0x1eadac = getSyncedOptionLabel(_0x598bc4, _0x7f8563, { adaptive: true });
-  _0x1bd56b.textContent =
-    _0x14fa6f.length > 1
-      ? [..._0x14fa6f, _0x1eadac].join(' · ')
-      : String(_0x818fa2?.dataset?.uiSchemaLabelOrder || '').trim() === 'fieldFirst'
-        ? (_0x14fa6f[0] || '') + ' · ' + _0x1eadac
-        : _0x1eadac + ' · ' + (_0x14fa6f[0] || '');
+  list57.length === 0 && value451 && list57.push(value451);
+  const el106 = el105?.querySelector?.('.ui-schema-quality-ratio-label');
+  if (!list57.length || !enabled30 || !el106) return;
+  const syncedFieldValue = getSyncedFieldValue(enabled30, value450),
+    list58 = list57.map((item59) => getSyncedOptionLabel(item59, getSyncedFieldValue(item59, value450))),
+    syncedOptionLabel = getSyncedOptionLabel(enabled30, syncedFieldValue, { adaptive: true });
+  el106.textContent =
+    list58.length > 1
+      ? [...list58, syncedOptionLabel].join(' · ')
+      : String(el105?.dataset?.uiSchemaLabelOrder || '').trim() === 'fieldFirst'
+        ? (list58[0] || '') + ' · ' + syncedOptionLabel
+        : syncedOptionLabel + ' · ' + (list58[0] || '');
 }
-function syncSectionPairComposite(_0xa877b, _0x54b54a = {}) {
-  const _0x1fe3ff = Array.from(_0xa877b?.querySelectorAll?.('[data-ui-schema-field]') || []),
-    _0x581a1e = _0xa877b?.querySelector?.('.ui-schema-section-pair-label');
-  if (_0x1fe3ff.length < 2 || !_0x581a1e) return;
-  const _0x1e6bda = _0x1fe3ff
-    .map((_0x59f198) => getSyncedOptionLabel(_0x59f198, getSyncedFieldValue(_0x59f198, _0x54b54a)))
+function syncSectionPairComposite(el107, value452 = {}) {
+  const list59 = Array.from(el107?.querySelectorAll?.('[data-ui-schema-field]') || []),
+    el108 = el107?.querySelector?.('.ui-schema-section-pair-label');
+  if (list59.length < 2 || !el108) return;
+  const list60 = list59
+    .map((item60) => getSyncedOptionLabel(item60, getSyncedFieldValue(item60, value452)))
     .filter(Boolean);
-  _0x1e6bda.length >= 2 && (_0x581a1e.textContent = _0x1e6bda.join(' · '));
+  list60.length >= 2 && (el108.textContent = list60.join(' · '));
 }
-function syncVideoResolutionComposite(_0x4af87f, _0x24c963 = {}) {
-  const _0x108b31 =
-      _0x4af87f?.querySelector?.('[data-ui-schema-field="rhVideoResolution"]') ||
-      _0x4af87f?.querySelector?.('[data-ui-schema-field="videoResolution"]'),
-    _0x2e4595 = _0x4af87f?.querySelector?.('.ui-schema-video-resolution-label');
-  if (!_0x108b31 || !_0x2e4595) return;
-  const _0x150e47 = _0x4af87f.querySelector('[data-ui-schema-field="rhVideoFps"]'),
-    _0x3643ce = _0x4af87f.querySelector('[data-ui-schema-field="rhVideoFrames"]'),
-    _0x54175c = getSyncedFieldValue(_0x108b31, _0x24c963);
-  if (!_0x150e47 || !_0x3643ce) {
-    _0x2e4595.textContent = formatMetricLabel('分辨率', _0x54175c);
+function syncVideoResolutionComposite(el109, value453 = {}) {
+  const enabled31 =
+      el109?.querySelector?.('[data-ui-schema-field="rhVideoResolution"]') ||
+      el109?.querySelector?.('[data-ui-schema-field="videoResolution"]'),
+    el110 = el109?.querySelector?.('.ui-schema-video-resolution-label');
+  if (!enabled31 || !el110) return;
+  const enabled32 = el109.querySelector('[data-ui-schema-field="rhVideoFps"]'),
+    enabled33 = el109.querySelector('[data-ui-schema-field="rhVideoFrames"]'),
+    syncedFieldValue2 = getSyncedFieldValue(enabled31, value453);
+  if (!enabled32 || !enabled33) {
+    el110.textContent = formatMetricLabel('分辨率', syncedFieldValue2);
     return;
   }
-  const _0x3eeb1f = getSyncedFieldValue(_0x150e47, _0x24c963),
-    _0x1cc76f = getSyncedFieldValue(_0x3643ce, _0x24c963),
-    _0x44e897 = Number(_0x1cc76f) === 0 ? t('aigenImage.uiSchema.fullLength') : String(_0x1cc76f || '');
-  _0x2e4595.textContent = joinMetricLabels([
-    ['帧数', _0x44e897],
-    ['帧率', _0x3eeb1f],
-    ['分辨率', _0x54175c],
+  const syncedFieldValue3 = getSyncedFieldValue(enabled32, value453),
+    syncedFieldValue4 = getSyncedFieldValue(enabled33, value453),
+    value454 =
+      Number(syncedFieldValue4) === 0 ? t('aigenImage.uiSchema.fullLength') : String(syncedFieldValue4 || '');
+  el110.textContent = joinMetricLabels([
+    ['帧数', value454],
+    ['帧率', syncedFieldValue3],
+    ['分辨率', syncedFieldValue2],
   ]);
 }
-function syncRhVideoParamsComposite(_0x1f2878, _0x5d89d0 = {}) {
-  const _0x50357b = _0x1f2878?.querySelector?.('.img-ratio-label'),
-    _0x18adc3 = Array.from(_0x1f2878?.querySelectorAll?.('[data-ui-schema-field]') || []).map(
-      (_0x2ef004) => ({
-        id: _0x2ef004.dataset.uiSchemaField,
-        defaultValue: _0x2ef004.dataset.uiSchemaDefault,
-        min: _0x2ef004.dataset.uiSchemaMin,
-        max: _0x2ef004.dataset.uiSchemaMax,
-      }),
-    ),
-    _0x3b0e03 = (_0x157298) => _0x18adc3.find((_0x39db2e) => _0x39db2e.id === _0x157298),
-    _0x320d93 = _0x3b0e03('rhVideoResolution'),
-    _0x174a14 = _0x3b0e03('rhVideoFps'),
-    _0x2186a9 = _0x3b0e03('rhVideoFrames'),
-    _0xde0468 = _0x3b0e03('rhVideoSeconds'),
-    _0x27940c = (_0x7a360d, _0x22b41e, _0x4135c3 = {}) =>
+function syncRhVideoParamsComposite(el111, value455 = {}) {
+  const el112 = el111?.querySelector?.('.img-ratio-label'),
+    list61 = Array.from(el111?.querySelectorAll?.('[data-ui-schema-field]') || []).map((id) => ({
+      id: id.dataset.uiSchemaField,
+      defaultValue: id.dataset.uiSchemaDefault,
+      min: id.dataset.uiSchemaMin,
+      max: id.dataset.uiSchemaMax,
+    })),
+    handler23 = (value456) => list61.find((item61) => item61.id === value456),
+    value457 = handler23('rhVideoResolution'),
+    value458 = handler23('rhVideoFps'),
+    value459 = handler23('rhVideoFrames'),
+    value460 = handler23('rhVideoSeconds'),
+    handler24 = (value461, value462, value463 = {}) =>
       normalizeNumberValue(
-        getNodeFieldValue(_0x5d89d0, _0x7a360d?.id, _0x7a360d?.defaultValue ?? _0x22b41e),
-        Number(_0x22b41e),
-        _0x4135c3,
+        getNodeFieldValue(value455, value461?.id, value461?.defaultValue ?? value462),
+        Number(value462),
+        value463,
       ),
-    _0x134e54 = _0x320d93 ? _0x27940c(_0x320d93, _0x320d93.defaultValue || 0x340, { min: 0x340 }) : 0x340;
-  if (_0x50357b && _0xde0468) {
-    const _0x2a1cef = _0x174a14 ? _0x27940c(_0x174a14, _0x174a14.defaultValue || 24) : 24,
-      _0x433940 = _0x27940c(_0xde0468, _0xde0468.defaultValue || 5, {
-        min: Number(_0xde0468.min || 1),
-        max: Number(_0xde0468.max || 0x258),
+    value464 = value457 ? handler24(value457, value457.defaultValue || 0x340, { min: 0x340 }) : 0x340;
+  if (el112 && value460) {
+    const value465 = value458 ? handler24(value458, value458.defaultValue || 24) : 24,
+      value466 = handler24(value460, value460.defaultValue || 5, {
+        min: Number(value460.min || 1),
+        max: Number(value460.max || 0x258),
       });
-    _0x50357b.textContent = joinMetricLabels([
-      ['秒数', _0x433940],
-      ['帧率', _0x2a1cef],
-      ['分辨率', _0x134e54],
+    el112.textContent = joinMetricLabels([
+      ['秒数', value466],
+      ['帧率', value465],
+      ['分辨率', value464],
     ]);
   } else {
-    if (_0x50357b && _0x2186a9) {
-      const _0x3064f4 = _0x27940c(_0x2186a9, _0x2186a9.defaultValue || 77, {
-          min: Number(_0x2186a9.min || 0),
-          max: Number(_0x2186a9.max || 0xf423f),
+    if (el112 && value459) {
+      const count3 = handler24(value459, value459.defaultValue || 77, {
+          min: Number(value459.min || 0),
+          max: Number(value459.max || 0xf423f),
         }),
-        _0x2f3fac = _0x3064f4 === 0 ? t('aigenImage.uiSchema.fullLength') : String(_0x3064f4);
-      if (_0x174a14) {
-        const _0x3f10b7 = _0x27940c(_0x174a14, _0x174a14.defaultValue || 24);
-        _0x50357b.textContent = joinMetricLabels([
-          ['帧数', _0x2f3fac],
-          ['帧率', _0x3f10b7],
-          ['分辨率', _0x134e54],
+        value467 = count3 === 0 ? t('aigenImage.uiSchema.fullLength') : String(count3);
+      if (value458) {
+        const value468 = handler24(value458, value458.defaultValue || 24);
+        el112.textContent = joinMetricLabels([
+          ['帧数', value467],
+          ['帧率', value468],
+          ['分辨率', value464],
         ]);
       } else
-        _0x50357b.textContent = joinMetricLabels([
-          ['帧数', _0x2f3fac],
-          ['分辨率', _0x134e54],
+        el112.textContent = joinMetricLabels([
+          ['帧数', value467],
+          ['分辨率', value464],
         ]);
-    } else _0x50357b && (_0x50357b.textContent = formatMetricLabel('分辨率', _0x134e54));
+    } else el112 && (el112.textContent = formatMetricLabel('分辨率', value464));
   }
-  const _0x2f79c5 = _0x1f2878?.querySelector?.('[data-ui-schema-field="rhVideoFrames"] .rh-stepper-value');
-  if (_0x2186a9 && _0x2f79c5) {
-    const _0x39a2fc = _0x27940c(_0x2186a9, _0x2186a9.defaultValue || 77, {
-      min: Number(_0x2186a9.min || 0),
-      max: Number(_0x2186a9.max || 0xf423f),
+  const el113 = el111?.querySelector?.('[data-ui-schema-field="rhVideoFrames"] .rh-stepper-value');
+  if (value459 && el113) {
+    const count4 = handler24(value459, value459.defaultValue || 77, {
+      min: Number(value459.min || 0),
+      max: Number(value459.max || 0xf423f),
     });
-    ((_0x2f79c5.textContent = _0x39a2fc === 0 ? t('aigenImage.uiSchema.fullLength') : String(_0x39a2fc)),
-      _0x2f79c5.setAttribute('aria-valuenow', String(_0x39a2fc)));
+    ((el113.textContent = count4 === 0 ? t('aigenImage.uiSchema.fullLength') : String(count4)),
+      el113.setAttribute('aria-valuenow', String(count4)));
   }
-  const _0x5491b3 = _0x1f2878?.querySelector?.('[data-ui-schema-field="rhVideoSeconds"] .rh-stepper-value');
-  if (_0xde0468 && _0x5491b3) {
-    const _0x3ba66a = _0x27940c(_0xde0468, _0xde0468.defaultValue || 5, {
-      min: Number(_0xde0468.min || 1),
-      max: Number(_0xde0468.max || 0x258),
+  const el114 = el111?.querySelector?.('[data-ui-schema-field="rhVideoSeconds"] .rh-stepper-value');
+  if (value460 && el114) {
+    const value469 = handler24(value460, value460.defaultValue || 5, {
+      min: Number(value460.min || 1),
+      max: Number(value460.max || 0x258),
     });
-    ((_0x5491b3.textContent = String(_0x3ba66a)), _0x5491b3.setAttribute('aria-valuenow', String(_0x3ba66a)));
+    ((el114.textContent = String(value469)), el114.setAttribute('aria-valuenow', String(value469)));
   }
-  const _0x8eeec6 = _0x1f2878?.querySelector?.('.rh-v5-source-framecount');
-  if (_0x8eeec6) {
-    const _0x560fa6 = Number(_0x5d89d0?.rhVideoSourceFrameCount || 0);
-    _0x8eeec6.textContent = _0x560fa6 ? String(_0x560fa6) : '—';
+  const el115 = el111?.querySelector?.('.rh-v5-source-framecount');
+  if (el115) {
+    const value470 = Number(value455?.rhVideoSourceFrameCount || 0);
+    el115.textContent = value470 ? String(value470) : '—';
   }
 }
-function syncCompositeUiSchemaControls(_0x3a273a, _0x50af9c = {}) {
-  (_0x3a273a
+function syncCompositeUiSchemaControls(el116, value471 = {}) {
+  (el116
     .querySelectorAll('[data-ui-schema-composite-field="qualityRatio"]')
-    .forEach((_0x552606) => syncQualityRatioComposite(_0x552606, _0x50af9c)),
-    _0x3a273a
+    .forEach((item62) => syncQualityRatioComposite(item62, value471)),
+    el116
       .querySelectorAll('[data-ui-schema-composite-field="sectionPair"]')
-      .forEach((_0x6e8580) => syncSectionPairComposite(_0x6e8580, _0x50af9c)),
-    _0x3a273a
+      .forEach((item63) => syncSectionPairComposite(item63, value471)),
+    el116
       .querySelectorAll('[data-ui-schema-composite-field="videoResolution"]')
-      .forEach((_0x2097cb) => syncVideoResolutionComposite(_0x2097cb, _0x50af9c)),
-    _0x3a273a
+      .forEach((item64) => syncVideoResolutionComposite(item64, value471)),
+    el116
       .querySelectorAll('[data-ui-schema-composite-field="rhVideoParams"]')
-      .forEach((_0x1e4cf3) => syncRhVideoParamsComposite(_0x1e4cf3, _0x50af9c)));
+      .forEach((item65) => syncRhVideoParamsComposite(item65, value471)));
 }
 
 const UI_SCHEMA_POPUP_EXIT_MS = 0xa0;
 
-function getUiSchemaValueOptions(_0x2e97c5){return Array["from"](_0x2e97c5?.["querySelectorAll"]?.("[data-ui-schema-value]")||[]);}
+function getUiSchemaValueOptions(value472) {
+  return Array['from'](value472?.['querySelectorAll']?.('[data-ui-schema-value]') || []);
+}
 
-function findUiSchemaValueOption(_0x2e5a01,_0x42bb62){const _0x193fdd=String(_0x42bb62??'');return getUiSchemaValueOptions(_0x2e5a01)["find"](_0xad3a74=>String(_0xad3a74?.['dataset']?.['uiSchemaValue']??'')===_0x193fdd)||null;}
+function findUiSchemaValueOption(value473, value474) {
+  const value475 = String(value474 ?? '');
+  return (
+    getUiSchemaValueOptions(value473)['find'](
+      (el117) => String(el117?.['dataset']?.['uiSchemaValue'] ?? '') === value475,
+    ) || null
+  );
+}
 
-function findFirstEnabledUiSchemaValueOption(_0x3285fe){return getUiSchemaValueOptions(_0x3285fe)['find'](_0x321169=>_0x321169?.["dataset"]?.["uiSchemaDisabled"]!=="true")||null;}
+function findFirstEnabledUiSchemaValueOption(value476) {
+  return (
+    getUiSchemaValueOptions(value476)['find'](
+      (value477) => value477?.['dataset']?.['uiSchemaDisabled'] !== 'true',
+    ) || null
+  );
+}
 
-function isFieldDisabledByCondition(_0x13df35,_0x1943aa){if(!_0x13df35||!_0x1943aa)return![];const _0x3dd5b5=_0x13df35?.["disableWhen"];if(!_0x3dd5b5||typeof _0x3dd5b5!=="object")return![];return optionDisableWhenMatches(_0x3dd5b5,_0x1943aa);}
+function isFieldDisabledByCondition(enabled34, enabled35) {
+  if (!enabled34 || !enabled35) return ![];
+  const enabled36 = enabled34?.['disableWhen'];
+  if (!enabled36 || typeof enabled36 !== 'object') return ![];
+  return optionDisableWhenMatches(enabled36, enabled35);
+}
 
-function isFieldDisabledByUiState(_0x5f4165,_0x40d239){const _0x49f032=String(_0x5f4165?.['id']||'')["trim"]();if(!_0x49f032||!_0x40d239)return![];const _0x11d016=_0x40d239?.["uiSchemaFieldState"]?.[_0x49f032];return _0x11d016===!![]||_0x11d016?.["disabled"]===!![]||_0x11d016?.["readOnly"]===!![];}
+function isFieldDisabledByUiState(value478, enabled37) {
+  const enabled38 = String(value478?.['id'] || '')['trim']();
+  if (!enabled38 || !enabled37) return ![];
+  const value479 = enabled37?.['uiSchemaFieldState']?.[enabled38];
+  return value479 === !![] || value479?.['disabled'] === !![] || value479?.['readOnly'] === !![];
+}
 
-function resolveFieldDisabled(_0x78089b,_0x5057d0){if(!_0x78089b)return![];if(isFieldDisabled(_0x78089b))return!![];return isFieldDisabledByUiState(_0x78089b,_0x5057d0||{})||isFieldDisabledByCondition(_0x78089b,_0x5057d0||{});}
+function resolveFieldDisabled(enabled39, value480) {
+  if (!enabled39) return ![];
+  if (isFieldDisabled(enabled39)) return !![];
+  return (
+    isFieldDisabledByUiState(enabled39, value480 || {}) ||
+    isFieldDisabledByCondition(enabled39, value480 || {})
+  );
+}
 
-const BUILTIN_ADAPTIVE_RATIO_OPTION=Object["freeze"]({'value':"自适应",'label':"自适应"});
+const BUILTIN_ADAPTIVE_RATIO_OPTION = Object['freeze']({ value: '自适应', label: '自适应' });
 
-function getRatioOptions(_0x2dba21,_0x2f3436={}){const _0x83238c=getVisibleOptions(_0x2dba21,_0x2f3436);return _0x83238c["some"](_0x1f658f=>isAdaptiveRatioOption(_0x2dba21,_0x1f658f))?_0x83238c:[BUILTIN_ADAPTIVE_RATIO_OPTION,..._0x83238c];}
+function getRatioOptions(value481, value482 = {}) {
+  const args13 = getVisibleOptions(value481, value482);
+  return args13['some']((value483) => isAdaptiveRatioOption(value481, value483))
+    ? args13
+    : [BUILTIN_ADAPTIVE_RATIO_OPTION, ...args13];
+}
 
-function getVoiceCompositeModeField(_0x59d595={},_0x3a13d5={}){return firstNonEmptyString(_0x59d595?.['modeField'],_0x3a13d5?.["modeField"],_0x59d595?.['voiceModeField'],_0x3a13d5?.["voiceModeField"],'voiceMode');}
+function getVoiceCompositeModeField(options4 = {}, value484 = {}) {
+  return firstNonEmptyString(
+    options4?.['modeField'],
+    value484?.['modeField'],
+    options4?.['voiceModeField'],
+    value484?.['voiceModeField'],
+    'voiceMode',
+  );
+}
 
-function getVoiceCompositeDefaultModeValue(_0x114211={},_0x4725e6={}){return firstNonEmptyString(_0x114211?.["modeValue"],_0x114211?.["defaultModeValue"],_0x4725e6?.["defaultModeValue"],'default');}
+function getVoiceCompositeDefaultModeValue(options5 = {}, value485 = {}) {
+  return firstNonEmptyString(
+    options5?.['modeValue'],
+    options5?.['defaultModeValue'],
+    value485?.['defaultModeValue'],
+    'default',
+  );
+}
 
-function getVoiceCompositeCustomModeValue(_0x39fd1d={},_0x411afb={}){return firstNonEmptyString(_0x411afb?.["modeValue"],_0x411afb?.["filledModeValue"],_0x411afb?.["customModeValue"],_0x39fd1d?.["customModeValue"],"custom");}
+function getVoiceCompositeCustomModeValue(options6 = {}, value486 = {}) {
+  return firstNonEmptyString(
+    value486?.['modeValue'],
+    value486?.['filledModeValue'],
+    value486?.['customModeValue'],
+    options6?.['customModeValue'],
+    'custom',
+  );
+}
 
-function renderVoiceQualityRatioField(_0x2199e0,_0x4d22d7){const _0x58a14c=(Array["isArray"](_0x2199e0)?_0x2199e0:[])["filter"](Boolean);if(_0x58a14c["length"]<0x2)return'';const _0x451195=_0x58a14c[0x0],_0x1ec3e1=_0x58a14c[0x1];assertSupportedField(_0x451195),assertSupportedField(_0x1ec3e1);const _0x5f0801=getVoiceCompositeModeField(_0x451195,_0x1ec3e1),_0x2868b9=getVoiceCompositeDefaultModeValue(_0x451195,_0x1ec3e1),_0x1c1c7b=getVoiceCompositeCustomModeValue(_0x451195,_0x1ec3e1),_0x5172dc=getFieldValue(_0x4d22d7,_0x451195),_0x37dd26=String(getFieldValue(_0x4d22d7,_0x1ec3e1)||'')["trim"](),_0x2d6d21=_0x5f0801?String(getNodeFieldValue(_0x4d22d7,_0x5f0801,'')||'')["trim"]():'',_0x90bf25=getOptionLabel(_0x451195,_0x5172dc),_0x5bfcb0=resolveAudioVoiceCompositeState({'voiceTypeValue':_0x5172dc,'voiceTypeLabel':_0x90bf25,'speakerIdValue':_0x37dd26,'voiceModeValue':_0x2d6d21,'defaultModeValue':_0x2868b9,'customModeValue':_0x1c1c7b}),_0x8d283c=_0x5bfcb0["speakerIdValue"],_0x105eaf=_0x5bfcb0["triggerLabel"],_0x45dd51=_0x5bfcb0['customAreaClassName'],_0x832c94=_0x5bfcb0["defaultAreaClassName"],_0x25a453=manifestText(_0x1ec3e1?.["label"]||"自定义音色ID"),_0x10f025=String(_0x1ec3e1?.['placeholder']||"留空使用预设音色")['trim'](),_0x1a8859=String(_0x1ec3e1?.["helpUrl"]||'')['trim'](),_0x426b42=_0x1a8859?"<span class=\"rh-tip ui-schema-info-tip\" data-tooltip=\""+escapeHtmlAttr(_0x1ec3e1?.["description"]||"填写后覆盖预设音色，默认音色将不可选。点击旁边链接可跳转音色库获取完整音色ID。")+"\">!</span><a href=\"#\" class=\"ui-schema-help-link img-rp-voice-help-link\" data-ui-schema-field-help-url=\""+escapeHtmlAttr(_0x1a8859)+'\x22\x20title=\x22打开火山音色库\x22\x20onclick=\x22return\x20false;\x22><svg\x20width=\x2212\x22\x20height=\x2212\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><path\x20d=\x22M18\x2013v6a2\x202\x200\x200\x201-2\x202H5a2\x202\x200\x200\x201-2-2V8a2\x202\x200\x200\x201\x202-2h6\x22/><polyline\x20points=\x2215\x203\x2021\x203\x2021\x209\x22/><line\x20x1=\x2210\x22\x20y1=\x2214\x22\x20x2=\x2221\x22\x20y2=\x223\x22/></svg></a>':'',_0x2b68aa="<div class=\"img-rp-quality-area img-rp-voice-custom-area"+_0x45dd51+"\" data-ui-schema-field=\""+escapeHtmlAttr(_0x1ec3e1['id'])+'\x22\x20data-ui-schema-type=\x22text\x22\x20data-ui-schema-default=\x22'+escapeHtmlAttr(_0x1ec3e1?.["defaultValue"]??'')+'\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22img-rp-section-label\x22>'+escapeHtmlAttr(_0x25a453)+_0x426b42+"</div>\n      <div class=\"img-rp-voice-input-wrap\">\n        <input type=\"text\" class=\"img-rp-voice-input\" data-ui-schema-input=\""+escapeHtmlAttr(_0x1ec3e1['id'])+"\" data-ui-schema-field=\""+escapeHtmlAttr(_0x1ec3e1['id'])+"\" data-ui-schema-value=\""+escapeHtmlAttr(_0x8d283c)+"\" placeholder=\""+escapeHtmlAttr(_0x10f025)+"\" value=\""+escapeHtmlAttr(_0x8d283c)+"\" />\n      </div>\n    </div>",_0x161a5f=manifestText(_0x451195?.["label"]||"默认音色"),_0x31fefb=getVisibleOptions(_0x451195,_0x4d22d7),_0x35e75a=_0x31fefb["map"](_0x33dc44=>{const _0x2be507=getOptionValue(_0x33dc44),_0x4018d8=manifestText(_0x33dc44?.["label"]??_0x2be507),_0x48799e=String(_0x5172dc??'')===String(_0x2be507);return "<button type=\"button\" class=\"img-rp-ratio-item ui-schema-option "+(_0x48799e?"active":'')+"\" data-label=\""+escapeHtmlAttr(_0x2be507)+'\x22\x20data-ui-schema-value=\x22'+escapeHtmlAttr(_0x2be507)+'\x22><span>'+escapeHtmlAttr(_0x4018d8)+"</span></button>";})['join'](''),_0xf95b7a="<div class=\"img-rp-ratio-area img-rp-voice-default-area"+_0x832c94+"\" data-ui-schema-field=\""+escapeHtmlAttr(_0x451195['id'])+"\" data-ui-schema-type=\"segmented\" data-ui-schema-default=\""+escapeHtmlAttr(_0x451195?.['defaultValue']??'')+"\">\n      <div class=\"img-rp-section-label\">"+escapeHtmlAttr(_0x161a5f)+"</div>\n      <div class=\"img-rp-ratio-split\">\n        <div class=\"img-rp-ratio-right\">\n          "+_0x35e75a+"\n        </div>\n      </div>\n    </div>";return "<div class=\"ui-schema-voice-quality-ratio-pill\" data-ui-schema-composite-field=\"voiceQualityRatio\" data-ui-schema-primary-field=\""+escapeHtmlAttr(_0x451195['id'])+"\" data-ui-schema-secondary-field=\""+escapeHtmlAttr(_0x1ec3e1['id'])+'\x22\x20data-ui-schema-mode-field=\x22'+escapeHtmlAttr(_0x5f0801)+"\" data-ui-schema-default-mode-value=\""+escapeHtmlAttr(_0x2868b9)+'\x22\x20data-ui-schema-custom-mode-value=\x22'+escapeHtmlAttr(_0x1c1c7b)+"\">\n    <button type=\"button\" class=\"img-pill-btn ui-schema-menu-trigger\" data-ui-schema-menu-trigger=\"voiceQualityRatio\">\n      <svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z\"/><path d=\"M19 10v2a7 7 0 0 1-14 0v-2\"/><line x1=\"12\" y1=\"19\" x2=\"12\" y2=\"23\"/><line x1=\"8\" y1=\"23\" x2=\"16\" y2=\"23\"/></svg>\n      <span class=\"ui-schema-pill-label ui-schema-voice-quality-ratio-label\">"+escapeHtmlAttr(_0x105eaf)+"</span>\n    </button>\n    <div class=\"img-ratio-popup ui-schema-popup ui-schema-voice-quality-ratio-popup\" style=\"display:none;\">\n      "+_0x2b68aa+"\n      "+_0xf95b7a+"\n    </div>\n  </div>";}
+function renderVoiceQualityRatioField(value487, value488) {
+  const value489 = (Array['isArray'](value487) ? value487 : [])['filter'](Boolean);
+  if (value489['length'] < 0x2) return '';
+  const value490 = value489[0x0],
+    value491 = value489[0x1];
+  (assertSupportedField(value490), assertSupportedField(value491));
+  const voiceCompositeModeField = getVoiceCompositeModeField(value490, value491),
+    voiceCompositeDefaultModeValue = getVoiceCompositeDefaultModeValue(value490, value491),
+    voiceCompositeCustomModeValue = getVoiceCompositeCustomModeValue(value490, value491),
+    fieldValue11 = getFieldValue(value488, value490),
+    value492 = String(getFieldValue(value488, value491) || '')['trim'](),
+    value493 = voiceCompositeModeField
+      ? String(getNodeFieldValue(value488, voiceCompositeModeField, '') || '')['trim']()
+      : '',
+    optionLabel3 = getOptionLabel(value490, fieldValue11),
+    audioVoiceCompositeState = resolveAudioVoiceCompositeState({
+      voiceTypeValue: fieldValue11,
+      voiceTypeLabel: optionLabel3,
+      speakerIdValue: value492,
+      voiceModeValue: value493,
+      defaultModeValue: voiceCompositeDefaultModeValue,
+      customModeValue: voiceCompositeCustomModeValue,
+    }),
+    value494 = audioVoiceCompositeState['speakerIdValue'],
+    value495 = audioVoiceCompositeState['triggerLabel'],
+    value496 = audioVoiceCompositeState['customAreaClassName'],
+    value497 = audioVoiceCompositeState['defaultAreaClassName'],
+    manifestText25 = manifestText(value491?.['label'] || '自定义音色ID'),
+    value498 = String(value491?.['placeholder'] || '留空使用预设音色')['trim'](),
+    value499 = String(value491?.['helpUrl'] || '')['trim'](),
+    value500 = value499
+      ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' +
+        escapeHtmlAttr(
+          value491?.['description'] ||
+            '填写后覆盖预设音色，默认音色将不可选。点击旁边链接可跳转音色库获取完整音色ID。',
+        ) +
+        '">!</span><a href="#" class="ui-schema-help-link img-rp-voice-help-link" data-ui-schema-field-help-url="' +
+        escapeHtmlAttr(value499) +
+        '\x22\x20title=\x22打开火山音色库\x22\x20onclick=\x22return\x20false;\x22><svg\x20width=\x2212\x22\x20height=\x2212\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><path\x20d=\x22M18\x2013v6a2\x202\x200\x200\x201-2\x202H5a2\x202\x200\x200\x201-2-2V8a2\x202\x200\x200\x201\x202-2h6\x22/><polyline\x20points=\x2215\x203\x2021\x203\x2021\x209\x22/><line\x20x1=\x2210\x22\x20y1=\x2214\x22\x20x2=\x2221\x22\x20y2=\x223\x22/></svg></a>'
+      : '',
+    value501 =
+      '<div class="img-rp-quality-area img-rp-voice-custom-area' +
+      value496 +
+      '" data-ui-schema-field="' +
+      escapeHtmlAttr(value491['id']) +
+      '\x22\x20data-ui-schema-type=\x22text\x22\x20data-ui-schema-default=\x22' +
+      escapeHtmlAttr(value491?.['defaultValue'] ?? '') +
+      '\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22img-rp-section-label\x22>' +
+      escapeHtmlAttr(manifestText25) +
+      value500 +
+      '</div>\n      <div class="img-rp-voice-input-wrap">\n        <input type="text" class="img-rp-voice-input" data-ui-schema-input="' +
+      escapeHtmlAttr(value491['id']) +
+      '" data-ui-schema-field="' +
+      escapeHtmlAttr(value491['id']) +
+      '" data-ui-schema-value="' +
+      escapeHtmlAttr(value494) +
+      '" placeholder="' +
+      escapeHtmlAttr(value498) +
+      '" value="' +
+      escapeHtmlAttr(value494) +
+      '" />\n      </div>\n    </div>',
+    manifestText26 = manifestText(value490?.['label'] || '默认音色'),
+    visibleOptions = getVisibleOptions(value490, value488),
+    value502 = visibleOptions['map']((value503) => {
+      const optionValue5 = getOptionValue(value503),
+        manifestText27 = manifestText(value503?.['label'] ?? optionValue5),
+        value504 = String(fieldValue11 ?? '') === String(optionValue5);
+      return (
+        '<button type="button" class="img-rp-ratio-item ui-schema-option ' +
+        (value504 ? 'active' : '') +
+        '" data-label="' +
+        escapeHtmlAttr(optionValue5) +
+        '\x22\x20data-ui-schema-value=\x22' +
+        escapeHtmlAttr(optionValue5) +
+        '\x22><span>' +
+        escapeHtmlAttr(manifestText27) +
+        '</span></button>'
+      );
+    })['join'](''),
+    value505 =
+      '<div class="img-rp-ratio-area img-rp-voice-default-area' +
+      value497 +
+      '" data-ui-schema-field="' +
+      escapeHtmlAttr(value490['id']) +
+      '" data-ui-schema-type="segmented" data-ui-schema-default="' +
+      escapeHtmlAttr(value490?.['defaultValue'] ?? '') +
+      '">\n      <div class="img-rp-section-label">' +
+      escapeHtmlAttr(manifestText26) +
+      '</div>\n      <div class="img-rp-ratio-split">\n        <div class="img-rp-ratio-right">\n          ' +
+      value502 +
+      '\n        </div>\n      </div>\n    </div>';
+  return (
+    '<div class="ui-schema-voice-quality-ratio-pill" data-ui-schema-composite-field="voiceQualityRatio" data-ui-schema-primary-field="' +
+    escapeHtmlAttr(value490['id']) +
+    '" data-ui-schema-secondary-field="' +
+    escapeHtmlAttr(value491['id']) +
+    '\x22\x20data-ui-schema-mode-field=\x22' +
+    escapeHtmlAttr(voiceCompositeModeField) +
+    '" data-ui-schema-default-mode-value="' +
+    escapeHtmlAttr(voiceCompositeDefaultModeValue) +
+    '\x22\x20data-ui-schema-custom-mode-value=\x22' +
+    escapeHtmlAttr(voiceCompositeCustomModeValue) +
+    '">\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="voiceQualityRatio">\n      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>\n      <span class="ui-schema-pill-label ui-schema-voice-quality-ratio-label">' +
+    escapeHtmlAttr(value495) +
+    '</span>\n    </button>\n    <div class="img-ratio-popup ui-schema-popup ui-schema-voice-quality-ratio-popup" style="display:none;">\n      ' +
+    value501 +
+    '\n      ' +
+    value505 +
+    '\n    </div>\n  </div>'
+  );
+}
 
-function renderDropdownControl(_0x423ffc,_0x3fb940,_0x3b157d,_0x57f5b1={}){const _0x37c627=String(_0x423ffc?.['id']||'')["trim"](),_0x33447d=getOptionLabel(_0x423ffc,_0x3fb940),_0xb86433=_0x57f5b1?.["advanced"]?" ui-schema-advanced-dropdown":'',_0x56d998=String(_0x57f5b1?.['titleHtml']||''),_0x9c94a2=_0x57f5b1?.['advanced']?'<svg\x20class=\x22ui-schema-dropdown-chevron\x22\x20width=\x2212\x22\x20height=\x2212\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20aria-hidden=\x22true\x22><polyline\x20points=\x226\x209\x2012\x2015\x2018\x209\x22></polyline></svg>':'',_0x1e0d51=resolveFieldDisabled(_0x423ffc,_0x3b157d)?'\x20disabled\x20aria-disabled=\x22true\x22\x20data-ui-schema-disabled=\x22true\x22':'';return "<div class=\"ui-schema-pill-menu"+_0xb86433+"\" data-ui-schema-dropdown>\n    <button type=\"button\" class=\"img-pill-btn ui-schema-menu-trigger\" data-ui-schema-menu-trigger=\""+escapeHtmlAttr(_0x37c627)+"\" aria-haspopup=\"listbox\" aria-expanded=\"false\""+_0x1e0d51+'>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22ui-schema-pill-label\x22>'+escapeHtmlAttr(_0x33447d)+"</span>\n      "+_0x9c94a2+"\n    </button>\n    <div class=\"floating-menu ui-schema-floating-menu\" role=\"listbox\" aria-hidden=\"true\">\n      "+_0x56d998+"\n      "+renderFloatingMenuItems(_0x423ffc,_0x3fb940,_0x3b157d)+"\n    </div>\n  </div>";}
+function renderDropdownControl(value506, value507, value508, value509 = {}) {
+  const value510 = String(value506?.['id'] || '')['trim'](),
+    optionLabel4 = getOptionLabel(value506, value507),
+    value511 = value509?.['advanced'] ? ' ui-schema-advanced-dropdown' : '',
+    value512 = String(value509?.['titleHtml'] || ''),
+    value513 = value509?.['advanced']
+      ? '<svg\x20class=\x22ui-schema-dropdown-chevron\x22\x20width=\x2212\x22\x20height=\x2212\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20aria-hidden=\x22true\x22><polyline\x20points=\x226\x209\x2012\x2015\x2018\x209\x22></polyline></svg>'
+      : '',
+    fieldDisabled = resolveFieldDisabled(value506, value508)
+      ? '\x20disabled\x20aria-disabled=\x22true\x22\x20data-ui-schema-disabled=\x22true\x22'
+      : '';
+  return (
+    '<div class="ui-schema-pill-menu' +
+    value511 +
+    '" data-ui-schema-dropdown>\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="' +
+    escapeHtmlAttr(value510) +
+    '" aria-haspopup="listbox" aria-expanded="false"' +
+    fieldDisabled +
+    '>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22ui-schema-pill-label\x22>' +
+    escapeHtmlAttr(optionLabel4) +
+    '</span>\n      ' +
+    value513 +
+    '\n    </button>\n    <div class="floating-menu ui-schema-floating-menu" role="listbox" aria-hidden="true">\n      ' +
+    value512 +
+    '\n      ' +
+    renderFloatingMenuItems(value506, value507, value508) +
+    '\n    </div>\n  </div>'
+  );
+}
 
-function syncDurationPillField(_0x5edc03,_0x3d5188){if(!_0x5edc03?.["classList"]?.["contains"]("ui-schema-duration-pill"))return;const _0x3ae489=_0x5edc03["querySelector"](".ui-schema-duration-label");if(!_0x3ae489)return;_0x3ae489['textContent']=getRangeValueDisplayLabel(_0x5edc03,_0x3d5188,_0x3d5188+'S');}
+function syncDurationPillField(enabled40, value514) {
+  if (!enabled40?.['classList']?.['contains']('ui-schema-duration-pill')) return;
+  const el118 = enabled40['querySelector']('.ui-schema-duration-label');
+  if (!el118) return;
+  el118['textContent'] = getRangeValueDisplayLabel(enabled40, value514, value514 + 'S');
+}
 
-function syncResolutionPillField(_0x5c602c,_0x36c455){if(!_0x5c602c?.["classList"]?.['contains']("ui-schema-resolution-pill"))return;const _0x1ad78f=_0x5c602c["querySelector"](".ui-schema-pill-label"),_0x5b5a77=_0x1ad78f?.["querySelector"]('.ui-schema-resolution-value');if(_0x5b5a77){_0x5b5a77['textContent']=String(_0x36c455);return;}const _0x592f5f=_0x5c602c["querySelector"](".rh-res-title")?.["textContent"]||'Resolution';if(_0x1ad78f)_0x1ad78f["textContent"]=_0x592f5f+'\x20'+_0x36c455;}
+function syncResolutionPillField(enabled41, value515) {
+  if (!enabled41?.['classList']?.['contains']('ui-schema-resolution-pill')) return;
+  const value516 = enabled41['querySelector']('.ui-schema-pill-label'),
+    el119 = value516?.['querySelector']('.ui-schema-resolution-value');
+  if (el119) {
+    el119['textContent'] = String(value515);
+    return;
+  }
+  const value517 = enabled41['querySelector']('.rh-res-title')?.['textContent'] || 'Resolution';
+  if (value516) value516['textContent'] = value517 + '\x20' + value515;
+}
 
-function formatRhAiAppFooterParamLabel(_0x3b604d,_0xf96ed0){const _0x454b32=String(_0x3b604d?.["dataset"]?.['uiSchemaFooterLabel']||_0x3b604d?.["dataset"]?.["uiSchemaField"]||'参数')["trim"](),_0x2baf5c=String(_0x3b604d?.["dataset"]?.['uiSchemaType']||'')['trim'](),_0x3695de=formatRhAiAppFooterParamValue(_0x2baf5c,_0xf96ed0);return _0x3695de?_0x454b32+" · "+_0x3695de:_0x454b32;}
+function formatRhAiAppFooterParamLabel(value518, value519) {
+  const value520 = String(
+      value518?.['dataset']?.['uiSchemaFooterLabel'] || value518?.['dataset']?.['uiSchemaField'] || '参数',
+    )['trim'](),
+    value521 = String(value518?.['dataset']?.['uiSchemaType'] || '')['trim'](),
+    formatRhAiAppFooterParamValue2 = formatRhAiAppFooterParamValue(value521, value519);
+  return formatRhAiAppFooterParamValue2 ? value520 + ' · ' + formatRhAiAppFooterParamValue2 : value520;
+}
 
-function isRhAiAppFooterToggleOn(_0x13c632){if(_0x13c632===!![])return!![];if(_0x13c632===![])return![];const _0x1c7f0c=String(_0x13c632??'')["trim"]()['toLowerCase']();return["true",'1',"yes",'on']['includes'](_0x1c7f0c);}
+function isRhAiAppFooterToggleOn(value522) {
+  if (value522 === !![]) return !![];
+  if (value522 === ![]) return ![];
+  const value523 = String(value522 ?? '')
+    ['trim']()
+    ['toLowerCase']();
+  return ['true', '1', 'yes', 'on']['includes'](value523);
+}
 
-function syncRhAiAppFooterParamField(_0x47ac12,_0xb7aac7){if(!_0x47ac12?.['classList']?.["contains"]("ui-schema-rh-aiapp-footer-param"))return;const _0x501dc3=_0x47ac12["querySelector"]("[data-ui-schema-rh-aiapp-footer-toggle]");if(_0x501dc3){const _0x392889=isRhAiAppFooterToggleOn(_0xb7aac7);_0x501dc3["dataset"]["uiSchemaValue"]=_0x392889?"false":"true",_0x501dc3["setAttribute"]("aria-pressed",String(_0x392889));const _0x5bba8d=_0x501dc3["querySelector"](".ui-schema-rh-aiapp-footer-value");if(_0x5bba8d)_0x5bba8d["textContent"]=formatRhAiAppFooterParamValue("toggle",_0x392889);const _0x207e1b=_0x501dc3["querySelector"](".ui-schema-pill-label");_0x207e1b&&(_0x207e1b["textContent"]=String(_0x47ac12?.["dataset"]?.["uiSchemaFooterLabel"]||_0x47ac12?.["dataset"]?.["uiSchemaField"]||'参数')['trim']());return;}const _0x2a1473=_0x47ac12["querySelector"]('.ui-schema-pill-label');if(!_0x2a1473)return;_0x2a1473["textContent"]=formatRhAiAppFooterParamLabel(_0x47ac12,_0xb7aac7);}
+function syncRhAiAppFooterParamField(el120, value524) {
+  if (!el120?.['classList']?.['contains']('ui-schema-rh-aiapp-footer-param')) return;
+  const value525 = el120['querySelector']('[data-ui-schema-rh-aiapp-footer-toggle]');
+  if (value525) {
+    const isRhAiAppFooterToggleOn2 = isRhAiAppFooterToggleOn(value524);
+    ((value525['dataset']['uiSchemaValue'] = isRhAiAppFooterToggleOn2 ? 'false' : 'true'),
+      value525['setAttribute']('aria-pressed', String(isRhAiAppFooterToggleOn2)));
+    const value526 = value525['querySelector']('.ui-schema-rh-aiapp-footer-value');
+    if (value526) value526['textContent'] = formatRhAiAppFooterParamValue('toggle', isRhAiAppFooterToggleOn2);
+    const value527 = value525['querySelector']('.ui-schema-pill-label');
+    value527 &&
+      (value527['textContent'] = String(
+        el120?.['dataset']?.['uiSchemaFooterLabel'] || el120?.['dataset']?.['uiSchemaField'] || '参数',
+      )['trim']());
+    return;
+  }
+  const enabled42 = el120['querySelector']('.ui-schema-pill-label');
+  if (!enabled42) return;
+  enabled42['textContent'] = formatRhAiAppFooterParamLabel(el120, value524);
+}
 
-function formatRhAiAppFooterParamValue(_0x908890,_0x5b9247){if(_0x908890==="toggle")return isRhAiAppFooterToggleOn(_0x5b9247)?'是':'否';return String(_0x5b9247??'')["trim"]();}
+function formatRhAiAppFooterParamValue(value528, value529) {
+  if (value528 === 'toggle') return isRhAiAppFooterToggleOn(value529) ? '是' : '否';
+  return String(value529 ?? '')['trim']();
+}
 
-function renderRhAiAppFooterDirectNumberField({field:_0xceb260,id:_0xa9ff,type:_0x166816,value:_0x220100,label:_0x5b81e7,defaultValue:_0xf960d8,valueTypeAttr:_0x2ab674,nodeData:_0x5b9cfb}){const _0x268f05=String(_0xceb260?.["valueType"]||_0xceb260?.["numberMode"]||'')["trim"]()["toLowerCase"](),_0x5d96d7=_0x268f05==="float"||_0x268f05==="decimal"?'decimal':'numeric',_0x55079e=[];_0xceb260?.['min']!==undefined&&_0xceb260?.["min"]!==null&&_0x55079e['push']('\x20min=\x22'+escapeHtmlAttr(_0xceb260["min"])+'\x22');_0xceb260?.['max']!==undefined&&_0xceb260?.["max"]!==null&&_0x55079e["push"]('\x20max=\x22'+escapeHtmlAttr(_0xceb260["max"])+'\x22');_0x55079e['push']('\x20step=\x22'+escapeHtmlAttr(_0xceb260?.["step"]??(_0x5d96d7==="decimal"?'any':0x1))+'\x22');const _0x1423ca=resolveFieldDisabled(_0xceb260,_0x5b9cfb)?" disabled aria-disabled=\"true\" data-ui-schema-disabled=\"true\"":'';return "<div class=\"ui-schema-field ui-schema-rh-aiapp-footer-param ui-schema-rh-aiapp-footer-param--input\" data-ui-schema-field=\""+escapeHtmlAttr(_0xa9ff)+'\x22\x20data-ui-schema-type=\x22'+escapeHtmlAttr(_0x166816)+"\" data-ui-schema-default=\""+escapeHtmlAttr(_0xf960d8)+'\x22\x20data-ui-schema-footer-label=\x22'+escapeHtmlAttr(_0x5b81e7)+'\x22'+_0x2ab674+renderStepperAttrs(_0xceb260,_0x166816)+'>\x0a\x20\x20\x20\x20<label\x20class=\x22ui-schema-rh-aiapp-footer-inline\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22ui-schema-rh-aiapp-footer-inline-label\x22\x20data-tooltip=\x22'+escapeHtmlAttr(_0x5b81e7)+'\x22>'+escapeHtmlAttr(_0x5b81e7)+"</span>\n      <span class=\"ui-schema-rh-aiapp-footer-inline-separator\">·</span>\n      <input class=\"ui-schema-rh-aiapp-footer-input\" data-ui-schema-input=\""+escapeHtmlAttr(_0xa9ff)+'\x22\x20type=\x22number\x22\x20inputmode=\x22'+escapeHtmlAttr(_0x5d96d7)+"\" value=\""+escapeHtmlAttr(_0x220100)+"\" aria-label=\""+escapeHtmlAttr(_0x5b81e7)+'\x22'+_0x55079e['join']('')+_0x1423ca+">\n    </label>\n  </div>";}
+function renderRhAiAppFooterDirectNumberField({
+  field: field,
+  id: id2,
+  type: type,
+  value: value530,
+  label: label8,
+  defaultValue: defaultValue,
+  valueTypeAttr: valueTypeAttr,
+  nodeData: nodeData11,
+}) {
+  const value531 = String(field?.['valueType'] || field?.['numberMode'] || '')
+      ['trim']()
+      ['toLowerCase'](),
+    value532 = value531 === 'float' || value531 === 'decimal' ? 'decimal' : 'numeric',
+    list62 = [];
+  field?.['min'] !== undefined &&
+    field?.['min'] !== null &&
+    list62['push']('\x20min=\x22' + escapeHtmlAttr(field['min']) + '\x22');
+  field?.['max'] !== undefined &&
+    field?.['max'] !== null &&
+    list62['push']('\x20max=\x22' + escapeHtmlAttr(field['max']) + '\x22');
+  list62['push'](
+    '\x20step=\x22' + escapeHtmlAttr(field?.['step'] ?? (value532 === 'decimal' ? 'any' : 0x1)) + '\x22',
+  );
+  const fieldDisabled2 = resolveFieldDisabled(field, nodeData11)
+    ? ' disabled aria-disabled="true" data-ui-schema-disabled="true"'
+    : '';
+  return (
+    '<div class="ui-schema-field ui-schema-rh-aiapp-footer-param ui-schema-rh-aiapp-footer-param--input" data-ui-schema-field="' +
+    escapeHtmlAttr(id2) +
+    '\x22\x20data-ui-schema-type=\x22' +
+    escapeHtmlAttr(type) +
+    '" data-ui-schema-default="' +
+    escapeHtmlAttr(defaultValue) +
+    '\x22\x20data-ui-schema-footer-label=\x22' +
+    escapeHtmlAttr(label8) +
+    '\x22' +
+    valueTypeAttr +
+    renderStepperAttrs(field, type) +
+    '>\x0a\x20\x20\x20\x20<label\x20class=\x22ui-schema-rh-aiapp-footer-inline\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22ui-schema-rh-aiapp-footer-inline-label\x22\x20data-tooltip=\x22' +
+    escapeHtmlAttr(label8) +
+    '\x22>' +
+    escapeHtmlAttr(label8) +
+    '</span>\n      <span class="ui-schema-rh-aiapp-footer-inline-separator">·</span>\n      <input class="ui-schema-rh-aiapp-footer-input" data-ui-schema-input="' +
+    escapeHtmlAttr(id2) +
+    '\x22\x20type=\x22number\x22\x20inputmode=\x22' +
+    escapeHtmlAttr(value532) +
+    '" value="' +
+    escapeHtmlAttr(value530) +
+    '" aria-label="' +
+    escapeHtmlAttr(label8) +
+    '\x22' +
+    list62['join']('') +
+    fieldDisabled2 +
+    '>\n    </label>\n  </div>'
+  );
+}
 
-function renderRhAiAppFooterToggleField({field:_0x268c92,id:_0x23986c,type:_0x3c4e94,value:_0x2f1612,label:_0x45ca5d,defaultValue:_0x16f7e0,valueTypeAttr:_0x55b2e3,nodeData:_0x55ca58}){const _0x988448=isRhAiAppFooterToggleOn(_0x2f1612),_0x1b3313=resolveFieldDisabled(_0x268c92,_0x55ca58)?" disabled aria-disabled=\"true\" data-ui-schema-disabled=\"true\"":'',_0x4fed07=formatRhAiAppFooterParamValue(_0x3c4e94,_0x988448);return "<div class=\"ui-schema-field ui-schema-rh-aiapp-footer-param ui-schema-rh-aiapp-footer-param--toggle\" data-ui-schema-field=\""+escapeHtmlAttr(_0x23986c)+"\" data-ui-schema-type=\""+escapeHtmlAttr(_0x3c4e94)+"\" data-ui-schema-default=\""+escapeHtmlAttr(_0x16f7e0)+'\x22\x20data-ui-schema-footer-label=\x22'+escapeHtmlAttr(_0x45ca5d)+'\x22'+_0x55b2e3+">\n    <button type=\"button\" class=\"img-pill-btn ui-schema-rh-aiapp-footer-toggle\" data-ui-schema-rh-aiapp-footer-toggle=\"true\" data-ui-schema-value=\""+escapeHtmlAttr(_0x988448?"false":"true")+'\x22\x20aria-pressed=\x22'+escapeHtmlAttr(_0x988448)+'\x22'+_0x1b3313+">\n      <span class=\"ui-schema-pill-label\">"+escapeHtmlAttr(_0x45ca5d)+"</span>\n      <span class=\"ui-schema-rh-aiapp-footer-separator\" aria-hidden=\"true\">·</span>\n      <span class=\"ui-schema-rh-aiapp-footer-value\">"+escapeHtmlAttr(_0x4fed07)+"</span>\n    </button>\n  </div>";}
+function renderRhAiAppFooterToggleField({
+  field: field2,
+  id: id3,
+  type: type2,
+  value: value533,
+  label: label9,
+  defaultValue: defaultValue2,
+  valueTypeAttr: valueTypeAttr2,
+  nodeData: nodeData12,
+}) {
+  const isRhAiAppFooterToggleOn3 = isRhAiAppFooterToggleOn(value533),
+    fieldDisabled3 = resolveFieldDisabled(field2, nodeData12)
+      ? ' disabled aria-disabled="true" data-ui-schema-disabled="true"'
+      : '',
+    formatRhAiAppFooterParamValue3 = formatRhAiAppFooterParamValue(type2, isRhAiAppFooterToggleOn3);
+  return (
+    '<div class="ui-schema-field ui-schema-rh-aiapp-footer-param ui-schema-rh-aiapp-footer-param--toggle" data-ui-schema-field="' +
+    escapeHtmlAttr(id3) +
+    '" data-ui-schema-type="' +
+    escapeHtmlAttr(type2) +
+    '" data-ui-schema-default="' +
+    escapeHtmlAttr(defaultValue2) +
+    '\x22\x20data-ui-schema-footer-label=\x22' +
+    escapeHtmlAttr(label9) +
+    '\x22' +
+    valueTypeAttr2 +
+    '>\n    <button type="button" class="img-pill-btn ui-schema-rh-aiapp-footer-toggle" data-ui-schema-rh-aiapp-footer-toggle="true" data-ui-schema-value="' +
+    escapeHtmlAttr(isRhAiAppFooterToggleOn3 ? 'false' : 'true') +
+    '\x22\x20aria-pressed=\x22' +
+    escapeHtmlAttr(isRhAiAppFooterToggleOn3) +
+    '\x22' +
+    fieldDisabled3 +
+    '>\n      <span class="ui-schema-pill-label">' +
+    escapeHtmlAttr(label9) +
+    '</span>\n      <span class="ui-schema-rh-aiapp-footer-separator" aria-hidden="true">·</span>\n      <span class="ui-schema-rh-aiapp-footer-value">' +
+    escapeHtmlAttr(formatRhAiAppFooterParamValue3) +
+    '</span>\n    </button>\n  </div>'
+  );
+}
 
-function renderRhAiAppFooterParamField(_0x333569,_0x2faf78){assertSupportedField(_0x333569);const _0x4453c1=String(_0x333569?.['id']||'')["trim"](),_0x261928=normalizeControlType(_0x333569?.["type"]),_0x4990bc=getFieldValue(_0x2faf78,_0x333569),_0x14d106=manifestText(_0x333569?.['label']||_0x4453c1),_0x397b9e=_0x333569?.["defaultValue"]??'',_0x22dea2=typeof _0x333569?.["defaultValue"]==='boolean'?" data-ui-schema-value-type=\"boolean\"":_0x261928==="stepper"?" data-ui-schema-value-type=\"number\"":'',_0x23b6f3=_0x261928==="stepper"?" ui-schema-rh-video-stepper":'';if(_0x261928==="stepper")return renderRhAiAppFooterDirectNumberField({'field':_0x333569,'id':_0x4453c1,'type':_0x261928,'value':_0x4990bc,'label':_0x14d106,'defaultValue':_0x397b9e,'valueTypeAttr':_0x22dea2,'nodeData':_0x2faf78});if(_0x261928==='toggle')return renderRhAiAppFooterToggleField({'field':_0x333569,'id':_0x4453c1,'type':_0x261928,'value':_0x4990bc,'label':_0x14d106,'defaultValue':_0x397b9e,'valueTypeAttr':_0x22dea2,'nodeData':_0x2faf78});const _0x23e6df=renderControl(_0x333569,_0x4990bc,_0x261928,{'nodeData':_0x2faf78,'advanced':!![]}),_0x59802c=formatRhAiAppFooterParamValue(_0x261928,_0x4990bc),_0x58649d=_0x59802c?_0x14d106+" · "+_0x59802c:_0x14d106;return "<div class=\"ui-schema-field ui-schema-pill-menu ui-schema-rh-aiapp-footer-param"+_0x23b6f3+"\" data-ui-schema-field=\""+escapeHtmlAttr(_0x4453c1)+"\" data-ui-schema-type=\""+escapeHtmlAttr(_0x261928)+"\" data-ui-schema-default=\""+escapeHtmlAttr(_0x397b9e)+"\" data-ui-schema-footer-label=\""+escapeHtmlAttr(_0x14d106)+'\x22'+_0x22dea2+renderStepperAttrs(_0x333569,_0x261928)+'>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22img-pill-btn\x20ui-schema-menu-trigger\x22\x20data-ui-schema-menu-trigger=\x22'+escapeHtmlAttr(_0x4453c1)+"\">\n      <span class=\"ui-schema-pill-label\">"+escapeHtmlAttr(_0x58649d)+"</span>\n    </button>\n    <div class=\"floating-menu ui-schema-floating-menu ui-schema-rh-aiapp-footer-menu\">\n      <div class=\"ui-schema-floating-menu-title\">"+escapeHtmlAttr(_0x14d106)+"</div>\n      <div class=\"ui-schema-rh-aiapp-footer-control\">"+_0x23e6df+"</div>\n    </div>\n  </div>";}
+function renderRhAiAppFooterParamField(value534, value535) {
+  assertSupportedField(value534);
+  const value536 = String(value534?.['id'] || '')['trim'](),
+    controlType6 = normalizeControlType(value534?.['type']),
+    fieldValue12 = getFieldValue(value535, value534),
+    manifestText28 = manifestText(value534?.['label'] || value536),
+    value537 = value534?.['defaultValue'] ?? '',
+    value538 =
+      typeof value534?.['defaultValue'] === 'boolean'
+        ? ' data-ui-schema-value-type="boolean"'
+        : controlType6 === 'stepper'
+          ? ' data-ui-schema-value-type="number"'
+          : '',
+    value539 = controlType6 === 'stepper' ? ' ui-schema-rh-video-stepper' : '';
+  if (controlType6 === 'stepper')
+    return renderRhAiAppFooterDirectNumberField({
+      field: value534,
+      id: value536,
+      type: controlType6,
+      value: fieldValue12,
+      label: manifestText28,
+      defaultValue: value537,
+      valueTypeAttr: value538,
+      nodeData: value535,
+    });
+  if (controlType6 === 'toggle')
+    return renderRhAiAppFooterToggleField({
+      field: value534,
+      id: value536,
+      type: controlType6,
+      value: fieldValue12,
+      label: manifestText28,
+      defaultValue: value537,
+      valueTypeAttr: value538,
+      nodeData: value535,
+    });
+  const renderControl3 = renderControl(value534, fieldValue12, controlType6, {
+      nodeData: value535,
+      advanced: !![],
+    }),
+    formatRhAiAppFooterParamValue4 = formatRhAiAppFooterParamValue(controlType6, fieldValue12),
+    value540 = formatRhAiAppFooterParamValue4
+      ? manifestText28 + ' · ' + formatRhAiAppFooterParamValue4
+      : manifestText28;
+  return (
+    '<div class="ui-schema-field ui-schema-pill-menu ui-schema-rh-aiapp-footer-param' +
+    value539 +
+    '" data-ui-schema-field="' +
+    escapeHtmlAttr(value536) +
+    '" data-ui-schema-type="' +
+    escapeHtmlAttr(controlType6) +
+    '" data-ui-schema-default="' +
+    escapeHtmlAttr(value537) +
+    '" data-ui-schema-footer-label="' +
+    escapeHtmlAttr(manifestText28) +
+    '\x22' +
+    value538 +
+    renderStepperAttrs(value534, controlType6) +
+    '>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22img-pill-btn\x20ui-schema-menu-trigger\x22\x20data-ui-schema-menu-trigger=\x22' +
+    escapeHtmlAttr(value536) +
+    '">\n      <span class="ui-schema-pill-label">' +
+    escapeHtmlAttr(value540) +
+    '</span>\n    </button>\n    <div class="floating-menu ui-schema-floating-menu ui-schema-rh-aiapp-footer-menu">\n      <div class="ui-schema-floating-menu-title">' +
+    escapeHtmlAttr(manifestText28) +
+    '</div>\n      <div class="ui-schema-rh-aiapp-footer-control">' +
+    renderControl3 +
+    '</div>\n    </div>\n  </div>'
+  );
+}
 
-function isStandaloneResolutionField(_0xfb65fd){if(_0xfb65fd?.["standaloneInResolution"]===!![])return!![];return String(_0xfb65fd?.['resolutionComposite']||'')['trim']()["toLowerCase"]()==="standalone";}
+function isStandaloneResolutionField(value541) {
+  if (value541?.['standaloneInResolution'] === !![]) return !![];
+  return (
+    String(value541?.['resolutionComposite'] || '')
+      ['trim']()
+      ['toLowerCase']() === 'standalone'
+  );
+}
 
-export function hasVisibleModelUiSchema(_0x158bf5,_0x279c86={},_0x1ab86d={}){const _0x3045e8=getUiSchemaFields(_0x158bf5,_0x1ab86d);return _0x3045e8['forEach'](assertSupportedField),filterVisibleUiSchemaFields(_0x3045e8,_0x279c86)["length"]>0x0;}
+export function hasVisibleModelUiSchema(value542, value543 = {}, value544 = {}) {
+  const list63 = getUiSchemaFields(value542, value544);
+  return (
+    list63['forEach'](assertSupportedField),
+    filterVisibleUiSchemaFields(list63, value543)['length'] > 0x0
+  );
+}
 
-function handleRandomSeedRowBindEvent({event:_0x350783,eventName:_0x75eb85,fieldEl:_0x1edde2,helpers:helpers={}}={}){if(_0x75eb85!=="click"||!_0x1edde2)return![];const _0x3a0141=helpers["commitValue"];if(typeof _0x3a0141!=="function")return![];const _0x179e57=typeof helpers["setRhVideoStepperValueEl"]==='function'?helpers["setRhVideoStepperValueEl"]:()=>{},_0x33466d=typeof helpers['generateRandomSeedForField']==='function'?helpers['generateRandomSeedForField']:()=>'',_0x3632c5=_0x350783?.["target"]?.["closest"]?.('[data-ui-schema-random-seed-mode]');if(_0x3632c5&&_0x1edde2["contains"](_0x3632c5)){_0x350783["preventDefault"]?.(),_0x350783["stopPropagation"]?.();const _0x55bda8=String(_0x3632c5['dataset']['uiSchemaRandomSeedModeField']||_0x1edde2["dataset"]?.["uiSchemaRandomSeedModeField"]||'')['trim'](),_0x4d4ee6=normalizeRandomSeedMode(_0x3632c5['dataset']["uiSchemaRandomSeedMode"],"fixed");if(!_0x55bda8)return!![];_0x3a0141(_0x55bda8,_0x4d4ee6);if(_0x4d4ee6==="random"){const _0x16e7bf=String(_0x1edde2['dataset']["uiSchemaField"]||'')["trim"](),_0x443850=_0x33466d(_0x1edde2);_0x1edde2['classList']?.["contains"]("ui-schema-rh-video-stepper")&&_0x179e57(_0x1edde2,_0x443850);const _0x348ed0=_0x1edde2['querySelector']('[data-ui-schema-input]');if(_0x348ed0)_0x348ed0['value']=_0x443850;if(_0x16e7bf)_0x3a0141(_0x16e7bf,_0x443850);}return!![];}const _0x3cab5f=_0x350783?.["target"]?.["closest"]?.("[data-ui-schema-random-seed]");if(_0x3cab5f&&_0x1edde2["contains"](_0x3cab5f)){_0x350783['preventDefault']?.(),_0x350783["stopPropagation"]?.();const _0x5b503e=String(_0x1edde2?.["dataset"]?.["uiSchemaField"]||'')['trim']();if(!_0x5b503e)return!![];const _0x14ef38=_0x33466d(_0x1edde2);_0x1edde2["classList"]?.['contains']('ui-schema-rh-video-stepper')&&_0x179e57(_0x1edde2,_0x14ef38);const _0x424787=_0x1edde2['querySelector']("[data-ui-schema-input]");if(_0x424787)_0x424787["value"]=_0x14ef38;return _0x3a0141(_0x5b503e,_0x14ef38),!![];}return![];}
+function handleRandomSeedRowBindEvent({
+  event: event12,
+  eventName: eventName,
+  fieldEl: fieldEl4,
+  helpers: helpers = {},
+} = {}) {
+  if (eventName !== 'click' || !fieldEl4) return ![];
+  const run7 = helpers['commitValue'];
+  if (typeof run7 !== 'function') return ![];
+  const run8 =
+      typeof helpers['setRhVideoStepperValueEl'] === 'function'
+        ? helpers['setRhVideoStepperValueEl']
+        : () => {},
+    handler25 =
+      typeof helpers['generateRandomSeedForField'] === 'function'
+        ? helpers['generateRandomSeedForField']
+        : () => '',
+    el121 = event12?.['target']?.['closest']?.('[data-ui-schema-random-seed-mode]');
+  if (el121 && fieldEl4['contains'](el121)) {
+    (event12['preventDefault']?.(), event12['stopPropagation']?.());
+    const enabled43 = String(
+        el121['dataset']['uiSchemaRandomSeedModeField'] ||
+          fieldEl4['dataset']?.['uiSchemaRandomSeedModeField'] ||
+          '',
+      )['trim'](),
+      randomSeedMode3 = normalizeRandomSeedMode(el121['dataset']['uiSchemaRandomSeedMode'], 'fixed');
+    if (!enabled43) return !![];
+    run7(enabled43, randomSeedMode3);
+    if (randomSeedMode3 === 'random') {
+      const value545 = String(fieldEl4['dataset']['uiSchemaField'] || '')['trim'](),
+        value546 = handler25(fieldEl4);
+      fieldEl4['classList']?.['contains']('ui-schema-rh-video-stepper') && run8(fieldEl4, value546);
+      const el122 = fieldEl4['querySelector']('[data-ui-schema-input]');
+      if (el122) el122['value'] = value546;
+      if (value545) run7(value545, value546);
+    }
+    return !![];
+  }
+  const value547 = event12?.['target']?.['closest']?.('[data-ui-schema-random-seed]');
+  if (value547 && fieldEl4['contains'](value547)) {
+    (event12['preventDefault']?.(), event12['stopPropagation']?.());
+    const enabled44 = String(fieldEl4?.['dataset']?.['uiSchemaField'] || '')['trim']();
+    if (!enabled44) return !![];
+    const value548 = handler25(fieldEl4);
+    fieldEl4['classList']?.['contains']('ui-schema-rh-video-stepper') && run8(fieldEl4, value548);
+    const value549 = fieldEl4['querySelector']('[data-ui-schema-input]');
+    if (value549) value549['value'] = value548;
+    return (run7(enabled44, value548), !![]);
+  }
+  return ![];
+}
 
-const uiSchemaStateOwner=createUiSchemaStateOwner({'getUiSchemaValueOptions':getUiSchemaValueOptions,'findUiSchemaValueOption':findUiSchemaValueOption,'findFirstEnabledUiSchemaValueOption':findFirstEnabledUiSchemaValueOption,'syncInstanceToggleField':syncInstanceToggleField,'syncStepperField':syncStepperField,'syncRhAiAppFooterParamField':syncRhAiAppFooterParamField,'parseRangeValuesFromFieldEl':parseRangeValuesFromFieldEl,'findRangeValueIndex':findRangeValueIndex,'normalizeRhV54SpecialMode':normalizeRhV54SpecialMode,'normalizeRhV54SinglePreset':normalizeRhV54SinglePreset,'normalizeRhV54MaskExpand':normalizeRhV54MaskExpand,'formatRhV54BreastJiggle':formatRhV54BreastJiggle,'getRhV54BreastJiggleRangeFromFieldEl':getRhV54BreastJiggleRangeFromFieldEl,'normalizeNumberValue':normalizeNumberValue,'formatMetricLabel':formatMetricLabel,'joinMetricLabels':joinMetricLabels});
+const uiSchemaStateOwner = createUiSchemaStateOwner({
+  getUiSchemaValueOptions: getUiSchemaValueOptions,
+  findUiSchemaValueOption: findUiSchemaValueOption,
+  findFirstEnabledUiSchemaValueOption: findFirstEnabledUiSchemaValueOption,
+  syncInstanceToggleField: syncInstanceToggleField,
+  syncStepperField: syncStepperField,
+  syncRhAiAppFooterParamField: syncRhAiAppFooterParamField,
+  parseRangeValuesFromFieldEl: parseRangeValuesFromFieldEl,
+  findRangeValueIndex: findRangeValueIndex,
+  normalizeRhV54SpecialMode: normalizeRhV54SpecialMode,
+  normalizeRhV54SinglePreset: normalizeRhV54SinglePreset,
+  normalizeRhV54MaskExpand: normalizeRhV54MaskExpand,
+  formatRhV54BreastJiggle: formatRhV54BreastJiggle,
+  getRhV54BreastJiggleRangeFromFieldEl: getRhV54BreastJiggleRangeFromFieldEl,
+  normalizeNumberValue: normalizeNumberValue,
+  formatMetricLabel: formatMetricLabel,
+  joinMetricLabels: joinMetricLabels,
+});

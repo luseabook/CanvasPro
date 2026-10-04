@@ -24,120 +24,120 @@ import {
 import { createProviderModelCatalogBundleRegistry } from './providerModelCatalogRegistration.js';
 const DREAMINA_LOGIN_PAGE_URL = 'https://jimeng.jianying.com/',
   DREAMINA_I18N_PREFIX = 'settings.apiInput.providers.dreamina';
-function trTemplate(_0x57eba7, _0x344c47 = {}) {
-  let _0x2f6155 = t(_0x57eba7);
+function trTemplate(value, item = {}) {
+  let t2 = t(value);
   return (
-    Object.entries(_0x344c47 || {}).forEach(([_0x434ce2, _0x32f978]) => {
-      _0x2f6155 = _0x2f6155.split('{' + _0x434ce2 + '}').join(String(_0x32f978 ?? ''));
+    Object.entries(item || {}).forEach(([key, index]) => {
+      t2 = t2.split('{' + key + '}').join(String(index ?? ''));
     }),
-    _0x2f6155
+    t2
   );
 }
-function trApiInput(_0x49883d, _0x1c7567 = {}) {
-  return trTemplate('settings.apiInput.' + _0x49883d, _0x1c7567);
+function trApiInput(result, data = {}) {
+  return trTemplate('settings.apiInput.' + result, data);
 }
-function trDreamina(_0x5c1d85, _0x4dc752 = {}) {
-  return trTemplate(DREAMINA_I18N_PREFIX + '.' + _0x5c1d85, _0x4dc752);
+function trDreamina(options, target = {}) {
+  return trTemplate(DREAMINA_I18N_PREFIX + '.' + options, target);
 }
-function normalizeDreaminaManualUrlCandidate(_0x1def27) {
-  const _0x80ce81 = String(_0x1def27 || '').trim();
-  if (!_0x80ce81) return '';
-  const _0x26d542 = _0x80ce81
+function normalizeDreaminaManualUrlCandidate(source) {
+  const enabled = String(source || '').trim();
+  if (!enabled) return '';
+  const next = enabled
     .replace(/^[<（(【\["'“‘]+/, '')
     .replace(/[>）)】\]"'”’]+$/, '')
     .replace(/[，。；;、]+$/, '');
-  return /^https?:\/\//.test(_0x26d542) ? _0x26d542 : '';
+  return /^https?:\/\//.test(next) ? next : '';
 }
-export function extractDreaminaManualLinksFromOutputLines(_0x1d4a0e) {
-  const _0x217515 = Array.isArray(_0x1d4a0e) ? _0x1d4a0e : [],
-    _0x4e837f = [];
-  let _0x3dc5de = '';
-  _0x217515.forEach((_0x9d9580) => {
-    const _0x1e2ca2 = String(_0x9d9580 || '');
-    if (!_0x3dc5de && _0x1e2ca2.includes('请在浏览器中打开以下链接')) _0x3dc5de = '__PENDING__';
-    else _0x3dc5de === '__PENDING__' && (_0x3dc5de = _0x1e2ca2.trim());
-    const _0x9dbb0e = _0x1e2ca2.match(/https?:\/\/[^\s]+/g);
-    if (!_0x9dbb0e) return;
-    _0x9dbb0e.forEach((_0x368221) => {
-      const _0x3e2c1a = normalizeDreaminaManualUrlCandidate(_0x368221);
-      if (_0x3e2c1a && !_0x4e837f.includes(_0x3e2c1a)) _0x4e837f.push(_0x3e2c1a);
+export function extractDreaminaManualLinksFromOutputLines(current) {
+  const list = Array.isArray(current) ? current : [],
+    list2 = [];
+  let enabled2 = '';
+  list.forEach((item2) => {
+    const list3 = String(item2 || '');
+    if (!enabled2 && list3.includes('请在浏览器中打开以下链接')) enabled2 = '__PENDING__';
+    else enabled2 === '__PENDING__' && (enabled2 = list3.trim());
+    const list4 = list3.match(/https?:\/\/[^\s]+/g);
+    if (!list4) return;
+    list4.forEach((item3) => {
+      const dreaminaManualUrlCandidate = normalizeDreaminaManualUrlCandidate(item3);
+      if (dreaminaManualUrlCandidate && !list2.includes(dreaminaManualUrlCandidate))
+        list2.push(dreaminaManualUrlCandidate);
     });
   });
-  const _0xdb684c =
-      _0x3dc5de && _0x3dc5de !== '__PENDING__' ? normalizeDreaminaManualUrlCandidate(_0x3dc5de) : '',
-    _0x2ef472 =
-      _0xdb684c ||
-      _0x4e837f.find((_0x26a135) => _0x26a135.includes('/passport/web_login')) ||
-      _0x4e837f.find((_0x4c85ee) => _0x4c85ee.includes('/passport/web/web_login')) ||
+  const entry = enabled2 && enabled2 !== '__PENDING__' ? normalizeDreaminaManualUrlCandidate(enabled2) : '',
+    strictAuthorizeUrl =
+      entry ||
+      list2.find((list5) => list5.includes('/passport/web_login')) ||
+      list2.find((list6) => list6.includes('/passport/web/web_login')) ||
       '',
-    _0xd8c29 = _0x4e837f.find((_0x375f2c) => _0x375f2c.includes('/dreamina/cli/v1/dreamina_cli_login')) || '',
-    _0x16b34c = _0xd8c29 || _0x4e837f.find((_0x561990) => _0x561990 !== DREAMINA_LOGIN_PAGE_URL) || '';
+    authorizeUrl = list2.find((list7) => list7.includes('/dreamina/cli/v1/dreamina_cli_login')) || '',
+    record = authorizeUrl || list2.find((item4) => item4 !== DREAMINA_LOGIN_PAGE_URL) || '';
   return {
-    authorizeUrl: _0xd8c29 || _0x2ef472 || _0x16b34c || '',
-    strictAuthorizeUrl: _0x2ef472,
-    callbackUrl: _0xd8c29,
+    authorizeUrl: authorizeUrl || strictAuthorizeUrl || record || '',
+    strictAuthorizeUrl: strictAuthorizeUrl,
+    callbackUrl: authorizeUrl,
   };
 }
-export function getDreaminaWebLoginButtonText(_0x43a814) {
-  const _0x2bac9d = _0x43a814?.runtime || {},
-    _0x427dfa = !!_0x43a814?.loggedIn,
-    _0x46db1a = !!_0x2bac9d?.active;
-  if (_0x46db1a) return trDreamina('viewLogin');
-  return _0x427dfa ? trDreamina('relogin') : trDreamina('login');
+export function getDreaminaWebLoginButtonText(enabled3) {
+  const enabled4 = enabled3?.runtime || {},
+    payload = !!enabled3?.loggedIn,
+    handle = !!enabled4?.active;
+  if (handle) return trDreamina('viewLogin');
+  return payload ? trDreamina('relogin') : trDreamina('login');
 }
-export function getDreaminaQrLoginButtonText(_0x3b4640) {
-  const _0x5206e6 = _0x3b4640?.runtime || {},
-    _0x4bcc6f = !!_0x5206e6?.active;
-  if (_0x4bcc6f) return trDreamina('viewLogin');
+export function getDreaminaQrLoginButtonText(state) {
+  const enabled5 = state?.runtime || {},
+    config = !!enabled5?.active;
+  if (config) return trDreamina('viewLogin');
   return trDreamina('login');
 }
-export function getDreaminaStatusSessionKey(_0x10d831) {
-  const _0x4b3d53 = _0x10d831?.runtime || {},
-    _0x104225 = Number(_0x4b3d53?.startedAt || 0);
-  if (_0x104225 > 0) return 'login:' + _0x104225;
-  const _0x217759 = Number(_0x4b3d53?.qrVersion || 0);
-  if (_0x217759 > 0) return 'qr:' + _0x217759;
+export function getDreaminaStatusSessionKey(scope) {
+  const input = scope?.runtime || {},
+    count = Number(input?.startedAt || 0);
+  if (count > 0) return 'login:' + count;
+  const count2 = Number(input?.qrVersion || 0);
+  if (count2 > 0) return 'qr:' + count2;
   return '';
 }
-export function shouldDreaminaManualGuideOpenByDefault(_0x4bc349, _0x102040 = '') {
-  const _0xb35cd2 = _0x4bc349?.runtime || {},
-    _0x3ee7a2 = String(_0xb35cd2?.loginMode || '');
-  if (!_0xb35cd2?.active || !['oauth', 'web', 'headless'].includes(_0x3ee7a2)) return false;
-  const _0x3036cd = getDreaminaStatusSessionKey(_0x4bc349);
-  return !_0x3036cd || String(_0x102040 || '') !== _0x3036cd;
+export function shouldDreaminaManualGuideOpenByDefault(output, value2 = '') {
+  const enabled6 = output?.runtime || {},
+    value3 = String(enabled6?.loginMode || '');
+  if (!enabled6?.active || !['oauth', 'web', 'headless'].includes(value3)) return false;
+  const dreaminaStatusSessionKey = getDreaminaStatusSessionKey(output);
+  return !dreaminaStatusSessionKey || String(value2 || '') !== dreaminaStatusSessionKey;
 }
-export function shouldAutoOpenDreaminaWebAuthLink(_0x5d2230, _0x44967a = {}, _0x9f8794 = Date.now()) {
-  const _0xe98f02 = _0x5d2230?.runtime || {},
-    _0xcab2ea = String(_0xe98f02?.loginMode || ''),
-    _0xf98a59 = String(_0xe98f02?.authorizeUrl || '').trim(),
-    _0x36c023 = String(_0xe98f02?.loginPageUrl || '').trim(),
-    _0x3a3e10 = String(_0xe98f02?.phase || ''),
-    _0x4ac945 = !!_0x5d2230?.loggedIn || ['success', 'reused', 'done'].includes(_0x3a3e10),
-    _0x5701b6 = Number(_0x44967a?.webLoginPrimedAt || 0),
-    _0x56535f = String(_0x44967a?.autoOpenedManualAuthUrl || '').trim();
-  if (!['oauth', 'web', 'headless'].includes(_0xcab2ea) || !_0xe98f02?.active || _0x4ac945) return false;
-  if (!_0xf98a59 || _0xf98a59 === _0x36c023) return false;
-  if (_0x56535f === _0xf98a59) return false;
-  if (_0x5701b6 <= 0) return false;
-  return Math.max(0, Number(_0x9f8794 || 0) - _0x5701b6) >= 0x9c4;
+export function shouldAutoOpenDreaminaWebAuthLink(enabled7, value4 = {}, value5 = Date.now()) {
+  const enabled8 = enabled7?.runtime || {},
+    value6 = String(enabled8?.loginMode || ''),
+    enabled9 = String(enabled8?.authorizeUrl || '').trim(),
+    value7 = String(enabled8?.loginPageUrl || '').trim(),
+    value8 = String(enabled8?.phase || ''),
+    value9 = !!enabled7?.loggedIn || ['success', 'reused', 'done'].includes(value8),
+    count3 = Number(value4?.webLoginPrimedAt || 0),
+    value10 = String(value4?.autoOpenedManualAuthUrl || '').trim();
+  if (!['oauth', 'web', 'headless'].includes(value6) || !enabled8?.active || value9) return false;
+  if (!enabled9 || enabled9 === value7) return false;
+  if (value10 === enabled9) return false;
+  if (count3 <= 0) return false;
+  return Math.max(0, Number(value5 || 0) - count3) >= 0x9c4;
 }
 export function createAppTopbarAndConfig({
-  store: _0x215acf,
-  fetchApiConfigFromServer: _0x5ae271,
-  saveApiConfigToServer: _0x5bc7d1,
-  testProviderConnections: _0x581697,
-  fetchDreaminaCliStatusFromServer: _0x20929e,
-  startDreaminaHeadlessLoginFromServer: _0x3d4c8c,
-  startDreaminaHeadlessReloginFromServer: _0x5beec2,
-  startDreaminaWebLoginFromServer: _0x5c254a,
-  importDreaminaLoginResponseFromServer: _0x57c009,
-  logoutDreaminaFromServer: _0x36ac1f,
-  buildDreaminaQrImageUrl: _0x14cf38,
-  refreshManifestModelNodeUis: _0x5f0a11,
-  showError: _0xf820b9,
+  store: store,
+  fetchApiConfigFromServer: fetchApiConfigFromServer,
+  saveApiConfigToServer: saveApiConfigToServer,
+  testProviderConnections: testProviderConnections,
+  fetchDreaminaCliStatusFromServer: fetchDreaminaCliStatusFromServer,
+  startDreaminaHeadlessLoginFromServer: startDreaminaHeadlessLoginFromServer,
+  startDreaminaHeadlessReloginFromServer: startDreaminaHeadlessReloginFromServer,
+  startDreaminaWebLoginFromServer: startDreaminaWebLoginFromServer,
+  importDreaminaLoginResponseFromServer: importDreaminaLoginResponseFromServer,
+  logoutDreaminaFromServer: logoutDreaminaFromServer,
+  buildDreaminaQrImageUrl: buildDreaminaQrImageUrl,
+  refreshManifestModelNodeUis: refreshManifestModelNodeUis,
+  showError: showError,
 } = {}) {
-  const _0x2bdde1 = 85 * 0x3e8,
-    _0x3e0739 = {
+  const value11 = 85 * 0x3e8,
+    enabled10 = {
       pollTimer: null,
       lastToastKey: '',
       lastStatus: null,
@@ -155,100 +155,91 @@ export function createAppTopbarAndConfig({
       webLoginPrimedAt: 0,
       autoOpenedManualAuthUrl: '',
     };
-  let _0x43d0f1 = {};
+  let value12 = {};
   // 'agnes-domestic' 是独立厂商（域名与密钥都与国际版不同），必须在这里登记，
   // 否则它的密钥输入框既不会回填也不会被保存。
-  const _0x1e2cbf = [
-      'grsai',
-      'openai',
-      'ppio',
-      'apimart',
-      'agnes-domestic',
-      'agnes',
-      'volcengine',
-      'runninghub',
-    ],
-    _0x5d49f2 = [
+  const list8 = ['grsai', 'openai', 'ppio', 'apimart', 'agnes-domestic', 'agnes', 'volcengine', 'runninghub'],
+    args = [
       'settings-provider-status--testing',
       'settings-provider-status--success',
       'settings-provider-status--partial',
       'settings-provider-status--danger',
     ];
-  let _0x41e853 = null,
-    _0x273e6c = null;
+  let el = null,
+    value13 = null;
   // ── 厂商模型清单：从接口拉取、勾选、动态登记 ─────────────────────────────
   // 内置清单只覆盖已适配的模型；厂商新增模型时，在这里拉一次真实列表即可选用。
-  const _0x4c7a19 = createProviderModelCatalogBundleRegistry();
-  function _0x2f9d13(_0x11e0a5 = _0x43d0f1) {
+  const providerModelCatalogBundleRegistry = createProviderModelCatalogBundleRegistry();
+  function run(value14 = value12) {
     try {
-      return _0x4c7a19.sync(collectEnabledVendorModels(_0x11e0a5));
-    } catch (_0x1c3d5e) {
-      console.warn('[Provider Model Catalog] sync failed:', _0x1c3d5e);
+      return providerModelCatalogBundleRegistry.sync(collectEnabledVendorModels(value14));
+    } catch (value15) {
+      console.warn('[Provider Model Catalog] sync failed:', value15);
       return { changed: false, registered: 0 };
     }
   }
-  function _0x5a7c9e(_0x2b1e0c, _0x3f5c1d = {}) {
-    const _0x3d0f2a = readProviderModelCatalog(_0x43d0f1?.providers?.[_0x2b1e0c] || {}),
-      _0x1a2f7f = _0x3f5c1d.statusText ?? '';
+  function run2(providerId, message = {}) {
+    const catalog = readProviderModelCatalog(value12?.providers?.[providerId] || {}),
+      statusText = message.statusText ?? '';
     return renderProviderModelCatalogPanel({
       documentObject: document,
-      providerId: _0x2b1e0c,
-      catalog: _0x3d0f2a,
+      providerId: providerId,
+      catalog: catalog,
       statusText:
-        _0x1a2f7f ||
-        (_0x3d0f2a.models.length ? trApiInput('models.count', { count: _0x3d0f2a.models.length }) : ''),
-      message: _0x3f5c1d.message || '',
-      messageKind: _0x3f5c1d.messageKind || 'info',
+        statusText ||
+        (catalog.models.length ? trApiInput('models.count', { count: catalog.models.length }) : ''),
+      message: message.message || '',
+      messageKind: message.messageKind || 'info',
     });
   }
-  function _0x5c1f8b(_0x2f0e57) {
-    const _0x3c9a1b = readProviderModelCatalogSelection(document, _0x2f0e57);
-    if (_0x3c9a1b.length === 0) return false;
-    const _0x4f0d69 = String(_0x2f0e57 || '').trim();
-    _0x43d0f1.providers = _0x43d0f1.providers || {};
-    _0x43d0f1.providers[_0x4f0d69] = applyProviderModelCatalog(_0x43d0f1.providers[_0x4f0d69], {
+  function run3(value16) {
+    const models = readProviderModelCatalogSelection(document, value16);
+    if (models.length === 0) return false;
+    const value17 = String(value16 || '').trim();
+    value12.providers = value12.providers || {};
+    value12.providers[value17] = applyProviderModelCatalog(value12.providers[value17], {
       fetchedAt: new Date().toISOString(),
-      models: _0x3c9a1b.map((_0x4d2f1a) => ({
-        id: _0x4d2f1a.id,
-        kind: _0x4d2f1a.kind || inferProviderModelKind(_0x4f0d69, _0x4d2f1a.id),
-        enabled: _0x4d2f1a.enabled,
+      models: models.map((id) => ({
+        id: id.id,
+        kind: id.kind || inferProviderModelKind(value17, id.id),
+        enabled: id.enabled,
       })),
     });
     return true;
   }
-  async function _0x1e5a76(_0x2f0e57, _0x5d3a91 = null) {
-    const _0x1a2cbe = String(_0x2f0e57 || '').trim();
-    if (!isProviderModelCatalogProvider(_0x1a2cbe)) return false;
-    const _0x3b1d0e = document.getElementById('providerKey-' + _0x1a2cbe),
-      _0x2210af = String(_0x3b1d0e?.value || '')
+  async function run4(value16, el2 = null) {
+    const providerId2 = String(value16 || '').trim();
+    if (!isProviderModelCatalogProvider(providerId2)) return false;
+    const el3 = document.getElementById('providerKey-' + providerId2),
+      apiKey = String(el3?.value || '')
         .trim()
         .replace(/^Bearer\s+/i, '');
-    if (!_0x2210af) {
-      (window.showToast?.(trApiInput('models.needKey'), 'warn'), _0x3b1d0e?.focus?.());
+    if (!apiKey) {
+      (window.showToast?.(trApiInput('models.needKey'), 'warn'), el3?.focus?.());
       return false;
     }
-    if (_0x5d3a91) _0x5d3a91.disabled = true;
-    _0x5a7c9e(_0x1a2cbe, {
+    if (el2) el2.disabled = true;
+    run2(providerId2, {
       statusText: trApiInput('models.fetching'),
       message: trApiInput('models.fetching'),
     });
     try {
-      const _0x4f7a1c = _0x43d0f1?.providers?.[_0x1a2cbe] || {},
-        _0x5fb8a5 = await fetchProviderModelList({
-          providerId: _0x1a2cbe,
-          apiUrl: _0x4f7a1c.apiUrl,
-          apiKey: _0x2210af,
+      const apiUrl = value12?.providers?.[providerId2] || {},
+        response = await fetchProviderModelList({
+          providerId: providerId2,
+          apiUrl: apiUrl.apiUrl,
+          apiKey: apiKey,
         });
-      if (!_0x5fb8a5.success) {
-        _0x5a7c9e(_0x1a2cbe, {
+      if (!response.success) {
+        run2(providerId2, {
           statusText: '',
-          message: trApiInput('models.failed') + '：' + _0x5fb8a5.error,
+          message: trApiInput('models.failed') + '：' + response.error,
           messageKind: 'error',
         });
         return false;
       }
-      if (_0x5fb8a5.models.length === 0) {
-        _0x5a7c9e(_0x1a2cbe, {
+      if (response.models.length === 0) {
+        run2(providerId2, {
           statusText: '',
           message: trApiInput('models.empty'),
           messageKind: 'error',
@@ -256,126 +247,123 @@ export function createAppTopbarAndConfig({
         return false;
       }
       // 拉取只刷新候选清单，不改动已勾选状态；写入配置由“保存选择”完成。
-      const _0x1f9d5f = mergeProviderModelCatalog(
-        _0x1a2cbe,
-        readProviderModelCatalog(_0x4f7a1c).models,
-        _0x5fb8a5.models,
+      const models2 = mergeProviderModelCatalog(
+        providerId2,
+        readProviderModelCatalog(apiUrl).models,
+        response.models,
       );
       renderProviderModelCatalogPanel({
         documentObject: document,
-        providerId: _0x1a2cbe,
-        catalog: { fetchedAt: new Date().toISOString(), models: _0x1f9d5f },
-        statusText: trApiInput('models.count', { count: _0x1f9d5f.length }),
+        providerId: providerId2,
+        catalog: { fetchedAt: new Date().toISOString(), models: models2 },
+        statusText: trApiInput('models.count', { count: models2.length }),
       });
       return true;
     } finally {
-      if (_0x5d3a91) _0x5d3a91.disabled = false;
+      if (el2) el2.disabled = false;
     }
   }
-  async function _0x4b8e2c(_0x2f0e57) {
-    const _0x1a2cbe = String(_0x2f0e57 || '').trim();
-    if (!isProviderModelCatalogProvider(_0x1a2cbe)) return false;
-    if (!_0x5c1f8b(_0x1a2cbe)) return false;
-    const _0x70211a = _0x5b6f5b(),
-      _0x211510 = await _0x5bc7d1(_0x70211a);
-    if (!_0x211510?.success && _0x211510?.error) {
-      window.showToast?.(
-        trApiInput('diagnostics.saveFailed', { error: _0x211510.error }),
-        'error',
-      );
+  async function run5(value16) {
+    const providerId2 = String(value16 || '').trim();
+    if (!isProviderModelCatalogProvider(providerId2)) return false;
+    if (!run3(providerId2)) return false;
+    const value18 = run6(),
+      error = await saveApiConfigToServer(value18);
+    if (!error?.success && error?.error) {
+      window.showToast?.(trApiInput('diagnostics.saveFailed', { error: error.error }), 'error');
       return false;
     }
-    _0x43d0f1 = _0x70211a;
-    const _0x2c1c9a = _0x2f9d13(_0x43d0f1);
-    _0x5f0a11?.();
-    const _0x3d0f2a = readProviderModelCatalog(_0x43d0f1?.providers?.[_0x1a2cbe] || {}),
+    value12 = value18;
+    const value19 = run(value12);
+    refreshManifestModelNodeUis?.();
+    const catalog = readProviderModelCatalog(value12?.providers?.[providerId2] || {}),
       // 只有“该模态还没适配”才算需要手动接入；已内置的模型被跳过是正常的。
-      _0x5a3f1c = (_0x2c1c9a?.skipped || []).filter((_0x5b0f1e) =>
-        String(_0x5b0f1e?.reason || '').startsWith('no-template'),
+      value20 = (value19?.skipped || []).filter((item5) =>
+        String(item5?.reason || '').startsWith('no-template'),
       ).length;
-    _0x5a7c9e(_0x1a2cbe, {
-      statusText: trApiInput('models.count', { count: _0x3d0f2a.models.length }),
+    run2(providerId2, {
+      statusText: trApiInput('models.count', { count: catalog.models.length }),
       message:
         trApiInput('models.saved') +
-        (_0x2c1c9a?.registered ? '（新增 ' + _0x2c1c9a.registered + ' 个）' : '') +
-        (_0x5a3f1c ? '（' + _0x5a3f1c + ' 个该模态暂未适配）' : ''),
+        (value19?.registered ? '（新增 ' + value19.registered + ' 个）' : '') +
+        (value20 ? '（' + value20 + ' 个该模态暂未适配）' : ''),
       messageKind: 'success',
     });
-    _0x3751c3({ force: true, silent: true }).catch(() => {});
+    run7({ force: true, silent: true }).catch(() => {});
     return true;
   }
-  function _0x5ef8ff() {
+  function run8() {
     return Array.from(document.querySelectorAll('[data-apimart-route]'));
   }
-  function _0x526645(_0xeaa331, _0x2a87dd = false) {
-    const _0x365864 = document.getElementById('providerRouteUrl-apimart');
-    if (!_0x365864) return;
-    const _0x45dca4 = String(_0xeaa331 || getApimartApiUrlForRoute(DEFAULT_APIMART_ROUTE_ID)).trim();
-    _0x365864.textContent = _0x2a87dd ? trApiInput('route.custom', { value: _0x45dca4 }) : _0x45dca4;
+  function run9(value21, value22 = false) {
+    const el4 = document.getElementById('providerRouteUrl-apimart');
+    if (!el4) return;
+    const value23 = String(value21 || getApimartApiUrlForRoute(DEFAULT_APIMART_ROUTE_ID)).trim();
+    el4.textContent = value22 ? trApiInput('route.custom', { value: value23 }) : value23;
   }
-  function _0xb6a5a8() {
-    const _0x4d6bc1 = _0x5ef8ff().find((_0x1a5554) => _0x1a5554.classList.contains('is-active')),
-      _0x228280 = String(_0x4d6bc1?.dataset?.apimartRoute || '').trim();
-    return _0x228280 ? getApimartRouteById(_0x228280) : null;
+  function run10() {
+    const el5 = run8().find((el6) => el6.classList.contains('is-active')),
+      value24 = String(el5?.dataset?.apimartRoute || '').trim();
+    return value24 ? getApimartRouteById(value24) : null;
   }
-  function _0x55ee8d(_0x5dfbee, _0x53ee0c = {}) {
-    const _0x5f2cee = String(_0x5dfbee || '').trim(),
-      _0x2f8c39 = _0x5f2cee ? getApimartRouteById(_0x5f2cee) : null,
-      _0x5d332d = String(_0x53ee0c?.customUrl || '').trim();
-    (_0x5ef8ff().forEach((_0x76b99) => {
-      const _0x52fdc0 = !!_0x2f8c39 && String(_0x76b99.dataset.apimartRoute || '') === _0x2f8c39.id;
-      (_0x76b99.classList.toggle('is-active', _0x52fdc0),
-        _0x76b99.setAttribute('aria-pressed', _0x52fdc0 ? 'true' : 'false'));
+  function run11(value25, value26 = {}) {
+    const value27 = String(value25 || '').trim(),
+      enabled11 = value27 ? getApimartRouteById(value27) : null,
+      enabled12 = String(value26?.customUrl || '').trim();
+    (run8().forEach((el7) => {
+      const value28 = !!enabled11 && String(el7.dataset.apimartRoute || '') === enabled11.id;
+      (el7.classList.toggle('is-active', value28),
+        el7.setAttribute('aria-pressed', value28 ? 'true' : 'false'));
     }),
-      _0x526645(_0x2f8c39?.apiUrl || _0x5d332d, !!_0x5d332d && !_0x2f8c39));
+      run9(enabled11?.apiUrl || enabled12, !!enabled12 && !enabled11));
   }
-  function _0x4edacd(_0xf4591c = {}) {
-    const _0x4ef45a = String(_0xf4591c?.apiUrl || '').trim(),
-      _0x55f2ec = resolveApimartRouteByApiUrl(_0x4ef45a);
-    if (_0x55f2ec) {
-      _0x55ee8d(_0x55f2ec.id);
+  function run12(options2 = {}) {
+    const customUrl = String(options2?.apiUrl || '').trim(),
+      apimartRouteByApiUrl = resolveApimartRouteByApiUrl(customUrl);
+    if (apimartRouteByApiUrl) {
+      run11(apimartRouteByApiUrl.id);
       return;
     }
-    const _0x3bbb5a = _0xf4591c?.routeId ? getApimartRouteById(_0xf4591c.routeId) : null;
-    if (_0x3bbb5a && !_0x4ef45a) {
-      _0x55ee8d(_0x3bbb5a.id);
+    const value29 = options2?.routeId ? getApimartRouteById(options2.routeId) : null;
+    if (value29 && !customUrl) {
+      run11(value29.id);
       return;
     }
-    if (_0x4ef45a) {
-      _0x55ee8d('', { customUrl: _0x4ef45a });
+    if (customUrl) {
+      run11('', { customUrl: customUrl });
       return;
     }
-    _0x55ee8d(DEFAULT_APIMART_ROUTE_ID);
+    run11(DEFAULT_APIMART_ROUTE_ID);
   }
-  function _0x4eb253(_0x2e8fe3 = {}) {
-    const _0x374708 = _0x2e8fe3 && typeof _0x2e8fe3 === 'object' ? { ..._0x2e8fe3 } : {},
-      _0x100da5 = _0xb6a5a8();
-    if (_0x100da5) ((_0x374708.routeId = _0x100da5.id), (_0x374708.apiUrl = _0x100da5.apiUrl));
-    else _0x374708.apiUrl && delete _0x374708.routeId;
-    return _0x374708;
+  function run13(args2 = {}) {
+    const value30 = args2 && typeof args2 === 'object' ? { ...args2 } : {},
+      value31 = run10();
+    if (value31) ((value30.routeId = value31.id), (value30.apiUrl = value31.apiUrl));
+    else value30.apiUrl && delete value30.routeId;
+    return value30;
   }
-  function _0x484950() {
-    const _0x465d0d = document.getElementById('projectNameText');
-    _0x465d0d &&
-      (_0x465d0d.addEventListener('keydown', (_0x2403b9) => {
-        _0x2403b9.key === 'Enter' && (_0x2403b9.preventDefault(), _0x465d0d.blur());
+  function run14() {
+    const el8 = document.getElementById('projectNameText');
+    el8 &&
+      (el8.addEventListener('keydown', (event) => {
+        event.key === 'Enter' && (event.preventDefault(), el8.blur());
       }),
-      _0x465d0d.addEventListener('click', () => {
-        _0x465d0d.focus();
+      el8.addEventListener('click', () => {
+        el8.focus();
       }));
-    const _0x296f1d = document.getElementById('userAvatar'),
-      _0x4cccea = document.getElementById('avatarMenu');
-    _0x296f1d &&
-      _0x4cccea &&
+    const button = document.getElementById('userAvatar'),
+      panel = document.getElementById('avatarMenu');
+    button &&
+      panel &&
       registerSidebarSubmenu({
         key: 'settings',
-        button: _0x296f1d,
-        panel: _0x4cccea,
+        button: button,
+        panel: panel,
         openClass: 'open',
-        isOpen: () => _0x4cccea.classList.contains('open'),
+        isOpen: () => panel.classList.contains('open'),
       });
   }
-  function _0x3235d6() {
+  function run15() {
     return {
       settingsCardEl: document.getElementById('dreaminaSettingsCard'),
       statusTextEl: document.getElementById('dreaminaStatusText'),
@@ -404,1037 +392,1032 @@ export function createAppTopbarAndConfig({
       manualImportJsonBtnEl: document.getElementById('dreaminaManualImportJsonBtn'),
     };
   }
-  function _0xad0f78() {
-    const { settingsCardEl: _0x34b08e } = _0x3235d6();
-    if (!_0x34b08e) return false;
-    const _0x2aea66 = true;
+  function run16() {
+    const { settingsCardEl: settingsCardEl } = run15();
+    if (!settingsCardEl) return false;
+    const enabled13 = true;
     return (
-      (_0x34b08e.hidden = !_0x2aea66),
-      !_0x2aea66 && (_0x53182e({ force: true, rememberDismissal: false }), _0xd65feb()),
-      _0x2aea66
+      (settingsCardEl.hidden = !enabled13),
+      !enabled13 && (run17({ force: true, rememberDismissal: false }), run18()),
+      enabled13
     );
   }
-  function _0xd65feb() {
-    _0x3e0739.pollTimer && (clearInterval(_0x3e0739.pollTimer), (_0x3e0739.pollTimer = null));
+  function run18() {
+    enabled10.pollTimer && (clearInterval(enabled10.pollTimer), (enabled10.pollTimer = null));
   }
-  function _0x37a171() {
-    if (_0x3e0739.pollTimer) return;
-    _0x3e0739.pollTimer = setInterval(() => {
-      _0x3751c3({ silent: true }).catch(() => {});
+  function run19() {
+    if (enabled10.pollTimer) return;
+    enabled10.pollTimer = setInterval(() => {
+      run7({ silent: true }).catch(() => {});
     }, 0x320);
   }
-  function _0x4ac46b() {
-    ((_0x3e0739.qrImageLoadError = false),
-      (_0x3e0739.lastQrImageUrl = ''),
-      (_0x3e0739.lastQrImageRequestedAt = 0),
-      (_0x3e0739.lastQrImageLoadedAt = 0),
-      (_0x3e0739.lastQrImageErrorAt = 0),
-      (_0x3e0739.lastQrImageErrorMessage = ''));
+  function run20() {
+    ((enabled10.qrImageLoadError = false),
+      (enabled10.lastQrImageUrl = ''),
+      (enabled10.lastQrImageRequestedAt = 0),
+      (enabled10.lastQrImageLoadedAt = 0),
+      (enabled10.lastQrImageErrorAt = 0),
+      (enabled10.lastQrImageErrorMessage = ''));
   }
-  function _0x5d9d2b(_0x11b6d8, _0x311f3c = Date.now()) {
-    const _0x60e0cb = String(_0x11b6d8 || '').trim();
-    if (!_0x60e0cb) return '';
-    const _0x1675b1 = _0x60e0cb.includes('?') ? '&' : '?';
-    return '' + _0x60e0cb + _0x1675b1 + 'cb=' + encodeURIComponent(String(_0x311f3c));
+  function run21(value32, value33 = Date.now()) {
+    const list9 = String(value32 || '').trim();
+    if (!list9) return '';
+    const value34 = list9.includes('?') ? '&' : '?';
+    return '' + list9 + value34 + 'cb=' + encodeURIComponent(String(value33));
   }
-  function _0x2d2f7c(_0x4bf6ca, { withCacheBust: withCacheBust = false } = {}) {
-    const _0x4ad39a = Number(_0x4bf6ca?.qrVersion || 0),
-      _0x244723 = _0x14cf38?.(_0x4ad39a || Date.now()) || '';
-    if (!_0x244723) return '';
-    return withCacheBust ? _0x5d9d2b(_0x244723) : _0x244723;
+  function run22(value35, { withCacheBust: withCacheBust = false } = {}) {
+    const value36 = Number(value35?.qrVersion || 0),
+      enabled14 = buildDreaminaQrImageUrl?.(value36 || Date.now()) || '';
+    if (!enabled14) return '';
+    return withCacheBust ? run21(enabled14) : enabled14;
   }
-  function _0xe9f0e(_0x5199d4) {
-    const _0x1bf4bb = _0x5199d4?.runtime || {},
-      _0x318b1e = String(_0x1bf4bb?.phase || ''),
-      _0x2bd923 = !!_0x1bf4bb?.qrAvailable;
-    return _0x318b1e === 'qr_ready' && _0x2bd923 && !!_0x3e0739.qrImageLoadError;
+  function run23(value37) {
+    const enabled15 = value37?.runtime || {},
+      value38 = String(enabled15?.phase || ''),
+      value39 = !!enabled15?.qrAvailable;
+    return value38 === 'qr_ready' && value39 && !!enabled10.qrImageLoadError;
   }
-  function _0x52c3e9(_0x29190e) {
-    const _0x4c31d8 = _0x29190e?.runtime || {};
-    return Array.isArray(_0x4c31d8?.outputTail) ? _0x4c31d8.outputTail : [];
+  function run24(value40) {
+    const value41 = value40?.runtime || {};
+    return Array.isArray(value41?.outputTail) ? value41.outputTail : [];
   }
-  function _0x12c79d(_0x507368) {
-    const _0x28268c = _0x52c3e9(_0x507368);
-    return _0x28268c.some((_0x1a479d) => {
-      const _0x3510ad = String(_0x1a479d || '').toLowerCase();
+  function run25(value42) {
+    const list10 = run24(value42);
+    return list10.some((item6) => {
+      const list11 = String(item6 || '').toLowerCase();
       return (
-        _0x3510ad.includes('自动打开浏览器失败') ||
-        _0x3510ad.includes('open headless login page') ||
-        _0x3510ad.includes('executable file not found') ||
-        _0x3510ad.includes('google-chrome')
+        list11.includes('自动打开浏览器失败') ||
+        list11.includes('open headless login page') ||
+        list11.includes('executable file not found') ||
+        list11.includes('google-chrome')
       );
     });
   }
-  function _0x2f1b3a(_0x4b2667) {
-    const _0x551593 = _0x4b2667?.runtime || {},
-      _0x172304 = extractDreaminaManualLinksFromOutputLines(_0x52c3e9(_0x4b2667));
+  function run26(value43) {
+    const value44 = value43?.runtime || {},
+      args3 = extractDreaminaManualLinksFromOutputLines(run24(value43));
     return {
-      ..._0x172304,
-      authorizeUrl: String(_0x551593?.authorizeUrl || '').trim() || _0x172304.authorizeUrl,
-      callbackUrl: String(_0x551593?.callbackUrl || '').trim() || _0x172304.callbackUrl,
+      ...args3,
+      authorizeUrl: String(value44?.authorizeUrl || '').trim() || args3.authorizeUrl,
+      callbackUrl: String(value44?.callbackUrl || '').trim() || args3.callbackUrl,
     };
   }
-  function _0x5c7612(_0x173f77) {
+  function run27(value45) {
     const {
-      manualLoginUrlEl: _0x595caa,
-      manualOpenLoginEl: _0x2dea6b,
-      manualCopyLoginEl: _0x49ea26,
-      manualAuthUrlEl: _0x272c6c,
-      manualOpenAuthEl: _0xdab217,
-      manualCopyAuthEl: _0x15e65a,
-    } = _0x3235d6();
-    if (!_0x595caa || !_0x2dea6b || !_0x49ea26 || !_0x272c6c || !_0xdab217 || !_0x15e65a) return;
-    const _0x33a10e = _0x2f1b3a(_0x173f77 || _0x3e0739.lastStatus || {}),
-      _0x234d9b = (_0x173f77 || _0x3e0739.lastStatus || {})?.runtime || {},
-      _0x71da13 = String(_0x234d9b?.userCode || '').trim();
-    ((_0x595caa.value = _0x71da13 || trDreamina('waitingCode')),
-      (_0x2dea6b.hidden = true),
-      (_0x2dea6b.disabled = true),
-      (_0x49ea26.disabled = !_0x71da13));
-    const _0x1c1fa2 = String(_0x33a10e?.authorizeUrl || '').trim();
-    ((_0x272c6c.value = _0x1c1fa2 || trDreamina('waitingAuthUrl')),
-      (_0xdab217.disabled = !_0x1c1fa2),
-      (_0x15e65a.disabled = !_0x1c1fa2));
+      manualLoginUrlEl: manualLoginUrlEl,
+      manualOpenLoginEl: manualOpenLoginEl,
+      manualCopyLoginEl: manualCopyLoginEl,
+      manualAuthUrlEl: manualAuthUrlEl,
+      manualOpenAuthEl: manualOpenAuthEl,
+      manualCopyAuthEl: manualCopyAuthEl,
+    } = run15();
+    if (
+      !manualLoginUrlEl ||
+      !manualOpenLoginEl ||
+      !manualCopyLoginEl ||
+      !manualAuthUrlEl ||
+      !manualOpenAuthEl ||
+      !manualCopyAuthEl
+    )
+      return;
+    const value46 = run26(value45 || enabled10.lastStatus || {}),
+      value47 = (value45 || enabled10.lastStatus || {})?.runtime || {},
+      enabled16 = String(value47?.userCode || '').trim();
+    ((manualLoginUrlEl.value = enabled16 || trDreamina('waitingCode')),
+      (manualOpenLoginEl.hidden = true),
+      (manualOpenLoginEl.disabled = true),
+      (manualCopyLoginEl.disabled = !enabled16));
+    const enabled17 = String(value46?.authorizeUrl || '').trim();
+    ((manualAuthUrlEl.value = enabled17 || trDreamina('waitingAuthUrl')),
+      (manualOpenAuthEl.disabled = !enabled17),
+      (manualCopyAuthEl.disabled = !enabled17));
   }
-  function _0x5806ba(_0x50f462) {
-    const { manualGuideEl: _0x3d90ec } = _0x3235d6();
-    if (!_0x3d90ec) return;
-    (_0x5c7612(_0x50f462 || _0x3e0739.lastStatus || {}), (_0x3d90ec.hidden = !_0x3e0739.manualGuideOpen));
+  function run28(value48) {
+    const { manualGuideEl: manualGuideEl } = run15();
+    if (!manualGuideEl) return;
+    (run27(value48 || enabled10.lastStatus || {}), (manualGuideEl.hidden = !enabled10.manualGuideOpen));
   }
-  function _0x262d1d() {
-    return String(_0x3e0739.lastStatus?.runtime?.userCode || '').trim();
+  function run29() {
+    return String(enabled10.lastStatus?.runtime?.userCode || '').trim();
   }
-  function _0x3f8355(_0xe7bd3e = _0x3e0739.lastStatus || {}) {
-    const _0x129289 = _0x2f1b3a(_0xe7bd3e);
-    return String(_0x129289?.authorizeUrl || '').trim();
+  function run30(value49 = enabled10.lastStatus || {}) {
+    const value50 = run26(value49);
+    return String(value50?.authorizeUrl || '').trim();
   }
-  async function _0xd6a377(_0x933dad, _0x291e25) {
-    const _0x425aac = String(_0x933dad || '').trim();
-    if (!_0x425aac)
-      return (window.showToast?.(trDreamina('missingValue', { label: _0x291e25 }), 'warning'), false);
+  async function run31(value51, label) {
+    const enabled18 = String(value51 || '').trim();
+    if (!enabled18)
+      return (window.showToast?.(trDreamina('missingValue', { label: label }), 'warning'), false);
     try {
-      return (await openExternalLink(_0x425aac, { label: _0x291e25 }), true);
-    } catch (_0x4624a6) {}
-    const _0xa32f2e = await _0x36f164(_0x425aac);
+      return (await openExternalLink(enabled18, { label: label }), true);
+    } catch (value52) {}
+    const value53 = await run32(enabled18);
     return (
-      _0xa32f2e
-        ? window.showToast?.(trDreamina('browserOpenFailedCopied', { label: _0x291e25 }), 'warning')
-        : window.showToast?.(trDreamina('browserOpenFailedCopyFirst', { label: _0x291e25 }), 'warning'),
+      value53
+        ? window.showToast?.(trDreamina('browserOpenFailedCopied', { label: label }), 'warning')
+        : window.showToast?.(trDreamina('browserOpenFailedCopyFirst', { label: label }), 'warning'),
       false
     );
   }
-  async function _0x4ed8cb(_0x1d39f4, _0x1abd7d) {
-    const _0x4d4fa9 = String(_0x1d39f4 || '').trim();
-    if (!_0x4d4fa9) {
-      window.showToast?.(trDreamina('missingValue', { label: _0x1abd7d }), 'warning');
+  async function run33(value54, label2) {
+    const enabled19 = String(value54 || '').trim();
+    if (!enabled19) {
+      window.showToast?.(trDreamina('missingValue', { label: label2 }), 'warning');
       return;
     }
-    const _0x1e9796 = await _0x36f164(_0x4d4fa9);
-    _0x1e9796
-      ? window.showToast?.(trDreamina('copySuccess', { label: _0x1abd7d }), 'success')
-      : window.showToast?.(trDreamina('copyFailed', { label: _0x1abd7d }), 'error');
+    const value55 = await run32(enabled19);
+    value55
+      ? window.showToast?.(trDreamina('copySuccess', { label: label2 }), 'success')
+      : window.showToast?.(trDreamina('copyFailed', { label: label2 }), 'error');
   }
-  async function _0x4c82a5() {
-    await _0x263d69();
+  async function run34() {
+    await run35();
   }
-  async function _0x20e964() {
-    await _0x4ed8cb(_0x262d1d(), trDreamina('codeLabel'));
+  async function run36() {
+    await run33(run29(), trDreamina('codeLabel'));
   }
-  async function _0x263d69() {
-    await _0xd6a377(_0x3f8355(), trDreamina('authLinkLabel'));
+  async function run35() {
+    await run31(run30(), trDreamina('authLinkLabel'));
   }
-  async function _0xd6175a() {
-    await _0x4ed8cb(_0x3f8355(), trDreamina('authLinkLabel'));
+  async function run37() {
+    await run33(run30(), trDreamina('authLinkLabel'));
   }
-  function _0x257f84(_0x326a5c) {
-    const _0x19ba01 = String(_0x326a5c || '').trim();
-    if (!_0x19ba01) throw new Error(trDreamina('jsonPasteRequired'));
-    const _0x59608c = [];
-    _0x59608c.push(_0x19ba01);
-    const _0x265da4 = _0x19ba01.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    _0x265da4?.[1] && _0x59608c.push(String(_0x265da4[1]).trim());
-    const _0x5d7cfc = _0x19ba01.indexOf('{'),
-      _0x1bec5e = _0x19ba01.lastIndexOf('}');
-    _0x5d7cfc >= 0 &&
-      _0x1bec5e > _0x5d7cfc &&
-      _0x59608c.push(_0x19ba01.slice(_0x5d7cfc, _0x1bec5e + 1).trim());
-    for (const _0x57028d of _0x59608c) {
-      if (!_0x57028d) continue;
+  function run38(value56) {
+    const list12 = String(value56 || '').trim();
+    if (!list12) throw new Error(trDreamina('jsonPasteRequired'));
+    const list13 = [];
+    list13.push(list12);
+    const value57 = list12.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    value57?.[1] && list13.push(String(value57[1]).trim());
+    const count4 = list12.indexOf('{'),
+      value58 = list12.lastIndexOf('}');
+    count4 >= 0 && value58 > count4 && list13.push(list12.slice(count4, value58 + 1).trim());
+    for (const enabled20 of list13) {
+      if (!enabled20) continue;
       try {
-        const _0x51eb79 = JSON.parse(_0x57028d);
-        if (!_0x51eb79 || typeof _0x51eb79 !== 'object' || Array.isArray(_0x51eb79))
+        const enabled21 = JSON.parse(enabled20);
+        if (!enabled21 || typeof enabled21 !== 'object' || Array.isArray(enabled21))
           throw new Error('INVALID_OBJECT');
-        return _0x51eb79;
-      } catch (_0x5871d2) {
-        if (_0x5871d2?.message === 'INVALID_OBJECT') throw new Error(trDreamina('jsonMustBeObject'));
+        return enabled21;
+      } catch (error2) {
+        if (error2?.message === 'INVALID_OBJECT') throw new Error(trDreamina('jsonMustBeObject'));
       }
     }
     throw new Error(trDreamina('jsonFormatInvalid'));
   }
-  async function _0x7ae70b() {
-    if (typeof _0x57c009 !== 'function') {
+  async function run39() {
+    if (typeof importDreaminaLoginResponseFromServer !== 'function') {
       window.showToast?.(trDreamina('jsonImportUnsupported'), 'error');
       return;
     }
-    const { manualImportJsonEl: _0x4e0199 } = _0x3235d6(),
-      _0x230e7a = String(_0x4e0199?.value || '');
-    let _0x16174c = null;
+    const { manualImportJsonEl: manualImportJsonEl } = run15(),
+      value59 = String(manualImportJsonEl?.value || '');
+    let value60 = null;
     try {
-      _0x16174c = _0x257f84(_0x230e7a);
-    } catch (_0x59f2a1) {
-      window.showToast?.(_0x59f2a1?.message || trDreamina('jsonParseFailed'), 'warning');
+      value60 = run38(value59);
+    } catch (error3) {
+      window.showToast?.(error3?.message || trDreamina('jsonParseFailed'), 'warning');
       return;
     }
     try {
-      const _0x4c87fa = await _0x57c009(_0x16174c);
-      if (_0x4c87fa?.success === false) throw new Error(_0x4c87fa?.message || trDreamina('importFailed'));
-      (_0x4c87fa?.status ? _0x30db53(_0x4c87fa.status) : await _0x3751c3({ force: true, silent: true }),
-        _0x4e0199 && (_0x4e0199.value = ''),
-        _0x37a171(),
+      const response2 = await importDreaminaLoginResponseFromServer(value60);
+      if (response2?.success === false) throw new Error(response2?.message || trDreamina('importFailed'));
+      (response2?.status ? run40(response2.status) : await run7({ force: true, silent: true }),
+        manualImportJsonEl && (manualImportJsonEl.value = ''),
+        run19(),
         window.showToast?.(trDreamina('importedSyncing'), 'success'));
-    } catch (_0x1177e3) {
-      window.showToast?.(_0x1177e3?.message || trDreamina('importFailed'), 'error');
+    } catch (error4) {
+      window.showToast?.(error4?.message || trDreamina('importFailed'), 'error');
     }
   }
-  function _0x4636db(_0x96931a, _0x12376b = {}) {
-    _0x3e0739.qrImageLoadError = !!_0x96931a;
-    if (_0x96931a) {
-      ((_0x3e0739.lastQrImageErrorAt = Date.now()),
-        (_0x3e0739.lastQrImageErrorMessage =
-          String(_0x12376b?.message || '').trim() || trDreamina('qrLoadFailed')));
+  function run41(enabled22, error5 = {}) {
+    enabled10.qrImageLoadError = !!enabled22;
+    if (enabled22) {
+      ((enabled10.lastQrImageErrorAt = Date.now()),
+        (enabled10.lastQrImageErrorMessage =
+          String(error5?.message || '').trim() || trDreamina('qrLoadFailed')));
       return;
     }
-    ((_0x3e0739.lastQrImageLoadedAt = Date.now()),
-      (_0x3e0739.lastQrImageErrorAt = 0),
-      (_0x3e0739.lastQrImageErrorMessage = ''));
+    ((enabled10.lastQrImageLoadedAt = Date.now()),
+      (enabled10.lastQrImageErrorAt = 0),
+      (enabled10.lastQrImageErrorMessage = ''));
   }
-  function _0x3200e4(_0x12583a, _0x488669, _0x4872d0 = {}) {
-    if (!_0x12583a) return false;
-    const _0x5ee3e4 = !!_0x4872d0?.withCacheBust,
-      _0x59c794 = _0x2d2f7c(_0x488669, { withCacheBust: _0x5ee3e4 });
-    if (!_0x59c794) return false;
-    const _0x3abf87 = String(_0x12583a.getAttribute('src') || '').trim();
-    if (!_0x5ee3e4 && _0x3abf87 === _0x59c794) return false;
+  function run42(enabled23, value61, enabled24 = {}) {
+    if (!enabled23) return false;
+    const withCacheBust2 = !!enabled24?.withCacheBust,
+      enabled25 = run22(value61, { withCacheBust: withCacheBust2 });
+    if (!enabled25) return false;
+    const value62 = String(enabled23.getAttribute('src') || '').trim();
+    if (!withCacheBust2 && value62 === enabled25) return false;
     return (
-      (_0x3e0739.lastQrImageUrl = _0x59c794),
-      (_0x3e0739.lastQrImageRequestedAt = Date.now()),
-      (_0x3e0739.qrImageLoadError = false),
-      (_0x3e0739.lastQrImageErrorMessage = ''),
-      (_0x12583a.src = _0x59c794),
+      (enabled10.lastQrImageUrl = enabled25),
+      (enabled10.lastQrImageRequestedAt = Date.now()),
+      (enabled10.qrImageLoadError = false),
+      (enabled10.lastQrImageErrorMessage = ''),
+      (enabled23.src = enabled25),
       true
     );
   }
-  function _0x3b9750(_0x1a7bdf) {
-    if (!_0x1a7bdf || _0x3e0739.qrImageListenersBound) return;
-    (_0x1a7bdf.addEventListener('load', () => {
-      (_0x4636db(false), _0x3e0739.lastStatus && _0x177b2a(_0x3e0739.lastStatus));
+  function run43(el9) {
+    if (!el9 || enabled10.qrImageListenersBound) return;
+    (el9.addEventListener('load', () => {
+      (run41(false), enabled10.lastStatus && run44(enabled10.lastStatus));
     }),
-      _0x1a7bdf.addEventListener('error', () => {
-        (_0x4636db(true, { message: trDreamina('qrLoadFailed') }),
-          _0x3e0739.lastStatus && _0x177b2a(_0x3e0739.lastStatus));
+      el9.addEventListener('error', () => {
+        (run41(true, { message: trDreamina('qrLoadFailed') }),
+          enabled10.lastStatus && run44(enabled10.lastStatus));
       }),
-      (_0x3e0739.qrImageListenersBound = true));
+      (enabled10.qrImageListenersBound = true));
   }
-  function _0x3c808d(_0x2f84b1) {
-    const _0x130591 = Number(_0x2f84b1?.startedAt || 0);
-    if (_0x130591 <= 0) return 0;
-    const _0x516d39 = Number(_0x2f84b1?.completedAt || 0),
-      _0x3018a8 = _0x516d39 > 0 ? _0x516d39 : Date.now();
-    return Math.max(0, _0x3018a8 - _0x130591);
+  function run45(value63) {
+    const count5 = Number(value63?.startedAt || 0);
+    if (count5 <= 0) return 0;
+    const count6 = Number(value63?.completedAt || 0),
+      value64 = count6 > 0 ? count6 : Date.now();
+    return Math.max(0, value64 - count5);
   }
-  function _0x139d04(_0x318113) {
-    const _0x7b49bd = _0x318113?.runtime || {};
-    if (!_0x7b49bd?.active) return false;
-    const _0x4e6022 = String(_0x7b49bd?.phase || '');
-    if (!['preparing', 'starting'].includes(_0x4e6022)) return false;
-    return _0x3c808d(_0x7b49bd) >= _0x2bdde1;
+  function run46(value65) {
+    const enabled26 = value65?.runtime || {};
+    if (!enabled26?.active) return false;
+    const value66 = String(enabled26?.phase || '');
+    if (!['preparing', 'starting'].includes(value66)) return false;
+    return run45(enabled26) >= value11;
   }
-  async function _0x36f164(_0x51ac54) {
-    const _0x44a2f2 = String(_0x51ac54 || '');
-    if (!_0x44a2f2) return false;
+  async function run32(value67) {
+    const enabled27 = String(value67 || '');
+    if (!enabled27) return false;
     try {
-      if (navigator?.clipboard?.writeText) return (await navigator.clipboard.writeText(_0x44a2f2), true);
-    } catch (_0x1f9b4f) {}
+      if (navigator?.clipboard?.writeText) return (await navigator.clipboard.writeText(enabled27), true);
+    } catch (value68) {}
     try {
-      const _0x104bc8 = document.createElement('textarea');
-      ((_0x104bc8.value = _0x44a2f2),
-        _0x104bc8.setAttribute('readonly', 'readonly'),
-        (_0x104bc8.style.position = 'fixed'),
-        (_0x104bc8.style.left = '-9999px'),
-        document.body?.appendChild(_0x104bc8),
-        _0x104bc8.select());
-      const _0x82da46 = document.execCommand('copy');
-      return (_0x104bc8.remove(), !!_0x82da46);
-    } catch (_0x5e460d) {
+      const el10 = document.createElement('textarea');
+      ((el10.value = enabled27),
+        el10.setAttribute('readonly', 'readonly'),
+        (el10.style.position = 'fixed'),
+        (el10.style.left = '-9999px'),
+        document.body?.appendChild(el10),
+        el10.select());
+      const enabled28 = document.execCommand('copy');
+      return (el10.remove(), !!enabled28);
+    } catch (value69) {
       return false;
     }
   }
-  function _0x407b7c(_0x16d388) {
-    if (!_0x16d388 || typeof _0x16d388 !== 'object') return trDreamina('creditPlaceholder');
-    const _0xd7fb56 = Number(_0x16d388.total_credit || 0),
-      _0x34dcad = Number(_0x16d388.vip_credit || 0),
-      _0x611048 = Number(_0x16d388.gift_credit || 0),
-      _0xd0dddd = Number(_0x16d388.purchase_credit || 0);
+  function run47(enabled29) {
+    if (!enabled29 || typeof enabled29 !== 'object') return trDreamina('creditPlaceholder');
+    const total = Number(enabled29.total_credit || 0),
+      vip = Number(enabled29.vip_credit || 0),
+      gift = Number(enabled29.gift_credit || 0),
+      purchase = Number(enabled29.purchase_credit || 0);
     return trDreamina('creditTotal', {
-      total: _0xd7fb56,
-      vip: _0x34dcad,
-      gift: _0x611048,
-      purchase: _0xd0dddd,
+      total: total,
+      vip: vip,
+      gift: gift,
+      purchase: purchase,
     });
   }
-  function _0x13f746(_0x3f91ad) {
-    const _0xf26b66 = String(_0x3f91ad?.phase || ''),
-      _0x2fb798 = Number(_0x3f91ad?.completedAt || 0),
-      _0x47f7ff = _0x2fb798 > 0 ? _0xf26b66 + ':' + _0x2fb798 + ':' + (_0x3f91ad?.error || '') : '';
-    if (!_0x47f7ff || _0x47f7ff === _0x3e0739.lastToastKey) return;
-    _0x3e0739.lastToastKey = _0x47f7ff;
-    if (_0xf26b66 === 'success') {
+  function run48(value70) {
+    const value71 = String(value70?.phase || ''),
+      count7 = Number(value70?.completedAt || 0),
+      enabled30 = count7 > 0 ? value71 + ':' + count7 + ':' + (value70?.error || '') : '';
+    if (!enabled30 || enabled30 === enabled10.lastToastKey) return;
+    enabled10.lastToastKey = enabled30;
+    if (value71 === 'success') {
       window.showToast?.(trDreamina('loginSuccess'), 'success');
       return;
     }
-    if (_0xf26b66 === 'reused') {
+    if (value71 === 'reused') {
       window.showToast?.(trDreamina('loginReused'), 'info');
       return;
     }
-    _0xf26b66 === 'failed' && window.showToast?.(_0x3f91ad?.error || trDreamina('loginFailed'), 'error');
+    value71 === 'failed' && window.showToast?.(value70?.error || trDreamina('loginFailed'), 'error');
   }
-  function _0x20ff05(_0x335aa6) {
-    const _0x6ccb58 = _0x335aa6?.runtime || {},
-      _0x45613c = !!_0x335aa6?.loggedIn,
-      _0xac0806 = !!_0x6ccb58?.active,
-      _0x203da0 = String(_0x6ccb58?.phase || '');
-    if (_0xac0806 && _0x203da0 === 'preparing') return trDreamina('statusPreparing');
-    if (_0xac0806 && ['oauth_ready', 'polling'].includes(_0x203da0)) return trDreamina('statusWaitingAuth');
-    if (_0xac0806) return trDreamina('statusLoggingIn');
-    if (_0x45613c) return trDreamina('statusLoggedIn');
+  function run49(enabled31) {
+    const enabled32 = enabled31?.runtime || {},
+      value72 = !!enabled31?.loggedIn,
+      value73 = !!enabled32?.active,
+      value74 = String(enabled32?.phase || '');
+    if (value73 && value74 === 'preparing') return trDreamina('statusPreparing');
+    if (value73 && ['oauth_ready', 'polling'].includes(value74)) return trDreamina('statusWaitingAuth');
+    if (value73) return trDreamina('statusLoggingIn');
+    if (value72) return trDreamina('statusLoggedIn');
     return trDreamina('statusLoggedOut');
   }
-  function _0x3c0565(_0x530f07) {
-    return getDreaminaStatusSessionKey(_0x530f07);
+  function run50(value75) {
+    return getDreaminaStatusSessionKey(value75);
   }
-  function _0x591857(_0x526972) {
-    const _0x7759a2 = _0x3c0565(_0x526972),
-      _0x6b1e14 = !!_0x526972?.runtime?.active;
-    if (_0x7759a2 && _0x7759a2 !== _0x3e0739.currentSessionKey) {
-      ((_0x3e0739.currentSessionKey = _0x7759a2),
-        (_0x3e0739.dismissedSessionKey = ''),
-        (_0x3e0739.manualGuideOpen = false),
-        (_0x3e0739.webLoginPrimedAt = 0),
-        (_0x3e0739.autoOpenedManualAuthUrl = ''),
-        _0x4ac46b());
+  function run51(enabled33) {
+    const enabled34 = run50(enabled33),
+      enabled35 = !!enabled33?.runtime?.active;
+    if (enabled34 && enabled34 !== enabled10.currentSessionKey) {
+      ((enabled10.currentSessionKey = enabled34),
+        (enabled10.dismissedSessionKey = ''),
+        (enabled10.manualGuideOpen = false),
+        (enabled10.webLoginPrimedAt = 0),
+        (enabled10.autoOpenedManualAuthUrl = ''),
+        run20());
       return;
     }
-    !_0x6b1e14 &&
-      !_0x7759a2 &&
-      ((_0x3e0739.currentSessionKey = ''),
-      (_0x3e0739.dismissedSessionKey = ''),
-      (_0x3e0739.manualGuideOpen = false),
-      (_0x3e0739.webLoginPrimedAt = 0),
-      (_0x3e0739.autoOpenedManualAuthUrl = ''),
-      _0x4ac46b());
+    !enabled35 &&
+      !enabled34 &&
+      ((enabled10.currentSessionKey = ''),
+      (enabled10.dismissedSessionKey = ''),
+      (enabled10.manualGuideOpen = false),
+      (enabled10.webLoginPrimedAt = 0),
+      (enabled10.autoOpenedManualAuthUrl = ''),
+      run20());
   }
-  function _0x12a5e0(_0x5dd127) {
-    if (!shouldAutoOpenDreaminaWebAuthLink(_0x5dd127, _0x3e0739)) return;
-    const _0x177f26 = _0x3f8355(_0x5dd127);
-    if (!_0x177f26) return;
-    ((_0x3e0739.autoOpenedManualAuthUrl = _0x177f26),
-      _0xd6a377(_0x177f26, trDreamina('authLinkLabel')).catch(() => {}));
+  function run52(value76) {
+    if (!shouldAutoOpenDreaminaWebAuthLink(value76, enabled10)) return;
+    const enabled36 = run30(value76);
+    if (!enabled36) return;
+    ((enabled10.autoOpenedManualAuthUrl = enabled36),
+      run31(enabled36, trDreamina('authLinkLabel')).catch(() => {}));
   }
-  function _0x97b8e4() {
-    _0x3e0739.modalCloseTimer &&
-      (clearTimeout(_0x3e0739.modalCloseTimer), (_0x3e0739.modalCloseTimer = null));
+  function run53() {
+    enabled10.modalCloseTimer &&
+      (clearTimeout(enabled10.modalCloseTimer), (enabled10.modalCloseTimer = null));
   }
-  function _0x25b492({ clearDismissed: clearDismissed = false } = {}) {
-    const { modalOverlayEl: _0x3f0dee } = _0x3235d6();
-    if (!_0x3f0dee) return;
-    (_0x97b8e4(), clearDismissed && (_0x3e0739.dismissedSessionKey = ''), (_0x3f0dee.hidden = false));
+  function run54({ clearDismissed: clearDismissed = false } = {}) {
+    const { modalOverlayEl: modalOverlayEl } = run15();
+    if (!modalOverlayEl) return;
+    (run53(), clearDismissed && (enabled10.dismissedSessionKey = ''), (modalOverlayEl.hidden = false));
   }
-  function _0x53182e({ force: force = false, rememberDismissal: rememberDismissal = true } = {}) {
+  function run17({ force: force = false, rememberDismissal: rememberDismissal = true } = {}) {
     const {
-      modalOverlayEl: _0x506a58,
-      modalQrImageEl: _0x5b5666,
-      manualImportJsonEl: _0x533e17,
-    } = _0x3235d6();
-    _0x97b8e4();
+      modalOverlayEl: modalOverlayEl2,
+      modalQrImageEl: modalQrImageEl,
+      manualImportJsonEl: manualImportJsonEl2,
+    } = run15();
+    run53();
     if (rememberDismissal) {
-      const _0x2fed61 = _0x3c0565(_0x3e0739.lastStatus);
-      _0x2fed61 && (_0x3e0739.dismissedSessionKey = _0x2fed61);
+      const value77 = run50(enabled10.lastStatus);
+      value77 && (enabled10.dismissedSessionKey = value77);
     }
-    if (_0x506a58) _0x506a58.hidden = true;
-    if (_0x5b5666) _0x5b5666.removeAttribute('src');
-    if (_0x533e17) _0x533e17.value = '';
-    ((_0x3e0739.manualGuideOpen = false), _0x5806ba(_0x3e0739.lastStatus || {}));
+    if (modalOverlayEl2) modalOverlayEl2.hidden = true;
+    if (modalQrImageEl) modalQrImageEl.removeAttribute('src');
+    if (manualImportJsonEl2) manualImportJsonEl2.value = '';
+    ((enabled10.manualGuideOpen = false), run28(enabled10.lastStatus || {}));
   }
-  function _0x564246(_0x281ab7 = 0) {
-    (_0x97b8e4(),
-      (_0x3e0739.modalCloseTimer = setTimeout(
+  function run55(value78 = 0) {
+    (run53(),
+      (enabled10.modalCloseTimer = setTimeout(
         () => {
-          _0x53182e({ force: true, rememberDismissal: false });
+          run17({ force: true, rememberDismissal: false });
         },
-        Math.max(0, Number(_0x281ab7) || 0),
+        Math.max(0, Number(value78) || 0),
       )));
   }
-  function _0x44573b(_0x278ff3) {
-    const _0x4c0216 = _0x278ff3?.runtime || {},
-      _0x45c683 = String(_0x4c0216?.phase || ''),
-      _0xbcf253 = ['oauth', 'web', 'headless'].includes(String(_0x4c0216?.loginMode || '')),
-      _0x49309f = _0x139d04(_0x278ff3),
-      _0x3cff23 = _0xe9f0e(_0x278ff3),
-      _0x28a32c = _0x12c79d(_0x278ff3);
-    if (_0x28a32c) return trDreamina('waitBrowserFailed');
-    if (shouldDreaminaManualGuideOpenByDefault(_0x278ff3, _0x3e0739.dismissedSessionKey))
+  function run56(value79) {
+    const value80 = value79?.runtime || {},
+      value81 = String(value80?.phase || ''),
+      value82 = ['oauth', 'web', 'headless'].includes(String(value80?.loginMode || '')),
+      value83 = run46(value79),
+      value84 = run23(value79),
+      value85 = run25(value79);
+    if (value85) return trDreamina('waitBrowserFailed');
+    if (shouldDreaminaManualGuideOpenByDefault(value79, enabled10.dismissedSessionKey))
       return trDreamina('waitOpenAuth');
-    if (_0x49309f) return trDreamina('waitPendingTooLong');
-    if (_0x3cff23) return trDreamina('waitQrDeprecated');
-    if (_0x45c683 === 'failed') return trDreamina('waitFailed');
-    if (_0x45c683 === 'oauth_ready' || _0x45c683 === 'polling') {
-      const _0x22e852 = String(_0x4c0216?.userCode || '').trim();
-      return _0x22e852 ? trDreamina('waitCode', { code: _0x22e852 }) : trDreamina('waitConfirm');
+    if (value83) return trDreamina('waitPendingTooLong');
+    if (value84) return trDreamina('waitQrDeprecated');
+    if (value81 === 'failed') return trDreamina('waitFailed');
+    if (value81 === 'oauth_ready' || value81 === 'polling') {
+      const code = String(value80?.userCode || '').trim();
+      return code ? trDreamina('waitCode', { code: code }) : trDreamina('waitConfirm');
     }
-    if (_0x45c683 === 'qr_ready') return trDreamina('waitUseOAuth');
-    if (_0x45c683 === 'success' || _0x45c683 === 'reused') return trDreamina('waitDone');
-    if (_0xbcf253) return trDreamina('waitOAuthPreparing');
+    if (value81 === 'qr_ready') return trDreamina('waitUseOAuth');
+    if (value81 === 'success' || value81 === 'reused') return trDreamina('waitDone');
+    if (value82) return trDreamina('waitOAuthPreparing');
     return trDreamina('waitPreparing');
   }
-  function _0x177b2a(_0x312821) {
+  function run44(error6) {
     const {
-      modalCardEl: _0x12ee3b,
-      modalCloseEl: _0x2b5b7a,
-      modalMessageEl: _0x15d2a0,
-      modalQrWrapEl: _0x535b88,
-      modalQrImageEl: _0x19616e,
-      modalWaitEl: _0xbdd964,
-      modalWaitTextEl: _0x542a63,
-      modalRetryEl: _0x198835,
-      manualGuideEl: _0x4b62c9,
-    } = _0x3235d6();
-    if (!_0x15d2a0) return;
-    const _0xf4f612 = _0x312821?.runtime || {},
-      _0x98ae = !!_0xf4f612?.active,
-      _0x403a74 = String(_0xf4f612?.phase || ''),
-      _0x1a7659 = !!_0x312821?.loggedIn,
-      _0x500fbb = ['oauth', 'web', 'headless'].includes(String(_0xf4f612?.loginMode || '')),
-      _0x5cddaf = _0x139d04(_0x312821),
-      _0x17715c = !_0x500fbb && !!_0xf4f612?.qrAvailable && _0x403a74 === 'qr_ready',
-      _0x1ed5e1 = _0xe9f0e(_0x312821),
-      _0x2502c8 = _0x12c79d(_0x312821),
-      _0x22de76 = _0x1a7659 || ['success', 'reused', 'done'].includes(_0x403a74);
-    _0x22de76 && (_0x3e0739.manualGuideOpen = false);
-    !_0x22de76 && _0x2502c8 && (_0x3e0739.manualGuideOpen = true);
-    const _0x5b7eed = _0x3c0565(_0x312821),
-      _0x48c2d3 = shouldDreaminaManualGuideOpenByDefault(_0x312821, _0x3e0739.dismissedSessionKey);
-    !_0x22de76 && _0x48c2d3 && (_0x3e0739.manualGuideOpen = true);
-    const _0x42032f =
-      _0x3e0739.manualGuideOpen ||
-      ((_0x98ae || _0x17715c) && (!!_0x5b7eed ? _0x3e0739.dismissedSessionKey !== _0x5b7eed : true));
-    if (_0x42032f) _0x25b492();
+      modalCardEl: modalCardEl,
+      modalCloseEl: modalCloseEl,
+      modalMessageEl: modalMessageEl,
+      modalQrWrapEl: modalQrWrapEl,
+      modalQrImageEl: modalQrImageEl2,
+      modalWaitEl: modalWaitEl,
+      modalWaitTextEl: modalWaitTextEl,
+      modalRetryEl: modalRetryEl,
+      manualGuideEl: manualGuideEl2,
+    } = run15();
+    if (!modalMessageEl) return;
+    const error7 = error6?.runtime || {},
+      value86 = !!error7?.active,
+      value87 = String(error7?.phase || ''),
+      value88 = !!error6?.loggedIn,
+      enabled37 = ['oauth', 'web', 'headless'].includes(String(error7?.loginMode || '')),
+      value89 = run46(error6),
+      enabled38 = !enabled37 && !!error7?.qrAvailable && value87 === 'qr_ready',
+      value90 = run23(error6),
+      value91 = run25(error6),
+      enabled39 = value88 || ['success', 'reused', 'done'].includes(value87);
+    enabled39 && (enabled10.manualGuideOpen = false);
+    !enabled39 && value91 && (enabled10.manualGuideOpen = true);
+    const enabled40 = run50(error6),
+      shouldDreaminaManualGuideOpenByDefault2 = shouldDreaminaManualGuideOpenByDefault(
+        error6,
+        enabled10.dismissedSessionKey,
+      );
+    !enabled39 && shouldDreaminaManualGuideOpenByDefault2 && (enabled10.manualGuideOpen = true);
+    const value92 =
+      enabled10.manualGuideOpen ||
+      ((value86 || enabled38) && (!!enabled40 ? enabled10.dismissedSessionKey !== enabled40 : true));
+    if (value92) run54();
     else
-      ['success', 'reused', 'failed', 'done'].includes(_0x403a74)
-        ? _0x564246(_0x403a74 === 'failed' ? 0 : 0x258)
-        : _0x53182e({ force: true, rememberDismissal: false });
-    (_0x12ee3b && _0x12ee3b.classList.toggle('dreamina-login-modal--guide-open', !!_0x3e0739.manualGuideOpen),
-      _0x15d2a0 &&
-        (_0x15d2a0.textContent = _0x22de76
+      ['success', 'reused', 'failed', 'done'].includes(value87)
+        ? run55(value87 === 'failed' ? 0 : 0x258)
+        : run17({ force: true, rememberDismissal: false });
+    (modalCardEl &&
+      modalCardEl.classList.toggle('dreamina-login-modal--guide-open', !!enabled10.manualGuideOpen),
+      modalMessageEl &&
+        (modalMessageEl.textContent = enabled39
           ? trDreamina('modalSynced')
-          : _0x2502c8
+          : value91
             ? trDreamina('modalBrowserFailed')
-            : _0x48c2d3
+            : shouldDreaminaManualGuideOpenByDefault2
               ? trDreamina('modalOAuthStarted')
-              : _0x5cddaf
+              : value89
                 ? trDreamina('modalPendingTooLong')
-                : _0x1ed5e1
+                : value90
                   ? trDreamina('modalQrAbnormal')
-                  : _0x403a74 === 'failed'
+                  : value87 === 'failed'
                     ? trDreamina('modalRetryAuth')
-                    : _0x403a74 === 'oauth_ready' || _0x403a74 === 'polling'
+                    : value87 === 'oauth_ready' || value87 === 'polling'
                       ? trDreamina('modalOpenAuthAndCode')
-                      : _0x17715c
+                      : enabled38
                         ? trDreamina('modalScanQr')
-                        : String(_0xf4f612?.message || '').trim() ||
-                          String(_0x312821?.message || '').trim() ||
+                        : String(error7?.message || '').trim() ||
+                          String(error6?.message || '').trim() ||
                           trDreamina('modalProcessing')),
-      _0x542a63 && (_0x542a63.textContent = _0x44573b(_0x312821)),
-      _0xbdd964 && (_0xbdd964.hidden = false),
-      _0x535b88 && (_0x535b88.hidden = !_0x17715c),
-      _0x19616e && (_0x17715c ? _0x3200e4(_0x19616e, _0xf4f612) : _0x19616e.removeAttribute('src')),
-      _0x2b5b7a && (_0x2b5b7a.disabled = false),
-      _0x198835 &&
-        ((_0x198835.hidden = false),
-        (_0x198835.disabled = false),
-        _0x3e0739.manualGuideOpen
-          ? (_0x198835.textContent = trDreamina('guideCollapse'))
-          : (_0x198835.textContent = _0x2502c8 ? trDreamina('guideRecommended') : trDreamina('guide'))),
-      _0x4b62c9 && _0x5806ba(_0x312821));
+      modalWaitTextEl && (modalWaitTextEl.textContent = run56(error6)),
+      modalWaitEl && (modalWaitEl.hidden = false),
+      modalQrWrapEl && (modalQrWrapEl.hidden = !enabled38),
+      modalQrImageEl2 &&
+        (enabled38 ? run42(modalQrImageEl2, error7) : modalQrImageEl2.removeAttribute('src')),
+      modalCloseEl && (modalCloseEl.disabled = false),
+      modalRetryEl &&
+        ((modalRetryEl.hidden = false),
+        (modalRetryEl.disabled = false),
+        enabled10.manualGuideOpen
+          ? (modalRetryEl.textContent = trDreamina('guideCollapse'))
+          : (modalRetryEl.textContent = value91 ? trDreamina('guideRecommended') : trDreamina('guide'))),
+      manualGuideEl2 && run28(error6));
   }
-  function _0x30db53(_0x1acd88) {
+  function run40(error8) {
     const {
-      statusTextEl: _0x49e220,
-      messageTextEl: _0x33b92d,
-      creditTextEl: _0x572456,
-      btnAuthEl: _0x557bd3,
-      btnQrAuthEl: _0x670677,
-      btnLogoutEl: _0x2b9eb4,
-    } = _0x3235d6();
-    if (!_0x49e220) return;
-    if (!_0xad0f78()) return;
-    const _0x3fda50 = _0x1acd88?.runtime || {},
-      _0x3dbc37 = !!_0x1acd88?.loggedIn,
-      _0x48a329 = !!_0x3fda50?.active,
-      _0x5bace5 = String(_0x3fda50?.phase || ''),
-      _0x4bda22 =
-        String(_0x3fda50?.message || '').trim() ||
-        String(_0x1acd88?.message || '').trim() ||
+      statusTextEl: statusTextEl,
+      messageTextEl: messageTextEl,
+      creditTextEl: creditTextEl,
+      btnAuthEl: btnAuthEl,
+      btnQrAuthEl: btnQrAuthEl,
+      btnLogoutEl: btnLogoutEl,
+    } = run15();
+    if (!statusTextEl) return;
+    if (!run16()) return;
+    const error9 = error8?.runtime || {},
+      enabled41 = !!error8?.loggedIn,
+      value93 = !!error9?.active,
+      value94 = String(error9?.phase || ''),
+      value95 =
+        String(error9?.message || '').trim() ||
+        String(error8?.message || '').trim() ||
         trDreamina('notLoggedInHint');
-    _0x49e220.textContent = _0x20ff05(_0x1acd88);
-    _0x33b92d && (_0x33b92d.textContent = _0x4bda22);
-    _0x572456 &&
-      (_0x572456.textContent = _0x3dbc37 ? _0x407b7c(_0x1acd88?.credit) : trDreamina('creditPlaceholder'));
-    _0x557bd3 &&
-      ((_0x557bd3.disabled = false), (_0x557bd3.textContent = getDreaminaWebLoginButtonText(_0x1acd88)));
-    _0x670677 &&
-      ((_0x670677.hidden = true),
-      (_0x670677.disabled = true),
-      (_0x670677.textContent = getDreaminaQrLoginButtonText(_0x1acd88)));
-    _0x2b9eb4 && (_0x2b9eb4.disabled = _0x48a329 || !_0x3dbc37);
-    if (_0x48a329) _0x37a171();
-    else _0xd65feb();
-    ((_0x3e0739.lastStatus = _0x1acd88),
-      _0x591857(_0x1acd88),
-      _0x177b2a(_0x1acd88),
-      _0x12a5e0(_0x1acd88),
-      _0x13f746(_0x3fda50));
+    statusTextEl.textContent = run49(error8);
+    messageTextEl && (messageTextEl.textContent = value95);
+    creditTextEl &&
+      (creditTextEl.textContent = enabled41 ? run47(error8?.credit) : trDreamina('creditPlaceholder'));
+    btnAuthEl &&
+      ((btnAuthEl.disabled = false), (btnAuthEl.textContent = getDreaminaWebLoginButtonText(error8)));
+    btnQrAuthEl &&
+      ((btnQrAuthEl.hidden = true),
+      (btnQrAuthEl.disabled = true),
+      (btnQrAuthEl.textContent = getDreaminaQrLoginButtonText(error8)));
+    btnLogoutEl && (btnLogoutEl.disabled = value93 || !enabled41);
+    if (value93) run19();
+    else run18();
+    ((enabled10.lastStatus = error8), run51(error8), run44(error8), run52(error8), run48(error9));
   }
-  async function _0x3751c3({ force: force = false, silent: silent = false } = {}) {
-    if (!_0xad0f78()) return null;
-    if (typeof _0x20929e !== 'function') return null;
+  async function run7({ force: force = false, silent: silent = false } = {}) {
+    if (!run16()) return null;
+    if (typeof fetchDreaminaCliStatusFromServer !== 'function') return null;
     try {
-      const _0x4cdfd3 = await _0x20929e({ refresh: force });
-      return (_0x30db53(_0x4cdfd3 || {}), _0x4cdfd3 || {});
-    } catch (_0x7ae74e) {
+      const value96 = await fetchDreaminaCliStatusFromServer({ refresh: force });
+      return (run40(value96 || {}), value96 || {});
+    } catch (error10) {
       if (!silent) {
-        const _0x392b9d = _0x7ae74e?.message || trDreamina('fetchStatusFailed');
-        window.showToast?.(_0x392b9d, 'error');
+        const value97 = error10?.message || trDreamina('fetchStatusFailed');
+        window.showToast?.(value97, 'error');
       }
       return null;
     }
   }
-  async function _0x192ea6() {
-    if (!_0xad0f78()) return;
-    const _0x41ad7c = _0x3e0739.lastStatus?.runtime || {};
-    if (_0x41ad7c?.active) {
-      (_0x25b492({ clearDismissed: true }),
-        (_0x3e0739.manualGuideOpen = true),
-        _0x177b2a(_0x3e0739.lastStatus || {}));
+  async function run57() {
+    if (!run16()) return;
+    const value98 = enabled10.lastStatus?.runtime || {};
+    if (value98?.active) {
+      (run54({ clearDismissed: true }),
+        (enabled10.manualGuideOpen = true),
+        run44(enabled10.lastStatus || {}));
       return;
     }
-    const _0x56ab38 = !!_0x3e0739.lastStatus?.loggedIn;
-    if (typeof _0x5c254a !== 'function') return;
-    ((_0x3e0739.manualGuideOpen = true),
-      (_0x3e0739.webLoginPrimedAt = Date.now()),
-      (_0x3e0739.autoOpenedManualAuthUrl = ''),
-      _0x25b492({ clearDismissed: true }));
+    const force2 = !!enabled10.lastStatus?.loggedIn;
+    if (typeof startDreaminaWebLoginFromServer !== 'function') return;
+    ((enabled10.manualGuideOpen = true),
+      (enabled10.webLoginPrimedAt = Date.now()),
+      (enabled10.autoOpenedManualAuthUrl = ''),
+      run54({ clearDismissed: true }));
     try {
-      const _0x30f0bf = await _0x5c254a({ force: _0x56ab38 });
-      if (_0x30f0bf?.success === false) throw new Error(_0x30f0bf?.message || trDreamina('startFailed'));
-      ((_0x3e0739.manualGuideOpen = true),
-        _0x30f0bf?.status && _0x30db53(_0x30f0bf.status),
-        window.showToast?.(_0x56ab38 ? trDreamina('reloginStarted') : trDreamina('loginStarted'), 'info'),
-        _0x37a171());
-    } catch (_0x6f1fd8) {
-      window.showToast?.(_0x6f1fd8?.message || trDreamina('startFailed'), 'error');
+      const response3 = await startDreaminaWebLoginFromServer({ force: force2 });
+      if (response3?.success === false) throw new Error(response3?.message || trDreamina('startFailed'));
+      ((enabled10.manualGuideOpen = true),
+        response3?.status && run40(response3.status),
+        window.showToast?.(force2 ? trDreamina('reloginStarted') : trDreamina('loginStarted'), 'info'),
+        run19());
+    } catch (error11) {
+      window.showToast?.(error11?.message || trDreamina('startFailed'), 'error');
     }
   }
-  async function _0x292a3c() {
-    await _0x192ea6();
+  async function run58() {
+    await run57();
   }
-  function _0x48a2e4() {
-    ((_0x3e0739.manualGuideOpen = !_0x3e0739.manualGuideOpen), _0x177b2a(_0x3e0739.lastStatus || {}));
+  function run59() {
+    ((enabled10.manualGuideOpen = !enabled10.manualGuideOpen), run44(enabled10.lastStatus || {}));
   }
-  async function _0x5baf99() {
-    if (!_0xad0f78()) return;
-    if (typeof _0x36ac1f !== 'function') return;
+  async function run60() {
+    if (!run16()) return;
+    if (typeof logoutDreaminaFromServer !== 'function') return;
     try {
-      const _0x1c38bb = await _0x36ac1f();
-      if (_0x1c38bb?.success === false) throw new Error(_0x1c38bb?.message || trDreamina('logoutFailed'));
-      (_0x1c38bb?.status ? _0x30db53(_0x1c38bb.status) : await _0x3751c3({ force: true, silent: true }),
-        _0xd65feb(),
+      const response4 = await logoutDreaminaFromServer();
+      if (response4?.success === false) throw new Error(response4?.message || trDreamina('logoutFailed'));
+      (response4?.status ? run40(response4.status) : await run7({ force: true, silent: true }),
+        run18(),
         window.showToast?.(trDreamina('loggedOut'), 'success'));
-    } catch (_0x18a7d0) {
-      window.showToast?.(_0x18a7d0?.message || trDreamina('logoutFailed'), 'error');
+    } catch (error12) {
+      window.showToast?.(error12?.message || trDreamina('logoutFailed'), 'error');
     }
   }
-  function _0x2fb6bc() {
+  function run61() {
     const {
-      btnAuthEl: _0x4c8327,
-      btnQrAuthEl: _0x262b4f,
-      btnLogoutEl: _0xc2b1c4,
-      modalOverlayEl: _0x2aea42,
-      modalCloseEl: _0x25fd67,
-      modalQrImageEl: _0x35bb2d,
-      modalRetryEl: _0x5eab14,
-      manualOpenLoginEl: _0x4b5e84,
-      manualCopyLoginEl: _0xb0b7d1,
-      manualOpenAuthEl: _0x436709,
-      manualCopyAuthEl: _0x51b42f,
-      manualImportJsonBtnEl: _0x5bbfcd,
-    } = _0x3235d6();
-    (_0x3b9750(_0x35bb2d),
-      _0x4c8327?.addEventListener('click', () => {
-        _0x192ea6().catch(() => {});
+      btnAuthEl: btnAuthEl2,
+      btnQrAuthEl: btnQrAuthEl2,
+      btnLogoutEl: btnLogoutEl2,
+      modalOverlayEl: modalOverlayEl3,
+      modalCloseEl: modalCloseEl2,
+      modalQrImageEl: modalQrImageEl3,
+      modalRetryEl: modalRetryEl2,
+      manualOpenLoginEl: manualOpenLoginEl2,
+      manualCopyLoginEl: manualCopyLoginEl2,
+      manualOpenAuthEl: manualOpenAuthEl2,
+      manualCopyAuthEl: manualCopyAuthEl2,
+      manualImportJsonBtnEl: manualImportJsonBtnEl,
+    } = run15();
+    (run43(modalQrImageEl3),
+      btnAuthEl2?.addEventListener('click', () => {
+        run57().catch(() => {});
       }),
-      _0x262b4f?.addEventListener('click', () => {
-        _0x292a3c().catch(() => {});
+      btnQrAuthEl2?.addEventListener('click', () => {
+        run58().catch(() => {});
       }),
-      _0xc2b1c4?.addEventListener('click', () => {
-        _0x5baf99().catch(() => {});
+      btnLogoutEl2?.addEventListener('click', () => {
+        run60().catch(() => {});
       }),
-      _0x25fd67?.addEventListener('click', () => {
-        _0x53182e({ force: true });
+      modalCloseEl2?.addEventListener('click', () => {
+        run17({ force: true });
       }),
-      _0x5eab14?.addEventListener('click', () => {
-        _0x48a2e4();
+      modalRetryEl2?.addEventListener('click', () => {
+        run59();
       }),
-      _0x4b5e84?.addEventListener('click', () => {
-        _0x4c82a5().catch(() => {});
+      manualOpenLoginEl2?.addEventListener('click', () => {
+        run34().catch(() => {});
       }),
-      _0xb0b7d1?.addEventListener('click', () => {
-        _0x20e964().catch(() => {});
+      manualCopyLoginEl2?.addEventListener('click', () => {
+        run36().catch(() => {});
       }),
-      _0x436709?.addEventListener('click', () => {
-        _0x263d69().catch(() => {});
+      manualOpenAuthEl2?.addEventListener('click', () => {
+        run35().catch(() => {});
       }),
-      _0x51b42f?.addEventListener('click', () => {
-        _0xd6175a().catch(() => {});
+      manualCopyAuthEl2?.addEventListener('click', () => {
+        run37().catch(() => {});
       }),
-      _0x5bbfcd?.addEventListener('click', () => {
-        _0x7ae70b().catch(() => {});
+      manualImportJsonBtnEl?.addEventListener('click', () => {
+        run39().catch(() => {});
       }),
-      _0x2aea42?.addEventListener('click', (_0x5497be) => {
-        if (_0x5497be.target !== _0x2aea42) return;
-        _0x53182e();
+      modalOverlayEl3?.addEventListener('click', (event2) => {
+        if (event2.target !== modalOverlayEl3) return;
+        run17();
       }),
-      document.addEventListener('keydown', (_0x3afe67) => {
-        if (_0x3afe67.key !== 'Escape') return;
-        _0x53182e();
+      document.addEventListener('keydown', (event3) => {
+        if (event3.key !== 'Escape') return;
+        run17();
       }));
     if (document.body) {
-      const _0x56cc34 = new MutationObserver(() => {
-        const _0x49a459 = _0xad0f78();
-        _0x49a459 && _0x3751c3({ force: true, silent: true }).catch(() => {});
+      const mutationObserver = new MutationObserver(() => {
+        const value99 = run16();
+        value99 && run7({ force: true, silent: true }).catch(() => {});
       });
-      _0x56cc34.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      mutationObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
     }
   }
-  function _0x5b6f5b() {
-    const _0x5c2e2a = (_0x5f2295) =>
-        String(_0x5f2295 || '')
+  function run6() {
+    const run62 = (value100) =>
+        String(value100 || '')
           .trim()
           .replace(/^Bearer\s+/i, ''),
-      _0x253ce0 = {};
-    _0x1e2cbf.forEach((_0x3c77b5) => {
-      const _0x3668dc = document.getElementById('providerUrl-' + _0x3c77b5),
-        _0x18dafd = document.getElementById('providerKey-' + _0x3c77b5),
-        _0x4634ca = _0x43d0f1?.providers?.[_0x3c77b5],
-        _0x4702b9 = _0x4634ca && typeof _0x4634ca === 'object' ? { ..._0x4634ca } : {};
-      if (_0x3668dc) _0x4702b9.apiUrl = _0x3668dc.value.trim();
-      if (_0x18dafd) _0x4702b9.apiKey = _0x5c2e2a(_0x18dafd.value);
-      (_0x3c77b5 === 'apimart' && Object.assign(_0x4702b9, _0x4eb253(_0x4702b9)),
-        (_0x253ce0[_0x3c77b5] = _0x4702b9));
+      providers = {};
+    list8.forEach((item7) => {
+      const el11 = document.getElementById('providerUrl-' + item7),
+        el12 = document.getElementById('providerKey-' + item7),
+        args4 = value12?.providers?.[item7],
+        value101 = args4 && typeof args4 === 'object' ? { ...args4 } : {};
+      if (el11) value101.apiUrl = el11.value.trim();
+      if (el12) value101.apiKey = run62(el12.value);
+      (item7 === 'apimart' && Object.assign(value101, run13(value101)), (providers[item7] = value101));
     });
-    const _0xe79c7 = document.getElementById('providerKey-runninghub-model');
+    const el13 = document.getElementById('providerKey-runninghub-model');
     return (
-      _0xe79c7 &&
-        ((_0x253ce0.runninghub = _0x253ce0.runninghub || {}),
-        (_0x253ce0.runninghub.modelApiKey = _0x5c2e2a(_0xe79c7.value))),
-      { ...(_0x43d0f1 || {}), providers: _0x253ce0 }
+      el13 &&
+        ((providers.runninghub = providers.runninghub || {}),
+        (providers.runninghub.modelApiKey = run62(el13.value))),
+      { ...(value12 || {}), providers: providers }
     );
   }
-  function _0x388c07(_0x43b98d) {
-    const _0x47fcba = _0x43b98d?.providers || {};
-    return _0x1e2cbf.filter((_0x5e383d) => {
-      const _0x15658c = _0x47fcba[_0x5e383d] || {};
-      return !!String(_0x15658c.apiKey || _0x15658c.modelApiKey || '').trim();
+  function run63(value102) {
+    const value103 = value102?.providers || {};
+    return list8.filter((item8) => {
+      const value104 = value103[item8] || {};
+      return !!String(value104.apiKey || value104.modelApiKey || '').trim();
     });
   }
-  function _0x52be9c(_0x3e0991, _0x43c73a) {
-    const _0x526ef1 = _0x3e0991?.providers?.[_0x43c73a] || {};
-    return !!String(_0x526ef1.apiKey || _0x526ef1.modelApiKey || '').trim();
+  function run64(value105, value106) {
+    const value107 = value105?.providers?.[value106] || {};
+    return !!String(value107.apiKey || value107.modelApiKey || '').trim();
   }
-  function _0x3d8209(_0x576daa) {
-    const _0x51ddba = document.getElementById('providerTestStatus-' + _0x576daa);
-    return (_0x3c7114(_0x51ddba), _0x51ddba);
+  function run65(value108) {
+    const value109 = document.getElementById('providerTestStatus-' + value108);
+    return (run66(value109), value109);
   }
-  function _0x311def(_0x3892b7) {
-    const _0x192b58 = document.getElementById('providerBalance-' + _0x3892b7);
-    return (_0x3c7114(_0x192b58), _0x192b58);
+  function run67(value110) {
+    const value111 = document.getElementById('providerBalance-' + value110);
+    return (run66(value111), value111);
   }
-  function _0x2e1e76() {
-    if (_0x41e853) return _0x41e853;
+  function run68() {
+    if (el) return el;
     return (
-      (_0x41e853 = document.createElement('div')),
-      (_0x41e853.className = 'settings-provider-test-tooltip'),
-      _0x41e853.setAttribute('role', 'tooltip'),
-      (_0x41e853.hidden = true),
-      document.body.appendChild(_0x41e853),
-      _0x41e853
+      (el = document.createElement('div')),
+      (el.className = 'settings-provider-test-tooltip'),
+      el.setAttribute('role', 'tooltip'),
+      (el.hidden = true),
+      document.body.appendChild(el),
+      el
     );
   }
-  function _0x1c68d3(_0x357ada) {
-    return String(_0x357ada?.getAttribute('data-provider-test-tooltip') || '').trim();
+  function run69(value112) {
+    return String(value112?.getAttribute('data-provider-test-tooltip') || '').trim();
   }
-  function _0x1ff843(_0x102fd3) {
-    if (!_0x41e853 || !_0x102fd3) return;
-    const _0x511978 = _0x41e853,
-      _0x300666 = _0x102fd3.getBoundingClientRect(),
-      _0x41be0c = _0x511978.getBoundingClientRect(),
-      _0x397950 = 24,
-      _0x59a22b = _0x102fd3.closest('.settings-modal')?.getBoundingClientRect().top ?? 0,
-      _0x2c5038 = Math.max(_0x397950, _0x59a22b + 10),
-      _0x1884c9 = Math.max(_0x397950, window.innerWidth - _0x41be0c.width - _0x397950),
-      _0x2d7e2e = Math.min(
-        _0x1884c9,
-        Math.max(_0x397950, _0x300666.left + _0x300666.width / 2 - _0x41be0c.width / 2),
-      ),
-      _0x3e2bc8 = Math.max(_0x2c5038, _0x300666.top - _0x41be0c.height - 12),
-      _0x422109 = Math.min(
-        _0x41be0c.width - 14,
-        Math.max(14, _0x300666.left + _0x300666.width / 2 - _0x2d7e2e),
-      );
-    ((_0x511978.style.left = _0x2d7e2e + 'px'),
-      (_0x511978.style.top = _0x3e2bc8 + 'px'),
-      _0x511978.style.setProperty('--settings-provider-test-tooltip-arrow-left', _0x422109 + 'px'));
+  function run70(el14) {
+    if (!el || !el14) return;
+    const el15 = el,
+      box = el14.getBoundingClientRect(),
+      box2 = el15.getBoundingClientRect(),
+      value113 = 24,
+      value114 = el14.closest('.settings-modal')?.getBoundingClientRect().top ?? 0,
+      value115 = Math.max(value113, value114 + 10),
+      value116 = Math.max(value113, window.innerWidth - box2.width - value113),
+      value117 = Math.min(value116, Math.max(value113, box.left + box.width / 2 - box2.width / 2)),
+      value118 = Math.max(value115, box.top - box2.height - 12),
+      value119 = Math.min(box2.width - 14, Math.max(14, box.left + box.width / 2 - value117));
+    ((el15.style.left = value117 + 'px'),
+      (el15.style.top = value118 + 'px'),
+      el15.style.setProperty('--settings-provider-test-tooltip-arrow-left', value119 + 'px'));
   }
-  function _0x271c96(_0x49b067) {
-    const _0x2c05ce = _0x1c68d3(_0x49b067);
-    if (!_0x2c05ce) return;
-    const _0x4f7420 = _0x2e1e76();
-    ((_0x273e6c = _0x49b067),
-      (_0x4f7420.textContent = _0x2c05ce),
-      (_0x4f7420.hidden = false),
-      _0x1ff843(_0x49b067),
-      _0x4f7420.classList.add('is-visible'));
+  function run71(value120) {
+    const enabled42 = run69(value120);
+    if (!enabled42) return;
+    const el16 = run68();
+    ((value13 = value120),
+      (el16.textContent = enabled42),
+      (el16.hidden = false),
+      run70(value120),
+      el16.classList.add('is-visible'));
   }
-  function _0x226c2f(_0x19e1eb = null) {
-    if (_0x19e1eb && _0x273e6c !== _0x19e1eb) return;
-    _0x273e6c = null;
-    if (!_0x41e853) return;
-    (_0x41e853.classList.remove('is-visible'), (_0x41e853.hidden = true));
+  function run72(value121 = null) {
+    if (value121 && value13 !== value121) return;
+    value13 = null;
+    if (!el) return;
+    (el.classList.remove('is-visible'), (el.hidden = true));
   }
-  function _0x3c7114(_0x219ec8) {
-    if (!_0x219ec8 || _0x219ec8.dataset.providerTestTooltipBound === '1') return;
-    ((_0x219ec8.dataset.providerTestTooltipBound = '1'),
-      _0x219ec8.addEventListener('pointerenter', () => _0x271c96(_0x219ec8)),
-      _0x219ec8.addEventListener('pointerleave', () => _0x226c2f(_0x219ec8)),
-      _0x219ec8.addEventListener('focus', () => _0x271c96(_0x219ec8)),
-      _0x219ec8.addEventListener('blur', () => _0x226c2f(_0x219ec8)));
+  function run66(el17) {
+    if (!el17 || el17.dataset.providerTestTooltipBound === '1') return;
+    ((el17.dataset.providerTestTooltipBound = '1'),
+      el17.addEventListener('pointerenter', () => run71(el17)),
+      el17.addEventListener('pointerleave', () => run72(el17)),
+      el17.addEventListener('focus', () => run71(el17)),
+      el17.addEventListener('blur', () => run72(el17)));
   }
-  function _0x59583d(_0x6a133e) {
-    const _0x4909a5 = _0x3d8209(_0x6a133e);
-    (_0x4909a5 &&
-      (_0x226c2f(_0x4909a5),
-      (_0x4909a5.hidden = true),
-      (_0x4909a5.textContent = ''),
-      (_0x4909a5.title = ''),
-      _0x4909a5.removeAttribute('data-tooltip'),
-      _0x4909a5.removeAttribute('data-tooltip-source'),
-      _0x4909a5.removeAttribute('data-native-title'),
-      _0x4909a5.removeAttribute('data-provider-test-tooltip'),
-      _0x4909a5.classList.remove(..._0x5d49f2)),
-      _0x1c6d68(_0x6a133e));
+  function run73(value122) {
+    const el18 = run65(value122);
+    (el18 &&
+      (run72(el18),
+      (el18.hidden = true),
+      (el18.textContent = ''),
+      (el18.title = ''),
+      el18.removeAttribute('data-tooltip'),
+      el18.removeAttribute('data-tooltip-source'),
+      el18.removeAttribute('data-native-title'),
+      el18.removeAttribute('data-provider-test-tooltip'),
+      el18.classList.remove(...args)),
+      run74(value122));
   }
-  function _0x26fea2(_0x6c2aeb, _0x4b7736, _0x3bde69, _0x26d97a = '') {
-    const _0x2bfe48 = _0x3d8209(_0x6c2aeb);
-    if (!_0x2bfe48) return;
-    ((_0x2bfe48.hidden = false), (_0x2bfe48.textContent = _0x3bde69));
-    const _0xc80956 = _0x26d97a || _0x3bde69;
-    (_0x2bfe48.removeAttribute('title'),
-      _0x2bfe48.removeAttribute('data-tooltip'),
-      _0x2bfe48.removeAttribute('data-tooltip-source'),
-      _0x2bfe48.removeAttribute('data-native-title'),
-      _0x2bfe48.setAttribute('data-provider-test-tooltip', _0xc80956),
-      _0x2bfe48.setAttribute('aria-label', _0xc80956),
-      _0x2bfe48.classList.remove(..._0x5d49f2));
-    if (_0x4b7736 === 'success') _0x2bfe48.classList.add('settings-provider-status--success');
+  function run75(value123, value124, value125, value126 = '') {
+    const el19 = run65(value123);
+    if (!el19) return;
+    ((el19.hidden = false), (el19.textContent = value125));
+    const value127 = value126 || value125;
+    (el19.removeAttribute('title'),
+      el19.removeAttribute('data-tooltip'),
+      el19.removeAttribute('data-tooltip-source'),
+      el19.removeAttribute('data-native-title'),
+      el19.setAttribute('data-provider-test-tooltip', value127),
+      el19.setAttribute('aria-label', value127),
+      el19.classList.remove(...args));
+    if (value124 === 'success') el19.classList.add('settings-provider-status--success');
     else {
-      if (_0x4b7736 === 'testing') _0x2bfe48.classList.add('settings-provider-status--testing');
+      if (value124 === 'testing') el19.classList.add('settings-provider-status--testing');
       else {
-        if (_0x4b7736 === 'partial') _0x2bfe48.classList.add('settings-provider-status--partial');
-        else _0x2bfe48.classList.add('settings-provider-status--danger');
+        if (value124 === 'partial') el19.classList.add('settings-provider-status--partial');
+        else el19.classList.add('settings-provider-status--danger');
       }
     }
   }
-  function _0x1c6d68(_0x323875) {
-    const _0x4ef4d8 = _0x311def(_0x323875);
-    if (!_0x4ef4d8) return;
-    (_0x226c2f(_0x4ef4d8),
-      (_0x4ef4d8.hidden = true),
-      (_0x4ef4d8.textContent = ''),
-      _0x4ef4d8.removeAttribute('aria-label'),
-      _0x4ef4d8.removeAttribute('data-provider-test-tooltip'));
+  function run74(value128) {
+    const el20 = run67(value128);
+    if (!el20) return;
+    (run72(el20),
+      (el20.hidden = true),
+      (el20.textContent = ''),
+      el20.removeAttribute('aria-label'),
+      el20.removeAttribute('data-provider-test-tooltip'));
   }
-  function _0x47d449(_0x40e8a6, _0x1df433 = null) {
-    const _0x5ef453 = _0x311def(_0x40e8a6);
-    if (!_0x5ef453) return;
-    const _0x3d4a49 = String(_0x1df433?.displayText || '').trim();
-    if (!_0x3d4a49) {
-      _0x1c6d68(_0x40e8a6);
+  function run76(value129, value130 = null) {
+    const el21 = run67(value129);
+    if (!el21) return;
+    const enabled43 = String(value130?.displayText || '').trim();
+    if (!enabled43) {
+      run74(value129);
       return;
     }
-    const _0x596b26 = String(_0x1df433?.detailText || _0x3d4a49).trim();
-    ((_0x5ef453.hidden = false),
-      (_0x5ef453.textContent = _0x3d4a49),
-      _0x5ef453.setAttribute('aria-label', _0x596b26),
-      _0x5ef453.setAttribute('data-provider-test-tooltip', _0x596b26));
+    const value131 = String(value130?.detailText || enabled43).trim();
+    ((el21.hidden = false),
+      (el21.textContent = enabled43),
+      el21.setAttribute('aria-label', value131),
+      el21.setAttribute('data-provider-test-tooltip', value131));
   }
-  function _0x3f4356(_0x104070 = {}) {
-    const _0x5e6a = [],
-      _0x599460 = _0x104070.suggestion || _0x104070.summary || _0x104070.error || _0x104070.detail || '';
-    if (_0x599460) _0x5e6a.push(_0x599460);
-    if (Array.isArray(_0x104070.steps) && _0x104070.steps.length > 0)
-      _0x104070.steps.forEach((_0x5ba86a) => {
-        const _0x1539d9 = _0x5ba86a.skipped
+  function run77(options3 = {}) {
+    const list14 = [],
+      value132 = options3.suggestion || options3.summary || options3.error || options3.detail || '';
+    if (value132) list14.push(value132);
+    if (Array.isArray(options3.steps) && options3.steps.length > 0)
+      options3.steps.forEach((error13) => {
+        const value133 = error13.skipped
             ? trApiInput('diagnostics.skipped')
-            : _0x5ba86a.ok
+            : error13.ok
               ? trApiInput('diagnostics.passed')
               : trApiInput('diagnostics.failed'),
-          _0xb552b = _0x5ba86a.message || _0x5ba86a.detail || '';
-        _0x5e6a.push(
-          (_0x5ba86a.label || _0x5ba86a.id || trApiInput('diagnostics.step')) +
+          value134 = error13.message || error13.detail || '';
+        list14.push(
+          (error13.label || error13.id || trApiInput('diagnostics.step')) +
             '：' +
-            _0x1539d9 +
-            (_0xb552b ? ' - ' + _0xb552b : ''),
+            value133 +
+            (value134 ? ' - ' + value134 : ''),
         );
       });
-    else _0x104070.detail && _0x5e6a.push(_0x104070.detail);
-    return _0x5e6a.filter(Boolean).join('\n');
+    else options3.detail && list14.push(options3.detail);
+    return list14.filter(Boolean).join('\n');
   }
-  function _0x179280(_0x2da0da = {}) {
-    if (_0x2da0da.ok) return 'success';
-    if (_0x2da0da.partial) return 'partial';
+  function run78(response5 = {}) {
+    if (response5.ok) return 'success';
+    if (response5.partial) return 'partial';
     return 'danger';
   }
-  function _0x22ece4(_0x26d678 = {}) {
-    if (_0x26d678.ok) return trApiInput('diagnostics.passed');
-    if (_0x26d678.partial) return trApiInput('diagnostics.partialPassed');
+  function run79(response6 = {}) {
+    if (response6.ok) return trApiInput('diagnostics.passed');
+    if (response6.partial) return trApiInput('diagnostics.partialPassed');
     return trApiInput('diagnostics.notPassed');
   }
-  function _0x2b8fa9() {
-    _0x1e2cbf.forEach(_0x59583d);
+  function run80() {
+    list8.forEach(run73);
   }
-  function _0x138603() {
-    (_0x1e2cbf.forEach((_0x40a16a) => {
-      const _0x201419 = document.getElementById('providerUrl-' + _0x40a16a),
-        _0x522894 = document.getElementById('providerKey-' + _0x40a16a);
-      (_0x201419?.addEventListener('input', () => _0x59583d(_0x40a16a)),
-        _0x522894?.addEventListener('input', () => _0x59583d(_0x40a16a)));
+  function run81() {
+    (list8.forEach((item9) => {
+      const el22 = document.getElementById('providerUrl-' + item9),
+        el23 = document.getElementById('providerKey-' + item9);
+      (el22?.addEventListener('input', () => run73(item9)),
+        el23?.addEventListener('input', () => run73(item9)));
     }),
-      _0x5ef8ff().forEach((_0x140a75) => {
-        _0x140a75.addEventListener('click', () => {
-          (_0x55ee8d(_0x140a75.dataset.apimartRoute), _0x59583d('apimart'));
+      run8().forEach((el24) => {
+        el24.addEventListener('click', () => {
+          (run11(el24.dataset.apimartRoute), run73('apimart'));
         });
       }),
       document
         .getElementById('providerKey-runninghub-model')
-        ?.addEventListener('input', () => _0x59583d('runninghub')));
+        ?.addEventListener('input', () => run73('runninghub')));
   }
-  async function _0x2d6980(_0x5aadd4, _0x2ea1c9 = {}) {
-    if (typeof _0x581697 !== 'function') {
+  async function run82(el25, value135 = {}) {
+    if (typeof testProviderConnections !== 'function') {
       window.showToast?.(trApiInput('diagnostics.testUnsupported'), 'error');
       return;
     }
-    const _0x430603 = _0x5b6f5b(),
-      _0x2229fc = String(_0x2ea1c9?.providerId || '')
+    const value136 = run6(),
+      value137 = String(value135?.providerId || '')
         .trim()
         .toLowerCase(),
-      _0x293bf9 = _0x2229fc ? [_0x2229fc] : _0x388c07(_0x430603);
-    _0x2229fc ? _0x59583d(_0x2229fc) : _0x2b8fa9();
-    if (_0x2229fc && !_0x52be9c(_0x430603, _0x2229fc)) {
+      list15 = value137 ? [value137] : run63(value136);
+    value137 ? run73(value137) : run80();
+    if (value137 && !run64(value136, value137)) {
       window.showToast?.(trApiInput('diagnostics.fillProviderKey'), 'warn');
       return;
     }
-    if (_0x293bf9.length === 0) {
+    if (list15.length === 0) {
       window.showToast?.(trApiInput('diagnostics.fillOneProviderKey'), 'warn');
       return;
     }
-    _0x293bf9.forEach((_0x394312) => _0x26fea2(_0x394312, 'testing', trApiInput('diagnostics.testing')));
-    const _0x561143 = _0x5aadd4?.querySelector?.('.settings-btn-label'),
-      _0x50d139 = _0x561143?.textContent || _0x5aadd4?.textContent || trApiInput('testConnection');
-    if (_0x5aadd4) {
-      _0x5aadd4.disabled = true;
-      if (_0x561143) _0x561143.textContent = trApiInput('diagnostics.testingBusy');
-      else _0x5aadd4.textContent = trApiInput('diagnostics.testingBusy');
+    list15.forEach((item10) => run75(item10, 'testing', trApiInput('diagnostics.testing')));
+    const el26 = el25?.querySelector?.('.settings-btn-label'),
+      value138 = el26?.textContent || el25?.textContent || trApiInput('testConnection');
+    if (el25) {
+      el25.disabled = true;
+      if (el26) el26.textContent = trApiInput('diagnostics.testingBusy');
+      else el25.textContent = trApiInput('diagnostics.testingBusy');
     }
-    const _0x522c46 = {},
-      _0x26af62 = [];
+    const value139 = {},
+      list16 = [];
     try {
       await Promise.all(
-        _0x293bf9.map(async (_0x34e654) => {
+        list15.map(async (label3) => {
           try {
-            const _0x161b44 = await _0x581697(_0x430603, [_0x34e654]);
-            _0x522c46[_0x34e654] = _0x161b44?.[_0x34e654];
-          } catch (_0x11314f) {
-            _0x522c46[_0x34e654] = {
+            const value140 = await testProviderConnections(value136, [label3]);
+            value139[label3] = value140?.[label3];
+          } catch (error14) {
+            value139[label3] = {
               ok: false,
-              label: _0x34e654,
-              error: _0x11314f?.message || trApiInput('diagnostics.testFailed'),
+              label: label3,
+              error: error14?.message || trApiInput('diagnostics.testFailed'),
             };
           }
-          const _0x1f4238 = _0x522c46[_0x34e654];
-          (_0x47d449(_0x34e654, _0x1f4238?.balance),
-            _0x1f4238?.ok
-              ? _0x26fea2(
-                  _0x34e654,
+          const label4 = value139[label3];
+          (run76(label3, label4?.balance),
+            label4?.ok
+              ? run75(
+                  label3,
                   'success',
                   trApiInput('diagnostics.passed'),
-                  _0x3f4356(_0x1f4238) || trApiInput('diagnostics.testPassed'),
+                  run77(label4) || trApiInput('diagnostics.testPassed'),
                 )
-              : (_0x26af62.push({
-                  label: _0x1f4238?.label || _0x34e654,
+              : (list16.push({
+                  label: label4?.label || label3,
                   error:
-                    _0x1f4238?.suggestion ||
-                    _0x1f4238?.summary ||
-                    _0x1f4238?.error ||
+                    label4?.suggestion ||
+                    label4?.summary ||
+                    label4?.error ||
                     trApiInput('diagnostics.testNotPassed'),
                 }),
-                _0x26fea2(
-                  _0x34e654,
-                  _0x179280(_0x1f4238),
-                  _0x22ece4(_0x1f4238),
-                  _0x3f4356(_0x1f4238) || _0x1f4238?.error || trApiInput('diagnostics.testNotPassed'),
+                run75(
+                  label3,
+                  run78(label4),
+                  run79(label4),
+                  run77(label4) || label4?.error || trApiInput('diagnostics.testNotPassed'),
                 )));
         }),
       );
-      if (_0x26af62.length === 0) {
-        const _0x3f1f15 = _0x522c46[_0x293bf9[0]],
-          _0x2ab68a = _0x2229fc
-            ? trApiInput('diagnostics.providerPassed', { label: _0x3f1f15?.label || _0x2229fc })
+      if (list16.length === 0) {
+        const label5 = value139[list15[0]],
+          value141 = value137
+            ? trApiInput('diagnostics.providerPassed', { label: label5?.label || value137 })
             : trApiInput('diagnostics.allPassed');
-        window.showToast?.(_0x2ab68a, 'success');
+        window.showToast?.(value141, 'success');
       } else {
-        const _0x1b6dc9 = _0x26af62[0];
+        const label6 = list16[0];
         window.showToast?.(
-          trApiInput('diagnostics.providerFailed', { label: _0x1b6dc9.label, error: _0x1b6dc9.error }),
+          trApiInput('diagnostics.providerFailed', { label: label6.label, error: label6.error }),
           'error',
           0x2328,
         );
       }
-    } catch (_0xdff3dd) {
-      (_0x293bf9.forEach((_0x18be7c) =>
-        _0x26fea2(
-          _0x18be7c,
+    } catch (error15) {
+      (list15.forEach((item11) =>
+        run75(
+          item11,
           'danger',
           trApiInput('diagnostics.notPassed'),
-          _0xdff3dd?.message || trApiInput('diagnostics.testFailed'),
+          error15?.message || trApiInput('diagnostics.testFailed'),
         ),
       ),
         window.showToast?.(
           trApiInput('diagnostics.testFailedWithDetail', {
-            error: _0xdff3dd?.message || trApiInput('diagnostics.unknownError'),
+            error: error15?.message || trApiInput('diagnostics.unknownError'),
           }),
           'error',
         ));
     } finally {
-      if (_0x5aadd4) {
-        _0x5aadd4.disabled = false;
-        if (_0x561143) _0x561143.textContent = _0x50d139;
-        else _0x5aadd4.textContent = _0x50d139;
+      if (el25) {
+        el25.disabled = false;
+        if (el26) el26.textContent = value138;
+        else el25.textContent = value138;
       }
     }
   }
-  function _0x43a7ff() {
-    const _0x36e156 = document.getElementById('btnApiSave'),
-      _0xc48bc1 = document.getElementById('btnApiTest');
-    (_0x5ae271()
-      .then((_0x4c1bd1) => {
-        if (!_0x4c1bd1 || _0x4c1bd1.error) return;
-        _0x43d0f1 = _0x4c1bd1 || {};
-        const _0xff95e5 = _0x4c1bd1.providers || {};
-        (_0x1e2cbf.forEach((_0x5b438f) => {
-          const _0x2c62ea = document.getElementById('providerUrl-' + _0x5b438f),
-            _0x4a4414 = document.getElementById('providerKey-' + _0x5b438f),
-            _0x2bfeb3 = _0xff95e5[_0x5b438f] || {};
-          if (_0x2c62ea && _0x2bfeb3.apiUrl) _0x2c62ea.value = _0x2bfeb3.apiUrl;
-          if (_0x4a4414 && _0x2bfeb3.apiKey) _0x4a4414.value = _0x2bfeb3.apiKey;
+  function run83() {
+    const el27 = document.getElementById('btnApiSave'),
+      el28 = document.getElementById('btnApiTest');
+    (fetchApiConfigFromServer()
+      .then((enabled44) => {
+        if (!enabled44 || enabled44.error) return;
+        value12 = enabled44 || {};
+        const enabled45 = enabled44.providers || {};
+        (list8.forEach((item12) => {
+          const el29 = document.getElementById('providerUrl-' + item12),
+            el30 = document.getElementById('providerKey-' + item12),
+            value142 = enabled45[item12] || {};
+          if (el29 && value142.apiUrl) el29.value = value142.apiUrl;
+          if (el30 && value142.apiKey) el30.value = value142.apiKey;
         }),
-          _0x4edacd(_0xff95e5.apimart || {}),
-          _0x2f9d13(_0x43d0f1),
-          PROVIDER_MODEL_CATALOG_PROVIDER_IDS.forEach((_0x6f31a2) => _0x5a7c9e(_0x6f31a2)));
-        const _0xbb0eef = document.getElementById('providerKey-runninghub-model');
-        _0xbb0eef &&
-          _0xff95e5.runninghub?.modelApiKey &&
-          (_0xbb0eef.value = _0xff95e5.runninghub.modelApiKey);
-        if (!_0xff95e5.grsai?.apiKey && _0x4c1bd1.apiKey) {
-          const _0x2261cd = document.getElementById('providerKey-grsai');
-          if (_0x2261cd && !_0x2261cd.value) _0x2261cd.value = _0x4c1bd1.apiKey;
+          run12(enabled45.apimart || {}),
+          run(value12),
+          PROVIDER_MODEL_CATALOG_PROVIDER_IDS.forEach((item13) => run2(item13)));
+        const el31 = document.getElementById('providerKey-runninghub-model');
+        el31 && enabled45.runninghub?.modelApiKey && (el31.value = enabled45.runninghub.modelApiKey);
+        if (!enabled45.grsai?.apiKey && enabled44.apiKey) {
+          const el32 = document.getElementById('providerKey-grsai');
+          if (el32 && !el32.value) el32.value = enabled44.apiKey;
         }
       })
-      .catch((_0x986493) => {
-        (console.error('[API Config] 加载失败:', _0x986493),
-          _0xf820b9?.(
+      .catch((error16) => {
+        (console.error('[API Config] 加载失败:', error16),
+          showError?.(
             trApiInput('diagnostics.loadFailed', {
-              error: _0x986493.message || trApiInput('diagnostics.unknownError'),
+              error: error16.message || trApiInput('diagnostics.unknownError'),
             }),
           ));
       })
       .finally(() => {
-        _0xad0f78() && _0x3751c3({ force: true, silent: true }).catch(() => {});
+        run16() && run7({ force: true, silent: true }).catch(() => {});
       }),
-      _0x36e156 &&
-        _0x36e156.addEventListener('click', () => {
-          const _0x70211a = _0x5b6f5b();
-          _0x5bc7d1(_0x70211a)
-            .then((_0x211510) => {
-              _0x211510.success || !_0x211510.error
-                ? ((_0x43d0f1 = _0x70211a),
+      el27 &&
+        el27.addEventListener('click', () => {
+          const value18 = run6();
+          saveApiConfigToServer(value18)
+            .then((error) => {
+              error.success || !error.error
+                ? ((value12 = value18),
                   window.showToast?.(trApiInput('diagnostics.saveSuccess')),
-                  _0x3751c3({ force: true, silent: true }).catch(() => {}))
+                  run7({ force: true, silent: true }).catch(() => {}))
                 : window.showToast?.(
                     trApiInput('diagnostics.saveFailed', {
-                      error: _0x211510.error || trApiInput('diagnostics.unknownError'),
+                      error: error.error || trApiInput('diagnostics.unknownError'),
                     }),
                     'error',
                   );
             })
-            .catch((_0x5cc3b9) => {
+            .catch((error17) => {
               window.showToast?.(
                 trApiInput('diagnostics.saveFailed', {
-                  error: _0x5cc3b9.message || trApiInput('diagnostics.unknownError'),
+                  error: error17.message || trApiInput('diagnostics.unknownError'),
                 }),
                 'error',
               );
             });
         }),
-      _0xc48bc1?.addEventListener('click', () => {
-        _0x2d6980(_0xc48bc1).catch(() => {});
+      el28?.addEventListener('click', () => {
+        run82(el28).catch(() => {});
       }),
-      document.querySelectorAll('[data-provider-test]').forEach((_0x21c197) => {
-        const _0x13ba2a = String(_0x21c197.dataset.providerTest || '').trim();
-        if (!_0x13ba2a) return;
-        _0x21c197.addEventListener('click', () => {
-          _0x2d6980(_0x21c197, { providerId: _0x13ba2a }).catch(() => {});
+      document.querySelectorAll('[data-provider-test]').forEach((el33) => {
+        const providerId3 = String(el33.dataset.providerTest || '').trim();
+        if (!providerId3) return;
+        el33.addEventListener('click', () => {
+          run82(el33, { providerId: providerId3 }).catch(() => {});
         });
       }),
-      document.querySelectorAll('[data-provider-models]').forEach((_0x3e1a2b) => {
-        const _0x1d6f0e = String(_0x3e1a2b.dataset.providerModels || '').trim();
-        if (!_0x1d6f0e) return;
-        _0x3e1a2b.addEventListener('click', () => {
-          _0x1e5a76(_0x1d6f0e, _0x3e1a2b).catch(() => {});
+      document.querySelectorAll('[data-provider-models]').forEach((el34) => {
+        const enabled46 = String(el34.dataset.providerModels || '').trim();
+        if (!enabled46) return;
+        el34.addEventListener('click', () => {
+          run4(enabled46, el34).catch(() => {});
         });
       }),
-      (document.getElementById('pane-api-input') || document).addEventListener(
-        'click',
-        (_0x4bb3c2) => {
-          const _0x2ab1d2 = _0x4bb3c2?.target?.closest?.('[data-provider-model-save]');
-          if (!_0x2ab1d2) return;
-          (_0x4bb3c2.preventDefault?.(),
-            _0x4b8e2c(String(_0x2ab1d2.dataset.providerModelSave || '').trim()).catch(() => {}));
-        },
-      ),
-      _0x138603(),
-      _0x2fb6bc());
+      (document.getElementById('pane-api-input') || document).addEventListener('click', (event4) => {
+        const el35 = event4?.target?.closest?.('[data-provider-model-save]');
+        if (!el35) return;
+        (event4.preventDefault?.(),
+          run5(String(el35.dataset.providerModelSave || '').trim()).catch(() => {}));
+      }),
+      run81(),
+      run61());
   }
-  function _0x52e5c1() {
-    (_0x484950(), _0xad0f78(), _0x43a7ff());
+  function init() {
+    (run14(), run16(), run83());
   }
-  return { init: _0x52e5c1 };
+  return { init: init };
 }

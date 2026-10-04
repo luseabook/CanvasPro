@@ -51,119 +51,118 @@ export const STORYBOARD_SCRIPT_MULTIMODAL_PROMPT_TEMPLATE =
   '\n8. “图片提示词”和“视频提示词”都必须是该镜头的完整生成总览，不是某一项字段的单独补充，不能只写几个关键词或复述“画面描述”。两者都要整合景别、构图、镜头语言/运镜意图、人物/产品/主体、参考图外观/材质/风格、场景、情绪、动作、表情、行为、服装道具、光影色彩、质感、氛围、风格和参考素材。“图片提示词”要把运镜意图转译成静帧镜头语言、画面张力和主体姿态，可直接给生图模型；“视频提示词”要在同一总览基础上继续写清时序变化、运动轨迹、速度节奏、身体联动、环境动态和转场，可直接给生视频模型。包含人物动作时，不能只写“走路、转身、抬手”这类泛动作，必须写清人物状态、动作意图、速度与节奏、重心变化、肩颈/手臂/躯干/髋部/腿部/脚步的身体联动，以及表情、视线、呼吸、衣物或道具随动作产生的细节。\n' +
   STORYBOARD_SCRIPT_CONCRETE_VIDEO_PROMPT_RULE +
   '\n9. 多人镜头必须写清主要人物和次要人物的互动关系。过肩镜头、对话镜头、双人同框等场景中，如果一个人在说话或行动，另一个人的反应、停顿、眼神、姿态或细微动作也要按镜头需要写入；不需要每个镜头都强行写反应，但不能让人物像静止背景。\n10. “对白”字段如果包含台词，必须根据剧情、人物性格和当下状态写成“声线质感+语速+情绪底色+发声习惯：“要说的台词””的形式，例如“温柔偏低的声线，语速平稳，底色带安抚，咬字轻但清晰：“你先听我说。””；不要只写裸台词。\n11. 没有对应内容的字段填空字符串，不要填 null，不要省略字段。\n\n输出要求：\n- 只输出合法 JSON。\n- 不要输出 Markdown，不要包裹代码块，不要解释。\n- 顶层对象必须包含 schemaVersion、type、sourceMode、title、detectedIntent、rows。\n- schemaVersion 必须是 "storyboard-script.v1"。\n- type 必须是 "storyboard-script"。\n- sourceMode 必须是 "multimodal"。\n- rows 中每个对象必须包含这些中文字段，且按这个顺序输出：\n  镜号、时长、景别、场景、画面描述、角色、角色描述、角色动作、情绪、角色图、参考、图片提示词、视频提示词、对白、音效。\n\nJSON 结构如下：\n{\n  "schemaVersion": "storyboard-script.v1",\n  "type": "storyboard-script",\n  "sourceMode": "multimodal",\n  "title": "根据内容生成的短标题",\n  "detectedIntent": {\n    "shotCount": 1,\n    "totalDurationSeconds": 1,\n    "aspectRatio": "9:16",\n    "style": "电影感",\n    "language": "zh-CN"\n  },\n  "rows": [\n    {\n      "镜号": "1",\n      "时长": "1.0s",\n      "景别": "",\n      "场景": "",\n      "画面描述": "",\n      "角色": "",\n      "角色描述": "",\n      "角色动作": "",\n      "情绪": "",\n      "角色图": "",\n      "参考": "",\n      "图片提示词": "",\n      "视频提示词": "",\n      "对白": "",\n      "音效": ""\n    }\n  ]\n}\n\n用户输入：\n{用户输入 || 请根据参考素材生成短视频分镜脚本}';
-export function buildStoryboardScriptTextOnlyPrompt(_0x3455bc) {
-  const _0x5c4bfe = String(_0x3455bc || '').trim();
+export function buildStoryboardScriptTextOnlyPrompt(value) {
+  const item = String(value || '').trim();
   return STORYBOARD_SCRIPT_TEXT_ONLY_USER_PROMPT_TEMPLATE.replace(
     /\{\{?\s*用户输入(?:\s*\|\|?\s*([^}]+))?\s*\}\}?/g,
-    (_0x42c16, _0x51a5f9) => _0x5c4bfe || _0x51a5f9 || '',
+    (key, index) => item || index || '',
   );
 }
 export function buildStoryboardScriptTextOnlySystemPrompt() {
   return STORYBOARD_SCRIPT_TEXT_ONLY_SYSTEM_PROMPT;
 }
-function normalizePositiveInteger(_0x598f85) {
-  const _0x1c5001 = Number(_0x598f85);
-  return Number.isFinite(_0x1c5001) && _0x1c5001 > 0 ? Math.trunc(_0x1c5001) : 0;
+function normalizePositiveInteger(result) {
+  const count = Number(result);
+  return Number.isFinite(count) && count > 0 ? Math.trunc(count) : 0;
 }
 export function extractRequestedStoryboardShotCount(
-  _0x1b921b,
+  data,
   { max: max = STORYBOARD_SCRIPT_MAX_SHOT_COUNT } = {},
 ) {
-  const _0x317ba7 = String(_0x1b921b || '');
-  if (!_0x317ba7.trim()) return 0;
-  const _0x1fbd86 = normalizePositiveInteger(max) || STORYBOARD_SCRIPT_MAX_SHOT_COUNT,
-    _0x48ff05 = [
+  const enabled = String(data || '');
+  if (!enabled.trim()) return 0;
+  const positiveInteger = normalizePositiveInteger(max) || STORYBOARD_SCRIPT_MAX_SHOT_COUNT,
+    options = [
       /(\d{1,3})\s*(?:段|个镜头|个分镜|镜头|分镜)/gi,
       /(?:分成|拆成|裁剪成|自动裁剪|生成|输出|出)\s*(\d{1,3})\s*(?:段|个|镜头|分镜)?/gi,
       /(\d{1,3})\s*(?:cuts?|shots?)/gi,
     ];
-  for (const _0x5f4e43 of _0x48ff05) {
-    _0x5f4e43.lastIndex = 0;
-    const _0x448d24 = _0x5f4e43.exec(_0x317ba7),
-      _0x394f9c = normalizePositiveInteger(_0x448d24?.[1]);
-    if (_0x394f9c > 0) return Math.min(_0x394f9c, _0x1fbd86);
+  for (const target of options) {
+    target.lastIndex = 0;
+    const source = target.exec(enabled),
+      positiveInteger2 = normalizePositiveInteger(source?.[1]);
+    if (positiveInteger2 > 0) return Math.min(positiveInteger2, positiveInteger);
   }
   return 0;
 }
-function getImageReferenceLabels(_0x5a942a = {}) {
-  if (Array.isArray(_0x5a942a.imageLabels) && _0x5a942a.imageLabels.length > 0)
-    return _0x5a942a.imageLabels.map((_0x3e3d56) => String(_0x3e3d56 || '').trim()).filter(Boolean);
-  const _0x229680 = normalizePositiveInteger(_0x5a942a.imageCount);
-  return Array.from({ length: _0x229680 }, (_0x1ffee1, _0x56a2d6) => '@图片' + (_0x56a2d6 + 1));
+function getImageReferenceLabels(options2 = {}) {
+  if (Array.isArray(options2.imageLabels) && options2.imageLabels.length > 0)
+    return options2.imageLabels.map((item2) => String(item2 || '').trim()).filter(Boolean);
+  const length = normalizePositiveInteger(options2.imageCount);
+  return Array.from({ length: length }, (next, current) => '@图片' + (current + 1));
 }
-function buildImageReferenceText(_0x1d2848 = {}) {
-  const _0x55f5d2 = getImageReferenceLabels(_0x1d2848);
-  return _0x55f5d2.length > 0 ? _0x55f5d2.join('、') : '@图片1';
+function buildImageReferenceText(options3 = {}) {
+  const list = getImageReferenceLabels(options3);
+  return list.length > 0 ? list.join('、') : '@图片1';
 }
-function getVideoReferenceLabels(_0x595c2f = {}) {
-  if (Array.isArray(_0x595c2f.videoLabels) && _0x595c2f.videoLabels.length > 0)
-    return _0x595c2f.videoLabels.map((_0x59bc3b) => String(_0x59bc3b || '').trim()).filter(Boolean);
-  const _0xbcc83e = normalizePositiveInteger(_0x595c2f.videoCount);
-  return Array.from({ length: _0xbcc83e }, (_0x3a6638, _0x136e32) => '@视频' + (_0x136e32 + 1));
+function getVideoReferenceLabels(options4 = {}) {
+  if (Array.isArray(options4.videoLabels) && options4.videoLabels.length > 0)
+    return options4.videoLabels.map((item3) => String(item3 || '').trim()).filter(Boolean);
+  const length2 = normalizePositiveInteger(options4.videoCount);
+  return Array.from({ length: length2 }, (entry, record) => '@视频' + (record + 1));
 }
-function buildVideoReferenceText(_0x184015 = {}) {
-  const _0x5bc7da = getVideoReferenceLabels(_0x184015);
-  return _0x5bc7da.length > 0 ? _0x5bc7da.join('、') : '@视频1';
+function buildVideoReferenceText(options5 = {}) {
+  const list2 = getVideoReferenceLabels(options5);
+  return list2.length > 0 ? list2.join('、') : '@视频1';
 }
-export function buildStoryboardScriptImagePrompt(_0x9e78ca, _0x189786 = {}) {
-  const _0x31911b = String(_0x9e78ca || '').trim(),
-    _0x27b243 = buildImageReferenceText(_0x189786);
+export function buildStoryboardScriptImagePrompt(payload, handle = {}) {
+  const state = String(payload || '').trim(),
+    imageReferenceText = buildImageReferenceText(handle);
   return STORYBOARD_SCRIPT_IMAGE_USER_PROMPT_TEMPLATE.replace(
     /\{\{?\s*参考图片(?:\s*\|\|?\s*([^}]+))?\s*\}\}?/g,
-    (_0x36780c, _0x39adca) => _0x27b243 || _0x39adca || '',
-  ).replace(
-    /\{\{?\s*用户输入(?:\s*\|\|?\s*([^}]+))?\s*\}\}?/g,
-    (_0x27b9be, _0x4a0767) => _0x31911b || _0x4a0767 || '',
-  );
+    (config, scope) => imageReferenceText || scope || '',
+  ).replace(/\{\{?\s*用户输入(?:\s*\|\|?\s*([^}]+))?\s*\}\}?/g, (input, output) => state || output || '');
 }
 export function buildStoryboardScriptImageSystemPrompt() {
   return STORYBOARD_SCRIPT_IMAGE_SYSTEM_PROMPT;
 }
-export function buildStoryboardScriptVideoPrompt(_0x56d823, _0x4f598d = {}) {
-  const _0x57624a = String(_0x56d823 || '').trim(),
-    _0x269baf = buildVideoReferenceText(_0x4f598d),
-    _0x129e2f = String(_0x4f598d.videoFrameSummary || '').trim();
+export function buildStoryboardScriptVideoPrompt(value2, value3 = {}) {
+  const value4 = String(value2 || '').trim(),
+    videoReferenceText = buildVideoReferenceText(value3),
+    value5 = String(value3.videoFrameSummary || '').trim();
   return STORYBOARD_SCRIPT_VIDEO_USER_PROMPT_TEMPLATE.replace(
     /\{\{?\s*视频切片参考(?:\s*\|\|?\s*([^}]+))?\s*\}\}?/g,
-    (_0x3797f0, _0x3e0a6d) => _0x129e2f || _0x3e0a6d || '',
+    (value6, value7) => value5 || value7 || '',
   )
     .replace(
       /\{\{?\s*参考视频(?:\s*\|\|?\s*([^}]+))?\s*\}\}?/g,
-      (_0x24b4f1, _0x2b8bfb) => _0x269baf || _0x2b8bfb || '',
+      (value8, value9) => videoReferenceText || value9 || '',
     )
     .replace(
       /\{\{?\s*用户输入(?:\s*\|\|?\s*([^}]+))?\s*\}\}?/g,
-      (_0x36055d, _0xc518f1) => _0x57624a || _0xc518f1 || '',
+      (value10, value11) => value4 || value11 || '',
     );
 }
 export function buildStoryboardScriptVideoSystemPrompt() {
   return STORYBOARD_SCRIPT_VIDEO_SYSTEM_PROMPT;
 }
-function hasMultimodalInputs(_0x4fe2d3 = {}) {
+function hasMultimodalInputs(options6 = {}) {
   return (
-    Number(_0x4fe2d3.imageCount || 0) > 0 ||
-    Number(_0x4fe2d3.videoCount || 0) > 0 ||
-    String(_0x4fe2d3.summary || '').trim()
+    Number(options6.imageCount || 0) > 0 ||
+    Number(options6.videoCount || 0) > 0 ||
+    String(options6.summary || '').trim()
   );
 }
-export function buildStoryboardScriptPrompt(_0x4360ad, _0x58daa3 = {}) {
-  const _0x5dbdf1 = String(_0x4360ad || '').trim(),
-    _0x317d44 = String(_0x58daa3.summary || '').trim(),
-    _0x4d3e57 = normalizePositiveInteger(_0x58daa3.imageCount),
-    _0x483d0b = normalizePositiveInteger(_0x58daa3.videoCount),
-    _0x826cf3 = [_0x317d44, _0x5dbdf1].filter(Boolean).join('\n\n');
-  if (!hasMultimodalInputs(_0x58daa3)) return buildStoryboardScriptTextOnlyPrompt(_0x826cf3);
-  if (_0x4d3e57 > 0 && _0x483d0b === 0) return buildStoryboardScriptImagePrompt(_0x826cf3, _0x58daa3);
-  if (_0x483d0b > 0 && _0x4d3e57 === 0) return buildStoryboardScriptVideoPrompt(_0x826cf3, _0x58daa3);
+export function buildStoryboardScriptPrompt(value12, value13 = {}) {
+  const value14 = String(value12 || '').trim(),
+    value15 = String(value13.summary || '').trim(),
+    positiveInteger3 = normalizePositiveInteger(value13.imageCount),
+    positiveInteger4 = normalizePositiveInteger(value13.videoCount),
+    value16 = [value15, value14].filter(Boolean).join('\n\n');
+  if (!hasMultimodalInputs(value13)) return buildStoryboardScriptTextOnlyPrompt(value16);
+  if (positiveInteger3 > 0 && positiveInteger4 === 0)
+    return buildStoryboardScriptImagePrompt(value16, value13);
+  if (positiveInteger4 > 0 && positiveInteger3 === 0)
+    return buildStoryboardScriptVideoPrompt(value16, value13);
   return STORYBOARD_SCRIPT_MULTIMODAL_PROMPT_TEMPLATE.replace(
     /\{\{?\s*用户输入(?:\s*\|\|?\s*([^}]+))?\s*\}\}?/g,
-    (_0x1a8a55, _0x4d3888) => _0x826cf3 || _0x4d3888 || '',
+    (value17, value18) => value16 || value18 || '',
   );
 }
 const STORYBOARD_SCRIPT_SOURCE_MODES = new Set(['text', 'image', 'video', 'multimodal']);
-function normalizeStoryboardScriptSourceMode(_0x2fea3f) {
-  const _0x340486 = String(_0x2fea3f || '').trim();
-  return STORYBOARD_SCRIPT_SOURCE_MODES.has(_0x340486) ? _0x340486 : 'text';
+function normalizeStoryboardScriptSourceMode(value19) {
+  const value20 = String(value19 || '').trim();
+  return STORYBOARD_SCRIPT_SOURCE_MODES.has(value20) ? value20 : 'text';
 }
 const COLUMN_ALIASES = Object.freeze({
   镜号: ['shotNumber', 'shot_number', 'shotNo', 'shotId', 'cut', 'cutNumber'],
@@ -298,161 +297,156 @@ const COLUMN_ALIASES = Object.freeze({
     'dynamicPrompt',
   ],
 });
-function extractJsonCandidate(_0x3b057d) {
-  const _0x478722 = String(_0x3b057d || '').trim();
-  if (!_0x478722) return '';
-  const _0x231dd3 = _0x478722.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  if (_0x231dd3?.[1]) return _0x231dd3[1].trim();
-  if (_0x478722.startsWith('{') || _0x478722.startsWith('[')) return _0x478722;
-  const _0x6271b5 = _0x478722.indexOf('{'),
-    _0x252f8f = _0x478722.lastIndexOf('}');
-  if (_0x6271b5 >= 0 && _0x252f8f > _0x6271b5) return _0x478722.slice(_0x6271b5, _0x252f8f + 1).trim();
-  const _0x2a3f06 = _0x478722.indexOf('['),
-    _0x1a33b4 = _0x478722.lastIndexOf(']');
-  if (_0x2a3f06 >= 0 && _0x1a33b4 > _0x2a3f06) return _0x478722.slice(_0x2a3f06, _0x1a33b4 + 1).trim();
+function extractJsonCandidate(value21) {
+  const list3 = String(value21 || '').trim();
+  if (!list3) return '';
+  const value22 = list3.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (value22?.[1]) return value22[1].trim();
+  if (list3.startsWith('{') || list3.startsWith('[')) return list3;
+  const count2 = list3.indexOf('{'),
+    value23 = list3.lastIndexOf('}');
+  if (count2 >= 0 && value23 > count2) return list3.slice(count2, value23 + 1).trim();
+  const count3 = list3.indexOf('['),
+    value24 = list3.lastIndexOf(']');
+  if (count3 >= 0 && value24 > count3) return list3.slice(count3, value24 + 1).trim();
   return '';
 }
-function parseJsonInput(_0x716a60) {
-  if (_0x716a60 && typeof _0x716a60 === 'object') return _0x716a60;
-  const _0x5bf8ee = extractJsonCandidate(_0x716a60);
-  if (!_0x5bf8ee) return null;
+function parseJsonInput(value25) {
+  if (value25 && typeof value25 === 'object') return value25;
+  const extractJsonCandidate2 = extractJsonCandidate(value25);
+  if (!extractJsonCandidate2) return null;
   try {
-    return JSON.parse(_0x5bf8ee);
+    return JSON.parse(extractJsonCandidate2);
   } catch {
     return null;
   }
 }
-function isPlainObject(_0xfba571) {
-  return _0xfba571 && typeof _0xfba571 === 'object' && !Array.isArray(_0xfba571);
+function isPlainObject(value26) {
+  return value26 && typeof value26 === 'object' && !Array.isArray(value26);
 }
-function pickRows(_0x5d32d8) {
-  if (Array.isArray(_0x5d32d8)) return _0x5d32d8;
-  if (!isPlainObject(_0x5d32d8)) return [];
-  if (Array.isArray(_0x5d32d8.rows)) return _0x5d32d8.rows;
-  if (Array.isArray(_0x5d32d8.shots)) return _0x5d32d8.shots;
-  if (Array.isArray(_0x5d32d8.scenes)) return _0x5d32d8.scenes;
-  if (Array.isArray(_0x5d32d8.items)) return _0x5d32d8.items;
+function pickRows(value27) {
+  if (Array.isArray(value27)) return value27;
+  if (!isPlainObject(value27)) return [];
+  if (Array.isArray(value27.rows)) return value27.rows;
+  if (Array.isArray(value27.shots)) return value27.shots;
+  if (Array.isArray(value27.scenes)) return value27.scenes;
+  if (Array.isArray(value27.items)) return value27.items;
   return [];
 }
-function toCellString(_0x2bf715, _0x5d33e5 = '') {
-  if (_0x2bf715 == null) return '';
-  if (Array.isArray(_0x2bf715))
-    return _0x2bf715
-      .map((_0x12d127) => toCellString(_0x12d127, _0x5d33e5))
+function toCellString(list4, value28 = '') {
+  if (list4 == null) return '';
+  if (Array.isArray(list4))
+    return list4
+      .map((item4) => toCellString(item4, value28))
       .filter(Boolean)
       .join('，');
-  if (typeof _0x2bf715 === 'number') return _0x5d33e5 === '时长' ? _0x2bf715 + 's' : String(_0x2bf715);
-  if (typeof _0x2bf715 === 'boolean') return _0x2bf715 ? '是' : '否';
-  if (typeof _0x2bf715 === 'object') {
-    const _0x10c209 =
-      _0x2bf715.url ||
-      _0x2bf715.imageUrl ||
-      _0x2bf715.reference_frame_image ||
-      _0x2bf715.referenceFrameImage ||
-      '';
-    if ((_0x5d33e5 === '参考' || _0x5d33e5 === '角色图') && _0x10c209) return String(_0x10c209).trim();
+  if (typeof list4 === 'number') return value28 === '时长' ? list4 + 's' : String(list4);
+  if (typeof list4 === 'boolean') return list4 ? '是' : '否';
+  if (typeof list4 === 'object') {
+    const value29 =
+      list4.url || list4.imageUrl || list4.reference_frame_image || list4.referenceFrameImage || '';
+    if ((value28 === '参考' || value28 === '角色图') && value29) return String(value29).trim();
     try {
-      return JSON.stringify(_0x2bf715);
+      return JSON.stringify(list4);
     } catch {
-      return String(_0x2bf715);
+      return String(list4);
     }
   }
-  return String(_0x2bf715).trim();
+  return String(list4).trim();
 }
-function pickColumnValue(_0x46ba6c, _0x30789a) {
-  if (Object.hasOwn(_0x46ba6c, _0x30789a)) return _0x46ba6c[_0x30789a];
-  const _0x249857 = COLUMN_ALIASES[_0x30789a] || [];
-  for (const _0xa1b248 of _0x249857) {
-    if (Object.hasOwn(_0x46ba6c, _0xa1b248)) return _0x46ba6c[_0xa1b248];
+function pickColumnValue(value30, value31) {
+  if (Object.hasOwn(value30, value31)) return value30[value31];
+  const value32 = COLUMN_ALIASES[value31] || [];
+  for (const value33 of value32) {
+    if (Object.hasOwn(value30, value33)) return value30[value33];
   }
   return '';
 }
-function normalizeStoryboardRow(_0x1d12b3, _0x439108) {
-  const _0x2d760c = {};
-  for (const _0x117f9a of STORYBOARD_SCRIPT_COLUMNS) {
-    _0x2d760c[_0x117f9a.key] = toCellString(pickColumnValue(_0x1d12b3, _0x117f9a.key), _0x117f9a.key);
+function normalizeStoryboardRow(value34, value35) {
+  const enabled2 = {};
+  for (const event of STORYBOARD_SCRIPT_COLUMNS) {
+    enabled2[event.key] = toCellString(pickColumnValue(value34, event.key), event.key);
   }
-  if (!_0x2d760c['镜号']) _0x2d760c['镜号'] = String(_0x439108 + 1);
-  return _0x2d760c;
+  if (!enabled2['镜号']) enabled2['镜号'] = String(value35 + 1);
+  return enabled2;
 }
 const STORYBOARD_IMAGE_PLACEHOLDER_PATTERN = /@图片\d+/g,
   STORYBOARD_VIDEO_PLACEHOLDER_PATTERN = /@视频\d+/g;
-function extractStoryboardImagePlaceholders(_0x3f1edb) {
-  return String(_0x3f1edb || '').match(STORYBOARD_IMAGE_PLACEHOLDER_PATTERN) || [];
+function extractStoryboardImagePlaceholders(value36) {
+  return String(value36 || '').match(STORYBOARD_IMAGE_PLACEHOLDER_PATTERN) || [];
 }
-function extractStoryboardVideoPlaceholders(_0x2b80e2) {
-  return String(_0x2b80e2 || '').match(STORYBOARD_VIDEO_PLACEHOLDER_PATTERN) || [];
+function extractStoryboardVideoPlaceholders(value37) {
+  return String(value37 || '').match(STORYBOARD_VIDEO_PLACEHOLDER_PATTERN) || [];
 }
-function normalizeStoryboardRowForSourceMode(_0x12f72c, _0x3b0473) {
-  const _0x1e2008 = { ..._0x12f72c };
-  if (_0x3b0473 === 'image' || _0x3b0473 === 'multimodal') {
-    const _0x17956e = extractStoryboardImagePlaceholders(_0x1e2008['角色图']),
-      _0x4da210 = extractStoryboardImagePlaceholders(_0x1e2008['参考']);
-    _0x17956e.length === 0 && _0x4da210.length > 0 && (_0x1e2008['角色图'] = _0x4da210.join('、'));
+function normalizeStoryboardRowForSourceMode(args, value38) {
+  const value39 = { ...args };
+  if (value38 === 'image' || value38 === 'multimodal') {
+    const list5 = extractStoryboardImagePlaceholders(value39['角色图']),
+      list6 = extractStoryboardImagePlaceholders(value39['参考']);
+    list5.length === 0 && list6.length > 0 && (value39['角色图'] = list6.join('、'));
   }
-  if (_0x3b0473 === 'video' || _0x3b0473 === 'multimodal') {
-    const _0x158f2a = extractStoryboardImagePlaceholders(_0x1e2008['角色图']),
-      _0x76f35f = extractStoryboardImagePlaceholders(_0x1e2008['参考']);
-    if (_0x3b0473 === 'video' && _0x76f35f.length === 0 && _0x158f2a.length > 0) {
-      const _0x2d0afb = String(_0x1e2008['参考'] || '').trim();
-      _0x1e2008['参考'] = _0x2d0afb ? _0x158f2a.join('、') + ' / ' + _0x2d0afb : _0x158f2a.join('、');
+  if (value38 === 'video' || value38 === 'multimodal') {
+    const list7 = extractStoryboardImagePlaceholders(value39['角色图']),
+      list8 = extractStoryboardImagePlaceholders(value39['参考']);
+    if (value38 === 'video' && list8.length === 0 && list7.length > 0) {
+      const value40 = String(value39['参考'] || '').trim();
+      value39['参考'] = value40 ? list7.join('、') + ' / ' + value40 : list7.join('、');
     }
-    const _0x577d76 = extractStoryboardVideoPlaceholders(_0x1e2008['角色图']),
-      _0x3d1119 = extractStoryboardVideoPlaceholders(_0x1e2008['参考']);
-    _0x3d1119.length === 0 && _0x577d76.length > 0 && (_0x1e2008['参考'] = _0x577d76.join('、'));
+    const list9 = extractStoryboardVideoPlaceholders(value39['角色图']),
+      list10 = extractStoryboardVideoPlaceholders(value39['参考']);
+    list10.length === 0 && list9.length > 0 && (value39['参考'] = list9.join('、'));
   }
-  return (_0x3b0473 === 'video' && (_0x1e2008['角色图'] = ''), _0x1e2008);
+  return (value38 === 'video' && (value39['角色图'] = ''), value39);
 }
-function hasStoryboardMarker(_0x911f03) {
-  if (!isPlainObject(_0x911f03)) return false;
+function hasStoryboardMarker(value41) {
+  if (!isPlainObject(value41)) return false;
   return (
-    String(_0x911f03.schemaVersion || '').trim() === STORYBOARD_SCRIPT_GENERATION_SCHEMA_VERSION ||
-    String(_0x911f03.type || '').trim() === STORYBOARD_SCRIPT_NODE_TYPE
+    String(value41.schemaVersion || '').trim() === STORYBOARD_SCRIPT_GENERATION_SCHEMA_VERSION ||
+    String(value41.type || '').trim() === STORYBOARD_SCRIPT_NODE_TYPE
   );
 }
-function normalizeDetectedIntent(_0x2a804e, _0x45de53) {
-  const _0x49b271 = isPlainObject(_0x2a804e) ? { ..._0x2a804e } : {},
-    _0x20c192 = Number(_0x49b271.shotCount);
-  _0x49b271.shotCount =
-    Number.isFinite(_0x20c192) && _0x20c192 > 0 ? Math.trunc(_0x20c192) : _0x45de53.length;
-  if (!_0x49b271.language) _0x49b271.language = 'zh-CN';
-  return _0x49b271;
+function normalizeDetectedIntent(args2, list11) {
+  const isPlainObject2 = isPlainObject(args2) ? { ...args2 } : {},
+    count4 = Number(isPlainObject2.shotCount);
+  isPlainObject2.shotCount = Number.isFinite(count4) && count4 > 0 ? Math.trunc(count4) : list11.length;
+  if (!isPlainObject2.language) isPlainObject2.language = 'zh-CN';
+  return isPlainObject2;
 }
 export function normalizeStoryboardScriptGenerationResult(
-  _0x27d1ac,
-  { requireMarker: requireMarker = true, sourceMode: _0xe583f3 = '' } = {},
+  value42,
+  { requireMarker: requireMarker = true, sourceMode: sourceMode = '' } = {},
 ) {
-  const _0x6ac764 = parseJsonInput(_0x27d1ac);
-  if (!_0x6ac764) return { ok: false, error: 'NO_VALID_JSON' };
-  if (requireMarker && !hasStoryboardMarker(_0x6ac764))
+  const jsonInput = parseJsonInput(value42);
+  if (!jsonInput) return { ok: false, error: 'NO_VALID_JSON' };
+  if (requireMarker && !hasStoryboardMarker(jsonInput))
     return { ok: false, error: 'NOT_STORYBOARD_SCRIPT_JSON' };
-  const _0x42db12 = normalizeStoryboardScriptSourceMode(_0xe583f3 || _0x6ac764.sourceMode),
-    _0x56b1e7 = pickRows(_0x6ac764).filter(isPlainObject),
-    _0x5ab797 = _0x56b1e7
+  const sourceMode2 = normalizeStoryboardScriptSourceMode(sourceMode || jsonInput.sourceMode),
+    list12 = pickRows(jsonInput).filter(isPlainObject),
+    rows = list12
       .map(normalizeStoryboardRow)
-      .map((_0x3b7739) => normalizeStoryboardRowForSourceMode(_0x3b7739, _0x42db12));
-  if (_0x5ab797.length === 0) return { ok: false, error: 'NO_ROWS' };
-  const _0x18fc35 = normalizeDetectedIntent(_0x6ac764.detectedIntent, _0x5ab797),
-    _0x8778fa = String(_0x6ac764.title || '分镜脚本').trim() || '分镜脚本',
-    _0xeb10bb = [];
-  Number.isFinite(Number(_0x18fc35.shotCount)) &&
-    Number(_0x18fc35.shotCount) !== _0x5ab797.length &&
-    _0xeb10bb.push('SHOT_COUNT_MISMATCH');
-  const _0x3ab41e = {
+      .map((item5) => normalizeStoryboardRowForSourceMode(item5, sourceMode2));
+  if (rows.length === 0) return { ok: false, error: 'NO_ROWS' };
+  const detectedIntent = normalizeDetectedIntent(jsonInput.detectedIntent, rows),
+    title = String(jsonInput.title || '分镜脚本').trim() || '分镜脚本',
+    warnings = [];
+  Number.isFinite(Number(detectedIntent.shotCount)) &&
+    Number(detectedIntent.shotCount) !== rows.length &&
+    warnings.push('SHOT_COUNT_MISMATCH');
+  const sourceMode3 = {
     schemaVersion: STORYBOARD_SCRIPT_GENERATION_SCHEMA_VERSION,
     type: STORYBOARD_SCRIPT_NODE_TYPE,
-    sourceMode: _0x42db12,
-    title: _0x8778fa,
-    detectedIntent: _0x18fc35,
-    rows: _0x5ab797,
+    sourceMode: sourceMode2,
+    title: title,
+    detectedIntent: detectedIntent,
+    rows: rows,
   };
   return {
     ok: true,
-    title: _0x8778fa,
-    sourceMode: _0x3ab41e.sourceMode,
-    rows: _0x5ab797,
-    detectedIntent: _0x18fc35,
-    warnings: _0xeb10bb,
-    rawJson: JSON.stringify(_0x3ab41e, null, 2),
+    title: title,
+    sourceMode: sourceMode3.sourceMode,
+    rows: rows,
+    detectedIntent: detectedIntent,
+    warnings: warnings,
+    rawJson: JSON.stringify(sourceMode3, null, 2),
   };
 }

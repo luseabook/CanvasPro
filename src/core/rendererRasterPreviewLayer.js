@@ -15,162 +15,154 @@ const DEFAULT_NODE_WIDTH = 0xa0,
   DEFAULT_MAX_READY_IMAGES_PER_FRAME = 0x8,
   DEFAULT_DENSE_MAX_READY_IMAGES_PER_FRAME = 0x10,
   DENSE_READY_REVEAL_NODE_COUNT = 0x140;
-function finiteNumber(_0x4ad3a9, _0x5ed32f = 0x0) {
-  const _0x32f9d2 = Number(_0x4ad3a9);
-  return Number['isFinite'](_0x32f9d2) ? _0x32f9d2 : _0x5ed32f;
+function finiteNumber(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
 }
-function positiveInteger(_0x2abe56, _0x4f25d6) {
-  const _0x47cf5d = Math['trunc'](finiteNumber(_0x2abe56, _0x4f25d6));
-  return _0x47cf5d > 0x0 ? _0x47cf5d : _0x4f25d6;
+function positiveInteger(index, result) {
+  const count = Math['trunc'](finiteNumber(index, result));
+  return count > 0x0 ? count : result;
 }
-function normalizeIdSet(_0xb9cb64) {
-  const _0x2afb29 = new Set();
-  if (!_0xb9cb64 || typeof _0xb9cb64[Symbol['iterator']] !== 'function') return _0x2afb29;
-  for (const _0x1a58b2 of _0xb9cb64) {
-    const _0x578da5 = String(_0x1a58b2?.['id'] ?? _0x1a58b2 ?? '')['trim']();
-    if (_0x578da5) _0x2afb29['add'](_0x578da5);
+function normalizeIdSet(enabled) {
+  const data = new Set();
+  if (!enabled || typeof enabled[Symbol['iterator']] !== 'function') return data;
+  for (const options of enabled) {
+    const target = String(options?.['id'] ?? options ?? '')['trim']();
+    if (target) data['add'](target);
   }
-  return _0x2afb29;
+  return data;
 }
-function resolveMediaLoadingBusy(_0xe6481d) {
-  if (_0xe6481d && Object['prototype']['hasOwnProperty']['call'](_0xe6481d, 'mediaLoadingBusy'))
-    return _0xe6481d['mediaLoadingBusy'] === !![];
-  return _0xe6481d?.['viewportBusy'] === !![];
+function resolveMediaLoadingBusy(source) {
+  if (source && Object['prototype']['hasOwnProperty']['call'](source, 'mediaLoadingBusy'))
+    return source['mediaLoadingBusy'] === !![];
+  return source?.['viewportBusy'] === !![];
 }
-function normalizeSources(_0x1bae0a) {
-  const _0x4d73f4 =
-      typeof _0x1bae0a === 'string'
-        ? [_0x1bae0a]
-        : Array['isArray'](_0x1bae0a)
-          ? _0x1bae0a
-          : Array['isArray'](_0x1bae0a?.['sources'])
-            ? _0x1bae0a['sources']
-            : [_0x1bae0a?.['source'], _0x1bae0a?.['src']],
-    _0x802e23 = [],
-    _0xa33fce = new Set();
-  for (const _0x4c900a of _0x4d73f4 || []) {
-    const _0x3a3590 = String(_0x4c900a || '')['trim']();
-    if (!_0x3a3590 || _0xa33fce['has'](_0x3a3590)) continue;
-    (_0xa33fce['add'](_0x3a3590), _0x802e23['push'](_0x3a3590));
+function normalizeSources(next) {
+  const current =
+      typeof next === 'string'
+        ? [next]
+        : Array['isArray'](next)
+          ? next
+          : Array['isArray'](next?.['sources'])
+            ? next['sources']
+            : [next?.['source'], next?.['src']],
+    list = [],
+    map = new Set();
+  for (const entry of current || []) {
+    const enabled2 = String(entry || '')['trim']();
+    if (!enabled2 || map['has'](enabled2)) continue;
+    (map['add'](enabled2), list['push'](enabled2));
   }
-  return _0x802e23;
+  return list;
 }
-function getNode(_0x46acc7, _0x49c960) {
-  if (_0x46acc7 instanceof Map) return _0x46acc7['get'](_0x49c960) || null;
-  return _0x46acc7?.[_0x49c960] || null;
+function getNode(map2, record) {
+  if (map2 instanceof Map) return map2['get'](record) || null;
+  return map2?.[record] || null;
 }
-function getCandidateIds(_0x45ea2d, _0x11fe81) {
-  if (_0x11fe81 && typeof _0x11fe81[Symbol['iterator']] === 'function') return normalizeIdSet(_0x11fe81);
-  if (_0x45ea2d instanceof Map) return normalizeIdSet(_0x45ea2d['keys']());
-  return normalizeIdSet(Object['keys'](_0x45ea2d || {}));
+function getCandidateIds(map3, payload) {
+  if (payload && typeof payload[Symbol['iterator']] === 'function') return normalizeIdSet(payload);
+  if (map3 instanceof Map) return normalizeIdSet(map3['keys']());
+  return normalizeIdSet(Object['keys'](map3 || {}));
 }
-function getNodeKind(_0x4ab123) {
-  const _0x1b56b9 = getRendererNodeLabelKind(_0x4ab123?.['type']);
-  if (_0x1b56b9) return _0x1b56b9;
-  const _0x4ac4af = String(_0x4ab123?.['type'] || '')['toLowerCase']();
-  if (_0x4ac4af['includes']('video') || _0x4ac4af['includes']('media-clip')) return 'video';
-  if (_0x4ac4af['includes']('image')) return 'image';
-  if (_0x4ac4af['includes']('text') || _0x4ac4af['includes']('comment')) return 'text';
-  if (_0x4ac4af['includes']('group')) return 'group';
+function getNodeKind(handle) {
+  const rendererNodeLabelKind = getRendererNodeLabelKind(handle?.['type']);
+  if (rendererNodeLabelKind) return rendererNodeLabelKind;
+  const list2 = String(handle?.['type'] || '')['toLowerCase']();
+  if (list2['includes']('video') || list2['includes']('media-clip')) return 'video';
+  if (list2['includes']('image')) return 'image';
+  if (list2['includes']('text') || list2['includes']('comment')) return 'text';
+  if (list2['includes']('group')) return 'group';
   return 'node';
 }
-function getNodeLabel(_0x3b217d, _0x3194cb) {
-  const _0x249d2d =
-    _0x3194cb === 'video'
+function getNodeLabel(error, state) {
+  const config =
+    state === 'video'
       ? 'Video'
-      : _0x3194cb === 'image'
+      : state === 'image'
         ? 'Image'
-        : _0x3194cb === 'text'
+        : state === 'text'
           ? 'Text'
-          : _0x3194cb === 'group'
+          : state === 'group'
             ? 'Group'
             : 'Node';
-  return String(
-    _0x3b217d?.['name'] || _0x3b217d?.['title'] || _0x3b217d?.['text'] || _0x3b217d?.['prompt'] || _0x249d2d,
-  )
+  return String(error?.['name'] || error?.['title'] || error?.['text'] || error?.['prompt'] || config)
     ['replace'](/\s+/g, '\x20')
     ['trim']()
-    ['slice'](0x0, _0x3194cb === 'text' ? 0x60 : 0x24);
+    ['slice'](0x0, state === 'text' ? 0x60 : 0x24);
 }
-function getCssColor(_0x3e2dfa, _0x506bba, _0x11e57a) {
+function getCssColor(scope, input, output) {
   try {
-    const _0x2c7de8 = _0x3e2dfa?.['getPropertyValue']?.(_0x506bba);
-    return String(_0x2c7de8 || '')['trim']() || _0x11e57a;
+    const value2 = scope?.['getPropertyValue']?.(input);
+    return String(value2 || '')['trim']() || output;
   } catch {
-    return _0x11e57a;
+    return output;
   }
 }
-function readPalette(_0x1ecad2) {
-  const _0x4923c8 = _0x1ecad2?.['documentElement'] || _0x1ecad2?.['body'],
-    _0x440ed2 = _0x1ecad2?.['defaultView'] || globalThis['window'];
-  let _0xbeec54 = null;
+function readPalette(dom) {
+  const value3 = dom?.['documentElement'] || dom?.['body'],
+    value4 = dom?.['defaultView'] || globalThis['window'];
+  let value5 = null;
   try {
-    _0xbeec54 = _0x440ed2?.['getComputedStyle']?.(_0x4923c8) || null;
+    value5 = value4?.['getComputedStyle']?.(value3) || null;
   } catch {}
   return {
-    nodeFill: getCssColor(_0xbeec54, '--surface-node', 'ButtonFace'),
-    nodeStroke: getCssColor(_0xbeec54, '--stroke-default', 'GrayText'),
-    text: getCssColor(_0xbeec54, '--text-primary', 'CanvasText'),
-    placeholder: getCssColor(_0xbeec54, '--text-secondary', 'GrayText'),
-    nodeLabel: getCssColor(_0xbeec54, '--white-40', 'GrayText'),
+    nodeFill: getCssColor(value5, '--surface-node', 'ButtonFace'),
+    nodeStroke: getCssColor(value5, '--stroke-default', 'GrayText'),
+    text: getCssColor(value5, '--text-primary', 'CanvasText'),
+    placeholder: getCssColor(value5, '--text-secondary', 'GrayText'),
+    nodeLabel: getCssColor(value5, '--white-40', 'GrayText'),
   };
 }
-function getPaletteThemeKey(_0x4e9b01) {
-  const _0x5c337a = _0x4e9b01?.['documentElement'] || _0x4e9b01?.['body'],
-    _0x4edb35 = _0x5c337a?.['getAttribute']?.('data-theme') || '',
-    _0x2726f9 = String(_0x5c337a?.['className'] || ''),
-    _0x2078ac = String(_0x4e9b01?.['readyState'] || '');
-  return _0x2078ac + '\x1f' + _0x4edb35 + '\x1f' + _0x2726f9;
+function getPaletteThemeKey(dom2) {
+  const value6 = dom2?.['documentElement'] || dom2?.['body'],
+    value7 = value6?.['getAttribute']?.('data-theme') || '',
+    value8 = String(value6?.['className'] || ''),
+    value9 = String(dom2?.['readyState'] || '');
+  return value9 + '\x1f' + value7 + '\x1f' + value8;
 }
-function applyPaletteOverrides(_0x2b78fc, _0x4d7b3e = {}) {
+function applyPaletteOverrides(response, nodeFill = {}) {
   return {
-    nodeFill: _0x4d7b3e['nodeFill'] || _0x2b78fc['nodeFill'],
-    nodeStroke: _0x4d7b3e['nodeStroke'] || _0x2b78fc['nodeStroke'],
-    text: _0x4d7b3e['text'] || _0x2b78fc['text'],
-    placeholder: _0x4d7b3e['placeholder'] || _0x2b78fc['placeholder'],
-    nodeLabel: _0x4d7b3e['nodeLabel'] || _0x2b78fc['nodeLabel'],
+    nodeFill: nodeFill['nodeFill'] || response['nodeFill'],
+    nodeStroke: nodeFill['nodeStroke'] || response['nodeStroke'],
+    text: nodeFill['text'] || response['text'],
+    placeholder: nodeFill['placeholder'] || response['placeholder'],
+    nodeLabel: nodeFill['nodeLabel'] || response['nodeLabel'],
   };
 }
-function formatCssNumber(_0x734a40) {
-  const _0xc4072f = Math['abs'](_0x734a40) < 0.0001 ? 0x0 : _0x734a40;
-  return String(_0xc4072f);
+function formatCssNumber(value10) {
+  const value11 = Math['abs'](value10) < 0.0001 ? 0x0 : value10;
+  return String(value11);
 }
-function normalizeExplicitWorldBounds(_0x1f27e6) {
-  if (!_0x1f27e6 || typeof _0x1f27e6 !== 'object') return null;
-  const _0x10155a = finiteNumber(_0x1f27e6['left'] ?? _0x1f27e6['minX'], NaN),
-    _0x29c82a = finiteNumber(_0x1f27e6['top'] ?? _0x1f27e6['minY'], NaN),
-    _0x191873 = finiteNumber(_0x1f27e6['width'], finiteNumber(_0x1f27e6['maxX'], NaN) - _0x10155a),
-    _0x2acea6 = finiteNumber(_0x1f27e6['height'], finiteNumber(_0x1f27e6['maxY'], NaN) - _0x29c82a);
-  if (
-    !Number['isFinite'](_0x10155a) ||
-    !Number['isFinite'](_0x29c82a) ||
-    !(_0x191873 > 0x0) ||
-    !(_0x2acea6 > 0x0)
-  )
-    return null;
-  return { left: _0x10155a, top: _0x29c82a, width: _0x191873, height: _0x2acea6 };
+function normalizeExplicitWorldBounds(box) {
+  if (!box || typeof box !== 'object') return null;
+  const left = finiteNumber(box['left'] ?? box['minX'], NaN),
+    top = finiteNumber(box['top'] ?? box['minY'], NaN),
+    width = finiteNumber(box['width'], finiteNumber(box['maxX'], NaN) - left),
+    height = finiteNumber(box['height'], finiteNumber(box['maxY'], NaN) - top);
+  if (!Number['isFinite'](left) || !Number['isFinite'](top) || !(width > 0x0) || !(height > 0x0)) return null;
+  return { left: left, top: top, width: width, height: height };
 }
-function computeRasterWorldBounds(_0x381b2c, _0x47f5b8) {
-  const _0x5b6644 = normalizeExplicitWorldBounds(_0x47f5b8?.['worldBounds']);
-  if (_0x5b6644) return _0x5b6644;
-  const _0x4fbfe0 = computeNodesWorldBounds(_0x381b2c);
-  if (!_0x4fbfe0) return null;
-  const _0x42b4ef = Math['max'](0x0, finiteNumber(_0x47f5b8?.['worldPadding'], DEFAULT_WORLD_PADDING)),
-    _0x42bf4f = Math['floor'](_0x4fbfe0['minX'] - _0x42b4ef),
-    _0x204232 = Math['floor'](_0x4fbfe0['minY'] - _0x42b4ef),
-    _0x5efa5e = Math['ceil'](_0x4fbfe0['maxX'] + _0x42b4ef),
-    _0x4730d0 = Math['ceil'](_0x4fbfe0['maxY'] + _0x42b4ef);
+function computeRasterWorldBounds(value12, value13) {
+  const explicitWorldBounds = normalizeExplicitWorldBounds(value13?.['worldBounds']);
+  if (explicitWorldBounds) return explicitWorldBounds;
+  const nodesWorldBounds = computeNodesWorldBounds(value12);
+  if (!nodesWorldBounds) return null;
+  const value14 = Math['max'](0x0, finiteNumber(value13?.['worldPadding'], DEFAULT_WORLD_PADDING)),
+    left2 = Math['floor'](nodesWorldBounds['minX'] - value14),
+    top2 = Math['floor'](nodesWorldBounds['minY'] - value14),
+    value15 = Math['ceil'](nodesWorldBounds['maxX'] + value14),
+    value16 = Math['ceil'](nodesWorldBounds['maxY'] + value14);
   return {
-    left: _0x42bf4f,
-    top: _0x204232,
-    width: Math['max'](0x1, _0x5efa5e - _0x42bf4f),
-    height: Math['max'](0x1, _0x4730d0 - _0x204232),
+    left: left2,
+    top: top2,
+    width: Math['max'](0x1, value15 - left2),
+    height: Math['max'](0x1, value16 - top2),
   };
 }
-function createEmptyStats(_0x40d7af = 0x0, _0x1e7420 = ![]) {
+function createEmptyStats(revision = 0x0, supported = ![]) {
   return {
     active: ![],
-    supported: _0x1e7420,
+    supported: supported,
     drawnNodeIds: [],
     drawnMediaNodeIds: [],
     drawnNodeCount: 0x0,
@@ -187,7 +179,7 @@ function createEmptyStats(_0x40d7af = 0x0, _0x1e7420 = ![]) {
     renderScale: 0x1,
     effectiveScale: 0x1,
     rasterScale: 0x1,
-    revision: _0x40d7af,
+    revision: revision,
     worldBounds: null,
     cachedImageCount: 0x0,
     pendingImageCount: 0x0,
@@ -202,59 +194,47 @@ function createEmptyStats(_0x40d7af = 0x0, _0x1e7420 = ![]) {
     revealedImageCount: 0x0,
   };
 }
-function defaultRequestFrame(_0x43a3ec) {
+function defaultRequestFrame(handler) {
   if (typeof globalThis['requestAnimationFrame'] === 'function')
-    return globalThis['requestAnimationFrame'](_0x43a3ec);
-  return (_0x43a3ec(), null);
+    return globalThis['requestAnimationFrame'](handler);
+  return (handler(), null);
 }
-function defaultCancelFrame(_0x32c9c0) {
-  _0x32c9c0 != null &&
+function defaultCancelFrame(value17) {
+  value17 != null &&
     typeof globalThis['cancelAnimationFrame'] === 'function' &&
-    globalThis['cancelAnimationFrame'](_0x32c9c0);
+    globalThis['cancelAnimationFrame'](value17);
 }
-function drawImageCover(_0x58281a, _0x2fc7e0, _0x1c9f57) {
-  const _0x167a7f = Math['max'](
+function drawImageCover(ctx, box2, box3) {
+  const count2 = Math['max'](
       0x0,
-      finiteNumber(_0x2fc7e0?.['naturalWidth'] ?? _0x2fc7e0?.['videoWidth'] ?? _0x2fc7e0?.['width'], 0x0),
+      finiteNumber(box2?.['naturalWidth'] ?? box2?.['videoWidth'] ?? box2?.['width'], 0x0),
     ),
-    _0x5da2aa = Math['max'](
+    count3 = Math['max'](
       0x0,
-      finiteNumber(_0x2fc7e0?.['naturalHeight'] ?? _0x2fc7e0?.['videoHeight'] ?? _0x2fc7e0?.['height'], 0x0),
+      finiteNumber(box2?.['naturalHeight'] ?? box2?.['videoHeight'] ?? box2?.['height'], 0x0),
     );
   try {
-    if (!(_0x167a7f > 0x0 && _0x5da2aa > 0x0))
-      return (
-        _0x58281a['drawImage'](
-          _0x2fc7e0,
-          _0x1c9f57['x'],
-          _0x1c9f57['y'],
-          _0x1c9f57['width'],
-          _0x1c9f57['height'],
-        ),
-        !![]
-      );
-    const _0x2973e0 = _0x167a7f / _0x5da2aa,
-      _0x939860 = _0x1c9f57['width'] / _0x1c9f57['height'];
-    let _0x18c872 = 0x0,
-      _0x5bd6b6 = 0x0,
-      _0xa41737 = _0x167a7f,
-      _0x5c95dd = _0x5da2aa;
-    if (_0x2973e0 > _0x939860)
-      ((_0xa41737 = _0x5da2aa * _0x939860), (_0x18c872 = (_0x167a7f - _0xa41737) / 0x2));
-    else
-      _0x2973e0 < _0x939860 &&
-        ((_0x5c95dd = _0x167a7f / _0x939860), (_0x5bd6b6 = (_0x5da2aa - _0x5c95dd) / 0x2));
+    if (!(count2 > 0x0 && count3 > 0x0))
+      return (ctx['drawImage'](box2, box3['x'], box3['y'], box3['width'], box3['height']), !![]);
+    const value18 = count2 / count3,
+      value19 = box3['width'] / box3['height'];
+    let value20 = 0x0,
+      value21 = 0x0,
+      value22 = count2,
+      value23 = count3;
+    if (value18 > value19) ((value22 = count3 * value19), (value20 = (count2 - value22) / 0x2));
+    else value18 < value19 && ((value23 = count2 / value19), (value21 = (count3 - value23) / 0x2));
     return (
-      _0x58281a['drawImage'](
-        _0x2fc7e0,
-        _0x18c872,
-        _0x5bd6b6,
-        _0xa41737,
-        _0x5c95dd,
-        _0x1c9f57['x'],
-        _0x1c9f57['y'],
-        _0x1c9f57['width'],
-        _0x1c9f57['height'],
+      ctx['drawImage'](
+        box2,
+        value20,
+        value21,
+        value22,
+        value23,
+        box3['x'],
+        box3['y'],
+        box3['width'],
+        box3['height'],
       ),
       !![]
     );
@@ -262,118 +242,100 @@ function drawImageCover(_0x58281a, _0x2fc7e0, _0x1c9f57) {
     return ![];
   }
 }
-function strokeRoundedRect(_0x5161fb, _0x2322d3, _0x377c47, _0x56896f, _0x19b7cb, _0x182b67) {
-  if (typeof _0x5161fb['roundRect'] === 'function') {
-    (_0x5161fb['beginPath'](),
-      _0x5161fb['roundRect'](_0x2322d3, _0x377c47, _0x56896f, _0x19b7cb, _0x182b67),
-      _0x5161fb['stroke']());
+function strokeRoundedRect(ctx2, value24, value25, value26, value27, value28) {
+  if (typeof ctx2['roundRect'] === 'function') {
+    (ctx2['beginPath'](), ctx2['roundRect'](value24, value25, value26, value27, value28), ctx2['stroke']());
     return;
   }
-  _0x5161fb['strokeRect'](_0x2322d3, _0x377c47, _0x56896f, _0x19b7cb);
+  ctx2['strokeRect'](value24, value25, value26, value27);
 }
-function strokeCircle(_0x5932d6, _0x70ed0e, _0x15b82e, _0x1eca1e) {
-  if (typeof _0x5932d6['arc'] !== 'function') return;
-  (_0x5932d6['beginPath'](),
-    _0x5932d6['arc'](_0x70ed0e, _0x15b82e, _0x1eca1e, 0x0, Math['PI'] * 0x2),
-    _0x5932d6['stroke']());
+function strokeCircle(ctx3, value29, value30, value31) {
+  if (typeof ctx3['arc'] !== 'function') return;
+  (ctx3['beginPath'](), ctx3['arc'](value29, value30, value31, 0x0, Math['PI'] * 0x2), ctx3['stroke']());
 }
-function drawMediaTypeIcon(_0x3b841a, _0x28e76c, _0x5d5c04, _0x172d00, _0x31aaf6, _0x21ef8d) {
-  if (!['image', 'video']['includes'](_0x28e76c)) return ![];
-  if (!(_0x31aaf6 > 0x0) || _0x31aaf6 * _0x21ef8d < 0x3) return ![];
-  const _0x369fb4 = _0x31aaf6 / 0x18,
-    _0x12aa9c = _0x5d5c04 - _0x31aaf6 / 0x2,
-    _0x390d61 = _0x172d00 - _0x31aaf6 / 0x2,
-    _0x82ca9c = (_0x2bf941) => _0x12aa9c + _0x2bf941 * _0x369fb4,
-    _0x1a36a9 = (_0x214f8d) => _0x390d61 + _0x214f8d * _0x369fb4;
-  _0x3b841a['lineWidth'] = Math['min'](3.2, Math['max'](1.2, 0.7 / Math['max'](0.01, _0x21ef8d)));
-  if (_0x28e76c === 'image')
+function drawMediaTypeIcon(ctx4, value32, value33, value34, count4, count5) {
+  if (!['image', 'video']['includes'](value32)) return ![];
+  if (!(count4 > 0x0) || count4 * count5 < 0x3) return ![];
+  const value35 = count4 / 0x18,
+    value36 = value33 - count4 / 0x2,
+    value37 = value34 - count4 / 0x2,
+    handler2 = (value38) => value36 + value38 * value35,
+    handler3 = (value39) => value37 + value39 * value35;
+  ctx4['lineWidth'] = Math['min'](3.2, Math['max'](1.2, 0.7 / Math['max'](0.01, count5)));
+  if (value32 === 'image')
     return (
-      strokeRoundedRect(
-        _0x3b841a,
-        _0x82ca9c(0x3),
-        _0x1a36a9(0x3),
-        0x12 * _0x369fb4,
-        0x12 * _0x369fb4,
-        0x2 * _0x369fb4,
-      ),
-      strokeCircle(_0x3b841a, _0x82ca9c(8.5), _0x1a36a9(8.5), 1.5 * _0x369fb4),
-      _0x3b841a['beginPath'](),
-      _0x3b841a['moveTo'](_0x82ca9c(0x15), _0x1a36a9(0xf)),
-      _0x3b841a['lineTo'](_0x82ca9c(0x10), _0x1a36a9(0xa)),
-      _0x3b841a['lineTo'](_0x82ca9c(0x5), _0x1a36a9(0x15)),
-      _0x3b841a['stroke'](),
+      strokeRoundedRect(ctx4, handler2(0x3), handler3(0x3), 0x12 * value35, 0x12 * value35, 0x2 * value35),
+      strokeCircle(ctx4, handler2(8.5), handler3(8.5), 1.5 * value35),
+      ctx4['beginPath'](),
+      ctx4['moveTo'](handler2(0x15), handler3(0xf)),
+      ctx4['lineTo'](handler2(0x10), handler3(0xa)),
+      ctx4['lineTo'](handler2(0x5), handler3(0x15)),
+      ctx4['stroke'](),
       !![]
     );
-  if (_0x28e76c === 'video')
+  if (value32 === 'video')
     return (
-      strokeRoundedRect(
-        _0x3b841a,
-        _0x82ca9c(0x1),
-        _0x1a36a9(0x5),
-        0xf * _0x369fb4,
-        0xe * _0x369fb4,
-        0x2 * _0x369fb4,
-      ),
-      _0x3b841a['beginPath'](),
-      _0x3b841a['moveTo'](_0x82ca9c(0x17), _0x1a36a9(0x7)),
-      _0x3b841a['lineTo'](_0x82ca9c(0x10), _0x1a36a9(0xc)),
-      _0x3b841a['lineTo'](_0x82ca9c(0x17), _0x1a36a9(0x11)),
-      _0x3b841a['closePath'](),
-      _0x3b841a['stroke'](),
+      strokeRoundedRect(ctx4, handler2(0x1), handler3(0x5), 0xf * value35, 0xe * value35, 0x2 * value35),
+      ctx4['beginPath'](),
+      ctx4['moveTo'](handler2(0x17), handler3(0x7)),
+      ctx4['lineTo'](handler2(0x10), handler3(0xc)),
+      ctx4['lineTo'](handler2(0x17), handler3(0x11)),
+      ctx4['closePath'](),
+      ctx4['stroke'](),
       !![]
     );
   return ![];
 }
-function drawPlaceholder(_0x4617d0, _0x17e05b, _0x25f037, _0x3b5a8f, _0x486a6c) {
-  const _0x2d9770 = Math['min'](0x28, _0x17e05b['width'] * 0.32, _0x17e05b['height'] * 0.32);
-  ((_0x4617d0['strokeStyle'] = _0x25f037['placeholder']), (_0x4617d0['globalAlpha'] = _0x486a6c * 0.72));
-  const _0x54e22b = drawMediaTypeIcon(
-    _0x4617d0,
-    _0x17e05b['kind'],
-    _0x17e05b['x'] + _0x17e05b['width'] / 0x2,
-    _0x17e05b['y'] + _0x17e05b['height'] / 0x2,
-    _0x2d9770,
-    _0x3b5a8f,
+function drawPlaceholder(ctx5, box4, value40, count6, value41) {
+  const value42 = Math['min'](0x28, box4['width'] * 0.32, box4['height'] * 0.32);
+  ((ctx5['strokeStyle'] = value40['placeholder']), (ctx5['globalAlpha'] = value41 * 0.72));
+  const drawMediaTypeIcon2 = drawMediaTypeIcon(
+    ctx5,
+    box4['kind'],
+    box4['x'] + box4['width'] / 0x2,
+    box4['y'] + box4['height'] / 0x2,
+    value42,
+    count6,
   );
-  if (!_0x54e22b) {
-    const _0x15547f = Math['min'](0x12, Math['max'](0xa, _0x17e05b['height'] * 0.12));
-    _0x15547f * _0x3b5a8f >= 0x7 &&
-      ((_0x4617d0['fillStyle'] = _0x25f037['placeholder']),
-      (_0x4617d0['font'] = '500 ' + _0x15547f + 'px system-ui, sans-serif'),
-      _0x4617d0['fillText'](
-        _0x17e05b['label'],
-        _0x17e05b['x'] + 0x8,
-        _0x17e05b['y'] + _0x17e05b['height'] / 0x2 + _0x15547f * 0.35,
-        Math['max'](0x1, _0x17e05b['width'] - 0x10),
+  if (!drawMediaTypeIcon2) {
+    const value43 = Math['min'](0x12, Math['max'](0xa, box4['height'] * 0.12));
+    value43 * count6 >= 0x7 &&
+      ((ctx5['fillStyle'] = value40['placeholder']),
+      (ctx5['font'] = '500 ' + value43 + 'px system-ui, sans-serif'),
+      ctx5['fillText'](
+        box4['label'],
+        box4['x'] + 0x8,
+        box4['y'] + box4['height'] / 0x2 + value43 * 0.35,
+        Math['max'](0x1, box4['width'] - 0x10),
       ));
   }
-  _0x4617d0['globalAlpha'] = _0x486a6c;
+  ctx5['globalAlpha'] = value41;
 }
-function drawNodeLabel(_0x319991, _0x38d1ff, _0x31a331, _0x31f7ae, _0x22c847) {
-  if (!['image', 'video']['includes'](_0x38d1ff['kind'])) return;
-  const _0x49fb17 = 0x15;
-  if (_0x49fb17 * _0x31f7ae < 0x3) return;
-  const _0x57410f = _0x49fb17 * 1.33;
-  ((_0x319991['globalAlpha'] = _0x22c847 * 0.64),
-    (_0x319991['strokeStyle'] = _0x31a331['nodeLabel']),
-    (_0x319991['fillStyle'] = _0x31a331['nodeLabel']),
+function drawNodeLabel(ctx6, box5, value44, count7, value45) {
+  if (!['image', 'video']['includes'](box5['kind'])) return;
+  const value46 = 0x15;
+  if (value46 * count7 < 0x3) return;
+  const value47 = value46 * 1.33;
+  ((ctx6['globalAlpha'] = value45 * 0.64),
+    (ctx6['strokeStyle'] = value44['nodeLabel']),
+    (ctx6['fillStyle'] = value44['nodeLabel']),
     drawMediaTypeIcon(
-      _0x319991,
-      _0x38d1ff['kind'],
-      _0x38d1ff['x'] + _0x57410f / 0x2,
-      _0x38d1ff['y'] - 0x8 - _0x57410f / 0x2,
-      _0x57410f,
-      _0x31f7ae,
+      ctx6,
+      box5['kind'],
+      box5['x'] + value47 / 0x2,
+      box5['y'] - 0x8 - value47 / 0x2,
+      value47,
+      count7,
     ));
-  const _0x153465 = '500\x20' + _0x49fb17 + 'px system-ui, sans-serif';
-  if (_0x319991['font'] !== _0x153465) _0x319991['font'] = _0x153465;
-  (_0x319991['fillText'](
-    _0x38d1ff['label'],
-    _0x38d1ff['x'] + _0x57410f + 0x6,
-    _0x38d1ff['y'] - 0xa,
-    Math['max'](0x1, _0x38d1ff['width'] - _0x57410f - 0x6),
+  const value48 = '500\x20' + value46 + 'px system-ui, sans-serif';
+  if (ctx6['font'] !== value48) ctx6['font'] = value48;
+  (ctx6['fillText'](
+    box5['label'],
+    box5['x'] + value47 + 0x6,
+    box5['y'] - 0xa,
+    Math['max'](0x1, box5['width'] - value47 - 0x6),
   ),
-    (_0x319991['globalAlpha'] = _0x22c847));
+    (ctx6['globalAlpha'] = value45));
 }
 export function createRendererRasterPreviewLayer({
   documentRef: documentRef = globalThis['document'],
@@ -389,209 +351,207 @@ export function createRendererRasterPreviewLayer({
   maxDpr: maxDpr = DEFAULT_MAX_DPR,
   onMediaPresented: onMediaPresented = null,
 } = {}) {
-  const _0x407d51 = Math['max'](0x0, Math['trunc'](finiteNumber(maxImageCache, DEFAULT_MAX_IMAGE_CACHE))),
-    _0x508cdb = Number(maxNewImagesPerSync),
-    _0x4f2dc9 = maxNewImagesPerSync != null && Number['isFinite'](_0x508cdb) && _0x508cdb >= 0x0,
-    _0x232f73 = _0x4f2dc9 ? Math['max'](0x0, Math['trunc'](_0x508cdb)) : DEFAULT_MAX_NEW_IMAGES_PER_SYNC,
-    _0x4ac2bf = _0x4f2dc9 ? _0x232f73 : DEFAULT_DENSE_MAX_NEW_IMAGES_PER_SYNC,
-    _0x10c733 = Number(maxReadyImagesPerFrame),
-    _0x53e251 = Number['isFinite'](_0x10c733) && _0x10c733 > 0x0,
-    _0x27659c = _0x53e251 ? Math['max'](0x1, Math['trunc'](_0x10c733)) : DEFAULT_MAX_READY_IMAGES_PER_FRAME,
-    _0x5e7309 = _0x53e251 ? _0x27659c : DEFAULT_DENSE_MAX_READY_IMAGES_PER_FRAME,
-    _0x148a62 = new Map(),
-    _0x43c99a = new Map();
-  let _0x466b59 = null,
-    _0x261037 = null,
-    _0x442475 = null,
-    _0x25a125 = ![],
-    _0x9b2b41 = ![],
-    _0x1a0e80 = ![],
-    _0x2dd307 = 0x0,
-    _0x333997 = { ...createEmptyStats(), cacheLimit: _0x407d51 },
-    _0x17729e = null,
-    _0x2fb358 = null,
-    _0x535472 = 0x0,
-    _0x58f114 = 0x0,
-    _0x2189ba = null,
-    _0x4540f9 = null,
-    _0x1c2e8b = null;
-  function _0x5ca0cc() {
-    _0x58f114 += 0x1;
-    const _0x51397c = _0x2189ba;
-    _0x2189ba = null;
-    if (!_0x51397c) return;
-    if (_0x51397c['kind'] === 'idle' && typeof globalThis['cancelIdleCallback'] === 'function')
-      globalThis['cancelIdleCallback'](_0x51397c['id']);
-    else _0x51397c['kind'] === 'timer' && clearTimeout(_0x51397c['id']);
+  const cacheLimit = Math['max'](0x0, Math['trunc'](finiteNumber(maxImageCache, DEFAULT_MAX_IMAGE_CACHE))),
+    count8 = Number(maxNewImagesPerSync),
+    value49 = maxNewImagesPerSync != null && Number['isFinite'](count8) && count8 >= 0x0,
+    value50 = value49 ? Math['max'](0x0, Math['trunc'](count8)) : DEFAULT_MAX_NEW_IMAGES_PER_SYNC,
+    value51 = value49 ? value50 : DEFAULT_DENSE_MAX_NEW_IMAGES_PER_SYNC,
+    count9 = Number(maxReadyImagesPerFrame),
+    value52 = Number['isFinite'](count9) && count9 > 0x0,
+    value53 = value52 ? Math['max'](0x1, Math['trunc'](count9)) : DEFAULT_MAX_READY_IMAGES_PER_FRAME,
+    value54 = value52 ? value53 : DEFAULT_DENSE_MAX_READY_IMAGES_PER_FRAME,
+    cachedImageCount = new Map(),
+    map4 = new Map();
+  let el = null,
+    ctx7 = null,
+    rendererRasterPaintSurface = null,
+    enabled3 = ![],
+    enabled4 = ![],
+    value55 = ![],
+    revision2 = 0x0,
+    revision3 = { ...createEmptyStats(), cacheLimit: cacheLimit },
+    candidateCount = null,
+    value56 = null,
+    value57 = 0x0,
+    value58 = 0x0,
+    value59 = null,
+    value60 = null,
+    palette = null;
+  function run() {
+    value58 += 0x1;
+    const enabled5 = value59;
+    value59 = null;
+    if (!enabled5) return;
+    if (enabled5['kind'] === 'idle' && typeof globalThis['cancelIdleCallback'] === 'function')
+      globalThis['cancelIdleCallback'](enabled5['id']);
+    else enabled5['kind'] === 'timer' && clearTimeout(enabled5['id']);
   }
-  function _0x8dfc37() {
-    if (!_0x466b59 || (_0x466b59['width'] <= 0x1 && _0x466b59['height'] <= 0x1)) return;
-    _0x5ca0cc();
-    const _0x303455 = _0x58f114,
-      _0x3c65ec = () => {
-        if (_0x303455 !== _0x58f114) return;
-        _0x2189ba = null;
-        if (_0x1a0e80 || !_0x466b59 || (_0x17729e?.['items']?.['length'] || 0x0) > 0x0) return;
-        _0x442475?.['resize'](0x1, 0x1);
+  function run2() {
+    if (!el || (el['width'] <= 0x1 && el['height'] <= 0x1)) return;
+    run();
+    const value61 = value58,
+      value62 = () => {
+        if (value61 !== value58) return;
+        value59 = null;
+        if (value55 || !el || (candidateCount?.['items']?.['length'] || 0x0) > 0x0) return;
+        rendererRasterPaintSurface?.['resize'](0x1, 0x1);
       };
     typeof globalThis['requestIdleCallback'] === 'function'
-      ? (_0x2189ba = { kind: 'idle', id: globalThis['requestIdleCallback'](_0x3c65ec, { timeout: 0x1f4 }) })
-      : (_0x2189ba = { kind: 'timer', id: setTimeout(_0x3c65ec, 0x60) });
+      ? (value59 = { kind: 'idle', id: globalThis['requestIdleCallback'](value62, { timeout: 0x1f4 }) })
+      : (value59 = { kind: 'timer', id: setTimeout(value62, 0x60) });
   }
-  function _0x35249c(_0x37be9d) {
-    const _0x5b5b08 = getPaletteThemeKey(documentRef);
+  function run3(value63) {
+    const paletteThemeKey = getPaletteThemeKey(documentRef);
     return (
-      (!_0x1c2e8b || _0x5b5b08 !== _0x4540f9) &&
-        ((_0x1c2e8b = readPalette(documentRef)), (_0x4540f9 = _0x5b5b08)),
-      _0x37be9d && typeof _0x37be9d === 'object' ? applyPaletteOverrides(_0x1c2e8b, _0x37be9d) : _0x1c2e8b
+      (!palette || paletteThemeKey !== value60) &&
+        ((palette = readPalette(documentRef)), (value60 = paletteThemeKey)),
+      value63 && typeof value63 === 'object' ? applyPaletteOverrides(palette, value63) : palette
     );
   }
-  function _0x36fc99(_0x2097f1) {
-    let _0x4b9782 = 0x0,
-      _0x4e85eb = 0x0,
-      _0x42b548 = 0x0,
-      _0x2c6e4d = 0x0;
-    for (const _0x1786e9 of _0x148a62['values']()) {
-      if (_0x1786e9['status'] === 'pending') _0x4b9782 += 0x1;
+  function run4(args) {
+    let pendingImageCount = 0x0,
+      readyImageCount = 0x0,
+      loadedImageCount = 0x0,
+      errorImageCount = 0x0;
+    for (const response2 of cachedImageCount['values']()) {
+      if (response2['status'] === 'pending') pendingImageCount += 0x1;
       else {
-        if (_0x1786e9['status'] === 'ready') _0x4e85eb += 0x1;
+        if (response2['status'] === 'ready') readyImageCount += 0x1;
         else {
-          if (_0x1786e9['status'] === 'loaded') _0x42b548 += 0x1;
+          if (response2['status'] === 'loaded') loadedImageCount += 0x1;
           else {
-            if (_0x1786e9['status'] === 'error') _0x2c6e4d += 0x1;
+            if (response2['status'] === 'error') errorImageCount += 0x1;
           }
         }
       }
     }
-    _0x333997 = {
-      ..._0x2097f1,
-      cachedImageCount: _0x148a62['size'],
-      mediaSourceCount: _0x148a62['size'],
-      pendingImageCount: _0x4b9782,
-      readyImageCount: _0x4e85eb,
-      loadedImageCount: _0x42b548,
-      errorImageCount: _0x2c6e4d,
-      cacheLimit: _0x407d51,
+    revision3 = {
+      ...args,
+      cachedImageCount: cachedImageCount['size'],
+      mediaSourceCount: cachedImageCount['size'],
+      pendingImageCount: pendingImageCount,
+      readyImageCount: readyImageCount,
+      loadedImageCount: loadedImageCount,
+      errorImageCount: errorImageCount,
+      cacheLimit: cacheLimit,
     };
-    if (_0x466b59) {
-      _0x466b59['__aicanvasRasterPreviewStats'] = _0x333997;
-      const _0x215b85 = new Set(_0x333997['drawnMediaNodeIds'] || []);
-      _0x466b59['__aicanvasRasterPreviewRevealItems'] = (_0x17729e?.['items'] || [])
-        ['filter']((_0x45dfb7) => _0x45dfb7['kind'] === 'image' && _0x45dfb7['sources']['length'] > 0x0)
-        ['map']((_0x1c367b) => {
-          const _0x302881 = _0x5ac41e(_0x1c367b),
-            _0x4e3013 = _0x302881['find'](
-              (_0xcd9957) => _0x148a62['get'](_0xcd9957)?.['status'] === 'loaded',
-            );
+    if (el) {
+      el['__aicanvasRasterPreviewStats'] = revision3;
+      const ready = new Set(revision3['drawnMediaNodeIds'] || []);
+      el['__aicanvasRasterPreviewRevealItems'] = (candidateCount?.['items'] || [])
+        ['filter']((value64) => value64['kind'] === 'image' && value64['sources']['length'] > 0x0)
+        ['map']((height2) => {
+          const list3 = run5(height2),
+            source2 = list3['find']((value65) => cachedImageCount['get'](value65)?.['status'] === 'loaded');
           return {
-            height: _0x1c367b['height'],
-            kind: _0x1c367b['kind'],
-            nodeId: _0x1c367b['id'],
-            ready: _0x215b85['has'](_0x1c367b['id']),
-            source: _0x4e3013 || _0x302881[0x0] || _0x1c367b['sources'][0x0] || '',
-            width: _0x1c367b['width'],
-            x: _0x1c367b['x'],
-            y: _0x1c367b['y'],
+            height: height2['height'],
+            kind: height2['kind'],
+            nodeId: height2['id'],
+            ready: ready['has'](height2['id']),
+            source: source2 || list3[0x0] || height2['sources'][0x0] || '',
+            width: height2['width'],
+            x: height2['x'],
+            y: height2['y'],
           };
         })
-        ['filter']((_0xc73719) => _0xc73719['source']);
+        ['filter']((value66) => value66['source']);
     }
-    return _0x333997;
+    return revision3;
   }
-  function _0xf40a36() {
-    for (const _0x3bea97 of _0x148a62['values']()) {
-      if (_0x3bea97['status'] === 'ready') return !![];
+  function run6() {
+    for (const response3 of cachedImageCount['values']()) {
+      if (response3['status'] === 'ready') return !![];
     }
     return ![];
   }
-  function _0x4c8919() {
-    let _0x3b88db = 0x0;
-    for (const _0x41aa51 of _0x148a62['values']()) {
-      if (_0x41aa51['status'] === 'pending') _0x3b88db += 0x1;
+  function run7() {
+    let value67 = 0x0;
+    for (const response4 of cachedImageCount['values']()) {
+      if (response4['status'] === 'pending') value67 += 0x1;
     }
-    return _0x3b88db;
+    return value67;
   }
-  function _0x31af67(_0x28e07a = _0x27659c) {
-    const _0x5e5cbf = [];
-    for (const _0xe8bb55 of _0x148a62['values']()) {
-      if (_0xe8bb55['status'] !== 'ready') continue;
-      ((_0xe8bb55['status'] = 'loaded'), _0x5e5cbf['push'](_0xe8bb55['source']));
-      if (_0x5e5cbf['length'] >= _0x28e07a) break;
+  function run8(value68 = value53) {
+    const list4 = [];
+    for (const response5 of cachedImageCount['values']()) {
+      if (response5['status'] !== 'ready') continue;
+      ((response5['status'] = 'loaded'), list4['push'](response5['source']));
+      if (list4['length'] >= value68) break;
     }
-    return _0x5e5cbf;
+    return list4;
   }
-  function _0x426b70() {
-    _0x535472 += 0x1;
-    if (_0x2fb358 != null) cancelFrame(_0x2fb358);
-    _0x2fb358 = null;
+  function run9() {
+    value57 += 0x1;
+    if (value56 != null) cancelFrame(value56);
+    value56 = null;
   }
-  function _0x53ecf3() {
-    if (_0x1a0e80 || !_0x17729e || _0x17729e['viewportBusy'] || _0x2fb358 != null) return;
-    const _0x49e768 = ++_0x535472;
-    let _0x40b447 = ![];
-    const _0x54cbf5 = requestFrame(() => {
-      _0x40b447 = !![];
-      if (_0x49e768 !== _0x535472 || _0x1a0e80) return;
-      ((_0x2fb358 = null), _0x1ba124());
+  function run10() {
+    if (value55 || !candidateCount || candidateCount['viewportBusy'] || value56 != null) return;
+    const value69 = ++value57;
+    let enabled6 = ![];
+    const requestFrame2 = requestFrame(() => {
+      enabled6 = !![];
+      if (value69 !== value57 || value55) return;
+      ((value56 = null), run11());
     });
-    if (!_0x40b447) _0x2fb358 = _0x54cbf5;
+    if (!enabled6) value56 = requestFrame2;
   }
-  function _0x2f6229(_0x381ad7) {
-    if (!_0x381ad7 || _0x381ad7['listenersRemoved']) return;
-    _0x381ad7['listenersRemoved'] = !![];
-    const { image: _0x42a397, onLoad: _0x2b6e8c, onError: _0x3594ce } = _0x381ad7;
-    if (typeof _0x42a397?.['removeEventListener'] === 'function')
-      (_0x42a397['removeEventListener']('load', _0x2b6e8c),
-        _0x42a397['removeEventListener']('error', _0x3594ce));
+  function run12(enabled7) {
+    if (!enabled7 || enabled7['listenersRemoved']) return;
+    enabled7['listenersRemoved'] = !![];
+    const { image: image, onLoad: onLoad, onError: onError } = enabled7;
+    if (typeof image?.['removeEventListener'] === 'function')
+      (image['removeEventListener']('load', onLoad), image['removeEventListener']('error', onError));
     else {
-      if (_0x42a397) {
-        if (_0x42a397['onload'] === _0x2b6e8c) _0x42a397['onload'] = null;
-        if (_0x42a397['onerror'] === _0x3594ce) _0x42a397['onerror'] = null;
+      if (image) {
+        if (image['onload'] === onLoad) image['onload'] = null;
+        if (image['onerror'] === onError) image['onerror'] = null;
       }
     }
   }
-  function _0x3b3533(_0x5121a8) {
-    if (!_0x5121a8) return;
-    _0x2f6229(_0x5121a8);
+  function run13(enabled8) {
+    if (!enabled8) return;
+    run12(enabled8);
     try {
-      if (_0x5121a8['ownsImage'] === !![] && _0x5121a8['image']) _0x5121a8['image']['src'] = '';
+      if (enabled8['ownsImage'] === !![] && enabled8['image']) enabled8['image']['src'] = '';
     } catch {}
   }
-  function _0xdafbb5(_0x31f88c) {
-    const _0x243f56 = _0x148a62['get'](_0x31f88c);
-    if (!_0x243f56) return ![];
-    return (_0x148a62['delete'](_0x31f88c), _0x3b3533(_0x243f56), !![]);
+  function run14(value70) {
+    const enabled9 = cachedImageCount['get'](value70);
+    if (!enabled9) return ![];
+    return (cachedImageCount['delete'](value70), run13(enabled9), !![]);
   }
-  function _0x30e53b(_0x49d3cd) {
-    if (!_0x49d3cd || _0x148a62['get'](_0x49d3cd['source']) !== _0x49d3cd) return;
-    (_0x148a62['delete'](_0x49d3cd['source']), _0x148a62['set'](_0x49d3cd['source'], _0x49d3cd));
+  function run15(enabled10) {
+    if (!enabled10 || cachedImageCount['get'](enabled10['source']) !== enabled10) return;
+    (cachedImageCount['delete'](enabled10['source']),
+      cachedImageCount['set'](enabled10['source'], enabled10));
   }
-  function _0x172065(_0x383e7b = null) {
-    for (const [_0x303d08] of _0x148a62) {
-      if (_0x383e7b instanceof Set ? _0x383e7b['has'](_0x303d08) : _0x303d08 === _0x383e7b) continue;
-      return _0xdafbb5(_0x303d08);
+  function run16(map5 = null) {
+    for (const [value71] of cachedImageCount) {
+      if (map5 instanceof Set ? map5['has'](value71) : value71 === map5) continue;
+      return run14(value71);
     }
     return ![];
   }
-  function _0x14bce3(_0x5dea06, _0x553f17 = null) {
-    if (!_0x5dea06 || _0x407d51 <= 0x0) return null;
-    while (_0x148a62['size'] >= _0x407d51) {
-      if (!_0x172065(_0x553f17 || _0x5dea06)) return null;
+  function run17(source3, value72 = null) {
+    if (!source3 || cacheLimit <= 0x0) return null;
+    while (cachedImageCount['size'] >= cacheLimit) {
+      if (!run16(value72 || source3)) return null;
     }
-    const _0x30c73d = typeof createImage === 'function' ? createImage() : null,
-      _0xb21312 = {
-        image: _0x30c73d,
-        ownsImage: !!_0x30c73d,
+    const image2 = typeof createImage === 'function' ? createImage() : null,
+      response6 = {
+        image: image2,
+        ownsImage: !!image2,
         listenersRemoved: ![],
         onError: null,
         onLoad: null,
-        source: _0x5dea06,
+        source: source3,
         status: 'pending',
       };
-    _0x148a62['set'](_0x5dea06, _0xb21312);
-    if (!_0x30c73d)
+    cachedImageCount['set'](source3, response6);
+    if (!image2)
       return (
-        preloadCanvasImage(_0x5dea06, {
+        preloadCanvasImage(source3, {
           decode: !![],
           requireImage: !![],
           priority: 0x5,
@@ -599,652 +559,659 @@ export function createRendererRasterPreviewLayer({
           scope: 'renderer-raster-preview',
           deferWhenPaused: !![],
         })['then'](
-          (_0x34a08e) => {
-            if (_0x148a62['get'](_0x5dea06) !== _0xb21312 || _0xb21312['status'] !== 'pending') return;
-            if (!_0x34a08e?.['image']) {
-              ((_0xb21312['status'] = 'error'), _0x53ecf3());
+          (enabled11) => {
+            if (cachedImageCount['get'](source3) !== response6 || response6['status'] !== 'pending') return;
+            if (!enabled11?.['image']) {
+              ((response6['status'] = 'error'), run10());
               return;
             }
-            ((_0xb21312['image'] = _0x34a08e['image']),
-              (_0xb21312['status'] = 'ready'),
-              _0x30e53b(_0xb21312),
-              _0x53ecf3());
+            ((response6['image'] = enabled11['image']),
+              (response6['status'] = 'ready'),
+              run15(response6),
+              run10());
           },
           () => {
-            if (_0x148a62['get'](_0x5dea06) !== _0xb21312) return;
-            ((_0xb21312['status'] = 'error'), _0x53ecf3());
+            if (cachedImageCount['get'](source3) !== response6) return;
+            ((response6['status'] = 'error'), run10());
           },
         ),
-        _0xb21312
+        response6
       );
-    ((_0xb21312['onLoad'] = () => {
-      if (_0x148a62['get'](_0x5dea06) !== _0xb21312) return;
-      _0x2f6229(_0xb21312);
-      const _0x554b06 = () => {
-        if (_0x148a62['get'](_0x5dea06) !== _0xb21312 || _0xb21312['status'] !== 'pending') return;
-        ((_0xb21312['status'] = 'ready'), _0x30e53b(_0xb21312), _0x53ecf3());
+    ((response6['onLoad'] = () => {
+      if (cachedImageCount['get'](source3) !== response6) return;
+      run12(response6);
+      const run18 = () => {
+        if (cachedImageCount['get'](source3) !== response6 || response6['status'] !== 'pending') return;
+        ((response6['status'] = 'ready'), run15(response6), run10());
       };
       try {
-        const _0x407a42 = typeof _0x30c73d['decode'] === 'function' ? _0x30c73d['decode']() : null;
-        _0x407a42 && typeof _0x407a42['then'] === 'function'
-          ? Promise['resolve'](_0x407a42)['then'](_0x554b06, _0x554b06)
-          : _0x554b06();
+        const promise = typeof image2['decode'] === 'function' ? image2['decode']() : null;
+        promise && typeof promise['then'] === 'function'
+          ? Promise['resolve'](promise)['then'](run18, run18)
+          : run18();
       } catch {
-        _0x554b06();
+        run18();
       }
     }),
-      (_0xb21312['onError'] = () => {
-        if (_0x148a62['get'](_0x5dea06) !== _0xb21312) return;
-        ((_0xb21312['status'] = 'error'), _0x2f6229(_0xb21312), _0x53ecf3());
+      (response6['onError'] = () => {
+        if (cachedImageCount['get'](source3) !== response6) return;
+        ((response6['status'] = 'error'), run12(response6), run10());
       }));
-    typeof _0x30c73d['addEventListener'] === 'function'
-      ? (_0x30c73d['addEventListener']('load', _0xb21312['onLoad']),
-        _0x30c73d['addEventListener']('error', _0xb21312['onError']))
-      : ((_0x30c73d['onload'] = _0xb21312['onLoad']), (_0x30c73d['onerror'] = _0xb21312['onError']));
+    typeof image2['addEventListener'] === 'function'
+      ? (image2['addEventListener']('load', response6['onLoad']),
+        image2['addEventListener']('error', response6['onError']))
+      : ((image2['onload'] = response6['onLoad']), (image2['onerror'] = response6['onError']));
     try {
-      ((_0x30c73d['decoding'] = 'async'), (_0x30c73d['src'] = _0x5dea06));
+      ((image2['decoding'] = 'async'), (image2['src'] = source3));
     } catch {
-      ((_0xb21312['status'] = 'error'), _0x2f6229(_0xb21312));
+      ((response6['status'] = 'error'), run12(response6));
     }
-    return _0xb21312;
+    return response6;
   }
-  function _0x5df0b3(_0xedd34a) {
-    if (_0x1a0e80 || !_0xedd34a || typeof documentRef?.['createElement'] !== 'function') return ![];
-    !_0x466b59 &&
-      ((_0x466b59 = documentRef['createElement']('canvas')),
-      (_0x466b59['className'] = 'v2-raster-preview-canvas'),
-      (_0x466b59['dataset']['role'] = 'raster-preview-canvas'),
-      _0x466b59['setAttribute']?.('data-role', 'raster-preview-canvas'),
-      _0x466b59['setAttribute']?.('aria-hidden', 'true'),
-      Object['assign'](_0x466b59['style'], {
+  function run19(el2) {
+    if (value55 || !el2 || typeof documentRef?.['createElement'] !== 'function') return ![];
+    !el &&
+      ((el = documentRef['createElement']('canvas')),
+      (el['className'] = 'v2-raster-preview-canvas'),
+      (el['dataset']['role'] = 'raster-preview-canvas'),
+      el['setAttribute']?.('data-role', 'raster-preview-canvas'),
+      el['setAttribute']?.('aria-hidden', 'true'),
+      Object['assign'](el['style'], {
         display: 'none',
         height: '1px',
         left: '0px',
         top: '0px',
         width: '1px',
       }));
-    if (_0x466b59['parentNode'] !== _0xedd34a) _0xedd34a['appendChild']?.(_0x466b59);
+    if (el['parentNode'] !== el2) el2['appendChild']?.(el);
     return (
-      !_0x25a125 &&
-        ((_0x25a125 = !![]),
-        (_0x442475 = createRendererRasterPaintSurface(_0x466b59)),
-        (_0x261037 = _0x442475['context']),
-        (_0x9b2b41 = Boolean(
-          _0x261037 &&
-          typeof _0x261037['setTransform'] === 'function' &&
-          typeof _0x261037['clearRect'] === 'function' &&
-          typeof _0x261037['fillRect'] === 'function' &&
-          typeof _0x261037['strokeRect'] === 'function' &&
-          typeof _0x261037['drawImage'] === 'function',
+      !enabled3 &&
+        ((enabled3 = !![]),
+        (rendererRasterPaintSurface = createRendererRasterPaintSurface(el)),
+        (ctx7 = rendererRasterPaintSurface['context']),
+        (enabled4 = Boolean(
+          ctx7 &&
+          typeof ctx7['setTransform'] === 'function' &&
+          typeof ctx7['clearRect'] === 'function' &&
+          typeof ctx7['fillRect'] === 'function' &&
+          typeof ctx7['strokeRect'] === 'function' &&
+          typeof ctx7['drawImage'] === 'function',
         )),
-        !_0x9b2b41 && ((_0x261037 = null), (_0x466b59['style']['display'] = 'none'))),
-      _0x9b2b41
+        !enabled4 && ((ctx7 = null), (el['style']['display'] = 'none'))),
+      enabled4
     );
   }
-  function _0x2096aa(_0x56a938, _0x5425f9, _0x514088) {
-    const _0x343df2 = getCandidateIds(_0x56a938, _0x5425f9),
-      _0x429cc8 = normalizeIdSet(_0x514088?.['excludedNodeIds']),
-      _0x407891 = String(_0x514088?.['sourceNodeId'] || '')['trim'](),
-      _0x26eaad = String(_0x514088?.['hoverNodeId'] || '')['trim']();
-    if (_0x407891) _0x429cc8['add'](_0x407891);
-    if (_0x26eaad) _0x429cc8['add'](_0x26eaad);
-    const _0x24cc39 = normalizeIdSet(_0x514088?.['invalidNodeIds']),
-      _0x1289ac =
-        typeof _0x514088?.['resolveMediaSources'] === 'function'
-          ? _0x514088['resolveMediaSources']
+  function run20(value73, value74, options2) {
+    const candidateCount2 = getCandidateIds(value73, value74),
+      map6 = normalizeIdSet(options2?.['excludedNodeIds']),
+      value75 = String(options2?.['sourceNodeId'] || '')['trim'](),
+      value76 = String(options2?.['hoverNodeId'] || '')['trim']();
+    if (value75) map6['add'](value75);
+    if (value76) map6['add'](value76);
+    const invalid = normalizeIdSet(options2?.['invalidNodeIds']),
+      handler4 =
+        typeof options2?.['resolveMediaSources'] === 'function'
+          ? options2['resolveMediaSources']
           : resolveMediaSources,
-      _0x37435c = [];
-    let _0x232c44 = 0x0;
-    for (const _0x183066 of _0x343df2) {
-      if (_0x429cc8['has'](_0x183066)) {
-        _0x232c44 += 0x1;
+      items = [];
+    let excludedNodeCount = 0x0;
+    for (const nodeId of candidateCount2) {
+      if (map6['has'](nodeId)) {
+        excludedNodeCount += 0x1;
         continue;
       }
-      const _0x5a8f46 = getNode(_0x56a938, _0x183066);
-      if (!_0x5a8f46 || typeof _0x5a8f46 !== 'object') continue;
-      const _0x5a94c3 = Math['max'](0x1, finiteNumber(_0x5a8f46['width'], DEFAULT_NODE_WIDTH)),
-        _0x38f7c1 = Math['max'](0x1, finiteNumber(_0x5a8f46['height'], DEFAULT_NODE_HEIGHT)),
-        _0x552a9c = getNodeKind(_0x5a8f46);
-      if (_0x552a9c === 'audio') continue;
-      let _0x1f378d = [];
-      if (typeof _0x1289ac === 'function')
+      const box6 = getNode(value73, nodeId);
+      if (!box6 || typeof box6 !== 'object') continue;
+      const width2 = Math['max'](0x1, finiteNumber(box6['width'], DEFAULT_NODE_WIDTH)),
+        height3 = Math['max'](0x1, finiteNumber(box6['height'], DEFAULT_NODE_HEIGHT)),
+        kind = getNodeKind(box6);
+      if (kind === 'audio') continue;
+      let sources = [];
+      if (typeof handler4 === 'function')
         try {
-          _0x1f378d = normalizeSources(_0x1289ac(_0x5a8f46, { nodeId: _0x183066, options: _0x514088 }));
+          sources = normalizeSources(handler4(box6, { nodeId: nodeId, options: options2 }));
         } catch {
-          _0x1f378d = [];
+          sources = [];
         }
-      _0x37435c['push']({
-        height: _0x38f7c1,
-        id: _0x183066,
-        invalid: _0x24cc39['has'](_0x183066),
-        kind: _0x552a9c,
-        label: getNodeLabel(_0x5a8f46, _0x552a9c),
-        sources: _0x1f378d,
-        width: _0x5a94c3,
-        x: finiteNumber(_0x5a8f46['x'], 0x0),
-        y: finiteNumber(_0x5a8f46['y'], 0x0),
+      items['push']({
+        height: height3,
+        id: nodeId,
+        invalid: invalid['has'](nodeId),
+        kind: kind,
+        label: getNodeLabel(box6, kind),
+        sources: sources,
+        width: width2,
+        x: finiteNumber(box6['x'], 0x0),
+        y: finiteNumber(box6['y'], 0x0),
       });
     }
-    const _0x2156e2 =
-        _0x514088?.['mediaLoadNodeIds'] == null ? null : normalizeIdSet(_0x514088['mediaLoadNodeIds']),
-      _0x211c8f =
-        _0x2156e2 === null
-          ? _0x37435c
+    const mediaLoadNodeIds =
+        options2?.['mediaLoadNodeIds'] == null ? null : normalizeIdSet(options2['mediaLoadNodeIds']),
+      list5 =
+        mediaLoadNodeIds === null
+          ? items
           : [
-              ..._0x37435c['filter']((_0x2798d2) => _0x2156e2['has'](_0x2798d2['id'])),
-              ..._0x37435c['filter'](
-                (_0x1acd25) =>
-                  !_0x2156e2['has'](_0x1acd25['id']) &&
-                  _0x1acd25['sources']['some']((_0x413370) => _0x148a62['has'](_0x413370)),
+              ...items['filter']((value77) => mediaLoadNodeIds['has'](value77['id'])),
+              ...items['filter'](
+                (value78) =>
+                  !mediaLoadNodeIds['has'](value78['id']) &&
+                  value78['sources']['some']((value79) => cachedImageCount['has'](value79)),
               ),
             ],
-      _0x1e649d = new Set(),
-      _0x4cab33 = _0x211c8f['reduce'](
-        (_0x27ce06, _0x129f46) => Math['max'](_0x27ce06, _0x129f46['sources']['length']),
+      admittedSources = new Set(),
+      value80 = list5['reduce'](
+        (value81, value82) => Math['max'](value81, value82['sources']['length']),
         0x0,
       );
-    for (let _0x5def87 = 0x0; _0x5def87 < _0x4cab33 && _0x1e649d['size'] < _0x407d51; _0x5def87 += 0x1) {
-      for (const _0x7628de of _0x211c8f) {
-        const _0x2b9480 = _0x7628de['sources'][_0x5def87];
-        if (_0x2b9480) _0x1e649d['add'](_0x2b9480);
-        if (_0x1e649d['size'] >= _0x407d51) break;
+    for (let value83 = 0x0; value83 < value80 && admittedSources['size'] < cacheLimit; value83 += 0x1) {
+      for (const value84 of list5) {
+        const value85 = value84['sources'][value83];
+        if (value85) admittedSources['add'](value85);
+        if (admittedSources['size'] >= cacheLimit) break;
       }
     }
     return {
-      admittedSources: _0x1e649d,
-      mediaLoadNodeIds: _0x2156e2,
-      candidateCount: _0x343df2['size'],
-      excludedNodeCount: _0x232c44,
-      items: _0x37435c,
-      options: _0x514088,
+      admittedSources: admittedSources,
+      mediaLoadNodeIds: mediaLoadNodeIds,
+      candidateCount: candidateCount2['size'],
+      excludedNodeCount: excludedNodeCount,
+      items: items,
+      options: options2,
       paintScaleKey: [
-        _0x514088?.['dpr'] ?? globalThis['devicePixelRatio'] ?? 0x1,
-        _0x514088?.['viewport']?.['zoom'] ?? _0x514088?.['zoom'],
-        _0x514088?.['renderScale'],
-        _0x514088?.['maxDpr'],
-        _0x514088?.['maxCanvasDimension'],
-        _0x514088?.['maxBitmapPixels'],
+        options2?.['dpr'] ?? globalThis['devicePixelRatio'] ?? 0x1,
+        options2?.['viewport']?.['zoom'] ?? options2?.['zoom'],
+        options2?.['renderScale'],
+        options2?.['maxDpr'],
+        options2?.['maxCanvasDimension'],
+        options2?.['maxBitmapPixels'],
       ]['join']('|'),
-      palette: _0x37435c['length'] > 0x0 ? _0x35249c(_0x514088?.['palette']) : _0x1c2e8b,
-      viewportBusy: resolveMediaLoadingBusy(_0x514088),
-      worldBounds: computeRasterWorldBounds(_0x37435c, _0x514088),
+      palette: items['length'] > 0x0 ? run3(options2?.['palette']) : palette,
+      viewportBusy: resolveMediaLoadingBusy(options2),
+      worldBounds: computeRasterWorldBounds(items, options2),
     };
   }
-  function _0x280b02(_0x476364, _0x4d3446) {
-    const _0x2cd8c9 = Math['max'](
+  function run21(box7, box8) {
+    const dpr = Math['max'](
         0.1,
-        finiteNumber(_0x4d3446?.['dpr'], finiteNumber(globalThis['devicePixelRatio'], 0x1)),
+        finiteNumber(box8?.['dpr'], finiteNumber(globalThis['devicePixelRatio'], 0x1)),
       ),
-      _0x1581e8 = Math['max'](
-        0.0001,
-        finiteNumber(_0x4d3446?.['viewport']?.['zoom'] ?? _0x4d3446?.['zoom'], 0x1),
-      ),
-      _0xe68c8c = Math['max'](0.0001, finiteNumber(_0x4d3446?.['renderScale'], _0x1581e8 * _0x2cd8c9)),
-      _0x122d27 = Math['max'](0.1, finiteNumber(_0x4d3446?.['maxDpr'], maxDpr)),
-      _0x4be4f7 = Math['min'](_0xe68c8c, _0x122d27),
-      _0xd73510 = positiveInteger(
-        _0x4d3446?.['maxCanvasDimension'],
+      value86 = Math['max'](0.0001, finiteNumber(box8?.['viewport']?.['zoom'] ?? box8?.['zoom'], 0x1)),
+      renderScale = Math['max'](0.0001, finiteNumber(box8?.['renderScale'], value86 * dpr)),
+      value87 = Math['max'](0.1, finiteNumber(box8?.['maxDpr'], maxDpr)),
+      value88 = Math['min'](renderScale, value87),
+      positiveInteger2 = positiveInteger(
+        box8?.['maxCanvasDimension'],
         positiveInteger(maxCanvasDimension, DEFAULT_MAX_CANVAS_DIMENSION),
       ),
-      _0x6b79e1 = positiveInteger(
-        _0x4d3446?.['maxBitmapPixels'],
+      positiveInteger3 = positiveInteger(
+        box8?.['maxBitmapPixels'],
         positiveInteger(maxBitmapPixels, DEFAULT_MAX_BITMAP_PIXELS),
       );
-    let _0x58f2b2 = Math['max'](
+    let effectiveScale = Math['max'](
         0.0001,
         Math['min'](
-          _0x4be4f7,
-          _0xd73510 / _0x476364['width'],
-          _0xd73510 / _0x476364['height'],
-          Math['sqrt'](_0x6b79e1 / (_0x476364['width'] * _0x476364['height'])),
+          value88,
+          positiveInteger2 / box7['width'],
+          positiveInteger2 / box7['height'],
+          Math['sqrt'](positiveInteger3 / (box7['width'] * box7['height'])),
         ),
       ),
-      _0x4076e8 = Math['max'](0x1, Math['min'](_0xd73510, Math['floor'](_0x476364['width'] * _0x58f2b2))),
-      _0x1ad453 = Math['max'](0x1, Math['min'](_0xd73510, Math['floor'](_0x476364['height'] * _0x58f2b2)));
-    if (_0x4076e8 * _0x1ad453 > _0x6b79e1) {
-      const _0x18bf00 = Math['sqrt'](_0x6b79e1 / (_0x4076e8 * _0x1ad453));
-      ((_0x4076e8 = Math['max'](0x1, Math['floor'](_0x4076e8 * _0x18bf00))),
-        (_0x1ad453 = Math['max'](0x1, Math['floor'](_0x1ad453 * _0x18bf00))));
+      bitmapWidth = Math['max'](
+        0x1,
+        Math['min'](positiveInteger2, Math['floor'](box7['width'] * effectiveScale)),
+      ),
+      bitmapHeight = Math['max'](
+        0x1,
+        Math['min'](positiveInteger2, Math['floor'](box7['height'] * effectiveScale)),
+      );
+    if (bitmapWidth * bitmapHeight > positiveInteger3) {
+      const value89 = Math['sqrt'](positiveInteger3 / (bitmapWidth * bitmapHeight));
+      ((bitmapWidth = Math['max'](0x1, Math['floor'](bitmapWidth * value89))),
+        (bitmapHeight = Math['max'](0x1, Math['floor'](bitmapHeight * value89))));
     }
     return (
-      (_0x58f2b2 = Math['min'](_0x58f2b2, _0x4076e8 / _0x476364['width'], _0x1ad453 / _0x476364['height'])),
-      _0x442475['resize'](_0x4076e8, _0x1ad453),
-      Object['assign'](_0x466b59['style'], {
+      (effectiveScale = Math['min'](
+        effectiveScale,
+        bitmapWidth / box7['width'],
+        bitmapHeight / box7['height'],
+      )),
+      rendererRasterPaintSurface['resize'](bitmapWidth, bitmapHeight),
+      Object['assign'](el['style'], {
         display: 'block',
-        height: formatCssNumber(_0x476364['height']) + 'px',
-        left: formatCssNumber(_0x476364['left']) + 'px',
-        top: formatCssNumber(_0x476364['top']) + 'px',
-        width: formatCssNumber(_0x476364['width']) + 'px',
+        height: formatCssNumber(box7['height']) + 'px',
+        left: formatCssNumber(box7['left']) + 'px',
+        top: formatCssNumber(box7['top']) + 'px',
+        width: formatCssNumber(box7['width']) + 'px',
       }),
-      _0x261037['setTransform'](0x1, 0x0, 0x0, 0x1, 0x0, 0x0),
-      _0x261037['clearRect'](0x0, 0x0, _0x4076e8, _0x1ad453),
-      _0x261037['setTransform'](
-        _0x58f2b2,
+      ctx7['setTransform'](0x1, 0x0, 0x0, 0x1, 0x0, 0x0),
+      ctx7['clearRect'](0x0, 0x0, bitmapWidth, bitmapHeight),
+      ctx7['setTransform'](
+        effectiveScale,
         0x0,
         0x0,
-        _0x58f2b2,
-        _0x476364['left'] === 0x0 ? 0x0 : -_0x476364['left'] * _0x58f2b2,
-        _0x476364['top'] === 0x0 ? 0x0 : -_0x476364['top'] * _0x58f2b2,
+        effectiveScale,
+        box7['left'] === 0x0 ? 0x0 : -box7['left'] * effectiveScale,
+        box7['top'] === 0x0 ? 0x0 : -box7['top'] * effectiveScale,
       ),
-      (_0x261037['imageSmoothingEnabled'] = !![]),
-      (_0x261037['imageSmoothingQuality'] = 'low'),
+      (ctx7['imageSmoothingEnabled'] = !![]),
+      (ctx7['imageSmoothingQuality'] = 'low'),
       {
-        bitmapHeight: _0x1ad453,
-        bitmapWidth: _0x4076e8,
-        dpr: _0x2cd8c9,
-        effectiveScale: _0x58f2b2,
-        rasterScale: _0x58f2b2,
-        renderScale: _0xe68c8c,
+        bitmapHeight: bitmapHeight,
+        bitmapWidth: bitmapWidth,
+        dpr: dpr,
+        effectiveScale: effectiveScale,
+        rasterScale: effectiveScale,
+        renderScale: renderScale,
       }
     );
   }
-  function _0x5ac41e(_0x5be49a) {
-    const _0xa2f098 = _0x17729e?.['admittedSources'];
-    return _0x5be49a['sources']['filter']((_0xfd51f8) => _0xa2f098?.['has'](_0xfd51f8));
+  function run5(value90) {
+    const map7 = candidateCount?.['admittedSources'];
+    return value90['sources']['filter']((value91) => map7?.['has'](value91));
   }
-  function _0x436cc1(_0x29f62e, _0x324bc6) {
-    const _0x20f983 = _0x5ac41e(_0x29f62e);
-    for (const _0x4704c2 of _0x20f983) {
-      const _0xbfa183 = _0x148a62['get'](_0x4704c2);
-      if (_0xbfa183?.['status'] !== 'loaded') continue;
-      (_0x30e53b(_0xbfa183), (_0x324bc6['cacheHitCount'] += 0x1));
-      if (drawImageCover(_0x261037, _0xbfa183['image'], _0x29f62e))
-        return (_0x43c99a['set'](_0x29f62e['id'], _0x4704c2), !![]);
+  function run22(value92, value93) {
+    const value94 = run5(value92);
+    for (const value95 of value94) {
+      const response7 = cachedImageCount['get'](value95);
+      if (response7?.['status'] !== 'loaded') continue;
+      (run15(response7), (value93['cacheHitCount'] += 0x1));
+      if (drawImageCover(ctx7, response7['image'], value92))
+        return (map4['set'](value92['id'], value95), !![]);
     }
     return ![];
   }
-  function _0x17a81c(_0x46db1f, _0x4b14f3) {
-    if (_0x17729e?.['mediaLoadNodeIds'] && !_0x17729e['mediaLoadNodeIds']['has'](_0x46db1f['id'])) return ![];
-    const _0x301ee8 = _0x17729e?.['admittedSources'],
-      _0x12f5a3 = _0x5ac41e(_0x46db1f);
-    for (const _0x56a2bb of _0x12f5a3) {
-      const _0x2a1843 = _0x148a62['get'](_0x56a2bb);
+  function run23(value96, value97) {
+    if (candidateCount?.['mediaLoadNodeIds'] && !candidateCount['mediaLoadNodeIds']['has'](value96['id']))
+      return ![];
+    const value98 = candidateCount?.['admittedSources'],
+      value99 = run5(value96);
+    for (const value100 of value99) {
+      const response8 = cachedImageCount['get'](value100);
       if (
-        _0x2a1843?.['status'] === 'pending' ||
-        _0x2a1843?.['status'] === 'ready' ||
-        _0x2a1843?.['status'] === 'loaded'
+        response8?.['status'] === 'pending' ||
+        response8?.['status'] === 'ready' ||
+        response8?.['status'] === 'loaded'
       )
         return ![];
-      if (_0x2a1843?.['status'] === 'error') continue;
-      if (isCanvasImageDisplayLoadPending(_0x56a2bb)) return ![];
-      _0x4b14f3['cacheMissCount'] += 0x1;
-      if (_0x4b14f3['viewportBusy']) return ((_0x4b14f3['skippedBusyImageCount'] += 0x1), ![]);
-      if (_0x4b14f3['newImageStartsRemaining'] <= 0x0) return ![];
-      _0x4b14f3['newImageStartsRemaining'] -= 0x1;
-      const _0x1495e8 = _0x14bce3(_0x56a2bb, _0x301ee8);
-      if (_0x1495e8) _0x4b14f3['startedImageCount'] += 0x1;
+      if (response8?.['status'] === 'error') continue;
+      if (isCanvasImageDisplayLoadPending(value100)) return ![];
+      value97['cacheMissCount'] += 0x1;
+      if (value97['viewportBusy']) return ((value97['skippedBusyImageCount'] += 0x1), ![]);
+      if (value97['newImageStartsRemaining'] <= 0x0) return ![];
+      value97['newImageStartsRemaining'] -= 0x1;
+      const value101 = run17(value100, value98);
+      if (value101) value97['startedImageCount'] += 0x1;
       return ![];
     }
     return ![];
   }
-  function _0x5df7ee(_0x399c91, _0x97a350) {
-    if (_0x399c91['sources']['length'] === 0x0) return ![];
-    if (_0x436cc1(_0x399c91, _0x97a350)) return !![];
-    return (_0x17a81c(_0x399c91, _0x97a350), ![]);
+  function run24(value102, value103) {
+    if (value102['sources']['length'] === 0x0) return ![];
+    if (run22(value102, value103)) return !![];
+    return (run23(value102, value103), ![]);
   }
-  function _0x558bb6(_0xd6f942, _0x143821, _0x2e8e44, _0x7937d6) {
-    const _0x359c11 = _0xd6f942['invalid'] ? 0.38 : 0x1,
-      _0xc05c65 = _0xd6f942['kind'] === 'image' || _0xd6f942['kind'] === 'video';
-    _0x261037['globalAlpha'] = _0x359c11;
-    !_0xc05c65 &&
-      ((_0x261037['fillStyle'] = _0x143821['nodeFill']),
-      _0x261037['fillRect'](_0xd6f942['x'], _0xd6f942['y'], _0xd6f942['width'], _0xd6f942['height']));
-    const _0x2f250f = _0x5df7ee(_0xd6f942, _0x7937d6);
-    if (!_0x2f250f) {
-      if (_0xc05c65) return ((_0x261037['globalAlpha'] = 0x1), ![]);
-      drawPlaceholder(_0x261037, _0xd6f942, _0x143821, _0x2e8e44, _0x359c11);
+  function run25(box9, value104, value105, value106) {
+    const value107 = box9['invalid'] ? 0.38 : 0x1,
+      enabled12 = box9['kind'] === 'image' || box9['kind'] === 'video';
+    ctx7['globalAlpha'] = value107;
+    !enabled12 &&
+      ((ctx7['fillStyle'] = value104['nodeFill']),
+      ctx7['fillRect'](box9['x'], box9['y'], box9['width'], box9['height']));
+    const enabled13 = run24(box9, value106);
+    if (!enabled13) {
+      if (enabled12) return ((ctx7['globalAlpha'] = 0x1), ![]);
+      drawPlaceholder(ctx7, box9, value104, value105, value107);
     }
     return (
-      (_0x261037['globalAlpha'] = _0x359c11),
-      (_0x261037['strokeStyle'] = _0x143821['nodeStroke']),
-      (_0x261037['lineWidth'] = Math['max'](0x1 / _0x2e8e44, 0.5)),
-      _0x261037['strokeRect'](_0xd6f942['x'], _0xd6f942['y'], _0xd6f942['width'], _0xd6f942['height']),
-      drawNodeLabel(_0x261037, _0xd6f942, _0x143821, _0x2e8e44, _0x359c11),
-      _0x2f250f
+      (ctx7['globalAlpha'] = value107),
+      (ctx7['strokeStyle'] = value104['nodeStroke']),
+      (ctx7['lineWidth'] = Math['max'](0x1 / value105, 0.5)),
+      ctx7['strokeRect'](box9['x'], box9['y'], box9['width'], box9['height']),
+      drawNodeLabel(ctx7, box9, value104, value105, value107),
+      enabled13
     );
   }
-  function _0x1c3cb5(_0x1d62d2, _0x57b2cf) {
-    const _0x5efdbf = Number(_0x57b2cf?.['maxNewImagesPerSync']),
-      _0x2f4059 = Number['isFinite'](_0x5efdbf) && _0x5efdbf >= 0x0;
-    return _0x2f4059
-      ? Math['max'](0x0, Math['trunc'](_0x5efdbf))
-      : _0x1d62d2['length'] >= DENSE_READY_REVEAL_NODE_COUNT
-        ? _0x4ac2bf
-        : _0x232f73;
+  function run26(list6, value108) {
+    const count10 = Number(value108?.['maxNewImagesPerSync']),
+      value109 = Number['isFinite'](count10) && count10 >= 0x0;
+    return value109
+      ? Math['max'](0x0, Math['trunc'](count10))
+      : list6['length'] >= DENSE_READY_REVEAL_NODE_COUNT
+        ? value51
+        : value50;
   }
-  function _0x4ce45a(_0x536b4d, _0x5ec276) {
-    const _0x598d6f = _0x4c8919();
+  function run27(value110, newImageStartsRemaining) {
+    const value111 = run7();
     return {
       cacheHitCount: 0x0,
       cacheMissCount: 0x0,
-      newImageStartsRemaining: _0x5ec276
+      newImageStartsRemaining: newImageStartsRemaining
         ? 0x0
-        : Math['min'](_0x536b4d, Math['max'](0x0, _0x536b4d - _0x598d6f)),
+        : Math['min'](value110, Math['max'](0x0, value110 - value111)),
       skippedBusyImageCount: 0x0,
       startedImageCount: 0x0,
-      viewportBusy: _0x5ec276,
+      viewportBusy: newImageStartsRemaining,
     };
   }
-  function _0x1ba124() {
-    if (_0x1a0e80 || !_0x17729e || _0x17729e['viewportBusy'] || !_0x9b2b41 || !_0x466b59 || !_0x261037)
-      return _0x333997;
-    const { items: _0xa2d816, options: _0x1a503c, palette: _0x2f0ee3, worldBounds: _0x2f821a } = _0x17729e;
-    if (!_0x2f821a || _0xa2d816['length'] === 0x0 || _0x333997['active'] !== !![]) return _0x4c18c3();
-    _0x2dd307 += 0x1;
-    const _0x32b8f = _0xa2d816['length'] >= DENSE_READY_REVEAL_NODE_COUNT ? _0x5e7309 : _0x27659c,
-      _0x57269b = new Set(_0x31af67(_0x32b8f)),
-      _0x5ef7d2 = Math['max'](0.0001, finiteNumber(_0x333997['rasterScale'], 0x1)),
-      _0x263a91 = new Set(_0x333997['drawnMediaNodeIds'] || []),
-      _0x237869 = [],
-      _0x41cbdc = _0x4ce45a(0x0, ![]);
-    if (_0x57269b['size'] > 0x0)
-      for (const _0x1d57ce of _0xa2d816) {
+  function run11() {
+    if (value55 || !candidateCount || candidateCount['viewportBusy'] || !enabled4 || !el || !ctx7)
+      return revision3;
+    const { items: items2, options: options3, palette: palette2, worldBounds: worldBounds } = candidateCount;
+    if (!worldBounds || items2['length'] === 0x0 || revision3['active'] !== !![]) return run28();
+    revision2 += 0x1;
+    const value112 = items2['length'] >= DENSE_READY_REVEAL_NODE_COUNT ? value54 : value53,
+      revealedImageCount = new Set(run8(value112)),
+      value113 = Math['max'](0.0001, finiteNumber(revision3['rasterScale'], 0x1)),
+      mediaDrawCount = new Set(revision3['drawnMediaNodeIds'] || []),
+      nodeIds = [],
+      cacheHitCount = run27(0x0, ![]);
+    if (revealedImageCount['size'] > 0x0)
+      for (const enabled14 of items2) {
         if (
-          _0x263a91['has'](_0x1d57ce['id']) ||
-          !_0x1d57ce['sources']['some']((_0x8198fd) => _0x57269b['has'](_0x8198fd))
+          mediaDrawCount['has'](enabled14['id']) ||
+          !enabled14['sources']['some']((value114) => revealedImageCount['has'](value114))
         )
           continue;
-        _0x558bb6(_0x1d57ce, _0x2f0ee3, _0x5ef7d2, _0x41cbdc) &&
-          (_0x263a91['add'](_0x1d57ce['id']), _0x237869['push'](_0x1d57ce['id']));
+        run25(enabled14, palette2, value113, cacheHitCount) &&
+          (mediaDrawCount['add'](enabled14['id']), nodeIds['push'](enabled14['id']));
       }
-    const _0x175039 = _0x1c3cb5(_0xa2d816, _0x1a503c);
-    _0x41cbdc['newImageStartsRemaining'] = Math['min'](_0x175039, Math['max'](0x0, _0x175039 - _0x4c8919()));
-    for (const _0xbc78da of _0xa2d816) {
-      if (_0x263a91['has'](_0xbc78da['id'])) continue;
-      _0x17a81c(_0xbc78da, _0x41cbdc);
-      if (_0x41cbdc['newImageStartsRemaining'] <= 0x0) break;
+    const value115 = run26(items2, options3);
+    cacheHitCount['newImageStartsRemaining'] = Math['min'](value115, Math['max'](0x0, value115 - run7()));
+    for (const value116 of items2) {
+      if (mediaDrawCount['has'](value116['id'])) continue;
+      run23(value116, cacheHitCount);
+      if (cacheHitCount['newImageStartsRemaining'] <= 0x0) break;
     }
-    if (_0x237869['length'] > 0x0) _0x442475['present']();
-    const _0x53fbe9 = _0x36fc99({
-      ..._0x333997,
-      drawnMediaNodeIds: [..._0x263a91],
-      mediaDrawCount: _0x263a91['size'],
-      placeholderCount: _0xa2d816['reduce'](
-        (_0x43485f, _0x23be5c) =>
-          _0x43485f +
+    if (nodeIds['length'] > 0x0) rendererRasterPaintSurface['present']();
+    const value117 = run4({
+      ...revision3,
+      drawnMediaNodeIds: [...mediaDrawCount],
+      mediaDrawCount: mediaDrawCount['size'],
+      placeholderCount: items2['reduce'](
+        (value118, value119) =>
+          value118 +
           Number(
-            _0x23be5c['kind'] !== 'image' &&
-              _0x23be5c['kind'] !== 'video' &&
-              !_0x263a91['has'](_0x23be5c['id']),
+            value119['kind'] !== 'image' &&
+              value119['kind'] !== 'video' &&
+              !mediaDrawCount['has'](value119['id']),
           ),
         0x0,
       ),
-      revision: _0x2dd307,
-      cacheHitCount: _0x41cbdc['cacheHitCount'],
-      cacheMissCount: _0x41cbdc['cacheMissCount'],
-      skippedBusyImageCount: _0x41cbdc['skippedBusyImageCount'],
-      startedImageCount: _0x41cbdc['startedImageCount'],
-      revealedImageCount: _0x57269b['size'],
+      revision: revision2,
+      cacheHitCount: cacheHitCount['cacheHitCount'],
+      cacheMissCount: cacheHitCount['cacheMissCount'],
+      skippedBusyImageCount: cacheHitCount['skippedBusyImageCount'],
+      startedImageCount: cacheHitCount['startedImageCount'],
+      revealedImageCount: revealedImageCount['size'],
     });
-    if (_0x237869['length'] > 0x0 && typeof onMediaPresented === 'function')
+    if (nodeIds['length'] > 0x0 && typeof onMediaPresented === 'function')
       try {
-        onMediaPresented({ nodeIds: _0x237869, revision: _0x2dd307 });
+        onMediaPresented({ nodeIds: nodeIds, revision: revision2 });
       } catch {}
-    if (_0xf40a36()) _0x53ecf3();
-    return _0x53fbe9;
+    if (run6()) run10();
+    return value117;
   }
-  function _0x4c18c3() {
-    if (_0x1a0e80 || !_0x17729e || !_0x9b2b41 || !_0x466b59 || !_0x261037) return _0x333997;
-    ((_0x2dd307 += 0x1), _0x43c99a['clear']());
-    const { items: _0x23b8e1, options: _0x12d97e, palette: _0xb37c7e, worldBounds: _0x3114e5 } = _0x17729e,
-      _0x49f0c2 = _0x23b8e1['length'] >= DENSE_READY_REVEAL_NODE_COUNT ? _0x5e7309 : _0x27659c,
-      _0x28180e = _0x17729e['viewportBusy'] ? 0x0 : _0x31af67(_0x49f0c2)['length'];
-    if (!_0x3114e5 || _0x23b8e1['length'] === 0x0)
+  function run28() {
+    if (value55 || !candidateCount || !enabled4 || !el || !ctx7) return revision3;
+    ((revision2 += 0x1), map4['clear']());
+    const { items: items3, options: options4, palette: palette3, worldBounds: worldBounds2 } = candidateCount,
+      value120 = items3['length'] >= DENSE_READY_REVEAL_NODE_COUNT ? value54 : value53,
+      revealedImageCount2 = candidateCount['viewportBusy'] ? 0x0 : run8(value120)['length'];
+    if (!worldBounds2 || items3['length'] === 0x0)
       return (
-        (_0x466b59['style']['display'] = 'none'),
-        _0x8dfc37(),
-        _0x36fc99({
-          ...createEmptyStats(_0x2dd307, !![]),
-          candidateCount: _0x17729e['candidateCount'],
-          excludedNodeCount: _0x17729e['excludedNodeCount'],
+        (el['style']['display'] = 'none'),
+        run2(),
+        run4({
+          ...createEmptyStats(revision2, !![]),
+          candidateCount: candidateCount['candidateCount'],
+          excludedNodeCount: candidateCount['excludedNodeCount'],
         })
       );
-    _0x5ca0cc();
-    const _0x46d2c1 = _0x280b02(_0x3114e5, _0x12d97e),
-      _0x4a8198 = _0x1c3cb5(_0x23b8e1, _0x12d97e),
-      _0xa8df38 = _0x4ce45a(_0x4a8198, _0x17729e['viewportBusy']),
-      _0x1a6ff0 = [],
-      _0x4c355a = [];
-    let _0x11c786 = 0x0;
-    _0x261037['lineWidth'] = Math['max'](0x1 / _0x46d2c1['rasterScale'], 0.5);
-    for (const _0x13e0bf of _0x23b8e1) {
-      const _0x24fe29 = _0x558bb6(_0x13e0bf, _0xb37c7e, _0x46d2c1['rasterScale'], _0xa8df38);
-      if (_0x24fe29) _0x4c355a['push'](_0x13e0bf['id']);
-      else _0x13e0bf['kind'] !== 'image' && _0x13e0bf['kind'] !== 'video' && (_0x11c786 += 0x1);
-      _0x1a6ff0['push'](_0x13e0bf['id']);
+    run();
+    const bitmapWidth2 = run21(worldBounds2, options4),
+      value121 = run26(items3, options4),
+      cacheHitCount2 = run27(value121, candidateCount['viewportBusy']),
+      active = [],
+      drawnMediaNodeIds = [];
+    let placeholderCount = 0x0;
+    ctx7['lineWidth'] = Math['max'](0x1 / bitmapWidth2['rasterScale'], 0.5);
+    for (const value122 of items3) {
+      const value123 = run25(value122, palette3, bitmapWidth2['rasterScale'], cacheHitCount2);
+      if (value123) drawnMediaNodeIds['push'](value122['id']);
+      else value122['kind'] !== 'image' && value122['kind'] !== 'video' && (placeholderCount += 0x1);
+      active['push'](value122['id']);
     }
-    _0x442475['present']();
-    const _0x177221 = _0x36fc99({
-      active: _0x1a6ff0['length'] > 0x0,
+    rendererRasterPaintSurface['present']();
+    const value124 = run4({
+      active: active['length'] > 0x0,
       supported: !![],
-      drawnNodeIds: _0x1a6ff0,
-      drawnMediaNodeIds: _0x4c355a,
-      drawnNodeCount: _0x1a6ff0['length'],
-      mediaDrawCount: _0x4c355a['length'],
-      placeholderCount: _0x11c786,
-      candidateCount: _0x17729e['candidateCount'],
-      excludedNodeCount: _0x17729e['excludedNodeCount'],
-      bitmapWidth: _0x46d2c1['bitmapWidth'],
-      bitmapHeight: _0x46d2c1['bitmapHeight'],
-      cssWidth: _0x3114e5['width'],
-      cssHeight: _0x3114e5['height'],
-      dpr: _0x46d2c1['dpr'],
-      renderScale: _0x46d2c1['renderScale'],
-      effectiveScale: _0x46d2c1['effectiveScale'],
-      rasterScale: _0x46d2c1['rasterScale'],
-      revision: _0x2dd307,
-      worldBounds: { ..._0x3114e5 },
-      cacheHitCount: _0xa8df38['cacheHitCount'],
-      cacheMissCount: _0xa8df38['cacheMissCount'],
-      skippedBusyImageCount: _0xa8df38['skippedBusyImageCount'],
-      startedImageCount: _0xa8df38['startedImageCount'],
-      revealedImageCount: _0x28180e,
+      drawnNodeIds: active,
+      drawnMediaNodeIds: drawnMediaNodeIds,
+      drawnNodeCount: active['length'],
+      mediaDrawCount: drawnMediaNodeIds['length'],
+      placeholderCount: placeholderCount,
+      candidateCount: candidateCount['candidateCount'],
+      excludedNodeCount: candidateCount['excludedNodeCount'],
+      bitmapWidth: bitmapWidth2['bitmapWidth'],
+      bitmapHeight: bitmapWidth2['bitmapHeight'],
+      cssWidth: worldBounds2['width'],
+      cssHeight: worldBounds2['height'],
+      dpr: bitmapWidth2['dpr'],
+      renderScale: bitmapWidth2['renderScale'],
+      effectiveScale: bitmapWidth2['effectiveScale'],
+      rasterScale: bitmapWidth2['rasterScale'],
+      revision: revision2,
+      worldBounds: { ...worldBounds2 },
+      cacheHitCount: cacheHitCount2['cacheHitCount'],
+      cacheMissCount: cacheHitCount2['cacheMissCount'],
+      skippedBusyImageCount: cacheHitCount2['skippedBusyImageCount'],
+      startedImageCount: cacheHitCount2['startedImageCount'],
+      revealedImageCount: revealedImageCount2,
     });
-    if (!_0x17729e['viewportBusy'] && _0xf40a36()) _0x53ecf3();
-    return _0x177221;
+    if (!candidateCount['viewportBusy'] && run6()) run10();
+    return value124;
   }
-  function _0x4a003b(_0xfb878c, _0x367563, _0x3c9609, _0x3115c5 = {}) {
-    const _0x34f554 =
-      _0x3115c5?.['viewportBusy'] === !![] &&
-      _0x3115c5?.['reuseWhileBusy'] === !![] &&
-      _0x3115c5?.['forceRender'] !== !![] &&
-      _0x333997['active'] &&
-      (Number(_0x3c9609?.['size']) > 0x0 || Number(_0x3c9609?.['length']) > 0x0);
-    if (_0x34f554 && _0x5df0b3(_0xfb878c)) {
-      const _0x14a79a = resolveMediaLoadingBusy(_0x3115c5);
-      _0x17729e && (_0x17729e['viewportBusy'] = _0x14a79a);
-      if (_0x14a79a) _0x426b70();
+  function sync(value125, value126, list7, value127 = {}) {
+    const value128 =
+      value127?.['viewportBusy'] === !![] &&
+      value127?.['reuseWhileBusy'] === !![] &&
+      value127?.['forceRender'] !== !![] &&
+      revision3['active'] &&
+      (Number(list7?.['size']) > 0x0 || Number(list7?.['length']) > 0x0);
+    if (value128 && run19(value125)) {
+      const mediaLoadingBusy = resolveMediaLoadingBusy(value127);
+      candidateCount && (candidateCount['viewportBusy'] = mediaLoadingBusy);
+      if (mediaLoadingBusy) run9();
       else {
-        if (_0xf40a36()) _0x53ecf3();
+        if (run6()) run10();
       }
-      return _0x333997;
+      return revision3;
     }
-    _0x426b70();
-    const _0x11157f = _0x2096aa(_0x367563, _0x3c9609, _0x3115c5);
-    if ((!_0x11157f['worldBounds'] || _0x11157f['items']['length'] === 0x0) && !_0x466b59)
+    run9();
+    const candidateCount3 = run20(value126, list7, value127);
+    if ((!candidateCount3['worldBounds'] || candidateCount3['items']['length'] === 0x0) && !el)
       return (
-        (_0x2dd307 += 0x1),
-        (_0x17729e = _0x11157f),
-        _0x36fc99({
-          ...createEmptyStats(_0x2dd307, !![]),
-          candidateCount: _0x11157f['candidateCount'],
-          excludedNodeCount: _0x11157f['excludedNodeCount'],
+        (revision2 += 0x1),
+        (candidateCount = candidateCount3),
+        run4({
+          ...createEmptyStats(revision2, !![]),
+          candidateCount: candidateCount3['candidateCount'],
+          excludedNodeCount: candidateCount3['excludedNodeCount'],
         })
       );
-    if (!_0x5df0b3(_0xfb878c))
+    if (!run19(value125))
       return (
-        (_0x2dd307 += 0x1),
-        (_0x17729e = null),
-        _0x36fc99({
-          ...createEmptyStats(_0x2dd307, ![]),
-          candidateCount: _0x11157f['candidateCount'],
-          excludedNodeCount: _0x11157f['excludedNodeCount'],
+        (revision2 += 0x1),
+        (candidateCount = null),
+        run4({
+          ...createEmptyStats(revision2, ![]),
+          candidateCount: candidateCount3['candidateCount'],
+          excludedNodeCount: candidateCount3['excludedNodeCount'],
         })
       );
-    const _0x10cc64 =
-      _0x333997['active'] &&
-      _0x3115c5?.['forceRender'] !== !![] &&
-      canReuseRasterPaint(_0x17729e, _0x11157f) &&
-      _0x11157f['items']['every']((_0x19074c) => {
-        if (!_0x43c99a['has'](_0x19074c['id'])) return !![];
-        const _0x3391f2 = _0x19074c['sources']['find'](
-          (_0x4dcd6a) =>
-            _0x11157f['admittedSources']['has'](_0x4dcd6a) &&
-            ['loaded', 'ready']['includes'](_0x148a62['get'](_0x4dcd6a)?.['status']),
+    const value129 =
+      revision3['active'] &&
+      value127?.['forceRender'] !== !![] &&
+      canReuseRasterPaint(candidateCount, candidateCount3) &&
+      candidateCount3['items']['every']((value130) => {
+        if (!map4['has'](value130['id'])) return !![];
+        const value131 = value130['sources']['find'](
+          (value132) =>
+            candidateCount3['admittedSources']['has'](value132) &&
+            ['loaded', 'ready']['includes'](cachedImageCount['get'](value132)?.['status']),
         );
-        return _0x3391f2 === _0x43c99a['get'](_0x19074c['id']);
+        return value131 === map4['get'](value130['id']);
       });
-    _0x17729e = _0x11157f;
-    if (_0x10cc64) return _0x1ba124();
-    return _0x4c18c3();
+    candidateCount = candidateCount3;
+    if (value129) return run11();
+    return run28();
   }
-  function _0x117d04(_0x3528a3) {
-    const _0x1aa1e1 = String(_0x3528a3 || '')['trim']();
-    if (!_0x1aa1e1 || !_0x17729e) return ![];
-    const _0x4f891b = _0x17729e['items'] || [],
-      _0x5baabd = _0x4f891b['filter']((_0xa1e995) => _0xa1e995['id'] !== _0x1aa1e1);
-    if (_0x5baabd['length'] === _0x4f891b['length']) return ![];
+  function excludeNode(value133) {
+    const enabled15 = String(value133 || '')['trim']();
+    if (!enabled15 || !candidateCount) return ![];
+    const list8 = candidateCount['items'] || [],
+      items4 = list8['filter']((value134) => value134['id'] !== enabled15);
+    if (items4['length'] === list8['length']) return ![];
     return (
-      _0x426b70(),
-      (_0x17729e = {
-        ..._0x17729e,
-        excludedNodeCount: Number(_0x17729e['excludedNodeCount'] || 0x0) + 0x1,
-        items: _0x5baabd,
-        worldBounds: computeRasterWorldBounds(_0x5baabd, _0x17729e['options']),
+      run9(),
+      (candidateCount = {
+        ...candidateCount,
+        excludedNodeCount: Number(candidateCount['excludedNodeCount'] || 0x0) + 0x1,
+        items: items4,
+        worldBounds: computeRasterWorldBounds(items4, candidateCount['options']),
       }),
-      _0x4c18c3(),
+      run28(),
       !![]
     );
   }
-  function _0x5bff7c(_0x5503a3) {
-    const _0x30887a = String(_0x5503a3 || '')['trim']();
+  function captureNodeFrame(value135) {
+    const nodeId2 = String(value135 || '')['trim']();
     if (
-      !_0x30887a ||
-      _0x1a0e80 ||
-      !_0x466b59 ||
-      !_0x9b2b41 ||
-      !_0x17729e ||
-      !_0x333997?.['worldBounds'] ||
+      !nodeId2 ||
+      value55 ||
+      !el ||
+      !enabled4 ||
+      !candidateCount ||
+      !revision3?.['worldBounds'] ||
       typeof documentRef?.['createElement'] !== 'function'
     )
       return null;
-    const _0x106ca5 = _0x17729e['items']?.['find']?.((_0x1e6df8) => _0x1e6df8['id'] === _0x30887a);
-    if (!_0x106ca5) return null;
-    const _0xdd6f28 = _0x106ca5['kind'] === 'image' || _0x106ca5['kind'] === 'video';
-    if (_0xdd6f28 && !(_0x333997['drawnMediaNodeIds'] || [])['includes'](_0x30887a)) return null;
-    const _0x32cfdc = _0x333997['worldBounds'],
-      _0x508648 = Math['max'](0.0001, finiteNumber(_0x333997['effectiveScale'], 0x1)),
-      _0xa32265 = (_0x106ca5['x'] - _0x32cfdc['left']) * _0x508648,
-      _0x353995 = (_0x106ca5['y'] - _0x32cfdc['top']) * _0x508648,
-      _0x179e35 = _0x106ca5['width'] * _0x508648,
-      _0x22deab = _0x106ca5['height'] * _0x508648,
-      _0x13ebf1 = Math['max'](0x0, _0xa32265),
-      _0x287ccc = Math['max'](0x0, _0x353995),
-      _0x2d5c7e = Math['min'](_0x466b59['width'], _0xa32265 + _0x179e35),
-      _0x235c64 = Math['min'](_0x466b59['height'], _0x353995 + _0x22deab),
-      _0x247ee4 = _0x2d5c7e - _0x13ebf1,
-      _0x27d7b5 = _0x235c64 - _0x287ccc;
-    if (!(_0x247ee4 > 0x0) || !(_0x27d7b5 > 0x0)) return null;
-    const _0x2aa705 = documentRef['createElement']('canvas');
-    ((_0x2aa705['width'] = Math['max'](0x1, Math['ceil'](_0x179e35))),
-      (_0x2aa705['height'] = Math['max'](0x1, Math['ceil'](_0x22deab))));
-    const _0x310d52 = _0x2aa705['getContext']?.('2d', { alpha: !![] }) || null;
-    if (!_0x310d52 || typeof _0x310d52['drawImage'] !== 'function') return null;
-    const _0x208792 = _0x2aa705['width'] / _0x179e35,
-      _0x55c3a6 = _0x2aa705['height'] / _0x22deab;
+    const height4 = candidateCount['items']?.['find']?.((value136) => value136['id'] === nodeId2);
+    if (!height4) return null;
+    const value137 = height4['kind'] === 'image' || height4['kind'] === 'video';
+    if (value137 && !(revision3['drawnMediaNodeIds'] || [])['includes'](nodeId2)) return null;
+    const box10 = revision3['worldBounds'],
+      value138 = Math['max'](0.0001, finiteNumber(revision3['effectiveScale'], 0x1)),
+      value139 = (height4['x'] - box10['left']) * value138,
+      value140 = (height4['y'] - box10['top']) * value138,
+      value141 = height4['width'] * value138,
+      value142 = height4['height'] * value138,
+      value143 = Math['max'](0x0, value139),
+      value144 = Math['max'](0x0, value140),
+      value145 = Math['min'](el['width'], value139 + value141),
+      value146 = Math['min'](el['height'], value140 + value142),
+      count11 = value145 - value143,
+      count12 = value146 - value144;
+    if (!(count11 > 0x0) || !(count12 > 0x0)) return null;
+    const canvas = documentRef['createElement']('canvas');
+    ((canvas['width'] = Math['max'](0x1, Math['ceil'](value141))),
+      (canvas['height'] = Math['max'](0x1, Math['ceil'](value142))));
+    const ctx8 = canvas['getContext']?.('2d', { alpha: !![] }) || null;
+    if (!ctx8 || typeof ctx8['drawImage'] !== 'function') return null;
+    const value147 = canvas['width'] / value141,
+      value148 = canvas['height'] / value142;
     try {
-      _0x310d52['drawImage'](
-        _0x466b59,
-        _0x13ebf1,
-        _0x287ccc,
-        _0x247ee4,
-        _0x27d7b5,
-        (_0x13ebf1 - _0xa32265) * _0x208792,
-        (_0x287ccc - _0x353995) * _0x55c3a6,
-        _0x247ee4 * _0x208792,
-        _0x27d7b5 * _0x55c3a6,
+      ctx8['drawImage'](
+        el,
+        value143,
+        value144,
+        count11,
+        count12,
+        (value143 - value139) * value147,
+        (value144 - value140) * value148,
+        count11 * value147,
+        count12 * value148,
       );
     } catch {
       return null;
     }
     return {
-      canvas: _0x2aa705,
-      height: _0x106ca5['height'],
-      kind: _0x106ca5['kind'],
-      label: _0x106ca5['label'],
-      nodeId: _0x30887a,
-      revision: _0x333997['revision'],
-      sources: [..._0x106ca5['sources']],
-      width: _0x106ca5['width'],
+      canvas: canvas,
+      height: height4['height'],
+      kind: height4['kind'],
+      label: height4['label'],
+      nodeId: nodeId2,
+      revision: revision3['revision'],
+      sources: [...height4['sources']],
+      width: height4['width'],
     };
   }
-  function _0x37e0dc(_0x1248a7) {
-    if (_0x1a0e80 || !_0x17729e) return _0x333997;
-    const _0x5de0ed = _0x17729e['viewportBusy'];
-    _0x17729e['viewportBusy'] = _0x1248a7 === !![];
-    if (_0x17729e['viewportBusy']) _0x426b70();
-    else _0x5de0ed && _0xf40a36() ? _0x1ba124() : _0x53ecf3();
-    return _0x36fc99(_0x333997);
+  function setMediaLoadingBusy(value149) {
+    if (value55 || !candidateCount) return revision3;
+    const value150 = candidateCount['viewportBusy'];
+    candidateCount['viewportBusy'] = value149 === !![];
+    if (candidateCount['viewportBusy']) run9();
+    else value150 && run6() ? run11() : run10();
+    return run4(revision3);
   }
-  function _0x549efd(_0x3546a7 = {}) {
-    if (_0x1a0e80) return _0x333997;
-    let _0x51497e = null,
-      _0x17d611 = _0x407d51;
-    if (_0x3546a7 && typeof _0x3546a7[Symbol['iterator']] === 'function')
-      _0x51497e = normalizeIdSet(_0x3546a7);
+  function prune(options5 = {}) {
+    if (value55) return revision3;
+    let map8 = null,
+      value151 = cacheLimit;
+    if (options5 && typeof options5[Symbol['iterator']] === 'function') map8 = normalizeIdSet(options5);
     else
-      _0x3546a7 &&
-        typeof _0x3546a7 === 'object' &&
-        (Object['prototype']['hasOwnProperty']['call'](_0x3546a7, 'keepSources') &&
-          (_0x51497e = normalizeIdSet(_0x3546a7['keepSources'])),
-        (_0x17d611 = Math['max'](0x0, Math['trunc'](finiteNumber(_0x3546a7['maxEntries'], _0x407d51)))));
-    let _0x37eae0 = ![];
-    for (const [_0x379076, _0x401fc1] of Array['from'](_0x148a62['entries']())) {
-      ((_0x51497e && !_0x51497e['has'](_0x379076)) || (!_0x51497e && _0x401fc1['status'] === 'error')) &&
-        (_0x37eae0 = _0xdafbb5(_0x379076) || _0x37eae0);
+      options5 &&
+        typeof options5 === 'object' &&
+        (Object['prototype']['hasOwnProperty']['call'](options5, 'keepSources') &&
+          (map8 = normalizeIdSet(options5['keepSources'])),
+        (value151 = Math['max'](0x0, Math['trunc'](finiteNumber(options5['maxEntries'], cacheLimit)))));
+    let value152 = ![];
+    for (const [value153, response9] of Array['from'](cachedImageCount['entries']())) {
+      ((map8 && !map8['has'](value153)) || (!map8 && response9['status'] === 'error')) &&
+        (value152 = run14(value153) || value152);
     }
-    while (_0x148a62['size'] > _0x17d611) {
-      const _0x1c7bdb = _0x172065();
-      if (!_0x1c7bdb) break;
-      _0x37eae0 = !![];
+    while (cachedImageCount['size'] > value151) {
+      const enabled16 = run16();
+      if (!enabled16) break;
+      value152 = !![];
     }
-    if (_0x37eae0 && _0x17729e && _0x9b2b41) {
-      const _0x3a2dc3 = _0x17729e['viewportBusy'];
-      _0x17729e['viewportBusy'] = !![];
-      const _0x192f4e = _0x4c18c3();
-      return ((_0x17729e['viewportBusy'] = _0x3a2dc3), _0x192f4e);
+    if (value152 && candidateCount && enabled4) {
+      const value154 = candidateCount['viewportBusy'];
+      candidateCount['viewportBusy'] = !![];
+      const value155 = run28();
+      return ((candidateCount['viewportBusy'] = value154), value155);
     }
-    return _0x36fc99(_0x333997);
+    return run4(revision3);
   }
-  function _0x27f096() {
-    if (_0x1a0e80) return;
-    ((_0x1a0e80 = !![]), _0x5ca0cc(), _0x426b70(), (_0x17729e = null));
-    for (const _0x4dd5e1 of _0x148a62['values']()) _0x3b3533(_0x4dd5e1);
-    (_0x148a62['clear'](), _0x43c99a['clear'](), (_0x2dd307 += 0x1));
-    const _0x1181ec = _0x466b59;
-    ((_0x333997 = { ...createEmptyStats(_0x2dd307, _0x9b2b41), cacheLimit: _0x407d51 }),
-      _0x1181ec &&
-        ((_0x1181ec['__aicanvasRasterPreviewStats'] = _0x333997),
-        (_0x1181ec['__aicanvasRasterPreviewRevealItems'] = []),
-        (_0x1181ec['width'] = 0x1),
-        (_0x1181ec['height'] = 0x1),
-        (_0x1181ec['style']['display'] = 'none'),
-        _0x1181ec['remove']?.()),
-      _0x442475?.['release'](),
-      (_0x442475 = null),
-      (_0x466b59 = null),
-      (_0x261037 = null));
+  function destroy() {
+    if (value55) return;
+    ((value55 = !![]), run(), run9(), (candidateCount = null));
+    for (const value156 of cachedImageCount['values']()) run13(value156);
+    (cachedImageCount['clear'](), map4['clear'](), (revision2 += 0x1));
+    const el3 = el;
+    ((revision3 = { ...createEmptyStats(revision2, enabled4), cacheLimit: cacheLimit }),
+      el3 &&
+        ((el3['__aicanvasRasterPreviewStats'] = revision3),
+        (el3['__aicanvasRasterPreviewRevealItems'] = []),
+        (el3['width'] = 0x1),
+        (el3['height'] = 0x1),
+        (el3['style']['display'] = 'none'),
+        el3['remove']?.()),
+      rendererRasterPaintSurface?.['release'](),
+      (rendererRasterPaintSurface = null),
+      (el = null),
+      (ctx7 = null));
   }
-  function _0x4d4fb4() {
-    return _0x333997;
+  function getStats() {
+    return revision3;
   }
   return {
-    sync: _0x4a003b,
-    captureNodeFrame: _0x5bff7c,
-    excludeNode: _0x117d04,
-    setMediaLoadingBusy: _0x37e0dc,
-    prune: _0x549efd,
-    destroy: _0x27f096,
-    getStats: _0x4d4fb4,
+    sync: sync,
+    captureNodeFrame: captureNodeFrame,
+    excludeNode: excludeNode,
+    setMediaLoadingBusy: setMediaLoadingBusy,
+    prune: prune,
+    destroy: destroy,
+    getStats: getStats,
   };
 }

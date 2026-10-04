@@ -666,18 +666,18 @@ const VIDEO_DURATION_FIELD = Object.freeze({
   HAPPYHORSE_WATERMARK_FIELD = Object.freeze({ ...VIDEO_WATERMARK_FIELD, label: '添加水印' }),
   HAPPYHORSE_SEED_FIELD = Object.freeze({ ...VIDEO_SEED_FIELD, label: '随机种子' });
 function createHappyHorseFixedSlot({
-  id: _0x3e62cb,
-  kind: _0xfd9fed,
-  label: _0x2d7c77,
-  mode: _0x2554ae,
-  description: _0x5812a5,
+  id: id,
+  kind: kind,
+  label: label2,
+  mode: mode,
+  description: description2,
 }) {
   return Object.freeze({
-    id: _0x3e62cb,
-    kind: _0xfd9fed,
-    label: _0x2d7c77,
-    description: _0x5812a5,
-    showWhen: Object.freeze({ field: 'happyhorse_mode', value: _0x2554ae }),
+    id: id,
+    kind: kind,
+    label: label2,
+    description: description2,
+    showWhen: Object.freeze({ field: 'happyhorse_mode', value: mode }),
   });
 }
 const HAPPYHORSE_FIXED_INPUT_SLOTS = Object.freeze([
@@ -792,12 +792,12 @@ const HAPPYHORSE_FIXED_INPUT_SLOTS = Object.freeze([
     defaultValue: false,
   });
 function createVolcengineSeedance2ResolutionField({ include1080p: include1080p = true } = {}) {
-  const _0x10d210 = [
+  const list = [
     Object.freeze({ value: '480p', label: '480p' }),
     Object.freeze({ value: '720p', label: '720p' }),
   ];
   return (
-    include1080p && _0x10d210.push(Object.freeze({ value: '1080p', label: '1080p' })),
+    include1080p && list.push(Object.freeze({ value: '1080p', label: '1080p' })),
     Object.freeze({
       id: 'resolution',
       displayRole: 'resolution',
@@ -807,7 +807,7 @@ function createVolcengineSeedance2ResolutionField({ include1080p: include1080p =
       qualityRatioLabelOrder: 'fieldFirst',
       label: '分辨率',
       defaultValue: '720p',
-      options: Object.freeze(_0x10d210),
+      options: Object.freeze(list),
     })
   );
 }
@@ -835,30 +835,28 @@ const VOLCENGINE_SEEDANCE_2_RATIO_FIELD = Object.freeze({
   }),
   VOLCENGINE_SEEDANCE_2_SEED_FIELD = Object.freeze({ ...VIDEO_SEED_FIELD, defaultValue: 'random' });
 function createRunningHubSeedance2FixedSlot({
-  id: _0x5ce218,
-  kind: _0x14e836,
-  label: _0x180d60,
-  mode: _0x1ee1ec,
-  modes: _0x162c39,
-  description: _0x3cc15d,
-  displayOrder: _0x19ab08,
+  id: id2,
+  kind: kind2,
+  label: label3,
+  mode: mode2,
+  modes: modes,
+  description: description3,
+  displayOrder: displayOrder,
 }) {
-  const _0x111025 = Object.freeze(
-      (Array.isArray(_0x162c39) ? _0x162c39 : [_0x1ee1ec])
-        .map((_0x42a6ea) => String(_0x42a6ea || '').trim())
-        .filter(Boolean),
+  const values = Object.freeze(
+      (Array.isArray(modes) ? modes : [mode2]).map((item) => String(item || '').trim()).filter(Boolean),
     ),
-    _0x44c9ff =
-      _0x111025.length > 1
-        ? Object.freeze({ field: 'rh_seedance_2_mode', values: _0x111025 })
-        : Object.freeze({ field: 'rh_seedance_2_mode', value: _0x111025[0] || '' });
+    showWhen =
+      values.length > 1
+        ? Object.freeze({ field: 'rh_seedance_2_mode', values: values })
+        : Object.freeze({ field: 'rh_seedance_2_mode', value: values[0] || '' });
   return Object.freeze({
-    id: _0x5ce218,
-    kind: _0x14e836,
-    label: _0x180d60,
-    description: _0x3cc15d,
-    displayOrder: _0x19ab08,
-    showWhen: _0x44c9ff,
+    id: id2,
+    kind: kind2,
+    label: label3,
+    description: description3,
+    displayOrder: displayOrder,
+    showWhen: showWhen,
   });
 }
 const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS = Object.freeze([
@@ -1019,20 +1017,20 @@ const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS = Object.freeze([
     ]),
   });
 function createKlingV3OmniFixedSlot({
-  id: _0x33a53c,
-  kind: _0x44c221,
-  label: _0x615e4f,
-  mode: _0x4a48f5,
-  description: _0xcfd057,
-  displayOrder: _0x4eb06b,
+  id: id3,
+  kind: kind3,
+  label: label4,
+  mode: mode3,
+  description: description4,
+  displayOrder: displayOrder2,
 }) {
   return Object.freeze({
-    id: _0x33a53c,
-    kind: _0x44c221,
-    label: _0x615e4f,
-    description: _0xcfd057,
-    displayOrder: _0x4eb06b,
-    showWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: _0x4a48f5 }),
+    id: id3,
+    kind: kind3,
+    label: label4,
+    description: description4,
+    displayOrder: displayOrder2,
+    showWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: mode3 }),
   });
 }
 const KLING_V3_OMNI_FIXED_INPUT_SLOTS = Object.freeze([
@@ -1174,16 +1172,16 @@ const KLING_V3_OMNI_FIXED_INPUT_SLOTS = Object.freeze([
   RUNNINGHUB_KLING_O1_EDIT_PROMPT_PLACEHOLDER =
     '描述要对原视频做的编辑。例如：移除背景路人，将晴天改为电影感雨夜，并保持人物动作连贯。';
 function createRunningHubKlingO1FixedSlot({
-  id: _0x30c2b5,
-  kind: _0x24d9ac,
-  label: _0x36c071,
-  mode: _0x418c05,
-  description: _0xb5d6bd,
-  displayOrder: _0x389cf1,
+  id: id4,
+  kind: kind4,
+  label: label5,
+  mode: mode4,
+  description: description5,
+  displayOrder: displayOrder3,
 }) {
-  const _0x26fc27 =
-    _0x418c05 === 'reference' || _0x418c05 === 'edit'
-      ? { showWhen: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: _0x418c05 }) }
+  const args =
+    mode4 === 'reference' || mode4 === 'edit'
+      ? { showWhen: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: mode4 }) }
       : {
           hideWhen: Object.freeze({
             field: 'rh_kling_o1_generation_mode',
@@ -1191,12 +1189,12 @@ function createRunningHubKlingO1FixedSlot({
           }),
         };
   return Object.freeze({
-    id: _0x30c2b5,
-    kind: _0x24d9ac,
-    label: _0x36c071,
-    description: _0xb5d6bd,
-    displayOrder: _0x389cf1,
-    ..._0x26fc27,
+    id: id4,
+    kind: kind4,
+    label: label5,
+    description: description5,
+    displayOrder: displayOrder3,
+    ...args,
   });
 }
 const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS = Object.freeze([
@@ -1310,21 +1308,21 @@ const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS = Object.freeze([
   RUNNINGHUB_KLING_O3_EDIT_PROMPT_PLACEHOLDER =
     '描述要对原视频做什么编辑，可接参考图补充风格。例如：将原视频改成夜晚赛博朋克街道风格，保留人物动作和镜头节奏。';
 function createRunningHubKlingO3FixedSlot({
-  id: _0x1b817b,
-  kind: _0x4dc716,
-  label: _0x290524,
-  mode: _0x4aafdd,
-  description: _0x5d5ed1,
-  displayOrder: _0x53c213,
+  id: id5,
+  kind: kind5,
+  label: label6,
+  mode: mode5,
+  description: description6,
+  displayOrder: displayOrder4,
   hideWhen: hideWhen = null,
 }) {
   return Object.freeze({
-    id: _0x1b817b,
-    kind: _0x4dc716,
-    label: _0x290524,
-    description: _0x5d5ed1,
-    displayOrder: _0x53c213,
-    showWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: _0x4aafdd }),
+    id: id5,
+    kind: kind5,
+    label: label6,
+    description: description6,
+    displayOrder: displayOrder4,
+    showWhen: Object.freeze({ field: 'kling_v3_omni_mode', value: mode5 }),
     ...(hideWhen ? { hideWhen: Object.freeze(hideWhen) } : {}),
   });
 }
@@ -1463,32 +1461,31 @@ const RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS = Object.freeze([
   VIDU_Q3_REFERENCE_PROMPT_PLACEHOLDER =
     '描述参考图的动作和镜头，外观由参考图决定。可用 @图片1、@图片2 指代素材。例如：@图片1 和 @图片2 中的角色在湖边相拥，镜头缓慢环绕。';
 function createWan27FixedSlot({
-  id: _0xc49347,
-  kind: _0x4d0779,
-  label: _0x1e70d8,
-  mode: _0x39d579,
-  description: _0x52006c,
-  displayOrder: _0xaf9096,
-  showWhen: _0x4a6695,
+  id: id6,
+  kind: kind6,
+  label: label7,
+  mode: mode6,
+  description: description7,
+  displayOrder: displayOrder5,
+  showWhen: showWhen2,
 }) {
-  const _0x5ffd38 = Array.isArray(_0x39d579)
-      ? _0x39d579.map((_0x18a6aa) => String(_0x18a6aa || '').trim()).filter(Boolean)
-      : [String(_0x39d579 || '').trim()].filter(Boolean),
-    _0x54ea21 = [];
-  _0x54ea21.push(
-    _0x5ffd38.length > 1
-      ? Object.freeze({ field: 'wan27_mode', values: Object.freeze(_0x5ffd38) })
-      : Object.freeze({ field: 'wan27_mode', value: _0x5ffd38[0] || '' }),
+  const value = Array.isArray(mode6)
+      ? mode6.map((item2) => String(item2 || '').trim()).filter(Boolean)
+      : [String(mode6 || '').trim()].filter(Boolean),
+    list2 = [];
+  list2.push(
+    value.length > 1
+      ? Object.freeze({ field: 'wan27_mode', values: Object.freeze(value) })
+      : Object.freeze({ field: 'wan27_mode', value: value[0] || '' }),
   );
-  const _0x1aa3ec =
-    _0x4a6695 || (_0x54ea21.length > 1 ? Object.freeze({ all: Object.freeze(_0x54ea21) }) : _0x54ea21[0]);
+  const showWhen3 = showWhen2 || (list2.length > 1 ? Object.freeze({ all: Object.freeze(list2) }) : list2[0]);
   return Object.freeze({
-    id: _0xc49347,
-    kind: _0x4d0779,
-    label: _0x1e70d8,
-    description: _0x52006c,
-    displayOrder: _0xaf9096,
-    showWhen: _0x1aa3ec,
+    id: id6,
+    kind: kind6,
+    label: label7,
+    description: description7,
+    displayOrder: displayOrder5,
+    showWhen: showWhen3,
   });
 }
 const WAN27_FIXED_INPUT_SLOTS = Object.freeze([
@@ -1623,42 +1620,41 @@ const WAN27_FIXED_INPUT_SLOTS = Object.freeze([
       description: '视频编辑可选参考图，最多 3 张',
     }),
   ]);
-function freezeOption(_0x5bcd1f) {
-  if (_0x5bcd1f && typeof _0x5bcd1f === 'object' && !Array.isArray(_0x5bcd1f))
-    return Object.freeze({ ..._0x5bcd1f });
-  return Object.freeze({ value: _0x5bcd1f, label: String(_0x5bcd1f) });
+function freezeOption(value2) {
+  if (value2 && typeof value2 === 'object' && !Array.isArray(value2)) return Object.freeze({ ...value2 });
+  return Object.freeze({ value: value2, label: String(value2) });
 }
-function isAdaptiveRatioOptionValue(_0x363729) {
-  const _0x39a04f = String(_0x363729 ?? '').trim(),
-    _0x30d7b9 = _0x39a04f.toLowerCase();
+function isAdaptiveRatioOptionValue(key) {
+  const index = String(key ?? '').trim(),
+    result = index.toLowerCase();
   return (
-    _0x39a04f === APIMART_VIDEO_ADAPTIVE_RATIO_VALUE ||
-    _0x30d7b9 === 'auto' ||
-    _0x30d7b9 === 'adaptive' ||
-    _0x30d7b9 === 'default'
+    index === APIMART_VIDEO_ADAPTIVE_RATIO_VALUE ||
+    result === 'auto' ||
+    result === 'adaptive' ||
+    result === 'default'
   );
 }
-function withAdaptiveRatioOption(_0xff2bcb = []) {
-  const _0x33bbf4 = Array.isArray(_0xff2bcb) ? _0xff2bcb : [],
-    _0x2bfe4a = _0x33bbf4.some((_0x4b066a) => isAdaptiveRatioOptionValue(_0x4b066a?.value ?? _0x4b066a));
-  return _0x2bfe4a ? _0x33bbf4 : [APIMART_VIDEO_ADAPTIVE_RATIO_OPTION, ..._0x33bbf4];
+function withAdaptiveRatioOption(list3 = []) {
+  const list4 = Array.isArray(list3) ? list3 : [],
+    data = list4.some((el) => isAdaptiveRatioOptionValue(el?.value ?? el));
+  return data ? list4 : [APIMART_VIDEO_ADAPTIVE_RATIO_OPTION, ...list4];
 }
 function createSegmentedField({
-  id: _0x5efdef,
-  label: _0x111a06,
-  defaultValue: _0x4e3d0a,
-  options: _0x482a82,
+  id: id7,
+  label: label8,
+  defaultValue: defaultValue2,
+  options: options2,
   placement: placement = 'mode',
   variant: variant = 'pillMenu',
 }) {
   return Object.freeze({
-    id: _0x5efdef,
+    id: id7,
     type: 'segmented',
     placement: placement,
     variant: variant,
-    label: _0x111a06,
-    defaultValue: _0x4e3d0a,
-    options: Object.freeze(_0x482a82.map(freezeOption)),
+    label: label8,
+    defaultValue: defaultValue2,
+    options: Object.freeze(options2.map(freezeOption)),
   });
 }
 function createDurationField({
@@ -1676,55 +1672,53 @@ function createDurationField({
   });
 }
 function createDurationSliderOptionsField({
-  values: _0x1b9bd5,
-  defaultValue: defaultValue = _0x1b9bd5?.[0],
+  values: values2,
+  defaultValue: defaultValue = values2?.[0],
   label: label = VIDEO_DURATION_FIELD.label,
   optionOverridesByValue: optionOverridesByValue = null,
 } = {}) {
-  const _0x3a9316 = (Array.isArray(_0x1b9bd5) ? _0x1b9bd5 : [])
-      .map((_0x5307c4) => Number(_0x5307c4))
-      .filter(Number.isFinite),
-    _0x196930 = _0x3a9316[0] ?? Number(defaultValue) ?? 1,
-    _0x174bb4 = _0x3a9316[_0x3a9316.length - 1] ?? _0x196930;
+  const list5 = (Array.isArray(values2) ? values2 : []).map((item3) => Number(item3)).filter(Number.isFinite),
+    min2 = list5[0] ?? Number(defaultValue) ?? 1,
+    max2 = list5[list5.length - 1] ?? min2;
   return Object.freeze({
     ...VIDEO_DURATION_FIELD,
     label: label,
     defaultValue: defaultValue,
-    min: _0x196930,
-    max: _0x174bb4,
+    min: min2,
+    max: max2,
     step: 1,
     options: Object.freeze(
-      _0x3a9316.map((_0x1d4672) =>
+      list5.map((value3) =>
         Object.freeze({
-          value: _0x1d4672,
-          label: _0x1d4672 + 's',
-          displayLabel: _0x1d4672 + 'S',
-          ...(optionOverridesByValue?.[_0x1d4672] || {}),
+          value: value3,
+          label: value3 + 's',
+          displayLabel: value3 + 'S',
+          ...(optionOverridesByValue?.[value3] || {}),
         }),
       ),
     ),
   });
 }
-function createDurationOptionsField(_0x2a20e6, _0x28dac6 = _0x2a20e6[0]) {
+function createDurationOptionsField(options3, defaultValue3 = options3[0]) {
   return createSegmentedField({
     id: 'duration',
     label: VIDEO_DURATION_FIELD.label,
-    defaultValue: _0x28dac6,
-    options: _0x2a20e6.map((_0x292649) => ({
-      value: _0x292649,
-      label: _0x292649 + 's',
-      displayLabel: _0x292649 + 'S',
+    defaultValue: defaultValue3,
+    options: options3.map((value4) => ({
+      value: value4,
+      label: value4 + 's',
+      displayLabel: value4 + 'S',
     })),
   });
 }
-function withResolutionPlacement(_0x2e985f) {
-  return Object.freeze({ ..._0x2e985f, placement: 'resolution' });
+function withResolutionPlacement(args2) {
+  return Object.freeze({ ...args2, placement: 'resolution' });
 }
-function createFooterDurationField(_0x2b2e7c = {}) {
-  return withResolutionPlacement(createDurationField(_0x2b2e7c));
+function createFooterDurationField(options4 = {}) {
+  return withResolutionPlacement(createDurationField(options4));
 }
-function createFooterDurationSliderOptionsField(_0x795d18 = {}) {
-  return withResolutionPlacement(createDurationSliderOptionsField(_0x795d18));
+function createFooterDurationSliderOptionsField(options5 = {}) {
+  return withResolutionPlacement(createDurationSliderOptionsField(options5));
 }
 function createResolutionField({
   label: label = VIDEO_RESOLUTION_FIELD.label,
@@ -1750,9 +1744,9 @@ function createAspectRatioField({
     options: Object.freeze(withAdaptiveRatioOption(options).map(freezeOption)),
   });
 }
-function createVideoMenuExtension(_0x37d9cc, _0x1ae2ea = '') {
+function createVideoMenuExtension(order, subtitle = '') {
   return Object.freeze({
-    videoMenu: Object.freeze({ role: 'apimartModel', order: _0x37d9cc, subtitle: _0x1ae2ea }),
+    videoMenu: Object.freeze({ role: 'apimartModel', order: order, subtitle: subtitle }),
   });
 }
 function createVideoInputSlots({
@@ -1764,36 +1758,36 @@ function createVideoInputSlots({
   exclusiveGroups: exclusiveGroups = null,
   cycleFixedInputWhenFull: cycleFixedInputWhenFull = false,
 } = {}) {
-  const _0x36046d = ['text'],
-    _0x3b5a6b = {};
-  image > 0 && (_0x36046d.push('image'), (_0x3b5a6b.image = image));
-  video > 0 && (_0x36046d.push('video'), (_0x3b5a6b.video = video));
-  audio > 0 && (_0x36046d.push('audio'), (_0x3b5a6b.audio = audio));
-  const _0x4f0518 = {
-    allowedKinds: Object.freeze(_0x36046d),
+  const list6 = ['text'],
+    target = {};
+  image > 0 && (list6.push('image'), (target.image = image));
+  video > 0 && (list6.push('video'), (target.video = video));
+  audio > 0 && (list6.push('audio'), (target.audio = audio));
+  const source = {
+    allowedKinds: Object.freeze(list6),
     minByKind: Object.freeze({ text: 0, ...(minImage > 0 ? { image: minImage } : {}) }),
-    maxByKind: Object.freeze(_0x3b5a6b),
+    maxByKind: Object.freeze(target),
   };
   return (
     Array.isArray(fixedSlots) &&
       fixedSlots.length > 0 &&
-      (_0x4f0518.fixedSlots = Object.freeze(fixedSlots.map((_0x44995b) => Object.freeze({ ..._0x44995b })))),
+      (source.fixedSlots = Object.freeze(fixedSlots.map((args3) => Object.freeze({ ...args3 })))),
     Array.isArray(exclusiveGroups) &&
       exclusiveGroups.length > 0 &&
-      (_0x4f0518.exclusiveGroups = Object.freeze(
-        exclusiveGroups.map((_0xdd9462) =>
+      (source.exclusiveGroups = Object.freeze(
+        exclusiveGroups.map((args4) =>
           Object.freeze({
-            ..._0xdd9462,
+            ...args4,
             slots: Object.freeze(
-              (Array.isArray(_0xdd9462?.slots) ? _0xdd9462.slots : [])
-                .map((_0x37088d) => String(_0x37088d || '').trim())
+              (Array.isArray(args4?.slots) ? args4.slots : [])
+                .map((item4) => String(item4 || '').trim())
                 .filter(Boolean),
             ),
           }),
         ),
       )),
-    cycleFixedInputWhenFull === true && (_0x4f0518.cycleFixedInputWhenFull = true),
-    Object.freeze(_0x4f0518)
+    cycleFixedInputWhenFull === true && (source.cycleFixedInputWhenFull = true),
+    Object.freeze(source)
   );
 }
 const VIDEO_SIZE_RATIO_POLICY = Object.freeze({ capability: 'size' }),
@@ -1805,12 +1799,12 @@ const VIDEO_SIZE_RATIO_POLICY = Object.freeze({ capability: 'size' }),
     ...SEEDANCE_VIDEO_RATIO_POLICY,
     preserveAdaptive: true,
   });
-function freezeBodyMapping(_0x4b2d72) {
+function freezeBodyMapping(list7) {
   return Object.freeze(
-    _0x4b2d72.map((_0x52df84) =>
+    list7.map((args5) =>
       Object.freeze({
-        ..._0x52df84,
-        ...(Array.isArray(_0x52df84.field) ? { field: Object.freeze(_0x52df84.field) } : {}),
+        ...args5,
+        ...(Array.isArray(args5.field) ? { field: Object.freeze(args5.field) } : {}),
       }),
     ),
   );
@@ -1819,8 +1813,8 @@ const APIMART_VIDEO_BASE_BODY_MAPPING = Object.freeze([
   Object.freeze({ path: 'model', from: 'model' }),
   Object.freeze({ path: 'prompt', from: 'prompt' }),
 ]);
-function createApimartVideoBodyMapping(_0x5384f2 = []) {
-  return freezeBodyMapping([...APIMART_VIDEO_BASE_BODY_MAPPING, ..._0x5384f2]);
+function createApimartVideoBodyMapping(args6 = []) {
+  return freezeBodyMapping([...APIMART_VIDEO_BASE_BODY_MAPPING, ...args6]);
 }
 const APIMART_VIDEO_LEGACY_BODY_MAPPING = Object.freeze([
     Object.freeze({ path: 'model', from: 'model' }),
@@ -2781,13 +2775,13 @@ const APIMART_VIDEO_LEGACY_BODY_MAPPING = Object.freeze([
     maxRoleImageCount: 2,
     maxImageCount: 1,
   });
-function createSeedanceVideoExecutionExtensions(_0x4d1488) {
-  return Object.freeze({ ...APIMART_SEEDANCE_VIDEO_RESOLVERS, seedanceVideo: _0x4d1488 });
+function createSeedanceVideoExecutionExtensions(seedanceVideo) {
+  return Object.freeze({ ...APIMART_SEEDANCE_VIDEO_RESOLVERS, seedanceVideo: seedanceVideo });
 }
-function createVolcengineSeedanceVideoExecutionExtensions(_0x1b6fd1) {
+function createVolcengineSeedanceVideoExecutionExtensions(seedanceVideo2) {
   return Object.freeze({
     ...VOLCENGINE_SEEDANCE_VIDEO_RESOLVERS,
-    seedanceVideo: _0x1b6fd1,
+    seedanceVideo: seedanceVideo2,
     imageInputUpload: VOLCENGINE_SEEDANCE_IMAGE_INPUT_UPLOAD_POLICY,
     videoInputUpload: VOLCENGINE_SEEDANCE_VIDEO_INPUT_UPLOAD_POLICY,
     audioInputUpload: VOLCENGINE_SEEDANCE_AUDIO_INPUT_UPLOAD_POLICY,
@@ -2847,13 +2841,13 @@ const APIMART_SEEDANCE_DEFAULT_TASK_TYPES = Object.freeze([
     APIMART_SEEDANCE_RATIO_FIELD,
     createFooterDurationField(),
   ]);
-function freezeFields(_0x710d7b) {
-  return Object.freeze(_0x710d7b.map((_0x120bba) => Object.freeze(_0x120bba)));
+function freezeFields(list8) {
+  return Object.freeze(list8.map((item5) => Object.freeze(item5)));
 }
 function createVideoModelApiManifest({
-  modelId: _0x1793db,
-  executionId: _0x3476c7,
-  displayName: _0x1070e5,
+  modelId: modelId,
+  executionId: executionId,
+  displayName: displayName,
   provider: provider = 'apimart',
   aliases: aliases = null,
   icon: icon = 'AM',
@@ -2866,25 +2860,26 @@ function createVideoModelApiManifest({
   help: help = null,
   footerPlacementOrder: footerPlacementOrder = APIMART_VIDEO_FOOTER_PLACEMENT_ORDER,
 }) {
-  const _0x453787 = Array.isArray(footerPlacementOrder)
-      ? footerPlacementOrder.map((_0x39e2c7) => String(_0x39e2c7 || '').trim()).filter(Boolean)
+  const list9 = Array.isArray(footerPlacementOrder)
+      ? footerPlacementOrder.map((item6) => String(item6 || '').trim()).filter(Boolean)
       : [],
-    _0x45c8eb = {
+    next = {
       schemaVersion: '1.0',
-      modelId: _0x1793db,
+      modelId: modelId,
       ...(Array.isArray(aliases) ? { aliases: aliases } : {}),
       provider: provider,
       kind: 'video',
       adapterType: 'modelApi',
-      executionId: _0x3476c7,
-      displayName: _0x1070e5,
+      executionId: executionId,
+      displayName: displayName,
       icon: icon,
       description:
-        description || (provider === 'apimart' ? 'APIMart video model API' : _0x1070e5 + ' video model API'),
+        description ||
+        (provider === 'apimart' ? 'APIMart video model API' : displayName + ' video model API'),
       inputSlots: inputSlots,
       uiSchema: Object.freeze({
         fields: freezeFields(fields),
-        ...(_0x453787.length ? { footerPlacementOrder: Object.freeze(_0x453787) } : {}),
+        ...(list9.length ? { footerPlacementOrder: Object.freeze(list9) } : {}),
       }),
       ...(prompt && typeof prompt === 'object' ? { prompt: Object.freeze(prompt) } : {}),
       ...(help && typeof help === 'object' ? { help: Object.freeze(help) } : {}),
@@ -2896,13 +2891,13 @@ function createVideoModelApiManifest({
   return (
     extensions &&
       typeof extensions === 'object' &&
-      (_0x45c8eb.extensions = Object.freeze({ ratioPolicy: ratioPolicy, ...extensions })),
-    Object.freeze(_0x45c8eb)
+      (next.extensions = Object.freeze({ ratioPolicy: ratioPolicy, ...extensions })),
+    Object.freeze(next)
   );
 }
 function createVideoExecutionManifest({
-  id: _0x5d74f1,
-  model: _0x2e87ba,
+  id: id8,
+  model: model,
   provider: provider = 'apimart',
   endpoint: endpoint = '/v1/videos/generations',
   endpointMode: endpointMode = 'video-generation',
@@ -2914,22 +2909,22 @@ function createVideoExecutionManifest({
   resultTaskIdPath: resultTaskIdPath = 'task_id',
   resultUrlFields: resultUrlFields = Object.freeze(['videoUrl', 'video_url', 'url']),
 }) {
-  const _0x226420 = Object.freeze({
+  const extensions2 = Object.freeze({
     ...(taskPolling ? { taskPolling: taskPolling } : {}),
     ...(extensions && typeof extensions === 'object' ? extensions : {}),
   });
   return Object.freeze({
     schemaVersion: '1.0',
-    id: _0x5d74f1,
+    id: id8,
     provider: provider,
     kind: 'video',
     adapterType: 'modelApi',
     endpoint: endpoint,
     endpointMode: endpointMode,
     method: 'POST',
-    model: _0x2e87ba,
+    model: model,
     ...(modeModels ? { modeModels: Object.freeze(modeModels) } : {}),
-    extensions: _0x226420,
+    extensions: extensions2,
     headers: Object.freeze({ 'Content-Type': 'application/json' }),
     bodyMapping: bodyMapping,
     responseMapping: responseMapping,
@@ -4501,7 +4496,7 @@ const APIMART_VIDEO_MODELS = Object.freeze([
   AGNES_VIDEO_DURATION_VALUES = Object.freeze([
     ...Array.from(
       { length: Math.floor(AGNES_VIDEO_MAX_SECONDS) - AGNES_VIDEO_MIN_SECONDS + 1 },
-      (_0x18910d, _0x178765) => AGNES_VIDEO_MIN_SECONDS + _0x178765,
+      (current, entry) => AGNES_VIDEO_MIN_SECONDS + entry,
     ),
     ...(Number.isInteger(AGNES_VIDEO_MAX_SECONDS) ? [] : [AGNES_VIDEO_MAX_SECONDS]),
   ]),
@@ -4754,55 +4749,55 @@ const APIMART_VIDEO_MODELS = Object.freeze([
     ...VOLCENGINE_VIDEO_MODELS,
     ...AGNES_VIDEO_MODELS,
   ]);
-function isSeedanceVideoManifest(_0x57b27b) {
+function isSeedanceVideoManifest(record) {
   return (
-    _0x57b27b?.endpointMode === 'seedance-video-generation' ||
-    _0x57b27b?.executionExtensions?.bodyResolver === 'volcengineSeedance2Video'
+    record?.endpointMode === 'seedance-video-generation' ||
+    record?.executionExtensions?.bodyResolver === 'volcengineSeedance2Video'
   );
 }
-function getVideoManifestRatioPolicy(_0x44ab51) {
-  if (_0x44ab51?.ratioPolicy) return _0x44ab51.ratioPolicy;
-  return isSeedanceVideoManifest(_0x44ab51) ? SEEDANCE_VIDEO_RATIO_POLICY : VIDEO_SIZE_RATIO_POLICY;
+function getVideoManifestRatioPolicy(payload) {
+  if (payload?.ratioPolicy) return payload.ratioPolicy;
+  return isSeedanceVideoManifest(payload) ? SEEDANCE_VIDEO_RATIO_POLICY : VIDEO_SIZE_RATIO_POLICY;
 }
 export const vendorVideoModelApiModelManifests = Object.freeze(
-  VENDOR_VIDEO_MODELS.map((_0x4931db) =>
+  VENDOR_VIDEO_MODELS.map((modelId2) =>
     createVideoModelApiManifest({
-      modelId: _0x4931db.modelId,
-      executionId: _0x4931db.executionId,
-      displayName: _0x4931db.displayName,
-      provider: _0x4931db.provider || 'apimart',
-      aliases: _0x4931db.aliases,
-      icon: _0x4931db.icon || 'AM',
-      description: _0x4931db.description,
-      fields: _0x4931db.fields,
-      inputSlots: _0x4931db.inputSlots,
-      prompt: _0x4931db.prompt,
-      help: _0x4931db.help,
-      footerPlacementOrder: _0x4931db.footerPlacementOrder,
+      modelId: modelId2.modelId,
+      executionId: modelId2.executionId,
+      displayName: modelId2.displayName,
+      provider: modelId2.provider || 'apimart',
+      aliases: modelId2.aliases,
+      icon: modelId2.icon || 'AM',
+      description: modelId2.description,
+      fields: modelId2.fields,
+      inputSlots: modelId2.inputSlots,
+      prompt: modelId2.prompt,
+      help: modelId2.help,
+      footerPlacementOrder: modelId2.footerPlacementOrder,
       extensions: Object.freeze({
-        ...(_0x4931db.extensions || {}),
-        ratioPolicy: getVideoManifestRatioPolicy(_0x4931db),
+        ...(modelId2.extensions || {}),
+        ratioPolicy: getVideoManifestRatioPolicy(modelId2),
       }),
-      ratioPolicy: getVideoManifestRatioPolicy(_0x4931db),
+      ratioPolicy: getVideoManifestRatioPolicy(modelId2),
     }),
   ),
 );
 export const vendorVideoModelApiExecutionManifests = Object.freeze(
-  VENDOR_VIDEO_MODELS.map((_0x3a850d) =>
+  VENDOR_VIDEO_MODELS.map((id9) =>
     createVideoExecutionManifest({
-      id: _0x3a850d.executionId,
-      model: _0x3a850d.model,
-      provider: _0x3a850d.provider || 'apimart',
-      endpoint: _0x3a850d.endpoint || '/v1/videos/generations',
-      endpointMode: _0x3a850d.endpointMode,
-      extensions: _0x3a850d.executionExtensions,
-      bodyMapping: _0x3a850d.bodyMapping,
-      modeModels: _0x3a850d.modeModels,
-      responseMapping: _0x3a850d.responseMapping || APIMART_VIDEO_RESPONSE_MAPPING,
-      taskPolling: Object.prototype.hasOwnProperty.call(_0x3a850d, 'taskPolling')
-        ? _0x3a850d.taskPolling
+      id: id9.executionId,
+      model: id9.model,
+      provider: id9.provider || 'apimart',
+      endpoint: id9.endpoint || '/v1/videos/generations',
+      endpointMode: id9.endpointMode,
+      extensions: id9.executionExtensions,
+      bodyMapping: id9.bodyMapping,
+      modeModels: id9.modeModels,
+      responseMapping: id9.responseMapping || APIMART_VIDEO_RESPONSE_MAPPING,
+      taskPolling: Object.prototype.hasOwnProperty.call(id9, 'taskPolling')
+        ? id9.taskPolling
         : APIMART_VIDEO_TASK_POLLING,
-      resultTaskIdPath: _0x3a850d.resultTaskIdPath || 'task_id',
+      resultTaskIdPath: id9.resultTaskIdPath || 'task_id',
     }),
   ),
 );

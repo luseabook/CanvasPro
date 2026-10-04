@@ -64,96 +64,96 @@ const POINTER_TOOL_ICON =
   BOX_SELECT_TOOL_ICON =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8v6H8z" stroke-dasharray="2 2"/></svg>',
   PANORAMA_360_IMAGE_SOURCE_TYPES = new Set(['source-image', 'ai-image', 'image']);
-function panoramaSceneText(_0x260c71, _0x2ed816 = {}) {
-  return t('panoramaSceneNode.' + _0x260c71, _0x2ed816);
+function panoramaSceneText(value, item = {}) {
+  return t('panoramaSceneNode.' + value, item);
 }
-function isPanorama360ImageSourceType(_0x4a2720) {
-  return PANORAMA_360_IMAGE_SOURCE_TYPES.has(String(_0x4a2720 || '').trim());
+function isPanorama360ImageSourceType(key) {
+  return PANORAMA_360_IMAGE_SOURCE_TYPES.has(String(key || '').trim());
 }
-function createElementFromHtml(_0xf5e832) {
-  const _0x4ea919 = document.createElement('template');
-  return ((_0x4ea919.innerHTML = _0xf5e832.trim()), _0x4ea919.content.firstElementChild);
+function createElementFromHtml(index) {
+  const el = document.createElement('template');
+  return ((el.innerHTML = index.trim()), el.content.firstElementChild);
 }
-function attachUiStop(_0x160525, { wheel: wheel = false } = {}) {
-  if (!_0x160525) return;
-  ((_0x160525.dataset.uiStop = '1'),
-    _0x160525.addEventListener('pointerdown', (_0x4f32cc) => _0x4f32cc.stopPropagation()),
+function attachUiStop(el2, { wheel: wheel = false } = {}) {
+  if (!el2) return;
+  ((el2.dataset.uiStop = '1'),
+    el2.addEventListener('pointerdown', (event) => event.stopPropagation()),
     wheel &&
-      _0x160525.addEventListener(
+      el2.addEventListener(
         'wheel',
-        (_0x505112) => {
-          _0x505112.stopPropagation();
+        (event2) => {
+          event2.stopPropagation();
         },
         { passive: false },
       ));
 }
-function getShortcutLabel(_0x58ac24) {
-  const _0x40ef34 = getShortcuts()?.[_0x58ac24],
-    _0x3fa6c5 = Array.isArray(_0x40ef34?.keys) ? _0x40ef34.keys.filter(Boolean) : [];
-  return _0x3fa6c5.length > 0 ? '[' + _0x3fa6c5.join('+') + ']' : '';
+function getShortcutLabel(result) {
+  const map = getShortcuts()?.[result],
+    list = Array.isArray(map?.keys) ? map.keys.filter(Boolean) : [];
+  return list.length > 0 ? '[' + list.join('+') + ']' : '';
 }
-function buildTooltipText(_0x487535, _0x3dd5da) {
-  const _0x14ba69 = getShortcutLabel(_0x3dd5da);
-  return _0x14ba69 ? _0x487535 + ' ' + _0x14ba69 : _0x487535;
+function buildTooltipText(data, options) {
+  const shortcutLabel = getShortcutLabel(options);
+  return shortcutLabel ? data + ' ' + shortcutLabel : data;
 }
-function normalizeCameraSlot(_0x1bb732) {
-  const _0x25529c = Number(_0x1bb732);
-  if (!Number.isInteger(_0x25529c)) return null;
-  if (_0x25529c < 1 || _0x25529c > 10) return null;
-  return _0x25529c;
+function normalizeCameraSlot(target) {
+  const count = Number(target);
+  if (!Number.isInteger(count)) return null;
+  if (count < 1 || count > 10) return null;
+  return count;
 }
-function resolveCameraSlotEntries(_0x58b503 = []) {
-  const _0x3f66aa = Array.isArray(_0x58b503) ? _0x58b503 : [],
-    _0x255eb5 = new Set(),
-    _0x350fdb = [];
+function resolveCameraSlotEntries(list2 = []) {
+  const list3 = Array.isArray(list2) ? list2 : [],
+    map2 = new Set(),
+    list4 = [];
   return (
-    _0x3f66aa.forEach((_0x70f70d) => {
-      const _0x5991d0 = normalizeCameraSlot(_0x70f70d?.slot);
-      if (!_0x5991d0 || _0x255eb5.has(_0x5991d0)) return;
-      (_0x255eb5.add(_0x5991d0), _0x350fdb.push({ camera: _0x70f70d, slot: _0x5991d0 }));
+    list3.forEach((camera) => {
+      const slot = normalizeCameraSlot(camera?.slot);
+      if (!slot || map2.has(slot)) return;
+      (map2.add(slot), list4.push({ camera: camera, slot: slot }));
     }),
-    _0x3f66aa.forEach((_0x1338d8) => {
-      if (_0x350fdb.some((_0xabfd34) => _0xabfd34.camera?.id === _0x1338d8?.id)) return;
-      for (let _0x2acf14 = 1; _0x2acf14 <= 10; _0x2acf14 += 1) {
-        if (_0x255eb5.has(_0x2acf14)) continue;
-        (_0x255eb5.add(_0x2acf14), _0x350fdb.push({ camera: _0x1338d8, slot: _0x2acf14 }));
+    list3.forEach((camera2) => {
+      if (list4.some((item2) => item2.camera?.id === camera2?.id)) return;
+      for (let slot2 = 1; slot2 <= 10; slot2 += 1) {
+        if (map2.has(slot2)) continue;
+        (map2.add(slot2), list4.push({ camera: camera2, slot: slot2 }));
         break;
       }
     }),
-    _0x350fdb.sort((_0x52ab00, _0x70c26f) => _0x52ab00.slot - _0x70c26f.slot)
+    list4.sort((item3, source) => item3.slot - source.slot)
   );
 }
-function lerp(_0x15e7fc, _0x5b2579, _0x1121d6) {
-  return _0x15e7fc + (_0x5b2579 - _0x15e7fc) * _0x1121d6;
+function lerp(next, current, entry) {
+  return next + (current - next) * entry;
 }
-function smootherstep(_0x370905) {
-  const _0x556898 = Math.max(0, Math.min(1, Number(_0x370905) || 0));
-  return _0x556898 * _0x556898 * _0x556898 * (_0x556898 * (_0x556898 * 6 - 15) + 10);
+function smootherstep(record) {
+  const payload = Math.max(0, Math.min(1, Number(record) || 0));
+  return payload * payload * payload * (payload * (payload * 6 - 15) + 10);
 }
-function interpolateVector3(_0x334e27, _0x3be61a, _0x4d64b7) {
+function interpolateVector3(box, box2, handle) {
   return {
-    x: lerp(Number(_0x334e27?.x) || 0, Number(_0x3be61a?.x) || 0, _0x4d64b7),
-    y: lerp(Number(_0x334e27?.y) || 0, Number(_0x3be61a?.y) || 0, _0x4d64b7),
-    z: lerp(Number(_0x334e27?.z) || 0, Number(_0x3be61a?.z) || 0, _0x4d64b7),
+    x: lerp(Number(box?.x) || 0, Number(box2?.x) || 0, handle),
+    y: lerp(Number(box?.y) || 0, Number(box2?.y) || 0, handle),
+    z: lerp(Number(box?.z) || 0, Number(box2?.z) || 0, handle),
   };
 }
-function cloneVector3(_0x143d5b) {
-  return interpolateVector3(_0x143d5b, _0x143d5b, 1);
+function cloneVector3(state) {
+  return interpolateVector3(state, state, 1);
 }
-function quaternionToRotation(_0x2bcfac) {
-  const _0x237a77 = _0x2bcfac?.clone?.() || new threeRuntime['Quaternion'](),
-    _0x52d8a2 = new threeRuntime['Euler'](0, 0, 0, 'YXZ').setFromQuaternion(_0x237a77, 'YXZ');
-  return { x: _0x52d8a2.x, y: _0x52d8a2.y, z: _0x52d8a2.z };
+function quaternionToRotation(config) {
+  const scope = config?.clone?.() || new threeRuntime['Quaternion'](),
+    x2 = new threeRuntime['Euler'](0, 0, 0, 'YXZ').setFromQuaternion(scope, 'YXZ');
+  return { x: x2.x, y: x2.y, z: x2.z };
 }
-function areSceneViewsEquivalent(_0x3bbe9b, _0xce05e6, _0x205169 = 0.00001) {
-  if (!_0x3bbe9b || !_0xce05e6) return false;
+function areSceneViewsEquivalent(event3, event4, input = 0.00001) {
+  if (!event3 || !event4) return false;
   return (
-    Math.abs((Number(_0x3bbe9b?.target?.x) || 0) - (Number(_0xce05e6?.target?.x) || 0)) <= _0x205169 &&
-    Math.abs((Number(_0x3bbe9b?.target?.y) || 0) - (Number(_0xce05e6?.target?.y) || 0)) <= _0x205169 &&
-    Math.abs((Number(_0x3bbe9b?.target?.z) || 0) - (Number(_0xce05e6?.target?.z) || 0)) <= _0x205169 &&
-    Math.abs((Number(_0x3bbe9b?.orbitYaw) || 0) - (Number(_0xce05e6?.orbitYaw) || 0)) <= _0x205169 &&
-    Math.abs((Number(_0x3bbe9b?.orbitPitch) || 0) - (Number(_0xce05e6?.orbitPitch) || 0)) <= _0x205169 &&
-    Math.abs((Number(_0x3bbe9b?.orbitDistance) || 0) - (Number(_0xce05e6?.orbitDistance) || 0)) <= _0x205169
+    Math.abs((Number(event3?.target?.x) || 0) - (Number(event4?.target?.x) || 0)) <= input &&
+    Math.abs((Number(event3?.target?.y) || 0) - (Number(event4?.target?.y) || 0)) <= input &&
+    Math.abs((Number(event3?.target?.z) || 0) - (Number(event4?.target?.z) || 0)) <= input &&
+    Math.abs((Number(event3?.orbitYaw) || 0) - (Number(event4?.orbitYaw) || 0)) <= input &&
+    Math.abs((Number(event3?.orbitPitch) || 0) - (Number(event4?.orbitPitch) || 0)) <= input &&
+    Math.abs((Number(event3?.orbitDistance) || 0) - (Number(event4?.orbitDistance) || 0)) <= input
   );
 }
 const PANORAMA_CAPTURE_MODE_OPTIONS = [
@@ -161,123 +161,121 @@ const PANORAMA_CAPTURE_MODE_OPTIONS = [
   { key: '9:16', labelKey: 'vertical', ratio: 9 / 16, iconClass: 'is-9-16' },
   { key: '2.35:1', labelKey: 'cinema', ratio: 2.35, iconClass: 'is-2-35-1' },
 ];
-function normalizeCaptureMode(_0x3d14eb) {
-  return PANORAMA_CAPTURE_MODE_OPTIONS.some((_0xf3adf1) => _0xf3adf1.key === _0x3d14eb)
-    ? _0x3d14eb
-    : 'adaptive';
+function normalizeCaptureMode(output) {
+  return PANORAMA_CAPTURE_MODE_OPTIONS.some((event5) => event5.key === output) ? output : 'adaptive';
 }
-function getCaptureModeMeta(_0xc04fe5) {
-  const _0x577099 = normalizeCaptureMode(_0xc04fe5);
+function getCaptureModeMeta(value2) {
+  const captureMode = normalizeCaptureMode(value2);
   return (
-    PANORAMA_CAPTURE_MODE_OPTIONS.find((_0x2f5dce) => _0x2f5dce.key === _0x577099) ||
+    PANORAMA_CAPTURE_MODE_OPTIONS.find((event6) => event6.key === captureMode) ||
     PANORAMA_CAPTURE_MODE_OPTIONS[0]
   );
 }
-function getCaptureModeLabel(_0x373191) {
-  const _0x12db34 = typeof _0x373191 === 'string' ? getCaptureModeMeta(_0x373191) : _0x373191,
-    _0x1ebeef = String(_0x12db34?.labelKey || '').trim();
-  return _0x1ebeef ? panoramaSceneText('capture.modes.' + _0x1ebeef) : String(_0x12db34?.key || '');
+function getCaptureModeLabel(value3) {
+  const event7 = typeof value3 === 'string' ? getCaptureModeMeta(value3) : value3,
+    value4 = String(event7?.labelKey || '').trim();
+  return value4 ? panoramaSceneText('capture.modes.' + value4) : String(event7?.key || '');
 }
-function computeCaptureFrameRect(_0x19c8d1, _0x4a2d15, _0x126a62) {
-  const _0x4ff0c1 = Math.max(0, Number(_0x19c8d1) || 0),
-    _0x505e62 = Math.max(0, Number(_0x4a2d15) || 0);
-  if (_0x4ff0c1 <= 0 || _0x505e62 <= 0) return { x: 0, y: 0, width: 0, height: 0 };
-  const _0x509187 = normalizeCaptureMode(_0x126a62);
-  if (_0x509187 === 'adaptive') return { x: 0, y: 0, width: _0x4ff0c1, height: _0x505e62 };
-  const _0xa0e4c6 = getCaptureModeMeta(_0x509187).ratio;
-  if (!(_0xa0e4c6 > 0)) return { x: 0, y: 0, width: _0x4ff0c1, height: _0x505e62 };
-  const _0x3a5786 = _0x4ff0c1 / _0x505e62;
-  if (_0x3a5786 >= _0xa0e4c6) {
-    const _0x5a099d = _0x505e62 * _0xa0e4c6;
-    return { x: (_0x4ff0c1 - _0x5a099d) / 2, y: 0, width: _0x5a099d, height: _0x505e62 };
+function computeCaptureFrameRect(value5, value6, value7) {
+  const width = Math.max(0, Number(value5) || 0),
+    height = Math.max(0, Number(value6) || 0);
+  if (width <= 0 || height <= 0) return { x: 0, y: 0, width: 0, height: 0 };
+  const captureMode2 = normalizeCaptureMode(value7);
+  if (captureMode2 === 'adaptive') return { x: 0, y: 0, width: width, height: height };
+  const captureModeMeta = getCaptureModeMeta(captureMode2).ratio;
+  if (!(captureModeMeta > 0)) return { x: 0, y: 0, width: width, height: height };
+  const value8 = width / height;
+  if (value8 >= captureModeMeta) {
+    const width2 = height * captureModeMeta;
+    return { x: (width - width2) / 2, y: 0, width: width2, height: height };
   }
-  const _0x258b98 = _0x4ff0c1 / _0xa0e4c6;
-  return { x: 0, y: (_0x505e62 - _0x258b98) / 2, width: _0x4ff0c1, height: _0x258b98 };
+  const height2 = width / captureModeMeta;
+  return { x: 0, y: (height - height2) / 2, width: width, height: height2 };
 }
-export function resolveNextPanoramaMouseTool(_0x3eb601) {
-  return String(_0x3eb601 || '').trim() === 'box-select' ? 'navigate' : 'box-select';
+export function resolveNextPanoramaMouseTool(value9) {
+  return String(value9 || '').trim() === 'box-select' ? 'navigate' : 'box-select';
 }
-function resolvePanoramaSceneHistoryShortcutAction(_0x2e8ee1) {
-  const _0x3ff1b6 = _0x2e8ee1?.ctrlKey === true || _0x2e8ee1?.metaKey === true;
-  if (!_0x3ff1b6 || _0x2e8ee1?.altKey === true) return null;
-  const _0x1a6286 = String(_0x2e8ee1?.key || '')
+function resolvePanoramaSceneHistoryShortcutAction(event8) {
+  const enabled = event8?.ctrlKey === true || event8?.metaKey === true;
+  if (!enabled || event8?.altKey === true) return null;
+  const value10 = String(event8?.key || '')
     .trim()
     .toLowerCase();
-  if (_0x1a6286 === 'z') return _0x2e8ee1?.shiftKey === true ? 'redo' : 'undo';
+  if (value10 === 'z') return event8?.shiftKey === true ? 'redo' : 'undo';
   return null;
 }
-async function decodeImageBlob(_0x24df26) {
-  if (typeof createImageBitmap === 'function') return createImageBitmap(_0x24df26);
-  const _0x3ffb28 = await new Promise((_0x368866, _0x1d68d0) => {
-    const _0x1f8f7e = URL.createObjectURL(_0x24df26),
-      _0x28e7e6 = new Image();
-    ((_0x28e7e6.onload = () => {
-      (URL.revokeObjectURL(_0x1f8f7e), _0x368866(_0x28e7e6));
+async function decodeImageBlob(value11) {
+  if (typeof createImageBitmap === 'function') return createImageBitmap(value11);
+  const value12 = await new Promise((handler, handler2) => {
+    const value13 = URL.createObjectURL(value11),
+      image = new Image();
+    ((image.onload = () => {
+      (URL.revokeObjectURL(value13), handler(image));
     }),
-      (_0x28e7e6.onerror = (_0x1f92a1) => {
-        (URL.revokeObjectURL(_0x1f8f7e), _0x1d68d0(_0x1f92a1));
+      (image.onerror = (value14) => {
+        (URL.revokeObjectURL(value13), handler2(value14));
       }),
-      (_0x28e7e6.src = _0x1f8f7e));
+      (image.src = value13));
   });
-  return _0x3ffb28;
+  return value12;
 }
-function closeDecodedImage(_0xcfd089) {
-  _0xcfd089 && typeof _0xcfd089.close === 'function' && _0xcfd089.close();
+function closeDecodedImage(value15) {
+  value15 && typeof value15.close === 'function' && value15.close();
 }
-async function canvasToPngBlob(_0x2e6d6c) {
-  return new Promise((_0x3ee0f6, _0x295118) => {
-    _0x2e6d6c.toBlob((_0x4e710d) => {
-      if (_0x4e710d) {
-        _0x3ee0f6(_0x4e710d);
+async function canvasToPngBlob(value16) {
+  return new Promise((handler3, handler4) => {
+    value16.toBlob((value17) => {
+      if (value17) {
+        handler3(value17);
         return;
       }
-      _0x295118(new Error(panoramaSceneText('errors.captureCropFailed')));
+      handler4(new Error(panoramaSceneText('errors.captureCropFailed')));
     }, 'image/png');
   });
 }
 async function cropCaptureBlobToFrame({
-  blob: _0x4d15ff,
-  viewportWidth: _0x57cf61,
-  viewportHeight: _0x3b50d9,
-  mode: _0x54c5bc,
+  blob: blob,
+  viewportWidth: viewportWidth,
+  viewportHeight: viewportHeight,
+  mode: mode,
 }) {
-  if (!(_0x4d15ff instanceof Blob)) return null;
-  const _0x21e437 = normalizeCaptureMode(_0x54c5bc);
-  if (_0x21e437 === 'adaptive') return _0x4d15ff;
-  const _0x4d439f = computeCaptureFrameRect(_0x57cf61, _0x3b50d9, _0x21e437);
-  if (_0x4d439f.width <= 0 || _0x4d439f.height <= 0) return _0x4d15ff;
-  const _0x113046 = await decodeImageBlob(_0x4d15ff);
+  if (!(blob instanceof Blob)) return null;
+  const captureMode3 = normalizeCaptureMode(mode);
+  if (captureMode3 === 'adaptive') return blob;
+  const box3 = computeCaptureFrameRect(viewportWidth, viewportHeight, captureMode3);
+  if (box3.width <= 0 || box3.height <= 0) return blob;
+  const box4 = await decodeImageBlob(blob);
   try {
-    const _0x2940c6 = Number(_0x113046.width) || Number(_0x113046.videoWidth) || 0,
-      _0x913b44 = Number(_0x113046.height) || Number(_0x113046.videoHeight) || 0;
-    if (_0x2940c6 <= 0 || _0x913b44 <= 0) return _0x4d15ff;
-    const _0x5e3028 = _0x2940c6 / Math.max(1, _0x57cf61),
-      _0x2e554d = _0x913b44 / Math.max(1, _0x3b50d9),
-      _0x2cafac = Math.max(0, Math.round(_0x4d439f.x * _0x5e3028)),
-      _0x5e00b9 = Math.max(0, Math.round(_0x4d439f.y * _0x2e554d)),
-      _0x10ac14 = Math.min(_0x2940c6 - _0x2cafac, Math.max(1, Math.round(_0x4d439f.width * _0x5e3028))),
-      _0x1b36b0 = Math.min(_0x913b44 - _0x5e00b9, Math.max(1, Math.round(_0x4d439f.height * _0x2e554d))),
-      _0x19a99f = document.createElement('canvas');
-    ((_0x19a99f.width = _0x10ac14), (_0x19a99f.height = _0x1b36b0));
-    const _0x20765e = _0x19a99f.getContext('2d');
-    if (!_0x20765e) throw new Error(panoramaSceneText('errors.captureCropFailed'));
+    const count2 = Number(box4.width) || Number(box4.videoWidth) || 0,
+      count3 = Number(box4.height) || Number(box4.videoHeight) || 0;
+    if (count2 <= 0 || count3 <= 0) return blob;
+    const value18 = count2 / Math.max(1, viewportWidth),
+      value19 = count3 / Math.max(1, viewportHeight),
+      value20 = Math.max(0, Math.round(box3.x * value18)),
+      value21 = Math.max(0, Math.round(box3.y * value19)),
+      value22 = Math.min(count2 - value20, Math.max(1, Math.round(box3.width * value18))),
+      value23 = Math.min(count3 - value21, Math.max(1, Math.round(box3.height * value19))),
+      box5 = document.createElement('canvas');
+    ((box5.width = value22), (box5.height = value23));
+    const ctx = box5.getContext('2d');
+    if (!ctx) throw new Error(panoramaSceneText('errors.captureCropFailed'));
     return (
-      _0x20765e.drawImage(_0x113046, _0x2cafac, _0x5e00b9, _0x10ac14, _0x1b36b0, 0, 0, _0x10ac14, _0x1b36b0),
-      canvasToPngBlob(_0x19a99f)
+      ctx.drawImage(box4, value20, value21, value22, value23, 0, 0, value22, value23),
+      canvasToPngBlob(box5)
     );
   } finally {
-    closeDecodedImage(_0x113046);
+    closeDecodedImage(box4);
   }
 }
 export class PanoramaSceneNode {
-  constructor(_0x54dd85) {
-    ((this._data = _0x54dd85),
-      (this.id = _0x54dd85.id),
-      (this._isPanorama360 = String(_0x54dd85?.type || '').trim() === PANORAMA_360_NODE_TYPE),
+  constructor(value24) {
+    ((this._data = value24),
+      (this.id = value24.id),
+      (this._isPanorama360 = String(value24?.type || '').trim() === PANORAMA_360_NODE_TYPE),
       (this.el = document.createElement('div')),
       (this.el.className = 'v2-node-component panorama-scene-component'),
       this.el.classList.toggle('is-panorama-360', this._isPanorama360),
-      (this._sceneState = getPanoramaSceneState(_0x54dd85)),
+      (this._sceneState = getPanoramaSceneState(value24)),
       (this._openMenuKey = null),
       (this._menuHideTimer = null),
       (this._resizeObserver = null),
@@ -347,9 +345,9 @@ export class PanoramaSceneNode {
       (this._sceneToolbarEl = createElementFromHtml(PANORAMA_SCENE_TOOLBAR_HTML)),
       this._sceneToolbarEl.addEventListener('click', this._handleToolbarClick),
       attachUiStop(this._sceneToolbarEl));
-    const _0x1b350e = this._isPanorama360 ? PANORAMA_360_MODE_TOOLBAR_HTML : PANORAMA_SCENE_MODE_TOOLBAR_HTML;
+    const value25 = this._isPanorama360 ? PANORAMA_360_MODE_TOOLBAR_HTML : PANORAMA_SCENE_MODE_TOOLBAR_HTML;
     return (
-      (this._editToolbarEl = createElementFromHtml(_0x1b350e)),
+      (this._editToolbarEl = createElementFromHtml(value25)),
       this._editToolbarEl.addEventListener('click', this._handleToolbarClick),
       attachUiStop(this._editToolbarEl),
       (this._cornerToolbarEl = createElementFromHtml(PANORAMA_SCENE_CORNER_TOOLBAR_HTML)),
@@ -371,23 +369,23 @@ export class PanoramaSceneNode {
       this._cameraListEl.addEventListener('mouseenter', () => this._openMenu('camera')),
       this._cameraListEl.addEventListener('mouseleave', () => this._scheduleMenuHide('camera')),
       (this._mannequinMenuEl = createMannequinQuickMenu({
-        onSelectGender: ({ gender: _0x4452bc }) => {
+        onSelectGender: ({ gender: gender }) => {
           setPanoramaSceneGridPlacement({
             nodeId: this.id,
-            patch: { gender: _0x4452bc === 'female' ? 'female' : 'male' },
+            patch: { gender: gender === 'female' ? 'female' : 'male' },
           });
         },
-        onSelectColor: ({ colorKey: _0x87587c, gender: _0x164820 }) => {
-          const _0x3d3a9c = _0x164820 === 'female' ? 'female' : 'male';
+        onSelectColor: ({ colorKey: colorKey, gender: gender2 }) => {
+          const gender3 = gender2 === 'female' ? 'female' : 'male';
           (this._selectNodeOnCanvas(),
             setPanoramaSceneGridPlacement({
               nodeId: this.id,
-              patch: { colorKey: _0x87587c, gender: _0x3d3a9c },
+              patch: { colorKey: colorKey, gender: gender3 },
             }),
             addPanoramaSceneMannequin({
               nodeId: this.id,
-              gender: _0x3d3a9c,
-              colorKey: _0x87587c,
+              gender: gender3,
+              colorKey: colorKey,
               viewPose: this._bridge?.readCurrentViewPose?.(),
             }),
             this._closeMenus());
@@ -479,8 +477,8 @@ export class PanoramaSceneNode {
       this.el.appendChild(this._fileInput),
       (this._bridge = new PanoramaScene3DBridge({
         container: this._viewportEl,
-        onPanoramaStatusChange: ({ isLoaded: _0x5a33c4, error: _0x164396 }) => {
-          updatePanoramaSceneLoadState({ nodeId: this.id, isLoaded: _0x5a33c4, error: _0x164396 });
+        onPanoramaStatusChange: ({ isLoaded: isLoaded, error: error }) => {
+          updatePanoramaSceneLoadState({ nodeId: this.id, isLoaded: isLoaded, error: error });
         },
       })),
       this._bridge.setDefaultSceneFocalLength?.(this._defaultSceneFocalLength),
@@ -489,70 +487,70 @@ export class PanoramaSceneNode {
         overlayEl: this._overlayEl,
         bridge: this._bridge,
         getSceneState: () => getPanoramaSceneState(appStore.getStateRaw().nodes[this.id]),
-        onViewCommit: (_0x3c59e5) => {
-          applyPanoramaSceneViewCommit({ nodeId: this.id, ..._0x3c59e5 });
+        onViewCommit: (args) => {
+          applyPanoramaSceneViewCommit({ nodeId: this.id, ...args });
         },
-        onObjectCommit: ({ objectType: _0x5da002, objectId: _0x19f6dd, pose: _0x2a8ec8 }) => {
+        onObjectCommit: ({ objectType: objectType, objectId: objectId, pose: pose }) => {
           updatePanoramaSceneObjectTransform({
             nodeId: this.id,
-            objectType: _0x5da002,
-            objectId: _0x19f6dd,
-            pose: _0x2a8ec8,
+            objectType: objectType,
+            objectId: objectId,
+            pose: pose,
           });
         },
-        onSelectionChange: (_0x34f64a, _0x221230) => {
+        onSelectionChange: (objectType2, objectId2) => {
           (this._selectNodeOnCanvas(),
-            setPanoramaSceneSelection({ nodeId: this.id, objectType: _0x34f64a, objectId: _0x221230 }));
+            setPanoramaSceneSelection({ nodeId: this.id, objectType: objectType2, objectId: objectId2 }));
         },
-        onSelectionBatchChange: (_0x2d4313, _0x58c480, _0x13e5b0 = null) => {
+        onSelectionBatchChange: (objectType3, objectIds, groupId = null) => {
           (this._selectNodeOnCanvas(),
             setPanoramaSceneSelectionBatch({
               nodeId: this.id,
-              objectType: _0x2d4313,
-              objectIds: _0x58c480,
-              groupId: _0x13e5b0,
+              objectType: objectType3,
+              objectIds: objectIds,
+              groupId: groupId,
             }));
         },
-        onSelectionObjectsChange: (_0x1acff2, _0x24a1b = {}) => {
+        onSelectionObjectsChange: (objects, activeObjectType = {}) => {
           (this._selectNodeOnCanvas(),
             setPanoramaSceneSelectionObjects({
               nodeId: this.id,
-              objects: _0x1acff2,
-              activeObjectType: _0x24a1b.activeObjectType || null,
-              activeObjectId: _0x24a1b.activeObjectId || null,
-              groupId: _0x24a1b.groupId || null,
+              objects: objects,
+              activeObjectType: activeObjectType.activeObjectType || null,
+              activeObjectId: activeObjectType.activeObjectId || null,
+              groupId: activeObjectType.groupId || null,
             }));
         },
         onSelectionClear: () => {
           clearPanoramaSceneSelection({ nodeId: this.id });
         },
-        onObjectBatchCommit: ({ targets: _0x4a45de }) => {
-          updatePanoramaSceneObjectTransform({ nodeId: this.id, targets: _0x4a45de });
+        onObjectBatchCommit: ({ targets: targets }) => {
+          updatePanoramaSceneObjectTransform({ nodeId: this.id, targets: targets });
         },
       })),
       this._interaction.attach(),
-      (this._resizeObserver = new ResizeObserver((_0x200d4a) => {
-        const _0x1d9354 = _0x200d4a?.[0]?.contentRect;
-        (this._bridge?.resize(_0x1d9354?.width, _0x1d9354?.height), this._positionMenus());
+      (this._resizeObserver = new ResizeObserver((value26) => {
+        const box6 = value26?.[0]?.contentRect;
+        (this._bridge?.resize(box6?.width, box6?.height), this._positionMenus());
       })),
       this._resizeObserver.observe(this._viewportEl),
       (this._unsubscribeSelection = appStore.subscribeSelector(
-        (_0x4cc8b) => {
-          const _0x22c1f5 = Array.isArray(_0x4cc8b.selectedNodeIds) ? _0x4cc8b.selectedNodeIds : [];
-          return _0x22c1f5.includes(this.id);
+        (value27) => {
+          const list5 = Array.isArray(value27.selectedNodeIds) ? value27.selectedNodeIds : [];
+          return list5.includes(this.id);
         },
-        (_0x111e35) => {
-          const _0x40777a = this._isSelected === true,
-            _0x5d8d5e = _0x111e35 === true;
-          ((this._isSelected = _0x5d8d5e),
-            _0x40777a && !_0x5d8d5e && this._sceneState?.ui?.isEditing === true && this._exitEditing(),
+        (value28) => {
+          const value29 = this._isSelected === true,
+            enabled2 = value28 === true;
+          ((this._isSelected = enabled2),
+            value29 && !enabled2 && this._sceneState?.ui?.isEditing === true && this._exitEditing(),
             this._syncAttachedUiVisibility(this._shouldShowBottomToolbar()));
         },
       )),
       (this._unsubscribeViewport = appStore.subscribeSelector(
-        (_0x341dd7) => {
-          const _0x387fe8 = _0x341dd7.viewport || { x: 0, y: 0, zoom: 1 };
-          return (_0x387fe8.x || 0) + '|' + (_0x387fe8.y || 0) + '|' + (_0x387fe8.zoom || 1);
+        (value30) => {
+          const box7 = value30.viewport || { x: 0, y: 0, zoom: 1 };
+          return (box7.x || 0) + '|' + (box7.y || 0) + '|' + (box7.zoom || 1);
         },
         () => {
           this._positionMenus();
@@ -560,7 +558,7 @@ export class PanoramaSceneNode {
       )),
       this._isPanorama360 &&
         (this._unsubscribePanoramaIncomingSync = appStore.subscribeSelector(
-          (_0x2920cf) => this._buildPanorama360IncomingImageSignature(_0x2920cf),
+          (value31) => this._buildPanorama360IncomingImageSignature(value31),
           () => {
             syncPanorama360FromIncomingImageEdge({ nodeId: this.id });
           },
@@ -580,12 +578,12 @@ export class PanoramaSceneNode {
   ['_handleShortcutsUpdated']() {
     this._syncToolbarState();
   }
-  ['_resolveCameraBySlot'](_0x595312) {
-    const _0x3b2a89 = normalizeCameraSlot(_0x595312);
-    if (!_0x3b2a89) return null;
-    const _0x2f6677 = resolveCameraSlotEntries(this._sceneState?.cameras || []),
-      _0x491a51 = _0x2f6677.find((_0x2392f7) => _0x2392f7.slot === _0x3b2a89);
-    return _0x491a51 ? { ..._0x491a51 } : null;
+  ['_resolveCameraBySlot'](value32) {
+    const cameraSlot = normalizeCameraSlot(value32);
+    if (!cameraSlot) return null;
+    const list6 = resolveCameraSlotEntries(this._sceneState?.cameras || []),
+      args2 = list6.find((item4) => item4.slot === cameraSlot);
+    return args2 ? { ...args2 } : null;
   }
   ['_cancelCameraJumpAnimation']({ clearDraft: clearDraft = true } = {}) {
     ((this._cameraJumpToken += 1),
@@ -595,12 +593,12 @@ export class PanoramaSceneNode {
       (this._pendingCameraJumpCommit = null),
       clearDraft && this._bridge?.clearDraftView?.());
   }
-  ['_setDefaultSceneFocalLength'](_0x4d0a27) {
-    const _0x1e48b3 = Math.max(
+  ['_setDefaultSceneFocalLength'](value33) {
+    const value34 = Math.max(
       SCENE_FOCAL_LENGTH_MIN_MM,
-      Math.min(SCENE_FOCAL_LENGTH_MAX_MM, Number(_0x4d0a27) || SCENE_DEFAULT_FOCAL_LENGTH_MM),
+      Math.min(SCENE_FOCAL_LENGTH_MAX_MM, Number(value33) || SCENE_DEFAULT_FOCAL_LENGTH_MM),
     );
-    ((this._defaultSceneFocalLength = _0x1e48b3), this._bridge?.setDefaultSceneFocalLength?.(_0x1e48b3));
+    ((this._defaultSceneFocalLength = value34), this._bridge?.setDefaultSceneFocalLength?.(value34));
   }
   ['_getDefaultSceneFocalLength']() {
     return (
@@ -609,335 +607,328 @@ export class PanoramaSceneNode {
       SCENE_DEFAULT_FOCAL_LENGTH_MM
     );
   }
-  ['_isDefaultSceneView'](_0x116ff3) {
-    const _0x1f3086 = createDefaultSceneView();
+  ['_isDefaultSceneView'](event9) {
+    const event10 = createDefaultSceneView();
     return (
-      Math.abs((Number(_0x116ff3?.target?.x) || 0) - _0x1f3086.target.x) < 1e-9 &&
-      Math.abs((Number(_0x116ff3?.target?.y) || 0) - _0x1f3086.target.y) < 1e-9 &&
-      Math.abs((Number(_0x116ff3?.target?.z) || 0) - _0x1f3086.target.z) < 1e-9 &&
-      Math.abs((Number(_0x116ff3?.orbitYaw) || 0) - _0x1f3086.orbitYaw) < 1e-9 &&
-      Math.abs((Number(_0x116ff3?.orbitPitch) || 0) - _0x1f3086.orbitPitch) < 1e-9 &&
-      Math.abs((Number(_0x116ff3?.orbitDistance) || 0) - _0x1f3086.orbitDistance) < 1e-9
+      Math.abs((Number(event9?.target?.x) || 0) - event10.target.x) < 1e-9 &&
+      Math.abs((Number(event9?.target?.y) || 0) - event10.target.y) < 1e-9 &&
+      Math.abs((Number(event9?.target?.z) || 0) - event10.target.z) < 1e-9 &&
+      Math.abs((Number(event9?.orbitYaw) || 0) - event10.orbitYaw) < 1e-9 &&
+      Math.abs((Number(event9?.orbitPitch) || 0) - event10.orbitPitch) < 1e-9 &&
+      Math.abs((Number(event9?.orbitDistance) || 0) - event10.orbitDistance) < 1e-9
     );
   }
   ['_maybeReleasePendingCameraJumpDraft']() {
-    const _0x453127 = this._pendingCameraJumpCommit;
-    if (!_0x453127 || this._pendingCameraJumpReleaseRaf) return;
-    const _0x3b43fb = this._sceneState?.viewport?.sceneView || null,
-      _0x248e9c = this._getDefaultSceneFocalLength();
-    if (!areSceneViewsEquivalent(_0x3b43fb, _0x453127.targetSceneView)) return;
-    if (Math.abs(_0x248e9c - _0x453127.targetFocalLength) > 0.000001) return;
-    const _0x5a68fe = _0x453127.token;
+    const enabled3 = this._pendingCameraJumpCommit;
+    if (!enabled3 || this._pendingCameraJumpReleaseRaf) return;
+    const value35 = this._sceneState?.viewport?.sceneView || null,
+      value36 = this._getDefaultSceneFocalLength();
+    if (!areSceneViewsEquivalent(value35, enabled3.targetSceneView)) return;
+    if (Math.abs(value36 - enabled3.targetFocalLength) > 0.000001) return;
+    const value37 = enabled3.token;
     this._pendingCameraJumpReleaseRaf = requestAnimationFrame(() => {
       this._pendingCameraJumpReleaseRaf = 0;
-      const _0x37edac = this._pendingCameraJumpCommit;
-      if (!_0x37edac || _0x37edac.token !== _0x5a68fe) return;
-      const _0x11ddf5 = this._sceneState?.viewport?.sceneView || null,
-        _0x68565d = this._getDefaultSceneFocalLength();
-      if (!areSceneViewsEquivalent(_0x11ddf5, _0x37edac.targetSceneView)) return;
-      if (Math.abs(_0x68565d - _0x37edac.targetFocalLength) > 0.000001) return;
+      const enabled4 = this._pendingCameraJumpCommit;
+      if (!enabled4 || enabled4.token !== value37) return;
+      const value38 = this._sceneState?.viewport?.sceneView || null,
+        value39 = this._getDefaultSceneFocalLength();
+      if (!areSceneViewsEquivalent(value38, enabled4.targetSceneView)) return;
+      if (Math.abs(value39 - enabled4.targetFocalLength) > 0.000001) return;
       ((this._pendingCameraJumpCommit = null), this._bridge?.clearDraftView?.());
     });
   }
-  ['_maybePreloadCharacterModels'](_0x1da0ce = null) {
+  ['_maybePreloadCharacterModels'](value40 = null) {
     if (this._isPanorama360) return;
     if (this._hasRequestedCharacterPreload) return;
-    const _0x4ba24e = this._sceneState?.ui?.isEditing === true,
-      _0x3821c1 = _0x1da0ce?.ui?.isEditing === true;
-    if (!_0x4ba24e || _0x3821c1) return;
+    const enabled5 = this._sceneState?.ui?.isEditing === true,
+      value41 = value40?.ui?.isEditing === true;
+    if (!enabled5 || value41) return;
     ((this._hasRequestedCharacterPreload = true), void preloadPanoramaCharacterModels().catch(() => {}));
   }
   ['_commitCameraJumpTarget']({
-    targetPose: _0x5ae093,
-    referenceSceneView: _0x12c58a,
-    targetFocalLength: _0x55d669,
+    targetPose: targetPose,
+    referenceSceneView: referenceSceneView,
+    targetFocalLength: targetFocalLength,
   }) {
-    const _0x2887af = cameraPoseToSceneViewFromReference(_0x5ae093, _0x12c58a);
+    const targetSceneView = cameraPoseToSceneViewFromReference(targetPose, referenceSceneView);
     return (
       (this._pendingCameraJumpCommit = {
         token: this._cameraJumpToken,
-        targetSceneView: _0x2887af,
-        targetFocalLength: _0x55d669,
+        targetSceneView: targetSceneView,
+        targetFocalLength: targetFocalLength,
       }),
-      this._setDefaultSceneFocalLength(_0x55d669),
+      this._setDefaultSceneFocalLength(targetFocalLength),
       applyPanoramaSceneViewCommit({
         nodeId: this.id,
-        sceneView: _0x2887af,
+        sceneView: targetSceneView,
         activeView: 'default',
         activeCameraId: null,
       }),
-      _0x2887af
+      targetSceneView
     );
   }
-  ['_animateCameraActivation'](_0x3134d8) {
+  ['_animateCameraActivation'](value42) {
     if (!this._supportsCameraFeatures()) return;
-    const _0x38e95b =
-      (this._sceneState?.cameras || []).find((_0x3986df) => _0x3986df.id === _0x3134d8) || null;
-    if (!_0x38e95b || this._sceneState?.mode !== 'scene') return;
-    const _0x25f922 = (_0x494284) => {
-        const _0x489ea3 = _0x494284?.quaternion;
+    const rotation = (this._sceneState?.cameras || []).find((item5) => item5.id === value42) || null;
+    if (!rotation || this._sceneState?.mode !== 'scene') return;
+    const run = (value43) => {
+        const box8 = value43?.quaternion;
         if (
-          Number.isFinite(Number(_0x489ea3?.x)) &&
-          Number.isFinite(Number(_0x489ea3?.y)) &&
-          Number.isFinite(Number(_0x489ea3?.z)) &&
-          Number.isFinite(Number(_0x489ea3?.w))
+          Number.isFinite(Number(box8?.x)) &&
+          Number.isFinite(Number(box8?.y)) &&
+          Number.isFinite(Number(box8?.z)) &&
+          Number.isFinite(Number(box8?.w))
         )
           return new threeRuntime.Quaternion(
-            Number(_0x489ea3.x),
-            Number(_0x489ea3.y),
-            Number(_0x489ea3.z),
-            Number(_0x489ea3.w),
+            Number(box8.x),
+            Number(box8.y),
+            Number(box8.z),
+            Number(box8.w),
           ).normalize();
-        const _0xcc68d5 = _0x494284?.rotation || { x: 0, y: 0, z: 0 };
+        const box9 = value43?.rotation || { x: 0, y: 0, z: 0 };
         return new threeRuntime.Quaternion().setFromEuler(
-          new threeRuntime['Euler'](
-            Number(_0xcc68d5.x) || 0,
-            Number(_0xcc68d5.y) || 0,
-            Number(_0xcc68d5.z) || 0,
-            'YXZ',
-          ),
+          new threeRuntime['Euler'](Number(box9.x) || 0, Number(box9.y) || 0, Number(box9.z) || 0, 'YXZ'),
         );
       },
-      _0x25d4d8 = _0x25f922(_0x38e95b),
-      _0x37ef88 = this._sceneState?.viewport?.sceneView || createDefaultSceneView(),
-      _0x5487b9 = {
+      x3 = run(rotation),
+      referenceSceneView2 = this._sceneState?.viewport?.sceneView || createDefaultSceneView(),
+      targetPose2 = {
         kind: 'camera',
-        position: cloneVector3(_0x38e95b.position),
-        quaternion: { x: _0x25d4d8.x, y: _0x25d4d8.y, z: _0x25d4d8.z, w: _0x25d4d8.w },
-        rotation: _0x38e95b.rotation || quaternionToRotation(_0x25d4d8),
+        position: cloneVector3(rotation.position),
+        quaternion: { x: x3.x, y: x3.y, z: x3.z, w: x3.w },
+        rotation: rotation.rotation || quaternionToRotation(x3),
       },
-      _0x3c5803 = Number.isFinite(Number(_0x38e95b?.focalLength))
-        ? Number(_0x38e95b.focalLength)
+      targetFocalLength2 = Number.isFinite(Number(rotation?.focalLength))
+        ? Number(rotation.focalLength)
         : SCENE_DEFAULT_FOCAL_LENGTH_MM,
-      _0x11ebaf = focalLengthToFov(_0x3c5803);
-    ((_0x5487b9.fov = _0x11ebaf), this._cancelCameraJumpAnimation({ clearDraft: false }));
-    const _0x49558e = this._bridge?.readCurrentViewPose?.();
-    if (!_0x49558e?.position) {
+      fov = focalLengthToFov(targetFocalLength2);
+    ((targetPose2.fov = fov), this._cancelCameraJumpAnimation({ clearDraft: false }));
+    const rotation2 = this._bridge?.readCurrentViewPose?.();
+    if (!rotation2?.position) {
       this._commitCameraJumpTarget({
-        targetPose: _0x5487b9,
-        referenceSceneView: _0x37ef88,
-        targetFocalLength: _0x3c5803,
+        targetPose: targetPose2,
+        referenceSceneView: referenceSceneView2,
+        targetFocalLength: targetFocalLength2,
       });
       return;
     }
-    const _0x116de9 = this._cameraJumpToken,
-      _0x49ce6d = _0x25f922(_0x49558e),
-      _0x1422ad = {
+    const value44 = this._cameraJumpToken,
+      x4 = run(rotation2),
+      value45 = {
         kind: 'camera',
-        position: cloneVector3(_0x49558e.position),
-        quaternion: { x: _0x49ce6d.x, y: _0x49ce6d.y, z: _0x49ce6d.z, w: _0x49ce6d.w },
-        rotation: _0x49558e.rotation || quaternionToRotation(_0x49ce6d),
-        fov: Number.isFinite(Number(_0x49558e.fov)) ? Number(_0x49558e.fov) : 58,
+        position: cloneVector3(rotation2.position),
+        quaternion: { x: x4.x, y: x4.y, z: x4.z, w: x4.w },
+        rotation: rotation2.rotation || quaternionToRotation(x4),
+        fov: Number.isFinite(Number(rotation2.fov)) ? Number(rotation2.fov) : 58,
       },
-      _0x5b73af = 0x1c2,
-      _0x179ba6 = performance.now(),
-      _0x330a1d = (_0x2f757f) => {
-        const _0xbf7d2d = interpolateVector3(_0x1422ad.position, _0x5487b9.position, _0x2f757f),
-          _0x59c189 = new threeRuntime.Quaternion(
-            _0x1422ad.quaternion.x,
-            _0x1422ad.quaternion.y,
-            _0x1422ad.quaternion.z,
-            _0x1422ad.quaternion.w,
+      value46 = 0x1c2,
+      value47 = performance.now(),
+      handler5 = (value48) => {
+        const position = interpolateVector3(value45.position, targetPose2.position, value48),
+          x5 = new threeRuntime.Quaternion(
+            value45.quaternion.x,
+            value45.quaternion.y,
+            value45.quaternion.z,
+            value45.quaternion.w,
           ).slerp(
             new threeRuntime['Quaternion'](
-              _0x5487b9.quaternion.x,
-              _0x5487b9.quaternion.y,
-              _0x5487b9.quaternion.z,
-              _0x5487b9.quaternion.w,
+              targetPose2.quaternion.x,
+              targetPose2.quaternion.y,
+              targetPose2.quaternion.z,
+              targetPose2.quaternion.w,
             ),
-            _0x2f757f,
+            value48,
           ),
-          _0x6ae2ba = lerp(_0x1422ad.fov, _0x5487b9.fov, _0x2f757f);
+          fov2 = lerp(value45.fov, targetPose2.fov, value48);
         this._bridge?.setDraftView?.({
           kind: 'camera',
-          position: _0xbf7d2d,
-          quaternion: { x: _0x59c189.x, y: _0x59c189.y, z: _0x59c189.z, w: _0x59c189.w },
-          rotation: quaternionToRotation(_0x59c189),
-          fov: _0x6ae2ba,
+          position: position,
+          quaternion: { x: x5.x, y: x5.y, z: x5.z, w: x5.w },
+          rotation: quaternionToRotation(x5),
+          fov: fov2,
           disableSmoothing: true,
         });
       };
-    _0x330a1d(0);
-    const _0x4b10b5 = (_0x4fd0fc) => {
-      if (_0x116de9 !== this._cameraJumpToken) return;
-      const _0x5acb14 = Math.max(0, _0x4fd0fc - _0x179ba6),
-        _0x935cf6 = Math.min(1, _0x5acb14 / _0x5b73af),
-        _0x1c3190 = smootherstep(_0x935cf6);
-      _0x330a1d(_0x1c3190);
-      if (_0x935cf6 < 1) {
-        this._cameraJumpRaf = requestAnimationFrame(_0x4b10b5);
+    handler5(0);
+    const value49 = (value50) => {
+      if (value44 !== this._cameraJumpToken) return;
+      const value51 = Math.max(0, value50 - value47),
+        count4 = Math.min(1, value51 / value46),
+        smootherstep2 = smootherstep(count4);
+      handler5(smootherstep2);
+      if (count4 < 1) {
+        this._cameraJumpRaf = requestAnimationFrame(value49);
         return;
       }
       ((this._cameraJumpRaf = 0),
         this._commitCameraJumpTarget({
-          targetPose: _0x5487b9,
-          referenceSceneView: _0x37ef88,
-          targetFocalLength: _0x3c5803,
+          targetPose: targetPose2,
+          referenceSceneView: referenceSceneView2,
+          targetFocalLength: targetFocalLength2,
         }),
         this._maybeReleasePendingCameraJumpDraft());
     };
-    this._cameraJumpRaf = requestAnimationFrame(_0x4b10b5);
+    this._cameraJumpRaf = requestAnimationFrame(value49);
   }
-  ['_saveCurrentViewToCameraSlot'](_0x206e0a) {
+  ['_saveCurrentViewToCameraSlot'](slot3) {
     if (!this._supportsCameraFeatures()) return;
-    const _0x445621 = this._bridge?.readCurrentViewPose?.();
-    if (!_0x445621) return;
-    upsertPanoramaSceneCameraAtSlot({ nodeId: this.id, slot: _0x206e0a, viewPose: _0x445621 });
+    const viewPose = this._bridge?.readCurrentViewPose?.();
+    if (!viewPose) return;
+    upsertPanoramaSceneCameraAtSlot({ nodeId: this.id, slot: slot3, viewPose: viewPose });
   }
-  ['_handleCameraShortcutEvent'](_0x59c1b1) {
+  ['_handleCameraShortcutEvent'](value52) {
     if (!this._supportsCameraFeatures()) return;
-    const _0x16396b = _0x59c1b1?.detail || {};
-    if (_0x16396b.nodeId !== this.id) return;
+    const value53 = value52?.detail || {};
+    if (value53.nodeId !== this.id) return;
     if (!this._isEditing()) return;
-    const _0x5a1181 = normalizeCameraSlot(_0x16396b.slot);
-    if (!_0x5a1181) return;
-    if (_0x16396b.mode === 'save') {
-      this._saveCurrentViewToCameraSlot(_0x5a1181);
+    const cameraSlot2 = normalizeCameraSlot(value53.slot);
+    if (!cameraSlot2) return;
+    if (value53.mode === 'save') {
+      this._saveCurrentViewToCameraSlot(cameraSlot2);
       return;
     }
-    const _0x4b8ec1 = this._resolveCameraBySlot(_0x5a1181);
-    if (!_0x4b8ec1?.camera?.id) return;
-    this._animateCameraActivation(_0x4b8ec1.camera.id);
+    const enabled6 = this._resolveCameraBySlot(cameraSlot2);
+    if (!enabled6?.camera?.id) return;
+    this._animateCameraActivation(enabled6.camera.id);
   }
-  ['_handleCaptureShortcutEvent'](_0xf27449) {
-    const _0x333010 = _0xf27449?.detail || {};
-    if (_0x333010.nodeId !== this.id) return;
+  ['_handleCaptureShortcutEvent'](value54) {
+    const value55 = value54?.detail || {};
+    if (value55.nodeId !== this.id) return;
     if (!this._isEditing()) return;
     void this._handleToolbarAction('capture');
   }
   ['_createCaptureMenu']() {
-    const _0x218a47 = document.createElement('div');
+    const el3 = document.createElement('div');
     return (
-      (_0x218a47.className = 'panorama-capture-menu'),
-      (_0x218a47.hidden = true),
-      (_0x218a47.innerHTML =
+      (el3.className = 'panorama-capture-menu'),
+      (el3.hidden = true),
+      (el3.innerHTML =
         '\n      <div class="panorama-capture-menu__grid">\n        ' +
-        PANORAMA_CAPTURE_MODE_OPTIONS.map((_0x43ca73) => {
-          const _0x126963 = getCaptureModeLabel(_0x43ca73);
+        PANORAMA_CAPTURE_MODE_OPTIONS.map((event11) => {
+          const label = getCaptureModeLabel(event11);
           return (
             '\n            <button\n              type="button"\n              class="panorama-capture-menu__item"\n              data-capture-mode="' +
-            _0x43ca73.key +
+            event11.key +
             '"\n              aria-label="' +
-            panoramaSceneText('capture.modeAria', { label: _0x126963 }) +
+            panoramaSceneText('capture.modeAria', { label: label }) +
             '"\n            >\n              <span class="panorama-capture-menu__icon ' +
-            _0x43ca73.iconClass +
+            event11.iconClass +
             '" aria-hidden="true">\n                <span class="panorama-capture-menu__icon-shape"></span>\n              </span>\n              <span class="panorama-capture-menu__label">' +
-            _0x126963 +
+            label +
             '</span>\n            </button>\n          '
           );
         }).join('') +
         '\n      </div>\n    '),
-      _0x218a47
+      el3
     );
   }
-  ['_handleCaptureMenuClick'](_0x21db98) {
-    const _0x13c973 = _0x21db98.target?.closest?.('[data-capture-mode]');
-    if (!(_0x13c973 instanceof HTMLButtonElement)) return;
-    const _0x4cd2f0 = _0x13c973.dataset.captureMode || 'adaptive';
+  ['_handleCaptureMenuClick'](event12) {
+    const el4 = event12.target?.closest?.('[data-capture-mode]');
+    if (!(el4 instanceof HTMLButtonElement)) return;
+    const mode2 = el4.dataset.captureMode || 'adaptive';
     (this._selectNodeOnCanvas(),
       setPanoramaSceneCaptureMode({
         nodeId: this.id,
-        mode: _0x4cd2f0,
-        showSafeFrame: _0x4cd2f0 !== 'adaptive',
+        mode: mode2,
+        showSafeFrame: mode2 !== 'adaptive',
       }));
   }
   ['_createFocusMenu']() {
-    const _0x2dc270 = document.createElement('div');
-    ((_0x2dc270.className = 'panorama-scene-focus-menu'), (_0x2dc270.hidden = true));
-    const _0xe80b8e = document.createElement('div');
-    _0xe80b8e.className = 'panorama-scene-focus-menu__header';
-    const _0xc67d18 = document.createElement('span');
-    ((_0xc67d18.className = 'panorama-scene-focus-menu__title'),
-      (_0xc67d18.textContent = panoramaSceneText('focus.title')),
-      _0xe80b8e.appendChild(_0xc67d18));
-    const _0x221f18 = document.createElement('span');
-    ((_0x221f18.className = 'panorama-scene-focus-menu__value'), _0xe80b8e.appendChild(_0x221f18));
-    const _0x140856 = document.createElement('input');
-    ((_0x140856.className = 'panorama-scene-focus-menu__slider'),
-      (_0x140856.type = 'range'),
-      (_0x140856.min = String(SCENE_FOCAL_LENGTH_MIN_MM)),
-      (_0x140856.max = String(SCENE_FOCAL_LENGTH_MAX_MM)),
-      (_0x140856.step = '1'),
-      _0x140856.setAttribute('aria-label', panoramaSceneText('focus.sliderAria')));
-    const _0x322960 = () => {
-      const _0x53b2ed = Math.max(
+    const el5 = document.createElement('div');
+    ((el5.className = 'panorama-scene-focus-menu'), (el5.hidden = true));
+    const el6 = document.createElement('div');
+    el6.className = 'panorama-scene-focus-menu__header';
+    const el7 = document.createElement('span');
+    ((el7.className = 'panorama-scene-focus-menu__title'),
+      (el7.textContent = panoramaSceneText('focus.title')),
+      el6.appendChild(el7));
+    const el8 = document.createElement('span');
+    ((el8.className = 'panorama-scene-focus-menu__value'), el6.appendChild(el8));
+    const el9 = document.createElement('input');
+    ((el9.className = 'panorama-scene-focus-menu__slider'),
+      (el9.type = 'range'),
+      (el9.min = String(SCENE_FOCAL_LENGTH_MIN_MM)),
+      (el9.max = String(SCENE_FOCAL_LENGTH_MAX_MM)),
+      (el9.step = '1'),
+      el9.setAttribute('aria-label', panoramaSceneText('focus.sliderAria')));
+    const run2 = () => {
+      const value56 = Math.max(
         SCENE_FOCAL_LENGTH_MIN_MM,
         Math.min(
           SCENE_FOCAL_LENGTH_MAX_MM,
           Number(this._getDefaultSceneFocalLength()) || SCENE_DEFAULT_FOCAL_LENGTH_MM,
         ),
       );
-      ((_0x140856.value = String(_0x53b2ed)), (_0x221f18.textContent = String(Math.round(_0x53b2ed))));
+      ((el9.value = String(value56)), (el8.textContent = String(Math.round(value56))));
     };
     return (
-      _0x140856.addEventListener('input', (_0x44197e) => {
-        const _0x1e060a = Math.max(
+      el9.addEventListener('input', (event13) => {
+        const value57 = Math.max(
           SCENE_FOCAL_LENGTH_MIN_MM,
           Math.min(
             SCENE_FOCAL_LENGTH_MAX_MM,
-            Number(_0x44197e.currentTarget?.value) || SCENE_DEFAULT_FOCAL_LENGTH_MM,
+            Number(event13.currentTarget?.value) || SCENE_DEFAULT_FOCAL_LENGTH_MM,
           ),
         );
-        ((_0x221f18.textContent = String(Math.round(_0x1e060a))),
-          this._setDefaultSceneFocalLength(_0x1e060a));
+        ((el8.textContent = String(Math.round(value57))), this._setDefaultSceneFocalLength(value57));
       }),
-      _0x2dc270.appendChild(_0xe80b8e),
-      _0x2dc270.appendChild(_0x140856),
-      (_0x2dc270._syncValue = _0x322960),
-      _0x322960(),
-      _0x2dc270
+      el5.appendChild(el6),
+      el5.appendChild(el9),
+      (el5._syncValue = run2),
+      run2(),
+      el5
     );
   }
   ['_resolveCaptureMode']() {
     return normalizeCaptureMode(this._sceneState?.capture?.mode);
   }
   ['_resolveCaptureFrameRect']() {
-    const _0x30c4ee = this._viewportEl?.clientWidth || 0,
-      _0xcd40f0 = this._viewportEl?.clientHeight || 0;
-    return computeCaptureFrameRect(_0x30c4ee, _0xcd40f0, this._resolveCaptureMode());
+    const value58 = this._viewportEl?.clientWidth || 0,
+      value59 = this._viewportEl?.clientHeight || 0;
+    return computeCaptureFrameRect(value58, value59, this._resolveCaptureMode());
   }
   ['_syncCaptureMenuState']() {
     if (!this._captureMenuEl) return;
-    const _0x120620 = this._resolveCaptureMode();
-    this._captureMenuEl.querySelectorAll('[data-capture-mode]').forEach((_0x51faef) => {
-      const _0x465381 = _0x51faef.dataset.captureMode === _0x120620;
-      (_0x51faef.classList.toggle('is-active', _0x465381),
-        _0x51faef.setAttribute('aria-pressed', _0x465381 ? 'true' : 'false'));
+    const value60 = this._resolveCaptureMode();
+    this._captureMenuEl.querySelectorAll('[data-capture-mode]').forEach((el10) => {
+      const value61 = el10.dataset.captureMode === value60;
+      (el10.classList.toggle('is-active', value61),
+        el10.setAttribute('aria-pressed', value61 ? 'true' : 'false'));
     });
   }
   ['_syncCaptureSafeFrame']() {
     if (!this._captureSafeFrameEl || !this._captureSafeFrameLabelEl) return;
-    const _0x2b78c2 = this._resolveCaptureMode(),
-      _0x332c78 =
+    const value62 = this._resolveCaptureMode(),
+      enabled7 =
         this._isEditing() &&
         this._isNodeSelected() &&
-        _0x2b78c2 !== 'adaptive' &&
+        value62 !== 'adaptive' &&
         this._sceneState?.capture?.showSafeFrame === true;
-    ((this._captureSafeFrameEl.hidden = !_0x332c78),
-      this._captureSafeFrameEl.classList.toggle('is-visible', _0x332c78),
-      this._captureSafeFrameEl.classList.toggle('is-adaptive', _0x2b78c2 === 'adaptive'));
-    if (!_0x332c78) return;
-    const _0x2cdd31 = this._resolveCaptureFrameRect();
-    ((this._captureSafeFrameEl.style.left = _0x2cdd31.x + 'px'),
-      (this._captureSafeFrameEl.style.top = _0x2cdd31.y + 'px'),
-      (this._captureSafeFrameEl.style.width = _0x2cdd31.width + 'px'),
-      (this._captureSafeFrameEl.style.height = _0x2cdd31.height + 'px'),
-      (this._captureSafeFrameLabelEl.textContent = getCaptureModeLabel(_0x2b78c2)));
+    ((this._captureSafeFrameEl.hidden = !enabled7),
+      this._captureSafeFrameEl.classList.toggle('is-visible', enabled7),
+      this._captureSafeFrameEl.classList.toggle('is-adaptive', value62 === 'adaptive'));
+    if (!enabled7) return;
+    const box10 = this._resolveCaptureFrameRect();
+    ((this._captureSafeFrameEl.style.left = box10.x + 'px'),
+      (this._captureSafeFrameEl.style.top = box10.y + 'px'),
+      (this._captureSafeFrameEl.style.width = box10.width + 'px'),
+      (this._captureSafeFrameEl.style.height = box10.height + 'px'),
+      (this._captureSafeFrameLabelEl.textContent = getCaptureModeLabel(value62)));
   }
   async ['_captureViewportByCurrentMode']() {
-    const _0x33659f = await this._bridge?.captureBlob?.({ includeEditorOverlays: false });
-    if (!_0x33659f) return null;
+    const blob2 = await this._bridge?.captureBlob?.({ includeEditorOverlays: false });
+    if (!blob2) return null;
     return cropCaptureBlobToFrame({
-      blob: _0x33659f,
+      blob: blob2,
       viewportWidth: this._viewportEl?.clientWidth || 0,
       viewportHeight: this._viewportEl?.clientHeight || 0,
       mode: this._resolveCaptureMode(),
     });
   }
   ['_createGridPanel']() {
-    const _0x34a157 = document.createElement('div');
-    ((_0x34a157.className = 'panorama-grid-panel'),
-      (_0x34a157.innerHTML =
+    const el11 = document.createElement('div');
+    ((el11.className = 'panorama-grid-panel'),
+      (el11.innerHTML =
         '\n      <div class="panorama-grid-panel__title">' +
         panoramaSceneText('grid.title') +
         '</div>\n      <div class="panorama-grid-panel__metrics-row">\n        <label class="panorama-grid-panel__metric-item">\n          <span class="panorama-grid-panel__metric-label" data-grid-label="rows">' +
@@ -959,194 +950,194 @@ export class PanoramaSceneNode {
         '" aria-valuenow="1.0" tabindex="0">1.0</div>\n          </div>\n        </label>\n      </div>\n      <div class="panorama-grid-panel__appearance-row">\n        <div class="panorama-grid-panel__appearance-group panorama-grid-panel__appearance-group--gender">\n          <span class="panorama-grid-panel__appearance-label" data-grid-label="gender">' +
         panoramaSceneText('grid.gender') +
         '</span>\n          <div class="panorama-grid-panel__appearance-options panorama-grid-panel__appearance-options--gender">\n            ' +
-        PANORAMA_MANNEQUIN_GENDER_OPTIONS.map(([_0x16d1e0, , _0x51bae6]) => {
-          const _0x1fec8f = getPanoramaMannequinGenderLabel(_0x16d1e0);
+        PANORAMA_MANNEQUIN_GENDER_OPTIONS.map(([value63, , value64]) => {
+          const label2 = getPanoramaMannequinGenderLabel(value63);
           return (
             '<button type="button" class="panorama-mannequin-menu__gender-btn" data-grid-gender="' +
-            _0x16d1e0 +
+            value63 +
             '" aria-label="' +
-            panoramaSceneText('grid.setGenderAria', { label: _0x1fec8f }) +
+            panoramaSceneText('grid.setGenderAria', { label: label2 }) +
             '">' +
-            _0x51bae6 +
+            value64 +
             '</button>'
           );
         }).join('') +
         '\n          </div>\n        </div>\n        <div class="panorama-grid-panel__appearance-group panorama-grid-panel__appearance-group--color">\n          <span class="panorama-grid-panel__appearance-label" data-grid-label="color">' +
         panoramaSceneText('grid.color') +
         '</span>\n          <div class="panorama-grid-panel__appearance-options panorama-grid-panel__appearance-options--color">\n            ' +
-        PANORAMA_MANNEQUIN_COLOR_OPTIONS.map(([_0x5d723d]) => {
-          const _0x3dbe37 = getPanoramaMannequinColorLabel(_0x5d723d);
+        PANORAMA_MANNEQUIN_COLOR_OPTIONS.map(([value65]) => {
+          const label3 = getPanoramaMannequinColorLabel(value65);
           return (
             '<button type="button" class="panorama-mannequin-menu__color-btn" data-grid-color="' +
-            _0x5d723d +
+            value65 +
             '" aria-label="' +
-            panoramaSceneText('grid.setColorAria', { label: _0x3dbe37 }) +
+            panoramaSceneText('grid.setColorAria', { label: label3 }) +
             '"></button>'
           );
         }).join('') +
         '\n          </div>\n        </div>\n      </div>\n      <button type="button" class="panorama-grid-panel__apply">' +
         panoramaSceneText('grid.apply') +
         '</button>\n    '));
-    const _0x530404 = {
+    const value66 = {
         rows: { min: 1, max: 12, step: 1, precision: 0 },
         cols: { min: 1, max: 12, step: 1, precision: 0 },
         spacingX: { min: 0.5, max: 8, step: 0.1, precision: 1 },
         spacingZ: { min: 0.5, max: 8, step: 0.1, precision: 1 },
       },
-      _0x2a5d40 = (_0x22d7af, _0x5f57b3) => {
-        const _0x47a2bf = _0x530404[_0x22d7af];
-        if (!_0x47a2bf) return null;
-        const _0x133e5a = Number(_0x5f57b3);
-        if (!Number.isFinite(_0x133e5a)) return null;
-        const _0x4e2405 = Math.min(_0x47a2bf.max, Math.max(_0x47a2bf.min, _0x133e5a));
-        if (_0x47a2bf.precision === 0) return Math.round(_0x4e2405);
-        return Number(_0x4e2405.toFixed(_0x47a2bf.precision));
+      handler6 = (value67, value68) => {
+        const enabled8 = value66[value67];
+        if (!enabled8) return null;
+        const value69 = Number(value68);
+        if (!Number.isFinite(value69)) return null;
+        const value70 = Math.min(enabled8.max, Math.max(enabled8.min, value69));
+        if (enabled8.precision === 0) return Math.round(value70);
+        return Number(value70.toFixed(enabled8.precision));
       },
-      _0x12a8b1 = (_0xcf537b, _0xf5e475) => {
-        const _0x298845 = _0x530404[_0xcf537b];
-        if (!_0x298845 || !Number.isFinite(Number(_0xf5e475))) return '';
-        return _0x298845.precision === 0
-          ? String(Math.round(Number(_0xf5e475)))
-          : Number(_0xf5e475).toFixed(_0x298845.precision);
+      handler7 = (value71, value72) => {
+        const enabled9 = value66[value71];
+        if (!enabled9 || !Number.isFinite(Number(value72))) return '';
+        return enabled9.precision === 0
+          ? String(Math.round(Number(value72)))
+          : Number(value72).toFixed(enabled9.precision);
       },
-      _0x555797 = (_0x3b0d33, _0x1cee26, _0x2bd057) => {
-        if (!_0x3b0d33) return;
-        const _0x18c02f = _0x12a8b1(_0x1cee26, _0x2bd057);
-        _0x3b0d33.tagName === 'INPUT'
-          ? (_0x3b0d33.value = _0x18c02f)
-          : ((_0x3b0d33.textContent = _0x18c02f), _0x3b0d33.setAttribute('aria-valuenow', String(_0x2bd057)));
+      handler8 = (el12, value73, value74) => {
+        if (!el12) return;
+        const value75 = handler7(value73, value74);
+        el12.tagName === 'INPUT'
+          ? (el12.value = value75)
+          : ((el12.textContent = value75), el12.setAttribute('aria-valuenow', String(value74)));
       },
-      _0x19ffea = (_0x3f490c, _0x827450) => {
-        const _0x544e5d = _0x2a5d40(_0x3f490c, _0x827450);
-        if (!Number.isFinite(_0x544e5d)) return;
-        setPanoramaSceneGridPlacement({ nodeId: this.id, patch: { [_0x3f490c]: _0x544e5d } });
-        const _0x1d795f = _0x34a157.querySelector('[data-grid-field="' + _0x3f490c + '"]');
-        _0x555797(_0x1d795f, _0x3f490c, _0x544e5d);
+      handler9 = (value76, value77) => {
+        const value78 = handler6(value76, value77);
+        if (!Number.isFinite(value78)) return;
+        setPanoramaSceneGridPlacement({ nodeId: this.id, patch: { [value76]: value78 } });
+        const value79 = el11.querySelector('[data-grid-field="' + value76 + '"]');
+        handler8(value79, value76, value78);
       };
     return (
-      Object.keys(_0x530404).forEach((_0x4182ed) => {
-        const _0x2d6573 = _0x530404[_0x4182ed],
-          _0x276065 = _0x34a157.querySelector('[data-grid-field="' + _0x4182ed + '"]');
-        if (!_0x276065) return;
-        let _0x107f00 = null,
-          _0x5db6ee = false;
-        const _0x64e6e8 = () => {
-            const _0x4f137b = _0x2a5d40(_0x4182ed, this._sceneState?.gridPlacement?.[_0x4182ed]);
-            if (Number.isFinite(_0x4f137b)) return _0x4f137b;
-            const _0x4701d8 = _0x2a5d40(_0x4182ed, _0x276065.getAttribute('aria-valuenow'));
-            if (Number.isFinite(_0x4701d8)) return _0x4701d8;
-            return _0x2d6573.min;
+      Object.keys(value66).forEach((item6) => {
+        const value80 = value66[item6],
+          enabled10 = el11.querySelector('[data-grid-field="' + item6 + '"]');
+        if (!enabled10) return;
+        let box11 = null,
+          value81 = false;
+        const run3 = () => {
+            const value82 = handler6(item6, this._sceneState?.gridPlacement?.[item6]);
+            if (Number.isFinite(value82)) return value82;
+            const value83 = handler6(item6, enabled10.getAttribute('aria-valuenow'));
+            if (Number.isFinite(value83)) return value83;
+            return value80.min;
           },
-          _0x5c7c24 = (_0x2e3234) => {
-            if (!_0x107f00) return;
-            const _0x83294a = _0x2e3234.clientX - _0x107f00.x;
-            if (!_0x107f00.moved && Math.abs(_0x83294a) >= 3) _0x107f00.moved = true;
-            const _0x5e309c = Math.trunc(_0x83294a / 6),
-              _0x3072f6 = _0x107f00.v + _0x5e309c * _0x2d6573.step;
-            if (_0x3072f6 === _0x107f00.last) return;
-            ((_0x107f00.last = _0x3072f6), _0x19ffea(_0x4182ed, _0x3072f6));
+          value84 = (event14) => {
+            if (!box11) return;
+            const value85 = event14.clientX - box11.x;
+            if (!box11.moved && Math.abs(value85) >= 3) box11.moved = true;
+            const value86 = Math.trunc(value85 / 6),
+              value87 = box11.v + value86 * value80.step;
+            if (value87 === box11.last) return;
+            ((box11.last = value87), handler9(item6, value87));
           },
-          _0x334673 = () => {
-            if (!_0x107f00) return;
-            const _0x441594 = _0x107f00.moved;
-            (_0x107f00.el.classList.remove('is-dragging'),
-              document.removeEventListener('mousemove', _0x5c7c24),
-              document.removeEventListener('mouseup', _0x334673),
-              _0x441594 && ((_0x5db6ee = true), (this._suppressDocClickOnce = true)),
-              (_0x107f00 = null));
+          value88 = () => {
+            if (!box11) return;
+            const value89 = box11.moved;
+            (box11.el.classList.remove('is-dragging'),
+              document.removeEventListener('mousemove', value84),
+              document.removeEventListener('mouseup', value88),
+              value89 && ((value81 = true), (this._suppressDocClickOnce = true)),
+              (box11 = null));
           },
-          _0x366e64 = (_0x56978b) => {
-            const _0x5322cf = _0x64e6e8(),
-              _0x389518 = document.createElement('input');
-            ((_0x389518.className = 'rh-stepper-input panorama-grid-panel__metric-stepper-input'),
-              (_0x389518.type = 'number'),
-              (_0x389518.step = String(_0x2d6573.step)),
-              (_0x389518.min = String(_0x2d6573.min)),
-              (_0x389518.max = String(_0x2d6573.max)),
-              (_0x389518.value = _0x12a8b1(_0x4182ed, _0x5322cf)),
-              _0x56978b.replaceWith(_0x389518),
-              _0x389518.focus(),
-              _0x389518.select());
-            const _0x56148f = (_0x5688e9) => {
-              const _0x28e412 = _0x5688e9 ? _0x389518.value : _0x5322cf,
-                _0x2af318 = _0x2a5d40(_0x4182ed, _0x28e412),
-                _0x31f020 = Number.isFinite(_0x2af318) ? _0x2af318 : _0x5322cf,
-                _0x2a8b97 = document.createElement('div');
-              ((_0x2a8b97.className = 'rh-stepper-value panorama-grid-panel__metric-stepper'),
-                (_0x2a8b97.dataset.gridField = _0x4182ed),
-                _0x2a8b97.setAttribute('role', 'spinbutton'),
-                _0x2a8b97.setAttribute('tabindex', '0'));
-              const _0x20b407 = _0x56978b.getAttribute('aria-label') || _0x4182ed;
-              (_0x2a8b97.setAttribute('aria-label', _0x20b407),
-                _0x2a8b97.setAttribute('aria-valuenow', String(_0x31f020)),
-                (_0x2a8b97.textContent = _0x12a8b1(_0x4182ed, _0x31f020)),
-                _0x389518.replaceWith(_0x2a8b97),
-                _0x5688e9 ? _0x19ffea(_0x4182ed, _0x31f020) : _0x555797(_0x2a8b97, _0x4182ed, _0x31f020),
-                _0x5ce670(_0x2a8b97));
+          handler10 = (value90) => {
+            const value91 = run3(),
+              el13 = document.createElement('input');
+            ((el13.className = 'rh-stepper-input panorama-grid-panel__metric-stepper-input'),
+              (el13.type = 'number'),
+              (el13.step = String(value80.step)),
+              (el13.min = String(value80.min)),
+              (el13.max = String(value80.max)),
+              (el13.value = handler7(item6, value91)),
+              value90.replaceWith(el13),
+              el13.focus(),
+              el13.select());
+            const run4 = (value92) => {
+              const value93 = value92 ? el13.value : value91,
+                value94 = handler6(item6, value93),
+                value95 = Number.isFinite(value94) ? value94 : value91,
+                el14 = document.createElement('div');
+              ((el14.className = 'rh-stepper-value panorama-grid-panel__metric-stepper'),
+                (el14.dataset.gridField = item6),
+                el14.setAttribute('role', 'spinbutton'),
+                el14.setAttribute('tabindex', '0'));
+              const value96 = value90.getAttribute('aria-label') || item6;
+              (el14.setAttribute('aria-label', value96),
+                el14.setAttribute('aria-valuenow', String(value95)),
+                (el14.textContent = handler7(item6, value95)),
+                el13.replaceWith(el14),
+                value92 ? handler9(item6, value95) : handler8(el14, item6, value95),
+                handler11(el14));
             };
-            ((_0x389518.onkeydown = (_0x87e928) => {
-              if (_0x87e928.key === 'Enter') _0x56148f(true);
-              if (_0x87e928.key === 'Escape') _0x56148f(false);
+            ((el13.onkeydown = (event15) => {
+              if (event15.key === 'Enter') run4(true);
+              if (event15.key === 'Escape') run4(false);
             }),
-              (_0x389518.onblur = () => _0x56148f(true)));
+              (el13.onblur = () => run4(true)));
           },
-          _0x5ce670 = (_0x28882c) => {
-            ((_0x28882c.onclick = (_0x133f74) => {
-              _0x133f74.stopPropagation();
-              if (_0x5db6ee) {
-                _0x5db6ee = false;
+          handler11 = (el15) => {
+            ((el15.onclick = (event16) => {
+              event16.stopPropagation();
+              if (value81) {
+                value81 = false;
                 return;
               }
-              _0x366e64(_0x28882c);
+              handler10(el15);
             }),
-              (_0x28882c.onkeydown = (_0x3e8f86) => {
-                const _0x1d4811 = _0x3e8f86.key === 'ArrowRight' ? 1 : _0x3e8f86.key === 'ArrowLeft' ? -1 : 0;
-                if (_0x1d4811) {
-                  (_0x3e8f86.preventDefault(), _0x3e8f86.stopPropagation());
-                  const _0x5350c4 = _0x64e6e8();
-                  _0x19ffea(_0x4182ed, _0x5350c4 + _0x1d4811 * _0x2d6573.step);
+              (el15.onkeydown = (event17) => {
+                const value97 = event17.key === 'ArrowRight' ? 1 : event17.key === 'ArrowLeft' ? -1 : 0;
+                if (value97) {
+                  (event17.preventDefault(), event17.stopPropagation());
+                  const value98 = run3();
+                  handler9(item6, value98 + value97 * value80.step);
                   return;
                 }
-                (_0x3e8f86.key === 'Enter' || _0x3e8f86.key === ' ') &&
-                  (_0x3e8f86.preventDefault(), _0x3e8f86.stopPropagation(), _0x366e64(_0x28882c));
+                (event17.key === 'Enter' || event17.key === ' ') &&
+                  (event17.preventDefault(), event17.stopPropagation(), handler10(el15));
               }),
-              (_0x28882c.onmousedown = (_0x302612) => {
-                if (_0x302612.button !== 0) return;
-                (_0x302612.preventDefault(), (_0x5db6ee = false));
-                const _0x40d63f = _0x64e6e8();
-                ((_0x107f00 = {
-                  x: _0x302612.clientX,
-                  v: _0x40d63f,
+              (el15.onmousedown = (x6) => {
+                if (x6.button !== 0) return;
+                (x6.preventDefault(), (value81 = false));
+                const v = run3();
+                ((box11 = {
+                  x: x6.clientX,
+                  v: v,
                   moved: false,
-                  last: _0x40d63f,
-                  el: _0x28882c,
+                  last: v,
+                  el: el15,
                 }),
-                  _0x28882c.classList.add('is-dragging'),
-                  document.addEventListener('mousemove', _0x5c7c24),
-                  document.addEventListener('mouseup', _0x334673));
+                  el15.classList.add('is-dragging'),
+                  document.addEventListener('mousemove', value84),
+                  document.addEventListener('mouseup', value88));
               }));
           };
-        _0x5ce670(_0x276065);
+        handler11(enabled10);
       }),
-      _0x34a157.querySelectorAll('[data-grid-gender]').forEach((_0x3d5f50) => {
-        _0x3d5f50.addEventListener('click', () => {
-          const _0x167c2d = _0x3d5f50.dataset.gridGender === 'female' ? 'female' : 'male';
-          setPanoramaSceneGridPlacement({ nodeId: this.id, patch: { gender: _0x167c2d } });
+      el11.querySelectorAll('[data-grid-gender]').forEach((el16) => {
+        el16.addEventListener('click', () => {
+          const gender4 = el16.dataset.gridGender === 'female' ? 'female' : 'male';
+          setPanoramaSceneGridPlacement({ nodeId: this.id, patch: { gender: gender4 } });
         });
       }),
-      _0x34a157.querySelectorAll('[data-grid-color]').forEach((_0x37cbb1) => {
-        _0x37cbb1.addEventListener('click', () => {
-          const _0x5ce454 = _0x37cbb1.dataset.gridColor || 'blue';
-          setPanoramaSceneGridPlacement({ nodeId: this.id, patch: { colorKey: _0x5ce454 } });
+      el11.querySelectorAll('[data-grid-color]').forEach((el17) => {
+        el17.addEventListener('click', () => {
+          const colorKey2 = el17.dataset.gridColor || 'blue';
+          setPanoramaSceneGridPlacement({ nodeId: this.id, patch: { colorKey: colorKey2 } });
         });
       }),
-      _0x34a157.querySelector('.panorama-grid-panel__apply')?.addEventListener('click', () => {
+      el11.querySelector('.panorama-grid-panel__apply')?.addEventListener('click', () => {
         (this._selectNodeOnCanvas(),
           addPanoramaSceneMannequinGrid({ nodeId: this.id, viewPose: this._bridge?.readCurrentViewPose?.() }),
           (this._openMenuKey = null),
           this._syncOverlayState());
       }),
-      _0x34a157
+      el11
     );
   }
   ['_isNodeSelected']() {
@@ -1160,21 +1151,21 @@ export class PanoramaSceneNode {
   }
   async ['_enterBrowserFullscreen']() {
     if (this._isBrowserFullscreen() || !this._shellEl) return;
-    const _0x23f38e = document.createElement('div');
-    _0x23f38e.className = 'panorama-scene-browser-fullscreen';
-    const _0x2c15a2 = document.createElement('button');
-    ((_0x2c15a2.type = 'button'),
-      (_0x2c15a2.className = 'panorama-scene-browser-fullscreen__exit'),
-      (_0x2c15a2.textContent = panoramaSceneText('toolbar.exitFullscreen')),
-      _0x2c15a2.setAttribute('aria-label', panoramaSceneText('toolbar.exitFullscreen')),
-      _0x2c15a2.addEventListener('click', () => {
+    const el18 = document.createElement('div');
+    el18.className = 'panorama-scene-browser-fullscreen';
+    const el19 = document.createElement('button');
+    ((el19.type = 'button'),
+      (el19.className = 'panorama-scene-browser-fullscreen__exit'),
+      (el19.textContent = panoramaSceneText('toolbar.exitFullscreen')),
+      el19.setAttribute('aria-label', panoramaSceneText('toolbar.exitFullscreen')),
+      el19.addEventListener('click', () => {
         void this._exitBrowserFullscreen();
       }),
-      (this._browserFullscreenExitBtnEl = _0x2c15a2),
-      _0x23f38e.appendChild(_0x2c15a2),
-      _0x23f38e.appendChild(this._shellEl),
-      document.body.appendChild(_0x23f38e),
-      (this._browserFullscreenOverlayEl = _0x23f38e),
+      (this._browserFullscreenExitBtnEl = el19),
+      el18.appendChild(el19),
+      el18.appendChild(this._shellEl),
+      document.body.appendChild(el18),
+      (this._browserFullscreenOverlayEl = el18),
       this._syncToolbarState(),
       this._syncOverlayState(),
       this._positionMenus(),
@@ -1182,96 +1173,96 @@ export class PanoramaSceneNode {
   }
   async ['_exitBrowserFullscreen']({ skipSync: skipSync = false } = {}) {
     if (!this._isBrowserFullscreen()) return;
-    const _0x459f92 = this._browserFullscreenOverlayEl;
+    const el20 = this._browserFullscreenOverlayEl;
     ((this._browserFullscreenOverlayEl = null), (this._browserFullscreenExitBtnEl = null));
     this._shellEl &&
       this.el?.isConnected &&
       (this._browserFullscreenAnchorEl?.parentElement === this.el
         ? this.el.insertBefore(this._shellEl, this._browserFullscreenAnchorEl.nextSibling)
         : this.el.appendChild(this._shellEl));
-    _0x459f92?.remove?.();
+    el20?.remove?.();
     if (skipSync) return;
     (this._syncToolbarState(), this._syncOverlayState(), this._positionMenus(), this._bridge?.resize());
   }
-  ['_handleWindowKeyDown'](_0x1dea2c) {
-    if (_0x1dea2c.defaultPrevented) return;
-    if (_0x1dea2c.key === 'Escape' && this._isBrowserFullscreen()) {
-      (_0x1dea2c.preventDefault(),
-        _0x1dea2c.stopPropagation(),
-        _0x1dea2c.stopImmediatePropagation?.(),
+  ['_handleWindowKeyDown'](event18) {
+    if (event18.defaultPrevented) return;
+    if (event18.key === 'Escape' && this._isBrowserFullscreen()) {
+      (event18.preventDefault(),
+        event18.stopPropagation(),
+        event18.stopImmediatePropagation?.(),
         void this._exitBrowserFullscreen());
       return;
     }
     if (!this._isEditing()) return;
-    const _0x1e8785 = _0x1dea2c.target,
-      _0x270ee5 = resolvePanoramaSceneHistoryShortcutAction(_0x1dea2c);
+    const value99 = event18.target,
+      detail = resolvePanoramaSceneHistoryShortcutAction(event18);
     if (
-      _0x270ee5 &&
-      _0x1e8785 instanceof HTMLElement &&
-      (this.el?.contains?.(_0x1e8785) || this._browserFullscreenOverlayEl?.contains?.(_0x1e8785))
+      detail &&
+      value99 instanceof HTMLElement &&
+      (this.el?.contains?.(value99) || this._browserFullscreenOverlayEl?.contains?.(value99))
     ) {
-      (_0x1dea2c.preventDefault(),
-        _0x1dea2c.stopPropagation(),
-        _0x1dea2c.stopImmediatePropagation?.(),
-        window.dispatchEvent(new CustomEvent('shortcut-action', { detail: _0x270ee5 })));
+      (event18.preventDefault(),
+        event18.stopPropagation(),
+        event18.stopImmediatePropagation?.(),
+        window.dispatchEvent(new CustomEvent('shortcut-action', { detail: detail })));
       return;
     }
     if (
-      _0x1e8785 instanceof HTMLElement &&
-      (_0x1e8785.isContentEditable ||
-        _0x1e8785.tagName === 'INPUT' ||
-        _0x1e8785.tagName === 'TEXTAREA' ||
-        _0x1e8785.tagName === 'SELECT')
+      value99 instanceof HTMLElement &&
+      (value99.isContentEditable ||
+        value99.tagName === 'INPUT' ||
+        value99.tagName === 'TEXTAREA' ||
+        value99.tagName === 'SELECT')
     )
       return;
-    if (_0x1dea2c.key === 'Delete' || _0x1dea2c.key === 'Backspace') {
-      (_0x1dea2c.preventDefault(),
-        _0x1dea2c.stopPropagation(),
-        _0x1dea2c.stopImmediatePropagation?.(),
+    if (event18.key === 'Delete' || event18.key === 'Backspace') {
+      (event18.preventDefault(),
+        event18.stopPropagation(),
+        event18.stopImmediatePropagation?.(),
         deleteSelectedPanoramaSceneObject({ nodeId: this.id }));
       return;
     }
     if (
-      !_0x1dea2c.repeat &&
-      !_0x1dea2c.ctrlKey &&
-      !_0x1dea2c.metaKey &&
-      !_0x1dea2c.altKey &&
-      (_0x1dea2c.key === 'v' || _0x1dea2c.key === 'V')
+      !event18.repeat &&
+      !event18.ctrlKey &&
+      !event18.metaKey &&
+      !event18.altKey &&
+      (event18.key === 'v' || event18.key === 'V')
     ) {
-      (_0x1dea2c.preventDefault(),
-        _0x1dea2c.stopPropagation(),
-        _0x1dea2c.stopImmediatePropagation?.(),
+      (event18.preventDefault(),
+        event18.stopPropagation(),
+        event18.stopImmediatePropagation?.(),
         this._toggleMouseTool());
       return;
     }
   }
-  ['_syncAttachedUiVisibility'](_0x18be4d) {
-    this._bottomToolbarAnchorEl && (this._bottomToolbarAnchorEl.hidden = !_0x18be4d);
-    const _0x502f75 = this._isNodeSelected() || this._isNodeHovered;
-    this._infoDockEl && (this._infoDockEl.hidden = !_0x502f75);
+  ['_syncAttachedUiVisibility'](enabled11) {
+    this._bottomToolbarAnchorEl && (this._bottomToolbarAnchorEl.hidden = !enabled11);
+    const enabled12 = this._isNodeSelected() || this._isNodeHovered;
+    this._infoDockEl && (this._infoDockEl.hidden = !enabled12);
   }
   ['_handleNodePointerEnter']() {
     ((this._isNodeHovered = true), this._syncAttachedUiVisibility(this._shouldShowBottomToolbar()));
   }
-  ['_handleNodePointerLeave'](_0x320971) {
-    const _0x1edc4 = _0x320971.relatedTarget;
-    if (_0x1edc4 && this.el.contains(_0x1edc4)) return;
+  ['_handleNodePointerLeave'](value100) {
+    const value101 = value100.relatedTarget;
+    if (value101 && this.el.contains(value101)) return;
     ((this._isNodeHovered = false),
       this._closeObjectContextMenu(),
       this._syncAttachedUiVisibility(this._shouldShowBottomToolbar()));
   }
   ['_selectNodeOnCanvas']({ preserveExistingSelection: preserveExistingSelection = false } = {}) {
-    const _0x1b300e = appStore.getStateRaw().selectedNodeIds || [];
-    if (preserveExistingSelection && _0x1b300e.includes(this.id)) return;
-    if (_0x1b300e.length === 1 && _0x1b300e[0] === this.id) return;
+    const list7 = appStore.getStateRaw().selectedNodeIds || [];
+    if (preserveExistingSelection && list7.includes(this.id)) return;
+    if (list7.length === 1 && list7[0] === this.id) return;
     appStore.setSelectedNodes([this.id]);
   }
   ['_isEditing']() {
     return this._sceneState?.ui?.isEditing === true && this._data?.isCollapsed !== true;
   }
   ['_shouldShowBottomToolbar']() {
-    const _0x32c41a = this._isNodeSelected();
-    return this._isEditing() && _0x32c41a;
+    const value102 = this._isNodeSelected();
+    return this._isEditing() && value102;
   }
   ['_resolveMouseTool']() {
     return (
@@ -1280,11 +1271,9 @@ export class PanoramaSceneNode {
     );
   }
   ['_toggleMouseTool']() {
-    const _0x505566 = String(
-        this._sceneState?.ui?.mouseTool || this._sceneState?.ui?.activeTool || '',
-      ).trim(),
-      _0x405096 = resolveNextPanoramaMouseTool(_0x505566);
-    setPanoramaSceneTool({ nodeId: this.id, tool: _0x405096 });
+    const value103 = String(this._sceneState?.ui?.mouseTool || this._sceneState?.ui?.activeTool || '').trim(),
+      tool = resolveNextPanoramaMouseTool(value103);
+    setPanoramaSceneTool({ nodeId: this.id, tool: tool });
   }
   ['_resolveTransformTool']() {
     return (
@@ -1305,46 +1294,46 @@ export class PanoramaSceneNode {
   ['_supportsCameraFeatures']() {
     return this._isPanorama360 !== true;
   }
-  ['_buildPanorama360IncomingImageSignature'](_0x42222d) {
+  ['_buildPanorama360IncomingImageSignature'](value104) {
     if (!this._isPanorama360) return '';
-    const _0x1096b4 = _0x42222d?.nodes || {},
-      _0x5345d = _0x1096b4[this.id];
-    if (!_0x5345d) return '';
-    const _0x3ae43f = String(_0x5345d.parentId || '').trim(),
-      _0x171edf = Object.values(_0x42222d?.edges || {}),
-      _0x350507 = [];
+    const value105 = value104?.nodes || {},
+      enabled13 = value105[this.id];
+    if (!enabled13) return '';
+    const enabled14 = String(enabled13.parentId || '').trim(),
+      list8 = Object.values(value104?.edges || {}),
+      list9 = [];
     return (
-      _0x171edf.forEach((_0x40232f) => {
-        if (!_0x40232f) return;
-        const _0x539679 = _0x40232f.targetId === this.id,
-          _0x2423f2 = !!_0x3ae43f && _0x40232f.targetId === _0x3ae43f;
-        if (!_0x539679 && !_0x2423f2) return;
-        const _0x4d076e = _0x1096b4[_0x40232f.sourceId];
-        if (!_0x4d076e || !isPanorama360ImageSourceType(_0x4d076e.type)) return;
-        const _0x4b1321 =
-            typeof _0x4d076e._bizRev === 'number' || typeof _0x4d076e._bizRev === 'string'
-              ? String(_0x4d076e._bizRev)
+      list8.forEach((enabled15) => {
+        if (!enabled15) return;
+        const enabled16 = enabled15.targetId === this.id,
+          enabled17 = !!enabled14 && enabled15.targetId === enabled14;
+        if (!enabled16 && !enabled17) return;
+        const enabled18 = value105[enabled15.sourceId];
+        if (!enabled18 || !isPanorama360ImageSourceType(enabled18.type)) return;
+        const value106 =
+            typeof enabled18._bizRev === 'number' || typeof enabled18._bizRev === 'string'
+              ? String(enabled18._bizRev)
               : '',
-          _0x8187a7 = [
-            String(_0x4d076e.localPath || '').trim(),
-            String(_0x4d076e.imageUrl || '').trim(),
-            String(_0x4d076e.src || '').trim(),
-            String(_0x4d076e.fileName || '').trim(),
+          value107 = [
+            String(enabled18.localPath || '').trim(),
+            String(enabled18.imageUrl || '').trim(),
+            String(enabled18.src || '').trim(),
+            String(enabled18.fileName || '').trim(),
           ].join(':');
-        _0x350507.push(
-          _0x40232f.id +
+        list9.push(
+          enabled15.id +
             ':' +
-            _0x40232f.sourceId +
+            enabled15.sourceId +
             ':' +
-            Number(_0x40232f.createdAt || 0) +
+            Number(enabled15.createdAt || 0) +
             ':' +
-            _0x4b1321 +
+            value106 +
             ':' +
-            _0x8187a7,
+            value107,
         );
       }),
-      _0x350507.sort((_0x59460c, _0x18b141) => _0x59460c.localeCompare(_0x18b141)),
-      _0x350507.join('|')
+      list9.sort((item7, value108) => item7.localeCompare(value108)),
+      list9.join('|')
     );
   }
   ['_enterEditing']() {
@@ -1356,34 +1345,34 @@ export class PanoramaSceneNode {
   ['_exitEditing']() {
     (this._closeMenus(), setPanoramaSceneEditing({ nodeId: this.id, isEditing: false }));
   }
-  async ['_handleFileInputChange'](_0x332fdd) {
+  async ['_handleFileInputChange'](event19) {
     if (!this._supportsPanoramaUpload()) {
-      _0x332fdd.target.value = '';
+      event19.target.value = '';
       return;
     }
-    const _0x20522c = _0x332fdd.target.files?.[0];
-    if (!_0x20522c) return;
+    const file = event19.target.files?.[0];
+    if (!file) return;
     this._selectNodeOnCanvas();
-    const _0x28a4c2 = await uploadPanoramaSceneImage({ nodeId: this.id, file: _0x20522c });
-    (_0x28a4c2 && this._isPanorama360 && this._enterEditing(), (_0x332fdd.target.value = ''));
+    const uploadPanoramaSceneImage2 = await uploadPanoramaSceneImage({ nodeId: this.id, file: file });
+    (uploadPanoramaSceneImage2 && this._isPanorama360 && this._enterEditing(), (event19.target.value = ''));
   }
-  ['_handleViewportPointerDown'](_0x20b6e0) {
-    const _0x4907bb = this._isEditing();
-    (this._selectNodeOnCanvas({ preserveExistingSelection: !_0x4907bb }), this._closeObjectContextMenu());
-    if (!_0x4907bb) return;
+  ['_handleViewportPointerDown'](event20) {
+    const enabled19 = this._isEditing();
+    (this._selectNodeOnCanvas({ preserveExistingSelection: !enabled19 }), this._closeObjectContextMenu());
+    if (!enabled19) return;
     (this._openMenuKey && ((this._openMenuKey = null), this._syncOverlayState()),
       this._viewportEl.focus?.(),
-      _0x20b6e0.stopPropagation());
+      event20.stopPropagation());
   }
-  ['_handleViewportContextMenu'](_0x1d2d5c) {
+  ['_handleViewportContextMenu'](event21) {
     if (!this._isEditing()) return;
-    (_0x1d2d5c.preventDefault(), _0x1d2d5c.stopPropagation(), this._selectNodeOnCanvas());
-    const _0x3376be = this._bridge?.pick?.(_0x1d2d5c.clientX, _0x1d2d5c.clientY);
-    if (_0x3376be?.objectType && _0x3376be?.objectId)
+    (event21.preventDefault(), event21.stopPropagation(), this._selectNodeOnCanvas());
+    const objectType4 = this._bridge?.pick?.(event21.clientX, event21.clientY);
+    if (objectType4?.objectType && objectType4?.objectId)
       setPanoramaSceneSelection({
         nodeId: this.id,
-        objectType: _0x3376be.objectType,
-        objectId: _0x3376be.objectId,
+        objectType: objectType4.objectType,
+        objectId: objectType4.objectId,
       });
     else {
       if (!this._sceneState?.selection?.selectedObjectId) {
@@ -1391,24 +1380,24 @@ export class PanoramaSceneNode {
         return;
       }
     }
-    this._openObjectContextMenu(_0x1d2d5c.clientX, _0x1d2d5c.clientY, { type: 'selection' });
+    this._openObjectContextMenu(event21.clientX, event21.clientY, { type: 'selection' });
   }
-  ['_handleGlobalPointerDown'](_0x3c654b) {
+  ['_handleGlobalPointerDown'](event22) {
     if (!this._contextMenuEl || this._contextMenuEl.hidden) return;
-    if (this._contextMenuEl.contains(_0x3c654b.target)) return;
+    if (this._contextMenuEl.contains(event22.target)) return;
     this._closeObjectContextMenu();
   }
-  ['_openObjectContextMenu'](_0x12901b, _0x9582f, _0x5a735b = { type: 'selection' }) {
+  ['_openObjectContextMenu'](value109, value110, value111 = { type: 'selection' }) {
     if (!this._contextMenuEl || !this._overlayEl) return;
-    const _0x51cb9b = this._overlayEl.getBoundingClientRect();
-    if (!_0x51cb9b.width || !_0x51cb9b.height) return;
-    const _0x193101 = this._contextMenuEl.offsetWidth || 132,
-      _0x4451bc = this._contextMenuEl.offsetHeight || 44,
-      _0x483dc0 = Math.max(0, Math.min(_0x12901b - _0x51cb9b.left, _0x51cb9b.width - _0x193101)),
-      _0x162e8a = Math.max(0, Math.min(_0x9582f - _0x51cb9b.top, _0x51cb9b.height - _0x4451bc));
-    ((this._contextMenuEl.style.left = _0x483dc0 + 'px'),
-      (this._contextMenuEl.style.top = _0x162e8a + 'px'),
-      (this._contextMenuTarget = _0x5a735b),
+    const box12 = this._overlayEl.getBoundingClientRect();
+    if (!box12.width || !box12.height) return;
+    const value112 = this._contextMenuEl.offsetWidth || 132,
+      value113 = this._contextMenuEl.offsetHeight || 44,
+      value114 = Math.max(0, Math.min(value109 - box12.left, box12.width - value112)),
+      value115 = Math.max(0, Math.min(value110 - box12.top, box12.height - value113));
+    ((this._contextMenuEl.style.left = value114 + 'px'),
+      (this._contextMenuEl.style.top = value115 + 'px'),
+      (this._contextMenuTarget = value111),
       (this._contextMenuEl.hidden = false),
       this._contextMenuEl.classList.add('is-visible'));
   }
@@ -1418,16 +1407,16 @@ export class PanoramaSceneNode {
       this._contextMenuEl.classList.remove('is-visible'),
       (this._contextMenuEl.hidden = true));
   }
-  ['_handleViewportDoubleClick'](_0x972f06) {
-    (_0x972f06.preventDefault(), _0x972f06.stopPropagation());
+  ['_handleViewportDoubleClick'](event23) {
+    (event23.preventDefault(), event23.stopPropagation());
     if (this._isEditing() && this._sceneState?.mode === 'scene') {
-      const _0x3f8546 = this._bridge?.pick?.(_0x972f06.clientX, _0x972f06.clientY);
-      if (_0x3f8546?.objectType && _0x3f8546?.objectId) {
+      const objectType5 = this._bridge?.pick?.(event23.clientX, event23.clientY);
+      if (objectType5?.objectType && objectType5?.objectId) {
         (this._selectNodeOnCanvas(),
           setPanoramaSceneSelection({
             nodeId: this.id,
-            objectType: _0x3f8546.objectType,
-            objectId: _0x3f8546.objectId,
+            objectType: objectType5.objectType,
+            objectId: objectType5.objectId,
           }),
           focusPanoramaSceneSelection({ nodeId: this.id }));
         return;
@@ -1435,96 +1424,96 @@ export class PanoramaSceneNode {
     }
     this._enterEditing();
   }
-  ['_handleKeyDown'](_0xf7c444) {
-    if (_0xf7c444.key !== 'Delete' && _0xf7c444.key !== 'Backspace') return;
+  ['_handleKeyDown'](event24) {
+    if (event24.key !== 'Delete' && event24.key !== 'Backspace') return;
     if (!this._isEditing()) return;
-    (_0xf7c444.preventDefault(),
-      _0xf7c444.stopPropagation(),
+    (event24.preventDefault(),
+      event24.stopPropagation(),
       deleteSelectedPanoramaSceneObject({ nodeId: this.id }));
   }
   ['_openPanoramaFilePicker']() {
     if (!this._supportsPanoramaUpload()) return;
     this._fileInput?.click();
   }
-  ['_openMenu'](_0x3303e0) {
-    if (!_0x3303e0) return;
+  ['_openMenu'](enabled20) {
+    if (!enabled20) return;
     (clearTimeout(this._menuHideTimer),
-      (this._openMenuKey = _0x3303e0),
+      (this._openMenuKey = enabled20),
       this._positionMenus(),
       this._syncOverlayState());
   }
   ['_closeMenus']() {
     (clearTimeout(this._menuHideTimer), (this._openMenuKey = null), this._syncOverlayState());
   }
-  ['_scheduleMenuHide'](_0x2135e9) {
+  ['_scheduleMenuHide'](value116) {
     (clearTimeout(this._menuHideTimer),
-      this._openMenuKey === _0x2135e9 && ((this._openMenuKey = null), this._syncOverlayState()));
+      this._openMenuKey === value116 && ((this._openMenuKey = null), this._syncOverlayState()));
   }
-  ['_handleBottomToolbarPointerEnter'](_0x1b4c97) {
-    const _0x5d2163 = _0x1b4c97.target?.closest?.('button');
-    if (!_0x5d2163) return;
-    if (_0x5d2163.classList.contains('act-capture')) {
+  ['_handleBottomToolbarPointerEnter'](event25) {
+    const el21 = event25.target?.closest?.('button');
+    if (!el21) return;
+    if (el21.classList.contains('act-capture')) {
       this._openMenu('capture');
       return;
     }
-    if (!this._isPanorama360 && _0x5d2163.classList.contains('act-focus')) {
+    if (!this._isPanorama360 && el21.classList.contains('act-focus')) {
       this._openMenu('focus');
       return;
     }
-    if (_0x5d2163.classList.contains('act-mannequin-entry')) {
+    if (el21.classList.contains('act-mannequin-entry')) {
       if (!this._supportsCubeCreation()) return;
       this._openMenu('mannequin');
       return;
     }
-    if (_0x5d2163.classList.contains('act-grid')) {
+    if (el21.classList.contains('act-grid')) {
       if (!this._supportsCubeCreation()) return;
       this._openMenu('grid');
       return;
     }
-    if (this._supportsCameraFeatures() && _0x5d2163.classList.contains('act-camera')) {
+    if (this._supportsCameraFeatures() && el21.classList.contains('act-camera')) {
       this._openMenu('camera');
       return;
     }
   }
-  ['_handleBottomToolbarPointerLeave'](_0x572ad9) {
-    const _0x4012bf = _0x572ad9.relatedTarget;
+  ['_handleBottomToolbarPointerLeave'](event26) {
+    const value117 = event26.relatedTarget;
     if (
-      _0x4012bf &&
-      (this._bottomToolbarEl?.contains(_0x4012bf) ||
-        this._captureMenuEl?.contains(_0x4012bf) ||
-        this._cameraListEl?.contains(_0x4012bf) ||
-        this._focusMenuEl?.contains(_0x4012bf) ||
-        this._mannequinMenuEl?.contains(_0x4012bf) ||
-        this._gridPanelEl?.contains(_0x4012bf))
+      value117 &&
+      (this._bottomToolbarEl?.contains(value117) ||
+        this._captureMenuEl?.contains(value117) ||
+        this._cameraListEl?.contains(value117) ||
+        this._focusMenuEl?.contains(value117) ||
+        this._mannequinMenuEl?.contains(value117) ||
+        this._gridPanelEl?.contains(value117))
     )
       return;
-    const _0xc8cd0b = _0x572ad9.target?.closest?.('button');
-    if (!_0xc8cd0b) return;
-    if (_0xc8cd0b.classList.contains('act-capture')) {
+    const el22 = event26.target?.closest?.('button');
+    if (!el22) return;
+    if (el22.classList.contains('act-capture')) {
       this._scheduleMenuHide('capture');
       return;
     }
-    if (!this._isPanorama360 && _0xc8cd0b.classList.contains('act-focus')) {
+    if (!this._isPanorama360 && el22.classList.contains('act-focus')) {
       this._scheduleMenuHide('focus');
       return;
     }
-    if (_0xc8cd0b.classList.contains('act-mannequin-entry')) {
+    if (el22.classList.contains('act-mannequin-entry')) {
       if (!this._supportsCubeCreation()) return;
       this._scheduleMenuHide('mannequin');
       return;
     }
-    if (_0xc8cd0b.classList.contains('act-grid')) {
+    if (el22.classList.contains('act-grid')) {
       if (!this._supportsCubeCreation()) return;
       this._scheduleMenuHide('grid');
       return;
     }
     this._supportsCameraFeatures() &&
-      _0xc8cd0b.classList.contains('act-camera') &&
+      el22.classList.contains('act-camera') &&
       this._scheduleMenuHide('camera');
   }
-  async ['_handleToolbarAction'](_0x101370) {
-    const _0x987161 = this._sceneState;
-    switch (_0x101370) {
+  async ['_handleToolbarAction'](tool2) {
+    const environmentMode = this._sceneState;
+    switch (tool2) {
       case 'enter-edit':
         this._enterEditing();
         return;
@@ -1549,23 +1538,23 @@ export class PanoramaSceneNode {
       case 'move':
       case 'rotate':
       case 'scale':
-        (this._closeMenus(), setPanoramaSceneTool({ nodeId: this.id, tool: _0x101370 }));
+        (this._closeMenus(), setPanoramaSceneTool({ nodeId: this.id, tool: tool2 }));
         return;
       case 'environment-toggle':
         setPanoramaSceneEnvironmentMode({
           nodeId: this.id,
-          environmentMode: _0x987161.environmentMode === 'day' ? 'night' : 'day',
+          environmentMode: environmentMode.environmentMode === 'day' ? 'night' : 'day',
         });
         return;
       case 'collapse-node':
         {
-          const _0x49db74 = this._data?.isCollapsed === true;
+          const enterEditingOnExpand = this._data?.isCollapsed === true;
           (setPanoramaSceneCollapsed({
             nodeId: this.id,
-            isCollapsed: !_0x49db74,
-            enterEditingOnExpand: _0x49db74,
+            isCollapsed: !enterEditingOnExpand,
+            enterEditingOnExpand: enterEditingOnExpand,
           }),
-            _0x49db74 && requestAnimationFrame(() => this._viewportEl?.focus()));
+            enterEditingOnExpand && requestAnimationFrame(() => this._viewportEl?.focus()));
         }
         return;
       case 'cube':
@@ -1617,99 +1606,98 @@ export class PanoramaSceneNode {
         return;
     }
   }
-  ['_handleToolbarClick'](_0x801994) {
-    const _0x4dd230 = _0x801994.target.closest('button');
-    if (!_0x4dd230) return;
-    const _0x5acfef = Array.from(_0x4dd230.classList).find((_0x4afc65) => _0x4afc65.startsWith('act-'));
-    if (!_0x5acfef) return;
-    (_0x801994.preventDefault(), _0x801994.stopPropagation(), this._selectNodeOnCanvas());
-    const _0x39d853 = _0x5acfef.slice(4);
-    void this._handleToolbarAction(_0x39d853);
+  ['_handleToolbarClick'](event27) {
+    const el23 = event27.target.closest('button');
+    if (!el23) return;
+    const list10 = Array.from(el23.classList).find((item8) => item8.startsWith('act-'));
+    if (!list10) return;
+    (event27.preventDefault(), event27.stopPropagation(), this._selectNodeOnCanvas());
+    const value118 = list10.slice(4);
+    void this._handleToolbarAction(value118);
   }
   ['_syncGridPanelValues']() {
     if (!this._gridPanelEl) return;
-    const _0x33dd44 = this._sceneState.gridPlacement,
-      _0x442312 = (_0x4c7ccf, _0x4d918e, _0x25caaa = 0) => {
-        const _0x275800 = this._gridPanelEl.querySelector('[data-grid-field="' + _0x4c7ccf + '"]');
-        if (!_0x275800) return;
-        if (!Number.isFinite(Number(_0x4d918e))) return;
-        const _0x4ec105 =
-          _0x25caaa > 0 ? Number(_0x4d918e).toFixed(_0x25caaa) : String(Math.round(Number(_0x4d918e)));
-        _0x275800.tagName === 'INPUT'
-          ? (_0x275800.value = _0x4ec105)
-          : ((_0x275800.textContent = _0x4ec105), _0x275800.setAttribute('aria-valuenow', String(_0x4d918e)));
+    const value119 = this._sceneState.gridPlacement,
+      handler12 = (value120, value121, count5 = 0) => {
+        const el24 = this._gridPanelEl.querySelector('[data-grid-field="' + value120 + '"]');
+        if (!el24) return;
+        if (!Number.isFinite(Number(value121))) return;
+        const value122 = count5 > 0 ? Number(value121).toFixed(count5) : String(Math.round(Number(value121)));
+        el24.tagName === 'INPUT'
+          ? (el24.value = value122)
+          : ((el24.textContent = value122), el24.setAttribute('aria-valuenow', String(value121)));
       };
-    (_0x442312('rows', _0x33dd44.rows, 0),
-      _0x442312('cols', _0x33dd44.cols, 0),
-      _0x442312('spacingX', _0x33dd44.spacingX, 1),
-      _0x442312('spacingZ', _0x33dd44.spacingZ, 1));
-    const _0x1a4f8e = _0x33dd44.gender === 'female' ? 'female' : 'male';
-    this._gridPanelEl.querySelectorAll('[data-grid-gender]').forEach((_0x509a6c) => {
-      _0x509a6c.classList.toggle('is-active', _0x509a6c.dataset.gridGender === _0x1a4f8e);
+    (handler12('rows', value119.rows, 0),
+      handler12('cols', value119.cols, 0),
+      handler12('spacingX', value119.spacingX, 1),
+      handler12('spacingZ', value119.spacingZ, 1));
+    const value123 = value119.gender === 'female' ? 'female' : 'male';
+    this._gridPanelEl.querySelectorAll('[data-grid-gender]').forEach((el25) => {
+      el25.classList.toggle('is-active', el25.dataset.gridGender === value123);
     });
-    const _0x4ab2a5 = new Set(PANORAMA_MANNEQUIN_COLOR_OPTIONS.map(([_0x3ae687]) => _0x3ae687)),
-      _0x28d56c = _0x4ab2a5.has(_0x33dd44.colorKey) ? _0x33dd44.colorKey : 'blue';
-    this._gridPanelEl.querySelectorAll('[data-grid-color]').forEach((_0x393ebb) => {
-      const _0x4d2d3f = _0x393ebb.dataset.gridColor;
-      (_0x393ebb.classList.toggle('is-active', _0x4d2d3f === _0x28d56c),
-        _0x393ebb.style.setProperty(
+    const map3 = new Set(PANORAMA_MANNEQUIN_COLOR_OPTIONS.map(([value124]) => value124)),
+      value125 = map3.has(value119.colorKey) ? value119.colorKey : 'blue';
+    this._gridPanelEl.querySelectorAll('[data-grid-color]').forEach((el26) => {
+      const value126 = el26.dataset.gridColor;
+      (el26.classList.toggle('is-active', value126 === value125),
+        el26.style.setProperty(
           '--panorama-scene-swatch-token',
-          'var(--' + resolvePanoramaSceneColorToken(_0x4d2d3f) + ')',
+          'var(--' + resolvePanoramaSceneColorToken(value126) + ')',
         ));
     });
   }
   ['_syncLocaleTexts']() {
-    const _0x1f7d9e = (_0x5b5d2d, _0x3feb64) => {
-        if (!_0x5b5d2d) return;
-        ((_0x5b5d2d.dataset.tooltip = _0x3feb64), _0x5b5d2d.setAttribute('aria-label', _0x3feb64));
+    const run5 = (el27, value127) => {
+        if (!el27) return;
+        ((el27.dataset.tooltip = value127), el27.setAttribute('aria-label', value127));
       },
-      _0x10116c = (_0x55ecdd, _0x31f594) => {
-        const _0x2bd446 = [this.el, this._browserFullscreenOverlayEl].filter(Boolean);
-        _0x2bd446.forEach((_0x4a9638) => {
-          _0x4a9638.querySelectorAll?.(_0x55ecdd)?.forEach((_0x4fb774) => _0x1f7d9e(_0x4fb774, _0x31f594));
+      handler13 = (value128, value129) => {
+        const list11 = [this.el, this._browserFullscreenOverlayEl].filter(Boolean);
+        list11.forEach((el28) => {
+          el28.querySelectorAll?.(value128)?.forEach((item9) => run5(item9, value129));
         });
       },
-      _0x5eaccc = (_0x5c35ac, _0x5189b1) => {
-        const _0x126022 =
-          this.el?.querySelector?.(_0x5c35ac) || this._browserFullscreenOverlayEl?.querySelector?.(_0x5c35ac);
-        if (_0x126022) _0x126022.textContent = _0x5189b1;
+      handler14 = (value130, value131) => {
+        const el29 =
+          this.el?.querySelector?.(value130) || this._browserFullscreenOverlayEl?.querySelector?.(value130);
+        if (el29) el29.textContent = value131;
       };
-    (_0x10116c('.act-enter-edit', panoramaSceneText('toolbar.edit')),
-      _0x10116c('.act-exit-edit', panoramaSceneText('toolbar.closeEdit')),
-      _0x10116c('.act-upload-panorama', panoramaSceneText('toolbar.uploadPanorama')),
-      _0x10116c('.act-cube', panoramaSceneText('toolbar.createCube')),
-      _0x10116c('.act-mannequin-entry', panoramaSceneText('toolbar.mannequin')),
-      _0x10116c('.act-grid', panoramaSceneText('toolbar.grid')),
-      _0x10116c('.act-capture', panoramaSceneText('toolbar.capture')),
-      _0x10116c('.act-camera', panoramaSceneText('toolbar.createCameraBookmark')),
-      _0x10116c('.act-focus', panoramaSceneText('toolbar.focus')),
-      _0x10116c('.act-reset-view', panoramaSceneText('toolbar.resetView')),
-      _0x10116c('.act-environment-toggle', panoramaSceneText('toolbar.switchEnvironment')));
-    const _0x53faed = this._contextMenuEl?.querySelector?.('.act-delete-selected');
-    if (_0x53faed) _0x53faed.textContent = panoramaSceneText('contextMenu.deleteObject');
+    (handler13('.act-enter-edit', panoramaSceneText('toolbar.edit')),
+      handler13('.act-exit-edit', panoramaSceneText('toolbar.closeEdit')),
+      handler13('.act-upload-panorama', panoramaSceneText('toolbar.uploadPanorama')),
+      handler13('.act-cube', panoramaSceneText('toolbar.createCube')),
+      handler13('.act-mannequin-entry', panoramaSceneText('toolbar.mannequin')),
+      handler13('.act-grid', panoramaSceneText('toolbar.grid')),
+      handler13('.act-capture', panoramaSceneText('toolbar.capture')),
+      handler13('.act-camera', panoramaSceneText('toolbar.createCameraBookmark')),
+      handler13('.act-focus', panoramaSceneText('toolbar.focus')),
+      handler13('.act-reset-view', panoramaSceneText('toolbar.resetView')),
+      handler13('.act-environment-toggle', panoramaSceneText('toolbar.switchEnvironment')));
+    const el30 = this._contextMenuEl?.querySelector?.('.act-delete-selected');
+    if (el30) el30.textContent = panoramaSceneText('contextMenu.deleteObject');
     (this._browserFullscreenExitBtnEl?.setAttribute(
       'aria-label',
       panoramaSceneText('toolbar.exitFullscreen'),
     ),
       this._browserFullscreenExitBtnEl &&
         (this._browserFullscreenExitBtnEl.textContent = panoramaSceneText('toolbar.exitFullscreen')),
-      this._captureMenuEl?.querySelectorAll?.('[data-capture-mode]')?.forEach((_0x47b331) => {
-        const _0x46d59b = getCaptureModeLabel(_0x47b331.dataset.captureMode || 'adaptive');
-        _0x47b331.setAttribute('aria-label', panoramaSceneText('capture.modeAria', { label: _0x46d59b }));
-        const _0x2c95b1 = _0x47b331.querySelector('.panorama-capture-menu__label');
-        if (_0x2c95b1) _0x2c95b1.textContent = _0x46d59b;
+      this._captureMenuEl?.querySelectorAll?.('[data-capture-mode]')?.forEach((el31) => {
+        const label4 = getCaptureModeLabel(el31.dataset.captureMode || 'adaptive');
+        el31.setAttribute('aria-label', panoramaSceneText('capture.modeAria', { label: label4 }));
+        const el32 = el31.querySelector('.panorama-capture-menu__label');
+        if (el32) el32.textContent = label4;
       }),
-      _0x5eaccc('.panorama-scene-focus-menu__title', panoramaSceneText('focus.title')),
+      handler14('.panorama-scene-focus-menu__title', panoramaSceneText('focus.title')),
       this._focusMenuEl
         ?.querySelector?.('.panorama-scene-focus-menu__slider')
         ?.setAttribute('aria-label', panoramaSceneText('focus.sliderAria')),
-      _0x5eaccc('.panorama-grid-panel__title', panoramaSceneText('grid.title')),
-      _0x5eaccc('[data-grid-label="rows"]', panoramaSceneText('grid.rows')),
-      _0x5eaccc('[data-grid-label="cols"]', panoramaSceneText('grid.cols')),
-      _0x5eaccc('[data-grid-label="spacingX"]', panoramaSceneText('grid.spacingX')),
-      _0x5eaccc('[data-grid-label="spacingZ"]', panoramaSceneText('grid.spacingZ')),
-      _0x5eaccc('[data-grid-label="gender"]', panoramaSceneText('grid.gender')),
-      _0x5eaccc('[data-grid-label="color"]', panoramaSceneText('grid.color')),
+      handler14('.panorama-grid-panel__title', panoramaSceneText('grid.title')),
+      handler14('[data-grid-label="rows"]', panoramaSceneText('grid.rows')),
+      handler14('[data-grid-label="cols"]', panoramaSceneText('grid.cols')),
+      handler14('[data-grid-label="spacingX"]', panoramaSceneText('grid.spacingX')),
+      handler14('[data-grid-label="spacingZ"]', panoramaSceneText('grid.spacingZ')),
+      handler14('[data-grid-label="gender"]', panoramaSceneText('grid.gender')),
+      handler14('[data-grid-label="color"]', panoramaSceneText('grid.color')),
       this._gridPanelEl
         ?.querySelector?.('[data-grid-field="rows"]')
         ?.setAttribute('aria-label', panoramaSceneText('grid.rowsAria')),
@@ -1722,15 +1710,15 @@ export class PanoramaSceneNode {
       this._gridPanelEl
         ?.querySelector?.('[data-grid-field="spacingZ"]')
         ?.setAttribute('aria-label', panoramaSceneText('grid.spacingZAria')),
-      this._gridPanelEl?.querySelectorAll?.('[data-grid-gender]')?.forEach((_0x2b9dd7) => {
-        const _0x552241 = getPanoramaMannequinGenderLabel(_0x2b9dd7.dataset.gridGender);
-        _0x2b9dd7.setAttribute('aria-label', panoramaSceneText('grid.setGenderAria', { label: _0x552241 }));
+      this._gridPanelEl?.querySelectorAll?.('[data-grid-gender]')?.forEach((el33) => {
+        const label5 = getPanoramaMannequinGenderLabel(el33.dataset.gridGender);
+        el33.setAttribute('aria-label', panoramaSceneText('grid.setGenderAria', { label: label5 }));
       }),
-      this._gridPanelEl?.querySelectorAll?.('[data-grid-color]')?.forEach((_0x406dca) => {
-        const _0x42917c = getPanoramaMannequinColorLabel(_0x406dca.dataset.gridColor);
-        _0x406dca.setAttribute('aria-label', panoramaSceneText('grid.setColorAria', { label: _0x42917c }));
+      this._gridPanelEl?.querySelectorAll?.('[data-grid-color]')?.forEach((el34) => {
+        const label6 = getPanoramaMannequinColorLabel(el34.dataset.gridColor);
+        el34.setAttribute('aria-label', panoramaSceneText('grid.setColorAria', { label: label6 }));
       }),
-      _0x5eaccc('.panorama-grid-panel__apply', panoramaSceneText('grid.apply')),
+      handler14('.panorama-grid-panel__apply', panoramaSceneText('grid.apply')),
       renderMannequinQuickMenu(this._mannequinMenuEl, this._sceneState),
       this._renderCameraPresetList(),
       this._syncToolbarState(),
@@ -1739,191 +1727,195 @@ export class PanoramaSceneNode {
   }
   ['_renderCameraPresetList']() {
     renderCameraPresetList(this._cameraListEl, this._sceneState, {
-      onActivate: (_0xa88fd7) => {
-        (this._animateCameraActivation(_0xa88fd7), (this._openMenuKey = null), this._syncOverlayState());
+      onActivate: (value132) => {
+        (this._animateCameraActivation(value132), (this._openMenuKey = null), this._syncOverlayState());
       },
-      onDelete: (_0x1c202c) => {
-        deletePanoramaSceneCamera({ nodeId: this.id, cameraId: _0x1c202c });
+      onDelete: (cameraId) => {
+        deletePanoramaSceneCamera({ nodeId: this.id, cameraId: cameraId });
       },
-      onContextMenu: ({ cameraId: _0x1f2f6d, clientX: _0x340458, clientY: _0x14bea9 }) => {
-        this._openObjectContextMenu(_0x340458, _0x14bea9, { type: 'camera', cameraId: _0x1f2f6d });
+      onContextMenu: ({ cameraId: cameraId2, clientX: clientX, clientY: clientY }) => {
+        this._openObjectContextMenu(clientX, clientY, { type: 'camera', cameraId: cameraId2 });
       },
     });
   }
   ['_syncToolbarState']() {
-    const _0x353295 = this._resolveMouseTool(),
-      _0x78e386 = this._resolveTransformTool();
+    const value133 = this._resolveMouseTool(),
+      value134 = this._resolveTransformTool();
     this._editToolbarEl
       .querySelectorAll('.act-navigate, .act-move, .act-rotate, .act-scale')
-      .forEach((_0x78d81e) => {
-        const _0x1b5850 = Array.from(_0x78d81e.classList).find((_0x2a6901) => _0x2a6901.startsWith('act-')),
-          _0x3243f3 = _0x1b5850?.slice(4),
-          _0x5708c1 = _0x3243f3 === 'navigate',
-          _0x4711c5 = _0x5708c1
-            ? _0x353295 === 'navigate' || _0x353295 === 'box-select'
-            : _0x3243f3 === _0x78e386;
-        _0x78d81e.classList.toggle('active', _0x4711c5);
+      .forEach((el35) => {
+        const list12 = Array.from(el35.classList).find((item10) => item10.startsWith('act-')),
+          value135 = list12?.slice(4),
+          value136 = value135 === 'navigate',
+          value137 = value136 ? value133 === 'navigate' || value133 === 'box-select' : value135 === value134;
+        el35.classList.toggle('active', value137);
       });
-    const _0x1d6d4a = this._editToolbarEl.querySelector('.act-navigate');
-    if (_0x1d6d4a) {
-      const _0x5d6981 = _0x353295 === 'box-select';
-      _0x1d6d4a.classList.toggle('is-box-select', _0x5d6981);
-      const _0x1375fe = buildTooltipText(
-        _0x5d6981 ? panoramaSceneText('toolbar.boxSelectMouse') : panoramaSceneText('toolbar.mouseMode'),
+    const el36 = this._editToolbarEl.querySelector('.act-navigate');
+    if (el36) {
+      const value138 = value133 === 'box-select';
+      el36.classList.toggle('is-box-select', value138);
+      const tooltipText = buildTooltipText(
+        value138 ? panoramaSceneText('toolbar.boxSelectMouse') : panoramaSceneText('toolbar.mouseMode'),
         'panorama-scene-tool-toggle-mouse',
       );
-      ((_0x1d6d4a.dataset.tooltip = _0x1375fe), _0x1d6d4a.setAttribute('aria-label', _0x1375fe));
-      const _0x30368b = _0x5d6981 ? BOX_SELECT_TOOL_ICON : POINTER_TOOL_ICON;
-      _0x1d6d4a.innerHTML !== _0x30368b && (_0x1d6d4a.innerHTML = _0x30368b);
+      ((el36.dataset.tooltip = tooltipText), el36.setAttribute('aria-label', tooltipText));
+      const value139 = value138 ? BOX_SELECT_TOOL_ICON : POINTER_TOOL_ICON;
+      el36.innerHTML !== value139 && (el36.innerHTML = value139);
     }
-    const _0x33d824 = this._editToolbarEl.querySelector('.act-move');
-    if (_0x33d824) {
-      const _0x55f25a = buildTooltipText(panoramaSceneText('toolbar.move'), 'panorama-scene-tool-move');
-      ((_0x33d824.dataset.tooltip = _0x55f25a), _0x33d824.setAttribute('aria-label', _0x55f25a));
+    const el37 = this._editToolbarEl.querySelector('.act-move');
+    if (el37) {
+      const tooltipText2 = buildTooltipText(panoramaSceneText('toolbar.move'), 'panorama-scene-tool-move');
+      ((el37.dataset.tooltip = tooltipText2), el37.setAttribute('aria-label', tooltipText2));
     }
-    const _0x2d594d = this._editToolbarEl.querySelector('.act-rotate');
-    if (_0x2d594d) {
-      const _0x5d807 = buildTooltipText(panoramaSceneText('toolbar.rotate'), 'panorama-scene-tool-rotate');
-      ((_0x2d594d.dataset.tooltip = _0x5d807), _0x2d594d.setAttribute('aria-label', _0x5d807));
+    const el38 = this._editToolbarEl.querySelector('.act-rotate');
+    if (el38) {
+      const tooltipText3 = buildTooltipText(
+        panoramaSceneText('toolbar.rotate'),
+        'panorama-scene-tool-rotate',
+      );
+      ((el38.dataset.tooltip = tooltipText3), el38.setAttribute('aria-label', tooltipText3));
     }
-    const _0x5efc5e = this._editToolbarEl.querySelector('.act-scale');
-    if (_0x5efc5e) {
-      const _0x5c5f52 = buildTooltipText(panoramaSceneText('toolbar.scale'), 'panorama-scene-tool-scale');
-      ((_0x5efc5e.dataset.tooltip = _0x5c5f52), _0x5efc5e.setAttribute('aria-label', _0x5c5f52));
+    const el39 = this._editToolbarEl.querySelector('.act-scale');
+    if (el39) {
+      const tooltipText4 = buildTooltipText(panoramaSceneText('toolbar.scale'), 'panorama-scene-tool-scale');
+      ((el39.dataset.tooltip = tooltipText4), el39.setAttribute('aria-label', tooltipText4));
     }
-    const _0x36ebba = this._cornerToolbarEl.querySelector('.act-environment-toggle');
-    if (_0x36ebba) {
-      const _0x10abe2 =
+    const el40 = this._cornerToolbarEl.querySelector('.act-environment-toggle');
+    if (el40) {
+      const value140 =
         this._sceneState.environmentMode === 'day'
           ? panoramaSceneText('toolbar.switchToNight')
           : panoramaSceneText('toolbar.switchToDay');
-      ((_0x36ebba.dataset.tooltip = _0x10abe2),
-        _0x36ebba.setAttribute('aria-label', _0x10abe2),
-        (_0x36ebba.hidden = false),
-        _0x36ebba.setAttribute('aria-hidden', 'false'));
+      ((el40.dataset.tooltip = value140),
+        el40.setAttribute('aria-label', value140),
+        (el40.hidden = false),
+        el40.setAttribute('aria-hidden', 'false'));
     }
-    const _0x141369 = this._sceneToolbarEl.querySelector('.act-upload-panorama');
-    if (_0x141369) {
-      const _0x3afa85 = this._supportsPanoramaUpload();
-      ((_0x141369.hidden = !_0x3afa85), _0x141369.setAttribute('aria-hidden', _0x3afa85 ? 'false' : 'true'));
+    const el41 = this._sceneToolbarEl.querySelector('.act-upload-panorama');
+    if (el41) {
+      const enabled21 = this._supportsPanoramaUpload();
+      ((el41.hidden = !enabled21), el41.setAttribute('aria-hidden', enabled21 ? 'false' : 'true'));
     }
-    const _0x4e18a8 = this._bottomToolbarEl.querySelector('.act-cube');
-    if (_0x4e18a8) {
-      const _0x50ffd3 = this._supportsCubeCreation();
-      ((_0x4e18a8.hidden = !_0x50ffd3), _0x4e18a8.setAttribute('aria-hidden', _0x50ffd3 ? 'false' : 'true'));
+    const el42 = this._bottomToolbarEl.querySelector('.act-cube');
+    if (el42) {
+      const enabled22 = this._supportsCubeCreation();
+      ((el42.hidden = !enabled22), el42.setAttribute('aria-hidden', enabled22 ? 'false' : 'true'));
     }
-    const _0x526663 = this._bottomToolbarEl.querySelector('.act-mannequin-entry');
-    if (_0x526663) {
-      const _0x57656d = this._supportsCubeCreation();
-      ((_0x526663.hidden = !_0x57656d),
-        _0x526663.setAttribute('aria-hidden', _0x57656d ? 'false' : 'true'),
-        (_0x526663.disabled = !_0x57656d),
-        !_0x57656d && this._openMenuKey === 'mannequin' && (this._openMenuKey = null));
+    const el43 = this._bottomToolbarEl.querySelector('.act-mannequin-entry');
+    if (el43) {
+      const enabled23 = this._supportsCubeCreation();
+      ((el43.hidden = !enabled23),
+        el43.setAttribute('aria-hidden', enabled23 ? 'false' : 'true'),
+        (el43.disabled = !enabled23),
+        !enabled23 && this._openMenuKey === 'mannequin' && (this._openMenuKey = null));
     }
-    const _0x3e897d = this._bottomToolbarEl.querySelector('.act-grid');
-    if (_0x3e897d) {
-      const _0x41104b = this._supportsCubeCreation();
-      ((_0x3e897d.hidden = !_0x41104b),
-        _0x3e897d.setAttribute('aria-hidden', _0x41104b ? 'false' : 'true'),
-        (_0x3e897d.disabled = !_0x41104b));
-      const _0x58b587 = panoramaSceneText('toolbar.grid');
-      ((_0x3e897d.dataset.tooltip = _0x58b587),
-        _0x3e897d.setAttribute('aria-label', _0x58b587),
-        !_0x41104b && this._openMenuKey === 'grid' && (this._openMenuKey = null));
+    const el44 = this._bottomToolbarEl.querySelector('.act-grid');
+    if (el44) {
+      const enabled24 = this._supportsCubeCreation();
+      ((el44.hidden = !enabled24),
+        el44.setAttribute('aria-hidden', enabled24 ? 'false' : 'true'),
+        (el44.disabled = !enabled24));
+      const panoramaSceneText2 = panoramaSceneText('toolbar.grid');
+      ((el44.dataset.tooltip = panoramaSceneText2),
+        el44.setAttribute('aria-label', panoramaSceneText2),
+        !enabled24 && this._openMenuKey === 'grid' && (this._openMenuKey = null));
     }
-    const _0x96020b = this._bottomToolbarEl.querySelector('.act-camera');
-    if (_0x96020b) {
-      const _0x58c95c = this._supportsCameraFeatures(),
-        _0x5c523b = this._sceneState.cameras.length >= 10;
-      ((_0x96020b.hidden = !_0x58c95c),
-        _0x96020b.setAttribute('aria-hidden', _0x58c95c ? 'false' : 'true'),
-        (_0x96020b.disabled = !_0x58c95c),
-        _0x96020b.classList.toggle('is-limit-reached', _0x58c95c && _0x5c523b),
-        _0x96020b.setAttribute('aria-disabled', !_0x58c95c || _0x5c523b ? 'true' : 'false'));
-      const _0x2c3749 = buildTooltipText(
+    const el45 = this._bottomToolbarEl.querySelector('.act-camera');
+    if (el45) {
+      const enabled25 = this._supportsCameraFeatures(),
+        value141 = this._sceneState.cameras.length >= 10;
+      ((el45.hidden = !enabled25),
+        el45.setAttribute('aria-hidden', enabled25 ? 'false' : 'true'),
+        (el45.disabled = !enabled25),
+        el45.classList.toggle('is-limit-reached', enabled25 && value141),
+        el45.setAttribute('aria-disabled', !enabled25 || value141 ? 'true' : 'false'));
+      const tooltipText5 = buildTooltipText(
         panoramaSceneText('toolbar.createCameraBookmark'),
         'panorama-scene-camera-create',
       );
-      ((_0x96020b.dataset.tooltip = _0x2c3749),
-        _0x96020b.setAttribute('aria-label', _0x2c3749),
-        !_0x58c95c && this._openMenuKey === 'camera' && (this._openMenuKey = null));
+      ((el45.dataset.tooltip = tooltipText5),
+        el45.setAttribute('aria-label', tooltipText5),
+        !enabled25 && this._openMenuKey === 'camera' && (this._openMenuKey = null));
     }
-    const _0x21a7dc = this._bottomToolbarEl.querySelector('.act-focus');
-    if (_0x21a7dc) {
-      const _0xa4503c = !this._isPanorama360 && this._sceneState?.mode === 'scene';
-      ((_0x21a7dc.hidden = !_0xa4503c),
-        _0x21a7dc.setAttribute('aria-hidden', _0xa4503c ? 'false' : 'true'),
-        (_0x21a7dc.disabled = !_0xa4503c));
-      const _0x315f9b = panoramaSceneText('toolbar.focus');
-      ((_0x21a7dc.dataset.tooltip = _0x315f9b),
-        _0x21a7dc.setAttribute('aria-label', _0x315f9b),
-        !_0xa4503c && this._openMenuKey === 'focus' && (this._openMenuKey = null));
+    const el46 = this._bottomToolbarEl.querySelector('.act-focus');
+    if (el46) {
+      const enabled26 = !this._isPanorama360 && this._sceneState?.mode === 'scene';
+      ((el46.hidden = !enabled26),
+        el46.setAttribute('aria-hidden', enabled26 ? 'false' : 'true'),
+        (el46.disabled = !enabled26));
+      const panoramaSceneText3 = panoramaSceneText('toolbar.focus');
+      ((el46.dataset.tooltip = panoramaSceneText3),
+        el46.setAttribute('aria-label', panoramaSceneText3),
+        !enabled26 && this._openMenuKey === 'focus' && (this._openMenuKey = null));
     }
-    const _0x4a99c0 = this._bottomToolbarEl.querySelector('.act-reset-view');
-    if (_0x4a99c0) {
-      const _0x40b921 = buildTooltipText(panoramaSceneText('toolbar.resetView'), 'panorama-scene-reset-view');
-      ((_0x4a99c0.dataset.tooltip = _0x40b921), _0x4a99c0.setAttribute('aria-label', _0x40b921));
+    const el47 = this._bottomToolbarEl.querySelector('.act-reset-view');
+    if (el47) {
+      const tooltipText6 = buildTooltipText(
+        panoramaSceneText('toolbar.resetView'),
+        'panorama-scene-reset-view',
+      );
+      ((el47.dataset.tooltip = tooltipText6), el47.setAttribute('aria-label', tooltipText6));
     }
-    const _0x44ce30 = this._bottomToolbarEl.querySelector('.act-capture');
-    if (_0x44ce30) {
-      const _0x47a73c = getCaptureModeMeta(this._resolveCaptureMode()),
-        _0x1ab201 = buildTooltipText(
-          panoramaSceneText('toolbar.captureWithMode', { mode: getCaptureModeLabel(_0x47a73c) }),
+    const el48 = this._bottomToolbarEl.querySelector('.act-capture');
+    if (el48) {
+      const captureModeMeta2 = getCaptureModeMeta(this._resolveCaptureMode()),
+        tooltipText7 = buildTooltipText(
+          panoramaSceneText('toolbar.captureWithMode', { mode: getCaptureModeLabel(captureModeMeta2) }),
           'panorama-scene-capture',
         );
-      ((_0x44ce30.dataset.tooltip = _0x1ab201), _0x44ce30.setAttribute('aria-label', _0x1ab201));
+      ((el48.dataset.tooltip = tooltipText7), el48.setAttribute('aria-label', tooltipText7));
     }
     this._syncCaptureMenuState();
-    const _0x4f63ef = [
+    const list13 = [
       this._sceneToolbarEl?.querySelector('.act-collapse-node'),
       this._editToolbarEl?.querySelector('.act-collapse-node'),
     ].filter(Boolean);
-    _0x4f63ef.forEach((_0x5df562) => {
-      const _0x31f5b2 = this._data?.isCollapsed === true,
-        _0x15b6be = _0x31f5b2 ? panoramaSceneText('toolbar.expand') : panoramaSceneText('toolbar.collapse');
-      ((_0x5df562.dataset.tooltip = _0x15b6be),
-        _0x5df562.setAttribute('aria-label', _0x15b6be),
-        _0x5df562.classList.toggle('is-collapsed', _0x31f5b2));
+    list13.forEach((el49) => {
+      const value142 = this._data?.isCollapsed === true,
+        value143 = value142 ? panoramaSceneText('toolbar.expand') : panoramaSceneText('toolbar.collapse');
+      ((el49.dataset.tooltip = value143),
+        el49.setAttribute('aria-label', value143),
+        el49.classList.toggle('is-collapsed', value142));
     });
-    const _0x542a77 = this.el?.querySelectorAll?.('.act-fullscreen') || [];
-    if (_0x542a77.length > 0) {
-      const _0x1a9ffb = this._isBrowserFullscreen(),
-        _0x3e2215 = _0x1a9ffb
+    const list14 = this.el?.querySelectorAll?.('.act-fullscreen') || [];
+    if (list14.length > 0) {
+      const value144 = this._isBrowserFullscreen(),
+        value145 = value144
           ? panoramaSceneText('toolbar.exitFullscreen')
           : panoramaSceneText('toolbar.fullscreen');
-      _0x542a77.forEach((_0x50cadf) => {
-        ((_0x50cadf.dataset.tooltip = _0x3e2215),
-          _0x50cadf.setAttribute('aria-label', _0x3e2215),
-          _0x50cadf.classList.toggle('active', _0x1a9ffb));
+      list14.forEach((el50) => {
+        ((el50.dataset.tooltip = value145),
+          el50.setAttribute('aria-label', value145),
+          el50.classList.toggle('active', value144));
       });
     }
   }
   ['_syncHintAndStatus']() {
-    const _0x46d83e = this._isEditing(),
-      _0xd924c0 = this._sceneState.selection,
-      _0x2e3f01 = this._resolveMouseTool();
-    if (_0x46d83e) {
-      const _0x3048c1 = _0xd924c0.selectedObjectId
-          ? _0xd924c0.selectedObjectType === 'camera'
+    const enabled27 = this._isEditing(),
+      value146 = this._sceneState.selection,
+      value147 = this._resolveMouseTool();
+    if (enabled27) {
+      const selection = value146.selectedObjectId
+          ? value146.selectedObjectType === 'camera'
             ? panoramaSceneText('status.cameraSelected')
             : panoramaSceneText('status.objectSelected')
           : panoramaSceneText('status.noObjectSelected'),
-        _0x7aaf85 = this._supportsPanoramaUpload()
+        mode3 = this._supportsPanoramaUpload()
           ? panoramaSceneText('status.panoramaMode')
           : panoramaSceneText('status.sceneMode');
       this._statusContentEl.textContent = panoramaSceneText('status.editing', {
-        mode: _0x7aaf85,
-        selection: _0x3048c1,
+        mode: mode3,
+        selection: selection,
       });
     } else
       this._data?.isCollapsed
         ? (this._statusContentEl.textContent = panoramaSceneText('status.collapsed'))
         : (this._statusContentEl.textContent = panoramaSceneText('status.normalNode'));
-    const _0x46cc27 = this._sceneState.panorama.error || this._sceneState.capture.error || '';
-    ((this._errorEl.textContent = _0x46cc27), this._errorEl.classList.toggle('is-visible', !!_0x46cc27));
+    const enabled28 = this._sceneState.panorama.error || this._sceneState.capture.error || '';
+    ((this._errorEl.textContent = enabled28), this._errorEl.classList.toggle('is-visible', !!enabled28));
     if (this._data?.isCollapsed) this._hintContentEl.textContent = panoramaSceneText('hint.doubleClickEdit');
     else {
-      if (!_0x46d83e)
+      if (!enabled27)
         this._hintContentEl.textContent = this._supportsPanoramaUpload()
           ? panoramaSceneText('hint.clickEditPanorama')
           : panoramaSceneText('hint.clickEditScene');
@@ -1931,7 +1923,7 @@ export class PanoramaSceneNode {
         if (this._supportsPanoramaUpload() || this._sceneState.mode === 'panorama')
           this._hintContentEl.textContent = panoramaSceneText('hint.panoramaControls');
         else
-          _0x2e3f01 === 'box-select'
+          value147 === 'box-select'
             ? (this._hintContentEl.textContent = panoramaSceneText('hint.boxSelect'))
             : (this._hintContentEl.textContent = panoramaSceneText('hint.defaultMouse'));
       }
@@ -1940,107 +1932,103 @@ export class PanoramaSceneNode {
   ['_positionMenus']() {
     if (!this._bottomToolbarPopoverLayerEl || !this._bottomToolbarEl) return;
     if (this._bottomToolbarEl.offsetWidth <= 0 || this._bottomToolbarEl.offsetHeight <= 0) return;
-    const _0x214c4c = (_0x52e685) => {
-        if (!(_0x52e685 instanceof HTMLElement)) return null;
-        const _0x6856af = _0x52e685.offsetWidth || 0,
-          _0x5bc924 = _0x52e685.offsetHeight || 0;
-        if (_0x6856af <= 0 || _0x5bc924 <= 0) return null;
-        return { x: (_0x52e685.offsetLeft || 0) + _0x6856af / 2, y: _0x52e685.offsetTop || 0 };
+    const run6 = (y2) => {
+        if (!(y2 instanceof HTMLElement)) return null;
+        const count6 = y2.offsetWidth || 0,
+          count7 = y2.offsetHeight || 0;
+        if (count6 <= 0 || count7 <= 0) return null;
+        return { x: (y2.offsetLeft || 0) + count6 / 2, y: y2.offsetTop || 0 };
       },
-      _0x2a6bb9 = _0x214c4c(this._bottomToolbarEl.querySelector('.act-mannequin-entry'));
-    _0x2a6bb9 &&
-      ((this._mannequinMenuEl.style.left = _0x2a6bb9.x + 'px'),
-      (this._mannequinMenuEl.style.top = _0x2a6bb9.y + 'px'));
-    const _0x259707 = _0x214c4c(this._bottomToolbarEl.querySelector('.act-grid'));
-    _0x259707 &&
-      ((this._gridPanelEl.style.left = _0x259707.x + 'px'),
-      (this._gridPanelEl.style.top = _0x259707.y + 'px'));
-    const _0x5c9053 = _0x214c4c(this._bottomToolbarEl.querySelector('.act-capture'));
-    _0x5c9053 &&
-      ((this._captureMenuEl.style.left = _0x5c9053.x + 'px'),
-      (this._captureMenuEl.style.top = _0x5c9053.y + 'px'));
-    const _0x1cd2aa = _0x214c4c(this._bottomToolbarEl.querySelector('.act-focus'));
-    _0x1cd2aa &&
-      ((this._focusMenuEl.style.left = _0x1cd2aa.x + 'px'),
-      (this._focusMenuEl.style.top = _0x1cd2aa.y + 'px'));
-    const _0x4f2f07 = _0x214c4c(this._bottomToolbarEl.querySelector('.act-camera'));
-    _0x4f2f07 &&
-      ((this._cameraListEl.style.left = _0x4f2f07.x + 'px'),
-      (this._cameraListEl.style.top = _0x4f2f07.y + 'px'));
+      box13 = run6(this._bottomToolbarEl.querySelector('.act-mannequin-entry'));
+    box13 &&
+      ((this._mannequinMenuEl.style.left = box13.x + 'px'),
+      (this._mannequinMenuEl.style.top = box13.y + 'px'));
+    const box14 = run6(this._bottomToolbarEl.querySelector('.act-grid'));
+    box14 &&
+      ((this._gridPanelEl.style.left = box14.x + 'px'), (this._gridPanelEl.style.top = box14.y + 'px'));
+    const box15 = run6(this._bottomToolbarEl.querySelector('.act-capture'));
+    box15 &&
+      ((this._captureMenuEl.style.left = box15.x + 'px'), (this._captureMenuEl.style.top = box15.y + 'px'));
+    const box16 = run6(this._bottomToolbarEl.querySelector('.act-focus'));
+    box16 &&
+      ((this._focusMenuEl.style.left = box16.x + 'px'), (this._focusMenuEl.style.top = box16.y + 'px'));
+    const box17 = run6(this._bottomToolbarEl.querySelector('.act-camera'));
+    box17 &&
+      ((this._cameraListEl.style.left = box17.x + 'px'), (this._cameraListEl.style.top = box17.y + 'px'));
   }
   ['_syncOverlayState']() {
-    const _0x113767 = this._isEditing(),
-      _0x2b7d6e = this._data?.isCollapsed === true,
-      _0x5638ca = this._isNodeSelected(),
-      _0xec7564 = !_0x113767,
-      _0x264c67 = _0x113767 && !_0x2b7d6e && _0x5638ca,
-      _0x428033 = _0x264c67,
-      _0x33fb54 = _0x264c67;
-    (this.el.classList.toggle('is-editing', _0x113767),
-      this.el.classList.toggle('is-collapsed', _0x2b7d6e),
+    const enabled29 = this._isEditing(),
+      enabled30 = this._data?.isCollapsed === true,
+      value148 = this._isNodeSelected(),
+      enabled31 = !enabled29,
+      enabled32 = enabled29 && !enabled30 && value148,
+      enabled33 = enabled32,
+      enabled34 = enabled32;
+    (this.el.classList.toggle('is-editing', enabled29),
+      this.el.classList.toggle('is-collapsed', enabled30),
       this.el.classList.toggle('is-panorama-mode', this._sceneState.mode === 'panorama'));
-    const _0x147279 = this._sceneState?.environmentMode === 'day' ? 'day' : 'night';
-    ((this.el.dataset.panoramaEnv = _0x147279),
-      (this._viewportEl.dataset.envMode = _0x147279),
+    const value149 = this._sceneState?.environmentMode === 'day' ? 'day' : 'night';
+    ((this.el.dataset.panoramaEnv = value149),
+      (this._viewportEl.dataset.envMode = value149),
       (this._viewportEl.dataset.sceneType = this._sceneState?.type || ''),
-      this._sceneToolbarEl.classList.toggle('is-hidden', !_0xec7564),
+      this._sceneToolbarEl.classList.toggle('is-hidden', !enabled31),
       this._sceneToolbarEl.classList.remove('is-node-collapsed'),
-      this._editToolbarEl.classList.toggle('is-hidden', !_0x264c67),
+      this._editToolbarEl.classList.toggle('is-hidden', !enabled32),
       this._editToolbarEl.classList.remove('is-node-collapsed'),
-      this._cornerToolbarEl.classList.toggle('is-hidden', !_0x33fb54),
-      this._cornerToolbarEl.classList.toggle('is-collapsed-state', _0x2b7d6e),
-      this._bottomToolbarEl.classList.toggle('is-hidden', !_0x428033),
+      this._cornerToolbarEl.classList.toggle('is-hidden', !enabled34),
+      this._cornerToolbarEl.classList.toggle('is-collapsed-state', enabled30),
+      this._bottomToolbarEl.classList.toggle('is-hidden', !enabled33),
       (this._statusEl.style.transform = 'none'),
       (this._hintEl.style.transform = 'none'));
-    !_0x264c67 && this._closeObjectContextMenu();
-    const _0x5383fd =
-        _0x264c67 &&
+    !enabled32 && this._closeObjectContextMenu();
+    const enabled35 =
+        enabled32 &&
         this._supportsCameraFeatures() &&
         this._sceneState.cameras.length > 0 &&
         this._openMenuKey === 'camera',
-      _0x457371 =
-        _0x264c67 &&
+      enabled36 =
+        enabled32 &&
         !this._isPanorama360 &&
         this._sceneState?.mode === 'scene' &&
         this._openMenuKey === 'focus',
-      _0x1185d5 = _0x264c67 && this._openMenuKey === 'capture',
-      _0x180735 = _0x264c67 && this._supportsCubeCreation() && this._openMenuKey === 'grid',
-      _0x2c561a = _0x264c67 && this._supportsCubeCreation() && this._openMenuKey === 'mannequin';
-    (this._captureMenuEl.classList.toggle('is-visible', _0x1185d5),
-      this._cameraListEl.classList.toggle('is-visible', _0x5383fd),
-      this._focusMenuEl.classList.toggle('is-visible', _0x457371),
-      this._gridPanelEl.classList.toggle('is-visible', _0x180735),
-      this._mannequinMenuEl.classList.toggle('is-visible', _0x2c561a),
-      (this._captureMenuEl.hidden = !_0x1185d5),
-      (this._cameraListEl.hidden = !_0x5383fd),
-      (this._focusMenuEl.hidden = !_0x457371),
-      (this._gridPanelEl.hidden = !_0x180735),
-      (this._mannequinMenuEl.hidden = !_0x2c561a));
-    _0x457371 && this._focusMenuEl?._syncValue?.();
+      enabled37 = enabled32 && this._openMenuKey === 'capture',
+      enabled38 = enabled32 && this._supportsCubeCreation() && this._openMenuKey === 'grid',
+      enabled39 = enabled32 && this._supportsCubeCreation() && this._openMenuKey === 'mannequin';
+    (this._captureMenuEl.classList.toggle('is-visible', enabled37),
+      this._cameraListEl.classList.toggle('is-visible', enabled35),
+      this._focusMenuEl.classList.toggle('is-visible', enabled36),
+      this._gridPanelEl.classList.toggle('is-visible', enabled38),
+      this._mannequinMenuEl.classList.toggle('is-visible', enabled39),
+      (this._captureMenuEl.hidden = !enabled37),
+      (this._cameraListEl.hidden = !enabled35),
+      (this._focusMenuEl.hidden = !enabled36),
+      (this._gridPanelEl.hidden = !enabled38),
+      (this._mannequinMenuEl.hidden = !enabled39));
+    enabled36 && this._focusMenuEl?._syncValue?.();
     (this._statusEl.classList.toggle('is-visible', true),
       this._hintEl.classList.toggle('is-visible', true),
-      this._syncAttachedUiVisibility(_0x428033),
+      this._syncAttachedUiVisibility(enabled33),
       this._syncCaptureSafeFrame());
-    const _0x46cf32 = this._bottomToolbarEl?.querySelector('.act-focus');
-    if (_0x46cf32) {
-      const _0x10fc6b = _0x457371 ? '' : panoramaSceneText('toolbar.focus');
-      (_0x10fc6b ? (_0x46cf32.dataset.tooltip = _0x10fc6b) : _0x46cf32.removeAttribute('data-tooltip'),
-        _0x46cf32.setAttribute('aria-label', panoramaSceneText('toolbar.focus')));
+    const el51 = this._bottomToolbarEl?.querySelector('.act-focus');
+    if (el51) {
+      const value150 = enabled36 ? '' : panoramaSceneText('toolbar.focus');
+      (value150 ? (el51.dataset.tooltip = value150) : el51.removeAttribute('data-tooltip'),
+        el51.setAttribute('aria-label', panoramaSceneText('toolbar.focus')));
     }
     this._positionMenus();
   }
-  ['update'](_0x4cc6a8) {
-    const _0x5d01e9 = this._sceneState;
-    ((this._data = _0x4cc6a8),
-      (this._isPanorama360 = String(_0x4cc6a8?.type || '').trim() === PANORAMA_360_NODE_TYPE),
+  ['update'](value151) {
+    const enabled40 = this._sceneState;
+    ((this._data = value151),
+      (this._isPanorama360 = String(value151?.type || '').trim() === PANORAMA_360_NODE_TYPE),
       this.el.classList.toggle('is-panorama-360', this._isPanorama360),
-      (this._sceneState = getPanoramaSceneState(_0x4cc6a8)),
+      (this._sceneState = getPanoramaSceneState(value151)),
       !this._sceneState.ui.isEditing && (this._openMenuKey = null),
-      this._maybePreloadCharacterModels(_0x5d01e9),
+      this._maybePreloadCharacterModels(enabled40),
       !this._isPanorama360 &&
       this._sceneState?.mode === 'scene' &&
-      (!_0x5d01e9 ||
-        (!this._isDefaultSceneView(_0x5d01e9?.viewport?.sceneView) &&
+      (!enabled40 ||
+        (!this._isDefaultSceneView(enabled40?.viewport?.sceneView) &&
           this._isDefaultSceneView(this._sceneState?.viewport?.sceneView)))
         ? this._setDefaultSceneFocalLength(SCENE_DEFAULT_FOCAL_LENGTH_MM)
         : this._bridge?.setDefaultSceneFocalLength?.(this._defaultSceneFocalLength),

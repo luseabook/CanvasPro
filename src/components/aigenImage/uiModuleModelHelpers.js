@@ -1,5 +1,9 @@
 import { renderOpenAiLogoHtml } from '../shared/openAiLogo.js';
-import { renderComfyUiCloudWorkflowLogoHtml, renderComfyUiLocalWorkflowLogoHtml, renderComfyUiWorkflowLogoHtmlFromIconKind } from '../shared/customAiAppLogo.js';
+import {
+  renderComfyUiCloudWorkflowLogoHtml,
+  renderComfyUiLocalWorkflowLogoHtml,
+  renderComfyUiWorkflowLogoHtmlFromIconKind,
+} from '../shared/customAiAppLogo.js';
 import { isModelManifestPubliclyListed } from '../../manifests/modelCatalogVisibility.js';
 import {
   NANO_BANANA_FAMILIES,
@@ -55,182 +59,180 @@ const GRSAI_IMAGE_MENU_ICON_HTML =
 function getDefaultImagePromptPlaceholder() {
   return t('aigenImage.prompt.placeholder');
 }
-function normalizeGrsaiModelToken(_0x5b2f41) {
-  let _0x2e30d8 = String(_0x5b2f41 || '')
+function normalizeGrsaiModelToken(value) {
+  let list = String(value || '')
     .trim()
     .toLowerCase();
-  return (_0x2e30d8.startsWith('grsai/') && (_0x2e30d8 = _0x2e30d8.slice('grsai/'.length).trim()), _0x2e30d8);
+  return (list.startsWith('grsai/') && (list = list.slice('grsai/'.length).trim()), list);
 }
 function isAdvancedModeEnabled() {
   return typeof window !== 'undefined' && window.ADVANCED_MODE === true;
 }
-function getManifestUiField(_0x19361e, _0x15a917) {
-  const _0x534973 = getModelManifest(_0x19361e)?.uiSchema?.fields;
-  return Array.isArray(_0x534973) ? _0x534973.find((_0x5ce432) => _0x5ce432?.id === _0x15a917) || null : null;
+function getManifestUiField(item, key) {
+  const list2 = getModelManifest(item)?.uiSchema?.fields;
+  return Array.isArray(list2) ? list2.find((item2) => item2?.id === key) || null : null;
 }
-function pickNearestNumber(_0x36029b, _0x15864a, _0x208c55) {
-  const _0x5ac3d5 = (Array.isArray(_0x15864a) ? _0x15864a : [])
-    .map((_0xe9683b) => Number(_0xe9683b))
-    .filter(Number.isFinite);
-  if (_0x5ac3d5.length === 0) return _0x208c55;
-  const _0x23669c = Number(_0x36029b);
-  if (!Number.isFinite(_0x23669c)) return _0x208c55;
-  return _0x5ac3d5.reduce(
-    (_0x5b4e17, _0x3f5f66) =>
-      Math.abs(_0x3f5f66 - _0x23669c) < Math.abs(_0x5b4e17 - _0x23669c) ? _0x3f5f66 : _0x5b4e17,
-    _0x5ac3d5[0],
+function pickNearestNumber(index, result, data) {
+  const list3 = (Array.isArray(result) ? result : []).map((item3) => Number(item3)).filter(Number.isFinite);
+  if (list3.length === 0) return data;
+  const options = Number(index);
+  if (!Number.isFinite(options)) return data;
+  return list3.reduce(
+    (item4, target) => (Math.abs(target - options) < Math.abs(item4 - options) ? target : item4),
+    list3[0],
   );
 }
-export function isGrsaiGptImage2ModelToken(_0x142b20) {
-  const _0x1cfeed = normalizeGrsaiModelToken(_0x142b20);
-  return _0x1cfeed === GRSAI_GPT_IMAGE_2_MODEL || _0x1cfeed === GRSAI_GPT_IMAGE_2_VIP_MODEL;
+export function isGrsaiGptImage2ModelToken(source) {
+  const grsaiModelToken = normalizeGrsaiModelToken(source);
+  return grsaiModelToken === GRSAI_GPT_IMAGE_2_MODEL || grsaiModelToken === GRSAI_GPT_IMAGE_2_VIP_MODEL;
 }
-export function isGrsaiGptImage2Selection(_0x36b797, _0x2ec854) {
-  const _0x4ae63e = String(_0x36b797 || '')
+export function isGrsaiGptImage2Selection(next, current) {
+  const enabled = String(next || '')
       .trim()
       .toLowerCase(),
-    _0x8b131a = String(_0x2ec854 || '')
+    list4 = String(current || '')
       .trim()
       .toLowerCase(),
-    _0x51cc27 = normalizeGrsaiModelToken(_0x8b131a);
-  if (!isGrsaiGptImage2ModelToken(_0x51cc27)) return false;
-  return _0x4ae63e === 'grsai' || _0x8b131a.startsWith('grsai/') || (!_0x4ae63e && !_0x8b131a.includes('/'));
+    grsaiModelToken2 = normalizeGrsaiModelToken(list4);
+  if (!isGrsaiGptImage2ModelToken(grsaiModelToken2)) return false;
+  return enabled === 'grsai' || list4.startsWith('grsai/') || (!enabled && !list4.includes('/'));
 }
-export function isApimartGptImage2Selection(_0x44cbbf, _0x54b7ba) {
-  const _0x18949f = String(_0x44cbbf || '')
+export function isApimartGptImage2Selection(entry, record) {
+  const payload = String(entry || '')
       .trim()
       .toLowerCase(),
-    _0x944a71 = String(_0x54b7ba || '')
+    handle = String(record || '')
       .trim()
       .toLowerCase();
   return (
-    _0x944a71 === APIMART_GPT_IMAGE_2_MODEL ||
-    (_0x18949f === 'apimart' && _0x944a71 === GRSAI_GPT_IMAGE_2_MODEL)
+    handle === APIMART_GPT_IMAGE_2_MODEL || (payload === 'apimart' && handle === GRSAI_GPT_IMAGE_2_MODEL)
   );
 }
-export function isRunningHubGptImage2Selection(_0x133110, _0x310eed) {
-  const _0x540b56 = String(_0x133110 || '')
+export function isRunningHubGptImage2Selection(state, config) {
+  const scope = String(state || '')
       .trim()
       .toLowerCase(),
-    _0x3cbc9a = resolveNanoBananaSelectionFromModel(_0x310eed, '2K', _0x540b56 || 'runninghub');
-  return _0x3cbc9a?.provider === 'runninghub' && _0x3cbc9a.family === NANO_BANANA_FAMILIES.GPT_IMAGE_2;
+    nanoBananaSelectionFromModel = resolveNanoBananaSelectionFromModel(config, '2K', scope || 'runninghub');
+  return (
+    nanoBananaSelectionFromModel?.provider === 'runninghub' &&
+    nanoBananaSelectionFromModel.family === NANO_BANANA_FAMILIES.GPT_IMAGE_2
+  );
 }
-export function getImageSizeCapabilityProvider(_0x24d430, _0x3c028d) {
-  return isGrsaiGptImage2Selection(_0x24d430, _0x3c028d) ? 'grsai' : _0x24d430;
+export function getImageSizeCapabilityProvider(input, output) {
+  return isGrsaiGptImage2Selection(input, output) ? 'grsai' : input;
 }
-export function getEffectiveImageSizeForUi(_0x36a370, _0x28e58f, _0x57d9b2) {
-  const _0x25bdf5 = String(_0x57d9b2 || '').trim();
-  if (_0x25bdf5) return _0x25bdf5.toUpperCase();
-  return isGrsaiGptImage2Selection(_0x36a370, _0x28e58f) ? '1K' : '2K';
+export function getEffectiveImageSizeForUi(value2, value3, value4) {
+  const value5 = String(value4 || '').trim();
+  if (value5) return value5.toUpperCase();
+  return isGrsaiGptImage2Selection(value2, value3) ? '1K' : '2K';
 }
-function isAdaptiveImageRatio(_0x45c623) {
-  const _0x7c74d2 = String(_0x45c623 || '').trim(),
-    _0x48575f = _0x7c74d2.toLowerCase();
-  return !_0x7c74d2 || _0x7c74d2 === '自适应' || _0x48575f === 'auto' || _0x48575f === 'adaptive';
+function isAdaptiveImageRatio(value6) {
+  const enabled2 = String(value6 || '').trim(),
+    value7 = enabled2.toLowerCase();
+  return !enabled2 || enabled2 === '自适应' || value7 === 'auto' || value7 === 'adaptive';
 }
-export function isAdaptiveImageAspectRatioValue(_0x181818) {
-  return isAdaptiveImageRatio(_0x181818);
+export function isAdaptiveImageAspectRatioValue(value8) {
+  return isAdaptiveImageRatio(value8);
 }
-export function parseImageDisplayAspectRatio(_0x4ded2d) {
-  if (isAdaptiveImageRatio(_0x4ded2d)) return null;
-  const _0x1a561c = String(_0x4ded2d || '')
+export function parseImageDisplayAspectRatio(value9) {
+  if (isAdaptiveImageRatio(value9)) return null;
+  const value10 = String(value9 || '')
       .trim()
       .replace(/[：∶﹕]/g, ':')
       .replace(/\s+/g, ''),
-    _0xd098d3 = _0x1a561c.match(/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/);
-  if (!_0xd098d3) return null;
-  const _0x135808 = Number.parseFloat(_0xd098d3[1]),
-    _0x5aa98f = Number.parseFloat(_0xd098d3[2]);
-  if (!Number.isFinite(_0x135808) || !Number.isFinite(_0x5aa98f)) return null;
-  if (_0x135808 <= 0 || _0x5aa98f <= 0) return null;
-  return { width: _0x135808, height: _0x5aa98f, label: _0x135808 + ':' + _0x5aa98f };
+    enabled3 = value10.match(/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/);
+  if (!enabled3) return null;
+  const width2 = Number.parseFloat(enabled3[1]),
+    height2 = Number.parseFloat(enabled3[2]);
+  if (!Number.isFinite(width2) || !Number.isFinite(height2)) return null;
+  if (width2 <= 0 || height2 <= 0) return null;
+  return { width: width2, height: height2, label: width2 + ':' + height2 };
 }
 export function buildImageDisplayRatioResizePatch({
   nodeData: nodeData = {},
   ratioValue: ratioValue = '',
   minSide: minSide = AI_GENERATION_NODE_SHORT_SIDE,
 } = {}) {
-  const _0x41495e = parseImageDisplayAspectRatio(ratioValue);
-  if (!_0x41495e) return {};
-  const _0x197f75 = Math.max(1, Math.round(Number(minSide) || AI_GENERATION_NODE_SHORT_SIDE)),
-    _0x1827d7 = Math.max(1, Math.round(Number(nodeData?.width) || _0x197f75)),
-    _0x345b21 = Math.max(1, Math.round(Number(nodeData?.height) || _0x197f75)),
-    _0x5723b3 = Number.isFinite(Number(nodeData?.x)) ? Number(nodeData.x) : 0,
-    _0x90c588 = Number.isFinite(Number(nodeData?.y)) ? Number(nodeData.y) : 0;
-  let _0x98c78e, _0x1e16f4;
-  _0x41495e.width >= _0x41495e.height
-    ? ((_0x1e16f4 = _0x197f75), (_0x98c78e = Math.round((_0x41495e.width / _0x41495e.height) * _0x197f75)))
-    : ((_0x98c78e = _0x197f75), (_0x1e16f4 = Math.round((_0x41495e.height / _0x41495e.width) * _0x197f75)));
-  if (_0x98c78e === _0x1827d7 && _0x1e16f4 === _0x345b21) return {};
-  const _0x2ac827 = _0x98c78e - _0x1827d7,
-    _0x3de030 = _0x1e16f4 - _0x345b21;
+  const box = parseImageDisplayAspectRatio(ratioValue);
+  if (!box) return {};
+  const value11 = Math.max(1, Math.round(Number(minSide) || AI_GENERATION_NODE_SHORT_SIDE)),
+    value12 = Math.max(1, Math.round(Number(nodeData?.width) || value11)),
+    value13 = Math.max(1, Math.round(Number(nodeData?.height) || value11)),
+    value14 = Number.isFinite(Number(nodeData?.x)) ? Number(nodeData.x) : 0,
+    value15 = Number.isFinite(Number(nodeData?.y)) ? Number(nodeData.y) : 0;
+  let width3, height3;
+  box.width >= box.height
+    ? ((height3 = value11), (width3 = Math.round((box.width / box.height) * value11)))
+    : ((width3 = value11), (height3 = Math.round((box.height / box.width) * value11)));
+  if (width3 === value12 && height3 === value13) return {};
+  const value16 = width3 - value12,
+    value17 = height3 - value13;
   return {
-    width: _0x98c78e,
-    height: _0x1e16f4,
-    x: Math.round(_0x5723b3 - _0x2ac827 / 2),
-    y: Math.round(_0x90c588 - _0x3de030),
+    width: width3,
+    height: height3,
+    x: Math.round(value14 - value16 / 2),
+    y: Math.round(value15 - value17),
   };
 }
-function getPlainSchemaParams(_0x454a60) {
-  return _0x454a60 && typeof _0x454a60 === 'object' && !Array.isArray(_0x454a60) ? { ..._0x454a60 } : {};
+function getPlainSchemaParams(args) {
+  return args && typeof args === 'object' && !Array.isArray(args) ? { ...args } : {};
 }
-function getImageSizeForRatioDisplay(_0x58da09 = {}, _0x490a71 = {}) {
-  const _0x40b65a = _0x58da09 || {},
-    _0x383493 = _0x490a71 || {},
-    _0x2b85b3 = getPlainSchemaParams(_0x40b65a.generationParams);
+function getImageSizeForRatioDisplay(options2 = {}, value18 = {}) {
+  const value19 = options2 || {},
+    value20 = value18 || {},
+    plainSchemaParams = getPlainSchemaParams(value19.generationParams);
   return getEffectiveImageSizeForUi(
-    _0x40b65a.provider || _0x383493.provider,
-    _0x40b65a.model || _0x383493.model,
-    _0x2b85b3.imageSize || _0x40b65a.imageSize,
+    value19.provider || value20.provider,
+    value19.model || value20.model,
+    plainSchemaParams.imageSize || value19.imageSize,
   );
 }
 function pickClosestRatioLabelForDisplay({
   nodeData: nodeData = {},
   fallbackNodeData: fallbackNodeData = {},
-  width: _0xca5229,
-  height: _0x5233fb,
+  width: width4,
+  height: height4,
 } = {}) {
-  const _0x2aa5b3 = Number(_0xca5229) || 0,
-    _0x3961e1 = Number(_0x5233fb) || 0;
-  if (_0x2aa5b3 <= 0 || _0x3961e1 <= 0) return null;
+  const width5 = Number(width4) || 0,
+    height5 = Number(height4) || 0;
+  if (width5 <= 0 || height5 <= 0) return null;
   return pickClosestRatioForProviderModel({
     provider: nodeData?.provider || fallbackNodeData?.provider,
     model: nodeData?.model || fallbackNodeData?.model,
-    width: _0x2aa5b3,
-    height: _0x3961e1,
+    width: width5,
+    height: height5,
     imageSize: getImageSizeForRatioDisplay(nodeData, fallbackNodeData),
   });
 }
-function getMediaSizeForRatioDisplay(_0x3bbdc5, _0x25afce, _0x449776 = null, _0x2cf471 = 'img, video') {
+function getMediaSizeForRatioDisplay(nodeId, nodeData2, edge = null, mediaSelector2 = 'img, video') {
   return (
     getGenerationRatioSizeWithDom({
-      nodeId: _0x3bbdc5,
-      nodeData: _0x25afce,
-      edge: _0x449776,
-      mediaSelector: _0x2cf471,
+      nodeId: nodeId,
+      nodeData: nodeData2,
+      edge: edge,
+      mediaSelector: mediaSelector2,
       includeNodeFrame: true,
     }) || { width: 0, height: 0 }
   );
 }
-function isAcceptedRatioInputKind(_0x27d58d, _0x188a7e, _0x4d2fdf, _0x4d1d06) {
-  const _0x5678de = String(_0x27d58d?.refSlot || '').toLowerCase();
-  if (_0x5678de.includes('mask')) return false;
-  const _0x5e99ef = _0x188a7e?.[_0x27d58d?.sourceId],
-    _0x21f877 = String(_0x5e99ef?.type || ''),
-    _0x3defc3 = typeof _0x4d1d06 === 'function' ? _0x4d1d06(_0x21f877) : '';
-  if (_0x3defc3 && _0x4d2fdf.has(_0x3defc3)) return true;
-  const _0x45628e = _0x21f877.toLowerCase();
-  return Array.from(_0x4d2fdf).some(
-    (_0x5a8128) =>
-      _0x45628e === _0x5a8128 || _0x45628e === 'source-' + _0x5a8128 || _0x45628e === 'ai-' + _0x5a8128,
+function isAcceptedRatioInputKind(value21, value22, map, handler) {
+  const list5 = String(value21?.refSlot || '').toLowerCase();
+  if (list5.includes('mask')) return false;
+  const value23 = value22?.[value21?.sourceId],
+    value24 = String(value23?.type || ''),
+    value25 = typeof handler === 'function' ? handler(value24) : '';
+  if (value25 && map.has(value25)) return true;
+  const value26 = value24.toLowerCase();
+  return Array.from(map).some(
+    (item5) => value26 === item5 || value26 === 'source-' + item5 || value26 === 'ai-' + item5,
   );
 }
 export function resolveImageSchemaAdaptiveRatioDisplayValue({
-  store: _0x19a237,
-  nodeId: _0x4a4d1c,
-  nodeData: _0xf260da,
-  fallbackNodeData: _0x10e771,
-  getRefKindByNodeType: _0x855c2d,
+  store: store,
+  nodeId: nodeId2,
+  nodeData: nodeData3,
+  fallbackNodeData: fallbackNodeData2,
+  getRefKindByNodeType: getRefKindByNodeType,
   inputKinds: inputKinds = ['image'],
   resultMediaElement: resultMediaElement = null,
   resultFields: resultFields = [
@@ -244,207 +246,212 @@ export function resolveImageSchemaAdaptiveRatioDisplayValue({
   ],
   mediaSelector: mediaSelector = 'img, video',
 } = {}) {
-  const _0x3b2dd0 = _0x19a237?.getState?.() || {},
-    _0x31b2c5 = _0x3b2dd0.nodes || {},
-    _0x2518bd = _0xf260da || _0x31b2c5?.[_0x4a4d1c] || _0x10e771 || {},
-    _0x50e10c = new Set(
+  const value27 = store?.getState?.() || {},
+    value28 = value27.nodes || {},
+    nodeData4 = nodeData3 || value28?.[nodeId2] || fallbackNodeData2 || {},
+    value29 = new Set(
       (Array.isArray(inputKinds) ? inputKinds : ['image'])
-        .map((_0x51d44d) => String(_0x51d44d || '').trim())
+        .map((item6) => String(item6 || '').trim())
         .filter(Boolean),
     ),
-    _0x159d79 =
-      typeof _0x19a237?.getIncomingEdges === 'function' ? _0x19a237.getIncomingEdges(_0x4a4d1c) : [],
-    _0x4564fc = _0x159d79.filter((_0x2312b5) =>
-      isAcceptedRatioInputKind(_0x2312b5, _0x31b2c5, _0x50e10c, _0x855c2d),
-    );
-  if (_0x4564fc.length > 0) {
-    const _0x5970a2 = pickGenerationRatioSourceEdge(_0x4564fc, _0x2518bd),
-      _0x58d594 = _0x31b2c5?.[_0x5970a2?.sourceId],
-      _0x1ac466 = getMediaSizeForRatioDisplay(_0x5970a2?.sourceId, _0x58d594, _0x5970a2, mediaSelector);
+    list6 = typeof store?.getIncomingEdges === 'function' ? store.getIncomingEdges(nodeId2) : [],
+    list7 = list6.filter((item7) => isAcceptedRatioInputKind(item7, value28, value29, getRefKindByNodeType));
+  if (list7.length > 0) {
+    const generationRatioSourceEdge = pickGenerationRatioSourceEdge(list7, nodeData4),
+      value30 = value28?.[generationRatioSourceEdge?.sourceId],
+      width6 = getMediaSizeForRatioDisplay(
+        generationRatioSourceEdge?.sourceId,
+        value30,
+        generationRatioSourceEdge,
+        mediaSelector,
+      );
     return (
       pickClosestRatioLabelForDisplay({
-        nodeData: _0x2518bd,
-        fallbackNodeData: _0x10e771,
-        width: _0x1ac466.width,
-        height: _0x1ac466.height,
+        nodeData: nodeData4,
+        fallbackNodeData: fallbackNodeData2,
+        width: width6.width,
+        height: width6.height,
       }) || '1:1'
     );
   }
-  const _0x150498 = resultFields.some((_0x251690) => {
-    const _0x198af1 = _0x2518bd?.[_0x251690];
-    return Array.isArray(_0x198af1) ? _0x198af1.length > 0 : Boolean(_0x198af1);
+  const value31 = resultFields.some((item8) => {
+    const list8 = nodeData4?.[item8];
+    return Array.isArray(list8) ? list8.length > 0 : Boolean(list8);
   });
-  if (_0x150498) {
-    const _0x2031c9 =
-        resultMediaElement?.naturalWidth || resultMediaElement?.videoWidth || Number(_0x2518bd?.width) || 0,
-      _0x380446 =
+  if (value31) {
+    const width7 =
+        resultMediaElement?.naturalWidth || resultMediaElement?.videoWidth || Number(nodeData4?.width) || 0,
+      height6 =
         resultMediaElement?.naturalHeight ||
         resultMediaElement?.videoHeight ||
-        Number(_0x2518bd?.height) ||
+        Number(nodeData4?.height) ||
         0;
     return (
       pickClosestRatioLabelForDisplay({
-        nodeData: _0x2518bd,
-        fallbackNodeData: _0x10e771,
-        width: _0x2031c9,
-        height: _0x380446,
+        nodeData: nodeData4,
+        fallbackNodeData: fallbackNodeData2,
+        width: width7,
+        height: height6,
       }) || '1:1'
     );
   }
   return '1:1';
 }
 export function buildImageSchemaAspectRatioDisplayPatch({
-  store: _0x52e4d3,
-  nodeId: _0x5131f2,
-  nodeData: _0x2f5ef4,
-  fallbackNodeData: _0x3be92c,
+  store: store2,
+  nodeId: nodeId3,
+  nodeData: nodeData5,
+  fallbackNodeData: fallbackNodeData3,
   ratioValue: ratioValue = '',
   minSide: minSide = AI_GENERATION_NODE_SHORT_SIDE,
-  getRefKindByNodeType: _0xc1e10e,
-  inputKinds: _0x1d2d85,
-  resultMediaElement: _0x4092f2,
-  resultFields: _0x17d3c3,
-  mediaSelector: _0x2dd237,
+  getRefKindByNodeType: getRefKindByNodeType2,
+  inputKinds: inputKinds2,
+  resultMediaElement: resultMediaElement2,
+  resultFields: resultFields2,
+  mediaSelector: mediaSelector3,
 } = {}) {
-  const _0x1e6d06 = _0x52e4d3?.getState?.().nodes?.[_0x5131f2];
-  if (!_0x1e6d06 && !_0x2f5ef4 && !_0x3be92c) return {};
-  const _0x22f519 = _0x2f5ef4 || _0x1e6d06 || _0x3be92c || {},
-    _0x334619 = isAdaptiveImageAspectRatioValue(ratioValue)
+  const enabled4 = store2?.getState?.().nodes?.[nodeId3];
+  if (!enabled4 && !nodeData5 && !fallbackNodeData3) return {};
+  const nodeData6 = nodeData5 || enabled4 || fallbackNodeData3 || {},
+    ratioValue2 = isAdaptiveImageAspectRatioValue(ratioValue)
       ? resolveImageSchemaAdaptiveRatioDisplayValue({
-          store: _0x52e4d3,
-          nodeId: _0x5131f2,
-          nodeData: _0x22f519,
-          fallbackNodeData: _0x3be92c,
-          getRefKindByNodeType: _0xc1e10e,
-          inputKinds: _0x1d2d85,
-          resultMediaElement: _0x4092f2,
-          resultFields: _0x17d3c3,
-          mediaSelector: _0x2dd237,
+          store: store2,
+          nodeId: nodeId3,
+          nodeData: nodeData6,
+          fallbackNodeData: fallbackNodeData3,
+          getRefKindByNodeType: getRefKindByNodeType2,
+          inputKinds: inputKinds2,
+          resultMediaElement: resultMediaElement2,
+          resultFields: resultFields2,
+          mediaSelector: mediaSelector3,
         })
       : ratioValue;
-  return buildImageDisplayRatioResizePatch({ nodeData: _0x22f519, ratioValue: _0x334619, minSide: minSide });
+  return buildImageDisplayRatioResizePatch({
+    nodeData: nodeData6,
+    ratioValue: ratioValue2,
+    minSide: minSide,
+  });
 }
-export function armImageSchemaRatioResizeAnimation(_0x31a3ec, _0x1be688, _0x107fec = 0x118) {
-  const _0x5f5132 = typeof document !== 'undefined' ? document.getElementById(_0x1be688) : null;
-  if (!_0x5f5132 || !_0x31a3ec) return;
-  _0x5f5132.classList.add('is-ratio-animating');
-  if (_0x31a3ec._ratioAnimTimer) clearTimeout(_0x31a3ec._ratioAnimTimer);
-  _0x31a3ec._ratioAnimTimer = setTimeout(() => {
-    const _0x3b9bd5 = typeof document !== 'undefined' ? document.getElementById(_0x1be688) : null;
-    (_0x3b9bd5?.classList.remove('is-ratio-animating'), (_0x31a3ec._ratioAnimTimer = null));
-  }, _0x107fec + 80);
+export function armImageSchemaRatioResizeAnimation(enabled5, value32, value33 = 0x118) {
+  const el = typeof document !== 'undefined' ? document.getElementById(value32) : null;
+  if (!el || !enabled5) return;
+  el.classList.add('is-ratio-animating');
+  if (enabled5._ratioAnimTimer) clearTimeout(enabled5._ratioAnimTimer);
+  enabled5._ratioAnimTimer = setTimeout(() => {
+    const el2 = typeof document !== 'undefined' ? document.getElementById(value32) : null;
+    (el2?.classList.remove('is-ratio-animating'), (enabled5._ratioAnimTimer = null));
+  }, value33 + 80);
 }
 export function animateImageSchemaRatioResizeFlip(
-  _0x5e31a1,
-  { nodeId: _0x27087a, previewEl: _0x311097, nodeData: _0x5bdc82, patch: _0x4c8c3b, ms: ms = 0x118 } = {},
+  enabled6,
+  { nodeId: nodeId4, previewEl: previewEl, nodeData: nodeData7, patch: patch, ms: ms = 0x118 } = {},
 ) {
-  if (!_0x5e31a1 || !_0x311097 || typeof _0x311097.animate !== 'function') return;
-  const _0x44f624 = Math.max(1, Number(_0x5bdc82?.width) || Number(_0x4c8c3b?.width) || 1),
-    _0x43b1a8 = Math.max(1, Number(_0x5bdc82?.height) || Number(_0x4c8c3b?.height) || 1),
-    _0x42d54a = Math.max(1, Number(_0x4c8c3b?.width) || _0x44f624),
-    _0x2b7619 = Math.max(1, Number(_0x4c8c3b?.height) || _0x43b1a8);
-  if (_0x44f624 === _0x42d54a && _0x43b1a8 === _0x2b7619) return;
-  const _0x1ca880 = _0x44f624 / _0x42d54a,
-    _0x465487 = _0x43b1a8 / _0x2b7619,
-    _0x36895e = 'scaleX(' + _0x1ca880 + ') scaleY(' + _0x465487 + ')',
-    _0x12364e = () => {
-      ((_0x5e31a1._ratioFlipAnim = null),
-        (_0x311097.style.transformOrigin = ''),
-        (_0x311097.style.transform = ''));
+  if (!enabled6 || !previewEl || typeof previewEl.animate !== 'function') return;
+  const value34 = Math.max(1, Number(nodeData7?.width) || Number(patch?.width) || 1),
+    value35 = Math.max(1, Number(nodeData7?.height) || Number(patch?.height) || 1),
+    value36 = Math.max(1, Number(patch?.width) || value34),
+    value37 = Math.max(1, Number(patch?.height) || value35);
+  if (value34 === value36 && value35 === value37) return;
+  const value38 = value34 / value36,
+    value39 = value35 / value37,
+    transform = 'scaleX(' + value38 + ') scaleY(' + value39 + ')',
+    handler2 = () => {
+      ((enabled6._ratioFlipAnim = null),
+        (previewEl.style.transformOrigin = ''),
+        (previewEl.style.transform = ''));
     };
-  if (_0x5e31a1._ratioFlipAnim) _0x5e31a1._ratioFlipAnim.cancel();
-  ((_0x311097.style.transition = 'none'),
-    (_0x311097.style.transformOrigin = 'bottom center'),
-    (_0x311097.style.transform = _0x36895e),
-    void _0x311097.offsetWidth);
-  const _0xbec0ec = () => {
-    if (typeof document !== 'undefined' && !document.getElementById(_0x27087a)) {
-      _0x12364e();
+  if (enabled6._ratioFlipAnim) enabled6._ratioFlipAnim.cancel();
+  ((previewEl.style.transition = 'none'),
+    (previewEl.style.transformOrigin = 'bottom center'),
+    (previewEl.style.transform = transform),
+    void previewEl.offsetWidth);
+  const value40 = () => {
+    if (typeof document !== 'undefined' && !document.getElementById(nodeId4)) {
+      handler2();
       return;
     }
-    ((_0x5e31a1._ratioFlipAnim = _0x311097.animate([{ transform: _0x36895e }, { transform: 'none' }], {
+    ((enabled6._ratioFlipAnim = previewEl.animate([{ transform: transform }, { transform: 'none' }], {
       duration: ms,
       easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       fill: 'forwards',
     })),
-      (_0x5e31a1._ratioFlipAnim.onfinish = _0x12364e),
-      (_0x5e31a1._ratioFlipAnim.oncancel = _0x12364e));
+      (enabled6._ratioFlipAnim.onfinish = handler2),
+      (enabled6._ratioFlipAnim.oncancel = handler2));
   };
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(_0xbec0ec);
-  else setTimeout(_0xbec0ec, 0);
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(value40);
+  else setTimeout(value40, 0);
 }
 export function applyImageSchemaRatioResizeAnimation(
-  _0x25b895,
-  { nodeId: _0x4c5d44, previewEl: _0x47101c, nodeData: _0x274976, patch: _0x6c3b8a, ms: ms = 0x118 } = {},
+  value41,
+  { nodeId: nodeId5, previewEl: previewEl2, nodeData: nodeData8, patch: patch2, ms: ms = 0x118 } = {},
 ) {
-  if (!_0x6c3b8a || Object.keys(_0x6c3b8a).length === 0) return;
-  (armImageSchemaRatioResizeAnimation(_0x25b895, _0x4c5d44, ms),
-    animateImageSchemaRatioResizeFlip(_0x25b895, {
-      nodeId: _0x4c5d44,
-      previewEl: _0x47101c,
-      nodeData: _0x274976,
-      patch: _0x6c3b8a,
+  if (!patch2 || Object.keys(patch2).length === 0) return;
+  (armImageSchemaRatioResizeAnimation(value41, nodeId5, ms),
+    animateImageSchemaRatioResizeFlip(value41, {
+      nodeId: nodeId5,
+      previewEl: previewEl2,
+      nodeData: nodeData8,
+      patch: patch2,
       ms: ms,
     }));
 }
-export function normalizeQwenImageEditMode(_0x10a616) {
-  const _0x1d31b8 = String(_0x10a616 || '')
+export function normalizeQwenImageEditMode(value42) {
+  const value43 = String(value42 || '')
     .trim()
     .toLowerCase();
-  return _0x1d31b8 === 'qwen2509' ||
-    _0x1d31b8 === 'qwen-edit2509' ||
-    _0x1d31b8 === '2509' ||
-    _0x1d31b8 === '0'
+  return value43 === 'qwen2509' || value43 === 'qwen-edit2509' || value43 === '2509' || value43 === '0'
     ? 'qwen2509'
     : 'qwen2511';
 }
-export function getQwenImageEditModeLabel(_0xda2526) {
-  return normalizeQwenImageEditMode(_0xda2526) === 'qwen2509' ? '2509' : '2511';
+export function getQwenImageEditModeLabel(value44) {
+  return normalizeQwenImageEditMode(value44) === 'qwen2509' ? '2509' : '2511';
 }
-export function getQwenImageEditModeTooltip(_0x2ed303) {
-  const _0x533775 = normalizeQwenImageEditMode(_0x2ed303),
-    _0xdcb3ae = getQwenUiFieldOptions('rhQwenEditMode').find((_0x478322) => _0x478322.value === _0x533775);
-  if (_0xdcb3ae?.tooltip) return _0xdcb3ae.tooltip;
-  return _0x533775 === 'qwen2509'
+export function getQwenImageEditModeTooltip(value45) {
+  const qwenImageEditMode = normalizeQwenImageEditMode(value45),
+    qwenUiFieldOptions = getQwenUiFieldOptions('rhQwenEditMode').find(
+      (el3) => el3.value === qwenImageEditMode,
+    );
+  if (qwenUiFieldOptions?.tooltip) return qwenUiFieldOptions.tooltip;
+  return qwenImageEditMode === 'qwen2509'
     ? t('aigenImage.qwen.versionTooltips.qwen2509')
     : t('aigenImage.qwen.versionTooltips.qwen2511');
 }
-export function normalizeQwenFirstImageMode(_0x143baf) {
-  const _0x5c62b8 = String(_0x143baf || '')
+export function normalizeQwenFirstImageMode(value46) {
+  const value47 = String(value46 || '')
     .trim()
     .toLowerCase();
-  if (_0x5c62b8 === 'pose' || _0x5c62b8 === '1' || _0x5c62b8 === '姿势图') return 'pose';
-  if (_0x5c62b8 === 'depth' || _0x5c62b8 === '2' || _0x5c62b8 === '深度图') return 'depth';
+  if (value47 === 'pose' || value47 === '1' || value47 === '姿势图') return 'pose';
+  if (value47 === 'depth' || value47 === '2' || value47 === '深度图') return 'depth';
   return 'original';
 }
-export function getQwenFirstImageModeLabel(_0x38f4d0) {
-  const _0x4e2509 = normalizeQwenFirstImageMode(_0x38f4d0),
-    _0x5c118b = getQwenUiFieldOptions('rhQwenFirstImageMode').find(
-      (_0x1c6225) => _0x1c6225.value === _0x4e2509,
+export function getQwenFirstImageModeLabel(value48) {
+  const qwenFirstImageMode = normalizeQwenFirstImageMode(value48),
+    qwenUiFieldOptions2 = getQwenUiFieldOptions('rhQwenFirstImageMode').find(
+      (el4) => el4.value === qwenFirstImageMode,
     );
-  if (_0x5c118b?.label) return _0x5c118b.label;
-  if (_0x4e2509 === 'pose') return t('aigenImage.qwen.firstImageModes.pose');
-  if (_0x4e2509 === 'depth') return t('aigenImage.qwen.firstImageModes.depth');
+  if (qwenUiFieldOptions2?.label) return qwenUiFieldOptions2.label;
+  if (qwenFirstImageMode === 'pose') return t('aigenImage.qwen.firstImageModes.pose');
+  if (qwenFirstImageMode === 'depth') return t('aigenImage.qwen.firstImageModes.depth');
   return t('aigenImage.qwen.firstImageModes.original');
 }
 function getQwenModelManifest() {
   return getModelManifest(QWEN_IMAGE_EDIT_MODEL_ID);
 }
-function getQwenUiField(_0x76f4a8) {
-  const _0x4c11df = getQwenModelManifest()?.uiSchema?.fields;
-  return Array.isArray(_0x4c11df) ? _0x4c11df.find((_0x2a9234) => _0x2a9234?.id === _0x76f4a8) || null : null;
+function getQwenUiField(value49) {
+  const list9 = getQwenModelManifest()?.uiSchema?.fields;
+  return Array.isArray(list9) ? list9.find((item9) => item9?.id === value49) || null : null;
 }
-function getQwenUiFieldOptions(_0x24b61f) {
-  const _0xbd7646 = getQwenUiField(_0x24b61f)?.options;
-  return Array.isArray(_0xbd7646) ? _0xbd7646 : [];
+function getQwenUiFieldOptions(value50) {
+  const qwenUiField = getQwenUiField(value50)?.options;
+  return Array.isArray(qwenUiField) ? qwenUiField : [];
 }
 export function getQwenImageEditModelManifest() {
   return getQwenModelManifest();
 }
 export function getQwenFirstImageModeOptions() {
-  const _0x1fd517 = getQwenUiFieldOptions('rhQwenFirstImageMode');
-  return _0x1fd517.length
-    ? _0x1fd517
+  const list10 = getQwenUiFieldOptions('rhQwenFirstImageMode');
+  return list10.length
+    ? list10
     : [
         { value: 'original', label: t('aigenImage.qwen.firstImageModes.original') },
         { value: 'pose', label: t('aigenImage.qwen.firstImageModes.pose') },
@@ -452,17 +459,19 @@ export function getQwenFirstImageModeOptions() {
       ];
 }
 export function getPersonReplaceV21ResolutionOptions() {
-  const _0x167484 = getManifestUiField(PERSON_REPLACE_V21_MODEL_ID, 'rhResolution'),
-    _0x257f9a = Array.isArray(_0x167484?.options) ? _0x167484.options : [],
-    _0x1ffc7e =
-      isAdvancedModeEnabled() && Array.isArray(_0x167484?.advancedOptions) ? _0x167484.advancedOptions : [];
-  return [..._0x257f9a, ..._0x1ffc7e].map((_0x32afb9) => Number(_0x32afb9)).filter(Number.isFinite);
+  const manifestUiField = getManifestUiField(PERSON_REPLACE_V21_MODEL_ID, 'rhResolution'),
+    args2 = Array.isArray(manifestUiField?.options) ? manifestUiField.options : [],
+    args3 =
+      isAdvancedModeEnabled() && Array.isArray(manifestUiField?.advancedOptions)
+        ? manifestUiField.advancedOptions
+        : [];
+  return [...args2, ...args3].map((item10) => Number(item10)).filter(Number.isFinite);
 }
-export function normalizePersonReplaceV21Resolution(_0x1060f6) {
-  const _0x169893 = getManifestUiField(PERSON_REPLACE_V21_MODEL_ID, 'rhResolution'),
-    _0x21b735 = getPersonReplaceV21ResolutionOptions(),
-    _0x5b6126 = Number(_0x169893?.defaultValue) || 0x500;
-  return pickNearestNumber(_0x1060f6, _0x21b735, _0x5b6126);
+export function normalizePersonReplaceV21Resolution(value51) {
+  const manifestUiField2 = getManifestUiField(PERSON_REPLACE_V21_MODEL_ID, 'rhResolution'),
+    personReplaceV21ResolutionOptions = getPersonReplaceV21ResolutionOptions(),
+    value52 = Number(manifestUiField2?.defaultValue) || 0x500;
+  return pickNearestNumber(value51, personReplaceV21ResolutionOptions, value52);
 }
 export function buildRunningHubGptImage2OfficialPatch({
   provider: provider = '',
@@ -471,47 +480,47 @@ export function buildRunningHubGptImage2OfficialPatch({
   aspectRatio: aspectRatio = '',
 } = {}) {
   if (!isRunningHubGptImage2OfficialModel(model, provider)) return {};
-  const _0x514441 = normalizeImageSizeForProviderModel({
+  const imageSize2 = normalizeImageSizeForProviderModel({
       model: model,
       provider: provider,
       imageSize: imageSize,
     }),
-    _0xfb567c = {},
-    _0x1e8d03 = String(imageSize || '')
+    value53 = {},
+    value54 = String(imageSize || '')
       .trim()
       .toUpperCase();
-  _0x514441 && _0x514441 !== _0x1e8d03 && (_0xfb567c.imageSize = _0x514441);
+  imageSize2 && imageSize2 !== value54 && (value53.imageSize = imageSize2);
   if (!isAdaptiveImageRatio(aspectRatio)) {
-    const _0x160014 = String(aspectRatio || '')
+    const ratioLabel = String(aspectRatio || '')
         .trim()
         .replace(/[：∶]/g, ':')
         .replace(/\s+/g, ''),
-      _0x4c2d6b = new Set(
-        getAllowedRatiosForProviderModel(provider, model, _0x514441).map((_0x570f11) => _0x570f11.label),
+      map2 = new Set(
+        getAllowedRatiosForProviderModel(provider, model, imageSize2).map((item11) => item11.label),
       );
-    _0x160014 &&
-      !_0x4c2d6b.has(_0x160014) &&
-      (_0xfb567c.aspectRatio = pickClosestRatioForProviderModel({
+    ratioLabel &&
+      !map2.has(ratioLabel) &&
+      (value53.aspectRatio = pickClosestRatioForProviderModel({
         provider: provider,
         model: model,
-        ratioLabel: _0x160014,
-        imageSize: _0x514441,
+        ratioLabel: ratioLabel,
+        imageSize: imageSize2,
       }));
   }
-  return _0xfb567c;
+  return value53;
 }
-export function getImagePromptPlaceholderForModel(_0x542804) {
-  const _0x54b218 = resolveModelProvider(_0x542804),
-    _0x54cb48 =
-      getModelManifest(_0x542804) ||
-      resolveModelExecution(_0x542804, { providerHint: _0x54b218 })?.modelManifest ||
+export function getImagePromptPlaceholderForModel(value55) {
+  const providerHint = resolveModelProvider(value55),
+    modelManifest =
+      getModelManifest(value55) ||
+      resolveModelExecution(value55, { providerHint: providerHint })?.modelManifest ||
       null,
-    _0x35991b = String(_0x54cb48?.prompt?.placeholder || '').trim();
-  if (_0x35991b) return _0x35991b;
+    value56 = String(modelManifest?.prompt?.placeholder || '').trim();
+  if (value56) return value56;
   return getDefaultImagePromptPlaceholder();
 }
-export function escapeHtmlAttr(_0x11e576) {
-  return String(_0x11e576 ?? '')
+export function escapeHtmlAttr(value57) {
+  return String(value57 ?? '')
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
     .replace(/</g, '&lt;')
@@ -519,71 +528,71 @@ export function escapeHtmlAttr(_0x11e576) {
 }
 const APIMART_BADGE_ICON_HTML =
   '<div class="node-menu-icon node-menu-icon-badge node-menu-icon-apimart">AM</div>';
-function getImageMenuMeta(_0x1be4bd) {
-  const _0x24fe4e = _0x1be4bd?.extensions?.imageMenu;
-  return _0x24fe4e && typeof _0x24fe4e === 'object' ? _0x24fe4e : null;
+function getImageMenuMeta(value58) {
+  const value59 = value58?.extensions?.imageMenu;
+  return value59 && typeof value59 === 'object' ? value59 : null;
 }
-export function getImageModelMenuManifests(_0x29fa82) {
-  const _0x258d51 = String(_0x29fa82 || '').trim();
+export function getImageModelMenuManifests(value60) {
+  const value61 = String(value60 || '').trim();
   return getModelsByKind('image')
-    .filter((_0x11f97a) => getImageMenuMeta(_0x11f97a)?.group === _0x258d51)
-    .sort((_0x291b41, _0x151654) => {
-      const _0x57a291 = getImageMenuMeta(_0x291b41),
-        _0x22e27a = getImageMenuMeta(_0x151654);
-      return (_0x57a291?.order || 0) - (_0x22e27a?.order || 0);
+    .filter((item12) => getImageMenuMeta(item12)?.group === value61)
+    .sort((item13, value62) => {
+      const imageMenuMeta = getImageMenuMeta(item13),
+        imageMenuMeta2 = getImageMenuMeta(value62);
+      return (imageMenuMeta?.order || 0) - (imageMenuMeta2?.order || 0);
     });
 }
 function renderImageMenuGroupHTML({
-  headerClass: _0x5be06b,
-  toggleAttr: _0x5be546,
-  submenuClass: _0x4a8632,
-  iconHtml: _0x25d944,
-  title: _0x3aa1fb,
-  subtitle: _0x49debe,
+  headerClass: headerClass,
+  toggleAttr: toggleAttr,
+  submenuClass: submenuClass,
+  iconHtml: iconHtml,
+  title: title,
+  subtitle: subtitle,
   badgeHtml: badgeHtml = '',
   itemsHtml: itemsHtml = '',
 }) {
   return renderNodeMenuGroup({
-    id: _0x4a8632,
-    headerClass: _0x5be06b,
-    toggleAttr: _0x5be546,
-    submenuClass: _0x4a8632,
-    iconHtml: _0x25d944,
-    label: _0x3aa1fb,
-    subtitle: _0x49debe,
+    id: submenuClass,
+    headerClass: headerClass,
+    toggleAttr: toggleAttr,
+    submenuClass: submenuClass,
+    iconHtml: iconHtml,
+    label: title,
+    subtitle: subtitle,
     badgeHtml: badgeHtml,
     itemsHtml: itemsHtml,
   });
 }
-function renderImageManifestIconHTML(_0x482c2b, _0x279173 = {}) {
-  if (_0x279173.iconKind === 'apimartBadge') return APIMART_BADGE_ICON_HTML;
-  if (_0x279173.iconKind === 'agnesBadge') return AGNES_BADGE_ICON_HTML;
-  const _0x1458d4 = _0x279173.icon || _0x482c2b?.icon || '';
-  if (!_0x1458d4) return '';
-  const _0x4ff9be = _0x279173.iconAlt || _0x482c2b?.provider || _0x482c2b?.displayName || '';
+function renderImageManifestIconHTML(value63, value64 = {}) {
+  if (value64.iconKind === 'apimartBadge') return APIMART_BADGE_ICON_HTML;
+  if (value64.iconKind === 'agnesBadge') return AGNES_BADGE_ICON_HTML;
+  const enabled7 = value64.icon || value63?.icon || '';
+  if (!enabled7) return '';
+  const value65 = value64.iconAlt || value63?.provider || value63?.displayName || '';
   return (
     '<img src="' +
-    escapeHtmlAttr(_0x1458d4) +
+    escapeHtmlAttr(enabled7) +
     '" class="node-menu-icon" alt="' +
-    escapeHtmlAttr(_0x4ff9be) +
+    escapeHtmlAttr(value65) +
     '">'
   );
 }
-function renderImageManifestMenuItemHTML(_0x36621c, _0x233d0d) {
-  const _0x2add6d = getImageMenuMeta(_0x36621c) || {},
-    _0x35f5ce = _0x36621c?.modelId || '',
-    _0x3ebda3 = _0x36621c?.provider || '',
-    _0x1069bb = String(_0x233d0d || '') === _0x35f5ce;
+function renderImageManifestMenuItemHTML(value66, value67) {
+  const label = getImageMenuMeta(value66) || {},
+    modelId = value66?.modelId || '',
+    provider2 = value66?.provider || '',
+    active = String(value67 || '') === modelId;
   return renderNodeMenuItem({
-    modelId: _0x35f5ce,
-    provider: _0x3ebda3,
-    label: _0x2add6d.title || _0x36621c?.displayName || _0x35f5ce,
-    description: _0x2add6d.subtitle || _0x36621c?.description || '',
-    iconHtml: renderImageManifestIconHTML(_0x36621c, _0x2add6d),
-    active: _0x1069bb,
+    modelId: modelId,
+    provider: provider2,
+    label: label.title || value66?.displayName || modelId,
+    description: label.subtitle || value66?.description || '',
+    iconHtml: renderImageManifestIconHTML(value66, label),
+    active: active,
   });
 }
-export function buildGrsaiImageMenuGroupHTML(_0x166ba9, _0xba8c9f = '') {
+export function buildGrsaiImageMenuGroupHTML(value68, value69 = '') {
   return renderImageMenuGroupHTML({
     headerClass: 'grsai-group-header',
     toggleAttr: 'data-grsai-toggle',
@@ -591,12 +600,12 @@ export function buildGrsaiImageMenuGroupHTML(_0x166ba9, _0xba8c9f = '') {
     iconHtml: GRSAI_IMAGE_MENU_ICON_HTML,
     title: 'GRSAI',
     subtitle: '高性能 AI 图像生成服务',
-    itemsHtml: buildNanoBananaFamilyMenuHTML(_0x166ba9, _0xba8c9f),
+    itemsHtml: buildNanoBananaFamilyMenuHTML(value68, value69),
   });
 }
-export function buildApimartImageMenuGroupHTML(_0x1fd8f3) {
-  const _0x5456e6 = getImageModelMenuManifests('apimart')
-    .map((_0x5390d1) => renderImageManifestMenuItemHTML(_0x5390d1, _0x1fd8f3))
+export function buildApimartImageMenuGroupHTML(value70) {
+  const itemsHtml2 = getImageModelMenuManifests('apimart')
+    .map((item14) => renderImageManifestMenuItemHTML(item14, value70))
     .join('');
   return renderImageMenuGroupHTML({
     headerClass: 'apimart-group-header',
@@ -605,12 +614,12 @@ export function buildApimartImageMenuGroupHTML(_0x1fd8f3) {
     iconHtml: APIMART_BADGE_ICON_HTML,
     title: 'APIMart',
     subtitle: '一个 API 搞定一切——节省 30-70%',
-    itemsHtml: _0x5456e6,
+    itemsHtml: itemsHtml2,
   });
 }
-export function buildAgnesImageMenuGroupHTML(_0x4cd042) {
-  const _0x329c55 = getImageModelMenuManifests('agnes')
-    .map((_0x2e1282) => renderImageManifestMenuItemHTML(_0x2e1282, _0x4cd042))
+export function buildAgnesImageMenuGroupHTML(value71) {
+  const itemsHtml3 = getImageModelMenuManifests('agnes')
+    .map((item15) => renderImageManifestMenuItemHTML(item15, value71))
     .join('');
   return renderImageMenuGroupHTML({
     headerClass: 'agnes-group-header',
@@ -619,12 +628,12 @@ export function buildAgnesImageMenuGroupHTML(_0x4cd042) {
     iconHtml: AGNES_BADGE_ICON_HTML,
     title: 'Agnes AI',
     subtitle: 'Agnes Image model API',
-    itemsHtml: _0x329c55,
+    itemsHtml: itemsHtml3,
   });
 }
-export function buildVolcengineImageMenuGroupHTML(_0x5b89ae) {
-  const _0x1332fb = getImageModelMenuManifests('volcengine')
-    .map((_0x5cce44) => renderImageManifestMenuItemHTML(_0x5cce44, _0x5b89ae))
+export function buildVolcengineImageMenuGroupHTML(value72) {
+  const itemsHtml4 = getImageModelMenuManifests('volcengine')
+    .map((item16) => renderImageManifestMenuItemHTML(item16, value72))
     .join('');
   return renderImageMenuGroupHTML({
     headerClass: 'volcengine-group-header',
@@ -633,10 +642,10 @@ export function buildVolcengineImageMenuGroupHTML(_0x5b89ae) {
     iconHtml: VOLCENGINE_IMAGE_MENU_ICON_HTML,
     title: '火山方舟',
     subtitle: 'Ark Seedream 图像生成 API',
-    itemsHtml: _0x1332fb,
+    itemsHtml: itemsHtml4,
   });
 }
-export function buildRunningHubImageModelMenuGroupHTML(_0x4dfb23, _0x1dce54 = '') {
+export function buildRunningHubImageModelMenuGroupHTML(value73, value74 = '') {
   return renderImageMenuGroupHTML({
     headerClass: 'runninghub-group-header',
     toggleAttr: 'data-runninghub-toggle',
@@ -644,12 +653,12 @@ export function buildRunningHubImageModelMenuGroupHTML(_0x4dfb23, _0x1dce54 = ''
     iconHtml: '<img src="images/RH.png" class="node-menu-icon" alt="runninghub">',
     title: 'RunningHUB模型',
     subtitle: '模型 API：文生图/图生图/图片编辑',
-    itemsHtml: buildRunningHubNanoBananaFamilyMenuHTML(_0x4dfb23, _0x1dce54),
+    itemsHtml: buildRunningHubNanoBananaFamilyMenuHTML(value73, value74),
   });
 }
-export function buildRunningHubWorkflowImageMenuGroupHTML(_0x7caa57) {
-  const _0x4bc318 = getImageModelMenuManifests('runninghubWorkflow')
-    .map((_0x37d3f6) => buildManifestModelMenuItemHTML(_0x37d3f6.modelId, _0x7caa57))
+export function buildRunningHubWorkflowImageMenuGroupHTML(value75) {
+  const itemsHtml5 = getImageModelMenuManifests('runninghubWorkflow')
+    .map((item17) => buildManifestModelMenuItemHTML(item17.modelId, value75))
     .join('');
   return renderImageMenuGroupHTML({
     headerClass: 'runninghubwf-group-header',
@@ -658,7 +667,7 @@ export function buildRunningHubWorkflowImageMenuGroupHTML(_0x7caa57) {
     iconHtml: '<img src="images/RH.png" class="node-menu-icon" alt="runninghub">',
     title: 'RunningHUB工作流',
     subtitle: '工作流模板：替换/风格迁移，结果更可控',
-    itemsHtml: _0x4bc318,
+    itemsHtml: itemsHtml5,
   });
 }
 export function buildImageModelMenuHTML({
@@ -683,530 +692,784 @@ export function buildImageModelMenuHTML({
     '\n              </div>'
   );
 }
-function getLatestImageMenuNodeData(_0x5af453, _0x1237fe, _0xf64418 = {}) {
-  return (_0x5af453?.getState?.() || {}).nodes?.[_0x1237fe] || _0xf64418 || {};
+function getLatestImageMenuNodeData(store3, value76, value77 = {}) {
+  return (store3?.getState?.() || {}).nodes?.[value76] || value77 || {};
 }
-function getImageMenuItemTitle(_0x5db60f, _0x4d20f5 = '') {
-  const _0x46c767 =
-    _0x5db60f?.querySelector?.('.fmi-title') || _0x5db60f?.querySelector?.('.floating-menu-label');
-  return _0x46c767 ? _0x46c767.textContent : _0x4d20f5;
+function getImageMenuItemTitle(el5, value78 = '') {
+  const el6 = el5?.querySelector?.('.fmi-title') || el5?.querySelector?.('.floating-menu-label');
+  return el6 ? el6.textContent : value78;
 }
-function clearImageModelMenuActive(_0x1eae21) {
-  _0x1eae21
-    ?.querySelectorAll?.('.floating-menu-item')
-    ?.forEach((_0x1cc81f) => _0x1cc81f.classList.remove('active'));
+function clearImageModelMenuActive(el7) {
+  el7?.querySelectorAll?.('.floating-menu-item')?.forEach((el8) => el8.classList.remove('active'));
 }
 export function bindImageModelMenuSubmenu({
-  modelMenu: _0x5364f7,
-  modelTrigger: _0x3c228b,
-  modelLabel: _0x31795b,
-  nodeId: _0x2871a1,
-  store: _0x226a0b,
+  modelMenu: modelMenu,
+  modelTrigger: modelTrigger,
+  modelLabel: modelLabel,
+  nodeId: nodeId6,
+  store: store4,
   fallbackNodeData: fallbackNodeData = {},
   toggleSelector: toggleSelector = '',
   submenuSelector: submenuSelector = '',
   defaultProvider: defaultProvider = '',
-  buildModelPatch: _0x27ae2a,
-  resolveSelection: _0x52f9fa,
-  beforeSelect: _0x186f53,
-  onDisabled: _0x2b0fa7,
-  afterSelect: _0x33860b,
+  buildModelPatch: buildModelPatch,
+  resolveSelection: resolveSelection,
+  beforeSelect: beforeSelect,
+  onDisabled: onDisabled,
+  afterSelect: afterSelect,
 } = {}) {
-  if (!_0x5364f7 || !_0x31795b || !_0x2871a1 || !_0x226a0b) return null;
-  const _0x42a1ba = _0x5364f7.querySelector(toggleSelector),
-    _0xbf3432 = _0x5364f7.querySelector(submenuSelector);
-  if (!_0x42a1ba || !_0xbf3432) return null;
-  let _0x1aa48b = null;
-  const _0x43901a = () => {
-      (_0x1aa48b && (clearTimeout(_0x1aa48b), (_0x1aa48b = null)), (_0xbf3432.style.display = 'flex'));
+  if (!modelMenu || !modelLabel || !nodeId6 || !store4) return null;
+  const header = modelMenu.querySelector(toggleSelector),
+    submenu = modelMenu.querySelector(submenuSelector);
+  if (!header || !submenu) return null;
+  let setTimeout2 = null;
+  const value79 = () => {
+      (setTimeout2 && (clearTimeout(setTimeout2), (setTimeout2 = null)), (submenu.style.display = 'flex'));
     },
-    _0x44356f = (_0x592932 = 120) => {
-      if (_0x1aa48b) clearTimeout(_0x1aa48b);
-      _0x1aa48b = setTimeout(() => {
-        _0xbf3432.style.display = 'none';
-      }, _0x592932);
+    handler3 = (value80 = 120) => {
+      if (setTimeout2) clearTimeout(setTimeout2);
+      setTimeout2 = setTimeout(() => {
+        submenu.style.display = 'none';
+      }, value80);
     };
   return (
-    _0x42a1ba.addEventListener('mouseenter', _0x43901a),
-    _0x42a1ba.addEventListener('mouseleave', () => _0x44356f()),
-    _0xbf3432.addEventListener('mouseenter', _0x43901a),
-    _0xbf3432.addEventListener('mouseleave', () => _0x44356f()),
-    _0xbf3432.querySelectorAll('.floating-menu-item').forEach((_0x4cd634) => {
-      _0x4cd634.addEventListener('click', () => {
-        if (_0x4cd634.dataset.disabled === 'true') {
-          _0x2b0fa7?.({ item: _0x4cd634, modelMenu: _0x5364f7, submenu: _0xbf3432, modelTrigger: _0x3c228b });
+    header.addEventListener('mouseenter', value79),
+    header.addEventListener('mouseleave', () => handler3()),
+    submenu.addEventListener('mouseenter', value79),
+    submenu.addEventListener('mouseleave', () => handler3()),
+    submenu.querySelectorAll('.floating-menu-item').forEach((item18) => {
+      item18.addEventListener('click', () => {
+        if (item18.dataset.disabled === 'true') {
+          onDisabled?.({ item: item18, modelMenu: modelMenu, submenu: submenu, modelTrigger: modelTrigger });
           return;
         }
-        const _0x265bdf = getLatestImageMenuNodeData(_0x226a0b, _0x2871a1, fallbackNodeData),
-          _0x49d027 = (typeof _0x52f9fa === 'function'
-            ? _0x52f9fa({ item: _0x4cd634, latestNode: _0x265bdf, defaultProvider: defaultProvider })
+        const latestNode = getLatestImageMenuNodeData(store4, nodeId6, fallbackNodeData),
+          selection = (typeof resolveSelection === 'function'
+            ? resolveSelection({ item: item18, latestNode: latestNode, defaultProvider: defaultProvider })
             : null) || {
-            model: _0x4cd634.dataset.value,
-            provider: _0x4cd634.dataset.provider || defaultProvider,
+            model: item18.dataset.value,
+            provider: item18.dataset.provider || defaultProvider,
           },
-          _0x4a0b7b = String(_0x49d027.model || '').trim(),
-          _0x39e5cd = String(_0x49d027.provider || defaultProvider).trim();
-        if (!_0x4a0b7b || !_0x39e5cd) return;
+          model2 = String(selection.model || '').trim(),
+          provider3 = String(selection.provider || defaultProvider).trim();
+        if (!model2 || !provider3) return;
         if (
-          typeof _0x186f53 === 'function' &&
-          _0x186f53({
-            item: _0x4cd634,
-            model: _0x4a0b7b,
-            provider: _0x39e5cd,
-            latestNode: _0x265bdf,
-            selection: _0x49d027,
+          typeof beforeSelect === 'function' &&
+          beforeSelect({
+            item: item18,
+            model: model2,
+            provider: provider3,
+            latestNode: latestNode,
+            selection: selection,
           }) === false
         )
           return;
-        ((_0x31795b.textContent = _0x49d027.label || getImageMenuItemTitle(_0x4cd634, _0x4a0b7b)),
-          clearImageModelMenuActive(_0x5364f7),
-          _0x4cd634.classList.add('active'),
-          _0x5364f7.classList.remove('show'),
-          (_0xbf3432.style.display = 'none'));
-        const _0x1f94e5 =
-            _0x49d027.patch && typeof _0x49d027.patch === 'object'
-              ? _0x49d027.patch
-              : { model: _0x4a0b7b, provider: _0x39e5cd },
-          _0x19907e =
-            typeof _0x27ae2a === 'function'
-              ? _0x27ae2a(_0x265bdf, _0x4a0b7b, _0x39e5cd, _0x1f94e5)
-              : { ..._0x1f94e5, model: _0x4a0b7b, provider: _0x39e5cd };
-        (_0x226a0b.updateNodeData(_0x2871a1, _0x19907e),
-          _0x33860b?.({
-            item: _0x4cd634,
-            model: _0x4a0b7b,
-            provider: _0x39e5cd,
-            latestNode: _0x265bdf,
-            selection: _0x49d027,
-            modelMenu: _0x5364f7,
-            submenu: _0xbf3432,
-            modelTrigger: _0x3c228b,
+        ((modelLabel.textContent = selection.label || getImageMenuItemTitle(item18, model2)),
+          clearImageModelMenuActive(modelMenu),
+          item18.classList.add('active'),
+          modelMenu.classList.remove('show'),
+          (submenu.style.display = 'none'));
+        const args4 =
+            selection.patch && typeof selection.patch === 'object'
+              ? selection.patch
+              : { model: model2, provider: provider3 },
+          value81 =
+            typeof buildModelPatch === 'function'
+              ? buildModelPatch(latestNode, model2, provider3, args4)
+              : { ...args4, model: model2, provider: provider3 };
+        (store4.updateNodeData(nodeId6, value81),
+          afterSelect?.({
+            item: item18,
+            model: model2,
+            provider: provider3,
+            latestNode: latestNode,
+            selection: selection,
+            modelMenu: modelMenu,
+            submenu: submenu,
+            modelTrigger: modelTrigger,
           }));
       });
     }),
-    { header: _0x42a1ba, submenu: _0xbf3432 }
+    { header: header, submenu: submenu }
   );
 }
-export function resolveGrsaiImageMenuSelection({ item: _0x3d0d30, latestNode: _0x52777c } = {}) {
-  const _0x8c89e9 = 'grsai',
-    _0x567501 = String(_0x3d0d30?.dataset?.value || '').trim();
-  let _0x3f0734 = _0x567501,
-    _0x4dce13 = { model: _0x3f0734, provider: _0x8c89e9 };
-  if (isGrsaiGptImage2ModelToken(_0x3f0734))
-    ((_0x3f0734 = GRSAI_GPT_IMAGE_2_MODEL),
-      (_0x4dce13 = { model: _0x3f0734, provider: _0x8c89e9, imageSize: '1K' }));
+export function resolveGrsaiImageMenuSelection({ item: item19, latestNode: latestNode2 } = {}) {
+  const provider4 = 'grsai',
+    value82 = String(item19?.dataset?.value || '').trim();
+  let model3 = value82,
+    patch3 = { model: model3, provider: provider4 };
+  if (isGrsaiGptImage2ModelToken(model3))
+    ((model3 = GRSAI_GPT_IMAGE_2_MODEL), (patch3 = { model: model3, provider: provider4, imageSize: '1K' }));
   else {
-    if (!_0x3f0734) {
-      const _0x289222 = String(_0x3d0d30?.dataset?.nbFamily || '').trim();
-      if (!_0x289222) return null;
-      const _0x2303d9 = getPlainSchemaParams(_0x52777c?.generationParams).imageSize || '2K',
-        _0x91584 = getDefaultModeForNanoBananaFamily(_0x289222, _0x8c89e9);
-      ((_0x3f0734 = resolveNanoBananaModelBySelection({
-        family: _0x289222,
-        mode: _0x91584,
-        imageSize: _0x2303d9,
-        provider: _0x8c89e9,
+    if (!model3) {
+      const family = String(item19?.dataset?.nbFamily || '').trim();
+      if (!family) return null;
+      const imageSize3 = getPlainSchemaParams(latestNode2?.generationParams).imageSize || '2K',
+        mode = getDefaultModeForNanoBananaFamily(family, provider4);
+      ((model3 = resolveNanoBananaModelBySelection({
+        family: family,
+        mode: mode,
+        imageSize: imageSize3,
+        provider: provider4,
       })),
-        (_0x4dce13 = { model: _0x3f0734, provider: _0x8c89e9 }));
+        (patch3 = { model: model3, provider: provider4 }));
     }
   }
-  return { model: _0x3f0734, provider: _0x8c89e9, patch: _0x4dce13 };
+  return { model: model3, provider: provider4, patch: patch3 };
 }
-export function resolveApimartImageMenuSelection({ item: _0x4135e4, latestNode: _0x155748 } = {}) {
-  const _0x2925dc = String(_0x4135e4?.dataset?.value || '').trim(),
-    _0x2a14ef = String(_0x4135e4?.dataset?.provider || 'apimart').trim(),
-    _0x1c5493 = { model: _0x2925dc, provider: _0x2a14ef };
+export function resolveApimartImageMenuSelection({ item: item20, latestNode: latestNode3 } = {}) {
+  const model4 = String(item20?.dataset?.value || '').trim(),
+    provider5 = String(item20?.dataset?.provider || 'apimart').trim(),
+    patch4 = { model: model4, provider: provider5 };
   if (
-    _0x2925dc === 'apimart/seedream-4.5' ||
-    _0x2925dc === 'apimart/seedream-5.0-lite' ||
-    _0x2925dc === APIMART_GPT_IMAGE_2_MODEL ||
-    _0x2925dc === APIMART_QWEN_IMAGE_MODEL ||
-    _0x2925dc === APIMART_Z_IMAGE_TURBO_MODEL ||
-    _0x2925dc === APIMART_WAN_IMAGE_MODEL
+    model4 === 'apimart/seedream-4.5' ||
+    model4 === 'apimart/seedream-5.0-lite' ||
+    model4 === APIMART_GPT_IMAGE_2_MODEL ||
+    model4 === APIMART_QWEN_IMAGE_MODEL ||
+    model4 === APIMART_Z_IMAGE_TURBO_MODEL ||
+    model4 === APIMART_WAN_IMAGE_MODEL
   ) {
-    const _0x3bc55e =
-      getPlainSchemaParams(_0x155748?.generationParams).imageSize || _0x155748?.imageSize || '2K';
-    ((_0x2925dc === 'apimart/seedream-4.5' || _0x2925dc === 'apimart/seedream-5.0-lite') &&
-      _0x3bc55e === '1K' &&
-      (_0x1c5493.imageSize = '2K'),
-      _0x2925dc === 'apimart/seedream-5.0-lite' && _0x3bc55e === '4K' && (_0x1c5493.imageSize = '3K'),
-      _0x2925dc === APIMART_GPT_IMAGE_2_MODEL && _0x3bc55e === '3K' && (_0x1c5493.imageSize = '2K'),
-      (_0x2925dc === APIMART_QWEN_IMAGE_MODEL || _0x2925dc === APIMART_Z_IMAGE_TURBO_MODEL) &&
-        _0x3bc55e !== '1K' &&
-        _0x3bc55e !== '2K' &&
-        (_0x1c5493.imageSize = '1K'),
-      _0x2925dc === APIMART_WAN_IMAGE_MODEL &&
-        _0x3bc55e !== '1K' &&
-        _0x3bc55e !== '2K' &&
-        (_0x1c5493.imageSize = '2K'));
+    const plainSchemaParams2 =
+      getPlainSchemaParams(latestNode3?.generationParams).imageSize || latestNode3?.imageSize || '2K';
+    ((model4 === 'apimart/seedream-4.5' || model4 === 'apimart/seedream-5.0-lite') &&
+      plainSchemaParams2 === '1K' &&
+      (patch4.imageSize = '2K'),
+      model4 === 'apimart/seedream-5.0-lite' && plainSchemaParams2 === '4K' && (patch4.imageSize = '3K'),
+      model4 === APIMART_GPT_IMAGE_2_MODEL && plainSchemaParams2 === '3K' && (patch4.imageSize = '2K'),
+      (model4 === APIMART_QWEN_IMAGE_MODEL || model4 === APIMART_Z_IMAGE_TURBO_MODEL) &&
+        plainSchemaParams2 !== '1K' &&
+        plainSchemaParams2 !== '2K' &&
+        (patch4.imageSize = '1K'),
+      model4 === APIMART_WAN_IMAGE_MODEL &&
+        plainSchemaParams2 !== '1K' &&
+        plainSchemaParams2 !== '2K' &&
+        (patch4.imageSize = '2K'));
   }
-  return { model: _0x2925dc, provider: _0x2a14ef, patch: _0x1c5493 };
+  return { model: model4, provider: provider5, patch: patch4 };
 }
-export function resolveVolcengineImageMenuSelection({ item: _0xfcadb6, latestNode: _0x2e6bda } = {}) {
-  const _0x5ac428 = String(_0xfcadb6?.dataset?.value || '').trim(),
-    _0x4cae78 = String(_0xfcadb6?.dataset?.provider || 'volcengine').trim(),
-    _0x8bb336 = { model: _0x5ac428, provider: _0x4cae78 },
-    _0x25efe = getPlainSchemaParams(_0x2e6bda?.generationParams).imageSize || _0x2e6bda?.imageSize || '2K';
+export function resolveVolcengineImageMenuSelection({ item: item21, latestNode: latestNode4 } = {}) {
+  const model5 = String(item21?.dataset?.value || '').trim(),
+    provider6 = String(item21?.dataset?.provider || 'volcengine').trim(),
+    patch5 = { model: model5, provider: provider6 },
+    plainSchemaParams3 =
+      getPlainSchemaParams(latestNode4?.generationParams).imageSize || latestNode4?.imageSize || '2K';
   return (
-    (_0x5ac428 === VOLCENGINE_SEEDREAM_5_MODEL || _0x5ac428 === VOLCENGINE_SEEDREAM_4_5_MODEL) &&
-      _0x25efe === '1K' &&
-      (_0x8bb336.imageSize = '2K'),
-    _0x5ac428 === VOLCENGINE_SEEDREAM_5_MODEL && _0x25efe === '4K' && (_0x8bb336.imageSize = '3K'),
-    (_0x5ac428 === VOLCENGINE_SEEDREAM_4_5_MODEL || _0x5ac428 === VOLCENGINE_SEEDREAM_4_MODEL) &&
-      _0x25efe === '3K' &&
-      (_0x8bb336.imageSize = '2K'),
-    { model: _0x5ac428, provider: _0x4cae78, patch: _0x8bb336 }
+    (model5 === VOLCENGINE_SEEDREAM_5_MODEL || model5 === VOLCENGINE_SEEDREAM_4_5_MODEL) &&
+      plainSchemaParams3 === '1K' &&
+      (patch5.imageSize = '2K'),
+    model5 === VOLCENGINE_SEEDREAM_5_MODEL && plainSchemaParams3 === '4K' && (patch5.imageSize = '3K'),
+    (model5 === VOLCENGINE_SEEDREAM_4_5_MODEL || model5 === VOLCENGINE_SEEDREAM_4_MODEL) &&
+      plainSchemaParams3 === '3K' &&
+      (patch5.imageSize = '2K'),
+    { model: model5, provider: provider6, patch: patch5 }
   );
 }
-export function resolveRunningHubWorkflowImageMenuSelection({ item: _0x25a4fe } = {}) {
-  return { model: _0x25a4fe?.dataset?.value, provider: _0x25a4fe?.dataset?.provider || 'runninghubwf' };
+export function resolveRunningHubWorkflowImageMenuSelection({ item: item22 } = {}) {
+  return { model: item22?.dataset?.value, provider: item22?.dataset?.provider || 'runninghubwf' };
 }
-export function resolveRunningHubModelImageMenuSelection({ item: _0x47c8a3, latestNode: _0x166cb1 } = {}) {
-  const _0x1c8cc1 = String(_0x47c8a3?.dataset?.nbFamily || '').trim();
-  let _0x15230e = _0x47c8a3?.dataset?.value,
-    _0x2dbd59 = _0x47c8a3?.dataset?.provider || 'runninghubwf';
-  const _0x2539a0 = {};
-  if (_0x1c8cc1) {
-    _0x2dbd59 = 'runninghub';
-    const _0x1e8ed1 = getPlainSchemaParams(_0x166cb1?.generationParams).imageSize || '2K',
-      _0x289976 = getDefaultModeForNanoBananaFamily(_0x1c8cc1, _0x2dbd59);
-    _0x15230e = resolveNanoBananaModelBySelection({
-      family: _0x1c8cc1,
-      mode: _0x289976,
-      imageSize: _0x1e8ed1,
-      provider: _0x2dbd59,
+export function resolveRunningHubModelImageMenuSelection({ item: item23, latestNode: latestNode5 } = {}) {
+  const family2 = String(item23?.dataset?.nbFamily || '').trim();
+  let model6 = item23?.dataset?.value,
+    provider7 = item23?.dataset?.provider || 'runninghubwf';
+  const patch6 = {};
+  if (family2) {
+    provider7 = 'runninghub';
+    const imageSize4 = getPlainSchemaParams(latestNode5?.generationParams).imageSize || '2K',
+      mode2 = getDefaultModeForNanoBananaFamily(family2, provider7);
+    model6 = resolveNanoBananaModelBySelection({
+      family: family2,
+      mode: mode2,
+      imageSize: imageSize4,
+      provider: provider7,
     });
   }
-  if (!_0x15230e || !_0x2dbd59) return null;
-  return { model: _0x15230e, provider: _0x2dbd59, patch: _0x2539a0 };
+  if (!model6 || !provider7) return null;
+  return { model: model6, provider: provider7, patch: patch6 };
 }
-function createImageTriggerIcon(_0x1a3cb5, _0x6a51a9 = 'img') {
-  const _0x2dba7f = _0x1a3cb5?.ownerDocument || (typeof document !== 'undefined' ? document : null);
-  return _0x2dba7f?.createElement?.(_0x6a51a9) || null;
+function createImageTriggerIcon(value83, value84 = 'img') {
+  const el9 = value83?.ownerDocument || (typeof document !== 'undefined' ? document : null);
+  return el9?.createElement?.(value84) || null;
 }
-function replaceImageModelTriggerFirstIcon(_0x5634c4, _0x1b6b2e) {
-  const _0xeb01ca = _0x5634c4?.firstElementChild;
-  if (!_0xeb01ca || !_0x1b6b2e) return;
-  _0xeb01ca.replaceWith(_0x1b6b2e);
+function replaceImageModelTriggerFirstIcon(value85, enabled8) {
+  const enabled9 = value85?.firstElementChild;
+  if (!enabled9 || !enabled8) return;
+  enabled9.replaceWith(enabled8);
 }
-function setSimpleImageModelTriggerIcon(_0x1e03e6, _0x5de8c0 = {}) {
-  const _0x13d474 = createImageTriggerIcon(_0x1e03e6, 'img');
-  if (!_0x13d474) return;
-  _0x13d474.src = _0x5de8c0.src || '';
-  if (_0x5de8c0.alt) _0x13d474.alt = _0x5de8c0.alt;
-  ((_0x13d474.className = ['image-model-trigger-icon', _0x5de8c0.className || ''].filter(Boolean).join(' ')),
-    replaceImageModelTriggerFirstIcon(_0x1e03e6, _0x13d474));
+function setSimpleImageModelTriggerIcon(value86, value87 = {}) {
+  const imageTriggerIcon = createImageTriggerIcon(value86, 'img');
+  if (!imageTriggerIcon) return;
+  imageTriggerIcon.src = value87.src || '';
+  if (value87.alt) imageTriggerIcon.alt = value87.alt;
+  ((imageTriggerIcon.className = ['image-model-trigger-icon', value87.className || '']
+    .filter(Boolean)
+    .join(' ')),
+    replaceImageModelTriggerFirstIcon(value86, imageTriggerIcon));
 }
-function setApimartImageModelTriggerIcon(_0x22b0a3) {
-  const _0x28df19 = createImageTriggerIcon(_0x22b0a3, 'div');
-  if (!_0x28df19) return;
-  ((_0x28df19.className =
+function setApimartImageModelTriggerIcon(value88) {
+  const imageTriggerIcon2 = createImageTriggerIcon(value88, 'div');
+  if (!imageTriggerIcon2) return;
+  ((imageTriggerIcon2.className =
     'image-model-trigger-icon image-model-trigger-badge image-model-trigger-icon-apimart'),
-    (_0x28df19.innerText = 'AM'),
-    replaceImageModelTriggerFirstIcon(_0x22b0a3, _0x28df19));
+    (imageTriggerIcon2.innerText = 'AM'),
+    replaceImageModelTriggerFirstIcon(value88, imageTriggerIcon2));
 }
-function setAgnesImageModelTriggerIcon(_0x134f1d) {
-  const _0x3e2520 = createImageTriggerIcon(_0x134f1d, 'div');
-  if (!_0x3e2520) return;
-  ((_0x3e2520.className = 'image-model-trigger-icon image-model-trigger-badge'),
-    (_0x3e2520.innerText = 'AG'),
-    replaceImageModelTriggerFirstIcon(_0x134f1d, _0x3e2520));
+function setAgnesImageModelTriggerIcon(value89) {
+  const imageTriggerIcon3 = createImageTriggerIcon(value89, 'div');
+  if (!imageTriggerIcon3) return;
+  ((imageTriggerIcon3.className = 'image-model-trigger-icon image-model-trigger-badge'),
+    (imageTriggerIcon3.innerText = 'AG'),
+    replaceImageModelTriggerFirstIcon(value89, imageTriggerIcon3));
 }
-export function setImageModelTriggerIcon(_0x2206f2, _0x47fcb3, _0x2c9a36 = null) {
-  const _0x1b6037 = String(_0x47fcb3 || '')
+export function setImageModelTriggerIcon(value90, value91, value92 = null) {
+  const value93 = String(value91 || '')
     .trim()
     .toLowerCase();
-  if (_0x1b6037 === 'apimart') {
-    setApimartImageModelTriggerIcon(_0x2206f2, _0x2c9a36);
+  if (value93 === 'apimart') {
+    setApimartImageModelTriggerIcon(value90, value92);
     return;
   }
-  if (_0x1b6037 === 'agnes') {
-    setAgnesImageModelTriggerIcon(_0x2206f2, _0x2c9a36);
+  if (value93 === 'agnes') {
+    setAgnesImageModelTriggerIcon(value90, value92);
     return;
   }
-  if (_0x1b6037 === 'aicanvas') {
-    setSimpleImageModelTriggerIcon(_0x2206f2, {
+  if (value93 === 'aicanvas') {
+    setSimpleImageModelTriggerIcon(value90, {
       src: 'images/favicon.svg',
       alt: 'aicanvas',
       className: 'image-model-trigger-icon-large',
     });
     return;
   }
-  if (_0x1b6037 === 'runninghub' || _0x1b6037 === 'runninghubwf') {
-    setSimpleImageModelTriggerIcon(_0x2206f2, {
+  if (value93 === 'runninghub' || value93 === 'runninghubwf') {
+    setSimpleImageModelTriggerIcon(value90, {
       src: 'images/RH.png',
       alt: 'runninghub',
       className: 'image-model-trigger-icon-soft',
     });
     return;
   }
-  if (_0x1b6037 === 'ppio') {
-    setSimpleImageModelTriggerIcon(_0x2206f2, { src: 'images/gemini.svg', alt: 'ppio' });
+  if (value93 === 'ppio') {
+    setSimpleImageModelTriggerIcon(value90, { src: 'images/gemini.svg', alt: 'ppio' });
     return;
   }
-  if (_0x1b6037 === 'volcengine') {
-    setSimpleImageModelTriggerIcon(_0x2206f2, { src: 'images/volcengine.svg', alt: 'volcengine' });
+  if (value93 === 'volcengine') {
+    setSimpleImageModelTriggerIcon(value90, { src: 'images/volcengine.svg', alt: 'volcengine' });
     return;
   }
-  setSimpleImageModelTriggerIcon(_0x2206f2, {
+  setSimpleImageModelTriggerIcon(value90, {
     src: 'images/grsai.png',
     alt: 'grsai',
     className: 'image-model-trigger-icon-padded',
   });
 }
 export function renderImageModelTriggerIconHTML({ model: model = '', provider: provider = '' } = {}) {
-  const _0x1cbc22 = String(model || '').trim(),
-    _0x7b72cb = String(resolveModelProvider(_0x1cbc22, provider) || provider || '')
+  const value94 = String(model || '').trim(),
+    value95 = String(resolveModelProvider(value94, provider) || provider || '')
       .trim()
       .toLowerCase();
-  if (_0x7b72cb === 'apimart')
+  if (value95 === 'apimart')
     return '<div class="image-model-trigger-icon image-model-trigger-badge image-model-trigger-icon-apimart">AM</div>';
-  if (_0x7b72cb === 'agnes')
-    return '<div class="image-model-trigger-icon image-model-trigger-badge">AG</div>';
-  if (_0x7b72cb === 'aicanvas' || _0x1cbc22.startsWith('aicanvas/'))
+  if (value95 === 'agnes') return '<div class="image-model-trigger-icon image-model-trigger-badge">AG</div>';
+  if (value95 === 'aicanvas' || value94.startsWith('aicanvas/'))
     return '<img src="images/favicon.svg" class="image-model-trigger-icon image-model-trigger-icon-large" alt="aicanvas">';
-  if (_0x7b72cb === 'dreamina') return getDreaminaImageTriggerIconHTML();
-  if (_0x7b72cb === 'runninghub' || _0x7b72cb === 'runninghubwf')
+  if (value95 === 'dreamina') return getDreaminaImageTriggerIconHTML();
+  if (value95 === 'runninghub' || value95 === 'runninghubwf')
     return '<img src="images/RH.png" class="image-model-trigger-icon image-model-trigger-icon-soft" alt="runninghub">';
-  if (_0x7b72cb === 'ppio')
-    return '<img src="images/gemini.svg" class="image-model-trigger-icon" alt="ppio">';
-  if (_0x7b72cb === 'volcengine')
+  if (value95 === 'ppio') return '<img src="images/gemini.svg" class="image-model-trigger-icon" alt="ppio">';
+  if (value95 === 'volcengine')
     return '<img src="images/volcengine.svg" class="image-model-trigger-icon" alt="volcengine">';
   return '<img src="images/grsai.png" class="image-model-trigger-icon image-model-trigger-icon-padded" alt="grsai">';
 }
-export function buildNanoBananaFamilyMenuHTML(_0x2d1bca, _0x2804ec = '') {
-  const _0x5750eb = _0x2d1bca?.provider === 'grsai' ? _0x2d1bca?.family || '' : '',
-    _0x3f5c40 = normalizeGrsaiModelToken(_0x2804ec);
+export function buildNanoBananaFamilyMenuHTML(value96, value97 = '') {
+  const value98 = value96?.provider === 'grsai' ? value96?.family || '' : '',
+    grsaiModelToken3 = normalizeGrsaiModelToken(value97);
   return getImageModelMenuManifests('grsaiModel')
-    .map((_0x2f508b) => {
-      const _0x2e6282 = getImageMenuMeta(_0x2f508b) || {};
-      if (_0x2e6282.role === 'directModel')
+    .map((modelId2) => {
+      const label2 = getImageMenuMeta(modelId2) || {};
+      if (label2.role === 'directModel')
         return renderNodeMenuItem({
-          modelId: _0x2f508b.modelId || GRSAI_GPT_IMAGE_2_MODEL,
+          modelId: modelId2.modelId || GRSAI_GPT_IMAGE_2_MODEL,
           provider: 'grsai',
-          label: _0x2e6282.title || _0x2f508b.displayName || 'GPT image 2',
-          description: _0x2e6282.subtitle || _0x2f508b.description || '',
+          label: label2.title || modelId2.displayName || 'GPT image 2',
+          description: label2.subtitle || modelId2.description || '',
           iconHtml: GRSAI_IMAGE_MENU_ICON_HTML,
-          active: isGrsaiGptImage2ModelToken(_0x3f5c40),
+          active: isGrsaiGptImage2ModelToken(grsaiModelToken3),
         });
-      const _0x2347f3 = String(_0x2e6282.family || '').trim(),
-        _0x3a521d = _0x2e6282.disabled === true,
-        _0x263569 = _0x5750eb === _0x2347f3;
+      const value99 = String(label2.family || '').trim(),
+        disabled = label2.disabled === true,
+        active2 = value98 === value99;
       return renderNodeMenuItem({
-        label: _0x2e6282.title || _0x2f508b.displayName || _0x2347f3,
-        description: _0x2e6282.subtitle || '',
+        label: label2.title || modelId2.displayName || value99,
+        description: label2.subtitle || '',
         iconHtml: GRSAI_IMAGE_MENU_ICON_HTML,
-        active: _0x263569,
-        disabled: _0x3a521d,
-        attrs: { 'data-nb-family': _0x2347f3 || undefined },
+        active: active2,
+        disabled: disabled,
+        attrs: { 'data-nb-family': value99 || undefined },
       });
     })
     .join('');
 }
-export function buildRunningHubNanoBananaFamilyMenuHTML(_0x48bde6, _0x228591 = '') {
-  const _0x103fa2 = _0x48bde6?.provider === 'runninghub' ? _0x48bde6?.family || '' : '';
+export function buildRunningHubNanoBananaFamilyMenuHTML(value100, value101 = '') {
+  const active3 = value100?.provider === 'runninghub' ? value100?.family || '' : '';
   return getImageModelMenuManifests('runninghubModel')
-    .map((_0x5d196f) => {
-      const _0x44cce3 = getImageMenuMeta(_0x5d196f) || {};
-      if (_0x44cce3.role === 'directModel') return renderImageManifestMenuItemHTML(_0x5d196f, _0x228591);
-      const _0x58ca7f = String(_0x44cce3.family || '').trim();
+    .map((item24) => {
+      const label3 = getImageMenuMeta(item24) || {};
+      if (label3.role === 'directModel') return renderImageManifestMenuItemHTML(item24, value101);
+      const value102 = String(label3.family || '').trim();
       return renderNodeMenuItem({
         provider: 'runninghub',
-        label: _0x44cce3.title || _0x5d196f.displayName || _0x58ca7f,
-        description: _0x44cce3.subtitle || _0x5d196f.description || '',
-        icon: _0x44cce3.icon || _0x5d196f.icon || 'images/gemini.svg',
-        iconAlt: _0x44cce3.alt || _0x58ca7f,
-        active: _0x103fa2 === _0x58ca7f,
-        attrs: { 'data-nb-family': _0x58ca7f || undefined },
+        label: label3.title || item24.displayName || value102,
+        description: label3.subtitle || item24.description || '',
+        icon: label3.icon || item24.icon || 'images/gemini.svg',
+        iconAlt: label3.alt || value102,
+        active: active3 === value102,
+        attrs: { 'data-nb-family': value102 || undefined },
       });
     })
     .join('');
 }
 export function shouldShowNanoBananaModeSelector({
-  family: _0x357ef7,
+  family: family3,
   provider: provider = '',
   isModelApiManifest: isModelApiManifest = false,
 } = {}) {
-  if (!isNanoBananaFamily(_0x357ef7)) return false;
+  if (!isNanoBananaFamily(family3)) return false;
   return String(provider || '')
     .trim()
     .toLowerCase() === 'runninghub'
     ? true
     : !isModelApiManifest;
 }
-export function buildNanoBananaModeMenuHTML(_0x11e1a3, _0xf0a52d, _0x5d4fd5 = '') {
-  if (!isNanoBananaFamily(_0x11e1a3)) return '';
-  const _0x17ab3a = getNanoBananaModeOptions(_0x11e1a3, _0x5d4fd5);
-  return _0x17ab3a
-    .map((_0x8ce89e) => {
-      const _0x28198c = _0x8ce89e.tooltip
+export function buildNanoBananaModeMenuHTML(value103, value104, value105 = '') {
+  if (!isNanoBananaFamily(value103)) return '';
+  const list11 = getNanoBananaModeOptions(value103, value105);
+  return list11
+    .map((item25) => {
+      const value106 = item25.tooltip
           ? ' title="' +
-            escapeHtmlAttr(_0x8ce89e.tooltip) +
+            escapeHtmlAttr(item25.tooltip) +
             '" data-tooltip="' +
-            escapeHtmlAttr(_0x8ce89e.tooltip) +
+            escapeHtmlAttr(item25.tooltip) +
             '"'
           : '',
-        _0x232193 = _0x8ce89e.mode === _0xf0a52d;
+        value107 = item25.mode === value104;
       return (
         '<div class="floating-menu-item ' +
-        (_0x232193 ? 'active' : '') +
+        (value107 ? 'active' : '') +
         '" data-nb-mode="' +
-        _0x8ce89e.mode +
+        item25.mode +
         '"' +
-        _0x28198c +
+        value106 +
         '><span class="floating-menu-label">' +
-        _0x8ce89e.label +
+        item25.label +
         '</span></div>'
       );
     })
     .join('');
 }
-export function buildQwenImageEditModeMenuHTML(_0x1af5cb) {
-  const _0xe13e1 = normalizeQwenImageEditMode(_0x1af5cb),
-    _0x34899f = getQwenUiFieldOptions('rhQwenEditMode'),
-    _0x2be5cb = _0x34899f.length
-      ? _0x34899f
+export function buildQwenImageEditModeMenuHTML(value108) {
+  const qwenImageEditMode2 = normalizeQwenImageEditMode(value108),
+    list12 = getQwenUiFieldOptions('rhQwenEditMode'),
+    list13 = list12.length
+      ? list12
       : [
           { value: 'qwen2511', label: '2511' },
           { value: 'qwen2509', label: '2509' },
         ];
-  return _0x2be5cb
-    .map((_0x1c7489) => {
-      const _0x173151 = escapeHtmlAttr(getQwenImageEditModeTooltip(_0x1c7489.value));
+  return list13
+    .map((el10) => {
+      const escapeHtmlAttr2 = escapeHtmlAttr(getQwenImageEditModeTooltip(el10.value));
       return (
         '<div class="floating-menu-item ' +
-        (_0xe13e1 === _0x1c7489.value ? 'active' : '') +
+        (qwenImageEditMode2 === el10.value ? 'active' : '') +
         '" data-qwen-mode="' +
-        _0x1c7489.value +
+        el10.value +
         '" title="' +
-        _0x173151 +
+        escapeHtmlAttr2 +
         '" data-tooltip="' +
-        _0x173151 +
+        escapeHtmlAttr2 +
         '"><span class="floating-menu-label">' +
-        _0x1c7489.label +
+        el10.label +
         '</span></div>'
       );
     })
     .join('');
 }
-export function buildQwenImageEditModelMenuItemHTML(_0x85a26f) {
-  return buildManifestModelMenuItemHTML(QWEN_IMAGE_EDIT_MODEL_ID, _0x85a26f, {
+export function buildQwenImageEditModelMenuItemHTML(value109) {
+  return buildManifestModelMenuItemHTML(QWEN_IMAGE_EDIT_MODEL_ID, value109, {
     title: t('aigenImage.modelMenu.qwenEdit.title'),
     description: t('aigenImage.modelMenu.qwenEdit.description'),
   });
 }
-export function buildAnimeRealModelMenuItemHTML(_0x5b29b9) {
-  return buildManifestModelMenuItemHTML(ANIME_REAL_MODEL_ID, _0x5b29b9, {
+export function buildAnimeRealModelMenuItemHTML(value110) {
+  return buildManifestModelMenuItemHTML(ANIME_REAL_MODEL_ID, value110, {
     title: t('aigenImage.modelMenu.animeReal.title'),
     description: t('aigenImage.modelMenu.animeReal.description'),
   });
 }
-export function buildPersonReplaceV21ModelMenuItemHTML(_0xf75509) {
-  return buildManifestModelMenuItemHTML(PERSON_REPLACE_V21_MODEL_ID, _0xf75509, {
+export function buildPersonReplaceV21ModelMenuItemHTML(value111) {
+  return buildManifestModelMenuItemHTML(PERSON_REPLACE_V21_MODEL_ID, value111, {
     title: t('aigenImage.modelMenu.personReplaceV21.title'),
     description: t('aigenImage.modelMenu.personReplaceV21.description'),
   });
 }
-export function buildPersonReplaceV3ModelMenuItemHTML(_0x4e2e73) {
-  return buildManifestModelMenuItemHTML(PERSON_REPLACE_V3_MODEL_ID, _0x4e2e73, {
+export function buildPersonReplaceV3ModelMenuItemHTML(value112) {
+  return buildManifestModelMenuItemHTML(PERSON_REPLACE_V3_MODEL_ID, value112, {
     title: t('aigenImage.modelMenu.personReplaceV3.title'),
     description: t('aigenImage.modelMenu.personReplaceV3.description'),
   });
 }
-function buildManifestModelMenuItemHTML(_0x377a92, _0x2263da, _0x90be26 = {}) {
-  const _0x8961ca = getModelManifest(_0x377a92),
-    _0x3fd3ce = _0x8961ca?.modelId || _0x377a92,
-    _0xb97ce1 = _0x8961ca?.provider || 'runninghubwf',
-    _0x564621 = _0x8961ca?.icon || 'images/RH.png',
-    _0x34c5de = _0x8961ca?.displayName || _0x90be26.title || _0x3fd3ce,
-    _0x2b6009 = _0x8961ca?.description || _0x90be26.description || '',
-    _0x112af9 = _0x8961ca?.vip === true || _0x90be26.vip === true,
-    _0x2a804c = getModelManifest(_0x2263da),
-    _0x296f91 = _0x2263da === _0x377a92 || _0x2263da === _0x3fd3ce || _0x2a804c?.modelId === _0x3fd3ce;
+function buildManifestModelMenuItemHTML(value113, activeModel2, value114 = {}) {
+  const modelManifest2 = getModelManifest(value113),
+    modelId3 = modelManifest2?.modelId || value113,
+    provider8 = modelManifest2?.provider || 'runninghubwf',
+    icon = modelManifest2?.icon || 'images/RH.png',
+    label4 = modelManifest2?.displayName || value114.title || modelId3,
+    description = modelManifest2?.description || value114.description || '',
+    vip = modelManifest2?.vip === true || value114.vip === true,
+    modelManifest3 = getModelManifest(activeModel2),
+    active4 = activeModel2 === value113 || activeModel2 === modelId3 || modelManifest3?.modelId === modelId3;
   return renderNodeMenuItem(
     {
-      modelId: _0x3fd3ce,
-      provider: _0xb97ce1,
-      label: _0x34c5de,
-      description: _0x2b6009,
-      icon: _0x564621,
+      modelId: modelId3,
+      provider: provider8,
+      label: label4,
+      description: description,
+      icon: icon,
       iconAlt: 'runninghub',
-      vip: _0x112af9,
-      active: _0x296f91,
+      vip: vip,
+      active: active4,
     },
-    { activeModel: _0x2263da },
+    { activeModel: activeModel2 },
   );
 }
-export function buildQwenFirstImageModeControlsHTML(_0x2851f4) {
-  const _0x2560e6 = normalizeQwenFirstImageMode(_0x2851f4);
+export function buildQwenFirstImageModeControlsHTML(value115) {
+  const qwenFirstImageMode2 = normalizeQwenFirstImageMode(value115);
   return getQwenFirstImageModeOptions()
-    .map((_0x1385e4) => {
-      const _0x158e1d = normalizeQwenFirstImageMode(_0x1385e4.value);
+    .map((el11) => {
+      const qwenFirstImageMode3 = normalizeQwenFirstImageMode(el11.value);
       return (
         '<button type="button" class="img-rp-quality-item qwen-first-image-mode-opt ' +
-        (_0x2560e6 === _0x158e1d ? 'active' : '') +
+        (qwenFirstImageMode2 === qwenFirstImageMode3 ? 'active' : '') +
         '" data-value="' +
-        escapeHtmlAttr(_0x158e1d) +
+        escapeHtmlAttr(qwenFirstImageMode3) +
         '">' +
-        escapeHtmlAttr(_0x1385e4.label) +
+        escapeHtmlAttr(el11.label) +
         '</button>'
       );
     })
     .join('');
 }
 
-export const VOLCENGINE_SEEDREAM_5_PRO_MODEL='volcengine/seedream-5.0-pro';
+export const VOLCENGINE_SEEDREAM_5_PRO_MODEL = 'volcengine/seedream-5.0-pro';
 
-const OPENAI_CLI_LOGO_ICON_HTML = renderOpenAiLogoHtml("node-menu-icon");
-const COMFYUI_CLOUD_WORKFLOW_ICON_HTML = renderComfyUiCloudWorkflowLogoHtml({'className':"node-menu-icon"});
-const COMFYUI_LOCAL_WORKFLOW_ICON_HTML = renderComfyUiLocalWorkflowLogoHtml({'className':"node-menu-icon"});
+const OPENAI_CLI_LOGO_ICON_HTML = renderOpenAiLogoHtml('node-menu-icon');
+const COMFYUI_CLOUD_WORKFLOW_ICON_HTML = renderComfyUiCloudWorkflowLogoHtml({ className: 'node-menu-icon' });
+const COMFYUI_LOCAL_WORKFLOW_ICON_HTML = renderComfyUiLocalWorkflowLogoHtml({ className: 'node-menu-icon' });
 
-const IMAGE_SIZE_ORDER=Object["freeze"](['1K','2K','3K','4K']);
+const IMAGE_SIZE_ORDER = Object['freeze'](['1K', '2K', '3K', '4K']);
 
-function normalizeImageSizeToken(_0x3a87e7){return String(_0x3a87e7||'')["trim"]()["toUpperCase"]();}
+function normalizeImageSizeToken(value116) {
+  return String(value116 || '')
+    ['trim']()
+    ['toUpperCase']();
+}
 
-function pickSupportedImageSize(_0x13d3ca,_0x50c7bd){const _0x583da9=(Array["isArray"](_0x50c7bd?.['options'])?_0x50c7bd["options"]:[])["map"](_0x4b42eb=>normalizeImageSizeToken(_0x4b42eb?.["value"]??_0x4b42eb))["filter"](Boolean),_0x476bc2=normalizeImageSizeToken(_0x13d3ca);if(!_0x583da9['length']||!_0x476bc2||_0x583da9['includes'](_0x476bc2))return'';const _0x217c60=IMAGE_SIZE_ORDER['indexOf'](_0x476bc2),_0x3d2c32=_0x583da9["map"](_0x4a7ad2=>({'value':_0x4a7ad2,'rank':IMAGE_SIZE_ORDER["indexOf"](_0x4a7ad2)}))["filter"](_0x51749f=>_0x51749f["rank"]>=0x0)["sort"]((_0x5bd771,_0x2c6128)=>_0x5bd771["rank"]-_0x2c6128["rank"]);if(_0x217c60>=0x0&&_0x3d2c32["length"]>0x0){const _0x36f0a7=_0x3d2c32["filter"](_0x332d8b=>_0x332d8b["rank"]<=_0x217c60)['at'](-0x1);return _0x36f0a7?.['value']||_0x3d2c32[0x0]['value'];}const _0x34cc51=normalizeImageSizeToken(_0x50c7bd?.["defaultValue"]);return _0x583da9["includes"](_0x34cc51)?_0x34cc51:_0x583da9[0x0];}
+function pickSupportedImageSize(value117, value118) {
+  const list14 = (Array['isArray'](value118?.['options']) ? value118['options'] : [])
+      ['map']((value119) => normalizeImageSizeToken(value119?.['value'] ?? value119))
+      ['filter'](Boolean),
+    imageSizeToken = normalizeImageSizeToken(value117);
+  if (!list14['length'] || !imageSizeToken || list14['includes'](imageSizeToken)) return '';
+  const count = IMAGE_SIZE_ORDER['indexOf'](imageSizeToken),
+    value120 = list14['map']((value121) => ({ value: value121, rank: IMAGE_SIZE_ORDER['indexOf'](value121) }))
+      ['filter']((value122) => value122['rank'] >= 0x0)
+      ['sort']((value123, value124) => value123['rank'] - value124['rank']);
+  if (count >= 0x0 && value120['length'] > 0x0) {
+    const el12 = value120['filter']((value125) => value125['rank'] <= count)['at'](-0x1);
+    return el12?.['value'] || value120[0x0]['value'];
+  }
+  const imageSizeToken2 = normalizeImageSizeToken(value118?.['defaultValue']);
+  return list14['includes'](imageSizeToken2) ? imageSizeToken2 : list14[0x0];
+}
 
-const BINGHUO_BADGE_ICON_HTML = "<div class=\"node-menu-icon node-menu-icon-badge\">BH</div>";
+const BINGHUO_BADGE_ICON_HTML = '<div class="node-menu-icon node-menu-icon-badge">BH</div>';
 
-function isSavedRhAiAppManifest(_0xb19cfe){return Boolean(String(_0xb19cfe?.["extensions"]?.['rhAiApp']?.["appKey"]||'')["trim"]());}
+function isSavedRhAiAppManifest(value126) {
+  return Boolean(String(value126?.['extensions']?.['rhAiApp']?.['appKey'] || '')['trim']());
+}
 
-function isSavedComfyUiWorkflowManifest(_0x4c652c){return Boolean(String(_0x4c652c?.["extensions"]?.["comfyUiWorkflow"]?.['appKey']||'')["trim"]());}
+function isSavedComfyUiWorkflowManifest(value127) {
+  return Boolean(String(value127?.['extensions']?.['comfyUiWorkflow']?.['appKey'] || '')['trim']());
+}
 
-function getCustomProviderMeta(_0x3201fd){const _0x1875e1=_0x3201fd?.["extensions"]?.['customProvider'];return _0x1875e1&&typeof _0x1875e1==="object"?_0x1875e1:null;}
+function getCustomProviderMeta(value128) {
+  const value129 = value128?.['extensions']?.['customProvider'];
+  return value129 && typeof value129 === 'object' ? value129 : null;
+}
 
-function getCustomProviderBadgeText(_0x46377a,_0x4d6771={}){return String(getCustomProviderMeta(_0x46377a)?.["badge"]||_0x4d6771["badge"]||'CP')['trim']()["slice"](0x0,0x2)||'CP';}
+function getCustomProviderBadgeText(value130, value131 = {}) {
+  return (
+    String(getCustomProviderMeta(value130)?.['badge'] || value131['badge'] || 'CP')
+      ['trim']()
+      ['slice'](0x0, 0x2) || 'CP'
+  );
+}
 
-function getCustomProviderImageGroups(_0x338c4b=''){const _0x59855b=new Map();return getModelsByKind('image')['filter'](isModelManifestPubliclyListed)["forEach"](_0x1840a1=>{const _0x1d3f1a=getImageMenuMeta(_0x1840a1),_0x1bd09c=getCustomProviderMeta(_0x1840a1),_0x28bd60=String(_0x1d3f1a?.["group"]||_0x1840a1?.["provider"]||'')["trim"]();if(!_0x1d3f1a||!_0x1bd09c||!_0x28bd60)return;!_0x59855b["has"](_0x28bd60)&&_0x59855b["set"](_0x28bd60,{'providerId':_0x28bd60,'displayName':_0x1bd09c["displayName"]||_0x28bd60,'subtitle':_0x1d3f1a["subtitle"]||"自定义中转站",'badge':_0x1bd09c["badge"]||_0x1d3f1a["badge"]||'CP','items':[]}),_0x59855b["get"](_0x28bd60)["items"]['push'](_0x1840a1);}),Array["from"](_0x59855b["values"]())["map"](_0x4638cf=>{const _0x464ea7=_0x4638cf["providerId"]["replace"](/[^A-Za-z0-9_-]/g,'-');return renderImageMenuGroupHTML({'headerClass':"custom-provider-image-group-header custom-provider-image-group-"+_0x464ea7,'toggleAttr':"data-custom-provider-image-toggle",'submenuClass':"custom-provider-image-submenu-"+_0x464ea7,'iconHtml':"<div class=\"node-menu-icon node-menu-icon-badge\">"+escapeHtmlAttr(_0x4638cf["badge"])+"</div>",'title':_0x4638cf['displayName'],'subtitle':_0x4638cf['subtitle'],'attrs':{'data-custom-provider-image-group':_0x4638cf["providerId"]},'itemsHtml':_0x4638cf['items']["sort"]((_0x4e2ce4,_0x5bfbb3)=>Number(getImageMenuMeta(_0x4e2ce4)?.['order']||0x0)-Number(getImageMenuMeta(_0x5bfbb3)?.["order"]||0x0))['map'](_0x285746=>renderImageManifestMenuItemHTML(_0x285746,_0x338c4b))["join"]('')});});}
+function getCustomProviderImageGroups(value132 = '') {
+  const enabled10 = new Map();
+  return (
+    getModelsByKind('image')
+      ['filter'](isModelManifestPubliclyListed)
+      ['forEach']((value133) => {
+        const imageMenuMeta3 = getImageMenuMeta(value133),
+          customProviderMeta = getCustomProviderMeta(value133),
+          enabled11 = String(imageMenuMeta3?.['group'] || value133?.['provider'] || '')['trim']();
+        if (!imageMenuMeta3 || !customProviderMeta || !enabled11) return;
+        (!enabled10['has'](enabled11) &&
+          enabled10['set'](enabled11, {
+            providerId: enabled11,
+            displayName: customProviderMeta['displayName'] || enabled11,
+            subtitle: imageMenuMeta3['subtitle'] || '自定义中转站',
+            badge: customProviderMeta['badge'] || imageMenuMeta3['badge'] || 'CP',
+            items: [],
+          }),
+          enabled10['get'](enabled11)['items']['push'](value133));
+      }),
+    Array['from'](enabled10['values']())['map']((value134) => {
+      const value135 = value134['providerId']['replace'](/[^A-Za-z0-9_-]/g, '-');
+      return renderImageMenuGroupHTML({
+        headerClass: 'custom-provider-image-group-header custom-provider-image-group-' + value135,
+        toggleAttr: 'data-custom-provider-image-toggle',
+        submenuClass: 'custom-provider-image-submenu-' + value135,
+        iconHtml:
+          '<div class="node-menu-icon node-menu-icon-badge">' + escapeHtmlAttr(value134['badge']) + '</div>',
+        title: value134['displayName'],
+        subtitle: value134['subtitle'],
+        attrs: { 'data-custom-provider-image-group': value134['providerId'] },
+        itemsHtml: value134['items']
+          ['sort'](
+            (value136, value137) =>
+              Number(getImageMenuMeta(value136)?.['order'] || 0x0) -
+              Number(getImageMenuMeta(value137)?.['order'] || 0x0),
+          )
+          ['map']((value138) => renderImageManifestMenuItemHTML(value138, value132))
+          ['join'](''),
+      });
+    })
+  );
+}
 
-export function buildBinghuoImageMenuGroupHTML(_0x5d198f){const _0xced180=getImageModelMenuManifests('binghuo')["map"](_0x38a80d=>renderImageManifestMenuItemHTML(_0x38a80d,_0x5d198f))["join"]('');if(!_0xced180)return'';return renderImageMenuGroupHTML({'headerClass':"binghuo-image-group-header",'toggleAttr':"data-binghuo-image-toggle",'submenuClass':'binghuo-image-submenu','iconHtml':BINGHUO_BADGE_ICON_HTML,'title':"便宜渠道bh",'subtitle':'炳火图片生成\x20API','itemsHtml':_0xced180});}
+export function buildBinghuoImageMenuGroupHTML(value139) {
+  const imageModelMenuManifests = getImageModelMenuManifests('binghuo')
+    ['map']((value140) => renderImageManifestMenuItemHTML(value140, value139))
+    ['join']('');
+  if (!imageModelMenuManifests) return '';
+  return renderImageMenuGroupHTML({
+    headerClass: 'binghuo-image-group-header',
+    toggleAttr: 'data-binghuo-image-toggle',
+    submenuClass: 'binghuo-image-submenu',
+    iconHtml: BINGHUO_BADGE_ICON_HTML,
+    title: '便宜渠道bh',
+    subtitle: '炳火图片生成\x20API',
+    itemsHtml: imageModelMenuManifests,
+  });
+}
 
-function buildOfficialImageMenuGroupHTML(_0x30944e,_0x14fe94,_0xecb9ae,_0x2cd50c,_0x37d947){const _0x524885=getImageModelMenuManifests(_0x14fe94)["map"](_0xc44faf=>renderImageManifestMenuItemHTML(_0xc44faf,_0x30944e))['join']('');return renderImageMenuGroupHTML({'headerClass':_0x14fe94+"-group-header",'toggleAttr':"data-"+_0x14fe94+"-toggle",'submenuClass':_0x14fe94+"-submenu",'iconHtml':"<img src=\""+_0x2cd50c+'\x22\x20class=\x22node-menu-icon\x22\x20alt=\x22'+_0x14fe94+'\x22>','title':_0xecb9ae,'subtitle':_0x37d947,'itemsHtml':_0x524885});}
+function buildOfficialImageMenuGroupHTML(value141, value142, value143, value144, value145) {
+  const imageModelMenuManifests2 = getImageModelMenuManifests(value142)
+    ['map']((value146) => renderImageManifestMenuItemHTML(value146, value141))
+    ['join']('');
+  return renderImageMenuGroupHTML({
+    headerClass: value142 + '-group-header',
+    toggleAttr: 'data-' + value142 + '-toggle',
+    submenuClass: value142 + '-submenu',
+    iconHtml:
+      '<img src="' + value144 + '\x22\x20class=\x22node-menu-icon\x22\x20alt=\x22' + value142 + '\x22>',
+    title: value143,
+    subtitle: value145,
+    itemsHtml: imageModelMenuManifests2,
+  });
+}
 
-export function buildOpenAiCliImageMenuGroupHTML(_0x5d86e3){const _0x5b4681=getImageModelMenuManifests('openai-cli')["map"](_0x2cc9de=>renderImageManifestMenuItemHTML(_0x2cc9de,_0x5d86e3))['join']('');if(!_0x5b4681)return'';return renderImageMenuGroupHTML({'headerClass':"openai-cli-image-group-header",'toggleAttr':"data-openai-cli-image-toggle",'submenuClass':"openai-cli-image-submenu",'iconHtml':OPENAI_CLI_LOGO_ICON_HTML,'title':"OpenAI CLI",'subtitle':"使用本机已登录的 OpenAI CLI 账号",'itemsHtml':_0x5b4681});}
+export function buildOpenAiCliImageMenuGroupHTML(value147) {
+  const imageModelMenuManifests3 = getImageModelMenuManifests('openai-cli')
+    ['map']((value148) => renderImageManifestMenuItemHTML(value148, value147))
+    ['join']('');
+  if (!imageModelMenuManifests3) return '';
+  return renderImageMenuGroupHTML({
+    headerClass: 'openai-cli-image-group-header',
+    toggleAttr: 'data-openai-cli-image-toggle',
+    submenuClass: 'openai-cli-image-submenu',
+    iconHtml: OPENAI_CLI_LOGO_ICON_HTML,
+    title: 'OpenAI CLI',
+    subtitle: '使用本机已登录的 OpenAI CLI 账号',
+    itemsHtml: imageModelMenuManifests3,
+  });
+}
 
-export function buildRhAiAppImageMenuGroupHTML(_0x5314ab){const _0x4e0240=getImageModelMenuManifests("rhAiApp")["map"](_0x4d1990=>renderImageManifestMenuItemHTML(_0x4d1990,_0x5314ab))['join']('');if(!_0x4e0240)return'';return renderImageMenuGroupHTML({'headerClass':'rh-ai-app-image-group-header','toggleAttr':"data-rh-ai-app-toggle",'submenuClass':"rh-ai-app-image-submenu",'iconHtml':"<img src=\"images/RH.png\" class=\"node-menu-icon\" alt=\"runninghub\">",'title':"RH AI应用",'subtitle':"自定义 RunningHub AI App",'itemsHtml':_0x4e0240});}
+export function buildRhAiAppImageMenuGroupHTML(value149) {
+  const imageModelMenuManifests4 = getImageModelMenuManifests('rhAiApp')
+    ['map']((value150) => renderImageManifestMenuItemHTML(value150, value149))
+    ['join']('');
+  if (!imageModelMenuManifests4) return '';
+  return renderImageMenuGroupHTML({
+    headerClass: 'rh-ai-app-image-group-header',
+    toggleAttr: 'data-rh-ai-app-toggle',
+    submenuClass: 'rh-ai-app-image-submenu',
+    iconHtml: '<img src="images/RH.png" class="node-menu-icon" alt="runninghub">',
+    title: 'RH AI应用',
+    subtitle: '自定义 RunningHub AI App',
+    itemsHtml: imageModelMenuManifests4,
+  });
+}
 
-function buildComfyUiWorkflowImageMenuGroupHTML({activeModel:_0x13deba,group:_0x43b15e,headerClass:_0x15d520,toggleAttr:_0x347778,submenuClass:_0x5b2461,iconHtml:_0x5ddba9,title:_0x46cebd,subtitle:_0x5d3930}={}){const _0x593928=getImageModelMenuManifests(_0x43b15e)["map"](_0x3f5be1=>renderImageManifestMenuItemHTML(_0x3f5be1,_0x13deba))["join"]('');if(!_0x593928)return'';return renderImageMenuGroupHTML({'headerClass':_0x15d520,'toggleAttr':_0x347778,'submenuClass':_0x5b2461,'iconHtml':_0x5ddba9,'title':_0x46cebd,'subtitle':_0x5d3930,'itemsHtml':_0x593928});}
+function buildComfyUiWorkflowImageMenuGroupHTML({
+  activeModel: activeModel3,
+  group: group,
+  headerClass: headerClass2,
+  toggleAttr: toggleAttr2,
+  submenuClass: submenuClass2,
+  iconHtml: iconHtml2,
+  title: title2,
+  subtitle: subtitle2,
+} = {}) {
+  const imageModelMenuManifests5 = getImageModelMenuManifests(group)
+    ['map']((value151) => renderImageManifestMenuItemHTML(value151, activeModel3))
+    ['join']('');
+  if (!imageModelMenuManifests5) return '';
+  return renderImageMenuGroupHTML({
+    headerClass: headerClass2,
+    toggleAttr: toggleAttr2,
+    submenuClass: submenuClass2,
+    iconHtml: iconHtml2,
+    title: title2,
+    subtitle: subtitle2,
+    itemsHtml: imageModelMenuManifests5,
+  });
+}
 
-export function buildComfyUiCloudWorkflowImageMenuGroupHTML(_0x31a9f9){return buildComfyUiWorkflowImageMenuGroupHTML({'activeModel':_0x31a9f9,'group':"comfyUiCloudWorkflow",'headerClass':"comfyui-cloud-workflow-group-header",'toggleAttr':"data-comfyui-cloud-workflow-toggle",'submenuClass':'comfyui-cloud-workflow-submenu','iconHtml':COMFYUI_CLOUD_WORKFLOW_ICON_HTML,'title':"云端工作流",'subtitle':"保存的 ComfyUI 云端工作流"});}
+export function buildComfyUiCloudWorkflowImageMenuGroupHTML(value152) {
+  return buildComfyUiWorkflowImageMenuGroupHTML({
+    activeModel: value152,
+    group: 'comfyUiCloudWorkflow',
+    headerClass: 'comfyui-cloud-workflow-group-header',
+    toggleAttr: 'data-comfyui-cloud-workflow-toggle',
+    submenuClass: 'comfyui-cloud-workflow-submenu',
+    iconHtml: COMFYUI_CLOUD_WORKFLOW_ICON_HTML,
+    title: '云端工作流',
+    subtitle: '保存的 ComfyUI 云端工作流',
+  });
+}
 
-export function buildComfyUiLocalWorkflowImageMenuGroupHTML(_0x98f744){return buildComfyUiWorkflowImageMenuGroupHTML({'activeModel':_0x98f744,'group':'comfyUiLocalWorkflow','headerClass':"comfyui-local-workflow-group-header",'toggleAttr':"data-comfyui-local-workflow-toggle",'submenuClass':'comfyui-local-workflow-submenu','iconHtml':COMFYUI_LOCAL_WORKFLOW_ICON_HTML,'title':"本地工作流",'subtitle':'保存的\x20ComfyUI\x20本地工作流'});}
+export function buildComfyUiLocalWorkflowImageMenuGroupHTML(value153) {
+  return buildComfyUiWorkflowImageMenuGroupHTML({
+    activeModel: value153,
+    group: 'comfyUiLocalWorkflow',
+    headerClass: 'comfyui-local-workflow-group-header',
+    toggleAttr: 'data-comfyui-local-workflow-toggle',
+    submenuClass: 'comfyui-local-workflow-submenu',
+    iconHtml: COMFYUI_LOCAL_WORKFLOW_ICON_HTML,
+    title: '本地工作流',
+    subtitle: '保存的\x20ComfyUI\x20本地工作流',
+  });
+}
 
-function createImageTriggerIconFromHTML(_0x435d18,_0x13aaec){const _0x595a42=_0x435d18?.["ownerDocument"]||(typeof document!=="undefined"?document:null),_0xb60fd4=_0x595a42?.['createElement']?.("template");if(!_0xb60fd4)return null;return _0xb60fd4["innerHTML"]=String(_0x13aaec||'')['trim'](),_0xb60fd4["content"]?.["firstElementChild"]||null;}
+function createImageTriggerIconFromHTML(value154, value155) {
+  const el13 = value154?.['ownerDocument'] || (typeof document !== 'undefined' ? document : null),
+    enabled12 = el13?.['createElement']?.('template');
+  if (!enabled12) return null;
+  return (
+    (enabled12['innerHTML'] = String(value155 || '')['trim']()),
+    enabled12['content']?.['firstElementChild'] || null
+  );
+}
 
-function setOpenAiCliImageModelTriggerIcon(_0x163add){const _0x3f3954=createImageTriggerIconFromHTML(_0x163add,renderOpenAiLogoHtml("image-model-trigger-icon"));if(!_0x3f3954)return;replaceImageModelTriggerFirstIcon(_0x163add,_0x3f3954);}
+function setOpenAiCliImageModelTriggerIcon(value156) {
+  const imageTriggerIconFromHTML = createImageTriggerIconFromHTML(
+    value156,
+    renderOpenAiLogoHtml('image-model-trigger-icon'),
+  );
+  if (!imageTriggerIconFromHTML) return;
+  replaceImageModelTriggerFirstIcon(value156, imageTriggerIconFromHTML);
+}
 
-function getComfyUiWorkflowIconKind(_0x158576='',_0x19d488=null){const _0x144eee=_0x19d488?.["querySelector"]?.(".custom-ai-app-logo");if(_0x144eee?.['classList']?.["contains"]('custom-ai-app-logo--comfyui-cloud'))return "comfyUiCloudWorkflowBadge";if(_0x144eee?.["classList"]?.["contains"]("custom-ai-app-logo--comfyui-local"))return "comfyUiLocalWorkflowBadge";const _0x5c41d7=String(_0x158576||'')["trim"]()||String(_0x19d488?.["dataset"]?.["value"]||_0x19d488?.["getAttribute"]?.('data-value')||'')['trim'](),_0x33ffb7=String(getModelManifest(_0x5c41d7)?.["extensions"]?.["imageMenu"]?.["iconKind"]||'')["trim"]();return _0x33ffb7;}
+function getComfyUiWorkflowIconKind(value157 = '', value158 = null) {
+  const el14 = value158?.['querySelector']?.('.custom-ai-app-logo');
+  if (el14?.['classList']?.['contains']('custom-ai-app-logo--comfyui-cloud'))
+    return 'comfyUiCloudWorkflowBadge';
+  if (el14?.['classList']?.['contains']('custom-ai-app-logo--comfyui-local'))
+    return 'comfyUiLocalWorkflowBadge';
+  const value159 =
+      String(value157 || '')['trim']() ||
+      String(value158?.['dataset']?.['value'] || value158?.['getAttribute']?.('data-value') || '')['trim'](),
+    value160 = String(getModelManifest(value159)?.['extensions']?.['imageMenu']?.['iconKind'] || '')[
+      'trim'
+    ]();
+  return value160;
+}
 
-function renderComfyUiWorkflowTriggerIconHTML(_0x554b35=''){return renderComfyUiWorkflowLogoHtmlFromIconKind(getComfyUiWorkflowIconKind(_0x554b35),{'className':"image-model-trigger-icon"});}
+function renderComfyUiWorkflowTriggerIconHTML(value161 = '') {
+  return renderComfyUiWorkflowLogoHtmlFromIconKind(getComfyUiWorkflowIconKind(value161), {
+    className: 'image-model-trigger-icon',
+  });
+}
 
-function setComfyUiWorkflowTriggerIcon(_0x2e7428,_0x3b76d2=null){const _0x1f02dd=createImageTriggerIconFromHTML(_0x2e7428,renderComfyUiWorkflowLogoHtmlFromIconKind(getComfyUiWorkflowIconKind('',_0x3b76d2),{'className':"image-model-trigger-icon"}));if(!_0x1f02dd)return;replaceImageModelTriggerFirstIcon(_0x2e7428,_0x1f02dd);}
+function setComfyUiWorkflowTriggerIcon(value162, value163 = null) {
+  const imageTriggerIconFromHTML2 = createImageTriggerIconFromHTML(
+    value162,
+    renderComfyUiWorkflowLogoHtmlFromIconKind(getComfyUiWorkflowIconKind('', value163), {
+      className: 'image-model-trigger-icon',
+    }),
+  );
+  if (!imageTriggerIconFromHTML2) return;
+  replaceImageModelTriggerFirstIcon(value162, imageTriggerIconFromHTML2);
+}
 
-function resolveImageTriggerManifest(_0x10a88c='',_0x1007f5=''){const _0x7efdf7=String(_0x10a88c||'')['trim']();if(_0x7efdf7){const _0x591da8=getModelManifest(_0x7efdf7);if(_0x591da8)return _0x591da8;}const _0x2a2308=String(_0x1007f5||'')['trim']();if(!_0x7efdf7&&!_0x2a2308)return null;try{return resolveModelExecution(_0x7efdf7,{'providerHint':_0x2a2308})?.["modelManifest"]||resolveModelExecution(_0x7efdf7)?.['modelManifest']||null;}catch{return null;}}
+function resolveImageTriggerManifest(value164 = '', value165 = '') {
+  const enabled13 = String(value164 || '')['trim']();
+  if (enabled13) {
+    const modelManifest4 = getModelManifest(enabled13);
+    if (modelManifest4) return modelManifest4;
+  }
+  const enabled14 = String(value165 || '')['trim']();
+  if (!enabled13 && !enabled14) return null;
+  try {
+    return (
+      resolveModelExecution(enabled13, { providerHint: enabled14 })?.['modelManifest'] ||
+      resolveModelExecution(enabled13)?.['modelManifest'] ||
+      null
+    );
+  } catch {
+    return null;
+  }
+}
 
-function renderCustomProviderTriggerBadgeHTML(_0xbbadfe,_0x3bf6ae={}){const _0x3b4b90=getCustomProviderBadgeText(_0xbbadfe,_0x3bf6ae);return "<div class=\"image-model-trigger-icon image-model-trigger-badge\">"+escapeHtmlAttr(_0x3b4b90)+"</div>";}
+function renderCustomProviderTriggerBadgeHTML(value166, value167 = {}) {
+  const customProviderBadgeText = getCustomProviderBadgeText(value166, value167);
+  return (
+    '<div class="image-model-trigger-icon image-model-trigger-badge">' +
+    escapeHtmlAttr(customProviderBadgeText) +
+    '</div>'
+  );
+}
 
-function setCustomProviderImageModelTriggerIcon(_0x1cea6d,_0xa51346,_0x2376bf={}){const _0x2a2ec9=createImageTriggerIcon(_0x1cea6d,"div");if(!_0x2a2ec9)return;_0x2a2ec9['className']="image-model-trigger-icon image-model-trigger-badge",_0x2a2ec9["innerText"]=getCustomProviderBadgeText(_0xa51346,_0x2376bf),replaceImageModelTriggerFirstIcon(_0x1cea6d,_0x2a2ec9);}
+function setCustomProviderImageModelTriggerIcon(value168, value169, value170 = {}) {
+  const imageTriggerIcon4 = createImageTriggerIcon(value168, 'div');
+  if (!imageTriggerIcon4) return;
+  ((imageTriggerIcon4['className'] = 'image-model-trigger-icon image-model-trigger-badge'),
+    (imageTriggerIcon4['innerText'] = getCustomProviderBadgeText(value169, value170)),
+    replaceImageModelTriggerFirstIcon(value168, imageTriggerIcon4));
+}
 
-export function syncImageModelTriggerIcon(_0x59910f,_0x4bf2e3={}){if(!_0x59910f||!_0x4bf2e3?.['model'])return;const _0x179af3=createImageTriggerIconFromHTML(_0x59910f,renderImageModelTriggerIconHTML({'model':_0x4bf2e3['model'],'provider':_0x4bf2e3["provider"]})),_0x53096f=_0x59910f["firstElementChild"];_0x179af3&&_0x53096f?.['outerHTML']!==_0x179af3['outerHTML']&&_0x53096f?.["replaceWith"]?.(_0x179af3);}
+export function syncImageModelTriggerIcon(enabled15, enabled16 = {}) {
+  if (!enabled15 || !enabled16?.['model']) return;
+  const imageTriggerIconFromHTML3 = createImageTriggerIconFromHTML(
+      enabled15,
+      renderImageModelTriggerIconHTML({ model: enabled16['model'], provider: enabled16['provider'] }),
+    ),
+    value171 = enabled15['firstElementChild'];
+  imageTriggerIconFromHTML3 &&
+    value171?.['outerHTML'] !== imageTriggerIconFromHTML3['outerHTML'] &&
+    value171?.['replaceWith']?.(imageTriggerIconFromHTML3);
+}

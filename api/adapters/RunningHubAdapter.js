@@ -31,385 +31,392 @@ const RH_V54_SOURCE_VIDEO_MISSING_MESSAGE = '未获取到源视频 URL，请重�
 function isAdvancedModeEnabled() {
   return typeof window !== 'undefined' && window.ADVANCED_MODE === true;
 }
-function normalizeRhVideoFps(_0x14c90e) {
-  const _0x5ae2c5 = Math.trunc(Number(_0x14c90e));
-  return RH_VIDEO_FPS_OPTIONS.includes(_0x5ae2c5) ? _0x5ae2c5 : 24;
+function normalizeRhVideoFps(value) {
+  const item = Math.trunc(Number(value));
+  return RH_VIDEO_FPS_OPTIONS.includes(item) ? item : 24;
 }
-function normalizeRhVideoResolution(_0x4c16f4, _0x3ea781 = RH_MIN_VIDEO_RESOLUTION) {
-  const _0x16c936 = Number(_0x4c16f4);
-  return Number.isFinite(_0x16c936) ? Math.max(RH_MIN_VIDEO_RESOLUTION, Math.trunc(_0x16c936)) : _0x3ea781;
+function normalizeRhVideoResolution(key, index = RH_MIN_VIDEO_RESOLUTION) {
+  const result = Number(key);
+  return Number.isFinite(result) ? Math.max(RH_MIN_VIDEO_RESOLUTION, Math.trunc(result)) : index;
 }
-function normalizeRunningHubWorkflowRatio(_0xfb8a9d) {
-  const _0x4940f6 = String(_0xfb8a9d || '').trim();
-  if (!_0x4940f6) return RUNNINGHUB_WORKFLOW_DEFAULT_RATIO;
-  const _0x53c55d = normalizeRatioLabelText(_0x4940f6),
-    _0x94552d = _0x53c55d.toLowerCase();
+function normalizeRunningHubWorkflowRatio(data) {
+  const enabled2 = String(data || '').trim();
+  if (!enabled2) return RUNNINGHUB_WORKFLOW_DEFAULT_RATIO;
+  const list = normalizeRatioLabelText(enabled2),
+    options = list.toLowerCase();
   if (
-    _0x94552d === 'auto' ||
-    _0x94552d === 'default' ||
-    _0x53c55d === '默认' ||
-    _0x53c55d === '自适应' ||
-    _0x94552d === 'original' ||
-    _0x53c55d === '原图比例'
+    options === 'auto' ||
+    options === 'default' ||
+    list === '默认' ||
+    list === '自适应' ||
+    options === 'original' ||
+    list === '原图比例'
   )
     return RUNNINGHUB_WORKFLOW_DEFAULT_RATIO;
-  if (!_0x53c55d.includes(':')) return RUNNINGHUB_WORKFLOW_DEFAULT_RATIO;
-  const [_0x47fd97, _0x3baa08] = _0x53c55d.split(':'),
-    _0x113675 = Number.parseFloat(_0x47fd97),
-    _0x34fca4 = Number.parseFloat(_0x3baa08);
-  if (!(_0x113675 > 0 && _0x34fca4 > 0)) return RUNNINGHUB_WORKFLOW_DEFAULT_RATIO;
-  const _0x25dc0b = _0x113675 + ':' + _0x34fca4;
-  return RUNNINGHUB_WORKFLOW_RATIO_SET.has(_0x25dc0b) ? _0x25dc0b : RUNNINGHUB_WORKFLOW_DEFAULT_RATIO;
+  if (!list.includes(':')) return RUNNINGHUB_WORKFLOW_DEFAULT_RATIO;
+  const [target, source] = list.split(':'),
+    count = Number.parseFloat(target),
+    count2 = Number.parseFloat(source);
+  if (!(count > 0 && count2 > 0)) return RUNNINGHUB_WORKFLOW_DEFAULT_RATIO;
+  const next = count + ':' + count2;
+  return RUNNINGHUB_WORKFLOW_RATIO_SET.has(next) ? next : RUNNINGHUB_WORKFLOW_DEFAULT_RATIO;
 }
-function normalizeQwenImageEditModeIndex(_0x2ad3a3) {
-  const _0x3182d0 = String(_0x2ad3a3 || '')
+function normalizeQwenImageEditModeIndex(current) {
+  const entry = String(current || '')
     .trim()
     .toLowerCase();
-  if (_0x3182d0 === '0' || _0x3182d0 === 'qwen2509' || _0x3182d0 === '2509') return '0';
+  if (entry === '0' || entry === 'qwen2509' || entry === '2509') return '0';
   return '1';
 }
-function normalizeQwenFirstImageModeIndex(_0x19cad8) {
-  const _0x49702b = String(_0x19cad8 || '')
+function normalizeQwenFirstImageModeIndex(record) {
+  const payload = String(record || '')
     .trim()
     .toLowerCase();
-  if (_0x49702b === '1' || _0x49702b === 'pose' || _0x49702b === '姿势图') return '1';
-  if (_0x49702b === '2' || _0x49702b === 'depth' || _0x49702b === '深度图') return '2';
+  if (payload === '1' || payload === 'pose' || payload === '姿势图') return '1';
+  if (payload === '2' || payload === 'depth' || payload === '深度图') return '2';
   return '0';
 }
-function normalizeQwenImageEditQuality(_0x4ef4cc) {
-  const _0x3eb73e = String(_0x4ef4cc || '')
+function normalizeQwenImageEditQuality(handle) {
+  const state = String(handle || '')
     .trim()
     .toUpperCase();
-  if (_0x3eb73e === '1.5K') return '1.5K';
-  return _0x3eb73e === '1K' ? '1K' : '2K';
+  if (state === '1.5K') return '1.5K';
+  return state === '1K' ? '1K' : '2K';
 }
-function resolveQwenImageEditDimensions(_0xd9cb9d, _0x2abe66) {
-  const _0x1b7f37 = normalizeQwenImageEditQuality(_0xd9cb9d),
-    _0x7fc15a = _0x1b7f37 === '1K' ? 0x400 : _0x1b7f37 === '1.5K' ? 0x600 : 0x780,
-    _0x12044a = normalizeRunningHubWorkflowRatio(_0x2abe66),
-    [_0x2f137a, _0x5538fb] = _0x12044a.split(':'),
-    _0x19411f = Number.parseFloat(_0x2f137a) || 1,
-    _0x404afe = Number.parseFloat(_0x5538fb) || 1,
-    _0x3899cf = _0x19411f >= _0x404afe,
-    _0x3bcccd = _0x3899cf ? _0x7fc15a : (_0x7fc15a * _0x19411f) / _0x404afe,
-    _0x3174fe = _0x3899cf ? (_0x7fc15a * _0x404afe) / _0x19411f : _0x7fc15a,
-    _0x59435b = 64,
-    _0x435d43 = (_0x362684) => Math.max(0x200, Math.round(Number(_0x362684 || 0) / _0x59435b) * _0x59435b);
-  return { width: _0x435d43(_0x3bcccd), height: _0x435d43(_0x3174fe) };
+function resolveQwenImageEditDimensions(config, scope) {
+  const qwenImageEditQuality = normalizeQwenImageEditQuality(config),
+    input = qwenImageEditQuality === '1K' ? 0x400 : qwenImageEditQuality === '1.5K' ? 0x600 : 0x780,
+    runningHubWorkflowRatio = normalizeRunningHubWorkflowRatio(scope),
+    [output, value2] = runningHubWorkflowRatio.split(':'),
+    value3 = Number.parseFloat(output) || 1,
+    value4 = Number.parseFloat(value2) || 1,
+    value5 = value3 >= value4,
+    value6 = value5 ? input : (input * value3) / value4,
+    value7 = value5 ? (input * value4) / value3 : input,
+    value8 = 64,
+    width = (value9) => Math.max(0x200, Math.round(Number(value9 || 0) / value8) * value8);
+  return { width: width(value6), height: width(value7) };
 }
-function normalizeManifestMappedValue(_0x58e9d2, _0x2a6d8a) {
-  const _0x31ae5e = String(_0x58e9d2 ?? _0x2a6d8a?.defaultValue ?? '').trim(),
-    _0x5bdbf3 = _0x2a6d8a?.valueMap || {};
+function normalizeManifestMappedValue(value10, value11) {
+  const value12 = String(value10 ?? value11?.defaultValue ?? '').trim(),
+    value13 = value11?.valueMap || {};
   return (
-    _0x5bdbf3[_0x31ae5e] ||
-    _0x5bdbf3[_0x31ae5e.toLowerCase()] ||
-    _0x5bdbf3[String(_0x2a6d8a?.defaultValue || '')] ||
-    _0x31ae5e
+    value13[value12] ||
+    value13[value12.toLowerCase()] ||
+    value13[String(value11?.defaultValue || '')] ||
+    value12
   );
 }
-function formatManifestPromptNodeValue(_0x378b75, _0x5bc9a0) {
-  const _0xa37e31 = String(_0x378b75 || '').trim(),
-    _0x2ac679 = String(_0x5bc9a0?.defaultValue ?? ''),
-    _0x2d61eb = _0xa37e31 || _0x2ac679;
-  if (!_0x2d61eb) return '';
-  return '' + String(_0x5bc9a0?.prefix ?? '') + _0x2d61eb + String(_0x5bc9a0?.suffix ?? '');
+function formatManifestPromptNodeValue(value14, value15) {
+  const value16 = String(value14 || '').trim(),
+    value17 = String(value15?.defaultValue ?? ''),
+    enabled3 = value16 || value17;
+  if (!enabled3) return '';
+  return '' + String(value15?.prefix ?? '') + enabled3 + String(value15?.suffix ?? '');
 }
-function normalizeManifestImageNode(_0x28bbe2, _0x2aaa30) {
-  if (_0x28bbe2 && typeof _0x28bbe2 === 'object' && !Array.isArray(_0x28bbe2))
+function normalizeManifestImageNode(description, value18) {
+  if (description && typeof description === 'object' && !Array.isArray(description))
     return {
-      nodeId: String(_0x28bbe2.nodeId || '').trim(),
-      fieldName: String(_0x28bbe2.fieldName || 'image').trim() || 'image',
-      description: _0x28bbe2.description || '图' + (_0x2aaa30 + 1),
+      nodeId: String(description.nodeId || '').trim(),
+      fieldName: String(description.fieldName || 'image').trim() || 'image',
+      description: description.description || '图' + (value18 + 1),
     };
-  return { nodeId: String(_0x28bbe2 || '').trim(), fieldName: 'image', description: '图' + (_0x2aaa30 + 1) };
+  return { nodeId: String(description || '').trim(), fieldName: 'image', description: '图' + (value18 + 1) };
 }
-function getManifestPayloadPathValue(_0xdf8883, _0x4e426b) {
-  const _0x9ccc4b = String(_0x4e426b || '').trim();
-  if (!_0x9ccc4b) return undefined;
-  return _0x9ccc4b.split('.').reduce((_0x7e75e, _0x4b511e) => {
-    if (_0x7e75e === undefined || _0x7e75e === null) return undefined;
-    return _0x7e75e[_0x4b511e];
-  }, _0xdf8883);
+function getManifestPayloadPathValue(value19, value20) {
+  const enabled4 = String(value20 || '').trim();
+  if (!enabled4) return undefined;
+  return enabled4.split('.').reduce((item2, value21) => {
+    if (item2 === undefined || item2 === null) return undefined;
+    return item2[value21];
+  }, value19);
 }
 function resolveManifestPayloadValue(
-  _0x24e964,
-  _0x10cf15 = [],
-  _0x407d70 = undefined,
+  value22,
+  value23 = [],
+  value24 = undefined,
   { allowEmpty: allowEmpty = false } = {},
 ) {
-  const _0x44f9de = Array.isArray(_0x10cf15) ? _0x10cf15 : [_0x10cf15];
-  for (const _0x44c071 of _0x44f9de.filter(Boolean)) {
-    const _0x4ca6d2 = getManifestPayloadPathValue(_0x24e964, _0x44c071);
-    if (allowEmpty && _0x4ca6d2 !== undefined && _0x4ca6d2 !== null) return _0x4ca6d2;
-    if (_0x4ca6d2 !== undefined && _0x4ca6d2 !== null && String(_0x4ca6d2).trim() !== '') return _0x4ca6d2;
+  const list2 = Array.isArray(value23) ? value23 : [value23];
+  for (const value25 of list2.filter(Boolean)) {
+    const manifestPayloadPathValue = getManifestPayloadPathValue(value22, value25);
+    if (allowEmpty && manifestPayloadPathValue !== undefined && manifestPayloadPathValue !== null)
+      return manifestPayloadPathValue;
+    if (
+      manifestPayloadPathValue !== undefined &&
+      manifestPayloadPathValue !== null &&
+      String(manifestPayloadPathValue).trim() !== ''
+    )
+      return manifestPayloadPathValue;
   }
-  return _0x407d70;
+  return value24;
 }
-function normalizeManifestValueNodeValue(_0xce841d, _0x4126dc) {
-  const _0x3b3130 = [
-    ...(Array.isArray(_0x4126dc?.allowedValues) ? _0x4126dc.allowedValues : []),
-    ...(isAdvancedModeEnabled() && Array.isArray(_0x4126dc?.advancedAllowedValues)
-      ? _0x4126dc.advancedAllowedValues
+function normalizeManifestValueNodeValue(value26, value27) {
+  const list3 = [
+    ...(Array.isArray(value27?.allowedValues) ? value27.allowedValues : []),
+    ...(isAdvancedModeEnabled() && Array.isArray(value27?.advancedAllowedValues)
+      ? value27.advancedAllowedValues
       : []),
   ]
-    .map((_0x2a8687) => Number(_0x2a8687))
+    .map((item3) => Number(item3))
     .filter(Number.isFinite);
-  if (_0x3b3130.length === 0) return _0xce841d;
-  const _0x4eb5c8 = Number(_0xce841d),
-    _0x40272b = Number(_0x4126dc?.defaultValue),
-    _0x5c49c6 = Number.isFinite(_0x4eb5c8)
-      ? _0x4eb5c8
-      : Number.isFinite(_0x40272b)
-        ? _0x40272b
-        : _0x3b3130[0];
-  return _0x3b3130.reduce(
-    (_0x1ef8c5, _0x303c98) =>
-      Math.abs(_0x303c98 - _0x5c49c6) < Math.abs(_0x1ef8c5 - _0x5c49c6) ? _0x303c98 : _0x1ef8c5,
-    _0x3b3130[0],
+  if (list3.length === 0) return value26;
+  const value28 = Number(value26),
+    value29 = Number(value27?.defaultValue),
+    value30 = Number.isFinite(value28) ? value28 : Number.isFinite(value29) ? value29 : list3[0];
+  return list3.reduce(
+    (item4, value31) => (Math.abs(value31 - value30) < Math.abs(item4 - value30) ? value31 : item4),
+    list3[0],
   );
 }
 async function buildOpenApiAiAppWorkflowRequestFromManifest({
-  executionManifest: _0x3160c4,
-  payload: _0x4188a9,
-  finalPrompt: _0x2b6386,
-  finalUrls: _0x32482e,
-  apiKey: _0x20d00f,
-  ctx: _0x8c57c3,
+  executionManifest: executionManifest,
+  payload: payload2,
+  finalPrompt: finalPrompt,
+  finalUrls: finalUrls,
+  apiKey: apiKey,
+  ctx: ctx,
 }) {
-  if (!_0x3160c4 || _0x3160c4.adapterType !== 'workflow' || _0x3160c4.submitMode !== 'openapi-v2-ai-app')
+  if (
+    !executionManifest ||
+    executionManifest.adapterType !== 'workflow' ||
+    executionManifest.submitMode !== 'openapi-v2-ai-app'
+  )
     return null;
-  const _0x53d2b9 = _0x3160c4.mapping || {},
-    _0x46afed = _0x3160c4.validation || {},
-    _0x4f2730 = Math.max(1, Number(_0x53d2b9.maxInputImages) || 1),
-    _0x369d54 = _0x32482e.filter(Boolean).slice(0, _0x4f2730),
-    _0x337505 = Math.max(0, Number(_0x46afed.minInputImages) || 0);
-  if (_0x369d54.length < _0x337505)
-    throw new Error(_0x46afed.missingInputMessage || '请先添加至少一张参考图再生成');
-  const _0x53979a = [],
-    _0x2ece1b = Array.isArray(_0x53d2b9.imageNodes) ? _0x53d2b9.imageNodes : [];
-  _0x369d54.forEach((_0x40e4cc, _0x5bb3b2) => {
-    const _0x540dd0 = normalizeManifestImageNode(_0x2ece1b[_0x5bb3b2], _0x5bb3b2),
-      _0x31c5c9 = _0x540dd0.nodeId;
-    if (!_0x31c5c9) return;
-    _0x53979a.push({
-      nodeId: _0x31c5c9,
-      fieldName: _0x540dd0.fieldName,
-      fieldValue: _0x40e4cc,
-      description: _0x540dd0.description,
+  const description2 = executionManifest.mapping || {},
+    value32 = executionManifest.validation || {},
+    value33 = Math.max(1, Number(description2.maxInputImages) || 1),
+    list4 = finalUrls.filter(Boolean).slice(0, value33),
+    value34 = Math.max(0, Number(value32.minInputImages) || 0);
+  if (list4.length < value34) throw new Error(value32.missingInputMessage || '请先添加至少一张参考图再生成');
+  const nodeInfoList = [],
+    value35 = Array.isArray(description2.imageNodes) ? description2.imageNodes : [];
+  list4.forEach((fieldValue, value36) => {
+    const fieldName = normalizeManifestImageNode(value35[value36], value36),
+      nodeId = fieldName.nodeId;
+    if (!nodeId) return;
+    nodeInfoList.push({
+      nodeId: nodeId,
+      fieldName: fieldName.fieldName,
+      fieldValue: fieldValue,
+      description: fieldName.description,
     });
   });
-  const _0x4120ab = Array.isArray(_0x53d2b9.optionalImageNodes) ? _0x53d2b9.optionalImageNodes : [];
-  if (_0x4120ab.length > 0) {
-    const _0x15f222 = _0x4120ab.map((_0x53840e) =>
-        String(resolveManifestPayloadValue(_0x4188a9, _0x53840e.fields, '') || '').trim(),
+  const list5 = Array.isArray(description2.optionalImageNodes) ? description2.optionalImageNodes : [];
+  if (list5.length > 0) {
+    const list6 = list5.map((item5) =>
+        String(resolveManifestPayloadValue(payload2, item5.fields, '') || '').trim(),
       ),
-      _0x111ad0 =
-        _0x8c57c3?.processInputImagesPreserveOrder && _0x15f222.some(Boolean)
-          ? await _0x8c57c3.processInputImagesPreserveOrder(_0x15f222, _0x20d00f, {
+      value37 =
+        ctx?.processInputImagesPreserveOrder && list6.some(Boolean)
+          ? await ctx.processInputImagesPreserveOrder(list6, apiKey, {
               compress: false,
               provider: 'runninghub',
             })
-          : _0x15f222;
-    _0x4120ab.forEach((_0x99bc17, _0x2a379f) => {
-      const _0x5ed789 = String(_0x111ad0?.[_0x2a379f] || '').trim();
-      if (!_0x5ed789 || !_0x99bc17?.nodeId || !_0x99bc17?.fieldName) return;
-      (_0x53979a.push({
-        nodeId: String(_0x99bc17.nodeId),
-        fieldName: String(_0x99bc17.fieldName),
-        fieldValue: _0x5ed789,
-        description: _0x99bc17.description || String(_0x99bc17.fieldName),
+          : list6;
+    list5.forEach((description3, value38) => {
+      const fieldValue2 = String(value37?.[value38] || '').trim();
+      if (!fieldValue2 || !description3?.nodeId || !description3?.fieldName) return;
+      (nodeInfoList.push({
+        nodeId: String(description3.nodeId),
+        fieldName: String(description3.fieldName),
+        fieldValue: fieldValue2,
+        description: description3.description || String(description3.fieldName),
       }),
-        _0x99bc17.enableNode?.nodeId &&
-          _0x99bc17.enableNode?.fieldName &&
-          _0x53979a.push({
-            nodeId: String(_0x99bc17.enableNode.nodeId),
-            fieldName: String(_0x99bc17.enableNode.fieldName),
-            fieldValue: String(_0x99bc17.enableNode.value ?? 'true'),
-            description: _0x99bc17.enableNode.description || String(_0x99bc17.enableNode.fieldName),
+        description3.enableNode?.nodeId &&
+          description3.enableNode?.fieldName &&
+          nodeInfoList.push({
+            nodeId: String(description3.enableNode.nodeId),
+            fieldName: String(description3.enableNode.fieldName),
+            fieldValue: String(description3.enableNode.value ?? 'true'),
+            description: description3.enableNode.description || String(description3.enableNode.fieldName),
           }));
     });
   }
-  _0x53d2b9.promptNode?.nodeId &&
-    _0x53d2b9.promptNode?.fieldName &&
-    _0x53979a.push({
-      nodeId: String(_0x53d2b9.promptNode.nodeId),
-      fieldName: String(_0x53d2b9.promptNode.fieldName),
-      fieldValue: formatManifestPromptNodeValue(_0x2b6386, _0x53d2b9.promptNode),
-      description: _0x53d2b9.promptNode.description || '提示词',
+  description2.promptNode?.nodeId &&
+    description2.promptNode?.fieldName &&
+    nodeInfoList.push({
+      nodeId: String(description2.promptNode.nodeId),
+      fieldName: String(description2.promptNode.fieldName),
+      fieldValue: formatManifestPromptNodeValue(finalPrompt, description2.promptNode),
+      description: description2.promptNode.description || '提示词',
     });
-  if (_0x53d2b9.dimensionsNode?.nodeId) {
-    const _0x5aca76 = resolveQwenImageEditDimensions(
-      _0x4188a9.imageSize,
-      _0x4188a9.resolvedRatioLabel || _0x4188a9.aspectRatio,
+  if (description2.dimensionsNode?.nodeId) {
+    const box = resolveQwenImageEditDimensions(
+      payload2.imageSize,
+      payload2.resolvedRatioLabel || payload2.aspectRatio,
     );
-    (_0x53979a.push({
-      nodeId: String(_0x53d2b9.dimensionsNode.nodeId),
+    (nodeInfoList.push({
+      nodeId: String(description2.dimensionsNode.nodeId),
       fieldName: 'width',
-      fieldValue: String(_0x5aca76.width),
+      fieldValue: String(box.width),
       description: 'width',
     }),
-      _0x53979a.push({
-        nodeId: String(_0x53d2b9.dimensionsNode.nodeId),
+      nodeInfoList.push({
+        nodeId: String(description2.dimensionsNode.nodeId),
         fieldName: 'height',
-        fieldValue: String(_0x5aca76.height),
+        fieldValue: String(box.height),
         description: 'height',
       }));
   }
-  [_0x53d2b9.firstImageModeNode, _0x53d2b9.editModeNode].forEach((_0x1cfa14) => {
-    if (!_0x1cfa14?.nodeId || !_0x1cfa14?.fieldName || !_0x1cfa14?.field) return;
-    _0x53979a.push({
-      nodeId: String(_0x1cfa14.nodeId),
-      fieldName: String(_0x1cfa14.fieldName),
-      fieldValue: normalizeManifestMappedValue(_0x4188a9[_0x1cfa14.field], _0x1cfa14),
-      description: _0x1cfa14 === _0x53d2b9.firstImageModeNode ? '把第一张图变为' : '模式选择',
+  [description2.firstImageModeNode, description2.editModeNode].forEach((description4) => {
+    if (!description4?.nodeId || !description4?.fieldName || !description4?.field) return;
+    nodeInfoList.push({
+      nodeId: String(description4.nodeId),
+      fieldName: String(description4.fieldName),
+      fieldValue: normalizeManifestMappedValue(payload2[description4.field], description4),
+      description: description4 === description2.firstImageModeNode ? '把第一张图变为' : '模式选择',
     });
   });
-  Array.isArray(_0x53d2b9.valueNodes) &&
-    _0x53d2b9.valueNodes.forEach((_0x756ec3) => {
-      if (!_0x756ec3?.nodeId || !_0x756ec3?.fieldName) return;
-      const _0x4787da = [
-        _0x756ec3.field,
-        ...(Array.isArray(_0x756ec3.fallbackFields) ? _0x756ec3.fallbackFields : []),
+  Array.isArray(description2.valueNodes) &&
+    description2.valueNodes.forEach((description5) => {
+      if (!description5?.nodeId || !description5?.fieldName) return;
+      const value39 = [
+        description5.field,
+        ...(Array.isArray(description5.fallbackFields) ? description5.fallbackFields : []),
       ].filter(Boolean);
-      let _0x84153c = '';
-      for (const _0x25a423 of _0x4787da) {
-        const _0x2aa1bd = getManifestPayloadPathValue(_0x4188a9, _0x25a423);
-        if (_0x2aa1bd !== undefined && _0x2aa1bd !== null && String(_0x2aa1bd).trim() !== '') {
-          _0x84153c = _0x2aa1bd;
+      let manifestValueNodeValue = '';
+      for (const value40 of value39) {
+        const manifestPayloadPathValue2 = getManifestPayloadPathValue(payload2, value40);
+        if (
+          manifestPayloadPathValue2 !== undefined &&
+          manifestPayloadPathValue2 !== null &&
+          String(manifestPayloadPathValue2).trim() !== ''
+        ) {
+          manifestValueNodeValue = manifestPayloadPathValue2;
           break;
         }
       }
-      if (_0x84153c === '') _0x84153c = _0x756ec3.defaultValue ?? '';
-      ((_0x84153c = normalizeManifestValueNodeValue(_0x84153c, _0x756ec3)),
-        _0x53979a.push({
-          nodeId: String(_0x756ec3.nodeId),
-          fieldName: String(_0x756ec3.fieldName),
-          fieldValue: String(_0x84153c),
-          description: _0x756ec3.description || String(_0x756ec3.fieldName),
+      if (manifestValueNodeValue === '') manifestValueNodeValue = description5.defaultValue ?? '';
+      ((manifestValueNodeValue = normalizeManifestValueNodeValue(manifestValueNodeValue, description5)),
+        nodeInfoList.push({
+          nodeId: String(description5.nodeId),
+          fieldName: String(description5.fieldName),
+          fieldValue: String(manifestValueNodeValue),
+          description: description5.description || String(description5.fieldName),
         }));
     });
-  if (_0x53d2b9.imageCountNode?.nodeId && _0x53d2b9.imageCountNode?.fieldName) {
-    const _0x117863 = Number(_0x53d2b9.imageCountNode.offset) || 0;
-    _0x53979a.push({
-      nodeId: String(_0x53d2b9.imageCountNode.nodeId),
-      fieldName: String(_0x53d2b9.imageCountNode.fieldName),
-      fieldValue: String(Math.max(0, _0x369d54.length + _0x117863)),
+  if (description2.imageCountNode?.nodeId && description2.imageCountNode?.fieldName) {
+    const value41 = Number(description2.imageCountNode.offset) || 0;
+    nodeInfoList.push({
+      nodeId: String(description2.imageCountNode.nodeId),
+      fieldName: String(description2.imageCountNode.fieldName),
+      fieldValue: String(Math.max(0, list4.length + value41)),
       description: '入参多少张图片',
     });
   }
-  const _0x3bdbf4 = _0x4188a9[_0x3160c4.instanceType?.field] === 'plus' ? 'plus' : 'default',
-    _0x3f27c8 = String(_0x3160c4.appId || _0x3160c4.workflowId || '').trim();
+  const instanceType = payload2[executionManifest.instanceType?.field] === 'plus' ? 'plus' : 'default',
+    value42 = String(executionManifest.appId || executionManifest.workflowId || '').trim();
   return {
     url: '/api/v2/proxy/image',
     headers: { 'Content-Type': 'application/json' },
     body: {
-      apiUrl: 'https://www.runninghub.cn/openapi/v2/run/ai-app/' + _0x3f27c8,
-      apiKey: _0x20d00f,
-      nodeInfoList: _0x53979a,
-      instanceType: _0x3bdbf4,
+      apiUrl: 'https://www.runninghub.cn/openapi/v2/run/ai-app/' + value42,
+      apiKey: apiKey,
+      nodeInfoList: nodeInfoList,
+      instanceType: instanceType,
       usePersonalQueue: 'false',
     },
     isAsync: true,
-    taskIdPath: _0x3160c4.result?.taskIdPath || 'taskId',
-    adapterTrace: { source: 'manifest', executionId: _0x3160c4.id, modelId: _0x4188a9.model },
+    taskIdPath: executionManifest.result?.taskIdPath || 'taskId',
+    adapterTrace: { source: 'manifest', executionId: executionManifest.id, modelId: payload2.model },
     pollUrlBuilder: () => 'https://www.runninghub.cn/openapi/v2/query',
-    resultExtractor: (_0x1e8d00) => {
-      if (_0x1e8d00.status === 'COMPLETED' && Array.isArray(_0x1e8d00.results))
-        return _0x1e8d00.results.map((_0x1aeb64) => _0x1aeb64.url || _0x1aeb64.imageUrl).filter(Boolean);
+    resultExtractor: (response) => {
+      if (response.status === 'COMPLETED' && Array.isArray(response.results))
+        return response.results.map((response2) => response2.url || response2.imageUrl).filter(Boolean);
       return [];
     },
   };
 }
-function normalizeVideoMattingMaskModeIndex(_0x5065f0) {
-  const _0x5d17d2 = String(_0x5065f0 || '').trim();
-  if (!_0x5d17d2 || _0x5d17d2 === '0') return '0';
-  if (_0x5d17d2 === '1') return '1';
-  if (_0x5d17d2 === '2') return '2';
-  const _0x50b9fd = _0x5d17d2.toLowerCase();
-  if (_0x50b9fd === 'sam3') return '1';
-  if (_0x50b9fd === 'ma2' || _0x50b9fd === 'matanyone2') return '2';
+function normalizeVideoMattingMaskModeIndex(value43) {
+  const enabled5 = String(value43 || '').trim();
+  if (!enabled5 || enabled5 === '0') return '0';
+  if (enabled5 === '1') return '1';
+  if (enabled5 === '2') return '2';
+  const value44 = enabled5.toLowerCase();
+  if (value44 === 'sam3') return '1';
+  if (value44 === 'ma2' || value44 === 'matanyone2') return '2';
   return '0';
 }
 function buildRunningHubVideoResultExtractor() {
-  return (_0xe72866) => {
-    if (_0xe72866.status === 'COMPLETED' && Array.isArray(_0xe72866.results))
-      return _0xe72866.results.map((_0x172293) => _0x172293.videoUrl || _0x172293.url).filter(Boolean);
+  return (response3) => {
+    if (response3.status === 'COMPLETED' && Array.isArray(response3.results))
+      return response3.results.map((response4) => response4.videoUrl || response4.url).filter(Boolean);
     return [];
   };
 }
 function buildOpenApiVideoWorkflowRequest({
-  executionManifest: _0x2c4c9f,
-  payload: _0x3fb6f6,
-  apiKey: _0x4864bb,
-  nodeInfoList: _0x23aea4,
+  executionManifest: executionManifest2,
+  payload: payload3,
+  apiKey: apiKey2,
+  nodeInfoList: nodeInfoList2,
 }) {
-  const _0x43b5a9 = _0x3fb6f6[_0x2c4c9f.instanceType?.field] === 'plus' ? 'plus' : 'default',
-    _0x9c7ab7 = String(_0x2c4c9f.appId || _0x2c4c9f.workflowId || '').trim();
+  const instanceType2 = payload3[executionManifest2.instanceType?.field] === 'plus' ? 'plus' : 'default',
+    value45 = String(executionManifest2.appId || executionManifest2.workflowId || '').trim();
   return {
     url: '/api/v2/proxy/image',
     headers: { 'Content-Type': 'application/json' },
     body: {
-      apiUrl: 'https://www.runninghub.cn/openapi/v2/run/ai-app/' + _0x9c7ab7,
-      apiKey: _0x4864bb,
-      nodeInfoList: _0x23aea4,
-      instanceType: _0x43b5a9,
+      apiUrl: 'https://www.runninghub.cn/openapi/v2/run/ai-app/' + value45,
+      apiKey: apiKey2,
+      nodeInfoList: nodeInfoList2,
+      instanceType: instanceType2,
       usePersonalQueue: 'false',
     },
     isAsync: true,
-    taskIdPath: _0x2c4c9f.result?.taskIdPath || 'taskId',
-    adapterTrace: { source: 'manifest', executionId: _0x2c4c9f.id, modelId: _0x3fb6f6.model },
+    taskIdPath: executionManifest2.result?.taskIdPath || 'taskId',
+    adapterTrace: { source: 'manifest', executionId: executionManifest2.id, modelId: payload3.model },
     pollUrlBuilder: () => 'https://www.runninghub.cn/openapi/v2/query',
     resultExtractor: buildRunningHubVideoResultExtractor(),
   };
 }
 function buildTaskCreateVideoWorkflowRequest({
-  executionManifest: _0x6f5153,
-  payload: _0x22363f,
-  apiKey: _0x1e783c,
-  nodeInfoList: _0x18f9c5,
+  executionManifest: executionManifest3,
+  payload: payload4,
+  apiKey: apiKey3,
+  nodeInfoList: nodeInfoList3,
 }) {
-  const _0x26135e = _0x22363f[_0x6f5153.instanceType?.field] === 'plus' ? 'plus' : 'default';
+  const instanceType3 = payload4[executionManifest3.instanceType?.field] === 'plus' ? 'plus' : 'default';
   return {
     url: '/api/v2/runninghubwf/run',
     apiUrl: 'https://www.runninghub.cn/task/openapi/create',
     headers: { 'Content-Type': 'application/json' },
     body: {
-      apiKey: _0x1e783c,
-      workflowId: String(_0x6f5153.workflowId || _0x6f5153.appId || ''),
+      apiKey: apiKey3,
+      workflowId: String(executionManifest3.workflowId || executionManifest3.appId || ''),
       addMetadata: false,
-      nodeInfoList: _0x18f9c5,
-      instanceType: _0x26135e,
+      nodeInfoList: nodeInfoList3,
+      instanceType: instanceType3,
       usePersonalQueue: 'false',
     },
     isAsync: true,
-    taskIdPath: _0x6f5153.result?.taskIdPath || 'taskId',
-    adapterTrace: { source: 'manifest', executionId: _0x6f5153.id, modelId: _0x22363f.model },
+    taskIdPath: executionManifest3.result?.taskIdPath || 'taskId',
+    adapterTrace: { source: 'manifest', executionId: executionManifest3.id, modelId: payload4.model },
     pollUrlBuilder: () => 'https://www.runninghub.cn/openapi/v2/query',
     resultExtractor: buildRunningHubVideoResultExtractor(),
   };
 }
-function pushManifestNode(_0x55f8ba, _0x3c6fd6, _0x338a7b, _0x376eba = {}) {
-  if (!_0x3c6fd6?.nodeId || !_0x3c6fd6?.fieldName) return;
-  _0x55f8ba.push({
-    nodeId: String(_0x3c6fd6.nodeId),
-    fieldName: String(_0x376eba.fieldName || _0x3c6fd6.fieldName),
-    fieldValue: String(_0x338a7b),
-    ...(_0x3c6fd6.description || _0x376eba.description
-      ? { description: _0x376eba.description || _0x3c6fd6.description }
+function pushManifestNode(list7, enabled6, value46, description6 = {}) {
+  if (!enabled6?.nodeId || !enabled6?.fieldName) return;
+  list7.push({
+    nodeId: String(enabled6.nodeId),
+    fieldName: String(description6.fieldName || enabled6.fieldName),
+    fieldValue: String(value46),
+    ...(enabled6.description || description6.description
+      ? { description: description6.description || enabled6.description }
       : {}),
   });
 }
-function getMappedValue(_0xf5bd28, _0x42e525, _0x5b538f = '') {
-  const _0x5dc923 = String(_0xf5bd28 ?? '').trim(),
-    _0x2b8734 = _0x42e525?.valueMap || {};
-  if (_0x5dc923 && _0x2b8734[_0x5dc923] !== undefined) return _0x2b8734[_0x5dc923];
-  if (_0x5dc923 && _0x2b8734[_0x5dc923.toLowerCase()] !== undefined)
-    return _0x2b8734[_0x5dc923.toLowerCase()];
-  return _0x42e525?.defaultValue ?? _0x5b538f;
+function getMappedValue(value47, value48, value49 = '') {
+  const value50 = String(value47 ?? '').trim(),
+    value51 = value48?.valueMap || {};
+  if (value50 && value51[value50] !== undefined) return value51[value50];
+  if (value50 && value51[value50.toLowerCase()] !== undefined) return value51[value50.toLowerCase()];
+  return value48?.defaultValue ?? value49;
 }
 async function resolveRunningHubVideoInput(
-  _0xfe0bf7,
-  _0x16924d,
+  value52,
+  value53,
   {
     urlField: urlField = 'videoUrl',
     fileField: fileField = 'videoFile',
@@ -417,31 +424,31 @@ async function resolveRunningHubVideoInput(
     uploadFailedMessage: uploadFailedMessage = '源视频上传失败',
   } = {},
 ) {
-  let _0x3c998e = '';
-  const _0x596698 = String(_0xfe0bf7[urlField] || '').trim();
-  if (_0x596698) {
-    const { processInputVideos: _0xc5188c } = await import('../videoUploadApi.js'),
-      _0x308757 = await _0xc5188c([_0x596698], _0x16924d);
-    if (_0x308757.length > 0) _0x3c998e = _0x308757[0];
+  let enabled7 = '';
+  const value54 = String(value52[urlField] || '').trim();
+  if (value54) {
+    const { processInputVideos: processInputVideos } = await import('../videoUploadApi.js'),
+      list8 = await processInputVideos([value54], value53);
+    if (list8.length > 0) enabled7 = list8[0];
   } else {
-    if (_0xfe0bf7[fileField]) {
-      const { uploadVideoToRunningHub: _0x1656a9 } = await import('../videoUploadApi.js');
-      _0x3c998e = await _0x1656a9(_0xfe0bf7[fileField], _0x16924d);
+    if (value52[fileField]) {
+      const { uploadVideoToRunningHub: uploadVideoToRunningHub } = await import('../videoUploadApi.js');
+      enabled7 = await uploadVideoToRunningHub(value52[fileField], value53);
     }
   }
-  if (!_0x3c998e) throw new Error(_0x596698 || _0xfe0bf7[fileField] ? uploadFailedMessage : missingMessage);
-  return _0x3c998e;
+  if (!enabled7) throw new Error(value54 || value52[fileField] ? uploadFailedMessage : missingMessage);
+  return enabled7;
 }
-async function resolveRunningHubOptionalVideoInput(_0x7ea084, _0x47646a, _0x1b8305) {
-  const _0x3fc7bc = String(_0x7ea084[_0x1b8305] || '').trim();
-  if (!_0x3fc7bc) return '';
-  const { processInputVideos: _0x5cdc69 } = await import('../videoUploadApi.js'),
-    _0x15d50d = await _0x5cdc69([_0x3fc7bc], _0x47646a);
-  return String(_0x15d50d?.[0] || '').trim();
+async function resolveRunningHubOptionalVideoInput(value55, value56, value57) {
+  const enabled8 = String(value55[value57] || '').trim();
+  if (!enabled8) return '';
+  const { processInputVideos: processInputVideos2 } = await import('../videoUploadApi.js'),
+    value58 = await processInputVideos2([enabled8], value56);
+  return String(value58?.[0] || '').trim();
 }
 async function resolveRunningHubAudioInput(
-  _0x4a2662,
-  _0x2c7ed8,
+  value59,
+  value60,
   {
     urlField: urlField = 'audioUrl',
     fileField: fileField = 'audioFile',
@@ -449,25 +456,25 @@ async function resolveRunningHubAudioInput(
     missingMessage: missingMessage = '请接入音频',
   } = {},
 ) {
-  let _0x566212 = '';
-  const _0x26553d = String(_0x4a2662[urlField] || '').trim();
-  if (_0x26553d) {
-    const { processInputAudios: _0x327621 } = await import('../audioUploadApi.js'),
-      _0x1da584 = await _0x327621([_0x26553d], _0x2c7ed8);
-    if (_0x1da584.length > 0) _0x566212 = _0x1da584[0];
+  let enabled9 = '';
+  const value61 = String(value59[urlField] || '').trim();
+  if (value61) {
+    const { processInputAudios: processInputAudios } = await import('../audioUploadApi.js'),
+      list9 = await processInputAudios([value61], value60);
+    if (list9.length > 0) enabled9 = list9[0];
   } else {
-    if (_0x4a2662[fileField]) {
-      const { uploadAudioToRunningHub: _0x2f6216 } = await import('../audioUploadApi.js');
-      _0x566212 = await _0x2f6216(_0x4a2662[fileField], _0x2c7ed8);
+    if (value59[fileField]) {
+      const { uploadAudioToRunningHub: uploadAudioToRunningHub } = await import('../audioUploadApi.js');
+      enabled9 = await uploadAudioToRunningHub(value59[fileField], value60);
     }
   }
-  if (required && !_0x566212) throw new Error(missingMessage);
-  return _0x566212;
+  if (required && !enabled9) throw new Error(missingMessage);
+  return enabled9;
 }
 async function resolveRunningHubFirstImageInput(
-  _0x2dce5b,
-  _0x10e764,
-  _0x2ec1a4,
+  value62,
+  value63,
+  value64,
   {
     field: field = 'inputUrls',
     required: required = false,
@@ -475,234 +482,232 @@ async function resolveRunningHubFirstImageInput(
     compress: compress = true,
   } = {},
 ) {
-  const _0x314c55 = Array.isArray(_0x2dce5b[field])
-    ? _0x2dce5b[field]
-    : String(_0x2dce5b[field] || '').trim()
-      ? [_0x2dce5b[field]]
+  const list10 = Array.isArray(value62[field])
+    ? value62[field]
+    : String(value62[field] || '').trim()
+      ? [value62[field]]
       : [];
-  if (!_0x314c55.length) {
+  if (!list10.length) {
     if (required) throw new Error(missingMessage);
     return '';
   }
-  const _0x468974 = await _0x2ec1a4.processInputImages(_0x314c55, _0x10e764, {
+  const value65 = await value64.processInputImages(list10, value63, {
       applyInputQualityProfile: compress,
       provider: 'runninghub',
     }),
-    _0xcc42b2 = String(_0x468974?.[0] || '').trim();
-  if (required && !_0xcc42b2) throw new Error(missingMessage);
-  return _0xcc42b2;
+    enabled10 = String(value65?.[0] || '').trim();
+  if (required && !enabled10) throw new Error(missingMessage);
+  return enabled10;
 }
-function hasOwnManifestValue(_0x3632d9, _0x2f5470) {
-  return Object.prototype.hasOwnProperty.call(_0x3632d9 || {}, _0x2f5470);
+function hasOwnManifestValue(value66, value67) {
+  return Object.prototype.hasOwnProperty.call(value66 || {}, value67);
 }
-function isPresentManifestValue(_0xfb2479) {
-  if (_0xfb2479 === undefined || _0xfb2479 === null) return false;
-  if (typeof _0xfb2479 === 'string') return _0xfb2479.trim() !== '';
+function isPresentManifestValue(value68) {
+  if (value68 === undefined || value68 === null) return false;
+  if (typeof value68 === 'string') return value68.trim() !== '';
   return true;
 }
-function normalizeManifestFieldList(_0x38d546, _0x1ec0ea = '') {
-  const _0x380157 = _0x38d546?.fields !== undefined ? _0x38d546.fields : _0x38d546?.field,
-    _0x5f2da8 = Array.isArray(_0x380157) ? _0x380157 : [_0x380157 || _0x1ec0ea];
-  return _0x5f2da8.map((_0x2db898) => String(_0x2db898 || '').trim()).filter(Boolean);
+function normalizeManifestFieldList(value69, value70 = '') {
+  const value71 = value69?.fields !== undefined ? value69.fields : value69?.field,
+    list11 = Array.isArray(value71) ? value71 : [value71 || value70];
+  return list11.map((item6) => String(item6 || '').trim()).filter(Boolean);
 }
-function manifestValuesEqual(_0x2c1ed7, _0x216bbe) {
-  if (typeof _0x216bbe === 'boolean') {
-    const _0x559546 = String(_0x2c1ed7 ?? '')
+function manifestValuesEqual(value72, value73) {
+  if (typeof value73 === 'boolean') {
+    const value74 = String(value72 ?? '')
       .trim()
       .toLowerCase();
-    return _0x2c1ed7 === _0x216bbe || _0x559546 === String(_0x216bbe);
+    return value72 === value73 || value74 === String(value73);
   }
-  if (typeof _0x216bbe === 'number') return Number(_0x2c1ed7) === _0x216bbe;
-  return String(_0x2c1ed7 ?? '').trim() === String(_0x216bbe ?? '').trim();
+  if (typeof value73 === 'number') return Number(value72) === value73;
+  return String(value72 ?? '').trim() === String(value73 ?? '').trim();
 }
-function evaluateManifestWhenRule(_0x31104f, _0x25a606) {
-  if (!_0x31104f || typeof _0x31104f !== 'object') return true;
-  const _0x141f30 = _0x31104f.field ? getManifestPayloadPathValue(_0x25a606, _0x31104f.field) : undefined,
-    _0x47837f = isPresentManifestValue(_0x141f30);
-  if (hasOwnManifestValue(_0x31104f, 'exists') && Boolean(_0x31104f.exists) !== _0x47837f) return false;
-  if (_0x31104f.truthy === true && !Boolean(_0x141f30)) return false;
-  if (_0x31104f.falsy === true && Boolean(_0x141f30)) return false;
-  if (hasOwnManifestValue(_0x31104f, 'equals') && !manifestValuesEqual(_0x141f30, _0x31104f.equals))
+function evaluateManifestWhenRule(enabled11, value75) {
+  if (!enabled11 || typeof enabled11 !== 'object') return true;
+  const value76 = enabled11.field ? getManifestPayloadPathValue(value75, enabled11.field) : undefined,
+    isPresentManifestValue2 = isPresentManifestValue(value76);
+  if (hasOwnManifestValue(enabled11, 'exists') && Boolean(enabled11.exists) !== isPresentManifestValue2)
     return false;
-  if (hasOwnManifestValue(_0x31104f, 'notEquals') && manifestValuesEqual(_0x141f30, _0x31104f.notEquals))
+  if (enabled11.truthy === true && !Boolean(value76)) return false;
+  if (enabled11.falsy === true && Boolean(value76)) return false;
+  if (hasOwnManifestValue(enabled11, 'equals') && !manifestValuesEqual(value76, enabled11.equals))
     return false;
-  if (
-    Array.isArray(_0x31104f.in) &&
-    !_0x31104f.in.some((_0x3f7fdd) => manifestValuesEqual(_0x141f30, _0x3f7fdd))
-  )
+  if (hasOwnManifestValue(enabled11, 'notEquals') && manifestValuesEqual(value76, enabled11.notEquals))
     return false;
-  if (
-    Array.isArray(_0x31104f.notIn) &&
-    _0x31104f.notIn.some((_0x501670) => manifestValuesEqual(_0x141f30, _0x501670))
-  )
+  if (Array.isArray(enabled11.in) && !enabled11.in.some((item7) => manifestValuesEqual(value76, item7)))
+    return false;
+  if (Array.isArray(enabled11.notIn) && enabled11.notIn.some((item8) => manifestValuesEqual(value76, item8)))
     return false;
   return true;
 }
-function shouldUseManifestNodeMapping(_0x4f6443, _0x2aed24) {
-  const _0x58d2cd = _0x4f6443?.when;
-  if (_0x58d2cd === undefined || _0x58d2cd === null) return true;
-  if (Array.isArray(_0x58d2cd))
-    return _0x58d2cd.every((_0x5e0868) => evaluateManifestWhenRule(_0x5e0868, _0x2aed24));
-  return evaluateManifestWhenRule(_0x58d2cd, _0x2aed24);
+function shouldUseManifestNodeMapping(value77, value78) {
+  const list12 = value77?.when;
+  if (list12 === undefined || list12 === null) return true;
+  if (Array.isArray(list12)) return list12.every((item9) => evaluateManifestWhenRule(item9, value78));
+  return evaluateManifestWhenRule(list12, value78);
 }
-function applyManifestNodeValueMap(_0x5c6d18, _0x3f7fad) {
-  const _0x446740 = _0x3f7fad?.valueMap || _0x3f7fad?.values || {},
-    _0x51e8de = String(_0x5c6d18 ?? '').trim();
-  if (_0x51e8de && _0x446740[_0x51e8de] !== undefined) return _0x446740[_0x51e8de];
-  const _0x357028 = _0x51e8de.toLowerCase();
-  if (_0x51e8de && _0x446740[_0x357028] !== undefined) return _0x446740[_0x357028];
-  return _0x5c6d18;
+function applyManifestNodeValueMap(value79, map) {
+  const value80 = map?.valueMap || map?.values || {},
+    value81 = String(value79 ?? '').trim();
+  if (value81 && value80[value81] !== undefined) return value80[value81];
+  const value82 = value81.toLowerCase();
+  if (value81 && value80[value82] !== undefined) return value80[value82];
+  return value79;
 }
-function normalizeManifestTransformSpec(_0x24cf68) {
-  if (!_0x24cf68) return { name: '' };
-  if (typeof _0x24cf68 === 'string') return { name: _0x24cf68 };
-  if (typeof _0x24cf68 === 'object' && !Array.isArray(_0x24cf68))
-    return { ..._0x24cf68, name: String(_0x24cf68.name || '').trim() };
+function normalizeManifestTransformSpec(name) {
+  if (!name) return { name: '' };
+  if (typeof name === 'string') return { name: name };
+  if (typeof name === 'object' && !Array.isArray(name))
+    return { ...name, name: String(name.name || '').trim() };
   return { name: '' };
 }
-function clampManifestNumber(_0x15ab53, _0x2ef7c6) {
-  let _0x3323b3 = _0x15ab53;
+function clampManifestNumber(value83, value84) {
+  let value85 = value83;
   return (
-    Number.isFinite(Number(_0x2ef7c6.min)) && (_0x3323b3 = Math.max(Number(_0x2ef7c6.min), _0x3323b3)),
-    Number.isFinite(Number(_0x2ef7c6.max)) && (_0x3323b3 = Math.min(Number(_0x2ef7c6.max), _0x3323b3)),
-    _0x3323b3
+    Number.isFinite(Number(value84.min)) && (value85 = Math.max(Number(value84.min), value85)),
+    Number.isFinite(Number(value84.max)) && (value85 = Math.min(Number(value84.max), value85)),
+    value85
   );
 }
-function applyManifestNodeTransform(_0x41c6f1, _0x2dde63) {
-  const _0x2541f3 = normalizeManifestTransformSpec(_0x2dde63?.transform);
-  switch (_0x2541f3.name) {
+function applyManifestNodeTransform(value86, value87) {
+  const error = normalizeManifestTransformSpec(value87?.transform);
+  switch (error.name) {
     case '':
-      return _0x41c6f1;
+      return value86;
     case 'trim':
-      return String(_0x41c6f1 ?? '').trim();
+      return String(value86 ?? '').trim();
     case 'string':
-      return String(_0x41c6f1 ?? '');
+      return String(value86 ?? '');
     case 'booleanString': {
-      const _0x161c9f = String(_0x41c6f1 ?? '')
+      const value88 = String(value86 ?? '')
         .trim()
         .toLowerCase();
-      return _0x41c6f1 === true || _0x161c9f === 'true' || _0x161c9f === '1' ? 'true' : 'false';
+      return value86 === true || value88 === 'true' || value88 === '1' ? 'true' : 'false';
     }
     case 'integer': {
-      const _0x36789d = Number(_0x41c6f1),
-        _0x428681 = Number(_0x2541f3.defaultValue ?? _0x2dde63?.defaultValue ?? 0),
-        _0xf8d27a = Number.isFinite(_0x36789d)
-          ? Math.trunc(_0x36789d)
-          : Number.isFinite(_0x428681)
-            ? Math.trunc(_0x428681)
+      const value89 = Number(value86),
+        value90 = Number(error.defaultValue ?? value87?.defaultValue ?? 0),
+        value91 = Number.isFinite(value89)
+          ? Math.trunc(value89)
+          : Number.isFinite(value90)
+            ? Math.trunc(value90)
             : 0;
-      return clampManifestNumber(_0xf8d27a, _0x2541f3);
+      return clampManifestNumber(value91, error);
     }
     case 'normalizeRhVideoFps':
-      return normalizeRhVideoFps(_0x41c6f1);
+      return normalizeRhVideoFps(value86);
     case 'normalizeRhVideoResolution':
       return normalizeRhVideoResolution(
-        _0x41c6f1,
-        Number.isFinite(Number(_0x2541f3.fallback)) ? Number(_0x2541f3.fallback) : RH_MIN_VIDEO_RESOLUTION,
+        value86,
+        Number.isFinite(Number(error.fallback)) ? Number(error.fallback) : RH_MIN_VIDEO_RESOLUTION,
       );
     default:
-      throw new Error('Unsupported RunningHub workflow transform: ' + _0x2541f3.name);
+      throw new Error('Unsupported RunningHub workflow transform: ' + error.name);
   }
 }
-async function resolveRunningHubManifestVideoInput(_0x2318b3, _0x3e33a8, _0x2430f3) {
-  const _0x4b6b15 = String(_0x2430f3?.urlField || _0x2430f3?.field || 'videoUrl').trim(),
-    _0x4e2b0b = String(_0x2430f3?.fileField || 'videoFile').trim(),
-    _0x507762 = String(_0x2318b3[_0x4b6b15] || '').trim(),
-    _0x519345 = _0x2318b3[_0x4e2b0b];
-  if (!_0x2430f3?.required && !_0x507762 && !_0x519345) return '';
-  return resolveRunningHubVideoInput(_0x2318b3, _0x3e33a8, {
-    urlField: _0x4b6b15,
-    fileField: _0x4e2b0b,
-    missingMessage: _0x2430f3?.missingMessage || '请接入源视频',
-    uploadFailedMessage: _0x2430f3?.uploadFailedMessage || '源视频上传失败',
+async function resolveRunningHubManifestVideoInput(value92, value93, missingMessage2) {
+  const urlField2 = String(missingMessage2?.urlField || missingMessage2?.field || 'videoUrl').trim(),
+    fileField2 = String(missingMessage2?.fileField || 'videoFile').trim(),
+    enabled12 = String(value92[urlField2] || '').trim(),
+    enabled13 = value92[fileField2];
+  if (!missingMessage2?.required && !enabled12 && !enabled13) return '';
+  return resolveRunningHubVideoInput(value92, value93, {
+    urlField: urlField2,
+    fileField: fileField2,
+    missingMessage: missingMessage2?.missingMessage || '请接入源视频',
+    uploadFailedMessage: missingMessage2?.uploadFailedMessage || '源视频上传失败',
   });
 }
-async function resolveRunningHubManifestAudioInput(_0x279cb6, _0x301a6e, _0x36d1ad) {
-  const _0x6ee73d = String(_0x36d1ad?.urlField || _0x36d1ad?.field || 'audioUrl').trim(),
-    _0x71dc32 = String(_0x36d1ad?.fileField || 'audioFile').trim(),
-    _0x223e62 = String(_0x279cb6[_0x6ee73d] || '').trim(),
-    _0x6ac002 = _0x279cb6[_0x71dc32];
-  if (!_0x36d1ad?.required && !_0x223e62 && !_0x6ac002) return '';
-  return resolveRunningHubAudioInput(_0x279cb6, _0x301a6e, {
-    urlField: _0x6ee73d,
-    fileField: _0x71dc32,
-    required: _0x36d1ad?.required === true,
-    missingMessage: _0x36d1ad?.missingMessage || '请接入音频',
+async function resolveRunningHubManifestAudioInput(value94, value95, required2) {
+  const urlField3 = String(required2?.urlField || required2?.field || 'audioUrl').trim(),
+    fileField3 = String(required2?.fileField || 'audioFile').trim(),
+    enabled14 = String(value94[urlField3] || '').trim(),
+    enabled15 = value94[fileField3];
+  if (!required2?.required && !enabled14 && !enabled15) return '';
+  return resolveRunningHubAudioInput(value94, value95, {
+    urlField: urlField3,
+    fileField: fileField3,
+    required: required2?.required === true,
+    missingMessage: required2?.missingMessage || '请接入音频',
   });
 }
 async function resolveRunningHubManifestNodeValue({
-  item: _0x42d4cd,
-  payload: _0x381280,
-  finalPrompt: _0xf21045,
-  apiKey: _0x27ca18,
-  ctx: _0x538bc9,
+  item: item10,
+  payload: payload5,
+  finalPrompt: finalPrompt2,
+  apiKey: apiKey4,
+  ctx: ctx2,
 }) {
-  const _0x11d4c3 = String(_0x42d4cd?.source || 'param').trim();
-  if (_0x11d4c3 === 'constant')
-    return hasOwnManifestValue(_0x42d4cd, 'value') ? _0x42d4cd.value : _0x42d4cd.defaultValue;
-  if (_0x11d4c3 === 'prompt') {
-    const _0x2379db = resolveManifestPayloadValue(_0x381280, normalizeManifestFieldList(_0x42d4cd), '');
-    return isPresentManifestValue(_0x2379db) ? _0x2379db : _0xf21045;
+  const value96 = String(item10?.source || 'param').trim();
+  if (value96 === 'constant')
+    return hasOwnManifestValue(item10, 'value') ? item10.value : item10.defaultValue;
+  if (value96 === 'prompt') {
+    const manifestPayloadValue = resolveManifestPayloadValue(
+      payload5,
+      normalizeManifestFieldList(item10),
+      '',
+    );
+    return isPresentManifestValue(manifestPayloadValue) ? manifestPayloadValue : finalPrompt2;
   }
-  if (_0x11d4c3 === 'param')
-    return resolveManifestPayloadValue(_0x381280, normalizeManifestFieldList(_0x42d4cd), undefined, {
-      allowEmpty: _0x42d4cd?.allowEmpty === true,
+  if (value96 === 'param')
+    return resolveManifestPayloadValue(payload5, normalizeManifestFieldList(item10), undefined, {
+      allowEmpty: item10?.allowEmpty === true,
     });
-  if (_0x11d4c3 === 'imageInput')
-    return resolveRunningHubFirstImageInput(_0x381280, _0x27ca18, _0x538bc9, {
-      field: String(_0x42d4cd?.field || 'inputUrls').trim(),
-      required: _0x42d4cd?.required === true,
-      missingMessage: _0x42d4cd?.missingMessage || '请接入参考图',
-      compress: _0x42d4cd?.compress !== false,
+  if (value96 === 'imageInput')
+    return resolveRunningHubFirstImageInput(payload5, apiKey4, ctx2, {
+      field: String(item10?.field || 'inputUrls').trim(),
+      required: item10?.required === true,
+      missingMessage: item10?.missingMessage || '请接入参考图',
+      compress: item10?.compress !== false,
     });
-  if (_0x11d4c3 === 'videoInput') return resolveRunningHubManifestVideoInput(_0x381280, _0x27ca18, _0x42d4cd);
-  if (_0x11d4c3 === 'audioInput') return resolveRunningHubManifestAudioInput(_0x381280, _0x27ca18, _0x42d4cd);
-  throw new Error('Unsupported RunningHub workflow mapping source: ' + _0x11d4c3);
+  if (value96 === 'videoInput') return resolveRunningHubManifestVideoInput(payload5, apiKey4, item10);
+  if (value96 === 'audioInput') return resolveRunningHubManifestAudioInput(payload5, apiKey4, item10);
+  throw new Error('Unsupported RunningHub workflow mapping source: ' + value96);
 }
 async function buildRunningHubNodeInfoListFromManifest({
-  mapping: _0xeab81e,
-  payload: _0x495ce6,
-  finalPrompt: _0x1384e0,
-  apiKey: _0x125c7f,
-  ctx: _0x2278b4,
+  mapping: mapping,
+  payload: payload6,
+  finalPrompt: finalPrompt3,
+  apiKey: apiKey5,
+  ctx: ctx3,
 }) {
-  const _0x3de364 = Array.isArray(_0xeab81e?.nodeInfoList) ? _0xeab81e.nodeInfoList : [];
-  if (_0x3de364.length === 0) return null;
-  const _0x31bdb3 = [];
-  for (const _0x384fbd of _0x3de364) {
-    if (!_0x384fbd?.nodeId || !_0x384fbd?.fieldName) continue;
-    if (!shouldUseManifestNodeMapping(_0x384fbd, _0x495ce6)) continue;
-    const _0x1b956a = await resolveRunningHubManifestNodeValue({
-        item: _0x384fbd,
-        payload: _0x495ce6,
-        finalPrompt: _0x1384e0,
-        apiKey: _0x125c7f,
-        ctx: _0x2278b4,
+  const list13 = Array.isArray(mapping?.nodeInfoList) ? mapping.nodeInfoList : [];
+  if (list13.length === 0) return null;
+  const value97 = [];
+  for (const item11 of list13) {
+    if (!item11?.nodeId || !item11?.fieldName) continue;
+    if (!shouldUseManifestNodeMapping(item11, payload6)) continue;
+    const runningHubManifestNodeValue = await resolveRunningHubManifestNodeValue({
+        item: item11,
+        payload: payload6,
+        finalPrompt: finalPrompt3,
+        apiKey: apiKey5,
+        ctx: ctx3,
       }),
-      _0x19cc03 = _0x384fbd?.allowEmpty === true,
-      _0x5dd0ba = _0x384fbd?.includeEmpty === true || _0x19cc03,
-      _0x20cb6e = hasOwnManifestValue(_0x384fbd, 'defaultValue');
-    let _0x38dd2e = _0x1b956a;
-    !isPresentManifestValue(_0x38dd2e) &&
-      _0x20cb6e &&
-      !(_0x19cc03 && _0x38dd2e !== undefined && _0x38dd2e !== null) &&
-      (_0x38dd2e = _0x384fbd.defaultValue);
-    if (!isPresentManifestValue(_0x38dd2e)) {
-      if (_0x5dd0ba) _0x38dd2e = '';
+      value98 = item11?.allowEmpty === true,
+      enabled16 = item11?.includeEmpty === true || value98,
+      hasOwnManifestValue2 = hasOwnManifestValue(item11, 'defaultValue');
+    let manifestNodeValueMap = runningHubManifestNodeValue;
+    !isPresentManifestValue(manifestNodeValueMap) &&
+      hasOwnManifestValue2 &&
+      !(value98 && manifestNodeValueMap !== undefined && manifestNodeValueMap !== null) &&
+      (manifestNodeValueMap = item11.defaultValue);
+    if (!isPresentManifestValue(manifestNodeValueMap)) {
+      if (enabled16) manifestNodeValueMap = '';
       else {
-        if (_0x384fbd.required)
-          throw new Error(_0x384fbd.missingMessage || '缺少 RunningHub 节点入参：' + _0x384fbd.fieldName);
+        if (item11.required)
+          throw new Error(item11.missingMessage || '缺少 RunningHub 节点入参：' + item11.fieldName);
         continue;
       }
     }
-    ((_0x38dd2e = applyManifestNodeValueMap(_0x38dd2e, _0x384fbd)),
-      (_0x38dd2e = applyManifestNodeTransform(_0x38dd2e, _0x384fbd)));
-    if (!isPresentManifestValue(_0x38dd2e) && _0x384fbd.required && !_0x5dd0ba)
-      throw new Error(_0x384fbd.missingMessage || '缺少 RunningHub 节点入参：' + _0x384fbd.fieldName);
-    if (!isPresentManifestValue(_0x38dd2e) && !_0x5dd0ba) continue;
-    pushManifestNode(_0x31bdb3, _0x384fbd, _0x38dd2e);
+    ((manifestNodeValueMap = applyManifestNodeValueMap(manifestNodeValueMap, item11)),
+      (manifestNodeValueMap = applyManifestNodeTransform(manifestNodeValueMap, item11)));
+    if (!isPresentManifestValue(manifestNodeValueMap) && item11.required && !enabled16)
+      throw new Error(item11.missingMessage || '缺少 RunningHub 节点入参：' + item11.fieldName);
+    if (!isPresentManifestValue(manifestNodeValueMap) && !enabled16) continue;
+    pushManifestNode(value97, item11, manifestNodeValueMap);
   }
-  return _0x31bdb3;
+  return value97;
 }
 function getRunningHubWorkflowResolverHelpers() {
   return {
@@ -721,283 +726,285 @@ function getRunningHubWorkflowResolverHelpers() {
   };
 }
 async function buildVideoWorkflowRequestFromManifest({
-  executionManifest: _0x342af3,
-  payload: _0x117586,
-  finalPrompt: _0x4616f3,
-  apiKey: _0x12837a,
-  ctx: _0x3f18a8,
+  executionManifest: executionManifest4,
+  payload: payload7,
+  finalPrompt: finalPrompt4,
+  apiKey: apiKey6,
+  ctx: ctx4,
 }) {
-  if (!_0x342af3 || _0x342af3.adapterType !== 'workflow') return null;
-  const _0x79380 = _0x342af3.mapping || {},
-    _0x17beae = String(_0x342af3.extensions?.payloadResolver || '').trim();
-  if (_0x17beae) {
-    const _0x18c51a = getRunningHubWorkflowPayloadResolver(_0x17beae);
-    if (!_0x18c51a) throw new Error('Unsupported RunningHub workflow payloadResolver: ' + _0x17beae);
-    return _0x18c51a({
-      executionManifest: _0x342af3,
-      payload: _0x117586,
-      finalPrompt: _0x4616f3,
-      apiKey: _0x12837a,
-      ctx: _0x3f18a8,
+  if (!executionManifest4 || executionManifest4.adapterType !== 'workflow') return null;
+  const mapping2 = executionManifest4.mapping || {},
+    value99 = String(executionManifest4.extensions?.payloadResolver || '').trim();
+  if (value99) {
+    const run = getRunningHubWorkflowPayloadResolver(value99);
+    if (!run) throw new Error('Unsupported RunningHub workflow payloadResolver: ' + value99);
+    return run({
+      executionManifest: executionManifest4,
+      payload: payload7,
+      finalPrompt: finalPrompt4,
+      apiKey: apiKey6,
+      ctx: ctx4,
       helpers: getRunningHubWorkflowResolverHelpers(),
     });
   }
-  const _0x309d7f = await buildRunningHubNodeInfoListFromManifest({
-    mapping: _0x79380,
-    payload: _0x117586,
-    finalPrompt: _0x4616f3,
-    apiKey: _0x12837a,
-    ctx: _0x3f18a8,
+  const nodeInfoList4 = await buildRunningHubNodeInfoListFromManifest({
+    mapping: mapping2,
+    payload: payload7,
+    finalPrompt: finalPrompt4,
+    apiKey: apiKey6,
+    ctx: ctx4,
   });
-  if (!_0x309d7f) return null;
-  if (_0x342af3.submitMode === 'openapi-v2-ai-app')
+  if (!nodeInfoList4) return null;
+  if (executionManifest4.submitMode === 'openapi-v2-ai-app')
     return buildOpenApiVideoWorkflowRequest({
-      executionManifest: _0x342af3,
-      payload: _0x117586,
-      apiKey: _0x12837a,
-      nodeInfoList: _0x309d7f,
+      executionManifest: executionManifest4,
+      payload: payload7,
+      apiKey: apiKey6,
+      nodeInfoList: nodeInfoList4,
     });
-  if (_0x342af3.submitMode === 'runninghub-task-create')
+  if (executionManifest4.submitMode === 'runninghub-task-create')
     return buildTaskCreateVideoWorkflowRequest({
-      executionManifest: _0x342af3,
-      payload: _0x117586,
-      apiKey: _0x12837a,
-      nodeInfoList: _0x309d7f,
+      executionManifest: executionManifest4,
+      payload: payload7,
+      apiKey: apiKey6,
+      nodeInfoList: nodeInfoList4,
     });
-  throw new Error('Unsupported RunningHub video workflow submitMode: ' + _0x342af3.submitMode);
+  throw new Error('Unsupported RunningHub video workflow submitMode: ' + executionManifest4.submitMode);
 }
-export async function buildImageRequest(_0x222bde, _0x350e0c, _0x96ad51) {
-  if (!_0x222bde.model) throw new Error('未指定模型，无法发起图像生成请求');
-  const _0x3b65bc = _0x96ad51.getProviderConfig('runninghubwf'),
-    _0x159889 = _0x3b65bc.apiKey || _0x222bde.apiKey;
-  if (!_0x159889) throw new Error('API Key 未配置，无法发起 RunningHUB 请求');
-  const _0xaebfab = _0x96ad51.processInputImagesPreserveOrder || _0x96ad51.processInputImages,
-    _0x336b3b = await _0xaebfab(_0x222bde.inputUrls, _0x159889, {
+export async function buildImageRequest(payload8, finalPrompt5, ctx5) {
+  if (!payload8.model) throw new Error('未指定模型，无法发起图像生成请求');
+  const value100 = ctx5.getProviderConfig('runninghubwf'),
+    apiKey7 = value100.apiKey || payload8.apiKey;
+  if (!apiKey7) throw new Error('API Key 未配置，无法发起 RunningHUB 请求');
+  const run2 = ctx5.processInputImagesPreserveOrder || ctx5.processInputImages,
+    list14 = await run2(payload8.inputUrls, apiKey7, {
       applyInputQualityProfile: true,
       provider: 'runninghub',
     }),
-    _0x3d3a27 = Array.isArray(_0x336b3b) ? _0x336b3b.map((_0x47cbbe) => String(_0x47cbbe || '').trim()) : [],
-    _0x12179e = resolveModelExecution(_0x222bde.model),
-    _0x591a85 = await buildOpenApiAiAppWorkflowRequestFromManifest({
-      executionManifest: _0x12179e?.executionManifest,
-      payload: _0x222bde,
-      finalPrompt: _0x350e0c,
-      finalUrls: _0x3d3a27,
-      apiKey: _0x159889,
-      ctx: _0x96ad51,
+    finalUrls2 = Array.isArray(list14) ? list14.map((item12) => String(item12 || '').trim()) : [],
+    executionManifest5 = resolveModelExecution(payload8.model),
+    openApiAiAppWorkflowRequestFromManifest = await buildOpenApiAiAppWorkflowRequestFromManifest({
+      executionManifest: executionManifest5?.executionManifest,
+      payload: payload8,
+      finalPrompt: finalPrompt5,
+      finalUrls: finalUrls2,
+      apiKey: apiKey7,
+      ctx: ctx5,
     });
-  if (_0x591a85) return _0x591a85;
-  throw new Error('RunningHub workflow manifest missing: ' + _0x222bde.model);
+  if (openApiAiAppWorkflowRequestFromManifest) return openApiAiAppWorkflowRequestFromManifest;
+  throw new Error('RunningHub workflow manifest missing: ' + payload8.model);
 }
-export async function buildVideoRequest(_0x3509fd, _0x2da839, _0x524480) {
-  const _0x364498 = _0x524480.getProviderConfig('runninghubwf'),
-    _0x4149b5 = _0x3509fd.apiKey || _0x364498.apiKey;
-  if (!_0x4149b5) throw new Error('API Key 未配置，无法发起 RunningHUB 视频生成请求');
-  const _0xf710e3 = resolveModelExecution(_0x3509fd.model),
-    _0x5fbe28 = await buildVideoWorkflowRequestFromManifest({
-      executionManifest: _0xf710e3?.executionManifest,
-      payload: _0x3509fd,
-      finalPrompt: _0x2da839,
-      apiKey: _0x4149b5,
-      ctx: _0x524480,
+export async function buildVideoRequest(payload9, finalPrompt6, ctx6) {
+  const value101 = ctx6.getProviderConfig('runninghubwf'),
+    apiKey8 = payload9.apiKey || value101.apiKey;
+  if (!apiKey8) throw new Error('API Key 未配置，无法发起 RunningHUB 视频生成请求');
+  const executionManifest6 = resolveModelExecution(payload9.model),
+    videoWorkflowRequestFromManifest = await buildVideoWorkflowRequestFromManifest({
+      executionManifest: executionManifest6?.executionManifest,
+      payload: payload9,
+      finalPrompt: finalPrompt6,
+      apiKey: apiKey8,
+      ctx: ctx6,
     });
-  if (_0x5fbe28) return _0x5fbe28;
-  throw new Error('RunningHub video workflow manifest missing: ' + _0x3509fd.model);
+  if (videoWorkflowRequestFromManifest) return videoWorkflowRequestFromManifest;
+  throw new Error('RunningHub video workflow manifest missing: ' + payload9.model);
 }
-export async function buildModelRequest(_0x2a4514, _0x1bdf33, _0x40ebd7) {
-  const _0x29afad = await buildImageRequestFromManifest(_0x2a4514, _0x1bdf33, _0x40ebd7, {
+export async function buildModelRequest(value102, value103, value104) {
+  const imageRequestFromManifest = await buildImageRequestFromManifest(value102, value103, value104, {
     expectedProvider: 'runninghub',
   });
-  if (_0x29afad) return _0x29afad;
-  throw new Error('RunningHub model API manifest missing: ' + _0x2a4514.model);
+  if (imageRequestFromManifest) return imageRequestFromManifest;
+  throw new Error('RunningHub model API manifest missing: ' + value102.model);
 }
 const CUSTOM_AI_APP_MEDIA_NODE_SOURCES = new Set(['imageInput', 'videoInput', 'audioInput']);
 
-function getRunningHubWorkflowProfileId(_0x514d28 = {}) {
-  const _0x5ea456 = getRunningHubProviderProfileId(_0x514d28);
-  return _0x5ea456 ? normalizeRunningHubModelApiProfileId(_0x5ea456) : '';
+function getRunningHubWorkflowProfileId(options2 = {}) {
+  const runningHubProviderProfileId = getRunningHubProviderProfileId(options2);
+  return runningHubProviderProfileId ? normalizeRunningHubModelApiProfileId(runningHubProviderProfileId) : '';
 }
 
-function getRunningHubWorkflowBaseUrl(_0x3de2ac = {}) {
-  const _0x3ef228 = String(_0x3de2ac?.['runningHubApiUrl'] || '')['trim']();
-  if (_0x3ef228) return _0x3ef228['replace'](/\/+$/, '');
-  return resolveRunningHubModelApiBaseUrl(getRunningHubWorkflowProfileId(_0x3de2ac));
+function getRunningHubWorkflowBaseUrl(options3 = {}) {
+  const value105 = String(options3?.['runningHubApiUrl'] || '')['trim']();
+  if (value105) return value105['replace'](/\/+$/, '');
+  return resolveRunningHubModelApiBaseUrl(getRunningHubWorkflowProfileId(options3));
 }
 
-export function resolveRunningHubWorkflowResourceId(_0x4c0d2e, _0x4819ac = {}) {
-  const _0x2bfe98 = getRunningHubWorkflowProfileId(_0x4819ac) || 'runninghub',
-    _0x21e58a = _0x4c0d2e?.['extensions']?.['providerProfileBindings']?.[_0x2bfe98],
-    _0x164a39 = _0x4c0d2e?.['submitMode'] === 'runninghub-task-create',
-    _0x49627a = _0x164a39
-      ? _0x21e58a?.['workflowId'] || _0x21e58a?.['appId']
-      : _0x21e58a?.['appId'] || _0x21e58a?.['workflowId'],
-    _0x9ea9f0 = _0x164a39
-      ? _0x4c0d2e?.['workflowId'] || _0x4c0d2e?.['appId']
-      : _0x4c0d2e?.['appId'] || _0x4c0d2e?.['workflowId'];
-  return String(_0x49627a || _0x9ea9f0 || '')['trim']();
+export function resolveRunningHubWorkflowResourceId(value106, value107 = {}) {
+  const runningHubWorkflowProfileId = getRunningHubWorkflowProfileId(value107) || 'runninghub',
+    value108 = value106?.['extensions']?.['providerProfileBindings']?.[runningHubWorkflowProfileId],
+    value109 = value106?.['submitMode'] === 'runninghub-task-create',
+    value110 = value109
+      ? value108?.['workflowId'] || value108?.['appId']
+      : value108?.['appId'] || value108?.['workflowId'],
+    value111 = value109
+      ? value106?.['workflowId'] || value106?.['appId']
+      : value106?.['appId'] || value106?.['workflowId'];
+  return String(value110 || value111 || '')['trim']();
 }
 
-function isImportedRunningHubAiAppManifest(_0x5a4a20) {
+function isImportedRunningHubAiAppManifest(value112) {
   return (
-    Boolean(_0x5a4a20?.['extensions']?.['rhAiApp']) &&
-    _0x5a4a20['extensions']['rhAiApp']['sourceType'] !== 'runninghub-workflow'
+    Boolean(value112?.['extensions']?.['rhAiApp']) &&
+    value112['extensions']['rhAiApp']['sourceType'] !== 'runninghub-workflow'
   );
 }
 
-function relaxCustomAiAppMediaNodeMappings(_0x4f48fb = null, { enabled: enabled = ![] } = {}) {
-  if (!enabled || !_0x4f48fb || typeof _0x4f48fb !== 'object' || Array['isArray'](_0x4f48fb))
-    return _0x4f48fb;
-  const _0xd9123a = Array['isArray'](_0x4f48fb['nodeInfoList'])
-    ? _0x4f48fb['nodeInfoList']['map']((_0x4dab6f) =>
-        CUSTOM_AI_APP_MEDIA_NODE_SOURCES['has'](String(_0x4dab6f?.['source'] || '')['trim']())
-          ? { ..._0x4dab6f, required: ![] }
-          : _0x4dab6f,
+function relaxCustomAiAppMediaNodeMappings(args = null, { enabled: enabled = ![] } = {}) {
+  if (!enabled || !args || typeof args !== 'object' || Array['isArray'](args)) return args;
+  const nodeInfoList5 = Array['isArray'](args['nodeInfoList'])
+    ? args['nodeInfoList']['map']((args2) =>
+        CUSTOM_AI_APP_MEDIA_NODE_SOURCES['has'](String(args2?.['source'] || '')['trim']())
+          ? { ...args2, required: ![] }
+          : args2,
       )
-    : _0x4f48fb['nodeInfoList'];
-  return { ..._0x4f48fb, nodeInfoList: _0xd9123a };
+    : args['nodeInfoList'];
+  return { ...args, nodeInfoList: nodeInfoList5 };
 }
 
-function getImageWorkflowLongSideMap(_0x521b53 = {}) {
-  const _0x4e8d18 =
-    _0x521b53?.['longSideByImageSize'] && typeof _0x521b53['longSideByImageSize'] === 'object'
-      ? _0x521b53['longSideByImageSize']
+function getImageWorkflowLongSideMap(options4 = {}) {
+  const value113 =
+    options4?.['longSideByImageSize'] && typeof options4['longSideByImageSize'] === 'object'
+      ? options4['longSideByImageSize']
       : null;
-  return _0x4e8d18 || Object['freeze']({ '1K': 0x400, '1.5K': 0x600, '2K': 0x780 });
+  return value113 || Object['freeze']({ '1K': 0x400, '1.5K': 0x600, '2K': 0x780 });
 }
 
-function resolveImageWorkflowQualityKey(_0x4541b5, _0x189981 = {}) {
-  const _0x2a1d21 = getImageWorkflowLongSideMap(_0x189981),
-    _0x19e26b = String(_0x189981?.['defaultImageSize'] || '2K')
+function resolveImageWorkflowQualityKey(value114, value115 = {}) {
+  const imageWorkflowLongSideMap = getImageWorkflowLongSideMap(value115),
+    value116 = String(value115?.['defaultImageSize'] || '2K')
       ['trim']()
       ['toUpperCase'](),
-    _0x3b7213 = String(_0x4541b5 || _0x19e26b)
+    value117 = String(value114 || value116)
       ['trim']()
       ['toUpperCase'](),
-    _0x597eaf = Object['keys'](_0x2a1d21);
+    list15 = Object['keys'](imageWorkflowLongSideMap);
   return (
-    _0x597eaf['find']((_0x560a37) => String(_0x560a37)['trim']()['toUpperCase']() === _0x3b7213) ||
-    _0x597eaf['find']((_0x4bd2b2) => String(_0x4bd2b2)['trim']()['toUpperCase']() === _0x19e26b) ||
-    _0x597eaf[0x0] ||
+    list15['find']((value118) => String(value118)['trim']()['toUpperCase']() === value117) ||
+    list15['find']((value119) => String(value119)['trim']()['toUpperCase']() === value116) ||
+    list15[0x0] ||
     '2K'
   );
 }
 
-function resolveImageWorkflowDimensions(_0x26c569, _0xe8b55c, _0x4ff4d1 = {}) {
-  const _0x37e6ce = resolveImageWorkflowQualityKey(_0x26c569, _0x4ff4d1),
-    _0x22535c = Number(getImageWorkflowLongSideMap(_0x4ff4d1)[_0x37e6ce]) || 0x780,
-    _0x4f92d1 = String(_0x4ff4d1?.['defaultAspectRatio'] || RUNNINGHUB_WORKFLOW_DEFAULT_RATIO)['trim'](),
-    _0x2520e1 = normalizeRunningHubWorkflowRatio(_0xe8b55c, _0x4f92d1),
-    [_0x1585a2, _0xcd4634] = _0x2520e1['split'](':'),
-    _0x37b5a3 = Number['parseFloat'](_0x1585a2) || 0x1,
-    _0x4aaf64 = Number['parseFloat'](_0xcd4634) || 0x1,
-    _0x41b04e = _0x37b5a3 >= _0x4aaf64,
-    _0x2158e0 = _0x41b04e ? _0x22535c : (_0x22535c * _0x37b5a3) / _0x4aaf64,
-    _0xdee1d5 = _0x41b04e ? (_0x22535c * _0x4aaf64) / _0x37b5a3 : _0x22535c,
-    _0x58b425 = Math['max'](0x1, Number(_0x4ff4d1?.['align']) || 0x40),
-    _0x4394c2 = Math['max'](0x1, Number(_0x4ff4d1?.['minDimension']) || 0x200),
-    _0x2645b0 = (_0x528680) =>
-      Math['max'](_0x4394c2, Math['round'](Number(_0x528680 || 0x0) / _0x58b425) * _0x58b425);
-  return { width: _0x2645b0(_0x2158e0), height: _0x2645b0(_0xdee1d5) };
+function resolveImageWorkflowDimensions(value120, value121, value122 = {}) {
+  const imageWorkflowQualityKey = resolveImageWorkflowQualityKey(value120, value122),
+    value123 = Number(getImageWorkflowLongSideMap(value122)[imageWorkflowQualityKey]) || 0x780,
+    value124 = String(value122?.['defaultAspectRatio'] || RUNNINGHUB_WORKFLOW_DEFAULT_RATIO)['trim'](),
+    runningHubWorkflowRatio2 = normalizeRunningHubWorkflowRatio(value121, value124),
+    [value125, value126] = runningHubWorkflowRatio2['split'](':'),
+    value127 = Number['parseFloat'](value125) || 0x1,
+    value128 = Number['parseFloat'](value126) || 0x1,
+    value129 = value127 >= value128,
+    value130 = value129 ? value123 : (value123 * value127) / value128,
+    value131 = value129 ? (value123 * value128) / value127 : value123,
+    value132 = Math['max'](0x1, Number(value122?.['align']) || 0x40),
+    value133 = Math['max'](0x1, Number(value122?.['minDimension']) || 0x200),
+    width2 = (value134) =>
+      Math['max'](value133, Math['round'](Number(value134 || 0x0) / value132) * value132);
+  return { width: width2(value130), height: width2(value131) };
 }
 
-function resolveManifestDimensionsValue(_0x1c717c, _0x4b96a0, _0x2e0d7b, _0x4d86fe) {
-  const _0x215ab6 = [
-    ...(Array['isArray'](_0x4b96a0?.[_0x2e0d7b + 'Fields']) ? _0x4b96a0[_0x2e0d7b + 'Fields'] : []),
-    _0x4b96a0?.[_0x2e0d7b + 'Field'],
-    _0x2e0d7b === 'imageSize' ? 'imageSize' : 'resolvedRatioLabel',
-    _0x2e0d7b === 'imageSize' ? 'generationParams.imageSize' : 'aspectRatio',
-    _0x2e0d7b === 'aspectRatio' ? 'generationParams.aspectRatio' : '',
+function resolveManifestDimensionsValue(value135, value136, value137, value138) {
+  const value139 = [
+    ...(Array['isArray'](value136?.[value137 + 'Fields']) ? value136[value137 + 'Fields'] : []),
+    value136?.[value137 + 'Field'],
+    value137 === 'imageSize' ? 'imageSize' : 'resolvedRatioLabel',
+    value137 === 'imageSize' ? 'generationParams.imageSize' : 'aspectRatio',
+    value137 === 'aspectRatio' ? 'generationParams.aspectRatio' : '',
   ]['filter'](Boolean);
-  return resolveManifestPayloadValue(_0x1c717c, _0x215ab6, _0x4d86fe);
+  return resolveManifestPayloadValue(value135, value139, value138);
 }
 
-function normalizeManifestDimensionNode(_0x5f1059, _0x38ced4, _0x204387) {
-  if (_0x5f1059 && typeof _0x5f1059 === 'object' && !Array['isArray'](_0x5f1059))
+function normalizeManifestDimensionNode(description7, value140, description8) {
+  if (description7 && typeof description7 === 'object' && !Array['isArray'](description7))
     return {
-      nodeId: String(_0x5f1059['nodeId'] || '')['trim'](),
-      fieldName: String(_0x5f1059['fieldName'] || _0x204387)['trim']() || _0x204387,
-      description: _0x5f1059['description'] || _0x204387,
+      nodeId: String(description7['nodeId'] || '')['trim'](),
+      fieldName: String(description7['fieldName'] || description8)['trim']() || description8,
+      description: description7['description'] || description8,
     };
   return {
-    nodeId: String(_0x38ced4?.['nodeId'] || '')['trim'](),
+    nodeId: String(value140?.['nodeId'] || '')['trim'](),
     fieldName: String(
-      _0x204387 === 'width'
-        ? _0x38ced4?.['widthFieldName'] || 'width'
-        : _0x38ced4?.['heightFieldName'] || 'height',
+      description8 === 'width'
+        ? value140?.['widthFieldName'] || 'width'
+        : value140?.['heightFieldName'] || 'height',
     )['trim'](),
-    description: _0x204387,
+    description: description8,
   };
 }
 
-function pushManifestDimensionsNodes(_0x1148df, _0x221c2e, _0x1a63d5) {
-  const _0x579a3f = normalizeManifestDimensionNode(_0x221c2e?.['widthNode'], _0x221c2e, 'width'),
-    _0x22f348 = normalizeManifestDimensionNode(_0x221c2e?.['heightNode'], _0x221c2e, 'height');
+function pushManifestDimensionsNodes(list16, value141, box2) {
+  const manifestDimensionNode = normalizeManifestDimensionNode(value141?.['widthNode'], value141, 'width'),
+    manifestDimensionNode2 = normalizeManifestDimensionNode(value141?.['heightNode'], value141, 'height');
   [
-    [_0x579a3f, _0x1a63d5['width']],
-    [_0x22f348, _0x1a63d5['height']],
-  ]['forEach'](([_0x477d88, _0x1c0a6]) => {
-    if (!_0x477d88['nodeId'] || !_0x477d88['fieldName']) return;
-    _0x1148df['push']({
-      nodeId: _0x477d88['nodeId'],
-      fieldName: _0x477d88['fieldName'],
-      fieldValue: String(_0x1c0a6),
-      description: _0x477d88['description'],
+    [manifestDimensionNode, box2['width']],
+    [manifestDimensionNode2, box2['height']],
+  ]['forEach'](([nodeId2, value142]) => {
+    if (!nodeId2['nodeId'] || !nodeId2['fieldName']) return;
+    list16['push']({
+      nodeId: nodeId2['nodeId'],
+      fieldName: nodeId2['fieldName'],
+      fieldValue: String(value142),
+      description: nodeId2['description'],
     });
   });
 }
 
 function buildRunningHubImageResultExtractor() {
-  return (_0x4b79c7) => {
-    if (_0x4b79c7['status'] === 'COMPLETED' && Array['isArray'](_0x4b79c7['results']))
-      return _0x4b79c7['results']
-        ['map']((_0x1d8936) => _0x1d8936['url'] || _0x1d8936['imageUrl'])
+  return (response5) => {
+    if (response5['status'] === 'COMPLETED' && Array['isArray'](response5['results']))
+      return response5['results']
+        ['map']((response6) => response6['url'] || response6['imageUrl'])
         ['filter'](Boolean);
     return [];
   };
 }
 
 function buildOpenApiImageWorkflowRequest({
-  executionManifest: _0x31329c,
-  payload: _0x1d2424,
-  apiKey: _0x51248e,
-  nodeInfoList: _0x5c0721,
+  executionManifest: executionManifest7,
+  payload: payload10,
+  apiKey: apiKey9,
+  nodeInfoList: nodeInfoList6,
 }) {
-  const _0x29d7f7 = normalizeRunningHubInstanceType(_0x1d2424[_0x31329c['instanceType']?.['field']]),
-    _0x3bd41d = resolveRunningHubWorkflowResourceId(_0x31329c, _0x1d2424);
+  const instanceType4 = normalizeRunningHubInstanceType(
+      payload10[executionManifest7['instanceType']?.['field']],
+    ),
+    runningHubWorkflowResourceId = resolveRunningHubWorkflowResourceId(executionManifest7, payload10);
   return {
     url: '/api/v2/proxy/image',
     headers: { 'Content-Type': 'application/json' },
     body: {
-      apiUrl: getRunningHubWorkflowBaseUrl(_0x1d2424) + '/openapi/v2/run/ai-app/' + _0x3bd41d,
-      apiKey: _0x51248e,
-      nodeInfoList: _0x5c0721,
-      instanceType: _0x29d7f7,
+      apiUrl:
+        getRunningHubWorkflowBaseUrl(payload10) + '/openapi/v2/run/ai-app/' + runningHubWorkflowResourceId,
+      apiKey: apiKey9,
+      nodeInfoList: nodeInfoList6,
+      instanceType: instanceType4,
       usePersonalQueue: 'false',
     },
     isAsync: !![],
-    taskIdPath: _0x31329c['result']?.['taskIdPath'] || 'taskId',
-    adapterTrace: { source: 'manifest', executionId: _0x31329c['id'], modelId: _0x1d2424['model'] },
-    pollUrlBuilder: () => getRunningHubWorkflowBaseUrl(_0x1d2424) + '/openapi/v2/query',
+    taskIdPath: executionManifest7['result']?.['taskIdPath'] || 'taskId',
+    adapterTrace: { source: 'manifest', executionId: executionManifest7['id'], modelId: payload10['model'] },
+    pollUrlBuilder: () => getRunningHubWorkflowBaseUrl(payload10) + '/openapi/v2/query',
     resultExtractor: buildRunningHubImageResultExtractor(),
   };
 }
 
 async function uploadRunningHubMediaInputs(
-  _0x542a1a,
-  _0xf980a0,
-  _0xc0626f,
-  _0x591ac5,
-  _0x41f068,
+  kind,
+  value143,
+  value144,
+  apiKey10,
+  value145,
   { uploadFailedMessage: uploadFailedMessage = 'RunningHUB\x20素材上传失败' } = {},
 ) {
   try {
-    return await uploadModelApiMediaInputs(_0x542a1a, _0xf980a0, _0x41f068, {
-      apiKey: _0x591ac5,
-      apiUrl: getRunningHubWorkflowBaseUrl(_0xc0626f),
+    return await uploadModelApiMediaInputs(kind, value143, value145, {
+      apiKey: apiKey10,
+      apiUrl: getRunningHubWorkflowBaseUrl(value144),
       fallbackProvider: 'runninghub',
       strictUpload: !![],
     });
-  } catch (_0x5321a9) {
-    throw createMediaUploadError(_0x5321a9, { kind: _0x542a1a, label: uploadFailedMessage });
+  } catch (value146) {
+    throw createMediaUploadError(value146, { kind: kind, label: uploadFailedMessage });
   }
 }

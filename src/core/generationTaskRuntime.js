@@ -33,737 +33,1098 @@ const WORKFLOW_ADAPTER = 'workflow',
 function getCancelledMessage() {
   return t('coreUi.generationTask.cancelled');
 }
-function nowFrom(_0x185e7e = {}) {
-  return typeof _0x185e7e.now === 'function' ? _0x185e7e.now() : Date.now();
+function nowFrom(options2 = {}) {
+  return typeof options2.now === 'function' ? options2.now() : Date.now();
 }
-function getStore(_0x3439ac = {}) {
-  return _0x3439ac.store || appStore;
+function getStore(options3 = {}) {
+  return options3.store || appStore;
 }
-function getStateSnapshot(_0x16eccd) {
-  return typeof _0x16eccd.getStateRaw === 'function' ? _0x16eccd.getStateRaw() : _0x16eccd.getState();
+function getStateSnapshot(store) {
+  return typeof store.getStateRaw === 'function' ? store.getStateRaw() : store.getState();
 }
-function normalizeAdapterType(_0x18633f) {
-  return String(_0x18633f || '')
+function normalizeAdapterType(value) {
+  return String(value || '')
     .trim()
     .toLowerCase();
 }
-function isWorkflowSpec(_0x11cd3c = {}, _0x5c71c1 = {}) {
-  const _0x4605d0 = normalizeAdapterType(_0x11cd3c.adapterType || _0x5c71c1.adapterType);
-  return _0x4605d0 === WORKFLOW_ADAPTER;
+function isWorkflowSpec(options4 = {}, item = {}) {
+  const adapterType2 = normalizeAdapterType(options4.adapterType || item.adapterType);
+  return adapterType2 === WORKFLOW_ADAPTER;
 }
-function isAsyncModelApiSpec(_0x4c84bf = {}, _0x4e31e2 = {}) {
-  const _0x6efe59 = normalizeAdapterType(_0x4c84bf.adapterType || _0x4e31e2.adapterType);
-  return _0x6efe59 === MODEL_API_ADAPTER && _0x4c84bf.async === true;
+function isAsyncModelApiSpec(options5 = {}, key = {}) {
+  const adapterType3 = normalizeAdapterType(options5.adapterType || key.adapterType);
+  return adapterType3 === MODEL_API_ADAPTER && options5.async === true;
 }
 function assertSpec(
-  _0x4386eb,
+  enabled,
   { requireSubmit: requireSubmit = false, requireTarget: requireTarget = false } = {},
 ) {
-  if (!_0x4386eb || typeof _0x4386eb !== 'object' || Array.isArray(_0x4386eb))
+  if (!enabled || typeof enabled !== 'object' || Array.isArray(enabled))
     throw new Error('[generationTaskRuntime] task spec must be an object');
-  const _0x39fb80 = REQUIRED_SPEC_FIELDS.filter((_0x4144cc) => {
-    if (_0x4144cc === 'targetNodeId' || _0x4144cc === 'payload') return false;
-    if (_0x4144cc === 'resultBuilder') return typeof _0x4386eb.resultBuilder !== 'function';
-    return _0x4386eb[_0x4144cc] === undefined || _0x4386eb[_0x4144cc] === null || _0x4386eb[_0x4144cc] === '';
+  const list = REQUIRED_SPEC_FIELDS.filter((item2) => {
+    if (item2 === 'targetNodeId' || item2 === 'payload') return false;
+    if (item2 === 'resultBuilder') return typeof enabled.resultBuilder !== 'function';
+    return enabled[item2] === undefined || enabled[item2] === null || enabled[item2] === '';
   });
-  if (_0x4386eb.payload === undefined) _0x39fb80.push('payload');
-  requireTarget && !String(_0x4386eb.targetNodeId || '').trim() && _0x39fb80.push('targetNodeId');
-  requireSubmit && typeof getSubmitFn(_0x4386eb) !== 'function' && _0x39fb80.push('submit');
-  if (_0x39fb80.length)
-    throw new Error('[generationTaskRuntime] missing required task fields: ' + _0x39fb80.join(', '));
+  if (enabled.payload === undefined) list.push('payload');
+  requireTarget && !String(enabled.targetNodeId || '').trim() && list.push('targetNodeId');
+  requireSubmit && typeof getSubmitFn(enabled) !== 'function' && list.push('submit');
+  if (list.length)
+    throw new Error('[generationTaskRuntime] missing required task fields: ' + list.join(', '));
 }
-function getSubmitFn(_0x307469) {
-  return _0x307469.submit || _0x307469.adapter?.submit || null;
+function getSubmitFn(index) {
+  return index.submit || index.adapter?.submit || null;
 }
-function getPollFn(_0x2fc394) {
-  return _0x2fc394.poll || _0x2fc394.spec?.poll || _0x2fc394.spec?.adapter?.poll || null;
+function getPollFn(result) {
+  return result.poll || result.spec?.poll || result.spec?.adapter?.poll || null;
 }
-function getCancelFn(_0x1ce3b5, _0x45c00c = {}) {
-  return (
-    _0x45c00c.cancel || _0x1ce3b5.cancel || _0x1ce3b5.spec?.cancel || _0x1ce3b5.spec?.adapter?.cancel || null
-  );
+function getCancelFn(data, target = {}) {
+  return target.cancel || data.cancel || data.spec?.cancel || data.spec?.adapter?.cancel || null;
 }
-function extractTaskId(_0x194563) {
-  const _0x41b4d7 = [
-    _0x194563?.taskId,
-    _0x194563?.task_id,
-    _0x194563?.id,
-    _0x194563?.data?.taskId,
-    _0x194563?.data?.task_id,
-    _0x194563?.data?.id,
+function extractTaskId(source) {
+  const list2 = [
+    source?.taskId,
+    source?.task_id,
+    source?.id,
+    source?.data?.taskId,
+    source?.data?.task_id,
+    source?.data?.id,
   ];
-  return String(_0x41b4d7.find((_0x17cc11) => String(_0x17cc11 || '').trim()) || '').trim();
+  return String(list2.find((item3) => String(item3 || '').trim()) || '').trim();
 }
-function extractSubmittedResult(_0x5967a2) {
-  if (!_0x5967a2 || typeof _0x5967a2 !== 'object') return _0x5967a2;
-  if (Object.prototype.hasOwnProperty.call(_0x5967a2, 'result')) return _0x5967a2.result;
-  if (Object.prototype.hasOwnProperty.call(_0x5967a2, 'output')) return _0x5967a2.output;
-  return _0x5967a2;
+function extractSubmittedResult(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object') return enabled2;
+  if (Object.prototype.hasOwnProperty.call(enabled2, 'result')) return enabled2.result;
+  if (Object.prototype.hasOwnProperty.call(enabled2, 'output')) return enabled2.output;
+  return enabled2;
 }
-function isPendingResult(_0x4a4779) {
-  return !!_0x4a4779 && typeof _0x4a4779 === 'object' && _0x4a4779.pending === true;
+function isPendingResult(enabled3) {
+  return !!enabled3 && typeof enabled3 === 'object' && enabled3.pending === true;
 }
-function getPendingMessage(_0x59a16f) {
-  return String(_0x59a16f?.message || _0x59a16f?.statusMessage || _0x59a16f?.msg || '').trim();
+function getPendingMessage(error) {
+  return String(error?.message || error?.statusMessage || error?.msg || '').trim();
 }
-function buildProtocolStartPatch(_0x258a23, _0x3f32b1) {
-  const _0xd64a8d = {
-    taskTrigger: String(_0x258a23.trigger || ''),
-    taskType: String(_0x258a23.taskType || ''),
-    taskProvider: String(_0x258a23.provider || ''),
-    taskAdapterType: String(_0x258a23.adapterType || ''),
-    taskModelId: String(_0x258a23.modelId || ''),
-    taskExecutionId: String(_0x258a23.executionId || ''),
-    taskCancellable: _0x258a23.cancellable === true,
-    taskResumable: _0x258a23.resumable === true,
+function buildProtocolStartPatch(taskCancellable, rhTaskStartedAt) {
+  const args = {
+    taskTrigger: String(taskCancellable.trigger || ''),
+    taskType: String(taskCancellable.taskType || ''),
+    taskProvider: String(taskCancellable.provider || ''),
+    taskAdapterType: String(taskCancellable.adapterType || ''),
+    taskModelId: String(taskCancellable.modelId || ''),
+    taskExecutionId: String(taskCancellable.executionId || ''),
+    taskCancellable: taskCancellable.cancellable === true,
+    taskResumable: taskCancellable.resumable === true,
   };
-  if (isWorkflowSpec(_0x258a23))
+  if (isWorkflowSpec(taskCancellable))
     return {
-      ..._0xd64a8d,
+      ...args,
       rhTaskId: '',
       rhTaskStatus: 'pending',
-      rhTaskStartedAt: _0x3f32b1,
+      rhTaskStartedAt: rhTaskStartedAt,
       rhTaskRecovering: false,
-      rhSourceNodeId: String(_0x258a23.sourceNodeId || ''),
-      rhToolbarTaskType: String(_0x258a23.taskType || ''),
+      rhSourceNodeId: String(taskCancellable.sourceNodeId || ''),
+      rhToolbarTaskType: String(taskCancellable.taskType || ''),
     };
-  if (isAsyncModelApiSpec(_0x258a23))
+  if (isAsyncModelApiSpec(taskCancellable))
     return {
-      ..._0xd64a8d,
+      ...args,
       asyncTaskId: '',
       asyncTaskStatus: 'pending',
-      asyncTaskStartedAt: _0x3f32b1,
+      asyncTaskStartedAt: rhTaskStartedAt,
       asyncTaskRecovering: false,
     };
-  return _0xd64a8d;
+  return args;
 }
-function buildProtocolTaskIdPatch(_0x3c6bfb, _0x54744a, _0x57df30) {
-  if (!_0x54744a) return {};
-  if (isWorkflowSpec(_0x3c6bfb))
+function buildProtocolTaskIdPatch(next, rhTaskId, rhTaskStartedAt2) {
+  if (!rhTaskId) return {};
+  if (isWorkflowSpec(next))
     return {
-      rhTaskId: _0x54744a,
+      rhTaskId: rhTaskId,
       rhTaskStatus: 'running',
-      rhTaskStartedAt: _0x57df30,
+      rhTaskStartedAt: rhTaskStartedAt2,
       rhTaskRecovering: false,
     };
-  if (isAsyncModelApiSpec(_0x3c6bfb))
+  if (isAsyncModelApiSpec(next))
     return {
-      asyncTaskId: _0x54744a,
+      asyncTaskId: rhTaskId,
       asyncTaskStatus: 'running',
-      asyncTaskStartedAt: _0x57df30,
+      asyncTaskStartedAt: rhTaskStartedAt2,
       asyncTaskRecovering: false,
     };
   return {};
 }
-function buildProtocolTerminalPatch(_0xd7e9e, _0x2ff8b2) {
-  if (isWorkflowSpec(_0xd7e9e)) return { rhTaskStatus: _0x2ff8b2, rhTaskRecovering: false };
-  if (isAsyncModelApiSpec(_0xd7e9e)) return { asyncTaskStatus: _0x2ff8b2, asyncTaskRecovering: false };
+function buildProtocolTerminalPatch(current, rhTaskStatus) {
+  if (isWorkflowSpec(current)) return { rhTaskStatus: rhTaskStatus, rhTaskRecovering: false };
+  if (isAsyncModelApiSpec(current)) return { asyncTaskStatus: rhTaskStatus, asyncTaskRecovering: false };
   return {};
 }
-function buildProtocolPendingPatch(_0xd0f655, _0x119178, _0x3590ef = '') {
-  const _0x51ee3f = String(_0x119178?.taskId || '').trim(),
-    _0x355dd2 = {
+function buildProtocolPendingPatch(entry, record, statusMessage = '') {
+  const payload = String(record?.taskId || '').trim(),
+    args2 = {
       isGenerating: true,
       jobStatus: 'running',
       jobError: null,
       generationDuration: null,
-      ...(_0x3590ef ? { statusMessage: _0x3590ef } : {}),
+      ...(statusMessage ? { statusMessage: statusMessage } : {}),
     };
-  if (isWorkflowSpec(_0xd0f655))
+  if (isWorkflowSpec(entry))
     return {
-      ..._0x355dd2,
-      ...(_0x51ee3f
-        ? buildProtocolTaskIdPatch(_0xd0f655, _0x51ee3f, _0x119178.startedAt)
-        : { rhTaskStatus: 'pending' }),
+      ...args2,
+      ...(payload ? buildProtocolTaskIdPatch(entry, payload, record.startedAt) : { rhTaskStatus: 'pending' }),
       rhTaskRecovering: false,
-      ...(_0x3590ef ? { rhStatusMessage: _0x3590ef } : {}),
+      ...(statusMessage ? { rhStatusMessage: statusMessage } : {}),
     };
-  if (isAsyncModelApiSpec(_0xd0f655))
+  if (isAsyncModelApiSpec(entry))
     return {
-      ..._0x355dd2,
-      ...(_0x51ee3f
-        ? buildProtocolTaskIdPatch(_0xd0f655, _0x51ee3f, _0x119178.startedAt)
+      ...args2,
+      ...(payload
+        ? buildProtocolTaskIdPatch(entry, payload, record.startedAt)
         : { asyncTaskStatus: 'pending' }),
       asyncTaskRecovering: false,
     };
-  return _0x355dd2;
+  return args2;
 }
-function isMissingTargetNodeError(_0x384a11, _0x5a7ef9) {
-  const _0x39e0bc = String(_0x384a11?.message || '');
-  return _0x39e0bc.includes('updateNodeData()') && _0x39e0bc.includes(String(_0x5a7ef9 || ''));
+function isMissingTargetNodeError(error2, handle) {
+  const list3 = String(error2?.message || '');
+  return list3.includes('updateNodeData()') && list3.includes(String(handle || ''));
 }
-function updateTaskNode(_0x1955ba, _0x2c7ebd, _0x5d034c, { allowMissing: allowMissing = false } = {}) {
-  if (!_0x2c7ebd || !_0x5d034c || typeof _0x5d034c !== 'object') return false;
+function updateTaskNode(store2, enabled4, enabled5, { allowMissing: allowMissing = false } = {}) {
+  if (!enabled4 || !enabled5 || typeof enabled5 !== 'object') return false;
   try {
-    return (_0x1955ba.updateNodeData(_0x2c7ebd, _0x5d034c), true);
-  } catch (_0x1e4dff) {
-    if (allowMissing && isMissingTargetNodeError(_0x1e4dff, _0x2c7ebd)) return false;
-    throw _0x1e4dff;
+    return (store2.updateNodeData(enabled4, enabled5), true);
+  } catch (state) {
+    if (allowMissing && isMissingTargetNodeError(state, enabled4)) return false;
+    throw state;
   }
 }
-function notifyTaskChange(_0xd48b32, _0x531e3e = {}) {
-  typeof _0xd48b32?.spec?.onTaskChange === 'function' &&
-    _0xd48b32.spec.onTaskChange({
-      sourceNodeId: _0xd48b32.sourceNodeId,
-      targetNodeId: _0xd48b32.targetNodeId,
-      taskId: _0xd48b32.taskId,
-      ..._0x531e3e,
+function notifyTaskChange(sourceNodeId, args3 = {}) {
+  typeof sourceNodeId?.spec?.onTaskChange === 'function' &&
+    sourceNodeId.spec.onTaskChange({
+      sourceNodeId: sourceNodeId.sourceNodeId,
+      targetNodeId: sourceNodeId.targetNodeId,
+      taskId: sourceNodeId.taskId,
+      ...args3,
     });
 }
-function isAbortLike(_0x420dd4) {
-  const _0x54a289 = String(_0x420dd4?.message || _0x420dd4 || '');
+function isAbortLike(error3) {
+  const config = String(error3?.message || error3 || '');
   return (
-    _0x420dd4?.name === 'AbortError' ||
-    _0x54a289 === 'CANCELLED' ||
-    _0x54a289 === getCancelledMessage() ||
-    CANCELLED_MESSAGE_ALIASES.includes(_0x54a289) ||
-    _0x54a289.toLowerCase().includes('aborted')
+    error3?.name === 'AbortError' ||
+    config === 'CANCELLED' ||
+    config === getCancelledMessage() ||
+    CANCELLED_MESSAGE_ALIASES.includes(config) ||
+    config.toLowerCase().includes('aborted')
   );
 }
-function parseErrorMessage(_0xc121e5, _0x2ef22d = {}, _0x2881bd = t('coreUi.generationTask.generateFailed')) {
-  if (typeof _0x2ef22d.parseError === 'function') {
-    const _0x55b55e = _0x2ef22d.parseError(_0xc121e5),
-      _0x386e34 = String(_0x55b55e || '').trim();
-    if (_0x386e34) return _0x386e34;
+function parseErrorMessage(error4, scope = {}, t2 = t('coreUi.generationTask.generateFailed')) {
+  if (typeof scope.parseError === 'function') {
+    const input = scope.parseError(error4),
+      output = String(input || '').trim();
+    if (output) return output;
   }
-  if (typeof _0xc121e5?.getUserMessage === 'function') {
-    const _0x527284 = String(_0xc121e5.getUserMessage() || '').trim();
-    if (_0x527284) return _0x527284;
+  if (typeof error4?.getUserMessage === 'function') {
+    const value2 = String(error4.getUserMessage() || '').trim();
+    if (value2) return value2;
   }
-  return String(_0xc121e5?.message || _0x2881bd).trim() || _0x2881bd;
+  return String(error4?.message || t2).trim() || t2;
 }
 function createCancelledError() {
-  const _0x27f153 = new Error(getCancelledMessage());
-  return ((_0x27f153.name = 'AbortError'), _0x27f153);
+  const error5 = new Error(getCancelledMessage());
+  return ((error5.name = 'AbortError'), error5);
 }
-function isCancelledStatus(_0x41cee1) {
-  const _0x1a5895 = String(_0x41cee1 || '')
+function isCancelledStatus(value3) {
+  const value4 = String(value3 || '')
     .trim()
     .toLowerCase();
-  return _0x1a5895 === 'cancelled' || _0x1a5895 === 'canceled';
+  return value4 === 'cancelled' || value4 === 'canceled';
 }
-function isContextCancelled(_0x210605) {
-  if (_0x210605?.cancelRequested === true) return true;
-  const _0x42f360 = getStateSnapshot(_0x210605.store).nodes?.[_0x210605.targetNodeId];
+function isContextCancelled(value5) {
+  if (value5?.cancelRequested === true) return true;
+  const stateSnapshot = getStateSnapshot(value5.store).nodes?.[value5.targetNodeId];
   return (
-    isCancelledStatus(_0x42f360?.jobStatus) ||
-    isCancelledStatus(_0x42f360?.rhTaskStatus) ||
-    isCancelledStatus(_0x42f360?.asyncTaskStatus)
+    isCancelledStatus(stateSnapshot?.jobStatus) ||
+    isCancelledStatus(stateSnapshot?.rhTaskStatus) ||
+    isCancelledStatus(stateSnapshot?.asyncTaskStatus)
   );
 }
-function shouldPauseOnAbort(_0x2f9644 = {}, _0x1aeccf = {}) {
-  if (_0x2f9644.pauseOnAbort === true) return true;
-  if (_0x2f9644.pauseOnAbort !== 'afterTaskId') return false;
-  return !!String(_0x1aeccf?.taskId || _0x2f9644.taskId || '').trim();
+function shouldPauseOnAbort(options6 = {}, value6 = {}) {
+  if (options6.pauseOnAbort === true) return true;
+  if (options6.pauseOnAbort !== 'afterTaskId') return false;
+  return !!String(value6?.taskId || options6.taskId || '').trim();
 }
-function isContextInFlight(_0x52d73d) {
-  return !!_0x52d73d && _0x52d73d.inFlight === true && !isContextCancelled(_0x52d73d);
+function isContextInFlight(enabled6) {
+  return !!enabled6 && enabled6.inFlight === true && !isContextCancelled(enabled6);
 }
-function markContextIdle(_0x4c20d5) {
-  if (_0x4c20d5) _0x4c20d5.inFlight = false;
+function markContextIdle(value7) {
+  if (value7) value7.inFlight = false;
 }
-function deleteActiveTask(_0x184458, _0x32eae3) {
-  (!_0x32eae3 || activeTasks.get(_0x184458) === _0x32eae3) && activeTasks.delete(_0x184458);
+function deleteActiveTask(value8, enabled7) {
+  (!enabled7 || activeTasks.get(value8) === enabled7) && activeTasks.delete(value8);
 }
-function buildAlreadyActiveResult(_0x2c7680, _0x1757f2, _0xa4aaad) {
+function buildAlreadyActiveResult(value9, targetNodeId2, value10) {
   return {
     ok: true,
     status: 'running',
     alreadyActive: true,
-    targetNodeId: _0x1757f2,
-    taskId: String(_0x2c7680?.taskId || _0xa4aaad || '').trim(),
+    targetNodeId: targetNodeId2,
+    taskId: String(value9?.taskId || value10 || '').trim(),
   };
 }
 async function cancelRemoteTask(
-  _0x14e7eb,
-  { taskId: _0x33099a, node: node = null, options: options = {} } = {},
+  targetNodeId3,
+  { taskId: taskId, node: node = null, options: options = {} } = {},
 ) {
-  const _0x2232f9 = String(_0x33099a || _0x14e7eb?.taskId || '').trim(),
-    _0xfeacf0 = getCancelFn(_0x14e7eb || { spec: options.spec }, options);
-  if (typeof _0xfeacf0 !== 'function' || !_0x2232f9) return;
-  return await _0xfeacf0({
-    taskId: _0x2232f9,
-    targetNodeId: _0x14e7eb?.targetNodeId || options.targetNodeId || '',
-    sourceNodeId: _0x14e7eb?.sourceNodeId || node?.rhSourceNodeId || '',
-    spec: _0x14e7eb?.spec || options.spec || {},
+  const taskId2 = String(taskId || targetNodeId3?.taskId || '').trim(),
+    handler = getCancelFn(targetNodeId3 || { spec: options.spec }, options);
+  if (typeof handler !== 'function' || !taskId2) return;
+  return await handler({
+    taskId: taskId2,
+    targetNodeId: targetNodeId3?.targetNodeId || options.targetNodeId || '',
+    sourceNodeId: targetNodeId3?.sourceNodeId || node?.rhSourceNodeId || '',
+    spec: targetNodeId3?.spec || options.spec || {},
     node: node,
   });
 }
-async function ensureTargetNode(_0x454cdd, _0x24d2b3, _0x9242d1) {
-  const _0x195568 = String(_0x454cdd.targetNodeId || '').trim();
-  if (_0x195568) return _0x195568;
-  if (typeof _0x454cdd.createTargetNode !== 'function')
+async function ensureTargetNode(spec2, value11, startedAt) {
+  const value12 = String(spec2.targetNodeId || '').trim();
+  if (value12) return value12;
+  if (typeof spec2.createTargetNode !== 'function')
     throw new Error('[generationTaskRuntime] targetNodeId or createTargetNode() is required');
-  const _0x4d9e6b = await _0x454cdd.createTargetNode({
-    spec: _0x454cdd,
-    startedAt: _0x9242d1,
-    startPatch: buildGenerationStartPatch({ startedAt: _0x9242d1 }),
-    protocolPatch: buildProtocolStartPatch(_0x454cdd, _0x9242d1),
+  const enabled8 = await spec2.createTargetNode({
+    spec: spec2,
+    startedAt: startedAt,
+    startPatch: buildGenerationStartPatch({ startedAt: startedAt }),
+    protocolPatch: buildProtocolStartPatch(spec2, startedAt),
   });
-  if (!_0x4d9e6b || typeof _0x4d9e6b !== 'object')
+  if (!enabled8 || typeof enabled8 !== 'object')
     throw new Error('[generationTaskRuntime] createTargetNode() must return a node');
-  const _0x258c1a = String(_0x4d9e6b.id || '').trim();
-  if (!_0x258c1a) throw new Error('[generationTaskRuntime] created target node must include id');
-  return (_0x24d2b3.addNode(_0x4d9e6b), _0x258c1a);
+  const enabled9 = String(enabled8.id || '').trim();
+  if (!enabled9) throw new Error('[generationTaskRuntime] created target node must include id');
+  return (value11.addNode(enabled8), enabled9);
 }
-function buildContext(_0x12b570, _0x4c4c78, _0x295d00, _0x482341, _0x307011) {
-  const _0x2abe98 =
-    _0x307011.abortController || (typeof AbortController === 'function' ? new AbortController() : null);
+function buildContext(spec3, targetNodeId4, store3, startedAt2, signal) {
+  const abortController =
+    signal.abortController || (typeof AbortController === 'function' ? new AbortController() : null);
   return {
-    spec: _0x12b570,
-    store: _0x295d00,
-    targetNodeId: _0x4c4c78,
-    sourceNodeId: String(_0x12b570.sourceNodeId || ''),
-    taskType: String(_0x12b570.taskType || ''),
-    startedAt: _0x482341,
-    taskId: String(_0x12b570.taskId || ''),
-    abortController: _0x2abe98,
-    signal: _0x307011.signal || _0x2abe98?.signal || null,
+    spec: spec3,
+    store: store3,
+    targetNodeId: targetNodeId4,
+    sourceNodeId: String(spec3.sourceNodeId || ''),
+    taskType: String(spec3.taskType || ''),
+    startedAt: startedAt2,
+    taskId: String(spec3.taskId || ''),
+    abortController: abortController,
+    signal: signal.signal || abortController?.signal || null,
     cancelRequested: false,
     inFlight: true,
   };
 }
-export async function normalizeResult(_0x29159f, { spec: _0x14ab83, context: _0x49ab9d } = {}) {
-  if (typeof _0x14ab83?.resultBuilder !== 'function') return {};
-  const _0x240627 = await _0x14ab83.resultBuilder(_0x29159f, {
-    spec: _0x14ab83,
-    targetNodeId: _0x49ab9d?.targetNodeId || _0x14ab83.targetNodeId,
-    sourceNodeId: _0x49ab9d?.sourceNodeId || _0x14ab83.sourceNodeId,
-    taskId: _0x49ab9d?.taskId || _0x14ab83.taskId || '',
-    startedAt: _0x49ab9d?.startedAt || _0x14ab83.startedAt || 0,
+export async function normalizeResult(value13, { spec: spec4, context: context } = {}) {
+  if (typeof spec4?.resultBuilder !== 'function') return {};
+  const value14 = await spec4.resultBuilder(value13, {
+    spec: spec4,
+    targetNodeId: context?.targetNodeId || spec4.targetNodeId,
+    sourceNodeId: context?.sourceNodeId || spec4.sourceNodeId,
+    taskId: context?.taskId || spec4.taskId || '',
+    startedAt: context?.startedAt || spec4.startedAt || 0,
   });
-  return _0x240627 && typeof _0x240627 === 'object' ? _0x240627 : {};
+  return value14 && typeof value14 === 'object' ? value14 : {};
 }
-async function buildOptionalTaskPatch(_0x21ef03, _0x27f007) {
-  if (typeof _0x21ef03 !== 'function') return {};
-  const _0x5c8f5b = await _0x21ef03(..._0x27f007);
-  return _0x5c8f5b && typeof _0x5c8f5b === 'object' ? _0x5c8f5b : {};
+async function buildOptionalTaskPatch(handler2, args4) {
+  if (typeof handler2 !== 'function') return {};
+  const value15 = await handler2(...args4);
+  return value15 && typeof value15 === 'object' ? value15 : {};
 }
-async function buildStartExtraPatch(_0x20a478, _0x5f1c1c) {
-  if (typeof _0x20a478?.startBuilder === 'function') {
-    const _0x2baace = await _0x20a478.startBuilder(_0x5f1c1c);
-    return _0x2baace && typeof _0x2baace === 'object' ? _0x2baace : {};
+async function buildStartExtraPatch(args5, value16) {
+  if (typeof args5?.startBuilder === 'function') {
+    const value17 = await args5.startBuilder(value16);
+    return value17 && typeof value17 === 'object' ? value17 : {};
   }
-  if (
-    _0x20a478?.startPatch &&
-    typeof _0x20a478.startPatch === 'object' &&
-    !Array.isArray(_0x20a478.startPatch)
-  )
-    return { ..._0x20a478.startPatch };
+  if (args5?.startPatch && typeof args5.startPatch === 'object' && !Array.isArray(args5.startPatch))
+    return { ...args5.startPatch };
   return {};
 }
-export async function pollTask(_0x8dfb7e, _0x50c271 = {}) {
-  const _0x1f1fc4 = getPollFn(_0x8dfb7e);
-  if (typeof _0x1f1fc4 !== 'function') throw new Error('[generationTaskRuntime] poll function is required');
-  return _0x1f1fc4({
-    taskId: String(_0x8dfb7e.taskId || _0x8dfb7e.spec?.taskId || ''),
-    targetNodeId: _0x8dfb7e.targetNodeId || _0x8dfb7e.spec?.targetNodeId,
-    sourceNodeId: _0x8dfb7e.sourceNodeId || _0x8dfb7e.spec?.sourceNodeId,
-    taskType: _0x8dfb7e.taskType || _0x8dfb7e.spec?.taskType,
-    payload: _0x8dfb7e.payload || _0x8dfb7e.spec?.payload,
-    spec: _0x8dfb7e.spec || _0x8dfb7e,
-    signal: _0x50c271.signal || _0x8dfb7e.signal || _0x8dfb7e.abortController?.signal || null,
+export async function pollTask(targetNodeId5, signal2 = {}) {
+  const run = getPollFn(targetNodeId5);
+  if (typeof run !== 'function') throw new Error('[generationTaskRuntime] poll function is required');
+  return run({
+    taskId: String(targetNodeId5.taskId || targetNodeId5.spec?.taskId || ''),
+    targetNodeId: targetNodeId5.targetNodeId || targetNodeId5.spec?.targetNodeId,
+    sourceNodeId: targetNodeId5.sourceNodeId || targetNodeId5.spec?.sourceNodeId,
+    taskType: targetNodeId5.taskType || targetNodeId5.spec?.taskType,
+    payload: targetNodeId5.payload || targetNodeId5.spec?.payload,
+    spec: targetNodeId5.spec || targetNodeId5,
+    signal: signal2.signal || targetNodeId5.signal || targetNodeId5.abortController?.signal || null,
   });
 }
-export async function submitTask(_0x94f50d, _0x2c6212 = {}) {
-  assertSpec(_0x94f50d, { requireSubmit: true });
-  const _0xe1ed52 = getStore(_0x2c6212),
-    _0x5db32c = Number(_0x94f50d.startedAt || _0x2c6212.startedAt || nowFrom(_0x2c6212)),
-    _0x4a9fa5 = String(_0x94f50d.targetNodeId || '').trim(),
-    _0x252bb2 = _0x4a9fa5 || (await ensureTargetNode(_0x94f50d, _0xe1ed52, _0x5db32c)),
-    _0x15d579 = { ..._0x94f50d, targetNodeId: _0x252bb2 },
-    _0x4e8269 = buildContext(_0x15d579, _0x252bb2, _0xe1ed52, _0x5db32c, _0x2c6212);
-  activeTasks.set(_0x252bb2, _0x4e8269);
-  const _0xd8d2b3 = await buildStartExtraPatch(_0x15d579, _0x4e8269);
-  updateTaskNode(_0xe1ed52, _0x252bb2, {
-    ...buildGenerationStartPatch({ startedAt: _0x5db32c }),
-    ...buildProtocolStartPatch(_0x15d579, _0x5db32c),
-    ..._0xd8d2b3,
+export async function submitTask(args6, value18 = {}) {
+  assertSpec(args6, { requireSubmit: true });
+  const store4 = getStore(value18),
+    startedAt3 = Number(args6.startedAt || value18.startedAt || nowFrom(value18)),
+    value19 = String(args6.targetNodeId || '').trim(),
+    targetNodeId6 = value19 || (await ensureTargetNode(args6, store4, startedAt3)),
+    spec5 = { ...args6, targetNodeId: targetNodeId6 },
+    sourceNodeId2 = buildContext(spec5, targetNodeId6, store4, startedAt3, value18);
+  activeTasks.set(targetNodeId6, sourceNodeId2);
+  const args7 = await buildStartExtraPatch(spec5, sourceNodeId2);
+  updateTaskNode(store4, targetNodeId6, {
+    ...buildGenerationStartPatch({ startedAt: startedAt3 }),
+    ...buildProtocolStartPatch(spec5, startedAt3),
+    ...args7,
   });
-  typeof _0x15d579.onTaskStart === 'function' && _0x15d579.onTaskStart(_0x4e8269);
-  notifyTaskChange(_0x4e8269, { status: 'running' });
+  typeof spec5.onTaskStart === 'function' && spec5.onTaskStart(sourceNodeId2);
+  notifyTaskChange(sourceNodeId2, { status: 'running' });
   try {
-    const _0x19b7ca = getSubmitFn(_0x15d579),
-      _0x29c6be = await _0x19b7ca(_0x15d579.payload, {
-        spec: _0x15d579,
-        targetNodeId: _0x252bb2,
-        sourceNodeId: _0x4e8269.sourceNodeId,
-        taskType: _0x4e8269.taskType,
-        signal: _0x4e8269.signal,
-        onTaskId: (_0x53a210) => {
-          const _0x5d120c = String(_0x53a210 || '').trim();
-          if (!_0x5d120c) return;
-          _0x4e8269.taskId = _0x5d120c;
-          if (isContextCancelled(_0x4e8269)) return;
-          (updateTaskNode(_0xe1ed52, _0x252bb2, buildProtocolTaskIdPatch(_0x15d579, _0x5d120c, _0x5db32c)),
-            notifyTaskChange(_0x4e8269, { status: 'running' }));
+    const run2 = getSubmitFn(spec5),
+      value20 = await run2(spec5.payload, {
+        spec: spec5,
+        targetNodeId: targetNodeId6,
+        sourceNodeId: sourceNodeId2.sourceNodeId,
+        taskType: sourceNodeId2.taskType,
+        signal: sourceNodeId2.signal,
+        onTaskId: (value21) => {
+          const enabled10 = String(value21 || '').trim();
+          if (!enabled10) return;
+          sourceNodeId2.taskId = enabled10;
+          if (isContextCancelled(sourceNodeId2)) return;
+          (updateTaskNode(store4, targetNodeId6, buildProtocolTaskIdPatch(spec5, enabled10, startedAt3)),
+            notifyTaskChange(sourceNodeId2, { status: 'running' }));
         },
       }),
-      _0x509108 = extractTaskId(_0x29c6be);
-    _0x509108 && (_0x4e8269.taskId = _0x509108);
-    if (isContextCancelled(_0x4e8269)) {
+      extractTaskId2 = extractTaskId(value20);
+    extractTaskId2 && (sourceNodeId2.taskId = extractTaskId2);
+    if (isContextCancelled(sourceNodeId2)) {
       try {
-        await cancelRemoteTask(_0x4e8269, {
-          taskId: _0x4e8269.taskId,
-          node: getStateSnapshot(_0xe1ed52).nodes?.[_0x252bb2],
+        await cancelRemoteTask(sourceNodeId2, {
+          taskId: sourceNodeId2.taskId,
+          node: getStateSnapshot(store4).nodes?.[targetNodeId6],
         });
       } catch {}
       throw createCancelledError();
     }
-    _0x509108 &&
-      (updateTaskNode(_0xe1ed52, _0x252bb2, buildProtocolTaskIdPatch(_0x15d579, _0x509108, _0x5db32c)),
-      notifyTaskChange(_0x4e8269, { status: 'running' }));
-    if (_0x15d579.waitForResult === false)
+    extractTaskId2 &&
+      (updateTaskNode(store4, targetNodeId6, buildProtocolTaskIdPatch(spec5, extractTaskId2, startedAt3)),
+      notifyTaskChange(sourceNodeId2, { status: 'running' }));
+    if (spec5.waitForResult === false)
       return (
-        markContextIdle(_0x4e8269),
-        { ok: true, status: 'submitted', targetNodeId: _0x252bb2, taskId: _0x4e8269.taskId }
+        markContextIdle(sourceNodeId2),
+        { ok: true, status: 'submitted', targetNodeId: targetNodeId6, taskId: sourceNodeId2.taskId }
       );
-    const _0x5856f9 =
-      _0x4e8269.taskId && getPollFn({ spec: _0x15d579 })
-        ? await pollTask({ ..._0x4e8269, spec: _0x15d579 }, { signal: _0x4e8269.signal })
-        : extractSubmittedResult(_0x29c6be);
-    if (isContextCancelled(_0x4e8269)) throw createCancelledError();
-    if (isPendingResult(_0x5856f9)) {
-      const _0x5c9f2d = getPendingMessage(_0x5856f9);
+    const result2 =
+      sourceNodeId2.taskId && getPollFn({ spec: spec5 })
+        ? await pollTask({ ...sourceNodeId2, spec: spec5 }, { signal: sourceNodeId2.signal })
+        : extractSubmittedResult(value20);
+    if (isContextCancelled(sourceNodeId2)) throw createCancelledError();
+    if (isPendingResult(result2)) {
+      const pendingMessage = getPendingMessage(result2);
       return (
-        markContextIdle(_0x4e8269),
-        updateTaskNode(_0xe1ed52, _0x252bb2, buildProtocolPendingPatch(_0x15d579, _0x4e8269, _0x5c9f2d)),
-        notifyTaskChange(_0x4e8269, { status: 'pending' }),
+        markContextIdle(sourceNodeId2),
+        updateTaskNode(
+          store4,
+          targetNodeId6,
+          buildProtocolPendingPatch(spec5, sourceNodeId2, pendingMessage),
+        ),
+        notifyTaskChange(sourceNodeId2, { status: 'pending' }),
         {
           ok: true,
           status: 'pending',
           pending: true,
-          targetNodeId: _0x252bb2,
-          taskId: _0x4e8269.taskId,
-          result: _0x5856f9,
+          targetNodeId: targetNodeId6,
+          taskId: sourceNodeId2.taskId,
+          result: result2,
         }
       );
     }
-    const _0x4176a4 = await normalizeResult(_0x5856f9, { spec: _0x15d579, context: _0x4e8269 });
-    if (isContextCancelled(_0x4e8269)) throw createCancelledError();
-    const _0x20b20e = nowFrom(_0x2c6212) - _0x5db32c;
+    const args8 = await normalizeResult(result2, { spec: spec5, context: sourceNodeId2 });
+    if (isContextCancelled(sourceNodeId2)) throw createCancelledError();
+    const duration = nowFrom(value18) - startedAt3;
     return (
-      updateTaskNode(_0xe1ed52, _0x252bb2, {
-        ...buildGenerationSuccessPatch({ startedAt: _0x5db32c, duration: _0x20b20e }),
-        ..._0x4176a4,
-        ...buildProtocolTerminalPatch(_0x15d579, 'success'),
+      updateTaskNode(store4, targetNodeId6, {
+        ...buildGenerationSuccessPatch({ startedAt: startedAt3, duration: duration }),
+        ...args8,
+        ...buildProtocolTerminalPatch(spec5, 'success'),
       }),
-      deleteActiveTask(_0x252bb2, _0x4e8269),
-      notifyTaskChange(_0x4e8269, { status: 'success' }),
+      deleteActiveTask(targetNodeId6, sourceNodeId2),
+      notifyTaskChange(sourceNodeId2, { status: 'success' }),
       playCompletionSound('generation-success'),
       showGenerationCompleteNotification(),
-      { ok: true, status: 'success', targetNodeId: _0x252bb2, taskId: _0x4e8269.taskId, result: _0x5856f9 }
+      {
+        ok: true,
+        status: 'success',
+        targetNodeId: targetNodeId6,
+        taskId: sourceNodeId2.taskId,
+        result: result2,
+      }
     );
-  } catch (_0x2b12b9) {
-    const _0x3f98a5 = nowFrom(_0x2c6212) - _0x5db32c,
-      _0x1410a3 = isAbortLike(_0x2b12b9),
-      _0x3b719f = getStateSnapshot(_0xe1ed52).nodes?.[_0x252bb2] || {};
+  } catch (error6) {
+    const duration2 = nowFrom(value18) - startedAt3,
+      status = isAbortLike(error6),
+      stateSnapshot2 = getStateSnapshot(store4).nodes?.[targetNodeId6] || {};
     if (
-      _0x1410a3 &&
-      (isCancelledStatus(_0x3b719f?.jobStatus) ||
-        isCancelledStatus(_0x3b719f?.rhTaskStatus) ||
-        isCancelledStatus(_0x3b719f?.asyncTaskStatus))
+      status &&
+      (isCancelledStatus(stateSnapshot2?.jobStatus) ||
+        isCancelledStatus(stateSnapshot2?.rhTaskStatus) ||
+        isCancelledStatus(stateSnapshot2?.asyncTaskStatus))
     )
       return (
-        deleteActiveTask(_0x252bb2, _0x4e8269),
-        notifyTaskChange(_0x4e8269, { status: 'cancelled' }),
+        deleteActiveTask(targetNodeId6, sourceNodeId2),
+        notifyTaskChange(sourceNodeId2, { status: 'cancelled' }),
         {
           ok: false,
           status: 'cancelled',
-          targetNodeId: _0x252bb2,
-          taskId: _0x4e8269.taskId,
-          error: _0x2b12b9,
+          targetNodeId: targetNodeId6,
+          taskId: sourceNodeId2.taskId,
+          error: error6,
         }
       );
-    if (_0x1410a3 && shouldPauseOnAbort(_0x15d579, _0x4e8269)) {
-      const _0x418df1 = await buildOptionalTaskPatch(_0x15d579.pauseBuilder, [_0x4e8269]);
+    if (status && shouldPauseOnAbort(spec5, sourceNodeId2)) {
+      const args9 = await buildOptionalTaskPatch(spec5.pauseBuilder, [sourceNodeId2]);
       return (
         updateTaskNode(
-          _0xe1ed52,
-          _0x252bb2,
-          { ...buildProtocolPendingPatch(_0x15d579, _0x4e8269), ..._0x418df1 },
+          store4,
+          targetNodeId6,
+          { ...buildProtocolPendingPatch(spec5, sourceNodeId2), ...args9 },
           { allowMissing: true },
         ),
-        deleteActiveTask(_0x252bb2, _0x4e8269),
-        notifyTaskChange(_0x4e8269, { status: 'paused' }),
-        { ok: false, status: 'paused', targetNodeId: _0x252bb2, taskId: _0x4e8269.taskId, error: _0x2b12b9 }
+        deleteActiveTask(targetNodeId6, sourceNodeId2),
+        notifyTaskChange(sourceNodeId2, { status: 'paused' }),
+        {
+          ok: false,
+          status: 'paused',
+          targetNodeId: targetNodeId6,
+          taskId: sourceNodeId2.taskId,
+          error: error6,
+        }
       );
     }
-    const _0x99ba20 = _0x1410a3
-        ? buildGenerationCancelledPatch({ startedAt: _0x5db32c, duration: _0x3f98a5 })
+    const args10 = status
+        ? buildGenerationCancelledPatch({ startedAt: startedAt3, duration: duration2 })
         : buildGenerationFailurePatch({
-            error: parseErrorMessage(_0x2b12b9, _0x15d579, t('coreUi.generationTask.generateFailed')),
-            startedAt: _0x5db32c,
-            duration: _0x3f98a5,
+            error: parseErrorMessage(error6, spec5, t('coreUi.generationTask.generateFailed')),
+            startedAt: startedAt3,
+            duration: duration2,
           }),
-      _0xde0b50 = await buildOptionalTaskPatch(
-        _0x1410a3 ? _0x15d579.cancelledBuilder : _0x15d579.failureBuilder,
-        _0x1410a3 ? [_0x4e8269] : [_0x2b12b9, _0x4e8269],
+      args11 = await buildOptionalTaskPatch(
+        status ? spec5.cancelledBuilder : spec5.failureBuilder,
+        status ? [sourceNodeId2] : [error6, sourceNodeId2],
       );
     return (
-      updateTaskNode(_0xe1ed52, _0x252bb2, {
-        ..._0x99ba20,
-        ..._0xde0b50,
-        ...buildProtocolTerminalPatch(_0x15d579, _0x1410a3 ? 'cancelled' : 'failed'),
+      updateTaskNode(store4, targetNodeId6, {
+        ...args10,
+        ...args11,
+        ...buildProtocolTerminalPatch(spec5, status ? 'cancelled' : 'failed'),
       }),
-      deleteActiveTask(_0x252bb2, _0x4e8269),
-      notifyTaskChange(_0x4e8269, { status: _0x1410a3 ? 'cancelled' : 'failed' }),
+      deleteActiveTask(targetNodeId6, sourceNodeId2),
+      notifyTaskChange(sourceNodeId2, { status: status ? 'cancelled' : 'failed' }),
       {
         ok: false,
-        status: _0x1410a3 ? 'cancelled' : 'failed',
-        targetNodeId: _0x252bb2,
-        taskId: _0x4e8269.taskId,
-        error: _0x2b12b9,
+        status: status ? 'cancelled' : 'failed',
+        targetNodeId: targetNodeId6,
+        taskId: sourceNodeId2.taskId,
+        error: error6,
       }
     );
   }
 }
-export async function cancelTask(_0x511d86, _0x548e84 = {}) {
-  const _0xd4c3b5 = getStore(_0x548e84),
-    _0x2bb711 = String(
-      typeof _0x511d86 === 'object'
-        ? _0x511d86?.targetNodeId || _0x511d86?.outId || _0x511d86?.id
-        : _0x511d86 || '',
+export async function cancelTask(value22, args12 = {}) {
+  const store5 = getStore(args12),
+    targetNodeId7 = String(
+      typeof value22 === 'object' ? value22?.targetNodeId || value22?.outId || value22?.id : value22 || '',
     ).trim();
-  if (!_0x2bb711) return { ok: false, reason: 'missing-target' };
-  const _0x252602 = activeTasks.get(_0x2bb711) || null,
-    _0x3f831b = getStateSnapshot(_0xd4c3b5).nodes?.[_0x2bb711] || {},
-    _0x1657a0 = _0x252602?.spec ||
-      _0x548e84.spec || {
-        adapterType: _0x3f831b.adapterType,
-        provider: _0x3f831b.provider,
-        async: !!_0x3f831b.asyncTaskId,
+  if (!targetNodeId7) return { ok: false, reason: 'missing-target' };
+  const value23 = activeTasks.get(targetNodeId7) || null,
+    adapterType4 = getStateSnapshot(store5).nodes?.[targetNodeId7] || {},
+    spec6 = value23?.spec ||
+      args12.spec || {
+        adapterType: adapterType4.adapterType,
+        provider: adapterType4.provider,
+        async: !!adapterType4.asyncTaskId,
       },
-    _0x5382ae = _0x548e84.cancellable === true || _0x252602?.spec?.cancellable === true;
-  if (!_0x5382ae) {
-    if (_0x548e84.abortLocal === true) {
-      if (_0x252602) _0x252602.cancelRequested = true;
-      _0x252602?.abortController?.abort?.();
+    enabled11 = args12.cancellable === true || value23?.spec?.cancellable === true;
+  if (!enabled11) {
+    if (args12.abortLocal === true) {
+      if (value23) value23.cancelRequested = true;
+      value23?.abortController?.abort?.();
     }
-    return { ok: false, reason: 'not-cancellable', targetNodeId: _0x2bb711 };
+    return { ok: false, reason: 'not-cancellable', targetNodeId: targetNodeId7 };
   }
-  const _0x2e417e = String(
-      _0x548e84.taskId ||
-        _0x252602?.taskId ||
-        _0x511d86?.taskId ||
-        _0x3f831b.rhTaskId ||
-        _0x3f831b.asyncTaskId ||
+  const taskId3 = String(
+      args12.taskId ||
+        value23?.taskId ||
+        value22?.taskId ||
+        adapterType4.rhTaskId ||
+        adapterType4.asyncTaskId ||
         '',
     ),
-    _0x37f265 = getCancelFn(_0x252602 || { spec: _0x1657a0 }, _0x548e84);
-  let _0xb2f0fa = null,
-    _0x12f3d9 = null;
+    cancel = getCancelFn(value23 || { spec: spec6 }, args12);
+  let remoteResult = null,
+    remoteError = null;
   try {
-    if (_0x252602) _0x252602.cancelRequested = true;
-    _0x252602?.abortController?.abort?.();
+    if (value23) value23.cancelRequested = true;
+    value23?.abortController?.abort?.();
   } catch {}
-  if (typeof _0x37f265 === 'function' && _0x2e417e)
+  if (typeof cancel === 'function' && taskId3)
     try {
-      _0xb2f0fa = await cancelRemoteTask(_0x252602 || { spec: _0x1657a0, targetNodeId: _0x2bb711 }, {
-        taskId: _0x2e417e,
-        node: _0x3f831b,
-        options: { ..._0x548e84, cancel: _0x37f265, spec: _0x1657a0, targetNodeId: _0x2bb711 },
+      remoteResult = await cancelRemoteTask(value23 || { spec: spec6, targetNodeId: targetNodeId7 }, {
+        taskId: taskId3,
+        node: adapterType4,
+        options: { ...args12, cancel: cancel, spec: spec6, targetNodeId: targetNodeId7 },
       });
-    } catch (_0x31079b) {
-      _0x12f3d9 = _0x31079b;
+    } catch (value24) {
+      remoteError = value24;
     }
-  const _0x55b052 = Number(_0x3f831b.generationStartTime || _0x3f831b.rhTaskStartedAt || 0) || 0,
-    _0xb86928 = await buildOptionalTaskPatch(_0x548e84.cancelledBuilder || _0x1657a0.cancelledBuilder, [
+  const startedAt4 = Number(adapterType4.generationStartTime || adapterType4.rhTaskStartedAt || 0) || 0,
+    args13 = await buildOptionalTaskPatch(args12.cancelledBuilder || spec6.cancelledBuilder, [
       {
-        spec: _0x1657a0,
-        store: _0xd4c3b5,
-        targetNodeId: _0x2bb711,
-        startedAt: _0x55b052,
-        taskId: _0x2e417e,
-        remoteResult: _0xb2f0fa,
-        remoteError: _0x12f3d9,
+        spec: spec6,
+        store: store5,
+        targetNodeId: targetNodeId7,
+        startedAt: startedAt4,
+        taskId: taskId3,
+        remoteResult: remoteResult,
+        remoteError: remoteError,
       },
     ]);
   return (
-    updateTaskNode(_0xd4c3b5, _0x2bb711, {
-      ...buildGenerationCancelledPatch({ startedAt: _0x55b052 }),
-      ..._0xb86928,
-      ...buildProtocolTerminalPatch(_0x1657a0, 'cancelled'),
+    updateTaskNode(store5, targetNodeId7, {
+      ...buildGenerationCancelledPatch({ startedAt: startedAt4 }),
+      ...args13,
+      ...buildProtocolTerminalPatch(spec6, 'cancelled'),
     }),
-    activeTasks.delete(_0x2bb711),
-    notifyTaskChange(_0x252602, { status: 'cancelled' }),
-    { ok: true, status: 'cancelled', targetNodeId: _0x2bb711, taskId: _0x2e417e }
+    activeTasks.delete(targetNodeId7),
+    notifyTaskChange(value23, { status: 'cancelled' }),
+    { ok: true, status: 'cancelled', targetNodeId: targetNodeId7, taskId: taskId3 }
   );
 }
-export async function resumeTask(_0x32ddef, _0x38a596 = {}) {
-  assertSpec(_0x32ddef, { requireTarget: true });
-  const _0x27c19a = getStore(_0x38a596),
-    _0x455dbf = String(_0x32ddef.targetNodeId || '').trim(),
-    _0x41689a = getStateSnapshot(_0x27c19a).nodes?.[_0x455dbf] || {},
-    _0x511f63 =
+export async function resumeTask(args14, value25 = {}) {
+  assertSpec(args14, { requireTarget: true });
+  const store6 = getStore(value25),
+    targetNodeId8 = String(args14.targetNodeId || '').trim(),
+    stateSnapshot3 = getStateSnapshot(store6).nodes?.[targetNodeId8] || {},
+    startedAt5 =
       Number(
-        _0x32ddef.startedAt ||
-          _0x41689a.generationStartTime ||
-          _0x41689a.rhTaskStartedAt ||
-          nowFrom(_0x38a596),
-      ) || nowFrom(_0x38a596),
-    _0x69682 = String(_0x32ddef.taskId || _0x41689a.rhTaskId || _0x41689a.asyncTaskId || '').trim();
-  if (!_0x69682) throw new Error('[generationTaskRuntime] resumeTask requires taskId');
-  const _0x3fe833 = activeTasks.get(_0x455dbf) || null;
-  if (isContextInFlight(_0x3fe833)) return buildAlreadyActiveResult(_0x3fe833, _0x455dbf, _0x69682);
-  const _0x32a8bd = { ..._0x32ddef, targetNodeId: _0x455dbf, taskId: _0x69682 },
-    _0x474238 = buildContext(_0x32a8bd, _0x455dbf, _0x27c19a, _0x511f63, _0x38a596);
-  ((_0x474238.taskId = _0x69682), activeTasks.set(_0x455dbf, _0x474238));
-  const _0x5208db = await buildStartExtraPatch(_0x32a8bd, _0x474238);
-  updateTaskNode(_0x27c19a, _0x455dbf, {
-    ...buildGenerationStartPatch({ startedAt: _0x511f63 }),
-    ...buildProtocolTaskIdPatch(_0x32a8bd, _0x69682, _0x511f63),
-    ..._0x5208db,
-    ...(isWorkflowSpec(_0x32a8bd) ? { rhTaskRecovering: true } : {}),
-    ...(isAsyncModelApiSpec(_0x32a8bd) ? { asyncTaskRecovering: true } : {}),
+        args14.startedAt ||
+          stateSnapshot3.generationStartTime ||
+          stateSnapshot3.rhTaskStartedAt ||
+          nowFrom(value25),
+      ) || nowFrom(value25),
+    taskId4 = String(args14.taskId || stateSnapshot3.rhTaskId || stateSnapshot3.asyncTaskId || '').trim();
+  if (!taskId4) throw new Error('[generationTaskRuntime] resumeTask requires taskId');
+  const value26 = activeTasks.get(targetNodeId8) || null;
+  if (isContextInFlight(value26)) return buildAlreadyActiveResult(value26, targetNodeId8, taskId4);
+  const spec7 = { ...args14, targetNodeId: targetNodeId8, taskId: taskId4 },
+    signal3 = buildContext(spec7, targetNodeId8, store6, startedAt5, value25);
+  ((signal3.taskId = taskId4), activeTasks.set(targetNodeId8, signal3));
+  const args15 = await buildStartExtraPatch(spec7, signal3);
+  updateTaskNode(store6, targetNodeId8, {
+    ...buildGenerationStartPatch({ startedAt: startedAt5 }),
+    ...buildProtocolTaskIdPatch(spec7, taskId4, startedAt5),
+    ...args15,
+    ...(isWorkflowSpec(spec7) ? { rhTaskRecovering: true } : {}),
+    ...(isAsyncModelApiSpec(spec7) ? { asyncTaskRecovering: true } : {}),
   });
-  typeof _0x32a8bd.onTaskStart === 'function' && _0x32a8bd.onTaskStart(_0x474238);
-  notifyTaskChange(_0x474238, { status: 'running', recovering: true });
+  typeof spec7.onTaskStart === 'function' && spec7.onTaskStart(signal3);
+  notifyTaskChange(signal3, { status: 'running', recovering: true });
   try {
-    const _0x33d67f = await pollTask({ ..._0x474238, spec: _0x32a8bd }, { signal: _0x474238.signal });
-    if (isContextCancelled(_0x474238)) throw createCancelledError();
-    if (isPendingResult(_0x33d67f)) {
-      const _0x34bb08 = getPendingMessage(_0x33d67f);
+    const result3 = await pollTask({ ...signal3, spec: spec7 }, { signal: signal3.signal });
+    if (isContextCancelled(signal3)) throw createCancelledError();
+    if (isPendingResult(result3)) {
+      const pendingMessage2 = getPendingMessage(result3);
       return (
-        markContextIdle(_0x474238),
-        updateTaskNode(_0x27c19a, _0x455dbf, buildProtocolPendingPatch(_0x32a8bd, _0x474238, _0x34bb08)),
-        notifyTaskChange(_0x474238, { status: 'pending', recovering: true }),
+        markContextIdle(signal3),
+        updateTaskNode(store6, targetNodeId8, buildProtocolPendingPatch(spec7, signal3, pendingMessage2)),
+        notifyTaskChange(signal3, { status: 'pending', recovering: true }),
         {
           ok: true,
           status: 'pending',
           pending: true,
-          targetNodeId: _0x455dbf,
-          taskId: _0x69682,
-          result: _0x33d67f,
+          targetNodeId: targetNodeId8,
+          taskId: taskId4,
+          result: result3,
         }
       );
     }
-    const _0x2dd082 = await normalizeResult(_0x33d67f, { spec: _0x32a8bd, context: _0x474238 });
-    if (isContextCancelled(_0x474238)) throw createCancelledError();
-    const _0x2f9346 = nowFrom(_0x38a596) - _0x511f63;
+    const args16 = await normalizeResult(result3, { spec: spec7, context: signal3 });
+    if (isContextCancelled(signal3)) throw createCancelledError();
+    const duration3 = nowFrom(value25) - startedAt5;
     return (
-      updateTaskNode(_0x27c19a, _0x455dbf, {
-        ...buildGenerationSuccessPatch({ startedAt: _0x511f63, duration: _0x2f9346 }),
-        ..._0x2dd082,
-        ...buildProtocolTerminalPatch(_0x32a8bd, 'success'),
+      updateTaskNode(store6, targetNodeId8, {
+        ...buildGenerationSuccessPatch({ startedAt: startedAt5, duration: duration3 }),
+        ...args16,
+        ...buildProtocolTerminalPatch(spec7, 'success'),
       }),
-      deleteActiveTask(_0x455dbf, _0x474238),
-      notifyTaskChange(_0x474238, { status: 'success', recovering: false }),
+      deleteActiveTask(targetNodeId8, signal3),
+      notifyTaskChange(signal3, { status: 'success', recovering: false }),
       playCompletionSound('generation-success'),
       showGenerationCompleteNotification(),
-      { ok: true, status: 'success', targetNodeId: _0x455dbf, taskId: _0x69682, result: _0x33d67f }
+      { ok: true, status: 'success', targetNodeId: targetNodeId8, taskId: taskId4, result: result3 }
     );
-  } catch (_0x260641) {
-    const _0x698f7c = nowFrom(_0x38a596) - _0x511f63,
-      _0x47752c = isAbortLike(_0x260641),
-      _0x4726e1 = getStateSnapshot(_0x27c19a).nodes?.[_0x455dbf] || {};
+  } catch (error7) {
+    const duration4 = nowFrom(value25) - startedAt5,
+      status2 = isAbortLike(error7),
+      stateSnapshot4 = getStateSnapshot(store6).nodes?.[targetNodeId8] || {};
     if (
-      _0x47752c &&
-      (isCancelledStatus(_0x4726e1?.jobStatus) ||
-        isCancelledStatus(_0x4726e1?.rhTaskStatus) ||
-        isCancelledStatus(_0x4726e1?.asyncTaskStatus))
+      status2 &&
+      (isCancelledStatus(stateSnapshot4?.jobStatus) ||
+        isCancelledStatus(stateSnapshot4?.rhTaskStatus) ||
+        isCancelledStatus(stateSnapshot4?.asyncTaskStatus))
     )
       return (
-        deleteActiveTask(_0x455dbf, _0x474238),
-        notifyTaskChange(_0x474238, { status: 'cancelled', recovering: false }),
-        { ok: false, status: 'cancelled', targetNodeId: _0x455dbf, taskId: _0x69682, error: _0x260641 }
+        deleteActiveTask(targetNodeId8, signal3),
+        notifyTaskChange(signal3, { status: 'cancelled', recovering: false }),
+        { ok: false, status: 'cancelled', targetNodeId: targetNodeId8, taskId: taskId4, error: error7 }
       );
-    if (_0x47752c && shouldPauseOnAbort(_0x32a8bd, _0x474238)) {
-      const _0x55bb95 = await buildOptionalTaskPatch(_0x32a8bd.pauseBuilder, [_0x474238]);
+    if (status2 && shouldPauseOnAbort(spec7, signal3)) {
+      const args17 = await buildOptionalTaskPatch(spec7.pauseBuilder, [signal3]);
       return (
         updateTaskNode(
-          _0x27c19a,
-          _0x455dbf,
-          { ...buildProtocolPendingPatch(_0x32a8bd, _0x474238), ..._0x55bb95 },
+          store6,
+          targetNodeId8,
+          { ...buildProtocolPendingPatch(spec7, signal3), ...args17 },
           { allowMissing: true },
         ),
-        deleteActiveTask(_0x455dbf, _0x474238),
-        notifyTaskChange(_0x474238, { status: 'paused', recovering: false }),
-        { ok: false, status: 'paused', targetNodeId: _0x455dbf, taskId: _0x69682, error: _0x260641 }
+        deleteActiveTask(targetNodeId8, signal3),
+        notifyTaskChange(signal3, { status: 'paused', recovering: false }),
+        { ok: false, status: 'paused', targetNodeId: targetNodeId8, taskId: taskId4, error: error7 }
       );
     }
-    const _0x2c3967 = _0x47752c
-        ? buildGenerationCancelledPatch({ startedAt: _0x511f63, duration: _0x698f7c })
+    const args18 = status2
+        ? buildGenerationCancelledPatch({ startedAt: startedAt5, duration: duration4 })
         : buildGenerationFailurePatch({
-            error: parseErrorMessage(_0x260641, _0x32a8bd, t('coreUi.generationTask.resumeFailed')),
-            startedAt: _0x511f63,
-            duration: _0x698f7c,
+            error: parseErrorMessage(error7, spec7, t('coreUi.generationTask.resumeFailed')),
+            startedAt: startedAt5,
+            duration: duration4,
           }),
-      _0x4324ba = await buildOptionalTaskPatch(
-        _0x47752c ? _0x32a8bd.cancelledBuilder : _0x32a8bd.failureBuilder,
-        _0x47752c ? [_0x474238] : [_0x260641, _0x474238],
+      args19 = await buildOptionalTaskPatch(
+        status2 ? spec7.cancelledBuilder : spec7.failureBuilder,
+        status2 ? [signal3] : [error7, signal3],
       );
     return (
-      updateTaskNode(_0x27c19a, _0x455dbf, {
-        ..._0x2c3967,
-        ..._0x4324ba,
-        ...buildProtocolTerminalPatch(_0x32a8bd, _0x47752c ? 'cancelled' : 'failed'),
+      updateTaskNode(store6, targetNodeId8, {
+        ...args18,
+        ...args19,
+        ...buildProtocolTerminalPatch(spec7, status2 ? 'cancelled' : 'failed'),
       }),
-      deleteActiveTask(_0x455dbf, _0x474238),
-      notifyTaskChange(_0x474238, { status: _0x47752c ? 'cancelled' : 'failed', recovering: false }),
+      deleteActiveTask(targetNodeId8, signal3),
+      notifyTaskChange(signal3, { status: status2 ? 'cancelled' : 'failed', recovering: false }),
       {
         ok: false,
-        status: _0x47752c ? 'cancelled' : 'failed',
-        targetNodeId: _0x455dbf,
-        taskId: _0x69682,
-        error: _0x260641,
+        status: status2 ? 'cancelled' : 'failed',
+        targetNodeId: targetNodeId8,
+        taskId: taskId4,
+        error: error7,
       }
     );
   }
 }
-export function getActiveGenerationTask(_0x2abdec) {
-  return activeTasks.get(String(_0x2abdec || '').trim()) || null;
+export function getActiveGenerationTask(value27) {
+  return activeTasks.get(String(value27 || '').trim()) || null;
 }
 export function __resetGenerationTaskRuntimeForTest() {
   activeTasks.clear();
 }
 
-let activeTaskSequence=0x0;
+let activeTaskSequence = 0x0;
 
-function findActiveTaskContext(_0x144f02,{storeLike:storeLike=null,taskCenterTaskId:taskCenterTaskId=''}={}){const _0x5f4e45=String(_0x144f02||'')["trim"]();if(!_0x5f4e45)return null;const _0x158fb5=String(taskCenterTaskId||'')['trim'](),_0x350626=Array['from'](activeTasks['values']())["filter"](_0x3c28d8=>_0x3c28d8?.["targetNodeId"]===_0x5f4e45&&(!storeLike||_0x3c28d8["store"]===storeLike)&&(!_0x158fb5||_0x3c28d8["taskCenterTaskId"]===_0x158fb5));return _0x350626["find"](_0x24a567=>isContextInFlight(_0x24a567))||_0x350626[0x0]||null;}
+function findActiveTaskContext(
+  value28,
+  { storeLike: storeLike = null, taskCenterTaskId: taskCenterTaskId = '' } = {},
+) {
+  const enabled12 = String(value28 || '')['trim']();
+  if (!enabled12) return null;
+  const enabled13 = String(taskCenterTaskId || '')['trim'](),
+    value29 = Array['from'](activeTasks['values']())['filter'](
+      (value30) =>
+        value30?.['targetNodeId'] === enabled12 &&
+        (!storeLike || value30['store'] === storeLike) &&
+        (!enabled13 || value30['taskCenterTaskId'] === enabled13),
+    );
+  return value29['find']((value31) => isContextInFlight(value31)) || value29[0x0] || null;
+}
 
-function normalizeCompletionFeedbackOutcome(_0x201665,_0x588f82){if(_0x201665["status"]==="rejected")return{'ok':![],'error':String(_0x201665["reason"]?.["message"]||_0x201665["reason"]||"Unknown error")};const _0x17ead5=_0x201665["value"]&&typeof _0x201665["value"]==="object"?_0x201665["value"]:{};if(_0x588f82==='notification')return{'ok':_0x17ead5["success"]!==![],'shown':_0x17ead5["shown"]===!![],'reason':String(_0x17ead5["reason"]||''),'error':String(_0x17ead5['error']||'')};return{'ok':_0x17ead5['ok']===!![],'native':_0x17ead5["native"]===!![],'skipped':String(_0x17ead5["skipped"]||''),'error':String(_0x17ead5["error"]?.['message']||_0x17ead5["error"]||'')};}
+function normalizeCompletionFeedbackOutcome(value32, value33) {
+  if (value32['status'] === 'rejected')
+    return { ok: ![], error: String(value32['reason']?.['message'] || value32['reason'] || 'Unknown error') };
+  const response = value32['value'] && typeof value32['value'] === 'object' ? value32['value'] : {};
+  if (value33 === 'notification')
+    return {
+      ok: response['success'] !== ![],
+      shown: response['shown'] === !![],
+      reason: String(response['reason'] || ''),
+      error: String(response['error'] || ''),
+    };
+  return {
+    ok: response['ok'] === !![],
+    native: response['native'] === !![],
+    skipped: String(response['skipped'] || ''),
+    error: String(response['error']?.['message'] || response['error'] || ''),
+  };
+}
 
-function dispatchGenerationCompletionFeedback(_0x4be651,{recovering:recovering=![]}={}){const _0x2ceb79=getStateSnapshot(_0x4be651['store'])["nodes"]?.[_0x4be651["targetNodeId"]]||{},_0x1116ae=Promise["allSettled"]([playCompletionSound("generation-success"),showGenerationCompleteNotification({'nodeId':_0x4be651["targetNodeId"],'navigation':{'source':"canvas",'nodeId':_0x4be651['targetNodeId'],'projectId':_0x4be651["projectId"],'canvasId':_0x4be651['taskScopeId']},'node':_0x2ceb79,'mediaKind':_0x4be651['spec']?.["modelManifest"]?.['outputType']||_0x4be651["spec"]?.["executionManifest"]?.["kind"]||_0x4be651["taskType"]||_0x2ceb79?.["outputType"]||_0x2ceb79?.["type"]||''})])["then"](([_0x39be61,_0x296d19])=>{const _0x28ccc6=normalizeCompletionFeedbackOutcome(_0x39be61,"sound"),_0x12ba53=normalizeCompletionFeedbackOutcome(_0x296d19,"notification"),_0x31e1ca=!_0x28ccc6['ok']&&_0x28ccc6["skipped"]!=='disabled',_0x346bd3=!_0x12ba53['ok'];return logDiagnosticEvent({'type':"generation.completion_feedback",'level':_0x31e1ca||_0x346bd3?"warn":"info",'source':'renderer','message':"Generation completion feedback dispatched",'context':{'targetNodeId':_0x4be651["targetNodeId"],'taskId':_0x4be651["taskId"],'taskType':_0x4be651["taskType"],'provider':String(_0x4be651["spec"]?.['provider']||''),'modelId':String(_0x4be651["spec"]?.["modelId"]||''),'recovering':recovering,'sound':_0x28ccc6,'notification':_0x12ba53}});});return void _0x1116ae['catch'](()=>{}),_0x1116ae;}
+function dispatchGenerationCompletionFeedback(value34, { recovering: recovering = ![] } = {}) {
+  const stateSnapshot5 = getStateSnapshot(value34['store'])['nodes']?.[value34['targetNodeId']] || {},
+    promise = Promise['allSettled']([
+      playCompletionSound('generation-success'),
+      showGenerationCompleteNotification({
+        nodeId: value34['targetNodeId'],
+        navigation: {
+          source: 'canvas',
+          nodeId: value34['targetNodeId'],
+          projectId: value34['projectId'],
+          canvasId: value34['taskScopeId'],
+        },
+        node: stateSnapshot5,
+        mediaKind:
+          value34['spec']?.['modelManifest']?.['outputType'] ||
+          value34['spec']?.['executionManifest']?.['kind'] ||
+          value34['taskType'] ||
+          stateSnapshot5?.['outputType'] ||
+          stateSnapshot5?.['type'] ||
+          '',
+      }),
+    ])['then'](([value35, value36]) => {
+      const response2 = normalizeCompletionFeedbackOutcome(value35, 'sound'),
+        response3 = normalizeCompletionFeedbackOutcome(value36, 'notification'),
+        value37 = !response2['ok'] && response2['skipped'] !== 'disabled',
+        value38 = !response3['ok'];
+      return logDiagnosticEvent({
+        type: 'generation.completion_feedback',
+        level: value37 || value38 ? 'warn' : 'info',
+        source: 'renderer',
+        message: 'Generation completion feedback dispatched',
+        context: {
+          targetNodeId: value34['targetNodeId'],
+          taskId: value34['taskId'],
+          taskType: value34['taskType'],
+          provider: String(value34['spec']?.['provider'] || ''),
+          modelId: String(value34['spec']?.['modelId'] || ''),
+          recovering: recovering,
+          sound: response2,
+          notification: response3,
+        },
+      });
+    });
+  return (void promise['catch'](() => {}), promise);
+}
 
-function normalizeProjectId(_0x12d15d){return String(_0x12d15d||'')['trim']();}
+function normalizeProjectId(value39) {
+  return String(value39 || '')['trim']();
+}
 
-function resolveTaskProjectId(_0x3d54fc={},_0x11d7db={}){return normalizeProjectId(_0x11d7db["projectId"]||_0x3d54fc["projectId"]||globalThis["window"]?.["currentProjectId"]||'');}
+function resolveTaskProjectId(options7 = {}, value40 = {}) {
+  return normalizeProjectId(
+    value40['projectId'] || options7['projectId'] || globalThis['window']?.['currentProjectId'] || '',
+  );
+}
 
-function isRunningHubWorkflowQueueSpec(_0x2394da={}){return isRunningHubWorkflowQueueTarget({'provider':_0x2394da["provider"],'adapterType':_0x2394da['adapterType'],'payload':{..._0x2394da["payload"]&&typeof _0x2394da['payload']==="object"?_0x2394da["payload"]:{},'model':_0x2394da["modelId"],'provider':_0x2394da["provider"],'adapterType':_0x2394da['adapterType']}});}
+function isRunningHubWorkflowQueueSpec(args20 = {}) {
+  return isRunningHubWorkflowQueueTarget({
+    provider: args20['provider'],
+    adapterType: args20['adapterType'],
+    payload: {
+      ...(args20['payload'] && typeof args20['payload'] === 'object' ? args20['payload'] : {}),
+      model: args20['modelId'],
+      provider: args20['provider'],
+      adapterType: args20['adapterType'],
+    },
+  });
+}
 
-function resolveSpecManifestContext(_0x102b2c={}){const _0x324981=_0x102b2c["modelManifest"]&&typeof _0x102b2c['modelManifest']==="object"?_0x102b2c['modelManifest']:null,_0x584c36=_0x102b2c["executionManifest"]&&typeof _0x102b2c["executionManifest"]==="object"?_0x102b2c["executionManifest"]:null;if(_0x324981&&_0x584c36)return{'modelManifest':_0x324981,'executionManifest':_0x584c36};const _0x315f0c=String(_0x102b2c["modelId"]||'')["trim"]();if(!_0x315f0c)return null;const _0x2f80e2=String(_0x102b2c["provider"]||'')["trim"]();let _0x384ef1=null;try{_0x384ef1=resolveModelExecution(_0x315f0c,_0x2f80e2?{'providerHint':_0x2f80e2}:{})||resolveModelExecution(_0x315f0c);}catch{_0x384ef1=null;}if(!_0x384ef1?.["modelManifest"]||!_0x384ef1?.['executionManifest'])return null;const _0x200d79=String(_0x102b2c['executionId']||'')["trim"](),_0x1dc70d=String(_0x384ef1["executionManifest"]['id']||'')["trim"]();if(_0x200d79&&_0x1dc70d!==_0x200d79)return null;return{'modelManifest':_0x324981||_0x384ef1["modelManifest"],'executionManifest':_0x584c36||_0x384ef1["executionManifest"]};}
+function resolveSpecManifestContext(options8 = {}) {
+  const value41 =
+      options8['modelManifest'] && typeof options8['modelManifest'] === 'object'
+        ? options8['modelManifest']
+        : null,
+    value42 =
+      options8['executionManifest'] && typeof options8['executionManifest'] === 'object'
+        ? options8['executionManifest']
+        : null;
+  if (value41 && value42) return { modelManifest: value41, executionManifest: value42 };
+  const enabled14 = String(options8['modelId'] || '')['trim']();
+  if (!enabled14) return null;
+  const value43 = String(options8['provider'] || '')['trim']();
+  let modelExecution = null;
+  try {
+    modelExecution =
+      resolveModelExecution(enabled14, value43 ? { providerHint: value43 } : {}) ||
+      resolveModelExecution(enabled14);
+  } catch {
+    modelExecution = null;
+  }
+  if (!modelExecution?.['modelManifest'] || !modelExecution?.['executionManifest']) return null;
+  const value44 = String(options8['executionId'] || '')['trim'](),
+    value45 = String(modelExecution['executionManifest']['id'] || '')['trim']();
+  if (value44 && value45 !== value44) return null;
+  return {
+    modelManifest: value41 || modelExecution['modelManifest'],
+    executionManifest: value42 || modelExecution['executionManifest'],
+  };
+}
 
-function hasResultNormalizer(_0x118bb8={}){return typeof _0x118bb8['resultBuilder']==="function"||!!resolveSpecManifestContext(_0x118bb8);}
+function hasResultNormalizer(options9 = {}) {
+  return typeof options9['resultBuilder'] === 'function' || !!resolveSpecManifestContext(options9);
+}
 
-function mergeManifestResultPatch(_0x4afe0d,_0xb00714){if(!_0xb00714||typeof _0xb00714!=='object')return _0x4afe0d;if(!_0x4afe0d||typeof _0x4afe0d!=='object'||Array["isArray"](_0x4afe0d))return _0xb00714;return{..._0xb00714,..._0x4afe0d};}
+function mergeManifestResultPatch(args21, args22) {
+  if (!args22 || typeof args22 !== 'object') return args21;
+  if (!args21 || typeof args21 !== 'object' || Array['isArray'](args21)) return args22;
+  return { ...args22, ...args21 };
+}
 
-function persistResumableTaskState(_0x2043eb,_0x51bdb3={}){if(_0x2043eb?.["spec"]?.['resumable']!==!![])return;if(typeof _0x2043eb['persistTaskState']!=="function")return;try{const _0x2f4726=_0x2043eb["persistTaskState"]({'sourceNodeId':_0x2043eb["sourceNodeId"],'targetNodeId':_0x2043eb['targetNodeId'],'taskId':_0x2043eb['taskId'],'spec':_0x2043eb["spec"],'patch':_0x51bdb3});_0x2f4726?.['catch']?.(()=>{});}catch{}}
+function persistResumableTaskState(value46, value47 = {}) {
+  if (value46?.['spec']?.['resumable'] !== !![]) return;
+  if (typeof value46['persistTaskState'] !== 'function') return;
+  try {
+    const promise2 = value46['persistTaskState']({
+      sourceNodeId: value46['sourceNodeId'],
+      targetNodeId: value46['targetNodeId'],
+      taskId: value46['taskId'],
+      spec: value46['spec'],
+      patch: value47,
+    });
+    promise2?.['catch']?.(() => {});
+  } catch {}
+}
 
-function updateContextNode(_0x112718,_0x2bd81a,_0x27ee56,_0x2ab0f2={}){if(_0x112718?.["background"]!==!![]&&_0x112718?.["isTargetCurrent"]?.()===![])return![];const _0x1a7e90=updateTaskNode(_0x112718["store"],_0x2bd81a,_0x27ee56,_0x2ab0f2);if(_0x1a7e90){_0x2bd81a===_0x112718["targetNodeId"]&&persistResumableTaskState(_0x112718,_0x27ee56);if(typeof _0x112718['mirrorTaskState']==="function")try{const _0x390657=_0x112718["mirrorTaskState"]({'sourceNodeId':_0x112718['sourceNodeId'],'targetNodeId':_0x112718['targetNodeId'],'taskId':_0x112718["taskId"],'taskScopeId':_0x112718["taskScopeId"],'spec':_0x112718["spec"],'patch':_0x27ee56,'updatedNodeId':_0x2bd81a,'store':_0x112718["store"]});_0x390657?.["catch"]?.(_0x3ed63b=>{console['error']("[generationTaskRuntime] Failed to mirror background task state:",_0x3ed63b);});}catch(_0x203619){console['error']("[generationTaskRuntime] Failed to mirror background task state:",_0x203619);}}return _0x1a7e90;}
+function updateContextNode(value48, value49, value50, value51 = {}) {
+  if (value48?.['background'] !== !![] && value48?.['isTargetCurrent']?.() === ![]) return ![];
+  const updateTaskNode2 = updateTaskNode(value48['store'], value49, value50, value51);
+  if (updateTaskNode2) {
+    value49 === value48['targetNodeId'] && persistResumableTaskState(value48, value50);
+    if (typeof value48['mirrorTaskState'] === 'function')
+      try {
+        const value52 = value48['mirrorTaskState']({
+          sourceNodeId: value48['sourceNodeId'],
+          targetNodeId: value48['targetNodeId'],
+          taskId: value48['taskId'],
+          taskScopeId: value48['taskScopeId'],
+          spec: value48['spec'],
+          patch: value50,
+          updatedNodeId: value49,
+          store: value48['store'],
+        });
+        value52?.['catch']?.((value53) => {
+          console['error']('[generationTaskRuntime] Failed to mirror background task state:', value53);
+        });
+      } catch (value54) {
+        console['error']('[generationTaskRuntime] Failed to mirror background task state:', value54);
+      }
+  }
+  return updateTaskNode2;
+}
 
-function updateContextTaskNode(_0x395921,_0x280ec7,_0x15ae90={}){return updateContextNode(_0x395921,_0x395921["targetNodeId"],_0x280ec7,_0x15ae90);}
+function updateContextTaskNode(value55, value56, value57 = {}) {
+  return updateContextNode(value55, value55['targetNodeId'], value56, value57);
+}
 
-function getQueuedMessage(){const _0x94571=String(t("coreUi.generationTask.queued")||'')["trim"]();return _0x94571&&_0x94571!=="coreUi.generationTask.queued"?_0x94571:"Queued";}
+function getQueuedMessage() {
+  const value58 = String(t('coreUi.generationTask.queued') || '')['trim']();
+  return value58 && value58 !== 'coreUi.generationTask.queued' ? value58 : 'Queued';
+}
 
-function canAbortContextSignal(_0x5b36c4){if(typeof _0x5b36c4?.["abortController"]?.["abort"]!=="function")return![];return!_0x5b36c4["signal"]||_0x5b36c4["signal"]===_0x5b36c4['abortController']["signal"];}
+function canAbortContextSignal(enabled15) {
+  if (typeof enabled15?.['abortController']?.['abort'] !== 'function') return ![];
+  return !enabled15['signal'] || enabled15['signal'] === enabled15['abortController']['signal'];
+}
 
-function cancelContextRemoteTaskOnce(_0x5b8dde,{taskId:_0xc006d1,node:node=null,options:options={}}={}){const _0x4bb9de=String(_0xc006d1||_0x5b8dde?.["taskId"]||'')['trim']();if(!_0x5b8dde||!_0x4bb9de)return Promise["resolve"](cancelRemoteTask(_0x5b8dde,{'taskId':_0x4bb9de,'node':node,'options':options}));if(_0x5b8dde["remoteCancellationTaskId"]===_0x4bb9de&&_0x5b8dde["remoteCancellationPromise"])return _0x5b8dde['remoteCancellationPromise'];return _0x5b8dde["remoteCancellationTaskId"]=_0x4bb9de,_0x5b8dde["remoteCancellationPromise"]=Promise['resolve'](cancelRemoteTask(_0x5b8dde,{'taskId':_0x4bb9de,'node':node,'options':options})),_0x5b8dde["remoteCancellationPromise"];}
+function cancelContextRemoteTaskOnce(
+  enabled16,
+  { taskId: taskId5, node: node = null, options: options = {} } = {},
+) {
+  const enabled17 = String(taskId5 || enabled16?.['taskId'] || '')['trim']();
+  if (!enabled16 || !enabled17)
+    return Promise['resolve'](
+      cancelRemoteTask(enabled16, { taskId: enabled17, node: node, options: options }),
+    );
+  if (enabled16['remoteCancellationTaskId'] === enabled17 && enabled16['remoteCancellationPromise'])
+    return enabled16['remoteCancellationPromise'];
+  return (
+    (enabled16['remoteCancellationTaskId'] = enabled17),
+    (enabled16['remoteCancellationPromise'] = Promise['resolve'](
+      cancelRemoteTask(enabled16, { taskId: enabled17, node: node, options: options }),
+    )),
+    enabled16['remoteCancellationPromise']
+  );
+}
 
-async function pauseTaskContexts(_0x248316,_0x343864,_0x1bbaad={}){const _0x41afbd=_0x248316["filter"](_0x462e28=>{if(_0x462e28?.['spec']?.["resumable"]!==!![])return!![];if(!String(_0x462e28?.["taskId"]||'')["trim"]())return!![];if(!shouldPauseOnAbort(_0x462e28["spec"],_0x462e28))return!![];return!canAbortContextSignal(_0x462e28);})["map"](_0x38f314=>({'targetNodeId':_0x38f314["targetNodeId"],'taskId':String(_0x38f314["taskId"]||'')['trim'](),'taskType':_0x38f314["taskType"],'reason':_0x38f314?.['spec']?.["resumable"]!==!![]?"not-resumable":!String(_0x38f314?.["taskId"]||'')['trim']()?"missing-task-id":!shouldPauseOnAbort(_0x38f314['spec'],_0x38f314)?'pause-not-supported':"abort-unavailable"}));if(_0x41afbd["length"]>0x0)return{'ok':![],'projectId':_0x343864,'activeCount':_0x248316["length"],'pausedCount':0x0,'blockers':_0x41afbd};if(_0x1bbaad["dryRun"]===!![])return{'ok':!![],'projectId':_0x343864,'activeCount':_0x248316['length'],'pausedCount':0x0,'blockers':[],'pausedTasks':[]};const _0x3cf697=[];_0x248316["forEach"](_0x26ac3e=>{_0x26ac3e["abortController"]["signal"]?.["aborted"]!==!![]&&_0x26ac3e['abortController']["abort"](),_0x3cf697["push"]({'targetNodeId':_0x26ac3e['targetNodeId'],'taskId':String(_0x26ac3e["taskId"]||'')["trim"](),'taskType':_0x26ac3e["taskType"]});});const _0x35694c=Math["max"](0x64,Number(_0x1bbaad['timeoutMs'])||0xbb8);if(_0x248316["length"]>0x0){let _0x244753=null;const _0xe9278e=new Promise(_0x469676=>{_0x244753=setTimeout(()=>_0x469676(![]),_0x35694c),_0x244753?.["unref"]?.();}),_0x42b045=await Promise["race"]([Promise['all'](_0x248316["map"](_0x2776d2=>_0x2776d2["settledPromise"]))["then"](()=>!![]),_0xe9278e]);if(_0x244753!==null)clearTimeout(_0x244753);if(!_0x42b045)return{'ok':![],'projectId':_0x343864,'activeCount':_0x248316["length"],'pausedCount':_0x3cf697['length'],'blockers':_0x3cf697['map'](_0x3e4386=>({..._0x3e4386,'reason':"pause-timeout"})),'pausedTasks':_0x3cf697};await new Promise(_0x4bbaad=>setTimeout(_0x4bbaad,0x0));}return{'ok':!![],'projectId':_0x343864,'activeCount':_0x248316["length"],'pausedCount':_0x3cf697['length'],'blockers':[],'pausedTasks':_0x3cf697};}
+async function pauseTaskContexts(list4, value59, value60 = {}) {
+  const value61 = list4['filter']((value62) => {
+    if (value62?.['spec']?.['resumable'] !== !![]) return !![];
+    if (!String(value62?.['taskId'] || '')['trim']()) return !![];
+    if (!shouldPauseOnAbort(value62['spec'], value62)) return !![];
+    return !canAbortContextSignal(value62);
+  })['map']((value63) => ({
+    targetNodeId: value63['targetNodeId'],
+    taskId: String(value63['taskId'] || '')['trim'](),
+    taskType: value63['taskType'],
+    reason:
+      value63?.['spec']?.['resumable'] !== !![]
+        ? 'not-resumable'
+        : !String(value63?.['taskId'] || '')['trim']()
+          ? 'missing-task-id'
+          : !shouldPauseOnAbort(value63['spec'], value63)
+            ? 'pause-not-supported'
+            : 'abort-unavailable',
+  }));
+  if (value61['length'] > 0x0)
+    return { ok: ![], projectId: value59, activeCount: list4['length'], pausedCount: 0x0, blockers: value61 };
+  if (value60['dryRun'] === !![])
+    return {
+      ok: !![],
+      projectId: value59,
+      activeCount: list4['length'],
+      pausedCount: 0x0,
+      blockers: [],
+      pausedTasks: [],
+    };
+  const list5 = [];
+  list4['forEach']((value64) => {
+    (value64['abortController']['signal']?.['aborted'] !== !![] && value64['abortController']['abort'](),
+      list5['push']({
+        targetNodeId: value64['targetNodeId'],
+        taskId: String(value64['taskId'] || '')['trim'](),
+        taskType: value64['taskType'],
+      }));
+  });
+  const value65 = Math['max'](0x64, Number(value60['timeoutMs']) || 0xbb8);
+  if (list4['length'] > 0x0) {
+    let setTimeout2 = null;
+    const value66 = new Promise((handler3) => {
+        ((setTimeout2 = setTimeout(() => handler3(![]), value65)), setTimeout2?.['unref']?.());
+      }),
+      enabled18 = await Promise['race']([
+        Promise['all'](list4['map']((value67) => value67['settledPromise']))['then'](() => !![]),
+        value66,
+      ]);
+    if (setTimeout2 !== null) clearTimeout(setTimeout2);
+    if (!enabled18)
+      return {
+        ok: ![],
+        projectId: value59,
+        activeCount: list4['length'],
+        pausedCount: list5['length'],
+        blockers: list5['map']((args23) => ({ ...args23, reason: 'pause-timeout' })),
+        pausedTasks: list5,
+      };
+    await new Promise((value68) => setTimeout(value68, 0x0));
+  }
+  return {
+    ok: !![],
+    projectId: value59,
+    activeCount: list4['length'],
+    pausedCount: list5['length'],
+    blockers: [],
+    pausedTasks: list5,
+  };
+}
 
-export async function pauseProjectTasks(_0x5af87d,_0x15adf1={}){const _0x5b8809=normalizeProjectId(_0x5af87d),_0x428875=Array["from"](activeTasks["values"]())["filter"](_0x370400=>isContextInFlight(_0x370400)&&normalizeProjectId(_0x370400?.["projectId"])===_0x5b8809);return pauseTaskContexts(_0x428875,_0x5b8809,_0x15adf1);}
+export async function pauseProjectTasks(value69, value70 = {}) {
+  const projectId = normalizeProjectId(value69),
+    value71 = Array['from'](activeTasks['values']())['filter'](
+      (value72) => isContextInFlight(value72) && normalizeProjectId(value72?.['projectId']) === projectId,
+    );
+  return pauseTaskContexts(value71, projectId, value70);
+}
 
-export async function pauseActiveWorkspaceTasks(_0x164c41={}){const _0x16d288=Array["from"](activeTasks["values"]())["filter"](isContextInFlight);return pauseTaskContexts(_0x16d288,"active-workspace",_0x164c41);}
+export async function pauseActiveWorkspaceTasks(options10 = {}) {
+  const value73 = Array['from'](activeTasks['values']())['filter'](isContextInFlight);
+  return pauseTaskContexts(value73, 'active-workspace', options10);
+}
 
-export function handoffActiveGenerationTasks({sourceStore:sourceStore=appStore,targetStore:_0x4604c3,taskScopeId:_0x255eeb,mirrorTaskState:mirrorTaskState=null}={}){const _0x47dc45=String(_0x255eeb||'')["trim"]();if(!_0x4604c3||!_0x47dc45)return{'ok':![],'movedCount':0x0,'taskScopeId':_0x47dc45};const _0x16363c=Array['from'](activeTasks["values"]())["filter"](_0x37372d=>isContextInFlight(_0x37372d)&&_0x37372d["store"]===sourceStore);return _0x16363c["forEach"](_0x52c546=>{_0x52c546["store"]=_0x4604c3,_0x52c546["taskScopeId"]=_0x47dc45,_0x52c546["background"]=!![],_0x52c546['mirrorTaskState']=typeof mirrorTaskState==='function'?mirrorTaskState:null;}),{'ok':!![],'movedCount':_0x16363c["length"],'taskScopeId':_0x47dc45,'targetNodeIds':_0x16363c["map"](_0x5f8a01=>_0x5f8a01["targetNodeId"])};}
+export function handoffActiveGenerationTasks({
+  sourceStore: sourceStore = appStore,
+  targetStore: targetStore2,
+  taskScopeId: taskScopeId,
+  mirrorTaskState: mirrorTaskState = null,
+} = {}) {
+  const enabled19 = String(taskScopeId || '')['trim']();
+  if (!targetStore2 || !enabled19) return { ok: ![], movedCount: 0x0, taskScopeId: enabled19 };
+  const value74 = Array['from'](activeTasks['values']())['filter'](
+    (value75) => isContextInFlight(value75) && value75['store'] === sourceStore,
+  );
+  return (
+    value74['forEach']((value76) => {
+      ((value76['store'] = targetStore2),
+        (value76['taskScopeId'] = enabled19),
+        (value76['background'] = !![]),
+        (value76['mirrorTaskState'] = typeof mirrorTaskState === 'function' ? mirrorTaskState : null));
+    }),
+    {
+      ok: !![],
+      movedCount: value74['length'],
+      taskScopeId: enabled19,
+      targetNodeIds: value74['map']((value77) => value77['targetNodeId']),
+    }
+  );
+}
 
-export function restoreActiveGenerationTasks({taskScopeId:_0x45a049,targetStore:targetStore=appStore}={}){const _0x778173=String(_0x45a049||'')["trim"](),_0x162c46=Array["from"](activeTasks["values"]())["filter"](_0x4107b4=>isContextInFlight(_0x4107b4)&&String(_0x4107b4["taskScopeId"]||'')['trim']()===_0x778173);return _0x162c46["forEach"](_0x3be224=>{_0x3be224["store"]=targetStore,_0x3be224["background"]=![],_0x3be224['mirrorTaskState']=null;}),{'ok':!![],'restoredCount':_0x162c46["length"],'taskScopeId':_0x778173,'targetNodeIds':_0x162c46["map"](_0x1f0fd7=>_0x1f0fd7["targetNodeId"])};}
+export function restoreActiveGenerationTasks({
+  taskScopeId: taskScopeId2,
+  targetStore: targetStore = appStore,
+} = {}) {
+  const value78 = String(taskScopeId2 || '')['trim'](),
+    value79 = Array['from'](activeTasks['values']())['filter'](
+      (value80) => isContextInFlight(value80) && String(value80['taskScopeId'] || '')['trim']() === value78,
+    );
+  return (
+    value79['forEach']((value81) => {
+      ((value81['store'] = targetStore), (value81['background'] = ![]), (value81['mirrorTaskState'] = null));
+    }),
+    {
+      ok: !![],
+      restoredCount: value79['length'],
+      taskScopeId: value78,
+      targetNodeIds: value79['map']((value82) => value82['targetNodeId']),
+    }
+  );
+}
 
-export function hasActiveGenerationTasksForStore(_0x5c8542){return Array["from"](activeTasks["values"]())["some"](_0x2e6dd8=>isContextInFlight(_0x2e6dd8)&&_0x2e6dd8["store"]===_0x5c8542);}
+export function hasActiveGenerationTasksForStore(value83) {
+  return Array['from'](activeTasks['values']())['some'](
+    (value84) => isContextInFlight(value84) && value84['store'] === value83,
+  );
+}
 
-export function hasActiveGenerationTasksForScope(_0x30854b){const _0x1797fb=String(_0x30854b||'')["trim"]();if(!_0x1797fb)return![];return Array["from"](activeTasks["values"]())["some"](_0x2dc447=>isContextInFlight(_0x2dc447)&&String(_0x2dc447["taskScopeId"]||'')["trim"]()===_0x1797fb);}
+export function hasActiveGenerationTasksForScope(value85) {
+  const enabled20 = String(value85 || '')['trim']();
+  if (!enabled20) return ![];
+  return Array['from'](activeTasks['values']())['some'](
+    (value86) => isContextInFlight(value86) && String(value86['taskScopeId'] || '')['trim']() === enabled20,
+  );
+}
 
-export function shouldPreserveGenerationTaskOnUnmount(_0x6b6876){const _0x246072=String(_0x6b6876||'')["trim"]();return Array['from'](activeTasks["values"]())["some"](_0xd828b1=>_0xd828b1?.["targetNodeId"]===_0x246072&&isContextInFlight(_0xd828b1)&&_0xd828b1["background"]===!![]);}
+export function shouldPreserveGenerationTaskOnUnmount(value87) {
+  const value88 = String(value87 || '')['trim']();
+  return Array['from'](activeTasks['values']())['some'](
+    (value89) =>
+      value89?.['targetNodeId'] === value88 && isContextInFlight(value89) && value89['background'] === !![],
+  );
+}
 
-function startTaskContext(_0x3bcda3,_0x3d35ce,{recovering:recovering=![]}={}){const {spec:_0x442c76,startedAt:_0x32606d,taskId:_0x2d5906}=_0x3bcda3;if(_0x3bcda3["cancelRequested"]||_0x3bcda3["signal"]?.["aborted"])throw createCancelledError();updateContextTaskNode(_0x3bcda3,{...buildGenerationStartPatch({'startedAt':_0x32606d}),...buildGenerationProtocolTransitionPatch({'type':"start",'spec':_0x442c76,'startedAt':_0x32606d}),...recovering?buildGenerationProtocolTransitionPatch({'type':"taskId",'spec':_0x442c76,'taskId':_0x2d5906,'startedAt':_0x32606d}):{},..._0x3d35ce,...recovering&&isWorkflowSpec(_0x442c76)?{'rhTaskRecovering':!![]}:{},...recovering&&isAsyncModelApiSpec(_0x442c76)?{'asyncTaskRecovering':!![]}:{}});const _0x56538a=()=>{if(isContextCancelled(_0x3bcda3))throw createCancelledError();notifyTaskChange(_0x3bcda3,{'status':"running",...recovering?{'recovering':!![]}:{}});},_0x1c3c44=typeof _0x442c76["onTaskStart"]==="function"?_0x442c76["onTaskStart"](_0x3bcda3):null;return _0x1c3c44&&typeof _0x1c3c44['then']==='function'?Promise['resolve'](_0x1c3c44)['then'](_0x56538a):_0x56538a();}
+function startTaskContext(value90, args24, { recovering: recovering = ![] } = {}) {
+  const { spec: spec8, startedAt: startedAt6, taskId: taskId6 } = value90;
+  if (value90['cancelRequested'] || value90['signal']?.['aborted']) throw createCancelledError();
+  updateContextTaskNode(value90, {
+    ...buildGenerationStartPatch({ startedAt: startedAt6 }),
+    ...buildGenerationProtocolTransitionPatch({ type: 'start', spec: spec8, startedAt: startedAt6 }),
+    ...(recovering
+      ? buildGenerationProtocolTransitionPatch({
+          type: 'taskId',
+          spec: spec8,
+          taskId: taskId6,
+          startedAt: startedAt6,
+        })
+      : {}),
+    ...args24,
+    ...(recovering && isWorkflowSpec(spec8) ? { rhTaskRecovering: !![] } : {}),
+    ...(recovering && isAsyncModelApiSpec(spec8) ? { asyncTaskRecovering: !![] } : {}),
+  });
+  const run3 = () => {
+      if (isContextCancelled(value90)) throw createCancelledError();
+      notifyTaskChange(value90, { status: 'running', ...(recovering ? { recovering: !![] } : {}) });
+    },
+    promise3 = typeof spec8['onTaskStart'] === 'function' ? spec8['onTaskStart'](value90) : null;
+  return promise3 && typeof promise3['then'] === 'function'
+    ? Promise['resolve'](promise3)['then'](run3)
+    : run3();
+}

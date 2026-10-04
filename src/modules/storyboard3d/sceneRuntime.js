@@ -24,398 +24,377 @@ import {
   getStoryboard3DObjectTransformCapabilities,
 } from './objectTransformCapabilities.js';
 const TRANSFORM_TOOLS = new Set(['move', 'rotate', 'scale']);
-function finiteNumber(_0x49e115, _0x26ecb7 = 0x0) {
-  const _0x424bc9 = Number(_0x49e115);
-  return Number['isFinite'](_0x424bc9) ? _0x424bc9 : _0x26ecb7;
+function finiteNumber(value, item = 0x0) {
+  const key = Number(value);
+  return Number['isFinite'](key) ? key : item;
 }
-function vectorFromArray(_0x127631, _0x2fdf67) {
-  const _0x683ead = Array['isArray'](_0x127631) ? _0x127631 : [];
+function vectorFromArray(index, box) {
+  const result = Array['isArray'](index) ? index : [];
   return {
-    x: finiteNumber(_0x683ead[0x0], _0x2fdf67['x']),
-    y: finiteNumber(_0x683ead[0x1], _0x2fdf67['y']),
-    z: finiteNumber(_0x683ead[0x2], _0x2fdf67['z']),
+    x: finiteNumber(result[0x0], box['x']),
+    y: finiteNumber(result[0x1], box['y']),
+    z: finiteNumber(result[0x2], box['z']),
   };
 }
-function scaleFromArray(_0x5b87f2) {
-  const _0x5d8df4 = vectorFromArray(_0x5b87f2, { x: 0x1, y: 0x1, z: 0x1 });
+function scaleFromArray(data) {
+  const box2 = vectorFromArray(data, { x: 0x1, y: 0x1, z: 0x1 });
   return {
-    x: Math['max'](0.001, _0x5d8df4['x']),
-    y: Math['max'](0.001, _0x5d8df4['y']),
-    z: Math['max'](0.001, _0x5d8df4['z']),
+    x: Math['max'](0.001, box2['x']),
+    y: Math['max'](0.001, box2['y']),
+    z: Math['max'](0.001, box2['z']),
   };
 }
-function transformToBridgePose(_0xd8e99b) {
+function transformToBridgePose(box3) {
   return {
-    position: vectorFromArray(_0xd8e99b?.['position'], { x: 0x0, y: 0x0, z: 0x0 }),
-    rotation: vectorFromArray(_0xd8e99b?.['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
-    scale: scaleFromArray(_0xd8e99b?.['scale']),
+    position: vectorFromArray(box3?.['position'], { x: 0x0, y: 0x0, z: 0x0 }),
+    rotation: vectorFromArray(box3?.['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
+    scale: scaleFromArray(box3?.['scale']),
   };
 }
-function convexHullXZ(_0x4a39ec) {
-  const _0x4fb1c7 = new Map();
-  for (const _0x24b8bc of _0x4a39ec || []) {
-    const _0x403148 = finiteNumber(_0x24b8bc?.['x']),
-      _0x287a3e = finiteNumber(_0x24b8bc?.['z']);
-    _0x4fb1c7['set'](_0x403148['toFixed'](0x6) + ':' + _0x287a3e['toFixed'](0x6), {
-      x: _0x403148,
-      z: _0x287a3e,
+function convexHullXZ(options) {
+  const map = new Map();
+  for (const box4 of options || []) {
+    const x = finiteNumber(box4?.['x']),
+      z = finiteNumber(box4?.['z']);
+    map['set'](x['toFixed'](0x6) + ':' + z['toFixed'](0x6), {
+      x: x,
+      z: z,
     });
   }
-  const _0x3d1e54 = [..._0x4fb1c7['values']()]['sort'](
-    (_0x390957, _0x1c6e70) => _0x390957['x'] - _0x1c6e70['x'] || _0x390957['z'] - _0x1c6e70['z'],
-  );
-  if (_0x3d1e54['length'] <= 0x2) return _0x3d1e54;
-  const _0x4ed5f9 = (_0xd1c210, _0x3a0931, _0x453515) =>
-      (_0x3a0931['x'] - _0xd1c210['x']) * (_0x453515['z'] - _0xd1c210['z']) -
-      (_0x3a0931['z'] - _0xd1c210['z']) * (_0x453515['x'] - _0xd1c210['x']),
-    _0x204743 = [];
-  for (const _0x51ee9f of _0x3d1e54) {
-    while (
-      _0x204743['length'] >= 0x2 &&
-      _0x4ed5f9(_0x204743['at'](-0x2), _0x204743['at'](-0x1), _0x51ee9f) <= 0x0
-    ) {
-      _0x204743['pop']();
+  const list = [...map['values']()]['sort']((box5, box6) => box5['x'] - box6['x'] || box5['z'] - box6['z']);
+  if (list['length'] <= 0x2) return list;
+  const run = (box7, box8, box9) =>
+      (box8['x'] - box7['x']) * (box9['z'] - box7['z']) - (box8['z'] - box7['z']) * (box9['x'] - box7['x']),
+    list2 = [];
+  for (const target of list) {
+    while (list2['length'] >= 0x2 && run(list2['at'](-0x2), list2['at'](-0x1), target) <= 0x0) {
+      list2['pop']();
     }
-    _0x204743['push'](_0x51ee9f);
+    list2['push'](target);
   }
-  const _0x2c990b = [];
-  for (let _0x4703f5 = _0x3d1e54['length'] - 0x1; _0x4703f5 >= 0x0; _0x4703f5 -= 0x1) {
-    const _0xa1410c = _0x3d1e54[_0x4703f5];
-    while (
-      _0x2c990b['length'] >= 0x2 &&
-      _0x4ed5f9(_0x2c990b['at'](-0x2), _0x2c990b['at'](-0x1), _0xa1410c) <= 0x0
-    ) {
-      _0x2c990b['pop']();
+  const list3 = [];
+  for (let count = list['length'] - 0x1; count >= 0x0; count -= 0x1) {
+    const source = list[count];
+    while (list3['length'] >= 0x2 && run(list3['at'](-0x2), list3['at'](-0x1), source) <= 0x0) {
+      list3['pop']();
     }
-    _0x2c990b['push'](_0xa1410c);
+    list3['push'](source);
   }
-  return (_0x204743['pop'](), _0x2c990b['pop'](), [..._0x204743, ..._0x2c990b]);
+  return (list2['pop'](), list3['pop'](), [...list2, ...list3]);
 }
-function collectGeometryTopViewPoints(_0x19b506, _0xaae94b) {
-  if (!_0x19b506 || !_0xaae94b) return [];
-  const _0x16e93e = _0x19b506['attributes']?.['position'];
-  if (_0x16e93e?.['count'] > 0x0) {
-    const _0x4f27e3 = [],
-      _0x434530 = Math['max'](0x1, Math['floor'](_0x16e93e['count'] / 0x180));
-    for (let _0x124d25 = 0x0; _0x124d25 < _0x16e93e['count']; _0x124d25 += _0x434530) {
-      const _0xf27287 = new threeRuntime['Vector3']()
-        ['fromBufferAttribute'](_0x16e93e, _0x124d25)
-        ['applyMatrix4'](_0xaae94b);
-      _0x4f27e3['push']({ x: _0xf27287['x'], z: _0xf27287['z'] });
+function collectGeometryTopViewPoints(enabled, enabled2) {
+  if (!enabled || !enabled2) return [];
+  const next = enabled['attributes']?.['position'];
+  if (next?.['count'] > 0x0) {
+    const list4 = [],
+      count2 = Math['max'](0x1, Math['floor'](next['count'] / 0x180));
+    for (let current = 0x0; current < next['count']; current += count2) {
+      const x2 = new threeRuntime['Vector3']()
+        ['fromBufferAttribute'](next, current)
+        ['applyMatrix4'](enabled2);
+      list4['push']({ x: x2['x'], z: x2['z'] });
     }
-    const _0x3f8586 = _0x16e93e['count'] - 0x1;
-    if (_0x3f8586 % _0x434530 !== 0x0) {
-      const _0x93235c = new threeRuntime['Vector3']()
-        ['fromBufferAttribute'](_0x16e93e, _0x3f8586)
-        ['applyMatrix4'](_0xaae94b);
-      _0x4f27e3['push']({ x: _0x93235c['x'], z: _0x93235c['z'] });
+    const entry = next['count'] - 0x1;
+    if (entry % count2 !== 0x0) {
+      const x3 = new threeRuntime['Vector3']()['fromBufferAttribute'](next, entry)['applyMatrix4'](enabled2);
+      list4['push']({ x: x3['x'], z: x3['z'] });
     }
-    return _0x4f27e3;
+    return list4;
   }
-  _0x19b506['computeBoundingBox']?.();
-  const _0x8c650 = _0x19b506['boundingBox'];
-  if (!_0x8c650 || _0x8c650['isEmpty']?.()) return [];
-  const _0x41cc24 = [];
-  for (const _0x5a4bc8 of [_0x8c650['min']['x'], _0x8c650['max']['x']]) {
-    for (const _0x34a741 of [_0x8c650['min']['y'], _0x8c650['max']['y']]) {
-      for (const _0x458a24 of [_0x8c650['min']['z'], _0x8c650['max']['z']]) {
-        const _0x18a5c7 = new threeRuntime['Vector3'](_0x5a4bc8, _0x34a741, _0x458a24)['applyMatrix4'](
-          _0xaae94b,
-        );
-        _0x41cc24['push']({ x: _0x18a5c7['x'], z: _0x18a5c7['z'] });
+  enabled['computeBoundingBox']?.();
+  const enabled3 = enabled['boundingBox'];
+  if (!enabled3 || enabled3['isEmpty']?.()) return [];
+  const list5 = [];
+  for (const record of [enabled3['min']['x'], enabled3['max']['x']]) {
+    for (const payload of [enabled3['min']['y'], enabled3['max']['y']]) {
+      for (const handle of [enabled3['min']['z'], enabled3['max']['z']]) {
+        const x4 = new threeRuntime['Vector3'](record, payload, handle)['applyMatrix4'](enabled2);
+        list5['push']({ x: x4['x'], z: x4['z'] });
       }
     }
   }
-  return _0x41cc24;
+  return list5;
 }
-function collectObjectTopViewFootprint(_0x3c15f0) {
-  if (!_0x3c15f0 || _0x3c15f0['visible'] === ![] || typeof _0x3c15f0['traverse'] !== 'function') return [];
-  _0x3c15f0['updateMatrixWorld']?.(!![]);
-  const _0x102960 = [];
+function collectObjectTopViewFootprint(enabled4) {
+  if (!enabled4 || enabled4['visible'] === ![] || typeof enabled4['traverse'] !== 'function') return [];
+  enabled4['updateMatrixWorld']?.(!![]);
+  const list6 = [];
   return (
-    _0x3c15f0['traverse']((_0x4ea01e) => {
-      if (!_0x4ea01e?.['isMesh'] || _0x4ea01e['visible'] === ![] || !_0x4ea01e['geometry']) return;
-      (_0x4ea01e['updateWorldMatrix']?.(!![], ![]),
-        _0x102960['push'](...collectGeometryTopViewPoints(_0x4ea01e['geometry'], _0x4ea01e['matrixWorld'])));
+    enabled4['traverse']((enabled5) => {
+      if (!enabled5?.['isMesh'] || enabled5['visible'] === ![] || !enabled5['geometry']) return;
+      (enabled5['updateWorldMatrix']?.(!![], ![]),
+        list6['push'](...collectGeometryTopViewPoints(enabled5['geometry'], enabled5['matrixWorld'])));
     }),
-    convexHullXZ(_0x102960)
+    convexHullXZ(list6)
   );
 }
-function collectInstanceTopViewFootprint(_0x47ab4a, _0x260ed3) {
-  const _0x2897e9 = _0x47ab4a?.['objectIds']?.['indexOf']?.(_0x260ed3) ?? -0x1,
-    _0x1b4d8e = _0x47ab4a?.['mesh'];
-  if (_0x2897e9 < 0x0 || !_0x1b4d8e?.['geometry'] || typeof _0x1b4d8e['getMatrixAt'] !== 'function')
-    return [];
-  _0x1b4d8e['updateMatrixWorld']?.(!![]);
-  const _0x2c7c1e = new threeRuntime['Matrix4']();
-  _0x1b4d8e['getMatrixAt'](_0x2897e9, _0x2c7c1e);
-  const _0x1ffdac = _0x1b4d8e['matrixWorld']['clone']()['multiply'](_0x2c7c1e);
-  return convexHullXZ(collectGeometryTopViewPoints(_0x1b4d8e['geometry'], _0x1ffdac));
+function collectInstanceTopViewFootprint(state, config) {
+  const count3 = state?.['objectIds']?.['indexOf']?.(config) ?? -0x1,
+    enabled6 = state?.['mesh'];
+  if (count3 < 0x0 || !enabled6?.['geometry'] || typeof enabled6['getMatrixAt'] !== 'function') return [];
+  enabled6['updateMatrixWorld']?.(!![]);
+  const scope = new threeRuntime['Matrix4']();
+  enabled6['getMatrixAt'](count3, scope);
+  const input = enabled6['matrixWorld']['clone']()['multiply'](scope);
+  return convexHullXZ(collectGeometryTopViewPoints(enabled6['geometry'], input));
 }
-function createFallbackTopViewFootprint(_0x2da825) {
-  const _0x421790 = _0x2da825?.['transform'] || {},
-    _0x53eb9c = vectorFromArray(_0x421790['position'], { x: 0x0, y: 0x0, z: 0x0 }),
-    _0x4b6c0f = vectorFromArray(_0x421790['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
-    _0x3bcce4 = scaleFromArray(_0x421790['scale']),
-    _0x4373e8 = _0x2da825?.['type'] === 'character' ? 0.65 : _0x2da825?.['type'] === 'light' ? 0.4 : 0x1,
-    _0x375799 = _0x2da825?.['type'] === 'character' ? 0.45 : _0x2da825?.['type'] === 'light' ? 0.4 : 0x1,
-    _0x3a007b = Math['max'](0.08, (_0x4373e8 * _0x3bcce4['x']) / 0x2),
-    _0x201f91 = Math['max'](0.08, (_0x375799 * _0x3bcce4['z']) / 0x2),
-    _0x48dddd = Math['cos'](_0x4b6c0f['y']),
-    _0x5ca906 = Math['sin'](_0x4b6c0f['y']);
+function createFallbackTopViewFootprint(output) {
+  const box10 = output?.['transform'] || {},
+    x5 = vectorFromArray(box10['position'], { x: 0x0, y: 0x0, z: 0x0 }),
+    box11 = vectorFromArray(box10['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
+    box12 = scaleFromArray(box10['scale']),
+    value2 = output?.['type'] === 'character' ? 0.65 : output?.['type'] === 'light' ? 0.4 : 0x1,
+    value3 = output?.['type'] === 'character' ? 0.45 : output?.['type'] === 'light' ? 0.4 : 0x1,
+    value4 = Math['max'](0.08, (value2 * box12['x']) / 0x2),
+    value5 = Math['max'](0.08, (value3 * box12['z']) / 0x2),
+    value6 = Math['cos'](box11['y']),
+    value7 = Math['sin'](box11['y']);
   return [
-    [-_0x3a007b, -_0x201f91],
-    [_0x3a007b, -_0x201f91],
-    [_0x3a007b, _0x201f91],
-    [-_0x3a007b, _0x201f91],
-  ]['map'](([_0x353105, _0x4fc84f]) => ({
-    x: _0x53eb9c['x'] + _0x353105 * _0x48dddd + _0x4fc84f * _0x5ca906,
-    z: _0x53eb9c['z'] - _0x353105 * _0x5ca906 + _0x4fc84f * _0x48dddd,
+    [-value4, -value5],
+    [value4, -value5],
+    [value4, value5],
+    [-value4, value5],
+  ]['map'](([value8, value9]) => ({
+    x: x5['x'] + value8 * value6 + value9 * value7,
+    z: x5['z'] - value8 * value7 + value9 * value6,
   }));
 }
-function cameraToSceneView(_0x5830cb) {
-  const _0x50b599 = vectorFromArray(_0x5830cb?.['position'], { x: 0x5, y: 0x4, z: 0x7 }),
-    _0x3ae2cf = vectorFromArray(_0x5830cb?.['target'], { x: 0x0, y: 1.2, z: 0x0 }),
-    _0x111868 = {
-      x: _0x50b599['x'] - _0x3ae2cf['x'],
-      y: _0x50b599['y'] - _0x3ae2cf['y'],
-      z: _0x50b599['z'] - _0x3ae2cf['z'],
+function cameraToSceneView(event) {
+  const x6 = vectorFromArray(event?.['position'], { x: 0x5, y: 0x4, z: 0x7 }),
+    target2 = vectorFromArray(event?.['target'], { x: 0x0, y: 1.2, z: 0x0 }),
+    box13 = {
+      x: x6['x'] - target2['x'],
+      y: x6['y'] - target2['y'],
+      z: x6['z'] - target2['z'],
     },
-    _0x1cfa70 = Math['max'](0.25, Math['hypot'](_0x111868['x'], _0x111868['y'], _0x111868['z']));
+    orbitDistance = Math['max'](0.25, Math['hypot'](box13['x'], box13['y'], box13['z']));
   return {
-    target: _0x3ae2cf,
-    orbitYaw: Math['atan2'](_0x111868['x'], _0x111868['z']),
-    orbitPitch: Math['asin'](Math['max'](-0x1, Math['min'](0x1, _0x111868['y'] / _0x1cfa70))),
-    orbitDistance: _0x1cfa70,
+    target: target2,
+    orbitYaw: Math['atan2'](box13['x'], box13['z']),
+    orbitPitch: Math['asin'](Math['max'](-0x1, Math['min'](0x1, box13['y'] / orbitDistance))),
+    orbitDistance: orbitDistance,
   };
 }
-function resolveScene(_0x49d7e7, _0x5943b0) {
-  const _0x311bc5 = Array['isArray'](_0x49d7e7?.['scenes']) ? _0x49d7e7['scenes'] : [];
+function resolveScene(value10, value11) {
+  const list7 = Array['isArray'](value10?.['scenes']) ? value10['scenes'] : [];
   return (
-    _0x311bc5['find']((_0x5d4def) => _0x5d4def['id'] === _0x5943b0) ||
-    _0x311bc5['find']((_0x1b81be) => _0x1b81be['id'] === _0x49d7e7?.['activeSceneId']) ||
-    _0x311bc5[0x0] ||
+    list7['find']((value12) => value12['id'] === value11) ||
+    list7['find']((value13) => value13['id'] === value10?.['activeSceneId']) ||
+    list7[0x0] ||
     null
   );
 }
-function resolveActiveShot(_0x189773) {
-  const _0xca0b59 = Array['isArray'](_0x189773?.['shots']) ? _0x189773['shots'] : [];
-  return (
-    _0xca0b59['find']((_0x177baf) => _0x177baf['id'] === _0x189773?.['activeShotId']) ||
-    _0xca0b59[0x0] ||
-    null
-  );
+function resolveActiveShot(value14) {
+  const list8 = Array['isArray'](value14?.['shots']) ? value14['shots'] : [];
+  return list8['find']((value15) => value15['id'] === value14?.['activeShotId']) || list8[0x0] || null;
 }
-function bridgeObjectType(_0x1d9f50) {
-  const _0x103757 = _0x1d9f50 && typeof _0x1d9f50 === 'object' ? _0x1d9f50 : null,
-    _0x54a6d4 = _0x103757?.['type'] || _0x1d9f50;
-  if (_0x54a6d4 === 'prop') return 'cube';
-  if (_0x54a6d4 === 'character') return 'mannequin';
-  if (_0x54a6d4 === 'camera') return 'camera';
-  if (_0x54a6d4 === 'light' && _0x103757?.['lightType'] !== 'ambient') return 'cube';
+function bridgeObjectType(value16) {
+  const value17 = value16 && typeof value16 === 'object' ? value16 : null,
+    value18 = value17?.['type'] || value16;
+  if (value18 === 'prop') return 'cube';
+  if (value18 === 'character') return 'mannequin';
+  if (value18 === 'camera') return 'camera';
+  if (value18 === 'light' && value17?.['lightType'] !== 'ambient') return 'cube';
   return null;
 }
-function disposeOwnedObject3D(_0x20aa12) {
-  _0x20aa12?.['traverse']?.((_0x20028a) => {
-    _0x20028a['geometry']?.['dispose']?.();
-    const _0x86a629 = Array['isArray'](_0x20028a['material'])
-      ? _0x20028a['material']
-      : [_0x20028a['material']];
-    _0x86a629['filter'](Boolean)['forEach']((_0x3f520b) => _0x3f520b['dispose']?.());
+function disposeOwnedObject3D(value19) {
+  value19?.['traverse']?.((value20) => {
+    value20['geometry']?.['dispose']?.();
+    const list9 = Array['isArray'](value20['material']) ? value20['material'] : [value20['material']];
+    list9['filter'](Boolean)['forEach']((value21) => value21['dispose']?.());
   });
 }
-function createImportedModelNormalizationRoot(_0x3b37b9) {
-  const _0x2cda12 = readStoryboard3DModelNormalization(_0x3b37b9),
-    _0x1f065d = new threeRuntime['Group']();
+function createImportedModelNormalizationRoot(value22) {
+  const storyboard3DModelNormalization = readStoryboard3DModelNormalization(value22),
+    error = new threeRuntime['Group']();
   return (
-    (_0x1f065d['name'] = 'storyboard3d-model-normalization'),
-    _0x2cda12 &&
-      (_0x1f065d['position']['set'](
-        _0x2cda12['translation']['x'],
-        _0x2cda12['translation']['y'],
-        _0x2cda12['translation']['z'],
+    (error['name'] = 'storyboard3d-model-normalization'),
+    storyboard3DModelNormalization &&
+      (error['position']['set'](
+        storyboard3DModelNormalization['translation']['x'],
+        storyboard3DModelNormalization['translation']['y'],
+        storyboard3DModelNormalization['translation']['z'],
       ),
-      _0x1f065d['scale']['setScalar'](_0x2cda12['uniformScale'])),
-    _0x1f065d['add'](_0x3b37b9['clone'](!![])),
-    _0x1f065d
+      error['scale']['setScalar'](storyboard3DModelNormalization['uniformScale'])),
+    error['add'](value22['clone'](!![])),
+    error
   );
 }
-function applyImportedNormalizationToTemplate(_0xa90421, _0x2b6829) {
-  const _0x5c1c31 = readStoryboard3DModelNormalization(_0x2b6829);
-  if (!_0xa90421 || !_0x5c1c31) return _0xa90421;
-  const _0x13d731 = new threeRuntime['Matrix4']()['compose'](
+function applyImportedNormalizationToTemplate(enabled7, value23) {
+  const storyboard3DModelNormalization2 = readStoryboard3DModelNormalization(value23);
+  if (!enabled7 || !storyboard3DModelNormalization2) return enabled7;
+  const value24 = new threeRuntime['Matrix4']()['compose'](
     new threeRuntime['Vector3'](
-      _0x5c1c31['translation']['x'],
-      _0x5c1c31['translation']['y'],
-      _0x5c1c31['translation']['z'],
+      storyboard3DModelNormalization2['translation']['x'],
+      storyboard3DModelNormalization2['translation']['y'],
+      storyboard3DModelNormalization2['translation']['z'],
     ),
     new threeRuntime['Quaternion'](),
     new threeRuntime['Vector3'](
-      _0x5c1c31['uniformScale'],
-      _0x5c1c31['uniformScale'],
-      _0x5c1c31['uniformScale'],
+      storyboard3DModelNormalization2['uniformScale'],
+      storyboard3DModelNormalization2['uniformScale'],
+      storyboard3DModelNormalization2['uniformScale'],
     ),
   );
-  return (_0xa90421['sourceMatrix']['premultiply'](_0x13d731), _0xa90421);
+  return (enabled7['sourceMatrix']['premultiply'](value24), enabled7);
 }
-function createSelection(_0x2b247e, _0x20ec28, _0x5d0eec) {
-  const _0x43222a = (Array['isArray'](_0x20ec28) ? _0x20ec28 : [])
-      ['map']((_0x1cddae) => String(_0x1cddae || '')['trim']())
+function createSelection(value25, value26, value27) {
+  const list10 = (Array['isArray'](value26) ? value26 : [])
+      ['map']((value28) => String(value28 || '')['trim']())
       ['filter'](Boolean),
-    _0x5be83f = new Map((_0x2b247e?.['objects'] || [])['map']((_0x404894) => [_0x404894['id'], _0x404894])),
-    _0x1b0015 = _0x43222a['map']((_0x373b7c) => _0x5be83f['get'](_0x373b7c))
+    map2 = new Map((value25?.['objects'] || [])['map']((value29) => [value29['id'], value29])),
+    selectedObjects = list10['map']((value30) => map2['get'](value30))
       ['filter'](Boolean)
-      ['filter']((_0xbc6574) => _0xbc6574['visible'] !== ![] && _0xbc6574['locked'] !== !![])
-      ['filter']((_0x3a982e) => canStoryboard3DObjectUseTransformTool(_0x3a982e, _0x5d0eec))
-      ['map']((_0xcca52a) => ({ objectType: bridgeObjectType(_0xcca52a), objectId: _0xcca52a['id'] }))
-      ['filter']((_0x2532ae) => _0x2532ae['objectType']),
-    _0x404e34 = _0x1b0015[_0x1b0015['length'] - 0x1] || null;
+      ['filter']((value31) => value31['visible'] !== ![] && value31['locked'] !== !![])
+      ['filter']((value32) => canStoryboard3DObjectUseTransformTool(value32, value27))
+      ['map']((objectId) => ({ objectType: bridgeObjectType(objectId), objectId: objectId['id'] }))
+      ['filter']((value33) => value33['objectType']),
+    selectedObjectType = selectedObjects[selectedObjects['length'] - 0x1] || null;
   return {
-    selectedObjectType: _0x404e34?.['objectType'] || null,
-    selectedObjectId: _0x404e34?.['objectId'] || null,
-    selectedObjectIds: _0x404e34
-      ? _0x1b0015['filter']((_0x1c66e5) => _0x1c66e5['objectType'] === _0x404e34['objectType'])['map'](
-          (_0x43aadd) => _0x43aadd['objectId'],
-        )
+    selectedObjectType: selectedObjectType?.['objectType'] || null,
+    selectedObjectId: selectedObjectType?.['objectId'] || null,
+    selectedObjectIds: selectedObjectType
+      ? selectedObjects['filter']((value34) => value34['objectType'] === selectedObjectType['objectType'])[
+          'map'
+        ]((value35) => value35['objectId'])
       : [],
-    selectedObjects: _0x1b0015,
+    selectedObjects: selectedObjects,
     selectedGroupId: null,
   };
 }
-function mapSceneObjects(_0x54ac6b) {
-  const _0x3cbfc6 = (Array['isArray'](_0x54ac6b?.['objects']) ? _0x54ac6b['objects'] : [])['filter'](
-      (_0x4d7246) => _0x4d7246?.['visible'] !== ![],
+function mapSceneObjects(value36) {
+  const list11 = (Array['isArray'](value36?.['objects']) ? value36['objects'] : [])['filter'](
+      (value37) => value37?.['visible'] !== ![],
     ),
-    _0x143182 = [],
-    _0x20f33c = [],
-    _0x1ab2d7 = [];
+    mannequins = [],
+    cubes = [],
+    cameras = [];
   return (
-    _0x3cbfc6['forEach']((_0x20e055, _0x4f76d9) => {
-      const _0x110ce3 = transformToBridgePose(_0x20e055['transform']);
-      if (_0x20e055['type'] === 'prop') {
-        _0x20f33c['push']({
-          id: _0x20e055['id'],
-          assetId: _0x20e055['assetId'],
-          colorKey: _0x20e055['tint'] || undefined,
-          ..._0x110ce3,
+    list11['forEach']((id, slot) => {
+      const position = transformToBridgePose(id['transform']);
+      if (id['type'] === 'prop') {
+        cubes['push']({
+          id: id['id'],
+          assetId: id['assetId'],
+          colorKey: id['tint'] || undefined,
+          ...position,
         });
         return;
       }
-      if (_0x20e055['type'] === 'light' && _0x20e055['lightType'] !== 'ambient') {
-        _0x20f33c['push']({ id: _0x20e055['id'], colorKey: _0x20e055['color'] || undefined, ..._0x110ce3 });
+      if (id['type'] === 'light' && id['lightType'] !== 'ambient') {
+        cubes['push']({ id: id['id'], colorKey: id['color'] || undefined, ...position });
         return;
       }
-      if (_0x20e055['type'] === 'character') {
-        const _0x128349 =
-            _0x20e055['bodyPresetId'] === 'female'
+      if (id['type'] === 'character') {
+        const bodyPresetId =
+            id['bodyPresetId'] === 'female'
               ? 'adult-female'
-              : _0x20e055['bodyPresetId'] === 'male'
+              : id['bodyPresetId'] === 'male'
                 ? 'adult-male'
-                : _0x20e055['bodyPresetId'],
-          _0x1be191 = resolveStoryboard3DCharacterPose({ ..._0x20e055, bodyPresetId: _0x128349 }),
-          _0x558bfb = Object['fromEntries'](
-            Object['entries'](_0x1be191['boneOverrides'] || {})['map'](([_0x2c050a, _0x24aa98]) => [
-              _0x2c050a,
-              quaternionToStoryboard3DEuler(_0x24aa98),
+                : id['bodyPresetId'],
+          bodyPresetId2 = resolveStoryboard3DCharacterPose({ ...id, bodyPresetId: bodyPresetId }),
+          args = Object['fromEntries'](
+            Object['entries'](bodyPresetId2['boneOverrides'] || {})['map'](([value38, value39]) => [
+              value38,
+              quaternionToStoryboard3DEuler(value39),
             ]),
           );
-        _0x143182['push']({
-          id: _0x20e055['id'],
-          bodyPresetId: _0x1be191['state']['bodyPresetId'],
-          colorKey: _0x20e055['colorKey'] || 'blue',
-          characterStyle: _0x20e055['characterStyle'] === 'anatomical' ? 'anatomical' : 'articulated',
-          bodyProfile: _0x1be191['body'],
-          gender: _0x1be191['body']?.['gender'] === 'female' ? 'female' : 'male',
-          poseId: _0x1be191['action']?.['poseId'] || undefined,
+        mannequins['push']({
+          id: id['id'],
+          bodyPresetId: bodyPresetId2['state']['bodyPresetId'],
+          colorKey: id['colorKey'] || 'blue',
+          characterStyle: id['characterStyle'] === 'anatomical' ? 'anatomical' : 'articulated',
+          bodyProfile: bodyPresetId2['body'],
+          gender: bodyPresetId2['body']?.['gender'] === 'female' ? 'female' : 'male',
+          poseId: bodyPresetId2['action']?.['poseId'] || undefined,
           bonePose: {
-            ...(_0x1be191['baseBones'] || {}),
-            ...(_0x1be191['handRotations'] || {}),
-            ..._0x558bfb,
+            ...(bodyPresetId2['baseBones'] || {}),
+            ...(bodyPresetId2['handRotations'] || {}),
+            ...args,
           },
-          ..._0x110ce3,
+          ...position,
         });
         return;
       }
-      _0x20e055['type'] === 'camera' &&
-        _0x1ab2d7['push']({
-          id: _0x20e055['id'],
-          slot: _0x4f76d9 + 0x1,
-          name: _0x20e055['name'],
-          position: _0x110ce3['position'],
-          rotation: _0x110ce3['rotation'],
-          focalLength: _0x20e055['focalLength'],
+      id['type'] === 'camera' &&
+        cameras['push']({
+          id: id['id'],
+          slot: slot + 0x1,
+          name: id['name'],
+          position: position['position'],
+          rotation: position['rotation'],
+          focalLength: id['focalLength'],
         });
     }),
-    { mannequins: _0x143182, cubes: _0x20f33c, cameras: _0x1ab2d7 }
+    { mannequins: mannequins, cubes: cubes, cameras: cameras }
   );
 }
 export function adaptStoryboard3DSceneToDirectorState({
-  project: _0x130f75,
-  sceneId: _0x46a8e3,
+  project: project,
+  sceneId: sceneId,
   selectedObjectIds: selectedObjectIds = [],
   activeTool: activeTool = 'select',
 } = {}) {
-  const _0x43b44c = resolveScene(_0x130f75, _0x46a8e3);
-  if (!_0x43b44c) return null;
-  const _0x3480c8 = resolveActiveShot(_0x43b44c),
-    _0x45f369 = TRANSFORM_TOOLS['has'](activeTool) ? activeTool : 'move',
-    _0x22ed9b = mapSceneObjects(_0x43b44c),
-    _0x382cf9 = {
+  const environmentMode = resolveScene(project, sceneId);
+  if (!environmentMode) return null;
+  const activeShot = resolveActiveShot(environmentMode),
+    transformTool = TRANSFORM_TOOLS['has'](activeTool) ? activeTool : 'move',
+    args2 = mapSceneObjects(environmentMode),
+    value40 = {
       version: 0x2,
       mode: 'scene',
-      environmentMode: _0x43b44c['environment']?.['type'] === 'outdoor' ? 'day' : 'night',
+      environmentMode: environmentMode['environment']?.['type'] === 'outdoor' ? 'day' : 'night',
       viewport: {
         activeView: 'default',
         activeCameraId: null,
-        sceneView: cameraToSceneView(_0x3480c8?.['camera']),
+        sceneView: cameraToSceneView(activeShot?.['camera']),
       },
       panorama: { imageUrl: null, isLoaded: ![] },
-      ..._0x22ed9b,
-      selection: createSelection(_0x43b44c, selectedObjectIds, activeTool),
+      ...args2,
+      selection: createSelection(environmentMode, selectedObjectIds, activeTool),
       groups: [],
       ui: {
         mouseTool: 'navigate',
-        transformTool: _0x45f369,
-        activeTool: _0x45f369,
+        transformTool: transformTool,
+        activeTool: transformTool,
         transformSpace: 'world',
         snapEnabled: ![],
         groundLock: ![],
         uniformScale: ![],
         isEditing: !![],
-        showOutline: _0x43b44c['environment']?.['showOutline'] !== ![],
+        showOutline: environmentMode['environment']?.['showOutline'] !== ![],
       },
     },
-    _0x227541 = normalizePanoramaSceneState(_0x382cf9);
+    state2 = normalizePanoramaSceneState(value40);
   return {
-    scene: _0x43b44c,
-    activeShot: _0x3480c8,
-    state: _0x227541,
-    focalLength: finiteNumber(_0x3480c8?.['camera']?.['focalLength'], 0x23),
-    unsupportedObjectIds: (_0x43b44c['objects'] || [])
-      ['filter'](
-        (_0x5a7f22) => !bridgeObjectType(_0x5a7f22) && !['camera', 'light']['includes'](_0x5a7f22['type']),
-      )
-      ['map']((_0x528d51) => _0x528d51['id']),
+    scene: environmentMode,
+    activeShot: activeShot,
+    state: state2,
+    focalLength: finiteNumber(activeShot?.['camera']?.['focalLength'], 0x23),
+    unsupportedObjectIds: (environmentMode['objects'] || [])
+      ['filter']((value41) => !bridgeObjectType(value41) && !['camera', 'light']['includes'](value41['type']))
+      ['map']((value42) => value42['id']),
   };
 }
 export class Storyboard3DSceneRuntime {
   constructor({
-    container: _0x279895,
-    bridgeFactory: _0x36332a,
-    importedModelResolver: _0x14d8a9,
-    onVisualChange: _0x53e38e,
+    container: container,
+    bridgeFactory: bridgeFactory,
+    importedModelResolver: importedModelResolver,
+    onVisualChange: onVisualChange,
   } = {}) {
-    if (!_0x279895) throw new TypeError('Storyboard3DSceneRuntime requires a container');
-    const _0x453da4 =
-      typeof _0x36332a === 'function' ? _0x36332a : (_0x545f06) => new PanoramaScene3DBridge(_0x545f06);
-    ((this['bridge'] = _0x453da4({ container: _0x279895 })),
+    if (!container) throw new TypeError('Storyboard3DSceneRuntime requires a container');
+    const run2 =
+      typeof bridgeFactory === 'function' ? bridgeFactory : (value43) => new PanoramaScene3DBridge(value43);
+    ((this['bridge'] = run2({ container: container })),
       (this['directorScene'] = new DirectorSceneRuntime(this)));
     if (!this['bridge'] || typeof this['bridge']['sync'] !== 'function')
       throw new TypeError('Storyboard3DSceneRuntime requires a compatible scene bridge');
     ((this['project'] = null),
-      (this['container'] = _0x279895),
-      (this['importedModelResolver'] = typeof _0x14d8a9 === 'function' ? _0x14d8a9 : null),
-      (this['onVisualChange'] = typeof _0x53e38e === 'function' ? _0x53e38e : null),
+      (this['container'] = container),
+      (this['importedModelResolver'] =
+        typeof importedModelResolver === 'function' ? importedModelResolver : null),
+      (this['onVisualChange'] = typeof onVisualChange === 'function' ? onVisualChange : null),
       (this['importedModelRoots'] = new Map()),
       (this['importedModelVisuals'] = new Map()),
       (this['importedInstanceBatches'] = new Map()),
@@ -438,18 +417,18 @@ export class Storyboard3DSceneRuntime {
       (this['disposed'] = ![]));
   }
   ['sync']({
-    project: _0x1e8603,
-    sceneId: _0x58d5ca,
-    selectedObjectIds: _0x2960e9,
-    activeTool: _0x31799a,
+    project: project2,
+    sceneId: sceneId2,
+    selectedObjectIds: selectedObjectIds2,
+    activeTool: activeTool2,
   } = {}) {
     if (this['disposed']) throw new Error('Storyboard3DSceneRuntime has been disposed');
-    if (_0x1e8603 !== undefined) this['project'] = _0x1e8603;
-    if (_0x58d5ca !== undefined) this['sceneId'] = _0x58d5ca;
-    if (_0x2960e9 !== undefined) this['selectedObjectIds'] = [..._0x2960e9];
-    if (_0x31799a !== undefined) this['activeTool'] = _0x31799a;
-    const _0x5984a1 = this['adapted']?.['scene']?.['id'] || null,
-      _0xcc5230 = this['adapted']?.['activeShot']?.['id'] || null;
+    if (project2 !== undefined) this['project'] = project2;
+    if (sceneId2 !== undefined) this['sceneId'] = sceneId2;
+    if (selectedObjectIds2 !== undefined) this['selectedObjectIds'] = [...selectedObjectIds2];
+    if (activeTool2 !== undefined) this['activeTool'] = activeTool2;
+    const value44 = this['adapted']?.['scene']?.['id'] || null,
+      value45 = this['adapted']?.['activeShot']?.['id'] || null;
     this['adapted'] = adaptStoryboard3DSceneToDirectorState({
       project: this['project'],
       sceneId: this['sceneId'],
@@ -457,15 +436,15 @@ export class Storyboard3DSceneRuntime {
       activeTool: this['activeTool'],
     });
     if (!this['adapted']) return null;
-    ((_0x5984a1 && _0x5984a1 !== this['adapted']['scene']['id']) ||
-      (_0xcc5230 && _0xcc5230 !== this['adapted']['activeShot']?.['id'])) &&
+    ((value44 && value44 !== this['adapted']['scene']['id']) ||
+      (value45 && value45 !== this['adapted']['activeShot']?.['id'])) &&
       (this['viewportFocalLengthOverride'] = null);
-    _0x5984a1 === this['adapted']['scene']['id'] &&
-      _0xcc5230 &&
-      _0xcc5230 !== this['adapted']['activeShot']?.['id'] &&
+    value44 === this['adapted']['scene']['id'] &&
+      value45 &&
+      value45 !== this['adapted']['activeShot']?.['id'] &&
       this['viewOverrides']['delete'](this['adapted']['scene']['id']);
-    const _0x3f7400 = this['viewOverrides']['get'](this['adapted']['scene']['id']);
-    if (_0x3f7400) this['adapted']['state']['viewport']['sceneView'] = structuredClone(_0x3f7400);
+    const value46 = this['viewOverrides']['get'](this['adapted']['scene']['id']);
+    if (value46) this['adapted']['state']['viewport']['sceneView'] = structuredClone(value46);
     return (
       (this['adapted']['state']['ui'] = { ...this['adapted']['state']['ui'], ...this['viewportUIPatch'] }),
       this['bridge']['setDefaultSceneFocalLength']?.(
@@ -487,134 +466,119 @@ export class Storyboard3DSceneRuntime {
       this['getSnapshot']()
     );
   }
-  ['_notifyVisualChange'](_0x326ff7) {
-    if (['set-selection', 'set-active-tool']['includes'](_0x326ff7)) this['directorScene']?.['sync']();
-    this['onVisualChange']?.({ reason: String(_0x326ff7 || 'visual-change') });
+  ['_notifyVisualChange'](value47) {
+    if (['set-selection', 'set-active-tool']['includes'](value47)) this['directorScene']?.['sync']();
+    this['onVisualChange']?.({ reason: String(value47 || 'visual-change') });
   }
-  ['_applyImportedModelTransform'](_0x490853, _0xdc191a) {
-    const _0x15a012 = transformToBridgePose(_0xdc191a);
-    (_0x490853?.['position']?.['set']?.(
-      _0x15a012['position']['x'],
-      _0x15a012['position']['y'],
-      _0x15a012['position']['z'],
-    ),
-      _0x490853?.['rotation']?.['set']?.(
-        _0x15a012['rotation']['x'],
-        _0x15a012['rotation']['y'],
-        _0x15a012['rotation']['z'],
-      ),
-      _0x490853?.['scale']?.['set']?.(
-        _0x15a012['scale']['x'],
-        _0x15a012['scale']['y'],
-        _0x15a012['scale']['z'],
-      ),
-      _0x490853?.['updateMatrixWorld']?.(!![]));
+  ['_applyImportedModelTransform'](box14, value48) {
+    const box15 = transformToBridgePose(value48);
+    (box14?.['position']?.['set']?.(box15['position']['x'], box15['position']['y'], box15['position']['z']),
+      box14?.['rotation']?.['set']?.(box15['rotation']['x'], box15['rotation']['y'], box15['rotation']['z']),
+      box14?.['scale']?.['set']?.(box15['scale']['x'], box15['scale']['y'], box15['scale']['z']),
+      box14?.['updateMatrixWorld']?.(!![]));
   }
   ['_clearImportedModels']() {
-    const _0x3d22ba = new Set([
+    const list12 = new Set([
       ...this['importedModelRoots']['keys'](),
       ...this['importedInstanceByObjectId']['keys'](),
       ...this['importedModelVisuals']['keys'](),
     ]);
-    _0x3d22ba['forEach']((_0x4b7d93) => {
-      this['bridge']['clearObjectVisualOverride']?.('cube', _0x4b7d93);
+    list12['forEach']((value49) => {
+      this['bridge']['clearObjectVisualOverride']?.('cube', value49);
     });
-    for (const _0x4d04f2 of this['importedModelRoots']['values']()) {
-      (this['bridge']['scene']?.['remove']?.(_0x4d04f2),
-        (_0x4d04f2['userData']?.['storyboardOwnedMaterials'] || [])['forEach']((_0x5293da) =>
-          _0x5293da?.['dispose']?.(),
+    for (const value50 of this['importedModelRoots']['values']()) {
+      (this['bridge']['scene']?.['remove']?.(value50),
+        (value50['userData']?.['storyboardOwnedMaterials'] || [])['forEach']((value51) =>
+          value51?.['dispose']?.(),
         ));
     }
     (this['importedModelRoots']['clear'](), this['importedModelVisuals']['clear']());
-    for (const _0x1ee340 of this['importedInstanceBatches']['values']()) {
-      (this['bridge']['scene']?.['remove']?.(_0x1ee340['mesh']), disposeStoryboard3DInstanceBatch(_0x1ee340));
+    for (const value52 of this['importedInstanceBatches']['values']()) {
+      (this['bridge']['scene']?.['remove']?.(value52['mesh']), disposeStoryboard3DInstanceBatch(value52));
     }
     (this['importedInstanceBatches']['clear'](), this['importedInstanceByObjectId']['clear']());
   }
   ['_clearSceneLights']() {
-    for (const [_0x338dd5, _0x26795f] of this['lightRoots']) {
-      (this['bridge']['clearObjectVisualOverride']?.('cube', _0x338dd5),
-        this['bridge']['scene']?.['remove']?.(_0x26795f),
-        disposeOwnedObject3D(_0x26795f));
+    for (const [value53, value54] of this['lightRoots']) {
+      (this['bridge']['clearObjectVisualOverride']?.('cube', value53),
+        this['bridge']['scene']?.['remove']?.(value54),
+        disposeOwnedObject3D(value54));
     }
     this['lightRoots']['clear']();
   }
   ['_syncSceneLights']() {
     this['_clearSceneLights']();
     if (!this['bridge']['scene']) return;
-    for (const _0x34edfd of this['adapted']?.['scene']?.['objects'] || []) {
-      if (_0x34edfd['type'] !== 'light' || _0x34edfd['visible'] === ![]) continue;
-      const _0x535139 = _0x34edfd['color'] || 0xffffff,
-        _0x34049e = Math['max'](0x0, Number(_0x34edfd['intensity']) || 0x0);
-      let _0x4efd19;
-      if (_0x34edfd['lightType'] === 'ambient')
-        _0x4efd19 = new threeRuntime['AmbientLight'](_0x535139, _0x34049e);
+    for (const enabled8 of this['adapted']?.['scene']?.['objects'] || []) {
+      if (enabled8['type'] !== 'light' || enabled8['visible'] === ![]) continue;
+      const color = enabled8['color'] || 0xffffff,
+        value55 = Math['max'](0x0, Number(enabled8['intensity']) || 0x0);
+      let event2;
+      if (enabled8['lightType'] === 'ambient') event2 = new threeRuntime['AmbientLight'](color, value55);
       else {
-        if (_0x34edfd['lightType'] === 'point')
-          _0x4efd19 = new threeRuntime['PointLight'](
-            _0x535139,
-            _0x34049e,
-            Number(_0x34edfd['distance']) || 0x0,
-            Number(_0x34edfd['decay']) || 0x2,
+        if (enabled8['lightType'] === 'point')
+          event2 = new threeRuntime['PointLight'](
+            color,
+            value55,
+            Number(enabled8['distance']) || 0x0,
+            Number(enabled8['decay']) || 0x2,
           );
         else {
-          if (_0x34edfd['lightType'] === 'spot')
-            _0x4efd19 = new threeRuntime['SpotLight'](
-              _0x535139,
-              _0x34049e,
-              Number(_0x34edfd['distance']) || 0x0,
-              Number(_0x34edfd['angle']) || Math['PI'] / 0x6,
+          if (enabled8['lightType'] === 'spot')
+            event2 = new threeRuntime['SpotLight'](
+              color,
+              value55,
+              Number(enabled8['distance']) || 0x0,
+              Number(enabled8['angle']) || Math['PI'] / 0x6,
             );
-          else _0x4efd19 = new threeRuntime['DirectionalLight'](_0x535139, _0x34049e);
+          else event2 = new threeRuntime['DirectionalLight'](color, value55);
         }
       }
-      _0x4efd19['castShadow'] = _0x34edfd['castShadow'] === !![];
-      const _0x580a43 = new threeRuntime['Group']();
-      ((_0x580a43['name'] = 'storyboard3d-light-' + _0x34edfd['id']),
-        (_0x580a43['userData']['storyboardObjectId'] = _0x34edfd['id']),
-        _0x580a43['add'](_0x4efd19));
+      event2['castShadow'] = enabled8['castShadow'] === !![];
+      const group = new threeRuntime['Group']();
+      ((group['name'] = 'storyboard3d-light-' + enabled8['id']),
+        (group['userData']['storyboardObjectId'] = enabled8['id']),
+        group['add'](event2));
       if (
-        _0x34edfd['lightType'] === 'directional' ||
-        _0x34edfd['lightType'] === 'spot' ||
-        !_0x34edfd['lightType']
+        enabled8['lightType'] === 'directional' ||
+        enabled8['lightType'] === 'spot' ||
+        !enabled8['lightType']
       ) {
-        const _0x5add0f = new threeRuntime['Object3D']();
-        (_0x5add0f['position']['set'](0x0, 0x0, -0x1),
-          _0x580a43['add'](_0x5add0f),
-          (_0x4efd19['target'] = _0x5add0f));
+        const value56 = new threeRuntime['Object3D']();
+        (value56['position']['set'](0x0, 0x0, -0x1), group['add'](value56), (event2['target'] = value56));
       }
-      if (_0x34edfd['lightType'] !== 'ambient') {
-        const _0x2fa6ce = new threeRuntime['Mesh'](
+      if (enabled8['lightType'] !== 'ambient') {
+        const value57 = new threeRuntime['Mesh'](
           new threeRuntime['SphereGeometry'](0.12, 0xc, 0x8),
-          new threeRuntime['MeshBasicMaterial']({ color: _0x535139 }),
+          new threeRuntime['MeshBasicMaterial']({ color: color }),
         );
-        ((_0x2fa6ce['userData']['storyboardObjectId'] = _0x34edfd['id']), _0x580a43['add'](_0x2fa6ce));
+        ((value57['userData']['storyboardObjectId'] = enabled8['id']), group['add'](value57));
       }
-      (this['_applyImportedModelTransform'](_0x580a43, _0x34edfd['transform']),
-        this['bridge']['scene']['add'](_0x580a43),
-        this['lightRoots']['set'](_0x34edfd['id'], _0x580a43));
-      if (_0x34edfd['lightType'] !== 'ambient') {
-        this['bridge']['setObjectVisualOverride']?.('cube', _0x34edfd['id'], { group: _0x580a43 });
-        const _0x5be39e = this['bridge']['_cubeMap']?.['get']?.(_0x34edfd['id']);
-        if (_0x5be39e?.['group']) _0x5be39e['group']['visible'] = ![];
+      (this['_applyImportedModelTransform'](group, enabled8['transform']),
+        this['bridge']['scene']['add'](group),
+        this['lightRoots']['set'](enabled8['id'], group));
+      if (enabled8['lightType'] !== 'ambient') {
+        this['bridge']['setObjectVisualOverride']?.('cube', enabled8['id'], { group: group });
+        const value58 = this['bridge']['_cubeMap']?.['get']?.(enabled8['id']);
+        if (value58?.['group']) value58['group']['visible'] = ![];
       }
     }
     this['bridge']['requestRender']?.();
   }
   ['_syncBackgroundCameraLock']() {
-    const _0x2b2dba = normalizeStoryboard3DBackgroundCalibration(this['adapted']?.['scene']?.['background']);
-    if (_0x2b2dba['lockedCamera'] && _0x2b2dba['lockedCameraSnapshot']) {
-      const _0x2dadd3 = this['bridge']['renderer']?.['getSize']?.(new threeRuntime['Vector2']()),
-        _0x31e565 = Math['max'](
+    const args3 = normalizeStoryboard3DBackgroundCalibration(this['adapted']?.['scene']?.['background']);
+    if (args3['lockedCamera'] && args3['lockedCameraSnapshot']) {
+      const box16 = this['bridge']['renderer']?.['getSize']?.(new threeRuntime['Vector2']()),
+        value59 = Math['max'](
           0.1,
-          Number(_0x2dadd3?.['x']) / Math['max'](0x1, Number(_0x2dadd3?.['y'])) ||
-            _0x2b2dba['imageWidth'] / Math['max'](0x1, _0x2b2dba['imageHeight']) ||
+          Number(box16?.['x']) / Math['max'](0x1, Number(box16?.['y'])) ||
+            args3['imageWidth'] / Math['max'](0x1, args3['imageHeight']) ||
             0x10 / 0x9,
         );
       return (
         this['previewCamera']({
-          ..._0x2b2dba['lockedCameraSnapshot'],
-          fov: computeStoryboard3DVerticalFov(_0x2b2dba['horizontalFov'], _0x31e565),
+          ...args3['lockedCameraSnapshot'],
+          fov: computeStoryboard3DVerticalFov(args3['horizontalFov'], value59),
         }),
         (this['backgroundCameraLockApplied'] = !![]),
         !![]
@@ -627,10 +591,10 @@ export class Storyboard3DSceneRuntime {
     );
   }
   ['_syncFlatBackground']() {
-    const _0x3ac2ce = this['adapted']?.['scene']?.['background'],
-      _0x2c1a28 = String(_0x3ac2ce?.['imageUrl'] || '')['trim']();
-    this['bridge']['setGroundFillVisible']?.(!_0x2c1a28);
-    if (!_0x2c1a28) {
+    const value60 = this['adapted']?.['scene']?.['background'],
+      enabled9 = String(value60?.['imageUrl'] || '')['trim']();
+    this['bridge']['setGroundFillVisible']?.(!enabled9);
+    if (!enabled9) {
       this['backgroundTextureToken'] += 0x1;
       this['bridge']['scene']?.['background'] === this['backgroundTexture'] &&
         (this['bridge']['scene']['background'] = null);
@@ -639,82 +603,82 @@ export class Storyboard3DSceneRuntime {
         (this['backgroundTextureUrl'] = ''));
       return;
     }
-    const _0x58f852 = (_0x349db1) => {
-      const _0x1c6102 = Math['max'](0.1, Math['min'](0xa, Number(_0x3ac2ce['imageScale']) || 0x1)),
-        _0x15a1e6 = Math['max'](0x1, Number(this['adapted']?.['focalLength']) || 0x23),
-        _0xda44cb = (0x2 * Math['atan'](0x24 / (0x2 * _0x15a1e6)) * 0xb4) / Math['PI'],
-        _0x564af2 = this['bridge']['renderer']?.['getSize']?.(new threeRuntime['Vector2']()),
-        _0x5bd723 = Math['max'](
+    const run3 = (value61) => {
+      const value62 = Math['max'](0.1, Math['min'](0xa, Number(value60['imageScale']) || 0x1)),
+        value63 = Math['max'](0x1, Number(this['adapted']?.['focalLength']) || 0x23),
+        value64 = (0x2 * Math['atan'](0x24 / (0x2 * value63)) * 0xb4) / Math['PI'],
+        box17 = this['bridge']['renderer']?.['getSize']?.(new threeRuntime['Vector2']()),
+        value65 = Math['max'](
           0.1,
-          Number(_0x564af2?.['x']) / Math['max'](0x1, Number(_0x564af2?.['y'])) || 0x10 / 0x9,
+          Number(box17?.['x']) / Math['max'](0x1, Number(box17?.['y'])) || 0x10 / 0x9,
         ),
-        _0x201861 =
-          (0x2 * Math['atan'](Math['tan']((_0xda44cb * Math['PI']) / 0x168) / _0x5bd723) * 0xb4) / Math['PI'],
-        _0xb61429 = _0x3ac2ce['lockedCamera'] === !![] && _0x3ac2ce['lockedCameraSnapshot'],
-        _0x43e032 = Math['max'](
+        value66 =
+          (0x2 * Math['atan'](Math['tan']((value64 * Math['PI']) / 0x168) / value65) * 0xb4) / Math['PI'],
+        value67 = value60['lockedCamera'] === !![] && value60['lockedCameraSnapshot'],
+        value68 = Math['max'](
           0.01,
           Math['min'](
             0xa,
-            _0xb61429
-              ? 0x1 / _0x1c6102
-              : _0xda44cb / Math['max'](0x1, Number(_0x3ac2ce['horizontalFov']) || 0x3c) / _0x1c6102,
+            value67
+              ? 0x1 / value62
+              : value64 / Math['max'](0x1, Number(value60['horizontalFov']) || 0x3c) / value62,
           ),
         ),
-        _0x82cdd8 = Math['max'](
+        value69 = Math['max'](
           0.01,
           Math['min'](
             0xa,
-            _0xb61429
-              ? 0x1 / _0x1c6102
-              : _0x201861 / Math['max'](0x1, Number(_0x3ac2ce['verticalFov']) || _0x201861) / _0x1c6102,
+            value67
+              ? 0x1 / value62
+              : value66 / Math['max'](0x1, Number(value60['verticalFov']) || value66) / value62,
           ),
         ),
-        _0x1f67b2 = Array['isArray'](_0x3ac2ce['vanishingPoint']) ? _0x3ac2ce['vanishingPoint'] : [0.5, 0.5],
-        _0x3c293d = Array['isArray'](_0x3ac2ce['imageOffset']) ? _0x3ac2ce['imageOffset'] : [0x0, 0x0];
-      (_0x349db1['repeat']?.['set']?.(_0x43e032, _0x82cdd8),
-        _0x349db1['offset']?.['set']?.(
+        value70 = Array['isArray'](value60['vanishingPoint']) ? value60['vanishingPoint'] : [0.5, 0.5],
+        value71 = Array['isArray'](value60['imageOffset']) ? value60['imageOffset'] : [0x0, 0x0];
+      (value61['repeat']?.['set']?.(value68, value69),
+        value61['offset']?.['set']?.(
           0.5 -
-            _0x43e032 / 0x2 +
-            (Number(_0x3c293d[0x0]) || 0x0) +
-            (_0xb61429 ? 0x0 : 0.5 - (Number(_0x1f67b2[0x0]) || 0.5)),
+            value68 / 0x2 +
+            (Number(value71[0x0]) || 0x0) +
+            (value67 ? 0x0 : 0.5 - (Number(value70[0x0]) || 0.5)),
           0.5 -
-            _0x82cdd8 / 0x2 +
-            (Number(_0x3c293d[0x1]) || 0x0) +
-            (_0xb61429 ? 0x0 : 0.5 - (Number(_0x3ac2ce['horizonY']) || 0.5)),
+            value69 / 0x2 +
+            (Number(value71[0x1]) || 0x0) +
+            (value67 ? 0x0 : 0.5 - (Number(value60['horizonY']) || 0.5)),
         ),
-        (_0x349db1['needsUpdate'] = !![]),
-        (this['bridge']['scene']['background'] = _0x349db1),
+        (value61['needsUpdate'] = !![]),
+        (this['bridge']['scene']['background'] = value61),
         this['bridge']['requestRender']?.());
     };
-    if (_0x2c1a28 === this['backgroundTextureUrl'] && this['backgroundTexture']) {
-      _0x58f852(this['backgroundTexture']);
+    if (enabled9 === this['backgroundTextureUrl'] && this['backgroundTexture']) {
+      run3(this['backgroundTexture']);
       return;
     }
-    const _0x563659 = ++this['backgroundTextureToken'],
-      _0x311cad = new threeRuntime['TextureLoader']();
-    (_0x311cad['setCrossOrigin']?.('anonymous'),
-      _0x311cad['load'](
-        _0x2c1a28,
-        (_0x3d204e) => {
+    const value72 = ++this['backgroundTextureToken'],
+      value73 = new threeRuntime['TextureLoader']();
+    (value73['setCrossOrigin']?.('anonymous'),
+      value73['load'](
+        enabled9,
+        (background) => {
           void applyStoryboard3DTexturePolicy(
-            { background: _0x3d204e },
+            { background: background },
             { renderer: this['bridge']['renderer'] },
           )
             ['catch'](() => null)
             ['then'](() => {
-              if (_0x563659 !== this['backgroundTextureToken'] || this['disposed']) {
-                _0x3d204e['dispose']?.();
+              if (value72 !== this['backgroundTextureToken'] || this['disposed']) {
+                background['dispose']?.();
                 return;
               }
               (this['backgroundTexture']?.['dispose']?.(),
-                (this['backgroundTexture'] = _0x3d204e),
-                (this['backgroundTextureUrl'] = _0x2c1a28),
-                _0x58f852(_0x3d204e));
+                (this['backgroundTexture'] = background),
+                (this['backgroundTextureUrl'] = enabled9),
+                run3(background));
             });
         },
         undefined,
         () => {
-          _0x563659 === this['backgroundTextureToken'] &&
+          value72 === this['backgroundTextureToken'] &&
             ((this['backgroundTextureUrl'] = ''), this['bridge']['setGroundFillVisible']?.(!![]));
         },
       ));
@@ -723,140 +687,139 @@ export class Storyboard3DSceneRuntime {
     this['characterAnimationFrame'] != null &&
       (globalThis['cancelAnimationFrame']?.(this['characterAnimationFrame']),
       (this['characterAnimationFrame'] = null));
-    for (const _0x32f547 of this['adapted']?.['scene']?.['objects'] || []) {
-      if (_0x32f547['type'] === 'character') this['bridge']['clearDraftMannequinBonePose']?.(_0x32f547['id']);
+    for (const value74 of this['adapted']?.['scene']?.['objects'] || []) {
+      if (value74['type'] === 'character') this['bridge']['clearDraftMannequinBonePose']?.(value74['id']);
     }
   }
   ['_syncCharacterAnimation']() {
     this['_stopCharacterAnimation']();
     if (this['timelinePreviewActive']) return;
-    const _0x4e4580 = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
-      (_0x41d2dc) => _0x41d2dc['type'] === 'character' && _0x41d2dc['actionPlaying'] === !![],
+    const list13 = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
+      (value75) => value75['type'] === 'character' && value75['actionPlaying'] === !![],
     );
-    if (_0x4e4580['length'] === 0x0 || typeof globalThis['requestAnimationFrame'] !== 'function') return;
-    const _0x10a688 = globalThis['performance']?.['now']?.() || Date['now'](),
-      _0xdd1a99 = (_0x18633d) => {
+    if (list13['length'] === 0x0 || typeof globalThis['requestAnimationFrame'] !== 'function') return;
+    const value76 = globalThis['performance']?.['now']?.() || Date['now'](),
+      value77 = (value78) => {
         if (this['disposed']) return;
-        const _0x4f2b48 = Math['max'](0x0, ((Number(_0x18633d) || Date['now']()) - _0x10a688) / 0x3e8);
-        for (const _0x15adef of _0x4e4580) {
-          const _0x5b7d18 = resolveStoryboard3DCharacterPose({
-              ..._0x15adef,
-              actionTime: (Number(_0x15adef['actionTime']) || 0x0) + _0x4f2b48,
+        const value79 = Math['max'](0x0, ((Number(value78) || Date['now']()) - value76) / 0x3e8);
+        for (const args4 of list13) {
+          const storyboard3DCharacterPose = resolveStoryboard3DCharacterPose({
+              ...args4,
+              actionTime: (Number(args4['actionTime']) || 0x0) + value79,
             }),
-            _0x347f7c = Object['fromEntries'](
-              Object['entries'](_0x5b7d18['boneOverrides'] || {})['map'](([_0x24a97e, _0x27f115]) => [
-                _0x24a97e,
-                quaternionToStoryboard3DEuler(_0x27f115),
-              ]),
+            args5 = Object['fromEntries'](
+              Object['entries'](storyboard3DCharacterPose['boneOverrides'] || {})['map'](
+                ([value80, value81]) => [value80, quaternionToStoryboard3DEuler(value81)],
+              ),
             );
-          this['bridge']['setDraftMannequinBonePose']?.(_0x15adef['id'], {
-            ...(_0x5b7d18['baseBones'] || {}),
-            ...(_0x5b7d18['handRotations'] || {}),
-            ..._0x347f7c,
+          this['bridge']['setDraftMannequinBonePose']?.(args4['id'], {
+            ...(storyboard3DCharacterPose['baseBones'] || {}),
+            ...(storyboard3DCharacterPose['handRotations'] || {}),
+            ...args5,
           });
         }
         (this['bridge']['requestRender']?.(),
-          (this['characterAnimationFrame'] = globalThis['requestAnimationFrame'](_0xdd1a99)));
+          (this['characterAnimationFrame'] = globalThis['requestAnimationFrame'](value77)));
       };
-    this['characterAnimationFrame'] = globalThis['requestAnimationFrame'](_0xdd1a99);
+    this['characterAnimationFrame'] = globalThis['requestAnimationFrame'](value77);
   }
   ['_syncImportedModels']() {
     this['_clearImportedModels']();
     if (!this['importedModelResolver'] || !this['bridge']['scene']) return;
-    const _0x35c5a9 = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
-        (_0x5b1b0b) => _0x5b1b0b['type'] === 'prop' && _0x5b1b0b['visible'] !== ![],
+    const list14 = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
+        (value82) => value82['type'] === 'prop' && value82['visible'] !== ![],
       ),
-      _0x39f36c = new Map();
-    _0x35c5a9['forEach']((_0x39b7d2) => {
-      const _0x5938e7 = [
-        _0x39b7d2['assetId'],
-        _0x39b7d2['tint'] || '',
-        _0x39b7d2['castShadow'] !== ![] ? 'cast' : 'no-cast',
-        _0x39b7d2['receiveShadow'] !== ![] ? 'receive' : 'no-receive',
+      map3 = new Map();
+    list14['forEach']((value83) => {
+      const value84 = [
+        value83['assetId'],
+        value83['tint'] || '',
+        value83['castShadow'] !== ![] ? 'cast' : 'no-cast',
+        value83['receiveShadow'] !== ![] ? 'receive' : 'no-receive',
       ]['join']('|');
-      if (!_0x39f36c['has'](_0x5938e7)) _0x39f36c['set'](_0x5938e7, []);
-      _0x39f36c['get'](_0x5938e7)['push'](_0x39b7d2);
+      if (!map3['has'](value84)) map3['set'](value84, []);
+      map3['get'](value84)['push'](value83);
     });
-    const _0x5da21e = new Set();
-    for (const [_0x120a86, _0x48bcab] of _0x39f36c) {
-      if (_0x48bcab['length'] < STORYBOARD_3D_INSTANCE_BATCH_MIN_COUNT) continue;
-      const _0x2529ed = this['importedModelResolver'](_0x48bcab[0x0]['assetId']),
-        _0x51025d = applyImportedNormalizationToTemplate(
-          findStoryboard3DInstancingTemplate(_0x2529ed),
-          _0x2529ed,
-        );
-      if (!_0x51025d) continue;
-      const _0x266379 = createStoryboard3DInstanceBatch({
-        template: _0x51025d,
-        objects: _0x48bcab,
-        tint: _0x48bcab[0x0]['tint'] || '',
-        castShadow: _0x48bcab[0x0]['castShadow'] !== ![],
-        receiveShadow: _0x48bcab[0x0]['receiveShadow'] !== ![],
+    const map4 = new Set();
+    for (const [value85, objects] of map3) {
+      if (objects['length'] < STORYBOARD_3D_INSTANCE_BATCH_MIN_COUNT) continue;
+      const value86 = this['importedModelResolver'](objects[0x0]['assetId']),
+        template = applyImportedNormalizationToTemplate(findStoryboard3DInstancingTemplate(value86), value86);
+      if (!template) continue;
+      const storyboard3DInstanceBatch = createStoryboard3DInstanceBatch({
+        template: template,
+        objects: objects,
+        tint: objects[0x0]['tint'] || '',
+        castShadow: objects[0x0]['castShadow'] !== ![],
+        receiveShadow: objects[0x0]['receiveShadow'] !== ![],
       });
-      ((_0x266379['mesh']['name'] = 'storyboard3d-instances-' + _0x48bcab[0x0]['assetId']),
-        this['bridge']['scene']['add'](_0x266379['mesh']),
-        this['importedInstanceBatches']['set'](_0x120a86, _0x266379),
-        _0x48bcab['forEach']((_0x348b95) => {
-          (_0x5da21e['add'](_0x348b95['id']),
-            this['importedInstanceByObjectId']['set'](_0x348b95['id'], _0x266379),
-            this['_syncImportedInstanceVisual'](_0x348b95, _0x266379, _0x348b95['transform']));
-          const _0x3da4fb = this['bridge']['_cubeMap']?.['get']?.(_0x348b95['id']);
-          if (_0x3da4fb?.['group']) _0x3da4fb['group']['visible'] = ![];
+      ((storyboard3DInstanceBatch['mesh']['name'] = 'storyboard3d-instances-' + objects[0x0]['assetId']),
+        this['bridge']['scene']['add'](storyboard3DInstanceBatch['mesh']),
+        this['importedInstanceBatches']['set'](value85, storyboard3DInstanceBatch),
+        objects['forEach']((value87) => {
+          (map4['add'](value87['id']),
+            this['importedInstanceByObjectId']['set'](value87['id'], storyboard3DInstanceBatch),
+            this['_syncImportedInstanceVisual'](value87, storyboard3DInstanceBatch, value87['transform']));
+          const value88 = this['bridge']['_cubeMap']?.['get']?.(value87['id']);
+          if (value88?.['group']) value88['group']['visible'] = ![];
         }));
     }
-    for (const _0x4b1e9e of _0x35c5a9) {
-      if (_0x5da21e['has'](_0x4b1e9e['id'])) continue;
-      const _0x5a3692 = this['importedModelResolver'](_0x4b1e9e['assetId']);
-      if (!_0x5a3692?.['clone']) continue;
-      const _0x5498f4 = new threeRuntime['Group']();
-      ((_0x5498f4['name'] = 'storyboard3d-imported-' + _0x4b1e9e['id']),
-        (_0x5498f4['userData'] = { ...(_0x5498f4['userData'] || {}), storyboardObjectId: _0x4b1e9e['id'] }),
-        _0x5498f4['add'](createImportedModelNormalizationRoot(_0x5a3692)));
-      const _0x2b145d = [];
-      (_0x5498f4['traverse']?.((_0x39872e) => {
-        if (!_0x39872e?.['isMesh']) return;
-        ((_0x39872e['castShadow'] = _0x4b1e9e['castShadow'] !== ![]),
-          (_0x39872e['receiveShadow'] = _0x4b1e9e['receiveShadow'] !== ![]));
-        if (!_0x4b1e9e['tint'] || !_0x39872e['material']) return;
-        const _0x8a2cbf = Array['isArray'](_0x39872e['material'])
-            ? _0x39872e['material']
-            : [_0x39872e['material']],
-          _0x12e795 = _0x8a2cbf['map']((_0x365c23) => {
-            const _0x1ffa32 = _0x365c23?.['clone']?.() || _0x365c23;
-            if (_0x1ffa32 !== _0x365c23) _0x2b145d['push'](_0x1ffa32);
-            return (_0x1ffa32?.['color']?.['set']?.(_0x4b1e9e['tint']), _0x1ffa32);
+    for (const storyboardObjectId of list14) {
+      if (map4['has'](storyboardObjectId['id'])) continue;
+      const enabled10 = this['importedModelResolver'](storyboardObjectId['assetId']);
+      if (!enabled10?.['clone']) continue;
+      const group2 = new threeRuntime['Group']();
+      ((group2['name'] = 'storyboard3d-imported-' + storyboardObjectId['id']),
+        (group2['userData'] = {
+          ...(group2['userData'] || {}),
+          storyboardObjectId: storyboardObjectId['id'],
+        }),
+        group2['add'](createImportedModelNormalizationRoot(enabled10)));
+      const list15 = [];
+      (group2['traverse']?.((enabled11) => {
+        if (!enabled11?.['isMesh']) return;
+        ((enabled11['castShadow'] = storyboardObjectId['castShadow'] !== ![]),
+          (enabled11['receiveShadow'] = storyboardObjectId['receiveShadow'] !== ![]));
+        if (!storyboardObjectId['tint'] || !enabled11['material']) return;
+        const list16 = Array['isArray'](enabled11['material'])
+            ? enabled11['material']
+            : [enabled11['material']],
+          value89 = list16['map']((value90) => {
+            const value91 = value90?.['clone']?.() || value90;
+            if (value91 !== value90) list15['push'](value91);
+            return (value91?.['color']?.['set']?.(storyboardObjectId['tint']), value91);
           });
-        _0x39872e['material'] = Array['isArray'](_0x39872e['material']) ? _0x12e795 : _0x12e795[0x0];
+        enabled11['material'] = Array['isArray'](enabled11['material']) ? value89 : value89[0x0];
       }),
-        (_0x5498f4['userData']['storyboardOwnedMaterials'] = _0x2b145d),
-        this['_applyImportedModelTransform'](_0x5498f4, _0x4b1e9e['transform']),
-        this['bridge']['scene']['add'](_0x5498f4),
-        this['importedModelRoots']['set'](_0x4b1e9e['id'], _0x5498f4),
-        this['bridge']['setObjectVisualOverride']?.('cube', _0x4b1e9e['id'], { group: _0x5498f4 }));
-      const _0xf00471 = this['bridge']['_cubeMap']?.['get']?.(_0x4b1e9e['id']);
-      if (_0xf00471?.['group']) _0xf00471['group']['visible'] = ![];
+        (group2['userData']['storyboardOwnedMaterials'] = list15),
+        this['_applyImportedModelTransform'](group2, storyboardObjectId['transform']),
+        this['bridge']['scene']['add'](group2),
+        this['importedModelRoots']['set'](storyboardObjectId['id'], group2),
+        this['bridge']['setObjectVisualOverride']?.('cube', storyboardObjectId['id'], { group: group2 }));
+      const value92 = this['bridge']['_cubeMap']?.['get']?.(storyboardObjectId['id']);
+      if (value92?.['group']) value92['group']['visible'] = ![];
     }
     this['bridge']['requestRender']?.();
   }
-  ['_syncImportedInstanceVisual'](_0x531415, _0x444cc0, _0x4609fd) {
-    const _0x3680d1 = _0x444cc0?.['mesh']?.['geometry'];
-    if (!_0x531415?.['id'] || !_0x3680d1 || !_0x444cc0?.['mesh']?.['getMatrixAt']) return;
-    _0x3680d1['computeBoundingBox']?.();
-    if (!_0x3680d1['boundingBox'] || _0x3680d1['boundingBox']['isEmpty']()) return;
-    let _0x239ec7 = this['importedModelVisuals']['get'](_0x531415['id']);
-    !_0x239ec7 &&
-      ((_0x239ec7 = { group: new threeRuntime['Group'](), boundsBox: new threeRuntime['Box3']() }),
-      this['importedModelVisuals']['set'](_0x531415['id'], _0x239ec7));
-    this['_applyImportedModelTransform'](_0x239ec7['group'], _0x4609fd);
-    const _0x168cae = _0x444cc0['objectIds']['indexOf'](_0x531415['id']);
-    if (_0x168cae < 0x0) return;
-    const _0x1fa271 = new threeRuntime['Matrix4']();
-    (_0x444cc0['mesh']['getMatrixAt'](_0x168cae, _0x1fa271), _0x444cc0['mesh']['updateMatrixWorld']?.(!![]));
-    const _0x400a58 = _0x444cc0['mesh']['matrixWorld']['clone']()['multiply'](_0x1fa271);
-    (_0x239ec7['boundsBox']['copy'](_0x3680d1['boundingBox'])['applyMatrix4'](_0x400a58),
-      this['bridge']['setObjectVisualOverride']?.('cube', _0x531415['id'], _0x239ec7));
+  ['_syncImportedInstanceVisual'](enabled12, enabled13, value93) {
+    const enabled14 = enabled13?.['mesh']?.['geometry'];
+    if (!enabled12?.['id'] || !enabled14 || !enabled13?.['mesh']?.['getMatrixAt']) return;
+    enabled14['computeBoundingBox']?.();
+    if (!enabled14['boundingBox'] || enabled14['boundingBox']['isEmpty']()) return;
+    let enabled15 = this['importedModelVisuals']['get'](enabled12['id']);
+    !enabled15 &&
+      ((enabled15 = { group: new threeRuntime['Group'](), boundsBox: new threeRuntime['Box3']() }),
+      this['importedModelVisuals']['set'](enabled12['id'], enabled15));
+    this['_applyImportedModelTransform'](enabled15['group'], value93);
+    const count4 = enabled13['objectIds']['indexOf'](enabled12['id']);
+    if (count4 < 0x0) return;
+    const value94 = new threeRuntime['Matrix4']();
+    (enabled13['mesh']['getMatrixAt'](count4, value94), enabled13['mesh']['updateMatrixWorld']?.(!![]));
+    const value95 = enabled13['mesh']['matrixWorld']['clone']()['multiply'](value94);
+    (enabled15['boundsBox']['copy'](enabled14['boundingBox'])['applyMatrix4'](value95),
+      this['bridge']['setObjectVisualOverride']?.('cube', enabled12['id'], enabled15));
   }
-  ['_pickImportedModel'](_0x216111, _0x479242) {
+  ['_pickImportedModel'](value96, value97) {
     if (
       this['importedModelRoots']['size'] === 0x0 &&
       this['importedInstanceBatches']['size'] === 0x0 &&
@@ -864,242 +827,257 @@ export class Storyboard3DSceneRuntime {
     )
       return null;
     if (!this['bridge']['camera']) return null;
-    const _0x2d0f7d =
+    const box18 =
       this['bridge']['renderer']?.['domElement']?.['getBoundingClientRect']?.() ||
       this['container']?.['getBoundingClientRect']?.();
-    if (!_0x2d0f7d?.['width'] || !_0x2d0f7d?.['height']) return null;
-    const _0x4df800 = new threeRuntime['Raycaster']();
-    _0x4df800['setFromCamera'](
+    if (!box18?.['width'] || !box18?.['height']) return null;
+    const value98 = new threeRuntime['Raycaster']();
+    value98['setFromCamera'](
       {
-        x: ((_0x216111 - _0x2d0f7d['left']) / _0x2d0f7d['width']) * 0x2 - 0x1,
-        y: -((_0x479242 - _0x2d0f7d['top']) / _0x2d0f7d['height']) * 0x2 + 0x1,
+        x: ((value96 - box18['left']) / box18['width']) * 0x2 - 0x1,
+        y: -((value97 - box18['top']) / box18['height']) * 0x2 + 0x1,
       },
       this['bridge']['camera'],
     );
-    let _0x135443 = null;
-    for (const [_0x1186a9, _0x36c1ef] of [...this['importedModelRoots'], ...this['lightRoots']]) {
-      const _0x34ac9d = _0x4df800['intersectObject'](_0x36c1ef, !![])[0x0];
-      if (_0x34ac9d && (!_0x135443 || _0x34ac9d['distance'] < _0x135443['distance']))
-        _0x135443 = { ..._0x34ac9d, objectId: _0x1186a9 };
+    let objectId2 = null;
+    for (const [objectId3, value99] of [...this['importedModelRoots'], ...this['lightRoots']]) {
+      const args6 = value98['intersectObject'](value99, !![])[0x0];
+      if (args6 && (!objectId2 || args6['distance'] < objectId2['distance']))
+        objectId2 = { ...args6, objectId: objectId3 };
     }
-    for (const _0x300e07 of this['importedInstanceBatches']['values']()) {
-      const _0x4ea42e = _0x4df800['intersectObject'](_0x300e07['mesh'], ![])[0x0],
-        _0x5ed369 = Number['isInteger'](_0x4ea42e?.['instanceId'])
-          ? _0x300e07['objectIds'][_0x4ea42e['instanceId']]
+    for (const value100 of this['importedInstanceBatches']['values']()) {
+      const args7 = value98['intersectObject'](value100['mesh'], ![])[0x0],
+        objectId4 = Number['isInteger'](args7?.['instanceId'])
+          ? value100['objectIds'][args7['instanceId']]
           : null;
-      _0x5ed369 &&
-        (!_0x135443 || _0x4ea42e['distance'] < _0x135443['distance']) &&
-        (_0x135443 = { ..._0x4ea42e, objectId: _0x5ed369 });
+      objectId4 &&
+        (!objectId2 || args7['distance'] < objectId2['distance']) &&
+        (objectId2 = { ...args7, objectId: objectId4 });
     }
-    return _0x135443
+    return objectId2
       ? {
           objectType: 'cube',
-          objectId: _0x135443['objectId'],
-          point: _0x135443['point'],
-          distance: _0x135443['distance'],
+          objectId: objectId2['objectId'],
+          point: objectId2['point'],
+          distance: objectId2['distance'],
         }
       : null;
   }
-  ['_syncInteractionState'](_0xec4f58) {
+  ['_syncInteractionState'](value101) {
     if (!this['adapted']) return this['sync']();
-    const _0x22715e = TRANSFORM_TOOLS['has'](this['activeTool']) ? this['activeTool'] : 'move';
+    const transformTool2 = TRANSFORM_TOOLS['has'](this['activeTool']) ? this['activeTool'] : 'move';
     return (
       (this['adapted'] = {
         ...this['adapted'],
         state: {
           ...this['adapted']['state'],
           selection: createSelection(this['adapted']['scene'], this['selectedObjectIds'], this['activeTool']),
-          ui: { ...this['adapted']['state']['ui'], transformTool: _0x22715e, activeTool: _0x22715e },
+          ui: {
+            ...this['adapted']['state']['ui'],
+            transformTool: transformTool2,
+            activeTool: transformTool2,
+          },
         },
       }),
       this['directorScene']['prepareMaterials'](),
       this['bridge']['sync'](this['adapted']['state']),
-      this['_notifyVisualChange'](_0xec4f58),
+      this['_notifyVisualChange'](value101),
       this['getSnapshot']()
     );
   }
-  ['setSelection'](_0x48f595) {
+  ['setSelection'](args8) {
     return (
-      (this['selectedObjectIds'] = Array['isArray'](_0x48f595) ? [..._0x48f595] : []),
+      (this['selectedObjectIds'] = Array['isArray'](args8) ? [...args8] : []),
       this['_syncInteractionState']('set-selection')
     );
   }
-  ['setActiveTool'](_0x52428d) {
-    return ((this['activeTool'] = _0x52428d), this['_syncInteractionState']('set-active-tool'));
+  ['setActiveTool'](value102) {
+    return ((this['activeTool'] = value102), this['_syncInteractionState']('set-active-tool'));
   }
-  ['pick'](_0x2aabf7, _0x527fec) {
-    const _0x497747 = this['_pickImportedModel'](_0x2aabf7, _0x527fec),
-      _0x5f5215 = this['bridge']['pick']?.(_0x2aabf7, _0x527fec) || null,
-      _0x1b7a7d =
-        _0x5f5215?.['point'] && this['bridge']['camera']?.['position']
-          ? this['bridge']['camera']['position']['distanceTo']?.(_0x5f5215['point'])
+  ['pick'](value103, value104) {
+    const value105 = this['_pickImportedModel'](value103, value104),
+      value106 = this['bridge']['pick']?.(value103, value104) || null,
+      value107 =
+        value106?.['point'] && this['bridge']['camera']?.['position']
+          ? this['bridge']['camera']['position']['distanceTo']?.(value106['point'])
           : Number['POSITIVE_INFINITY'],
-      _0x36935a = _0x497747 && _0x497747['distance'] <= _0x1b7a7d ? _0x497747 : _0x5f5215 || _0x497747;
-    if (!_0x36935a) return null;
-    const _0x1c5bef = this['adapted']?.['scene']?.['objects']?.['find'](
-      (_0xeccbfd) => _0xeccbfd['id'] === _0x36935a['objectId'],
+      args9 = value105 && value105['distance'] <= value107 ? value105 : value106 || value105;
+    if (!args9) return null;
+    const storyboardObjectId2 = this['adapted']?.['scene']?.['objects']?.['find'](
+      (value108) => value108['id'] === args9['objectId'],
     );
-    if (!_0x1c5bef || _0x1c5bef['visible'] === ![] || _0x1c5bef['locked'] === !![]) return null;
-    return { ..._0x36935a, storyboardObjectId: _0x1c5bef['id'], storyboardObjectType: _0x1c5bef['type'] };
+    if (
+      !storyboardObjectId2 ||
+      storyboardObjectId2['visible'] === ![] ||
+      storyboardObjectId2['locked'] === !![]
+    )
+      return null;
+    return {
+      ...args9,
+      storyboardObjectId: storyboardObjectId2['id'],
+      storyboardObjectType: storyboardObjectId2['type'],
+    };
   }
-  ['pickObjectsInRect'](_0x437d51) {
-    const _0x4ef1f5 = this['bridge']['pickObjectsInRect']?.(_0x437d51) || [],
-      _0x60998d = new Set(
+  ['pickObjectsInRect'](value109) {
+    const list17 = this['bridge']['pickObjectsInRect']?.(value109) || [],
+      map5 = new Set(
         (this['adapted']?.['scene']?.['objects'] || [])
-          ['filter']((_0x25f300) => _0x25f300['visible'] !== ![] && _0x25f300['locked'] !== !![])
-          ['map']((_0x3d992e) => _0x3d992e['id']),
+          ['filter']((value110) => value110['visible'] !== ![] && value110['locked'] !== !![])
+          ['map']((value111) => value111['id']),
       );
-    return _0x4ef1f5['filter']((_0x31e734) => _0x60998d['has'](_0x31e734['objectId']));
+    return list17['filter']((value112) => map5['has'](value112['objectId']));
   }
-  ['resolveDollyAnchor'](_0x4fbabe, _0x1006b3) {
-    return this['bridge']['resolveDollyAnchor']?.(_0x4fbabe, _0x1006b3) || null;
+  ['resolveDollyAnchor'](value113, value114) {
+    return this['bridge']['resolveDollyAnchor']?.(value113, value114) || null;
   }
-  ['resolveGroundPosition'](_0x57095a, _0x4b76f3, _0x3ca1e7 = 0x0) {
-    const _0x401b1e = this['bridge']['camera'],
-      _0x421768 =
+  ['resolveGroundPosition'](value115, value116, value117 = 0x0) {
+    const enabled16 = this['bridge']['camera'],
+      box19 =
         this['bridge']['renderer']?.['domElement']?.['getBoundingClientRect']?.() ||
         this['container']?.['getBoundingClientRect']?.();
-    if (!_0x401b1e || !_0x421768?.['width'] || !_0x421768?.['height']) return null;
-    _0x401b1e['updateMatrixWorld']?.();
-    const _0x5bb44e = new threeRuntime['Raycaster']();
-    _0x5bb44e['setFromCamera'](
+    if (!enabled16 || !box19?.['width'] || !box19?.['height']) return null;
+    enabled16['updateMatrixWorld']?.();
+    const enabled17 = new threeRuntime['Raycaster']();
+    enabled17['setFromCamera'](
       {
-        x: ((finiteNumber(_0x57095a) - _0x421768['left']) / _0x421768['width']) * 0x2 - 0x1,
-        y: -((finiteNumber(_0x4b76f3) - _0x421768['top']) / _0x421768['height']) * 0x2 + 0x1,
+        x: ((finiteNumber(value115) - box19['left']) / box19['width']) * 0x2 - 0x1,
+        y: -((finiteNumber(value116) - box19['top']) / box19['height']) * 0x2 + 0x1,
       },
-      _0x401b1e,
+      enabled16,
     );
-    const _0x243e1a = new threeRuntime['Vector3'](),
-      _0x526ef1 = new threeRuntime['Plane'](
+    const box20 = new threeRuntime['Vector3'](),
+      value118 = new threeRuntime['Plane'](
         new threeRuntime['Vector3'](0x0, 0x1, 0x0),
-        -finiteNumber(_0x3ca1e7),
+        -finiteNumber(value117),
       );
-    if (!_0x5bb44e['ray']['intersectPlane'](_0x526ef1, _0x243e1a)) return null;
-    if (_0x243e1a['distanceTo'](_0x401b1e['position']) > 0x2710) return null;
-    return [_0x243e1a['x'], finiteNumber(_0x3ca1e7), _0x243e1a['z']];
+    if (!enabled17['ray']['intersectPlane'](value118, box20)) return null;
+    if (box20['distanceTo'](enabled16['position']) > 0x2710) return null;
+    return [box20['x'], finiteNumber(value117), box20['z']];
   }
-  ['resolveViewportGroundPosition'](_0xa3ccc2 = 0x0) {
-    const _0x52de45 =
+  ['resolveViewportGroundPosition'](value119 = 0x0) {
+    const box21 =
       this['bridge']['renderer']?.['domElement']?.['getBoundingClientRect']?.() ||
       this['container']?.['getBoundingClientRect']?.();
-    if (!_0x52de45?.['width'] || !_0x52de45?.['height']) return null;
+    if (!box21?.['width'] || !box21?.['height']) return null;
     return this['resolveGroundPosition'](
-      _0x52de45['left'] + _0x52de45['width'] / 0x2,
-      _0x52de45['top'] + _0x52de45['height'] / 0x2,
-      _0xa3ccc2,
+      box21['left'] + box21['width'] / 0x2,
+      box21['top'] + box21['height'] / 0x2,
+      value119,
     );
   }
-  ['resolveObjectGroundPosition'](_0x1011df) {
-    const _0x3053db = this['adapted']?.['scene']?.['objects']?.['find'](
-      (_0x1e4b3c) => _0x1e4b3c['id'] === _0x1011df,
+  ['resolveObjectGroundPosition'](value120) {
+    const enabled18 = this['adapted']?.['scene']?.['objects']?.['find'](
+      (value121) => value121['id'] === value120,
     );
-    if (!_0x3053db || !getStoryboard3DObjectTransformCapabilities(_0x3053db)['groundSnap']) return null;
-    const _0x38911d = this['importedModelVisuals']['get'](_0x3053db['id']),
-      _0xab705b = this['importedModelRoots']['get'](_0x3053db['id']),
-      _0x5c3700 =
-        _0x3053db['type'] === 'character'
-          ? this['bridge']['_mannequinMap']?.['get']?.(_0x3053db['id'])
-          : this['bridge']['_cubeMap']?.['get']?.(_0x3053db['id']);
-    let _0x9b2431 =
-      _0x38911d?.['boundsBox']?.['isBox3'] && !_0x38911d['boundsBox']['isEmpty']()
-        ? _0x38911d['boundsBox']['clone']()
+    if (!enabled18 || !getStoryboard3DObjectTransformCapabilities(enabled18)['groundSnap']) return null;
+    const enabled19 = this['importedModelVisuals']['get'](enabled18['id']),
+      value122 = this['importedModelRoots']['get'](enabled18['id']),
+      value123 =
+        enabled18['type'] === 'character'
+          ? this['bridge']['_mannequinMap']?.['get']?.(enabled18['id'])
+          : this['bridge']['_cubeMap']?.['get']?.(enabled18['id']);
+    let enabled20 =
+      enabled19?.['boundsBox']?.['isBox3'] && !enabled19['boundsBox']['isEmpty']()
+        ? enabled19['boundsBox']['clone']()
         : null;
-    const _0x12f4f1 = _0xab705b || _0x5c3700?.['proxyRoot'] || _0x5c3700?.['group'];
-    if (!_0x9b2431 && _0x12f4f1) {
-      _0x12f4f1['updateMatrixWorld']?.(!![]);
-      const _0x3483ec = new threeRuntime['Box3']()['setFromObject'](_0x12f4f1);
-      if (!_0x3483ec['isEmpty']()) _0x9b2431 = _0x3483ec;
+    const value124 = value122 || value123?.['proxyRoot'] || value123?.['group'];
+    if (!enabled20 && value124) {
+      value124['updateMatrixWorld']?.(!![]);
+      const enabled21 = new threeRuntime['Box3']()['setFromObject'](value124);
+      if (!enabled21['isEmpty']()) enabled20 = enabled21;
     }
-    if (!_0x9b2431 || !Number['isFinite'](_0x9b2431['min']['y'])) return null;
-    const _0x5ae13a = finiteNumber(_0x3053db['transform']?.['position']?.[0x1]);
-    return _0x5ae13a - _0x9b2431['min']['y'];
+    if (!enabled20 || !Number['isFinite'](enabled20['min']['y'])) return null;
+    const finiteNumber2 = finiteNumber(enabled18['transform']?.['position']?.[0x1]);
+    return finiteNumber2 - enabled20['min']['y'];
   }
-  ['resolveObjectGroundPositions'](_0x39169f) {
+  ['resolveObjectGroundPositions'](value125) {
     return Object['fromEntries'](
-      (Array['isArray'](_0x39169f) ? _0x39169f : [])
-        ['map']((_0x4ce15c) => [_0x4ce15c, this['resolveObjectGroundPosition'](_0x4ce15c)])
-        ['filter'](([, _0x2d7450]) => Number['isFinite'](_0x2d7450)),
+      (Array['isArray'](value125) ? value125 : [])
+        ['map']((value126) => [value126, this['resolveObjectGroundPosition'](value126)])
+        ['filter'](([, value127]) => Number['isFinite'](value127)),
     );
   }
-  ['previewObjectTransform'](_0x43a074, _0x2f17e3) {
-    return this['previewObjectTransforms']({ [_0x43a074]: _0x2f17e3 });
+  ['previewObjectTransform'](value128, value129) {
+    return this['previewObjectTransforms']({ [value128]: value129 });
   }
-  ['previewTimelineSample'](_0x566a11) {
-    if (!_0x566a11) return ![];
+  ['previewTimelineSample'](args10) {
+    if (!args10) return ![];
     if (!this['timelinePreviewActive']) this['_stopCharacterAnimation']();
     this['timelinePreviewActive'] = !![];
-    if (_0x566a11['camera']) this['previewCamera'](_0x566a11['camera']);
-    const _0x747fb4 = new Set(Object['keys'](_0x566a11['objectTransforms'] || {}));
-    for (const _0x941f0f of this['timelinePreviewObjectIds']) {
-      if (!_0x747fb4['has'](_0x941f0f)) this['clearObjectTransformPreview'](_0x941f0f);
+    if (args10['camera']) this['previewCamera'](args10['camera']);
+    const map6 = new Set(Object['keys'](args10['objectTransforms'] || {}));
+    for (const value130 of this['timelinePreviewObjectIds']) {
+      if (!map6['has'](value130)) this['clearObjectTransformPreview'](value130);
     }
-    ((this['timelinePreviewObjectIds'] = _0x747fb4),
-      this['previewObjectTransforms'](_0x566a11['objectTransforms'] || {}, { includeLocked: !![] }));
-    for (const _0x4989d6 of this['adapted']?.['scene']?.['objects'] || []) {
-      if (_0x4989d6['type'] !== 'character') continue;
-      const _0x142552 = resolveStoryboard3DCharacterPose({
-        ..._0x4989d6,
-        ..._0x566a11['characterActions']?.[_0x4989d6['id']],
+    ((this['timelinePreviewObjectIds'] = map6),
+      this['previewObjectTransforms'](args10['objectTransforms'] || {}, { includeLocked: !![] }));
+    for (const args11 of this['adapted']?.['scene']?.['objects'] || []) {
+      if (args11['type'] !== 'character') continue;
+      const args12 = resolveStoryboard3DCharacterPose({
+        ...args11,
+        ...args10['characterActions']?.[args11['id']],
       });
-      this['bridge']['setDraftMannequinBonePose']?.(_0x4989d6['id'], {
-        ..._0x142552['baseBones'],
-        ..._0x142552['handRotations'],
+      this['bridge']['setDraftMannequinBonePose']?.(args11['id'], {
+        ...args12['baseBones'],
+        ...args12['handRotations'],
         ...Object['fromEntries'](
-          Object['entries'](_0x142552['boneOverrides'] || {})['map'](([_0x1db37, _0x4d1b39]) => [
-            _0x1db37,
-            quaternionToStoryboard3DEuler(_0x4d1b39),
+          Object['entries'](args12['boneOverrides'] || {})['map'](([value131, value132]) => [
+            value131,
+            quaternionToStoryboard3DEuler(value132),
           ]),
         ),
       });
     }
     return (this['bridge']['requestRender']?.(), !![]);
   }
-  ['previewObjectTransforms'](_0x2af581 = {}, { includeLocked: includeLocked = ![] } = {}) {
-    const _0x224107 = new Set();
-    let _0x4eac62 = ![];
-    (Object['entries'](_0x2af581)['forEach'](([_0x4943a7, _0x46008b]) => {
-      const _0x3fca35 = this['adapted']?.['scene']?.['objects']?.['find'](
-          (_0x40d09b) => _0x40d09b['id'] === _0x4943a7,
+  ['previewObjectTransforms'](options2 = {}, { includeLocked: includeLocked = ![] } = {}) {
+    const list18 = new Set();
+    let value133 = ![];
+    (Object['entries'](options2)['forEach'](([value134, value135]) => {
+      const value136 = this['adapted']?.['scene']?.['objects']?.['find'](
+          (value137) => value137['id'] === value134,
         ),
-        _0x135433 = bridgeObjectType(_0x3fca35),
-        _0x4d790b =
-          this['importedModelRoots']['get'](_0x3fca35?.['id']) ||
-          this['lightRoots']['get'](_0x3fca35?.['id']),
-        _0x312c01 = this['importedInstanceByObjectId']['get'](_0x3fca35?.['id']);
-      if ((!_0x135433 && !_0x4d790b && !_0x312c01) || (!includeLocked && _0x3fca35?.['locked'] === !![]))
+        bridgeObjectType2 = bridgeObjectType(value136),
+        enabled22 =
+          this['importedModelRoots']['get'](value136?.['id']) || this['lightRoots']['get'](value136?.['id']),
+        enabled23 = this['importedInstanceByObjectId']['get'](value136?.['id']);
+      if (
+        (!bridgeObjectType2 && !enabled22 && !enabled23) ||
+        (!includeLocked && value136?.['locked'] === !![])
+      )
         return;
-      if (_0x135433)
+      if (bridgeObjectType2)
         this['bridge']['setDraftObjectTransform']?.(
-          _0x135433,
-          _0x3fca35['id'],
-          transformToBridgePose(_0x46008b),
+          bridgeObjectType2,
+          value136['id'],
+          transformToBridgePose(value135),
         );
-      if (_0x4d790b) this['_applyImportedModelTransform'](_0x4d790b, _0x46008b);
-      (_0x312c01 &&
-        (updateStoryboard3DInstanceTransform(_0x312c01, _0x3fca35['id'], _0x46008b, { recomputeBounds: ![] }),
-        _0x224107['add'](_0x312c01),
-        this['_syncImportedInstanceVisual'](_0x3fca35, _0x312c01, _0x46008b)),
-        (_0x4eac62 = !![]));
+      if (enabled22) this['_applyImportedModelTransform'](enabled22, value135);
+      (enabled23 &&
+        (updateStoryboard3DInstanceTransform(enabled23, value136['id'], value135, { recomputeBounds: ![] }),
+        list18['add'](enabled23),
+        this['_syncImportedInstanceVisual'](value136, enabled23, value135)),
+        (value133 = !![]));
     }),
-      _0x224107['forEach']((_0x3d7c8b) => refreshStoryboard3DInstanceBatchBounds(_0x3d7c8b)));
-    if (_0x4eac62) this['_notifyVisualChange']('preview-object-transform');
-    return _0x4eac62;
+      list18['forEach']((value138) => refreshStoryboard3DInstanceBatchBounds(value138)));
+    if (value133) this['_notifyVisualChange']('preview-object-transform');
+    return value133;
   }
-  ['clearObjectTransformPreview'](_0x380153) {
-    const _0x5f480e = this['adapted']?.['scene']?.['objects']?.['find'](
-        (_0x20d4b3) => _0x20d4b3['id'] === _0x380153,
+  ['clearObjectTransformPreview'](value139) {
+    const value140 = this['adapted']?.['scene']?.['objects']?.['find'](
+        (value141) => value141['id'] === value139,
       ),
-      _0x38217d = bridgeObjectType(_0x5f480e),
-      _0x316f0e =
-        this['importedModelRoots']['get'](_0x5f480e?.['id']) || this['lightRoots']['get'](_0x5f480e?.['id']),
-      _0x2c2487 = this['importedInstanceByObjectId']['get'](_0x5f480e?.['id']);
-    if (!_0x38217d && !_0x316f0e && !_0x2c2487) return ![];
-    if (_0x38217d) this['bridge']['clearDraftObjectTransform']?.(_0x38217d, _0x5f480e['id']);
-    if (_0x316f0e) this['_applyImportedModelTransform'](_0x316f0e, _0x5f480e['transform']);
+      bridgeObjectType3 = bridgeObjectType(value140),
+      enabled24 =
+        this['importedModelRoots']['get'](value140?.['id']) || this['lightRoots']['get'](value140?.['id']),
+      enabled25 = this['importedInstanceByObjectId']['get'](value140?.['id']);
+    if (!bridgeObjectType3 && !enabled24 && !enabled25) return ![];
+    if (bridgeObjectType3) this['bridge']['clearDraftObjectTransform']?.(bridgeObjectType3, value140['id']);
+    if (enabled24) this['_applyImportedModelTransform'](enabled24, value140['transform']);
     return (
-      _0x2c2487 &&
-        (updateStoryboard3DInstanceTransform(_0x2c2487, _0x5f480e['id'], _0x5f480e['transform']),
-        this['_syncImportedInstanceVisual'](_0x5f480e, _0x2c2487, _0x5f480e['transform'])),
+      enabled25 &&
+        (updateStoryboard3DInstanceTransform(enabled25, value140['id'], value140['transform']),
+        this['_syncImportedInstanceVisual'](value140, enabled25, value140['transform'])),
       this['_notifyVisualChange']('clear-object-transform-preview'),
       !![]
     );
@@ -1110,107 +1088,107 @@ export class Storyboard3DSceneRuntime {
       this['bridge']['clearAllDrafts']?.(),
       this['_syncCharacterAnimation']());
     if (this['backgroundCameraLockApplied']) this['_syncBackgroundCameraLock']();
-    const _0x2eab99 = new Set();
-    for (const _0x22888a of this['adapted']?.['scene']?.['objects'] || []) {
-      const _0xe0826c = this['importedModelRoots']['get'](_0x22888a['id']);
-      if (_0xe0826c) this['_applyImportedModelTransform'](_0xe0826c, _0x22888a['transform']);
-      const _0x5a82c2 = this['lightRoots']['get'](_0x22888a['id']);
-      if (_0x5a82c2) this['_applyImportedModelTransform'](_0x5a82c2, _0x22888a['transform']);
-      const _0x29b1f4 = this['importedInstanceByObjectId']['get'](_0x22888a['id']);
-      _0x29b1f4 &&
-        (updateStoryboard3DInstanceTransform(_0x29b1f4, _0x22888a['id'], _0x22888a['transform'], {
+    const list19 = new Set();
+    for (const value142 of this['adapted']?.['scene']?.['objects'] || []) {
+      const value143 = this['importedModelRoots']['get'](value142['id']);
+      if (value143) this['_applyImportedModelTransform'](value143, value142['transform']);
+      const value144 = this['lightRoots']['get'](value142['id']);
+      if (value144) this['_applyImportedModelTransform'](value144, value142['transform']);
+      const value145 = this['importedInstanceByObjectId']['get'](value142['id']);
+      value145 &&
+        (updateStoryboard3DInstanceTransform(value145, value142['id'], value142['transform'], {
           recomputeBounds: ![],
         }),
-        _0x2eab99['add'](_0x29b1f4),
-        this['_syncImportedInstanceVisual'](_0x22888a, _0x29b1f4, _0x22888a['transform']));
+        list19['add'](value145),
+        this['_syncImportedInstanceVisual'](value142, value145, value142['transform']));
     }
-    (_0x2eab99['forEach']((_0x441779) => refreshStoryboard3DInstanceBatchBounds(_0x441779)),
+    (list19['forEach']((value146) => refreshStoryboard3DInstanceBatchBounds(value146)),
       this['_notifyVisualChange']('clear-previews'));
   }
   ['getMiniMapFootprints']() {
-    const _0x3eaf6d = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
-      (_0x4dd0be) =>
-        _0x4dd0be?.['visible'] !== ![] && ['prop', 'character', 'light']['includes'](_0x4dd0be?.['type']),
+    const list20 = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
+      (value147) =>
+        value147?.['visible'] !== ![] && ['prop', 'character', 'light']['includes'](value147?.['type']),
     );
-    return _0x3eaf6d['map']((_0x269b71) => {
-      const _0x2bc509 = this['importedInstanceByObjectId']['get'](_0x269b71['id']),
-        _0x2a8317 =
-          this['importedModelRoots']['get'](_0x269b71['id']) || this['lightRoots']['get'](_0x269b71['id']),
-        _0x566756 =
-          _0x269b71['type'] === 'character'
-            ? this['bridge']['_mannequinMap']?.['get']?.(_0x269b71['id'])
-            : this['bridge']['_cubeMap']?.['get']?.(_0x269b71['id']);
-      let _0x2a4c2d = _0x2bc509
-        ? collectInstanceTopViewFootprint(_0x2bc509, _0x269b71['id'])
-        : collectObjectTopViewFootprint(_0x2a8317 || _0x566756?.['group']);
-      if (_0x2a4c2d['length'] < 0x3) _0x2a4c2d = createFallbackTopViewFootprint(_0x269b71);
-      return { objectId: _0x269b71['id'], objectType: _0x269b71['type'], points: _0x2a4c2d };
+    return list20['map']((objectId5) => {
+      const value148 = this['importedInstanceByObjectId']['get'](objectId5['id']),
+        value149 =
+          this['importedModelRoots']['get'](objectId5['id']) || this['lightRoots']['get'](objectId5['id']),
+        value150 =
+          objectId5['type'] === 'character'
+            ? this['bridge']['_mannequinMap']?.['get']?.(objectId5['id'])
+            : this['bridge']['_cubeMap']?.['get']?.(objectId5['id']);
+      let points = value148
+        ? collectInstanceTopViewFootprint(value148, objectId5['id'])
+        : collectObjectTopViewFootprint(value149 || value150?.['group']);
+      if (points['length'] < 0x3) points = createFallbackTopViewFootprint(objectId5);
+      return { objectId: objectId5['id'], objectType: objectId5['type'], points: points };
     });
   }
-  ['pickGizmoHandle'](_0x310a0f, _0xd83d3d) {
-    return this['bridge']['pickGizmoHandle']?.(_0x310a0f, _0xd83d3d) || null;
+  ['pickGizmoHandle'](value151, value152) {
+    return this['bridge']['pickGizmoHandle']?.(value151, value152) || null;
   }
-  ['beginGizmoDrag']({ handleKey: _0x4f71cc, clientX: _0x5d16e1, clientY: _0x582e53 } = {}) {
+  ['beginGizmoDrag']({ handleKey: handleKey, clientX: clientX, clientY: clientY } = {}) {
     if (this['activeTool'] === 'rotate')
       return (
         this['bridge']['beginRotateGizmoDrag']?.({
-          handleKey: _0x4f71cc,
-          clientX: _0x5d16e1,
-          clientY: _0x582e53,
+          handleKey: handleKey,
+          clientX: clientX,
+          clientY: clientY,
         }) || null
       );
     if (this['activeTool'] === 'scale')
       return (
         this['bridge']['beginScaleGizmoDrag']?.({
-          handleKey: _0x4f71cc,
-          clientX: _0x5d16e1,
-          clientY: _0x582e53,
+          handleKey: handleKey,
+          clientX: clientX,
+          clientY: clientY,
         }) || null
       );
     return (
       this['bridge']['beginMoveGizmoDrag']?.({
-        handleKey: _0x4f71cc,
-        clientX: _0x5d16e1,
-        clientY: _0x582e53,
+        handleKey: handleKey,
+        clientX: clientX,
+        clientY: clientY,
       }) || null
     );
   }
-  ['sampleGizmoDragPoint'](_0x51d27a, _0x3ec5f0, _0x2537f0) {
-    return this['bridge']['sampleMoveGizmoDragPoint']?.(_0x51d27a, _0x3ec5f0, _0x2537f0) || null;
+  ['sampleGizmoDragPoint'](value153, value154, value155) {
+    return this['bridge']['sampleMoveGizmoDragPoint']?.(value153, value154, value155) || null;
   }
-  ['computeGizmoDragValue'](_0x22f1d8, _0x4a830f) {
-    if (_0x22f1d8?.['mode'] === 'rotate')
-      return this['bridge']['computeRotateGizmoAngle']?.(_0x22f1d8, _0x4a830f) ?? 0x0;
-    if (String(_0x22f1d8?.['mode'] || '')['startsWith']('scale'))
-      return this['bridge']['computeScaleGizmoFactor']?.(_0x22f1d8, _0x4a830f) ?? 0x1;
-    return this['bridge']['computeMoveGizmoDelta']?.(_0x22f1d8, _0x4a830f) || null;
+  ['computeGizmoDragValue'](value156, value157) {
+    if (value156?.['mode'] === 'rotate')
+      return this['bridge']['computeRotateGizmoAngle']?.(value156, value157) ?? 0x0;
+    if (String(value156?.['mode'] || '')['startsWith']('scale'))
+      return this['bridge']['computeScaleGizmoFactor']?.(value156, value157) ?? 0x1;
+    return this['bridge']['computeMoveGizmoDelta']?.(value156, value157) || null;
   }
   ['clearGizmoState']() {
     (this['bridge']['clearGizmoHandleState']?.(), this['bridge']['clearGizmoMoveGuideLine']?.());
   }
-  ['setGizmoHoverHandle'](_0xf3332f) {
-    this['bridge']['setGizmoHoverHandle']?.(_0xf3332f || null);
+  ['setGizmoHoverHandle'](value158) {
+    this['bridge']['setGizmoHoverHandle']?.(value158 || null);
   }
-  ['setGizmoActiveHandle'](_0x3b3700) {
-    this['bridge']['setGizmoActiveHandle']?.(_0x3b3700 || null);
+  ['setGizmoActiveHandle'](value159) {
+    this['bridge']['setGizmoActiveHandle']?.(value159 || null);
   }
-  ['setGizmoMoveGuideLine'](_0x56ae5c) {
-    if (_0x56ae5c) this['bridge']['setGizmoMoveGuideLine']?.(_0x56ae5c);
+  ['setGizmoMoveGuideLine'](value160) {
+    if (value160) this['bridge']['setGizmoMoveGuideLine']?.(value160);
     else this['bridge']['clearGizmoMoveGuideLine']?.();
   }
-  ['resize'](_0x1a1392, _0x3b0faf) {
-    this['bridge']['resize']?.(_0x1a1392, _0x3b0faf);
+  ['resize'](value161, value162) {
+    this['bridge']['resize']?.(value161, value162);
     if (this['backgroundCameraLockApplied']) this['_syncBackgroundCameraLock']();
   }
   ['renderNow']() {
     this['bridge']['renderNow']?.();
   }
-  ['setViewProjection'](_0x24b3a4 = 'perspective', _0x5857e6 = null) {
-    const _0x2682d = _0x24b3a4 === 'orthographic' ? 'orthographic' : 'perspective',
-      _0x2d5cb1 = _0x2682d === 'orthographic' && _0x5857e6 ? structuredClone(_0x5857e6) : null;
+  ['setViewProjection'](value163 = 'perspective', value164 = null) {
+    const type = value163 === 'orthographic' ? 'orthographic' : 'perspective',
+      options3 = type === 'orthographic' && value164 ? structuredClone(value164) : null;
     return (
-      (this['viewProjection'] = { type: _0x2682d, options: _0x2d5cb1 }),
-      this['bridge']['setViewProjection']?.({ type: _0x2682d, ...(_0x2d5cb1 || {}) }),
+      (this['viewProjection'] = { type: type, options: options3 }),
+      this['bridge']['setViewProjection']?.({ type: type, ...(options3 || {}) }),
       this['getViewProjection']()
     );
   }
@@ -1225,8 +1203,8 @@ export class Storyboard3DSceneRuntime {
       ? structuredClone(this['adapted']['state']['viewport']['sceneView'])
       : null;
   }
-  ['setViewportUIPatch'](_0x361398 = {}) {
-    this['viewportUIPatch'] = { ...this['viewportUIPatch'], ..._0x361398 };
+  ['setViewportUIPatch'](args13 = {}) {
+    this['viewportUIPatch'] = { ...this['viewportUIPatch'], ...args13 };
     if (!this['adapted']) return ![];
     return (
       (this['adapted']['state']['ui'] = { ...this['adapted']['state']['ui'], ...this['viewportUIPatch'] }),
@@ -1240,24 +1218,24 @@ export class Storyboard3DSceneRuntime {
       !![]
     );
   }
-  ['previewSceneView'](_0x5c7fe7) {
-    if (!_0x5c7fe7) return ![];
+  ['previewSceneView'](enabled26) {
+    if (!enabled26) return ![];
     return (
       this['bridge']['setDraftView']?.({
         kind: 'scene-default',
-        sceneView: structuredClone(_0x5c7fe7),
+        sceneView: structuredClone(enabled26),
         disableSmoothing: !![],
       }),
       !![]
     );
   }
-  ['setViewportFocalLength'](_0x205a79) {
+  ['setViewportFocalLength'](value165) {
     if (!this['adapted']) return ![];
-    const _0x444f08 = clampSceneFocalLength(_0x205a79);
-    ((this['viewportFocalLengthOverride'] = _0x444f08),
-      this['bridge']['setDefaultSceneFocalLength']?.(_0x444f08));
-    const _0x5bd8e1 = this['getSceneView']();
-    if (_0x5bd8e1) this['previewSceneView'](_0x5bd8e1);
+    const clampSceneFocalLength2 = clampSceneFocalLength(value165);
+    ((this['viewportFocalLengthOverride'] = clampSceneFocalLength2),
+      this['bridge']['setDefaultSceneFocalLength']?.(clampSceneFocalLength2));
+    const value166 = this['getSceneView']();
+    if (value166) this['previewSceneView'](value166);
     return !![];
   }
   ['getViewportFocalLength']() {
@@ -1265,51 +1243,47 @@ export class Storyboard3DSceneRuntime {
     return clampSceneFocalLength(this['viewportFocalLengthOverride'] ?? this['adapted']['focalLength']);
   }
   ['getViewportFov']() {
-    const _0x1053ad = this['getViewportFocalLength']();
-    return _0x1053ad == null ? null : focalLengthToFov(_0x1053ad);
+    const value167 = this['getViewportFocalLength']();
+    return value167 == null ? null : focalLengthToFov(value167);
   }
-  ['previewCamera'](_0x5b33eb) {
-    if (!_0x5b33eb) return ![];
-    const _0x57cdae = vectorFromArray(_0x5b33eb['position'], { x: 0x5, y: 0x4, z: 0x7 }),
-      _0x2d593f = vectorFromArray(_0x5b33eb['target'], { x: 0x0, y: 1.2, z: 0x0 }),
-      _0x1f534d = new threeRuntime['Vector3'](_0x57cdae['x'], _0x57cdae['y'], _0x57cdae['z']),
-      _0x1f864c = new threeRuntime['Vector3'](_0x2d593f['x'], _0x2d593f['y'], _0x2d593f['z']),
-      _0x22f4e8 = new threeRuntime['Matrix4']()['lookAt'](
-        _0x1f534d,
-        _0x1f864c,
-        new threeRuntime['Vector3'](0x0, 0x1, 0x0),
-      ),
-      _0x201261 = new threeRuntime['Quaternion']()['setFromRotationMatrix'](_0x22f4e8)['normalize'](),
-      _0x393639 = finiteNumber(_0x5b33eb['roll'], 0x0);
-    Math['abs'](_0x393639) > 1e-8 &&
-      _0x201261['multiply'](
+  ['previewCamera'](event3) {
+    if (!event3) return ![];
+    const box22 = vectorFromArray(event3['position'], { x: 0x5, y: 0x4, z: 0x7 }),
+      box23 = vectorFromArray(event3['target'], { x: 0x0, y: 1.2, z: 0x0 }),
+      x7 = new threeRuntime['Vector3'](box22['x'], box22['y'], box22['z']),
+      x8 = new threeRuntime['Vector3'](box23['x'], box23['y'], box23['z']),
+      value168 = new threeRuntime['Matrix4']()['lookAt'](x7, x8, new threeRuntime['Vector3'](0x0, 0x1, 0x0)),
+      x9 = new threeRuntime['Quaternion']()['setFromRotationMatrix'](value168)['normalize'](),
+      finiteNumber3 = finiteNumber(event3['roll'], 0x0);
+    Math['abs'](finiteNumber3) > 1e-8 &&
+      x9['multiply'](
         new threeRuntime['Quaternion']()['setFromAxisAngle'](
           new threeRuntime['Vector3'](0x0, 0x0, 0x1),
-          _0x393639,
+          finiteNumber3,
         ),
       )['normalize']();
-    const _0x121339 = new threeRuntime['Euler']()['setFromQuaternion'](_0x201261, 'YXZ');
+    const x10 = new threeRuntime['Euler']()['setFromQuaternion'](x9, 'YXZ');
     return (
       this['bridge']['setDraftView']?.({
         kind: 'camera',
-        position: { x: _0x1f534d['x'], y: _0x1f534d['y'], z: _0x1f534d['z'] },
-        target: { x: _0x1f864c['x'], y: _0x1f864c['y'], z: _0x1f864c['z'] },
-        quaternion: { x: _0x201261['x'], y: _0x201261['y'], z: _0x201261['z'], w: _0x201261['w'] },
-        rotation: { x: _0x121339['x'], y: _0x121339['y'], z: _0x121339['z'] },
-        fov: Number['isFinite'](Number(_0x5b33eb['fov']))
-          ? Number(_0x5b33eb['fov'])
-          : focalLengthToFov(_0x5b33eb['focalLength']),
+        position: { x: x7['x'], y: x7['y'], z: x7['z'] },
+        target: { x: x8['x'], y: x8['y'], z: x8['z'] },
+        quaternion: { x: x9['x'], y: x9['y'], z: x9['z'], w: x9['w'] },
+        rotation: { x: x10['x'], y: x10['y'], z: x10['z'] },
+        fov: Number['isFinite'](Number(event3['fov']))
+          ? Number(event3['fov'])
+          : focalLengthToFov(event3['focalLength']),
         disableSmoothing: !![],
       }),
       !![]
     );
   }
-  ['commitSceneView'](_0x56ced4) {
-    if (!_0x56ced4 || !this['adapted']?.['scene']?.['id']) return ![];
-    const _0x24608b = structuredClone(_0x56ced4);
+  ['commitSceneView'](enabled27) {
+    if (!enabled27 || !this['adapted']?.['scene']?.['id']) return ![];
+    const structuredClone2 = structuredClone(enabled27);
     return (
-      this['viewOverrides']['set'](this['adapted']['scene']['id'], _0x24608b),
-      (this['adapted']['state']['viewport']['sceneView'] = structuredClone(_0x24608b)),
+      this['viewOverrides']['set'](this['adapted']['scene']['id'], structuredClone2),
+      (this['adapted']['state']['viewport']['sceneView'] = structuredClone(structuredClone2)),
       this['directorScene']['prepareMaterials'](),
       this['bridge']['sync'](this['adapted']['state']),
       this['_syncBackgroundCameraLock'](),
@@ -1327,32 +1301,30 @@ export class Storyboard3DSceneRuntime {
   ['getDirectorViewport']() {
     return (this['directorViewport'] ||= new DirectorViewportRuntime(this['bridge']));
   }
-  ['captureBlob'](_0x22af66) {
-    return this['bridge']['captureBlob']?.(_0x22af66);
+  ['captureBlob'](value169) {
+    return this['bridge']['captureBlob']?.(value169);
   }
-  ['withCleanCaptureCanvas'](_0x411dc5) {
-    return this['bridge']['_withCleanCaptureFrame'](() =>
-      _0x411dc5(this['bridge']['renderer']['domElement']),
-    );
+  ['withCleanCaptureCanvas'](handler) {
+    return this['bridge']['_withCleanCaptureFrame'](() => handler(this['bridge']['renderer']['domElement']));
   }
-  async ['waitForCaptureReady']({ signal: _0x1f1e92, timeout: timeout = 0x7530 } = {}) {
-    const _0x2a401b = Date['now']();
+  async ['waitForCaptureReady']({ signal: signal, timeout: timeout = 0x7530 } = {}) {
+    const value170 = Date['now']();
     while (!![]) {
-      if (_0x1f1e92?.['aborted'] || this['disposed']) throw new DOMException('已取消录制', 'AbortError');
-      const _0x30eec7 = [...(this['bridge']['_mannequinMap']?.['values']() || [])],
-        _0x5b1bef = _0x30eec7['find']((_0x49284c) => _0x49284c['modelLoadError']);
-      if (_0x5b1bef) throw new Error('人偶加载失败：' + _0x5b1bef['modelLoadError']['message']);
-      const _0x456f03 = this['adapted']?.['scene']?.['background'],
-        _0x181642 = Boolean(_0x456f03?.['imageUrl'] && !this['backgroundTexture']);
+      if (signal?.['aborted'] || this['disposed']) throw new DOMException('已取消录制', 'AbortError');
+      const list21 = [...(this['bridge']['_mannequinMap']?.['values']() || [])],
+        value171 = list21['find']((value172) => value172['modelLoadError']);
+      if (value171) throw new Error('人偶加载失败：' + value171['modelLoadError']['message']);
+      const value173 = this['adapted']?.['scene']?.['background'],
+        enabled28 = Boolean(value173?.['imageUrl'] && !this['backgroundTexture']);
       if (this['directorScene']['error']) throw this['directorScene']['error'];
       if (
-        _0x30eec7['every']((_0x4c6be2) => _0x4c6be2['modelRoot']) &&
-        !_0x181642 &&
+        list21['every']((value174) => value174['modelRoot']) &&
+        !enabled28 &&
         !this['directorScene']['pending']
       )
         return;
-      if (Date['now']() - _0x2a401b > timeout) throw new Error('场景资源加载超时，请检查模型与背景后重试。');
-      await new Promise((_0x5270de) => globalThis['setTimeout'](_0x5270de, 0x32));
+      if (Date['now']() - value170 > timeout) throw new Error('场景资源加载超时，请检查模型与背景后重试。');
+      await new Promise((value175) => globalThis['setTimeout'](value175, 0x32));
     }
   }
   ['getSnapshot']() {
@@ -1361,7 +1333,7 @@ export class Storyboard3DSceneRuntime {
           sceneId: this['adapted']['scene']['id'],
           activeShotId: this['adapted']['activeShot']?.['id'] || null,
           selectedObjectIds: this['adapted']['state']['selection']['selectedObjects']['map'](
-            (_0x4c8741) => _0x4c8741['objectId'],
+            (value176) => value176['objectId'],
           ),
           activeTool: this['activeTool'],
           projection: this['getViewProjection'](),
@@ -1386,6 +1358,6 @@ export class Storyboard3DSceneRuntime {
       (this['project'] = null));
   }
 }
-export function createStoryboard3DSceneRuntime(_0x59ecc9) {
-  return new Storyboard3DSceneRuntime(_0x59ecc9);
+export function createStoryboard3DSceneRuntime(value177) {
+  return new Storyboard3DSceneRuntime(value177);
 }

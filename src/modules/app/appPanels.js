@@ -1,31 +1,31 @@
 import { showTutorialVideoPanel } from '../AutoUpdate.js';
 import { t } from '../../i18n/index.js';
 export function createAppPanels({
-  store: _0xfb393f,
-  setTextWithLineBreaks: _0xd69fa3,
-  getAIGenerationDefaultSizeByType: _0x191cfc,
-  createDefaultSubscriptionState: _0x3c36eb,
-  isModelAllowed: _0x5ea7df,
-  isSubscriptionActive: _0x6c98b0,
-  isActivationRequestAccepted: _0xa37438,
-  normalizeSubscriptionPayload: _0x5a7448,
-  ensureInstallId: _0x557ec9,
-  pullSubscriptionState: _0x2a95a0,
-  submitCdkey: _0xf47c9e,
-  clearSubscriptionAuthorization: _0x139885,
-  DEFAULT_VIP_GATE_MODEL_ID: _0x83f922,
+  store: store,
+  setTextWithLineBreaks: setTextWithLineBreaks,
+  getAIGenerationDefaultSizeByType: getAIGenerationDefaultSizeByType,
+  createDefaultSubscriptionState: createDefaultSubscriptionState,
+  isModelAllowed: isModelAllowed,
+  isSubscriptionActive: isSubscriptionActive,
+  isActivationRequestAccepted: isActivationRequestAccepted,
+  normalizeSubscriptionPayload: normalizeSubscriptionPayload,
+  ensureInstallId: ensureInstallId,
+  pullSubscriptionState: pullSubscriptionState,
+  submitCdkey: submitCdkey,
+  clearSubscriptionAuthorization: clearSubscriptionAuthorization,
+  DEFAULT_VIP_GATE_MODEL_ID: DEFAULT_VIP_GATE_MODEL_ID,
 } = {}) {
-  const _0x57b751 = 'https://api.ashuoai.com/static/contact/wechat.png',
-    _0x37b1a4 = 'yumengashuo',
-    _0x3d29d7 = 'https://api.ashuoai.com/static/contact/fankui.jpg';
-  function _0x2359a2(_0x53d358) {
-    const _0x498287 = String(_0x53d358 || '').trim();
-    if (!_0x498287) return '';
-    if (/^https?:\/\//i.test(_0x498287)) return _0x498287;
-    if (_0x498287.startsWith('/')) return _0x498287;
+  const value = 'https://api.ashuoai.com/static/contact/wechat.png',
+    item = 'yumengashuo',
+    key = 'https://api.ashuoai.com/static/contact/fankui.jpg';
+  function run(index) {
+    const enabled = String(index || '').trim();
+    if (!enabled) return '';
+    if (/^https?:\/\//i.test(enabled)) return enabled;
+    if (enabled.startsWith('/')) return enabled;
     return '';
   }
-  function _0x58519b() {
+  function run2() {
     return [
       { title: t('appPanels.tutorial.bernini'), url: 'https://www.bilibili.com/video/BV1TwEb6gEsC' },
       { title: t('appPanels.tutorial.usage'), url: 'https://www.bilibili.com/video/BV1RX5z6gEXq/' },
@@ -41,32 +41,32 @@ export function createAppPanels({
       { title: t('appPanels.tutorial.panorama'), url: 'https://www.bilibili.com/video/BV1FqdyBwEGx' },
     ];
   }
-  function _0x372097() {
-    const _0xcee6c4 = document.getElementById('subStatusText'),
-      _0x39f48e = document.getElementById('subExpireText'),
-      _0x2649b0 = document.getElementById('subscriptionCdkeyInput'),
-      _0x311bbb = document.getElementById('btnSubscriptionActivate'),
-      _0x513dc1 = document.getElementById('btnSubscriptionClearAuthorization'),
-      _0x333fa8 = document.getElementById('subscriptionContactLink'),
-      _0x11a9d4 = document.getElementById('subscriptionContactReveal'),
-      _0x2d60e5 = document.getElementById('subscriptionContactWechat'),
-      _0xf0b340 = [0, 0x1f4, 0x4b0, 0x9c4, 0xfa0],
-      _0x367601 = 0x2bc;
-    function _0x39a272(_0x2b2868 = '') {
-      return t('settings.subscription.contact', {}, _0x2b2868 ? { locale: _0x2b2868 } : {});
+  function run3() {
+    const el = document.getElementById('subStatusText'),
+      el2 = document.getElementById('subExpireText'),
+      el3 = document.getElementById('subscriptionCdkeyInput'),
+      el4 = document.getElementById('btnSubscriptionActivate'),
+      el5 = document.getElementById('btnSubscriptionClearAuthorization'),
+      result = document.getElementById('subscriptionContactLink'),
+      data = document.getElementById('subscriptionContactReveal'),
+      options = document.getElementById('subscriptionContactWechat'),
+      retryScheduleMs = [0, 0x1f4, 0x4b0, 0x9c4, 0xfa0],
+      target = 0x2bc;
+    function run4(locale = '') {
+      return t('settings.subscription.contact', {}, locale ? { locale: locale } : {});
     }
-    function _0x3a6473(_0x39c48e) {
-      const _0x54091a = String(_0x39c48e || '').trim();
-      if (!_0x54091a) return true;
-      return _0x54091a === _0x39a272('zh-CN') || _0x54091a === _0x39a272('en-US');
+    function run5(source) {
+      const enabled2 = String(source || '').trim();
+      if (!enabled2) return true;
+      return enabled2 === run4('zh-CN') || enabled2 === run4('en-US');
     }
-    function _0x55cbef(_0x4d0c17) {
-      const _0x10c437 = String(_0x4d0c17 || '').trim();
-      return _0x3a6473(_0x10c437) ? _0x39a272() : _0x10c437;
+    function run6(next) {
+      const current = String(next || '').trim();
+      return run5(current) ? run4() : current;
     }
-    function _0x2788ee(_0x1235a5) {
-      return String(_0x1235a5 ?? '').replace(/[&<>"']/g, (_0x143468) => {
-        switch (_0x143468) {
+    function run7(entry) {
+      return String(entry ?? '').replace(/[&<>"']/g, (record) => {
+        switch (record) {
           case '&':
             return '&amp;';
           case '<':
@@ -78,135 +78,131 @@ export function createAppPanels({
           case "'":
             return '&#39;';
           default:
-            return _0x143468;
+            return record;
         }
       });
     }
-    function _0x14e40c(_0x29dac8) {
-      const _0x268bae = Number(_0x29dac8);
-      if (!Number.isFinite(_0x268bae) || _0x268bae <= 0) return '-';
+    function run8(payload) {
+      const count = Number(payload);
+      if (!Number.isFinite(count) || count <= 0) return '-';
       try {
-        return new Date(_0x268bae * 0x3e8).toLocaleString();
+        return new Date(count * 0x3e8).toLocaleString();
       } catch {
         return '-';
       }
     }
-    function _0x5ab20d(_0x1caced, _0x5a1241, _0x5e214f = true) {
-      if (!_0x1caced) return;
-      _0x1caced.replaceChildren();
-      if (!_0x5a1241) {
-        _0x1caced.hidden = true;
+    function run9(el6, enabled3, enabled4 = true) {
+      if (!el6) return;
+      el6.replaceChildren();
+      if (!enabled3) {
+        el6.hidden = true;
         return;
       }
-      _0x1caced.hidden = !_0x5e214f;
-      const _0x36add1 = document.createElement('span');
-      ((_0x36add1.className = 'settings-contact-label'),
-        (_0x36add1.textContent = t('settings.subscription.contactInfo.wechatLabel')));
-      const _0x4b5683 = document.createElement('input');
-      ((_0x4b5683.type = 'text'),
-        (_0x4b5683.className = 'settings-contact-copy'),
-        (_0x4b5683.value = _0x5a1241),
-        (_0x4b5683.readOnly = true),
-        _0x4b5683.setAttribute('aria-label', t('settings.subscription.contactInfo.wechatAria')),
-        _0x4b5683.addEventListener('focus', () => _0x4b5683.select()),
-        _0x4b5683.addEventListener('click', () => {
-          (_0x4b5683.focus(), _0x4b5683.select());
+      el6.hidden = !enabled4;
+      const el7 = document.createElement('span');
+      ((el7.className = 'settings-contact-label'),
+        (el7.textContent = t('settings.subscription.contactInfo.wechatLabel')));
+      const el8 = document.createElement('input');
+      ((el8.type = 'text'),
+        (el8.className = 'settings-contact-copy'),
+        (el8.value = enabled3),
+        (el8.readOnly = true),
+        el8.setAttribute('aria-label', t('settings.subscription.contactInfo.wechatAria')),
+        el8.addEventListener('focus', () => el8.select()),
+        el8.addEventListener('click', () => {
+          (el8.focus(), el8.select());
         }),
-        _0x1caced.append(_0x36add1, _0x4b5683));
+        el6.append(el7, el8));
     }
-    function _0x4dd777(_0x42455f, _0x4c82f5, _0x905517) {
-      if (!_0x42455f) return;
-      (_0x42455f.replaceChildren(), _0x42455f.classList.toggle('has-contact-image', !!_0x4c82f5));
-      if (!_0x4c82f5) {
-        if (_0x905517) return;
-        const _0x36ec58 = document.createElement('span');
-        ((_0x36ec58.className = 'settings-contact-fallback'),
-          (_0x36ec58.textContent = t('settings.subscription.contactInfo.qrNotConfigured')),
-          _0x42455f.appendChild(_0x36ec58));
+    function run10(el9, enabled5, handle) {
+      if (!el9) return;
+      (el9.replaceChildren(), el9.classList.toggle('has-contact-image', !!enabled5));
+      if (!enabled5) {
+        if (handle) return;
+        const el10 = document.createElement('span');
+        ((el10.className = 'settings-contact-fallback'),
+          (el10.textContent = t('settings.subscription.contactInfo.qrNotConfigured')),
+          el9.appendChild(el10));
         return;
       }
-      const _0xb5b498 = document.createElement('img');
-      ((_0xb5b498.className = 'settings-contact-qr'),
-        (_0xb5b498.alt = t('settings.subscription.contactInfo.qrAlt')),
-        (_0xb5b498.loading = 'lazy'),
-        (_0xb5b498.decoding = 'async'),
-        (_0xb5b498.referrerPolicy = 'no-referrer'),
-        (_0xb5b498.src = _0x4c82f5),
-        _0xb5b498.addEventListener('error', () => {
-          _0xb5b498.hidden = true;
-          const _0xf28e90 = document.createElement('div');
-          ((_0xf28e90.className = 'settings-contact-hint'),
-            (_0xf28e90.textContent = t('settings.subscription.contactInfo.qrLoadFailed')),
-            _0x42455f.appendChild(_0xf28e90),
-            _0x42455f.classList.add('has-contact-error'));
+      const el11 = document.createElement('img');
+      ((el11.className = 'settings-contact-qr'),
+        (el11.alt = t('settings.subscription.contactInfo.qrAlt')),
+        (el11.loading = 'lazy'),
+        (el11.decoding = 'async'),
+        (el11.referrerPolicy = 'no-referrer'),
+        (el11.src = enabled5),
+        el11.addEventListener('error', () => {
+          el11.hidden = true;
+          const el12 = document.createElement('div');
+          ((el12.className = 'settings-contact-hint'),
+            (el12.textContent = t('settings.subscription.contactInfo.qrLoadFailed')),
+            el9.appendChild(el12),
+            el9.classList.add('has-contact-error'));
         }),
-        _0x42455f.appendChild(_0xb5b498));
+        el9.appendChild(el11));
     }
-    function _0x50ad07(_0x53ed6a, _0x1633b3, _0x74238f, _0x302f2a = '', _0x5682a9 = '', _0x194e45 = null) {
-      if (!_0x53ed6a) return;
-      _0x53ed6a.textContent = _0x55cbef(_0x74238f);
-      const _0x24bb90 = _0x2359a2(_0x302f2a || _0x57b751),
-        _0x606c48 = String(_0x5682a9 || _0x37b1a4).trim();
-      _0x194e45 && _0x5ab20d(_0x194e45, _0x606c48, _0x194e45.hidden === false);
-      _0x4dd777(_0x1633b3, _0x24bb90, !!_0x606c48);
-      if (!_0x194e45 && _0x1633b3 && _0x606c48) {
-        const _0x3f4b10 = document.createElement('div');
-        ((_0x3f4b10.className = 'settings-contact-wechat'),
-          _0x1633b3.appendChild(_0x3f4b10),
-          _0x5ab20d(_0x3f4b10, _0x606c48));
+    function run11(el13, el14, state, config = '', scope = '', el15 = null) {
+      if (!el13) return;
+      el13.textContent = run6(state);
+      const input = run(config || value),
+        enabled6 = String(scope || item).trim();
+      el15 && run9(el15, enabled6, el15.hidden === false);
+      run10(el14, input, !!enabled6);
+      if (!el15 && el14 && enabled6) {
+        const output = document.createElement('div');
+        ((output.className = 'settings-contact-wechat'), el14.appendChild(output), run9(output, enabled6));
       }
     }
-    function _0x2b1d62(_0x511898, _0x33be9a, _0x13467c = null) {
-      if (!_0x511898 || !_0x33be9a || _0x511898.dataset.contactRevealBound === '1') return;
-      ((_0x511898.dataset.contactRevealBound = '1'),
-        _0x511898.addEventListener('click', () => {
-          _0x33be9a.hidden = false;
-          if (_0x13467c?.children?.length) _0x13467c.hidden = false;
+    function run12(el16, el17, el18 = null) {
+      if (!el16 || !el17 || el16.dataset.contactRevealBound === '1') return;
+      ((el16.dataset.contactRevealBound = '1'),
+        el16.addEventListener('click', () => {
+          el17.hidden = false;
+          if (el18?.children?.length) el18.hidden = false;
         }));
     }
-    function _0x340374(_0x2c77fc) {
-      const _0x35d6d4 = _0x2c77fc || _0x3c36eb();
-      if (_0xcee6c4) {
-        let _0x26ebdb = t('settings.subscription.inactive');
-        if (_0x35d6d4.loading) _0x26ebdb = t('settings.subscription.loading');
+    function run13(value2) {
+      const response = value2 || createDefaultSubscriptionState();
+      if (el) {
+        let t2 = t('settings.subscription.inactive');
+        if (response.loading) t2 = t('settings.subscription.loading');
         else {
-          if (String(_0x35d6d4.status || '').toLowerCase() === 'active')
-            _0x26ebdb = t('settings.subscription.active');
-          else _0x35d6d4.status === 'expired' && (_0x26ebdb = t('settings.subscription.expired'));
+          if (String(response.status || '').toLowerCase() === 'active')
+            t2 = t('settings.subscription.active');
+          else response.status === 'expired' && (t2 = t('settings.subscription.expired'));
         }
-        _0xcee6c4.textContent = _0x26ebdb;
+        el.textContent = t2;
       }
-      (_0x39f48e &&
-        (_0x39f48e.textContent =
-          '' + t('settings.subscription.expirePrefix') + _0x14e40c(_0x35d6d4.expiresAt)),
-        _0x333fa8 &&
-          _0x50ad07(
-            _0x333fa8,
-            _0x11a9d4,
-            _0x35d6d4.contactText,
-            _0x35d6d4.contactUrl || '',
-            _0x35d6d4.contactWechat || _0x37b1a4,
-            _0x2d60e5,
+      (el2 && (el2.textContent = '' + t('settings.subscription.expirePrefix') + run8(response.expiresAt)),
+        result &&
+          run11(
+            result,
+            data,
+            response.contactText,
+            response.contactUrl || '',
+            response.contactWechat || item,
+            options,
           ));
     }
-    function _0x8314ed() {
+    function run14() {
       return Boolean(window.AI_CANVAS_IS_DEV_BUILD || window.LOCAL_DEV_BUILD);
     }
-    function _0x2bfcba() {
-      if (!_0x513dc1) return;
-      _0x513dc1.hidden = !_0x8314ed();
+    function run15() {
+      if (!el5) return;
+      el5.hidden = !run14();
     }
-    function _0x1bd3d3() {
-      return _0xfb393f.getStateRaw().subscription || _0x3c36eb();
+    function run16() {
+      return store.getStateRaw().subscription || createDefaultSubscriptionState();
     }
-    function _0x9b3bc4(_0x83923d) {
-      const _0x2f5ce8 = _0x5a7448(_0x83923d || {});
-      if (!_0x6c98b0(_0x2f5ce8)) return false;
-      const _0x2c1ca9 = _0x1bd3d3();
+    function run17(value3) {
+      const args = normalizeSubscriptionPayload(value3 || {});
+      if (!isSubscriptionActive(args)) return false;
+      const args2 = run16();
       return (
-        _0xfb393f.setSubscriptionState({
-          ..._0x2c1ca9,
-          ..._0x2f5ce8,
+        store.setSubscriptionState({
+          ...args2,
+          ...args,
           loading: false,
           error: null,
           lastSyncAt: Date.now(),
@@ -214,116 +210,116 @@ export function createAppPanels({
         true
       );
     }
-    function _0x1289b9() {
+    function run18() {
       return !!document.getElementById('subscriptionGateOverlay');
     }
-    async function _0x3bf00b() {
-      const _0x24d91e = _0x1bd3d3();
-      _0xfb393f.setSubscriptionState({ ..._0x24d91e, loading: true, error: null });
-      const _0x4a965d = await _0x557ec9();
-      if (!String(_0x4a965d || '').trim())
+    async function run19() {
+      const args3 = run16();
+      store.setSubscriptionState({ ...args3, loading: true, error: null });
+      const value4 = await ensureInstallId();
+      if (!String(value4 || '').trim())
         return (
-          _0xfb393f.setSubscriptionState({
+          store.setSubscriptionState({
             loading: false,
             status: 'none',
             expiresAt: null,
             error: t('settings.subscription.missingInstallIdSync'),
             lastSyncAt: Date.now(),
           }),
-          _0x1bd3d3()
+          run16()
         );
       try {
-        const _0x21783c = _0x1bd3d3(),
-          _0x5b981d = await _0x2a95a0(_0x4a965d);
+        const value5 = run16(),
+          expiresAt = await pullSubscriptionState(value4);
         return (
-          _0xfb393f.setSubscriptionState({
-            ..._0x5b981d,
-            expiresAt: _0x5b981d?.expiresAt ?? _0x21783c?.expiresAt ?? null,
+          store.setSubscriptionState({
+            ...expiresAt,
+            expiresAt: expiresAt?.expiresAt ?? value5?.expiresAt ?? null,
             loading: false,
             error: null,
             lastSyncAt: Date.now(),
           }),
-          _0x1bd3d3()
+          run16()
         );
-      } catch (_0x2da8db) {
+      } catch (error2) {
         return (
-          _0xfb393f.setSubscriptionState({
+          store.setSubscriptionState({
             status: 'none',
             expiresAt: null,
             loading: false,
-            error: _0x2da8db?.message || t('settings.subscription.syncFailed'),
+            error: error2?.message || t('settings.subscription.syncFailed'),
             lastSyncAt: Date.now(),
           }),
-          _0x1bd3d3()
+          run16()
         );
       }
     }
-    async function _0x5cad8d(_0x5f4ce1, _0x4a9394 = {}) {
-      const _0x347cec = typeof _0x4a9394?.onProgress === 'function' ? _0x4a9394.onProgress : null,
-        _0x19d498 =
-          Array.isArray(_0x4a9394?.retryScheduleMs) && _0x4a9394.retryScheduleMs.length > 0
-            ? _0x4a9394.retryScheduleMs
-            : _0xf0b340,
-        _0x32ea43 = String(_0x5f4ce1 || '').trim();
-      if (!_0x32ea43) return (window.showToast?.(t('settings.subscription.enterCdkey'), 'warn'), false);
-      const _0x1bcf03 = await _0x557ec9();
-      if (!String(_0x1bcf03 || '').trim())
+    async function run20(value6, value7 = {}) {
+      const value8 = typeof value7?.onProgress === 'function' ? value7.onProgress : null,
+        total =
+          Array.isArray(value7?.retryScheduleMs) && value7.retryScheduleMs.length > 0
+            ? value7.retryScheduleMs
+            : retryScheduleMs,
+        enabled7 = String(value6 || '').trim();
+      if (!enabled7) return (window.showToast?.(t('settings.subscription.enterCdkey'), 'warn'), false);
+      const value9 = await ensureInstallId();
+      if (!String(value9 || '').trim())
         return (window.showToast?.(t('settings.subscription.missingInstallIdActivate'), 'error'), false);
-      let _0x497134 = null,
-        _0x133c84 = null;
-      for (let _0x5cec24 = 0; _0x5cec24 < 2; _0x5cec24 += 1) {
+      let error3 = null,
+        value10 = null;
+      for (let count2 = 0; count2 < 2; count2 += 1) {
         try {
-          ((_0x497134 = await _0xf47c9e(_0x1bcf03, _0x32ea43)), (_0x133c84 = null));
+          ((error3 = await submitCdkey(value9, enabled7)), (value10 = null));
           break;
-        } catch (_0x272429) {
-          _0x133c84 = _0x272429;
-          if (_0x5cec24 >= 1) break;
-          await new Promise((_0x3cf302) => setTimeout(_0x3cf302, _0x367601));
+        } catch (value11) {
+          value10 = value11;
+          if (count2 >= 1) break;
+          await new Promise((value12) => setTimeout(value12, target));
         }
       }
-      if (_0x133c84) throw _0x133c84;
-      if (!_0xa37438(_0x497134)) {
-        const _0x4e0fae = _0x497134?.message || t('settings.subscription.activationFailed');
-        return (window.showToast?.(_0x4e0fae, 'error'), false);
+      if (value10) throw value10;
+      if (!isActivationRequestAccepted(error3)) {
+        const value13 = error3?.message || t('settings.subscription.activationFailed');
+        return (window.showToast?.(value13, 'error'), false);
       }
-      if (_0x9b3bc4(_0x497134)) return (window.showToast?.(t('settings.subscription.activated')), true);
+      if (run17(error3)) return (window.showToast?.(t('settings.subscription.activated')), true);
       window.showToast?.(t('settings.subscription.submitted'));
-      for (let _0x492b6d = 0; _0x492b6d < _0x19d498.length; _0x492b6d += 1) {
-        const _0x3c5e09 = _0x19d498[_0x492b6d];
-        _0x347cec?.({ phase: 'checking', attempt: _0x492b6d + 1, total: _0x19d498.length });
-        if (_0x3c5e09 > 0) await new Promise((_0xa28ef5) => setTimeout(_0xa28ef5, _0x3c5e09));
-        const _0x39926f = await _0x3bf00b();
-        if (_0x6c98b0(_0x39926f)) return (window.showToast?.(t('settings.subscription.activated')), true);
+      for (let attempt = 0; attempt < total.length; attempt += 1) {
+        const count3 = total[attempt];
+        value8?.({ phase: 'checking', attempt: attempt + 1, total: total.length });
+        if (count3 > 0) await new Promise((value14) => setTimeout(value14, count3));
+        const value15 = await run19();
+        if (isSubscriptionActive(value15))
+          return (window.showToast?.(t('settings.subscription.activated')), true);
       }
-      const _0x36ee96 = _0x1bd3d3(),
-        _0x2402d8 = String(_0x36ee96.error || _0x497134?.message || '').trim();
+      const value16 = run16(),
+        value17 = String(value16.error || error3?.message || '').trim();
       return (
-        _0x2402d8
+        value17
           ? window.showToast?.(
-              t('settings.subscription.serverNotConfirmed') + ' (' + _0x2402d8 + ')',
+              t('settings.subscription.serverNotConfirmed') + ' (' + value17 + ')',
               'warning',
             )
           : window.showToast?.(t('settings.subscription.serverNotConfirmed'), 'warning'),
         false
       );
     }
-    async function _0x1f8db4() {
-      if (!_0x8314ed() || typeof _0x139885 !== 'function') return false;
-      const _0x3c0caa = window.confirm?.(t('settings.subscription.clearConfirm'));
-      if (_0x3c0caa === false) return false;
-      const _0x46459f = _0x513dc1?.textContent || t('settings.subscription.clearAuthorization');
-      _0x513dc1 &&
-        ((_0x513dc1.disabled = true), (_0x513dc1.textContent = t('settings.subscription.clearing')));
+    async function run21() {
+      if (!run14() || typeof clearSubscriptionAuthorization !== 'function') return false;
+      const value18 = window.confirm?.(t('settings.subscription.clearConfirm'));
+      if (value18 === false) return false;
+      const value19 = el5?.textContent || t('settings.subscription.clearAuthorization');
+      el5 && ((el5.disabled = true), (el5.textContent = t('settings.subscription.clearing')));
       try {
-        await _0x139885();
-        const _0x48b201 = _0x1bd3d3(),
-          _0x68c52b = _0x3c36eb();
+        await clearSubscriptionAuthorization();
+        const contactText = run16(),
+          args4 = createDefaultSubscriptionState();
         return (
-          _0xfb393f.setSubscriptionState({
-            ..._0x68c52b,
-            contactText: _0x48b201.contactText || _0x68c52b.contactText,
-            contactUrl: _0x48b201.contactUrl || _0x68c52b.contactUrl,
-            contactWechat: _0x48b201.contactWechat || _0x68c52b.contactWechat,
+          store.setSubscriptionState({
+            ...args4,
+            contactText: contactText.contactText || args4.contactText,
+            contactUrl: contactText.contactUrl || args4.contactUrl,
+            contactWechat: contactText.contactWechat || args4.contactWechat,
             loading: false,
             status: 'none',
             expiresAt: null,
@@ -336,186 +332,178 @@ export function createAppPanels({
           window.showToast?.(t('settings.subscription.clearSuccess')),
           true
         );
-      } catch (_0x473daf) {
+      } catch (error4) {
         return (
-          window.showToast?.(_0x473daf?.message || t('settings.subscription.clearFailed'), 'error'),
+          window.showToast?.(error4?.message || t('settings.subscription.clearFailed'), 'error'),
           false
         );
       } finally {
-        _0x513dc1 && ((_0x513dc1.disabled = false), (_0x513dc1.textContent = _0x46459f));
+        el5 && ((el5.disabled = false), (el5.textContent = value19));
       }
     }
-    function _0x3c2511(_0x4febc7 = _0x83f922, _0x46433a = '', _0x2ef7d0 = null) {
-      if (_0x1289b9()) return;
-      const _0x5a8b0e = document.createElement('div');
-      ((_0x5a8b0e.id = 'subscriptionGateOverlay'), (_0x5a8b0e.className = 'subscription-gate-overlay'));
-      const _0x43af8f = _0x1bd3d3();
-      ((_0x5a8b0e.innerHTML =
+    function run22(value20 = DEFAULT_VIP_GATE_MODEL_ID, value21 = '', handler = null) {
+      if (run18()) return;
+      const el19 = document.createElement('div');
+      ((el19.id = 'subscriptionGateOverlay'), (el19.className = 'subscription-gate-overlay'));
+      const value22 = run16();
+      ((el19.innerHTML =
         '\n        <div class="subscription-gate-dialog" role="dialog" aria-modal="true" aria-label="' +
-        _0x2788ee(t('settings.subscription.gate.aria')) +
+        run7(t('settings.subscription.gate.aria')) +
         '">\n          <div class="subscription-gate-title">' +
-        _0x2788ee(t('settings.subscription.gate.title')) +
+        run7(t('settings.subscription.gate.title')) +
         '</div>\n          <div class="subscription-gate-desc">' +
-        _0x2788ee(t('settings.subscription.gate.desc')) +
+        run7(t('settings.subscription.gate.desc')) +
         '</div>\n          <input type="text" class="settings-input" id="gateCdkeyInput" placeholder="' +
-        _0x2788ee(t('settings.subscription.gate.cdkeyPlaceholder')) +
+        run7(t('settings.subscription.gate.cdkeyPlaceholder')) +
         '">\n          <div class="settings-subscription-contact">\n            <button type="button" id="gateContactLink" class="settings-getkey settings-contact-trigger"></button>\n            <div id="gateContactReveal" class="settings-contact-reveal" hidden></div>\n          </div>\n          <div class="subscription-gate-actions">\n            <button type="button" class="subscription-gate-btn" id="gateCancelBtn">' +
-        _0x2788ee(t('settings.subscription.gate.cancel')) +
+        run7(t('settings.subscription.gate.cancel')) +
         '</button>\n            <button type="button" class="subscription-gate-btn is-primary" id="gateSubmitBtn">' +
-        _0x2788ee(t('settings.subscription.gate.activate')) +
+        run7(t('settings.subscription.gate.activate')) +
         '</button>\n          </div>\n        </div>\n      '),
-        document.body.appendChild(_0x5a8b0e));
-      const _0x3b6d11 = () => _0x5a8b0e.remove();
-      (_0x5a8b0e.addEventListener('click', (_0x4bc345) => {
-        if (_0x4bc345.target === _0x5a8b0e) _0x3b6d11();
+        document.body.appendChild(el19));
+      const run23 = () => el19.remove();
+      (el19.addEventListener('click', (event) => {
+        if (event.target === el19) run23();
       }),
-        _0x5a8b0e.querySelector('#gateCancelBtn')?.addEventListener('click', _0x3b6d11),
-        _0x50ad07(
-          _0x5a8b0e.querySelector('#gateContactLink'),
-          _0x5a8b0e.querySelector('#gateContactReveal'),
-          _0x43af8f.contactText,
-          _0x43af8f.contactUrl || '',
-          _0x43af8f.contactWechat || SUBSCRIPTION_CONTACT_WECHAT_FALLBACK,
+        el19.querySelector('#gateCancelBtn')?.addEventListener('click', run23),
+        run11(
+          el19.querySelector('#gateContactLink'),
+          el19.querySelector('#gateContactReveal'),
+          value22.contactText,
+          value22.contactUrl || '',
+          value22.contactWechat || SUBSCRIPTION_CONTACT_WECHAT_FALLBACK,
         ),
-        _0x2b1d62(
-          _0x5a8b0e.querySelector('#gateContactLink'),
-          _0x5a8b0e.querySelector('#gateContactReveal'),
-        ));
-      const _0x211f7c = _0x5a8b0e.querySelector('#gateSubmitBtn'),
-        _0x4414b9 = _0x5a8b0e.querySelector('#gateCdkeyInput');
-      let _0x51bf50 = false;
-      _0x5a8b0e.querySelector('#gateSubmitBtn')?.addEventListener('click', async () => {
-        if (_0x51bf50) return;
-        _0x51bf50 = true;
-        const _0x13e8e1 = _0x211f7c?.textContent || t('settings.subscription.gate.activate');
-        _0x211f7c &&
-          ((_0x211f7c.disabled = true),
-          (_0x211f7c.textContent = t('settings.subscription.checking') + ' 1/4'));
-        if (_0x4414b9) _0x4414b9.disabled = true;
-        let _0x388007 = false;
+        run12(el19.querySelector('#gateContactLink'), el19.querySelector('#gateContactReveal')));
+      const el20 = el19.querySelector('#gateSubmitBtn'),
+        el21 = el19.querySelector('#gateCdkeyInput');
+      let value23 = false;
+      el19.querySelector('#gateSubmitBtn')?.addEventListener('click', async () => {
+        if (value23) return;
+        value23 = true;
+        const value24 = el20?.textContent || t('settings.subscription.gate.activate');
+        el20 && ((el20.disabled = true), (el20.textContent = t('settings.subscription.checking') + ' 1/4'));
+        if (el21) el21.disabled = true;
+        let value25 = false;
         try {
-          _0x388007 = await _0x5cad8d(_0x4414b9?.value, {
-            onProgress: ({ attempt: _0x2a2485, total: _0x4bf632 }) => {
-              if (!_0x211f7c || !_0x211f7c.isConnected) return;
-              _0x211f7c.textContent = t('settings.subscription.checking') + ' ' + _0x2a2485 + '/' + _0x4bf632;
+          value25 = await run20(el21?.value, {
+            onProgress: ({ attempt: attempt2, total: total2 }) => {
+              if (!el20 || !el20.isConnected) return;
+              el20.textContent = t('settings.subscription.checking') + ' ' + attempt2 + '/' + total2;
             },
-            retryScheduleMs: _0xf0b340,
+            retryScheduleMs: retryScheduleMs,
           });
-        } catch (_0x38715b) {
-          (window.showToast?.(_0x38715b?.message || t('settings.subscription.gateFailed'), 'error'),
-            (_0x388007 = false));
+        } catch (error5) {
+          (window.showToast?.(error5?.message || t('settings.subscription.gateFailed'), 'error'),
+            (value25 = false));
         }
-        if (_0x388007) {
-          _0x3b6d11();
-          if (typeof _0x2ef7d0 === 'function')
+        if (value25) {
+          run23();
+          if (typeof handler === 'function')
             try {
-              _0x2ef7d0();
+              handler();
             } catch {}
           return;
         }
-        ((_0x51bf50 = false),
-          _0x211f7c &&
-            _0x211f7c.isConnected &&
-            ((_0x211f7c.disabled = false), (_0x211f7c.textContent = _0x13e8e1)),
-          _0x4414b9 && _0x4414b9.isConnected && ((_0x4414b9.disabled = false), _0x4414b9.focus()));
+        ((value23 = false),
+          el20 && el20.isConnected && ((el20.disabled = false), (el20.textContent = value24)),
+          el21 && el21.isConnected && ((el21.disabled = false), el21.focus()));
       });
     }
-    async function _0x5208c3(_0x3c4974 = _0x83f922, _0x32b63f = '', _0x488fab = null) {
-      const _0x2b26a8 = _0x1bd3d3(),
-        _0x2306e0 =
-          typeof _0x5ea7df === 'function' ? _0x5ea7df(_0x3c4974, _0x2b26a8, _0x32b63f) : _0x6c98b0(_0x2b26a8);
-      if (_0x2306e0) {
-        const _0x14ca9c = String(_0x488fab?.message || '').trim();
-        window.showToast?.(_0x14ca9c || t('settings.subscription.activeSyncTip'), 'warning');
+    async function run24(value26 = DEFAULT_VIP_GATE_MODEL_ID, value27 = '', error6 = null) {
+      const value28 = run16(),
+        value29 =
+          typeof isModelAllowed === 'function'
+            ? isModelAllowed(value26, value28, value27)
+            : isSubscriptionActive(value28);
+      if (value29) {
+        const value30 = String(error6?.message || '').trim();
+        window.showToast?.(value30 || t('settings.subscription.activeSyncTip'), 'warning');
         try {
-          await _0x3bf00b();
+          await run19();
         } catch {}
         return;
       }
-      if (_0x1289b9()) return;
-      _0x3c2511(_0x3c4974, _0x32b63f);
+      if (run18()) return;
+      run22(value26, value27);
     }
     ((window.openSubscriptionDialog = ({
-      modelId: modelId = _0x83f922,
+      modelId: modelId = DEFAULT_VIP_GATE_MODEL_ID,
       provider: provider = '',
       onSuccess: onSuccess = null,
     } = {}) => {
-      const _0x3ca6a9 = _0x1bd3d3();
-      if (typeof _0x5ea7df === 'function' && _0x5ea7df(modelId, _0x3ca6a9, provider)) return;
-      if (_0x1289b9()) return;
-      _0x3c2511(modelId, provider, onSuccess);
+      const value31 = run16();
+      if (typeof isModelAllowed === 'function' && isModelAllowed(modelId, value31, provider)) return;
+      if (run18()) return;
+      run22(modelId, provider, onSuccess);
     }),
-      (window.isModelAllowedBySubscription = (_0x4ce433, _0x3ff3cc = '') =>
-        _0x5ea7df(_0x4ce433, _0xfb393f.getStateRaw().subscription || {}, _0x3ff3cc)),
-      (window.getSubscriptionState = () => _0x1bd3d3()),
-      (window.ensureSubscriptionInstallId = _0x557ec9),
-      (window.refreshSubscriptionState = _0x3bf00b),
+      (window.isModelAllowedBySubscription = (value32, value33 = '') =>
+        isModelAllowed(value32, store.getStateRaw().subscription || {}, value33)),
+      (window.getSubscriptionState = () => run16()),
+      (window.ensureSubscriptionInstallId = ensureInstallId),
+      (window.refreshSubscriptionState = run19),
       (window.handleSubscriptionRequired = ({
-        modelId: modelId = _0x83f922,
+        modelId: modelId = DEFAULT_VIP_GATE_MODEL_ID,
         provider: provider = '',
         error: error = null,
-      } = {}) => _0x5208c3(modelId, provider, error)),
-      _0x311bbb &&
-        _0x311bbb.addEventListener('click', async () => {
-          const _0x5e0240 = await _0x5cad8d(_0x2649b0?.value);
-          if (_0x5e0240 && _0x2649b0) _0x2649b0.value = '';
+      } = {}) => run24(modelId, provider, error)),
+      el4 &&
+        el4.addEventListener('click', async () => {
+          const value34 = await run20(el3?.value);
+          if (value34 && el3) el3.value = '';
         }),
-      _0x513dc1 &&
-        (_0x513dc1.addEventListener('click', () => {
-          void _0x1f8db4();
+      el5 &&
+        (el5.addEventListener('click', () => {
+          void run21();
         }),
-        _0x2bfcba(),
-        window.addEventListener?.('aicanvas:runtime-info', _0x2bfcba)),
-      _0x2b1d62(_0x333fa8, _0x11a9d4, _0x2d60e5),
-      _0xfb393f.subscribeSelector(
-        (_0x4add56) => _0x4add56.subscription,
-        (_0x2d93f8) => _0x340374(_0x2d93f8),
+        run15(),
+        window.addEventListener?.('aicanvas:runtime-info', run15)),
+      run12(result, data, options),
+      store.subscribeSelector(
+        (value35) => value35.subscription,
+        (value36) => run13(value36),
       ),
-      void _0x3bf00b());
+      void run19());
   }
-  function _0x2f34a1() {
-    const _0x5c6cd4 = document.getElementById('aiPanel'),
-      _0x27b475 = document.getElementById('aiPanelToggle');
-    if (_0x5c6cd4 && _0x27b475) {
-      const _0x3ee78d = 'http://www.w3.org/2000/svg';
-      function _0x1459c7(_0x4c5754) {
-        _0x27b475.replaceChildren();
-        const _0x2ade78 = document.createElementNS(_0x3ee78d, 'svg');
-        (_0x2ade78.setAttribute('width', '14'),
-          _0x2ade78.setAttribute('height', '14'),
-          _0x2ade78.setAttribute('viewBox', '0 0 24 24'),
-          _0x2ade78.setAttribute('fill', 'none'),
-          _0x2ade78.setAttribute('stroke', 'currentColor'),
-          _0x2ade78.setAttribute('stroke-width', '2'));
-        const _0x4c6224 = document.createElementNS(_0x3ee78d, 'polyline');
-        (_0x4c6224.setAttribute('points', _0x4c5754 ? '15 18 9 12 15 6' : '9 18 15 12 9 6'),
-          _0x2ade78.appendChild(_0x4c6224),
-          _0x27b475.appendChild(_0x2ade78));
+  function run25() {
+    const el22 = document.getElementById('aiPanel'),
+      el23 = document.getElementById('aiPanelToggle');
+    if (el22 && el23) {
+      const value37 = 'http://www.w3.org/2000/svg';
+      function run26(value38) {
+        el23.replaceChildren();
+        const el24 = document.createElementNS(value37, 'svg');
+        (el24.setAttribute('width', '14'),
+          el24.setAttribute('height', '14'),
+          el24.setAttribute('viewBox', '0 0 24 24'),
+          el24.setAttribute('fill', 'none'),
+          el24.setAttribute('stroke', 'currentColor'),
+          el24.setAttribute('stroke-width', '2'));
+        const el25 = document.createElementNS(value37, 'polyline');
+        (el25.setAttribute('points', value38 ? '15 18 9 12 15 6' : '9 18 15 12 9 6'),
+          el24.appendChild(el25),
+          el23.appendChild(el24));
       }
-      _0x27b475.addEventListener('click', () => {
-        (_0x5c6cd4.classList.toggle('collapsed'), _0x1459c7(_0x5c6cd4.classList.contains('collapsed')));
+      el23.addEventListener('click', () => {
+        (el22.classList.toggle('collapsed'), run26(el22.classList.contains('collapsed')));
       });
     }
-    const _0x15d4b7 = document.getElementById('aiTipGot'),
-      _0x14082b = document.getElementById('aiTipCard');
-    _0x15d4b7 &&
-      _0x14082b &&
-      _0x15d4b7.addEventListener('click', () => {
-        ((_0x14082b.style.opacity = '0'),
-          (_0x14082b.style.maxHeight = '0px'),
-          setTimeout(() => _0x14082b.remove(), 0x140));
+    const el26 = document.getElementById('aiTipGot'),
+      el27 = document.getElementById('aiTipCard');
+    el26 &&
+      el27 &&
+      el26.addEventListener('click', () => {
+        ((el27.style.opacity = '0'), (el27.style.maxHeight = '0px'), setTimeout(() => el27.remove(), 0x140));
       });
-    const _0x2506ea = document.getElementById('aiTextarea');
-    _0x2506ea &&
-      _0x2506ea.addEventListener('input', () => {
-        ((_0x2506ea.style.height = 'auto'),
-          (_0x2506ea.style.height = Math.min(_0x2506ea.scrollHeight, 120) + 'px'));
+    const el28 = document.getElementById('aiTextarea');
+    el28 &&
+      el28.addEventListener('input', () => {
+        ((el28.style.height = 'auto'), (el28.style.height = Math.min(el28.scrollHeight, 120) + 'px'));
       });
-    const _0x54321e = document.getElementById('aiMessages'),
-      _0x29e097 = document.getElementById('aiStartBtn'),
-      _0x32d11d = document.getElementById('aiStartWrap'),
-      _0x1d220f = document.getElementById('aiSend');
-    function _0x4449e3() {
+    const el29 = document.getElementById('aiMessages'),
+      el30 = document.getElementById('aiStartBtn'),
+      el31 = document.getElementById('aiStartWrap'),
+      el32 = document.getElementById('aiSend');
+    function run27() {
       return [
         t('appPanels.aiAssistant.responses.idea'),
         t('appPanels.aiAssistant.responses.prompt'),
@@ -523,226 +511,228 @@ export function createAppPanels({
         t('appPanels.aiAssistant.responses.optimize'),
       ];
     }
-    function _0x55a358(_0x3d6d7e) {
-      if (!_0x54321e) return;
-      const _0x43abe4 = document.createElement('div');
-      _0x43abe4.className = 'ai-msg ai';
-      const _0xe7a68b = document.createElement('div');
-      ((_0xe7a68b.className = 'ai-msg-avatar'), (_0xe7a68b.textContent = 'A'));
-      const _0x221e13 = document.createElement('div');
-      ((_0x221e13.className = 'ai-msg-bubble'),
-        _0xd69fa3(_0x221e13, _0x3d6d7e),
-        _0x43abe4.appendChild(_0xe7a68b),
-        _0x43abe4.appendChild(_0x221e13),
-        _0x54321e.appendChild(_0x43abe4),
-        (_0x54321e.scrollTop = _0x54321e.scrollHeight));
+    function run28(value39) {
+      if (!el29) return;
+      const el33 = document.createElement('div');
+      el33.className = 'ai-msg ai';
+      const el34 = document.createElement('div');
+      ((el34.className = 'ai-msg-avatar'), (el34.textContent = 'A'));
+      const value40 = document.createElement('div');
+      ((value40.className = 'ai-msg-bubble'),
+        setTextWithLineBreaks(value40, value39),
+        el33.appendChild(el34),
+        el33.appendChild(value40),
+        el29.appendChild(el33),
+        (el29.scrollTop = el29.scrollHeight));
     }
-    function _0x43fdc5(_0x579a31) {
-      if (!_0x54321e) return;
-      const _0x528b8f = document.createElement('div');
-      _0x528b8f.className = 'ai-msg user';
-      const _0x5dfd46 = document.createElement('div');
-      ((_0x5dfd46.className = 'ai-msg-avatar'),
-        (_0x5dfd46.style.background = 'var(--indigo)'),
-        (_0x5dfd46.textContent = 'U'));
-      const _0x5b0844 = document.createElement('div');
-      ((_0x5b0844.className = 'ai-msg-bubble'),
-        _0xd69fa3(_0x5b0844, _0x579a31),
-        _0x528b8f.appendChild(_0x5dfd46),
-        _0x528b8f.appendChild(_0x5b0844),
-        _0x54321e.appendChild(_0x528b8f),
-        (_0x54321e.scrollTop = _0x54321e.scrollHeight));
+    function run29(value41) {
+      if (!el29) return;
+      const el35 = document.createElement('div');
+      el35.className = 'ai-msg user';
+      const el36 = document.createElement('div');
+      ((el36.className = 'ai-msg-avatar'),
+        (el36.style.background = 'var(--indigo)'),
+        (el36.textContent = 'U'));
+      const value42 = document.createElement('div');
+      ((value42.className = 'ai-msg-bubble'),
+        setTextWithLineBreaks(value42, value41),
+        el35.appendChild(el36),
+        el35.appendChild(value42),
+        el29.appendChild(el35),
+        (el29.scrollTop = el29.scrollHeight));
     }
-    function _0x223ca6() {
-      if (!_0x2506ea) return;
-      const _0x5b91ab = _0x2506ea.value.trim();
-      if (!_0x5b91ab) return;
-      (_0x43fdc5(_0x5b91ab), (_0x2506ea.value = ''), (_0x2506ea.style.height = 'auto'));
-      if (_0x32d11d) _0x32d11d.style.display = 'none';
-      const _0xbfd9d2 = document.createElement('div');
-      _0xbfd9d2.className = 'ai-msg ai loading';
-      const _0x566ee1 = document.createElement('div');
-      ((_0x566ee1.className = 'ai-msg-avatar'), (_0x566ee1.textContent = 'A'));
-      const _0xdbf73f = document.createElement('div');
-      _0xdbf73f.className = 'ai-msg-bubble';
-      for (let _0x5490fb = 0; _0x5490fb < 3; _0x5490fb += 1) {
-        const _0x583217 = document.createElement('span');
-        ((_0x583217.className = 'dot'), _0xdbf73f.appendChild(_0x583217));
+    function run30() {
+      if (!el28) return;
+      const enabled8 = el28.value.trim();
+      if (!enabled8) return;
+      (run29(enabled8), (el28.value = ''), (el28.style.height = 'auto'));
+      if (el31) el31.style.display = 'none';
+      const el37 = document.createElement('div');
+      el37.className = 'ai-msg ai loading';
+      const el38 = document.createElement('div');
+      ((el38.className = 'ai-msg-avatar'), (el38.textContent = 'A'));
+      const el39 = document.createElement('div');
+      el39.className = 'ai-msg-bubble';
+      for (let count4 = 0; count4 < 3; count4 += 1) {
+        const value43 = document.createElement('span');
+        ((value43.className = 'dot'), el39.appendChild(value43));
       }
-      (_0xbfd9d2.appendChild(_0x566ee1),
-        _0xbfd9d2.appendChild(_0xdbf73f),
-        _0x54321e.appendChild(_0xbfd9d2),
-        (_0x54321e.scrollTop = _0x54321e.scrollHeight),
+      (el37.appendChild(el38),
+        el37.appendChild(el39),
+        el29.appendChild(el37),
+        (el29.scrollTop = el29.scrollHeight),
         setTimeout(() => {
-          _0xbfd9d2.remove();
-          const _0x27c711 = _0x4449e3(),
-            _0x242174 = _0x27c711[Math.floor(Math.random() * _0x27c711.length)];
-          _0x55a358(_0x242174);
+          el37.remove();
+          const list = run27(),
+            value44 = list[Math.floor(Math.random() * list.length)];
+          run28(value44);
         }, 0x4b0));
     }
-    _0x29e097 &&
-      _0x29e097.addEventListener('click', () => {
-        if (_0x32d11d) _0x32d11d.style.display = 'none';
-        _0x55a358(t('appPanels.aiAssistant.greeting'));
-        if (_0x2506ea) _0x2506ea.focus();
+    el30 &&
+      el30.addEventListener('click', () => {
+        if (el31) el31.style.display = 'none';
+        run28(t('appPanels.aiAssistant.greeting'));
+        if (el28) el28.focus();
       });
-    if (_0x1d220f) _0x1d220f.addEventListener('click', _0x223ca6);
-    _0x2506ea &&
-      _0x2506ea.addEventListener('keydown', (_0x173e37) => {
-        _0x173e37.key === 'Enter' && !_0x173e37.shiftKey && (_0x173e37.preventDefault(), _0x223ca6());
+    if (el32) el32.addEventListener('click', run30);
+    el28 &&
+      el28.addEventListener('keydown', (event2) => {
+        event2.key === 'Enter' && !event2.shiftKey && (event2.preventDefault(), run30());
       });
   }
-  function _0x2c856e() {
-    const _0x5e550 = document.getElementById('emptyHint');
-    if (!_0x5e550) return;
-    function _0x28564c(_0x4435ab) {
+  function run31() {
+    const el40 = document.getElementById('emptyHint');
+    if (!el40) return;
+    function run32(count5) {
       if (!window._isAppLoaded) {
-        _0x5e550.classList.add('hidden');
+        el40.classList.add('hidden');
         return;
       }
-      if (_0x4435ab === 0) _0x5e550.classList.remove('hidden');
-      else _0x5e550.classList.add('hidden');
+      if (count5 === 0) el40.classList.remove('hidden');
+      else el40.classList.add('hidden');
     }
-    ((window._checkEmptyHint = () => _0x28564c(_0xfb393f.getStateRaw()._nodeCount || 0)),
-      _0xfb393f.subscribeSelector((_0x2f0998) => _0x2f0998._nodeCount || 0, _0x28564c),
-      _0x28564c(_0xfb393f.getStateRaw()._nodeCount || 0));
-    const _0x4fc5e7 = { text: 'ai-text', image: 'ai-image', video: 'ai-video', 'test-video': 'test-video' };
-    _0x5e550.querySelectorAll('.pill-btn').forEach((_0xb4eeb9) => {
-      _0xb4eeb9.addEventListener('click', (_0x5a1954) => {
-        _0x5a1954.stopPropagation();
-        const _0x4d690f = _0xb4eeb9.dataset.type,
-          _0x1ddd4d = _0x4fc5e7[_0x4d690f];
-        if (!_0x1ddd4d) return;
-        const _0x1df47c = _0xfb393f.getState().viewport,
-          _0xc4bd64 = (window.innerWidth / 2 - _0x1df47c.x) / _0x1df47c.zoom,
-          _0x30c3af = (window.innerHeight / 2 - _0x1df47c.y) / _0x1df47c.zoom,
-          _0x1fbc5d = 'node-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-          _0x5d92d8 =
-            typeof _0x191cfc === 'function' ? _0x191cfc(_0x1ddd4d) : { width: 0x12c, height: 0x12c },
-          _0x5fc2fd = _0x5d92d8.width,
-          _0xc44532 = _0x5d92d8.height;
-        (_0xfb393f.addNode({
-          id: _0x1fbc5d,
-          type: _0x1ddd4d,
-          x: _0xc4bd64 - _0x5fc2fd / 2,
-          y: _0x30c3af - _0xc44532 / 2,
-          width: _0x5fc2fd,
-          height: _0xc44532,
+    ((window._checkEmptyHint = () => run32(store.getStateRaw()._nodeCount || 0)),
+      store.subscribeSelector((value45) => value45._nodeCount || 0, run32),
+      run32(store.getStateRaw()._nodeCount || 0));
+    const value46 = { text: 'ai-text', image: 'ai-image', video: 'ai-video', 'test-video': 'test-video' };
+    el40.querySelectorAll('.pill-btn').forEach((el41) => {
+      el41.addEventListener('click', (event3) => {
+        event3.stopPropagation();
+        const name = el41.dataset.type,
+          type = value46[name];
+        if (!type) return;
+        const box = store.getState().viewport,
+          x = (window.innerWidth / 2 - box.x) / box.zoom,
+          y = (window.innerHeight / 2 - box.y) / box.zoom,
+          id = 'node-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+          box2 =
+            typeof getAIGenerationDefaultSizeByType === 'function'
+              ? getAIGenerationDefaultSizeByType(type)
+              : { width: 0x12c, height: 0x12c },
+          width = box2.width,
+          height = box2.height;
+        (store.addNode({
+          id: id,
+          type: type,
+          x: x - width / 2,
+          y: y - height / 2,
+          width: width,
+          height: height,
           name:
-            _0x4d690f === 'text'
+            name === 'text'
               ? t('appPanels.emptyHint.textNode')
-              : _0x4d690f === 'image'
+              : name === 'image'
                 ? t('appPanels.emptyHint.imageNode')
                 : t('appPanels.emptyHint.videoNode'),
-          needsAutoResize: _0x1ddd4d === 'ai-image' || _0x1ddd4d === 'ai-video',
+          needsAutoResize: type === 'ai-image' || type === 'ai-video',
         }),
-          _0xfb393f.setSelectedNodes([_0x1fbc5d]));
+          store.setSelectedNodes([id]));
       });
     });
   }
-  function _0x2bf494() {
-    const _0x1f9392 = document.getElementById('aboutOverlay'),
-      _0x184017 = document.getElementById('aboutClose'),
-      _0x918d0e = document.querySelector('meta[name="app-version"]')?.getAttribute('content') || 'V0.0.1',
-      _0x1d926d = document.getElementById('aboutVersion');
-    if (_0x1d926d) _0x1d926d.innerText = _0x918d0e;
-    function _0x5083a7() {
-      if (_0x1f9392) _0x1f9392.style.display = 'flex';
+  function run33() {
+    const el42 = document.getElementById('aboutOverlay'),
+      el43 = document.getElementById('aboutClose'),
+      value47 = document.querySelector('meta[name="app-version"]')?.getAttribute('content') || 'V0.0.1',
+      el44 = document.getElementById('aboutVersion');
+    if (el44) el44.innerText = value47;
+    function run34() {
+      if (el42) el42.style.display = 'flex';
     }
-    function _0x3d8f14() {
-      if (_0x1f9392) _0x1f9392.style.display = 'none';
+    function run35() {
+      if (el42) el42.style.display = 'none';
     }
-    function _0x32108d() {
+    function run36() {
       document.getElementById('avatarMenu')?.classList.remove('open');
     }
-    (document.getElementById('btnAbout')?.addEventListener('click', (_0x141af0) => {
-      (_0x141af0.stopPropagation(), _0x32108d(), _0x5083a7());
+    (document.getElementById('btnAbout')?.addEventListener('click', (event4) => {
+      (event4.stopPropagation(), run36(), run34());
     }),
-      document.getElementById('btnTutorial')?.addEventListener('click', (_0x374370) => {
-        (_0x374370.stopPropagation(), _0x32108d(), showTutorialVideoPanel(_0x58519b()));
+      document.getElementById('btnTutorial')?.addEventListener('click', (event5) => {
+        (event5.stopPropagation(), run36(), showTutorialVideoPanel(run2()));
       }),
-      document.querySelectorAll('#btnGithubOfficial, #btnFeatureFeedback').forEach((_0x432b11) => {
-        _0x432b11.addEventListener('click', () => {
-          _0x32108d();
+      document.querySelectorAll('#btnGithubOfficial, #btnFeatureFeedback').forEach((el45) => {
+        el45.addEventListener('click', () => {
+          run36();
         });
       }),
-      _0x184017?.addEventListener('click', _0x3d8f14),
-      _0x1f9392?.addEventListener('click', (_0x490c7c) => {
-        if (_0x490c7c.target === _0x1f9392) _0x3d8f14();
+      el43?.addEventListener('click', run35),
+      el42?.addEventListener('click', (event6) => {
+        if (event6.target === el42) run35();
       }));
-    let _0x58efb9 = 0,
-      _0x5096a5 = null;
-    _0x1d926d?.addEventListener('click', () => {
-      (_0x58efb9++, clearTimeout(_0x5096a5));
-      if (_0x58efb9 >= 7)
-        ((_0x58efb9 = 0),
+    let count6 = 0,
+      setTimeout2 = null;
+    el44?.addEventListener('click', () => {
+      (count6++, clearTimeout(setTimeout2));
+      if (count6 >= 7)
+        ((count6 = 0),
           (window.DEV_MODE = !window.DEV_MODE),
           document.body.classList.toggle('dev-mode', window.DEV_MODE),
           window.dispatchEvent(new CustomEvent('dev-mode-changed', { detail: { enabled: window.DEV_MODE } })),
-          _0x3d8f14(),
+          run35(),
           window.showToast?.(
             window.DEV_MODE ? t('appPanels.devMode.entered') : t('appPanels.devMode.exited'),
           ));
       else
-        _0x58efb9 >= 4 &&
+        count6 >= 4 &&
           window.showToast?.(
             t('appPanels.devMode.clickHint', {
-              count: 7 - _0x58efb9,
+              count: 7 - count6,
               action: window.DEV_MODE
                 ? t('appPanels.devMode.exitAction')
                 : t('appPanels.devMode.enterAction'),
             }),
           );
-      _0x5096a5 = setTimeout(() => {
-        _0x58efb9 = 0;
+      setTimeout2 = setTimeout(() => {
+        count6 = 0;
       }, 0x7d0);
     });
   }
-  function _0xdb21f0() {
-    const _0x31c417 = document.getElementById('feedbackGroupOverlay'),
-      _0x11d923 = document.getElementById('btnFeedbackGroup'),
-      _0x125eae = document.getElementById('feedbackGroupClose'),
-      _0x20d8f9 = document.getElementById('feedbackGroupQrImage'),
-      _0x29a116 = document.getElementById('feedbackGroupQrError');
-    function _0x558244() {
+  function run37() {
+    const el46 = document.getElementById('feedbackGroupOverlay'),
+      el47 = document.getElementById('btnFeedbackGroup'),
+      el48 = document.getElementById('feedbackGroupClose'),
+      el49 = document.getElementById('feedbackGroupQrImage'),
+      el50 = document.getElementById('feedbackGroupQrError');
+    function run38() {
       document.getElementById('avatarMenu')?.classList.remove('open');
     }
-    function _0x10f332() {
-      return _0x3d29d7;
+    function run39() {
+      return key;
     }
-    function _0xf45734() {
-      _0x558244();
-      if (!_0x31c417) return;
-      if (_0x29a116) _0x29a116.hidden = true;
-      (_0x20d8f9 &&
-        ((_0x20d8f9.hidden = false),
-        (_0x20d8f9.loading = 'lazy'),
-        (_0x20d8f9.decoding = 'async'),
-        (_0x20d8f9.referrerPolicy = 'no-referrer'),
-        (_0x20d8f9.src = _0x10f332())),
-        (_0x31c417.hidden = false),
-        _0x125eae?.focus?.({ preventScroll: true }));
+    function run40() {
+      run38();
+      if (!el46) return;
+      if (el50) el50.hidden = true;
+      (el49 &&
+        ((el49.hidden = false),
+        (el49.loading = 'lazy'),
+        (el49.decoding = 'async'),
+        (el49.referrerPolicy = 'no-referrer'),
+        (el49.src = run39())),
+        (el46.hidden = false),
+        el48?.focus?.({ preventScroll: true }));
     }
-    function _0x3c0e7f() {
-      if (_0x31c417) _0x31c417.hidden = true;
+    function run41() {
+      if (el46) el46.hidden = true;
     }
-    (_0x11d923?.addEventListener('click', (_0x1c9b48) => {
-      (_0x1c9b48.stopPropagation(), _0xf45734());
+    (el47?.addEventListener('click', (event7) => {
+      (event7.stopPropagation(), run40());
     }),
-      _0x125eae?.addEventListener('click', _0x3c0e7f),
-      _0x31c417?.addEventListener('click', (_0x3e8049) => {
-        if (_0x3e8049.target === _0x31c417) _0x3c0e7f();
+      el48?.addEventListener('click', run41),
+      el46?.addEventListener('click', (event8) => {
+        if (event8.target === el46) run41();
       }),
-      _0x20d8f9?.addEventListener('error', () => {
-        _0x20d8f9.hidden = true;
-        if (_0x29a116) _0x29a116.hidden = false;
+      el49?.addEventListener('error', () => {
+        el49.hidden = true;
+        if (el50) el50.hidden = false;
       }),
-      document.addEventListener('keydown', (_0x3c0c1e) => {
-        _0x3c0c1e.key === 'Escape' && _0x31c417 && !_0x31c417.hidden && _0x3c0e7f();
+      document.addEventListener('keydown', (event9) => {
+        event9.key === 'Escape' && el46 && !el46.hidden && run41();
       }));
   }
-  function _0x4005ab() {
-    (_0x372097(), _0x2f34a1(), _0x2c856e(), _0xdb21f0(), _0x2bf494());
+  function init() {
+    (run3(), run25(), run31(), run37(), run33());
   }
-  return { init: _0x4005ab };
+  return { init: init };
 }

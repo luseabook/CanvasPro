@@ -53,262 +53,242 @@ const FILE_FILTERS = Object.freeze([
   }),
   FILE_HISTORY_PAGE_SIZE = 80,
   FILE_HISTORY_SCROLL_PREFETCH_PX = 0x168;
-function fileManagerText(_0x48549c, _0x4f9e0b = {}) {
-  return t('generationHistoryFileManager.' + _0x48549c, _0x4f9e0b);
+function fileManagerText(value, item = {}) {
+  return t('generationHistoryFileManager.' + value, item);
 }
-function isHistorySource(_0x2b884c) {
-  const _0x3b7172 = String(_0x2b884c || '').trim();
-  return _0x3b7172 === 'current-canvas' || _0x3b7172 === 'history';
+function isHistorySource(key) {
+  const result = String(key || '').trim();
+  return result === 'current-canvas' || result === 'history';
 }
-function sortByUpdatedAt(_0x54b126) {
-  return [...(Array.isArray(_0x54b126) ? _0x54b126 : [])].sort((_0x527152, _0x2116b8) => {
-    const _0x195cd2 = Number(_0x527152?.updatedAt || _0x527152?.createdAt || 0),
-      _0x5e4f1e = Number(_0x2116b8?.updatedAt || _0x2116b8?.createdAt || 0);
-    return _0x5e4f1e - _0x195cd2;
+function sortByUpdatedAt(data) {
+  return [...(Array.isArray(data) ? data : [])].sort((item2, options) => {
+    const target = Number(item2?.updatedAt || item2?.createdAt || 0),
+      source = Number(options?.updatedAt || options?.createdAt || 0);
+    return source - target;
   });
 }
-function normalizeProjectId(_0x3c3c0a) {
-  return String(_0x3c3c0a || '').trim() || 'default_v2_project';
+function normalizeProjectId(next) {
+  return String(next || '').trim() || 'default_v2_project';
 }
-function resolveThumbSrc(_0x50e2b0) {
-  if (!resolveMediaSrc(_0x50e2b0)) return '';
-  const _0x31f412 = Array.isArray(_0x50e2b0?.items) ? _0x50e2b0.items[0] : null,
-    _0x2d1e1f = Array.isArray(_0x50e2b0?.nodes) ? _0x50e2b0.nodes[0] : null;
+function resolveThumbSrc(current) {
+  if (!resolveMediaSrc(current)) return '';
+  const entry = Array.isArray(current?.items) ? current.items[0] : null,
+    record = Array.isArray(current?.nodes) ? current.nodes[0] : null;
   return String(
-    _0x50e2b0?.coverUrl ||
-      _0x31f412?.thumbSrc ||
-      _0x2d1e1f?.thumbUrl ||
-      _0x2d1e1f?.videoThumbSrc ||
-      _0x2d1e1f?.imageUrl ||
-      _0x2d1e1f?.videoUrl ||
-      _0x2d1e1f?.src ||
+    current?.coverUrl ||
+      entry?.thumbSrc ||
+      record?.thumbUrl ||
+      record?.videoThumbSrc ||
+      record?.imageUrl ||
+      record?.videoUrl ||
+      record?.src ||
       '',
   ).trim();
 }
-function resolveMediaSrc(_0x517fba) {
-  const _0x1c22c8 = Array.isArray(_0x517fba?.nodes) ? _0x517fba.nodes[0] : null;
+function resolveMediaSrc(payload) {
+  const handle = Array.isArray(payload?.nodes) ? payload.nodes[0] : null;
   return String(
-    _0x1c22c8?.imageUrl ||
-      _0x1c22c8?.sourceUrl ||
-      _0x1c22c8?.videoUrl ||
-      _0x1c22c8?.audioUrl ||
-      _0x1c22c8?.src ||
-      '',
+    handle?.imageUrl || handle?.sourceUrl || handle?.videoUrl || handle?.audioUrl || handle?.src || '',
   ).trim();
 }
-function getRecordMediaKind(_0x1db343) {
-  const _0x5203de = String(_0x1db343?.mediaKind || '')
+function getRecordMediaKind(state) {
+  const config = String(state?.mediaKind || '')
     .trim()
     .toLowerCase();
   if (
-    _0x5203de === 'image' ||
-    _0x5203de === 'video' ||
-    _0x5203de === 'audio' ||
-    _0x5203de === 'folder' ||
-    _0x5203de === 'file'
+    config === 'image' ||
+    config === 'video' ||
+    config === 'audio' ||
+    config === 'folder' ||
+    config === 'file'
   )
-    return _0x5203de;
-  const _0x65f5e3 = String(_0x1db343?.coverType || '')
+    return config;
+  const scope = String(state?.coverType || '')
     .trim()
     .toLowerCase();
-  if (
-    _0x65f5e3 === 'image' ||
-    _0x65f5e3 === 'video' ||
-    _0x65f5e3 === 'audio' ||
-    _0x65f5e3 === 'folder' ||
-    _0x65f5e3 === 'file'
-  )
-    return _0x65f5e3;
-  const _0x1a2057 = Array.isArray(_0x1db343?.nodes) ? _0x1db343.nodes[0] : null,
-    _0x28c7fd = String(_0x1a2057?.type || '')
+  if (scope === 'image' || scope === 'video' || scope === 'audio' || scope === 'folder' || scope === 'file')
+    return scope;
+  const input = Array.isArray(state?.nodes) ? state.nodes[0] : null,
+    list = String(input?.type || '')
       .trim()
       .toLowerCase();
-  if (_0x28c7fd.includes('video')) return 'video';
-  if (_0x28c7fd.includes('audio')) return 'audio';
+  if (list.includes('video')) return 'video';
+  if (list.includes('audio')) return 'audio';
   return 'image';
 }
-function getMediaLabel(_0x16ea68) {
-  if (_0x16ea68 === 'video') return fileManagerText('mediaKinds.video');
-  if (_0x16ea68 === 'audio') return fileManagerText('mediaKinds.audio');
-  if (_0x16ea68 === 'folder') return fileManagerText('mediaKinds.folder');
-  if (_0x16ea68 === 'file') return fileManagerText('mediaKinds.file');
+function getMediaLabel(output) {
+  if (output === 'video') return fileManagerText('mediaKinds.video');
+  if (output === 'audio') return fileManagerText('mediaKinds.audio');
+  if (output === 'folder') return fileManagerText('mediaKinds.folder');
+  if (output === 'file') return fileManagerText('mediaKinds.file');
   return fileManagerText('mediaKinds.image');
 }
-function isSupportedOutputMediaKind(_0x48da03) {
-  return isActionableFileManagerMediaKind(_0x48da03);
+function isSupportedOutputMediaKind(value2) {
+  return isActionableFileManagerMediaKind(value2);
 }
-function isFileManagerActionableRecord(_0xe0de3f) {
-  const _0x2dab5d = getRecordMediaKind(_0xe0de3f);
-  if (!isSupportedOutputMediaKind(_0x2dab5d)) return false;
-  return Array.isArray(_0xe0de3f?.nodes) && _0xe0de3f.nodes.length > 0;
+function isFileManagerActionableRecord(value3) {
+  const recordMediaKind = getRecordMediaKind(value3);
+  if (!isSupportedOutputMediaKind(recordMediaKind)) return false;
+  return Array.isArray(value3?.nodes) && value3.nodes.length > 0;
 }
-function resolveRecordLocalPath(_0x51ff83) {
-  const _0x404c86 = Array.isArray(_0x51ff83?.nodes) ? _0x51ff83.nodes[0] : null;
+function resolveRecordLocalPath(value4) {
+  const value5 = Array.isArray(value4?.nodes) ? value4.nodes[0] : null;
   return normalizeLocalPath(
-    _0x51ff83?.localPath ||
-      _0x51ff83?.outputItem?.localPath ||
-      _0x404c86?.originalLocalPath ||
-      _0x404c86?.localPath ||
-      _0x404c86?.displayLocalPath ||
-      _0x404c86?.thumbLocalPath ||
-      _0x404c86?.src ||
-      _0x404c86?.imageUrl ||
-      _0x404c86?.videoUrl ||
-      _0x404c86?.audioUrl,
+    value4?.localPath ||
+      value4?.outputItem?.localPath ||
+      value5?.originalLocalPath ||
+      value5?.localPath ||
+      value5?.displayLocalPath ||
+      value5?.thumbLocalPath ||
+      value5?.src ||
+      value5?.imageUrl ||
+      value5?.videoUrl ||
+      value5?.audioUrl,
   );
 }
-function buildHistoryRecordIdentityKey(_0x40a969) {
+function buildHistoryRecordIdentityKey(resultFingerprint) {
   return buildFileManagerHistoryMediaKey({
-    projectId: normalizeProjectId(_0x40a969?.projectId),
-    canvasId: String(_0x40a969?.canvasId || '').trim(),
-    mediaKind: getRecordMediaKind(_0x40a969),
-    localPath: resolveRecordLocalPath(_0x40a969),
-    resultFingerprint: _0x40a969?.resultFingerprint,
+    projectId: normalizeProjectId(resultFingerprint?.projectId),
+    canvasId: String(resultFingerprint?.canvasId || '').trim(),
+    mediaKind: getRecordMediaKind(resultFingerprint),
+    localPath: resolveRecordLocalPath(resultFingerprint),
+    resultFingerprint: resultFingerprint?.resultFingerprint,
   });
 }
-function dedupeHistoryRecords(_0x394ba9) {
-  const _0x5a4bbf = new Set(),
-    _0x49b66c = [];
-  for (const _0x1c74e7 of sortByUpdatedAt(_0x394ba9)) {
-    const _0x4bca8f = buildHistoryRecordIdentityKey(_0x1c74e7);
-    if (_0x4bca8f && _0x5a4bbf.has(_0x4bca8f)) continue;
-    if (_0x4bca8f) _0x5a4bbf.add(_0x4bca8f);
-    _0x49b66c.push(_0x1c74e7);
+function dedupeHistoryRecords(value6) {
+  const map = new Set(),
+    list2 = [];
+  for (const value7 of sortByUpdatedAt(value6)) {
+    const historyRecordIdentityKey = buildHistoryRecordIdentityKey(value7);
+    if (historyRecordIdentityKey && map.has(historyRecordIdentityKey)) continue;
+    if (historyRecordIdentityKey) map.add(historyRecordIdentityKey);
+    list2.push(value7);
   }
-  return _0x49b66c;
+  return list2;
 }
-function getOutputRecordIdForItem(_0x3a0a58) {
-  if (_0x3a0a58?.isDir) return 'folder:' + String(_0x3a0a58?.relPath || '');
+function getOutputRecordIdForItem(error) {
+  if (error?.isDir) return 'folder:' + String(error?.relPath || '');
   if (
     isSupportedOutputMediaKind(
-      String(_0x3a0a58?.mediaKind || '')
+      String(error?.mediaKind || '')
         .trim()
         .toLowerCase(),
     )
   )
-    return 'output:' + String(_0x3a0a58?.relPath || _0x3a0a58?.localPath || '');
-  return 'file:' + String(_0x3a0a58?.relPath || _0x3a0a58?.name || '');
+    return 'output:' + String(error?.relPath || error?.localPath || '');
+  return 'file:' + String(error?.relPath || error?.name || '');
 }
-function outputFileToRecord(_0x2add8a) {
-  const _0x50219d = String(_0x2add8a?.mediaKind || '')
+function outputFileToRecord(box) {
+  const needsAutoResize = String(box?.mediaKind || '')
     .trim()
     .toLowerCase();
-  if (!isSupportedOutputMediaKind(_0x50219d)) return null;
-  const _0x420504 = normalizeLocalPath(_0x2add8a?.localPath || _0x2add8a?.url),
-    _0x3ed903 = String(_0x2add8a?.url || localPathToUrl(_0x420504)).trim();
-  if (!_0x3ed903) return null;
-  const _0xd93e4a = normalizeLocalPath(_0x2add8a?.displayLocalPath),
-    _0x570e10 = normalizeLocalPath(_0x2add8a?.thumbLocalPath),
-    _0x37c177 = localPathToUrl(_0xd93e4a),
-    _0x5913db = localPathToUrl(_0x570e10),
-    _0x1c5d2b =
-      String(_0x2add8a?.name || '').trim() ||
-      _0x420504.split(/[\\/]/).pop() ||
+  if (!isSupportedOutputMediaKind(needsAutoResize)) return null;
+  const localPath = normalizeLocalPath(box?.localPath || box?.url),
+    src = String(box?.url || localPathToUrl(localPath)).trim();
+  if (!src) return null;
+  const displayLocalPath = normalizeLocalPath(box?.displayLocalPath),
+    thumbLocalPath = normalizeLocalPath(box?.thumbLocalPath),
+    url = localPathToUrl(displayLocalPath),
+    url2 = localPathToUrl(thumbLocalPath),
+    name =
+      String(box?.name || '').trim() ||
+      localPath.split(/[\\/]/).pop() ||
       fileManagerText('fallback.outputFile'),
-    _0x360221 =
-      _0x50219d === 'video' ? 'source-video' : _0x50219d === 'audio' ? 'source-audio' : 'source-image',
-    _0x248d97 = Number(_0x2add8a?.videoWidth || _0x2add8a?.originalWidth || _0x2add8a?.width || 0) || 0,
-    _0x2c8c3d = Number(_0x2add8a?.videoHeight || _0x2add8a?.originalHeight || _0x2add8a?.height || 0) || 0,
-    _0x42a465 = {
-      id: _0x360221 + '-output-' + String(_0x2add8a?.relPath || _0x420504).replace(/[^\w-]+/g, '_'),
-      type: _0x360221,
-      name: _0x1c5d2b,
+    id =
+      needsAutoResize === 'video'
+        ? 'source-video'
+        : needsAutoResize === 'audio'
+          ? 'source-audio'
+          : 'source-image',
+    count = Number(box?.videoWidth || box?.originalWidth || box?.width || 0) || 0,
+    count2 = Number(box?.videoHeight || box?.originalHeight || box?.height || 0) || 0,
+    value8 = {
+      id: id + '-output-' + String(box?.relPath || localPath).replace(/[^\w-]+/g, '_'),
+      type: id,
+      name: name,
       x: 0,
       y: 0,
-      ...getNodeDefaultSize(_0x360221),
-      src: _0x3ed903,
-      localPath: _0x420504,
-      displayLocalPath: _0xd93e4a,
-      thumbLocalPath: _0x570e10,
-      fileName: _0x1c5d2b,
-      needsAutoResize: _0x50219d !== 'audio',
+      ...getNodeDefaultSize(id),
+      src: src,
+      localPath: localPath,
+      displayLocalPath: displayLocalPath,
+      thumbLocalPath: thumbLocalPath,
+      fileName: name,
+      needsAutoResize: needsAutoResize !== 'audio',
     };
-  if (_0x50219d === 'image')
-    ((_0x42a465.imageUrl = _0x3ed903),
-      (_0x42a465.sourceUrl = _0x3ed903),
-      (_0x42a465.thumbUrl = _0x5913db),
-      _0x248d97 > 0 && ((_0x42a465.originalWidth = _0x248d97), (_0x42a465.imageWidth = _0x248d97)),
-      _0x2c8c3d > 0 && ((_0x42a465.originalHeight = _0x2c8c3d), (_0x42a465.imageHeight = _0x2c8c3d)));
+  if (needsAutoResize === 'image')
+    ((value8.imageUrl = src),
+      (value8.sourceUrl = src),
+      (value8.thumbUrl = url2),
+      count > 0 && ((value8.originalWidth = count), (value8.imageWidth = count)),
+      count2 > 0 && ((value8.originalHeight = count2), (value8.imageHeight = count2)));
   else {
-    if (_0x50219d === 'video') {
-      ((_0x42a465.videoUrl = _0x3ed903),
-        (_0x42a465.thumbUrl = _0x5913db),
-        (_0x42a465.videoThumbSrc = _0x5913db));
-      if (_0x248d97 > 0) _0x42a465.videoWidth = _0x248d97;
-      if (_0x2c8c3d > 0) _0x42a465.videoHeight = _0x2c8c3d;
-      if (Number(_0x2add8a?.duration || 0) > 0) _0x42a465.duration = Number(_0x2add8a.duration);
-    } else _0x50219d === 'audio' && (_0x42a465.audioUrl = _0x3ed903);
+    if (needsAutoResize === 'video') {
+      ((value8.videoUrl = src), (value8.thumbUrl = url2), (value8.videoThumbSrc = url2));
+      if (count > 0) value8.videoWidth = count;
+      if (count2 > 0) value8.videoHeight = count2;
+      if (Number(box?.duration || 0) > 0) value8.duration = Number(box.duration);
+    } else needsAutoResize === 'audio' && (value8.audioUrl = src);
   }
   return {
-    id: 'output:' + String(_0x2add8a?.relPath || _0x420504),
-    mediaKind: _0x50219d,
-    coverType: _0x50219d,
-    coverUrl: _0x50219d === 'audio' ? '' : _0x5913db || _0x37c177 || _0x3ed903,
-    name: _0x1c5d2b,
-    localPath: _0x420504,
-    updatedAt: Number(_0x2add8a?.mtime || 0) || 0,
-    nodes: [_0x42a465],
+    id: 'output:' + String(box?.relPath || localPath),
+    mediaKind: needsAutoResize,
+    coverType: needsAutoResize,
+    coverUrl: needsAutoResize === 'audio' ? '' : url2 || url || src,
+    name: name,
+    localPath: localPath,
+    updatedAt: Number(box?.mtime || 0) || 0,
+    nodes: [value8],
   };
 }
-function outputFileToDisplayRecord(_0x122a1f) {
-  if (_0x122a1f?.isDir)
+function outputFileToDisplayRecord(outputItem) {
+  if (outputItem?.isDir)
     return {
-      id: 'folder:' + String(_0x122a1f?.relPath || _0x122a1f?.name || ''),
+      id: 'folder:' + String(outputItem?.relPath || outputItem?.name || ''),
       mediaKind: 'folder',
       coverType: 'folder',
-      name: String(_0x122a1f?.name || fileManagerText('fallback.folder')),
-      updatedAt: Number(_0x122a1f?.mtime || 0) || 0,
-      outputItem: _0x122a1f,
+      name: String(outputItem?.name || fileManagerText('fallback.folder')),
+      updatedAt: Number(outputItem?.mtime || 0) || 0,
+      outputItem: outputItem,
       nodes: [],
     };
-  const _0x357fb7 = outputFileToRecord(_0x122a1f);
-  if (_0x357fb7) return { ..._0x357fb7, outputItem: _0x122a1f };
+  const args = outputFileToRecord(outputItem);
+  if (args) return { ...args, outputItem: outputItem };
   return {
-    id: 'file:' + String(_0x122a1f?.relPath || _0x122a1f?.name || ''),
+    id: 'file:' + String(outputItem?.relPath || outputItem?.name || ''),
     mediaKind: 'file',
     coverType: 'file',
-    name: String(_0x122a1f?.name || fileManagerText('fallback.file')),
-    updatedAt: Number(_0x122a1f?.mtime || 0) || 0,
-    outputItem: _0x122a1f,
+    name: String(outputItem?.name || fileManagerText('fallback.file')),
+    updatedAt: Number(outputItem?.mtime || 0) || 0,
+    outputItem: outputItem,
     nodes: [],
   };
 }
-function resolveRecordSize(_0x1d3f2b, _0x5c5432) {
-  const _0x32f555 = Array.isArray(_0x1d3f2b?.nodes) ? _0x1d3f2b.nodes[0] : null,
-    _0x5df488 = Array.isArray(_0x1d3f2b?.items) ? _0x1d3f2b.items[0] : null,
-    _0x5239a3 = _0x5df488?.nodeData || {},
-    _0x5ab1ed =
+function resolveRecordSize(value9, value10) {
+  const box2 = Array.isArray(value9?.nodes) ? value9.nodes[0] : null,
+    value11 = Array.isArray(value9?.items) ? value9.items[0] : null,
+    box3 = value11?.nodeData || {},
+    width =
+      Number(box2?.videoWidth || box2?.imageWidth || box2?.originalWidth || box2?.width || box3.width || 0) ||
+      0,
+    height =
       Number(
-        _0x32f555?.videoWidth ||
-          _0x32f555?.imageWidth ||
-          _0x32f555?.originalWidth ||
-          _0x32f555?.width ||
-          _0x5239a3.width ||
-          0,
-      ) || 0,
-    _0x11cf33 =
-      Number(
-        _0x32f555?.videoHeight ||
-          _0x32f555?.imageHeight ||
-          _0x32f555?.originalHeight ||
-          _0x32f555?.height ||
-          _0x5239a3.height ||
-          0,
+        box2?.videoHeight || box2?.imageHeight || box2?.originalHeight || box2?.height || box3.height || 0,
       ) || 0;
-  if (_0x5ab1ed > 0 && _0x11cf33 > 0) return { width: _0x5ab1ed, height: _0x11cf33 };
-  if (_0x5c5432 === GENERATION_HISTORY_MEDIA_KINDS.VIDEO)
+  if (width > 0 && height > 0) return { width: width, height: height };
+  if (value10 === GENERATION_HISTORY_MEDIA_KINDS.VIDEO)
     return {
       width: Math.round((FILE_MASONRY.defaultShortSide * 16) / 9),
       height: FILE_MASONRY.defaultShortSide,
     };
-  if (_0x5c5432 === GENERATION_HISTORY_MEDIA_KINDS.AUDIO) return { width: 0x140, height: 140 };
-  if (_0x5c5432 === 'folder') return { width: 150, height: 118 };
-  if (_0x5c5432 === 'file') return { width: 150, height: 132 };
+  if (value10 === GENERATION_HISTORY_MEDIA_KINDS.AUDIO) return { width: 0x140, height: 140 };
+  if (value10 === 'folder') return { width: 150, height: 118 };
+  if (value10 === 'file') return { width: 150, height: 132 };
   return { width: FILE_MASONRY.defaultShortSide, height: FILE_MASONRY.defaultShortSide };
 }
-function resolveRecordAspect(_0x5c975b, _0x477e5c) {
-  const { width: _0x272d28, height: _0x47ebbf } = resolveRecordSize(_0x5c975b, _0x477e5c);
-  return _0x272d28 + ' / ' + _0x47ebbf;
+function resolveRecordAspect(value12, value13) {
+  const { width: width2, height: height2 } = resolveRecordSize(value12, value13);
+  return width2 + ' / ' + height2;
 }
 class GenerationHistoryFileManager {
   constructor() {
@@ -353,139 +333,139 @@ class GenerationHistoryFileManager {
     return normalizeProjectId(window.currentProjectId);
   }
   ['_getCurrentCanvasId']() {
-    const _0x1f3cb2 = window.CanvasTabManager;
+    const value14 = window.CanvasTabManager;
     return (
-      String(_0x1f3cb2?.getActiveCanvasId?.() || '').trim() ||
-      String(_0x1f3cb2?._activeId || '').trim() ||
+      String(value14?.getActiveCanvasId?.() || '').trim() ||
+      String(value14?._activeId || '').trim() ||
       'canvas_1'
     );
   }
   ['_getCanvasCenterWorld']() {
-    const { viewport: _0x425258 } = appStore.getState(),
-      _0x4a63ba = window.innerWidth / 2,
-      _0x2b66ec = window.innerHeight / 2,
-      _0x131261 = document.documentElement?.clientWidth || window.innerWidth || 0,
-      _0x2964ff = document.documentElement?.clientHeight || window.innerHeight || 0;
-    if (!_0x131261 || !_0x2964ff) return screenToWorld(_0x4a63ba, _0x2b66ec, _0x425258);
-    let _0xa96b38 = 0,
-      _0x25ae84 = 0,
-      _0x2d1e1c = _0x131261,
-      _0x4aa139 = _0x2964ff;
-    const _0x2bfbc0 = [],
-      _0x18b812 = document.querySelector('header'),
-      _0x283c00 = document.querySelector('.sidebar-floating');
-    if (_0x18b812) _0x2bfbc0.push(_0x18b812);
-    if (_0x283c00) _0x2bfbc0.push(_0x283c00);
-    if (this.panel?.classList.contains('show')) _0x2bfbc0.push(this.panel);
-    const _0xb1d269 = 8;
-    for (const _0x53c3d8 of _0x2bfbc0) {
-      if (!_0x53c3d8?.isConnected) continue;
-      const _0x30366d = _0x53c3d8.getBoundingClientRect(),
-        _0x5c8357 = Math.max(_0xa96b38, _0x30366d.left),
-        _0x1cca19 = Math.max(_0x25ae84, _0x30366d.top),
-        _0x4c0046 = Math.min(_0x2d1e1c, _0x30366d.right),
-        _0x803524 = Math.min(_0x4aa139, _0x30366d.bottom);
-      if (_0x4c0046 <= _0x5c8357 || _0x803524 <= _0x1cca19) continue;
-      if (_0x30366d.left <= _0xa96b38 + _0xb1d269 && _0x30366d.right > _0xa96b38 + _0xb1d269) {
-        _0xa96b38 = Math.max(_0xa96b38, _0x30366d.right);
+    const { viewport: viewport } = appStore.getState(),
+      value15 = window.innerWidth / 2,
+      value16 = window.innerHeight / 2,
+      enabled = document.documentElement?.clientWidth || window.innerWidth || 0,
+      enabled2 = document.documentElement?.clientHeight || window.innerHeight || 0;
+    if (!enabled || !enabled2) return screenToWorld(value15, value16, viewport);
+    let value17 = 0,
+      value18 = 0,
+      value19 = enabled,
+      value20 = enabled2;
+    const list3 = [],
+      value21 = document.querySelector('header'),
+      value22 = document.querySelector('.sidebar-floating');
+    if (value21) list3.push(value21);
+    if (value22) list3.push(value22);
+    if (this.panel?.classList.contains('show')) list3.push(this.panel);
+    const value23 = 8;
+    for (const el of list3) {
+      if (!el?.isConnected) continue;
+      const box4 = el.getBoundingClientRect(),
+        value24 = Math.max(value17, box4.left),
+        value25 = Math.max(value18, box4.top),
+        value26 = Math.min(value19, box4.right),
+        value27 = Math.min(value20, box4.bottom);
+      if (value26 <= value24 || value27 <= value25) continue;
+      if (box4.left <= value17 + value23 && box4.right > value17 + value23) {
+        value17 = Math.max(value17, box4.right);
         continue;
       }
-      if (_0x30366d.right >= _0x2d1e1c - _0xb1d269 && _0x30366d.left < _0x2d1e1c - _0xb1d269) {
-        _0x2d1e1c = Math.min(_0x2d1e1c, _0x30366d.left);
+      if (box4.right >= value19 - value23 && box4.left < value19 - value23) {
+        value19 = Math.min(value19, box4.left);
         continue;
       }
-      if (_0x30366d.top <= _0x25ae84 + _0xb1d269 && _0x30366d.bottom > _0x25ae84 + _0xb1d269) {
-        _0x25ae84 = Math.max(_0x25ae84, _0x30366d.bottom);
+      if (box4.top <= value18 + value23 && box4.bottom > value18 + value23) {
+        value18 = Math.max(value18, box4.bottom);
         continue;
       }
-      _0x30366d.bottom >= _0x4aa139 - _0xb1d269 &&
-        _0x30366d.top < _0x4aa139 - _0xb1d269 &&
-        (_0x4aa139 = Math.min(_0x4aa139, _0x30366d.top));
+      box4.bottom >= value20 - value23 &&
+        box4.top < value20 - value23 &&
+        (value20 = Math.min(value20, box4.top));
     }
-    const _0x229d24 = _0x2d1e1c - _0xa96b38,
-      _0x53f878 = _0x4aa139 - _0x25ae84,
-      _0x2f3767 = _0x229d24 > 40 ? _0xa96b38 + _0x229d24 / 2 : _0x4a63ba,
-      _0x227cef = _0x53f878 > 40 ? _0x25ae84 + _0x53f878 / 2 : _0x2b66ec;
-    return screenToWorld(_0x2f3767, _0x227cef, _0x425258);
+    const count3 = value19 - value17,
+      count4 = value20 - value18,
+      value28 = count3 > 40 ? value17 + count3 / 2 : value15,
+      value29 = count4 > 40 ? value18 + count4 / 2 : value16;
+    return screenToWorld(value28, value29, viewport);
   }
-  ['_hasRecord'](_0x217741, _0xf7ad40, _0x57f1e4, _0x358816 = '', _0x3e798f = '') {
-    const _0x2c0ab1 = buildFileManagerHistoryRecordKey({
-        projectId: normalizeProjectId(_0x217741),
-        canvasId: String(_0xf7ad40 || '').trim(),
-        resultFingerprint: _0x57f1e4,
+  ['_hasRecord'](value30, value31, resultFingerprint2, localPath2 = '', mediaKind = '') {
+    const fileManagerHistoryRecordKey = buildFileManagerHistoryRecordKey({
+        projectId: normalizeProjectId(value30),
+        canvasId: String(value31 || '').trim(),
+        resultFingerprint: resultFingerprint2,
       }),
-      _0x4e6f3b = buildFileManagerHistoryMediaKey({
-        projectId: normalizeProjectId(_0x217741),
-        canvasId: String(_0xf7ad40 || '').trim(),
-        mediaKind: _0x3e798f,
-        localPath: _0x358816,
-        resultFingerprint: _0x57f1e4,
+      fileManagerHistoryMediaKey = buildFileManagerHistoryMediaKey({
+        projectId: normalizeProjectId(value30),
+        canvasId: String(value31 || '').trim(),
+        mediaKind: mediaKind,
+        localPath: localPath2,
+        resultFingerprint: resultFingerprint2,
       });
-    if (!String(_0x57f1e4 || '').trim() && !String(_0x358816 || '').trim()) return false;
+    if (!String(resultFingerprint2 || '').trim() && !String(localPath2 || '').trim()) return false;
     return this.records.some(
-      (_0x59a268) =>
-        buildHistoryRecordIdentityKey(_0x59a268) === _0x4e6f3b ||
+      (resultFingerprint3) =>
+        buildHistoryRecordIdentityKey(resultFingerprint3) === fileManagerHistoryMediaKey ||
         buildFileManagerHistoryRecordKey({
-          projectId: normalizeProjectId(_0x59a268?.projectId),
-          canvasId: String(_0x59a268?.canvasId || '').trim(),
-          resultFingerprint: _0x59a268?.resultFingerprint,
-        }) === _0x2c0ab1,
+          projectId: normalizeProjectId(resultFingerprint3?.projectId),
+          canvasId: String(resultFingerprint3?.canvasId || '').trim(),
+          resultFingerprint: resultFingerprint3?.resultFingerprint,
+        }) === fileManagerHistoryRecordKey,
     );
   }
   ['_visibleRecords']() {
     if (this._activeSource === 'output') return this._visibleOutputRecords();
-    const _0x22880a = this._getCurrentProjectId(),
-      _0x4aec0 = this._getCurrentCanvasId(),
-      _0x35aee1 =
+    const projectId = this._getCurrentProjectId(),
+      canvasId = this._getCurrentCanvasId(),
+      list4 =
         this._sortOrder === 'asc'
           ? dedupeHistoryRecords(this.records).reverse()
           : dedupeHistoryRecords(this.records);
-    return _0x35aee1.filter((_0x311283) =>
+    return list4.filter((record2) =>
       isFileManagerHistoryRecordVisible({
-        record: _0x311283,
+        record: record2,
         source: this._activeSource,
-        projectId: _0x22880a,
-        canvasId: _0x4aec0,
+        projectId: projectId,
+        canvasId: canvasId,
         activeFilter: this._activeFilter,
         getMediaKind: getRecordMediaKind,
       }),
     );
   }
   ['_visibleOutputRecords']() {
-    const _0xfa06cb = (Array.isArray(this.outputItems) ? this.outputItems : [])
+    const list5 = (Array.isArray(this.outputItems) ? this.outputItems : [])
       .map(outputFileToDisplayRecord)
       .filter(Boolean)
-      .filter((_0x839cae) => {
-        const _0x213a5c = getRecordMediaKind(_0x839cae);
-        if (_0x839cae?.outputItem?.isDir) return true;
-        if (this._activeFilter === 'all') return _0x213a5c !== 'file';
-        return _0x213a5c === this._activeFilter;
+      .filter((item3) => {
+        const recordMediaKind2 = getRecordMediaKind(item3);
+        if (item3?.outputItem?.isDir) return true;
+        if (this._activeFilter === 'all') return recordMediaKind2 !== 'file';
+        return recordMediaKind2 === this._activeFilter;
       });
     return (
-      _0xfa06cb.sort((_0xb32743, _0x46fae4) => {
-        const _0x233c71 = _0xb32743?.outputItem?.isDir ? 0 : 1,
-          _0x3bc082 = _0x46fae4?.outputItem?.isDir ? 0 : 1;
-        if (_0x233c71 !== _0x3bc082) return _0x233c71 - _0x3bc082;
-        const _0x13e681 = Number(_0xb32743?.updatedAt || 0),
-          _0x1c7faa = Number(_0x46fae4?.updatedAt || 0),
-          _0x4a8e53 = this._sortOrder === 'asc' ? _0x13e681 - _0x1c7faa : _0x1c7faa - _0x13e681;
-        if (_0x4a8e53 !== 0) return _0x4a8e53;
-        return String(_0xb32743?.name || '').localeCompare(String(_0x46fae4?.name || ''), 'zh-CN');
+      list5.sort((error2, error3) => {
+        const value32 = error2?.outputItem?.isDir ? 0 : 1,
+          value33 = error3?.outputItem?.isDir ? 0 : 1;
+        if (value32 !== value33) return value32 - value33;
+        const value34 = Number(error2?.updatedAt || 0),
+          value35 = Number(error3?.updatedAt || 0),
+          count5 = this._sortOrder === 'asc' ? value34 - value35 : value35 - value34;
+        if (count5 !== 0) return count5;
+        return String(error2?.name || '').localeCompare(String(error3?.name || ''), 'zh-CN');
       }),
-      _0xfa06cb
+      list5
     );
   }
-  ['_findVisibleRecordById'](_0x2b4b18) {
-    const _0x2a2de4 = String(_0x2b4b18 || '');
-    if (!_0x2a2de4) return null;
-    return this._visibleRecords().find((_0x3a7ff0) => String(_0x3a7ff0?.id || '') === _0x2a2de4) || null;
+  ['_findVisibleRecordById'](value36) {
+    const enabled3 = String(value36 || '');
+    if (!enabled3) return null;
+    return this._visibleRecords().find((item4) => String(item4?.id || '') === enabled3) || null;
   }
-  ['_findOutputItemByRecordId'](_0x2d6d9e) {
-    const _0x5a0299 = String(_0x2d6d9e || '');
-    if (!_0x5a0299) return null;
+  ['_findOutputItemByRecordId'](value37) {
+    const enabled4 = String(value37 || '');
+    if (!enabled4) return null;
     return (
       (Array.isArray(this.outputItems) ? this.outputItems : []).find(
-        (_0x31f99) => getOutputRecordIdForItem(_0x31f99) === _0x5a0299,
+        (item5) => getOutputRecordIdForItem(item5) === enabled4,
       ) || null
     );
   }
@@ -493,43 +473,40 @@ class GenerationHistoryFileManager {
     if (this._selectedRecordIds.size === 0) return;
     (this._selectedRecordIds.clear(), this._syncSelectionClasses());
   }
-  ['_selectRecord'](_0x3bd63b, { shiftKey: shiftKey = false } = {}) {
-    const _0x3e0c50 = this._findVisibleRecordById(_0x3bd63b),
-      _0x117c72 = getFileManagerSelectionAfterClick({
+  ['_selectRecord'](recordId, { shiftKey: shiftKey = false } = {}) {
+    const value38 = this._findVisibleRecordById(recordId),
+      fileManagerSelectionAfterClick = getFileManagerSelectionAfterClick({
         current: Array.from(this._selectedRecordIds),
-        recordId: _0x3bd63b,
+        recordId: recordId,
         shiftKey: shiftKey,
-        actionable: isFileManagerActionableRecord(_0x3e0c50),
+        actionable: isFileManagerActionableRecord(value38),
       });
-    ((this._selectedRecordIds = new Set(_0x117c72)), this._syncSelectionClasses());
+    ((this._selectedRecordIds = new Set(fileManagerSelectionAfterClick)), this._syncSelectionClasses());
   }
-  ['_setSelection'](_0x1ee548) {
-    const _0x2960df = (Array.isArray(_0x1ee548) ? _0x1ee548 : []).filter((_0x3ab316) =>
-      isFileManagerActionableRecord(this._findVisibleRecordById(_0x3ab316)),
+  ['_setSelection'](value39) {
+    const value40 = (Array.isArray(value39) ? value39 : []).filter((item6) =>
+      isFileManagerActionableRecord(this._findVisibleRecordById(item6)),
     );
-    ((this._selectedRecordIds = new Set(_0x2960df)), this._syncSelectionClasses());
+    ((this._selectedRecordIds = new Set(value40)), this._syncSelectionClasses());
   }
   ['_syncSelectionClasses']() {
     if (!this.contentEl) return;
-    this.contentEl.querySelectorAll('.v2-file-history-card').forEach((_0x55e80e) => {
-      _0x55e80e.classList.toggle(
-        'is-selected',
-        this._selectedRecordIds.has(String(_0x55e80e.dataset.recordId || '')),
-      );
+    this.contentEl.querySelectorAll('.v2-file-history-card').forEach((el2) => {
+      el2.classList.toggle('is-selected', this._selectedRecordIds.has(String(el2.dataset.recordId || '')));
     });
   }
   ['_pruneSelectionToVisibleRecords']() {
     if (this._selectedRecordIds.size === 0) return;
-    const _0x2ba7da = new Set(
+    const map2 = new Set(
       this._visibleRecords()
         .filter(isFileManagerActionableRecord)
-        .map((_0x4a9334) => String(_0x4a9334?.id || '')),
+        .map((item7) => String(item7?.id || '')),
     );
-    let _0x3b0307 = false;
-    for (const _0x15bbb1 of Array.from(this._selectedRecordIds)) {
-      !_0x2ba7da.has(_0x15bbb1) && (this._selectedRecordIds.delete(_0x15bbb1), (_0x3b0307 = true));
+    let value41 = false;
+    for (const value42 of Array.from(this._selectedRecordIds)) {
+      !map2.has(value42) && (this._selectedRecordIds.delete(value42), (value41 = true));
     }
-    if (_0x3b0307) this._syncSelectionClasses();
+    if (value41) this._syncSelectionClasses();
   }
   ['_initPanel']() {
     ((this.panel = document.createElement('div')),
@@ -550,44 +527,41 @@ class GenerationHistoryFileManager {
       this._bindMarqueeSelection(),
       this._bindContextMenu(),
       this._bindDoubleClickToCanvas(),
-      this.panel.addEventListener('click', (_0x476e6d) => {
+      this.panel.addEventListener('click', (shiftKey2) => {
         if (this._suppressNextClick) {
-          (_0x476e6d.preventDefault(), _0x476e6d.stopPropagation(), (this._suppressNextClick = false));
+          (shiftKey2.preventDefault(), shiftKey2.stopPropagation(), (this._suppressNextClick = false));
           return;
         }
-        const _0x164702 = _0x476e6d.target.closest('[data-file-action]'),
-          _0x17d0cf = _0x164702?.dataset?.fileAction || '';
-        if (_0x17d0cf === 'filter') {
-          (_0x476e6d.preventDefault(), _0x476e6d.stopPropagation());
-          const _0x5e9b70 = String(_0x164702.dataset.filter || 'all').trim();
-          FILE_FILTERS.some((_0x3693b7) => _0x3693b7.key === _0x5e9b70) &&
-            _0x5e9b70 !== this._activeFilter &&
-            ((this._activeFilter = _0x5e9b70),
+        const dir2 = shiftKey2.target.closest('[data-file-action]'),
+          value43 = dir2?.dataset?.fileAction || '';
+        if (value43 === 'filter') {
+          (shiftKey2.preventDefault(), shiftKey2.stopPropagation());
+          const value44 = String(dir2.dataset.filter || 'all').trim();
+          FILE_FILTERS.some((event) => event.key === value44) &&
+            value44 !== this._activeFilter &&
+            ((this._activeFilter = value44),
             this._clearSelection(),
             this.render(),
             isHistorySource(this._activeSource) &&
               (this._resetPageState(), void this.loadRecords({ reset: true })));
           return;
         }
-        if (_0x17d0cf === 'source') {
-          (_0x476e6d.preventDefault(), _0x476e6d.stopPropagation());
-          const _0x5ab9f0 = String(_0x164702.dataset.source || 'history').trim();
-          if (
-            FILE_SOURCES.some((_0xa2243) => _0xa2243.key === _0x5ab9f0) &&
-            _0x5ab9f0 !== this._activeSource
-          ) {
-            ((this._activeSource = _0x5ab9f0), this._clearSelection(), this.render());
-            if (isHistorySource(_0x5ab9f0)) void this.loadRecords({ backfillAfterLoad: true, reset: true });
+        if (value43 === 'source') {
+          (shiftKey2.preventDefault(), shiftKey2.stopPropagation());
+          const value45 = String(dir2.dataset.source || 'history').trim();
+          if (FILE_SOURCES.some((event2) => event2.key === value45) && value45 !== this._activeSource) {
+            ((this._activeSource = value45), this._clearSelection(), this.render());
+            if (isHistorySource(value45)) void this.loadRecords({ backfillAfterLoad: true, reset: true });
             else
-              _0x5ab9f0 === 'output' &&
+              value45 === 'output' &&
                 !this._outputLoaded &&
                 void this.loadOutputFiles({ dir: this._outputDir });
           }
           return;
         }
-        if (_0x17d0cf === 'order') {
-          (_0x476e6d.preventDefault(),
-            _0x476e6d.stopPropagation(),
+        if (value43 === 'order') {
+          (shiftKey2.preventDefault(),
+            shiftKey2.stopPropagation(),
             (this._sortOrder = this._sortOrder === 'asc' ? 'desc' : 'asc'),
             this._clearSelection(),
             this.render());
@@ -596,34 +570,34 @@ class GenerationHistoryFileManager {
             : void this.loadOutputFiles({ dir: this._outputDir });
           return;
         }
-        if (_0x17d0cf === 'output-dir') {
-          (_0x476e6d.preventDefault(),
-            _0x476e6d.stopPropagation(),
+        if (value43 === 'output-dir') {
+          (shiftKey2.preventDefault(),
+            shiftKey2.stopPropagation(),
             this._clearSelection(),
-            void this.loadOutputFiles({ dir: _0x164702.dataset.dir || '' }));
+            void this.loadOutputFiles({ dir: dir2.dataset.dir || '' }));
           return;
         }
-        const _0x5d3895 = _0x476e6d.target.closest('.v2-file-history-card');
-        if (!_0x5d3895 || !_0x5d3895.dataset.recordId) return;
+        const el3 = shiftKey2.target.closest('.v2-file-history-card');
+        if (!el3 || !el3.dataset.recordId) return;
         if (this._activeSource === 'output') {
-          const _0x1e0cfa = this._findOutputItemByRecordId(_0x5d3895.dataset.recordId);
-          if (_0x1e0cfa?.isDir) {
-            void this.loadOutputFiles({ dir: _0x1e0cfa.dir || _0x1e0cfa.relPath || '' });
+          const dir3 = this._findOutputItemByRecordId(el3.dataset.recordId);
+          if (dir3?.isDir) {
+            void this.loadOutputFiles({ dir: dir3.dir || dir3.relPath || '' });
             return;
           }
         }
-        this._selectRecord(_0x5d3895.dataset.recordId, { shiftKey: _0x476e6d.shiftKey });
+        this._selectRecord(el3.dataset.recordId, { shiftKey: shiftKey2.shiftKey });
       }));
-    const _0x1a6dc8 = document.querySelector('.sidebar-floating') || document.body;
-    (_0x1a6dc8.appendChild(this.panel), this._bindResizeHandle());
+    const el4 = document.querySelector('.sidebar-floating') || document.body;
+    (el4.appendChild(this.panel), this._bindResizeHandle());
   }
   ['_bindContentWheelGuard']() {
     if (!this.panel || !this.contentEl) return;
     this.panel.addEventListener(
       'wheel',
-      (_0x1d04d4) => {
+      (event3) => {
         if (!this.panel?.classList.contains('show')) return;
-        (_0x1d04d4.stopPropagation(), _0x1d04d4.stopImmediatePropagation?.());
+        (event3.stopPropagation(), event3.stopImmediatePropagation?.());
       },
       { passive: false, capture: true },
     );
@@ -641,85 +615,84 @@ class GenerationHistoryFileManager {
           !this._recordsLoaded
         )
           return;
-        const _0x534d0e =
-          this.contentEl.scrollHeight - this.contentEl.scrollTop - this.contentEl.clientHeight;
-        _0x534d0e <= FILE_HISTORY_SCROLL_PREFETCH_PX && void this.loadRecords({ reset: false });
+        const value46 = this.contentEl.scrollHeight - this.contentEl.scrollTop - this.contentEl.clientHeight;
+        value46 <= FILE_HISTORY_SCROLL_PREFETCH_PX && void this.loadRecords({ reset: false });
       },
       { passive: true },
     );
   }
   ['_bindMarqueeSelection']() {
     if (!this.contentEl) return;
-    this.contentEl.addEventListener('pointerdown', (_0x34433d) => {
-      if (_0x34433d.button !== 0 || !this._isOpen()) return;
-      if (_0x34433d.target.closest('[data-file-action], .v2-file-history-resize-handle')) return;
-      const _0x5e02d2 = _0x34433d.clientX,
-        _0x1f0869 = _0x34433d.clientY,
-        _0x25710a = { startX: _0x5e02d2, startY: _0x1f0869, active: false, marqueeEl: null };
-      this._selectionDrag = _0x25710a;
-      const _0x2a7ffb = (_0x45a046) => {
-          if (this._selectionDrag !== _0x25710a) return;
-          const _0x418f05 = _0x45a046.clientX - _0x5e02d2,
-            _0x29719f = _0x45a046.clientY - _0x1f0869;
-          if (!_0x25710a.active && Math.hypot(_0x418f05, _0x29719f) < 6) return;
-          !_0x25710a.active &&
-            ((_0x25710a.active = true),
-            (_0x25710a.marqueeEl = document.createElement('div')),
-            (_0x25710a.marqueeEl.className = 'v2-file-history-marquee'),
-            this.contentEl.appendChild(_0x25710a.marqueeEl));
-          const _0x2416bc = this.contentEl.getBoundingClientRect(),
-            _0x4f8902 = Math.min(_0x5e02d2, _0x45a046.clientX) - _0x2416bc.left + this.contentEl.scrollLeft,
-            _0x398edf = Math.min(_0x1f0869, _0x45a046.clientY) - _0x2416bc.top + this.contentEl.scrollTop,
-            _0x36d30e = Math.abs(_0x45a046.clientX - _0x5e02d2),
-            _0x32ecf8 = Math.abs(_0x45a046.clientY - _0x1f0869);
-          Object.assign(_0x25710a.marqueeEl.style, {
-            left: _0x4f8902 + 'px',
-            top: _0x398edf + 'px',
-            width: _0x36d30e + 'px',
-            height: _0x32ecf8 + 'px',
+    this.contentEl.addEventListener('pointerdown', (event4) => {
+      if (event4.button !== 0 || !this._isOpen()) return;
+      if (event4.target.closest('[data-file-action], .v2-file-history-resize-handle')) return;
+      const startX = event4.clientX,
+        startY = event4.clientY,
+        enabled5 = { startX: startX, startY: startY, active: false, marqueeEl: null };
+      this._selectionDrag = enabled5;
+      const value47 = (event5) => {
+          if (this._selectionDrag !== enabled5) return;
+          const value48 = event5.clientX - startX,
+            value49 = event5.clientY - startY;
+          if (!enabled5.active && Math.hypot(value48, value49) < 6) return;
+          !enabled5.active &&
+            ((enabled5.active = true),
+            (enabled5.marqueeEl = document.createElement('div')),
+            (enabled5.marqueeEl.className = 'v2-file-history-marquee'),
+            this.contentEl.appendChild(enabled5.marqueeEl));
+          const box5 = this.contentEl.getBoundingClientRect(),
+            left = Math.min(startX, event5.clientX) - box5.left + this.contentEl.scrollLeft,
+            top = Math.min(startY, event5.clientY) - box5.top + this.contentEl.scrollTop,
+            width3 = Math.abs(event5.clientX - startX),
+            height3 = Math.abs(event5.clientY - startY);
+          Object.assign(enabled5.marqueeEl.style, {
+            left: left + 'px',
+            top: top + 'px',
+            width: width3 + 'px',
+            height: height3 + 'px',
           });
         },
-        _0x4fe2e3 = () => {
-          (window.removeEventListener('pointermove', _0x2a7ffb, true),
-            window.removeEventListener('pointerup', _0x4fe2e3, true),
-            window.removeEventListener('pointercancel', _0x4fe2e3, true));
-          if (this._selectionDrag !== _0x25710a) return;
+        value50 = () => {
+          (window.removeEventListener('pointermove', value47, true),
+            window.removeEventListener('pointerup', value50, true),
+            window.removeEventListener('pointercancel', value50, true));
+          if (this._selectionDrag !== enabled5) return;
           this._selectionDrag = null;
-          if (!_0x25710a.active || !_0x25710a.marqueeEl) return;
-          const _0x4f1f47 = _0x25710a.marqueeEl.getBoundingClientRect(),
-            _0x4871a5 = Array.from(this.contentEl.querySelectorAll('.v2-file-history-card'))
-              .filter((_0x12ec85) => {
-                const _0x35a801 = _0x12ec85.getBoundingClientRect();
+          if (!enabled5.active || !enabled5.marqueeEl) return;
+          const box6 = enabled5.marqueeEl.getBoundingClientRect(),
+            value51 = Array.from(this.contentEl.querySelectorAll('.v2-file-history-card'))
+              .filter((el5) => {
+                const box7 = el5.getBoundingClientRect();
                 return !(
-                  _0x35a801.right < _0x4f1f47.left ||
-                  _0x35a801.left > _0x4f1f47.right ||
-                  _0x35a801.bottom < _0x4f1f47.top ||
-                  _0x35a801.top > _0x4f1f47.bottom
+                  box7.right < box6.left ||
+                  box7.left > box6.right ||
+                  box7.bottom < box6.top ||
+                  box7.top > box6.bottom
                 );
               })
-              .map((_0x4918f5) => String(_0x4918f5.dataset.recordId || ''))
+              .map((el6) => String(el6.dataset.recordId || ''))
               .filter(Boolean);
-          (_0x25710a.marqueeEl.remove(), (this._suppressNextClick = true), this._setSelection(_0x4871a5));
+          (enabled5.marqueeEl.remove(), (this._suppressNextClick = true), this._setSelection(value51));
         };
-      (window.addEventListener('pointermove', _0x2a7ffb, true),
-        window.addEventListener('pointerup', _0x4fe2e3, true),
-        window.addEventListener('pointercancel', _0x4fe2e3, true));
+      (window.addEventListener('pointermove', value47, true),
+        window.addEventListener('pointerup', value50, true),
+        window.addEventListener('pointercancel', value50, true));
     });
   }
   ['_bindContextMenu']() {
     if (!this.panel) return;
-    this.panel.addEventListener('contextmenu', (_0x5ba489) => {
-      const _0x14b71c = _0x5ba489.target.closest('.v2-file-history-card');
-      if (!_0x14b71c || !this.panel.contains(_0x14b71c)) return;
-      (_0x5ba489.preventDefault(), _0x5ba489.stopPropagation());
-      const _0x186973 = String(_0x14b71c.dataset.recordId || ''),
-        _0x5bb3c7 = this._findVisibleRecordById(_0x186973);
-      if (!isFileManagerActionableRecord(_0x5bb3c7)) return;
-      if (!this._selectedRecordIds.has(_0x186973)) this._setSelection([_0x186973]);
-      const _0x33ebca = this._getSelectedRecords(),
-        _0x3f0283 = this._buildContextMenuItems(_0x33ebca);
-      if (_0x3f0283.length === 0) return;
-      showContextMenu(_0x5ba489.clientX, _0x5ba489.clientY, _0x3f0283, {
+    this.panel.addEventListener('contextmenu', (event6) => {
+      const el7 = event6.target.closest('.v2-file-history-card');
+      if (!el7 || !this.panel.contains(el7)) return;
+      (event6.preventDefault(), event6.stopPropagation());
+      const value52 = String(el7.dataset.recordId || ''),
+        value53 = this._findVisibleRecordById(value52);
+      if (!isFileManagerActionableRecord(value53)) return;
+      if (!this._selectedRecordIds.has(value52)) this._setSelection([value52]);
+      const value54 = this._getSelectedRecords(),
+        list6 = this._buildContextMenuItems(value54);
+      if (list6.length === 0) return;
+      showContextMenu(event6.clientX, event6.clientY, list6, {
         includeNodePicker: false,
         sidebarSubmenuOwner: FILE_MANAGER_SIDEBAR_KEY,
       });
@@ -727,121 +700,121 @@ class GenerationHistoryFileManager {
   }
   ['_bindDoubleClickToCanvas']() {
     if (!this.panel) return;
-    this.panel.addEventListener('dblclick', (_0x5c0f3b) => {
-      const _0x1640d1 = _0x5c0f3b.target.closest('.v2-file-history-card');
-      if (!_0x1640d1 || !this.panel.contains(_0x1640d1)) return;
-      const _0x44c37d = String(_0x1640d1.dataset.recordId || ''),
-        _0x46320f = this._findVisibleRecordById(_0x44c37d);
-      if (!isFileManagerActionableRecord(_0x46320f)) return;
-      (_0x5c0f3b.preventDefault(), _0x5c0f3b.stopPropagation());
-      const _0xfd862f =
-        this._selectedRecordIds.has(_0x44c37d) && this._getSelectedRecords().length > 0
+    this.panel.addEventListener('dblclick', (event7) => {
+      const el8 = event7.target.closest('.v2-file-history-card');
+      if (!el8 || !this.panel.contains(el8)) return;
+      const value55 = String(el8.dataset.recordId || ''),
+        value56 = this._findVisibleRecordById(value55);
+      if (!isFileManagerActionableRecord(value56)) return;
+      (event7.preventDefault(), event7.stopPropagation());
+      const value57 =
+        this._selectedRecordIds.has(value55) && this._getSelectedRecords().length > 0
           ? this._getSelectedRecords()
-          : [_0x46320f];
-      this.restoreRecordsToCanvas(_0xfd862f);
+          : [value56];
+      this.restoreRecordsToCanvas(value57);
     });
   }
   ['_getSelectedRecords']() {
-    const _0x9b6cfb = this._visibleRecords(),
-      _0x213fcd = this._selectedRecordIds;
-    return _0x9b6cfb.filter((_0x844150) => _0x213fcd.has(String(_0x844150?.id || '')));
+    const list7 = this._visibleRecords(),
+      map3 = this._selectedRecordIds;
+    return list7.filter((item8) => map3.has(String(item8?.id || '')));
   }
-  ['_buildContextMenuItems'](_0x5d3eb0) {
-    const _0xc019f2 = (Array.isArray(_0x5d3eb0) ? _0x5d3eb0 : []).filter(isFileManagerActionableRecord),
-      _0x6ac010 = _0xc019f2[0] || null,
-      _0x2f786a = _0xc019f2.length === 1 ? resolveRecordLocalPath(_0x6ac010) : '',
-      _0x2a9ff1 = getFileManagerMenuActions({
-        records: _0xc019f2,
-        canRevealInFolder: canShowItemInFolder(_0x2f786a),
+  ['_buildContextMenuItems'](value58) {
+    const records = (Array.isArray(value58) ? value58 : []).filter(isFileManagerActionableRecord),
+      value59 = records[0] || null,
+      value60 = records.length === 1 ? resolveRecordLocalPath(value59) : '',
+      fileManagerMenuActions = getFileManagerMenuActions({
+        records: records,
+        canRevealInFolder: canShowItemInFolder(value60),
         getMediaKind: getRecordMediaKind,
         isActionableRecord: isFileManagerActionableRecord,
       }),
-      _0x159280 = [];
-    for (const _0x25f8c9 of _0x2a9ff1) {
-      if (_0x25f8c9 === 'delete' && _0x159280.length > 0) _0x159280.push('sep');
-      if (_0x25f8c9 === 'add-to-canvas')
-        _0x159280.push({
+      list8 = [];
+    for (const value61 of fileManagerMenuActions) {
+      if (value61 === 'delete' && list8.length > 0) list8.push('sep');
+      if (value61 === 'add-to-canvas')
+        list8.push({
           label:
-            _0xc019f2.length > 1
-              ? fileManagerText('contextMenu.addManyToCanvas', { count: _0xc019f2.length })
+            records.length > 1
+              ? fileManagerText('contextMenu.addManyToCanvas', { count: records.length })
               : fileManagerText('contextMenu.addToCanvas'),
-          action: () => this.restoreRecordsToCanvas(_0xc019f2),
+          action: () => this.restoreRecordsToCanvas(records),
         });
       else {
-        if (_0x25f8c9 === 'fullscreen')
-          _0x159280.push({
+        if (value61 === 'fullscreen')
+          list8.push({
             label: fileManagerText('contextMenu.fullscreen'),
-            action: () => this._openRecordPreview(_0x6ac010),
+            action: () => this._openRecordPreview(value59),
           });
         else {
-          if (_0x25f8c9 === 'reveal')
-            _0x159280.push({
+          if (value61 === 'reveal')
+            list8.push({
               label: fileManagerText('contextMenu.reveal'),
-              action: () => this._showRecordInFolder(_0x6ac010),
+              action: () => this._showRecordInFolder(value59),
             });
           else
-            _0x25f8c9 === 'delete' &&
-              _0x159280.push({
+            value61 === 'delete' &&
+              list8.push({
                 label:
-                  _0xc019f2.length > 1
-                    ? fileManagerText('contextMenu.deleteMany', { count: _0xc019f2.length })
+                  records.length > 1
+                    ? fileManagerText('contextMenu.deleteMany', { count: records.length })
                     : fileManagerText('contextMenu.delete'),
-                action: () => void this._deleteRecords(_0xc019f2),
+                action: () => void this._deleteRecords(records),
               });
         }
       }
     }
-    return _0x159280;
+    return list8;
   }
   ['_clampContentScroll']() {
     if (!this.contentEl) return;
-    const _0x57588a = Math.max(0, this.contentEl.scrollHeight - this.contentEl.clientHeight);
-    if (_0x57588a <= 0) {
+    const count6 = Math.max(0, this.contentEl.scrollHeight - this.contentEl.clientHeight);
+    if (count6 <= 0) {
       this.contentEl.scrollTop = 0;
       return;
     }
-    this.contentEl.scrollTop > _0x57588a && (this.contentEl.scrollTop = _0x57588a);
+    this.contentEl.scrollTop > count6 && (this.contentEl.scrollTop = count6);
   }
   ['_bindResizeHandle']() {
     if (!this.panel || !this.resizeHandleEl) return;
-    const _0xc98eb = () => {
+    const value62 = () => {
         if (!this._resizeState) return;
-        (window.removeEventListener('pointermove', _0x84f95a, true),
-          window.removeEventListener('pointerup', _0xc98eb, true),
-          window.removeEventListener('pointercancel', _0xc98eb, true),
+        (window.removeEventListener('pointermove', value63, true),
+          window.removeEventListener('pointerup', value62, true),
+          window.removeEventListener('pointercancel', value62, true),
           this.panel.classList.remove('is-resizing'),
           (this._resizeState = null));
       },
-      _0x84f95a = (_0x1746de) => {
+      value63 = (event8) => {
         if (!this._resizeState) return;
-        _0x1746de.preventDefault();
-        const _0x5cec67 = Math.max(
+        event8.preventDefault();
+        const value64 = Math.max(
             FILE_PANEL_RESIZE.minWidth,
             window.innerWidth - this._resizeState.left - FILE_PANEL_RESIZE.maxViewportGap,
           ),
-          _0x68296e = Math.max(
+          value65 = Math.max(
             FILE_PANEL_RESIZE.minWidth,
-            Math.min(_0x5cec67, this._resizeState.startWidth + _0x1746de.clientX - this._resizeState.startX),
+            Math.min(value64, this._resizeState.startWidth + event8.clientX - this._resizeState.startX),
           );
-        ((this._panelWidth = Math.round(_0x68296e)),
+        ((this._panelWidth = Math.round(value65)),
           (this.panel.style.width = this._panelWidth + 'px'),
           this._relayoutMasonry(),
           this._clampContentScroll());
       };
-    this.resizeHandleEl.addEventListener('pointerdown', (_0xa791d0) => {
-      if (_0xa791d0.button !== 0) return;
-      (_0xa791d0.preventDefault(), _0xa791d0.stopPropagation());
-      const _0x3553b4 = this.panel.getBoundingClientRect();
+    this.resizeHandleEl.addEventListener('pointerdown', (startX2) => {
+      if (startX2.button !== 0) return;
+      (startX2.preventDefault(), startX2.stopPropagation());
+      const startWidth = this.panel.getBoundingClientRect();
       ((this._resizeState = {
-        startX: _0xa791d0.clientX,
-        startWidth: _0x3553b4.width || FILE_PANEL_RESIZE.defaultWidth,
-        left: _0x3553b4.left,
+        startX: startX2.clientX,
+        startWidth: startWidth.width || FILE_PANEL_RESIZE.defaultWidth,
+        left: startWidth.left,
       }),
         this.panel.classList.add('is-resizing'),
-        this.resizeHandleEl.setPointerCapture?.(_0xa791d0.pointerId),
-        window.addEventListener('pointermove', _0x84f95a, true),
-        window.addEventListener('pointerup', _0xc98eb, true),
-        window.addEventListener('pointercancel', _0xc98eb, true));
+        this.resizeHandleEl.setPointerCapture?.(startX2.pointerId),
+        window.addEventListener('pointermove', value63, true),
+        window.addEventListener('pointerup', value62, true),
+        window.addEventListener('pointercancel', value62, true));
     });
   }
   ['_bindLocaleChange']() {
@@ -857,39 +830,39 @@ class GenerationHistoryFileManager {
       this.orderEl?.setAttribute('aria-label', fileManagerText('panel.orderAria')));
   }
   ['_bindButton']() {
-    const _0x33d544 = document.getElementById('btnFiles');
-    if (!_0x33d544) return;
-    const _0x10cc25 = () => {
+    const button = document.getElementById('btnFiles');
+    if (!button) return;
+    const open = () => {
       this.show();
     };
     registerSidebarSubmenu({
       key: FILE_MANAGER_SIDEBAR_KEY,
-      button: _0x33d544,
+      button: button,
       panel: this.panel,
-      open: _0x10cc25,
+      open: open,
       close: () => this.hide(),
       isOpen: () => this.panel.classList.contains('show'),
-      ignorePointerDown: (_0x245a0b) => this._shouldKeepOpenForExternalPointerDown(_0x245a0b),
+      ignorePointerDown: (value66) => this._shouldKeepOpenForExternalPointerDown(value66),
     });
   }
-  ['_shouldKeepOpenForExternalPointerDown'](_0x46cc9b) {
-    const _0x268a4e = _0x46cc9b?.target;
-    if (!_0x268a4e?.closest) return false;
-    return !!_0x268a4e.closest(FILE_MANAGER_KEEP_OPEN_SELECTOR);
+  ['_shouldKeepOpenForExternalPointerDown'](event9) {
+    const el9 = event9?.target;
+    if (!el9?.closest) return false;
+    return !!el9.closest(FILE_MANAGER_KEEP_OPEN_SELECTOR);
   }
   ['_bindGenerationEvents']() {
-    window.addEventListener(GENERATION_HISTORY_EVENT, (_0xddadf8) => {
-      const _0xf1738b = _0xddadf8?.detail || {},
-        _0x48d63e = buildGenerationHistoryAssetsFromNode({
-          images: Array.isArray(_0xf1738b.images) ? _0xf1738b.images : [],
-          videos: Array.isArray(_0xf1738b.videos) ? _0xf1738b.videos : [],
-          audios: Array.isArray(_0xf1738b.audios) ? _0xf1738b.audios : [],
-          nodeData: _0xf1738b.nodeData || {},
+    window.addEventListener(GENERATION_HISTORY_EVENT, (value67) => {
+      const nodeData = value67?.detail || {},
+        generationHistoryAssetsFromNode = buildGenerationHistoryAssetsFromNode({
+          images: Array.isArray(nodeData.images) ? nodeData.images : [],
+          videos: Array.isArray(nodeData.videos) ? nodeData.videos : [],
+          audios: Array.isArray(nodeData.audios) ? nodeData.audios : [],
+          nodeData: nodeData.nodeData || {},
           projectId: this._getCurrentProjectId(),
           canvasId: this._getCurrentCanvasId(),
-          now: Number(_0xf1738b.createdAt || Date.now()) || Date.now(),
+          now: Number(nodeData.createdAt || Date.now()) || Date.now(),
         });
-      void this._saveRecords(_0x48d63e);
+      void this._saveRecords(generationHistoryAssetsFromNode);
     });
   }
   ['_resetPageState']() {
@@ -904,17 +877,23 @@ class GenerationHistoryFileManager {
   async ['loadOutputFiles']({ dir: dir = this._outputDir } = {}) {
     ((this._activeSource = 'output'), (this._outputLoading = true), this.render());
     try {
-      const _0x1616b4 = await fetchOutputFilesFromServer({ dir: dir, order: this._sortOrder });
-      ((this.outputItems = Array.isArray(_0x1616b4?.items) ? _0x1616b4.items : []),
-        (this._outputDir = String(_0x1616b4?.dir || '').trim()),
-        (this._outputParent = String(_0x1616b4?.parent || '').trim()),
+      const fetchOutputFilesFromServer2 = await fetchOutputFilesFromServer({
+        dir: dir,
+        order: this._sortOrder,
+      });
+      ((this.outputItems = Array.isArray(fetchOutputFilesFromServer2?.items)
+        ? fetchOutputFilesFromServer2.items
+        : []),
+        (this._outputDir = String(fetchOutputFilesFromServer2?.dir || '').trim()),
+        (this._outputParent = String(fetchOutputFilesFromServer2?.parent || '').trim()),
         (this._outputBreadcrumbs =
-          Array.isArray(_0x1616b4?.breadcrumbs) && _0x1616b4.breadcrumbs.length > 0
-            ? _0x1616b4.breadcrumbs
+          Array.isArray(fetchOutputFilesFromServer2?.breadcrumbs) &&
+          fetchOutputFilesFromServer2.breadcrumbs.length > 0
+            ? fetchOutputFilesFromServer2.breadcrumbs
             : [{ name: 'output', dir: '' }]),
         (this._outputLoaded = true));
-    } catch (_0x2596d9) {
-      (console.error('[GenerationHistoryFileManager] 加载输出文件夹失败:', _0x2596d9),
+    } catch (value68) {
+      (console.error('[GenerationHistoryFileManager] 加载输出文件夹失败:', value68),
         (this.outputItems = []),
         (this._outputLoaded = true));
     } finally {
@@ -922,175 +901,173 @@ class GenerationHistoryFileManager {
       if (this._isOpen()) this.render();
     }
   }
-  ['_buildAssetPageParams'](_0x5ee49c) {
-    const _0x315993 = {
+  ['_buildAssetPageParams'](value69) {
+    const value70 = {
       kind: 'generation-history',
       projectId: this._getCurrentProjectId(),
-      offset: Number(_0x5ee49c) || 0,
+      offset: Number(value69) || 0,
       limit: FILE_HISTORY_PAGE_SIZE,
     };
-    this._activeSource === 'current-canvas' && (_0x315993.canvasId = this._getCurrentCanvasId());
-    if (this._activeFilter !== 'all') _0x315993.mediaKind = this._activeFilter;
-    return ((_0x315993.order = this._sortOrder), _0x315993);
+    this._activeSource === 'current-canvas' && (value70.canvasId = this._getCurrentCanvasId());
+    if (this._activeFilter !== 'all') value70.mediaKind = this._activeFilter;
+    return ((value70.order = this._sortOrder), value70);
   }
-  ['_normalizeAssetsPageResponse'](_0x52efae, _0x35d93d) {
-    if (Array.isArray(_0x52efae))
+  ['_normalizeAssetsPageResponse'](items, value71) {
+    if (Array.isArray(items))
       return {
-        items: _0x52efae.filter(isGenerationHistoryAsset),
-        total: _0x52efae.length,
+        items: items.filter(isGenerationHistoryAsset),
+        total: items.length,
         nextOffset: null,
         hasMore: false,
       };
-    const _0x22f553 = Array.isArray(_0x52efae?.items) ? _0x52efae.items.filter(isGenerationHistoryAsset) : [];
+    const items2 = Array.isArray(items?.items) ? items.items.filter(isGenerationHistoryAsset) : [];
     return {
-      items: _0x22f553,
-      total: Number(_0x52efae?.total || 0) || _0x22f553.length,
+      items: items2,
+      total: Number(items?.total || 0) || items2.length,
       nextOffset:
-        _0x52efae?.nextOffset === null || _0x52efae?.nextOffset === undefined
+        items?.nextOffset === null || items?.nextOffset === undefined
           ? null
-          : Number(_0x52efae.nextOffset) || Number(_0x35d93d) + _0x22f553.length,
-      hasMore: Boolean(_0x52efae?.hasMore),
+          : Number(items.nextOffset) || Number(value71) + items2.length,
+      hasMore: Boolean(items?.hasMore),
     };
   }
   async ['loadRecords']({ backfillAfterLoad: backfillAfterLoad = false, reset: reset = false } = {}) {
     if (this._loading && !reset) return;
     if (reset) this._resetPageState();
     if (!this._hasMore && this._recordsLoaded) return;
-    const _0x46bcc8 = ++this._loadToken;
+    const value72 = ++this._loadToken;
     this._loading = true;
     if (this._isOpen()) this.render();
-    let _0x3e4a6a = false;
-    const _0x3ffdc4 = reset ? 0 : this._nextOffset;
+    let value73 = false;
+    const count7 = reset ? 0 : this._nextOffset;
     try {
-      const _0x3d39a8 = await fetchAssetsFromServer(this._buildAssetPageParams(_0x3ffdc4));
-      if (_0x46bcc8 !== this._loadToken) return;
-      const _0xf5b004 = this._normalizeAssetsPageResponse(_0x3d39a8, _0x3ffdc4),
-        _0x9cfecb =
-          _0x3ffdc4 === 0
-            ? _0xf5b004.items
+      const fetchAssetsFromServer2 = await fetchAssetsFromServer(this._buildAssetPageParams(count7));
+      if (value72 !== this._loadToken) return;
+      const args2 = this._normalizeAssetsPageResponse(fetchAssetsFromServer2, count7),
+        value74 =
+          count7 === 0
+            ? args2.items
             : [
                 ...this.records,
-                ..._0xf5b004.items.filter(
-                  (_0x5ee709) =>
-                    !this.records.some(
-                      (_0x1428c7) => String(_0x1428c7?.id || '') === String(_0x5ee709?.id || ''),
-                    ),
+                ...args2.items.filter(
+                  (item9) =>
+                    !this.records.some((item10) => String(item10?.id || '') === String(item9?.id || '')),
                 ),
               ];
-      ((this.records = dedupeHistoryRecords(_0x9cfecb)),
+      ((this.records = dedupeHistoryRecords(value74)),
         (this._nextOffset =
-          _0xf5b004.nextOffset === null || _0xf5b004.nextOffset === undefined
+          args2.nextOffset === null || args2.nextOffset === undefined
             ? this.records.length
-            : _0xf5b004.nextOffset),
-        (this._hasMore = _0xf5b004.hasMore),
-        (this._totalRecords = _0xf5b004.total),
+            : args2.nextOffset),
+        (this._hasMore = args2.hasMore),
+        (this._totalRecords = args2.total),
         (this._recordsLoaded = true),
         (this._recordsDirty = false),
-        (_0x3e4a6a = backfillAfterLoad && _0x3ffdc4 === 0));
-    } catch (_0xabd1c8) {
-      if (_0x46bcc8 !== this._loadToken) return;
-      console.error('[GenerationHistoryFileManager] 加载生成媒体历史失败:', _0xabd1c8);
+        (value73 = backfillAfterLoad && count7 === 0));
+    } catch (value75) {
+      if (value72 !== this._loadToken) return;
+      console.error('[GenerationHistoryFileManager] 加载生成媒体历史失败:', value75);
     } finally {
-      if (_0x46bcc8 === this._loadToken) {
+      if (value72 === this._loadToken) {
         this._loading = false;
         if (this._isOpen()) this.render();
       }
     }
-    _0x46bcc8 === this._loadToken && _0x3e4a6a && this._isOpen() && void this._backfillCurrentCanvas();
+    value72 === this._loadToken && value73 && this._isOpen() && void this._backfillCurrentCanvas();
   }
-  async ['_saveRecords'](_0xa80911) {
-    const _0x2cc5cd = Array.isArray(_0xa80911) ? _0xa80911 : [],
-      _0x28d5f8 = new Set(),
-      _0x359245 = _0x2cc5cd.filter((_0xc4ab67) => {
-        const _0x565904 = String(_0xc4ab67?.resultFingerprint || '').trim(),
-          _0x109058 = resolveRecordLocalPath(_0xc4ab67);
-        if (!_0xc4ab67?.id || (!_0x565904 && !_0x109058)) return false;
-        const _0x587666 = buildHistoryRecordIdentityKey(_0xc4ab67),
-          _0x31fbaa = buildFileManagerHistoryRecordKey({
-            projectId: normalizeProjectId(_0xc4ab67.projectId),
-            canvasId: String(_0xc4ab67.canvasId || '').trim(),
-            resultFingerprint: _0x565904,
+  async ['_saveRecords'](value76) {
+    const list9 = Array.isArray(value76) ? value76 : [],
+      map4 = new Set(),
+      list10 = list9.filter((enabled6) => {
+        const resultFingerprint4 = String(enabled6?.resultFingerprint || '').trim(),
+          recordLocalPath = resolveRecordLocalPath(enabled6);
+        if (!enabled6?.id || (!resultFingerprint4 && !recordLocalPath)) return false;
+        const historyRecordIdentityKey2 = buildHistoryRecordIdentityKey(enabled6),
+          fileManagerHistoryRecordKey2 = buildFileManagerHistoryRecordKey({
+            projectId: normalizeProjectId(enabled6.projectId),
+            canvasId: String(enabled6.canvasId || '').trim(),
+            resultFingerprint: resultFingerprint4,
           });
-        if (_0x28d5f8.has(_0x587666)) return false;
-        _0x28d5f8.add(_0x587666);
-        if (this._savingIds.has(_0xc4ab67.id)) return false;
-        if (this._savingRecordKeys.has(_0x587666)) return false;
+        if (map4.has(historyRecordIdentityKey2)) return false;
+        map4.add(historyRecordIdentityKey2);
+        if (this._savingIds.has(enabled6.id)) return false;
+        if (this._savingRecordKeys.has(historyRecordIdentityKey2)) return false;
         return (
           !this._hasRecord(
-            _0xc4ab67.projectId,
-            _0xc4ab67.canvasId,
-            _0x565904,
-            _0x109058,
-            getRecordMediaKind(_0xc4ab67),
-          ) && !this._savingRecordKeys.has('fingerprint:' + _0x31fbaa)
+            enabled6.projectId,
+            enabled6.canvasId,
+            resultFingerprint4,
+            recordLocalPath,
+            getRecordMediaKind(enabled6),
+          ) && !this._savingRecordKeys.has('fingerprint:' + fileManagerHistoryRecordKey2)
         );
       });
-    if (_0x359245.length === 0) return 0;
-    let _0x4b8140 = 0;
-    for (const _0x46d5c5 of _0x359245) {
-      const _0x306201 = buildHistoryRecordIdentityKey(_0x46d5c5);
-      this._savingIds.add(_0x46d5c5.id);
-      if (_0x306201) this._savingRecordKeys.add(_0x306201);
+    if (list10.length === 0) return 0;
+    let count8 = 0;
+    for (const value77 of list10) {
+      const historyRecordIdentityKey3 = buildHistoryRecordIdentityKey(value77);
+      this._savingIds.add(value77.id);
+      if (historyRecordIdentityKey3) this._savingRecordKeys.add(historyRecordIdentityKey3);
       try {
-        (await saveAssetToServer(_0x46d5c5),
+        (await saveAssetToServer(value77),
           (this.records = dedupeHistoryRecords([
-            _0x46d5c5,
-            ...this.records.filter((_0x57ce67) => _0x57ce67.id !== _0x46d5c5.id),
+            value77,
+            ...this.records.filter((item11) => item11.id !== value77.id),
           ])),
-          (_0x4b8140 += 1));
-      } catch (_0x4f888e) {
-        console.error('[GenerationHistoryFileManager] 保存生成媒体历史失败:', _0x4f888e);
+          (count8 += 1));
+      } catch (value78) {
+        console.error('[GenerationHistoryFileManager] 保存生成媒体历史失败:', value78);
       } finally {
-        this._savingIds.delete(_0x46d5c5.id);
-        if (_0x306201) this._savingRecordKeys.delete(_0x306201);
+        this._savingIds.delete(value77.id);
+        if (historyRecordIdentityKey3) this._savingRecordKeys.delete(historyRecordIdentityKey3);
       }
     }
-    if (_0x4b8140 > 0) {
+    if (count8 > 0) {
       if (this._isOpen()) this.render();
       else this._recordsDirty = true;
     }
-    return _0x4b8140;
+    return count8;
   }
   async ['_backfillCurrentCanvas']() {
     if (this._backfillInFlight) return;
     this._backfillInFlight = true;
     try {
-      const _0x2889a3 = this._getCurrentProjectId(),
-        _0x2c2cc0 = this._getCurrentCanvasId(),
-        _0x44b2e7 = appStore.getStateRaw?.().nodes || appStore.getState().nodes || {},
-        _0x225f43 = [];
-      for (const _0x40004f of Object.values(_0x44b2e7 || {})) {
-        if (!_0x40004f) continue;
-        const _0x2e89ec = String(_0x40004f.type || '');
-        if (!['ai-image', 'ai-video', 'ai-audio'].includes(_0x2e89ec)) continue;
-        const _0x2a9a8d = _0x2e89ec === 'ai-image' && Array.isArray(_0x40004f.images) ? _0x40004f.images : [],
-          _0x45e749 = Array.isArray(_0x40004f.videos) ? _0x40004f.videos : [],
-          _0x15f047 =
-            _0x2e89ec === 'ai-video'
-              ? _0x45e749.length > 0
-                ? _0x45e749
-                : String(_0x40004f.videoUrl || _0x40004f.localPath || '').trim()
-                  ? [_0x40004f]
+      const projectId2 = this._getCurrentProjectId(),
+        canvasId2 = this._getCurrentCanvasId(),
+        value79 = appStore.getStateRaw?.().nodes || appStore.getState().nodes || {},
+        list11 = [];
+      for (const nodeData2 of Object.values(value79 || {})) {
+        if (!nodeData2) continue;
+        const value80 = String(nodeData2.type || '');
+        if (!['ai-image', 'ai-video', 'ai-audio'].includes(value80)) continue;
+        const images = value80 === 'ai-image' && Array.isArray(nodeData2.images) ? nodeData2.images : [],
+          list12 = Array.isArray(nodeData2.videos) ? nodeData2.videos : [],
+          videos =
+            value80 === 'ai-video'
+              ? list12.length > 0
+                ? list12
+                : String(nodeData2.videoUrl || nodeData2.localPath || '').trim()
+                  ? [nodeData2]
                   : []
               : [],
-          _0x5728ad =
-            _0x2e89ec === 'ai-audio' && String(_0x40004f.audioUrl || _0x40004f.localPath || '').trim()
-              ? [_0x40004f]
+          audios =
+            value80 === 'ai-audio' && String(nodeData2.audioUrl || nodeData2.localPath || '').trim()
+              ? [nodeData2]
               : [];
-        if (_0x2a9a8d.length === 0 && _0x15f047.length === 0 && _0x5728ad.length === 0) continue;
-        _0x225f43.push(
+        if (images.length === 0 && videos.length === 0 && audios.length === 0) continue;
+        list11.push(
           ...buildGenerationHistoryAssetsFromNode({
-            images: _0x2a9a8d,
-            videos: _0x15f047,
-            audios: _0x5728ad,
-            nodeData: _0x40004f,
-            projectId: _0x2889a3,
-            canvasId: _0x2c2cc0,
-            now: Number(_0x40004f.generationStartTime || Date.now()) || Date.now(),
+            images: images,
+            videos: videos,
+            audios: audios,
+            nodeData: nodeData2,
+            projectId: projectId2,
+            canvasId: canvasId2,
+            now: Number(nodeData2.generationStartTime || Date.now()) || Date.now(),
           }),
         );
       }
-      await this._saveRecords(_0x225f43);
+      await this._saveRecords(list11);
     } finally {
       this._backfillInFlight = false;
     }
@@ -1130,18 +1107,18 @@ class GenerationHistoryFileManager {
       (isHistorySource(this._activeSource) && this._loading && !this._recordsLoaded) ||
       (this._activeSource === 'output' && this._outputLoading && !this._outputLoaded)
     ) {
-      const _0x457632 = document.createElement('div');
-      ((_0x457632.className = 'v2-file-history-empty'),
-        (_0x457632.textContent = fileManagerText('loading.initial')),
-        this.contentEl.appendChild(_0x457632));
+      const el10 = document.createElement('div');
+      ((el10.className = 'v2-file-history-empty'),
+        (el10.textContent = fileManagerText('loading.initial')),
+        this.contentEl.appendChild(el10));
       return;
     }
-    const _0x1daf5e = this._visibleRecords();
+    const list13 = this._visibleRecords();
     this._pruneSelectionToVisibleRecords();
-    if (_0x1daf5e.length === 0) {
-      const _0x24bb14 = document.createElement('div');
-      ((_0x24bb14.className = 'v2-file-history-empty'),
-        (_0x24bb14.textContent =
+    if (list13.length === 0) {
+      const el11 = document.createElement('div');
+      ((el11.className = 'v2-file-history-empty'),
+        (el11.textContent =
           this._activeFilter === 'all'
             ? this._activeSource === 'output'
               ? fileManagerText('empty.output')
@@ -1149,54 +1126,54 @@ class GenerationHistoryFileManager {
                 ? fileManagerText('empty.currentCanvas')
                 : fileManagerText('empty.history')
             : fileManagerText('empty.filtered', { label: getMediaLabel(this._activeFilter) })),
-        this.contentEl.appendChild(_0x24bb14),
+        this.contentEl.appendChild(el11),
         this._clampContentScroll());
       return;
     }
-    this._renderMasonry(_0x1daf5e);
+    this._renderMasonry(list13);
     if (isHistorySource(this._activeSource) && this._loading && this._recordsLoaded) {
-      const _0x49385 = document.createElement('div');
-      ((_0x49385.className = 'v2-file-history-page-status'),
-        (_0x49385.textContent = fileManagerText('loading.more')),
-        this.contentEl.appendChild(_0x49385));
+      const el12 = document.createElement('div');
+      ((el12.className = 'v2-file-history-page-status'),
+        (el12.textContent = fileManagerText('loading.more')),
+        this.contentEl.appendChild(el12));
     }
     this._clampContentScroll();
   }
   ['_renderSourceTabs']() {
     if (!this.sourceTabsEl) return;
-    const _0x16e42c = document.createDocumentFragment();
-    for (const _0x4e5a32 of FILE_SOURCES) {
-      const _0x5ee770 = document.createElement('button');
-      ((_0x5ee770.type = 'button'),
-        (_0x5ee770.className = 'v2-file-history-source-tab'),
-        (_0x5ee770.dataset.fileAction = 'source'),
-        (_0x5ee770.dataset.source = _0x4e5a32.key),
-        _0x5ee770.setAttribute('role', 'tab'),
-        _0x5ee770.setAttribute('aria-selected', this._activeSource === _0x4e5a32.key ? 'true' : 'false'),
-        _0x5ee770.classList.toggle('is-active', this._activeSource === _0x4e5a32.key),
-        (_0x5ee770.textContent = fileManagerText(_0x4e5a32.labelKey)),
-        _0x16e42c.appendChild(_0x5ee770));
+    const el13 = document.createDocumentFragment();
+    for (const event10 of FILE_SOURCES) {
+      const el14 = document.createElement('button');
+      ((el14.type = 'button'),
+        (el14.className = 'v2-file-history-source-tab'),
+        (el14.dataset.fileAction = 'source'),
+        (el14.dataset.source = event10.key),
+        el14.setAttribute('role', 'tab'),
+        el14.setAttribute('aria-selected', this._activeSource === event10.key ? 'true' : 'false'),
+        el14.classList.toggle('is-active', this._activeSource === event10.key),
+        (el14.textContent = fileManagerText(event10.labelKey)),
+        el13.appendChild(el14));
     }
-    this.sourceTabsEl.replaceChildren(_0x16e42c);
+    this.sourceTabsEl.replaceChildren(el13);
   }
   ['_renderOrderControls']() {
     if (!this.orderEl) return;
-    const _0x3d3924 = document.createElement('button');
-    ((_0x3d3924.type = 'button'),
-      (_0x3d3924.className = 'v2-file-history-order-btn'),
-      (_0x3d3924.dataset.fileAction = 'order'),
-      (_0x3d3924.dataset.order = this._sortOrder),
-      _0x3d3924.setAttribute(
+    const el15 = document.createElement('button');
+    ((el15.type = 'button'),
+      (el15.className = 'v2-file-history-order-btn'),
+      (el15.dataset.fileAction = 'order'),
+      (el15.dataset.order = this._sortOrder),
+      el15.setAttribute(
         'aria-label',
         this._sortOrder === 'asc' ? fileManagerText('sort.ascAria') : fileManagerText('sort.descAria'),
       ),
-      (_0x3d3924.title =
+      (el15.title =
         this._sortOrder === 'asc' ? fileManagerText('sort.ascTitle') : fileManagerText('sort.descTitle')),
-      (_0x3d3924.innerHTML =
+      (el15.innerHTML =
         '\n      <svg viewBox="0 0 24 24" aria-hidden="true" class="' +
         (this._sortOrder === 'asc' ? 'is-asc' : 'is-desc') +
         '">\n        <path d="M8 5v14" />\n        <path d="M4.5 8.5 8 5l3.5 3.5" />\n        <path d="M16 19V5" />\n        <path d="m12.5 15.5 3.5 3.5 3.5-3.5" />\n      </svg>\n    '),
-      this.orderEl.replaceChildren(_0x3d3924));
+      this.orderEl.replaceChildren(el15));
   }
   ['_renderSubtitle']() {
     if (!this.subtitleEl) return;
@@ -1212,524 +1189,512 @@ class GenerationHistoryFileManager {
     (this.breadcrumbsEl.replaceChildren(),
       this.breadcrumbsEl.classList.toggle('is-visible', this._activeSource === 'output'));
     if (this._activeSource !== 'output') return;
-    const _0x94e902 = Array.isArray(this._outputBreadcrumbs)
+    const value81 = Array.isArray(this._outputBreadcrumbs)
       ? this._outputBreadcrumbs
       : [{ name: 'output', dir: '' }];
     if (this._outputDir) {
-      const _0x5469f6 = document.createElement('button');
-      ((_0x5469f6.type = 'button'),
-        (_0x5469f6.className = 'v2-file-history-crumb'),
-        (_0x5469f6.dataset.fileAction = 'output-dir'),
-        (_0x5469f6.dataset.dir = this._outputParent || ''),
-        (_0x5469f6.textContent = fileManagerText('breadcrumbs.up')),
-        this.breadcrumbsEl.appendChild(_0x5469f6));
+      const el16 = document.createElement('button');
+      ((el16.type = 'button'),
+        (el16.className = 'v2-file-history-crumb'),
+        (el16.dataset.fileAction = 'output-dir'),
+        (el16.dataset.dir = this._outputParent || ''),
+        (el16.textContent = fileManagerText('breadcrumbs.up')),
+        this.breadcrumbsEl.appendChild(el16));
     }
-    for (const _0x1efd5a of _0x94e902) {
-      const _0x535258 = document.createElement('button');
-      ((_0x535258.type = 'button'),
-        (_0x535258.className = 'v2-file-history-crumb'),
-        (_0x535258.dataset.fileAction = 'output-dir'),
-        (_0x535258.dataset.dir = String(_0x1efd5a?.dir || '')),
-        (_0x535258.textContent = String(_0x1efd5a?.name || 'output')),
-        this.breadcrumbsEl.appendChild(_0x535258));
+    for (const error4 of value81) {
+      const el17 = document.createElement('button');
+      ((el17.type = 'button'),
+        (el17.className = 'v2-file-history-crumb'),
+        (el17.dataset.fileAction = 'output-dir'),
+        (el17.dataset.dir = String(error4?.dir || '')),
+        (el17.textContent = String(error4?.name || 'output')),
+        this.breadcrumbsEl.appendChild(el17));
     }
   }
   ['_getMasonryMetrics']() {
     if (!this.contentEl) return { contentWidth: 1 };
-    const _0x272030 = window.getComputedStyle(this.contentEl),
-      _0x2221f6 =
-        (Number.parseFloat(_0x272030.paddingLeft) || 0) + (Number.parseFloat(_0x272030.paddingRight) || 0);
-    return { contentWidth: Math.max(1, (this.contentEl.clientWidth || 1) - _0x2221f6) };
+    const value82 = window.getComputedStyle(this.contentEl),
+      value83 =
+        (Number.parseFloat(value82.paddingLeft) || 0) + (Number.parseFloat(value82.paddingRight) || 0);
+    return { contentWidth: Math.max(1, (this.contentEl.clientWidth || 1) - value83) };
   }
-  ['_getRecordDisplaySize'](_0x3887fd, _0x39bfb3) {
-    const _0x79abdb = getRecordMediaKind(_0x3887fd),
-      { width: _0x58bc34, height: _0x36f962 } = resolveRecordSize(_0x3887fd, _0x79abdb),
-      _0x264e4f = Math.max(1, _0x58bc34),
-      _0x1013a0 = Math.max(1, _0x36f962),
-      _0x12e54e = Math.min(_0x264e4f, _0x1013a0),
-      _0xb3a72d = Math.max(_0x264e4f, _0x1013a0),
-      _0x3fd722 = FILE_MASONRY.fixedShortSide,
-      _0x5d2b55 = Math.min(
-        _0x3fd722 / _0x12e54e,
-        FILE_MASONRY.maxLongSide / _0xb3a72d,
-        _0x264e4f > _0x39bfb3 ? _0x39bfb3 / _0x264e4f : 1,
+  ['_getRecordDisplaySize'](value84, value85) {
+    const recordMediaKind3 = getRecordMediaKind(value84),
+      { width: width4, height: height4 } = resolveRecordSize(value84, recordMediaKind3),
+      value86 = Math.max(1, width4),
+      value87 = Math.max(1, height4),
+      value88 = Math.min(value86, value87),
+      value89 = Math.max(value86, value87),
+      value90 = FILE_MASONRY.fixedShortSide,
+      value91 = Math.min(
+        value90 / value88,
+        FILE_MASONRY.maxLongSide / value89,
+        value86 > value85 ? value85 / value86 : 1,
       );
     return {
-      width: Math.max(1, Math.round(_0x264e4f * _0x5d2b55)),
-      height: Math.max(1, Math.round(_0x1013a0 * _0x5d2b55)),
+      width: Math.max(1, Math.round(value86 * value91)),
+      height: Math.max(1, Math.round(value87 * value91)),
     };
   }
-  ['_findMasonrySlot'](_0x4bbea9, _0xe40de8, _0x39fe46) {
-    const _0x459efb = FILE_MASONRY.gap,
-      _0x193a00 = Math.max(0, _0x39fe46 - _0xe40de8.width),
-      _0x18afdd = [];
-    for (let _0x4c1dad = 0; _0x4c1dad <= _0x193a00; _0x4c1dad += FILE_MASONRY.placementStep) {
-      _0x18afdd.push(_0x4c1dad);
+  ['_findMasonrySlot'](value92, box8, value93) {
+    const value94 = FILE_MASONRY.gap,
+      value95 = Math.max(0, value93 - box8.width),
+      list14 = [];
+    for (let value96 = 0; value96 <= value95; value96 += FILE_MASONRY.placementStep) {
+      list14.push(value96);
     }
-    if (_0x18afdd[_0x18afdd.length - 1] !== _0x193a00) _0x18afdd.push(_0x193a00);
-    let _0x2497ec = null;
-    for (const _0xb4b764 of _0x18afdd) {
-      let _0x525a8d = 0;
-      for (const _0x46277b of _0x4bbea9) {
-        const _0x51d55e =
-          _0xb4b764 < _0x46277b.x + _0x46277b.width + _0x459efb &&
-          _0xb4b764 + _0xe40de8.width + _0x459efb > _0x46277b.x;
-        if (_0x51d55e) _0x525a8d = Math.max(_0x525a8d, _0x46277b.y + _0x46277b.height + _0x459efb);
+    if (list14[list14.length - 1] !== value95) list14.push(value95);
+    let box9 = null;
+    for (const x2 of list14) {
+      let y2 = 0;
+      for (const box10 of value92) {
+        const value97 = x2 < box10.x + box10.width + value94 && x2 + box8.width + value94 > box10.x;
+        if (value97) y2 = Math.max(y2, box10.y + box10.height + value94);
       }
-      (!_0x2497ec || _0x525a8d < _0x2497ec.y || (_0x525a8d === _0x2497ec.y && _0xb4b764 < _0x2497ec.x)) &&
-        (_0x2497ec = { x: _0xb4b764, y: _0x525a8d });
+      (!box9 || y2 < box9.y || (y2 === box9.y && x2 < box9.x)) && (box9 = { x: x2, y: y2 });
     }
-    return _0x2497ec || { x: 0, y: 0 };
+    return box9 || { x: 0, y: 0 };
   }
-  ['_renderMasonry'](_0x566761) {
-    const { contentWidth: _0x45ebff } = this._getMasonryMetrics(),
-      _0x5476bd = document.createElement('div');
-    ((_0x5476bd.className = 'v2-file-history-masonry-canvas'), this.contentEl.appendChild(_0x5476bd));
-    const _0x500e93 = [];
-    let _0x1e4c66 = 0;
-    for (const _0xd7b7fd of _0x566761) {
-      const _0x341711 = this._getRecordDisplaySize(_0xd7b7fd, _0x45ebff),
-        _0x387456 = this._findMasonrySlot(_0x500e93, _0x341711, _0x45ebff),
-        _0x9daec3 = this._renderCard(_0xd7b7fd);
-      ((_0x9daec3.style.left = _0x387456.x + 'px'),
-        (_0x9daec3.style.top = _0x387456.y + 'px'),
-        (_0x9daec3.style.width = _0x341711.width + 'px'),
-        (_0x9daec3.style.height = _0x341711.height + 'px'),
-        _0x5476bd.appendChild(_0x9daec3),
-        _0x500e93.push({ ..._0x387456, ..._0x341711 }),
-        (_0x1e4c66 = Math.max(_0x1e4c66, _0x387456.y + _0x341711.height)));
+  ['_renderMasonry'](value98) {
+    const { contentWidth: contentWidth } = this._getMasonryMetrics(),
+      el18 = document.createElement('div');
+    ((el18.className = 'v2-file-history-masonry-canvas'), this.contentEl.appendChild(el18));
+    const list15 = [];
+    let value99 = 0;
+    for (const value100 of value98) {
+      const box11 = this._getRecordDisplaySize(value100, contentWidth),
+        box12 = this._findMasonrySlot(list15, box11, contentWidth),
+        el19 = this._renderCard(value100);
+      ((el19.style.left = box12.x + 'px'),
+        (el19.style.top = box12.y + 'px'),
+        (el19.style.width = box11.width + 'px'),
+        (el19.style.height = box11.height + 'px'),
+        el18.appendChild(el19),
+        list15.push({ ...box12, ...box11 }),
+        (value99 = Math.max(value99, box12.y + box11.height)));
     }
-    _0x5476bd.style.height = _0x1e4c66 + 'px';
+    el18.style.height = value99 + 'px';
   }
   ['_relayoutMasonry']() {
     if (!this.contentEl || !this._isOpen()) return false;
-    const _0x4d00de = this.contentEl.querySelector('.v2-file-history-masonry-canvas');
-    if (!_0x4d00de) return (this.render(), false);
-    const _0x5acd34 = this._visibleRecords(),
-      _0x3c9d00 = new Map(
-        Array.from(_0x4d00de.querySelectorAll('.v2-file-history-card')).map((_0x5ab1de) => [
-          String(_0x5ab1de.dataset.recordId || ''),
-          _0x5ab1de,
+    const el20 = this.contentEl.querySelector('.v2-file-history-masonry-canvas');
+    if (!el20) return (this.render(), false);
+    const list16 = this._visibleRecords(),
+      map5 = new Map(
+        Array.from(el20.querySelectorAll('.v2-file-history-card')).map((el21) => [
+          String(el21.dataset.recordId || ''),
+          el21,
         ]),
       );
-    if (_0x5acd34.length !== _0x3c9d00.size) return (this.render(), false);
-    const { contentWidth: _0x469b55 } = this._getMasonryMetrics(),
-      _0x215519 = [];
-    let _0x4b19c9 = 0;
-    for (const _0x3b98c3 of _0x5acd34) {
-      const _0x52d8f2 = String(_0x3b98c3?.id || ''),
-        _0x2dfa3c = _0x3c9d00.get(_0x52d8f2);
-      if (!_0x2dfa3c) return (this.render(), false);
-      const _0x1a1d3a = this._getRecordDisplaySize(_0x3b98c3, _0x469b55),
-        _0x2d2061 = this._findMasonrySlot(_0x215519, _0x1a1d3a, _0x469b55);
-      ((_0x2dfa3c.style.left = _0x2d2061.x + 'px'),
-        (_0x2dfa3c.style.top = _0x2d2061.y + 'px'),
-        (_0x2dfa3c.style.width = _0x1a1d3a.width + 'px'),
-        (_0x2dfa3c.style.height = _0x1a1d3a.height + 'px'),
-        _0x215519.push({ ..._0x2d2061, ..._0x1a1d3a }),
-        (_0x4b19c9 = Math.max(_0x4b19c9, _0x2d2061.y + _0x1a1d3a.height)));
+    if (list16.length !== map5.size) return (this.render(), false);
+    const { contentWidth: contentWidth2 } = this._getMasonryMetrics(),
+      list17 = [];
+    let value101 = 0;
+    for (const value102 of list16) {
+      const value103 = String(value102?.id || ''),
+        el22 = map5.get(value103);
+      if (!el22) return (this.render(), false);
+      const box13 = this._getRecordDisplaySize(value102, contentWidth2),
+        box14 = this._findMasonrySlot(list17, box13, contentWidth2);
+      ((el22.style.left = box14.x + 'px'),
+        (el22.style.top = box14.y + 'px'),
+        (el22.style.width = box13.width + 'px'),
+        (el22.style.height = box13.height + 'px'),
+        list17.push({ ...box14, ...box13 }),
+        (value101 = Math.max(value101, box14.y + box13.height)));
     }
-    return ((_0x4d00de.style.height = _0x4b19c9 + 'px'), true);
+    return ((el20.style.height = value101 + 'px'), true);
   }
   ['_renderFilters']() {
     if (!this.filterEl) return;
-    const _0x49bc54 = new Map(
-        Array.from(this.filterEl.querySelectorAll('.v2-file-history-filter')).map((_0x448c5b) => [
-          _0x448c5b.dataset.filter || '',
-          _0x448c5b,
+    const map6 = new Map(
+        Array.from(this.filterEl.querySelectorAll('.v2-file-history-filter')).map((el23) => [
+          el23.dataset.filter || '',
+          el23,
         ]),
       ),
-      _0x5676d3 = document.createDocumentFragment();
-    for (const _0x1df17a of FILE_FILTERS) {
-      const _0x52c3ba = _0x49bc54.get(_0x1df17a.key) || document.createElement('button');
-      (!_0x52c3ba.dataset.filter &&
-        ((_0x52c3ba.type = 'button'),
-        (_0x52c3ba.className = 'v2-file-history-filter'),
-        (_0x52c3ba.dataset.fileAction = 'filter'),
-        (_0x52c3ba.dataset.filter = _0x1df17a.key)),
-        _0x52c3ba.setAttribute('role', 'tab'),
-        _0x52c3ba.setAttribute('aria-selected', this._activeFilter === _0x1df17a.key ? 'true' : 'false'),
-        _0x52c3ba.classList.toggle('is-active', this._activeFilter === _0x1df17a.key),
-        (_0x52c3ba.textContent = fileManagerText(_0x1df17a.labelKey)),
-        _0x5676d3.appendChild(_0x52c3ba));
+      el24 = document.createDocumentFragment();
+    for (const event11 of FILE_FILTERS) {
+      const el25 = map6.get(event11.key) || document.createElement('button');
+      (!el25.dataset.filter &&
+        ((el25.type = 'button'),
+        (el25.className = 'v2-file-history-filter'),
+        (el25.dataset.fileAction = 'filter'),
+        (el25.dataset.filter = event11.key)),
+        el25.setAttribute('role', 'tab'),
+        el25.setAttribute('aria-selected', this._activeFilter === event11.key ? 'true' : 'false'),
+        el25.classList.toggle('is-active', this._activeFilter === event11.key),
+        (el25.textContent = fileManagerText(event11.labelKey)),
+        el24.appendChild(el25));
     }
-    this.filterEl.replaceChildren(_0x5676d3);
+    this.filterEl.replaceChildren(el24);
   }
-  ['_renderCard'](_0x3081b8) {
-    const _0x453e23 = document.createElement('div');
-    ((_0x453e23.className = 'v2-file-history-card'),
-      (_0x453e23.dataset.recordId = String(_0x3081b8?.id || '')));
-    const _0x20f4fc = getRecordMediaKind(_0x3081b8);
-    ((_0x453e23.dataset.mediaKind = _0x20f4fc),
-      _0x453e23.classList.toggle('is-selected', this._selectedRecordIds.has(String(_0x3081b8?.id || ''))));
-    const _0x3d48f3 = document.createElement('div');
-    _0x3d48f3.className = 'v2-file-history-thumb is-' + _0x20f4fc;
-    const _0x352d45 = resolveRecordAspect(_0x3081b8, _0x20f4fc);
-    if (_0x352d45) _0x3d48f3.style.aspectRatio = _0x352d45;
-    const _0x39e50b = resolveThumbSrc(_0x3081b8),
-      _0x3c3654 = resolveMediaSrc(_0x3081b8);
-    if (_0x20f4fc === 'folder') _0x3d48f3.appendChild(this._renderFolderThumb(_0x3081b8));
+  ['_renderCard'](value104) {
+    const el26 = document.createElement('div');
+    ((el26.className = 'v2-file-history-card'), (el26.dataset.recordId = String(value104?.id || '')));
+    const recordMediaKind4 = getRecordMediaKind(value104);
+    ((el26.dataset.mediaKind = recordMediaKind4),
+      el26.classList.toggle('is-selected', this._selectedRecordIds.has(String(value104?.id || ''))));
+    const el27 = document.createElement('div');
+    el27.className = 'v2-file-history-thumb is-' + recordMediaKind4;
+    const recordAspect = resolveRecordAspect(value104, recordMediaKind4);
+    if (recordAspect) el27.style.aspectRatio = recordAspect;
+    const thumbSrc = resolveThumbSrc(value104),
+      mediaSrc = resolveMediaSrc(value104);
+    if (recordMediaKind4 === 'folder') el27.appendChild(this._renderFolderThumb(value104));
     else {
-      if (_0x20f4fc === 'file') _0x3d48f3.appendChild(this._renderFileThumb(_0x3081b8));
+      if (recordMediaKind4 === 'file') el27.appendChild(this._renderFileThumb(value104));
       else {
-        if (_0x20f4fc === GENERATION_HISTORY_MEDIA_KINDS.VIDEO && _0x3c3654) {
-          const _0x42c82a = document.createElement('video');
-          _0x42c82a.src = _0x3c3654;
-          if (_0x39e50b && _0x39e50b !== _0x3c3654) _0x42c82a.poster = _0x39e50b;
-          ((_0x42c82a.muted = false),
-            (_0x42c82a.volume = 0.72),
-            (_0x42c82a.loop = true),
-            (_0x42c82a.playsInline = true),
-            (_0x42c82a.preload = 'metadata'),
-            (_0x42c82a.draggable = false),
-            _0x3d48f3.appendChild(_0x42c82a),
-            _0x3d48f3.appendChild(this._renderVideoPreviewOverlay()));
+        if (recordMediaKind4 === GENERATION_HISTORY_MEDIA_KINDS.VIDEO && mediaSrc) {
+          const value105 = document.createElement('video');
+          value105.src = mediaSrc;
+          if (thumbSrc && thumbSrc !== mediaSrc) value105.poster = thumbSrc;
+          ((value105.muted = false),
+            (value105.volume = 0.72),
+            (value105.loop = true),
+            (value105.playsInline = true),
+            (value105.preload = 'metadata'),
+            (value105.draggable = false),
+            el27.appendChild(value105),
+            el27.appendChild(this._renderVideoPreviewOverlay()));
         } else {
-          if (_0x20f4fc === GENERATION_HISTORY_MEDIA_KINDS.VIDEO && _0x39e50b) {
-            const _0x325d07 = document.createElement('img');
-            ((_0x325d07.src = _0x39e50b),
-              (_0x325d07.alt = fileManagerText('alt.videoHistory')),
-              (_0x325d07.draggable = false),
-              (_0x325d07.decoding = 'async'),
-              (_0x325d07.loading = 'lazy'),
-              _0x3d48f3.appendChild(_0x325d07));
+          if (recordMediaKind4 === GENERATION_HISTORY_MEDIA_KINDS.VIDEO && thumbSrc) {
+            const value106 = document.createElement('img');
+            ((value106.src = thumbSrc),
+              (value106.alt = fileManagerText('alt.videoHistory')),
+              (value106.draggable = false),
+              (value106.decoding = 'async'),
+              (value106.loading = 'lazy'),
+              el27.appendChild(value106));
           } else {
-            if (_0x20f4fc === GENERATION_HISTORY_MEDIA_KINDS.AUDIO)
-              _0x3d48f3.appendChild(this._renderAudioThumb(_0x3c3654));
+            if (recordMediaKind4 === GENERATION_HISTORY_MEDIA_KINDS.AUDIO)
+              el27.appendChild(this._renderAudioThumb(mediaSrc));
             else {
-              if (_0x39e50b) {
-                const _0x2d244b = document.createElement('img');
-                ((_0x2d244b.src = _0x39e50b),
-                  (_0x2d244b.alt = fileManagerText('alt.imageHistory')),
-                  (_0x2d244b.draggable = false),
-                  (_0x2d244b.decoding = 'async'),
-                  (_0x2d244b.loading = 'lazy'),
-                  _0x3d48f3.appendChild(_0x2d244b));
+              if (thumbSrc) {
+                const value107 = document.createElement('img');
+                ((value107.src = thumbSrc),
+                  (value107.alt = fileManagerText('alt.imageHistory')),
+                  (value107.draggable = false),
+                  (value107.decoding = 'async'),
+                  (value107.loading = 'lazy'),
+                  el27.appendChild(value107));
               }
             }
           }
         }
       }
     }
-    return (_0x453e23.appendChild(_0x3d48f3), this._bindHoverPreview(_0x453e23, _0x20f4fc), _0x453e23);
+    return (el26.appendChild(el27), this._bindHoverPreview(el26, recordMediaKind4), el26);
   }
-  ['_bindHoverPreview'](_0x285509, _0x88e11b) {
-    if (!_0x285509) return;
-    if (_0x88e11b === GENERATION_HISTORY_MEDIA_KINDS.VIDEO) {
-      const _0x5c8a8f = _0x285509.querySelector('video');
-      if (!_0x5c8a8f) return;
-      const _0x2d4fa6 = _0x285509.querySelector('.v2-file-history-video-progress-fill'),
-        _0x1a05e3 = () => {
-          if (_0x2d4fa6) _0x2d4fa6.style.transform = 'scaleX(0)';
+  ['_bindHoverPreview'](el28, value108) {
+    if (!el28) return;
+    if (value108 === GENERATION_HISTORY_MEDIA_KINDS.VIDEO) {
+      const el29 = el28.querySelector('video');
+      if (!el29) return;
+      const el30 = el28.querySelector('.v2-file-history-video-progress-fill'),
+        handler = () => {
+          if (el30) el30.style.transform = 'scaleX(0)';
         },
-        _0x5ca471 = () => {
-          if (!_0x2d4fa6) return;
-          const _0x474edd = Number(_0x5c8a8f.duration || 0),
-            _0x2a01a1 = Number(_0x5c8a8f.currentTime || 0),
-            _0x2e5178 = _0x474edd > 0 ? Math.min(Math.max(_0x2a01a1 / _0x474edd, 0), 1) : 0;
-          _0x2d4fa6.style.transform = 'scaleX(' + _0x2e5178 + ')';
+        value109 = () => {
+          if (!el30) return;
+          const count9 = Number(el29.duration || 0),
+            value110 = Number(el29.currentTime || 0),
+            value111 = count9 > 0 ? Math.min(Math.max(value110 / count9, 0), 1) : 0;
+          el30.style.transform = 'scaleX(' + value111 + ')';
         };
-      (_0x5c8a8f.addEventListener('timeupdate', _0x5ca471),
-        _0x5c8a8f.addEventListener('loadedmetadata', _0x5ca471),
-        _0x285509.addEventListener('mouseenter', () => {
-          (_0x285509.classList.add('is-preview-playing'),
-            (_0x5c8a8f.muted = false),
-            (_0x5c8a8f.volume = 0.72));
-          const _0x30cf0 = _0x5c8a8f.play();
-          _0x30cf0 &&
-            typeof _0x30cf0.catch === 'function' &&
-            _0x30cf0.catch(() => {
-              _0x5c8a8f.muted = true;
-              const _0x4cfdd6 = _0x5c8a8f.play();
-              _0x4cfdd6 &&
-                typeof _0x4cfdd6.catch === 'function' &&
-                _0x4cfdd6.catch(() => {
-                  (_0x285509.classList.remove('is-preview-playing'), _0x1a05e3());
+      (el29.addEventListener('timeupdate', value109),
+        el29.addEventListener('loadedmetadata', value109),
+        el28.addEventListener('mouseenter', () => {
+          (el28.classList.add('is-preview-playing'), (el29.muted = false), (el29.volume = 0.72));
+          const promise = el29.play();
+          promise &&
+            typeof promise.catch === 'function' &&
+            promise.catch(() => {
+              el29.muted = true;
+              const promise2 = el29.play();
+              promise2 &&
+                typeof promise2.catch === 'function' &&
+                promise2.catch(() => {
+                  (el28.classList.remove('is-preview-playing'), handler());
                 });
             });
         }),
-        _0x285509.addEventListener('mouseleave', () => {
-          _0x5c8a8f.pause();
+        el28.addEventListener('mouseleave', () => {
+          el29.pause();
           try {
-            _0x5c8a8f.currentTime = 0;
+            el29.currentTime = 0;
           } catch {}
-          (_0x1a05e3(), (_0x5c8a8f.muted = false), _0x285509.classList.remove('is-preview-playing'));
+          (handler(), (el29.muted = false), el28.classList.remove('is-preview-playing'));
         }));
       return;
     }
-    if (_0x88e11b === GENERATION_HISTORY_MEDIA_KINDS.AUDIO) {
-      const _0xb72f6 = _0x285509.querySelector('audio');
-      if (!_0xb72f6) return;
-      (_0x285509.addEventListener('mouseenter', () => {
-        _0x285509.classList.add('is-preview-playing');
+    if (value108 === GENERATION_HISTORY_MEDIA_KINDS.AUDIO) {
+      const enabled7 = el28.querySelector('audio');
+      if (!enabled7) return;
+      (el28.addEventListener('mouseenter', () => {
+        el28.classList.add('is-preview-playing');
         try {
-          _0xb72f6.currentTime = 0;
+          enabled7.currentTime = 0;
         } catch {}
-        const _0x3137e6 = _0xb72f6.play();
-        _0x3137e6 &&
-          typeof _0x3137e6.catch === 'function' &&
-          _0x3137e6.catch(() => {
-            _0x285509.classList.remove('is-preview-playing');
+        const promise3 = enabled7.play();
+        promise3 &&
+          typeof promise3.catch === 'function' &&
+          promise3.catch(() => {
+            el28.classList.remove('is-preview-playing');
           });
       }),
-        _0x285509.addEventListener('mouseleave', () => {
-          _0xb72f6.pause();
+        el28.addEventListener('mouseleave', () => {
+          enabled7.pause();
           try {
-            _0xb72f6.currentTime = 0;
+            enabled7.currentTime = 0;
           } catch {}
-          _0x285509.classList.remove('is-preview-playing');
+          el28.classList.remove('is-preview-playing');
         }));
     }
   }
-  ['_renderFolderThumb'](_0x396fcd) {
-    const _0x54a7ea = document.createElement('div');
-    _0x54a7ea.className = 'v2-file-history-folder-thumb';
-    const _0x9c7c90 = document.createElement('div');
+  ['_renderFolderThumb'](error5) {
+    const el31 = document.createElement('div');
+    el31.className = 'v2-file-history-folder-thumb';
+    const el32 = document.createElement('div');
     return (
-      (_0x9c7c90.className = 'v2-file-history-folder-name'),
-      (_0x9c7c90.textContent = _0x396fcd?.name || fileManagerText('fallback.folder')),
-      (_0x54a7ea.innerHTML =
+      (el32.className = 'v2-file-history-folder-name'),
+      (el32.textContent = error5?.name || fileManagerText('fallback.folder')),
+      (el31.innerHTML =
         '\n      <svg viewBox="0 0 96 72" aria-hidden="true">\n        <path d="M8 22h28l8 9h44v31a8 8 0 0 1-8 8H16a8 8 0 0 1-8-8V22z" class="folder-body"/>\n        <path d="M8 18a8 8 0 0 1 8-8h19l8 9h37a8 8 0 0 1 8 8v6H8V18z" class="folder-tab"/>\n      </svg>\n    '),
-      _0x54a7ea.appendChild(_0x9c7c90),
-      _0x54a7ea
+      el31.appendChild(el32),
+      el31
     );
   }
   ['_renderVideoPreviewOverlay']() {
-    const _0x1650d1 = document.createElement('div');
+    const el33 = document.createElement('div');
     return (
-      (_0x1650d1.className = 'v2-file-history-video-preview-overlay'),
-      (_0x1650d1.innerHTML =
+      (el33.className = 'v2-file-history-video-preview-overlay'),
+      (el33.innerHTML =
         '\n      <div class="v2-file-history-video-progress" aria-hidden="true">\n        <div class="v2-file-history-video-progress-fill"></div>\n      </div>\n    '),
-      _0x1650d1
+      el33
     );
   }
-  ['_renderFileThumb'](_0xdf125a) {
-    const _0x3d7850 = document.createElement('div');
-    ((_0x3d7850.className = 'v2-file-history-file-thumb'),
-      (_0x3d7850.innerHTML =
+  ['_renderFileThumb'](error6) {
+    const el34 = document.createElement('div');
+    ((el34.className = 'v2-file-history-file-thumb'),
+      (el34.innerHTML =
         '\n      <svg viewBox="0 0 72 88" aria-hidden="true">\n        <path d="M14 4h30l14 14v66H14z" class="file-page"/>\n        <path d="M44 4v15h14" class="file-fold"/>\n      </svg>\n    '));
-    const _0x39a0f7 = document.createElement('div');
+    const el35 = document.createElement('div');
     return (
-      (_0x39a0f7.className = 'v2-file-history-folder-name'),
-      (_0x39a0f7.textContent = _0xdf125a?.name || fileManagerText('fallback.file')),
-      _0x3d7850.appendChild(_0x39a0f7),
-      _0x3d7850
+      (el35.className = 'v2-file-history-folder-name'),
+      (el35.textContent = error6?.name || fileManagerText('fallback.file')),
+      el34.appendChild(el35),
+      el34
     );
   }
-  ['_renderAudioThumb'](_0x2d98fb = '') {
-    const _0x1178fc = document.createElement('div');
-    ((_0x1178fc.className = 'v2-file-history-audio-thumb'),
-      (_0x1178fc.innerHTML =
+  ['_renderAudioThumb'](value112 = '') {
+    const el36 = document.createElement('div');
+    ((el36.className = 'v2-file-history-audio-thumb'),
+      (el36.innerHTML =
         '\n      <svg viewBox="0 0 120 72" aria-hidden="true">\n        <path d="M12 38h8m8 0h8m8 0h8m8 0h8m8 0h8m8 0h8m8 0h8" class="wave-line"/>\n        <path d="M20 48V28m16 28V20m16 36V26m16 30V18m16 38V24m16 26V32" class="wave-bars"/>\n      </svg>\n      <div class="v2-file-history-audio-progress-line" aria-hidden="true"></div>\n    '));
-    const _0x27465e = String(_0x2d98fb || '').trim();
-    if (_0x27465e) {
-      const _0x251293 = document.createElement('audio');
-      ((_0x251293.src = _0x27465e),
-        (_0x251293.preload = 'none'),
-        (_0x251293.className = 'v2-file-history-preview-audio'),
-        (_0x251293.volume = 0.72),
-        _0x1178fc.appendChild(_0x251293));
+    const value113 = String(value112 || '').trim();
+    if (value113) {
+      const value114 = document.createElement('audio');
+      ((value114.src = value113),
+        (value114.preload = 'none'),
+        (value114.className = 'v2-file-history-preview-audio'),
+        (value114.volume = 0.72),
+        el36.appendChild(value114));
     }
-    return _0x1178fc;
+    return el36;
   }
   ['_buildCanvasNodeFromRecord'](
-    _0x178027,
-    { center: _0x22dc65, occupiedNodes: _0x2f63a0, index: index = 0 } = {},
+    value115,
+    { center: center, occupiedNodes: occupiedNodes, index: index = 0 } = {},
   ) {
-    const _0x31767a = Array.isArray(_0x178027?.nodes) ? _0x178027.nodes[0] : null;
-    if (!_0x31767a) return null;
-    const _0x347eaf = getRecordMediaKind(_0x178027),
-      _0x274537 =
-        _0x347eaf === GENERATION_HISTORY_MEDIA_KINDS.VIDEO
+    const args3 = Array.isArray(value115?.nodes) ? value115.nodes[0] : null;
+    if (!args3) return null;
+    const recordMediaKind5 = getRecordMediaKind(value115),
+      value116 =
+        recordMediaKind5 === GENERATION_HISTORY_MEDIA_KINDS.VIDEO
           ? 'source-video'
-          : _0x347eaf === GENERATION_HISTORY_MEDIA_KINDS.AUDIO
+          : recordMediaKind5 === GENERATION_HISTORY_MEDIA_KINDS.AUDIO
             ? 'source-audio'
             : 'source-image',
-      _0x3dce6a = String(_0x31767a.type || _0x274537).trim() || _0x274537,
-      _0x3a500c = normalizeFileManagerSourceNodeForCanvas({ ..._0x31767a, type: _0x3dce6a }),
-      _0x4899aa = Number(_0x3a500c.width ?? _0x3a500c.w) || (_0x3dce6a === 'source-audio' ? 0x140 : 0x104),
-      _0x106163 = Number(_0x3a500c.height ?? _0x3a500c.h) || (_0x3dce6a === 'source-audio' ? 140 : 0x104),
-      _0x1882e3 = _0x22dc65 || this._getCanvasCenterWorld(),
-      _0x22e4a6 = findAvailablePosition(
-        _0x2f63a0 || appStore.getState().nodes,
-        _0x1882e3.x - _0x4899aa / 2 + index * 24,
-        _0x1882e3.y - _0x106163 / 2 + index * 24,
-        _0x4899aa,
-        _0x106163,
+      type = String(args3.type || value116).trim() || value116,
+      box15 = normalizeFileManagerSourceNodeForCanvas({ ...args3, type: type }),
+      value117 = Number(box15.width ?? box15.w) || (type === 'source-audio' ? 0x140 : 0x104),
+      value118 = Number(box15.height ?? box15.h) || (type === 'source-audio' ? 140 : 0x104),
+      box16 = center || this._getCanvasCenterWorld(),
+      box17 = findAvailablePosition(
+        occupiedNodes || appStore.getState().nodes,
+        box16.x - value117 / 2 + index * 24,
+        box16.y - value118 / 2 + index * 24,
+        value117,
+        value118,
         24,
         'right',
       ),
-      _0x5a87aa = JSON.parse(JSON.stringify(_0x3a500c));
+      box18 = JSON.parse(JSON.stringify(box15));
     return (
-      (_0x5a87aa.id = generateId(_0x3dce6a)),
-      (_0x5a87aa.type = _0x3dce6a),
-      (_0x5a87aa.x = _0x22e4a6.x),
-      (_0x5a87aa.y = _0x22e4a6.y),
-      _0x5a87aa
+      (box18.id = generateId(type)),
+      (box18.type = type),
+      (box18.x = box17.x),
+      (box18.y = box17.y),
+      box18
     );
   }
-  ['restoreRecordsToCanvas'](_0x3c3d48) {
-    const _0x516d43 = (Array.isArray(_0x3c3d48) ? _0x3c3d48 : []).filter(isFileManagerActionableRecord);
-    if (_0x516d43.length === 0) return;
-    const _0x2dc516 = this._getCanvasCenterWorld(),
-      _0x45d674 = { ...(appStore.getState().nodes || {}) },
-      _0xc762d0 = [];
-    _0x516d43.forEach((_0x32ed65, _0xff929b) => {
-      const _0x33e241 = this._buildCanvasNodeFromRecord(_0x32ed65, {
-        center: _0x2dc516,
-        occupiedNodes: _0x45d674,
-        index: _0xff929b,
+  ['restoreRecordsToCanvas'](value119) {
+    const list18 = (Array.isArray(value119) ? value119 : []).filter(isFileManagerActionableRecord);
+    if (list18.length === 0) return;
+    const center2 = this._getCanvasCenterWorld(),
+      occupiedNodes2 = { ...(appStore.getState().nodes || {}) },
+      count10 = [];
+    list18.forEach((item12, index2) => {
+      const enabled8 = this._buildCanvasNodeFromRecord(item12, {
+        center: center2,
+        occupiedNodes: occupiedNodes2,
+        index: index2,
       });
-      if (!_0x33e241) return;
-      ((_0x45d674[_0x33e241.id] = _0x33e241), _0xc762d0.push(_0x33e241));
+      if (!enabled8) return;
+      ((occupiedNodes2[enabled8.id] = enabled8), count10.push(enabled8));
     });
-    if (_0xc762d0.length === 0) return;
+    if (count10.length === 0) return;
     appStore.batch(() => {
-      (_0xc762d0.forEach((_0x1ddb7b) => appStore.addNode(_0x1ddb7b)),
-        appStore.setSelectedNodes(_0xc762d0.map((_0x244e90) => _0x244e90.id)));
+      (count10.forEach((item13) => appStore.addNode(item13)),
+        appStore.setSelectedNodes(count10.map((item14) => item14.id)));
     });
-    const _0x63b4fe =
-      _0xc762d0.length > 1
-        ? fileManagerText('toasts.addedMany', { count: _0xc762d0.length })
+    const value120 =
+      count10.length > 1
+        ? fileManagerText('toasts.addedMany', { count: count10.length })
         : this._activeSource === 'output'
           ? fileManagerText('toasts.addedOutput')
           : fileManagerText('toasts.addedHistory', {
-              label: getMediaLabel(getRecordMediaKind(_0x516d43[0])),
+              label: getMediaLabel(getRecordMediaKind(list18[0])),
             });
-    window.showToast?.(_0x63b4fe, 'success');
+    window.showToast?.(value120, 'success');
   }
-  ['_openRecordPreview'](_0x5716e5) {
-    if (!isFileManagerActionableRecord(_0x5716e5)) return;
-    const _0x503ba5 = getRecordMediaKind(_0x5716e5),
-      _0xf1b4fb = resolveMediaSrc(_0x5716e5);
-    if (_0x503ba5 === 'image') {
-      const _0x3d4b05 = _0xf1b4fb || resolveThumbSrc(_0x5716e5);
-      if (_0x3d4b05) openImagePreview(_0x3d4b05, { sidebarSubmenuOwner: FILE_MANAGER_SIDEBAR_KEY });
+  ['_openRecordPreview'](value121) {
+    if (!isFileManagerActionableRecord(value121)) return;
+    const recordMediaKind6 = getRecordMediaKind(value121),
+      mediaSrc2 = resolveMediaSrc(value121);
+    if (recordMediaKind6 === 'image') {
+      const value122 = mediaSrc2 || resolveThumbSrc(value121);
+      if (value122) openImagePreview(value122, { sidebarSubmenuOwner: FILE_MANAGER_SIDEBAR_KEY });
       return;
     }
-    _0x503ba5 === 'video' &&
-      _0xf1b4fb &&
-      openVideoPreview(_0xf1b4fb, { sidebarSubmenuOwner: FILE_MANAGER_SIDEBAR_KEY });
+    recordMediaKind6 === 'video' &&
+      mediaSrc2 &&
+      openVideoPreview(mediaSrc2, { sidebarSubmenuOwner: FILE_MANAGER_SIDEBAR_KEY });
   }
-  async ['_showRecordInFolder'](_0x573626) {
-    const _0x51c4da = resolveRecordLocalPath(_0x573626);
-    if (!canShowItemInFolder(_0x51c4da)) return;
+  async ['_showRecordInFolder'](value123) {
+    const recordLocalPath2 = resolveRecordLocalPath(value123);
+    if (!canShowItemInFolder(recordLocalPath2)) return;
     try {
-      await showItemInFolder(_0x51c4da);
-    } catch (_0x1b3ee7) {
-      (console.warn('[GenerationHistoryFileManager] 打开资源管理器失败:', _0x1b3ee7),
+      await showItemInFolder(recordLocalPath2);
+    } catch (value124) {
+      (console.warn('[GenerationHistoryFileManager] 打开资源管理器失败:', value124),
         window.showToast?.(fileManagerText('toasts.revealFailed'), 'error'));
     }
   }
-  ['_showDeleteRecordsConfirm'](_0x5c44b0) {
+  ['_showDeleteRecordsConfirm'](count11) {
     if (typeof document === 'undefined' || !document.body) return Promise.resolve(false);
     return (
       document.getElementById('file-manager-delete-confirm-overlay')?.remove(),
-      new Promise((_0x6867f7) => {
-        const _0x160c80 = document.createElement('div');
-        ((_0x160c80.id = 'file-manager-delete-confirm-overlay'),
-          (_0x160c80.className = 'custom-confirm-overlay'));
-        const _0x52fa7b = document.createElement('div');
-        ((_0x52fa7b.className = 'custom-confirm-box'),
-          _0x52fa7b.setAttribute('role', 'dialog'),
-          _0x52fa7b.setAttribute('aria-modal', 'true'),
-          _0x52fa7b.setAttribute('aria-label', fileManagerText('deleteConfirm.ariaLabel')));
-        const _0x16a147 = document.createElement('div');
-        ((_0x16a147.className = 'confirm-title'),
-          (_0x16a147.textContent = fileManagerText('deleteConfirm.title')));
-        const _0x5de58b = document.createElement('div');
-        ((_0x5de58b.className = 'confirm-msg'),
-          (_0x5de58b.textContent =
-            _0x5c44b0 > 1
-              ? fileManagerText('deleteConfirm.messageMany', { count: _0x5c44b0 })
+      new Promise((handler2) => {
+        const el37 = document.createElement('div');
+        ((el37.id = 'file-manager-delete-confirm-overlay'), (el37.className = 'custom-confirm-overlay'));
+        const el38 = document.createElement('div');
+        ((el38.className = 'custom-confirm-box'),
+          el38.setAttribute('role', 'dialog'),
+          el38.setAttribute('aria-modal', 'true'),
+          el38.setAttribute('aria-label', fileManagerText('deleteConfirm.ariaLabel')));
+        const el39 = document.createElement('div');
+        ((el39.className = 'confirm-title'), (el39.textContent = fileManagerText('deleteConfirm.title')));
+        const el40 = document.createElement('div');
+        ((el40.className = 'confirm-msg'),
+          (el40.textContent =
+            count11 > 1
+              ? fileManagerText('deleteConfirm.messageMany', { count: count11 })
               : fileManagerText('deleteConfirm.messageOne')));
-        const _0x580a40 = document.createElement('div');
-        _0x580a40.className = 'confirm-btns';
-        const _0x1ae03 = document.createElement('button');
-        ((_0x1ae03.type = 'button'),
-          (_0x1ae03.className = 'confirm-btn confirm-cancel'),
-          (_0x1ae03.textContent = fileManagerText('deleteConfirm.cancel')));
-        const _0x2c7323 = document.createElement('button');
-        ((_0x2c7323.type = 'button'),
-          (_0x2c7323.className = 'confirm-btn confirm-ok'),
-          (_0x2c7323.textContent = fileManagerText('deleteConfirm.delete')),
-          _0x580a40.appendChild(_0x1ae03),
-          _0x580a40.appendChild(_0x2c7323),
-          _0x52fa7b.appendChild(_0x16a147),
-          _0x52fa7b.appendChild(_0x5de58b),
-          _0x52fa7b.appendChild(_0x580a40),
-          _0x160c80.appendChild(_0x52fa7b),
-          document.body.appendChild(_0x160c80));
-        let _0x33db36 = false;
-        const _0x5edf41 = (_0x5d3183) => {
-            if (_0x33db36) return;
-            ((_0x33db36 = true),
-              document.removeEventListener('keydown', _0x582251, true),
-              _0x160c80.remove(),
-              _0x6867f7(_0x5d3183));
+        const el41 = document.createElement('div');
+        el41.className = 'confirm-btns';
+        const el42 = document.createElement('button');
+        ((el42.type = 'button'),
+          (el42.className = 'confirm-btn confirm-cancel'),
+          (el42.textContent = fileManagerText('deleteConfirm.cancel')));
+        const el43 = document.createElement('button');
+        ((el43.type = 'button'),
+          (el43.className = 'confirm-btn confirm-ok'),
+          (el43.textContent = fileManagerText('deleteConfirm.delete')),
+          el41.appendChild(el42),
+          el41.appendChild(el43),
+          el38.appendChild(el39),
+          el38.appendChild(el40),
+          el38.appendChild(el41),
+          el37.appendChild(el38),
+          document.body.appendChild(el37));
+        let value125 = false;
+        const run = (value126) => {
+            if (value125) return;
+            ((value125 = true),
+              document.removeEventListener('keydown', value127, true),
+              el37.remove(),
+              handler2(value126));
           },
-          _0x582251 = (_0x29b853) => {
-            if (_0x29b853.key === 'Escape') {
-              (_0x29b853.preventDefault(), _0x5edf41(false));
+          value127 = (event12) => {
+            if (event12.key === 'Escape') {
+              (event12.preventDefault(), run(false));
               return;
             }
-            _0x29b853.key === 'Enter' &&
-              !_0x29b853.isComposing &&
-              (_0x29b853.preventDefault(), _0x5edf41(true));
+            event12.key === 'Enter' && !event12.isComposing && (event12.preventDefault(), run(true));
           };
-        (_0x160c80.addEventListener('click', (_0x4ab9e6) => {
-          if (_0x4ab9e6.target === _0x160c80) _0x5edf41(false);
+        (el37.addEventListener('click', (event13) => {
+          if (event13.target === el37) run(false);
         }),
-          _0x1ae03.addEventListener('click', () => _0x5edf41(false)),
-          _0x2c7323.addEventListener('click', () => _0x5edf41(true)),
-          document.addEventListener('keydown', _0x582251, true),
-          _0x1ae03.focus?.());
+          el42.addEventListener('click', () => run(false)),
+          el43.addEventListener('click', () => run(true)),
+          document.addEventListener('keydown', value127, true),
+          el42.focus?.());
       })
     );
   }
-  async ['_deleteRecords'](_0x1923ce) {
-    const _0x44baf0 = (Array.isArray(_0x1923ce) ? _0x1923ce : []).filter(isFileManagerActionableRecord);
-    if (_0x44baf0.length === 0) return;
-    const _0x4dd614 = await this._showDeleteRecordsConfirm(_0x44baf0.length);
-    if (!_0x4dd614) return;
+  async ['_deleteRecords'](value128) {
+    const list19 = (Array.isArray(value128) ? value128 : []).filter(isFileManagerActionableRecord);
+    if (list19.length === 0) return;
+    const enabled9 = await this._showDeleteRecordsConfirm(list19.length);
+    if (!enabled9) return;
     try {
       if (this._activeSource === 'output') {
-        const _0x4fc320 = _0x44baf0.map(resolveRecordLocalPath).filter(Boolean);
-        if (_0x4fc320.length === 0) return;
-        await deleteOutputFilesFromServer({ localPaths: _0x4fc320 });
-        const _0x1e51e4 = new Set(_0x4fc320.map((_0x542c76) => normalizeLocalPath(_0x542c76)));
+        const localPaths = list19.map(resolveRecordLocalPath).filter(Boolean);
+        if (localPaths.length === 0) return;
+        await deleteOutputFilesFromServer({ localPaths: localPaths });
+        const map7 = new Set(localPaths.map((item15) => normalizeLocalPath(item15)));
         this.outputItems = (Array.isArray(this.outputItems) ? this.outputItems : []).filter(
-          (_0x55252b) => !_0x1e51e4.has(normalizeLocalPath(_0x55252b?.localPath)),
+          (item16) => !map7.has(normalizeLocalPath(item16?.localPath)),
         );
       } else {
-        const _0x344d49 = _0x44baf0.map((_0x22857c) => String(_0x22857c?.id || '')).filter(Boolean),
-          _0x3ee0db = await Promise.all(_0x344d49.map((_0x42becb) => deleteAssetFromServer(_0x42becb)));
-        if (_0x3ee0db.some((_0x38dada) => _0x38dada === false)) throw new Error('delete asset failed');
-        const _0x22b864 = new Set(_0x344d49);
+        const list20 = list19.map((item17) => String(item17?.id || '')).filter(Boolean),
+          list21 = await Promise.all(list20.map((item18) => deleteAssetFromServer(item18)));
+        if (list21.some((item19) => item19 === false)) throw new Error('delete asset failed');
+        const map8 = new Set(list20);
         ((this.records = (Array.isArray(this.records) ? this.records : []).filter(
-          (_0x161128) => !_0x22b864.has(String(_0x161128?.id || '')),
+          (item20) => !map8.has(String(item20?.id || '')),
         )),
-          (this._totalRecords = Math.max(0, Number(this._totalRecords || 0) - _0x344d49.length)));
+          (this._totalRecords = Math.max(0, Number(this._totalRecords || 0) - list20.length)));
       }
       this._selectedRecordIds.clear();
       if (this._isOpen()) this.render();
       window.showToast?.(
-        _0x44baf0.length > 1 ? fileManagerText('toasts.deletedMany') : fileManagerText('toasts.deletedOne'),
+        list19.length > 1 ? fileManagerText('toasts.deletedMany') : fileManagerText('toasts.deletedOne'),
         'success',
       );
-    } catch (_0x4e604a) {
-      (console.error('[GenerationHistoryFileManager] 删除文件失败:', _0x4e604a),
+    } catch (value129) {
+      (console.error('[GenerationHistoryFileManager] 删除文件失败:', value129),
         window.showToast?.(fileManagerText('toasts.deleteFailed'), 'error'));
     }
   }
-  ['restoreRecordToCanvas'](_0xbceb38) {
-    const _0x27e8fd =
+  ['restoreRecordToCanvas'](value130) {
+    const value131 =
       this._activeSource === 'output'
-        ? this._visibleOutputRecords().find(
-            (_0x118938) => String(_0x118938?.id || '') === String(_0xbceb38 || ''),
-          )
-        : this.records.find((_0x1dc866) => String(_0x1dc866?.id || '') === String(_0xbceb38 || ''));
-    this.restoreRecordsToCanvas(_0x27e8fd ? [_0x27e8fd] : []);
+        ? this._visibleOutputRecords().find((item21) => String(item21?.id || '') === String(value130 || ''))
+        : this.records.find((item22) => String(item22?.id || '') === String(value130 || ''));
+    this.restoreRecordsToCanvas(value131 ? [value131] : []);
   }
 }
 export const generationHistoryFileManager = new GenerationHistoryFileManager();

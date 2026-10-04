@@ -69,93 +69,88 @@ const STORY_ASSET_DETAIL_SOURCE_BODY_MAX_CHARACTERS = 0x4b0,
     '只依据输入 sourceScenes 细化，不续写剧情，不创建分集或分镜。',
     '只返回严格 JSON，不要输出 Markdown、注释或说明。',
   ]['join']('\x0a');
-function normalizeText(_0x2c8874) {
-  return typeof _0x2c8874 === 'string' ? _0x2c8874['trim']() : '';
+function normalizeText(value) {
+  return typeof value === 'string' ? value['trim']() : '';
 }
-function normalizeStringArray(_0x439a4f) {
-  return [
-    ...new Set((Array['isArray'](_0x439a4f) ? _0x439a4f : [])['map'](normalizeText)['filter'](Boolean)),
-  ];
+function normalizeStringArray(item) {
+  return [...new Set((Array['isArray'](item) ? item : [])['map'](normalizeText)['filter'](Boolean))];
 }
-function normalizeReference(_0x4199b9, _0x57064b = '') {
-  return normalizeText(_0x4199b9)['replace'](/\s+/g, '-') || _0x57064b;
+function normalizeReference(key, index = '') {
+  return normalizeText(key)['replace'](/\s+/g, '-') || index;
 }
-function getResultText(_0x215b22) {
-  if (typeof _0x215b22 === 'string') return _0x215b22;
-  return _0x215b22?.['text'] || _0x215b22?.['outputText'] || _0x215b22?.['content'] || _0x215b22 || '';
+function getResultText(response) {
+  if (typeof response === 'string') return response;
+  return response?.['text'] || response?.['outputText'] || response?.['content'] || response || '';
 }
 async function requestStrictAgentResult({
-  request: _0x61c293,
-  requestPayload: _0x27cec2,
-  parse: _0x57e584,
-  outputContract: _0x3d5ed0,
+  request: request2,
+  requestPayload: requestPayload,
+  parse: parse,
+  outputContract: outputContract,
   maxAttempts: maxAttempts = 0x2,
 }) {
-  let _0x16ccab = await _0x61c293(_0x27cec2);
-  for (let _0x3f59a3 = 0x1; _0x3f59a3 <= maxAttempts; _0x3f59a3 += 0x1) {
+  let result = await request2(requestPayload);
+  for (let data = 0x1; data <= maxAttempts; data += 0x1) {
     try {
-      return _0x57e584(_0x16ccab);
-    } catch (_0x390beb) {
-      if (_0x3f59a3 >= maxAttempts) throw _0x390beb;
-      _0x16ccab = await _0x61c293({
-        ..._0x27cec2,
+      return parse(result);
+    } catch (error) {
+      if (data >= maxAttempts) throw error;
+      result = await request2({
+        ...requestPayload,
         temperature: 0.1,
         prompt: JSON['stringify']({
           task: 'repair_invalid_agent_response',
-          originalRequest: JSON['parse'](_0x27cec2['prompt']),
-          rejectionReason: normalizeText(_0x390beb?.['message'] || _0x390beb),
-          rejectedResponse: normalizeText(getResultText(_0x16ccab)),
+          originalRequest: JSON['parse'](requestPayload['prompt']),
+          rejectionReason: normalizeText(error?.['message'] || error),
+          rejectedResponse: normalizeText(getResultText(result)),
           instruction: '重新执行原任务，只返回符合要求的严格 JSON 对象。',
-          outputContract: _0x3d5ed0,
+          outputContract: outputContract,
         }),
       });
     }
   }
   throw new Error('Agent 返回结果校验失败。');
 }
-function normalizeStoryContext(_0xf7829c = {}) {
-  const _0x1562ae = Array['isArray'](_0xf7829c?.['chapters'])
-      ? _0xf7829c['chapters']['map']((_0x5539ab, _0x58fc28) => ({
-          id: normalizeText(_0x5539ab?.['id']) || 'chapter-' + (_0x58fc28 + 0x1),
-          title: normalizeText(_0x5539ab?.['title']),
+function normalizeStoryContext(options = {}) {
+  const chapterIds2 = Array['isArray'](options?.['chapters'])
+      ? options['chapters']['map']((target, source) => ({
+          id: normalizeText(target?.['id']) || 'chapter-' + (source + 0x1),
+          title: normalizeText(target?.['title']),
         }))
       : [],
-    _0x5c522c = {
-      title: normalizeText(_0xf7829c?.['title']),
-      storyType: normalizeText(_0xf7829c?.['storyType']),
-      summary: normalizeText(_0xf7829c?.['summary'] || _0xf7829c?.['storySummary']),
-      background: normalizeText(_0xf7829c?.['background'] || _0xf7829c?.['storyBackground']),
-      setting: normalizeText(_0xf7829c?.['setting'] || _0xf7829c?.['storySetting']),
-      logline: normalizeText(_0xf7829c?.['logline']),
+    enabled = {
+      title: normalizeText(options?.['title']),
+      storyType: normalizeText(options?.['storyType']),
+      summary: normalizeText(options?.['summary'] || options?.['storySummary']),
+      background: normalizeText(options?.['background'] || options?.['storyBackground']),
+      setting: normalizeText(options?.['setting'] || options?.['storySetting']),
+      logline: normalizeText(options?.['logline']),
       continuityFacts: normalizeStringArray([
-        ...(Array['isArray'](_0xf7829c?.['continuityFacts']) ? _0xf7829c['continuityFacts'] : []),
-        ...(Array['isArray'](_0xf7829c?.['storyFacts']) ? _0xf7829c['storyFacts'] : []),
+        ...(Array['isArray'](options?.['continuityFacts']) ? options['continuityFacts'] : []),
+        ...(Array['isArray'](options?.['storyFacts']) ? options['storyFacts'] : []),
       ])['slice'](0x0, 0x14),
-      characters: (Array['isArray'](_0xf7829c?.['characters']) ? _0xf7829c['characters'] : [])
-        ['map']((_0x266458) => ({
-          ref: normalizeText(_0x266458?.['ref']),
-          name: normalizeText(_0x266458?.['name']),
-          roleType: normalizeText(_0x266458?.['roleType'] || _0x266458?.['role']),
-          fixedTraits: normalizeText(_0x266458?.['fixedTraits']),
-          profile: normalizeText(_0x266458?.['profile']),
+      characters: (Array['isArray'](options?.['characters']) ? options['characters'] : [])
+        ['map']((error2) => ({
+          ref: normalizeText(error2?.['ref']),
+          name: normalizeText(error2?.['name']),
+          roleType: normalizeText(error2?.['roleType'] || error2?.['role']),
+          fixedTraits: normalizeText(error2?.['fixedTraits']),
+          profile: normalizeText(error2?.['profile']),
         }))
-        ['filter']((_0x3e48f3) => _0x3e48f3['name'])
+        ['filter']((error3) => error3['name'])
         ['slice'](0x0, 0xc),
-      scriptMode: normalizeText(_0xf7829c?.['scriptMode']) || 'plot',
-      aspectRatio: normalizeText(_0xf7829c?.['aspectRatio']) || '16:9',
+      scriptMode: normalizeText(options?.['scriptMode']) || 'plot',
+      aspectRatio: normalizeText(options?.['aspectRatio']) || '16:9',
       visualStyle: normalizeText(
-        _0xf7829c?.['videoStylePrompt'] || _0xf7829c?.['visualStyle'] || _0xf7829c?.['videoStyle'],
+        options?.['videoStylePrompt'] || options?.['visualStyle'] || options?.['videoStyle'],
       ),
-      chapterIds: _0x1562ae['map']((_0x5f5605) => _0x5f5605['id']),
+      chapterIds: chapterIds2['map']((next) => next['id']),
     };
-  if (!_0x5c522c['title'] || !_0x5c522c['chapterIds']['length'])
-    throw new Error('请先完成并确认全部分集剧本。');
-  return _0x5c522c;
+  if (!enabled['title'] || !enabled['chapterIds']['length']) throw new Error('请先完成并确认全部分集剧本。');
+  return enabled;
 }
-function normalizeSourceCharacters(_0x612de4) {
-  return normalizeStringArray(_0x612de4)['filter'](
-    (_0xfc6f06) => !/^(?:旁白|画外音|VO|OS)$/iu['test'](_0xfc6f06),
-  );
+function normalizeSourceCharacters(current) {
+  return normalizeStringArray(current)['filter']((entry) => !/^(?:旁白|画外音|VO|OS)$/iu['test'](entry));
 }
 const STORY_SOURCE_NON_CHARACTER_LABELS = new Set([
     '旁白',
@@ -196,437 +191,428 @@ const STORY_SOURCE_NON_CHARACTER_LABELS = new Set([
     /^(?:系统广播|机械广播|电子广播|电子合成音|录音笔|电话|手机|广播|扩音器|扬声器|喇叭|电视|收音机|新闻主播|电视主播|电台主播)$/u,
   STORY_SOURCE_ANONYMOUS_GROUP_PATTERN =
     /^(?:[零一二两三四五六七八九十百\d]+|数|多|几)(?:名|位|个)(?:[\p{Script=Han}]{1,8})$/u;
-function normalizeSourceCharacterName(_0x568bd8) {
-  const _0x401253 = normalizeText(_0x568bd8)
+function normalizeSourceCharacterName(record) {
+  const args = normalizeText(record)
     ['replace'](/^[【\[]|[】\]]$/gu, '')
     ['replace'](/[（(][^（）()\r\n]{0,30}[）)]\s*$/u, '')
     ['replace'](/^(?:演员|饰演)\s*[:：]\s*/u, '')
     ['trim']();
-  if (!_0x401253 || [..._0x401253]['length'] > 0xc) return '';
-  if (STORY_SOURCE_NON_CHARACTER_LABELS['has'](_0x401253['toLowerCase']())) return '';
-  if (STORY_SOURCE_NONVISUAL_SPEAKER_PATTERN['test'](_0x401253)) return '';
-  if (/(?:旁白|画外音|字幕|音效|音乐)$/u['test'](_0x401253)) return '';
-  if (/^(?:第?\d+[场幕镜]|场次|章节|日|夜|白天|黑夜)$/u['test'](_0x401253)) return '';
-  if (/^(?:然后|随后|接着|紧接着|这时|此时)(?:他|她|它)?/u['test'](_0x401253)) return '';
-  if (/^(?:若干|数名|多名)|(?:若干|数人|多人|等人)$/u['test'](_0x401253)) return '';
-  if (STORY_SOURCE_ANONYMOUS_GROUP_PATTERN['test'](_0x401253)) return '';
-  if (!/^[\p{Script=Han}A-Za-z0-9·•._-]+$/u['test'](_0x401253)) return '';
-  return _0x401253;
+  if (!args || [...args]['length'] > 0xc) return '';
+  if (STORY_SOURCE_NON_CHARACTER_LABELS['has'](args['toLowerCase']())) return '';
+  if (STORY_SOURCE_NONVISUAL_SPEAKER_PATTERN['test'](args)) return '';
+  if (/(?:旁白|画外音|字幕|音效|音乐)$/u['test'](args)) return '';
+  if (/^(?:第?\d+[场幕镜]|场次|章节|日|夜|白天|黑夜)$/u['test'](args)) return '';
+  if (/^(?:然后|随后|接着|紧接着|这时|此时)(?:他|她|它)?/u['test'](args)) return '';
+  if (/^(?:若干|数名|多名)|(?:若干|数人|多人|等人)$/u['test'](args)) return '';
+  if (STORY_SOURCE_ANONYMOUS_GROUP_PATTERN['test'](args)) return '';
+  if (!/^[\p{Script=Han}A-Za-z0-9·•._-]+$/u['test'](args)) return '';
+  return args;
 }
-function normalizeDeterministicStoryCharacterCandidate(_0xda94b7) {
-  const _0x520776 = normalizeSourceCharacterName(_0xda94b7)['replace'](
+function normalizeDeterministicStoryCharacterCandidate(payload) {
+  const args2 = normalizeSourceCharacterName(payload)['replace'](
       /(?:及|与)(?:其)?(?:弟子|随从|众人|同伴)$/u,
       '',
     ),
-    _0x27ecce = [..._0x520776]['length'];
-  if (!_0x520776 || _0x27ecce < 0x2 || _0x27ecce > 0x8) return '';
-  if (/^无(?:相应)?实体$/u['test'](_0x520776)) return '';
-  if (/^第[一二三四五六七八九十百千万\d]+(?:道|次|个|名|位|集|章|场|幕|镜)$/u['test'](_0x520776)) return '';
-  if (/^(?:他|她|它|他们|她们|它们|众人|人群|观众|子殿下)$/u['test'](_0x520776)) return '';
-  if (/(?:若干|数人|多人|[一二三四五六七八九十\d]+人)$/u['test'](_0x520776)) return '';
-  if (STORY_SOURCE_ANONYMOUS_GROUP_PATTERN['test'](_0x520776)) return '';
-  if (/^(?:只想|该是|才能|如果|因为|为了|已经|这个|那个)/u['test'](_0x520776)) return '';
-  if (/(?:说话|曲子|意赅|怎样的奇女子)$/u['test'](_0x520776)) return '';
-  return _0x520776;
+    count = [...args2]['length'];
+  if (!args2 || count < 0x2 || count > 0x8) return '';
+  if (/^无(?:相应)?实体$/u['test'](args2)) return '';
+  if (/^第[一二三四五六七八九十百千万\d]+(?:道|次|个|名|位|集|章|场|幕|镜)$/u['test'](args2)) return '';
+  if (/^(?:他|她|它|他们|她们|它们|众人|人群|观众|子殿下)$/u['test'](args2)) return '';
+  if (/(?:若干|数人|多人|[一二三四五六七八九十\d]+人)$/u['test'](args2)) return '';
+  if (STORY_SOURCE_ANONYMOUS_GROUP_PATTERN['test'](args2)) return '';
+  if (/^(?:只想|该是|才能|如果|因为|为了|已经|这个|那个)/u['test'](args2)) return '';
+  if (/(?:说话|曲子|意赅|怎样的奇女子)$/u['test'](args2)) return '';
+  return args2;
 }
-function getDeterministicStoryCharacterCandidates(_0x574c1c = {}) {
+function getDeterministicStoryCharacterCandidates(options2 = {}) {
   return normalizeStringArray(
-    normalizeStringArray(_0x574c1c?.['characters'])['map'](normalizeDeterministicStoryCharacterCandidate),
+    normalizeStringArray(options2?.['characters'])['map'](normalizeDeterministicStoryCharacterCandidate),
   );
 }
-function getStoryAssetNameAliases(_0x37d1b6) {
-  const _0x32c462 = normalizeText(_0x37d1b6);
-  if (!_0x32c462) return [];
-  const _0x5602eb = [..._0x32c462['matchAll'](/[（(]([^（）()\r\n]+)[）)]/gu)]['map']((_0x379d26) =>
-      normalizeText(_0x379d26[0x1]),
+function getStoryAssetNameAliases(handle) {
+  const args3 = normalizeText(handle);
+  if (!args3) return [];
+  const args4 = [...args3['matchAll'](/[（(]([^（）()\r\n]+)[）)]/gu)]['map']((state) =>
+      normalizeText(state[0x1]),
     ),
-    _0x4f92b3 = normalizeText(_0x32c462['replace'](/[（(][^（）()\r\n]+[）)]/gu, ''));
+    text = normalizeText(args3['replace'](/[（(][^（）()\r\n]+[）)]/gu, ''));
   return normalizeStringArray(
-    [_0x32c462, _0x4f92b3, ..._0x5602eb]['flatMap']((_0x3cdfeb) => [
-      _0x3cdfeb,
-      normalizeSourceCharacterName(_0x3cdfeb),
-    ]),
+    [args3, text, ...args4]['flatMap']((config) => [config, normalizeSourceCharacterName(config)]),
   );
 }
-function storyCharacterNamesOverlap(_0x17c8b4, _0x2cf0bb) {
-  const _0x507355 = new Set(
-    getStoryAssetNameAliases(_0x2cf0bb)['map']((_0xd72824) => _0xd72824['toLowerCase']()),
-  );
-  return getStoryAssetNameAliases(_0x17c8b4)['some']((_0x4f127c) =>
-    _0x507355['has'](_0x4f127c['toLowerCase']()),
-  );
+function storyCharacterNamesOverlap(scope, input) {
+  const map = new Set(getStoryAssetNameAliases(input)['map']((output) => output['toLowerCase']()));
+  return getStoryAssetNameAliases(scope)['some']((value2) => map['has'](value2['toLowerCase']()));
 }
-function storyCharacterNamesStronglyOverlap(_0x53d351, _0x14dada) {
-  if (storyCharacterNamesOverlap(_0x53d351, _0x14dada)) return !![];
-  const _0x2bfd3e = normalizeDeterministicStoryCharacterCandidate(_0x53d351)['toLowerCase'](),
-    _0x3140de = normalizeDeterministicStoryCharacterCandidate(_0x14dada)['toLowerCase']();
-  if (!_0x2bfd3e || !_0x3140de) return ![];
-  if (/[a-z0-9]/u['test'](_0x2bfd3e) || /[a-z0-9]/u['test'](_0x3140de)) return ![];
-  const [_0x4dc28b, _0x53b22d] =
-    _0x2bfd3e['length'] <= _0x3140de['length'] ? [_0x2bfd3e, _0x3140de] : [_0x3140de, _0x2bfd3e];
+function storyCharacterNamesStronglyOverlap(value3, value4) {
+  if (storyCharacterNamesOverlap(value3, value4)) return !![];
+  const list = normalizeDeterministicStoryCharacterCandidate(value3)['toLowerCase'](),
+    list2 = normalizeDeterministicStoryCharacterCandidate(value4)['toLowerCase']();
+  if (!list || !list2) return ![];
+  if (/[a-z0-9]/u['test'](list) || /[a-z0-9]/u['test'](list2)) return ![];
+  const [args5, list3] = list['length'] <= list2['length'] ? [list, list2] : [list2, list];
   return (
-    [..._0x4dc28b]['length'] >= 0x2 &&
-    [..._0x53b22d]['length'] - [..._0x4dc28b]['length'] <= 0x3 &&
-    _0x53b22d['includes'](_0x4dc28b)
+    [...args5]['length'] >= 0x2 &&
+    [...list3]['length'] - [...args5]['length'] <= 0x3 &&
+    list3['includes'](args5)
   );
 }
-function addDeterministicStoryCharacterCandidate(_0x28b882, _0x5baeda, _0x488d71) {
-  const _0x24f93a = [..._0x28b882['entries']()]['find'](
-    ([_0x3eceb0, _0x45ca49]) =>
-      storyCharacterNamesStronglyOverlap(_0x3eceb0, _0x5baeda) ||
-      (_0x45ca49?.['aliases'] || [])['some']((_0x2620c2) =>
-        storyCharacterNamesStronglyOverlap(_0x2620c2, _0x5baeda),
-      ),
+function addDeterministicStoryCharacterCandidate(map2, value5, value6) {
+  const value7 = [...map2['entries']()]['find'](
+    ([value8, value9]) =>
+      storyCharacterNamesStronglyOverlap(value8, value5) ||
+      (value9?.['aliases'] || [])['some']((value10) => storyCharacterNamesStronglyOverlap(value10, value5)),
   );
-  if (_0x24f93a) {
-    const [_0x2a24bc, _0x19bc38] = _0x24f93a;
-    (_0x19bc38['sourceSceneRefs']['push'](_0x488d71),
-      (_0x19bc38['aliases'] = normalizeStringArray([..._0x19bc38['aliases'], _0x5baeda])),
-      _0x28b882['set'](_0x2a24bc, _0x19bc38));
+  if (value7) {
+    const [value11, args6] = value7;
+    (args6['sourceSceneRefs']['push'](value6),
+      (args6['aliases'] = normalizeStringArray([...args6['aliases'], value5])),
+      map2['set'](value11, args6));
     return;
   }
-  _0x28b882['set'](_0x5baeda, { aliases: [_0x5baeda], sourceSceneRefs: [_0x488d71] });
+  map2['set'](value5, { aliases: [value5], sourceSceneRefs: [value6] });
 }
-function createDeterministicStoryCharacterCandidateMap(_0x3353c5 = []) {
-  const _0x5dfa24 = new Map();
+function createDeterministicStoryCharacterCandidateMap(list4 = []) {
+  const value12 = new Map();
   return (
-    _0x3353c5['forEach']((_0x54571f) => {
-      getDeterministicStoryCharacterCandidates(_0x54571f)['forEach']((_0x106954) => {
-        addDeterministicStoryCharacterCandidate(_0x5dfa24, _0x106954, _0x54571f['ref']);
+    list4['forEach']((value13) => {
+      getDeterministicStoryCharacterCandidates(value13)['forEach']((value14) => {
+        addDeterministicStoryCharacterCandidate(value12, value14, value13['ref']);
       });
     }),
-    _0x5dfa24
+    value12
   );
 }
-function resolveDeterministicStoryCharacterCanonicalName(_0x2a1490, _0x13477c) {
-  const _0x5ae087 = normalizeDeterministicStoryCharacterCandidate(_0x2a1490);
-  if (!_0x5ae087) return '';
-  const _0x5a22a1 = [..._0x13477c['entries']()]['find'](
-    ([_0x308bd2, _0x280496]) =>
-      storyCharacterNamesStronglyOverlap(_0x308bd2, _0x5ae087) ||
-      (_0x280496?.['aliases'] || [])['some']((_0x280df8) =>
-        storyCharacterNamesStronglyOverlap(_0x280df8, _0x5ae087),
+function resolveDeterministicStoryCharacterCanonicalName(value15, map3) {
+  const deterministicStoryCharacterCandidate = normalizeDeterministicStoryCharacterCandidate(value15);
+  if (!deterministicStoryCharacterCandidate) return '';
+  const value16 = [...map3['entries']()]['find'](
+    ([value17, value18]) =>
+      storyCharacterNamesStronglyOverlap(value17, deterministicStoryCharacterCandidate) ||
+      (value18?.['aliases'] || [])['some']((value19) =>
+        storyCharacterNamesStronglyOverlap(value19, deterministicStoryCharacterCandidate),
       ),
   );
-  return _0x5a22a1?.[0x0] || _0x5ae087;
+  return value16?.[0x0] || deterministicStoryCharacterCandidate;
 }
 const STORY_CHARACTER_TRAILING_ACTION_PATTERN =
   /^(?:(?:正|又|还|便|只|连忙|忙)?(?:附耳|噘着嘴|不死心|安抚|劝说|劝道|说道|问道|答道|喊道|笑道|哭道|皱眉|点头|摇头|转身|抬手|挥手|走向|看向|望着|盯着|站起|坐下|推开|握住|拿起|放下|冷笑|苦笑|大喊).*)$/u;
-function getStoryAssetLocalCharacterCanonicalNames(_0x53dc65 = []) {
+function getStoryAssetLocalCharacterCanonicalNames(list5 = []) {
   return normalizeStringArray(
-    _0x53dc65['flatMap']((_0x3b4201) => [
-      ...normalizeStringArray(_0x3b4201?.['localEntityCandidates']?.['character']),
-      ...(Array['isArray'](_0x3b4201?.['localEntityEvidence'])
-        ? _0x3b4201['localEntityEvidence']
-            ['filter']((_0x366a78) => _0x366a78?.['kind'] === 'character')
-            ['map']((_0xdb42b3) => _0xdb42b3?.['text'])
+    list5['flatMap']((value20) => [
+      ...normalizeStringArray(value20?.['localEntityCandidates']?.['character']),
+      ...(Array['isArray'](value20?.['localEntityEvidence'])
+        ? value20['localEntityEvidence']
+            ['filter']((value21) => value21?.['kind'] === 'character')
+            ['map']((response2) => response2?.['text'])
         : []),
     ])
       ['map'](normalizeDeterministicStoryCharacterCandidate)
       ['filter'](Boolean),
   );
 }
-function resolveStoryAssetCharacterCanonicalName(_0x27bbe9, _0x17a086, _0x1fffe2 = []) {
-  const _0x3929b0 = normalizeDeterministicStoryCharacterCandidate(_0x27bbe9);
-  if (!_0x3929b0) return '';
-  const _0x1701fa = _0x1fffe2['filter'](
-    (_0x2479dc) =>
-      _0x2479dc !== _0x3929b0 &&
-      _0x3929b0['startsWith'](_0x2479dc) &&
-      STORY_CHARACTER_TRAILING_ACTION_PATTERN['test'](_0x3929b0['slice'](_0x2479dc['length'])),
-  )['sort']((_0x483ca4, _0x31af9b) => [..._0x31af9b]['length'] - [..._0x483ca4]['length'])[0x0];
-  return _0x1701fa || resolveDeterministicStoryCharacterCanonicalName(_0x3929b0, _0x17a086);
+function resolveStoryAssetCharacterCanonicalName(value22, value23, list6 = []) {
+  const list7 = normalizeDeterministicStoryCharacterCandidate(value22);
+  if (!list7) return '';
+  const value24 = list6['filter'](
+    (list8) =>
+      list8 !== list7 &&
+      list7['startsWith'](list8) &&
+      STORY_CHARACTER_TRAILING_ACTION_PATTERN['test'](list7['slice'](list8['length'])),
+  )['sort']((args7, args8) => [...args8]['length'] - [...args7]['length'])[0x0];
+  return value24 || resolveDeterministicStoryCharacterCanonicalName(list7, value23);
 }
-function resolveStoryProjectCharacterCanonicalName(_0x1b90ac, _0x5ce0c7 = []) {
-  return _0x5ce0c7['find']((_0x3cb2de) => storyCharacterNamesOverlap(_0x3cb2de, _0x1b90ac)) || '';
+function resolveStoryProjectCharacterCanonicalName(value25, list9 = []) {
+  return list9['find']((value26) => storyCharacterNamesOverlap(value26, value25)) || '';
 }
-function extractStorySourceCastNames(_0x2d26cb = '') {
-  const _0x3dc1de = [],
-    _0x7a7aa0 = normalizeText(_0x2d26cb),
-    _0x3ee0b3 = /(?:出场人物|登场人物|出场角色)\s*[:：]\s*([^\r\n]+)/gu;
-  let _0x54842a = _0x3ee0b3['exec'](_0x7a7aa0);
-  while (_0x54842a) {
-    const _0x39d248 = _0x54842a[0x1]
+function extractStorySourceCastNames(value27 = '') {
+  const list10 = [],
+    text2 = normalizeText(value27),
+    value28 = /(?:出场人物|登场人物|出场角色)\s*[:：]\s*([^\r\n]+)/gu;
+  let value29 = value28['exec'](text2);
+  while (value29) {
+    const value30 = value29[0x1]
       ['replace'](/[（(][^（）()\r\n]{0,30}[）)]/gu, '')
       ['split'](/\s{2,}|[；;。]/u)[0x0];
-    (_0x39d248['split'](/[、,，/／|]/u)['forEach']((_0x115ad6) => {
-      const _0x1c95b7 = normalizeSourceCharacterName(_0x115ad6);
-      if (_0x1c95b7) _0x3dc1de['push'](_0x1c95b7);
+    (value30['split'](/[、,，/／|]/u)['forEach']((value31) => {
+      const sourceCharacterName = normalizeSourceCharacterName(value31);
+      if (sourceCharacterName) list10['push'](sourceCharacterName);
     }),
-      (_0x54842a = _0x3ee0b3['exec'](_0x7a7aa0)));
+      (value29 = value28['exec'](text2)));
   }
-  return normalizeStringArray(_0x3dc1de);
+  return normalizeStringArray(list10);
 }
-function isLikelyStorySourceDialogueSpeaker(_0x673fdc, _0x33d715 = []) {
-  if (!_0x673fdc) return ![];
-  if (_0x33d715['includes'](_0x673fdc)) return !![];
-  if (_0x33d715['some']((_0x18f1f0) => _0x673fdc['startsWith'](_0x18f1f0))) return ![];
-  if ([..._0x673fdc]['length'] > 0x6) return ![];
-  if (/^(?:他|她|它|他们|她们|它们|众人|人群|观众|评论区|弹幕)/u['test'](_0x673fdc)) return ![];
-  if (/^(?:然后|随后|接着|紧接着|这时|此时)(?:他|她|它)?/u['test'](_0x673fdc)) return ![];
-  if (/(?:若干|数人|多人|等人)$/u['test'](_0x673fdc)) return ![];
+function isLikelyStorySourceDialogueSpeaker(args9, list11 = []) {
+  if (!args9) return ![];
+  if (list11['includes'](args9)) return !![];
+  if (list11['some']((value32) => args9['startsWith'](value32))) return ![];
+  if ([...args9]['length'] > 0x6) return ![];
+  if (/^(?:他|她|它|他们|她们|它们|众人|人群|观众|评论区|弹幕)/u['test'](args9)) return ![];
+  if (/^(?:然后|随后|接着|紧接着|这时|此时)(?:他|她|它)?/u['test'](args9)) return ![];
+  if (/(?:若干|数人|多人|等人)$/u['test'](args9)) return ![];
   return !/(?:面无表情|面不改色|一把|抓住|咳着|喊出声|已经|炸了|冷笑|苦笑|说道|问道|答道|开口|皱眉|点头|摇头|转身|抬手|挥手|走向|看向|望着|盯着|站起|坐下|推开|握住|拿起|放下)$/u[
     'test'
-  ](_0x673fdc);
+  ](args9);
 }
-function normalizeStorySourceDialogueSpeaker(_0x1e5aa4) {
-  const _0x2f1af4 = normalizeSourceCharacterName(_0x1e5aa4)
+function normalizeStorySourceDialogueSpeaker(value33) {
+  const sourceCharacterName2 = normalizeSourceCharacterName(value33)
     ['replace'](STORY_SOURCE_DIALOGUE_ACTION_SUFFIX_PATTERN, '')
     ['trim']();
-  if (!_0x2f1af4 || STORY_SOURCE_NONVISUAL_SPEAKER_PATTERN['test'](_0x2f1af4)) return '';
-  return _0x2f1af4;
+  if (!sourceCharacterName2 || STORY_SOURCE_NONVISUAL_SPEAKER_PATTERN['test'](sourceCharacterName2))
+    return '';
+  return sourceCharacterName2;
 }
-function isDeclaredStorySourceSpeakerAlias(_0x20dd17, _0x451cd1 = []) {
-  const _0x494b9a = normalizeText(_0x20dd17);
-  if (!_0x494b9a) return ![];
-  return _0x451cd1['some'](
-    (_0x295029) =>
-      storyCharacterNamesOverlap(_0x295029, _0x494b9a) ||
-      ([..._0x494b9a]['length'] >= 0x2 && normalizeText(_0x295029)['endsWith'](_0x494b9a)),
+function isDeclaredStorySourceSpeakerAlias(value34, list12 = []) {
+  const args10 = normalizeText(value34);
+  if (!args10) return ![];
+  return list12['some'](
+    (value35) =>
+      storyCharacterNamesOverlap(value35, args10) ||
+      ([...args10]['length'] >= 0x2 && normalizeText(value35)['endsWith'](args10)),
   );
 }
-function extractStorySourceDialogueSpeakers(_0x21c16c = '', _0x3fbf2f = []) {
-  const _0x3411f3 = [];
+function extractStorySourceDialogueSpeakers(value36 = '', value37 = []) {
+  const list13 = [];
   return (
-    normalizeText(_0x21c16c)
+    normalizeText(value36)
       ['split'](/\r?\n/u)
-      ['forEach']((_0x12bce5) => {
-        const _0x3b88b5 = _0x12bce5['match'](
+      ['forEach']((value38) => {
+        const value39 = value38['match'](
             /^[\s>*#-]*(?:【)?([\p{Script=Han}A-Za-z0-9·•._-]{1,12})(?:】)?(?:[（(][^（）()\r\n]{0,30}[）)])?(?:\*\*)?\s*[:：]/u,
           ),
-          _0x26f928 = normalizeStorySourceDialogueSpeaker(_0x3b88b5?.[0x1]);
-        isLikelyStorySourceDialogueSpeaker(_0x26f928, _0x3fbf2f) &&
-          !isDeclaredStorySourceSpeakerAlias(_0x26f928, _0x3fbf2f) &&
-          _0x3411f3['push'](_0x26f928);
+          storySourceDialogueSpeaker = normalizeStorySourceDialogueSpeaker(value39?.[0x1]);
+        isLikelyStorySourceDialogueSpeaker(storySourceDialogueSpeaker, value37) &&
+          !isDeclaredStorySourceSpeakerAlias(storySourceDialogueSpeaker, value37) &&
+          list13['push'](storySourceDialogueSpeaker);
       }),
-    normalizeStringArray(_0x3411f3)
+    normalizeStringArray(list13)
   );
 }
 export function extractStorySourceCharacterNames({ characters: characters = [], body: body = '' } = {}) {
-  const _0x49b458 = normalizeSourceCharacters([
+  const args11 = normalizeSourceCharacters([
     ...normalizeStringArray(characters)['map'](normalizeSourceCharacterName)['filter'](Boolean),
     ...extractStorySourceCastNames(body),
   ]);
-  return normalizeSourceCharacters([..._0x49b458, ...extractStorySourceDialogueSpeakers(body, _0x49b458)]);
+  return normalizeSourceCharacters([...args11, ...extractStorySourceDialogueSpeakers(body, args11)]);
 }
-export function normalizeStoryAssetExtractionSources(_0x17db03 = []) {
-  const _0x3e3312 = [];
-  (Array['isArray'](_0x17db03) ? _0x17db03 : [])['forEach']((_0x1446ef, _0x51295e) => {
-    const _0x2daaec = normalizeReference(
-        _0x1446ef?.['id'] || _0x1446ef?.['ref'] || _0x1446ef?.['planningRef'],
-        'episode-' + (_0x51295e + 0x1),
+export function normalizeStoryAssetExtractionSources(list14 = []) {
+  const list15 = [];
+  (Array['isArray'](list14) ? list14 : [])['forEach']((value40, value41) => {
+    const episodeRef = normalizeReference(
+        value40?.['id'] || value40?.['ref'] || value40?.['planningRef'],
+        'episode-' + (value41 + 0x1),
       ),
-      _0x5a5663 = Math['max'](0x1, Math['trunc'](Number(_0x1446ef?.['number']) || _0x51295e + 0x1));
-    (Array['isArray'](_0x1446ef?.['script']?.['scenes']) ? _0x1446ef['script']['scenes'] : [])['forEach'](
-      (_0x2c1172, _0x343723) => {
-        const _0x24950d = normalizeText(_0x2c1172?.['heading']),
-          _0x3d65ef = normalizeText(_0x2c1172?.['body']);
-        if (!_0x24950d || !_0x3d65ef) return;
-        const _0x454e43 = normalizeReference(_0x2c1172?.['ref'], _0x2daaec + '-scene-' + (_0x343723 + 0x1)),
-          _0x507e2b = extractStorySourceCharacterNames({
-            characters: _0x2c1172?.['characters'],
-            body: _0x3d65ef,
+      episodeNumber = Math['max'](0x1, Math['trunc'](Number(value40?.['number']) || value41 + 0x1));
+    (Array['isArray'](value40?.['script']?.['scenes']) ? value40['script']['scenes'] : [])['forEach'](
+      (characters2, value42) => {
+        const heading = normalizeText(characters2?.['heading']),
+          body2 = normalizeText(characters2?.['body']);
+        if (!heading || !body2) return;
+        const localRef = normalizeReference(characters2?.['ref'], episodeRef + '-scene-' + (value42 + 0x1)),
+          characters3 = extractStorySourceCharacterNames({
+            characters: characters2?.['characters'],
+            body: body2,
           });
-        _0x3e3312['push']({
-          episodeRef: _0x2daaec,
-          episodeNumber: _0x5a5663,
-          localRef: _0x454e43,
-          heading: _0x24950d,
-          assetHeading: _0x24950d,
-          source: normalizeText(_0x2c1172?.['source']),
+        list15['push']({
+          episodeRef: episodeRef,
+          episodeNumber: episodeNumber,
+          localRef: localRef,
+          heading: heading,
+          assetHeading: heading,
+          source: normalizeText(characters2?.['source']),
           isSourceWindow: ![],
-          characters: _0x507e2b,
-          body: _0x3d65ef,
+          characters: characters3,
+          body: body2,
         });
       },
     );
   });
-  const _0x424cff = _0x3e3312['reduce']((_0x2cceba, _0x1fe36d) => {
-      return (
-        _0x2cceba['set'](_0x1fe36d['localRef'], (_0x2cceba['get'](_0x1fe36d['localRef']) || 0x0) + 0x1),
-        _0x2cceba
-      );
+  const ref2 = list15['reduce']((map4, value43) => {
+      return (map4['set'](value43['localRef'], (map4['get'](value43['localRef']) || 0x0) + 0x1), map4);
     }, new Map()),
-    _0x260958 = _0x3e3312['map']((_0x1765c5) => ({
+    list16 = list15['map']((episodeRef2) => ({
       ref:
-        _0x424cff['get'](_0x1765c5['localRef']) > 0x1
-          ? _0x1765c5['episodeRef'] + ':' + _0x1765c5['localRef']
-          : _0x1765c5['localRef'],
-      episodeRef: _0x1765c5['episodeRef'],
-      episodeNumber: _0x1765c5['episodeNumber'],
-      heading: _0x1765c5['heading'],
-      assetHeading: _0x1765c5['assetHeading'] || _0x1765c5['heading'],
-      source: _0x1765c5['source'],
-      isSourceWindow: Boolean(_0x1765c5['isSourceWindow']),
-      characters: _0x1765c5['characters'],
-      body: _0x1765c5['body'],
+        ref2['get'](episodeRef2['localRef']) > 0x1
+          ? episodeRef2['episodeRef'] + ':' + episodeRef2['localRef']
+          : episodeRef2['localRef'],
+      episodeRef: episodeRef2['episodeRef'],
+      episodeNumber: episodeRef2['episodeNumber'],
+      heading: episodeRef2['heading'],
+      assetHeading: episodeRef2['assetHeading'] || episodeRef2['heading'],
+      source: episodeRef2['source'],
+      isSourceWindow: Boolean(episodeRef2['isSourceWindow']),
+      characters: episodeRef2['characters'],
+      body: episodeRef2['body'],
     }));
-  if (!_0x260958['length']) throw new Error('资产提取没有找到可用的分集场次正文。');
-  return _0x260958;
+  if (!list16['length']) throw new Error('资产提取没有找到可用的分集场次正文。');
+  return list16;
 }
 export function createStoryAssetKindSourceBatches(
-  _0xdfa7bb = [],
+  list17 = [],
   { maxSourceScenes: maxSourceScenes = STORY_ASSET_KIND_BATCH_MAX_SOURCE_SCENES } = {},
 ) {
-  const _0x12c24a = Math['max'](0x1, Math['trunc'](Number(maxSourceScenes) || 0x0)),
-    _0x12f9db = [];
-  (Array['isArray'](_0xdfa7bb) ? _0xdfa7bb : [])['forEach']((_0x48a5cd) => {
-    const _0x113f44 = normalizeText(_0x48a5cd?.['episodeRef']) || 'unknown-episode',
-      _0x7d48f3 = _0x12f9db['at'](-0x1);
-    if (!_0x7d48f3 || _0x7d48f3['episodeRef'] !== _0x113f44) {
-      _0x12f9db['push']({ episodeRef: _0x113f44, scenes: [_0x48a5cd] });
+  const value44 = Math['max'](0x1, Math['trunc'](Number(maxSourceScenes) || 0x0)),
+    list18 = [];
+  (Array['isArray'](list17) ? list17 : [])['forEach']((value45) => {
+    const episodeRef3 = normalizeText(value45?.['episodeRef']) || 'unknown-episode',
+      enabled2 = list18['at'](-0x1);
+    if (!enabled2 || enabled2['episodeRef'] !== episodeRef3) {
+      list18['push']({ episodeRef: episodeRef3, scenes: [value45] });
       return;
     }
-    _0x7d48f3['scenes']['push'](_0x48a5cd);
+    enabled2['scenes']['push'](value45);
   });
-  const _0x1b50ea = [];
-  let _0x10c5f5 = [];
-  const _0x477759 = () => {
-    if (!_0x10c5f5['length']) return;
-    (_0x1b50ea['push'](_0x10c5f5), (_0x10c5f5 = []));
+  const list19 = [];
+  let list20 = [];
+  const run = () => {
+    if (!list20['length']) return;
+    (list19['push'](list20), (list20 = []));
   };
   return (
-    _0x12f9db['forEach'](({ scenes: _0x47df80 }) => {
-      if (_0x47df80['length'] > _0x12c24a) {
-        _0x477759();
-        for (let _0x9149c6 = 0x0; _0x9149c6 < _0x47df80['length']; _0x9149c6 += _0x12c24a) {
-          _0x1b50ea['push'](_0x47df80['slice'](_0x9149c6, _0x9149c6 + _0x12c24a));
+    list18['forEach'](({ scenes: scenes }) => {
+      if (scenes['length'] > value44) {
+        run();
+        for (let value46 = 0x0; value46 < scenes['length']; value46 += value44) {
+          list19['push'](scenes['slice'](value46, value46 + value44));
         }
         return;
       }
-      (_0x10c5f5['length'] && _0x10c5f5['length'] + _0x47df80['length'] > _0x12c24a && _0x477759(),
-        _0x10c5f5['push'](..._0x47df80));
+      (list20['length'] && list20['length'] + scenes['length'] > value44 && run(), list20['push'](...scenes));
     }),
-    _0x477759(),
-    _0x1b50ea
+    run(),
+    list19
   );
 }
-function buildOccurrences(_0x481246 = []) {
-  const _0x16f9f9 = normalizeStringArray(_0x481246);
-  if (!_0x16f9f9['length']) return '当前项目';
-  const _0x1c76c2 = _0x16f9f9['map']((_0x5f2211) => {
-    const _0x311fa6 = /(?:^|[-_])episode-(\d+)$/iu['exec'](_0x5f2211);
-    return _0x311fa6 ? String(Math['max'](0x1, Number(_0x311fa6[0x1]) || 0x1)) : '';
+function buildOccurrences(list21 = []) {
+  const list22 = normalizeStringArray(list21);
+  if (!list22['length']) return '当前项目';
+  const list23 = list22['map']((value47) => {
+    const value48 = /(?:^|[-_])episode-(\d+)$/iu['exec'](value47);
+    return value48 ? String(Math['max'](0x1, Number(value48[0x1]) || 0x1)) : '';
   });
-  if (_0x1c76c2['every'](Boolean)) {
-    const _0x3bf5e9 = [...new Set(_0x1c76c2['map'](Number))]['sort'](
-      (_0x2910a0, _0x106608) => _0x2910a0 - _0x106608,
-    );
-    return '第\x20' + _0x3bf5e9['join']('、') + '\x20集';
+  if (list23['every'](Boolean)) {
+    const list24 = [...new Set(list23['map'](Number))]['sort']((value49, value50) => value49 - value50);
+    return '第\x20' + list24['join']('、') + '\x20集';
   }
-  return _0x16f9f9['map']((_0x224abd, _0x37c20a) =>
-    _0x1c76c2[_0x37c20a] ? '第\x20' + _0x1c76c2[_0x37c20a] + '\x20集' : _0x224abd,
+  return list22['map']((value51, value52) =>
+    list23[value52] ? '第\x20' + list23[value52] + '\x20集' : value51,
   )['join']('、');
 }
-function deriveSourceEpisodeRefs(_0x3f3f4b, _0x4021dd) {
-  return normalizeStringArray(_0x3f3f4b['map']((_0x27ea3c) => _0x4021dd['get'](_0x27ea3c)?.['episodeRef']));
+function deriveSourceEpisodeRefs(list25, map5) {
+  return normalizeStringArray(list25['map']((value53) => map5['get'](value53)?.['episodeRef']));
 }
-function normalizeStoryAssetFinalCharacterRole(_0x29b744 = '') {
-  const _0x547870 = normalizeText(_0x29b744);
-  if (/主角|男主|女主|主人公/u['test'](_0x547870)) return '主角';
-  if (/反派|反面|敌对|敌人|宿敌|对手/u['test'](_0x547870)) return '反派';
-  if (/路人|群众|群演|背景人物|无名角色/u['test'](_0x547870)) return '路人';
+function normalizeStoryAssetFinalCharacterRole(value54 = '') {
+  const text3 = normalizeText(value54);
+  if (/主角|男主|女主|主人公/u['test'](text3)) return '主角';
+  if (/反派|反面|敌对|敌人|宿敌|对手/u['test'](text3)) return '反派';
+  if (/路人|群众|群演|背景人物|无名角色/u['test'](text3)) return '路人';
   return '配角';
 }
 function normalizeInventoryAssets(
-  _0x2ae5c6,
+  value55,
   { sourceScenes: sourceScenes = [], allowEmpty: allowEmpty = ![] } = {},
 ) {
-  const _0x140fdd = new Map(sourceScenes['map']((_0x255de6) => [_0x255de6['ref'], _0x255de6])),
-    _0x1e0124 = new Set(_0x140fdd['keys']()),
-    _0x5a54fa = (Array['isArray'](_0x2ae5c6) ? _0x2ae5c6 : [])
-      ['map']((_0x11022b, _0x5111d4) => {
-        const _0x23fef1 = normalizeText(_0x11022b?.['kind']),
-          _0x47a70c = normalizeText(_0x11022b?.['name']),
-          _0x45bddd = normalizeReference(_0x11022b?.['ref'], 'asset-' + (_0x5111d4 + 0x1));
-        if (!_0x47a70c || !['character', 'scene', 'prop']['includes'](_0x23fef1)) return null;
-        const _0x451380 =
-          _0x23fef1 === 'character'
-            ? normalizeStoryAssetFinalCharacterRole(_0x11022b?.['role'])
-            : normalizeText(_0x11022b?.['role']);
-        let _0x59a755 = normalizeStringArray(_0x11022b?.['sourceSceneRefs'])['filter']((_0x554f0d) =>
-          _0x1e0124['has'](_0x554f0d),
+  const map6 = new Map(sourceScenes['map']((value56) => [value56['ref'], value56])),
+    map7 = new Set(map6['keys']()),
+    list26 = (Array['isArray'](value55) ? value55 : [])
+      ['map']((error4, value57) => {
+        const kind2 = normalizeText(error4?.['kind']),
+          name2 = normalizeText(error4?.['name']),
+          ref3 = normalizeReference(error4?.['ref'], 'asset-' + (value57 + 0x1));
+        if (!name2 || !['character', 'scene', 'prop']['includes'](kind2)) return null;
+        const role =
+          kind2 === 'character'
+            ? normalizeStoryAssetFinalCharacterRole(error4?.['role'])
+            : normalizeText(error4?.['role']);
+        let sourceSceneRefs2 = normalizeStringArray(error4?.['sourceSceneRefs'])['filter']((value58) =>
+          map7['has'](value58),
         );
-        !_0x59a755['length'] &&
-          (_0x59a755 = inferStoryAssetSourceSceneRefs(_0x23fef1, _0x47a70c, sourceScenes));
-        if (!_0x59a755['length']) return null;
-        const _0x50f943 = deriveSourceEpisodeRefs(_0x59a755, _0x140fdd),
-          _0x22e01a =
-            Array['isArray'](_0x11022b?.['appearances']) && _0x11022b['appearances']['length']
-              ? _0x11022b['appearances']
-              : [{ ref: _0x45bddd + '-base', name: '基础形象', description: '', sourceSceneRefs: _0x59a755 }],
-          _0x495283 =
-            _0x23fef1 === 'prop' && _0x22e01a['length'] > 0x1
+        !sourceSceneRefs2['length'] &&
+          (sourceSceneRefs2 = inferStoryAssetSourceSceneRefs(kind2, name2, sourceScenes));
+        if (!sourceSceneRefs2['length']) return null;
+        const sourceEpisodeRefs2 = deriveSourceEpisodeRefs(sourceSceneRefs2, map6),
+          list27 =
+            Array['isArray'](error4?.['appearances']) && error4['appearances']['length']
+              ? error4['appearances']
+              : [
+                  {
+                    ref: ref3 + '-base',
+                    name: '基础形象',
+                    description: '',
+                    sourceSceneRefs: sourceSceneRefs2,
+                  },
+                ],
+          list28 =
+            kind2 === 'prop' && list27['length'] > 0x1
               ? [
                   {
-                    ref: _0x45bddd + '-base',
+                    ref: ref3 + '-base',
                     name: '基础形象',
                     description: normalizeStringArray(
-                      _0x22e01a['map']((_0x232827) => {
-                        const _0x5f1ad5 = normalizeText(_0x232827?.['name']),
-                          _0x58e56e = normalizeText(_0x232827?.['description']);
-                        if (_0x5f1ad5 && _0x58e56e) return _0x5f1ad5 + '：' + _0x58e56e;
-                        return _0x58e56e || _0x5f1ad5;
+                      list27['map']((error5) => {
+                        const text4 = normalizeText(error5?.['name']),
+                          text5 = normalizeText(error5?.['description']);
+                        if (text4 && text5) return text4 + '：' + text5;
+                        return text5 || text4;
                       }),
                     )['join']('；'),
-                    sourceSceneRefs: _0x59a755,
+                    sourceSceneRefs: sourceSceneRefs2,
                   },
                 ]
-              : _0x22e01a,
-          _0x24b3be = _0x495283['map']((_0x10b286, _0x47c777) => {
-            const _0x4f5ce0 = normalizeStringArray(
-              _0x10b286?.['sourceSceneRefs']?.['length']
-                ? _0x10b286['sourceSceneRefs']
-                : _0x495283['length'] === 0x1
-                  ? _0x59a755
+              : list27,
+          appearances = list28['map']((error6, count2) => {
+            const sourceSceneRefs3 = normalizeStringArray(
+              error6?.['sourceSceneRefs']?.['length']
+                ? error6['sourceSceneRefs']
+                : list28['length'] === 0x1
+                  ? sourceSceneRefs2
                   : [],
-            )['filter']((_0x4c5730) => _0x59a755['includes'](_0x4c5730));
+            )['filter']((value59) => sourceSceneRefs2['includes'](value59));
             return {
-              ref: normalizeReference(_0x10b286?.['ref'], _0x45bddd + '-appearance-' + (_0x47c777 + 0x1)),
+              ref: normalizeReference(error6?.['ref'], ref3 + '-appearance-' + (count2 + 0x1)),
               name:
-                normalizeText(_0x10b286?.['name']) ||
-                (_0x47c777 === 0x0 ? '基础形象' : '形象 ' + (_0x47c777 + 0x1)),
-              description: normalizeText(_0x10b286?.['description']),
-              occurrences: buildOccurrences(deriveSourceEpisodeRefs(_0x4f5ce0, _0x140fdd)),
-              sourceEpisodeRefs: deriveSourceEpisodeRefs(_0x4f5ce0, _0x140fdd),
-              sourceSceneRefs: _0x4f5ce0,
+                normalizeText(error6?.['name']) || (count2 === 0x0 ? '基础形象' : '形象 ' + (count2 + 0x1)),
+              description: normalizeText(error6?.['description']),
+              occurrences: buildOccurrences(deriveSourceEpisodeRefs(sourceSceneRefs3, map6)),
+              sourceEpisodeRefs: deriveSourceEpisodeRefs(sourceSceneRefs3, map6),
+              sourceSceneRefs: sourceSceneRefs3,
             };
           }),
-          _0x4ad683 = _0x24b3be['map']((_0x7e35ca) => _0x7e35ca['ref']);
-        if (new Set(_0x4ad683)['size'] !== _0x4ad683['length'])
-          throw new Error('资产“' + _0x47a70c + '”规划了重复的形象 ref。');
+          list29 = appearances['map']((value60) => value60['ref']);
+        if (new Set(list29)['size'] !== list29['length'])
+          throw new Error('资产“' + name2 + '”规划了重复的形象 ref。');
         return {
-          ref: _0x45bddd,
-          kind: _0x23fef1,
-          name: _0x47a70c,
-          role: _0x451380,
-          description: normalizeText(_0x11022b?.['description']),
-          occurrences: normalizeText(_0x11022b?.['occurrences']) || buildOccurrences(_0x50f943),
-          sourceEpisodeRefs: _0x50f943,
-          sourceSceneRefs: _0x59a755,
-          appearances: _0x24b3be,
+          ref: ref3,
+          kind: kind2,
+          name: name2,
+          role: role,
+          description: normalizeText(error4?.['description']),
+          occurrences: normalizeText(error4?.['occurrences']) || buildOccurrences(sourceEpisodeRefs2),
+          sourceEpisodeRefs: sourceEpisodeRefs2,
+          sourceSceneRefs: sourceSceneRefs2,
+          appearances: appearances,
         };
       })
       ['filter'](Boolean);
-  if (!_0x5a54fa['length'] && !allowEmpty) throw new Error('Agent\x20未返回可用的轻量资产清单。');
-  const _0xa2967b = new Set();
+  if (!list26['length'] && !allowEmpty) throw new Error('Agent\x20未返回可用的轻量资产清单。');
+  const value61 = new Set();
   return (
-    _0x5a54fa['forEach']((_0xb22f7d, _0x153ec7) => {
-      _0xb22f7d['ref'] = createUniqueStoryAssetInventoryRef(
-        _0xb22f7d['ref'],
-        _0xa2967b,
-        'asset-' + (_0x153ec7 + 0x1),
+    list26['forEach']((value62, value63) => {
+      value62['ref'] = createUniqueStoryAssetInventoryRef(
+        value62['ref'],
+        value61,
+        'asset-' + (value63 + 0x1),
       );
-      const _0x4819bd = new Set();
-      _0xb22f7d['appearances']['forEach']((_0x556328, _0x9f779f) => {
-        _0x556328['ref'] = createUniqueStoryAssetAppearanceRef(
-          _0x556328['ref'],
-          _0x4819bd,
-          _0xb22f7d['ref'] + '-appearance-' + (_0x9f779f + 0x1),
+      const value64 = new Set();
+      value62['appearances']['forEach']((value65, value66) => {
+        value65['ref'] = createUniqueStoryAssetAppearanceRef(
+          value65['ref'],
+          value64,
+          value62['ref'] + '-appearance-' + (value66 + 0x1),
         );
       });
     }),
-    _0x5a54fa
+    list26
   );
 }
 export function buildStoryAssetInventoryPrompt({
@@ -634,32 +620,30 @@ export function buildStoryAssetInventoryPrompt({
   episodes: episodes = [],
   sourceScenes: sourceScenes = null,
 } = {}) {
-  const _0x32e294 = normalizeStoryContext(project),
-    _0x531b41 = Array['isArray'](sourceScenes)
-      ? sourceScenes
-      : normalizeStoryAssetExtractionSources(episodes);
-  if (!_0x531b41['length']) throw new Error('资产清单规划缺少可用的场次正文。');
-  const _0x3d1c53 = createDeterministicStoryCharacterCandidateMap(_0x531b41),
-    _0x4484e5 = _0x531b41['map']((_0x1e9179) => ({
-      ref: _0x1e9179['ref'],
-      heading: _0x1e9179['heading'],
-      ...(_0x1e9179['isSourceWindow']
-        ? { assetHeading: _0x1e9179['assetHeading'] || _0x1e9179['heading'], isSourceWindow: !![] }
+  const storyContext2 = normalizeStoryContext(project),
+    list30 = Array['isArray'](sourceScenes) ? sourceScenes : normalizeStoryAssetExtractionSources(episodes);
+  if (!list30['length']) throw new Error('资产清单规划缺少可用的场次正文。');
+  const map8 = createDeterministicStoryCharacterCandidateMap(list30),
+    sourceScenes2 = list30['map']((ref4) => ({
+      ref: ref4['ref'],
+      heading: ref4['heading'],
+      ...(ref4['isSourceWindow']
+        ? { assetHeading: ref4['assetHeading'] || ref4['heading'], isSourceWindow: !![] }
         : {}),
-      ...(_0x1e9179['characters']['length'] ? { characters: _0x1e9179['characters'] } : {}),
-      body: _0x1e9179['body'],
+      ...(ref4['characters']['length'] ? { characters: ref4['characters'] } : {}),
+      body: ref4['body'],
     }));
   return JSON['stringify']({
     task: 'plan_story_asset_inventory',
     schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION,
-    storyContext: _0x32e294,
+    storyContext: storyContext2,
     deterministicCandidates: {
-      characters: [..._0x3d1c53['entries']()]['map'](([_0x53c330, _0x4d1262]) => ({
-        name: _0x53c330,
-        sourceSceneRefs: normalizeStringArray(_0x4d1262['sourceSceneRefs']),
+      characters: [...map8['entries']()]['map'](([name3, value67]) => ({
+        name: name3,
+        sourceSceneRefs: normalizeStringArray(value67['sourceSceneRefs']),
       })),
     },
-    sourceScenes: _0x4484e5,
+    sourceScenes: sourceScenes2,
     requirements: [
       '本轮只输出必要补充：角色或场景的显著形象状态、需要跨标题合并的场景组、关键道具；没有补充时\x20assets\x20返回空数组。',
       '不要逐项复述只有基础形象的角色或普通单场场景；客户端会从\x20deterministicCandidates.characters\x20和\x20sourceScenes\x20本地补齐。',
@@ -684,288 +668,289 @@ export function createStoryAssetInventorySourceBatches({
   maxPromptCharacters: maxPromptCharacters = STORY_ASSET_INVENTORY_PROMPT_TARGET_CHARACTERS,
   maxSourceScenes: maxSourceScenes = STORY_ASSET_INVENTORY_MAX_SOURCE_SCENES,
 } = {}) {
-  const _0x23d3f7 = Array['isArray'](sourceScenes)
+  const list31 = Array['isArray'](sourceScenes)
       ? sourceScenes
       : normalizeStoryAssetExtractionSources(episodes),
-    _0x43dc58 = Math['max'](0xfa0, Math['trunc'](Number(maxPromptCharacters) || 0x0)),
-    _0x9cdf88 = Math['max'](0x1, Math['trunc'](Number(maxSourceScenes) || 0x0)),
-    _0x243cc7 = [];
-  let _0x105448 = [];
-  _0x23d3f7['forEach']((_0x3ea7f3) => {
-    const _0x547b7e = [..._0x105448, _0x3ea7f3],
-      _0x5e8dec = buildStoryAssetInventoryPrompt({ project: project, sourceScenes: _0x547b7e })['length'];
-    if (_0x105448['length'] && (_0x105448['length'] >= _0x9cdf88 || _0x5e8dec > _0x43dc58)) {
-      (_0x243cc7['push'](_0x105448), (_0x105448 = [_0x3ea7f3]));
+    value68 = Math['max'](0xfa0, Math['trunc'](Number(maxPromptCharacters) || 0x0)),
+    value69 = Math['max'](0x1, Math['trunc'](Number(maxSourceScenes) || 0x0)),
+    list32 = [];
+  let list33 = [];
+  list31['forEach']((value70) => {
+    const sourceScenes3 = [...list33, value70],
+      storyAssetInventoryPrompt = buildStoryAssetInventoryPrompt({
+        project: project,
+        sourceScenes: sourceScenes3,
+      })['length'];
+    if (list33['length'] && (list33['length'] >= value69 || storyAssetInventoryPrompt > value68)) {
+      (list32['push'](list33), (list33 = [value70]));
       return;
     }
-    _0x105448 = _0x547b7e;
+    list33 = sourceScenes3;
   });
-  if (_0x105448['length']) _0x243cc7['push'](_0x105448);
-  const _0x2713a8 = _0x243cc7['find'](
-    (_0x44210a) =>
-      buildStoryAssetInventoryPrompt({ project: project, sourceScenes: _0x44210a })['length'] > _0x43dc58,
+  if (list33['length']) list32['push'](list33);
+  const value71 = list32['find'](
+    (sourceScenes4) =>
+      buildStoryAssetInventoryPrompt({ project: project, sourceScenes: sourceScenes4 })['length'] > value68,
   );
-  if (_0x2713a8) {
-    const _0x3807d7 = _0x2713a8[0x0];
+  if (value71) {
+    const value72 = value71[0x0];
     throw new Error(
       '单个场次“' +
-        (_0x3807d7?.['heading'] || _0x3807d7?.['ref'] || '未命名场次') +
+        (value72?.['heading'] || value72?.['ref'] || '未命名场次') +
         '”正文过长，请先拆分该场次。',
     );
   }
-  return _0x243cc7;
+  return list32;
 }
-export function parseStoryAssetInventoryResult(_0x3053b6, { sourceScenes: sourceScenes = [] } = {}) {
-  const _0x3c117e = parseStrictJson(getResultText(_0x3053b6), 'Agent 未返回轻量资产清单。'),
-    _0x2b248e = normalizeInventoryAssets(_0x3c117e?.['assets'], {
+export function parseStoryAssetInventoryResult(value73, { sourceScenes: sourceScenes = [] } = {}) {
+  const strictJson = parseStrictJson(getResultText(value73), 'Agent 未返回轻量资产清单。'),
+    assets = normalizeInventoryAssets(strictJson?.['assets'], {
       sourceScenes: sourceScenes,
       allowEmpty: !![],
     }),
-    _0x10fa88 = new Set(sourceScenes['map']((_0x4267a2) => _0x4267a2['ref'])),
-    _0x272a56 = (Array['isArray'](_0x3c117e?.['sceneAudits']) ? _0x3c117e['sceneAudits'] : [])['map'](
-      (_0x3224b2) => ({
+    map9 = new Set(sourceScenes['map']((value74) => value74['ref'])),
+    list34 = (Array['isArray'](strictJson?.['sceneAudits']) ? strictJson['sceneAudits'] : [])['map'](
+      (value75) => ({
         sourceSceneRef: normalizeText(
-          _0x3224b2?.['sourceSceneRef'] || _0x3224b2?.['sceneRef'] || _0x3224b2?.['ref'],
+          value75?.['sourceSceneRef'] || value75?.['sceneRef'] || value75?.['ref'],
         ),
-        characterNames: normalizeStringArray(_0x3224b2?.['characterNames']),
-        keyPropNames: normalizeStringArray(_0x3224b2?.['keyPropNames']),
+        characterNames: normalizeStringArray(value75?.['characterNames']),
+        keyPropNames: normalizeStringArray(value75?.['keyPropNames']),
       }),
     ),
-    _0x2cee66 = _0x272a56['map']((_0x512dca) => _0x512dca['sourceSceneRef']),
-    _0x4e4d73 = _0x2cee66['find']((_0x4bb173) => !_0x10fa88['has'](_0x4bb173));
-  if (_0x4e4d73) throw new Error('场次审计引用了不存在的场次：' + _0x4e4d73 + '。');
-  if (new Set(_0x2cee66)['size'] !== _0x2cee66['length'])
-    throw new Error('场次审计包含重复的\x20sourceSceneRef。');
-  const _0x3c9286 = new Map(_0x272a56['map']((_0x95bdcb) => [_0x95bdcb['sourceSceneRef'], _0x95bdcb])),
-    _0x3ec33b = sourceScenes['map']((_0x3954a4) => ({
-      sourceSceneRef: _0x3954a4['ref'],
+    list35 = list34['map']((value76) => value76['sourceSceneRef']),
+    value77 = list35['find']((value78) => !map9['has'](value78));
+  if (value77) throw new Error('场次审计引用了不存在的场次：' + value77 + '。');
+  if (new Set(list35)['size'] !== list35['length']) throw new Error('场次审计包含重复的\x20sourceSceneRef。');
+  const map10 = new Map(list34['map']((value79) => [value79['sourceSceneRef'], value79])),
+    sceneAudits = sourceScenes['map']((sourceSceneRef2) => ({
+      sourceSceneRef: sourceSceneRef2['ref'],
       characterNames: normalizeStringArray([
-        ...(_0x3c9286['get'](_0x3954a4['ref'])?.['characterNames'] || []),
-        ..._0x2b248e['filter'](
-          (_0x1df5e7) =>
-            _0x1df5e7['kind'] === 'character' && _0x1df5e7['sourceSceneRefs']['includes'](_0x3954a4['ref']),
-        )['map']((_0xe606f4) => _0xe606f4['name']),
+        ...(map10['get'](sourceSceneRef2['ref'])?.['characterNames'] || []),
+        ...assets['filter'](
+          (value80) =>
+            value80['kind'] === 'character' && value80['sourceSceneRefs']['includes'](sourceSceneRef2['ref']),
+        )['map']((error7) => error7['name']),
       ]),
       keyPropNames: normalizeStringArray([
-        ...(_0x3c9286['get'](_0x3954a4['ref'])?.['keyPropNames'] || []),
-        ..._0x2b248e['filter'](
-          (_0x31511b) =>
-            _0x31511b['kind'] === 'prop' && _0x31511b['sourceSceneRefs']['includes'](_0x3954a4['ref']),
-        )['map']((_0xc7e0d6) => _0xc7e0d6['name']),
+        ...(map10['get'](sourceSceneRef2['ref'])?.['keyPropNames'] || []),
+        ...assets['filter'](
+          (value81) =>
+            value81['kind'] === 'prop' && value81['sourceSceneRefs']['includes'](sourceSceneRef2['ref']),
+        )['map']((error8) => error8['name']),
       ]),
     }));
   return {
     schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION,
-    assets: _0x2b248e,
-    sceneAudits: _0x3ec33b,
+    assets: assets,
+    sceneAudits: sceneAudits,
   };
 }
-function getStoryAssetInventoryIdentity(_0x1fbd8c = {}) {
-  return normalizeText(_0x1fbd8c?.['kind']) + ':' + normalizeText(_0x1fbd8c?.['name'])['toLowerCase']();
+function getStoryAssetInventoryIdentity(error9 = {}) {
+  return normalizeText(error9?.['kind']) + ':' + normalizeText(error9?.['name'])['toLowerCase']();
 }
-function resolveMergedStoryCharacterRole(_0x53272c = '', _0x188e8b = '') {
-  const _0x5128ba = [
-    normalizeStoryAssetFinalCharacterRole(_0x53272c),
-    normalizeStoryAssetFinalCharacterRole(_0x188e8b),
+function resolveMergedStoryCharacterRole(value82 = '', value83 = '') {
+  const list36 = [
+    normalizeStoryAssetFinalCharacterRole(value82),
+    normalizeStoryAssetFinalCharacterRole(value83),
   ];
-  if (_0x5128ba['includes']('主角')) return '主角';
-  if (_0x5128ba['includes']('反派')) return '反派';
-  if (_0x5128ba['includes']('配角')) return '配角';
+  if (list36['includes']('主角')) return '主角';
+  if (list36['includes']('反派')) return '反派';
+  if (list36['includes']('配角')) return '配角';
   return '路人';
 }
-function createUniqueStoryAssetInventoryRef(_0x2f44ac, _0x2ab3fe, _0x47d701) {
-  const _0x75620c = normalizeReference(_0x2f44ac, _0x47d701);
-  let _0x4836cb = _0x75620c,
-    _0xab6a27 = 0x2;
-  while (_0x2ab3fe['has'](_0x4836cb)) {
-    ((_0x4836cb = _0x75620c + '-' + _0xab6a27), (_0xab6a27 += 0x1));
+function createUniqueStoryAssetInventoryRef(value84, map11, value85) {
+  const reference = normalizeReference(value84, value85);
+  let value86 = reference,
+    value87 = 0x2;
+  while (map11['has'](value86)) {
+    ((value86 = reference + '-' + value87), (value87 += 0x1));
   }
-  return (_0x2ab3fe['add'](_0x4836cb), _0x4836cb);
+  return (map11['add'](value86), value86);
 }
-function createUniqueStoryAssetAppearanceRef(_0x3836b5, _0x6da9e5, _0x4c6aae) {
-  const _0x263034 = normalizeReference(_0x3836b5, _0x4c6aae);
-  if (!_0x6da9e5['has'](_0x263034)) return (_0x6da9e5['add'](_0x263034), _0x263034);
-  return createUniqueStoryAssetInventoryRef(_0x4c6aae, _0x6da9e5, _0x4c6aae);
+function createUniqueStoryAssetAppearanceRef(value88, map12, value89) {
+  const reference2 = normalizeReference(value88, value89);
+  if (!map12['has'](reference2)) return (map12['add'](reference2), reference2);
+  return createUniqueStoryAssetInventoryRef(value89, map12, value89);
 }
-function mergeStoryAssetInventoryAppearance(_0x2f45de, _0x33633a) {
+function mergeStoryAssetInventoryAppearance(args12, args13) {
   return (
-    (_0x2f45de['description'] = _0x2f45de['description'] || _0x33633a['description']),
-    (_0x2f45de['sourceSceneRefs'] = normalizeStringArray([
-      ..._0x2f45de['sourceSceneRefs'],
-      ..._0x33633a['sourceSceneRefs'],
+    (args12['description'] = args12['description'] || args13['description']),
+    (args12['sourceSceneRefs'] = normalizeStringArray([
+      ...args12['sourceSceneRefs'],
+      ...args13['sourceSceneRefs'],
     ])),
-    _0x2f45de
+    args12
   );
 }
-export function mergeStoryAssetInventoryResults(_0x4b67fa = [], { sourceScenes: sourceScenes = [] } = {}) {
-  const _0x1f71d7 = [],
-    _0x452ba1 = new Map(),
-    _0x44e45e = new Map();
-  (Array['isArray'](_0x4b67fa) ? _0x4b67fa : [])['forEach']((_0x4403e9) => {
-    ((Array['isArray'](_0x4403e9?.['assets']) ? _0x4403e9['assets'] : [])['forEach']((_0xf1999a) => {
-      const _0x41b660 = getStoryAssetInventoryIdentity(_0xf1999a),
-        _0x4ca60c = _0x452ba1['get'](_0x41b660);
-      if (!_0x4ca60c) {
-        const _0x1e4f47 = {
-          ..._0xf1999a,
-          sourceSceneRefs: [..._0xf1999a['sourceSceneRefs']],
-          appearances: _0xf1999a['appearances']['map']((_0x2837bf) => ({
-            ..._0x2837bf,
-            sourceSceneRefs: [..._0x2837bf['sourceSceneRefs']],
+export function mergeStoryAssetInventoryResults(list37 = [], { sourceScenes: sourceScenes = [] } = {}) {
+  const assets2 = [],
+    map13 = new Map(),
+    map14 = new Map();
+  (Array['isArray'](list37) ? list37 : [])['forEach']((value90) => {
+    ((Array['isArray'](value90?.['assets']) ? value90['assets'] : [])['forEach']((appearances2) => {
+      const storyAssetInventoryIdentity = getStoryAssetInventoryIdentity(appearances2),
+        args14 = map13['get'](storyAssetInventoryIdentity);
+      if (!args14) {
+        const value91 = {
+          ...appearances2,
+          sourceSceneRefs: [...appearances2['sourceSceneRefs']],
+          appearances: appearances2['appearances']['map']((args15) => ({
+            ...args15,
+            sourceSceneRefs: [...args15['sourceSceneRefs']],
           })),
         };
-        (_0x452ba1['set'](_0x41b660, _0x1e4f47), _0x1f71d7['push'](_0x1e4f47));
+        (map13['set'](storyAssetInventoryIdentity, value91), assets2['push'](value91));
         return;
       }
-      ((_0x4ca60c['description'] = _0x4ca60c['description'] || _0xf1999a['description']),
-        (_0x4ca60c['sourceSceneRefs'] = normalizeStringArray([
-          ..._0x4ca60c['sourceSceneRefs'],
-          ..._0xf1999a['sourceSceneRefs'],
+      ((args14['description'] = args14['description'] || appearances2['description']),
+        (args14['sourceSceneRefs'] = normalizeStringArray([
+          ...args14['sourceSceneRefs'],
+          ...appearances2['sourceSceneRefs'],
         ])));
-      if (_0x4ca60c['kind'] === 'character')
-        _0x4ca60c['role'] = resolveMergedStoryCharacterRole(_0x4ca60c['role'], _0xf1999a['role']);
+      if (args14['kind'] === 'character')
+        args14['role'] = resolveMergedStoryCharacterRole(args14['role'], appearances2['role']);
       else {
-        if (_0x4ca60c['kind'] === 'prop') {
-          const _0x26d901 = _0x4ca60c['appearances'][0x0];
-          _0xf1999a['appearances']['forEach']((_0x57f6ce) => {
-            mergeStoryAssetInventoryAppearance(_0x26d901, _0x57f6ce);
+        if (args14['kind'] === 'prop') {
+          const value92 = args14['appearances'][0x0];
+          appearances2['appearances']['forEach']((value93) => {
+            mergeStoryAssetInventoryAppearance(value92, value93);
           });
           return;
         }
       }
-      _0xf1999a['appearances']['forEach']((_0x40ce68) => {
-        const _0x341d09 = normalizeText(_0x40ce68['name'])['toLowerCase'](),
-          _0x3abe58 = _0x4ca60c['appearances']['find'](
-            (_0x570959) => normalizeText(_0x570959['name'])['toLowerCase']() === _0x341d09,
+      appearances2['appearances']['forEach']((error10) => {
+        const text6 = normalizeText(error10['name'])['toLowerCase'](),
+          value94 = args14['appearances']['find'](
+            (error11) => normalizeText(error11['name'])['toLowerCase']() === text6,
           );
-        _0x3abe58
-          ? mergeStoryAssetInventoryAppearance(_0x3abe58, _0x40ce68)
-          : _0x4ca60c['appearances']['push']({
-              ..._0x40ce68,
-              sourceSceneRefs: [..._0x40ce68['sourceSceneRefs']],
+        value94
+          ? mergeStoryAssetInventoryAppearance(value94, error10)
+          : args14['appearances']['push']({
+              ...error10,
+              sourceSceneRefs: [...error10['sourceSceneRefs']],
             });
       });
     }),
-      (Array['isArray'](_0x4403e9?.['sceneAudits']) ? _0x4403e9['sceneAudits'] : [])['forEach'](
-        (_0x5c52b3) => {
-          const _0x1686fb = normalizeText(_0x5c52b3?.['sourceSceneRef']);
-          if (!_0x1686fb) return;
-          const _0x3a7b2d = _0x44e45e['get'](_0x1686fb) || {
-            sourceSceneRef: _0x1686fb,
-            characterNames: [],
-            keyPropNames: [],
-          };
-          ((_0x3a7b2d['characterNames'] = normalizeStringArray([
-            ..._0x3a7b2d['characterNames'],
-            ...normalizeStringArray(_0x5c52b3?.['characterNames']),
+      (Array['isArray'](value90?.['sceneAudits']) ? value90['sceneAudits'] : [])['forEach']((value95) => {
+        const sourceSceneRef3 = normalizeText(value95?.['sourceSceneRef']);
+        if (!sourceSceneRef3) return;
+        const args16 = map14['get'](sourceSceneRef3) || {
+          sourceSceneRef: sourceSceneRef3,
+          characterNames: [],
+          keyPropNames: [],
+        };
+        ((args16['characterNames'] = normalizeStringArray([
+          ...args16['characterNames'],
+          ...normalizeStringArray(value95?.['characterNames']),
+        ])),
+          (args16['keyPropNames'] = normalizeStringArray([
+            ...args16['keyPropNames'],
+            ...normalizeStringArray(value95?.['keyPropNames']),
           ])),
-            (_0x3a7b2d['keyPropNames'] = normalizeStringArray([
-              ..._0x3a7b2d['keyPropNames'],
-              ...normalizeStringArray(_0x5c52b3?.['keyPropNames']),
-            ])),
-            _0x44e45e['set'](_0x1686fb, _0x3a7b2d));
-        },
-      ));
+          map14['set'](sourceSceneRef3, args16));
+      }));
   });
-  const _0x22c346 = new Set(),
-    _0x7f077a = new Set();
+  const value96 = new Set(),
+    value97 = new Set();
   return (
-    _0x1f71d7['forEach']((_0x417b1e, _0x4ea177) => {
-      ((_0x417b1e['ref'] = createUniqueStoryAssetInventoryRef(
-        _0x417b1e['ref'],
-        _0x22c346,
-        'asset-' + (_0x4ea177 + 0x1),
+    assets2['forEach']((value98, value99) => {
+      ((value98['ref'] = createUniqueStoryAssetInventoryRef(
+        value98['ref'],
+        value96,
+        'asset-' + (value99 + 0x1),
       )),
-        (_0x417b1e['appearances'] = _0x417b1e['appearances']['map']((_0x5c7825, _0x9a98d5) => ({
-          ..._0x5c7825,
+        (value98['appearances'] = value98['appearances']['map']((args17, value100) => ({
+          ...args17,
           ref: createUniqueStoryAssetAppearanceRef(
-            _0x5c7825['ref'],
-            _0x7f077a,
-            _0x417b1e['ref'] + '-appearance-' + (_0x9a98d5 + 0x1),
+            args17['ref'],
+            value97,
+            value98['ref'] + '-appearance-' + (value100 + 0x1),
           ),
         }))));
     }),
     parseStoryAssetInventoryResult(
-      { assets: _0x1f71d7, sceneAudits: [..._0x44e45e['values']()] },
+      { assets: assets2, sceneAudits: [...map14['values']()] },
       { sourceScenes: sourceScenes },
     )
   );
 }
-function pushCoverageIssue(_0x219d5a, _0x2089e4) {
-  const _0x5bd42b = JSON['stringify'](_0x2089e4);
-  if (!_0x219d5a['some']((_0x5d3b5b) => JSON['stringify'](_0x5d3b5b) === _0x5bd42b))
-    _0x219d5a['push'](_0x2089e4);
+function pushCoverageIssue(list38, value101) {
+  const value102 = JSON['stringify'](value101);
+  if (!list38['some']((value103) => JSON['stringify'](value103) === value102)) list38['push'](value101);
 }
-export function inspectStoryAssetInventoryCoverage(_0x4108b1 = {}, _0x4eac46 = []) {
-  const _0x27e76c = Array['isArray'](_0x4108b1?.['assets']) ? _0x4108b1['assets'] : [],
-    _0xd23608 = new Map(
-      (Array['isArray'](_0x4108b1?.['sceneAudits']) ? _0x4108b1['sceneAudits'] : [])['map']((_0x447a4e) => [
-        _0x447a4e['sourceSceneRef'],
-        _0x447a4e,
+export function inspectStoryAssetInventoryCoverage(options3 = {}, list39 = []) {
+  const list40 = Array['isArray'](options3?.['assets']) ? options3['assets'] : [],
+    map15 = new Map(
+      (Array['isArray'](options3?.['sceneAudits']) ? options3['sceneAudits'] : [])['map']((value104) => [
+        value104['sourceSceneRef'],
+        value104,
       ]),
     ),
-    _0x538b2b = [];
+    value105 = [];
   return (
-    _0x4eac46['forEach']((_0x14cd85) => {
-      const _0x54ae1f = _0x27e76c['filter'](
-          (_0x5f828) =>
-            _0x5f828['kind'] === 'scene' && _0x5f828['sourceSceneRefs']['includes'](_0x14cd85['ref']),
+    list39['forEach']((sourceSceneRef4) => {
+      const type = list40['filter'](
+          (value106) =>
+            value106['kind'] === 'scene' && value106['sourceSceneRefs']['includes'](sourceSceneRef4['ref']),
         ),
-        _0xe9fc80 = /[/／|｜]/u['test'](normalizeText(_0x14cd85?.['assetHeading'] || _0x14cd85?.['heading']));
-      ((!_0x54ae1f['length'] || (!_0xe9fc80 && _0x54ae1f['length'] > 0x1)) &&
-        pushCoverageIssue(_0x538b2b, {
-          type: _0x54ae1f['length'] ? 'duplicate-scene-assets' : 'missing-scene-asset',
-          sourceSceneRef: _0x14cd85['ref'],
-          expectedName: _0x14cd85['heading'],
-          assetRefs: _0x54ae1f['map']((_0x46d6f4) => _0x46d6f4['ref']),
+        enabled3 = /[/／|｜]/u['test'](
+          normalizeText(sourceSceneRef4?.['assetHeading'] || sourceSceneRef4?.['heading']),
+        );
+      ((!type['length'] || (!enabled3 && type['length'] > 0x1)) &&
+        pushCoverageIssue(value105, {
+          type: type['length'] ? 'duplicate-scene-assets' : 'missing-scene-asset',
+          sourceSceneRef: sourceSceneRef4['ref'],
+          expectedName: sourceSceneRef4['heading'],
+          assetRefs: type['map']((value107) => value107['ref']),
         }),
-        (_0xd23608['get'](_0x14cd85['ref'])?.['keyPropNames'] || [])['forEach']((_0x587a50) => {
-          const _0x3afde0 = _0x27e76c['filter'](
-            (_0x39f230) =>
-              _0x39f230['kind'] === 'prop' &&
-              _0x39f230['name'] === _0x587a50 &&
-              _0x39f230['sourceSceneRefs']['includes'](_0x14cd85['ref']),
+        (map15['get'](sourceSceneRef4['ref'])?.['keyPropNames'] || [])['forEach']((expectedName) => {
+          const type2 = list40['filter'](
+            (error12) =>
+              error12['kind'] === 'prop' &&
+              error12['name'] === expectedName &&
+              error12['sourceSceneRefs']['includes'](sourceSceneRef4['ref']),
           );
-          _0x3afde0['length'] !== 0x1 &&
-            pushCoverageIssue(_0x538b2b, {
-              type: _0x3afde0['length'] ? 'duplicate-key-props' : 'missing-key-prop',
-              sourceSceneRef: _0x14cd85['ref'],
-              expectedName: _0x587a50,
-              assetRefs: _0x3afde0['map']((_0x3b0669) => _0x3b0669['ref']),
+          type2['length'] !== 0x1 &&
+            pushCoverageIssue(value105, {
+              type: type2['length'] ? 'duplicate-key-props' : 'missing-key-prop',
+              sourceSceneRef: sourceSceneRef4['ref'],
+              expectedName: expectedName,
+              assetRefs: type2['map']((value108) => value108['ref']),
             });
         }),
-        (_0xd23608['get'](_0x14cd85['ref'])?.['characterNames'] || [])['forEach']((_0x357723) => {
-          const _0x49f010 = _0x27e76c['filter'](
-            (_0x211a05) =>
-              _0x211a05['kind'] === 'character' &&
-              storyCharacterNamesOverlap(_0x211a05['name'], _0x357723) &&
-              _0x211a05['sourceSceneRefs']['includes'](_0x14cd85['ref']),
+        (map15['get'](sourceSceneRef4['ref'])?.['characterNames'] || [])['forEach']((expectedName2) => {
+          const type3 = list40['filter'](
+            (error13) =>
+              error13['kind'] === 'character' &&
+              storyCharacterNamesOverlap(error13['name'], expectedName2) &&
+              error13['sourceSceneRefs']['includes'](sourceSceneRef4['ref']),
           );
-          _0x49f010['length'] !== 0x1 &&
-            pushCoverageIssue(_0x538b2b, {
-              type: _0x49f010['length'] ? 'duplicate-scene-characters' : 'missing-scene-character',
-              sourceSceneRef: _0x14cd85['ref'],
-              expectedName: _0x357723,
-              assetRefs: _0x49f010['map']((_0xf70f7e) => _0xf70f7e['ref']),
+          type3['length'] !== 0x1 &&
+            pushCoverageIssue(value105, {
+              type: type3['length'] ? 'duplicate-scene-characters' : 'missing-scene-character',
+              sourceSceneRef: sourceSceneRef4['ref'],
+              expectedName: expectedName2,
+              assetRefs: type3['map']((value109) => value109['ref']),
             });
         }));
     }),
-    _0x27e76c['forEach']((_0x2bb13a) => {
-      _0x2bb13a['sourceSceneRefs']['forEach']((_0x37881d) => {
-        const _0x7df615 = _0x2bb13a['appearances']
-          ['filter']((_0x5a48c4) => _0x5a48c4['sourceSceneRefs']['includes'](_0x37881d))
-          ['map']((_0xc570f) => _0xc570f['ref']);
-        !_0x7df615['length'] &&
-          pushCoverageIssue(_0x538b2b, {
+    list40['forEach']((expectedName3) => {
+      expectedName3['sourceSceneRefs']['forEach']((sourceSceneRef5) => {
+        const appearanceRefs = expectedName3['appearances']
+          ['filter']((value110) => value110['sourceSceneRefs']['includes'](sourceSceneRef5))
+          ['map']((value111) => value111['ref']);
+        !appearanceRefs['length'] &&
+          pushCoverageIssue(value105, {
             type: 'missing-appearance-mapping',
-            sourceSceneRef: _0x37881d,
-            expectedName: _0x2bb13a['name'],
-            assetRefs: [_0x2bb13a['ref']],
-            appearanceRefs: _0x7df615,
+            sourceSceneRef: sourceSceneRef5,
+            expectedName: expectedName3['name'],
+            assetRefs: [expectedName3['ref']],
+            appearanceRefs: appearanceRefs,
           });
       });
     }),
-    _0x538b2b
+    value105
   );
 }
 export function buildStoryAssetInventoryRepairPrompt({
@@ -973,20 +958,20 @@ export function buildStoryAssetInventoryRepairPrompt({
   sourceScenes: sourceScenes = [],
   coverageIssues: coverageIssues = [],
 } = {}) {
-  const _0x40d985 = new Set(coverageIssues['map']((_0x2b2930) => _0x2b2930['sourceSceneRef'])),
-    _0x26e722 = new Set(coverageIssues['flatMap']((_0x33241e) => _0x33241e['assetRefs'] || [])),
-    _0x1c4638 = sourceScenes['filter']((_0x135f20) => _0x40d985['has'](_0x135f20['ref'])),
-    _0x1a1bd5 = (inventory['assets'] || [])['filter'](
-      (_0x4fb52e) =>
-        _0x26e722['has'](_0x4fb52e['ref']) ||
-        _0x4fb52e['sourceSceneRefs']['some']((_0x4770e2) => _0x40d985['has'](_0x4770e2)),
+  const map16 = new Set(coverageIssues['map']((value112) => value112['sourceSceneRef'])),
+    map17 = new Set(coverageIssues['flatMap']((value113) => value113['assetRefs'] || [])),
+    sourceScenes5 = sourceScenes['filter']((value114) => map16['has'](value114['ref'])),
+    currentAssets = (inventory['assets'] || [])['filter'](
+      (value115) =>
+        map17['has'](value115['ref']) ||
+        value115['sourceSceneRefs']['some']((value116) => map16['has'](value116)),
     );
   return JSON['stringify']({
     task: 'repair_story_asset_inventory_coverage',
     schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION,
     coverageIssues: coverageIssues,
-    sourceScenes: _0x1c4638,
-    currentAssets: _0x1a1bd5,
+    sourceScenes: sourceScenes5,
+    currentAssets: currentAssets,
     requirements: [
       '只修复 coverageIssues；未在 currentAssets 中出现且未被问题点名的资产不得改动。',
       '缺失项用 upserts 新增；来源映射错误用同 ref 的完整资产覆盖；确需删除的重复资产写入 removeAssetRefs。',
@@ -1021,58 +1006,57 @@ function createStoryAssetInventoryRepairBatches({
   coverageIssues: coverageIssues = [],
   maxPromptCharacters: maxPromptCharacters = STORY_ASSET_INVENTORY_PROMPT_TARGET_CHARACTERS,
 } = {}) {
-  const _0x596904 = Math['max'](0xfa0, Math['trunc'](Number(maxPromptCharacters) || 0x0)),
-    _0x43df2a = [];
-  let _0x959fe = [];
-  coverageIssues['forEach']((_0x436699) => {
-    const _0x2d3424 = [..._0x959fe, _0x436699],
-      _0x66a203 = buildStoryAssetInventoryRepairPrompt({
+  const value117 = Math['max'](0xfa0, Math['trunc'](Number(maxPromptCharacters) || 0x0)),
+    list41 = [];
+  let list42 = [];
+  coverageIssues['forEach']((value118) => {
+    const coverageIssues2 = [...list42, value118],
+      storyAssetInventoryRepairPrompt = buildStoryAssetInventoryRepairPrompt({
         inventory: inventory,
         sourceScenes: sourceScenes,
-        coverageIssues: _0x2d3424,
+        coverageIssues: coverageIssues2,
       })['length'];
-    if (_0x959fe['length'] && _0x66a203 > _0x596904) {
-      (_0x43df2a['push'](_0x959fe), (_0x959fe = [_0x436699]));
+    if (list42['length'] && storyAssetInventoryRepairPrompt > value117) {
+      (list41['push'](list42), (list42 = [value118]));
       return;
     }
-    _0x959fe = _0x2d3424;
+    list42 = coverageIssues2;
   });
-  if (_0x959fe['length']) _0x43df2a['push'](_0x959fe);
-  return _0x43df2a;
+  if (list42['length']) list41['push'](list42);
+  return list41;
 }
 function parseStoryAssetInventoryRepairResult(
-  _0x46331f,
+  value119,
   { sourceScenes: sourceScenes = [], inventory: inventory = {} } = {},
 ) {
-  const _0x5110d0 = parseStrictJson(getResultText(_0x46331f), 'Agent 未返回资产清单修复结果。'),
-    _0x542e36 = normalizeInventoryAssets(_0x5110d0?.['upserts'], {
+  const strictJson2 = parseStrictJson(getResultText(value119), 'Agent 未返回资产清单修复结果。'),
+    upserts = normalizeInventoryAssets(strictJson2?.['upserts'], {
       sourceScenes: sourceScenes,
       allowEmpty: !![],
     }),
-    _0x1c4322 = new Set((inventory['assets'] || [])['map']((_0x3fbc91) => _0x3fbc91['ref'])),
-    _0x5a91dc = normalizeStringArray(_0x5110d0?.['removeAssetRefs']),
-    _0x17e59c = _0x5a91dc['find']((_0x5d551e) => !_0x1c4322['has'](_0x5d551e));
-  if (_0x17e59c) throw new Error('资产清单修复尝试删除不存在的资产：' + _0x17e59c + '。');
-  if (!_0x542e36['length'] && !_0x5a91dc['length']) throw new Error('资产清单修复没有返回任何改动。');
-  return { upserts: _0x542e36, removeAssetRefs: _0x5a91dc };
+    map18 = new Set((inventory['assets'] || [])['map']((value120) => value120['ref'])),
+    removeAssetRefs = normalizeStringArray(strictJson2?.['removeAssetRefs']),
+    value121 = removeAssetRefs['find']((value122) => !map18['has'](value122));
+  if (value121) throw new Error('资产清单修复尝试删除不存在的资产：' + value121 + '。');
+  if (!upserts['length'] && !removeAssetRefs['length']) throw new Error('资产清单修复没有返回任何改动。');
+  return { upserts: upserts, removeAssetRefs: removeAssetRefs };
 }
-function applyStoryAssetInventoryRepair(_0x3ce3ef, _0x29af1c) {
-  const _0x433c97 = new Set(_0x29af1c['removeAssetRefs'] || []),
-    _0x149615 = new Map((_0x29af1c['upserts'] || [])['map']((_0x36b71f) => [_0x36b71f['ref'], _0x36b71f])),
-    _0x1d86c0 = (_0x3ce3ef['assets'] || [])
-      ['filter']((_0x33c95b) => !_0x433c97['has'](_0x33c95b['ref']))
-      ['map']((_0x24c2bf) => _0x149615['get'](_0x24c2bf['ref']) || _0x24c2bf),
-    _0xa91c77 = new Set(_0x1d86c0['map']((_0x2b0924) => _0x2b0924['ref']));
+function applyStoryAssetInventoryRepair(args18, value123) {
+  const map19 = new Set(value123['removeAssetRefs'] || []),
+    map20 = new Map((value123['upserts'] || [])['map']((value124) => [value124['ref'], value124])),
+    assets3 = (args18['assets'] || [])
+      ['filter']((value125) => !map19['has'](value125['ref']))
+      ['map']((value126) => map20['get'](value126['ref']) || value126),
+    map21 = new Set(assets3['map']((value127) => value127['ref']));
   return (
-    (_0x29af1c['upserts'] || [])['forEach']((_0x3487ba) => {
-      !_0xa91c77['has'](_0x3487ba['ref']) &&
-        (_0x1d86c0['push'](_0x3487ba), _0xa91c77['add'](_0x3487ba['ref']));
+    (value123['upserts'] || [])['forEach']((value128) => {
+      !map21['has'](value128['ref']) && (assets3['push'](value128), map21['add'](value128['ref']));
     }),
-    { ..._0x3ce3ef, assets: _0x1d86c0 }
+    { ...args18, assets: assets3 }
   );
 }
 export function createStoryAssetExtractionBatches(
-  _0x500b3b = [],
+  list43 = [],
   {
     targetOutputCharacters: targetOutputCharacters = STORY_ASSET_DETAIL_TARGET_OUTPUT_CHARACTERS,
     maxOutputCharacters: maxOutputCharacters = STORY_ASSET_DETAIL_MAX_OUTPUT_CHARACTERS,
@@ -1080,69 +1064,69 @@ export function createStoryAssetExtractionBatches(
     estimateByKind: estimateByKind = {},
   } = {},
 ) {
-  const _0x53d258 = Array['isArray'](_0x500b3b) ? _0x500b3b : [];
-  if (!_0x53d258['length']) return [];
-  const _0x1ae802 = Math['max'](0xfa0, Math['trunc'](Number(targetOutputCharacters) || 0x0)),
-    _0x5afaff = Math['max'](_0x1ae802, Math['trunc'](Number(maxOutputCharacters) || 0x0)),
-    _0x384f01 = Math['max'](0x1, Math['trunc'](Number(maxAssetsPerBatch) || 0x0)),
-    _0x4b5d90 = { character: 0x898, scene: 0x4b0, prop: 0x4b0 },
-    _0x1bff5d = (_0xdc5891 = {}) => {
-      const _0x46370f = normalizeText(_0xdc5891?.['kind']),
-        _0x80dc29 = Math['max'](
+  const list44 = Array['isArray'](list43) ? list43 : [];
+  if (!list44['length']) return [];
+  const value129 = Math['max'](0xfa0, Math['trunc'](Number(targetOutputCharacters) || 0x0)),
+    value130 = Math['max'](value129, Math['trunc'](Number(maxOutputCharacters) || 0x0)),
+    value131 = Math['max'](0x1, Math['trunc'](Number(maxAssetsPerBatch) || 0x0)),
+    value132 = { character: 0x898, scene: 0x4b0, prop: 0x4b0 },
+    handler = (options4 = {}) => {
+      const text7 = normalizeText(options4?.['kind']),
+        value133 = Math['max'](
           0x258,
-          Math['trunc'](Number(estimateByKind?.[_0x46370f]) || _0x4b5d90[_0x46370f] || 0x578),
+          Math['trunc'](Number(estimateByKind?.[text7]) || value132[text7] || 0x578),
         ),
-        _0x44222b = Math['max'](
+        value134 = Math['max'](
           0x1,
-          Array['isArray'](_0xdc5891?.['appearances']) ? _0xdc5891['appearances']['length'] : 0x1,
+          Array['isArray'](options4?.['appearances']) ? options4['appearances']['length'] : 0x1,
         );
-      return Math['min'](_0x5afaff, _0x80dc29 + Math['max'](0x0, _0x44222b - 0x1) * 0x44c);
+      return Math['min'](value130, value133 + Math['max'](0x0, value134 - 0x1) * 0x44c);
     },
-    _0x281e2d = [];
-  let _0x115449 = [],
-    _0x5a6abc = 0x0;
-  _0x53d258['forEach']((_0x5965f5) => {
-    const _0x3d20ec = _0x1bff5d(_0x5965f5);
-    (_0x115449['length'] &&
-      (_0x115449['length'] >= _0x384f01 || _0x5a6abc + _0x3d20ec > _0x1ae802) &&
-      (_0x281e2d['push'](_0x115449), (_0x115449 = []), (_0x5a6abc = 0x0)),
-      _0x115449['push'](_0x5965f5),
-      (_0x5a6abc += _0x3d20ec),
-      _0x5a6abc >= _0x5afaff && (_0x281e2d['push'](_0x115449), (_0x115449 = []), (_0x5a6abc = 0x0)));
+    list45 = [];
+  let list46 = [],
+    value135 = 0x0;
+  list44['forEach']((value136) => {
+    const value137 = handler(value136);
+    (list46['length'] &&
+      (list46['length'] >= value131 || value135 + value137 > value129) &&
+      (list45['push'](list46), (list46 = []), (value135 = 0x0)),
+      list46['push'](value136),
+      (value135 += value137),
+      value135 >= value130 && (list45['push'](list46), (list46 = []), (value135 = 0x0)));
   });
-  if (_0x115449['length']) _0x281e2d['push'](_0x115449);
-  return _0x281e2d;
+  if (list46['length']) list45['push'](list46);
+  return list45;
 }
-function compactStoryAssetDetailSourceBody(_0x381bc0 = '') {
-  const _0x2c1e73 = normalizeText(_0x381bc0);
-  if ([..._0x2c1e73]['length'] <= STORY_ASSET_DETAIL_SOURCE_BODY_MAX_CHARACTERS) return _0x2c1e73;
-  const _0x26b65f = '\n……\n',
-    _0x15ae14 = Math['max'](0x1, STORY_ASSET_DETAIL_SOURCE_BODY_MAX_CHARACTERS - [..._0x26b65f]['length']),
-    _0x5726b1 = Math['floor'](_0x15ae14 * 0.7),
-    _0x482621 = _0x15ae14 - _0x5726b1;
+function compactStoryAssetDetailSourceBody(value138 = '') {
+  const args19 = normalizeText(value138);
+  if ([...args19]['length'] <= STORY_ASSET_DETAIL_SOURCE_BODY_MAX_CHARACTERS) return args19;
+  const args20 = '\n……\n',
+    value139 = Math['max'](0x1, STORY_ASSET_DETAIL_SOURCE_BODY_MAX_CHARACTERS - [...args20]['length']),
+    value140 = Math['floor'](value139 * 0.7),
+    value141 = value139 - value140;
   return (
     '' +
-    [..._0x2c1e73]['slice'](0x0, _0x5726b1)['join']('') +
-    _0x26b65f +
-    [..._0x2c1e73]['slice'](-_0x482621)['join']('')
+    [...args19]['slice'](0x0, value140)['join']('') +
+    args20 +
+    [...args19]['slice'](-value141)['join']('')
   );
 }
-function selectStoryAssetDetailSourceScenes(_0x1a7b52 = [], _0x426be6 = []) {
-  const _0x214828 = new Set(),
-    _0x43bbf5 = (_0x5cb908) => {
-      const _0x56bb5c = normalizeText(_0x5cb908);
-      if (!_0x56bb5c || _0x214828['size'] >= STORY_ASSET_DETAIL_SOURCE_SCENE_MAX_COUNT) return;
-      _0x214828['add'](_0x56bb5c);
+function selectStoryAssetDetailSourceScenes(list47 = [], list48 = []) {
+  const map22 = new Set(),
+    handler2 = (value142) => {
+      const text8 = normalizeText(value142);
+      if (!text8 || map22['size'] >= STORY_ASSET_DETAIL_SOURCE_SCENE_MAX_COUNT) return;
+      map22['add'](text8);
     };
   return (
-    _0x1a7b52['forEach']((_0x44b911) => _0x43bbf5(_0x44b911['sourceSceneRefs'][0x0])),
-    _0x1a7b52['forEach']((_0x58b8d0) => {
-      _0x58b8d0['appearances']['forEach']((_0x2e69e6) => _0x43bbf5(_0x2e69e6['sourceSceneRefs'][0x0]));
+    list47['forEach']((value143) => handler2(value143['sourceSceneRefs'][0x0])),
+    list47['forEach']((value144) => {
+      value144['appearances']['forEach']((value145) => handler2(value145['sourceSceneRefs'][0x0]));
     }),
-    _0x1a7b52['forEach']((_0x4c6d62) => _0x43bbf5(_0x4c6d62['sourceSceneRefs']['at'](-0x1))),
-    _0x426be6['filter']((_0x4bb0d9) => _0x214828['has'](_0x4bb0d9['ref']))['map']((_0x45bb7a) => ({
-      ..._0x45bb7a,
-      body: compactStoryAssetDetailSourceBody(_0x45bb7a['body']),
+    list47['forEach']((value146) => handler2(value146['sourceSceneRefs']['at'](-0x1))),
+    list48['filter']((value147) => map22['has'](value147['ref']))['map']((dom) => ({
+      ...dom,
+      body: compactStoryAssetDetailSourceBody(dom['body']),
     }))
   );
 }
@@ -1154,40 +1138,40 @@ export function buildStoryAssetDetailBatchPrompt({
   aspectRatio: aspectRatio = '',
   visualStyle: visualStyle = '',
 } = {}) {
-  const _0x54b76d = normalizeStoryContext(project),
-    _0x700f32 = Array['isArray'](batches?.[batchIndex]) ? batches[batchIndex] : [];
-  if (!_0x700f32['length']) throw new Error('资产提取缺少当前细化批次。');
-  const _0x481577 = _0x700f32['map']((_0x331d62) => ({
-      ref: _0x331d62['ref'],
-      kind: _0x331d62['kind'],
-      name: _0x331d62['name'],
-      role: _0x331d62['role'],
-      appearances: _0x331d62['appearances']['map']((_0x18cd50) => ({
-        ref: _0x18cd50['ref'],
-        name: _0x18cd50['name'],
+  const title = normalizeStoryContext(project),
+    list49 = Array['isArray'](batches?.[batchIndex]) ? batches[batchIndex] : [];
+  if (!list49['length']) throw new Error('资产提取缺少当前细化批次。');
+  const assetPlans2 = list49['map']((ref5) => ({
+      ref: ref5['ref'],
+      kind: ref5['kind'],
+      name: ref5['name'],
+      role: ref5['role'],
+      appearances: ref5['appearances']['map']((ref6) => ({
+        ref: ref6['ref'],
+        name: ref6['name'],
       })),
     })),
-    _0x136943 = createStoryAssetEvidenceDossiers(_0x700f32, sourceScenes, { includeSourceMappings: ![] }),
-    _0x1a971c = normalizeText(visualStyle) || _0x54b76d['visualStyle'];
+    evidenceDossiers = createStoryAssetEvidenceDossiers(list49, sourceScenes, { includeSourceMappings: ![] }),
+    style = normalizeText(visualStyle) || title['visualStyle'];
   return JSON['stringify']({
     task: 'detail_story_asset_batch',
     schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION,
     batch: { index: batchIndex + 0x1, total: batches['length'] },
     storyContext: {
-      title: _0x54b76d['title'],
-      storyType: _0x54b76d['storyType'],
-      summary: _0x54b76d['summary'],
-      background: _0x54b76d['background'],
-      setting: _0x54b76d['setting'],
-      continuityFacts: _0x54b76d['continuityFacts'],
-      characters: _0x54b76d['characters'],
+      title: title['title'],
+      storyType: title['storyType'],
+      summary: title['summary'],
+      background: title['background'],
+      setting: title['setting'],
+      continuityFacts: title['continuityFacts'],
+      characters: title['characters'],
     },
     visualDirection: {
-      aspectRatio: normalizeText(aspectRatio) || _0x54b76d['aspectRatio'],
-      style: _0x1a971c,
+      aspectRatio: normalizeText(aspectRatio) || title['aspectRatio'],
+      style: style,
     },
-    assetPlans: _0x481577,
-    evidenceDossiers: _0x136943,
+    assetPlans: assetPlans2,
+    evidenceDossiers: evidenceDossiers,
     requirements: [
       '严格按 assetPlans 顺序返回同 ref 的全部资产，不得新增、删除、合并或重排。',
       '严格按每个 assetPlans[].appearances 顺序返回同 ref 的全部形象，不得改变来源映射。',
@@ -1201,7 +1185,7 @@ export function buildStoryAssetDetailBatchPrompt({
       '角色\x20prompt\x20必须聚焦脸部、发型、体态、服装、鞋履和必要穿戴细节，采用自然站立的正面全身独立人设图，不写剧情道具、动作表演或场景环境。',
       '最终\x20prompt\x20只写正向视觉内容，不复述任何规则、限制、处理流程、模型说明或其他元说明措辞。',
       '场景 prompt 默认无人；道具 prompt 默认无人手持。',
-      _0x1a971c
+      style
         ? '每个 appearance.prompt 必须逐字以 visualDirection.style 的完整内容开头。'
         : '图片提示词保持统一视觉方向。',
     ],
@@ -1226,7 +1210,7 @@ export function buildStoryAssetDetailBatchPrompt({
   });
 }
 export function createStoryAssetDetailPromptBatches(
-  _0x42536b = [],
+  list50 = [],
   {
     project: project = {},
     sourceScenes: sourceScenes = [],
@@ -1236,59 +1220,59 @@ export function createStoryAssetDetailPromptBatches(
     maxPromptCharacters: maxPromptCharacters = STORY_ASSET_DETAIL_PROMPT_TARGET_CHARACTERS,
   } = {},
 ) {
-  const _0x4d302f = Math['max'](0x1f40, Math['trunc'](Number(maxPromptCharacters) || 0x0)),
-    _0x4caacc = createStoryAssetExtractionBatches(_0x42536b, { estimateByKind: estimateByKind }),
-    _0x54153e = [];
+  const value148 = Math['max'](0x1f40, Math['trunc'](Number(maxPromptCharacters) || 0x0)),
+    list51 = createStoryAssetExtractionBatches(list50, { estimateByKind: estimateByKind }),
+    list52 = [];
   return (
-    _0x4caacc['forEach']((_0x336529) => {
-      let _0x16349c = [];
-      _0x336529['forEach']((_0x30355a) => {
-        const _0x57a01f = [..._0x16349c, _0x30355a],
-          _0x139ed4 = buildStoryAssetDetailBatchPrompt({
+    list51['forEach']((list53) => {
+      let list54 = [];
+      list53['forEach']((error14) => {
+        const value149 = [...list54, error14],
+          storyAssetDetailBatchPrompt = buildStoryAssetDetailBatchPrompt({
             project: project,
             sourceScenes: sourceScenes,
-            batches: [_0x57a01f],
+            batches: [value149],
             batchIndex: 0x0,
             aspectRatio: aspectRatio,
             visualStyle: visualStyle,
           })['length'];
-        if (_0x16349c['length'] && _0x139ed4 > _0x4d302f) {
-          (_0x54153e['push'](_0x16349c), (_0x16349c = [_0x30355a]));
-          const _0x21a429 = buildStoryAssetDetailBatchPrompt({
+        if (list54['length'] && storyAssetDetailBatchPrompt > value148) {
+          (list52['push'](list54), (list54 = [error14]));
+          const storyAssetDetailBatchPrompt2 = buildStoryAssetDetailBatchPrompt({
             project: project,
             sourceScenes: sourceScenes,
-            batches: [_0x16349c],
+            batches: [list54],
             batchIndex: 0x0,
             aspectRatio: aspectRatio,
             visualStyle: visualStyle,
           })['length'];
-          if (_0x21a429 > _0x4d302f)
+          if (storyAssetDetailBatchPrompt2 > value148)
             throw new Error(
               '资产“' +
-                _0x30355a['name'] +
+                error14['name'] +
                 '”的证据档案达到 ' +
-                _0x21a429 +
+                storyAssetDetailBatchPrompt2 +
                 ' 字，超过单批 ' +
-                _0x4d302f +
+                value148 +
                 ' 字上限。',
             );
           return;
         }
-        if (_0x139ed4 > _0x4d302f)
+        if (storyAssetDetailBatchPrompt > value148)
           throw new Error(
             '资产“' +
-              _0x30355a['name'] +
+              error14['name'] +
               '”的证据档案达到\x20' +
-              _0x139ed4 +
+              storyAssetDetailBatchPrompt +
               ' 字，超过单批 ' +
-              _0x4d302f +
+              value148 +
               '\x20字上限。',
           );
-        _0x16349c = _0x57a01f;
+        list54 = value149;
       });
-      if (_0x16349c['length']) _0x54153e['push'](_0x16349c);
+      if (list54['length']) list52['push'](list54);
     }),
-    _0x54153e
+    list52
   );
 }
 const STORY_ASSET_VOICE_DESCRIPTION_FIELDS = Object['freeze']([
@@ -1302,268 +1286,263 @@ const STORY_ASSET_VOICE_DESCRIPTION_FIELDS = Object['freeze']([
   '说话方式',
   '音色特征',
 ]);
-function normalizeStoryAssetNaturalVoiceDescription(_0x587639) {
-  const _0x2a19d9 =
-      _0x587639 && typeof _0x587639 === 'object' && !Array['isArray'](_0x587639) ? _0x587639 : null,
-    _0x1b9ed1 = normalizeText(_0x587639);
-  if (!_0x1b9ed1 && !_0x2a19d9) return '';
+function normalizeStoryAssetNaturalVoiceDescription(value150) {
+  const enabled4 = value150 && typeof value150 === 'object' && !Array['isArray'](value150) ? value150 : null,
+    text9 = normalizeText(value150);
+  if (!text9 && !enabled4) return '';
   try {
-    const _0x50e52c = _0x2a19d9 || JSON['parse'](_0x1b9ed1);
-    if (_0x50e52c && typeof _0x50e52c === 'object' && !Array['isArray'](_0x50e52c)) {
-      const _0xc7025d = {
-        年龄: normalizeText(_0x50e52c['年龄'] || _0x50e52c['age']),
-        性别: normalizeText(_0x50e52c['性别'] || _0x50e52c['gender']),
-        身份: normalizeText(_0x50e52c['身份'] || _0x50e52c['identity']),
-        口音: normalizeText(_0x50e52c['口音'] || _0x50e52c['accent']),
+    const value151 = enabled4 || JSON['parse'](text9);
+    if (value151 && typeof value151 === 'object' && !Array['isArray'](value151)) {
+      const value152 = {
+        年龄: normalizeText(value151['年龄'] || value151['age']),
+        性别: normalizeText(value151['性别'] || value151['gender']),
+        身份: normalizeText(value151['身份'] || value151['identity']),
+        口音: normalizeText(value151['口音'] || value151['accent']),
         情绪底色: normalizeText(
-          _0x50e52c['情绪底色'] || _0x50e52c['emotionalBase'] || _0x50e52c['emotionalTone'],
+          value151['情绪底色'] || value151['emotionalBase'] || value151['emotionalTone'],
         ),
         声线: normalizeText(
-          _0x50e52c['声线'] || _0x50e52c['voiceTexture'] || _0x50e52c['voiceType'] || _0x50e52c['voice'],
+          value151['声线'] || value151['voiceTexture'] || value151['voiceType'] || value151['voice'],
         ),
-        语速: normalizeText(_0x50e52c['语速'] || _0x50e52c['voiceSpeed'] || _0x50e52c['speed']),
+        语速: normalizeText(value151['语速'] || value151['voiceSpeed'] || value151['speed']),
         说话方式: normalizeText(
-          _0x50e52c['说话方式'] ||
-            _0x50e52c['speechPattern'] ||
-            _0x50e52c['speechManner'] ||
-            _0x50e52c['speakingStyle'],
+          value151['说话方式'] ||
+            value151['speechPattern'] ||
+            value151['speechManner'] ||
+            value151['speakingStyle'],
         ),
-        音色特征: normalizeText(_0x50e52c['音色特征'] || _0x50e52c['timbre'] || _0x50e52c['toneColor']),
+        音色特征: normalizeText(value151['音色特征'] || value151['timbre'] || value151['toneColor']),
       };
-      if (STORY_ASSET_VOICE_DESCRIPTION_FIELDS['some']((_0x48a087) => _0xc7025d[_0x48a087]))
-        return STORY_ASSET_VOICE_DESCRIPTION_FIELDS['filter']((_0x434d44) => _0xc7025d[_0x434d44])
-          ['map']((_0x22375d) => _0x22375d + '：' + _0xc7025d[_0x22375d])
+      if (STORY_ASSET_VOICE_DESCRIPTION_FIELDS['some']((value153) => value152[value153]))
+        return STORY_ASSET_VOICE_DESCRIPTION_FIELDS['filter']((value154) => value152[value154])
+          ['map']((value155) => value155 + '：' + value152[value155])
           ['join']('；');
     }
   } catch {}
-  if (!_0x1b9ed1) return '';
+  if (!text9) return '';
   if (
-    STORY_ASSET_VOICE_DESCRIPTION_FIELDS['every']((_0x3591b2) =>
-      new RegExp(_0x3591b2 + '\x5cs*[：:]', 'u')['test'](_0x1b9ed1),
+    STORY_ASSET_VOICE_DESCRIPTION_FIELDS['every']((value156) =>
+      new RegExp(value156 + '\x5cs*[：:]', 'u')['test'](text9),
     )
   )
-    return _0x1b9ed1;
-  const _0x1ae170 = (_0x112612) =>
+    return text9;
+  const run2 = (value157) =>
       normalizeText(
-        _0x1b9ed1['match'](
-          new RegExp(_0x112612 + '(?:为|是|偏|呈|如|习惯|[:：])?([^，,；;。]+)', 'u'),
-        )?.[0x1],
+        text9['match'](new RegExp(value157 + '(?:为|是|偏|呈|如|习惯|[:：])?([^，,；;。]+)', 'u'))?.[0x1],
       ),
-    _0x3a0e12 = normalizeText(
-      _0x1b9ed1['match'](/(?:^|[，,；;])(?:约)?(幼年|少年|青年|中年|中老年|老年)/u)?.[0x1],
-    ),
-    _0x2aad5b = normalizeText(
-      _0x1b9ed1['match'](
+    text10 = normalizeText(text9['match'](/(?:^|[，,；;])(?:约)?(幼年|少年|青年|中年|中老年|老年)/u)?.[0x1]),
+    text11 = normalizeText(
+      text9['match'](
         /(?:约)?([零〇一二两三四五六七八九十百\d]{1,4}岁|[二三四五六七八九]十(?:出头|上下))/u,
       )?.[0x1],
     ),
-    _0x4dc722 = /女性|女声/u['test'](_0x1b9ed1) ? '女' : /男性|男声/u['test'](_0x1b9ed1) ? '男' : '',
-    _0x2611d6 = _0x1b9ed1['split'](/[，,；;。]+/u)
+    value158 = /女性|女声/u['test'](text9) ? '女' : /男性|男声/u['test'](text9) ? '男' : '',
+    list55 = text9['split'](/[，,；;。]+/u)
       ['map'](normalizeText)
       ['filter'](Boolean),
-    _0x4e60ab = _0x1b9ed1['split'](/[；;]+/u)
+    list56 = text9['split'](/[；;]+/u)
       ['map'](normalizeText)
       ['filter'](Boolean);
   if (
-    _0x4e60ab['length'] === STORY_ASSET_VOICE_DESCRIPTION_FIELDS['length'] &&
-    (_0x3a0e12 || _0x2aad5b) &&
-    _0x4dc722 &&
-    /口音/u['test'](_0x4e60ab[0x3]) &&
-    /声线/u['test'](_0x4e60ab[0x5]) &&
-    /语速/u['test'](_0x4e60ab[0x6]) &&
-    /说话/u['test'](_0x4e60ab[0x7]) &&
-    /音色/u['test'](_0x4e60ab[0x8])
+    list56['length'] === STORY_ASSET_VOICE_DESCRIPTION_FIELDS['length'] &&
+    (text10 || text11) &&
+    value158 &&
+    /口音/u['test'](list56[0x3]) &&
+    /声线/u['test'](list56[0x5]) &&
+    /语速/u['test'](list56[0x6]) &&
+    /说话/u['test'](list56[0x7]) &&
+    /音色/u['test'](list56[0x8])
   ) {
-    const _0x2740fa = (_0x9e75fa, _0x24d512) =>
+    const run3 = (value159, value160) =>
         normalizeText(
-          _0x9e75fa['replace'](
-            new RegExp('^' + _0x24d512 + '\x5cs*(?:约|为|是|偏|呈|[:：])?\x5cs*', 'u'),
-            '',
-          ),
+          value159['replace'](new RegExp('^' + value160 + '\x5cs*(?:约|为|是|偏|呈|[:：])?\x5cs*', 'u'), ''),
         ),
-      _0x2e194f = {
-        年龄: normalizeStringArray([_0x3a0e12, _0x2aad5b])['join']('，'),
-        性别: _0x4dc722,
-        身份: _0x2740fa(_0x4e60ab[0x2], '身份'),
-        口音: _0x2740fa(_0x4e60ab[0x3], '口音'),
-        情绪底色: _0x2740fa(_0x4e60ab[0x4], '情绪底色'),
-        声线: _0x2740fa(_0x4e60ab[0x5], '声线'),
-        语速: _0x2740fa(_0x4e60ab[0x6], '语速'),
-        说话方式: _0x2740fa(_0x4e60ab[0x7], '说话方式'),
-        音色特征: _0x2740fa(_0x4e60ab[0x8], '音色(?:特征)?'),
+      value161 = {
+        年龄: normalizeStringArray([text10, text11])['join']('，'),
+        性别: value158,
+        身份: run3(list56[0x2], '身份'),
+        口音: run3(list56[0x3], '口音'),
+        情绪底色: run3(list56[0x4], '情绪底色'),
+        声线: run3(list56[0x5], '声线'),
+        语速: run3(list56[0x6], '语速'),
+        说话方式: run3(list56[0x7], '说话方式'),
+        音色特征: run3(list56[0x8], '音色(?:特征)?'),
       };
-    if (STORY_ASSET_VOICE_DESCRIPTION_FIELDS['every']((_0x2a28cb) => _0x2e194f[_0x2a28cb]))
-      return STORY_ASSET_VOICE_DESCRIPTION_FIELDS['map'](
-        (_0x28ecb0) => _0x28ecb0 + '：' + _0x2e194f[_0x28ecb0],
-      )['join']('；');
+    if (STORY_ASSET_VOICE_DESCRIPTION_FIELDS['every']((value162) => value161[value162]))
+      return STORY_ASSET_VOICE_DESCRIPTION_FIELDS['map']((value163) => value163 + '：' + value161[value163])[
+        'join'
+      ]('；');
   }
-  const _0x1edcf9 = _0x2611d6['find'](
-      (_0x71180c, _0x5e76ee) =>
-        _0x5e76ee > 0x0 &&
-        !/(?:幼年|少年|青年|中年|中老年|老年|男性|女性|男声|女声)/u['test'](_0x71180c) &&
-        !/(?:[零〇一二两三四五六七八九十百\d]{1,4}岁|[二三四五六七八九]十(?:出头|上下))/u['test'](
-          _0x71180c,
-        ) &&
-        !/^(?:身份|口音|情绪底色|声线|语速|说话方式|音色)/u['test'](_0x71180c),
+  const value164 = list55['find'](
+      (value165, count3) =>
+        count3 > 0x0 &&
+        !/(?:幼年|少年|青年|中年|中老年|老年|男性|女性|男声|女声)/u['test'](value165) &&
+        !/(?:[零〇一二两三四五六七八九十百\d]{1,4}岁|[二三四五六七八九]十(?:出头|上下))/u['test'](value165) &&
+        !/^(?:身份|口音|情绪底色|声线|语速|说话方式|音色)/u['test'](value165),
     ),
-    _0x30d261 = {
-      年龄: normalizeStringArray([_0x3a0e12, _0x2aad5b])['join']('，'),
-      性别: _0x4dc722,
-      身份: _0x1ae170('身份') || _0x1edcf9,
-      口音: _0x1ae170('口音'),
-      情绪底色: _0x1ae170('情绪底色'),
-      声线: _0x1ae170('声线'),
-      语速: _0x1ae170('语速'),
-      说话方式: _0x1ae170('说话方式'),
-      音色特征: _0x1ae170('音色(?:特征)?'),
+    enabled5 = {
+      年龄: normalizeStringArray([text10, text11])['join']('，'),
+      性别: value158,
+      身份: run2('身份') || value164,
+      口音: run2('口音'),
+      情绪底色: run2('情绪底色'),
+      声线: run2('声线'),
+      语速: run2('语速'),
+      说话方式: run2('说话方式'),
+      音色特征: run2('音色(?:特征)?'),
     };
-  if (STORY_ASSET_VOICE_DESCRIPTION_FIELDS['some']((_0x57032d) => !_0x30d261[_0x57032d])) return _0x1b9ed1;
-  return STORY_ASSET_VOICE_DESCRIPTION_FIELDS['map']((_0x367177) => _0x367177 + '：' + _0x30d261[_0x367177])[
+  if (STORY_ASSET_VOICE_DESCRIPTION_FIELDS['some']((value166) => !enabled5[value166])) return text9;
+  return STORY_ASSET_VOICE_DESCRIPTION_FIELDS['map']((value167) => value167 + '：' + enabled5[value167])[
     'join'
   ]('；');
 }
 function parseStoryAssetDetailBatchResult(
-  _0x5d91d5,
+  value168,
   { assetPlans: assetPlans = [], chapterIds: chapterIds = [], visualStyle: visualStyle = '' } = {},
 ) {
-  const _0x418945 = parseStrictJson(getResultText(_0x5d91d5), 'Agent 未返回资产细化结果。'),
-    _0x5441a8 = Array['isArray'](_0x418945?.['assets']) ? _0x418945['assets'] : [],
-    _0x4208e8 = new Map(_0x5441a8['map']((_0x33ead7) => [normalizeReference(_0x33ead7?.['ref']), _0x33ead7]));
-  if (_0x5441a8['length'] !== assetPlans['length'] || _0x4208e8['size'] !== assetPlans['length'])
+  const strictJson3 = parseStrictJson(getResultText(value168), 'Agent 未返回资产细化结果。'),
+    list57 = Array['isArray'](strictJson3?.['assets']) ? strictJson3['assets'] : [],
+    map23 = new Map(list57['map']((value169) => [normalizeReference(value169?.['ref']), value169]));
+  if (list57['length'] !== assetPlans['length'] || map23['size'] !== assetPlans['length'])
     throw new Error('资产细化结果必须与当前批次资产数量完全一致。');
-  const _0x4d07ba = assetPlans['map']((_0x5bb256) => {
-      const _0x3b4308 = _0x4208e8['get'](_0x5bb256['ref']);
-      if (!_0x3b4308) throw new Error('资产细化结果缺少“' + _0x5bb256['ref'] + '”。');
-      const _0x5d87b8 = Array['isArray'](_0x3b4308?.['appearances']) ? _0x3b4308['appearances'] : [],
-        _0xfde13c = new Map(
-          _0x5d87b8['map']((_0x396b31) => [normalizeReference(_0x396b31?.['ref']), _0x396b31]),
-        );
+  const assets4 = assetPlans['map']((ref7) => {
+      const args21 = map23['get'](ref7['ref']);
+      if (!args21) throw new Error('资产细化结果缺少“' + ref7['ref'] + '”。');
+      const list58 = Array['isArray'](args21?.['appearances']) ? args21['appearances'] : [],
+        map24 = new Map(list58['map']((value170) => [normalizeReference(value170?.['ref']), value170]));
       if (
-        _0x5d87b8['length'] !== _0x5bb256['appearances']['length'] ||
-        _0xfde13c['size'] !== _0x5bb256['appearances']['length']
+        list58['length'] !== ref7['appearances']['length'] ||
+        map24['size'] !== ref7['appearances']['length']
       )
-        throw new Error('资产“' + _0x5bb256['name'] + '”的形象数量与轻量清单不一致。');
+        throw new Error('资产“' + ref7['name'] + '”的形象数量与轻量清单不一致。');
       return {
-        ..._0x3b4308,
-        ref: _0x5bb256['ref'],
-        kind: _0x5bb256['kind'],
-        name: _0x5bb256['name'],
-        role: _0x5bb256['role'],
+        ...args21,
+        ref: ref7['ref'],
+        kind: ref7['kind'],
+        name: ref7['name'],
+        role: ref7['role'],
         voiceDescription:
-          _0x5bb256['kind'] === 'character'
-            ? normalizeStoryAssetNaturalVoiceDescription(_0x3b4308?.['voiceDescription'])
+          ref7['kind'] === 'character'
+            ? normalizeStoryAssetNaturalVoiceDescription(args21?.['voiceDescription'])
             : '',
-        description: formatStoryAssetFactAndDesignDescription(_0x3b4308, _0x5bb256['description']),
-        occurrences: normalizeText(_0x3b4308?.['occurrences']) || _0x5bb256['occurrences'],
-        sourceChapterIds: _0x5bb256['sourceEpisodeRefs'],
-        appearances: _0x5bb256['appearances']['map']((_0x2bb9e6) => {
-          const _0x486b43 = _0xfde13c['get'](_0x2bb9e6['ref']);
-          if (!_0x486b43)
-            throw new Error('资产“' + _0x5bb256['name'] + '”缺少形象“' + _0x2bb9e6['ref'] + '”。');
-          const _0x173916 = normalizeText(_0x486b43?.['prompt']);
+        description: formatStoryAssetFactAndDesignDescription(args21, ref7['description']),
+        occurrences: normalizeText(args21?.['occurrences']) || ref7['occurrences'],
+        sourceChapterIds: ref7['sourceEpisodeRefs'],
+        appearances: ref7['appearances']['map']((ref8) => {
+          const error15 = map24['get'](ref8['ref']);
+          if (!error15) throw new Error('资产“' + ref7['name'] + '”缺少形象“' + ref8['ref'] + '”。');
+          const prompt = normalizeText(error15?.['prompt']);
           return {
-            ..._0x486b43,
-            ref: _0x2bb9e6['ref'],
-            name: normalizeText(_0x486b43?.['name']) || _0x2bb9e6['name'],
-            description: formatStoryAssetFactAndDesignDescription(_0x486b43, _0x2bb9e6['description']),
-            occurrences: normalizeText(_0x486b43?.['occurrences']) || _0x2bb9e6['occurrences'],
-            prompt: _0x173916,
-            sourceChapterIds: _0x2bb9e6['sourceEpisodeRefs'],
+            ...error15,
+            ref: ref8['ref'],
+            name: normalizeText(error15?.['name']) || ref8['name'],
+            description: formatStoryAssetFactAndDesignDescription(error15, ref8['description']),
+            occurrences: normalizeText(error15?.['occurrences']) || ref8['occurrences'],
+            prompt: prompt,
+            sourceChapterIds: ref8['sourceEpisodeRefs'],
           };
         }),
       };
     }),
-    _0x15acfe = parseStoryAssetExtractionResult({ assets: _0x4d07ba }, { chapterIds: chapterIds });
-  return _0x15acfe['assets']['map']((_0x70782e, _0x25bfe4) => {
-    const _0x2b7ba9 = assetPlans[_0x25bfe4],
-      _0xe77e89 = _0x4208e8['get'](_0x2b7ba9['ref']) || {},
-      _0x416e2d = new Map(
-        (Array['isArray'](_0xe77e89?.['appearances']) ? _0xe77e89['appearances'] : [])['map']((_0x50e403) => [
-          normalizeReference(_0x50e403?.['ref']),
-          _0x50e403,
+    storyAssetExtractionResult = parseStoryAssetExtractionResult(
+      { assets: assets4 },
+      { chapterIds: chapterIds },
+    );
+  return storyAssetExtractionResult['assets']['map']((args22, value171) => {
+    const sourceEpisodeRefs3 = assetPlans[value171],
+      value172 = map23['get'](sourceEpisodeRefs3['ref']) || {},
+      map25 = new Map(
+        (Array['isArray'](value172?.['appearances']) ? value172['appearances'] : [])['map']((value173) => [
+          normalizeReference(value173?.['ref']),
+          value173,
         ]),
       ),
-      _0x4a43a6 = _0x70782e['appearances']['map']((_0x2b292a, _0x17f01b) => {
-        const _0xeb79d1 = _0x2b7ba9['appearances'][_0x17f01b],
-          _0x432fab = _0x416e2d['get'](_0xeb79d1['ref']) || {};
+      prompt2 = args22['appearances']['map']((args23, value174) => {
+        const sourceEpisodeRefs4 = sourceEpisodeRefs3['appearances'][value174],
+          value175 = map25['get'](sourceEpisodeRefs4['ref']) || {};
         return {
-          ..._0x2b292a,
-          scriptFacts: normalizeText(_0x432fab?.['scriptFacts']),
-          visualDesign: normalizeText(_0x432fab?.['visualDesign']),
+          ...args23,
+          scriptFacts: normalizeText(value175?.['scriptFacts']),
+          visualDesign: normalizeText(value175?.['visualDesign']),
           designStatus: 'ai-facts-plus-visual-completion',
-          prompt: ensureStoryAssetVisualStyle(_0x2b292a['prompt'], visualStyle),
-          sourceEpisodeRefs: _0xeb79d1['sourceEpisodeRefs'],
-          sourceSceneRefs: _0xeb79d1['sourceSceneRefs'],
+          prompt: ensureStoryAssetVisualStyle(args23['prompt'], visualStyle),
+          sourceEpisodeRefs: sourceEpisodeRefs4['sourceEpisodeRefs'],
+          sourceSceneRefs: sourceEpisodeRefs4['sourceSceneRefs'],
         };
       });
     return {
-      ..._0x70782e,
-      scriptFacts: normalizeText(_0xe77e89?.['scriptFacts']),
-      visualDesign: normalizeText(_0xe77e89?.['visualDesign']),
+      ...args22,
+      scriptFacts: normalizeText(value172?.['scriptFacts']),
+      visualDesign: normalizeText(value172?.['visualDesign']),
       designStatus: 'ai-facts-plus-visual-completion',
-      prompt: _0x4a43a6[0x0]?.['prompt'] || normalizeText(_0x70782e?.['prompt']),
-      sourceEpisodeRefs: _0x2b7ba9['sourceEpisodeRefs'],
-      sourceSceneRefs: _0x2b7ba9['sourceSceneRefs'],
-      appearances: _0x4a43a6,
+      prompt: prompt2[0x0]?.['prompt'] || normalizeText(args22?.['prompt']),
+      sourceEpisodeRefs: sourceEpisodeRefs3['sourceEpisodeRefs'],
+      sourceSceneRefs: sourceEpisodeRefs3['sourceSceneRefs'],
+      appearances: prompt2,
     };
   });
 }
-function formatStoryAssetFactAndDesignDescription(_0x23be4c = {}, _0x4848dd = '') {
-  const _0x360eda = stripStoryAssetInternalEvidenceMetadata(_0x23be4c?.['scriptFacts']),
-    _0x2b29ed = stripStoryAssetInternalEvidenceMetadata(_0x23be4c?.['visualDesign']),
-    _0x48d529 = [_0x360eda ? '剧本事实：' + _0x360eda : '', _0x2b29ed ? '视觉补全：' + _0x2b29ed : ''][
-      'filter'
-    ](Boolean);
+function formatStoryAssetFactAndDesignDescription(options5 = {}, value176 = '') {
+  const stripStoryAssetInternalEvidenceMetadata2 = stripStoryAssetInternalEvidenceMetadata(
+      options5?.['scriptFacts'],
+    ),
+    stripStoryAssetInternalEvidenceMetadata3 = stripStoryAssetInternalEvidenceMetadata(
+      options5?.['visualDesign'],
+    ),
+    list59 = [
+      stripStoryAssetInternalEvidenceMetadata2 ? '剧本事实：' + stripStoryAssetInternalEvidenceMetadata2 : '',
+      stripStoryAssetInternalEvidenceMetadata3 ? '视觉补全：' + stripStoryAssetInternalEvidenceMetadata3 : '',
+    ]['filter'](Boolean);
   return (
-    _0x48d529['join']('\x0a') ||
-    stripStoryAssetInternalEvidenceMetadata(_0x23be4c?.['description']) ||
-    stripStoryAssetInternalEvidenceMetadata(_0x4848dd)
+    list59['join']('\x0a') ||
+    stripStoryAssetInternalEvidenceMetadata(options5?.['description']) ||
+    stripStoryAssetInternalEvidenceMetadata(value176)
   );
 }
-function createCoverageError(_0x40e634) {
-  const _0x2e73fe = _0x40e634['slice'](0x0, 0x3)
+function createCoverageError(issues) {
+  const value177 = issues['slice'](0x0, 0x3)
       ['map'](
-        (_0x40605d) =>
-          _0x40605d['type'] +
+        (value178) =>
+          value178['type'] +
           ':' +
-          _0x40605d['sourceSceneRef'] +
-          (_0x40605d['expectedName'] ? ':' + _0x40605d['expectedName'] : ''),
+          value178['sourceSceneRef'] +
+          (value178['expectedName'] ? ':' + value178['expectedName'] : ''),
       )
       ['join']('；'),
-    _0x838ae2 = new Error('实验资产清单覆盖校验未通过：' + _0x2e73fe + '。');
-  return ((_0x838ae2['validationDetails'] = { issues: _0x40e634 }), _0x838ae2);
+    error16 = new Error('实验资产清单覆盖校验未通过：' + value177 + '。');
+  return ((error16['validationDetails'] = { issues: issues }), error16);
 }
 const STORY_ASSET_EXTRACTION_DRAFT_STRATEGY = 'kind-compact-v7',
   STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY = 'evidence-batched-api-v2';
-function createStoryAssetStructuredOutput(_0x32f810, _0xdd9694) {
-  return { name: _0x32f810, schema: _0xdd9694, strict: !![], fallback: 'none' };
+function createStoryAssetStructuredOutput(name4, schema) {
+  return { name: name4, schema: schema, strict: !![], fallback: 'none' };
 }
-function createStoryAssetKindStructuredOutput(_0x2e7d05) {
-  const _0x151c7a = normalizeStoryAssetKind(_0x2e7d05),
-    _0x41bdd7 = { name: { type: 'string' } },
-    _0x5f386c = ['name'];
+function createStoryAssetKindStructuredOutput(value179) {
+  const storyAssetKind = normalizeStoryAssetKind(value179),
+    properties = { name: { type: 'string' } },
+    required = ['name'];
   return (
-    _0x151c7a === 'character' &&
-      ((_0x41bdd7['role'] = { type: 'string', enum: ['主角', '配角', '反派', '路人'] }),
-      _0x5f386c['push']('role')),
-    _0x151c7a === 'scene' &&
-      ((_0x41bdd7['sourceSceneRefs'] = { type: 'array', minItems: 0x2, items: { type: 'string' } }),
-      _0x5f386c['push']('sourceSceneRefs')),
-    createStoryAssetStructuredOutput('story_asset_' + _0x151c7a + '_compact_v7', {
+    storyAssetKind === 'character' &&
+      ((properties['role'] = { type: 'string', enum: ['主角', '配角', '反派', '路人'] }),
+      required['push']('role')),
+    storyAssetKind === 'scene' &&
+      ((properties['sourceSceneRefs'] = { type: 'array', minItems: 0x2, items: { type: 'string' } }),
+      required['push']('sourceSceneRefs')),
+    createStoryAssetStructuredOutput('story_asset_' + storyAssetKind + '_compact_v7', {
       type: 'object',
       additionalProperties: ![],
       required: ['assets'],
       properties: {
         assets: {
           type: 'array',
-          items: { type: 'object', additionalProperties: ![], required: _0x5f386c, properties: _0x41bdd7 },
+          items: { type: 'object', additionalProperties: ![], required: required, properties: properties },
         },
       },
     })
   );
 }
 function createStoryAssetInventoryStructuredOutput() {
-  const _0x213c8e = {
+  const items = {
     type: 'object',
     additionalProperties: ![],
     required: ['name', 'sourceSceneRefs'],
@@ -1585,7 +1564,7 @@ function createStoryAssetInventoryStructuredOutput() {
             name: { type: 'string' },
             role: { type: 'string' },
             sourceSceneRefs: { type: 'array', items: { type: 'string' } },
-            appearances: { type: 'array', items: _0x213c8e },
+            appearances: { type: 'array', items: items },
           },
         },
       },
@@ -1616,30 +1595,30 @@ function createStoryAssetInventoryRepairStructuredOutput() {
     },
   });
 }
-function createStoryAssetDetailStructuredOutput(_0x4029cd = 0x0, _0x31eab5 = []) {
-  const _0x50b12f = Array['isArray'](_0x31eab5) ? _0x31eab5 : [],
-    _0x4c8701 = normalizeStringArray(_0x50b12f['map']((_0x258e60) => _0x258e60?.['ref'])),
-    _0x15346d = normalizeStringArray(
-      _0x50b12f['flatMap']((_0xd20822) =>
-        Array['isArray'](_0xd20822?.['appearances'])
-          ? _0xd20822['appearances']['map']((_0x4ceefc) => _0x4ceefc?.['ref'])
+function createStoryAssetDetailStructuredOutput(value180 = 0x0, value181 = []) {
+  const list60 = Array['isArray'](value181) ? value181 : [],
+    minItems = normalizeStringArray(list60['map']((value182) => value182?.['ref'])),
+    ref9 = normalizeStringArray(
+      list60['flatMap']((value183) =>
+        Array['isArray'](value183?.['appearances'])
+          ? value183['appearances']['map']((value184) => value184?.['ref'])
           : [],
       ),
     );
-  return createStoryAssetStructuredOutput('story_asset_detail_v5_' + (_0x4029cd + 0x1), {
+  return createStoryAssetStructuredOutput('story_asset_detail_v5_' + (value180 + 0x1), {
     type: 'object',
     additionalProperties: ![],
     required: ['assets'],
     properties: {
       assets: {
         type: 'array',
-        ...(_0x4c8701['length'] ? { minItems: _0x4c8701['length'], maxItems: _0x4c8701['length'] } : {}),
+        ...(minItems['length'] ? { minItems: minItems['length'], maxItems: minItems['length'] } : {}),
         items: {
           type: 'object',
           additionalProperties: ![],
           required: ['ref', 'scriptFacts', 'visualDesign', 'voiceDescription', 'appearances'],
           properties: {
-            ref: _0x4c8701['length'] ? { type: 'string', enum: _0x4c8701 } : { type: 'string' },
+            ref: minItems['length'] ? { type: 'string', enum: minItems } : { type: 'string' },
             scriptFacts: { type: 'string' },
             visualDesign: { type: 'string' },
             voiceDescription: { type: 'string' },
@@ -1651,7 +1630,7 @@ function createStoryAssetDetailStructuredOutput(_0x4029cd = 0x0, _0x31eab5 = [])
                 additionalProperties: ![],
                 required: ['ref', 'scriptFacts', 'visualDesign', 'prompt'],
                 properties: {
-                  ref: _0x15346d['length'] ? { type: 'string', enum: _0x15346d } : { type: 'string' },
+                  ref: ref9['length'] ? { type: 'string', enum: ref9 } : { type: 'string' },
                   scriptFacts: { type: 'string' },
                   visualDesign: { type: 'string' },
                   prompt: { type: 'string' },
@@ -1664,258 +1643,258 @@ function createStoryAssetDetailStructuredOutput(_0x4029cd = 0x0, _0x31eab5 = [])
     },
   });
 }
-function extractBalancedStoryAssetObjects(_0x44ba57, _0x21a54d = 'assets') {
-  const _0x2221a1 = normalizeText(getResultText(_0x44ba57)),
-    _0xf14701 = _0x2221a1['search'](
-      new RegExp('(?:\x22' + _0x21a54d + '\x22|\x27' + _0x21a54d + "')\\s*:", 'u'),
-    );
-  if (_0xf14701 < 0x0) return [];
-  const _0x29c4d1 = _0x2221a1['indexOf']('[', _0xf14701);
-  if (_0x29c4d1 < 0x0) return [];
-  const _0x44bba7 = [];
-  let _0x5039e6 = -0x1,
-    _0x210975 = 0x0,
-    _0x3f09e9 = ![],
-    _0x50480b = ![];
-  for (let _0x319f09 = _0x29c4d1 + 0x1; _0x319f09 < _0x2221a1['length']; _0x319f09 += 0x1) {
-    const _0xb7b13 = _0x2221a1[_0x319f09];
-    if (_0x3f09e9) {
-      if (_0x50480b) _0x50480b = ![];
+function extractBalancedStoryAssetObjects(value185, value186 = 'assets') {
+  const list61 = normalizeText(getResultText(value185)),
+    count4 = list61['search'](new RegExp('(?:\x22' + value186 + '\x22|\x27' + value186 + "')\\s*:", 'u'));
+  if (count4 < 0x0) return [];
+  const count5 = list61['indexOf']('[', count4);
+  if (count5 < 0x0) return [];
+  const list62 = [];
+  let count6 = -0x1,
+    count7 = 0x0,
+    value187 = ![],
+    value188 = ![];
+  for (let value189 = count5 + 0x1; value189 < list61['length']; value189 += 0x1) {
+    const value190 = list61[value189];
+    if (value187) {
+      if (value188) value188 = ![];
       else {
-        if (_0xb7b13 === '\x5c') _0x50480b = !![];
+        if (value190 === '\x5c') value188 = !![];
         else {
-          if (_0xb7b13 === '\x22') _0x3f09e9 = ![];
+          if (value190 === '\x22') value187 = ![];
         }
       }
       continue;
     }
-    if (_0xb7b13 === '\x22') {
-      _0x3f09e9 = !![];
+    if (value190 === '\x22') {
+      value187 = !![];
       continue;
     }
-    if (_0xb7b13 === '{') {
-      if (_0x210975 === 0x0) _0x5039e6 = _0x319f09;
-      _0x210975 += 0x1;
+    if (value190 === '{') {
+      if (count7 === 0x0) count6 = value189;
+      count7 += 0x1;
       continue;
     }
-    if (_0xb7b13 === '}' && _0x210975 > 0x0) {
-      _0x210975 -= 0x1;
-      if (_0x210975 === 0x0 && _0x5039e6 >= 0x0) {
+    if (value190 === '}' && count7 > 0x0) {
+      count7 -= 0x1;
+      if (count7 === 0x0 && count6 >= 0x0) {
         try {
-          _0x44bba7['push'](JSON['parse'](_0x2221a1['slice'](_0x5039e6, _0x319f09 + 0x1)));
+          list62['push'](JSON['parse'](list61['slice'](count6, value189 + 0x1)));
         } catch {}
-        _0x5039e6 = -0x1;
+        count6 = -0x1;
       }
     }
-    if (_0xb7b13 === ']' && _0x210975 === 0x0) break;
+    if (value190 === ']' && count7 === 0x0) break;
   }
-  return _0x44bba7;
+  return list62;
 }
-function salvageStoryAssetInventoryResult(_0x241f7e, { sourceScenes: sourceScenes = [] } = {}) {
-  const _0xb35068 = extractBalancedStoryAssetObjects(_0x241f7e, 'assets'),
-    _0x52f612 = _0xb35068['flatMap']((_0x53c12b) => {
+function salvageStoryAssetInventoryResult(value191, { sourceScenes: sourceScenes = [] } = {}) {
+  const list63 = extractBalancedStoryAssetObjects(value191, 'assets'),
+    assets5 = list63['flatMap']((value192) => {
       try {
-        return normalizeInventoryAssets([_0x53c12b], { sourceScenes: sourceScenes, allowEmpty: !![] });
+        return normalizeInventoryAssets([value192], { sourceScenes: sourceScenes, allowEmpty: !![] });
       } catch {
         return [];
       }
     });
-  if (!_0x52f612['length']) return null;
-  const _0x251f91 = new Set();
+  if (!assets5['length']) return null;
+  const value193 = new Set();
   return (
-    _0x52f612['forEach']((_0x5ddee4, _0x1007a6) => {
-      _0x5ddee4['ref'] = createUniqueStoryAssetInventoryRef(
-        _0x5ddee4['ref'],
-        _0x251f91,
-        'asset-' + (_0x1007a6 + 0x1),
+    assets5['forEach']((value194, value195) => {
+      value194['ref'] = createUniqueStoryAssetInventoryRef(
+        value194['ref'],
+        value193,
+        'asset-' + (value195 + 0x1),
       );
     }),
     {
       schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION,
-      assets: _0x52f612,
-      sceneAudits: sourceScenes['map']((_0xe0aaaf) => ({
-        sourceSceneRef: _0xe0aaaf['ref'],
+      assets: assets5,
+      sceneAudits: sourceScenes['map']((sourceSceneRef6) => ({
+        sourceSceneRef: sourceSceneRef6['ref'],
         characterNames: normalizeStringArray(
-          _0x52f612['filter'](
-            (_0x80ec69) =>
-              _0x80ec69['kind'] === 'character' && _0x80ec69['sourceSceneRefs']['includes'](_0xe0aaaf['ref']),
-          )['map']((_0x352b23) => _0x352b23['name']),
+          assets5['filter'](
+            (value196) =>
+              value196['kind'] === 'character' &&
+              value196['sourceSceneRefs']['includes'](sourceSceneRef6['ref']),
+          )['map']((error17) => error17['name']),
         ),
         keyPropNames: normalizeStringArray(
-          _0x52f612['filter'](
-            (_0xf3d7ce) =>
-              _0xf3d7ce['kind'] === 'prop' && _0xf3d7ce['sourceSceneRefs']['includes'](_0xe0aaaf['ref']),
-          )['map']((_0x311d31) => _0x311d31['name']),
+          assets5['filter'](
+            (value197) =>
+              value197['kind'] === 'prop' && value197['sourceSceneRefs']['includes'](sourceSceneRef6['ref']),
+          )['map']((error18) => error18['name']),
         ),
       })),
       salvaged: !![],
     }
   );
 }
-function parseStoryAssetInventoryResultWithSalvage(_0x171637, _0x259c69 = {}) {
+function parseStoryAssetInventoryResultWithSalvage(value198, value199 = {}) {
   try {
-    return parseStoryAssetInventoryResult(_0x171637, _0x259c69);
-  } catch (_0x14bb43) {
-    const _0x2d42c1 = salvageStoryAssetInventoryResult(_0x171637, _0x259c69);
-    if (_0x2d42c1) return _0x2d42c1;
-    throw _0x14bb43;
+    return parseStoryAssetInventoryResult(value198, value199);
+  } catch (value200) {
+    const salvageStoryAssetInventoryResult2 = salvageStoryAssetInventoryResult(value198, value199);
+    if (salvageStoryAssetInventoryResult2) return salvageStoryAssetInventoryResult2;
+    throw value200;
   }
 }
 function salvageStoryAssetDetailBatchResult(
-  _0x418a6f,
+  value201,
   { assetPlans: assetPlans = [], chapterIds: chapterIds = [], visualStyle: visualStyle = '' } = {},
 ) {
-  const _0x14b8ca = new Map(
-      extractBalancedStoryAssetObjects(_0x418a6f, 'assets')['map']((_0x1d776d) => [
-        normalizeReference(_0x1d776d?.['ref']),
-        _0x1d776d,
+  const map26 = new Map(
+      extractBalancedStoryAssetObjects(value201, 'assets')['map']((value202) => [
+        normalizeReference(value202?.['ref']),
+        value202,
       ]),
     ),
-    _0x1b761a = [];
+    list64 = [];
   return (
-    assetPlans['forEach']((_0x56d6db) => {
-      const _0x31e00c = _0x14b8ca['get'](_0x56d6db['ref']);
-      if (!_0x31e00c) return;
+    assetPlans['forEach']((value203) => {
+      const enabled6 = map26['get'](value203['ref']);
+      if (!enabled6) return;
       try {
-        _0x1b761a['push'](
+        list64['push'](
           ...parseStoryAssetDetailBatchResult(
-            { assets: [_0x31e00c] },
-            { assetPlans: [_0x56d6db], chapterIds: chapterIds, visualStyle: visualStyle },
+            { assets: [enabled6] },
+            { assetPlans: [value203], chapterIds: chapterIds, visualStyle: visualStyle },
           ),
         );
       } catch {}
     }),
-    _0x1b761a
+    list64
   );
 }
-export function splitDeterministicStorySceneAssetNames(_0x43682b = '') {
-  const _0x4b2d53 = /(?:客厅|厨房|走廊|卧室|书房|餐厅|浴室|卫生间|阳台|玄关)$/u,
-    _0xad7257 = normalizeText(_0x43682b)
+export function splitDeterministicStorySceneAssetNames(value204 = '') {
+  const value205 = /(?:客厅|厨房|走廊|卧室|书房|餐厅|浴室|卫生间|阳台|玄关)$/u,
+    list65 = normalizeText(value204)
       ['split'](/[/／|｜]+/u)
-      ['map']((_0x294bf0) => normalizeStorySceneHeadingIdentity(_0x294bf0))
+      ['map']((value206) => normalizeStorySceneHeadingIdentity(value206))
       ['filter'](Boolean),
-    _0x164b54 = _0xad7257[0x0] || '',
-    _0x56fd78 = _0x164b54['replace'](_0x4b2d53, ''),
-    _0x3c6949 = [];
+    value207 = list65[0x0] || '',
+    value208 = value207['replace'](value205, ''),
+    list66 = [];
   return (
-    _0xad7257['map']((_0x6bb73e, _0x2cd548) =>
-      _0x2cd548 > 0x0 && _0x56fd78 && [..._0x6bb73e]['length'] <= 0x4 && _0x4b2d53['test'](_0x6bb73e)
-        ? '' + _0x56fd78 + _0x6bb73e
-        : _0x6bb73e,
-    )['forEach']((_0x601624) => {
-      const _0x5c819b = getStorySceneIdentityKey(_0x601624);
-      _0x5c819b &&
-        !_0x3c6949['some']((_0x1ed619) => getStorySceneIdentityKey(_0x1ed619) === _0x5c819b) &&
-        _0x3c6949['push'](_0x601624);
+    list65['map']((args24, count8) =>
+      count8 > 0x0 && value208 && [...args24]['length'] <= 0x4 && value205['test'](args24)
+        ? '' + value208 + args24
+        : args24,
+    )['forEach']((value209) => {
+      const storySceneIdentityKey = getStorySceneIdentityKey(value209);
+      storySceneIdentityKey &&
+        !list66['some']((value210) => getStorySceneIdentityKey(value210) === storySceneIdentityKey) &&
+        list66['push'](value209);
     }),
-    _0x3c6949
+    list66
   );
 }
 function createDeterministicStoryAssetInventory({
   project: project = {},
   sourceScenes: sourceScenes = [],
 } = {}) {
-  const _0x548764 = (Array['isArray'](project?.['characters']) ? project['characters'] : [])['filter'](
-      (_0x5e2bf4) => normalizeText(_0x5e2bf4?.['name']),
+  const list67 = (Array['isArray'](project?.['characters']) ? project['characters'] : [])['filter'](
+      (error19) => normalizeText(error19?.['name']),
     ),
-    _0x2deab7 = new Map();
-  sourceScenes['forEach']((_0x1322c3) => {
-    splitDeterministicStorySceneAssetNames(_0x1322c3['assetHeading'] || _0x1322c3['heading'])['forEach'](
-      (_0x2ab3df) => {
-        const _0x22f839 = getStorySceneIdentityKey(_0x2ab3df),
-          _0x19cd82 = _0x2deab7['get'](_0x22f839) || { name: _0x2ab3df, sourceSceneRefs: [] };
-        (_0x19cd82['sourceSceneRefs']['push'](_0x1322c3['ref']), _0x2deab7['set'](_0x22f839, _0x19cd82));
+    map27 = new Map();
+  sourceScenes['forEach']((value211) => {
+    splitDeterministicStorySceneAssetNames(value211['assetHeading'] || value211['heading'])['forEach'](
+      (name5) => {
+        const storySceneIdentityKey2 = getStorySceneIdentityKey(name5),
+          value212 = map27['get'](storySceneIdentityKey2) || { name: name5, sourceSceneRefs: [] };
+        (value212['sourceSceneRefs']['push'](value211['ref']),
+          map27['set'](storySceneIdentityKey2, value212));
       },
     );
   });
-  const _0x4618f0 = [];
-  _0x548764['forEach']((_0x63d515, _0x3f36ce) => {
-    const _0x51ad1f = normalizeText(_0x63d515['name']),
-      _0x2c2080 = getStoryAssetNameAliases(_0x51ad1f),
-      _0x197715 = sourceScenes['filter'](
-        (_0x203412) =>
-          _0x203412['characters']['some']((_0xac7c85) => storyCharacterNamesOverlap(_0x51ad1f, _0xac7c85)) ||
-          _0x2c2080['some']((_0x454adf) => _0x203412['body']['includes'](_0x454adf)),
-      )['map']((_0x2963e3) => _0x2963e3['ref']);
-    if (!_0x197715['length']) return;
-    const _0x4d1801 = 'local-character-' + (_0x3f36ce + 0x1);
-    _0x4618f0['push']({
-      ref: _0x4d1801,
+  const assets6 = [];
+  list67['forEach']((error20, value213) => {
+    const name6 = normalizeText(error20['name']),
+      list68 = getStoryAssetNameAliases(name6),
+      list69 = sourceScenes['filter'](
+        (dom2) =>
+          dom2['characters']['some']((value214) => storyCharacterNamesOverlap(name6, value214)) ||
+          list68['some']((value215) => dom2['body']['includes'](value215)),
+      )['map']((value216) => value216['ref']);
+    if (!list69['length']) return;
+    const ref10 = 'local-character-' + (value213 + 0x1);
+    assets6['push']({
+      ref: ref10,
       kind: 'character',
-      name: _0x51ad1f,
-      role: resolveStoryCharacterRole(_0x63d515?.['roleType'] || _0x63d515?.['role']),
-      description: normalizeText(_0x63d515?.['profile'] || _0x63d515?.['fixedTraits']),
-      sourceSceneRefs: normalizeStringArray(_0x197715),
+      name: name6,
+      role: resolveStoryCharacterRole(error20?.['roleType'] || error20?.['role']),
+      description: normalizeText(error20?.['profile'] || error20?.['fixedTraits']),
+      sourceSceneRefs: normalizeStringArray(list69),
       appearances: [
         {
-          ref: _0x4d1801 + '-base',
+          ref: ref10 + '-base',
           name: '基础形象',
-          description: normalizeText(_0x63d515?.['fixedTraits']),
-          sourceSceneRefs: normalizeStringArray(_0x197715),
+          description: normalizeText(error20?.['fixedTraits']),
+          sourceSceneRefs: normalizeStringArray(list69),
         },
       ],
     });
   });
-  const _0x5d1369 = createDeterministicStoryCharacterCandidateMap(sourceScenes);
+  const map28 = createDeterministicStoryCharacterCandidateMap(sourceScenes);
   return (
-    [..._0x5d1369['entries']()]['forEach'](([_0x2c001c, _0x247ebc], _0x42781d) => {
-      const _0x35e3cf = 'local-source-character-' + (_0x42781d + 0x1),
-        _0x53fe19 = normalizeStringArray(_0x247ebc['sourceSceneRefs']);
-      _0x4618f0['push']({
-        ref: _0x35e3cf,
+    [...map28['entries']()]['forEach'](([name7, value217], value218) => {
+      const ref11 = 'local-source-character-' + (value218 + 0x1),
+        sourceSceneRefs4 = normalizeStringArray(value217['sourceSceneRefs']);
+      assets6['push']({
+        ref: ref11,
         kind: 'character',
-        name: _0x2c001c,
+        name: name7,
         role: '配角',
         description: '',
-        sourceSceneRefs: _0x53fe19,
+        sourceSceneRefs: sourceSceneRefs4,
         appearances: [
-          { ref: _0x35e3cf + '-base', name: '基础形象', description: '', sourceSceneRefs: _0x53fe19 },
+          { ref: ref11 + '-base', name: '基础形象', description: '', sourceSceneRefs: sourceSceneRefs4 },
         ],
       });
     }),
-    [..._0x2deab7['values']()]['forEach']((_0x203cd9, _0x2743b8) => {
-      const _0x26d40e = 'local-scene-' + (_0x2743b8 + 0x1);
-      _0x4618f0['push']({
-        ref: _0x26d40e,
+    [...map27['values']()]['forEach']((name8, value219) => {
+      const ref12 = 'local-scene-' + (value219 + 0x1);
+      assets6['push']({
+        ref: ref12,
         kind: 'scene',
-        name: _0x203cd9['name'],
+        name: name8['name'],
         role: '剧情场景',
         description: '',
-        sourceSceneRefs: normalizeStringArray(_0x203cd9['sourceSceneRefs']),
+        sourceSceneRefs: normalizeStringArray(name8['sourceSceneRefs']),
         appearances: [
           {
-            ref: _0x26d40e + '-base',
+            ref: ref12 + '-base',
             name: '基础形象',
             description: '',
-            sourceSceneRefs: normalizeStringArray(_0x203cd9['sourceSceneRefs']),
+            sourceSceneRefs: normalizeStringArray(name8['sourceSceneRefs']),
           },
         ],
       });
     }),
-    createStoryAssetActionPropCandidates(sourceScenes)['forEach']((_0x537064, _0x5165dd) => {
-      const _0x4d285b = 'local-action-prop-' + (_0x5165dd + 0x1);
-      _0x4618f0['push']({
-        ref: _0x4d285b,
+    createStoryAssetActionPropCandidates(sourceScenes)['forEach']((name9, value220) => {
+      const ref13 = 'local-action-prop-' + (value220 + 0x1);
+      assets6['push']({
+        ref: ref13,
         kind: 'prop',
-        name: _0x537064['name'],
+        name: name9['name'],
         role: '关键道具',
         description: '',
-        sourceSceneRefs: normalizeStringArray(_0x537064['sourceSceneRefs']),
+        sourceSceneRefs: normalizeStringArray(name9['sourceSceneRefs']),
         appearances: [
           {
-            ref: _0x4d285b + '-base',
+            ref: ref13 + '-base',
             name: '基础形象',
             description: '',
-            sourceSceneRefs: normalizeStringArray(_0x537064['sourceSceneRefs']),
+            sourceSceneRefs: normalizeStringArray(name9['sourceSceneRefs']),
           },
         ],
       });
     }),
     parseStoryAssetInventoryResult(
       {
-        assets: _0x4618f0,
-        sceneAudits: sourceScenes['map']((_0x416e61) => ({
-          sourceSceneRef: _0x416e61['ref'],
+        assets: assets6,
+        sceneAudits: sourceScenes['map']((sourceSceneRef7) => ({
+          sourceSceneRef: sourceSceneRef7['ref'],
           characterNames: [],
           keyPropNames: [],
         })),
@@ -1924,26 +1903,32 @@ function createDeterministicStoryAssetInventory({
     )
   );
 }
-function getStorySceneAssignmentScore(_0x2d73bb, _0x259aeb, _0x5312bf) {
-  const _0x4f3562 = getStorySceneIdentityKey(_0x2d73bb?.['name']),
-    _0x1a66b8 = getStorySceneIdentityKey(_0x259aeb?.['assetHeading'] || _0x259aeb?.['heading']),
-    _0x43f19a = normalizeStringArray([
-      ...(_0x259aeb?.['localEntityCandidates']?.['scene'] || []),
-      ...(_0x259aeb?.['localEntityEvidence'] || [])
-        ['filter']((_0x356372) => _0x356372?.['kind'] === 'scene')
-        ['map']((_0x2a71ac) => _0x2a71ac?.['text']),
+function getStorySceneAssignmentScore(error21, value221, assetIndex) {
+  const storySceneIdentityKey3 = getStorySceneIdentityKey(error21?.['name']),
+    storySceneIdentityKey4 = getStorySceneIdentityKey(value221?.['assetHeading'] || value221?.['heading']),
+    list70 = normalizeStringArray([
+      ...(value221?.['localEntityCandidates']?.['scene'] || []),
+      ...(value221?.['localEntityEvidence'] || [])
+        ['filter']((value222) => value222?.['kind'] === 'scene')
+        ['map']((response3) => response3?.['text']),
     ]);
-  let _0x3464d2 = 0x0;
-  if (_0x4f3562 && _0x4f3562 === _0x1a66b8) _0x3464d2 += 0x2710;
-  if (_0x43f19a['some']((_0x4ec49c) => getStorySceneIdentityKey(_0x4ec49c) === _0x4f3562)) _0x3464d2 += 0x3e8;
-  if (_0x4f3562 && _0x1a66b8 && storySceneIdentitiesOverlap(_0x4f3562, _0x1a66b8)) _0x3464d2 += 0x64;
+  let score = 0x0;
+  if (storySceneIdentityKey3 && storySceneIdentityKey3 === storySceneIdentityKey4) score += 0x2710;
+  if (list70['some']((value223) => getStorySceneIdentityKey(value223) === storySceneIdentityKey3))
+    score += 0x3e8;
+  if (
+    storySceneIdentityKey3 &&
+    storySceneIdentityKey4 &&
+    storySceneIdentitiesOverlap(storySceneIdentityKey3, storySceneIdentityKey4)
+  )
+    score += 0x64;
   return (
-    (_0x3464d2 -= Math['max'](0x0, normalizeStringArray(_0x2d73bb?.['sourceSceneRefs'])['length'] - 0x1)),
-    { score: _0x3464d2, assetIndex: _0x5312bf }
+    (score -= Math['max'](0x0, normalizeStringArray(error21?.['sourceSceneRefs'])['length'] - 0x1)),
+    { score: score, assetIndex: assetIndex }
   );
 }
-function getReusableStorySceneIdentityKey(_0x199509) {
-  return normalizeStorySceneHeadingIdentity(_0x199509)
+function getReusableStorySceneIdentityKey(value224) {
+  return normalizeStorySceneHeadingIdentity(value224)
     ['replace'](/[（(](?:稍后|封锁|断电|电力|后半夜|窗边|紧接|紧随|细雨|雨天)[^）)]*[）)]\s*$/u, '')
     ['replace'](/宴会大厅/gu, '宴会厅')
     ['replace'](/集团(?:总部|大楼|大厦)/gu, '集团')
@@ -1951,489 +1936,494 @@ function getReusableStorySceneIdentityKey(_0x199509) {
     ['toLowerCase']()
     ['replace'](/[^\p{L}\p{N}]+/gu, '');
 }
-function reconcileStorySceneAssetAssignments(_0x3c8717 = [], _0x1b98bf = [], _0x16bfe5 = []) {
-  const _0x588cdd = _0x3c8717['filter']((_0x5232e0) => _0x5232e0?.['kind'] === 'scene'),
-    _0x295ddf = new Map();
+function reconcileStorySceneAssetAssignments(list71 = [], list72 = [], list73 = []) {
+  const list74 = list71['filter']((value225) => value225?.['kind'] === 'scene'),
+    map29 = new Map();
   return (
-    _0x16bfe5['forEach']((_0x27c37b) => {
-      const _0x5111d9 = _0x588cdd['map']((_0x365e04, _0x41654c) => ({
-        asset: _0x365e04,
-        assetIndex: _0x41654c,
+    list73['forEach']((value226) => {
+      const list75 = list74['map']((asset, assetIndex2) => ({
+        asset: asset,
+        assetIndex: assetIndex2,
       }))
-        ['filter'](({ asset: _0x435ee4 }) =>
-          normalizeStringArray(_0x435ee4?.['sourceSceneRefs'])['includes'](_0x27c37b['ref']),
+        ['filter'](({ asset: asset2 }) =>
+          normalizeStringArray(asset2?.['sourceSceneRefs'])['includes'](value226['ref']),
         )
-        ['map'](({ asset: _0x415978, assetIndex: _0x557f48 }) => ({
-          asset: _0x415978,
-          ...getStorySceneAssignmentScore(_0x415978, _0x27c37b, _0x557f48),
+        ['map'](({ asset: asset3, assetIndex: assetIndex3 }) => ({
+          asset: asset3,
+          ...getStorySceneAssignmentScore(asset3, value226, assetIndex3),
         }))
         ['sort'](
-          (_0x28121e, _0x11876e) =>
-            _0x11876e['score'] - _0x28121e['score'] || _0x28121e['assetIndex'] - _0x11876e['assetIndex'],
+          (value227, value228) =>
+            value228['score'] - value227['score'] || value227['assetIndex'] - value228['assetIndex'],
         );
-      if (!_0x5111d9['length']) return;
-      const _0x2fc745 = /[/／|｜]/u['test'](
-          normalizeText(_0x27c37b?.['assetHeading'] || _0x27c37b?.['heading']),
+      if (!list75['length']) return;
+      const value229 = /[/／|｜]/u['test'](
+          normalizeText(value226?.['assetHeading'] || value226?.['heading']),
         ),
-        _0x5b462c = _0x2fc745
-          ? _0x5111d9['map']((_0x307169) => _0x307169['asset'])['filter'](
-              (_0x414f8e) => !/[/／|｜]/u['test'](normalizeText(_0x414f8e?.['name'])),
+        list76 = value229
+          ? list75['map']((value230) => value230['asset'])['filter'](
+              (error22) => !/[/／|｜]/u['test'](normalizeText(error22?.['name'])),
             )
-          : [_0x5111d9[0x0]['asset']];
-      if (_0x5b462c['length']) _0x295ddf['set'](_0x27c37b['ref'], new Set(_0x5b462c));
+          : [list75[0x0]['asset']];
+      if (list76['length']) map29['set'](value226['ref'], new Set(list76));
     }),
-    _0x16bfe5['forEach']((_0x58b73d) => {
-      if (_0x295ddf['has'](_0x58b73d['ref'])) return;
-      const _0xfb1a8c = _0x1b98bf['filter'](
-        (_0x23d086) =>
-          _0x23d086?.['kind'] === 'scene' &&
-          normalizeStringArray(_0x23d086?.['sourceSceneRefs'])['includes'](_0x58b73d['ref']),
+    list73['forEach']((value231) => {
+      if (map29['has'](value231['ref'])) return;
+      const list77 = list72['filter'](
+        (value232) =>
+          value232?.['kind'] === 'scene' &&
+          normalizeStringArray(value232?.['sourceSceneRefs'])['includes'](value231['ref']),
       );
-      if (!_0xfb1a8c['length']) return;
-      const _0x5e6da1 = /[/／|｜]/u['test'](
-          normalizeText(_0x58b73d?.['assetHeading'] || _0x58b73d?.['heading']),
+      if (!list77['length']) return;
+      const value233 = /[/／|｜]/u['test'](
+          normalizeText(value231?.['assetHeading'] || value231?.['heading']),
         ),
-        _0x42dd6f = _0x5e6da1
-          ? _0xfb1a8c['filter']((_0x52df88) => !/[/／|｜]/u['test'](normalizeText(_0x52df88?.['name'])))
-          : _0xfb1a8c['slice'](0x0, 0x1),
-        _0xbc2128 = new Set();
-      _0x42dd6f['forEach']((_0x1faf73) => {
-        let _0x1b3da1 = _0x588cdd['find'](
-          (_0x552e80) =>
-            normalizeText(_0x552e80?.['name'])['toLowerCase']() ===
-            normalizeText(_0x1faf73['name'])['toLowerCase'](),
+        list78 = value233
+          ? list77['filter']((error23) => !/[/／|｜]/u['test'](normalizeText(error23?.['name'])))
+          : list77['slice'](0x0, 0x1),
+        value234 = new Set();
+      list78['forEach']((appearances3) => {
+        let enabled7 = list74['find'](
+          (error24) =>
+            normalizeText(error24?.['name'])['toLowerCase']() ===
+            normalizeText(appearances3['name'])['toLowerCase'](),
         );
-        (!_0x1b3da1 &&
-          ((_0x1b3da1 = {
-            ..._0x1faf73,
+        (!enabled7 &&
+          ((enabled7 = {
+            ...appearances3,
             sourceSceneRefs: [],
-            appearances: _0x1faf73['appearances']
+            appearances: appearances3['appearances']
               ['slice'](0x0, 0x1)
-              ['map']((_0x54ccca) => ({ ..._0x54ccca, sourceSceneRefs: [] })),
+              ['map']((args25) => ({ ...args25, sourceSceneRefs: [] })),
           }),
-          _0x3c8717['push'](_0x1b3da1),
-          _0x588cdd['push'](_0x1b3da1)),
-          _0xbc2128['add'](_0x1b3da1));
+          list71['push'](enabled7),
+          list74['push'](enabled7)),
+          value234['add'](enabled7));
       });
-      if (_0xbc2128['size']) _0x295ddf['set'](_0x58b73d['ref'], _0xbc2128);
+      if (value234['size']) map29['set'](value231['ref'], value234);
     }),
-    _0x588cdd['forEach']((_0x240deb) => {
-      const _0x2d8138 = _0x16bfe5['filter']((_0x1205d3) =>
-        _0x295ddf['get'](_0x1205d3['ref'])?.['has'](_0x240deb),
-      )['map']((_0x15261d) => _0x15261d['ref']);
-      _0x240deb['sourceSceneRefs'] = normalizeStringArray(_0x2d8138);
-      const _0x22116e = _0x240deb['appearances'][0x0] || {
-        ref: _0x240deb['ref'] + '-base',
+    list74['forEach']((ref14) => {
+      const value235 = list73['filter']((value236) => map29['get'](value236['ref'])?.['has'](ref14))['map'](
+        (value237) => value237['ref'],
+      );
+      ref14['sourceSceneRefs'] = normalizeStringArray(value235);
+      const value238 = ref14['appearances'][0x0] || {
+        ref: ref14['ref'] + '-base',
         name: '基础形象',
         description: '',
         sourceSceneRefs: [],
       };
-      ((_0x240deb['appearances'] = (
-        _0x240deb['appearances']['length'] ? _0x240deb['appearances'] : [_0x22116e]
-      )['map']((_0x330b8e) => ({
-        ..._0x330b8e,
-        sourceSceneRefs: normalizeStringArray(_0x330b8e?.['sourceSceneRefs'])['filter']((_0x1f836d) =>
-          _0x240deb['sourceSceneRefs']['includes'](_0x1f836d),
-        ),
-      }))),
-        _0x240deb['sourceSceneRefs']['forEach']((_0x34121b) => {
-          if (
-            _0x240deb['appearances']['some']((_0x156384) =>
-              _0x156384['sourceSceneRefs']['includes'](_0x34121b),
-            )
-          )
+      ((ref14['appearances'] = (ref14['appearances']['length'] ? ref14['appearances'] : [value238])['map'](
+        (args26) => ({
+          ...args26,
+          sourceSceneRefs: normalizeStringArray(args26?.['sourceSceneRefs'])['filter']((value239) =>
+            ref14['sourceSceneRefs']['includes'](value239),
+          ),
+        }),
+      )),
+        ref14['sourceSceneRefs']['forEach']((value240) => {
+          if (ref14['appearances']['some']((value241) => value241['sourceSceneRefs']['includes'](value240)))
             return;
-          _0x240deb['appearances'][0x0]['sourceSceneRefs']['push'](_0x34121b);
+          ref14['appearances'][0x0]['sourceSceneRefs']['push'](value240);
         }));
     }),
-    _0x3c8717
+    list71
   );
 }
 export function reconcileStoryAssetInventory(
-  _0x567fb5 = {},
+  sceneAudits2 = {},
   { project: project = {}, sourceScenes: sourceScenes = [] } = {},
 ) {
-  const _0x1e3dc2 = createDeterministicStoryAssetInventory({ project: project, sourceScenes: sourceScenes }),
-    _0x166b7a = createDeterministicStoryCharacterCandidateMap(sourceScenes),
-    _0x3fcaaf = getStoryAssetLocalCharacterCanonicalNames(sourceScenes),
-    _0x34db1f = normalizeStringArray(
+  const assets7 = createDeterministicStoryAssetInventory({ project: project, sourceScenes: sourceScenes }),
+    map30 = createDeterministicStoryCharacterCandidateMap(sourceScenes),
+    storyAssetLocalCharacterCanonicalNames = getStoryAssetLocalCharacterCanonicalNames(sourceScenes),
+    stringArray = normalizeStringArray(
       (Array['isArray'](project?.['characters']) ? project['characters'] : [])['map'](
-        (_0x59252f) => _0x59252f?.['name'],
+        (error25) => error25?.['name'],
       ),
     );
-  _0x1e3dc2['assets'] = mergeStoryAssetInventoryResults(
+  assets7['assets'] = mergeStoryAssetInventoryResults(
     [
       {
-        assets: _0x1e3dc2['assets']['map']((_0x5e1ad7) =>
-          _0x5e1ad7?.['kind'] === 'character'
+        assets: assets7['assets']['map']((error26) =>
+          error26?.['kind'] === 'character'
             ? {
-                ..._0x5e1ad7,
+                ...error26,
                 name:
-                  resolveStoryProjectCharacterCanonicalName(_0x5e1ad7['name'], _0x34db1f) ||
-                  resolveStoryAssetCharacterCanonicalName(_0x5e1ad7['name'], _0x166b7a, _0x3fcaaf),
+                  resolveStoryProjectCharacterCanonicalName(error26['name'], stringArray) ||
+                  resolveStoryAssetCharacterCanonicalName(
+                    error26['name'],
+                    map30,
+                    storyAssetLocalCharacterCanonicalNames,
+                  ),
               }
-            : _0x5e1ad7,
+            : error26,
         ),
         sceneAudits: [],
       },
     ],
     { sourceScenes: sourceScenes },
   )['assets'];
-  const _0x31c7bb = new Set(
-      _0x1e3dc2['assets']
-        ['filter']((_0x771905) => normalizeText(_0x771905?.['ref'])['startsWith']('local-source-character-'))
-        ['map']((_0x18cf12) => normalizeText(_0x18cf12?.['name'])['toLowerCase']()),
+  const map31 = new Set(
+      assets7['assets']
+        ['filter']((value242) => normalizeText(value242?.['ref'])['startsWith']('local-source-character-'))
+        ['map']((error27) => normalizeText(error27?.['name'])['toLowerCase']()),
     ),
-    _0x423148 = new Set(
-      _0x1e3dc2['assets']
-        ['filter']((_0x3739c6) => normalizeText(_0x3739c6?.['ref'])['startsWith']('local-action-prop-'))
-        ['map']((_0x22506b) => normalizeText(_0x22506b?.['name'])['toLowerCase']()),
+    map32 = new Set(
+      assets7['assets']
+        ['filter']((value243) => normalizeText(value243?.['ref'])['startsWith']('local-action-prop-'))
+        ['map']((error28) => normalizeText(error28?.['name'])['toLowerCase']()),
     ),
-    _0x5d416b = (cloneStoryAssetExtractionValue(_0x567fb5?.['assets']) || [])
-      ['filter']((_0x2ccd83) => {
-        const _0x4eb7b9 = normalizeText(_0x2ccd83?.['ref']),
-          _0x3fa3ac = normalizeText(_0x2ccd83?.['name'])['toLowerCase']();
-        if (_0x4eb7b9['startsWith']('local-source-character-')) return _0x31c7bb['has'](_0x3fa3ac);
-        if (_0x4eb7b9['startsWith']('local-action-prop-')) return _0x423148['has'](_0x3fa3ac);
+    assets8 = (cloneStoryAssetExtractionValue(sceneAudits2?.['assets']) || [])
+      ['filter']((error29) => {
+        const text12 = normalizeText(error29?.['ref']),
+          text13 = normalizeText(error29?.['name'])['toLowerCase']();
+        if (text12['startsWith']('local-source-character-')) return map31['has'](text13);
+        if (text12['startsWith']('local-action-prop-')) return map32['has'](text13);
         return !![];
       })
-      ['flatMap']((_0x2c8d3) => {
-        if (_0x2c8d3?.['kind'] === 'scene') {
-          const _0x4ca695 = getReusableStorySceneIdentityKey(_0x2c8d3?.['name']),
-            _0x104952 = normalizeStringArray(_0x2c8d3?.['sourceSceneRefs']),
-            _0x380bef = (_0x54443b) =>
-              _0x4ca695 &&
-              _0x4ca695 ===
-                getReusableStorySceneIdentityKey(_0x54443b?.['assetHeading'] || _0x54443b?.['heading']),
-            _0x5b0a44 =
-              sourceScenes['find'](
-                (_0x507332) => _0x104952['includes'](_0x507332['ref']) && _0x380bef(_0x507332),
-              ) || sourceScenes['find'](_0x380bef);
-          if (!_0x5b0a44) return [_0x2c8d3];
-          const _0x43cbe8 = new Set(
-              sourceScenes['filter'](_0x380bef)['map']((_0x57b815) => _0x57b815['ref']),
-            ),
-            _0x24b7ec = _0x104952['filter']((_0x1d1777) => _0x43cbe8['has'](_0x1d1777));
+      ['flatMap']((appearances4) => {
+        if (appearances4?.['kind'] === 'scene') {
+          const reusableStorySceneIdentityKey = getReusableStorySceneIdentityKey(appearances4?.['name']),
+            list79 = normalizeStringArray(appearances4?.['sourceSceneRefs']),
+            handler3 = (value244) =>
+              reusableStorySceneIdentityKey &&
+              reusableStorySceneIdentityKey ===
+                getReusableStorySceneIdentityKey(value244?.['assetHeading'] || value244?.['heading']),
+            enabled8 =
+              sourceScenes['find']((value245) => list79['includes'](value245['ref']) && handler3(value245)) ||
+              sourceScenes['find'](handler3);
+          if (!enabled8) return [appearances4];
+          const map33 = new Set(sourceScenes['filter'](handler3)['map']((value246) => value246['ref'])),
+            sourceSceneRefs5 = list79['filter']((value247) => map33['has'](value247));
           return [
             {
-              ..._0x2c8d3,
-              name: normalizeText(_0x5b0a44['assetHeading'] || _0x5b0a44['heading']),
-              sourceSceneRefs: _0x24b7ec,
-              appearances: _0x2c8d3['appearances']['map']((_0x28dc44) => ({
-                ..._0x28dc44,
-                sourceSceneRefs: normalizeStringArray(_0x28dc44?.['sourceSceneRefs'])['filter']((_0x42585a) =>
-                  _0x43cbe8['has'](_0x42585a),
+              ...appearances4,
+              name: normalizeText(enabled8['assetHeading'] || enabled8['heading']),
+              sourceSceneRefs: sourceSceneRefs5,
+              appearances: appearances4['appearances']['map']((args27) => ({
+                ...args27,
+                sourceSceneRefs: normalizeStringArray(args27?.['sourceSceneRefs'])['filter']((value248) =>
+                  map33['has'](value248),
                 ),
               })),
             },
           ];
         }
-        if (_0x2c8d3?.['kind'] !== 'character') return [_0x2c8d3];
-        const _0x12a480 = normalizeDeterministicStoryCharacterCandidate(_0x2c8d3?.['name']);
-        if (!_0x12a480) return [];
-        const _0x59fde1 =
-          resolveStoryProjectCharacterCanonicalName(_0x12a480, _0x34db1f) ||
-          resolveStoryAssetCharacterCanonicalName(_0x12a480, _0x166b7a, _0x3fcaaf);
-        if (!_0x59fde1) return [];
-        const _0x9fa345 = [..._0x166b7a['keys']()]['some']((_0x3250c3) =>
-          storyCharacterNamesStronglyOverlap(_0x3250c3, _0x59fde1),
+        if (appearances4?.['kind'] !== 'character') return [appearances4];
+        const deterministicStoryCharacterCandidate2 = normalizeDeterministicStoryCharacterCandidate(
+          appearances4?.['name'],
         );
-        if (normalizeText(_0x2c8d3?.['ref'])['startsWith']('local-source-character-') && !_0x9fa345)
+        if (!deterministicStoryCharacterCandidate2) return [];
+        const name10 =
+          resolveStoryProjectCharacterCanonicalName(deterministicStoryCharacterCandidate2, stringArray) ||
+          resolveStoryAssetCharacterCanonicalName(
+            deterministicStoryCharacterCandidate2,
+            map30,
+            storyAssetLocalCharacterCanonicalNames,
+          );
+        if (!name10) return [];
+        const enabled9 = [...map30['keys']()]['some']((value249) =>
+          storyCharacterNamesStronglyOverlap(value249, name10),
+        );
+        if (normalizeText(appearances4?.['ref'])['startsWith']('local-source-character-') && !enabled9)
           return [];
-        return [{ ..._0x2c8d3, name: _0x59fde1 }];
+        return [{ ...appearances4, name: name10 }];
       }),
-    _0x35c033 = mergeStoryAssetInventoryResults([{ assets: _0x5d416b, sceneAudits: [] }], {
+    inventoryAssets = mergeStoryAssetInventoryResults([{ assets: assets8, sceneAudits: [] }], {
       sourceScenes: sourceScenes,
     })['assets'],
-    _0x32fedc = createStoryAssetCandidateLedger({
+    candidateLedger = createStoryAssetCandidateLedger({
       sourceScenes: sourceScenes,
-      authoritativeAssets: _0x1e3dc2['assets'],
-      inventoryAssets: _0x35c033,
-      sceneAudits: _0x567fb5?.['sceneAudits'],
+      authoritativeAssets: assets7['assets'],
+      inventoryAssets: inventoryAssets,
+      sceneAudits: sceneAudits2?.['sceneAudits'],
     }),
-    _0x4c52a6 = [];
-  _0x35c033['forEach']((_0x571e9d) => {
-    const _0x99b8c5 = _0x32fedc['reviewAsset'](_0x571e9d, { origin: 'inventory-asset' });
-    if (_0x99b8c5['status'] !== 'promoted') return;
-    if (_0x571e9d?.['kind'] !== 'character') {
-      _0x4c52a6['push'](_0x571e9d);
+    list80 = [];
+  inventoryAssets['forEach']((error30) => {
+    const response4 = candidateLedger['reviewAsset'](error30, { origin: 'inventory-asset' });
+    if (response4['status'] !== 'promoted') return;
+    if (error30?.['kind'] !== 'character') {
+      list80['push'](error30);
       return;
     }
-    const _0x2817cb = normalizeText(_0x571e9d?.['name']);
-    if (!_0x2817cb) return;
-    const _0x175a60 = _0x4c52a6['find'](
-      (_0x419ce7) =>
-        _0x419ce7['kind'] === 'character' && storyCharacterNamesStronglyOverlap(_0x419ce7['name'], _0x2817cb),
+    const text14 = normalizeText(error30?.['name']);
+    if (!text14) return;
+    const args28 = list80['find'](
+      (error31) =>
+        error31['kind'] === 'character' && storyCharacterNamesStronglyOverlap(error31['name'], text14),
     );
-    if (!_0x175a60) {
-      _0x4c52a6['push'](_0x571e9d);
+    if (!args28) {
+      list80['push'](error30);
       return;
     }
-    ((_0x175a60['role'] = resolveMergedStoryCharacterRole(_0x175a60['role'], _0x571e9d['role'])),
-      (_0x175a60['description'] = _0x175a60['description'] || _0x571e9d['description']),
-      (_0x175a60['sourceSceneRefs'] = normalizeStringArray([
-        ..._0x175a60['sourceSceneRefs'],
-        ..._0x571e9d['sourceSceneRefs'],
+    ((args28['role'] = resolveMergedStoryCharacterRole(args28['role'], error30['role'])),
+      (args28['description'] = args28['description'] || error30['description']),
+      (args28['sourceSceneRefs'] = normalizeStringArray([
+        ...args28['sourceSceneRefs'],
+        ...error30['sourceSceneRefs'],
       ])),
-      _0x571e9d['appearances']['forEach']((_0x18cc40) => {
-        const _0x2e5a97 = _0x175a60['appearances']['find'](
-          (_0xb5fa76) =>
-            normalizeText(_0xb5fa76['name'])['toLowerCase']() ===
-            normalizeText(_0x18cc40['name'])['toLowerCase'](),
+      error30['appearances']['forEach']((error32) => {
+        const value250 = args28['appearances']['find'](
+          (error33) =>
+            normalizeText(error33['name'])['toLowerCase']() ===
+            normalizeText(error32['name'])['toLowerCase'](),
         );
-        _0x2e5a97
-          ? mergeStoryAssetInventoryAppearance(_0x2e5a97, _0x18cc40)
-          : _0x175a60['appearances']['push'](_0x18cc40);
+        value250
+          ? mergeStoryAssetInventoryAppearance(value250, error32)
+          : args28['appearances']['push'](error32);
       }));
   });
-  const _0x911189 = new Map(
-      (Array['isArray'](_0x567fb5?.['sceneAudits']) ? _0x567fb5['sceneAudits'] : [])['map']((_0x5d9254) => [
-        _0x5d9254['sourceSceneRef'],
-        {
-          ..._0x5d9254,
-          characterNames: normalizeStringArray(
-            (_0x5d9254?.['characterNames'] || [])
-              ['map'](
-                (_0x2ffb40) =>
-                  resolveStoryProjectCharacterCanonicalName(_0x2ffb40, _0x34db1f) ||
-                  resolveStoryAssetCharacterCanonicalName(_0x2ffb40, _0x166b7a, _0x3fcaaf),
-              )
-              ['filter']((_0x57548d) =>
-                ['absorbed', 'promoted']['includes'](
-                  _0x32fedc['reviewAsset'](
-                    { kind: 'character', name: _0x57548d, sourceSceneRefs: [_0x5d9254?.['sourceSceneRef']] },
-                    { origin: 'inventory-audit' },
-                  )['status'],
+  const list81 = new Map(
+      (Array['isArray'](sceneAudits2?.['sceneAudits']) ? sceneAudits2['sceneAudits'] : [])['map'](
+        (args29) => [
+          args29['sourceSceneRef'],
+          {
+            ...args29,
+            characterNames: normalizeStringArray(
+              (args29?.['characterNames'] || [])
+                ['map'](
+                  (value251) =>
+                    resolveStoryProjectCharacterCanonicalName(value251, stringArray) ||
+                    resolveStoryAssetCharacterCanonicalName(
+                      value251,
+                      map30,
+                      storyAssetLocalCharacterCanonicalNames,
+                    ),
+                )
+                ['filter']((name11) =>
+                  ['absorbed', 'promoted']['includes'](
+                    candidateLedger['reviewAsset'](
+                      { kind: 'character', name: name11, sourceSceneRefs: [args29?.['sourceSceneRef']] },
+                      { origin: 'inventory-audit' },
+                    )['status'],
+                  ),
                 ),
-              ),
-          ),
-        },
-      ]),
+            ),
+          },
+        ],
+      ),
     ),
-    _0x533c3b = (_0x58c65a, _0x119f98) =>
-      _0x4c52a6['find'](
-        (_0x28b4f4) =>
-          _0x28b4f4['kind'] === _0x58c65a &&
-          (_0x58c65a === 'character'
-            ? storyCharacterNamesStronglyOverlap(_0x28b4f4['name'], _0x119f98)
-            : normalizeText(_0x28b4f4['name'])['toLowerCase']() ===
-              normalizeText(_0x119f98)['toLowerCase']()),
+    handler4 = (value252, value253) =>
+      list80['find'](
+        (error34) =>
+          error34['kind'] === value252 &&
+          (value252 === 'character'
+            ? storyCharacterNamesStronglyOverlap(error34['name'], value253)
+            : normalizeText(error34['name'])['toLowerCase']() === normalizeText(value253)['toLowerCase']()),
       );
-  (_0x1e3dc2['assets']
-    ['filter']((_0x649ca0) => _0x649ca0['kind'] === 'character')
-    ['forEach']((_0xebb0cb) => {
-      const _0x2faee6 = _0x533c3b('character', _0xebb0cb['name']);
-      if (!_0x2faee6) {
-        _0x4c52a6['push'](_0xebb0cb);
+  (assets7['assets']
+    ['filter']((value254) => value254['kind'] === 'character')
+    ['forEach']((error35) => {
+      const args30 = handler4('character', error35['name']);
+      if (!args30) {
+        list80['push'](error35);
         return;
       }
-      _0x2faee6['sourceSceneRefs'] = normalizeStringArray([
-        ..._0x2faee6['sourceSceneRefs'],
-        ..._0xebb0cb['sourceSceneRefs'],
+      args30['sourceSceneRefs'] = normalizeStringArray([
+        ...args30['sourceSceneRefs'],
+        ...error35['sourceSceneRefs'],
       ]);
-      const _0x5d09ba = _0x2faee6['appearances'][0x0] || _0xebb0cb['appearances'][0x0];
-      _0x5d09ba['sourceSceneRefs'] = normalizeStringArray([
-        ..._0x5d09ba['sourceSceneRefs'],
-        ..._0xebb0cb['sourceSceneRefs']['filter'](
-          (_0x10fb91) =>
-            !_0x2faee6['appearances']['some']((_0x3fdffd) =>
-              _0x3fdffd['sourceSceneRefs']['includes'](_0x10fb91),
-            ),
+      const args31 = args30['appearances'][0x0] || error35['appearances'][0x0];
+      args31['sourceSceneRefs'] = normalizeStringArray([
+        ...args31['sourceSceneRefs'],
+        ...error35['sourceSceneRefs']['filter'](
+          (value255) =>
+            !args30['appearances']['some']((value256) => value256['sourceSceneRefs']['includes'](value255)),
         ),
       ]);
-      if (!_0x2faee6['appearances']['length']) _0x2faee6['appearances'] = [_0x5d09ba];
+      if (!args30['appearances']['length']) args30['appearances'] = [args31];
     }),
-    _0x1e3dc2['assets']
-      ['filter']((_0x22ff24) => _0x22ff24['kind'] === 'prop')
-      ['forEach']((_0x57f2ee) => {
-        const _0x191f72 = _0x533c3b('prop', _0x57f2ee['name']);
-        if (!_0x191f72) {
-          _0x4c52a6['push'](_0x57f2ee);
+    assets7['assets']
+      ['filter']((value257) => value257['kind'] === 'prop')
+      ['forEach']((error36) => {
+        const args32 = handler4('prop', error36['name']);
+        if (!args32) {
+          list80['push'](error36);
           return;
         }
-        _0x191f72['sourceSceneRefs'] = normalizeStringArray([
-          ..._0x191f72['sourceSceneRefs'],
-          ..._0x57f2ee['sourceSceneRefs'],
+        args32['sourceSceneRefs'] = normalizeStringArray([
+          ...args32['sourceSceneRefs'],
+          ...error36['sourceSceneRefs'],
         ]);
-        const _0x5d4013 = _0x191f72['appearances'][0x0] || _0x57f2ee['appearances'][0x0];
-        _0x5d4013['sourceSceneRefs'] = normalizeStringArray([
-          ..._0x5d4013['sourceSceneRefs'],
-          ..._0x57f2ee['sourceSceneRefs'],
+        const args33 = args32['appearances'][0x0] || error36['appearances'][0x0];
+        args33['sourceSceneRefs'] = normalizeStringArray([
+          ...args33['sourceSceneRefs'],
+          ...error36['sourceSceneRefs'],
         ]);
-        if (!_0x191f72['appearances']['length']) _0x191f72['appearances'] = [_0x5d4013];
+        if (!args32['appearances']['length']) args32['appearances'] = [args33];
       }));
-  const _0x3ce638 = (_0x4133ec, _0x5aaecd, _0x574ee6) => {
-    if (!_0x5aaecd || !_0x574ee6) return;
-    const _0x2c15bb = _0x32fedc['reviewAsset'](
-      { kind: _0x4133ec, name: _0x5aaecd, sourceSceneRefs: [_0x574ee6] },
+  const run4 = (kind3, name12, enabled10) => {
+    if (!name12 || !enabled10) return;
+    const response5 = candidateLedger['reviewAsset'](
+      { kind: kind3, name: name12, sourceSceneRefs: [enabled10] },
       { origin: 'inventory-audit' },
     );
-    if (!['absorbed', 'promoted']['includes'](_0x2c15bb['status'])) return;
-    let _0x3d0216 = _0x533c3b(_0x4133ec, _0x5aaecd);
-    if (!_0x3d0216 && _0x2c15bb['status'] === 'promoted') {
-      const _0x525454 = 'evidence-' + _0x4133ec + '-' + (_0x4c52a6['length'] + 0x1);
-      ((_0x3d0216 = {
-        ref: _0x525454,
-        kind: _0x4133ec,
-        name: normalizeText(_0x5aaecd),
-        role: _0x4133ec === 'character' ? '配角' : '关键道具',
+    if (!['absorbed', 'promoted']['includes'](response5['status'])) return;
+    let args34 = handler4(kind3, name12);
+    if (!args34 && response5['status'] === 'promoted') {
+      const ref15 = 'evidence-' + kind3 + '-' + (list80['length'] + 0x1);
+      ((args34 = {
+        ref: ref15,
+        kind: kind3,
+        name: normalizeText(name12),
+        role: kind3 === 'character' ? '配角' : '关键道具',
         description: '',
         sourceSceneRefs: [],
-        appearances: [{ ref: _0x525454 + '-base', name: '基础形象', description: '', sourceSceneRefs: [] }],
+        appearances: [{ ref: ref15 + '-base', name: '基础形象', description: '', sourceSceneRefs: [] }],
       }),
-        _0x4c52a6['push'](_0x3d0216));
+        list80['push'](args34));
     }
-    if (!_0x3d0216) return;
-    _0x3d0216['sourceSceneRefs'] = normalizeStringArray([..._0x3d0216['sourceSceneRefs'], _0x574ee6]);
-    const _0x1fbc7e = _0x3d0216['appearances']['find']((_0x1770b0) =>
-      _0x1770b0['sourceSceneRefs']['includes'](_0x574ee6),
+    if (!args34) return;
+    args34['sourceSceneRefs'] = normalizeStringArray([...args34['sourceSceneRefs'], enabled10]);
+    const enabled11 = args34['appearances']['find']((value258) =>
+      value258['sourceSceneRefs']['includes'](enabled10),
     );
-    !_0x1fbc7e &&
-      _0x3d0216['appearances'][0x0] &&
-      (_0x3d0216['appearances'][0x0]['sourceSceneRefs'] = normalizeStringArray([
-        ..._0x3d0216['appearances'][0x0]['sourceSceneRefs'],
-        _0x574ee6,
+    !enabled11 &&
+      args34['appearances'][0x0] &&
+      (args34['appearances'][0x0]['sourceSceneRefs'] = normalizeStringArray([
+        ...args34['appearances'][0x0]['sourceSceneRefs'],
+        enabled10,
       ]));
   };
-  (_0x911189['forEach']((_0x33fb9, _0x39b1b9) => {
-    (normalizeStringArray(_0x33fb9?.['characterNames'])['forEach']((_0x14f9ea) => {
-      _0x3ce638('character', _0x14f9ea, _0x39b1b9);
+  (list81['forEach']((value259, value260) => {
+    (normalizeStringArray(value259?.['characterNames'])['forEach']((value261) => {
+      run4('character', value261, value260);
     }),
-      normalizeStringArray(_0x33fb9?.['keyPropNames'])['forEach']((_0x3434f9) => {
-        _0x3ce638('prop', _0x3434f9, _0x39b1b9);
+      normalizeStringArray(value259?.['keyPropNames'])['forEach']((value262) => {
+        run4('prop', value262, value260);
       }));
   }),
-    reconcileStorySceneAssetAssignments(_0x4c52a6, _0x1e3dc2['assets'], sourceScenes));
-  const _0x175f50 = _0x4c52a6['filter']((_0x1ef382) => _0x1ef382['sourceSceneRefs']['length']);
-  _0x175f50['forEach']((_0x28d22f) => {
-    (_0x28d22f['sourceSceneRefs']['forEach']((_0x21f733) => {
-      const _0x5a1281 = _0x28d22f['appearances']['filter']((_0x4ade95) =>
-        _0x4ade95['sourceSceneRefs']['includes'](_0x21f733),
+    reconcileStorySceneAssetAssignments(list80, assets7['assets'], sourceScenes));
+  const assets9 = list80['filter']((value263) => value263['sourceSceneRefs']['length']);
+  assets9['forEach']((value264) => {
+    (value264['sourceSceneRefs']['forEach']((value265) => {
+      const list82 = value264['appearances']['filter']((value266) =>
+        value266['sourceSceneRefs']['includes'](value265),
       );
-      if (!_0x5a1281['length']) _0x28d22f['appearances'][0x0]['sourceSceneRefs']['push'](_0x21f733);
-      _0x28d22f['kind'] !== 'scene' &&
-        _0x5a1281['slice'](0x1)['forEach']((_0x409996) => {
-          _0x409996['sourceSceneRefs'] = _0x409996['sourceSceneRefs']['filter'](
-            (_0x44d81d) => _0x44d81d !== _0x21f733,
+      if (!list82['length']) value264['appearances'][0x0]['sourceSceneRefs']['push'](value265);
+      value264['kind'] !== 'scene' &&
+        list82['slice'](0x1)['forEach']((value267) => {
+          value267['sourceSceneRefs'] = value267['sourceSceneRefs']['filter'](
+            (value268) => value268 !== value265,
           );
         });
     }),
-      _0x28d22f['appearances']['forEach']((_0x23e8ec) => {
-        _0x23e8ec['sourceSceneRefs'] = normalizeStringArray(_0x23e8ec['sourceSceneRefs']);
+      value264['appearances']['forEach']((value269) => {
+        value269['sourceSceneRefs'] = normalizeStringArray(value269['sourceSceneRefs']);
       }));
   });
-  const _0x2909a5 = new Set(),
-    _0x1130d3 = new Set();
-  _0x175f50['forEach']((_0x401aea, _0x23ca66) => {
-    ((_0x401aea['ref'] = createUniqueStoryAssetInventoryRef(
-      _0x401aea['ref'],
-      _0x2909a5,
-      'asset-' + (_0x23ca66 + 0x1),
+  const value270 = new Set(),
+    value271 = new Set();
+  assets9['forEach']((value272, value273) => {
+    ((value272['ref'] = createUniqueStoryAssetInventoryRef(
+      value272['ref'],
+      value270,
+      'asset-' + (value273 + 0x1),
     )),
-      _0x401aea['appearances']['forEach']((_0x385e20, _0x3a4efa) => {
-        _0x385e20['ref'] = createUniqueStoryAssetAppearanceRef(
-          _0x385e20['ref'],
-          _0x1130d3,
-          _0x401aea['ref'] + '-appearance-' + (_0x3a4efa + 0x1),
+      value272['appearances']['forEach']((value274, value275) => {
+        value274['ref'] = createUniqueStoryAssetAppearanceRef(
+          value274['ref'],
+          value271,
+          value272['ref'] + '-appearance-' + (value275 + 0x1),
         );
       }));
   });
-  const _0x51a434 = new Set(
-      _0x175f50['filter']((_0x20f175) => _0x20f175['kind'] === 'prop')['map'](
-        (_0x3f3bb3) => _0x3f3bb3['name'],
-      ),
+  const map34 = new Set(
+      assets9['filter']((value276) => value276['kind'] === 'prop')['map']((error37) => error37['name']),
     ),
-    _0x5b4d8d = parseStoryAssetInventoryResult(
+    args35 = parseStoryAssetInventoryResult(
       {
-        assets: _0x175f50,
-        sceneAudits: sourceScenes['map']((_0x1d62ae) => ({
-          sourceSceneRef: _0x1d62ae['ref'],
+        assets: assets9,
+        sceneAudits: sourceScenes['map']((sourceSceneRef8) => ({
+          sourceSceneRef: sourceSceneRef8['ref'],
           characterNames: normalizeStringArray(
-            _0x175f50['filter'](
-              (_0x305b9b) =>
-                _0x305b9b['kind'] === 'character' &&
-                _0x305b9b['sourceSceneRefs']['includes'](_0x1d62ae['ref']),
-            )['map']((_0x53b34d) => _0x53b34d['name']),
+            assets9['filter'](
+              (value277) =>
+                value277['kind'] === 'character' &&
+                value277['sourceSceneRefs']['includes'](sourceSceneRef8['ref']),
+            )['map']((error38) => error38['name']),
           ),
           keyPropNames: normalizeStringArray([
-            ...(_0x911189['get'](_0x1d62ae['ref'])?.['keyPropNames'] || [])['filter']((_0x4d1a06) =>
-              _0x51a434['has'](_0x4d1a06),
+            ...(list81['get'](sourceSceneRef8['ref'])?.['keyPropNames'] || [])['filter']((value278) =>
+              map34['has'](value278),
             ),
-            ..._0x175f50['filter'](
-              (_0x23f51d) =>
-                _0x23f51d['kind'] === 'prop' && _0x23f51d['sourceSceneRefs']['includes'](_0x1d62ae['ref']),
-            )['map']((_0x94037a) => _0x94037a['name']),
+            ...assets9['filter'](
+              (value279) =>
+                value279['kind'] === 'prop' &&
+                value279['sourceSceneRefs']['includes'](sourceSceneRef8['ref']),
+            )['map']((error39) => error39['name']),
           ]),
         })),
       },
       { sourceScenes: sourceScenes },
     );
-  return { ..._0x5b4d8d, candidateLedger: _0x32fedc['snapshot']() };
+  return { ...args35, candidateLedger: candidateLedger['snapshot']() };
 }
 const STORY_ASSET_KIND_LABELS = Object['freeze']({ character: '角色', scene: '场景', prop: '道具' });
-function normalizeStoryAssetKind(_0x47b623) {
-  const _0x14db29 = normalizeText(_0x47b623);
-  if (!STORY_ASSET_EXPERIMENTAL_KINDS['includes'](_0x14db29))
-    throw new Error('资产提取不支持类型“' + (_0x14db29 || '未指定') + '”。');
-  return _0x14db29;
+function normalizeStoryAssetKind(value280) {
+  const text15 = normalizeText(value280);
+  if (!STORY_ASSET_EXPERIMENTAL_KINDS['includes'](text15))
+    throw new Error('资产提取不支持类型“' + (text15 || '未指定') + '”。');
+  return text15;
 }
-function buildStoryAssetKindSystemPrompt(_0x2533f9) {
-  const _0x888b63 = normalizeStoryAssetKind(_0x2533f9),
-    _0x789186 = STORY_ASSET_KIND_LABELS[_0x888b63],
-    _0x23048b =
-      _0x888b63 === 'character'
+function buildStoryAssetKindSystemPrompt(value281) {
+  const storyAssetKind2 = normalizeStoryAssetKind(value281),
+    value282 = STORY_ASSET_KIND_LABELS[storyAssetKind2],
+    value283 =
+      storyAssetKind2 === 'character'
         ? '每项只能包含 name 和 role'
-        : _0x888b63 === 'scene'
+        : storyAssetKind2 === 'scene'
           ? '每项只能包含 name 和 sourceSceneRefs'
           : '每项只能包含 name';
   return [
-    '你是专业的影视' + _0x789186 + '资产提取 Agent。',
-    _0x888b63 === 'scene'
+    '你是专业的影视' + value282 + '资产提取 Agent。',
+    storyAssetKind2 === 'scene'
       ? '本次只返回需要合并的重复场景组；只出现一次的唯一场景禁止返回。'
-      : '本次只提取全部' + _0x789186 + '，禁止返回其他类型的资产。',
-    ...(_0x888b63 === 'scene'
+      : '本次只提取全部' + value282 + '，禁止返回其他类型的资产。',
+    ...(storyAssetKind2 === 'scene'
       ? ['必须从第一场到最后一场完整扫描全部重复关系，所有重复组都要返回，不得遗漏。']
       : []),
     '输入包含完整分集剧本，只把它作为识别与视觉设定依据，不续写剧情，不生成分镜。',
-    '输出必须极短：' + _0x23048b + '。',
+    '输出必须极短：' + value283 + '。',
     '禁止返回 description、提示词、形象列表、声音、出现范围、章节、解释、Markdown 或契约外字段。',
     '只返回一个 JSON 对象，顶层只能包含 assets 数组。',
   ]['join']('\x0a');
 }
-function buildStoryAssetKindOutputSchema(_0x3d6185) {
-  if (_0x3d6185 === 'character')
+function buildStoryAssetKindOutputSchema(name13) {
+  if (name13 === 'character')
     return { assets: [{ name: '角色姓名或不超过 6 个汉字的身份短称', role: '主角、配角、反派或路人' }] };
   return {
     assets: [
       {
-        name: _0x3d6185 === 'scene' ? '场景名称及必要的视觉状态' : '关键道具名称',
-        ...(_0x3d6185 === 'scene' ? { sourceSceneRefs: ['sourceScenes[].ref'] } : {}),
+        name: name13 === 'scene' ? '场景名称及必要的视觉状态' : '关键道具名称',
+        ...(name13 === 'scene' ? { sourceSceneRefs: ['sourceScenes[].ref'] } : {}),
       },
     ],
   };
 }
-function buildStoryAssetKindRequirements(_0x245739, _0x534868 = '') {
-  const _0x553628 =
-      _0x245739 === 'character'
+function buildStoryAssetKindRequirements(value284, value285 = '') {
+  const value286 =
+      value284 === 'character'
         ? 'name 和 role'
-        : _0x245739 === 'scene'
+        : value284 === 'scene'
           ? 'name\x20和\x20sourceSceneRefs'
           : 'name',
-    _0x3863ba = [
+    list83 = [
       '本轮必须阅读全部 sourceScenes，但 assets 中只能返回 assetKind 指定的一种资产。',
       'storyContext.characters[].fixedTraits 与 continuityFacts 是已确认约束，不得为了视觉效果改写。',
-      '每项只能返回\x20' + _0x553628 + '；其余信息全部由客户端补齐。',
+      '每项只能返回\x20' + value286 + '；其余信息全部由客户端补齐。',
       '不要为了满足数量而虚构资产；确实没有该类资产时返回\x20{\x22assets\x22:[]}。',
     ];
-  if (_0x245739 === 'character')
-    _0x3863ba['push'](
+  if (value284 === 'character')
+    list83['push'](
       '提取需要保持人物外观一致的真实角色；动作短语、台词引导语、评论区、记者群等泛称不得当作具名角色。',
       'role\x20只能是主角、配角、反派或路人。',
       '每项只返回 name 和 role；禁止返回人物描述。',
     );
   else
-    _0x245739 === 'scene'
-      ? _0x3863ba['push'](
+    value284 === 'scene'
+      ? list83['push'](
           'assets\x20只列重复场景合并组；每组必须包含至少两个\x20sourceScenes[].ref，唯一场景由客户端本地补齐。',
           '先只扫描\x20sceneHeadingIndex\x20完成地点聚类，再结合\x20sourceScenes\x20正文消歧；必须穷尽全部重复组，不能只合并字面完全相同的标题。',
           '同一物理空间因简称、所属人或机构前缀、日夜、稍后、紧接、后半夜、窗边、天气、镜头位置、封锁或断电等标题变体应合并。',
@@ -2444,11 +2434,11 @@ function buildStoryAssetKindRequirements(_0x245739, _0x534868 = '') {
           '同一个 sourceScenes[].ref 最多出现在一个重复组中；sourceSceneRefs 只能引用真实 ref。',
           'name 使用去掉时间、转场和镜头位置修饰后的稳定场景名称，并且必须能与组内每个标题的地点身份对应。',
         )
-      : _0x3863ba['push'](
+      : list83['push'](
           '只提取跨镜头需要保持视觉一致的剧情关键道具，不提取普通背景杂物、一次性食物或无叙事作用的小物件。',
           '每项只返回 name；禁止返回道具描述。',
         );
-  return _0x3863ba;
+  return list83;
 }
 export function buildStoryAssetKindExtractionPrompt({
   project: project = {},
@@ -2460,27 +2450,27 @@ export function buildStoryAssetKindExtractionPrompt({
   aspectRatio: aspectRatio = '',
   visualStyle: visualStyle = '',
 } = {}) {
-  const _0x13a18a = normalizeStoryAssetKind(kind),
-    _0x55e861 = normalizeStoryContext(project),
-    _0x292a63 = Array['isArray'](sourceScenes)
+  const assetKind = normalizeStoryAssetKind(kind),
+    title2 = normalizeStoryContext(project),
+    previousRef = Array['isArray'](sourceScenes)
       ? sourceScenes
       : normalizeStoryAssetExtractionSources(episodes);
-  if (!_0x292a63['length']) throw new Error('资产提取缺少可用的场次正文。');
-  const _0x4ad86e = _0x292a63['map']((_0x51787c) => ({
-      ref: _0x51787c['ref'],
-      heading: _0x51787c['heading'],
-      characters: _0x51787c['characters'],
-      body: _0x51787c['body'],
+  if (!previousRef['length']) throw new Error('资产提取缺少可用的场次正文。');
+  const sourceScenes6 = previousRef['map']((ref16) => ({
+      ref: ref16['ref'],
+      heading: ref16['heading'],
+      characters: ref16['characters'],
+      body: ref16['body'],
     })),
-    _0x41c639 =
-      _0x13a18a === 'scene'
-        ? _0x292a63['map']((_0xdc0b56, _0x46d715) => ({
-            ref: _0xdc0b56['ref'],
-            heading: _0xdc0b56['heading'],
-            ...(_0x46d715 > 0x0
+    sceneHeadingIndex =
+      assetKind === 'scene'
+        ? previousRef['map']((ref17, count9) => ({
+            ref: ref17['ref'],
+            heading: ref17['heading'],
+            ...(count9 > 0x0
               ? {
-                  previousRef: _0x292a63[_0x46d715 - 0x1]['ref'],
-                  previousHeading: _0x292a63[_0x46d715 - 0x1]['heading'],
+                  previousRef: previousRef[count9 - 0x1]['ref'],
+                  previousHeading: previousRef[count9 - 0x1]['heading'],
                 }
               : {}),
           }))
@@ -2488,37 +2478,37 @@ export function buildStoryAssetKindExtractionPrompt({
   return JSON['stringify']({
     task: 'extract_story_assets_by_kind',
     schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION,
-    assetKind: _0x13a18a,
+    assetKind: assetKind,
     storyContext: {
-      title: _0x55e861['title'],
-      summary: _0x55e861['summary'],
-      setting: _0x55e861['setting'],
-      continuityFacts: _0x55e861['continuityFacts'],
-      ...(_0x13a18a === 'character' ? { characters: _0x55e861['characters'] } : {}),
+      title: title2['title'],
+      summary: title2['summary'],
+      setting: title2['setting'],
+      continuityFacts: title2['continuityFacts'],
+      ...(assetKind === 'character' ? { characters: title2['characters'] } : {}),
     },
-    ...(_0x41c639 ? { sceneHeadingIndex: _0x41c639 } : {}),
-    sourceScenes: _0x4ad86e,
-    requirements: buildStoryAssetKindRequirements(_0x13a18a),
+    ...(sceneHeadingIndex ? { sceneHeadingIndex: sceneHeadingIndex } : {}),
+    sourceScenes: sourceScenes6,
+    requirements: buildStoryAssetKindRequirements(assetKind),
   });
 }
-function inferStoryAssetSourceSceneRefs(_0x25d19f, _0x35680d, _0x19474c = []) {
-  const _0x5c469b = normalizeText(_0x35680d);
-  if (!_0x5c469b) return [];
-  const _0x57a865 = _0x5c469b['split'](/[_＿|｜·•]/u)[0x0]['trim'](),
-    _0x102d0c = getStoryAssetNameAliases(_0x5c469b);
-  return _0x19474c['filter']((_0x29be87) => {
-    if (_0x25d19f === 'character')
+function inferStoryAssetSourceSceneRefs(value287, value288, list84 = []) {
+  const text16 = normalizeText(value288);
+  if (!text16) return [];
+  const list85 = text16['split'](/[_＿|｜·•]/u)[0x0]['trim'](),
+    list86 = getStoryAssetNameAliases(text16);
+  return list84['filter']((dom3) => {
+    if (value287 === 'character')
       return (
-        _0x29be87['characters']['some']((_0x4fbcb4) => storyCharacterNamesOverlap(_0x4fbcb4, _0x5c469b)) ||
-        _0x102d0c['some']((_0x530de4) => _0x29be87['body']['includes'](_0x530de4))
+        dom3['characters']['some']((value289) => storyCharacterNamesOverlap(value289, text16)) ||
+        list86['some']((value290) => dom3['body']['includes'](value290))
       );
-    if (_0x25d19f === 'scene')
+    if (value287 === 'scene')
       return (
-        _0x29be87['heading']['includes'](_0x5c469b) ||
-        (_0x57a865['length'] >= 0x2 && _0x29be87['heading']['includes'](_0x57a865))
+        dom3['heading']['includes'](text16) ||
+        (list85['length'] >= 0x2 && dom3['heading']['includes'](list85))
       );
-    return _0x29be87['body']['includes'](_0x5c469b);
-  })['map']((_0x381d13) => _0x381d13['ref']);
+    return dom3['body']['includes'](text16);
+  })['map']((value291) => value291['ref']);
 }
 function resolveStoryAssetSourceChapterIds({
   sourceSceneRefs: sourceSceneRefs = [],
@@ -2526,280 +2516,276 @@ function resolveStoryAssetSourceChapterIds({
   sourceScenes: sourceScenes = [],
   chapterIds: chapterIds = [],
 } = {}) {
-  const _0x43aea3 = new Set(normalizeStringArray(chapterIds)),
-    _0x31f3c1 = new Map(sourceScenes['map']((_0x282219) => [_0x282219['ref'], _0x282219])),
-    _0x2c4c9d = new Map();
-  sourceScenes['forEach']((_0x4c0776) => {
-    if (_0x2c4c9d['has'](_0x4c0776['episodeRef'])) return;
-    const _0x45ea6d = _0x43aea3['has'](_0x4c0776['episodeRef'])
-      ? _0x4c0776['episodeRef']
-      : normalizeText(chapterIds[Math['max'](0x0, _0x4c0776['episodeNumber'] - 0x1)]);
-    if (_0x45ea6d) _0x2c4c9d['set'](_0x4c0776['episodeRef'], _0x45ea6d);
+  const map35 = new Set(normalizeStringArray(chapterIds)),
+    map36 = new Map(sourceScenes['map']((value292) => [value292['ref'], value292])),
+    map37 = new Map();
+  sourceScenes['forEach']((value293) => {
+    if (map37['has'](value293['episodeRef'])) return;
+    const value294 = map35['has'](value293['episodeRef'])
+      ? value293['episodeRef']
+      : normalizeText(chapterIds[Math['max'](0x0, value293['episodeNumber'] - 0x1)]);
+    if (value294) map37['set'](value293['episodeRef'], value294);
   });
-  const _0x234637 = normalizeStringArray([
+  const list87 = normalizeStringArray([
     ...sourceEpisodeRefs,
-    ...sourceSceneRefs['map']((_0x4401df) => _0x31f3c1['get'](_0x4401df)?.['episodeRef']),
+    ...sourceSceneRefs['map']((value295) => map36['get'](value295)?.['episodeRef']),
   ]);
   return normalizeStringArray(
-    _0x234637['map'](
-      (_0x1f75b7) => _0x2c4c9d['get'](_0x1f75b7) || (_0x43aea3['has'](_0x1f75b7) ? _0x1f75b7 : ''),
-    ),
+    list87['map']((value296) => map37['get'](value296) || (map35['has'](value296) ? value296 : '')),
   );
 }
-function ensureStoryAssetVisualStyle(_0x31a698, _0x4056a3 = '') {
-  const _0x1c2d5b = sanitizeStoryAssetPublicPromptText(_0x31a698),
-    _0x7e1487 = sanitizeStoryAssetPublicPromptText(_0x4056a3);
-  if (!_0x7e1487 || _0x1c2d5b['startsWith'](_0x7e1487)) return _0x1c2d5b;
-  return _0x7e1487 + '\x0a' + _0x1c2d5b;
+function ensureStoryAssetVisualStyle(value297, value298 = '') {
+  const sanitizeStoryAssetPublicPromptText2 = sanitizeStoryAssetPublicPromptText(value297),
+    sanitizeStoryAssetPublicPromptText3 = sanitizeStoryAssetPublicPromptText(value298);
+  if (
+    !sanitizeStoryAssetPublicPromptText3 ||
+    sanitizeStoryAssetPublicPromptText2['startsWith'](sanitizeStoryAssetPublicPromptText3)
+  )
+    return sanitizeStoryAssetPublicPromptText2;
+  return sanitizeStoryAssetPublicPromptText3 + '\x0a' + sanitizeStoryAssetPublicPromptText2;
 }
-function resolveStoryCharacterRole(_0x440a3a) {
-  return normalizeStoryAssetFinalCharacterRole(_0x440a3a);
+function resolveStoryCharacterRole(value299) {
+  return normalizeStoryAssetFinalCharacterRole(value299);
 }
-function getStoryAssetKindRawAssets(_0x15b112, _0x1b585e) {
-  const _0x48963d = getResultText(_0x15b112);
-  if (Array['isArray'](_0x48963d)) return _0x48963d;
-  const _0x4ea3bd = parseStrictJson(
-    _0x48963d,
-    'Agent\x20未返回' + STORY_ASSET_KIND_LABELS[_0x1b585e] + '提取结果。',
+function getStoryAssetKindRawAssets(value300, value301) {
+  const resultText = getResultText(value300);
+  if (Array['isArray'](resultText)) return resultText;
+  const strictJson4 = parseStrictJson(
+    resultText,
+    'Agent\x20未返回' + STORY_ASSET_KIND_LABELS[value301] + '提取结果。',
   );
-  if (Array['isArray'](_0x4ea3bd)) return _0x4ea3bd;
-  const _0x2db8ba =
-      _0x1b585e === 'character'
-        ? [_0x4ea3bd?.['characters'], _0x4ea3bd?.['assets']]
-        : _0x1b585e === 'scene'
-          ? [_0x4ea3bd?.['scenes'], _0x4ea3bd?.['assets']]
-          : [_0x4ea3bd?.['props'], _0x4ea3bd?.['assets']],
-    _0x555125 = _0x2db8ba['find'](Array['isArray']);
-  if (!_0x555125)
-    throw new Error('Agent 返回的' + STORY_ASSET_KIND_LABELS[_0x1b585e] + '结果缺少 assets 数组。');
-  return _0x555125;
+  if (Array['isArray'](strictJson4)) return strictJson4;
+  const list88 =
+      value301 === 'character'
+        ? [strictJson4?.['characters'], strictJson4?.['assets']]
+        : value301 === 'scene'
+          ? [strictJson4?.['scenes'], strictJson4?.['assets']]
+          : [strictJson4?.['props'], strictJson4?.['assets']],
+    enabled12 = list88['find'](Array['isArray']);
+  if (!enabled12)
+    throw new Error('Agent 返回的' + STORY_ASSET_KIND_LABELS[value301] + '结果缺少 assets 数组。');
+  return enabled12;
 }
-function mergeStoryAssetKindResultAssets(_0x15ec86 = []) {
-  const _0x551f28 = [],
-    _0x253c61 = new Map();
+function mergeStoryAssetKindResultAssets(list89 = []) {
+  const list90 = [],
+    map38 = new Map();
   return (
-    _0x15ec86['forEach']((_0x21323d) => {
-      const _0x4435f4 = normalizeText(_0x21323d?.['name'])['toLowerCase']();
-      if (!_0x4435f4) return;
-      const _0x1670c3 = _0x253c61['get'](_0x4435f4);
-      if (!_0x1670c3) {
-        (_0x253c61['set'](_0x4435f4, _0x21323d), _0x551f28['push'](_0x21323d));
+    list89['forEach']((error40) => {
+      const text17 = normalizeText(error40?.['name'])['toLowerCase']();
+      if (!text17) return;
+      const args36 = map38['get'](text17);
+      if (!args36) {
+        (map38['set'](text17, error40), list90['push'](error40));
         return;
       }
-      ((_0x1670c3['description'] ||= _0x21323d['description']),
-        (_0x1670c3['voiceDescription'] ||= _0x21323d['voiceDescription']),
-        (_0x1670c3['occurrences'] ||= _0x21323d['occurrences']),
-        (_0x1670c3['sourceEpisodeRefs'] = normalizeStringArray([
-          ..._0x1670c3['sourceEpisodeRefs'],
-          ..._0x21323d['sourceEpisodeRefs'],
+      ((args36['description'] ||= error40['description']),
+        (args36['voiceDescription'] ||= error40['voiceDescription']),
+        (args36['occurrences'] ||= error40['occurrences']),
+        (args36['sourceEpisodeRefs'] = normalizeStringArray([
+          ...args36['sourceEpisodeRefs'],
+          ...error40['sourceEpisodeRefs'],
         ])),
-        (_0x1670c3['sourceSceneRefs'] = normalizeStringArray([
-          ..._0x1670c3['sourceSceneRefs'],
-          ..._0x21323d['sourceSceneRefs'],
+        (args36['sourceSceneRefs'] = normalizeStringArray([
+          ...args36['sourceSceneRefs'],
+          ...error40['sourceSceneRefs'],
         ])));
-      const _0x1ca0e8 = new Map(
-        _0x1670c3['appearances']['map']((_0x27083c) => [
-          normalizeText(_0x27083c['name'])['toLowerCase'](),
-          _0x27083c,
-        ]),
+      const map39 = new Map(
+        args36['appearances']['map']((error41) => [normalizeText(error41['name'])['toLowerCase'](), error41]),
       );
-      (_0x21323d['appearances']['forEach']((_0x567c48) => {
-        const _0x119fa6 = normalizeText(_0x567c48['name'])['toLowerCase'](),
-          _0x5ad0ad = _0x1ca0e8['get'](_0x119fa6);
-        if (!_0x5ad0ad) {
-          (_0x1670c3['appearances']['push'](_0x567c48), _0x1ca0e8['set'](_0x119fa6, _0x567c48));
+      (error40['appearances']['forEach']((error42) => {
+        const text18 = normalizeText(error42['name'])['toLowerCase'](),
+          args37 = map39['get'](text18);
+        if (!args37) {
+          (args36['appearances']['push'](error42), map39['set'](text18, error42));
           return;
         }
-        ((_0x5ad0ad['description'] ||= _0x567c48['description']),
-          (_0x5ad0ad['prompt'] ||= _0x567c48['prompt']),
-          (_0x5ad0ad['occurrences'] ||= _0x567c48['occurrences']),
-          (_0x5ad0ad['sourceEpisodeRefs'] = normalizeStringArray([
-            ..._0x5ad0ad['sourceEpisodeRefs'],
-            ..._0x567c48['sourceEpisodeRefs'],
+        ((args37['description'] ||= error42['description']),
+          (args37['prompt'] ||= error42['prompt']),
+          (args37['occurrences'] ||= error42['occurrences']),
+          (args37['sourceEpisodeRefs'] = normalizeStringArray([
+            ...args37['sourceEpisodeRefs'],
+            ...error42['sourceEpisodeRefs'],
           ])),
-          (_0x5ad0ad['sourceSceneRefs'] = normalizeStringArray([
-            ..._0x5ad0ad['sourceSceneRefs'],
-            ..._0x567c48['sourceSceneRefs'],
+          (args37['sourceSceneRefs'] = normalizeStringArray([
+            ...args37['sourceSceneRefs'],
+            ...error42['sourceSceneRefs'],
           ])),
-          (_0x5ad0ad['sourceChapterIds'] = normalizeStringArray([
-            ..._0x5ad0ad['sourceChapterIds'],
-            ..._0x567c48['sourceChapterIds'],
+          (args37['sourceChapterIds'] = normalizeStringArray([
+            ...args37['sourceChapterIds'],
+            ...error42['sourceChapterIds'],
           ])));
       }),
-        (_0x1670c3['sourceChapterIds'] = normalizeStringArray([
-          ..._0x1670c3['sourceChapterIds'],
-          ..._0x21323d['sourceChapterIds'],
+        (args36['sourceChapterIds'] = normalizeStringArray([
+          ...args36['sourceChapterIds'],
+          ...error40['sourceChapterIds'],
         ])));
     }),
-    _0x551f28
+    list90
   );
 }
 function normalizeStorySceneAssetsForCoverage(
-  _0x402156 = [],
+  list91 = [],
   { sourceScenes: sourceScenes = [], chapterIds: chapterIds = [], visualStyle: visualStyle = '' } = {},
 ) {
-  if (!sourceScenes['length']) return _0x402156;
-  const _0x19dcb0 = new Map(sourceScenes['map']((_0x588bf9, _0x580ebe) => [_0x588bf9['ref'], _0x580ebe])),
-    _0x33b539 = /^(?:(?:同地点|同一地点|同一处|原地|此处|该处|这里|旁边)(?:\s|$|[（(])|.+(?:旁|附近|周围)$)/u,
-    _0x5a76a3 = (_0x82c041, _0x23a584) => {
-      const _0x1e13a7 = getReusableStorySceneIdentityKey(_0x82c041),
-        _0x2f56a5 = getReusableStorySceneIdentityKey(_0x23a584);
-      return Boolean(_0x1e13a7 && _0x1e13a7 === _0x2f56a5);
-    },
-    _0x581417 = (_0x168ffe, _0x2ebf26) => {
-      if (storySceneIdentitiesOverlap(_0x168ffe?.['name'], _0x2ebf26?.['heading'])) return !![];
-      const _0x1c70a4 = normalizeStorySceneHeadingIdentity(_0x2ebf26?.['heading']);
-      if (!_0x33b539['test'](_0x1c70a4)) return ![];
-      const _0x4cbb0d = _0x19dcb0['get'](_0x2ebf26['ref']),
-        _0x15131a = _0x4cbb0d > 0x0 ? sourceScenes[_0x4cbb0d - 0x1]?.['ref'] : '';
+  if (!sourceScenes['length']) return list91;
+  const map40 = new Map(sourceScenes['map']((value302, value303) => [value302['ref'], value303])),
+    enabled13 = /^(?:(?:同地点|同一地点|同一处|原地|此处|该处|这里|旁边)(?:\s|$|[（(])|.+(?:旁|附近|周围)$)/u,
+    handler5 = (value304, value305) => {
+      const reusableStorySceneIdentityKey2 = getReusableStorySceneIdentityKey(value304),
+        reusableStorySceneIdentityKey3 = getReusableStorySceneIdentityKey(value305);
       return Boolean(
-        _0x15131a && normalizeStringArray(_0x168ffe?.['sourceSceneRefs'])['includes'](_0x15131a),
+        reusableStorySceneIdentityKey2 && reusableStorySceneIdentityKey2 === reusableStorySceneIdentityKey3,
       );
     },
-    _0x2b7dcb = new Map(),
-    _0x4b0e91 = [];
-  sourceScenes['forEach']((_0x1671ec) => {
-    const _0x139dfc = _0x402156['map']((_0x5e4012, _0x52111a) => ({
-        asset: _0x5e4012,
-        assetIndex: _0x52111a,
-        explicitlyBound: normalizeStringArray(_0x5e4012?.['sourceSceneRefs'])['includes'](_0x1671ec['ref']),
-        hasExplicitBindings: normalizeStringArray(_0x5e4012?.['sourceSceneRefs'])['length'] > 0x0,
+    handler6 = (error43, value306) => {
+      if (storySceneIdentitiesOverlap(error43?.['name'], value306?.['heading'])) return !![];
+      const storySceneHeadingIdentity = normalizeStorySceneHeadingIdentity(value306?.['heading']);
+      if (!enabled13['test'](storySceneHeadingIdentity)) return ![];
+      const count10 = map40['get'](value306['ref']),
+        value307 = count10 > 0x0 ? sourceScenes[count10 - 0x1]?.['ref'] : '';
+      return Boolean(value307 && normalizeStringArray(error43?.['sourceSceneRefs'])['includes'](value307));
+    },
+    map41 = new Map(),
+    list92 = [];
+  sourceScenes['forEach']((value308) => {
+    const value309 = list91['map']((asset4, assetIndex4) => ({
+        asset: asset4,
+        assetIndex: assetIndex4,
+        explicitlyBound: normalizeStringArray(asset4?.['sourceSceneRefs'])['includes'](value308['ref']),
+        hasExplicitBindings: normalizeStringArray(asset4?.['sourceSceneRefs'])['length'] > 0x0,
       }))
         ['filter'](
-          ({ asset: _0x32cac1, explicitlyBound: _0x57f271, hasExplicitBindings: _0x11e533 }) =>
-            (!_0x11e533 || _0x57f271) &&
-            (_0x57f271
-              ? _0x581417(_0x32cac1, _0x1671ec)
-              : storySceneIdentitiesOverlap(_0x32cac1?.['name'], _0x1671ec?.['heading'])),
+          ({ asset: asset5, explicitlyBound: explicitlyBound, hasExplicitBindings: hasExplicitBindings }) =>
+            (!hasExplicitBindings || explicitlyBound) &&
+            (explicitlyBound
+              ? handler6(asset5, value308)
+              : storySceneIdentitiesOverlap(asset5?.['name'], value308?.['heading'])),
         )
         ['sort'](
-          (_0x56a79e, _0x163e81) =>
-            Number(_0x163e81['explicitlyBound']) - Number(_0x56a79e['explicitlyBound']) ||
-            normalizeStringArray(_0x56a79e['asset']?.['sourceSceneRefs'])['length'] -
-              normalizeStringArray(_0x163e81['asset']?.['sourceSceneRefs'])['length'],
+          (value310, value311) =>
+            Number(value311['explicitlyBound']) - Number(value310['explicitlyBound']) ||
+            normalizeStringArray(value310['asset']?.['sourceSceneRefs'])['length'] -
+              normalizeStringArray(value311['asset']?.['sourceSceneRefs'])['length'],
         ),
-      _0xd0cef8 = _0x139dfc[0x0];
-    if (!_0xd0cef8) {
-      _0x4b0e91['push'](_0x1671ec);
+      enabled14 = value309[0x0];
+    if (!enabled14) {
+      list92['push'](value308);
       return;
     }
-    const _0x57dca5 = _0x2b7dcb['get'](_0xd0cef8['assetIndex']) || [];
-    (_0x57dca5['push'](_0x1671ec), _0x2b7dcb['set'](_0xd0cef8['assetIndex'], _0x57dca5));
+    const list93 = map41['get'](enabled14['assetIndex']) || [];
+    (list93['push'](value308), map41['set'](enabled14['assetIndex'], list93));
   });
-  const _0x4002a0 = [..._0x2b7dcb['entries']()]['map'](([_0x30c0af, _0x2fad30]) => {
-    const _0x2da613 = _0x402156[_0x30c0af],
-      _0x2528f2 = _0x2fad30['map']((_0x13510a) => _0x13510a['ref']),
-      _0x105e08 = deriveSourceEpisodeRefs(
-        _0x2528f2,
-        new Map(sourceScenes['map']((_0x39dffa) => [_0x39dffa['ref'], _0x39dffa])),
+  const list94 = [...map41['entries']()]['map'](([value312, list95]) => {
+    const args38 = list91[value312],
+      sourceSceneRefs6 = list95['map']((value313) => value313['ref']),
+      sourceEpisodeRefs5 = deriveSourceEpisodeRefs(
+        sourceSceneRefs6,
+        new Map(sourceScenes['map']((value314) => [value314['ref'], value314])),
       ),
-      _0x195d08 = resolveStoryAssetSourceChapterIds({
-        sourceSceneRefs: _0x2528f2,
-        sourceEpisodeRefs: _0x105e08,
+      sourceChapterIds = resolveStoryAssetSourceChapterIds({
+        sourceSceneRefs: sourceSceneRefs6,
+        sourceEpisodeRefs: sourceEpisodeRefs5,
         sourceScenes: sourceScenes,
         chapterIds: chapterIds,
       }),
-      _0x4d29fb = (Array['isArray'](_0x2da613?.['appearances']) ? _0x2da613['appearances'] : [])['map'](
-        (_0x45feed) => ({
-          ..._0x45feed,
-          occurrences: buildOccurrences(_0x105e08),
-          sourceChapterIds: _0x195d08,
-          sourceEpisodeRefs: _0x105e08,
-          sourceSceneRefs: _0x2528f2,
+      appearances5 = (Array['isArray'](args38?.['appearances']) ? args38['appearances'] : [])['map'](
+        (args39) => ({
+          ...args39,
+          occurrences: buildOccurrences(sourceEpisodeRefs5),
+          sourceChapterIds: sourceChapterIds,
+          sourceEpisodeRefs: sourceEpisodeRefs5,
+          sourceSceneRefs: sourceSceneRefs6,
         }),
       );
     return {
-      ..._0x2da613,
-      occurrences: buildOccurrences(_0x105e08),
-      sourceChapterIds: _0x195d08,
-      sourceEpisodeRefs: _0x105e08,
-      sourceSceneRefs: _0x2528f2,
-      appearances: _0x4d29fb,
+      ...args38,
+      occurrences: buildOccurrences(sourceEpisodeRefs5),
+      sourceChapterIds: sourceChapterIds,
+      sourceEpisodeRefs: sourceEpisodeRefs5,
+      sourceSceneRefs: sourceSceneRefs6,
+      appearances: appearances5,
     };
   });
   return (
-    _0x4b0e91['forEach']((_0x146d4a, _0x3ce56c) => {
-      const _0x405286 = _0x4002a0['find']((_0x106333) =>
-        _0x5a76a3(_0x106333?.['name'], _0x146d4a?.['heading']),
-      );
-      if (_0x405286) {
-        ((_0x405286['sourceSceneRefs'] = normalizeStringArray([
-          ..._0x405286['sourceSceneRefs'],
-          _0x146d4a['ref'],
+    list92['forEach']((dom4, value315) => {
+      const sourceSceneRefs7 = list94['find']((error44) => handler5(error44?.['name'], dom4?.['heading']));
+      if (sourceSceneRefs7) {
+        ((sourceSceneRefs7['sourceSceneRefs'] = normalizeStringArray([
+          ...sourceSceneRefs7['sourceSceneRefs'],
+          dom4['ref'],
         ])),
-          (_0x405286['sourceEpisodeRefs'] = deriveSourceEpisodeRefs(
-            _0x405286['sourceSceneRefs'],
-            new Map(sourceScenes['map']((_0x2a619c) => [_0x2a619c['ref'], _0x2a619c])),
+          (sourceSceneRefs7['sourceEpisodeRefs'] = deriveSourceEpisodeRefs(
+            sourceSceneRefs7['sourceSceneRefs'],
+            new Map(sourceScenes['map']((value316) => [value316['ref'], value316])),
           )),
-          (_0x405286['sourceChapterIds'] = resolveStoryAssetSourceChapterIds({
-            sourceSceneRefs: _0x405286['sourceSceneRefs'],
-            sourceEpisodeRefs: _0x405286['sourceEpisodeRefs'],
+          (sourceSceneRefs7['sourceChapterIds'] = resolveStoryAssetSourceChapterIds({
+            sourceSceneRefs: sourceSceneRefs7['sourceSceneRefs'],
+            sourceEpisodeRefs: sourceSceneRefs7['sourceEpisodeRefs'],
             sourceScenes: sourceScenes,
             chapterIds: chapterIds,
           })),
-          (_0x405286['occurrences'] = buildOccurrences(_0x405286['sourceEpisodeRefs'])));
-        const _0x333b4e = _0x405286['appearances'][0x0];
-        _0x333b4e &&
-          ((_0x333b4e['sourceSceneRefs'] = [..._0x405286['sourceSceneRefs']]),
-          (_0x333b4e['sourceEpisodeRefs'] = [..._0x405286['sourceEpisodeRefs']]),
-          (_0x333b4e['sourceChapterIds'] = [..._0x405286['sourceChapterIds']]),
-          (_0x333b4e['occurrences'] = _0x405286['occurrences']));
+          (sourceSceneRefs7['occurrences'] = buildOccurrences(sourceSceneRefs7['sourceEpisodeRefs'])));
+        const value317 = sourceSceneRefs7['appearances'][0x0];
+        value317 &&
+          ((value317['sourceSceneRefs'] = [...sourceSceneRefs7['sourceSceneRefs']]),
+          (value317['sourceEpisodeRefs'] = [...sourceSceneRefs7['sourceEpisodeRefs']]),
+          (value317['sourceChapterIds'] = [...sourceSceneRefs7['sourceChapterIds']]),
+          (value317['occurrences'] = sourceSceneRefs7['occurrences']));
         return;
       }
-      const _0x57762b =
-          normalizeStorySceneHeadingIdentity(_0x146d4a?.['heading']) || '场景 ' + (_0x3ce56c + 0x1),
-        _0x23d500 = [_0x146d4a['ref']],
-        _0x2bb7db = deriveSourceEpisodeRefs(
-          _0x23d500,
-          new Map(sourceScenes['map']((_0x5b3c96) => [_0x5b3c96['ref'], _0x5b3c96])),
+      const name14 = normalizeStorySceneHeadingIdentity(dom4?.['heading']) || '场景 ' + (value315 + 0x1),
+        sourceSceneRefs8 = [dom4['ref']],
+        sourceEpisodeRefs6 = deriveSourceEpisodeRefs(
+          sourceSceneRefs8,
+          new Map(sourceScenes['map']((value318) => [value318['ref'], value318])),
         ),
-        _0x1f3bf6 = resolveStoryAssetSourceChapterIds({
-          sourceSceneRefs: _0x23d500,
-          sourceEpisodeRefs: _0x2bb7db,
+        sourceChapterIds2 = resolveStoryAssetSourceChapterIds({
+          sourceSceneRefs: sourceSceneRefs8,
+          sourceEpisodeRefs: sourceEpisodeRefs6,
           sourceScenes: sourceScenes,
           chapterIds: chapterIds,
         }),
-        _0x2f46f6 = [
-          normalizeText(_0x146d4a?.['heading']),
-          stripStoryAssetInternalEvidenceMetadata(_0x146d4a?.['body'])['slice'](0x0, 0xb4),
+        description2 = [
+          normalizeText(dom4?.['heading']),
+          stripStoryAssetInternalEvidenceMetadata(dom4?.['body'])['slice'](0x0, 0xb4),
         ]
           ['filter'](Boolean)
           ['join']('；'),
-        _0x29b105 = normalizeReference('', 'scene-coverage-' + (_0x4002a0['length'] + _0x3ce56c + 0x1)),
-        _0x564b9e = ensureStoryAssetVisualStyle(
-          _0x57762b + '，' + (_0x2f46f6 || '依据原文建立的剧情空间') + '，影视场景设定图，默认无人',
+        ref18 = normalizeReference('', 'scene-coverage-' + (list94['length'] + value315 + 0x1)),
+        prompt3 = ensureStoryAssetVisualStyle(
+          name14 + '，' + (description2 || '依据原文建立的剧情空间') + '，影视场景设定图，默认无人',
           visualStyle,
         );
-      _0x4002a0['push']({
-        ref: _0x29b105,
+      list94['push']({
+        ref: ref18,
         kind: 'scene',
-        name: _0x57762b,
+        name: name14,
         role: '剧情场景',
-        description: _0x2f46f6,
+        description: description2,
         voiceDescription: '',
-        occurrences: buildOccurrences(_0x2bb7db),
-        sourceChapterIds: _0x1f3bf6,
-        sourceEpisodeRefs: _0x2bb7db,
-        sourceSceneRefs: _0x23d500,
+        occurrences: buildOccurrences(sourceEpisodeRefs6),
+        sourceChapterIds: sourceChapterIds2,
+        sourceEpisodeRefs: sourceEpisodeRefs6,
+        sourceSceneRefs: sourceSceneRefs8,
         appearances: [
           {
-            ref: _0x29b105 + '-appearance-1',
+            ref: ref18 + '-appearance-1',
             name: '基础形象',
-            description: _0x2f46f6,
-            occurrences: buildOccurrences(_0x2bb7db),
-            sourceChapterIds: _0x1f3bf6,
-            sourceEpisodeRefs: _0x2bb7db,
-            sourceSceneRefs: _0x23d500,
-            prompt: _0x564b9e,
+            description: description2,
+            occurrences: buildOccurrences(sourceEpisodeRefs6),
+            sourceChapterIds: sourceChapterIds2,
+            sourceEpisodeRefs: sourceEpisodeRefs6,
+            sourceSceneRefs: sourceSceneRefs8,
+            prompt: prompt3,
           },
         ],
       });
     }),
-    _0x4002a0
+    list94
   );
 }
 export function parseStoryAssetKindExtractionResult(
-  _0x383a7b,
+  value319,
   {
     kind: kind = 'character',
     sourceScenes: sourceScenes = [],
@@ -2807,147 +2793,146 @@ export function parseStoryAssetKindExtractionResult(
     visualStyle: visualStyle = '',
   } = {},
 ) {
-  const _0xdcd514 = normalizeStoryAssetKind(kind),
-    _0x2fe542 = new Set(sourceScenes['map']((_0x876d89) => _0x876d89['ref'])),
-    _0x412d03 = new Set(sourceScenes['map']((_0xd5be6) => _0xd5be6['episodeRef'])),
-    _0x5b9da9 = getStoryAssetKindRawAssets(_0x383a7b, _0xdcd514),
-    _0xccd242 = _0x5b9da9['map']((_0x12e270, _0x23c712) => {
-      if (!_0x12e270 || typeof _0x12e270 !== 'object' || Array['isArray'](_0x12e270)) return null;
-      const _0x228fd0 = normalizeText(_0x12e270['name']);
-      if (!_0x228fd0) return null;
-      let _0x4ee999 = normalizeStringArray(_0x12e270['sourceSceneRefs'] || _0x12e270['sceneRefs'])['filter'](
-        (_0x1ab431) => _0x2fe542['has'](_0x1ab431),
-      );
-      !_0x4ee999['length'] &&
-        (_0x4ee999 = inferStoryAssetSourceSceneRefs(_0xdcd514, _0x228fd0, sourceScenes));
-      const _0x35fd6e = normalizeStringArray([
+  const kind4 = normalizeStoryAssetKind(kind),
+    map42 = new Set(sourceScenes['map']((value320) => value320['ref'])),
+    map43 = new Set(sourceScenes['map']((value321) => value321['episodeRef'])),
+    list96 = getStoryAssetKindRawAssets(value319, kind4),
+    value322 = list96['map']((description3, value323) => {
+      if (!description3 || typeof description3 !== 'object' || Array['isArray'](description3)) return null;
+      const name15 = normalizeText(description3['name']);
+      if (!name15) return null;
+      let sourceSceneRefs9 = normalizeStringArray(
+        description3['sourceSceneRefs'] || description3['sceneRefs'],
+      )['filter']((value324) => map42['has'](value324));
+      !sourceSceneRefs9['length'] &&
+        (sourceSceneRefs9 = inferStoryAssetSourceSceneRefs(kind4, name15, sourceScenes));
+      const sourceEpisodeRefs7 = normalizeStringArray([
           ...deriveSourceEpisodeRefs(
-            _0x4ee999,
-            new Map(sourceScenes['map']((_0x5b1221) => [_0x5b1221['ref'], _0x5b1221])),
+            sourceSceneRefs9,
+            new Map(sourceScenes['map']((value325) => [value325['ref'], value325])),
           ),
-          ...normalizeStringArray(_0x12e270['sourceEpisodeRefs'] || _0x12e270['sourceChapterIds'])['filter'](
-            (_0xe84f11) => _0x412d03['has'](_0xe84f11),
-          ),
+          ...normalizeStringArray(description3['sourceEpisodeRefs'] || description3['sourceChapterIds'])[
+            'filter'
+          ]((value326) => map43['has'](value326)),
         ]),
-        _0x395817 = resolveStoryAssetSourceChapterIds({
-          sourceSceneRefs: _0x4ee999,
-          sourceEpisodeRefs: _0x35fd6e,
+        sourceChapterIds3 = resolveStoryAssetSourceChapterIds({
+          sourceSceneRefs: sourceSceneRefs9,
+          sourceEpisodeRefs: sourceEpisodeRefs7,
           sourceScenes: sourceScenes,
           chapterIds: chapterIds,
         }),
-        _0x32061d = normalizeReference(_0x12e270['ref'], _0xdcd514 + '-' + (_0x23c712 + 0x1)),
-        _0x1d42a1 = normalizeText(_0x12e270['prompt'] || _0x12e270['description'] || _0x228fd0 + '视觉设定'),
-        _0x3e9894 =
-          _0xdcd514 === 'character' &&
-          Array['isArray'](_0x12e270['appearances']) &&
-          _0x12e270['appearances']['length']
-            ? _0x12e270['appearances']
+        ref19 = normalizeReference(description3['ref'], kind4 + '-' + (value323 + 0x1)),
+        text19 = normalizeText(description3['prompt'] || description3['description'] || name15 + '视觉设定'),
+        list97 =
+          kind4 === 'character' &&
+          Array['isArray'](description3['appearances']) &&
+          description3['appearances']['length']
+            ? description3['appearances']
             : [
                 {
                   name: '基础形象',
-                  description: _0x12e270['description'],
-                  occurrences: _0x12e270['occurrences'],
-                  sourceSceneRefs: _0x4ee999,
-                  prompt: _0x12e270['prompt'] || _0x12e270['appearances']?.[0x0]?.['prompt'],
+                  description: description3['description'],
+                  occurrences: description3['occurrences'],
+                  sourceSceneRefs: sourceSceneRefs9,
+                  prompt: description3['prompt'] || description3['appearances']?.[0x0]?.['prompt'],
                 },
               ],
-        _0x327cd4 = _0x3e9894['map']((_0x523d29, _0x5ef4b0) => {
-          const _0x54827c = normalizeStringArray(_0x523d29?.['sourceSceneRefs'] || _0x523d29?.['sceneRefs'])[
+        appearances6 = list97['map']((error45, count11) => {
+          const list98 = normalizeStringArray(error45?.['sourceSceneRefs'] || error45?.['sceneRefs'])[
               'filter'
-            ]((_0x231d5c) => _0x2fe542['has'](_0x231d5c)),
-            _0x1fdaeb = _0x54827c['length'] ? _0x54827c : _0x4ee999,
-            _0x2ba0ce = deriveSourceEpisodeRefs(
-              _0x1fdaeb,
-              new Map(sourceScenes['map']((_0xda62a3) => [_0xda62a3['ref'], _0xda62a3])),
+            ]((value327) => map42['has'](value327)),
+            sourceSceneRefs10 = list98['length'] ? list98 : sourceSceneRefs9,
+            sourceEpisodeRefs8 = deriveSourceEpisodeRefs(
+              sourceSceneRefs10,
+              new Map(sourceScenes['map']((value328) => [value328['ref'], value328])),
             ),
-            _0x216ba0 = resolveStoryAssetSourceChapterIds({
-              sourceSceneRefs: _0x1fdaeb,
-              sourceEpisodeRefs: _0x2ba0ce,
+            sourceChapterIds4 = resolveStoryAssetSourceChapterIds({
+              sourceSceneRefs: sourceSceneRefs10,
+              sourceEpisodeRefs: sourceEpisodeRefs8,
               sourceScenes: sourceScenes,
               chapterIds: chapterIds,
             });
           return {
-            ref: normalizeReference(_0x523d29?.['ref'], _0x32061d + '-appearance-' + (_0x5ef4b0 + 0x1)),
+            ref: normalizeReference(error45?.['ref'], ref19 + '-appearance-' + (count11 + 0x1)),
             name:
-              normalizeText(_0x523d29?.['name']) ||
-              (_0x5ef4b0 === 0x0 ? '基础形象' : '形象 ' + (_0x5ef4b0 + 0x1)),
-            description: normalizeText(_0x523d29?.['description'] || _0x12e270['description']),
+              normalizeText(error45?.['name']) || (count11 === 0x0 ? '基础形象' : '形象 ' + (count11 + 0x1)),
+            description: normalizeText(error45?.['description'] || description3['description']),
             occurrences:
-              normalizeText(_0x523d29?.['occurrences'] || _0x12e270['occurrences']) ||
-              buildOccurrences(_0x2ba0ce),
-            sourceChapterIds: _0x216ba0,
-            sourceEpisodeRefs: _0x2ba0ce,
-            sourceSceneRefs: _0x1fdaeb,
-            prompt: ensureStoryAssetVisualStyle(_0x523d29?.['prompt'] || _0x1d42a1, visualStyle),
+              normalizeText(error45?.['occurrences'] || description3['occurrences']) ||
+              buildOccurrences(sourceEpisodeRefs8),
+            sourceChapterIds: sourceChapterIds4,
+            sourceEpisodeRefs: sourceEpisodeRefs8,
+            sourceSceneRefs: sourceSceneRefs10,
+            prompt: ensureStoryAssetVisualStyle(error45?.['prompt'] || text19, visualStyle),
           };
         });
       return {
-        ref: _0x32061d,
-        kind: _0xdcd514,
-        name: _0x228fd0,
+        ref: ref19,
+        kind: kind4,
+        name: name15,
         role:
-          _0xdcd514 === 'character'
-            ? resolveStoryCharacterRole(_0x12e270['role'])
-            : normalizeText(_0x12e270['role']) || (_0xdcd514 === 'scene' ? '剧情场景' : '关键道具'),
-        description: normalizeText(_0x12e270['description']),
-        voiceDescription: _0xdcd514 === 'character' ? normalizeText(_0x12e270['voiceDescription']) : '',
-        occurrences: normalizeText(_0x12e270['occurrences']) || buildOccurrences(_0x35fd6e),
-        sourceChapterIds: _0x395817,
-        sourceEpisodeRefs: _0x35fd6e,
-        sourceSceneRefs: _0x4ee999,
-        appearances: _0x327cd4,
+          kind4 === 'character'
+            ? resolveStoryCharacterRole(description3['role'])
+            : normalizeText(description3['role']) || (kind4 === 'scene' ? '剧情场景' : '关键道具'),
+        description: normalizeText(description3['description']),
+        voiceDescription: kind4 === 'character' ? normalizeText(description3['voiceDescription']) : '',
+        occurrences: normalizeText(description3['occurrences']) || buildOccurrences(sourceEpisodeRefs7),
+        sourceChapterIds: sourceChapterIds3,
+        sourceEpisodeRefs: sourceEpisodeRefs7,
+        sourceSceneRefs: sourceSceneRefs9,
+        appearances: appearances6,
       };
     })['filter'](Boolean),
-    _0x563038 = mergeStoryAssetKindResultAssets(_0xccd242),
-    _0x14316a =
-      _0xdcd514 === 'scene'
-        ? normalizeStorySceneAssetsForCoverage(_0x563038, {
+    storyAssetKindResultAssets = mergeStoryAssetKindResultAssets(value322),
+    assets10 =
+      kind4 === 'scene'
+        ? normalizeStorySceneAssetsForCoverage(storyAssetKindResultAssets, {
             sourceScenes: sourceScenes,
             chapterIds: chapterIds,
             visualStyle: visualStyle,
           })
-        : _0x563038,
-    _0x441bf4 = new Set(),
-    _0x5ab176 = new Set();
+        : storyAssetKindResultAssets,
+    value329 = new Set(),
+    value330 = new Set();
   return (
-    _0x14316a['forEach']((_0x5d1c11, _0x424e23) => {
-      ((_0x5d1c11['ref'] = createUniqueStoryAssetInventoryRef(
-        _0x5d1c11['ref'],
-        _0x441bf4,
-        _0xdcd514 + '-' + (_0x424e23 + 0x1),
+    assets10['forEach']((value331, value332) => {
+      ((value331['ref'] = createUniqueStoryAssetInventoryRef(
+        value331['ref'],
+        value329,
+        kind4 + '-' + (value332 + 0x1),
       )),
-        (_0x5d1c11['appearances'] = _0x5d1c11['appearances']['map']((_0xc262a1, _0xda782c) => ({
-          ..._0xc262a1,
+        (value331['appearances'] = value331['appearances']['map']((args40, value333) => ({
+          ...args40,
           ref: createUniqueStoryAssetAppearanceRef(
-            _0xc262a1['ref'],
-            _0x5ab176,
-            _0x5d1c11['ref'] + '-appearance-' + (_0xda782c + 0x1),
+            args40['ref'],
+            value330,
+            value331['ref'] + '-appearance-' + (value333 + 0x1),
           ),
         }))));
     }),
-    { schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION, kind: _0xdcd514, assets: _0x14316a }
+    { schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION, kind: kind4, assets: assets10 }
   );
 }
-function cloneStoryAssetExtractionValue(_0x16aa06) {
-  if (!_0x16aa06 || typeof _0x16aa06 !== 'object') return null;
+function cloneStoryAssetExtractionValue(enabled15) {
+  if (!enabled15 || typeof enabled15 !== 'object') return null;
   try {
-    return JSON['parse'](JSON['stringify'](_0x16aa06));
+    return JSON['parse'](JSON['stringify'](enabled15));
   } catch {
     return null;
   }
 }
-function hashStoryAssetExtractionValue(_0x3adcf7) {
-  const _0x2454bd = JSON['stringify'](_0x3adcf7);
-  let _0x4ec515 = 0x811c9dc5;
-  for (let _0x31c882 = 0x0; _0x31c882 < _0x2454bd['length']; _0x31c882 += 0x1) {
-    ((_0x4ec515 ^= _0x2454bd['charCodeAt'](_0x31c882)), (_0x4ec515 = Math['imul'](_0x4ec515, 0x1000193)));
+function hashStoryAssetExtractionValue(value334) {
+  const list99 = JSON['stringify'](value334);
+  let value335 = 0x811c9dc5;
+  for (let value336 = 0x0; value336 < list99['length']; value336 += 0x1) {
+    ((value335 ^= list99['charCodeAt'](value336)), (value335 = Math['imul'](value335, 0x1000193)));
   }
   return (
     STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION +
     '-' +
-    (_0x4ec515 >>> 0x0)['toString'](0x10)['padStart'](0x8, '0') +
+    (value335 >>> 0x0)['toString'](0x10)['padStart'](0x8, '0') +
     '-' +
-    _0x2454bd['length']
+    list99['length']
   );
 }
 function createStoryAssetExtractionFingerprint({
@@ -2994,352 +2979,352 @@ function createStoryAssetExtractionContentFingerprint({
     extractionKinds: STORY_ASSET_EXPERIMENTAL_KINDS,
   });
 }
-async function saveStoryAssetExtractionCheckpoint(_0x35ff60, _0x4f2184) {
-  const _0x93e3eb = { ..._0x35ff60, updatedAt: Date['now']() };
+async function saveStoryAssetExtractionCheckpoint(args41, handler7) {
+  const value337 = { ...args41, updatedAt: Date['now']() };
   return (
-    typeof _0x4f2184 === 'function' && (await _0x4f2184(cloneStoryAssetExtractionValue(_0x93e3eb))),
-    _0x93e3eb
+    typeof handler7 === 'function' && (await handler7(cloneStoryAssetExtractionValue(value337))),
+    value337
   );
 }
-function classifyStoryAssetKindError(_0x3d5a05) {
-  const _0x190de5 = normalizeText(_0x3d5a05?.['message'] || _0x3d5a05),
-    _0x15dd63 = normalizeText(_0x3d5a05?.['type'] || _0x3d5a05?.['code'])['toUpperCase']();
+function classifyStoryAssetKindError(error46) {
+  const message2 = normalizeText(error46?.['message'] || error46),
+    text20 = normalizeText(error46?.['type'] || error46?.['code'])['toUpperCase']();
   if (
-    _0x15dd63 === 'AUTH_ERROR' ||
-    Number(_0x3d5a05?.['status']) === 0x191 ||
-    /API\s*Key.*(?:无效|过期|未配置|错误)|认证失败|unauthori[sz]ed|invalid\s+api\s+key/iu['test'](_0x190de5)
+    text20 === 'AUTH_ERROR' ||
+    Number(error46?.['status']) === 0x191 ||
+    /API\s*Key.*(?:无效|过期|未配置|错误)|认证失败|unauthori[sz]ed|invalid\s+api\s+key/iu['test'](message2)
   )
-    return { type: 'auth', message: _0x190de5 };
+    return { type: 'auth', message: message2 };
   if (
-    _0x15dd63 === 'RATE_LIMIT' ||
-    Number(_0x3d5a05?.['status'] || _0x3d5a05?.['statusCode']) === 0x1ad ||
-    /rate\s*limit|too\s*many\s*requests|限流|请求过于频繁/iu['test'](_0x190de5)
+    text20 === 'RATE_LIMIT' ||
+    Number(error46?.['status'] || error46?.['statusCode']) === 0x1ad ||
+    /rate\s*limit|too\s*many\s*requests|限流|请求过于频繁/iu['test'](message2)
   )
-    return { type: 'rate-limit', message: _0x190de5 };
-  if (_0x15dd63 === 'TIMEOUT' || /超时|timeout|timed\s*out/iu['test'](_0x190de5))
-    return { type: 'timeout', message: _0x190de5 };
+    return { type: 'rate-limit', message: message2 };
+  if (text20 === 'TIMEOUT' || /超时|timeout|timed\s*out/iu['test'](message2))
+    return { type: 'timeout', message: message2 };
   if (
-    _0x15dd63 === 'DNS_ERROR' ||
-    _0x15dd63 === 'ENOTFOUND' ||
-    _0x15dd63 === 'EAI_AGAIN' ||
-    /dns|name\s+resolution|getaddrinfo|域名解析/iu['test'](_0x190de5)
+    text20 === 'DNS_ERROR' ||
+    text20 === 'ENOTFOUND' ||
+    text20 === 'EAI_AGAIN' ||
+    /dns|name\s+resolution|getaddrinfo|域名解析/iu['test'](message2)
   )
-    return { type: 'dns-error', message: _0x190de5 };
+    return { type: 'dns-error', message: message2 };
   if (
-    _0x15dd63 === 'NETWORK_ERROR' ||
+    text20 === 'NETWORK_ERROR' ||
     /fetch\s+failed|failed\s+to\s+fetch|network\s+(?:error|failure)|网络(?:错误|异常|失败)/iu['test'](
-      _0x190de5,
+      message2,
     )
   )
-    return { type: 'network-error', message: _0x190de5 };
+    return { type: 'network-error', message: message2 };
   if (
     ['ECONNRESET', 'ECONNABORTED', 'UND_ERR_SOCKET']['includes'](
-      normalizeText(_0x3d5a05?.['code'])['toUpperCase'](),
+      normalizeText(error46?.['code'])['toUpperCase'](),
     ) ||
-    /connection\s*(?:reset|closed|aborted)|socket\s*hang\s*up|连接(?:被)?重置|连接中断/iu['test'](_0x190de5)
+    /connection\s*(?:reset|closed|aborted)|socket\s*hang\s*up|连接(?:被)?重置|连接中断/iu['test'](message2)
   )
-    return { type: 'connection-reset', message: _0x190de5 };
+    return { type: 'connection-reset', message: message2 };
   if (
-    _0x15dd63 === 'OUTPUT_LENGTH' ||
+    text20 === 'OUTPUT_LENGTH' ||
     /max(?:imum)?\s*(?:output\s*)?tokens|finish[_\s-]*reason.{0,12}length|输出.{0,8}(?:截断|过长)|内容过长/iu[
       'test'
-    ](_0x190de5)
+    ](message2)
   )
-    return { type: 'length', message: _0x190de5 };
-  if (_0x15dd63 === 'CALL_LIMIT') return { type: 'call-limit', message: _0x190de5 };
+    return { type: 'length', message: message2 };
+  if (text20 === 'CALL_LIMIT') return { type: 'call-limit', message: message2 };
   if (
-    _0x15dd63 === 'VALIDATION' ||
-    _0x3d5a05?.['validationDetails'] ||
-    /Agent 返回的.+(?:声音设定|图片提示词).*(?:缺少|不能为空)|形象数量与轻量清单不一致/iu['test'](_0x190de5)
+    text20 === 'VALIDATION' ||
+    error46?.['validationDetails'] ||
+    /Agent 返回的.+(?:声音设定|图片提示词).*(?:缺少|不能为空)|形象数量与轻量清单不一致/iu['test'](message2)
   )
-    return { type: 'validation', message: _0x190de5 };
-  if (/资产细化结果必须与当前批次资产数量完全一致|缺少\s*\d+\s*个资产结果/u['test'](_0x190de5))
-    return { type: 'incomplete-output', message: _0x190de5 };
-  if (/有效的\s*JSON|JSON|缺少\s*assets\s*数组|返回格式/iu['test'](_0x190de5))
-    return { type: 'invalid-json', message: _0x190de5 };
-  return { type: 'request', message: _0x190de5 };
+    return { type: 'validation', message: message2 };
+  if (/资产细化结果必须与当前批次资产数量完全一致|缺少\s*\d+\s*个资产结果/u['test'](message2))
+    return { type: 'incomplete-output', message: message2 };
+  if (/有效的\s*JSON|JSON|缺少\s*assets\s*数组|返回格式/iu['test'](message2))
+    return { type: 'invalid-json', message: message2 };
+  return { type: 'request', message: message2 };
 }
-function isStoryAssetConfirmedUnchargedRejection(_0x41c604) {
-  const _0xa7d645 = Number(_0x41c604?.['status'] ?? _0x41c604?.['statusCode']);
-  return [0x190, 0x191, 0x193, 0x194, 0x199, 0x1a6, 0x1ad]['includes'](_0xa7d645);
+function isStoryAssetConfirmedUnchargedRejection(response6) {
+  const value338 = Number(response6?.['status'] ?? response6?.['statusCode']);
+  return [0x190, 0x191, 0x193, 0x194, 0x199, 0x1a6, 0x1ad]['includes'](value338);
 }
-function getStoryAssetKindErrorLabel(_0x698dbd = '', _0x1dae91 = '') {
-  if (
-    _0x698dbd === 'auth' ||
-    classifyStoryAssetKindError({ type: _0x698dbd, message: _0x1dae91 })['type'] === 'auth'
-  )
+function getStoryAssetKindErrorLabel(type4 = '', message3 = '') {
+  if (type4 === 'auth' || classifyStoryAssetKindError({ type: type4, message: message3 })['type'] === 'auth')
     return 'API\x20Key\x20无效或已过期';
-  if (_0x698dbd === 'timeout') return '请求超时';
-  if (_0x698dbd === 'rate-limit') return '请求限流';
-  if (_0x698dbd === 'length') return '输出被截断';
-  if (_0x698dbd === 'call-limit') return '达到自动调用上限';
-  if (_0x698dbd === 'validation') return '结果校验失败';
-  if (_0x698dbd === 'incomplete-output') return '输出缺少部分资产';
-  if (_0x698dbd === 'invalid-json') return '返回格式不合格';
+  if (type4 === 'timeout') return '请求超时';
+  if (type4 === 'rate-limit') return '请求限流';
+  if (type4 === 'length') return '输出被截断';
+  if (type4 === 'call-limit') return '达到自动调用上限';
+  if (type4 === 'validation') return '结果校验失败';
+  if (type4 === 'incomplete-output') return '输出缺少部分资产';
+  if (type4 === 'invalid-json') return '返回格式不合格';
   return '请求失败';
 }
-function getStoryAssetResponseFinishReason(_0x38a326) {
+function getStoryAssetResponseFinishReason(value339) {
   return normalizeText(
-    _0x38a326?.['finishReason'] ||
-      _0x38a326?.['finish_reason'] ||
-      _0x38a326?.['choices']?.[0x0]?.['finish_reason'] ||
-      _0x38a326?.['data']?.['choices']?.[0x0]?.['finish_reason'],
+    value339?.['finishReason'] ||
+      value339?.['finish_reason'] ||
+      value339?.['choices']?.[0x0]?.['finish_reason'] ||
+      value339?.['data']?.['choices']?.[0x0]?.['finish_reason'],
   );
 }
-function isStoryAssetResponseTruncated(_0x787fec) {
-  const _0x1322ec =
-    typeof _0x787fec === 'string'
-      ? normalizeText(_0x787fec)['toLowerCase']()
-      : getStoryAssetResponseFinishReason(_0x787fec)['toLowerCase']();
-  return ['length', 'max_tokens', 'max_output_tokens']['includes'](_0x1322ec);
+function isStoryAssetResponseTruncated(value340) {
+  const value341 =
+    typeof value340 === 'string'
+      ? normalizeText(value340)['toLowerCase']()
+      : getStoryAssetResponseFinishReason(value340)['toLowerCase']();
+  return ['length', 'max_tokens', 'max_output_tokens']['includes'](value341);
 }
-function createStoryAssetPipelineError(_0x1d1e00 = []) {
-  const _0x34db03 = _0x1d1e00['slice'](0x0, 0x5)
-      ['map']((_0x5b9dda) => {
-        const _0x3efe3d =
-            _0x5b9dda['stage'] === 'kind'
-              ? STORY_ASSET_KIND_LABELS[_0x5b9dda['kind']] || '资产'
-              : _0x5b9dda['stage'] === 'repair'
+function createStoryAssetPipelineError(list100 = []) {
+  const value342 = list100['slice'](0x0, 0x5)
+      ['map']((value343) => {
+        const value344 =
+            value343['stage'] === 'kind'
+              ? STORY_ASSET_KIND_LABELS[value343['kind']] || '资产'
+              : value343['stage'] === 'repair'
                 ? '归并校验'
-                : _0x5b9dda['stage'] === 'detail'
+                : value343['stage'] === 'detail'
                   ? '提示词细化'
                   : '清单',
-          _0x18411e = normalizeText(_0x5b9dda['batchLabel'] || _0x5b9dda['batchId']);
+          text21 = normalizeText(value343['batchLabel'] || value343['batchId']);
         return (
           '' +
-          _0x3efe3d +
-          (_0x18411e ? '\x20' + _0x18411e : '') +
+          value344 +
+          (text21 ? '\x20' + text21 : '') +
           '（' +
-          getStoryAssetKindErrorLabel(_0x5b9dda['errorType'], _0x5b9dda['errorMessage']) +
+          getStoryAssetKindErrorLabel(value343['errorType'], value343['errorMessage']) +
           '）'
         );
       })
       ['join']('、'),
-    _0x283e76 = new Error(
-      '资产提取未完成：' + (_0x34db03 || '存在未完成工作项') + '。已完成结果已保存，再次点击只处理未完成项。',
+    error47 = new Error(
+      '资产提取未完成：' + (value342 || '存在未完成工作项') + '。已完成结果已保存，再次点击只处理未完成项。',
     );
-  return ((_0x283e76['assetExtractionFailures'] = _0x1d1e00), _0x283e76);
+  return ((error47['assetExtractionFailures'] = list100), error47);
 }
-function createStoryAssetPipelineContinuation(_0x44df1, _0x42377a, _0x5a8bb1 = {}) {
-  const _0x13bc7e = new Error(_0x42377a);
+function createStoryAssetPipelineContinuation(value345, value346, value347 = {}) {
+  const error48 = new Error(value346);
   return (
-    (_0x13bc7e['type'] = 'ASSET_EXTRACTION_CONTINUE_REQUIRED'),
-    (_0x13bc7e['isContinuation'] = !![]),
-    (_0x13bc7e['remaining'] = cloneStoryAssetExtractionValue(_0x5a8bb1)),
-    (_0x13bc7e['assetExtractionDraft'] = cloneStoryAssetExtractionValue(_0x44df1)),
-    _0x13bc7e
+    (error48['type'] = 'ASSET_EXTRACTION_CONTINUE_REQUIRED'),
+    (error48['isContinuation'] = !![]),
+    (error48['remaining'] = cloneStoryAssetExtractionValue(value347)),
+    (error48['assetExtractionDraft'] = cloneStoryAssetExtractionValue(value345)),
+    error48
   );
 }
-function createStoryAssetBatchContractKey(_0xae815, _0x4a51db = []) {
-  const _0x19d984 = JSON['stringify']({
-    stage: normalizeText(_0xae815),
-    identities: normalizeStringArray(_0x4a51db),
+function createStoryAssetBatchContractKey(value348, value349 = []) {
+  const list101 = JSON['stringify']({
+    stage: normalizeText(value348),
+    identities: normalizeStringArray(value349),
   });
-  let _0x3122de = 0x811c9dc5;
-  for (let _0x59b83c = 0x0; _0x59b83c < _0x19d984['length']; _0x59b83c += 0x1) {
-    ((_0x3122de ^= _0x19d984['charCodeAt'](_0x59b83c)), (_0x3122de = Math['imul'](_0x3122de, 0x1000193)));
+  let value350 = 0x811c9dc5;
+  for (let value351 = 0x0; value351 < list101['length']; value351 += 0x1) {
+    ((value350 ^= list101['charCodeAt'](value351)), (value350 = Math['imul'](value350, 0x1000193)));
   }
   return (
-    (normalizeText(_0xae815) || 'batch') + '-' + (_0x3122de >>> 0x0)['toString'](0x10)['padStart'](0x8, '0')
+    (normalizeText(value348) || 'batch') + '-' + (value350 >>> 0x0)['toString'](0x10)['padStart'](0x8, '0')
   );
 }
 function createStoryAssetPipelineKindStates(
-  _0x3ce71d = [],
-  _0x4191df = [],
-  _0x18733b = [],
+  list102 = [],
+  list103 = [],
+  list104 = [],
   { inventoryRunning: inventoryRunning = ![] } = {},
 ) {
-  const _0x28f8d3 = new Set(_0x4191df['map']((_0x12d84b) => _0x12d84b['ref']));
+  const map44 = new Set(list103['map']((value352) => value352['ref']));
   return Object['fromEntries'](
-    STORY_ASSET_EXPERIMENTAL_KINDS['map']((_0xfe939c) => {
-      const _0x185276 = _0x3ce71d['filter']((_0x28a1e2) => _0x28a1e2['kind'] === _0xfe939c),
-        _0x5220aa = _0x185276['filter']((_0x29e975) => _0x28f8d3['has'](_0x29e975['ref']))['length'],
-        _0xecce26 = _0x18733b['filter']((_0x43263b) => !_0x43263b['kind'] || _0x43263b['kind'] === _0xfe939c);
-      let _0x383310 = 'pending';
-      if (inventoryRunning) _0x383310 = 'running';
+    STORY_ASSET_EXPERIMENTAL_KINDS['map']((kind5) => {
+      const totalAssetCount = list102['filter']((value353) => value353['kind'] === kind5),
+        assetCount = totalAssetCount['filter']((value354) => map44['has'](value354['ref']))['length'],
+        list105 = list104['filter']((enabled16) => !enabled16['kind'] || enabled16['kind'] === kind5);
+      let status2 = 'pending';
+      if (inventoryRunning) status2 = 'running';
       else {
-        if (_0x185276['length'] && _0x5220aa === _0x185276['length']) _0x383310 = 'succeeded';
+        if (totalAssetCount['length'] && assetCount === totalAssetCount['length']) status2 = 'succeeded';
         else {
-          if (_0xecce26['length']) _0x383310 = 'failed';
+          if (list105['length']) status2 = 'failed';
           else {
-            if (_0x5220aa || _0x185276['length']) _0x383310 = 'running';
+            if (assetCount || totalAssetCount['length']) status2 = 'running';
           }
         }
       }
-      const _0x30ad44 = _0xecce26[0x0];
+      const errorType = list105[0x0];
       return [
-        _0xfe939c,
+        kind5,
         {
-          kind: _0xfe939c,
-          status: _0x383310,
+          kind: kind5,
+          status: status2,
           attempt: 0x0,
-          assetCount: _0x5220aa,
-          totalAssetCount: _0x185276['length'],
-          errorType: _0x30ad44?.['errorType'] || '',
-          errorMessage: _0x30ad44?.['errorMessage'] || '',
+          assetCount: assetCount,
+          totalAssetCount: totalAssetCount['length'],
+          errorType: errorType?.['errorType'] || '',
+          errorMessage: errorType?.['errorMessage'] || '',
           startedAt: 0x0,
-          finishedAt: _0x383310 === 'succeeded' || _0x383310 === 'failed' ? Date['now']() : 0x0,
+          finishedAt: status2 === 'succeeded' || status2 === 'failed' ? Date['now']() : 0x0,
         },
       ];
     }),
   );
 }
 function restoreStoryAssetPipelineDraft(
-  _0x12cc7d,
+  value355,
   {
     sourceFingerprint: sourceFingerprint = '',
     sourceContentFingerprint: sourceContentFingerprint = '',
     extractionStrategy: extractionStrategy = STORY_ASSET_EXTRACTION_DRAFT_STRATEGY,
   } = {},
 ) {
-  const _0x3613f9 = cloneStoryAssetExtractionValue(_0x12cc7d);
+  const cloneStoryAssetExtractionValue2 = cloneStoryAssetExtractionValue(value355);
   if (
-    !_0x3613f9 ||
-    _0x3613f9['strategy'] !== extractionStrategy ||
-    _0x3613f9['schemaVersion'] !== STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION
+    !cloneStoryAssetExtractionValue2 ||
+    cloneStoryAssetExtractionValue2['strategy'] !== extractionStrategy ||
+    cloneStoryAssetExtractionValue2['schemaVersion'] !== STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION
   )
     return null;
-  const _0x31e773 = normalizeText(_0x3613f9['sourceFingerprint']) === sourceFingerprint,
-    _0x2ef344 = Boolean(
-      normalizeText(_0x3613f9['sourceContentFingerprint']) &&
-      normalizeText(_0x3613f9['sourceContentFingerprint']) === sourceContentFingerprint,
+  const text22 = normalizeText(cloneStoryAssetExtractionValue2['sourceFingerprint']) === sourceFingerprint,
+    value356 = Boolean(
+      normalizeText(cloneStoryAssetExtractionValue2['sourceContentFingerprint']) &&
+      normalizeText(cloneStoryAssetExtractionValue2['sourceContentFingerprint']) === sourceContentFingerprint,
     );
-  return _0x31e773 || _0x2ef344 ? _0x3613f9 : null;
+  return text22 || value356 ? cloneStoryAssetExtractionValue2 : null;
 }
-function splitStoryAssetWorkItems(_0x92ccac = []) {
-  const _0x70df71 = Math['max'](0x1, Math['ceil'](_0x92ccac['length'] / 0x2));
-  return [_0x92ccac['slice'](0x0, _0x70df71), _0x92ccac['slice'](_0x70df71)]['filter'](
-    (_0x51c8bf) => _0x51c8bf['length'],
+function splitStoryAssetWorkItems(list106 = []) {
+  const value357 = Math['max'](0x1, Math['ceil'](list106['length'] / 0x2));
+  return [list106['slice'](0x0, value357), list106['slice'](value357)]['filter'](
+    (list107) => list107['length'],
   );
 }
-function updateStoryAssetOutputEstimates(_0x601ff = {}, _0x29a1d5 = []) {
-  const _0x3b20b3 = { ..._0x601ff };
+function updateStoryAssetOutputEstimates(args42 = {}, list108 = []) {
+  const value358 = { ...args42 };
   return (
-    STORY_ASSET_EXPERIMENTAL_KINDS['forEach']((_0x4fe0e2) => {
-      const _0x44aee5 = _0x29a1d5['filter']((_0x14678b) => _0x14678b['kind'] === _0x4fe0e2);
-      if (!_0x44aee5['length']) return;
-      const _0x5ce23b = Math['ceil'](
-          _0x44aee5['reduce'](
-            (_0x19980b, _0xfbb9c) => _0x19980b + JSON['stringify'](_0xfbb9c)['length'],
-            0x0,
-          ) / _0x44aee5['length'],
+    STORY_ASSET_EXPERIMENTAL_KINDS['forEach']((value359) => {
+      const list109 = list108['filter']((value360) => value360['kind'] === value359);
+      if (!list109['length']) return;
+      const value361 = Math['ceil'](
+          list109['reduce']((value362, value363) => value362 + JSON['stringify'](value363)['length'], 0x0) /
+            list109['length'],
         ),
-        _0x23f310 = Math['max'](
+        value364 = Math['max'](
           0x258,
-          Number(_0x3b20b3[_0x4fe0e2]) || (_0x4fe0e2 === 'character' ? 0x898 : 0x4b0),
+          Number(value358[value359]) || (value359 === 'character' ? 0x898 : 0x4b0),
         );
-      _0x3b20b3[_0x4fe0e2] = Math['max'](0x258, Math['ceil'](_0x23f310 * 0.65 + _0x5ce23b * 0.35));
+      value358[value359] = Math['max'](0x258, Math['ceil'](value364 * 0.65 + value361 * 0.35));
     }),
-    _0x3b20b3
+    value358
   );
 }
-function reportStoryAssetDiagnostics(_0x337633, _0x188ee8, _0x1a9e45 = {}) {
+function reportStoryAssetDiagnostics(value365, value366, level = {}) {
   try {
-    const _0x429e28 =
-      typeof _0x337633?.['info'] === 'function'
-        ? _0x337633['info'](_0x188ee8, _0x1a9e45)
-        : _0x337633?.['logEvent']?.({
+    const promise =
+      typeof value365?.['info'] === 'function'
+        ? value365['info'](value366, level)
+        : value365?.['logEvent']?.({
             type:
               'story_asset.' +
-              normalizeText(_0x188ee8)
+              normalizeText(value366)
                 ['replace'](/^story-asset-?/iu, '')
                 ['replace'](/[^a-z0-9]+/giu, '_'),
-            level: _0x1a9e45?.['status'] === 'failed' ? 'error' : 'info',
+            level: level?.['status'] === 'failed' ? 'error' : 'info',
             source: 'renderer',
-            message: normalizeText(_0x188ee8) || 'Story asset extraction event',
-            context: _0x1a9e45,
+            message: normalizeText(value366) || 'Story asset extraction event',
+            context: level,
           });
-    _0x429e28 &&
-      typeof _0x429e28['then'] === 'function' &&
-      void Promise['resolve'](_0x429e28)['catch'](() => undefined);
+    promise &&
+      typeof promise['then'] === 'function' &&
+      void Promise['resolve'](promise)['catch'](() => undefined);
   } catch {}
 }
-function buildStoryAssetBaselinePrompt(_0x1413a5 = {}, _0xcbcfab = {}, _0x15e28a = '') {
-  const _0xa9a038 = normalizeText(_0x1413a5['kind']),
-    _0x4f2830 = normalizeStringArray(
+function buildStoryAssetBaselinePrompt(error49 = {}, error50 = {}, value367 = '') {
+  const text23 = normalizeText(error49['kind']),
+    stringArray2 = normalizeStringArray(
       [
-        _0x1413a5['name'],
-        _0x1413a5['scriptFacts'] || _0x1413a5['description'],
-        _0x1413a5['visualDesign'],
-        _0xcbcfab['name'] && _0xcbcfab['name'] !== '基础形象' ? _0xcbcfab['name'] : '',
-        _0xcbcfab['scriptFacts'] || _0xcbcfab['description'],
-        _0xcbcfab['visualDesign'],
+        error49['name'],
+        error49['scriptFacts'] || error49['description'],
+        error49['visualDesign'],
+        error50['name'] && error50['name'] !== '基础形象' ? error50['name'] : '',
+        error50['scriptFacts'] || error50['description'],
+        error50['visualDesign'],
       ]['map'](sanitizeStoryAssetPublicPromptText),
     )['join']('，'),
-    _0xbf0282 =
-      _0xa9a038 === 'character'
+    value368 =
+      text23 === 'character'
         ? '正面全身独立人物设定图，中性站姿，无剧情动作、无手持或背负道具，完整展示服装、发型、五官与体态'
-        : _0xa9a038 === 'scene'
+        : text23 === 'scene'
           ? '环境概念设定图，默认无人，完整展示空间布局、时间状态、光线与关键环境结构'
           : '单体道具设定图，默认无人手持，完整展示轮廓、材质、结构与剧情要求的状态';
-  return ensureStoryAssetVisualStyle([_0x4f2830, _0xbf0282]['filter'](Boolean)['join']('，'), _0x15e28a);
+  return ensureStoryAssetVisualStyle([stringArray2, value368]['filter'](Boolean)['join']('，'), value367);
 }
-function createStoryAssetBaselineVisualDesign(_0x3f5475 = {}) {
-  const _0x2f2f6a = normalizeText(_0x3f5475?.['name']) || '该资产',
-    _0x5712cc = normalizeText(_0x3f5475?.['kind']);
-  if (_0x5712cc === 'character')
+function createStoryAssetBaselineVisualDesign(error51 = {}) {
+  const text24 = normalizeText(error51?.['name']) || '该资产',
+    text25 = normalizeText(error51?.['kind']);
+  if (text25 === 'character')
     return (
-      _0x2f2f6a +
+      text24 +
       '的外观符合' +
-      (normalizeText(_0x3f5475?.['role']) || '剧情角色') +
+      (normalizeText(error51?.['role']) || '剧情角色') +
       '身份与项目时代背景，形成稳定、可复用的人物设定'
     );
-  if (_0x5712cc === 'scene')
-    return _0x2f2f6a + '的空间布局、结构材质、时间光线与剧本场景标题及项目世界观保持一致';
-  return _0x2f2f6a + '的轮廓、材质、尺寸与关键结构符合剧本用途，形成清晰可辨的单体道具设定';
+  if (text25 === 'scene') return text24 + '的空间布局、结构材质、时间光线与剧本场景标题及项目世界观保持一致';
+  return text24 + '的轮廓、材质、尺寸与关键结构符合剧本用途，形成清晰可辨的单体道具设定';
 }
-function sanitizeStoryAssetPublicAsset(_0x488bb6 = {}, { visualStyle: visualStyle = '' } = {}) {
-  const _0x3d290a = normalizeText(_0x488bb6?.['designStatus']) === 'baseline',
-    _0xb600b8 = stripStoryAssetInternalEvidenceMetadata(
-      _0x488bb6?.['scriptFacts'] || _0x488bb6?.['description'],
+function sanitizeStoryAssetPublicAsset(description4 = {}, { visualStyle: visualStyle = '' } = {}) {
+  const text26 = normalizeText(description4?.['designStatus']) === 'baseline',
+    scriptFacts = stripStoryAssetInternalEvidenceMetadata(
+      description4?.['scriptFacts'] || description4?.['description'],
     ),
-    _0x2b0399 =
-      stripStoryAssetInternalEvidenceMetadata(_0x488bb6?.['visualDesign']) ||
-      (_0x3d290a ? createStoryAssetBaselineVisualDesign(_0x488bb6) : ''),
-    _0x534cbe = formatStoryAssetFactAndDesignDescription({
-      scriptFacts: _0xb600b8,
-      visualDesign: _0x2b0399,
-      description: _0x488bb6?.['description'],
+    visualDesign =
+      stripStoryAssetInternalEvidenceMetadata(description4?.['visualDesign']) ||
+      (text26 ? createStoryAssetBaselineVisualDesign(description4) : ''),
+    description5 = formatStoryAssetFactAndDesignDescription({
+      scriptFacts: scriptFacts,
+      visualDesign: visualDesign,
+      description: description4?.['description'],
     }),
-    _0x49680e = (Array['isArray'](_0x488bb6?.['appearances']) ? _0x488bb6['appearances'] : [])['map'](
-      (_0x4d9a86) => {
-        const _0x1d502e = _0x3d290a || normalizeText(_0x4d9a86?.['designStatus']) === 'baseline',
-          _0x4fbf0a = stripStoryAssetInternalEvidenceMetadata(
-            _0x4d9a86?.['scriptFacts'] || _0x4d9a86?.['description'] || _0xb600b8,
-          ),
-          _0x209153 =
-            stripStoryAssetInternalEvidenceMetadata(_0x4d9a86?.['visualDesign']) ||
-            (_0x1d502e ? _0x2b0399 : ''),
-          _0x46d91f = formatStoryAssetFactAndDesignDescription({
-            scriptFacts: _0x4fbf0a,
-            visualDesign: _0x209153,
-            description: _0x4d9a86?.['description'],
-          }),
-          _0x55e1fe = {
-            ..._0x4d9a86,
-            description: _0x46d91f,
-            scriptFacts: _0x4fbf0a,
-            visualDesign: _0x209153,
-          };
-        return {
-          ..._0x55e1fe,
-          prompt: _0x1d502e
-            ? buildStoryAssetBaselinePrompt(
-                { ..._0x488bb6, description: _0x534cbe, scriptFacts: _0xb600b8, visualDesign: _0x2b0399 },
-                _0x55e1fe,
-                visualStyle,
-              )
-            : ensureStoryAssetVisualStyle(_0x4d9a86?.['prompt'], visualStyle),
+    appearances7 = (Array['isArray'](description4?.['appearances']) ? description4['appearances'] : [])[
+      'map'
+    ]((description6) => {
+      const prompt4 = text26 || normalizeText(description6?.['designStatus']) === 'baseline',
+        scriptFacts2 = stripStoryAssetInternalEvidenceMetadata(
+          description6?.['scriptFacts'] || description6?.['description'] || scriptFacts,
+        ),
+        visualDesign2 =
+          stripStoryAssetInternalEvidenceMetadata(description6?.['visualDesign']) ||
+          (prompt4 ? visualDesign : ''),
+        description7 = formatStoryAssetFactAndDesignDescription({
+          scriptFacts: scriptFacts2,
+          visualDesign: visualDesign2,
+          description: description6?.['description'],
+        }),
+        args43 = {
+          ...description6,
+          description: description7,
+          scriptFacts: scriptFacts2,
+          visualDesign: visualDesign2,
         };
-      },
-    );
+      return {
+        ...args43,
+        prompt: prompt4
+          ? buildStoryAssetBaselinePrompt(
+              {
+                ...description4,
+                description: description5,
+                scriptFacts: scriptFacts,
+                visualDesign: visualDesign,
+              },
+              args43,
+              visualStyle,
+            )
+          : ensureStoryAssetVisualStyle(description6?.['prompt'], visualStyle),
+      };
+    });
   return {
-    ..._0x488bb6,
-    description: _0x534cbe,
-    scriptFacts: _0xb600b8,
-    visualDesign: _0x2b0399,
-    appearances: _0x49680e,
-    prompt: _0x49680e[0x0]?.['prompt'] || ensureStoryAssetVisualStyle(_0x488bb6?.['prompt'], visualStyle),
+    ...description4,
+    description: description5,
+    scriptFacts: scriptFacts,
+    visualDesign: visualDesign,
+    appearances: appearances7,
+    prompt:
+      appearances7[0x0]?.['prompt'] || ensureStoryAssetVisualStyle(description4?.['prompt'], visualStyle),
   };
 }
 export function finalizeStoryAssetInventoryAssets({
@@ -3348,39 +3333,39 @@ export function finalizeStoryAssetInventoryAssets({
   chapterIds: chapterIds = [],
   visualStyle: visualStyle = '',
 } = {}) {
-  return (Array['isArray'](inventory?.['assets']) ? inventory['assets'] : [])['map']((_0x1fb5e4) => {
-    const _0x3e476a = resolveStoryAssetSourceChapterIds({
-        sourceSceneRefs: _0x1fb5e4['sourceSceneRefs'],
-        sourceEpisodeRefs: _0x1fb5e4['sourceEpisodeRefs'],
+  return (Array['isArray'](inventory?.['assets']) ? inventory['assets'] : [])['map']((sourceSceneRefs11) => {
+    const sourceChapterIds5 = resolveStoryAssetSourceChapterIds({
+        sourceSceneRefs: sourceSceneRefs11['sourceSceneRefs'],
+        sourceEpisodeRefs: sourceSceneRefs11['sourceEpisodeRefs'],
         sourceScenes: sourceScenes,
         chapterIds: chapterIds,
       }),
-      _0x468e5b = (Array['isArray'](_0x1fb5e4['appearances']) ? _0x1fb5e4['appearances'] : [])['map'](
-        (_0x4de4fa) => {
-          const _0x4bed34 = resolveStoryAssetSourceChapterIds({
-            sourceSceneRefs: _0x4de4fa['sourceSceneRefs'],
-            sourceEpisodeRefs: _0x4de4fa['sourceEpisodeRefs'],
-            sourceScenes: sourceScenes,
-            chapterIds: chapterIds,
-          });
-          return {
-            ..._0x4de4fa,
-            sourceChapterIds: _0x4bed34,
-            prompt: buildStoryAssetBaselinePrompt(_0x1fb5e4, _0x4de4fa, visualStyle),
-            designStatus: 'baseline',
-          };
-        },
-      );
+      prompt5 = (Array['isArray'](sourceSceneRefs11['appearances']) ? sourceSceneRefs11['appearances'] : [])[
+        'map'
+      ]((sourceSceneRefs12) => {
+        const sourceChapterIds6 = resolveStoryAssetSourceChapterIds({
+          sourceSceneRefs: sourceSceneRefs12['sourceSceneRefs'],
+          sourceEpisodeRefs: sourceSceneRefs12['sourceEpisodeRefs'],
+          sourceScenes: sourceScenes,
+          chapterIds: chapterIds,
+        });
+        return {
+          ...sourceSceneRefs12,
+          sourceChapterIds: sourceChapterIds6,
+          prompt: buildStoryAssetBaselinePrompt(sourceSceneRefs11, sourceSceneRefs12, visualStyle),
+          designStatus: 'baseline',
+        };
+      });
     return {
-      ..._0x1fb5e4,
+      ...sourceSceneRefs11,
       role:
-        _0x1fb5e4['kind'] === 'character'
-          ? normalizeStoryAssetFinalCharacterRole(_0x1fb5e4['role'])
-          : _0x1fb5e4['role'],
+        sourceSceneRefs11['kind'] === 'character'
+          ? normalizeStoryAssetFinalCharacterRole(sourceSceneRefs11['role'])
+          : sourceSceneRefs11['role'],
       voiceDescription: '',
-      sourceChapterIds: _0x3e476a,
-      prompt: _0x468e5b[0x0]?.['prompt'] || '',
-      appearances: _0x468e5b,
+      sourceChapterIds: sourceChapterIds5,
+      prompt: prompt5[0x0]?.['prompt'] || '',
+      appearances: prompt5,
       designStatus: 'baseline',
     };
   });
@@ -3394,93 +3379,91 @@ function createStoryAssetDetailPlans({
     inventory: inventory,
     sourceScenes: sourceScenes,
     chapterIds: chapterIds,
-  })['map']((_0x356cf6) => ({
-    ref: _0x356cf6['ref'],
-    kind: _0x356cf6['kind'],
-    name: _0x356cf6['name'],
-    role: _0x356cf6['role'],
-    description: _0x356cf6['description'],
-    occurrences: normalizeStringArray(_0x356cf6['sourceChapterIds'])['length']
-      ? buildOccurrences(_0x356cf6['sourceChapterIds'])
-      : normalizeText(_0x356cf6['occurrences']),
-    sourceSceneRefs: normalizeStringArray(_0x356cf6['sourceSceneRefs']),
-    sourceEpisodeRefs: normalizeStringArray(_0x356cf6['sourceChapterIds']),
-    appearances: (Array['isArray'](_0x356cf6['appearances']) ? _0x356cf6['appearances'] : [])['map'](
-      (_0xa9f8ad) => ({
-        ref: _0xa9f8ad['ref'],
-        name: _0xa9f8ad['name'],
-        description: _0xa9f8ad['description'],
-        occurrences: normalizeStringArray(_0xa9f8ad['sourceChapterIds'])['length']
-          ? buildOccurrences(_0xa9f8ad['sourceChapterIds'])
-          : normalizeText(_0xa9f8ad['occurrences']),
-        sourceSceneRefs: normalizeStringArray(_0xa9f8ad['sourceSceneRefs']),
-        sourceEpisodeRefs: normalizeStringArray(_0xa9f8ad['sourceChapterIds']),
-      }),
-    ),
+  })['map']((ref20) => ({
+    ref: ref20['ref'],
+    kind: ref20['kind'],
+    name: ref20['name'],
+    role: ref20['role'],
+    description: ref20['description'],
+    occurrences: normalizeStringArray(ref20['sourceChapterIds'])['length']
+      ? buildOccurrences(ref20['sourceChapterIds'])
+      : normalizeText(ref20['occurrences']),
+    sourceSceneRefs: normalizeStringArray(ref20['sourceSceneRefs']),
+    sourceEpisodeRefs: normalizeStringArray(ref20['sourceChapterIds']),
+    appearances: (Array['isArray'](ref20['appearances']) ? ref20['appearances'] : [])['map']((ref21) => ({
+      ref: ref21['ref'],
+      name: ref21['name'],
+      description: ref21['description'],
+      occurrences: normalizeStringArray(ref21['sourceChapterIds'])['length']
+        ? buildOccurrences(ref21['sourceChapterIds'])
+        : normalizeText(ref21['occurrences']),
+      sourceSceneRefs: normalizeStringArray(ref21['sourceSceneRefs']),
+      sourceEpisodeRefs: normalizeStringArray(ref21['sourceChapterIds']),
+    })),
   }));
 }
 function createStoryAssetBaselineDetailAssets(
-  _0x116275 = [],
+  list110 = [],
   { sourceScenes: sourceScenes = [], visualStyle: visualStyle = '' } = {},
 ) {
-  const _0x688e23 = new Map(sourceScenes['map']((_0x252eb7) => [_0x252eb7['ref'], _0x252eb7]));
-  return _0x116275['map']((_0x553a6a) => {
-    const _0x27eeb9 = normalizeStringArray(
-        _0x553a6a['sourceSceneRefs']
-          ['map']((_0x1dc3d2) => _0x688e23['get'](_0x1dc3d2))
+  const map45 = new Map(sourceScenes['map']((value369) => [value369['ref'], value369]));
+  return list110['map']((ref22) => {
+    const stringArray3 = normalizeStringArray(
+        ref22['sourceSceneRefs']
+          ['map']((value370) => map45['get'](value370))
           ['filter'](Boolean)
           ['slice'](0x0, 0x2)
-          ['map']((_0x1d6d71) =>
+          ['map']((dom5) =>
             [
-              normalizeText(_0x1d6d71['heading']),
-              stripStoryAssetInternalEvidenceMetadata(_0x1d6d71['body'])['slice'](0x0, 0xa0),
+              normalizeText(dom5['heading']),
+              stripStoryAssetInternalEvidenceMetadata(dom5['body'])['slice'](0x0, 0xa0),
             ]
               ['filter'](Boolean)
               ['join']('：'),
           ),
       )['join']('；'),
-      _0x26a7fc =
-        stripStoryAssetInternalEvidenceMetadata(_0x553a6a['description']) ||
-        _0x27eeb9 ||
-        _0x553a6a['name'] + '在剧本相关场次中出现。',
-      _0x1845eb = createStoryAssetBaselineVisualDesign(_0x553a6a),
-      _0x41ee93 = formatStoryAssetFactAndDesignDescription({
-        scriptFacts: _0x26a7fc,
-        visualDesign: _0x1845eb,
+      scriptFacts3 =
+        stripStoryAssetInternalEvidenceMetadata(ref22['description']) ||
+        stringArray3 ||
+        ref22['name'] + '在剧本相关场次中出现。',
+      visualDesign3 = createStoryAssetBaselineVisualDesign(ref22),
+      description8 = formatStoryAssetFactAndDesignDescription({
+        scriptFacts: scriptFacts3,
+        visualDesign: visualDesign3,
       }),
-      _0x17902e = _0x553a6a['appearances']['map']((_0x4631ba) => ({
-        ref: _0x4631ba['ref'],
-        name: _0x4631ba['name'],
-        description: normalizeText(_0x4631ba['description']) || _0x41ee93,
-        occurrences: buildOccurrences(_0x4631ba['sourceEpisodeRefs']),
+      prompt6 = ref22['appearances']['map']((ref23) => ({
+        ref: ref23['ref'],
+        name: ref23['name'],
+        description: normalizeText(ref23['description']) || description8,
+        occurrences: buildOccurrences(ref23['sourceEpisodeRefs']),
         prompt: buildStoryAssetBaselinePrompt(
-          { ..._0x553a6a, description: _0x41ee93, scriptFacts: _0x26a7fc, visualDesign: _0x1845eb },
+          { ...ref22, description: description8, scriptFacts: scriptFacts3, visualDesign: visualDesign3 },
           {
-            ..._0x4631ba,
-            scriptFacts: stripStoryAssetInternalEvidenceMetadata(_0x4631ba['description']) || _0x26a7fc,
-            visualDesign: _0x1845eb,
+            ...ref23,
+            scriptFacts: stripStoryAssetInternalEvidenceMetadata(ref23['description']) || scriptFacts3,
+            visualDesign: visualDesign3,
           },
           visualStyle,
         ),
-        sourceChapterIds: _0x4631ba['sourceEpisodeRefs'],
-        sourceEpisodeRefs: _0x4631ba['sourceEpisodeRefs'],
-        sourceSceneRefs: _0x4631ba['sourceSceneRefs'],
-        scriptFacts: _0x26a7fc,
-        visualDesign: _0x1845eb,
+        sourceChapterIds: ref23['sourceEpisodeRefs'],
+        sourceEpisodeRefs: ref23['sourceEpisodeRefs'],
+        sourceSceneRefs: ref23['sourceSceneRefs'],
+        scriptFacts: scriptFacts3,
+        visualDesign: visualDesign3,
         designStatus: 'baseline',
       }));
     return {
-      ref: _0x553a6a['ref'],
-      kind: _0x553a6a['kind'],
-      name: _0x553a6a['name'],
-      role: _0x553a6a['role'],
-      description: _0x41ee93,
+      ref: ref22['ref'],
+      kind: ref22['kind'],
+      name: ref22['name'],
+      role: ref22['role'],
+      description: description8,
       voiceDescription:
-        _0x553a6a['kind'] === 'character'
+        ref22['kind'] === 'character'
           ? [
               '年龄：未明确',
               '性别：未明确',
-              '身份：' + (_0x553a6a['role'] || '剧情角色'),
+              '身份：' + (ref22['role'] || '剧情角色'),
               '口音：标准普通话',
               '情绪底色：中性克制',
               '声线：自然清晰',
@@ -3489,14 +3472,14 @@ function createStoryAssetBaselineDetailAssets(
               '音色特征：自然稳定',
             ]['join']('；')
           : '',
-      occurrences: buildOccurrences(_0x553a6a['sourceEpisodeRefs']),
-      prompt: _0x17902e[0x0]?.['prompt'] || '',
-      sourceChapterIds: _0x553a6a['sourceEpisodeRefs'],
-      sourceEpisodeRefs: _0x553a6a['sourceEpisodeRefs'],
-      sourceSceneRefs: _0x553a6a['sourceSceneRefs'],
-      appearances: _0x17902e,
-      scriptFacts: _0x26a7fc,
-      visualDesign: _0x1845eb,
+      occurrences: buildOccurrences(ref22['sourceEpisodeRefs']),
+      prompt: prompt6[0x0]?.['prompt'] || '',
+      sourceChapterIds: ref22['sourceEpisodeRefs'],
+      sourceEpisodeRefs: ref22['sourceEpisodeRefs'],
+      sourceSceneRefs: ref22['sourceSceneRefs'],
+      appearances: prompt6,
+      scriptFacts: scriptFacts3,
+      visualDesign: visualDesign3,
       designStatus: 'baseline',
     };
   });
@@ -3504,8 +3487,8 @@ function createStoryAssetBaselineDetailAssets(
 export async function extractStoryAssetsEvidenceBatched({
   project: project = {},
   episodes: episodes = [],
-  sourceScenes: _0x470379 = null,
-  authoritativeSourceScenes: _0x230c67 = null,
+  sourceScenes: sourceScenes7 = null,
+  authoritativeSourceScenes: authoritativeSourceScenes = null,
   model: model = '',
   provider: provider = '',
   providerProfileId: providerProfileId = '',
@@ -3521,59 +3504,64 @@ export async function extractStoryAssetsEvidenceBatched({
   paidRerunAuthorization: paidRerunAuthorization = null,
 } = {}) {
   request = withReplicationRequestPolicy(request, project);
-  const _0xc16409 = normalizeText(model),
-    _0x48bb0e = normalizeText(provider),
-    _0x545d08 = normalizeText(providerProfileId);
-  if (!_0xc16409 || !_0x48bb0e) throw new Error('请先选择可用的文本模型。');
-  const _0x42827c = normalizeStoryContext(project),
-    _0x3f938b =
-      Array['isArray'](_0x470379) && _0x470379['length']
-        ? cloneStoryAssetExtractionValue(_0x470379)
+  const model2 = normalizeText(model),
+    provider2 = normalizeText(provider),
+    providerProfileId2 = normalizeText(providerProfileId);
+  if (!model2 || !provider2) throw new Error('请先选择可用的文本模型。');
+  const storyContext3 = normalizeStoryContext(project),
+    sourceScenes8 =
+      Array['isArray'](sourceScenes7) && sourceScenes7['length']
+        ? cloneStoryAssetExtractionValue(sourceScenes7)
         : normalizeStoryAssetExtractionSources(episodes),
-    _0x4c98ca = new Map(
-      (Array['isArray'](_0x230c67) ? _0x230c67 : [])['map']((_0x1937ee) => [_0x1937ee?.['ref'], _0x1937ee]),
+    map46 = new Map(
+      (Array['isArray'](authoritativeSourceScenes) ? authoritativeSourceScenes : [])['map']((value371) => [
+        value371?.['ref'],
+        value371,
+      ]),
     ),
-    _0x92e8b = _0x3f938b['map']((_0x925d60) => {
-      const _0x5a298d = _0x4c98ca['get'](_0x925d60?.['ref']);
-      if (!_0x5a298d) return _0x925d60;
-      return { ..._0x925d60, characters: cloneStoryAssetExtractionValue(_0x5a298d['characters'] || []) };
+    sourceScenes9 = sourceScenes8['map']((args44) => {
+      const enabled17 = map46['get'](args44?.['ref']);
+      if (!enabled17) return args44;
+      return { ...args44, characters: cloneStoryAssetExtractionValue(enabled17['characters'] || []) };
     }),
-    _0x46d60e = normalizeText(visualStyle) || _0x42827c['visualStyle'],
-    _0xde30a0 = createStoryAssetExtractionFingerprint({
-      storyContext: _0x42827c,
-      sourceScenes: _0x3f938b,
-      model: _0xc16409,
-      provider: _0x48bb0e,
-      providerProfileId: _0x545d08,
+    visualStyle2 = normalizeText(visualStyle) || storyContext3['visualStyle'],
+    sourceFingerprint2 = createStoryAssetExtractionFingerprint({
+      storyContext: storyContext3,
+      sourceScenes: sourceScenes8,
+      model: model2,
+      provider: provider2,
+      providerProfileId: providerProfileId2,
       aspectRatio: aspectRatio,
-      visualStyle: _0x46d60e,
+      visualStyle: visualStyle2,
       extractionStrategy: STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY,
     }),
-    _0x29163d = createStoryAssetExtractionContentFingerprint({
-      storyContext: _0x42827c,
-      sourceScenes: _0x3f938b,
+    sourceContentFingerprint2 = createStoryAssetExtractionContentFingerprint({
+      storyContext: storyContext3,
+      sourceScenes: sourceScenes8,
       aspectRatio: aspectRatio,
-      visualStyle: _0x46d60e,
+      visualStyle: visualStyle2,
       extractionStrategy: STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY,
     }),
-    _0x24e47c = cloneStoryAssetExtractionValue(resumeDraft),
-    _0x29aa45 = restoreStoryAssetPipelineDraft(resumeDraft, {
-      sourceFingerprint: _0xde30a0,
-      sourceContentFingerprint: _0x29163d,
+    cloneStoryAssetExtractionValue3 = cloneStoryAssetExtractionValue(resumeDraft),
+    restoreStoryAssetPipelineDraft2 = restoreStoryAssetPipelineDraft(resumeDraft, {
+      sourceFingerprint: sourceFingerprint2,
+      sourceContentFingerprint: sourceContentFingerprint2,
       extractionStrategy: STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY,
     }),
-    _0x56f941 =
-      _0x24e47c?.['batchSubmissionRecords'] && typeof _0x24e47c['batchSubmissionRecords'] === 'object'
-        ? _0x24e47c['batchSubmissionRecords']
+    value372 =
+      cloneStoryAssetExtractionValue3?.['batchSubmissionRecords'] &&
+      typeof cloneStoryAssetExtractionValue3['batchSubmissionRecords'] === 'object'
+        ? cloneStoryAssetExtractionValue3['batchSubmissionRecords']
         : {},
-    _0x2ad37a =
-      !_0x29aa45 && _0x24e47c?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
-        ? Object['entries'](_0x56f941)['flatMap'](([_0x40e7f9, _0x1e7b8e]) => {
-            const _0x48ef15 = normalizeText(_0x1e7b8e?.['status']),
-              _0x3389c6 =
-                _0x48ef15 !== 'rejected-confirmed' &&
-                (Math['max'](0x0, Math['trunc'](Number(_0x1e7b8e?.['requestCount']) || 0x0)) > 0x0 ||
-                  Object['hasOwn'](_0x1e7b8e || {}, 'rawResponse') ||
+    list111 =
+      !restoreStoryAssetPipelineDraft2 &&
+      cloneStoryAssetExtractionValue3?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+        ? Object['entries'](value372)['flatMap'](([value373, response7]) => {
+            const text27 = normalizeText(response7?.['status']),
+              value374 =
+                text27 !== 'rejected-confirmed' &&
+                (Math['max'](0x0, Math['trunc'](Number(response7?.['requestCount']) || 0x0)) > 0x0 ||
+                  Object['hasOwn'](response7 || {}, 'rawResponse') ||
                   [
                     'submitted',
                     'ambiguous',
@@ -3582,23 +3570,23 @@ export async function extractStoryAssetsEvidenceBatched({
                     'blocked-paid-response',
                     'blocked-incompatible',
                     'validated',
-                  ]['includes'](_0x48ef15));
-            return _0x3389c6 ? [_0x40e7f9] : [];
+                  ]['includes'](text27));
+            return value374 ? [value373] : [];
           })
         : [],
-    _0x5065d2 = _0x2ad37a['length'] > 0x0,
-    _0x1f9cae = Math['min'](
+    enabled18 = list111['length'] > 0x0,
+    callLimit = Math['min'](
       STORY_ASSET_BATCH_REQUEST_LIMIT,
       Math['max'](0x1, Math['trunc'](Number(requestLimit) || 0x0)),
     );
-  let _0x429444 = 0x0,
-    _0x4b4c56 = ![],
-    _0x39222a = '';
-  const _0x406830 = (_0x3205d9 = {}) => ({
+  let requestCount = 0x0,
+    enabled19 = ![],
+    fallbackReason = '';
+  const run5 = (paidBatchHistory = {}) => ({
     strategy: STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY,
     schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION,
-    sourceFingerprint: _0xde30a0,
-    sourceContentFingerprint: _0x29163d,
+    sourceFingerprint: sourceFingerprint2,
+    sourceContentFingerprint: sourceContentFingerprint2,
     status: 'pending',
     phase: 'inventory',
     inventoryBatches: [],
@@ -3610,52 +3598,51 @@ export async function extractStoryAssetsEvidenceBatched({
     outputEstimates: { character: 0x898, scene: 0x4b0, prop: 0x4b0 },
     failures: [],
     totalRequestCount: 0x0,
-    ...(_0x3205d9 && typeof _0x3205d9 === 'object' ? { paidBatchHistory: _0x3205d9 } : {}),
+    ...(paidBatchHistory && typeof paidBatchHistory === 'object'
+      ? { paidBatchHistory: paidBatchHistory }
+      : {}),
   });
-  let _0x9ad6a8 = _0x29aa45 || (_0x5065d2 ? _0x24e47c : _0x406830());
-  _0x9ad6a8['strategy'] = STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY;
-  !_0x5065d2 &&
-    ((_0x9ad6a8['schemaVersion'] = STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION),
-    (_0x9ad6a8['sourceFingerprint'] = _0xde30a0),
-    (_0x9ad6a8['sourceContentFingerprint'] = _0x29163d));
-  ((_0x9ad6a8['failures'] = []),
-    (_0x9ad6a8['runRequestCount'] = 0x0),
-    (_0x9ad6a8['requestLimit'] = _0x1f9cae),
-    (_0x9ad6a8['batchSubmissionRecords'] =
-      _0x9ad6a8['batchSubmissionRecords'] && typeof _0x9ad6a8['batchSubmissionRecords'] === 'object'
-        ? _0x9ad6a8['batchSubmissionRecords']
+  let current2 = restoreStoryAssetPipelineDraft2 || (enabled18 ? cloneStoryAssetExtractionValue3 : run5());
+  current2['strategy'] = STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY;
+  !enabled18 &&
+    ((current2['schemaVersion'] = STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION),
+    (current2['sourceFingerprint'] = sourceFingerprint2),
+    (current2['sourceContentFingerprint'] = sourceContentFingerprint2));
+  ((current2['failures'] = []),
+    (current2['runRequestCount'] = 0x0),
+    (current2['requestLimit'] = callLimit),
+    (current2['batchSubmissionRecords'] =
+      current2['batchSubmissionRecords'] && typeof current2['batchSubmissionRecords'] === 'object'
+        ? current2['batchSubmissionRecords']
         : {}),
-    (_0x9ad6a8['paidBatchHistory'] =
-      _0x9ad6a8['paidBatchHistory'] && typeof _0x9ad6a8['paidBatchHistory'] === 'object'
-        ? _0x9ad6a8['paidBatchHistory']
+    (current2['paidBatchHistory'] =
+      current2['paidBatchHistory'] && typeof current2['paidBatchHistory'] === 'object'
+        ? current2['paidBatchHistory']
         : {}));
-  const _0x153924 = async ({ message: message = '', stage: stage = _0x9ad6a8['phase'] } = {}) => {
-      const _0x3c5fd9 = Array['isArray'](_0x9ad6a8['inventory']?.['assets'])
-          ? _0x9ad6a8['inventory']['assets']
+  const run6 = async ({ message: message = '', stage: stage = current2['phase'] } = {}) => {
+      const list112 = Array['isArray'](current2['inventory']?.['assets'])
+          ? current2['inventory']['assets']
           : [],
-        _0x1ab657 = Array['isArray'](_0x9ad6a8['completedAssets']) ? _0x9ad6a8['completedAssets'] : [],
-        _0x1e0930 = stage === 'inventory' || stage === 'repair';
-      ((_0x9ad6a8['kindStates'] = createStoryAssetPipelineKindStates(
-        _0x3c5fd9,
-        _0x1ab657,
-        _0x9ad6a8['failures'],
-        { inventoryRunning: stage === 'inventory' && _0x9ad6a8['status'] === 'in-progress' },
-      )),
-        (_0x9ad6a8['progress'] = {
+        list113 = Array['isArray'](current2['completedAssets']) ? current2['completedAssets'] : [],
+        current3 = stage === 'inventory' || stage === 'repair';
+      ((current2['kindStates'] = createStoryAssetPipelineKindStates(list112, list113, current2['failures'], {
+        inventoryRunning: stage === 'inventory' && current2['status'] === 'in-progress',
+      })),
+        (current2['progress'] = {
           stage: stage,
-          current: _0x1e0930
+          current: current3
             ? new Set(
-                (_0x9ad6a8['inventoryBatches'] || [])
-                  ['filter']((_0x5ed66e) => _0x5ed66e['status'] === 'succeeded')
-                  ['flatMap']((_0x33ed1e) => _0x33ed1e['sourceSceneRefs'] || []),
+                (current2['inventoryBatches'] || [])
+                  ['filter']((response8) => response8['status'] === 'succeeded')
+                  ['flatMap']((value375) => value375['sourceSceneRefs'] || []),
               )['size']
-            : _0x1ab657['length'],
-          total: _0x1e0930 ? _0x92e8b['length'] : _0x3c5fd9['length'],
+            : list113['length'],
+          total: current3 ? sourceScenes9['length'] : list112['length'],
           message: message,
-          requestCount: _0x429444,
-          callLimit: _0x1f9cae,
+          requestCount: requestCount,
+          callLimit: callLimit,
         }),
-        (_0x9ad6a8 = await saveStoryAssetExtractionCheckpoint(_0x9ad6a8, onCheckpoint)),
+        (current2 = await saveStoryAssetExtractionCheckpoint(current2, onCheckpoint)),
         onProgress?.({
           stage:
             stage === 'repair'
@@ -3663,156 +3650,156 @@ export async function extractStoryAssetsEvidenceBatched({
               : stage === 'detail'
                 ? 'detailing-story-assets'
                 : 'extracting-asset-inventory',
-          current: _0x9ad6a8['progress']['current'],
-          total: _0x9ad6a8['progress']['total'],
+          current: current2['progress']['current'],
+          total: current2['progress']['total'],
           message: message,
         }));
     },
-    _0x5e2720 = (_0x682468) => {
+    handler8 = (value376) => {
       if (paidRerunAuthorization?.['confirmed'] !== !![]) return ![];
-      const _0x19a3c0 = Array['isArray'](paidRerunAuthorization?.['authorizedBatchIds'])
+      const list114 = Array['isArray'](paidRerunAuthorization?.['authorizedBatchIds'])
         ? paidRerunAuthorization['authorizedBatchIds']
         : [];
-      return _0x19a3c0['includes'](_0x682468);
+      return list114['includes'](value376);
     },
-    _0x38b049 = (_0x9ed7b7, _0xbd75bb) => {
-      const _0x137794 = _0x9ad6a8['batchSubmissionRecords'][_0x9ed7b7];
-      if (!_0x137794) return;
-      const _0x49c4c8 = Array['isArray'](_0x9ad6a8['paidBatchHistory'][_0x9ed7b7])
-        ? _0x9ad6a8['paidBatchHistory'][_0x9ed7b7]
+    handler9 = (value377, archiveReason) => {
+      const enabled20 = current2['batchSubmissionRecords'][value377];
+      if (!enabled20) return;
+      const list115 = Array['isArray'](current2['paidBatchHistory'][value377])
+        ? current2['paidBatchHistory'][value377]
         : [];
-      (_0x49c4c8['push']({
-        ...cloneStoryAssetExtractionValue(_0x137794),
+      (list115['push']({
+        ...cloneStoryAssetExtractionValue(enabled20),
         archivedAt: Date['now'](),
-        archiveReason: _0xbd75bb,
+        archiveReason: archiveReason,
       }),
-        (_0x9ad6a8['paidBatchHistory'][_0x9ed7b7] = _0x49c4c8),
-        delete _0x9ad6a8['batchSubmissionRecords'][_0x9ed7b7]);
+        (current2['paidBatchHistory'][value377] = list115),
+        delete current2['batchSubmissionRecords'][value377]);
     },
-    _0x2ecc29 = (_0x5bca3d, _0x5966c1, _0x42951e, _0x16f44e) => {
-      const _0x1b37e4 = new Error(_0x16f44e);
+    handler10 = (value378, value379, value380, value381) => {
+      const error52 = new Error(value381);
       return (
-        (_0x1b37e4['type'] = _0x5bca3d),
-        (_0x1b37e4['batchKey'] = _0x5966c1),
-        (_0x1b37e4['batchId'] = _0x42951e?.['batchId'] || ''),
-        (_0x1b37e4['assetExtractionDraft'] = cloneStoryAssetExtractionValue(_0x9ad6a8)),
-        _0x1b37e4
+        (error52['type'] = value378),
+        (error52['batchKey'] = value379),
+        (error52['batchId'] = value380?.['batchId'] || ''),
+        (error52['assetExtractionDraft'] = cloneStoryAssetExtractionValue(current2)),
+        error52
       );
     };
-  if (_0x5065d2) {
-    const _0x346b82 = _0x2ad37a['every']((_0x57e535) => _0x5e2720(_0x57e535));
-    if (!_0x346b82) {
-      (_0x2ad37a['forEach']((_0x902b2) => {
-        const _0xe7ecf3 = _0x9ad6a8['batchSubmissionRecords'][_0x902b2];
-        if (!_0xe7ecf3) return;
-        (_0xe7ecf3['status'] !== 'blocked-incompatible' &&
-          (_0xe7ecf3['incompatiblePreviousStatus'] = _0xe7ecf3['status']),
-          (_0xe7ecf3['status'] = 'blocked-incompatible'),
-          (_0xe7ecf3['errorType'] = 'contract-incompatible'),
-          (_0xe7ecf3['errorMessage'] = '已付费批次的来源或草稿版本与当前请求不兼容。'),
-          (_0xe7ecf3['blockedAt'] = Date['now']()));
+  if (enabled18) {
+    const enabled21 = list111['every']((value382) => handler8(value382));
+    if (!enabled21) {
+      (list111['forEach']((value383) => {
+        const response9 = current2['batchSubmissionRecords'][value383];
+        if (!response9) return;
+        (response9['status'] !== 'blocked-incompatible' &&
+          (response9['incompatiblePreviousStatus'] = response9['status']),
+          (response9['status'] = 'blocked-incompatible'),
+          (response9['errorType'] = 'contract-incompatible'),
+          (response9['errorMessage'] = '已付费批次的来源或草稿版本与当前请求不兼容。'),
+          (response9['blockedAt'] = Date['now']()));
       }),
-        (_0x9ad6a8['status'] = 'blocked'),
-        await _0x153924({
-          stage: _0x9ad6a8['phase'],
+        (current2['status'] = 'blocked'),
+        await run6({
+          stage: current2['phase'],
           message: '已付费批次与当前剧本来源或草稿版本不兼容；未自动重新请求',
         }));
-      const [_0x397484] = _0x2ad37a,
-        _0x402c30 = _0x9ad6a8['batchSubmissionRecords'][_0x397484] || {},
-        _0x240415 = _0x2ecc29(
+      const [value384] = list111,
+        value385 = current2['batchSubmissionRecords'][value384] || {},
+        value386 = handler10(
           'ASSET_CONTRACT_INCOMPATIBLE',
-          _0x397484,
-          _0x402c30,
+          value384,
+          value385,
           '已付费批次与当前剧本来源或草稿版本不兼容；需要逐批明确授权后才能重新请求。',
         );
-      _0x240415['blockedBatchIds'] = [..._0x2ad37a];
-      throw _0x240415;
+      value386['blockedBatchIds'] = [...list111];
+      throw value386;
     }
-    const _0x2d7d6e = Math['max'](0x0, Math['trunc'](Number(_0x9ad6a8['totalRequestCount']) || 0x0));
-    _0x2ad37a['forEach']((_0x35a980) => {
-      _0x38b049(_0x35a980, 'authorized-source-or-schema-change-rerun');
+    const value387 = Math['max'](0x0, Math['trunc'](Number(current2['totalRequestCount']) || 0x0));
+    list111['forEach']((value388) => {
+      handler9(value388, 'authorized-source-or-schema-change-rerun');
     });
-    const _0x20892e = cloneStoryAssetExtractionValue(_0x9ad6a8['paidBatchHistory']) || {};
-    ((_0x9ad6a8 = _0x406830(_0x20892e)),
-      (_0x9ad6a8['totalRequestCount'] = _0x2d7d6e),
-      (_0x9ad6a8['runRequestCount'] = 0x0),
-      (_0x9ad6a8['requestLimit'] = _0x1f9cae),
-      await _0x153924({ stage: 'inventory', message: '旧付费批次已归档，正在按当前剧本重新提取' }));
+    const cloneStoryAssetExtractionValue4 =
+      cloneStoryAssetExtractionValue(current2['paidBatchHistory']) || {};
+    ((current2 = run5(cloneStoryAssetExtractionValue4)),
+      (current2['totalRequestCount'] = value387),
+      (current2['runRequestCount'] = 0x0),
+      (current2['requestLimit'] = callLimit),
+      await run6({ stage: 'inventory', message: '旧付费批次已归档，正在按当前剧本重新提取' }));
   }
-  const _0x43c2d9 = async (_0x15fc89, _0x5671e2 = {}) => {
-      const _0x181112 =
-          normalizeText(_0x5671e2?.['batchKey']) ||
+  const run7 = async (value389, stage2 = {}) => {
+      const batchKey =
+          normalizeText(stage2?.['batchKey']) ||
           createStoryAssetBatchContractKey(
-            _0x5671e2?.['stage'],
-            _0x5671e2?.['contractIdentities'] || [_0x5671e2?.['batchId']],
+            stage2?.['stage'],
+            stage2?.['contractIdentities'] || [stage2?.['batchId']],
           ),
-        _0x53e731 = _0x9ad6a8['batchSubmissionRecords'][_0x181112];
-      if (_0x53e731 && ['submitted', 'ambiguous']['includes'](_0x53e731['status'])) {
-        if (_0x5e2720(_0x181112)) _0x38b049(_0x181112, 'authorized-ambiguous-submission-rerun');
+        response10 = current2['batchSubmissionRecords'][batchKey];
+      if (response10 && ['submitted', 'ambiguous']['includes'](response10['status'])) {
+        if (handler8(batchKey)) handler9(batchKey, 'authorized-ambiguous-submission-rerun');
         else {
-          ((_0x53e731['status'] = 'blocked-ambiguous-submission'),
-            (_0x9ad6a8['status'] = 'blocked'),
-            await _0x153924({
-              stage: _0x5671e2?.['stage'],
-              message: (_0x5671e2?.['batchId'] || _0x181112) + '提交状态不明确；未自动重新请求',
+          ((response10['status'] = 'blocked-ambiguous-submission'),
+            (current2['status'] = 'blocked'),
+            await run6({
+              stage: stage2?.['stage'],
+              message: (stage2?.['batchId'] || batchKey) + '提交状态不明确；未自动重新请求',
             }));
-          throw _0x2ecc29(
+          throw handler10(
             'ASSET_SUBMISSION_AMBIGUOUS',
-            _0x181112,
-            _0x5671e2,
-            (_0x5671e2?.['batchId'] || _0x181112) +
-              '请求已提交但无法确认是否计费；需要明确授权后才能重新请求。',
+            batchKey,
+            stage2,
+            (stage2?.['batchId'] || batchKey) + '请求已提交但无法确认是否计费；需要明确授权后才能重新请求。',
           );
         }
       } else {
-        if (_0x53e731 && _0x53e731['status'] === 'blocked-ambiguous-submission') {
-          if (_0x5e2720(_0x181112)) _0x38b049(_0x181112, 'authorized-ambiguous-submission-rerun');
+        if (response10 && response10['status'] === 'blocked-ambiguous-submission') {
+          if (handler8(batchKey)) handler9(batchKey, 'authorized-ambiguous-submission-rerun');
           else {
-            ((_0x9ad6a8['status'] = 'blocked'),
-              await _0x153924({
-                stage: _0x5671e2?.['stage'],
-                message: (_0x5671e2?.['batchId'] || _0x181112) + '提交状态不明确；未自动重新请求',
+            ((current2['status'] = 'blocked'),
+              await run6({
+                stage: stage2?.['stage'],
+                message: (stage2?.['batchId'] || batchKey) + '提交状态不明确；未自动重新请求',
               }));
-            throw _0x2ecc29(
+            throw handler10(
               'ASSET_SUBMISSION_AMBIGUOUS',
-              _0x181112,
-              _0x5671e2,
-              (_0x5671e2?.['batchId'] || _0x181112) +
+              batchKey,
+              stage2,
+              (stage2?.['batchId'] || batchKey) +
                 '请求已提交但无法确认是否计费；需要明确授权后才能重新请求。',
             );
           }
         } else {
           if (
-            _0x53e731 &&
+            response10 &&
             ['response-received', 'blocked-paid-response', 'blocked-incompatible', 'validated']['includes'](
-              _0x53e731['status'],
+              response10['status'],
             )
           ) {
-            if (_0x5e2720(_0x181112))
-              _0x38b049(
-                _0x181112,
-                _0x53e731['status'] === 'blocked-incompatible'
+            if (handler8(batchKey))
+              handler9(
+                batchKey,
+                response10['status'] === 'blocked-incompatible'
                   ? 'authorized-incompatible-paid-response-rerun'
                   : 'authorized-invalid-paid-response-rerun',
               );
             else {
-              if (_0x53e731['status'] === 'blocked-incompatible') {
-                _0x9ad6a8['status'] = 'blocked';
-                throw _0x2ecc29(
+              if (response10['status'] === 'blocked-incompatible') {
+                current2['status'] = 'blocked';
+                throw handler10(
                   'ASSET_CONTRACT_INCOMPATIBLE',
-                  _0x181112,
-                  _0x5671e2,
-                  (_0x5671e2?.['batchId'] || _0x181112) + '的已付费结果与当前合同不兼容；未自动重新请求。',
+                  batchKey,
+                  stage2,
+                  (stage2?.['batchId'] || batchKey) + '的已付费结果与当前合同不兼容；未自动重新请求。',
                 );
               } else {
-                if (normalizeText(_0x53e731['rawResponse'])) return _0x53e731['rawResponse'];
+                if (normalizeText(response10['rawResponse'])) return response10['rawResponse'];
                 else {
-                  _0x53e731['status'] = 'blocked-paid-response';
-                  throw _0x2ecc29(
+                  response10['status'] = 'blocked-paid-response';
+                  throw handler10(
                     'ASSET_PAID_RESULT_BLOCKED',
-                    _0x181112,
-                    _0x5671e2,
-                    (_0x5671e2?.['batchId'] || _0x181112) + '已付费但返回为空；未自动重新请求。',
+                    batchKey,
+                    stage2,
+                    (stage2?.['batchId'] || batchKey) + '已付费但返回为空；未自动重新请求。',
                   );
                 }
               }
@@ -3820,89 +3807,88 @@ export async function extractStoryAssetsEvidenceBatched({
           }
         }
       }
-      if (_0x429444 >= _0x1f9cae)
+      if (requestCount >= callLimit)
         throw Object['assign'](
-          new Error('已达到本轮 ' + _0x1f9cae + ' 次分批请求上限。已完成结果已保存，系统将自动继续。'),
+          new Error('已达到本轮 ' + callLimit + ' 次分批请求上限。已完成结果已保存，系统将自动继续。'),
           { type: 'CALL_LIMIT' },
         );
-      ((_0x429444 += 0x1),
-        (_0x9ad6a8['runRequestCount'] = _0x429444),
-        (_0x9ad6a8['totalRequestCount'] =
-          Math['max'](0x0, Number(_0x9ad6a8['totalRequestCount']) || 0x0) + 0x1));
-      const _0x4e5e65 = Date['now']();
-      ((_0x9ad6a8['batchSubmissionRecords'][_0x181112] = {
-        batchKey: _0x181112,
-        batchId: normalizeText(_0x5671e2?.['batchId']),
-        stage: normalizeText(_0x5671e2?.['stage']),
-        kinds: normalizeStringArray(_0x5671e2?.['kinds']),
+      ((requestCount += 0x1),
+        (current2['runRequestCount'] = requestCount),
+        (current2['totalRequestCount'] =
+          Math['max'](0x0, Number(current2['totalRequestCount']) || 0x0) + 0x1));
+      const submittedAt = Date['now']();
+      ((current2['batchSubmissionRecords'][batchKey] = {
+        batchKey: batchKey,
+        batchId: normalizeText(stage2?.['batchId']),
+        stage: normalizeText(stage2?.['stage']),
+        kinds: normalizeStringArray(stage2?.['kinds']),
         status: 'submitted',
         requestCount:
           Math['max'](
             0x0,
-            Math['trunc'](Number(_0x9ad6a8['batchSubmissionRecords'][_0x181112]?.['requestCount']) || 0x0),
+            Math['trunc'](Number(current2['batchSubmissionRecords'][batchKey]?.['requestCount']) || 0x0),
           ) + 0x1,
-        submittedAt: _0x4e5e65,
-        contractSnapshot: cloneStoryAssetExtractionValue(_0x15fc89),
+        submittedAt: submittedAt,
+        contractSnapshot: cloneStoryAssetExtractionValue(value389),
         rawResponse: '',
       }),
-        await _0x153924({
-          stage: _0x5671e2?.['stage'],
-          message: (_0x5671e2?.['batchId'] || _0x181112) + '已提交，等待付费结果',
+        await run6({
+          stage: stage2?.['stage'],
+          message: (stage2?.['batchId'] || batchKey) + '已提交，等待付费结果',
         }),
         reportStoryAssetDiagnostics(diagnostics, 'story-asset-request', {
-          ..._0x5671e2,
+          ...stage2,
           status: 'started',
-          requestCount: _0x429444,
-          callLimit: _0x1f9cae,
-          promptCharacters: normalizeText(_0x15fc89['prompt'])['length'],
+          requestCount: requestCount,
+          callLimit: callLimit,
+          promptCharacters: normalizeText(value389['prompt'])['length'],
         }));
-      let _0x28e7b7;
+      let request3;
       try {
-        _0x28e7b7 = await request(_0x15fc89);
-      } catch (_0x588518) {
-        const _0x4c650f = classifyStoryAssetKindError(_0x588518),
-          _0x5b4cc6 = !isStoryAssetConfirmedUnchargedRejection(_0x588518);
-        _0x9ad6a8['batchSubmissionRecords'][_0x181112] = {
-          ..._0x9ad6a8['batchSubmissionRecords'][_0x181112],
-          status: _0x5b4cc6 ? 'blocked-ambiguous-submission' : 'rejected-confirmed',
+        request3 = await request(value389);
+      } catch (value390) {
+        const errorType2 = classifyStoryAssetKindError(value390),
+          status3 = !isStoryAssetConfirmedUnchargedRejection(value390);
+        current2['batchSubmissionRecords'][batchKey] = {
+          ...current2['batchSubmissionRecords'][batchKey],
+          status: status3 ? 'blocked-ambiguous-submission' : 'rejected-confirmed',
           failedAt: Date['now'](),
-          errorType: _0x4c650f['type'],
-          errorMessage: _0x4c650f['message'],
+          errorType: errorType2['type'],
+          errorMessage: errorType2['message'],
         };
-        if (_0x5b4cc6) _0x9ad6a8['status'] = 'blocked';
-        (await _0x153924({
-          stage: _0x5671e2?.['stage'],
-          message: _0x5b4cc6
-            ? (_0x5671e2?.['batchId'] || _0x181112) + '提交状态不明确；未自动重新请求'
-            : (_0x5671e2?.['batchId'] || _0x181112) + '请求失败；已保存状态',
+        if (status3) current2['status'] = 'blocked';
+        (await run6({
+          stage: stage2?.['stage'],
+          message: status3
+            ? (stage2?.['batchId'] || batchKey) + '提交状态不明确；未自动重新请求'
+            : (stage2?.['batchId'] || batchKey) + '请求失败；已保存状态',
         }),
           reportStoryAssetDiagnostics(diagnostics, 'story-asset-request', {
-            ..._0x5671e2,
+            ...stage2,
             status: 'failed',
-            requestCount: _0x429444,
-            elapsedMs: Math['max'](0x0, Date['now']() - _0x4e5e65),
-            errorType: _0x4c650f['type'],
-            errorMessage: _0x4c650f['message'],
+            requestCount: requestCount,
+            elapsedMs: Math['max'](0x0, Date['now']() - submittedAt),
+            errorType: errorType2['type'],
+            errorMessage: errorType2['message'],
           }));
-        if (_0x5b4cc6)
-          throw _0x2ecc29(
+        if (status3)
+          throw handler10(
             'ASSET_SUBMISSION_AMBIGUOUS',
-            _0x181112,
-            _0x5671e2,
-            (_0x5671e2?.['batchId'] || _0x181112) +
-              '请求已提交但无法确认是否计费；需要明确授权后才能重新请求。',
+            batchKey,
+            stage2,
+            (stage2?.['batchId'] || batchKey) + '请求已提交但无法确认是否计费；需要明确授权后才能重新请求。',
           );
-        throw _0x588518;
+        throw value390;
       }
-      const _0x24d9ea = normalizeText(getResultText(_0x28e7b7)),
-        _0x1dcbc7 = getStoryAssetResponseFinishReason(_0x28e7b7)['toLowerCase']();
-      _0x9ad6a8['batchSubmissionRecords'][_0x181112] = {
-        ..._0x9ad6a8['batchSubmissionRecords'][_0x181112],
-        status: _0x24d9ea ? 'response-received' : 'blocked-paid-response',
+      const status4 = normalizeText(getResultText(request3)),
+        finishReason = getStoryAssetResponseFinishReason(request3)['toLowerCase']();
+      current2['batchSubmissionRecords'][batchKey] = {
+        ...current2['batchSubmissionRecords'][batchKey],
+        status: status4 ? 'response-received' : 'blocked-paid-response',
         responseReceivedAt: Date['now'](),
-        rawResponse: _0x24d9ea,
-        ...(_0x1dcbc7 ? { finishReason: _0x1dcbc7 } : {}),
-        ...(_0x24d9ea
+        rawResponse: status4,
+        ...(finishReason ? { finishReason: finishReason } : {}),
+        ...(status4
           ? {}
           : {
               blockedAt: Date['now'](),
@@ -3910,204 +3896,200 @@ export async function extractStoryAssetsEvidenceBatched({
               errorMessage: '付费请求返回空内容。',
             }),
       };
-      if (!_0x24d9ea) {
-        ((_0x9ad6a8['status'] = 'blocked'),
-          await _0x153924({
-            stage: _0x5671e2?.['stage'],
-            message: (_0x5671e2?.['batchId'] || _0x181112) + '付费请求返回空内容；已阻断且未自动重试',
+      if (!status4) {
+        ((current2['status'] = 'blocked'),
+          await run6({
+            stage: stage2?.['stage'],
+            message: (stage2?.['batchId'] || batchKey) + '付费请求返回空内容；已阻断且未自动重试',
           }),
           reportStoryAssetDiagnostics(diagnostics, 'story-asset-request', {
-            ..._0x5671e2,
+            ...stage2,
             status: 'failed',
-            requestCount: _0x429444,
-            elapsedMs: Math['max'](0x0, Date['now']() - _0x4e5e65),
+            requestCount: requestCount,
+            elapsedMs: Math['max'](0x0, Date['now']() - submittedAt),
             errorType: 'empty-paid-response',
             errorMessage: '付费请求返回空内容。',
           }));
-        throw _0x2ecc29(
+        throw handler10(
           'ASSET_PAID_RESULT_BLOCKED',
-          _0x181112,
-          _0x5671e2,
-          (_0x5671e2?.['batchId'] || _0x181112) + '已付费但返回为空；需要明确授权后才能重新请求。',
+          batchKey,
+          stage2,
+          (stage2?.['batchId'] || batchKey) + '已付费但返回为空；需要明确授权后才能重新请求。',
         );
       }
       return (
-        await _0x153924({
-          stage: _0x5671e2?.['stage'],
-          message: (_0x5671e2?.['batchId'] || _0x181112) + '已返回，正在校验付费结果',
+        await run6({
+          stage: stage2?.['stage'],
+          message: (stage2?.['batchId'] || batchKey) + '已返回，正在校验付费结果',
         }),
         reportStoryAssetDiagnostics(diagnostics, 'story-asset-request', {
-          ..._0x5671e2,
+          ...stage2,
           status: 'succeeded',
-          requestCount: _0x429444,
-          elapsedMs: Math['max'](0x0, Date['now']() - _0x4e5e65),
-          responseCharacters: _0x24d9ea['length'],
+          requestCount: requestCount,
+          elapsedMs: Math['max'](0x0, Date['now']() - submittedAt),
+          responseCharacters: status4['length'],
         }),
-        _0x28e7b7
+        request3
       );
     },
-    _0x27e695 = (_0x208465) => {
-      if (!_0x9ad6a8['batchSubmissionRecords'][_0x208465]) return;
-      _0x9ad6a8['batchSubmissionRecords'][_0x208465] = {
-        ..._0x9ad6a8['batchSubmissionRecords'][_0x208465],
+    handler11 = (value391) => {
+      if (!current2['batchSubmissionRecords'][value391]) return;
+      current2['batchSubmissionRecords'][value391] = {
+        ...current2['batchSubmissionRecords'][value391],
         status: 'validated',
         validatedAt: Date['now'](),
       };
     },
-    _0x428c0d = async (_0x55bff4, _0x3b9f9b, _0x7aea17) => {
-      const _0x217c02 = _0x9ad6a8['batchSubmissionRecords'][_0x55bff4];
-      if (!_0x217c02 || !normalizeText(_0x217c02['rawResponse'])) throw _0x7aea17;
-      ((_0x217c02['status'] = 'blocked-paid-response'),
-        (_0x217c02['errorType'] = classifyStoryAssetKindError(_0x7aea17)['type']),
-        (_0x217c02['errorMessage'] = normalizeText(_0x7aea17?.['message'] || _0x7aea17)));
-      const _0x1ba830 = normalizeText(_0x7aea17?.['finishReason'] || _0x217c02['finishReason'])[
-        'toLowerCase'
-      ]();
-      if (_0x1ba830) _0x217c02['finishReason'] = _0x1ba830;
-      ((_0x217c02['blockedAt'] = Date['now']()),
-        (_0x9ad6a8['status'] = 'blocked'),
-        await _0x153924({
-          stage: _0x3b9f9b?.['stage'],
+    handler12 = async (value392, stage3, error53) => {
+      const response11 = current2['batchSubmissionRecords'][value392];
+      if (!response11 || !normalizeText(response11['rawResponse'])) throw error53;
+      ((response11['status'] = 'blocked-paid-response'),
+        (response11['errorType'] = classifyStoryAssetKindError(error53)['type']),
+        (response11['errorMessage'] = normalizeText(error53?.['message'] || error53)));
+      const text28 = normalizeText(error53?.['finishReason'] || response11['finishReason'])['toLowerCase']();
+      if (text28) response11['finishReason'] = text28;
+      ((response11['blockedAt'] = Date['now']()),
+        (current2['status'] = 'blocked'),
+        await run6({
+          stage: stage3?.['stage'],
           message:
-            (_0x3b9f9b?.['batchId'] || _0x55bff4) + '付费返回未通过合同校验；原始返回已保留，未自动重新请求',
+            (stage3?.['batchId'] || value392) + '付费返回未通过合同校验；原始返回已保留，未自动重新请求',
         }));
-      throw _0x2ecc29(
+      throw handler10(
         'ASSET_PAID_RESULT_BLOCKED',
-        _0x55bff4,
-        _0x3b9f9b,
-        (_0x3b9f9b?.['batchId'] || _0x55bff4) + '付费返回未通过合同校验；需要明确授权后才能重新请求。',
+        value392,
+        stage3,
+        (stage3?.['batchId'] || value392) + '付费返回未通过合同校验；需要明确授权后才能重新请求。',
       );
     },
-    _0x427886 = async ({ stage: _0x101a4b, message: _0x591438, remaining: _0xeb069d }) => {
-      ((_0x9ad6a8['status'] = 'partial'), await _0x153924({ stage: _0x101a4b, message: _0x591438 }));
-      throw createStoryAssetPipelineContinuation(_0x9ad6a8, _0x591438, _0xeb069d);
+    handler13 = async ({ stage: stage4, message: message4, remaining: remaining }) => {
+      ((current2['status'] = 'partial'), await run6({ stage: stage4, message: message4 }));
+      throw createStoryAssetPipelineContinuation(current2, message4, remaining);
     },
-    _0x57a84a = async (_0x4f9113, _0x4b0c91) => {
+    handler14 = async (batchId, value393) => {
       if (!allowLocalBaselineFallback) {
-        const _0x173348 = normalizeText(_0x4b0c91) || '资产清单 API 请求不可用';
-        (_0x9ad6a8['failures']['push']({
+        const errorMessage = normalizeText(value393) || '资产清单 API 请求不可用';
+        (current2['failures']['push']({
           stage: 'inventory',
-          batchId: _0x4f9113['id'],
-          batchLabel: _0x4f9113['id'] + '（' + _0x4f9113['sourceScenes']['length'] + ' 场）',
+          batchId: batchId['id'],
+          batchLabel: batchId['id'] + '（' + batchId['sourceScenes']['length'] + ' 场）',
           errorType: 'incomplete-ai-inventory',
-          errorMessage: _0x173348,
-          sourceSceneRefs: _0x4f9113['sourceScenes']['map']((_0x17fc41) => _0x17fc41['ref']),
+          errorMessage: errorMessage,
+          sourceSceneRefs: batchId['sourceScenes']['map']((value394) => value394['ref']),
         }),
-          (_0x9ad6a8['status'] = 'failed'),
-          await _0x153924({
+          (current2['status'] = 'failed'),
+          await run6({
             stage: 'inventory',
-            message: _0x4f9113['id'] + '未获得完整\x20API\x20清单；已停止且不会使用本地候选冒充正式资产',
+            message: batchId['id'] + '未获得完整\x20API\x20清单；已停止且不会使用本地候选冒充正式资产',
           }));
-        throw createStoryAssetPipelineError(_0x9ad6a8['failures']);
+        throw createStoryAssetPipelineError(current2['failures']);
       }
-      const _0x336371 = createDeterministicStoryAssetInventory({
+      const inventory2 = createDeterministicStoryAssetInventory({
         project: project,
-        sourceScenes: _0x4f9113['sourceScenes'],
+        sourceScenes: batchId['sourceScenes'],
       });
-      (_0x9ad6a8['inventoryBatches']['push']({
-        id: _0x4f9113['id'],
+      (current2['inventoryBatches']['push']({
+        id: batchId['id'],
         status: 'succeeded',
-        sourceSceneRefs: _0x4f9113['sourceScenes']['map']((_0x3e4945) => _0x3e4945['ref']),
+        sourceSceneRefs: batchId['sourceScenes']['map']((value395) => value395['ref']),
         salvaged: ![],
         localFallback: !![],
-        fallbackReason: normalizeText(_0x4b0c91) || '清单请求不可用，已使用本地确定性清单',
-        inventory: _0x336371,
+        fallbackReason: normalizeText(value393) || '清单请求不可用，已使用本地确定性清单',
+        inventory: inventory2,
       }),
-        await _0x153924({
+        await run6({
           stage: 'inventory',
           message:
-            _0x4f9113['id'] +
+            batchId['id'] +
             '（' +
-            _0x4f9113['sourceScenes']['length'] +
+            batchId['sourceScenes']['length'] +
             ' 场）已使用本地确定性清单；后续不会为清单自动重试',
         }));
     },
-    _0x5c1289 = (Array['isArray'](_0x9ad6a8['inventoryBatches']) ? _0x9ad6a8['inventoryBatches'] : [])[
-      'filter'
-    ](
-      (_0x5bfee6) =>
-        _0x5bfee6?.['status'] === 'succeeded' &&
-        Array['isArray'](_0x5bfee6['sourceSceneRefs']) &&
-        _0x5bfee6['inventory'],
+    list116 = (Array['isArray'](current2['inventoryBatches']) ? current2['inventoryBatches'] : [])['filter'](
+      (response12) =>
+        response12?.['status'] === 'succeeded' &&
+        Array['isArray'](response12['sourceSceneRefs']) &&
+        response12['inventory'],
     ),
-    _0x1f8210 = new Set(_0x5c1289['flatMap']((_0x58f035) => _0x58f035['sourceSceneRefs'])),
-    _0x41df66 = _0x92e8b['filter']((_0x10ed25) => !_0x1f8210['has'](_0x10ed25['ref']));
-  if (_0x41df66['length']) {
-    ((_0x9ad6a8['phase'] = 'inventory'),
-      (_0x9ad6a8['status'] = 'in-progress'),
-      (_0x9ad6a8['inventoryBatches'] = _0x5c1289),
-      await _0x153924({
+    map47 = new Set(list116['flatMap']((value396) => value396['sourceSceneRefs'])),
+    sourceScenes10 = sourceScenes9['filter']((value397) => !map47['has'](value397['ref']));
+  if (sourceScenes10['length']) {
+    ((current2['phase'] = 'inventory'),
+      (current2['status'] = 'in-progress'),
+      (current2['inventoryBatches'] = list116),
+      await run6({
         stage: 'inventory',
-        message: '正在建立轻量资产清单（已覆盖 ' + _0x1f8210['size'] + '/' + _0x92e8b['length'] + ' 场）',
+        message: '正在建立轻量资产清单（已覆盖 ' + map47['size'] + '/' + sourceScenes9['length'] + ' 场）',
       }));
-    let _0x25977c = [];
+    let list117 = [];
     try {
-      _0x25977c = createStoryAssetInventorySourceBatches({ project: project, sourceScenes: _0x41df66 })[
+      list117 = createStoryAssetInventorySourceBatches({ project: project, sourceScenes: sourceScenes10 })[
         'map'
-      ]((_0x54780d, _0x1badfb) => ({ id: 'inventory-' + (_0x1badfb + 0x1), sourceScenes: _0x54780d }));
-    } catch (_0x3b6e77) {
-      _0x25977c = [
+      ]((sourceScenes11, value398) => ({
+        id: 'inventory-' + (value398 + 0x1),
+        sourceScenes: sourceScenes11,
+      }));
+    } catch (error54) {
+      list117 = [
         {
           id: 'inventory-local-fallback',
-          sourceScenes: _0x41df66,
-          localFallbackReason: normalizeText(_0x3b6e77?.['message']) || '清单输入超过安全窗口',
+          sourceScenes: sourceScenes10,
+          localFallbackReason: normalizeText(error54?.['message']) || '清单输入超过安全窗口',
         },
       ];
     }
-    while (_0x25977c['length']) {
-      const _0x471c18 = _0x25977c['shift'](),
-        _0x2d17bf = _0x471c18['id'] + '（' + _0x471c18['sourceScenes']['length'] + ' 场）',
-        _0xdfb904 = createStoryAssetBatchContractKey(
+    while (list117['length']) {
+      const batchId2 = list117['shift'](),
+        message5 = batchId2['id'] + '（' + batchId2['sourceScenes']['length'] + ' 场）',
+        batchKey2 = createStoryAssetBatchContractKey(
           'inventory',
-          _0x471c18['sourceScenes']['map']((_0x496ae9) => _0x496ae9['ref']),
+          batchId2['sourceScenes']['map']((value399) => value399['ref']),
         ),
-        _0xc362ec = {
+        value400 = {
           stage: 'inventory',
-          batchId: _0x471c18['id'],
-          batchKey: _0xdfb904,
+          batchId: batchId2['id'],
+          batchKey: batchKey2,
           kinds: STORY_ASSET_EXPERIMENTAL_KINDS,
-          contractIdentities: _0x471c18['sourceScenes']['map']((_0x18a338) => _0x18a338['ref']),
-          sourceSceneCount: _0x471c18['sourceScenes']['length'],
+          contractIdentities: batchId2['sourceScenes']['map']((value401) => value401['ref']),
+          sourceSceneCount: batchId2['sourceScenes']['length'],
         };
       !allowLocalBaselineFallback &&
-        !_0x4b4c56 &&
-        !_0x471c18['localFallbackReason'] &&
-        _0x429444 >= _0x1f9cae &&
-        (await _0x427886({
+        !enabled19 &&
+        !batchId2['localFallbackReason'] &&
+        requestCount >= callLimit &&
+        (await handler13({
           stage: 'inventory',
           message:
             '本轮已完成\x20' +
-            _0x429444 +
+            requestCount +
             '/' +
-            _0x1f9cae +
+            callLimit +
             ' 次分批调用；仍有清单批次待处理，系统将自动继续',
           remaining: {
             phase: 'inventory',
             sourceSceneCount:
-              _0x471c18['sourceScenes']['length'] +
-              _0x25977c['reduce'](
-                (_0x44874c, _0x3f3379) => _0x44874c + _0x3f3379['sourceScenes']['length'],
-                0x0,
-              ),
+              batchId2['sourceScenes']['length'] +
+              list117['reduce']((value402, value403) => value402 + value403['sourceScenes']['length'], 0x0),
           },
         }));
-      if (_0x4b4c56 || _0x471c18['localFallbackReason'] || _0x429444 >= _0x1f9cae) {
-        await _0x57a84a(
-          _0x471c18,
-          _0x471c18['localFallbackReason'] || _0x39222a || '已达到本轮 ' + _0x1f9cae + '\x20次请求上限',
+      if (enabled19 || batchId2['localFallbackReason'] || requestCount >= callLimit) {
+        await handler14(
+          batchId2,
+          batchId2['localFallbackReason'] || fallbackReason || '已达到本轮 ' + callLimit + '\x20次请求上限',
         );
         continue;
       }
-      let _0x3b4e98 = null;
+      let inventory3 = null;
       try {
-        const _0x1da913 = await _0x43c2d9(
+        const value404 = await run7(
           {
-            model: _0xc16409,
-            provider: _0x48bb0e,
-            ...(_0x545d08 ? { providerProfileId: _0x545d08 } : {}),
+            model: model2,
+            provider: provider2,
+            ...(providerProfileId2 ? { providerProfileId: providerProfileId2 } : {}),
             prompt: buildStoryAssetInventoryPrompt({
               project: project,
-              sourceScenes: _0x471c18['sourceScenes'],
+              sourceScenes: batchId2['sourceScenes'],
             }),
             systemPrompt: STORY_ASSET_INVENTORY_SYSTEM_PROMPT,
             structuredOutput: createStoryAssetInventoryStructuredOutput(),
@@ -4116,641 +4098,648 @@ export async function extractStoryAssetsEvidenceBatched({
             maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
             allowOversizedPrompt: !![],
           },
-          _0xc362ec,
+          value400,
         );
         try {
-          const _0x4f3024 = normalizeText(
-            getStoryAssetResponseFinishReason(_0x1da913) ||
-              _0x9ad6a8['batchSubmissionRecords'][_0xdfb904]?.['finishReason'],
+          const finishReason2 = normalizeText(
+            getStoryAssetResponseFinishReason(value404) ||
+              current2['batchSubmissionRecords'][batchKey2]?.['finishReason'],
           )['toLowerCase']();
-          if (isStoryAssetResponseTruncated(_0x4f3024))
-            throw Object['assign'](new Error(_0x2d17bf + '输出被截断。'), {
+          if (isStoryAssetResponseTruncated(finishReason2))
+            throw Object['assign'](new Error(message5 + '输出被截断。'), {
               type: 'OUTPUT_LENGTH',
-              finishReason: _0x4f3024,
+              finishReason: finishReason2,
             });
-          _0x3b4e98 = allowLocalBaselineFallback
-            ? parseStoryAssetInventoryResultWithSalvage(_0x1da913, {
-                sourceScenes: _0x471c18['sourceScenes'],
+          inventory3 = allowLocalBaselineFallback
+            ? parseStoryAssetInventoryResultWithSalvage(value404, {
+                sourceScenes: batchId2['sourceScenes'],
               })
-            : parseStoryAssetInventoryResult(_0x1da913, {
+            : parseStoryAssetInventoryResult(value404, {
                 sourceScenes:
                   JSON['parse'](
-                    _0x9ad6a8['batchSubmissionRecords'][_0xdfb904]?.['contractSnapshot']?.['prompt'] || '{}',
-                  )['sourceScenes'] || _0x471c18['sourceScenes'],
+                    current2['batchSubmissionRecords'][batchKey2]?.['contractSnapshot']?.['prompt'] || '{}',
+                  )['sourceScenes'] || batchId2['sourceScenes'],
               });
-        } catch (_0x41ba24) {
-          await _0x428c0d(_0xdfb904, _0xc362ec, _0x41ba24);
+        } catch (value405) {
+          await handler12(batchKey2, value400, value405);
         }
-      } catch (_0x55995d) {
+      } catch (value406) {
         if (
           ['ASSET_SUBMISSION_AMBIGUOUS', 'ASSET_PAID_RESULT_BLOCKED', 'ASSET_EXTRACTION_CONTINUE_REQUIRED'][
             'includes'
-          ](_0x55995d?.['type'])
+          ](value406?.['type'])
         )
-          throw _0x55995d;
-        const _0x4a3627 = classifyStoryAssetKindError(_0x55995d);
-        ((_0x4b4c56 = !![]),
-          (_0x39222a =
-            getStoryAssetKindErrorLabel(_0x4a3627['type'], _0x4a3627['message']) + '，已熔断后续请求'),
-          await _0x57a84a(_0x471c18, _0x39222a));
+          throw value406;
+        const error55 = classifyStoryAssetKindError(value406);
+        ((enabled19 = !![]),
+          (fallbackReason =
+            getStoryAssetKindErrorLabel(error55['type'], error55['message']) + '，已熔断后续请求'),
+          await handler14(batchId2, fallbackReason));
         continue;
       }
-      (_0x9ad6a8['inventoryBatches']['push']({
-        id: _0x471c18['id'],
+      (current2['inventoryBatches']['push']({
+        id: batchId2['id'],
         status: 'succeeded',
-        sourceSceneRefs: _0x471c18['sourceScenes']['map']((_0x57c7ad) => _0x57c7ad['ref']),
-        salvaged: Boolean(_0x3b4e98['salvaged']),
-        inventory: _0x3b4e98,
+        sourceSceneRefs: batchId2['sourceScenes']['map']((value407) => value407['ref']),
+        salvaged: Boolean(inventory3['salvaged']),
+        inventory: inventory3,
       }),
-        _0x27e695(_0xdfb904),
-        await _0x153924({
+        handler11(batchKey2),
+        await run6({
           stage: 'inventory',
-          message: _0x2d17bf + '完成；本轮已调用\x20' + _0x429444 + '/' + _0x1f9cae + '\x20次',
+          message: message5 + '完成；本轮已调用\x20' + requestCount + '/' + callLimit + '\x20次',
         }));
     }
-    const _0x154934 = new Set(
-        _0x9ad6a8['inventoryBatches']['flatMap']((_0x127948) => _0x127948['sourceSceneRefs'] || []),
+    const map48 = new Set(
+        current2['inventoryBatches']['flatMap']((value408) => value408['sourceSceneRefs'] || []),
       ),
-      _0x15c614 = _0x92e8b['map']((_0x492bc2) => _0x492bc2['ref'])['filter'](
-        (_0x8ccda3) => !_0x154934['has'](_0x8ccda3),
+      list118 = sourceScenes9['map']((value409) => value409['ref'])['filter'](
+        (value410) => !map48['has'](value410),
       );
-    if (_0x15c614['length']) {
-      const _0x4f22f9 = new Set(_0x15c614);
-      await _0x57a84a(
+    if (list118['length']) {
+      const map49 = new Set(list118);
+      await handler14(
         {
           id: 'inventory-missing-local-fallback',
-          sourceScenes: _0x92e8b['filter']((_0x19f62b) => _0x4f22f9['has'](_0x19f62b['ref'])),
+          sourceScenes: sourceScenes9['filter']((value411) => map49['has'](value411['ref'])),
         },
         '清单覆盖缺失，已使用本地确定性清单补齐',
       );
     }
   }
-  if (!_0x9ad6a8['inventory']) {
-    const _0x30eb94 = mergeStoryAssetInventoryResults(
-      _0x9ad6a8['inventoryBatches']['map']((_0x59a803) => _0x59a803['inventory']),
-      { sourceScenes: _0x92e8b },
+  if (!current2['inventory']) {
+    const storyAssetInventoryResults = mergeStoryAssetInventoryResults(
+      current2['inventoryBatches']['map']((value412) => value412['inventory']),
+      { sourceScenes: sourceScenes9 },
     );
-    _0x9ad6a8['inventory'] = _0x30eb94;
+    current2['inventory'] = storyAssetInventoryResults;
   }
-  _0x9ad6a8['inventory'] = reconcileStoryAssetInventory(_0x9ad6a8['inventory'], {
+  current2['inventory'] = reconcileStoryAssetInventory(current2['inventory'], {
     project: project,
-    sourceScenes: _0x92e8b,
+    sourceScenes: sourceScenes9,
   });
   if (!allowLocalBaselineFallback) {
-    const _0x2a0f11 = (_0x9ad6a8['inventory']?.['assets'] || [])['filter'](
-      (_0x309c50) =>
-        _0x309c50?.['kind'] === 'scene' && /[/／|｜]/u['test'](normalizeText(_0x309c50?.['name'])),
+    const assetRefs = (current2['inventory']?.['assets'] || [])['filter'](
+      (error56) => error56?.['kind'] === 'scene' && /[/／|｜]/u['test'](normalizeText(error56?.['name'])),
     );
-    if (_0x2a0f11['length']) {
-      (_0x9ad6a8['failures']['push']({
+    if (assetRefs['length']) {
+      (current2['failures']['push']({
         stage: 'inventory',
         batchId: 'inventory-scene-quality-gate',
         batchLabel: '场景原子化校验',
         errorType: 'composite-scene-assets',
-        errorMessage: '仍有\x20' + _0x2a0f11['length'] + '\x20个复合场景名',
-        assetRefs: _0x2a0f11['map']((_0x326d2f) => _0x326d2f['ref']),
+        errorMessage: '仍有\x20' + assetRefs['length'] + '\x20个复合场景名',
+        assetRefs: assetRefs['map']((value413) => value413['ref']),
       }),
-        (_0x9ad6a8['status'] = 'failed'),
-        await _0x153924({
+        (current2['status'] = 'failed'),
+        await run6({
           stage: 'inventory',
           message:
-            '场景清单仍包含 ' + _0x2a0f11['length'] + '\x20个复合地点；已停止且不会把复合标题写入正式资产',
+            '场景清单仍包含 ' + assetRefs['length'] + '\x20个复合地点；已停止且不会把复合标题写入正式资产',
         }));
-      throw createStoryAssetPipelineError(_0x9ad6a8['failures']);
+      throw createStoryAssetPipelineError(current2['failures']);
     }
   }
   reportStoryAssetDiagnostics(diagnostics, 'story-asset-candidate-ledger', {
     status: 'completed',
-    ...(_0x9ad6a8['inventory']?.['candidateLedger']?.['summary'] || {}),
+    ...(current2['inventory']?.['candidateLedger']?.['summary'] || {}),
   });
-  const _0x380921 = inspectStoryAssetInventoryCoverage(_0x9ad6a8['inventory'], _0x92e8b);
-  _0x380921['length']
-    ? ((_0x9ad6a8['inventory']['coverageWarnings'] = cloneStoryAssetExtractionValue(_0x380921)),
+  const issueCount = inspectStoryAssetInventoryCoverage(current2['inventory'], sourceScenes9);
+  issueCount['length']
+    ? ((current2['inventory']['coverageWarnings'] = cloneStoryAssetExtractionValue(issueCount)),
       reportStoryAssetDiagnostics(diagnostics, 'story-asset-coverage-warning', {
         status: 'fallback',
-        issueCount: _0x380921['length'],
-        issueTypes: normalizeStringArray(_0x380921['map']((_0x15df02) => _0x15df02['type'])),
+        issueCount: issueCount['length'],
+        issueTypes: normalizeStringArray(issueCount['map']((value414) => value414['type'])),
       }))
-    : delete _0x9ad6a8['inventory']['coverageWarnings'];
-  const _0x55c21f = createStoryAssetDetailPlans({
-      inventory: _0x9ad6a8['inventory'],
-      sourceScenes: _0x92e8b,
-      chapterIds: _0x42827c['chapterIds'],
+    : delete current2['inventory']['coverageWarnings'];
+  const list119 = createStoryAssetDetailPlans({
+      inventory: current2['inventory'],
+      sourceScenes: sourceScenes9,
+      chapterIds: storyContext3['chapterIds'],
     }),
-    _0x36a808 = new Map(_0x55c21f['map']((_0x2c0925) => [_0x2c0925['ref'], _0x2c0925]));
-  ((_0x9ad6a8['completedAssets'] = (
-    Array['isArray'](_0x9ad6a8['completedAssets']) ? _0x9ad6a8['completedAssets'] : []
+    map50 = new Map(list119['map']((value415) => [value415['ref'], value415]));
+  ((current2['completedAssets'] = (
+    Array['isArray'](current2['completedAssets']) ? current2['completedAssets'] : []
   )
     ['filter'](
-      (_0x40d757) =>
-        _0x36a808['has'](_0x40d757?.['ref']) &&
-        (allowLocalBaselineFallback || normalizeText(_0x40d757?.['designStatus']) !== 'baseline'),
+      (value416) =>
+        map50['has'](value416?.['ref']) &&
+        (allowLocalBaselineFallback || normalizeText(value416?.['designStatus']) !== 'baseline'),
     )
-    ['map']((_0x5f1cd3) => {
-      const _0x8cc34b = _0x36a808['get'](_0x5f1cd3['ref']),
-        _0x4b1f2d = new Map(_0x8cc34b['appearances']['map']((_0x3c2fef) => [_0x3c2fef['ref'], _0x3c2fef])),
-        _0x4c2982 = (Array['isArray'](_0x5f1cd3?.['appearances']) ? _0x5f1cd3['appearances'] : [])
-          ['filter']((_0x485f9c) => _0x4b1f2d['has'](_0x485f9c?.['ref']))
-          ['map']((_0x16dfac) => {
-            const _0x3d7308 = _0x4b1f2d['get'](_0x16dfac['ref']);
+    ['map']((args45) => {
+      const kind6 = map50['get'](args45['ref']),
+        map51 = new Map(kind6['appearances']['map']((value417) => [value417['ref'], value417])),
+        prompt7 = (Array['isArray'](args45?.['appearances']) ? args45['appearances'] : [])
+          ['filter']((value418) => map51['has'](value418?.['ref']))
+          ['map']((args46) => {
+            const name16 = map51['get'](args46['ref']);
             return {
-              ..._0x16dfac,
-              name: _0x3d7308['name'],
-              occurrences: _0x3d7308['occurrences'],
-              sourceChapterIds: _0x3d7308['sourceEpisodeRefs'],
-              sourceEpisodeRefs: _0x3d7308['sourceEpisodeRefs'],
-              sourceSceneRefs: _0x3d7308['sourceSceneRefs'],
+              ...args46,
+              name: name16['name'],
+              occurrences: name16['occurrences'],
+              sourceChapterIds: name16['sourceEpisodeRefs'],
+              sourceEpisodeRefs: name16['sourceEpisodeRefs'],
+              sourceSceneRefs: name16['sourceSceneRefs'],
             };
           });
       return {
-        ..._0x5f1cd3,
-        kind: _0x8cc34b['kind'],
-        name: _0x8cc34b['name'],
-        role: _0x8cc34b['role'],
-        occurrences: _0x8cc34b['occurrences'],
-        prompt: _0x4c2982[0x0]?.['prompt'] || _0x5f1cd3['prompt'] || '',
-        sourceChapterIds: _0x8cc34b['sourceEpisodeRefs'],
-        sourceEpisodeRefs: _0x8cc34b['sourceEpisodeRefs'],
-        sourceSceneRefs: _0x8cc34b['sourceSceneRefs'],
-        appearances: _0x4c2982,
+        ...args45,
+        kind: kind6['kind'],
+        name: kind6['name'],
+        role: kind6['role'],
+        occurrences: kind6['occurrences'],
+        prompt: prompt7[0x0]?.['prompt'] || args45['prompt'] || '',
+        sourceChapterIds: kind6['sourceEpisodeRefs'],
+        sourceEpisodeRefs: kind6['sourceEpisodeRefs'],
+        sourceSceneRefs: kind6['sourceSceneRefs'],
+        appearances: prompt7,
       };
     })),
-    (_0x9ad6a8['detailBatches'] = Array['isArray'](_0x9ad6a8['detailBatches'])
-      ? _0x9ad6a8['detailBatches']
+    (current2['detailBatches'] = Array['isArray'](current2['detailBatches'])
+      ? current2['detailBatches']
       : []));
-  const _0x5de858 = new Set(
-    _0x9ad6a8['detailBatches']
-      ['map']((_0x3963a7) => normalizeText(_0x3963a7?.['submissionBatchKey']))
+  const map52 = new Set(
+    current2['detailBatches']
+      ['map']((value419) => normalizeText(value419?.['submissionBatchKey']))
       ['filter'](Boolean),
   );
-  (Object['entries'](_0x9ad6a8['batchSubmissionRecords'])['forEach'](([_0x487781, _0xd1eabf]) => {
+  (Object['entries'](current2['batchSubmissionRecords'])['forEach'](([submissionBatchKey, args47]) => {
     if (
-      normalizeText(_0xd1eabf?.['stage']) !== 'detail' ||
-      !normalizeText(_0xd1eabf?.['rawResponse']) ||
-      _0x5de858['has'](_0x487781)
+      normalizeText(args47?.['stage']) !== 'detail' ||
+      !normalizeText(args47?.['rawResponse']) ||
+      map52['has'](submissionBatchKey)
     )
       return;
-    let _0x159b3c = [];
+    let list120 = [];
     try {
-      const _0x20653b = JSON['parse'](_0xd1eabf?.['contractSnapshot']?.['prompt'] || '{}');
-      _0x159b3c = Array['isArray'](_0x20653b?.['assetPlans']) ? _0x20653b['assetPlans'] : [];
+      const value420 = JSON['parse'](args47?.['contractSnapshot']?.['prompt'] || '{}');
+      list120 = Array['isArray'](value420?.['assetPlans']) ? value420['assetPlans'] : [];
     } catch {
       return;
     }
-    const _0x5bcd75 = _0x159b3c['map']((_0x5ba524) => _0x36a808['get'](normalizeText(_0x5ba524?.['ref'])))[
+    const assetPlans3 = list120['map']((value421) => map50['get'](normalizeText(value421?.['ref'])))[
         'filter'
       ](Boolean),
-      _0x4ba22 = _0x159b3c['map']((_0x22cb08) => normalizeText(_0x22cb08?.['ref']))['filter'](
-        (_0x400157) => _0x400157 && !_0x36a808['has'](_0x400157),
+      reconciledRemovedAssetRefs = list120['map']((value422) => normalizeText(value422?.['ref']))['filter'](
+        (value423) => value423 && !map50['has'](value423),
       );
-    if (!_0x5bcd75['length'] || !_0x4ba22['length']) return;
-    const _0x4ad7b5 = salvageStoryAssetDetailBatchResult(_0xd1eabf['rawResponse'], {
-        assetPlans: _0x5bcd75,
-        chapterIds: _0x42827c['chapterIds'],
-        visualStyle: _0x46d60e,
+    if (!assetPlans3['length'] || !reconciledRemovedAssetRefs['length']) return;
+    const completedAssetRefs = salvageStoryAssetDetailBatchResult(args47['rawResponse'], {
+        assetPlans: assetPlans3,
+        chapterIds: storyContext3['chapterIds'],
+        visualStyle: visualStyle2,
       }),
-      _0x9bf21a = new Set(_0x4ad7b5['map']((_0x26b7e6) => _0x26b7e6['ref']));
-    if (!_0x5bcd75['every']((_0x312922) => _0x9bf21a['has'](_0x312922['ref']))) return;
-    ((_0x9ad6a8['completedAssets'] = [
-      ..._0x9ad6a8['completedAssets']['filter']((_0xa9ce4a) => !_0x9bf21a['has'](_0xa9ce4a['ref'])),
-      ..._0x4ad7b5,
+      map53 = new Set(completedAssetRefs['map']((value424) => value424['ref']));
+    if (!assetPlans3['every']((value425) => map53['has'](value425['ref']))) return;
+    ((current2['completedAssets'] = [
+      ...current2['completedAssets']['filter']((value426) => !map53['has'](value426['ref'])),
+      ...completedAssetRefs,
     ]),
-      _0x9ad6a8['detailBatches']['push']({
+      current2['detailBatches']['push']({
         id:
-          normalizeText(_0xd1eabf?.['batchId']) ||
-          'detail-recovered-' + (_0x9ad6a8['detailBatches']['length'] + 0x1),
+          normalizeText(args47?.['batchId']) ||
+          'detail-recovered-' + (current2['detailBatches']['length'] + 0x1),
         status: 'succeeded',
-        assetRefs: _0x5bcd75['map']((_0xef7452) => _0xef7452['ref']),
-        completedAssetRefs: _0x4ad7b5['map']((_0x1ade3a) => _0x1ade3a['ref']),
+        assetRefs: assetPlans3['map']((value427) => value427['ref']),
+        completedAssetRefs: completedAssetRefs['map']((value428) => value428['ref']),
         fallbackAssetRefs: [],
         recoveredFromSavedResponse: !![],
-        submissionBatchKey: _0x487781,
-        reconciledRemovedAssetRefs: _0x4ba22,
+        submissionBatchKey: submissionBatchKey,
+        reconciledRemovedAssetRefs: reconciledRemovedAssetRefs,
       }),
-      (_0x9ad6a8['batchSubmissionRecords'][_0x487781] = {
-        ..._0xd1eabf,
+      (current2['batchSubmissionRecords'][submissionBatchKey] = {
+        ...args47,
         status: 'validated',
         validatedAt: Date['now'](),
         recoveredFromSavedResponse: !![],
-        reconciledRemovedAssetRefs: _0x4ba22,
+        reconciledRemovedAssetRefs: reconciledRemovedAssetRefs,
       }),
-      _0x5de858['add'](_0x487781));
+      map52['add'](submissionBatchKey));
   }),
-    _0x9ad6a8['detailBatches']['forEach']((_0xd0491a) => {
-      const _0x391b12 = normalizeText(_0xd0491a?.['rawResponse']);
-      if (!_0x391b12 || _0xd0491a?.['status'] === 'succeeded') return;
-      const _0x5d7fcb = normalizeStringArray(_0xd0491a?.['assetRefs'])
-        ['map']((_0x345311) => _0x36a808['get'](_0x345311))
+    current2['detailBatches']['forEach']((response13) => {
+      const text29 = normalizeText(response13?.['rawResponse']);
+      if (!text29 || response13?.['status'] === 'succeeded') return;
+      const assetPlans4 = normalizeStringArray(response13?.['assetRefs'])
+        ['map']((value429) => map50['get'](value429))
         ['filter'](Boolean);
-      if (!_0x5d7fcb['length']) return;
-      const _0x3857c3 = salvageStoryAssetDetailBatchResult(_0x391b12, {
-          assetPlans: _0x5d7fcb,
-          chapterIds: _0x42827c['chapterIds'],
-          visualStyle: _0x46d60e,
+      if (!assetPlans4['length']) return;
+      const list121 = salvageStoryAssetDetailBatchResult(text29, {
+          assetPlans: assetPlans4,
+          chapterIds: storyContext3['chapterIds'],
+          visualStyle: visualStyle2,
         }),
-        _0x265128 = new Set(_0x3857c3['map']((_0x28e008) => _0x28e008['ref'])),
-        _0x1e4e06 = allowLocalBaselineFallback
+        map54 = new Set(list121['map']((value430) => value430['ref'])),
+        list122 = allowLocalBaselineFallback
           ? createStoryAssetBaselineDetailAssets(
-              _0x5d7fcb['filter']((_0x2a9f99) => !_0x265128['has'](_0x2a9f99['ref'])),
-              { sourceScenes: _0x92e8b, visualStyle: _0x46d60e },
+              assetPlans4['filter']((value431) => !map54['has'](value431['ref'])),
+              { sourceScenes: sourceScenes9, visualStyle: visualStyle2 },
             )
           : [],
-        _0x55ccd6 = [..._0x3857c3, ..._0x1e4e06];
-      if (!_0x55ccd6['length']) return;
-      const _0x369564 = new Set(_0x55ccd6['map']((_0x1331f7) => _0x1331f7['ref']));
-      ((_0x9ad6a8['completedAssets'] = [
-        ..._0x9ad6a8['completedAssets']['filter']((_0x515b6b) => !_0x369564['has'](_0x515b6b['ref'])),
-        ..._0x55ccd6,
+        list123 = [...list121, ...list122];
+      if (!list123['length']) return;
+      const map55 = new Set(list123['map']((value432) => value432['ref']));
+      ((current2['completedAssets'] = [
+        ...current2['completedAssets']['filter']((value433) => !map55['has'](value433['ref'])),
+        ...list123,
       ]),
-        (_0xd0491a['completedAssetRefs'] = normalizeStringArray([
-          ...(_0xd0491a['completedAssetRefs'] || []),
-          ..._0x369564,
+        (response13['completedAssetRefs'] = normalizeStringArray([
+          ...(response13['completedAssetRefs'] || []),
+          ...map55,
         ])),
-        (_0xd0491a['fallbackAssetRefs'] = normalizeStringArray([
-          ...(_0xd0491a['fallbackAssetRefs'] || []),
-          ..._0x1e4e06['map']((_0x146b6f) => _0x146b6f['ref']),
+        (response13['fallbackAssetRefs'] = normalizeStringArray([
+          ...(response13['fallbackAssetRefs'] || []),
+          ...list122['map']((value434) => value434['ref']),
         ])),
-        (_0xd0491a['status'] = _0x5d7fcb['every']((_0x198e9c) => _0x369564['has'](_0x198e9c['ref']))
+        (response13['status'] = assetPlans4['every']((value435) => map55['has'](value435['ref']))
           ? 'succeeded'
           : 'partial'),
-        (_0xd0491a['recoveredFromSavedResponse'] = !![]));
-      if (_0xd0491a['status'] === 'succeeded') delete _0xd0491a['rawResponse'];
+        (response13['recoveredFromSavedResponse'] = !![]));
+      if (response13['status'] === 'succeeded') delete response13['rawResponse'];
     }));
-  const _0x28babc = new Set(_0x9ad6a8['completedAssets']['map']((_0x4bd75a) => _0x4bd75a['ref'])),
-    _0x32fa3a = _0x55c21f['filter']((_0x1cc2ad) => !_0x28babc['has'](_0x1cc2ad['ref']));
-  let _0x15a8ef = [],
-    _0x48ce30 = null;
+  const map56 = new Set(current2['completedAssets']['map']((value436) => value436['ref'])),
+    batchPlans = list119['filter']((value437) => !map56['has'](value437['ref']));
+  let assetCount2 = [],
+    error57 = null;
   try {
-    _0x15a8ef = createStoryAssetDetailPromptBatches(_0x32fa3a, {
+    assetCount2 = createStoryAssetDetailPromptBatches(batchPlans, {
       project: project,
-      sourceScenes: _0x92e8b,
+      sourceScenes: sourceScenes9,
       aspectRatio: aspectRatio,
-      visualStyle: _0x46d60e,
-      estimateByKind: _0x9ad6a8['outputEstimates'],
+      visualStyle: visualStyle2,
+      estimateByKind: current2['outputEstimates'],
     });
-  } catch (_0x12d830) {
-    _0x48ce30 = _0x12d830;
+  } catch (value438) {
+    error57 = value438;
   }
-  const _0x51c94e = _0x9ad6a8['detailBatches']['length'],
-    _0x3ef312 = async ({
-      batchPlans: _0xd26bfc,
-      batchId: _0x444638,
-      fallbackReason: _0x178a6c,
-      message: _0x18c98b,
+  const value439 = current2['detailBatches']['length'],
+    handler15 = async ({
+      batchPlans: batchPlans2,
+      batchId: batchId3,
+      fallbackReason: fallbackReason2,
+      message: message6,
     }) => {
       if (!allowLocalBaselineFallback) {
-        const _0x198577 = normalizeText(_0x178a6c) || '资产视觉细化 API 请求不可用';
-        (_0x9ad6a8['detailBatches']['push']({
-          id: _0x444638,
+        const errorMessage2 = normalizeText(fallbackReason2) || '资产视觉细化 API 请求不可用';
+        (current2['detailBatches']['push']({
+          id: batchId3,
           status: 'failed',
-          assetRefs: _0xd26bfc['map']((_0x2eb1dd) => _0x2eb1dd['ref']),
+          assetRefs: batchPlans2['map']((value440) => value440['ref']),
           completedAssetRefs: [],
           fallbackAssetRefs: [],
-          errorMessage: _0x198577,
+          errorMessage: errorMessage2,
         }),
-          _0x9ad6a8['failures']['push']({
+          current2['failures']['push']({
             stage: 'detail',
-            batchId: _0x444638,
-            batchLabel: _0x444638 + '（' + _0xd26bfc['length'] + '\x20个资产）',
+            batchId: batchId3,
+            batchLabel: batchId3 + '（' + batchPlans2['length'] + '\x20个资产）',
             errorType: 'incomplete-ai-detail',
-            errorMessage: _0x198577,
-            assetRefs: _0xd26bfc['map']((_0x3ce45a) => _0x3ce45a['ref']),
+            errorMessage: errorMessage2,
+            assetRefs: batchPlans2['map']((value441) => value441['ref']),
           }),
-          (_0x9ad6a8['status'] = _0x9ad6a8['completedAssets']['length'] ? 'partial' : 'failed'),
-          await _0x153924({ stage: 'detail', message: _0x18c98b + '；已停止且不会生成本地假提示词' }));
-        throw createStoryAssetPipelineError(_0x9ad6a8['failures']);
+          (current2['status'] = current2['completedAssets']['length'] ? 'partial' : 'failed'),
+          await run6({ stage: 'detail', message: message6 + '；已停止且不会生成本地假提示词' }));
+        throw createStoryAssetPipelineError(current2['failures']);
       }
-      const _0x10af9c = createStoryAssetBaselineDetailAssets(_0xd26bfc, {
-          sourceScenes: _0x92e8b,
-          visualStyle: _0x46d60e,
+      const completedAssetRefs2 = createStoryAssetBaselineDetailAssets(batchPlans2, {
+          sourceScenes: sourceScenes9,
+          visualStyle: visualStyle2,
         }),
-        _0x40244e = new Set(_0x10af9c['map']((_0x5b6de5) => _0x5b6de5['ref']));
-      ((_0x9ad6a8['completedAssets'] = [
-        ..._0x9ad6a8['completedAssets']['filter']((_0x969bb4) => !_0x40244e['has'](_0x969bb4['ref'])),
-        ..._0x10af9c,
+        map57 = new Set(completedAssetRefs2['map']((value442) => value442['ref']));
+      ((current2['completedAssets'] = [
+        ...current2['completedAssets']['filter']((value443) => !map57['has'](value443['ref'])),
+        ...completedAssetRefs2,
       ]),
-        _0x9ad6a8['detailBatches']['push']({
-          id: _0x444638,
+        current2['detailBatches']['push']({
+          id: batchId3,
           status: 'succeeded',
-          assetRefs: _0xd26bfc['map']((_0x7d6c5) => _0x7d6c5['ref']),
-          completedAssetRefs: _0x10af9c['map']((_0x32e989) => _0x32e989['ref']),
-          fallbackAssetRefs: _0x10af9c['map']((_0x2fb3ae) => _0x2fb3ae['ref']),
-          fallbackReason: _0x178a6c,
+          assetRefs: batchPlans2['map']((value444) => value444['ref']),
+          completedAssetRefs: completedAssetRefs2['map']((value445) => value445['ref']),
+          fallbackAssetRefs: completedAssetRefs2['map']((value446) => value446['ref']),
+          fallbackReason: fallbackReason2,
           circuitBreakerFallback: !![],
         }),
-        await _0x153924({ stage: 'detail', message: _0x18c98b }));
+        await run6({ stage: 'detail', message: message6 }));
     };
-  _0x32fa3a['length'] &&
-    ((_0x9ad6a8['phase'] = 'detail'),
-    (_0x9ad6a8['status'] = 'in-progress'),
-    await _0x153924({
+  batchPlans['length'] &&
+    ((current2['phase'] = 'detail'),
+    (current2['status'] = 'in-progress'),
+    await run6({
       stage: 'detail',
       message:
-        '正在按资产证据生成描述与图片提示词（已完成 ' +
-        _0x28babc['size'] +
-        '/' +
-        _0x55c21f['length'] +
-        ' 个）',
+        '正在按资产证据生成描述与图片提示词（已完成 ' + map56['size'] + '/' + list119['length'] + ' 个）',
     }));
-  _0x32fa3a['length'] &&
-    _0x48ce30 &&
-    (await _0x3ef312({
-      batchPlans: _0x32fa3a,
-      batchId: 'detail-' + (_0x51c94e + 0x1),
-      fallbackReason: normalizeText(_0x48ce30?.['message']) || '资产证据超过安全窗口',
+  batchPlans['length'] &&
+    error57 &&
+    (await handler15({
+      batchPlans: batchPlans,
+      batchId: 'detail-' + (value439 + 0x1),
+      fallbackReason: normalizeText(error57?.['message']) || '资产证据超过安全窗口',
       message:
-        '资产证据超过安全窗口，已在本地生成\x20' + _0x32fa3a['length'] + '\x20个基础设定，不会扩大请求',
+        '资产证据超过安全窗口，已在本地生成\x20' + batchPlans['length'] + '\x20个基础设定，不会扩大请求',
     }));
-  for (let _0x57818c = 0x0; _0x57818c < _0x15a8ef['length']; _0x57818c += 0x1) {
-    const _0x126aa1 = _0x15a8ef[_0x57818c],
-      _0x5612cf = 'detail-' + (_0x51c94e + _0x57818c + 0x1),
-      _0x3fb578 = _0x5612cf + '（' + _0x126aa1['length'] + '\x20个资产）',
-      _0x310410 = createStoryAssetBatchContractKey(
+  for (let batchIndex2 = 0x0; batchIndex2 < assetCount2['length']; batchIndex2 += 0x1) {
+    const contractIdentities = assetCount2[batchIndex2],
+      batchId4 = 'detail-' + (value439 + batchIndex2 + 0x1),
+      message7 = batchId4 + '（' + contractIdentities['length'] + '\x20个资产）',
+      batchKey3 = createStoryAssetBatchContractKey(
         'detail',
-        _0x126aa1['map']((_0x450276) => _0x450276['kind'] + ':' + _0x450276['ref'] + ':' + _0x450276['name']),
-      ),
-      _0x200ee2 = {
-        stage: 'detail',
-        batchId: _0x5612cf,
-        batchKey: _0x310410,
-        kinds: normalizeStringArray(_0x126aa1['map']((_0x54235c) => _0x54235c['kind'])),
-        contractIdentities: _0x126aa1['map'](
-          (_0x6ddae) => _0x6ddae['kind'] + ':' + _0x6ddae['ref'] + ':' + _0x6ddae['name'],
+        contractIdentities['map'](
+          (error58) => error58['kind'] + ':' + error58['ref'] + ':' + error58['name'],
         ),
-        assetCount: _0x126aa1['length'],
-        sourceSceneCount: selectStoryAssetDetailSourceScenes(_0x126aa1, _0x92e8b)['length'],
+      ),
+      value447 = {
+        stage: 'detail',
+        batchId: batchId4,
+        batchKey: batchKey3,
+        kinds: normalizeStringArray(contractIdentities['map']((value448) => value448['kind'])),
+        contractIdentities: contractIdentities['map'](
+          (error59) => error59['kind'] + ':' + error59['ref'] + ':' + error59['name'],
+        ),
+        assetCount: contractIdentities['length'],
+        sourceSceneCount: selectStoryAssetDetailSourceScenes(contractIdentities, sourceScenes9)['length'],
       };
     !allowLocalBaselineFallback &&
-      !_0x4b4c56 &&
-      _0x429444 >= _0x1f9cae &&
-      (await _0x427886({
+      !enabled19 &&
+      requestCount >= callLimit &&
+      (await handler13({
         stage: 'detail',
         message:
           '本轮已完成\x20' +
-          _0x429444 +
+          requestCount +
           '/' +
-          _0x1f9cae +
+          callLimit +
           ' 次分批调用；仍有提示词批次待处理，系统将自动继续',
         remaining: {
           phase: 'detail',
-          assetCount: _0x15a8ef['slice'](_0x57818c)['reduce'](
-            (_0xfd3640, _0x3f3cfb) => _0xfd3640 + _0x3f3cfb['length'],
+          assetCount: assetCount2['slice'](batchIndex2)['reduce'](
+            (value449, list124) => value449 + list124['length'],
             0x0,
           ),
-          batchCount: _0x15a8ef['length'] - _0x57818c,
+          batchCount: assetCount2['length'] - batchIndex2,
         },
       }));
-    if (_0x4b4c56) {
-      await _0x3ef312({
-        batchPlans: _0x126aa1,
-        batchId: _0x5612cf,
-        fallbackReason: _0x39222a || '前序请求失败，熔断后未继续调用\x20API',
+    if (enabled19) {
+      await handler15({
+        batchPlans: contractIdentities,
+        batchId: batchId4,
+        fallbackReason: fallbackReason || '前序请求失败，熔断后未继续调用\x20API',
         message:
-          _0x3fb578 +
+          message7 +
           '已跳过 API，使用本地基础设定补齐；已完成 ' +
-          (_0x9ad6a8['completedAssets']['length'] + _0x126aa1['length']) +
+          (current2['completedAssets']['length'] + contractIdentities['length']) +
           '/' +
-          _0x55c21f['length'] +
+          list119['length'] +
           '\x20个资产',
       });
       continue;
     }
-    let _0x37bd8d = null;
+    let value450 = null;
     try {
-      _0x37bd8d = await _0x43c2d9(
+      value450 = await run7(
         {
-          model: _0xc16409,
-          provider: _0x48bb0e,
-          ...(_0x545d08 ? { providerProfileId: _0x545d08 } : {}),
+          model: model2,
+          provider: provider2,
+          ...(providerProfileId2 ? { providerProfileId: providerProfileId2 } : {}),
           prompt: buildStoryAssetDetailBatchPrompt({
             project: project,
-            sourceScenes: _0x92e8b,
-            batches: _0x15a8ef,
-            batchIndex: _0x57818c,
+            sourceScenes: sourceScenes9,
+            batches: assetCount2,
+            batchIndex: batchIndex2,
             aspectRatio: aspectRatio,
-            visualStyle: _0x46d60e,
+            visualStyle: visualStyle2,
           }),
           systemPrompt: STORY_ASSET_DETAIL_SYSTEM_PROMPT,
-          structuredOutput: createStoryAssetDetailStructuredOutput(_0x57818c, _0x126aa1),
+          structuredOutput: createStoryAssetDetailStructuredOutput(batchIndex2, contractIdentities),
           thinking: { type: 'disabled' },
           temperature: 0.2,
           timeoutMs: STORY_ASSET_EXPERIMENTAL_REQUEST_TIMEOUT_MS,
           maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
         },
-        _0x200ee2,
+        value447,
       );
-      const _0x42fd50 = normalizeText(
-        getStoryAssetResponseFinishReason(_0x37bd8d) ||
-          _0x9ad6a8['batchSubmissionRecords'][_0x310410]?.['finishReason'],
+      const finishReason3 = normalizeText(
+        getStoryAssetResponseFinishReason(value450) ||
+          current2['batchSubmissionRecords'][batchKey3]?.['finishReason'],
       )['toLowerCase']();
-      let _0x1366d7 = [],
-        _0x2bab87 = null;
+      let completedAssetRefs3 = [],
+        error60 = null;
       if (!allowLocalBaselineFallback)
         try {
-          if (isStoryAssetResponseTruncated(_0x42fd50))
-            throw Object['assign'](new Error(_0x3fb578 + '输出被截断。'), {
+          if (isStoryAssetResponseTruncated(finishReason3))
+            throw Object['assign'](new Error(message7 + '输出被截断。'), {
               type: 'OUTPUT_LENGTH',
-              finishReason: _0x42fd50,
+              finishReason: finishReason3,
             });
-          const _0x202476 = JSON['parse'](
-            _0x9ad6a8['batchSubmissionRecords'][_0x310410]?.['contractSnapshot']?.['prompt'] || '{}',
+          const value451 = JSON['parse'](
+            current2['batchSubmissionRecords'][batchKey3]?.['contractSnapshot']?.['prompt'] || '{}',
           );
-          _0x1366d7 = parseStoryAssetDetailBatchResult(_0x37bd8d, {
-            assetPlans: Array['isArray'](_0x202476?.['assetPlans']) ? _0x202476['assetPlans'] : _0x126aa1,
-            chapterIds: _0x42827c['chapterIds'],
-            visualStyle: _0x46d60e,
+          completedAssetRefs3 = parseStoryAssetDetailBatchResult(value450, {
+            assetPlans: Array['isArray'](value451?.['assetPlans'])
+              ? value451['assetPlans']
+              : contractIdentities,
+            chapterIds: storyContext3['chapterIds'],
+            visualStyle: visualStyle2,
           });
-        } catch (_0x3b5811) {
-          await _0x428c0d(_0x310410, _0x200ee2, _0x3b5811);
+        } catch (value452) {
+          await handler12(batchKey3, value447, value452);
         }
       else
         try {
-          if (isStoryAssetResponseTruncated(_0x42fd50))
-            throw Object['assign'](new Error(_0x3fb578 + '输出被截断。'), {
+          if (isStoryAssetResponseTruncated(finishReason3))
+            throw Object['assign'](new Error(message7 + '输出被截断。'), {
               type: 'OUTPUT_LENGTH',
-              finishReason: _0x42fd50,
+              finishReason: finishReason3,
             });
-          _0x1366d7 = parseStoryAssetDetailBatchResult(_0x37bd8d, {
-            assetPlans: _0x126aa1,
-            chapterIds: _0x42827c['chapterIds'],
-            visualStyle: _0x46d60e,
+          completedAssetRefs3 = parseStoryAssetDetailBatchResult(value450, {
+            assetPlans: contractIdentities,
+            chapterIds: storyContext3['chapterIds'],
+            visualStyle: visualStyle2,
           });
-        } catch (_0x17d204) {
-          ((_0x2bab87 = _0x17d204),
-            (_0x1366d7 = salvageStoryAssetDetailBatchResult(_0x37bd8d, {
-              assetPlans: _0x126aa1,
-              chapterIds: _0x42827c['chapterIds'],
-              visualStyle: _0x46d60e,
+        } catch (value453) {
+          ((error60 = value453),
+            (completedAssetRefs3 = salvageStoryAssetDetailBatchResult(value450, {
+              assetPlans: contractIdentities,
+              chapterIds: storyContext3['chapterIds'],
+              visualStyle: visualStyle2,
             })));
         }
-      const _0x1b2da1 = _0x1366d7,
-        _0x4c9e15 = new Set(_0x1366d7['map']((_0x5ce84e) => _0x5ce84e['ref'])),
-        _0x5cae33 = allowLocalBaselineFallback
+      const list125 = completedAssetRefs3,
+        map58 = new Set(completedAssetRefs3['map']((value454) => value454['ref'])),
+        fallbackAssetRefs = allowLocalBaselineFallback
           ? createStoryAssetBaselineDetailAssets(
-              _0x126aa1['filter']((_0x1e5913) => !_0x4c9e15['has'](_0x1e5913['ref'])),
-              { sourceScenes: _0x92e8b, visualStyle: _0x46d60e },
+              contractIdentities['filter']((value455) => !map58['has'](value455['ref'])),
+              { sourceScenes: sourceScenes9, visualStyle: visualStyle2 },
             )
           : [],
-        _0x494697 = Boolean(_0x2bab87 || _0x5cae33['length']);
-      _0x1366d7 = [..._0x1366d7, ..._0x5cae33];
-      if (_0x1366d7['length']) {
-        const _0x5a8091 = new Set(_0x1366d7['map']((_0x2b7ee9) => _0x2b7ee9['ref']));
-        ((_0x9ad6a8['completedAssets'] = [
-          ..._0x9ad6a8['completedAssets']['filter']((_0x316751) => !_0x5a8091['has'](_0x316751['ref'])),
-          ..._0x1366d7,
+        status5 = Boolean(error60 || fallbackAssetRefs['length']);
+      completedAssetRefs3 = [...completedAssetRefs3, ...fallbackAssetRefs];
+      if (completedAssetRefs3['length']) {
+        const map59 = new Set(completedAssetRefs3['map']((value456) => value456['ref']));
+        ((current2['completedAssets'] = [
+          ...current2['completedAssets']['filter']((value457) => !map59['has'](value457['ref'])),
+          ...completedAssetRefs3,
         ]),
-          (_0x9ad6a8['outputEstimates'] = updateStoryAssetOutputEstimates(
-            _0x9ad6a8['outputEstimates'],
-            _0x1b2da1,
+          (current2['outputEstimates'] = updateStoryAssetOutputEstimates(
+            current2['outputEstimates'],
+            list125,
           )));
       }
-      const _0x2c1742 = new Set(_0x1366d7['map']((_0x53291a) => _0x53291a['ref'])),
-        _0xd3e910 = _0x126aa1['filter']((_0x216c38) => !_0x2c1742['has'](_0x216c38['ref'])),
-        _0x44d01f = _0xd3e910['length'] > 0x0;
-      (_0x9ad6a8['detailBatches']['push']({
-        id: _0x5612cf,
-        status: _0x494697 || _0xd3e910['length'] ? 'partial' : 'succeeded',
-        assetRefs: _0x126aa1['map']((_0x1ef798) => _0x1ef798['ref']),
-        completedAssetRefs: _0x1366d7['map']((_0x55aad4) => _0x55aad4['ref']),
-        fallbackAssetRefs: _0x5cae33['map']((_0xb33a34) => _0xb33a34['ref']),
-        ...(_0x5cae33['length']
+      const map60 = new Set(completedAssetRefs3['map']((value458) => value458['ref'])),
+        list126 = contractIdentities['filter']((value459) => !map60['has'](value459['ref'])),
+        value460 = list126['length'] > 0x0;
+      (current2['detailBatches']['push']({
+        id: batchId4,
+        status: status5 || list126['length'] ? 'partial' : 'succeeded',
+        assetRefs: contractIdentities['map']((value461) => value461['ref']),
+        completedAssetRefs: completedAssetRefs3['map']((value462) => value462['ref']),
+        fallbackAssetRefs: fallbackAssetRefs['map']((value463) => value463['ref']),
+        ...(fallbackAssetRefs['length']
           ? {
               fallbackReason:
-                normalizeText(_0x2bab87?.['message']) || 'AI 响应缺少 ' + _0x5cae33['length'] + ' 个资产',
+                normalizeText(error60?.['message']) ||
+                'AI 响应缺少 ' + fallbackAssetRefs['length'] + ' 个资产',
             }
           : {}),
-        ...(_0x44d01f || _0x494697
-          ? { rawResponse: normalizeText(getResultText(_0x37bd8d)), finishReason: _0x42fd50 }
+        ...(value460 || status5
+          ? { rawResponse: normalizeText(getResultText(value450)), finishReason: finishReason3 }
           : {}),
       }),
-        _0x27e695(_0x310410));
-      _0x494697 &&
-        ((_0x4b4c56 = !![]),
-        (_0x39222a =
-          (normalizeText(_0x2bab87?.['message']) ||
-            'AI\x20响应缺少\x20' + _0x5cae33['length'] + '\x20个资产') + '，已熔断后续细化请求'));
-      if (_0x494697 && !allowLocalBaselineFallback)
+        handler11(batchKey3));
+      status5 &&
+        ((enabled19 = !![]),
+        (fallbackReason =
+          (normalizeText(error60?.['message']) ||
+            'AI\x20响应缺少\x20' + fallbackAssetRefs['length'] + '\x20个资产') + '，已熔断后续细化请求'));
+      if (status5 && !allowLocalBaselineFallback)
         throw (
-          _0x2bab87 ||
+          error60 ||
           new Error(
-            _0x3fb578 + '缺少\x20' + (_0x126aa1['length'] - _0x1b2da1['length']) + ' 个完整 API 资产结果。',
+            message7 +
+              '缺少\x20' +
+              (contractIdentities['length'] - list125['length']) +
+              ' 个完整 API 资产结果。',
           )
         );
-      if (_0xd3e910['length'])
-        throw _0x2bab87 || new Error(_0x3fb578 + '缺少\x20' + _0xd3e910['length'] + ' 个资产结果。');
-      await _0x153924({
+      if (list126['length'])
+        throw error60 || new Error(message7 + '缺少\x20' + list126['length'] + ' 个资产结果。');
+      await run6({
         stage: 'detail',
-        message: _0x494697
-          ? _0x3fb578 +
+        message: status5
+          ? message7 +
             '响应不完整，已本地补齐并熔断后续 API；已完成 ' +
-            _0x9ad6a8['completedAssets']['length'] +
+            current2['completedAssets']['length'] +
             '/' +
-            _0x55c21f['length'] +
+            list119['length'] +
             ' 个资产'
-          : _0x3fb578 +
+          : message7 +
             '完成；已完成 ' +
-            _0x9ad6a8['completedAssets']['length'] +
+            current2['completedAssets']['length'] +
             '/' +
-            _0x55c21f['length'] +
+            list119['length'] +
             '\x20个资产，本轮已调用\x20' +
-            _0x429444 +
+            requestCount +
             '/' +
-            _0x1f9cae +
+            callLimit +
             '\x20次',
       });
-    } catch (_0x35ec3b) {
+    } catch (value464) {
       if (
         ['ASSET_SUBMISSION_AMBIGUOUS', 'ASSET_PAID_RESULT_BLOCKED', 'ASSET_EXTRACTION_CONTINUE_REQUIRED'][
           'includes'
-        ](_0x35ec3b?.['type'])
+        ](value464?.['type'])
       )
-        throw _0x35ec3b;
-      const _0x4317b2 = classifyStoryAssetKindError(_0x35ec3b);
-      if (_0x37bd8d === null) {
-        _0x4b4c56 = !![];
-        const _0x376c3f = getStoryAssetKindErrorLabel(_0x4317b2['type'], _0x4317b2['message']);
-        ((_0x39222a = _0x376c3f + '，已熔断后续细化请求'),
-          await _0x3ef312({
-            batchPlans: _0x126aa1,
-            batchId: _0x5612cf,
-            fallbackReason: _0x39222a,
-            message: '' + _0x3fb578 + _0x376c3f + '；本批改用本地基础设定，后续批次不再调用 API',
+        throw value464;
+      const errorType3 = classifyStoryAssetKindError(value464);
+      if (value450 === null) {
+        enabled19 = !![];
+        const storyAssetKindErrorLabel = getStoryAssetKindErrorLabel(
+          errorType3['type'],
+          errorType3['message'],
+        );
+        ((fallbackReason = storyAssetKindErrorLabel + '，已熔断后续细化请求'),
+          await handler15({
+            batchPlans: contractIdentities,
+            batchId: batchId4,
+            fallbackReason: fallbackReason,
+            message:
+              '' + message7 + storyAssetKindErrorLabel + '；本批改用本地基础设定，后续批次不再调用 API',
           }));
         continue;
       }
-      (_0x9ad6a8['failures']['push']({
+      (current2['failures']['push']({
         stage: 'detail',
-        batchId: _0x5612cf,
-        batchLabel: _0x3fb578,
-        errorType: _0x4317b2['type'],
-        errorMessage: _0x4317b2['message'],
-        assetRefs: _0x126aa1['map']((_0x4d12b1) => _0x4d12b1['ref']),
+        batchId: batchId4,
+        batchLabel: message7,
+        errorType: errorType3['type'],
+        errorMessage: errorType3['message'],
+        assetRefs: contractIdentities['map']((value465) => value465['ref']),
       }),
-        (_0x9ad6a8['status'] = _0x9ad6a8['completedAssets']['length'] ? 'partial' : 'failed'),
-        await _0x153924({
+        (current2['status'] = current2['completedAssets']['length'] ? 'partial' : 'failed'),
+        await run6({
           stage: 'detail',
           message:
             '' +
-            _0x3fb578 +
-            getStoryAssetKindErrorLabel(_0x4317b2['type'], _0x4317b2['message']) +
+            message7 +
+            getStoryAssetKindErrorLabel(errorType3['type'], errorType3['message']) +
             '；已保存本批可解析结果，未自动重试',
         }));
-      throw createStoryAssetPipelineError(_0x9ad6a8['failures']);
+      throw createStoryAssetPipelineError(current2['failures']);
     }
   }
   if (!allowLocalBaselineFallback) {
-    const _0xe16ab6 = new Set(
-        _0x9ad6a8['completedAssets']
-          ['filter']((_0x51c75a) => normalizeText(_0x51c75a?.['designStatus']) !== 'baseline')
-          ['map']((_0x71544f) => _0x71544f['ref']),
+    const map61 = new Set(
+        current2['completedAssets']
+          ['filter']((value466) => normalizeText(value466?.['designStatus']) !== 'baseline')
+          ['map']((value467) => value467['ref']),
       ),
-      _0x57b955 = _0x55c21f['filter']((_0x2a2eae) => !_0xe16ab6['has'](_0x2a2eae['ref']));
-    if (_0x57b955['length']) {
-      (_0x9ad6a8['failures']['push']({
+      assetRefs2 = list119['filter']((value468) => !map61['has'](value468['ref']));
+    if (assetRefs2['length']) {
+      (current2['failures']['push']({
         stage: 'detail',
         batchId: 'detail-quality-gate',
         batchLabel: 'API 视觉细化完整性校验',
         errorType: 'incomplete-ai-detail',
-        errorMessage: '仍有\x20' + _0x57b955['length'] + ' 个资产没有完整 API 视觉结果',
-        assetRefs: _0x57b955['map']((_0x4fd3bc) => _0x4fd3bc['ref']),
+        errorMessage: '仍有\x20' + assetRefs2['length'] + ' 个资产没有完整 API 视觉结果',
+        assetRefs: assetRefs2['map']((value469) => value469['ref']),
       }),
-        (_0x9ad6a8['status'] = _0x9ad6a8['completedAssets']['length'] ? 'partial' : 'failed'),
-        await _0x153924({
+        (current2['status'] = current2['completedAssets']['length'] ? 'partial' : 'failed'),
+        await run6({
           stage: 'detail',
           message:
             '仍有 ' +
-            _0x57b955['length'] +
+            assetRefs2['length'] +
             '\x20个资产没有完整\x20API\x20视觉结果；已停止且不会写入本地假提示词',
         }));
-      throw createStoryAssetPipelineError(_0x9ad6a8['failures']);
+      throw createStoryAssetPipelineError(current2['failures']);
     }
   }
   return (
-    _0x9ad6a8['completedAssets']['sort'](
-      (_0x2261e6, _0x488479) =>
-        _0x55c21f['findIndex']((_0x5171e0) => _0x5171e0['ref'] === _0x2261e6['ref']) -
-        _0x55c21f['findIndex']((_0x46c6ae) => _0x46c6ae['ref'] === _0x488479['ref']),
+    current2['completedAssets']['sort'](
+      (value470, value471) =>
+        list119['findIndex']((value472) => value472['ref'] === value470['ref']) -
+        list119['findIndex']((value473) => value473['ref'] === value471['ref']),
     ),
-    (_0x9ad6a8['completedAssets'] = _0x9ad6a8['completedAssets']['map']((_0x52d641) =>
-      sanitizeStoryAssetPublicAsset(_0x52d641, { visualStyle: _0x46d60e }),
+    (current2['completedAssets'] = current2['completedAssets']['map']((value474) =>
+      sanitizeStoryAssetPublicAsset(value474, { visualStyle: visualStyle2 }),
     )),
-    (_0x9ad6a8['phase'] = 'detail'),
-    (_0x9ad6a8['status'] = 'completed'),
-    (_0x9ad6a8['failures'] = []),
-    await _0x153924({
+    (current2['phase'] = 'detail'),
+    (current2['status'] = 'completed'),
+    (current2['failures'] = []),
+    await run6({
       stage: 'detail',
       message:
         '资产提取完成：' +
-        _0x9ad6a8['completedAssets']['length'] +
+        current2['completedAssets']['length'] +
         ' 个资产，本轮分批调用 ' +
-        _0x429444 +
+        requestCount +
         ' 次；每个请求仅执行一次',
     }),
     {
       schemaVersion: STORY_ASSET_EXTRACTION_SCHEMA_VERSION,
       extractionStrategy: 'evidence-batched-api',
-      assets: _0x9ad6a8['completedAssets'],
-      candidateLedger: cloneStoryAssetExtractionValue(_0x9ad6a8['inventory']?.['candidateLedger']),
+      assets: current2['completedAssets'],
+      candidateLedger: cloneStoryAssetExtractionValue(current2['inventory']?.['candidateLedger']),
     }
   );
 }
@@ -4769,37 +4758,37 @@ export async function extractStoryAssetsExperimental({
   diagnostics: diagnostics = null,
 } = {}) {
   request = withReplicationRequestPolicy(request, project);
-  const _0x59439e = normalizeText(model),
-    _0x2af464 = normalizeText(provider),
-    _0x485ade = normalizeText(providerProfileId);
-  if (!_0x59439e || !_0x2af464) throw new Error('请先选择可用的文本模型。');
-  const _0x2206f1 = normalizeStoryContext(project),
-    _0x2d54f3 = normalizeStoryAssetExtractionSources(episodes),
-    _0x3ac7d3 = normalizeText(visualStyle) || _0x2206f1['visualStyle'],
-    _0x316148 = createStoryAssetExtractionFingerprint({
-      storyContext: _0x2206f1,
-      sourceScenes: _0x2d54f3,
-      model: _0x59439e,
-      provider: _0x2af464,
-      providerProfileId: _0x485ade,
+  const model3 = normalizeText(model),
+    provider3 = normalizeText(provider),
+    providerProfileId3 = normalizeText(providerProfileId);
+  if (!model3 || !provider3) throw new Error('请先选择可用的文本模型。');
+  const storyContext4 = normalizeStoryContext(project),
+    sourceScenes12 = normalizeStoryAssetExtractionSources(episodes),
+    visualStyle3 = normalizeText(visualStyle) || storyContext4['visualStyle'],
+    sourceFingerprint3 = createStoryAssetExtractionFingerprint({
+      storyContext: storyContext4,
+      sourceScenes: sourceScenes12,
+      model: model3,
+      provider: provider3,
+      providerProfileId: providerProfileId3,
       aspectRatio: aspectRatio,
-      visualStyle: _0x3ac7d3,
+      visualStyle: visualStyle3,
     }),
-    _0x22dd79 = createStoryAssetExtractionContentFingerprint({
-      storyContext: _0x2206f1,
-      sourceScenes: _0x2d54f3,
+    sourceContentFingerprint3 = createStoryAssetExtractionContentFingerprint({
+      storyContext: storyContext4,
+      sourceScenes: sourceScenes12,
       aspectRatio: aspectRatio,
-      visualStyle: _0x3ac7d3,
+      visualStyle: visualStyle3,
     }),
-    _0x3f96ac = restoreStoryAssetPipelineDraft(resumeDraft, {
-      sourceFingerprint: _0x316148,
-      sourceContentFingerprint: _0x22dd79,
+    restoreStoryAssetPipelineDraft3 = restoreStoryAssetPipelineDraft(resumeDraft, {
+      sourceFingerprint: sourceFingerprint3,
+      sourceContentFingerprint: sourceContentFingerprint3,
     }),
-    _0x169115 = Object['fromEntries'](
-      STORY_ASSET_EXPERIMENTAL_KINDS['map']((_0x4796a9) => [
-        _0x4796a9,
+    kindStates2 = Object['fromEntries'](
+      STORY_ASSET_EXPERIMENTAL_KINDS['map']((kind7) => [
+        kind7,
         {
-          kind: _0x4796a9,
+          kind: kind7,
           status: 'pending',
           attempt: 0x0,
           assetCount: 0x0,
@@ -4810,277 +4799,274 @@ export async function extractStoryAssetsExperimental({
         },
       ]),
     );
-  let _0x428af5 = _0x3f96ac || {
+  let current4 = restoreStoryAssetPipelineDraft3 || {
     strategy: STORY_ASSET_EXTRACTION_DRAFT_STRATEGY,
     schemaVersion: STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION,
-    sourceFingerprint: _0x316148,
-    sourceContentFingerprint: _0x22dd79,
+    sourceFingerprint: sourceFingerprint3,
+    sourceContentFingerprint: sourceContentFingerprint3,
     status: 'pending',
     phase: 'kind',
-    assetsByKind: Object['fromEntries'](
-      STORY_ASSET_EXPERIMENTAL_KINDS['map']((_0x593c09) => [_0x593c09, []]),
-    ),
-    kindStates: _0x169115,
+    assetsByKind: Object['fromEntries'](STORY_ASSET_EXPERIMENTAL_KINDS['map']((value475) => [value475, []])),
+    kindStates: kindStates2,
     completedKinds: [],
     completedAssets: [],
     failures: [],
     totalRequestCount: 0x0,
   };
-  ((_0x428af5['strategy'] = STORY_ASSET_EXTRACTION_DRAFT_STRATEGY),
-    (_0x428af5['schemaVersion'] = STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION),
-    (_0x428af5['sourceFingerprint'] = _0x316148),
-    (_0x428af5['sourceContentFingerprint'] = _0x22dd79),
-    (_0x428af5['phase'] = 'kind'),
-    (_0x428af5['assetsByKind'] =
-      _0x428af5['assetsByKind'] && typeof _0x428af5['assetsByKind'] === 'object'
-        ? _0x428af5['assetsByKind']
+  ((current4['strategy'] = STORY_ASSET_EXTRACTION_DRAFT_STRATEGY),
+    (current4['schemaVersion'] = STORY_ASSET_BATCHED_EXTRACTION_SCHEMA_VERSION),
+    (current4['sourceFingerprint'] = sourceFingerprint3),
+    (current4['sourceContentFingerprint'] = sourceContentFingerprint3),
+    (current4['phase'] = 'kind'),
+    (current4['assetsByKind'] =
+      current4['assetsByKind'] && typeof current4['assetsByKind'] === 'object'
+        ? current4['assetsByKind']
         : {}),
-    (_0x428af5['kindStates'] =
-      _0x428af5['kindStates'] && typeof _0x428af5['kindStates'] === 'object' ? _0x428af5['kindStates'] : {}),
-    STORY_ASSET_EXPERIMENTAL_KINDS['forEach']((_0x2dfa88) => {
-      if (!Array['isArray'](_0x428af5['assetsByKind'][_0x2dfa88])) _0x428af5['assetsByKind'][_0x2dfa88] = [];
-      _0x428af5['kindStates'][_0x2dfa88] = {
-        ..._0x169115[_0x2dfa88],
-        ...(_0x428af5['kindStates'][_0x2dfa88] || {}),
-        kind: _0x2dfa88,
+    (current4['kindStates'] =
+      current4['kindStates'] && typeof current4['kindStates'] === 'object' ? current4['kindStates'] : {}),
+    STORY_ASSET_EXPERIMENTAL_KINDS['forEach']((kind8) => {
+      if (!Array['isArray'](current4['assetsByKind'][kind8])) current4['assetsByKind'][kind8] = [];
+      current4['kindStates'][kind8] = {
+        ...kindStates2[kind8],
+        ...(current4['kindStates'][kind8] || {}),
+        kind: kind8,
       };
     }),
-    (_0x428af5['completedKinds'] = STORY_ASSET_EXPERIMENTAL_KINDS['filter'](
-      (_0x195de8) => _0x428af5['kindStates'][_0x195de8]?.['status'] === 'succeeded',
+    (current4['completedKinds'] = STORY_ASSET_EXPERIMENTAL_KINDS['filter'](
+      (value476) => current4['kindStates'][value476]?.['status'] === 'succeeded',
     )),
-    (_0x428af5['failures'] = []),
-    (_0x428af5['runRequestCount'] = 0x0));
-  let _0x26c844 = 0x0;
-  const _0x3690db = async (_0x5a1535 = '') => {
-      ((_0x428af5['completedKinds'] = STORY_ASSET_EXPERIMENTAL_KINDS['filter'](
-        (_0x44c7a0) => _0x428af5['kindStates'][_0x44c7a0]?.['status'] === 'succeeded',
+    (current4['failures'] = []),
+    (current4['runRequestCount'] = 0x0));
+  let requestCount2 = 0x0;
+  const run8 = async (message8 = '') => {
+      ((current4['completedKinds'] = STORY_ASSET_EXPERIMENTAL_KINDS['filter'](
+        (value477) => current4['kindStates'][value477]?.['status'] === 'succeeded',
       )),
-        _0x428af5['status'] !== 'completed' &&
-          (_0x428af5['completedAssets'] = STORY_ASSET_EXPERIMENTAL_KINDS['flatMap'](
-            (_0x2c2650) => _0x428af5['assetsByKind'][_0x2c2650] || [],
+        current4['status'] !== 'completed' &&
+          (current4['completedAssets'] = STORY_ASSET_EXPERIMENTAL_KINDS['flatMap'](
+            (value478) => current4['assetsByKind'][value478] || [],
           )),
-        (_0x428af5['progress'] = {
+        (current4['progress'] = {
           stage: 'kind',
-          current: _0x428af5['completedKinds']['length'],
+          current: current4['completedKinds']['length'],
           total: STORY_ASSET_EXPERIMENTAL_KINDS['length'],
-          message: _0x5a1535,
-          requestCount: _0x26c844,
+          message: message8,
+          requestCount: requestCount2,
         }),
-        (_0x428af5 = await saveStoryAssetExtractionCheckpoint(_0x428af5, onCheckpoint)),
+        (current4 = await saveStoryAssetExtractionCheckpoint(current4, onCheckpoint)),
         onProgress?.({
           stage: 'extracting-asset-kinds',
-          current: _0x428af5['progress']['current'],
-          total: _0x428af5['progress']['total'],
-          message: _0x5a1535,
+          current: current4['progress']['current'],
+          total: current4['progress']['total'],
+          message: message8,
         }));
     },
-    _0x1a8d46 = async (_0x13a652) => {
-      ((_0x26c844 += 0x1),
-        (_0x428af5['runRequestCount'] = _0x26c844),
-        (_0x428af5['totalRequestCount'] =
-          Math['max'](0x0, Number(_0x428af5['totalRequestCount']) || 0x0) + 0x1));
-      const _0x5d9880 = buildStoryAssetKindExtractionPrompt({
+    handler16 = async (kind9) => {
+      ((requestCount2 += 0x1),
+        (current4['runRequestCount'] = requestCount2),
+        (current4['totalRequestCount'] =
+          Math['max'](0x0, Number(current4['totalRequestCount']) || 0x0) + 0x1));
+      const promptCharacters = buildStoryAssetKindExtractionPrompt({
           project: project,
-          sourceScenes: _0x2d54f3,
-          kind: _0x13a652,
+          sourceScenes: sourceScenes12,
+          kind: kind9,
           aspectRatio: aspectRatio,
-          visualStyle: _0x3ac7d3,
+          visualStyle: visualStyle3,
         }),
-        _0x559e69 = Date['now']();
+        value479 = Date['now']();
       reportStoryAssetDiagnostics(diagnostics, 'story-asset-request', {
         stage: 'kind',
-        kind: _0x13a652,
+        kind: kind9,
         status: 'started',
-        requestCount: _0x26c844,
-        promptCharacters: _0x5d9880['length'],
-        sourceSceneCount: _0x2d54f3['length'],
+        requestCount: requestCount2,
+        promptCharacters: promptCharacters['length'],
+        sourceSceneCount: sourceScenes12['length'],
       });
       try {
-        const _0x412495 = await request({
-            model: _0x59439e,
-            provider: _0x2af464,
-            ...(_0x485ade ? { providerProfileId: _0x485ade } : {}),
-            prompt: _0x5d9880,
-            systemPrompt: buildStoryAssetKindSystemPrompt(_0x13a652),
-            structuredOutput: createStoryAssetKindStructuredOutput(_0x13a652),
+        const request4 = await request({
+            model: model3,
+            provider: provider3,
+            ...(providerProfileId3 ? { providerProfileId: providerProfileId3 } : {}),
+            prompt: promptCharacters,
+            systemPrompt: buildStoryAssetKindSystemPrompt(kind9),
+            structuredOutput: createStoryAssetKindStructuredOutput(kind9),
             thinking: { type: 'disabled' },
             temperature: 0.1,
             timeoutMs: STORY_ASSET_EXPERIMENTAL_REQUEST_TIMEOUT_MS,
             maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
             allowOversizedPrompt: !![],
           }),
-          _0x3af797 = getStoryAssetResponseFinishReason(_0x412495)['toLowerCase']();
-        if (isStoryAssetResponseTruncated(_0x3af797))
-          throw Object['assign'](new Error(STORY_ASSET_KIND_LABELS[_0x13a652] + '输出被截断。'), {
+          finishReason4 = getStoryAssetResponseFinishReason(request4)['toLowerCase']();
+        if (isStoryAssetResponseTruncated(finishReason4))
+          throw Object['assign'](new Error(STORY_ASSET_KIND_LABELS[kind9] + '输出被截断。'), {
             type: 'OUTPUT_LENGTH',
-            finishReason: _0x3af797,
+            finishReason: finishReason4,
           });
         return (
           reportStoryAssetDiagnostics(diagnostics, 'story-asset-request', {
             stage: 'kind',
-            kind: _0x13a652,
+            kind: kind9,
             status: 'succeeded',
-            requestCount: _0x26c844,
-            elapsedMs: Math['max'](0x0, Date['now']() - _0x559e69),
-            responseCharacters: normalizeText(getResultText(_0x412495))['length'],
+            requestCount: requestCount2,
+            elapsedMs: Math['max'](0x0, Date['now']() - value479),
+            responseCharacters: normalizeText(getResultText(request4))['length'],
           }),
-          _0x412495
+          request4
         );
-      } catch (_0x25ec28) {
-        const _0x599282 = classifyStoryAssetKindError(_0x25ec28);
+      } catch (value480) {
+        const errorType4 = classifyStoryAssetKindError(value480);
         reportStoryAssetDiagnostics(diagnostics, 'story-asset-request', {
           stage: 'kind',
-          kind: _0x13a652,
+          kind: kind9,
           status: 'failed',
-          requestCount: _0x26c844,
-          elapsedMs: Math['max'](0x0, Date['now']() - _0x559e69),
-          errorType: _0x599282['type'],
-          errorMessage: _0x599282['message'],
+          requestCount: requestCount2,
+          elapsedMs: Math['max'](0x0, Date['now']() - value479),
+          errorType: errorType4['type'],
+          errorMessage: errorType4['message'],
         });
-        throw _0x25ec28;
+        throw value480;
       }
     };
-  ((_0x428af5['status'] = 'in-progress'),
-    await _0x3690db(
+  ((current4['status'] = 'in-progress'),
+    await run8(
       '正在按输出域提取资产（已完成 ' +
-        _0x428af5['completedKinds']['length'] +
+        current4['completedKinds']['length'] +
         '/' +
         STORY_ASSET_EXPERIMENTAL_KINDS['length'] +
         '）',
     ));
-  for (const _0x6c86a8 of STORY_ASSET_EXPERIMENTAL_KINDS) {
-    if (_0x428af5['kindStates'][_0x6c86a8]?.['status'] === 'succeeded') continue;
-    const _0x13b3f9 = Date['now']();
-    ((_0x428af5['kindStates'][_0x6c86a8] = {
-      ..._0x428af5['kindStates'][_0x6c86a8],
-      kind: _0x6c86a8,
+  for (const kind10 of STORY_ASSET_EXPERIMENTAL_KINDS) {
+    if (current4['kindStates'][kind10]?.['status'] === 'succeeded') continue;
+    const startedAt = Date['now']();
+    ((current4['kindStates'][kind10] = {
+      ...current4['kindStates'][kind10],
+      kind: kind10,
       status: 'running',
       attempt:
-        Math['max'](0x0, Math['trunc'](Number(_0x428af5['kindStates'][_0x6c86a8]?.['attempt']) || 0x0)) + 0x1,
+        Math['max'](0x0, Math['trunc'](Number(current4['kindStates'][kind10]?.['attempt']) || 0x0)) + 0x1,
       assetCount: 0x0,
       errorType: '',
       errorMessage: '',
-      startedAt: _0x13b3f9,
+      startedAt: startedAt,
       finishedAt: 0x0,
     }),
-      await _0x3690db('正在提取' + STORY_ASSET_KIND_LABELS[_0x6c86a8] + '；完整剧本输入保持不变'));
+      await run8('正在提取' + STORY_ASSET_KIND_LABELS[kind10] + '；完整剧本输入保持不变'));
     try {
-      const _0x4eed3e = await _0x1a8d46(_0x6c86a8),
-        _0x5900da = parseStoryAssetKindExtractionResult(_0x4eed3e, {
-          kind: _0x6c86a8,
-          sourceScenes: _0x2d54f3,
-          chapterIds: _0x2206f1['chapterIds'],
-          visualStyle: _0x3ac7d3,
+      const value481 = await handler16(kind10),
+        assetCount3 = parseStoryAssetKindExtractionResult(value481, {
+          kind: kind10,
+          sourceScenes: sourceScenes12,
+          chapterIds: storyContext4['chapterIds'],
+          visualStyle: visualStyle3,
         });
-      ((_0x428af5['assetsByKind'][_0x6c86a8] = _0x5900da['assets']),
-        (_0x428af5['kindStates'][_0x6c86a8] = {
-          ..._0x428af5['kindStates'][_0x6c86a8],
+      ((current4['assetsByKind'][kind10] = assetCount3['assets']),
+        (current4['kindStates'][kind10] = {
+          ...current4['kindStates'][kind10],
           status: 'succeeded',
-          assetCount: _0x5900da['assets']['length'],
+          assetCount: assetCount3['assets']['length'],
           errorType: '',
           errorMessage: '',
           finishedAt: Date['now'](),
         }),
-        await _0x3690db(
-          STORY_ASSET_KIND_LABELS[_0x6c86a8] + '完成：' + _0x5900da['assets']['length'] + '\x20个',
-        ));
-    } catch (_0xfcbc58) {
-      const _0x57c870 = classifyStoryAssetKindError(_0xfcbc58);
-      ((_0x428af5['kindStates'][_0x6c86a8] = {
-        ..._0x428af5['kindStates'][_0x6c86a8],
+        await run8(STORY_ASSET_KIND_LABELS[kind10] + '完成：' + assetCount3['assets']['length'] + '\x20个'));
+    } catch (value482) {
+      const errorType5 = classifyStoryAssetKindError(value482);
+      ((current4['kindStates'][kind10] = {
+        ...current4['kindStates'][kind10],
         status: 'failed',
         assetCount: 0x0,
-        errorType: _0x57c870['type'],
-        errorMessage: _0x57c870['message'],
+        errorType: errorType5['type'],
+        errorMessage: errorType5['message'],
         finishedAt: Date['now'](),
       }),
-        (_0x428af5['failures'] = [
+        (current4['failures'] = [
           {
             stage: 'kind',
-            kind: _0x6c86a8,
-            errorType: _0x57c870['type'],
-            errorMessage: _0x57c870['message'],
+            kind: kind10,
+            errorType: errorType5['type'],
+            errorMessage: errorType5['message'],
           },
         ]),
-        (_0x428af5['status'] = _0x428af5['completedKinds']['length'] ? 'partial' : 'failed'),
-        await _0x3690db(
+        (current4['status'] = current4['completedKinds']['length'] ? 'partial' : 'failed'),
+        await run8(
           '' +
-            STORY_ASSET_KIND_LABELS[_0x6c86a8] +
-            getStoryAssetKindErrorLabel(_0x57c870['type'], _0x57c870['message']) +
+            STORY_ASSET_KIND_LABELS[kind10] +
+            getStoryAssetKindErrorLabel(errorType5['type'], errorType5['message']) +
             '；未自动重试',
         ));
-      throw createStoryAssetPipelineError(_0x428af5['failures']);
+      throw createStoryAssetPipelineError(current4['failures']);
     }
   }
-  const _0x13bcaa = normalizeStringArray(_0x2d54f3['flatMap']((_0x3dafb2) => _0x3dafb2['characters'] || [])),
-    _0x111ffe = STORY_ASSET_EXPERIMENTAL_KINDS['flatMap'](
-      (_0x523768) => _0x428af5['assetsByKind'][_0x523768] || [],
+  const list127 = normalizeStringArray(sourceScenes12['flatMap']((value483) => value483['characters'] || [])),
+    assets11 = STORY_ASSET_EXPERIMENTAL_KINDS['flatMap'](
+      (value484) => current4['assetsByKind'][value484] || [],
     )
-      ['map']((_0x33ff21) => {
-        const _0x1aa2ee = normalizeStringArray(_0x33ff21?.['sourceSceneRefs']),
-          _0x32e1f8 = _0x1aa2ee['length']
-            ? _0x1aa2ee
-            : inferStoryAssetSourceSceneRefs(_0x33ff21?.['kind'], _0x33ff21?.['name'], _0x2d54f3);
-        return { ..._0x33ff21, sourceSceneRefs: _0x32e1f8 };
+      ['map']((error61) => {
+        const list128 = normalizeStringArray(error61?.['sourceSceneRefs']),
+          sourceSceneRefs13 = list128['length']
+            ? list128
+            : inferStoryAssetSourceSceneRefs(error61?.['kind'], error61?.['name'], sourceScenes12);
+        return { ...error61, sourceSceneRefs: sourceSceneRefs13 };
       })
       ['filter'](
-        (_0x2f9e1f) =>
-          normalizeStringArray(_0x2f9e1f?.['sourceSceneRefs'])['length'] > 0x0 &&
+        (error62) =>
+          normalizeStringArray(error62?.['sourceSceneRefs'])['length'] > 0x0 &&
           !(
-            _0x2f9e1f?.['kind'] === 'prop' &&
-            _0x13bcaa['some']((_0x32657e) => storyCharacterNamesOverlap(_0x2f9e1f?.['name'], _0x32657e))
+            error62?.['kind'] === 'prop' &&
+            list127['some']((value485) => storyCharacterNamesOverlap(error62?.['name'], value485))
           ),
       ),
-    _0x46686b = reconcileStoryAssetInventory(
+    inventory4 = reconcileStoryAssetInventory(
       parseStoryAssetInventoryResult(
         {
-          assets: _0x111ffe['map']((_0x46536f) => ({
-            ref: _0x46536f['ref'],
-            kind: _0x46536f['kind'],
-            name: _0x46536f['name'],
-            role: _0x46536f['role'],
-            description: _0x46536f['description'],
-            sourceSceneRefs: _0x46536f['sourceSceneRefs'],
-            appearances: (_0x46536f['appearances'] || [])['map']((_0x313343) => ({
-              ref: _0x313343['ref'],
-              name: _0x313343['name'],
-              description: _0x313343['description'],
-              sourceSceneRefs: _0x313343['sourceSceneRefs'],
+          assets: assets11['map']((ref24) => ({
+            ref: ref24['ref'],
+            kind: ref24['kind'],
+            name: ref24['name'],
+            role: ref24['role'],
+            description: ref24['description'],
+            sourceSceneRefs: ref24['sourceSceneRefs'],
+            appearances: (ref24['appearances'] || [])['map']((ref25) => ({
+              ref: ref25['ref'],
+              name: ref25['name'],
+              description: ref25['description'],
+              sourceSceneRefs: ref25['sourceSceneRefs'],
             })),
           })),
-          sceneAudits: _0x2d54f3['map']((_0x29a216) => ({
-            sourceSceneRef: _0x29a216['ref'],
-            keyPropNames: _0x111ffe['filter'](
-              (_0x665eb7) =>
-                _0x665eb7['kind'] === 'prop' && _0x665eb7['sourceSceneRefs']['includes'](_0x29a216['ref']),
-            )['map']((_0x9da31e) => _0x9da31e['name']),
+          sceneAudits: sourceScenes12['map']((sourceSceneRef9) => ({
+            sourceSceneRef: sourceSceneRef9['ref'],
+            keyPropNames: assets11['filter'](
+              (value486) =>
+                value486['kind'] === 'prop' &&
+                value486['sourceSceneRefs']['includes'](sourceSceneRef9['ref']),
+            )['map']((error63) => error63['name']),
           })),
         },
-        { sourceScenes: _0x2d54f3 },
+        { sourceScenes: sourceScenes12 },
       ),
-      { project: project, sourceScenes: _0x2d54f3 },
+      { project: project, sourceScenes: sourceScenes12 },
     ),
-    _0x37a76f = inspectStoryAssetInventoryCoverage(_0x46686b, _0x2d54f3);
-  if (_0x37a76f['length']) throw createCoverageError(_0x37a76f);
+    list129 = inspectStoryAssetInventoryCoverage(inventory4, sourceScenes12);
+  if (list129['length']) throw createCoverageError(list129);
   return (
-    (_0x428af5['inventory'] = _0x46686b),
-    (_0x428af5['completedAssets'] = finalizeStoryAssetInventoryAssets({
-      inventory: _0x46686b,
-      sourceScenes: _0x2d54f3,
-      chapterIds: _0x2206f1['chapterIds'],
-      visualStyle: _0x3ac7d3,
+    (current4['inventory'] = inventory4),
+    (current4['completedAssets'] = finalizeStoryAssetInventoryAssets({
+      inventory: inventory4,
+      sourceScenes: sourceScenes12,
+      chapterIds: storyContext4['chapterIds'],
+      visualStyle: visualStyle3,
     })),
-    (_0x428af5['status'] = 'completed'),
-    (_0x428af5['failures'] = []),
-    await _0x3690db(
+    (current4['status'] = 'completed'),
+    (current4['failures'] = []),
+    await run8(
       '资产提取完成：' +
-        _0x428af5['completedAssets']['length'] +
+        current4['completedAssets']['length'] +
         '\x20个资产；模型只返回精简清单，基础提示词已在本地生成',
     ),
     {
       schemaVersion: STORY_ASSET_EXTRACTION_SCHEMA_VERSION,
       extractionStrategy: 'kind-compact',
-      assets: _0x428af5['completedAssets'],
+      assets: current4['completedAssets'],
     }
   );
 }

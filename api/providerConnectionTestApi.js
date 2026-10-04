@@ -39,231 +39,235 @@ const TEST_TIMEOUT_MS = 0x7530,
   }),
   ONE_PIXEL_PNG_BASE64 =
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
-function isPlainObject(_0x5f2b8b) {
-  return !!_0x5f2b8b && typeof _0x5f2b8b === 'object' && !Array.isArray(_0x5f2b8b);
+function isPlainObject(enabled) {
+  return !!enabled && typeof enabled === 'object' && !Array.isArray(enabled);
 }
-function normalizeProviderId(_0x2fc2bb) {
-  return String(_0x2fc2bb || '')
+function normalizeProviderId(value) {
+  return String(value || '')
     .trim()
     .toLowerCase();
 }
-function trimSlashes(_0x1f8089) {
-  return String(_0x1f8089 || '').replace(/^\/+|\/+$/g, '');
+function trimSlashes(item) {
+  return String(item || '').replace(/^\/+|\/+$/g, '');
 }
-function normalizeBaseUrl(_0xdf4dda) {
-  return String(_0xdf4dda || '')
+function normalizeBaseUrl(key) {
+  return String(key || '')
     .trim()
     .replace(/\/+$/, '');
 }
-function joinUrl(_0x481e64, _0x8b5a28) {
-  const _0x1f8846 = normalizeBaseUrl(_0x481e64),
-    _0x4d4bdc = trimSlashes(_0x8b5a28);
-  if (!_0x1f8846) return _0x4d4bdc;
-  if (!_0x4d4bdc) return _0x1f8846;
-  return _0x1f8846 + '/' + _0x4d4bdc;
+function joinUrl(index, result) {
+  const baseUrl = normalizeBaseUrl(index),
+    trimSlashes2 = trimSlashes(result);
+  if (!baseUrl) return trimSlashes2;
+  if (!trimSlashes2) return baseUrl;
+  return baseUrl + '/' + trimSlashes2;
 }
-function providerLabel(_0x55c026) {
-  return PROVIDERS_META?.[_0x55c026]?.label || _0x55c026;
+function providerLabel(data) {
+  return PROVIDERS_META?.[data]?.label || data;
 }
-function providerConfigWithDefaults(_0x480195, _0x5c4aa7 = {}) {
-  const _0x40c843 = isPlainObject(_0x5c4aa7) ? _0x5c4aa7 : {},
-    _0x363533 = _0x480195 === 'grsai' ? PROVIDERS_META?.[_0x480195]?.defaultUrl || '' : '',
-    _0x3b88e9 = _0x480195 === 'apimart' ? getApimartApiUrlForRoute(_0x40c843.routeId) : '';
+function providerConfigWithDefaults(options, target = {}) {
+  const isPlainObject2 = isPlainObject(target) ? target : {},
+    source = options === 'grsai' ? PROVIDERS_META?.[options]?.defaultUrl || '' : '',
+    next = options === 'apimart' ? getApimartApiUrlForRoute(isPlainObject2.routeId) : '';
   return {
     apiUrl: normalizeBaseUrl(
-      _0x363533 || _0x40c843.apiUrl || _0x3b88e9 || PROVIDERS_META?.[_0x480195]?.defaultUrl || '',
+      source || isPlainObject2.apiUrl || next || PROVIDERS_META?.[options]?.defaultUrl || '',
     ),
-    apiKey: String(_0x40c843.apiKey || '')
+    apiKey: String(isPlainObject2.apiKey || '')
       .trim()
       .replace(/^Bearer\s+/i, ''),
-    modelApiKey: String(_0x40c843.modelApiKey || '')
+    modelApiKey: String(isPlainObject2.modelApiKey || '')
       .trim()
       .replace(/^Bearer\s+/i, ''),
   };
 }
-function stripKnownOpenAiTail(_0x200035) {
-  return normalizeBaseUrl(_0x200035)
+function stripKnownOpenAiTail(current) {
+  return normalizeBaseUrl(current)
     .replace(/\/chat\/completions$/i, '')
     .replace(/\/models$/i, '');
 }
-function buildModelsProbeUrl(_0x3b317f, _0x2ce6c6) {
-  const _0x2753ae = normalizeProviderId(_0x3b317f),
-    _0x3a8bf1 = stripKnownOpenAiTail(_0x2ce6c6);
-  if (!_0x3a8bf1 || _0x3a8bf1.includes(':generateContent')) return '';
-  if (_0x2753ae === 'ppio') return joinUrl(_0x3a8bf1.replace(/\/openai\/v1$/i, ''), 'openai/v1/models');
-  if (/\/v\d+(?:beta)?$/i.test(_0x3a8bf1) || /\/openai\/v1$/i.test(_0x3a8bf1))
-    return joinUrl(_0x3a8bf1, 'models');
-  return joinUrl(_0x3a8bf1, 'v1/models');
+function buildModelsProbeUrl(entry, record) {
+  const providerId = normalizeProviderId(entry),
+    list = stripKnownOpenAiTail(record);
+  if (!list || list.includes(':generateContent')) return '';
+  if (providerId === 'ppio') return joinUrl(list.replace(/\/openai\/v1$/i, ''), 'openai/v1/models');
+  if (/\/v\d+(?:beta)?$/i.test(list) || /\/openai\/v1$/i.test(list)) return joinUrl(list, 'models');
+  return joinUrl(list, 'v1/models');
 }
-function buildCompletionProbeUrl(_0x1d7bd2, _0x527f11) {
-  const _0x20cd4d = COMPLETION_FALLBACKS[_0x1d7bd2];
-  if (!_0x20cd4d) return '';
-  const _0xbbf45f = stripKnownOpenAiTail(_0x527f11);
-  if (!_0xbbf45f || _0xbbf45f.includes(':generateContent')) return '';
-  if (_0x1d7bd2 === 'ppio') return joinUrl(_0xbbf45f.replace(/\/openai\/v1$/i, ''), _0x20cd4d.basePath);
-  if (/\/v\d+(?:beta)?$/i.test(_0xbbf45f)) return _0xbbf45f;
-  return joinUrl(_0xbbf45f, _0x20cd4d.basePath);
+function buildCompletionProbeUrl(payload, handle) {
+  const enabled2 = COMPLETION_FALLBACKS[payload];
+  if (!enabled2) return '';
+  const list2 = stripKnownOpenAiTail(handle);
+  if (!list2 || list2.includes(':generateContent')) return '';
+  if (payload === 'ppio') return joinUrl(list2.replace(/\/openai\/v1$/i, ''), enabled2.basePath);
+  if (/\/v\d+(?:beta)?$/i.test(list2)) return list2;
+  return joinUrl(list2, enabled2.basePath);
 }
-function buildVolcenginePingProbeUrl(_0x23e22d) {
-  const _0x3db84a = stripKnownOpenAiTail(_0x23e22d);
-  if (!_0x3db84a || _0x3db84a.includes(':generateContent')) return '';
-  const _0x149ec0 = _0x3db84a.replace(/\/api\/v3$/i, '').replace(/\/api\/coding\/v3$/i, '');
-  return joinUrl(_0x149ec0, 'ping');
+function buildVolcenginePingProbeUrl(state) {
+  const list3 = stripKnownOpenAiTail(state);
+  if (!list3 || list3.includes(':generateContent')) return '';
+  const config = list3.replace(/\/api\/v3$/i, '').replace(/\/api\/coding\/v3$/i, '');
+  return joinUrl(config, 'ping');
 }
-function buildApimartBalanceProbeUrls(_0x170f09) {
-  const _0x600e63 = stripKnownOpenAiTail(_0x170f09);
-  if (!_0x600e63 || _0x600e63.includes(':generateContent')) return [];
-  if (/\/v\d+(?:beta)?$/i.test(_0x600e63))
-    return [joinUrl(_0x600e63, 'user/balance'), joinUrl(_0x600e63, 'balance')];
-  return [joinUrl(_0x600e63, 'v1/user/balance'), joinUrl(_0x600e63, 'v1/balance')];
+function buildApimartBalanceProbeUrls(scope) {
+  const list4 = stripKnownOpenAiTail(scope);
+  if (!list4 || list4.includes(':generateContent')) return [];
+  if (/\/v\d+(?:beta)?$/i.test(list4)) return [joinUrl(list4, 'user/balance'), joinUrl(list4, 'balance')];
+  return [joinUrl(list4, 'v1/user/balance'), joinUrl(list4, 'v1/balance')];
 }
-function buildRunningHubAccountStatusProbeUrl(_0x20b2ec) {
-  const _0x405043 = normalizeBaseUrl(
-    _0x20b2ec || PROVIDERS_META?.runninghub?.defaultUrl || 'https://www.runninghub.cn',
+function buildRunningHubAccountStatusProbeUrl(input) {
+  const baseUrl2 = normalizeBaseUrl(
+    input || PROVIDERS_META?.runninghub?.defaultUrl || 'https://www.runninghub.cn',
   )
     .replace(/\/openapi\/v2(?:\/.*)?$/i, '')
     .replace(/\/uc\/openapi\/accountStatus$/i, '');
-  return joinUrl(_0x405043, 'uc/openapi/accountStatus');
+  return joinUrl(baseUrl2, 'uc/openapi/accountStatus');
 }
-function buildGrsaiApiKeyCreditsProbeUrl(_0x2ead94) {
-  const _0xbef559 = normalizeBaseUrl(
-    _0x2ead94 || PROVIDERS_META?.grsai?.defaultUrl || 'https://grsai.dakka.com.cn',
+function buildGrsaiApiKeyCreditsProbeUrl(output) {
+  const baseUrl3 = normalizeBaseUrl(
+    output || PROVIDERS_META?.grsai?.defaultUrl || 'https://grsai.dakka.com.cn',
   )
     .replace(/\/v\d+(?:beta)?$/i, '')
     .replace(/\/client\/openapi\/getAPIKeyCredits$/i, '');
-  return joinUrl(_0xbef559, 'client/openapi/getAPIKeyCredits');
+  return joinUrl(baseUrl3, 'client/openapi/getAPIKeyCredits');
 }
-function buildGrsaiAccountCreditsProbeUrl(_0xe79030) {
-  const _0x422e19 = normalizeBaseUrl(
-    _0xe79030 || PROVIDERS_META?.grsai?.defaultUrl || 'https://grsai.dakka.com.cn',
+function buildGrsaiAccountCreditsProbeUrl(value2) {
+  const baseUrl4 = normalizeBaseUrl(
+    value2 || PROVIDERS_META?.grsai?.defaultUrl || 'https://grsai.dakka.com.cn',
   )
     .replace(/\/v\d+(?:beta)?$/i, '')
     .replace(/\/client\/openapi\/getCredits$/i, '')
     .replace(/\/client\/common\/getCredits(?:\?.*)?$/i, '');
-  return joinUrl(_0x422e19, 'client/openapi/getCredits');
+  return joinUrl(baseUrl4, 'client/openapi/getCredits');
 }
-function buildGrsaiCommonCreditsProbeUrl(_0x327085, _0x40574d) {
-  const _0x38bc7d = normalizeBaseUrl(
-    _0x327085 || PROVIDERS_META?.grsai?.defaultUrl || 'https://grsai.dakka.com.cn',
+function buildGrsaiCommonCreditsProbeUrl(value3, value4) {
+  const baseUrl5 = normalizeBaseUrl(
+    value3 || PROVIDERS_META?.grsai?.defaultUrl || 'https://grsai.dakka.com.cn',
   )
     .replace(/\/v\d+(?:beta)?$/i, '')
     .replace(/\/client\/openapi\/getCredits$/i, '')
     .replace(/\/client\/openapi\/getAPIKeyCredits$/i, '')
     .replace(/\/client\/common\/getCredits(?:\?.*)?$/i, '');
-  return joinUrl(_0x38bc7d, 'client/common/getCredits') + '?apikey=' + encodeURIComponent(_0x40574d);
+  return joinUrl(baseUrl5, 'client/common/getCredits') + '?apikey=' + encodeURIComponent(value4);
 }
-function toFiniteNumber(_0x136821) {
-  if (_0x136821 === null || _0x136821 === undefined || _0x136821 === '') return null;
-  const _0x30fb54 = Number(_0x136821);
-  return Number.isFinite(_0x30fb54) ? _0x30fb54 : null;
+function toFiniteNumber(value5) {
+  if (value5 === null || value5 === undefined || value5 === '') return null;
+  const value6 = Number(value5);
+  return Number.isFinite(value6) ? value6 : null;
 }
-function formatBalanceNumber(_0x21d6f1) {
-  const _0x441ef1 = toFiniteNumber(_0x21d6f1);
-  if (_0x441ef1 === null) return '';
-  return new Intl['NumberFormat']('zh-CN', { maximumFractionDigits: 6 }).format(_0x441ef1);
+function formatBalanceNumber(value7) {
+  const toFiniteNumber2 = toFiniteNumber(value7);
+  if (toFiniteNumber2 === null) return '';
+  return new Intl['NumberFormat']('zh-CN', { maximumFractionDigits: 6 }).format(toFiniteNumber2);
 }
-function formatCurrencyLabel(_0x163898) {
-  const _0x3f0200 = String(_0x163898 || '')
+function formatCurrencyLabel(value8) {
+  const enabled3 = String(value8 || '')
     .trim()
     .toUpperCase();
-  if (!_0x3f0200 || _0x3f0200 === 'CNY' || _0x3f0200 === 'RMB' || _0x3f0200 === 'CNH') return '人民币';
-  return _0x3f0200;
+  if (!enabled3 || enabled3 === 'CNY' || enabled3 === 'RMB' || enabled3 === 'CNH') return '人民币';
+  return enabled3;
 }
-export function normalizeApimartBalancePayload(_0x2dba0a = {}) {
-  const _0x4fb493 =
-    isPlainObject(_0x2dba0a?.data) && !Array.isArray(_0x2dba0a.data) ? _0x2dba0a.data : _0x2dba0a;
-  if (!isPlainObject(_0x4fb493) || _0x4fb493.success === false) return null;
-  const _0x48665e = _0x4fb493.unlimited_quota === true,
-    _0x29f429 = toFiniteNumber(_0x4fb493.remain_balance ?? _0x4fb493.remaining_balance ?? _0x4fb493.balance),
-    _0x247a66 = _0x48665e ? null : _0x29f429,
-    _0x37fe4b = toFiniteNumber(_0x4fb493.used_balance);
-  if (!_0x48665e && _0x247a66 === null) return null;
-  const _0x4e656a = _0x247a66 === null ? '' : formatBalanceNumber(_0x247a66),
-    _0x45315c = [];
-  if (_0x48665e) _0x45315c.push('额度不限');
-  if (_0x4e656a) _0x45315c.push('剩余余额：' + _0x4e656a + ' 美元');
+export function normalizeApimartBalancePayload(options2 = {}) {
+  const response = isPlainObject(options2?.data) && !Array.isArray(options2.data) ? options2.data : options2;
+  if (!isPlainObject(response) || response.success === false) return null;
+  const unlimited = response.unlimited_quota === true,
+    toFiniteNumber3 = toFiniteNumber(
+      response.remain_balance ?? response.remaining_balance ?? response.balance,
+    ),
+    remaining = unlimited ? null : toFiniteNumber3,
+    used = toFiniteNumber(response.used_balance);
+  if (!unlimited && remaining === null) return null;
+  const value9 = remaining === null ? '' : formatBalanceNumber(remaining),
+    detailText = [];
+  if (unlimited) detailText.push('额度不限');
+  if (value9) detailText.push('剩余余额：' + value9 + ' 美元');
   return {
-    unlimited: _0x48665e,
-    remaining: _0x247a66,
-    used: _0x37fe4b,
-    displayText: _0x48665e ? '余额 不限' : _0x4e656a ? '余额 ' + _0x4e656a + ' 美元' : '余额 已读取',
-    detailText: _0x45315c.join('；') || 'APIMart 余额已读取',
+    unlimited: unlimited,
+    remaining: remaining,
+    used: used,
+    displayText: unlimited ? '余额 不限' : value9 ? '余额 ' + value9 + ' 美元' : '余额 已读取',
+    detailText: detailText.join('；') || 'APIMart 余额已读取',
   };
 }
-function normalizeRunningHubAccountStatusPayload(_0x552068 = {}) {
-  const _0x511920 =
-    isPlainObject(_0x552068?.data) && !Array.isArray(_0x552068.data) ? _0x552068.data : _0x552068;
-  if (!isPlainObject(_0x511920)) return null;
-  if (_0x511920.success === false) return null;
-  if (_0x511920.code !== undefined && Number(_0x511920.code) !== 0) return null;
-  const _0x25d9e4 =
-      isPlainObject(_0x511920.data) && !Array.isArray(_0x511920.data) ? _0x511920.data : _0x511920,
-    _0x24216f = toFiniteNumber(_0x25d9e4.remainCoins ?? _0x25d9e4.remain_coins ?? _0x25d9e4.coins),
-    _0x2eb51b = toFiniteNumber(
-      _0x25d9e4.remainMoney ?? _0x25d9e4.remain_money ?? _0x25d9e4.money ?? _0x25d9e4.balance,
+function normalizeRunningHubAccountStatusPayload(options3 = {}) {
+  const response2 = isPlainObject(options3?.data) && !Array.isArray(options3.data) ? options3.data : options3;
+  if (!isPlainObject(response2)) return null;
+  if (response2.success === false) return null;
+  if (response2.code !== undefined && Number(response2.code) !== 0) return null;
+  const isPlainObject3 =
+      isPlainObject(response2.data) && !Array.isArray(response2.data) ? response2.data : response2,
+    coins = toFiniteNumber(isPlainObject3.remainCoins ?? isPlainObject3.remain_coins ?? isPlainObject3.coins),
+    money = toFiniteNumber(
+      isPlainObject3.remainMoney ??
+        isPlainObject3.remain_money ??
+        isPlainObject3.money ??
+        isPlainObject3.balance,
     );
-  if (_0x24216f === null && _0x2eb51b === null) return null;
-  const _0x593ddc =
-    String(_0x25d9e4.currency || 'CNY')
+  if (coins === null && money === null) return null;
+  const currency =
+    String(isPlainObject3.currency || 'CNY')
       .trim()
       .toUpperCase() || 'CNY';
   return {
-    coins: _0x24216f,
-    money: _0x2eb51b,
-    currency: _0x593ddc,
-    apiType: String(_0x25d9e4.apiType || _0x25d9e4.api_type || '').trim(),
+    coins: coins,
+    money: money,
+    currency: currency,
+    apiType: String(isPlainObject3.apiType || isPlainObject3.api_type || '').trim(),
   };
 }
-export function normalizeRunningHubBalancePayload({ workflow: _0x4df6ec, model: _0x28fa41 } = {}) {
-  const _0x328500 = normalizeRunningHubAccountStatusPayload(_0x4df6ec),
-    _0x246a11 = normalizeRunningHubAccountStatusPayload(_0x28fa41),
-    _0x373e34 = _0x328500?.coins ?? null,
-    _0x1579ea = _0x246a11?.money ?? null;
-  if (_0x373e34 === null && _0x1579ea === null) return null;
-  const _0x7b75be = _0x246a11?.currency || _0x328500?.currency || 'CNY',
-    _0x9b37d4 = formatCurrencyLabel(_0x7b75be),
-    _0x48ad57 = formatBalanceNumber(_0x373e34),
-    _0x2150ae = formatBalanceNumber(_0x1579ea),
-    _0x492432 = [],
-    _0x47ea77 = [];
+export function normalizeRunningHubBalancePayload({ workflow: workflow, model: model } = {}) {
+  const runningHubAccountStatusPayload = normalizeRunningHubAccountStatusPayload(workflow),
+    runningHubAccountStatusPayload2 = normalizeRunningHubAccountStatusPayload(model),
+    workflowCredits = runningHubAccountStatusPayload?.coins ?? null,
+    modelWallet = runningHubAccountStatusPayload2?.money ?? null;
+  if (workflowCredits === null && modelWallet === null) return null;
+  const currency2 =
+      runningHubAccountStatusPayload2?.currency || runningHubAccountStatusPayload?.currency || 'CNY',
+    currencyLabel = formatCurrencyLabel(currency2),
+    formatBalanceNumber2 = formatBalanceNumber(workflowCredits),
+    formatBalanceNumber3 = formatBalanceNumber(modelWallet),
+    displayText = [],
+    detailText2 = [];
   return (
-    _0x48ad57 && (_0x492432.push('积分 ' + _0x48ad57), _0x47ea77.push('工作流积分：' + _0x48ad57)),
-    _0x2150ae &&
-      (_0x492432.push('钱包 ' + _0x2150ae + ' ' + _0x9b37d4),
-      _0x47ea77.push('模型钱包：' + _0x2150ae + ' ' + _0x9b37d4)),
+    formatBalanceNumber2 &&
+      (displayText.push('积分 ' + formatBalanceNumber2),
+      detailText2.push('工作流积分：' + formatBalanceNumber2)),
+    formatBalanceNumber3 &&
+      (displayText.push('钱包 ' + formatBalanceNumber3 + ' ' + currencyLabel),
+      detailText2.push('模型钱包：' + formatBalanceNumber3 + ' ' + currencyLabel)),
     {
-      workflowCredits: _0x373e34,
-      modelWallet: _0x1579ea,
-      currency: _0x7b75be,
-      currencyLabel: _0x9b37d4,
-      displayText: _0x492432.join(' · ') || '余额 已读取',
-      detailText: _0x47ea77.join('；') || 'RunningHUB 账户信息已读取',
+      workflowCredits: workflowCredits,
+      modelWallet: modelWallet,
+      currency: currency2,
+      currencyLabel: currencyLabel,
+      displayText: displayText.join(' · ') || '余额 已读取',
+      detailText: detailText2.join('；') || 'RunningHUB 账户信息已读取',
     }
   );
 }
-function isSuccessfulGrsaiPayload(_0x3f44eb) {
-  if (!isPlainObject(_0x3f44eb)) return true;
-  if (_0x3f44eb.success === false || _0x3f44eb.ok === false) return false;
-  const _0x45d252 = _0x3f44eb.code ?? _0x3f44eb.statusCode;
-  if (_0x45d252 !== undefined) {
-    const _0x382a18 = Number(_0x45d252);
-    return _0x382a18 === 0 || _0x382a18 === 200;
+function isSuccessfulGrsaiPayload(response3) {
+  if (!isPlainObject(response3)) return true;
+  if (response3.success === false || response3.ok === false) return false;
+  const value10 = response3.code ?? response3.statusCode;
+  if (value10 !== undefined) {
+    const count = Number(value10);
+    return count === 0 || count === 200;
   }
   return true;
 }
-function unwrapGrsaiCreditsPayload(_0x272a12) {
-  if (!isPlainObject(_0x272a12)) return _0x272a12;
-  if (!isSuccessfulGrsaiPayload(_0x272a12)) return null;
-  if (_0x272a12.data !== undefined) return unwrapGrsaiCreditsPayload(_0x272a12.data);
-  if (_0x272a12.result !== undefined) return unwrapGrsaiCreditsPayload(_0x272a12.result);
-  return _0x272a12;
+function unwrapGrsaiCreditsPayload(value11) {
+  if (!isPlainObject(value11)) return value11;
+  if (!isSuccessfulGrsaiPayload(value11)) return null;
+  if (value11.data !== undefined) return unwrapGrsaiCreditsPayload(value11.data);
+  if (value11.result !== undefined) return unwrapGrsaiCreditsPayload(value11.result);
+  return value11;
 }
-function extractGrsaiCreditsValue(_0x4e54bf, _0x448fcc = new Set()) {
-  const _0xe67afd = toFiniteNumber(_0x4e54bf);
-  if (_0xe67afd !== null) return _0xe67afd;
-  if (!isPlainObject(_0x4e54bf) || _0x448fcc.has(_0x4e54bf)) return null;
-  _0x448fcc.add(_0x4e54bf);
-  const _0x53a4da = [
+function extractGrsaiCreditsValue(value12, map = new Set()) {
+  const toFiniteNumber4 = toFiniteNumber(value12);
+  if (toFiniteNumber4 !== null) return toFiniteNumber4;
+  if (!isPlainObject(value12) || map.has(value12)) return null;
+  map.add(value12);
+  const value13 = [
     'currentCredits',
     'availableCredits',
     'remainingCredits',
@@ -281,254 +285,254 @@ function extractGrsaiCreditsValue(_0x4e54bf, _0x448fcc = new Set()) {
     'balance',
     'amount',
   ];
-  for (const _0x555a48 of _0x53a4da) {
-    if (_0x4e54bf[_0x555a48] === undefined) continue;
-    const _0x4473d3 = extractGrsaiCreditsValue(_0x4e54bf[_0x555a48], _0x448fcc);
-    if (_0x4473d3 !== null) return _0x4473d3;
+  for (const value14 of value13) {
+    if (value12[value14] === undefined) continue;
+    const extractGrsaiCreditsValue2 = extractGrsaiCreditsValue(value12[value14], map);
+    if (extractGrsaiCreditsValue2 !== null) return extractGrsaiCreditsValue2;
   }
-  for (const _0xa5557e of ['account', 'user', 'wallet', 'quota']) {
-    if (_0x4e54bf[_0xa5557e] === undefined) continue;
-    const _0x362d90 = extractGrsaiCreditsValue(_0x4e54bf[_0xa5557e], _0x448fcc);
-    if (_0x362d90 !== null) return _0x362d90;
+  for (const value15 of ['account', 'user', 'wallet', 'quota']) {
+    if (value12[value15] === undefined) continue;
+    const extractGrsaiCreditsValue3 = extractGrsaiCreditsValue(value12[value15], map);
+    if (extractGrsaiCreditsValue3 !== null) return extractGrsaiCreditsValue3;
   }
   return null;
 }
-export function normalizeGrsaiBalancePayload(_0x5e4482 = {}, _0x30aba3 = {}) {
-  const _0x346090 = unwrapGrsaiCreditsPayload(_0x5e4482);
-  if (_0x346090 === null) return null;
-  const _0x151465 = toFiniteNumber(extractGrsaiCreditsValue(_0x346090));
-  if (_0x151465 === null) return null;
-  const _0x3f95c9 = formatBalanceNumber(_0x151465),
-    _0xcb4276 = _0x30aba3.source || 'account',
-    _0x1515fd = _0xcb4276 === 'apiKey' ? 'API Key 积分' : '账户积分';
+export function normalizeGrsaiBalancePayload(options4 = {}, value16 = {}) {
+  const unwrapGrsaiCreditsPayload2 = unwrapGrsaiCreditsPayload(options4);
+  if (unwrapGrsaiCreditsPayload2 === null) return null;
+  const credits = toFiniteNumber(extractGrsaiCreditsValue(unwrapGrsaiCreditsPayload2));
+  if (credits === null) return null;
+  const formatBalanceNumber4 = formatBalanceNumber(credits),
+    source2 = value16.source || 'account',
+    detailText3 = source2 === 'apiKey' ? 'API Key 积分' : '账户积分';
   return {
-    credits: _0x151465,
-    source: _0xcb4276,
-    displayText: '积分 ' + _0x3f95c9,
-    detailText: _0x1515fd + '：' + _0x3f95c9,
+    credits: credits,
+    source: source2,
+    displayText: '积分 ' + formatBalanceNumber4,
+    detailText: detailText3 + '：' + formatBalanceNumber4,
   };
 }
-function stringifyProbePayload(_0x1b532e) {
-  if (_0x1b532e == null) return '';
-  if (typeof _0x1b532e === 'string') return _0x1b532e;
+function stringifyProbePayload(value17) {
+  if (value17 == null) return '';
+  if (typeof value17 === 'string') return value17;
   try {
-    return JSON.stringify(_0x1b532e);
+    return JSON.stringify(value17);
   } catch {
-    return String(_0x1b532e || '');
+    return String(value17 || '');
   }
 }
-function probeText(_0x5e8070 = {}) {
+function probeText(response4 = {}) {
   return [
-    _0x5e8070.status ? 'HTTP ' + _0x5e8070.status : '',
-    _0x5e8070.error || '',
-    stringifyProbePayload(_0x5e8070.data),
+    response4.status ? 'HTTP ' + response4.status : '',
+    response4.error || '',
+    stringifyProbePayload(response4.data),
   ]
     .filter(Boolean)
     .join(' ');
 }
-function normalizeErrorText(_0x23381e = '') {
-  return String(_0x23381e || '')
+function normalizeErrorText(value18 = '') {
+  return String(value18 || '')
     .replace(/\s+/g, ' ')
     .trim();
 }
-function isAuthFailure(_0x472d85 = {}) {
-  const _0x28cf47 = Number(_0x472d85.status || 0);
-  if (_0x28cf47 === 0x191 || _0x28cf47 === 0x193) return true;
-  const _0x332645 = probeText(_0x472d85).toLowerCase();
+function isAuthFailure(response5 = {}) {
+  const count2 = Number(response5.status || 0);
+  if (count2 === 0x191 || count2 === 0x193) return true;
+  const probeText2 = probeText(response5).toLowerCase();
   return /(?:\b401\b|\b403\b|unauthorized|forbidden|authentication|authorization|invalid\s+(?:api\s*)?key|invalid\s+token|api\s*key\s+invalid|apikey|bearer|access\s*token|鉴权|认证|未授权|无权限|密钥|令牌)/i.test(
-    _0x332645,
+    probeText2,
   );
 }
-function classifyProbeFailure(_0x162724 = {}, _0x3a56f5 = 'provider_error') {
-  const _0xc77460 = Number(_0x162724.status || 0),
-    _0x54444b = probeText(_0x162724).toLowerCase();
-  if (isAuthFailure(_0x162724)) return 'auth_failed';
+function classifyProbeFailure(response6 = {}, value19 = 'provider_error') {
+  const count3 = Number(response6.status || 0),
+    probeText3 = probeText(response6).toLowerCase();
+  if (isAuthFailure(response6)) return 'auth_failed';
   if (
-    _0xc77460 === 0 ||
-    /timeout|timed out|network|failed to fetch|dns|econn|请求超时|网络请求失败/i.test(_0x54444b)
+    count3 === 0 ||
+    /timeout|timed out|network|failed to fetch|dns|econn|请求超时|网络请求失败/i.test(probeText3)
   )
     return 'network_failed';
-  if (_0xc77460 === 0x1ad || /rate limit|too many requests|限流|请求过于频繁/i.test(_0x54444b))
+  if (count3 === 0x1ad || /rate limit|too many requests|限流|请求过于频繁/i.test(probeText3))
     return 'rate_limited';
-  if (/insufficient|quota|balance|billing|credit|payment|额度|余额|欠费|付费|账户余额/i.test(_0x54444b))
+  if (/insufficient|quota|balance|billing|credit|payment|额度|余额|欠费|付费|账户余额/i.test(probeText3))
     return 'quota_or_balance';
   if (
     /model.+(?:not found|not exist|unavailable|no access)|模型.*(?:不存在|不可用|无权限|未开通)|no permission.*model/i.test(
-      _0x54444b,
+      probeText3,
     )
   )
     return 'model_unavailable';
   if (
-    _0xc77460 === 0x194 ||
-    /not found|invalid url|unsupported endpoint|cannot post|cannot get|接口地址|地址不兼容/i.test(_0x54444b)
+    count3 === 0x194 ||
+    /not found|invalid url|unsupported endpoint|cannot post|cannot get|接口地址|地址不兼容/i.test(probeText3)
   )
     return 'bad_base_url';
-  return _0x3a56f5;
+  return value19;
 }
-function humanizeCategory(_0x279179, _0x290080, _0x413bde = '连接测试未通过') {
-  const _0xc43dd4 = providerLabel(_0x290080),
-    _0x18e185 = {
-      missing_key: _0xc43dd4 + ' 的 API Key 还没填写。',
-      missing_url: _0xc43dd4 + ' 的接口地址未配置。',
-      auth_failed: _0xc43dd4 + ' 的 API Key 无效、过期，或没有访问权限。',
-      network_failed: '无法连到 ' + _0xc43dd4 + '，请检查网络、本地服务或防火墙。',
-      rate_limited: _0xc43dd4 + ' 返回限流，请稍后再试。',
-      quota_or_balance: _0xc43dd4 + ' 账户额度或余额可能不足。',
-      model_unavailable: _0xc43dd4 + ' 的测试模型不可访问，可能未开通该模型或模型名不兼容。',
-      bad_base_url: _0xc43dd4 + ' 的接口地址不兼容，请检查 Base URL 是否填对。',
-      upload_failed: _0xc43dd4 + ' 上传链路未通过，参考图/视频上传可能会失败。',
-      provider_error: _0xc43dd4 + ' 返回异常，稍后重试或查看厂商后台状态。',
-      unsupported: _0xc43dd4 + ' 暂不支持连接测试。',
+function humanizeCategory(value20, value21, value22 = '连接测试未通过') {
+  const missing_key = providerLabel(value21),
+    value23 = {
+      missing_key: missing_key + ' 的 API Key 还没填写。',
+      missing_url: missing_key + ' 的接口地址未配置。',
+      auth_failed: missing_key + ' 的 API Key 无效、过期，或没有访问权限。',
+      network_failed: '无法连到 ' + missing_key + '，请检查网络、本地服务或防火墙。',
+      rate_limited: missing_key + ' 返回限流，请稍后再试。',
+      quota_or_balance: missing_key + ' 账户额度或余额可能不足。',
+      model_unavailable: missing_key + ' 的测试模型不可访问，可能未开通该模型或模型名不兼容。',
+      bad_base_url: missing_key + ' 的接口地址不兼容，请检查 Base URL 是否填对。',
+      upload_failed: missing_key + ' 上传链路未通过，参考图/视频上传可能会失败。',
+      provider_error: missing_key + ' 返回异常，稍后重试或查看厂商后台状态。',
+      unsupported: missing_key + ' 暂不支持连接测试。',
     };
-  return _0x18e185[_0x279179] || _0x413bde;
+  return value23[value20] || value22;
 }
-function isSuccessfulProbe(_0x33776e = {}) {
-  if (!_0x33776e.success) return false;
-  const _0x2de86f = Number(_0x33776e.status || 0);
-  if (_0x2de86f && (_0x2de86f < 200 || _0x2de86f >= 0x12c)) return false;
-  return !isAuthFailure(_0x33776e);
+function isSuccessfulProbe(response7 = {}) {
+  if (!response7.success) return false;
+  const count4 = Number(response7.status || 0);
+  if (count4 && (count4 < 200 || count4 >= 0x12c)) return false;
+  return !isAuthFailure(response7);
 }
-function summarizeFailure(_0x4055c1 = {}, _0x462925 = '连接测试未通过') {
-  const _0x2e6747 = probeText(_0x4055c1).trim();
-  if (!_0x2e6747) return _0x462925;
-  return _0x2e6747.length > 180 ? _0x2e6747.slice(0, 177) + '...' : _0x2e6747;
+function summarizeFailure(options5 = {}, value24 = '连接测试未通过') {
+  const list5 = probeText(options5).trim();
+  if (!list5) return value24;
+  return list5.length > 180 ? list5.slice(0, 177) + '...' : list5;
 }
-function makeStep(_0x45a729, _0x2c3d0b, _0x3747e1, _0x322fdb = '', _0x5f0c86 = {}) {
+function makeStep(id, value25, message, value26 = '', skipped = {}) {
   return {
-    id: _0x45a729,
-    label: STEP_LABELS[_0x45a729] || _0x45a729,
-    ok: Boolean(_0x2c3d0b),
-    skipped: _0x5f0c86.skipped === true,
-    message: _0x3747e1,
-    detail: normalizeErrorText(_0x322fdb),
-    category: _0x5f0c86.category || '',
+    id: id,
+    label: STEP_LABELS[id] || id,
+    ok: Boolean(value25),
+    skipped: skipped.skipped === true,
+    message: message,
+    detail: normalizeErrorText(value26),
+    category: skipped.category || '',
   };
 }
-function pass(_0x3777cb, _0x457666 = '连接测试通过', _0x31ed8a = []) {
+function pass(providerId2, detail = '连接测试通过', steps = []) {
   return {
     ok: true,
-    providerId: _0x3777cb,
-    label: providerLabel(_0x3777cb),
+    providerId: providerId2,
+    label: providerLabel(providerId2),
     message: '通过',
     summary: '连接测试通过',
-    detail: _0x457666,
+    detail: detail,
     category: '',
     suggestion: '',
-    steps: _0x31ed8a,
+    steps: steps,
   };
 }
-function fail(_0xbec2f9, _0x391c7b, _0x44ee31 = [], _0x290b55 = 'provider_error') {
+function fail(providerId3, value27, steps2 = [], category = 'provider_error') {
   return {
     ok: false,
-    providerId: _0xbec2f9,
-    label: providerLabel(_0xbec2f9),
+    providerId: providerId3,
+    label: providerLabel(providerId3),
     message: '未通过',
-    error: String(_0x391c7b || '连接测试未通过'),
-    summary: String(_0x391c7b || '连接测试未通过'),
-    category: _0x290b55,
-    suggestion: humanizeCategory(_0x290b55, _0xbec2f9, _0x391c7b),
-    steps: _0x44ee31,
+    error: String(value27 || '连接测试未通过'),
+    summary: String(value27 || '连接测试未通过'),
+    category: category,
+    suggestion: humanizeCategory(category, providerId3, value27),
+    steps: steps2,
   };
 }
-function finishProviderResult(_0xf9c0f7, _0x39d12d = []) {
-  const _0x30f7f3 = _0x39d12d.find((_0x3834c3) => !_0x3834c3.ok && !_0x3834c3.skipped),
-    _0x53d384 = _0x39d12d.filter((_0x490863) => _0x490863.ok),
-    _0x5afaa9 = _0x39d12d.filter((_0x524d33) => _0x524d33.skipped);
-  if (!_0x30f7f3) {
-    const _0xdcbbf8 = _0x39d12d.map((_0x3a0244) => _0x3a0244.label + ': ' + _0x3a0244.message).join('；');
-    return pass(_0xf9c0f7, _0xdcbbf8 || '连接测试通过', _0x39d12d);
+function finishProviderResult(providerId4, steps3 = []) {
+  const error = steps3.find((response8) => !response8.ok && !response8.skipped),
+    partial = steps3.filter((response9) => response9.ok),
+    list6 = steps3.filter((item2) => item2.skipped);
+  if (!error) {
+    const value28 = steps3.map((error2) => error2.label + ': ' + error2.message).join('；');
+    return pass(providerId4, value28 || '连接测试通过', steps3);
   }
-  const _0xdf60f8 = _0x30f7f3.category || 'provider_error',
-    _0x2cde76 = _0x30f7f3.message || humanizeCategory(_0xdf60f8, _0xf9c0f7),
-    _0x464e8c = _0x39d12d.map((_0x217c09) => {
-      const _0x565e68 = _0x217c09.skipped ? '跳过' : _0x217c09.ok ? '通过' : '失败';
-      return '' + _0x217c09.label + _0x565e68 + ': ' + _0x217c09.message;
+  const category2 = error.category || 'provider_error',
+    error3 = error.message || humanizeCategory(category2, providerId4),
+    detail2 = steps3.map((error4) => {
+      const value29 = error4.skipped ? '跳过' : error4.ok ? '通过' : '失败';
+      return '' + error4.label + value29 + ': ' + error4.message;
     });
   return {
     ok: false,
-    partial: _0x53d384.length > 0 || _0x5afaa9.length > 0,
-    providerId: _0xf9c0f7,
-    label: providerLabel(_0xf9c0f7),
-    message: _0x53d384.length > 0 ? '部分通过' : '未通过',
-    error: _0x2cde76,
-    summary: _0x2cde76,
-    detail: _0x464e8c.join('；'),
-    category: _0xdf60f8,
-    suggestion: humanizeCategory(_0xdf60f8, _0xf9c0f7, _0x2cde76),
-    steps: _0x39d12d,
+    partial: partial.length > 0 || list6.length > 0,
+    providerId: providerId4,
+    label: providerLabel(providerId4),
+    message: partial.length > 0 ? '部分通过' : '未通过',
+    error: error3,
+    summary: error3,
+    detail: detail2.join('；'),
+    category: category2,
+    suggestion: humanizeCategory(category2, providerId4, error3),
+    steps: steps3,
   };
 }
-async function getModelsProbe(_0x22c811, _0x532d93, _0x507205) {
-  const _0x22fc80 = await request(
-    '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(_0x532d93),
-    { method: 'GET', headers: { Authorization: 'Bearer ' + _0x507205 } },
+async function getModelsProbe(value30, value31, value32) {
+  const request2 = await request(
+    '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(value31),
+    { method: 'GET', headers: { Authorization: 'Bearer ' + value32 } },
     TEST_TIMEOUT_MS,
   );
-  if (isSuccessfulProbe(_0x22fc80)) return makeStep('auth', true, 'API Key 可用，模型列表可访问', 'models');
-  const _0x5d1729 = classifyProbeFailure(_0x22fc80);
+  if (isSuccessfulProbe(request2)) return makeStep('auth', true, 'API Key 可用，模型列表可访问', 'models');
+  const category3 = classifyProbeFailure(request2);
   return {
-    ...makeStep('auth', false, humanizeCategory(_0x5d1729, _0x22c811), summarizeFailure(_0x22fc80), {
-      category: _0x5d1729,
+    ...makeStep('auth', false, humanizeCategory(category3, value30), summarizeFailure(request2), {
+      category: category3,
     }),
-    authFailed: isAuthFailure(_0x22fc80),
+    authFailed: isAuthFailure(request2),
   };
 }
-async function completionFallbackProbe(_0x59e0b6, _0xbad7a, _0x228fb6) {
-  const _0x1c0b4f = COMPLETION_FALLBACKS[_0x59e0b6],
-    _0x3067af = buildCompletionProbeUrl(_0x59e0b6, _0xbad7a);
-  if (!_0x1c0b4f?.model || !_0x3067af)
+async function completionFallbackProbe(content, value33, apiKey) {
+  const model2 = COMPLETION_FALLBACKS[content],
+    apiUrl = buildCompletionProbeUrl(content, value33);
+  if (!model2?.model || !apiUrl)
     return makeStep('model', true, '模型列表可访问，未执行额外模型调用', 'no completion fallback', {
       skipped: true,
     });
-  const _0x1295c5 = {
-    apiUrl: _0x3067af,
-    apiKey: _0x228fb6,
-    model: _0x1c0b4f.model,
+  const value34 = {
+    apiUrl: apiUrl,
+    apiKey: apiKey,
+    model: model2.model,
     stream: false,
-    messages: [{ role: 'user', content: _0x59e0b6 === 'grsai' ? GRSAI_COMPLETION_TEST_MESSAGE : 'ping' }],
+    messages: [{ role: 'user', content: content === 'grsai' ? GRSAI_COMPLETION_TEST_MESSAGE : 'ping' }],
   };
-  _0x59e0b6 !== 'grsai' && (_0x1295c5.max_tokens = 1);
-  const _0x347b7c = await post('/api/v2/proxy/completions', _0x1295c5, TEST_TIMEOUT_MS);
-  if (isSuccessfulProbe(_0x347b7c))
+  content !== 'grsai' && (value34.max_tokens = 1);
+  const post2 = await post('/api/v2/proxy/completions', value34, TEST_TIMEOUT_MS);
+  if (isSuccessfulProbe(post2))
     return makeStep(
       'model',
       true,
-      '测试模型 ' + (_0x1c0b4f.label || _0x1c0b4f.model) + ' 可访问',
+      '测试模型 ' + (model2.label || model2.model) + ' 可访问',
       'chat-completions',
     );
-  const _0x479c29 = classifyProbeFailure(_0x347b7c, 'model_unavailable');
-  return makeStep('model', false, humanizeCategory(_0x479c29, _0x59e0b6), summarizeFailure(_0x347b7c), {
-    category: _0x479c29,
+  const category4 = classifyProbeFailure(post2, 'model_unavailable');
+  return makeStep('model', false, humanizeCategory(category4, content), summarizeFailure(post2), {
+    category: category4,
   });
 }
-async function apimartBalanceProbe(_0x428b90, _0x5e3729) {
-  const _0x5810b0 = buildApimartBalanceProbeUrls(_0x5e3729.apiUrl);
-  if (_0x5810b0.length <= 0)
+async function apimartBalanceProbe(value35, value36) {
+  const list7 = buildApimartBalanceProbeUrls(value36.apiUrl);
+  if (list7.length <= 0)
     return {
       step: makeStep('balance', true, '余额接口地址不可用，已跳过', 'no balance endpoint', {
         skipped: true,
       }),
       balance: null,
     };
-  let _0x5d60ce = null;
-  for (const _0x255eab of _0x5810b0) {
-    const _0x446e06 = await request(
-      '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(_0x255eab),
-      { method: 'GET', headers: { Authorization: 'Bearer ' + _0x5e3729.apiKey } },
+  let value37 = null;
+  for (const list8 of list7) {
+    const request3 = await request(
+      '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(list8),
+      { method: 'GET', headers: { Authorization: 'Bearer ' + value36.apiKey } },
       TEST_TIMEOUT_MS,
     );
-    _0x5d60ce = _0x446e06;
-    if (isSuccessfulProbe(_0x446e06)) {
-      const _0x4bc920 = normalizeApimartBalancePayload(_0x446e06.data);
-      if (_0x4bc920)
+    value37 = request3;
+    if (isSuccessfulProbe(request3)) {
+      const balance = normalizeApimartBalancePayload(request3.data);
+      if (balance)
         return {
           step: makeStep(
             'balance',
             true,
-            _0x4bc920.detailText || 'APIMart 余额已读取',
-            _0x255eab.includes('/user/balance') ? 'apimart-user-balance' : 'apimart-token-balance',
+            balance.detailText || 'APIMart 余额已读取',
+            list8.includes('/user/balance') ? 'apimart-user-balance' : 'apimart-token-balance',
           ),
-          balance: _0x4bc920,
+          balance: balance,
         };
     }
   }
@@ -537,102 +541,102 @@ async function apimartBalanceProbe(_0x428b90, _0x5e3729) {
       'balance',
       true,
       '余额暂未返回，连接测试继续',
-      summarizeFailure(_0x5d60ce, 'APIMart 余额接口未返回可识别数据'),
+      summarizeFailure(value37, 'APIMart 余额接口未返回可识别数据'),
       { skipped: true },
     ),
     balance: null,
   };
 }
-async function grsaiCreditsRequest(_0x55b209, _0x144153) {
-  if (_0x55b209.id === 'account')
+async function grsaiCreditsRequest(value38, token) {
+  if (value38.id === 'account')
     return request(
-      buildGrsaiAccountCreditsProbeUrl(_0x144153.apiUrl),
+      buildGrsaiAccountCreditsProbeUrl(token.apiUrl),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: _0x144153.apiKey }),
+        body: JSON.stringify({ token: token.apiKey }),
       },
       TEST_TIMEOUT_MS,
     );
-  if (_0x55b209.id === 'common')
+  if (value38.id === 'common')
     return request(
-      buildGrsaiCommonCreditsProbeUrl(_0x144153.apiUrl, _0x144153.apiKey),
-      { method: 'GET', headers: { Authorization: 'Bearer ' + _0x144153.apiKey } },
+      buildGrsaiCommonCreditsProbeUrl(token.apiUrl, token.apiKey),
+      { method: 'GET', headers: { Authorization: 'Bearer ' + token.apiKey } },
       TEST_TIMEOUT_MS,
     );
   return request(
-    buildGrsaiApiKeyCreditsProbeUrl(_0x144153.apiUrl),
+    buildGrsaiApiKeyCreditsProbeUrl(token.apiUrl),
     {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + _0x144153.apiKey },
-      body: JSON.stringify({ apikey: _0x144153.apiKey }),
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token.apiKey },
+      body: JSON.stringify({ apikey: token.apiKey }),
     },
     TEST_TIMEOUT_MS,
   );
 }
-async function grsaiBalanceProbe(_0x1edd51) {
-  const _0x1e811a = [
+async function grsaiBalanceProbe(value39) {
+  const value40 = [
     { id: 'account', source: 'account', detail: 'grsai-account-credits' },
     { id: 'common', source: 'account', detail: 'grsai-common-credits' },
     { id: 'apiKey', source: 'apiKey', detail: 'grsai-api-key-credits' },
   ];
-  let _0x220ab2 = null,
-    _0x6114fb = null;
-  for (const _0x142e6e of _0x1e811a) {
-    const _0x5dde88 = await grsaiCreditsRequest(_0x142e6e, _0x1edd51);
-    _0x6114fb = _0x5dde88;
-    if (!isSuccessfulProbe(_0x5dde88)) continue;
-    const _0x5e9546 = normalizeGrsaiBalancePayload(_0x5dde88.data, { source: _0x142e6e.source });
-    if (!_0x5e9546) continue;
-    if (_0x5e9546.credits > 0)
+  let balance2 = null,
+    value41 = null;
+  for (const source3 of value40) {
+    const grsaiCreditsRequest2 = await grsaiCreditsRequest(source3, value39);
+    value41 = grsaiCreditsRequest2;
+    if (!isSuccessfulProbe(grsaiCreditsRequest2)) continue;
+    const balance3 = normalizeGrsaiBalancePayload(grsaiCreditsRequest2.data, { source: source3.source });
+    if (!balance3) continue;
+    if (balance3.credits > 0)
       return {
-        step: makeStep('balance', true, _0x5e9546.detailText || 'GRSAI 积分已读取', _0x142e6e.detail),
-        balance: _0x5e9546,
+        step: makeStep('balance', true, balance3.detailText || 'GRSAI 积分已读取', source3.detail),
+        balance: balance3,
       };
-    if (!_0x220ab2) _0x220ab2 = { balance: _0x5e9546, detail: _0x142e6e.detail };
+    if (!balance2) balance2 = { balance: balance3, detail: source3.detail };
   }
-  if (_0x220ab2)
+  if (balance2)
     return {
-      step: makeStep('balance', true, _0x220ab2.balance.detailText || 'GRSAI 积分已读取', _0x220ab2.detail),
-      balance: _0x220ab2.balance,
+      step: makeStep('balance', true, balance2.balance.detailText || 'GRSAI 积分已读取', balance2.detail),
+      balance: balance2.balance,
     };
   return {
     step: makeStep(
       'balance',
       true,
       '积分暂未返回，连接测试继续',
-      summarizeFailure(_0x6114fb, 'GRSAI 积分接口未返回可识别数据'),
+      summarizeFailure(value41, 'GRSAI 积分接口未返回可识别数据'),
       { skipped: true },
     ),
     balance: null,
   };
 }
-async function runningHubAccountStatusProbe(_0x50cce8, _0xb96a43) {
-  const _0x576963 = String(_0xb96a43 || '').trim();
-  if (!_0x576963) return null;
-  const _0x505c9a = buildRunningHubAccountStatusProbeUrl(_0x50cce8.apiUrl),
-    _0x381a2e = await post(
+async function runningHubAccountStatusProbe(value42, value43) {
+  const apiKey2 = String(value43 || '').trim();
+  if (!apiKey2) return null;
+  const apiUrl2 = buildRunningHubAccountStatusProbeUrl(value42.apiUrl),
+    post3 = await post(
       '/api/v2/proxy/image',
-      { apiUrl: _0x505c9a, apiKey: _0x576963, apikey: _0x576963 },
+      { apiUrl: apiUrl2, apiKey: apiKey2, apikey: apiKey2 },
       TEST_TIMEOUT_MS,
     );
-  return isSuccessfulProbe(_0x381a2e) ? _0x381a2e.data : null;
+  return isSuccessfulProbe(post3) ? post3.data : null;
 }
-async function runningHubBalanceProbe(_0x455270) {
-  const [_0x523ab0, _0x4a6080] = await Promise.all([
-      runningHubAccountStatusProbe(_0x455270, _0x455270.apiKey),
-      runningHubAccountStatusProbe(_0x455270, _0x455270.modelApiKey),
+async function runningHubBalanceProbe(value44) {
+  const [workflow2, model3] = await Promise.all([
+      runningHubAccountStatusProbe(value44, value44.apiKey),
+      runningHubAccountStatusProbe(value44, value44.modelApiKey),
     ]),
-    _0x54da9f = normalizeRunningHubBalancePayload({ workflow: _0x523ab0, model: _0x4a6080 });
-  if (_0x54da9f)
+    balance4 = normalizeRunningHubBalancePayload({ workflow: workflow2, model: model3 });
+  if (balance4)
     return {
       step: makeStep(
         'balance',
         true,
-        _0x54da9f.detailText || 'RunningHUB 账户信息已读取',
+        balance4.detailText || 'RunningHUB 账户信息已读取',
         'runninghub-account-status',
       ),
-      balance: _0x54da9f,
+      balance: balance4,
     };
   return {
     step: makeStep(
@@ -646,293 +650,304 @@ async function runningHubBalanceProbe(_0x455270) {
   };
 }
 function createTinyPngBlob() {
-  const _0x29d667 =
+  const list9 =
       typeof atob === 'function'
         ? atob(ONE_PIXEL_PNG_BASE64)
         : Buffer.from(ONE_PIXEL_PNG_BASE64, 'base64').toString('binary'),
-    _0x3d02d5 = new Uint8Array(_0x29d667.length);
-  for (let _0x3635ac = 0; _0x3635ac < _0x29d667.length; _0x3635ac++) {
-    _0x3d02d5[_0x3635ac] = _0x29d667.charCodeAt(_0x3635ac);
+    uint8Array = new Uint8Array(list9.length);
+  for (let value45 = 0; value45 < list9.length; value45++) {
+    uint8Array[value45] = list9.charCodeAt(value45);
   }
-  return new Blob([_0x3d02d5], { type: 'image/png' });
+  return new Blob([uint8Array], { type: 'image/png' });
 }
-async function grsaiUploadProbe(_0x2b1602, _0x48f472) {
-  const _0x470047 = await request(
+async function grsaiUploadProbe(value46, value47) {
+  const request4 = await request(
     'https://grsai.dakka.com.cn/client/resource/newUploadTokenZH',
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(_0x48f472 ? { Authorization: 'Bearer ' + _0x48f472 } : {}),
+        ...(value47 ? { Authorization: 'Bearer ' + value47 } : {}),
       },
       body: JSON.stringify({ sux: 'png' }),
     },
     TEST_UPLOAD_TIMEOUT_MS,
   );
-  if (!isSuccessfulProbe(_0x470047) || !_0x470047.data?.data) {
-    const _0x1d9431 = classifyProbeFailure(_0x470047, 'upload_failed');
+  if (!isSuccessfulProbe(request4) || !request4.data?.data) {
+    const category5 = classifyProbeFailure(request4, 'upload_failed');
     return makeStep(
       'upload',
       false,
-      humanizeCategory(_0x1d9431 === 'provider_error' ? 'upload_failed' : _0x1d9431, _0x2b1602),
-      summarizeFailure(_0x470047, 'GRSAI 上传凭证获取失败'),
-      { category: _0x1d9431 === 'provider_error' ? 'upload_failed' : _0x1d9431 },
+      humanizeCategory(category5 === 'provider_error' ? 'upload_failed' : category5, value46),
+      summarizeFailure(request4, 'GRSAI 上传凭证获取失败'),
+      { category: category5 === 'provider_error' ? 'upload_failed' : category5 },
     );
   }
-  const { token: _0xc0b892, key: _0x40966f, url: _0x4fabb4 } = _0x470047.data.data;
-  if (!_0xc0b892 || !_0x40966f || !_0x4fabb4)
-    return makeStep('upload', false, 'GRSAI 上传凭证返回不完整。', stringifyProbePayload(_0x470047.data), {
+  const { token: token2, key: key2, url: url } = request4.data.data;
+  if (!token2 || !key2 || !url)
+    return makeStep('upload', false, 'GRSAI 上传凭证返回不完整。', stringifyProbePayload(request4.data), {
       category: 'upload_failed',
     });
-  const _0x22fd2a = new FormData();
-  (_0x22fd2a.append('token', _0xc0b892),
-    _0x22fd2a.append('key', _0x40966f),
-    _0x22fd2a.append('file', createTinyPngBlob(), 'aic-connection-test.png'));
-  const _0x3612f4 = await request(_0x4fabb4, { method: 'POST', body: _0x22fd2a }, TEST_UPLOAD_TIMEOUT_MS);
-  if (isSuccessfulProbe(_0x3612f4)) return makeStep('upload', true, '上传链路可用', 'qiniu');
-  const _0x21aa4c = classifyProbeFailure(_0x3612f4, 'upload_failed');
+  const body = new FormData();
+  (body.append('token', token2),
+    body.append('key', key2),
+    body.append('file', createTinyPngBlob(), 'aic-connection-test.png'));
+  const request5 = await request(url, { method: 'POST', body: body }, TEST_UPLOAD_TIMEOUT_MS);
+  if (isSuccessfulProbe(request5)) return makeStep('upload', true, '上传链路可用', 'qiniu');
+  const category6 = classifyProbeFailure(request5, 'upload_failed');
   return makeStep(
     'upload',
     false,
-    humanizeCategory(_0x21aa4c === 'provider_error' ? 'upload_failed' : _0x21aa4c, _0x2b1602),
-    summarizeFailure(_0x3612f4, 'GRSAI 上传失败'),
-    { category: _0x21aa4c === 'provider_error' ? 'upload_failed' : _0x21aa4c },
+    humanizeCategory(category6 === 'provider_error' ? 'upload_failed' : category6, value46),
+    summarizeFailure(request5, 'GRSAI 上传失败'),
+    { category: category6 === 'provider_error' ? 'upload_failed' : category6 },
   );
 }
-async function apimartUploadProbe(_0x1cc4ec, _0x448a8e) {
-  const _0x4a9416 = new FormData();
-  (_0x4a9416.append('file', createTinyPngBlob(), 'aic-connection-test.png'),
-    _0x4a9416.append('contentType', 'image/png'),
-    _0x4a9416.append('fileExtension', 'png'),
-    _0x4a9416.append('permanent', '0'),
-    _0x4a9416.append('apiKey', _0x448a8e.apiKey),
-    _0x4a9416.append('apiUrl', normalizeApimartBaseUrl(_0x448a8e.apiUrl)));
-  const _0x3829d5 = await post('/api/v2/proxy/apimart-upload', _0x4a9416, TEST_UPLOAD_TIMEOUT_MS);
-  if (isSuccessfulProbe(_0x3829d5) && (_0x3829d5.data?.cdnUrl || _0x3829d5.data?.url))
+async function apimartUploadProbe(value48, value49) {
+  const formData = new FormData();
+  (formData.append('file', createTinyPngBlob(), 'aic-connection-test.png'),
+    formData.append('contentType', 'image/png'),
+    formData.append('fileExtension', 'png'),
+    formData.append('permanent', '0'),
+    formData.append('apiKey', value49.apiKey),
+    formData.append('apiUrl', normalizeApimartBaseUrl(value49.apiUrl)));
+  const post4 = await post('/api/v2/proxy/apimart-upload', formData, TEST_UPLOAD_TIMEOUT_MS);
+  if (isSuccessfulProbe(post4) && (post4.data?.cdnUrl || post4.data?.url))
     return makeStep('upload', true, '上传链路可用', 'apimart-upload');
-  const _0x1d9343 = classifyProbeFailure(_0x3829d5, 'upload_failed');
+  const category7 = classifyProbeFailure(post4, 'upload_failed');
   return makeStep(
     'upload',
     false,
-    humanizeCategory(_0x1d9343 === 'provider_error' ? 'upload_failed' : _0x1d9343, _0x1cc4ec),
-    summarizeFailure(_0x3829d5, 'APIMart 上传失败'),
-    { category: _0x1d9343 === 'provider_error' ? 'upload_failed' : _0x1d9343 },
+    humanizeCategory(category7 === 'provider_error' ? 'upload_failed' : category7, value48),
+    summarizeFailure(post4, 'APIMart 上传失败'),
+    { category: category7 === 'provider_error' ? 'upload_failed' : category7 },
   );
 }
-async function runningHubUploadProbe(_0x184e68, _0x11e4f3) {
-  if (!_0x11e4f3)
+async function runningHubUploadProbe(value50, enabled4) {
+  if (!enabled4)
     return makeStep('upload', true, '未填写模型 API Key，跳过模型上传链路', 'no model api key', {
       skipped: true,
     });
-  const _0x4b8c56 = 'https://www.runninghub.cn/openapi/v2/media/upload/binary',
-    _0x5a1e79 = new FormData();
-  _0x5a1e79.append('file', createTinyPngBlob(), 'aic-connection-test.png');
-  const _0x478864 = await request(
-    '/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(_0x4b8c56),
-    { method: 'POST', headers: { Authorization: 'Bearer ' + _0x11e4f3 }, body: _0x5a1e79 },
+  const value51 = 'https://www.runninghub.cn/openapi/v2/media/upload/binary',
+    body2 = new FormData();
+  body2.append('file', createTinyPngBlob(), 'aic-connection-test.png');
+  const request6 = await request(
+    '/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(value51),
+    { method: 'POST', headers: { Authorization: 'Bearer ' + enabled4 }, body: body2 },
     TEST_UPLOAD_TIMEOUT_MS,
   );
-  if (isSuccessfulProbe(_0x478864) && _0x478864.data?.data?.download_url)
+  if (isSuccessfulProbe(request6) && request6.data?.data?.download_url)
     return makeStep('upload', true, '上传链路可用', 'runninghub-upload');
-  const _0x594e45 = classifyProbeFailure(_0x478864, 'upload_failed');
+  const category8 = classifyProbeFailure(request6, 'upload_failed');
   return makeStep(
     'upload',
     false,
-    humanizeCategory(_0x594e45 === 'provider_error' ? 'upload_failed' : _0x594e45, _0x184e68),
-    summarizeFailure(_0x478864, 'RunningHUB 上传失败'),
-    { category: _0x594e45 === 'provider_error' ? 'upload_failed' : _0x594e45 },
+    humanizeCategory(category8 === 'provider_error' ? 'upload_failed' : category8, value50),
+    summarizeFailure(request6, 'RunningHUB 上传失败'),
+    { category: category8 === 'provider_error' ? 'upload_failed' : category8 },
   );
 }
-async function uploadProbe(_0x57fac9, _0x5523e5) {
-  if (_0x57fac9 === 'grsai') return grsaiUploadProbe(_0x57fac9, _0x5523e5.apiKey);
-  if (_0x57fac9 === 'apimart') return apimartUploadProbe(_0x57fac9, _0x5523e5);
-  if (_0x57fac9 === 'runninghub') return runningHubUploadProbe(_0x57fac9, _0x5523e5.modelApiKey);
+async function uploadProbe(value52, value53) {
+  if (value52 === 'grsai') return grsaiUploadProbe(value52, value53.apiKey);
+  if (value52 === 'apimart') return apimartUploadProbe(value52, value53);
+  if (value52 === 'runninghub') return runningHubUploadProbe(value52, value53.modelApiKey);
   return makeStep(
     'upload',
     true,
-    SKIPPED_UPLOAD_PROVIDERS[_0x57fac9] || '当前厂商无需独立上传检测',
+    SKIPPED_UPLOAD_PROVIDERS[value52] || '当前厂商无需独立上传检测',
     'skipped',
     { skipped: true },
   );
 }
-async function openAiLikeProviderProbe(_0x791268, _0xa775cd) {
-  const _0x9c0ceb = providerConfigWithDefaults(_0x791268, _0xa775cd),
-    _0x45db1a = [];
-  let _0x588399 = null,
-    _0x174551 = false;
-  if (!_0x9c0ceb.apiKey)
+async function openAiLikeProviderProbe(value54, value55) {
+  const providerConfigWithDefaults2 = providerConfigWithDefaults(value54, value55),
+    list10 = [];
+  let balance5 = null,
+    value56 = false;
+  if (!providerConfigWithDefaults2.apiKey)
     return (
-      _0x45db1a.push(makeStep('config', false, 'API Key 未填写', '', { category: 'missing_key' })),
-      finishProviderResult(_0x791268, _0x45db1a)
+      list10.push(makeStep('config', false, 'API Key 未填写', '', { category: 'missing_key' })),
+      finishProviderResult(value54, list10)
     );
-  if (!_0x9c0ceb.apiUrl)
+  if (!providerConfigWithDefaults2.apiUrl)
     return (
-      _0x45db1a.push(makeStep('config', false, '接口地址未配置', '', { category: 'missing_url' })),
-      finishProviderResult(_0x791268, _0x45db1a)
+      list10.push(makeStep('config', false, '接口地址未配置', '', { category: 'missing_url' })),
+      finishProviderResult(value54, list10)
     );
-  _0x45db1a.push(makeStep('config', true, '接口地址和 API Key 已填写'));
-  const _0x5c274c = _0x791268 === 'grsai' ? '' : buildModelsProbeUrl(_0x791268, _0x9c0ceb.apiUrl);
-  if (_0x5c274c) {
-    const _0x26c6aa = await getModelsProbe(_0x791268, _0x5c274c, _0x9c0ceb.apiKey);
-    if (_0x26c6aa.ok) (_0x45db1a.push(_0x26c6aa), (_0x174551 = true));
+  list10.push(makeStep('config', true, '接口地址和 API Key 已填写'));
+  const value57 = value54 === 'grsai' ? '' : buildModelsProbeUrl(value54, providerConfigWithDefaults2.apiUrl);
+  if (value57) {
+    const response10 = await getModelsProbe(value54, value57, providerConfigWithDefaults2.apiKey);
+    if (response10.ok) (list10.push(response10), (value56 = true));
     else {
-      if (_0x26c6aa.authFailed || !COMPLETION_FALLBACKS[_0x791268]?.model)
-        return (_0x45db1a.push(_0x26c6aa), finishProviderResult(_0x791268, _0x45db1a));
+      if (response10.authFailed || !COMPLETION_FALLBACKS[value54]?.model)
+        return (list10.push(response10), finishProviderResult(value54, list10));
       else
-        _0x45db1a.push(
-          makeStep('auth', true, '模型列表不可用，已改用轻量模型调用继续检测', _0x26c6aa.detail, {
+        list10.push(
+          makeStep('auth', true, '模型列表不可用，已改用轻量模型调用继续检测', response10.detail, {
             skipped: true,
           }),
         );
     }
   }
-  _0x791268 === 'apimart' && _0x174551
-    ? _0x45db1a.push(
-        makeStep('model', true, '模型列表可访问，未执行额外模型调用', 'models', { skipped: true }),
-      )
-    : _0x45db1a.push(await completionFallbackProbe(_0x791268, _0x9c0ceb.apiUrl, _0x9c0ceb.apiKey));
-  if (_0x45db1a.some((_0xd0494c) => !_0xd0494c.ok && !_0xd0494c.skipped))
-    return finishProviderResult(_0x791268, _0x45db1a);
-  if (_0x791268 === 'apimart') {
-    const _0x264834 = await apimartBalanceProbe(_0x791268, _0x9c0ceb);
-    (_0x45db1a.push(_0x264834.step), (_0x588399 = _0x264834.balance));
+  value54 === 'apimart' && value56
+    ? list10.push(makeStep('model', true, '模型列表可访问，未执行额外模型调用', 'models', { skipped: true }))
+    : list10.push(
+        await completionFallbackProbe(
+          value54,
+          providerConfigWithDefaults2.apiUrl,
+          providerConfigWithDefaults2.apiKey,
+        ),
+      );
+  if (list10.some((response11) => !response11.ok && !response11.skipped))
+    return finishProviderResult(value54, list10);
+  if (value54 === 'apimart') {
+    const apimartBalanceProbe2 = await apimartBalanceProbe(value54, providerConfigWithDefaults2);
+    (list10.push(apimartBalanceProbe2.step), (balance5 = apimartBalanceProbe2.balance));
   } else {
-    if (_0x791268 === 'grsai') {
-      const _0x486415 = await grsaiBalanceProbe(_0x9c0ceb);
-      (_0x45db1a.push(_0x486415.step), (_0x588399 = _0x486415.balance));
+    if (value54 === 'grsai') {
+      const grsaiBalanceProbe2 = await grsaiBalanceProbe(providerConfigWithDefaults2);
+      (list10.push(grsaiBalanceProbe2.step), (balance5 = grsaiBalanceProbe2.balance));
     }
   }
-  _0x45db1a.push(await uploadProbe(_0x791268, _0x9c0ceb));
-  const _0x27ad4b = finishProviderResult(_0x791268, _0x45db1a);
-  return _0x588399 ? { ..._0x27ad4b, balance: _0x588399 } : _0x27ad4b;
+  list10.push(await uploadProbe(value54, providerConfigWithDefaults2));
+  const args = finishProviderResult(value54, list10);
+  return balance5 ? { ...args, balance: balance5 } : args;
 }
-function runningHubProbePassed(_0x3e07e8 = {}) {
-  if (isAuthFailure(_0x3e07e8)) return false;
-  if (_0x3e07e8.success) return true;
-  const _0x5b8c16 = Number(_0x3e07e8.status || 0);
-  return _0x5b8c16 >= 0x190 && _0x5b8c16 < 0x1f4;
+function runningHubProbePassed(response12 = {}) {
+  if (isAuthFailure(response12)) return false;
+  if (response12.success) return true;
+  const count5 = Number(response12.status || 0);
+  return count5 >= 0x190 && count5 < 0x1f4;
 }
-async function runningHubWorkflowProbe(_0x5a048b) {
-  const _0x1d795b = await post(
+async function runningHubWorkflowProbe(apiKey3) {
+  const post5 = await post(
     '/api/v2/runninghubwf/query',
-    { apiKey: _0x5a048b, taskId: 'aic-connection-test' },
+    { apiKey: apiKey3, taskId: 'aic-connection-test' },
     TEST_TIMEOUT_MS,
   );
-  return runningHubProbePassed(_0x1d795b)
+  return runningHubProbePassed(post5)
     ? makeStep('auth', true, '工作流 API Key 可用', 'workflow')
     : makeStep(
         'auth',
         false,
-        humanizeCategory(classifyProbeFailure(_0x1d795b), 'runninghub'),
-        summarizeFailure(_0x1d795b, '工作流 API Key 测试未通过'),
-        { category: classifyProbeFailure(_0x1d795b) },
+        humanizeCategory(classifyProbeFailure(post5), 'runninghub'),
+        summarizeFailure(post5, '工作流 API Key 测试未通过'),
+        { category: classifyProbeFailure(post5) },
       );
 }
-async function runningHubModelProbe(_0x245793) {
-  const _0x5d0432 = await post(
+async function runningHubModelProbe(apiKey4) {
+  const post6 = await post(
     '/api/v2/proxy/image',
     {
       apiUrl: 'https://www.runninghub.cn/openapi/v2/query',
-      apiKey: _0x245793,
+      apiKey: apiKey4,
       taskId: 'aic-connection-test',
     },
     TEST_TIMEOUT_MS,
   );
-  return runningHubProbePassed(_0x5d0432)
+  return runningHubProbePassed(post6)
     ? makeStep('model', true, '模型 API Key 可用', 'model-api')
     : makeStep(
         'model',
         false,
-        humanizeCategory(classifyProbeFailure(_0x5d0432, 'model_unavailable'), 'runninghub'),
-        summarizeFailure(_0x5d0432, '模型 API Key 测试未通过'),
-        { category: classifyProbeFailure(_0x5d0432, 'model_unavailable') },
+        humanizeCategory(classifyProbeFailure(post6, 'model_unavailable'), 'runninghub'),
+        summarizeFailure(post6, '模型 API Key 测试未通过'),
+        { category: classifyProbeFailure(post6, 'model_unavailable') },
       );
 }
-async function runningHubProviderProbe(_0x5abaff) {
-  const _0x58e901 = providerConfigWithDefaults('runninghub', _0x5abaff),
-    _0x149292 = [],
-    _0x503bea = [];
-  let _0x48eaa6 = null;
-  if (_0x58e901.apiKey) _0x149292.push(runningHubWorkflowProbe(_0x58e901.apiKey));
-  if (_0x58e901.modelApiKey) _0x149292.push(runningHubModelProbe(_0x58e901.modelApiKey));
-  if (_0x149292.length === 0)
+async function runningHubProviderProbe(value58) {
+  const providerConfigWithDefaults3 = providerConfigWithDefaults('runninghub', value58),
+    list11 = [],
+    list12 = [];
+  let balance6 = null;
+  if (providerConfigWithDefaults3.apiKey)
+    list11.push(runningHubWorkflowProbe(providerConfigWithDefaults3.apiKey));
+  if (providerConfigWithDefaults3.modelApiKey)
+    list11.push(runningHubModelProbe(providerConfigWithDefaults3.modelApiKey));
+  if (list11.length === 0)
     return (
-      _0x503bea.push(makeStep('config', false, 'API Key 未填写', '', { category: 'missing_key' })),
-      finishProviderResult('runninghub', _0x503bea)
+      list12.push(makeStep('config', false, 'API Key 未填写', '', { category: 'missing_key' })),
+      finishProviderResult('runninghub', list12)
     );
-  _0x503bea.push(makeStep('config', true, '已填写至少一个 RunningHUB API Key'));
-  const _0x24c459 = await Promise.all(_0x149292);
-  _0x503bea.push(..._0x24c459);
-  const _0x359285 = await runningHubBalanceProbe(_0x58e901);
-  (_0x503bea.push(_0x359285.step), (_0x48eaa6 = _0x359285.balance));
-  !_0x503bea.some((_0x139cfe) => !_0x139cfe.ok && !_0x139cfe.skipped) &&
-    _0x503bea.push(await uploadProbe('runninghub', _0x58e901));
-  const _0x183061 = finishProviderResult('runninghub', _0x503bea);
-  return _0x48eaa6 ? { ..._0x183061, balance: _0x48eaa6 } : _0x183061;
+  list12.push(makeStep('config', true, '已填写至少一个 RunningHUB API Key'));
+  const args2 = await Promise.all(list11);
+  list12.push(...args2);
+  const runningHubBalanceProbe2 = await runningHubBalanceProbe(providerConfigWithDefaults3);
+  (list12.push(runningHubBalanceProbe2.step), (balance6 = runningHubBalanceProbe2.balance));
+  !list12.some((response13) => !response13.ok && !response13.skipped) &&
+    list12.push(await uploadProbe('runninghub', providerConfigWithDefaults3));
+  const args3 = finishProviderResult('runninghub', list12);
+  return balance6 ? { ...args3, balance: balance6 } : args3;
 }
-async function volcengineProviderProbe(_0x480bca) {
-  const _0x291796 = providerConfigWithDefaults('volcengine', _0x480bca),
-    _0xfbec26 = [];
-  if (!_0x291796.apiKey)
+async function volcengineProviderProbe(value59) {
+  const providerConfigWithDefaults4 = providerConfigWithDefaults('volcengine', value59),
+    list13 = [];
+  if (!providerConfigWithDefaults4.apiKey)
     return (
-      _0xfbec26.push(makeStep('config', false, 'API Key 未填写', '', { category: 'missing_key' })),
-      finishProviderResult('volcengine', _0xfbec26)
+      list13.push(makeStep('config', false, 'API Key 未填写', '', { category: 'missing_key' })),
+      finishProviderResult('volcengine', list13)
     );
-  if (!_0x291796.apiUrl)
+  if (!providerConfigWithDefaults4.apiUrl)
     return (
-      _0xfbec26.push(makeStep('config', false, '接口地址未配置', '', { category: 'missing_url' })),
-      finishProviderResult('volcengine', _0xfbec26)
+      list13.push(makeStep('config', false, '接口地址未配置', '', { category: 'missing_url' })),
+      finishProviderResult('volcengine', list13)
     );
-  _0xfbec26.push(makeStep('config', true, '接口地址和 API Key 已填写'));
-  const _0x216ccd = buildVolcenginePingProbeUrl(_0x291796.apiUrl);
-  if (!_0x216ccd)
+  list13.push(makeStep('config', true, '接口地址和 API Key 已填写'));
+  const volcenginePingProbeUrl = buildVolcenginePingProbeUrl(providerConfigWithDefaults4.apiUrl);
+  if (!volcenginePingProbeUrl)
     return (
-      _0xfbec26.push(
-        makeStep('auth', false, '接口地址不兼容', _0x291796.apiUrl, { category: 'bad_base_url' }),
+      list13.push(
+        makeStep('auth', false, '接口地址不兼容', providerConfigWithDefaults4.apiUrl, {
+          category: 'bad_base_url',
+        }),
       ),
-      finishProviderResult('volcengine', _0xfbec26)
+      finishProviderResult('volcengine', list13)
     );
-  const _0x200916 = await request(
-    '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(_0x216ccd),
-    { method: 'GET', headers: { Authorization: 'Bearer ' + _0x291796.apiKey } },
+  const request7 = await request(
+    '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(volcenginePingProbeUrl),
+    { method: 'GET', headers: { Authorization: 'Bearer ' + providerConfigWithDefaults4.apiKey } },
     TEST_TIMEOUT_MS,
   );
-  if (isSuccessfulProbe(_0x200916))
+  if (isSuccessfulProbe(request7))
     return (
-      _0xfbec26.push(makeStep('auth', true, '方舟 API Key 可用，服务可访问', 'ping')),
-      _0xfbec26.push(await uploadProbe('volcengine', _0x291796)),
-      finishProviderResult('volcengine', _0xfbec26)
+      list13.push(makeStep('auth', true, '方舟 API Key 可用，服务可访问', 'ping')),
+      list13.push(await uploadProbe('volcengine', providerConfigWithDefaults4)),
+      finishProviderResult('volcengine', list13)
     );
-  const _0x208760 = classifyProbeFailure(_0x200916);
+  const category9 = classifyProbeFailure(request7);
   return (
-    _0xfbec26.push(
+    list13.push(
       makeStep(
         'auth',
         false,
-        humanizeCategory(_0x208760, 'volcengine'),
-        summarizeFailure(_0x200916, '火山方舟 ping 测试未通过'),
-        { category: _0x208760 },
+        humanizeCategory(category9, 'volcengine'),
+        summarizeFailure(request7, '火山方舟 ping 测试未通过'),
+        { category: category9 },
       ),
     ),
-    finishProviderResult('volcengine', _0xfbec26)
+    finishProviderResult('volcengine', list13)
   );
 }
-export async function testProviderConnection(_0xaa4aeb, _0x48cfea = {}) {
-  const _0x266152 = normalizeProviderId(_0xaa4aeb);
-  if (!DEFAULT_PROVIDER_TEST_IDS.includes(_0x266152))
-    return fail(_0x266152 || 'unknown', '暂不支持该厂商的连接测试');
-  if (_0x266152 === 'runninghub') return runningHubProviderProbe(_0x48cfea);
-  if (_0x266152 === 'volcengine') return volcengineProviderProbe(_0x48cfea);
-  return openAiLikeProviderProbe(_0x266152, _0x48cfea);
+export async function testProviderConnection(value60, value61 = {}) {
+  const providerId5 = normalizeProviderId(value60);
+  if (!DEFAULT_PROVIDER_TEST_IDS.includes(providerId5))
+    return fail(providerId5 || 'unknown', '暂不支持该厂商的连接测试');
+  if (providerId5 === 'runninghub') return runningHubProviderProbe(value61);
+  if (providerId5 === 'volcengine') return volcengineProviderProbe(value61);
+  return openAiLikeProviderProbe(providerId5, value61);
 }
-export async function testProviderConnections(_0x11a251 = {}, _0x2c07d3 = DEFAULT_PROVIDER_TEST_IDS) {
-  const _0x3cfea1 = isPlainObject(_0x11a251?.providers) ? _0x11a251.providers : {},
-    _0x8f0f1a = await Promise.all(
-      _0x2c07d3.map(async (_0x4fa077) => {
-        const _0x51eccb = normalizeProviderId(_0x4fa077),
-          _0x25dfff = await testProviderConnection(_0x51eccb, _0x3cfea1[_0x51eccb] || {});
-        return [_0x51eccb, _0x25dfff];
+export async function testProviderConnections(options6 = {}, list14 = DEFAULT_PROVIDER_TEST_IDS) {
+  const isPlainObject4 = isPlainObject(options6?.providers) ? options6.providers : {},
+    value62 = await Promise.all(
+      list14.map(async (value63) => {
+        const providerId6 = normalizeProviderId(value63),
+          testProviderConnection2 = await testProviderConnection(
+            providerId6,
+            isPlainObject4[providerId6] || {},
+          );
+        return [providerId6, testProviderConnection2];
       }),
     );
-  return Object.fromEntries(_0x8f0f1a);
+  return Object.fromEntries(value62);
 }

@@ -19,26 +19,26 @@ const DEFAULT_PRESET_NAME = '默认预设',
     文本功能: 'textTools',
     '3D导演台': 'panoramaStage',
   });
-function _formatI18nMessage(_0xdde15, _0x386c07 = {}) {
-  let _0x3ee2ae = String(_0xdde15 || '');
+function _formatI18nMessage(value, item = {}) {
+  let key = String(value || '');
   return (
-    Object.entries(_0x386c07 || {}).forEach(([_0x7f27a5, _0x5246cd]) => {
-      _0x3ee2ae = _0x3ee2ae.split('{' + _0x7f27a5 + '}').join(String(_0x5246cd ?? ''));
+    Object.entries(item || {}).forEach(([index, result]) => {
+      key = key.split('{' + index + '}').join(String(result ?? ''));
     }),
-    _0x3ee2ae
+    key
   );
 }
-function _tShortcut(_0x25eafa, _0x2382ef, _0x5ea6ab = {}) {
-  const _0x40d1e0 = 'settings.shortcuts.' + _0x25eafa,
-    _0x40fd72 = t(_0x40d1e0);
-  return _formatI18nMessage(_0x40fd72 === _0x40d1e0 ? _0x2382ef : _0x40fd72, _0x5ea6ab);
+function _tShortcut(data, options, target = {}) {
+  const source = 'settings.shortcuts.' + data,
+    t2 = t(source);
+  return _formatI18nMessage(t2 === source ? options : t2, target);
 }
-function _translateShortcutGroup(_0x18b0fc) {
-  const _0x52104d = SHORTCUT_GROUP_I18N_KEYS[_0x18b0fc];
-  return _0x52104d ? _tShortcut('groups.' + _0x52104d, _0x18b0fc) : _0x18b0fc;
+function _translateShortcutGroup(next) {
+  const current = SHORTCUT_GROUP_I18N_KEYS[next];
+  return current ? _tShortcut('groups.' + current, next) : next;
 }
-function _translateShortcutAction(_0x555f54, _0x40a092) {
-  return _tShortcut('actions.' + _0x555f54, _0x40a092 || _0x555f54);
+function _translateShortcutAction(entry, record) {
+  return _tShortcut('actions.' + entry, record || entry);
 }
 export const DEFAULT_SHORTCUTS = {
   'zoom-in': { label: '放大', keys: ['Ctrl', '+'], group: '通用' },
@@ -240,232 +240,220 @@ const _TOOLBAR_SHORTCUT_PREFIX_BY_NODE_TYPE = {
     text: 'text-tool-',
   },
   _PANORAMA_SCENE_NODE_TYPES = new Set(['panorama-scene', 'panorama-360']);
-function _isPanoramaSceneShortcut(_0x284c3a) {
-  const _0x29e776 = String(_0x284c3a || '').trim();
+function _isPanoramaSceneShortcut(payload) {
+  const handle = String(payload || '').trim();
   return (
-    _0x29e776.startsWith('panorama-scene-tool-') ||
-    _0x29e776.startsWith('panorama-scene-camera-') ||
-    _0x29e776.startsWith('panorama-scene-camera-save-') ||
-    _0x29e776 === 'panorama-scene-camera-create' ||
-    _0x29e776 === 'panorama-scene-reset-view' ||
-    _0x29e776 === 'panorama-scene-capture'
+    handle.startsWith('panorama-scene-tool-') ||
+    handle.startsWith('panorama-scene-camera-') ||
+    handle.startsWith('panorama-scene-camera-save-') ||
+    handle === 'panorama-scene-camera-create' ||
+    handle === 'panorama-scene-reset-view' ||
+    handle === 'panorama-scene-capture'
   );
 }
-function _isNodeToolbarAction(_0x6402b3) {
-  return /^(image|video|audio|clip|text)-tool-/.test(String(_0x6402b3 || ''));
+function _isNodeToolbarAction(state) {
+  return /^(image|video|audio|clip|text)-tool-/.test(String(state || ''));
 }
-function _isEditorShortcut(_0x544ec8) {
-  return String(_0x544ec8 || '')
+function _isEditorShortcut(config) {
+  return String(config || '')
     .trim()
     .startsWith('editor-');
 }
-function _isCreateNodeShortcut(_0x2e4ea9) {
-  return String(_0x2e4ea9 || '')
+function _isCreateNodeShortcut(scope) {
+  return String(scope || '')
     .trim()
     .startsWith('create-');
 }
-function _isGlobalShortcut(_0x5d438a) {
-  const _0x16a912 = String(_0x5d438a || '').trim();
-  if (!_0x16a912) return false;
+function _isGlobalShortcut(input) {
+  const enabled = String(input || '').trim();
+  if (!enabled) return false;
   return (
-    !_isEditorShortcut(_0x16a912) &&
-    !_isNodeToolbarAction(_0x16a912) &&
-    !_isPanoramaSceneShortcut(_0x16a912) &&
-    !_isCreateNodeShortcut(_0x16a912)
+    !_isEditorShortcut(enabled) &&
+    !_isNodeToolbarAction(enabled) &&
+    !_isPanoramaSceneShortcut(enabled) &&
+    !_isCreateNodeShortcut(enabled)
   );
 }
-function _isPanoramaSceneNodeType(_0x195e0f) {
-  return _PANORAMA_SCENE_NODE_TYPES.has(String(_0x195e0f || '').trim());
+function _isPanoramaSceneNodeType(output) {
+  return _PANORAMA_SCENE_NODE_TYPES.has(String(output || '').trim());
 }
-function _isPanoramaSceneEditingContext(_0x323331) {
-  return _isPanoramaSceneNodeType(_0x323331?.selectedNodeType) && _0x323331?.panoramaSceneEditing === true;
+function _isPanoramaSceneEditingContext(value2) {
+  return _isPanoramaSceneNodeType(value2?.selectedNodeType) && value2?.panoramaSceneEditing === true;
 }
-function _filterShortcutMatchesByContext(_0x1dd153, _0x437072 = {}) {
-  let _0x1addee = Array.isArray(_0x1dd153) ? [..._0x1dd153] : [];
+function _filterShortcutMatchesByContext(args, value3 = {}) {
+  let list = Array.isArray(args) ? [...args] : [];
   return (
-    !(Number(_0x437072.selectedSyncPlayableVideoCount) >= 2) &&
-      (_0x1addee = _0x1addee.filter((_0x467828) => _0x467828 !== 'ms-sync-video-play')),
-    _0x437072.featureModeActive &&
-      (_0x1addee = _0x1addee.filter((_0xdfcd15) => !_isNodeToolbarAction(_0xdfcd15))),
-    _0x437072.alignFeatureEnabled === false &&
-      (_0x1addee = _0x1addee.filter((_0x50d805) => _0x50d805 !== 'align-feature')),
-    _0x437072.mediaClipExpandedEditing === true &&
-      (_0x1addee = _0x1addee.filter((_0x24b9bd) => _0x24b9bd !== 'pan-canvas')),
-    _isPanoramaSceneEditingContext(_0x437072) &&
-      (_0x1addee = _0x1addee.filter(
-        (_0x317a0f) => !_isNodeToolbarAction(_0x317a0f) && !_isCreateNodeShortcut(_0x317a0f),
-      )),
-    _0x1addee
+    !(Number(value3.selectedSyncPlayableVideoCount) >= 2) &&
+      (list = list.filter((item2) => item2 !== 'ms-sync-video-play')),
+    value3.featureModeActive && (list = list.filter((item3) => !_isNodeToolbarAction(item3))),
+    value3.alignFeatureEnabled === false && (list = list.filter((item4) => item4 !== 'align-feature')),
+    value3.mediaClipExpandedEditing === true && (list = list.filter((item5) => item5 !== 'pan-canvas')),
+    _isPanoramaSceneEditingContext(value3) &&
+      (list = list.filter((item6) => !_isNodeToolbarAction(item6) && !_isCreateNodeShortcut(item6))),
+    list
   );
 }
-function _resolveToolbarShortcutMatch(_0x4f8db3, _0x34781a) {
-  const _0x29ef4c = _TOOLBAR_SHORTCUT_PREFIX_BY_NODE_TYPE[String(_0x34781a || '').trim()];
-  if (!_0x29ef4c) return null;
-  return _0x4f8db3.find((_0xd5d599) => _0xd5d599.startsWith(_0x29ef4c)) || null;
+function _resolveToolbarShortcutMatch(list2, value4) {
+  const enabled2 = _TOOLBAR_SHORTCUT_PREFIX_BY_NODE_TYPE[String(value4 || '').trim()];
+  if (!enabled2) return null;
+  return list2.find((item7) => item7.startsWith(enabled2)) || null;
 }
-function _resolveShortcutMatch(_0x561e1f, _0x51e70d = {}) {
-  if (!Array.isArray(_0x561e1f) || _0x561e1f.length === 0) return null;
-  if (_0x51e70d.mattingActive || _0x51e70d.annotateActive || _0x51e70d.videoKeyingActive) {
-    const _0xc4699f = _0x561e1f.find((_0x50e8a1) => _isEditorShortcut(_0x50e8a1));
-    if (_0xc4699f) return _0xc4699f;
+function _resolveShortcutMatch(list3, value5 = {}) {
+  if (!Array.isArray(list3) || list3.length === 0) return null;
+  if (value5.mattingActive || value5.annotateActive || value5.videoKeyingActive) {
+    const value6 = list3.find((item8) => _isEditorShortcut(item8));
+    if (value6) return value6;
   }
-  if (_isPanoramaSceneEditingContext(_0x51e70d)) {
-    const _0x255ddb = _0x561e1f.find((_0x4cbb76) => _isPanoramaSceneShortcut(_0x4cbb76));
-    if (_0x255ddb) return _0x255ddb;
+  if (_isPanoramaSceneEditingContext(value5)) {
+    const value7 = list3.find((item9) => _isPanoramaSceneShortcut(item9));
+    if (value7) return value7;
   }
-  const _0x432680 = _resolveToolbarShortcutMatch(_0x561e1f, _0x51e70d.selectedNodeType);
-  if (_0x432680) return _0x432680;
-  const _0x233a43 = _0x561e1f.find((_0x32be0e) => _isGlobalShortcut(_0x32be0e));
-  if (_0x233a43) return _0x233a43;
-  const _0x453b9e = _0x561e1f.find((_0x17c873) => _isCreateNodeShortcut(_0x17c873));
-  if (_0x453b9e) return _0x453b9e;
+  const _resolveToolbarShortcutMatch2 = _resolveToolbarShortcutMatch(list3, value5.selectedNodeType);
+  if (_resolveToolbarShortcutMatch2) return _resolveToolbarShortcutMatch2;
+  const value8 = list3.find((item10) => _isGlobalShortcut(item10));
+  if (value8) return value8;
+  const value9 = list3.find((item11) => _isCreateNodeShortcut(item11));
+  if (value9) return value9;
   return null;
 }
-function _getShortcutBindingStrings(_0x4d9925) {
-  const _0x24496e = [];
+function _getShortcutBindingStrings(map) {
+  const list4 = [];
   return (
-    Array.isArray(_0x4d9925?.keys) && _0x4d9925.keys.length > 0 && _0x24496e.push(_0x4d9925.keys),
-    Array.isArray(_0x4d9925?.alternateKeys) &&
-      _0x4d9925.alternateKeys.forEach((_0x71abb5) => {
-        Array.isArray(_0x71abb5) && _0x71abb5.length > 0 && _0x24496e.push(_0x71abb5);
+    Array.isArray(map?.keys) && map.keys.length > 0 && list4.push(map.keys),
+    Array.isArray(map?.alternateKeys) &&
+      map.alternateKeys.forEach((list5) => {
+        Array.isArray(list5) && list5.length > 0 && list4.push(list5);
       }),
-    _0x24496e.map((_0x5aa9a9) => _toShortcutBindingString(_0x5aa9a9))
+    list4.map((item12) => _toShortcutBindingString(item12))
   );
 }
-function _normalizeShortcutToken(_0x1954d7) {
-  const _0x54e44c = String(_0x1954d7 || '').trim();
-  if (!_0x54e44c) return '';
-  const _0x3ca5f0 = _0x54e44c.toLowerCase();
-  if (_0x3ca5f0 === 'ctrl' || _0x3ca5f0 === 'control' || _0x3ca5f0 === 'meta') return 'Ctrl';
-  if (_0x3ca5f0 === 'shift') return 'Shift';
-  if (_0x3ca5f0 === 'alt') return 'Alt';
-  if (_0x3ca5f0 === 'space') return 'Space';
-  if (_0x3ca5f0 === 'backquote' || _0x54e44c === '`' || _0x54e44c === '~') return '`';
-  if (_0x54e44c.length === 1) return _0x54e44c.toUpperCase();
-  return _0x54e44c;
+function _normalizeShortcutToken(value10) {
+  const list6 = String(value10 || '').trim();
+  if (!list6) return '';
+  const value11 = list6.toLowerCase();
+  if (value11 === 'ctrl' || value11 === 'control' || value11 === 'meta') return 'Ctrl';
+  if (value11 === 'shift') return 'Shift';
+  if (value11 === 'alt') return 'Alt';
+  if (value11 === 'space') return 'Space';
+  if (value11 === 'backquote' || list6 === '`' || list6 === '~') return '`';
+  if (list6.length === 1) return list6.toUpperCase();
+  return list6;
 }
-function _normalizeShortcutMainKey(_0x5bacfd) {
-  const _0x2f3173 = String(_0x5bacfd?.code || '').trim(),
-    _0x279d8e = String(_0x5bacfd?.key || '').trim();
-  if (_0x2f3173 === 'Backquote') return '`';
-  if (_0x2f3173 === 'Space') return 'Space';
-  if (_0x2f3173 === 'Delete' || _0x279d8e === 'Del') return 'Delete';
-  if (_0x2f3173 === 'Backspace') return 'Backspace';
-  return _normalizeShortcutToken(_0x5bacfd?.key === ' ' ? 'Space' : _0x5bacfd?.key);
+function _normalizeShortcutMainKey(event) {
+  const value12 = String(event?.code || '').trim(),
+    value13 = String(event?.key || '').trim();
+  if (value12 === 'Backquote') return '`';
+  if (value12 === 'Space') return 'Space';
+  if (value12 === 'Delete' || value13 === 'Del') return 'Delete';
+  if (value12 === 'Backspace') return 'Backspace';
+  return _normalizeShortcutToken(event?.key === ' ' ? 'Space' : event?.key);
 }
-function _normalizeShortcutKeys(_0x5a7feb) {
-  if (!Array.isArray(_0x5a7feb)) return [];
-  const _0x447902 = _0x5a7feb.map((_0x5ab5c9) => _normalizeShortcutToken(_0x5ab5c9)).filter(Boolean),
-    _0x236cc0 = [];
-  if (_0x447902.includes('Ctrl')) _0x236cc0.push('Ctrl');
-  if (_0x447902.includes('Shift')) _0x236cc0.push('Shift');
-  if (_0x447902.includes('Alt')) _0x236cc0.push('Alt');
-  const _0x2c8474 = _0x447902.filter(
-    (_0x2c8974) => _0x2c8974 !== 'Ctrl' && _0x2c8974 !== 'Shift' && _0x2c8974 !== 'Alt',
+function _normalizeShortcutKeys(list7) {
+  if (!Array.isArray(list7)) return [];
+  const list8 = list7.map((item13) => _normalizeShortcutToken(item13)).filter(Boolean),
+    list9 = [];
+  if (list8.includes('Ctrl')) list9.push('Ctrl');
+  if (list8.includes('Shift')) list9.push('Shift');
+  if (list8.includes('Alt')) list9.push('Alt');
+  const args2 = list8.filter((item14) => item14 !== 'Ctrl' && item14 !== 'Shift' && item14 !== 'Alt');
+  return [...list9, ...args2];
+}
+function _buildShortcutKeysFromEvent(value14) {
+  const list10 = [];
+  if (value14.ctrlKey || value14.metaKey) list10.push('Ctrl');
+  if (value14.shiftKey) list10.push('Shift');
+  if (value14.altKey) list10.push('Alt');
+  const _normalizeShortcutMainKey2 = _normalizeShortcutMainKey(value14);
+  return (
+    !['Ctrl', 'Shift', 'Alt', ''].includes(_normalizeShortcutMainKey2) &&
+      list10.push(_normalizeShortcutMainKey2),
+    list10
   );
-  return [..._0x236cc0, ..._0x2c8474];
 }
-function _buildShortcutKeysFromEvent(_0x4e08bd) {
-  const _0xada670 = [];
-  if (_0x4e08bd.ctrlKey || _0x4e08bd.metaKey) _0xada670.push('Ctrl');
-  if (_0x4e08bd.shiftKey) _0xada670.push('Shift');
-  if (_0x4e08bd.altKey) _0xada670.push('Alt');
-  const _0x6a5fa2 = _normalizeShortcutMainKey(_0x4e08bd);
-  return (!['Ctrl', 'Shift', 'Alt', ''].includes(_0x6a5fa2) && _0xada670.push(_0x6a5fa2), _0xada670);
+function _toShortcutBindingString(value15) {
+  return _normalizeShortcutKeys(value15).join('+').toUpperCase();
 }
-function _toShortcutBindingString(_0x1426a0) {
-  return _normalizeShortcutKeys(_0x1426a0).join('+').toUpperCase();
-}
-function _isContextualShortcutConflictExempt(_0x2e4d00, _0x435edd, _0x2cb9b9) {
-  const _0x498c04 = new Set([_0x2e4d00, _0x435edd]);
-  if (_0x2cb9b9 === 'B')
-    return _0x498c04.has('toggle-connection-lines') && _0x498c04.has('editor-tool-brush');
-  if (_0x2cb9b9 === 'G') return _0x498c04.has('ms-sync-video-play') && _0x498c04.has('editor-tool-bucket');
+function _isContextualShortcutConflictExempt(value16, value17, value18) {
+  const map2 = new Set([value16, value17]);
+  if (value18 === 'B') return map2.has('toggle-connection-lines') && map2.has('editor-tool-brush');
+  if (value18 === 'G') return map2.has('ms-sync-video-play') && map2.has('editor-tool-bucket');
   return false;
 }
-function _resolveSavedShortcutKeys(_0x5a6ffb, _0x36b2bf, _0x261812, _0x1fdaae = {}) {
-  const _0x31ac57 = Array.isArray(_0x36b2bf),
-    _0x43d991 = _0x31ac57 ? _normalizeShortcutKeys(_0x36b2bf) : [],
-    _0x3742dd =
-      _0x1fdaae.savedPresetName === ASHUO_PRESET_NAME ? ASHUO_PRESET_SHORTCUT_MIGRATIONS[_0x5a6ffb] : null,
-    _0x3c5add = BUILTIN_PRESET_NAMES.has(_0x1fdaae.savedPresetName)
-      ? BUILTIN_PRESET_SHORTCUT_MIGRATIONS[_0x5a6ffb]
+function _resolveSavedShortcutKeys(value19, value20, value21, value22 = {}) {
+  const value23 = Array.isArray(value20),
+    value24 = value23 ? _normalizeShortcutKeys(value20) : [],
+    value25 =
+      value22.savedPresetName === ASHUO_PRESET_NAME ? ASHUO_PRESET_SHORTCUT_MIGRATIONS[value19] : null,
+    value26 = BUILTIN_PRESET_NAMES.has(value22.savedPresetName)
+      ? BUILTIN_PRESET_SHORTCUT_MIGRATIONS[value19]
       : null;
-  if (
-    _0x31ac57 &&
-    _0x3742dd &&
-    _toShortcutBindingString(_0x43d991) === _toShortcutBindingString(_0x3742dd.from)
-  )
-    return _normalizeShortcutKeys(_0x3742dd.to);
-  if (
-    _0x31ac57 &&
-    _0x3c5add &&
-    _toShortcutBindingString(_0x43d991) === _toShortcutBindingString(_0x3c5add.from)
-  )
-    return _normalizeShortcutKeys(_0x3c5add.to);
-  const _0x2f9073 = DEFAULT_SHORTCUT_MIGRATIONS[_0x5a6ffb];
-  if (
-    _0x31ac57 &&
-    _0x2f9073 &&
-    _toShortcutBindingString(_0x43d991) === _toShortcutBindingString(_0x2f9073.from)
-  )
-    return _normalizeShortcutKeys(_0x2f9073.to);
-  return _0x31ac57 ? _0x43d991 : _normalizeShortcutKeys(_0x261812);
+  if (value23 && value25 && _toShortcutBindingString(value24) === _toShortcutBindingString(value25.from))
+    return _normalizeShortcutKeys(value25.to);
+  if (value23 && value26 && _toShortcutBindingString(value24) === _toShortcutBindingString(value26.from))
+    return _normalizeShortcutKeys(value26.to);
+  const value27 = DEFAULT_SHORTCUT_MIGRATIONS[value19];
+  if (value23 && value27 && _toShortcutBindingString(value24) === _toShortcutBindingString(value27.from))
+    return _normalizeShortcutKeys(value27.to);
+  return value23 ? value24 : _normalizeShortcutKeys(value21);
 }
-function _normalizePresetName(_0x2dfb86) {
-  const _0x5f171a = String(_0x2dfb86 || '').trim();
-  if (_0x5f171a === '自定义') return CUSTOM_PRESET_NAME;
-  if (BUILTIN_PRESET_NAMES.has(_0x5f171a)) return _0x5f171a;
-  if (_0x5f171a === CUSTOM_PRESET_NAME) return CUSTOM_PRESET_NAME;
+function _normalizePresetName(value28) {
+  const value29 = String(value28 || '').trim();
+  if (value29 === '自定义') return CUSTOM_PRESET_NAME;
+  if (BUILTIN_PRESET_NAMES.has(value29)) return value29;
+  if (value29 === CUSTOM_PRESET_NAME) return CUSTOM_PRESET_NAME;
   return ASHUO_PRESET_NAME;
 }
-function _buildPresetShortcuts(_0x2a0c7e) {
-  const _0x373a07 = _normalizePresetName(_0x2a0c7e),
-    _0x1d89aa = PRESETS[_0x373a07] || {};
+function _buildPresetShortcuts(value30) {
+  const _normalizePresetName2 = _normalizePresetName(value30),
+    value31 = PRESETS[_normalizePresetName2] || {};
   return Object.fromEntries(
-    Object.entries(DEFAULT_SHORTCUTS).map(([_0x264e1e, _0x7b257c]) => [
-      _0x264e1e,
-      { ..._0x7b257c, keys: _normalizeShortcutKeys(_0x1d89aa[_0x264e1e] ?? [..._0x7b257c.keys]) },
+    Object.entries(DEFAULT_SHORTCUTS).map(([value32, map3]) => [
+      value32,
+      { ...map3, keys: _normalizeShortcutKeys(value31[value32] ?? [...map3.keys]) },
     ]),
   );
 }
-function _shortcutsMatchPreset(_0x353871, _0xc90a96) {
-  const _0x281e18 = _buildPresetShortcuts(_0xc90a96);
-  return Object.entries(_0x281e18).every(([_0x525e41, _0x316ad3]) => {
-    const _0x49f2d3 = _0x353871?.[_0x525e41]?.keys || [];
-    return _toShortcutBindingString(_0x49f2d3) === _toShortcutBindingString(_0x316ad3.keys);
+function _shortcutsMatchPreset(value33, value34) {
+  const _buildPresetShortcuts2 = _buildPresetShortcuts(value34);
+  return Object.entries(_buildPresetShortcuts2).every(([value35, map4]) => {
+    const value36 = value33?.[value35]?.keys || [];
+    return _toShortcutBindingString(value36) === _toShortcutBindingString(map4.keys);
   });
 }
-function _inferPresetName(_0x4c1092, _0x7ad071) {
-  if (_normalizePresetName(_0x7ad071) === CUSTOM_PRESET_NAME) return CUSTOM_PRESET_NAME;
-  if (_shortcutsMatchPreset(_0x4c1092, DEFAULT_PRESET_NAME)) return DEFAULT_PRESET_NAME;
-  if (_shortcutsMatchPreset(_0x4c1092, ASHUO_PRESET_NAME)) return ASHUO_PRESET_NAME;
+function _inferPresetName(value37, value38) {
+  if (_normalizePresetName(value38) === CUSTOM_PRESET_NAME) return CUSTOM_PRESET_NAME;
+  if (_shortcutsMatchPreset(value37, DEFAULT_PRESET_NAME)) return DEFAULT_PRESET_NAME;
+  if (_shortcutsMatchPreset(value37, ASHUO_PRESET_NAME)) return ASHUO_PRESET_NAME;
   return CUSTOM_PRESET_NAME;
 }
 async function _loadFromServer() {
   try {
-    const _0x208020 = await fetchUserShortcutsFromServer();
-    if (_0x208020 && _0x208020.shortcuts && Object.keys(_0x208020.shortcuts).length > 0) {
-      const _0x4cf0d2 = _normalizePresetName(_0x208020.preset),
-        _0x11fb0c = BUILTIN_PRESET_NAMES.has(_0x4cf0d2) ? _0x4cf0d2 : ASHUO_PRESET_NAME,
-        _0xae384c = _buildPresetShortcuts(_0x11fb0c);
+    const fetchUserShortcutsFromServer2 = await fetchUserShortcutsFromServer();
+    if (
+      fetchUserShortcutsFromServer2 &&
+      fetchUserShortcutsFromServer2.shortcuts &&
+      Object.keys(fetchUserShortcutsFromServer2.shortcuts).length > 0
+    ) {
+      const savedPresetName = _normalizePresetName(fetchUserShortcutsFromServer2.preset),
+        value39 = BUILTIN_PRESET_NAMES.has(savedPresetName) ? savedPresetName : ASHUO_PRESET_NAME,
+        _buildPresetShortcuts3 = _buildPresetShortcuts(value39);
       ((_shortcuts = Object.fromEntries(
-        Object.entries(_0xae384c).map(([_0xea321f, _0x32f4ca]) => [
-          _0xea321f,
-          _0x208020.shortcuts[_0xea321f]
+        Object.entries(_buildPresetShortcuts3).map(([value40, map5]) => [
+          value40,
+          fetchUserShortcutsFromServer2.shortcuts[value40]
             ? {
-                ..._0x32f4ca,
+                ...map5,
                 keys: _resolveSavedShortcutKeys(
-                  _0xea321f,
-                  _0x208020.shortcuts[_0xea321f].keys,
-                  _0x32f4ca.keys,
-                  { savedPresetName: _0x4cf0d2 },
+                  value40,
+                  fetchUserShortcutsFromServer2.shortcuts[value40].keys,
+                  map5.keys,
+                  { savedPresetName: savedPresetName },
                 ),
               }
-            : { ..._0x32f4ca, keys: _normalizeShortcutKeys(_0x32f4ca.keys) },
+            : { ...map5, keys: _normalizeShortcutKeys(map5.keys) },
         ]),
       )),
-        (_currentPreset = _inferPresetName(_shortcuts, _0x4cf0d2)));
+        (_currentPreset = _inferPresetName(_shortcuts, savedPresetName)));
       if (_shortcuts['matting-auto']) _shortcuts['matting-auto'].keys = [];
       (_updatePresetSelect(), _render(), _syncShortcutsToGlobal());
     } else (_applyPreset(ASHUO_PRESET_NAME, false), _syncShortcutsToGlobal());
@@ -474,273 +462,258 @@ async function _loadFromServer() {
   }
 }
 async function _saveToServer() {
-  const _0x5b7acc = {
+  const value41 = {
     preset: _currentPreset,
     shortcuts: Object.fromEntries(
-      Object.entries(_shortcuts).map(([_0xe96316, _0x2f2b23]) => [_0xe96316, { keys: _0x2f2b23.keys }]),
+      Object.entries(_shortcuts).map(([value42, keys]) => [value42, { keys: keys.keys }]),
     ),
   };
   try {
-    (await saveUserShortcutsToServer(_0x5b7acc), _syncShortcutsToGlobal());
-  } catch (_0x23a4f5) {
-    console.warn('[shortcuts] save failed:', _0x23a4f5);
+    (await saveUserShortcutsToServer(value41), _syncShortcutsToGlobal());
+  } catch (value43) {
+    console.warn('[shortcuts] save failed:', value43);
   }
 }
 function _syncCanvasScreenshotShortcutToElectron() {
   if (typeof window === 'undefined') return;
-  const _0x216a4c = globalThis.window?.electronAPI?.screenshot;
-  if (typeof _0x216a4c?.updateGlobalShortcut !== 'function') return;
-  const _0x363bbb = Array.isArray(_shortcuts?.['canvas-screenshot']?.keys)
+  const value44 = globalThis.window?.electronAPI?.screenshot;
+  if (typeof value44?.updateGlobalShortcut !== 'function') return;
+  const keys2 = Array.isArray(_shortcuts?.['canvas-screenshot']?.keys)
     ? _shortcuts['canvas-screenshot'].keys
     : DEFAULT_SHORTCUTS['canvas-screenshot'].keys;
   try {
-    const _0x2424ad = _0x216a4c.updateGlobalShortcut({ keys: _0x363bbb });
-    if (_0x2424ad && typeof _0x2424ad.catch === 'function')
-      _0x2424ad.catch((_0x570fb2) => {
-        console.warn('[shortcuts] failed to sync global screenshot shortcut:', _0x570fb2);
+    const promise = value44.updateGlobalShortcut({ keys: keys2 });
+    if (promise && typeof promise.catch === 'function')
+      promise.catch((value45) => {
+        console.warn('[shortcuts] failed to sync global screenshot shortcut:', value45);
       });
-  } catch (_0x18ad86) {
-    console.warn('[shortcuts] failed to sync global screenshot shortcut:', _0x18ad86);
+  } catch (value46) {
+    console.warn('[shortcuts] failed to sync global screenshot shortcut:', value46);
   }
 }
 function _syncShortcutsToGlobal() {
-  const _0x512415 = {},
-    _0x528ab9 = ['editor-tool-brush', 'editor-tool-eraser', 'editor-tool-bucket', 'editor-clear'];
-  (_0x528ab9.forEach((_0x4868bc) => {
-    if (_shortcuts[_0x4868bc]?.keys?.length > 0) {
-      const _0x5e8e0f = _shortcuts[_0x4868bc].keys[_shortcuts[_0x4868bc].keys.length - 1];
-      _0x512415[_0x4868bc] = _0x5e8e0f.toUpperCase();
+  const value47 = {},
+    list11 = ['editor-tool-brush', 'editor-tool-eraser', 'editor-tool-bucket', 'editor-clear'];
+  (list11.forEach((item15) => {
+    if (_shortcuts[item15]?.keys?.length > 0) {
+      const value48 = _shortcuts[item15].keys[_shortcuts[item15].keys.length - 1];
+      value47[item15] = value48.toUpperCase();
     }
   }),
-    (window._mattingShortcuts = _0x512415),
+    (window._mattingShortcuts = value47),
     _syncCanvasScreenshotShortcutToElectron());
 }
-function _applyPreset(_0xec91c, _0x2f9af8 = true) {
-  const _0x992453 = _normalizePresetName(_0xec91c);
-  if (!BUILTIN_PRESET_NAMES.has(_0x992453)) return;
-  ((_currentPreset = _0x992453),
-    (_shortcuts = _buildPresetShortcuts(_0x992453)),
+function _applyPreset(value49, value50 = true) {
+  const _normalizePresetName3 = _normalizePresetName(value49);
+  if (!BUILTIN_PRESET_NAMES.has(_normalizePresetName3)) return;
+  ((_currentPreset = _normalizePresetName3),
+    (_shortcuts = _buildPresetShortcuts(_normalizePresetName3)),
     _render(),
     _syncShortcutsToGlobal(),
     _emitShortcutsUpdated());
-  if (_0x2f9af8) _saveToServer();
+  if (value50) _saveToServer();
 }
 function _getPresetControls() {
   if (typeof document === 'undefined') return {};
-  const _0x3b105f = document.getElementById('shortcutsPresetSelect'),
-    _0x3e0b4f = document.getElementById('shortcutsPresetControl'),
-    _0x3bea91 = document.getElementById('shortcutsPresetTrigger'),
-    _0x2c3026 = document.getElementById('shortcutsPresetTriggerText'),
-    _0x257bc2 = document.getElementById('shortcutsPresetMenu'),
-    _0x1c737c = _0x257bc2?.querySelectorAll
-      ? Array.from(_0x257bc2.querySelectorAll('.settings-preset-option'))
-      : [];
+  const select = document.getElementById('shortcutsPresetSelect'),
+    control = document.getElementById('shortcutsPresetControl'),
+    trigger = document.getElementById('shortcutsPresetTrigger'),
+    triggerText = document.getElementById('shortcutsPresetTriggerText'),
+    menu = document.getElementById('shortcutsPresetMenu'),
+    options2 = menu?.querySelectorAll ? Array.from(menu.querySelectorAll('.settings-preset-option')) : [];
   return {
-    select: _0x3b105f,
-    control: _0x3e0b4f,
-    trigger: _0x3bea91,
-    triggerText: _0x2c3026,
-    menu: _0x257bc2,
-    options: _0x1c737c,
+    select: select,
+    control: control,
+    trigger: trigger,
+    triggerText: triggerText,
+    menu: menu,
+    options: options2,
   };
 }
-function _getPresetLabel(_0x1aa827) {
-  const { select: _0x503f01, options: _0x196ffd } = _getPresetControls(),
-    _0x5a19d5 = _0x503f01?.options
-      ? Array.from(_0x503f01.options).find((_0xb393bc) => _0xb393bc.value === _0x1aa827)
-      : null,
-    _0x23ca1f = _0x196ffd.find((_0x255229) => _0x255229.dataset?.value === _0x1aa827);
-  return _0x5a19d5?.textContent || _0x23ca1f?.textContent || _0x1aa827;
+function _getPresetLabel(value51) {
+  const { select: select2, options: options3 } = _getPresetControls(),
+    el = select2?.options ? Array.from(select2.options).find((el2) => el2.value === value51) : null,
+    el3 = options3.find((el4) => el4.dataset?.value === value51);
+  return el?.textContent || el3?.textContent || value51;
 }
 function _setPresetMenuOpen(
-  _0x107ebb,
+  enabled3,
   { focusOption: focusOption = false, focusTrigger: focusTrigger = false } = {},
 ) {
-  const {
-    control: _0x52360f,
-    trigger: _0x1dd6de,
-    menu: _0xabafa1,
-    options: _0x11cf2e,
-  } = _getPresetControls();
-  if (!_0x52360f || !_0x1dd6de || !_0xabafa1) return;
-  (_0x52360f.classList.toggle('is-open', _0x107ebb),
-    _0x1dd6de.setAttribute('aria-expanded', _0x107ebb ? 'true' : 'false'),
-    (_0xabafa1.hidden = !_0x107ebb));
-  if (_0x107ebb && focusOption) {
-    const _0x4c18bd = _0x11cf2e.find(
-        (_0x33992b) => _0x33992b.dataset?.value === _currentPreset && !_0x33992b.disabled,
-      ),
-      _0x381473 = _0x11cf2e.find((_0x58eeb6) => !_0x58eeb6.disabled);
-    (_0x4c18bd || _0x381473)?.focus?.();
-  } else !_0x107ebb && focusTrigger && _0x1dd6de.focus?.();
+  const { control: control2, trigger: trigger2, menu: menu2, options: options4 } = _getPresetControls();
+  if (!control2 || !trigger2 || !menu2) return;
+  (control2.classList.toggle('is-open', enabled3),
+    trigger2.setAttribute('aria-expanded', enabled3 ? 'true' : 'false'),
+    (menu2.hidden = !enabled3));
+  if (enabled3 && focusOption) {
+    const value52 = options4.find((el5) => el5.dataset?.value === _currentPreset && !el5.disabled),
+      value53 = options4.find((el6) => !el6.disabled);
+    (value52 || value53)?.focus?.();
+  } else !enabled3 && focusTrigger && trigger2.focus?.();
 }
 function _isPresetMenuOpen() {
-  const { control: _0x33a99e } = _getPresetControls();
-  return !!_0x33a99e?.classList?.contains('is-open');
+  const { control: control3 } = _getPresetControls();
+  return !!control3?.classList?.contains('is-open');
 }
-function _selectPresetFromUi(_0x3d5e31) {
-  if (_normalizePresetName(_0x3d5e31) === CUSTOM_PRESET_NAME) {
+function _selectPresetFromUi(value54) {
+  if (_normalizePresetName(value54) === CUSTOM_PRESET_NAME) {
     (_updatePresetSelect(), _setPresetMenuOpen(false, { focusTrigger: true }));
     return;
   }
-  const _0x3031d5 = _normalizePresetName(_0x3d5e31);
-  (_applyPreset(_0x3031d5, true),
+  const _normalizePresetName4 = _normalizePresetName(value54);
+  (_applyPreset(_normalizePresetName4, true),
     _updatePresetSelect(),
     _setPresetMenuOpen(false, { focusTrigger: true }),
     window.showToast?.(
-      _tShortcut('presetSwitched', '已切换预设：' + _0x3031d5, { preset: _getPresetLabel(_0x3031d5) }),
+      _tShortcut('presetSwitched', '已切换预设：' + _normalizePresetName4, {
+        preset: _getPresetLabel(_normalizePresetName4),
+      }),
     ));
 }
-function _movePresetOptionFocus(_0x5c0c2f) {
-  const { options: _0x3d8ba0 } = _getPresetControls(),
-    _0x56f785 = _0x3d8ba0.filter((_0x15274b) => !_0x15274b.disabled);
-  if (_0x56f785.length === 0) return;
-  const _0xa5571b = document.activeElement;
-  let _0x2cd8dd = _0x56f785.indexOf(_0xa5571b);
-  _0x2cd8dd < 0 &&
-    (_0x2cd8dd = _0x56f785.findIndex((_0x4b3ac6) => _0x4b3ac6.dataset?.value === _currentPreset));
-  const _0x4d6c95 = (Math.max(_0x2cd8dd, 0) + _0x5c0c2f + _0x56f785.length) % _0x56f785.length;
-  _0x56f785[_0x4d6c95]?.focus?.();
+function _movePresetOptionFocus(value55) {
+  const { options: options5 } = _getPresetControls(),
+    list12 = options5.filter((el7) => !el7.disabled);
+  if (list12.length === 0) return;
+  const value56 = document.activeElement;
+  let count = list12.indexOf(value56);
+  count < 0 && (count = list12.findIndex((el8) => el8.dataset?.value === _currentPreset));
+  const value57 = (Math.max(count, 0) + value55 + list12.length) % list12.length;
+  list12[value57]?.focus?.();
 }
 function _updatePresetSelect() {
-  const { select: _0x36dec2, triggerText: _0x26249b, options: _0x4f6701 } = _getPresetControls();
-  if (_0x36dec2) _0x36dec2.value = _currentPreset;
-  if (_0x26249b) _0x26249b.textContent = _getPresetLabel(_currentPreset);
-  _0x4f6701.forEach((_0x57f546) => {
-    const _0x492121 = _0x57f546.dataset?.value === _currentPreset;
-    (_0x57f546.classList.toggle('is-active', _0x492121),
-      _0x57f546.setAttribute('aria-selected', _0x492121 ? 'true' : 'false'));
+  const { select: select3, triggerText: triggerText2, options: options6 } = _getPresetControls();
+  if (select3) select3.value = _currentPreset;
+  if (triggerText2) triggerText2.textContent = _getPresetLabel(_currentPreset);
+  options6.forEach((el9) => {
+    const value58 = el9.dataset?.value === _currentPreset;
+    (el9.classList.toggle('is-active', value58),
+      el9.setAttribute('aria-selected', value58 ? 'true' : 'false'));
   });
 }
 function _initPresetSelect() {
-  const { select: _0x5a3160, control: _0xf67532, trigger: _0x5bfe64, menu: _0x12f3da } = _getPresetControls();
-  _0x5a3160 &&
-    !_0x5a3160.dataset.presetSelectBound &&
-    ((_0x5a3160.dataset.presetSelectBound = 'true'),
-    _0x5a3160.addEventListener('change', () => {
-      _selectPresetFromUi(_0x5a3160.value);
+  const { select: select4, control: control4, trigger: trigger3, menu: menu3 } = _getPresetControls();
+  select4 &&
+    !select4.dataset.presetSelectBound &&
+    ((select4.dataset.presetSelectBound = 'true'),
+    select4.addEventListener('change', () => {
+      _selectPresetFromUi(select4.value);
     }));
-  if (!_0xf67532 || !_0x5bfe64 || !_0x12f3da || _0x5bfe64.dataset.presetSelectBound) {
+  if (!control4 || !trigger3 || !menu3 || trigger3.dataset.presetSelectBound) {
     _updatePresetSelect();
     return;
   }
-  ((_0x5bfe64.dataset.presetSelectBound = 'true'),
-    _0x5bfe64.addEventListener('click', () => {
+  ((trigger3.dataset.presetSelectBound = 'true'),
+    trigger3.addEventListener('click', () => {
       _setPresetMenuOpen(!_isPresetMenuOpen(), { focusOption: true });
     }),
-    _0x5bfe64.addEventListener('keydown', (_0x28706b) => {
-      (_0x28706b.key === 'ArrowDown' || _0x28706b.key === 'Enter' || _0x28706b.key === ' ') &&
-        (_0x28706b.preventDefault(), _setPresetMenuOpen(true, { focusOption: true }));
+    trigger3.addEventListener('keydown', (event2) => {
+      (event2.key === 'ArrowDown' || event2.key === 'Enter' || event2.key === ' ') &&
+        (event2.preventDefault(), _setPresetMenuOpen(true, { focusOption: true }));
     }),
-    _0x12f3da.addEventListener('click', (_0x3dea86) => {
-      const _0x569990 = _0x3dea86.target?.closest?.('.settings-preset-option');
-      if (!_0x569990 || _0x569990.disabled) return;
-      _selectPresetFromUi(_0x569990.dataset.value);
+    menu3.addEventListener('click', (event3) => {
+      const el10 = event3.target?.closest?.('.settings-preset-option');
+      if (!el10 || el10.disabled) return;
+      _selectPresetFromUi(el10.dataset.value);
     }),
-    _0x12f3da.addEventListener('keydown', (_0x20ed0e) => {
-      if (_0x20ed0e.key === 'Escape')
-        (_0x20ed0e.preventDefault(), _setPresetMenuOpen(false, { focusTrigger: true }));
+    menu3.addEventListener('keydown', (event4) => {
+      if (event4.key === 'Escape')
+        (event4.preventDefault(), _setPresetMenuOpen(false, { focusTrigger: true }));
       else {
-        if (_0x20ed0e.key === 'ArrowDown') (_0x20ed0e.preventDefault(), _movePresetOptionFocus(1));
+        if (event4.key === 'ArrowDown') (event4.preventDefault(), _movePresetOptionFocus(1));
         else {
-          if (_0x20ed0e.key === 'ArrowUp') (_0x20ed0e.preventDefault(), _movePresetOptionFocus(-1));
+          if (event4.key === 'ArrowUp') (event4.preventDefault(), _movePresetOptionFocus(-1));
           else {
-            if (_0x20ed0e.key === 'Enter' || _0x20ed0e.key === ' ') {
-              _0x20ed0e.preventDefault();
-              const _0x3a555c = document.activeElement?.closest?.('.settings-preset-option');
-              if (_0x3a555c && !_0x3a555c.disabled) _selectPresetFromUi(_0x3a555c.dataset.value);
+            if (event4.key === 'Enter' || event4.key === ' ') {
+              event4.preventDefault();
+              const el11 = document.activeElement?.closest?.('.settings-preset-option');
+              if (el11 && !el11.disabled) _selectPresetFromUi(el11.dataset.value);
             }
           }
         }
       }
     }),
-    document.addEventListener('pointerdown', (_0x12b551) => {
+    document.addEventListener('pointerdown', (event5) => {
       if (!_isPresetMenuOpen()) return;
-      if (typeof _0xf67532.contains === 'function' && _0xf67532.contains(_0x12b551.target)) return;
+      if (typeof control4.contains === 'function' && control4.contains(event5.target)) return;
       _setPresetMenuOpen(false);
     }),
     _updatePresetSelect());
 }
 function _render() {
-  const _0x23ad20 = document.getElementById('shortcutsContent');
-  if (!_0x23ad20) return;
-  _0x23ad20.replaceChildren();
-  const _0x3d4eb9 = {};
-  (Object.entries(_shortcuts).forEach(([_0x2b37a7, _0x17647b]) => {
-    if (_0x17647b.hidden) return;
-    if (!_0x3d4eb9[_0x17647b.group]) _0x3d4eb9[_0x17647b.group] = [];
-    _0x3d4eb9[_0x17647b.group].push({ id: _0x2b37a7, ..._0x17647b });
+  const el12 = document.getElementById('shortcutsContent');
+  if (!el12) return;
+  el12.replaceChildren();
+  const enabled4 = {};
+  (Object.entries(_shortcuts).forEach(([id, el13]) => {
+    if (el13.hidden) return;
+    if (!enabled4[el13.group]) enabled4[el13.group] = [];
+    enabled4[el13.group].push({ id: id, ...el13 });
   }),
-    Object.entries(_0x3d4eb9).forEach(([_0x881a9e, _0x2ac5f6]) => {
-      const _0x5473ff = document.createElement('div');
-      _0x5473ff.className = 'sc-section';
-      const _0x5a50a2 = document.createElement('div');
-      ((_0x5a50a2.className = 'sc-section-title'),
-        (_0x5a50a2.textContent = _translateShortcutGroup(_0x881a9e)),
-        _0x5473ff.appendChild(_0x5a50a2),
-        _0x2ac5f6.forEach((_0x293beb) => {
-          const _0x4e751a = document.createElement('div');
-          _0x4e751a.className = 'sc-item';
-          const _0x3cb717 = document.createElement('span');
-          ((_0x3cb717.className = 'sc-label'),
-            (_0x3cb717.textContent = _translateShortcutAction(_0x293beb.id, _0x293beb.label)));
-          const _0x4c7c55 = document.createElement('div');
-          ((_0x4c7c55.className = 'sc-keys'),
-            (_0x4c7c55.dataset.action = _0x293beb.id),
-            _0x4c7c55.replaceChildren());
-          if (_recordingAction === _0x293beb.id) {
-            const _0x1a3c9d = document.createElement('kbd');
-            ((_0x1a3c9d.className = 'kbd-v2 recording'),
-              (_0x1a3c9d.textContent = _tShortcut('recording', '录制中...')),
-              _0x4c7c55.appendChild(_0x1a3c9d));
+    Object.entries(enabled4).forEach(([value59, list13]) => {
+      const el14 = document.createElement('div');
+      el14.className = 'sc-section';
+      const el15 = document.createElement('div');
+      ((el15.className = 'sc-section-title'),
+        (el15.textContent = _translateShortcutGroup(value59)),
+        el14.appendChild(el15),
+        list13.forEach((map6) => {
+          const el16 = document.createElement('div');
+          el16.className = 'sc-item';
+          const el17 = document.createElement('span');
+          ((el17.className = 'sc-label'), (el17.textContent = _translateShortcutAction(map6.id, map6.label)));
+          const el18 = document.createElement('div');
+          ((el18.className = 'sc-keys'), (el18.dataset.action = map6.id), el18.replaceChildren());
+          if (_recordingAction === map6.id) {
+            const el19 = document.createElement('kbd');
+            ((el19.className = 'kbd-v2 recording'),
+              (el19.textContent = _tShortcut('recording', '录制中...')),
+              el18.appendChild(el19));
           } else {
-            if (_0x293beb.keys.length > 0)
-              _0x293beb.keys.forEach((_0x4570da) => {
-                const _0x50dc4a = document.createElement('kbd');
-                ((_0x50dc4a.className = 'kbd-v2'),
-                  (_0x50dc4a.textContent = _0x4570da),
-                  _0x4c7c55.appendChild(_0x50dc4a));
+            if (map6.keys.length > 0)
+              map6.keys.forEach((item16) => {
+                const el20 = document.createElement('kbd');
+                ((el20.className = 'kbd-v2'), (el20.textContent = item16), el18.appendChild(el20));
               });
             else {
-              const _0x5d3520 = document.createElement('kbd');
-              ((_0x5d3520.className = 'kbd-v2'),
-                (_0x5d3520.textContent = _tShortcut('unset', '未设置')),
-                _0x4c7c55.appendChild(_0x5d3520));
+              const el21 = document.createElement('kbd');
+              ((el21.className = 'kbd-v2'),
+                (el21.textContent = _tShortcut('unset', '未设置')),
+                el18.appendChild(el21));
             }
           }
-          (_0x4c7c55.addEventListener('click', () => _startRecording(_0x293beb.id)),
-            _0x4e751a.appendChild(_0x3cb717),
-            _0x4e751a.appendChild(_0x4c7c55),
-            _0x5473ff.appendChild(_0x4e751a));
+          (el18.addEventListener('click', () => _startRecording(map6.id)),
+            el16.appendChild(el17),
+            el16.appendChild(el18),
+            el14.appendChild(el16));
         }),
-        _0x23ad20.appendChild(_0x5473ff));
+        el12.appendChild(el14));
     }));
 }
-function _startRecording(_0x2c2110) {
+function _startRecording(value60) {
   if (_recordingAction) return;
-  ((_recordingAction = _0x2c2110), _render());
+  ((_recordingAction = value60), _render());
 }
-export function detectShortcutConflict(_0x506d53, _0x11bd96, _0x5178f9) {
-  if (!_0x506d53 || typeof _0x506d53 !== 'object') return null;
-  const _0x4a3d3d = _toShortcutBindingString(_0x5178f9);
-  if (!_0x4a3d3d) return null;
-  for (const [_0x38364c, _0x2733cf] of Object.entries(_0x506d53)) {
-    if (_0x38364c === _0x11bd96) continue;
-    if (_getShortcutBindingStrings(_0x2733cf).includes(_0x4a3d3d)) {
-      if (_isContextualShortcutConflictExempt(_0x11bd96, _0x38364c, _0x4a3d3d)) continue;
-      return { id: _0x38364c, label: _0x2733cf.label || _0x38364c };
+export function detectShortcutConflict(enabled5, value61, value62) {
+  if (!enabled5 || typeof enabled5 !== 'object') return null;
+  const _toShortcutBindingString2 = _toShortcutBindingString(value62);
+  if (!_toShortcutBindingString2) return null;
+  for (const [id2, label] of Object.entries(enabled5)) {
+    if (id2 === value61) continue;
+    if (_getShortcutBindingStrings(label).includes(_toShortcutBindingString2)) {
+      if (_isContextualShortcutConflictExempt(value61, id2, _toShortcutBindingString2)) continue;
+      return { id: id2, label: label.label || id2 };
     }
   }
   return null;
 }
-function _stopRecording(_0x903d87) {
+function _stopRecording(list14) {
   if (!_recordingAction) return;
-  if (_0x903d87 && _0x903d87.length > 0) {
-    const _0x1a2103 = detectShortcutConflict(_shortcuts, _recordingAction, _0x903d87);
-    if (_0x1a2103) {
+  if (list14 && list14.length > 0) {
+    const detectShortcutConflict2 = detectShortcutConflict(_shortcuts, _recordingAction, list14);
+    if (detectShortcutConflict2) {
       (window.showToast?.(
-        _tShortcut('conflict', '快捷键冲突：已被「' + _0x1a2103.label + '」占用', {
-          label: _translateShortcutAction(_0x1a2103.id, _0x1a2103.label),
+        _tShortcut('conflict', '快捷键冲突：已被「' + detectShortcutConflict2.label + '」占用', {
+          label: _translateShortcutAction(detectShortcutConflict2.id, detectShortcutConflict2.label),
         }),
         'warn',
       ),
@@ -748,7 +721,7 @@ function _stopRecording(_0x903d87) {
         _render());
       return;
     }
-    ((_shortcuts[_recordingAction].keys = _normalizeShortcutKeys(_0x903d87)),
+    ((_shortcuts[_recordingAction].keys = _normalizeShortcutKeys(list14)),
       (_currentPreset = CUSTOM_PRESET_NAME),
       _updatePresetSelect(),
       _syncShortcutsToGlobal(),
@@ -763,49 +736,49 @@ function _reset() {
     _updatePresetSelect(),
     window.showToast?.(_tShortcut('restored', '已恢复默认快捷键')));
 }
-function _dispatchWebPreviewSettingsSync(_0x1d5c75) {
+function _dispatchWebPreviewSettingsSync(reason) {
   if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return;
-  const _0x1df902 = { reason: _0x1d5c75 },
-    _0x8af6f6 =
+  const detail = { reason: reason },
+    value63 =
       typeof CustomEvent === 'function'
-        ? new CustomEvent('web-preview:force-sync', { detail: _0x1df902 })
-        : { type: 'web-preview:force-sync', detail: _0x1df902 };
-  window.dispatchEvent(_0x8af6f6);
+        ? new CustomEvent('web-preview:force-sync', { detail: detail })
+        : { type: 'web-preview:force-sync', detail: detail };
+  window.dispatchEvent(value63);
 }
 export function openShortcuts() {
-  const _0xfcb6ae = document.getElementById('settingsOverlay');
-  if (!_0xfcb6ae) return;
-  ((_0xfcb6ae.style.display = 'block'), _dispatchWebPreviewSettingsSync('shortcuts-open'));
-  const _0x5dc952 = document.querySelectorAll('.settings-nav-item'),
-    _0x4b8e76 = document.querySelectorAll('.settings-pane');
-  (_0x5dc952.forEach((_0x113b73) => {
-    _0x113b73.classList.toggle('active', _0x113b73.dataset.pane === 'shortcuts');
+  const el22 = document.getElementById('settingsOverlay');
+  if (!el22) return;
+  ((el22.style.display = 'block'), _dispatchWebPreviewSettingsSync('shortcuts-open'));
+  const list15 = document.querySelectorAll('.settings-nav-item'),
+    list16 = document.querySelectorAll('.settings-pane');
+  (list15.forEach((el23) => {
+    el23.classList.toggle('active', el23.dataset.pane === 'shortcuts');
   }),
-    _0x4b8e76.forEach((_0x5f2977) => {
-      _0x5f2977.classList.toggle('active', _0x5f2977.id === 'pane-shortcuts');
+    list16.forEach((el24) => {
+      el24.classList.toggle('active', el24.id === 'pane-shortcuts');
     }),
     _render(),
     _updatePresetSelect());
 }
 export function closeShortcuts() {
-  const _0x25ffee = document.getElementById('settingsOverlay');
-  (_0x25ffee && ((_0x25ffee.style.display = 'none'), _dispatchWebPreviewSettingsSync('shortcuts-close')),
+  const el25 = document.getElementById('settingsOverlay');
+  (el25 && ((el25.style.display = 'none'), _dispatchWebPreviewSettingsSync('shortcuts-close')),
     _recordingAction && ((_recordingAction = null), _render()));
 }
 export function getShortcuts() {
   return _shortcuts;
 }
-export function getShortcutLabel(_0x3e0c2d, _0x2bb5f6 = '') {
-  const _0x3e1b41 = String(_0x3e0c2d || '').trim();
-  if (!_0x3e1b41) return _0x2bb5f6;
-  const _0x3e7d90 = getShortcutKeys(_0x3e1b41);
-  return _0x3e7d90.length > 0 ? _0x3e7d90.join(' ') : '';
+export function getShortcutLabel(value64, value65 = '') {
+  const enabled6 = String(value64 || '').trim();
+  if (!enabled6) return value65;
+  const list17 = getShortcutKeys(enabled6);
+  return list17.length > 0 ? list17.join(' ') : '';
 }
-export function getShortcutKeys(_0x3e0c2d) {
-  const _0x3e1b41 = String(_0x3e0c2d || '').trim();
-  if (!_0x3e1b41) return [];
-  const _0x4bf264 = _shortcuts[_0x3e1b41] || DEFAULT_SHORTCUTS[_0x3e1b41];
-  return Array.isArray(_0x4bf264?.keys) ? _0x4bf264.keys.filter(Boolean) : [];
+export function getShortcutKeys(value64) {
+  const enabled6 = String(value64 || '').trim();
+  if (!enabled6) return [];
+  const map7 = _shortcuts[enabled6] || DEFAULT_SHORTCUTS[enabled6];
+  return Array.isArray(map7?.keys) ? map7.keys.filter(Boolean) : [];
 }
 export function getCurrentPreset() {
   return _currentPreset;
@@ -813,16 +786,16 @@ export function getCurrentPreset() {
 export function isRecording() {
   return !!_recordingAction;
 }
-export function handleShortcutKeydown(_0x1af211, _0x35036d = {}) {
+export function handleShortcutKeydown(value66, value67 = {}) {
   if (_recordingAction) return null;
-  const _0x9c1ff2 = _toShortcutBindingString(_buildShortcutKeysFromEvent(_0x1af211));
-  let _0xde9bb7 = [];
-  for (const [_0x28dcd7, _0x40d891] of Object.entries(_shortcuts)) {
-    _getShortcutBindingStrings(_0x40d891).includes(_0x9c1ff2) && _0xde9bb7.push(_0x28dcd7);
+  const _toShortcutBindingString3 = _toShortcutBindingString(_buildShortcutKeysFromEvent(value66));
+  let list18 = [];
+  for (const [value68, value69] of Object.entries(_shortcuts)) {
+    _getShortcutBindingStrings(value69).includes(_toShortcutBindingString3) && list18.push(value68);
   }
-  _0xde9bb7 = _filterShortcutMatchesByContext(_0xde9bb7, _0x35036d);
-  if (_0xde9bb7.length === 0) return null;
-  return _resolveShortcutMatch(_0xde9bb7, _0x35036d);
+  list18 = _filterShortcutMatchesByContext(list18, value67);
+  if (list18.length === 0) return null;
+  return _resolveShortcutMatch(list18, value67);
 }
 typeof document !== 'undefined' &&
   document?.addEventListener &&
@@ -831,59 +804,188 @@ typeof document !== 'undefined' &&
   }),
   document.addEventListener(
     'keydown',
-    (_0xa2541a) => {
+    (event6) => {
       if (!_recordingAction) return;
-      (_0xa2541a.preventDefault(), _0xa2541a.stopImmediatePropagation());
-      if (_0xa2541a.key === 'Escape') {
+      (event6.preventDefault(), event6.stopImmediatePropagation());
+      if (event6.key === 'Escape') {
         _stopRecording(null);
         return;
       }
-      const _0x39dc26 = _buildShortcutKeysFromEvent(_0xa2541a),
-        _0x1f837d = _normalizeShortcutMainKey(_0xa2541a);
-      _0x39dc26.length > 0 && !['Ctrl', 'Shift', 'Alt', ''].includes(_0x1f837d) && _stopRecording(_0x39dc26);
+      const list19 = _buildShortcutKeysFromEvent(event6),
+        _normalizeShortcutMainKey3 = _normalizeShortcutMainKey(event6);
+      list19.length > 0 &&
+        !['Ctrl', 'Shift', 'Alt', ''].includes(_normalizeShortcutMainKey3) &&
+        _stopRecording(list19);
     },
     true,
   ),
   document.addEventListener('DOMContentLoaded', () => {
     (_loadFromServer(),
       document.getElementById('btnShortcutsClose')?.addEventListener('click', closeShortcuts),
-      document.getElementById('btnResetShortcuts')?.addEventListener('click', (_0x3a7372) => {
-        (_0x3a7372.stopPropagation(), _reset());
+      document.getElementById('btnResetShortcuts')?.addEventListener('click', (event7) => {
+        (event7.stopPropagation(), _reset());
       }),
       document.getElementById('btnShortcutsClose')?.addEventListener('click', closeShortcuts),
-      document.getElementById('btnShortcuts')?.addEventListener('click', (_0x257bb9) => {
-        (_0x257bb9.stopPropagation(),
+      document.getElementById('btnShortcuts')?.addEventListener('click', (event8) => {
+        (event8.stopPropagation(),
           document.getElementById('avatarMenu')?.classList.remove('open'),
           openShortcuts());
       }),
       _initPresetSelect());
   }));
 
-const MODIFIER_ONLY_SHORTCUT_ACTIONS = new Set(["cut-edge","duplicate-with-edges",'multi-select']);
-const FIXED_GLOBAL_SHORTCUT_BINDINGS = Object["freeze"]({'delete':Object["freeze"]([Object["freeze"](["Delete"])])});
+const MODIFIER_ONLY_SHORTCUT_ACTIONS = new Set(['cut-edge', 'duplicate-with-edges', 'multi-select']);
+const FIXED_GLOBAL_SHORTCUT_BINDINGS = Object['freeze']({
+  delete: Object['freeze']([Object['freeze'](['Delete'])]),
+});
 
 let _shortcutSearchQuery = '';
 let _saveRevision = 0x0;
 let _saveLoopPromise = null;
 
-function _setRecordingAction(_0x973268){_recordingAction=_0x973268||null,typeof window!=="undefined"&&(window["__aicShortcutRecording"]=!!_recordingAction,void syncNotificationShortcut(_recordingAction?[]:_shortcuts['jump-latest-notification']['keys']));}
+function _setRecordingAction(value70) {
+  ((_recordingAction = value70 || null),
+    typeof window !== 'undefined' &&
+      ((window['__aicShortcutRecording'] = !!_recordingAction),
+      void syncNotificationShortcut(_recordingAction ? [] : _shortcuts['jump-latest-notification']['keys'])));
+}
 
-const DEFAULT_PRESET_SHORTCUT_MIGRATIONS = {'fit-all':{'from':['Ctrl','0'],'to':[]}};
+const DEFAULT_PRESET_SHORTCUT_MIGRATIONS = { 'fit-all': { from: ['Ctrl', '0'], to: [] } };
 
-function _resolveSavedAlternateKeys(_0x37eed3,_0x1073c9,_0xee52d1){const _0xd12ec8=Array["isArray"](_0x37eed3?.["alternateKeys"])?_0x37eed3["alternateKeys"]:_0xee52d1===CUSTOM_PRESET_NAME?[]:_0x1073c9;if(!Array["isArray"](_0xd12ec8))return[];return _0xd12ec8['map'](_0x5a6e9f=>_normalizeShortcutKeys(_0x5a6e9f))["filter"](_0x5625cb=>_0x5625cb["length"]>0x0);}
+function _resolveSavedAlternateKeys(value71, value72, value73) {
+  const list20 = Array['isArray'](value71?.['alternateKeys'])
+    ? value71['alternateKeys']
+    : value73 === CUSTOM_PRESET_NAME
+      ? []
+      : value72;
+  if (!Array['isArray'](list20)) return [];
+  return list20['map']((value74) => _normalizeShortcutKeys(value74))['filter'](
+    (value75) => value75['length'] > 0x0,
+  );
+}
 
-function _createShortcutSavePayload(){return{'preset':_currentPreset,'shortcuts':Object["fromEntries"](Object['entries'](_shortcuts)['map'](([_0x535d67,_0xfe268c])=>[_0x535d67,{'keys':_0xfe268c["keys"],...Array["isArray"](_0xfe268c["alternateKeys"])?{'alternateKeys':_0xfe268c['alternateKeys']}:{}}]))};}
+function _createShortcutSavePayload() {
+  return {
+    preset: _currentPreset,
+    shortcuts: Object['fromEntries'](
+      Object['entries'](_shortcuts)['map'](([value76, value77]) => [
+        value76,
+        {
+          keys: value77['keys'],
+          ...(Array['isArray'](value77['alternateKeys']) ? { alternateKeys: value77['alternateKeys'] } : {}),
+        },
+      ]),
+    ),
+  };
+}
 
-function _syncGlobalTextCaptureShortcutsToElectron(){if(typeof window==="undefined")return;if(!desktopBridge["textPreset"]["isAvailable"]())return;["global-capture-launcher","global-text-preset"]["forEach"](_0x3a1d92=>{const _0x220b40=Array['isArray'](_shortcuts?.[_0x3a1d92]?.['keys'])?_shortcuts[_0x3a1d92]['keys']:DEFAULT_SHORTCUTS[_0x3a1d92]["keys"];try{const _0x49c1ab=desktopBridge["textPreset"]["updateGlobalShortcut"]({'actionId':_0x3a1d92,'keys':_0x220b40});_0x49c1ab&&typeof _0x49c1ab["catch"]==="function"&&_0x49c1ab["catch"](_0xfb467=>{console["warn"]("[shortcuts] failed to sync "+_0x3a1d92+" global shortcut:",_0xfb467);});}catch(_0x1cde41){console["warn"]("[shortcuts] failed to sync "+_0x3a1d92+" global shortcut:",_0x1cde41);}});}
+function _syncGlobalTextCaptureShortcutsToElectron() {
+  if (typeof window === 'undefined') return;
+  if (!desktopBridge['textPreset']['isAvailable']()) return;
+  ['global-capture-launcher', 'global-text-preset']['forEach']((value78) => {
+    const value79 = Array['isArray'](_shortcuts?.[value78]?.['keys'])
+      ? _shortcuts[value78]['keys']
+      : DEFAULT_SHORTCUTS[value78]['keys'];
+    try {
+      const value80 = desktopBridge['textPreset']['updateGlobalShortcut']({
+        actionId: value78,
+        keys: value79,
+      });
+      value80 &&
+        typeof value80['catch'] === 'function' &&
+        value80['catch']((value81) => {
+          console['warn']('[shortcuts] failed to sync ' + value78 + ' global shortcut:', value81);
+        });
+    } catch (value82) {
+      console['warn']('[shortcuts] failed to sync ' + value78 + ' global shortcut:', value82);
+    }
+  });
+}
 
-function _normalizeShortcutSearchText(_0x2d5223){return String(_0x2d5223||'')["trim"]()['toLocaleLowerCase']();}
+function _normalizeShortcutSearchText(value83) {
+  return String(value83 || '')
+    ['trim']()
+    ['toLocaleLowerCase']();
+}
 
-function _matchesShortcutSearch(_0x114437,_0x377e49,_0x4b5b6a,_0x4dff5c){const _0x126225=_normalizeShortcutSearchText(_0x4dff5c);if(!_0x126225)return!![];const _0x3442cd=_getShortcutBindingStrings(_0x114437,_0x377e49),_0x47bbf2=_0x3442cd["length"]>0x0?_0x3442cd["flatMap"](_0x2bc4af=>[_0x2bc4af,_0x2bc4af['replaceAll']('+','\x20')]):[_tShortcut('unset',"未设置")],_0x5b0c0d=_normalizeShortcutSearchText([_0x114437,_0x377e49['label'],_translateShortcutAction(_0x114437,_0x377e49["label"]),_0x4b5b6a,_translateShortcutGroup(_0x4b5b6a),..._0x47bbf2]["join"]('\x20'));return _0x126225["split"](/\s+/)["filter"](Boolean)["every"](_0x33e5e2=>_0x5b0c0d["includes"](_0x33e5e2));}
+function _matchesShortcutSearch(value84, value85, value86, value87) {
+  const _normalizeShortcutSearchText2 = _normalizeShortcutSearchText(value87);
+  if (!_normalizeShortcutSearchText2) return !![];
+  const _getShortcutBindingStrings2 = _getShortcutBindingStrings(value84, value85),
+    args3 =
+      _getShortcutBindingStrings2['length'] > 0x0
+        ? _getShortcutBindingStrings2['flatMap']((value88) => [value88, value88['replaceAll']('+', '\x20')])
+        : [_tShortcut('unset', '未设置')],
+    _normalizeShortcutSearchText3 = _normalizeShortcutSearchText(
+      [
+        value84,
+        value85['label'],
+        _translateShortcutAction(value84, value85['label']),
+        value86,
+        _translateShortcutGroup(value86),
+        ...args3,
+      ]['join']('\x20'),
+    );
+  return _normalizeShortcutSearchText2['split'](/\s+/)
+    ['filter'](Boolean)
+    ['every']((value89) => _normalizeShortcutSearchText3['includes'](value89));
+}
 
-function _initShortcutSearch(){const _0x4ae3a4=document["getElementById"]('shortcutsSearchInput');if(!_0x4ae3a4)return;_shortcutSearchQuery=_0x4ae3a4["value"]||'';if(_0x4ae3a4["dataset"]["shortcutSearchBound"]){_render();return;}_0x4ae3a4["dataset"]["shortcutSearchBound"]="true",_0x4ae3a4["addEventListener"]('input',_0x3f84ce=>{_shortcutSearchQuery=_0x3f84ce['target']?.['value']||'',_render();}),_0x4ae3a4["addEventListener"]("keydown",_0x4825eb=>{if(_0x4825eb["key"]!=="Escape"||!_0x4ae3a4["value"])return;_0x4825eb["preventDefault"](),_0x4825eb["stopPropagation"](),_0x4ae3a4["value"]='',_shortcutSearchQuery='',_render();});}
+function _initShortcutSearch() {
+  const enabled7 = document['getElementById']('shortcutsSearchInput');
+  if (!enabled7) return;
+  _shortcutSearchQuery = enabled7['value'] || '';
+  if (enabled7['dataset']['shortcutSearchBound']) {
+    _render();
+    return;
+  }
+  ((enabled7['dataset']['shortcutSearchBound'] = 'true'),
+    enabled7['addEventListener']('input', (event9) => {
+      ((_shortcutSearchQuery = event9['target']?.['value'] || ''), _render());
+    }),
+    enabled7['addEventListener']('keydown', (value90) => {
+      if (value90['key'] !== 'Escape' || !enabled7['value']) return;
+      (value90['preventDefault'](),
+        value90['stopPropagation'](),
+        (enabled7['value'] = ''),
+        (_shortcutSearchQuery = ''),
+        _render());
+    }));
+}
 
-export function resolveShortcutActionForEvent(_0x568bae,_0x59949f=[]){const _0x2288c3=_toShortcutBindingString(_buildShortcutKeysFromEvent(_0x568bae));if(!_0x2288c3)return null;for(const _0xd2764b of _0x59949f){const _0x680fef=String(_0xd2764b||'')["trim"]();if(!_0x680fef)continue;const _0x47cb36=_shortcuts[_0x680fef]||DEFAULT_SHORTCUTS[_0x680fef];if(_getShortcutBindingStrings(_0x680fef,_0x47cb36)["includes"](_0x2288c3))return _0x680fef;}return null;}
+export function resolveShortcutActionForEvent(value91, value92 = []) {
+  const _toShortcutBindingString4 = _toShortcutBindingString(_buildShortcutKeysFromEvent(value91));
+  if (!_toShortcutBindingString4) return null;
+  for (const value93 of value92) {
+    const enabled8 = String(value93 || '')['trim']();
+    if (!enabled8) continue;
+    const value94 = _shortcuts[enabled8] || DEFAULT_SHORTCUTS[enabled8];
+    if (_getShortcutBindingStrings(enabled8, value94)['includes'](_toShortcutBindingString4)) return enabled8;
+  }
+  return null;
+}
 
-export function getInitialShortcuts(){return _buildPresetShortcuts(ASHUO_PRESET_NAME);}
+export function getInitialShortcuts() {
+  return _buildPresetShortcuts(ASHUO_PRESET_NAME);
+}
 
-function _handleRecordingKeydown(_0x851700){if(!_recordingAction)return;_0x851700['preventDefault'](),_0x851700['stopImmediatePropagation']();if(_0x851700["key"]==="Escape"){_stopRecording(null);return;}const _0x3e51d7=_buildShortcutKeysFromEvent(_0x851700),_0x52087b=_normalizeShortcutMainKey(_0x851700),_0x37ba48=MODIFIER_ONLY_SHORTCUT_ACTIONS["has"](_recordingAction);if(_0x3e51d7['length']>0x0&&(_0x37ba48||_0x3e51d7["includes"]("AltRight")||!["Ctrl","Shift","Alt",'']["includes"](_0x52087b))){if(_shortcuts[_recordingAction]?.["inputType"]==='pointer')return;_stopRecording(_0x3e51d7);}}
+function _handleRecordingKeydown(event10) {
+  if (!_recordingAction) return;
+  (event10['preventDefault'](), event10['stopImmediatePropagation']());
+  if (event10['key'] === 'Escape') {
+    _stopRecording(null);
+    return;
+  }
+  const list21 = _buildShortcutKeysFromEvent(event10),
+    _normalizeShortcutMainKey4 = _normalizeShortcutMainKey(event10),
+    value95 = MODIFIER_ONLY_SHORTCUT_ACTIONS['has'](_recordingAction);
+  if (
+    list21['length'] > 0x0 &&
+    (value95 ||
+      list21['includes']('AltRight') ||
+      !['Ctrl', 'Shift', 'Alt', '']['includes'](_normalizeShortcutMainKey4))
+  ) {
+    if (_shortcuts[_recordingAction]?.['inputType'] === 'pointer') return;
+    _stopRecording(list21);
+  }
+}

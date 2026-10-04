@@ -286,7 +286,7 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
   }),
   APIMART_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
     -0x1,
-    ...Array['from']({ length: 0x1b }, (_0x4ad536, _0x3b5954) => _0x3b5954 + 0x4),
+    ...Array['from']({ length: 0x1b }, (value, item) => item + 0x4),
   ]),
   APIMART_SEEDANCE_2_5_DURATION_RANGE = Object['freeze']({
     min: 0x4,
@@ -530,7 +530,7 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
   }),
   APIMART_WAN_3_DURATION_VALUES = Object['freeze']([
     -0x1,
-    ...Array['from']({ length: 0x1d }, (_0x25db8c, _0xdc99ce) => _0xdc99ce + 0x2),
+    ...Array['from']({ length: 0x1d }, (key, index) => index + 0x2),
   ]),
   APIMART_WAN_3_AUDIO_FIELD = Object['freeze']({
     ...VIDEO_AUDIO_FIELD,
@@ -1093,14 +1093,12 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
     }),
     extensions: createVideoMenuExtension(0x28, '文生 / 图生 / 参考 / 续写 / 编辑'),
   }),
-  ...[![], !![]]['map']((_0x2a8617) =>
+  ...[![], !![]]['map']((modelId) =>
     Object['freeze']({
-      modelId: _0x2a8617 ? 'apimart/wan3.0-video-prime' : 'apimart/wan3.0',
-      executionId: _0x2a8617
-        ? 'apimart.model-api.video.wan3-0-prime.v1'
-        : 'apimart.model-api.video.wan3-0.v1',
-      displayName: _0x2a8617 ? 'Wan 3.0 Prime' : 'Wan 3.0',
-      model: _0x2a8617 ? 'wan3.0-video-prime' : 'wan3.0-video',
+      modelId: modelId ? 'apimart/wan3.0-video-prime' : 'apimart/wan3.0',
+      executionId: modelId ? 'apimart.model-api.video.wan3-0-prime.v1' : 'apimart.model-api.video.wan3-0.v1',
+      displayName: modelId ? 'Wan 3.0 Prime' : 'Wan 3.0',
+      model: modelId ? 'wan3.0-video-prime' : 'wan3.0-video',
       fields: Object['freeze']([
         APIMART_WAN_3_GENERATION_TYPE_FIELD,
         createResolutionField({ defaultValue: '1080P', options: ['480P', '720P', '1080P'] }),
@@ -1150,7 +1148,7 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
       extensions: Object['freeze']({
         storyWorkspace: Object['freeze']({ promptMode: 'wan-3.0' }),
-        ...createVideoMenuExtension(_0x2a8617 ? 0x2a : 0x29, '文生 / 首尾帧 / 多模态参考'),
+        ...createVideoMenuExtension(modelId ? 0x2a : 0x29, '文生 / 首尾帧 / 多模态参考'),
         videoInputSurface: Object['freeze']({ hideFixedInputSlots: !![] }),
       }),
     }),

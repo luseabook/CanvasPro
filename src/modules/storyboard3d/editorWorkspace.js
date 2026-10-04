@@ -176,69 +176,69 @@ import {
   createStoryboard3DModelImportJob,
   disposeCancelledStoryboard3DModelImportResult,
 } from './modelImportJob.js';
-function escapeHtml(_0xa0512f) {
-  return String(_0xa0512f ?? '')
+function escapeHtml(value) {
+  return String(value ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
     ['replaceAll']('\x22', '&quot;')
     ['replaceAll']('\x27', '&#39;');
 }
-function dispatchWorkspaceEvent(_0x409551, _0x30735a, _0x1760fc) {
-  if (!_0x409551?.['dispatchEvent'] || typeof _0x409551['CustomEvent'] !== 'function') return;
-  _0x409551['dispatchEvent'](new _0x409551['CustomEvent'](_0x30735a, { detail: _0x1760fc }));
+function dispatchWorkspaceEvent(enabled, item, detail) {
+  if (!enabled?.['dispatchEvent'] || typeof enabled['CustomEvent'] !== 'function') return;
+  enabled['dispatchEvent'](new enabled['CustomEvent'](item, { detail: detail }));
 }
-function setStoryboard3DShotInitialCamera(_0xd8e78f, _0x50b4f8, _0x467533) {
-  if (!_0xd8e78f || !_0x50b4f8 || !_0x467533) return;
-  ((_0x50b4f8['camera'] = {
-    ..._0x50b4f8['camera'],
-    ..._0x467533,
-    position: [..._0x467533['position']],
-    target: [..._0x467533['target']],
+function setStoryboard3DShotInitialCamera(enabled2, camera2, event) {
+  if (!enabled2 || !camera2 || !event) return;
+  ((camera2['camera'] = {
+    ...camera2['camera'],
+    ...event,
+    position: [...event['position']],
+    target: [...event['target']],
   }),
-    (_0x50b4f8['animation'] = upsertStoryboard3DCameraKeyframe(_0x50b4f8['animation'], {
+    (camera2['animation'] = upsertStoryboard3DCameraKeyframe(camera2['animation'], {
       time: 0x0,
-      camera: _0x50b4f8['camera'],
+      camera: camera2['camera'],
     })),
-    syncStoryboard3DCameraObjectFromShot(_0xd8e78f, _0x50b4f8));
+    syncStoryboard3DCameraObjectFromShot(enabled2, camera2));
 }
-function restoreStoryboard3DStoredFile(_0x51b4e6, _0x2b3614 = globalThis['window']) {
-  if (!_0x51b4e6?.['blob']) return null;
-  const _0x5a66bc = _0x2b3614?.['File'] || globalThis['File'];
-  if (typeof _0x5a66bc === 'function') {
-    const _0x8321d5 = new _0x5a66bc([_0x51b4e6['blob']], _0x51b4e6['name'], {
-      type: _0x51b4e6['type'] || _0x51b4e6['blob']['type'],
-      lastModified: _0x51b4e6['lastModified'] || 0x0,
+function restoreStoryboard3DStoredFile(type2, key = globalThis['window']) {
+  if (!type2?.['blob']) return null;
+  const run = key?.['File'] || globalThis['File'];
+  if (typeof run === 'function') {
+    const index = new run([type2['blob']], type2['name'], {
+      type: type2['type'] || type2['blob']['type'],
+      lastModified: type2['lastModified'] || 0x0,
     });
     return (
-      _0x51b4e6['relativePath'] &&
-        _0x51b4e6['relativePath'] !== _0x51b4e6['name'] &&
-        Object['defineProperty'](_0x8321d5, 'webkitRelativePath', {
+      type2['relativePath'] &&
+        type2['relativePath'] !== type2['name'] &&
+        Object['defineProperty'](index, 'webkitRelativePath', {
           configurable: !![],
-          value: _0x51b4e6['relativePath'],
+          value: type2['relativePath'],
         }),
-      _0x8321d5
+      index
     );
   }
-  const _0x5938fd = _0x51b4e6['blob'];
-  for (const [_0x2e2765, _0x35734b] of Object['entries']({
-    name: _0x51b4e6['name'],
-    lastModified: _0x51b4e6['lastModified'] || 0x0,
-    webkitRelativePath: _0x51b4e6['relativePath'] || _0x51b4e6['name'],
+  const result = type2['blob'];
+  for (const [data, value2] of Object['entries']({
+    name: type2['name'],
+    lastModified: type2['lastModified'] || 0x0,
+    webkitRelativePath: type2['relativePath'] || type2['name'],
   })) {
     try {
-      Object['defineProperty'](_0x5938fd, _0x2e2765, { configurable: !![], value: _0x35734b });
+      Object['defineProperty'](result, data, { configurable: !![], value: value2 });
     } catch {}
   }
-  return _0x5938fd;
+  return result;
 }
-function getSaveStatusLabel(_0x422449) {
-  if (_0x422449 === 'saving') return t('storyboard3d.saveStatus.saving');
-  if (_0x422449 === 'error') return t('storyboard3d.saveStatus.error');
+function getSaveStatusLabel(options) {
+  if (options === 'saving') return t('storyboard3d.saveStatus.saving');
+  if (options === 'error') return t('storyboard3d.saveStatus.error');
   return t('storyboard3d.saveStatus.saved');
 }
-function renderObjectOutline(_0x2279cf, _0x16b1e6 = [], { query: query = '', type: type = 'all' } = {}) {
-  if (!_0x2279cf || _0x2279cf['objects']['length'] === 0x0)
+function renderObjectOutline(enabled3, list = [], { query: query = '', type: type = 'all' } = {}) {
+  if (!enabled3 || enabled3['objects']['length'] === 0x0)
     return (
       '<div\x20class=\x22storyboard-3d-empty-state\x22>\x0a\x20\x20\x20\x20\x20\x20<strong>' +
       escapeHtml(t('storyboard3d.editor.emptyOutlineTitle')) +
@@ -246,102 +246,99 @@ function renderObjectOutline(_0x2279cf, _0x16b1e6 = [], { query: query = '', typ
       escapeHtml(t('storyboard3d.editor.emptyOutlineDescription')) +
       '</span>\n    </div>'
     );
-  const _0x34f96f = String(query || '')
+  const enabled4 = String(query || '')
       ['trim']()
       ['toLocaleLowerCase'](),
-    _0x33f288 = _0x2279cf['objects']['filter']((_0x4ec67c) => {
-      if (type !== 'all' && _0x4ec67c['type'] !== type) return ![];
+    list2 = enabled3['objects']['filter']((error) => {
+      if (type !== 'all' && error['type'] !== type) return ![];
       return (
-        !_0x34f96f ||
-        (_0x4ec67c['name'] + '\x20' + _0x4ec67c['type'])['toLocaleLowerCase']()['includes'](_0x34f96f)
+        !enabled4 || (error['name'] + '\x20' + error['type'])['toLocaleLowerCase']()['includes'](enabled4)
       );
     });
-  if (_0x33f288['length'] === 0x0)
+  if (list2['length'] === 0x0)
     return '<div class="storyboard-3d-empty-state"><strong>没有匹配对象</strong><span>调整名称或类型筛选。</span></div>';
-  const _0x37e5b8 = new Map(_0x2279cf['objects']['map']((_0x5ca81b) => [_0x5ca81b['id'], _0x5ca81b])),
-    _0x4307a1 = (_0x2869ef) => {
-      let _0x32094c = 0x0,
-        _0x6ba5b7 = _0x2869ef['parentId'];
-      const _0xa128a3 = new Set([_0x2869ef['id']]);
-      while (_0x6ba5b7 && _0x37e5b8['has'](_0x6ba5b7) && !_0xa128a3['has'](_0x6ba5b7) && _0x32094c < 0x4) {
-        (_0xa128a3['add'](_0x6ba5b7),
-          (_0x32094c += 0x1),
-          (_0x6ba5b7 = _0x37e5b8['get'](_0x6ba5b7)?.['parentId']));
+  const map = new Map(enabled3['objects']['map']((target) => [target['id'], target])),
+    handler = (source) => {
+      let count = 0x0,
+        next = source['parentId'];
+      const map2 = new Set([source['id']]);
+      while (next && map['has'](next) && !map2['has'](next) && count < 0x4) {
+        (map2['add'](next), (count += 0x1), (next = map['get'](next)?.['parentId']));
       }
-      return _0x32094c;
+      return count;
     };
-  return _0x33f288['map']((_0x5db13c) => {
-    const _0x24a4ea = _0x5db13c['visible'] !== ![],
-      _0x176b39 = _0x5db13c['locked'] === !![],
-      _0x2aa416 = escapeHtml(_0x5db13c['name']);
+  return list2['map']((error2) => {
+    const current = error2['visible'] !== ![],
+      entry = error2['locked'] === !![],
+      escapeHtml2 = escapeHtml(error2['name']);
     return (
       '<div draggable="true" class="storyboard-3d-object-row is-depth-' +
-      _0x4307a1(_0x5db13c) +
+      handler(error2) +
       '\x20' +
-      (_0x16b1e6['includes'](_0x5db13c['id']) ? 'is-active' : '') +
+      (list['includes'](error2['id']) ? 'is-active' : '') +
       '" data-object-type="' +
-      escapeHtml(_0x5db13c['type']) +
+      escapeHtml(error2['type']) +
       '" data-object-id="' +
-      escapeHtml(_0x5db13c['id']) +
+      escapeHtml(error2['id']) +
       '">\n          <button type="button" class="storyboard-3d-object-row-select" data-storyboard-3d-action="select-object" data-object-id="' +
-      escapeHtml(_0x5db13c['id']) +
+      escapeHtml(error2['id']) +
       '" data-object-type="' +
-      escapeHtml(_0x5db13c['type']) +
+      escapeHtml(error2['type']) +
       '" aria-pressed="' +
-      _0x16b1e6['includes'](_0x5db13c['id']) +
+      list['includes'](error2['id']) +
       '" aria-label="选择 ' +
-      _0x2aa416 +
+      escapeHtml2 +
       '">\n            <span class="storyboard-3d-object-type">' +
-      escapeHtml(_0x5db13c['type']) +
+      escapeHtml(error2['type']) +
       '</span>\n          </button>\n          <input type="text" class="storyboard-3d-object-row-name-input" value="' +
-      _0x2aa416 +
+      escapeHtml2 +
       '\x22\x20maxlength=\x22120\x22\x20draggable=\x22false\x22\x20data-storyboard-3d-action=\x22edit-object-name\x22\x20data-storyboard-3d-outline-name\x20data-storyboard-3d-object-name\x20data-object-id=\x22' +
-      escapeHtml(_0x5db13c['id']) +
+      escapeHtml(error2['id']) +
       '" data-object-type="' +
-      escapeHtml(_0x5db13c['type']) +
+      escapeHtml(error2['type']) +
       '" aria-label="重命名 ' +
-      _0x2aa416 +
+      escapeHtml2 +
       '\x22\x20title=\x22点击重命名\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-object-row-actions\x22\x20role=\x22group\x22\x20aria-label=\x22' +
-      _0x2aa416 +
+      escapeHtml2 +
       ' 对象状态">\n            <button type="button" class="storyboard-3d-object-state-button ' +
-      (_0x24a4ea ? '' : 'is-off') +
+      (current ? '' : 'is-off') +
       '" data-storyboard-3d-action="toggle-object-visibility" data-object-id="' +
-      escapeHtml(_0x5db13c['id']) +
+      escapeHtml(error2['id']) +
       '" aria-pressed="' +
-      _0x24a4ea +
+      current +
       '" aria-label="' +
-      (_0x24a4ea ? '隐藏' : '显示') +
+      (current ? '隐藏' : '显示') +
       '\x20' +
-      _0x2aa416 +
+      escapeHtml2 +
       '" title="' +
-      (_0x24a4ea ? '隐藏对象' : '显示对象') +
+      (current ? '隐藏对象' : '显示对象') +
       '\x22>' +
-      renderStoryboard3DControlIcon(_0x24a4ea ? 'eye' : 'eyeOff') +
+      renderStoryboard3DControlIcon(current ? 'eye' : 'eyeOff') +
       '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22storyboard-3d-object-state-button\x20' +
-      (_0x176b39 ? 'is-locked' : '') +
+      (entry ? 'is-locked' : '') +
       '" data-storyboard-3d-action="toggle-object-lock" data-object-id="' +
-      escapeHtml(_0x5db13c['id']) +
+      escapeHtml(error2['id']) +
       '" aria-pressed="' +
-      _0x176b39 +
+      entry +
       '\x22\x20aria-label=\x22' +
-      (_0x176b39 ? '解锁' : '锁定') +
+      (entry ? '解锁' : '锁定') +
       '\x20' +
-      _0x2aa416 +
+      escapeHtml2 +
       '" title="' +
-      (_0x176b39 ? '解锁对象' : '锁定对象') +
+      (entry ? '解锁对象' : '锁定对象') +
       '\x22>' +
-      renderStoryboard3DControlIcon(_0x176b39 ? 'lock' : 'unlock') +
+      renderStoryboard3DControlIcon(entry ? 'lock' : 'unlock') +
       '</button>\n            <button type="button" class="storyboard-3d-object-state-button is-delete" data-storyboard-3d-action="delete-object" data-object-id="' +
-      escapeHtml(_0x5db13c['id']) +
+      escapeHtml(error2['id']) +
       '" aria-label="删除 ' +
-      _0x2aa416 +
+      escapeHtml2 +
       '" title="删除对象">×</button>\n          </span>\n        </div>'
     );
   })['join']('');
 }
-function renderShotStrip(_0xf51cc0, { timelineOpen: timelineOpen = ![] } = {}) {
-  if (!_0xf51cc0) return '';
-  const _0x2b253b =
+function renderShotStrip(enabled5, { timelineOpen: timelineOpen = ![] } = {}) {
+  if (!enabled5) return '';
+  const record =
       '<div class="storyboard-3d-shot-strip-heading">\n    <strong>' +
       escapeHtml(t('storyboard3d.editor.shots')) +
       '</strong>\n    <button type="button" class="storyboard-3d-shot-keyframe-trigger ' +
@@ -349,178 +346,169 @@ function renderShotStrip(_0xf51cc0, { timelineOpen: timelineOpen = ![] } = {}) {
       '\x22\x20data-storyboard-3d-action=\x22timeline-toggle-drawer\x22\x20aria-expanded=\x22' +
       timelineOpen +
       '\x22>关键帧</button>\x0a\x20\x20</div>',
-    _0x5bb7d7 = _0xf51cc0['shots']
+    payload = enabled5['shots']
       ['map'](
-        (_0x11d4dc, _0x3b4f0c) =>
+        (error3, index2) =>
           '<button type="button" draggable="true" class="storyboard-3d-shot-card ' +
-          (_0x11d4dc['id'] === _0xf51cc0['activeShotId'] ? 'is-active' : '') +
+          (error3['id'] === enabled5['activeShotId'] ? 'is-active' : '') +
           '" data-storyboard-3d-action="select-shot" data-shot-id="' +
-          escapeHtml(_0x11d4dc['id']) +
+          escapeHtml(error3['id']) +
           '" aria-pressed="' +
-          (_0x11d4dc['id'] === _0xf51cc0['activeShotId']) +
+          (error3['id'] === enabled5['activeShotId']) +
           '">\n        <span class="storyboard-3d-shot-thumb">\n          ' +
-          (_0x11d4dc['thumbnailUrl']
+          (error3['thumbnailUrl']
             ? '<img\x20src=\x22' +
-              escapeHtml(_0x11d4dc['thumbnailUrl']) +
+              escapeHtml(error3['thumbnailUrl']) +
               '" alt="' +
-              escapeHtml(_0x11d4dc['name']) +
+              escapeHtml(error3['name']) +
               '\x22>'
             : '<span>' + escapeHtml(t('storyboard3d.editor.previewPending')) + '</span>') +
           '\n        </span>\n        <span class="storyboard-3d-shot-copy">\n          <small>' +
-          escapeHtml(t('storyboard3d.editor.shotNumber', { index: _0x3b4f0c + 0x1 })) +
+          escapeHtml(t('storyboard3d.editor.shotNumber', { index: index2 + 0x1 })) +
           '</small>\n          <strong>' +
-          escapeHtml(_0x11d4dc['name']) +
+          escapeHtml(error3['name']) +
           '</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>' +
-          escapeHtml(
-            formatFocalLength(_0x11d4dc['camera']['focalLength']) + 'mm · ' + _0x11d4dc['shotSize'],
-          ) +
+          escapeHtml(formatFocalLength(error3['camera']['focalLength']) + 'mm · ' + error3['shotSize']) +
           '</span>\n        </span>\n      </button>',
       )
       ['join'](''),
-    _0x60dd63 = escapeHtml(t('storyboard3d.editor.addShot')),
-    _0x1fc8ea = escapeHtml(t('storyboard3d.editor.addShotDescription'));
+    escapeHtml3 = escapeHtml(t('storyboard3d.editor.addShot')),
+    escapeHtml4 = escapeHtml(t('storyboard3d.editor.addShotDescription'));
   return (
     '' +
-    _0x2b253b +
-    _0x5bb7d7 +
+    record +
+    payload +
     '<button type="button" class="storyboard-3d-shot-add-card" data-storyboard-3d-action="add-shot" aria-label="' +
-    _0x60dd63 +
+    escapeHtml3 +
     '" title="' +
-    _0x1fc8ea +
+    escapeHtml4 +
     '\x22>' +
     renderStoryboard3DControlIcon('camera') +
     '<strong>' +
-    _0x60dd63 +
+    escapeHtml3 +
     '</strong></button>'
   );
 }
-function renderShotTimelineDrawerHandle(_0x505f01, _0x5d4584) {
-  const _0x5ce1df = _0x505f01 ? '拖拽调整关键帧区域高度，点击收起' : '向上拖拽调整关键帧区域高度，点击展开';
+function renderShotTimelineDrawerHandle(handle, state) {
+  const config = handle ? '拖拽调整关键帧区域高度，点击收起' : '向上拖拽调整关键帧区域高度，点击展开';
   return (
     '<button type="button" class="storyboard-3d-timeline-drawer-handle ' +
-    (_0x505f01 ? 'is-open' : '') +
+    (handle ? 'is-open' : '') +
     '\x22\x20data-storyboard-3d-action=\x22timeline-toggle-drawer\x22\x20data-storyboard-3d-timeline-resize-handle\x20role=\x22separator\x22\x20aria-orientation=\x22horizontal\x22\x20aria-valuemin=\x22120\x22\x20aria-valuemax=\x22720\x22\x20aria-valuenow=\x22' +
-    _0x5d4584 +
+    state +
     '" aria-expanded="' +
-    _0x505f01 +
+    handle +
     '" aria-label="' +
-    _0x5ce1df +
+    config +
     '">\n    <span class="storyboard-3d-timeline-drawer-grip" aria-hidden="true"></span>\n  </button>'
   );
 }
-function formatFocalLength(_0x42e6c) {
-  const _0xce11b7 = Number(_0x42e6c);
-  if (!Number['isFinite'](_0xce11b7)) return '35';
-  const _0x231896 = Math['round'](_0xce11b7 * 0xa) / 0xa;
-  return Number['isInteger'](_0x231896) ? String(_0x231896) : _0x231896['toFixed'](0x1);
+function formatFocalLength(scope) {
+  const input = Number(scope);
+  if (!Number['isFinite'](input)) return '35';
+  const output = Math['round'](input * 0xa) / 0xa;
+  return Number['isInteger'](output) ? String(output) : output['toFixed'](0x1);
 }
-function resolveStoryboard3DFocalPresetIndex(_0x1a3637) {
-  const _0x540546 = Number(_0x1a3637);
-  if (!Number['isFinite'](_0x540546)) return STORYBOARD_3D_FOCAL_LENGTH_PRESETS['indexOf'](0x23);
+function resolveStoryboard3DFocalPresetIndex(value3) {
+  const value4 = Number(value3);
+  if (!Number['isFinite'](value4)) return STORYBOARD_3D_FOCAL_LENGTH_PRESETS['indexOf'](0x23);
   return STORYBOARD_3D_FOCAL_LENGTH_PRESETS['reduce'](
-    (_0x3a8bda, _0x26727c, _0x1766a8) =>
-      Math['abs'](_0x26727c - _0x540546) <
-      Math['abs'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS[_0x3a8bda] - _0x540546)
-        ? _0x1766a8
-        : _0x3a8bda,
+    (value5, value6, value7) =>
+      Math['abs'](value6 - value4) < Math['abs'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS[value5] - value4)
+        ? value7
+        : value5,
     0x0,
   );
 }
-function getStoryboard3DFocalPreset(_0x2571ef) {
-  const _0x540d27 = Math['max'](
+function getStoryboard3DFocalPreset(value8) {
+  const value9 = Math['max'](
     0x0,
-    Math['min'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS['length'] - 0x1, Math['round'](Number(_0x2571ef) || 0x0)),
+    Math['min'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS['length'] - 0x1, Math['round'](Number(value8) || 0x0)),
   );
-  return STORYBOARD_3D_FOCAL_LENGTH_PRESETS[_0x540d27];
+  return STORYBOARD_3D_FOCAL_LENGTH_PRESETS[value9];
 }
-function renderStoryboard3DFocalControl(_0x55d006, _0x23830e) {
-  if (!_0x55d006) return '';
-  const _0x1b9768 = resolveStoryboard3DFocalPresetIndex(_0x23830e),
-    _0x33be94 = STORYBOARD_3D_FOCAL_LENGTH_PRESETS[_0x1b9768],
-    _0x43a329 = _0x55d006?.['background']?.['lockedCamera'] === !![],
-    _0x333f17 = _0x43a329
+function renderStoryboard3DFocalControl(enabled6, value10) {
+  if (!enabled6) return '';
+  const storyboard3DFocalPresetIndex = resolveStoryboard3DFocalPresetIndex(value10),
+    value11 = STORYBOARD_3D_FOCAL_LENGTH_PRESETS[storyboard3DFocalPresetIndex],
+    value12 = enabled6?.['background']?.['lockedCamera'] === !![],
+    value13 = value12
       ? '背景机位已锁定，请先解除锁定再调整视口焦距'
       : '拖动调整视口焦距；添加摄像机时才会保存',
-    _0x900d72 = [...STORYBOARD_3D_FOCAL_LENGTH_PRESETS]
+    value14 = [...STORYBOARD_3D_FOCAL_LENGTH_PRESETS]
       ['reverse']()
-      ['map']((_0x5c2c70) => {
-        const _0x3f1135 = _0x5c2c70 === _0x33be94 ? ' is-active' : '';
-        return _0x5c2c70 === 0x23
+      ['map']((count2) => {
+        const value15 = count2 === value11 ? ' is-active' : '';
+        return count2 === 0x23
           ? '<button type="button" class="storyboard-3d-focal-tick is-default' +
-              _0x3f1135 +
+              value15 +
               '" data-storyboard-3d-action="reset-focal-length" data-focal-length="35" aria-label="恢复默认焦距 35mm"><span aria-hidden="true">35</span><small aria-hidden="true">默认</small></button>'
           : '<span class="storyboard-3d-focal-tick' +
-              _0x3f1135 +
+              value15 +
               '" data-focal-length="' +
-              _0x5c2c70 +
+              count2 +
               '" aria-hidden="true">' +
-              _0x5c2c70 +
+              count2 +
               '</span>';
       })
       ['join']('');
   return (
     '<div class="storyboard-3d-focal-control" title="' +
-    _0x333f17 +
+    value13 +
     '">\n    <span class="storyboard-3d-focal-value">焦距 <output data-storyboard-3d-focal-output>' +
-    _0x33be94 +
+    value11 +
     'mm</output></span>\n    <span class="storyboard-3d-focal-slider-wrap">\n      <input type="range" min="0" max="' +
     (STORYBOARD_3D_FOCAL_LENGTH_PRESETS['length'] - 0x1) +
     '" step="1" value="' +
-    _0x1b9768 +
+    storyboard3DFocalPresetIndex +
     '\x22\x20data-storyboard-3d-focal-slider\x20aria-label=\x22镜头焦距\x22\x20aria-valuetext=\x22' +
-    _0x33be94 +
+    value11 +
     'mm" ' +
-    (_0x43a329 ? 'disabled' : '') +
+    (value12 ? 'disabled' : '') +
     '>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-focal-ticks\x22>' +
-    _0x900d72 +
+    value14 +
     '</span>\n    </span>\n  </div>'
   );
 }
-function createLocalId(_0x575002) {
-  const _0xff2a2a = globalThis['crypto'];
-  if (typeof _0xff2a2a?.['randomUUID'] === 'function') return _0x575002 + '-' + _0xff2a2a['randomUUID']();
+function createLocalId(value16) {
+  const value17 = globalThis['crypto'];
+  if (typeof value17?.['randomUUID'] === 'function') return value16 + '-' + value17['randomUUID']();
   return (
-    _0x575002 +
+    value16 +
     '-' +
     Date['now']()['toString'](0x24) +
     '-' +
     Math['random']()['toString'](0x24)['slice'](0x2, 0x9)
   );
 }
-function renderVectorInputs(_0x297d2b, _0x1d8080, _0x172f96 = []) {
-  const _0x327ba2 = _0x1d8080 === 'rotation';
+function renderVectorInputs(value18, value19, value20 = []) {
+  const value21 = value19 === 'rotation';
   return ['x', 'y', 'z']
     ['map'](
-      (_0x184df3, _0x5efd50) =>
+      (value22, value23) =>
         '<label><span>' +
-        _0x184df3['toUpperCase']() +
-        (_0x327ba2 ? '°' : '') +
+        value22['toUpperCase']() +
+        (value21 ? '°' : '') +
         '</span><input type="number" step="' +
-        (_0x327ba2 ? '1' : '0.01') +
+        (value21 ? '1' : '0.01') +
         '\x22\x20value=\x22' +
         escapeHtml(
-          (_0x327ba2
-            ? (Number(_0x172f96[_0x5efd50] || 0x0) * 0xb4) / Math['PI']
-            : Number(_0x172f96[_0x5efd50] || 0x0))['toFixed'](_0x327ba2 ? 0x1 : 0x2),
+          (value21 ? (Number(value20[value23] || 0x0) * 0xb4) / Math['PI'] : Number(value20[value23] || 0x0))[
+            'toFixed'
+          ](value21 ? 0x1 : 0x2),
         ) +
         '" data-storyboard-3d-transform-input data-object-id="' +
-        escapeHtml(_0x297d2b) +
+        escapeHtml(value18) +
         '" data-transform-field="' +
-        _0x1d8080 +
+        value19 +
         '" data-transform-axis="' +
-        _0x5efd50 +
+        value23 +
         '"></label>',
     )
     ['join']('');
 }
-function renderSelectedObjectInspector(
-  _0x46d1d9,
-  _0xe8b3b2 = 'Head',
-  _0x1faea4 = null,
-  _0xca506a = [],
-  _0xb101a5 = null,
-) {
-  if (!_0x46d1d9)
+function renderSelectedObjectInspector(error4, value24 = 'Head', value25 = null, list3 = [], value26 = null) {
+  if (!error4)
     return (
       '<section class="storyboard-3d-inspector-card is-muted">\n      <small>' +
       escapeHtml(t('storyboard3d.editor.selection')) +
@@ -530,122 +518,122 @@ function renderSelectedObjectInspector(
       escapeHtml(t('storyboard3d.editor.noSelectionDescription')) +
       '</p>\n    </section>'
     );
-  const _0x8ab860 = getStoryboard3DObjectTransformCapabilities(_0x46d1d9),
-    _0x2152e6 = { position: '位置', rotation: '旋转', scale: '缩放' },
-    _0x22890e =
-      _0x8ab860['fields']['length'] > 0x0
-        ? _0x8ab860['fields']
+  const storyboard3DObjectTransformCapabilities = getStoryboard3DObjectTransformCapabilities(error4),
+    value27 = { position: '位置', rotation: '旋转', scale: '缩放' },
+    value28 =
+      storyboard3DObjectTransformCapabilities['fields']['length'] > 0x0
+        ? storyboard3DObjectTransformCapabilities['fields']
             ['map'](
-              (_0x2b49f6) =>
+              (value29) =>
                 '<div\x20class=\x22storyboard-3d-transform-group\x22><strong>' +
-                _0x2152e6[_0x2b49f6] +
+                value27[value29] +
                 '</strong><div>' +
-                renderVectorInputs(_0x46d1d9['id'], _0x2b49f6, _0x46d1d9['transform']?.[_0x2b49f6]) +
+                renderVectorInputs(error4['id'], value29, error4['transform']?.[value29]) +
                 '</div></div>',
             )
             ['join']('')
         : '<p class="storyboard-3d-transform-unavailable">该对象没有可生效的空间变换；请编辑下方对象参数。</p>';
   return (
     '<section class="storyboard-3d-inspector-card storyboard-3d-object-inspector">\n    <small>当前选择 · ' +
-    escapeHtml(_0x46d1d9['type']) +
+    escapeHtml(error4['type']) +
     '</small>\n    <input class="storyboard-3d-object-name-input" value="' +
-    escapeHtml(_0x46d1d9['name']) +
+    escapeHtml(error4['name']) +
     '" maxlength="120" data-storyboard-3d-object-name data-object-id="' +
-    escapeHtml(_0x46d1d9['id']) +
+    escapeHtml(error4['id']) +
     '" aria-label="对象名称">\n    <label class="storyboard-3d-object-parent"><span>所属分组</span><select data-storyboard-3d-object-parent data-object-id="' +
-    escapeHtml(_0x46d1d9['id']) +
+    escapeHtml(error4['id']) +
     '"><option value="">无分组</option>' +
-    _0xca506a['filter']((_0x5e9c1e) => _0x5e9c1e['id'] !== _0x46d1d9['id'])
+    list3['filter']((value30) => value30['id'] !== error4['id'])
       ['map'](
-        (_0x8d525f) =>
+        (error5) =>
           '<option value="' +
-          escapeHtml(_0x8d525f['id']) +
+          escapeHtml(error5['id']) +
           '\x22\x20' +
-          (_0x46d1d9['parentId'] === _0x8d525f['id'] ? 'selected' : '') +
+          (error4['parentId'] === error5['id'] ? 'selected' : '') +
           '>' +
-          escapeHtml(_0x8d525f['name']) +
+          escapeHtml(error5['name']) +
           '</option>',
       )
       ['join']('') +
     '</select></label>\n    ' +
-    _0x22890e +
+    value28 +
     '\n    ' +
-    (_0x46d1d9['type'] === 'prop' ? renderPropControls(_0x46d1d9, _0x1faea4) : '') +
+    (error4['type'] === 'prop' ? renderPropControls(error4, value25) : '') +
     '\n    ' +
-    (_0x46d1d9['type'] === 'character' ? renderCharacterControls(_0x46d1d9, _0xe8b3b2, _0xb101a5) : '') +
+    (error4['type'] === 'character' ? renderCharacterControls(error4, value24, value26) : '') +
     '\n    ' +
-    (_0x46d1d9['type'] === 'light' ? renderLightControls(_0x46d1d9) : '') +
+    (error4['type'] === 'light' ? renderLightControls(error4) : '') +
     '\n    ' +
-    (_0x46d1d9['type'] === 'camera' ? renderCameraControls(_0x46d1d9) : '') +
+    (error4['type'] === 'camera' ? renderCameraControls(error4) : '') +
     '\n    <div class="storyboard-3d-object-actions">\n      ' +
-    (_0x46d1d9['type'] === 'group'
+    (error4['type'] === 'group'
       ? '<button type="button" data-storyboard-3d-action="ungroup-object" data-object-id="' +
-        escapeHtml(_0x46d1d9['id']) +
+        escapeHtml(error4['id']) +
         '">解除分组</button>'
       : '') +
     '\n      <button type="button" data-storyboard-3d-action="duplicate-object" data-object-id="' +
-    escapeHtml(_0x46d1d9['id']) +
+    escapeHtml(error4['id']) +
     '">复制</button>\n      <button type="button" data-storyboard-3d-action="delete-object" data-object-id="' +
-    escapeHtml(_0x46d1d9['id']) +
+    escapeHtml(error4['id']) +
     '\x22>删除</button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</section>'
   );
 }
-function renderCameraControls(_0x43dcde) {
+function renderCameraControls(value31) {
   return (
     '<div class="storyboard-3d-character-controls storyboard-3d-camera-controls">\n    <label><span>焦距 mm</span><input type="number" min="1" max="200" step="1" value="' +
-    escapeHtml(_0x43dcde['focalLength'] ?? 0x23) +
+    escapeHtml(value31['focalLength'] ?? 0x23) +
     '" data-storyboard-3d-camera-field="focalLength" data-object-id="' +
-    escapeHtml(_0x43dcde['id']) +
+    escapeHtml(value31['id']) +
     '"></label>\n    <label><span>宽高比</span><input type="text" value="' +
-    escapeHtml(_0x43dcde['aspectRatio'] || '16:9') +
+    escapeHtml(value31['aspectRatio'] || '16:9') +
     '" data-storyboard-3d-camera-field="aspectRatio" data-object-id="' +
-    escapeHtml(_0x43dcde['id']) +
+    escapeHtml(value31['id']) +
     '"></label>\n    <label><span>近裁剪面</span><input type="number" min="0.001" step="0.01" value="' +
-    escapeHtml(_0x43dcde['near'] ?? 0.1) +
+    escapeHtml(value31['near'] ?? 0.1) +
     '\x22\x20data-storyboard-3d-camera-field=\x22near\x22\x20data-object-id=\x22' +
-    escapeHtml(_0x43dcde['id']) +
+    escapeHtml(value31['id']) +
     '"></label>\n    <label><span>远裁剪面</span><input type="number" min="1" step="1" value="' +
-    escapeHtml(_0x43dcde['far'] ?? 0x3e8) +
+    escapeHtml(value31['far'] ?? 0x3e8) +
     '" data-storyboard-3d-camera-field="far" data-object-id="' +
-    escapeHtml(_0x43dcde['id']) +
+    escapeHtml(value31['id']) +
     '"></label>\n    <p>该摄像机与对应 Shot 一对一绑定；移动、旋转和焦距修改会同步到镜头与摄像机关键帧。</p>\n  </div>'
   );
 }
-function renderPropControls(_0x3d12da, _0x403a22) {
-  const _0x972c63 = _0x403a22?.['assetRecord'];
+function renderPropControls(value32, value33) {
+  const value34 = value33?.['assetRecord'];
   return (
     '<div class="storyboard-3d-character-controls storyboard-3d-prop-controls">\n    <label><span>分类</span><input type="text" value="' +
-    escapeHtml(_0x403a22?.['category'] || '道具') +
+    escapeHtml(value33?.['category'] || '道具') +
     '" readonly></label>\n    ' +
-    (_0x972c63
+    (value34
       ? '<label><span>格式 / 三角面</span><input type="text" value="' +
-        escapeHtml(_0x972c63['sourceFormat']['toUpperCase']() + ' · ' + _0x972c63['triangleCount']) +
+        escapeHtml(value34['sourceFormat']['toUpperCase']() + ' · ' + value34['triangleCount']) +
         '" readonly></label>'
       : '') +
     '\n    <label><span>色调覆盖</span><input type="color" value="' +
-    escapeHtml(_0x3d12da['tint'] || '#ffffff') +
+    escapeHtml(value32['tint'] || '#ffffff') +
     '\x22\x20data-storyboard-3d-prop-field=\x22tint\x22\x20data-object-id=\x22' +
-    escapeHtml(_0x3d12da['id']) +
+    escapeHtml(value32['id']) +
     '"></label>\n    <label class="is-check"><input type="checkbox" data-storyboard-3d-prop-field="castShadow" data-object-id="' +
-    escapeHtml(_0x3d12da['id']) +
+    escapeHtml(value32['id']) +
     '\x22\x20' +
-    (_0x3d12da['castShadow'] !== ![] ? 'checked' : '') +
+    (value32['castShadow'] !== ![] ? 'checked' : '') +
     '>投射阴影</label>\n    <label class="is-check"><input type="checkbox" data-storyboard-3d-prop-field="receiveShadow" data-object-id="' +
-    escapeHtml(_0x3d12da['id']) +
+    escapeHtml(value32['id']) +
     '\x22\x20' +
-    (_0x3d12da['receiveShadow'] !== ![] ? 'checked' : '') +
+    (value32['receiveShadow'] !== ![] ? 'checked' : '') +
     '>接收阴影</label>\n  </div>'
   );
 }
-function renderSelectOptions(_0x1f58e2, _0x102735) {
-  return _0x1f58e2['map'](
-    (_0x5cdb7a) =>
+function renderSelectOptions(list4, value35) {
+  return list4['map'](
+    (error6) =>
       '<option\x20value=\x22' +
-      escapeHtml(_0x5cdb7a['id']) +
+      escapeHtml(error6['id']) +
       '\x22\x20' +
-      (_0x5cdb7a['id'] === _0x102735 ? 'selected' : '') +
+      (error6['id'] === value35 ? 'selected' : '') +
       '>' +
-      escapeHtml(_0x5cdb7a['name']) +
+      escapeHtml(error6['name']) +
       '</option>',
   )['join']('');
 }
@@ -673,432 +661,432 @@ const STORYBOARD_3D_EDITABLE_BONES = Object['freeze']([
   STORYBOARD_3D_TIMELINE_MAX_HEIGHT = 0x2d0,
   STORYBOARD_3D_TIMELINE_DEFAULT_HEIGHT = 0x154,
   STORYBOARD_3D_VIEWPORT_MIN_HEIGHT = 0xa0;
-export function normalizeStoryboard3DInspectorWidth(_0x1351a0, _0x3a432d = 0x4b0) {
-  const _0x3f9020 = Number(_0x3a432d),
-    _0x142e45 = Number['isFinite'](_0x3f9020)
-      ? _0x3f9020 - STORYBOARD_3D_VIEWPORT_MIN_WIDTH - STORYBOARD_3D_INSPECTOR_SPLITTER_WIDTH
+export function normalizeStoryboard3DInspectorWidth(value36, value37 = 0x4b0) {
+  const value38 = Number(value37),
+    value39 = Number['isFinite'](value38)
+      ? value38 - STORYBOARD_3D_VIEWPORT_MIN_WIDTH - STORYBOARD_3D_INSPECTOR_SPLITTER_WIDTH
       : STORYBOARD_3D_INSPECTOR_MAX_WIDTH,
-    _0x270fab = Math['max'](
+    value40 = Math['max'](
       STORYBOARD_3D_INSPECTOR_MIN_WIDTH,
-      Math['min'](STORYBOARD_3D_INSPECTOR_MAX_WIDTH, _0x142e45),
+      Math['min'](STORYBOARD_3D_INSPECTOR_MAX_WIDTH, value39),
     ),
-    _0x5bacba = Number(_0x1351a0),
-    _0x149491 = Math['min'](0x168, _0x270fab);
+    value41 = Number(value36),
+    value42 = Math['min'](0x168, value40);
   return Math['round'](
     Math['max'](
       STORYBOARD_3D_INSPECTOR_MIN_WIDTH,
-      Math['min'](_0x270fab, Number['isFinite'](_0x5bacba) ? _0x5bacba : _0x149491),
+      Math['min'](value40, Number['isFinite'](value41) ? value41 : value42),
     ),
   );
 }
-export function resolveStoryboard3DViewportCenterPosition(_0x266c9b) {
-  const _0x1bf4f3 = _0x266c9b?.['target'],
-    _0x3f3dc8 = Array['isArray'](_0x1bf4f3) ? Number(_0x1bf4f3[0x0]) : Number(_0x1bf4f3?.['x']),
-    _0x225af9 = Array['isArray'](_0x1bf4f3) ? Number(_0x1bf4f3[0x2]) : Number(_0x1bf4f3?.['z']);
-  return [
-    Number['isFinite'](_0x3f3dc8) ? _0x3f3dc8 : 0x0,
-    0x0,
-    Number['isFinite'](_0x225af9) ? _0x225af9 : 0x0,
-  ];
+export function resolveStoryboard3DViewportCenterPosition(event2) {
+  const box = event2?.['target'],
+    value43 = Array['isArray'](box) ? Number(box[0x0]) : Number(box?.['x']),
+    value44 = Array['isArray'](box) ? Number(box[0x2]) : Number(box?.['z']);
+  return [Number['isFinite'](value43) ? value43 : 0x0, 0x0, Number['isFinite'](value44) ? value44 : 0x0];
 }
-export function normalizeStoryboard3DRightSidebarWidth(_0x4783c4, _0x47ceeb = 0x5a0, _0x386054 = 'assets') {
-  const _0x434687 = Number(_0x47ceeb),
-    _0x16973a = Number['isFinite'](_0x434687)
-      ? _0x434687 - STORYBOARD_3D_RIGHT_SIDEBAR_VIEWPORT_MIN_WIDTH
+export function normalizeStoryboard3DRightSidebarWidth(value45, value46 = 0x5a0, value47 = 'assets') {
+  const value48 = Number(value46),
+    value49 = Number['isFinite'](value48)
+      ? value48 - STORYBOARD_3D_RIGHT_SIDEBAR_VIEWPORT_MIN_WIDTH
       : STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH,
-    _0x5a6066 = Math['max'](
+    value50 = Math['max'](
       STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH,
-      Math['min'](STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH, _0x16973a),
+      Math['min'](STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH, value49),
     ),
-    _0x594d11 = _0x4783c4 == null ? Number['NaN'] : Number(_0x4783c4),
-    _0x43c46f = _0x386054 !== 'assets',
-    _0x5a519a = Math['min'](
-      _0x43c46f ? 0x1e0 : 0x3c0,
+    value51 = value45 == null ? Number['NaN'] : Number(value45),
+    value52 = value47 !== 'assets',
+    value53 = Math['min'](
+      value52 ? 0x1e0 : 0x3c0,
       Math['max'](
         STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH,
-        Number['isFinite'](_0x434687) ? _0x434687 * (_0x43c46f ? 0.21 : 0.42) : _0x43c46f ? 0x168 : 0x2d0,
+        Number['isFinite'](value48) ? value48 * (value52 ? 0.21 : 0.42) : value52 ? 0x168 : 0x2d0,
       ),
     );
   return Math['round'](
     Math['max'](
       STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH,
-      Math['min'](_0x5a6066, Number['isFinite'](_0x594d11) ? _0x594d11 : _0x5a519a),
+      Math['min'](value50, Number['isFinite'](value51) ? value51 : value53),
     ),
   );
 }
-export function normalizeStoryboard3DTimelineHeight(_0x256bf1, _0x46cf0b = 0x384) {
-  const _0x66376c = Number(_0x46cf0b),
-    _0x10b4e7 = Number['isFinite'](_0x66376c)
+export function normalizeStoryboard3DTimelineHeight(value54, value55 = 0x384) {
+  const value56 = Number(value55),
+    value57 = Number['isFinite'](value56)
       ? Math['min'](
           STORYBOARD_3D_TIMELINE_MIN_HEIGHT,
-          Math['max'](0x78, _0x66376c - STORYBOARD_3D_VIEWPORT_MIN_HEIGHT),
+          Math['max'](0x78, value56 - STORYBOARD_3D_VIEWPORT_MIN_HEIGHT),
         )
       : STORYBOARD_3D_TIMELINE_MIN_HEIGHT,
-    _0x393893 = Number['isFinite'](_0x66376c)
-      ? _0x66376c - STORYBOARD_3D_VIEWPORT_MIN_HEIGHT
+    value58 = Number['isFinite'](value56)
+      ? value56 - STORYBOARD_3D_VIEWPORT_MIN_HEIGHT
       : STORYBOARD_3D_TIMELINE_MAX_HEIGHT,
-    _0x2eafe5 = Math['max'](_0x10b4e7, Math['min'](STORYBOARD_3D_TIMELINE_MAX_HEIGHT, _0x393893)),
-    _0x777c51 = _0x256bf1 == null ? Number['NaN'] : Number(_0x256bf1),
-    _0x5af6dd = Math['min'](STORYBOARD_3D_TIMELINE_DEFAULT_HEIGHT, _0x2eafe5);
+    value59 = Math['max'](value57, Math['min'](STORYBOARD_3D_TIMELINE_MAX_HEIGHT, value58)),
+    value60 = value54 == null ? Number['NaN'] : Number(value54),
+    value61 = Math['min'](STORYBOARD_3D_TIMELINE_DEFAULT_HEIGHT, value59);
   return Math['round'](
-    Math['max'](_0x10b4e7, Math['min'](_0x2eafe5, Number['isFinite'](_0x777c51) ? _0x777c51 : _0x5af6dd)),
+    Math['max'](value57, Math['min'](value59, Number['isFinite'](value60) ? value60 : value61)),
   );
 }
-function getCharacterPoseStatusText(_0xb0a470 = {}) {
-  if (_0xb0a470['status'] === 'running') return '正在本地识别“' + (_0xb0a470['fileName'] || '参考图') + '”…';
-  if (_0xb0a470['status'] === 'error') return _0xb0a470['error'] || '姿势识别失败。';
-  if (_0xb0a470['status'] === 'success') {
-    const _0x40cce1 = Math['round']((Number(_0xb0a470['confidence']) || 0x0) * 0x64),
-      _0xce2a63 = _0xb0a470['warningCount'] > 0x0 ? ' · 部分遮挡关节已跳过' : '';
-    return (
-      '已应用 ' + (Number(_0xb0a470['boneCount']) || 0x0) + ' 个骨骼 · 置信度 ' + _0x40cce1 + '%' + _0xce2a63
-    );
+function getCharacterPoseStatusText(response = {}) {
+  if (response['status'] === 'running') return '正在本地识别“' + (response['fileName'] || '参考图') + '”…';
+  if (response['status'] === 'error') return response['error'] || '姿势识别失败。';
+  if (response['status'] === 'success') {
+    const value62 = Math['round']((Number(response['confidence']) || 0x0) * 0x64),
+      value63 = response['warningCount'] > 0x0 ? ' · 部分遮挡关节已跳过' : '';
+    return '已应用 ' + (Number(response['boneCount']) || 0x0) + ' 个骨骼 · 置信度 ' + value62 + '%' + value63;
   }
   return '支持单人全身\x20JPG、PNG、WebP；图片仅在本机处理。';
 }
-function reconcileCharacterPoseState(_0x4ff658, _0x543b23) {
+function reconcileCharacterPoseState(value64, response2) {
   if (
-    _0x543b23?.['status'] === 'success' &&
-    _0x543b23['poseSignature'] !== createStoryboard3DBoneOverridesSignature(_0x4ff658?.['boneOverrides'])
+    response2?.['status'] === 'success' &&
+    response2['poseSignature'] !== createStoryboard3DBoneOverridesSignature(value64?.['boneOverrides'])
   )
-    return { status: 'idle', objectId: String(_0x4ff658?.['id'] || '') };
-  return _0x543b23;
+    return { status: 'idle', objectId: String(value64?.['id'] || '') };
+  return response2;
 }
-function renderCharacterControls(_0x49cec9, _0x363e43 = 'Head', _0x282543 = null) {
-  const _0x513459 =
-      STORYBOARD_3D_ACTIONS['find']((_0x22e521) => _0x22e521['id'] === _0x49cec9['actionId']) ||
+function renderCharacterControls(value65, value66 = 'Head', value67 = null) {
+  const value68 =
+      STORYBOARD_3D_ACTIONS['find']((value69) => value69['id'] === value65['actionId']) ||
       STORYBOARD_3D_ACTIONS[0x0],
-    _0x3d9fdd = quaternionToStoryboard3DEuler(_0x49cec9['boneOverrides']?.[_0x363e43]),
-    _0x2423c2 = _0x282543 || { status: 'idle' },
-    _0x5b4d8d = _0x2423c2['status'] === 'running',
-    _0x2732e4 = Object['keys'](_0x49cec9['boneOverrides'] || {})['length'] > 0x0;
+    storyboard3DEuler = quaternionToStoryboard3DEuler(value65['boneOverrides']?.[value66]),
+    response3 = value67 || { status: 'idle' },
+    enabled7 = response3['status'] === 'running',
+    enabled8 = Object['keys'](value65['boneOverrides'] || {})['length'] > 0x0;
   return (
     '<div class="storyboard-3d-character-controls">\n    <label><span>人偶外观</span><select data-storyboard-3d-character-field="characterStyle" data-object-id="' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22><option\x20value=\x22articulated\x22\x20' +
-    (_0x49cec9['characterStyle'] !== 'anatomical' ? 'selected' : '') +
+    (value65['characterStyle'] !== 'anatomical' ? 'selected' : '') +
     '>关节预演人偶</option><option value="anatomical" ' +
-    (_0x49cec9['characterStyle'] === 'anatomical' ? 'selected' : '') +
+    (value65['characterStyle'] === 'anatomical' ? 'selected' : '') +
     '>人体模型</option></select></label>\n    <label><span>体型</span><select data-storyboard-3d-character-field="bodyPresetId" data-object-id="' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22>' +
-    renderSelectOptions(STORYBOARD_3D_BODY_PRESETS, _0x49cec9['bodyPresetId']) +
+    renderSelectOptions(STORYBOARD_3D_BODY_PRESETS, value65['bodyPresetId']) +
     '</select></label>\n    <label><span>动作</span><select data-storyboard-3d-character-field="actionId" data-object-id="' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22>' +
-    renderSelectOptions(STORYBOARD_3D_ACTIONS, _0x49cec9['actionId']) +
+    renderSelectOptions(STORYBOARD_3D_ACTIONS, value65['actionId']) +
     '</select></label>\n    <label><span>左手</span><select data-storyboard-3d-character-field="leftHandPoseId" data-object-id="' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22>' +
-    renderSelectOptions(STORYBOARD_3D_HAND_POSES, _0x49cec9['leftHandPoseId']) +
+    renderSelectOptions(STORYBOARD_3D_HAND_POSES, value65['leftHandPoseId']) +
     '</select></label>\x0a\x20\x20\x20\x20<label><span>右手</span><select\x20data-storyboard-3d-character-field=\x22rightHandPoseId\x22\x20data-object-id=\x22' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22>' +
-    renderSelectOptions(STORYBOARD_3D_HAND_POSES, _0x49cec9['rightHandPoseId']) +
+    renderSelectOptions(STORYBOARD_3D_HAND_POSES, value65['rightHandPoseId']) +
     '</select></label>\n    <label><span>发型</span><input type="text" maxlength="80" value="' +
-    escapeHtml(_0x49cec9['hairId'] || '') +
+    escapeHtml(value65['hairId'] || '') +
     '\x22\x20placeholder=\x22默认\x22\x20data-storyboard-3d-character-field=\x22hairId\x22\x20data-object-id=\x22' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '"></label>\n    <label class="is-wide"><span>附件 ID（逗号分隔）</span><input type="text" maxlength="500" value="' +
-    escapeHtml((_0x49cec9['attachmentIds'] || [])['join'](',\x20')) +
+    escapeHtml((value65['attachmentIds'] || [])['join'](',\x20')) +
     '" placeholder="hat-01, bag-02" data-storyboard-3d-character-attachments data-object-id="' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22></label>\x0a\x20\x20\x20\x20<label\x20class=\x22is-wide\x22><span>动作时间\x20' +
-    Number(_0x49cec9['actionTime'] || 0x0)['toFixed'](0x2) +
+    Number(value65['actionTime'] || 0x0)['toFixed'](0x2) +
     's</span><input type="range" min="0" max="' +
-    escapeHtml(_0x513459['duration'] || 0x1) +
+    escapeHtml(value68['duration'] || 0x1) +
     '" step="0.01" value="' +
-    escapeHtml(_0x49cec9['actionTime'] || 0x0) +
+    escapeHtml(value65['actionTime'] || 0x0) +
     '" data-storyboard-3d-character-time data-object-id="' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '"></label>\n    <button type="button" data-storyboard-3d-action="toggle-character-play" data-object-id="' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22>' +
-    (_0x49cec9['actionPlaying'] ? '暂停动作' : '播放动作') +
+    (value65['actionPlaying'] ? '暂停动作' : '播放动作') +
     '</button>\x0a\x20\x20\x20\x20<section\x20class=\x22storyboard-3d-character-pose-from-image\x22\x20data-storyboard-3d-character-pose\x20data-object-id=\x22' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '" data-pose-status="' +
-    escapeHtml(_0x2423c2['status'] || 'idle') +
+    escapeHtml(response3['status'] || 'idle') +
     '" data-has-pose="' +
-    _0x2732e4 +
+    enabled8 +
     '\x22\x20aria-busy=\x22' +
-    _0x5b4d8d +
+    enabled7 +
     '">\n      <div>\n        <strong>参考图姿势</strong>\n        <small>MediaPipe Heavy · 本地单人识别</small>\n      </div>\n      <div class="storyboard-3d-character-pose-actions">\n        <button type="button" class="is-primary" data-storyboard-3d-action="extract-character-pose" data-object-id="' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22\x20' +
-    (_0x5b4d8d ? 'disabled' : '') +
+    (enabled7 ? 'disabled' : '') +
     '>' +
-    (_0x5b4d8d ? '识别中…' : '从图片提取姿势') +
+    (enabled7 ? '识别中…' : '从图片提取姿势') +
     '</button>\n        <button type="button" data-storyboard-3d-action="' +
-    (_0x5b4d8d ? 'cancel-character-pose' : 'reset-character-pose') +
+    (enabled7 ? 'cancel-character-pose' : 'reset-character-pose') +
     '\x22\x20data-object-id=\x22' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22\x20' +
-    (!_0x5b4d8d && !_0x2732e4 ? 'disabled' : '') +
+    (!enabled7 && !enabled8 ? 'disabled' : '') +
     '>' +
-    (_0x5b4d8d ? '取消识别' : '重置骨骼') +
+    (enabled7 ? '取消识别' : '重置骨骼') +
     '</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<p\x20data-storyboard-3d-character-pose-status\x20role=\x22status\x22\x20aria-live=\x22polite\x22>' +
-    escapeHtml(getCharacterPoseStatusText(_0x2423c2)) +
+    escapeHtml(getCharacterPoseStatusText(response3)) +
     '</p>\x0a\x20\x20\x20\x20</section>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-bone-editor\x22>\x0a\x20\x20\x20\x20\x20\x20<label><span>骨骼微调</span><select\x20data-storyboard-3d-bone-select\x20data-object-id=\x22' +
-    escapeHtml(_0x49cec9['id']) +
+    escapeHtml(value65['id']) +
     '\x22>' +
     STORYBOARD_3D_EDITABLE_BONES['map'](
-      ([_0x5974c3, _0x2c5304]) =>
+      ([value70, value71]) =>
         '<option value="' +
-        _0x5974c3 +
+        value70 +
         '\x22\x20' +
-        (_0x5974c3 === _0x363e43 ? 'selected' : '') +
+        (value70 === value66 ? 'selected' : '') +
         '>' +
-        _0x2c5304 +
+        value71 +
         '</option>',
     )['join']('') +
     '</select></label>\n      <div>' +
     ['x', 'y', 'z']
       ['map'](
-        (_0x5a3d9d) =>
+        (value72) =>
           '<label><span>' +
-          _0x5a3d9d['toUpperCase']() +
+          value72['toUpperCase']() +
           '°</span><input\x20type=\x22number\x22\x20min=\x22-180\x22\x20max=\x22180\x22\x20step=\x221\x22\x20value=\x22' +
-          escapeHtml(Math['round'](((_0x3d9fdd[_0x5a3d9d] || 0x0) * 0xb4) / Math['PI'])) +
+          escapeHtml(Math['round'](((storyboard3DEuler[value72] || 0x0) * 0xb4) / Math['PI'])) +
           '" data-storyboard-3d-bone-axis="' +
-          _0x5a3d9d +
+          value72 +
           '" data-bone-name="' +
-          escapeHtml(_0x363e43) +
+          escapeHtml(value66) +
           '" data-object-id="' +
-          escapeHtml(_0x49cec9['id']) +
+          escapeHtml(value65['id']) +
           '"></label>',
       )
       ['join']('') +
     '</div>\n    </div>\n  </div>'
   );
 }
-function renderLightControls(_0x2ac24d) {
+function renderLightControls(value73) {
   return (
     '<div\x20class=\x22storyboard-3d-character-controls\x20storyboard-3d-light-controls\x22>\x0a\x20\x20\x20\x20<label><span>类型</span><select\x20data-storyboard-3d-light-field=\x22lightType\x22\x20data-object-id=\x22' +
-    escapeHtml(_0x2ac24d['id']) +
+    escapeHtml(value73['id']) +
     '">\n      ' +
     ['ambient', 'directional', 'point', 'spot']
       ['map'](
-        (_0x189183) =>
+        (value74) =>
           '<option\x20value=\x22' +
-          _0x189183 +
+          value74 +
           '\x22\x20' +
-          (_0x2ac24d['lightType'] === _0x189183 ? 'selected' : '') +
+          (value73['lightType'] === value74 ? 'selected' : '') +
           '>' +
-          _0x189183 +
+          value74 +
           '</option>',
       )
       ['join']('') +
     '\x0a\x20\x20\x20\x20</select></label>\x0a\x20\x20\x20\x20<label><span>强度</span><input\x20type=\x22number\x22\x20min=\x220\x22\x20max=\x22100\x22\x20step=\x220.1\x22\x20value=\x22' +
-    escapeHtml(_0x2ac24d['intensity'] ?? 0x1) +
+    escapeHtml(value73['intensity'] ?? 0x1) +
     '" data-storyboard-3d-light-field="intensity" data-object-id="' +
-    escapeHtml(_0x2ac24d['id']) +
+    escapeHtml(value73['id']) +
     '\x22></label>\x0a\x20\x20\x20\x20<label><span>颜色</span><input\x20type=\x22color\x22\x20value=\x22' +
-    escapeHtml(_0x2ac24d['color'] || '#ffffff') +
+    escapeHtml(value73['color'] || '#ffffff') +
     '" data-storyboard-3d-light-field="color" data-object-id="' +
-    escapeHtml(_0x2ac24d['id']) +
+    escapeHtml(value73['id']) +
     '"></label>\n    <label><span>衰减距离</span><input type="number" min="0" max="10000" step="0.1" value="' +
-    escapeHtml(_0x2ac24d['distance'] ?? 0x0) +
+    escapeHtml(value73['distance'] ?? 0x0) +
     '\x22\x20data-storyboard-3d-light-field=\x22distance\x22\x20data-object-id=\x22' +
-    escapeHtml(_0x2ac24d['id']) +
+    escapeHtml(value73['id']) +
     '"></label>\n    <label><span>衰减系数</span><input type="number" min="0" max="10" step="0.1" value="' +
-    escapeHtml(_0x2ac24d['decay'] ?? 0x2) +
+    escapeHtml(value73['decay'] ?? 0x2) +
     '" data-storyboard-3d-light-field="decay" data-object-id="' +
-    escapeHtml(_0x2ac24d['id']) +
+    escapeHtml(value73['id']) +
     '"></label>\n    <label><span>聚光角度°</span><input type="number" min="1" max="179" step="1" value="' +
-    escapeHtml(Math['round'](((_0x2ac24d['angle'] ?? Math['PI'] / 0x6) * 0xb4) / Math['PI'])) +
+    escapeHtml(Math['round'](((value73['angle'] ?? Math['PI'] / 0x6) * 0xb4) / Math['PI'])) +
     '" data-storyboard-3d-light-field="angleDegrees" data-object-id="' +
-    escapeHtml(_0x2ac24d['id']) +
+    escapeHtml(value73['id']) +
     '"></label>\n    <label class="is-check"><input type="checkbox" data-storyboard-3d-light-field="castShadow" data-object-id="' +
-    escapeHtml(_0x2ac24d['id']) +
+    escapeHtml(value73['id']) +
     '\x22\x20' +
-    (_0x2ac24d['castShadow'] === !![] ? 'checked' : '') +
+    (value73['castShadow'] === !![] ? 'checked' : '') +
     '>投射阴影</label>\n  </div>'
   );
 }
-function renderBackgroundCalibrationGuide(_0x276c23) {
-  const _0x190971 = normalizeStoryboard3DBackgroundCalibration(_0x276c23);
-  if (!_0x190971['imageUrl']) return '';
-  const _0x1d0fe8 = computeStoryboard3DBackgroundGuideGeometry(_0x190971),
-    [_0x1f913a, _0x10aabe] = _0x1d0fe8['vanishingPoint'],
-    _0x42fb15 = Math['round'](_0x190971['calibrationConfidence'] * 0x64);
+function renderBackgroundCalibrationGuide(value75) {
+  const storyboard3DBackgroundCalibration = normalizeStoryboard3DBackgroundCalibration(value75);
+  if (!storyboard3DBackgroundCalibration['imageUrl']) return '';
+  const storyboard3DBackgroundGuideGeometry = computeStoryboard3DBackgroundGuideGeometry(
+      storyboard3DBackgroundCalibration,
+    ),
+    [value76, value77] = storyboard3DBackgroundGuideGeometry['vanishingPoint'],
+    value78 = Math['round'](storyboard3DBackgroundCalibration['calibrationConfidence'] * 0x64);
   return (
     '<div class="storyboard-3d-background-calibration-guide" aria-hidden="true">\n    <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">\n      <polygon class="storyboard-3d-background-ground-region" data-storyboard-3d-background-ground-region points="' +
-    _0x1d0fe8['groundPoints'] +
+    storyboard3DBackgroundGuideGeometry['groundPoints'] +
     '"></polygon>\n      <line class="storyboard-3d-background-axis" data-storyboard-3d-background-axis-left x1="' +
-    _0x1f913a +
+    value76 +
     '" y1="' +
-    _0x10aabe +
+    value77 +
     '" x2="0" y2="1000"></line>\n      <line class="storyboard-3d-background-axis" data-storyboard-3d-background-axis-right x1="' +
-    _0x1f913a +
+    value76 +
     '" y1="' +
-    _0x10aabe +
+    value77 +
     '" x2="1000" y2="1000"></line>\n      <line class="storyboard-3d-background-horizon" data-storyboard-3d-background-horizon-line x1="0" y1="' +
-    _0x1d0fe8['leftY'] +
+    storyboard3DBackgroundGuideGeometry['leftY'] +
     '" x2="1000" y2="' +
-    _0x1d0fe8['rightY'] +
+    storyboard3DBackgroundGuideGeometry['rightY'] +
     '"></line>\n      <line class="storyboard-3d-background-horizon-hit" data-storyboard-3d-background-horizon-line data-storyboard-3d-background-drag="horizon" x1="0" y1="' +
-    _0x1d0fe8['leftY'] +
+    storyboard3DBackgroundGuideGeometry['leftY'] +
     '" x2="1000" y2="' +
-    _0x1d0fe8['rightY'] +
+    storyboard3DBackgroundGuideGeometry['rightY'] +
     '\x22></line>\x0a\x20\x20\x20\x20\x20\x20<circle\x20class=\x22storyboard-3d-background-vanishing-point\x22\x20data-storyboard-3d-background-vanishing-point\x20cx=\x22' +
-    _0x1f913a +
+    value76 +
     '" cy="' +
-    _0x10aabe +
+    value77 +
     '" r="9"></circle>\n      <circle class="storyboard-3d-background-vanishing-point-hit" data-storyboard-3d-background-vanishing-point data-storyboard-3d-background-drag="vanishing-point" cx="' +
-    _0x1f913a +
+    value76 +
     '\x22\x20cy=\x22' +
-    _0x10aabe +
+    value77 +
     '\x22\x20r=\x2224\x22></circle>\x0a\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20<span\x20data-storyboard-3d-background-guide-status>拖动青线或黄点调整\x20·\x20' +
-    _0x42fb15 +
+    value78 +
     '%</span>\x0a\x20\x20</div>'
   );
 }
-function renderSceneControls(_0x326553, _0xd727ac, _0x511a73 = {}, _0xf72154 = ![]) {
-  const _0x53c6c5 = normalizeStoryboard3DBackgroundCalibration(_0x326553?.['background']),
-    _0x4b497b = Math['max'](
+function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
+  const storyboard3DBackgroundCalibration2 = normalizeStoryboard3DBackgroundCalibration(
+      error7?.['background'],
+    ),
+    value82 = Math['max'](
       0x0,
       Math['min'](
         0x1,
-        _0x53c6c5['horizonY'] + _0x53c6c5['horizonSlope'] * (_0x53c6c5['vanishingPoint'][0x0] - 0.5),
+        storyboard3DBackgroundCalibration2['horizonY'] +
+          storyboard3DBackgroundCalibration2['horizonSlope'] *
+            (storyboard3DBackgroundCalibration2['vanishingPoint'][0x0] - 0.5),
       ),
     );
   return (
     '<section\x20class=\x22storyboard-3d-inspector-card\x20storyboard-3d-scene-controls\x22>\x0a\x20\x20\x20\x20<small>场景设置</small>\x0a\x20\x20\x20\x20<input\x20class=\x22storyboard-3d-scene-name-input\x22\x20type=\x22text\x22\x20maxlength=\x22120\x22\x20value=\x22' +
-    escapeHtml(_0x326553?.['name'] || '') +
+    escapeHtml(error7?.['name'] || '') +
     '\x22\x20data-storyboard-3d-scene-name\x20data-scene-id=\x22' +
-    escapeHtml(_0x326553?.['id'] || '') +
+    escapeHtml(error7?.['id'] || '') +
     '" aria-label="场景名称">\n    <details class="storyboard-3d-scene-environment" data-storyboard-3d-scene-environment ' +
-    (_0xf72154 ? 'open' : '') +
+    (value81 ? 'open' : '') +
     '>\n      <summary data-storyboard-3d-action="toggle-scene-environment"><span>环境与参考背景</span><small>展开设置</small></summary>\n      <div class="storyboard-3d-scene-control-grid">\n      <label><span>环境</span><select data-storyboard-3d-scene-field="environmentType">\n        ' +
     ['empty', 'outdoor', 'indoor', 'studio']
       ['map'](
-        (_0x15e5db) =>
+        (value83) =>
           '<option value="' +
-          _0x15e5db +
+          value83 +
           '\x22\x20' +
-          (_0x326553?.['environment']?.['type'] === _0x15e5db ? 'selected' : '') +
+          (error7?.['environment']?.['type'] === value83 ? 'selected' : '') +
           '>' +
-          _0x15e5db +
+          value83 +
           '</option>',
       )
       ['join']('') +
     '\n      </select></label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-scene-field="showGrid" ' +
-    (_0x326553?.['environment']?.['showGrid'] !== ![] ? 'checked' : '') +
+    (error7?.['environment']?.['showGrid'] !== ![] ? 'checked' : '') +
     '>显示网格</label>\x0a\x20\x20\x20\x20\x20\x20<label\x20class=\x22is-check\x22><input\x20type=\x22checkbox\x22\x20data-storyboard-3d-scene-field=\x22showOutline\x22\x20' +
-    (_0x326553?.['environment']?.['showOutline'] !== ![] ? 'checked' : '') +
+    (error7?.['environment']?.['showOutline'] !== ![] ? 'checked' : '') +
     '>选择描边</label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-scene-field="enableShadows" ' +
-    (_0x326553?.['environment']?.['enableShadows'] !== ![] ? 'checked' : '') +
+    (error7?.['environment']?.['enableShadows'] !== ![] ? 'checked' : '') +
     '>启用阴影</label>\n      <label class="is-wide"><span>参考背景 URL</span><input type="url" value="' +
-    escapeHtml(_0x53c6c5['imageUrl']) +
+    escapeHtml(storyboard3DBackgroundCalibration2['imageUrl']) +
     '" placeholder="https://…" data-storyboard-3d-background-field="imageUrl"></label>\n      <label><span>水平 FOV</span><input type="number" min="10" max="170" step="1" value="' +
-    _0x53c6c5['horizontalFov'] +
+    storyboard3DBackgroundCalibration2['horizontalFov'] +
     '" data-storyboard-3d-background-field="horizontalFov"></label>\n      <label><span>垂直 FOV</span><input type="number" min="10" max="170" step="1" value="' +
-    (_0x53c6c5['verticalFov'] || 0x28) +
+    (storyboard3DBackgroundCalibration2['verticalFov'] || 0x28) +
     '" data-storyboard-3d-background-field="verticalFov"></label>\n      <label><span>地平线</span><input type="number" min="0" max="1" step="0.01" value="' +
-    _0x53c6c5['horizonY'] +
+    storyboard3DBackgroundCalibration2['horizonY'] +
     '" data-storyboard-3d-background-field="horizonY"></label>\n      <label><span>地平线倾斜</span><input type="number" min="-1" max="1" step="0.01" value="' +
-    _0x53c6c5['horizonSlope'] +
+    storyboard3DBackgroundCalibration2['horizonSlope'] +
     '" data-storyboard-3d-background-field="horizonSlope"></label>\n      <label><span>相机高度 m</span><input type="number" min="0.2" max="20" step="0.1" value="' +
-    _0x53c6c5['cameraHeight'] +
+    storyboard3DBackgroundCalibration2['cameraHeight'] +
     '\x22\x20data-storyboard-3d-background-field=\x22cameraHeight\x22></label>\x0a\x20\x20\x20\x20\x20\x20<label><span>背景缩放</span><input\x20type=\x22number\x22\x20min=\x220.1\x22\x20max=\x2210\x22\x20step=\x220.1\x22\x20value=\x22' +
-    _0x53c6c5['imageScale'] +
+    storyboard3DBackgroundCalibration2['imageScale'] +
     '\x22\x20data-storyboard-3d-background-field=\x22imageScale\x22></label>\x0a\x20\x20\x20\x20\x20\x20<label><span>消失点\x20X</span><input\x20type=\x22number\x22\x20min=\x220\x22\x20max=\x221\x22\x20step=\x220.01\x22\x20value=\x22' +
-    _0x53c6c5['vanishingPoint'][0x0] +
+    storyboard3DBackgroundCalibration2['vanishingPoint'][0x0] +
     '\x22\x20data-storyboard-3d-background-field=\x22vanishingPointX\x22></label>\x0a\x20\x20\x20\x20\x20\x20<label><span>消失点\x20Y（自动）</span><input\x20type=\x22number\x22\x20value=\x22' +
-    _0x4b497b['toFixed'](0x3) +
+    value82['toFixed'](0x3) +
     '" disabled></label>\n      <label><span>背景偏移 X</span><input type="number" min="-2" max="2" step="0.01" value="' +
-    _0x53c6c5['imageOffset'][0x0] +
+    storyboard3DBackgroundCalibration2['imageOffset'][0x0] +
     '" data-storyboard-3d-background-field="imageOffsetX"></label>\n      <label><span>背景偏移 Y</span><input type="number" min="-2" max="2" step="0.01" value="' +
-    _0x53c6c5['imageOffset'][0x1] +
+    storyboard3DBackgroundCalibration2['imageOffset'][0x1] +
     '\x22\x20data-storyboard-3d-background-field=\x22imageOffsetY\x22></label>\x0a\x20\x20\x20\x20\x20\x20<label\x20class=\x22is-check\x22><input\x20type=\x22checkbox\x22\x20data-storyboard-3d-background-lock\x20' +
-    (_0x53c6c5['lockedCamera'] ? 'checked' : '') +
+    (storyboard3DBackgroundCalibration2['lockedCamera'] ? 'checked' : '') +
     '\x20' +
-    (!_0x53c6c5['imageUrl'] ? 'disabled' : '') +
+    (!storyboard3DBackgroundCalibration2['imageUrl'] ? 'disabled' : '') +
     '>锁定背景机位</label>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</details>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-viewport-settings\x22>\x0a\x20\x20\x20\x20\x20\x20<label><span>变换空间</span><select\x20data-storyboard-3d-viewport-setting=\x22transformSpace\x22><option\x20value=\x22world\x22\x20' +
-    (_0x511a73['transformSpace'] !== 'local' ? 'selected' : '') +
+    (value80['transformSpace'] !== 'local' ? 'selected' : '') +
     '>世界</option><option value="local" ' +
-    (_0x511a73['transformSpace'] === 'local' ? 'selected' : '') +
+    (value80['transformSpace'] === 'local' ? 'selected' : '') +
     '>本地</option></select></label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-viewport-setting="groundLock" ' +
-    (_0x511a73['groundLock'] ? 'checked' : '') +
+    (value80['groundLock'] ? 'checked' : '') +
     '>地面吸附</label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-viewport-setting="uniformScale" ' +
-    (_0x511a73['uniformScale'] ? 'checked' : '') +
+    (value80['uniformScale'] ? 'checked' : '') +
     '>均匀缩放</label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-viewport-setting="snapEnabled" ' +
-    (_0x511a73['snapEnabled'] ? 'checked' : '') +
+    (value80['snapEnabled'] ? 'checked' : '') +
     '>启用吸附</label>\n      <label><span>移动步长</span><input type="number" min="0.01" max="10" step="0.01" value="' +
-    escapeHtml(_0x511a73['translationSnap'] || 0.25) +
+    escapeHtml(value80['translationSnap'] || 0.25) +
     '" data-storyboard-3d-viewport-setting="translationSnap"></label>\n      <label><span>旋转步长°</span><input type="number" min="1" max="180" step="1" value="' +
-    escapeHtml(Math['round'](((_0x511a73['rotationSnap'] || Math['PI'] / 0xc) * 0xb4) / Math['PI'])) +
+    escapeHtml(Math['round'](((value80['rotationSnap'] || Math['PI'] / 0xc) * 0xb4) / Math['PI'])) +
     '" data-storyboard-3d-viewport-setting="rotationSnapDegrees"></label>\n      <label><span>缩放步长</span><input type="number" min="0.01" max="10" step="0.01" value="' +
-    escapeHtml(_0x511a73['scaleSnap'] || 0.1) +
+    escapeHtml(value80['scaleSnap'] || 0.1) +
     '" data-storyboard-3d-viewport-setting="scaleSnap"></label>\n    </div>\n    <div class="storyboard-3d-scene-control-actions">\n      <button type="button" data-storyboard-3d-action="add-light">添加灯光</button>\n      <button type="button" data-storyboard-3d-action="upload-background">上传背景</button>\n      <button type="button" data-storyboard-3d-action="analyze-background" ' +
-    (_0x53c6c5['binaryAssetId'] ? '' : 'disabled') +
+    (storyboard3DBackgroundCalibration2['binaryAssetId'] ? '' : 'disabled') +
     '>重新自动匹配</button>\n      <button type="button" data-storyboard-3d-action="clear-background" ' +
-    (_0x53c6c5['imageUrl'] ? '' : 'disabled') +
+    (storyboard3DBackgroundCalibration2['imageUrl'] ? '' : 'disabled') +
     '>清除背景</button>\n      <small>' +
-    (_0x53c6c5['lockedCamera']
+    (storyboard3DBackgroundCalibration2['lockedCamera']
       ? '已锁定 ' +
-        escapeHtml(formatFocalLength(_0xd727ac?.['camera']?.['focalLength']) + 'mm') +
+        escapeHtml(formatFocalLength(value79?.['camera']?.['focalLength']) + 'mm') +
         ' · 匹配度 ' +
-        Math['round'](_0x53c6c5['calibrationConfidence'] * 0x64) +
+        Math['round'](storyboard3DBackgroundCalibration2['calibrationConfidence'] * 0x64) +
         '%'
       : '调整地平线、消失点和相机高度后再锁定') +
     '</small>\n    </div>\n  </section>'
   );
 }
 function renderNavigationSettings(
-  _0x2f3472,
+  value84,
   { open: open = ![], viewportSettings: viewportSettings = {} } = {},
 ) {
-  const _0x5945e1 =
-      STORYBOARD_3D_NAVIGATION_PRESETS[_0x2f3472['preset']] || STORYBOARD_3D_NAVIGATION_PRESETS['unity'],
-    _0x289d15 = Object['values'](STORYBOARD_3D_NAVIGATION_PRESETS)
+  const value85 =
+      STORYBOARD_3D_NAVIGATION_PRESETS[value84['preset']] || STORYBOARD_3D_NAVIGATION_PRESETS['unity'],
+    value86 = Object['values'](STORYBOARD_3D_NAVIGATION_PRESETS)
       ['map'](
-        (_0x17ed54) =>
+        (value87) =>
           '<label class="storyboard-3d-navigation-preset ' +
-          (_0x17ed54['id'] === _0x5945e1['id'] ? 'is-active' : '') +
+          (value87['id'] === value85['id'] ? 'is-active' : '') +
           '">\n      <input type="radio" name="storyboard-3d-navigation-preset" value="' +
-          escapeHtml(_0x17ed54['id']) +
+          escapeHtml(value87['id']) +
           '\x22\x20data-storyboard-3d-navigation-preset\x20' +
-          (_0x17ed54['id'] === _0x5945e1['id'] ? 'checked' : '') +
+          (value87['id'] === value85['id'] ? 'checked' : '') +
           '>\n      <strong>' +
-          escapeHtml(_0x17ed54['label']) +
+          escapeHtml(value87['label']) +
           '</strong>\n      <span>' +
-          escapeHtml(_0x17ed54['summary']) +
+          escapeHtml(value87['summary']) +
           '</span>\x0a\x20\x20\x20\x20</label>',
       )
       ['join'](''),
-    _0x56eb1d = (_0x23d709, _0x1c6f4d) =>
+    handler2 = (value88, value89) =>
       '<label class="storyboard-3d-navigation-slider">\n    <span>' +
-      escapeHtml(_0x1c6f4d) +
+      escapeHtml(value89) +
       '\x20<output\x20data-storyboard-3d-navigation-output=\x22' +
-      _0x23d709 +
+      value88 +
       '\x22>' +
-      Number(_0x2f3472[_0x23d709])['toFixed'](0x2) +
+      Number(value84[value88])['toFixed'](0x2) +
       '×</output></span>\n    <input type="range" min="0.2" max="3" step="0.05" value="' +
-      escapeHtml(_0x2f3472[_0x23d709]) +
+      escapeHtml(value84[value88]) +
       '" data-storyboard-3d-navigation-setting="' +
-      _0x23d709 +
+      value88 +
       '">\n  </label>';
   return (
     '<details class="storyboard-3d-global-settings" ' +
     (open ? 'open' : '') +
     '>\n    <summary title="3D 操作习惯设置 (K)" aria-keyshortcuts="K"><span aria-hidden="true">⚙</span>全局设置<small data-storyboard-3d-navigation-current>' +
-    escapeHtml(_0x5945e1['label']) +
+    escapeHtml(value85['label']) +
     '</small></summary>\n    <section class="storyboard-3d-global-settings-panel" aria-label="3D 全局操作设置">\n      <header><div><strong>视口操作习惯</strong><span>每次只启用一套映射，设置会保存到本机。</span></div></header>\n      <div class="storyboard-3d-navigation-presets">' +
-    _0x289d15 +
+    value86 +
     '</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-navigation-tuning\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
-    _0x56eb1d('orbitSensitivity', '环绕灵敏度') +
+    handler2('orbitSensitivity', '环绕灵敏度') +
     '\n        ' +
-    _0x56eb1d('panSensitivity', '平移灵敏度') +
+    handler2('panSensitivity', '平移灵敏度') +
     '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
-    _0x56eb1d('zoomSensitivity', '缩放灵敏度') +
+    handler2('zoomSensitivity', '缩放灵敏度') +
     '\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><input\x20type=\x22checkbox\x22\x20data-storyboard-3d-navigation-setting=\x22invertOrbitX\x22\x20' +
-    (_0x2f3472['invertOrbitX'] ? 'checked' : '') +
+    (value84['invertOrbitX'] ? 'checked' : '') +
     '>反向环绕 X</label>\n        <label><input type="checkbox" data-storyboard-3d-navigation-setting="invertOrbitY" ' +
-    (_0x2f3472['invertOrbitY'] ? 'checked' : '') +
+    (value84['invertOrbitY'] ? 'checked' : '') +
     '>反向环绕 Y</label>\n        <label><input type="checkbox" data-storyboard-3d-navigation-setting="invertWheel" ' +
-    (_0x2f3472['invertWheel'] ? 'checked' : '') +
+    (value84['invertWheel'] ? 'checked' : '') +
     '>反向滚轮缩放</label>\n      </div>\n      <header><div><strong>对象变换</strong><span>吸附与变换偏好会保存到本机；地面吸附按模型可见底部对齐。</span></div></header>\n      <div class="storyboard-3d-viewport-settings">\n        <label><span>变换空间</span><select data-storyboard-3d-viewport-setting="transformSpace"><option value="world" ' +
     (viewportSettings['transformSpace'] !== 'local' ? 'selected' : '') +
     '>世界</option><option value="local" ' +
@@ -1125,8 +1113,8 @@ const STORYBOARD_3D_TOOL_LABELS = Object['freeze']({
     scale: '缩放',
   }),
   STORYBOARD_3D_SELECT_MOVE_TOOLS = new Set(['select', 'move']);
-function renderStoryboard3DControlIcon(_0x3b0e6d) {
-  const _0x219e00 = {
+function renderStoryboard3DControlIcon(value90) {
+  const value91 = {
     select: '<path d="M5 3.5 16.5 12l-5.1 1.2L9.2 19 5 3.5Z"/><path d="M18 5h2v2M20 17v2h-2M6 19H4v-2"/>',
     move: '<path d="M12 3v18M3 12h18"/><path d="m12 3-2.5 2.5M12 3l2.5 2.5M21 12l-2.5-2.5M21 12l-2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5"/>',
     rotate: '<path d="M19 10a7.5 7.5 0 1 0 .2 4.7"/><path d="m15 5 4.8.2L19.5 10"/>',
@@ -1161,14 +1149,14 @@ function renderStoryboard3DControlIcon(_0x3b0e6d) {
   };
   return (
     '<svg\x20class=\x22storyboard-3d-control-icon\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.7\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22\x20aria-hidden=\x22true\x22\x20focusable=\x22false\x22>' +
-    (_0x219e00[_0x3b0e6d] || '') +
+    (value91[value90] || '') +
     '</svg>'
   );
 }
 function renderStoryboard3DIconButton({
-  action: _0x28401d,
-  icon: _0x4117b5,
-  label: _0x5555f2,
+  action: action,
+  icon: icon,
+  label: label2,
   shortcut: shortcut = '',
   active: active = null,
   dataTool: dataTool = '',
@@ -1180,127 +1168,125 @@ function renderStoryboard3DIconButton({
   hidden: hidden = ![],
   title: title = '',
 }) {
-  const _0x54a240 = ['storyboard-3d-icon-button', className, active === !![] ? 'is-active' : '']
+  const value92 = ['storyboard-3d-icon-button', className, active === !![] ? 'is-active' : '']
       ['filter'](Boolean)
       ['join']('\x20'),
-    _0xd973fc = dataTool ? '\x20data-tool=\x22' + escapeHtml(dataTool) + '\x22' : '',
-    _0x43e8b1 = dataView ? ' data-view="' + escapeHtml(dataView) + '\x22' : '',
-    _0x25bfd0 = dataShortcutTool
+    value93 = dataTool ? '\x20data-tool=\x22' + escapeHtml(dataTool) + '\x22' : '',
+    value94 = dataView ? ' data-view="' + escapeHtml(dataView) + '\x22' : '',
+    value95 = dataShortcutTool
       ? '\x20data-storyboard-3d-tool-shortcut=\x22' + escapeHtml(dataShortcutTool) + '\x22'
       : '',
-    _0x18b114 = dataSetting
+    value96 = dataSetting
       ? ' data-storyboard-3d-viewport-setting-toggle="' + escapeHtml(dataSetting) + '\x22'
       : '',
-    _0x2f599b = active === null ? '' : ' aria-pressed="' + active + '\x22',
-    _0x3f131e = disabled ? ' disabled' : '',
-    _0x54db7e = hidden ? '\x20hidden' : '',
-    _0x2a63a9 = shortcut
+    value97 = active === null ? '' : ' aria-pressed="' + active + '\x22',
+    value98 = disabled ? ' disabled' : '',
+    value99 = hidden ? '\x20hidden' : '',
+    value100 = shortcut
       ? '<span\x20class=\x22storyboard-3d-control-shortcut\x22\x20aria-hidden=\x22true\x22>' +
         escapeHtml(shortcut) +
         '</span>'
       : '',
-    _0x24c394 = shortcut ? ' aria-keyshortcuts="' + escapeHtml(shortcut) + '\x22' : '',
-    _0x582be8 = title || (shortcut ? _0x5555f2 + '\x20(' + shortcut + ')' : _0x5555f2);
+    value101 = shortcut ? ' aria-keyshortcuts="' + escapeHtml(shortcut) + '\x22' : '',
+    value102 = title || (shortcut ? label2 + '\x20(' + shortcut + ')' : label2);
   return (
     '<button type="button" class="' +
-    _0x54a240 +
+    value92 +
     '\x22\x20data-storyboard-3d-action=\x22' +
-    escapeHtml(_0x28401d) +
+    escapeHtml(action) +
     '\x22' +
-    _0xd973fc +
-    _0x43e8b1 +
-    _0x25bfd0 +
-    _0x18b114 +
-    _0x2f599b +
-    _0x3f131e +
-    _0x54db7e +
-    _0x24c394 +
+    value93 +
+    value94 +
+    value95 +
+    value96 +
+    value97 +
+    value98 +
+    value99 +
+    value101 +
     '\x20aria-label=\x22' +
-    escapeHtml(_0x5555f2) +
+    escapeHtml(label2) +
     '" title="' +
-    escapeHtml(_0x582be8) +
+    escapeHtml(value102) +
     '\x22>' +
-    renderStoryboard3DControlIcon(_0x4117b5) +
-    _0x2a63a9 +
+    renderStoryboard3DControlIcon(icon) +
+    value100 +
     '</button>'
   );
 }
-function renderStoryboard3DToolButton(_0x4d0e0c, _0x5b991c, _0x1c441a) {
-  const _0x19e906 = _0x4d0e0c;
+function renderStoryboard3DToolButton(icon2, active2, value103) {
+  const dataShortcutTool2 = icon2;
   return renderStoryboard3DIconButton({
     action: 'set-tool',
-    icon: _0x4d0e0c,
-    label: STORYBOARD_3D_TOOL_LABELS[_0x4d0e0c] || _0x4d0e0c,
-    shortcut: getStoryboard3DToolShortcut(_0x1c441a, _0x19e906),
-    active: _0x5b991c,
-    dataTool: _0x4d0e0c,
-    dataShortcutTool: _0x19e906,
+    icon: icon2,
+    label: STORYBOARD_3D_TOOL_LABELS[icon2] || icon2,
+    shortcut: getStoryboard3DToolShortcut(value103, dataShortcutTool2),
+    active: active2,
+    dataTool: icon2,
+    dataShortcutTool: dataShortcutTool2,
   });
 }
 function renderStoryboard3DViewportSettingButton({
-  field: _0x4b98d8,
-  icon: _0x2eac09,
-  label: _0x1044a9,
-  active: _0x31758f,
+  field: field,
+  icon: icon3,
+  label: label3,
+  active: active3,
   hidden: hidden = ![],
 }) {
   return renderStoryboard3DIconButton({
     action: 'toggle-viewport-setting',
-    icon: _0x2eac09,
-    label: _0x1044a9,
-    active: _0x31758f,
-    dataSetting: _0x4b98d8,
+    icon: icon3,
+    label: label3,
+    active: active3,
+    dataSetting: field,
     hidden: hidden,
   });
 }
-function renderShotInspector(_0x45b83b, _0x13f0fe) {
-  if (!_0x45b83b || !_0x13f0fe) return '';
-  const _0x3e3452 = _0x45b83b['shots']['findIndex']((_0xce5929) => _0xce5929['id'] === _0x13f0fe['id']);
+function renderShotInspector(enabled9, error8) {
+  if (!enabled9 || !error8) return '';
+  const count3 = enabled9['shots']['findIndex']((value104) => value104['id'] === error8['id']);
   return (
     '<section class="storyboard-3d-inspector-card storyboard-3d-shot-inspector">\n    <small>当前镜头 · ' +
-    (_0x3e3452 + 0x1) +
+    (count3 + 0x1) +
     '/' +
-    _0x45b83b['shots']['length'] +
+    enabled9['shots']['length'] +
     '</small>\n    <input type="text" maxlength="120" value="' +
-    escapeHtml(_0x13f0fe['name']) +
+    escapeHtml(error8['name']) +
     '" data-storyboard-3d-shot-field="name" data-shot-id="' +
-    escapeHtml(_0x13f0fe['id']) +
+    escapeHtml(error8['id']) +
     '\x22\x20aria-label=\x22镜头名称\x22>\x0a\x20\x20\x20\x20<textarea\x20rows=\x222\x22\x20maxlength=\x221000\x22\x20placeholder=\x22镜头说明\x22\x20data-storyboard-3d-shot-field=\x22description\x22\x20data-shot-id=\x22' +
-    escapeHtml(_0x13f0fe['id']) +
+    escapeHtml(error8['id']) +
     '\x22>' +
-    escapeHtml(_0x13f0fe['description'] || '') +
+    escapeHtml(error8['description'] || '') +
     '</textarea>\n    <div class="storyboard-3d-shot-inspector-meta"><span>' +
-    escapeHtml(_0x13f0fe['shotSize']) +
+    escapeHtml(error8['shotSize']) +
     '</span><span>' +
-    escapeHtml(_0x13f0fe['shotAngle']) +
+    escapeHtml(error8['shotAngle']) +
     '</span><strong>' +
-    escapeHtml(formatFocalLength(_0x13f0fe['camera']['focalLength']) + 'mm') +
+    escapeHtml(formatFocalLength(error8['camera']['focalLength']) + 'mm') +
     '</strong></div>\n    <div class="storyboard-3d-shot-inspector-actions">\n      <button type="button" data-storyboard-3d-action="replace-shot-camera" data-shot-id="' +
-    escapeHtml(_0x13f0fe['id']) +
+    escapeHtml(error8['id']) +
     '">更新当前镜头</button>\n      <button type="button" data-storyboard-3d-action="move-shot" data-direction="-1" data-shot-id="' +
-    escapeHtml(_0x13f0fe['id']) +
+    escapeHtml(error8['id']) +
     '\x22\x20' +
-    (_0x3e3452 <= 0x0 ? 'disabled' : '') +
+    (count3 <= 0x0 ? 'disabled' : '') +
     '>前移</button>\n      <button type="button" data-storyboard-3d-action="move-shot" data-direction="1" data-shot-id="' +
-    escapeHtml(_0x13f0fe['id']) +
+    escapeHtml(error8['id']) +
     '\x22\x20' +
-    (_0x3e3452 >= _0x45b83b['shots']['length'] - 0x1 ? 'disabled' : '') +
+    (count3 >= enabled9['shots']['length'] - 0x1 ? 'disabled' : '') +
     '>后移</button>\n      <button type="button" data-storyboard-3d-action="duplicate-shot" data-shot-id="' +
-    escapeHtml(_0x13f0fe['id']) +
+    escapeHtml(error8['id']) +
     '">复制</button>\n      <button type="button" data-storyboard-3d-action="delete-shot" data-shot-id="' +
-    escapeHtml(_0x13f0fe['id']) +
+    escapeHtml(error8['id']) +
     '">删除</button>\n    </div>\n  </section>'
   );
 }
-function renderAIAssistant(_0x2e04ba = {}) {
-  const { modelId: _0x6c1a63, provider: _0xf7fb1b } = resolveStoryboard3DTextModelSelection(
-      _0x2e04ba['modelId'],
+function renderAIAssistant(error9 = {}) {
+  const { modelId: modelId, provider: provider } = resolveStoryboard3DTextModelSelection(error9['modelId']),
+    value105 = error9['status'] || 'idle',
+    value106 = ['planning', 'executing', 'starting', 'listening', 'transcribing', 'stopping']['includes'](
+      value105,
     ),
-    _0x178823 = _0x2e04ba['status'] || 'idle',
-    _0x35085e = ['planning', 'executing', 'starting', 'listening', 'transcribing', 'stopping']['includes'](
-      _0x178823,
-    ),
-    _0x4c06cc = {
+    value107 = {
       idle: '等待指令',
       planning: '正在规划安全命令…',
       ready: '计划已就绪',
@@ -1310,70 +1296,68 @@ function renderAIAssistant(_0x2e04ba = {}) {
       listening: '正在聆听…',
       transcribing: '正在转写…',
       stopping: '正在结束录音…',
-      error: _0x2e04ba['error']?.['message'] || '执行失败',
+      error: error9['error']?.['message'] || '执行失败',
     },
-    _0x59e98e = _0x2e04ba['plan']?.['commands'] || [];
+    list5 = error9['plan']?.['commands'] || [];
   return (
     '<section\x20class=\x22storyboard-3d-inspector-card\x20storyboard-3d-ai-assistant\x22\x20data-storyboard-3d-ai-panel\x20data-status=\x22' +
-    escapeHtml(_0x178823) +
+    escapeHtml(value105) +
     '\x22>\x0a\x20\x20\x20\x20<small>AI\x20场景助手</small>\x0a\x20\x20\x20\x20<strong>用自然语言编辑当前场景</strong>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-ai-feed\x22\x20aria-live=\x22polite\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-ai-message\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span>场景助手</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<p\x20data-storyboard-3d-ai-status>' +
-    escapeHtml(_0x4c06cc[_0x178823] || _0x178823) +
+    escapeHtml(value107[value105] || value105) +
     '</p>\n      </div>\n      ' +
-    (_0x59e98e['length']
+    (list5['length']
       ? '<ol class="storyboard-3d-ai-plan">' +
-        _0x59e98e['map'](
-          (_0x43a0cb) =>
+        list5['map'](
+          (value108) =>
             '<li><strong>' +
-            escapeHtml(_0x43a0cb['tool']) +
+            escapeHtml(value108['tool']) +
             '</strong><span>' +
-            escapeHtml(_0x43a0cb['commandId'] || '') +
+            escapeHtml(value108['commandId'] || '') +
             '</span></li>',
         )['join']('') +
         '</ol>'
       : '<p class="storyboard-3d-ai-empty">AI 返回的计划与执行信息会显示在这里。</p>') +
     '\n    </div>\n    <div class="storyboard-3d-ai-composer">\n      <div class="storyboard-3d-ai-prompt-wrap">\n        <textarea rows="4" maxlength="5000" aria-label="AI 场景指令" placeholder="例如：在人物左侧放一张桌子，再增加一个 50mm 近景镜头" data-storyboard-3d-ai-instruction>' +
-    escapeHtml(_0x2e04ba['instruction'] || '') +
+    escapeHtml(error9['instruction'] || '') +
     '</textarea>\n        ' +
-    (_0x2e04ba['interimTranscript']
-      ? '<p class="storyboard-3d-ai-transcript">正在转写：' +
-        escapeHtml(_0x2e04ba['interimTranscript']) +
-        '</p>'
+    (error9['interimTranscript']
+      ? '<p class="storyboard-3d-ai-transcript">正在转写：' + escapeHtml(error9['interimTranscript']) + '</p>'
       : '') +
     '\n      </div>\n      <div class="storyboard-3d-ai-model-bar">\n        ' +
     renderAIGenTextModelSelectorMarkup({
-      modelId: _0x6c1a63,
-      provider: _0xf7fb1b,
+      modelId: modelId,
+      provider: provider,
       getDisplayModelName: getDisplayModelName,
       className: 'storyboard-3d-ai-text-model-selector',
       allowedModelIds: getStoryboard3DTextModelIds(),
     }) +
     '\n        <div class="storyboard-3d-ai-actions">\n          <button type="button" data-storyboard-3d-action="toggle-ai-voice" ' +
-    (_0x2e04ba['voiceSupported'] === ![] ? 'disabled' : '') +
+    (error9['voiceSupported'] === ![] ? 'disabled' : '') +
     '>' +
-    (['starting', 'listening', 'transcribing', 'stopping']['includes'](_0x178823) ? '停止语音' : '语音输入') +
+    (['starting', 'listening', 'transcribing', 'stopping']['includes'](value105) ? '停止语音' : '语音输入') +
     '</button>\n          <button type="button" class="is-primary" data-storyboard-3d-action="run-ai-command" ' +
-    (_0x35085e || !_0xf7fb1b ? 'disabled' : '') +
+    (value106 || !provider ? 'disabled' : '') +
     '>执行指令</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
-    (_0x2e04ba['canUndoAI']
+    (error9['canUndoAI']
       ? '<button type="button" data-storyboard-3d-action="undo-ai-command">撤销本次 AI 修改</button>'
       : '') +
     '\n          ' +
-    (_0x35085e
+    (value106
       ? '<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22cancel-ai-command\x22>取消</button>'
       : '') +
     '\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</section>'
   );
 }
-function renderAIAssistantRightSidebar(_0x4d5dce = {}, _0x53c6a0 = {}) {
+function renderAIAssistantRightSidebar(options2 = {}, value109 = {}) {
   return (
     '<aside\x20class=\x22storyboard-3d-right-sidebar\x20storyboard-3d-ai-sidebar\x22\x20id=\x22storyboard3DRightSidebar\x22\x20aria-labelledby=\x22storyboard3DAIAssistantTitle\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-right-sidebar-splitter\x20panel-resize-handle\x22\x20data-storyboard-3d-right-sidebar-splitter\x20role=\x22separator\x22\x20aria-orientation=\x22vertical\x22\x20aria-label=\x22调整\x20AI\x20助手宽度\x22\x20aria-valuemin=\x22' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH +
     '" aria-valuemax="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH +
     '" aria-valuenow="' +
-    normalizeStoryboard3DRightSidebarWidth(_0x53c6a0['sidebarWidth'], _0x53c6a0['layoutWidth']) +
+    normalizeStoryboard3DRightSidebarWidth(value109['sidebarWidth'], value109['layoutWidth']) +
     '" tabindex="0"></div>\n    <section class="storyboard-3d-ai-sidebar-layout">\n      <header class="storyboard-3d-ai-sidebar-heading">\n        <div><small>场景编辑</small><h2 id="storyboard3DAIAssistantTitle">AI 助手</h2></div>\n      </header>\n      <div class="storyboard-3d-ai-sidebar-content">' +
-    renderAIAssistant(_0x4d5dce) +
+    renderAIAssistant(options2) +
     '</div>\x0a\x20\x20\x20\x20</section>\x0a\x20\x20</aside>'
   );
 }
@@ -1385,7 +1369,7 @@ function renderObjectPropertiesRightSidebar(
     sceneGroups: sceneGroups = [],
     characterPoseState: characterPoseState = null,
   } = {},
-  _0x44903a = {},
+  value110 = {},
 ) {
   if (!object) return '';
   return (
@@ -1396,7 +1380,7 @@ function renderObjectPropertiesRightSidebar(
     '" aria-valuemax="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH +
     '" aria-valuenow="' +
-    normalizeStoryboard3DRightSidebarWidth(_0x44903a['sidebarWidth'], _0x44903a['layoutWidth']) +
+    normalizeStoryboard3DRightSidebarWidth(value110['sidebarWidth'], value110['layoutWidth']) +
     '" tabindex="0"></div>\n    <section class="storyboard-3d-ai-sidebar-layout storyboard-3d-object-properties-layout">\n      <header class="storyboard-3d-ai-sidebar-heading storyboard-3d-object-properties-heading">\n        <div><small>' +
     escapeHtml(object['type']) +
     ' · 对象属性</small><h2 id="storyboard3DObjectPropertiesTitle">' +
@@ -1412,74 +1396,81 @@ function renderObjectPropertiesRightSidebar(
     '\n      </div>\n    </section>\n  </aside>'
   );
 }
-function getBackgroundCalibrationMethodLabel(_0x4bc639) {
-  if (_0x4bc639 === 'exif-local-estimate') return 'EXIF + 图像分析';
-  if (_0x4bc639 === 'local-image-estimate') return '本地图像分析';
-  if (_0x4bc639 === 'manual') return '手动校准';
+function getBackgroundCalibrationMethodLabel(value111) {
+  if (value111 === 'exif-local-estimate') return 'EXIF + 图像分析';
+  if (value111 === 'local-image-estimate') return '本地图像分析';
+  if (value111 === 'manual') return '手动校准';
   return '尚未匹配';
 }
-function renderBackgroundPerspectivePanel(_0x56bae9, _0x6c16c8) {
-  const _0x316b93 = normalizeStoryboard3DBackgroundCalibration(_0x56bae9?.['background']),
-    _0x18ef6b = Boolean(_0x316b93['imageUrl']),
-    _0xea9aee = Math['round'](_0x316b93['calibrationConfidence'] * 0x64),
-    _0x38d3b9 = Math['max'](
+function renderBackgroundPerspectivePanel(value112, value113) {
+  const storyboard3DBackgroundCalibration3 = normalizeStoryboard3DBackgroundCalibration(
+      value112?.['background'],
+    ),
+    enabled10 = Boolean(storyboard3DBackgroundCalibration3['imageUrl']),
+    value114 = Math['round'](storyboard3DBackgroundCalibration3['calibrationConfidence'] * 0x64),
+    value115 = Math['max'](
       0x0,
       Math['min'](
         0x1,
-        _0x316b93['horizonY'] + _0x316b93['horizonSlope'] * (_0x316b93['vanishingPoint'][0x0] - 0.5),
+        storyboard3DBackgroundCalibration3['horizonY'] +
+          storyboard3DBackgroundCalibration3['horizonSlope'] *
+            (storyboard3DBackgroundCalibration3['vanishingPoint'][0x0] - 0.5),
       ),
     ),
-    _0x54cf06 =
-      _0x316b93['imageWidth'] > 0x1 && _0x316b93['imageHeight'] > 0x1
-        ? _0x316b93['imageWidth'] + ' × ' + _0x316b93['imageHeight']
+    value116 =
+      storyboard3DBackgroundCalibration3['imageWidth'] > 0x1 &&
+      storyboard3DBackgroundCalibration3['imageHeight'] > 0x1
+        ? storyboard3DBackgroundCalibration3['imageWidth'] +
+          ' × ' +
+          storyboard3DBackgroundCalibration3['imageHeight']
         : '尺寸未知';
-  if (!_0x18ef6b)
+  if (!enabled10)
     return '<section\x20class=\x22storyboard-3d-perspective-panel\x22\x20data-storyboard-3d-perspective-panel>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-perspective-empty\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20aria-hidden=\x22true\x22>⌗</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<strong>用参考图匹配\x203D\x20透视</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<p>上传图片后自动检测地平线、消失点和地面区域，并将当前摄像机匹配到图片视角。</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22is-primary\x22\x20data-storyboard-3d-action=\x22upload-background\x22>选择图像并匹配</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<small>支持\x20PNG、JPG、WEBP；原图只保存在本地项目资源中。</small>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</section>';
   return (
     '<section class="storyboard-3d-perspective-panel" data-storyboard-3d-perspective-panel>\n    <figure class="storyboard-3d-perspective-preview">\n      <img src="' +
-    escapeHtml(_0x316b93['imageUrl']) +
+    escapeHtml(storyboard3DBackgroundCalibration3['imageUrl']) +
     '" alt="当前透视匹配参考图">\n      <figcaption>\n        <span>' +
-    (_0x316b93['lockedCamera'] ? '透视已锁定' : '透视未锁定') +
+    (storyboard3DBackgroundCalibration3['lockedCamera'] ? '透视已锁定' : '透视未锁定') +
     '</span>\n        <strong>' +
-    _0xea9aee +
+    value114 +
     '%</strong>\n      </figcaption>\n    </figure>\n    <div class="storyboard-3d-perspective-summary" data-state="' +
-    (_0x316b93['lockedCamera'] ? 'locked' : 'ready') +
+    (storyboard3DBackgroundCalibration3['lockedCamera'] ? 'locked' : 'ready') +
     '">\n      <div><small>匹配方式</small><strong>' +
-    escapeHtml(getBackgroundCalibrationMethodLabel(_0x316b93['calibrationMethod'])) +
+    escapeHtml(getBackgroundCalibrationMethodLabel(storyboard3DBackgroundCalibration3['calibrationMethod'])) +
     '</strong></div>\n      <div><small>图像尺寸</small><strong>' +
-    escapeHtml(_0x54cf06) +
+    escapeHtml(value116) +
     '</strong></div>\n      <div><small>当前镜头</small><strong>' +
-    escapeHtml(_0x6c16c8 ? formatFocalLength(_0x6c16c8['camera']?.['focalLength']) + 'mm' : '未创建') +
+    escapeHtml(value113 ? formatFocalLength(value113['camera']?.['focalLength']) + 'mm' : '未创建') +
     '</strong></div>\n    </div>\n    <div class="storyboard-3d-perspective-actions">\n      <button type="button" class="is-primary" data-storyboard-3d-action="upload-background">更换图像</button>\n      <button type="button" data-storyboard-3d-action="analyze-background" ' +
-    (_0x316b93['binaryAssetId'] ? '' : 'disabled') +
+    (storyboard3DBackgroundCalibration3['binaryAssetId'] ? '' : 'disabled') +
     '>重新匹配</button>\n      <button type="button" data-storyboard-3d-action="clear-background">清除</button>\n    </div>\n    <details class="storyboard-3d-perspective-settings" open>\n      <summary>匹配参数 <small>修改后即时更新摄像机</small></summary>\n      <div class="storyboard-3d-scene-control-grid">\n        <label><span>水平 FOV°</span><input type="number" min="10" max="170" step="0.1" value="' +
-    _0x316b93['horizontalFov'] +
+    storyboard3DBackgroundCalibration3['horizontalFov'] +
     '" data-storyboard-3d-background-field="horizontalFov"></label>\n        <label><span>垂直 FOV°</span><input type="number" min="10" max="170" step="0.1" value="' +
-    (_0x316b93['verticalFov'] || 0x28) +
+    (storyboard3DBackgroundCalibration3['verticalFov'] || 0x28) +
     '\x22\x20data-storyboard-3d-background-field=\x22verticalFov\x22></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><span>地平线\x20Y</span><input\x20type=\x22number\x22\x20min=\x220\x22\x20max=\x221\x22\x20step=\x220.01\x22\x20value=\x22' +
-    _0x316b93['horizonY'] +
+    storyboard3DBackgroundCalibration3['horizonY'] +
     '\x22\x20data-storyboard-3d-background-field=\x22horizonY\x22></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><span>地平线倾斜</span><input\x20type=\x22number\x22\x20min=\x22-1\x22\x20max=\x221\x22\x20step=\x220.01\x22\x20value=\x22' +
-    _0x316b93['horizonSlope'] +
+    storyboard3DBackgroundCalibration3['horizonSlope'] +
     '" data-storyboard-3d-background-field="horizonSlope"></label>\n        <label><span>消失点 X</span><input type="number" min="0" max="1" step="0.01" value="' +
-    _0x316b93['vanishingPoint'][0x0] +
+    storyboard3DBackgroundCalibration3['vanishingPoint'][0x0] +
     '" data-storyboard-3d-background-field="vanishingPointX"></label>\n        <label><span>消失点 Y</span><input type="number" value="' +
-    _0x38d3b9['toFixed'](0x3) +
+    value115['toFixed'](0x3) +
     '" disabled></label>\n        <label><span>相机高度 m</span><input type="number" min="0.2" max="20" step="0.1" value="' +
-    _0x316b93['cameraHeight'] +
+    storyboard3DBackgroundCalibration3['cameraHeight'] +
     '\x22\x20data-storyboard-3d-background-field=\x22cameraHeight\x22></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><span>背景缩放</span><input\x20type=\x22number\x22\x20min=\x220.1\x22\x20max=\x2210\x22\x20step=\x220.1\x22\x20value=\x22' +
-    _0x316b93['imageScale'] +
+    storyboard3DBackgroundCalibration3['imageScale'] +
     '" data-storyboard-3d-background-field="imageScale"></label>\n        <label><span>背景偏移 X</span><input type="number" min="-2" max="2" step="0.01" value="' +
-    _0x316b93['imageOffset'][0x0] +
+    storyboard3DBackgroundCalibration3['imageOffset'][0x0] +
     '" data-storyboard-3d-background-field="imageOffsetX"></label>\n        <label><span>背景偏移 Y</span><input type="number" min="-2" max="2" step="0.01" value="' +
-    _0x316b93['imageOffset'][0x1] +
+    storyboard3DBackgroundCalibration3['imageOffset'][0x1] +
     '" data-storyboard-3d-background-field="imageOffsetY"></label>\n      </div>\n    </details>\n    <label class="storyboard-3d-perspective-lock">\n      <input type="checkbox" data-storyboard-3d-background-lock ' +
-    (_0x316b93['lockedCamera'] ? 'checked' : '') +
+    (storyboard3DBackgroundCalibration3['lockedCamera'] ? 'checked' : '') +
     '>\n      <span><strong>锁定匹配机位</strong><small>锁定后禁止意外改变与参考图对应的摄像机视角</small></span>\n    </label>\n  </section>'
   );
 }
 function renderBackgroundPerspectiveRightSidebar(
   { scene: scene = null, activeShot: activeShot = null } = {},
-  _0x22278c = {},
+  value117 = {},
 ) {
   return (
     '<aside\x20class=\x22storyboard-3d-right-sidebar\x20storyboard-3d-perspective-sidebar\x22\x20id=\x22storyboard3DRightSidebar\x22\x20aria-labelledby=\x22storyboard3DPerspectiveTitle\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-right-sidebar-splitter\x20panel-resize-handle\x22\x20data-storyboard-3d-right-sidebar-splitter\x20role=\x22separator\x22\x20aria-orientation=\x22vertical\x22\x20aria-label=\x22调整图像透视匹配宽度\x22\x20aria-valuemin=\x22' +
@@ -1487,11 +1478,7 @@ function renderBackgroundPerspectiveRightSidebar(
     '" aria-valuemax="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH +
     '" aria-valuenow="' +
-    normalizeStoryboard3DRightSidebarWidth(
-      _0x22278c['sidebarWidth'],
-      _0x22278c['layoutWidth'],
-      'perspective',
-    ) +
+    normalizeStoryboard3DRightSidebarWidth(value117['sidebarWidth'], value117['layoutWidth'], 'perspective') +
     '" tabindex="0"></div>\n    <section class="storyboard-3d-ai-sidebar-layout storyboard-3d-perspective-layout">\n      <header class="storyboard-3d-ai-sidebar-heading">\n        <div><small>场景校准</small><h2 id="storyboard3DPerspectiveTitle">图像透视匹配</h2></div>\n      </header>\n      <div class="storyboard-3d-ai-sidebar-content storyboard-3d-perspective-content">\n        ' +
     renderBackgroundPerspectivePanel(scene, activeShot) +
     '\n      </div>\n    </section>\n  </aside>'
@@ -1502,8 +1489,8 @@ function renderAssetLibrarySidebar({
   category: category = 'all',
   importState: importState = null,
 } = {}) {
-  const _0x521220 = ['queued', 'reading', 'parsing']['includes'](importState?.['status']),
-    _0x2e7933 = [
+  const value118 = ['queued', 'reading', 'parsing']['includes'](importState?.['status']),
+    list6 = [
       ...STORYBOARD_3D_ASSET_CATEGORIES,
       { id: 'recent', label: getStoryboard3DAssetCategoryLabel('recent') },
       { id: 'favorite', label: getStoryboard3DAssetCategoryLabel('favorite') },
@@ -1512,24 +1499,24 @@ function renderAssetLibrarySidebar({
     '<aside class="storyboard-3d-asset-library-sidebar" aria-label="模型库工具">\n    <div class="storyboard-3d-asset-sidebar-heading">\n      <small>模型工具</small>\n      <strong>查找与导入</strong>\n    </div>\n    <div class="storyboard-3d-asset-filters">\n      <label>\n        <span>搜索模型</span>\n        <input type="search" value="' +
     escapeHtml(query) +
     '" placeholder="输入模型名称" data-storyboard-3d-asset-query>\n      </label>\n      <nav class="storyboard-3d-asset-category-panel" aria-label="模型分类">\n        <span>模型分类</span>\n        <div class="storyboard-3d-asset-category-list">\n          ' +
-    _0x2e7933['map'](
-      (_0x512cb3) =>
+    list6['map'](
+      (value119) =>
         '<button\x20type=\x22button\x22\x20class=\x22' +
-        (_0x512cb3['id'] === category ? 'is-active' : '') +
+        (value119['id'] === category ? 'is-active' : '') +
         '" data-storyboard-3d-action="select-asset-category" data-storyboard-3d-asset-category="' +
-        escapeHtml(_0x512cb3['id']) +
+        escapeHtml(value119['id']) +
         '" aria-pressed="' +
-        (_0x512cb3['id'] === category) +
+        (value119['id'] === category) +
         '\x22>' +
-        escapeHtml(_0x512cb3['label']) +
+        escapeHtml(value119['label']) +
         '</button>',
     )['join']('') +
     '\n        </div>\n      </nav>\n    </div>\n    <div class="storyboard-3d-asset-toolbar">\n      <strong>导入本地模型</strong>\n      <button type="button" data-storyboard-3d-action="import-model" ' +
-    (_0x521220 ? 'disabled' : '') +
+    (value118 ? 'disabled' : '') +
     '>导入模型</button>\x0a\x20\x20\x20\x20\x20\x20' +
-    (_0x521220 ? '<button type="button" data-storyboard-3d-action="cancel-model-import">取消</button>' : '') +
+    (value118 ? '<button type="button" data-storyboard-3d-action="cancel-model-import">取消</button>' : '') +
     '\n      <small>支持 GLB / GLTF / FBX / OBJ / STL</small>\n      <span data-storyboard-3d-import-status>' +
-    (_0x521220
+    (value118
       ? escapeHtml(importState['fileName'] || '模型') +
         '\x20·\x20' +
         importState['status'] +
@@ -1549,38 +1536,38 @@ function renderAssetLibrary({
     '<section class="storyboard-3d-asset-results" aria-label="模型列表">\n      <div class="storyboard-3d-asset-grid">\n      ' +
     (assets['length'] > 0x0
       ? assets['map'](
-          (_0x397dd3) =>
+          (error10) =>
             '<article><button type="button" data-storyboard-3d-action="add-asset" data-asset-id="' +
-            escapeHtml(_0x397dd3['id']) +
+            escapeHtml(error10['id']) +
             '\x22><span\x20class=\x22storyboard-3d-asset-thumb\x22\x20data-storyboard-3d-asset-thumbnail\x20data-asset-id=\x22' +
-            escapeHtml(_0x397dd3['id']) +
+            escapeHtml(error10['id']) +
             '\x22\x20data-thumbnail-status=\x22' +
-            (_0x397dd3['thumbnailUrl'] ? 'ready' : 'pending') +
+            (error10['thumbnailUrl'] ? 'ready' : 'pending') +
             '\x22>' +
-            (_0x397dd3['thumbnailUrl']
+            (error10['thumbnailUrl']
               ? '<img src="' +
-                escapeHtml(_0x397dd3['thumbnailUrl']) +
+                escapeHtml(error10['thumbnailUrl']) +
                 '\x22\x20alt=\x22' +
-                escapeHtml(_0x397dd3['name'] + ' 模型预览') +
+                escapeHtml(error10['name'] + ' 模型预览') +
                 '\x22>'
               : '<span\x20class=\x22storyboard-3d-asset-thumb-loading\x22\x20aria-label=\x22正在生成\x20' +
-                escapeHtml(_0x397dd3['name']) +
+                escapeHtml(error10['name']) +
                 ' 的模型预览"><i></i><small>生成预览</small></span>') +
             '</span><span>' +
-            escapeHtml(getStoryboard3DAssetCategoryLabel(_0x397dd3['category'])) +
-            (_0x397dd3['assetRecord']?.['sourceFormat']
-              ? '\x20·\x20' + escapeHtml(_0x397dd3['assetRecord']['sourceFormat']['toUpperCase']())
+            escapeHtml(getStoryboard3DAssetCategoryLabel(error10['category'])) +
+            (error10['assetRecord']?.['sourceFormat']
+              ? '\x20·\x20' + escapeHtml(error10['assetRecord']['sourceFormat']['toUpperCase']())
               : '') +
             '</span><strong title="' +
-            escapeHtml(_0x397dd3['name']) +
+            escapeHtml(error10['name']) +
             '\x22>' +
-            escapeHtml(_0x397dd3['name']) +
+            escapeHtml(error10['name']) +
             '</strong></button><button type="button" class="storyboard-3d-asset-favorite ' +
-            (favoriteIds['has'](_0x397dd3['id']) ? 'is-active' : '') +
+            (favoriteIds['has'](error10['id']) ? 'is-active' : '') +
             '\x22\x20data-storyboard-3d-action=\x22toggle-asset-favorite\x22\x20data-asset-id=\x22' +
-            escapeHtml(_0x397dd3['id']) +
+            escapeHtml(error10['id']) +
             '" aria-label="' +
-            (favoriteIds['has'](_0x397dd3['id']) ? '取消收藏' : '收藏') +
+            (favoriteIds['has'](error10['id']) ? '取消收藏' : '收藏') +
             '">★</button></article>',
         )['join']('')
       : '<div\x20class=\x22storyboard-3d-empty-state\x22><strong>没有匹配的模型</strong><span>调整搜索词或分类后重试。</span></div>') +
@@ -1591,52 +1578,51 @@ function renderAssetLibrary({
     '\n    </section>'
   );
 }
-function renderAssetLibraryRightSidebar(_0xadeeb5 = {}) {
-  const _0x387433 = Array['isArray'](_0xadeeb5['assets']) ? _0xadeeb5['assets']['length'] : 0x0,
-    _0x24a18c = Math['max'](_0x387433, Number(_0xadeeb5['totalCount']) || 0x0);
+function renderAssetLibraryRightSidebar(options3 = {}) {
+  const value120 = Array['isArray'](options3['assets']) ? options3['assets']['length'] : 0x0,
+    value121 = Math['max'](value120, Number(options3['totalCount']) || 0x0);
   return (
     '<aside\x20class=\x22storyboard-3d-right-sidebar\x20storyboard-3d-asset-library-panel\x22\x20id=\x22storyboard3DRightSidebar\x22\x20aria-labelledby=\x22storyboard3DAssetLibraryTitle\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-right-sidebar-splitter\x20panel-resize-handle\x22\x20data-storyboard-3d-right-sidebar-splitter\x20role=\x22separator\x22\x20aria-orientation=\x22vertical\x22\x20aria-label=\x22调整模型库宽度\x22\x20aria-valuemin=\x22' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH +
     '" aria-valuemax="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH +
     '" aria-valuenow="' +
-    normalizeStoryboard3DRightSidebarWidth(_0xadeeb5['sidebarWidth'], _0xadeeb5['layoutWidth']) +
+    normalizeStoryboard3DRightSidebarWidth(options3['sidebarWidth'], options3['layoutWidth']) +
     '" tabindex="0"></div>\n    <section class="storyboard-3d-asset-library-layout">\n      ' +
-    renderAssetLibrarySidebar(_0xadeeb5) +
+    renderAssetLibrarySidebar(options3) +
     '\n      <div class="storyboard-3d-asset-library-main">\n        <header class="storyboard-3d-asset-library-heading">\n          <div>\n            <small>场景资源</small>\n            <h2 id="storyboard3DAssetLibraryTitle">模型库</h2>\n            <p>查看模型外观后，点击卡片即可加入当前场景。</p>\n          </div>\n          <span>' +
-    _0x24a18c +
+    value121 +
     ' 个模型</span>\n        </header>\n        <div class="storyboard-3d-asset-library-content">' +
-    renderAssetLibrary(_0xadeeb5) +
+    renderAssetLibrary(options3) +
     '</div>\n      </div>\n    </section>\n  </aside>'
   );
 }
-function finiteMiniMapValue(_0x2044bc, _0x1d4eb6 = 0x0) {
-  const _0x1da292 = Number(_0x2044bc);
-  return Number['isFinite'](_0x1da292) ? _0x1da292 : _0x1d4eb6;
+function finiteMiniMapValue(value122, value123 = 0x0) {
+  const value124 = Number(value122);
+  return Number['isFinite'](value124) ? value124 : value123;
 }
-function createStoryboard3DMiniMapCameraPose(_0x86c82a, _0x4f3eff, _0x476cef) {
-  const _0x545093 = _0x86c82a?.['camera']?.['position'] || [0x0, 0x0, 0x0],
-    _0x2b3d97 = _0x86c82a?.['camera']?.['target'] || [0x0, 0x0, -0x1],
-    _0x46418c = _0x4f3eff ? resolveSceneCameraPose(_0x4f3eff) : null,
-    _0x3bfeec = {
-      x: finiteMiniMapValue(_0x46418c?.['position']?.['x'], _0x476cef?.['position']?.['x'] ?? _0x545093[0x0]),
-      y: finiteMiniMapValue(_0x46418c?.['position']?.['y'], _0x476cef?.['position']?.['y'] ?? _0x545093[0x1]),
-      z: finiteMiniMapValue(_0x46418c?.['position']?.['z'], _0x476cef?.['position']?.['z'] ?? _0x545093[0x2]),
+function createStoryboard3DMiniMapCameraPose(value125, event3, value126) {
+  const value127 = value125?.['camera']?.['position'] || [0x0, 0x0, 0x0],
+    x2 = value125?.['camera']?.['target'] || [0x0, 0x0, -0x1],
+    event4 = event3 ? resolveSceneCameraPose(event3) : null,
+    position2 = {
+      x: finiteMiniMapValue(event4?.['position']?.['x'], value126?.['position']?.['x'] ?? value127[0x0]),
+      y: finiteMiniMapValue(event4?.['position']?.['y'], value126?.['position']?.['y'] ?? value127[0x1]),
+      z: finiteMiniMapValue(event4?.['position']?.['z'], value126?.['position']?.['z'] ?? value127[0x2]),
     },
-    _0x53e33d = _0x46418c?.['target'] ||
-      _0x4f3eff?.['target'] || { x: _0x2b3d97[0x0], y: _0x2b3d97[0x1], z: _0x2b3d97[0x2] };
+    box2 = event4?.['target'] || event3?.['target'] || { x: x2[0x0], y: x2[0x1], z: x2[0x2] };
   return {
-    position: _0x3bfeec,
+    position: position2,
     target: {
-      x: finiteMiniMapValue(_0x53e33d?.['x'], _0x2b3d97[0x0]),
-      y: finiteMiniMapValue(_0x53e33d?.['y'], _0x2b3d97[0x1]),
-      z: finiteMiniMapValue(_0x53e33d?.['z'], _0x2b3d97[0x2]),
+      x: finiteMiniMapValue(box2?.['x'], x2[0x0]),
+      y: finiteMiniMapValue(box2?.['y'], x2[0x1]),
+      z: finiteMiniMapValue(box2?.['z'], x2[0x2]),
     },
   };
 }
 function renderMiniMap(
-  _0x262709,
-  _0x28155f,
+  value128,
+  value129,
   {
     expanded: expanded = ![],
     zoom: zoom = 0x1,
@@ -1645,76 +1631,70 @@ function renderMiniMap(
     camera: camera = null,
   } = {},
 ) {
-  const _0x20a3e4 = camera || createStoryboard3DMiniMapCameraPose(_0x28155f),
-    { objects: _0x56e37c, projection: _0x3ea818 } = createMiniMapLayout(
-      _0x262709,
-      _0x28155f,
+  const value130 = camera || createStoryboard3DMiniMapCameraPose(value129),
+    { objects: objects, projection: projection } = createMiniMapLayout(
+      value128,
+      value129,
       undefined,
       zoom,
       footprints,
       worldBounds,
-      _0x20a3e4,
+      value130,
     ),
-    _0x163fca = new Map(
-      (Array['isArray'](footprints) ? footprints : [])['map']((_0x29fcea) => [
-        _0x29fcea['objectId'],
-        _0x29fcea,
-      ]),
+    map3 = new Map(
+      (Array['isArray'](footprints) ? footprints : [])['map']((value131) => [value131['objectId'], value131]),
     ),
-    _0x56f855 = _0x56e37c['map']((_0x3ff1e3) => {
-      const _0x4bd09b = projectStoryboard3DWorldToMiniMapRatio(
-          { x: _0x3ff1e3['transform']?.['position']?.[0x0], z: _0x3ff1e3['transform']?.['position']?.[0x2] },
-          _0x3ea818,
+    value132 = objects['map']((x3) => {
+      const box3 = projectStoryboard3DWorldToMiniMapRatio(
+          { x: x3['transform']?.['position']?.[0x0], z: x3['transform']?.['position']?.[0x2] },
+          projection,
         ),
-        _0x44770c = projectStoryboard3DTopViewFootprint(
-          _0x163fca['get'](_0x3ff1e3['id'])?.['points'],
-          _0x3ea818,
-        );
-      if (_0x44770c) {
-        const _0x157881 = _0x44770c['polygon']
-          ['map']((_0x55f229) => _0x55f229['x'] * 0x64 + '%\x20' + _0x55f229['y'] * 0x64 + '%')
+        box4 = projectStoryboard3DTopViewFootprint(map3['get'](x3['id'])?.['points'], projection);
+      if (box4) {
+        const value133 = box4['polygon']
+          ['map']((box5) => box5['x'] * 0x64 + '%\x20' + box5['y'] * 0x64 + '%')
           ['join'](',');
         return (
           '<button type="button" class="storyboard-3d-mini-map-marker has-top-view-footprint is-' +
-          escapeHtml(_0x3ff1e3['type']) +
+          escapeHtml(x3['type']) +
           '\x22\x20data-storyboard-3d-action=\x22select-object\x22\x20data-object-id=\x22' +
-          escapeHtml(_0x3ff1e3['id']) +
+          escapeHtml(x3['id']) +
           '" data-top-view-footprint="true" title="' +
-          escapeHtml(_0x3ff1e3['name']) +
+          escapeHtml(x3['name']) +
           '" style="--mini-x:' +
-          _0x44770c['centerX'] * 0x64 +
+          box4['centerX'] * 0x64 +
           '%;--mini-y:' +
-          _0x44770c['centerY'] * 0x64 +
+          box4['centerY'] * 0x64 +
           '%;--mini-left:' +
-          _0x44770c['left'] * 0x64 +
+          box4['left'] * 0x64 +
           '%;--mini-top:' +
-          _0x44770c['top'] * 0x64 +
+          box4['top'] * 0x64 +
           '%;--mini-width:' +
-          _0x44770c['width'] * 0x64 +
+          box4['width'] * 0x64 +
           '%;--mini-height:' +
-          _0x44770c['height'] * 0x64 +
+          box4['height'] * 0x64 +
           '%;clip-path:polygon(' +
-          _0x157881 +
+          value133 +
           ')"></button>'
         );
       }
       return (
         '<button type="button" class="storyboard-3d-mini-map-marker" data-storyboard-3d-action="select-object" data-object-id="' +
-        escapeHtml(_0x3ff1e3['id']) +
+        escapeHtml(x3['id']) +
         '" title="' +
-        escapeHtml(_0x3ff1e3['name']) +
+        escapeHtml(x3['name']) +
         '\x22\x20style=\x22--mini-x:' +
-        _0x4bd09b['x'] * 0x64 +
+        box3['x'] * 0x64 +
         '%;--mini-y:' +
-        _0x4bd09b['y'] * 0x64 +
+        box3['y'] * 0x64 +
         '%"></button>'
       );
     })['join'](''),
-    _0x50d4a9 = createStoryboard3DMiniMapCameraMarker(_0x20a3e4, _0x3ea818),
-    _0x43df22 = projectStoryboard3DWorldToMiniMapRatio(_0x20a3e4['position'], _0x3ea818);
+    storyboard3DMiniMapCameraMarker = createStoryboard3DMiniMapCameraMarker(value130, projection),
+    box6 = projectStoryboard3DWorldToMiniMapRatio(value130['position'], projection);
   return (
     '<div class="storyboard-3d-mini-map-title"><span>Mini Map · 跟随视角</span><small>' +
-    _0x56e37c['length'] +
+    objects['length'] +
     ' 个对象 · ' +
     Math['round'](zoom * 0x64) +
     '%</small><button type="button" data-storyboard-3d-action="toggle-mini-map" aria-label="' +
@@ -1722,97 +1702,89 @@ function renderMiniMap(
     '\x22>' +
     (expanded ? '−' : '+') +
     '</button></div>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-mini-map-canvas\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-mini-map-grid\x22\x20aria-hidden=\x22true\x22\x20style=\x22--mini-map-rotation:' +
-    _0x3ea818['rotation'] +
+    projection['rotation'] +
     'rad"></span>\n      ' +
-    _0x56f855 +
+    value132 +
     '\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-mini-map-camera\x22\x20data-storyboard-3d-mini-map-camera\x20style=\x22--mini-x:' +
-    _0x43df22['x'] * 0x64 +
+    box6['x'] * 0x64 +
     '%;--mini-y:' +
-    _0x43df22['y'] * 0x64 +
+    box6['y'] * 0x64 +
     '%;--mini-angle:' +
-    _0x50d4a9['angle'] +
+    storyboard3DMiniMapCameraMarker['angle'] +
     'rad"></span>\n    </div>'
   );
 }
-function createMiniMapWorldBounds(_0x125a04, _0x30541d, _0x23e0b5 = []) {
-  const _0x160512 = Array['isArray'](_0x125a04?.['objects'])
-      ? _0x125a04['objects']['filter']((_0x1ccd04) => _0x1ccd04['visible'] !== ![])
+function createMiniMapWorldBounds(value134, value135, value136 = []) {
+  const list7 = Array['isArray'](value134?.['objects'])
+      ? value134['objects']['filter']((value137) => value137['visible'] !== ![])
       : [],
-    _0x3f9caf = _0x160512['map']((_0x5cb31d) => _0x5cb31d['transform']?.['position'] || [0x0, 0x0, 0x0]),
-    _0x5b2e00 = new Set(_0x160512['map']((_0x444531) => _0x444531['id'])),
-    _0x5f6563 = (Array['isArray'](_0x23e0b5) ? _0x23e0b5 : [])
-      ['filter']((_0x87692a) => _0x5b2e00['has'](_0x87692a?.['objectId']))
-      ['flatMap']((_0x10e773) => (Array['isArray'](_0x10e773?.['points']) ? _0x10e773['points'] : [])),
-    _0x1cf302 = _0x30541d?.['camera']?.['position'] || [0x0, 0x0, 0x0],
-    _0x4d8d0e = [
-      ..._0x3f9caf['map']((_0x76929e) => Number(_0x76929e[0x0]) || 0x0),
-      ..._0x5f6563['map']((_0x2716d2) => Number(_0x2716d2['x']) || 0x0),
-      Number(_0x1cf302[0x0]) || 0x0,
+    list8 = list7['map']((value138) => value138['transform']?.['position'] || [0x0, 0x0, 0x0]),
+    map4 = new Set(list7['map']((value139) => value139['id'])),
+    list9 = (Array['isArray'](value136) ? value136 : [])
+      ['filter']((value140) => map4['has'](value140?.['objectId']))
+      ['flatMap']((value141) => (Array['isArray'](value141?.['points']) ? value141['points'] : [])),
+    value142 = value135?.['camera']?.['position'] || [0x0, 0x0, 0x0],
+    args = [
+      ...list8['map']((value143) => Number(value143[0x0]) || 0x0),
+      ...list9['map']((box7) => Number(box7['x']) || 0x0),
+      Number(value142[0x0]) || 0x0,
     ],
-    _0x1aecce = [
-      ..._0x3f9caf['map']((_0x156d0a) => Number(_0x156d0a[0x2]) || 0x0),
-      ..._0x5f6563['map']((_0x2fa361) => Number(_0x2fa361['z']) || 0x0),
-      Number(_0x1cf302[0x2]) || 0x0,
+    args2 = [
+      ...list8['map']((value144) => Number(value144[0x2]) || 0x0),
+      ...list9['map']((value145) => Number(value145['z']) || 0x0),
+      Number(value142[0x2]) || 0x0,
     ],
-    _0xebfe8c = Math['min'](-0x5, ..._0x4d8d0e) - 0x2,
-    _0x5a76c0 = Math['max'](0x5, ..._0x4d8d0e) + 0x2,
-    _0x2b2c65 = Math['min'](-0x5, ..._0x1aecce) - 0x2,
-    _0x2d4482 = Math['max'](0x5, ..._0x1aecce) + 0x2;
-  return { minX: _0xebfe8c, maxX: _0x5a76c0, minZ: _0x2b2c65, maxZ: _0x2d4482 };
+    minX = Math['min'](-0x5, ...args) - 0x2,
+    maxX = Math['max'](0x5, ...args) + 0x2,
+    minZ = Math['min'](-0x5, ...args2) - 0x2,
+    maxZ = Math['max'](0x5, ...args2) + 0x2;
+  return { minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ };
 }
 function createMiniMapLayout(
-  _0x4e4be9,
-  _0x185816,
-  _0x225e44 = { width: 0x8c, height: 0x69 },
-  _0x1d3ccc = 0x1,
-  _0x12e216 = [],
-  _0x533ab2 = null,
-  _0x3b3f06 = null,
+  value146,
+  value147,
+  width = { width: 0x8c, height: 0x69 },
+  value148 = 0x1,
+  value149 = [],
+  value150 = null,
+  value151 = null,
 ) {
-  const _0x6c6320 = Array['isArray'](_0x4e4be9?.['objects'])
-      ? _0x4e4be9['objects']['filter']((_0x1c60c2) => _0x1c60c2['visible'] !== ![])
+  const objects2 = Array['isArray'](value146?.['objects'])
+      ? value146['objects']['filter']((value152) => value152['visible'] !== ![])
       : [],
-    _0x2e63af = _0x533ab2 || createMiniMapWorldBounds(_0x4e4be9, _0x185816, _0x12e216),
-    _0x325f50 = Math['max'](0.5, Math['min'](0x3, Number(_0x1d3ccc) || 0x1)),
-    _0x3c7293 = _0x3b3f06 || createStoryboard3DMiniMapCameraPose(_0x185816),
-    _0x3ea5c5 = finiteMiniMapValue(
-      _0x3c7293['position']?.['x'],
-      (_0x2e63af['minX'] + _0x2e63af['maxX']) / 0x2,
-    ),
-    _0x56b63a = finiteMiniMapValue(
-      _0x3c7293['position']?.['z'],
-      (_0x2e63af['minZ'] + _0x2e63af['maxZ']) / 0x2,
-    ),
-    _0x54fae6 = (_0x2e63af['maxX'] - _0x2e63af['minX']) / 0x2 / _0x325f50,
-    _0x22c8c5 = (_0x2e63af['maxZ'] - _0x2e63af['minZ']) / 0x2 / _0x325f50,
-    _0xd6d415 = _0x3ea5c5 - _0x54fae6,
-    _0x4b812d = _0x3ea5c5 + _0x54fae6,
-    _0x4dda85 = _0x56b63a - _0x22c8c5,
-    _0x211c8a = _0x56b63a + _0x22c8c5,
-    _0x57a6cc = finiteMiniMapValue(_0x3c7293['target']?.['x']) - _0x3ea5c5,
-    _0x5dee30 = finiteMiniMapValue(_0x3c7293['target']?.['z']) - _0x56b63a,
-    _0x49221d = Math['hypot'](_0x57a6cc, _0x5dee30) > 0.000001,
-    _0x43a965 = _0x49221d ? Math['atan2'](_0x5dee30, _0x57a6cc) : 0x0,
-    _0x7a22d4 = createStoryboard3DMiniMapProjection({
-      worldBounds: { minX: _0xd6d415, maxX: _0x4b812d, minZ: _0x4dda85, maxZ: _0x211c8a },
-      viewport: { x: 0x0, y: 0x0, width: _0x225e44['width'] || 0x8c, height: _0x225e44['height'] || 0x69 },
+    value153 = value150 || createMiniMapWorldBounds(value146, value147, value149),
+    value154 = Math['max'](0.5, Math['min'](0x3, Number(value148) || 0x1)),
+    event5 = value151 || createStoryboard3DMiniMapCameraPose(value147),
+    x4 = finiteMiniMapValue(event5['position']?.['x'], (value153['minX'] + value153['maxX']) / 0x2),
+    z2 = finiteMiniMapValue(event5['position']?.['z'], (value153['minZ'] + value153['maxZ']) / 0x2),
+    value155 = (value153['maxX'] - value153['minX']) / 0x2 / value154,
+    value156 = (value153['maxZ'] - value153['minZ']) / 0x2 / value154,
+    minX2 = x4 - value155,
+    maxX2 = x4 + value155,
+    minZ2 = z2 - value156,
+    maxZ2 = z2 + value156,
+    finiteMiniMapValue2 = finiteMiniMapValue(event5['target']?.['x']) - x4,
+    finiteMiniMapValue3 = finiteMiniMapValue(event5['target']?.['z']) - z2,
+    rotation = Math['hypot'](finiteMiniMapValue2, finiteMiniMapValue3) > 0.000001,
+    value157 = rotation ? Math['atan2'](finiteMiniMapValue3, finiteMiniMapValue2) : 0x0,
+    projection2 = createStoryboard3DMiniMapProjection({
+      worldBounds: { minX: minX2, maxX: maxX2, minZ: minZ2, maxZ: maxZ2 },
+      viewport: { x: 0x0, y: 0x0, width: width['width'] || 0x8c, height: width['height'] || 0x69 },
       padding: 0x8,
-      center: { x: _0x3ea5c5, z: _0x56b63a },
-      rotation: _0x49221d ? -Math['PI'] / 0x2 - _0x43a965 : 0x0,
+      center: { x: x4, z: z2 },
+      rotation: rotation ? -Math['PI'] / 0x2 - value157 : 0x0,
     });
-  return { objects: _0x6c6320, projection: _0x7a22d4 };
+  return { objects: objects2, projection: projection2 };
 }
-function renderShotExplorePanel(_0xfe5bad = [], _0x50b462 = 'all') {
-  const _0x420248 = {
+function renderShotExplorePanel(list10 = [], value158 = 'all') {
+  const value159 = {
       close: new Set(['MCU', 'CU', 'ECU']),
       medium: new Set(['MLS', 'MED']),
       wide: new Set(['EST', 'ELS', 'LS']),
     },
-    _0x32b267 = _0xfe5bad['map']((_0x166dbb, _0x316da5) => ({ candidate: _0x166dbb, index: _0x316da5 }))[
-      'filter'
-    ](
-      ({ candidate: _0x2b31c7 }) =>
-        _0x50b462 === 'all' || _0x420248[_0x50b462]?.['has'](_0x2b31c7['shotSize']),
+    list11 = list10['map']((candidate, index3) => ({ candidate: candidate, index: index3 }))['filter'](
+      ({ candidate: candidate2 }) =>
+        value158 === 'all' || value159[value158]?.['has'](candidate2['shotSize']),
     );
   return (
     '<section class="storyboard-3d-explore-panel" aria-label="镜头探索">\n    <header><div><small>SHOT EXPLORER</small><strong>镜头探索</strong></div><div class="storyboard-3d-explore-toolbar">' +
@@ -1823,50 +1795,50 @@ function renderShotExplorePanel(_0xfe5bad = [], _0x50b462 = 'all') {
       ['wide', '远景'],
     ]
       ['map'](
-        ([_0x21006f, _0x4bed8b]) =>
+        ([value160, value161]) =>
           '<button type="button" data-storyboard-3d-action="filter-explore" data-explore-filter="' +
-          _0x21006f +
+          value160 +
           '\x22\x20aria-pressed=\x22' +
-          (_0x50b462 === _0x21006f) +
+          (value158 === value160) +
           '\x22>' +
-          _0x4bed8b +
+          value161 +
           '</button>',
       )
       ['join']('') +
     '<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22regenerate-explore\x22>重新生成</button><button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22close-explore\x22\x20aria-label=\x22关闭\x22>×</button></div></header>\x0a\x20\x20\x20\x20' +
-    (_0x32b267['length'] > 0x0
+    (list11['length'] > 0x0
       ? '<div class="storyboard-3d-candidate-grid">' +
-        _0x32b267['map'](
-          ({ candidate: _0x31d36d, index: _0x4e9435 }) =>
+        list11['map'](
+          ({ candidate: candidate3, index: index4 }) =>
             '<article>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-candidate-preview\x22\x20data-candidate-preview=\x22' +
-            _0x4e9435 +
+            index4 +
             '\x22>' +
-            (_0x31d36d['thumbnailUrl']
+            (candidate3['thumbnailUrl']
               ? '<img src="' +
-                escapeHtml(_0x31d36d['thumbnailUrl']) +
+                escapeHtml(candidate3['thumbnailUrl']) +
                 '" alt="候选镜头 ' +
-                (_0x4e9435 + 0x1) +
+                (index4 + 0x1) +
                 '\x22>'
-              : '<span>正在渲染候选\x20' + (_0x4e9435 + 0x1) + '</span>') +
+              : '<span>正在渲染候选\x20' + (index4 + 0x1) + '</span>') +
             '</div>\n          <div><strong>' +
-            escapeHtml(_0x31d36d['shotSize'] + '\x20·\x20' + _0x31d36d['shotAngle']) +
+            escapeHtml(candidate3['shotSize'] + '\x20·\x20' + candidate3['shotAngle']) +
             '</strong><small>' +
-            Math['round'](_0x31d36d['score'] * 0x64) +
+            Math['round'](candidate3['score'] * 0x64) +
             ' 分 · ' +
-            formatFocalLength(_0x31d36d['camera']['focalLength']) +
+            formatFocalLength(candidate3['camera']['focalLength']) +
             'mm</small></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<footer><button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22preview-candidate\x22\x20data-candidate-index=\x22' +
-            _0x4e9435 +
+            index4 +
             '">主视口预览</button><button type="button" data-storyboard-3d-action="replace-with-candidate" data-candidate-index="' +
-            _0x4e9435 +
+            index4 +
             '">替换当前</button><button type="button" data-storyboard-3d-action="append-candidate" data-candidate-index="' +
-            _0x4e9435 +
+            index4 +
             '\x22>添加镜头</button></footer>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</article>',
         )['join']('') +
         '</div>'
       : '<div class="storyboard-3d-explore-empty"><strong>' +
-        (_0xfe5bad['length'] > 0x0 ? '当前景别没有候选' : '需要至少一个可见主体') +
+        (list10['length'] > 0x0 ? '当前景别没有候选' : '需要至少一个可见主体') +
         '</strong><span>' +
-        (_0xfe5bad['length'] > 0x0
+        (list10['length'] > 0x0
           ? '切换筛选或重新生成一组机位。'
           : '从素材库添加人物或道具后，即可生成 9 个候选机位。') +
         '</span></div>') +
@@ -1875,10 +1847,10 @@ function renderShotExplorePanel(_0xfe5bad = [], _0x50b462 = 'all') {
 }
 export class Storyboard3DEditorWorkspace {
   constructor({
-    projectId: _0x436da8,
-    project: _0x14a3e9,
-    onProjectChange: _0x3cad46,
-    onClose: _0x55f4f7,
+    projectId: projectId,
+    project: project,
+    onProjectChange: onProjectChange,
+    onClose: onClose,
     documentObject: documentObject = globalThis['document'],
     windowObject: windowObject = globalThis['window'],
     binaryAssetRepository: binaryAssetRepository = null,
@@ -1887,11 +1859,11 @@ export class Storyboard3DEditorWorkspace {
     imagePoseEstimator: imagePoseEstimator = null,
     imagePoseRetargeter: imagePoseRetargeter = null,
   } = {}) {
-    ((this['projectId'] = String(_0x436da8 || _0x14a3e9?.['id'] || '')),
+    ((this['projectId'] = String(projectId || project?.['id'] || '')),
       (this['document'] = documentObject),
       (this['window'] = windowObject),
-      (this['onProjectChange'] = _0x3cad46),
-      (this['onClose'] = _0x55f4f7),
+      (this['onProjectChange'] = onProjectChange),
+      (this['onClose'] = onClose),
       (this['root'] = null),
       (this['_message'] = ''),
       (this['_closed'] = ![]),
@@ -1954,15 +1926,15 @@ export class Storyboard3DEditorWorkspace {
       (this['_packAssetLoads'] = new Map()),
       (this['binaryAssetRepository'] = binaryAssetRepository || createStoryboard3DBinaryAssetRepository()),
       (this['_binaryAssetHydrationPromise'] = null));
-    const _0x2a82a8 = createThreeStoryboard3DModelParsers({
+    const fallbackParser = createThreeStoryboard3DModelParsers({
       gltf: { urlApi: this['window']?.['URL'] || globalThis['URL'] },
       fbx: { urlApi: this['window']?.['URL'] || globalThis['URL'] },
     });
     ((this['modelParsers'] = {
-      ..._0x2a82a8,
+      ...fallbackParser,
       ...createThreeWorkerBackedStoryboard3DModelParsers({
-        obj: { fallbackParser: _0x2a82a8['obj'] },
-        stl: { fallbackParser: _0x2a82a8['stl'] },
+        obj: { fallbackParser: fallbackParser['obj'] },
+        stl: { fallbackParser: fallbackParser['stl'] },
       }),
     }),
       (this['modelImportJob'] = null),
@@ -1974,30 +1946,30 @@ export class Storyboard3DEditorWorkspace {
       (this['shotCandidates'] = []),
       (this['_candidateRenderToken'] = 0x0),
       (this['_shotThumbnailQueue'] = Promise['resolve']()));
-    const _0x3c1ad3 = resolveStoryboard3DTextModelSelection();
-    ((this['aiModelId'] = _0x3c1ad3['modelId']),
-      (this['aiProvider'] = _0x3c1ad3['provider']),
+    const storyboard3DTextModelSelection = resolveStoryboard3DTextModelSelection();
+    ((this['aiModelId'] = storyboard3DTextModelSelection['modelId']),
+      (this['aiProvider'] = storyboard3DTextModelSelection['provider']),
       (this['_aiModelSelectorController'] = null),
       (this['aiState'] = { status: 'idle', instruction: '', voiceSupported: ![] }),
       (this['exportController'] = createStoryboard3DExportController({
         documentObject: this['document'],
         windowObject: this['window'],
         getProject: () => this['projectStore']['getSnapshot'](),
-        renderFrame: (_0x31e46c, _0x4e077e) => this['_renderShotFrame'](_0x31e46c, _0x4e077e),
-        renderVideo: (_0x4f3daf, _0x424aad) =>
+        renderFrame: (value162, value163) => this['_renderShotFrame'](value162, value163),
+        renderVideo: (shot, args3) =>
           renderStoryboard3DShotVideo({
-            ..._0x424aad,
-            shot: _0x4f3daf,
+            ...args3,
+            shot: shot,
             project: this['projectStore']['getSnapshot'](),
-            importedModelResolver: (_0x5728a1) => this['importedModelScenes']['get'](_0x5728a1),
+            importedModelResolver: (value164) => this['importedModelScenes']['get'](value164),
             windowObject: this['window'],
           }),
-        onComplete: ({ project: _0x23a6b5, options: _0x1c9fa1, results: _0x451167 }) => {
+        onComplete: ({ project: project2, options: options4, results: results }) => {
           dispatchWorkspaceEvent(this['window'], 'storyboard-3d:export-complete', {
-            projectId: _0x23a6b5['id'],
-            projectName: _0x23a6b5['name'],
-            options: _0x1c9fa1,
-            results: _0x451167,
+            projectId: project2['id'],
+            projectName: project2['name'],
+            options: options4,
+            results: results,
           });
         },
       })),
@@ -2037,8 +2009,8 @@ export class Storyboard3DEditorWorkspace {
       (this['_handleOutlineDrop'] = this['_handleOutlineDrop']['bind'](this)),
       (this['_syncServerAlertOffset'] = this['_syncServerAlertOffset']['bind'](this)),
       (this['editorStore'] = createStoryboard3DEditorStore({ inspectorOpen: ![] })),
-      (this['projectStore'] = createStoryboard3DProjectStore(_0x14a3e9, {
-        onPersist: (_0x42a6c7, _0x15fb7d) => this['_persistProject'](_0x42a6c7, _0x15fb7d),
+      (this['projectStore'] = createStoryboard3DProjectStore(project, {
+        onPersist: (value165, value166) => this['_persistProject'](value165, value166),
       })),
       (this['viewportFocalLength'] =
         Number(
@@ -2047,12 +2019,12 @@ export class Storyboard3DEditorWorkspace {
       (this['commandHistory'] = createCommandHistory({
         context: {
           getProject: () => this['projectStore']['getSnapshot'](),
-          replaceProject: (_0x3d97e4, _0x1a8d64 = {}) => {
-            const _0x2a7964 = this['projectStore']['replaceProject'](
-              _0x3d97e4,
-              _0x1a8d64['reason'] || 'history-command',
+          replaceProject: (value167, value168 = {}) => {
+            const value169 = this['projectStore']['replaceProject'](
+              value167,
+              value168['reason'] || 'history-command',
             );
-            return (this['_render'](this['_historyRenderOptions'] || undefined), _0x2a7964);
+            return (this['_render'](this['_historyRenderOptions'] || undefined), value169);
           },
         },
         limit: 0x64,
@@ -2061,42 +2033,37 @@ export class Storyboard3DEditorWorkspace {
       (this['characterImagePoseController'] = createStoryboard3DCharacterImagePoseController({
         ...(imagePoseEstimator ? { estimator: imagePoseEstimator } : {}),
         ...(imagePoseRetargeter ? { retarget: imagePoseRetargeter } : {}),
-        getCharacter: (_0x5e6af2) => {
-          for (const _0x2f3dc1 of this['projectStore']['getSnapshot']()['scenes'] || []) {
-            const _0x3de966 = _0x2f3dc1['objects']?.['find']((_0x7b76a7) => _0x7b76a7['id'] === _0x5e6af2);
-            if (_0x3de966?.['type'] === 'character') return _0x3de966;
+        getCharacter: (value170) => {
+          for (const value171 of this['projectStore']['getSnapshot']()['scenes'] || []) {
+            const value172 = value171['objects']?.['find']((value173) => value173['id'] === value170);
+            if (value172?.['type'] === 'character') return value172;
           }
           return null;
         },
-        applyPose: ({ objectId: _0x2394e1, boneOverrides: _0x37f522, confidence: _0x10d4e8 }) => {
+        applyPose: ({ objectId: objectId, boneOverrides: boneOverrides, confidence: confidence }) => {
           (this['_executeMutation']({
             type: 'apply-character-pose-from-image',
             label: 'Apply character pose from image',
-            mutate: (_0xd53812) => {
-              for (const _0x4362d9 of _0xd53812['scenes'] || []) {
-                const _0x347568 = _0x4362d9['objects']?.['find'](
-                  (_0x423586) => _0x423586['id'] === _0x2394e1,
-                );
-                if (_0x347568?.['type'] !== 'character') continue;
-                ((_0x347568['boneOverrides'] = Object['fromEntries'](
-                  Object['entries'](_0x37f522)['map'](([_0x45b348, _0xeb2491]) => [
-                    _0x45b348,
-                    [..._0xeb2491],
-                  ]),
+            mutate: (value174) => {
+              for (const value175 of value174['scenes'] || []) {
+                const value176 = value175['objects']?.['find']((value177) => value177['id'] === objectId);
+                if (value176?.['type'] !== 'character') continue;
+                ((value176['boneOverrides'] = Object['fromEntries'](
+                  Object['entries'](boneOverrides)['map'](([value178, args4]) => [value178, [...args4]]),
                 )),
-                  (_0x347568['actionId'] = 'standing'),
-                  (_0x347568['actionTime'] = 0x0),
-                  (_0x347568['actionPlaying'] = ![]));
+                  (value176['actionId'] = 'standing'),
+                  (value176['actionTime'] = 0x0),
+                  (value176['actionPlaying'] = ![]));
                 break;
               }
-              return _0xd53812;
+              return value174;
             },
           }),
             this['_setMessage'](
-              '已从参考图应用人物姿势（置信度\x20' + Math['round'](_0x10d4e8 * 0x64) + '%）。',
+              '已从参考图应用人物姿势（置信度\x20' + Math['round'](confidence * 0x64) + '%）。',
             ));
         },
-        onStateChange: (_0x3ce8ae) => this['_syncCharacterImagePoseUI'](_0x3ce8ae),
+        onStateChange: (value179) => this['_syncCharacterImagePoseUI'](value179),
       })),
       (this['shotTimelineController'] = createStoryboard3DShotTimelineController({
         windowObject: this['window'],
@@ -2106,36 +2073,36 @@ export class Storyboard3DEditorWorkspace {
         readCurrentCamera: () => this['_readCurrentCameraState'](),
         getRuntime: () => this['sceneRuntime'],
         getBinaryAssetRepository: () => this['binaryAssetRepository'],
-        getImportedModel: (_0x2e2395) => this['importedModelScenes']['get'](_0x2e2395),
+        getImportedModel: (value180) => this['importedModelScenes']['get'](value180),
         getGenerationContext: () => ({
           model: this['aiModelId'],
           provider: this['aiProvider'],
           assets: this['modelPackStatus']['assets'],
         }),
-        requestGeneration: (_0x1e0631) =>
-          dispatchWorkspaceEvent(this['window'], 'storyboard-3d:generate-layer', _0x1e0631),
-        importProject: (_0x5ccbb5) =>
-          dispatchWorkspaceEvent(this['window'], 'storyboard-3d:save-as-copy', { project: _0x5ccbb5 }),
-        sendResults: ({ project: _0x199b15, options: _0x2aba0b, results: _0x4c6b26 }) =>
+        requestGeneration: (value181) =>
+          dispatchWorkspaceEvent(this['window'], 'storyboard-3d:generate-layer', value181),
+        importProject: (project3) =>
+          dispatchWorkspaceEvent(this['window'], 'storyboard-3d:save-as-copy', { project: project3 }),
+        sendResults: ({ project: project4, options: options5, results: results2 }) =>
           dispatchWorkspaceEvent(this['window'], 'storyboard-3d:export-complete', {
-            projectId: _0x199b15['id'],
-            projectName: _0x199b15['name'],
-            options: _0x2aba0b,
-            results: _0x4c6b26,
+            projectId: project4['id'],
+            projectName: project4['name'],
+            options: options5,
+            results: results2,
           }),
-        previewSample: (_0x5f4d87) => this['_previewShotTimelineSample'](_0x5f4d87),
+        previewSample: (value182) => this['_previewShotTimelineSample'](value182),
         clearPreview: () => this['_clearShotTimelinePreview'](),
         expandDirectorPanel: () => this['_applyTimelineHeight'](Math['max'](this['timelineHeight'], 0x1ae)),
-        commitMutation: (_0x57fb43) => this['_executeMutation'](_0x57fb43),
+        commitMutation: (value183) => this['_executeMutation'](value183),
         requestRender: () => this['_render'](),
-        setMessage: (_0x5df9b6) => this['_setMessage'](_0x5df9b6),
+        setMessage: (value184) => this['_setMessage'](value184),
       })));
-    let _0x1c46b6 = null;
-    const _0x46691e = createStoryboard3DSafeToolExecutor({
+    let value185 = null;
+    const run2 = createStoryboard3DSafeToolExecutor({
       projectStore: {
         getSnapshot: () => this['projectStore']['getSnapshot'](),
-        replaceProject: (_0x519f80) => {
-          return ((_0x1c46b6 = _0x519f80), _0x519f80);
+        replaceProject: (value186) => {
+          return ((value185 = value186), value186);
         },
       },
       assetLibrary: this['assetLibrary'],
@@ -2145,33 +2112,33 @@ export class Storyboard3DEditorWorkspace {
       projectStore: this['projectStore'],
       model: () => this['aiModelId'],
       provider: () => this['aiProvider'],
-      executeTransaction: async (_0x241c65, _0x4df324) => {
-        (await this['_ensurePackAssetsForCommands'](_0x241c65), (_0x1c46b6 = null));
-        const _0x39faf5 = await _0x46691e(_0x241c65, _0x4df324);
+      executeTransaction: async (value187, value188) => {
+        (await this['_ensurePackAssetsForCommands'](value187), (value185 = null));
+        const args5 = await run2(value187, value188);
         return (
-          _0x39faf5['changed'] &&
-            _0x1c46b6 &&
+          args5['changed'] &&
+            value185 &&
             this['commandHistory']['execute'](
               createStoryboard3DProjectMutationCommand({
                 type: 'ai-scene-transaction',
                 label: 'AI scene transaction',
-                mutate: () => _0x1c46b6,
+                mutate: () => value185,
               }),
             ),
-          { ..._0x39faf5, project: this['projectStore']['getSnapshot']() }
+          { ...args5, project: this['projectStore']['getSnapshot']() }
         );
       },
       assetLibrary: this['assetLibrary'],
       windowObject: this['window'],
-      onStateChange: (_0xeb34ac, _0x2f63ee = {}) => {
-        this['aiState'] = _0xeb34ac;
-        if (_0x2f63ee['reason'] !== 'set-instruction') this['_syncAIAssistant']();
+      onStateChange: (value189, value190 = {}) => {
+        this['aiState'] = value189;
+        if (value190['reason'] !== 'set-instruction') this['_syncAIAssistant']();
       },
-      onError: (_0xacb61b) => this['_setMessage'](_0xacb61b?.['message'] || String(_0xacb61b)),
+      onError: (error11) => this['_setMessage'](error11?.['message'] || String(error11)),
     })),
       (this['aiState'] = this['aiController']['getSnapshot']()),
-      (this['_unsubscribeProject'] = this['projectStore']['subscribe']((_0x3577ad, _0x226423) => {
-        this['_syncSaveStatus'](_0x226423?.['saveStatus']);
+      (this['_unsubscribeProject'] = this['projectStore']['subscribe']((value191, value192) => {
+        this['_syncSaveStatus'](value192?.['saveStatus']);
       })),
       (this['_unsubscribeEditor'] = this['editorStore']['subscribe'](() => {
         this['_syncResponsiveState']();
@@ -2179,41 +2146,41 @@ export class Storyboard3DEditorWorkspace {
   }
   ['mount']() {
     if (this['root'] || !this['document']?.['body']) return this['root'];
-    const _0x453aa6 = this['document']['createElement']('section');
+    const root = this['document']['createElement']('section');
     return (
-      (_0x453aa6['className'] = 'storyboard-3d-editor-overlay'),
-      (_0x453aa6['dataset']['uiStop'] = '1'),
-      _0x453aa6['setAttribute']('role', 'dialog'),
-      _0x453aa6['setAttribute']('aria-modal', 'true'),
-      (_0x453aa6['tabIndex'] = -0x1),
-      _0x453aa6['setAttribute']('aria-label', t('storyboard3d.editor.ariaLabel')),
+      (root['className'] = 'storyboard-3d-editor-overlay'),
+      (root['dataset']['uiStop'] = '1'),
+      root['setAttribute']('role', 'dialog'),
+      root['setAttribute']('aria-modal', 'true'),
+      (root['tabIndex'] = -0x1),
+      root['setAttribute']('aria-label', t('storyboard3d.editor.ariaLabel')),
       (this['backgroundCalibrationInteraction'] = createStoryboard3DBackgroundCalibrationInteraction({
-        root: _0x453aa6,
+        root: root,
         windowObject: this['window'],
         getBackground: () =>
           getActiveStoryboard3DScene(this['projectStore']['getSnapshot']())?.['background'],
-        onPreview: (_0x16735a) => this['_previewBackgroundCalibrationDrag'](_0x16735a),
-        onCommit: (_0x562095) => this['_commitBackgroundCalibrationDrag'](_0x562095),
+        onPreview: (value193) => this['_previewBackgroundCalibrationDrag'](value193),
+        onCommit: (value194) => this['_commitBackgroundCalibrationDrag'](value194),
         onCancel: () => this['_render'](),
       })),
-      _0x453aa6['addEventListener']('contextmenu', containWorkspaceContextMenu),
-      _0x453aa6['addEventListener']('pointerdown', (_0x254dd3) => _0x254dd3['stopPropagation']()),
-      _0x453aa6['addEventListener']('pointerdown', this['_handleInspectorResizePointerDown']),
-      _0x453aa6['addEventListener']('pointerdown', this['_handleRightSidebarResizePointerDown']),
-      _0x453aa6['addEventListener']('pointerdown', this['_handleTimelineResizePointerDown']),
-      _0x453aa6['addEventListener']('pointerdown', this['_handleMiniMapPointerDown']),
-      _0x453aa6['addEventListener']('wheel', (_0x5dae85) => _0x5dae85['stopPropagation'](), {
+      root['addEventListener']('contextmenu', containWorkspaceContextMenu),
+      root['addEventListener']('pointerdown', (event6) => event6['stopPropagation']()),
+      root['addEventListener']('pointerdown', this['_handleInspectorResizePointerDown']),
+      root['addEventListener']('pointerdown', this['_handleRightSidebarResizePointerDown']),
+      root['addEventListener']('pointerdown', this['_handleTimelineResizePointerDown']),
+      root['addEventListener']('pointerdown', this['_handleMiniMapPointerDown']),
+      root['addEventListener']('wheel', (event7) => event7['stopPropagation'](), {
         passive: !![],
       }),
-      _0x453aa6['addEventListener']('wheel', this['_handleMiniMapWheel'], { passive: ![] }),
-      _0x453aa6['addEventListener']('click', this['_handleClick']),
-      _0x453aa6['addEventListener']('input', this['_handleInput']),
-      _0x453aa6['addEventListener']('change', this['_handleChange']),
-      _0x453aa6['addEventListener']('dragstart', this['_handleOutlineDragStart']),
-      _0x453aa6['addEventListener']('dragover', this['_handleOutlineDragOver']),
-      _0x453aa6['addEventListener']('drop', this['_handleOutlineDrop']),
-      (this['root'] = _0x453aa6),
-      this['document']['body']['appendChild'](_0x453aa6),
+      root['addEventListener']('wheel', this['_handleMiniMapWheel'], { passive: ![] }),
+      root['addEventListener']('click', this['_handleClick']),
+      root['addEventListener']('input', this['_handleInput']),
+      root['addEventListener']('change', this['_handleChange']),
+      root['addEventListener']('dragstart', this['_handleOutlineDragStart']),
+      root['addEventListener']('dragover', this['_handleOutlineDragOver']),
+      root['addEventListener']('drop', this['_handleOutlineDrop']),
+      (this['root'] = root),
+      this['document']['body']['appendChild'](root),
       this['document']['body']['classList']['add']('storyboard-3d-editor-open'),
       this['window']?.['addEventListener']?.('keydown', this['_handleWindowKeyDown'], !![]),
       this['window']?.['addEventListener']?.('keyup', this['_handleWindowKeyUp'], !![]),
@@ -2223,58 +2190,58 @@ export class Storyboard3DEditorWorkspace {
       this['_render'](),
       (this['_modelPackStatusPromise'] = this['_loadModelPackStatus']()),
       (this['_binaryAssetHydrationPromise'] = this['_hydrateBinaryAssets']()),
-      _0x453aa6['querySelector']('[data-storyboard-3d-project-name]')?.['focus']?.(),
-      _0x453aa6
+      root['querySelector']('[data-storyboard-3d-project-name]')?.['focus']?.(),
+      root
     );
   }
   ['_observeServerAlert']() {
-    const _0x3c7a4f = this['document']?.['getElementById']?.('v2-server-disconnect-alert'),
-      _0x1c57d5 = this['document']?.['querySelector']?.('.header');
+    const value195 = this['document']?.['getElementById']?.('v2-server-disconnect-alert'),
+      value196 = this['document']?.['querySelector']?.('.header');
     this['_syncServerAlertOffset']();
-    const _0x42584d = this['window']?.['MutationObserver'];
-    _0x3c7a4f &&
-      typeof _0x42584d === 'function' &&
-      ((this['_serverAlertMutationObserver'] = new _0x42584d(this['_syncServerAlertOffset'])),
-      this['_serverAlertMutationObserver']['observe'](_0x3c7a4f, {
+    const run3 = this['window']?.['MutationObserver'];
+    value195 &&
+      typeof run3 === 'function' &&
+      ((this['_serverAlertMutationObserver'] = new run3(this['_syncServerAlertOffset'])),
+      this['_serverAlertMutationObserver']['observe'](value195, {
         attributes: !![],
         attributeFilter: ['style', 'class'],
         childList: !![],
         subtree: !![],
       }));
-    const _0x2cb5e3 = this['window']?.['ResizeObserver'];
-    if (typeof _0x2cb5e3 === 'function') {
-      this['_serverAlertResizeObserver'] = new _0x2cb5e3(this['_syncServerAlertOffset']);
-      if (_0x3c7a4f) this['_serverAlertResizeObserver']['observe'](_0x3c7a4f);
-      if (_0x1c57d5) this['_serverAlertResizeObserver']['observe'](_0x1c57d5);
+    const run4 = this['window']?.['ResizeObserver'];
+    if (typeof run4 === 'function') {
+      this['_serverAlertResizeObserver'] = new run4(this['_syncServerAlertOffset']);
+      if (value195) this['_serverAlertResizeObserver']['observe'](value195);
+      if (value196) this['_serverAlertResizeObserver']['observe'](value196);
     }
   }
   ['_syncServerAlertOffset']() {
     if (!this['root']) return;
-    const _0x2fe2ce = this['document']?.['getElementById']?.('v2-server-disconnect-alert'),
-      _0x5b220e = this['document']?.['querySelector']?.('.header');
-    let _0xa25640 = Math['max'](0x0, Math['ceil'](_0x5b220e?.['getBoundingClientRect']?.()['bottom'] || 0x0));
-    if (_0x2fe2ce) {
-      const _0x4a4779 = this['window']?.['getComputedStyle']?.(_0x2fe2ce);
-      _0x4a4779?.['display'] !== 'none' &&
-        _0x4a4779?.['visibility'] !== 'hidden' &&
-        (_0xa25640 = Math['max'](
-          _0xa25640,
-          Math['max'](0x0, Math['ceil'](_0x2fe2ce['getBoundingClientRect']?.()['bottom'] || 0x0)),
+    const el = this['document']?.['getElementById']?.('v2-server-disconnect-alert'),
+      el2 = this['document']?.['querySelector']?.('.header');
+    let value197 = Math['max'](0x0, Math['ceil'](el2?.['getBoundingClientRect']?.()['bottom'] || 0x0));
+    if (el) {
+      const value198 = this['window']?.['getComputedStyle']?.(el);
+      value198?.['display'] !== 'none' &&
+        value198?.['visibility'] !== 'hidden' &&
+        (value197 = Math['max'](
+          value197,
+          Math['max'](0x0, Math['ceil'](el['getBoundingClientRect']?.()['bottom'] || 0x0)),
         ));
     }
-    this['root']['style']['setProperty']('--storyboard-3d-editor-top-offset', _0xa25640 + 'px');
+    this['root']['style']['setProperty']('--storyboard-3d-editor-top-offset', value197 + 'px');
   }
   ['_disposeSceneRuntime']() {
     (this['_sceneRuntimeResizeObserver']?.['disconnect']?.(), (this['_sceneRuntimeResizeObserver'] = null));
     this['_miniMapRefreshFrame'] !== null &&
       (this['window']?.['cancelAnimationFrame']?.(this['_miniMapRefreshFrame']),
       (this['_miniMapRefreshFrame'] = null));
-    const _0x34fbac = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-host]');
-    (_0x34fbac?.['removeEventListener']?.('pointerdown', this['_handleRuntimePointerDown']),
-      _0x34fbac?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerHover']),
-      _0x34fbac?.['removeEventListener']?.('pointerleave', this['_handleRuntimePointerLeave']),
-      _0x34fbac?.['removeEventListener']?.('contextmenu', this['_handleRuntimeContextMenu']),
-      _0x34fbac?.['removeEventListener']?.('wheel', this['_handleRuntimeWheel']),
+    const el3 = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-host]');
+    (el3?.['removeEventListener']?.('pointerdown', this['_handleRuntimePointerDown']),
+      el3?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerHover']),
+      el3?.['removeEventListener']?.('pointerleave', this['_handleRuntimePointerLeave']),
+      el3?.['removeEventListener']?.('contextmenu', this['_handleRuntimeContextMenu']),
+      el3?.['removeEventListener']?.('wheel', this['_handleRuntimeWheel']),
       this['_cancelRuntimeSelection'](),
       this['_cancelRuntimeTransform'](),
       this['sceneRuntime']?.['dispose']?.(),
@@ -2288,205 +2255,203 @@ export class Storyboard3DEditorWorkspace {
       this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
       this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]));
   }
-  ['_showRuntimeFailure'](_0x5d22be, _0x2553e5, { busy: busy = ![] } = {}) {
-    const _0x374667 = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-status]');
-    if (!_0x374667) return;
-    const _0x1a897f = String(_0x2553e5?.['message'] || _0x2553e5 || '')['trim']();
+  ['_showRuntimeFailure'](value199, error12, { busy: busy = ![] } = {}) {
+    const el4 = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-status]');
+    if (!el4) return;
+    const value200 = String(error12?.['message'] || error12 || '')['trim']();
     !busy &&
-      ((this['_runtimeFailureTitle'] = String(_0x5d22be || '3D 视口不可用')),
-      (this['_runtimeError'] = _0x1a897f || this['_runtimeError'] || this['_runtimeFailureTitle']));
-    ((_0x374667['hidden'] = ![]),
-      (_0x374667['dataset']['state'] = busy ? 'rebuilding' : 'error'),
-      _0x374667['replaceChildren']?.());
+      ((this['_runtimeFailureTitle'] = String(value199 || '3D 视口不可用')),
+      (this['_runtimeError'] = value200 || this['_runtimeError'] || this['_runtimeFailureTitle']));
+    ((el4['hidden'] = ![]),
+      (el4['dataset']['state'] = busy ? 'rebuilding' : 'error'),
+      el4['replaceChildren']?.());
     if (typeof this['document']?.['createElement'] !== 'function') {
-      _0x374667['textContent'] = _0x1a897f ? _0x5d22be + '：' + _0x1a897f : _0x5d22be;
+      el4['textContent'] = value200 ? value199 + '：' + value200 : value199;
       return;
     }
-    const _0x5f022e = this['document']['createElement']('strong');
-    ((_0x5f022e['textContent'] = _0x5d22be), _0x374667['appendChild'](_0x5f022e));
-    if (_0x1a897f) {
-      const _0x4468b1 = this['document']['createElement']('span');
-      ((_0x4468b1['textContent'] = _0x1a897f), _0x374667['appendChild'](_0x4468b1));
+    const el5 = this['document']['createElement']('strong');
+    ((el5['textContent'] = value199), el4['appendChild'](el5));
+    if (value200) {
+      const el6 = this['document']['createElement']('span');
+      ((el6['textContent'] = value200), el4['appendChild'](el6));
     }
     if (!busy) {
-      const _0x1b0f73 = this['document']['createElement']('button');
-      ((_0x1b0f73['type'] = 'button'),
-        _0x1b0f73['setAttribute']('data-storyboard-3d-action', 'rebuild-viewport'),
-        (_0x1b0f73['textContent'] = '重建视口'),
-        _0x374667['appendChild'](_0x1b0f73));
+      const el7 = this['document']['createElement']('button');
+      ((el7['type'] = 'button'),
+        el7['setAttribute']('data-storyboard-3d-action', 'rebuild-viewport'),
+        (el7['textContent'] = '重建视口'),
+        el4['appendChild'](el7));
     }
   }
   ['_hideRuntimeFailure']() {
-    const _0x29b13a = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-status]');
-    if (!_0x29b13a) return;
-    ((_0x29b13a['hidden'] = !![]),
-      _0x29b13a['removeAttribute']?.('data-state'),
-      _0x29b13a['replaceChildren']?.(),
+    const el8 = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-status]');
+    if (!el8) return;
+    ((el8['hidden'] = !![]),
+      el8['removeAttribute']?.('data-state'),
+      el8['replaceChildren']?.(),
       (this['_runtimeFailureTitle'] = ''));
   }
   ['_rebuildSceneRuntime']() {
     if (this['_closed'] || !this['root']) return ![];
-    const _0x4d6f11 = this['projectStore']['getSnapshot'](),
-      _0x186e73 = this['editorStore']['getSnapshot']();
+    const value201 = this['projectStore']['getSnapshot'](),
+      value202 = this['editorStore']['getSnapshot']();
     (this['_disposeSceneRuntime'](),
       (this['_runtimeError'] = ''),
       (this['_runtimeFailureTitle'] = ''),
       this['_showRuntimeFailure']('正在重建 3D 视口…', '', { busy: !![] }));
-    const _0x2fd777 = this['_mountSceneRuntime'](_0x4d6f11, _0x186e73);
-    if (_0x2fd777) this['_setMessage']('3D 视口已重建。');
-    return _0x2fd777;
+    const value203 = this['_mountSceneRuntime'](value201, value202);
+    if (value203) this['_setMessage']('3D 视口已重建。');
+    return value203;
   }
-  ['_mountSceneRuntime'](_0x20681b, _0x199f97) {
-    const _0x29e41f = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-host]');
-    if (!_0x29e41f) return ![];
-    let _0x2b687b = null;
+  ['_mountSceneRuntime'](project5, selectedObjectIds) {
+    const container = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-host]');
+    if (!container) return ![];
+    let sceneRuntime = null;
     try {
-      ((_0x2b687b = createStoryboard3DSceneRuntime({
-        container: _0x29e41f,
-        importedModelResolver: (_0x187a47) => this['importedModelScenes']['get'](_0x187a47) || null,
+      ((sceneRuntime = createStoryboard3DSceneRuntime({
+        container: container,
+        importedModelResolver: (value204) => this['importedModelScenes']['get'](value204) || null,
         onVisualChange: () => this['_scheduleMiniMapRefresh'](),
       })),
-        _0x2b687b['sync']({
-          project: _0x20681b,
-          sceneId: _0x20681b['activeSceneId'],
-          selectedObjectIds: _0x199f97['selectedObjectIds'],
-          activeTool: _0x199f97['activeTool'],
+        sceneRuntime['sync']({
+          project: project5,
+          sceneId: project5['activeSceneId'],
+          selectedObjectIds: selectedObjectIds['selectedObjectIds'],
+          activeTool: selectedObjectIds['activeTool'],
         }),
-        _0x29e41f['addEventListener']('pointerdown', this['_handleRuntimePointerDown']),
-        _0x29e41f['addEventListener']('pointermove', this['_handleRuntimePointerHover']),
-        _0x29e41f['addEventListener']('pointerleave', this['_handleRuntimePointerLeave']),
-        _0x29e41f['addEventListener']('contextmenu', this['_handleRuntimeContextMenu']),
-        _0x29e41f['addEventListener']('wheel', this['_handleRuntimeWheel'], { passive: ![] }),
-        (this['sceneRuntime'] = _0x2b687b),
+        container['addEventListener']('pointerdown', this['_handleRuntimePointerDown']),
+        container['addEventListener']('pointermove', this['_handleRuntimePointerHover']),
+        container['addEventListener']('pointerleave', this['_handleRuntimePointerLeave']),
+        container['addEventListener']('contextmenu', this['_handleRuntimeContextMenu']),
+        container['addEventListener']('wheel', this['_handleRuntimeWheel'], { passive: ![] }),
+        (this['sceneRuntime'] = sceneRuntime),
         this['_scheduleMiniMapRefresh'](),
         (this['viewportControls'] = createStoryboard3DViewportControlSystem({
-          sceneRuntime: _0x2b687b,
-          initialSceneView: _0x2b687b['getSceneView'](),
+          sceneRuntime: sceneRuntime,
+          initialSceneView: sceneRuntime['getSceneView'](),
           initialSettings: this['viewportSettings'],
-          applyViewState: (_0x9e5cf2) => _0x2b687b['commitSceneView'](_0x9e5cf2['sceneView']),
-          onChange: (_0x5d337c, _0x4a4c62) => {
-            ((this['viewportSettings'] = _0x5d337c['settings']),
-              _0x2b687b['setViewportUIPatch']?.(this['viewportControls']?.['getDirectorUIPatch']?.() || {}));
-            for (const _0x3b7f16 of this['root']?.['querySelectorAll']?.(
+          applyViewState: (value205) => sceneRuntime['commitSceneView'](value205['sceneView']),
+          onChange: (value206, value207) => {
+            ((this['viewportSettings'] = value206['settings']),
+              sceneRuntime['setViewportUIPatch']?.(
+                this['viewportControls']?.['getDirectorUIPatch']?.() || {},
+              ));
+            for (const el9 of this['root']?.['querySelectorAll']?.(
               '[data-storyboard-3d-action="set-viewport-view"]',
             ) || []) {
-              const _0x2617e5 = _0x3b7f16['dataset']['view'] === _0x5d337c['viewMode'];
-              (_0x3b7f16['classList']?.['toggle']?.('is-active', _0x2617e5),
-                _0x3b7f16['setAttribute']?.('aria-pressed', String(_0x2617e5)));
+              const value208 = el9['dataset']['view'] === value206['viewMode'];
+              (el9['classList']?.['toggle']?.('is-active', value208),
+                el9['setAttribute']?.('aria-pressed', String(value208)));
             }
-            if (_0x4a4c62?.['reason'] === 'settings') this['_syncViewportSettingControls']();
+            if (value207?.['reason'] === 'settings') this['_syncViewportSettingControls']();
           },
-          onContextStateChange: (_0x26e466, _0x1dbe99) => {
-            if (_0x26e466['state'] === 'lost')
+          onContextStateChange: (value209, value210) => {
+            if (value209['state'] === 'lost')
               this['_setMessage']('WebGL\x20上下文已丢失，正在等待浏览器恢复。');
-            if (_0x26e466['state'] === 'ready' && _0x26e466['lossCount'] > 0x0)
+            if (value209['state'] === 'ready' && value209['lossCount'] > 0x0)
               this['_setMessage']('WebGL\x20上下文已恢复。');
-            _0x26e466['state'] === 'error' &&
+            value209['state'] === 'error' &&
               ((this['_runtimeError'] =
-                _0x1dbe99?.['error']?.['message'] || String(_0x1dbe99?.['error'] || 'WebGL 上下文恢复失败')),
+                value210?.['error']?.['message'] || String(value210?.['error'] || 'WebGL 上下文恢复失败')),
               this['_showRuntimeFailure']('WebGL 恢复失败', this['_runtimeError']));
           },
         })),
-        _0x2b687b['setViewportUIPatch'](this['viewportControls']['getDirectorUIPatch']()),
+        sceneRuntime['setViewportUIPatch'](this['viewportControls']['getDirectorUIPatch']()),
         this['_restoreViewportFocalLength'](),
         (this['_runtimeError'] = ''),
         (this['_runtimeFailureTitle'] = ''),
         this['_hideRuntimeFailure']());
-      const _0x370c7f = () => {
-          const _0x5f0530 = _0x29e41f['getBoundingClientRect']?.();
-          (_0x2b687b['resize'](
-            Math['max'](0x1, Math['round'](_0x5f0530?.['width'] || _0x29e41f['clientWidth'] || 0x1)),
-            Math['max'](0x1, Math['round'](_0x5f0530?.['height'] || _0x29e41f['clientHeight'] || 0x1)),
+      const run5 = () => {
+          const box8 = container['getBoundingClientRect']?.();
+          (sceneRuntime['resize'](
+            Math['max'](0x1, Math['round'](box8?.['width'] || container['clientWidth'] || 0x1)),
+            Math['max'](0x1, Math['round'](box8?.['height'] || container['clientHeight'] || 0x1)),
           ),
-            _0x2b687b['renderNow']());
+            sceneRuntime['renderNow']());
         },
-        _0x514806 = this['window']?.['ResizeObserver'];
-      typeof _0x514806 === 'function' &&
-        ((this['_sceneRuntimeResizeObserver'] = new _0x514806(_0x370c7f)),
-        this['_sceneRuntimeResizeObserver']['observe'](_0x29e41f));
-      _0x370c7f();
-      const _0x22f017 = getActiveStoryboard3DScene(_0x20681b);
+        handler3 = this['window']?.['ResizeObserver'];
+      typeof handler3 === 'function' &&
+        ((this['_sceneRuntimeResizeObserver'] = new handler3(run5)),
+        this['_sceneRuntimeResizeObserver']['observe'](container));
+      run5();
+      const activeStoryboard3DScene = getActiveStoryboard3DScene(project5);
       return (
-        _0x22f017?.['shots']?.['some']((_0xbff91) => !_0xbff91['thumbnailUrl']) &&
+        activeStoryboard3DScene?.['shots']?.['some']((enabled11) => !enabled11['thumbnailUrl']) &&
           this['window']?.['setTimeout']?.(() => {
-            if (!this['_closed']) void this['_generateMissingShotThumbnails'](_0x22f017['id']);
+            if (!this['_closed']) void this['_generateMissingShotThumbnails'](activeStoryboard3DScene['id']);
           }, 0x0),
         !![]
       );
-    } catch (_0x54b680) {
-      ((this['_runtimeError'] = _0x54b680?.['message'] || String(_0x54b680)),
+    } catch (error13) {
+      ((this['_runtimeError'] = error13?.['message'] || String(error13)),
         (this['_runtimeFailureTitle'] = '3D\x20视口初始化失败'));
-      if (this['sceneRuntime'] === _0x2b687b) this['_disposeSceneRuntime']();
-      else _0x2b687b?.['dispose']?.();
+      if (this['sceneRuntime'] === sceneRuntime) this['_disposeSceneRuntime']();
+      else sceneRuntime?.['dispose']?.();
       return (this['_showRuntimeFailure']('3D 视口初始化失败', this['_runtimeError']), ![]);
     }
   }
-  async ['_renderShotCandidatePreviews'](_0x19ab2a, _0x9b797b) {
-    const _0x431701 = this['sceneRuntime'];
-    if (!_0x431701) return;
-    const _0x5f2d8f = ++this['_candidateRenderToken'],
-      _0x588230 = this['window']?.['URL'] || globalThis['URL'];
-    for (let _0x42da5d = 0x0; _0x42da5d < this['shotCandidates']['length']; _0x42da5d += 0x1) {
-      const _0x43a06c = this['shotCandidates'][_0x42da5d];
-      if (_0x43a06c['thumbnailUrl'] || _0x5f2d8f !== this['_candidateRenderToken']) continue;
-      const _0x81f8a8 = structuredClone(_0x19ab2a),
-        _0x369486 = getActiveStoryboard3DScene(_0x81f8a8),
-        _0x3bce44 = getActiveStoryboard3DShot(_0x81f8a8);
-      if (!_0x369486 || !_0x3bce44) continue;
-      ((_0x3bce44['camera'] = structuredClone(_0x43a06c['camera'])),
-        _0x431701['sync']({
-          project: _0x81f8a8,
-          sceneId: _0x369486['id'],
+  async ['_renderShotCandidatePreviews'](project6, selectedObjectIds2) {
+    const enabled12 = this['sceneRuntime'];
+    if (!enabled12) return;
+    const value211 = ++this['_candidateRenderToken'],
+      value212 = this['window']?.['URL'] || globalThis['URL'];
+    for (let value213 = 0x0; value213 < this['shotCandidates']['length']; value213 += 0x1) {
+      const value214 = this['shotCandidates'][value213];
+      if (value214['thumbnailUrl'] || value211 !== this['_candidateRenderToken']) continue;
+      const project7 = structuredClone(project6),
+        sceneId = getActiveStoryboard3DScene(project7),
+        activeStoryboard3DShot = getActiveStoryboard3DShot(project7);
+      if (!sceneId || !activeStoryboard3DShot) continue;
+      ((activeStoryboard3DShot['camera'] = structuredClone(value214['camera'])),
+        enabled12['sync']({
+          project: project7,
+          sceneId: sceneId['id'],
           selectedObjectIds: [],
           activeTool: 'select',
         }),
-        _0x431701['renderNow']());
+        enabled12['renderNow']());
       try {
-        const _0x37a0b7 = await _0x431701['captureBlob']({ includeEditorOverlays: ![] });
-        if (_0x5f2d8f !== this['_candidateRenderToken']) return;
-        if (_0x37a0b7 && typeof _0x588230?.['createObjectURL'] === 'function') {
-          _0x43a06c['thumbnailUrl'] = _0x588230['createObjectURL'](_0x37a0b7);
-          const _0x297a57 = this['root']?.['querySelector']?.(
-            '[data-candidate-preview="' + _0x42da5d + '\x22]',
-          );
-          _0x297a57 &&
-            (_0x297a57['innerHTML'] =
+        const value215 = await enabled12['captureBlob']({ includeEditorOverlays: ![] });
+        if (value211 !== this['_candidateRenderToken']) return;
+        if (value215 && typeof value212?.['createObjectURL'] === 'function') {
+          value214['thumbnailUrl'] = value212['createObjectURL'](value215);
+          const el10 = this['root']?.['querySelector']?.('[data-candidate-preview="' + value213 + '\x22]');
+          el10 &&
+            (el10['innerHTML'] =
               '<img src="' +
-              escapeHtml(_0x43a06c['thumbnailUrl']) +
+              escapeHtml(value214['thumbnailUrl']) +
               '" alt="候选镜头 ' +
-              (_0x42da5d + 0x1) +
+              (value213 + 0x1) +
               '\x22>');
         }
-      } catch (_0x124550) {
-        const _0x4eac36 = this['root']?.['querySelector']?.(
-          '[data-candidate-preview=\x22' + _0x42da5d + '\x22]',
-        );
-        if (_0x4eac36) _0x4eac36['textContent'] = _0x124550?.['message'] || '候选预览失败';
+      } catch (error14) {
+        const el11 = this['root']?.['querySelector']?.('[data-candidate-preview=\x22' + value213 + '\x22]');
+        if (el11) el11['textContent'] = error14?.['message'] || '候选预览失败';
       }
     }
-    _0x5f2d8f === this['_candidateRenderToken'] &&
-      this['sceneRuntime'] === _0x431701 &&
-      (_0x431701['sync']({
-        project: _0x19ab2a,
-        sceneId: _0x19ab2a['activeSceneId'],
-        selectedObjectIds: _0x9b797b['selectedObjectIds'],
-        activeTool: _0x9b797b['activeTool'],
+    value211 === this['_candidateRenderToken'] &&
+      this['sceneRuntime'] === enabled12 &&
+      (enabled12['sync']({
+        project: project6,
+        sceneId: project6['activeSceneId'],
+        selectedObjectIds: selectedObjectIds2['selectedObjectIds'],
+        activeTool: selectedObjectIds2['activeTool'],
       }),
-      _0x431701['renderNow']());
+      enabled12['renderNow']());
   }
   ['_clearShotCandidates']() {
     this['_candidateRenderToken'] += 0x1;
-    const _0xc8da3f = this['window']?.['URL'] || globalThis['URL'];
-    (this['shotCandidates']['forEach']((_0x16339d) => {
-      if (_0x16339d['thumbnailUrl']) _0xc8da3f?.['revokeObjectURL']?.(_0x16339d['thumbnailUrl']);
+    const value216 = this['window']?.['URL'] || globalThis['URL'];
+    (this['shotCandidates']['forEach']((value217) => {
+      if (value217['thumbnailUrl']) value216?.['revokeObjectURL']?.(value217['thumbnailUrl']);
     }),
       (this['shotCandidates'] = []));
   }
-  async ['_renderShotFrame'](_0x41302a, { width: _0x164dca, height: _0x47f18e } = {}) {
+  async ['_renderShotFrame'](shot2, { width: width2, height: height } = {}) {
     return renderStoryboard3DShotFrame({
-      shot: _0x41302a,
-      width: _0x164dca,
-      height: _0x47f18e,
+      shot: shot2,
+      width: width2,
+      height: height,
       runtime: this['sceneRuntime'],
       getProject: () => this['projectStore']['getSnapshot'](),
       getEditorState: () => this['editorStore']['getSnapshot'](),
@@ -2494,96 +2459,88 @@ export class Storyboard3DEditorWorkspace {
       windowObject: this['window'],
     });
   }
-  ['_generateShotThumbnail'](_0x3a092b, _0x344492) {
+  ['_generateShotThumbnail'](value218, value219) {
     return (
       (this['_shotThumbnailQueue'] = this['_shotThumbnailQueue']
         ['catch'](() => ![])
-        ['then'](() => this['_generateShotThumbnailNow'](_0x3a092b, _0x344492))),
+        ['then'](() => this['_generateShotThumbnailNow'](value218, value219))),
       this['_shotThumbnailQueue']
     );
   }
-  async ['_generateShotThumbnailNow'](_0x29d7dc, _0x34d84f) {
+  async ['_generateShotThumbnailNow'](sceneId2, shotId) {
     if (this['_closed'] || !this['sceneRuntime']) return ![];
-    const _0x282793 = this['projectStore']['getSnapshot'](),
-      _0xc63dd0 = _0x282793['scenes']['find']((_0x588196) => _0x588196['id'] === _0x29d7dc),
-      _0x10500f = _0xc63dd0?.['shots']?.['find']((_0x4879cb) => _0x4879cb['id'] === _0x34d84f);
-    if (!_0x10500f) return ![];
-    const _0x34ab5c = createStoryboard3DShotThumbnailToken(_0x29d7dc, _0x10500f);
+    const value220 = this['projectStore']['getSnapshot'](),
+      value221 = value220['scenes']['find']((value222) => value222['id'] === sceneId2),
+      enabled13 = value221?.['shots']?.['find']((value223) => value223['id'] === shotId);
+    if (!enabled13) return ![];
+    const storyboard3DShotThumbnailToken = createStoryboard3DShotThumbnailToken(sceneId2, enabled13);
     try {
-      const _0x569200 = await this['_renderShotFrame'](_0x10500f, { width: 0x140, height: 0xb4 }),
-        _0x3eab22 = this['document']?.['createElement']?.('canvas');
-      if (!_0x3eab22?.['getContext']) return ![];
-      ((_0x3eab22['width'] = 0x140),
-        (_0x3eab22['height'] = 0xb4),
-        _0x3eab22['getContext']('2d')?.['drawImage']?.(
-          _0x569200?.['image'] || _0x569200,
-          0x0,
-          0x0,
-          0x140,
-          0xb4,
-        ));
-      const _0x23494a = _0x3eab22['toDataURL']?.('image/jpeg', 0.78) || '';
-      _0x569200?.['close']?.();
-      if (!_0x23494a) return ![];
-      const _0x2a5628 = applyStoryboard3DShotThumbnail(
+      const value224 = await this['_renderShotFrame'](enabled13, { width: 0x140, height: 0xb4 }),
+        box9 = this['document']?.['createElement']?.('canvas');
+      if (!box9?.['getContext']) return ![];
+      ((box9['width'] = 0x140),
+        (box9['height'] = 0xb4),
+        box9['getContext']('2d')?.['drawImage']?.(value224?.['image'] || value224, 0x0, 0x0, 0x140, 0xb4));
+      const previewUrl = box9['toDataURL']?.('image/jpeg', 0.78) || '';
+      value224?.['close']?.();
+      if (!previewUrl) return ![];
+      const storyboard3DShotThumbnail = applyStoryboard3DShotThumbnail(
         this['projectStore']['getSnapshot'](),
-        _0x34ab5c,
-        _0x23494a,
+        storyboard3DShotThumbnailToken,
+        previewUrl,
         { now: Date['now']() },
       );
-      if (!_0x2a5628['applied']) return ![];
+      if (!storyboard3DShotThumbnail['applied']) return ![];
       return (
-        this['projectStore']['replaceProject'](_0x2a5628['project'], 'shot-thumbnail'),
+        this['projectStore']['replaceProject'](storyboard3DShotThumbnail['project'], 'shot-thumbnail'),
         this['_render'](),
         dispatchWorkspaceEvent(this['window'], 'storyboard-3d:preview-updated', {
           projectId: this['projectId'],
-          sceneId: _0x29d7dc,
-          shotId: _0x34d84f,
-          previewUrl: _0x23494a,
+          sceneId: sceneId2,
+          shotId: shotId,
+          previewUrl: previewUrl,
         }),
         !![]
       );
-    } catch (_0x586bf2) {
-      return (this['_setMessage'](_0x586bf2?.['message'] || String(_0x586bf2)), ![]);
+    } catch (error15) {
+      return (this['_setMessage'](error15?.['message'] || String(error15)), ![]);
     }
   }
-  async ['_generateMissingShotThumbnails'](_0x3a214a) {
-    const _0xd947df = this['projectStore']
+  async ['_generateMissingShotThumbnails'](value225) {
+    const value226 = this['projectStore']
         ['getSnapshot']()
-        ['scenes']['find']((_0x3a6941) => _0x3a6941['id'] === _0x3a214a),
-      _0xcf4753 = (_0xd947df?.['shots'] || [])
-        ['filter']((_0x552734) => !_0x552734['thumbnailUrl'])
-        ['map']((_0x5ace43) => _0x5ace43['id']);
-    for (const _0x377e3c of _0xcf4753) {
+        ['scenes']['find']((value227) => value227['id'] === value225),
+      value228 = (value226?.['shots'] || [])
+        ['filter']((enabled14) => !enabled14['thumbnailUrl'])
+        ['map']((value229) => value229['id']);
+    for (const value230 of value228) {
       if (this['_closed'] || !this['sceneRuntime']) break;
-      await this['_generateShotThumbnail'](_0x3a214a, _0x377e3c);
+      await this['_generateShotThumbnail'](value225, value230);
     }
   }
   ['_syncHistoryButtons']() {
-    const _0xc04565 = this['commandHistory']?.['getSnapshot']?.() || {},
-      _0x5f5454 = this['root']?.['querySelector']?.('[data-storyboard-3d-action="undo"]'),
-      _0x227814 = this['root']?.['querySelector']?.('[data-storyboard-3d-action="redo"]');
-    if (_0x5f5454) _0x5f5454['disabled'] = !_0xc04565['canUndo'];
-    if (_0x227814) _0x227814['disabled'] = !_0xc04565['canRedo'];
+    const enabled15 = this['commandHistory']?.['getSnapshot']?.() || {},
+      el12 = this['root']?.['querySelector']?.('[data-storyboard-3d-action="undo"]'),
+      el13 = this['root']?.['querySelector']?.('[data-storyboard-3d-action="redo"]');
+    if (el12) el12['disabled'] = !enabled15['canUndo'];
+    if (el13) el13['disabled'] = !enabled15['canRedo'];
   }
   ['_readCurrentCameraState']() {
-    const _0x1e0439 = this['sceneRuntime']?.['readCurrentCamera']?.();
-    if (_0x1e0439?.['position'] && _0x1e0439?.['forward']) {
-      const _0x46c946 = this['sceneRuntime']?.['getSceneView']?.(),
-        _0x110495 = Number(this['sceneRuntime']?.['getViewportFocalLength']?.());
+    const value231 = this['sceneRuntime']?.['readCurrentCamera']?.();
+    if (value231?.['position'] && value231?.['forward']) {
+      const target2 = this['sceneRuntime']?.['getSceneView']?.(),
+        count4 = Number(this['sceneRuntime']?.['getViewportFocalLength']?.());
       return {
-        position: [_0x1e0439['position']['x'], _0x1e0439['position']['y'], _0x1e0439['position']['z']],
-        target: _0x46c946?.['target']
-          ? [_0x46c946['target']['x'], _0x46c946['target']['y'], _0x46c946['target']['z']]
+        position: [value231['position']['x'], value231['position']['y'], value231['position']['z']],
+        target: target2?.['target']
+          ? [target2['target']['x'], target2['target']['y'], target2['target']['z']]
           : [
-              _0x1e0439['position']['x'] + _0x1e0439['forward']['x'] * 0xa,
-              _0x1e0439['position']['y'] + _0x1e0439['forward']['y'] * 0xa,
-              _0x1e0439['position']['z'] + _0x1e0439['forward']['z'] * 0xa,
+              value231['position']['x'] + value231['forward']['x'] * 0xa,
+              value231['position']['y'] + value231['forward']['y'] * 0xa,
+              value231['position']['z'] + value231['forward']['z'] * 0xa,
             ],
         focalLength:
-          Number['isFinite'](_0x110495) && _0x110495 > 0x0
-            ? _0x110495
-            : Number(_0x1e0439['focalLength']) || 0x23,
+          Number['isFinite'](count4) && count4 > 0x0 ? count4 : Number(value231['focalLength']) || 0x23,
         near: 0.1,
         far: 0x3e8,
         aspectRatio: '16:9',
@@ -2591,46 +2548,47 @@ export class Storyboard3DEditorWorkspace {
     }
     return getActiveStoryboard3DShot(this['projectStore']['getSnapshot']())?.['camera'] || null;
   }
-  ['_previewFocalLength'](_0x22394e) {
-    const _0x3d42c2 = getStoryboard3DFocalPreset(_0x22394e),
-      _0x5bcd18 = this['projectStore']['getSnapshot'](),
-      _0x1fb2f4 = getActiveStoryboard3DScene(_0x5bcd18),
-      _0x44126d = this['_readCurrentCameraState']();
-    if (!_0x1fb2f4 || !_0x44126d) return null;
-    const _0x10f21f = setStoryboard3DCameraFocalLength(_0x44126d, _0x3d42c2),
-      _0x2ece17 = guardStoryboard3DBackgroundCameraChange(_0x1fb2f4['background'], _0x10f21f);
-    if (!_0x2ece17['allowed']) return (this['_setMessage'](_0x2ece17['reason']), null);
-    ((this['viewportFocalLength'] = _0x3d42c2),
-      this['sceneRuntime']?.['setViewportFocalLength']?.(_0x3d42c2));
-    const _0xea04b8 = this['root']?.['querySelector']?.('[data-storyboard-3d-focal-slider]');
-    if (_0xea04b8) _0xea04b8['value'] = String(resolveStoryboard3DFocalPresetIndex(_0x3d42c2));
-    _0xea04b8?.['setAttribute']?.('aria-valuetext', _0x3d42c2 + 'mm');
-    const _0x57cf50 = this['root']?.['querySelector']?.('[data-storyboard-3d-focal-output]');
-    if (_0x57cf50) _0x57cf50['textContent'] = _0x3d42c2 + 'mm';
+  ['_previewFocalLength'](value232) {
+    const focalLength = getStoryboard3DFocalPreset(value232),
+      value233 = this['projectStore']['getSnapshot'](),
+      scene2 = getActiveStoryboard3DScene(value233),
+      enabled16 = this['_readCurrentCameraState']();
+    if (!scene2 || !enabled16) return null;
+    const camera3 = setStoryboard3DCameraFocalLength(enabled16, focalLength),
+      guardStoryboard3DBackgroundCameraChange2 = guardStoryboard3DBackgroundCameraChange(
+        scene2['background'],
+        camera3,
+      );
+    if (!guardStoryboard3DBackgroundCameraChange2['allowed'])
+      return (this['_setMessage'](guardStoryboard3DBackgroundCameraChange2['reason']), null);
+    ((this['viewportFocalLength'] = focalLength),
+      this['sceneRuntime']?.['setViewportFocalLength']?.(focalLength));
+    const el14 = this['root']?.['querySelector']?.('[data-storyboard-3d-focal-slider]');
+    if (el14) el14['value'] = String(resolveStoryboard3DFocalPresetIndex(focalLength));
+    el14?.['setAttribute']?.('aria-valuetext', focalLength + 'mm');
+    const el15 = this['root']?.['querySelector']?.('[data-storyboard-3d-focal-output]');
+    if (el15) el15['textContent'] = focalLength + 'mm';
     this['root']
       ?.['querySelectorAll']?.('.storyboard-3d-focal-ticks [data-focal-length]')
-      ?.['forEach']?.((_0x3b29b3) => {
-        _0x3b29b3['classList']['toggle'](
-          'is-active',
-          Number(_0x3b29b3['dataset']['focalLength']) === _0x3d42c2,
-        );
+      ?.['forEach']?.((el16) => {
+        el16['classList']['toggle']('is-active', Number(el16['dataset']['focalLength']) === focalLength);
       });
-    const _0x78d3de = this['root']?.['querySelector']?.('.storyboard-3d-viewport-hud\x20>\x20strong');
-    if (_0x78d3de) _0x78d3de['textContent'] = _0x3d42c2 + 'mm';
-    return { camera: _0x10f21f, focalLength: _0x3d42c2, scene: _0x1fb2f4 };
+    const el17 = this['root']?.['querySelector']?.('.storyboard-3d-viewport-hud\x20>\x20strong');
+    if (el17) el17['textContent'] = focalLength + 'mm';
+    return { camera: camera3, focalLength: focalLength, scene: scene2 };
   }
-  ['_commitFocalLength'](_0x52ffb2) {
-    return Boolean(this['_previewFocalLength'](_0x52ffb2));
+  ['_commitFocalLength'](value234) {
+    return Boolean(this['_previewFocalLength'](value234));
   }
   ['_restoreViewportFocalLength']() {
-    const _0x1c8349 = Number(this['viewportFocalLength']),
-      _0x3ab55c = this['_readCurrentCameraState']();
-    if (!Number['isFinite'](_0x1c8349) || !_0x3ab55c) return ![];
-    return this['sceneRuntime']?.['setViewportFocalLength']?.(_0x1c8349) === !![];
+    const value235 = Number(this['viewportFocalLength']),
+      enabled17 = this['_readCurrentCameraState']();
+    if (!Number['isFinite'](value235) || !enabled17) return ![];
+    return this['sceneRuntime']?.['setViewportFocalLength']?.(value235) === !![];
   }
-  ['_previewShotTimelineSample'](_0x4cbaef) {
-    if (!_0x4cbaef || !this['sceneRuntime']) return;
-    (this['sceneRuntime']['previewTimelineSample']?.(_0x4cbaef),
+  ['_previewShotTimelineSample'](enabled18) {
+    if (!enabled18 || !this['sceneRuntime']) return;
+    (this['sceneRuntime']['previewTimelineSample']?.(enabled18),
       (this['_miniMapPreviewSceneView'] = null),
       this['_scheduleMiniMapRefresh']());
   }
@@ -2640,11 +2598,11 @@ export class Storyboard3DEditorWorkspace {
       this['_scheduleMiniMapRefresh']());
   }
   ['_syncAIAssistant']() {
-    const _0xfc8b26 = this['root']?.['querySelector']?.('[data-storyboard-3d-ai-panel]');
-    if (!_0xfc8b26) return;
+    const enabled19 = this['root']?.['querySelector']?.('[data-storyboard-3d-ai-panel]');
+    if (!enabled19) return;
     (this['_aiModelSelectorController']?.['destroy']?.(),
       (this['_aiModelSelectorController'] = null),
-      (_0xfc8b26['outerHTML'] = renderAIAssistant({
+      (enabled19['outerHTML'] = renderAIAssistant({
         ...this['aiState'],
         modelId: this['aiModelId'],
         provider: this['aiProvider'],
@@ -2654,99 +2612,97 @@ export class Storyboard3DEditorWorkspace {
   }
   ['_bindAIAssistantModelSelector']() {
     (this['_aiModelSelectorController']?.['destroy']?.(), (this['_aiModelSelectorController'] = null));
-    const _0x453486 = this['root']?.['querySelector']?.(
+    const el18 = this['root']?.['querySelector']?.(
       '.storyboard-3d-ai-assistant [data-aigen-text-model-selector]',
     );
-    if (!_0x453486) return;
-    ((this['_aiModelSelectorController'] = bindAIGenTextModelSelector(_0x453486, {
+    if (!el18) return;
+    ((this['_aiModelSelectorController'] = bindAIGenTextModelSelector(el18, {
       modelId: this['aiModelId'],
       provider: this['aiProvider'],
       getDisplayModelName: getDisplayModelName,
       documentObject: this['document'],
-      onChange: ({ modelId: _0x430f14 }) => {
-        const _0x4b7e13 = resolveStoryboard3DTextModelSelection(_0x430f14);
-        ((this['aiModelId'] = _0x4b7e13['modelId']), (this['aiProvider'] = _0x4b7e13['provider']));
-        const _0x4fd910 = this['root']?.['querySelector']?.('[data-storyboard-3d-action="run-ai-command"]');
-        if (_0x4fd910) {
-          const _0x5cf3ad = ['planning', 'executing', 'starting', 'listening', 'transcribing', 'stopping'][
+      onChange: ({ modelId: modelId2 }) => {
+        const storyboard3DTextModelSelection2 = resolveStoryboard3DTextModelSelection(modelId2);
+        ((this['aiModelId'] = storyboard3DTextModelSelection2['modelId']),
+          (this['aiProvider'] = storyboard3DTextModelSelection2['provider']));
+        const el19 = this['root']?.['querySelector']?.('[data-storyboard-3d-action="run-ai-command"]');
+        if (el19) {
+          const value236 = ['planning', 'executing', 'starting', 'listening', 'transcribing', 'stopping'][
             'includes'
           ](this['aiState']['status']);
-          _0x4fd910['disabled'] = _0x5cf3ad || !this['aiProvider'];
+          el19['disabled'] = value236 || !this['aiProvider'];
         }
       },
     })),
-      _0x453486['querySelectorAll']?.('.node-model-submenu')?.['forEach']((_0x21e289) => {
-        _0x21e289['dataset']['nodeSubmenuPlacement'] = 'viewport-left';
+      el18['querySelectorAll']?.('.node-model-submenu')?.['forEach']((el20) => {
+        el20['dataset']['nodeSubmenuPlacement'] = 'viewport-left';
       }));
   }
   ['_syncViewportSettingControls']() {
-    for (const _0x50a0f8 of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-viewport-setting]') ||
-      []) {
-      const _0x31890b = _0x50a0f8['getAttribute']('data-storyboard-3d-viewport-setting');
-      if (_0x50a0f8['type'] === 'checkbox')
-        _0x50a0f8['checked'] = this['viewportSettings'][_0x31890b] === !![];
+    for (const el21 of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-viewport-setting]') || []) {
+      const value237 = el21['getAttribute']('data-storyboard-3d-viewport-setting');
+      if (el21['type'] === 'checkbox') el21['checked'] = this['viewportSettings'][value237] === !![];
       else {
-        if (_0x31890b === 'rotationSnapDegrees')
-          _0x50a0f8['value'] = String(
+        if (value237 === 'rotationSnapDegrees')
+          el21['value'] = String(
             Math['round']((this['viewportSettings']['rotationSnap'] * 0xb4) / Math['PI']),
           );
         else {
-          if (_0x31890b in this['viewportSettings'])
-            _0x50a0f8['value'] = String(this['viewportSettings'][_0x31890b]);
+          if (value237 in this['viewportSettings'])
+            el21['value'] = String(this['viewportSettings'][value237]);
         }
       }
     }
   }
   ['_syncNavigationSettingControls']() {
-    const _0x54dd9a =
+    const preset =
       STORYBOARD_3D_NAVIGATION_PRESETS[this['navigationSettings']['preset']] ||
       STORYBOARD_3D_NAVIGATION_PRESETS['unity'];
-    for (const _0xe40a8d of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-navigation-preset]') ||
-      []) {
-      const _0x3d6cb0 = _0xe40a8d['value'] === _0x54dd9a['id'];
-      ((_0xe40a8d['checked'] = _0x3d6cb0),
-        _0xe40a8d['closest']('.storyboard-3d-navigation-preset')?.['classList']?.['toggle']?.(
+    for (const el22 of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-navigation-preset]') || []) {
+      const value238 = el22['value'] === preset['id'];
+      ((el22['checked'] = value238),
+        el22['closest']('.storyboard-3d-navigation-preset')?.['classList']?.['toggle']?.(
           'is-active',
-          _0x3d6cb0,
+          value238,
         ));
     }
-    for (const _0x5800b7 of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-navigation-setting]') ||
+    for (const el23 of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-navigation-setting]') ||
       []) {
-      const _0xfc6b33 = _0x5800b7['getAttribute']('data-storyboard-3d-navigation-setting');
-      if (_0x5800b7['type'] === 'checkbox')
-        _0x5800b7['checked'] = this['navigationSettings'][_0xfc6b33] === !![];
-      else _0x5800b7['value'] = String(this['navigationSettings'][_0xfc6b33]);
-      const _0x4b3e8e = this['root']?.['querySelector']?.(
-        '[data-storyboard-3d-navigation-output="' + _0xfc6b33 + '\x22]',
+      const value239 = el23['getAttribute']('data-storyboard-3d-navigation-setting');
+      if (el23['type'] === 'checkbox') el23['checked'] = this['navigationSettings'][value239] === !![];
+      else el23['value'] = String(this['navigationSettings'][value239]);
+      const el24 = this['root']?.['querySelector']?.(
+        '[data-storyboard-3d-navigation-output="' + value239 + '\x22]',
       );
-      if (_0x4b3e8e)
-        _0x4b3e8e['textContent'] = Number(this['navigationSettings'][_0xfc6b33])['toFixed'](0x2) + '×';
+      if (el24) el24['textContent'] = Number(this['navigationSettings'][value239])['toFixed'](0x2) + '×';
     }
-    const _0x35d137 = this['root']?.['querySelector']?.('[data-storyboard-3d-navigation-current]');
-    if (_0x35d137) _0x35d137['textContent'] = _0x54dd9a['label'];
-    for (const _0x2c1478 of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-tool-shortcut]') ||
-      []) {
-      const _0xa8ebe0 = _0x2c1478['getAttribute']('data-storyboard-3d-tool-shortcut'),
-        _0x40c57d = getStoryboard3DToolShortcut(_0x54dd9a['id'], _0xa8ebe0),
-        _0xd142d8 = _0x2c1478['querySelector']?.('.storyboard-3d-control-shortcut');
-      if (_0xd142d8) _0xd142d8['textContent'] = _0x40c57d;
-      const _0x317b3c = _0x2c1478['getAttribute']('aria-label') || _0xa8ebe0;
-      _0x2c1478['setAttribute']('title', _0x40c57d ? _0x317b3c + '\x20(' + _0x40c57d + ')' : _0x317b3c);
+    const el25 = this['root']?.['querySelector']?.('[data-storyboard-3d-navigation-current]');
+    if (el25) el25['textContent'] = preset['label'];
+    for (const el26 of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-tool-shortcut]') || []) {
+      const value240 = el26['getAttribute']('data-storyboard-3d-tool-shortcut'),
+        storyboard3DToolShortcut = getStoryboard3DToolShortcut(preset['id'], value240),
+        el27 = el26['querySelector']?.('.storyboard-3d-control-shortcut');
+      if (el27) el27['textContent'] = storyboard3DToolShortcut;
+      const value241 = el26['getAttribute']('aria-label') || value240;
+      el26['setAttribute'](
+        'title',
+        storyboard3DToolShortcut ? value241 + '\x20(' + storyboard3DToolShortcut + ')' : value241,
+      );
     }
-    const _0x33f0e8 = this['root']?.['querySelector']?.('.storyboard-3d-navigation-status:not(.is-fly-mode)');
-    _0x33f0e8 && (_0x33f0e8['textContent'] = getStoryboard3DNavigationHelpText({ preset: _0x54dd9a['id'] }));
+    const el28 = this['root']?.['querySelector']?.('.storyboard-3d-navigation-status:not(.is-fly-mode)');
+    el28 && (el28['textContent'] = getStoryboard3DNavigationHelpText({ preset: preset['id'] }));
   }
-  ['_saveNavigationSettings'](_0x1821a4) {
+  ['_saveNavigationSettings'](value242) {
     ((this['navigationSettings'] = saveStoryboard3DNavigationSettings(
-      _0x1821a4,
+      value242,
       this['window']?.['localStorage'],
     )),
       this['_syncNavigationSettingControls']());
   }
-  ['_saveTransformSettings'](_0x4d7c4b) {
+  ['_saveTransformSettings'](value243) {
     return (
       (this['viewportSettings'] = saveStoryboard3DTransformSettings(
-        _0x4d7c4b,
+        value243,
         this['window']?.['localStorage'],
       )),
       this['_syncViewportSettingControls'](),
@@ -2754,10 +2710,10 @@ export class Storyboard3DEditorWorkspace {
     );
   }
   ['_syncModelImportStatus']() {
-    const _0x5b54ba = this['root']?.['querySelector']?.('[data-storyboard-3d-import-status]');
-    _0x5b54ba &&
+    const el29 = this['root']?.['querySelector']?.('[data-storyboard-3d-import-status]');
+    el29 &&
       this['modelImportState'] &&
-      (_0x5b54ba['textContent'] =
+      (el29['textContent'] =
         (this['modelImportState']['fileName'] || '模型') +
         '\x20·\x20' +
         this['modelImportState']['status'] +
@@ -2765,251 +2721,263 @@ export class Storyboard3DEditorWorkspace {
         Math['round']((this['modelImportState']['progress'] || 0x0) * 0x64) +
         '%');
   }
-  ['_syncCharacterImagePoseUI'](_0x1aa0cb) {
-    const _0x3ce1ed = String(_0x1aa0cb?.['objectId'] || ''),
-      _0x3ba5d4 = [...(this['root']?.['querySelectorAll']?.('[data-storyboard-3d-character-pose]') || [])][
-        'find'
-      ]((_0xe9a851) => _0xe9a851['dataset']['objectId'] === _0x3ce1ed);
-    if (!_0x3ba5d4) return;
-    const _0x31d145 = _0x1aa0cb['status'] === 'running',
-      _0x7e3d68 = this['projectStore']
+  ['_syncCharacterImagePoseUI'](response4) {
+    const value244 = String(response4?.['objectId'] || ''),
+      el30 = [...(this['root']?.['querySelectorAll']?.('[data-storyboard-3d-character-pose]') || [])]['find'](
+        (el31) => el31['dataset']['objectId'] === value244,
+      );
+    if (!el30) return;
+    const enabled20 = response4['status'] === 'running',
+      value245 = this['projectStore']
         ['getSnapshot']()
-        ['scenes']?.['flatMap']((_0x57cb4) => _0x57cb4['objects'] || [])
-        ['find']((_0x5b1c09) => _0x5b1c09['id'] === _0x3ce1ed && _0x5b1c09['type'] === 'character'),
-      _0x59eafc = Object['keys'](_0x7e3d68?.['boneOverrides'] || {})['length'] > 0x0;
-    ((_0x3ba5d4['dataset']['poseStatus'] = _0x1aa0cb['status'] || 'idle'),
-      (_0x3ba5d4['dataset']['hasPose'] = String(_0x59eafc)),
-      _0x3ba5d4['setAttribute']('aria-busy', String(_0x31d145)));
-    const _0x43fbe0 = _0x3ba5d4['querySelector']('[data-storyboard-3d-action="extract-character-pose"]');
-    _0x43fbe0 &&
-      ((_0x43fbe0['disabled'] = _0x31d145),
-      (_0x43fbe0['textContent'] = _0x31d145 ? '识别中…' : '从图片提取姿势'));
-    const _0x541ba5 = _0x3ba5d4['querySelector'](
+        ['scenes']?.['flatMap']((value246) => value246['objects'] || [])
+        ['find']((value247) => value247['id'] === value244 && value247['type'] === 'character'),
+      enabled21 = Object['keys'](value245?.['boneOverrides'] || {})['length'] > 0x0;
+    ((el30['dataset']['poseStatus'] = response4['status'] || 'idle'),
+      (el30['dataset']['hasPose'] = String(enabled21)),
+      el30['setAttribute']('aria-busy', String(enabled20)));
+    const el32 = el30['querySelector']('[data-storyboard-3d-action="extract-character-pose"]');
+    el32 &&
+      ((el32['disabled'] = enabled20), (el32['textContent'] = enabled20 ? '识别中…' : '从图片提取姿势'));
+    const el33 = el30['querySelector'](
       '[data-storyboard-3d-action="reset-character-pose"], [data-storyboard-3d-action="cancel-character-pose"]',
     );
-    _0x541ba5 &&
-      (_0x541ba5['setAttribute'](
+    el33 &&
+      (el33['setAttribute'](
         'data-storyboard-3d-action',
-        _0x31d145 ? 'cancel-character-pose' : 'reset-character-pose',
+        enabled20 ? 'cancel-character-pose' : 'reset-character-pose',
       ),
-      (_0x541ba5['disabled'] = !_0x31d145 && !_0x59eafc),
-      (_0x541ba5['textContent'] = _0x31d145 ? '取消识别' : '重置骨骼'));
-    const _0x2bfac5 = _0x3ba5d4['querySelector']('[data-storyboard-3d-character-pose-status]');
-    if (_0x2bfac5) _0x2bfac5['textContent'] = getCharacterPoseStatusText(_0x1aa0cb);
+      (el33['disabled'] = !enabled20 && !enabled21),
+      (el33['textContent'] = enabled20 ? '取消识别' : '重置骨骼'));
+    const el34 = el30['querySelector']('[data-storyboard-3d-character-pose-status]');
+    if (el34) el34['textContent'] = getCharacterPoseStatusText(response4);
   }
-  ['_executeMutation']({
-    type: _0x3dfcd4,
-    label: _0x51fc9f,
-    mutate: _0x1dffbd,
-    renderOptions: renderOptions = null,
-  }) {
-    const _0x1a80ec = this['_historyRenderOptions'];
+  ['_executeMutation']({ type: type3, label: label4, mutate: mutate, renderOptions: renderOptions = null }) {
+    const value248 = this['_historyRenderOptions'];
     this['_historyRenderOptions'] = renderOptions;
     try {
       return this['commandHistory']['execute'](
-        createStoryboard3DProjectMutationCommand({ type: _0x3dfcd4, label: _0x51fc9f, mutate: _0x1dffbd }),
+        createStoryboard3DProjectMutationCommand({ type: type3, label: label4, mutate: mutate }),
       );
     } finally {
-      this['_historyRenderOptions'] = _0x1a80ec;
+      this['_historyRenderOptions'] = value248;
     }
   }
-  ['_previewBackgroundCalibrationDrag'](_0x34d729) {
-    const _0x6665f1 = this['projectStore']['getSnapshot'](),
-      _0x42dacf = getActiveStoryboard3DShot(_0x6665f1);
-    if (!_0x34d729?.['imageUrl'] || !_0x42dacf?.['camera']) return;
+  ['_previewBackgroundCalibrationDrag'](enabled22) {
+    const value249 = this['projectStore']['getSnapshot'](),
+      activeStoryboard3DShot2 = getActiveStoryboard3DShot(value249);
+    if (!enabled22?.['imageUrl'] || !activeStoryboard3DShot2?.['camera']) return;
     this['sceneRuntime']?.['previewCamera']?.(
-      deriveStoryboard3DBackgroundCamera(_0x34d729, _0x42dacf['camera']),
+      deriveStoryboard3DBackgroundCamera(enabled22, activeStoryboard3DShot2['camera']),
     );
   }
-  ['_commitBackgroundCalibrationDrag'](_0x17c726) {
+  ['_commitBackgroundCalibrationDrag'](horizonY) {
     this['_executeMutation']({
       type: 'adjust-background-perspective',
       label: 'Adjust background perspective',
-      mutate: (_0x4567c3) => {
-        const _0x51c90a = getActiveStoryboard3DScene(_0x4567c3),
-          _0x47c0b3 = getActiveStoryboard3DShot(_0x4567c3);
-        if (!_0x51c90a?.['background']) return _0x4567c3;
-        const _0x5c358e = updateStoryboard3DBackgroundCalibration(_0x51c90a['background'], {
-          horizonY: _0x17c726['horizonY'],
-          vanishingPoint: [..._0x17c726['vanishingPoint']],
-          calibrationMethod: 'manual',
-          calibrationConfidence: 0x1,
-        });
-        if (_0x47c0b3?.['camera']) {
-          const _0x50f31e = deriveStoryboard3DBackgroundCamera(_0x5c358e, _0x47c0b3['camera']);
-          (setStoryboard3DShotInitialCamera(_0x51c90a, _0x47c0b3, _0x50f31e),
-            (_0x51c90a['background'] = setStoryboard3DBackgroundCameraLock(
-              _0x5c358e,
-              _0x5c358e['lockedCamera'],
-              _0x47c0b3['camera'],
+      mutate: (value250) => {
+        const activeStoryboard3DScene2 = getActiveStoryboard3DScene(value250),
+          activeStoryboard3DShot3 = getActiveStoryboard3DShot(value250);
+        if (!activeStoryboard3DScene2?.['background']) return value250;
+        const updateStoryboard3DBackgroundCalibration2 = updateStoryboard3DBackgroundCalibration(
+          activeStoryboard3DScene2['background'],
+          {
+            horizonY: horizonY['horizonY'],
+            vanishingPoint: [...horizonY['vanishingPoint']],
+            calibrationMethod: 'manual',
+            calibrationConfidence: 0x1,
+          },
+        );
+        if (activeStoryboard3DShot3?.['camera']) {
+          const storyboard3DBackgroundCamera = deriveStoryboard3DBackgroundCamera(
+            updateStoryboard3DBackgroundCalibration2,
+            activeStoryboard3DShot3['camera'],
+          );
+          (setStoryboard3DShotInitialCamera(
+            activeStoryboard3DScene2,
+            activeStoryboard3DShot3,
+            storyboard3DBackgroundCamera,
+          ),
+            (activeStoryboard3DScene2['background'] = setStoryboard3DBackgroundCameraLock(
+              updateStoryboard3DBackgroundCalibration2,
+              updateStoryboard3DBackgroundCalibration2['lockedCamera'],
+              activeStoryboard3DShot3['camera'],
             )));
-        } else _0x51c90a['background'] = _0x5c358e;
-        return _0x4567c3;
+        } else activeStoryboard3DScene2['background'] = updateStoryboard3DBackgroundCalibration2;
+        return value250;
       },
     });
   }
-  ['_deleteObjects'](_0x4c4b04) {
-    const _0x4f554c = [
+  ['_deleteObjects'](value251) {
+    const type4 = [
       ...new Set(
-        (Array['isArray'](_0x4c4b04) ? _0x4c4b04 : [_0x4c4b04])
-          ['map']((_0xdb4564) => String(_0xdb4564 || '')['trim']())
+        (Array['isArray'](value251) ? value251 : [value251])
+          ['map']((value252) => String(value252 || '')['trim']())
           ['filter'](Boolean),
       ),
     ];
-    if (_0x4f554c['length'] === 0x0) return ![];
-    const _0x169328 = this['projectStore']
+    if (type4['length'] === 0x0) return ![];
+    const value253 = this['projectStore']
         ['getSnapshot']()
         ['scenes']['find'](
-          (_0x3f855c) => _0x3f855c['id'] === this['projectStore']['getSnapshot']()['activeSceneId'],
+          (value254) => value254['id'] === this['projectStore']['getSnapshot']()['activeSceneId'],
         ),
-      _0x19abd6 = _0x169328 ? directorDeletionImpact(_0x169328, _0x4f554c) : '';
+      value255 = value253 ? directorDeletionImpact(value253, type4) : '';
     (this['_executeMutation']({
-      type: _0x4f554c['length'] === 0x1 ? 'delete-object' : 'delete-objects',
-      label: _0x4f554c['length'] === 0x1 ? 'Delete object' : 'Delete objects',
-      mutate: (_0x386599) => {
-        const _0x4a2643 = _0x386599['scenes']['findIndex'](
-          (_0x15a437) => _0x15a437['id'] === _0x386599['activeSceneId'],
+      type: type4['length'] === 0x1 ? 'delete-object' : 'delete-objects',
+      label: type4['length'] === 0x1 ? 'Delete object' : 'Delete objects',
+      mutate: (value256) => {
+        const count5 = value256['scenes']['findIndex'](
+          (value257) => value257['id'] === value256['activeSceneId'],
         );
-        if (_0x4a2643 < 0x0) return _0x386599;
-        let _0x2a5b0f = _0x386599['scenes'][_0x4a2643];
+        if (count5 < 0x0) return value256;
+        let objects3 = value256['scenes'][count5];
         return (
-          _0x4f554c['forEach']((_0x4b4388) => {
-            const _0x2e5e59 = _0x2a5b0f['objects']?.['find']((_0xd06ff8) => _0xd06ff8['id'] === _0x4b4388);
-            if (!_0x2e5e59) return;
-            if (_0x2e5e59['type'] === 'camera') {
-              const _0x41bee4 = _0x2a5b0f['shots']?.['find'](
-                (_0x14f3a2) => _0x14f3a2['cameraId'] === _0x4b4388,
-              );
-              _0x2a5b0f = _0x41bee4
-                ? deleteStoryboard3DShot(_0x2a5b0f, _0x41bee4['id'])
+          type4['forEach']((value258) => {
+            const enabled23 = objects3['objects']?.['find']((value259) => value259['id'] === value258);
+            if (!enabled23) return;
+            if (enabled23['type'] === 'camera') {
+              const value260 = objects3['shots']?.['find']((value261) => value261['cameraId'] === value258);
+              objects3 = value260
+                ? deleteStoryboard3DShot(objects3, value260['id'])
                 : {
-                    ..._0x2a5b0f,
-                    objects: _0x2a5b0f['objects']['filter']((_0x4d59eb) => _0x4d59eb['id'] !== _0x4b4388),
+                    ...objects3,
+                    objects: objects3['objects']['filter']((value262) => value262['id'] !== value258),
                   };
               return;
             }
-            if (_0x2e5e59['type'] === 'group') {
-              _0x2a5b0f = deleteStoryboard3DSceneGroup(_0x2a5b0f, _0x4b4388, { deleteChildren: ![] });
+            if (enabled23['type'] === 'group') {
+              objects3 = deleteStoryboard3DSceneGroup(objects3, value258, { deleteChildren: ![] });
               return;
             }
-            _0x2a5b0f = {
-              ..._0x2a5b0f,
-              objects: _0x2a5b0f['objects']['filter']((_0xca2680) => _0xca2680['id'] !== _0x4b4388),
+            objects3 = {
+              ...objects3,
+              objects: objects3['objects']['filter']((value263) => value263['id'] !== value258),
             };
           }),
-          (_0x386599['scenes'][_0x4a2643] = _0x2a5b0f),
-          _0x386599
+          (value256['scenes'][count5] = objects3),
+          value256
         );
       },
     }),
       this['_setSelectedObjects']([]));
-    if (_0x19abd6) this['_setMessage'](_0x19abd6);
+    if (value255) this['_setMessage'](value255);
     return (this['_render'](), !![]);
   }
-  ['_activateShotForCamera'](_0x2a1fb1) {
-    const _0x56ab45 = this['projectStore']['getSnapshot'](),
-      _0x22036f = getActiveStoryboard3DScene(_0x56ab45),
-      _0x5d1823 = _0x22036f?.['shots']?.['find']((_0x23e0a3) => _0x23e0a3['cameraId'] === _0x2a1fb1);
-    if (!_0x5d1823) return !![];
-    const _0x128910 = guardStoryboard3DBackgroundCameraChange(_0x22036f['background'], _0x5d1823['camera']);
-    if (!_0x128910['allowed']) return (this['_setMessage'](_0x128910['reason']), ![]);
-    return (this['projectStore']['selectShot'](_0x5d1823['id']), !![]);
+  ['_activateShotForCamera'](value264) {
+    const value265 = this['projectStore']['getSnapshot'](),
+      activeStoryboard3DScene3 = getActiveStoryboard3DScene(value265),
+      enabled24 = activeStoryboard3DScene3?.['shots']?.['find'](
+        (value266) => value266['cameraId'] === value264,
+      );
+    if (!enabled24) return !![];
+    const guardStoryboard3DBackgroundCameraChange3 = guardStoryboard3DBackgroundCameraChange(
+      activeStoryboard3DScene3['background'],
+      enabled24['camera'],
+    );
+    if (!guardStoryboard3DBackgroundCameraChange3['allowed'])
+      return (this['_setMessage'](guardStoryboard3DBackgroundCameraChange3['reason']), ![]);
+    return (this['projectStore']['selectShot'](enabled24['id']), !![]);
   }
-  ['_focusCameraObject'](_0x5ae977) {
-    if (!_0x5ae977) return;
-    const _0x374086 = () => this['viewportControls']?.['focusObject']?.('camera', _0x5ae977),
-      _0x1d2691 =
+  ['_focusCameraObject'](enabled25) {
+    if (!enabled25) return;
+    const value267 = () => this['viewportControls']?.['focusObject']?.('camera', enabled25),
+      handler4 =
         this['window']?.['requestAnimationFrame']?.['bind'](this['window']) ||
         globalThis['requestAnimationFrame']?.['bind'](globalThis);
-    if (_0x1d2691) _0x1d2691(_0x374086);
-    else queueMicrotask(_0x374086);
+    if (handler4) handler4(value267);
+    else queueMicrotask(value267);
   }
-  ['_recordTransformedKeyframes'](_0x2c1f8c, _0x6221c4) {
+  ['_recordTransformedKeyframes'](value268, value269) {
     if (typeof this['projectStore']?.['getSnapshot'] !== 'function') {
-      this['shotTimelineController']?.['recordObjectTransforms']?.(_0x2c1f8c, _0x6221c4);
+      this['shotTimelineController']?.['recordObjectTransforms']?.(value268, value269);
       return;
     }
-    const _0x2078ba = this['projectStore']['getSnapshot'](),
-      _0x4e3d63 = getActiveStoryboard3DScene(_0x2078ba),
-      _0x52024c = getActiveStoryboard3DShot(_0x2078ba),
-      _0xddadf1 = _0x52024c?.['cameraId'] && _0x2c1f8c?.[_0x52024c['cameraId']];
-    if (_0xddadf1) this['shotTimelineController']?.['recordCameraKeyframe']?.(_0x52024c['camera']);
-    const _0x2266d4 = Object['fromEntries'](
-      Object['entries'](_0x2c1f8c || {})['filter'](
-        ([_0x176079]) =>
-          _0x4e3d63?.['objects']?.['find']((_0x52701f) => _0x52701f['id'] === _0x176079)?.['type'] !==
-          'camera',
+    const value270 = this['projectStore']['getSnapshot'](),
+      activeStoryboard3DScene4 = getActiveStoryboard3DScene(value270),
+      activeStoryboard3DShot4 = getActiveStoryboard3DShot(value270),
+      value271 = activeStoryboard3DShot4?.['cameraId'] && value268?.[activeStoryboard3DShot4['cameraId']];
+    if (value271)
+      this['shotTimelineController']?.['recordCameraKeyframe']?.(activeStoryboard3DShot4['camera']);
+    const value272 = Object['fromEntries'](
+      Object['entries'](value268 || {})['filter'](
+        ([value273]) =>
+          activeStoryboard3DScene4?.['objects']?.['find']((value274) => value274['id'] === value273)?.[
+            'type'
+          ] !== 'camera',
       ),
     );
-    Object['keys'](_0x2266d4)['length'] > 0x0 &&
-      this['shotTimelineController']?.['recordObjectTransforms']?.(_0x2266d4, _0x6221c4);
+    Object['keys'](value272)['length'] > 0x0 &&
+      this['shotTimelineController']?.['recordObjectTransforms']?.(value272, value269);
   }
   ['_commitObjectTransforms']({
-    sceneId: _0x5ed6a5,
-    transforms: _0x352fd1,
-    activeTool: _0x26ed7b,
-    label: _0x8b64f1,
+    sceneId: sceneId3,
+    transforms: transforms,
+    activeTool: activeTool,
+    label: label5,
   }) {
-    const _0x56b278 = () => {
-      const _0x5b4fc1 = this['commandHistory']['execute'](
+    const run6 = () => {
+      const value275 = this['commandHistory']['execute'](
         createStoryboard3DTransformCommand({
-          sceneId: _0x5ed6a5,
-          transforms: _0x352fd1,
-          label: _0x8b64f1,
+          sceneId: sceneId3,
+          transforms: transforms,
+          label: label5,
           mergeKey: ![],
         }),
       );
-      if (_0x5b4fc1 !== ![]) this['_recordTransformedKeyframes'](_0x352fd1, _0x26ed7b);
-      return _0x5b4fc1;
+      if (value275 !== ![]) this['_recordTransformedKeyframes'](transforms, activeTool);
+      return value275;
     };
     if (
       this['shotTimelineController']?.['isAutoKeyEnabled']?.() &&
       typeof this['commandHistory']['runTransaction'] === 'function'
     )
-      return this['commandHistory']['runTransaction'](_0x8b64f1 + '\x20+\x20Auto\x20Key', _0x56b278);
-    return _0x56b278();
+      return this['commandHistory']['runTransaction'](label5 + '\x20+\x20Auto\x20Key', run6);
+    return run6();
   }
   ['_applyDetectedBackgroundCalibration'](
-    _0x5a8594,
+    value276,
     { type: type = 'calibrate-background', label: label = 'Calibrate background' } = {},
   ) {
-    const _0x54f4cb = this['_readCurrentCameraState']?.() || createDefaultStoryboard3DCameraState();
+    const camera4 = this['_readCurrentCameraState']?.() || createDefaultStoryboard3DCameraState();
     this['_executeMutation']({
       type: type,
       label: label,
-      mutate: (_0x40a021) => {
-        const _0xe3ce5 = _0x40a021['scenes']['findIndex'](
-          (_0x2f860b) => _0x2f860b['id'] === _0x40a021['activeSceneId'],
+      mutate: (value277) => {
+        const count6 = value277['scenes']['findIndex'](
+          (value278) => value278['id'] === value277['activeSceneId'],
         );
-        if (_0xe3ce5 < 0x0) return _0x40a021;
-        let _0x549ad4 = _0x40a021['scenes'][_0xe3ce5],
-          _0x1c6e46 = _0x549ad4['shots']?.['find'](
-            (_0x45dbfd) => _0x45dbfd['id'] === _0x549ad4['activeShotId'],
+        if (count6 < 0x0) return value277;
+        let scene3 = value277['scenes'][count6],
+          enabled26 = scene3['shots']?.['find']((value279) => value279['id'] === scene3['activeShotId']);
+        !enabled26 &&
+          ((scene3 = appendShotFromCurrentView({ scene: scene3, camera: camera4 })),
+          (value277['scenes'][count6] = scene3),
+          (enabled26 = scene3['shots']['find']((value280) => value280['id'] === scene3['activeShotId'])));
+        if (!enabled26) return value277;
+        const updateStoryboard3DBackgroundCalibration3 = updateStoryboard3DBackgroundCalibration(
+            scene3['background'],
+            value276,
+          ),
+          storyboard3DBackgroundCamera2 = deriveStoryboard3DBackgroundCamera(
+            updateStoryboard3DBackgroundCalibration3,
+            enabled26['camera'],
           );
-        !_0x1c6e46 &&
-          ((_0x549ad4 = appendShotFromCurrentView({ scene: _0x549ad4, camera: _0x54f4cb })),
-          (_0x40a021['scenes'][_0xe3ce5] = _0x549ad4),
-          (_0x1c6e46 = _0x549ad4['shots']['find'](
-            (_0xa38d29) => _0xa38d29['id'] === _0x549ad4['activeShotId'],
-          )));
-        if (!_0x1c6e46) return _0x40a021;
-        const _0x4e441c = updateStoryboard3DBackgroundCalibration(_0x549ad4['background'], _0x5a8594),
-          _0x461be6 = deriveStoryboard3DBackgroundCamera(_0x4e441c, _0x1c6e46['camera']);
         return (
-          setStoryboard3DShotInitialCamera(_0x549ad4, _0x1c6e46, _0x461be6),
-          (_0x549ad4['background'] = setStoryboard3DBackgroundCameraLock(
-            _0x4e441c,
+          setStoryboard3DShotInitialCamera(scene3, enabled26, storyboard3DBackgroundCamera2),
+          (scene3['background'] = setStoryboard3DBackgroundCameraLock(
+            updateStoryboard3DBackgroundCalibration3,
             !![],
-            _0x1c6e46['camera'],
+            enabled26['camera'],
           )),
-          _0x40a021
+          value277
         );
       },
     });
-    const _0x108396 =
+    const value281 =
       this['viewportControls']?.['updateSettings']?.({ groundLock: !![] }) ||
       normalizeStoryboard3DViewportSettings({ ...this['viewportSettings'], groundLock: !![] });
-    (this['_saveTransformSettings'](_0x108396),
+    (this['_saveTransformSettings'](value281),
       this['sceneRuntime']?.['setViewportUIPatch']?.(
         this['viewportControls']?.['getDirectorUIPatch']?.() || {},
       ),
@@ -3017,52 +2985,58 @@ export class Storyboard3DEditorWorkspace {
   }
   async ['_reanalyzeActiveBackground']() {
     try {
-      const _0x538e09 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
-        _0x57f1a3 = _0x538e09?.['background']?.['binaryAssetId'];
-      if (!_0x538e09 || !_0x57f1a3) throw new Error('当前背景缺少可重新分析的本地原图。');
+      const activeStoryboard3DScene5 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
+        enabled27 = activeStoryboard3DScene5?.['background']?.['binaryAssetId'];
+      if (!activeStoryboard3DScene5 || !enabled27) throw new Error('当前背景缺少可重新分析的本地原图。');
       this['_setMessage']('正在分析地面、地平线和消失点…');
-      const _0x59cfdf = await this['binaryAssetRepository']['get'](_0x57f1a3),
-        _0x1bb828 = restoreStoryboard3DStoredFile(_0x59cfdf?.['primaryFile'], this['window']);
-      if (!_0x1bb828) throw new Error('无法读取当前背景原图。');
-      const _0x50f7f8 = await analyzeStoryboard3DBackgroundImage(_0x1bb828, {
-        documentObject: this['document'],
-        imageBitmapFactory:
-          typeof this['window']?.['createImageBitmap'] === 'function'
-            ? this['window']['createImageBitmap']['bind'](this['window'])
-            : undefined,
-      });
-      (this['_applyDetectedBackgroundCalibration'](_0x50f7f8, {
+      const value282 = await this['binaryAssetRepository']['get'](enabled27),
+        restoreStoryboard3DStoredFile2 = restoreStoryboard3DStoredFile(
+          value282?.['primaryFile'],
+          this['window'],
+        );
+      if (!restoreStoryboard3DStoredFile2) throw new Error('无法读取当前背景原图。');
+      const analyzeStoryboard3DBackgroundImage2 = await analyzeStoryboard3DBackgroundImage(
+        restoreStoryboard3DStoredFile2,
+        {
+          documentObject: this['document'],
+          imageBitmapFactory:
+            typeof this['window']?.['createImageBitmap'] === 'function'
+              ? this['window']['createImageBitmap']['bind'](this['window'])
+              : undefined,
+        },
+      );
+      (this['_applyDetectedBackgroundCalibration'](analyzeStoryboard3DBackgroundImage2, {
         type: 'reanalyze-background',
         label: 'Reanalyze background',
       }),
         this['_setMessage'](
           '背景透视已重新匹配并锁定，当前匹配度 ' +
-            Math['round'](_0x50f7f8['calibrationConfidence'] * 0x64) +
+            Math['round'](analyzeStoryboard3DBackgroundImage2['calibrationConfidence'] * 0x64) +
             '%。',
         ));
-    } catch (_0x5bffaa) {
-      this['_setMessage'](_0x5bffaa?.['message'] || String(_0x5bffaa));
+    } catch (error16) {
+      this['_setMessage'](error16?.['message'] || String(error16));
     }
   }
-  ['_getBackgroundImageController'](_0x26733d) {
-    const _0x2e25f0 = String(_0x26733d || '');
+  ['_getBackgroundImageController'](value283) {
+    const value284 = String(value283 || '');
     return (
-      !this['backgroundImageControllers']['has'](_0x2e25f0) &&
+      !this['backgroundImageControllers']['has'](value284) &&
         this['backgroundImageControllers']['set'](
-          _0x2e25f0,
+          value284,
           createStoryboard3DBackgroundImageController({
             urlApi: this['window']?.['URL'] || globalThis['URL'],
           }),
         ),
-      this['backgroundImageControllers']['get'](_0x2e25f0)
+      this['backgroundImageControllers']['get'](value284)
     );
   }
-  ['_setImportedModelScene'](_0x601bed, _0x85a944, _0x1b71c4 = null) {
-    const _0x19967c = this['importedModelScenes']['get'](_0x601bed);
-    (_0x19967c &&
-      _0x19967c !== _0x85a944 &&
-      disposeCancelledStoryboard3DModelImportResult({ parsed: { scene: _0x19967c } }),
-      this['importedModelScenes']['set'](_0x601bed, setStoryboard3DModelNormalization(_0x85a944, _0x1b71c4)));
+  ['_setImportedModelScene'](value285, value286, value287 = null) {
+    const scene4 = this['importedModelScenes']['get'](value285);
+    (scene4 &&
+      scene4 !== value286 &&
+      disposeCancelledStoryboard3DModelImportResult({ parsed: { scene: scene4 } }),
+      this['importedModelScenes']['set'](value285, setStoryboard3DModelNormalization(value286, value287)));
   }
   ['_getAssetThumbnailRenderer']() {
     return (
@@ -3073,401 +3047,404 @@ export class Storyboard3DEditorWorkspace {
       this['assetThumbnailRenderer']
     );
   }
-  ['_syncAssetThumbnail'](_0x2c4dd4, _0xc3b003, _0x564fde = 'ready') {
-    const _0x502c64 =
+  ['_syncAssetThumbnail'](value288, value289, value290 = 'ready') {
+    const value291 =
       '[data-storyboard-3d-asset-thumbnail][data-asset-id="' +
-      (globalThis['CSS']?.['escape']?.(_0x2c4dd4) || _0x2c4dd4) +
+      (globalThis['CSS']?.['escape']?.(value288) || value288) +
       '\x22]';
-    this['root']?.['querySelectorAll']?.(_0x502c64)?.['forEach']((_0x4fb4b4) => {
-      _0x4fb4b4['dataset']['thumbnailStatus'] = _0x564fde;
-      if (_0xc3b003) {
-        const _0x11f8fa = this['assetLibrary']['find'](_0x2c4dd4),
-          _0x19af8c = this['document']['createElement']('img');
-        ((_0x19af8c['src'] = _0xc3b003),
-          (_0x19af8c['alt'] = (_0x11f8fa?.['name'] || '模型') + ' 模型预览'),
-          _0x4fb4b4['replaceChildren'](_0x19af8c));
+    this['root']?.['querySelectorAll']?.(value291)?.['forEach']((el35) => {
+      el35['dataset']['thumbnailStatus'] = value290;
+      if (value289) {
+        const error17 = this['assetLibrary']['find'](value288),
+          value292 = this['document']['createElement']('img');
+        ((value292['src'] = value289),
+          (value292['alt'] = (error17?.['name'] || '模型') + ' 模型预览'),
+          el35['replaceChildren'](value292));
       } else {
-        if (_0x564fde === 'unavailable') {
-          const _0x3860bd = this['document']['createElement']('small');
-          ((_0x3860bd['textContent'] = '暂无预览'), _0x4fb4b4['replaceChildren'](_0x3860bd));
+        if (value290 === 'unavailable') {
+          const el36 = this['document']['createElement']('small');
+          ((el36['textContent'] = '暂无预览'), el35['replaceChildren'](el36));
         }
       }
     });
   }
-  ['_ensureAssetThumbnail'](_0x281f53) {
-    const _0x372471 = this['assetLibrary']['find'](_0x281f53);
-    if (!_0x372471 || this['_assetThumbnailFailures']['has'](_0x372471['id'])) return Promise['resolve']('');
-    const _0x5f63bf = storyboard3DAssetThumbnailCache['get'](_0x372471);
-    if (_0x5f63bf)
-      return (this['_syncAssetThumbnail'](_0x372471['id'], _0x5f63bf), Promise['resolve'](_0x5f63bf));
-    if (this['_assetThumbnailLoads']['has'](_0x372471['id']))
-      return this['_assetThumbnailLoads']['get'](_0x372471['id']);
-    const _0x3627ab =
-      _0x372471['source']?.['kind'] === 'builtin'
-        ? createStoryboard3DBuiltinAssetThumbnailModel(_0x372471['source']['assetId'] || _0x372471['id'], {
-            clayColor: _0x372471['tint'],
+  ['_ensureAssetThumbnail'](value293) {
+    const clayColor = this['assetLibrary']['find'](value293);
+    if (!clayColor || this['_assetThumbnailFailures']['has'](clayColor['id'])) return Promise['resolve']('');
+    const value294 = storyboard3DAssetThumbnailCache['get'](clayColor);
+    if (value294)
+      return (this['_syncAssetThumbnail'](clayColor['id'], value294), Promise['resolve'](value294));
+    if (this['_assetThumbnailLoads']['has'](clayColor['id']))
+      return this['_assetThumbnailLoads']['get'](clayColor['id']);
+    const enabled28 =
+      clayColor['source']?.['kind'] === 'builtin'
+        ? createStoryboard3DBuiltinAssetThumbnailModel(clayColor['source']['assetId'] || clayColor['id'], {
+            clayColor: clayColor['tint'],
           })
         : null;
     if (
-      _0x372471['source']?.['kind'] !== 'pack' &&
-      !this['importedModelScenes']['has'](_0x372471['id']) &&
-      !_0x3627ab
+      clayColor['source']?.['kind'] !== 'pack' &&
+      !this['importedModelScenes']['has'](clayColor['id']) &&
+      !enabled28
     )
       return (
-        this['_assetThumbnailFailures']['add'](_0x372471['id']),
-        this['_syncAssetThumbnail'](_0x372471['id'], '', 'unavailable'),
+        this['_assetThumbnailFailures']['add'](clayColor['id']),
+        this['_syncAssetThumbnail'](clayColor['id'], '', 'unavailable'),
         Promise['resolve']('')
       );
-    this['_syncAssetThumbnail'](_0x372471['id'], '', 'loading');
-    const _0x4b5bc8 = this['_assetThumbnailQueue']
+    this['_syncAssetThumbnail'](clayColor['id'], '', 'loading');
+    const value295 = this['_assetThumbnailQueue']
       ['catch'](() => '')
       ['then'](async () => {
-        const _0x37a7d8 = _0x3627ab;
+        const value296 = enabled28;
         try {
           if (this['_closed']) return '';
-          const _0x1594ad =
-            _0x37a7d8 ||
-            this['importedModelScenes']['get'](_0x372471['id']) ||
-            (await this['_loadPackAsset'](_0x372471['id']));
-          if (!_0x1594ad || this['_closed']) return '';
-          const _0xf63996 = this['_getAssetThumbnailRenderer']()['render'](_0x1594ad);
+          const enabled29 =
+            value296 ||
+            this['importedModelScenes']['get'](clayColor['id']) ||
+            (await this['_loadPackAsset'](clayColor['id']));
+          if (!enabled29 || this['_closed']) return '';
+          const value297 = this['_getAssetThumbnailRenderer']()['render'](enabled29);
           return (
-            storyboard3DAssetThumbnailCache['set'](_0x372471, _0xf63996),
-            this['_syncAssetThumbnail'](_0x372471['id'], _0xf63996),
-            _0xf63996
+            storyboard3DAssetThumbnailCache['set'](clayColor, value297),
+            this['_syncAssetThumbnail'](clayColor['id'], value297),
+            value297
           );
         } finally {
-          if (_0x37a7d8) disposeStoryboard3DAssetThumbnailModel(_0x37a7d8);
+          if (value296) disposeStoryboard3DAssetThumbnailModel(value296);
         }
       })
       ['catch'](() => {
         return (
-          this['_assetThumbnailFailures']['add'](_0x372471['id']),
-          this['_syncAssetThumbnail'](_0x372471['id'], '', 'unavailable'),
+          this['_assetThumbnailFailures']['add'](clayColor['id']),
+          this['_syncAssetThumbnail'](clayColor['id'], '', 'unavailable'),
           ''
         );
       })
-      ['finally'](() => this['_assetThumbnailLoads']['delete'](_0x372471['id']));
+      ['finally'](() => this['_assetThumbnailLoads']['delete'](clayColor['id']));
     return (
-      this['_assetThumbnailLoads']['set'](_0x372471['id'], _0x4b5bc8),
-      (this['_assetThumbnailQueue'] = _0x4b5bc8),
-      _0x4b5bc8
+      this['_assetThumbnailLoads']['set'](clayColor['id'], value295),
+      (this['_assetThumbnailQueue'] = value295),
+      value295
     );
   }
   ['_observeVisibleAssetThumbnails']() {
     (this['_assetThumbnailObserver']?.['disconnect']?.(), (this['_assetThumbnailObserver'] = null));
     if (!this['editorStore']['getSnapshot']()['assetLibraryOpen']) return;
-    const _0x57e5be = [
+    const list12 = [
       ...(this['root']?.['querySelectorAll']?.(
         '[data-storyboard-3d-asset-thumbnail][data-thumbnail-status="pending"]',
       ) || []),
     ];
-    if (_0x57e5be['length'] === 0x0) return;
-    const _0x4340cb = this['window']?.['IntersectionObserver'];
-    if (typeof _0x4340cb !== 'function') {
-      _0x57e5be['slice'](0x0, 0xc)['forEach']((_0x11eec8) => {
-        void this['_ensureAssetThumbnail'](_0x11eec8['dataset']['assetId']);
+    if (list12['length'] === 0x0) return;
+    const run7 = this['window']?.['IntersectionObserver'];
+    if (typeof run7 !== 'function') {
+      list12['slice'](0x0, 0xc)['forEach']((el37) => {
+        void this['_ensureAssetThumbnail'](el37['dataset']['assetId']);
       });
       return;
     }
-    ((this['_assetThumbnailObserver'] = new _0x4340cb(
-      (_0x3d7fd5) => {
-        _0x3d7fd5['forEach']((_0x4bfe6e) => {
-          if (!_0x4bfe6e['isIntersecting']) return;
-          (this['_assetThumbnailObserver']?.['unobserve']?.(_0x4bfe6e['target']),
-            void this['_ensureAssetThumbnail'](_0x4bfe6e['target']['dataset']['assetId']));
+    ((this['_assetThumbnailObserver'] = new run7(
+      (list13) => {
+        list13['forEach']((event8) => {
+          if (!event8['isIntersecting']) return;
+          (this['_assetThumbnailObserver']?.['unobserve']?.(event8['target']),
+            void this['_ensureAssetThumbnail'](event8['target']['dataset']['assetId']));
         });
       },
       { root: this['root']['querySelector']('.storyboard-3d-asset-grid'), rootMargin: '120px' },
     )),
-      _0x57e5be['forEach']((_0x1de1b5) => this['_assetThumbnailObserver']['observe'](_0x1de1b5)));
+      list12['forEach']((value298) => this['_assetThumbnailObserver']['observe'](value298)));
   }
   async ['_loadModelPackStatus']() {
     try {
-      const _0x172987 = await this['modelPackApi']['getStatus']();
-      this['modelPackStatus'] = { ..._0x172987, loaded: !![], error: '' };
+      const packId = await this['modelPackApi']['getStatus']();
+      this['modelPackStatus'] = { ...packId, loaded: !![], error: '' };
       if (this['_closed']) return this['modelPackStatus'];
-      if (!_0x172987['installed'])
+      if (!packId['installed'])
         return (
           this['_setMessage']('3D 模型包尚未安装，请返回 3D 场景预演首页完成下载后再使用 Agent。'),
           this['modelPackStatus']
         );
-      (this['assetLibrary']['registerPackAssets'](_0x172987['assets'], { packId: _0x172987['packId'] }),
+      (this['assetLibrary']['registerPackAssets'](packId['assets'], { packId: packId['packId'] }),
         await this['_hydratePackAssetsForProject']());
       if (!this['_closed'] && !this['_runtimeError']) this['_render']();
       return this['modelPackStatus'];
-    } catch (_0x73facc) {
-      const _0x22bc10 = '无法读取 3D 模型包：' + (_0x73facc?.['message'] || String(_0x73facc));
+    } catch (error18) {
+      const error19 = '无法读取 3D 模型包：' + (error18?.['message'] || String(error18));
       return (
-        (this['modelPackStatus'] = { loaded: !![], installed: ![], assets: [], error: _0x22bc10 }),
-        this['_setMessage'](_0x22bc10),
+        (this['modelPackStatus'] = { loaded: !![], installed: ![], assets: [], error: error19 }),
+        this['_setMessage'](error19),
         this['modelPackStatus']
       );
     }
   }
   async ['_requireInstalledModelPack']() {
-    const _0x4be108 = this['_modelPackStatusPromise']
+    const enabled30 = this['_modelPackStatusPromise']
       ? await this['_modelPackStatusPromise']
       : await this['_loadModelPackStatus']();
-    if (!_0x4be108?.['installed'])
-      throw new Error(_0x4be108?.['error'] || '3D 模型包尚未安装，无法生成场景。请先返回首页下载模型包。');
-    return _0x4be108;
+    if (!enabled30?.['installed'])
+      throw new Error(enabled30?.['error'] || '3D 模型包尚未安装，无法生成场景。请先返回首页下载模型包。');
+    return enabled30;
   }
-  async ['_loadPackAsset'](_0xf199dd) {
-    const _0x3c9124 = this['assetLibrary']['find'](_0xf199dd);
-    if (_0x3c9124?.['source']?.['kind'] !== 'pack') return null;
-    if (this['importedModelScenes']['has'](_0x3c9124['id']))
-      return this['importedModelScenes']['get'](_0x3c9124['id']);
-    if (this['_packAssetLoads']['has'](_0x3c9124['id']))
-      return this['_packAssetLoads']['get'](_0x3c9124['id']);
-    const _0x10c867 = (async () => {
-      const _0x3d6989 = await this['modelPackApi']['fetchAssetFile'](_0x3c9124['source']),
-        _0x379f31 = await importStoryboard3DModelFile(_0x3d6989, {
+  async ['_loadPackAsset'](value299) {
+    const error20 = this['assetLibrary']['find'](value299);
+    if (error20?.['source']?.['kind'] !== 'pack') return null;
+    if (this['importedModelScenes']['has'](error20['id']))
+      return this['importedModelScenes']['get'](error20['id']);
+    if (this['_packAssetLoads']['has'](error20['id'])) return this['_packAssetLoads']['get'](error20['id']);
+    const value300 = (async () => {
+      const value301 = await this['modelPackApi']['fetchAssetFile'](error20['source']),
+        importStoryboard3DModelFile2 = await importStoryboard3DModelFile(value301, {
           parsers: this['modelParsers'],
-          targetSize: getStoryboard3DAssetSpatialExtent(_0x3c9124),
+          targetSize: getStoryboard3DAssetSpatialExtent(error20),
         });
-      await applyStoryboard3DTexturePolicy(_0x379f31['parsed']['scene'], {
+      await applyStoryboard3DTexturePolicy(importStoryboard3DModelFile2['parsed']['scene'], {
         renderer: this['sceneRuntime']?.['bridge']?.['renderer'],
       });
       if (this['_closed']) {
-        disposeCancelledStoryboard3DModelImportResult(_0x379f31);
+        disposeCancelledStoryboard3DModelImportResult(importStoryboard3DModelFile2);
         throw new Error('3D\x20编辑器已关闭。');
       }
       return (
         this['_setImportedModelScene'](
-          _0x3c9124['id'],
-          _0x379f31['parsed']['scene'],
-          _0x379f31['normalization'],
+          error20['id'],
+          importStoryboard3DModelFile2['parsed']['scene'],
+          importStoryboard3DModelFile2['normalization'],
         ),
-        _0x379f31['parsed']['scene']
+        importStoryboard3DModelFile2['parsed']['scene']
       );
-    })()['catch']((_0x41dfba) => {
-      this['_packAssetLoads']['delete'](_0x3c9124['id']);
+    })()['catch']((error21) => {
+      this['_packAssetLoads']['delete'](error20['id']);
       throw new Error(
-        '模型包素材“' + _0x3c9124['name'] + '”加载失败：' + (_0x41dfba?.['message'] || String(_0x41dfba)),
+        '模型包素材“' + error20['name'] + '”加载失败：' + (error21?.['message'] || String(error21)),
       );
     });
-    return (this['_packAssetLoads']['set'](_0x3c9124['id'], _0x10c867), _0x10c867);
+    return (this['_packAssetLoads']['set'](error20['id'], value300), value300);
   }
   async ['_hydratePackAssetsForProject']() {
-    const _0x11822e = [
+    const list14 = [
         ...new Set(
           this['projectStore']
             ['getSnapshot']()
-            ['scenes']['flatMap']((_0x1a5722) =>
-              _0x1a5722['objects']
-                ['filter']((_0x3b86ed) => _0x3b86ed['type'] === 'prop')
-                ['map']((_0x1191e5) => _0x1191e5['assetId']),
+            ['scenes']['flatMap']((value302) =>
+              value302['objects']
+                ['filter']((value303) => value303['type'] === 'prop')
+                ['map']((value304) => value304['assetId']),
             )
             ['filter'](Boolean),
         ),
       ],
-      _0x57f2ce = _0x11822e['filter'](
-        (_0x130c04) => this['assetLibrary']['find'](_0x130c04)?.['source']?.['kind'] === 'pack',
+      list15 = list14['filter'](
+        (value305) => this['assetLibrary']['find'](value305)?.['source']?.['kind'] === 'pack',
       );
-    if (_0x57f2ce['length'] === 0x0) return [];
-    const _0x5b4ef5 = await Promise['allSettled'](
-        _0x57f2ce['map']((_0x2e2ac7) => this['_loadPackAsset'](_0x2e2ac7)),
-      ),
-      _0x381386 = _0x5b4ef5['find']((_0x41b46e) => _0x41b46e['status'] === 'rejected');
-    if (_0x381386) this['_setMessage'](_0x381386['reason']?.['message'] || String(_0x381386['reason']));
-    return _0x5b4ef5;
+    if (list15['length'] === 0x0) return [];
+    const list16 = await Promise['allSettled'](list15['map']((value306) => this['_loadPackAsset'](value306))),
+      value307 = list16['find']((response5) => response5['status'] === 'rejected');
+    if (value307) this['_setMessage'](value307['reason']?.['message'] || String(value307['reason']));
+    return list16;
   }
-  async ['_ensurePackAssetsForCommands'](_0x345172 = []) {
+  async ['_ensurePackAssetsForCommands'](list17 = []) {
     await this['_requireInstalledModelPack']();
-    const _0x144056 = [
+    const list18 = [
       ...new Set(
-        _0x345172['filter']((_0x8d8c89) => _0x8d8c89?.['tool'] === 'addProp')
-          ['map']((_0x247e42) => _0x247e42?.['args']?.['assetId'])
-          ['filter']((_0x21f7ed) => this['assetLibrary']['find'](_0x21f7ed)?.['source']?.['kind'] === 'pack'),
+        list17['filter']((value308) => value308?.['tool'] === 'addProp')
+          ['map']((value309) => value309?.['args']?.['assetId'])
+          ['filter']((value310) => this['assetLibrary']['find'](value310)?.['source']?.['kind'] === 'pack'),
       ),
     ];
-    await Promise['all'](_0x144056['map']((_0x19cefc) => this['_loadPackAsset'](_0x19cefc)));
+    await Promise['all'](list18['map']((value311) => this['_loadPackAsset'](value311)));
   }
   async ['_hydrateBinaryAssets']() {
-    const _0x114343 = this['projectStore']['getSnapshot'](),
-      _0x47fbe9 = [
+    const value312 = this['projectStore']['getSnapshot'](),
+      args6 = [
         ...new Set(
-          _0x114343['scenes']
-            ['flatMap']((_0x44feac) =>
-              _0x44feac['objects']
-                ['filter']((_0x1547c3) => _0x1547c3['type'] === 'prop')
-                ['map']((_0x1c585a) => _0x1c585a['assetId']),
+          value312['scenes']
+            ['flatMap']((value313) =>
+              value313['objects']
+                ['filter']((value314) => value314['type'] === 'prop')
+                ['map']((value315) => value315['assetId']),
             )
             ['filter'](Boolean),
         ),
       ],
-      _0x554dd9 = [
+      args7 = [
         ...new Set(
-          _0x114343['scenes']
-            ['map']((_0x93ed92) => _0x93ed92['background']?.['binaryAssetId'])
+          value312['scenes']
+            ['map']((value316) => value316['background']?.['binaryAssetId'])
             ['filter'](Boolean),
         ),
       ],
-      _0x4c421e = [...new Set([..._0x47fbe9, ..._0x554dd9])];
-    if (_0x4c421e['length'] === 0x0) return { restoredModels: 0x0, restoredBackgrounds: 0x0 };
+      list19 = [...new Set([...args6, ...args7])];
+    if (list19['length'] === 0x0) return { restoredModels: 0x0, restoredBackgrounds: 0x0 };
     try {
-      const _0x15cae3 = await this['binaryAssetRepository']['getMany'](_0x4c421e);
+      const list20 = await this['binaryAssetRepository']['getMany'](list19);
       if (this['_closed']) return { restoredModels: 0x0, restoredBackgrounds: 0x0 };
-      let _0x3f75f5 = 0x0;
-      const _0x50d1d0 = new Map();
-      for (const _0x554e9e of _0x15cae3['filter'](Boolean)) {
-        const _0x30c65c = restoreStoryboard3DStoredFile(_0x554e9e['primaryFile'], this['window']),
-          _0x575fea = _0x554e9e['relatedFiles']
-            ['map']((_0x423ede) => restoreStoryboard3DStoredFile(_0x423ede, this['window']))
+      let restoredModels = 0x0;
+      const restoredBackgrounds = new Map();
+      for (const value317 of list20['filter'](Boolean)) {
+        const restoreStoryboard3DStoredFile3 = restoreStoryboard3DStoredFile(
+            value317['primaryFile'],
+            this['window'],
+          ),
+          relatedFiles = value317['relatedFiles']
+            ['map']((value318) => restoreStoryboard3DStoredFile(value318, this['window']))
             ['filter'](Boolean);
-        if (!_0x30c65c) continue;
-        if (_0x554e9e['kind'] === 'model') {
-          const _0x4e17e7 = await importStoryboard3DModelFile(_0x30c65c, {
-            parsers: this['modelParsers'],
-            relatedFiles: _0x575fea,
-          });
+        if (!restoreStoryboard3DStoredFile3) continue;
+        if (value317['kind'] === 'model') {
+          const importStoryboard3DModelFile3 = await importStoryboard3DModelFile(
+            restoreStoryboard3DStoredFile3,
+            {
+              parsers: this['modelParsers'],
+              relatedFiles: relatedFiles,
+            },
+          );
           if (this['_closed']) {
-            disposeCancelledStoryboard3DModelImportResult(_0x4e17e7);
+            disposeCancelledStoryboard3DModelImportResult(importStoryboard3DModelFile3);
             break;
           }
-          await applyStoryboard3DTexturePolicy(_0x4e17e7['parsed']['scene'], {
+          await applyStoryboard3DTexturePolicy(importStoryboard3DModelFile3['parsed']['scene'], {
             renderer: this['sceneRuntime']?.['bridge']?.['renderer'],
           });
           if (this['_closed']) {
-            disposeCancelledStoryboard3DModelImportResult(_0x4e17e7);
+            disposeCancelledStoryboard3DModelImportResult(importStoryboard3DModelFile3);
             break;
           }
-          const _0x343093 = _0x554e9e['descriptor']?.['assetDescriptor'];
-          if (_0x343093) this['assetLibrary']['registerImported'](_0x343093);
+          const value319 = value317['descriptor']?.['assetDescriptor'];
+          if (value319) this['assetLibrary']['registerImported'](value319);
           (this['_setImportedModelScene'](
-            _0x554e9e['assetId'],
-            _0x4e17e7['parsed']['scene'],
-            _0x4e17e7['normalization'],
+            value317['assetId'],
+            importStoryboard3DModelFile3['parsed']['scene'],
+            importStoryboard3DModelFile3['normalization'],
           ),
-            (_0x3f75f5 += 0x1));
+            (restoredModels += 0x1));
         } else
-          _0x554e9e['kind'] === 'background' &&
-            _0x114343['scenes']
-              ['filter']((_0x294c9c) => _0x294c9c['background']?.['binaryAssetId'] === _0x554e9e['assetId'])
-              ['forEach']((_0x32c517) => {
-                const _0x3edd90 = this['_getBackgroundImageController'](_0x32c517['id'])['load'](_0x30c65c);
-                _0x50d1d0['set'](_0x32c517['id'], _0x3edd90['imageUrl']);
+          value317['kind'] === 'background' &&
+            value312['scenes']
+              ['filter']((value320) => value320['background']?.['binaryAssetId'] === value317['assetId'])
+              ['forEach']((value321) => {
+                const value322 = this['_getBackgroundImageController'](value321['id'])['load'](
+                  restoreStoryboard3DStoredFile3,
+                );
+                restoredBackgrounds['set'](value321['id'], value322['imageUrl']);
               });
       }
-      _0x50d1d0['size'] > 0x0 &&
-        this['projectStore']['updateProject']('restore-background-assets', (_0x59b71e) => {
-          _0x59b71e['scenes']['forEach']((_0x321368) => {
-            _0x321368['background'] &&
-              _0x50d1d0['has'](_0x321368['id']) &&
-              (_0x321368['background']['imageUrl'] = _0x50d1d0['get'](_0x321368['id']));
+      restoredBackgrounds['size'] > 0x0 &&
+        this['projectStore']['updateProject']('restore-background-assets', (value323) => {
+          value323['scenes']['forEach']((value324) => {
+            value324['background'] &&
+              restoredBackgrounds['has'](value324['id']) &&
+              (value324['background']['imageUrl'] = restoredBackgrounds['get'](value324['id']));
           });
         });
-      if (_0x3f75f5 > 0x0 || _0x50d1d0['size'] > 0x0) this['_render']();
-      return { restoredModels: _0x3f75f5, restoredBackgrounds: _0x50d1d0['size'] };
-    } catch (_0x2d8102) {
+      if (restoredModels > 0x0 || restoredBackgrounds['size'] > 0x0) this['_render']();
+      return { restoredModels: restoredModels, restoredBackgrounds: restoredBackgrounds['size'] };
+    } catch (error22) {
       if (!this['_closed'])
-        this['_setMessage']('本地 3D 资源恢复失败：' + (_0x2d8102?.['message'] || String(_0x2d8102)));
-      return { restoredModels: 0x0, restoredBackgrounds: 0x0, error: _0x2d8102 };
+        this['_setMessage']('本地 3D 资源恢复失败：' + (error22?.['message'] || String(error22)));
+      return { restoredModels: 0x0, restoredBackgrounds: 0x0, error: error22 };
     }
   }
-  ['_getObject'](_0x92fd32, _0x4dffa3) {
-    const _0xed5b8c = this['projectStore']['getSnapshot'](),
-      _0x417b3a = _0xed5b8c['scenes']['find']((_0xa98f1) => _0xa98f1['id'] === _0x92fd32);
-    return _0x417b3a?.['objects']?.['find']((_0x833606) => _0x833606['id'] === _0x4dffa3) || null;
+  ['_getObject'](value325, value326) {
+    const value327 = this['projectStore']['getSnapshot'](),
+      value328 = value327['scenes']['find']((value329) => value329['id'] === value325);
+    return value328?.['objects']?.['find']((value330) => value330['id'] === value326) || null;
   }
-  ['_handleRuntimePointerDown'](_0xb1817f) {
+  ['_handleRuntimePointerDown'](startX) {
     if (!this['sceneRuntime']) return;
-    const _0x1f8156 = this['editorStore']['getSnapshot'](),
-      _0x664abe = resolveStoryboard3DNavigationMode(_0xb1817f, {
-        flyMode: _0x1f8156['flyMode'],
+    const flyMode = this['editorStore']['getSnapshot'](),
+      mode = resolveStoryboard3DNavigationMode(startX, {
+        flyMode: flyMode['flyMode'],
         preset: this['navigationSettings']['preset'],
       });
-    if (_0x664abe) {
-      const _0x1c771c = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
-      if (_0x1c771c?.['background']?.['lockedCamera']) {
+    if (mode) {
+      const activeStoryboard3DScene6 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
+      if (activeStoryboard3DScene6?.['background']?.['lockedCamera']) {
         this['_setMessage']('背景机位已锁定；请先解除锁定再导航视口。');
         return;
       }
-      const _0x305eea = this['sceneRuntime']['getSceneView']?.(),
-        _0x3ebb38 = _0xb1817f['currentTarget'],
-        _0x1293e7 = _0x3ebb38?.['getBoundingClientRect']?.();
-      if (!_0x305eea || !_0x1293e7?.['width'] || !_0x1293e7?.['height']) return;
-      (_0xb1817f['preventDefault'](), _0xb1817f['stopPropagation']());
-      const _0x4c819d = structuredClone(
-        _0x664abe === 'fly-look' ? this['_flySceneView'] || _0x305eea : _0x305eea,
-      );
-      if (_0x664abe === 'fly-look') this['_flySceneView'] = _0x4c819d;
-      const _0x50750a = this['sceneRuntime']['readCurrentCamera']?.();
+      const enabled31 = this['sceneRuntime']['getSceneView']?.(),
+        host = startX['currentTarget'],
+        rect = host?.['getBoundingClientRect']?.();
+      if (!enabled31 || !rect?.['width'] || !rect?.['height']) return;
+      (startX['preventDefault'](), startX['stopPropagation']());
+      const sceneView = structuredClone(mode === 'fly-look' ? this['_flySceneView'] || enabled31 : enabled31);
+      if (mode === 'fly-look') this['_flySceneView'] = sceneView;
+      const cameraPose = this['sceneRuntime']['readCurrentCamera']?.();
       ((this['_cameraDrag'] = {
-        mode: _0x664abe,
-        startX: _0xb1817f['clientX'],
-        startY: _0xb1817f['clientY'],
-        lastX: _0xb1817f['clientX'],
-        lastY: _0xb1817f['clientY'],
-        rect: _0x1293e7,
-        sceneView: _0x4c819d,
-        cameraPose: _0x50750a,
-        fov: this['sceneRuntime']['getViewportFov']?.() ?? _0x50750a?.['fov'],
-        latestSceneView: _0x4c819d,
-        pointerId: _0xb1817f['pointerId'],
-        host: _0x3ebb38,
+        mode: mode,
+        startX: startX['clientX'],
+        startY: startX['clientY'],
+        lastX: startX['clientX'],
+        lastY: startX['clientY'],
+        rect: rect,
+        sceneView: sceneView,
+        cameraPose: cameraPose,
+        fov: this['sceneRuntime']['getViewportFov']?.() ?? cameraPose?.['fov'],
+        latestSceneView: sceneView,
+        pointerId: startX['pointerId'],
+        host: host,
       }),
-        _0x3ebb38?.['classList']?.['add']?.('is-camera-' + _0x664abe));
+        host?.['classList']?.['add']?.('is-camera-' + mode));
       try {
-        _0x3ebb38?.['setPointerCapture']?.(_0xb1817f['pointerId']);
+        host?.['setPointerCapture']?.(startX['pointerId']);
       } catch {}
       (this['window']?.['addEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
         this['window']?.['addEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
         this['window']?.['addEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]));
       return;
     }
-    if (_0xb1817f['button'] !== 0x0) return;
-    (_0xb1817f['preventDefault'](), _0xb1817f['stopPropagation']());
-    const _0x7dc79d = this['sceneRuntime']['pickGizmoHandle'](_0xb1817f['clientX'], _0xb1817f['clientY']);
-    if (_0x7dc79d && _0x1f8156['selectedObjectIds']['length'] > 0x0) {
-      const _0xb2c912 = this['sceneRuntime']['beginGizmoDrag']({
-        handleKey: _0x7dc79d['handleKey'],
-        clientX: _0xb1817f['clientX'],
-        clientY: _0xb1817f['clientY'],
+    if (startX['button'] !== 0x0) return;
+    (startX['preventDefault'](), startX['stopPropagation']());
+    const handleKey = this['sceneRuntime']['pickGizmoHandle'](startX['clientX'], startX['clientY']);
+    if (handleKey && flyMode['selectedObjectIds']['length'] > 0x0) {
+      const dragState = this['sceneRuntime']['beginGizmoDrag']({
+        handleKey: handleKey['handleKey'],
+        clientX: startX['clientX'],
+        clientY: startX['clientY'],
       });
-      if (_0xb2c912) {
-        const _0x4f887c = this['projectStore']['getSnapshot'](),
-          _0x4d0584 = getActiveStoryboard3DScene(_0x4f887c),
-          _0x9ad0b1 = {};
-        _0x1f8156['selectedObjectIds']['forEach']((_0x13d73f) => {
-          const _0x154023 = _0x4d0584?.['objects']?.['find']((_0x27a741) => _0x27a741['id'] === _0x13d73f);
-          _0x154023 &&
-            _0x154023['visible'] !== ![] &&
-            _0x154023['locked'] !== !![] &&
-            canStoryboard3DObjectUseTransformTool(_0x154023, _0x1f8156['activeTool']) &&
-            (_0x9ad0b1[_0x13d73f] = structuredClone(
-              this['shotTimelineController']?.['getPreviewTransform']?.(_0x13d73f) || _0x154023['transform'],
+      if (dragState) {
+        const value331 = this['projectStore']['getSnapshot'](),
+          sceneId4 = getActiveStoryboard3DScene(value331),
+          initialTransforms = {};
+        flyMode['selectedObjectIds']['forEach']((value332) => {
+          const value333 = sceneId4?.['objects']?.['find']((value334) => value334['id'] === value332);
+          value333 &&
+            value333['visible'] !== ![] &&
+            value333['locked'] !== !![] &&
+            canStoryboard3DObjectUseTransformTool(value333, flyMode['activeTool']) &&
+            (initialTransforms[value332] = structuredClone(
+              this['shotTimelineController']?.['getPreviewTransform']?.(value332) || value333['transform'],
             ));
         });
-        if (Object['keys'](_0x9ad0b1)['length'] > 0x0) {
-          const _0x4407fd = createStoryboard3DTransformSession({
-            sceneId: _0x4d0584['id'],
-            activeTool: _0x1f8156['activeTool'],
-            initialTransforms: _0x9ad0b1,
-            dragState: _0xb2c912,
+        if (Object['keys'](initialTransforms)['length'] > 0x0) {
+          const event9 = createStoryboard3DTransformSession({
+            sceneId: sceneId4['id'],
+            activeTool: flyMode['activeTool'],
+            initialTransforms: initialTransforms,
+            dragState: dragState,
             settings: {
               ...this['viewportSettings'],
               groundPositions: this['sceneRuntime']['resolveObjectGroundPositions']?.(
-                Object['keys'](_0x9ad0b1),
+                Object['keys'](initialTransforms),
               ),
             },
           });
-          if (!_0x4407fd) return;
-          _0x4407fd['forcedUniformScale'] &&
+          if (!event9) return;
+          event9['forcedUniformScale'] &&
             this['_setMessage']('多选对象朝向不同，已使用均匀缩放以避免产生不可保存的剪切变形。');
-          ((_0x4407fd['pointerId'] = _0xb1817f['pointerId']),
-            (_0x4407fd['host'] = _0xb1817f['currentTarget']),
-            (this['_gizmoDrag'] = _0x4407fd),
+          ((event9['pointerId'] = startX['pointerId']),
+            (event9['host'] = startX['currentTarget']),
+            (this['_gizmoDrag'] = event9),
             this['sceneRuntime']['setGizmoHoverHandle']?.(null),
-            this['sceneRuntime']['setGizmoActiveHandle']?.(_0x7dc79d['handleKey']));
-          if (_0x4407fd['activeTool'] === 'move') {
-            const _0x46be42 = _0xb2c912['pivot'] || { x: 0x0, y: 0x0, z: 0x0 };
-            this['sceneRuntime']['setGizmoMoveGuideLine']?.({ from: _0x46be42, to: _0x46be42 });
+            this['sceneRuntime']['setGizmoActiveHandle']?.(handleKey['handleKey']));
+          if (event9['activeTool'] === 'move') {
+            const from2 = dragState['pivot'] || { x: 0x0, y: 0x0, z: 0x0 };
+            this['sceneRuntime']['setGizmoMoveGuideLine']?.({ from: from2, to: from2 });
           }
-          _0xb1817f['currentTarget']?.['classList']?.['add']?.('is-gizmo-dragging');
+          startX['currentTarget']?.['classList']?.['add']?.('is-gizmo-dragging');
           try {
-            _0xb1817f['currentTarget']?.['setPointerCapture']?.(_0xb1817f['pointerId']);
+            startX['currentTarget']?.['setPointerCapture']?.(startX['pointerId']);
           } catch {}
           (this['window']?.['addEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
             this['window']?.['addEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
@@ -3480,244 +3457,238 @@ export class Storyboard3DEditorWorkspace {
         }
       }
     }
-    const _0x51a696 = this['sceneRuntime']['pick'](_0xb1817f['clientX'], _0xb1817f['clientY']),
-      _0x579419 = _0x1f8156['selectedObjectIds'];
-    if (STORYBOARD_3D_SELECT_MOVE_TOOLS['has'](_0x1f8156['activeTool']) && !_0x51a696) {
-      this['_beginRuntimeSelectionBox'](_0xb1817f, _0x579419);
+    const enabled32 = this['sceneRuntime']['pick'](startX['clientX'], startX['clientY']),
+      list21 = flyMode['selectedObjectIds'];
+    if (STORYBOARD_3D_SELECT_MOVE_TOOLS['has'](flyMode['activeTool']) && !enabled32) {
+      this['_beginRuntimeSelectionBox'](startX, list21);
       return;
     }
-    let _0x3e41e9 = _0x51a696 ? [_0x51a696['storyboardObjectId']] : [];
-    _0x51a696 &&
-      (_0xb1817f['shiftKey'] || _0xb1817f['ctrlKey'] || _0xb1817f['metaKey']) &&
-      (_0x3e41e9 = _0x579419['includes'](_0x51a696['storyboardObjectId'])
-        ? _0x579419['filter']((_0x25656f) => _0x25656f !== _0x51a696['storyboardObjectId'])
-        : [..._0x579419, _0x51a696['storyboardObjectId']]);
+    let list22 = enabled32 ? [enabled32['storyboardObjectId']] : [];
+    enabled32 &&
+      (startX['shiftKey'] || startX['ctrlKey'] || startX['metaKey']) &&
+      (list22 = list21['includes'](enabled32['storyboardObjectId'])
+        ? list21['filter']((value335) => value335 !== enabled32['storyboardObjectId'])
+        : [...list21, enabled32['storyboardObjectId']]);
     if (
-      _0x51a696?.['storyboardObjectType'] === 'camera' &&
-      _0x3e41e9['includes'](_0x51a696['storyboardObjectId'])
+      enabled32?.['storyboardObjectType'] === 'camera' &&
+      list22['includes'](enabled32['storyboardObjectId'])
     ) {
-      if (!this['_activateShotForCamera'](_0x51a696['storyboardObjectId'])) return;
+      if (!this['_activateShotForCamera'](enabled32['storyboardObjectId'])) return;
     }
-    (this['_setSelectedObjects'](_0x3e41e9),
+    (this['_setSelectedObjects'](list22),
       this['_render'](),
-      _0x51a696?.['storyboardObjectType'] === 'camera' &&
-        _0x3e41e9['length'] === 0x1 &&
-        this['_focusCameraObject'](_0x51a696['storyboardObjectId']));
+      enabled32?.['storyboardObjectType'] === 'camera' &&
+        list22['length'] === 0x1 &&
+        this['_focusCameraObject'](enabled32['storyboardObjectId']));
   }
-  ['_beginRuntimeSelectionBox'](_0x1a7f8c, _0x2d9c75 = []) {
-    const _0x5c03d8 = _0x1a7f8c['currentTarget'];
-    if (!_0x5c03d8) return;
-    const _0x230b4f = this['document']?.['createElement']?.('div') || null;
-    _0x230b4f &&
-      ((_0x230b4f['className'] = 'storyboard-3d-selection-box'),
-      (_0x230b4f['hidden'] = !![]),
-      _0x5c03d8['appendChild'](_0x230b4f));
+  ['_beginRuntimeSelectionBox'](pointerId, args8 = []) {
+    const host2 = pointerId['currentTarget'];
+    if (!host2) return;
+    const box10 = this['document']?.['createElement']?.('div') || null;
+    box10 &&
+      ((box10['className'] = 'storyboard-3d-selection-box'),
+      (box10['hidden'] = !![]),
+      host2['appendChild'](box10));
     ((this['_selectionDrag'] = {
-      pointerId: _0x1a7f8c['pointerId'],
-      host: _0x5c03d8,
-      box: _0x230b4f,
-      start: { clientX: _0x1a7f8c['clientX'], clientY: _0x1a7f8c['clientY'] },
-      initialObjectIds: [..._0x2d9c75],
-      latestObjectIds: [..._0x2d9c75],
-      additive: _0x1a7f8c['shiftKey'] === !![],
-      toggle: _0x1a7f8c['ctrlKey'] === !![] || _0x1a7f8c['metaKey'] === !![],
+      pointerId: pointerId['pointerId'],
+      host: host2,
+      box: box10,
+      start: { clientX: pointerId['clientX'], clientY: pointerId['clientY'] },
+      initialObjectIds: [...args8],
+      latestObjectIds: [...args8],
+      additive: pointerId['shiftKey'] === !![],
+      toggle: pointerId['ctrlKey'] === !![] || pointerId['metaKey'] === !![],
       moved: ![],
     }),
-      _0x5c03d8['classList']?.['add']?.('is-box-selecting'),
+      host2['classList']?.['add']?.('is-box-selecting'),
       this['sceneRuntime']?.['setGizmoHoverHandle']?.(null));
     try {
-      _0x5c03d8['setPointerCapture']?.(_0x1a7f8c['pointerId']);
+      host2['setPointerCapture']?.(pointerId['pointerId']);
     } catch {}
     (this['window']?.['addEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
       this['window']?.['addEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
       this['window']?.['addEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]));
   }
-  ['_cleanupRuntimeSelectionBox'](_0x197f35) {
+  ['_cleanupRuntimeSelectionBox'](event10) {
     (this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
       this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
       this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]),
-      _0x197f35?.['box']?.['remove']?.(),
-      _0x197f35?.['host']?.['classList']?.['remove']?.('is-box-selecting'));
+      event10?.['box']?.['remove']?.(),
+      event10?.['host']?.['classList']?.['remove']?.('is-box-selecting'));
     try {
-      _0x197f35?.['host']?.['releasePointerCapture']?.(_0x197f35['pointerId']);
+      event10?.['host']?.['releasePointerCapture']?.(event10['pointerId']);
     } catch {}
   }
-  ['_finishRuntimeSelectionBox'](_0x507834) {
-    const _0x2201c1 = this['_selectionDrag'];
-    if (!_0x2201c1) return ![];
-    if (_0x2201c1['pointerId'] != null && _0x507834?.['pointerId'] !== _0x2201c1['pointerId']) return ![];
-    (_0x507834?.['preventDefault']?.(),
-      _0x507834?.['stopImmediatePropagation']?.(),
-      this['_cleanupRuntimeSelectionBox'](_0x2201c1),
+  ['_finishRuntimeSelectionBox'](event11) {
+    const event12 = this['_selectionDrag'];
+    if (!event12) return ![];
+    if (event12['pointerId'] != null && event11?.['pointerId'] !== event12['pointerId']) return ![];
+    (event11?.['preventDefault']?.(),
+      event11?.['stopImmediatePropagation']?.(),
+      this['_cleanupRuntimeSelectionBox'](event12),
       (this['_selectionDrag'] = null));
-    if (_0x2201c1['moved']) (this['_setSelectedObjects'](_0x2201c1['latestObjectIds']), this['_render']());
+    if (event12['moved']) (this['_setSelectedObjects'](event12['latestObjectIds']), this['_render']());
     else
-      !_0x2201c1['additive'] && !_0x2201c1['toggle']
+      !event12['additive'] && !event12['toggle']
         ? (this['_setSelectedObjects']([]), this['_render']())
-        : this['sceneRuntime']?.['setSelection']?.(_0x2201c1['initialObjectIds']);
+        : this['sceneRuntime']?.['setSelection']?.(event12['initialObjectIds']);
     return !![];
   }
-  ['_cancelRuntimeSelection'](_0x55bcf3) {
-    const _0x5cd855 = this['_selectionDrag'];
-    if (!_0x5cd855) return ![];
-    if (_0x55bcf3 && _0x5cd855['pointerId'] != null && _0x55bcf3['pointerId'] !== _0x5cd855['pointerId'])
-      return ![];
+  ['_cancelRuntimeSelection'](event13) {
+    const event14 = this['_selectionDrag'];
+    if (!event14) return ![];
+    if (event13 && event14['pointerId'] != null && event13['pointerId'] !== event14['pointerId']) return ![];
     return (
-      _0x55bcf3?.['preventDefault']?.(),
-      _0x55bcf3?.['stopImmediatePropagation']?.(),
-      this['_cleanupRuntimeSelectionBox'](_0x5cd855),
+      event13?.['preventDefault']?.(),
+      event13?.['stopImmediatePropagation']?.(),
+      this['_cleanupRuntimeSelectionBox'](event14),
       (this['_selectionDrag'] = null),
-      this['sceneRuntime']?.['setSelection']?.(_0x5cd855['initialObjectIds']),
+      this['sceneRuntime']?.['setSelection']?.(event14['initialObjectIds']),
       !![]
     );
   }
-  ['_handleRuntimePointerHover'](_0x53f44d) {
+  ['_handleRuntimePointerHover'](event15) {
     if (!this['sceneRuntime'] || this['_gizmoDrag'] || this['_selectionDrag'] || this['_cameraDrag']) return;
-    const _0x5e2b5f = this['editorStore']['getSnapshot'](),
-      _0x14f640 =
-        _0x5e2b5f['selectedObjectIds']['length'] === 0x0
+    const value336 = this['editorStore']['getSnapshot'](),
+      value337 =
+        value336['selectedObjectIds']['length'] === 0x0
           ? null
-          : this['sceneRuntime']['pickGizmoHandle'](_0x53f44d['clientX'], _0x53f44d['clientY']);
-    (this['sceneRuntime']['setGizmoHoverHandle']?.(_0x14f640?.['handleKey'] || null),
-      _0x53f44d['currentTarget']?.['classList']?.['toggle']?.('is-gizmo-hovered', Boolean(_0x14f640)));
+          : this['sceneRuntime']['pickGizmoHandle'](event15['clientX'], event15['clientY']);
+    (this['sceneRuntime']['setGizmoHoverHandle']?.(value337?.['handleKey'] || null),
+      event15['currentTarget']?.['classList']?.['toggle']?.('is-gizmo-hovered', Boolean(value337)));
   }
-  ['_handleRuntimePointerLeave'](_0x55f797) {
+  ['_handleRuntimePointerLeave'](event16) {
     if (this['_gizmoDrag'] || this['_selectionDrag'] || this['_cameraDrag']) return;
     (this['sceneRuntime']?.['setGizmoHoverHandle']?.(null),
-      _0x55f797['currentTarget']?.['classList']?.['remove']?.('is-gizmo-hovered'));
+      event16['currentTarget']?.['classList']?.['remove']?.('is-gizmo-hovered'));
   }
-  ['_handleRuntimeContextMenu'](_0xf66558) {
-    _0xf66558['preventDefault']();
+  ['_handleRuntimeContextMenu'](event17) {
+    event17['preventDefault']();
   }
-  ['_handleRuntimePointerMove'](_0x25d09d) {
-    const _0x500b5c = this['_cameraDrag'];
-    if (_0x500b5c && this['sceneRuntime']) {
-      if (_0x500b5c['pointerId'] != null && _0x25d09d['pointerId'] !== _0x500b5c['pointerId']) return;
-      (_0x25d09d['preventDefault'](), _0x25d09d['stopImmediatePropagation']());
-      const _0x571a83 = _0x25d09d['clientX'] - _0x500b5c['startX'],
-        _0x316a90 = _0x25d09d['clientY'] - _0x500b5c['startY'],
-        _0x5aab2b =
-          _0x571a83 *
+  ['_handleRuntimePointerMove'](precision) {
+    const fov = this['_cameraDrag'];
+    if (fov && this['sceneRuntime']) {
+      if (fov['pointerId'] != null && precision['pointerId'] !== fov['pointerId']) return;
+      (precision['preventDefault'](), precision['stopImmediatePropagation']());
+      const value338 = precision['clientX'] - fov['startX'],
+        value339 = precision['clientY'] - fov['startY'],
+        value340 =
+          value338 *
           this['navigationSettings']['orbitSensitivity'] *
           (this['navigationSettings']['invertOrbitX'] ? -0x1 : 0x1),
-        _0x4414d3 =
-          _0x316a90 *
+        value341 =
+          value339 *
           this['navigationSettings']['orbitSensitivity'] *
           (this['navigationSettings']['invertOrbitY'] ? -0x1 : 0x1),
-        _0x3a0bdb = _0x571a83 * this['navigationSettings']['panSensitivity'],
-        _0x1601f1 = _0x316a90 * this['navigationSettings']['panSensitivity'],
-        _0x350c9e = _0x316a90 * this['navigationSettings']['zoomSensitivity'];
-      if (_0x500b5c['mode'] === 'fly-look') {
-        const _0x1d8bcf = this['_flySceneView'] || _0x500b5c['latestSceneView'],
-          _0x1d3f6c = _0x25d09d['clientX'] - _0x500b5c['lastX'],
-          _0x126aa9 = _0x25d09d['clientY'] - _0x500b5c['lastY'];
-        ((_0x500b5c['lastX'] = _0x25d09d['clientX']),
-          (_0x500b5c['lastY'] = _0x25d09d['clientY']),
-          (_0x500b5c['latestSceneView'] = {
-            ..._0x1d8bcf,
-            ...applySceneFlyLookDelta(_0x1d8bcf, _0x1d3f6c, _0x126aa9, _0x500b5c['rect'], {
-              fov: _0x500b5c['fov'],
+        value342 = value338 * this['navigationSettings']['panSensitivity'],
+        value343 = value339 * this['navigationSettings']['panSensitivity'],
+        value344 = value339 * this['navigationSettings']['zoomSensitivity'];
+      if (fov['mode'] === 'fly-look') {
+        const args9 = this['_flySceneView'] || fov['latestSceneView'],
+          value345 = precision['clientX'] - fov['lastX'],
+          value346 = precision['clientY'] - fov['lastY'];
+        ((fov['lastX'] = precision['clientX']),
+          (fov['lastY'] = precision['clientY']),
+          (fov['latestSceneView'] = {
+            ...args9,
+            ...applySceneFlyLookDelta(args9, value345, value346, fov['rect'], {
+              fov: fov['fov'],
             }),
           }),
-          (this['_flySceneView'] = _0x500b5c['latestSceneView']));
+          (this['_flySceneView'] = fov['latestSceneView']));
       } else {
-        const _0x51e91d =
-          _0x500b5c['mode'] === 'pan'
-            ? applyScenePanDelta(
-                _0x500b5c['sceneView'],
-                _0x500b5c['cameraPose'],
-                _0x3a0bdb,
-                _0x1601f1,
-                _0x500b5c['rect'],
-              )
-            : _0x500b5c['mode'] === 'dolly'
-              ? applySceneDollyDelta(_0x500b5c['sceneView'], _0x350c9e)
-              : applyOrbitDelta(_0x500b5c['sceneView'], _0x5aab2b, _0x4414d3, _0x500b5c['rect'], {
-                  fov: _0x500b5c['fov'],
+        const args10 =
+          fov['mode'] === 'pan'
+            ? applyScenePanDelta(fov['sceneView'], fov['cameraPose'], value342, value343, fov['rect'])
+            : fov['mode'] === 'dolly'
+              ? applySceneDollyDelta(fov['sceneView'], value344)
+              : applyOrbitDelta(fov['sceneView'], value340, value341, fov['rect'], {
+                  fov: fov['fov'],
                 });
-        _0x500b5c['latestSceneView'] = { ..._0x500b5c['sceneView'], ..._0x51e91d };
+        fov['latestSceneView'] = { ...fov['sceneView'], ...args10 };
       }
-      (this['sceneRuntime']['previewSceneView'](_0x500b5c['latestSceneView']),
-        (this['_miniMapPreviewSceneView'] = structuredClone(_0x500b5c['latestSceneView'])),
+      (this['sceneRuntime']['previewSceneView'](fov['latestSceneView']),
+        (this['_miniMapPreviewSceneView'] = structuredClone(fov['latestSceneView'])),
         this['_scheduleMiniMapRefresh']());
       return;
     }
-    const _0x38f5e3 = this['_selectionDrag'];
-    if (_0x38f5e3 && this['sceneRuntime']) {
-      if (_0x38f5e3['pointerId'] != null && _0x25d09d['pointerId'] !== _0x38f5e3['pointerId']) return;
-      (_0x25d09d['preventDefault'](), _0x25d09d['stopImmediatePropagation']());
-      const _0x889220 = createStoryboard3DSelectionRect(_0x38f5e3['start'], _0x25d09d);
-      _0x38f5e3['moved'] = hasStoryboard3DSelectionDragMoved(_0x889220);
-      const _0x4a2ee5 = _0x38f5e3['host']?.['getBoundingClientRect']?.();
-      _0x38f5e3['box'] &&
-        _0x4a2ee5 &&
-        ((_0x38f5e3['box']['hidden'] = !_0x38f5e3['moved']),
-        (_0x38f5e3['box']['style']['left'] = Math['max'](0x0, _0x889220['left'] - _0x4a2ee5['left']) + 'px'),
-        (_0x38f5e3['box']['style']['top'] = Math['max'](0x0, _0x889220['top'] - _0x4a2ee5['top']) + 'px'),
-        (_0x38f5e3['box']['style']['width'] = _0x889220['width'] + 'px'),
-        (_0x38f5e3['box']['style']['height'] = _0x889220['height'] + 'px'));
-      if (_0x38f5e3['moved']) {
-        const _0xd1afb = this['sceneRuntime']
-          ['pickObjectsInRect'](_0x889220)
-          ['map']((_0x14ce75) => _0x14ce75['storyboardObjectId'] || _0x14ce75['objectId'])
+    const initialObjectIds = this['_selectionDrag'];
+    if (initialObjectIds && this['sceneRuntime']) {
+      if (initialObjectIds['pointerId'] != null && precision['pointerId'] !== initialObjectIds['pointerId'])
+        return;
+      (precision['preventDefault'](), precision['stopImmediatePropagation']());
+      const box11 = createStoryboard3DSelectionRect(initialObjectIds['start'], precision);
+      initialObjectIds['moved'] = hasStoryboard3DSelectionDragMoved(box11);
+      const box12 = initialObjectIds['host']?.['getBoundingClientRect']?.();
+      initialObjectIds['box'] &&
+        box12 &&
+        ((initialObjectIds['box']['hidden'] = !initialObjectIds['moved']),
+        (initialObjectIds['box']['style']['left'] = Math['max'](0x0, box11['left'] - box12['left']) + 'px'),
+        (initialObjectIds['box']['style']['top'] = Math['max'](0x0, box11['top'] - box12['top']) + 'px'),
+        (initialObjectIds['box']['style']['width'] = box11['width'] + 'px'),
+        (initialObjectIds['box']['style']['height'] = box11['height'] + 'px'));
+      if (initialObjectIds['moved']) {
+        const hitObjectIds = this['sceneRuntime']
+          ['pickObjectsInRect'](box11)
+          ['map']((value347) => value347['storyboardObjectId'] || value347['objectId'])
           ['filter'](Boolean);
-        ((_0x38f5e3['latestObjectIds'] = mergeStoryboard3DBoxSelection({
-          initialObjectIds: _0x38f5e3['initialObjectIds'],
-          hitObjectIds: _0xd1afb,
-          additive: _0x38f5e3['additive'],
-          toggle: _0x38f5e3['toggle'],
+        ((initialObjectIds['latestObjectIds'] = mergeStoryboard3DBoxSelection({
+          initialObjectIds: initialObjectIds['initialObjectIds'],
+          hitObjectIds: hitObjectIds,
+          additive: initialObjectIds['additive'],
+          toggle: initialObjectIds['toggle'],
         })),
-          this['sceneRuntime']['setSelection'](_0x38f5e3['latestObjectIds']));
+          this['sceneRuntime']['setSelection'](initialObjectIds['latestObjectIds']));
       }
       return;
     }
-    const _0x14e065 = this['_gizmoDrag'];
-    if (!_0x14e065 || !this['sceneRuntime']) return;
-    if (_0x14e065['pointerId'] != null && _0x25d09d['pointerId'] !== _0x14e065['pointerId']) return;
-    (_0x25d09d['preventDefault'](), _0x25d09d['stopImmediatePropagation']());
-    const _0x56eed8 = this['sceneRuntime']['sampleGizmoDragPoint'](
-      _0x14e065['dragState'],
-      _0x25d09d['clientX'],
-      _0x25d09d['clientY'],
+    const event18 = this['_gizmoDrag'];
+    if (!event18 || !this['sceneRuntime']) return;
+    if (event18['pointerId'] != null && precision['pointerId'] !== event18['pointerId']) return;
+    (precision['preventDefault'](), precision['stopImmediatePropagation']());
+    const enabled33 = this['sceneRuntime']['sampleGizmoDragPoint'](
+      event18['dragState'],
+      precision['clientX'],
+      precision['clientY'],
     );
-    if (!_0x56eed8) return;
-    const _0x4b9b05 = this['sceneRuntime']['computeGizmoDragValue'](_0x14e065['dragState'], _0x56eed8),
-      _0x5bbd5f = updateStoryboard3DTransformSession(_0x14e065, _0x4b9b05, {
-        precision: _0x25d09d['shiftKey'] === !![],
-        toggleSnap: _0x25d09d['ctrlKey'] === !![] || _0x25d09d['metaKey'] === !![],
+    if (!enabled33) return;
+    const value348 = this['sceneRuntime']['computeGizmoDragValue'](event18['dragState'], enabled33),
+      updateStoryboard3DTransformSession2 = updateStoryboard3DTransformSession(event18, value348, {
+        precision: precision['shiftKey'] === !![],
+        toggleSnap: precision['ctrlKey'] === !![] || precision['metaKey'] === !![],
       });
-    this['sceneRuntime']['previewObjectTransforms']?.(_0x5bbd5f);
-    if (_0x14e065['activeTool'] === 'move') {
-      const _0x11d630 = Object['keys'](_0x5bbd5f)[0x0],
-        _0x5b7929 = _0x14e065['initialTransforms'][_0x11d630],
-        _0x1ed941 = _0x5bbd5f[_0x11d630],
-        _0x1a7cac = _0x14e065['dragState']['pivot'] || { x: 0x0, y: 0x0, z: 0x0 };
+    this['sceneRuntime']['previewObjectTransforms']?.(updateStoryboard3DTransformSession2);
+    if (event18['activeTool'] === 'move') {
+      const value349 = Object['keys'](updateStoryboard3DTransformSession2)[0x0],
+        value350 = event18['initialTransforms'][value349],
+        value351 = updateStoryboard3DTransformSession2[value349],
+        from3 = event18['dragState']['pivot'] || { x: 0x0, y: 0x0, z: 0x0 };
       this['sceneRuntime']['setGizmoMoveGuideLine']?.({
-        from: _0x1a7cac,
+        from: from3,
         to: {
           x:
-            (_0x1a7cac['x'] || 0x0) +
-            (_0x1ed941?.['position']?.[0x0] || 0x0) -
-            (_0x5b7929?.['position']?.[0x0] || 0x0),
+            (from3['x'] || 0x0) +
+            (value351?.['position']?.[0x0] || 0x0) -
+            (value350?.['position']?.[0x0] || 0x0),
           y:
-            (_0x1a7cac['y'] || 0x0) +
-            (_0x1ed941?.['position']?.[0x1] || 0x0) -
-            (_0x5b7929?.['position']?.[0x1] || 0x0),
+            (from3['y'] || 0x0) +
+            (value351?.['position']?.[0x1] || 0x0) -
+            (value350?.['position']?.[0x1] || 0x0),
           z:
-            (_0x1a7cac['z'] || 0x0) +
-            (_0x1ed941?.['position']?.[0x2] || 0x0) -
-            (_0x5b7929?.['position']?.[0x2] || 0x0),
+            (from3['z'] || 0x0) +
+            (value351?.['position']?.[0x2] || 0x0) -
+            (value350?.['position']?.[0x2] || 0x0),
         },
       });
     }
   }
-  ['_handleRuntimePointerUp'](_0x2b11d6) {
-    if (this['_finishRuntimeSelectionBox'](_0x2b11d6)) return;
-    const _0x11e579 = this['_cameraDrag'];
-    if (_0x11e579) {
-      if (_0x11e579['pointerId'] != null && _0x2b11d6?.['pointerId'] !== _0x11e579['pointerId']) return;
-      (_0x2b11d6?.['preventDefault']?.(),
-        _0x2b11d6?.['stopImmediatePropagation']?.(),
+  ['_handleRuntimePointerUp'](event19) {
+    if (this['_finishRuntimeSelectionBox'](event19)) return;
+    const event20 = this['_cameraDrag'];
+    if (event20) {
+      if (event20['pointerId'] != null && event19?.['pointerId'] !== event20['pointerId']) return;
+      (event19?.['preventDefault']?.(),
+        event19?.['stopImmediatePropagation']?.(),
         this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
         this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
         this['window']?.['removeEventListener']?.(
@@ -3726,473 +3697,469 @@ export class Storyboard3DEditorWorkspace {
           !![],
         ));
       try {
-        _0x11e579['host']?.['releasePointerCapture']?.(_0x11e579['pointerId']);
+        event20['host']?.['releasePointerCapture']?.(event20['pointerId']);
       } catch {}
-      (_0x11e579['host']?.['classList']?.['remove']?.(
+      (event20['host']?.['classList']?.['remove']?.(
         'is-camera-orbit',
         'is-camera-pan',
         'is-camera-dolly',
         'is-camera-fly-look',
       ),
         (this['_cameraDrag'] = null));
-      const _0x4c4e6f = _0x11e579['mode'] === 'fly-look';
-      _0x4c4e6f
-        ? ((this['_flySceneView'] = structuredClone(_0x11e579['latestSceneView'])),
+      const enabled34 = event20['mode'] === 'fly-look';
+      enabled34
+        ? ((this['_flySceneView'] = structuredClone(event20['latestSceneView'])),
           this['_flyKeys']['size'] > 0x0
             ? this['sceneRuntime']?.['previewSceneView']?.(this['_flySceneView'])
             : this['_finishFlyMovement']())
-        : this['sceneRuntime']?.['commitSceneView']?.(_0x11e579['latestSceneView']);
+        : this['sceneRuntime']?.['commitSceneView']?.(event20['latestSceneView']);
       if (this['viewportControls']) {
-        this['viewportControls']['sceneView'] = structuredClone(_0x11e579['latestSceneView']);
-        const _0x3cf7e9 =
+        this['viewportControls']['sceneView'] = structuredClone(event20['latestSceneView']);
+        const value352 =
           this['viewportControls']['getSnapshot']?.()['viewMode'] || this['viewportControls']['viewMode'];
-        _0x3cf7e9 === 'perspective' &&
-          (this['viewportControls']['perspectiveSceneView'] = structuredClone(_0x11e579['latestSceneView']));
+        value352 === 'perspective' &&
+          (this['viewportControls']['perspectiveSceneView'] = structuredClone(event20['latestSceneView']));
       }
       ((this['_miniMapPreviewSceneView'] = null), this['_scheduleMiniMapRefresh']());
-      !_0x4c4e6f &&
+      !enabled34 &&
         this['shotTimelineController']?.['isAutoKeyEnabled']?.() &&
         this['shotTimelineController']['recordCameraKeyframe'](this['_readCurrentCameraState']());
       return;
     }
-    const _0x3300ef = this['_gizmoDrag'];
-    if (!_0x3300ef) return;
-    if (_0x3300ef['pointerId'] != null && _0x2b11d6?.['pointerId'] !== _0x3300ef['pointerId']) return;
-    (_0x2b11d6?.['preventDefault']?.(),
-      _0x2b11d6?.['stopImmediatePropagation']?.(),
+    const sceneId5 = this['_gizmoDrag'];
+    if (!sceneId5) return;
+    if (sceneId5['pointerId'] != null && event19?.['pointerId'] !== sceneId5['pointerId']) return;
+    (event19?.['preventDefault']?.(),
+      event19?.['stopImmediatePropagation']?.(),
       this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
       this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
       this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]),
       this['sceneRuntime']?.['clearPreviews']?.(),
       this['sceneRuntime']?.['clearGizmoState']?.(),
-      _0x3300ef['host']?.['classList']?.['remove']?.('is-gizmo-dragging', 'is-gizmo-hovered'));
+      sceneId5['host']?.['classList']?.['remove']?.('is-gizmo-dragging', 'is-gizmo-hovered'));
     try {
-      _0x3300ef['host']?.['releasePointerCapture']?.(_0x3300ef['pointerId']);
+      sceneId5['host']?.['releasePointerCapture']?.(sceneId5['pointerId']);
     } catch {}
     ((this['_gizmoDrag'] = null),
       this['_commitObjectTransforms']({
-        sceneId: _0x3300ef['sceneId'],
-        transforms: _0x3300ef['latestTransforms'],
-        activeTool: _0x3300ef['activeTool'],
-        label: _0x3300ef['activeTool'] + '\x20objects',
+        sceneId: sceneId5['sceneId'],
+        transforms: sceneId5['latestTransforms'],
+        activeTool: sceneId5['activeTool'],
+        label: sceneId5['activeTool'] + '\x20objects',
       }));
   }
-  ['_cancelRuntimeTransform'](_0x34a93e) {
-    const _0x114fc6 = this['_gizmoDrag'];
-    if (!_0x114fc6) return ![];
-    if (_0x34a93e && _0x114fc6['pointerId'] != null && _0x34a93e['pointerId'] !== _0x114fc6['pointerId'])
-      return ![];
-    (_0x34a93e?.['preventDefault']?.(),
-      _0x34a93e?.['stopImmediatePropagation']?.(),
+  ['_cancelRuntimeTransform'](event21) {
+    const event22 = this['_gizmoDrag'];
+    if (!event22) return ![];
+    if (event21 && event22['pointerId'] != null && event21['pointerId'] !== event22['pointerId']) return ![];
+    (event21?.['preventDefault']?.(),
+      event21?.['stopImmediatePropagation']?.(),
       this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
       this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
       this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]),
       this['sceneRuntime']?.['clearPreviews']?.(),
       this['sceneRuntime']?.['clearGizmoState']?.(),
-      _0x114fc6['host']?.['classList']?.['remove']?.('is-gizmo-dragging', 'is-gizmo-hovered'));
+      event22['host']?.['classList']?.['remove']?.('is-gizmo-dragging', 'is-gizmo-hovered'));
     try {
-      _0x114fc6['host']?.['releasePointerCapture']?.(_0x114fc6['pointerId']);
+      event22['host']?.['releasePointerCapture']?.(event22['pointerId']);
     } catch {}
     return ((this['_gizmoDrag'] = null), !![]);
   }
-  ['_handleRuntimePointerCancel'](_0x3e7623) {
-    if (this['_cancelRuntimeSelection'](_0x3e7623)) return;
-    if (this['_cancelRuntimeTransform'](_0x3e7623)) return;
-    this['_handleRuntimePointerUp'](_0x3e7623);
+  ['_handleRuntimePointerCancel'](value353) {
+    if (this['_cancelRuntimeSelection'](value353)) return;
+    if (this['_cancelRuntimeTransform'](value353)) return;
+    this['_handleRuntimePointerUp'](value353);
   }
-  ['_handleRuntimeWheel'](_0x199320) {
+  ['_handleRuntimeWheel'](event23) {
     if (!this['sceneRuntime']) return;
-    const _0x4c5815 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
-    if (_0x4c5815?.['background']?.['lockedCamera']) {
+    const activeStoryboard3DScene7 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
+    if (activeStoryboard3DScene7?.['background']?.['lockedCamera']) {
       this['_setMessage']('背景机位已锁定；请先解除锁定再缩放视口。');
       return;
     }
-    const _0x270e8d = this['sceneRuntime']['getSceneView']?.();
-    if (!_0x270e8d) return;
-    (_0x199320['preventDefault'](), _0x199320['stopPropagation']());
-    const _0x170e58 = _0x199320['currentTarget']?.['getBoundingClientRect']?.(),
-      _0x24b7d2 = this['navigationSettings']['invertWheel'] ? -0x1 : 0x1,
-      _0x439502 =
-        normalizeWheelDelta(_0x199320['deltaY'], _0x199320['deltaMode'], _0x170e58?.['height'] || 0x320) *
+    const args11 = this['sceneRuntime']['getSceneView']?.();
+    if (!args11) return;
+    (event23['preventDefault'](), event23['stopPropagation']());
+    const box13 = event23['currentTarget']?.['getBoundingClientRect']?.(),
+      value354 = this['navigationSettings']['invertWheel'] ? -0x1 : 0x1,
+      wheelDelta =
+        normalizeWheelDelta(event23['deltaY'], event23['deltaMode'], box13?.['height'] || 0x320) *
         this['navigationSettings']['zoomSensitivity'] *
-        _0x24b7d2,
-      _0x3258fd = { ..._0x270e8d, ...applySceneZoomDelta(_0x270e8d, _0x439502) };
-    (this['sceneRuntime']['previewSceneView'](_0x3258fd),
-      this['sceneRuntime']['commitSceneView'](_0x3258fd),
+        value354,
+      value355 = { ...args11, ...applySceneZoomDelta(args11, wheelDelta) };
+    (this['sceneRuntime']['previewSceneView'](value355),
+      this['sceneRuntime']['commitSceneView'](value355),
       this['_scheduleMiniMapRefresh'](),
       this['viewportControls'] &&
-        ((this['viewportControls']['sceneView'] = structuredClone(_0x3258fd)),
+        ((this['viewportControls']['sceneView'] = structuredClone(value355)),
         this['viewportControls']['getSnapshot']?.()['viewMode'] === 'perspective' &&
-          (this['viewportControls']['perspectiveSceneView'] = structuredClone(_0x3258fd))));
+          (this['viewportControls']['perspectiveSceneView'] = structuredClone(value355))));
   }
-  ['_handleMiniMapPointerDown'](_0x2f53fc) {
-    const _0x164ea3 = _0x2f53fc['target']?.['closest']?.('.storyboard-3d-mini-map-title');
-    if (_0x164ea3 && !_0x2f53fc['target']['closest']('button') && _0x2f53fc['button'] === 0x0) {
-      const _0x1af466 = _0x164ea3['closest']('.storyboard-3d-mini-map-placeholder'),
-        _0xc1f485 = _0x1af466?.['closest']?.('.storyboard-3d-viewport'),
-        _0x2a8d9d = _0x1af466?.['getBoundingClientRect']?.(),
-        _0x382b72 = _0xc1f485?.['getBoundingClientRect']?.();
-      if (!_0x2a8d9d || !_0x382b72) return;
-      (_0x2f53fc['preventDefault'](),
-        _0x2f53fc['stopImmediatePropagation'](),
+  ['_handleMiniMapPointerDown'](startX2) {
+    const el38 = startX2['target']?.['closest']?.('.storyboard-3d-mini-map-title');
+    if (el38 && !startX2['target']['closest']('button') && startX2['button'] === 0x0) {
+      const el39 = el38['closest']('.storyboard-3d-mini-map-placeholder'),
+        el40 = el39?.['closest']?.('.storyboard-3d-viewport'),
+        box14 = el39?.['getBoundingClientRect']?.(),
+        box15 = el40?.['getBoundingClientRect']?.();
+      if (!box14 || !box15) return;
+      (startX2['preventDefault'](),
+        startX2['stopImmediatePropagation'](),
         (this['_miniMapWindowDrag'] = {
-          startX: _0x2f53fc['clientX'],
-          startY: _0x2f53fc['clientY'],
+          startX: startX2['clientX'],
+          startY: startX2['clientY'],
           initial: { ...this['miniMapWindowOffset'] },
-          maxLeft: Math['max'](0x0, _0x382b72['width'] - _0x2a8d9d['width'] - 0x1c),
-          maxDown: Math['max'](0x0, _0x382b72['height'] - _0x2a8d9d['height'] - 0x1c),
+          maxLeft: Math['max'](0x0, box15['width'] - box14['width'] - 0x1c),
+          maxDown: Math['max'](0x0, box15['height'] - box14['height'] - 0x1c),
         }),
         this['window']?.['addEventListener']?.('pointermove', this['_handleMiniMapWindowMove'], !![]),
         this['window']?.['addEventListener']?.('pointerup', this['_handleMiniMapWindowUp'], !![]),
         this['window']?.['addEventListener']?.('pointercancel', this['_handleMiniMapWindowUp'], !![]));
       return;
     }
-    const _0x5e60f5 = _0x2f53fc['target']?.['closest']?.('.storyboard-3d-mini-map-canvas [data-object-id]');
-    if (!_0x5e60f5 || _0x2f53fc['button'] !== 0x0) return;
-    const _0x497c89 = this['projectStore']['getSnapshot'](),
-      _0x33b727 = getActiveStoryboard3DScene(_0x497c89),
-      _0x2285a0 = _0x33b727?.['objects']?.['find'](
-        (_0x3fcb08) => _0x3fcb08['id'] === _0x5e60f5['dataset']['objectId'],
+    const el41 = startX2['target']?.['closest']?.('.storyboard-3d-mini-map-canvas [data-object-id]');
+    if (!el41 || startX2['button'] !== 0x0) return;
+    const value356 = this['projectStore']['getSnapshot'](),
+      sceneId6 = getActiveStoryboard3DScene(value356),
+      objectId2 = sceneId6?.['objects']?.['find'](
+        (value357) => value357['id'] === el41['dataset']['objectId'],
       ),
-      _0x18686c = _0x5e60f5['closest']('.storyboard-3d-mini-map-canvas'),
-      _0x108b01 = _0x18686c?.['getBoundingClientRect']?.();
-    if (!_0x2285a0 || _0x2285a0['locked'] || !_0x108b01?.['width'] || !_0x108b01?.['height']) return;
-    (_0x2f53fc['preventDefault'](),
-      _0x2f53fc['stopImmediatePropagation'](),
-      this['_setSelectedObjects']([_0x2285a0['id']]));
-    const _0x2435e6 = getActiveStoryboard3DShot(_0x497c89);
+      el42 = el41['closest']('.storyboard-3d-mini-map-canvas'),
+      rect2 = el42?.['getBoundingClientRect']?.();
+    if (!objectId2 || objectId2['locked'] || !rect2?.['width'] || !rect2?.['height']) return;
+    (startX2['preventDefault'](),
+      startX2['stopImmediatePropagation'](),
+      this['_setSelectedObjects']([objectId2['id']]));
+    const activeStoryboard3DShot5 = getActiveStoryboard3DShot(value356);
     ((this['_miniMapDrag'] = {
-      sceneId: _0x33b727['id'],
-      objectId: _0x2285a0['id'],
-      object: _0x2285a0,
-      rect: _0x108b01,
+      sceneId: sceneId6['id'],
+      objectId: objectId2['id'],
+      object: objectId2,
+      rect: rect2,
       projection: createMiniMapLayout(
-        _0x33b727,
-        _0x2435e6,
-        _0x108b01,
+        sceneId6,
+        activeStoryboard3DShot5,
+        rect2,
         this['miniMapZoom'],
         this['_miniMapFootprints'],
         this['_miniMapFrame']?.['worldBounds'] || null,
-        this['_getMiniMapCamera'](_0x2435e6),
+        this['_getMiniMapCamera'](activeStoryboard3DShot5),
       )['projection'],
-      transform: structuredClone(_0x2285a0['transform']),
+      transform: structuredClone(objectId2['transform']),
     }),
       this['window']?.['addEventListener']?.('pointermove', this['_handleMiniMapPointerMove'], !![]),
       this['window']?.['addEventListener']?.('pointerup', this['_handleMiniMapPointerUp'], !![]),
       this['window']?.['addEventListener']?.('pointercancel', this['_handleMiniMapPointerUp'], !![]));
   }
-  ['_handleMiniMapPointerMove'](_0x248c9a) {
-    const _0x59dbc3 = this['_miniMapDrag'];
-    if (!_0x59dbc3) return;
-    (_0x248c9a['preventDefault']?.(),
-      _0x248c9a['stopImmediatePropagation']?.(),
-      (_0x59dbc3['transform'] = computeStoryboard3DMiniMapObjectDrag(
+  ['_handleMiniMapPointerMove'](x5) {
+    const x6 = this['_miniMapDrag'];
+    if (!x6) return;
+    (x5['preventDefault']?.(),
+      x5['stopImmediatePropagation']?.(),
+      (x6['transform'] = computeStoryboard3DMiniMapObjectDrag(
         {
-          x: _0x248c9a['clientX'] - _0x59dbc3['rect']['left'],
-          y: _0x248c9a['clientY'] - _0x59dbc3['rect']['top'],
+          x: x5['clientX'] - x6['rect']['left'],
+          y: x5['clientY'] - x6['rect']['top'],
         },
-        _0x59dbc3['object'],
-        _0x59dbc3['projection'],
+        x6['object'],
+        x6['projection'],
       )),
-      this['sceneRuntime']?.['previewObjectTransform']?.(_0x59dbc3['objectId'], _0x59dbc3['transform']));
-    const _0x28def8 = [
+      this['sceneRuntime']?.['previewObjectTransform']?.(x6['objectId'], x6['transform']));
+    const el43 = [
         ...(this['root']?.['querySelectorAll']?.('.storyboard-3d-mini-map-canvas [data-object-id]') || []),
-      ]['find']((_0x360a93) => _0x360a93['dataset']['objectId'] === _0x59dbc3['objectId']),
-      _0x2c5bc9 = projectStoryboard3DWorldToMiniMapRatio(
-        { x: _0x59dbc3['transform']['position'][0x0], z: _0x59dbc3['transform']['position'][0x2] },
-        _0x59dbc3['projection'],
+      ]['find']((el44) => el44['dataset']['objectId'] === x6['objectId']),
+      box16 = projectStoryboard3DWorldToMiniMapRatio(
+        { x: x6['transform']['position'][0x0], z: x6['transform']['position'][0x2] },
+        x6['projection'],
       );
-    (_0x28def8?.['style']?.['setProperty']?.('--mini-x', _0x2c5bc9['x'] * 0x64 + '%'),
-      _0x28def8?.['style']?.['setProperty']?.('--mini-y', _0x2c5bc9['y'] * 0x64 + '%'));
+    (el43?.['style']?.['setProperty']?.('--mini-x', box16['x'] * 0x64 + '%'),
+      el43?.['style']?.['setProperty']?.('--mini-y', box16['y'] * 0x64 + '%'));
   }
   ['_scheduleMiniMapRefresh']() {
     if (this['_closed'] || !this['root'] || this['_miniMapRefreshFrame'] !== null) return;
-    const _0x2a9899 = this['window']?.['requestAnimationFrame']?.['bind']?.(this['window']);
-    if (typeof _0x2a9899 !== 'function') {
+    const run8 = this['window']?.['requestAnimationFrame']?.['bind']?.(this['window']);
+    if (typeof run8 !== 'function') {
       this['_refreshMiniMapFromRuntime']();
       return;
     }
-    this['_miniMapRefreshFrame'] = _0x2a9899(() => {
+    this['_miniMapRefreshFrame'] = run8(() => {
       ((this['_miniMapRefreshFrame'] = null), this['_refreshMiniMapFromRuntime']());
     });
   }
   ['_refreshMiniMapFromRuntime']() {
     if (this['_closed'] || !this['root'] || !this['sceneRuntime']) return;
     this['_miniMapFootprints'] = this['sceneRuntime']['getMiniMapFootprints']?.() || [];
-    const _0x203142 = this['projectStore']['getSnapshot'](),
-      _0x31614f = getActiveStoryboard3DScene(_0x203142),
-      _0x196e62 = getActiveStoryboard3DShot(_0x203142),
-      _0x471d93 = this['root']['querySelector']('.storyboard-3d-mini-map-placeholder');
-    if (!_0x471d93 || !_0x31614f) return;
-    const _0x35b386 = this['_resolveMiniMapWorldBounds'](_0x31614f, _0x196e62, this['_miniMapFootprints']),
-      _0x372aa1 = this['_getMiniMapCamera'](_0x196e62);
-    _0x471d93['innerHTML'] = renderMiniMap(_0x31614f, _0x196e62, {
+    const value358 = this['projectStore']['getSnapshot'](),
+      activeStoryboard3DScene8 = getActiveStoryboard3DScene(value358),
+      activeStoryboard3DShot6 = getActiveStoryboard3DShot(value358),
+      el45 = this['root']['querySelector']('.storyboard-3d-mini-map-placeholder');
+    if (!el45 || !activeStoryboard3DScene8) return;
+    const worldBounds2 = this['_resolveMiniMapWorldBounds'](
+        activeStoryboard3DScene8,
+        activeStoryboard3DShot6,
+        this['_miniMapFootprints'],
+      ),
+      camera5 = this['_getMiniMapCamera'](activeStoryboard3DShot6);
+    el45['innerHTML'] = renderMiniMap(activeStoryboard3DScene8, activeStoryboard3DShot6, {
       expanded: this['miniMapExpanded'],
       zoom: this['miniMapZoom'],
       footprints: this['_miniMapFootprints'],
-      worldBounds: _0x35b386,
-      camera: _0x372aa1,
+      worldBounds: worldBounds2,
+      camera: camera5,
     });
   }
-  ['_getMiniMapCamera'](_0x30fb72) {
+  ['_getMiniMapCamera'](value359) {
     return createStoryboard3DMiniMapCameraPose(
-      _0x30fb72,
+      value359,
       this['_miniMapPreviewSceneView'] || this['sceneRuntime']?.['getSceneView']?.(),
       this['sceneRuntime']?.['readCurrentCamera']?.(),
     );
   }
-  ['_resolveMiniMapWorldBounds'](_0x15b99a, _0x26bb5c, _0x873a03 = []) {
-    const _0x1f3b17 = (_0x15b99a?.['objects'] || [])
-        ['filter']((_0x5612d9) => _0x5612d9?.['visible'] !== ![])
-        ['map']((_0x2554cc) => String(_0x2554cc['id'] || ''))
+  ['_resolveMiniMapWorldBounds'](sceneId7, value360, value361 = []) {
+    const list23 = (sceneId7?.['objects'] || [])
+        ['filter']((value362) => value362?.['visible'] !== ![])
+        ['map']((value363) => String(value363['id'] || ''))
         ['filter'](Boolean)
         ['sort'](),
-      _0x27cb76 = _0x1f3b17['join']('|'),
-      _0x2d36f3 = (_0x873a03 || [])['some'](
-        (_0x236018) => Array['isArray'](_0x236018?.['points']) && _0x236018['points']['length'] >= 0x3,
+      objectSignature = list23['join']('|'),
+      hasGeometry = (value361 || [])['some'](
+        (value364) => Array['isArray'](value364?.['points']) && value364['points']['length'] >= 0x3,
       );
     return (
       (!this['_miniMapFrame'] ||
-        this['_miniMapFrame']['sceneId'] !== _0x15b99a?.['id'] ||
-        this['_miniMapFrame']['objectSignature'] !== _0x27cb76 ||
-        (!this['_miniMapFrame']['hasGeometry'] && _0x2d36f3)) &&
+        this['_miniMapFrame']['sceneId'] !== sceneId7?.['id'] ||
+        this['_miniMapFrame']['objectSignature'] !== objectSignature ||
+        (!this['_miniMapFrame']['hasGeometry'] && hasGeometry)) &&
         (this['_miniMapFrame'] = {
-          sceneId: _0x15b99a?.['id'] || '',
-          objectSignature: _0x27cb76,
-          hasGeometry: _0x2d36f3,
-          worldBounds: createMiniMapWorldBounds(_0x15b99a, _0x26bb5c, _0x873a03),
+          sceneId: sceneId7?.['id'] || '',
+          objectSignature: objectSignature,
+          hasGeometry: hasGeometry,
+          worldBounds: createMiniMapWorldBounds(sceneId7, value360, value361),
         }),
       this['_miniMapFrame']['worldBounds']
     );
   }
-  ['_handleMiniMapPointerUp'](_0x4c8f23) {
-    const _0x87c0f0 = this['_miniMapDrag'];
-    if (!_0x87c0f0) return;
-    (_0x4c8f23?.['preventDefault']?.(),
-      _0x4c8f23?.['stopImmediatePropagation']?.(),
+  ['_handleMiniMapPointerUp'](event24) {
+    const sceneId8 = this['_miniMapDrag'];
+    if (!sceneId8) return;
+    (event24?.['preventDefault']?.(),
+      event24?.['stopImmediatePropagation']?.(),
       this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapPointerMove'], !![]),
       this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapPointerUp'], !![]),
       this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapPointerUp'], !![]),
-      this['sceneRuntime']?.['clearObjectTransformPreview']?.(_0x87c0f0['objectId']),
+      this['sceneRuntime']?.['clearObjectTransformPreview']?.(sceneId8['objectId']),
       (this['_miniMapDrag'] = null),
       this['_commitObjectTransforms']({
-        sceneId: _0x87c0f0['sceneId'],
-        transforms: { [_0x87c0f0['objectId']]: _0x87c0f0['transform'] },
+        sceneId: sceneId8['sceneId'],
+        transforms: { [sceneId8['objectId']]: sceneId8['transform'] },
         activeTool: 'move',
         label: 'Move object from mini map',
       }));
   }
-  ['_handleMiniMapWheel'](_0x48c32a) {
-    if (!_0x48c32a['target']?.['closest']?.('.storyboard-3d-mini-map-placeholder')) return;
-    (_0x48c32a['preventDefault'](),
-      _0x48c32a['stopPropagation'](),
+  ['_handleMiniMapWheel'](event25) {
+    if (!event25['target']?.['closest']?.('.storyboard-3d-mini-map-placeholder')) return;
+    (event25['preventDefault'](),
+      event25['stopPropagation'](),
       (this['miniMapZoom'] = Math['max'](
         0.5,
-        Math['min'](0x3, this['miniMapZoom'] * Math['exp'](-(Number(_0x48c32a['deltaY']) || 0x0) * 0.001)),
+        Math['min'](0x3, this['miniMapZoom'] * Math['exp'](-(Number(event25['deltaY']) || 0x0) * 0.001)),
       )),
       this['_render']());
   }
-  ['_handleMiniMapWindowMove'](_0x5085a9) {
-    const _0x4dc7f7 = this['_miniMapWindowDrag'];
-    if (!_0x4dc7f7) return;
-    (_0x5085a9['preventDefault']?.(),
-      _0x5085a9['stopImmediatePropagation']?.(),
+  ['_handleMiniMapWindowMove'](event26) {
+    const enabled35 = this['_miniMapWindowDrag'];
+    if (!enabled35) return;
+    (event26['preventDefault']?.(),
+      event26['stopImmediatePropagation']?.(),
       (this['miniMapWindowOffset'] = {
         x: Math['max'](
-          -_0x4dc7f7['maxLeft'],
-          Math['min'](0x0, _0x4dc7f7['initial']['x'] + _0x5085a9['clientX'] - _0x4dc7f7['startX']),
+          -enabled35['maxLeft'],
+          Math['min'](0x0, enabled35['initial']['x'] + event26['clientX'] - enabled35['startX']),
         ),
         y: Math['max'](
           0x0,
           Math['min'](
-            _0x4dc7f7['maxDown'],
-            _0x4dc7f7['initial']['y'] + _0x5085a9['clientY'] - _0x4dc7f7['startY'],
+            enabled35['maxDown'],
+            enabled35['initial']['y'] + event26['clientY'] - enabled35['startY'],
           ),
         ),
       }));
-    const _0x3359f4 = this['root']?.['querySelector']?.('.storyboard-3d-mini-map-placeholder');
-    (_0x3359f4?.['style']?.['setProperty']?.('--mini-map-window-x', this['miniMapWindowOffset']['x'] + 'px'),
-      _0x3359f4?.['style']?.['setProperty']?.(
-        '--mini-map-window-y',
-        this['miniMapWindowOffset']['y'] + 'px',
-      ));
+    const el46 = this['root']?.['querySelector']?.('.storyboard-3d-mini-map-placeholder');
+    (el46?.['style']?.['setProperty']?.('--mini-map-window-x', this['miniMapWindowOffset']['x'] + 'px'),
+      el46?.['style']?.['setProperty']?.('--mini-map-window-y', this['miniMapWindowOffset']['y'] + 'px'));
   }
-  ['_handleMiniMapWindowUp'](_0x85c12b) {
+  ['_handleMiniMapWindowUp'](event27) {
     if (!this['_miniMapWindowDrag']) return;
-    (_0x85c12b?.['preventDefault']?.(),
-      _0x85c12b?.['stopImmediatePropagation']?.(),
+    (event27?.['preventDefault']?.(),
+      event27?.['stopImmediatePropagation']?.(),
       (this['_miniMapWindowDrag'] = null),
       this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapWindowMove'], !![]),
       this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapWindowUp'], !![]),
       this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapWindowUp'], !![]));
   }
-  ['_handleOutlineDragStart'](_0x139714) {
-    const _0x599564 = _0x139714['target']?.['closest']?.('.storyboard-3d-scene-item[data-scene-id]');
-    if (_0x599564 && _0x139714['dataTransfer']) {
-      ((_0x139714['dataTransfer']['effectAllowed'] = 'move'),
-        _0x139714['dataTransfer']['setData'](
+  ['_handleOutlineDragStart'](event28) {
+    const el47 = event28['target']?.['closest']?.('.storyboard-3d-scene-item[data-scene-id]');
+    if (el47 && event28['dataTransfer']) {
+      ((event28['dataTransfer']['effectAllowed'] = 'move'),
+        event28['dataTransfer']['setData'](
           'application/x-storyboard3d-scene',
-          _0x599564['dataset']['sceneId'] || '',
+          el47['dataset']['sceneId'] || '',
         ));
       return;
     }
-    const _0x10cdc3 = _0x139714['target']?.['closest']?.('.storyboard-3d-shot-card[data-shot-id]');
-    if (_0x10cdc3 && _0x139714['dataTransfer']) {
-      ((_0x139714['dataTransfer']['effectAllowed'] = 'move'),
-        _0x139714['dataTransfer']['setData'](
+    const el48 = event28['target']?.['closest']?.('.storyboard-3d-shot-card[data-shot-id]');
+    if (el48 && event28['dataTransfer']) {
+      ((event28['dataTransfer']['effectAllowed'] = 'move'),
+        event28['dataTransfer']['setData'](
           'application/x-storyboard3d-shot',
-          _0x10cdc3['dataset']['shotId'] || '',
+          el48['dataset']['shotId'] || '',
         ));
       return;
     }
-    const _0xf68107 = _0x139714['target']?.['closest']?.('.storyboard-3d-object-row[data-object-id]');
-    if (!_0xf68107 || !_0x139714['dataTransfer']) return;
-    ((_0x139714['dataTransfer']['effectAllowed'] = 'move'),
-      _0x139714['dataTransfer']['setData'](
-        'text/storyboard3d-object-id',
-        _0xf68107['dataset']['objectId'] || '',
-      ),
-      _0x139714['dataTransfer']['setData']('text/plain', _0xf68107['dataset']['objectId'] || ''));
+    const el49 = event28['target']?.['closest']?.('.storyboard-3d-object-row[data-object-id]');
+    if (!el49 || !event28['dataTransfer']) return;
+    ((event28['dataTransfer']['effectAllowed'] = 'move'),
+      event28['dataTransfer']['setData']('text/storyboard3d-object-id', el49['dataset']['objectId'] || ''),
+      event28['dataTransfer']['setData']('text/plain', el49['dataset']['objectId'] || ''));
   }
-  ['_handleOutlineDragOver'](_0x40dc58) {
-    if (_0x40dc58['target']?.['closest']?.('.storyboard-3d-scene-item,\x20.storyboard-3d-shot-card')) {
-      _0x40dc58['preventDefault']();
-      if (_0x40dc58['dataTransfer']) _0x40dc58['dataTransfer']['dropEffect'] = 'move';
+  ['_handleOutlineDragOver'](event29) {
+    if (event29['target']?.['closest']?.('.storyboard-3d-scene-item,\x20.storyboard-3d-shot-card')) {
+      event29['preventDefault']();
+      if (event29['dataTransfer']) event29['dataTransfer']['dropEffect'] = 'move';
       return;
     }
-    if (!_0x40dc58['target']?.['closest']?.('.storyboard-3d-outline-list')) return;
-    const _0xb59af5 = _0x40dc58['target']['closest']('.storyboard-3d-object-row');
-    if (_0xb59af5 && _0xb59af5['dataset']['objectType'] !== 'group') return;
-    _0x40dc58['preventDefault']();
-    if (_0x40dc58['dataTransfer']) _0x40dc58['dataTransfer']['dropEffect'] = 'move';
+    if (!event29['target']?.['closest']?.('.storyboard-3d-outline-list')) return;
+    const el50 = event29['target']['closest']('.storyboard-3d-object-row');
+    if (el50 && el50['dataset']['objectType'] !== 'group') return;
+    event29['preventDefault']();
+    if (event29['dataTransfer']) event29['dataTransfer']['dropEffect'] = 'move';
   }
-  ['_handleOutlineDrop'](_0xfe85f) {
-    const _0x2f1369 = _0xfe85f['target']?.['closest']?.('.storyboard-3d-scene-item[data-scene-id]'),
-      _0x332c6a = _0xfe85f['dataTransfer']?.['getData']?.('application/x-storyboard3d-scene') || '';
-    if (_0x2f1369 && _0x332c6a) {
-      (_0xfe85f['preventDefault'](),
+  ['_handleOutlineDrop'](event30) {
+    const el51 = event30['target']?.['closest']?.('.storyboard-3d-scene-item[data-scene-id]'),
+      value365 = event30['dataTransfer']?.['getData']?.('application/x-storyboard3d-scene') || '';
+    if (el51 && value365) {
+      (event30['preventDefault'](),
         this['_executeMutation']({
           type: 'drag-reorder-scene',
           label: 'Reorder scene',
-          mutate: (_0x17e8a0) =>
+          mutate: (value366) =>
             reorderStoryboard3DScene(
-              _0x17e8a0,
-              _0x332c6a,
-              _0x17e8a0['scenes']['findIndex'](
-                (_0x4a503c) => _0x4a503c['id'] === _0x2f1369['dataset']['sceneId'],
-              ),
+              value366,
+              value365,
+              value366['scenes']['findIndex']((value367) => value367['id'] === el51['dataset']['sceneId']),
               { now: Date['now']() },
             ),
         }),
         this['_render']());
       return;
     }
-    const _0xd9b28c = _0xfe85f['target']?.['closest']?.('.storyboard-3d-shot-card[data-shot-id]'),
-      _0x28133e = _0xfe85f['dataTransfer']?.['getData']?.('application/x-storyboard3d-shot') || '';
-    if (_0xd9b28c && _0x28133e) {
-      (_0xfe85f['preventDefault'](),
+    const el52 = event30['target']?.['closest']?.('.storyboard-3d-shot-card[data-shot-id]'),
+      value368 = event30['dataTransfer']?.['getData']?.('application/x-storyboard3d-shot') || '';
+    if (el52 && value368) {
+      (event30['preventDefault'](),
         this['_executeMutation']({
           type: 'drag-reorder-shot',
           label: 'Reorder shot',
-          mutate: (_0x1aeb94) => {
-            const _0xf76e6 = _0x1aeb94['scenes']['findIndex'](
-                (_0x518829) => _0x518829['id'] === _0x1aeb94['activeSceneId'],
+          mutate: (value369) => {
+            const value370 = value369['scenes']['findIndex'](
+                (value371) => value371['id'] === value369['activeSceneId'],
               ),
-              _0x4c346d = _0x1aeb94['scenes'][_0xf76e6];
+              value372 = value369['scenes'][value370];
             return (
-              _0x4c346d &&
-                (_0x1aeb94['scenes'][_0xf76e6] = reorderStoryboard3DShot(
-                  _0x4c346d,
-                  _0x28133e,
-                  _0x4c346d['shots']['findIndex'](
-                    (_0x29f821) => _0x29f821['id'] === _0xd9b28c['dataset']['shotId'],
-                  ),
+              value372 &&
+                (value369['scenes'][value370] = reorderStoryboard3DShot(
+                  value372,
+                  value368,
+                  value372['shots']['findIndex']((value373) => value373['id'] === el52['dataset']['shotId']),
                 )),
-              _0x1aeb94
+              value369
             );
           },
         }),
         this['_render']());
       return;
     }
-    if (!_0xfe85f['target']?.['closest']?.('.storyboard-3d-outline-list')) return;
-    const _0x14913f =
-      _0xfe85f['dataTransfer']?.['getData']?.('text/storyboard3d-object-id') ||
-      _0xfe85f['dataTransfer']?.['getData']?.('text/plain') ||
+    if (!event30['target']?.['closest']?.('.storyboard-3d-outline-list')) return;
+    const enabled36 =
+      event30['dataTransfer']?.['getData']?.('text/storyboard3d-object-id') ||
+      event30['dataTransfer']?.['getData']?.('text/plain') ||
       '';
-    if (!_0x14913f) return;
-    const _0x286695 = _0xfe85f['target']['closest']('.storyboard-3d-object-row');
-    if (_0x286695 && _0x286695['dataset']['objectType'] !== 'group') return;
-    _0xfe85f['preventDefault']();
-    const _0x53c586 = _0x286695?.['dataset']['objectId'] || null;
+    if (!enabled36) return;
+    const el53 = event30['target']['closest']('.storyboard-3d-object-row');
+    if (el53 && el53['dataset']['objectType'] !== 'group') return;
+    event30['preventDefault']();
+    const value374 = el53?.['dataset']['objectId'] || null;
     try {
       this['_executeMutation']({
         type: 'drag-object-parent',
         label: 'Move object in hierarchy',
-        mutate: (_0x5532f3) => {
-          const _0xd239fc = _0x5532f3['scenes']['findIndex'](
-            (_0x55dbce) => _0x55dbce['id'] === _0x5532f3['activeSceneId'],
+        mutate: (value375) => {
+          const count7 = value375['scenes']['findIndex'](
+            (value376) => value376['id'] === value375['activeSceneId'],
           );
           return (
-            _0xd239fc >= 0x0 &&
-              (_0x5532f3['scenes'][_0xd239fc] = setStoryboard3DObjectParent(
-                _0x5532f3['scenes'][_0xd239fc],
-                _0x14913f,
-                _0x53c586,
+            count7 >= 0x0 &&
+              (value375['scenes'][count7] = setStoryboard3DObjectParent(
+                value375['scenes'][count7],
+                enabled36,
+                value374,
               )),
-            _0x5532f3
+            value375
           );
         },
       });
-    } catch (_0x4c01c0) {
-      this['_setMessage'](_0x4c01c0?.['message'] || String(_0x4c01c0));
+    } catch (error23) {
+      this['_setMessage'](error23?.['message'] || String(error23));
     }
     this['_render']();
   }
   ['_render']({ preserveAssetLibrary: preserveAssetLibrary = ![] } = {}) {
     if (!this['root']) return;
-    const _0x19fb8a = captureTimelinePresentation(this['root']),
-      _0x25802c = this['root']['querySelector']('.storyboard-3d-outline-list')?.['scrollTop'] || 0x0,
-      _0x3f1e06 = this['root']['querySelector']('.storyboard-3d-object-properties-sidebar'),
-      _0x1dac6c = _0x3f1e06?.['dataset']['objectId'] || '',
-      _0x41f464 =
-        _0x3f1e06?.['querySelector']('.storyboard-3d-object-properties-content')?.['scrollTop'] || 0x0,
-      _0x231b6d = this['root']['querySelector']('.storyboard-3d-global-settings')?.['open'] === !![];
+    const captureTimelinePresentation2 = captureTimelinePresentation(this['root']),
+      value377 = this['root']['querySelector']('.storyboard-3d-outline-list')?.['scrollTop'] || 0x0,
+      el54 = this['root']['querySelector']('.storyboard-3d-object-properties-sidebar'),
+      value378 = el54?.['dataset']['objectId'] || '',
+      value379 = el54?.['querySelector']('.storyboard-3d-object-properties-content')?.['scrollTop'] || 0x0,
+      open2 = this['root']['querySelector']('.storyboard-3d-global-settings')?.['open'] === !![];
     (this['_aiModelSelectorController']?.['destroy']?.(), (this['_aiModelSelectorController'] = null));
-    const _0x26a06c = this['projectStore']['getSnapshot'](),
-      _0x37bf1f = this['editorStore']['getSnapshot'](),
-      _0x261fcb = getActiveStoryboard3DScene(_0x26a06c),
-      _0x144b5f = getActiveStoryboard3DShot(_0x26a06c),
-      _0x25b821 = _0x37bf1f['selectedObjectIds']['at'](-0x1),
-      _0x4195c0 = _0x261fcb?.['objects']?.['find']((_0x54ef64) => _0x54ef64['id'] === _0x25b821),
-      _0x2e1b39 = _0x37bf1f['assetLibraryOpen']
+    const project8 = this['projectStore']['getSnapshot'](),
+      active4 = this['editorStore']['getSnapshot'](),
+      sceneGroups2 = getActiveStoryboard3DScene(project8),
+      activeShot2 = getActiveStoryboard3DShot(project8),
+      value380 = active4['selectedObjectIds']['at'](-0x1),
+      object2 = sceneGroups2?.['objects']?.['find']((value381) => value381['id'] === value380),
+      active5 = active4['assetLibraryOpen']
         ? 'assets'
-        : this['rightSidebarMode'] === 'object' && _0x4195c0
+        : this['rightSidebarMode'] === 'object' && object2
           ? 'object'
           : ['ai', 'perspective']['includes'](this['rightSidebarMode'])
             ? this['rightSidebarMode']
             : null;
-    this['rightSidebarMode'] = _0x2e1b39;
-    const _0xc070be = this['window']?.['innerWidth'] || 0x5a0,
-      _0x48932d = normalizeStoryboard3DRightSidebarWidth(this['rightSidebarWidth'], _0xc070be, _0x2e1b39),
-      _0xbbcb21 =
-        preserveAssetLibrary && _0x2e1b39 === 'assets'
+    this['rightSidebarMode'] = active5;
+    const layoutWidth = this['window']?.['innerWidth'] || 0x5a0,
+      sidebarWidth = normalizeStoryboard3DRightSidebarWidth(this['rightSidebarWidth'], layoutWidth, active5),
+      el55 =
+        preserveAssetLibrary && active5 === 'assets'
           ? this['root']['querySelector']('.storyboard-3d-right-sidebar')
           : null,
-      _0x7a3557 = _0xbbcb21?.['contains']?.(this['document']?.['activeElement'])
+      el56 = el55?.['contains']?.(this['document']?.['activeElement'])
         ? this['document']['activeElement']
         : null;
-    _0xbbcb21?.['remove']?.();
-    const _0xf44e69 = this['viewportControls']?.['getSnapshot']?.()['viewMode'] || 'perspective',
-      _0x51d4da = this['shotTimelineController']?.['isDrawerOpen']?.() === !![],
-      _0x2cff3a =
+    el55?.['remove']?.();
+    const active6 = this['viewportControls']?.['getSnapshot']?.()['viewMode'] || 'perspective',
+      timelineOpen2 = this['shotTimelineController']?.['isDrawerOpen']?.() === !![],
+      value382 =
         this['root']['getBoundingClientRect']?.()['height'] || this['window']?.['innerHeight'] || 0x384,
-      _0x379796 = normalizeStoryboard3DTimelineHeight(this['timelineHeight'], _0x2cff3a);
-    this['timelineHeight'] = _0x379796;
-    const _0x3ceccb = this['_getMiniMapCamera'](_0x144b5f),
-      _0x1d6e22 = summarizeStoryboard3DProject(_0x26a06c),
-      _0x2f2149 = this['_resolveMiniMapWorldBounds'](_0x261fcb, _0x144b5f, this['_miniMapFootprints']),
-      _0xfc7f77 = _0x37bf1f['assetLibraryOpen']
+      storyboard3DTimelineHeight = normalizeStoryboard3DTimelineHeight(this['timelineHeight'], value382);
+    this['timelineHeight'] = storyboard3DTimelineHeight;
+    const camera6 = this['_getMiniMapCamera'](activeShot2),
+      summarizeStoryboard3DProject2 = summarizeStoryboard3DProject(project8),
+      worldBounds3 = this['_resolveMiniMapWorldBounds'](
+        sceneGroups2,
+        activeShot2,
+        this['_miniMapFootprints'],
+      ),
+      totalCount = active4['assetLibraryOpen']
         ? this['assetLibrary']
             ['list']({
               query: this['assetQuery'],
@@ -4200,26 +4167,24 @@ export class Storyboard3DEditorWorkspace {
               limit: 0x640,
             })
             ['filter'](
-              (_0xdb492e) =>
-                this['assetCategory'] !== 'favorite' || this['favoriteAssetIds']['has'](_0xdb492e['id']),
+              (value383) =>
+                this['assetCategory'] !== 'favorite' || this['favoriteAssetIds']['has'](value383['id']),
             )
         : [],
-      _0x4c2e4d = _0xfc7f77['slice'](0x0, this['assetVisibleLimit'])['map']((_0x4ddbe6) => ({
-        ..._0x4ddbe6,
-        thumbnailUrl: _0x4ddbe6['thumbnailUrl'] || storyboard3DAssetThumbnailCache['get'](_0x4ddbe6),
+      assets2 = totalCount['slice'](0x0, this['assetVisibleLimit'])['map']((thumbnailUrl) => ({
+        ...thumbnailUrl,
+        thumbnailUrl: thumbnailUrl['thumbnailUrl'] || storyboard3DAssetThumbnailCache['get'](thumbnailUrl),
       })),
-      _0x448062 = this['sceneRuntime']
-        ? this['root']['querySelector']('[data-storyboard-3d-runtime-host]')
-        : null;
-    _0x448062?.['remove']?.();
-    if (!_0x448062) this['_disposeSceneRuntime']();
+      el57 = this['sceneRuntime'] ? this['root']['querySelector']('[data-storyboard-3d-runtime-host]') : null;
+    el57?.['remove']?.();
+    if (!el57) this['_disposeSceneRuntime']();
     this['root']['innerHTML'] =
       '<div class="storyboard-3d-editor-shell ' +
-      (_0x2e1b39 ? 'is-right-sidebar-open' : '') +
+      (active5 ? 'is-right-sidebar-open' : '') +
       '">\n      <header class="storyboard-3d-editor-topbar">\n        <div class="storyboard-3d-editor-identity">\n          <span class="storyboard-3d-editor-mark" aria-hidden="true">3D</span>\n          <label>\n            <span>' +
       escapeHtml(t('storyboard3d.editor.projectName')) +
       '</span>\n            <input type="text" value="' +
-      escapeHtml(_0x26a06c['name']) +
+      escapeHtml(project8['name']) +
       '" maxlength="120" data-storyboard-3d-project-name aria-label="' +
       escapeHtml(t('storyboard3d.editor.projectName')) +
       '">\n          </label>\n          <span class="storyboard-3d-save-status" data-storyboard-3d-save-status data-status="' +
@@ -4233,24 +4198,24 @@ export class Storyboard3DEditorWorkspace {
       '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22open-explore\x22>' +
       escapeHtml(t('storyboard3d.editor.exploreMode')) +
       '</button>\n        </nav>\n        <div class="storyboard-3d-topbar-actions">\n          <button type="button" class="storyboard-3d-asset-library-trigger ' +
-      (_0x2e1b39 === 'assets' ? 'is-active' : '') +
+      (active5 === 'assets' ? 'is-active' : '') +
       '" data-storyboard-3d-action="open-asset-library" aria-controls="storyboard3DRightSidebar" aria-expanded="' +
-      (_0x2e1b39 === 'assets') +
+      (active5 === 'assets') +
       '\x22><span\x20aria-hidden=\x22true\x22>◇</span>模型库</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
       renderNavigationSettings(this['navigationSettings'], {
-        open: _0x231b6d,
+        open: open2,
         viewportSettings: this['viewportSettings'],
       }) +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22storyboard-3d-ai-sidebar-trigger\x20' +
-      (_0x2e1b39 === 'ai' ? 'is-active' : '') +
+      (active5 === 'ai' ? 'is-active' : '') +
       '" data-storyboard-3d-action="toggle-ai-sidebar" aria-controls="storyboard3DRightSidebar" aria-expanded="' +
-      (_0x2e1b39 === 'ai') +
+      (active5 === 'ai') +
       '"><span aria-hidden="true">✦</span>AI 助手</button>\n          <button type="button" data-storyboard-3d-action="undo" title="Ctrl+Z">撤销</button>\n          <button type="button" data-storyboard-3d-action="redo" title="Ctrl+Shift+Z">重做</button>\n          <button type="button" class="storyboard-3d-export-trigger" data-storyboard-3d-action="export-storyboard">导出分镜</button>\n        </div>\n      </header>\n\n      <div class="storyboard-3d-editor-main" style="--storyboard-3d-right-sidebar-width:' +
-      _0x48932d +
+      sidebarWidth +
       'px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<main\x20class=\x22storyboard-3d-viewport-column\x20' +
-      (_0x51d4da ? 'is-timeline-open' : 'is-timeline-collapsed') +
+      (timelineOpen2 ? 'is-timeline-open' : 'is-timeline-collapsed') +
       '" style="--storyboard-3d-timeline-height:' +
-      _0x379796 +
+      storyboard3DTimelineHeight +
       'px">\n          <section class="storyboard-3d-viewport" tabindex="0" aria-label="' +
       escapeHtml(t('storyboard3d.editor.viewport')) +
       '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-tool-rail\x22\x20role=\x22toolbar\x22\x20aria-label=\x22' +
@@ -4262,7 +4227,7 @@ export class Storyboard3DEditorWorkspace {
         action: 'open-background-perspective',
         icon: 'background',
         label: '图像透视匹配',
-        active: _0x2e1b39 === 'perspective',
+        active: active5 === 'perspective',
         className: 'storyboard-3d-background-match-trigger',
       }) +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-view-controls\x22\x20role=\x22toolbar\x22\x20aria-label=\x22视图控制\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
@@ -4270,7 +4235,7 @@ export class Storyboard3DEditorWorkspace {
         action: 'set-viewport-view',
         icon: 'perspective',
         label: '透视视图',
-        active: _0xf44e69 === 'perspective',
+        active: active6 === 'perspective',
         dataView: 'perspective',
       }) +
       '\n              ' +
@@ -4278,7 +4243,7 @@ export class Storyboard3DEditorWorkspace {
         action: 'set-viewport-view',
         icon: 'top',
         label: '顶视图',
-        active: _0xf44e69 === 'top',
+        active: active6 === 'top',
         dataView: 'top',
       }) +
       '\n              ' +
@@ -4286,7 +4251,7 @@ export class Storyboard3DEditorWorkspace {
         action: 'set-viewport-view',
         icon: 'front',
         label: '前视图',
-        active: _0xf44e69 === 'front',
+        active: active6 === 'front',
         dataView: 'front',
       }) +
       '\n              ' +
@@ -4294,47 +4259,47 @@ export class Storyboard3DEditorWorkspace {
         action: 'set-viewport-view',
         icon: 'right',
         label: '右视图',
-        active: _0xf44e69 === 'right',
+        active: active6 === 'right',
         dataView: 'right',
       }) +
       '\n            </div>\n            <details class="storyboard-3d-object-popover" ' +
-      (_0x37bf1f['objectOutlineOpen'] ? 'open' : '') +
+      (active4['objectOutlineOpen'] ? 'open' : '') +
       '>\n              <summary data-storyboard-3d-action="toggle-object-outline"><span>对象</span><small>' +
-      _0x1d6e22['objectCount'] +
+      summarizeStoryboard3DProject2['objectCount'] +
       '</small></summary>\n              <div class="storyboard-3d-object-outline">\n                <div class="storyboard-3d-object-popover-heading">\n                  <span>' +
-      escapeHtml(_0x261fcb?.['name'] || '当前场景') +
+      escapeHtml(sceneGroups2?.['name'] || '当前场景') +
       '</span>\n                  <button type="button" data-storyboard-3d-action="group-selected" title="将当前选中对象创建为分组">分组</button>\n                </div>\n                <div class="storyboard-3d-outline-filters"><input type="search" value="' +
       escapeHtml(this['outlineQuery']) +
       '" placeholder="搜索对象" data-storyboard-3d-outline-query><select data-storyboard-3d-outline-type>' +
       ['all', 'camera', 'character', 'prop', 'light', 'group']
         ['map'](
-          (_0x143e95) =>
+          (value384) =>
             '<option value="' +
-            _0x143e95 +
+            value384 +
             '\x22\x20' +
-            (_0x143e95 === this['outlineType'] ? 'selected' : '') +
+            (value384 === this['outlineType'] ? 'selected' : '') +
             '>' +
-            (_0x143e95 === 'all' ? '全部类型' : _0x143e95) +
+            (value384 === 'all' ? '全部类型' : value384) +
             '</option>',
         )
         ['join']('') +
       '</select></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-outline-list\x22>' +
-      renderObjectOutline(_0x261fcb, _0x37bf1f['selectedObjectIds'], {
+      renderObjectOutline(sceneGroups2, active4['selectedObjectIds'], {
         query: this['outlineQuery'],
         type: this['outlineType'],
       }) +
       '</div>\n              </div>\n            </details>\n            <div class="storyboard-3d-viewport-stage">\n              <div class="storyboard-3d-runtime-host" data-storyboard-3d-runtime-host></div>\n              ' +
-      renderBackgroundCalibrationGuide(_0x261fcb?.['background']) +
+      renderBackgroundCalibrationGuide(sceneGroups2?.['background']) +
       '\n              <div class="storyboard-3d-runtime-status" data-storyboard-3d-runtime-status hidden></div>\n            </div>\n            <div class="storyboard-3d-viewport-toolbar" role="toolbar" aria-label="常用 3D 工具">\n              ' +
       renderStoryboard3DToolButton(
         'select',
-        _0x37bf1f['activeTool'] === 'select',
+        active4['activeTool'] === 'select',
         this['navigationSettings']['preset'],
       ) +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
       renderStoryboard3DToolButton(
         'move',
-        _0x37bf1f['activeTool'] === 'move',
+        active4['activeTool'] === 'move',
         this['navigationSettings']['preset'],
       ) +
       '\n              ' +
@@ -4343,7 +4308,7 @@ export class Storyboard3DEditorWorkspace {
         icon: 'fly',
         label: '飞行模式',
         shortcut: 'Shift+F',
-        active: _0x37bf1f['flyMode'],
+        active: active4['flyMode'],
         className: 'storyboard-3d-fly-mode-button',
       }) +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
@@ -4352,7 +4317,7 @@ export class Storyboard3DEditorWorkspace {
         icon: 'focus',
         label: '聚焦选中',
         shortcut: 'F',
-        disabled: _0x37bf1f['selectedObjectIds']['length'] === 0x0,
+        disabled: active4['selectedObjectIds']['length'] === 0x0,
       }) +
       '\n              ' +
       renderStoryboard3DIconButton({
@@ -4365,13 +4330,13 @@ export class Storyboard3DEditorWorkspace {
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-view-controls-separator\x22\x20aria-hidden=\x22true\x22></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
       renderStoryboard3DToolButton(
         'rotate',
-        _0x37bf1f['activeTool'] === 'rotate',
+        active4['activeTool'] === 'rotate',
         this['navigationSettings']['preset'],
       ) +
       '\n              ' +
       renderStoryboard3DToolButton(
         'scale',
-        _0x37bf1f['activeTool'] === 'scale',
+        active4['activeTool'] === 'scale',
         this['navigationSettings']['preset'],
       ) +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-view-controls-separator\x22\x20aria-hidden=\x22true\x22></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
@@ -4380,7 +4345,7 @@ export class Storyboard3DEditorWorkspace {
         icon: 'transformSpace',
         label: this['viewportSettings']['transformSpace'] === 'local' ? '本地坐标' : '世界坐标',
         active: this['viewportSettings']['transformSpace'] === 'local',
-        hidden: _0x37bf1f['activeTool'] === 'scale',
+        hidden: active4['activeTool'] === 'scale',
       }) +
       '\n              ' +
       renderStoryboard3DViewportSettingButton({
@@ -4395,7 +4360,7 @@ export class Storyboard3DEditorWorkspace {
         icon: 'ground',
         label: '地面吸附',
         active: this['viewportSettings']['groundLock'],
-        hidden: !STORYBOARD_3D_SELECT_MOVE_TOOLS['has'](_0x37bf1f['activeTool']),
+        hidden: !STORYBOARD_3D_SELECT_MOVE_TOOLS['has'](active4['activeTool']),
       }) +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
       renderStoryboard3DViewportSettingButton({
@@ -4403,7 +4368,7 @@ export class Storyboard3DEditorWorkspace {
         icon: 'uniform',
         label: '均匀缩放',
         active: this['viewportSettings']['uniformScale'],
-        hidden: _0x37bf1f['activeTool'] !== 'scale',
+        hidden: active4['activeTool'] !== 'scale',
       }) +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
       renderStoryboard3DIconButton({
@@ -4414,20 +4379,20 @@ export class Storyboard3DEditorWorkspace {
         className: 'storyboard-3d-fit-all-control',
       }) +
       '\n            ' +
-      renderStoryboard3DFocalControl(_0x261fcb, this['viewportFocalLength']) +
+      renderStoryboard3DFocalControl(sceneGroups2, this['viewportFocalLength']) +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-viewport-hud\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-navigation-status\x20' +
-      (_0x37bf1f['flyMode'] ? 'is-fly-mode' : '') +
+      (active4['flyMode'] ? 'is-fly-mode' : '') +
       '\x22>' +
       escapeHtml(
         getStoryboard3DNavigationHelpText({
-          flyMode: _0x37bf1f['flyMode'],
+          flyMode: active4['flyMode'],
           preset: this['navigationSettings']['preset'],
         }),
       ) +
       '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>' +
-      escapeHtml(_0x144b5f?.['shotSize'] || 'MED') +
+      escapeHtml(activeShot2?.['shotSize'] || 'MED') +
       '</span>\n              <span>' +
-      escapeHtml(_0x144b5f?.['shotAngle'] || 'eye') +
+      escapeHtml(activeShot2?.['shotAngle'] || 'eye') +
       '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>' +
       escapeHtml(formatFocalLength(this['viewportFocalLength']) + 'mm') +
       '</strong>\n            </div>\n            <div class="storyboard-3d-mini-map-placeholder ' +
@@ -4437,71 +4402,71 @@ export class Storyboard3DEditorWorkspace {
       'px;--mini-map-window-y:' +
       this['miniMapWindowOffset']['y'] +
       'px\x22>' +
-      renderMiniMap(_0x261fcb, _0x144b5f, {
+      renderMiniMap(sceneGroups2, activeShot2, {
         expanded: this['miniMapExpanded'],
         zoom: this['miniMapZoom'],
         footprints: this['_miniMapFootprints'],
-        worldBounds: _0x2f2149,
-        camera: _0x3ceccb,
+        worldBounds: worldBounds3,
+        camera: camera6,
       }) +
       '</div>\n          </section>\n          <section class="storyboard-3d-shot-dock ' +
-      (_0x51d4da ? 'is-timeline-open' : 'is-timeline-collapsed') +
+      (timelineOpen2 ? 'is-timeline-open' : 'is-timeline-collapsed') +
       '" aria-label="' +
       escapeHtml(t('storyboard3d.editor.shots')) +
       '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-shot-strip\x22>' +
-      renderShotStrip(_0x261fcb, { timelineOpen: _0x51d4da }) +
+      renderShotStrip(sceneGroups2, { timelineOpen: timelineOpen2 }) +
       '</div>\n            ' +
-      renderShotTimelineDrawerHandle(_0x51d4da, _0x379796) +
+      renderShotTimelineDrawerHandle(timelineOpen2, storyboard3DTimelineHeight) +
       '\n            <div class="storyboard-3d-timeline-drawer-content" aria-hidden="' +
-      !_0x51d4da +
+      !timelineOpen2 +
       '\x22\x20' +
-      (_0x51d4da ? '' : 'inert') +
+      (timelineOpen2 ? '' : 'inert') +
       '>\n              ' +
       (this['shotTimelineController']?.['render']?.() || '') +
       '\n            </div>\n          </section>\n        </main>\n        ' +
-      (_0x37bf1f['assetLibraryOpen'] && !_0xbbcb21
+      (active4['assetLibraryOpen'] && !el55
         ? renderAssetLibraryRightSidebar({
-            assets: _0x4c2e4d,
-            totalCount: _0xfc7f77['length'],
-            hasMore: _0xfc7f77['length'] > _0x4c2e4d['length'],
+            assets: assets2,
+            totalCount: totalCount['length'],
+            hasMore: totalCount['length'] > assets2['length'],
             query: this['assetQuery'],
             category: this['assetCategory'],
             favoriteIds: this['favoriteAssetIds'],
             importState: this['modelImportState'],
-            sidebarWidth: _0x48932d,
-            layoutWidth: _0xc070be,
+            sidebarWidth: sidebarWidth,
+            layoutWidth: layoutWidth,
           })
         : '') +
       '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
-      (_0x2e1b39 === 'object'
+      (active5 === 'object'
         ? renderObjectPropertiesRightSidebar(
             {
-              object: _0x4195c0,
-              selectedBoneName: this['characterBoneSelection']['get'](_0x4195c0?.['id']) || 'Head',
+              object: object2,
+              selectedBoneName: this['characterBoneSelection']['get'](object2?.['id']) || 'Head',
               characterPoseState:
-                _0x4195c0?.['type'] === 'character'
+                object2?.['type'] === 'character'
                   ? reconcileCharacterPoseState(
-                      _0x4195c0,
-                      this['characterImagePoseController']['getSnapshot'](_0x4195c0['id']),
+                      object2,
+                      this['characterImagePoseController']['getSnapshot'](object2['id']),
                     )
                   : null,
               assetDescriptor:
-                _0x4195c0?.['type'] === 'prop' ? this['assetLibrary']['find'](_0x4195c0['assetId']) : null,
+                object2?.['type'] === 'prop' ? this['assetLibrary']['find'](object2['assetId']) : null,
               sceneGroups:
-                _0x261fcb?.['objects']?.['filter']((_0x2eec77) => _0x2eec77['type'] === 'group') || [],
+                sceneGroups2?.['objects']?.['filter']((value385) => value385['type'] === 'group') || [],
             },
-            { sidebarWidth: _0x48932d, layoutWidth: _0xc070be },
+            { sidebarWidth: sidebarWidth, layoutWidth: layoutWidth },
           )
         : '') +
       '\n        ' +
-      (_0x2e1b39 === 'perspective'
+      (active5 === 'perspective'
         ? renderBackgroundPerspectiveRightSidebar(
-            { scene: _0x261fcb, activeShot: _0x144b5f },
-            { sidebarWidth: _0x48932d, layoutWidth: _0xc070be },
+            { scene: sceneGroups2, activeShot: activeShot2 },
+            { sidebarWidth: sidebarWidth, layoutWidth: layoutWidth },
           )
         : '') +
       '\n        ' +
-      (_0x2e1b39 === 'ai'
+      (active5 === 'ai'
         ? renderAIAssistantRightSidebar(
             {
               ...this['aiState'],
@@ -4509,7 +4474,7 @@ export class Storyboard3DEditorWorkspace {
               provider: this['aiProvider'],
               canUndoAI: this['commandHistory']['getSnapshot']()['nextUndoLabel'] === 'AI scene transaction',
             },
-            { sidebarWidth: _0x48932d, layoutWidth: _0xc070be },
+            { sidebarWidth: sidebarWidth, layoutWidth: layoutWidth },
           )
         : '') +
       '\n      </div>\n\n      ' +
@@ -4521,40 +4486,39 @@ export class Storyboard3DEditorWorkspace {
       '>' +
       escapeHtml(this['_message']) +
       '</div>\n    </div>';
-    const _0x2052c = this['root']['querySelector']('.storyboard-3d-outline-list');
-    if (_0x2052c) _0x2052c['scrollTop'] = _0x25802c;
-    const _0x7f2e3b = this['root']['querySelector']('.storyboard-3d-object-properties-content');
-    _0x7f2e3b && _0x1dac6c && _0x1dac6c === _0x4195c0?.['id'] && (_0x7f2e3b['scrollTop'] = _0x41f464);
-    _0xbbcb21 &&
-      (this['root']['querySelector']('.storyboard-3d-editor-main')?.['append']?.(_0xbbcb21),
-      _0x7a3557?.['focus']?.({ preventScroll: !![] }));
-    const _0xe08971 = this['root']['querySelector']('[data-storyboard-3d-runtime-host]');
-    if (_0x448062 && _0xe08971 && this['sceneRuntime']) {
-      _0xe08971['replaceWith'](_0x448062);
+    const value386 = this['root']['querySelector']('.storyboard-3d-outline-list');
+    if (value386) value386['scrollTop'] = value377;
+    const value387 = this['root']['querySelector']('.storyboard-3d-object-properties-content');
+    value387 && value378 && value378 === object2?.['id'] && (value387['scrollTop'] = value379);
+    el55 &&
+      (this['root']['querySelector']('.storyboard-3d-editor-main')?.['append']?.(el55),
+      el56?.['focus']?.({ preventScroll: !![] }));
+    const value388 = this['root']['querySelector']('[data-storyboard-3d-runtime-host]');
+    if (el57 && value388 && this['sceneRuntime']) {
+      value388['replaceWith'](el57);
       try {
         this['sceneRuntime']['sync']({
-          project: _0x26a06c,
-          sceneId: _0x26a06c['activeSceneId'],
-          selectedObjectIds: _0x37bf1f['selectedObjectIds'],
-          activeTool: _0x37bf1f['activeTool'],
+          project: project8,
+          sceneId: project8['activeSceneId'],
+          selectedObjectIds: active4['selectedObjectIds'],
+          activeTool: active4['activeTool'],
         });
         if (this['viewportControls']) {
-          const _0x43700a = this['sceneRuntime']['getSceneView']();
-          ((this['viewportControls']['sceneView'] = _0x43700a),
+          const value389 = this['sceneRuntime']['getSceneView']();
+          ((this['viewportControls']['sceneView'] = value389),
             this['viewportControls']['viewMode'] === 'perspective' &&
-              (this['viewportControls']['perspectiveSceneView'] = structuredClone(_0x43700a)));
+              (this['viewportControls']['perspectiveSceneView'] = structuredClone(value389)));
         }
         this['_restoreViewportFocalLength']();
-        const _0xf1f5f2 = _0x448062['getBoundingClientRect']?.();
-        this['sceneRuntime']['resize'](_0xf1f5f2?.['width'], _0xf1f5f2?.['height']);
-      } catch (_0x19cc3d) {
-        ((this['_runtimeError'] = _0x19cc3d?.['message'] || String(_0x19cc3d)),
-          this['_disposeSceneRuntime']());
+        const box17 = el57['getBoundingClientRect']?.();
+        this['sceneRuntime']['resize'](box17?.['width'], box17?.['height']);
+      } catch (error24) {
+        ((this['_runtimeError'] = error24?.['message'] || String(error24)), this['_disposeSceneRuntime']());
       }
     }
     (this['_syncResponsiveState'](),
       this['_syncHistoryButtons'](),
-      !this['sceneRuntime'] && !this['_runtimeError'] && this['_mountSceneRuntime'](_0x26a06c, _0x37bf1f),
+      !this['sceneRuntime'] && !this['_runtimeError'] && this['_mountSceneRuntime'](project8, active4),
       this['_runtimeError'] &&
         this['_showRuntimeFailure'](
           this['_runtimeFailureTitle'] || '3D\x20视口不可用',
@@ -4562,90 +4526,83 @@ export class Storyboard3DEditorWorkspace {
         ),
       this['exploreOpen'] &&
         this['shotCandidates']['length'] > 0x0 &&
-        void this['_renderShotCandidatePreviews'](_0x26a06c, _0x37bf1f),
+        void this['_renderShotCandidatePreviews'](project8, active4),
       this['_bindAIAssistantModelSelector'](),
       this['_observeVisibleAssetThumbnails'](),
       this['shotTimelineController']?.['syncPreview']?.(),
-      restoreTimelinePresentation(this['root'], _0x19fb8a));
+      restoreTimelinePresentation(this['root'], captureTimelinePresentation2));
   }
-  ['_syncSaveStatus'](_0xa9b86d = this['projectStore']['getSaveStatus']()) {
-    const _0x3eeee0 = this['root']?.['querySelector']?.('[data-storyboard-3d-save-status]');
-    if (!_0x3eeee0) return;
-    ((_0x3eeee0['dataset']['status'] = _0xa9b86d),
-      (_0x3eeee0['textContent'] = getSaveStatusLabel(_0xa9b86d)));
+  ['_syncSaveStatus'](value390 = this['projectStore']['getSaveStatus']()) {
+    const el58 = this['root']?.['querySelector']?.('[data-storyboard-3d-save-status]');
+    if (!el58) return;
+    ((el58['dataset']['status'] = value390), (el58['textContent'] = getSaveStatusLabel(value390)));
   }
   ['_syncResponsiveState']() {
-    const _0x3f2ca5 = this['root']?.['querySelector']?.('.storyboard-3d-editor-shell');
-    if (!_0x3f2ca5) return;
-    _0x3f2ca5['classList']['remove']('is-inspector-open');
+    const el59 = this['root']?.['querySelector']?.('.storyboard-3d-editor-shell');
+    if (!el59) return;
+    el59['classList']['remove']('is-inspector-open');
   }
-  ['_applyInspectorWidth'](_0x68d95c, _0x4308e2 = null) {
-    const _0x557a2a = _0x4308e2 || this['root']?.['querySelector']?.('.storyboard-3d-editor-main'),
-      _0x507738 =
-        _0x557a2a?.['getBoundingClientRect']?.()['width'] || this['window']?.['innerWidth'] || 0x4b0;
+  ['_applyInspectorWidth'](value391, value392 = null) {
+    const el60 = value392 || this['root']?.['querySelector']?.('.storyboard-3d-editor-main'),
+      value393 = el60?.['getBoundingClientRect']?.()['width'] || this['window']?.['innerWidth'] || 0x4b0;
     return (
-      (this['inspectorWidth'] = normalizeStoryboard3DInspectorWidth(_0x68d95c, _0x507738)),
-      _0x557a2a?.['style']?.['setProperty']?.(
-        '--storyboard-3d-inspector-width',
-        this['inspectorWidth'] + 'px',
-      ),
-      _0x557a2a?.['querySelector']?.('[data-storyboard-3d-inspector-splitter]')?.['setAttribute']?.(
+      (this['inspectorWidth'] = normalizeStoryboard3DInspectorWidth(value391, value393)),
+      el60?.['style']?.['setProperty']?.('--storyboard-3d-inspector-width', this['inspectorWidth'] + 'px'),
+      el60?.['querySelector']?.('[data-storyboard-3d-inspector-splitter]')?.['setAttribute']?.(
         'aria-valuenow',
         String(this['inspectorWidth']),
       ),
       this['inspectorWidth']
     );
   }
-  ['_handleInspectorResizePointerDown'](_0x19ca98) {
-    const _0x2918c6 = _0x19ca98['target']?.['closest']?.('[data-storyboard-3d-inspector-splitter]');
+  ['_handleInspectorResizePointerDown'](event31) {
+    const splitter = event31['target']?.['closest']?.('[data-storyboard-3d-inspector-splitter]');
     if (
-      !_0x2918c6 ||
-      _0x19ca98['isPrimary'] === ![] ||
-      (Number['isFinite'](_0x19ca98['button']) && _0x19ca98['button'] !== 0x0)
+      !splitter ||
+      event31['isPrimary'] === ![] ||
+      (Number['isFinite'](event31['button']) && event31['button'] !== 0x0)
     )
       return;
-    const _0x433725 = _0x2918c6['closest']?.('.storyboard-3d-editor-main'),
-      _0x1ecb76 = _0x433725?.['getBoundingClientRect']?.();
-    if (!_0x1ecb76?.['width'] || _0x1ecb76['width'] < 0x384) return;
-    (_0x19ca98['preventDefault']?.(), _0x19ca98['stopImmediatePropagation']?.());
-    const _0x387293 = _0x19ca98['pointerId'];
+    const layout = splitter['closest']?.('.storyboard-3d-editor-main'),
+      bounds = layout?.['getBoundingClientRect']?.();
+    if (!bounds?.['width'] || bounds['width'] < 0x384) return;
+    (event31['preventDefault']?.(), event31['stopImmediatePropagation']?.());
+    const pointerId2 = event31['pointerId'];
     try {
-      _0x2918c6['setPointerCapture']?.(_0x387293);
+      splitter['setPointerCapture']?.(pointerId2);
     } catch {}
     ((this['_inspectorResize'] = {
-      pointerId: _0x387293,
-      splitter: _0x2918c6,
-      layout: _0x433725,
-      bounds: _0x1ecb76,
+      pointerId: pointerId2,
+      splitter: splitter,
+      layout: layout,
+      bounds: bounds,
     }),
       this['document']?.['body']?.['classList']?.['add']?.('storyboard-3d-inspector-resizing'),
-      this['_applyInspectorWidth'](_0x1ecb76['right'] - Number(_0x19ca98['clientX']), _0x433725),
+      this['_applyInspectorWidth'](bounds['right'] - Number(event31['clientX']), layout),
       this['window']?.['addEventListener']?.('pointermove', this['_handleInspectorResizePointerMove'], !![]),
       this['window']?.['addEventListener']?.('pointerup', this['_handleInspectorResizePointerUp'], !![]),
       this['window']?.['addEventListener']?.('pointercancel', this['_handleInspectorResizePointerUp'], !![]));
   }
-  ['_handleInspectorResizePointerMove'](_0x2936e7) {
-    const _0x2a4684 = this['_inspectorResize'];
-    if (!_0x2a4684 || (_0x2a4684['pointerId'] != null && _0x2936e7['pointerId'] !== _0x2a4684['pointerId']))
-      return;
-    (_0x2936e7['preventDefault']?.(),
-      _0x2936e7['stopImmediatePropagation']?.(),
+  ['_handleInspectorResizePointerMove'](event32) {
+    const event33 = this['_inspectorResize'];
+    if (!event33 || (event33['pointerId'] != null && event32['pointerId'] !== event33['pointerId'])) return;
+    (event32['preventDefault']?.(),
+      event32['stopImmediatePropagation']?.(),
       this['_applyInspectorWidth'](
-        _0x2a4684['bounds']['right'] - Number(_0x2936e7['clientX']),
-        _0x2a4684['layout'],
+        event33['bounds']['right'] - Number(event32['clientX']),
+        event33['layout'],
       ));
   }
-  ['_handleInspectorResizePointerUp'](_0x262151) {
-    const _0x4150fc = this['_inspectorResize'];
-    if (!_0x4150fc || (_0x4150fc['pointerId'] != null && _0x262151?.['pointerId'] !== _0x4150fc['pointerId']))
-      return;
-    (_0x262151?.['preventDefault']?.(),
-      _0x262151?.['stopImmediatePropagation']?.(),
+  ['_handleInspectorResizePointerUp'](event34) {
+    const event35 = this['_inspectorResize'];
+    if (!event35 || (event35['pointerId'] != null && event34?.['pointerId'] !== event35['pointerId'])) return;
+    (event34?.['preventDefault']?.(),
+      event34?.['stopImmediatePropagation']?.(),
       (this['_inspectorResize'] = null),
       this['document']?.['body']?.['classList']?.['remove']?.('storyboard-3d-inspector-resizing'));
     try {
-      _0x4150fc['splitter']['hasPointerCapture']?.(_0x4150fc['pointerId']) &&
-        _0x4150fc['splitter']['releasePointerCapture']?.(_0x4150fc['pointerId']);
+      event35['splitter']['hasPointerCapture']?.(event35['pointerId']) &&
+        event35['splitter']['releasePointerCapture']?.(event35['pointerId']);
     } catch {}
     (this['window']?.['removeEventListener']?.(
       'pointermove',
@@ -4659,48 +4616,47 @@ export class Storyboard3DEditorWorkspace {
         !![],
       ));
   }
-  ['_applyRightSidebarWidth'](_0x5cdad1, _0x404df5 = null) {
-    const _0x1d4e5d = _0x404df5 || this['root']?.['querySelector']?.('.storyboard-3d-editor-main'),
-      _0x202bd5 =
-        _0x1d4e5d?.['getBoundingClientRect']?.()['width'] || this['window']?.['innerWidth'] || 0x5a0;
+  ['_applyRightSidebarWidth'](value394, value395 = null) {
+    const el61 = value395 || this['root']?.['querySelector']?.('.storyboard-3d-editor-main'),
+      value396 = el61?.['getBoundingClientRect']?.()['width'] || this['window']?.['innerWidth'] || 0x5a0;
     return (
-      (this['rightSidebarWidth'] = normalizeStoryboard3DRightSidebarWidth(_0x5cdad1, _0x202bd5)),
-      _0x1d4e5d?.['style']?.['setProperty']?.(
+      (this['rightSidebarWidth'] = normalizeStoryboard3DRightSidebarWidth(value394, value396)),
+      el61?.['style']?.['setProperty']?.(
         '--storyboard-3d-right-sidebar-width',
         this['rightSidebarWidth'] + 'px',
       ),
-      _0x1d4e5d?.['querySelector']?.('[data-storyboard-3d-right-sidebar-splitter]')?.['setAttribute']?.(
+      el61?.['querySelector']?.('[data-storyboard-3d-right-sidebar-splitter]')?.['setAttribute']?.(
         'aria-valuenow',
         String(this['rightSidebarWidth']),
       ),
       this['rightSidebarWidth']
     );
   }
-  ['_handleRightSidebarResizePointerDown'](_0x3f2d26) {
-    const _0x1bb151 = _0x3f2d26['target']?.['closest']?.('[data-storyboard-3d-right-sidebar-splitter]');
+  ['_handleRightSidebarResizePointerDown'](event36) {
+    const splitter2 = event36['target']?.['closest']?.('[data-storyboard-3d-right-sidebar-splitter]');
     if (
-      !_0x1bb151 ||
-      _0x3f2d26['isPrimary'] === ![] ||
-      (Number['isFinite'](_0x3f2d26['button']) && _0x3f2d26['button'] !== 0x0)
+      !splitter2 ||
+      event36['isPrimary'] === ![] ||
+      (Number['isFinite'](event36['button']) && event36['button'] !== 0x0)
     )
       return;
-    const _0x539bb8 = _0x1bb151['closest']?.('.storyboard-3d-right-sidebar'),
-      _0x944613 = _0x539bb8?.['closest']?.('.storyboard-3d-editor-main'),
-      _0x948b4e = _0x539bb8?.['getBoundingClientRect']?.();
-    if (!_0x948b4e?.['width'] || !_0x944613) return;
-    (_0x3f2d26['preventDefault']?.(), _0x3f2d26['stopImmediatePropagation']?.());
-    const _0x4f1aeb = _0x3f2d26['pointerId'];
+    const el62 = splitter2['closest']?.('.storyboard-3d-right-sidebar'),
+      layout2 = el62?.['closest']?.('.storyboard-3d-editor-main'),
+      right = el62?.['getBoundingClientRect']?.();
+    if (!right?.['width'] || !layout2) return;
+    (event36['preventDefault']?.(), event36['stopImmediatePropagation']?.());
+    const pointerId3 = event36['pointerId'];
     try {
-      _0x1bb151['setPointerCapture']?.(_0x4f1aeb);
+      splitter2['setPointerCapture']?.(pointerId3);
     } catch {}
     ((this['_rightSidebarResize'] = {
-      pointerId: _0x4f1aeb,
-      splitter: _0x1bb151,
-      layout: _0x944613,
-      right: _0x948b4e['right'],
+      pointerId: pointerId3,
+      splitter: splitter2,
+      layout: layout2,
+      right: right['right'],
     }),
       this['document']?.['body']?.['classList']?.['add']?.('storyboard-3d-right-sidebar-resizing'),
-      this['_applyRightSidebarWidth'](_0x948b4e['right'] - Number(_0x3f2d26['clientX']), _0x944613),
+      this['_applyRightSidebarWidth'](right['right'] - Number(event36['clientX']), layout2),
       this['window']?.['addEventListener']?.(
         'pointermove',
         this['_handleRightSidebarResizePointerMove'],
@@ -4713,28 +4669,23 @@ export class Storyboard3DEditorWorkspace {
         !![],
       ));
   }
-  ['_handleRightSidebarResizePointerMove'](_0xb5ea0b) {
-    const _0x598608 = this['_rightSidebarResize'];
-    if (!_0x598608 || (_0x598608['pointerId'] != null && _0xb5ea0b['pointerId'] !== _0x598608['pointerId']))
-      return;
-    (_0xb5ea0b['preventDefault']?.(),
-      _0xb5ea0b['stopImmediatePropagation']?.(),
-      this['_applyRightSidebarWidth'](
-        _0x598608['right'] - Number(_0xb5ea0b['clientX']),
-        _0x598608['layout'],
-      ));
+  ['_handleRightSidebarResizePointerMove'](event37) {
+    const event38 = this['_rightSidebarResize'];
+    if (!event38 || (event38['pointerId'] != null && event37['pointerId'] !== event38['pointerId'])) return;
+    (event37['preventDefault']?.(),
+      event37['stopImmediatePropagation']?.(),
+      this['_applyRightSidebarWidth'](event38['right'] - Number(event37['clientX']), event38['layout']));
   }
-  ['_handleRightSidebarResizePointerUp'](_0x3a81e4) {
-    const _0x4901ad = this['_rightSidebarResize'];
-    if (!_0x4901ad || (_0x4901ad['pointerId'] != null && _0x3a81e4?.['pointerId'] !== _0x4901ad['pointerId']))
-      return;
-    (_0x3a81e4?.['preventDefault']?.(),
-      _0x3a81e4?.['stopImmediatePropagation']?.(),
+  ['_handleRightSidebarResizePointerUp'](event39) {
+    const event40 = this['_rightSidebarResize'];
+    if (!event40 || (event40['pointerId'] != null && event39?.['pointerId'] !== event40['pointerId'])) return;
+    (event39?.['preventDefault']?.(),
+      event39?.['stopImmediatePropagation']?.(),
       (this['_rightSidebarResize'] = null),
       this['document']?.['body']?.['classList']?.['remove']?.('storyboard-3d-right-sidebar-resizing'));
     try {
-      _0x4901ad['splitter']['hasPointerCapture']?.(_0x4901ad['pointerId']) &&
-        _0x4901ad['splitter']['releasePointerCapture']?.(_0x4901ad['pointerId']);
+      event40['splitter']['hasPointerCapture']?.(event40['pointerId']) &&
+        event40['splitter']['releasePointerCapture']?.(event40['pointerId']);
     } catch {}
     (this['window']?.['removeEventListener']?.(
       'pointermove',
@@ -4752,83 +4703,75 @@ export class Storyboard3DEditorWorkspace {
         !![],
       ));
   }
-  ['_applyTimelineHeight'](_0x112e7b, _0x1d36a5 = null) {
-    const _0x56674d = _0x1d36a5 || this['root']?.['querySelector']?.('.storyboard-3d-viewport-column'),
-      _0x23ee4c =
-        _0x56674d?.['getBoundingClientRect']?.()['height'] ||
+  ['_applyTimelineHeight'](value397, value398 = null) {
+    const el63 = value398 || this['root']?.['querySelector']?.('.storyboard-3d-viewport-column'),
+      value399 =
+        el63?.['getBoundingClientRect']?.()['height'] ||
         this['root']?.['getBoundingClientRect']?.()['height'] ||
         this['window']?.['innerHeight'] ||
         0x384;
     return (
-      (this['timelineHeight'] = normalizeStoryboard3DTimelineHeight(_0x112e7b, _0x23ee4c)),
-      _0x56674d?.['style']?.['setProperty']?.(
-        '--storyboard-3d-timeline-height',
-        this['timelineHeight'] + 'px',
-      ),
-      _0x56674d?.['querySelector']?.('[data-storyboard-3d-timeline-resize-handle]')?.['setAttribute']?.(
+      (this['timelineHeight'] = normalizeStoryboard3DTimelineHeight(value397, value399)),
+      el63?.['style']?.['setProperty']?.('--storyboard-3d-timeline-height', this['timelineHeight'] + 'px'),
+      el63?.['querySelector']?.('[data-storyboard-3d-timeline-resize-handle]')?.['setAttribute']?.(
         'aria-valuenow',
         String(this['timelineHeight']),
       ),
       this['timelineHeight']
     );
   }
-  ['_handleTimelineResizePointerDown'](_0x29dcb3) {
-    const _0x2e1d8a = _0x29dcb3['target']?.['closest']?.('[data-storyboard-3d-timeline-resize-handle]');
+  ['_handleTimelineResizePointerDown'](event41) {
+    const handle2 = event41['target']?.['closest']?.('[data-storyboard-3d-timeline-resize-handle]');
     if (
-      !_0x2e1d8a ||
-      _0x29dcb3['isPrimary'] === ![] ||
-      (Number['isFinite'](_0x29dcb3['button']) && _0x29dcb3['button'] !== 0x0)
+      !handle2 ||
+      event41['isPrimary'] === ![] ||
+      (Number['isFinite'](event41['button']) && event41['button'] !== 0x0)
     )
       return;
-    const _0x2232d6 = _0x2e1d8a['closest']?.('.storyboard-3d-viewport-column'),
-      _0x5d6de = _0x2232d6?.['getBoundingClientRect']?.(),
-      _0x434f23 = _0x2e1d8a['closest']?.('.storyboard-3d-shot-dock')?.['getBoundingClientRect']?.()['height'];
-    if (!_0x5d6de?.['height']) return;
-    const _0x467e34 = _0x29dcb3['pointerId'];
+    const column = handle2['closest']?.('.storyboard-3d-viewport-column'),
+      box18 = column?.['getBoundingClientRect']?.(),
+      value400 = handle2['closest']?.('.storyboard-3d-shot-dock')?.['getBoundingClientRect']?.()['height'];
+    if (!box18?.['height']) return;
+    const pointerId4 = event41['pointerId'];
     try {
-      _0x2e1d8a['setPointerCapture']?.(_0x467e34);
+      handle2['setPointerCapture']?.(pointerId4);
     } catch {}
     ((this['_timelineResize'] = {
-      pointerId: _0x467e34,
-      handle: _0x2e1d8a,
-      column: _0x2232d6,
-      startHeight: Number(_0x434f23) || this['timelineHeight'],
-      startY: Number(_0x29dcb3['clientY']),
+      pointerId: pointerId4,
+      handle: handle2,
+      column: column,
+      startHeight: Number(value400) || this['timelineHeight'],
+      startY: Number(event41['clientY']),
       moved: ![],
     }),
       this['window']?.['addEventListener']?.('pointermove', this['_handleTimelineResizePointerMove'], !![]),
       this['window']?.['addEventListener']?.('pointerup', this['_handleTimelineResizePointerUp'], !![]),
       this['window']?.['addEventListener']?.('pointercancel', this['_handleTimelineResizePointerUp'], !![]));
   }
-  ['_handleTimelineResizePointerMove'](_0x10b516) {
-    const _0x2033a5 = this['_timelineResize'];
-    if (!_0x2033a5 || (_0x2033a5['pointerId'] != null && _0x10b516['pointerId'] !== _0x2033a5['pointerId']))
-      return;
-    const _0x53e982 = Number(_0x10b516['clientY']);
-    if (!Number['isFinite'](_0x53e982)) return;
-    if (!_0x2033a5['moved'] && Math['abs'](_0x53e982 - _0x2033a5['startY']) < 0x4) return;
-    (_0x10b516['preventDefault']?.(),
-      _0x10b516['stopImmediatePropagation']?.(),
-      !_0x2033a5['moved'] &&
-        ((_0x2033a5['moved'] = !![]),
+  ['_handleTimelineResizePointerMove'](event42) {
+    const event43 = this['_timelineResize'];
+    if (!event43 || (event43['pointerId'] != null && event42['pointerId'] !== event43['pointerId'])) return;
+    const value401 = Number(event42['clientY']);
+    if (!Number['isFinite'](value401)) return;
+    if (!event43['moved'] && Math['abs'](value401 - event43['startY']) < 0x4) return;
+    (event42['preventDefault']?.(),
+      event42['stopImmediatePropagation']?.(),
+      !event43['moved'] &&
+        ((event43['moved'] = !![]),
         (this['_suppressTimelineToggleClick'] = !![]),
         this['shotTimelineController']?.['setDrawerOpen']?.(!![]),
         this['document']?.['body']?.['classList']?.['add']?.('storyboard-3d-timeline-resizing')),
-      this['_applyTimelineHeight'](
-        _0x2033a5['startHeight'] + _0x2033a5['startY'] - _0x53e982,
-        _0x2033a5['column'],
-      ));
+      this['_applyTimelineHeight'](event43['startHeight'] + event43['startY'] - value401, event43['column']));
   }
-  ['_handleTimelineResizePointerUp'](_0x19f570) {
-    const _0x2b449d = this['_timelineResize'];
-    if (!_0x2b449d || (_0x2b449d['pointerId'] != null && _0x19f570?.['pointerId'] !== _0x2b449d['pointerId']))
-      return;
-    _0x2b449d['moved'] && (_0x19f570?.['preventDefault']?.(), _0x19f570?.['stopImmediatePropagation']?.());
+  ['_handleTimelineResizePointerUp'](event44) {
+    const event45 = this['_timelineResize'];
+    if (!event45 || (event45['pointerId'] != null && event44?.['pointerId'] !== event45['pointerId'])) return;
+    event45['moved'] && (event44?.['preventDefault']?.(), event44?.['stopImmediatePropagation']?.());
     ((this['_timelineResize'] = null),
       this['document']?.['body']?.['classList']?.['remove']?.('storyboard-3d-timeline-resizing'));
     try {
-      _0x2b449d['handle']['hasPointerCapture']?.(_0x2b449d['pointerId']) &&
-        _0x2b449d['handle']['releasePointerCapture']?.(_0x2b449d['pointerId']);
+      event45['handle']['hasPointerCapture']?.(event45['pointerId']) &&
+        event45['handle']['releasePointerCapture']?.(event45['pointerId']);
     } catch {}
     (this['window']?.['removeEventListener']?.('pointermove', this['_handleTimelineResizePointerMove'], !![]),
       this['window']?.['removeEventListener']?.('pointerup', this['_handleTimelineResizePointerUp'], !![]),
@@ -4837,13 +4780,13 @@ export class Storyboard3DEditorWorkspace {
         this['_handleTimelineResizePointerUp'],
         !![],
       ));
-    if (_0x2b449d['moved']) {
-      const _0x2a3b98 = () => {
+    if (event45['moved']) {
+      const value402 = () => {
         this['_suppressTimelineToggleClick'] = ![];
       };
       typeof this['window']?.['setTimeout'] === 'function'
-        ? this['window']['setTimeout'](_0x2a3b98, 0x0)
-        : globalThis['setTimeout']?.(_0x2a3b98, 0x0);
+        ? this['window']['setTimeout'](value402, 0x0)
+        : globalThis['setTimeout']?.(value402, 0x0);
     }
   }
   ['_openAssetLibrary']() {
@@ -4860,89 +4803,90 @@ export class Storyboard3DEditorWorkspace {
       (this['_assetThumbnailObserver'] = null),
       this['_render']());
   }
-  ['_setSelectedObjects'](_0x22505a, { openProperties: openProperties = !![] } = {}) {
-    const _0x4ed055 = this['editorStore']['setSelectedObjects'](_0x22505a);
-    if (openProperties && _0x4ed055['selectedObjectIds']['length'] > 0x0) {
+  ['_setSelectedObjects'](value403, { openProperties: openProperties = !![] } = {}) {
+    const value404 = this['editorStore']['setSelectedObjects'](value403);
+    if (openProperties && value404['selectedObjectIds']['length'] > 0x0) {
       this['rightSidebarMode'] = 'object';
-      if (_0x4ed055['assetLibraryOpen']) this['editorStore']['setAssetLibraryOpen'](![]);
+      if (value404['assetLibraryOpen']) this['editorStore']['setAssetLibraryOpen'](![]);
       (this['_assetThumbnailObserver']?.['disconnect']?.(), (this['_assetThumbnailObserver'] = null));
     } else
-      _0x4ed055['selectedObjectIds']['length'] === 0x0 &&
+      value404['selectedObjectIds']['length'] === 0x0 &&
         this['rightSidebarMode'] === 'object' &&
         (this['rightSidebarMode'] = Number(this['window']?.['innerWidth']) <= 0x384 ? null : 'ai');
-    return _0x4ed055['selectedObjectIds'];
+    return value404['selectedObjectIds'];
   }
   ['_toggleAIAssistant']() {
-    const _0x4fb5e0 = this['rightSidebarMode'] !== 'ai';
-    ((this['rightSidebarMode'] = _0x4fb5e0 ? 'ai' : null),
+    const value405 = this['rightSidebarMode'] !== 'ai';
+    ((this['rightSidebarMode'] = value405 ? 'ai' : null),
       this['editorStore']['setAssetLibraryOpen'](![]),
       this['_assetThumbnailObserver']?.['disconnect']?.(),
       (this['_assetThumbnailObserver'] = null),
       this['_render']());
-    if (_0x4fb5e0) this['root']?.['querySelector']?.('[data-storyboard-3d-ai-instruction]')?.['focus']?.();
+    if (value405) this['root']?.['querySelector']?.('[data-storyboard-3d-ai-instruction]')?.['focus']?.();
   }
-  ['_setMessage'](_0x140753) {
-    this['_message'] = String(_0x140753 || '');
-    const _0x1c4d10 = this['root']?.['querySelector']?.('[data-storyboard-3d-message]');
-    if (!_0x1c4d10) return;
-    ((_0x1c4d10['textContent'] = this['_message']), (_0x1c4d10['hidden'] = !this['_message']));
+  ['_setMessage'](value406) {
+    this['_message'] = String(value406 || '');
+    const el64 = this['root']?.['querySelector']?.('[data-storyboard-3d-message]');
+    if (!el64) return;
+    ((el64['textContent'] = this['_message']), (el64['hidden'] = !this['_message']));
   }
   async ['_runAICommand']() {
-    const _0x51e987 = this['root']?.['querySelector']?.('[data-storyboard-3d-ai-instruction]'),
-      _0x3dbdfb = String(_0x51e987?.['value'] || this['aiState']['instruction'] || '')['trim']();
-    if (!_0x3dbdfb) {
+    const el65 = this['root']?.['querySelector']?.('[data-storyboard-3d-ai-instruction]'),
+      instruction = String(el65?.['value'] || this['aiState']['instruction'] || '')['trim']();
+    if (!instruction) {
       this['_setMessage']('请先输入要执行的 3D 场景指令。');
       return;
     }
     try {
       await this['_requireInstalledModelPack']();
-    } catch (_0xf08d38) {
-      this['_setMessage'](_0xf08d38?.['message'] || String(_0xf08d38));
+    } catch (error25) {
+      this['_setMessage'](error25?.['message'] || String(error25));
       return;
     }
-    this['aiController']['setInstruction'](_0x3dbdfb);
+    this['aiController']['setInstruction'](instruction);
     try {
-      const _0x46d3f0 = await this['aiController']['submit']({ instruction: _0x3dbdfb });
-      if (_0x46d3f0) {
-        this['_setMessage'](_0x46d3f0['plan']?.['summary'] || 'AI 场景指令已执行。');
-        const _0x556a0b = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
-        if (_0x556a0b) void this['_generateMissingShotThumbnails'](_0x556a0b['id']);
+      const value407 = await this['aiController']['submit']({ instruction: instruction });
+      if (value407) {
+        this['_setMessage'](value407['plan']?.['summary'] || 'AI 场景指令已执行。');
+        const activeStoryboard3DScene9 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
+        if (activeStoryboard3DScene9)
+          void this['_generateMissingShotThumbnails'](activeStoryboard3DScene9['id']);
       }
     } catch {}
   }
-  ['_persistProject'](_0x5d7cb6, _0x2a68a7 = {}) {
-    const _0x35768c = this['onProjectChange']?.(_0x5d7cb6, _0x2a68a7);
+  ['_persistProject'](projectId2, reason = {}) {
+    const value408 = this['onProjectChange']?.(projectId2, reason);
     dispatchWorkspaceEvent(this['window'], 'storyboard-3d:project-changed', {
-      projectId: _0x5d7cb6['id'],
-      updatedAt: _0x5d7cb6['updatedAt'],
-      reason: _0x2a68a7['reason'],
+      projectId: projectId2['id'],
+      updatedAt: projectId2['updatedAt'],
+      reason: reason['reason'],
     });
-    if (_0x2a68a7['reason'] === 'select-shot') {
-      const _0x4ffa81 = getActiveStoryboard3DScene(_0x5d7cb6);
+    if (reason['reason'] === 'select-shot') {
+      const sceneId9 = getActiveStoryboard3DScene(projectId2);
       dispatchWorkspaceEvent(this['window'], 'storyboard-3d:shot-selected', {
         projectId: this['projectId'],
-        sceneId: _0x4ffa81?.['id'] || '',
-        shotId: _0x4ffa81?.['activeShotId'] || '',
+        sceneId: sceneId9?.['id'] || '',
+        shotId: sceneId9?.['activeShotId'] || '',
       });
     }
-    return _0x35768c;
+    return value408;
   }
-  ['_getFlyMovementKey'](_0x5e75cb) {
+  ['_getFlyMovementKey'](value409) {
     return (
       { KeyW: 'forward', KeyS: 'backward', KeyA: 'left', KeyD: 'right', KeyQ: 'down', KeyE: 'up' }[
-        _0x5e75cb
+        value409
       ] || ''
     );
   }
   ['_scheduleFlyMovement']() {
     if (this['_flyFrame'] != null || this['_flyKeys']['size'] === 0x0) return;
-    const _0x52f3cc =
+    const run9 =
       this['window']?.['requestAnimationFrame']?.['bind'](this['window']) ||
       globalThis['requestAnimationFrame']?.['bind'](globalThis);
-    if (!_0x52f3cc) return;
+    if (!run9) return;
     ((this['_flyLastTime'] =
       this['_flyLastTime'] || this['window']?.['performance']?.['now']?.() || Date['now']()),
-      (this['_flyFrame'] = _0x52f3cc((_0x1bcb13) => {
+      (this['_flyFrame'] = run9((value410) => {
         this['_flyFrame'] = null;
         if (
           !this['editorStore']['getSnapshot']()['flyMode'] ||
@@ -4950,13 +4894,13 @@ export class Storyboard3DEditorWorkspace {
           this['_flyKeys']['size'] === 0x0
         )
           return;
-        const _0x403ee3 = Number(_0x1bcb13) || this['window']?.['performance']?.['now']?.() || Date['now'](),
-          _0x2a0c63 = Math['max'](0x0, Math['min'](0.1, (_0x403ee3 - this['_flyLastTime']) / 0x3e8));
-        this['_flyLastTime'] = _0x403ee3;
-        const _0x14839a = this['_flySceneView'] || this['sceneRuntime']['getSceneView']?.();
-        if (!_0x14839a) return;
-        const _0x3a9a1b = applySceneFlyMovement(
-          _0x14839a,
+        const value411 = Number(value410) || this['window']?.['performance']?.['now']?.() || Date['now'](),
+          value412 = Math['max'](0x0, Math['min'](0.1, (value411 - this['_flyLastTime']) / 0x3e8));
+        this['_flyLastTime'] = value411;
+        const args12 = this['_flySceneView'] || this['sceneRuntime']['getSceneView']?.();
+        if (!args12) return;
+        const args13 = applySceneFlyMovement(
+          args12,
           {
             forward:
               (this['_flyKeys']['has']('forward') ? 0x1 : 0x0) -
@@ -4967,10 +4911,10 @@ export class Storyboard3DEditorWorkspace {
               (this['_flyKeys']['has']('up') ? 0x1 : 0x0) - (this['_flyKeys']['has']('down') ? 0x1 : 0x0),
             boost: this['_flyBoost'],
           },
-          _0x2a0c63,
+          value412,
           { speed: 0x4, boostMultiplier: 0x4 },
         );
-        ((this['_flySceneView'] = { ..._0x14839a, ..._0x3a9a1b }),
+        ((this['_flySceneView'] = { ...args12, ...args13 }),
           this['_cameraDrag']?.['mode'] === 'fly-look' &&
             (this['_cameraDrag']['latestSceneView'] = this['_flySceneView']),
           this['sceneRuntime']['previewSceneView']?.(this['_flySceneView']),
@@ -4983,46 +4927,46 @@ export class Storyboard3DEditorWorkspace {
       })));
   }
   ['_stopFlyMovementFrame']() {
-    const _0x38206c =
+    const value413 =
       this['window']?.['cancelAnimationFrame']?.['bind'](this['window']) ||
       globalThis['cancelAnimationFrame']?.['bind'](globalThis);
-    if (this['_flyFrame'] != null) _0x38206c?.(this['_flyFrame']);
+    if (this['_flyFrame'] != null) value413?.(this['_flyFrame']);
     ((this['_flyFrame'] = null), (this['_flyLastTime'] = 0x0));
   }
   ['_finishFlyMovement']({ clearKeys: clearKeys = ![] } = {}) {
     this['_stopFlyMovementFrame']();
-    const _0x41f703 = this['_flySceneView'];
-    if (_0x41f703) this['sceneRuntime']?.['commitSceneView']?.(_0x41f703);
+    const value414 = this['_flySceneView'];
+    if (value414) this['sceneRuntime']?.['commitSceneView']?.(value414);
     ((this['_flySceneView'] = null),
       (this['_miniMapPreviewSceneView'] = null),
       this['_scheduleMiniMapRefresh'](),
       clearKeys && (this['_flyKeys']['clear'](), (this['_flyBoost'] = ![])),
       !this['_closed'] &&
-        _0x41f703 &&
+        value414 &&
         this['shotTimelineController']?.['isAutoKeyEnabled']?.() &&
         this['shotTimelineController']['recordCameraKeyframe'](this['_readCurrentCameraState']()));
   }
-  ['_setFlyMode'](_0x5250e9) {
-    const _0x13a774 = _0x5250e9 === !![];
-    if (!_0x13a774) this['_finishFlyMovement']({ clearKeys: !![] });
-    (_0x13a774 &&
+  ['_setFlyMode'](value415) {
+    const enabled37 = value415 === !![];
+    if (!enabled37) this['_finishFlyMovement']({ clearKeys: !![] });
+    (enabled37 &&
       this['viewportControls']?.['getSnapshot']?.()['viewMode'] !== 'perspective' &&
       this['viewportControls']['showPerspectiveView']?.(),
-      this['editorStore']['setFlyMode'](_0x13a774),
+      this['editorStore']['setFlyMode'](enabled37),
       this['_render'](),
       this['root']?.['querySelector']?.('.storyboard-3d-viewport')?.['focus']?.(),
       this['_setMessage'](
-        _0x13a774 ? '飞行模式已开启：WASD 移动，Q/E 升降，右键观察，Shift 加速。' : '飞行模式已关闭。',
+        enabled37 ? '飞行模式已开启：WASD 移动，Q/E 升降，右键观察，Shift 加速。' : '飞行模式已关闭。',
       ));
   }
-  ['_handleWindowKeyUp'](_0x305b9a) {
+  ['_handleWindowKeyUp'](event46) {
     if (!this['root'] || !this['editorStore']['getSnapshot']()['flyMode']) return;
-    const _0xe9f0a3 = this['_getFlyMovementKey'](_0x305b9a['code']),
-      _0x460892 = _0x305b9a['code'] === 'ShiftLeft' || _0x305b9a['code'] === 'ShiftRight';
-    if (!_0xe9f0a3 && !_0x460892) return;
-    (_0x305b9a['preventDefault']?.(), _0x305b9a['stopImmediatePropagation']?.());
-    if (_0xe9f0a3) this['_flyKeys']['delete'](_0xe9f0a3);
-    if (_0x460892) this['_flyBoost'] = ![];
+    const enabled38 = this['_getFlyMovementKey'](event46['code']),
+      enabled39 = event46['code'] === 'ShiftLeft' || event46['code'] === 'ShiftRight';
+    if (!enabled38 && !enabled39) return;
+    (event46['preventDefault']?.(), event46['stopImmediatePropagation']?.());
+    if (enabled38) this['_flyKeys']['delete'](enabled38);
+    if (enabled39) this['_flyBoost'] = ![];
     if (this['_flyKeys']['size'] === 0x0) {
       if (this['_cameraDrag']?.['mode'] === 'fly-look') this['_stopFlyMovementFrame']();
       else this['_finishFlyMovement']();
@@ -5035,121 +4979,117 @@ export class Storyboard3DEditorWorkspace {
       this['shotTimelineController']?.['stopPlayback']?.({ clear: !![] }));
   }
   ['_toggleNavigationSettings']() {
-    const _0x97e801 = this['root']?.['querySelector']?.('.storyboard-3d-global-settings');
-    if (!_0x97e801) return ![];
-    return ((_0x97e801['open'] = !_0x97e801['open']), !![]);
+    const enabled40 = this['root']?.['querySelector']?.('.storyboard-3d-global-settings');
+    if (!enabled40) return ![];
+    return ((enabled40['open'] = !enabled40['open']), !![]);
   }
-  ['_handleWindowKeyDown'](_0x3900f8) {
+  ['_handleWindowKeyDown'](event47) {
     if (!this['root']) return;
     if (this['exportController']?.['root']) return;
-    if (this['shotTimelineController']?.['cameraPath']?.['onKey'](_0x3900f8)) return;
-    if (this['shotTimelineController']?.['editing']?.['handleKey'](_0x3900f8)) return;
-    const _0x39e8af = _0x3900f8['target']?.['closest']?.('[data-storyboard-3d-inspector-splitter]');
-    if (_0x39e8af && ['ArrowLeft', 'ArrowRight']['includes'](_0x3900f8['key'])) {
-      (_0x3900f8['preventDefault'](), _0x3900f8['stopImmediatePropagation']());
-      const _0x127372 = _0x3900f8['shiftKey'] ? 0x30 : 0x10;
+    if (this['shotTimelineController']?.['cameraPath']?.['onKey'](event47)) return;
+    if (this['shotTimelineController']?.['editing']?.['handleKey'](event47)) return;
+    const el66 = event47['target']?.['closest']?.('[data-storyboard-3d-inspector-splitter]');
+    if (el66 && ['ArrowLeft', 'ArrowRight']['includes'](event47['key'])) {
+      (event47['preventDefault'](), event47['stopImmediatePropagation']());
+      const value416 = event47['shiftKey'] ? 0x30 : 0x10;
       this['_applyInspectorWidth'](
-        this['inspectorWidth'] + (_0x3900f8['key'] === 'ArrowLeft' ? _0x127372 : -_0x127372),
-        _0x39e8af['closest']?.('.storyboard-3d-editor-main'),
+        this['inspectorWidth'] + (event47['key'] === 'ArrowLeft' ? value416 : -value416),
+        el66['closest']?.('.storyboard-3d-editor-main'),
       );
       return;
     }
-    const _0x2249d3 = _0x3900f8['target']?.['closest']?.('[data-storyboard-3d-right-sidebar-splitter]');
-    if (_0x2249d3 && ['ArrowLeft', 'ArrowRight']['includes'](_0x3900f8['key'])) {
-      (_0x3900f8['preventDefault'](), _0x3900f8['stopImmediatePropagation']());
-      const _0x921998 = _0x3900f8['shiftKey'] ? 0x30 : 0x10,
-        _0x1cc6fb = Number['isFinite'](this['rightSidebarWidth'])
+    const el67 = event47['target']?.['closest']?.('[data-storyboard-3d-right-sidebar-splitter]');
+    if (el67 && ['ArrowLeft', 'ArrowRight']['includes'](event47['key'])) {
+      (event47['preventDefault'](), event47['stopImmediatePropagation']());
+      const value417 = event47['shiftKey'] ? 0x30 : 0x10,
+        value418 = Number['isFinite'](this['rightSidebarWidth'])
           ? this['rightSidebarWidth']
-          : _0x2249d3['closest']?.('.storyboard-3d-right-sidebar')?.['getBoundingClientRect']?.()['width'];
+          : el67['closest']?.('.storyboard-3d-right-sidebar')?.['getBoundingClientRect']?.()['width'];
       this['_applyRightSidebarWidth'](
-        _0x1cc6fb + (_0x3900f8['key'] === 'ArrowLeft' ? _0x921998 : -_0x921998),
-        _0x2249d3['closest']?.('.storyboard-3d-editor-main'),
+        value418 + (event47['key'] === 'ArrowLeft' ? value417 : -value417),
+        el67['closest']?.('.storyboard-3d-editor-main'),
       );
       return;
     }
-    const _0x4ca6a7 = _0x3900f8['target']?.['closest']?.('[data-storyboard-3d-timeline-resize-handle]');
-    if (_0x4ca6a7 && ['ArrowUp', 'ArrowDown']['includes'](_0x3900f8['key'])) {
-      (_0x3900f8['preventDefault'](), _0x3900f8['stopImmediatePropagation']());
-      const _0x47a952 = _0x3900f8['shiftKey'] ? 0x40 : 0x18;
+    const el68 = event47['target']?.['closest']?.('[data-storyboard-3d-timeline-resize-handle]');
+    if (el68 && ['ArrowUp', 'ArrowDown']['includes'](event47['key'])) {
+      (event47['preventDefault'](), event47['stopImmediatePropagation']());
+      const value419 = event47['shiftKey'] ? 0x40 : 0x18;
       (this['shotTimelineController']?.['setDrawerOpen']?.(!![]),
         this['_applyTimelineHeight'](
-          this['timelineHeight'] + (_0x3900f8['key'] === 'ArrowUp' ? _0x47a952 : -_0x47a952),
-          _0x4ca6a7['closest']?.('.storyboard-3d-viewport-column'),
+          this['timelineHeight'] + (event47['key'] === 'ArrowUp' ? value419 : -value419),
+          el68['closest']?.('.storyboard-3d-viewport-column'),
         ));
       return;
     }
     if (this['rightSidebarMode']) {
-      const _0x3b0970 = this['root']['querySelector']('.storyboard-3d-right-sidebar');
-      if (_0x3b0970?.['contains']?.(_0x3900f8['target'])) {
-        if (trapTabKey(_0x3900f8, _0x3b0970, this['document'])) return;
-        _0x3900f8['stopImmediatePropagation']();
+      const value420 = this['root']['querySelector']('.storyboard-3d-right-sidebar');
+      if (value420?.['contains']?.(event47['target'])) {
+        if (trapTabKey(event47, value420, this['document'])) return;
+        event47['stopImmediatePropagation']();
         return;
       }
     }
-    if (trapTabKey(_0x3900f8, this['root'], this['document'])) return;
-    const _0x328d0c = _0x3900f8['target']?.['matches']?.(
+    if (trapTabKey(event47, this['root'], this['document'])) return;
+    const enabled41 = event47['target']?.['matches']?.(
         'input,\x20textarea,\x20select,\x20[contenteditable=\x27true\x27]',
       ),
-      _0xc70059 =
-        !_0x328d0c &&
-        !_0x3900f8['altKey'] &&
-        !_0x3900f8['ctrlKey'] &&
-        !_0x3900f8['metaKey'] &&
-        !_0x3900f8['shiftKey'] &&
-        (_0x3900f8['code'] === 'KeyK' || String(_0x3900f8['key'] || '')['toLowerCase']() === 'k');
-    if (_0xc70059) {
-      (_0x3900f8['preventDefault'](), _0x3900f8['stopImmediatePropagation']());
-      if (!_0x3900f8['repeat']) this['_toggleNavigationSettings']();
+      value421 =
+        !enabled41 &&
+        !event47['altKey'] &&
+        !event47['ctrlKey'] &&
+        !event47['metaKey'] &&
+        !event47['shiftKey'] &&
+        (event47['code'] === 'KeyK' || String(event47['key'] || '')['toLowerCase']() === 'k');
+    if (value421) {
+      (event47['preventDefault'](), event47['stopImmediatePropagation']());
+      if (!event47['repeat']) this['_toggleNavigationSettings']();
       return;
     }
-    const _0x1900b4 =
-      !_0x328d0c &&
-      !_0x3900f8['altKey'] &&
-      !_0x3900f8['ctrlKey'] &&
-      !_0x3900f8['metaKey'] &&
-      !_0x3900f8['shiftKey'] &&
-      (_0x3900f8['code'] === 'Space' || _0x3900f8['key'] === '\x20') &&
-      !_0x3900f8['target']?.['closest']?.("button, a, [role='button']");
-    if (_0x1900b4) {
-      (_0x3900f8['preventDefault'](), _0x3900f8['stopImmediatePropagation']());
-      if (!_0x3900f8['repeat']) this['shotTimelineController']?.['togglePlayback']?.();
+    const value422 =
+      !enabled41 &&
+      !event47['altKey'] &&
+      !event47['ctrlKey'] &&
+      !event47['metaKey'] &&
+      !event47['shiftKey'] &&
+      (event47['code'] === 'Space' || event47['key'] === '\x20') &&
+      !event47['target']?.['closest']?.("button, a, [role='button']");
+    if (value422) {
+      (event47['preventDefault'](), event47['stopImmediatePropagation']());
+      if (!event47['repeat']) this['shotTimelineController']?.['togglePlayback']?.();
       return;
     }
     if (
-      !_0x328d0c &&
-      _0x3900f8['shiftKey'] &&
-      (_0x3900f8['code'] === 'KeyF' || _0x3900f8['key']['toLowerCase']() === 'f')
+      !enabled41 &&
+      event47['shiftKey'] &&
+      (event47['code'] === 'KeyF' || event47['key']['toLowerCase']() === 'f')
     ) {
-      (_0x3900f8['preventDefault'](),
-        _0x3900f8['stopImmediatePropagation'](),
+      (event47['preventDefault'](),
+        event47['stopImmediatePropagation'](),
         this['_setFlyMode'](!this['editorStore']['getSnapshot']()['flyMode']));
       return;
     }
-    if (!_0x328d0c && this['editorStore']['getSnapshot']()['flyMode']) {
-      const _0x4f3f34 = this['_getFlyMovementKey'](_0x3900f8['code']),
-        _0x3ad01b = _0x3900f8['code'] === 'ShiftLeft' || _0x3900f8['code'] === 'ShiftRight';
-      if (_0x4f3f34 || _0x3ad01b) {
-        (_0x3900f8['preventDefault'](), _0x3900f8['stopImmediatePropagation']());
-        if (_0x4f3f34) this['_flyKeys']['add'](_0x4f3f34);
-        if (_0x3ad01b || _0x3900f8['shiftKey']) this['_flyBoost'] = !![];
+    if (!enabled41 && this['editorStore']['getSnapshot']()['flyMode']) {
+      const value423 = this['_getFlyMovementKey'](event47['code']),
+        value424 = event47['code'] === 'ShiftLeft' || event47['code'] === 'ShiftRight';
+      if (value423 || value424) {
+        (event47['preventDefault'](), event47['stopImmediatePropagation']());
+        if (value423) this['_flyKeys']['add'](value423);
+        if (value424 || event47['shiftKey']) this['_flyBoost'] = !![];
         this['_scheduleFlyMovement']();
         return;
       }
     }
-    if (
-      !_0x328d0c &&
-      (_0x3900f8['ctrlKey'] || _0x3900f8['metaKey']) &&
-      _0x3900f8['key']['toLowerCase']() === 'z'
-    ) {
-      (_0x3900f8['preventDefault'](), _0x3900f8['stopImmediatePropagation']());
+    if (!enabled41 && (event47['ctrlKey'] || event47['metaKey']) && event47['key']['toLowerCase']() === 'z') {
+      (event47['preventDefault'](), event47['stopImmediatePropagation']());
       if (this['_cancelRuntimeSelection']()) return;
       if (this['_cancelRuntimeTransform']()) return;
-      if (_0x3900f8['shiftKey']) this['commandHistory']['redo']();
+      if (event47['shiftKey']) this['commandHistory']['redo']();
       else this['commandHistory']['undo']();
       return;
     }
-    if (_0x3900f8['key'] === 'Escape') {
-      (_0x3900f8['preventDefault'](), _0x3900f8['stopImmediatePropagation']());
+    if (event47['key'] === 'Escape') {
+      (event47['preventDefault'](), event47['stopImmediatePropagation']());
       if (this['_cancelRuntimeSelection']()) return;
       if (this['_cancelRuntimeTransform']()) return;
       if (this['editorStore']['getSnapshot']()['flyMode']) {
@@ -5163,77 +5103,75 @@ export class Storyboard3DEditorWorkspace {
       this['close']();
       return;
     }
-    const _0x461175 =
-      !_0x328d0c && !_0x3900f8['altKey'] && !_0x3900f8['ctrlKey'] && !_0x3900f8['metaKey']
-        ? resolveStoryboard3DToolFromShortcut(_0x3900f8['key'], this['navigationSettings']['preset'])
+    const value425 =
+      !enabled41 && !event47['altKey'] && !event47['ctrlKey'] && !event47['metaKey']
+        ? resolveStoryboard3DToolFromShortcut(event47['key'], this['navigationSettings']['preset'])
         : null;
-    if (_0x461175) {
-      (_0x3900f8['preventDefault'](),
-        _0x3900f8['stopImmediatePropagation'](),
-        this['editorStore']['setActiveTool'](_0x461175),
+    if (value425) {
+      (event47['preventDefault'](),
+        event47['stopImmediatePropagation'](),
+        this['editorStore']['setActiveTool'](value425),
         this['_render']());
       return;
     }
-    if (!_0x328d0c && !_0x3900f8['shiftKey'] && _0x3900f8['key']['toLowerCase']() === 'f') {
-      (_0x3900f8['preventDefault'](), _0x3900f8['stopImmediatePropagation']());
+    if (!enabled41 && !event47['shiftKey'] && event47['key']['toLowerCase']() === 'f') {
+      (event47['preventDefault'](), event47['stopImmediatePropagation']());
       if (!this['viewportControls']?.['focusSelection']?.()) this['_setMessage']('请先选择一个可见对象。');
       return;
     }
-    if (!_0x328d0c && _0x3900f8['key'] === 'Home') {
-      (_0x3900f8['preventDefault'](),
-        _0x3900f8['stopImmediatePropagation'](),
+    if (!enabled41 && event47['key'] === 'Home') {
+      (event47['preventDefault'](),
+        event47['stopImmediatePropagation'](),
         this['viewportControls']?.['fitAll']?.());
       return;
     }
-    const _0x29d2e2 =
-      ['Delete', 'Backspace']['includes'](_0x3900f8['key']) ||
-      (!_0x3900f8['shiftKey'] &&
-        !_0x3900f8['altKey'] &&
-        !_0x3900f8['ctrlKey'] &&
-        !_0x3900f8['metaKey'] &&
-        _0x3900f8['code'] === 'KeyD');
-    if (!_0x328d0c && _0x29d2e2) {
-      const _0x276cac = this['editorStore']['getSnapshot']()['selectedObjectIds'];
-      if (_0x276cac['length'] > 0x0) {
-        (_0x3900f8['preventDefault'](),
-          _0x3900f8['stopImmediatePropagation'](),
-          this['_deleteObjects'](_0x276cac));
+    const value426 =
+      ['Delete', 'Backspace']['includes'](event47['key']) ||
+      (!event47['shiftKey'] &&
+        !event47['altKey'] &&
+        !event47['ctrlKey'] &&
+        !event47['metaKey'] &&
+        event47['code'] === 'KeyD');
+    if (!enabled41 && value426) {
+      const list24 = this['editorStore']['getSnapshot']()['selectedObjectIds'];
+      if (list24['length'] > 0x0) {
+        (event47['preventDefault'](), event47['stopImmediatePropagation'](), this['_deleteObjects'](list24));
         return;
       }
     }
-    _0x3900f8['stopImmediatePropagation']();
+    event47['stopImmediatePropagation']();
   }
-  ['_addAssetToActiveScene'](_0x56a290, { position: position = null } = {}) {
-    let _0x39655f = '';
-    const _0x3da595 = this['sceneRuntime']?.['resolveViewportGroundPosition']?.(0x0),
-      _0x21724a = Array['isArray'](position)
+  ['_addAssetToActiveScene'](name, { position: position = null } = {}) {
+    let value427 = '';
+    const list25 = this['sceneRuntime']?.['resolveViewportGroundPosition']?.(0x0),
+      position3 = Array['isArray'](position)
         ? position['slice'](0x0, 0x3)
-        : Array['isArray'](_0x3da595)
-          ? _0x3da595['slice'](0x0, 0x3)
+        : Array['isArray'](list25)
+          ? list25['slice'](0x0, 0x3)
           : resolveStoryboard3DViewportCenterPosition(this['sceneRuntime']?.['getSceneView']?.());
     (this['_executeMutation']({
       type: 'add-object',
       label: 'Add asset',
       renderOptions: { preserveAssetLibrary: !![] },
-      mutate: (_0x1b2c11) => {
-        const _0x2245d4 = _0x1b2c11['scenes']['find'](
-          (_0x2e25a4) => _0x2e25a4['id'] === _0x1b2c11['activeSceneId'],
+      mutate: (value428) => {
+        const enabled42 = value428['scenes']['find'](
+          (value429) => value429['id'] === value428['activeSceneId'],
         );
-        if (!_0x2245d4) return _0x1b2c11;
-        const _0x4028da = _0x56a290['source']?.['assetId'] || _0x56a290['id'] || '',
-          _0x459058 =
-            _0x56a290['category'] === 'character' &&
-            STORYBOARD_3D_BODY_PRESETS['some']((_0x532e11) => _0x532e11['id'] === _0x4028da),
-          _0x40538a = {
-            id: createLocalId(_0x459058 ? 'character' : 'prop'),
-            type: _0x459058 ? 'character' : 'prop',
-            name: _0x56a290['name'],
+        if (!enabled42) return value428;
+        const bodyPresetId = name['source']?.['assetId'] || name['id'] || '',
+          type5 =
+            name['category'] === 'character' &&
+            STORYBOARD_3D_BODY_PRESETS['some']((value430) => value430['id'] === bodyPresetId),
+          value431 = {
+            id: createLocalId(type5 ? 'character' : 'prop'),
+            type: type5 ? 'character' : 'prop',
+            name: name['name'],
             visible: !![],
             locked: ![],
-            transform: { position: _0x21724a, rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] },
-            ...(_0x459058
+            transform: { position: position3, rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] },
+            ...(type5
               ? {
-                  bodyPresetId: _0x4028da || 'adult-male',
+                  bodyPresetId: bodyPresetId || 'adult-male',
                   actionId: 'standing',
                   actionPlaying: ![],
                   leftHandPoseId: 'relaxed',
@@ -5241,230 +5179,228 @@ export class Storyboard3DEditorWorkspace {
                   boneOverrides: {},
                 }
               : {
-                  assetId: _0x56a290['source']?.['assetId'] || _0x56a290['id'],
-                  ...(_0x56a290['tint'] ? { tint: _0x56a290['tint'] } : {}),
+                  assetId: name['source']?.['assetId'] || name['id'],
+                  ...(name['tint'] ? { tint: name['tint'] } : {}),
                   castShadow: !![],
                   receiveShadow: !![],
                 }),
           };
-        return (_0x2245d4['objects']['push'](_0x40538a), (_0x39655f = _0x40538a['id']), _0x1b2c11);
+        return (enabled42['objects']['push'](value431), (value427 = value431['id']), value428);
       },
     }),
-      this['assetLibrary']['markUsed'](_0x56a290['id']),
-      _0x39655f &&
-        (this['_setSelectedObjects']([_0x39655f], { openProperties: ![] }),
+      this['assetLibrary']['markUsed'](name['id']),
+      value427 &&
+        (this['_setSelectedObjects']([value427], { openProperties: ![] }),
         this['_render']({ preserveAssetLibrary: !![] })));
   }
-  ['_handleClick'](_0x57058e) {
-    const _0x415d6f = _0x57058e['target']?.['closest']?.('[data-storyboard-3d-action]');
-    if (!_0x415d6f || _0x415d6f['disabled']) return;
-    const _0x382e67 = _0x415d6f['getAttribute']('data-storyboard-3d-action');
-    if (_0x382e67 === 'timeline-toggle-drawer' && this['_suppressTimelineToggleClick']) {
+  ['_handleClick'](event48) {
+    const el69 = event48['target']?.['closest']?.('[data-storyboard-3d-action]');
+    if (!el69 || el69['disabled']) return;
+    const type6 = el69['getAttribute']('data-storyboard-3d-action');
+    if (type6 === 'timeline-toggle-drawer' && this['_suppressTimelineToggleClick']) {
       ((this['_suppressTimelineToggleClick'] = ![]),
-        _0x57058e['preventDefault']?.(),
-        _0x57058e['stopImmediatePropagation']?.());
+        event48['preventDefault']?.(),
+        event48['stopImmediatePropagation']?.());
       return;
     }
-    if (this['shotTimelineController']?.['handleClick']?.(_0x382e67, _0x415d6f, _0x57058e)) return;
-    if (_0x382e67 === 'set-inspector-tab') {
-      const _0x429039 = this['root']?.['querySelector']?.('.storyboard-3d-inspector-dock');
-      if (_0x429039) _0x429039['scrollTop'] = 0x0;
-      (this['editorStore']['setInspectorTab'](_0x415d6f['dataset']['inspectorTab']), this['_render']());
+    if (this['shotTimelineController']?.['handleClick']?.(type6, el69, event48)) return;
+    if (type6 === 'set-inspector-tab') {
+      const value432 = this['root']?.['querySelector']?.('.storyboard-3d-inspector-dock');
+      if (value432) value432['scrollTop'] = 0x0;
+      (this['editorStore']['setInspectorTab'](el69['dataset']['inspectorTab']), this['_render']());
       return;
     }
-    if (_0x382e67 === 'toggle-object-outline') {
-      const _0x150f40 = _0x415d6f['closest']('.storyboard-3d-object-popover');
-      this['editorStore']['setObjectOutlineOpen'](!_0x150f40?.['open']);
+    if (type6 === 'toggle-object-outline') {
+      const enabled43 = el69['closest']('.storyboard-3d-object-popover');
+      this['editorStore']['setObjectOutlineOpen'](!enabled43?.['open']);
       return;
     }
-    if (_0x382e67 === 'toggle-scene-environment') {
-      const _0x54401b = _0x415d6f['closest']('[data-storyboard-3d-scene-environment]');
-      this['sceneEnvironmentOpen'] = !_0x54401b?.['open'];
+    if (type6 === 'toggle-scene-environment') {
+      const enabled44 = el69['closest']('[data-storyboard-3d-scene-environment]');
+      this['sceneEnvironmentOpen'] = !enabled44?.['open'];
       return;
     }
-    if (_0x382e67 === 'toggle-fly-mode') {
+    if (type6 === 'toggle-fly-mode') {
       this['_setFlyMode'](!this['editorStore']['getSnapshot']()['flyMode']);
       return;
     }
-    if (_0x382e67 === 'open-asset-library') {
+    if (type6 === 'open-asset-library') {
       this['_openAssetLibrary']();
       return;
     }
-    if (_0x382e67 === 'open-background-perspective') {
+    if (type6 === 'open-background-perspective') {
       this['_openBackgroundPerspective']();
       return;
     }
-    if (_0x382e67 === 'toggle-ai-sidebar') {
+    if (type6 === 'toggle-ai-sidebar') {
       this['_toggleAIAssistant']();
       return;
     }
-    if (_0x382e67 === 'select-asset-category') {
-      ((this['assetCategory'] = String(
-        _0x415d6f['getAttribute']('data-storyboard-3d-asset-category') || 'all',
-      )),
+    if (type6 === 'select-asset-category') {
+      ((this['assetCategory'] = String(el69['getAttribute']('data-storyboard-3d-asset-category') || 'all')),
         (this['assetVisibleLimit'] = 0x20),
         this['_render']());
       return;
     }
-    if (_0x382e67 === 'rebuild-viewport') {
+    if (type6 === 'rebuild-viewport') {
       this['_rebuildSceneRuntime']();
       return;
     }
-    if (_0x382e67 === 'focus-selection') {
+    if (type6 === 'focus-selection') {
       if (!this['viewportControls']?.['focusSelection']?.()) this['_setMessage']('请先选择一个可见对象。');
       return;
     }
-    if (_0x382e67 === 'fit-all') {
+    if (type6 === 'fit-all') {
       this['viewportControls']?.['fitAll']?.();
       return;
     }
-    if (_0x382e67 === 'reset-focal-length') {
+    if (type6 === 'reset-focal-length') {
       this['_commitFocalLength'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS['indexOf'](0x23));
       return;
     }
-    if (_0x382e67 === 'set-viewport-view') {
-      const _0x479716 = _0x415d6f['dataset']['view'];
-      if (_0x479716 === 'perspective') this['viewportControls']?.['showPerspectiveView']?.();
-      else this['viewportControls']?.['showOrthographicView']?.(_0x479716);
+    if (type6 === 'set-viewport-view') {
+      const value433 = el69['dataset']['view'];
+      if (value433 === 'perspective') this['viewportControls']?.['showPerspectiveView']?.();
+      else this['viewportControls']?.['showOrthographicView']?.(value433);
       return;
     }
-    if (_0x382e67 === 'toggle-viewport-setting') {
-      const _0x521a5f = _0x415d6f['getAttribute']('data-storyboard-3d-viewport-setting-toggle');
-      if (!['transformSpace', 'snapEnabled', 'groundLock', 'uniformScale']['includes'](_0x521a5f)) return;
-      const _0x8de972 =
-          _0x521a5f === 'transformSpace'
+    if (type6 === 'toggle-viewport-setting') {
+      const value434 = el69['getAttribute']('data-storyboard-3d-viewport-setting-toggle');
+      if (!['transformSpace', 'snapEnabled', 'groundLock', 'uniformScale']['includes'](value434)) return;
+      const args14 =
+          value434 === 'transformSpace'
             ? { transformSpace: this['viewportSettings']['transformSpace'] === 'local' ? 'world' : 'local' }
-            : { [_0x521a5f]: this['viewportSettings'][_0x521a5f] !== !![] },
-        _0x5ea01c =
-          this['viewportControls']?.['updateSettings']?.(_0x8de972) ||
-          normalizeStoryboard3DViewportSettings({ ...this['viewportSettings'], ..._0x8de972 });
-      (this['_saveTransformSettings'](_0x5ea01c),
+            : { [value434]: this['viewportSettings'][value434] !== !![] },
+        value435 =
+          this['viewportControls']?.['updateSettings']?.(args14) ||
+          normalizeStoryboard3DViewportSettings({ ...this['viewportSettings'], ...args14 });
+      (this['_saveTransformSettings'](value435),
         this['sceneRuntime']?.['setViewportUIPatch']?.(
           this['viewportControls']?.['getDirectorUIPatch']?.() || {},
         ),
         this['_render']());
       return;
     }
-    if (_0x382e67 === 'toggle-top-view') {
-      const _0x4fdc84 = this['viewportControls']?.['getSnapshot']?.()['viewMode'];
-      if (_0x4fdc84 === 'top') this['viewportControls']['showPerspectiveView']();
+    if (type6 === 'toggle-top-view') {
+      const value436 = this['viewportControls']?.['getSnapshot']?.()['viewMode'];
+      if (value436 === 'top') this['viewportControls']['showPerspectiveView']();
       else this['viewportControls']?.['showTopView']?.();
       return;
     }
-    if (_0x382e67 === 'run-ai-command') {
+    if (type6 === 'run-ai-command') {
       void this['_runAICommand']();
       return;
     }
-    if (_0x382e67 === 'toggle-mini-map') {
+    if (type6 === 'toggle-mini-map') {
       ((this['miniMapExpanded'] = !this['miniMapExpanded']), this['_render']());
       return;
     }
-    if (_0x382e67 === 'cancel-ai-command') {
+    if (type6 === 'cancel-ai-command') {
       this['aiController']['cancel']();
       return;
     }
-    if (_0x382e67 === 'toggle-ai-voice') {
+    if (type6 === 'toggle-ai-voice') {
       ['starting', 'listening', 'transcribing', 'stopping']['includes'](this['aiState']['status'])
         ? this['aiController']['stopVoice']()
         : this['aiController']['startVoice']({ language: 'zh-CN' });
       return;
     }
-    if (_0x382e67 === 'undo') {
+    if (type6 === 'undo') {
       this['commandHistory']['undo']();
       return;
     }
-    if (_0x382e67 === 'redo') {
+    if (type6 === 'redo') {
       this['commandHistory']['redo']();
       return;
     }
-    if (_0x382e67 === 'undo-ai-command') {
+    if (type6 === 'undo-ai-command') {
       this['commandHistory']['getSnapshot']()['nextUndoLabel'] === 'AI scene transaction' &&
         (this['commandHistory']['undo'](),
         this['_setMessage']('已撤销本次 AI 场景修改。'),
         this['_syncAIAssistant']());
       return;
     }
-    if (_0x382e67 === 'set-tool') {
-      (this['editorStore']['setActiveTool'](_0x415d6f['dataset']['tool']), this['_render']());
+    if (type6 === 'set-tool') {
+      (this['editorStore']['setActiveTool'](el69['dataset']['tool']), this['_render']());
       return;
     }
-    if (['toggle-object-visibility', 'toggle-object-lock']['includes'](_0x382e67)) {
-      const _0x2cb6e5 = _0x415d6f['dataset']['objectId'],
-        _0x1afd5a = _0x382e67 === 'toggle-object-visibility' ? 'visible' : 'locked';
+    if (['toggle-object-visibility', 'toggle-object-lock']['includes'](type6)) {
+      const value437 = el69['dataset']['objectId'],
+        value438 = type6 === 'toggle-object-visibility' ? 'visible' : 'locked';
       this['_executeMutation']({
-        type: 'toggle-object-' + _0x1afd5a,
-        label: 'Toggle\x20object\x20' + _0x1afd5a,
-        mutate: (_0x525be2) => {
-          const _0x59767f = _0x525be2['scenes']['find'](
-              (_0x2f6595) => _0x2f6595['id'] === _0x525be2['activeSceneId'],
+        type: 'toggle-object-' + value438,
+        label: 'Toggle\x20object\x20' + value438,
+        mutate: (value439) => {
+          const value440 = value439['scenes']['find'](
+              (value441) => value441['id'] === value439['activeSceneId'],
             ),
-            _0x41237d = _0x59767f?.['objects']?.['find']((_0x9db8d) => _0x9db8d['id'] === _0x2cb6e5);
+            value442 = value440?.['objects']?.['find']((value443) => value443['id'] === value437);
           return (
-            _0x41237d &&
-              (_0x41237d[_0x1afd5a] =
-                _0x1afd5a === 'visible' ? _0x41237d['visible'] === ![] : _0x41237d['locked'] !== !![]),
-            _0x525be2
+            value442 &&
+              (value442[value438] =
+                value438 === 'visible' ? value442['visible'] === ![] : value442['locked'] !== !![]),
+            value439
           );
         },
       });
       return;
     }
-    if (_0x382e67 === 'edit-object-name') {
-      const _0x40d7cb = _0x415d6f['dataset']['objectId'],
-        _0x3dfa50 = _0x415d6f['dataset']['objectType'],
-        _0x36df7b = this['editorStore']['getSnapshot'](),
-        _0x1e11eb = _0x57058e['shiftKey'] || _0x57058e['ctrlKey'] || _0x57058e['metaKey'];
-      if (_0x1e11eb) {
-        const _0xc97c4e = _0x36df7b['selectedObjectIds']['includes'](_0x40d7cb)
-          ? _0x36df7b['selectedObjectIds']['filter']((_0x3c517a) => _0x3c517a !== _0x40d7cb)
-          : [..._0x36df7b['selectedObjectIds'], _0x40d7cb];
-        if (_0x3dfa50 === 'camera' && _0xc97c4e['includes'](_0x40d7cb)) {
-          if (!this['_activateShotForCamera'](_0x40d7cb)) return;
+    if (type6 === 'edit-object-name') {
+      const value444 = el69['dataset']['objectId'],
+        value445 = el69['dataset']['objectType'],
+        args15 = this['editorStore']['getSnapshot'](),
+        value446 = event48['shiftKey'] || event48['ctrlKey'] || event48['metaKey'];
+      if (value446) {
+        const list26 = args15['selectedObjectIds']['includes'](value444)
+          ? args15['selectedObjectIds']['filter']((value447) => value447 !== value444)
+          : [...args15['selectedObjectIds'], value444];
+        if (value445 === 'camera' && list26['includes'](value444)) {
+          if (!this['_activateShotForCamera'](value444)) return;
         }
-        (this['_setSelectedObjects'](_0xc97c4e), this['_render']());
+        (this['_setSelectedObjects'](list26), this['_render']());
         return;
       }
-      const _0x4d71fb =
-        _0x36df7b['selectedObjectIds']['length'] === 0x1 &&
-        _0x36df7b['selectedObjectIds'][0x0] === _0x40d7cb &&
-        !_0x36df7b['assetLibraryOpen'] &&
+      const value448 =
+        args15['selectedObjectIds']['length'] === 0x1 &&
+        args15['selectedObjectIds'][0x0] === value444 &&
+        !args15['assetLibraryOpen'] &&
         this['rightSidebarMode'] === 'object';
-      if (_0x4d71fb) return;
-      if (_0x3dfa50 === 'camera' && !this['_activateShotForCamera'](_0x40d7cb)) return;
-      (this['_setSelectedObjects']([_0x40d7cb]), this['_render']());
-      const _0x344514 = [
-        ...(this['root']?.['querySelectorAll']?.('[data-storyboard-3d-outline-name]') || []),
-      ]['find']((_0x28250b) => _0x28250b['dataset']['objectId'] === _0x40d7cb);
-      (_0x344514?.['focus']?.(), _0x344514?.['select']?.());
-      if (_0x3dfa50 === 'camera') this['_focusCameraObject'](_0x40d7cb);
+      if (value448) return;
+      if (value445 === 'camera' && !this['_activateShotForCamera'](value444)) return;
+      (this['_setSelectedObjects']([value444]), this['_render']());
+      const el70 = [...(this['root']?.['querySelectorAll']?.('[data-storyboard-3d-outline-name]') || [])][
+        'find'
+      ]((el71) => el71['dataset']['objectId'] === value444);
+      (el70?.['focus']?.(), el70?.['select']?.());
+      if (value445 === 'camera') this['_focusCameraObject'](value444);
       return;
     }
-    if (_0x382e67 === 'select-object') {
-      const _0x4f82fa = _0x415d6f['dataset']['objectId'],
-        _0x14beac = this['editorStore']['getSnapshot']()['selectedObjectIds'],
-        _0x4acb7c = _0x57058e['shiftKey'] || _0x57058e['ctrlKey'] || _0x57058e['metaKey'],
-        _0x30e20f = !_0x4f82fa
+    if (type6 === 'select-object') {
+      const enabled45 = el69['dataset']['objectId'],
+        list27 = this['editorStore']['getSnapshot']()['selectedObjectIds'],
+        value449 = event48['shiftKey'] || event48['ctrlKey'] || event48['metaKey'],
+        list28 = !enabled45
           ? []
-          : _0x4acb7c
-            ? _0x14beac['includes'](_0x4f82fa)
-              ? _0x14beac['filter']((_0x3c94de) => _0x3c94de !== _0x4f82fa)
-              : [..._0x14beac, _0x4f82fa]
-            : [_0x4f82fa];
-      if (_0x415d6f['dataset']['objectType'] === 'camera' && _0x30e20f['includes'](_0x4f82fa)) {
-        if (!this['_activateShotForCamera'](_0x4f82fa)) return;
+          : value449
+            ? list27['includes'](enabled45)
+              ? list27['filter']((value450) => value450 !== enabled45)
+              : [...list27, enabled45]
+            : [enabled45];
+      if (el69['dataset']['objectType'] === 'camera' && list28['includes'](enabled45)) {
+        if (!this['_activateShotForCamera'](enabled45)) return;
       }
-      (this['_setSelectedObjects'](_0x30e20f), this['_render']());
-      _0x415d6f['dataset']['objectType'] === 'camera' &&
-        _0x30e20f['length'] === 0x1 &&
-        this['_focusCameraObject'](_0x4f82fa);
+      (this['_setSelectedObjects'](list28), this['_render']());
+      el69['dataset']['objectType'] === 'camera' &&
+        list28['length'] === 0x1 &&
+        this['_focusCameraObject'](enabled45);
       return;
     }
-    if (_0x382e67 === 'open-explore') {
+    if (type6 === 'open-explore') {
       this['_clearShotCandidates']();
-      const _0x257f6d = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
+      const activeStoryboard3DScene10 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
       ((this['exploreFilter'] = 'all'),
         (this['exploreVariation'] = 0x0),
-        (this['shotCandidates'] = generateStoryboard3DShotCandidates(_0x257f6d, {
+        (this['shotCandidates'] = generateStoryboard3DShotCandidates(activeStoryboard3DScene10, {
           count: 0x9,
           variation: 0x0,
         })),
@@ -5472,195 +5408,195 @@ export class Storyboard3DEditorWorkspace {
         this['_render']());
       return;
     }
-    if (_0x382e67 === 'filter-explore') {
+    if (type6 === 'filter-explore') {
       ((this['exploreFilter'] = ['all', 'close', 'medium', 'wide']['includes'](
-        _0x415d6f['dataset']['exploreFilter'],
+        el69['dataset']['exploreFilter'],
       )
-        ? _0x415d6f['dataset']['exploreFilter']
+        ? el69['dataset']['exploreFilter']
         : 'all'),
         this['_render']());
       return;
     }
-    if (_0x382e67 === 'regenerate-explore') {
-      const _0x5a8ad1 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
+    if (type6 === 'regenerate-explore') {
+      const activeStoryboard3DScene11 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
       (this['_clearShotCandidates'](),
         (this['exploreVariation'] += 0x1),
-        (this['shotCandidates'] = generateStoryboard3DShotCandidates(_0x5a8ad1, {
+        (this['shotCandidates'] = generateStoryboard3DShotCandidates(activeStoryboard3DScene11, {
           count: 0x9,
           variation: this['exploreVariation'],
         })),
         this['_render']());
       return;
     }
-    if (_0x382e67 === 'close-explore') {
+    if (type6 === 'close-explore') {
       ((this['exploreOpen'] = ![]), this['_clearShotCandidates'](), this['_render']());
       return;
     }
-    if (_0x382e67 === 'preview-candidate') {
-      const _0x53130c = this['shotCandidates'][Number(_0x415d6f['dataset']['candidateIndex'])],
-        _0xef1316 = this['projectStore']['getSnapshot'](),
-        _0x90b45c = getActiveStoryboard3DScene(_0xef1316),
-        _0x100d82 = getActiveStoryboard3DShot(_0xef1316);
-      if (!_0x53130c || !_0x90b45c || !_0x100d82 || !this['sceneRuntime']) return;
-      const _0x4a025e = structuredClone(_0xef1316),
-        _0x12a666 = getActiveStoryboard3DScene(_0x4a025e),
-        _0x113cbd = getActiveStoryboard3DShot(_0x4a025e);
-      ((_0x113cbd['camera'] = structuredClone(_0x53130c['camera'])),
+    if (type6 === 'preview-candidate') {
+      const enabled46 = this['shotCandidates'][Number(el69['dataset']['candidateIndex'])],
+        value451 = this['projectStore']['getSnapshot'](),
+        activeStoryboard3DScene12 = getActiveStoryboard3DScene(value451),
+        activeStoryboard3DShot7 = getActiveStoryboard3DShot(value451);
+      if (!enabled46 || !activeStoryboard3DScene12 || !activeStoryboard3DShot7 || !this['sceneRuntime'])
+        return;
+      const project9 = structuredClone(value451),
+        sceneId10 = getActiveStoryboard3DScene(project9),
+        activeStoryboard3DShot8 = getActiveStoryboard3DShot(project9);
+      ((activeStoryboard3DShot8['camera'] = structuredClone(enabled46['camera'])),
         this['sceneRuntime']['sync']({
-          project: _0x4a025e,
-          sceneId: _0x12a666['id'],
+          project: project9,
+          sceneId: sceneId10['id'],
           selectedObjectIds: [],
           activeTool: 'select',
         }),
         this['sceneRuntime']['renderNow'](),
         this['_setMessage'](
-          '正在预览\x20' + _0x53130c['shotSize'] + ' · ' + _0x53130c['shotAngle'] + ' 候选机位。',
+          '正在预览\x20' + enabled46['shotSize'] + ' · ' + enabled46['shotAngle'] + ' 候选机位。',
         ));
       return;
     }
-    if (_0x382e67 === 'replace-with-candidate' || _0x382e67 === 'append-candidate') {
-      const _0xe155db = this['shotCandidates'][Number(_0x415d6f['dataset']['candidateIndex'])];
-      if (!_0xe155db) return;
+    if (type6 === 'replace-with-candidate' || type6 === 'append-candidate') {
+      const enabled47 = this['shotCandidates'][Number(el69['dataset']['candidateIndex'])];
+      if (!enabled47) return;
       (this['_executeMutation']({
-        type: _0x382e67 === 'append-candidate' ? 'append-shot-candidate' : 'replace-shot-candidate',
-        label: _0x382e67 === 'append-candidate' ? 'Append shot candidate' : 'Replace shot candidate',
-        mutate: (_0xc15fbf) => {
-          const _0x2d2540 = _0xc15fbf['scenes']['findIndex'](
-            (_0x4a912c) => _0x4a912c['id'] === _0xc15fbf['activeSceneId'],
+        type: type6 === 'append-candidate' ? 'append-shot-candidate' : 'replace-shot-candidate',
+        label: type6 === 'append-candidate' ? 'Append shot candidate' : 'Replace shot candidate',
+        mutate: (value452) => {
+          const count8 = value452['scenes']['findIndex'](
+            (value453) => value453['id'] === value452['activeSceneId'],
           );
-          if (_0x2d2540 < 0x0) return _0xc15fbf;
-          const _0x1e15ce = _0xc15fbf['scenes'][_0x2d2540];
+          if (count8 < 0x0) return value452;
+          const value454 = value452['scenes'][count8];
           return (
-            (_0xc15fbf['scenes'][_0x2d2540] =
-              _0x382e67 === 'append-candidate'
-                ? appendStoryboard3DShotCandidate(_0x1e15ce, _0xe155db)
-                : replaceStoryboard3DShotWithCandidate(_0x1e15ce, _0x1e15ce['activeShotId'], _0xe155db)),
-            _0xc15fbf
+            (value452['scenes'][count8] =
+              type6 === 'append-candidate'
+                ? appendStoryboard3DShotCandidate(value454, enabled47)
+                : replaceStoryboard3DShotWithCandidate(value454, value454['activeShotId'], enabled47)),
+            value452
           );
         },
       }),
         (this['exploreOpen'] = ![]),
         this['_clearShotCandidates'](),
         this['_render']());
-      const _0x3b6ebc = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
-        _0x16a8ee = _0x3b6ebc?.['shots']?.['find'](
-          (_0xec7bb2) => _0xec7bb2['id'] === _0x3b6ebc['activeShotId'],
+      const activeStoryboard3DScene13 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
+        value455 = activeStoryboard3DScene13?.['shots']?.['find'](
+          (value456) => value456['id'] === activeStoryboard3DScene13['activeShotId'],
         );
-      _0x16a8ee &&
-        (this['_setSelectedObjects']([_0x16a8ee['cameraId']]),
+      value455 &&
+        (this['_setSelectedObjects']([value455['cameraId']]),
         this['_render'](),
-        this['_focusCameraObject'](_0x16a8ee['cameraId']),
-        void this['_generateShotThumbnail'](_0x3b6ebc['id'], _0x16a8ee['id']));
+        this['_focusCameraObject'](value455['cameraId']),
+        void this['_generateShotThumbnail'](activeStoryboard3DScene13['id'], value455['id']));
       return;
     }
-    if (_0x382e67 === 'add-asset') {
-      const _0x1da8d6 = _0x415d6f['dataset']['assetId'],
-        _0x4bab19 = this['assetLibrary']['find'](_0x1da8d6);
-      if (!_0x4bab19) return;
-      const _0x5cece6 =
+    if (type6 === 'add-asset') {
+      const value457 = el69['dataset']['assetId'],
+        error26 = this['assetLibrary']['find'](value457);
+      if (!error26) return;
+      const position4 =
         this['sceneRuntime']?.['resolveViewportGroundPosition']?.(0x0) ||
         resolveStoryboard3DViewportCenterPosition(this['sceneRuntime']?.['getSceneView']?.());
-      if (_0x4bab19['source']?.['kind'] === 'pack' && !this['importedModelScenes']['has'](_0x4bab19['id'])) {
-        (this['_setMessage']('正在加载模型包素材“' + _0x4bab19['name'] + '”…'),
-          void this['_loadPackAsset'](_0x4bab19['id'])
+      if (error26['source']?.['kind'] === 'pack' && !this['importedModelScenes']['has'](error26['id'])) {
+        (this['_setMessage']('正在加载模型包素材“' + error26['name'] + '”…'),
+          void this['_loadPackAsset'](error26['id'])
             ['then'](() => {
               if (this['_closed']) return;
-              (this['_addAssetToActiveScene'](_0x4bab19, { position: _0x5cece6 }),
-                this['_setMessage']('模型包素材“' + _0x4bab19['name'] + '”已加入场景。'));
+              (this['_addAssetToActiveScene'](error26, { position: position4 }),
+                this['_setMessage']('模型包素材“' + error26['name'] + '”已加入场景。'));
             })
-            ['catch']((_0x480280) => this['_setMessage'](_0x480280?.['message'] || String(_0x480280))));
+            ['catch']((error27) => this['_setMessage'](error27?.['message'] || String(error27))));
         return;
       }
-      this['_addAssetToActiveScene'](_0x4bab19, { position: _0x5cece6 });
+      this['_addAssetToActiveScene'](error26, { position: position4 });
       return;
     }
-    if (_0x382e67 === 'toggle-asset-favorite') {
-      const _0x3a6235 = _0x415d6f['dataset']['assetId'];
-      if (this['favoriteAssetIds']['has'](_0x3a6235)) this['favoriteAssetIds']['delete'](_0x3a6235);
-      else this['favoriteAssetIds']['add'](_0x3a6235);
+    if (type6 === 'toggle-asset-favorite') {
+      const value458 = el69['dataset']['assetId'];
+      if (this['favoriteAssetIds']['has'](value458)) this['favoriteAssetIds']['delete'](value458);
+      else this['favoriteAssetIds']['add'](value458);
       this['_render']();
       return;
     }
-    if (_0x382e67 === 'load-more-assets') {
+    if (type6 === 'load-more-assets') {
       ((this['assetVisibleLimit'] = Math['min'](0x640, this['assetVisibleLimit'] + 0x20)), this['_render']());
       return;
     }
-    if (_0x382e67 === 'toggle-character-play') {
-      const _0x15030e = _0x415d6f['dataset']['objectId'];
+    if (type6 === 'toggle-character-play') {
+      const value459 = el69['dataset']['objectId'];
       this['_executeMutation']({
         type: 'toggle-character-playback',
         label: 'Toggle\x20character\x20playback',
-        mutate: (_0x2ba6d9) => {
-          const _0x5196da = _0x2ba6d9['scenes']['find'](
-              (_0x25b126) => _0x25b126['id'] === _0x2ba6d9['activeSceneId'],
+        mutate: (value460) => {
+          const value461 = value460['scenes']['find'](
+              (value462) => value462['id'] === value460['activeSceneId'],
             ),
-            _0x1d4164 = _0x5196da?.['objects']?.['find']((_0x5ccf27) => _0x5ccf27['id'] === _0x15030e);
+            enabled48 = value461?.['objects']?.['find']((value463) => value463['id'] === value459);
           return (
-            _0x1d4164?.['type'] === 'character' &&
+            enabled48?.['type'] === 'character' &&
               Object['assign'](
-                _0x1d4164,
-                setStoryboard3DCharacterActionPlayback(_0x1d4164, !_0x1d4164['actionPlaying']),
+                enabled48,
+                setStoryboard3DCharacterActionPlayback(enabled48, !enabled48['actionPlaying']),
               ),
-            _0x2ba6d9
+            value460
           );
         },
       });
       return;
     }
-    if (_0x382e67 === 'extract-character-pose') {
-      const _0x5a7fe4 = this['root']['querySelector']('[data-storyboard-3d-pose-image-input]');
-      if (!_0x5a7fe4) return;
-      ((_0x5a7fe4['dataset']['objectId'] = String(_0x415d6f['dataset']['objectId'] || '')),
-        _0x5a7fe4['click']?.());
+    if (type6 === 'extract-character-pose') {
+      const el72 = this['root']['querySelector']('[data-storyboard-3d-pose-image-input]');
+      if (!el72) return;
+      ((el72['dataset']['objectId'] = String(el69['dataset']['objectId'] || '')), el72['click']?.());
       return;
     }
-    if (_0x382e67 === 'cancel-character-pose') {
-      const _0x308a7f = String(_0x415d6f['dataset']['objectId'] || '');
-      (this['characterImagePoseController']['clear'](_0x308a7f), this['_setMessage']('已取消人物姿势识别。'));
+    if (type6 === 'cancel-character-pose') {
+      const value464 = String(el69['dataset']['objectId'] || '');
+      (this['characterImagePoseController']['clear'](value464), this['_setMessage']('已取消人物姿势识别。'));
       return;
     }
-    if (_0x382e67 === 'reset-character-pose') {
-      const _0x25c2d0 = String(_0x415d6f['dataset']['objectId'] || '');
-      (this['characterImagePoseController']['clear'](_0x25c2d0),
+    if (type6 === 'reset-character-pose') {
+      const value465 = String(el69['dataset']['objectId'] || '');
+      (this['characterImagePoseController']['clear'](value465),
         this['_executeMutation']({
           type: 'reset-character-pose',
           label: 'Reset\x20character\x20pose',
-          mutate: (_0x249a1a) => {
-            for (const _0x57a305 of _0x249a1a['scenes'] || []) {
-              const _0x46854b = _0x57a305['objects']?.['find']((_0x8fcb7a) => _0x8fcb7a['id'] === _0x25c2d0);
-              if (_0x46854b?.['type'] !== 'character') continue;
-              _0x46854b['boneOverrides'] = {};
+          mutate: (value466) => {
+            for (const value467 of value466['scenes'] || []) {
+              const value468 = value467['objects']?.['find']((value469) => value469['id'] === value465);
+              if (value468?.['type'] !== 'character') continue;
+              value468['boneOverrides'] = {};
               break;
             }
-            return _0x249a1a;
+            return value466;
           },
         }),
         this['_setMessage']('已重置人物骨骼姿势。'));
       return;
     }
-    if (_0x382e67 === 'import-model') {
+    if (type6 === 'import-model') {
       this['root']['querySelector']('[data-storyboard-3d-model-input]')?.['click']?.();
       return;
     }
-    if (_0x382e67 === 'cancel-model-import') {
+    if (type6 === 'cancel-model-import') {
       (this['modelImportJob']?.['cancel']?.('用户取消了模型导入'),
         (this['modelImportState'] = this['modelImportJob']?.['getSnapshot']?.() || this['modelImportState']),
         this['_render']());
       return;
     }
-    if (_0x382e67 === 'add-scene') {
+    if (type6 === 'add-scene') {
       (this['_executeMutation']({
         type: 'add-scene',
         label: 'Add\x20scene',
-        mutate: (_0x396279) => {
-          const _0x56daeb = createStoryboard3DScene({
-            name: '场景 ' + (_0x396279['scenes']['length'] + 0x1),
+        mutate: (value470) => {
+          const storyboard3DScene = createStoryboard3DScene({
+            name: '场景 ' + (value470['scenes']['length'] + 0x1),
             shotName: '镜头 1',
           });
           return (
-            _0x396279['scenes']['push'](_0x56daeb),
-            (_0x396279['activeSceneId'] = _0x56daeb['id']),
-            _0x396279
+            value470['scenes']['push'](storyboard3DScene),
+            (value470['activeSceneId'] = storyboard3DScene['id']),
+            value470
           );
         },
       }),
@@ -5668,25 +5604,25 @@ export class Storyboard3DEditorWorkspace {
         this['_render']());
       return;
     }
-    if (['duplicate-scene', 'delete-scene', 'move-scene']['includes'](_0x382e67)) {
-      const _0x102eb4 = _0x415d6f['dataset']['sceneId'],
-        _0x2a03d4 = Number(_0x415d6f['dataset']['direction']) || 0x0,
-        _0xe2db23 = this['projectStore']['getSnapshot'](),
-        _0x36807c = _0xe2db23['scenes']['findIndex']((_0x48987b) => _0x48987b['id'] === _0x102eb4);
+    if (['duplicate-scene', 'delete-scene', 'move-scene']['includes'](type6)) {
+      const value471 = el69['dataset']['sceneId'],
+        value472 = Number(el69['dataset']['direction']) || 0x0,
+        value473 = this['projectStore']['getSnapshot'](),
+        value474 = value473['scenes']['findIndex']((value475) => value475['id'] === value471);
       (this['_executeMutation']({
-        type: _0x382e67,
-        label: _0x382e67,
-        mutate: (_0x1689ab) => {
-          if (_0x382e67 === 'duplicate-scene')
-            return duplicateStoryboard3DScene(_0x1689ab, _0x102eb4, {
+        type: type6,
+        label: type6,
+        mutate: (value476) => {
+          if (type6 === 'duplicate-scene')
+            return duplicateStoryboard3DScene(value476, value471, {
               name:
-                (_0x1689ab['scenes']['find']((_0x70ece4) => _0x70ece4['id'] === _0x102eb4)?.['name'] ||
-                  '场景') + ' 副本',
+                (value476['scenes']['find']((value477) => value477['id'] === value471)?.['name'] || '场景') +
+                ' 副本',
               now: Date['now'](),
             });
-          if (_0x382e67 === 'delete-scene')
-            return deleteStoryboard3DScene(_0x1689ab, _0x102eb4, { now: Date['now']() });
-          return reorderStoryboard3DScene(_0x1689ab, _0x102eb4, _0x36807c + _0x2a03d4, {
+          if (type6 === 'delete-scene')
+            return deleteStoryboard3DScene(value476, value471, { now: Date['now']() });
+          return reorderStoryboard3DScene(value476, value471, value474 + value472, {
             now: Date['now'](),
           });
         },
@@ -5695,117 +5631,127 @@ export class Storyboard3DEditorWorkspace {
         this['_render']());
       return;
     }
-    if (_0x382e67 === 'add-shot') {
-      const _0x474337 = this['_readCurrentCameraState']();
-      if (!_0x474337) {
+    if (type6 === 'add-shot') {
+      const camera7 = this['_readCurrentCameraState']();
+      if (!camera7) {
         this['_setMessage']('当前摄像机状态不可用。');
         return;
       }
-      const _0x383218 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
-        _0x32d5d1 = guardStoryboard3DBackgroundCameraChange(_0x383218?.['background'], _0x474337);
-      if (!_0x32d5d1['allowed']) {
-        this['_setMessage'](_0x32d5d1['reason']);
+      const activeStoryboard3DScene14 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
+        guardStoryboard3DBackgroundCameraChange4 = guardStoryboard3DBackgroundCameraChange(
+          activeStoryboard3DScene14?.['background'],
+          camera7,
+        );
+      if (!guardStoryboard3DBackgroundCameraChange4['allowed']) {
+        this['_setMessage'](guardStoryboard3DBackgroundCameraChange4['reason']);
         return;
       }
       this['_executeMutation']({
         type: 'add-shot',
         label: 'Add shot from current view',
-        mutate: (_0x6257f4) => {
-          const _0x57ac76 = _0x6257f4['scenes']['findIndex'](
-            (_0x290f3a) => _0x290f3a['id'] === _0x6257f4['activeSceneId'],
+        mutate: (scene5) => {
+          const count9 = scene5['scenes']['findIndex'](
+            (value478) => value478['id'] === scene5['activeSceneId'],
           );
           return (
-            _0x57ac76 >= 0x0 &&
-              (_0x6257f4['scenes'][_0x57ac76] = appendShotFromCurrentView({
-                scene: _0x6257f4['scenes'][_0x57ac76],
-                camera: _0x474337,
+            count9 >= 0x0 &&
+              (scene5['scenes'][count9] = appendShotFromCurrentView({
+                scene: scene5['scenes'][count9],
+                camera: camera7,
               })),
-            _0x6257f4
+            scene5
           );
         },
       });
-      const _0x34839a = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
-        _0x3726cd = _0x34839a?.['shots']?.['find'](
-          (_0x1acd6e) => _0x1acd6e['id'] === _0x34839a['activeShotId'],
+      const activeStoryboard3DScene15 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
+        value479 = activeStoryboard3DScene15?.['shots']?.['find'](
+          (value480) => value480['id'] === activeStoryboard3DScene15['activeShotId'],
         );
-      _0x3726cd &&
-        (this['_setSelectedObjects']([_0x3726cd['cameraId']]),
+      value479 &&
+        (this['_setSelectedObjects']([value479['cameraId']]),
         this['_render'](),
-        this['_focusCameraObject'](_0x3726cd['cameraId']),
-        void this['_generateShotThumbnail'](_0x34839a['id'], _0x3726cd['id']));
+        this['_focusCameraObject'](value479['cameraId']),
+        void this['_generateShotThumbnail'](activeStoryboard3DScene15['id'], value479['id']));
       return;
     }
-    if (_0x382e67 === 'replace-shot-camera') {
-      const _0x5325e7 = this['_readCurrentCameraState'](),
-        _0x2e712d = this['projectStore']['getSnapshot'](),
-        _0x1ba71b = getActiveStoryboard3DScene(_0x2e712d),
-        _0x4dacf6 = _0x415d6f['dataset']['shotId'];
-      if (!_0x5325e7 || !_0x1ba71b) return;
-      const _0x63973e = guardStoryboard3DBackgroundCameraChange(_0x1ba71b['background'], _0x5325e7);
-      if (!_0x63973e['allowed']) {
-        this['_setMessage'](_0x63973e['reason']);
+    if (type6 === 'replace-shot-camera') {
+      const camera8 = this['_readCurrentCameraState'](),
+        value481 = this['projectStore']['getSnapshot'](),
+        sceneId11 = getActiveStoryboard3DScene(value481),
+        shotId2 = el69['dataset']['shotId'];
+      if (!camera8 || !sceneId11) return;
+      const guardStoryboard3DBackgroundCameraChange5 = guardStoryboard3DBackgroundCameraChange(
+        sceneId11['background'],
+        camera8,
+      );
+      if (!guardStoryboard3DBackgroundCameraChange5['allowed']) {
+        this['_setMessage'](guardStoryboard3DBackgroundCameraChange5['reason']);
         return;
       }
       (this['_executeMutation']({
         type: 'replace-shot-camera',
         label: 'Replace shot camera',
-        mutate: (_0x451242) =>
-          replaceStoryboard3DShotFromCurrentView(_0x451242, {
-            sceneId: _0x1ba71b['id'],
-            shotId: _0x4dacf6,
-            camera: _0x5325e7,
+        mutate: (value482) =>
+          replaceStoryboard3DShotFromCurrentView(value482, {
+            sceneId: sceneId11['id'],
+            shotId: shotId2,
+            camera: camera8,
             now: Date['now'](),
           }),
       }),
-        void this['_generateShotThumbnail'](_0x1ba71b['id'], _0x4dacf6));
+        void this['_generateShotThumbnail'](sceneId11['id'], shotId2));
       return;
     }
-    if (_0x382e67 === 'group-selected') {
-      const _0x161f01 = this['editorStore']['getSnapshot']()['selectedObjectIds'];
-      if (_0x161f01['length'] === 0x0) {
+    if (type6 === 'group-selected') {
+      const list29 = this['editorStore']['getSnapshot']()['selectedObjectIds'];
+      if (list29['length'] === 0x0) {
         this['_setMessage']('请先选择要分组的对象。');
         return;
       }
-      let _0x3196de = '';
+      let value483 = '';
       this['_executeMutation']({
         type: 'group-objects',
         label: 'Group selected objects',
-        mutate: (_0x1d2a42) => {
-          const _0xdc4e77 = _0x1d2a42['scenes']['findIndex'](
-            (_0x2a04dd) => _0x2a04dd['id'] === _0x1d2a42['activeSceneId'],
+        mutate: (value484) => {
+          const count10 = value484['scenes']['findIndex'](
+            (value485) => value485['id'] === value484['activeSceneId'],
           );
-          if (_0xdc4e77 < 0x0) return _0x1d2a42;
-          const _0x5c5f75 = groupStoryboard3DSceneObjects(_0x1d2a42['scenes'][_0xdc4e77], _0x161f01, {
-            name: '新分组',
-            idFactory: createLocalId,
-          });
+          if (count10 < 0x0) return value484;
+          const groupStoryboard3DSceneObjects2 = groupStoryboard3DSceneObjects(
+            value484['scenes'][count10],
+            list29,
+            {
+              name: '新分组',
+              idFactory: createLocalId,
+            },
+          );
           return (
-            (_0x3196de = _0x5c5f75['objects']['at'](-0x1)?.['id'] || ''),
-            (_0x1d2a42['scenes'][_0xdc4e77] = _0x5c5f75),
-            _0x1d2a42
+            (value483 = groupStoryboard3DSceneObjects2['objects']['at'](-0x1)?.['id'] || ''),
+            (value484['scenes'][count10] = groupStoryboard3DSceneObjects2),
+            value484
           );
         },
       });
-      if (_0x3196de) this['_setSelectedObjects']([_0x3196de]);
+      if (value483) this['_setSelectedObjects']([value483]);
       this['_render']();
       return;
     }
-    if (_0x382e67 === 'ungroup-object') {
-      const _0x5995f5 = _0x415d6f['dataset']['objectId'];
+    if (type6 === 'ungroup-object') {
+      const value486 = el69['dataset']['objectId'];
       (this['_executeMutation']({
         type: 'ungroup-objects',
         label: 'Ungroup\x20objects',
-        mutate: (_0x41fb03) => {
-          const _0x1c9cb2 = _0x41fb03['scenes']['findIndex'](
-            (_0x2aceff) => _0x2aceff['id'] === _0x41fb03['activeSceneId'],
+        mutate: (value487) => {
+          const count11 = value487['scenes']['findIndex'](
+            (value488) => value488['id'] === value487['activeSceneId'],
           );
           return (
-            _0x1c9cb2 >= 0x0 &&
-              (_0x41fb03['scenes'][_0x1c9cb2] = ungroupStoryboard3DSceneGroup(
-                _0x41fb03['scenes'][_0x1c9cb2],
-                _0x5995f5,
+            count11 >= 0x0 &&
+              (value487['scenes'][count11] = ungroupStoryboard3DSceneGroup(
+                value487['scenes'][count11],
+                value486,
               )),
-            _0x41fb03
+            value487
           );
         },
       }),
@@ -5813,108 +5759,105 @@ export class Storyboard3DEditorWorkspace {
         this['_render']());
       return;
     }
-    if (_0x382e67 === 'duplicate-object') {
-      const _0xeff2e3 = _0x415d6f['dataset']['objectId'];
-      let _0x3a9df8 = '';
+    if (type6 === 'duplicate-object') {
+      const value489 = el69['dataset']['objectId'];
+      let value490 = '';
       this['_executeMutation']({
         type: 'duplicate-object',
         label: 'Duplicate\x20object',
-        mutate: (_0x289ede) => {
-          const _0x2c5230 = _0x289ede['scenes']['find'](
-              (_0x403498) => _0x403498['id'] === _0x289ede['activeSceneId'],
+        mutate: (value491) => {
+          const value492 = value491['scenes']['find'](
+              (value493) => value493['id'] === value491['activeSceneId'],
             ),
-            _0x2b135e = _0x2c5230?.['objects']?.['find']((_0x39298a) => _0x39298a['id'] === _0xeff2e3);
-          if (!_0x2b135e) return _0x289ede;
-          if (_0x2b135e['type'] === 'camera') {
-            const _0x333658 = _0x2c5230['shots']?.['find'](
-                (_0x3e4d01) => _0x3e4d01['cameraId'] === _0x2b135e['id'],
+            error28 = value492?.['objects']?.['find']((value494) => value494['id'] === value489);
+          if (!error28) return value491;
+          if (error28['type'] === 'camera') {
+            const enabled49 = value492['shots']?.['find'](
+                (value495) => value495['cameraId'] === error28['id'],
               ),
-              _0x24624c = _0x289ede['scenes']['findIndex'](
-                (_0x591667) => _0x591667['id'] === _0x2c5230['id'],
-              );
-            if (!_0x333658 || _0x24624c < 0x0) return _0x289ede;
-            const _0x1fecf0 = duplicateStoryboard3DShot(_0x2c5230, _0x333658['id'], {
+              count12 = value491['scenes']['findIndex']((value496) => value496['id'] === value492['id']);
+            if (!enabled49 || count12 < 0x0) return value491;
+            const duplicateStoryboard3DShot2 = duplicateStoryboard3DShot(value492, enabled49['id'], {
               idFactory: createLocalId,
             });
             return (
-              (_0x289ede['scenes'][_0x24624c] = _0x1fecf0),
-              (_0x3a9df8 =
-                _0x1fecf0['shots']['find']((_0x2d8f5d) => _0x2d8f5d['id'] === _0x1fecf0['activeShotId'])?.[
-                  'cameraId'
-                ] || ''),
-              _0x289ede
+              (value491['scenes'][count12] = duplicateStoryboard3DShot2),
+              (value490 =
+                duplicateStoryboard3DShot2['shots']['find'](
+                  (value497) => value497['id'] === duplicateStoryboard3DShot2['activeShotId'],
+                )?.['cameraId'] || ''),
+              value491
             );
           }
-          const _0x47d897 = structuredClone(_0x2b135e);
+          const error29 = structuredClone(error28);
           return (
-            (_0x47d897['id'] = createLocalId(_0x2b135e['type'] || 'object')),
-            (_0x47d897['name'] = _0x2b135e['name'] + ' 副本'),
-            (_0x47d897['transform']['position'][0x0] += 0.5),
-            (_0x47d897['transform']['position'][0x2] += 0.5),
-            _0x2c5230['objects']['push'](_0x47d897),
-            (_0x3a9df8 = _0x47d897['id']),
-            _0x289ede
+            (error29['id'] = createLocalId(error28['type'] || 'object')),
+            (error29['name'] = error28['name'] + ' 副本'),
+            (error29['transform']['position'][0x0] += 0.5),
+            (error29['transform']['position'][0x2] += 0.5),
+            value492['objects']['push'](error29),
+            (value490 = error29['id']),
+            value491
           );
         },
       });
-      if (_0x3a9df8) {
-        (this['_setSelectedObjects']([_0x3a9df8]), this['_render']());
-        const _0x160484 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']())?.['objects']?.[
-          'find'
-        ]((_0x4cb2ac) => _0x4cb2ac['id'] === _0x3a9df8);
-        if (_0x160484?.['type'] === 'camera') this['_focusCameraObject'](_0x3a9df8);
+      if (value490) {
+        (this['_setSelectedObjects']([value490]), this['_render']());
+        const activeStoryboard3DScene16 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']())?.[
+          'objects'
+        ]?.['find']((value498) => value498['id'] === value490);
+        if (activeStoryboard3DScene16?.['type'] === 'camera') this['_focusCameraObject'](value490);
       }
       return;
     }
-    if (_0x382e67 === 'delete-object') {
-      this['_deleteObjects'](_0x415d6f['dataset']['objectId']);
+    if (type6 === 'delete-object') {
+      this['_deleteObjects'](el69['dataset']['objectId']);
       return;
     }
-    if (_0x382e67 === 'clear-background') {
-      const _0x2fb7e5 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
-        _0x1beb51 = _0x2fb7e5?.['background']?.['binaryAssetId'];
-      (this['_getBackgroundImageController'](_0x2fb7e5?.['id'])?.['clear']?.(),
+    if (type6 === 'clear-background') {
+      const activeStoryboard3DScene17 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
+        value499 = activeStoryboard3DScene17?.['background']?.['binaryAssetId'];
+      (this['_getBackgroundImageController'](activeStoryboard3DScene17?.['id'])?.['clear']?.(),
         this['_executeMutation']({
           type: 'clear-background',
           label: 'Clear background',
-          mutate: (_0x494499) => {
-            const _0x4fe35a = _0x494499['scenes']['find'](
-              (_0x2cb783) => _0x2cb783['id'] === _0x494499['activeSceneId'],
+          mutate: (value500) => {
+            const value501 = value500['scenes']['find'](
+              (value502) => value502['id'] === value500['activeSceneId'],
             );
-            if (_0x4fe35a) delete _0x4fe35a['background'];
-            return _0x494499;
+            if (value501) delete value501['background'];
+            return value500;
           },
         }));
-      if (_0x1beb51) void this['binaryAssetRepository']['remove'](_0x1beb51)['catch'](() => {});
+      if (value499) void this['binaryAssetRepository']['remove'](value499)['catch'](() => {});
       return;
     }
-    if (_0x382e67 === 'upload-background') {
+    if (type6 === 'upload-background') {
       this['root']['querySelector']('[data-storyboard-3d-background-input]')?.['click']?.();
       return;
     }
-    if (_0x382e67 === 'analyze-background') {
+    if (type6 === 'analyze-background') {
       void this['_reanalyzeActiveBackground']();
       return;
     }
-    if (_0x382e67 === 'add-light') {
-      let _0x1c1609 = '';
+    if (type6 === 'add-light') {
+      let id = '';
       this['_executeMutation']({
         type: 'add-light',
         label: 'Add light',
-        mutate: (_0x4b0902) => {
-          const _0x2d995c = _0x4b0902['scenes']['find'](
-            (_0x1ac7e2) => _0x1ac7e2['id'] === _0x4b0902['activeSceneId'],
+        mutate: (value503) => {
+          const enabled50 = value503['scenes']['find'](
+            (value504) => value504['id'] === value503['activeSceneId'],
           );
-          if (!_0x2d995c) return _0x4b0902;
+          if (!enabled50) return value503;
           return (
-            (_0x1c1609 = createLocalId('light')),
-            _0x2d995c['objects']['push']({
-              id: _0x1c1609,
+            (id = createLocalId('light')),
+            enabled50['objects']['push']({
+              id: id,
               type: 'light',
               name:
                 '灯光 ' +
-                (_0x2d995c['objects']['filter']((_0x4bec24) => _0x4bec24['type'] === 'light')['length'] +
-                  0x1),
+                (enabled50['objects']['filter']((value505) => value505['type'] === 'light')['length'] + 0x1),
               lightType: 'directional',
               color: '#ffffff',
               intensity: 0x1,
@@ -5923,50 +5866,50 @@ export class Storyboard3DEditorWorkspace {
               transform: { position: [0x3, 0x5, 0x3], rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] },
               castShadow: !![],
             }),
-            _0x4b0902
+            value503
           );
         },
       });
-      _0x1c1609 && (this['_setSelectedObjects']([_0x1c1609]), this['_render']());
+      id && (this['_setSelectedObjects']([id]), this['_render']());
       return;
     }
-    if (['duplicate-shot', 'delete-shot', 'move-shot']['includes'](_0x382e67)) {
-      const _0x21a362 = _0x415d6f['dataset']['shotId'],
-        _0x202cc3 = Number(_0x415d6f['dataset']['direction']) || 0x0;
+    if (['duplicate-shot', 'delete-shot', 'move-shot']['includes'](type6)) {
+      const value506 = el69['dataset']['shotId'],
+        value507 = Number(el69['dataset']['direction']) || 0x0;
       this['_executeMutation']({
-        type: _0x382e67,
-        label: _0x382e67,
-        mutate: (_0x6872bf) => {
-          const _0x1f617f = _0x6872bf['scenes']['findIndex'](
-            (_0x144bce) => _0x144bce['id'] === _0x6872bf['activeSceneId'],
+        type: type6,
+        label: type6,
+        mutate: (value508) => {
+          const count13 = value508['scenes']['findIndex'](
+            (value509) => value509['id'] === value508['activeSceneId'],
           );
-          if (_0x1f617f < 0x0) return _0x6872bf;
-          const _0x5b4785 = _0x6872bf['scenes'][_0x1f617f];
-          if (_0x382e67 === 'duplicate-shot')
-            _0x6872bf['scenes'][_0x1f617f] = duplicateStoryboard3DShot(_0x5b4785, _0x21a362);
+          if (count13 < 0x0) return value508;
+          const value510 = value508['scenes'][count13];
+          if (type6 === 'duplicate-shot')
+            value508['scenes'][count13] = duplicateStoryboard3DShot(value510, value506);
           else {
-            if (_0x382e67 === 'delete-shot')
-              _0x6872bf['scenes'][_0x1f617f] = deleteStoryboard3DShot(_0x5b4785, _0x21a362);
+            if (type6 === 'delete-shot')
+              value508['scenes'][count13] = deleteStoryboard3DShot(value510, value506);
             else {
-              const _0x206957 = _0x5b4785['shots']['findIndex']((_0x1c6f52) => _0x1c6f52['id'] === _0x21a362);
-              _0x6872bf['scenes'][_0x1f617f] = reorderStoryboard3DShot(
-                _0x5b4785,
-                _0x21a362,
-                Math['max'](0x0, Math['min'](_0x5b4785['shots']['length'] - 0x1, _0x206957 + _0x202cc3)),
+              const value511 = value510['shots']['findIndex']((value512) => value512['id'] === value506);
+              value508['scenes'][count13] = reorderStoryboard3DShot(
+                value510,
+                value506,
+                Math['max'](0x0, Math['min'](value510['shots']['length'] - 0x1, value511 + value507)),
               );
             }
           }
-          return _0x6872bf;
+          return value508;
         },
       });
       return;
     }
-    if (_0x382e67 === 'close') {
+    if (type6 === 'close') {
       this['close']();
       return;
     }
-    if (_0x382e67 === 'select-scene') {
-      (this['projectStore']['selectScene'](_0x415d6f['dataset']['sceneId']),
+    if (type6 === 'select-scene') {
+      (this['projectStore']['selectScene'](el69['dataset']['sceneId']),
         (this['viewportFocalLength'] =
           Number(
             getActiveStoryboard3DShot(this['projectStore']['getSnapshot']())?.['camera']?.['focalLength'],
@@ -5974,430 +5917,433 @@ export class Storyboard3DEditorWorkspace {
         this['_render']());
       return;
     }
-    if (_0x382e67 === 'select-shot') {
-      const _0x5acdf0 = this['projectStore']['getSnapshot'](),
-        _0x1b8a44 = getActiveStoryboard3DScene(_0x5acdf0),
-        _0x47eefc = _0x1b8a44?.['shots']?.['find'](
-          (_0x59bb37) => _0x59bb37['id'] === _0x415d6f['dataset']['shotId'],
+    if (type6 === 'select-shot') {
+      const value513 = this['projectStore']['getSnapshot'](),
+        activeStoryboard3DScene18 = getActiveStoryboard3DScene(value513),
+        value514 = activeStoryboard3DScene18?.['shots']?.['find'](
+          (value515) => value515['id'] === el69['dataset']['shotId'],
         ),
-        _0x488240 = guardStoryboard3DBackgroundCameraChange(_0x1b8a44?.['background'], _0x47eefc?.['camera']);
-      if (!_0x488240['allowed']) {
-        this['_setMessage'](_0x488240['reason']);
+        guardStoryboard3DBackgroundCameraChange6 = guardStoryboard3DBackgroundCameraChange(
+          activeStoryboard3DScene18?.['background'],
+          value514?.['camera'],
+        );
+      if (!guardStoryboard3DBackgroundCameraChange6['allowed']) {
+        this['_setMessage'](guardStoryboard3DBackgroundCameraChange6['reason']);
         return;
       }
-      (this['projectStore']['selectShot'](_0x415d6f['dataset']['shotId']),
-        (this['viewportFocalLength'] = Number(_0x47eefc?.['camera']?.['focalLength']) || 0x23),
+      (this['projectStore']['selectShot'](el69['dataset']['shotId']),
+        (this['viewportFocalLength'] = Number(value514?.['camera']?.['focalLength']) || 0x23),
         this['_render']());
       return;
     }
-    _0x382e67 === 'export-storyboard' && this['exportStoryboard']();
+    type6 === 'export-storyboard' && this['exportStoryboard']();
   }
-  ['_handleInput'](_0x3768e7) {
-    if (_0x3768e7['target']?.['matches']?.('[data-storyboard-3d-focal-slider]')) {
-      this['_previewFocalLength'](_0x3768e7['target']['value']);
+  ['_handleInput'](event49) {
+    if (event49['target']?.['matches']?.('[data-storyboard-3d-focal-slider]')) {
+      this['_previewFocalLength'](event49['target']['value']);
       return;
     }
-    this['shotTimelineController']?.['handleInput']?.(_0x3768e7);
+    this['shotTimelineController']?.['handleInput']?.(event49);
   }
-  async ['_handleChange'](_0x532a39) {
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-focal-slider]')) {
-      this['_commitFocalLength'](_0x532a39['target']['value']);
+  async ['_handleChange'](event50) {
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-focal-slider]')) {
+      this['_commitFocalLength'](event50['target']['value']);
       return;
     }
-    if (this['shotTimelineController']?.['handleChange']?.(_0x532a39)) return;
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-pose-image-input]')) {
-      const _0x3fda8c = _0x532a39['target']['files']?.[0x0],
-        _0x160946 = String(_0x532a39['target']['dataset']['objectId'] || '');
-      ((_0x532a39['target']['value'] = ''), delete _0x532a39['target']['dataset']['objectId']);
-      if (!_0x3fda8c || !_0x160946) return;
+    if (this['shotTimelineController']?.['handleChange']?.(event50)) return;
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-pose-image-input]')) {
+      const file = event50['target']['files']?.[0x0],
+        objectId3 = String(event50['target']['dataset']['objectId'] || '');
+      ((event50['target']['value'] = ''), delete event50['target']['dataset']['objectId']);
+      if (!file || !objectId3) return;
       try {
-        await this['characterImagePoseController']['extract']({ objectId: _0x160946, file: _0x3fda8c });
-      } catch (_0x48a50c) {
-        _0x48a50c?.['name'] !== 'AbortError' &&
-          _0x48a50c?.['code'] !== 'ABORT_ERR' &&
-          this['_setMessage'](_0x48a50c?.['message'] || String(_0x48a50c));
+        await this['characterImagePoseController']['extract']({ objectId: objectId3, file: file });
+      } catch (error30) {
+        error30?.['name'] !== 'AbortError' &&
+          error30?.['code'] !== 'ABORT_ERR' &&
+          this['_setMessage'](error30?.['message'] || String(error30));
       }
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-navigation-preset]')) {
-      this['_saveNavigationSettings'](
-        createStoryboard3DNavigationPresetSettings(_0x532a39['target']['value']),
-      );
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-navigation-preset]')) {
+      this['_saveNavigationSettings'](createStoryboard3DNavigationPresetSettings(event50['target']['value']));
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-navigation-setting]')) {
-      const _0x5b122d = _0x532a39['target']['getAttribute']('data-storyboard-3d-navigation-setting'),
-        _0x4e2350 =
-          _0x532a39['target']['type'] === 'checkbox'
-            ? _0x532a39['target']['checked']
-            : Number(_0x532a39['target']['value']);
-      this['_saveNavigationSettings']({ ...this['navigationSettings'], [_0x5b122d]: _0x4e2350 });
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-navigation-setting]')) {
+      const value516 = event50['target']['getAttribute']('data-storyboard-3d-navigation-setting'),
+        value517 =
+          event50['target']['type'] === 'checkbox'
+            ? event50['target']['checked']
+            : Number(event50['target']['value']);
+      this['_saveNavigationSettings']({ ...this['navigationSettings'], [value516]: value517 });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-bone-select]')) {
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-bone-select]')) {
       (this['characterBoneSelection']['set'](
-        _0x532a39['target']['dataset']['objectId'],
-        String(_0x532a39['target']['value'] || 'Head'),
+        event50['target']['dataset']['objectId'],
+        String(event50['target']['value'] || 'Head'),
       ),
         this['_render']());
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-bone-axis]')) {
-      const _0x34774a = _0x532a39['target']['dataset']['objectId'],
-        _0xacb3c1 = _0x532a39['target']['dataset']['boneName'],
-        _0x51e262 = _0x532a39['target']['getAttribute']('data-storyboard-3d-bone-axis'),
-        _0x2eb045 = Number(_0x532a39['target']['value']) || 0x0;
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-bone-axis]')) {
+      const value518 = event50['target']['dataset']['objectId'],
+        value519 = event50['target']['dataset']['boneName'],
+        value520 = event50['target']['getAttribute']('data-storyboard-3d-bone-axis'),
+        value521 = Number(event50['target']['value']) || 0x0;
       this['_executeMutation']({
         type: 'edit-character-bone',
         label: 'Edit character bone',
-        mutate: (_0x5b685b) => {
-          const _0x2ce2a6 = _0x5b685b['scenes']['find'](
-              (_0x168421) => _0x168421['id'] === _0x5b685b['activeSceneId'],
+        mutate: (value522) => {
+          const value523 = value522['scenes']['find'](
+              (value524) => value524['id'] === value522['activeSceneId'],
             ),
-            _0x78cf90 = _0x2ce2a6?.['objects']?.['find']((_0x1b6826) => _0x1b6826['id'] === _0x34774a);
-          if (_0x78cf90?.['type'] !== 'character' || !['x', 'y', 'z']['includes'](_0x51e262))
-            return _0x5b685b;
-          const _0x1d1c35 = quaternionToStoryboard3DEuler(_0x78cf90['boneOverrides']?.[_0xacb3c1]);
+            value525 = value523?.['objects']?.['find']((value526) => value526['id'] === value518);
+          if (value525?.['type'] !== 'character' || !['x', 'y', 'z']['includes'](value520)) return value522;
+          const storyboard3DEuler2 = quaternionToStoryboard3DEuler(value525['boneOverrides']?.[value519]);
           return (
-            (_0x1d1c35[_0x51e262] = (_0x2eb045 * Math['PI']) / 0xb4),
-            (_0x78cf90['boneOverrides'] = setStoryboard3DBoneOverride(
-              _0x78cf90['boneOverrides'],
-              _0xacb3c1,
-              _0x1d1c35,
+            (storyboard3DEuler2[value520] = (value521 * Math['PI']) / 0xb4),
+            (value525['boneOverrides'] = setStoryboard3DBoneOverride(
+              value525['boneOverrides'],
+              value519,
+              storyboard3DEuler2,
             )),
-            _0x5b685b
+            value522
           );
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-character-time]')) {
-      const _0xbe99e6 = _0x532a39['target']['dataset']['objectId'],
-        _0x5c34dc = Number(_0x532a39['target']['value']) || 0x0;
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-character-time]')) {
+      const value527 = event50['target']['dataset']['objectId'],
+        value528 = Number(event50['target']['value']) || 0x0;
       this['_executeMutation']({
         type: 'seek-character-action',
         label: 'Seek character action',
-        mutate: (_0xdc8b07) => {
-          const _0x4bba2f = _0xdc8b07['scenes']['find'](
-              (_0x5928de) => _0x5928de['id'] === _0xdc8b07['activeSceneId'],
+        mutate: (value529) => {
+          const value530 = value529['scenes']['find'](
+              (value531) => value531['id'] === value529['activeSceneId'],
             ),
-            _0x4206a9 = _0x4bba2f?.['objects']?.['find']((_0x473123) => _0x473123['id'] === _0xbe99e6);
-          if (_0x4206a9?.['type'] === 'character')
-            Object['assign'](_0x4206a9, seekStoryboard3DCharacterAction(_0x4206a9, _0x5c34dc));
-          return _0xdc8b07;
+            value532 = value530?.['objects']?.['find']((value533) => value533['id'] === value527);
+          if (value532?.['type'] === 'character')
+            Object['assign'](value532, seekStoryboard3DCharacterAction(value532, value528));
+          return value529;
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-background-input]')) {
-      const _0x399420 = _0x532a39['target']['files']?.[0x0];
-      _0x532a39['target']['value'] = '';
-      if (!_0x399420) return;
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-background-input]')) {
+      const fileName = event50['target']['files']?.[0x0];
+      event50['target']['value'] = '';
+      if (!fileName) return;
       try {
-        const _0x322f27 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
-        if (!_0x322f27) return;
-        const _0x51c93d = await preflightStoryboard3DImageFile(_0x399420, {
+        const sceneId12 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
+        if (!sceneId12) return;
+        const response6 = await preflightStoryboard3DImageFile(fileName, {
           renderer: this['sceneRuntime']?.['bridge']?.['renderer'],
         });
-        if (!_0x51c93d['ok'])
-          throw new Error(_0x51c93d['errors']['map']((_0x3ee969) => _0x3ee969['message'])['join']('\x20'));
-        let _0x55f703 = null,
-          _0x399651 = null;
+        if (!response6['ok'])
+          throw new Error(response6['errors']['map']((error31) => error31['message'])['join']('\x20'));
+        let analyzeStoryboard3DBackgroundImage3 = null,
+          error32 = null;
         try {
-          _0x55f703 = await analyzeStoryboard3DBackgroundImage(_0x399420, {
+          analyzeStoryboard3DBackgroundImage3 = await analyzeStoryboard3DBackgroundImage(fileName, {
             documentObject: this['document'],
             imageBitmapFactory:
               typeof this['window']?.['createImageBitmap'] === 'function'
                 ? this['window']['createImageBitmap']['bind'](this['window'])
                 : undefined,
           });
-        } catch (_0x28d42e) {
-          _0x399651 = _0x28d42e;
+        } catch (value534) {
+          error32 = value534;
         }
-        const _0x34cd49 = _0x322f27['background']?.['binaryAssetId'] || createLocalId('background');
+        const assetId = sceneId12['background']?.['binaryAssetId'] || createLocalId('background');
         await this['binaryAssetRepository']['put']({
-          assetId: _0x34cd49,
+          assetId: assetId,
           kind: 'background',
-          descriptor: { sceneId: _0x322f27['id'], fileName: _0x399420['name'] },
-          primaryFile: _0x399420,
+          descriptor: { sceneId: sceneId12['id'], fileName: fileName['name'] },
+          primaryFile: fileName,
           relatedFiles: [],
         });
-        const _0x4679ba = this['_getBackgroundImageController'](_0x322f27?.['id'])['load'](_0x399420),
-          _0x58660c = {
-            imageUrl: _0x4679ba['imageUrl'],
-            binaryAssetId: _0x34cd49,
-            ...(_0x55f703 || { calibrationMethod: 'unconfigured', calibrationConfidence: 0x0 }),
+        const imageUrl = this['_getBackgroundImageController'](sceneId12?.['id'])['load'](fileName),
+          value535 = {
+            imageUrl: imageUrl['imageUrl'],
+            binaryAssetId: assetId,
+            ...(analyzeStoryboard3DBackgroundImage3 || {
+              calibrationMethod: 'unconfigured',
+              calibrationConfidence: 0x0,
+            }),
           };
-        _0x55f703
-          ? (this['_applyDetectedBackgroundCalibration'](_0x58660c, {
+        analyzeStoryboard3DBackgroundImage3
+          ? (this['_applyDetectedBackgroundCalibration'](value535, {
               type: 'upload-and-calibrate-background',
               label: 'Upload and calibrate background',
             }),
             this['_setMessage'](
-              _0x4679ba['fileName'] +
+              imageUrl['fileName'] +
                 ' 已自动匹配地面透视并锁定，匹配度 ' +
-                Math['round'](_0x55f703['calibrationConfidence'] * 0x64) +
+                Math['round'](analyzeStoryboard3DBackgroundImage3['calibrationConfidence'] * 0x64) +
                 '%。',
             ))
           : (this['_executeMutation']({
               type: 'upload-background',
               label: 'Upload background',
-              mutate: (_0x2c3ee3) => {
-                const _0x1a89c8 = _0x2c3ee3['scenes']['find'](
-                  (_0x1752bb) => _0x1752bb['id'] === _0x2c3ee3['activeSceneId'],
+              mutate: (value536) => {
+                const value537 = value536['scenes']['find'](
+                  (value538) => value538['id'] === value536['activeSceneId'],
                 );
                 return (
-                  _0x1a89c8 &&
-                    (_0x1a89c8['background'] = updateStoryboard3DBackgroundCalibration(
-                      _0x1a89c8['background'],
-                      _0x58660c,
+                  value537 &&
+                    (value537['background'] = updateStoryboard3DBackgroundCalibration(
+                      value537['background'],
+                      value535,
                     )),
-                  _0x2c3ee3
+                  value536
                 );
               },
             }),
             this['_setMessage'](
-              _0x4679ba['fileName'] +
+              imageUrl['fileName'] +
                 ' 已设置为背景，但自动匹配失败：' +
-                (_0x399651?.['message'] || '请手动调整参数') +
+                (error32?.['message'] || '请手动调整参数') +
                 '。',
             ));
-      } catch (_0x4619e3) {
-        this['_setMessage'](_0x4619e3?.['message'] || String(_0x4619e3));
+      } catch (error33) {
+        this['_setMessage'](error33?.['message'] || String(error33));
       }
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-scene-name]')) {
-      const _0x10e6a4 = _0x532a39['target']['dataset']['sceneId'],
-        _0x2f3e88 = String(_0x532a39['target']['value'] || '')['trim']();
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-scene-name]')) {
+      const value539 = event50['target']['dataset']['sceneId'],
+        value540 = String(event50['target']['value'] || '')['trim']();
       this['_executeMutation']({
         type: 'rename-scene',
         label: 'Rename\x20scene',
-        mutate: (_0x4b0a91) =>
-          renameStoryboard3DScene(_0x4b0a91, _0x10e6a4, _0x2f3e88, { now: Date['now']() }),
+        mutate: (value541) => renameStoryboard3DScene(value541, value539, value540, { now: Date['now']() }),
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-viewport-setting]')) {
-      const _0x378bf6 = _0x532a39['target']['getAttribute']('data-storyboard-3d-viewport-setting'),
-        _0x23c905 =
-          _0x532a39['target']['type'] === 'checkbox'
-            ? _0x532a39['target']['checked']
-            : _0x532a39['target']['value'],
-        _0x4eb735 =
-          _0x378bf6 === 'rotationSnapDegrees'
-            ? { rotationSnap: (Math['max'](0x1, Number(_0x23c905) || 0xf) * Math['PI']) / 0xb4 }
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-viewport-setting]')) {
+      const value542 = event50['target']['getAttribute']('data-storyboard-3d-viewport-setting'),
+        value543 =
+          event50['target']['type'] === 'checkbox'
+            ? event50['target']['checked']
+            : event50['target']['value'],
+        args16 =
+          value542 === 'rotationSnapDegrees'
+            ? { rotationSnap: (Math['max'](0x1, Number(value543) || 0xf) * Math['PI']) / 0xb4 }
             : {
-                [_0x378bf6]: ['translationSnap', 'scaleSnap']['includes'](_0x378bf6)
-                  ? Number(_0x23c905)
-                  : _0x23c905,
+                [value542]: ['translationSnap', 'scaleSnap']['includes'](value542)
+                  ? Number(value543)
+                  : value543,
               },
-        _0x402e80 =
-          this['viewportControls']?.['updateSettings']?.(_0x4eb735) ||
-          normalizeStoryboard3DViewportSettings({ ...this['viewportSettings'], ..._0x4eb735 });
-      (this['_saveTransformSettings'](_0x402e80),
+        value544 =
+          this['viewportControls']?.['updateSettings']?.(args16) ||
+          normalizeStoryboard3DViewportSettings({ ...this['viewportSettings'], ...args16 });
+      (this['_saveTransformSettings'](value544),
         this['sceneRuntime']?.['setViewportUIPatch']?.(
           this['viewportControls']?.['getDirectorUIPatch']?.() || {},
         ));
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-outline-query]')) {
-      ((this['outlineQuery'] = String(_0x532a39['target']['value'] || '')['trim']()),
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-outline-query]')) {
+      ((this['outlineQuery'] = String(event50['target']['value'] || '')['trim']()),
         queueMicrotask(() => this['_render']()));
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-outline-type]')) {
-      ((this['outlineType'] = String(_0x532a39['target']['value'] || 'all')),
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-outline-type]')) {
+      ((this['outlineType'] = String(event50['target']['value'] || 'all')),
         queueMicrotask(() => this['_render']()));
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-asset-query]')) {
-      ((this['assetQuery'] = String(_0x532a39['target']['value'] || '')['trim']()),
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-asset-query]')) {
+      ((this['assetQuery'] = String(event50['target']['value'] || '')['trim']()),
         (this['assetVisibleLimit'] = 0x20),
         queueMicrotask(() => this['_render']()));
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-camera-field]')) {
-      const _0x5c77f0 = _0x532a39['target']['dataset']['objectId'],
-        _0x49f558 = _0x532a39['target']['getAttribute']('data-storyboard-3d-camera-field'),
-        _0x4ed652 = _0x532a39['target']['value'];
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-camera-field]')) {
+      const value545 = event50['target']['dataset']['objectId'],
+        value546 = event50['target']['getAttribute']('data-storyboard-3d-camera-field'),
+        value547 = event50['target']['value'];
       this['_executeMutation']({
-        type: 'update-camera-' + _0x49f558,
-        label: 'Update camera ' + _0x49f558,
-        mutate: (_0x2012ed) => {
-          const _0x53d7b9 = _0x2012ed['scenes']['find'](
-              (_0x266ed0) => _0x266ed0['id'] === _0x2012ed['activeSceneId'],
+        type: 'update-camera-' + value546,
+        label: 'Update camera ' + value546,
+        mutate: (value548) => {
+          const value549 = value548['scenes']['find'](
+              (value550) => value550['id'] === value548['activeSceneId'],
             ),
-            _0x307bc2 = _0x53d7b9?.['objects']?.['find']((_0x4abb11) => _0x4abb11['id'] === _0x5c77f0);
-          if (_0x307bc2?.['type'] !== 'camera') return _0x2012ed;
-          if (_0x49f558 === 'aspectRatio') {
-            const _0x50303c = String(_0x4ed652 || '')['trim']();
-            if (/^\d+(?:\.\d+)?:\d+(?:\.\d+)?$/['test'](_0x50303c)) _0x307bc2['aspectRatio'] = _0x50303c;
+            value551 = value549?.['objects']?.['find']((value552) => value552['id'] === value545);
+          if (value551?.['type'] !== 'camera') return value548;
+          if (value546 === 'aspectRatio') {
+            const value553 = String(value547 || '')['trim']();
+            if (/^\d+(?:\.\d+)?:\d+(?:\.\d+)?$/['test'](value553)) value551['aspectRatio'] = value553;
           } else {
-            const _0x3f596a = Number(_0x4ed652);
-            if (!Number['isFinite'](_0x3f596a)) return _0x2012ed;
-            if (_0x49f558 === 'focalLength')
-              _0x307bc2['focalLength'] = Math['max'](0x1, Math['min'](0xc8, _0x3f596a));
-            if (_0x49f558 === 'near') _0x307bc2['near'] = Math['max'](0.001, _0x3f596a);
-            if (_0x49f558 === 'far') _0x307bc2['far'] = Math['max'](_0x307bc2['near'] + 0.001, _0x3f596a);
+            const value554 = Number(value547);
+            if (!Number['isFinite'](value554)) return value548;
+            if (value546 === 'focalLength')
+              value551['focalLength'] = Math['max'](0x1, Math['min'](0xc8, value554));
+            if (value546 === 'near') value551['near'] = Math['max'](0.001, value554);
+            if (value546 === 'far') value551['far'] = Math['max'](value551['near'] + 0.001, value554);
           }
-          return (syncStoryboard3DShotFromCameraObject(_0x53d7b9, _0x5c77f0), _0x2012ed);
+          return (syncStoryboard3DShotFromCameraObject(value549, value545), value548);
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-light-field]')) {
-      const _0xef1e57 = _0x532a39['target']['dataset']['objectId'],
-        _0x5d9c79 = _0x532a39['target']['getAttribute']('data-storyboard-3d-light-field'),
-        _0x98d35e =
-          _0x532a39['target']['type'] === 'checkbox'
-            ? _0x532a39['target']['checked']
-            : ['intensity', 'distance', 'decay', 'angleDegrees']['includes'](_0x5d9c79)
-              ? Number(_0x532a39['target']['value'])
-              : String(_0x532a39['target']['value'] || '');
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-light-field]')) {
+      const value555 = event50['target']['dataset']['objectId'],
+        value556 = event50['target']['getAttribute']('data-storyboard-3d-light-field'),
+        value557 =
+          event50['target']['type'] === 'checkbox'
+            ? event50['target']['checked']
+            : ['intensity', 'distance', 'decay', 'angleDegrees']['includes'](value556)
+              ? Number(event50['target']['value'])
+              : String(event50['target']['value'] || '');
       this['_executeMutation']({
-        type: 'update-light-' + _0x5d9c79,
-        label: 'Update light ' + _0x5d9c79,
-        mutate: (_0x1810c4) => {
-          const _0xf43147 = _0x1810c4['scenes']['find'](
-              (_0x48f5b1) => _0x48f5b1['id'] === _0x1810c4['activeSceneId'],
+        type: 'update-light-' + value556,
+        label: 'Update light ' + value556,
+        mutate: (value558) => {
+          const value559 = value558['scenes']['find'](
+              (value560) => value560['id'] === value558['activeSceneId'],
             ),
-            _0x26a95b = _0xf43147?.['objects']?.['find']((_0x2f3a01) => _0x2f3a01['id'] === _0xef1e57);
-          if (_0x26a95b?.['type'] !== 'light') return _0x1810c4;
-          if (_0x5d9c79 === 'intensity')
-            _0x26a95b['intensity'] = Math['max'](0x0, Number['isFinite'](_0x98d35e) ? _0x98d35e : 0x1);
-          if (_0x5d9c79 === 'distance')
-            _0x26a95b['distance'] = Math['max'](0x0, Number['isFinite'](_0x98d35e) ? _0x98d35e : 0x0);
-          if (_0x5d9c79 === 'decay')
-            _0x26a95b['decay'] = Math['max'](0x0, Number['isFinite'](_0x98d35e) ? _0x98d35e : 0x2);
-          _0x5d9c79 === 'angleDegrees' &&
-            (_0x26a95b['angle'] =
-              (Math['max'](0x1, Math['min'](0xb3, Number['isFinite'](_0x98d35e) ? _0x98d35e : 0x1e)) *
+            value561 = value559?.['objects']?.['find']((value562) => value562['id'] === value555);
+          if (value561?.['type'] !== 'light') return value558;
+          if (value556 === 'intensity')
+            value561['intensity'] = Math['max'](0x0, Number['isFinite'](value557) ? value557 : 0x1);
+          if (value556 === 'distance')
+            value561['distance'] = Math['max'](0x0, Number['isFinite'](value557) ? value557 : 0x0);
+          if (value556 === 'decay')
+            value561['decay'] = Math['max'](0x0, Number['isFinite'](value557) ? value557 : 0x2);
+          value556 === 'angleDegrees' &&
+            (value561['angle'] =
+              (Math['max'](0x1, Math['min'](0xb3, Number['isFinite'](value557) ? value557 : 0x1e)) *
                 Math['PI']) /
               0xb4);
-          if (_0x5d9c79 === 'castShadow') _0x26a95b['castShadow'] = _0x98d35e === !![];
-          if (_0x5d9c79 === 'color' && /^#[0-9a-f]{6}$/i['test'](_0x98d35e)) _0x26a95b['color'] = _0x98d35e;
+          if (value556 === 'castShadow') value561['castShadow'] = value557 === !![];
+          if (value556 === 'color' && /^#[0-9a-f]{6}$/i['test'](value557)) value561['color'] = value557;
           return (
-            _0x5d9c79 === 'lightType' &&
-              ['ambient', 'directional', 'point', 'spot']['includes'](_0x98d35e) &&
-              (_0x26a95b['lightType'] = _0x98d35e),
-            _0x1810c4
+            value556 === 'lightType' &&
+              ['ambient', 'directional', 'point', 'spot']['includes'](value557) &&
+              (value561['lightType'] = value557),
+            value558
           );
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-prop-field]')) {
-      const _0x386246 = _0x532a39['target']['dataset']['objectId'],
-        _0x164b13 = _0x532a39['target']['getAttribute']('data-storyboard-3d-prop-field'),
-        _0x2f90f8 =
-          _0x532a39['target']['type'] === 'checkbox'
-            ? _0x532a39['target']['checked']
-            : String(_0x532a39['target']['value'] || '');
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-prop-field]')) {
+      const value563 = event50['target']['dataset']['objectId'],
+        value564 = event50['target']['getAttribute']('data-storyboard-3d-prop-field'),
+        value565 =
+          event50['target']['type'] === 'checkbox'
+            ? event50['target']['checked']
+            : String(event50['target']['value'] || '');
       this['_executeMutation']({
-        type: 'update-prop-' + _0x164b13,
-        label: 'Update prop ' + _0x164b13,
-        mutate: (_0x4c7dd8) => {
-          const _0x2f6d54 = _0x4c7dd8['scenes']['find'](
-              (_0x4bf671) => _0x4bf671['id'] === _0x4c7dd8['activeSceneId'],
+        type: 'update-prop-' + value564,
+        label: 'Update prop ' + value564,
+        mutate: (value566) => {
+          const value567 = value566['scenes']['find'](
+              (value568) => value568['id'] === value566['activeSceneId'],
             ),
-            _0x88d651 = _0x2f6d54?.['objects']?.['find']((_0x4f26a3) => _0x4f26a3['id'] === _0x386246);
-          if (_0x88d651?.['type'] !== 'prop') return _0x4c7dd8;
-          if (_0x164b13 === 'tint' && /^#[0-9a-f]{6}$/i['test'](_0x2f90f8)) _0x88d651['tint'] = _0x2f90f8;
-          if (['castShadow', 'receiveShadow']['includes'](_0x164b13))
-            _0x88d651[_0x164b13] = _0x2f90f8 === !![];
-          return _0x4c7dd8;
+            value569 = value567?.['objects']?.['find']((value570) => value570['id'] === value563);
+          if (value569?.['type'] !== 'prop') return value566;
+          if (value564 === 'tint' && /^#[0-9a-f]{6}$/i['test'](value565)) value569['tint'] = value565;
+          if (['castShadow', 'receiveShadow']['includes'](value564)) value569[value564] = value565 === !![];
+          return value566;
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-shot-field]')) {
-      const _0x4a221f = _0x532a39['target']['getAttribute']('data-storyboard-3d-shot-field'),
-        _0x370852 = _0x532a39['target']['dataset']['shotId'],
-        _0x385c70 = String(_0x532a39['target']['value'] || '')['trim']();
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-shot-field]')) {
+      const value571 = event50['target']['getAttribute']('data-storyboard-3d-shot-field'),
+        value572 = event50['target']['dataset']['shotId'],
+        value573 = String(event50['target']['value'] || '')['trim']();
       this['_executeMutation']({
-        type: 'update-shot-' + _0x4a221f,
-        label: 'Update shot ' + _0x4a221f,
-        mutate: (_0xd8cbb0) => {
-          const _0x59cd0a = _0xd8cbb0['scenes']['findIndex'](
-            (_0x5353be) => _0x5353be['id'] === _0xd8cbb0['activeSceneId'],
+        type: 'update-shot-' + value571,
+        label: 'Update shot ' + value571,
+        mutate: (value574) => {
+          const count14 = value574['scenes']['findIndex'](
+            (value575) => value575['id'] === value574['activeSceneId'],
           );
-          if (_0x59cd0a < 0x0) return _0xd8cbb0;
-          const _0x4e74b9 = _0xd8cbb0['scenes'][_0x59cd0a];
+          if (count14 < 0x0) return value574;
+          const value576 = value574['scenes'][count14];
           return (
-            (_0xd8cbb0['scenes'][_0x59cd0a] =
-              _0x4a221f === 'name'
-                ? renameStoryboard3DShot(_0x4e74b9, _0x370852, _0x385c70)
-                : describeStoryboard3DShot(_0x4e74b9, _0x370852, _0x385c70)),
-            _0xd8cbb0
+            (value574['scenes'][count14] =
+              value571 === 'name'
+                ? renameStoryboard3DShot(value576, value572, value573)
+                : describeStoryboard3DShot(value576, value572, value573)),
+            value574
           );
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-ai-instruction]')) {
-      this['aiController']['setInstruction'](_0x532a39['target']['value']);
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-ai-instruction]')) {
+      this['aiController']['setInstruction'](event50['target']['value']);
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-scene-field]')) {
-      const _0x132fbd = _0x532a39['target']['getAttribute']('data-storyboard-3d-scene-field'),
-        _0x1278d9 =
-          _0x532a39['target']['type'] === 'checkbox'
-            ? _0x532a39['target']['checked']
-            : String(_0x532a39['target']['value'] || '');
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-scene-field]')) {
+      const value577 = event50['target']['getAttribute']('data-storyboard-3d-scene-field'),
+        value578 =
+          event50['target']['type'] === 'checkbox'
+            ? event50['target']['checked']
+            : String(event50['target']['value'] || '');
       this['_executeMutation']({
-        type: 'update-scene-' + _0x132fbd,
-        label: 'Update scene ' + _0x132fbd,
-        mutate: (_0x5061e3) => {
-          const _0x4afbd6 = _0x5061e3['scenes']['find'](
-            (_0x26f4a3) => _0x26f4a3['id'] === _0x5061e3['activeSceneId'],
+        type: 'update-scene-' + value577,
+        label: 'Update scene ' + value577,
+        mutate: (value579) => {
+          const showGrid = value579['scenes']['find'](
+            (value580) => value580['id'] === value579['activeSceneId'],
           );
-          if (!_0x4afbd6) return _0x5061e3;
-          ['showGrid', 'showOutline', 'enableShadows']['includes'](_0x132fbd) &&
-            (_0x4afbd6['environment'][_0x132fbd] = _0x1278d9 === !![]);
-          if (['empty', 'outdoor', 'indoor', 'studio']['includes'](_0x1278d9))
-            return applyStoryboard3DEnvironmentPreset(_0x5061e3, _0x4afbd6['id'], _0x1278d9, {
+          if (!showGrid) return value579;
+          ['showGrid', 'showOutline', 'enableShadows']['includes'](value577) &&
+            (showGrid['environment'][value577] = value578 === !![]);
+          if (['empty', 'outdoor', 'indoor', 'studio']['includes'](value578))
+            return applyStoryboard3DEnvironmentPreset(value579, showGrid['id'], value578, {
               overrides: {
-                showGrid: _0x4afbd6['environment']['showGrid'],
-                showOutline: _0x4afbd6['environment']['showOutline'],
-                enableShadows: _0x4afbd6['environment']['enableShadows'],
+                showGrid: showGrid['environment']['showGrid'],
+                showOutline: showGrid['environment']['showOutline'],
+                enableShadows: showGrid['environment']['enableShadows'],
               },
               now: Date['now'](),
             });
-          return _0x5061e3;
+          return value579;
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-background-field]')) {
-      const _0x46ad53 = _0x532a39['target']['getAttribute']('data-storyboard-3d-background-field'),
-        _0x383862 =
-          _0x46ad53 === 'imageUrl'
-            ? String(_0x532a39['target']['value'] || '')['trim']()
-            : Number(_0x532a39['target']['value']);
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-background-field]')) {
+      const value581 = event50['target']['getAttribute']('data-storyboard-3d-background-field'),
+        value582 =
+          value581 === 'imageUrl'
+            ? String(event50['target']['value'] || '')['trim']()
+            : Number(event50['target']['value']);
       this['_executeMutation']({
-        type: 'update-background-' + _0x46ad53,
-        label: 'Update background ' + _0x46ad53,
-        mutate: (_0x5b455f) => {
-          const _0x254701 = _0x5b455f['scenes']['find'](
-            (_0x2505a3) => _0x2505a3['id'] === _0x5b455f['activeSceneId'],
+        type: 'update-background-' + value581,
+        label: 'Update background ' + value581,
+        mutate: (value583) => {
+          const enabled51 = value583['scenes']['find'](
+            (value584) => value584['id'] === value583['activeSceneId'],
           );
-          if (!_0x254701) return _0x5b455f;
-          const _0x123487 = _0x254701['shots']?.['find'](
-              (_0xc0f98f) => _0xc0f98f['id'] === _0x254701['activeShotId'],
+          if (!enabled51) return value583;
+          const value585 = enabled51['shots']?.['find'](
+              (value586) => value586['id'] === enabled51['activeShotId'],
             ),
-            _0x472cab = normalizeStoryboard3DBackgroundCalibration(_0x254701['background']),
-            _0xe1e79e =
-              _0x46ad53 === 'vanishingPointX'
-                ? { vanishingPoint: [_0x383862, _0x472cab['vanishingPoint'][0x1]] }
-                : _0x46ad53 === 'vanishingPointY'
-                  ? { vanishingPoint: [_0x472cab['vanishingPoint'][0x0], _0x383862] }
-                  : _0x46ad53 === 'imageOffsetX'
-                    ? { imageOffset: [_0x383862, _0x472cab['imageOffset'][0x1]] }
-                    : _0x46ad53 === 'imageOffsetY'
-                      ? { imageOffset: [_0x472cab['imageOffset'][0x0], _0x383862] }
-                      : { [_0x46ad53]: _0x383862 },
-            _0x189557 = new Set([
+            storyboard3DBackgroundCalibration4 = normalizeStoryboard3DBackgroundCalibration(
+              enabled51['background'],
+            ),
+            args17 =
+              value581 === 'vanishingPointX'
+                ? { vanishingPoint: [value582, storyboard3DBackgroundCalibration4['vanishingPoint'][0x1]] }
+                : value581 === 'vanishingPointY'
+                  ? { vanishingPoint: [storyboard3DBackgroundCalibration4['vanishingPoint'][0x0], value582] }
+                  : value581 === 'imageOffsetX'
+                    ? { imageOffset: [value582, storyboard3DBackgroundCalibration4['imageOffset'][0x1]] }
+                    : value581 === 'imageOffsetY'
+                      ? { imageOffset: [storyboard3DBackgroundCalibration4['imageOffset'][0x0], value582] }
+                      : { [value581]: value582 },
+            map5 = new Set([
               'horizontalFov',
               'verticalFov',
               'horizonY',
@@ -6405,339 +6351,343 @@ export class Storyboard3DEditorWorkspace {
               'vanishingPointX',
               'cameraHeight',
             ]),
-            _0x7a3f75 = updateStoryboard3DBackgroundCalibration(_0x254701['background'], {
-              ..._0xe1e79e,
-              ...(_0x189557['has'](_0x46ad53)
-                ? { calibrationMethod: 'manual', calibrationConfidence: 0x1 }
-                : {}),
-            });
-          if (_0x7a3f75['imageUrl'] && _0x7a3f75['lockedCamera'] && _0x123487) {
-            const _0x1d82c0 = deriveStoryboard3DBackgroundCamera(_0x7a3f75, _0x123487['camera']);
-            (setStoryboard3DShotInitialCamera(_0x254701, _0x123487, _0x1d82c0),
-              (_0x254701['background'] = setStoryboard3DBackgroundCameraLock(
-                _0x7a3f75,
+            updateStoryboard3DBackgroundCalibration4 = updateStoryboard3DBackgroundCalibration(
+              enabled51['background'],
+              {
+                ...args17,
+                ...(map5['has'](value581) ? { calibrationMethod: 'manual', calibrationConfidence: 0x1 } : {}),
+              },
+            );
+          if (
+            updateStoryboard3DBackgroundCalibration4['imageUrl'] &&
+            updateStoryboard3DBackgroundCalibration4['lockedCamera'] &&
+            value585
+          ) {
+            const storyboard3DBackgroundCamera3 = deriveStoryboard3DBackgroundCamera(
+              updateStoryboard3DBackgroundCalibration4,
+              value585['camera'],
+            );
+            (setStoryboard3DShotInitialCamera(enabled51, value585, storyboard3DBackgroundCamera3),
+              (enabled51['background'] = setStoryboard3DBackgroundCameraLock(
+                updateStoryboard3DBackgroundCalibration4,
                 !![],
-                _0x123487['camera'],
+                value585['camera'],
               )));
           } else {
-            if (_0x7a3f75['imageUrl']) _0x254701['background'] = _0x7a3f75;
-            else delete _0x254701['background'];
+            if (updateStoryboard3DBackgroundCalibration4['imageUrl'])
+              enabled51['background'] = updateStoryboard3DBackgroundCalibration4;
+            else delete enabled51['background'];
           }
-          return _0x5b455f;
+          return value583;
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-background-lock]')) {
-      const _0x19e77e = _0x532a39['target']['checked'] === !![];
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-background-lock]')) {
+      const label6 = event50['target']['checked'] === !![];
       this['_executeMutation']({
         type: 'set-background-camera-lock',
-        label: _0x19e77e ? 'Lock background camera' : 'Unlock background camera',
-        mutate: (_0x25f71c) => {
-          const _0x45cc3c = _0x25f71c['scenes']['find'](
-              (_0x23bfbd) => _0x23bfbd['id'] === _0x25f71c['activeSceneId'],
+        label: label6 ? 'Lock background camera' : 'Unlock background camera',
+        mutate: (value587) => {
+          const value588 = value587['scenes']['find'](
+              (value589) => value589['id'] === value587['activeSceneId'],
             ),
-            _0x7d037c = _0x45cc3c?.['shots']?.['find'](
-              (_0x1576b3) => _0x1576b3['id'] === _0x45cc3c['activeShotId'],
+            value590 = value588?.['shots']?.['find'](
+              (value591) => value591['id'] === value588['activeShotId'],
             );
-          if (_0x45cc3c?.['background'] && _0x7d037c?.['camera']) {
-            const _0x469154 = _0x19e77e
-              ? deriveStoryboard3DBackgroundCamera(_0x45cc3c['background'], _0x7d037c['camera'])
-              : _0x7d037c['camera'];
-            if (_0x19e77e) setStoryboard3DShotInitialCamera(_0x45cc3c, _0x7d037c, _0x469154);
-            _0x45cc3c['background'] = setStoryboard3DBackgroundCameraLock(
-              _0x45cc3c['background'],
-              _0x19e77e,
-              _0x469154,
+          if (value588?.['background'] && value590?.['camera']) {
+            const value592 = label6
+              ? deriveStoryboard3DBackgroundCamera(value588['background'], value590['camera'])
+              : value590['camera'];
+            if (label6) setStoryboard3DShotInitialCamera(value588, value590, value592);
+            value588['background'] = setStoryboard3DBackgroundCameraLock(
+              value588['background'],
+              label6,
+              value592,
             );
           }
-          return _0x25f71c;
+          return value587;
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-character-field]')) {
-      const _0x2f0591 = _0x532a39['target']['dataset']['objectId'],
-        _0x47c1af = _0x532a39['target']['getAttribute']('data-storyboard-3d-character-field'),
-        _0x4d2937 = String(_0x532a39['target']['value'] || '');
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-character-field]')) {
+      const value593 = event50['target']['dataset']['objectId'],
+        value594 = event50['target']['getAttribute']('data-storyboard-3d-character-field'),
+        value595 = String(event50['target']['value'] || '');
       this['_executeMutation']({
         type: 'update-character',
         label: 'Update character',
-        mutate: (_0x5a32c8) => {
-          const _0x138282 = _0x5a32c8['scenes']['find'](
-              (_0x29837d) => _0x29837d['id'] === _0x5a32c8['activeSceneId'],
+        mutate: (value596) => {
+          const value597 = value596['scenes']['find'](
+              (value598) => value598['id'] === value596['activeSceneId'],
             ),
-            _0x27afdf = _0x138282?.['objects']?.['find']((_0x74986a) => _0x74986a['id'] === _0x2f0591);
+            value599 = value597?.['objects']?.['find']((value600) => value600['id'] === value593);
           return (
-            _0x27afdf?.['type'] === 'character' &&
+            value599?.['type'] === 'character' &&
               ['bodyPresetId', 'actionId', 'leftHandPoseId', 'rightHandPoseId', 'hairId', 'characterStyle'][
                 'includes'
-              ](_0x47c1af) &&
-              ((_0x27afdf[_0x47c1af] = _0x4d2937),
-              _0x47c1af === 'actionId' &&
-                ((_0x27afdf['actionTime'] = 0x0), (_0x27afdf['actionPlaying'] = ![]))),
-            _0x5a32c8
+              ](value594) &&
+              ((value599[value594] = value595),
+              value594 === 'actionId' && ((value599['actionTime'] = 0x0), (value599['actionPlaying'] = ![]))),
+            value596
           );
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-character-attachments]')) {
-      const _0x2c4be1 = _0x532a39['target']['dataset']['objectId'],
-        _0x9fcdcd = [
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-character-attachments]')) {
+      const value601 = event50['target']['dataset']['objectId'],
+        value602 = [
           ...new Set(
-            String(_0x532a39['target']['value'] || '')
+            String(event50['target']['value'] || '')
               ['split'](',')
-              ['map']((_0x39be0e) => _0x39be0e['trim']())
+              ['map']((value603) => value603['trim']())
               ['filter'](Boolean),
           ),
         ]['slice'](0x0, 0x20);
       this['_executeMutation']({
         type: 'update-character-attachments',
         label: 'Update\x20character\x20attachments',
-        mutate: (_0x1c0107) => {
-          const _0x4b2a70 = _0x1c0107['scenes']['find'](
-              (_0x3bebfe) => _0x3bebfe['id'] === _0x1c0107['activeSceneId'],
+        mutate: (value604) => {
+          const value605 = value604['scenes']['find'](
+              (value606) => value606['id'] === value604['activeSceneId'],
             ),
-            _0x2e6653 = _0x4b2a70?.['objects']?.['find']((_0x4e3eea) => _0x4e3eea['id'] === _0x2c4be1);
-          if (_0x2e6653?.['type'] === 'character') _0x2e6653['attachmentIds'] = _0x9fcdcd;
-          return _0x1c0107;
+            value607 = value605?.['objects']?.['find']((value608) => value608['id'] === value601);
+          if (value607?.['type'] === 'character') value607['attachmentIds'] = value602;
+          return value604;
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-transform-input]')) {
-      const _0xe9204d = _0x532a39['target']['dataset']['objectId'],
-        _0x497617 = _0x532a39['target']['dataset']['transformField'],
-        _0xad482f = Math['max'](
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-transform-input]')) {
+      const value609 = event50['target']['dataset']['objectId'],
+        activeTool2 = event50['target']['dataset']['transformField'],
+        value610 = Math['max'](
           0x0,
-          Math['min'](0x2, Number(_0x532a39['target']['dataset']['transformAxis']) || 0x0),
+          Math['min'](0x2, Number(event50['target']['dataset']['transformAxis']) || 0x0),
         ),
-        _0x20a2be = this['projectStore']['getSnapshot'](),
-        _0x385354 = getActiveStoryboard3DScene(_0x20a2be),
-        _0x51b749 = _0x385354?.['objects']?.['find']((_0x436e0f) => _0x436e0f['id'] === _0xe9204d);
+        value611 = this['projectStore']['getSnapshot'](),
+        sceneId13 = getActiveStoryboard3DScene(value611),
+        enabled52 = sceneId13?.['objects']?.['find']((value612) => value612['id'] === value609);
       if (
-        !_0x51b749 ||
-        !['position', 'rotation', 'scale']['includes'](_0x497617) ||
-        !canStoryboard3DObjectEditTransformField(_0x51b749, _0x497617)
+        !enabled52 ||
+        !['position', 'rotation', 'scale']['includes'](activeTool2) ||
+        !canStoryboard3DObjectEditTransformField(enabled52, activeTool2)
       )
         return;
-      const _0x310d25 = structuredClone(_0x51b749['transform']),
-        _0x52051d = Number(_0x532a39['target']['value']);
-      ((_0x310d25[_0x497617][_0xad482f] =
-        _0x497617 === 'scale'
-          ? Math['max'](0.001, Number['isFinite'](_0x52051d) ? _0x52051d : _0x310d25[_0x497617][_0xad482f])
-          : _0x497617 === 'rotation' && Number['isFinite'](_0x52051d)
-            ? (_0x52051d * Math['PI']) / 0xb4
-            : Number['isFinite'](_0x52051d)
-              ? _0x52051d
-              : _0x310d25[_0x497617][_0xad482f]),
+      const structuredClone2 = structuredClone(enabled52['transform']),
+        value613 = Number(event50['target']['value']);
+      ((structuredClone2[activeTool2][value610] =
+        activeTool2 === 'scale'
+          ? Math['max'](
+              0.001,
+              Number['isFinite'](value613) ? value613 : structuredClone2[activeTool2][value610],
+            )
+          : activeTool2 === 'rotation' && Number['isFinite'](value613)
+            ? (value613 * Math['PI']) / 0xb4
+            : Number['isFinite'](value613)
+              ? value613
+              : structuredClone2[activeTool2][value610]),
         this['_commitObjectTransforms']({
-          sceneId: _0x385354['id'],
-          transforms: { [_0xe9204d]: _0x310d25 },
-          activeTool: _0x497617 === 'position' ? 'move' : _0x497617 === 'rotation' ? 'rotate' : 'scale',
-          label: 'Update ' + _0x497617,
+          sceneId: sceneId13['id'],
+          transforms: { [value609]: structuredClone2 },
+          activeTool: activeTool2 === 'position' ? 'move' : activeTool2 === 'rotation' ? 'rotate' : 'scale',
+          label: 'Update ' + activeTool2,
         }));
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-object-name]')) {
-      const _0x176e7a = _0x532a39['target']['dataset']['objectId'],
-        _0x267e26 = String(_0x532a39['target']['value'] || '')['trim']();
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-object-name]')) {
+      const value614 = event50['target']['dataset']['objectId'],
+        value615 = String(event50['target']['value'] || '')['trim']();
       this['_executeMutation']({
         type: 'rename-object',
         label: 'Rename\x20object',
-        mutate: (_0x16e498) => {
-          const _0x10370c = _0x16e498['scenes']['find'](
-              (_0x54834c) => _0x54834c['id'] === _0x16e498['activeSceneId'],
+        mutate: (value616) => {
+          const value617 = value616['scenes']['find'](
+              (value618) => value618['id'] === value616['activeSceneId'],
             ),
-            _0x26c33f = _0x10370c?.['objects']?.['find']((_0xe6405f) => _0xe6405f['id'] === _0x176e7a);
-          if (_0x26c33f && _0x267e26 && _0x26c33f['type'] === 'camera') {
-            const _0x1b63ba = _0x10370c['shots']?.['find'](
-              (_0x245237) => _0x245237['cameraId'] === _0x176e7a,
-            );
-            _0x1b63ba &&
-              ((_0x1b63ba['name'] = _0x267e26['replace'](/\s*摄像机$/, '')['trim']() || _0x267e26),
-              (_0x1b63ba['updatedAt'] = Date['now']()),
-              syncStoryboard3DCameraObjectFromShot(_0x10370c, _0x1b63ba));
+            error34 = value617?.['objects']?.['find']((value619) => value619['id'] === value614);
+          if (error34 && value615 && error34['type'] === 'camera') {
+            const error35 = value617['shots']?.['find']((value620) => value620['cameraId'] === value614);
+            error35 &&
+              ((error35['name'] = value615['replace'](/\s*摄像机$/, '')['trim']() || value615),
+              (error35['updatedAt'] = Date['now']()),
+              syncStoryboard3DCameraObjectFromShot(value617, error35));
           } else {
-            if (_0x26c33f && _0x267e26) _0x26c33f['name'] = _0x267e26;
+            if (error34 && value615) error34['name'] = value615;
           }
-          return _0x16e498;
+          return value616;
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-object-parent]')) {
-      const _0x2b3441 = _0x532a39['target']['dataset']['objectId'],
-        _0x2cfae3 = String(_0x532a39['target']['value'] || '')['trim']() || null;
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-object-parent]')) {
+      const value621 = event50['target']['dataset']['objectId'],
+        value622 = String(event50['target']['value'] || '')['trim']() || null;
       try {
         this['_executeMutation']({
           type: 'set-object-parent',
           label: 'Set object parent',
-          mutate: (_0x4261c1) => {
-            const _0x322fcd = _0x4261c1['scenes']['findIndex'](
-              (_0xb22bb6) => _0xb22bb6['id'] === _0x4261c1['activeSceneId'],
+          mutate: (value623) => {
+            const count15 = value623['scenes']['findIndex'](
+              (value624) => value624['id'] === value623['activeSceneId'],
             );
             return (
-              _0x322fcd >= 0x0 &&
-                (_0x4261c1['scenes'][_0x322fcd] = setStoryboard3DObjectParent(
-                  _0x4261c1['scenes'][_0x322fcd],
-                  _0x2b3441,
-                  _0x2cfae3,
+              count15 >= 0x0 &&
+                (value623['scenes'][count15] = setStoryboard3DObjectParent(
+                  value623['scenes'][count15],
+                  value621,
+                  value622,
                 )),
-              _0x4261c1
+              value623
             );
           },
         });
-      } catch (_0x4cd843) {
-        (this['_setMessage'](_0x4cd843?.['message'] || String(_0x4cd843)), this['_render']());
+      } catch (error36) {
+        (this['_setMessage'](error36?.['message'] || String(error36)), this['_render']());
       }
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-object-flag]')) {
-      const _0x33d0c0 = _0x532a39['target']['dataset']['objectId'],
-        _0x3a0551 = _0x532a39['target']['getAttribute']('data-storyboard-3d-object-flag'),
-        _0x2834bb = _0x532a39['target']['checked'];
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-object-flag]')) {
+      const value625 = event50['target']['dataset']['objectId'],
+        value626 = event50['target']['getAttribute']('data-storyboard-3d-object-flag'),
+        value627 = event50['target']['checked'];
       this['_executeMutation']({
-        type: 'set-object-' + _0x3a0551,
-        label: 'Set object ' + _0x3a0551,
-        mutate: (_0x381dcc) => {
-          const _0xc70b9d = _0x381dcc['scenes']['find'](
-              (_0x4afcc3) => _0x4afcc3['id'] === _0x381dcc['activeSceneId'],
+        type: 'set-object-' + value626,
+        label: 'Set object ' + value626,
+        mutate: (value628) => {
+          const value629 = value628['scenes']['find'](
+              (value630) => value630['id'] === value628['activeSceneId'],
             ),
-            _0x4d80d9 = _0xc70b9d?.['objects']?.['find']((_0x1f16d3) => _0x1f16d3['id'] === _0x33d0c0);
-          if (_0x4d80d9 && ['visible', 'locked']['includes'](_0x3a0551)) _0x4d80d9[_0x3a0551] = _0x2834bb;
-          return _0x381dcc;
+            value631 = value629?.['objects']?.['find']((value632) => value632['id'] === value625);
+          if (value631 && ['visible', 'locked']['includes'](value626)) value631[value626] = value627;
+          return value628;
         },
       });
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-project-name]')) {
-      const _0x3e0617 = this['projectStore']['renameProject'](_0x532a39['target']['value']);
-      ((_0x532a39['target']['value'] = _0x3e0617['name']), this['_render']());
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-project-name]')) {
+      const error37 = this['projectStore']['renameProject'](event50['target']['value']);
+      ((event50['target']['value'] = error37['name']), this['_render']());
       return;
     }
-    if (_0x532a39['target']?.['matches']?.('[data-storyboard-3d-model-input]')) {
-      const _0x5863d3 = [...(_0x532a39['target']['files'] || [])];
-      _0x532a39['target']['value'] = '';
-      const _0x1c4fed = _0x5863d3['find']((_0x32fd03) =>
-        /\.(glb|gltf|fbx|obj|stl)$/i['test'](_0x32fd03['name'] || ''),
+    if (event50['target']?.['matches']?.('[data-storyboard-3d-model-input]')) {
+      const relatedFiles2 = [...(event50['target']['files'] || [])];
+      event50['target']['value'] = '';
+      const file2 = relatedFiles2['find']((error38) =>
+        /\.(glb|gltf|fbx|obj|stl)$/i['test'](error38['name'] || ''),
       );
-      if (!_0x1c4fed) return;
+      if (!file2) return;
       try {
         (this['modelImportJob']?.['cancel']?.('开始新的模型导入'),
           (this['modelImportJob'] = createStoryboard3DModelImportJob({
-            file: _0x1c4fed,
-            relatedFiles: _0x5863d3['filter']((_0x326ba1) => _0x326ba1 !== _0x1c4fed),
+            file: file2,
+            relatedFiles: relatedFiles2['filter']((value633) => value633 !== file2),
             importOptions: { parsers: this['modelParsers'] },
-            onStateChange: (_0x257738) => {
-              ((this['modelImportState'] = _0x257738), this['_syncModelImportStatus']());
+            onStateChange: (value634) => {
+              ((this['modelImportState'] = value634), this['_syncModelImportStatus']());
             },
           })),
           (this['modelImportState'] = this['modelImportJob']['getSnapshot']()),
           this['_render']());
-        const _0x3c03a1 = await this['modelImportJob']['start']();
-        if (!_0x3c03a1) {
+        const format = await this['modelImportJob']['start']();
+        if (!format) {
           this['_render']();
           return;
         }
-        const _0x21dca2 = await applyStoryboard3DTexturePolicy(_0x3c03a1['parsed']['scene'], {
+        const storyboard3DTexturePolicy = await applyStoryboard3DTexturePolicy(format['parsed']['scene'], {
             renderer: this['sceneRuntime']?.['bridge']?.['renderer'],
           }),
-          _0xfc231c = await createCanonicalStoryboard3DAssetId(_0x1c4fed),
-          _0x30a934 = await createStoryboard3DAssetRecord({
-            file: _0x1c4fed,
-            format: _0x3c03a1['format'],
-            parsed: _0x3c03a1['parsed'],
-            normalization: _0x3c03a1['normalization'],
-            canonicalAssetId: _0xfc231c,
+          canonicalAssetId = await createCanonicalStoryboard3DAssetId(file2),
+          assetRecord = await createStoryboard3DAssetRecord({
+            file: file2,
+            format: format['format'],
+            parsed: format['parsed'],
+            normalization: format['normalization'],
+            canonicalAssetId: canonicalAssetId,
             indexedDbReference: {
               databaseName: STORYBOARD_3D_BINARY_ASSET_DB_NAME,
               storeName: STORYBOARD_3D_BINARY_ASSET_STORE_NAME,
-              key: _0xfc231c,
+              key: canonicalAssetId,
             },
           }),
-          _0x119c7d = _0x30a934['canonicalAssetId'],
-          _0x23bf53 = this['assetLibrary']['registerImported']({
-            id: _0x119c7d,
-            name: _0x1c4fed['name']['replace'](/\.[^.]+$/, ''),
-            tags: [_0x3c03a1['format'], '3d', 'model'],
+          id2 = assetRecord['canonicalAssetId'],
+          assetDescriptor2 = this['assetLibrary']['registerImported']({
+            id: id2,
+            name: file2['name']['replace'](/\.[^.]+$/, ''),
+            tags: [format['format'], '3d', 'model'],
             source: {
               kind: 'file',
-              format: _0x3c03a1['format'],
-              fileName: _0x1c4fed['name'],
-              byteLength: _0x1c4fed['size'],
-              fingerprint:
-                _0x1c4fed['name'] + ':' + _0x1c4fed['size'] + ':' + (_0x1c4fed['lastModified'] || 0x0),
+              format: format['format'],
+              fileName: file2['name'],
+              byteLength: file2['size'],
+              fingerprint: file2['name'] + ':' + file2['size'] + ':' + (file2['lastModified'] || 0x0),
             },
-            normalization: _0x3c03a1['normalization'],
-            assetRecord: _0x30a934,
+            normalization: format['normalization'],
+            assetRecord: assetRecord,
             createdAt: Date['now'](),
           });
         (await this['binaryAssetRepository']['put']({
-          assetId: _0x119c7d,
+          assetId: id2,
           kind: 'model',
-          descriptor: { assetDescriptor: _0x23bf53 },
-          primaryFile: _0x1c4fed,
-          relatedFiles: _0x5863d3['filter']((_0x260eea) => _0x260eea !== _0x1c4fed),
+          descriptor: { assetDescriptor: assetDescriptor2 },
+          primaryFile: file2,
+          relatedFiles: relatedFiles2['filter']((value635) => value635 !== file2),
         }),
-          this['_setImportedModelScene'](
-            _0x119c7d,
-            _0x3c03a1['parsed']['scene'],
-            _0x3c03a1['normalization'],
-          ));
-        let _0x5e36a8 = '';
+          this['_setImportedModelScene'](id2, format['parsed']['scene'], format['normalization']));
+        let id3 = '';
         (this['_executeMutation']({
           type: 'import-model',
-          label: 'Import\x20' + _0x3c03a1['format']['toUpperCase']() + ' model',
-          mutate: (_0x1b1804) => {
-            const _0x298f60 = _0x1b1804['scenes']['find'](
-              (_0x1c23f3) => _0x1c23f3['id'] === _0x1b1804['activeSceneId'],
+          label: 'Import\x20' + format['format']['toUpperCase']() + ' model',
+          mutate: (value636) => {
+            const enabled53 = value636['scenes']['find'](
+              (value637) => value637['id'] === value636['activeSceneId'],
             );
-            if (!_0x298f60) return _0x1b1804;
+            if (!enabled53) return value636;
             return (
-              (_0x5e36a8 = createLocalId('prop')),
-              _0x298f60['objects']['push']({
-                id: _0x5e36a8,
+              (id3 = createLocalId('prop')),
+              enabled53['objects']['push']({
+                id: id3,
                 type: 'prop',
-                name: _0x23bf53['name'],
-                assetId: _0x119c7d,
+                name: assetDescriptor2['name'],
+                assetId: id2,
                 visible: !![],
                 locked: ![],
                 transform: { position: [0x0, 0x0, 0x0], rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] },
                 castShadow: !![],
                 receiveShadow: !![],
               }),
-              _0x1b1804
+              value636
             );
           },
         }),
-          this['assetLibrary']['markUsed'](_0x119c7d));
-        if (_0x5e36a8) this['_setSelectedObjects']([_0x5e36a8], { openProperties: ![] });
-        const _0x473bf3 =
-          _0x21dca2['optimized']['length'] > 0x0
-            ? '，已优化 ' + _0x21dca2['optimized']['length'] + ' 张超限纹理'
+          this['assetLibrary']['markUsed'](id2));
+        if (id3) this['_setSelectedObjects']([id3], { openProperties: ![] });
+        const value638 =
+          storyboard3DTexturePolicy['optimized']['length'] > 0x0
+            ? '，已优化 ' + storyboard3DTexturePolicy['optimized']['length'] + ' 张超限纹理'
             : '';
-        (this['_setMessage'](_0x1c4fed['name'] + ' 已解析并加入当前场景' + _0x473bf3 + '。'),
+        (this['_setMessage'](file2['name'] + ' 已解析并加入当前场景' + value638 + '。'),
           (this['modelImportState'] = this['modelImportJob']['getSnapshot']()),
           this['_render']());
-      } catch (_0x22d1eb) {
+      } catch (error39) {
         ((this['modelImportState'] = this['modelImportJob']?.['getSnapshot']?.() || this['modelImportState']),
-          this['_setMessage'](_0x22d1eb?.['message'] || String(_0x22d1eb)),
+          this['_setMessage'](error39?.['message'] || String(error39)),
           this['_render']());
       }
       return;
     }
   }
-  async ['load'](_0x4da653) {
-    const _0x449c18 = this['projectStore']['load'](_0x4da653);
-    return (this['_render'](), _0x449c18);
+  async ['load'](value639) {
+    const value640 = this['projectStore']['load'](value639);
+    return (this['_render'](), value640);
   }
   async ['save']() {
     return this['projectStore']['save']();
   }
-  ['focusObject'](_0x2934d1) {
-    this['_setSelectedObjects'](_0x2934d1 ? [_0x2934d1] : []);
+  ['focusObject'](value641) {
+    this['_setSelectedObjects'](value641 ? [value641] : []);
   }
   ['undo']() {
     return this['commandHistory']['undo']();
@@ -6746,9 +6696,9 @@ export class Storyboard3DEditorWorkspace {
     return this['commandHistory']['redo']();
   }
   async ['renderShot']() {
-    const _0x1ab607 = getActiveStoryboard3DShot(this['projectStore']['getSnapshot']());
-    if (!_0x1ab607) throw new Error('当前场景没有可渲染镜头。');
-    return this['_renderShotFrame'](_0x1ab607, { width: 0x780, height: 0x438 });
+    const activeStoryboard3DShot9 = getActiveStoryboard3DShot(this['projectStore']['getSnapshot']());
+    if (!activeStoryboard3DShot9) throw new Error('当前场景没有可渲染镜头。');
+    return this['_renderShotFrame'](activeStoryboard3DShot9, { width: 0x780, height: 0x438 });
   }
   async ['exportStoryboard']() {
     return this['exportController']['open']();
@@ -6756,9 +6706,9 @@ export class Storyboard3DEditorWorkspace {
   ['close']({ persist: persist = !![] } = {}) {
     if (this['_closed']) return;
     this['_closed'] = !![];
-    const _0x46f22e = persist ? this['projectStore']['save']() : this['projectStore']['getSnapshot'](),
-      _0x199198 = getActiveStoryboard3DScene(_0x46f22e),
-      _0x454068 = getActiveStoryboard3DShot(_0x46f22e);
+    const projectId3 = persist ? this['projectStore']['save']() : this['projectStore']['getSnapshot'](),
+      activeSceneId = getActiveStoryboard3DScene(projectId3),
+      activeShotId = getActiveStoryboard3DShot(projectId3);
     (this['_finishFlyMovement']({ clearKeys: !![] }),
       this['exportController']['destroy'](),
       this['_aiModelSelectorController']?.['destroy']?.(),
@@ -6781,14 +6731,14 @@ export class Storyboard3DEditorWorkspace {
       (this['_assetThumbnailObserver'] = null),
       this['assetThumbnailRenderer']?.['dispose']?.(),
       (this['assetThumbnailRenderer'] = null),
-      this['importedModelScenes']['forEach']((_0x5d9ef4) => {
-        disposeCancelledStoryboard3DModelImportResult({ parsed: { scene: _0x5d9ef4 } });
+      this['importedModelScenes']['forEach']((scene6) => {
+        disposeCancelledStoryboard3DModelImportResult({ parsed: { scene: scene6 } });
       }),
       this['importedModelScenes']['clear'](),
       this['_packAssetLoads']['clear'](),
       this['_assetThumbnailLoads']['clear'](),
       this['_assetThumbnailFailures']['clear'](),
-      this['backgroundImageControllers']['forEach']((_0xdcebe3) => _0xdcebe3['dispose']?.()),
+      this['backgroundImageControllers']['forEach']((value642) => value642['dispose']?.()),
       this['backgroundImageControllers']['clear'](),
       void this['binaryAssetRepository']['close'](),
       this['window']?.['removeEventListener']?.('keydown', this['_handleWindowKeyDown'], !![]),
@@ -6863,17 +6813,17 @@ export class Storyboard3DEditorWorkspace {
       this['projectStore']['destroy'](),
       this['editorStore']['destroy'](),
       this['commandHistory']['clear']());
-    const _0x2739c3 = {
-      projectId: _0x46f22e['id'],
-      activeSceneId: _0x199198?.['id'] || '',
-      activeShotId: _0x454068?.['id'] || '',
-      previewUrl: _0x454068?.['thumbnailUrl'] || '',
+    const value643 = {
+      projectId: projectId3['id'],
+      activeSceneId: activeSceneId?.['id'] || '',
+      activeShotId: activeShotId?.['id'] || '',
+      previewUrl: activeShotId?.['thumbnailUrl'] || '',
     };
-    (dispatchWorkspaceEvent(this['window'], 'storyboard-3d:editor-closed', _0x2739c3),
-      this['onClose']?.(_0x2739c3, _0x46f22e));
+    (dispatchWorkspaceEvent(this['window'], 'storyboard-3d:editor-closed', value643),
+      this['onClose']?.(value643, projectId3));
   }
 }
-export function openStoryboard3DEditor(_0xa442dc) {
-  const _0x70973f = new Storyboard3DEditorWorkspace(_0xa442dc);
-  return (_0x70973f['mount'](), _0x70973f);
+export function openStoryboard3DEditor(value644) {
+  const storyboard3DEditorWorkspace = new Storyboard3DEditorWorkspace(value644);
+  return (storyboard3DEditorWorkspace['mount'](), storyboard3DEditorWorkspace);
 }

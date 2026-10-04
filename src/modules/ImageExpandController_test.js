@@ -31,46 +31,46 @@ const ImageExpandController = {
   _unsubscribe: null,
   _view: null,
   cleanup: null,
-  init(_0x3e1174) {
+  init(value) {
     if (this.active) return;
-    const _0x24c59a = appStore.getStateRaw(),
-      _0xcde897 = _0x24c59a.nodes?.[_0x3e1174];
-    if (!_0xcde897) return;
+    const viewport = appStore.getStateRaw(),
+      node = viewport.nodes?.[value];
+    if (!node) return;
     ((this.active = true),
-      (this.nodeId = _0x3e1174),
-      (this.nodeData = _0xcde897),
-      (this._view = { viewport: _0x24c59a.viewport, node: _0xcde897 }),
+      (this.nodeId = value),
+      (this.nodeData = node),
+      (this._view = { viewport: viewport.viewport, node: node }),
       (this.ratioStr = 'original'),
       (this.imageSize = '1K'));
-    const _0x296527 = Object.keys(IMAGE_MODELS)[0],
-      _0x1a73c6 = IMAGE_MODELS[_0x296527].models[0];
-    ((this.model = _0x1a73c6.id),
-      (this.provider = _0x296527),
+    const item = Object.keys(IMAGE_MODELS)[0],
+      key = IMAGE_MODELS[item].models[0];
+    ((this.model = key.id),
+      (this.provider = item),
       this._createUI(),
       this._bindEvents(),
       (this._unsubscribe = appStore.subscribeSelector(
-        (_0x20fddc) => {
-          const _0x428cc5 = _0x20fddc.nodes?.[_0x3e1174],
-            _0x1e31d2 = _0x20fddc.viewport || { x: 0, y: 0, zoom: 1 };
+        (index) => {
+          const nx = index.nodes?.[value],
+            vx = index.viewport || { x: 0, y: 0, zoom: 1 };
           return {
-            hasNode: !!_0x428cc5,
-            vx: _0x1e31d2.x,
-            vy: _0x1e31d2.y,
-            vz: _0x1e31d2.zoom || 1,
-            nx: _0x428cc5 ? _0x428cc5.x : 0,
-            ny: _0x428cc5 ? _0x428cc5.y : 0,
-            nw: _0x428cc5 ? _0x428cc5.width : 0,
-            nh: _0x428cc5 ? _0x428cc5.height : 0,
+            hasNode: !!nx,
+            vx: vx.x,
+            vy: vx.y,
+            vz: vx.zoom || 1,
+            nx: nx ? nx.x : 0,
+            ny: nx ? nx.y : 0,
+            nw: nx ? nx.width : 0,
+            nh: nx ? nx.height : 0,
           };
         },
-        (_0x4bf9a8) => {
-          if (!_0x4bf9a8?.hasNode) return;
-          const _0x15eede = appStore.getStateRaw().nodes?.[_0x3e1174];
-          if (!_0x15eede) return;
-          ((this.nodeData = _0x15eede),
+        (x2) => {
+          if (!x2?.hasNode) return;
+          const node2 = appStore.getStateRaw().nodes?.[value];
+          if (!node2) return;
+          ((this.nodeData = node2),
             (this._view = {
-              viewport: { x: _0x4bf9a8.vx, y: _0x4bf9a8.vy, zoom: _0x4bf9a8.vz },
-              node: _0x15eede,
+              viewport: { x: x2.vx, y: x2.vy, zoom: x2.vz },
+              node: node2,
             }),
             this._updateView(this._view));
         },
@@ -78,297 +78,292 @@ const ImageExpandController = {
       this._waitForImageAndShow());
   },
   _waitForImageAndShow() {
-    const _0x432a57 = () => {
+    const run = () => {
       this.imgEl && this.imgEl.complete && this.imgEl.naturalWidth > 0
         ? (this._updateView(this._view),
           requestAnimationFrame(() => {
             if (this.overlayEl) this.overlayEl.classList.add('visible');
           }))
-        : requestAnimationFrame(_0x432a57);
+        : requestAnimationFrame(run);
     };
-    _0x432a57();
+    run();
   },
   _getImageUrl() {
-    const _0x1e8023 = this.nodeData || {};
-    return localPathToUrl(_0x1e8023.localPath) || _0x1e8023.src || _0x1e8023.imageUrl || _0x1e8023.sourceUrl;
+    const result = this.nodeData || {};
+    return localPathToUrl(result.localPath) || result.src || result.imageUrl || result.sourceUrl;
   },
-  _createExpandedImage(_0x1d2c1e, _0x5ae606) {
-    return new Promise((_0x24f02e, _0x208aab) => {
-      const _0x1b48ab = new Image();
-      ((_0x1b48ab.crossOrigin = 'anonymous'),
-        (_0x1b48ab.onload = async () => {
+  _createExpandedImage(data, x3) {
+    return new Promise((handler, handler2) => {
+      const image = new Image();
+      ((image.crossOrigin = 'anonymous'),
+        (image.onload = async () => {
           try {
-            const _0x4b6e63 = document.createElement('canvas'),
-              _0x124d57 = _0x4b6e63.getContext('2d'),
-              _0x27cbce = _0x1b48ab.naturalWidth,
-              _0x1b0e2a = _0x1b48ab.naturalHeight,
-              _0x26f127 = _0x1d2c1e,
-              _0x142fd2 = {
-                x: _0x5ae606.x || 0,
-                y: _0x5ae606.y || 0,
-                w: _0x5ae606.width || 1,
-                h: _0x5ae606.height || 1,
+            const box = document.createElement('canvas'),
+              ctx = box.getContext('2d'),
+              options = image.naturalWidth,
+              target = image.naturalHeight,
+              box2 = data,
+              box3 = {
+                x: x3.x || 0,
+                y: x3.y || 0,
+                w: x3.width || 1,
+                h: x3.height || 1,
               },
-              _0x652a43 = _0x27cbce / _0x142fd2.w,
-              _0xa4221e = _0x1b0e2a / _0x142fd2.h,
-              _0x4583a6 = Math.round(_0x26f127.w * _0x652a43),
-              _0x337a12 = Math.round(_0x26f127.h * _0xa4221e);
-            ((_0x4b6e63.width = _0x4583a6),
-              (_0x4b6e63.height = _0x337a12),
-              (_0x124d57.fillStyle = '#000'),
-              _0x124d57.fillRect(0, 0, _0x4583a6, _0x337a12));
-            const _0x1b2861 = Math.round((_0x142fd2.x - _0x26f127.x) * _0x652a43),
-              _0x70f28b = Math.round((_0x142fd2.y - _0x26f127.y) * _0xa4221e);
-            (_0x124d57.drawImage(_0x1b48ab, _0x1b2861, _0x70f28b, _0x27cbce, _0x1b0e2a),
-              _0x4b6e63.toBlob((_0x3c4793) => {
-                if (_0x3c4793) {
-                  const _0x33846f = URL.createObjectURL(_0x3c4793);
-                  _0x24f02e(_0x33846f);
-                } else _0x208aab(new Error('无法创建扩展图像'));
+              source = options / box3.w,
+              next = target / box3.h,
+              current = Math.round(box2.w * source),
+              entry = Math.round(box2.h * next);
+            ((box.width = current),
+              (box.height = entry),
+              (ctx.fillStyle = '#000'),
+              ctx.fillRect(0, 0, current, entry));
+            const record = Math.round((box3.x - box2.x) * source),
+              payload = Math.round((box3.y - box2.y) * next);
+            (ctx.drawImage(image, record, payload, options, target),
+              box.toBlob((handle) => {
+                if (handle) {
+                  const state = URL.createObjectURL(handle);
+                  handler(state);
+                } else handler2(new Error('无法创建扩展图像'));
               }, 'image/png'));
-          } catch (_0x467b3a) {
-            _0x208aab(_0x467b3a);
+          } catch (config) {
+            handler2(config);
           }
         }),
-        (_0x1b48ab.onerror = () => {
-          _0x208aab(new Error('无法加载原始图像'));
+        (image.onerror = () => {
+          handler2(new Error('无法加载原始图像'));
         }));
-      const _0x417d64 =
-        localPathToUrl(_0x5ae606.localPath) || _0x5ae606.src || _0x5ae606.imageUrl || _0x5ae606.sourceUrl;
-      _0x1b48ab.src = _0x417d64;
+      const url = localPathToUrl(x3.localPath) || x3.src || x3.imageUrl || x3.sourceUrl;
+      image.src = url;
     });
   },
   _parseRatio() {
     if (this.ratioStr === 'original') return (this.nodeData.width || 1) / (this.nodeData.height || 1);
-    const _0x44afde = this.ratioStr.split(':').map((_0x2427d5) => Number(_0x2427d5));
-    if (_0x44afde.length !== 2 || !_0x44afde[0] || !_0x44afde[1])
+    const list = this.ratioStr.split(':').map((item2) => Number(item2));
+    if (list.length !== 2 || !list[0] || !list[1])
       return (this.nodeData.width || 1) / (this.nodeData.height || 1);
-    return _0x44afde[0] / _0x44afde[1];
+    return list[0] / list[1];
   },
   _calcFrameWorldRect() {
-    const _0x17ccf2 = this.nodeData,
-      _0x267559 = _0x17ccf2.width || 1,
-      _0x596eed = _0x17ccf2.height || 1,
-      _0x247bd5 = _0x17ccf2.x + _0x267559 / 2,
-      _0x3ed1ae = _0x17ccf2.y + _0x596eed / 2,
-      _0x2cc90b = _0x267559 / _0x596eed,
-      _0x22a3a9 = this._parseRatio();
-    let _0xd478ee, _0x15cc78;
-    _0x22a3a9 >= _0x2cc90b
-      ? ((_0x15cc78 = _0x596eed), (_0xd478ee = _0x596eed * _0x22a3a9))
-      : ((_0xd478ee = _0x267559), (_0x15cc78 = _0x267559 / _0x22a3a9));
-    const _0x2a1e2d = 1.35,
-      _0xf62fd7 = Math.max(_0x267559, _0xd478ee) * _0x2a1e2d,
-      _0x32875a = Math.max(_0x596eed, _0x15cc78) * _0x2a1e2d;
-    return { x: _0x247bd5 - _0xf62fd7 / 2, y: _0x3ed1ae - _0x32875a / 2, w: _0xf62fd7, h: _0x32875a };
+    const box4 = this.nodeData,
+      scope = box4.width || 1,
+      input = box4.height || 1,
+      x4 = box4.x + scope / 2,
+      y2 = box4.y + input / 2,
+      output = scope / input,
+      value2 = this._parseRatio();
+    let value3, value4;
+    value2 >= output
+      ? ((value4 = input), (value3 = input * value2))
+      : ((value3 = scope), (value4 = scope / value2));
+    const value5 = 1.35,
+      w = Math.max(scope, value3) * value5,
+      h = Math.max(input, value4) * value5;
+    return { x: x4 - w / 2, y: y2 - h / 2, w: w, h: h };
   },
   _getNodeWorldRect() {
-    const _0x4eb6f1 = this.nodeData || {},
-      _0x2980cd = _0x4eb6f1.width || 1,
-      _0x323ed9 = _0x4eb6f1.height || 1;
-    return { x: _0x4eb6f1.x || 0, y: _0x4eb6f1.y || 0, w: _0x2980cd, h: _0x323ed9 };
+    const x5 = this.nodeData || {},
+      w2 = x5.width || 1,
+      h2 = x5.height || 1;
+    return { x: x5.x || 0, y: x5.y || 0, w: w2, h: h2 };
   },
-  _clampFrameRect(_0x15786f) {
-    const _0x25c644 = this._getNodeWorldRect(),
-      _0x9e96cc = (_0x108167, _0xfc5dcf, _0x4f5441) => Math.min(_0x4f5441, Math.max(_0xfc5dcf, _0x108167)),
-      _0x1a9836 = {
-        x: Number(_0x15786f?.x) || 0,
-        y: Number(_0x15786f?.y) || 0,
-        w: Number(_0x15786f?.w) || 1,
-        h: Number(_0x15786f?.h) || 1,
+  _clampFrameRect(box5) {
+    const box6 = this._getNodeWorldRect(),
+      handler3 = (value6, value7, value8) => Math.min(value8, Math.max(value7, value6)),
+      box7 = {
+        x: Number(box5?.x) || 0,
+        y: Number(box5?.y) || 0,
+        w: Number(box5?.w) || 1,
+        h: Number(box5?.h) || 1,
       },
-      _0x5e912c = Math.max(_0x25c644.w, 24),
-      _0x1b6b4a = Math.max(_0x25c644.h, 24);
-    ((_0x1a9836.w = Math.max(_0x1a9836.w, _0x5e912c)), (_0x1a9836.h = Math.max(_0x1a9836.h, _0x1b6b4a)));
+      value9 = Math.max(box6.w, 24),
+      value10 = Math.max(box6.h, 24);
+    ((box7.w = Math.max(box7.w, value9)), (box7.h = Math.max(box7.h, value10)));
     if (this.ratioStr !== 'original') {
-      const _0x1add1a = this._parseRatio(),
-        _0x4ffb83 = _0x1a9836.x + _0x1a9836.w / 2,
-        _0x3a077a = _0x1a9836.y + _0x1a9836.h / 2;
-      let _0x1021ea = _0x1a9836.w,
-        _0x3cf9da = _0x1a9836.h;
-      (_0x1021ea / _0x3cf9da > _0x1add1a
-        ? (_0x3cf9da = _0x1021ea / _0x1add1a)
-        : (_0x1021ea = _0x3cf9da * _0x1add1a),
-        _0x1021ea < _0x5e912c && ((_0x1021ea = _0x5e912c), (_0x3cf9da = _0x1021ea / _0x1add1a)),
-        _0x3cf9da < _0x1b6b4a && ((_0x3cf9da = _0x1b6b4a), (_0x1021ea = _0x3cf9da * _0x1add1a)),
-        (_0x1a9836.w = _0x1021ea),
-        (_0x1a9836.h = _0x3cf9da),
-        (_0x1a9836.x = _0x4ffb83 - _0x1a9836.w / 2),
-        (_0x1a9836.y = _0x3a077a - _0x1a9836.h / 2));
+      const value11 = this._parseRatio(),
+        value12 = box7.x + box7.w / 2,
+        value13 = box7.y + box7.h / 2;
+      let value14 = box7.w,
+        value15 = box7.h;
+      (value14 / value15 > value11 ? (value15 = value14 / value11) : (value14 = value15 * value11),
+        value14 < value9 && ((value14 = value9), (value15 = value14 / value11)),
+        value15 < value10 && ((value15 = value10), (value14 = value15 * value11)),
+        (box7.w = value14),
+        (box7.h = value15),
+        (box7.x = value12 - box7.w / 2),
+        (box7.y = value13 - box7.h / 2));
     }
-    const _0x501463 = _0x25c644.x + _0x25c644.w - _0x1a9836.w,
-      _0x5324a2 = _0x25c644.x,
-      _0x56587e = _0x25c644.y + _0x25c644.h - _0x1a9836.h,
-      _0x44ab46 = _0x25c644.y;
+    const value16 = box6.x + box6.w - box7.w,
+      value17 = box6.x,
+      value18 = box6.y + box6.h - box7.h,
+      value19 = box6.y;
     return (
-      (_0x1a9836.x = _0x9e96cc(_0x1a9836.x, _0x501463, _0x5324a2)),
-      (_0x1a9836.y = _0x9e96cc(_0x1a9836.y, _0x56587e, _0x44ab46)),
-      _0x1a9836
+      (box7.x = handler3(box7.x, value16, value17)),
+      (box7.y = handler3(box7.y, value18, value19)),
+      box7
     );
   },
   _createUI() {
-    const _0xf89c03 = document.createElement('div');
-    _0xf89c03.className = 'v2-expand-overlay';
-    const _0x2e7ffd = document.createElement('div');
-    ((_0x2e7ffd.className = 'v2-expand-frame'),
-      ['tl', 'tr', 'bl', 'br', 'tm', 'bm', 'lm', 'rm'].forEach((_0x122280) => {
-        const _0x2f9a99 = document.createElement('div');
-        ((_0x2f9a99.className = 'v2-expand-handle ' + _0x122280),
-          (_0x2f9a99.dataset.handle = _0x122280),
-          _0x2e7ffd.appendChild(_0x2f9a99));
+    const el = document.createElement('div');
+    el.className = 'v2-expand-overlay';
+    const el2 = document.createElement('div');
+    ((el2.className = 'v2-expand-frame'),
+      ['tl', 'tr', 'bl', 'br', 'tm', 'bm', 'lm', 'rm'].forEach((item3) => {
+        const el3 = document.createElement('div');
+        ((el3.className = 'v2-expand-handle ' + item3), (el3.dataset.handle = item3), el2.appendChild(el3));
       }));
-    const _0x5c73e9 = document.createElement('img');
-    ((_0x5c73e9.className = 'v2-expand-img'),
-      (_0x5c73e9.draggable = false),
-      (_0x5c73e9.src = this._getImageUrl()),
-      _0xf89c03.appendChild(_0x2e7ffd),
-      _0xf89c03.appendChild(_0x5c73e9),
-      document.body.appendChild(_0xf89c03),
-      (this.overlayEl = _0xf89c03),
-      (this.frameEl = _0x2e7ffd),
-      (this.imgEl = _0x5c73e9),
+    const value20 = document.createElement('img');
+    ((value20.className = 'v2-expand-img'),
+      (value20.draggable = false),
+      (value20.src = this._getImageUrl()),
+      el.appendChild(el2),
+      el.appendChild(value20),
+      document.body.appendChild(el),
+      (this.overlayEl = el),
+      (this.frameEl = el2),
+      (this.imgEl = value20),
       (this.frameRect = this._calcFrameWorldRect()));
-    const _0x5852cb = document.createElement('div');
-    _0x5852cb.className = 'v2-expand-toolbar';
-    const _0x8dd89f = this.ratioStr === 'original' ? '比例' : this.ratioStr,
-      _0x18fb80 = getModelDisplayName(this.model);
-    let _0x4111c8 = '';
-    (Object.entries(IMAGE_MODELS).forEach(([_0x3660b5, _0x1b84c9]) => {
-      const _0x207155 = _0x1b84c9.isTextIcon
+    const el4 = document.createElement('div');
+    el4.className = 'v2-expand-toolbar';
+    const value21 = this.ratioStr === 'original' ? '比例' : this.ratioStr,
+      modelDisplayName = getModelDisplayName(this.model);
+    let value22 = '';
+    (Object.entries(IMAGE_MODELS).forEach(([value23, error]) => {
+      const value24 = error.isTextIcon
         ? '<div style="width:20px;height:20px;border-radius:3px;background:var(--bg-node);color:var(--text-primary);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
-          _0x1b84c9.icon +
+          error.icon +
           '</div>'
         : '<img src="' +
-          _0x1b84c9.icon +
+          error.icon +
           '" style="width:20px;height:20px;object-fit:contain;border-radius:3px;flex-shrink:0;background:var(--white-10);padding:2.5px;" alt="' +
-          _0x3660b5 +
+          value23 +
           '">';
-      let _0x20b52d = '';
-      (_0x1b84c9.models.forEach((_0x44f65d) => {
-        const _0x766e26 = _0x44f65d.icon || _0x1b84c9.icon,
-          _0x4233d3 = this.model === _0x44f65d.id ? 'active' : '';
-        _0x20b52d +=
+      let value25 = '';
+      (error.models.forEach((error2) => {
+        const value26 = error2.icon || error.icon,
+          value27 = this.model === error2.id ? 'active' : '';
+        value25 +=
           '\n          <div class="floating-menu-item ' +
-          _0x4233d3 +
+          value27 +
           '" data-value="' +
-          _0x44f65d.id +
+          error2.id +
           '" data-provider="' +
-          _0x3660b5 +
+          value23 +
           '" style="display:flex;align-items:center;gap:8px;">\n            <img src="' +
-          _0x766e26 +
+          value26 +
           '" style="width:20px;height:20px;object-fit:contain;border-radius:3px;flex-shrink:0;background:var(--white-10);padding:2.5px;" alt="' +
-          _0x3660b5 +
+          value23 +
           '">\n            <div class="fmi-content">\n              <div class="fmi-title">' +
-          _0x44f65d.name +
+          error2.name +
           '</div>\n              <div class="fmi-sub">' +
-          _0x44f65d.description +
+          error2.description +
           '</div>\n            </div>\n          </div>';
       }),
-        (_0x4111c8 +=
+        (value22 +=
           '\n        <div class="' +
-          _0x3660b5 +
+          value23 +
           '-group-header floating-menu-item" data-' +
-          _0x3660b5 +
+          value23 +
           '-toggle style="display:flex;align-items:center;gap:8px;cursor:var(--link-cursor);">\n          ' +
-          _0x207155 +
+          value24 +
           '\n          <div class="fmi-content">\n            <div class="fmi-title">' +
-          _0x1b84c9.name +
+          error.name +
           '</div>\n            <div class="fmi-sub">' +
-          _0x1b84c9.description +
+          error.description +
           '</div>\n          </div>\n          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:0.5;flex-shrink:0;"><polyline points="9 18 15 12 9 6"></polyline></svg>\n        </div>\n        <div class="' +
-          _0x3660b5 +
+          value23 +
           '-submenu" style="position:absolute;left:calc(100% + 6px);top:0;z-index:1001;width:max-content;max-width:320px;background:var(--bg-2);border:1px solid var(--stroke-08);border-radius:14px;padding:8px;box-shadow:var(--shadow-popover);display:none;flex-direction:column;">\n          ' +
-          _0x20b52d +
+          value25 +
           '\n        </div>'));
     }),
-      (_0x5852cb.innerHTML =
+      (el4.innerHTML =
         '\n      <button class="v2-expand-toolbar-btn exit" title="退出 (Esc)">\n        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>\n      </button>\n      <div class="v2-expand-divider"></div>\n      <div class="v2-expand-wrap">\n        <button class="v2-expand-toolbar-btn ratio-toggle">\n          <span class="ratio-text">' +
-        _0x8dd89f +
+        value21 +
         '</span>\n          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5;margin-left:2px;"><polyline points="6 9 12 15 18 9"></polyline></svg>\n        </button>\n        <div class="v2-expand-menu ratio-menu">\n          <div class="v2-expand-menu-item active" data-type="ratio" data-value="original">原图比例</div>\n          <div class="v2-expand-menu-item" data-type="ratio" data-value="21:9">21:9</div>\n          <div class="v2-expand-menu-item" data-type="ratio" data-value="16:9">16:9</div>\n          <div class="v2-expand-menu-item" data-type="ratio" data-value="9:16">9:16</div>\n          <div class="v2-expand-menu-item" data-type="ratio" data-value="4:3">4:3</div>\n          <div class="v2-expand-menu-item" data-type="ratio" data-value="3:4">3:4</div>\n          <div class="v2-expand-menu-item" data-type="ratio" data-value="1:1">1:1</div>\n        </div>\n      </div>\n      <div class="v2-expand-wrap">\n        <button class="v2-expand-toolbar-btn size-toggle">\n          <span class="size-text">' +
         this.imageSize +
         '</span>\n          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5;margin-left:2px;"><polyline points="6 9 12 15 18 9"></polyline></svg>\n        </button>\n        <div class="v2-expand-menu size-menu">\n          <div class="v2-expand-menu-item active" data-type="size" data-value="1K">1K</div>\n          <div class="v2-expand-menu-item" data-type="size" data-value="2K">2K</div>\n          <div class="v2-expand-menu-item" data-type="size" data-value="4K">4K</div>\n        </div>\n      </div>\n      <div class="v2-expand-wrap">\n        <button class="v2-expand-toolbar-btn model-toggle">\n          <span class="model-text">' +
-        _0x18fb80 +
+        modelDisplayName +
         '</span>\n          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5;margin-left:2px;"><polyline points="6 9 12 15 18 9"></polyline></svg>\n        </button>\n        <div class="floating-menu img-model-menu model-menu">\n          ' +
-        _0x4111c8 +
+        value22 +
         '\n        </div>\n      </div>\n      <button class="v2-expand-toolbar-btn go" title="生成扩图">\n        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>\n      </button>\n    '),
-      document.body.appendChild(_0x5852cb),
-      (this.toolbarEl = _0x5852cb),
-      (this.ratioMenuEl = _0x5852cb.querySelector('.ratio-menu')),
-      (this.sizeMenuEl = _0x5852cb.querySelector('.size-menu')),
-      (this.modelMenuEl = _0x5852cb.querySelector('.model-menu')),
+      document.body.appendChild(el4),
+      (this.toolbarEl = el4),
+      (this.ratioMenuEl = el4.querySelector('.ratio-menu')),
+      (this.sizeMenuEl = el4.querySelector('.size-menu')),
+      (this.modelMenuEl = el4.querySelector('.model-menu')),
       this._updateView(this._view));
   },
-  _updateView(_0x51465a = this._view) {
+  _updateView(value28 = this._view) {
     if (!this.active) return;
-    const _0xfd7f66 = _0x51465a?.node,
-      _0x2e62a5 = _0x51465a?.viewport;
-    if (!_0xfd7f66) return;
-    this.nodeData = _0xfd7f66;
+    const box8 = value28?.node,
+      box9 = value28?.viewport;
+    if (!box8) return;
+    this.nodeData = box8;
     if (!this.frameRect) this.frameRect = this._calcFrameWorldRect();
     this.frameRect = this._clampFrameRect(this.frameRect);
-    const _0x1126e8 = this.frameRect,
-      _0x11d02d = worldToScreen(_0x1126e8.x, _0x1126e8.y, _0x2e62a5),
-      _0x4b9ff8 = Math.round(_0x1126e8.w * _0x2e62a5.zoom),
-      _0x5009cf = Math.round(_0x1126e8.h * _0x2e62a5.zoom);
-    ((this.frameEl.style.left = Math.round(_0x11d02d.x) + 'px'),
-      (this.frameEl.style.top = Math.round(_0x11d02d.y) + 'px'),
-      (this.frameEl.style.width = _0x4b9ff8 + 'px'),
-      (this.frameEl.style.height = _0x5009cf + 'px'));
-    const _0x1b4a13 = worldToScreen(_0xfd7f66.x, _0xfd7f66.y, _0x2e62a5),
-      _0x49c00a = Math.round(_0xfd7f66.width * _0x2e62a5.zoom),
-      _0x2d91bb = Math.round(_0xfd7f66.height * _0x2e62a5.zoom);
-    ((this.imgEl.style.left = Math.round(_0x1b4a13.x) + 'px'),
-      (this.imgEl.style.top = Math.round(_0x1b4a13.y) + 'px'),
-      (this.imgEl.style.width = _0x49c00a + 'px'),
-      (this.imgEl.style.height = _0x2d91bb + 'px'));
+    const box10 = this.frameRect,
+      box11 = worldToScreen(box10.x, box10.y, box9),
+      value29 = Math.round(box10.w * box9.zoom),
+      value30 = Math.round(box10.h * box9.zoom);
+    ((this.frameEl.style.left = Math.round(box11.x) + 'px'),
+      (this.frameEl.style.top = Math.round(box11.y) + 'px'),
+      (this.frameEl.style.width = value29 + 'px'),
+      (this.frameEl.style.height = value30 + 'px'));
+    const box12 = worldToScreen(box8.x, box8.y, box9),
+      value31 = Math.round(box8.width * box9.zoom),
+      value32 = Math.round(box8.height * box9.zoom);
+    ((this.imgEl.style.left = Math.round(box12.x) + 'px'),
+      (this.imgEl.style.top = Math.round(box12.y) + 'px'),
+      (this.imgEl.style.width = value31 + 'px'),
+      (this.imgEl.style.height = value32 + 'px'));
     if (this.toolbarEl) {
-      const _0x568054 = _0x1b4a13.y + _0x2d91bb + 14;
-      ((this.toolbarEl.style.top = _0x568054 + 'px'),
-        (this.toolbarEl.style.left = _0x1b4a13.x + _0x49c00a / 2 + 'px'),
+      const value33 = box12.y + value32 + 14;
+      ((this.toolbarEl.style.top = value33 + 'px'),
+        (this.toolbarEl.style.left = box12.x + value31 / 2 + 'px'),
         (this.toolbarEl.style.transform = 'translateX(-50%)'),
         (this.toolbarEl.style.bottom = 'auto'));
     }
   },
   _bindEvents() {
-    const _0x4ed72b = () => this._updateView(this._view);
-    window.addEventListener('resize', _0x4ed72b);
-    const _0x4ad0df = (_0x424309) => {
-      if (_0x424309.key === 'Escape') this.exit();
+    const value34 = () => this._updateView(this._view);
+    window.addEventListener('resize', value34);
+    const value35 = (event) => {
+      if (event.key === 'Escape') this.exit();
     };
-    window.addEventListener('keydown', _0x4ad0df);
-    const _0x5a6b5b = (_0x43d57e) => _0x43d57e.stopPropagation();
-    this.overlayEl.addEventListener('wheel', _0x5a6b5b, { passive: false });
-    const _0x108c01 = () => {
+    window.addEventListener('keydown', value35);
+    const value36 = (event2) => event2.stopPropagation();
+    this.overlayEl.addEventListener('wheel', value36, { passive: false });
+    const run2 = () => {
       (this.ratioMenuEl?.classList.remove('open'),
         this.sizeMenuEl?.classList.remove('open'),
         this.modelMenuEl?.classList.remove('show'),
-        Object.keys(IMAGE_MODELS).forEach((_0x1696e2) => {
-          const _0x1e07c3 = this.modelMenuEl?.querySelector('.' + _0x1696e2 + '-submenu');
-          if (_0x1e07c3) _0x1e07c3.style.display = 'none';
+        Object.keys(IMAGE_MODELS).forEach((item4) => {
+          const el5 = this.modelMenuEl?.querySelector('.' + item4 + '-submenu');
+          if (el5) el5.style.display = 'none';
         }));
     };
     this.toolbarEl.querySelector('.exit').onclick = () => this.exit();
-    const _0x31c5ce = this.toolbarEl.querySelector('.ratio-toggle');
-    _0x31c5ce.onclick = (_0x1c3f80) => {
-      _0x1c3f80.stopPropagation();
-      const _0x1624ed = this.ratioMenuEl.classList.toggle('open');
-      _0x1624ed && (this.sizeMenuEl.classList.remove('open'), this.modelMenuEl.classList.remove('open'));
+    const value37 = this.toolbarEl.querySelector('.ratio-toggle');
+    value37.onclick = (event3) => {
+      event3.stopPropagation();
+      const value38 = this.ratioMenuEl.classList.toggle('open');
+      value38 && (this.sizeMenuEl.classList.remove('open'), this.modelMenuEl.classList.remove('open'));
     };
-    const _0x47f689 = this.toolbarEl.querySelector('.size-toggle');
-    _0x47f689.onclick = (_0x3ee17a) => {
-      _0x3ee17a.stopPropagation();
-      const _0x4f5e3c = this.sizeMenuEl.classList.toggle('open');
-      _0x4f5e3c && (this.ratioMenuEl.classList.remove('open'), this.modelMenuEl.classList.remove('open'));
+    const value39 = this.toolbarEl.querySelector('.size-toggle');
+    value39.onclick = (event4) => {
+      event4.stopPropagation();
+      const value40 = this.sizeMenuEl.classList.toggle('open');
+      value40 && (this.ratioMenuEl.classList.remove('open'), this.modelMenuEl.classList.remove('open'));
     };
-    const _0x373140 = (_0x222baf) => {
-      const _0x52348b = _0x222baf.target.closest('.v2-expand-menu-item');
-      if (!_0x52348b) return;
-      const _0x25ae99 = _0x52348b.dataset.type;
-      if (_0x25ae99 === 'ratio') {
-        ((this.ratioStr = _0x52348b.dataset.value),
+    const value41 = (event5) => {
+      const el6 = event5.target.closest('.v2-expand-menu-item');
+      if (!el6) return;
+      const value42 = el6.dataset.type;
+      if (value42 === 'ratio') {
+        ((this.ratioStr = el6.dataset.value),
           this.ratioMenuEl
             .querySelectorAll('.v2-expand-menu-item')
-            .forEach((_0x4a427e) => _0x4a427e.classList.toggle('active', _0x4a427e === _0x52348b)),
+            .forEach((el7) => el7.classList.toggle('active', el7 === el6)),
           (this.toolbarEl.querySelector('.ratio-text').textContent =
             this.ratioStr === 'original' ? '比例' : this.ratioStr),
           this.ratioMenuEl.classList.remove('open'),
@@ -376,105 +371,100 @@ const ImageExpandController = {
           this._updateView(this._view));
         return;
       }
-      if (_0x25ae99 === 'size') {
-        ((this.imageSize = _0x52348b.dataset.value),
+      if (value42 === 'size') {
+        ((this.imageSize = el6.dataset.value),
           this.sizeMenuEl
             .querySelectorAll('.v2-expand-menu-item')
-            .forEach((_0x17db19) => _0x17db19.classList.toggle('active', _0x17db19 === _0x52348b)),
+            .forEach((el8) => el8.classList.toggle('active', el8 === el6)),
           (this.toolbarEl.querySelector('.size-text').textContent = this.imageSize),
           this.sizeMenuEl.classList.remove('open'));
         return;
       }
-      if (_0x25ae99 === 'model') {
-        ((this.model = _0x52348b.dataset.value),
-          (this.provider = _0x52348b.dataset.provider || getModelProvider(this.model)),
+      if (value42 === 'model') {
+        ((this.model = el6.dataset.value),
+          (this.provider = el6.dataset.provider || getModelProvider(this.model)),
           this.modelMenuEl
             .querySelectorAll('.v2-expand-menu-item')
-            .forEach((_0x1305a5) => _0x1305a5.classList.toggle('active', _0x1305a5 === _0x52348b)),
+            .forEach((el9) => el9.classList.toggle('active', el9 === el6)),
           (this.toolbarEl.querySelector('.model-text').textContent = getModelDisplayName(this.model)),
           this.modelMenuEl.classList.remove('open'));
         return;
       }
     };
-    ((this.ratioMenuEl.onclick = _0x373140),
-      (this.sizeMenuEl.onclick = _0x373140),
-      (this.modelMenuEl.onclick = _0x373140));
-    const _0x34cf9d = this.toolbarEl.querySelector('.model-toggle'),
-      _0x3a444f = this.modelMenuEl,
-      _0x318564 = this.toolbarEl.querySelector('.model-text');
-    _0x34cf9d &&
-      _0x3a444f &&
-      _0x318564 &&
-      (_0x34cf9d.addEventListener('click', (_0x4041fc) => {
-        (_0x4041fc.stopPropagation(),
-          _0x3a444f.classList.toggle('show'),
+    ((this.ratioMenuEl.onclick = value41),
+      (this.sizeMenuEl.onclick = value41),
+      (this.modelMenuEl.onclick = value41));
+    const el10 = this.toolbarEl.querySelector('.model-toggle'),
+      el11 = this.modelMenuEl,
+      el12 = this.toolbarEl.querySelector('.model-text');
+    el10 &&
+      el11 &&
+      el12 &&
+      (el10.addEventListener('click', (event6) => {
+        (event6.stopPropagation(),
+          el11.classList.toggle('show'),
           this.ratioMenuEl.classList.remove('open'),
           this.sizeMenuEl.classList.remove('open'));
       }),
-      Object.keys(IMAGE_MODELS).forEach((_0x55156e) => {
-        const _0x20c730 = _0x3a444f.querySelector('[data-' + _0x55156e + '-toggle]'),
-          _0x32f8f9 = _0x3a444f.querySelector('.' + _0x55156e + '-submenu');
-        if (!_0x20c730 || !_0x32f8f9) return;
-        let _0x113027 = null;
-        const _0x287661 = () => {
-            (clearTimeout(_0x113027), (_0x32f8f9.style.display = 'flex'));
+      Object.keys(IMAGE_MODELS).forEach((item5) => {
+        const el13 = el11.querySelector('[data-' + item5 + '-toggle]'),
+          el14 = el11.querySelector('.' + item5 + '-submenu');
+        if (!el13 || !el14) return;
+        let setTimeout2 = null;
+        const value43 = () => {
+            (clearTimeout(setTimeout2), (el14.style.display = 'flex'));
           },
-          _0x4f50ad = (_0x2cf2f0 = 120) => {
-            _0x113027 = setTimeout(() => {
-              _0x32f8f9.style.display = 'none';
-            }, _0x2cf2f0);
+          handler4 = (value44 = 120) => {
+            setTimeout2 = setTimeout(() => {
+              el14.style.display = 'none';
+            }, value44);
           };
-        (_0x20c730.addEventListener('mouseenter', _0x287661),
-          _0x20c730.addEventListener('mouseleave', () => _0x4f50ad()),
-          _0x32f8f9.addEventListener('mouseenter', _0x287661),
-          _0x32f8f9.addEventListener('mouseleave', () => _0x4f50ad()),
-          _0x32f8f9.querySelectorAll('.floating-menu-item').forEach((_0x1fc8c0) => {
-            _0x1fc8c0.addEventListener('click', () => {
-              const _0x3b1657 = _0x1fc8c0.dataset.value,
-                _0x440d38 = _0x1fc8c0.dataset.provider || _0x55156e,
-                _0x1245f2 = _0x1fc8c0.querySelector('.fmi-title');
-              ((_0x318564.textContent = _0x1245f2 ? _0x1245f2.textContent : getModelDisplayName(_0x3b1657)),
-                (this.model = _0x3b1657),
-                (this.provider = _0x440d38),
-                appStore.updateNodeData(this.nodeId, { model: _0x3b1657, provider: _0x440d38 }),
-                _0x3a444f
+        (el13.addEventListener('mouseenter', value43),
+          el13.addEventListener('mouseleave', () => handler4()),
+          el14.addEventListener('mouseenter', value43),
+          el14.addEventListener('mouseleave', () => handler4()),
+          el14.querySelectorAll('.floating-menu-item').forEach((el15) => {
+            el15.addEventListener('click', () => {
+              const model = el15.dataset.value,
+                provider = el15.dataset.provider || item5,
+                el16 = el15.querySelector('.fmi-title');
+              ((el12.textContent = el16 ? el16.textContent : getModelDisplayName(model)),
+                (this.model = model),
+                (this.provider = provider),
+                appStore.updateNodeData(this.nodeId, { model: model, provider: provider }),
+                el11
                   .querySelectorAll('.floating-menu-item')
-                  .forEach((_0xf866cf) => _0xf866cf.classList.remove('active')),
-                _0x1fc8c0.classList.add('active'),
-                _0x3a444f.classList.remove('show'),
-                (_0x32f8f9.style.display = 'none'));
+                  .forEach((el17) => el17.classList.remove('active')),
+                el15.classList.add('active'),
+                el11.classList.remove('show'),
+                (el14.style.display = 'none'));
             });
           }));
       }));
     this.toolbarEl.querySelector('.go').onclick = async () => {
       try {
         window.showToast?.('正在生成扩图...', 'loading');
-        const _0x55f195 = appStore.getStateRaw(),
-          _0x42284d = _0x55f195.nodes?.[this.nodeId];
-        if (!_0x42284d) return;
-        const _0x9e702 = { ...this.frameRect };
-        let _0x2493f9, _0x4051e1;
-        const _0x26362c =
+        const value45 = appStore.getStateRaw(),
+          box13 = value45.nodes?.[this.nodeId];
+        if (!box13) return;
+        const value46 = { ...this.frameRect };
+        let width, height;
+        const value47 =
             this.ratioStr === 'original'
-              ? _0x42284d.width / _0x42284d.height
+              ? box13.width / box13.height
               : parseInt(this.ratioStr.split(':')[0]) / parseInt(this.ratioStr.split(':')[1]),
-          _0x526fa0 = getAutoMediaSizeByShortSide(_0x26362c, 1);
-        ((_0x2493f9 = _0x526fa0.width), (_0x4051e1 = _0x526fa0.height));
-        const { x: _0x241056, y: _0x2ec9ee } = calcSafeSpawnPosNearNode(
-            _0x55f195.nodes,
-            _0x42284d,
-            _0x2493f9,
-            _0x4051e1,
-          ),
-          _0x455507 = generateId('source-image-expand');
+          box14 = getAutoMediaSizeByShortSide(value47, 1);
+        ((width = box14.width), (height = box14.height));
+        const { x: x6, y: y3 } = calcSafeSpawnPosNearNode(value45.nodes, box13, width, height),
+          id = generateId('source-image-expand');
         (appStore.addNode(
           buildSourceMediaNodePayload({
-            id: _0x455507,
+            id: id,
             type: 'source-image',
-            x: _0x241056,
-            y: _0x2ec9ee,
-            width: _0x2493f9,
-            height: _0x4051e1,
+            x: x6,
+            y: y3,
+            width: width,
+            height: height,
             name: '扩图生成中...',
             src: '',
             isGenerating: true,
@@ -482,287 +472,275 @@ const ImageExpandController = {
               '模型: ' + getDisplayModelName(this.model) + '\n提示词: 保持现有主体不变，填充黑色区域',
           }),
         ),
-          appStore.setSelectedNodes([_0x455507]));
+          appStore.setSelectedNodes([id]));
         typeof window.v2FocusOnNodes === 'function'
-          ? window.v2FocusOnNodes([_0x42284d.id, _0x455507])
-          : window.v2FocusOnNode?.(_0x455507);
-        const _0x443e52 = { ..._0x42284d };
+          ? window.v2FocusOnNodes([box13.id, id])
+          : window.v2FocusOnNode?.(id);
+        const value48 = { ...box13 };
         this.exit();
-        const _0x23c4fb = await this._createExpandedImage(_0x9e702, _0x443e52),
-          _0x35acaa = {
+        const value49 = await this._createExpandedImage(value46, value48),
+          value50 = {
             prompt: '保持现有主体不变，填充黑色区域',
             model: this.model,
             provider: this.provider,
             aspectRatio: this.ratioStr === 'original' ? '自适应' : this.ratioStr,
             imageSize: this.imageSize,
-            inputUrls: [_0x23c4fb],
+            inputUrls: [value49],
             batchSize: 1,
           },
-          _0x563667 = await generateImage(_0x35acaa);
-        URL.revokeObjectURL(_0x23c4fb);
-        if (_0x563667.error) {
-          (appStore.updateNodeData(_0x455507, {
+          imageUrl = await generateImage(value50);
+        URL.revokeObjectURL(value49);
+        if (imageUrl.error) {
+          (appStore.updateNodeData(id, {
             isGenerating: false,
             name: '扩图生成失败',
             outputText:
               '模型: ' +
               getDisplayModelName(this.model) +
               '\n提示词: 保持现有主体不变，填充黑色区域\n错误: ' +
-              _0x563667.error,
+              imageUrl.error,
           }),
-            window.showToast?.('扩图失败: ' + _0x563667.error, 'error'));
+            window.showToast?.('扩图失败: ' + imageUrl.error, 'error'));
           return;
         }
-        (appStore.updateNodeData(_0x455507, {
+        (appStore.updateNodeData(id, {
           isGenerating: false,
           name: '扩图结果',
-          imageUrl: _0x563667.imageUrl,
-          sourceUrl: _0x563667.sourceUrl,
-          thumbUrl: _0x563667.thumbUrl,
-          sourceId: _0x563667.sourceId,
-          thumbId: _0x563667.thumbId,
-          localPath: _0x563667.localPath,
+          imageUrl: imageUrl.imageUrl,
+          sourceUrl: imageUrl.sourceUrl,
+          thumbUrl: imageUrl.thumbUrl,
+          sourceId: imageUrl.sourceId,
+          thumbId: imageUrl.thumbId,
+          localPath: imageUrl.localPath,
           outputText: '模型: ' + getDisplayModelName(this.model) + '\n提示词: 保持现有主体不变，填充黑色区域',
         }),
           window.showToast?.('扩图生成成功', 'success'));
-      } catch (_0x316a5e) {
-        (console.error('扩图生成失败:', _0x316a5e),
-          window.showToast?.('扩图生成失败: ' + (_0x316a5e.message || '未知错误'), 'error'));
+      } catch (error3) {
+        (console.error('扩图生成失败:', error3),
+          window.showToast?.('扩图生成失败: ' + (error3.message || '未知错误'), 'error'));
       }
     };
-    const _0x4b134f = (_0x217ad) => {
-      if (!this.toolbarEl.contains(_0x217ad.target)) _0x108c01();
+    const value51 = (event7) => {
+      if (!this.toolbarEl.contains(event7.target)) run2();
     };
-    document.addEventListener('pointerdown', _0x4b134f, true);
-    const _0x5358a7 = () => {
+    document.addEventListener('pointerdown', value51, true);
+    const run3 = () => {
         if (!this._pointerState) return;
-        (window.removeEventListener('pointermove', _0x10fd49, true),
-          window.removeEventListener('pointerup', _0x9d796, true),
-          window.removeEventListener('pointercancel', _0x9d796, true),
+        (window.removeEventListener('pointermove', value52, true),
+          window.removeEventListener('pointerup', value53, true),
+          window.removeEventListener('pointercancel', value53, true),
           (this._pointerState = null));
       },
-      _0x561092 = () => this.ratioStr !== 'original',
-      _0x10fd49 = (_0x15cb99) => {
-        const _0x256dc5 = this._pointerState;
-        if (!_0x256dc5 || _0x15cb99.pointerId !== _0x256dc5.pointerId) return;
-        _0x15cb99.preventDefault();
-        const _0x5b132c = _0x256dc5.zoom || this._view?.viewport?.zoom || 1,
-          _0x1a7f0b = (_0x15cb99.clientX - _0x256dc5.startX) / _0x5b132c,
-          _0x357ab7 = (_0x15cb99.clientY - _0x256dc5.startY) / _0x5b132c,
-          _0x3c4d1a = this._getNodeWorldRect(),
-          _0x13fd13 = (_0x16a155, _0x56023e, _0x1e5dcd) =>
-            Math.min(_0x1e5dcd, Math.max(_0x56023e, _0x16a155));
-        if (_0x256dc5.mode === 'drag') {
-          const _0xd00c9 = _0x256dc5.startRect.w,
-            _0x332958 = _0x256dc5.startRect.h;
-          let _0xc7ad70 = _0x256dc5.startRect.x + _0x1a7f0b,
-            _0x294cf1 = _0x256dc5.startRect.y + _0x357ab7;
-          ((_0xc7ad70 = _0x13fd13(_0xc7ad70, _0x3c4d1a.x + _0x3c4d1a.w - _0xd00c9, _0x3c4d1a.x)),
-            (_0x294cf1 = _0x13fd13(_0x294cf1, _0x3c4d1a.y + _0x3c4d1a.h - _0x332958, _0x3c4d1a.y)),
-            (this.frameRect = { x: _0xc7ad70, y: _0x294cf1, w: _0xd00c9, h: _0x332958 }),
+      handler5 = () => this.ratioStr !== 'original',
+      value52 = (event8) => {
+        const event9 = this._pointerState;
+        if (!event9 || event8.pointerId !== event9.pointerId) return;
+        event8.preventDefault();
+        const value54 = event9.zoom || this._view?.viewport?.zoom || 1,
+          value55 = (event8.clientX - event9.startX) / value54,
+          value56 = (event8.clientY - event9.startY) / value54,
+          box15 = this._getNodeWorldRect(),
+          handler6 = (value57, value58, value59) => Math.min(value59, Math.max(value58, value57));
+        if (event9.mode === 'drag') {
+          const w3 = event9.startRect.w,
+            h3 = event9.startRect.h;
+          let x7 = event9.startRect.x + value55,
+            y4 = event9.startRect.y + value56;
+          ((x7 = handler6(x7, box15.x + box15.w - w3, box15.x)),
+            (y4 = handler6(y4, box15.y + box15.h - h3, box15.y)),
+            (this.frameRect = { x: x7, y: y4, w: w3, h: h3 }),
             this._updateView(this._view));
           return;
         }
-        const _0x59ce4d = _0x256dc5.handle,
-          _0x5c9a78 = Math.max(_0x3c4d1a.w, 24),
-          _0x165954 = Math.max(_0x3c4d1a.h, 24),
-          _0x5f9250 = (_0x6011d3) => {
-            const _0x170d7b = { ..._0x6011d3 },
-              _0x5eb22c = _0x3c4d1a.x + _0x3c4d1a.w - _0x170d7b.w,
-              _0x550a68 = _0x3c4d1a.x,
-              _0x18edff = _0x3c4d1a.y + _0x3c4d1a.h - _0x170d7b.h,
-              _0x38ae15 = _0x3c4d1a.y;
+        const value60 = event9.handle,
+          value61 = Math.max(box15.w, 24),
+          value62 = Math.max(box15.h, 24),
+          handler7 = (args) => {
+            const box16 = { ...args },
+              value63 = box15.x + box15.w - box16.w,
+              value64 = box15.x,
+              value65 = box15.y + box15.h - box16.h,
+              value66 = box15.y;
             return (
-              (_0x170d7b.x = _0x13fd13(_0x170d7b.x, _0x5eb22c, _0x550a68)),
-              (_0x170d7b.y = _0x13fd13(_0x170d7b.y, _0x18edff, _0x38ae15)),
-              _0x170d7b
+              (box16.x = handler6(box16.x, value63, value64)),
+              (box16.y = handler6(box16.y, value65, value66)),
+              box16
             );
           },
-          _0x591cc7 = (_0x27c11d, _0x47ecd4) => {
-            const _0x12e9e8 = { ..._0x27c11d };
-            if (_0x12e9e8.w < _0x5c9a78) _0x12e9e8.w = _0x5c9a78;
-            if (_0x12e9e8.h < _0x165954) _0x12e9e8.h = _0x165954;
-            if (_0x47ecd4 === 'tl')
-              ((_0x12e9e8.x = _0x256dc5.startRect.x + _0x256dc5.startRect.w - _0x12e9e8.w),
-                (_0x12e9e8.y = _0x256dc5.startRect.y + _0x256dc5.startRect.h - _0x12e9e8.h));
+          handler8 = (args2, value67) => {
+            const box17 = { ...args2 };
+            if (box17.w < value61) box17.w = value61;
+            if (box17.h < value62) box17.h = value62;
+            if (value67 === 'tl')
+              ((box17.x = event9.startRect.x + event9.startRect.w - box17.w),
+                (box17.y = event9.startRect.y + event9.startRect.h - box17.h));
             else {
-              if (_0x47ecd4 === 'tr')
-                ((_0x12e9e8.x = _0x256dc5.startRect.x),
-                  (_0x12e9e8.y = _0x256dc5.startRect.y + _0x256dc5.startRect.h - _0x12e9e8.h));
+              if (value67 === 'tr')
+                ((box17.x = event9.startRect.x),
+                  (box17.y = event9.startRect.y + event9.startRect.h - box17.h));
               else {
-                if (_0x47ecd4 === 'bl')
-                  ((_0x12e9e8.x = _0x256dc5.startRect.x + _0x256dc5.startRect.w - _0x12e9e8.w),
-                    (_0x12e9e8.y = _0x256dc5.startRect.y));
+                if (value67 === 'bl')
+                  ((box17.x = event9.startRect.x + event9.startRect.w - box17.w),
+                    (box17.y = event9.startRect.y));
                 else {
-                  if (_0x47ecd4 === 'br')
-                    ((_0x12e9e8.x = _0x256dc5.startRect.x), (_0x12e9e8.y = _0x256dc5.startRect.y));
+                  if (value67 === 'br') ((box17.x = event9.startRect.x), (box17.y = event9.startRect.y));
                   else {
-                    if (_0x47ecd4 === 'lm')
-                      ((_0x12e9e8.x = _0x256dc5.startRect.x + _0x256dc5.startRect.w - _0x12e9e8.w),
-                        (_0x12e9e8.y = _0x256dc5.startRect.y));
+                    if (value67 === 'lm')
+                      ((box17.x = event9.startRect.x + event9.startRect.w - box17.w),
+                        (box17.y = event9.startRect.y));
                     else {
-                      if (_0x47ecd4 === 'rm')
-                        ((_0x12e9e8.x = _0x256dc5.startRect.x), (_0x12e9e8.y = _0x256dc5.startRect.y));
+                      if (value67 === 'rm') ((box17.x = event9.startRect.x), (box17.y = event9.startRect.y));
                       else {
-                        if (_0x47ecd4 === 'tm')
-                          ((_0x12e9e8.x = _0x256dc5.startRect.x),
-                            (_0x12e9e8.y = _0x256dc5.startRect.y + _0x256dc5.startRect.h - _0x12e9e8.h));
+                        if (value67 === 'tm')
+                          ((box17.x = event9.startRect.x),
+                            (box17.y = event9.startRect.y + event9.startRect.h - box17.h));
                         else
-                          _0x47ecd4 === 'bm' &&
-                            ((_0x12e9e8.x = _0x256dc5.startRect.x), (_0x12e9e8.y = _0x256dc5.startRect.y));
+                          value67 === 'bm' &&
+                            ((box17.x = event9.startRect.x), (box17.y = event9.startRect.y));
                       }
                     }
                   }
                 }
               }
             }
-            return _0x12e9e8;
+            return box17;
           };
-        if (!_0x561092()) {
-          let _0x561309 = { ..._0x256dc5.startRect };
-          if (_0x59ce4d === 'tl')
-            ((_0x561309.x = _0x256dc5.startRect.x + _0x1a7f0b),
-              (_0x561309.y = _0x256dc5.startRect.y + _0x357ab7),
-              (_0x561309.w = _0x256dc5.startRect.w - _0x1a7f0b),
-              (_0x561309.h = _0x256dc5.startRect.h - _0x357ab7),
-              (_0x561309 = _0x591cc7(_0x561309, 'tl')));
+        if (!handler5()) {
+          let box18 = { ...event9.startRect };
+          if (value60 === 'tl')
+            ((box18.x = event9.startRect.x + value55),
+              (box18.y = event9.startRect.y + value56),
+              (box18.w = event9.startRect.w - value55),
+              (box18.h = event9.startRect.h - value56),
+              (box18 = handler8(box18, 'tl')));
           else {
-            if (_0x59ce4d === 'tr')
-              ((_0x561309.y = _0x256dc5.startRect.y + _0x357ab7),
-                (_0x561309.w = _0x256dc5.startRect.w + _0x1a7f0b),
-                (_0x561309.h = _0x256dc5.startRect.h - _0x357ab7),
-                (_0x561309 = _0x591cc7(_0x561309, 'tr')));
+            if (value60 === 'tr')
+              ((box18.y = event9.startRect.y + value56),
+                (box18.w = event9.startRect.w + value55),
+                (box18.h = event9.startRect.h - value56),
+                (box18 = handler8(box18, 'tr')));
             else {
-              if (_0x59ce4d === 'bl')
-                ((_0x561309.x = _0x256dc5.startRect.x + _0x1a7f0b),
-                  (_0x561309.w = _0x256dc5.startRect.w - _0x1a7f0b),
-                  (_0x561309.h = _0x256dc5.startRect.h + _0x357ab7),
-                  (_0x561309 = _0x591cc7(_0x561309, 'bl')));
+              if (value60 === 'bl')
+                ((box18.x = event9.startRect.x + value55),
+                  (box18.w = event9.startRect.w - value55),
+                  (box18.h = event9.startRect.h + value56),
+                  (box18 = handler8(box18, 'bl')));
               else {
-                if (_0x59ce4d === 'br')
-                  ((_0x561309.w = _0x256dc5.startRect.w + _0x1a7f0b),
-                    (_0x561309.h = _0x256dc5.startRect.h + _0x357ab7),
-                    (_0x561309 = _0x591cc7(_0x561309, 'br')));
+                if (value60 === 'br')
+                  ((box18.w = event9.startRect.w + value55),
+                    (box18.h = event9.startRect.h + value56),
+                    (box18 = handler8(box18, 'br')));
                 else {
-                  if (_0x59ce4d === 'tm')
-                    ((_0x561309.y = _0x256dc5.startRect.y + _0x357ab7),
-                      (_0x561309.h = _0x256dc5.startRect.h - _0x357ab7),
-                      (_0x561309 = _0x591cc7(_0x561309, 'tm')));
+                  if (value60 === 'tm')
+                    ((box18.y = event9.startRect.y + value56),
+                      (box18.h = event9.startRect.h - value56),
+                      (box18 = handler8(box18, 'tm')));
                   else {
-                    if (_0x59ce4d === 'bm')
-                      ((_0x561309.h = _0x256dc5.startRect.h + _0x357ab7),
-                        (_0x561309 = _0x591cc7(_0x561309, 'bm')));
+                    if (value60 === 'bm')
+                      ((box18.h = event9.startRect.h + value56), (box18 = handler8(box18, 'bm')));
                     else {
-                      if (_0x59ce4d === 'lm')
-                        ((_0x561309.x = _0x256dc5.startRect.x + _0x1a7f0b),
-                          (_0x561309.w = _0x256dc5.startRect.w - _0x1a7f0b),
-                          (_0x561309 = _0x591cc7(_0x561309, 'lm')));
+                      if (value60 === 'lm')
+                        ((box18.x = event9.startRect.x + value55),
+                          (box18.w = event9.startRect.w - value55),
+                          (box18 = handler8(box18, 'lm')));
                       else
-                        _0x59ce4d === 'rm' &&
-                          ((_0x561309.w = _0x256dc5.startRect.w + _0x1a7f0b),
-                          (_0x561309 = _0x591cc7(_0x561309, 'rm')));
+                        value60 === 'rm' &&
+                          ((box18.w = event9.startRect.w + value55), (box18 = handler8(box18, 'rm')));
                     }
                   }
                 }
               }
             }
           }
-          ((this.frameRect = _0x5f9250(_0x561309)), this._updateView(this._view));
+          ((this.frameRect = handler7(box18)), this._updateView(this._view));
           return;
         }
-        const _0x5dcf32 = this._parseRatio(),
-          _0x14c551 = _0x256dc5.startRect.x + _0x256dc5.startRect.w / 2,
-          _0x4c179d = _0x256dc5.startRect.y + _0x256dc5.startRect.h / 2;
-        let _0x8dbfdb = { ..._0x256dc5.startRect };
-        if (_0x59ce4d === 'lm' || _0x59ce4d === 'rm') {
-          let _0x150418 = _0x256dc5.startRect.w + (_0x59ce4d === 'rm' ? _0x1a7f0b : -_0x1a7f0b);
-          _0x150418 = Math.max(_0x150418, _0x5c9a78);
-          let _0x315fff = _0x150418 / _0x5dcf32;
-          (_0x315fff < _0x165954 && ((_0x315fff = _0x165954), (_0x150418 = _0x315fff * _0x5dcf32)),
-            (_0x8dbfdb.w = _0x150418),
-            (_0x8dbfdb.h = _0x315fff),
-            (_0x8dbfdb.x =
-              _0x59ce4d === 'rm'
-                ? _0x256dc5.startRect.x
-                : _0x256dc5.startRect.x + _0x256dc5.startRect.w - _0x8dbfdb.w),
-            (_0x8dbfdb.y = _0x4c179d - _0x8dbfdb.h / 2));
+        const value68 = this._parseRatio(),
+          value69 = event9.startRect.x + event9.startRect.w / 2,
+          value70 = event9.startRect.y + event9.startRect.h / 2;
+        let box19 = { ...event9.startRect };
+        if (value60 === 'lm' || value60 === 'rm') {
+          let value71 = event9.startRect.w + (value60 === 'rm' ? value55 : -value55);
+          value71 = Math.max(value71, value61);
+          let value72 = value71 / value68;
+          (value72 < value62 && ((value72 = value62), (value71 = value72 * value68)),
+            (box19.w = value71),
+            (box19.h = value72),
+            (box19.x =
+              value60 === 'rm' ? event9.startRect.x : event9.startRect.x + event9.startRect.w - box19.w),
+            (box19.y = value70 - box19.h / 2));
         } else {
-          if (_0x59ce4d === 'tm' || _0x59ce4d === 'bm') {
-            let _0xc9d31e = _0x256dc5.startRect.h + (_0x59ce4d === 'bm' ? _0x357ab7 : -_0x357ab7);
-            _0xc9d31e = Math.max(_0xc9d31e, _0x165954);
-            let _0x5dfacc = _0xc9d31e * _0x5dcf32;
-            (_0x5dfacc < _0x5c9a78 && ((_0x5dfacc = _0x5c9a78), (_0xc9d31e = _0x5dfacc / _0x5dcf32)),
-              (_0x8dbfdb.w = _0x5dfacc),
-              (_0x8dbfdb.h = _0xc9d31e),
-              (_0x8dbfdb.y =
-                _0x59ce4d === 'bm'
-                  ? _0x256dc5.startRect.y
-                  : _0x256dc5.startRect.y + _0x256dc5.startRect.h - _0x8dbfdb.h),
-              (_0x8dbfdb.x = _0x14c551 - _0x8dbfdb.w / 2));
+          if (value60 === 'tm' || value60 === 'bm') {
+            let value73 = event9.startRect.h + (value60 === 'bm' ? value56 : -value56);
+            value73 = Math.max(value73, value62);
+            let value74 = value73 * value68;
+            (value74 < value61 && ((value74 = value61), (value73 = value74 / value68)),
+              (box19.w = value74),
+              (box19.h = value73),
+              (box19.y =
+                value60 === 'bm' ? event9.startRect.y : event9.startRect.y + event9.startRect.h - box19.h),
+              (box19.x = value69 - box19.w / 2));
           } else {
-            const _0x1fbf7a = _0x59ce4d === 'tr' || _0x59ce4d === 'br' ? 1 : -1,
-              _0x286d90 = _0x59ce4d === 'bl' || _0x59ce4d === 'br' ? 1 : -1;
-            let _0x2972e7 = _0x256dc5.startRect.w + _0x1a7f0b * _0x1fbf7a,
-              _0x489bbc = _0x256dc5.startRect.h + _0x357ab7 * _0x286d90;
-            ((_0x2972e7 = Math.max(_0x2972e7, 1)), (_0x489bbc = Math.max(_0x489bbc, 1)));
-            _0x2972e7 / _0x489bbc > _0x5dcf32
-              ? (_0x489bbc = _0x2972e7 / _0x5dcf32)
-              : (_0x2972e7 = _0x489bbc * _0x5dcf32);
-            _0x2972e7 < _0x5c9a78 && ((_0x2972e7 = _0x5c9a78), (_0x489bbc = _0x2972e7 / _0x5dcf32));
-            _0x489bbc < _0x165954 && ((_0x489bbc = _0x165954), (_0x2972e7 = _0x489bbc * _0x5dcf32));
-            ((_0x8dbfdb.w = _0x2972e7), (_0x8dbfdb.h = _0x489bbc));
-            if (_0x59ce4d === 'br')
-              ((_0x8dbfdb.x = _0x256dc5.startRect.x), (_0x8dbfdb.y = _0x256dc5.startRect.y));
+            const value75 = value60 === 'tr' || value60 === 'br' ? 1 : -1,
+              value76 = value60 === 'bl' || value60 === 'br' ? 1 : -1;
+            let value77 = event9.startRect.w + value55 * value75,
+              value78 = event9.startRect.h + value56 * value76;
+            ((value77 = Math.max(value77, 1)), (value78 = Math.max(value78, 1)));
+            value77 / value78 > value68 ? (value78 = value77 / value68) : (value77 = value78 * value68);
+            value77 < value61 && ((value77 = value61), (value78 = value77 / value68));
+            value78 < value62 && ((value78 = value62), (value77 = value78 * value68));
+            ((box19.w = value77), (box19.h = value78));
+            if (value60 === 'br') ((box19.x = event9.startRect.x), (box19.y = event9.startRect.y));
             else {
-              if (_0x59ce4d === 'bl')
-                ((_0x8dbfdb.x = _0x256dc5.startRect.x + _0x256dc5.startRect.w - _0x8dbfdb.w),
-                  (_0x8dbfdb.y = _0x256dc5.startRect.y));
+              if (value60 === 'bl')
+                ((box19.x = event9.startRect.x + event9.startRect.w - box19.w),
+                  (box19.y = event9.startRect.y));
               else
-                _0x59ce4d === 'tr'
-                  ? ((_0x8dbfdb.x = _0x256dc5.startRect.x),
-                    (_0x8dbfdb.y = _0x256dc5.startRect.y + _0x256dc5.startRect.h - _0x8dbfdb.h))
-                  : ((_0x8dbfdb.x = _0x256dc5.startRect.x + _0x256dc5.startRect.w - _0x8dbfdb.w),
-                    (_0x8dbfdb.y = _0x256dc5.startRect.y + _0x256dc5.startRect.h - _0x8dbfdb.h));
+                value60 === 'tr'
+                  ? ((box19.x = event9.startRect.x),
+                    (box19.y = event9.startRect.y + event9.startRect.h - box19.h))
+                  : ((box19.x = event9.startRect.x + event9.startRect.w - box19.w),
+                    (box19.y = event9.startRect.y + event9.startRect.h - box19.h));
             }
           }
         }
-        ((this.frameRect = _0x5f9250(_0x8dbfdb)), this._updateView(this._view));
+        ((this.frameRect = handler7(box19)), this._updateView(this._view));
       },
-      _0x9d796 = (_0x24379c) => {
-        const _0x462b85 = this._pointerState;
-        if (!_0x462b85 || _0x24379c.pointerId !== _0x462b85.pointerId) return;
-        (_0x24379c.preventDefault(), _0x5358a7());
+      value53 = (event10) => {
+        const event11 = this._pointerState;
+        if (!event11 || event10.pointerId !== event11.pointerId) return;
+        (event10.preventDefault(), run3());
       },
-      _0x19d227 = (_0x3954db) => {
-        if (_0x3954db.button !== 0) return;
-        (_0x3954db.stopPropagation(), _0x3954db.preventDefault());
+      value79 = (pointerId) => {
+        if (pointerId.button !== 0) return;
+        (pointerId.stopPropagation(), pointerId.preventDefault());
         if (!this.frameRect) this.frameRect = this._calcFrameWorldRect();
         this.frameRect = this._clampFrameRect(this.frameRect);
-        const _0xddb536 = _0x3954db.target.closest('.v2-expand-handle'),
-          _0x56eacd = _0xddb536?.dataset?.handle || null,
-          _0x582f72 = _0x56eacd ? 'resize' : 'drag';
+        const el18 = pointerId.target.closest('.v2-expand-handle'),
+          handle2 = el18?.dataset?.handle || null,
+          mode = handle2 ? 'resize' : 'drag';
         ((this._pointerState = {
-          pointerId: _0x3954db.pointerId,
-          mode: _0x582f72,
-          handle: _0x56eacd,
-          startX: _0x3954db.clientX,
-          startY: _0x3954db.clientY,
+          pointerId: pointerId.pointerId,
+          mode: mode,
+          handle: handle2,
+          startX: pointerId.clientX,
+          startY: pointerId.clientY,
           startRect: { ...this.frameRect },
           zoom: this._view?.viewport?.zoom || 1,
         }),
-          this.frameEl.setPointerCapture?.(_0x3954db.pointerId),
-          window.addEventListener('pointermove', _0x10fd49, true),
-          window.addEventListener('pointerup', _0x9d796, true),
-          window.addEventListener('pointercancel', _0x9d796, true));
+          this.frameEl.setPointerCapture?.(pointerId.pointerId),
+          window.addEventListener('pointermove', value52, true),
+          window.addEventListener('pointerup', value53, true),
+          window.addEventListener('pointercancel', value53, true));
       };
-    (this.frameEl.addEventListener('pointerdown', _0x19d227),
+    (this.frameEl.addEventListener('pointerdown', value79),
       (this.cleanup = () => {
-        (_0x5358a7(),
-          window.removeEventListener('resize', _0x4ed72b),
-          window.removeEventListener('keydown', _0x4ad0df),
-          document.removeEventListener('pointerdown', _0x4b134f, true),
-          this.overlayEl?.removeEventListener('wheel', _0x5a6b5b),
-          this.frameEl?.removeEventListener('pointerdown', _0x19d227));
+        (run3(),
+          window.removeEventListener('resize', value34),
+          window.removeEventListener('keydown', value35),
+          document.removeEventListener('pointerdown', value51, true),
+          this.overlayEl?.removeEventListener('wheel', value36),
+          this.frameEl?.removeEventListener('pointerdown', value79));
       }));
   },
   exit() {

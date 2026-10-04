@@ -63,245 +63,253 @@ import {
 } from '../../modules/dreaminaVideoModelHelper.js';
 import { bindModelCredentialMenu, syncModelCredentialMenu } from '../../modules/modelCredentialUi.js';
 import { buildModelProviderProfileSelectionPatch } from '../../modules/modelProviderProfileSelection.js';
-function escapeHtml(_0x505f65) {
-  return String(_0x505f65 ?? '')
+function escapeHtml(value) {
+  return String(value ?? '')
     ['replace'](/&/g, '&amp;')
     ['replace'](/</g, '&lt;')
     ['replace'](/>/g, '&gt;')
     ['replace'](/"/g, '&quot;')
     ['replace'](/'/g, '&#39;');
 }
-function getPlainObject(_0x45dc73) {
-  return _0x45dc73 && typeof _0x45dc73 === 'object' && !Array['isArray'](_0x45dc73) ? { ..._0x45dc73 } : {};
+function getPlainObject(args) {
+  return args && typeof args === 'object' && !Array['isArray'](args) ? { ...args } : {};
 }
-function normalizeAllowedModelIds(_0xe6460f = []) {
+function normalizeAllowedModelIds(list = []) {
   return [
     ...new Set(
-      (Array['isArray'](_0xe6460f) ? _0xe6460f : [])
-        ['map']((_0x346b4f) => String(_0x346b4f || '')['trim']())
-        ['filter'](Boolean),
+      (Array['isArray'](list) ? list : [])['map']((item) => String(item || '')['trim']())['filter'](Boolean),
     ),
   ];
 }
-function resolveAllowedModelId(_0x3f4980, _0x570647 = []) {
-  const _0x343318 = String(_0x3f4980 || '')['trim']();
-  return _0x570647['length'] && !_0x570647['includes'](_0x343318) ? _0x570647[0x0] : _0x343318;
+function resolveAllowedModelId(key, list2 = []) {
+  const index = String(key || '')['trim']();
+  return list2['length'] && !list2['includes'](index) ? list2[0x0] : index;
 }
-function resolveRunningHubWorkflowAllowedModelId(_0x2d0954, _0x185ea2 = []) {
-  const _0x1435c7 = String(_0x2d0954 || '')['trim'](),
-    _0x11be61 = getModelManifest(_0x1435c7);
-  return _0x185ea2['length'] &&
-    _0x11be61?.['provider'] === 'runninghubwf' &&
-    _0x11be61?.['adapterType'] === 'workflow' &&
-    !_0x185ea2['includes'](_0x1435c7)
-    ? _0x185ea2[0x0]
-    : _0x1435c7;
+function resolveRunningHubWorkflowAllowedModelId(result, list3 = []) {
+  const data = String(result || '')['trim'](),
+    modelManifest = getModelManifest(data);
+  return list3['length'] &&
+    modelManifest?.['provider'] === 'runninghubwf' &&
+    modelManifest?.['adapterType'] === 'workflow' &&
+    !list3['includes'](data)
+    ? list3[0x0]
+    : data;
 }
 const DEFAULT_VIDEO_FOOTER_PLACEMENT_ORDER = Object['freeze'](['resolution', 'mode']);
-function normalizeReferenceCounts(_0x278e13 = {}) {
+function normalizeReferenceCounts(options = {}) {
   return {
-    imageCount: Math['max'](0x0, Number(_0x278e13?.['imageCount']) || 0x0),
-    videoCount: Math['max'](0x0, Number(_0x278e13?.['videoCount']) || 0x0),
-    audioCount: Math['max'](0x0, Number(_0x278e13?.['audioCount']) || 0x0),
+    imageCount: Math['max'](0x0, Number(options?.['imageCount']) || 0x0),
+    videoCount: Math['max'](0x0, Number(options?.['videoCount']) || 0x0),
+    audioCount: Math['max'](0x0, Number(options?.['audioCount']) || 0x0),
   };
 }
-function wrapSchemaPlacement(_0x1521f8, _0x37cd6b) {
-  return _0x37cd6b ? '<div class="ui-schema-placement ' + _0x1521f8 + '\x22>' + _0x37cd6b + '</div>' : '';
+function wrapSchemaPlacement(target, source) {
+  return source ? '<div class="ui-schema-placement ' + target + '\x22>' + source + '</div>' : '';
 }
-function renderVideoAdvancedControlsMarkup(_0x5c34d7) {
-  if (!_0x5c34d7) return '';
-  const _0x1ec200 = escapeHtml(t('videoNode.parameterPanel.advancedSettings'));
+function renderVideoAdvancedControlsMarkup(enabled) {
+  if (!enabled) return '';
+  const escapeHtml2 = escapeHtml(t('videoNode.parameterPanel.advancedSettings'));
   return (
     '<div class="rh-adv-wrap"><button type="button" class="img-pill-btn rh-adv2-btn advanced-settings-icon-button" data-tooltip="' +
-    _0x1ec200 +
+    escapeHtml2 +
     '" aria-label="' +
-    _0x1ec200 +
+    escapeHtml2 +
     '" aria-expanded="false">' +
     ADVANCED_SETTINGS_TUNE_ICON_MARKUP +
     '</button></div>\x0a\x20\x20\x20\x20<div\x20class=\x22rh-vram-adv-panel\x22>' +
-    _0x5c34d7 +
+    enabled +
     '</div>'
   );
 }
-function getDreaminaProviderLabel(_0x4feb61) {
-  const _0x59ea99 = String(_0x4feb61 || '')
+function getDreaminaProviderLabel(next) {
+  const current = String(next || '')
     ['trim']()
     ['toLowerCase']();
-  if (_0x59ea99 === 'dreamina') return t('videoNode.parameterPanel.providers.dreamina');
-  if (_0x59ea99 === 'volcengine') return t('videoNode.parameterPanel.providers.volcengine');
+  if (current === 'dreamina') return t('videoNode.parameterPanel.providers.dreamina');
+  if (current === 'volcengine') return t('videoNode.parameterPanel.providers.volcengine');
   return t('videoNode.parameterPanel.providers.default');
 }
-function resolveDreaminaSelectorLayout(_0x184467, _0x2a941e) {
-  const _0xa361bf = getDreaminaEffectiveNodeData(_0x184467),
-    _0x3d10f7 = resolveDreaminaStyleVideoProvider(_0xa361bf['model'], _0xa361bf['provider']),
-    _0x29b748 = normalizeDreaminaVideoRouteMode(_0xa361bf['dreaminaRouteMode'], _0xa361bf['mode']),
-    _0x1e528c = resolveDreaminaVideoTaskType({
-      routeMode: _0x29b748,
-      ...normalizeReferenceCounts(_0x2a941e),
+function resolveDreaminaSelectorLayout(entry, record) {
+  const args2 = getDreaminaEffectiveNodeData(entry),
+    provider2 = resolveDreaminaStyleVideoProvider(args2['model'], args2['provider']),
+    routeMode = normalizeDreaminaVideoRouteMode(args2['dreaminaRouteMode'], args2['mode']),
+    taskType = resolveDreaminaVideoTaskType({
+      routeMode: routeMode,
+      ...normalizeReferenceCounts(record),
     }),
-    _0x5eb56e = ensureDreaminaStyleVideoModelForTask(_0x1e528c, _0xa361bf['model'], _0x3d10f7),
-    _0x3b8270 = normalizeDreaminaStyleVideoResolution(
-      _0x1e528c,
-      _0x5eb56e,
-      _0xa361bf['resolution'] || _0xa361bf['videoSize'],
-      _0x3d10f7,
+    model = ensureDreaminaStyleVideoModelForTask(taskType, args2['model'], provider2),
+    resolution = normalizeDreaminaStyleVideoResolution(
+      taskType,
+      model,
+      args2['resolution'] || args2['videoSize'],
+      provider2,
     ),
-    _0x350836 = normalizeDreaminaVideoAspectRatio(_0xa361bf['aspectRatio'], { preserveAdaptive: !![] }),
-    _0x225848 = normalizeDreaminaStyleVideoDuration(_0x1e528c, _0x5eb56e, _0xa361bf['duration'], _0x3d10f7),
-    _0x9327c0 = {
-      ...getPlainObject(_0xa361bf['generationParams']),
-      dreaminaRouteMode: _0x29b748,
-      aspectRatio: _0x350836,
-      duration: _0x225848,
-      ...(_0x3b8270 ? { resolution: _0x3b8270 } : {}),
+    aspectRatio = normalizeDreaminaVideoAspectRatio(args2['aspectRatio'], { preserveAdaptive: !![] }),
+    duration = normalizeDreaminaStyleVideoDuration(taskType, model, args2['duration'], provider2),
+    generationParams2 = {
+      ...getPlainObject(args2['generationParams']),
+      dreaminaRouteMode: routeMode,
+      aspectRatio: aspectRatio,
+      duration: duration,
+      ...(resolution ? { resolution: resolution } : {}),
     },
-    _0x32ee01 = {
-      ..._0xa361bf,
-      model: _0x5eb56e,
-      provider: _0x3d10f7,
-      dreaminaRouteMode: _0x29b748,
-      aspectRatio: _0x350836,
-      duration: _0x225848,
-      ...(_0x3b8270 ? { resolution: _0x3b8270, videoSize: _0x3b8270 } : {}),
-      generationParams: _0x9327c0,
+    nodeData = {
+      ...args2,
+      model: model,
+      provider: provider2,
+      dreaminaRouteMode: routeMode,
+      aspectRatio: aspectRatio,
+      duration: duration,
+      ...(resolution ? { resolution: resolution, videoSize: resolution } : {}),
+      generationParams: generationParams2,
     },
-    _0x505edf = getDreaminaVideoTaskParamVisibility(_0x1e528c),
-    _0x28f93b = buildDreaminaParamSchemaFields({
-      routeMode: _0x29b748,
-      currentRatio: _0x350836,
-      currentResolution: _0x3b8270,
-      currentDuration: _0x225848,
-      durationRange: getDreaminaStyleVideoDurationRange(_0x1e528c, _0x5eb56e, _0x3d10f7),
-      resolutionOptions: getDreaminaStyleVideoResolutionOptions(_0x1e528c, _0x5eb56e, _0x3d10f7),
+    dreaminaVideoTaskParamVisibility = getDreaminaVideoTaskParamVisibility(taskType),
+    dreaminaParamSchemaFields = buildDreaminaParamSchemaFields({
+      routeMode: routeMode,
+      currentRatio: aspectRatio,
+      currentResolution: resolution,
+      currentDuration: duration,
+      durationRange: getDreaminaStyleVideoDurationRange(taskType, model, provider2),
+      resolutionOptions: getDreaminaStyleVideoResolutionOptions(taskType, model, provider2),
     }),
-    _0x187ee8 = (_0x459b64, _0x28a239 = {}) =>
-      renderUiSchemaFields(_0x459b64['filter'](Boolean), _0x32ee01, {
+    handler = (list4, args3 = {}) =>
+      renderUiSchemaFields(list4['filter'](Boolean), nodeData, {
         sourceId: 'dreamina-video-normal-params',
-        ..._0x28a239,
+        ...args3,
       }),
-    _0x3badf0 = getDreaminaTaskModelMenuMeta(_0x5eb56e, _0x3d10f7),
-    _0x3c265c =
+    dreaminaTaskModelMenuMeta = getDreaminaTaskModelMenuMeta(model, provider2),
+    payload =
       '<div class="dreamina-task-model-wrap">\n    <button type="button" class="img-pill-btn dreamina-task-model-btn">\n      <span class="dreamina-task-model-label">' +
-      escapeHtml(_0x3badf0?.['title'] || getDisplayModelName(_0x5eb56e)) +
+      escapeHtml(dreaminaTaskModelMenuMeta?.['title'] || getDisplayModelName(model)) +
       '</span>\n    </button>\n    <div class="floating-menu dreamina-task-model-menu">' +
-      buildDreaminaTaskModelMenuHtml(_0x5eb56e, _0x1e528c, _0x3d10f7) +
+      buildDreaminaTaskModelMenuHtml(model, taskType, provider2) +
       '</div>\x0a\x20\x20</div>',
-    _0x383ada = [
-      _0x3c265c,
-      _0x505edf['mode']
+    controlsHtml = [
+      payload,
+      dreaminaVideoTaskParamVisibility['mode']
         ? wrapSchemaPlacement(
             'ui-schema-mode-slot\x20dreamina-video-mode-schema',
-            _0x187ee8([_0x28f93b['mode']]),
+            handler([dreaminaParamSchemaFields['mode']]),
           )
         : '',
-      _0x505edf['ratio']
+      dreaminaVideoTaskParamVisibility['ratio']
         ? wrapSchemaPlacement(
             'ui-schema-resolution-slot dreamina-video-ratio-schema',
-            _0x187ee8([_0x28f93b['resolution'], _0x28f93b['aspectRatio']], { placement: 'resolution' }),
+            handler([dreaminaParamSchemaFields['resolution'], dreaminaParamSchemaFields['aspectRatio']], {
+              placement: 'resolution',
+            }),
           )
         : '',
-      _0x505edf['duration']
+      dreaminaVideoTaskParamVisibility['duration']
         ? wrapSchemaPlacement(
             'ui-schema-duration-slot dreamina-video-duration-schema',
-            _0x187ee8([_0x28f93b['duration']]),
+            handler([dreaminaParamSchemaFields['duration']]),
           )
         : '',
     ]['join']('');
   return {
     kind: 'dreamina',
-    model: _0x5eb56e,
-    provider: _0x3d10f7,
-    modelLabel: getDreaminaProviderLabel(_0x3d10f7),
-    nodeData: _0x32ee01,
-    taskType: _0x1e528c,
-    controlsHtml: _0x383ada,
+    model: model,
+    provider: provider2,
+    modelLabel: getDreaminaProviderLabel(provider2),
+    nodeData: nodeData,
+    taskType: taskType,
+    controlsHtml: controlsHtml,
     advanced: '',
   };
 }
 export function resolveVideoSelectorSchemaLayout(
-  _0x26bad0,
-  _0x217267 = {},
+  handle,
+  args4 = {},
   { referenceCounts: referenceCounts = {} } = {},
 ) {
-  const _0xdd7c10 = String(_0x26bad0 || _0x217267?.['model'] || '')['trim'](),
-    _0x11d2dc = resolveModelProvider(_0xdd7c10, _0x217267?.['provider'] || ''),
-    _0x4ad0b2 = { ..._0x217267, model: _0xdd7c10, provider: _0x11d2dc };
-  if (isDreaminaStyleVideoModel(_0xdd7c10, _0x11d2dc))
-    return resolveDreaminaSelectorLayout(_0x4ad0b2, referenceCounts);
-  const _0x14de16 =
-      resolveModelExecution(_0xdd7c10, { providerHint: _0x11d2dc }) || resolveModelExecution(_0xdd7c10),
-    _0x5502fd = _0x14de16?.['modelManifest'] || getModelManifest(_0xdd7c10),
-    _0x35cf87 = String(_0x14de16?.['canonicalModelId'] || _0x5502fd?.['modelId'] || _0xdd7c10)['trim'](),
-    _0x466530 = isRunningHubVideoWorkflowManifest(_0x35cf87);
-  let _0x83aca4 = { ..._0x4ad0b2, model: _0x35cf87 };
-  if (_0x466530) {
-    const _0x5a9fe2 = buildVideoWorkflowReferenceSummaryParamsPatch(_0x83aca4, _0x35cf87, referenceCounts),
-      _0x6ac523 = buildVideoWorkflowGenerationParamsPatch(_0x83aca4, _0x35cf87, _0x5a9fe2);
-    _0x83aca4 = {
-      ..._0x83aca4,
-      ..._0x6ac523,
-      ...buildVideoWorkflowDisplayParamsPatch(_0x35cf87, _0x6ac523['generationParams'], {
+  const model2 = String(handle || args4?.['model'] || '')['trim'](),
+    provider3 = resolveModelProvider(model2, args4?.['provider'] || ''),
+    args5 = { ...args4, model: model2, provider: provider3 };
+  if (isDreaminaStyleVideoModel(model2, provider3))
+    return resolveDreaminaSelectorLayout(args5, referenceCounts);
+  const modelExecution =
+      resolveModelExecution(model2, { providerHint: provider3 }) || resolveModelExecution(model2),
+    state = modelExecution?.['modelManifest'] || getModelManifest(model2),
+    model3 = String(modelExecution?.['canonicalModelId'] || state?.['modelId'] || model2)['trim'](),
+    kind = isRunningHubVideoWorkflowManifest(model3);
+  let fallbackNodeData = { ...args5, model: model3 };
+  if (kind) {
+    const videoWorkflowReferenceSummaryParamsPatch = buildVideoWorkflowReferenceSummaryParamsPatch(
+        fallbackNodeData,
+        model3,
+        referenceCounts,
+      ),
+      args6 = buildVideoWorkflowGenerationParamsPatch(
+        fallbackNodeData,
+        model3,
+        videoWorkflowReferenceSummaryParamsPatch,
+      );
+    fallbackNodeData = {
+      ...fallbackNodeData,
+      ...args6,
+      ...buildVideoWorkflowDisplayParamsPatch(model3, args6['generationParams'], {
         v54FpsOptions: getRhV54FpsOptions(),
       }),
     };
   }
-  const _0xc857a = (_0xdce7a4, _0x28b39c = {}) =>
-      renderModelUiSchemaControls(_0x35cf87, _0x83aca4, { placement: _0xdce7a4, ..._0x28b39c }),
-    _0x42ee65 = [];
-  if (_0x466530) {
-    const _0x1b2e70 = (_0x115e47) =>
-      hasRunningHubVideoWorkflowUiPlacement(_0x35cf87, _0x115e47, { includeToolbarOnly: !![] });
-    (_0x1b2e70('mode') && _0x42ee65['push'](wrapSchemaPlacement('ui-schema-mode-slot', _0xc857a('mode'))),
-      _0x1b2e70('videoParams') &&
-        _0x42ee65['push'](
+  const run = (placement2, args7 = {}) =>
+      renderModelUiSchemaControls(model3, fallbackNodeData, { placement: placement2, ...args7 }),
+    controlsHtml2 = [];
+  if (kind) {
+    const run2 = (config) =>
+      hasRunningHubVideoWorkflowUiPlacement(model3, config, { includeToolbarOnly: !![] });
+    (run2('mode') && controlsHtml2['push'](wrapSchemaPlacement('ui-schema-mode-slot', run('mode'))),
+      run2('videoParams') &&
+        controlsHtml2['push'](
           wrapSchemaPlacement(
             'ui-schema-video-params-slot',
-            _0xc857a('videoParams', {
+            run('videoParams', {
               unwrap: !![],
-              rhVideoFpsOptions: getRunningHubVideoWorkflowFpsOptions(_0x35cf87, {
+              rhVideoFpsOptions: getRunningHubVideoWorkflowFpsOptions(model3, {
                 v54FpsOptions: getRhV54FpsOptions(),
               }),
             }),
           ),
         ),
-      _0x1b2e70('resolution') &&
-        _0x42ee65['push'](wrapSchemaPlacement('ui-schema-resolution-slot', _0xc857a('resolution'))),
-      _0x42ee65['push'](
-        wrapSchemaPlacement('ui-schema-instance-slot', _0xc857a('instance', { variant: 'instanceToggle' })),
+      run2('resolution') &&
+        controlsHtml2['push'](wrapSchemaPlacement('ui-schema-resolution-slot', run('resolution'))),
+      controlsHtml2['push'](
+        wrapSchemaPlacement('ui-schema-instance-slot', run('instance', { variant: 'instanceToggle' })),
       ));
   } else {
-    if (_0x5502fd?.['adapterType'] === 'modelApi' && _0x5502fd?.['kind'] === 'video') {
-      const _0x466470 = Array['isArray'](_0x5502fd?.['uiSchema']?.['footerPlacementOrder'])
-          ? _0x5502fd['uiSchema']['footerPlacementOrder']
+    if (state?.['adapterType'] === 'modelApi' && state?.['kind'] === 'video') {
+      const list5 = Array['isArray'](state?.['uiSchema']?.['footerPlacementOrder'])
+          ? state['uiSchema']['footerPlacementOrder']
           : [],
-        _0x2adec1 = [
-          ..._0x466470['filter']((_0x10393a) =>
-            DEFAULT_VIDEO_FOOTER_PLACEMENT_ORDER['includes'](String(_0x10393a || '')['trim']()),
+        list6 = [
+          ...list5['filter']((scope) =>
+            DEFAULT_VIDEO_FOOTER_PLACEMENT_ORDER['includes'](String(scope || '')['trim']()),
           ),
           ...DEFAULT_VIDEO_FOOTER_PLACEMENT_ORDER,
-        ]['filter']((_0x2989b5, _0x142294, _0x1db490) => _0x1db490['indexOf'](_0x2989b5) === _0x142294);
-      _0x2adec1['forEach']((_0x40a0c9) => {
-        _0x42ee65['push'](wrapSchemaPlacement('ui-schema-' + _0x40a0c9 + '-slot', _0xc857a(_0x40a0c9)));
+        ]['filter']((input, output, list7) => list7['indexOf'](input) === output);
+      list6['forEach']((value2) => {
+        controlsHtml2['push'](wrapSchemaPlacement('ui-schema-' + value2 + '-slot', run(value2)));
       });
     }
   }
-  const _0x3fde3a = resolveVideoAdvancedSchemaTarget(_0x83aca4, {
-      fallbackNodeData: _0x83aca4,
-      buildRunningHubNodeData: (_0x4a2e29) => _0x4a2e29,
+  const placement3 = resolveVideoAdvancedSchemaTarget(fallbackNodeData, {
+      fallbackNodeData: fallbackNodeData,
+      buildRunningHubNodeData: (value3) => value3,
     }),
-    _0xbe6553 = _0x3fde3a
-      ? renderModelUiSchemaControls(_0x3fde3a['modelId'], _0x3fde3a['nodeData'], {
-          placement: _0x3fde3a['placement'],
+    advanced = placement3
+      ? renderModelUiSchemaControls(placement3['modelId'], placement3['nodeData'], {
+          placement: placement3['placement'],
         })
       : '';
   return {
-    kind: _0x466530 ? 'workflow' : 'modelApi',
-    model: _0x35cf87,
-    provider: _0x11d2dc,
-    modelLabel: getDisplayModelName(_0x35cf87),
-    nodeData: _0x83aca4,
-    controlsHtml: _0x42ee65['join'](''),
-    advanced: _0xbe6553,
+    kind: kind ? 'workflow' : 'modelApi',
+    model: model3,
+    provider: provider3,
+    modelLabel: getDisplayModelName(model3),
+    nodeData: fallbackNodeData,
+    controlsHtml: controlsHtml2['join'](''),
+    advanced: advanced,
   };
 }
 export function renderAIGenVideoModelSelectorMarkup({
@@ -318,11 +326,14 @@ export function renderAIGenVideoModelSelectorMarkup({
   allowedModelIds: allowedModelIds = [],
   runningHubWorkflowAllowedModelIds: runningHubWorkflowAllowedModelIds = [],
 } = {}) {
-  const _0x54c156 = normalizeAllowedModelIds(allowedModelIds),
-    _0x26f7e1 = normalizeAllowedModelIds(runningHubWorkflowAllowedModelIds),
-    _0x1af6ac = resolveRunningHubWorkflowAllowedModelId(resolveAllowedModelId(modelId, _0x54c156), _0x26f7e1),
-    _0x12b79a = {
-      model: _0x1af6ac,
+  const allowedModelIds2 = normalizeAllowedModelIds(allowedModelIds),
+    runningHubWorkflowAllowedModelIds2 = normalizeAllowedModelIds(runningHubWorkflowAllowedModelIds),
+    model4 = resolveRunningHubWorkflowAllowedModelId(
+      resolveAllowedModelId(modelId, allowedModelIds2),
+      runningHubWorkflowAllowedModelIds2,
+    ),
+    value4 = {
+      model: model4,
       provider: provider,
       generationParams: getPlainObject(generationParams),
       generationParamsByModel: getPlainObject(generationParamsByModel),
@@ -330,129 +341,131 @@ export function renderAIGenVideoModelSelectorMarkup({
       providerProfileId: String(providerProfileId || '')['trim'](),
       providerProfileIdByModel: getPlainObject(providerProfileIdByModel),
     },
-    _0xe26543 = resolveVideoSelectorSchemaLayout(_0x1af6ac, _0x12b79a, { referenceCounts: referenceCounts });
+    model5 = resolveVideoSelectorSchemaLayout(model4, value4, { referenceCounts: referenceCounts });
   return (
     '<div\x20class=\x22img-model-pills\x20aigen-video-model-selector\x20' +
     escapeHtml(className) +
     '\x22\x20data-aigen-video-model-selector>\x0a\x20\x20\x20\x20<div\x20class=\x22img-model-wrap\x22>\x0a\x20\x20\x20\x20\x20\x20' +
     renderNodeModelTrigger({
       iconHtml: renderVideoModelTriggerIconHTML({
-        model: _0xe26543['model'],
-        provider: _0xe26543['provider'],
+        model: model5['model'],
+        provider: model5['provider'],
         providersMeta: PROVIDERS_META,
       }),
-      label: _0xe26543['modelLabel'],
+      label: model5['modelLabel'],
     }) +
     '\n      ' +
     buildVideoModelMenuHTML({
-      activeModel: _0xe26543['model'],
-      provider: _0xe26543['provider'],
-      allowedModelIds: _0x54c156,
-      runningHubWorkflowAllowedModelIds: _0x26f7e1,
+      activeModel: model5['model'],
+      provider: model5['provider'],
+      allowedModelIds: allowedModelIds2,
+      runningHubWorkflowAllowedModelIds: runningHubWorkflowAllowedModelIds2,
     }) +
     '\n    </div>\n    ' +
     (showSchemaControls
       ? '<div class="aigen-video-schema-controls">' +
-        _0xe26543['controlsHtml'] +
+        model5['controlsHtml'] +
         '</div>\x0a\x20\x20\x20\x20' +
-        renderVideoAdvancedControlsMarkup(_0xe26543['advanced'])
+        renderVideoAdvancedControlsMarkup(model5['advanced'])
       : '') +
     '\x0a\x20\x20</div>'
   );
 }
 function createVideoModelMenuPortal({
-  menu: _0x4cabf6,
-  trigger: _0x277c92,
-  host: _0x59b627,
-  documentObject: _0x40cb3c,
-  windowObject: _0x308c7d,
+  menu: menu,
+  trigger: trigger,
+  host: host,
+  documentObject: documentObject2,
+  windowObject: windowObject2,
   submenuPlacement: submenuPlacement = 'viewport-auto',
 } = {}) {
   return createFloatingModelMenuPortal({
-    menu: _0x4cabf6,
-    trigger: _0x277c92,
-    host: _0x59b627,
-    documentObject: _0x40cb3c,
-    windowObject: _0x308c7d,
+    menu: menu,
+    trigger: trigger,
+    host: host,
+    documentObject: documentObject2,
+    windowObject: windowObject2,
     portalClass: 'aigen-video-model-menu-portal',
     submenuPlacement: submenuPlacement,
   });
 }
 function createSchemaPopupViewportPositioner({
-  selector: _0x39376c,
-  documentObject: _0x555365,
-  windowObject: _0x123a77,
+  selector: selector,
+  documentObject: documentObject3,
+  windowObject: windowObject3,
   placement: placement = 'inline',
 } = {}) {
-  if (!_0x39376c || placement !== 'viewport-auto-up') return { destroy() {} };
-  let _0x229f73 = null,
-    _0x3b5b3b = null,
-    _0x1f944c = 0x0;
-  const _0x345adf = 0x10,
-    _0x3be96e = 0x8,
-    _0x1bec21 = () => {
-      _0x1f944c = 0x0;
-      if (!_0x229f73?.['isConnected'] || !_0x229f73['classList']?.['contains']?.('show')) return;
-      const _0x4d52e1 = _0x3b5b3b?.['querySelector']?.('[data-ui-schema-menu-trigger]') || _0x3b5b3b,
-        _0xb10801 = _0x4d52e1?.['getBoundingClientRect']?.(),
-        _0xa88fa7 = _0x229f73['getBoundingClientRect']?.(),
-        _0x73fa1f =
-          Number(_0x123a77?.['innerWidth']) || Number(_0x555365?.['documentElement']?.['clientWidth']) || 0x0,
-        _0x1c5623 =
-          Number(_0x123a77?.['innerHeight']) ||
-          Number(_0x555365?.['documentElement']?.['clientHeight']) ||
+  if (!selector || placement !== 'viewport-auto-up') return { destroy() {} };
+  let el = null,
+    el2 = null,
+    value5 = 0x0;
+  const value6 = 0x10,
+    value7 = 0x8,
+    value8 = () => {
+      value5 = 0x0;
+      if (!el?.['isConnected'] || !el['classList']?.['contains']?.('show')) return;
+      const el3 = el2?.['querySelector']?.('[data-ui-schema-menu-trigger]') || el2,
+        box = el3?.['getBoundingClientRect']?.(),
+        box2 = el['getBoundingClientRect']?.(),
+        count =
+          Number(windowObject3?.['innerWidth']) ||
+          Number(documentObject3?.['documentElement']?.['clientWidth']) ||
+          0x0,
+        count2 =
+          Number(windowObject3?.['innerHeight']) ||
+          Number(documentObject3?.['documentElement']?.['clientHeight']) ||
           0x0;
-      if (!_0xb10801 || !_0xa88fa7 || _0x73fa1f <= 0x0 || _0x1c5623 <= 0x0) return;
-      const _0x8ffcfc = Math['max'](_0x345adf, _0x73fa1f - _0x345adf - _0xa88fa7['width']),
-        _0x233bca = Math['min'](Math['max'](_0xb10801['right'] - _0xa88fa7['width'], _0x345adf), _0x8ffcfc),
-        _0x1f89c6 = Math['max'](_0x345adf, _0x1c5623 - _0x345adf - _0xa88fa7['height']),
-        _0x7da842 = _0xb10801['top'] - _0x3be96e - _0xa88fa7['height'],
-        _0x36f332 = _0xb10801['bottom'] + _0x3be96e,
-        _0x24b6d6 =
-          _0x7da842 >= _0x345adf
-            ? Math['min'](_0x7da842, _0x1f89c6)
-            : Math['min'](Math['max'](_0x36f332, _0x345adf), _0x1f89c6);
-      (_0x229f73['style']?.['setProperty']?.('position', 'fixed'),
-        _0x229f73['style']?.['setProperty']?.('left', Math['round'](_0x233bca) + 'px'),
-        _0x229f73['style']?.['setProperty']?.('top', Math['round'](_0x24b6d6) + 'px'),
-        _0x229f73['style']?.['setProperty']?.('right', 'auto'),
-        _0x229f73['style']?.['setProperty']?.('bottom', 'auto'));
+      if (!box || !box2 || count <= 0x0 || count2 <= 0x0) return;
+      const value9 = Math['max'](value6, count - value6 - box2['width']),
+        value10 = Math['min'](Math['max'](box['right'] - box2['width'], value6), value9),
+        value11 = Math['max'](value6, count2 - value6 - box2['height']),
+        value12 = box['top'] - value7 - box2['height'],
+        value13 = box['bottom'] + value7,
+        value14 =
+          value12 >= value6
+            ? Math['min'](value12, value11)
+            : Math['min'](Math['max'](value13, value6), value11);
+      (el['style']?.['setProperty']?.('position', 'fixed'),
+        el['style']?.['setProperty']?.('left', Math['round'](value10) + 'px'),
+        el['style']?.['setProperty']?.('top', Math['round'](value14) + 'px'),
+        el['style']?.['setProperty']?.('right', 'auto'),
+        el['style']?.['setProperty']?.('bottom', 'auto'));
     },
-    _0x19016a = () => {
-      _0x1f944c && _0x123a77?.['cancelAnimationFrame']?.(_0x1f944c);
-      const _0x41e91f =
-        _0x123a77?.['requestAnimationFrame']?.['bind']?.(_0x123a77) ||
-        ((_0x2fe3df) => _0x123a77?.['setTimeout']?.(_0x2fe3df, 0x0));
-      _0x1f944c = _0x41e91f(_0x1bec21);
+    handler2 = () => {
+      value5 && windowObject3?.['cancelAnimationFrame']?.(value5);
+      const run3 =
+        windowObject3?.['requestAnimationFrame']?.['bind']?.(windowObject3) ||
+        ((value15) => windowObject3?.['setTimeout']?.(value15, 0x0));
+      value5 = run3(value8);
     },
-    _0x279c87 = (_0x3e167d) => {
-      const _0x4ad98a = _0x3e167d?.['detail']?.['popup'] || null,
-        _0x343f97 = _0x3e167d?.['detail']?.['fieldEl'] || null;
-      if (!_0x4ad98a || !_0x343f97 || !_0x39376c['contains']?.(_0x343f97)) return;
-      if (!_0x3e167d['detail']?.['shouldOpen']) {
-        _0x4ad98a === _0x229f73 && ((_0x229f73 = null), (_0x3b5b3b = null));
+    value16 = (enabled2) => {
+      const enabled3 = enabled2?.['detail']?.['popup'] || null,
+        enabled4 = enabled2?.['detail']?.['fieldEl'] || null;
+      if (!enabled3 || !enabled4 || !selector['contains']?.(enabled4)) return;
+      if (!enabled2['detail']?.['shouldOpen']) {
+        enabled3 === el && ((el = null), (el2 = null));
         return;
       }
-      ((_0x229f73 = _0x4ad98a), (_0x3b5b3b = _0x343f97), _0x19016a());
+      ((el = enabled3), (el2 = enabled4), handler2());
     };
   return (
-    _0x39376c['addEventListener']?.('ui-schema-menu-before-open', _0x279c87),
-    _0x555365?.['addEventListener']?.('scroll', _0x19016a, !![]),
-    _0x123a77?.['addEventListener']?.('resize', _0x19016a),
+    selector['addEventListener']?.('ui-schema-menu-before-open', value16),
+    documentObject3?.['addEventListener']?.('scroll', handler2, !![]),
+    windowObject3?.['addEventListener']?.('resize', handler2),
     {
       destroy() {
-        (_0x1f944c && (_0x123a77?.['cancelAnimationFrame']?.(_0x1f944c), (_0x1f944c = 0x0)),
-          _0x39376c['removeEventListener']?.('ui-schema-menu-before-open', _0x279c87),
-          _0x555365?.['removeEventListener']?.('scroll', _0x19016a, !![]),
-          _0x123a77?.['removeEventListener']?.('resize', _0x19016a),
-          (_0x229f73 = null),
-          (_0x3b5b3b = null));
+        (value5 && (windowObject3?.['cancelAnimationFrame']?.(value5), (value5 = 0x0)),
+          selector['removeEventListener']?.('ui-schema-menu-before-open', value16),
+          documentObject3?.['removeEventListener']?.('scroll', handler2, !![]),
+          windowObject3?.['removeEventListener']?.('resize', handler2),
+          (el = null),
+          (el2 = null));
       },
     }
   );
 }
 export function bindAIGenVideoModelSelector(
-  _0x4b4411,
+  el4,
   {
     modelId: modelId = '',
     provider: provider = '',
@@ -465,7 +478,7 @@ export function bindAIGenVideoModelSelector(
     showSchemaControls: showSchemaControls = !![],
     allowedModelIds: allowedModelIds = [],
     runningHubWorkflowAllowedModelIds: runningHubWorkflowAllowedModelIds = [],
-    onChange: _0x2d5c00,
+    onChange: onChange,
     documentObject: documentObject = globalThis['document'],
     windowObject: windowObject = globalThis['window'],
     floatingMenuHost: floatingMenuHost = null,
@@ -473,435 +486,443 @@ export function bindAIGenVideoModelSelector(
     schemaPopupPlacement: schemaPopupPlacement = 'inline',
   } = {},
 ) {
-  const _0x353d0e = _0x4b4411?.['matches']?.('[data-aigen-video-model-selector]')
-    ? _0x4b4411
-    : _0x4b4411?.['querySelector']?.('[data-aigen-video-model-selector]');
-  if (!_0x353d0e || !documentObject) return { destroy() {} };
-  const _0x1135b6 = _0x353d0e['querySelector']('.img-model-btn-trigger'),
-    _0x1631a4 = _0x353d0e['querySelector']('.img-model-label'),
-    _0x35452c = _0x353d0e['querySelector']('.img-model-menu'),
-    _0x282836 = createVideoModelMenuPortal({
-      menu: _0x35452c,
-      trigger: _0x1135b6,
+  const selector2 = el4?.['matches']?.('[data-aigen-video-model-selector]')
+    ? el4
+    : el4?.['querySelector']?.('[data-aigen-video-model-selector]');
+  if (!selector2 || !documentObject) return { destroy() {} };
+  const trigger2 = selector2['querySelector']('.img-model-btn-trigger'),
+    el5 = selector2['querySelector']('.img-model-label'),
+    menu2 = selector2['querySelector']('.img-model-menu'),
+    videoModelMenuPortal = createVideoModelMenuPortal({
+      menu: menu2,
+      trigger: trigger2,
       host: floatingMenuHost,
       documentObject: documentObject,
       windowObject: windowObject,
       submenuPlacement: modelSubmenuPlacement,
     }),
-    _0x232a57 = createSchemaPopupViewportPositioner({
-      selector: _0x353d0e,
+    schemaPopupViewportPositioner = createSchemaPopupViewportPositioner({
+      selector: selector2,
       documentObject: documentObject,
       windowObject: windowObject,
       placement: schemaPopupPlacement,
     }),
-    _0x272a96 = createFloatingUiSchemaPopupPortal({
-      selector: _0x353d0e,
+    floatingUiSchemaPopupPortal = createFloatingUiSchemaPopupPortal({
+      selector: selector2,
       host: floatingMenuHost,
       documentObject: documentObject,
       windowObject: windowObject,
       placement: schemaPopupPlacement,
     }),
-    _0x1f51e0 = 'standalone-video-model-selector',
-    _0x3647d0 = normalizeAllowedModelIds(allowedModelIds),
-    _0x55d5f0 = normalizeAllowedModelIds(runningHubWorkflowAllowedModelIds);
-  let _0x1546e0 = resolveRunningHubWorkflowAllowedModelId(
-      resolveAllowedModelId(modelId, _0x3647d0),
-      _0x55d5f0,
+    nodeId = 'standalone-video-model-selector',
+    allowedModelIds3 = normalizeAllowedModelIds(allowedModelIds),
+    runningHubWorkflowAllowedModelIds3 = normalizeAllowedModelIds(runningHubWorkflowAllowedModelIds);
+  let model6 = resolveRunningHubWorkflowAllowedModelId(
+      resolveAllowedModelId(modelId, allowedModelIds3),
+      runningHubWorkflowAllowedModelIds3,
     ),
-    _0x17e676 = String(provider || '')['trim'](),
-    _0xee1167 = {
-      model: _0x1546e0,
-      provider: _0x17e676,
+    provider4 = String(provider || '')['trim'](),
+    nodeData2 = {
+      model: model6,
+      provider: provider4,
       generationParams: getPlainObject(generationParams),
       generationParamsByModel: getPlainObject(generationParamsByModel),
       uiSchemaFieldState: getPlainObject(uiSchemaFieldState),
       providerProfileId: String(providerProfileId || '')['trim'](),
       providerProfileIdByModel: getPlainObject(providerProfileIdByModel),
     },
-    _0x3d1062 = normalizeReferenceCounts(referenceCounts),
-    _0x292e8e = resolveVideoSelectorSchemaLayout(_0x1546e0, _0xee1167, { referenceCounts: _0x3d1062 }),
-    _0x458b97 = null,
-    _0x415b31 = '',
-    _0x528165 = null;
-  const _0xd228b3 = () => {
-      const _0x5d800d = documentObject['createElement']('template');
-      _0x5d800d['innerHTML'] = buildVideoModelMenuHTML({
-        activeModel: _0x292e8e?.['model'] || _0x1546e0,
-        provider: _0x292e8e?.['provider'] || _0x17e676,
+    referenceCounts2 = normalizeReferenceCounts(referenceCounts),
+    activeModel = resolveVideoSelectorSchemaLayout(model6, nodeData2, { referenceCounts: referenceCounts2 }),
+    bindUiSchemaFieldControls2 = null,
+    uiSchemaVisibilitySignature = '',
+    bindNodeSubmenus2 = null;
+  const run4 = () => {
+      const el6 = documentObject['createElement']('template');
+      el6['innerHTML'] = buildVideoModelMenuHTML({
+        activeModel: activeModel?.['model'] || model6,
+        provider: activeModel?.['provider'] || provider4,
         subscriptionState:
           typeof windowObject?.['getSubscriptionState'] === 'function'
             ? windowObject['getSubscriptionState']()
             : {},
-        allowedModelIds: _0x3647d0,
-        runningHubWorkflowAllowedModelIds: _0x55d5f0,
+        allowedModelIds: allowedModelIds3,
+        runningHubWorkflowAllowedModelIds: runningHubWorkflowAllowedModelIds3,
       })['trim']();
-      const _0x33986f = _0x5d800d['content']['firstElementChild'];
-      if (_0x35452c && _0x33986f) _0x35452c['innerHTML'] = _0x33986f['innerHTML'];
-      (_0x528165?.(),
-        (_0x528165 = bindNodeSubmenus(_0x35452c)),
-        void syncModelCredentialMenu(_0x35452c, {
+      const el7 = el6['content']['firstElementChild'];
+      if (menu2 && el7) menu2['innerHTML'] = el7['innerHTML'];
+      (bindNodeSubmenus2?.(),
+        (bindNodeSubmenus2 = bindNodeSubmenus(menu2)),
+        void syncModelCredentialMenu(menu2, {
           documentObject: documentObject,
-          getProviderProfileId: () => String(_0xee1167['providerProfileId'] || '')['trim'](),
+          getProviderProfileId: () => String(nodeData2['providerProfileId'] || '')['trim'](),
         }));
     },
-    _0x104ea7 = () => {
-      if (_0x1631a4) _0x1631a4['textContent'] = _0x292e8e?.['modelLabel'] || getDisplayModelName(_0x1546e0);
-      const _0x4ead2b = documentObject['createElement']('template');
-      _0x4ead2b['innerHTML'] = renderVideoModelTriggerIconHTML({
-        model: _0x292e8e?.['model'] || _0x1546e0,
-        provider: _0x292e8e?.['provider'] || _0x17e676,
+    handler3 = () => {
+      if (el5) el5['textContent'] = activeModel?.['modelLabel'] || getDisplayModelName(model6);
+      const el8 = documentObject['createElement']('template');
+      el8['innerHTML'] = renderVideoModelTriggerIconHTML({
+        model: activeModel?.['model'] || model6,
+        provider: activeModel?.['provider'] || provider4,
         providersMeta: PROVIDERS_META,
       })['trim']();
-      const _0x20dfb5 = _0x4ead2b['content']['firstElementChild'];
+      const value17 = el8['content']['firstElementChild'];
       if (
-        _0x20dfb5 &&
-        _0x1135b6?.['firstElementChild'] &&
-        _0x1135b6['firstElementChild']['outerHTML'] !== _0x20dfb5['outerHTML']
+        value17 &&
+        trigger2?.['firstElementChild'] &&
+        trigger2['firstElementChild']['outerHTML'] !== value17['outerHTML']
       )
-        _0x1135b6['firstElementChild']['replaceWith'](_0x20dfb5);
+        trigger2['firstElementChild']['replaceWith'](value17);
     },
-    _0x4aa3c7 = {
-      getState: () => ({ nodes: { [_0x1f51e0]: _0xee1167 } }),
+    store = {
+      getState: () => ({ nodes: { [nodeId]: nodeData2 } }),
       getIncomingEdges: () => [],
-      updateNodeData: (_0x3feef9, _0x3ed0dd = {}) => {
-        ((_0xee1167 = { ..._0xee1167, ..._0x3ed0dd }),
-          (_0x1546e0 = String(_0xee1167['model'] || _0x1546e0)['trim']()),
-          (_0x17e676 = String(_0xee1167['provider'] || _0x17e676)['trim']()));
-        const _0x514a58 = buildUiSchemaVisibilitySignature(_0x1546e0, _0xee1167);
-        (_0x3ed0dd?.['model'] || _0x514a58 !== _0x415b31
-          ? _0x256c17()
-          : ((_0x292e8e = resolveVideoSelectorSchemaLayout(_0x1546e0, _0xee1167, {
-              referenceCounts: _0x3d1062,
+      updateNodeData: (value18, args8 = {}) => {
+        ((nodeData2 = { ...nodeData2, ...args8 }),
+          (model6 = String(nodeData2['model'] || model6)['trim']()),
+          (provider4 = String(nodeData2['provider'] || provider4)['trim']()));
+        const uiSchemaVisibilitySignature2 = buildUiSchemaVisibilitySignature(model6, nodeData2);
+        (args8?.['model'] || uiSchemaVisibilitySignature2 !== uiSchemaVisibilitySignature
+          ? handler4()
+          : ((activeModel = resolveVideoSelectorSchemaLayout(model6, nodeData2, {
+              referenceCounts: referenceCounts2,
             })),
-            _0x104ea7()),
-          _0x2d5c00?.({
-            modelId: _0x1546e0,
-            provider: _0x17e676,
-            generationParams: getPlainObject(_0xee1167['generationParams']),
-            generationParamsByModel: getPlainObject(_0xee1167['generationParamsByModel']),
-            providerProfileId: String(_0xee1167['providerProfileId'] || '')['trim'](),
-            providerProfileIdByModel: getPlainObject(_0xee1167['providerProfileIdByModel']),
-            patch: { ..._0x3ed0dd },
+            handler3()),
+          onChange?.({
+            modelId: model6,
+            provider: provider4,
+            generationParams: getPlainObject(nodeData2['generationParams']),
+            generationParamsByModel: getPlainObject(nodeData2['generationParamsByModel']),
+            providerProfileId: String(nodeData2['providerProfileId'] || '')['trim'](),
+            providerProfileIdByModel: getPlainObject(nodeData2['providerProfileIdByModel']),
+            patch: { ...args8 },
           }));
       },
     },
-    _0x256c17 = () => {
+    handler4 = () => {
       if (!showSchemaControls) return;
-      (_0x272a96['close'](),
-        (_0x292e8e = resolveVideoSelectorSchemaLayout(_0x1546e0, _0xee1167, { referenceCounts: _0x3d1062 })),
-        (_0xee1167 = {
-          ..._0xee1167,
-          ..._0x292e8e['nodeData'],
+      (floatingUiSchemaPopupPortal['close'](),
+        (activeModel = resolveVideoSelectorSchemaLayout(model6, nodeData2, {
+          referenceCounts: referenceCounts2,
+        })),
+        (nodeData2 = {
+          ...nodeData2,
+          ...activeModel['nodeData'],
           generationParamsByModel: getPlainObject(
-            _0x292e8e['nodeData']?.['generationParamsByModel'] || _0xee1167['generationParamsByModel'],
+            activeModel['nodeData']?.['generationParamsByModel'] || nodeData2['generationParamsByModel'],
           ),
         }),
-        (_0x1546e0 = String(_0x292e8e['model'] || _0x1546e0)['trim']()),
-        (_0x17e676 = String(_0x292e8e['provider'] || _0x17e676)['trim']()),
-        (_0x415b31 = buildUiSchemaVisibilitySignature(_0x1546e0, _0xee1167)),
-        _0x104ea7());
-      const _0x4745fc = _0x353d0e['querySelector']('.aigen-video-schema-controls');
-      if (_0x4745fc) _0x4745fc['innerHTML'] = _0x292e8e['controlsHtml'];
-      (_0x353d0e['querySelectorAll'](':scope > .rh-adv-wrap, :scope > .rh-vram-adv-panel')['forEach'](
-        (_0x389404) => _0x389404['remove'](),
+        (model6 = String(activeModel['model'] || model6)['trim']()),
+        (provider4 = String(activeModel['provider'] || provider4)['trim']()),
+        (uiSchemaVisibilitySignature = buildUiSchemaVisibilitySignature(model6, nodeData2)),
+        handler3());
+      const el9 = selector2['querySelector']('.aigen-video-schema-controls');
+      if (el9) el9['innerHTML'] = activeModel['controlsHtml'];
+      (selector2['querySelectorAll'](':scope > .rh-adv-wrap, :scope > .rh-vram-adv-panel')['forEach'](
+        (el10) => el10['remove'](),
       ),
-        _0x4745fc &&
-          _0x292e8e['advanced'] &&
-          _0x4745fc['insertAdjacentHTML'](
-            'afterend',
-            renderVideoAdvancedControlsMarkup(_0x292e8e['advanced']),
-          ),
-        _0x458b97?.(),
-        _0x292e8e['kind'] === 'dreamina'
-          ? (_0x458b97 = bindUiSchemaFieldControls(_0x353d0e, {
-              getNodeData: () => _0xee1167,
-              commitFieldValue: (_0x44bb57, _0x2dd061, _0x5bdbe5) => {
-                const _0x7be334 = String(_0x44bb57 || '')['trim'](),
-                  _0x466cf7 = getDreaminaEffectiveNodeData(_0x5bdbe5),
-                  _0x587bb7 = resolveDreaminaStyleVideoProvider(_0x466cf7['model'], _0x466cf7['provider']),
-                  _0x46cdda =
-                    _0x7be334 === 'dreaminaRouteMode'
-                      ? normalizeDreaminaVideoRouteMode(_0x2dd061)
-                      : normalizeDreaminaVideoRouteMode(_0x466cf7['dreaminaRouteMode'], _0x466cf7['mode']),
-                  _0x5ed069 = resolveDreaminaVideoTaskType({ routeMode: _0x46cdda, ..._0x3d1062 });
-                let _0x250c24;
-                if (_0x7be334 === 'dreaminaRouteMode') {
-                  const _0x3902bc = ensureDreaminaStyleVideoModelForTask(
-                    _0x5ed069,
-                    _0x466cf7['model'],
-                    _0x587bb7,
-                  );
-                  _0x250c24 = {
+        el9 &&
+          activeModel['advanced'] &&
+          el9['insertAdjacentHTML']('afterend', renderVideoAdvancedControlsMarkup(activeModel['advanced'])),
+        bindUiSchemaFieldControls2?.(),
+        activeModel['kind'] === 'dreamina'
+          ? (bindUiSchemaFieldControls2 = bindUiSchemaFieldControls(selector2, {
+              getNodeData: () => nodeData2,
+              commitFieldValue: (value19, value20, value21) => {
+                const value22 = String(value19 || '')['trim'](),
+                  args9 = getDreaminaEffectiveNodeData(value21),
+                  provider5 = resolveDreaminaStyleVideoProvider(args9['model'], args9['provider']),
+                  routeMode2 =
+                    value22 === 'dreaminaRouteMode'
+                      ? normalizeDreaminaVideoRouteMode(value20)
+                      : normalizeDreaminaVideoRouteMode(args9['dreaminaRouteMode'], args9['mode']),
+                  taskType2 = resolveDreaminaVideoTaskType({ routeMode: routeMode2, ...referenceCounts2 });
+                let value23;
+                if (value22 === 'dreaminaRouteMode') {
+                  const model7 = ensureDreaminaStyleVideoModelForTask(taskType2, args9['model'], provider5);
+                  value23 = {
                     ...buildDreaminaModelSelectionParamPatch(
                       {
-                        ..._0x466cf7,
+                        ...args9,
                         generationParams: {
-                          ...getPlainObject(_0x466cf7['generationParams']),
-                          dreaminaRouteMode: _0x46cdda,
+                          ...getPlainObject(args9['generationParams']),
+                          dreaminaRouteMode: routeMode2,
                         },
                       },
                       {
-                        model: _0x3902bc,
-                        provider: _0x587bb7,
-                        taskType: _0x5ed069,
-                        fallbackValues: { dreaminaRouteMode: _0x46cdda },
+                        model: model7,
+                        provider: provider5,
+                        taskType: taskType2,
+                        fallbackValues: { dreaminaRouteMode: routeMode2 },
                       },
                     ),
-                    model: _0x3902bc,
-                    provider: _0x587bb7,
+                    model: model7,
+                    provider: provider5,
                   };
                 } else {
-                  let _0x2795d5 = _0x2dd061;
-                  if (_0x7be334 === 'resolution')
-                    _0x2795d5 = normalizeDreaminaStyleVideoResolution(
-                      _0x5ed069,
-                      _0x466cf7['model'],
-                      _0x2dd061,
-                      _0x587bb7,
+                  let dreaminaStyleVideoResolution = value20;
+                  if (value22 === 'resolution')
+                    dreaminaStyleVideoResolution = normalizeDreaminaStyleVideoResolution(
+                      taskType2,
+                      args9['model'],
+                      value20,
+                      provider5,
                     );
                   else {
-                    if (_0x7be334 === 'duration')
-                      _0x2795d5 = normalizeDreaminaStyleVideoDuration(
-                        _0x5ed069,
-                        _0x466cf7['model'],
-                        _0x2dd061,
-                        _0x587bb7,
+                    if (value22 === 'duration')
+                      dreaminaStyleVideoResolution = normalizeDreaminaStyleVideoDuration(
+                        taskType2,
+                        args9['model'],
+                        value20,
+                        provider5,
                       );
                     else
-                      _0x7be334 === 'aspectRatio' &&
-                        (_0x2795d5 = normalizeDreaminaVideoAspectRatio(_0x2dd061, {
+                      value22 === 'aspectRatio' &&
+                        (dreaminaStyleVideoResolution = normalizeDreaminaVideoAspectRatio(value20, {
                           preserveAdaptive: !![],
                         }));
                   }
-                  _0x250c24 = ['resolution', 'duration', 'aspectRatio']['includes'](_0x7be334)
-                    ? buildDreaminaParamPatch(_0x466cf7, { [_0x7be334]: _0x2795d5 })
-                    : buildUiSchemaParamPatch(_0x466cf7, _0x7be334, _0x2795d5);
+                  value23 = ['resolution', 'duration', 'aspectRatio']['includes'](value22)
+                    ? buildDreaminaParamPatch(args9, { [value22]: dreaminaStyleVideoResolution })
+                    : buildUiSchemaParamPatch(args9, value22, dreaminaStyleVideoResolution);
                 }
-                return (_0x4aa3c7['updateNodeData'](_0x1f51e0, _0x250c24), _0xee1167);
+                return (store['updateNodeData'](nodeId, value23), nodeData2);
               },
             }))
-          : (_0x458b97 = bindModelUiSchemaControls(_0x353d0e, {
-              nodeId: _0x1f51e0,
-              nodeData: _0xee1167,
-              store: _0x4aa3c7,
-              buildPatch: (_0x12d17c, _0xbed78, _0x381598, _0x14fc26) =>
-                buildRhWorkflowFieldPatch(_0x12d17c, _0xbed78, _0x381598, _0x14fc26),
+          : (bindUiSchemaFieldControls2 = bindModelUiSchemaControls(selector2, {
+              nodeId: nodeId,
+              nodeData: nodeData2,
+              store: store,
+              buildPatch: (value24, value25, value26, value27) =>
+                buildRhWorkflowFieldPatch(value24, value25, value26, value27),
             })));
     },
-    _0x1ec823 = (_0x30061d) => _0x30061d['stopPropagation'](),
-    _0x913f46 = () => {
-      const _0x1c413d = _0x353d0e['querySelector']('.rh-vram-adv-panel');
-      _0x353d0e['querySelector']('.rh-adv2-btn')?.['setAttribute'](
+    value28 = (event) => event['stopPropagation'](),
+    handler5 = () => {
+      const el11 = selector2['querySelector']('.rh-vram-adv-panel');
+      selector2['querySelector']('.rh-adv2-btn')?.['setAttribute'](
         'aria-expanded',
-        String(_0x1c413d?.['classList']['contains']('show') === !![]),
+        String(el11?.['classList']['contains']('show') === !![]),
       );
     },
-    _0x2dae99 = (_0x49881a) => {
-      _0x49881a['stopPropagation']();
-      const _0x2892b7 = !_0x282836['isOpen']();
-      (_0x272a96['close'](),
-        closeNodeFooterMenus(_0x353d0e, _0x35452c),
-        _0x913f46(),
-        _0x2892b7
-          ? (_0xd228b3(), _0x282836['open'](), activateMenuKeyboard(_0x35452c))
-          : _0x282836['close']());
+    value29 = (event2) => {
+      event2['stopPropagation']();
+      const value30 = !videoModelMenuPortal['isOpen']();
+      (floatingUiSchemaPopupPortal['close'](),
+        closeNodeFooterMenus(selector2, menu2),
+        handler5(),
+        value30
+          ? (run4(), videoModelMenuPortal['open'](), activateMenuKeyboard(menu2))
+          : videoModelMenuPortal['close']());
     },
-    _0x3071f3 = (_0x249c2f) => {
-      const _0x1ed291 = _0x249c2f['target']['closest']?.('.node-menu-item[data-value]');
-      if (!_0x1ed291 || _0x1ed291['dataset']['disabled'] === 'true') return;
-      const _0x3f3877 = String(_0x1ed291['dataset']['value'] || '')['trim']();
-      if (!_0x3f3877) return;
-      if (_0x3647d0['length'] && !_0x3647d0['includes'](_0x3f3877)) return;
-      const _0x3b60c6 = getModelManifest(_0x3f3877);
+    value31 = (event3) => {
+      const el12 = event3['target']['closest']?.('.node-menu-item[data-value]');
+      if (!el12 || el12['dataset']['disabled'] === 'true') return;
+      const enabled5 = String(el12['dataset']['value'] || '')['trim']();
+      if (!enabled5) return;
+      if (allowedModelIds3['length'] && !allowedModelIds3['includes'](enabled5)) return;
+      const modelManifest2 = getModelManifest(enabled5);
       if (
-        _0x55d5f0['length'] &&
-        _0x3b60c6?.['provider'] === 'runninghubwf' &&
-        _0x3b60c6?.['adapterType'] === 'workflow' &&
-        !_0x55d5f0['includes'](_0x3f3877)
+        runningHubWorkflowAllowedModelIds3['length'] &&
+        modelManifest2?.['provider'] === 'runninghubwf' &&
+        modelManifest2?.['adapterType'] === 'workflow' &&
+        !runningHubWorkflowAllowedModelIds3['includes'](enabled5)
       )
         return;
-      const _0x19d3e4 = resolveModelProvider(_0x3f3877, _0x1ed291['dataset']['provider'] || _0x17e676);
-      let _0x1f59da;
-      if (isDreaminaStyleVideoModel(_0x3f3877, _0x19d3e4)) {
-        const _0x268b89 = getDreaminaEffectiveNodeData(_0xee1167),
-          _0x269d28 = normalizeDreaminaVideoRouteMode(_0x268b89['dreaminaRouteMode'], _0x268b89['mode']),
-          _0x4f33ff = resolveDreaminaVideoTaskType({ routeMode: _0x269d28, ..._0x3d1062 }),
-          _0x3e3404 = ensureDreaminaStyleVideoModelForTask(_0x4f33ff, _0x3f3877, _0x19d3e4),
-          _0x4e531d = resolveDreaminaRememberedRouteModel(_0xee1167, {
-            provider: _0x19d3e4,
-            routeMode: _0x269d28,
-            taskType: _0x4f33ff,
-            fallbackModel: _0x3e3404,
+      const provider6 = resolveModelProvider(enabled5, el12['dataset']['provider'] || provider4);
+      let model8;
+      if (isDreaminaStyleVideoModel(enabled5, provider6)) {
+        const dreaminaEffectiveNodeData = getDreaminaEffectiveNodeData(nodeData2),
+          routeMode3 = normalizeDreaminaVideoRouteMode(
+            dreaminaEffectiveNodeData['dreaminaRouteMode'],
+            dreaminaEffectiveNodeData['mode'],
+          ),
+          taskType3 = resolveDreaminaVideoTaskType({ routeMode: routeMode3, ...referenceCounts2 }),
+          fallbackModel = ensureDreaminaStyleVideoModelForTask(taskType3, enabled5, provider6),
+          dreaminaRememberedRouteModel = resolveDreaminaRememberedRouteModel(nodeData2, {
+            provider: provider6,
+            routeMode: routeMode3,
+            taskType: taskType3,
+            fallbackModel: fallbackModel,
           }),
-          _0x53ca97 =
-            _0x3647d0['length'] && !_0x3647d0['includes'](_0x4e531d) ? _0x3e3404 : _0x4e531d || _0x3e3404;
-        if (_0x3647d0['length'] && !_0x3647d0['includes'](_0x53ca97)) return;
-        _0x1f59da = {
-          ...buildDreaminaModelSelectionParamPatch(_0xee1167, {
-            model: _0x53ca97,
-            provider: _0x19d3e4,
-            taskType: _0x4f33ff,
+          model9 =
+            allowedModelIds3['length'] && !allowedModelIds3['includes'](dreaminaRememberedRouteModel)
+              ? fallbackModel
+              : dreaminaRememberedRouteModel || fallbackModel;
+        if (allowedModelIds3['length'] && !allowedModelIds3['includes'](model9)) return;
+        model8 = {
+          ...buildDreaminaModelSelectionParamPatch(nodeData2, {
+            model: model9,
+            provider: provider6,
+            taskType: taskType3,
           }),
-          model: _0x53ca97,
-          provider: _0x19d3e4,
+          model: model9,
+          provider: provider6,
         };
       } else
-        _0x1f59da = isRunningHubVideoWorkflowManifest(_0x3f3877)
-          ? buildVideoWorkflowModelSelectionPatch(_0xee1167, _0x3f3877)
-          : buildVideoModelApiModelSelectionPatch(_0xee1167, _0x3f3877, _0x19d3e4);
-      const _0x30866f = [_0x3f3877, _0x1f59da['model'] || _0x3f3877]['find'](
-        (_0xdb5db0) =>
-          getModelManifest(_0xdb5db0)?.['vip'] === !![] &&
+        model8 = isRunningHubVideoWorkflowManifest(enabled5)
+          ? buildVideoWorkflowModelSelectionPatch(nodeData2, enabled5)
+          : buildVideoModelApiModelSelectionPatch(nodeData2, enabled5, provider6);
+      const modelId2 = [enabled5, model8['model'] || enabled5]['find'](
+        (value32) =>
+          getModelManifest(value32)?.['vip'] === !![] &&
           typeof windowObject?.['isModelAllowedBySubscription'] === 'function' &&
-          !windowObject['isModelAllowedBySubscription'](_0xdb5db0, _0x19d3e4),
+          !windowObject['isModelAllowedBySubscription'](value32, provider6),
       );
-      if (_0x30866f) {
-        windowObject['openSubscriptionDialog']?.({ modelId: _0x30866f, provider: _0x19d3e4 });
+      if (modelId2) {
+        windowObject['openSubscriptionDialog']?.({ modelId: modelId2, provider: provider6 });
         return;
       }
-      const _0x2acf64 = buildModelProviderProfileSelectionPatch(
-        _0xee1167,
-        _0x1f59da['model'] || _0x3f3877,
-        _0x1ed291['dataset']['credentialResolvedProviderProfileId'],
+      const args10 = buildModelProviderProfileSelectionPatch(
+        nodeData2,
+        model8['model'] || enabled5,
+        el12['dataset']['credentialResolvedProviderProfileId'],
       );
-      (_0x4aa3c7['updateNodeData'](_0x1f51e0, {
-        ..._0x1f59da,
-        ..._0x2acf64,
-        model: _0x1f59da['model'] || _0x3f3877,
-        provider: _0x1f59da['provider'] || _0x19d3e4,
+      (store['updateNodeData'](nodeId, {
+        ...model8,
+        ...args10,
+        model: model8['model'] || enabled5,
+        provider: model8['provider'] || provider6,
       }),
-        _0x282836['close'](),
-        _0xd228b3());
+        videoModelMenuPortal['close'](),
+        run4());
     },
-    _0x30b5 = (_0x3109d3) => {
-      const _0x31004d = _0x3109d3['target']['closest']?.('.dreamina-task-model-btn');
-      if (_0x31004d) {
-        _0x3109d3['stopPropagation']();
-        const _0x5997d2 = _0x31004d['parentElement']?.['querySelector']?.('.dreamina-task-model-menu'),
-          _0x5c1952 = !_0x5997d2?.['classList']['contains']('show');
-        (closeNodeFooterMenus(_0x353d0e, _0x5997d2),
-          _0x913f46(),
-          _0x5997d2?.['classList']['toggle']('show', _0x5c1952));
-        if (_0x5c1952) activateMenuKeyboard(_0x5997d2);
+    value33 = (event4) => {
+      const value34 = event4['target']['closest']?.('.dreamina-task-model-btn');
+      if (value34) {
+        event4['stopPropagation']();
+        const el13 = value34['parentElement']?.['querySelector']?.('.dreamina-task-model-menu'),
+          value35 = !el13?.['classList']['contains']('show');
+        (closeNodeFooterMenus(selector2, el13), handler5(), el13?.['classList']['toggle']('show', value35));
+        if (value35) activateMenuKeyboard(el13);
         return;
       }
-      const _0x143812 = _0x3109d3['target']['closest']?.(
-        '.dreamina-task-model-menu .node-menu-item[data-value]',
-      );
-      if (!_0x143812 || _0x143812['dataset']['disabled'] === 'true') return;
-      _0x3109d3['stopPropagation']();
-      const _0x4121fd = String(_0x143812['dataset']['value'] || '')['trim']();
-      if (!_0x4121fd) return;
-      const _0x1d1dd0 = resolveDreaminaStyleVideoProvider(
-        _0x4121fd,
-        _0x143812['dataset']['provider'] || _0x17e676,
-      );
+      const el14 = event4['target']['closest']?.('.dreamina-task-model-menu .node-menu-item[data-value]');
+      if (!el14 || el14['dataset']['disabled'] === 'true') return;
+      event4['stopPropagation']();
+      const modelId3 = String(el14['dataset']['value'] || '')['trim']();
+      if (!modelId3) return;
+      const provider7 = resolveDreaminaStyleVideoProvider(modelId3, el14['dataset']['provider'] || provider4);
       if (
-        getModelManifest(_0x4121fd)?.['vip'] === !![] &&
+        getModelManifest(modelId3)?.['vip'] === !![] &&
         typeof windowObject?.['isModelAllowedBySubscription'] === 'function' &&
-        !windowObject['isModelAllowedBySubscription'](_0x4121fd, _0x1d1dd0)
+        !windowObject['isModelAllowedBySubscription'](modelId3, provider7)
       ) {
-        windowObject['openSubscriptionDialog']?.({ modelId: _0x4121fd, provider: _0x1d1dd0 });
+        windowObject['openSubscriptionDialog']?.({ modelId: modelId3, provider: provider7 });
         return;
       }
-      const _0x5e5fde =
-        _0x292e8e?.['taskType'] ||
+      const taskType4 =
+        activeModel?.['taskType'] ||
         resolveDreaminaVideoTaskType({
-          routeMode: _0xee1167?.['generationParams']?.['dreaminaRouteMode'],
-          ..._0x3d1062,
+          routeMode: nodeData2?.['generationParams']?.['dreaminaRouteMode'],
+          ...referenceCounts2,
         });
-      (_0x4aa3c7['updateNodeData'](_0x1f51e0, {
-        ...buildDreaminaModelSelectionParamPatch(_0xee1167, {
-          model: _0x4121fd,
-          provider: _0x1d1dd0,
-          taskType: _0x5e5fde,
+      (store['updateNodeData'](nodeId, {
+        ...buildDreaminaModelSelectionParamPatch(nodeData2, {
+          model: modelId3,
+          provider: provider7,
+          taskType: taskType4,
         }),
-        ...buildModelProviderProfileSelectionPatch(_0xee1167, _0x4121fd),
-        model: _0x4121fd,
-        provider: _0x1d1dd0,
+        ...buildModelProviderProfileSelectionPatch(nodeData2, modelId3),
+        model: modelId3,
+        provider: provider7,
       }),
-        _0xd228b3());
+        run4());
     },
-    _0x3a9221 = (_0x3fed0f) => {
-      const _0x7ff0c7 = _0x3fed0f['target']['closest']?.('.rh-adv2-btn');
-      if (!_0x7ff0c7 || !_0x353d0e['contains'](_0x7ff0c7)) return;
-      _0x3fed0f['stopPropagation']();
-      const _0x33d4a3 = _0x353d0e['querySelector']('.rh-vram-adv-panel');
-      (_0x272a96['close'](),
-        closeNodeFooterMenus(_0x353d0e, _0x33d4a3),
-        _0x33d4a3?.['classList']['toggle']('show'),
-        _0x913f46(),
-        _0x282836['close']());
+    value36 = (event5) => {
+      const enabled6 = event5['target']['closest']?.('.rh-adv2-btn');
+      if (!enabled6 || !selector2['contains'](enabled6)) return;
+      event5['stopPropagation']();
+      const el15 = selector2['querySelector']('.rh-vram-adv-panel');
+      (floatingUiSchemaPopupPortal['close'](),
+        closeNodeFooterMenus(selector2, el15),
+        el15?.['classList']['toggle']('show'),
+        handler5(),
+        videoModelMenuPortal['close']());
     },
-    _0x4b3596 = (_0x142c4a) => {
+    value37 = (event6) => {
       if (
-        _0x353d0e['contains'](_0x142c4a['target']) ||
-        _0x282836['contains'](_0x142c4a['target']) ||
-        _0x272a96['contains'](_0x142c4a['target'])
+        selector2['contains'](event6['target']) ||
+        videoModelMenuPortal['contains'](event6['target']) ||
+        floatingUiSchemaPopupPortal['contains'](event6['target'])
       )
         return;
-      (_0x282836['close'](), _0x272a96['close'](), closeNodeFooterMenus(_0x353d0e), _0x913f46());
+      (videoModelMenuPortal['close'](),
+        floatingUiSchemaPopupPortal['close'](),
+        closeNodeFooterMenus(selector2),
+        handler5());
     },
-    _0x49999c = () => _0x282836['close']();
-  (_0x353d0e['addEventListener']('pointerdown', _0x1ec823),
-    _0x35452c?.['addEventListener']('pointerdown', _0x1ec823),
-    _0x1135b6?.['addEventListener']('click', _0x2dae99),
-    _0x35452c?.['addEventListener']('click', _0x3071f3),
-    _0x353d0e['addEventListener']('click', _0x30b5),
-    _0x353d0e['addEventListener']('click', _0x3a9221),
-    _0x353d0e['addEventListener']('ui-schema-menu-before-open', _0x49999c),
-    documentObject['addEventListener']('click', _0x4b3596));
-  const _0x25914a = bindModelCredentialMenu(_0x35452c, {
+    value38 = () => videoModelMenuPortal['close']();
+  (selector2['addEventListener']('pointerdown', value28),
+    menu2?.['addEventListener']('pointerdown', value28),
+    trigger2?.['addEventListener']('click', value29),
+    menu2?.['addEventListener']('click', value31),
+    selector2['addEventListener']('click', value33),
+    selector2['addEventListener']('click', value36),
+    selector2['addEventListener']('ui-schema-menu-before-open', value38),
+    documentObject['addEventListener']('click', value37));
+  const bindModelCredentialMenu2 = bindModelCredentialMenu(menu2, {
     documentObject: documentObject,
-    getProviderProfileId: () => String(_0xee1167['providerProfileId'] || '')['trim'](),
+    getProviderProfileId: () => String(nodeData2['providerProfileId'] || '')['trim'](),
   });
   return (
-    _0xd228b3(),
-    _0x256c17(),
+    run4(),
+    handler4(),
     {
-      syncContext(_0x2edb2a = {}) {
-        const _0xcd7bb1 = getPlainObject(_0x2edb2a['generationParams'] ?? _0xee1167['generationParams']),
-          _0x415d3f = getPlainObject(_0x2edb2a['uiSchemaFieldState'] ?? _0xee1167['uiSchemaFieldState']),
-          _0x3083cc = normalizeReferenceCounts(_0x2edb2a['referenceCounts'] ?? _0x3d1062);
+      syncContext(options2 = {}) {
+        const generationParams3 = getPlainObject(
+            options2['generationParams'] ?? nodeData2['generationParams'],
+          ),
+          uiSchemaFieldState2 = getPlainObject(
+            options2['uiSchemaFieldState'] ?? nodeData2['uiSchemaFieldState'],
+          ),
+          referenceCounts3 = normalizeReferenceCounts(options2['referenceCounts'] ?? referenceCounts2);
         if (
-          JSON['stringify']([_0xcd7bb1, _0x415d3f, _0x3083cc]) ===
-          JSON['stringify']([_0xee1167['generationParams'], _0xee1167['uiSchemaFieldState'], _0x3d1062])
+          JSON['stringify']([generationParams3, uiSchemaFieldState2, referenceCounts3]) ===
+          JSON['stringify']([
+            nodeData2['generationParams'],
+            nodeData2['uiSchemaFieldState'],
+            referenceCounts2,
+          ])
         )
           return;
-        ((_0xee1167 = { ..._0xee1167, generationParams: _0xcd7bb1, uiSchemaFieldState: _0x415d3f }),
-          (_0x3d1062 = _0x3083cc),
-          _0x256c17());
+        ((nodeData2 = {
+          ...nodeData2,
+          generationParams: generationParams3,
+          uiSchemaFieldState: uiSchemaFieldState2,
+        }),
+          (referenceCounts2 = referenceCounts3),
+          handler4());
       },
-      applyProviderProfilePatch(_0x156e94 = {}) {
+      applyProviderProfilePatch(options3 = {}) {
         return (
-          _0x4aa3c7['updateNodeData'](_0x1f51e0, {
-            providerProfileId: String(_0x156e94['providerProfileId'] || '')['trim'](),
+          store['updateNodeData'](nodeId, {
+            providerProfileId: String(options3['providerProfileId'] || '')['trim'](),
             providerProfileIdByModel: getPlainObject(
-              _0x156e94['providerProfileIdByModel'] || _0xee1167['providerProfileIdByModel'],
+              options3['providerProfileIdByModel'] || nodeData2['providerProfileIdByModel'],
             ),
           }),
-          void syncModelCredentialMenu(_0x35452c, {
+          void syncModelCredentialMenu(menu2, {
             documentObject: documentObject,
-            getProviderProfileId: () => String(_0xee1167['providerProfileId'] || '')['trim'](),
+            getProviderProfileId: () => String(nodeData2['providerProfileId'] || '')['trim'](),
           }),
           !![]
         );
       },
       destroy() {
-        (_0x272a96['destroy'](),
-          _0x458b97?.(),
-          _0x528165?.(),
-          _0x25914a?.(),
-          _0x282836['destroy'](),
-          _0x232a57['destroy'](),
-          _0x353d0e['removeEventListener']('pointerdown', _0x1ec823),
-          _0x35452c?.['removeEventListener']('pointerdown', _0x1ec823),
-          _0x1135b6?.['removeEventListener']('click', _0x2dae99),
-          _0x35452c?.['removeEventListener']('click', _0x3071f3),
-          _0x353d0e['removeEventListener']('click', _0x30b5),
-          _0x353d0e['removeEventListener']('click', _0x3a9221),
-          _0x353d0e['removeEventListener']('ui-schema-menu-before-open', _0x49999c),
-          documentObject['removeEventListener']('click', _0x4b3596));
+        (floatingUiSchemaPopupPortal['destroy'](),
+          bindUiSchemaFieldControls2?.(),
+          bindNodeSubmenus2?.(),
+          bindModelCredentialMenu2?.(),
+          videoModelMenuPortal['destroy'](),
+          schemaPopupViewportPositioner['destroy'](),
+          selector2['removeEventListener']('pointerdown', value28),
+          menu2?.['removeEventListener']('pointerdown', value28),
+          trigger2?.['removeEventListener']('click', value29),
+          menu2?.['removeEventListener']('click', value31),
+          selector2['removeEventListener']('click', value33),
+          selector2['removeEventListener']('click', value36),
+          selector2['removeEventListener']('ui-schema-menu-before-open', value38),
+          documentObject['removeEventListener']('click', value37));
       },
     }
   );

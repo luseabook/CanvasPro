@@ -21,139 +21,138 @@ import { createPromptAttachmentButtonHTML } from '../refAttachmentButton.js';
 import { t } from '../../i18n/index.js';
 const RH_V54_FPS_OPTIONS = Object.freeze([16, 24, 30]),
   RH_MIN_VIDEO_RESOLUTION = 0x340;
-function referenceInputText(_0x178c82, _0x457a9d = {}) {
-  return t('videoNode.referenceInput.' + _0x178c82, _0x457a9d);
+function referenceInputText(value, item = {}) {
+  return t('videoNode.referenceInput.' + value, item);
 }
-function normalizeRhV54Fps(_0xe2de76) {
-  const _0x2a7671 = Number(_0xe2de76);
-  return RH_V54_FPS_OPTIONS.includes(_0x2a7671) ? _0x2a7671 : 24;
+function normalizeRhV54Fps(index) {
+  const result = Number(index);
+  return RH_V54_FPS_OPTIONS.includes(result) ? result : 24;
 }
-function normalizeRhVideoResolution(_0x354f8a) {
-  const _0x33d0d0 = Number(_0x354f8a);
-  return Number.isFinite(_0x33d0d0)
-    ? Math.max(RH_MIN_VIDEO_RESOLUTION, Math.trunc(_0x33d0d0))
+function normalizeRhVideoResolution(data) {
+  const options = Number(data);
+  return Number.isFinite(options)
+    ? Math.max(RH_MIN_VIDEO_RESOLUTION, Math.trunc(options))
     : RH_MIN_VIDEO_RESOLUTION;
 }
-function normalizeVideoMediaKey(_0x509147) {
-  return String(_0x509147 || '')
+function normalizeVideoMediaKey(target) {
+  return String(target || '')
     .trim()
     .replace(/^\/+/, '');
 }
-function normalizeRefSignaturePart(_0x355386) {
-  return String(_0x355386 || '').trim();
+function normalizeRefSignaturePart(source) {
+  return String(source || '').trim();
 }
-function getFixedRefBarLayoutKey(_0x181070) {
-  if (!_0x181070) return 'generic';
+function getFixedRefBarLayoutKey(enabled) {
+  if (!enabled) return 'generic';
   return 'fixed';
 }
-function getVideoItemMediaKey(_0x2d334f) {
+function getVideoItemMediaKey(next) {
   return (
-    normalizeVideoMediaKey(_0x2d334f?.localPath) ||
-    normalizeVideoMediaKey(_0x2d334f?.displayLocalPath) ||
-    normalizeVideoMediaKey(_0x2d334f?.originalLocalPath) ||
-    normalizeVideoMediaKey(_0x2d334f?.videoLocalPath) ||
-    normalizeVideoMediaKey(_0x2d334f?.videoUrl)
+    normalizeVideoMediaKey(next?.localPath) ||
+    normalizeVideoMediaKey(next?.displayLocalPath) ||
+    normalizeVideoMediaKey(next?.originalLocalPath) ||
+    normalizeVideoMediaKey(next?.videoLocalPath) ||
+    normalizeVideoMediaKey(next?.videoUrl)
   );
 }
-function getVideoItemByEdge(_0x2d721e, _0x4a17ba) {
-  const _0x16bf27 = Array.isArray(_0x2d721e?.videos) ? _0x2d721e.videos : [];
-  if (!_0x16bf27.length) return { item: null, index: -1, matchedByKey: false };
-  const _0x27f4fd = normalizeVideoMediaKey(_0x4a17ba?.sourceMediaKey);
-  let _0x479643 = -1;
-  _0x27f4fd &&
-    (_0x479643 = _0x16bf27.findIndex((_0x29b379) => getVideoItemMediaKey(_0x29b379) === _0x27f4fd));
-  const _0x25cd54 = _0x479643 >= 0;
-  if (_0x479643 < 0) {
-    const _0x389b2e = Number(_0x2d721e?.mainVideoIndex),
-      _0x50136e = Number.isFinite(_0x389b2e) ? Math.max(0, Math.trunc(_0x389b2e)) : 0;
-    _0x479643 = Math.max(0, Math.min(_0x16bf27.length - 1, _0x50136e));
+function getVideoItemByEdge(current, entry) {
+  const item2 = Array.isArray(current?.videos) ? current.videos : [];
+  if (!item2.length) return { item: null, index: -1, matchedByKey: false };
+  const videoMediaKey = normalizeVideoMediaKey(entry?.sourceMediaKey);
+  let index2 = -1;
+  videoMediaKey && (index2 = item2.findIndex((item3) => getVideoItemMediaKey(item3) === videoMediaKey));
+  const matchedByKey = index2 >= 0;
+  if (index2 < 0) {
+    const record = Number(current?.mainVideoIndex),
+      payload = Number.isFinite(record) ? Math.max(0, Math.trunc(record)) : 0;
+    index2 = Math.max(0, Math.min(item2.length - 1, payload));
   }
-  return { item: _0x16bf27[_0x479643] || null, index: _0x479643, matchedByKey: _0x25cd54 };
+  return { item: item2[index2] || null, index: index2, matchedByKey: matchedByKey };
 }
-function getVideoThumbCandidate(_0x5ce356, _0x260abe) {
-  const _0x298ab5 = getVideoItemByEdge(_0x5ce356, _0x260abe),
-    _0x5d0e6a = String(_0x298ab5.item?.thumbUrl || '').trim();
-  if (_0x5d0e6a) return { thumbUrl: _0x5d0e6a, selected: _0x298ab5 };
-  const _0xd21120 = Array.isArray(_0x5ce356?.videos) ? _0x5ce356.videos : [],
-    _0xd1d24 = Number(_0x5ce356?.mainVideoIndex),
-    _0x317ef9 = Number.isFinite(_0xd1d24) ? Math.max(0, Math.trunc(_0xd1d24)) : 0,
-    _0x42af5c = Math.max(0, Math.min(_0xd21120.length - 1, _0x317ef9)),
-    _0x22bad9 = String(_0xd21120[_0x42af5c]?.thumbUrl || '').trim();
-  if (_0x22bad9 && !_0x298ab5.matchedByKey)
+function getVideoThumbCandidate(handle, state) {
+  const selected = getVideoItemByEdge(handle, state),
+    thumbUrl = String(selected.item?.thumbUrl || '').trim();
+  if (thumbUrl) return { thumbUrl: thumbUrl, selected: selected };
+  const item4 = Array.isArray(handle?.videos) ? handle.videos : [],
+    config = Number(handle?.mainVideoIndex),
+    scope = Number.isFinite(config) ? Math.max(0, Math.trunc(config)) : 0,
+    index3 = Math.max(0, Math.min(item4.length - 1, scope)),
+    thumbUrl2 = String(item4[index3]?.thumbUrl || '').trim();
+  if (thumbUrl2 && !selected.matchedByKey)
     return {
-      thumbUrl: _0x22bad9,
-      selected: { item: _0xd21120[_0x42af5c] || null, index: _0x42af5c, matchedByKey: false },
+      thumbUrl: thumbUrl2,
+      selected: { item: item4[index3] || null, index: index3, matchedByKey: false },
     };
-  const _0x4c34e2 = String(_0x5ce356?.thumbUrl || '').trim();
-  if (_0x4c34e2 && (!_0x298ab5.matchedByKey || _0x298ab5.index === _0x42af5c))
-    return { thumbUrl: _0x4c34e2, selected: _0x298ab5 };
-  return { thumbUrl: '', selected: _0x298ab5 };
+  const thumbUrl3 = String(handle?.thumbUrl || '').trim();
+  if (thumbUrl3 && (!selected.matchedByKey || selected.index === index3))
+    return { thumbUrl: thumbUrl3, selected: selected };
+  return { thumbUrl: '', selected: selected };
 }
-function getVideoSourcePathForThumb(_0x430120, _0x55f05b) {
-  if (String(_0x430120?.type || '') === 'ai-video') {
-    const { item: _0xd496cb } = getVideoItemByEdge(_0x430120, _0x55f05b),
-      _0x345d48 = String(_0xd496cb?.localPath || '').trim();
-    if (_0x345d48) return localPathToUrl(_0x345d48);
-    const _0x105ef6 = String(_0xd496cb?.displayLocalPath || '').trim();
-    if (_0x105ef6) return localPathToUrl(_0x105ef6);
-    const _0xad1754 = String(_0xd496cb?.originalLocalPath || '').trim();
-    if (_0xad1754) return localPathToUrl(_0xad1754);
-    const _0x3b3882 = String(_0xd496cb?.videoLocalPath || '').trim();
-    if (_0x3b3882) return localPathToUrl(_0x3b3882);
-    const _0x58453f = String(_0xd496cb?.videoUrl || '').trim(),
-      _0x279998 = localPathToUrl(_0x58453f);
-    if (_0x279998) return _0x279998;
+function getVideoSourcePathForThumb(input, output) {
+  if (String(input?.type || '') === 'ai-video') {
+    const { item: item5 } = getVideoItemByEdge(input, output),
+      value2 = String(item5?.localPath || '').trim();
+    if (value2) return localPathToUrl(value2);
+    const value3 = String(item5?.displayLocalPath || '').trim();
+    if (value3) return localPathToUrl(value3);
+    const value4 = String(item5?.originalLocalPath || '').trim();
+    if (value4) return localPathToUrl(value4);
+    const value5 = String(item5?.videoLocalPath || '').trim();
+    if (value5) return localPathToUrl(value5);
+    const value6 = String(item5?.videoUrl || '').trim(),
+      url = localPathToUrl(value6);
+    if (url) return url;
     return '';
   }
-  const _0x3e20b9 = String(_0x430120?.localPath || '').trim();
-  if (_0x3e20b9) return localPathToUrl(_0x3e20b9);
-  const _0x37db75 = String(_0x430120?.displayLocalPath || '').trim();
-  if (_0x37db75) return localPathToUrl(_0x37db75);
-  const _0x34a477 = String(_0x430120?.originalLocalPath || '').trim();
-  if (_0x34a477) return localPathToUrl(_0x34a477);
-  const _0x58efa1 = String(_0x430120?.videoLocalPath || '').trim();
-  if (_0x58efa1) return localPathToUrl(_0x58efa1);
-  const _0x2c918f = String(_0x430120?.videoUrl || _0x430120?.src || '').trim(),
-    _0x57a209 = localPathToUrl(_0x2c918f);
-  if (_0x57a209) return _0x57a209;
+  const value7 = String(input?.localPath || '').trim();
+  if (value7) return localPathToUrl(value7);
+  const value8 = String(input?.displayLocalPath || '').trim();
+  if (value8) return localPathToUrl(value8);
+  const value9 = String(input?.originalLocalPath || '').trim();
+  if (value9) return localPathToUrl(value9);
+  const value10 = String(input?.videoLocalPath || '').trim();
+  if (value10) return localPathToUrl(value10);
+  const value11 = String(input?.videoUrl || input?.src || '').trim(),
+    url2 = localPathToUrl(value11);
+  if (url2) return url2;
   return '';
 }
-function getVideoRefMediaSignature(_0x28b368, _0x1fe3a3) {
-  const _0x5d14cc = getVideoItemByEdge(_0x28b368, _0x1fe3a3);
+function getVideoRefMediaSignature(value12, value13) {
+  const videoItemByEdge = getVideoItemByEdge(value12, value13);
   return (
-    getVideoItemMediaKey(_0x5d14cc.item) ||
-    normalizeVideoMediaKey(_0x28b368?.localPath) ||
-    normalizeVideoMediaKey(_0x28b368?.displayLocalPath) ||
-    normalizeVideoMediaKey(_0x28b368?.originalLocalPath) ||
-    normalizeVideoMediaKey(_0x28b368?.videoLocalPath) ||
-    normalizeVideoMediaKey(_0x28b368?.videoUrl) ||
-    normalizeVideoMediaKey(_0x28b368?.src)
+    getVideoItemMediaKey(videoItemByEdge.item) ||
+    normalizeVideoMediaKey(value12?.localPath) ||
+    normalizeVideoMediaKey(value12?.displayLocalPath) ||
+    normalizeVideoMediaKey(value12?.originalLocalPath) ||
+    normalizeVideoMediaKey(value12?.videoLocalPath) ||
+    normalizeVideoMediaKey(value12?.videoUrl) ||
+    normalizeVideoMediaKey(value12?.src)
   );
 }
-function pickPositiveNumber(..._0x5e4c8a) {
-  for (const _0x523193 of _0x5e4c8a) {
-    const _0x48f8c1 = Number(_0x523193);
-    if (Number.isFinite(_0x48f8c1) && _0x48f8c1 > 0) return _0x48f8c1;
+function pickPositiveNumber(...args) {
+  for (const value14 of args) {
+    const count = Number(value14);
+    if (Number.isFinite(count) && count > 0) return count;
   }
   return 0;
 }
-function getSourceVideoFrameCount(_0x24d376, _0xbc5248) {
-  const _0x173f56 = getVideoItemByEdge(_0x24d376, _0xbc5248).item,
-    _0x39f024 = pickPositiveNumber(
-      _0x173f56?.videoFrameCount,
-      _0x173f56?.frameCount,
-      _0x24d376?.videoFrameCount,
-      _0x24d376?.frameCount,
+function getSourceVideoFrameCount(value15, value16) {
+  const videoItemByEdge2 = getVideoItemByEdge(value15, value16).item,
+    positiveNumber = pickPositiveNumber(
+      videoItemByEdge2?.videoFrameCount,
+      videoItemByEdge2?.frameCount,
+      value15?.videoFrameCount,
+      value15?.frameCount,
     );
-  return _0x39f024 > 0 ? Math.round(_0x39f024) : 0;
+  return positiveNumber > 0 ? Math.round(positiveNumber) : 0;
 }
-function getSourceVideoDuration(_0x10c6dd, _0x5f28a6) {
-  const _0x3913d1 = getVideoItemByEdge(_0x10c6dd, _0x5f28a6).item;
+function getSourceVideoDuration(value17, value18) {
+  const videoItemByEdge3 = getVideoItemByEdge(value17, value18).item;
   return pickPositiveNumber(
-    _0x3913d1?.videoDuration,
-    _0x3913d1?.duration,
-    _0x10c6dd?.videoDuration,
-    _0x10c6dd?.duration,
+    videoItemByEdge3?.videoDuration,
+    videoItemByEdge3?.duration,
+    value17?.videoDuration,
+    value17?.duration,
   );
 }
 function getRhV5SourceVideoNode({
@@ -162,18 +161,16 @@ function getRhV5SourceVideoNode({
   promptEl: promptEl = null,
   nodeData: nodeData = null,
 }) {
-  const _0x1c0815 = Array.isArray(inEdges) ? inEdges : [];
-  let _0x1be162 = _0x1c0815.find((_0xe00333) => String(_0xe00333?.refSlot || '') === 'sourceVideo') || null;
-  !_0x1be162 &&
-    (_0x1be162 =
-      _0x1c0815.find((_0x28b13a) => String(nodes?.[_0x28b13a?.sourceId]?.type || '').includes('video')) ||
-      null);
-  if (_0x1be162 && nodes?.[_0x1be162.sourceId]) return { node: nodes[_0x1be162.sourceId], edge: _0x1be162 };
-  const _0x3d65f0 = getAssetInputRefsFromPromptAndNode(promptEl, {
+  const list = Array.isArray(inEdges) ? inEdges : [];
+  let edge = list.find((item6) => String(item6?.refSlot || '') === 'sourceVideo') || null;
+  !edge &&
+    (edge = list.find((item7) => String(nodes?.[item7?.sourceId]?.type || '').includes('video')) || null);
+  if (edge && nodes?.[edge.sourceId]) return { node: nodes[edge.sourceId], edge: edge };
+  const node = getAssetInputRefsFromPromptAndNode(promptEl, {
     nodeData: nodeData,
     allowedTypes: ['video'],
   })[0];
-  return _0x3d65f0?.nodeData ? { node: _0x3d65f0.nodeData, edge: null } : { node: null, edge: null };
+  return node?.nodeData ? { node: node.nodeData, edge: null } : { node: null, edge: null };
 }
 function getRhV5SourceVideoFrameCount({
   inEdges: inEdges = [],
@@ -182,35 +179,35 @@ function getRhV5SourceVideoFrameCount({
   nodeData: nodeData = null,
   targetFps: targetFps = 0,
 } = {}) {
-  const { node: _0x451404, edge: _0x264882 } = getRhV5SourceVideoNode({
+  const { node: node2, edge: edge2 } = getRhV5SourceVideoNode({
     inEdges: inEdges,
     nodes: nodes,
     promptEl: promptEl,
     nodeData: nodeData,
   });
-  if (!_0x451404) return null;
-  const _0x1195b3 = getSourceVideoFrameCount(_0x451404, _0x264882);
-  if (_0x1195b3 > 0) return _0x1195b3;
-  const _0x2b2081 = Number(targetFps);
-  if (!Number.isFinite(_0x2b2081) || _0x2b2081 <= 0) return null;
-  let _0x34d230 = getSourceVideoDuration(_0x451404, _0x264882);
-  if (!(_0x34d230 > 0)) {
-    const _0x5d6170 = getVideoItemByEdge(_0x451404, _0x264882).item,
-      _0x520866 = pickPositiveNumber(
-        _0x5d6170?.videoFrameCount,
-        _0x5d6170?.frameCount,
-        _0x451404?.videoFrameCount,
-        _0x451404?.frameCount,
+  if (!node2) return null;
+  const sourceVideoFrameCount = getSourceVideoFrameCount(node2, edge2);
+  if (sourceVideoFrameCount > 0) return sourceVideoFrameCount;
+  const count2 = Number(targetFps);
+  if (!Number.isFinite(count2) || count2 <= 0) return null;
+  let sourceVideoDuration = getSourceVideoDuration(node2, edge2);
+  if (!(sourceVideoDuration > 0)) {
+    const videoItemByEdge4 = getVideoItemByEdge(node2, edge2).item,
+      positiveNumber2 = pickPositiveNumber(
+        videoItemByEdge4?.videoFrameCount,
+        videoItemByEdge4?.frameCount,
+        node2?.videoFrameCount,
+        node2?.frameCount,
       ),
-      _0x21de59 = pickPositiveNumber(
-        _0x5d6170?.videoFps,
-        _0x5d6170?.fps,
-        _0x451404?.videoFps,
-        _0x451404?.fps,
+      positiveNumber3 = pickPositiveNumber(
+        videoItemByEdge4?.videoFps,
+        videoItemByEdge4?.fps,
+        node2?.videoFps,
+        node2?.fps,
       );
-    if (_0x520866 > 0 && _0x21de59 > 0) _0x34d230 = _0x520866 / _0x21de59;
+    if (positiveNumber2 > 0 && positiveNumber3 > 0) sourceVideoDuration = positiveNumber2 / positiveNumber3;
   }
-  return _0x34d230 > 0 ? Math.round(_0x34d230 * _0x2b2081) : null;
+  return sourceVideoDuration > 0 ? Math.round(sourceVideoDuration * count2) : null;
 }
 function createRunningHubAudioFallbackThumbHtml() {
   return createReferenceFallbackThumbHtml('audio', 'ref-thumb-media rh-v5-ref-media-fallback');
@@ -229,22 +226,22 @@ const FIXED_REF_KIND_LABEL_KEYS = Object.freeze({
     maskImage: 'slots.maskImage',
     audio: 'slots.audio',
   });
-function escapeHtmlText(_0x5d1a74) {
-  return String(_0x5d1a74 ?? '')
+function escapeHtmlText(value19) {
+  return String(value19 ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
-function escapeHtmlAttr(_0x548033) {
-  return escapeHtmlText(_0x548033).replace(/"/g, '&quot;');
+function escapeHtmlAttr(value20) {
+  return escapeHtmlText(value20).replace(/"/g, '&quot;');
 }
-function getFixedRefKindLabel(_0x2d9db2) {
-  const _0x5bd091 = FIXED_REF_KIND_LABEL_KEYS[String(_0x2d9db2 || '')];
-  return _0x5bd091 ? referenceInputText(_0x5bd091) : '';
+function getFixedRefKindLabel(value21) {
+  const value22 = FIXED_REF_KIND_LABEL_KEYS[String(value21 || '')];
+  return value22 ? referenceInputText(value22) : '';
 }
-function getFixedRefSlotFallbackLabel(_0xc95df0) {
-  const _0x173e01 = FIXED_REF_SLOT_FALLBACK_LABEL_KEYS[String(_0xc95df0 || '')];
-  return _0x173e01 ? referenceInputText(_0x173e01) : '';
+function getFixedRefSlotFallbackLabel(value23) {
+  const value24 = FIXED_REF_SLOT_FALLBACK_LABEL_KEYS[String(value23 || '')];
+  return value24 ? referenceInputText(value24) : '';
 }
 function createRefThumbDeleteButtonHtml() {
   return (
@@ -253,108 +250,114 @@ function createRefThumbDeleteButtonHtml() {
     '">&times;</button>'
   );
 }
-function getFixedSlotLabelHtml(_0x32e047, _0x3dd032) {
-  const _0x294108 = String(_0x3dd032 || '').trim(),
-    _0x5bb5ef = _0x32e047?.slotById?.[_0x294108] || null,
-    _0x14d2fc =
-      String(_0x5bb5ef?.label || '').trim() ||
-      getFixedRefSlotFallbackLabel(_0x294108) ||
-      getFixedRefKindLabel(_0x32e047?.slotKindById?.[_0x294108]) ||
-      _0x294108;
-  return escapeHtmlText(_0x14d2fc);
+function getFixedSlotLabelHtml(value25, value26) {
+  const value27 = String(value26 || '').trim(),
+    value28 = value25?.slotById?.[value27] || null,
+    value29 =
+      String(value28?.label || '').trim() ||
+      getFixedRefSlotFallbackLabel(value27) ||
+      getFixedRefKindLabel(value25?.slotKindById?.[value27]) ||
+      value27;
+  return escapeHtmlText(value29);
 }
-function getFixedSlotAcceptMap(_0xb3ec84) {
-  const _0x2ce1cf = {};
+function getFixedSlotAcceptMap(value30) {
+  const value31 = {};
   return (
-    (_0xb3ec84?.visibleSlots || []).forEach((_0x4af91c) => {
-      const _0x5190f4 = String(_0xb3ec84?.slotKindById?.[_0x4af91c] || '').trim();
-      if (_0x4af91c && _0x5190f4) _0x2ce1cf[_0x4af91c] = _0x5190f4;
+    (value30?.visibleSlots || []).forEach((item8) => {
+      const value32 = String(value30?.slotKindById?.[item8] || '').trim();
+      if (item8 && value32) value31[item8] = value32;
     }),
-    _0x2ce1cf
+    value31
   );
 }
-function normalizeDisplayRatioSource(_0x5055d4) {
-  if (!_0x5055d4 || typeof _0x5055d4 !== 'object' || Array.isArray(_0x5055d4)) return null;
-  const _0x151504 = Array.from(
+function normalizeDisplayRatioSource(enabled2) {
+  if (!enabled2 || typeof enabled2 !== 'object' || Array.isArray(enabled2)) return null;
+  const slot2 = Array.from(
       new Set(
         [
-          String(_0x5055d4.slot || _0x5055d4.refSlot || '').trim(),
-          ...(Array.isArray(_0x5055d4.slots) ? _0x5055d4.slots : []),
+          String(enabled2.slot || enabled2.refSlot || '').trim(),
+          ...(Array.isArray(enabled2.slots) ? enabled2.slots : []),
         ]
-          .map((_0x46d277) => String(_0x46d277 || '').trim())
+          .map((item9) => String(item9 || '').trim())
           .filter(Boolean),
       ),
     ),
-    _0x3e184c = String(_0x5055d4.kind || '').trim(),
-    _0x3587fe = Number(_0x5055d4.fallbackIndex ?? _0x5055d4.inputIndex ?? _0x5055d4.index),
-    _0x56a786 = Number.isFinite(_0x3587fe) && _0x3587fe >= 0 ? Math.trunc(_0x3587fe) : null;
-  if (_0x151504.length === 0 && _0x56a786 === null) return null;
+    kind = String(enabled2.kind || '').trim(),
+    count3 = Number(enabled2.fallbackIndex ?? enabled2.inputIndex ?? enabled2.index),
+    fallbackIndex = Number.isFinite(count3) && count3 >= 0 ? Math.trunc(count3) : null;
+  if (slot2.length === 0 && fallbackIndex === null) return null;
   return {
-    ...(_0x151504.length ? { slot: _0x151504[0], slots: _0x151504 } : {}),
-    ...(_0x3e184c ? { kind: _0x3e184c } : {}),
-    ...(_0x56a786 !== null ? { fallbackIndex: _0x56a786 } : {}),
+    ...(slot2.length ? { slot: slot2[0], slots: slot2 } : {}),
+    ...(kind ? { kind: kind } : {}),
+    ...(fallbackIndex !== null ? { fallbackIndex: fallbackIndex } : {}),
   };
 }
-function resolveConfiguredDisplayRatioSlot(_0x5cad24, _0x14fb9b = {}) {
-  const _0x4936dd = normalizeDisplayRatioSource(_0x5cad24?.manifest?.inputSlots?.displayAspectRatioSource);
-  if (!_0x4936dd) return null;
-  const _0x3bf336 = Array.isArray(_0x4936dd.slots) ? _0x4936dd.slots : _0x4936dd.slot ? [_0x4936dd.slot] : [];
-  for (const _0x465f50 of _0x3bf336) {
-    if (!_0x14fb9b?.[_0x465f50]) continue;
-    if (_0x4936dd.kind && String(_0x5cad24?.slotKindById?.[_0x465f50] || '') !== _0x4936dd.kind) continue;
-    return { slot: _0x465f50, mode: 'configured' };
+function resolveConfiguredDisplayRatioSlot(value33, enabled3 = {}) {
+  const displayRatioSource = normalizeDisplayRatioSource(
+    value33?.manifest?.inputSlots?.displayAspectRatioSource,
+  );
+  if (!displayRatioSource) return null;
+  const value34 = Array.isArray(displayRatioSource.slots)
+    ? displayRatioSource.slots
+    : displayRatioSource.slot
+      ? [displayRatioSource.slot]
+      : [];
+  for (const slot3 of value34) {
+    if (!enabled3?.[slot3]) continue;
+    if (displayRatioSource.kind && String(value33?.slotKindById?.[slot3] || '') !== displayRatioSource.kind)
+      continue;
+    return { slot: slot3, mode: 'configured' };
   }
-  const _0x2f3531 = Array.isArray(_0x5cad24?.visibleSlots) ? _0x5cad24.visibleSlots : [],
-    _0x1a23a4 = _0x2f3531.filter((_0x11e2d6) => {
-      const _0x1c9950 = _0x14fb9b?.[_0x11e2d6];
-      if (!_0x1c9950) return false;
-      if (!_0x4936dd.kind) return true;
-      return String(_0x5cad24?.slotKindById?.[_0x11e2d6] || '') === _0x4936dd.kind;
+  const list2 = Array.isArray(value33?.visibleSlots) ? value33.visibleSlots : [],
+    slot4 = list2.filter((item10) => {
+      const enabled4 = enabled3?.[item10];
+      if (!enabled4) return false;
+      if (!displayRatioSource.kind) return true;
+      return String(value33?.slotKindById?.[item10] || '') === displayRatioSource.kind;
     }),
-    _0x477fc9 = _0x4936dd.fallbackIndex;
-  if (Number.isInteger(_0x477fc9) && _0x477fc9 >= 0 && _0x477fc9 < _0x1a23a4.length)
-    return { slot: _0x1a23a4[_0x477fc9], mode: 'configured' };
+    count4 = displayRatioSource.fallbackIndex;
+  if (Number.isInteger(count4) && count4 >= 0 && count4 < slot4.length)
+    return { slot: slot4[count4], mode: 'configured' };
   return null;
 }
-function resolveLegacySingleReferenceVideoSlot(_0x372fd9, _0x424d53 = {}) {
-  const _0x2652c2 = _0x372fd9?.visibleSlots || [],
-    _0x32f3e9 =
-      _0x2652c2.length === 2 &&
-      _0x2652c2[0] === 'sourceVideo' &&
-      _0x2652c2[1] === 'refImage' &&
-      (_0x372fd9?.fixedSlots || []).length === 2;
-  if (!_0x32f3e9 || !_0x424d53?.sourceVideo) return null;
+function resolveLegacySingleReferenceVideoSlot(value35, enabled5 = {}) {
+  const list3 = value35?.visibleSlots || [],
+    enabled6 =
+      list3.length === 2 &&
+      list3[0] === 'sourceVideo' &&
+      list3[1] === 'refImage' &&
+      (value35?.fixedSlots || []).length === 2;
+  if (!enabled6 || !enabled5?.sourceVideo) return null;
   return { slot: 'sourceVideo', mode: 'sourceVideoFrames' };
 }
-function resolveFixedInputDisplayRatioSlot(_0x191afc, _0x51f60f = {}) {
+function resolveFixedInputDisplayRatioSlot(value36, value37 = {}) {
   return (
-    resolveConfiguredDisplayRatioSlot(_0x191afc, _0x51f60f) ||
-    resolveLegacySingleReferenceVideoSlot(_0x191afc, _0x51f60f)
+    resolveConfiguredDisplayRatioSlot(value36, value37) ||
+    resolveLegacySingleReferenceVideoSlot(value36, value37)
   );
 }
-function getFixedInputRatioMediaSize(_0x45633c, _0x5dc366 = {}) {
-  if (!_0x45633c) return null;
-  const _0xb1a9b0 = String(_0x45633c.kind || _0x45633c.refType || '').trim(),
-    _0x2b6443 = _0x45633c.node || _0x45633c.ref?.nodeData || _0x5dc366?.[_0x45633c.sourceId];
-  if (!_0x2b6443) return null;
-  const _0x957e0 = _0xb1a9b0 === 'video' ? 'video' : _0xb1a9b0 === 'image' ? 'img' : 'img, video';
+function getFixedInputRatioMediaSize(nodeId, value38 = {}) {
+  if (!nodeId) return null;
+  const value39 = String(nodeId.kind || nodeId.refType || '').trim(),
+    nodeData2 = nodeId.node || nodeId.ref?.nodeData || value38?.[nodeId.sourceId];
+  if (!nodeData2) return null;
+  const mediaSelector = value39 === 'video' ? 'video' : value39 === 'image' ? 'img' : 'img, video';
   return getGenerationRatioSizeWithDom({
-    nodeId: _0x45633c.sourceId,
-    nodeData: _0x2b6443,
-    edge: _0x45633c.edge || null,
-    mediaSelector: _0x957e0,
+    nodeId: nodeId.sourceId,
+    nodeData: nodeData2,
+    edge: nodeId.edge || null,
+    mediaSelector: mediaSelector,
     includeNodeFrame: true,
   });
 }
-function calcFixedInputDisplaySize(_0x48145c, _0xebc4af, _0x58a6b6 = 0x12c) {
-  const _0x5b2603 = Number(_0x48145c),
-    _0x5839b7 = Number(_0xebc4af);
-  if (!(Number.isFinite(_0x5b2603) && _0x5b2603 > 0)) return null;
-  if (!(Number.isFinite(_0x5839b7) && _0x5839b7 > 0)) return null;
-  const _0x20ab7d = Math.max(1, Math.round(Number(_0x58a6b6) || 0x12c));
-  if (_0x5b2603 >= _0x5839b7)
-    return { width: Math.round((_0x5b2603 / _0x5839b7) * _0x20ab7d), height: _0x20ab7d };
-  return { width: _0x20ab7d, height: Math.round((_0x5839b7 / _0x5b2603) * _0x20ab7d) };
+function calcFixedInputDisplaySize(value40, value41, value42 = 0x12c) {
+  const count5 = Number(value40),
+    count6 = Number(value41);
+  if (!(Number.isFinite(count5) && count5 > 0)) return null;
+  if (!(Number.isFinite(count6) && count6 > 0)) return null;
+  const height = Math.max(1, Math.round(Number(value42) || 0x12c));
+  if (count5 >= count6) return { width: Math.round((count5 / count6) * height), height: height };
+  return { width: height, height: Math.round((count6 / count5) * height) };
 }
 export const __videoReferenceInputTest = {
   getVideoThumbCandidate: getVideoThumbCandidate,
@@ -364,210 +367,208 @@ export const __videoReferenceInputTest = {
   createRunningHubAudioFallbackThumbHtml: createRunningHubAudioFallbackThumbHtml,
   calcFixedInputDisplaySize: calcFixedInputDisplaySize,
 };
-export function createVideoNodeReferenceInputModule(_0x41f3ac) {
+export function createVideoNodeReferenceInputModule(value43) {
   const {
-    store: _0x2b49c9,
-    api: _0x50c6b2,
-    _syncPillLabels: _0xd25a29,
-    getImage: _0x46ffd3,
-    ensureThumbDecoded: _0x3ca8ce,
-    revealRefThumbMedia: _0x9589d,
-  } = _0x41f3ac;
-  class _0x21ad33 {
-    ['_getRefSourceStateKey'](_0x18343d) {
-      const _0x3d9a43 = String(_0x18343d?.type || ''),
-        _0x455fba = getReferenceMaskSignaturePart(_0x18343d),
-        _0x1fecec = normalizeRefSignaturePart(
-          _0x18343d?.outputText || _0x18343d?.text || _0x18343d?.content || '',
+    store: store,
+    api: api,
+    _syncPillLabels: _syncPillLabels,
+    getImage: getImage,
+    ensureThumbDecoded: ensureThumbDecoded,
+    revealRefThumbMedia: revealRefThumbMedia,
+  } = value43;
+  class value44 {
+    ['_getRefSourceStateKey'](response) {
+      const list4 = String(response?.type || ''),
+        referenceMaskSignaturePart = getReferenceMaskSignaturePart(response),
+        refSignaturePart = normalizeRefSignaturePart(
+          response?.outputText || response?.text || response?.content || '',
         );
-      if (_0x3d9a43.includes('text')) return 't:' + _0x1fecec;
-      if (_0x3d9a43.includes('video')) {
-        const _0x9a4599 = (Array.isArray(_0x18343d?.videos) ? _0x18343d.videos : [])
-          .map((_0x3229e6) =>
+      if (list4.includes('text')) return 't:' + refSignaturePart;
+      if (list4.includes('video')) {
+        const value45 = (Array.isArray(response?.videos) ? response.videos : [])
+          .map((item11) =>
             [
-              normalizeVideoMediaKey(_0x3229e6?.localPath),
-              normalizeVideoMediaKey(_0x3229e6?.displayLocalPath),
-              normalizeVideoMediaKey(_0x3229e6?.originalLocalPath),
-              normalizeVideoMediaKey(_0x3229e6?.videoLocalPath),
-              normalizeVideoMediaKey(_0x3229e6?.videoUrl),
-              normalizeVideoMediaKey(_0x3229e6?.thumbId),
-              normalizeVideoMediaKey(_0x3229e6?.thumbUrl),
-              Number(_0x3229e6?.videoFrameCount || _0x3229e6?.frameCount || 0) || 0,
-              Number(_0x3229e6?.videoDuration || _0x3229e6?.duration || 0) || 0,
-              Number(_0x3229e6?.videoFps || _0x3229e6?.fps || 0) || 0,
+              normalizeVideoMediaKey(item11?.localPath),
+              normalizeVideoMediaKey(item11?.displayLocalPath),
+              normalizeVideoMediaKey(item11?.originalLocalPath),
+              normalizeVideoMediaKey(item11?.videoLocalPath),
+              normalizeVideoMediaKey(item11?.videoUrl),
+              normalizeVideoMediaKey(item11?.thumbId),
+              normalizeVideoMediaKey(item11?.thumbUrl),
+              Number(item11?.videoFrameCount || item11?.frameCount || 0) || 0,
+              Number(item11?.videoDuration || item11?.duration || 0) || 0,
+              Number(item11?.videoFps || item11?.fps || 0) || 0,
             ].join(','),
           )
           .join(';');
         return [
           'v',
-          Number.isFinite(Number(_0x18343d?.mainVideoIndex))
-            ? Math.max(0, Math.trunc(Number(_0x18343d.mainVideoIndex)))
+          Number.isFinite(Number(response?.mainVideoIndex))
+            ? Math.max(0, Math.trunc(Number(response.mainVideoIndex)))
             : 0,
-          normalizeVideoMediaKey(_0x18343d?.thumbId),
-          normalizeVideoMediaKey(_0x18343d?.thumbUrl),
-          normalizeVideoMediaKey(_0x18343d?.localPath),
-          normalizeVideoMediaKey(_0x18343d?.displayLocalPath),
-          normalizeVideoMediaKey(_0x18343d?.originalLocalPath),
-          normalizeVideoMediaKey(_0x18343d?.videoLocalPath),
-          normalizeVideoMediaKey(_0x18343d?.videoUrl),
-          normalizeVideoMediaKey(_0x18343d?.src),
-          normalizeVideoMediaKey(_0x18343d?.url),
-          normalizeVideoMediaKey(_0x18343d?.resultUrl),
-          normalizeVideoMediaKey(_0x18343d?.sourceUrl),
-          Number(_0x18343d?.videoFrameCount || 0) || 0,
-          Number(_0x18343d?.videoDuration || 0) || 0,
-          Number(_0x18343d?.videoFps || 0) || 0,
-          _0x9a4599,
+          normalizeVideoMediaKey(response?.thumbId),
+          normalizeVideoMediaKey(response?.thumbUrl),
+          normalizeVideoMediaKey(response?.localPath),
+          normalizeVideoMediaKey(response?.displayLocalPath),
+          normalizeVideoMediaKey(response?.originalLocalPath),
+          normalizeVideoMediaKey(response?.videoLocalPath),
+          normalizeVideoMediaKey(response?.videoUrl),
+          normalizeVideoMediaKey(response?.src),
+          normalizeVideoMediaKey(response?.url),
+          normalizeVideoMediaKey(response?.resultUrl),
+          normalizeVideoMediaKey(response?.sourceUrl),
+          Number(response?.videoFrameCount || 0) || 0,
+          Number(response?.videoDuration || 0) || 0,
+          Number(response?.videoFps || 0) || 0,
+          value45,
         ].join(':');
       }
-      if (_0x3d9a43.includes('audio'))
+      if (list4.includes('audio'))
         return [
           'a',
-          normalizeRefSignaturePart(_0x18343d?.audioUrl),
-          normalizeRefSignaturePart(_0x18343d?.src),
-          normalizeRefSignaturePart(_0x18343d?.localPath),
+          normalizeRefSignaturePart(response?.audioUrl),
+          normalizeRefSignaturePart(response?.src),
+          normalizeRefSignaturePart(response?.localPath),
         ].join(':');
       return [
         'i',
-        normalizeRefSignaturePart(_0x18343d?.thumbId),
-        normalizeRefSignaturePart(_0x18343d?.thumbUrl),
-        normalizeRefSignaturePart(_0x18343d?.imageUrl),
-        normalizeRefSignaturePart(_0x18343d?.src),
-        normalizeRefSignaturePart(_0x18343d?.localPath),
-        _0x455fba,
+        normalizeRefSignaturePart(response?.thumbId),
+        normalizeRefSignaturePart(response?.thumbUrl),
+        normalizeRefSignaturePart(response?.imageUrl),
+        normalizeRefSignaturePart(response?.src),
+        normalizeRefSignaturePart(response?.localPath),
+        referenceMaskSignaturePart,
       ].join(':');
     }
-    ['_getRhV5SourceVideoFrameCount'](_0x19a786) {
-      const _0xf1dcad = _0x2b49c9.getIncomingEdges(this.nodeId) || [],
-        _0x3e7d01 = _0x2b49c9.getState() || {},
-        _0x378dc4 = _0x3e7d01.nodes || {};
+    ['_getRhV5SourceVideoFrameCount'](targetFps2) {
+      const inEdges2 = store.getIncomingEdges(this.nodeId) || [],
+        value46 = store.getState() || {},
+        nodes2 = value46.nodes || {};
       return getRhV5SourceVideoFrameCount({
-        inEdges: _0xf1dcad,
-        nodes: _0x378dc4,
+        inEdges: inEdges2,
+        nodes: nodes2,
         promptEl: this.promptEl,
-        nodeData: _0x378dc4?.[this.nodeId] || this._data || null,
-        targetFps: _0x19a786,
+        nodeData: nodes2?.[this.nodeId] || this._data || null,
+        targetFps: targetFps2,
       });
     }
-    ['_createAssetRefThumbData'](_0x385b72, { slot: slot = '', key: key = '' } = {}) {
-      const _0xaa206a = String(_0x385b72?.type || '').trim();
-      if (!_0xaa206a) return null;
-      let _0x2d425b = '',
-        _0x2e8a3a = '';
-      if (_0xaa206a === 'image') {
-        const _0x1082ee = this._resolveMediaUrl(_0x385b72.thumbUrl || _0x385b72.url || '');
-        if (!_0x1082ee) return null;
-        (_0x3ca8ce(_0x1082ee),
-          (_0x2d425b = '<img src="' + _0x1082ee + '" class="ref-thumb-media is-pending" draggable="false">'),
-          (_0x2e8a3a = 'asset-i|' + _0x1082ee));
+    ['_createAssetRefThumbData'](node3, { slot: slot = '', key: key = '' } = {}) {
+      const kind2 = String(node3?.type || '').trim();
+      if (!kind2) return null;
+      let html = '',
+        value47 = '';
+      if (kind2 === 'image') {
+        const enabled7 = this._resolveMediaUrl(node3.thumbUrl || node3.url || '');
+        if (!enabled7) return null;
+        (ensureThumbDecoded(enabled7),
+          (html = '<img src="' + enabled7 + '" class="ref-thumb-media is-pending" draggable="false">'),
+          (value47 = 'asset-i|' + enabled7));
       } else {
-        if (_0xaa206a === 'video') {
-          const _0x4b3f11 = this._resolveMediaUrl(_0x385b72.thumbUrl || '');
-          _0x4b3f11
-            ? (_0x3ca8ce(_0x4b3f11),
-              (_0x2d425b =
-                '<img src="' + _0x4b3f11 + '" class="ref-thumb-media is-pending" draggable="false">'),
-              (_0x2e8a3a = 'asset-v|' + _0x4b3f11))
-            : ((_0x2d425b = createReferenceFallbackThumbHtml('video')), (_0x2e8a3a = 'asset-v|fallback'));
+        if (kind2 === 'video') {
+          const value48 = this._resolveMediaUrl(node3.thumbUrl || '');
+          value48
+            ? (ensureThumbDecoded(value48),
+              (html = '<img src="' + value48 + '" class="ref-thumb-media is-pending" draggable="false">'),
+              (value47 = 'asset-v|' + value48))
+            : ((html = createReferenceFallbackThumbHtml('video')), (value47 = 'asset-v|fallback'));
         } else {
-          if (_0xaa206a === 'audio')
-            ((_0x2d425b = createReferenceFallbackThumbHtml('audio')), (_0x2e8a3a = 'asset-a|fallback'));
+          if (kind2 === 'audio')
+            ((html = createReferenceFallbackThumbHtml('audio')), (value47 = 'asset-a|fallback'));
           else {
-            if (_0xaa206a === 'text')
-              ((_0x2d425b = createReferenceFallbackThumbHtml('text')),
-                (_0x2e8a3a = 'asset-t|' + String(_0x385b72.content || _0x385b72.label || '').trim()));
+            if (kind2 === 'text')
+              ((html = createReferenceFallbackThumbHtml('text')),
+                (value47 = 'asset-t|' + String(node3.content || node3.label || '').trim()));
             else return null;
           }
         }
       }
-      const _0x10f83c = String(_0x385b72.assetId || ''),
-        _0x20f21e = String(_0x385b72.itemIndex ?? ''),
-        _0x21510b = String(_0x385b72.assetMentionOccurrence ?? ''),
-        _0x1728ec = String(_0x385b72.assetRefSource || 'prompt'),
-        _0x49efa9 = 'asset:' + _0x10f83c + ':' + _0x20f21e;
+      const assetId = String(node3.assetId || ''),
+        assetIndex = String(node3.itemIndex ?? ''),
+        assetOccurrence = String(node3.assetMentionOccurrence ?? ''),
+        assetRefSource = String(node3.assetRefSource || 'prompt'),
+        sourceId = 'asset:' + assetId + ':' + assetIndex;
       return {
         key:
-          key || 'asset:' + _0x1728ec + ':' + _0x10f83c + ':' + _0x20f21e + ':' + _0xaa206a + ':' + _0x21510b,
+          key ||
+          'asset:' + assetRefSource + ':' + assetId + ':' + assetIndex + ':' + kind2 + ':' + assetOccurrence,
         edgeId: '',
-        kind: _0xaa206a,
-        sourceId: _0x49efa9,
-        assetId: _0x10f83c,
-        assetIndex: _0x20f21e,
-        assetOccurrence: _0x21510b,
-        assetRefSource: _0x1728ec,
-        refType: _0xaa206a,
-        node: _0x385b72.nodeData || null,
-        ref: _0x385b72,
-        html: _0x2d425b,
-        thumbHTML: _0x2d425b,
+        kind: kind2,
+        sourceId: sourceId,
+        assetId: assetId,
+        assetIndex: assetIndex,
+        assetOccurrence: assetOccurrence,
+        assetRefSource: assetRefSource,
+        refType: kind2,
+        node: node3.nodeData || null,
+        ref: node3,
+        html: html,
+        thumbHTML: html,
         sig:
           '' +
           (slot ? slot + '|' : '') +
-          _0x49efa9 +
+          sourceId +
           '|' +
-          _0xaa206a +
+          kind2 +
           '|' +
-          String(_0x385b72.url || '') +
+          String(node3.url || '') +
           '|' +
-          _0x2e8a3a,
+          value47,
         virtual: true,
       };
     }
-    ['_createTextEdgeRefThumbData'](_0x5f555e, _0x2b61b1) {
-      const _0x11a25e = String(
-        _0x2b61b1?.outputText || _0x2b61b1?.text || _0x2b61b1?.content || _0x2b61b1?.prompt || '',
+    ['_createTextEdgeRefThumbData'](edgeId, response2) {
+      const enabled8 = String(
+        response2?.outputText || response2?.text || response2?.content || response2?.prompt || '',
       ).trim();
-      if (!_0x11a25e) return null;
+      if (!enabled8) return null;
       return {
-        key: 'edge:' + _0x5f555e.id,
-        edgeId: _0x5f555e.id,
+        key: 'edge:' + edgeId.id,
+        edgeId: edgeId.id,
         kind: 'text',
-        sourceId: _0x5f555e.sourceId,
+        sourceId: edgeId.sourceId,
         html: createReferenceFallbackThumbHtml('text'),
-        sig: 'text|' + _0x5f555e.id + '|' + _0x5f555e.sourceId + '|' + _0x11a25e,
+        sig: 'text|' + edgeId.id + '|' + edgeId.sourceId + '|' + enabled8,
       };
     }
-    ['_syncFixedTrailingRefItems'](_0x2007a5, _0x3d71d7 = []) {
-      if (!_0x2007a5) return;
-      const _0x26a0d5 = new Map();
-      _0x2007a5
-        .querySelectorAll('.rh-fixed-extra-ref')
-        .forEach((_0x1dae0c) => _0x26a0d5.set(_0x1dae0c.dataset.refKey, _0x1dae0c));
-      const _0x5b0626 = new Set();
-      (Array.isArray(_0x3d71d7) ? _0x3d71d7 : []).forEach((_0x568641) => {
-        if (!_0x568641?.key) return;
-        let _0x46acb6 = _0x26a0d5.get(_0x568641.key);
-        (!_0x46acb6 &&
-          ((_0x46acb6 = document.createElement('div')),
-          (_0x46acb6.className =
+    ['_syncFixedTrailingRefItems'](el, value49 = []) {
+      if (!el) return;
+      const map = new Map();
+      el.querySelectorAll('.rh-fixed-extra-ref').forEach((el2) => map.set(el2.dataset.refKey, el2));
+      const map2 = new Set();
+      (Array.isArray(value49) ? value49 : []).forEach((event) => {
+        if (!event?.key) return;
+        let el3 = map.get(event.key);
+        (!el3 &&
+          ((el3 = document.createElement('div')),
+          (el3.className =
             'ref-thumb-wrap rh-v5-ref-box rh-fixed-extra-ref' +
-            (_0x568641.virtual ? ' ref-thumb-wrap--asset' : ''))),
-          _0x46acb6.setAttribute('draggable', _0x568641.virtual || !_0x568641.edgeId ? 'false' : 'true'),
-          _0x46acb6.dataset.sig !== _0x568641.sig &&
-            ((_0x46acb6.innerHTML = '' + _0x568641.html + createRefThumbDeleteButtonHtml()),
-            (_0x46acb6.dataset.sig = _0x568641.sig),
-            _0x9589d(_0x46acb6, _0x568641.sig)),
-          (_0x46acb6.dataset.refKey = _0x568641.key),
-          (_0x46acb6.dataset.edgeId = _0x568641.edgeId || ''),
-          (_0x46acb6.dataset.kind = _0x568641.kind || ''),
-          (_0x46acb6.dataset.sourceId = _0x568641.sourceId || ''),
-          (_0x46acb6.dataset.refOrigin = _0x568641.virtual ? 'asset' : 'node'),
-          _0x568641.virtual
-            ? ((_0x46acb6.dataset.assetId = _0x568641.assetId || ''),
-              (_0x46acb6.dataset.assetIndex = _0x568641.assetIndex || ''),
-              (_0x46acb6.dataset.assetOccurrence = _0x568641.assetOccurrence || ''),
-              (_0x46acb6.dataset.assetRefSource = _0x568641.assetRefSource || 'prompt'),
-              (_0x46acb6.dataset.refType = _0x568641.refType || _0x568641.kind || ''))
-            : (delete _0x46acb6.dataset.assetId,
-              delete _0x46acb6.dataset.assetIndex,
-              delete _0x46acb6.dataset.assetOccurrence,
-              delete _0x46acb6.dataset.assetRefSource,
-              delete _0x46acb6.dataset.refType),
-          _0x2007a5.appendChild(_0x46acb6),
-          _0x5b0626.add(_0x568641.key));
+            (event.virtual ? ' ref-thumb-wrap--asset' : ''))),
+          el3.setAttribute('draggable', event.virtual || !event.edgeId ? 'false' : 'true'),
+          el3.dataset.sig !== event.sig &&
+            ((el3.innerHTML = '' + event.html + createRefThumbDeleteButtonHtml()),
+            (el3.dataset.sig = event.sig),
+            revealRefThumbMedia(el3, event.sig)),
+          (el3.dataset.refKey = event.key),
+          (el3.dataset.edgeId = event.edgeId || ''),
+          (el3.dataset.kind = event.kind || ''),
+          (el3.dataset.sourceId = event.sourceId || ''),
+          (el3.dataset.refOrigin = event.virtual ? 'asset' : 'node'),
+          event.virtual
+            ? ((el3.dataset.assetId = event.assetId || ''),
+              (el3.dataset.assetIndex = event.assetIndex || ''),
+              (el3.dataset.assetOccurrence = event.assetOccurrence || ''),
+              (el3.dataset.assetRefSource = event.assetRefSource || 'prompt'),
+              (el3.dataset.refType = event.refType || event.kind || ''))
+            : (delete el3.dataset.assetId,
+              delete el3.dataset.assetIndex,
+              delete el3.dataset.assetOccurrence,
+              delete el3.dataset.assetRefSource,
+              delete el3.dataset.refType),
+          el.appendChild(el3),
+          map2.add(event.key));
       });
-      for (const [_0x39898e, _0x14b89b] of _0x26a0d5.entries()) {
-        if (!_0x5b0626.has(_0x39898e)) _0x14b89b.remove();
+      for (const [value50, el4] of map.entries()) {
+        if (!map2.has(value50)) el4.remove();
       }
     }
     ['_getFixedSlotRefThumbObjectUrlMap']() {
@@ -576,414 +577,400 @@ export function createVideoNodeReferenceInputModule(_0x41f3ac) {
         this._fixedSlotRefThumbObjectUrls
       );
     }
-    ['_clearObjectUrlMap'](_0x3f955d) {
-      if (!_0x3f955d || _0x3f955d.size === 0) return;
-      for (const _0x406627 of _0x3f955d.values()) {
-        _0x406627 && String(_0x406627).startsWith('blob:') && URL.revokeObjectURL(_0x406627);
+    ['_clearObjectUrlMap'](map3) {
+      if (!map3 || map3.size === 0) return;
+      for (const value51 of map3.values()) {
+        value51 && String(value51).startsWith('blob:') && URL.revokeObjectURL(value51);
       }
-      _0x3f955d.clear();
+      map3.clear();
     }
-    ['_pruneFixedSlotRefThumbObjectUrls'](_0xed1e37 = [], _0x4e5422 = {}) {
-      const _0x4bc221 = this._getFixedSlotRefThumbObjectUrlMap(),
-        _0x1d95e3 = new Set();
-      for (const _0x269f98 of _0xed1e37 || []) {
-        const _0x6a4a89 = _0x4e5422?.[_0x269f98?.sourceId];
-        if (_0x6a4a89?.thumbId) _0x1d95e3.add(_0x6a4a89.thumbId);
+    ['_pruneFixedSlotRefThumbObjectUrls'](list5 = [], value52 = {}) {
+      const map4 = this._getFixedSlotRefThumbObjectUrlMap(),
+        map5 = new Set();
+      for (const value53 of list5 || []) {
+        const value54 = value52?.[value53?.sourceId];
+        if (value54?.thumbId) map5.add(value54.thumbId);
       }
-      for (const [_0x17404b, _0x223502] of _0x4bc221.entries()) {
-        if (_0x1d95e3.has(_0x17404b)) continue;
-        (_0x223502 && String(_0x223502).startsWith('blob:') && URL.revokeObjectURL(_0x223502),
-          _0x4bc221.delete(_0x17404b));
+      for (const [value55, value56] of map4.entries()) {
+        if (map5.has(value55)) continue;
+        (value56 && String(value56).startsWith('blob:') && URL.revokeObjectURL(value56),
+          map4.delete(value55));
       }
     }
-    ['_resolveFixedMediaUrl'](_0x2ecd17) {
-      const _0x4f808f = String(_0x2ecd17 || '').trim();
-      if (!_0x4f808f) return '';
-      if (typeof this._resolveMediaUrl === 'function') return this._resolveMediaUrl(_0x4f808f);
-      return _0x4f808f;
+    ['_resolveFixedMediaUrl'](value57) {
+      const enabled9 = String(value57 || '').trim();
+      if (!enabled9) return '';
+      if (typeof this._resolveMediaUrl === 'function') return this._resolveMediaUrl(enabled9);
+      return enabled9;
     }
-    async ['_resolveFixedThumbObjectUrl'](_0x2be8fa) {
-      const _0x48e3dc = String(_0x2be8fa || '').trim();
-      if (!_0x48e3dc) return '';
-      const _0x23a6d0 = this._getFixedSlotRefThumbObjectUrlMap();
-      if (_0x23a6d0.has(_0x48e3dc)) return _0x23a6d0.get(_0x48e3dc);
-      const _0x578c69 = await _0x46ffd3(_0x48e3dc);
-      if (!_0x578c69) return '';
-      const _0x480490 = URL.createObjectURL(_0x578c69);
-      return (_0x23a6d0.set(_0x48e3dc, _0x480490), _0x480490);
+    async ['_resolveFixedThumbObjectUrl'](value58) {
+      const enabled10 = String(value58 || '').trim();
+      if (!enabled10) return '';
+      const map6 = this._getFixedSlotRefThumbObjectUrlMap();
+      if (map6.has(enabled10)) return map6.get(enabled10);
+      const enabled11 = await getImage(enabled10);
+      if (!enabled11) return '';
+      const value59 = URL.createObjectURL(enabled11);
+      return (map6.set(enabled10, value59), value59);
     }
-    async ['_createFixedEdgeRefThumbData'](_0x85229d, _0x384965, _0x1a9a19, _0x4e2855) {
-      const _0xe9e71f = String(_0x1a9a19 || '').trim();
-      if (!_0x85229d || !_0x384965 || !_0xe9e71f) return null;
-      if (_0xe9e71f === 'text') return this._createTextEdgeRefThumbData(_0x85229d, _0x384965);
-      let _0x2df400 = '',
-        _0x488dbb = '';
-      if (_0xe9e71f === 'image') {
-        let _0x47b330 = await this._resolveFixedThumbObjectUrl(_0x384965.thumbId);
-        !_0x47b330 && (_0x47b330 = this._resolveFixedMediaUrl(resolveCanvasImageLowZoomUrl(_0x384965)));
-        !_0x47b330 &&
-          _0x384965.localPath &&
-          (_0x47b330 = this._resolveFixedMediaUrl(localPathToUrl(_0x384965.localPath)));
-        if (!_0x47b330) return null;
-        (_0x3ca8ce(_0x47b330),
-          (_0x2df400 =
+    async ['_createFixedEdgeRefThumbData'](edgeId2, node4, value60, value61) {
+      const kind3 = String(value60 || '').trim();
+      if (!edgeId2 || !node4 || !kind3) return null;
+      if (kind3 === 'text') return this._createTextEdgeRefThumbData(edgeId2, node4);
+      let html2 = '',
+        value62 = '';
+      if (kind3 === 'image') {
+        let enabled12 = await this._resolveFixedThumbObjectUrl(node4.thumbId);
+        !enabled12 && (enabled12 = this._resolveFixedMediaUrl(resolveCanvasImageLowZoomUrl(node4)));
+        !enabled12 &&
+          node4.localPath &&
+          (enabled12 = this._resolveFixedMediaUrl(localPathToUrl(node4.localPath)));
+        if (!enabled12) return null;
+        (ensureThumbDecoded(enabled12),
+          (html2 =
             '<img src="' +
-            _0x47b330 +
+            enabled12 +
             '" class="ref-thumb-media is-pending" draggable="false">' +
-            createReferenceMaskBadgeHtml(_0x384965)),
-          (_0x488dbb = 'i|' + _0x47b330 + '|' + getReferenceMaskSignaturePart(_0x384965)));
+            createReferenceMaskBadgeHtml(node4)),
+          (value62 = 'i|' + enabled12 + '|' + getReferenceMaskSignaturePart(node4)));
       } else {
-        if (_0xe9e71f === 'video') {
-          const _0x152ce5 = getVideoRefMediaSignature(_0x384965, _0x85229d);
-          let _0x5628d6 = await this._resolveFixedThumbObjectUrl(_0x384965.thumbId);
-          if (!_0x5628d6) {
-            const _0x50ebde = getVideoThumbCandidate(_0x384965, _0x85229d);
-            _0x5628d6 = this._resolveFixedMediaUrl(_0x50ebde.thumbUrl || _0x384965.imageUrl || '');
+        if (kind3 === 'video') {
+          const videoRefMediaSignature = getVideoRefMediaSignature(node4, edgeId2);
+          let enabled13 = await this._resolveFixedThumbObjectUrl(node4.thumbId);
+          if (!enabled13) {
+            const videoThumbCandidate = getVideoThumbCandidate(node4, edgeId2);
+            enabled13 = this._resolveFixedMediaUrl(videoThumbCandidate.thumbUrl || node4.imageUrl || '');
           }
-          _0x5628d6
-            ? (_0x3ca8ce(_0x5628d6),
-              (_0x2df400 =
-                '<img src="' + _0x5628d6 + '" class="ref-thumb-media is-pending" draggable="false">'),
-              (_0x488dbb = 'v|' + (_0x152ce5 || _0x5628d6)))
-            : (_0x4e2855?.(_0x85229d, _0x384965),
-              (_0x2df400 = createReferenceFallbackThumbHtml(
-                'video',
-                'ref-thumb-media rh-v5-ref-media-fallback',
-              )),
-              (_0x488dbb = 'v|' + (_0x152ce5 || 'fallback')));
+          enabled13
+            ? (ensureThumbDecoded(enabled13),
+              (html2 = '<img src="' + enabled13 + '" class="ref-thumb-media is-pending" draggable="false">'),
+              (value62 = 'v|' + (videoRefMediaSignature || enabled13)))
+            : (value61?.(edgeId2, node4),
+              (html2 = createReferenceFallbackThumbHtml('video', 'ref-thumb-media rh-v5-ref-media-fallback')),
+              (value62 = 'v|' + (videoRefMediaSignature || 'fallback')));
         } else {
-          if (_0xe9e71f === 'audio') {
-            const _0x5fd65b = String(_0x384965.localPath || _0x384965.src || _0x384965.audioUrl || '');
-            if (!_0x5fd65b) return null;
-            ((_0x2df400 = createRunningHubAudioFallbackThumbHtml()), (_0x488dbb = 'a|' + _0x5fd65b));
+          if (kind3 === 'audio') {
+            const enabled14 = String(node4.localPath || node4.src || node4.audioUrl || '');
+            if (!enabled14) return null;
+            ((html2 = createRunningHubAudioFallbackThumbHtml()), (value62 = 'a|' + enabled14));
           } else return null;
         }
       }
       return {
-        key: 'edge:' + _0x85229d.id,
-        edgeId: _0x85229d.id,
-        kind: _0xe9e71f,
-        sourceId: _0x85229d.sourceId,
-        node: _0x384965,
-        edge: _0x85229d,
-        html: _0x2df400,
-        thumbHTML: _0x2df400,
-        sig: _0x85229d.id + '|' + _0x85229d.sourceId + '|' + _0x488dbb,
+        key: 'edge:' + edgeId2.id,
+        edgeId: edgeId2.id,
+        kind: kind3,
+        sourceId: edgeId2.sourceId,
+        node: node4,
+        edge: edgeId2,
+        html: html2,
+        thumbHTML: html2,
+        sig: edgeId2.id + '|' + edgeId2.sourceId + '|' + value62,
       };
     }
-    ['_syncFixedSlotEl'](_0x29a5ef, _0x2cdb77, _0xf1ae3c, _0x165983) {
-      if (!_0x29a5ef || !_0x2cdb77) return;
-      const _0x10a4e9 = String(_0x165983?.slotKindById?.[_0x2cdb77] || '').trim(),
-        _0x2e7277 = _0x29a5ef.querySelector('[data-slot="' + _0x2cdb77 + '"]');
-      if (!_0xf1ae3c) {
-        let _0x12c1a5 =
-          _0x2e7277 && _0x2e7277.classList?.contains('ref-upload-slot')
-            ? _0x2e7277
-            : document.createElement('button');
-        ((_0x12c1a5.className = 'ref-thumb-wrap ref-upload-slot rh-v5-ref-box'),
-          (_0x12c1a5.type = 'button'),
-          _0x12c1a5.setAttribute('draggable', 'false'),
-          _0x12c1a5.setAttribute('title', referenceInputText('uploadReference')),
-          (_0x12c1a5.dataset.slot = _0x2cdb77),
-          (_0x12c1a5.dataset.kind = _0x10a4e9),
-          (_0x12c1a5.dataset.edgeId = ''),
-          (_0x12c1a5.dataset.sourceId = ''),
-          (_0x12c1a5.dataset.refOrigin = ''),
-          delete _0x12c1a5.dataset.refKey,
-          delete _0x12c1a5.dataset.assetId,
-          delete _0x12c1a5.dataset.assetIndex,
-          delete _0x12c1a5.dataset.assetOccurrence,
-          delete _0x12c1a5.dataset.assetRefSource,
-          delete _0x12c1a5.dataset.refType);
-        const _0x289a8f = getFixedSlotLabelHtml(_0x165983, _0x2cdb77),
-          _0x1715b3 = 'empty|' + _0x2cdb77 + '|' + _0x10a4e9 + '|' + _0x289a8f;
-        _0x12c1a5.dataset.sig !== _0x1715b3 &&
-          ((_0x12c1a5.innerHTML = '<span class="ref-upload-label">' + _0x289a8f + '</span>'),
-          (_0x12c1a5.dataset.sig = _0x1715b3));
-        if (_0x2e7277 && _0x2e7277 !== _0x12c1a5) _0x2e7277.replaceWith(_0x12c1a5);
+    ['_syncFixedSlotEl'](el5, enabled15, event2, value63) {
+      if (!el5 || !enabled15) return;
+      const value64 = String(value63?.slotKindById?.[enabled15] || '').trim(),
+        el6 = el5.querySelector('[data-slot="' + enabled15 + '"]');
+      if (!event2) {
+        let el7 = el6 && el6.classList?.contains('ref-upload-slot') ? el6 : document.createElement('button');
+        ((el7.className = 'ref-thumb-wrap ref-upload-slot rh-v5-ref-box'),
+          (el7.type = 'button'),
+          el7.setAttribute('draggable', 'false'),
+          el7.setAttribute('title', referenceInputText('uploadReference')),
+          (el7.dataset.slot = enabled15),
+          (el7.dataset.kind = value64),
+          (el7.dataset.edgeId = ''),
+          (el7.dataset.sourceId = ''),
+          (el7.dataset.refOrigin = ''),
+          delete el7.dataset.refKey,
+          delete el7.dataset.assetId,
+          delete el7.dataset.assetIndex,
+          delete el7.dataset.assetOccurrence,
+          delete el7.dataset.assetRefSource,
+          delete el7.dataset.refType);
+        const fixedSlotLabelHtml = getFixedSlotLabelHtml(value63, enabled15),
+          value65 = 'empty|' + enabled15 + '|' + value64 + '|' + fixedSlotLabelHtml;
+        el7.dataset.sig !== value65 &&
+          ((el7.innerHTML = '<span class="ref-upload-label">' + fixedSlotLabelHtml + '</span>'),
+          (el7.dataset.sig = value65));
+        if (el6 && el6 !== el7) el6.replaceWith(el7);
         else {
-          if (!_0x2e7277) _0x29a5ef.appendChild(_0x12c1a5);
+          if (!el6) el5.appendChild(el7);
         }
         return;
       }
-      let _0x5a7a42 =
-        _0x2e7277 && !_0x2e7277.classList?.contains('ref-upload-slot')
-          ? _0x2e7277
-          : document.createElement('div');
-      ((_0x5a7a42.className =
-        'ref-thumb-wrap rh-v5-ref-box' + (_0xf1ae3c.virtual ? ' ref-thumb-wrap--asset' : '')),
-        _0x5a7a42.setAttribute('draggable', _0xf1ae3c.virtual || !_0xf1ae3c.edgeId ? 'false' : 'true'));
-      const _0x27758d = _0x2cdb77 + '|' + (_0xf1ae3c.sig || '');
-      _0x5a7a42.dataset.sig !== _0x27758d &&
-        ((_0x5a7a42.innerHTML = '' + _0xf1ae3c.html + createRefThumbDeleteButtonHtml()),
-        (_0x5a7a42.dataset.sig = _0x27758d),
-        _0x9589d(_0x5a7a42, _0x27758d));
-      ((_0x5a7a42.dataset.slot = _0x2cdb77),
-        (_0x5a7a42.dataset.kind = _0xf1ae3c.kind || _0x10a4e9),
-        (_0x5a7a42.dataset.refKey = _0xf1ae3c.key || (_0xf1ae3c.edgeId ? 'edge:' + _0xf1ae3c.edgeId : '')),
-        (_0x5a7a42.dataset.edgeId = _0xf1ae3c.edgeId || ''),
-        (_0x5a7a42.dataset.sourceId = _0xf1ae3c.sourceId || ''),
-        (_0x5a7a42.dataset.refOrigin = _0xf1ae3c.virtual ? 'asset' : 'node'));
-      _0xf1ae3c.virtual
-        ? ((_0x5a7a42.dataset.assetId = _0xf1ae3c.assetId || ''),
-          (_0x5a7a42.dataset.assetIndex = _0xf1ae3c.assetIndex || ''),
-          (_0x5a7a42.dataset.assetOccurrence = _0xf1ae3c.assetOccurrence || ''),
-          (_0x5a7a42.dataset.assetRefSource = _0xf1ae3c.assetRefSource || 'prompt'),
-          (_0x5a7a42.dataset.refType = _0xf1ae3c.refType || _0xf1ae3c.kind || _0x10a4e9))
-        : (delete _0x5a7a42.dataset.assetId,
-          delete _0x5a7a42.dataset.assetIndex,
-          delete _0x5a7a42.dataset.assetOccurrence,
-          delete _0x5a7a42.dataset.assetRefSource,
-          delete _0x5a7a42.dataset.refType);
-      if (_0x2e7277 && _0x2e7277 !== _0x5a7a42) _0x2e7277.replaceWith(_0x5a7a42);
+      let el8 = el6 && !el6.classList?.contains('ref-upload-slot') ? el6 : document.createElement('div');
+      ((el8.className = 'ref-thumb-wrap rh-v5-ref-box' + (event2.virtual ? ' ref-thumb-wrap--asset' : '')),
+        el8.setAttribute('draggable', event2.virtual || !event2.edgeId ? 'false' : 'true'));
+      const value66 = enabled15 + '|' + (event2.sig || '');
+      el8.dataset.sig !== value66 &&
+        ((el8.innerHTML = '' + event2.html + createRefThumbDeleteButtonHtml()),
+        (el8.dataset.sig = value66),
+        revealRefThumbMedia(el8, value66));
+      ((el8.dataset.slot = enabled15),
+        (el8.dataset.kind = event2.kind || value64),
+        (el8.dataset.refKey = event2.key || (event2.edgeId ? 'edge:' + event2.edgeId : '')),
+        (el8.dataset.edgeId = event2.edgeId || ''),
+        (el8.dataset.sourceId = event2.sourceId || ''),
+        (el8.dataset.refOrigin = event2.virtual ? 'asset' : 'node'));
+      event2.virtual
+        ? ((el8.dataset.assetId = event2.assetId || ''),
+          (el8.dataset.assetIndex = event2.assetIndex || ''),
+          (el8.dataset.assetOccurrence = event2.assetOccurrence || ''),
+          (el8.dataset.assetRefSource = event2.assetRefSource || 'prompt'),
+          (el8.dataset.refType = event2.refType || event2.kind || value64))
+        : (delete el8.dataset.assetId,
+          delete el8.dataset.assetIndex,
+          delete el8.dataset.assetOccurrence,
+          delete el8.dataset.assetRefSource,
+          delete el8.dataset.refType);
+      if (el6 && el6 !== el8) el6.replaceWith(el8);
       else {
-        if (!_0x2e7277) _0x29a5ef.appendChild(_0x5a7a42);
+        if (!el6) el5.appendChild(el8);
       }
     }
-    ['_syncFixedSlotOrder'](_0x4c93c9, _0x55eb6b = []) {
-      if (!_0x4c93c9) return;
-      const _0x2aea0d = _0x4c93c9.querySelector('.rh-fixed-extra-ref');
-      (Array.isArray(_0x55eb6b) ? _0x55eb6b : []).forEach((_0x503074) => {
-        const _0x4d7b2e = _0x4c93c9.querySelector('[data-slot="' + _0x503074 + '"]');
-        if (!_0x4d7b2e) return;
-        _0x2aea0d && typeof _0x4c93c9.insertBefore === 'function'
-          ? _0x4c93c9.insertBefore(_0x4d7b2e, _0x2aea0d)
-          : _0x4c93c9.appendChild(_0x4d7b2e);
+    ['_syncFixedSlotOrder'](el9, value67 = []) {
+      if (!el9) return;
+      const value68 = el9.querySelector('.rh-fixed-extra-ref');
+      (Array.isArray(value67) ? value67 : []).forEach((item12) => {
+        const enabled16 = el9.querySelector('[data-slot="' + item12 + '"]');
+        if (!enabled16) return;
+        value68 && typeof el9.insertBefore === 'function'
+          ? el9.insertBefore(enabled16, value68)
+          : el9.appendChild(enabled16);
       });
     }
-    ['_syncSingleReferenceEditorRatio'](_0x16610b, _0x331a68, _0x4f5a47 = {}) {
-      const _0x349c4b = resolveFixedInputDisplayRatioSlot(_0x16610b, _0x331a68),
-        _0x135e4f = _0x349c4b?.slot || '';
-      if (!_0x135e4f || !_0x331a68?.[_0x135e4f]) return;
-      const _0x167a04 = getFixedInputRatioMediaSize(_0x331a68[_0x135e4f], _0x4f5a47),
-        _0x16523c = calcFixedInputDisplaySize(_0x167a04?.width, _0x167a04?.height);
-      if (!_0x16523c) return;
-      const _0x5c536a = 0x118,
-        _0x4f3b77 = (_0x274c53) => {
-          const _0x51063b =
+    ['_syncSingleReferenceEditorRatio'](value69, enabled17, value70 = {}) {
+      const fixedInputDisplayRatioSlot = resolveFixedInputDisplayRatioSlot(value69, enabled17),
+        enabled18 = fixedInputDisplayRatioSlot?.slot || '';
+      if (!enabled18 || !enabled17?.[enabled18]) return;
+      const box = getFixedInputRatioMediaSize(enabled17[enabled18], value70),
+        box2 = calcFixedInputDisplaySize(box?.width, box?.height);
+      if (!box2) return;
+      const duration = 0x118,
+        handler = (value71) => {
+          const el10 =
             typeof document !== 'undefined' && typeof document.getElementById === 'function'
               ? document.getElementById(this.nodeId)
               : null;
-          if (!_0x51063b) return;
-          _0x51063b.classList.add('is-ratio-animating');
+          if (!el10) return;
+          el10.classList.add('is-ratio-animating');
           if (this._ratioAnimTimer) clearTimeout(this._ratioAnimTimer);
           this._ratioAnimTimer = setTimeout(() => {
-            const _0x2207cb =
+            const el11 =
               typeof document !== 'undefined' && typeof document.getElementById === 'function'
                 ? document.getElementById(this.nodeId)
                 : null;
-            if (_0x2207cb) _0x2207cb.classList.remove('is-ratio-animating');
+            if (el11) el11.classList.remove('is-ratio-animating');
             this._ratioAnimTimer = null;
-          }, _0x274c53 + 80);
+          }, value71 + 80);
         },
-        _0x3d4a17 = _0x2b49c9.getState?.().nodes?.[this.nodeId] || this._data || {},
-        _0x44ce97 = Number(_0x3d4a17.width) || 0x12c,
-        _0x461d73 = Number(_0x3d4a17.height) || 0x12c,
-        _0x2a8c91 = Number.isFinite(Number(_0x3d4a17.x)) ? Number(_0x3d4a17.x) : 0,
-        _0x22fdf6 = Number.isFinite(Number(_0x3d4a17.y)) ? Number(_0x3d4a17.y) : 0,
-        _0x8e3336 = _0x16523c.width,
-        _0x145676 = _0x16523c.height,
-        _0x22fd37 = _0x8e3336 - _0x44ce97,
-        _0x32beaa = _0x145676 - _0x461d73;
-      if (_0x22fd37 !== 0 || _0x32beaa !== 0) _0x4f3b77(_0x5c536a);
-      const _0x2b2f79 = {
-        width: _0x8e3336,
-        height: _0x145676,
-        x: Math.round(_0x2a8c91 - _0x22fd37 / 2),
-        y: Math.round(_0x22fdf6 - _0x32beaa),
+        box3 = store.getState?.().nodes?.[this.nodeId] || this._data || {},
+        value72 = Number(box3.width) || 0x12c,
+        value73 = Number(box3.height) || 0x12c,
+        value74 = Number.isFinite(Number(box3.x)) ? Number(box3.x) : 0,
+        value75 = Number.isFinite(Number(box3.y)) ? Number(box3.y) : 0,
+        width = box2.width,
+        height2 = box2.height,
+        count7 = width - value72,
+        count8 = height2 - value73;
+      if (count7 !== 0 || count8 !== 0) handler(duration);
+      const args2 = {
+        width: width,
+        height: height2,
+        x: Math.round(value74 - count7 / 2),
+        y: Math.round(value75 - count8),
         aspectRatio: '自适应',
       };
-      (_0x2b49c9.updateNodeData(this.nodeId, _0x2b2f79), (this._data = { ..._0x3d4a17, ..._0x2b2f79 }));
-      const _0x4a4879 = this.footerEl?.querySelector('.img-ratio-label'),
-        _0x539eae = this.footerEl?.querySelector('.img-ratio-icon-slot');
-      if (_0x4a4879 && _0x349c4b.mode === 'sourceVideoFrames') {
-        const _0x4c4182 = normalizeRhV54Fps(this._data?.rhVideoFps),
-          _0x2e00b1 = Number.isFinite(this._data?.rhVideoFrames)
+      (store.updateNodeData(this.nodeId, args2), (this._data = { ...box3, ...args2 }));
+      const el12 = this.footerEl?.querySelector('.img-ratio-label'),
+        el13 = this.footerEl?.querySelector('.img-ratio-icon-slot');
+      if (el12 && fixedInputDisplayRatioSlot.mode === 'sourceVideoFrames') {
+        const fps = normalizeRhV54Fps(this._data?.rhVideoFps),
+          count9 = Number.isFinite(this._data?.rhVideoFrames)
             ? Math.max(0, Math.trunc(this._data.rhVideoFrames))
             : 77,
-          _0x400a95 = normalizeRhVideoResolution(this._data?.rhVideoResolution),
-          _0x1a1c15 = _0x2e00b1 === 0 ? referenceInputText('fullLength') : String(_0x2e00b1);
-        _0x4a4879.textContent = referenceInputText('sourceVideoFramesLabel', {
-          frames: _0x1a1c15,
-          fps: _0x4c4182,
-          resolution: _0x400a95,
+          resolution = normalizeRhVideoResolution(this._data?.rhVideoResolution),
+          frames = count9 === 0 ? referenceInputText('fullLength') : String(count9);
+        el12.textContent = referenceInputText('sourceVideoFramesLabel', {
+          frames: frames,
+          fps: fps,
+          resolution: resolution,
         });
       }
-      _0x539eae &&
+      el13 &&
         typeof this._getRatioIconHTML === 'function' &&
-        (_0x539eae.innerHTML = this._getRatioIconHTML('自适应'));
+        (el13.innerHTML = this._getRatioIconHTML('自适应'));
       if (this.previewEl && typeof this.previewEl.animate === 'function') {
         ((this.previewEl.style.transition = 'none'),
           (this.previewEl.style.transformOrigin = 'bottom center'),
           (this.previewEl.style.transform =
-            'scaleX(' + _0x44ce97 / _0x8e3336 + ') scaleY(' + _0x461d73 / _0x145676 + ')'),
+            'scaleX(' + value72 / width + ') scaleY(' + value73 / height2 + ')'),
           void this.previewEl.offsetWidth);
         if (this._ratioFlipAnim) this._ratioFlipAnim.cancel();
-        const _0x205396 = 'scaleX(' + _0x44ce97 / _0x8e3336 + ') scaleY(' + _0x461d73 / _0x145676 + ')';
-        this._ratioFlipAnim = this.previewEl.animate([{ transform: _0x205396 }, { transform: 'none' }], {
-          duration: _0x5c536a,
+        const transform = 'scaleX(' + value72 / width + ') scaleY(' + value73 / height2 + ')';
+        this._ratioFlipAnim = this.previewEl.animate([{ transform: transform }, { transform: 'none' }], {
+          duration: duration,
           easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           fill: 'forwards',
         });
-        const _0x5c1f52 = () => {
+        const value76 = () => {
           ((this._ratioFlipAnim = null),
             (this.previewEl.style.transformOrigin = ''),
             (this.previewEl.style.transform = ''));
         };
-        ((this._ratioFlipAnim.onfinish = _0x5c1f52), (this._ratioFlipAnim.oncancel = _0x5c1f52));
+        ((this._ratioFlipAnim.onfinish = value76), (this._ratioFlipAnim.oncancel = value76));
       }
     }
     async ['_renderManifestFixedRefBar']({
-      fixedInputConfig: _0x372ee3,
-      inEdges: _0x49a244,
-      nodes: _0x36b9fa,
-      nodeData: _0x40b3b5,
-      attachBtnHTML: _0x44723c,
-      ensureVideoThumb: _0x434d08,
+      fixedInputConfig: fixedInputConfig,
+      inEdges: inEdges3,
+      nodes: nodes3,
+      nodeData: nodeData3,
+      attachBtnHTML: attachBtnHTML,
+      ensureVideoThumb: ensureVideoThumb,
     }) {
-      const _0x2d584d = (_0x372ee3?.visibleSlots || [])
-        .map((_0x4b8294) => String(_0x4b8294 || '').trim())
+      const visibleSlots = (fixedInputConfig?.visibleSlots || [])
+        .map((item13) => String(item13 || '').trim())
         .filter(Boolean);
-      if (!_0x2d584d.length) return false;
-      this._pruneFixedSlotRefThumbObjectUrls(_0x49a244, _0x36b9fa);
-      const _0x10e8c3 = new Set(_0x2d584d),
-        _0x3d4fc3 = {};
-      _0x2d584d.forEach((_0x1d38f9) => {
-        _0x3d4fc3[_0x1d38f9] = null;
+      if (!visibleSlots.length) return false;
+      this._pruneFixedSlotRefThumbObjectUrls(inEdges3, nodes3);
+      const map7 = new Set(visibleSlots),
+        occupiedSlots = {};
+      visibleSlots.forEach((item14) => {
+        occupiedSlots[item14] = null;
       });
-      const _0x4cee92 = [],
-        _0x49deb2 = { text: 0, image: 0, video: 0, audio: 0 },
-        _0x5e4c4f = {},
-        _0x24bf32 = [];
-      for (const _0x1d1b56 of _0x49a244 || []) {
-        const _0x18d3ec = _0x36b9fa?.[_0x1d1b56?.sourceId];
-        if (!_0x18d3ec) continue;
-        const _0x59028c = resolveEffectiveInputKind(_0x18d3ec, _0x1d1b56) || 'image';
-        ((_0x49deb2[_0x59028c] = Number(_0x49deb2[_0x59028c] || 0) + 1),
-          (_0x5e4c4f[_0x1d1b56.sourceId] =
-            '@' + (getFixedRefKindLabel(_0x59028c) || _0x59028c) + _0x49deb2[_0x59028c]));
-        if (_0x59028c === 'text') {
-          const _0x50cdd6 = this._createTextEdgeRefThumbData(_0x1d1b56, _0x18d3ec);
-          if (_0x50cdd6) _0x4cee92.push(_0x50cdd6);
+      const list6 = [],
+        value77 = { text: 0, image: 0, video: 0, audio: 0 },
+        value78 = {},
+        list7 = [];
+      for (const refSlot of inEdges3 || []) {
+        const sourceNode = nodes3?.[refSlot?.sourceId];
+        if (!sourceNode) continue;
+        const kind4 = resolveEffectiveInputKind(sourceNode, refSlot) || 'image';
+        ((value77[kind4] = Number(value77[kind4] || 0) + 1),
+          (value78[refSlot.sourceId] = '@' + (getFixedRefKindLabel(kind4) || kind4) + value77[kind4]));
+        if (kind4 === 'text') {
+          const value79 = this._createTextEdgeRefThumbData(refSlot, sourceNode);
+          if (value79) list6.push(value79);
           continue;
         }
-        const _0x53ddaf = resolveFixedInputSlotForRef({
-            fixedInputConfig: _0x372ee3,
-            refSlot: _0x1d1b56?.refSlot,
-            kind: _0x59028c,
-            occupiedSlots: _0x3d4fc3,
-            sourceNode: _0x18d3ec,
+        const fixedInputSlotForRef = resolveFixedInputSlotForRef({
+            fixedInputConfig: fixedInputConfig,
+            refSlot: refSlot?.refSlot,
+            kind: kind4,
+            occupiedSlots: occupiedSlots,
+            sourceNode: sourceNode,
           }),
-          _0x5f0c3e = _0x53ddaf.slot;
-        if (_0x53ddaf.reason === 'kindMismatch') continue;
-        if (_0x53ddaf.reason === 'hidden' || _0x53ddaf.reason === 'slotConstraint') {
-          if (_0x1d1b56?.id) _0x24bf32.push(_0x1d1b56.id);
+          enabled19 = fixedInputSlotForRef.slot;
+        if (fixedInputSlotForRef.reason === 'kindMismatch') continue;
+        if (fixedInputSlotForRef.reason === 'hidden' || fixedInputSlotForRef.reason === 'slotConstraint') {
+          if (refSlot?.id) list7.push(refSlot.id);
           continue;
         }
-        if (!_0x5f0c3e || _0x3d4fc3[_0x5f0c3e]) {
-          const _0x461026 = await this._createFixedEdgeRefThumbData(
-            _0x1d1b56,
-            _0x18d3ec,
-            _0x59028c,
-            _0x434d08,
+        if (!enabled19 || occupiedSlots[enabled19]) {
+          const value80 = await this._createFixedEdgeRefThumbData(
+            refSlot,
+            sourceNode,
+            kind4,
+            ensureVideoThumb,
           );
-          if (_0x461026) _0x4cee92.push(_0x461026);
+          if (value80) list6.push(value80);
           continue;
         }
-        const _0x754115 = await this._createFixedEdgeRefThumbData(_0x1d1b56, _0x18d3ec, _0x59028c, _0x434d08);
-        if (_0x754115) _0x3d4fc3[_0x5f0c3e] = _0x754115;
+        const value81 = await this._createFixedEdgeRefThumbData(refSlot, sourceNode, kind4, ensureVideoThumb);
+        if (value81) occupiedSlots[enabled19] = value81;
       }
-      _0x24bf32.length > 0 &&
-        (typeof _0x2b49c9.batch === 'function'
-          ? _0x2b49c9.batch(() => {
-              _0x24bf32.forEach((_0x55ceb1) => _0x2b49c9.removeEdge(_0x55ceb1));
+      list7.length > 0 &&
+        (typeof store.batch === 'function'
+          ? store.batch(() => {
+              list7.forEach((item15) => store.removeEdge(item15));
             })
-          : _0x24bf32.forEach((_0x5d5d44) => _0x2b49c9.removeEdge(_0x5d5d44)));
-      const _0x156af7 = new Set(
-          Object.entries(_0x3d4fc3)
-            .filter(([, _0x5e7863]) => !!_0x5e7863)
-            .map(([_0x51bed7]) => _0x51bed7),
+          : list7.forEach((item16) => store.removeEdge(item16)));
+      const occupiedSlots2 = new Set(
+          Object.entries(occupiedSlots)
+            .filter(([, enabled20]) => !!enabled20)
+            .map(([value82]) => value82),
         ),
-        _0x36beba = buildFixedInputAssetSlotMap(this.promptEl, {
-          slotOrderByType: _0x372ee3?.slotOrderByType || {},
-          visibleSlots: _0x2d584d,
-          exclusiveGroups: _0x372ee3?.exclusiveGroups || [],
-          slotById: _0x372ee3?.slotById || {},
-          occupiedSlots: _0x156af7,
-          nodeData: _0x40b3b5,
+        fixedInputAssetSlotMap = buildFixedInputAssetSlotMap(this.promptEl, {
+          slotOrderByType: fixedInputConfig?.slotOrderByType || {},
+          visibleSlots: visibleSlots,
+          exclusiveGroups: fixedInputConfig?.exclusiveGroups || [],
+          slotById: fixedInputConfig?.slotById || {},
+          occupiedSlots: occupiedSlots2,
+          nodeData: nodeData3,
         });
-      (_0x2d584d.forEach((_0x5b0283) => {
-        if (_0x3d4fc3[_0x5b0283]) return;
-        const _0x4af6da = this._createAssetRefThumbData(_0x36beba[_0x5b0283], { slot: _0x5b0283 });
-        if (_0x4af6da) _0x3d4fc3[_0x5b0283] = _0x4af6da;
+      (visibleSlots.forEach((slot5) => {
+        if (occupiedSlots[slot5]) return;
+        const value83 = this._createAssetRefThumbData(fixedInputAssetSlotMap[slot5], { slot: slot5 });
+        if (value83) occupiedSlots[slot5] = value83;
       }),
-        getAssetInputRefsFromPrompt(this.promptEl, { allowedTypes: ['text'] }).forEach(
-          (_0x384c29, _0xa59229) => {
-            const _0x41638b = this._createAssetRefThumbData(_0x384c29, {
-              key:
-                'asset-text:' +
-                String(_0x384c29.assetId || '') +
-                ':' +
-                String(_0x384c29.itemIndex ?? '') +
-                ':' +
-                _0xa59229,
-            });
-            if (_0x41638b) _0x4cee92.push(_0x41638b);
-          },
-        ),
+        getAssetInputRefsFromPrompt(this.promptEl, { allowedTypes: ['text'] }).forEach((item17, value84) => {
+          const value85 = this._createAssetRefThumbData(item17, {
+            key:
+              'asset-text:' +
+              String(item17.assetId || '') +
+              ':' +
+              String(item17.itemIndex ?? '') +
+              ':' +
+              value84,
+          });
+          if (value85) list6.push(value85);
+        }),
         this.refBarEl.classList.add('active', 'rh-v5-refbar'));
-      let _0x47701c = this.refBarEl.querySelector('.rh-v5-ref-container');
-      const _0x309674 = !_0x47701c || !this.refBarEl.querySelector('.prompt-attachment-btn');
-      if (_0x309674) {
-        const _0x3afa72 =
-            String(_0x372ee3?.manifest?.displayName || '').trim() ||
-            String(_0x372ee3?.manifest?.label || '').trim() ||
+      let el14 = this.refBarEl.querySelector('.rh-v5-ref-container');
+      const value86 = !el14 || !this.refBarEl.querySelector('.prompt-attachment-btn');
+      if (value86) {
+        const label =
+            String(fixedInputConfig?.manifest?.displayName || '').trim() ||
+            String(fixedInputConfig?.manifest?.label || '').trim() ||
             referenceInputText('fixedInputs'),
-          _0x5c30cb = _0x2d584d
-            .map((_0x5233b9) => {
-              const _0x3dee74 = String(_0x372ee3?.slotKindById?.[_0x5233b9] || '');
+          value87 = visibleSlots
+            .map((item18) => {
+              const value88 = String(fixedInputConfig?.slotKindById?.[item18] || '');
               return (
                 '<button type="button" class="ref-thumb-wrap ref-upload-slot rh-v5-ref-box" data-slot="' +
-                escapeHtmlAttr(_0x5233b9) +
+                escapeHtmlAttr(item18) +
                 '" data-kind="' +
-                escapeHtmlAttr(_0x3dee74) +
+                escapeHtmlAttr(value88) +
                 '" title="' +
                 escapeHtmlAttr(referenceInputText('uploadReference')) +
                 '"><span class="ref-upload-label">' +
-                getFixedSlotLabelHtml(_0x372ee3, _0x5233b9) +
+                getFixedSlotLabelHtml(fixedInputConfig, item18) +
                 '</span></button>'
               );
             })
             .join('');
         ((this.refBarEl.innerHTML =
-          _0x44723c +
+          attachBtnHTML +
           ' <div class="ref-thumb-container rh-v5-ref-container" aria-label="' +
-          escapeHtmlAttr(referenceInputText('fixedInputsAria', { label: _0x3afa72 })) +
+          escapeHtmlAttr(referenceInputText('fixedInputsAria', { label: label })) +
           '">' +
-          _0x5c30cb +
+          value87 +
           '</div>'),
-          (_0x47701c = this.refBarEl.querySelector('.rh-v5-ref-container')));
+          (el14 = this.refBarEl.querySelector('.rh-v5-ref-container')));
       } else {
-        const _0x4b1689 =
-          String(_0x372ee3?.manifest?.displayName || '').trim() ||
-          String(_0x372ee3?.manifest?.label || '').trim() ||
+        const label2 =
+          String(fixedInputConfig?.manifest?.displayName || '').trim() ||
+          String(fixedInputConfig?.manifest?.label || '').trim() ||
           referenceInputText('fixedInputs');
-        _0x47701c.setAttribute('aria-label', referenceInputText('fixedInputsAria', { label: _0x4b1689 }));
+        el14.setAttribute('aria-label', referenceInputText('fixedInputsAria', { label: label2 }));
       }
-      const _0x2bcc80 = Array.from(_0x47701c?.querySelectorAll?.('[data-slot]') || []).filter(
-        (_0x3bd812) => !_0x10e8c3.has(String(_0x3bd812?.dataset?.slot || '')),
+      const list8 = Array.from(el14?.querySelectorAll?.('[data-slot]') || []).filter(
+        (el15) => !map7.has(String(el15?.dataset?.slot || '')),
       );
       return (
-        _0x2bcc80.forEach((_0x1b6e5a) => _0x1b6e5a.remove()),
-        _0x2d584d.forEach((_0x466a8d) => {
-          this._syncFixedSlotEl(_0x47701c, _0x466a8d, _0x3d4fc3[_0x466a8d], _0x372ee3);
+        list8.forEach((el16) => el16.remove()),
+        visibleSlots.forEach((item19) => {
+          this._syncFixedSlotEl(el14, item19, occupiedSlots[item19], fixedInputConfig);
         }),
-        this._syncFixedSlotOrder(_0x47701c, _0x2d584d),
-        this._syncFixedTrailingRefItems(_0x47701c, _0x4cee92),
-        this._bindFixedSlotDragSwap(_0x47701c, getFixedSlotAcceptMap(_0x372ee3)),
-        this._syncSingleReferenceEditorRatio(_0x372ee3, _0x3d4fc3, _0x36b9fa),
+        this._syncFixedSlotOrder(el14, visibleSlots),
+        this._syncFixedTrailingRefItems(el14, list6),
+        this._bindFixedSlotDragSwap(el14, getFixedSlotAcceptMap(fixedInputConfig)),
+        this._syncSingleReferenceEditorRatio(fixedInputConfig, occupiedSlots, nodes3),
         this._syncBtnIconState(),
-        _0xd25a29(this, _0x5e4c4f),
+        _syncPillLabels(this, value78),
         true
       );
     }
@@ -1007,361 +994,364 @@ export function createVideoNodeReferenceInputModule(_0x41f3ac) {
     }
     async ['_renderRefBarImpl']() {
       if (!this.refBarEl) return;
-      const _0x404dcb = _0x2b49c9.getIncomingEdges(this.nodeId),
-        _0x24204c = _0x2b49c9.getState().nodes,
-        _0x5b309e = _0x24204c?.[this.nodeId] || this._data || null,
-        _0x4a4c02 = getFixedInputSlotConfigFromManifest(_0x5b309e || {}),
-        _0x53ffad = createPromptAttachmentButtonHTML({ stroke: 'var(--white-90)' }),
-        _0x17decc = (_0x5b1965, _0x219ea6) => {
-          const _0x2c3e62 = String(_0x5b1965?.sourceId || '');
-          if (!_0x2c3e62) return;
-          const _0x2e4a65 = String(_0x5b1965?.refSlot || 'sourceVideo'),
-            _0x37d27b = getVideoSourcePathForThumb(_0x219ea6, _0x5b1965);
-          if (!_0x37d27b) return;
-          if (!(_0x37d27b.startsWith('/output/') || _0x37d27b.startsWith('/data/'))) return;
-          const _0x433b44 = (() => {
-            if (String(_0x219ea6?.type || '') === 'ai-video') {
-              const _0xd70a66 = getVideoItemByEdge(_0x219ea6, _0x5b1965);
-              return String(_0xd70a66?.item?.videoThumbUnavailableSource || '').trim();
+      const inEdges4 = store.getIncomingEdges(this.nodeId),
+        nodes4 = store.getState().nodes,
+        nodeData4 = nodes4?.[this.nodeId] || this._data || null,
+        fixedInputConfig2 = getFixedInputSlotConfigFromManifest(nodeData4 || {}),
+        attachBtnHTML2 = createPromptAttachmentButtonHTML({ stroke: 'var(--white-90)' }),
+        ensureVideoThumb2 = (value89, value90) => {
+          const nodeId2 = String(value89?.sourceId || '');
+          if (!nodeId2) return;
+          const value91 = String(value89?.refSlot || 'sourceVideo'),
+            videoThumbUnavailableSource = getVideoSourcePathForThumb(value90, value89);
+          if (!videoThumbUnavailableSource) return;
+          if (!(
+            videoThumbUnavailableSource.startsWith('/output/') ||
+            videoThumbUnavailableSource.startsWith('/data/')
+          ))
+            return;
+          const value92 = (() => {
+            if (String(value90?.type || '') === 'ai-video') {
+              const videoItemByEdge5 = getVideoItemByEdge(value90, value89);
+              return String(videoItemByEdge5?.item?.videoThumbUnavailableSource || '').trim();
             }
-            return String(_0x219ea6?.videoThumbUnavailableSource || '').trim();
+            return String(value90?.videoThumbUnavailableSource || '').trim();
           })();
-          if (_0x433b44 === _0x37d27b) return;
-          const _0x65af57 = _0x2e4a65 + '|' + _0x2c3e62 + '|' + _0x37d27b;
-          if (this._videoThumbPending.has(_0x65af57)) return;
-          (this._videoThumbPending.add(_0x65af57),
-            _0x50c6b2
-              .fetchVideoFirstFrameThumbFromServer(_0x37d27b, {
-                nodeId: _0x2c3e62,
-                assetId: String(_0x5b1965?.sourceMediaKey || _0x5b1965?.id || ''),
+          if (value92 === videoThumbUnavailableSource) return;
+          const value93 = value91 + '|' + nodeId2 + '|' + videoThumbUnavailableSource;
+          if (this._videoThumbPending.has(value93)) return;
+          (this._videoThumbPending.add(value93),
+            api
+              .fetchVideoFirstFrameThumbFromServer(videoThumbUnavailableSource, {
+                nodeId: nodeId2,
+                assetId: String(value89?.sourceMediaKey || value89?.id || ''),
               })
-              .then((_0x2d8829) => {
-                const _0x4f7ec6 = String(_0x2d8829?.url || '').trim();
-                if (!_0x4f7ec6) return;
-                const _0x4a3a0d = _0x2b49c9.getState(),
-                  _0x5a10fd = _0x4a3a0d.nodes?.[_0x2c3e62];
-                if (!_0x5a10fd) return;
-                if (String(_0x5a10fd.type || '') === 'ai-video') {
-                  const _0x3abf53 = getVideoItemByEdge(_0x5a10fd, _0x5b1965),
-                    _0x21081b = Number(_0x3abf53.index),
-                    _0xa467bc = Array.isArray(_0x5a10fd.videos) ? _0x5a10fd.videos : [];
-                  if (!(_0x21081b >= 0 && _0x21081b < _0xa467bc.length)) return;
-                  const _0x19b3d1 = _0xa467bc[_0x21081b] || null;
-                  if (!_0x19b3d1 || typeof _0x19b3d1 !== 'object') return;
-                  if (String(_0x19b3d1.thumbUrl || '').trim()) return;
-                  const _0x1846e5 = { ..._0x19b3d1, thumbUrl: _0x4f7ec6, videoThumbUnavailableSource: '' },
-                    _0x25cb46 = _0xa467bc.slice();
-                  _0x25cb46[_0x21081b] = _0x1846e5;
-                  const _0x374c33 = { videos: _0x25cb46 },
-                    _0x21f4e3 = Number(_0x5a10fd.mainVideoIndex),
-                    _0x58dd1e = Number.isFinite(_0x21f4e3) ? Math.max(0, Math.trunc(_0x21f4e3)) : 0;
-                  if (_0x21081b === _0x58dd1e) _0x374c33.videoThumbUnavailableSource = '';
-                  if (_0x21081b === _0x58dd1e && !String(_0x5a10fd.thumbUrl || '').trim())
-                    _0x374c33.thumbUrl = _0x4f7ec6;
-                  _0x2b49c9.updateNodeData(_0x2c3e62, _0x374c33);
+              .then((response3) => {
+                const thumbUrl4 = String(response3?.url || '').trim();
+                if (!thumbUrl4) return;
+                const value94 = store.getState(),
+                  enabled21 = value94.nodes?.[nodeId2];
+                if (!enabled21) return;
+                if (String(enabled21.type || '') === 'ai-video') {
+                  const videoItemByEdge6 = getVideoItemByEdge(enabled21, value89),
+                    count10 = Number(videoItemByEdge6.index),
+                    list9 = Array.isArray(enabled21.videos) ? enabled21.videos : [];
+                  if (!(count10 >= 0 && count10 < list9.length)) return;
+                  const args3 = list9[count10] || null;
+                  if (!args3 || typeof args3 !== 'object') return;
+                  if (String(args3.thumbUrl || '').trim()) return;
+                  const value95 = { ...args3, thumbUrl: thumbUrl4, videoThumbUnavailableSource: '' },
+                    videos = list9.slice();
+                  videos[count10] = value95;
+                  const value96 = { videos: videos },
+                    value97 = Number(enabled21.mainVideoIndex),
+                    value98 = Number.isFinite(value97) ? Math.max(0, Math.trunc(value97)) : 0;
+                  if (count10 === value98) value96.videoThumbUnavailableSource = '';
+                  if (count10 === value98 && !String(enabled21.thumbUrl || '').trim())
+                    value96.thumbUrl = thumbUrl4;
+                  store.updateNodeData(nodeId2, value96);
                 } else {
-                  if (String(_0x5a10fd.thumbUrl || '').trim()) return;
-                  _0x2b49c9.updateNodeData(_0x2c3e62, {
-                    thumbUrl: _0x4f7ec6,
+                  if (String(enabled21.thumbUrl || '').trim()) return;
+                  store.updateNodeData(nodeId2, {
+                    thumbUrl: thumbUrl4,
                     videoThumbUnavailableSource: '',
                   });
                 }
               })
               .catch(() => {
-                const _0xd4813 = _0x2b49c9.getState(),
-                  _0x5c70fe = _0xd4813.nodes?.[_0x2c3e62];
-                if (!_0x5c70fe) return;
-                if (getVideoSourcePathForThumb(_0x5c70fe, _0x5b1965) !== _0x37d27b) return;
-                if (String(_0x5c70fe.type || '') === 'ai-video') {
-                  const _0x130532 = getVideoItemByEdge(_0x5c70fe, _0x5b1965),
-                    _0x22bd1f = Number(_0x130532.index),
-                    _0x655fbd = Array.isArray(_0x5c70fe.videos) ? _0x5c70fe.videos : [];
-                  if (!(_0x22bd1f >= 0 && _0x22bd1f < _0x655fbd.length)) return;
-                  const _0x1364f7 = _0x655fbd[_0x22bd1f] || null;
-                  if (!_0x1364f7 || typeof _0x1364f7 !== 'object') return;
-                  const _0x5bd2a2 = _0x655fbd.slice();
-                  _0x5bd2a2[_0x22bd1f] = {
-                    ..._0x1364f7,
-                    videoThumbUnavailableSource: _0x37d27b,
+                const value99 = store.getState(),
+                  enabled22 = value99.nodes?.[nodeId2];
+                if (!enabled22) return;
+                if (getVideoSourcePathForThumb(enabled22, value89) !== videoThumbUnavailableSource) return;
+                if (String(enabled22.type || '') === 'ai-video') {
+                  const videoItemByEdge7 = getVideoItemByEdge(enabled22, value89),
+                    count11 = Number(videoItemByEdge7.index),
+                    list10 = Array.isArray(enabled22.videos) ? enabled22.videos : [];
+                  if (!(count11 >= 0 && count11 < list10.length)) return;
+                  const args4 = list10[count11] || null;
+                  if (!args4 || typeof args4 !== 'object') return;
+                  const videos2 = list10.slice();
+                  videos2[count11] = {
+                    ...args4,
+                    videoThumbUnavailableSource: videoThumbUnavailableSource,
                     thumbUrl: '',
                   };
-                  const _0x483871 = { videos: _0x5bd2a2 },
-                    _0x342149 = Number(_0x5c70fe.mainVideoIndex),
-                    _0x4586ff = Number.isFinite(_0x342149) ? Math.max(0, Math.trunc(_0x342149)) : 0;
-                  (_0x22bd1f === _0x4586ff &&
-                    ((_0x483871.videoThumbUnavailableSource = _0x37d27b), (_0x483871.thumbUrl = '')),
-                    _0x2b49c9.updateNodeData(_0x2c3e62, _0x483871));
+                  const value100 = { videos: videos2 },
+                    value101 = Number(enabled22.mainVideoIndex),
+                    value102 = Number.isFinite(value101) ? Math.max(0, Math.trunc(value101)) : 0;
+                  (count11 === value102 &&
+                    ((value100.videoThumbUnavailableSource = videoThumbUnavailableSource),
+                    (value100.thumbUrl = '')),
+                    store.updateNodeData(nodeId2, value100));
                 } else
-                  _0x2b49c9.updateNodeData(_0x2c3e62, {
-                    videoThumbUnavailableSource: _0x37d27b,
+                  store.updateNodeData(nodeId2, {
+                    videoThumbUnavailableSource: videoThumbUnavailableSource,
                     thumbUrl: '',
                   });
               })
               .finally(() => {
-                this._videoThumbPending.delete(_0x65af57);
+                this._videoThumbPending.delete(value93);
               }));
         },
-        _0x4bd56c = getFixedRefBarLayoutKey(_0x4a4c02);
-      this._refBarLayoutKey !== _0x4bd56c &&
-        ((this._refBarLayoutKey = _0x4bd56c),
+        fixedRefBarLayoutKey = getFixedRefBarLayoutKey(fixedInputConfig2);
+      this._refBarLayoutKey !== fixedRefBarLayoutKey &&
+        ((this._refBarLayoutKey = fixedRefBarLayoutKey),
         this.refBarEl.classList.remove('active', 'rh-v5-refbar'),
         (this.refBarEl.innerHTML = ''),
-        !_0x4a4c02 && this._clearObjectUrlMap(this._getFixedSlotRefThumbObjectUrlMap()),
-        _0x4bd56c !== 'generic' && this._clearObjectUrlMap(this._refThumbObjectUrls));
-      if (_0x4a4c02) {
+        !fixedInputConfig2 && this._clearObjectUrlMap(this._getFixedSlotRefThumbObjectUrlMap()),
+        fixedRefBarLayoutKey !== 'generic' && this._clearObjectUrlMap(this._refThumbObjectUrls));
+      if (fixedInputConfig2) {
         await this._renderManifestFixedRefBar({
-          fixedInputConfig: _0x4a4c02,
-          inEdges: _0x404dcb,
-          nodes: _0x24204c,
-          nodeData: _0x5b309e,
-          attachBtnHTML: _0x53ffad,
-          ensureVideoThumb: _0x17decc,
+          fixedInputConfig: fixedInputConfig2,
+          inEdges: inEdges4,
+          nodes: nodes4,
+          nodeData: nodeData4,
+          attachBtnHTML: attachBtnHTML2,
+          ensureVideoThumb: ensureVideoThumb2,
         });
         return;
       }
-      const _0x3a26d8 = getAssetInputRefsFromPromptAndNode(this.promptEl, {
-        nodeData: _0x5b309e,
+      const list11 = getAssetInputRefsFromPromptAndNode(this.promptEl, {
+        nodeData: nodeData4,
         allowedTypes: ['text', 'image', 'video', 'audio'],
       });
-      if (_0x404dcb.length === 0 && _0x3a26d8.length === 0) {
+      if (inEdges4.length === 0 && list11.length === 0) {
         (this.refBarEl.classList.remove('rh-v5-refbar'),
           this.refBarEl.classList.remove('active'),
-          (this.refBarEl.innerHTML = _0x53ffad),
+          (this.refBarEl.innerHTML = attachBtnHTML2),
           this._syncBtnIconState(),
-          _0xd25a29(this, {}));
+          _syncPillLabels(this, {}));
         return;
       }
-      const _0x15d987 = new Set();
-      for (const _0x2ee1de of _0x404dcb) {
-        const _0xf982b3 = _0x24204c?.[_0x2ee1de.sourceId];
-        if (_0xf982b3?.thumbId) _0x15d987.add(_0xf982b3.thumbId);
+      const map8 = new Set();
+      for (const value103 of inEdges4) {
+        const value104 = nodes4?.[value103.sourceId];
+        if (value104?.thumbId) map8.add(value104.thumbId);
       }
-      for (const [_0x188f54, _0x51321e] of this._refThumbObjectUrls.entries()) {
-        !_0x15d987.has(_0x188f54) &&
-          (_0x51321e && String(_0x51321e).startsWith('blob:') && URL.revokeObjectURL(_0x51321e),
-          this._refThumbObjectUrls.delete(_0x188f54));
+      for (const [value105, value106] of this._refThumbObjectUrls.entries()) {
+        !map8.has(value105) &&
+          (value106 && String(value106).startsWith('blob:') && URL.revokeObjectURL(value106),
+          this._refThumbObjectUrls.delete(value105));
       }
-      let _0x1c7426 = [];
-      const _0xfee9ad = { text: 0, image: 0, video: 0, audio: 0 },
-        _0x5a20f2 = {},
-        _0x1bf1dd = {
+      let list12 = [];
+      const value107 = { text: 0, image: 0, video: 0, audio: 0 },
+        value108 = {},
+        value109 = {
           text: referenceInputText('kind.text'),
           image: referenceInputText('kind.image'),
           video: referenceInputText('kind.video'),
           audio: referenceInputText('kind.audio'),
         };
-      for (const _0x1a5b74 of _0x404dcb) {
-        const _0x1c8984 = _0x24204c[_0x1a5b74.sourceId];
-        if (!_0x1c8984) continue;
-        const _0xe923c1 = resolveEffectiveInputKind(_0x1c8984, _0x1a5b74) || 'image';
-        if (_0xe923c1 === 'text') {
-          const _0x19a777 = String(
-            _0x1c8984.outputText || _0x1c8984.text || _0x1c8984.content || _0x1c8984.prompt || '',
+      for (const edgeId3 of inEdges4) {
+        const response4 = nodes4[edgeId3.sourceId];
+        if (!response4) continue;
+        const effectiveInputKind = resolveEffectiveInputKind(response4, edgeId3) || 'image';
+        if (effectiveInputKind === 'text') {
+          const enabled23 = String(
+            response4.outputText || response4.text || response4.content || response4.prompt || '',
           ).trim();
-          if (!_0x19a777) continue;
+          if (!enabled23) continue;
         } else {
-          if (_0xe923c1 === 'image') {
-            const _0xa98f23 =
-              !!_0x1c8984.thumbId ||
-              !!_0x1c8984.thumbUrl ||
-              !!_0x1c8984.imageUrl ||
-              !!_0x1c8984.src ||
-              !!_0x1c8984.localPath;
-            if (!_0xa98f23) continue;
+          if (effectiveInputKind === 'image') {
+            const enabled24 =
+              !!response4.thumbId ||
+              !!response4.thumbUrl ||
+              !!response4.imageUrl ||
+              !!response4.src ||
+              !!response4.localPath;
+            if (!enabled24) continue;
           } else {
-            if (_0xe923c1 === 'video') {
-              const _0x41ec7a =
-                (Array.isArray(_0x1c8984.videos) && _0x1c8984.videos.length > 0) ||
-                !!_0x1c8984.thumbId ||
-                !!_0x1c8984.thumbUrl ||
-                !!_0x1c8984.videoUrl ||
-                !!_0x1c8984.displayLocalPath ||
-                !!_0x1c8984.originalLocalPath ||
-                !!_0x1c8984.videoLocalPath ||
-                !!_0x1c8984.src ||
-                !!_0x1c8984.localPath ||
-                !!_0x1c8984.url ||
-                !!_0x1c8984.resultUrl ||
-                !!_0x1c8984.sourceUrl;
-              if (!_0x41ec7a) continue;
+            if (effectiveInputKind === 'video') {
+              const enabled25 =
+                (Array.isArray(response4.videos) && response4.videos.length > 0) ||
+                !!response4.thumbId ||
+                !!response4.thumbUrl ||
+                !!response4.videoUrl ||
+                !!response4.displayLocalPath ||
+                !!response4.originalLocalPath ||
+                !!response4.videoLocalPath ||
+                !!response4.src ||
+                !!response4.localPath ||
+                !!response4.url ||
+                !!response4.resultUrl ||
+                !!response4.sourceUrl;
+              if (!enabled25) continue;
             } else {
-              if (_0xe923c1 === 'audio') {
-                const _0x35c5a1 = !!_0x1c8984.audioUrl || !!_0x1c8984.src || !!_0x1c8984.localPath;
-                if (!_0x35c5a1) continue;
+              if (effectiveInputKind === 'audio') {
+                const enabled26 = !!response4.audioUrl || !!response4.src || !!response4.localPath;
+                if (!enabled26) continue;
               }
             }
           }
         }
-        let _0x32bf41 = '',
-          _0x38c83f = '';
-        if (_0xe923c1 === 'image') {
-          let _0x542876 = '';
-          if (_0x1c8984.thumbId) {
-            if (this._refThumbObjectUrls.has(_0x1c8984.thumbId))
-              _0x542876 = this._refThumbObjectUrls.get(_0x1c8984.thumbId);
+        let thumbHTML = '',
+          value110 = '';
+        if (effectiveInputKind === 'image') {
+          let enabled27 = '';
+          if (response4.thumbId) {
+            if (this._refThumbObjectUrls.has(response4.thumbId))
+              enabled27 = this._refThumbObjectUrls.get(response4.thumbId);
             else {
-              const _0x42b8bc = await _0x46ffd3(_0x1c8984.thumbId);
-              if (_0x42b8bc) {
-                const _0x119293 = URL.createObjectURL(_0x42b8bc);
-                (this._refThumbObjectUrls.set(_0x1c8984.thumbId, _0x119293), (_0x542876 = _0x119293));
+              const value111 = await getImage(response4.thumbId);
+              if (value111) {
+                const value112 = URL.createObjectURL(value111);
+                (this._refThumbObjectUrls.set(response4.thumbId, value112), (enabled27 = value112));
               }
             }
           }
-          !_0x542876 && (_0x542876 = this._resolveMediaUrl(resolveCanvasImageLowZoomUrl(_0x1c8984)));
-          !_0x542876 &&
-            _0x1c8984.localPath &&
-            (_0x542876 = this._resolveMediaUrl(localPathToUrl(_0x1c8984.localPath)));
-          if (!_0x542876) continue;
-          (_0x3ca8ce(_0x542876),
-            (_0x32bf41 =
+          !enabled27 && (enabled27 = this._resolveMediaUrl(resolveCanvasImageLowZoomUrl(response4)));
+          !enabled27 &&
+            response4.localPath &&
+            (enabled27 = this._resolveMediaUrl(localPathToUrl(response4.localPath)));
+          if (!enabled27) continue;
+          (ensureThumbDecoded(enabled27),
+            (thumbHTML =
               '<img src="' +
-              _0x542876 +
+              enabled27 +
               '" class="ref-thumb-media is-pending" draggable="false">' +
-              createReferenceMaskBadgeHtml(_0x1c8984)),
-            (_0x38c83f = 'i|' + _0x542876 + '|' + getReferenceMaskSignaturePart(_0x1c8984)));
+              createReferenceMaskBadgeHtml(response4)),
+            (value110 = 'i|' + enabled27 + '|' + getReferenceMaskSignaturePart(response4)));
         } else {
-          if (_0xe923c1 === 'video') {
-            const _0x1d6719 = getVideoThumbCandidate(_0x1c8984, _0x1a5b74),
-              _0x40a485 = this._resolveMediaUrl(_0x1d6719.thumbUrl || _0x1c8984.imageUrl || '');
-            _0x40a485
-              ? (_0x3ca8ce(_0x40a485),
-                (_0x32bf41 =
-                  '<img src="' + _0x40a485 + '" class="ref-thumb-media is-pending" draggable="false">'),
-                (_0x38c83f = 'v|' + _0x40a485))
-              : (_0x17decc(_0x1a5b74, _0x1c8984),
-                (_0x32bf41 =
+          if (effectiveInputKind === 'video') {
+            const videoThumbCandidate2 = getVideoThumbCandidate(response4, edgeId3),
+              value113 = this._resolveMediaUrl(videoThumbCandidate2.thumbUrl || response4.imageUrl || '');
+            value113
+              ? (ensureThumbDecoded(value113),
+                (thumbHTML =
+                  '<img src="' + value113 + '" class="ref-thumb-media is-pending" draggable="false">'),
+                (value110 = 'v|' + value113))
+              : (ensureVideoThumb2(edgeId3, response4),
+                (thumbHTML =
                   '<div class="ref-thumb-media" style="background:var(--bg-node);display:flex;align-items:center;justify-content:center;">\n                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white" opacity="0.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>\n                </div>'),
-                (_0x38c83f = 'v|fallback'));
+                (value110 = 'v|fallback'));
           } else
-            ((_0x32bf41 = createReferenceFallbackThumbHtml(_0xe923c1)),
-              (_0x38c83f = _0xe923c1 + '|fallback'));
+            ((thumbHTML = createReferenceFallbackThumbHtml(effectiveInputKind)),
+              (value110 = effectiveInputKind + '|fallback'));
         }
-        _0xfee9ad[_0xe923c1]++;
-        const _0x1a2e28 = '@' + _0x1bf1dd[_0xe923c1] + _0xfee9ad[_0xe923c1];
-        _0x5a20f2[_0x1a5b74.sourceId] = _0x1a2e28;
-        const _0x5bfeb2 = _0x1a5b74.id + '|' + _0x1a5b74.sourceId + '|' + _0x38c83f;
-        _0x1c7426.push({
-          key: 'edge:' + _0x1a5b74.id,
-          edgeId: _0x1a5b74.id,
-          sourceId: _0x1a5b74.sourceId,
-          sig: _0x5bfeb2,
-          thumbHTML: _0x32bf41,
+        value107[effectiveInputKind]++;
+        const value114 = '@' + value109[effectiveInputKind] + value107[effectiveInputKind];
+        value108[edgeId3.sourceId] = value114;
+        const sig = edgeId3.id + '|' + edgeId3.sourceId + '|' + value110;
+        list12.push({
+          key: 'edge:' + edgeId3.id,
+          edgeId: edgeId3.id,
+          sourceId: edgeId3.sourceId,
+          sig: sig,
+          thumbHTML: thumbHTML,
         });
       }
-      _0x3a26d8.forEach((_0x26f33f, _0x2b970d) => {
-        const _0x3e7f96 = String(_0x26f33f?.type || '').trim();
-        if (!_0x3e7f96) return;
-        let _0x1df164 = '',
-          _0x5cd581 = '';
-        if (_0x3e7f96 === 'image') {
-          const _0x2f2fc9 = this._resolveMediaUrl(_0x26f33f.thumbUrl || _0x26f33f.url || '');
-          if (!_0x2f2fc9) return;
-          (_0x3ca8ce(_0x2f2fc9),
-            (_0x1df164 =
-              '<img src="' + _0x2f2fc9 + '" class="ref-thumb-media is-pending" draggable="false">'),
-            (_0x5cd581 = 'asset-i|' + _0x2f2fc9));
+      list11.forEach((response5, value115) => {
+        const refType = String(response5?.type || '').trim();
+        if (!refType) return;
+        let thumbHTML2 = '',
+          value116 = '';
+        if (refType === 'image') {
+          const enabled28 = this._resolveMediaUrl(response5.thumbUrl || response5.url || '');
+          if (!enabled28) return;
+          (ensureThumbDecoded(enabled28),
+            (thumbHTML2 =
+              '<img src="' + enabled28 + '" class="ref-thumb-media is-pending" draggable="false">'),
+            (value116 = 'asset-i|' + enabled28));
         } else {
-          if (_0x3e7f96 === 'video') {
-            const _0x538e12 = this._resolveMediaUrl(_0x26f33f.thumbUrl || '');
-            _0x538e12
-              ? (_0x3ca8ce(_0x538e12),
-                (_0x1df164 =
-                  '<img src="' + _0x538e12 + '" class="ref-thumb-media is-pending" draggable="false">'),
-                (_0x5cd581 = 'asset-v|' + _0x538e12))
-              : ((_0x1df164 = createReferenceFallbackThumbHtml('video')), (_0x5cd581 = 'asset-v|fallback'));
+          if (refType === 'video') {
+            const value117 = this._resolveMediaUrl(response5.thumbUrl || '');
+            value117
+              ? (ensureThumbDecoded(value117),
+                (thumbHTML2 =
+                  '<img src="' + value117 + '" class="ref-thumb-media is-pending" draggable="false">'),
+                (value116 = 'asset-v|' + value117))
+              : ((thumbHTML2 = createReferenceFallbackThumbHtml('video')), (value116 = 'asset-v|fallback'));
           } else
-            ((_0x1df164 = createReferenceFallbackThumbHtml(_0x3e7f96)),
-              (_0x5cd581 = 'asset-' + _0x3e7f96 + '|fallback'));
+            ((thumbHTML2 = createReferenceFallbackThumbHtml(refType)),
+              (value116 = 'asset-' + refType + '|fallback'));
         }
-        const _0x31d4cd = String(_0x26f33f.assetId || ''),
-          _0x33fe67 = String(_0x26f33f.itemIndex ?? ''),
-          _0x3de94e = String(_0x26f33f.assetMentionOccurrence ?? ''),
-          _0x21bd7e = String(_0x26f33f.assetRefSource || 'prompt'),
-          _0x2f04d3 = 'asset:' + _0x31d4cd + ':' + _0x33fe67;
-        _0x1c7426.push({
-          key: 'asset:' + _0x31d4cd + ':' + _0x33fe67 + ':' + _0x3e7f96 + ':' + _0x2b970d,
+        const assetId2 = String(response5.assetId || ''),
+          assetIndex2 = String(response5.itemIndex ?? ''),
+          assetOccurrence2 = String(response5.assetMentionOccurrence ?? ''),
+          assetRefSource2 = String(response5.assetRefSource || 'prompt'),
+          sourceId2 = 'asset:' + assetId2 + ':' + assetIndex2;
+        list12.push({
+          key: 'asset:' + assetId2 + ':' + assetIndex2 + ':' + refType + ':' + value115,
           edgeId: '',
-          sourceId: _0x2f04d3,
-          sig: _0x2f04d3 + '|' + _0x3e7f96 + '|' + String(_0x26f33f.url || '') + '|' + _0x5cd581,
-          thumbHTML: _0x1df164,
+          sourceId: sourceId2,
+          sig: sourceId2 + '|' + refType + '|' + String(response5.url || '') + '|' + value116,
+          thumbHTML: thumbHTML2,
           virtual: true,
-          assetId: _0x31d4cd,
-          assetIndex: _0x33fe67,
-          assetOccurrence: _0x3de94e,
-          assetRefSource: _0x21bd7e,
-          refType: _0x3e7f96,
+          assetId: assetId2,
+          assetIndex: assetIndex2,
+          assetOccurrence: assetOccurrence2,
+          assetRefSource: assetRefSource2,
+          refType: refType,
         });
       });
-      if (_0x1c7426.length === 0) {
+      if (list12.length === 0) {
         (this.refBarEl.classList.remove('rh-v5-refbar'),
           this.refBarEl.classList.remove('active'),
-          (this.refBarEl.innerHTML = _0x53ffad),
+          (this.refBarEl.innerHTML = attachBtnHTML2),
           this._syncBtnIconState(),
-          _0xd25a29(this, {}));
+          _syncPillLabels(this, {}));
         return;
       }
       if (this._isDraggingSorting) {
-        (this._syncBtnIconState(), _0xd25a29(this, _0x5a20f2));
+        (this._syncBtnIconState(), _syncPillLabels(this, value108));
         return;
       }
       (this.refBarEl.classList.remove('rh-v5-refbar'), this.refBarEl.classList.add('active'));
-      let _0x5ce106 = this.refBarEl.querySelector('.ref-thumb-container');
-      (!this.refBarEl.querySelector('.prompt-attachment-btn') || !_0x5ce106) &&
-        ((this.refBarEl.innerHTML = _0x53ffad + ' <div class="ref-thumb-container"></div>'),
-        (_0x5ce106 = this.refBarEl.querySelector('.ref-thumb-container')));
-      const _0x4224dd = new Map();
-      _0x5ce106
+      let el17 = this.refBarEl.querySelector('.ref-thumb-container');
+      (!this.refBarEl.querySelector('.prompt-attachment-btn') || !el17) &&
+        ((this.refBarEl.innerHTML = attachBtnHTML2 + ' <div class="ref-thumb-container"></div>'),
+        (el17 = this.refBarEl.querySelector('.ref-thumb-container')));
+      const map9 = new Map();
+      el17
         .querySelectorAll('.ref-thumb-wrap')
-        .forEach((_0x3f47a5) =>
-          _0x4224dd.set(_0x3f47a5.dataset.refKey || 'edge:' + _0x3f47a5.dataset.edgeId, _0x3f47a5),
-        );
-      const _0x4e185e = new Set();
-      for (let _0xcdeb93 = 0; _0xcdeb93 < _0x1c7426.length; _0xcdeb93++) {
-        const _0x44f58b = _0x1c7426[_0xcdeb93];
-        let _0x3837e0 = _0x4224dd.get(_0x44f58b.key);
-        (!_0x3837e0 &&
-          ((_0x3837e0 = document.createElement('div')),
-          (_0x3837e0.className = 'ref-thumb-wrap' + (_0x44f58b.virtual ? ' ref-thumb-wrap--asset' : ''))),
-          _0x3837e0.setAttribute('draggable', _0x44f58b.virtual ? 'false' : 'true'),
-          _0x3837e0.dataset.sig !== _0x44f58b.sig &&
-            ((_0x3837e0.innerHTML = '' + _0x44f58b.thumbHTML + createRefThumbDeleteButtonHtml()),
-            (_0x3837e0.dataset.sig = _0x44f58b.sig),
-            _0x9589d(_0x3837e0, _0x44f58b.sig)),
-          (_0x3837e0.dataset.refKey = _0x44f58b.key),
-          (_0x3837e0.dataset.edgeId = _0x44f58b.edgeId),
-          (_0x3837e0.dataset.sourceId = _0x44f58b.sourceId),
-          (_0x3837e0.dataset.refOrigin = _0x44f58b.virtual ? 'asset' : 'node'),
-          _0x44f58b.virtual
-            ? ((_0x3837e0.dataset.assetId = _0x44f58b.assetId || ''),
-              (_0x3837e0.dataset.assetIndex = _0x44f58b.assetIndex || ''),
-              (_0x3837e0.dataset.assetOccurrence = _0x44f58b.assetOccurrence || ''),
-              (_0x3837e0.dataset.assetRefSource = _0x44f58b.assetRefSource || 'prompt'),
-              (_0x3837e0.dataset.refType = _0x44f58b.refType || ''))
-            : (delete _0x3837e0.dataset.assetId,
-              delete _0x3837e0.dataset.assetIndex,
-              delete _0x3837e0.dataset.assetOccurrence,
-              delete _0x3837e0.dataset.assetRefSource,
-              delete _0x3837e0.dataset.refType),
-          _0x5ce106.appendChild(_0x3837e0),
-          _0x4e185e.add(_0x44f58b.key));
+        .forEach((el18) => map9.set(el18.dataset.refKey || 'edge:' + el18.dataset.edgeId, el18));
+      const map10 = new Set();
+      for (let value118 = 0; value118 < list12.length; value118++) {
+        const event3 = list12[value118];
+        let el19 = map9.get(event3.key);
+        (!el19 &&
+          ((el19 = document.createElement('div')),
+          (el19.className = 'ref-thumb-wrap' + (event3.virtual ? ' ref-thumb-wrap--asset' : ''))),
+          el19.setAttribute('draggable', event3.virtual ? 'false' : 'true'),
+          el19.dataset.sig !== event3.sig &&
+            ((el19.innerHTML = '' + event3.thumbHTML + createRefThumbDeleteButtonHtml()),
+            (el19.dataset.sig = event3.sig),
+            revealRefThumbMedia(el19, event3.sig)),
+          (el19.dataset.refKey = event3.key),
+          (el19.dataset.edgeId = event3.edgeId),
+          (el19.dataset.sourceId = event3.sourceId),
+          (el19.dataset.refOrigin = event3.virtual ? 'asset' : 'node'),
+          event3.virtual
+            ? ((el19.dataset.assetId = event3.assetId || ''),
+              (el19.dataset.assetIndex = event3.assetIndex || ''),
+              (el19.dataset.assetOccurrence = event3.assetOccurrence || ''),
+              (el19.dataset.assetRefSource = event3.assetRefSource || 'prompt'),
+              (el19.dataset.refType = event3.refType || ''))
+            : (delete el19.dataset.assetId,
+              delete el19.dataset.assetIndex,
+              delete el19.dataset.assetOccurrence,
+              delete el19.dataset.assetRefSource,
+              delete el19.dataset.refType),
+          el17.appendChild(el19),
+          map10.add(event3.key));
       }
-      for (const [_0x3aa90b, _0x22720f] of _0x4224dd.entries()) {
-        if (!_0x4e185e.has(_0x3aa90b)) _0x22720f.remove();
+      for (const [value119, el20] of map9.entries()) {
+        if (!map10.has(value119)) el20.remove();
       }
-      (this._bindDragSort(this.refBarEl), this._syncBtnIconState(), _0xd25a29(this, _0x5a20f2));
+      (this._bindDragSort(this.refBarEl), this._syncBtnIconState(), _syncPillLabels(this, value108));
     }
-    ['_bindFixedSlotDragSwap'](_0x350416, _0x3adc25) {
+    ['_bindFixedSlotDragSwap'](container, acceptMap) {
       bindRefThumbFixedSlotDrag({
         owner: this,
-        container: _0x350416,
-        store: _0x2b49c9,
+        container: container,
+        store: store,
         nodeId: this.nodeId,
-        acceptMap: _0x3adc25,
+        acceptMap: acceptMap,
       });
     }
-    ['_bindDragSort'](_0x469190) {
-      bindRefThumbOrderDrag({ owner: this, container: _0x469190, store: _0x2b49c9, nodeId: this.nodeId });
+    ['_bindDragSort'](container2) {
+      bindRefThumbOrderDrag({ owner: this, container: container2, store: store, nodeId: this.nodeId });
     }
   }
-  return _0x21ad33.prototype;
+  return value44.prototype;
 }

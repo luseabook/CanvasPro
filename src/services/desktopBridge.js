@@ -18,215 +18,198 @@ function getWindowObject() {
   return globalThis['window'] || null;
 }
 function getElectronApi() {
-  const _0x37204c = getWindowObject()?.['electronAPI'] || null;
-  return _0x37204c?.['__aicDesktopHttpShim'] === !![] ? null : _0x37204c;
+  const windowObject = getWindowObject()?.['electronAPI'] || null;
+  return windowObject?.['__aicDesktopHttpShim'] === !![] ? null : windowObject;
 }
 function getDesktopApi() {
-  const _0x110fb6 = getWindowObject()?.['aiCanvasDesktop'] || null;
-  return _0x110fb6?.['__aicDesktopHttpShim'] === !![] ? null : _0x110fb6;
+  const windowObject2 = getWindowObject()?.['aiCanvasDesktop'] || null;
+  return windowObject2?.['__aicDesktopHttpShim'] === !![] ? null : windowObject2;
 }
-function isFunction(_0x5f55bb) {
-  return typeof _0x5f55bb === 'function';
+function isFunction(value) {
+  return typeof value === 'function';
 }
 function isLoopbackAppOrigin() {
   try {
-    const _0x163188 = globalThis['location'];
-    if (!_0x163188 || !/^https?:$/i['test'](String(_0x163188['protocol'] || ''))) return ![];
-    return LOOPBACK_HOSTS['has'](String(_0x163188['hostname'] || '')['toLowerCase']());
+    const enabled = globalThis['location'];
+    if (!enabled || !/^https?:$/i['test'](String(enabled['protocol'] || ''))) return ![];
+    return LOOPBACK_HOSTS['has'](String(enabled['hostname'] || '')['toLowerCase']());
   } catch {
     return ![];
   }
 }
 function hasChromeShellRuntimeHint() {
-  const _0x46c18a = getWindowObject();
-  if (_0x46c18a?.['__AIC_CHROME_SHELL__'] || _0x46c18a?.['__AIC_DESKTOP_HTTP_BRIDGE__']) return !![];
+  const windowObject3 = getWindowObject();
+  if (windowObject3?.['__AIC_CHROME_SHELL__'] || windowObject3?.['__AIC_DESKTOP_HTTP_BRIDGE__']) return !![];
   try {
-    const _0x1b71a8 = new URLSearchParams(globalThis['location']?.['search'] || '');
-    return String(_0x1b71a8['get']('aicRuntime') || '')['toLowerCase']() === 'chrome-shell';
+    const map = new URLSearchParams(globalThis['location']?.['search'] || '');
+    return String(map['get']('aicRuntime') || '')['toLowerCase']() === 'chrome-shell';
   } catch {
     return ![];
   }
 }
-function normalizeHttpBridgeResult(_0x50d4a2) {
-  if (!_0x50d4a2?.['success']) throw new Error(_0x50d4a2?.['error'] || 'Desktop bridge request failed');
-  const _0x441569 = _0x50d4a2['data'];
-  if (
-    !_0x441569 ||
-    typeof _0x441569 !== 'object' ||
-    !Object['prototype']['hasOwnProperty']['call'](_0x441569, 'success')
-  )
-    return _0x441569;
-  if (_0x441569['success'] === ![] && _0x441569['canceled'] === !![]) return _0x441569;
-  if (_0x441569['success'] === ![])
-    throw new Error(_0x441569['error'] || _0x441569['message'] || 'Desktop bridge request failed');
-  if (Object['prototype']['hasOwnProperty']['call'](_0x441569, 'data')) return _0x441569['data'];
-  return _0x441569;
+function normalizeHttpBridgeResult(response) {
+  if (!response?.['success']) throw new Error(response?.['error'] || 'Desktop bridge request failed');
+  const error = response['data'];
+  if (!error || typeof error !== 'object' || !Object['prototype']['hasOwnProperty']['call'](error, 'success'))
+    return error;
+  if (error['success'] === ![] && error['canceled'] === !![]) return error;
+  if (error['success'] === ![])
+    throw new Error(error['error'] || error['message'] || 'Desktop bridge request failed');
+  if (Object['prototype']['hasOwnProperty']['call'](error, 'data')) return error['data'];
+  return error;
 }
-function resolveDesktopBridgeRequestTimeout(_0x208150, _0x97ac0b = {}) {
+function resolveDesktopBridgeRequestTimeout(item, key = {}) {
   if (
-    String(_0x208150 || '') === CHROME_SHELL_STARTUP_READY_PATH &&
-    _0x97ac0b?.['type'] === CHROME_SHELL_STARTUP_READY_EVENT
+    String(item || '') === CHROME_SHELL_STARTUP_READY_PATH &&
+    key?.['type'] === CHROME_SHELL_STARTUP_READY_EVENT
   )
     return CHROME_SHELL_STARTUP_READY_REQUEST_TIMEOUT_MS;
-  return LONG_DESKTOP_REQUEST_PATHS['has'](String(_0x208150 || ''))
-    ? LONG_DESKTOP_REQUEST_TIMEOUT_MS
-    : undefined;
+  return LONG_DESKTOP_REQUEST_PATHS['has'](String(item || '')) ? LONG_DESKTOP_REQUEST_TIMEOUT_MS : undefined;
 }
-async function postDesktopBridge(_0x79592b, _0x3f0f2e = {}) {
+async function postDesktopBridge(index, result = {}) {
   return normalizeHttpBridgeResult(
-    await post(_0x79592b, _0x3f0f2e, resolveDesktopBridgeRequestTimeout(_0x79592b, _0x3f0f2e)),
+    await post(index, result, resolveDesktopBridgeRequestTimeout(index, result)),
   );
 }
-async function normalizeDesktopHttpPayload(_0x36f1e3) {
-  if (_0x36f1e3 instanceof ArrayBuffer) return Array['from'](new Uint8Array(_0x36f1e3));
-  if (ArrayBuffer['isView'](_0x36f1e3))
-    return Array['from'](
-      new Uint8Array(_0x36f1e3['buffer'], _0x36f1e3['byteOffset'], _0x36f1e3['byteLength']),
-    );
-  if (typeof Blob !== 'undefined' && _0x36f1e3 instanceof Blob)
-    return Array['from'](new Uint8Array(await _0x36f1e3['arrayBuffer']()));
-  if (Array['isArray'](_0x36f1e3))
-    return Promise['all'](_0x36f1e3['map']((_0x466261) => normalizeDesktopHttpPayload(_0x466261)));
-  if (!_0x36f1e3 || typeof _0x36f1e3 !== 'object') return _0x36f1e3;
-  const _0x4064a8 = await Promise['all'](
-    Object['entries'](_0x36f1e3)['map'](async ([_0x30d614, _0x11d198]) => [
-      _0x30d614,
-      await normalizeDesktopHttpPayload(_0x11d198),
+async function normalizeDesktopHttpPayload(list) {
+  if (list instanceof ArrayBuffer) return Array['from'](new Uint8Array(list));
+  if (ArrayBuffer['isView'](list))
+    return Array['from'](new Uint8Array(list['buffer'], list['byteOffset'], list['byteLength']));
+  if (typeof Blob !== 'undefined' && list instanceof Blob)
+    return Array['from'](new Uint8Array(await list['arrayBuffer']()));
+  if (Array['isArray'](list)) return Promise['all'](list['map']((data) => normalizeDesktopHttpPayload(data)));
+  if (!list || typeof list !== 'object') return list;
+  const options = await Promise['all'](
+    Object['entries'](list)['map'](async ([target, source]) => [
+      target,
+      await normalizeDesktopHttpPayload(source),
     ]),
   );
-  return Object['fromEntries'](_0x4064a8);
+  return Object['fromEntries'](options);
 }
-function chromeShellPost(_0x5a03ed, _0x50c7ff = {}) {
+function chromeShellPost(next, current = {}) {
   if (!desktopBridge['isChromeShell']) return undefined;
-  return normalizeDesktopHttpPayload(_0x50c7ff)['then']((_0x16cf1b) =>
-    postDesktopBridge(_0x5a03ed, _0x16cf1b),
-  );
+  return normalizeDesktopHttpPayload(current)['then']((entry) => postDesktopBridge(next, entry));
 }
-function chromeShellPostOperationResult(_0x53c234, _0x8006ce = {}) {
+function chromeShellPostOperationResult(record, payload = {}) {
   if (!desktopBridge['isChromeShell']) return undefined;
-  return normalizeDesktopHttpPayload(_0x8006ce)['then'](async (_0x445491) => {
-    const _0x1f0be6 = await post(
-      _0x53c234,
-      _0x445491,
-      resolveDesktopBridgeRequestTimeout(_0x53c234, _0x445491),
-    );
-    if (!_0x1f0be6?.['success']) throw new Error(_0x1f0be6?.['error'] || 'Desktop bridge request failed');
-    const _0xcd183e = _0x1f0be6['data'];
-    if (_0xcd183e?.['success'] === ![])
-      throw new Error(_0xcd183e?.['error'] || 'Desktop bridge request failed');
-    return _0xcd183e && Object['prototype']['hasOwnProperty']['call'](_0xcd183e, 'data')
-      ? _0xcd183e['data']
-      : _0xcd183e;
+  return normalizeDesktopHttpPayload(payload)['then'](async (handle) => {
+    const response2 = await post(record, handle, resolveDesktopBridgeRequestTimeout(record, handle));
+    if (!response2?.['success']) throw new Error(response2?.['error'] || 'Desktop bridge request failed');
+    const response3 = response2['data'];
+    if (response3?.['success'] === ![])
+      throw new Error(response3?.['error'] || 'Desktop bridge request failed');
+    return response3 && Object['prototype']['hasOwnProperty']['call'](response3, 'data')
+      ? response3['data']
+      : response3;
   });
 }
 async function writeChromeShellRecoverySnapshotBeforeInstall() {
   if (!desktopBridge['isChromeShell']) return null;
-  const _0x42c059 = getWindowObject()?.['__aiCanvasWriteRecoverySnapshotForClose'];
-  if (typeof _0x42c059 !== 'function') return null;
-  return _0x42c059('update-install');
+  const run = getWindowObject()?.['__aiCanvasWriteRecoverySnapshotForClose'];
+  if (typeof run !== 'function') return null;
+  return run('update-install');
 }
-function createLatestOnlyChromeShellPoster(_0xb5174f) {
-  let _0x3dc91b = null,
-    _0xc35f0d = null;
-  const _0x14e722 = async () => {
+function createLatestOnlyChromeShellPoster(state) {
+  let value2 = null,
+    enabled2 = null;
+  const run2 = async () => {
     try {
-      while (_0x3dc91b) {
-        const _0x36a9d6 = _0x3dc91b;
-        ((_0x3dc91b = null), await chromeShellPost(_0xb5174f, _0x36a9d6));
+      while (value2) {
+        const config = value2;
+        ((value2 = null), await chromeShellPost(state, config));
       }
       return { ok: !![] };
     } finally {
-      _0xc35f0d = null;
+      enabled2 = null;
     }
   };
-  return (_0x447c66 = {}) => {
-    _0x3dc91b = _0x447c66;
-    if (!_0xc35f0d) _0xc35f0d = _0x14e722();
-    return _0xc35f0d;
+  return (options2 = {}) => {
+    value2 = options2;
+    if (!enabled2) enabled2 = run2();
+    return enabled2;
   };
 }
 let chromeShellUnsavedStatePoster = null;
-function postChromeShellUnsavedState(_0x4d8ca6) {
+function postChromeShellUnsavedState(scope) {
   if (!desktopBridge['isChromeShell']) return undefined;
   return (
     !chromeShellUnsavedStatePoster &&
       (chromeShellUnsavedStatePoster = createLatestOnlyChromeShellPoster(
         '/api/v2/desktop/project/set-unsaved-state',
       )),
-    chromeShellUnsavedStatePoster(_0x4d8ca6)
+    chromeShellUnsavedStatePoster(scope)
   );
 }
 function subscribeByPolling(
-  _0x1c017c,
-  _0x2ee4be,
+  handler,
+  handler2,
   {
     intervalMs: intervalMs = 0x3e8,
-    extractItems: extractItems = (_0x2208c7) => _0x2208c7,
-    getKey: getKey = (_0x53703e) => JSON['stringify'](_0x53703e),
+    extractItems: extractItems = (input) => input,
+    getKey: getKey = (output) => JSON['stringify'](output),
   } = {},
 ) {
-  if (!desktopBridge['isChromeShell'] || typeof _0x2ee4be !== 'function') return () => {};
-  let _0x40159c = ![];
-  const _0x84dc39 = new Map(),
-    _0x130ad5 = async () => {
-      if (_0x40159c) return;
+  if (!desktopBridge['isChromeShell'] || typeof handler2 !== 'function') return () => {};
+  let enabled3 = ![];
+  const map2 = new Map(),
+    async2 = async () => {
+      if (enabled3) return;
       try {
-        const _0x327e9e = await _0x1c017c();
-        if (_0x40159c) return;
-        const _0x4a6b11 = extractItems(_0x327e9e);
-        if (Array['isArray'](_0x4a6b11))
-          for (const _0x157ee8 of _0x4a6b11) {
-            if (_0x40159c) break;
-            const _0x6cdf16 = getKey(_0x157ee8),
-              _0x313e25 = JSON['stringify'](_0x157ee8 || {});
-            if (_0x84dc39['get'](_0x6cdf16) === _0x313e25) continue;
-            (_0x84dc39['set'](_0x6cdf16, _0x313e25), _0x2ee4be(_0x157ee8));
+        const value3 = await handler();
+        if (enabled3) return;
+        const extractItems2 = extractItems(value3);
+        if (Array['isArray'](extractItems2))
+          for (const value4 of extractItems2) {
+            if (enabled3) break;
+            const key2 = getKey(value4),
+              value5 = JSON['stringify'](value4 || {});
+            if (map2['get'](key2) === value5) continue;
+            (map2['set'](key2, value5), handler2(value4));
           }
         else {
-          if (_0x4a6b11 && typeof _0x4a6b11 === 'object') {
-            const _0x17626f = getKey(_0x4a6b11),
-              _0x384e38 = JSON['stringify'](_0x4a6b11 || {});
-            _0x84dc39['get'](_0x17626f) !== _0x384e38 &&
-              (_0x84dc39['set'](_0x17626f, _0x384e38), _0x2ee4be(_0x4a6b11));
+          if (extractItems2 && typeof extractItems2 === 'object') {
+            const key3 = getKey(extractItems2),
+              value6 = JSON['stringify'](extractItems2 || {});
+            map2['get'](key3) !== value6 && (map2['set'](key3, value6), handler2(extractItems2));
           }
         }
       } catch {}
-      if (!_0x40159c) setTimeout(_0x130ad5, intervalMs);
+      if (!enabled3) setTimeout(async2, intervalMs);
     };
   return (
-    setTimeout(_0x130ad5, 0x0),
+    setTimeout(async2, 0x0),
     () => {
-      _0x40159c = !![];
+      enabled3 = !![];
     }
   );
 }
-function subscribeToConsumedBatch(_0x3939e6, _0x2d0521, { intervalMs: intervalMs = 0x1f4 } = {}) {
-  if (!desktopBridge['isChromeShell'] || typeof _0x2d0521 !== 'function') return () => {};
-  let _0x55cef7 = ![];
-  const _0x421f56 = async () => {
-    if (_0x55cef7) return;
+function subscribeToConsumedBatch(handler3, handler4, { intervalMs: intervalMs = 0x1f4 } = {}) {
+  if (!desktopBridge['isChromeShell'] || typeof handler4 !== 'function') return () => {};
+  let enabled4 = ![];
+  const async3 = async () => {
+    if (enabled4) return;
     try {
-      const _0x1d3957 = await _0x3939e6();
-      if (_0x55cef7) return;
-      if (Array['isArray'](_0x1d3957) && _0x1d3957['length'] > 0x0) _0x2d0521(_0x1d3957);
+      const list2 = await handler3();
+      if (enabled4) return;
+      if (Array['isArray'](list2) && list2['length'] > 0x0) handler4(list2);
     } catch {}
-    if (!_0x55cef7) setTimeout(_0x421f56, intervalMs);
+    if (!enabled4) setTimeout(async3, intervalMs);
   };
   return (
-    setTimeout(_0x421f56, 0x0),
+    setTimeout(async3, 0x0),
     () => {
-      _0x55cef7 = !![];
+      enabled4 = !![];
     }
   );
 }
-function updaterEventFromStateSnapshot(_0x5920ba = {}) {
-  if (!_0x5920ba || typeof _0x5920ba !== 'object') return null;
-  if (typeof _0x5920ba['type'] === 'string' && _0x5920ba['type']) return _0x5920ba;
-  if (_0x5920ba['latestEvent'] && typeof _0x5920ba['latestEvent']['type'] === 'string')
-    return _0x5920ba['latestEvent'];
-  const _0x26ced2 = String(_0x5920ba['state'] || '');
-  if (!_0x26ced2 || _0x26ced2 === 'idle') return null;
-  const _0x5dd418 = {
+function updaterEventFromStateSnapshot(info = {}) {
+  if (!info || typeof info !== 'object') return null;
+  if (typeof info['type'] === 'string' && info['type']) return info;
+  if (info['latestEvent'] && typeof info['latestEvent']['type'] === 'string') return info['latestEvent'];
+  const state2 = String(info['state'] || '');
+  if (!state2 || state2 === 'idle') return null;
+  const value7 = {
       checking: 'checking',
       available: 'available',
       downloading: 'download-started',
@@ -234,60 +217,60 @@ function updaterEventFromStateSnapshot(_0x5920ba = {}) {
       error: 'download-failed',
       installing: 'installing',
     },
-    _0x2225bd = _0x5dd418[_0x26ced2];
-  if (!_0x2225bd) return null;
+    type = value7[state2];
+  if (!type) return null;
   return {
-    type: _0x2225bd,
-    state: _0x26ced2,
-    info: _0x5920ba['latestInfo'] || null,
-    retryCount: Number(_0x5920ba['retryCount'] || 0x0),
-    maxRetries: Number(_0x5920ba['maxRetries'] || 0x0),
+    type: type,
+    state: state2,
+    info: info['latestInfo'] || null,
+    retryCount: Number(info['retryCount'] || 0x0),
+    maxRetries: Number(info['maxRetries'] || 0x0),
   };
 }
-function subscribeToUpdaterState(_0x1fa34a, _0x4f075f, _0x4e6b4 = subscribeByPolling) {
-  if (typeof _0x4f075f !== 'function') return () => {};
-  return _0x4e6b4(
-    _0x1fa34a,
-    (_0x30a88a) => {
-      const _0x5342f9 = updaterEventFromStateSnapshot(_0x30a88a);
-      if (_0x5342f9) _0x4f075f(_0x5342f9);
+function subscribeToUpdaterState(value8, handler5, handler6 = subscribeByPolling) {
+  if (typeof handler5 !== 'function') return () => {};
+  return handler6(
+    value8,
+    (value9) => {
+      const updaterEventFromStateSnapshot2 = updaterEventFromStateSnapshot(value9);
+      if (updaterEventFromStateSnapshot2) handler5(updaterEventFromStateSnapshot2);
     },
     { intervalMs: 0xbb8, getKey: () => 'updater-state' },
   );
 }
-function subscribeByLongPolling(_0xe24dee, _0x58379f) {
-  if (!desktopBridge['isChromeShell'] || typeof _0x58379f !== 'function') return () => {};
-  let _0x1b1522 = ![];
-  const _0x4de41e = (_0xec9309) => new Promise((_0x5c4f88) => setTimeout(_0x5c4f88, _0xec9309)),
-    _0x5b721b = async () => {
-      while (!_0x1b1522) {
-        let _0x3ae272 = 0x0;
+function subscribeByLongPolling(handler7, handler8) {
+  if (!desktopBridge['isChromeShell'] || typeof handler8 !== 'function') return () => {};
+  let enabled5 = ![];
+  const run3 = (value10) => new Promise((value11) => setTimeout(value11, value10)),
+    handler9 = async () => {
+      while (!enabled5) {
+        let count = 0x0;
         try {
-          const _0x2c0660 = await _0xe24dee();
-          if (_0x1b1522) break;
-          const _0x2c0165 = Array['isArray'](_0x2c0660) ? _0x2c0660 : [];
-          ((_0x3ae272 = _0x2c0165['length']), _0x2c0165['forEach']((_0x11c5f5) => _0x58379f(_0x11c5f5)));
+          const value12 = await handler7();
+          if (enabled5) break;
+          const list3 = Array['isArray'](value12) ? value12 : [];
+          ((count = list3['length']), list3['forEach']((value13) => handler8(value13)));
         } catch {
-          if (!_0x1b1522) await _0x4de41e(0xfa);
+          if (!enabled5) await run3(0xfa);
           continue;
         }
-        if (!_0x1b1522 && _0x3ae272 === 0x0) await _0x4de41e(0x18);
+        if (!enabled5 && count === 0x0) await run3(0x18);
       }
     };
   return (
-    void _0x5b721b(),
+    void handler9(),
     () => {
-      _0x1b1522 = !![];
+      enabled5 = !![];
     }
   );
 }
-function getGroup(_0x4c8a7c, _0x4d4180) {
-  const _0x540dca = _0x4c8a7c?.[_0x4d4180];
-  return _0x540dca && typeof _0x540dca === 'object' ? _0x540dca : null;
+function getGroup(value14, value15) {
+  const value16 = value14?.[value15];
+  return value16 && typeof value16 === 'object' ? value16 : null;
 }
-function unavailable(_0x944416) {
+function unavailable(value17) {
   return () => {
-    throw new Error(_0x944416 + ' unavailable');
+    throw new Error(value17 + ' unavailable');
   };
 }
 const syncChromeShellWebPreviewViews = createLatestOnlyChromeShellPoster(
@@ -295,10 +278,10 @@ const syncChromeShellWebPreviewViews = createLatestOnlyChromeShellPoster(
 );
 export const desktopBridge = {
   get usesHttpCompat() {
-    const _0x43098e = getWindowObject();
+    const windowObject4 = getWindowObject();
     return (
-      _0x43098e?.['electronAPI']?.['__aicDesktopHttpShim'] === !![] ||
-      _0x43098e?.['aiCanvasDesktop']?.['__aicDesktopHttpShim'] === !![] ||
+      windowObject4?.['electronAPI']?.['__aicDesktopHttpShim'] === !![] ||
+      windowObject4?.['aiCanvasDesktop']?.['__aicDesktopHttpShim'] === !![] ||
       desktopBridge['isChromeShell']
     );
   },
@@ -312,41 +295,41 @@ export const desktopBridge = {
     isAvailable() {
       return !!getDesktopApi() || desktopBridge['isChromeShell'];
     },
-    getAppVersion: (..._0x58efec) =>
-      getDesktopApi()?.['getAppVersion']?.(..._0x58efec) ??
-      chromeShellPost('/api/v2/desktop/app/get-version', _0x58efec[0x0]) ??
+    getAppVersion: (...args) =>
+      getDesktopApi()?.['getAppVersion']?.(...args) ??
+      chromeShellPost('/api/v2/desktop/app/get-version', args[0x0]) ??
       Promise['resolve'](''),
-    getDeviceId: (..._0x2d4b80) =>
-      getDesktopApi()?.['getDeviceId']?.(..._0x2d4b80) ??
-      chromeShellPost('/api/v2/desktop/app/get-device-id', _0x2d4b80[0x0]) ??
+    getDeviceId: (...args2) =>
+      getDesktopApi()?.['getDeviceId']?.(...args2) ??
+      chromeShellPost('/api/v2/desktop/app/get-device-id', args2[0x0]) ??
       Promise['resolve'](''),
-    checkForUpdates: (..._0x4a271d) =>
-      getDesktopApi()?.['checkForUpdates']?.(..._0x4a271d) ??
-      chromeShellPost('/api/v2/desktop/app/check-for-updates', _0x4a271d[0x0]) ??
+    checkForUpdates: (...args3) =>
+      getDesktopApi()?.['checkForUpdates']?.(...args3) ??
+      chromeShellPost('/api/v2/desktop/app/check-for-updates', args3[0x0]) ??
       Promise['resolve'](null),
-    getUpdateState: (..._0x569ff0) =>
-      getDesktopApi()?.['getUpdateState']?.(..._0x569ff0) ??
-      chromeShellPost('/api/v2/desktop/app/update-state', _0x569ff0[0x0]) ??
+    getUpdateState: (...args4) =>
+      getDesktopApi()?.['getUpdateState']?.(...args4) ??
+      chromeShellPost('/api/v2/desktop/app/update-state', args4[0x0]) ??
       Promise['resolve'](null),
-    downloadUpdate: (..._0x44d78d) =>
-      getDesktopApi()?.['downloadUpdate']?.(..._0x44d78d) ??
-      chromeShellPost('/api/v2/desktop/app/download-update', _0x44d78d[0x0]) ??
+    downloadUpdate: (...args5) =>
+      getDesktopApi()?.['downloadUpdate']?.(...args5) ??
+      chromeShellPost('/api/v2/desktop/app/download-update', args5[0x0]) ??
       Promise['resolve'](null),
-    cancelUpdateDownload: (..._0x34e3a7) =>
-      getDesktopApi()?.['cancelUpdateDownload']?.(..._0x34e3a7) ??
-      chromeShellPost('/api/v2/desktop/app/cancel-update-download', _0x34e3a7[0x0]) ??
+    cancelUpdateDownload: (...args6) =>
+      getDesktopApi()?.['cancelUpdateDownload']?.(...args6) ??
+      chromeShellPost('/api/v2/desktop/app/cancel-update-download', args6[0x0]) ??
       Promise['resolve'](null),
-    installDownloadedUpdate: async (..._0x5da028) => {
+    installDownloadedUpdate: async (...args7) => {
       return (
         await writeChromeShellRecoverySnapshotBeforeInstall(),
-        getDesktopApi()?.['installDownloadedUpdate']?.(..._0x5da028) ??
-          chromeShellPost('/api/v2/desktop/app/install-downloaded-update', _0x5da028[0x0]) ??
+        getDesktopApi()?.['installDownloadedUpdate']?.(...args7) ??
+          chromeShellPost('/api/v2/desktop/app/install-downloaded-update', args7[0x0]) ??
           null
       );
     },
-    onUpdaterEvent: (_0x19aed2) =>
-      getDesktopApi()?.['onUpdaterEvent']?.(_0x19aed2) ||
-      subscribeToUpdaterState(() => desktopBridge['app']['getUpdateState'](), _0x19aed2),
+    onUpdaterEvent: (value18) =>
+      getDesktopApi()?.['onUpdaterEvent']?.(value18) ||
+      subscribeToUpdaterState(() => desktopBridge['app']['getUpdateState'](), value18),
   },
   project: {
     get api() {
@@ -355,74 +338,72 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['project']['api'] || desktopBridge['isChromeShell'];
     },
-    open: (..._0x24e54c) =>
-      desktopBridge['project']['api']?.['open']?.(..._0x24e54c) ??
-      chromeShellPost('/api/v2/desktop/project/open', _0x24e54c[0x0]),
-    save: (..._0x1598db) =>
-      desktopBridge['project']['api']?.['save']?.(..._0x1598db) ??
-      chromeShellPost('/api/v2/desktop/project/save', _0x1598db[0x0]),
-    exportPackage: (..._0x2ff9a3) =>
+    open: (...args8) =>
+      desktopBridge['project']['api']?.['open']?.(...args8) ??
+      chromeShellPost('/api/v2/desktop/project/open', args8[0x0]),
+    save: (...args9) =>
+      desktopBridge['project']['api']?.['save']?.(...args9) ??
+      chromeShellPost('/api/v2/desktop/project/save', args9[0x0]),
+    exportPackage: (...args10) =>
       withDeferredMediaFiles(
-        _0x2ff9a3,
+        args10,
         () =>
-          desktopBridge['project']['api']?.['exportPackage']?.(..._0x2ff9a3) ??
-          chromeShellPost('/api/v2/desktop/project/export-package', _0x2ff9a3[0x0]),
+          desktopBridge['project']['api']?.['exportPackage']?.(...args10) ??
+          chromeShellPost('/api/v2/desktop/project/export-package', args10[0x0]),
       ),
-    importPackage: (..._0x51b645) =>
-      desktopBridge['project']['api']?.['importPackage']?.(..._0x51b645) ??
-      chromeShellPost('/api/v2/desktop/project/import-package', _0x51b645[0x0]),
-    listRecent: (..._0x5ab989) =>
-      desktopBridge['project']['api']?.['listRecent']?.(..._0x5ab989) ??
-      chromeShellPost('/api/v2/desktop/project/list-recent', _0x5ab989[0x0]),
-    removeRecent: (..._0x25de45) =>
-      desktopBridge['project']['api']?.['removeRecent']?.(..._0x25de45) ??
-      chromeShellPost('/api/v2/desktop/project/remove-recent', _0x25de45[0x0]),
-    clearRecoverySnapshot: (..._0x517f9e) =>
-      desktopBridge['project']['api']?.['clearRecoverySnapshot']?.(..._0x517f9e) ??
-      chromeShellPost('/api/v2/desktop/project/clear-recovery-snapshot', _0x517f9e[0x0]),
-    writeRecoverySnapshot: (..._0x31b343) =>
-      desktopBridge['project']['api']?.['writeRecoverySnapshot']?.(..._0x31b343) ??
-      chromeShellPost('/api/v2/desktop/project/write-recovery-snapshot', _0x31b343[0x0]),
-    getRecoverySnapshotInfo: (..._0x52441f) =>
-      desktopBridge['project']['api']?.['getRecoverySnapshotInfo']?.(..._0x52441f) ??
-      chromeShellPost('/api/v2/desktop/project/get-recovery-snapshot-info', _0x52441f[0x0]),
-    readRecoverySnapshot: (..._0x204094) =>
-      desktopBridge['project']['api']?.['readRecoverySnapshot']?.(..._0x204094) ??
-      chromeShellPost('/api/v2/desktop/project/read-recovery-snapshot', _0x204094[0x0]),
-    setUnsavedState: (..._0x635f0a) =>
-      desktopBridge['project']['api']?.['setUnsavedState']?.(..._0x635f0a) ??
-      postChromeShellUnsavedState(_0x635f0a[0x0]),
-    consumeExternalOpenRequests: (..._0x562f69) =>
-      desktopBridge['project']['api']?.['consumeExternalOpenRequests']?.(..._0x562f69) ??
-      chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', _0x562f69[0x0]),
-    onExternalOpen: (_0x4cc71c) =>
-      desktopBridge['project']['api']?.['onExternalOpen']?.(_0x4cc71c) ||
+    importPackage: (...args11) =>
+      desktopBridge['project']['api']?.['importPackage']?.(...args11) ??
+      chromeShellPost('/api/v2/desktop/project/import-package', args11[0x0]),
+    listRecent: (...args12) =>
+      desktopBridge['project']['api']?.['listRecent']?.(...args12) ??
+      chromeShellPost('/api/v2/desktop/project/list-recent', args12[0x0]),
+    removeRecent: (...args13) =>
+      desktopBridge['project']['api']?.['removeRecent']?.(...args13) ??
+      chromeShellPost('/api/v2/desktop/project/remove-recent', args13[0x0]),
+    clearRecoverySnapshot: (...args14) =>
+      desktopBridge['project']['api']?.['clearRecoverySnapshot']?.(...args14) ??
+      chromeShellPost('/api/v2/desktop/project/clear-recovery-snapshot', args14[0x0]),
+    writeRecoverySnapshot: (...args15) =>
+      desktopBridge['project']['api']?.['writeRecoverySnapshot']?.(...args15) ??
+      chromeShellPost('/api/v2/desktop/project/write-recovery-snapshot', args15[0x0]),
+    getRecoverySnapshotInfo: (...args16) =>
+      desktopBridge['project']['api']?.['getRecoverySnapshotInfo']?.(...args16) ??
+      chromeShellPost('/api/v2/desktop/project/get-recovery-snapshot-info', args16[0x0]),
+    readRecoverySnapshot: (...args17) =>
+      desktopBridge['project']['api']?.['readRecoverySnapshot']?.(...args17) ??
+      chromeShellPost('/api/v2/desktop/project/read-recovery-snapshot', args17[0x0]),
+    setUnsavedState: (...args18) =>
+      desktopBridge['project']['api']?.['setUnsavedState']?.(...args18) ??
+      postChromeShellUnsavedState(args18[0x0]),
+    consumeExternalOpenRequests: (...args19) =>
+      desktopBridge['project']['api']?.['consumeExternalOpenRequests']?.(...args19) ??
+      chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', args19[0x0]),
+    onExternalOpen: (value19) =>
+      desktopBridge['project']['api']?.['onExternalOpen']?.(value19) ||
       subscribeToConsumedBatch(
         () => chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', {}),
-        _0x4cc71c,
+        value19,
         { intervalMs: 0x1f4 },
       ),
-    onPackageProgress: (_0x311122) =>
-      desktopBridge['project']['api']?.['onPackageProgress']?.(_0x311122) ||
+    onPackageProgress: (value20) =>
+      desktopBridge['project']['api']?.['onPackageProgress']?.(value20) ||
       subscribeByPolling(
         () => chromeShellPost('/api/v2/desktop/project/consume-package-progress-events', {}),
-        _0x311122,
+        value20,
         {
           intervalMs: 0xfa,
-          extractItems: (_0xc69f8d) => (Array['isArray'](_0xc69f8d) ? _0xc69f8d : []),
-          getKey: (_0x5c15a8) =>
-            String(
-              _0x5c15a8?.['createdAt'] || _0x5c15a8?.['operationId'] || JSON['stringify'](_0x5c15a8 || {}),
-            ),
+          extractItems: (value21) => (Array['isArray'](value21) ? value21 : []),
+          getKey: (value22) =>
+            String(value22?.['createdAt'] || value22?.['operationId'] || JSON['stringify'](value22 || {})),
         },
       ),
   },
   shell: {
     isAvailable() {
-      const _0x2d7ebf = getElectronApi();
+      const electronApi = getElectronApi();
       return (
-        isFunction(_0x2d7ebf?.['shell']?.['openExternal']) ||
-        isFunction(_0x2d7ebf?.['openExternal']) ||
+        isFunction(electronApi?.['shell']?.['openExternal']) ||
+        isFunction(electronApi?.['openExternal']) ||
         desktopBridge['isChromeShell']
       );
     },
@@ -432,22 +413,22 @@ export const desktopBridge = {
     canOpenKnownFolder() {
       return isFunction(getElectronApi()?.['openKnownFolder']) || desktopBridge['isChromeShell'];
     },
-    showItemInFolder: (_0x302839) =>
-      getElectronApi()?.['showItemInFolder']?.(_0x302839) ??
-      chromeShellPost('/api/v2/desktop/shell/show-item-in-folder', _0x302839) ??
+    showItemInFolder: (value23) =>
+      getElectronApi()?.['showItemInFolder']?.(value23) ??
+      chromeShellPost('/api/v2/desktop/shell/show-item-in-folder', value23) ??
       unavailable('showItemInFolder')(),
-    openKnownFolder: (_0x5d11bc) =>
-      getElectronApi()?.['openKnownFolder']?.(_0x5d11bc) ??
-      chromeShellPost('/api/v2/desktop/shell/open-known-folder', _0x5d11bc) ??
+    openKnownFolder: (value24) =>
+      getElectronApi()?.['openKnownFolder']?.(value24) ??
+      chromeShellPost('/api/v2/desktop/shell/open-known-folder', value24) ??
       unavailable('openKnownFolder')(),
-    openExternal(_0x5e1005) {
-      const _0xda1bd4 = getElectronApi()?.['shell']?.['openExternal'] || getElectronApi()?.['openExternal'];
-      if (isFunction(_0xda1bd4)) return _0xda1bd4(_0x5e1005);
-      const _0x963a1d = chromeShellPost('/api/v2/desktop/shell/open-external', { url: _0x5e1005 });
-      if (_0x963a1d) return _0x963a1d;
+    openExternal(url) {
+      const run4 = getElectronApi()?.['shell']?.['openExternal'] || getElectronApi()?.['openExternal'];
+      if (isFunction(run4)) return run4(url);
+      const chromeShellPost2 = chromeShellPost('/api/v2/desktop/shell/open-external', { url: url });
+      if (chromeShellPost2) return chromeShellPost2;
       if (typeof globalThis['open'] === 'function')
         return (
-          globalThis['open'](String(_0x5e1005 || ''), '_blank', 'noopener,noreferrer'),
+          globalThis['open'](String(url || ''), '_blank', 'noopener,noreferrer'),
           Promise['resolve']({ ok: !![], fallback: 'browser' })
         );
       return Promise['resolve']({ ok: ![], error: 'openExternal\x20unavailable' });
@@ -457,13 +438,13 @@ export const desktopBridge = {
     isAvailable() {
       return isFunction(getElectronApi()?.['getLocalPreviewUrl']) || desktopBridge['isChromeShell'];
     },
-    async getLocalPreviewUrl(_0x3ef41 = {}) {
-      const _0xdd385f = deferredMediaPreview(_0x3ef41);
-      if (_0xdd385f) return _0xdd385f;
-      const _0x2ef30d = getElectronApi()?.['getLocalPreviewUrl'];
-      if (isFunction(_0x2ef30d)) return _0x2ef30d(_0x3ef41);
+    async getLocalPreviewUrl(options3 = {}) {
+      const deferredMediaPreview2 = deferredMediaPreview(options3);
+      if (deferredMediaPreview2) return deferredMediaPreview2;
+      const run5 = getElectronApi()?.['getLocalPreviewUrl'];
+      if (isFunction(run5)) return run5(options3);
       if (!desktopBridge['isChromeShell']) throw new Error('Local preview bridge unavailable');
-      return postDesktopBridge('/api/v2/desktop/local-preview', _0x3ef41);
+      return postDesktopBridge('/api/v2/desktop/local-preview', options3);
     },
   },
   assetImport: {
@@ -485,43 +466,43 @@ export const desktopBridge = {
     canSubscribeUpdates() {
       return isFunction(getElectronApi()?.['onAssetUpdated']) || desktopBridge['isChromeShell'];
     },
-    importAsset: (..._0x1f5c1b) =>
+    importAsset: (...args20) =>
       withDeferredMediaFiles(
-        _0x1f5c1b,
+        args20,
         () =>
-          getElectronApi()?.['importAsset']?.(..._0x1f5c1b) ??
-          chromeShellPost('/api/v2/desktop/asset/import', _0x1f5c1b[0x0]),
+          getElectronApi()?.['importAsset']?.(...args20) ??
+          chromeShellPost('/api/v2/desktop/asset/import', args20[0x0]),
       ),
-    importRemoteAsset: (..._0xdb817f) =>
+    importRemoteAsset: (...args21) =>
       withDeferredMediaFiles(
-        _0xdb817f,
+        args21,
         () =>
-          getElectronApi()?.['importRemoteAsset']?.(..._0xdb817f) ??
-          chromeShellPost('/api/v2/desktop/asset/import-remote', _0xdb817f[0x0]),
+          getElectronApi()?.['importRemoteAsset']?.(...args21) ??
+          chromeShellPost('/api/v2/desktop/asset/import-remote', args21[0x0]),
       ),
-    importLocalFile: (..._0xaea58f) =>
+    importLocalFile: (...args22) =>
       withDeferredMediaFiles(
-        _0xaea58f,
+        args22,
         () =>
-          getElectronApi()?.['importLocalFile']?.(..._0xaea58f) ??
-          chromeShellPost('/api/v2/desktop/file/import-local', _0xaea58f[0x0]),
+          getElectronApi()?.['importLocalFile']?.(...args22) ??
+          chromeShellPost('/api/v2/desktop/file/import-local', args22[0x0]),
       ),
-    getPathForFile: (..._0x4b0b73) => getElectronApi()?.['getPathForFile']?.(..._0x4b0b73) || '',
-    onAssetUpdated: (_0x43a8fe) =>
-      getElectronApi()?.['onAssetUpdated']?.(_0x43a8fe) ||
-      subscribeByPolling(() => chromeShellPost('/api/v2/desktop/asset/consume-updates', {}), _0x43a8fe, {
+    getPathForFile: (...args23) => getElectronApi()?.['getPathForFile']?.(...args23) || '',
+    onAssetUpdated: (value25) =>
+      getElectronApi()?.['onAssetUpdated']?.(value25) ||
+      subscribeByPolling(() => chromeShellPost('/api/v2/desktop/asset/consume-updates', {}), value25, {
         intervalMs: 0x1f4,
-        extractItems: (_0x211983) => (Array['isArray'](_0x211983) ? _0x211983 : []),
-        getKey: (_0x5944b3) => String(_0x5944b3?.['assetId'] || JSON['stringify'](_0x5944b3 || {})),
+        extractItems: (value26) => (Array['isArray'](value26) ? value26 : []),
+        getKey: (value27) => String(value27?.['assetId'] || JSON['stringify'](value27 || {})),
       }),
   },
   dialog: {
     isAvailable() {
       return isFunction(getElectronApi()?.['selectDirectory']) || desktopBridge['isChromeShell'];
     },
-    selectDirectory: (..._0x4a4b8f) =>
-      getElectronApi()?.['selectDirectory']?.(..._0x4a4b8f) ??
-      chromeShellPost('/api/v2/desktop/dialog/select-directory', _0x4a4b8f[0x0]),
+    selectDirectory: (...args24) =>
+      getElectronApi()?.['selectDirectory']?.(...args24) ??
+      chromeShellPost('/api/v2/desktop/dialog/select-directory', args24[0x0]),
   },
   webPreview: {
     get api() {
@@ -536,24 +517,24 @@ export const desktopBridge = {
     isAvailable() {
       return isFunction(desktopBridge['webPreview']['api']?.['syncViews']) || desktopBridge['isChromeShell'];
     },
-    syncViews: (..._0x1ef41b) =>
-      desktopBridge['webPreview']['api']?.['syncViews']?.(..._0x1ef41b) ??
-      chromeShellPost('/api/v2/desktop/web-preview/sync-views', _0x1ef41b[0x0]),
-    syncViewsFast: (..._0x67de14) =>
-      desktopBridge['webPreview']['api']?.['syncViewsFast']?.(..._0x67de14) ??
-      desktopBridge['webPreview']['api']?.['syncViews']?.(..._0x67de14) ??
-      syncChromeShellWebPreviewViews(_0x67de14[0x0]),
-    disposeViews: (..._0xd60f91) =>
-      desktopBridge['webPreview']['api']?.['disposeViews']?.(..._0xd60f91) ??
-      chromeShellPost('/api/v2/desktop/web-preview/dispose-views', _0xd60f91[0x0]),
-    controlView: (..._0xedd6e7) =>
-      desktopBridge['webPreview']['api']?.['controlView']?.(..._0xedd6e7) ??
-      chromeShellPost('/api/v2/desktop/web-preview/control-view', _0xedd6e7[0x0]),
-    onEvent: (_0x3362e9) =>
-      desktopBridge['webPreview']['api']?.['onEvent']?.(_0x3362e9) ||
+    syncViews: (...args25) =>
+      desktopBridge['webPreview']['api']?.['syncViews']?.(...args25) ??
+      chromeShellPost('/api/v2/desktop/web-preview/sync-views', args25[0x0]),
+    syncViewsFast: (...args26) =>
+      desktopBridge['webPreview']['api']?.['syncViewsFast']?.(...args26) ??
+      desktopBridge['webPreview']['api']?.['syncViews']?.(...args26) ??
+      syncChromeShellWebPreviewViews(args26[0x0]),
+    disposeViews: (...args27) =>
+      desktopBridge['webPreview']['api']?.['disposeViews']?.(...args27) ??
+      chromeShellPost('/api/v2/desktop/web-preview/dispose-views', args27[0x0]),
+    controlView: (...args28) =>
+      desktopBridge['webPreview']['api']?.['controlView']?.(...args28) ??
+      chromeShellPost('/api/v2/desktop/web-preview/control-view', args28[0x0]),
+    onEvent: (value28) =>
+      desktopBridge['webPreview']['api']?.['onEvent']?.(value28) ||
       subscribeByLongPolling(
         () => chromeShellPost('/api/v2/desktop/web-preview/wait-events', { waitMs: 0x3e8 }),
-        _0x3362e9,
+        value28,
       ),
   },
   customAiApps: {
@@ -563,12 +544,12 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['customAiApps']['api'] || desktopBridge['isChromeShell'];
     },
-    read: (..._0x3a4420) =>
-      desktopBridge['customAiApps']['api']?.['read']?.(..._0x3a4420) ??
-      chromeShellPost('/api/v2/desktop/custom-ai-apps/read', _0x3a4420[0x0]),
-    write: (..._0x421456) =>
-      desktopBridge['customAiApps']['api']?.['write']?.(..._0x421456) ??
-      chromeShellPost('/api/v2/desktop/custom-ai-apps/write', _0x421456[0x0]),
+    read: (...args29) =>
+      desktopBridge['customAiApps']['api']?.['read']?.(...args29) ??
+      chromeShellPost('/api/v2/desktop/custom-ai-apps/read', args29[0x0]),
+    write: (...args30) =>
+      desktopBridge['customAiApps']['api']?.['write']?.(...args30) ??
+      chromeShellPost('/api/v2/desktop/custom-ai-apps/write', args30[0x0]),
   },
   agentSkills: {
     get api() {
@@ -577,21 +558,21 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['agentSkills']['api'] || desktopBridge['isChromeShell'];
     },
-    list: (..._0x507082) =>
-      desktopBridge['agentSkills']['api']?.['list']?.(..._0x507082) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/list', _0x507082[0x0]),
-    openRoot: (..._0x42fce3) =>
-      desktopBridge['agentSkills']['api']?.['openRoot']?.(..._0x42fce3) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/open-root', _0x42fce3[0x0]),
-    installFromFolder: (..._0x33edfc) =>
-      desktopBridge['agentSkills']['api']?.['installFromFolder']?.(..._0x33edfc) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/install-folder', _0x33edfc[0x0]),
-    saveManaged: (..._0x21e257) =>
-      desktopBridge['agentSkills']['api']?.['saveManaged']?.(..._0x21e257) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/save-managed', _0x21e257[0x0]),
-    deleteInstalled: (..._0x281f33) =>
-      desktopBridge['agentSkills']['api']?.['deleteInstalled']?.(..._0x281f33) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/delete-installed', _0x281f33[0x0]),
+    list: (...args31) =>
+      desktopBridge['agentSkills']['api']?.['list']?.(...args31) ??
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/list', args31[0x0]),
+    openRoot: (...args32) =>
+      desktopBridge['agentSkills']['api']?.['openRoot']?.(...args32) ??
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/open-root', args32[0x0]),
+    installFromFolder: (...args33) =>
+      desktopBridge['agentSkills']['api']?.['installFromFolder']?.(...args33) ??
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/install-folder', args33[0x0]),
+    saveManaged: (...args34) =>
+      desktopBridge['agentSkills']['api']?.['saveManaged']?.(...args34) ??
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/save-managed', args34[0x0]),
+    deleteInstalled: (...args35) =>
+      desktopBridge['agentSkills']['api']?.['deleteInstalled']?.(...args35) ??
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/delete-installed', args35[0x0]),
   },
   agentInformation: {
     get api() {
@@ -600,30 +581,30 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['agentInformation']['api'] || desktopBridge['isChromeShell'];
     },
-    readUrl: (..._0xe3caa0) =>
-      desktopBridge['agentInformation']['api']?.['readUrl']?.(..._0xe3caa0) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-information/read-url', _0xe3caa0[0x0]),
+    readUrl: (...args36) =>
+      desktopBridge['agentInformation']['api']?.['readUrl']?.(...args36) ??
+      chromeShellPostOperationResult('/api/v2/desktop/agent-information/read-url', args36[0x0]),
   },
   storageMigration: {
     isAvailable() {
       return desktopBridge['isChromeShell'];
     },
     read: () => chromeShellPost('/api/v2/desktop/storage-migration/read', {}),
-    complete: (_0x3f8791) => chromeShellPost('/api/v2/desktop/storage-migration/complete', _0x3f8791),
+    complete: (value29) => chromeShellPost('/api/v2/desktop/storage-migration/complete', value29),
   },
   secureSettings: {
     get api() {
       return getGroup(getElectronApi(), 'secureSettings');
     },
-    get: (..._0x5aa77c) =>
-      desktopBridge['secureSettings']['api']?.['get']?.(..._0x5aa77c) ??
-      chromeShellPost('/api/v2/desktop/secure-settings/get', _0x5aa77c[0x0]),
-    set: (..._0x27d3a9) =>
-      desktopBridge['secureSettings']['api']?.['set']?.(..._0x27d3a9) ??
-      chromeShellPost('/api/v2/desktop/secure-settings/set', _0x27d3a9[0x0]),
-    delete: (..._0x3e02cb) =>
-      desktopBridge['secureSettings']['api']?.['delete']?.(..._0x3e02cb) ??
-      chromeShellPost('/api/v2/desktop/secure-settings/delete', _0x3e02cb[0x0]),
+    get: (...args37) =>
+      desktopBridge['secureSettings']['api']?.['get']?.(...args37) ??
+      chromeShellPost('/api/v2/desktop/secure-settings/get', args37[0x0]),
+    set: (...args38) =>
+      desktopBridge['secureSettings']['api']?.['set']?.(...args38) ??
+      chromeShellPost('/api/v2/desktop/secure-settings/set', args38[0x0]),
+    delete: (...args39) =>
+      desktopBridge['secureSettings']['api']?.['delete']?.(...args39) ??
+      chromeShellPost('/api/v2/desktop/secure-settings/delete', args39[0x0]),
   },
   mediaTask: {
     get api() {
@@ -632,30 +613,26 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['mediaTask']['api'] || desktopBridge['isChromeShell'];
     },
-    enqueue: (..._0x1ab65c) =>
+    enqueue: (...args40) =>
       withDeferredMediaFiles(
-        _0x1ab65c,
+        args40,
         () =>
-          desktopBridge['mediaTask']['api']?.['enqueue']?.(..._0x1ab65c) ??
-          chromeShellPost('/api/v2/desktop/media-task/enqueue', _0x1ab65c[0x0]),
+          desktopBridge['mediaTask']['api']?.['enqueue']?.(...args40) ??
+          chromeShellPost('/api/v2/desktop/media-task/enqueue', args40[0x0]),
       ),
-    cancel: (..._0x5dcb6b) =>
-      desktopBridge['mediaTask']['api']?.['cancel']?.(..._0x5dcb6b) ??
-      chromeShellPost('/api/v2/desktop/media-task/cancel', _0x5dcb6b[0x0]),
-    list: (..._0x1d474c) =>
-      desktopBridge['mediaTask']['api']?.['list']?.(..._0x1d474c) ??
-      chromeShellPost('/api/v2/desktop/media-task/list', _0x1d474c[0x0]),
-    onUpdate: (_0x59a0b7) =>
-      desktopBridge['mediaTask']['api']?.['onUpdate']?.(_0x59a0b7) ||
-      subscribeByPolling(() => desktopBridge['mediaTask']['list']({ limit: 0x78 }), _0x59a0b7, {
+    cancel: (...args41) =>
+      desktopBridge['mediaTask']['api']?.['cancel']?.(...args41) ??
+      chromeShellPost('/api/v2/desktop/media-task/cancel', args41[0x0]),
+    list: (...args42) =>
+      desktopBridge['mediaTask']['api']?.['list']?.(...args42) ??
+      chromeShellPost('/api/v2/desktop/media-task/list', args42[0x0]),
+    onUpdate: (value30) =>
+      desktopBridge['mediaTask']['api']?.['onUpdate']?.(value30) ||
+      subscribeByPolling(() => desktopBridge['mediaTask']['list']({ limit: 0x78 }), value30, {
         intervalMs: 0x3e8,
-        extractItems: (_0x1a43e2) =>
-          Array['isArray'](_0x1a43e2?.['tasks'])
-            ? _0x1a43e2['tasks']
-            : Array['isArray'](_0x1a43e2)
-              ? _0x1a43e2
-              : [],
-        getKey: (_0xbf1e4c) => String(_0xbf1e4c?.['taskId'] || JSON['stringify'](_0xbf1e4c || {})),
+        extractItems: (value31) =>
+          Array['isArray'](value31?.['tasks']) ? value31['tasks'] : Array['isArray'](value31) ? value31 : [],
+        getKey: (value32) => String(value32?.['taskId'] || JSON['stringify'](value32 || {})),
       }),
   },
   diagnostics: {
@@ -665,27 +642,27 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['diagnostics']['api'] || desktopBridge['isChromeShell'];
     },
-    logEvent: (..._0x1674b2) =>
-      desktopBridge['diagnostics']['api']?.['logEvent']?.(..._0x1674b2) ??
-      chromeShellPost('/api/v2/desktop/diagnostics/log-event', _0x1674b2[0x0]),
-    createPackage: (..._0x3e07ee) =>
-      desktopBridge['diagnostics']['api']?.['createPackage']?.(..._0x3e07ee) ??
-      chromeShellPost('/api/v2/desktop/diagnostics/create-package', _0x3e07ee[0x0]),
-    openLogsFolder: (..._0x2ada03) =>
-      desktopBridge['diagnostics']['api']?.['openLogsFolder']?.(..._0x2ada03) ??
-      chromeShellPost('/api/v2/desktop/diagnostics/open-logs-folder', _0x2ada03[0x0]),
+    logEvent: (...args43) =>
+      desktopBridge['diagnostics']['api']?.['logEvent']?.(...args43) ??
+      chromeShellPost('/api/v2/desktop/diagnostics/log-event', args43[0x0]),
+    createPackage: (...args44) =>
+      desktopBridge['diagnostics']['api']?.['createPackage']?.(...args44) ??
+      chromeShellPost('/api/v2/desktop/diagnostics/create-package', args44[0x0]),
+    openLogsFolder: (...args45) =>
+      desktopBridge['diagnostics']['api']?.['openLogsFolder']?.(...args45) ??
+      chromeShellPost('/api/v2/desktop/diagnostics/open-logs-folder', args45[0x0]),
   },
   nodeExport: {
     openJianying: () =>
       desktopBridge['nodeExport']['api']?.['openJianying']?.() ??
       chromeShellPost('/api/v2/desktop/node-export/open-jianying', {}) ??
       unavailable('nodeExport.openJianying')(),
-    saveTimeline: (..._0x57c15e) =>
+    saveTimeline: (...args46) =>
       withDeferredMediaFiles(
-        _0x57c15e,
+        args46,
         () =>
-          desktopBridge['nodeExport']['api']?.['saveTimeline']?.(..._0x57c15e) ??
-          chromeShellPost('/api/v2/desktop/node-export/save-timeline', _0x57c15e[0x0]) ??
+          desktopBridge['nodeExport']['api']?.['saveTimeline']?.(...args46) ??
+          chromeShellPost('/api/v2/desktop/node-export/save-timeline', args46[0x0]) ??
           unavailable('nodeExport.saveTimeline')(),
       ),
     get api() {
@@ -712,32 +689,32 @@ export const desktopBridge = {
         isFunction(desktopBridge['nodeExport']['api']?.['saveMediaFiles']) || desktopBridge['isChromeShell']
       );
     },
-    exportSelected: (..._0x2c79e9) =>
+    exportSelected: (...args47) =>
       withDeferredMediaFiles(
-        _0x2c79e9,
+        args47,
         () =>
-          desktopBridge['nodeExport']['api']?.['exportSelected']?.(..._0x2c79e9) ??
-          chromeShellPost('/api/v2/desktop/node-export/export-selected', _0x2c79e9[0x0]) ??
+          desktopBridge['nodeExport']['api']?.['exportSelected']?.(...args47) ??
+          chromeShellPost('/api/v2/desktop/node-export/export-selected', args47[0x0]) ??
           unavailable('nodeExport.exportSelected')(),
       ),
-    saveMedia: (..._0x2e1916) =>
+    saveMedia: (...args48) =>
       withDeferredMediaFiles(
-        _0x2e1916,
+        args48,
         () =>
-          desktopBridge['nodeExport']['api']?.['saveMedia']?.(..._0x2e1916) ??
-          chromeShellPost('/api/v2/desktop/node-export/save-media', _0x2e1916[0x0]) ??
+          desktopBridge['nodeExport']['api']?.['saveMedia']?.(...args48) ??
+          chromeShellPost('/api/v2/desktop/node-export/save-media', args48[0x0]) ??
           unavailable('nodeExport.saveMedia')(),
       ),
-    saveText: (..._0xb014a7) =>
-      desktopBridge['nodeExport']['api']?.['saveText']?.(..._0xb014a7) ??
-      chromeShellPost('/api/v2/desktop/node-export/save-text', _0xb014a7[0x0]) ??
+    saveText: (...args49) =>
+      desktopBridge['nodeExport']['api']?.['saveText']?.(...args49) ??
+      chromeShellPost('/api/v2/desktop/node-export/save-text', args49[0x0]) ??
       unavailable('nodeExport.saveText')(),
-    saveMediaFiles: (..._0x74ca19) =>
+    saveMediaFiles: (...args50) =>
       withDeferredMediaFiles(
-        _0x74ca19,
+        args50,
         () =>
-          desktopBridge['nodeExport']['api']?.['saveMediaFiles']?.(..._0x74ca19) ??
-          chromeShellPost('/api/v2/desktop/node-export/save-media-files', _0x74ca19[0x0]) ??
+          desktopBridge['nodeExport']['api']?.['saveMediaFiles']?.(...args50) ??
+          chromeShellPost('/api/v2/desktop/node-export/save-media-files', args50[0x0]) ??
           unavailable('nodeExport.saveMediaFiles')(),
       ),
   },
@@ -751,26 +728,26 @@ export const desktopBridge = {
         desktopBridge['isChromeShell']
       );
     },
-    updateGlobalShortcut: (_0xcc1bba) =>
-      desktopBridge['notification']['api']?.['updateGlobalShortcut']?.(_0xcc1bba) ??
-      chromeShellPost('/api/v2/desktop/notification/update-global-shortcut', _0xcc1bba),
-    acknowledge: (_0x23581f) =>
-      desktopBridge['notification']['api']?.['acknowledge']?.(_0x23581f) ??
-      chromeShellPost('/api/v2/desktop/notification/acknowledge', _0x23581f),
-    showGenerationComplete: (..._0x3f1de9) =>
-      desktopBridge['notification']['api']?.['showGenerationComplete']?.(..._0x3f1de9) ??
-      chromeShellPost('/api/v2/desktop/notification/show-generation-complete', _0x3f1de9[0x0]) ??
+    updateGlobalShortcut: (value33) =>
+      desktopBridge['notification']['api']?.['updateGlobalShortcut']?.(value33) ??
+      chromeShellPost('/api/v2/desktop/notification/update-global-shortcut', value33),
+    acknowledge: (value34) =>
+      desktopBridge['notification']['api']?.['acknowledge']?.(value34) ??
+      chromeShellPost('/api/v2/desktop/notification/acknowledge', value34),
+    showGenerationComplete: (...args51) =>
+      desktopBridge['notification']['api']?.['showGenerationComplete']?.(...args51) ??
+      chromeShellPost('/api/v2/desktop/notification/show-generation-complete', args51[0x0]) ??
       Promise['resolve']({ success: !![], shown: ![], reason: 'unavailable' }),
-    onGenerationCompleteClick: (_0x2c8011) =>
-      desktopBridge['notification']['api']?.['onGenerationCompleteClick']?.(_0x2c8011) ||
+    onGenerationCompleteClick: (value35) =>
+      desktopBridge['notification']['api']?.['onGenerationCompleteClick']?.(value35) ||
       subscribeByPolling(
         () => chromeShellPost('/api/v2/desktop/notification/consume-generation-complete-clicks', {}),
-        _0x2c8011,
+        value35,
         {
           intervalMs: 0x190,
-          extractItems: (_0x406f41) => (Array['isArray'](_0x406f41) ? _0x406f41 : []),
-          getKey: (_0x4c1d31) =>
-            String(_0x4c1d31?.['eventId'] || _0x4c1d31?.['createdAt'] || JSON['stringify'](_0x4c1d31 || {})),
+          extractItems: (value36) => (Array['isArray'](value36) ? value36 : []),
+          getKey: (value37) =>
+            String(value37?.['eventId'] || value37?.['createdAt'] || JSON['stringify'](value37 || {})),
         },
       ),
   },
@@ -781,29 +758,29 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['screenshot']['api'] || desktopBridge['isChromeShell'];
     },
-    captureDisplay: (..._0x270fcc) =>
-      desktopBridge['screenshot']['api']?.['captureDisplay']?.(..._0x270fcc) ??
-      chromeShellPost('/api/v2/desktop/screenshot/capture-display', _0x270fcc[0x0]),
-    updateGlobalShortcut: (..._0xc6f4c3) =>
-      desktopBridge['screenshot']['api']?.['updateGlobalShortcut']?.(..._0xc6f4c3) ??
-      chromeShellPost('/api/v2/desktop/screenshot/update-global-shortcut', _0xc6f4c3[0x0]),
-    onGlobalCapture: (_0x1a2017) =>
-      desktopBridge['screenshot']['api']?.['onGlobalCapture']?.(_0x1a2017) ||
+    captureDisplay: (...args52) =>
+      desktopBridge['screenshot']['api']?.['captureDisplay']?.(...args52) ??
+      chromeShellPost('/api/v2/desktop/screenshot/capture-display', args52[0x0]),
+    updateGlobalShortcut: (...args53) =>
+      desktopBridge['screenshot']['api']?.['updateGlobalShortcut']?.(...args53) ??
+      chromeShellPost('/api/v2/desktop/screenshot/update-global-shortcut', args53[0x0]),
+    onGlobalCapture: (value38) =>
+      desktopBridge['screenshot']['api']?.['onGlobalCapture']?.(value38) ||
       subscribeByPolling(
         () => chromeShellPost('/api/v2/desktop/screenshot/consume-global-capture-events', {}),
-        _0x1a2017,
+        value38,
         {
           intervalMs: 0x96,
-          extractItems: (_0x35fa3a) => (Array['isArray'](_0x35fa3a) ? _0x35fa3a : []),
-          getKey: (_0x2520ae) =>
-            String(_0x2520ae?.['createdAt'] || _0x2520ae?.['source'] || JSON['stringify'](_0x2520ae || {})),
+          extractItems: (value39) => (Array['isArray'](value39) ? value39 : []),
+          getKey: (value40) =>
+            String(value40?.['createdAt'] || value40?.['source'] || JSON['stringify'](value40 || {})),
         },
       ),
-    onGlobalShortcutStatus: (_0x313afd) =>
-      desktopBridge['screenshot']['api']?.['onGlobalShortcutStatus']?.(_0x313afd) ||
+    onGlobalShortcutStatus: (value41) =>
+      desktopBridge['screenshot']['api']?.['onGlobalShortcutStatus']?.(value41) ||
       subscribeByPolling(
         () => chromeShellPost('/api/v2/desktop/screenshot/get-global-shortcut-status', {}),
-        _0x313afd,
+        value41,
         { intervalMs: 0x3e8, getKey: () => 'global-shortcut-status' },
       ),
   },
@@ -814,27 +791,27 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['textPreset']['api'] || desktopBridge['isChromeShell'];
     },
-    updateGlobalShortcut: (..._0x135234) =>
-      desktopBridge['textPreset']['api']?.['updateGlobalShortcut']?.(..._0x135234) ??
-      chromeShellPost('/api/v2/desktop/text-preset/update-global-shortcut', _0x135234[0x0]),
-    claimEvent: (_0x2d29ae) =>
-      desktopBridge['textPreset']['api']?.['claimEvent']?.(_0x2d29ae) ??
-      chromeShellPost('/api/v2/desktop/text-preset/claim-event', _0x2d29ae),
-    acknowledgeEvent: (_0xde4d5a) =>
-      desktopBridge['textPreset']['api']?.['acknowledgeEvent']?.(_0xde4d5a) ??
-      chromeShellPost('/api/v2/desktop/text-preset/acknowledge-event', _0xde4d5a),
-    onSelectedText: (_0x2e5533) =>
-      desktopBridge['textPreset']['api']?.['onSelectedText']?.(_0x2e5533) ||
+    updateGlobalShortcut: (...args54) =>
+      desktopBridge['textPreset']['api']?.['updateGlobalShortcut']?.(...args54) ??
+      chromeShellPost('/api/v2/desktop/text-preset/update-global-shortcut', args54[0x0]),
+    claimEvent: (value42) =>
+      desktopBridge['textPreset']['api']?.['claimEvent']?.(value42) ??
+      chromeShellPost('/api/v2/desktop/text-preset/claim-event', value42),
+    acknowledgeEvent: (value43) =>
+      desktopBridge['textPreset']['api']?.['acknowledgeEvent']?.(value43) ??
+      chromeShellPost('/api/v2/desktop/text-preset/acknowledge-event', value43),
+    onSelectedText: (handler10) =>
+      desktopBridge['textPreset']['api']?.['onSelectedText']?.(handler10) ||
       subscribeToConsumedBatch(
         () => chromeShellPost('/api/v2/desktop/text-preset/consume-events', {}),
-        (_0x43a6fa) => _0x43a6fa['forEach']((_0x475681) => _0x2e5533(_0x475681)),
+        (list4) => list4['forEach']((value44) => handler10(value44)),
         { intervalMs: 0x96 },
       ),
-    onGlobalShortcutStatus: (_0x2df59e) =>
-      desktopBridge['textPreset']['api']?.['onGlobalShortcutStatus']?.(_0x2df59e) ||
+    onGlobalShortcutStatus: (value45) =>
+      desktopBridge['textPreset']['api']?.['onGlobalShortcutStatus']?.(value45) ||
       subscribeByPolling(
         () => chromeShellPost('/api/v2/desktop/text-preset/get-global-shortcut-status', {}),
-        _0x2df59e,
+        value45,
         { intervalMs: 0x3e8, getKey: () => 'global-text-preset-shortcut-status' },
       ),
   },
@@ -845,18 +822,18 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['notificationSound']['api'] || desktopBridge['isChromeShell'];
     },
-    listMp3Files: (..._0x5b762b) =>
-      desktopBridge['notificationSound']['api']?.['listMp3Files']?.(..._0x5b762b) ??
-      chromeShellPost('/api/v2/desktop/notification-sound/list-mp3-files', _0x5b762b[0x0]),
-    listSystemSounds: (..._0x5b3c57) =>
-      desktopBridge['notificationSound']['api']?.['listSystemSounds']?.(..._0x5b3c57) ??
-      chromeShellPost('/api/v2/desktop/notification-sound/list-system-sounds', _0x5b3c57[0x0]),
-    openSystemSoundFolder: (..._0x41dd6c) =>
-      desktopBridge['notificationSound']['api']?.['openSystemSoundFolder']?.(..._0x41dd6c) ??
-      chromeShellPost('/api/v2/desktop/notification-sound/open-system-sound-folder', _0x41dd6c[0x0]),
-    play: (..._0x3283d8) =>
-      desktopBridge['notificationSound']['api']?.['play']?.(..._0x3283d8) ??
-      chromeShellPost('/api/v2/desktop/notification-sound/play', _0x3283d8[0x0]),
+    listMp3Files: (...args55) =>
+      desktopBridge['notificationSound']['api']?.['listMp3Files']?.(...args55) ??
+      chromeShellPost('/api/v2/desktop/notification-sound/list-mp3-files', args55[0x0]),
+    listSystemSounds: (...args56) =>
+      desktopBridge['notificationSound']['api']?.['listSystemSounds']?.(...args56) ??
+      chromeShellPost('/api/v2/desktop/notification-sound/list-system-sounds', args56[0x0]),
+    openSystemSoundFolder: (...args57) =>
+      desktopBridge['notificationSound']['api']?.['openSystemSoundFolder']?.(...args57) ??
+      chromeShellPost('/api/v2/desktop/notification-sound/open-system-sound-folder', args57[0x0]),
+    play: (...args58) =>
+      desktopBridge['notificationSound']['api']?.['play']?.(...args58) ??
+      chromeShellPost('/api/v2/desktop/notification-sound/play', args58[0x0]),
   },
   localAssetCleanup: {
     get api() {
@@ -865,12 +842,12 @@ export const desktopBridge = {
     isAvailable() {
       return !!desktopBridge['localAssetCleanup']['api'] || desktopBridge['isChromeShell'];
     },
-    scan: (..._0x1ce693) =>
-      desktopBridge['localAssetCleanup']['api']?.['scan']?.(..._0x1ce693) ??
-      chromeShellPost('/api/v2/desktop/local-asset-cleanup/scan', _0x1ce693[0x0]),
-    trash: (..._0x2db8f7) =>
-      desktopBridge['localAssetCleanup']['api']?.['trash']?.(..._0x2db8f7) ??
-      chromeShellPost('/api/v2/desktop/local-asset-cleanup/trash', _0x2db8f7[0x0]),
+    scan: (...args59) =>
+      desktopBridge['localAssetCleanup']['api']?.['scan']?.(...args59) ??
+      chromeShellPost('/api/v2/desktop/local-asset-cleanup/scan', args59[0x0]),
+    trash: (...args60) =>
+      desktopBridge['localAssetCleanup']['api']?.['trash']?.(...args60) ??
+      chromeShellPost('/api/v2/desktop/local-asset-cleanup/trash', args60[0x0]),
   },
   clipboard: {
     get api() {
@@ -889,22 +866,22 @@ export const desktopBridge = {
     canUseText() {
       return !!desktopBridge['clipboard']['api'] || desktopBridge['isChromeShell'];
     },
-    writeImage: (..._0x15fe3b) => desktopBridge['clipboard']['api']?.['writeImage']?.(..._0x15fe3b),
-    readImage: (..._0x575f0a) =>
-      desktopBridge['clipboard']['api']?.['readImage']?.(..._0x575f0a) ??
+    writeImage: (...args61) => desktopBridge['clipboard']['api']?.['writeImage']?.(...args61),
+    readImage: (...args62) =>
+      desktopBridge['clipboard']['api']?.['readImage']?.(...args62) ??
       chromeShellPost('/api/v2/desktop/clipboard/read-image'),
-    writeFileReferences: (..._0x32bb9d) =>
-      desktopBridge['clipboard']['api']?.['writeFileReferences']?.(..._0x32bb9d) ??
-      chromeShellPost('/api/v2/desktop/clipboard/write-file-references', _0x32bb9d[0x0]),
-    readFileReferences: (..._0x15258a) =>
-      desktopBridge['clipboard']['api']?.['readFileReferences']?.(..._0x15258a) ??
-      chromeShellPost('/api/v2/desktop/clipboard/read-file-references', _0x15258a[0x0]),
-    writeText: (..._0x38fe42) =>
-      desktopBridge['clipboard']['api']?.['writeText']?.(..._0x38fe42) ??
-      chromeShellPost('/api/v2/desktop/clipboard/write-text', _0x38fe42[0x0]),
-    readText: (..._0x3dbf02) =>
-      desktopBridge['clipboard']['api']?.['readText']?.(..._0x3dbf02) ??
-      chromeShellPost('/api/v2/desktop/clipboard/read-text', _0x3dbf02[0x0]),
+    writeFileReferences: (...args63) =>
+      desktopBridge['clipboard']['api']?.['writeFileReferences']?.(...args63) ??
+      chromeShellPost('/api/v2/desktop/clipboard/write-file-references', args63[0x0]),
+    readFileReferences: (...args64) =>
+      desktopBridge['clipboard']['api']?.['readFileReferences']?.(...args64) ??
+      chromeShellPost('/api/v2/desktop/clipboard/read-file-references', args64[0x0]),
+    writeText: (...args65) =>
+      desktopBridge['clipboard']['api']?.['writeText']?.(...args65) ??
+      chromeShellPost('/api/v2/desktop/clipboard/write-text', args65[0x0]),
+    readText: (...args66) =>
+      desktopBridge['clipboard']['api']?.['readText']?.(...args66) ??
+      chromeShellPost('/api/v2/desktop/clipboard/read-text', args66[0x0]),
   },
   canvasVisualSnapshot: {
     get api() {
@@ -913,239 +890,230 @@ export const desktopBridge = {
     isAvailable() {
       return isFunction(desktopBridge['canvasVisualSnapshot']['api']?.['capturePage']);
     },
-    capturePage: (..._0x6bd9fa) =>
-      desktopBridge['canvasVisualSnapshot']['api']?.['capturePage']?.(..._0x6bd9fa),
+    capturePage: (...args67) => desktopBridge['canvasVisualSnapshot']['api']?.['capturePage']?.(...args67),
   },
 };
 export function installDesktopBridgeCompat() {
-  const _0x261593 = getWindowObject();
+  const windowObject5 = getWindowObject();
   if (
-    !_0x261593 ||
+    !windowObject5 ||
     !desktopBridge['isChromeShell'] ||
-    _0x261593['electronAPI'] ||
-    _0x261593['aiCanvasDesktop']
+    windowObject5['electronAPI'] ||
+    windowObject5['aiCanvasDesktop']
   )
     return ![];
   return (
-    (_0x261593['__AIC_CHROME_SHELL__'] = !![]),
-    (_0x261593['aiCanvasDesktop'] = {
+    (windowObject5['__AIC_CHROME_SHELL__'] = !![]),
+    (windowObject5['aiCanvasDesktop'] = {
       __aicDesktopHttpShim: !![],
       isElectron: ![],
-      getAppVersion: (_0x41f792) => chromeShellPost('/api/v2/desktop/app/get-version', _0x41f792),
-      getDeviceId: (_0x65e347) => chromeShellPost('/api/v2/desktop/app/get-device-id', _0x65e347),
-      checkForUpdates: (_0x22fffa) => chromeShellPost('/api/v2/desktop/app/check-for-updates', _0x22fffa),
-      getUpdateState: (_0x4c28c0) => chromeShellPost('/api/v2/desktop/app/update-state', _0x4c28c0),
-      downloadUpdate: (_0x20a5ec) => chromeShellPost('/api/v2/desktop/app/download-update', _0x20a5ec),
-      cancelUpdateDownload: (_0x185229) =>
-        chromeShellPost('/api/v2/desktop/app/cancel-update-download', _0x185229),
-      installDownloadedUpdate: async (_0x452144) => {
+      getAppVersion: (value46) => chromeShellPost('/api/v2/desktop/app/get-version', value46),
+      getDeviceId: (value47) => chromeShellPost('/api/v2/desktop/app/get-device-id', value47),
+      checkForUpdates: (value48) => chromeShellPost('/api/v2/desktop/app/check-for-updates', value48),
+      getUpdateState: (value49) => chromeShellPost('/api/v2/desktop/app/update-state', value49),
+      downloadUpdate: (value50) => chromeShellPost('/api/v2/desktop/app/download-update', value50),
+      cancelUpdateDownload: (value51) =>
+        chromeShellPost('/api/v2/desktop/app/cancel-update-download', value51),
+      installDownloadedUpdate: async (value52) => {
         return (
           await writeChromeShellRecoverySnapshotBeforeInstall(),
-          chromeShellPost('/api/v2/desktop/app/install-downloaded-update', _0x452144)
+          chromeShellPost('/api/v2/desktop/app/install-downloaded-update', value52)
         );
       },
-      onUpdaterEvent: (_0x50e51d) =>
-        subscribeToUpdaterState(() => chromeShellPost('/api/v2/desktop/app/update-state', {}), _0x50e51d),
+      onUpdaterEvent: (value53) =>
+        subscribeToUpdaterState(() => chromeShellPost('/api/v2/desktop/app/update-state', {}), value53),
     }),
-    (_0x261593['electronAPI'] = {
+    (windowObject5['electronAPI'] = {
       __aicDesktopHttpShim: !![],
       project: {
-        open: (_0x345b15) => chromeShellPost('/api/v2/desktop/project/open', _0x345b15),
-        save: (_0x2dd9af) => chromeShellPost('/api/v2/desktop/project/save', _0x2dd9af),
-        exportPackage: (_0x53b83e) => chromeShellPost('/api/v2/desktop/project/export-package', _0x53b83e),
-        importPackage: (_0x38dc2e) => chromeShellPost('/api/v2/desktop/project/import-package', _0x38dc2e),
-        listRecent: (_0x3491cc) => chromeShellPost('/api/v2/desktop/project/list-recent', _0x3491cc),
-        removeRecent: (_0x5a22c4) => chromeShellPost('/api/v2/desktop/project/remove-recent', _0x5a22c4),
-        setUnsavedState: (_0x43a0db) => postChromeShellUnsavedState(_0x43a0db),
-        writeRecoverySnapshot: (_0x5c9632) =>
-          chromeShellPost('/api/v2/desktop/project/write-recovery-snapshot', _0x5c9632),
-        getRecoverySnapshotInfo: (_0x5197f3) =>
-          chromeShellPost('/api/v2/desktop/project/get-recovery-snapshot-info', _0x5197f3),
-        readRecoverySnapshot: (_0x49397d) =>
-          chromeShellPost('/api/v2/desktop/project/read-recovery-snapshot', _0x49397d),
-        clearRecoverySnapshot: (_0x214ada) =>
-          chromeShellPost('/api/v2/desktop/project/clear-recovery-snapshot', _0x214ada),
-        consumeExternalOpenRequests: (_0x57fe35) =>
-          chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', _0x57fe35),
-        onExternalOpen: (_0x91103a) =>
+        open: (value54) => chromeShellPost('/api/v2/desktop/project/open', value54),
+        save: (value55) => chromeShellPost('/api/v2/desktop/project/save', value55),
+        exportPackage: (value56) => chromeShellPost('/api/v2/desktop/project/export-package', value56),
+        importPackage: (value57) => chromeShellPost('/api/v2/desktop/project/import-package', value57),
+        listRecent: (value58) => chromeShellPost('/api/v2/desktop/project/list-recent', value58),
+        removeRecent: (value59) => chromeShellPost('/api/v2/desktop/project/remove-recent', value59),
+        setUnsavedState: (value60) => postChromeShellUnsavedState(value60),
+        writeRecoverySnapshot: (value61) =>
+          chromeShellPost('/api/v2/desktop/project/write-recovery-snapshot', value61),
+        getRecoverySnapshotInfo: (value62) =>
+          chromeShellPost('/api/v2/desktop/project/get-recovery-snapshot-info', value62),
+        readRecoverySnapshot: (value63) =>
+          chromeShellPost('/api/v2/desktop/project/read-recovery-snapshot', value63),
+        clearRecoverySnapshot: (value64) =>
+          chromeShellPost('/api/v2/desktop/project/clear-recovery-snapshot', value64),
+        consumeExternalOpenRequests: (value65) =>
+          chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', value65),
+        onExternalOpen: (value66) =>
           subscribeToConsumedBatch(
             () => chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', {}),
-            _0x91103a,
+            value66,
             { intervalMs: 0x1f4 },
           ),
-        onPackageProgress: (_0x4b9a4b) =>
+        onPackageProgress: (value67) =>
           subscribeByPolling(
             () => chromeShellPost('/api/v2/desktop/project/consume-package-progress-events', {}),
-            _0x4b9a4b,
+            value67,
             {
               intervalMs: 0xfa,
-              extractItems: (_0x578159) => (Array['isArray'](_0x578159) ? _0x578159 : []),
-              getKey: (_0x7bd33b) =>
+              extractItems: (value68) => (Array['isArray'](value68) ? value68 : []),
+              getKey: (value69) =>
                 String(
-                  _0x7bd33b?.['createdAt'] ||
-                    _0x7bd33b?.['operationId'] ||
-                    JSON['stringify'](_0x7bd33b || {}),
+                  value69?.['createdAt'] || value69?.['operationId'] || JSON['stringify'](value69 || {}),
                 ),
             },
           ),
       },
-      importAsset: (_0x1444b9) => chromeShellPost('/api/v2/desktop/asset/import', _0x1444b9),
-      importRemoteAsset: (_0x194d82) => chromeShellPost('/api/v2/desktop/asset/import-remote', _0x194d82),
-      importLocalFile: (_0x3c40ac) => chromeShellPost('/api/v2/desktop/file/import-local', _0x3c40ac),
-      getPathForFile: (_0x12f03e) => String(_0x12f03e?.['path'] || ''),
-      getLocalPreviewUrl: (_0x556c35) => postDesktopBridge('/api/v2/desktop/local-preview', _0x556c35),
-      selectDirectory: (_0x4b1049) => chromeShellPost('/api/v2/desktop/dialog/select-directory', _0x4b1049),
-      showItemInFolder: (_0x5b04fc) =>
-        chromeShellPost('/api/v2/desktop/shell/show-item-in-folder', _0x5b04fc),
-      openKnownFolder: (_0x462b5f) => chromeShellPost('/api/v2/desktop/shell/open-known-folder', _0x462b5f),
-      openExternal: (_0x80ce35) => chromeShellPost('/api/v2/desktop/shell/open-external', { url: _0x80ce35 }),
+      importAsset: (value70) => chromeShellPost('/api/v2/desktop/asset/import', value70),
+      importRemoteAsset: (value71) => chromeShellPost('/api/v2/desktop/asset/import-remote', value71),
+      importLocalFile: (value72) => chromeShellPost('/api/v2/desktop/file/import-local', value72),
+      getPathForFile: (value73) => String(value73?.['path'] || ''),
+      getLocalPreviewUrl: (value74) => postDesktopBridge('/api/v2/desktop/local-preview', value74),
+      selectDirectory: (value75) => chromeShellPost('/api/v2/desktop/dialog/select-directory', value75),
+      showItemInFolder: (value76) => chromeShellPost('/api/v2/desktop/shell/show-item-in-folder', value76),
+      openKnownFolder: (value77) => chromeShellPost('/api/v2/desktop/shell/open-known-folder', value77),
+      openExternal: (url2) => chromeShellPost('/api/v2/desktop/shell/open-external', { url: url2 }),
       shell: {
-        openExternal: (_0x53828b) =>
-          chromeShellPost('/api/v2/desktop/shell/open-external', { url: _0x53828b }),
+        openExternal: (url3) => chromeShellPost('/api/v2/desktop/shell/open-external', { url: url3 }),
       },
       webPreview: {
         surfaceMode: 'remote-snapshot',
-        syncViews: (_0x1defb2) => chromeShellPost('/api/v2/desktop/web-preview/sync-views', _0x1defb2),
-        syncViewsFast: (_0x1d4455) => syncChromeShellWebPreviewViews(_0x1d4455),
-        disposeViews: (_0x187539) => chromeShellPost('/api/v2/desktop/web-preview/dispose-views', _0x187539),
-        controlView: (_0x5a84b1) => chromeShellPost('/api/v2/desktop/web-preview/control-view', _0x5a84b1),
-        onEvent: (_0x213a20) =>
+        syncViews: (value78) => chromeShellPost('/api/v2/desktop/web-preview/sync-views', value78),
+        syncViewsFast: (value79) => syncChromeShellWebPreviewViews(value79),
+        disposeViews: (value80) => chromeShellPost('/api/v2/desktop/web-preview/dispose-views', value80),
+        controlView: (value81) => chromeShellPost('/api/v2/desktop/web-preview/control-view', value81),
+        onEvent: (value82) =>
           subscribeByLongPolling(
             () => chromeShellPost('/api/v2/desktop/web-preview/wait-events', { waitMs: 0x3e8 }),
-            _0x213a20,
+            value82,
           ),
       },
       secureSettings: {
-        get: (_0x4fc265) => chromeShellPost('/api/v2/desktop/secure-settings/get', _0x4fc265),
-        set: (_0x1dc092) => chromeShellPost('/api/v2/desktop/secure-settings/set', _0x1dc092),
-        delete: (_0x1d4a44) => chromeShellPost('/api/v2/desktop/secure-settings/delete', _0x1d4a44),
+        get: (value83) => chromeShellPost('/api/v2/desktop/secure-settings/get', value83),
+        set: (value84) => chromeShellPost('/api/v2/desktop/secure-settings/set', value84),
+        delete: (value85) => chromeShellPost('/api/v2/desktop/secure-settings/delete', value85),
       },
       customAiApps: {
-        read: (_0x21bb68) => chromeShellPost('/api/v2/desktop/custom-ai-apps/read', _0x21bb68),
-        write: (_0x34302c) => chromeShellPost('/api/v2/desktop/custom-ai-apps/write', _0x34302c),
+        read: (value86) => chromeShellPost('/api/v2/desktop/custom-ai-apps/read', value86),
+        write: (value87) => chromeShellPost('/api/v2/desktop/custom-ai-apps/write', value87),
       },
       agentInformation: {
-        readUrl: (_0x20a044) => chromeShellPost('/api/v2/desktop/agent-information/read-url', _0x20a044),
+        readUrl: (value88) => chromeShellPost('/api/v2/desktop/agent-information/read-url', value88),
       },
       mediaTask: {
-        enqueue: (_0x5bef54) => chromeShellPost('/api/v2/desktop/media-task/enqueue', _0x5bef54),
-        cancel: (_0x2f25ae) => chromeShellPost('/api/v2/desktop/media-task/cancel', _0x2f25ae),
-        list: (_0x1ef4e9) => chromeShellPost('/api/v2/desktop/media-task/list', _0x1ef4e9),
-        onUpdate: (_0x346f84) =>
+        enqueue: (value89) => chromeShellPost('/api/v2/desktop/media-task/enqueue', value89),
+        cancel: (value90) => chromeShellPost('/api/v2/desktop/media-task/cancel', value90),
+        list: (value91) => chromeShellPost('/api/v2/desktop/media-task/list', value91),
+        onUpdate: (value92) =>
           subscribeByPolling(
             () => chromeShellPost('/api/v2/desktop/media-task/list', { limit: 0x78 }),
-            _0x346f84,
+            value92,
             {
               intervalMs: 0x3e8,
-              extractItems: (_0xafeff5) =>
-                Array['isArray'](_0xafeff5?.['tasks'])
-                  ? _0xafeff5['tasks']
-                  : Array['isArray'](_0xafeff5)
-                    ? _0xafeff5
+              extractItems: (value93) =>
+                Array['isArray'](value93?.['tasks'])
+                  ? value93['tasks']
+                  : Array['isArray'](value93)
+                    ? value93
                     : [],
-              getKey: (_0x40033b) => String(_0x40033b?.['taskId'] || JSON['stringify'](_0x40033b || {})),
+              getKey: (value94) => String(value94?.['taskId'] || JSON['stringify'](value94 || {})),
             },
           ),
       },
       diagnostics: {
-        logEvent: (_0x1704e2) => desktopBridge['diagnostics']['logEvent'](_0x1704e2),
-        createPackage: (_0x36815b) => desktopBridge['diagnostics']['createPackage'](_0x36815b),
-        openLogsFolder: (_0x299c0f) => desktopBridge['diagnostics']['openLogsFolder'](_0x299c0f),
+        logEvent: (value95) => desktopBridge['diagnostics']['logEvent'](value95),
+        createPackage: (value96) => desktopBridge['diagnostics']['createPackage'](value96),
+        openLogsFolder: (value97) => desktopBridge['diagnostics']['openLogsFolder'](value97),
       },
       notification: {
-        showGenerationComplete: (_0x12a685) =>
-          desktopBridge['notification']['showGenerationComplete'](_0x12a685),
-        onGenerationCompleteClick: (_0x51579c) =>
-          desktopBridge['notification']['onGenerationCompleteClick'](_0x51579c),
+        showGenerationComplete: (value98) => desktopBridge['notification']['showGenerationComplete'](value98),
+        onGenerationCompleteClick: (value99) =>
+          desktopBridge['notification']['onGenerationCompleteClick'](value99),
       },
       notificationSound: {
-        listMp3Files: (_0x1f8b65) =>
-          chromeShellPost('/api/v2/desktop/notification-sound/list-mp3-files', _0x1f8b65),
-        listSystemSounds: (_0x519463) =>
-          chromeShellPost('/api/v2/desktop/notification-sound/list-system-sounds', _0x519463),
-        openSystemSoundFolder: (_0x234bff) =>
-          chromeShellPost('/api/v2/desktop/notification-sound/open-system-sound-folder', _0x234bff),
-        play: (_0x173680) => chromeShellPost('/api/v2/desktop/notification-sound/play', _0x173680),
+        listMp3Files: (value100) =>
+          chromeShellPost('/api/v2/desktop/notification-sound/list-mp3-files', value100),
+        listSystemSounds: (value101) =>
+          chromeShellPost('/api/v2/desktop/notification-sound/list-system-sounds', value101),
+        openSystemSoundFolder: (value102) =>
+          chromeShellPost('/api/v2/desktop/notification-sound/open-system-sound-folder', value102),
+        play: (value103) => chromeShellPost('/api/v2/desktop/notification-sound/play', value103),
       },
       localAssetCleanup: {
-        scan: (_0x121f70) => chromeShellPost('/api/v2/desktop/local-asset-cleanup/scan', _0x121f70),
-        trash: (_0x79c71b) => chromeShellPost('/api/v2/desktop/local-asset-cleanup/trash', _0x79c71b),
+        scan: (value104) => chromeShellPost('/api/v2/desktop/local-asset-cleanup/scan', value104),
+        trash: (value105) => chromeShellPost('/api/v2/desktop/local-asset-cleanup/trash', value105),
       },
       nodeExport: {
-        exportSelected: (_0x4da22b) =>
-          chromeShellPost('/api/v2/desktop/node-export/export-selected', _0x4da22b),
-        saveMedia: (_0x29b744) => chromeShellPost('/api/v2/desktop/node-export/save-media', _0x29b744),
-        saveText: (_0x38b5a4) => chromeShellPost('/api/v2/desktop/node-export/save-text', _0x38b5a4),
-        saveMediaFiles: (_0x12f998) =>
-          chromeShellPost('/api/v2/desktop/node-export/save-media-files', _0x12f998),
-        saveTimeline: (_0x528ba1) => chromeShellPost('/api/v2/desktop/node-export/save-timeline', _0x528ba1),
+        exportSelected: (value106) =>
+          chromeShellPost('/api/v2/desktop/node-export/export-selected', value106),
+        saveMedia: (value107) => chromeShellPost('/api/v2/desktop/node-export/save-media', value107),
+        saveText: (value108) => chromeShellPost('/api/v2/desktop/node-export/save-text', value108),
+        saveMediaFiles: (value109) =>
+          chromeShellPost('/api/v2/desktop/node-export/save-media-files', value109),
+        saveTimeline: (value110) => chromeShellPost('/api/v2/desktop/node-export/save-timeline', value110),
         openJianying: () => chromeShellPost('/api/v2/desktop/node-export/open-jianying', {}),
       },
       screenshot: {
-        captureDisplay: (_0x4e8c14) =>
-          chromeShellPost('/api/v2/desktop/screenshot/capture-display', _0x4e8c14),
-        updateGlobalShortcut: (_0xac9927) =>
-          chromeShellPost('/api/v2/desktop/screenshot/update-global-shortcut', _0xac9927),
-        onGlobalCapture: (_0x36311a) =>
+        captureDisplay: (value111) => chromeShellPost('/api/v2/desktop/screenshot/capture-display', value111),
+        updateGlobalShortcut: (value112) =>
+          chromeShellPost('/api/v2/desktop/screenshot/update-global-shortcut', value112),
+        onGlobalCapture: (value113) =>
           subscribeByPolling(
             () => chromeShellPost('/api/v2/desktop/screenshot/consume-global-capture-events', {}),
-            _0x36311a,
+            value113,
             {
               intervalMs: 0x96,
-              extractItems: (_0x407393) => (Array['isArray'](_0x407393) ? _0x407393 : []),
-              getKey: (_0x37bf84) =>
-                String(
-                  _0x37bf84?.['createdAt'] || _0x37bf84?.['source'] || JSON['stringify'](_0x37bf84 || {}),
-                ),
+              extractItems: (value114) => (Array['isArray'](value114) ? value114 : []),
+              getKey: (value115) =>
+                String(value115?.['createdAt'] || value115?.['source'] || JSON['stringify'](value115 || {})),
             },
           ),
-        onGlobalShortcutStatus: (_0x2ae003) =>
+        onGlobalShortcutStatus: (value116) =>
           subscribeByPolling(
             () => chromeShellPost('/api/v2/desktop/screenshot/get-global-shortcut-status', {}),
-            _0x2ae003,
+            value116,
             { intervalMs: 0x3e8, getKey: () => 'global-shortcut-status' },
           ),
       },
       textPreset: {
-        claimEvent: (_0x5797fd) => chromeShellPost('/api/v2/desktop/text-preset/claim-event', _0x5797fd),
-        acknowledgeEvent: (_0x44b876) =>
-          chromeShellPost('/api/v2/desktop/text-preset/acknowledge-event', _0x44b876),
-        updateGlobalShortcut: (_0x281a90) =>
-          chromeShellPost('/api/v2/desktop/text-preset/update-global-shortcut', _0x281a90),
-        onSelectedText: (_0x36db97) =>
+        claimEvent: (value117) => chromeShellPost('/api/v2/desktop/text-preset/claim-event', value117),
+        acknowledgeEvent: (value118) =>
+          chromeShellPost('/api/v2/desktop/text-preset/acknowledge-event', value118),
+        updateGlobalShortcut: (value119) =>
+          chromeShellPost('/api/v2/desktop/text-preset/update-global-shortcut', value119),
+        onSelectedText: (handler11) =>
           subscribeToConsumedBatch(
             () => chromeShellPost('/api/v2/desktop/text-preset/consume-events', {}),
-            (_0x2f7ef5) => _0x2f7ef5['forEach']((_0x16dc0d) => _0x36db97(_0x16dc0d)),
+            (list5) => list5['forEach']((value120) => handler11(value120)),
             { intervalMs: 0x96 },
           ),
-        onGlobalShortcutStatus: (_0x42004c) =>
+        onGlobalShortcutStatus: (value121) =>
           subscribeByPolling(
             () => chromeShellPost('/api/v2/desktop/text-preset/get-global-shortcut-status', {}),
-            _0x42004c,
+            value121,
             { intervalMs: 0x3e8, getKey: () => 'global-text-preset-shortcut-status' },
           ),
       },
       clipboard: {
-        writeText: (_0x535168) => chromeShellPost('/api/v2/desktop/clipboard/write-text', _0x535168),
-        readText: (_0x2d9455) => chromeShellPost('/api/v2/desktop/clipboard/read-text', _0x2d9455),
-        writeFileReferences: (_0xf97d0d) =>
-          chromeShellPost('/api/v2/desktop/clipboard/write-file-references', _0xf97d0d),
-        readFileReferences: (_0xdae75f) =>
-          chromeShellPost('/api/v2/desktop/clipboard/read-file-references', _0xdae75f),
+        writeText: (value122) => chromeShellPost('/api/v2/desktop/clipboard/write-text', value122),
+        readText: (value123) => chromeShellPost('/api/v2/desktop/clipboard/read-text', value123),
+        writeFileReferences: (value124) =>
+          chromeShellPost('/api/v2/desktop/clipboard/write-file-references', value124),
+        readFileReferences: (value125) =>
+          chromeShellPost('/api/v2/desktop/clipboard/read-file-references', value125),
       },
-      onAssetUpdated: (_0x397f09) =>
-        subscribeByPolling(() => chromeShellPost('/api/v2/desktop/asset/consume-updates', {}), _0x397f09, {
+      onAssetUpdated: (value126) =>
+        subscribeByPolling(() => chromeShellPost('/api/v2/desktop/asset/consume-updates', {}), value126, {
           intervalMs: 0x1f4,
-          extractItems: (_0x396733) => (Array['isArray'](_0x396733) ? _0x396733 : []),
-          getKey: (_0x5e5e21) => String(_0x5e5e21?.['assetId'] || JSON['stringify'](_0x5e5e21 || {})),
+          extractItems: (value127) => (Array['isArray'](value127) ? value127 : []),
+          getKey: (value128) => String(value128?.['assetId'] || JSON['stringify'](value128 || {})),
         }),
-      logDragImport: (_0x230980, _0x244613) =>
+      logDragImport: (label, value129) =>
         desktopBridge['diagnostics']['logEvent']({
           type: 'import.drag_profile',
           level: 'debug',
           source: 'renderer',
           message: 'Drag\x20import\x20profile',
-          context: { label: _0x230980, ...(_0x244613 || {}) },
+          context: { label: label, ...(value129 || {}) },
         }),
     }),
     !![]
