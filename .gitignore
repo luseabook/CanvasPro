@@ -34,6 +34,7 @@ test-results/
 test-artifacts/
 
 dev-helper.js
+.workbuddy/
 .agent/
 .agentsrules/
 .trae/

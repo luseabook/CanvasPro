@@ -35,7 +35,14 @@ function lex(source) {
   let i = 0;
   let previous = null;
   const push = (kind, value) => {
-    const token = { kind, value, offset: i };
+    const token = {
+      kind,
+      value,
+      offset: i,
+      // `obj.name` / `obj?.name`: the identifier is a member name, part of the
+      // data being addressed, not a binding. Renaming it changes behaviour.
+      member: previous !== null && previous.kind === 'punct' && (previous.value === '.' || previous.value === '?.'),
+    };
     tokens.push(token);
     previous = token;
     return token;
@@ -324,6 +331,35 @@ function main() {
         'identifier ' + JSON.stringify(from) + ' is referenced by an export clause and must not be renamed',
       );
     }
+  }
+
+  const badPositions = [];
+  for (let index = 0; index < limit; index += 1) {
+    const token = original[index];
+    if (token.kind !== 'identifier') continue;
+    if (token.member) {
+      if (rename.get(token.value) !== token.value) badPositions.push('member access `.' + token.value + '`');
+      continue;
+    }
+    const colon = original[index + 1];
+    const opener = original[index - 1];
+    if (
+      colon &&
+      colon.kind === 'punct' &&
+      colon.value === ':' &&
+      opener &&
+      opener.kind === 'punct' &&
+      (opener.value === '{' || opener.value === ',') &&
+      rename.get(token.value) !== token.value
+    ) {
+      badPositions.push('object key `' + token.value + ':`');
+    }
+  }
+  if (badPositions.length) {
+    failures.push(
+      'identifiers used as member names or object keys must not be renamed: ' +
+        [...new Set(badPositions)].slice(0, 10).join(', '),
+    );
   }
 
   const collisions = [...rename.entries()]
