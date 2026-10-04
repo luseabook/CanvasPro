@@ -209,7 +209,11 @@ test('main.js registers the Control+Alt+Shift+C global shortcut on start and unr
 });
 
 test('mainIpcSetup reads the four overlay deps off the capture window controller', () => {
-  assert.match(IPC_SETUP_SOURCE, /globalCaptureWindowController: _0x331d63,/);
+  // Match the controller binding by shape, not by name: it is a local of
+  // mainIpcSetup, so renaming it must not break this wiring check. Capturing the
+  // name also lets the loop below assert that all five keys point at one binding.
+  const controller = IPC_SETUP_SOURCE.match(/globalCaptureWindowController: ([A-Za-z_$][\w$]*),/);
+  assert.ok(controller, 'mainIpcSetup must wire globalCaptureWindowController');
   for (const [depKey, member] of [
     ['chooseGlobalCaptureWindowAction', 'chooseAction'],
     ['cancelGlobalCaptureWindow', 'cancel'],
@@ -217,7 +221,7 @@ test('mainIpcSetup reads the four overlay deps off the capture window controller
     ['acknowledgeGlobalCaptureWindowPresentation', 'didPresent'],
   ])
     assert.equal(
-      IPC_SETUP_SOURCE.includes(`${depKey}: _0x331d63?.['${member}'],`),
+      IPC_SETUP_SOURCE.includes(`${depKey}: ${controller[1]}?.['${member}'],`),
       true,
       `${depKey} -> ${member}`,
     );
