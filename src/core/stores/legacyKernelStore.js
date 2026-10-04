@@ -1,4 +1,5 @@
 import { generateId } from '../math.js';
+import { createNodeFieldSubscriptions } from './nodeFieldSubscriptions.js';
 import {
   applyFeatureSelectionsToNodeData,
   captureFeatureSelectionsFromNodePatch,
@@ -13,7 +14,10 @@ import {
   serializeVideoToolbarLayout,
 } from '../../modules/videoToolbarLayoutMemory.js';
 import { normalizeCommentNoteJumpShortcut } from '../../modules/commentNoteJumpShortcut.js';
-import { sanitizeSerializedCanvasData } from '../../utils/thumbnailPersistence.js';
+import {
+  sanitizeSerializedCanvasData,
+  sanitizeNodeForPersistence,
+} from '../../utils/thumbnailPersistence.js';
 import { sanitizePromptHtml } from '../../utils/dom.js';
 import {
   isGenerationTaskTerminalStatus,
@@ -28,8 +32,11 @@ import {
   resolveStoryboardCellSourceIndex,
 } from '../storyboardCellUtils.js';
 import { cloneStoryboard3DProjects, createStoryboard3DProjectActions } from './storyboard3dProjectState.js';
-import { createNodeFieldSubscriptions } from './nodeFieldSubscriptions.js';
+import { createViewportScreenFrame } from './viewportScreenFrame.js';
+import { createGenerationHistoryState } from './generationHistoryState.js';
+import { planNodeMovement } from './graphMutationImpact.js';
 import { sanitizeCanvasNodeMediaPatchForStore } from '../../services/canvasMediaLocalService.js';
+import { createRendererStateRevisionTracker } from './rendererStateRevisions.js';
 import {
   canAppendInputKindWithinLimit,
   canTargetReceiveInputs,
@@ -51,24 +58,30 @@ import {
   createInitialWorkflowDraftState,
   createInitialWorkflowUiState,
 } from './legacyInitialState.js';
+import { emitNodeDeletions } from '../nodeDeletionEvents.js';
+import { normalizeConnectionLineStyle } from '../edgePathGeometry.js';
+import { normalizeCanvasToolbarPlacement } from '../../modules/canvasToolbarPlacement.js';
+import { normalizeNodeManagerPlacement } from '../../modules/nodeManager/nodeManagerPlacement.js';
 function deepClone(value) {
   if (typeof structuredClone === 'function')
     try {
       return structuredClone(value);
     } catch {}
-  return JSON.parse(JSON.stringify(value));
+  return JSON['parse'](JSON['stringify'](value));
 }
 function stripPersistedRichText(item) {
   if (typeof item !== 'string') return item;
-  return item.replace(/<[^>]*>/g, '');
+  return item['replace'](/<[^>]*>/g, '');
 }
 function sanitizePersistedPromptHtml(key) {
   if (typeof key !== 'string') return key;
   return sanitizePromptHtml(key);
 }
 function cloneShallowObjectArray(list) {
-  if (!Array.isArray(list)) return list;
-  return list.map((args) => (args && typeof args === 'object' ? { ...args } : args));
+  if (!Array['isArray'](list)) return list;
+  return list['map']((args) =>
+    args && typeof args === 'object' ? { ...args } : args,
+  );
 }
 function cloneViewportSnapshot(args2) {
   if (!args2 || typeof args2 !== 'object') return args2;
@@ -85,7 +98,7 @@ function cloneAssetSnapshot(args4) {
       return structuredClone(args4);
     } catch {}
   try {
-    return JSON.parse(JSON.stringify(args4));
+    return JSON['parse'](JSON['stringify'](args4));
   } catch {}
   return { ...args4 };
 }
@@ -94,94 +107,107 @@ function cloneWorkflowSnapshot(enabled) {
   return deepClone(enabled);
 }
 function isBlobLikeUrl(index) {
-  return typeof index === 'string' && /^blob:/i.test(index.trim());
+  return typeof index === 'string' && /^blob:/i['test'](index['trim']());
 }
 function sanitizePanoramaStateForPersistence(enabled2) {
   if (!enabled2 || typeof enabled2 !== 'object') return enabled2;
   const deepClone2 = deepClone(enabled2);
   return (
-    deepClone2.ui && typeof deepClone2.ui === 'object' && delete deepClone2.ui.isEditing,
-    deepClone2.panorama &&
-      typeof deepClone2.panorama === 'object' &&
-      (delete deepClone2.panorama.isLoaded,
-      delete deepClone2.panorama.error,
-      isBlobLikeUrl(deepClone2.panorama.imageUrl) && delete deepClone2.panorama.imageUrl,
-      isBlobLikeUrl(deepClone2.panorama.localPath) && delete deepClone2.panorama.localPath),
-    deepClone2.capture &&
-      typeof deepClone2.capture === 'object' &&
-      (delete deepClone2.capture.pending,
-      delete deepClone2.capture.error,
-      delete deepClone2.capture.lastCaptureAt),
+    deepClone2['ui'] && typeof deepClone2['ui'] === 'object' && delete deepClone2['ui']['isEditing'],
+    deepClone2['panorama'] &&
+      typeof deepClone2['panorama'] === 'object' &&
+      (delete deepClone2['panorama']['isLoaded'],
+      delete deepClone2['panorama']['error'],
+      isBlobLikeUrl(deepClone2['panorama']['imageUrl']) && delete deepClone2['panorama']['imageUrl'],
+      isBlobLikeUrl(deepClone2['panorama']['localPath']) && delete deepClone2['panorama']['localPath']),
+    deepClone2['capture'] &&
+      typeof deepClone2['capture'] === 'object' &&
+      (delete deepClone2['capture']['pending'],
+      delete deepClone2['capture']['error'],
+      delete deepClone2['capture']['lastCaptureAt']),
     deepClone2
   );
 }
 function sanitizePanoramaStateForHistory(result) {
   const sanitizePanoramaStateForPersistence2 = sanitizePanoramaStateForPersistence(result);
-  if (!sanitizePanoramaStateForPersistence2 || typeof sanitizePanoramaStateForPersistence2 !== 'object')
-    return sanitizePanoramaStateForPersistence2;
-  return (delete sanitizePanoramaStateForPersistence2.viewport, sanitizePanoramaStateForPersistence2);
+  if (!sanitizePanoramaStateForPersistence2 || typeof sanitizePanoramaStateForPersistence2 !== 'object') return sanitizePanoramaStateForPersistence2;
+  return (delete sanitizePanoramaStateForPersistence2['viewport'], sanitizePanoramaStateForPersistence2);
 }
 function cloneNodeSnapshot(
   args5,
   {
-    stripRichText: stripRichText = false,
+    stripRichText: stripRichText = ![],
     hydratedAt: hydratedAt = null,
     featureSelections: featureSelections = null,
-    stripPanoramaViewport: stripPanoramaViewport = false,
-    preserveLiveGeneration: preserveLiveGeneration = false,
+    stripPanoramaViewport: stripPanoramaViewport = ![],
+    preserveLiveGeneration: preserveLiveGeneration = ![],
   } = {},
 ) {
   if (!args5 || typeof args5 !== 'object') return args5;
   const data = { ...args5 };
   normalizeNodeModel(data);
   stripRichText &&
-    (data.content !== undefined && (data.content = stripPersistedRichText(data.content)),
-    data.prompt !== undefined && (data.prompt = sanitizePersistedPromptHtml(data.prompt)));
-  Array.isArray(args5.cells) && (data.cells = cloneShallowObjectArray(args5.cells));
-  Array.isArray(args5.images) && (data.images = cloneShallowObjectArray(args5.images));
-  Array.isArray(args5.videos) && (data.videos = cloneShallowObjectArray(args5.videos));
-  args5.sceneNode &&
-    typeof args5.sceneNode === 'object' &&
-    (data.sceneNode = stripPanoramaViewport
-      ? sanitizePanoramaStateForHistory(args5.sceneNode)
-      : sanitizePanoramaStateForPersistence(args5.sceneNode));
-  args5.panorama360Node &&
-    typeof args5.panorama360Node === 'object' &&
-    (data.panorama360Node = stripPanoramaViewport
-      ? sanitizePanoramaStateForHistory(args5.panorama360Node)
-      : sanitizePanoramaStateForPersistence(args5.panorama360Node));
+    (data['content'] !== undefined &&
+      (data['content'] = stripPersistedRichText(data['content'])),
+    data['prompt'] !== undefined &&
+      (data['prompt'] = sanitizePersistedPromptHtml(data['prompt'])));
+  Array['isArray'](args5['cells']) && (data['cells'] = cloneShallowObjectArray(args5['cells']));
+  Array['isArray'](args5['images']) &&
+    (data['images'] = cloneShallowObjectArray(args5['images']));
+  Array['isArray'](args5['videos']) &&
+    (data['videos'] = cloneShallowObjectArray(args5['videos']));
+  args5['sceneNode'] &&
+    typeof args5['sceneNode'] === 'object' &&
+    (data['sceneNode'] = stripPanoramaViewport
+      ? sanitizePanoramaStateForHistory(args5['sceneNode'])
+      : sanitizePanoramaStateForPersistence(args5['sceneNode']));
+  args5['panorama360Node'] &&
+    typeof args5['panorama360Node'] === 'object' &&
+    (data['panorama360Node'] = stripPanoramaViewport
+      ? sanitizePanoramaStateForHistory(args5['panorama360Node'])
+      : sanitizePanoramaStateForPersistence(args5['panorama360Node']));
+  args5['storyboard3d'] &&
+    typeof args5['storyboard3d'] === 'object' &&
+    (data['storyboard3d'] = deepClone(args5['storyboard3d']));
   typeof hydratedAt === 'number' &&
-    Number.isFinite(hydratedAt) &&
-    typeof data.generationStartTime === 'number' &&
-    Number.isFinite(data.generationStartTime) &&
-    data.generationDuration == null &&
+    Number['isFinite'](hydratedAt) &&
+    typeof data['generationStartTime'] === 'number' &&
+    Number['isFinite'](data['generationStartTime']) &&
+    data['generationDuration'] == null &&
     !shouldPreserveRunningGenerationOnHydrate(data, {
       preserveLiveGeneration: preserveLiveGeneration,
     }) &&
-    finalizeHydratedGenerationSnapshot(data, Math.max(1, hydratedAt - data.generationStartTime));
-  if (typeof data._bizRev !== 'number') data._bizRev = 1;
+    finalizeHydratedGenerationSnapshot(
+      data,
+      Math['max'](0x1, hydratedAt - data['generationStartTime']),
+    );
+  if (typeof data['_bizRev'] !== 'number') data['_bizRev'] = 0x1;
   return featureSelections ? applyFeatureSelectionsToNodeData(data, featureSelections) : data;
 }
 function shallowEqual(options, target) {
-  if (options === target) return true;
-  if (typeof options !== typeof target) return false;
-  if (typeof options !== 'object' || options === null || target === null) return false;
-  const list2 = Object.keys(options),
-    list3 = Object.keys(target);
-  if (list2.length !== list3.length) return false;
+  if (options === target) return !![];
+  if (typeof options !== typeof target) return ![];
+  if (typeof options !== 'object' || options === null || target === null) return ![];
+  const list2 = Object['keys'](options),
+    list3 = Object['keys'](target);
+  if (list2['length'] !== list3['length']) return ![];
   for (const source of list2) {
-    if (!list3.includes(source) || options[source] !== target[source]) return false;
+    if (
+      !Object['prototype']['hasOwnProperty']['call'](target, source) ||
+      options[source] !== target[source]
+    )
+      return ![];
   }
-  return true;
+  return !![];
 }
 function isPlainObject(enabled3) {
-  if (!enabled3 || typeof enabled3 !== 'object' || Array.isArray(enabled3)) return false;
-  const next = Object.getPrototypeOf(enabled3);
-  return next === Object.prototype || next === null;
+  if (!enabled3 || typeof enabled3 !== 'object' || Array['isArray'](enabled3)) return ![];
+  const next = Object['getPrototypeOf'](enabled3);
+  return next === Object['prototype'] || next === null;
 }
 function snapshotSelectorValue(list4) {
   if (list4 == null || typeof list4 !== 'object') return list4;
-  if (Array.isArray(list4)) return list4.slice();
+  if (Array['isArray'](list4)) return list4['slice']();
   if (isPlainObject(list4)) return { ...list4 };
   if (typeof structuredClone === 'function')
     try {
@@ -190,207 +216,119 @@ function snapshotSelectorValue(list4) {
   return list4;
 }
 function _isSameStoreValue(current, entry) {
-  return Object.is(current, entry);
+  return Object['is'](current, entry);
 }
 function _isPatchNoop(enabled4, enabled5) {
-  if (!enabled4 || !enabled5 || typeof enabled5 !== 'object') return false;
-  const list5 = Object.keys(enabled5);
-  if (list5.length === 0) return true;
-  return list5.every((item2) => _isSameStoreValue(enabled4[item2], enabled5[item2]));
+  if (!enabled4 || !enabled5 || typeof enabled5 !== 'object') return ![];
+  const list5 = Object['keys'](enabled5);
+  if (list5['length'] === 0x0) return !![];
+  return list5['every']((record) => _isSameStoreValue(enabled4[record], enabled5[record]));
 }
-function _trimText(record) {
-  return typeof record === 'string' ? record.trim() : '';
+function _trimText(payload) {
+  return typeof payload === 'string' ? payload['trim']() : '';
 }
-const HISTORY_RUNNING_STATUSES = new Set([
-    'pending',
-    'queued',
-    'queueing',
-    'waiting',
-    'submitted',
-    'submitting',
-    'submit',
-    'running',
-    'processing',
-    'generating',
-    'in_progress',
-    'in-progress',
-    'recovering',
-  ]),
-  HISTORY_GENERATION_STATUS_FIELDS = Object.freeze([
-    'jobStatus',
-    'rhTaskStatus',
-    'dreaminaTaskStatus',
-    'dreaminaTaskPhase',
-    'asyncTaskStatus',
-  ]);
-function normalizeHistoryStatus(payload) {
-  return String(payload || '')
-    .trim()
-    .toLowerCase();
+function _getStoryboardCellPosition(handle, col) {
+  const state = Math['max'](0x1, Math['round'](Number(handle?.['cols']) || 0x1));
+  return { col: col % state, row: Math['floor'](col / state) };
 }
-function hasUsableImageResultItem(enabled6) {
-  if (!enabled6 || typeof enabled6 !== 'object') return false;
-  if (_trimText(enabled6.error)) return false;
-  return !!(
-    _trimText(enabled6.imageUrl) ||
-    _trimText(enabled6.sourceUrl) ||
-    _trimText(enabled6.thumbUrl) ||
-    _trimText(enabled6.localPath) ||
-    _trimText(enabled6.originalLocalPath) ||
-    _trimText(enabled6.displayLocalPath) ||
-    _trimText(enabled6.thumbLocalPath) ||
-    _trimText(enabled6.thumbId) ||
-    _trimText(enabled6.sourceId)
-  );
-}
-function hasResolvedAiImageResultSnapshot(enabled7) {
-  if (!enabled7 || typeof enabled7 !== 'object') return false;
-  if (String(enabled7.type || '') !== 'ai-image') return false;
-  const list6 = Array.isArray(enabled7.images) ? enabled7.images : [];
-  if (list6.some((item3) => hasUsableImageResultItem(item3))) return true;
-  return hasUsableImageResultItem(enabled7);
-}
-function isRunningAiImageHistorySnapshot(enabled8) {
-  if (!enabled8 || typeof enabled8 !== 'object') return false;
-  if (String(enabled8.type || '') !== 'ai-image') return false;
-  if (enabled8.isGenerating === true) return true;
-  if (
-    enabled8.rhTaskRecovering === true ||
-    enabled8.dreaminaTaskRecovering === true ||
-    enabled8.asyncTaskRecovering === true
-  )
-    return true;
-  return HISTORY_GENERATION_STATUS_FIELDS.some((item4) =>
-    HISTORY_RUNNING_STATUSES.has(normalizeHistoryStatus(enabled8[item4])),
-  );
-}
-function normalizeAiImageRunningHistorySnapshot(handle) {
-  if (!isRunningAiImageHistorySnapshot(handle)) return handle;
-  const hasResolvedAiImageResultSnapshot2 = hasResolvedAiImageResultSnapshot(handle);
+function _placeStoryboardCellForSwap(config, scope, input, output, value2, value3) {
+  Object['assign'](config, _getStoryboardCellPosition(value2, value3));
+  if (isStoryboardCellEmpty(scope)) return normalizeEmptyStoryboardCell(config);
   return (
-    (handle.isGenerating = false),
-    (handle.jobStatus = hasResolvedAiImageResultSnapshot2 ? 'success' : null),
-    (handle.jobError = null),
-    (handle.rhStatusMessage = null),
-    (handle.rhStatusCode = null),
-    (handle.rhTaskId = ''),
-    (handle.rhTaskStatus = 'idle'),
-    (handle.rhTaskRecovering = false),
-    (handle.dreaminaSubmitId = ''),
-    (handle.dreaminaTaskStatus = 'idle'),
-    (handle.dreaminaTaskPhase = 'done'),
-    (handle.dreaminaTaskLabel = ''),
-    (handle.dreaminaTaskRecovering = false),
-    (handle.dreaminaTaskLastRaw = {}),
-    (handle.asyncTaskId = ''),
-    (handle.asyncTaskStatus = 'idle'),
-    (handle.asyncTaskRecovering = false),
-    handle
+    (config['storyboardSourceIndex'] = resolveStoryboardCellSourceIndex(scope, output, input)),
+    config
   );
 }
-function _getStoryboardCellPosition(state, col) {
-  const config = Math.max(1, Math.round(Number(state?.cols) || 1));
-  return { col: col % config, row: Math.floor(col / config) };
-}
-function _placeStoryboardCellForSwap(scope, input, output, value2, value3, value4) {
-  Object.assign(scope, _getStoryboardCellPosition(value3, value4));
-  if (isStoryboardCellEmpty(input)) return normalizeEmptyStoryboardCell(scope);
-  return ((scope.storyboardSourceIndex = resolveStoryboardCellSourceIndex(input, value2, output)), scope);
-}
-function _isValidStoryboardCellTarget(value5, count) {
+function _isValidStoryboardCellTarget(value4, count) {
   return (
-    value5 &&
-    value5.type === 'storyboard' &&
-    Array.isArray(value5.cells) &&
-    Number.isInteger(count) &&
-    count >= 0 &&
-    count < value5.cells.length
+    value4 &&
+    value4['type'] === 'storyboard' &&
+    Array['isArray'](value4['cells']) &&
+    Number['isInteger'](count) &&
+    count >= 0x0 &&
+    count < value4['cells']['length']
   );
 }
 const LEGACY_VIDEO_EDIT_V52_MODEL_ID = 'runninghub/2037339851183366146';
-function normalizeNodeModel(enabled9) {
-  if (!enabled9 || typeof enabled9 !== 'object') return;
-  String(enabled9.model || '') === LEGACY_VIDEO_EDIT_V52_MODEL_ID && (enabled9.model = RH_VIDEO_V54_MODEL_ID);
+function normalizeNodeModel(enabled6) {
+  if (!enabled6 || typeof enabled6 !== 'object') return;
+  String(enabled6['model'] || '') === LEGACY_VIDEO_EDIT_V52_MODEL_ID &&
+    (enabled6['model'] = RH_VIDEO_V54_MODEL_ID);
 }
-function normalizeNodesCollection(list7) {
-  if (!list7) return;
-  if (Array.isArray(list7)) {
-    list7.forEach(normalizeNodeModel);
+function normalizeNodesCollection(list6) {
+  if (!list6) return;
+  if (Array['isArray'](list6)) {
+    list6['forEach'](normalizeNodeModel);
     return;
   }
-  typeof list7 === 'object' && Object.values(list7).forEach(normalizeNodeModel);
+  typeof list6 === 'object' && Object['values'](list6)['forEach'](normalizeNodeModel);
 }
-function isDreaminaTaskNodeSnapshot(enabled10) {
-  if (!enabled10 || typeof enabled10 !== 'object') return false;
-  const value6 = String(enabled10.type || '')
-    .trim()
-    .toLowerCase();
-  if (!['ai-video', 'ai-image', 'source-image', 'source-video'].includes(value6)) return false;
-  const value7 = String(enabled10.provider || '')
-      .trim()
-      .toLowerCase(),
-    value8 = String(enabled10.model || '').trim();
-  return value7 === 'dreamina' || resolveModelProvider(value8, value7) === 'dreamina';
+function isDreaminaTaskNodeSnapshot(enabled7) {
+  if (!enabled7 || typeof enabled7 !== 'object') return ![];
+  const value5 = String(enabled7['type'] || '')
+    ['trim']()
+    ['toLowerCase']();
+  if (!['ai-video', 'ai-image', 'source-image', 'source-video']['includes'](value5)) return ![];
+  const value6 = String(enabled7['provider'] || '')
+      ['trim']()
+      ['toLowerCase'](),
+    value7 = String(enabled7['model'] || '')['trim']();
+  return value6 === 'dreamina' || resolveModelProvider(value7, value6) === 'dreamina';
 }
-function inferAsyncProviderByModel(value9, value10 = '') {
-  const modelProvider = resolveModelProvider(value9, '', { allowProviderHint: false });
+function inferAsyncProviderByModel(value8, value9 = '') {
+  const modelProvider = resolveModelProvider(value8, '', { allowProviderHint: ![] });
   if (modelProvider) return modelProvider;
-  const value11 = String(value10 || '')
-    .trim()
-    .toLowerCase();
-  if (value11) return value11;
-  const list8 = String(value9 || '').trim();
-  if (list8 && !list8.includes('/')) return 'grsai';
+  const value10 = String(value9 || '')
+    ['trim']()
+    ['toLowerCase']();
+  if (value10) return value10;
+  const list7 = String(value8 || '')['trim']();
+  if (list7 && !list7['includes']('/')) return 'grsai';
   return 'grsai';
 }
-function isAsyncTaskNodeSnapshot(enabled11) {
-  if (!enabled11 || typeof enabled11 !== 'object') return false;
-  const value12 = String(enabled11.type || '')
-    .trim()
-    .toLowerCase();
-  if (!['ai-video', 'ai-image', 'source-video', 'source-image'].includes(value12)) return false;
+function isAsyncTaskNodeSnapshot(enabled8) {
+  if (!enabled8 || typeof enabled8 !== 'object') return ![];
+  const value11 = String(enabled8['type'] || '')
+    ['trim']()
+    ['toLowerCase']();
+  if (!['ai-video', 'ai-image', 'source-video', 'source-image']['includes'](value11)) return ![];
   const inferAsyncProviderByModel2 = inferAsyncProviderByModel(
-    enabled11.model,
-    enabled11.asyncTaskProvider || enabled11.provider || '',
+    enabled8['model'],
+    enabled8['asyncTaskProvider'] || enabled8['provider'] || '',
   );
-  if (
-    !inferAsyncProviderByModel2 ||
-    inferAsyncProviderByModel2 === 'runninghubwf' ||
-    inferAsyncProviderByModel2 === 'runninghub' ||
-    inferAsyncProviderByModel2 === 'dreamina'
-  )
-    return false;
-  return true;
+  if (!inferAsyncProviderByModel2 || inferAsyncProviderByModel2 === 'runninghubwf' || inferAsyncProviderByModel2 === 'runninghub' || inferAsyncProviderByModel2 === 'dreamina')
+    return ![];
+  return !![];
 }
-function isRunningHubTaskNodeSnapshot(enabled12) {
-  if (!enabled12 || typeof enabled12 !== 'object') return false;
-  const value13 = String(enabled12.type || '')
-      .trim()
-      .toLowerCase(),
-    value14 = String(enabled12.provider || '')
-      .trim()
-      .toLowerCase(),
-    value15 = String(enabled12.model || '').trim(),
-    modelProvider2 = resolveModelProvider(value15, value14, { allowProviderHint: false }),
-    isWorkflowModel2 = isWorkflowModel(value15, value14 || 'runninghubwf'),
-    value16 = modelProvider2 === 'runninghub' && isModelApiModel(value15, 'runninghub');
-  if (value13 === 'ai-audio') return value14 === 'runninghubwf';
-  if (value13 === 'source-video') return value14 === 'runninghubwf' || isWorkflowModel2;
-  if (value13 === 'source-image')
-    return value14 === 'runninghubwf' || value14 === 'runninghub' || isWorkflowModel2 || value16;
-  if (value13 === 'source-audio') return value14 === 'runninghubwf' && isWorkflowModel2;
-  if (value13 === 'ai-video') return value14 === 'runninghubwf' && isWorkflowModel2;
-  if (value13 === 'ai-image')
-    return isWorkflowModel2 || value16 || value14 === 'runninghub' || value14 === 'runninghubwf';
-  return false;
+function isRunningHubTaskNodeSnapshot(enabled9) {
+  if (!enabled9 || typeof enabled9 !== 'object') return ![];
+  const value12 = String(enabled9['type'] || '')
+      ['trim']()
+      ['toLowerCase'](),
+    value13 = String(enabled9['provider'] || '')
+      ['trim']()
+      ['toLowerCase'](),
+    value14 = String(enabled9['model'] || '')['trim'](),
+    modelProvider2 = resolveModelProvider(value14, value13, { allowProviderHint: ![] }),
+    isWorkflowModel2 = isWorkflowModel(value14, value13 || 'runninghubwf'),
+    value15 = modelProvider2 === 'runninghub' && isModelApiModel(value14, 'runninghub');
+  if (value12 === 'ai-audio') return value13 === 'runninghubwf';
+  if (value12 === 'source-video') return value13 === 'runninghubwf' || isWorkflowModel2;
+  if (value12 === 'source-image')
+    return value13 === 'runninghubwf' || value13 === 'runninghub' || isWorkflowModel2 || value15;
+  if (value12 === 'source-audio') return value13 === 'runninghubwf' && isWorkflowModel2;
+  if (value12 === 'ai-video') return value13 === 'runninghubwf' && isWorkflowModel2;
+  if (value12 === 'ai-image')
+    return isWorkflowModel2 || value15 || value13 === 'runninghub' || value13 === 'runninghubwf';
+  return ![];
 }
-function hasResolvedVideoResultSnapshot(enabled13) {
-  if (!enabled13 || typeof enabled13 !== 'object') return false;
-  const list9 = Array.isArray(enabled13.videos) ? enabled13.videos : [];
-  if (list9.length > 0) return true;
-  return !!String(enabled13.videoUrl || '').trim() || !!String(enabled13.localPath || '').trim();
+function hasResolvedVideoResultSnapshot(enabled10) {
+  if (!enabled10 || typeof enabled10 !== 'object') return ![];
+  const list8 = Array['isArray'](enabled10['videos']) ? enabled10['videos'] : [];
+  if (list8['length'] > 0x0) return !![];
+  return !!String(enabled10['videoUrl'] || '')['trim']() || !!String(enabled10['localPath'] || '')['trim']();
 }
-const HYDRATE_ACTIVE_STATUS_FIELDS = Object.freeze([
+const HYDRATE_ACTIVE_STATUS_FIELDS = Object['freeze']([
     'jobStatus',
     'rhTaskStatus',
     'dreaminaTaskStatus',
@@ -398,242 +336,264 @@ const HYDRATE_ACTIVE_STATUS_FIELDS = Object.freeze([
     'asyncTaskStatus',
     'mediaTaskStatus',
   ]),
-  HYDRATE_RECOVERING_FIELDS = Object.freeze([
+  HYDRATE_RECOVERING_FIELDS = Object['freeze']([
     'rhTaskRecovering',
     'dreaminaTaskRecovering',
     'asyncTaskRecovering',
   ]);
-function finalizeHydratedGenerationSnapshot(value17, value18) {
-  value17.generationDuration = value18;
-  if (value17.isGenerating === true) value17.isGenerating = false;
-  for (const value19 of HYDRATE_ACTIVE_STATUS_FIELDS) {
-    const value20 = String(value17[value19] || '').trim();
-    if (value20 && !isGenerationTaskTerminalStatus(value20)) value17[value19] = 'cancelled';
+function finalizeHydratedGenerationSnapshot(value16, value17) {
+  value16['generationDuration'] = value17;
+  if (value16['isGenerating'] === !![]) value16['isGenerating'] = ![];
+  for (const value18 of HYDRATE_ACTIVE_STATUS_FIELDS) {
+    const value19 = String(value16[value18] || '')['trim']();
+    if (value19 && !isGenerationTaskTerminalStatus(value19)) value16[value18] = 'cancelled';
   }
-  for (const value21 of HYDRATE_RECOVERING_FIELDS) if (value17[value21] === true) value17[value21] = false;
+  for (const value20 of HYDRATE_RECOVERING_FIELDS)
+    if (value16[value20] === !![]) value16[value20] = ![];
 }
 function shouldPreserveRunningGenerationOnHydrate(
-  value22,
-  { preserveLiveGeneration: preserveLiveGeneration = false } = {},
+  value21,
+  { preserveLiveGeneration: preserveLiveGeneration = ![] } = {},
 ) {
-  if (preserveLiveGeneration && value22?.isGenerating === true) {
-    const enabled14 = [
-      value22.dreaminaTaskPhase,
-      value22.dreaminaTaskStatus,
-      value22.asyncTaskStatus,
-      value22.rhTaskStatus,
-      value22.mediaTaskStatus,
-      value22.jobStatus,
-    ].some((item5) => {
-      const enabled15 = String(item5 || '')
-        .trim()
-        .toLowerCase();
-      return !!enabled15 && enabled15 !== 'idle' && isGenerationTaskTerminalStatus(enabled15);
+  if (preserveLiveGeneration && value21?.['isGenerating'] === !![]) {
+    const enabled11 = [
+      value21['dreaminaTaskPhase'],
+      value21['dreaminaTaskStatus'],
+      value21['asyncTaskStatus'],
+      value21['rhTaskStatus'],
+      value21['mediaTaskStatus'],
+      value21['jobStatus'],
+    ]['some']((value22) => {
+      const enabled12 = String(value22 || '')
+        ['trim']()
+        ['toLowerCase']();
+      return !!enabled12 && enabled12 !== 'idle' && isGenerationTaskTerminalStatus(enabled12);
     });
-    if (!enabled14) return true;
+    if (!enabled11) return !![];
   }
-  if (isDreaminaTaskNodeSnapshot(value22)) {
-    const enabled16 = String(value22.dreaminaSubmitId || '').trim();
-    if (!enabled16) return false;
-    const value23 = String(value22.dreaminaTaskPhase || '')
-        .trim()
-        .toLowerCase(),
-      value24 = String(value22.dreaminaTaskStatus || '')
-        .trim()
-        .toLowerCase();
-    if (isGenerationTaskTerminalStatus(value23)) return false;
-    if (isGenerationTaskTerminalStatus(value24)) return false;
-    return true;
+  if (isDreaminaTaskNodeSnapshot(value21)) {
+    const enabled13 = String(value21['dreaminaSubmitId'] || '')['trim']();
+    if (!enabled13) return ![];
+    const value23 = String(value21['dreaminaTaskPhase'] || '')
+        ['trim']()
+        ['toLowerCase'](),
+      value24 = String(value21['dreaminaTaskStatus'] || '')
+        ['trim']()
+        ['toLowerCase']();
+    if (isGenerationTaskTerminalStatus(value23)) return ![];
+    if (isGenerationTaskTerminalStatus(value24)) return ![];
+    return !![];
   }
-  if (isAsyncTaskNodeSnapshot(value22)) {
-    const enabled17 = String(value22.asyncTaskId || '').trim();
-    if (!enabled17) return false;
-    const value25 = String(value22.asyncTaskKind || '')
-        .trim()
-        .toLowerCase(),
-      value26 = String(value22.type || '')
-        .trim()
-        .toLowerCase();
-    if (value25 === 'image' && !['ai-image', 'source-image'].includes(value26)) return false;
-    if (value25 === 'video' && !['ai-video', 'source-video'].includes(value26)) return false;
-    const value27 = String(value22.asyncTaskStatus || '')
-      .trim()
-      .toLowerCase();
-    if (isGenerationTaskTerminalStatus(value27)) return false;
-    return true;
+  if (isAsyncTaskNodeSnapshot(value21)) {
+    const enabled14 = String(value21['asyncTaskId'] || '')['trim']();
+    if (!enabled14) return ![];
+    const value25 = String(value21['asyncTaskKind'] || '')
+        ['trim']()
+        ['toLowerCase'](),
+      value26 = String(value21['type'] || '')
+        ['trim']()
+        ['toLowerCase']();
+    if (value25 === 'image' && !['ai-image', 'source-image']['includes'](value26)) return ![];
+    if (value25 === 'video' && !['ai-video', 'source-video']['includes'](value26)) return ![];
+    const value27 = String(value21['asyncTaskStatus'] || '')
+      ['trim']()
+      ['toLowerCase']();
+    if (isGenerationTaskTerminalStatus(value27)) return ![];
+    return !![];
   }
-  if (!isRunningHubTaskNodeSnapshot(value22)) return false;
-  const enabled18 = String(value22.rhTaskId || '').trim();
-  if (!enabled18) return false;
-  const value28 = String(value22.rhTaskStatus || '')
-    .trim()
-    .toLowerCase();
-  if (isGenerationTaskTerminalStatus(value28)) return false;
-  return true;
+  if (!isRunningHubTaskNodeSnapshot(value21)) return ![];
+  const enabled15 = String(value21['rhTaskId'] || '')['trim']();
+  if (!enabled15) return ![];
+  const value28 = String(value21['rhTaskStatus'] || '')
+    ['trim']()
+    ['toLowerCase']();
+  if (isGenerationTaskTerminalStatus(value28)) return ![];
+  return !![];
 }
 function createStore() {
+  const map = createGenerationHistoryState();
   let args6 = createInitialState();
-  const subscribeNodeField = createNodeFieldSubscriptions(() => args6.nodes),
+  const el = createRendererStateRevisionTracker(args6),
+    subscribeNodeField = createNodeFieldSubscriptions(() => args6['nodes']),
+    viewport = createViewportScreenFrame(),
+    list9 = [],
     list10 = [],
-    list11 = [],
-    list12 = [];
-  let count2 = 0,
-    value29 = false,
-    handler = () => true;
-  function run() {
-    args6._persistRev = (args6._persistRev || 0) + 1;
+    list11 = [];
+  let count2 = 0x0,
+    enabled16 = ![],
+    handler = () => !![];
+  function run(value29 = !![]) {
+    args6['_persistRev'] = (args6['_persistRev'] || 0x0) + 0x1;
+    if (value29) args6['_contentPersistRev'] = (args6['_contentPersistRev'] || 0x0) + 0x1;
   }
   function run2() {
-    args6._edgesRev = (args6._edgesRev || 0) + 1;
+    args6['_edgesRev'] = (args6['_edgesRev'] || 0x0) + 0x1;
   }
   function setViewportPersistPolicy(value30) {
-    handler = typeof value30 === 'function' ? value30 : () => true;
+    handler = typeof value30 === 'function' ? value30 : () => !![];
   }
-  function run3(value31, args7) {
+  function setViewportScreenOrigin(value31, value32) {
+    if (!viewport['set'](value31, value32)) return;
+    ((args6['viewport'] = viewport['attach'](args6['viewport'])), run3());
+  }
+  function run4(value33, args7) {
     if (!args7 || typeof args7 !== 'object') return args7;
-    const value32 = { ...args7 },
-      status = (value33) => Object.prototype.hasOwnProperty.call(value32, value33),
+    const value34 = { ...args7 },
+      status = (value35) => Object['prototype']['hasOwnProperty']['call'](value34, value35),
       handler2 = () => {
-        const value34 = [value32.images, value32.videos].filter(Array.isArray);
-        for (const value35 of value34) {
-          let enabled19 = '',
-            enabled20 = false;
-          for (const error of value35) {
+        const value36 = [value34['images'], value34['videos']]['filter'](Array['isArray']);
+        for (const value37 of value36) {
+          let enabled17 = '',
+            enabled18 = ![];
+          for (const error of value37) {
             if (!error || typeof error !== 'object') continue;
-            const value36 = String(error.error || error.message || '').trim();
-            if (value36 && !enabled19) enabled19 = value36;
+            const value38 = String(error['error'] || error['message'] || '')['trim']();
+            if (value38 && !enabled17) enabled17 = value38;
             String(
-              error.localPath ||
-                error.originalLocalPath ||
-                error.displayLocalPath ||
-                error.thumbLocalPath ||
-                error.imageUrl ||
-                error.videoUrl ||
-                error.thumbUrl ||
-                error.sourceUrl ||
+              error['localPath'] ||
+                error['originalLocalPath'] ||
+                error['displayLocalPath'] ||
+                error['thumbLocalPath'] ||
+                error['imageUrl'] ||
+                error['videoUrl'] ||
+                error['thumbUrl'] ||
+                error['sourceUrl'] ||
                 '',
-            ).trim() && (enabled20 = true);
+            )['trim']() && (enabled18 = !![]);
           }
-          if (enabled19 && !enabled20) return enabled19;
+          if (enabled17 && !enabled18) return enabled17;
         }
-        return String(value32.jobError || '').trim();
+        return String(value34['jobError'] || '')['trim']();
       },
-      enabled21 = status('isGenerating'),
-      enabled22 = handler2(),
-      handler3 = (value37) =>
-        String(value37 || '')
-          .trim()
-          .toLowerCase(),
-      active = (value38) => ['error', 'failed', 'fail', 'cancelled', 'canceled'].includes(handler3(value38)),
-      handler4 = (value39) => {
-        if (status(value39)) return String(value32[value39] || '').trim();
-        return String(value31?.[value39] || '').trim();
+      enabled19 = status('isGenerating'),
+      enabled20 = handler2(),
+      handler3 = (value39) =>
+        String(value39 || '')
+          ['trim']()
+          ['toLowerCase'](),
+      active = (value40) =>
+        ['error', 'failed', 'fail', 'cancelled', 'canceled']['includes'](handler3(value40)),
+      handler4 = (value41) => {
+        if (status(value41)) return String(value34[value41] || '')['trim']();
+        return String(value33?.[value41] || '')['trim']();
       },
       handler5 = () => !!handler4('dreaminaSubmitId'),
-      active2 = (value40) => {
-        if (active(value40)) return true;
-        if (handler5()) return true;
-        if (handler3(value40) === 'idle') return false;
-        return handler3(value32.dreaminaTaskStatus) !== 'idle';
+      active2 = (value42) => {
+        if (active(value42)) return !![];
+        if (handler5()) return !![];
+        if (handler3(value42) === 'idle') return ![];
+        return handler3(value34['dreaminaTaskStatus']) !== 'idle';
       },
-      list13 = [
+      list12 = [
         {
-          status: status('asyncTaskStatus') ? value32.asyncTaskStatus : null,
+          status: status('asyncTaskStatus') ? value34['asyncTaskStatus'] : null,
           active:
-            active(value32.asyncTaskStatus) ||
+            active(value34['asyncTaskStatus']) ||
             !!handler4('asyncTaskId') ||
-            handler3(value32.asyncTaskStatus) !== 'idle',
+            handler3(value34['asyncTaskStatus']) !== 'idle',
         },
         {
-          status: status('rhTaskStatus') ? value32.rhTaskStatus : null,
+          status: status('rhTaskStatus') ? value34['rhTaskStatus'] : null,
           active:
-            active(value32.rhTaskStatus) ||
+            active(value34['rhTaskStatus']) ||
             !!handler4('rhTaskId') ||
-            handler3(value32.rhTaskStatus) !== 'idle',
+            handler3(value34['rhTaskStatus']) !== 'idle',
         },
         {
-          status: status('dreaminaTaskStatus') ? value32.dreaminaTaskStatus : null,
-          active: active2(value32.dreaminaTaskStatus),
+          status: status('dreaminaTaskStatus') ? value34['dreaminaTaskStatus'] : null,
+          active: active2(value34['dreaminaTaskStatus']),
         },
         {
-          status: status('dreaminaTaskPhase') ? value32.dreaminaTaskPhase : null,
-          active: active2(value32.dreaminaTaskPhase),
+          status: status('dreaminaTaskPhase') ? value34['dreaminaTaskPhase'] : null,
+          active: active2(value34['dreaminaTaskPhase']),
         },
-        { status: status('mediaTaskStatus') ? value32.mediaTaskStatus : null, active: true },
-      ].filter((response) => response.active === true && String(response.status || '').trim()),
-      enabled23 = list13.find((response2) => isGenerationTaskTerminalStatus(response2.status))?.status,
-      value41 = status('mediaTaskStatus')
-        ? String(value32.mediaTaskStatus || '')
-            .trim()
-            .toLowerCase()
+        { status: status('mediaTaskStatus') ? value34['mediaTaskStatus'] : null, active: !![] },
+      ]['filter']((response) => response['active'] === !![] && String(response['status'] || '')['trim']()),
+      enabled21 = list12['find']((response2) => isGenerationTaskTerminalStatus(response2['status']))?.[
+        'status'
+      ],
+      value43 = status('mediaTaskStatus')
+        ? String(value34['mediaTaskStatus'] || '')
+            ['trim']()
+            ['toLowerCase']()
         : '';
-    !enabled21 && (value41 === 'waiting' || value41 === 'processing') && (value32.isGenerating = true);
-    if (enabled22) {
-      ((value32.isGenerating = false), (value32.jobStatus = 'error'), (value32.jobError = enabled22));
-      if (status('dreaminaTaskStatus')) value32.dreaminaTaskStatus = 'failed';
-      if (status('dreaminaTaskPhase')) value32.dreaminaTaskPhase = 'failed';
-      if (status('dreaminaTaskLabel')) value32.dreaminaTaskLabel = enabled22;
-      if (status('dreaminaTaskRecovering')) value32.dreaminaTaskRecovering = false;
-      if (status('asyncTaskStatus')) value32.asyncTaskStatus = 'failed';
-      if (status('asyncTaskRecovering')) value32.asyncTaskRecovering = false;
-      if (status('rhTaskStatus')) value32.rhTaskStatus = 'failed';
-      if (status('rhTaskRecovering')) value32.rhTaskRecovering = false;
+    !enabled19 &&
+      (value43 === 'waiting' || value43 === 'processing') &&
+      (value34['isGenerating'] = !![]);
+    if (enabled20) {
+      ((value34['isGenerating'] = ![]),
+        (value34['jobStatus'] = 'error'),
+        (value34['jobError'] = enabled20));
+      if (status('dreaminaTaskStatus')) value34['dreaminaTaskStatus'] = 'failed';
+      if (status('dreaminaTaskPhase')) value34['dreaminaTaskPhase'] = 'failed';
+      if (status('dreaminaTaskLabel')) value34['dreaminaTaskLabel'] = enabled20;
+      if (status('dreaminaTaskRecovering')) value34['dreaminaTaskRecovering'] = ![];
+      if (status('asyncTaskStatus')) value34['asyncTaskStatus'] = 'failed';
+      if (status('asyncTaskRecovering')) value34['asyncTaskRecovering'] = ![];
+      if (status('rhTaskStatus')) value34['rhTaskStatus'] = 'failed';
+      if (status('rhTaskRecovering')) value34['rhTaskRecovering'] = ![];
     }
-    if (enabled23) {
-      value32.isGenerating = false;
-      const jobStatusFromTaskStatus = resolveJobStatusFromTaskStatus(enabled23, value32.jobStatus ?? null);
-      if (jobStatusFromTaskStatus !== undefined) value32.jobStatus = jobStatusFromTaskStatus;
+    if (enabled21) {
+      value34['isGenerating'] = ![];
+      const jobStatusFromTaskStatus = resolveJobStatusFromTaskStatus(enabled21, value34['jobStatus'] ?? null);
+      if (jobStatusFromTaskStatus !== undefined) value34['jobStatus'] = jobStatusFromTaskStatus;
       (status('dreaminaTaskStatus') || status('dreaminaTaskPhase')) &&
-        (value32.dreaminaTaskRecovering = false);
-      if (status('asyncTaskStatus')) value32.asyncTaskRecovering = false;
-      if (status('rhTaskStatus')) value32.rhTaskRecovering = false;
+        (value34['dreaminaTaskRecovering'] = ![]);
+      if (status('asyncTaskStatus')) value34['asyncTaskRecovering'] = ![];
+      if (status('rhTaskStatus')) value34['rhTaskRecovering'] = ![];
     }
-    if (value32.isGenerating === true) {
-      if (!status('jobStatus')) value32.jobStatus = 'running';
-      const count3 = Number(value32.generationStartTime);
-      if (!Number.isFinite(count3) || count3 <= 0) {
-        const count4 = Number(value31?.generationStartTime);
-        value32.generationStartTime = Number.isFinite(count4) && count4 > 0 ? count4 : Date.now();
+    if (value34['isGenerating'] === !![]) {
+      if (!status('jobStatus')) value34['jobStatus'] = 'running';
+      const count3 = Number(value34['generationStartTime']);
+      if (!Number['isFinite'](count3) || count3 <= 0x0) {
+        const count4 = Number(value33?.['generationStartTime']);
+        value34['generationStartTime'] =
+          Number['isFinite'](count4) && count4 > 0x0 ? count4 : Date['now']();
       }
-      return ((value32.generationDuration = null), value32);
+      return ((value34['generationDuration'] = null), value34);
     }
-    const value42 = value31?.isGenerating === true,
-      value43 =
-        value32.isGenerating === false &&
-        value32.generationDuration == null &&
-        (value42 || !!enabled22 || !!enabled23);
-    if (value43) {
+    const value44 = value33?.['isGenerating'] === !![],
+      value45 =
+        value34['isGenerating'] === ![] &&
+        value34['generationDuration'] == null &&
+        (value44 || !!enabled20 || !!enabled21);
+    if (value45) {
       const count5 = status('generationStartTime')
-        ? Number(value32.generationStartTime)
-        : Number(value31?.generationStartTime);
-      value32.generationDuration =
-        Number.isFinite(count5) && count5 > 0
-          ? Math.max(0, Date.now() - count5)
-          : value42
-            ? 0
-            : value32.generationDuration;
+        ? Number(value34['generationStartTime'])
+        : Number(value33?.['generationStartTime']);
+      value34['generationDuration'] =
+        Number['isFinite'](count5) && count5 > 0x0
+          ? Math['max'](0x0, Date['now']() - count5)
+          : value44
+            ? 0x0
+            : value34['generationDuration'];
     }
-    return value32;
+    return value34;
   }
-  function run4() {
-    if (count2 > 0) {
-      value29 = true;
+  function run3() {
+    if (count2 > 0x0) {
+      enabled16 = !![];
       return;
     }
-    subscribeNodeField.flush();
-    for (const run5 of list11) {
+    subscribeNodeField['flush']();
+    for (const run5 of list10) {
       run5(args6);
     }
-    if (list10.length > 0) {
+    if (list9['length'] > 0x0) {
       const deepClone3 = deepClone(args6);
-      for (const run6 of list10) {
+      for (const run6 of list9) {
         run6(deepClone3);
       }
     }
-    for (const { selector: selector, callback: callback, isEqual: isEqual, lastValue: lastValue } of list12) {
-      const value44 = selector(args6);
-      !isEqual(lastValue.value, value44) &&
-        ((lastValue.value = snapshotSelectorValue(value44)), callback(value44));
+    for (const {
+      selector: selector,
+      callback: callback,
+      isEqual: isEqual,
+      lastValue: lastValue,
+    } of list11) {
+      const value46 = selector(args6);
+      !isEqual(lastValue['value'], value46) &&
+        ((lastValue['value'] = snapshotSelectorValue(value46)), callback(value46));
     }
   }
   function batch(handler6) {
@@ -642,67 +602,68 @@ function createStore() {
     try {
       return handler6();
     } finally {
-      (count2--, count2 === 0 && value29 && ((value29 = false), run4()));
+      (count2--, count2 === 0x0 && enabled16 && ((enabled16 = ![]), run3()));
     }
   }
   function requestRender() {
-    run4();
+    (el['renderRequest'](), run3());
   }
   function invalidateUi() {
-    run4();
+    (el['renderRequest'](), run3());
   }
   function subscribe(handler7) {
     if (typeof handler7 !== 'function') throw new TypeError('[store] subscribe() 的参数必须是一个函数');
     return (
-      list10.push(handler7),
+      list9['push'](handler7),
       handler7(deepClone(args6)),
       function run7() {
-        const value45 = list10.indexOf(handler7);
-        value45 !== -1 && list10.splice(value45, 1);
+        const value47 = list9['indexOf'](handler7);
+        value47 !== -0x1 && list9['splice'](value47, 0x1);
       }
     );
   }
   function subscribeRaw(handler8) {
-    if (typeof handler8 !== 'function') throw new TypeError('[store] subscribeRaw() 的参数必须是一个函数');
+    if (typeof handler8 !== 'function')
+      throw new TypeError('[store]\x20subscribeRaw()\x20的参数必须是一个函数');
     return (
-      list11.push(handler8),
+      list10['push'](handler8),
       handler8(args6),
       function run8() {
-        const value46 = list11.indexOf(handler8);
-        value46 !== -1 && list11.splice(value46, 1);
+        const value48 = list10['indexOf'](handler8);
+        value48 !== -0x1 && list10['splice'](value48, 0x1);
       }
     );
   }
-  function subscribeSelector(selector2, callback2, value47 = {}) {
+  function subscribeSelector(selector2, callback2, value49 = {}) {
     if (typeof selector2 !== 'function')
-      throw new TypeError('[store] subscribeSelector() 的 selector 必须是函数');
+      throw new TypeError('[store]\x20subscribeSelector()\x20的\x20selector\x20必须是函数');
     if (typeof callback2 !== 'function')
       throw new TypeError('[store] subscribeSelector() 的 callback 必须是函数');
-    const isEqual2 = value47.isEqual || shallowEqual,
-      value48 = selector2(args6),
-      value49 = {
+    const isEqual2 = value49['isEqual'] || shallowEqual,
+      value50 = selector2(args6),
+      value51 = {
         selector: selector2,
         callback: callback2,
         isEqual: isEqual2,
-        lastValue: { value: snapshotSelectorValue(value48) },
+        lastValue: { value: snapshotSelectorValue(value50) },
       };
     return (
-      list12.push(value49),
-      callback2(value48),
+      list11['push'](value51),
+      callback2(value50),
       function run9() {
-        const value50 = list12.indexOf(value49);
-        value50 !== -1 && list12.splice(value50, 1);
+        const value52 = list11['indexOf'](value51);
+        value52 !== -0x1 && list11['splice'](value52, 0x1);
       }
     );
   }
-  function addNode(enabled24) {
-    if (!enabled24 || !enabled24.id) throw new Error('[store] addNode() 需要提供含有 id 字段的节点数据');
+  function addNode(enabled22) {
+    if (!enabled22 || !enabled22['id']) throw new Error('[store] addNode() 需要提供含有 id 字段的节点数据');
     const nodeData = applyFeatureSelectionsToNodeData(
-        JSON.parse(JSON.stringify(enabled24)),
-        args6.ui?.featureSelections || {},
+        JSON['parse'](JSON['stringify'](enabled22)),
+        args6['ui']?.['featureSelections'] || {},
       ),
       sanitizeCanvasNodeMediaPatchForStore2 = sanitizeCanvasNodeMediaPatchForStore(nodeData),
-      value51 = {
+      value53 = {
         text: '文本块',
         'ai-text': '生成文本',
         'ai-image': '生成图像',
@@ -722,242 +683,188 @@ function createStore() {
         audio: '源音频',
         video: '源视频',
       },
-      name = Object.prototype.hasOwnProperty.call(value51, sanitizeCanvasNodeMediaPatchForStore2.type)
-        ? value51[sanitizeCanvasNodeMediaPatchForStore2.type]
+      name = Object['prototype']['hasOwnProperty']['call'](value53, sanitizeCanvasNodeMediaPatchForStore2['type'])
+        ? value53[sanitizeCanvasNodeMediaPatchForStore2['type']]
         : '未命名';
-    sanitizeCanvasNodeMediaPatchForStore2.type === 'storyboard' &&
-      (!Array.isArray(sanitizeCanvasNodeMediaPatchForStore2.cells)
-        ? (sanitizeCanvasNodeMediaPatchForStore2.cells = [])
-        : (sanitizeCanvasNodeMediaPatchForStore2.cells = sanitizeCanvasNodeMediaPatchForStore2.cells.map(
-            (args8) => ({ ...args8, id: generateId('cell') }),
-          )));
-    sanitizeCanvasNodeMediaPatchForStore2.type === 'storyboard-script' &&
-      (sanitizeCanvasNodeMediaPatchForStore2.storyboardScript = createDefaultStoryboardScriptState(
-        sanitizeCanvasNodeMediaPatchForStore2.storyboardScript,
-      ));
-    sanitizeCanvasNodeMediaPatchForStore2.type === 'comment-note' &&
-      (sanitizeCanvasNodeMediaPatchForStore2.jumpShortcut = normalizeCommentNoteJumpShortcut(
-        sanitizeCanvasNodeMediaPatchForStore2.jumpShortcut,
-      ));
+    sanitizeCanvasNodeMediaPatchForStore2['type'] === 'storyboard' &&
+      (!Array['isArray'](sanitizeCanvasNodeMediaPatchForStore2['cells'])
+        ? (sanitizeCanvasNodeMediaPatchForStore2['cells'] = [])
+        : (sanitizeCanvasNodeMediaPatchForStore2['cells'] = sanitizeCanvasNodeMediaPatchForStore2['cells']['map']((args8) => ({
+            ...args8,
+            id: generateId('cell'),
+          }))));
+    sanitizeCanvasNodeMediaPatchForStore2['type'] === 'storyboard-script' &&
+      (sanitizeCanvasNodeMediaPatchForStore2['storyboardScript'] = createDefaultStoryboardScriptState(sanitizeCanvasNodeMediaPatchForStore2['storyboardScript']));
+    sanitizeCanvasNodeMediaPatchForStore2['type'] === 'comment-note' &&
+      (sanitizeCanvasNodeMediaPatchForStore2['jumpShortcut'] = normalizeCommentNoteJumpShortcut(sanitizeCanvasNodeMediaPatchForStore2['jumpShortcut']));
     const { _bizRev: _bizRev, ...args9 } = sanitizeCanvasNodeMediaPatchForStore2,
-      args10 = run3(null, args9),
-      value52 = { parentId: null, name: name, _bizRev: 1, ...args10 };
-    (captureFeatureSelectionsFromNodePatch(value52, value52, args6.ui?.featureSelections || {}),
-      (args6.nodes[value52.id] = value52),
-      subscribeNodeField.touch(value52.id),
-      (args6._nodeCount = (args6._nodeCount || 0) + 1),
+      args10 = run4(null, args9),
+      value54 = { parentId: null, name: name, _bizRev: 0x1, ...args10 };
+    (captureFeatureSelectionsFromNodePatch(
+      value54,
+      value54,
+      args6['ui']?.['featureSelections'] || {},
+    ),
+      el['add'](args6['nodes'][value54['id']], value54),
+      (args6['nodes'][value54['id']] = value54),
+      subscribeNodeField['touch'](value54['id']),
+      (args6['_nodeCount'] = (args6['_nodeCount'] || 0x0) + 0x1),
       run(),
-      value52.parentId && run10(value52.id, value52.parentId),
-      run4());
+      value54['parentId'] && run10(value54['id'], value54['parentId']),
+      run3());
   }
-  function run10(value53, value54, value55 = null) {
-    (value55 && args6._parentToChildren[value55]?.delete(value53),
-      value54 &&
-        (!args6._parentToChildren[value54] && (args6._parentToChildren[value54] = new Set()),
-        args6._parentToChildren[value54].add(value53)));
+  function run10(value55, value56, value57 = null) {
+    (value57 && args6['_parentToChildren'][value57]?.['delete'](value55),
+      value56 &&
+        (!args6['_parentToChildren'][value56] &&
+          (args6['_parentToChildren'][value56] = new Set()),
+        args6['_parentToChildren'][value56]['add'](value55)));
   }
-  function run11(value56, value57 = null) {
-    if (value57) {
-      const map = args6._parentToChildren[value57];
-      map && (map.delete(value56), map.size === 0 && delete args6._parentToChildren[value57]);
+  function run11(value58, value59 = null) {
+    if (value59) {
+      const map2 = args6['_parentToChildren'][value59];
+      map2 &&
+        (map2['delete'](value58),
+        map2['size'] === 0x0 && delete args6['_parentToChildren'][value59]);
     }
-    args6._parentToChildren[value56] && delete args6._parentToChildren[value56];
-  }
-  function run12(args11) {
-    const map2 = new Set(args11),
-      list14 = [...args11];
-    while (list14.length > 0) {
-      const value58 = list14.pop(),
-        enabled25 = args6._parentToChildren[value58];
-      if (!enabled25) continue;
-      for (const value59 of enabled25) {
-        if (!args6.nodes[value59]) continue;
-        if (map2.has(value59)) continue;
-        (map2.add(value59), list14.push(value59));
-      }
-    }
-    return map2;
+    args6['_parentToChildren'][value58] && delete args6['_parentToChildren'][value58];
   }
   function updateNodePosition(value60, value61, value62) {
     moveNodes([value60], value61, value62);
   }
-  function moveNodes(list15, value63, value64) {
-    if (!list15 || list15.length === 0) return;
-    const count6 = Number(value63),
-      count7 = Number(value64);
-    if (!Number.isFinite(count6) || !Number.isFinite(count7)) return;
-    if (count6 === 0 && count7 === 0) return;
-    const value65 = run12(list15);
-    let enabled26 = false;
-    for (const value66 of value65) {
-      const box = args6.nodes[value66];
+  function moveNodes(value63, value64, value65) {
+    run12(planNodeMovement(args6, 'moveNodes', [value63, value64, value65]));
+  }
+  function moveNodesByOffsets(value66) {
+    run12(planNodeMovement(args6, 'moveNodesByOffsets', [value66]));
+  }
+  function run12(value67) {
+    let enabled23 = ![];
+    for (const [value68, value69] of Object['entries'](value67)) {
+      const box = args6['nodes'][value68];
       if (!box) continue;
-      const value67 = (box.x || 0) + count6,
-        value68 = (box.y || 0) + count7;
-      if (value67 === box.x && value68 === box.y) continue;
-      ((box.x = value67), (box.y = value68), (enabled26 = true));
+      const x2 = (box['x'] || 0x0) + value69['dx'],
+        y2 = (box['y'] || 0x0) + value69['dy'];
+      if (x2 === box['x'] && y2 === box['y']) continue;
+      ((box['x'] = x2),
+        (box['y'] = y2),
+        subscribeNodeField['touch'](value68),
+        map['record'](value68, { x: x2, y: y2 }),
+        (enabled23 = !![]));
     }
-    if (!enabled26) return;
-    (run(), run4());
+    if (!enabled23) return;
+    (el['geometry'](), run(), run3());
   }
-  function run13(value69, enabled27, dx, dy) {
-    if (!enabled27) return;
-    const value70 = value69[enabled27];
-    if (value70) {
-      ((value70.dx += dx), (value70.dy += dy));
-      return;
-    }
-    value69[enabled27] = { dx: dx, dy: dy };
-  }
-  function moveNodesByOffsets(enabled28) {
-    if (!enabled28 || typeof enabled28 !== 'object') return;
-    const value71 = {};
-    for (const [enabled29, enabled30] of Object.entries(enabled28)) {
-      if (!enabled29 || !enabled30 || !args6.nodes[enabled29]) continue;
-      const dx2 = Number(enabled30.dx),
-        dy2 = Number(enabled30.dy);
-      if (!Number.isFinite(dx2) || !Number.isFinite(dy2)) continue;
-      if (dx2 === 0 && dy2 === 0) continue;
-      value71[enabled29] = { dx: dx2, dy: dy2 };
-    }
-    const list16 = Object.keys(value71);
-    if (list16.length === 0) return;
-    const map3 = new Set(list16),
-      value72 = {};
-    for (const value73 of list16) {
-      const value74 = value71[value73];
-      run13(value72, value73, value74.dx, value74.dy);
-      const list17 = [value73];
-      while (list17.length > 0) {
-        const value75 = list17.pop(),
-          enabled31 = args6._parentToChildren[value75];
-        if (!enabled31) continue;
-        for (const value76 of enabled31) {
-          if (!args6.nodes[value76]) continue;
-          if (map3.has(value76)) continue;
-          (run13(value72, value76, value74.dx, value74.dy), list17.push(value76));
-        }
-      }
-    }
-    let enabled32 = false;
-    for (const [value77, value78] of Object.entries(value72)) {
-      const box2 = args6.nodes[value77];
-      if (!box2) continue;
-      const value79 = (box2.x || 0) + value78.dx,
-        value80 = (box2.y || 0) + value78.dy;
-      if (value79 === box2.x && value80 === box2.y) continue;
-      ((box2.x = value79), (box2.y = value80), (enabled32 = true));
-    }
-    if (!enabled32) return;
-    (run(), run4());
-  }
-  function groupNodes(list18, value81) {
-    if (!Array.isArray(list18) || list18.length === 0) return;
-    const value82 = value81 || null;
-    let enabled33 = false;
-    list18.forEach((item6) => {
-      const value83 = args6.nodes[item6];
-      if (value83) {
-        const value84 = value83.parentId || null;
-        if (value84 === value82) return;
-        ((value83.parentId = value82),
-          (value83._bizRev = (typeof value83._bizRev === 'number' ? value83._bizRev : 0) + 1),
-          run10(item6, value82, value84),
-          (enabled33 = true));
+  function groupNodes(list13, value70) {
+    if (!Array['isArray'](list13) || list13['length'] === 0x0) return;
+    const parentId = value70 || null;
+    let enabled24 = ![];
+    list13['forEach']((value71) => {
+      const value72 = args6['nodes'][value71];
+      if (value72) {
+        const value73 = value72['parentId'] || null;
+        if (value73 === parentId) return;
+        ((value72['parentId'] = parentId),
+          subscribeNodeField['touch'](value71),
+          map['record'](value71, { parentId: parentId }),
+          (value72['_bizRev'] =
+            (typeof value72['_bizRev'] === 'number' ? value72['_bizRev'] : 0x0) + 0x1),
+          run10(value71, parentId, value73),
+          (enabled24 = !![]));
       }
     });
-    if (!enabled33) return;
-    (run(), run4());
+    if (!enabled24) return;
+    (el['content'](), run(), run3());
   }
-  function run14(options2 = {}) {
+  function run13(options2 = {}) {
     const fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(options2);
     if (!fixedInputSlotConfigFromManifest) return null;
     const targetInputPolicy = getTargetInputPolicy(options2),
-      map4 = new Set(fixedInputSlotConfigFromManifest.visibleSlots || []),
+      map3 = new Set(fixedInputSlotConfigFromManifest['visibleSlots'] || []),
+      map4 = new Set(),
       map5 = new Set(),
-      map6 = new Set(),
-      value85 = {},
-      map7 = new Map();
-    (fixedInputSlotConfigFromManifest.exclusiveGroups || []).forEach((item7) => {
-      (item7.slots || []).forEach((item8) => {
-        map7.set(item8, item7.id);
+      value74 = {},
+      map6 = new Map();
+    (fixedInputSlotConfigFromManifest['exclusiveGroups'] || [])['forEach']((value75) => {
+      (value75['slots'] || [])['forEach']((value76) => {
+        map6['set'](value76, value75['id']);
       });
     });
-    const run15 = (value86, value87) => {
-      const value88 = Number(targetInputPolicy?.maxByKind?.[value86]),
-        value89 = Number(value85[value86] || 0);
-      if (!Number.isFinite(value88) || value88 <= value87 || value89 >= value88) return false;
-      return ((value85[value86] = value89 + 1), true);
+    const run14 = (value77, value78) => {
+      const value79 = Number(targetInputPolicy?.['maxByKind']?.[value77]),
+        value80 = Number(value74[value77] || 0x0);
+      if (!Number['isFinite'](value79) || value79 <= value78 || value80 >= value79) return ![];
+      return ((value74[value77] = value80 + 0x1), !![]);
     };
     return {
-      reserveSlot(value90, value91 = null) {
-        const value92 = String(value90 || '').trim();
-        if (value92 === 'text') return true;
-        const value93 = String(value91?.refSlot || '').trim(),
-          list19 = (fixedInputSlotConfigFromManifest.slotOrderByType?.[value92] || []).filter((item9) =>
-            map4.has(item9),
+      reserveSlot(value81, value82 = null) {
+        const value83 = String(value81 || '')['trim']();
+        if (value83 === 'text') return !![];
+        const value84 = String(value82?.['refSlot'] || '')['trim'](),
+          list14 = (fixedInputSlotConfigFromManifest['slotOrderByType']?.[value83] || [])['filter']((value85) =>
+            map3['has'](value85),
           );
-        if (list19.length === 0) return run15(value92, 0);
-        const enabled34 =
-          value93 && list19.includes(value93) && map4.has(value93)
-            ? value93
-            : list19.find((item10) => !map5.has(item10));
-        if (!enabled34 || map5.has(enabled34)) return run15(value92, list19.length);
-        const value94 = map7.get(enabled34);
-        if (value94 && map6.has(value94)) return run15(value92, list19.length);
-        map5.add(enabled34);
-        if (value94) map6.add(value94);
-        return ((value85[value92] = Number(value85[value92] || 0) + 1), enabled34);
+        if (list14['length'] === 0x0) return run14(value83, 0x0);
+        const enabled25 =
+          value84 && list14['includes'](value84) && map3['has'](value84)
+            ? value84
+            : list14['find']((value86) => !map4['has'](value86));
+        if (!enabled25 || map4['has'](enabled25)) return run14(value83, list14['length']);
+        const value87 = map6['get'](enabled25);
+        if (value87 && map5['has'](value87)) return run14(value83, list14['length']);
+        map4['add'](enabled25);
+        if (value87) map5['add'](value87);
+        return ((value74[value83] = Number(value74[value83] || 0x0) + 0x1), enabled25);
       },
-      reserve(value95, value96 = null) {
-        return !!this.reserveSlot(value95, value96);
+      reserve(value88, value89 = null) {
+        return !!this['reserveSlot'](value88, value89);
       },
     };
   }
   function getIncomingEdges(targetId) {
     const nodes = args6,
-      enabled35 = nodes.nodes[targetId];
-    if (!enabled35) return [];
-    if (!canTargetReceiveInputs(enabled35)) return [];
-    const sharedGroupId = enabled35.parentId,
-      policy = getTargetInputPolicy(enabled35),
-      reserveInputSlot = run14(enabled35),
-      counts = { text: 0, image: 0, video: 0, audio: 0 },
-      list20 = [],
-      list21 = [],
+      enabled26 = nodes['nodes'][targetId];
+    if (!enabled26) return [];
+    if (!canTargetReceiveInputs(enabled26)) return [];
+    const sharedGroupId = enabled26['parentId'],
+      policy = getTargetInputPolicy(enabled26),
+      reserveInputSlot = run13(enabled26),
+      counts = { text: 0x0, image: 0x0, video: 0x0, audio: 0x0 },
+      list15 = [],
+      list16 = [],
       directSourceIds = new Set(),
-      acceptSource = (value97, edge = null) => {
-        const kind = resolveEffectiveInputKind(value97, edge);
+      acceptSource = (value90, edge = null) => {
+        const kind = resolveEffectiveInputKind(value90, edge);
         if (!kind) return '';
         if (!isInputKindAllowed(policy, kind)) return '';
-        if (!hasUsableInputNodeSource(value97, { edge: edge, kind: kind })) return '';
+        if (!hasUsableInputNodeSource(value90, { edge: edge, kind: kind })) return '';
         return kind;
       };
     return (
-      Object.values(nodes.edges || {}).forEach((args12) => {
-        if (!args12 || args12.targetId !== targetId) return;
-        const enabled36 = nodes.nodes[args12.sourceId];
-        if (!enabled36) return;
-        if (isGroupNodeData(enabled36)) return;
-        const enabled37 = acceptSource(enabled36, args12);
-        if (!enabled37) return;
-        const refSlot = reserveInputSlot ? reserveInputSlot.reserveSlot(enabled37, args12) : '';
+      Object['values'](nodes['edges'] || {})['forEach']((args11) => {
+        if (!args11 || args11['targetId'] !== targetId) return;
+        const enabled27 = nodes['nodes'][args11['sourceId']];
+        if (!enabled27) return;
+        if (isGroupNodeData(enabled27)) return;
+        const enabled28 = acceptSource(enabled27, args11);
+        if (!enabled28) return;
+        const refSlot = reserveInputSlot ? reserveInputSlot['reserveSlot'](enabled28, args11) : '';
         if (reserveInputSlot && !refSlot) return;
-        (refSlot && typeof refSlot === 'string' && !args12.refSlot
-          ? list20.push({ ...args12, refSlot: refSlot })
-          : list20.push(args12),
-          directSourceIds.add(args12.sourceId),
-          (counts[enabled37] = (counts[enabled37] || 0) + 1));
+        (refSlot && typeof refSlot === 'string' && !args11['refSlot']
+          ? list15['push']({ ...args11, refSlot: refSlot })
+          : list15['push'](args11),
+          directSourceIds['add'](args11['sourceId']),
+          (counts[enabled28] = (counts[enabled28] || 0x0) + 0x1));
       }),
-      Object.values(nodes.edges || {}).forEach((edge2) => {
-        if (!edge2 || edge2.targetId !== targetId) return;
-        const groupNode = nodes.nodes[edge2.sourceId];
+      Object['values'](nodes['edges'] || {})['forEach']((edge2) => {
+        if (!edge2 || edge2['targetId'] !== targetId) return;
+        const groupNode = nodes['nodes'][edge2['sourceId']];
         if (!isGroupNodeData(groupNode)) return;
-        list20.push(
+        list15['push'](
           ...collectGroupOutputIncomingEdges({
             edge: edge2,
             groupNode: groupNode,
-            nodes: nodes.nodes,
+            nodes: nodes['nodes'],
             targetId: targetId,
             policy: policy,
             counts: counts,
@@ -965,21 +872,21 @@ function createStore() {
             acceptSource: acceptSource,
             canAppendInputKindWithinLimit: canAppendInputKindWithinLimit,
             reserveInputSlot: reserveInputSlot
-              ? (value98, value99) => reserveInputSlot.reserveSlot(value98, value99)
+              ? (value91, value92) => reserveInputSlot['reserveSlot'](value91, value92)
               : null,
           }),
         );
       }),
       sharedGroupId &&
-        Object.values(nodes.edges || {}).forEach((edge3) => {
-          if (!edge3 || edge3.targetId !== sharedGroupId) return;
-          const groupNode2 = nodes.nodes[edge3.sourceId];
+        Object['values'](nodes['edges'] || {})['forEach']((edge3) => {
+          if (!edge3 || edge3['targetId'] !== sharedGroupId) return;
+          const groupNode2 = nodes['nodes'][edge3['sourceId']];
           if (!groupNode2) return;
           if (isGroupNodeData(groupNode2)) {
-            const list22 = collectGroupOutputIncomingEdges({
+            const list17 = collectGroupOutputIncomingEdges({
               edge: edge3,
               groupNode: groupNode2,
-              nodes: nodes.nodes,
+              nodes: nodes['nodes'],
               targetId: targetId,
               policy: policy,
               counts: counts,
@@ -987,229 +894,259 @@ function createStore() {
               acceptSource: acceptSource,
               canAppendInputKindWithinLimit: canAppendInputKindWithinLimit,
               reserveInputSlot: reserveInputSlot
-                ? (value100, value101) => reserveInputSlot.reserveSlot(value100, value101)
+                ? (value93, value94) => reserveInputSlot['reserveSlot'](value93, value94)
                 : null,
             });
-            list21.push(
-              ...list22.map((args13) => ({
-                ...args13,
-                isGroupShared: true,
+            list16['push'](
+              ...list17['map']((args12) => ({
+                ...args12,
+                isGroupShared: !![],
                 sharedGroupId: sharedGroupId,
               })),
             );
             return;
           }
-          const enabled38 = acceptSource(groupNode2, edge3);
-          if (!enabled38) return;
-          if (!canAppendInputKindWithinLimit(policy, enabled38, counts)) return;
-          const refSlot2 = reserveInputSlot ? reserveInputSlot.reserveSlot(enabled38, edge3) : '';
+          const enabled29 = acceptSource(groupNode2, edge3);
+          if (!enabled29) return;
+          if (!canAppendInputKindWithinLimit(policy, enabled29, counts)) return;
+          const refSlot2 = reserveInputSlot ? reserveInputSlot['reserveSlot'](enabled29, edge3) : '';
           if (reserveInputSlot && !refSlot2) return;
-          (list21.push({
+          (list16['push']({
             ...edge3,
-            ...(refSlot2 && typeof refSlot2 === 'string' && !edge3.refSlot ? { refSlot: refSlot2 } : null),
-            isGroupShared: true,
+            ...(refSlot2 && typeof refSlot2 === 'string' && !edge3['refSlot']
+              ? { refSlot: refSlot2 }
+              : null),
+            isGroupShared: !![],
             sharedGroupId: sharedGroupId,
             effectiveTargetId: targetId,
           }),
-            (counts[enabled38] = (counts[enabled38] || 0) + 1));
+            (counts[enabled29] = (counts[enabled29] || 0x0) + 0x1));
         }),
-      [...list20, ...list21].map((item11) => cloneEdgeSnapshot(item11))
+      [...list15, ...list16]['map']((value95) => cloneEdgeSnapshot(value95))
     );
   }
-  function deleteNodes(value102) {
-    const map8 = new Set(value102),
-      list23 = [];
-    for (const id of value102) {
-      const parentId = args6.nodes[id];
-      if (!parentId) continue;
-      list23.push({ id: id, parentId: parentId.parentId || null });
+  function deleteNodes(value96) {
+    const map7 = new Set(value96),
+      list18 = [];
+    el['remove'](value96);
+    for (const id of value96) {
+      const parentId2 = args6['nodes'][id];
+      if (!parentId2) continue;
+      list18['push']({ id: id, parentId: parentId2['parentId'] || null });
     }
-    for (const value103 of value102) {
-      delete args6.nodes[value103];
-      subscribeNodeField.touch(value103);
+    for (const value97 of value96) {
+      (delete args6['nodes'][value97], subscribeNodeField['touch'](value97), map['delete'](value97));
     }
-    args6._nodeCount = Object.keys(args6.nodes).length;
-    for (const { id: id2, parentId: parentId2 } of list23) {
-      run11(id2, parentId2);
+    args6['_nodeCount'] = Object['keys'](args6['nodes'])['length'];
+    for (const { id: id2, parentId: parentId3 } of list18) {
+      run11(id2, parentId3);
     }
-    let value104 = false;
-    for (const value105 of Object.keys(args6.edges)) {
-      const value106 = args6.edges[value105];
-      (map8.has(value106.sourceId) || map8.has(value106.targetId)) &&
-        (delete args6.edges[value105], (value104 = true));
+    let value98 = ![];
+    for (const value99 of Object['keys'](args6['edges'])) {
+      const value100 = args6['edges'][value99];
+      (map7['has'](value100['sourceId']) || map7['has'](value100['targetId'])) &&
+        (delete args6['edges'][value99], (value98 = !![]));
     }
-    if (value104) run2();
-    (run(), run4());
+    if (value98) run2();
+    (run(), emitNodeDeletions(list18), run3());
   }
-  function addEdge(args14) {
-    if (!args14 || !args14.id) throw new Error('[store] addEdge() 需要提供含有 id 字段的连线数据');
-    ((args6.edges[args14.id] = { isThumbnailActive: true, type: null, ...args14 }), run2(), run(), run4());
+  function addEdge(args13) {
+    if (!args13 || !args13['id']) throw new Error('[store] addEdge() 需要提供含有 id 字段的连线数据');
+    ((args6['edges'][args13['id']] = { isThumbnailActive: !![], type: null, ...args13 }),
+      run2(),
+      run(),
+      run3());
   }
-  function updateEdgesBatch(list24, list25) {
-    (list24.forEach((item12) => {
-      if (args6.edges[item12]) delete args6.edges[item12];
+  function updateEdgesBatch(list19, list20) {
+    (list19['forEach']((value101) => {
+      if (args6['edges'][value101]) delete args6['edges'][value101];
     }),
-      list25.forEach((item13) => {
+      list20['forEach']((value102) => {
         const {
           isGroupShared: isGroupShared,
           sharedGroupId: sharedGroupId2,
           effectiveTargetId: effectiveTargetId,
-          ...args15
-        } = item13 || {};
-        if (!args15.id) return;
-        args6.edges[args15.id] = args15;
+          ...args14
+        } = value102 || {};
+        if (!args14['id']) return;
+        args6['edges'][args14['id']] = args14;
       }),
       run2(),
       run(),
-      run4());
+      run3());
   }
-  function updateViewport(x2, y2, zoom2) {
-    const box3 = args6.viewport || {};
-    if (box3.x === x2 && box3.y === y2 && box3.zoom === zoom2) return;
-    const value107 = box3.zoom;
-    args6.viewport = { x: x2, y: y2, zoom: zoom2 };
-    if (value107 !== zoom2) {
-      if (handler()) run();
-    }
-    run4();
+  function updateViewport(x3, y3, zoom2) {
+    const box2 = args6['viewport'] || {};
+    if (box2['x'] === x3 && box2['y'] === y3 && box2['zoom'] === zoom2)
+      return;
+    const value103 = box2['zoom'];
+    args6['viewport'] = viewport['attach']({ x: x3, y: y3, zoom: zoom2 });
+    if (value103 !== zoom2 && handler()) run(![]);
+    run3();
   }
   function markViewportPersist() {
-    (run(), run4());
+    (run(![]), run3());
   }
-  function updateNodeData(value108, value109) {
-    const args16 = args6.nodes[value108];
-    if (!args16) throw new Error('[store] updateNodeData() 找不到 id 为 "' + value108 + '" 的节点');
-    const value110 = JSON.parse(JSON.stringify(value109)),
-      { _bizRev: _bizRev2, ...args17 } = value110;
-    args17.cells &&
-      Array.isArray(args17.cells) &&
-      (args17.cells = args17.cells.map((args18) => ({ ...args18 })));
-    const sanitizeCanvasNodeMediaPatchForStore3 = sanitizeCanvasNodeMediaPatchForStore(args17, args16),
-      args19 = run3(args16, sanitizeCanvasNodeMediaPatchForStore3);
-    if (_isPatchNoop(args16, args19)) return;
-    const value111 = Object.prototype.hasOwnProperty.call(args19, 'parentId')
-      ? args19.parentId
-      : args16.parentId;
-    captureFeatureSelectionsFromNodePatch(args16, args19, args6.ui?.featureSelections || {});
-    const _bizRev3 = (typeof args16._bizRev === 'number' ? args16._bizRev : 0) + 1;
-    ((args6.nodes[value108] = { ...args16, ...args19, _bizRev: _bizRev3 }),
-      subscribeNodeField.touch(value108),
-      value111 !== args16.parentId && run10(value108, value111, args16.parentId),
+  function updateNodeData(value104, value105, value106 = {}) {
+    const id3 = args6['nodes'][value104];
+    if (!id3)
+      throw new Error('[store]\x20updateNodeData()\x20找不到\x20id\x20为\x20\x22' + value104 + '" 的节点');
+    const value107 = JSON['parse'](JSON['stringify'](value105)),
+      { _bizRev: _bizRev2, ...args15 } = value107;
+    args15['cells'] &&
+      Array['isArray'](args15['cells']) &&
+      (args15['cells'] = args15['cells']['map']((args16) => ({ ...args16 })));
+    const sanitizeCanvasNodeMediaPatchForStore3 = sanitizeCanvasNodeMediaPatchForStore(args15, id3),
+      args17 = run4(id3, sanitizeCanvasNodeMediaPatchForStore3);
+    if (value106['replace'] !== !![] && _isPatchNoop(id3, args17)) return;
+    map['record'](value104, args17, value106);
+    const value108 = Object['prototype']['hasOwnProperty']['call'](args17, 'parentId')
+      ? args17['parentId']
+      : id3['parentId'];
+    captureFeatureSelectionsFromNodePatch(id3, args17, args6['ui']?.['featureSelections'] || {});
+    const _bizRev3 = (typeof id3['_bizRev'] === 'number' ? id3['_bizRev'] : 0x0) + 0x1;
+    ((args6['nodes'][value104] = {
+      ...(value106['replace'] === !![] ? { id: id3['id'], type: id3['type'] } : id3),
+      ...args17,
+      _bizRev: _bizRev3,
+    }),
+      value108 !== id3['parentId'] && run10(value104, value108, id3['parentId']),
+      el['patch'](id3, args6['nodes'][value104]),
+      subscribeNodeField['touch'](value104),
       run(),
-      run4());
+      run3());
   }
-  function updateNodesData(value112) {
-    let value113 = false;
-    for (const [value114, value115] of Object.entries(value112)) {
-      const args20 = args6.nodes[value114];
-      if (args20) {
-        const value116 = JSON.parse(JSON.stringify(value115)),
-          { _bizRev: _bizRev4, ...args21 } = value116;
-        args21.cells &&
-          Array.isArray(args21.cells) &&
-          (args21.cells = args21.cells.map((args22) => ({ ...args22 })));
-        const sanitizeCanvasNodeMediaPatchForStore4 = sanitizeCanvasNodeMediaPatchForStore(args21, args20),
-          args23 = run3(args20, sanitizeCanvasNodeMediaPatchForStore4);
-        if (_isPatchNoop(args20, args23)) continue;
-        const value117 = Object.prototype.hasOwnProperty.call(args23, 'parentId')
-          ? args23.parentId
-          : args20.parentId;
-        captureFeatureSelectionsFromNodePatch(args20, args23, args6.ui?.featureSelections || {});
-        const _bizRev5 = (typeof args20._bizRev === 'number' ? args20._bizRev : 0) + 1;
-        ((args6.nodes[value114] = { ...args20, ...args23, _bizRev: _bizRev5 }),
-          subscribeNodeField.touch(value114),
-          value117 !== args20.parentId && run10(value114, value117, args20.parentId),
-          (value113 = true));
+  function updateNodesData(value109) {
+    let value110 = ![];
+    const store = el['batch']();
+    for (const [value111, value112] of Object['entries'](value109)) {
+      const args18 = args6['nodes'][value111];
+      if (args18) {
+        const value113 = JSON['parse'](JSON['stringify'](value112)),
+          { _bizRev: _bizRev4, ...args19 } = value113;
+        args19['cells'] &&
+          Array['isArray'](args19['cells']) &&
+          (args19['cells'] = args19['cells']['map']((args20) => ({ ...args20 })));
+        const sanitizeCanvasNodeMediaPatchForStore4 = sanitizeCanvasNodeMediaPatchForStore(args19, args18),
+          args21 = run4(args18, sanitizeCanvasNodeMediaPatchForStore4);
+        map['record'](value111, args21);
+        if (_isPatchNoop(args18, args21)) continue;
+        const value114 = Object['prototype']['hasOwnProperty']['call'](args21, 'parentId')
+          ? args21['parentId']
+          : args18['parentId'];
+        captureFeatureSelectionsFromNodePatch(
+          args18,
+          args21,
+          args6['ui']?.['featureSelections'] || {},
+        );
+        const _bizRev5 = (typeof args18['_bizRev'] === 'number' ? args18['_bizRev'] : 0x0) + 0x1;
+        ((args6['nodes'][value111] = { ...args18, ...args21, _bizRev: _bizRev5 }),
+          store['patch'](args18, args6['nodes'][value111]),
+          subscribeNodeField['touch'](value111),
+          value114 !== args18['parentId'] && run10(value111, value114, args18['parentId']),
+          (value110 = !![]));
       }
     }
-    value113 && (run(), run4());
+    value110 && (store['commit'](), run(), run3());
   }
-  function swapStoryboardCells(value118, value119, value120, value121) {
-    const args24 = args6.nodes[value118],
-      args25 = args6.nodes[value120],
-      value122 = Number(value119),
-      value123 = Number(value121);
-    if (!_isValidStoryboardCellTarget(args24, value122) || !_isValidStoryboardCellTarget(args25, value123))
-      return false;
-    if (value118 === value120 && value122 === value123) return false;
-    const cells = args24.cells.slice(),
-      value124 = args24.cells[value122],
-      value125 = args25.cells[value123];
-    if (value118 === value120)
-      ((cells[value123] = _placeStoryboardCellForSwap(
-        cloneStoryboardCellForSwapDestination(value124),
-        value124,
-        args24,
-        value122,
-        args24,
-        value123,
+  function swapStoryboardCells(value115, value116, value117, value118) {
+    const args22 = args6['nodes'][value115],
+      args23 = args6['nodes'][value117],
+      value119 = Number(value116),
+      value120 = Number(value118);
+    if (
+      !_isValidStoryboardCellTarget(args22, value119) ||
+      !_isValidStoryboardCellTarget(args23, value120)
+    )
+      return ![];
+    if (value115 === value117 && value119 === value120) return ![];
+    const cells = args22['cells']['slice'](),
+      value121 = args22['cells'][value119],
+      value122 = args23['cells'][value120];
+    if (value115 === value117)
+      ((cells[value120] = _placeStoryboardCellForSwap(
+        cloneStoryboardCellForSwapDestination(value121),
+        value121,
+        args22,
+        value119,
+        args22,
+        value120,
       )),
-        (cells[value122] = _placeStoryboardCellForSwap(
-          cloneStoryboardCellForSwapDestination(value125),
-          value125,
-          args24,
-          value123,
-          args24,
+        (cells[value119] = _placeStoryboardCellForSwap(
+          cloneStoryboardCellForSwapDestination(value122),
           value122,
+          args22,
+          value120,
+          args22,
+          value119,
         )),
-        (args6.nodes[value118] = {
-          ...args24,
+        (args6['nodes'][value115] = {
+          ...args22,
           cells: cells,
-          _bizRev: (typeof args24._bizRev === 'number' ? args24._bizRev : 0) + 1,
+          _bizRev: (typeof args22['_bizRev'] === 'number' ? args22['_bizRev'] : 0x0) + 0x1,
         }));
     else {
-      const cells2 = args25.cells.slice();
-      ((cells2[value123] = _placeStoryboardCellForSwap(
-        cloneStoryboardCellForSwapDestination(value124),
-        value124,
-        args24,
-        value122,
-        args25,
-        value123,
+      const cells2 = args23['cells']['slice']();
+      ((cells2[value120] = _placeStoryboardCellForSwap(
+        cloneStoryboardCellForSwapDestination(value121),
+        value121,
+        args22,
+        value119,
+        args23,
+        value120,
       )),
-        (cells[value122] = normalizeEmptyStoryboardCell({
-          ...cloneStoryboardCellForSwap(value124),
-          ..._getStoryboardCellPosition(args24, value122),
+        (cells[value119] = normalizeEmptyStoryboardCell({
+          ...cloneStoryboardCellForSwap(value121),
+          ..._getStoryboardCellPosition(args22, value119),
         })),
-        (args6.nodes[value118] = {
-          ...args24,
+        (args6['nodes'][value115] = {
+          ...args22,
           cells: cells,
-          _bizRev: (typeof args24._bizRev === 'number' ? args24._bizRev : 0) + 1,
+          _bizRev: (typeof args22['_bizRev'] === 'number' ? args22['_bizRev'] : 0x0) + 0x1,
         }),
-        (args6.nodes[value120] = {
-          ...args25,
+        (args6['nodes'][value117] = {
+          ...args23,
           cells: cells2,
-          _bizRev: (typeof args25._bizRev === 'number' ? args25._bizRev : 0) + 1,
+          _bizRev: (typeof args23['_bizRev'] === 'number' ? args23['_bizRev'] : 0x0) + 0x1,
         }));
     }
-    return (subscribeNodeField.touch(value118), subscribeNodeField.touch(value120), run(), run4(), true);
-  }
-  function renameNode(value126, name2) {
-    const error2 = args6.nodes[value126];
-    if (!error2) return;
-    if (error2.name === name2) return;
-    const _bizRev6 = (typeof error2._bizRev === 'number' ? error2._bizRev : 0) + 1;
-    ((args6.nodes[value126] = { ...error2, name: name2, _bizRev: _bizRev6 }),
-      subscribeNodeField.touch(value126),
+    return (
+      el['content'](),
+      subscribeNodeField['touch'](value115),
+      subscribeNodeField['touch'](value117),
       run(),
-      run4());
+      run3(),
+      !![]
+    );
   }
-  function removeEdge(value127) {
-    args6.edges[value127] && (delete args6.edges[value127], run2(), run(), run4());
+  function renameNode(value123, name2) {
+    const error2 = args6['nodes'][value123];
+    if (!error2) return;
+    if (error2['name'] === name2) return;
+    const _bizRev6 = (typeof error2['_bizRev'] === 'number' ? error2['_bizRev'] : 0x0) + 0x1;
+    ((args6['nodes'][value123] = { ...error2, name: name2, _bizRev: _bizRev6 }),
+      subscribeNodeField['touch'](value123),
+      el['content'](),
+      run(),
+      run3());
   }
-  function showPicker(screenX, screenY, x3, y3) {
-    ((args6.picker = {
-      visible: true,
-      x: x3,
-      y: y3,
+  function removeEdge(value124) {
+    args6['edges'][value124] &&
+      (delete args6['edges'][value124], run2(), run(), run3());
+  }
+  function showPicker(screenX, screenY, x4, y4) {
+    ((args6['picker'] = {
+      visible: !![],
+      x: x4,
+      y: y4,
       screenX: screenX,
       screenY: screenY,
     }),
-      run4());
+      run3());
   }
   function hidePicker() {
-    if (args6.picker?.visible === false) return;
-    ((args6.picker = { ...args6.picker, visible: false }), run4());
+    if (args6['picker']?.['visible'] === ![]) return;
+    ((args6['picker'] = { ...args6['picker'], visible: ![] }), run3());
   }
   function getState() {
     return deepClone(args6);
@@ -1217,237 +1154,272 @@ function createStore() {
   function getStateRaw() {
     return args6;
   }
-  function loadState(enabled39) {
-    if (!enabled39) return;
-    args6.nodes = deepClone(enabled39.nodes ?? {});
-    for (const [value128, value129] of Object.entries(args6.nodes)) {
-      args6.nodes[value128] = applyFeatureSelectionsToNodeData(value129, args6.ui?.featureSelections || {});
+  function loadState(enabled30, { preserveHistoryProjection: preserveHistoryProjection = ![] } = {}) {
+    if (!enabled30) return;
+    if (!preserveHistoryProjection) map['clear']();
+    ((args6['nodes'] = deepClone(enabled30['nodes'] ?? {})), map['prune'](args6['nodes']));
+    for (const [value125, value126] of Object['entries'](args6['nodes'])) {
+      args6['nodes'][value125] = applyFeatureSelectionsToNodeData(
+        value126,
+        args6['ui']?.['featureSelections'] || {},
+      );
     }
-    (normalizeNodesCollection(args6.nodes),
-      (args6.edges = deepClone(enabled39.edges ?? {})),
-      (args6.viewport = deepClone(enabled39.viewport ?? { x: 0, y: 0, zoom: 1 })),
-      (args6._nodeCount = Object.keys(args6.nodes).length));
-    for (const enabled40 of Object.values(args6.nodes)) {
-      if (!enabled40 || typeof enabled40 !== 'object') continue;
-      if (typeof enabled40._bizRev !== 'number') enabled40._bizRev = 1;
+    (normalizeNodesCollection(args6['nodes']),
+      (args6['edges'] = deepClone(enabled30['edges'] ?? {})),
+      (args6['viewport'] = viewport['attach'](
+        deepClone(enabled30['viewport'] ?? { x: 0x0, y: 0x0, zoom: 0x1 }),
+      )),
+      (args6['_nodeCount'] = Object['keys'](args6['nodes'])['length']));
+    for (const enabled31 of Object['values'](args6['nodes'])) {
+      if (!enabled31 || typeof enabled31 !== 'object') continue;
+      if (typeof enabled31['_bizRev'] !== 'number') enabled31['_bizRev'] = 0x1;
     }
-    args6._parentToChildren = {};
-    for (const [value130, value131] of Object.entries(args6.nodes)) {
-      value131.parentId && run10(value130, value131.parentId);
+    args6['_parentToChildren'] = {};
+    for (const [value127, value128] of Object['entries'](args6['nodes'])) {
+      value128['parentId'] && run10(value127, value128['parentId']);
     }
-    (subscribeNodeField.reload(), run2(), run(), run4());
+    (run2(), el['reload'](), subscribeNodeField['reload'](), run(), run3());
   }
   function getHistorySnapshot() {
     const nodes2 = {};
-    for (const [value132, value133] of Object.entries(args6.nodes || {})) {
-      nodes2[value132] = cloneNodeSnapshot(value133, { stripPanoramaViewport: true });
+    for (const [value129, value130] of Object['entries'](args6['nodes'] || {})) {
+      nodes2[value129] = cloneNodeSnapshot(value130, { stripPanoramaViewport: !![] });
     }
     const edges = {};
-    for (const [value134, value135] of Object.entries(args6.edges || {})) {
-      edges[value134] = cloneEdgeSnapshot(value135);
+    for (const [value131, value132] of Object['entries'](args6['edges'] || {})) {
+      edges[value131] = cloneEdgeSnapshot(value132);
     }
     return { nodes: nodes2, edges: edges };
   }
-  function loadHistorySnapshot(args26) {
-    if (!args26) return;
-    const value136 = args6.nodes || {},
-      nodes3 = deepClone(args26.nodes ?? {});
-    for (const [value137, enabled41] of Object.entries(nodes3)) {
-      if (!enabled41 || typeof enabled41 !== 'object') continue;
-      const value138 = value136[value137];
-      if (enabled41.type === 'panorama-scene') {
-        const value139 = value138?.sceneNode?.viewport;
-        value139 && (enabled41.sceneNode = { ...(enabled41.sceneNode || {}), viewport: deepClone(value139) });
+  function loadHistorySnapshot(args24) {
+    if (!args24) return;
+    const value133 = args6['nodes'] || {},
+      nodes3 = deepClone(args24['nodes'] ?? {});
+    for (const [value134, enabled32] of Object['entries'](nodes3)) {
+      if (!enabled32 || typeof enabled32 !== 'object') continue;
+      const value135 = value133[value134];
+      if (enabled32['type'] === 'panorama-scene') {
+        const value136 = value135?.['sceneNode']?.['viewport'];
+        value136 &&
+          (enabled32['sceneNode'] = { ...(enabled32['sceneNode'] || {}), viewport: deepClone(value136) });
       } else {
-        if (enabled41.type === 'panorama-360') {
-          const value140 = value138?.panorama360Node?.viewport;
-          value140 &&
-            (enabled41.panorama360Node = {
-              ...(enabled41.panorama360Node || {}),
-              viewport: deepClone(value140),
+        if (enabled32['type'] === 'panorama-360') {
+          const value137 = value135?.['panorama360Node']?.['viewport'];
+          value137 &&
+            (enabled32['panorama360Node'] = {
+              ...(enabled32['panorama360Node'] || {}),
+              viewport: deepClone(value137),
             });
-        } else enabled41.type === 'ai-image' && normalizeAiImageRunningHistorySnapshot(enabled41);
+        }
       }
+      map['restore'](enabled32, value135);
     }
-    loadState({ ...args26, nodes: nodes3, viewport: cloneViewportSnapshot(args6.viewport) });
+    loadState(
+      { ...args24, nodes: nodes3, viewport: cloneViewportSnapshot(args6['viewport']) },
+      { preserveHistoryProjection: !![] },
+    );
   }
-  function getSourcesForNode(value141) {
-    const list26 = Object.values(args6.edges).filter((item14) => item14.targetId === value141);
-    return list26.map((item15) => args6.nodes[item15.sourceId]).filter((enabled42) => !!enabled42);
+  function getSourcesForNode(value138) {
+    const list21 = Object['values'](args6['edges'])['filter'](
+      (value139) => value139['targetId'] === value138,
+    );
+    return list21['map']((value140) => args6['nodes'][value140['sourceId']])['filter'](
+      (enabled33) => !!enabled33,
+    );
   }
-  function run16(value142, enabled43) {
-    if (!enabled43 || typeof enabled43 !== 'object') return false;
-    for (const [value143, value144] of Object.entries(enabled43)) {
-      if (value142?.[value143] !== value144) return true;
+  function run15(value141, enabled34) {
+    if (!enabled34 || typeof enabled34 !== 'object') return ![];
+    for (const [value142, value143] of Object['entries'](enabled34)) {
+      if (value141?.[value142] !== value143) return !![];
     }
-    return false;
+    return ![];
   }
-  function run17(list27, list28) {
-    if (list27 === list28) return true;
-    if (!Array.isArray(list27) || !Array.isArray(list28)) return false;
-    if (list27.length !== list28.length) return false;
-    for (let value145 = 0; value145 < list27.length; value145 += 1) {
-      if (!Object.is(list27[value145], list28[value145])) return false;
+  function run16(list22, list23) {
+    if (list22 === list23) return !![];
+    if (!Array['isArray'](list22) || !Array['isArray'](list23)) return ![];
+    if (list22['length'] !== list23['length']) return ![];
+    for (let value144 = 0x0; value144 < list22['length']; value144 += 0x1) {
+      if (!Object['is'](list22[value144], list23[value144])) return ![];
     }
-    return true;
+    return !![];
   }
-  function run18(enabled44, enabled45) {
-    if (enabled44 === enabled45) return true;
+  function run17(enabled35, enabled36) {
+    if (enabled35 === enabled36) return !![];
     if (
-      !enabled44 ||
-      !enabled45 ||
-      typeof enabled44 !== 'object' ||
-      typeof enabled45 !== 'object' ||
-      Array.isArray(enabled44) ||
-      Array.isArray(enabled45)
+      !enabled35 ||
+      !enabled36 ||
+      typeof enabled35 !== 'object' ||
+      typeof enabled36 !== 'object' ||
+      Array['isArray'](enabled35) ||
+      Array['isArray'](enabled36)
     )
-      return false;
-    const list29 = Object.keys(enabled44),
-      list30 = Object.keys(enabled45);
-    if (list29.length !== list30.length) return false;
-    for (const value146 of list29) {
-      if (!Object.prototype.hasOwnProperty.call(enabled45, value146)) return false;
-      const value147 = enabled44[value146],
-        value148 = enabled45[value146];
-      if (Array.isArray(value147) || Array.isArray(value148)) {
-        if (!run17(value147, value148)) return false;
+      return ![];
+    const list24 = Object['keys'](enabled35),
+      list25 = Object['keys'](enabled36);
+    if (list24['length'] !== list25['length']) return ![];
+    for (const value145 of list24) {
+      if (!Object['prototype']['hasOwnProperty']['call'](enabled36, value145)) return ![];
+      const value146 = enabled35[value145],
+        value147 = enabled36[value145];
+      if (Array['isArray'](value146) || Array['isArray'](value147)) {
+        if (!run16(value146, value147)) return ![];
       } else {
-        if (!Object.is(value147, value148)) return false;
+        if (!Object['is'](value146, value147)) return ![];
       }
     }
-    return true;
+    return !![];
   }
-  function setSelectionBox(args27) {
-    if (!args27 || typeof args27 !== 'object') return;
-    if (!run16(args6.selectionBox, args27)) return;
-    ((args6.selectionBox = { ...args6.selectionBox, ...args27 }), run4());
+  function setSelectionBox(args25) {
+    if (!args25 || typeof args25 !== 'object') return;
+    if (!run15(args6['selectionBox'], args25)) return;
+    ((args6['selectionBox'] = { ...args6['selectionBox'], ...args25 }), run3());
   }
-  function setSelectionMeta(value149) {
-    const args28 = value149 || {};
-    if (!run16(args6.selectionMeta, args28)) return;
-    ((args6.selectionMeta = { ...args6.selectionMeta, ...args28 }), run4());
+  function setSelectionMeta(value148) {
+    const args26 = value148 || {};
+    if (!run15(args6['selectionMeta'], args26)) return;
+    ((args6['selectionMeta'] = { ...args6['selectionMeta'], ...args26 }), run3());
   }
-  function setSelectedNodes(value150) {
-    const value151 = Array.from(value150 || []);
-    if (run17(args6.selectedNodeIds, value151)) return;
-    ((args6.selectedNodeIds = value151), run4());
+  function setSelectedNodes(value149) {
+    const value150 = Array['from'](value149 || []);
+    if (run16(args6['selectedNodeIds'], value150)) return;
+    ((args6['selectedNodeIds'] = value150), run3());
   }
   function clearSelection() {
-    const enabled46 = args6.selectionBox?.active === true,
-      enabled47 = Array.isArray(args6.selectedNodeIds) ? args6.selectedNodeIds.length > 0 : false,
-      enabled48 = args6.selectionMeta?.source != null;
-    if (!enabled46 && !enabled47 && !enabled48) return;
-    ((args6.selectionBox.active = false),
-      (args6.selectedNodeIds = []),
-      (args6.selectionMeta.source = null),
-      run4());
+    const enabled37 = args6['selectionBox']?.['active'] === !![],
+      enabled38 = Array['isArray'](args6['selectedNodeIds'])
+        ? args6['selectedNodeIds']['length'] > 0x0
+        : ![],
+      enabled39 = args6['selectionMeta']?.['source'] != null;
+    if (!enabled37 && !enabled38 && !enabled39) return;
+    ((args6['selectionBox']['active'] = ![]),
+      (args6['selectedNodeIds'] = []),
+      (args6['selectionMeta']['source'] = null),
+      run3());
   }
-  function showContextMenu(x4, y4, items) {
-    ((args6.contextMenu = { visible: true, x: x4, y: y4, items: items }), run4());
+  function showContextMenu(x5, y5, items) {
+    ((args6['contextMenu'] = { visible: !![], x: x5, y: y5, items: items }),
+      run3());
   }
   function hideContextMenu() {
-    ((args6.contextMenu = { visible: false, x: 0, y: 0, items: [] }), run4());
+    if (args6['contextMenu']?.['visible'] !== !![]) return;
+    ((args6['contextMenu'] = { visible: ![], x: 0x0, y: 0x0, items: [] }), run3());
   }
   function setConnOverlay({ srcId: srcId, invalidNodeIds: invalidNodeIds, hoverId: hoverId, side: side }) {
-    const value152 = {
-      srcId: srcId !== undefined ? srcId : args6.connOverlay.srcId,
+    const value151 = {
+      srcId: srcId !== undefined ? srcId : args6['connOverlay']['srcId'],
       invalidNodeIds:
         invalidNodeIds !== undefined
-          ? Array.isArray(invalidNodeIds)
+          ? Array['isArray'](invalidNodeIds)
             ? invalidNodeIds
             : []
-          : args6.connOverlay.invalidNodeIds,
-      hoverId: hoverId !== undefined ? hoverId : args6.connOverlay.hoverId,
-      side: side !== undefined ? side : args6.connOverlay.side,
+          : args6['connOverlay']['invalidNodeIds'],
+      hoverId: hoverId !== undefined ? hoverId : args6['connOverlay']['hoverId'],
+      side: side !== undefined ? side : args6['connOverlay']['side'],
     };
-    if (run18(args6.connOverlay, value152)) return;
-    ((args6.connOverlay = value152), run4());
+    if (run17(args6['connOverlay'], value151)) return;
+    ((args6['connOverlay'] = value151), run3());
   }
   function clearConnOverlay() {
-    const value153 = { srcId: null, invalidNodeIds: [], hoverId: null, side: null };
-    if (run18(args6.connOverlay, value153)) return;
-    ((args6.connOverlay = value153), run4());
+    const value152 = { srcId: null, invalidNodeIds: [], hoverId: null, side: null };
+    if (run17(args6['connOverlay'], value152)) return;
+    ((args6['connOverlay'] = value152), run3());
+  }
+  function serializeNode(value153) {
+    const value154 = args6['nodes']?.[value153];
+    return value154
+      ? sanitizeNodeForPersistence(cloneNodeSnapshot(value154, { stripRichText: !![] }))
+      : null;
   }
   function serialize() {
-    const nodes4 = Object.values(args6.nodes || {}).map((item16) =>
-        cloneNodeSnapshot(item16, { stripRichText: true }),
+    const nodes4 = Object['values'](args6['nodes'] || {})['map']((value155) =>
+        cloneNodeSnapshot(value155, { stripRichText: !![] }),
       ),
-      edges2 = Object.values(args6.edges || {}).map((item17) => cloneEdgeSnapshot(item17)),
-      value154 = {
+      edges2 = Object['values'](args6['edges'] || {})['map']((value156) =>
+        cloneEdgeSnapshot(value156),
+      ),
+      value157 = {
         nodes: nodes4,
         edges: edges2,
-        viewport: cloneViewportSnapshot(args6.viewport),
-        assets: Array.isArray(args6.assets) ? args6.assets.map((item18) => cloneAssetSnapshot(item18)) : [],
-        storyboard3dProjects: cloneStoryboard3DProjects(args6.storyboard3dProjects, deepClone),
+        viewport: viewport['strip'](args6['viewport']),
+        assets: Array['isArray'](args6['assets'])
+          ? args6['assets']['map']((value158) => cloneAssetSnapshot(value158))
+          : [],
+        storyboard3dProjects: cloneStoryboard3DProjects(args6['storyboard3dProjects'], deepClone),
       };
-    return sanitizeSerializedCanvasData(value154);
+    return sanitizeSerializedCanvasData(value157);
   }
-  function run19(enabled49, { preserveLiveGeneration: preserveLiveGeneration = false } = {}) {
-    if (!enabled49) return;
-    const hydratedAt2 = Date.now(),
-      featureSelections2 = args6.ui?.featureSelections || {};
-    enabled49.viewport && (args6.viewport = cloneViewportSnapshot(enabled49.viewport));
-    ((args6.nodes = {}), (args6._parentToChildren = {}));
-    let value155 = 0;
-    if (Array.isArray(enabled49.nodes))
-      enabled49.nodes.forEach((enabled50) => {
-        if (!enabled50 || typeof enabled50 !== 'object') return;
-        const cloneNodeSnapshot2 = cloneNodeSnapshot(enabled50, {
+  function run18(enabled40, { preserveLiveGeneration: preserveLiveGeneration = ![] } = {}) {
+    if (!enabled40) return;
+    map['clear']();
+    const hydratedAt2 = Date['now'](),
+      featureSelections2 = args6['ui']?.['featureSelections'] || {};
+    enabled40['viewport'] &&
+      (args6['viewport'] = viewport['attach'](cloneViewportSnapshot(enabled40['viewport'])));
+    ((args6['nodes'] = {}), (args6['_parentToChildren'] = {}));
+    let value159 = 0x0;
+    if (Array['isArray'](enabled40['nodes']))
+      enabled40['nodes']['forEach']((enabled41) => {
+        if (!enabled41 || typeof enabled41 !== 'object') return;
+        const cloneNodeSnapshot2 = cloneNodeSnapshot(enabled41, {
           hydratedAt: hydratedAt2,
           featureSelections: featureSelections2,
           preserveLiveGeneration: preserveLiveGeneration,
         });
-        ((args6.nodes[cloneNodeSnapshot2.id] = cloneNodeSnapshot2),
-          (value155 += 1),
-          cloneNodeSnapshot2.parentId && run10(cloneNodeSnapshot2.id, cloneNodeSnapshot2.parentId));
+        ((args6['nodes'][cloneNodeSnapshot2['id']] = cloneNodeSnapshot2),
+          (value159 += 0x1),
+          cloneNodeSnapshot2['parentId'] && run10(cloneNodeSnapshot2['id'], cloneNodeSnapshot2['parentId']));
       });
     else {
-      if (enabled49.nodes && typeof enabled49.nodes === 'object')
-        for (const [id3, args29] of Object.entries(enabled49.nodes)) {
-          if (!args29 || typeof args29 !== 'object') continue;
-          const cloneNodeSnapshot3 = cloneNodeSnapshot(args29.id ? args29 : { ...args29, id: id3 }, {
+      if (enabled40['nodes'] && typeof enabled40['nodes'] === 'object')
+        for (const [id4, args27] of Object['entries'](enabled40['nodes'])) {
+          if (!args27 || typeof args27 !== 'object') continue;
+          const cloneNodeSnapshot3 = cloneNodeSnapshot(args27['id'] ? args27 : { ...args27, id: id4 }, {
             hydratedAt: hydratedAt2,
             featureSelections: featureSelections2,
             preserveLiveGeneration: preserveLiveGeneration,
           });
-          ((args6.nodes[id3] = cloneNodeSnapshot3),
-            (value155 += 1),
-            cloneNodeSnapshot3.parentId && run10(id3, cloneNodeSnapshot3.parentId));
+          ((args6['nodes'][id4] = cloneNodeSnapshot3),
+            (value159 += 0x1),
+            cloneNodeSnapshot3['parentId'] && run10(id4, cloneNodeSnapshot3['parentId']));
         }
     }
-    args6._nodeCount = value155;
-    const value156 = {};
-    if (Array.isArray(enabled49.edges))
-      for (const enabled51 of enabled49.edges) {
-        if (!enabled51 || typeof enabled51 !== 'object') continue;
-        value156[enabled51.id] = cloneEdgeSnapshot(enabled51);
+    args6['_nodeCount'] = value159;
+    const value160 = {};
+    if (Array['isArray'](enabled40['edges']))
+      for (const enabled42 of enabled40['edges']) {
+        if (!enabled42 || typeof enabled42 !== 'object') continue;
+        value160[enabled42['id']] = cloneEdgeSnapshot(enabled42);
       }
     else {
-      if (enabled49.edges && typeof enabled49.edges === 'object')
-        for (const [value157, enabled52] of Object.entries(enabled49.edges)) {
-          if (!enabled52 || typeof enabled52 !== 'object') continue;
-          const cloneEdgeSnapshot2 = cloneEdgeSnapshot(enabled52);
-          if (cloneEdgeSnapshot2.id == null) cloneEdgeSnapshot2.id = value157;
-          value156[cloneEdgeSnapshot2.id] = cloneEdgeSnapshot2;
+      if (enabled40['edges'] && typeof enabled40['edges'] === 'object')
+        for (const [value161, enabled43] of Object['entries'](enabled40['edges'])) {
+          if (!enabled43 || typeof enabled43 !== 'object') continue;
+          const cloneEdgeSnapshot2 = cloneEdgeSnapshot(enabled43);
+          if (cloneEdgeSnapshot2['id'] == null) cloneEdgeSnapshot2['id'] = value161;
+          value160[cloneEdgeSnapshot2['id']] = cloneEdgeSnapshot2;
         }
     }
-    ((args6.edges = value156),
+    ((args6['edges'] = value160),
       run2(),
-      (args6.assets = Array.isArray(enabled49.assets)
-        ? enabled49.assets.map((item19) => cloneAssetSnapshot(item19))
+      (args6['assets'] = Array['isArray'](enabled40['assets'])
+        ? enabled40['assets']['map']((value162) => cloneAssetSnapshot(value162))
         : []),
-      (args6.storyboard3dProjects = cloneStoryboard3DProjects(enabled49.storyboard3dProjects, deepClone)),
-      subscribeNodeField.reload(),
+      (args6['storyboard3dProjects'] = cloneStoryboard3DProjects(
+        enabled40['storyboard3dProjects'],
+        deepClone,
+      )),
+      el['reload'](),
+      subscribeNodeField['reload'](),
       run(),
-      run4());
+      run3());
   }
-  function hydrateTrustedSnapshot(value158, value159 = {}) {
-    run19(value158, value159);
+  function hydrateTrustedSnapshot(value163, value164 = {}) {
+    run18(value163, value164);
   }
-  function hydrate(enabled53) {
-    if (!enabled53) return;
-    const deepClone4 = deepClone(enabled53);
-    run19(deepClone4);
+  function hydrate(enabled44) {
+    if (!enabled44) return;
+    const deepClone4 = deepClone(enabled44);
+    run18(deepClone4);
   }
   function setPickConnectMode({
     active: active3,
@@ -1455,423 +1427,486 @@ function createStore() {
     handleDirection: handleDirection = null,
     hoverNodeId: hoverNodeId = null,
   }) {
-    ((args6.pickConnectMode = {
+    ((args6['pickConnectMode'] = {
       active: active3,
       sourceNodeId: sourceNodeId,
       handleDirection: handleDirection,
       hoverNodeId: hoverNodeId,
     }),
-      run4());
+      run3());
   }
-  function setServerConnection(value160) {
-    if (args6.isServerConnected === value160) return;
-    ((args6.isServerConnected = value160), run4());
+  function setServerConnection(value165) {
+    if (args6['isServerConnected'] === value165) return;
+    ((args6['isServerConnected'] = value165), run3());
   }
   function setPickConnectHover(hoverNodeId2) {
-    if (!args6.pickConnectMode || !args6.pickConnectMode.active) return;
-    if (args6.pickConnectMode.hoverNodeId === hoverNodeId2) return;
-    ((args6.pickConnectMode = { ...args6.pickConnectMode, hoverNodeId: hoverNodeId2 }), run4());
+    if (!args6['pickConnectMode'] || !args6['pickConnectMode']['active']) return;
+    if (args6['pickConnectMode']['hoverNodeId'] === hoverNodeId2) return;
+    ((args6['pickConnectMode'] = { ...args6['pickConnectMode'], hoverNodeId: hoverNodeId2 }),
+      run3());
   }
-  function setAnnotateState(value161) {
-    const args30 = args6.annotate || {},
-      args31 = value161 || {};
-    if (!run16(args30, args31)) return;
-    const value162 = { ...args30, ...args31 };
-    ((args6.annotate = value162), run4());
+  function setAnnotateState(value166) {
+    const args28 = args6['annotate'] || {},
+      args29 = value166 || {};
+    if (!run15(args28, args29)) return;
+    const value167 = { ...args28, ...args29 };
+    ((args6['annotate'] = value167), run3());
   }
-  function setMattingState(value163) {
-    const args32 = args6.matting || {},
-      args33 = value163 || {};
-    if (!run16(args32, args33)) return;
-    const value164 = { ...args32, ...args33 };
-    ((args6.matting = value164), run4());
+  function setMattingState(value168) {
+    const args30 = args6['matting'] || {},
+      args31 = value168 || {};
+    if (!run15(args30, args31)) return;
+    const value169 = { ...args30, ...args31 };
+    ((args6['matting'] = value169), run3());
   }
-  function setVideoKeyingState(value165) {
-    const args34 = args6.videoKeying || {},
-      args35 = value165 || {};
-    if (!run16(args34, args35)) return;
-    const value166 = { ...args34, ...args35 };
-    ((args6.videoKeying = value166), run4());
+  function setVideoKeyingState(value170) {
+    const args32 = args6['videoKeying'] || {},
+      args33 = value170 || {};
+    if (!run15(args32, args33)) return;
+    const value171 = { ...args32, ...args33 };
+    ((args6['videoKeying'] = value171), run3());
   }
-  function setVideoClipState(value167) {
-    const args36 = args6.videoClip || {},
-      args37 = value167 || {};
-    if (!run16(args36, args37)) return;
-    const value168 = { ...args36, ...args37 };
-    ((args6.videoClip = value168), run4());
+  function setVideoClipState(value172) {
+    const args34 = args6['videoClip'] || {},
+      args35 = value172 || {};
+    if (!run15(args34, args35)) return;
+    const value173 = { ...args34, ...args35 };
+    ((args6['videoClip'] = value173), run3());
   }
-  function setTheme(value169) {
-    if (args6.theme === value169) return;
-    ((args6.theme = value169), run4());
+  function setTheme(value174) {
+    if (args6['theme'] === value174) return;
+    ((args6['theme'] = value174), run3());
   }
   function toggleTheme() {
-    const value170 = args6.theme === 'dark' ? 'light' : 'dark';
-    setTheme(value170);
+    const value175 = args6['theme'] === 'dark' ? 'light' : 'dark';
+    setTheme(value175);
   }
-  function initTheme(value171 = 'dark') {
-    const value172 = value171 === 'light' ? 'light' : 'dark';
-    args6.theme = value172;
+  function initTheme(value176 = 'dark') {
+    const value177 = value176 === 'light' ? 'light' : 'dark';
+    args6['theme'] = value177;
   }
   function initFeatureSelections(options3 = {}) {
-    if (!args6.ui) args6.ui = {};
-    args6.ui.featureSelections = sanitizeFeatureSelectionsRecord(options3);
+    if (!args6['ui']) args6['ui'] = {};
+    args6['ui']['featureSelections'] = sanitizeFeatureSelectionsRecord(options3);
   }
-  function getFeatureSelection(value173, value174, value175 = undefined) {
-    const enabled54 = String(value173 || '').trim(),
-      enabled55 = String(value174 || '').trim();
-    if (!enabled54 || !enabled55) return value175;
-    const value176 = args6.ui?.featureSelections?.[enabled54]?.[enabled55];
-    return value176 === undefined ? value175 : value176;
+  function getFeatureSelection(value178, value179, value180 = undefined) {
+    const enabled45 = String(value178 || '')['trim'](),
+      enabled46 = String(value179 || '')['trim']();
+    if (!enabled45 || !enabled46) return value180;
+    const value181 = args6['ui']?.['featureSelections']?.[enabled45]?.[enabled46];
+    return value181 === undefined ? value180 : value181;
   }
-  function setFeatureSelection(value177, value178, value179) {
-    const enabled56 = String(value177 || '').trim(),
-      enabled57 = String(value178 || '').trim();
-    if (!enabled56 || !enabled57) return;
-    if (!args6.ui) args6.ui = {};
-    (!args6.ui.featureSelections || typeof args6.ui.featureSelections !== 'object') &&
-      (args6.ui.featureSelections = {});
-    const args38 = args6.ui.featureSelections[enabled56] || {};
-    if (args38[enabled57] === value179) return;
-    ((args6.ui.featureSelections = {
-      ...args6.ui.featureSelections,
-      [enabled56]: { ...args38, [enabled57]: value179 },
+  function setFeatureSelection(value182, value183, value184) {
+    const enabled47 = String(value182 || '')['trim'](),
+      enabled48 = String(value183 || '')['trim']();
+    if (!enabled47 || !enabled48) return;
+    if (!args6['ui']) args6['ui'] = {};
+    (!args6['ui']['featureSelections'] || typeof args6['ui']['featureSelections'] !== 'object') &&
+      (args6['ui']['featureSelections'] = {});
+    const args36 = args6['ui']['featureSelections'][enabled47] || {};
+    if (args36[enabled48] === value184) return;
+    ((args6['ui']['featureSelections'] = {
+      ...args6['ui']['featureSelections'],
+      [enabled47]: { ...args36, [enabled48]: value184 },
     }),
-      run4());
+      run3());
   }
-  function run20(value180, value181) {
-    if (args6.ui && args6.ui[value180] === value181) return;
-    if (!args6.ui) args6.ui = {};
-    ((args6.ui[value180] = value181), run4());
+  function run19(value185, value186) {
+    if (args6['ui'] && args6['ui'][value185] === value186) return;
+    if (!args6['ui']) args6['ui'] = {};
+    ((args6['ui'][value185] = value186), run3());
   }
-  function setShowVideoMeta(value182) {
-    run20('showVideoMeta', value182 === true);
+  function setShowVideoMeta(value187) {
+    run19('showVideoMeta', value187 === !![]);
   }
-  function setTitleFollowsCanvasZoom(value183) {
-    run20('titleFollowsCanvasZoom', value183 === true);
+  function setShowSelectionMediaProperties(value188) {
+    run19('showSelectionMediaProperties', value188 !== ![]);
   }
-  function setPromptBoxResizeEnabled(value184) {
-    run20('promptBoxResizeEnabled', value184 !== false);
+  function setTitleFollowsCanvasZoom(value189) {
+    run19('titleFollowsCanvasZoom', value189 === !![]);
   }
-  function setPromptEnterBehavior(value185) {
-    run20('promptEnterBehavior', value185 === 'newline' ? 'newline' : 'submit');
+  function setPromptBoxResizeEnabled(value190) {
+    run19('promptBoxResizeEnabled', value190 !== ![]);
   }
-  function setPromptAttachmentButtonHidden(value186) {
-    run20('promptAttachmentButtonHidden', value186 === true);
+  function setPromptEnterBehavior(value191) {
+    run19('promptEnterBehavior', value191 === 'newline' ? 'newline' : 'submit');
   }
-  function setImageVideoNodeResizeEnabled(value187) {
-    run20('imageVideoNodeResizeEnabled', value187 === true);
+  function setPromptAttachmentButtonHidden(value192) {
+    run19('promptAttachmentButtonHidden', value192 === !![]);
   }
-  function run21(value188, value189, handler9, handler10) {
-    const value190 = handler9(value189);
-    if (!args6.ui) args6.ui = {};
-    if (handler10(args6.ui[value188]) === handler10(value190)) return;
-    ((args6.ui[value188] = value190), run4());
+  function setPromptPresetButtonHidden(value193) {
+    run19('promptPresetButtonHidden', value193 === !![]);
   }
-  function setImageToolbarLayout(value191) {
-    run21('imageToolbarLayout', value191, normalizeImageToolbarLayout, serializeImageToolbarLayout);
+  function setVideoAudioDefaultEnabled(value194) {
+    run19('videoAudioDefaultEnabled', value194 === !![]);
   }
-  function setVideoToolbarLayout(value192) {
-    run21('videoToolbarLayout', value192, normalizeVideoToolbarLayout, serializeVideoToolbarLayout);
+  function setCanvasToolbarPlacement(value195) {
+    run19('canvasToolbarPlacement', normalizeCanvasToolbarPlacement(value195));
   }
-  function setAlignFeatureEnabled(value193) {
-    const enabled58 = value193 !== false;
-    if (args6.ui && args6.ui.alignFeatureEnabled === enabled58) return;
-    if (!args6.ui) args6.ui = {};
-    args6.ui.alignFeatureEnabled = enabled58;
-    if (!enabled58)
-      ((args6.ui.alignFeatureTriggerMode = 'off'),
-        (args6.ui.alignPanelVisible = false),
-        (args6.ui.alignPanelAnchorWorld = null));
-    else args6.ui.alignFeatureTriggerMode === 'off' && (args6.ui.alignFeatureTriggerMode = 'click');
-    run4();
+  function setNodeManagerPlacement(value196) {
+    run19('nodeManagerPlacement', normalizeNodeManagerPlacement(value196));
   }
-  function setAlignFeatureTriggerMode(value194) {
-    const value195 = value194 === 'hold' || value194 === 'click' || value194 === 'off' ? value194 : 'click';
-    if (!args6.ui) args6.ui = {};
-    if (args6.ui.alignFeatureTriggerMode === value195) return;
-    ((args6.ui.alignFeatureTriggerMode = value195),
-      (args6.ui.alignFeatureEnabled = value195 !== 'off'),
-      value195 === 'off' && ((args6.ui.alignPanelVisible = false), (args6.ui.alignPanelAnchorWorld = null)),
-      run4());
+  function setLeftSidebarAutoHideEnabled(value197) {
+    run19('leftSidebarAutoHideEnabled', value197 === !![]);
   }
-  function setAlignDistributeGap(value196) {
-    const value197 = Number(value196),
-      value198 = Number.isFinite(value197) ? Math.max(0, Math.min(200, Math.round(value197))) : 40;
-    if (args6.ui && args6.ui.alignDistributeGap === value198) return;
-    if (!args6.ui) args6.ui = {};
-    ((args6.ui.alignDistributeGap = value198), run4());
+  function setBottomLeftBarAutoHideEnabled(value198) {
+    run19('bottomLeftBarAutoHideEnabled', value198 === !![]);
   }
-  function setAlignPanelVisible(value199) {
-    const enabled59 = value199 === true;
-    if (!args6.ui) args6.ui = {};
-    if (!enabled59) {
-      const enabled60 = !!args6.ui.alignPanelAnchorWorld;
-      if (args6.ui.alignPanelVisible === enabled59 && !enabled60) return;
-      ((args6.ui.alignPanelVisible = false), (args6.ui.alignPanelAnchorWorld = null), run4());
+  function setImageVideoNodeResizeEnabled(value199) {
+    run19('imageVideoNodeResizeEnabled', value199 === !![]);
+  }
+  function run20(value200, value201, handler9, handler10) {
+    const value202 = handler9(value201);
+    if (!args6['ui']) args6['ui'] = {};
+    if (handler10(args6['ui'][value200]) === handler10(value202)) return;
+    ((args6['ui'][value200] = value202), run3());
+  }
+  function setImageToolbarLayout(value203) {
+    run20('imageToolbarLayout', value203, normalizeImageToolbarLayout, serializeImageToolbarLayout);
+  }
+  function setVideoToolbarLayout(value204) {
+    run20('videoToolbarLayout', value204, normalizeVideoToolbarLayout, serializeVideoToolbarLayout);
+  }
+  function setAlignFeatureEnabled(value205) {
+    const enabled49 = value205 !== ![];
+    if (args6['ui'] && args6['ui']['alignFeatureEnabled'] === enabled49) return;
+    if (!args6['ui']) args6['ui'] = {};
+    args6['ui']['alignFeatureEnabled'] = enabled49;
+    if (!enabled49)
+      ((args6['ui']['alignFeatureTriggerMode'] = 'off'),
+        (args6['ui']['alignPanelVisible'] = ![]),
+        (args6['ui']['alignPanelAnchorWorld'] = null));
+    else
+      args6['ui']['alignFeatureTriggerMode'] === 'off' &&
+        (args6['ui']['alignFeatureTriggerMode'] = 'click');
+    run3();
+  }
+  function setAlignFeatureTriggerMode(value206) {
+    const value207 =
+      value206 === 'hold' || value206 === 'click' || value206 === 'off' ? value206 : 'click';
+    if (!args6['ui']) args6['ui'] = {};
+    if (args6['ui']['alignFeatureTriggerMode'] === value207) return;
+    ((args6['ui']['alignFeatureTriggerMode'] = value207),
+      (args6['ui']['alignFeatureEnabled'] = value207 !== 'off'),
+      value207 === 'off' &&
+        ((args6['ui']['alignPanelVisible'] = ![]), (args6['ui']['alignPanelAnchorWorld'] = null)),
+      run3());
+  }
+  function setAlignDistributeGap(value208) {
+    const value209 = Number(value208),
+      value210 = Number['isFinite'](value209)
+        ? Math['max'](0x0, Math['min'](0xc8, Math['round'](value209)))
+        : 0x28;
+    if (args6['ui'] && args6['ui']['alignDistributeGap'] === value210) return;
+    if (!args6['ui']) args6['ui'] = {};
+    ((args6['ui']['alignDistributeGap'] = value210), run3());
+  }
+  function setAlignPanelVisible(value211) {
+    const enabled50 = value211 === !![];
+    if (!args6['ui']) args6['ui'] = {};
+    if (!enabled50) {
+      const enabled51 = !!args6['ui']['alignPanelAnchorWorld'];
+      if (args6['ui']['alignPanelVisible'] === enabled50 && !enabled51) return;
+      ((args6['ui']['alignPanelVisible'] = ![]),
+        (args6['ui']['alignPanelAnchorWorld'] = null),
+        run3());
       return;
     }
-    if (args6.ui.alignPanelVisible === enabled59) return;
-    ((args6.ui.alignPanelVisible = enabled59), run4());
+    if (args6['ui']['alignPanelVisible'] === enabled50) return;
+    ((args6['ui']['alignPanelVisible'] = enabled50), run3());
   }
-  function setAlignPanelAnchorWorld(box4) {
-    if (!args6.ui) args6.ui = {};
-    let box5 = null;
-    box4 &&
-      Number.isFinite(box4.x) &&
-      Number.isFinite(box4.y) &&
-      (box5 = { x: Number(box4.x), y: Number(box4.y) });
-    const box6 = args6.ui.alignPanelAnchorWorld,
-      value200 =
-        (!box6 && !box5) ||
-        (box6 && box5 && Number(box6.x) === Number(box5.x) && Number(box6.y) === Number(box5.y));
-    if (value200) return;
-    ((args6.ui.alignPanelAnchorWorld = box5), run4());
+  function setAlignPanelAnchorWorld(box3) {
+    if (!args6['ui']) args6['ui'] = {};
+    let box4 = null;
+    box3 &&
+      Number['isFinite'](box3['x']) &&
+      Number['isFinite'](box3['y']) &&
+      (box4 = { x: Number(box3['x']), y: Number(box3['y']) });
+    const box5 = args6['ui']['alignPanelAnchorWorld'],
+      value212 =
+        (!box5 && !box4) ||
+        (box5 &&
+          box4 &&
+          Number(box5['x']) === Number(box4['x']) &&
+          Number(box5['y']) === Number(box4['y']));
+    if (value212) return;
+    ((args6['ui']['alignPanelAnchorWorld'] = box4), run3());
   }
-  function setSnapGuidesEnabled(value201) {
-    const value202 = value201 !== false;
-    if (args6.ui && args6.ui.snapGuidesEnabled === value202) return;
-    if (!args6.ui) args6.ui = {};
-    ((args6.ui.snapGuidesEnabled = value202), run4());
+  function setSnapGuidesEnabled(value213) {
+    const value214 = value213 !== ![];
+    if (args6['ui'] && args6['ui']['snapGuidesEnabled'] === value214) return;
+    if (!args6['ui']) args6['ui'] = {};
+    ((args6['ui']['snapGuidesEnabled'] = value214), run3());
   }
-  function setSelectionRelatedHighlightEnabled(value203) {
-    const value204 = value203 !== false;
-    if (args6.ui && args6.ui.selectionRelatedHighlightEnabled === value204) return;
-    if (!args6.ui) args6.ui = {};
-    ((args6.ui.selectionRelatedHighlightEnabled = value204), run4());
+  function setSelectionRelatedHighlightEnabled(value215) {
+    const value216 = value215 !== ![];
+    if (args6['ui'] && args6['ui']['selectionRelatedHighlightEnabled'] === value216) return;
+    if (!args6['ui']) args6['ui'] = {};
+    ((args6['ui']['selectionRelatedHighlightEnabled'] = value216), run3());
   }
-  function run22(value205) {
-    const value206 = String(value205 || '').trim();
-    return ['white', 'blue', 'green', 'cyan', 'purple', 'red', 'yellow'].includes(value206)
-      ? value206
+  function run21(value217) {
+    const value218 = String(value217 || '')['trim']();
+    return ['white', 'blue', 'green', 'cyan', 'purple', 'red', 'yellow']['includes'](value218)
+      ? value218
       : 'white';
   }
-  function setSelectionRelatedHighlightColor(value207) {
-    const value208 = run22(value207);
-    if (args6.ui && args6.ui.selectionRelatedHighlightColor === value208) return;
-    if (!args6.ui) args6.ui = {};
-    ((args6.ui.selectionRelatedHighlightColor = value208), run4());
+  function setSelectionRelatedHighlightColor(value219) {
+    const value220 = run21(value219);
+    if (args6['ui'] && args6['ui']['selectionRelatedHighlightColor'] === value220) return;
+    if (!args6['ui']) args6['ui'] = {};
+    ((args6['ui']['selectionRelatedHighlightColor'] = value220), run3());
   }
-  function setConnectionLinesVisible(value209) {
-    const value210 = value209 !== false;
-    if (args6.ui && args6.ui.connectionLinesVisible === value210) return;
-    if (!args6.ui) args6.ui = {};
-    ((args6.ui.connectionLinesVisible = value210), run4());
+  function setConnectionLinesVisible(value221) {
+    const value222 = value221 !== ![];
+    if (args6['ui'] && args6['ui']['connectionLinesVisible'] === value222) return;
+    if (!args6['ui']) args6['ui'] = {};
+    ((args6['ui']['connectionLinesVisible'] = value222), run3());
+  }
+  function setConnectionLineStyle(value223) {
+    const connectionLineStyle = normalizeConnectionLineStyle(value223);
+    if (args6['ui'] && args6['ui']['connectionLineStyle'] === connectionLineStyle) return;
+    if (!args6['ui']) args6['ui'] = {};
+    ((args6['ui']['connectionLineStyle'] = connectionLineStyle), run3());
   }
   function initUiPrefs(options4 = {}) {
-    const value211 = options4?.showVideoMeta === true,
-      value212 = options4?.titleFollowsCanvasZoom === true,
-      value213 = options4?.promptBoxResizeEnabled !== false,
-      value214 = options4?.promptAttachmentButtonHidden === true,
-      value215 = options4?.imageVideoNodeResizeEnabled === true,
-      value216 = options4?.selectionRelatedHighlightEnabled !== false,
-      value217 = run22(options4?.selectionRelatedHighlightColor),
-      value218 = options4?.connectionLinesVisible !== false,
-      value219 = String(options4?.alignFeatureTriggerMode || '').trim(),
-      value220 =
-        value219 === 'hold' || value219 === 'click' || value219 === 'off'
-          ? value219
-          : options4?.alignFeatureEnabled === false
+    const value224 = options4?.['showSelectionMediaProperties'] !== ![],
+      value225 = options4?.['titleFollowsCanvasZoom'] === !![],
+      value226 = options4?.['promptBoxResizeEnabled'] !== ![],
+      value227 = options4?.['promptAttachmentButtonHidden'] === !![],
+      value228 = options4?.['imageVideoNodeResizeEnabled'] === !![],
+      value229 = options4?.['selectionRelatedHighlightEnabled'] !== ![],
+      value230 = run21(options4?.['selectionRelatedHighlightColor']),
+      value231 = options4?.['connectionLinesVisible'] !== ![],
+      connectionLineStyle2 = normalizeConnectionLineStyle(options4?.['connectionLineStyle']),
+      value232 = String(options4?.['alignFeatureTriggerMode'] || '')['trim'](),
+      value233 =
+        value232 === 'hold' || value232 === 'click' || value232 === 'off'
+          ? value232
+          : options4?.['alignFeatureEnabled'] === ![]
             ? 'off'
             : 'click',
-      value221 = options4?.alignFeatureEnabled === false ? false : value220 !== 'off',
-      value222 = Number(options4?.alignDistributeGap),
-      value223 = Number.isFinite(value222) ? Math.max(0, Math.min(200, Math.round(value222))) : 40,
-      value224 = options4?.snapGuidesEnabled !== false;
-    if (!args6.ui) args6.ui = {};
-    ((args6.ui.showVideoMeta = value211),
-      (args6.ui.titleFollowsCanvasZoom = value212),
-      (args6.ui.promptBoxResizeEnabled = value213),
-      (args6.ui.promptEnterBehavior = options4?.promptEnterBehavior === 'newline' ? 'newline' : 'submit'),
-      (args6.ui.promptAttachmentButtonHidden = value214),
-      (args6.ui.imageVideoNodeResizeEnabled = value215),
-      (args6.ui.imageToolbarLayout = normalizeImageToolbarLayout(options4?.imageToolbarLayout)),
-      (args6.ui.videoToolbarLayout = normalizeVideoToolbarLayout(options4?.videoToolbarLayout)),
-      (args6.ui.selectionRelatedHighlightEnabled = value216),
-      (args6.ui.selectionRelatedHighlightColor = value217),
-      (args6.ui.connectionLinesVisible = value218),
-      (args6.ui.alignFeatureEnabled = value221),
-      (args6.ui.alignFeatureTriggerMode = value220),
-      (args6.ui.alignDistributeGap = value223),
-      (args6.ui.alignPanelVisible = false),
-      (args6.ui.alignPanelAnchorWorld = null),
-      (args6.ui.snapGuidesEnabled = value224),
-      initFeatureSelections(options4?.featureSelections || {}),
-      run4());
+      value234 = options4?.['alignFeatureEnabled'] === ![] ? ![] : value233 !== 'off',
+      value235 = Number(options4?.['alignDistributeGap']),
+      value236 = Number['isFinite'](value235)
+        ? Math['max'](0x0, Math['min'](0xc8, Math['round'](value235)))
+        : 0x28,
+      value237 = options4?.['snapGuidesEnabled'] !== ![];
+    if (!args6['ui']) args6['ui'] = {};
+    ((args6['ui']['showVideoMeta'] = ![]),
+      (args6['ui']['showSelectionMediaProperties'] = value224),
+      (args6['ui']['titleFollowsCanvasZoom'] = value225),
+      (args6['ui']['promptBoxResizeEnabled'] = value226),
+      (args6['ui']['promptEnterBehavior'] =
+        options4?.['promptEnterBehavior'] === 'newline' ? 'newline' : 'submit'),
+      (args6['ui']['promptAttachmentButtonHidden'] = value227),
+      (args6['ui']['promptPresetButtonHidden'] = options4?.['promptPresetButtonHidden'] === !![]),
+      (args6['ui']['videoAudioDefaultEnabled'] = options4?.['videoAudioDefaultEnabled'] === !![]),
+      (args6['ui']['canvasToolbarPlacement'] = normalizeCanvasToolbarPlacement(
+        options4?.['canvasToolbarPlacement'],
+      )),
+      (args6['ui']['nodeManagerPlacement'] = normalizeNodeManagerPlacement(
+        options4?.['nodeManagerPlacement'],
+      )),
+      (args6['ui']['leftSidebarAutoHideEnabled'] = options4?.['leftSidebarAutoHideEnabled'] === !![]),
+      (args6['ui']['bottomLeftBarAutoHideEnabled'] =
+        options4?.['bottomLeftBarAutoHideEnabled'] === !![]),
+      (args6['ui']['imageVideoNodeResizeEnabled'] = value228),
+      (args6['ui']['imageToolbarLayout'] = normalizeImageToolbarLayout(
+        options4?.['imageToolbarLayout'],
+      )),
+      (args6['ui']['videoToolbarLayout'] = normalizeVideoToolbarLayout(
+        options4?.['videoToolbarLayout'],
+      )),
+      (args6['ui']['selectionRelatedHighlightEnabled'] = value229),
+      (args6['ui']['selectionRelatedHighlightColor'] = value230),
+      (args6['ui']['connectionLinesVisible'] = value231),
+      (args6['ui']['connectionLineStyle'] = connectionLineStyle2),
+      (args6['ui']['alignFeatureEnabled'] = value234),
+      (args6['ui']['alignFeatureTriggerMode'] = value233),
+      (args6['ui']['alignDistributeGap'] = value236),
+      (args6['ui']['alignPanelVisible'] = ![]),
+      (args6['ui']['alignPanelAnchorWorld'] = null),
+      (args6['ui']['snapGuidesEnabled'] = value237),
+      initFeatureSelections(options4?.['featureSelections'] || {}),
+      run3());
   }
-  function setSubscriptionState(value225) {
-    const args39 = args6.subscription || {};
-    ((args6.subscription = { ...args39, ...(value225 || {}) }), run4());
+  function run22(value238, value239) {
+    const args37 = args6[value238] || {};
+    ((args6[value238] = { ...args37, ...(value239 || {}) }), run3());
   }
-  function setModelCatalogState(value226) {
-    const args40 = args6.modelCatalog || {};
-    ((args6.modelCatalog = { ...args40, ...(value226 || {}) }), run4());
+  const setSubscriptionState = (value240) => run22('subscription', value240),
+    setModelCatalogState = (value241) => run22('modelCatalog', value241),
+    { upsertStoryboard3DProject: upsertStoryboard3DProject, deleteStoryboard3DProject: deleteStoryboard3DProject } =
+      createStoryboard3DProjectActions({
+        readProjects: () => args6['storyboard3dProjects'],
+        writeProjects: (value242) => {
+          ((args6['storyboard3dProjects'] = value242), run(), run3());
+        },
+        clone: deepClone,
+      });
+  function addAsset(enabled52) {
+    if (!enabled52 || !enabled52['id']) throw new Error('[store] addAsset() 需要提供含有 id 字段的资产数据');
+    const value243 = JSON['parse'](JSON['stringify'](enabled52));
+    if (!args6['assets']) args6['assets'] = [];
+    (args6['assets']['unshift'](value243), run(), run3());
   }
-  const {
-    upsertStoryboard3DProject: upsertStoryboard3DProject,
-    deleteStoryboard3DProject: deleteStoryboard3DProject,
-  } = createStoryboard3DProjectActions({
-    readProjects: () => args6.storyboard3dProjects,
-    writeProjects: (value227) => {
-      args6.storyboard3dProjects = value227;
-      run();
-      run4();
-    },
-    clone: deepClone,
-  });
-  function addAsset(enabled61) {
-    if (!enabled61 || !enabled61.id) throw new Error('[store] addAsset() 需要提供含有 id 字段的资产数据');
-    const value228 = JSON.parse(JSON.stringify(enabled61));
-    if (!args6.assets) args6.assets = [];
-    (args6.assets.unshift(value228), run(), run4());
+  function deleteAsset(value244) {
+    if (!args6['assets']) return;
+    const value245 = args6['assets']['length'];
+    ((args6['assets'] = args6['assets']['filter']((value246) => value246['id'] !== value244)),
+      args6['assets']['length'] !== value245 && (run(), run3()));
   }
-  function deleteAsset(value229) {
-    if (!args6.assets) return;
-    const value230 = args6.assets.length;
-    ((args6.assets = args6.assets.filter((item20) => item20.id !== value229)),
-      args6.assets.length !== value230 && (run(), run4()));
-  }
-  function updateAsset(value231, args41) {
-    if (!args6.assets) return;
-    const value232 = args6.assets.findIndex((item21) => item21.id === value231);
-    if (value232 !== -1) {
-      const args42 = args6.assets[value232],
-        value233 = { ...args42, ...args41 };
-      if (shallowEqual(args42, value233)) return;
-      ((args6.assets[value232] = value233), run(), run4());
+  function updateAsset(value247, args38) {
+    if (!args6['assets']) return;
+    const value248 = args6['assets']['findIndex']((value249) => value249['id'] === value247);
+    if (value248 !== -0x1) {
+      const args39 = args6['assets'][value248],
+        value250 = { ...args39, ...args38 };
+      if (shallowEqual(args39, value250)) return;
+      ((args6['assets'][value248] = value250), run(), run3());
     }
   }
   function run23() {
-    ((!args6.workflows || typeof args6.workflows !== 'object') &&
-      (args6.workflows = { items: [], loading: false, error: null, loadedAt: 0 }),
-      !Array.isArray(args6.workflows.items) && (args6.workflows.items = []),
-      (!args6.workflowUi || typeof args6.workflowUi !== 'object') &&
-        (args6.workflowUi = createInitialWorkflowUiState()));
+    ((!args6['workflows'] || typeof args6['workflows'] !== 'object') &&
+      (args6['workflows'] = { items: [], loading: ![], error: null, loadedAt: 0x0 }),
+      !Array['isArray'](args6['workflows']['items']) && (args6['workflows']['items'] = []),
+      (!args6['workflowUi'] || typeof args6['workflowUi'] !== 'object') &&
+        (args6['workflowUi'] = createInitialWorkflowUiState()));
   }
   function setWorkflowsLoading(loading, error3 = null) {
     (run23(),
-      (args6.workflows = {
-        ...args6.workflows,
-        loading: loading === true,
+      (args6['workflows'] = {
+        ...args6['workflows'],
+        loading: loading === !![],
         error: error3 == null ? null : String(error3),
       }),
-      run4());
+      run3());
   }
-  function setWorkflows(list31) {
+  function setWorkflows(list26) {
     (run23(),
-      (args6.workflows = {
-        ...args6.workflows,
-        items: Array.isArray(list31) ? list31.map((item22) => cloneWorkflowSnapshot(item22)) : [],
-        loading: false,
+      (args6['workflows'] = {
+        ...args6['workflows'],
+        items: Array['isArray'](list26)
+          ? list26['map']((value251) => cloneWorkflowSnapshot(value251))
+          : [],
+        loading: ![],
         error: null,
-        loadedAt: Date.now(),
+        loadedAt: Date['now'](),
       }),
-      run4());
+      run3());
   }
-  function upsertWorkflow(enabled62) {
-    if (!enabled62 || !enabled62.id) return;
+  function upsertWorkflow(enabled53) {
+    if (!enabled53 || !enabled53['id']) return;
     run23();
-    const args43 = cloneWorkflowSnapshot(enabled62),
-      count8 = args6.workflows.items.findIndex((item23) => item23?.id === args43.id);
-    (count8 >= 0
-      ? (args6.workflows.items[count8] = { ...args6.workflows.items[count8], ...args43 })
-      : args6.workflows.items.unshift(args43),
-      run4());
+    const args40 = cloneWorkflowSnapshot(enabled53),
+      count6 = args6['workflows']['items']['findIndex'](
+        (value252) => value252?.['id'] === args40['id'],
+      );
+    (count6 >= 0x0
+      ? (args6['workflows']['items'][count6] = {
+          ...args6['workflows']['items'][count6],
+          ...args40,
+        })
+      : args6['workflows']['items']['unshift'](args40),
+      run3());
   }
-  function updateWorkflowLocal(value234, enabled63) {
-    const enabled64 = String(value234 || '').trim();
-    if (!enabled64 || !enabled63 || typeof enabled63 !== 'object') return;
+  function updateWorkflowLocal(value253, enabled54) {
+    const enabled55 = String(value253 || '')['trim']();
+    if (!enabled55 || !enabled54 || typeof enabled54 !== 'object') return;
     run23();
-    const count9 = args6.workflows.items.findIndex((item24) => item24?.id === enabled64);
-    if (count9 < 0) return;
-    ((args6.workflows.items[count9] = {
-      ...args6.workflows.items[count9],
-      ...cloneWorkflowSnapshot(enabled63),
+    const count7 = args6['workflows']['items']['findIndex'](
+      (value254) => value254?.['id'] === enabled55,
+    );
+    if (count7 < 0x0) return;
+    ((args6['workflows']['items'][count7] = {
+      ...args6['workflows']['items'][count7],
+      ...cloneWorkflowSnapshot(enabled54),
     }),
-      run4());
+      run3());
   }
-  function markWorkflowUsed(value235, lastUsedAt = Date.now()) {
-    updateWorkflowLocal(value235, { lastUsedAt: lastUsedAt });
+  function markWorkflowUsed(value255, lastUsedAt = Date['now']()) {
+    updateWorkflowLocal(value255, { lastUsedAt: lastUsedAt });
   }
-  function setWorkflowUi(enabled65) {
-    if (!enabled65 || typeof enabled65 !== 'object') return;
+  function setWorkflowUi(enabled56) {
+    if (!enabled56 || typeof enabled56 !== 'object') return;
     run23();
-    const args44 = { ...args6.workflowUi };
-    for (const [value236, value237] of Object.entries(enabled65)) {
-      value236 === 'draft' && value237 && typeof value237 === 'object'
-        ? (args44.draft = { ...args44.draft, ...cloneWorkflowSnapshot(value237) })
-        : (args44[value236] = cloneWorkflowSnapshot(value237));
+    const args41 = { ...args6['workflowUi'] };
+    for (const [value256, value257] of Object['entries'](enabled56)) {
+      value256 === 'draft' && value257 && typeof value257 === 'object'
+        ? (args41['draft'] = { ...args41['draft'], ...cloneWorkflowSnapshot(value257) })
+        : (args41[value256] = cloneWorkflowSnapshot(value257));
     }
-    ((args6.workflowUi = args44), run4());
+    ((args6['workflowUi'] = args41), run3());
   }
-  function setWorkflowDraft(enabled66) {
-    if (!enabled66 || typeof enabled66 !== 'object') return;
+  function setWorkflowDraft(enabled57) {
+    if (!enabled57 || typeof enabled57 !== 'object') return;
     (run23(),
-      (args6.workflowUi = {
-        ...args6.workflowUi,
+      (args6['workflowUi'] = {
+        ...args6['workflowUi'],
         draft: {
-          ...(args6.workflowUi.draft || createInitialWorkflowDraftState()),
-          ...cloneWorkflowSnapshot(enabled66),
+          ...(args6['workflowUi']['draft'] || createInitialWorkflowDraftState()),
+          ...cloneWorkflowSnapshot(enabled57),
         },
       }),
-      run4());
+      run3());
   }
   function resetWorkflowDraft(options5 = {}) {
     (run23(),
-      (args6.workflowUi = {
-        ...args6.workflowUi,
+      (args6['workflowUi'] = {
+        ...args6['workflowUi'],
         draft: { ...createInitialWorkflowDraftState(), ...cloneWorkflowSnapshot(options5) },
         tagDraft: '',
-        updateConfirmOpen: false,
+        updateConfirmOpen: ![],
         error: null,
       }),
-      run4());
+      run3());
   }
   function openWorkflowModal({ tab: tab = 'create', sourceGroupId: sourceGroupId = null } = {}) {
     (run23(),
-      (args6.workflowUi = {
-        ...args6.workflowUi,
-        modalOpen: true,
+      (args6['workflowUi'] = {
+        ...args6['workflowUi'],
+        modalOpen: !![],
         modalTab: tab === 'update' ? 'update' : 'create',
-        sourceGroupId: sourceGroupId == null ? null : String(sourceGroupId || '').trim() || null,
+        sourceGroupId: sourceGroupId == null ? null : String(sourceGroupId || '')['trim']() || null,
         draft: createInitialWorkflowDraftState(),
         tagDraft: '',
         updateTargetId: null,
         updateSearchKeyword: '',
-        updateConfirmOpen: false,
-        saving: false,
+        updateConfirmOpen: ![],
+        saving: ![],
         error: null,
       }),
-      run4());
+      run3());
   }
   function closeWorkflowModal() {
     (run23(),
-      (args6.workflowUi = {
-        ...args6.workflowUi,
-        modalOpen: false,
+      (args6['workflowUi'] = {
+        ...args6['workflowUi'],
+        modalOpen: ![],
         modalTab: 'create',
         sourceGroupId: null,
         draft: createInitialWorkflowDraftState(),
         tagDraft: '',
         updateTargetId: null,
         updateSearchKeyword: '',
-        updateConfirmOpen: false,
-        saving: false,
+        updateConfirmOpen: ![],
+        saving: ![],
         error: null,
       }),
-      run4());
+      run3());
   }
   function setWorkflowSaving(saving) {
-    setWorkflowUi({ saving: saving === true });
+    setWorkflowUi({ saving: saving === !![] });
   }
-  function setWorkflowApplying(value238) {
-    const applyingWorkflowId = value238 == null ? null : String(value238);
+  function setWorkflowApplying(value258) {
+    const applyingWorkflowId = value258 == null ? null : String(value258);
     setWorkflowUi({ applyingWorkflowId: applyingWorkflowId || null });
   }
   return {
     subscribe: subscribe,
     subscribeRaw: subscribeRaw,
     subscribeSelector: subscribeSelector,
-    subscribeNodeField: subscribeNodeField.subscribe,
+    subscribeNodeField: subscribeNodeField['subscribe'],
     batch: batch,
     requestRender: requestRender,
     invalidateUi: invalidateUi,
@@ -1887,6 +1922,7 @@ function createStore() {
     removeEdge: removeEdge,
     updateEdgesBatch: updateEdgesBatch,
     updateViewport: updateViewport,
+    setViewportScreenOrigin: setViewportScreenOrigin,
     setViewportPersistPolicy: setViewportPersistPolicy,
     markViewportPersist: markViewportPersist,
     showPicker: showPicker,
@@ -1922,10 +1958,17 @@ function createStore() {
     getFeatureSelection: getFeatureSelection,
     initFeatureSelections: initFeatureSelections,
     setShowVideoMeta: setShowVideoMeta,
+    setShowSelectionMediaProperties: setShowSelectionMediaProperties,
     setTitleFollowsCanvasZoom: setTitleFollowsCanvasZoom,
     setPromptBoxResizeEnabled: setPromptBoxResizeEnabled,
     setPromptEnterBehavior: setPromptEnterBehavior,
     setPromptAttachmentButtonHidden: setPromptAttachmentButtonHidden,
+    setPromptPresetButtonHidden: setPromptPresetButtonHidden,
+    setVideoAudioDefaultEnabled: setVideoAudioDefaultEnabled,
+    setCanvasToolbarPlacement: setCanvasToolbarPlacement,
+    setNodeManagerPlacement: setNodeManagerPlacement,
+    setLeftSidebarAutoHideEnabled: setLeftSidebarAutoHideEnabled,
+    setBottomLeftBarAutoHideEnabled: setBottomLeftBarAutoHideEnabled,
     setImageVideoNodeResizeEnabled: setImageVideoNodeResizeEnabled,
     setImageToolbarLayout: setImageToolbarLayout,
     setVideoToolbarLayout: setVideoToolbarLayout,
@@ -1938,6 +1981,7 @@ function createStore() {
     setSelectionRelatedHighlightEnabled: setSelectionRelatedHighlightEnabled,
     setSelectionRelatedHighlightColor: setSelectionRelatedHighlightColor,
     setConnectionLinesVisible: setConnectionLinesVisible,
+    setConnectionLineStyle: setConnectionLineStyle,
     setSubscriptionState: setSubscriptionState,
     setModelCatalogState: setModelCatalogState,
     initUiPrefs: initUiPrefs,
@@ -1959,6 +2003,7 @@ function createStore() {
     setWorkflowSaving: setWorkflowSaving,
     setWorkflowApplying: setWorkflowApplying,
     serialize: serialize,
+    serializeNode: serializeNode,
     hydrate: hydrate,
     hydrateTrustedSnapshot: hydrateTrustedSnapshot,
   };

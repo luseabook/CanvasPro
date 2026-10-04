@@ -1,12 +1,12 @@
 # 孤立模块清单（已落地但从入口不可达）
 
-> 由 `docs/TRACKING.md` 维护。**本表是 2026-09-28 第 126 批的实测结果**（第 150 批接线后删 9 件、重算 474 / 1238），不再是按批次累加的估算：
+> 由 `docs/TRACKING.md` 维护。**本表是 2026-09-28 第 126 批的实测结果**（第 150/151 批接线后删 10 件、重算 473 / 1238），不再是按批次累加的估算：
 > 从 `index.html` 的 `<script type="module">`、`package.json` 的 `main`（`electron/main.js`）、以及按运行期加载约定补的入口（`electron/*preload*.cjs`、`db/migrations/*.cjs`、`knexfile.cjs`、`main.js`）出发，
 > 沿相对 `import` / `export … from` / 动态 `import()` / `new URL("…js", import.meta.url)` 做全图遍历，走不到的非测试 JS 模块都列在这里。
 > 脚本与证据：`deobf-tools/b126/reach.mjs`、`reach-report.txt`、`reach-orphans.json`；方法说明见 `docs/b126-reachability.md`。
 
 > scope：**1238** 个非测试 JS 模块（`src/`、`api/`、`electron/`、`db/` 加根级 `*.js`/`*.cjs`；排除 `*.test.js` / `*_test.js` / `*.spec.js`、`node_modules/`、`deobfuscated/`、`vendor/`、`user/`、`data/`、`output/`、`build/`、`dist/`、`tools/`、`backend/`）。
-> 可达 **764** / 孤立 **474** / 断链 **0** / 解析失败 **0**（断链为 0 说明整个仓库的相对 import 都能解析到实际文件）。第 150 批接线 9 件后重算：canvasCommands 组 4 件清零、panoramaSceneNode 组 5 件接通。
+> 可达 **765** / 孤立 **473** / 断链 **0** / 解析失败 **0**（断链为 0 说明整个仓库的相对 import 都能解析到实际文件）。第 150 批接线 9 件（canvasCommands 组清零、panoramaSceneNode 组 5 件）、第 151 批接线 1 件（interaction/previewCommitSession）后重算。
 > 另有 5 个 `vendor/three/**` 文件可达，不计入 scope。
 
 > 某个模块接线后，从本表删掉它，并同步 `docs/TRACKING.md` §5 的计数。重算：`node deobf-tools/b126/reach.mjs`。
@@ -27,7 +27,7 @@
 | `src/core/` | 9 |
 | `src/modules/settings/` | 8 |
 | `src/modules/runninghubAiApp/` | 7 |
-| `src/modules/interaction/` | 6 |
+| `src/modules/interaction/` | 5 |
 | `api/` | 4 |
 | `api/utils/` | 4 |
 | `src/hooks/` | 4 |
@@ -106,9 +106,9 @@ apiConfigSavePresentation.js、apiRouteSelection.js、canvasControlSettings.js�
 
 rhAiAppFieldMetadata.js、rhAiAppMotion.js、rhAiAppPersistence.js、rhAiAppPreviewPresentation.js、rhAiAppRunningHubProfile.js、rhAiAppSaveAction.js、rhAiAppSources.js
 
-## `src/modules/interaction/`（6）
+## `src/modules/interaction/`（5）
 
-WheelPanController.js、contextMenuIcons.js、dropTargetSpatialQuery.js、previewCommitSession.js、viewportAutoPan.js、viewportPreviewCoordinator.js
+WheelPanController.js、contextMenuIcons.js、dropTargetSpatialQuery.js、viewportAutoPan.js、viewportPreviewCoordinator.js
 
 ## `api/`（4）
 

@@ -113,3 +113,29 @@ fields[1] = { id: 'extend_from_task_id', type: 'text', defaultValue: '', allowEm
 
 因此整批若要继续，必须：**逐件验证 + 失败即回滚 + 按依赖闭包分组**，
 而不是把 104 件当作一次批量替换。
+
+## 7. 第 151 批续：`src/core` 干净件（6 取 5）
+
+按同一工序对 `src/core` 的 6 个干净候选（onlyRepo=0、非受保护）升代：
+
+| 文件 | 改名 | 结果 |
+| --- | --- | --- |
+| `rendererResizePreview.js` | 23 | 保留 |
+| `viewportFocus.js` | 79 | 保留 |
+| `viewportPanPreview.js` | 32 | 保留 |
+| `stores/legacyKernelStore.js` | 664 | 保留 |
+| `stores/facadeStore.js` | 5 | 保留 |
+| `generationTaskRuntime.js` | 289 | **回滚**（自身测试约 24 例回归，同 §4.2 性质） |
+
+机械工序 6/6 全过（导出面 6/6 完全一致、`_0x` 残留 0）。保留 5 件后：
+core 目录 266/266、stores 目录 21/21；孤立模块再接通 **11 件**（368 口径 356 → 345）：
+`canvasZoom`、`nodeGeometryOverlay`、`rendererGeometryPreview`、`rendererViewportTransform`、
+`viewportGridDots`、`interaction/previewCommitSession` 与 stores 族 5 件
+（`generationHistoryState`、`graphMutationBoundary`、`graphMutationImpact`、`rendererStateRevisions`、`viewportScreenFrame`）。
+
+**既有雷（非本批引入）**：`stores/runtime.js` 第 1 行以本地名 `legacyKernelStore_2` 导入
+`legacyKernelStore.js` 并在第 3 行顶层急切解引用，而 `legacyKernelStore.js` 的依赖链可达
+`runtime.js`——以任一文件为**直接入口**做 bare 导入必触发 TDZ
+（`Cannot access 'legacyKernelStore_2' before initialization`）。
+HEAD 原件同样必挂，属循环导入 + 求值顺序的环境性产物；应用内入口顺序不同所以不炸。
+修复需改在用 `runtime.js` 初始化顺序，须单独授权。bare 导入闸门对 stores 件以目录测试替代。
